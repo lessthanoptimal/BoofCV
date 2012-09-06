@@ -18,7 +18,7 @@
 
 package boofcv.alg.feature.orientation;
 
-import boofcv.abst.feature.detect.extract.GeneralFeatureDetector;
+import boofcv.abst.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.abst.filter.derivative.AnyImageDerivative;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.alg.transform.ii.GIntegralImageOps;
@@ -46,9 +46,8 @@ import java.util.ArrayList;
  *
  * @author Peter Abeles
  */
-public class ShowFeatureOrientationApp <T extends ImageSingleBand, D extends ImageSingleBand>
-		extends SelectAlgorithmAndInputPanel
-{
+public class ShowFeatureOrientationApp<T extends ImageSingleBand, D extends ImageSingleBand>
+		extends SelectAlgorithmAndInputPanel {
 	ImagePanel panel;
 
 	static int NUM_FEATURES = 500;
@@ -66,23 +65,23 @@ public class ShowFeatureOrientationApp <T extends ImageSingleBand, D extends Ima
 		this.imageType = imageType;
 		this.derivType = derivType;
 
-		addAlgorithm(0, "Pixel", FactoryOrientationAlgs.nogradient(radius,imageType));
-		addAlgorithm(0, "Gradient Average", FactoryOrientationAlgs.average(radius,false,derivType));
-		addAlgorithm(0, "Gradient Average Weighted", FactoryOrientationAlgs.average(radius,true,derivType));
-		addAlgorithm(0, "Gradient Histogram 10", FactoryOrientationAlgs.histogram(10,radius,false,derivType));
-		addAlgorithm(0, "Gradient Histogram 10 Weighted", FactoryOrientationAlgs.histogram(10,radius,true,derivType));
-		addAlgorithm(0, "Gradient Sliding", FactoryOrientationAlgs.sliding(20,Math.PI/3.0,radius,false,derivType));
-		addAlgorithm(0, "Gradient Sliding Weighted", FactoryOrientationAlgs.sliding(20,Math.PI/3.0,radius,true,derivType));
-		addAlgorithm(0, "Integral Average", FactoryOrientationAlgs.average_ii(radius,1,4,0,imageType));
-		addAlgorithm(0, "Integral Average Weighted", FactoryOrientationAlgs.average_ii(radius,1,4,-1,imageType));
-		addAlgorithm(0, "Integral Sliding", FactoryOrientationAlgs.sliding_ii(1, 1,4,0, 4, imageType));
-		addAlgorithm(0, "Integral Sliding Weighted", FactoryOrientationAlgs.sliding_ii(1, 1,4,-1, 4, imageType));
+		addAlgorithm(0, "Pixel", FactoryOrientationAlgs.nogradient(radius, imageType));
+		addAlgorithm(0, "Gradient Average", FactoryOrientationAlgs.average(radius, false, derivType));
+		addAlgorithm(0, "Gradient Average Weighted", FactoryOrientationAlgs.average(radius, true, derivType));
+		addAlgorithm(0, "Gradient Histogram 10", FactoryOrientationAlgs.histogram(10, radius, false, derivType));
+		addAlgorithm(0, "Gradient Histogram 10 Weighted", FactoryOrientationAlgs.histogram(10, radius, true, derivType));
+		addAlgorithm(0, "Gradient Sliding", FactoryOrientationAlgs.sliding(20, Math.PI / 3.0, radius, false, derivType));
+		addAlgorithm(0, "Gradient Sliding Weighted", FactoryOrientationAlgs.sliding(20, Math.PI / 3.0, radius, true, derivType));
+		addAlgorithm(0, "Integral Average", FactoryOrientationAlgs.average_ii(radius, 1, 4, 0, imageType));
+		addAlgorithm(0, "Integral Average Weighted", FactoryOrientationAlgs.average_ii(radius, 1, 4, -1, imageType));
+		addAlgorithm(0, "Integral Sliding", FactoryOrientationAlgs.sliding_ii(1, 1, 4, 0, 4, imageType));
+		addAlgorithm(0, "Integral Sliding Weighted", FactoryOrientationAlgs.sliding_ii(1, 1, 4, -1, 4, imageType));
 
 		panel = new ImagePanel();
 		setMainGUI(panel);
 	}
 
-	public synchronized void process( final BufferedImage input ) {
+	public synchronized void process(final BufferedImage input) {
 		setInputImage(input);
 
 		panel.setBufferedImage(input);
@@ -90,71 +89,73 @@ public class ShowFeatureOrientationApp <T extends ImageSingleBand, D extends Ima
 		doRefreshAll();
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
-				setPreferredSize(new Dimension(input.getWidth(),input.getHeight()));
-				setSize(input.getWidth(),input.getHeight());
+				setPreferredSize(new Dimension(input.getWidth(), input.getHeight()));
+				setSize(input.getWidth(), input.getHeight());
 				hasProcessed = true;
-			}});
+			}
+		});
 	}
 
 	@Override
-	public void loadConfigurationFile(String fileName) {}
+	public void loadConfigurationFile(String fileName) {
+	}
 
 	@Override
 	public void refreshAll(Object[] cookies) {
-		setActiveAlgorithm(0,null,cookies[0]);
+		setActiveAlgorithm(0, null, cookies[0]);
 	}
 
 	@Override
 	public synchronized void setActiveAlgorithm(int indexFamily, String name, Object cookie) {
-		if( input == null )
+		if (input == null)
 			return;
-		
-		RegionOrientation orientation = (RegionOrientation)cookie;
+
+		RegionOrientation orientation = (RegionOrientation) cookie;
 
 		T workImage = ConvertBufferedImage.convertFromSingle(input, null, imageType);
-		AnyImageDerivative<T,D> deriv = GImageDerivativeOps.createDerivatives(imageType, FactoryImageGenerator.create(derivType));
+		AnyImageDerivative<T, D> deriv = GImageDerivativeOps.createDerivatives(imageType, FactoryImageGenerator.create(derivType));
 		deriv.setInput(workImage);
 
 		int r = 2;
-		GeneralFeatureDetector<T,D> detector =  FactoryDetectPoint.createHarris(r, false, 1, NUM_FEATURES, derivType);
+		GeneralFeatureDetector<T, D> detector = FactoryDetectPoint.createHarris(r, false, 1, NUM_FEATURES, derivType);
 
-		D derivX=null,derivY=null,derivXX=null,derivYY=null,derivXY=null;
+		D derivX = null, derivY = null, derivXX = null, derivYY = null, derivXY = null;
 
-		if( detector.getRequiresGradient() ) {
+		if (detector.getRequiresGradient()) {
 			derivX = deriv.getDerivative(true);
 			derivY = deriv.getDerivative(false);
-		} else if( detector.getRequiresHessian() ) {
-			derivXX = deriv.getDerivative(true,true);
-			derivYY = deriv.getDerivative(false,false);
-			derivXY = deriv.getDerivative(true,false);
+		} else if (detector.getRequiresHessian()) {
+			derivXX = deriv.getDerivative(true, true);
+			derivYY = deriv.getDerivative(false, false);
+			derivXY = deriv.getDerivative(true, false);
 		}
-		detector.process(workImage,derivX,derivY,derivXX,derivYY,derivXY);
+		detector.process(workImage, derivX, derivY, derivXX, derivYY, derivXY);
 
 		QueueCorner points = detector.getFeatures();
 
 		FancyInterestPointRender render = new FancyInterestPointRender();
 
-		if( orientation instanceof OrientationGradient ) {
-			((OrientationGradient<D>)orientation).setImage(deriv.getDerivative(true),deriv.getDerivative(false));
-		} else if( orientation instanceof OrientationIntegral ) {
-			T ii = GIntegralImageOps.transform(workImage,null);
-			((OrientationIntegral<T>)orientation).setImage(ii);
-		} else if( orientation instanceof OrientationImageAverage) {
-			((OrientationImageAverage)orientation).setImage(workImage);
+		if (orientation instanceof OrientationGradient) {
+			((OrientationGradient<D>) orientation).setImage(deriv.getDerivative(true), deriv.getDerivative(false));
+		} else if (orientation instanceof OrientationIntegral) {
+			T ii = GIntegralImageOps.transform(workImage, null);
+			((OrientationIntegral<T>) orientation).setImage(ii);
+		} else if (orientation instanceof OrientationImageAverage) {
+			((OrientationImageAverage) orientation).setImage(workImage);
 		} else {
 			throw new IllegalArgumentException("Unknown algorithm type.");
 		}
 
-		for( int i = 0; i < points.size; i++ ) {
+		for (int i = 0; i < points.size; i++) {
 			Point2D_I16 p = points.get(i);
-			double angle = orientation.compute(p.x,p.y);
-			render.addCircle(p.x,p.y,radius, Color.RED,angle);
+			double angle = orientation.compute(p.x, p.y);
+			render.addCircle(p.x, p.y, radius, Color.RED, angle);
 		}
 
-		BufferedImage temp = new BufferedImage(input.getWidth(),input.getHeight(),input.getType());
-		Graphics2D g2 = (Graphics2D)temp.getGraphics();
+		BufferedImage temp = new BufferedImage(input.getWidth(), input.getHeight(), input.getType());
+		Graphics2D g2 = (Graphics2D) temp.getGraphics();
 
-		g2.drawImage(input,0,0,null);
+		g2.drawImage(input, 0, 0, null);
 		g2.setStroke(new BasicStroke(2.5f));
 		render.draw(g2);
 		panel.setBufferedImage(temp);
@@ -165,7 +166,7 @@ public class ShowFeatureOrientationApp <T extends ImageSingleBand, D extends Ima
 	public synchronized void changeInput(String name, int index) {
 		BufferedImage image = media.openImage(inputRefs.get(index).getPath());
 
-		if( image != null ) {
+		if (image != null) {
 			process(image);
 		}
 	}
@@ -175,27 +176,27 @@ public class ShowFeatureOrientationApp <T extends ImageSingleBand, D extends Ima
 		return hasProcessed;
 	}
 
-	public static void main( String args[] ) {
-		ShowFeatureOrientationApp<ImageFloat32,ImageFloat32> app =
+	public static void main(String args[]) {
+		ShowFeatureOrientationApp<ImageFloat32, ImageFloat32> app =
 				new ShowFeatureOrientationApp<ImageFloat32, ImageFloat32>(ImageFloat32.class, ImageFloat32.class);
 
 //		ShowFeatureOrientationApp<ImageUInt8, ImageSInt16> app =
 //				new ShowFeatureOrientationApp<ImageUInt8,ImageSInt16>(input,ImageUInt8.class, ImageSInt16.class);
 
 		java.util.List<PathLabel> inputs = new ArrayList<PathLabel>();
-		inputs.add(new PathLabel("shapes","../data/evaluation/shapes01.png"));
-		inputs.add(new PathLabel("sunflowers","../data/evaluation/sunflowers.png"));
-		inputs.add(new PathLabel("beach","../data/evaluation/scale/beach02.jpg"));
+		inputs.add(new PathLabel("shapes", "../data/evaluation/shapes01.png"));
+		inputs.add(new PathLabel("sunflowers", "../data/evaluation/sunflowers.png"));
+		inputs.add(new PathLabel("beach", "../data/evaluation/scale/beach02.jpg"));
 
 		app.setInputList(inputs);
 
 		// wait for it to process one image so that the size isn't all screwed up
-		while( !app.getHasProcessedImage() ) {
+		while (!app.getHasProcessedImage()) {
 			Thread.yield();
 		}
 
 		System.out.println("Calling show window");
-		ShowImages.showWindow(app,"Feature Orientation");
+		ShowImages.showWindow(app, "Feature Orientation");
 		System.out.println("Done");
 	}
 }

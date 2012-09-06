@@ -18,7 +18,7 @@
 
 package boofcv.benchmark.feature.corner;
 
-import boofcv.abst.feature.detect.extract.GeneralFeatureDetector;
+import boofcv.abst.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.abst.filter.derivative.ImageHessian;
 import boofcv.core.image.GeneralizedImageOps;
@@ -57,19 +57,19 @@ public class BenchmarkCornerRuntime {
 	static boolean includeGradient = true;
 
 	public static class Detector<T extends ImageSingleBand, D extends ImageSingleBand> extends PerformerBase {
-		GeneralFeatureDetector<T,D> alg;
-		ImageGradient<T,D> gradient;
+		GeneralFeatureDetector<T, D> alg;
+		ImageGradient<T, D> gradient;
 		ImageHessian<D> hessian;
 
-		D derivX,derivY;
-		D derivXX,derivYY,derivXY;
+		D derivX, derivY;
+		D derivXX, derivYY, derivXY;
 
 		T input;
 
-		public Detector(GeneralFeatureDetector<T,D> alg, T input , Class<T> imageType , Class<D> derivType) {
+		public Detector(GeneralFeatureDetector<T, D> alg, T input, Class<T> imageType, Class<D> derivType) {
 			this.alg = alg;
 			this.input = input;
-			gradient = FactoryDerivative.sobel(imageType,derivType);
+			gradient = FactoryDerivative.sobel(imageType, derivType);
 			hessian = FactoryDerivative.hessianSobel(derivType);
 
 			derivX = GeneralizedImageOps.createSingleBand(derivType, imgWidth, imgHeight);
@@ -82,52 +82,52 @@ public class BenchmarkCornerRuntime {
 		@Override
 		public void process() {
 
-			if( includeGradient ) {
-				if( alg.getRequiresGradient() || alg.getRequiresHessian() ) {
-					gradient.process(input,derivX,derivY);
+			if (includeGradient) {
+				if (alg.getRequiresGradient() || alg.getRequiresHessian()) {
+					gradient.process(input, derivX, derivY);
 				}
 
-				if( alg.getRequiresHessian()) {
-					hessian.process(derivX,derivY,derivXX,derivYY,derivXY);
+				if (alg.getRequiresHessian()) {
+					hessian.process(derivX, derivY, derivXX, derivYY, derivXY);
 				}
 			}
 
-			alg.process(input,derivX, derivY,derivXX,derivYY,derivXY);
+			alg.process(input, derivX, derivY, derivXX, derivYY, derivXY);
 		}
 	}
 
 	public static void benchmark(GeneralFeatureDetector alg, String name) {
 		ImageSingleBand input = imageType == ImageFloat32.class ? image_F32 : image_I8;
-		double opsPerSec = ProfileOperation.profileOpsPerSec(new Detector(alg,input,imageType,derivType), TEST_TIME, false);
+		double opsPerSec = ProfileOperation.profileOpsPerSec(new Detector(alg, input, imageType, derivType), TEST_TIME, false);
 
 		System.out.printf("%30s ops/sec = %6.2f\n", name, opsPerSec);
 	}
 
-	public static GeneralFeatureDetector<?,?> createMedian() {
+	public static GeneralFeatureDetector<?, ?> createMedian() {
 		return FactoryDetectPoint.createMedian(windowRadius, 1, maxFeatures, imageType);
 	}
 
-	public static GeneralFeatureDetector<?,?> createFast12() {
+	public static GeneralFeatureDetector<?, ?> createFast12() {
 		return FactoryDetectPoint.createFast(windowRadius, 30, maxFeatures, imageType);
 	}
 
-	public static GeneralFeatureDetector<?,?> createHarris() {
+	public static GeneralFeatureDetector<?, ?> createHarris() {
 		return FactoryDetectPoint.createHarris(windowRadius, false, 1, maxFeatures, derivType);
 	}
 
-	public static GeneralFeatureDetector<?,?> createKitRos() {
+	public static GeneralFeatureDetector<?, ?> createKitRos() {
 		return FactoryDetectPoint.createKitRos(windowRadius, 1, maxFeatures, derivType);
 	}
 
-	public static GeneralFeatureDetector<?,?> createShiTomasi() {
+	public static GeneralFeatureDetector<?, ?> createShiTomasi() {
 		return FactoryDetectPoint.createShiTomasi(windowRadius, false, 1, maxFeatures, derivType);
 	}
 
 	public static void main(String args[]) {
 		String pre = "../data/evaluation/";
 
-		FileImageSequence<ImageUInt8> sequence_U8 = new FileImageSequence<ImageUInt8>(ImageUInt8.class,"indoors01.jpg", "outdoors01.jpg", "particles01.jpg");
-		FileImageSequence<ImageFloat32> sequence_F32 = new FileImageSequence<ImageFloat32>(ImageFloat32.class,"indoors01.jpg", "outdoors01.jpg", "particles01.jpg");
+		FileImageSequence<ImageUInt8> sequence_U8 = new FileImageSequence<ImageUInt8>(ImageUInt8.class, "indoors01.jpg", "outdoors01.jpg", "particles01.jpg");
+		FileImageSequence<ImageFloat32> sequence_F32 = new FileImageSequence<ImageFloat32>(ImageFloat32.class, "indoors01.jpg", "outdoors01.jpg", "particles01.jpg");
 
 		sequence_U8.setPrefix(pre);
 		sequence_F32.setPrefix(pre);

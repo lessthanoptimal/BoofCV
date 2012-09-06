@@ -19,7 +19,6 @@
 package boofcv.factory.feature.detect.interest;
 
 import boofcv.abst.feature.detect.extract.FeatureExtractor;
-import boofcv.abst.feature.detect.extract.GeneralFeatureDetector;
 import boofcv.abst.feature.detect.interest.*;
 import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.abst.filter.derivative.ImageHessian;
@@ -36,24 +35,23 @@ import boofcv.struct.image.ImageSingleBand;
 /**
  * Factory for creating interest point detectors which conform to the {@link InterestPointDetector}
  * interface
- *
+ * <p/>
  * <p>
  * NOTE: Higher level interface than {@link GeneralFeatureDetector}.  This will automatically
  * compute image derivatives across scale space as needed, unlike GeneralFeatureDetector which
  * just detects features at a particular scale and requires image derivatives be passed in.
  * </p>
  *
+ * @author Peter Abeles
  * @see FactoryFeatureExtractor
  * @see FactoryInterestPoint
- *
- * @author Peter Abeles
  */
 public class FactoryInterestPoint {
 
 	/**
 	 * Wraps {@link GeneralFeatureDetector} inside an {@link InterestPointDetector}.
 	 *
-	 * @param feature Feature detector.
+	 * @param feature   Feature detector.
 	 * @param inputType Image type of input image.
 	 * @param inputType Image type for gradient.
 	 * @return The interest point detector.
@@ -61,25 +59,25 @@ public class FactoryInterestPoint {
 	public static <T extends ImageSingleBand, D extends ImageSingleBand>
 	InterestPointDetector<T> wrapPoint(GeneralFeatureDetector<T, D> feature, Class<T> inputType, Class<D> derivType) {
 
-		ImageGradient<T,D> gradient = null;
+		ImageGradient<T, D> gradient = null;
 		ImageHessian<D> hessian = null;
 		ImageGenerator<D> derivativeGenerator = null;
 
-		if( feature.getRequiresGradient() || feature.getRequiresHessian() )
-			gradient = FactoryDerivative.sobel(inputType,derivType);
-		if( feature.getRequiresHessian() )
-			hessian  = FactoryDerivative.hessianSobel(derivType);
-		if( gradient != null || hessian != null )
+		if (feature.getRequiresGradient() || feature.getRequiresHessian())
+			gradient = FactoryDerivative.sobel(inputType, derivType);
+		if (feature.getRequiresHessian())
+			hessian = FactoryDerivative.hessianSobel(derivType);
+		if (gradient != null || hessian != null)
 			derivativeGenerator = FactoryImageGenerator.create(derivType);
 
-		return new WrapCornerToInterestPoint<T,D>(feature,gradient,hessian,derivativeGenerator);
+		return new WrapCornerToInterestPoint<T, D>(feature, gradient, hessian, derivativeGenerator);
 	}
 
 	/**
 	 * Wraps {@link FeatureLaplaceScaleSpace} inside an {@link InterestPointDetector}.
 	 *
-	 * @param feature Feature detector.
-	 * @param scales Scales at which features are detected at.
+	 * @param feature   Feature detector.
+	 * @param scales    Scales at which features are detected at.
 	 * @param inputType Image type of input image.
 	 * @return The interest point detector.
 	 */
@@ -88,17 +86,17 @@ public class FactoryInterestPoint {
 										  double[] scales,
 										  Class<T> inputType) {
 
-		GaussianScaleSpace<T,D> ss = FactoryGaussianScaleSpace.nocache(inputType);
+		GaussianScaleSpace<T, D> ss = FactoryGaussianScaleSpace.nocache(inputType);
 		ss.setScales(scales);
 
-		return new WrapFLSStoInterestPoint<T,D>(feature,ss);
+		return new WrapFLSStoInterestPoint<T, D>(feature, ss);
 	}
 
 	/**
 	 * Wraps {@link FeatureScaleSpace} inside an {@link InterestPointDetector}.
 	 *
-	 * @param feature Feature detector.
-	 * @param scales Scales at which features are detected at.
+	 * @param feature   Feature detector.
+	 * @param scales    Scales at which features are detected at.
 	 * @param inputType Image type of input image.
 	 * @return The interest point detector.
 	 */
@@ -107,16 +105,16 @@ public class FactoryInterestPoint {
 										  double[] scales,
 										  Class<T> inputType) {
 
-		ScaleSpacePyramid<T> ss = new ScaleSpacePyramid<T>(inputType,scales);
+		ScaleSpacePyramid<T> ss = new ScaleSpacePyramid<T>(inputType, scales);
 
-		return new WrapFLPtoInterestPoint<T,D>(feature,ss);
+		return new WrapFLPtoInterestPoint<T, D>(feature, ss);
 	}
 
 	/**
 	 * Wraps {@link FeatureScaleSpace} inside an {@link InterestPointDetector}.
 	 *
-	 * @param feature Feature detector.
-	 * @param scales Scales at which features are detected at.
+	 * @param feature   Feature detector.
+	 * @param scales    Scales at which features are detected at.
 	 * @param inputType Image type of input image.
 	 * @return The interest point detector.
 	 */
@@ -125,17 +123,17 @@ public class FactoryInterestPoint {
 										  double[] scales,
 										  Class<T> inputType) {
 
-		GaussianScaleSpace<T,D> ss = FactoryGaussianScaleSpace.nocache(inputType);
+		GaussianScaleSpace<T, D> ss = FactoryGaussianScaleSpace.nocache(inputType);
 		ss.setScales(scales);
 
-		return new WrapFSStoInterestPoint<T,D>(feature,ss);
+		return new WrapFSStoInterestPoint<T, D>(feature, ss);
 	}
 
 	/**
 	 * Wraps {@link FeaturePyramid} inside an {@link InterestPointDetector}.
 	 *
-	 * @param feature Feature detector.
-	 * @param scales Scales at which features are detected at.
+	 * @param feature   Feature detector.
+	 * @param scales    Scales at which features are detected at.
 	 * @param inputType Image type of input image.
 	 * @return The interest point detector.
 	 */
@@ -144,36 +142,34 @@ public class FactoryInterestPoint {
 										  double[] scales,
 										  Class<T> inputType) {
 
-		ScaleSpacePyramid<T> ss = new ScaleSpacePyramid<T>(inputType,scales);
+		ScaleSpacePyramid<T> ss = new ScaleSpacePyramid<T>(inputType, scales);
 
-		return new WrapFPtoInterestPoint<T,D>(feature,ss);
+		return new WrapFPtoInterestPoint<T, D>(feature, ss);
 	}
 
 	/**
 	 * Creates a {@link FastHessianFeatureDetector} detector which is wrapped inside
 	 * an {@link InterestPointDetector}
 	 *
-	 * @see FastHessianFeatureDetector
-	 *
-	 * @param detectThreshold Minimum feature intensity. Image dependent.  Start tuning at 1.
-	 * @param extractRadius Radius used for non-max-suppression.  Typically 1 or 2.
-	 * @param maxFeaturesPerScale Number of features it will find or if <= 0 it will return all features it finds.
-	 * @param initialSampleSize How often pixels are sampled in the first octave.  Typically 1 or 2.
-	 * @param initialSize Typically 9.
+	 * @param detectThreshold       Minimum feature intensity. Image dependent.  Start tuning at 1.
+	 * @param extractRadius         Radius used for non-max-suppression.  Typically 1 or 2.
+	 * @param maxFeaturesPerScale   Number of features it will find or if <= 0 it will return all features it finds.
+	 * @param initialSampleSize     How often pixels are sampled in the first octave.  Typically 1 or 2.
+	 * @param initialSize           Typically 9.
 	 * @param numberScalesPerOctave Typically 4.
-	 * @param numberOfOctaves Typically 4.
+	 * @param numberOfOctaves       Typically 4.
 	 * @return The interest point detector.
+	 * @see FastHessianFeatureDetector
 	 */
 	public static <T extends ImageSingleBand>
 	InterestPointDetector<T> fastHessian(float detectThreshold,
 										 int extractRadius, int maxFeaturesPerScale,
 										 int initialSampleSize, int initialSize,
 										 int numberScalesPerOctave,
-										 int numberOfOctaves)
-	{
+										 int numberOfOctaves) {
 		FeatureExtractor extractor = FactoryFeatureExtractor.nonmax(extractRadius, detectThreshold, 5, true);
-		FastHessianFeatureDetector feature = new FastHessianFeatureDetector<T>(extractor,maxFeaturesPerScale,
-				initialSampleSize, initialSize,numberScalesPerOctave,numberOfOctaves);
+		FastHessianFeatureDetector feature = new FastHessianFeatureDetector<T>(extractor, maxFeaturesPerScale,
+				initialSampleSize, initialSize, numberScalesPerOctave, numberOfOctaves);
 
 		return new WrapFHtoInterestPoint(feature);
 	}

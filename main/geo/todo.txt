@@ -22,8 +22,6 @@
   - Need to add functions to geometry math or create a new class
   - Also add a generic Matrix3x3_F64 to georegression
 
-- Optimize Nister 5-pt Essential
-
 - Move Trackers to Features?
 - Reconsider how DLT is handled
  * Have normalization be handled outside of the estimator algorithms

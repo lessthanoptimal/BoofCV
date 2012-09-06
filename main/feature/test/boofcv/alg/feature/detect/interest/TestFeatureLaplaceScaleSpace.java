@@ -18,7 +18,7 @@
 
 package boofcv.alg.feature.detect.interest;
 
-import boofcv.abst.feature.detect.extract.GeneralFeatureDetector;
+import boofcv.abst.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.abst.filter.ImageFunctionSparse;
 import boofcv.factory.filter.derivative.FactoryDerivativeSparse;
 import boofcv.factory.transform.gss.FactoryGaussianScaleSpace;
@@ -35,19 +35,19 @@ public class TestFeatureLaplaceScaleSpace extends GenericFeatureScaleDetector {
 
 	@Override
 	protected Object createDetector(GeneralFeatureDetector<ImageFloat32, ImageFloat32> detector) {
-		ImageFunctionSparse<ImageFloat32> sparseLaplace = FactoryDerivativeSparse.createLaplacian(ImageFloat32.class,null);
+		ImageFunctionSparse<ImageFloat32> sparseLaplace = FactoryDerivativeSparse.createLaplacian(ImageFloat32.class, null);
 
-		return new FeatureLaplaceScaleSpace<ImageFloat32,ImageFloat32>(detector,sparseLaplace,2);
+		return new FeatureLaplaceScaleSpace<ImageFloat32, ImageFloat32>(detector, sparseLaplace, 2);
 	}
 
 	@Override
 	protected List<Point2D_I32> detectFeature(ImageFloat32 input, double[] scales, Object detector) {
-		GaussianScaleSpace<ImageFloat32,ImageFloat32> ss = FactoryGaussianScaleSpace.nocache_F32();
+		GaussianScaleSpace<ImageFloat32, ImageFloat32> ss = FactoryGaussianScaleSpace.nocache_F32();
 		ss.setScales(scales);
 		ss.setImage(input);
 
-		FeatureLaplaceScaleSpace<ImageFloat32,ImageFloat32> alg = (FeatureLaplaceScaleSpace<ImageFloat32,ImageFloat32>)detector;
+		FeatureLaplaceScaleSpace<ImageFloat32, ImageFloat32> alg = (FeatureLaplaceScaleSpace<ImageFloat32, ImageFloat32>) detector;
 		alg.detect(ss);
-		return (List)alg.getInterestPoints();
+		return (List) alg.getInterestPoints();
 	}
 }

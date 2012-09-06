@@ -18,7 +18,7 @@
 
 package boofcv.alg.feature.detect.interest;
 
-import boofcv.abst.feature.detect.extract.GeneralFeatureDetector;
+import boofcv.abst.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.abst.feature.detect.interest.InterestPointScaleSpace;
 import boofcv.core.image.border.FactoryImageBorderAlgs;
 import boofcv.core.image.border.ImageBorder_F32;
@@ -38,27 +38,25 @@ import java.util.List;
  * Features which are maximums with in a local 2D neighborhood and within the local scale neighbourhood are declared to
  * be features.
  * </p>
- *
+ * <p/>
  * <p>
  * NOTE: Features are not computed for the bottom and top most layers in the pyramid.
  * </p>
- *
+ * <p/>
  * <p>
  * [1] Krystian Mikolajczyk and Cordelia Schmid, "Indexing based on scale invariant interest points"  ICCV 2001. Proceedings.<br>
  * [2] Lindeberg, T., "Feature detection with automatic scale selection." IJCV 30(2) (1998) 79 – 116
  * </p>
  *
- * @see boofcv.factory.feature.detect.interest.FactoryInterestPoint
- *
  * @author Peter Abeles
+ * @see boofcv.factory.feature.detect.interest.FactoryInterestPoint
  */
 @SuppressWarnings({"unchecked"})
 public class FeatureScaleSpace<T extends ImageSingleBand, D extends ImageSingleBand>
-		implements InterestPointScaleSpace<T,D>
-{
+		implements InterestPointScaleSpace<T, D> {
 
 	// generalized feature detector.  Used to find candidate features in each scale's image
-	private GeneralFeatureDetector<T,D> detector;
+	private GeneralFeatureDetector<T, D> detector;
 	private float baseThreshold;
 	// feature intensity in the pyramid
 	protected ImageFloat32 intensities[];
@@ -76,11 +74,11 @@ public class FeatureScaleSpace<T extends ImageSingleBand, D extends ImageSingleB
 	/**
 	 * Create a feature detector.
 	 *
-	 * @param detector Point feature detector which is used to find candidates in each scale level
+	 * @param detector   Point feature detector which is used to find candidates in each scale level
 	 * @param scalePower Used to adjust feature intensity in each level to make them comparable.  Feature dependent, but
-	 * most common features should use a value of 2.
+	 *                   most common features should use a value of 2.
 	 */
-	public FeatureScaleSpace( GeneralFeatureDetector<T, D> detector , double scalePower ) {
+	public FeatureScaleSpace(GeneralFeatureDetector<T, D> detector, double scalePower) {
 		this.detector = detector;
 		this.baseThreshold = detector.getThreshold();
 		this.scalePower = scalePower;
@@ -92,15 +90,15 @@ public class FeatureScaleSpace<T extends ImageSingleBand, D extends ImageSingleB
 	 * @param ss Scale space of an image
 	 */
 	@Override
-	public void detect( GaussianScaleSpace<T,D> ss ) {
+	public void detect(GaussianScaleSpace<T, D> ss) {
 		spaceIndex = 0;
-		if( intensities == null ) {
+		if (intensities == null) {
 			intensities = new ImageFloat32[3];
-			intensities[0] = new ImageFloat32(1,1);
-			intensities[1] = new ImageFloat32(1,1);
-			intensities[2] = new ImageFloat32(1,1);
+			intensities[0] = new ImageFloat32(1, 1);
+			intensities[1] = new ImageFloat32(1, 1);
+			intensities[2] = new ImageFloat32(1, 1);
 
-			maximums = new List[ 3 ];
+			maximums = new List[3];
 			maximums[0] = new ArrayList<Point2D_I16>();
 			maximums[1] = new ArrayList<Point2D_I16>();
 			maximums[2] = new ArrayList<Point2D_I16>();
@@ -108,13 +106,13 @@ public class FeatureScaleSpace<T extends ImageSingleBand, D extends ImageSingleB
 		foundPoints.clear();
 
 		// compute feature intensity in each level
-		for( int i = 0; i < ss.getTotalScales(); i++ ) {
+		for (int i = 0; i < ss.getTotalScales(); i++) {
 			ss.setActiveScale(i);
-			detectCandidateFeatures(ss,ss.getCurrentScale());
+			detectCandidateFeatures(ss, ss.getCurrentScale());
 
 			// find maximum in NxNx3 (local image and scale space) region
-			if( i >= 2 ) {
-				findLocalScaleSpaceMax(ss,i-1);
+			if (i >= 2) {
+				findLocalScaleSpaceMax(ss, i - 1);
 			}
 		}
 	}
@@ -123,69 +121,69 @@ public class FeatureScaleSpace<T extends ImageSingleBand, D extends ImageSingleB
 	/**
 	 * Use the feature detector to find candidate features in each level.  Only compute the needed image derivatives.
 	 */
-	private void detectCandidateFeatures( GaussianScaleSpace<T,D> ss , double scale ) {
+	private void detectCandidateFeatures(GaussianScaleSpace<T, D> ss, double scale) {
 		// adjust corner intensity threshold based upon the current scale factor
-		float scaleThreshold = (float)(baseThreshold/Math.pow(scale,scalePower));
+		float scaleThreshold = (float) (baseThreshold / Math.pow(scale, scalePower));
 		detector.setThreshold(scaleThreshold);
 
 		D derivX = null, derivY = null;
 		D derivXX = null, derivYY = null, derivXY = null;
 
-		if( detector.getRequiresGradient() ) {
+		if (detector.getRequiresGradient()) {
 			derivX = ss.getDerivative(true);
 			derivY = ss.getDerivative(false);
 		}
-		if( detector.getRequiresHessian() ) {
-			derivXX = ss.getDerivative(true,true);
-			derivYY = ss.getDerivative(false,false);
-			derivXY = ss.getDerivative(true,false);
+		if (detector.getRequiresHessian()) {
+			derivXX = ss.getDerivative(true, true);
+			derivYY = ss.getDerivative(false, false);
+			derivXY = ss.getDerivative(true, false);
 		}
 
 		T image = ss.getScaledImage();
-		detector.process(image,derivX,derivY,derivXX,derivYY,derivXY);
+		detector.process(image, derivX, derivY, derivXX, derivYY, derivXY);
 
-		intensities[spaceIndex].reshape(image.width,image.height);
+		intensities[spaceIndex].reshape(image.width, image.height);
 		intensities[spaceIndex].setTo(detector.getIntensity());
 
 		List<Point2D_I16> m = maximums[spaceIndex];
 		m.clear();
 		QueueCorner q = detector.getFeatures();
-		for( int i = 0; i < q.size; i++ ) {
-			m.add( q.get(i).copy() );
+		for (int i = 0; i < q.size; i++) {
+			m.add(q.get(i).copy());
 		}
 
 		spaceIndex++;
-		if( spaceIndex >= 3 )
+		if (spaceIndex >= 3)
 			spaceIndex = 0;
 	}
 
 	/**
 	 * Searches the pyramid layers up and down to see if the found 2D features are also scale space maximums.
 	 */
-	protected void findLocalScaleSpaceMax( GaussianScaleSpace<T,D> ss , int layerID ) {
+	protected void findLocalScaleSpaceMax(GaussianScaleSpace<T, D> ss, int layerID) {
 		int index0 = spaceIndex;
 		int index1 = (spaceIndex + 1) % 3;
 		int index2 = (spaceIndex + 2) % 3;
 
 		List<Point2D_I16> candidates = maximums[index1];
-		ImageBorder_F32 inten0 = (ImageBorder_F32)FactoryImageBorderAlgs.value(intensities[index0], 0);
+		ImageBorder_F32 inten0 = (ImageBorder_F32) FactoryImageBorderAlgs.value(intensities[index0], 0);
 		ImageFloat32 inten1 = intensities[index1];
-		ImageBorder_F32 inten2 = (ImageBorder_F32)FactoryImageBorderAlgs.value(intensities[index2], 0);
+		ImageBorder_F32 inten2 = (ImageBorder_F32) FactoryImageBorderAlgs.value(intensities[index2], 0);
 
-		float scale0 = (float)ss.getScale(layerID-1);
-		float scale1 = (float)ss.getScale(layerID);
-		float scale2 = (float)ss.getScale(layerID+1);
+		float scale0 = (float) ss.getScale(layerID - 1);
+		float scale1 = (float) ss.getScale(layerID);
+		float scale2 = (float) ss.getScale(layerID + 1);
 
-		float ss0 = (float)Math.pow(scale0,scalePower);
-		float ss1 = (float)Math.pow(scale1,scalePower);
-		float ss2 = (float)Math.pow(scale2,scalePower);
+		float ss0 = (float) Math.pow(scale0, scalePower);
+		float ss1 = (float) Math.pow(scale1, scalePower);
+		float ss2 = (float) Math.pow(scale2, scalePower);
 
-		for( Point2D_I16 c : candidates ) {
-			float val = ss1*inten1.get(c.x,c.y);
+		for (Point2D_I16 c : candidates) {
+			float val = ss1 * inten1.get(c.x, c.y);
 
-			if( checkMax(inten0, val/ss0, c.x, c.y) && checkMax(inten2, val/ss2, c.x, c.y) ) {
+			if (checkMax(inten0, val / ss0, c.x, c.y) && checkMax(inten2, val / ss2, c.x, c.y)) {
 				// put features into the scale of the upper image
-				foundPoints.add( new ScalePoint(c.x,c.y,scale1));
+				foundPoints.add(new ScalePoint(c.x, c.y, scale1));
 			}
 		}
 	}
@@ -193,10 +191,10 @@ public class FeatureScaleSpace<T extends ImageSingleBand, D extends ImageSingleB
 	protected static boolean checkMax(ImageBorder_F32 inten, float bestScore, int c_x, int c_y) {
 		boolean isMax = true;
 		beginLoop:
-		for( int i = c_y -1; i <= c_y+1; i++ ) {
-			for( int j = c_x-1; j <= c_x+1; j++ ) {
+		for (int i = c_y - 1; i <= c_y + 1; i++) {
+			for (int j = c_x - 1; j <= c_x + 1; j++) {
 
-				if( inten.get(j,i) >= bestScore ) {
+				if (inten.get(j, i) >= bestScore) {
 					isMax = false;
 					break beginLoop;
 				}

@@ -18,7 +18,7 @@
 
 package boofcv.alg.feature.detect.interest;
 
-import boofcv.abst.feature.detect.extract.GeneralFeatureDetector;
+import boofcv.abst.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.abst.feature.detect.interest.InterestPointDetector;
 import boofcv.alg.feature.detect.ImageCorruptPanel;
 import boofcv.alg.feature.detect.intensity.HessianBlobIntensity;
@@ -47,13 +47,12 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class DetectFeaturePointApp<T extends ImageSingleBand, D extends ImageSingleBand>
-		extends SelectAlgorithmAndInputPanel implements ImageCorruptPanel.Listener
-{
+		extends SelectAlgorithmAndInputPanel implements ImageCorruptPanel.Listener {
 
 	static int maxFeatures = 400;
-	static int maxScaleFeatures = maxFeatures/3;
-	
-	public double[] scales = new double[]{1,1.5,2,3,4,6,8,12};
+	static int maxScaleFeatures = maxFeatures / 3;
+
+	public double[] scales = new double[]{1, 1.5, 2, 3, 4, 6, 8, 12};
 	int radius = 2;
 	float thresh = 1;
 	T grayImage;
@@ -67,11 +66,11 @@ public class DetectFeaturePointApp<T extends ImageSingleBand, D extends ImageSin
 	ImagePanel panel;
 	ImageCorruptPanel corruptPanel;
 
-	public DetectFeaturePointApp( Class<T> imageType , Class<D> derivType ) {
+	public DetectFeaturePointApp(Class<T> imageType, Class<D> derivType) {
 		super(1);
 		this.imageType = imageType;
 
-		GeneralFeatureDetector<T,D> alg;
+		GeneralFeatureDetector<T, D> alg;
 
 		alg = FactoryDetectPoint.createHarris(radius, false, thresh, maxFeatures, derivType);
 		addAlgorithm(0, "Harris", FactoryInterestPoint.wrapPoint(alg, imageType, derivType));
@@ -92,9 +91,9 @@ public class DetectFeaturePointApp<T extends ImageSingleBand, D extends ImageSin
 		alg = FactoryDetectPoint.createHessian(HessianBlobIntensity.Type.TRACE, radius, thresh, maxFeatures, derivType);
 		addAlgorithm(0, "Laplace", FactoryInterestPoint.wrapPoint(alg, imageType, derivType));
 
-		FeatureLaplaceScaleSpace<T,D> flss = FactoryInterestPointAlgs.hessianLaplace(radius, thresh, maxScaleFeatures, imageType, derivType);
+		FeatureLaplaceScaleSpace<T, D> flss = FactoryInterestPointAlgs.hessianLaplace(radius, thresh, maxScaleFeatures, imageType, derivType);
 		addAlgorithm(0, "Hess Lap SS", FactoryInterestPoint.wrapDetector(flss, scales, imageType));
-		FeatureLaplacePyramid<T,D> flp = FactoryInterestPointAlgs.hessianLaplacePyramid(radius, thresh, maxScaleFeatures, imageType, derivType);
+		FeatureLaplacePyramid<T, D> flp = FactoryInterestPointAlgs.hessianLaplacePyramid(radius, thresh, maxScaleFeatures, imageType, derivType);
 		addAlgorithm(0, "Hess Lap P", FactoryInterestPoint.wrapDetector(flp, scales, imageType));
 		addAlgorithm(0, "FastHessian", FactoryInterestPoint.<T>fastHessian(thresh, 5, maxScaleFeatures, 2, 9, 4, 4));
 
@@ -103,17 +102,17 @@ public class DetectFeaturePointApp<T extends ImageSingleBand, D extends ImageSin
 		corruptPanel.setListener(this);
 		panel = new ImagePanel();
 
-		viewArea.add(corruptPanel,BorderLayout.WEST);
-		viewArea.add(panel,BorderLayout.CENTER);
+		viewArea.add(corruptPanel, BorderLayout.WEST);
+		viewArea.add(panel, BorderLayout.CENTER);
 		setMainGUI(viewArea);
 	}
 
-	public void process( BufferedImage input ) {
+	public void process(BufferedImage input) {
 		setInputImage(input);
 		this.input = input;
 		grayImage = ConvertBufferedImage.convertFromSingle(input, null, imageType);
-		corruptImage = (T)grayImage._createNew(grayImage.width,grayImage.height);
-		workImage = new BufferedImage(input.getWidth(),input.getHeight(),BufferedImage.TYPE_INT_BGR);
+		corruptImage = (T) grayImage._createNew(grayImage.width, grayImage.height);
+		workImage = new BufferedImage(input.getWidth(), input.getHeight(), BufferedImage.TYPE_INT_BGR);
 		panel.setBufferedImage(workImage);
 		panel.setPreferredSize(new Dimension(workImage.getWidth(), workImage.getHeight()));
 		doRefreshAll();
@@ -122,11 +121,13 @@ public class DetectFeaturePointApp<T extends ImageSingleBand, D extends ImageSin
 			public void run() {
 				revalidate();
 				processImage = true;
-			}});
+			}
+		});
 	}
 
 	@Override
-	public void loadConfigurationFile(String fileName) {}
+	public void loadConfigurationFile(String fileName) {
+	}
 
 	@Override
 	public void refreshAll(Object[] cookies) {
@@ -135,28 +136,28 @@ public class DetectFeaturePointApp<T extends ImageSingleBand, D extends ImageSin
 
 	@Override
 	public synchronized void setActiveAlgorithm(int indexFamily, String name, Object cookie) {
-		if( input == null )
+		if (input == null)
 			return;
 
 		// corrupt the input image
-		corruptPanel.corruptImage(grayImage,corruptImage);
+		corruptPanel.corruptImage(grayImage, corruptImage);
 
-		final InterestPointDetector<T> det = (InterestPointDetector<T>)cookie;
+		final InterestPointDetector<T> det = (InterestPointDetector<T>) cookie;
 		det.detect(corruptImage);
 
 		double detectorRadius = det.getCanonicalRadius();
 
 		render.reset();
-		if( det.hasScale() ) {
-			for( int i = 0; i < det.getNumberOfFeatures(); i++ ) {
+		if (det.hasScale()) {
+			for (int i = 0; i < det.getNumberOfFeatures(); i++) {
 				Point2D_F64 p = det.getLocation(i);
-				int radius = (int)Math.ceil(det.getScale(i)*detectorRadius);
-				render.addCircle((int)p.x,(int)p.y,radius);
+				int radius = (int) Math.ceil(det.getScale(i) * detectorRadius);
+				render.addCircle((int) p.x, (int) p.y, radius);
 			}
 		} else {
-			for( int i = 0; i < det.getNumberOfFeatures(); i++ ) {
+			for (int i = 0; i < det.getNumberOfFeatures(); i++) {
 				Point2D_F64 p = det.getLocation(i);
-				render.addPoint((int)p.x,(int)p.y,3,Color.RED);
+				render.addPoint((int) p.x, (int) p.y, 3, Color.RED);
 			}
 		}
 
@@ -175,7 +176,7 @@ public class DetectFeaturePointApp<T extends ImageSingleBand, D extends ImageSin
 	public void changeInput(String name, int index) {
 		BufferedImage image = media.openImage(inputRefs.get(index).getPath());
 
-		if( image != null ) {
+		if (image != null) {
 			process(image);
 		}
 	}
@@ -190,23 +191,23 @@ public class DetectFeaturePointApp<T extends ImageSingleBand, D extends ImageSin
 		doRefreshAll();
 	}
 
-	public static void main( String args[] ) {
-		DetectFeaturePointApp app = new DetectFeaturePointApp(ImageFloat32.class,ImageFloat32.class);
+	public static void main(String args[]) {
+		DetectFeaturePointApp app = new DetectFeaturePointApp(ImageFloat32.class, ImageFloat32.class);
 //		DetectFeaturePointApp app = new DetectFeaturePointApp(ImageUInt8.class,ImageSInt16.class);
 
 		List<PathLabel> inputs = new ArrayList<PathLabel>();
-		inputs.add(new PathLabel("shapes","../data/evaluation/shapes01.png"));
-		inputs.add(new PathLabel("sunflowers","../data/evaluation/sunflowers.png"));
-		inputs.add(new PathLabel("beach","../data/evaluation/scale/beach02.jpg"));
+		inputs.add(new PathLabel("shapes", "../data/evaluation/shapes01.png"));
+		inputs.add(new PathLabel("sunflowers", "../data/evaluation/sunflowers.png"));
+		inputs.add(new PathLabel("beach", "../data/evaluation/scale/beach02.jpg"));
 
 		app.setInputList(inputs);
 
 		// wait for it to process one image so that the size isn't all screwed up
-		while( !app.getHasProcessedImage() ) {
+		while (!app.getHasProcessedImage()) {
 			Thread.yield();
 		}
 
-		ShowImages.showWindow(app,"Point Feature");
+		ShowImages.showWindow(app, "Point Feature");
 
 		System.out.println("Done");
 	}

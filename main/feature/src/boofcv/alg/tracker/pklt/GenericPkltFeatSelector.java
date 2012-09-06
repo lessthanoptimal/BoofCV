@@ -18,7 +18,7 @@
 
 package boofcv.alg.tracker.pklt;
 
-import boofcv.abst.feature.detect.extract.GeneralFeatureDetector;
+import boofcv.abst.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.pyramid.ImagePyramid;
@@ -27,17 +27,16 @@ import georegression.struct.point.Point2D_I16;
 import java.util.List;
 
 /**
- * Automatically selects features for the {@link PyramidKltTracker} using a {@link boofcv.abst.feature.detect.extract.GeneralFeatureDetector}.
+ * Automatically selects features for the {@link PyramidKltTracker} using a {@link boofcv.abst.feature.detect.interest.GeneralFeatureDetector}.
  *
  * @author Peter Abeles
  */
 public class GenericPkltFeatSelector<InputImage extends ImageSingleBand, DerivativeImage extends ImageSingleBand>
-		implements PyramidKltFeatureSelector<InputImage,DerivativeImage>
-{
+		implements PyramidKltFeatureSelector<InputImage, DerivativeImage> {
 	// selects corners
-	GeneralFeatureDetector<InputImage,DerivativeImage> detector;
+	GeneralFeatureDetector<InputImage, DerivativeImage> detector;
 	// used to set feature description
-	PyramidKltTracker<InputImage,DerivativeImage> tracker;
+	PyramidKltTracker<InputImage, DerivativeImage> tracker;
 
 	// list of corners which should be ignored by the corner detector
 	QueueCorner excludeList = new QueueCorner(10);
@@ -47,13 +46,13 @@ public class GenericPkltFeatSelector<InputImage extends ImageSingleBand, Derivat
 	ImagePyramid<DerivativeImage> derivX;
 	ImagePyramid<DerivativeImage> derivY;
 
-	public GenericPkltFeatSelector( GeneralFeatureDetector<InputImage,DerivativeImage> detector,
-									PyramidKltTracker<InputImage, DerivativeImage> tracker) {
+	public GenericPkltFeatSelector(GeneralFeatureDetector<InputImage, DerivativeImage> detector,
+								   PyramidKltTracker<InputImage, DerivativeImage> tracker) {
 		this.detector = detector;
 		this.tracker = tracker;
 
 
-		if( detector.getRequiresHessian() )
+		if (detector.getRequiresHessian())
 			throw new IllegalArgumentException("Corner selectors which require the Hessian are not allowed");
 	}
 
@@ -62,41 +61,40 @@ public class GenericPkltFeatSelector<InputImage extends ImageSingleBand, Derivat
 	}
 
 	@Override
-	public void setInputs( ImagePyramid<InputImage> image,
-						ImagePyramid<DerivativeImage> derivX,
-						ImagePyramid<DerivativeImage> derivY)
-	{
+	public void setInputs(ImagePyramid<InputImage> image,
+						  ImagePyramid<DerivativeImage> derivX,
+						  ImagePyramid<DerivativeImage> derivY) {
 		this.image = image;
 		this.derivX = derivX;
 		this.derivY = derivY;
 	}
 
 	@Override
-	public void compute(List<PyramidKltFeature> active, List<PyramidKltFeature> availableData ) {
+	public void compute(List<PyramidKltFeature> active, List<PyramidKltFeature> availableData) {
 
-		float scaleBottom = (float)image.getScale(0);
+		float scaleBottom = (float) image.getScale(0);
 
 		// exclude active tracks
 		excludeList.reset();
-		for( int i = 0; i < active.size(); i++ ) {
+		for (int i = 0; i < active.size(); i++) {
 			PyramidKltFeature f = active.get(i);
-			excludeList.add((int)(f.x/scaleBottom),(int)(f.y/scaleBottom));
+			excludeList.add((int) (f.x / scaleBottom), (int) (f.y / scaleBottom));
 		}
-		
+
 		// find new tracks
 		detector.setExcludedCorners(excludeList);
-		detector.setMaxFeatures(excludeList.size()+availableData.size());
-		detector.process(image.getLayer(0),derivX.getLayer(0),derivY.getLayer(0),null,null,null);
+		detector.setMaxFeatures(excludeList.size() + availableData.size());
+		detector.process(image.getLayer(0), derivX.getLayer(0), derivY.getLayer(0), null, null, null);
 
 		// extract the features
 		QueueCorner found = detector.getFeatures();
 
-		for( int i = 0; i < found.size() && !availableData.isEmpty(); i++ ) {
+		for (int i = 0; i < found.size() && !availableData.isEmpty(); i++) {
 			Point2D_I16 pt = found.get(i);
 
-			PyramidKltFeature feat = availableData.remove( availableData.size()-1);
-			feat.x = pt.x*scaleBottom;
-			feat.y = pt.y*scaleBottom;
+			PyramidKltFeature feat = availableData.remove(availableData.size() - 1);
+			feat.x = pt.x * scaleBottom;
+			feat.y = pt.y * scaleBottom;
 
 			tracker.setDescription(feat);
 			active.add(feat);

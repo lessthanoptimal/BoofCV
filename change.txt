@@ -27,6 +27,7 @@ Version : Alpha 0.10
 - InterestPointDetector 
   * WrapFHtoInterestPoint now returns the correct detection radius
   * Fixed non-compliant implementations with incorrectly handled unsupported features.  Thanks jasonnn for submitting this bug
+- GeneralFeatureDetector moved from extract to interest package
 - Fundamental/Essential Matrix
   * 7-point algorithm now returns all solutions and the algorithm was tweaked
   * Nister 5-pt Essential Matrix
@@ -42,6 +43,14 @@ Version : Alpha 0.10
   * Added normalized to distorted pixel transform
   * Tweaked some of the function names
 - SparseIntegralSample_I32.isInBounds() did not return that correct value along the right and bottom image border 
+- Functions inside of GThresholdImageOps did not return the number of blobs found like it should
+  * Thanks jasonnn
+- NonMaxBlockStrict
+  * Figued bug where it assumed intensity values were all positive
+- TemplateMatching
+  * Added code for template matching
+  * Added example code to demonstrate its use
+- Added support for alpha channel in ConvertBufferedImage 
 
 ---------------------------------------------
 Date    : 2012/7/22

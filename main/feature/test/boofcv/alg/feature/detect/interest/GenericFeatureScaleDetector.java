@@ -18,7 +18,7 @@
 
 package boofcv.alg.feature.detect.interest;
 
-import boofcv.abst.feature.detect.extract.GeneralFeatureDetector;
+import boofcv.abst.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.alg.feature.detect.intensity.HessianBlobIntensity;
 import boofcv.factory.feature.detect.interest.FactoryDetectPoint;
 import boofcv.struct.image.ImageFloat32;
@@ -30,16 +30,15 @@ public abstract class GenericFeatureScaleDetector extends GenericFeatureDetector
 
 	int r = 2;
 
-	private GeneralFeatureDetector<ImageFloat32,ImageFloat32> createBlobDetector( int maxFeatures) {
+	private GeneralFeatureDetector<ImageFloat32, ImageFloat32> createBlobDetector(int maxFeatures) {
 		return FactoryDetectPoint.createHessian(HessianBlobIntensity.Type.DETERMINANT,
 				r, 1, maxFeatures, ImageFloat32.class);
 	}
 
 	@Override
-	protected Object createDetector( int maxFeatures )
-	{
+	protected Object createDetector(int maxFeatures) {
 		return createDetector(createBlobDetector(maxFeatures));
 	}
 
-	protected abstract Object createDetector( GeneralFeatureDetector<ImageFloat32, ImageFloat32> detector);
+	protected abstract Object createDetector(GeneralFeatureDetector<ImageFloat32, ImageFloat32> detector);
 }

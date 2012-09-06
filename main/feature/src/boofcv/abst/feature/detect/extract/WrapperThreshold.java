@@ -37,7 +37,7 @@ public class WrapperThreshold implements FeatureExtractor {
 
 	@Override
 	public void process(ImageFloat32 intensity, QueueCorner candidate, int requestedNumber,
-					QueueCorner foundFeature) {
+						QueueCorner foundFeature) {
 		extractor.process(intensity, foundFeature);
 	}
 
@@ -74,6 +74,11 @@ public class WrapperThreshold implements FeatureExtractor {
 	@Override
 	public boolean canDetectBorder() {
 		return true;
+	}
+
+	@Override
+	public void setSearchRadius(int radius) {
+		throw new IllegalArgumentException("Operation not supported");
 	}
 
 	@Override
