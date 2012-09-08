@@ -221,17 +221,17 @@ public class EssentialNister5 {
 		DenseMatrix64F Y = new DenseMatrix64F(3,1);
 
 		// solve for x and y using the first two rows of B
-		A.data[0] = ((helper.K0*z + helper.K1)*z + helper.K2)*z + helper.K3;
-		A.data[1] = ((helper.K4*z + helper.K5)*z + helper.K6)*z + helper.K7;
-		Y.data[0] = (((helper.K8*z + helper.K9)*z + helper.K10)*z + helper.K11)*z + helper.K12;
+		A.data[0] = ((helper.K00*z + helper.K01)*z + helper.K02)*z + helper.K03;
+		A.data[1] = ((helper.K04*z + helper.K05)*z + helper.K06)*z + helper.K07;
+		Y.data[0] = (((helper.K08*z + helper.K09)*z + helper.K10)*z + helper.K11)*z + helper.K12;
 
-		A.data[2] = ((helper.L0*z + helper.L1)*z + helper.L2)*z + helper.L3;
-		A.data[3] = ((helper.L4*z + helper.L5)*z + helper.L6)*z + helper.L7;
-		Y.data[1] = (((helper.L8*z + helper.L9)*z + helper.L10)*z + helper.L11)*z + helper.L12;
+		A.data[2] = ((helper.L00*z + helper.L01)*z + helper.L02)*z + helper.L03;
+		A.data[3] = ((helper.L04*z + helper.L05)*z + helper.L06)*z + helper.L07;
+		Y.data[1] = (((helper.L08*z + helper.L09)*z + helper.L10)*z + helper.L11)*z + helper.L12;
 
-		A.data[4] = ((helper.L0*z + helper.L1)*z + helper.L2)*z + helper.L3;
-		A.data[5] = ((helper.L4*z + helper.L5)*z + helper.L6)*z + helper.L7;
-		Y.data[2] = (((helper.L8*z + helper.L9)*z + helper.L10)*z + helper.L11)*z + helper.L12;
+		A.data[4] = ((helper.L00*z + helper.L01)*z + helper.L02)*z + helper.L03;
+		A.data[5] = ((helper.L04*z + helper.L05)*z + helper.L06)*z + helper.L07;
+		Y.data[2] = (((helper.L08*z + helper.L09)*z + helper.L10)*z + helper.L11)*z + helper.L12;
 
 		CommonOps.scale(-1,Y);
 
