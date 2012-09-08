@@ -18,9 +18,14 @@
 
 package boofcv.alg.distort;
 
+import boofcv.alg.geo.UtilIntrinsic;
+import boofcv.struct.calib.IntrinsicParameters;
+import georegression.geometry.GeometryMath_F64;
+import georegression.struct.point.Point2D_F64;
+import org.ejml.data.DenseMatrix64F;
 import org.junit.Test;
 
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Peter Abeles
@@ -28,8 +33,24 @@ import static org.junit.Assert.fail;
 public class TestNormalizedToPixel_F64 {
 
 	@Test
-	public void stuff() {
-		fail("Implement");
+	public void basicTest() {
+		IntrinsicParameters p = new IntrinsicParameters(1, 2, 3, 4, 5, 200, 300, false, null);
+
+		DenseMatrix64F K = UtilIntrinsic.calibrationMatrix(p, null);
+
+		Point2D_F64 pixel = new Point2D_F64(150, 200);
+		Point2D_F64 expected = new Point2D_F64();
+		Point2D_F64 found = new Point2D_F64();
+
+		GeometryMath_F64.mult(K, pixel, expected);
+
+		NormalizedToPixel_F64 alg = new NormalizedToPixel_F64();
+		alg.set(p.fx, p.fy, p.skew, p.cx, p.cy);
+
+		alg.compute(pixel.x, pixel.y, found);
+
+		assertEquals(expected.x, found.x, 1e-8);
+		assertEquals(expected.y, found.y, 1e-8);
 	}
 
 }
