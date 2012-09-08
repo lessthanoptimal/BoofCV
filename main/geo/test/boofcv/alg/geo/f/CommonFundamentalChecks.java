@@ -36,52 +36,60 @@ import static org.junit.Assert.assertTrue;
  */
 public abstract class CommonFundamentalChecks extends EpipolarTestSimulation {
 
-	public abstract List<DenseMatrix64F> computeFundamental( List<AssociatedPair> pairs );
-	
-	
-	public void checkEpipolarMatrix( int N , boolean isFundamental ) {
-		init(100,isFundamental);
+	double zeroTol = 1e-8;
+
+	public abstract List<DenseMatrix64F> computeFundamental(List<AssociatedPair> pairs);
+
+
+	public void checkEpipolarMatrix(int N, boolean isFundamental) {
+		init(100, isFundamental);
 
 		// run several trials with different inputs of size N
-		for( int trial = 0; trial < 20; trial++ ) {
+		for (int trial = 0; trial < 20; trial++) {
 			List<AssociatedPair> pairs = randomPairs(N);
 
 			List<DenseMatrix64F> l = computeFundamental(pairs);
 
 			// At least one solution should have been found
-			assertTrue(l.size()>0);
+			assertTrue(l.size() > 0);
 
 			int totalMatchedAll = 0;
+			int totalPassedMatrix = 0;
 
-			for( DenseMatrix64F F : l ) {
+			for (DenseMatrix64F F : l) {
 				// sanity check, F is not zero
-				assertTrue(NormOps.normF(F) > 0.1);
+				if (NormOps.normF(F) <= 0.1)
+					continue;
 
 				// the determinant should be zero
-				assertEquals(0, CommonOps.det(F),1e-8);
+				if (Math.abs(CommonOps.det(F)) > zeroTol)
+					continue;
+
+				totalPassedMatrix++;
 
 				// The constraint should be consistent for all the points used in the calculation
-				for( AssociatedPair p : pairs ) {
+				for (AssociatedPair p : pairs) {
 					double val = GeometryMath_F64.innerProd(p.currLoc, F, p.keyLoc);
-					assertEquals(0,val,1e-8);
+					assertEquals(0, val, zeroTol);
 				}
 
 				// see if this hypothesis matched all the points
 				boolean matchedAll = true;
-				for( AssociatedPair p : this.pairs ) {
+				for (AssociatedPair p : this.pairs) {
 					double val = GeometryMath_F64.innerProd(p.currLoc, F, p.keyLoc);
-					if( val > 1e-8) {
+					if (val > zeroTol) {
 						matchedAll = false;
 						break;
 					}
 				}
-				if( matchedAll ) {
+				if (matchedAll) {
 					totalMatchedAll++;
 				}
 			}
 
 			// At least one of them should be consistent with the original set of points
-			assertTrue( totalMatchedAll > 0 );
+			assertTrue(totalMatchedAll > 0);
+			assertTrue(totalPassedMatrix > 0);
 		}
 	}
 }

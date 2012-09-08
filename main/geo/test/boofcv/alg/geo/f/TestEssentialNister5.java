@@ -24,9 +24,7 @@ import org.junit.Test;
 
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
@@ -41,6 +39,14 @@ public class TestEssentialNister5 extends EpipolarTestSimulation {
 	private CommonFundamentalChecks createCommonChecks() {
 		return new CommonFundamentalChecks() {
 			EssentialNister5 alg = new EssentialNister5();
+
+			{
+				// use a more relaxed tolerance
+				// in practice the bad hypotheses seem to get thrown out.  The robustness benchmark
+				// also provides a better idea of what's going on and seems to be similar to what
+				// papers show
+				zeroTol = 0.0001;
+			}
 
 			@Override
 			public List<DenseMatrix64F> computeFundamental(List<AssociatedPair> pairs) {

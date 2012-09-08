@@ -34,25 +34,25 @@ import java.util.List;
  * Given a set of solutions for the Fundamental/Essential matrix, use the epipolar constraint to
  * select the best solution.  This requires an extra point be passed in beyond the minimum number.
  * </p>
- *
+ * <p/>
  * <p>
  * Epipolar constraint: x'*F*x = 0
  * </p>
  *
  * @author Peter Abeles
  */
-public class FundamentalNto1 implements EpipolarMatrixEstimator  {
+public class FundamentalNto1 implements EpipolarMatrixEstimator {
 
 	// Algorithm which generates multiple hypotheses
-	EpipolarMatrixEstimatorN alg;
+	private EpipolarMatrixEstimatorN alg;
 
 	// number of sample points used to evaluate hypotheses
-	int numTest=1;
+	private int numTest;
 
 	// list of points passed to the algorithm
-	List<AssociatedPair> list = new ArrayList<AssociatedPair>();
+	private List<AssociatedPair> list = new ArrayList<AssociatedPair>();
 	// the best hypothesis
-	DenseMatrix64F best;
+	private DenseMatrix64F best;
 
 	public FundamentalNto1(EpipolarMatrixEstimatorN alg, int numTest) {
 		this.alg = alg;
@@ -65,39 +65,39 @@ public class FundamentalNto1 implements EpipolarMatrixEstimator  {
 
 		// only pass in the required number of points
 		list.clear();
-		for( int i = 0; i < points.size()-numTest; i++ ) {
+		for (int i = 0; i < points.size() - numTest; i++) {
 			list.add(points.get(i));
 		}
 
 		// compute the hypotheses
-		if( !alg.process(list) )
+		if (!alg.process(list))
 			return false;
 
 		// select best solution
 		List<DenseMatrix64F> solutions = alg.getSolutions();
-		double bestScore = Double.MAX_VALUE;
 
 		int N = solutions.size();
-		if( N == 0 ) {
+		if (N == 0) {
 			return false;
-		} else if( N == 1 ) {
+		} else if (N == 1) {
 			best = solutions.get(0);
 		} else {
-			for( int i = 0; i < N; i++ ) {
+			double bestScore = Double.MAX_VALUE;
+			for (int i = 0; i < N; i++) {
 				DenseMatrix64F F = solutions.get(i);
 
 				// Make sure all the solutions have the same scale factor to avoid biasing the scores
-				CommonOps.scale(1.0/NormOps.fastNormF(F),F);
+				CommonOps.scale(1.0 / NormOps.fastNormF(F), F);
 
+				// select the best solution
 				double score = 0;
-				for( int j = list.size(); j < points.size(); j++ ) {
+				for (int j = list.size(); j < points.size(); j++) {
 					AssociatedPair p = points.get(j);
 
 					score += Math.abs(GeometryMath_F64.innerProd(p.currLoc, F, p.keyLoc));
 				}
 
-//				System.out.println("  score = "+score);
-				if( score < bestScore ) {
+				if (score < bestScore) {
 					bestScore = score;
 					best = F;
 				}
@@ -114,6 +114,6 @@ public class FundamentalNto1 implements EpipolarMatrixEstimator  {
 
 	@Override
 	public int getMinimumPoints() {
-		return alg.getMinimumPoints()+numTest;
+		return alg.getMinimumPoints() + numTest;
 	}
 }

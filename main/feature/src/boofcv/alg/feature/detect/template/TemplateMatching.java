@@ -127,9 +127,6 @@ public class TemplateMatching<T extends ImageBase> {
 		for (int i = 0; i < candidates.size; i++) {
 			Point2D_I16 p = candidates.get(i);
 
-			if (!intensity.isInBounds(p.x, p.y))
-				throw new RuntimeException("Crap");
-
 			scores[i] = -intensity.get(p.x, p.y);
 		}
 
