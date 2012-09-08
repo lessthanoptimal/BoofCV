@@ -35,9 +35,9 @@ public class HelperNister5 {
 	double W00,W01,W02,W10,W11,W12,W20,W21,W22;
 
 	// Vectors used to define polynomial
-	double K0,K1,K2,K3,K4,K5,K6,K7,K8,K9,K10,K11,K12;
-	double L0,L1,L2,L3,L4,L5,L6,L7,L8,L9,L10,L11,L12;
-	double M0,M1,M2,M3,M4,M5,M6,M7,M8,M9,M10,M11,M12;
+	double K00,K01,K02,K03,K04,K05,K06,K07,K08,K09,K10,K11,K12;
+	double L00,L01,L02,L03,L04,L05,L06,L07,L08,L09,L10,L11,L12;
+	double M00,M01,M02,M03,M04,M05,M06,M07,M08,M09,M10,M11,M12;
 
 	public void setNullSpace( double x[], double y[], double z[] , double w[] ) {
 		X00=x[0];X01=x[1];X02=x[2]; X10=x[3];X11=x[4];X12=x[5]; X20=x[6];X21=x[7];X22=x[8];
@@ -281,48 +281,48 @@ public class HelperNister5 {
 		int r = A.numCols*4;
 		int t = A.numCols*5;
 
-		K0  =             - A.data[t++];
-		K1  = A.data[r++] - A.data[t++];
-		K2  = A.data[r++] - A.data[t++];
-		K3  = A.data[r++];
-		K4  =             - A.data[t++];
-		K5  = A.data[r++] - A.data[t++];
-		K6  = A.data[r++] - A.data[t++];
-		K7  = A.data[r++];
-		K8  =             - A.data[t++];
-		K9  = A.data[r++] - A.data[t++];
+		K00  =             - A.data[t++];
+		K01  = A.data[r++] - A.data[t++];
+		K02  = A.data[r++] - A.data[t++];
+		K03  = A.data[r++];
+		K04  =             - A.data[t++];
+		K05  = A.data[r++] - A.data[t++];
+		K06  = A.data[r++] - A.data[t++];
+		K07  = A.data[r++];
+		K08  =             - A.data[t++];
+		K09  = A.data[r++] - A.data[t++];
 		K10 = A.data[r++] - A.data[t++];
 		K11 = A.data[r++] - A.data[t];
 		K12 = A.data[r];
 
 		r = A.numCols*6;
 		t = A.numCols*7;
-		L0  =             - A.data[t++];
-		L1  = A.data[r++] - A.data[t++];
-		L2  = A.data[r++] - A.data[t++];
-		L3  = A.data[r++];
-		L4  =             - A.data[t++];
-		L5  = A.data[r++] - A.data[t++];
-		L6  = A.data[r++] - A.data[t++];
-		L7  = A.data[r++];
-		L8  =             - A.data[t++];
-		L9  = A.data[r++] - A.data[t++];
+		L00  =             - A.data[t++];
+		L01  = A.data[r++] - A.data[t++];
+		L02  = A.data[r++] - A.data[t++];
+		L03  = A.data[r++];
+		L04  =             - A.data[t++];
+		L05  = A.data[r++] - A.data[t++];
+		L06  = A.data[r++] - A.data[t++];
+		L07  = A.data[r++];
+		L08  =             - A.data[t++];
+		L09  = A.data[r++] - A.data[t++];
 		L10 = A.data[r++] - A.data[t++];
 		L11 = A.data[r++] - A.data[t];
 		L12 = A.data[r];
 
 		r = A.numCols*8;
 		t = A.numCols*9;
-		M0  =             - A.data[t++];
-		M1  = A.data[r++] - A.data[t++];
-		M2  = A.data[r++] - A.data[t++];
-		M3  = A.data[r++];
-		M4  =             - A.data[t++];
-		M5  = A.data[r++] - A.data[t++];
-		M6  = A.data[r++] - A.data[t++];
-		M7  = A.data[r++];
-		M8  =             - A.data[t++];
-		M9  = A.data[r++] - A.data[t++];
+		M00  =             - A.data[t++];
+		M01  = A.data[r++] - A.data[t++];
+		M02  = A.data[r++] - A.data[t++];
+		M03  = A.data[r++];
+		M04  =             - A.data[t++];
+		M05  = A.data[r++] - A.data[t++];
+		M06  = A.data[r++] - A.data[t++];
+		M07  = A.data[r++];
+		M08  =             - A.data[t++];
+		M09  = A.data[r++] - A.data[t++];
 		M10 = A.data[r++] - A.data[t++];
 		M11 = A.data[r++] - A.data[t];
 		M12 = A.data[r];
@@ -337,16 +337,16 @@ public class HelperNister5 {
 	 * @param coefs Array with 11 elements. The index corresponds to the coefficient power.
 	 */
 	public void extractPolynomial( double coefs[] ) {
-		coefs[0] = K12*(L3*M7 - L7*M3) + K3*(L7*M12 - L12*M7) + K7*(L12*M3 - L3*M12);
-		coefs[1] = K11*(L3*M7 - L7*M3) + K12*(L2*M7 + L3*M6 - L6*M3 - L7*M2) + K2*(L7*M12 - L12*M7) + K3*(- L11*M7 - L12*M6 + L6*M12 + L7*M11) + K6*(L12*M3 - L3*M12) + K7*(L11*M3 + L12*M2 - L2*M12 - L3*M11);
-		coefs[2] = -K1*L12*M7 + K1*L7*M12 + K10*L3*M7 - K10*L7*M3 + K11*L2*M7 + K11*L3*M6 - K11*L6*M3 - K11*L7*M2 + K12*L1*M7 + K12*L2*M6 + K12*L3*M5 - K12*L5*M3 - K12*L6*M2 - K12*L7*M1 - K2*L11*M7 - K2*L12*M6 + K2*L6*M12 + K2*L7*M11 - K3*L10*M7 - K3*L11*M6 - K3*L12*M5 + K3*L5*M12 + K3*L6*M11 + K3*L7*M10 + K5*L12*M3 - K5*L3*M12 + K6*L11*M3 + K6*L12*M2 - K6*L2*M12 - K6*L3*M11 - K7*L1*M12 + K7*L10*M3 + K7*L11*M2 + K7*L12*M1 - K7*L2*M11 - K7*L3*M10;
-		coefs[3] = -K0*L12*M7 + K0*L7*M12 - K1*L11*M7 - K1*L12*M6 + K1*L6*M12 + K1*L7*M11 + K10*L2*M7 + K10*L3*M6 - K10*L6*M3 - K10*L7*M2 + K11*L1*M7 + K11*L2*M6 + K11*L3*M5 - K11*L5*M3 - K11*L6*M2 - K11*L7*M1 + K12*L0*M7 + K12*L1*M6 + K12*L2*M5 + K12*L3*M4 - K12*L4*M3 - K12*L5*M2 - K12*L6*M1 - K12*L7*M0 - K2*L10*M7 - K2*L11*M6 - K2*L12*M5 + K2*L5*M12 + K2*L6*M11 + K2*L7*M10 - K3*L10*M6 - K3*L11*M5 - K3*L12*M4 + K3*L4*M12 + K3*L5*M11 + K3*L6*M10 + K3*L7*M9 - K3*L9*M7 + K4*L12*M3 - K4*L3*M12 + K5*L11*M3 + K5*L12*M2 - K5*L2*M12 - K5*L3*M11 - K6*L1*M12 + K6*L10*M3 + K6*L11*M2 + K6*L12*M1 - K6*L2*M11 - K6*L3*M10 - K7*L0*M12 - K7*L1*M11 + K7*L10*M2 + K7*L11*M1 + K7*L12*M0 - K7*L2*M10 - K7*L3*M9 + K7*L9*M3 + K9*L3*M7 - K9*L7*M3;
-		coefs[4] = -K0*L11*M7 - K0*L12*M6 + K0*L6*M12 + K0*L7*M11 - K1*L10*M7 - K1*L11*M6 - K1*L12*M5 + K1*L5*M12 + K1*L6*M11 + K1*L7*M10 + K10*L1*M7 + K10*L2*M6 + K10*L3*M5 - K10*L5*M3 - K10*L6*M2 - K10*L7*M1 + K11*L0*M7 + K11*L1*M6 + K11*L2*M5 + K11*L3*M4 - K11*L4*M3 - K11*L5*M2 - K11*L6*M1 - K11*L7*M0 + K12*L0*M6 + K12*L1*M5 + K12*L2*M4 - K12*L4*M2 - K12*L5*M1 - K12*L6*M0 - K2*L10*M6 - K2*L11*M5 - K2*L12*M4 + K2*L4*M12 + K2*L5*M11 + K2*L6*M10 + K2*L7*M9 - K2*L9*M7 - K3*L10*M5 - K3*L11*M4 + K3*L4*M11 + K3*L5*M10 + K3*L6*M9 + K3*L7*M8 - K3*L8*M7 - K3*L9*M6 + K4*L11*M3 + K4*L12*M2 - K4*L2*M12 - K4*L3*M11 - K5*L1*M12 + K5*L10*M3 + K5*L11*M2 + K5*L12*M1 - K5*L2*M11 - K5*L3*M10 - K6*L0*M12 - K6*L1*M11 + K6*L10*M2 + K6*L11*M1 + K6*L12*M0 - K6*L2*M10 - K6*L3*M9 + K6*L9*M3 - K7*L0*M11 - K7*L1*M10 + K7*L10*M1 + K7*L11*M0 - K7*L2*M9 - K7*L3*M8 + K7*L8*M3 + K7*L9*M2 + K8*L3*M7 - K8*L7*M3 + K9*L2*M7 + K9*L3*M6 - K9*L6*M3 - K9*L7*M2;
-		coefs[5] = -K0*L10*M7 - K0*L11*M6 - K0*L12*M5 + K0*L5*M12 + K0*L6*M11 + K0*L7*M10 - K1*L10*M6 - K1*L11*M5 - K1*L12*M4 + K1*L4*M12 + K1*L5*M11 + K1*L6*M10 + K1*L7*M9 - K1*L9*M7 + K10*L0*M7 + K10*L1*M6 + K10*L2*M5 + K10*L3*M4 - K10*L4*M3 - K10*L5*M2 - K10*L6*M1 - K10*L7*M0 + K11*L0*M6 + K11*L1*M5 + K11*L2*M4 - K11*L4*M2 - K11*L5*M1 - K11*L6*M0 + K12*L0*M5 + K12*L1*M4 - K12*L4*M1 - K12*L5*M0 - K2*L10*M5 - K2*L11*M4 + K2*L4*M11 + K2*L5*M10 + K2*L6*M9 + K2*L7*M8 - K2*L8*M7 - K2*L9*M6 - K3*L10*M4 + K3*L4*M10 + K3*L5*M9 + K3*L6*M8 - K3*L8*M6 - K3*L9*M5 - K4*L1*M12 + K4*L10*M3 + K4*L11*M2 + K4*L12*M1 - K4*L2*M11 - K4*L3*M10 - K5*L0*M12 - K5*L1*M11 + K5*L10*M2 + K5*L11*M1 + K5*L12*M0 - K5*L2*M10 - K5*L3*M9 + K5*L9*M3 - K6*L0*M11 - K6*L1*M10 + K6*L10*M1 + K6*L11*M0 - K6*L2*M9 - K6*L3*M8 + K6*L8*M3 + K6*L9*M2 - K7*L0*M10 - K7*L1*M9 + K7*L10*M0 - K7*L2*M8 + K7*L8*M2 + K7*L9*M1 + K8*L2*M7 + K8*L3*M6 - K8*L6*M3 - K8*L7*M2 + K9*L1*M7 + K9*L2*M6 + K9*L3*M5 - K9*L5*M3 - K9*L6*M2 - K9*L7*M1;
-		coefs[6] = -K0*L10*M6 - K0*L11*M5 - K0*L12*M4 + K0*L4*M12 + K0*L5*M11 + K0*L6*M10 + K0*L7*M9 - K0*L9*M7 - K1*L10*M5 - K1*L11*M4 + K1*L4*M11 + K1*L5*M10 + K1*L6*M9 + K1*L7*M8 - K1*L8*M7 - K1*L9*M6 + K10*L0*M6 + K10*L1*M5 + K10*L2*M4 - K10*L4*M2 - K10*L5*M1 - K10*L6*M0 + K11*L0*M5 + K11*L1*M4 - K11*L4*M1 - K11*L5*M0 + K12*L0*M4 - K12*L4*M0 - K2*L10*M4 + K2*L4*M10 + K2*L5*M9 + K2*L6*M8 - K2*L8*M6 - K2*L9*M5 + K3*L4*M9 + K3*L5*M8 - K3*L8*M5 - K3*L9*M4 - K4*L0*M12 - K4*L1*M11 + K4*L10*M2 + K4*L11*M1 + K4*L12*M0 - K4*L2*M10 - K4*L3*M9 + K4*L9*M3 - K5*L0*M11 - K5*L1*M10 + K5*L10*M1 + K5*L11*M0 - K5*L2*M9 - K5*L3*M8 + K5*L8*M3 + K5*L9*M2 - K6*L0*M10 - K6*L1*M9 + K6*L10*M0 - K6*L2*M8 + K6*L8*M2 + K6*L9*M1 - K7*L0*M9 - K7*L1*M8 + K7*L8*M1 + K7*L9*M0 + K8*L1*M7 + K8*L2*M6 + K8*L3*M5 - K8*L5*M3 - K8*L6*M2 - K8*L7*M1 + K9*L0*M7 + K9*L1*M6 + K9*L2*M5 + K9*L3*M4 - K9*L4*M3 - K9*L5*M2 - K9*L6*M1 - K9*L7*M0;
-		coefs[7] = -K0*L10*M5 - K0*L11*M4 + K0*L4*M11 + K0*L5*M10 + K0*L6*M9 + K0*L7*M8 - K0*L8*M7 - K0*L9*M6 - K1*L10*M4 + K1*L4*M10 + K1*L5*M9 + K1*L6*M8 - K1*L8*M6 - K1*L9*M5 + K10*L0*M5 + K10*L1*M4 - K10*L4*M1 - K10*L5*M0 + K11*L0*M4 - K11*L4*M0 + K2*L4*M9 + K2*L5*M8 - K2*L8*M5 - K2*L9*M4 + K3*L4*M8 - K3*L8*M4 - K4*L0*M11 - K4*L1*M10 + K4*L10*M1 + K4*L11*M0 - K4*L2*M9 - K4*L3*M8 + K4*L8*M3 + K4*L9*M2 - K5*L0*M10 - K5*L1*M9 + K5*L10*M0 - K5*L2*M8 + K5*L8*M2 + K5*L9*M1 - K6*L0*M9 - K6*L1*M8 + K6*L8*M1 + K6*L9*M0 - K7*L0*M8 + K7*L8*M0 + K8*L0*M7 + K8*L1*M6 + K8*L2*M5 + K8*L3*M4 - K8*L4*M3 - K8*L5*M2 - K8*L6*M1 - K8*L7*M0 + K9*L0*M6 + K9*L1*M5 + K9*L2*M4 - K9*L4*M2 - K9*L5*M1 - K9*L6*M0;
-		coefs[8] = -K0*L10*M4 + K0*L4*M10 + K0*L5*M9 + K0*L6*M8 - K0*L8*M6 - K0*L9*M5 + K1*L4*M9 + K1*L5*M8 - K1*L8*M5 - K1*L9*M4 + K10*L0*M4 - K10*L4*M0 + K2*L4*M8 - K2*L8*M4 - K4*L0*M10 - K4*L1*M9 + K4*L10*M0 - K4*L2*M8 + K4*L8*M2 + K4*L9*M1 - K5*L0*M9 - K5*L1*M8 + K5*L8*M1 + K5*L9*M0 - K6*L0*M8 + K6*L8*M0 + K8*L0*M6 + K8*L1*M5 + K8*L2*M4 - K8*L4*M2 - K8*L5*M1 - K8*L6*M0 + K9*L0*M5 + K9*L1*M4 - K9*L4*M1 - K9*L5*M0;
-		coefs[9] = K0*L4*M9 + K0*L5*M8 - K0*L8*M5 - K0*L9*M4 + K1*L4*M8 - K1*L8*M4 - K4*L0*M9 - K4*L1*M8 + K4*L8*M1 + K4*L9*M0 - K5*L0*M8 + K5*L8*M0 + K8*L0*M5 + K8*L1*M4 - K8*L4*M1 - K8*L5*M0 + K9*L0*M4 - K9*L4*M0;
-		coefs[10] = K0*L4*M8 - K0*L8*M4 - K4*L0*M8 + K4*L8*M0 + K8*L0*M4 - K8*L4*M0;
+		coefs[0] = K12*( L03*M07 - L07*M03 ) + K03*( L07*M12 - L12*M07 ) + K07*( -L03*M12 + L12*M03 );
+		coefs[1] = K03*( L06*M12 + L07*M11 - L11*M07 - L12*M06 ) + K12*( L02*M07 + L03*M06 - L06*M03 - L07*M02 ) + K07*( -L02*M12 - L03*M11 + L11*M03 + L12*M02 ) + K02*( L07*M12 - L12*M07 ) + K11*( L03*M07 - L07*M03 ) + K06*( -L03*M12 + L12*M03 );
+		coefs[2] = K12*( L01*M07 + L02*M06 + L03*M05 - L05*M03 - L06*M02 - L07*M01 ) + L12*( -K01*M07 - K02*M06 - K03*M05 + K05*M03 + K06*M02 + K07*M01 ) + M12*( K01*L07 + K02*L06 + K03*L05 - K05*L03 - K06*L02 - K07*L01 ) + L03*( -K06*M11 - K07*M10 + K10*M07 + K11*M06 ) + K03*( L06*M11 + L07*M10 - L10*M07 - L11*M06 ) + M03*( K06*L11 + K07*L10 - K10*L07 - K11*L06 ) + K02*( L07*M11 - L11*M07 ) + K11*( L02*M07 - L07*M02 ) + K07*( -L02*M11 + L11*M02 );
+		coefs[3] = K12*( L00*M07 + L01*M06 + L02*M05 + L03*M04 - L04*M03 - L05*M02 - L06*M01 - L07*M00 ) + L12*( -K00*M07 - K01*M06 - K02*M05 - K03*M04 + K04*M03 + K05*M02 + K06*M01 + K07*M00 ) + M12*( K00*L07 + K01*L06 + K02*L05 + K03*L04 - K04*L03 - K05*L02 - K06*L01 - K07*L00 ) + K11*( L01*M07 + L02*M06 + L03*M05 - L05*M03 - L06*M02 - L07*M01 ) + L11*( -K01*M07 - K02*M06 - K03*M05 + K05*M03 + K06*M02 + K07*M01 ) + M11*( K01*L07 + K02*L06 + K03*L05 - K05*L03 - K06*L02 - K07*L01 ) + L03*( -K06*M10 - K07*M09 + K09*M07 + K10*M06 ) + K03*( L06*M10 + L07*M09 - L09*M07 - L10*M06 ) + M03*( K06*L10 + K07*L09 - K09*L07 - K10*L06 ) + M07*( -K02*L10 + K10*L02 ) + K07*( -L02*M10 + L10*M02 ) + L07*( K02*M10 - K10*M02 );
+		coefs[4] = K11*( L00*M07 + L01*M06 + L02*M05 + L03*M04 - L04*M03 - L05*M02 - L06*M01 - L07*M00 ) + L11*( -K00*M07 - K01*M06 - K02*M05 - K03*M04 + K04*M03 + K05*M02 + K06*M01 + K07*M00 ) + M11*( K00*L07 + K01*L06 + K02*L05 + K03*L04 - K04*L03 - K05*L02 - K06*L01 - K07*L00 ) + K12*( L00*M06 + L01*M05 + L02*M04 - L04*M02 - L05*M01 - L06*M00 ) + K10*( L01*M07 + L02*M06 + L03*M05 - L05*M03 - L06*M02 - L07*M01 ) + L10*( -K01*M07 - K02*M06 - K03*M05 + K05*M03 + K06*M02 + K07*M01 ) + L12*( -K00*M06 - K01*M05 - K02*M04 + K04*M02 + K05*M01 + K06*M00 ) + M10*( K01*L07 + K02*L06 + K03*L05 - K05*L03 - K06*L02 - K07*L01 ) + M12*( K00*L06 + K01*L05 + K02*L04 - K04*L02 - K05*L01 - K06*L00 ) + K03*( L06*M09 + L07*M08 - L08*M07 - L09*M06 ) + K07*( -L02*M09 - L03*M08 + L08*M03 + L09*M02 ) + K09*( L02*M07 + L03*M06 - L06*M03 - L07*M02 ) + K02*( L07*M09 - L09*M07 ) + K06*( -L03*M09 + L09*M03 ) + K08*( L03*M07 - L07*M03 );
+		coefs[5] = K10*( L00*M07 + L01*M06 + L02*M05 + L03*M04 - L04*M03 - L05*M02 - L06*M01 - L07*M00 ) + L10*( -K00*M07 - K01*M06 - K02*M05 - K03*M04 + K04*M03 + K05*M02 + K06*M01 + K07*M00 ) + M10*( K00*L07 + K01*L06 + K02*L05 + K03*L04 - K04*L03 - K05*L02 - K06*L01 - K07*L00 ) + K11*( L00*M06 + L01*M05 + L02*M04 - L04*M02 - L05*M01 - L06*M00 ) + K09*( L01*M07 + L02*M06 + L03*M05 - L05*M03 - L06*M02 - L07*M01 ) + L11*( -K00*M06 - K01*M05 - K02*M04 + K04*M02 + K05*M01 + K06*M00 ) + M09*( K01*L07 + K02*L06 + K03*L05 - K05*L03 - K06*L02 - K07*L01 ) + L09*( -K01*M07 - K02*M06 - K03*M05 + K05*M03 + K06*M02 + K07*M01 ) + M11*( K00*L06 + K01*L05 + K02*L04 - K04*L02 - K05*L01 - K06*L00 ) + K12*( L00*M05 + L01*M04 - L04*M01 - L05*M00 ) + L12*( -K00*M05 - K01*M04 + K04*M01 + K05*M00 ) + M08*( K02*L07 + K03*L06 - K06*L03 - K07*L02 ) + L08*( -K02*M07 - K03*M06 + K06*M03 + K07*M02 ) + K08*( L02*M07 + L03*M06 - L06*M03 - L07*M02 ) + M12*( K00*L05 + K01*L04 - K04*L01 - K05*L00 );
+		coefs[6] = M04*( -K00*L12 - K01*L11 - K02*L10 - K03*L09 + K09*L03 + K10*L02 + K11*L01 + K12*L00 ) + M05*( -K00*L11 - K01*L10 - K02*L09 - K03*L08 + K08*L03 + K09*L02 + K10*L01 + K11*L00 ) + M00*( K04*L12 + K05*L11 + K06*L10 + K07*L09 - K09*L07 - K10*L06 - K11*L05 - K12*L04 ) + M01*( K04*L11 + K05*L10 + K06*L09 + K07*L08 - K08*L07 - K09*L06 - K10*L05 - K11*L04 ) + M09*( K00*L07 + K01*L06 + K02*L05 + K03*L04 - K04*L03 - K05*L02 - K06*L01 - K07*L00 ) + M06*( -K00*L10 - K01*L09 - K02*L08 + K08*L02 + K09*L01 + K10*L00 ) + M02*( K04*L10 + K05*L09 + K06*L08 - K08*L06 - K09*L05 - K10*L04 ) + M08*( K01*L07 + K02*L06 + K03*L05 - K05*L03 - K06*L02 - K07*L01 ) + M10*( K00*L06 + K01*L05 + K02*L04 - K04*L02 - K05*L01 - K06*L00 ) + M11*( K00*L05 + K01*L04 - K04*L01 - K05*L00 ) + M07*( -K00*L09 - K01*L08 + K08*L01 + K09*L00 ) + M03*( K04*L09 + K05*L08 - K08*L05 - K09*L04 ) + M12*( K00*L04 - K04*L00 );
+		coefs[7] = M04*( -K00*L11 - K01*L10 - K02*L09 - K03*L08 + K08*L03 + K09*L02 + K10*L01 + K11*L00 ) + M00*( K04*L11 + K05*L10 + K06*L09 + K07*L08 - K08*L07 - K09*L06 - K10*L05 - K11*L04 ) + M08*( K00*L07 + K01*L06 + K02*L05 + K03*L04 - K04*L03 - K05*L02 - K06*L01 - K07*L00 ) + M05*( -K00*L10 - K01*L09 - K02*L08 + K08*L02 + K09*L01 + K10*L00 ) + M01*( K04*L10 + K05*L09 + K06*L08 - K08*L06 - K09*L05 - K10*L04 ) + M09*( K00*L06 + K01*L05 + K02*L04 - K04*L02 - K05*L01 - K06*L00 ) + K00*( L04*M11 + L05*M10 - L08*M07 - L09*M06 ) + K04*( -L00*M11 - L01*M10 + L08*M03 + L09*M02 ) + K08*( L00*M07 + L01*M06 - L04*M03 - L05*M02 ) + K01*( L04*M10 - L08*M06 ) + K05*( -L00*M10 + L08*M02 ) + K09*( L00*M06 - L04*M02 );
+		coefs[8] = M04*( -K00*L10 - K01*L09 - K02*L08 + K08*L02 + K09*L01 + K10*L00 ) + M00*( K04*L10 + K05*L09 + K06*L08 - K08*L06 - K09*L05 - K10*L04 ) + M08*( K00*L06 + K01*L05 + K02*L04 - K04*L02 - K05*L01 - K06*L00 ) + K00*( L04*M10 + L05*M09 - L08*M06 - L09*M05 ) + K04*( -L00*M10 - L01*M09 + L08*M02 + L09*M01 ) + K08*( L00*M06 + L01*M05 - L04*M02 - L05*M01 ) + K01*( L04*M09 - L08*M05 ) + K05*( -L00*M09 + L08*M01 ) + K09*( L00*M05 - L04*M01 );
+		coefs[9] = K00*( L04*M09 + L05*M08 - L08*M05 - L09*M04 ) + K04*( -L00*M09 - L01*M08 + L08*M01 + L09*M00 ) + K08*( L00*M05 + L01*M04 - L04*M01 - L05*M00 ) + K01*( L04*M08 - L08*M04 ) + K05*( -L00*M08 + L08*M00 ) + K09*( L00*M04 - L04*M00 );
+		coefs[10] = K00*( L04*M08 - L08*M04 ) + K04*( -L00*M08 + L08*M00 ) + K08*( L00*M04 - L04*M00 );
 	}
 }
