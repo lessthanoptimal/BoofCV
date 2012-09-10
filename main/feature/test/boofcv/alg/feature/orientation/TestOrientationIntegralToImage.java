@@ -18,17 +18,41 @@
 
 package boofcv.alg.feature.orientation;
 
+import boofcv.alg.feature.orientation.impl.ImplOrientationImageAverageIntegral;
+import boofcv.alg.transform.ii.IntegralImageOps;
+import boofcv.core.image.GeneralizedImageOps;
+import boofcv.struct.image.ImageFloat32;
 import org.junit.Test;
 
-import static org.junit.Assert.fail;
+import java.util.Random;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Peter Abeles
  */
 public class TestOrientationIntegralToImage {
 
+	Random rand = new Random(234);
+
 	@Test
-	public void stuff() {
-		fail("implement");
+	public void simpleTest() {
+		ImageFloat32 input = new ImageFloat32(30,40);
+		ImageFloat32 ii = new ImageFloat32(input.width,input.height);
+
+		GeneralizedImageOps.randomize(input,rand,0,50);
+		IntegralImageOps.transform(input, ii);
+
+		ImplOrientationImageAverageIntegral o = new ImplOrientationImageAverageIntegral(5,2,2,1,ImageFloat32.class);
+
+		OrientationIntegralToImage alg = new OrientationIntegralToImage(o,ImageFloat32.class);
+		alg.setImage(input);
+		double found = alg.compute(10,12);
+
+		// now compute it directly from an integral image
+		o.setImage(ii);
+		double expected = alg.compute(10,12);
+
+		assertEquals(expected,found,1e-8);
 	}
 }

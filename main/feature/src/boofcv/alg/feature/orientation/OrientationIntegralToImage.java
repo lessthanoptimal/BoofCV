@@ -29,11 +29,11 @@ import boofcv.struct.image.ImageSingleBand;
 public class OrientationIntegralToImage<T extends ImageSingleBand, II extends ImageSingleBand>
 	implements OrientationImage<T>
 {
-	Class<T> imageType;
-	OrientationIntegral<II> alg;
+	private Class<T> imageType;
+	private OrientationIntegral<II> alg;
 
 	// converted integral image of input image
-	II ii;
+	private II ii;
 
 	public OrientationIntegralToImage(OrientationIntegral<II> alg, Class<T> imageType) {
 		this.alg = alg;
