@@ -22,6 +22,12 @@ import java.util.List;
  * </p>
  *
  * <p>
+ * Error units can be in either pixels<sup>2</sup> or unit less (normalized pixel coordinates).  To compute
+ * the error in pixels pass in the correct intrinsic calibration parameters in the constructor.  Otherwise
+ * pass in fx=1.fy=1,skew=0 for normalized.
+ * </p>
+ *
+ * <p>
  * NOTE: If a point does not pass the positive depth constraint then a very large error is returned.
  * </p>
  *
@@ -42,7 +48,8 @@ public class DistanceSe3SymmetricSq implements DistanceFromModel<Se3_F64,Associa
 	private double skew; // pixel skew
 
 	/**
-	 * Configure distance calculation.
+	 * Configure distance calculation.   See comment above about how to specify error units using
+	 * intrinsic parameters.
 	 *
 	 * @param triangulate Triangulates the intersection of two observations
 	 * @param fx intrinsic parameter: focal length x
@@ -78,15 +85,17 @@ public class DistanceSe3SymmetricSq implements DistanceFromModel<Se3_F64,Associa
 			return Double.MAX_VALUE;
 		
 		// compute observational error in each view
-		double dy1 = (obs.keyLoc.y - p.y/p.z)*fy;
+		double dy1 = (obs.keyLoc.y - p.y/p.z);
 		double dx1 = (obs.keyLoc.x - p.x/p.z)*fx + dy1*skew;
+		dy1 *= fy;
 
 		SePointOps_F64.transform(keyToCurr,p,p);
 		if( p.z < 0 )
 			return Double.MAX_VALUE;
 
-		double dy2 = (obs.currLoc.y - p.y/p.z)*fy;
+		double dy2 = (obs.currLoc.y - p.y/p.z);
 		double dx2 = (obs.currLoc.x - p.x/p.z)*fx + dy2*skew;
+		dy2 *= fy;
 
 		// symmetric error
 		return dx1*dx1 + dy1*dy1 + dx2*dx2 + dy2*dy2;
