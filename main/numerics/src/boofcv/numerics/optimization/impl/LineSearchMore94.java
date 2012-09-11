@@ -38,10 +38,13 @@ import boofcv.numerics.optimization.functions.CoupledDerivative;
  * </p>
  *
  * <p>
- * Parts of this code
+ * Parts of this code are from:.
  * MINPACK-2 Project. November 1993.<br>
  * Argonne National Laboratory and University of Minnesota.<br>
  * Brett M. Averick, Richard G. Carter, and Jorge J. More'.<br>
+ * <br>
+ * Permission has been given by Jorge Moré (after he emerged from underwater) to redistribute csrch on
+ * July 8th 2012 via e-mail.
  * </p>
  *
  * <p>

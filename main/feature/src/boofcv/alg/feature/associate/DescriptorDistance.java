@@ -99,7 +99,12 @@ public class DescriptorDistance {
 	}
 
 	/**
-	 * Normalized cross correlation (NCC)
+	 * <p>
+	 * Normalized cross correlation (NCC):<br>
+	 * <br>
+	 * NCC = sum(a[i]*b[i]) / sqrt( variance_a * variance_b )<br>
+	 * where a[i] = I[i]-mean(a), and I[i] is the image pixel intensity around the feature.
+	 * </p>
 	 *
 	 * @param a First descriptor
 	 * @param b Second descriptor
@@ -114,7 +119,7 @@ public class DescriptorDistance {
 		}
 
 		// negative so that smaller values are better
-		return top/(a.variance*b.variance);
+		return top/Math.sqrt(a.variance * b.variance);
 	}
 
 	/**

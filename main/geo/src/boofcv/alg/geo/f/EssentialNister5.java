@@ -210,9 +210,9 @@ public class EssentialNister5 {
 		A.data[3] = ((helper.L04*z + helper.L05)*z + helper.L06)*z + helper.L07;
 		Y.data[1] = (((helper.L08*z + helper.L09)*z + helper.L10)*z + helper.L11)*z + helper.L12;
 
-		A.data[4] = ((helper.L00*z + helper.L01)*z + helper.L02)*z + helper.L03;
-		A.data[5] = ((helper.L04*z + helper.L05)*z + helper.L06)*z + helper.L07;
-		Y.data[2] = (((helper.L08*z + helper.L09)*z + helper.L10)*z + helper.L11)*z + helper.L12;
+		A.data[4] = ((helper.M00*z + helper.M01)*z + helper.M02)*z + helper.M03;
+		A.data[5] = ((helper.M04*z + helper.M05)*z + helper.M06)*z + helper.M07;
+		Y.data[2] = (((helper.M08*z + helper.M09)*z + helper.M10)*z + helper.M11)*z + helper.M12;
 
 		CommonOps.scale(-1,Y);
 
