@@ -90,8 +90,8 @@ public class VisualizeAssociationScoreApp<T extends ImageSingleBand, D extends I
 		addAlgorithm(1, "BRIEFO", FactoryDescribeRegionPoint.brief(16, 512, -1, 4, false, imageType));
 		addAlgorithm(1, "Gaussian 12", FactoryDescribeRegionPoint.gaussian12(20, imageType, derivType));
 		addAlgorithm(1, "Gaussian 14", FactoryDescribeRegionPoint.steerableGaussian(20, false, imageType, derivType));
-		addAlgorithm(1, "Pixel 5x5", FactoryDescribeRegionPoint.pixel(5, 5, imageType));
-		addAlgorithm(1, "NCC 5x5", FactoryDescribeRegionPoint.pixelNCC(5, 5, imageType));
+		addAlgorithm(1, "Pixel 11x11", FactoryDescribeRegionPoint.pixel(11, 11, imageType));
+		addAlgorithm(1, "NCC 11x11", FactoryDescribeRegionPoint.pixelNCC(11, 11, imageType));
 
 		orientation = FactoryOrientationAlgs.nogradient(5, imageType);
 

@@ -39,7 +39,6 @@ import boofcv.io.PathLabel;
 import boofcv.struct.FastQueue;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.feature.TupleDescQueue;
-import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.point.Point2D_F64;
@@ -71,6 +70,9 @@ public class VisualizeAssociationMatchesApp<T extends ImageSingleBand, D extends
 	T imageRight;
 	Class<T> imageType;
 
+	// which type of association it should perform
+	boolean associateBackwards;
+
 	AssociationPanel panel = new AssociationPanel(20);
 
 	boolean processedImage = false;
@@ -91,13 +93,11 @@ public class VisualizeAssociationMatchesApp<T extends ImageSingleBand, D extends
 		addAlgorithm(1, "BRIEFO", FactoryDescribeRegionPoint.brief(16, 512, -1, 4, false, imageType));
 		addAlgorithm(1, "Gaussian 12", FactoryDescribeRegionPoint.gaussian12(20, imageType, derivType));
 		addAlgorithm(1, "Gaussian 14", FactoryDescribeRegionPoint.steerableGaussian(20, false, imageType, derivType));
-		addAlgorithm(1, "Pixel 5x5", FactoryDescribeRegionPoint.pixel(5, 5, imageType));
-		addAlgorithm(1, "NCC 5x5", FactoryDescribeRegionPoint.pixelNCC(5, 5, imageType));
+		addAlgorithm(1, "Pixel 11x11", FactoryDescribeRegionPoint.pixel(11, 11, imageType));
+		addAlgorithm(1, "NCC 11x11", FactoryDescribeRegionPoint.pixelNCC(11, 11, imageType));
 
-		ScoreAssociation<TupleDesc_F64> scorer = FactoryAssociation.scoreEuclidean(TupleDesc_F64.class, true);
-
-		addAlgorithm(2, "Greedy", FactoryAssociation.greedy(scorer, Double.MAX_VALUE, maxMatches, false));
-		addAlgorithm(2, "Backwards", FactoryAssociation.greedy(scorer, Double.MAX_VALUE, maxMatches, true));
+		addAlgorithm(2, "Greedy", false);
+		addAlgorithm(2, "Backwards", true);
 
 		orientation = FactoryOrientationAlgs.nogradient(5, imageType);
 
@@ -131,9 +131,15 @@ public class VisualizeAssociationMatchesApp<T extends ImageSingleBand, D extends
 	public synchronized void refreshAll(Object[] cookies) {
 		detector = (InterestPointDetector<T>) cookies[0];
 		describe = (DescribeRegionPoint<T, TupleDesc>) cookies[1];
-		matcher = (GeneralAssociation<TupleDesc>) cookies[2];
+		associateBackwards = (Boolean)cookies[2];
+		matcher = createMatcher();
 
 		processImage();
+	}
+
+	private GeneralAssociation createMatcher() {
+		ScoreAssociation scorer = FactoryAssociation.defaultScore(describe.getDescriptorType());
+		return FactoryAssociation.greedy(scorer, Double.MAX_VALUE, maxMatches, associateBackwards);
 	}
 
 	@Override
@@ -148,10 +154,13 @@ public class VisualizeAssociationMatchesApp<T extends ImageSingleBand, D extends
 
 			case 1:
 				describe = (DescribeRegionPoint<T, TupleDesc>) cookie;
+				// need to update association since the descriptor type changed
+				matcher = createMatcher();
 				break;
 
 			case 2:
-				matcher = (GeneralAssociation<TupleDesc>) cookie;
+				associateBackwards = (Boolean)cookie;
+				matcher = createMatcher();
 				break;
 		}
 

@@ -27,6 +27,8 @@ import boofcv.struct.image.ImageSingleBand;
  * allows the descriptor to be light invariant.  The entire region must be inside the image for a descriptor to be computed
  * because any outside values will change its intensity normalization.
  *
+ * @see boofcv.alg.feature.associate.DescriptorDistance#ncc(boofcv.struct.feature.NccFeature, boofcv.struct.feature.NccFeature)
+ *
  * @author Peter Abeles
  */
 public abstract class DescribePointPixelRegionNCC<T extends ImageSingleBand>

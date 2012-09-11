@@ -24,6 +24,8 @@ import boofcv.struct.feature.NccFeature;
 /**
  * Association scorer for NccFeatures.  Computes the normalized cross correlation score.
  *
+ * @see DescriptorDistance#ncc(boofcv.struct.feature.NccFeature, boofcv.struct.feature.NccFeature)
+ *
  * @author Peter Abeles
  */
 public class ScoreAssociateNccFeature implements ScoreAssociation<NccFeature>{
