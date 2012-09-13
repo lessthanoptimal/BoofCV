@@ -12,6 +12,7 @@ Version : Alpha 0.10
   * Added hamming lookup table
   * Brief now uses a look up table.  About a 7x speed improvement.
   * FactoryAssociate now can create instances of ScoreAssociate.
+  * Fixed incorrect NCC equation.  Thanks Christian Kramer.
 - DescribeRegionPoint has been redesigned
   * Now more generic and can work with any feature descriptor
   * Separate function for checking to see if feature is inside bounds

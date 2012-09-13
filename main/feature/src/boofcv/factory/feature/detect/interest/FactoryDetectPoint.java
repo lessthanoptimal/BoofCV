@@ -109,7 +109,7 @@ public class FactoryDetectPoint {
 	public static <T extends ImageSingleBand, D extends ImageSingleBand>
 	GeneralFeatureDetector<T, D> createFast(int extractRadius,
 											int detectThreshold, int maxFeatures, Class<T> imageType) {
-		FastCornerIntensity<T> alg = FactoryIntensityPointAlg.fast12(detectThreshold, 11, imageType);
+		FastCornerIntensity<T> alg = FactoryIntensityPointAlg.fast12(detectThreshold, 9, imageType);
 		GeneralFeatureIntensity<T, D> intensity = new WrapperFastCornerIntensity<T, D>(alg);
 		return createGeneral(intensity, extractRadius, detectThreshold, maxFeatures);
 	}
