@@ -18,12 +18,8 @@
 
 package boofcv.alg.feature.detect.intensity;
 
-import boofcv.alg.feature.detect.intensity.impl.ImplFastCorner12_F32;
-import boofcv.alg.feature.detect.intensity.impl.ImplFastCorner12_Table_F32;
 import boofcv.alg.misc.ImageTestingOps;
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.misc.PerformerBase;
-import boofcv.misc.ProfileOperation;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 
@@ -48,30 +44,30 @@ public class BenchmarkFeatureIntensity< T extends ImageSingleBand> {
 		ImageTestingOps.randomize((ImageFloat32)input, rand, 0, 255);
 	}
 
-	public class FAST_TABLE_F32 extends PerformerBase {
-		ImplFastCorner12_Table_F32 corner = new ImplFastCorner12_Table_F32(50,12);
-
-		@Override
-		public void process() {
-			corner.process((ImageFloat32)input,intensity);
-		}
-	}
-
-	public class FAST_F32 extends PerformerBase {
-		ImplFastCorner12_F32 corner = new ImplFastCorner12_F32(50,12);
-
-		@Override
-		public void process() {
-			corner.process((ImageFloat32)input,intensity);
-		}
-	}
+//	public class FAST_TABLE_F32 extends PerformerBase {
+//		ImplFastCorner12_Table_F32 corner = new ImplFastCorner12_Table_F32(50,12);
+//
+//		@Override
+//		public void process() {
+//			corner.process((ImageFloat32)input,intensity);
+//		}
+//	}
+//
+//	public class FAST_F32 extends PerformerBase {
+//		ImplFastCorner12_F32 corner = new ImplFastCorner12_F32(50,12);
+//
+//		@Override
+//		public void process() {
+//			corner.process((ImageFloat32)input,intensity);
+//		}
+//	}
 
 	public void evaluate() {
 		System.out.println("=========  Profile Image Size " + imgWidth + " x " + imgHeight + " ==========");
 		System.out.println();
 
-		ProfileOperation.printOpsPerSec(new FAST_TABLE_F32(), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new FAST_F32(), TEST_TIME);
+//		ProfileOperation.printOpsPerSec(new FAST_TABLE_F32(), TEST_TIME);
+//		ProfileOperation.printOpsPerSec(new FAST_F32(), TEST_TIME);
 
 	}
 

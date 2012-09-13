@@ -48,12 +48,20 @@ public class FactoryIntensityPointAlg {
 	public static <T extends ImageSingleBand>
 	FastCornerIntensity<T> fast12(int pixelTol, int minCont, Class<T> imageType)
 	{
+		FastHelper<T> helper;
+
 		if( imageType == ImageFloat32.class )
-			return (FastCornerIntensity<T>)new ImplFastCorner12_F32(pixelTol,minCont);
+			helper = (FastHelper)new ImplFastHelper_F32(pixelTol);
 		else if( imageType == ImageUInt8.class )
-			return (FastCornerIntensity<T>)new ImplFastCorner12_U8(pixelTol,minCont);
+			helper = (FastHelper)new ImplFastHelper_U8(pixelTol);
 		else
-			throw new IllegalArgumentException("Unknown image type "+imageType);
+			throw new IllegalArgumentException("Unsupported image type "+imageType);
+
+		if( minCont == 9 ) {
+			return new ImplFastIntensity9<T>(helper);
+		} else {
+			throw new IllegalArgumentException("Specified minCont is not supported");
+		}
 	}
 
 	/**

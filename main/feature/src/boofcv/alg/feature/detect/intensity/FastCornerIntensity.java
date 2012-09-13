@@ -18,40 +18,116 @@
 
 package boofcv.alg.feature.detect.intensity;
 
+import boofcv.alg.feature.detect.intensity.impl.FastHelper;
+import boofcv.misc.DiscretizedCircle;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 
 /**
  * <p>
- * Generic interface for fast corner detection algorithms.  The general idea is that at the points in a circle around
- * the center point should either be mostly above or mostly below the center pixel's intensity value value.  With
- * this information candidates can be quickly eliminated.  See the paper: "Faster and better: a machine learning
- * approach to corner detection" by Edward Rosten, Reid Porter, and Tom Drummond.
+ * Generic interface for fast corner detection algorithms. The general idea is that at the points in a circle around
+ * the center point should either be above or below the center pixel's intensity value value. With
+ * this information candidates corners can be quickly eliminated, see [1].
  * <p/>
  *
  * <p>
- * NOTE: This implementation might vary from the original algorithm.  Take care when using this class for
- * academic research.
+ * This implementation works by trying to minimize the number of reads per pixel.  Code is auto generated and samples
+ * each point in a series of if statements such that the number of possible candidate corners around a pixel are
+ * eliminated.  A different auto generated implementation is provided for Fast 9 to Fast 12. The number indicates how
+ * many continuous pixels are needed for it to be considered a corner.
+ * </p>
+ *
+ * <p>
+ * After a pixel is flagged as a corner then the the intensity the difference between the average
+ * exterior pixel value which is part of the corner and the center pixel value.  See code for details.
+ * </p>
+ *
+ * @see FastHelper
+ *
+ * <p>
+ * [1] Edward Rosten, Reid Porter and Tom Drummond. "Faster and better: a machine learning approach to corner detection"
  * </p>
  *
  * @author Peter Abeles
  */
-public interface FastCornerIntensity<T extends ImageSingleBand> extends FeatureIntensity<T> {
+public abstract class FastCornerIntensity<T extends ImageSingleBand> implements FeatureIntensity<T> {
+
+	// radius of the circle being sampled
+	protected static final int radius = 3;
+
+	// pixel index offsets for the circle
+	protected int []offsets;
+	// the image's stride.  Used to determine if the offsets need to be recomputed
+	private int stride = 0;
+
+	// list of pixels that might be corners.
+	private QueueCorner candidates = new QueueCorner(10);
+
+	// reference to the input image
+	protected T image;
+
+	// Used to sample the image and compute the score
+	protected FastHelper<T> helper;
 
 	/**
-	 * Extracts corner features from the provided image.
+	 * Constructor
 	 *
-	 * @param input Input image which corners are to be detected inside of.
-	 * @param intensity Output intensity image.
+	 * @param helper Provide the image type specific helper.
 	 */
-	public void process( T input , ImageFloat32 intensity );
+	protected FastCornerIntensity(FastHelper<T> helper) {
+		this.helper = helper;
+	}
+
+	public QueueCorner getCandidates() {
+		return candidates;
+	}
+
+	@Override
+	public int getRadius() {
+		return radius;
+	}
+
+	@Override
+	public int getIgnoreBorder() {
+		return radius;
+	}
+
+	public void process( T image , ImageFloat32 intensity ) {
+		candidates.reset();
+		this.image = image;
+
+		if( stride != image.stride ) {
+			stride = image.stride;
+			offsets = DiscretizedCircle.imageOffsets(radius, image.stride);
+		}
+		helper.setImage(image,offsets);
+
+		for (int y = radius; y < image.width-radius; y++) {
+			int indexIntensity = intensity.startIndex + y*intensity.stride + radius;
+			int index = image.startIndex + y*image.stride + radius;
+			for (int x = radius; index < image.width-radius; x++, index++,indexIntensity++) {
+
+				helper.setThresholds(index);
+
+				if( checkLower(index) ) {
+					intensity.data[indexIntensity] = helper.scoreLower(index);
+				} else if( checkUpper(index)) {
+					intensity.data[indexIntensity] = helper.scoreUpper(index);
+				} else {
+					intensity.data[indexIntensity] = 0;
+				}
+			}
+		}
+	}
 
 	/**
-	 * Returns a list of candidate locations for corners.  All other pixels are assumed to not be corners.
-	 *
-	 * @return List of potential corners.
+	 * Checks to see if the specified pixel qualifies as a corner with lower values
 	 */
-	public QueueCorner getCandidates();
-	
+	protected abstract boolean checkLower( int index );
+
+	/**
+	 * Checks to see if the specified pixel qualifies as a corner with upper values
+	 */
+	protected abstract boolean checkUpper( int index );
 }
