@@ -74,7 +74,7 @@ public class TestImplDescribePointPixelRegionNCC_U8 {
 		}
 		variance /= w*h;
 		assertEquals(desc.mean,mean,1e-8);
-		assertEquals(desc.variance,variance,1e-8);
+		assertEquals(desc.sigma,Math.sqrt(variance),1e-8);
 
 		int index = 0;
 		for( int y = y0; y < y0+h; y++ ) {
