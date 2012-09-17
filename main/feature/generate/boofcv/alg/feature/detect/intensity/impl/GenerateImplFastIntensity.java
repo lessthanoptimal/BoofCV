@@ -21,11 +21,23 @@ package boofcv.alg.feature.detect.intensity.impl;
 import boofcv.misc.CodeGeneratorBase;
 
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * @author Peter Abeles
  */
 public class GenerateImplFastIntensity extends CodeGeneratorBase {
+
+	private final int TOTAL_CIRCLE = 16;
+	private final int ALL = 0xFFFF;
+	// bit field which indicates which pixels cannot be the first pixel in a corner if this one is false
+	// 1 = still possible and 0 = not possible
+	private int[]masks;
+
+	// minimum number of edge points in a row to make a corner
+	private int minContinuous;
 
 	@Override
 	public void generate() throws FileNotFoundException {
@@ -35,9 +47,12 @@ public class GenerateImplFastIntensity extends CodeGeneratorBase {
 		createFile(12);
 	}
 
-	public void createFile( int numContinuous ) throws FileNotFoundException {
-		className = "ImplFastIntensity"+numContinuous;
+	public void createFile( int minContinuous ) throws FileNotFoundException {
+		className = "ImplFastIntensity"+minContinuous;
 
+		this.minContinuous = minContinuous;
+
+		createMasks();
 		printPreamble();
 		printCheck(true);
 		printCheck(false);
@@ -45,12 +60,27 @@ public class GenerateImplFastIntensity extends CodeGeneratorBase {
 		out.println("}");
 	}
 
+	/**
+	 * Create the set of masks for each pixel in the circle
+	 */
+	private void createMasks() {
+		masks = new int[TOTAL_CIRCLE];
+		for( int i = 0; i < TOTAL_CIRCLE; i++ ) {
+			int mask = 0;
+			for( int j = 0; j < minContinuous; j++ ) {
+				int v = i-j < 0 ? TOTAL_CIRCLE+i-j : i-j;
+				mask |= 1 << v;
+			}
+			masks[i] = ~mask;
+			System.out.println("Mask["+i+"]: "+fieldToString(masks[i]));
+		}
+	}
+
+
 	private void printPreamble() throws FileNotFoundException {
 		setOutputFile(className);
 
-		out.print("package boofcv.alg.feature.detect.intensity.impl;\n" +
-				"\n" +
-				"import boofcv.alg.feature.detect.intensity.FastCornerIntensity;\n" +
+		out.print("import boofcv.alg.feature.detect.intensity.FastCornerIntensity;\n" +
 				"import boofcv.struct.image.ImageSingleBand;\n" +
 				"\n" +
 				"/**\n" +
@@ -78,22 +108,157 @@ public class GenerateImplFastIntensity extends CodeGeneratorBase {
 
 	private void printCheck( boolean isLower ) {
 		String type = isLower ? "Lower" : "Upper";
-		String tabs = "\t";
 
 		out.print("\t@Override\n" +
 				"\tprotected boolean check"+type+"( int index )\n" +
-				"\t{\n\n");
+				"\t{\n");
 
 		// bit field keeps tracks of which circle index could be the start of a corner
 		// value of 1 means it could still be a corner
-		handleDecisionPoint(type,tabs,0xFFFFFFFF);
+		handleDecisionPoint(type, ALL, 0, 0, 2, false);
 
 		out.print("\t}\n\n");
 	}
 
-	private void handleDecisionPoint( String type , String tabs , int bitfield ) {
+	/**
+	 * Recursive function which prints out decision tree for detecting a corner. Designed to eliminate
+	 * candidates quickly
+	 *
+	 * @param type Lower or Upper
+	 * @param candidateField Bitfield indicating if a pixel is a candidate for a starting point
+	 * @param positiveField Bitfield indicating if a pixel as been proven to be an edge or not
+	 * @param testedField Bitfield indicating which pixels have been tested for being a corner.
+	 * @param depth How many tabs there are in front
+	 */
+	private void handleDecisionPoint( String type , int candidateField , int positiveField , int testedField , int depth , boolean fromElse) {
 
+		System.out.println("----------------   Depth "+depth);
+		System.out.println("Candidates: "+fieldToString(candidateField));
+		System.out.println("Positive:   " + fieldToString(positiveField));
+		System.out.println("Tested:     "+fieldToString(testedField));
+
+		if( checkFinished(positiveField) ) {
+			out.print(tabs(depth)+"return true;\n");
+			return;
+		} else if( candidateField == 0 ) {
+			out.print(tabs(depth)+"return false;\n");
+			return;
+		}
+
+		List<Candidate> candidates = new ArrayList<Candidate>();
+
+		for( int i = 0; i < TOTAL_CIRCLE; i++ ) {
+			if( (testedField & (1 << i)) != 0 )
+				continue;
+			Candidate c = new Candidate();
+			c.candidateFields = candidateField & masks[i];
+			c.score = countCandidates(c.candidateFields);
+			c.index = i;
+			candidates.add(c);
+		}
+
+		Collections.sort(candidates);
+
+		// select the candidate which will eliminate the most pixels
+		Candidate c = candidates.get(0);
+		System.out.println("  considering "+c.index);
+		if( !fromElse)
+			out.print(tabs(depth));
+		out.print("if( helper.checkPixel"+type+"(index + offsets["+c.index+"]) ) {\n");
+
+		int adjustedTested = testedField | (1 << c.index);
+
+		// positive case with edge being detected
+		int adjustedPositive = positiveField | (1 << c.index);
+		handleDecisionPoint(type, candidateField, adjustedPositive, adjustedTested, depth + 1, false);
+
+		// handle negative case
+		if( c.candidateFields == 0 ) {
+			out.print(tabs(depth)+"} else {\n");
+			out.print(tabs(depth+1)+"return false;\n");
+			out.print(tabs(depth)+"}\n");
+		} else {
+			out.print(tabs(depth)+"} else ");
+			handleDecisionPoint(type,c.candidateFields,positiveField,adjustedTested,depth,true);
+		}
 	}
 
+	private String fieldToString( int field ) {
+		String s = "";
+		for( int i = 0; i < TOTAL_CIRCLE; i++ ) {
+			if( (field & (1 << i)) != 0 )
+				s += 1;
+			else
+				s += 0;
+		}
+		return s;
+	}
+
+	/**
+	 * Prints tabs to ensure proper formatting
+	 */
+	private String tabs( int depth ) {
+		String ret = "";
+		for( int i = 0; i < depth; i++ ) {
+			ret += "\t";
+		}
+		return ret;
+	}
+
+	/**
+	 * Counts the number of candidates which remain
+	 */
+	private int countCandidates( int candidateField ) {
+		int count = 0;
+		for( int i = 0; i < TOTAL_CIRCLE; i++ ) {
+			if( (candidateField & (1 << i)) != 0 )
+				count++;
+		}
+		return count;
+	}
+
+	/**
+	 * Checks to see if a corner has been proven
+	 */
+	private boolean checkFinished( int positive ) {
+		for( int i = 0; i < TOTAL_CIRCLE; i++ ) {
+			boolean match = true;
+			for( int j = 0; j < minContinuous; j++ ) {
+				int w = (i+j) % TOTAL_CIRCLE;
+				if( (positive & (1 << w)) == 0 ) {
+					match = false;
+					break;
+				}
+			}
+			if( match )
+				return true;
+		}
+		return false;
+	}
+
+	private static class Candidate implements Comparable<Candidate> {
+		int score;
+		int candidateFields;
+		int index = 0;
+
+		@Override
+		public int compareTo(Candidate o) {
+			if( score < o.score )
+				return -1;
+			else if( score > o.score )
+				return 1;
+			else if( index < o.index )
+				return -1;
+			else if( index > o.index )
+				return 1;
+			else
+				return 0;
+		}
+	}
+
+	public static void main( String args[] ) throws FileNotFoundException {
+		GenerateImplFastIntensity gen = new GenerateImplFastIntensity();
+		gen.generate();
+	}
 
 }

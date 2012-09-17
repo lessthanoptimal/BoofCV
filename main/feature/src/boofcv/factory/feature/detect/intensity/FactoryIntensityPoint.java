@@ -49,7 +49,7 @@ public class FactoryIntensityPoint {
 	 */
 	public static <I extends ImageSingleBand, D extends ImageSingleBand>
 	GeneralFeatureIntensity<I,D>  fast( int pixelTol, int minCont, Class<I> imageType ) {
-		FastCornerIntensity<I> alg =  FactoryIntensityPointAlg.fast12(pixelTol, minCont, imageType);
+		FastCornerIntensity<I> alg =  FactoryIntensityPointAlg.fast(pixelTol, minCont, imageType);
 		return new WrapperFastCornerIntensity<I, D>(alg);
 	}
 

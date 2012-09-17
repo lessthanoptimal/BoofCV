@@ -18,6 +18,8 @@
 
 package boofcv.alg.feature.detect.intensity.impl;
 
+import boofcv.alg.feature.detect.intensity.DetectorFastNaive;
+import boofcv.alg.feature.detect.intensity.FastCornerIntensity;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.misc.DiscretizedCircle;
 import boofcv.struct.image.ImageFloat32;
@@ -33,24 +35,30 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestImplFastDetect9 {
-
+public abstract class GenericImplFastIntensity {
 	Random rand = new Random(234);
-	int minContinuous = 9;
-	int detectDifference = 20;
+
+	int minContinuous;
+	int detectDifference ;
+
+	FastCornerIntensity<ImageUInt8> alg;
+
+	public GenericImplFastIntensity(FastCornerIntensity<ImageUInt8> alg, int minContinuous, int detectDifference ) {
+		this.alg = alg;
+		this.minContinuous = minContinuous;
+		this.detectDifference = detectDifference;
+	}
 
 	@Test
 	public void compareToNaiveDetection() {
 
 		ImageUInt8 input = new ImageUInt8(40,50);
-		GeneralizedImageOps.randomize(input,rand,0,50);
+		GeneralizedImageOps.randomize(input, rand, 0, 50);
 		ImageFloat32 intensity = new ImageFloat32(input.width,input.height);
 
 		DetectorFastNaive validator = new DetectorFastNaive(3,minContinuous,detectDifference);
 		validator.process(input);
 
-		ImplFastHelper_U8 helper = new ImplFastHelper_U8(detectDifference);
-		ImplFastIntensity9<ImageUInt8> alg = new ImplFastIntensity9<ImageUInt8>(helper);
 		alg.process(input,intensity);
 
 		assertEquals(validator.getCandidates().size,alg.getCandidates().size);
@@ -67,16 +75,12 @@ public class TestImplFastDetect9 {
 	@Test
 	public void checkIntensity() {
 		ImageUInt8 input = new ImageUInt8(40,50);
-		GeneralizedImageOps.randomize(input,rand,0,50);
 		ImageFloat32 intensity = new ImageFloat32(input.width,input.height);
 
-
-		int []offsets = DiscretizedCircle.imageOffsets(4, input.stride);
-		createCircle(4,5,offsets,minContinuous,detectDifference,input);
+		int []offsets = DiscretizedCircle.imageOffsets(3, input.stride);
+		createCircle(4,5,offsets,minContinuous,detectDifference+1,input);
 		createCircle(12,20,offsets,minContinuous,detectDifference+10,input);
 
-		ImplFastHelper_U8 helper = new ImplFastHelper_U8(detectDifference);
-		ImplFastIntensity9<ImageUInt8> alg = new ImplFastIntensity9<ImageUInt8>(helper);
 		alg.process(input,intensity);
 
 		assertTrue(intensity.get(4,5) < intensity.get(12,20));

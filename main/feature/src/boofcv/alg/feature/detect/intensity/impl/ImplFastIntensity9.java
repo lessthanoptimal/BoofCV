@@ -47,25 +47,1088 @@ public class ImplFastIntensity9<T extends ImageSingleBand> extends FastCornerInt
 	protected boolean checkLower( int index )
 	{
 		if( helper.checkPixelLower(index + offsets[0]) ) {
-			if( helper.checkPixelLower(index + offsets[5])  ) {
-				return true;
+			if( helper.checkPixelLower(index + offsets[1]) ) {
+				if( helper.checkPixelLower(index + offsets[2]) ) {
+					if( helper.checkPixelLower(index + offsets[3]) ) {
+						if( helper.checkPixelLower(index + offsets[4]) ) {
+							if( helper.checkPixelLower(index + offsets[5]) ) {
+								if( helper.checkPixelLower(index + offsets[6]) ) {
+									if( helper.checkPixelLower(index + offsets[7]) ) {
+										if( helper.checkPixelLower(index + offsets[8]) ) {
+											return true;
+										} else if( helper.checkPixelLower(index + offsets[15]) ) {
+											return true;
+										} else {
+											return false;
+										}
+									} else if( helper.checkPixelLower(index + offsets[14]) ) {
+										if( helper.checkPixelLower(index + offsets[15]) ) {
+											return true;
+										} else {
+											return false;
+										}
+									} else {
+										return false;
+									}
+								} else if( helper.checkPixelLower(index + offsets[13]) ) {
+									if( helper.checkPixelLower(index + offsets[14]) ) {
+										if( helper.checkPixelLower(index + offsets[15]) ) {
+											return true;
+										} else {
+											return false;
+										}
+									} else {
+										return false;
+									}
+								} else {
+									return false;
+								}
+							} else if( helper.checkPixelLower(index + offsets[12]) ) {
+								if( helper.checkPixelLower(index + offsets[13]) ) {
+									if( helper.checkPixelLower(index + offsets[14]) ) {
+										if( helper.checkPixelLower(index + offsets[11]) ) {
+											if( helper.checkPixelLower(index + offsets[15]) ) {
+												return true;
+											} else if( helper.checkPixelLower(index + offsets[6]) ) {
+												if( helper.checkPixelLower(index + offsets[7]) ) {
+													if( helper.checkPixelLower(index + offsets[8]) ) {
+														if( helper.checkPixelLower(index + offsets[9]) ) {
+															if( helper.checkPixelLower(index + offsets[10]) ) {
+																return true;
+															} else {
+																return false;
+															}
+														} else {
+															return false;
+														}
+													} else {
+														return false;
+													}
+												} else {
+													return false;
+												}
+											} else {
+												return false;
+											}
+										} else if( helper.checkPixelLower(index + offsets[15]) ) {
+											return true;
+										} else {
+											return false;
+										}
+									} else {
+										return false;
+									}
+								} else {
+									return false;
+								}
+							} else {
+								return false;
+							}
+						} else if( helper.checkPixelLower(index + offsets[11]) ) {
+							if( helper.checkPixelLower(index + offsets[12]) ) {
+								if( helper.checkPixelLower(index + offsets[13]) ) {
+									if( helper.checkPixelLower(index + offsets[10]) ) {
+										if( helper.checkPixelLower(index + offsets[14]) ) {
+											if( helper.checkPixelLower(index + offsets[9]) ) {
+												if( helper.checkPixelLower(index + offsets[15]) ) {
+													return true;
+												} else if( helper.checkPixelLower(index + offsets[6]) ) {
+													if( helper.checkPixelLower(index + offsets[7]) ) {
+														if( helper.checkPixelLower(index + offsets[8]) ) {
+															return true;
+														} else {
+															return false;
+														}
+													} else {
+														return false;
+													}
+												} else {
+													return false;
+												}
+											} else if( helper.checkPixelLower(index + offsets[15]) ) {
+												return true;
+											} else {
+												return false;
+											}
+										} else if( helper.checkPixelLower(index + offsets[5]) ) {
+											if( helper.checkPixelLower(index + offsets[6]) ) {
+												if( helper.checkPixelLower(index + offsets[7]) ) {
+													if( helper.checkPixelLower(index + offsets[8]) ) {
+														if( helper.checkPixelLower(index + offsets[9]) ) {
+															return true;
+														} else {
+															return false;
+														}
+													} else {
+														return false;
+													}
+												} else {
+													return false;
+												}
+											} else {
+												return false;
+											}
+										} else {
+											return false;
+										}
+									} else if( helper.checkPixelLower(index + offsets[14]) ) {
+										if( helper.checkPixelLower(index + offsets[15]) ) {
+											return true;
+										} else {
+											return false;
+										}
+									} else {
+										return false;
+									}
+								} else {
+									return false;
+								}
+							} else {
+								return false;
+							}
+						} else {
+							return false;
+						}
+					} else if( helper.checkPixelLower(index + offsets[10]) ) {
+						if( helper.checkPixelLower(index + offsets[11]) ) {
+							if( helper.checkPixelLower(index + offsets[12]) ) {
+								if( helper.checkPixelLower(index + offsets[9]) ) {
+									if( helper.checkPixelLower(index + offsets[13]) ) {
+										if( helper.checkPixelLower(index + offsets[8]) ) {
+											if( helper.checkPixelLower(index + offsets[14]) ) {
+												if( helper.checkPixelLower(index + offsets[7]) ) {
+													if( helper.checkPixelLower(index + offsets[15]) ) {
+														return true;
+													} else if( helper.checkPixelLower(index + offsets[6]) ) {
+														return true;
+													} else {
+														return false;
+													}
+												} else if( helper.checkPixelLower(index + offsets[15]) ) {
+													return true;
+												} else {
+													return false;
+												}
+											} else if( helper.checkPixelLower(index + offsets[5]) ) {
+												if( helper.checkPixelLower(index + offsets[6]) ) {
+													if( helper.checkPixelLower(index + offsets[7]) ) {
+														return true;
+													} else {
+														return false;
+													}
+												} else {
+													return false;
+												}
+											} else {
+												return false;
+											}
+										} else if( helper.checkPixelLower(index + offsets[14]) ) {
+											if( helper.checkPixelLower(index + offsets[15]) ) {
+												return true;
+											} else {
+												return false;
+											}
+										} else {
+											return false;
+										}
+									} else if( helper.checkPixelLower(index + offsets[4]) ) {
+										if( helper.checkPixelLower(index + offsets[5]) ) {
+											if( helper.checkPixelLower(index + offsets[6]) ) {
+												if( helper.checkPixelLower(index + offsets[7]) ) {
+													if( helper.checkPixelLower(index + offsets[8]) ) {
+														return true;
+													} else {
+														return false;
+													}
+												} else {
+													return false;
+												}
+											} else {
+												return false;
+											}
+										} else {
+											return false;
+										}
+									} else {
+										return false;
+									}
+								} else if( helper.checkPixelLower(index + offsets[13]) ) {
+									if( helper.checkPixelLower(index + offsets[14]) ) {
+										if( helper.checkPixelLower(index + offsets[15]) ) {
+											return true;
+										} else {
+											return false;
+										}
+									} else {
+										return false;
+									}
+								} else {
+									return false;
+								}
+							} else {
+								return false;
+							}
+						} else {
+							return false;
+						}
+					} else {
+						return false;
+					}
+				} else if( helper.checkPixelLower(index + offsets[9]) ) {
+					if( helper.checkPixelLower(index + offsets[10]) ) {
+						if( helper.checkPixelLower(index + offsets[11]) ) {
+							if( helper.checkPixelLower(index + offsets[8]) ) {
+								if( helper.checkPixelLower(index + offsets[12]) ) {
+									if( helper.checkPixelLower(index + offsets[7]) ) {
+										if( helper.checkPixelLower(index + offsets[13]) ) {
+											if( helper.checkPixelLower(index + offsets[6]) ) {
+												if( helper.checkPixelLower(index + offsets[14]) ) {
+													return true;
+												} else if( helper.checkPixelLower(index + offsets[5]) ) {
+													return true;
+												} else {
+													return false;
+												}
+											} else if( helper.checkPixelLower(index + offsets[14]) ) {
+												if( helper.checkPixelLower(index + offsets[15]) ) {
+													return true;
+												} else {
+													return false;
+												}
+											} else {
+												return false;
+											}
+										} else if( helper.checkPixelLower(index + offsets[4]) ) {
+											if( helper.checkPixelLower(index + offsets[5]) ) {
+												if( helper.checkPixelLower(index + offsets[6]) ) {
+													return true;
+												} else {
+													return false;
+												}
+											} else {
+												return false;
+											}
+										} else {
+											return false;
+										}
+									} else if( helper.checkPixelLower(index + offsets[13]) ) {
+										if( helper.checkPixelLower(index + offsets[14]) ) {
+											if( helper.checkPixelLower(index + offsets[15]) ) {
+												return true;
+											} else {
+												return false;
+											}
+										} else {
+											return false;
+										}
+									} else {
+										return false;
+									}
+								} else if( helper.checkPixelLower(index + offsets[3]) ) {
+									if( helper.checkPixelLower(index + offsets[4]) ) {
+										if( helper.checkPixelLower(index + offsets[5]) ) {
+											if( helper.checkPixelLower(index + offsets[6]) ) {
+												if( helper.checkPixelLower(index + offsets[7]) ) {
+													return true;
+												} else {
+													return false;
+												}
+											} else {
+												return false;
+											}
+										} else {
+											return false;
+										}
+									} else {
+										return false;
+									}
+								} else {
+									return false;
+								}
+							} else if( helper.checkPixelLower(index + offsets[12]) ) {
+								if( helper.checkPixelLower(index + offsets[13]) ) {
+									if( helper.checkPixelLower(index + offsets[14]) ) {
+										if( helper.checkPixelLower(index + offsets[15]) ) {
+											return true;
+										} else {
+											return false;
+										}
+									} else {
+										return false;
+									}
+								} else {
+									return false;
+								}
+							} else {
+								return false;
+							}
+						} else {
+							return false;
+						}
+					} else {
+						return false;
+					}
+				} else {
+					return false;
+				}
+			} else if( helper.checkPixelLower(index + offsets[8]) ) {
+				if( helper.checkPixelLower(index + offsets[9]) ) {
+					if( helper.checkPixelLower(index + offsets[10]) ) {
+						if( helper.checkPixelLower(index + offsets[7]) ) {
+							if( helper.checkPixelLower(index + offsets[11]) ) {
+								if( helper.checkPixelLower(index + offsets[6]) ) {
+									if( helper.checkPixelLower(index + offsets[12]) ) {
+										if( helper.checkPixelLower(index + offsets[5]) ) {
+											if( helper.checkPixelLower(index + offsets[13]) ) {
+												return true;
+											} else if( helper.checkPixelLower(index + offsets[4]) ) {
+												return true;
+											} else {
+												return false;
+											}
+										} else if( helper.checkPixelLower(index + offsets[13]) ) {
+											if( helper.checkPixelLower(index + offsets[14]) ) {
+												return true;
+											} else {
+												return false;
+											}
+										} else {
+											return false;
+										}
+									} else if( helper.checkPixelLower(index + offsets[3]) ) {
+										if( helper.checkPixelLower(index + offsets[4]) ) {
+											if( helper.checkPixelLower(index + offsets[5]) ) {
+												return true;
+											} else {
+												return false;
+											}
+										} else {
+											return false;
+										}
+									} else {
+										return false;
+									}
+								} else if( helper.checkPixelLower(index + offsets[12]) ) {
+									if( helper.checkPixelLower(index + offsets[13]) ) {
+										if( helper.checkPixelLower(index + offsets[14]) ) {
+											if( helper.checkPixelLower(index + offsets[15]) ) {
+												return true;
+											} else {
+												return false;
+											}
+										} else {
+											return false;
+										}
+									} else {
+										return false;
+									}
+								} else {
+									return false;
+								}
+							} else if( helper.checkPixelLower(index + offsets[2]) ) {
+								if( helper.checkPixelLower(index + offsets[3]) ) {
+									if( helper.checkPixelLower(index + offsets[4]) ) {
+										if( helper.checkPixelLower(index + offsets[5]) ) {
+											if( helper.checkPixelLower(index + offsets[6]) ) {
+												return true;
+											} else {
+												return false;
+											}
+										} else {
+											return false;
+										}
+									} else {
+										return false;
+									}
+								} else {
+									return false;
+								}
+							} else {
+								return false;
+							}
+						} else if( helper.checkPixelLower(index + offsets[11]) ) {
+							if( helper.checkPixelLower(index + offsets[12]) ) {
+								if( helper.checkPixelLower(index + offsets[13]) ) {
+									if( helper.checkPixelLower(index + offsets[14]) ) {
+										if( helper.checkPixelLower(index + offsets[15]) ) {
+											return true;
+										} else {
+											return false;
+										}
+									} else {
+										return false;
+									}
+								} else {
+									return false;
+								}
+							} else {
+								return false;
+							}
+						} else {
+							return false;
+						}
+					} else {
+						return false;
+					}
+				} else {
+					return false;
+				}
+			} else {
+				return false;
+			}
+		} else if( helper.checkPixelLower(index + offsets[7]) ) {
+			if( helper.checkPixelLower(index + offsets[8]) ) {
+				if( helper.checkPixelLower(index + offsets[9]) ) {
+					if( helper.checkPixelLower(index + offsets[6]) ) {
+						if( helper.checkPixelLower(index + offsets[10]) ) {
+							if( helper.checkPixelLower(index + offsets[5]) ) {
+								if( helper.checkPixelLower(index + offsets[11]) ) {
+									if( helper.checkPixelLower(index + offsets[4]) ) {
+										if( helper.checkPixelLower(index + offsets[12]) ) {
+											return true;
+										} else if( helper.checkPixelLower(index + offsets[3]) ) {
+											return true;
+										} else {
+											return false;
+										}
+									} else if( helper.checkPixelLower(index + offsets[12]) ) {
+										if( helper.checkPixelLower(index + offsets[13]) ) {
+											return true;
+										} else {
+											return false;
+										}
+									} else {
+										return false;
+									}
+								} else if( helper.checkPixelLower(index + offsets[2]) ) {
+									if( helper.checkPixelLower(index + offsets[3]) ) {
+										if( helper.checkPixelLower(index + offsets[4]) ) {
+											return true;
+										} else {
+											return false;
+										}
+									} else {
+										return false;
+									}
+								} else {
+									return false;
+								}
+							} else if( helper.checkPixelLower(index + offsets[11]) ) {
+								if( helper.checkPixelLower(index + offsets[12]) ) {
+									if( helper.checkPixelLower(index + offsets[13]) ) {
+										if( helper.checkPixelLower(index + offsets[14]) ) {
+											return true;
+										} else {
+											return false;
+										}
+									} else {
+										return false;
+									}
+								} else {
+									return false;
+								}
+							} else {
+								return false;
+							}
+						} else if( helper.checkPixelLower(index + offsets[1]) ) {
+							if( helper.checkPixelLower(index + offsets[2]) ) {
+								if( helper.checkPixelLower(index + offsets[3]) ) {
+									if( helper.checkPixelLower(index + offsets[4]) ) {
+										if( helper.checkPixelLower(index + offsets[5]) ) {
+											return true;
+										} else {
+											return false;
+										}
+									} else {
+										return false;
+									}
+								} else {
+									return false;
+								}
+							} else {
+								return false;
+							}
+						} else {
+							return false;
+						}
+					} else if( helper.checkPixelLower(index + offsets[10]) ) {
+						if( helper.checkPixelLower(index + offsets[11]) ) {
+							if( helper.checkPixelLower(index + offsets[12]) ) {
+								if( helper.checkPixelLower(index + offsets[13]) ) {
+									if( helper.checkPixelLower(index + offsets[14]) ) {
+										if( helper.checkPixelLower(index + offsets[15]) ) {
+											return true;
+										} else {
+											return false;
+										}
+									} else {
+										return false;
+									}
+								} else {
+									return false;
+								}
+							} else {
+								return false;
+							}
+						} else {
+							return false;
+						}
+					} else {
+						return false;
+					}
+				} else {
+					return false;
+				}
+			} else {
+				return false;
 			}
 		} else {
-
+			return false;
 		}
-		return false;
 	}
 
 	@Override
 	protected boolean checkUpper( int index )
 	{
 		if( helper.checkPixelUpper(index + offsets[0]) ) {
-			if( helper.checkPixelUpper(index + offsets[5])  ) {
-				return true;
+			if( helper.checkPixelUpper(index + offsets[1]) ) {
+				if( helper.checkPixelUpper(index + offsets[2]) ) {
+					if( helper.checkPixelUpper(index + offsets[3]) ) {
+						if( helper.checkPixelUpper(index + offsets[4]) ) {
+							if( helper.checkPixelUpper(index + offsets[5]) ) {
+								if( helper.checkPixelUpper(index + offsets[6]) ) {
+									if( helper.checkPixelUpper(index + offsets[7]) ) {
+										if( helper.checkPixelUpper(index + offsets[8]) ) {
+											return true;
+										} else if( helper.checkPixelUpper(index + offsets[15]) ) {
+											return true;
+										} else {
+											return false;
+										}
+									} else if( helper.checkPixelUpper(index + offsets[14]) ) {
+										if( helper.checkPixelUpper(index + offsets[15]) ) {
+											return true;
+										} else {
+											return false;
+										}
+									} else {
+										return false;
+									}
+								} else if( helper.checkPixelUpper(index + offsets[13]) ) {
+									if( helper.checkPixelUpper(index + offsets[14]) ) {
+										if( helper.checkPixelUpper(index + offsets[15]) ) {
+											return true;
+										} else {
+											return false;
+										}
+									} else {
+										return false;
+									}
+								} else {
+									return false;
+								}
+							} else if( helper.checkPixelUpper(index + offsets[12]) ) {
+								if( helper.checkPixelUpper(index + offsets[13]) ) {
+									if( helper.checkPixelUpper(index + offsets[14]) ) {
+										if( helper.checkPixelUpper(index + offsets[11]) ) {
+											if( helper.checkPixelUpper(index + offsets[15]) ) {
+												return true;
+											} else if( helper.checkPixelUpper(index + offsets[6]) ) {
+												if( helper.checkPixelUpper(index + offsets[7]) ) {
+													if( helper.checkPixelUpper(index + offsets[8]) ) {
+														if( helper.checkPixelUpper(index + offsets[9]) ) {
+															if( helper.checkPixelUpper(index + offsets[10]) ) {
+																return true;
+															} else {
+																return false;
+															}
+														} else {
+															return false;
+														}
+													} else {
+														return false;
+													}
+												} else {
+													return false;
+												}
+											} else {
+												return false;
+											}
+										} else if( helper.checkPixelUpper(index + offsets[15]) ) {
+											return true;
+										} else {
+											return false;
+										}
+									} else {
+										return false;
+									}
+								} else {
+									return false;
+								}
+							} else {
+								return false;
+							}
+						} else if( helper.checkPixelUpper(index + offsets[11]) ) {
+							if( helper.checkPixelUpper(index + offsets[12]) ) {
+								if( helper.checkPixelUpper(index + offsets[13]) ) {
+									if( helper.checkPixelUpper(index + offsets[10]) ) {
+										if( helper.checkPixelUpper(index + offsets[14]) ) {
+											if( helper.checkPixelUpper(index + offsets[9]) ) {
+												if( helper.checkPixelUpper(index + offsets[15]) ) {
+													return true;
+												} else if( helper.checkPixelUpper(index + offsets[6]) ) {
+													if( helper.checkPixelUpper(index + offsets[7]) ) {
+														if( helper.checkPixelUpper(index + offsets[8]) ) {
+															return true;
+														} else {
+															return false;
+														}
+													} else {
+														return false;
+													}
+												} else {
+													return false;
+												}
+											} else if( helper.checkPixelUpper(index + offsets[15]) ) {
+												return true;
+											} else {
+												return false;
+											}
+										} else if( helper.checkPixelUpper(index + offsets[5]) ) {
+											if( helper.checkPixelUpper(index + offsets[6]) ) {
+												if( helper.checkPixelUpper(index + offsets[7]) ) {
+													if( helper.checkPixelUpper(index + offsets[8]) ) {
+														if( helper.checkPixelUpper(index + offsets[9]) ) {
+															return true;
+														} else {
+															return false;
+														}
+													} else {
+														return false;
+													}
+												} else {
+													return false;
+												}
+											} else {
+												return false;
+											}
+										} else {
+											return false;
+										}
+									} else if( helper.checkPixelUpper(index + offsets[14]) ) {
+										if( helper.checkPixelUpper(index + offsets[15]) ) {
+											return true;
+										} else {
+											return false;
+										}
+									} else {
+										return false;
+									}
+								} else {
+									return false;
+								}
+							} else {
+								return false;
+							}
+						} else {
+							return false;
+						}
+					} else if( helper.checkPixelUpper(index + offsets[10]) ) {
+						if( helper.checkPixelUpper(index + offsets[11]) ) {
+							if( helper.checkPixelUpper(index + offsets[12]) ) {
+								if( helper.checkPixelUpper(index + offsets[9]) ) {
+									if( helper.checkPixelUpper(index + offsets[13]) ) {
+										if( helper.checkPixelUpper(index + offsets[8]) ) {
+											if( helper.checkPixelUpper(index + offsets[14]) ) {
+												if( helper.checkPixelUpper(index + offsets[7]) ) {
+													if( helper.checkPixelUpper(index + offsets[15]) ) {
+														return true;
+													} else if( helper.checkPixelUpper(index + offsets[6]) ) {
+														return true;
+													} else {
+														return false;
+													}
+												} else if( helper.checkPixelUpper(index + offsets[15]) ) {
+													return true;
+												} else {
+													return false;
+												}
+											} else if( helper.checkPixelUpper(index + offsets[5]) ) {
+												if( helper.checkPixelUpper(index + offsets[6]) ) {
+													if( helper.checkPixelUpper(index + offsets[7]) ) {
+														return true;
+													} else {
+														return false;
+													}
+												} else {
+													return false;
+												}
+											} else {
+												return false;
+											}
+										} else if( helper.checkPixelUpper(index + offsets[14]) ) {
+											if( helper.checkPixelUpper(index + offsets[15]) ) {
+												return true;
+											} else {
+												return false;
+											}
+										} else {
+											return false;
+										}
+									} else if( helper.checkPixelUpper(index + offsets[4]) ) {
+										if( helper.checkPixelUpper(index + offsets[5]) ) {
+											if( helper.checkPixelUpper(index + offsets[6]) ) {
+												if( helper.checkPixelUpper(index + offsets[7]) ) {
+													if( helper.checkPixelUpper(index + offsets[8]) ) {
+														return true;
+													} else {
+														return false;
+													}
+												} else {
+													return false;
+												}
+											} else {
+												return false;
+											}
+										} else {
+											return false;
+										}
+									} else {
+										return false;
+									}
+								} else if( helper.checkPixelUpper(index + offsets[13]) ) {
+									if( helper.checkPixelUpper(index + offsets[14]) ) {
+										if( helper.checkPixelUpper(index + offsets[15]) ) {
+											return true;
+										} else {
+											return false;
+										}
+									} else {
+										return false;
+									}
+								} else {
+									return false;
+								}
+							} else {
+								return false;
+							}
+						} else {
+							return false;
+						}
+					} else {
+						return false;
+					}
+				} else if( helper.checkPixelUpper(index + offsets[9]) ) {
+					if( helper.checkPixelUpper(index + offsets[10]) ) {
+						if( helper.checkPixelUpper(index + offsets[11]) ) {
+							if( helper.checkPixelUpper(index + offsets[8]) ) {
+								if( helper.checkPixelUpper(index + offsets[12]) ) {
+									if( helper.checkPixelUpper(index + offsets[7]) ) {
+										if( helper.checkPixelUpper(index + offsets[13]) ) {
+											if( helper.checkPixelUpper(index + offsets[6]) ) {
+												if( helper.checkPixelUpper(index + offsets[14]) ) {
+													return true;
+												} else if( helper.checkPixelUpper(index + offsets[5]) ) {
+													return true;
+												} else {
+													return false;
+												}
+											} else if( helper.checkPixelUpper(index + offsets[14]) ) {
+												if( helper.checkPixelUpper(index + offsets[15]) ) {
+													return true;
+												} else {
+													return false;
+												}
+											} else {
+												return false;
+											}
+										} else if( helper.checkPixelUpper(index + offsets[4]) ) {
+											if( helper.checkPixelUpper(index + offsets[5]) ) {
+												if( helper.checkPixelUpper(index + offsets[6]) ) {
+													return true;
+												} else {
+													return false;
+												}
+											} else {
+												return false;
+											}
+										} else {
+											return false;
+										}
+									} else if( helper.checkPixelUpper(index + offsets[13]) ) {
+										if( helper.checkPixelUpper(index + offsets[14]) ) {
+											if( helper.checkPixelUpper(index + offsets[15]) ) {
+												return true;
+											} else {
+												return false;
+											}
+										} else {
+											return false;
+										}
+									} else {
+										return false;
+									}
+								} else if( helper.checkPixelUpper(index + offsets[3]) ) {
+									if( helper.checkPixelUpper(index + offsets[4]) ) {
+										if( helper.checkPixelUpper(index + offsets[5]) ) {
+											if( helper.checkPixelUpper(index + offsets[6]) ) {
+												if( helper.checkPixelUpper(index + offsets[7]) ) {
+													return true;
+												} else {
+													return false;
+												}
+											} else {
+												return false;
+											}
+										} else {
+											return false;
+										}
+									} else {
+										return false;
+									}
+								} else {
+									return false;
+								}
+							} else if( helper.checkPixelUpper(index + offsets[12]) ) {
+								if( helper.checkPixelUpper(index + offsets[13]) ) {
+									if( helper.checkPixelUpper(index + offsets[14]) ) {
+										if( helper.checkPixelUpper(index + offsets[15]) ) {
+											return true;
+										} else {
+											return false;
+										}
+									} else {
+										return false;
+									}
+								} else {
+									return false;
+								}
+							} else {
+								return false;
+							}
+						} else {
+							return false;
+						}
+					} else {
+						return false;
+					}
+				} else {
+					return false;
+				}
+			} else if( helper.checkPixelUpper(index + offsets[8]) ) {
+				if( helper.checkPixelUpper(index + offsets[9]) ) {
+					if( helper.checkPixelUpper(index + offsets[10]) ) {
+						if( helper.checkPixelUpper(index + offsets[7]) ) {
+							if( helper.checkPixelUpper(index + offsets[11]) ) {
+								if( helper.checkPixelUpper(index + offsets[6]) ) {
+									if( helper.checkPixelUpper(index + offsets[12]) ) {
+										if( helper.checkPixelUpper(index + offsets[5]) ) {
+											if( helper.checkPixelUpper(index + offsets[13]) ) {
+												return true;
+											} else if( helper.checkPixelUpper(index + offsets[4]) ) {
+												return true;
+											} else {
+												return false;
+											}
+										} else if( helper.checkPixelUpper(index + offsets[13]) ) {
+											if( helper.checkPixelUpper(index + offsets[14]) ) {
+												return true;
+											} else {
+												return false;
+											}
+										} else {
+											return false;
+										}
+									} else if( helper.checkPixelUpper(index + offsets[3]) ) {
+										if( helper.checkPixelUpper(index + offsets[4]) ) {
+											if( helper.checkPixelUpper(index + offsets[5]) ) {
+												return true;
+											} else {
+												return false;
+											}
+										} else {
+											return false;
+										}
+									} else {
+										return false;
+									}
+								} else if( helper.checkPixelUpper(index + offsets[12]) ) {
+									if( helper.checkPixelUpper(index + offsets[13]) ) {
+										if( helper.checkPixelUpper(index + offsets[14]) ) {
+											if( helper.checkPixelUpper(index + offsets[15]) ) {
+												return true;
+											} else {
+												return false;
+											}
+										} else {
+											return false;
+										}
+									} else {
+										return false;
+									}
+								} else {
+									return false;
+								}
+							} else if( helper.checkPixelUpper(index + offsets[2]) ) {
+								if( helper.checkPixelUpper(index + offsets[3]) ) {
+									if( helper.checkPixelUpper(index + offsets[4]) ) {
+										if( helper.checkPixelUpper(index + offsets[5]) ) {
+											if( helper.checkPixelUpper(index + offsets[6]) ) {
+												return true;
+											} else {
+												return false;
+											}
+										} else {
+											return false;
+										}
+									} else {
+										return false;
+									}
+								} else {
+									return false;
+								}
+							} else {
+								return false;
+							}
+						} else if( helper.checkPixelUpper(index + offsets[11]) ) {
+							if( helper.checkPixelUpper(index + offsets[12]) ) {
+								if( helper.checkPixelUpper(index + offsets[13]) ) {
+									if( helper.checkPixelUpper(index + offsets[14]) ) {
+										if( helper.checkPixelUpper(index + offsets[15]) ) {
+											return true;
+										} else {
+											return false;
+										}
+									} else {
+										return false;
+									}
+								} else {
+									return false;
+								}
+							} else {
+								return false;
+							}
+						} else {
+							return false;
+						}
+					} else {
+						return false;
+					}
+				} else {
+					return false;
+				}
+			} else {
+				return false;
+			}
+		} else if( helper.checkPixelUpper(index + offsets[7]) ) {
+			if( helper.checkPixelUpper(index + offsets[8]) ) {
+				if( helper.checkPixelUpper(index + offsets[9]) ) {
+					if( helper.checkPixelUpper(index + offsets[6]) ) {
+						if( helper.checkPixelUpper(index + offsets[10]) ) {
+							if( helper.checkPixelUpper(index + offsets[5]) ) {
+								if( helper.checkPixelUpper(index + offsets[11]) ) {
+									if( helper.checkPixelUpper(index + offsets[4]) ) {
+										if( helper.checkPixelUpper(index + offsets[12]) ) {
+											return true;
+										} else if( helper.checkPixelUpper(index + offsets[3]) ) {
+											return true;
+										} else {
+											return false;
+										}
+									} else if( helper.checkPixelUpper(index + offsets[12]) ) {
+										if( helper.checkPixelUpper(index + offsets[13]) ) {
+											return true;
+										} else {
+											return false;
+										}
+									} else {
+										return false;
+									}
+								} else if( helper.checkPixelUpper(index + offsets[2]) ) {
+									if( helper.checkPixelUpper(index + offsets[3]) ) {
+										if( helper.checkPixelUpper(index + offsets[4]) ) {
+											return true;
+										} else {
+											return false;
+										}
+									} else {
+										return false;
+									}
+								} else {
+									return false;
+								}
+							} else if( helper.checkPixelUpper(index + offsets[11]) ) {
+								if( helper.checkPixelUpper(index + offsets[12]) ) {
+									if( helper.checkPixelUpper(index + offsets[13]) ) {
+										if( helper.checkPixelUpper(index + offsets[14]) ) {
+											return true;
+										} else {
+											return false;
+										}
+									} else {
+										return false;
+									}
+								} else {
+									return false;
+								}
+							} else {
+								return false;
+							}
+						} else if( helper.checkPixelUpper(index + offsets[1]) ) {
+							if( helper.checkPixelUpper(index + offsets[2]) ) {
+								if( helper.checkPixelUpper(index + offsets[3]) ) {
+									if( helper.checkPixelUpper(index + offsets[4]) ) {
+										if( helper.checkPixelUpper(index + offsets[5]) ) {
+											return true;
+										} else {
+											return false;
+										}
+									} else {
+										return false;
+									}
+								} else {
+									return false;
+								}
+							} else {
+								return false;
+							}
+						} else {
+							return false;
+						}
+					} else if( helper.checkPixelUpper(index + offsets[10]) ) {
+						if( helper.checkPixelUpper(index + offsets[11]) ) {
+							if( helper.checkPixelUpper(index + offsets[12]) ) {
+								if( helper.checkPixelUpper(index + offsets[13]) ) {
+									if( helper.checkPixelUpper(index + offsets[14]) ) {
+										if( helper.checkPixelUpper(index + offsets[15]) ) {
+											return true;
+										} else {
+											return false;
+										}
+									} else {
+										return false;
+									}
+								} else {
+									return false;
+								}
+							} else {
+								return false;
+							}
+						} else {
+							return false;
+						}
+					} else {
+						return false;
+					}
+				} else {
+					return false;
+				}
+			} else {
+				return false;
 			}
 		} else {
-
+			return false;
 		}
-		return false;
 	}
+
 }
