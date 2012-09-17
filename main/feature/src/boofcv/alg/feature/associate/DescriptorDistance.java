@@ -119,7 +119,7 @@ public class DescriptorDistance {
 		}
 
 		// negative so that smaller values are better
-		return top/Math.sqrt(a.variance * b.variance);
+		return top/(a.sigma * b.sigma);
 	}
 
 	/**

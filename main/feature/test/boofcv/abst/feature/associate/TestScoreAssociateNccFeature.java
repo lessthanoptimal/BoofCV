@@ -36,8 +36,8 @@ public class TestScoreAssociateNccFeature {
 		NccFeature a = new NccFeature(5);
 		NccFeature b = new NccFeature(5);
 
-		a.variance=12;
-		b.variance=7;
+		a.sigma =12;
+		b.sigma =7;
 		a.value=new double[]{1,2,3,4,5};
 		b.value=new double[]{2,-1,7,-8,10};
 

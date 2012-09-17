@@ -33,6 +33,7 @@ import boofcv.alg.feature.describe.DescribePointSurf;
 import boofcv.alg.feature.describe.brief.FactoryBriefDefinition;
 import boofcv.alg.feature.detect.interest.FastHessianFeatureDetector;
 import boofcv.alg.feature.orientation.OrientationIntegral;
+import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.alg.tracker.pklt.GenericPkltFeatSelector;
 import boofcv.alg.tracker.pklt.PkltManager;
 import boofcv.alg.tracker.pklt.PkltManagerConfig;
@@ -143,15 +144,18 @@ public class FactoryPointSequentialTracker {
 	 *
 	 * @param maxFeatures         Maximum number of features it will track.
 	 * @param maxAssociationError Maximum allowed association error.  Try 200.
-	 * @param pixelDetectTol      Tolerance for detecting FAST features.  Try 20.
+	 * @param cornerThreshold     Tolerance for detecting corner features.  Tune. Start at 1.
 	 * @param imageType           Type of image being processed.
 	 */
 	public static <I extends ImageSingleBand>
-	ImagePointTracker<I> brief(int maxFeatures, int maxAssociationError, int pixelDetectTol, Class<I> imageType) {
+	ImagePointTracker<I> brief(int maxFeatures, int maxAssociationError, float cornerThreshold, Class<I> imageType) {
 		DescribePointBrief<I> alg = FactoryDescribePointAlgs.brief(FactoryBriefDefinition.gaussian2(new Random(123), 16, 512),
 				FactoryBlurFilter.gaussian(imageType, 0, 4));
-		GeneralFeatureDetector<I, ?> fast = FactoryDetectPoint.createFast(3, pixelDetectTol, maxFeatures, imageType);
-		InterestPointDetector<I> detector = FactoryInterestPoint.wrapPoint(fast, imageType, null);
+
+		Class derivType = GImageDerivativeOps.getDerivativeType(imageType);
+		GeneralFeatureDetector corner = FactoryDetectPoint.createShiTomasi(3,false,cornerThreshold, maxFeatures, derivType);
+
+		InterestPointDetector<I> detector = FactoryInterestPoint.wrapPoint(corner, imageType, derivType);
 		ScoreAssociateHamming_B score = new ScoreAssociateHamming_B();
 
 		GeneralAssociation<TupleDesc_B> association =
@@ -167,14 +171,15 @@ public class FactoryPointSequentialTracker {
 	 * @param maxFeatures    Maximum number of features it will track.
 	 * @param regionWidth    How wide the region is.  Try 5
 	 * @param regionHeight   How tall the region is.  Try 5
-	 * @param pixelDetectTol Tolerance for detecting features.  Try 20.
+	 * @param cornerThreshold     Tolerance for detecting corner features.  Tune. Start at 1.
 	 * @param imageType      Type of image being processed.
 	 */
 	public static <I extends ImageSingleBand, D extends ImageSingleBand>
 	ImagePointTracker<I> pixelNCC(int maxFeatures, int regionWidth, int regionHeight,
-								  int pixelDetectTol, Class<I> imageType, Class<D> derivType) {
+								  float cornerThreshold, Class<I> imageType, Class<D> derivType) {
 		DescribePointPixelRegionNCC<I> alg = FactoryDescribePointAlgs.pixelRegionNCC(regionWidth, regionHeight, imageType);
-		GeneralFeatureDetector<I, D> corner = FactoryDetectPoint.createFast(2, pixelDetectTol, maxFeatures, imageType);
+
+		GeneralFeatureDetector corner = FactoryDetectPoint.createShiTomasi(3, false, cornerThreshold, maxFeatures, derivType);
 
 		InterestPointDetector<I> detector = FactoryInterestPoint.wrapPoint(corner, imageType, derivType);
 		ScoreAssociateNccFeature score = new ScoreAssociateNccFeature();

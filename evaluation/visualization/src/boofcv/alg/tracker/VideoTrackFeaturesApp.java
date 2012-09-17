@@ -66,7 +66,7 @@ public class VideoTrackFeaturesApp<I extends ImageSingleBand, D extends ImageSin
 		config.pyramidScaling = new int[]{1,2,4,8};
 
 		addAlgorithm(0,"KLT", FactoryPointSequentialTracker.klt(config));
-		addAlgorithm(0,"BRIEF", FactoryPointSequentialTracker.brief(300, 200, 50, imageType));
+		addAlgorithm(0,"BRIEF", FactoryPointSequentialTracker.brief(300, 200, 10, imageType));
 		addAlgorithm(0,"SURF", FactoryPointSequentialTracker.surf(300, 200, 2, imageType));
 		addAlgorithm(0,"NCC", FactoryPointSequentialTracker.pixelNCC(500,5,5,20,imageType,derivType));
 

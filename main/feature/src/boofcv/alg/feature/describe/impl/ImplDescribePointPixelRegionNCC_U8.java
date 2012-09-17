@@ -49,6 +49,6 @@ public class ImplDescribePointPixelRegionNCC_U8 extends DescribePointPixelRegion
 		variance /= offset.length;
 
 		desc.mean = mean;
-		desc.variance = variance;
+		desc.sigma = Math.sqrt(variance);
 	}
 }

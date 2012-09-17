@@ -27,8 +27,8 @@ public class NccFeature extends TupleDesc_F64 {
 
 	// mean pixel intensity
 	public double mean;
-	// variance deviation
-	public double variance;
+	// standard deviation
+	public double sigma;
 
 	public NccFeature(int numFeatures) {
 		super(numFeatures);
@@ -36,7 +36,7 @@ public class NccFeature extends TupleDesc_F64 {
 
 	public void setTo(NccFeature src) {
 		this.mean = src.mean;
-		this.variance = src.variance;
+		this.sigma = src.sigma;
 		System.arraycopy(src.value,0,value,0,value.length);
 	}
 }
