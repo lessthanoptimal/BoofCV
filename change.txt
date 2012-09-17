@@ -28,6 +28,9 @@ Version : Alpha 0.10
 - InterestPointDetector 
   * WrapFHtoInterestPoint now returns the correct detection radius
   * Fixed non-compliant implementations with incorrectly handled unsupported features.  Thanks jasonnn for submitting this bug
+- FAST Feature Detector
+  * Original implementation was buggy and did not produce same results as original author's code
+  * Rewrote from scratch and replicates original author results
 - GeneralFeatureDetector moved from extract to interest package
 - Fundamental/Essential Matrix
   * 7-point algorithm now returns all solutions and the algorithm was tweaked
@@ -52,6 +55,7 @@ Version : Alpha 0.10
   * Added code for template matching
   * Added example code to demonstrate its use
 - Added support for alpha channel in ConvertBufferedImage 
+- FactoryPointSequentialTracker doesn't create trackers with FAST detector instead uses ShiTomasi to improve stability
 
 ---------------------------------------------
 Date    : 2012/7/22
