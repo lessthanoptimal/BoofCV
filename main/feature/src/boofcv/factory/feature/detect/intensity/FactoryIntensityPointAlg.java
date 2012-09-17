@@ -46,7 +46,7 @@ public class FactoryIntensityPointAlg {
 	 * @return Fast corner
 	 */
 	public static <T extends ImageSingleBand>
-	FastCornerIntensity<T> fast12(int pixelTol, int minCont, Class<T> imageType)
+	FastCornerIntensity<T> fast(int pixelTol, int minCont, Class<T> imageType)
 	{
 		FastHelper<T> helper;
 
@@ -59,6 +59,12 @@ public class FactoryIntensityPointAlg {
 
 		if( minCont == 9 ) {
 			return new ImplFastIntensity9<T>(helper);
+		} else if( minCont == 10 ) {
+			return new ImplFastIntensity10<T>(helper);
+		} else if( minCont == 11 ) {
+			return new ImplFastIntensity11<T>(helper);
+		} else if( minCont == 12 ) {
+			return new ImplFastIntensity12<T>(helper);
 		} else {
 			throw new IllegalArgumentException("Specified minCont is not supported");
 		}

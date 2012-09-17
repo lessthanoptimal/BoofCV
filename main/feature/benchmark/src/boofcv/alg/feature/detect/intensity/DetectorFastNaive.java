@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.feature.detect.intensity.impl;
+package boofcv.alg.feature.detect.intensity;
 
 import boofcv.misc.DiscretizedCircle;
 import boofcv.struct.QueueCorner;

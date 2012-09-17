@@ -18,17 +18,22 @@
 
 package boofcv.alg.feature.detect.intensity;
 
-import boofcv.alg.misc.ImageTestingOps;
+import boofcv.alg.feature.detect.intensity.impl.ImplFastHelper_U8;
+import boofcv.alg.feature.detect.intensity.impl.ImplFastIntensity12;
+import boofcv.alg.feature.detect.intensity.impl.ImplFastIntensity9;
 import boofcv.core.image.GeneralizedImageOps;
+import boofcv.misc.PerformerBase;
+import boofcv.misc.ProfileOperation;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageUInt8;
 
 import java.util.Random;
 
 /**
  * @author Peter Abeles
  */
-public class BenchmarkFeatureIntensity< T extends ImageSingleBand> {
+public class BenchmarkFastIntensity< T extends ImageSingleBand> {
 	static int imgWidth = 640;
 	static int imgHeight = 480;
 	static long TEST_TIME = 1000;
@@ -36,43 +41,53 @@ public class BenchmarkFeatureIntensity< T extends ImageSingleBand> {
 	T input;
 	ImageFloat32 intensity;
 
-	public BenchmarkFeatureIntensity( Class<T> imageType ) {
+	public BenchmarkFastIntensity(Class<T> imageType) {
 		input = GeneralizedImageOps.createSingleBand(imageType,imgWidth,imgHeight);
 		intensity = new ImageFloat32(input.width,input.height);
 
 		Random rand = new Random(234);
-		ImageTestingOps.randomize((ImageFloat32)input, rand, 0, 255);
+		GeneralizedImageOps.randomize(input, rand, 0, 255);
 	}
 
-//	public class FAST_TABLE_F32 extends PerformerBase {
-//		ImplFastCorner12_Table_F32 corner = new ImplFastCorner12_Table_F32(50,12);
-//
-//		@Override
-//		public void process() {
-//			corner.process((ImageFloat32)input,intensity);
-//		}
-//	}
-//
-//	public class FAST_F32 extends PerformerBase {
-//		ImplFastCorner12_F32 corner = new ImplFastCorner12_F32(50,12);
-//
-//		@Override
-//		public void process() {
-//			corner.process((ImageFloat32)input,intensity);
-//		}
-//	}
+	public class FAST_NAIVE_9 extends PerformerBase {
+		DetectorFastNaive corner = new DetectorFastNaive(3,9,60);
+
+		@Override
+		public void process() {
+			corner.process((ImageUInt8)input);
+		}
+	}
+
+	public class FAST9 extends PerformerBase {
+		ImplFastIntensity9<ImageUInt8> corner = new ImplFastIntensity9<ImageUInt8>(new ImplFastHelper_U8(60));
+
+		@Override
+		public void process() {
+			corner.process((ImageUInt8)input,intensity);
+		}
+	}
+
+	public class FAST12 extends PerformerBase {
+		ImplFastIntensity12<ImageUInt8> corner = new ImplFastIntensity12<ImageUInt8>(new ImplFastHelper_U8(60));
+
+		@Override
+		public void process() {
+			corner.process((ImageUInt8)input,intensity);
+		}
+	}
 
 	public void evaluate() {
 		System.out.println("=========  Profile Image Size " + imgWidth + " x " + imgHeight + " ==========");
 		System.out.println();
 
-//		ProfileOperation.printOpsPerSec(new FAST_TABLE_F32(), TEST_TIME);
-//		ProfileOperation.printOpsPerSec(new FAST_F32(), TEST_TIME);
+		ProfileOperation.printOpsPerSec(new FAST_NAIVE_9(), TEST_TIME);
+		ProfileOperation.printOpsPerSec(new FAST9(), TEST_TIME);
+		ProfileOperation.printOpsPerSec(new FAST12(), TEST_TIME);
 
 	}
 
 	public static void main( String args[] ) {
-		BenchmarkFeatureIntensity benchmark = new BenchmarkFeatureIntensity(ImageFloat32.class);
+		BenchmarkFastIntensity benchmark = new BenchmarkFastIntensity(ImageUInt8.class);
 
 		benchmark.evaluate();
 	}

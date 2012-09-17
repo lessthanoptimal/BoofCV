@@ -103,17 +103,19 @@ public abstract class FastCornerIntensity<T extends ImageSingleBand> implements 
 		}
 		helper.setImage(image,offsets);
 
-		for (int y = radius; y < image.width-radius; y++) {
+		for (int y = radius; y < image.height-radius; y++) {
 			int indexIntensity = intensity.startIndex + y*intensity.stride + radius;
 			int index = image.startIndex + y*image.stride + radius;
-			for (int x = radius; index < image.width-radius; x++, index++,indexIntensity++) {
+			for (int x = radius; x < image.width-radius; x++, index++,indexIntensity++) {
 
 				helper.setThresholds(index);
 
 				if( checkLower(index) ) {
 					intensity.data[indexIntensity] = helper.scoreLower(index);
+					candidates.add(x,y);
 				} else if( checkUpper(index)) {
 					intensity.data[indexIntensity] = helper.scoreUpper(index);
+					candidates.add(x,y);
 				} else {
 					intensity.data[indexIntensity] = 0;
 				}

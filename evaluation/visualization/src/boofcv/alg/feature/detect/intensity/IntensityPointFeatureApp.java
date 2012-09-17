@@ -81,7 +81,7 @@ public class IntensityPointFeatureApp<T extends ImageSingleBand, D extends Image
 		addAlgorithm(0, "Harris Weighted",new WrapperGradientCornerIntensity<T,D>(FactoryIntensityPointAlg.harris(2, 0.4f, true, derivType)));
 		addAlgorithm(0, "Shi Tomasi",new WrapperGradientCornerIntensity<T,D>( FactoryIntensityPointAlg.shiTomasi(2, false, derivType)));
 		addAlgorithm(0, "Shi Tomasi Weighted",new WrapperGradientCornerIntensity<T,D>( FactoryIntensityPointAlg.shiTomasi(2, true, derivType)));
-		addAlgorithm(0, "FAST 12",new WrapperFastCornerIntensity<T,D>(FactoryIntensityPointAlg.fast12(5, 11, imageType)));
+		addAlgorithm(0, "FAST 12",new WrapperFastCornerIntensity<T,D>(FactoryIntensityPointAlg.fast(5, 11, imageType)));
 		addAlgorithm(0, "KitRos",new WrapperKitRosCornerIntensity<T,D>(derivType));
 		addAlgorithm(0, "Median",new WrapperMedianCornerIntensity<T,D>(FactoryBlurFilter.median(imageType,2),imageType));
 

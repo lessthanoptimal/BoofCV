@@ -66,7 +66,10 @@ public class ImplFastHelper_F32 implements FastHelper<ImageFloat32> {
 			}
 		}
 
-		return centerValue - (total/count);
+		if( count == 0 )
+			return 0;
+
+		return centerValue*count - total;
 	}
 
 	@Override
@@ -81,7 +84,10 @@ public class ImplFastHelper_F32 implements FastHelper<ImageFloat32> {
 			}
 		}
 
-		return (total/count) - centerValue;
+		if( count == 0 )
+			return 0;
+
+		return total - centerValue*count;
 	}
 
 	@Override

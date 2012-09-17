@@ -66,7 +66,10 @@ public class ImplFastHelper_U8 implements FastHelper<ImageUInt8> {
 			}
 		}
 
-		return centerValue - (total/count);
+		if( count == 0 )
+			return 0;
+
+		return centerValue*count - total;
 	}
 
 	@Override
@@ -81,7 +84,10 @@ public class ImplFastHelper_U8 implements FastHelper<ImageUInt8> {
 			}
 		}
 
-		return (total/count) - centerValue;
+		if( count == 0 )
+			return 0;
+
+		return total - centerValue*count;
 	}
 
 	@Override
