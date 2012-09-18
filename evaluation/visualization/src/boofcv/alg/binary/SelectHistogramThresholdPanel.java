@@ -56,6 +56,7 @@ public class SelectHistogramThresholdPanel extends JPanel implements ChangeListe
 		thresholdLevel.setMajorTickSpacing(20);
 		thresholdLevel.setPaintTicks(true);
 		thresholdLevel.addChangeListener(this);
+		thresholdLevel.setValue(threshold);
 
 		toggleButton = new JButton();
 		toggleButton.setPreferredSize(new Dimension(100,30));
@@ -128,6 +129,7 @@ public class SelectHistogramThresholdPanel extends JPanel implements ChangeListe
 	public void setThreshold(int threshold) {
 		valueThreshold = threshold;
 		thresholdLevel.setValue(threshold);
+		histogramPanel.setThreshold(valueThreshold,valueDown);
 	}
 
 	public static interface Listener

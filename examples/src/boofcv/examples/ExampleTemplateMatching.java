@@ -36,8 +36,7 @@ import java.util.List;
 
 /**
  * Example of how to find objects inside an image using template matching.  Template matching works
- * well when there is little noise in the image and the appearance of objects is well known.  However
- * it is still an expensive operation.
+ * well when there is little noise in the image and the object's appearance is known and static.
  *
  * @author Peter Abeles
  */

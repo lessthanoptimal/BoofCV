@@ -68,7 +68,7 @@ public class TestZhang99OptimizationJacobian {
 				assumeZeroSkew,param.distortion.length,observations.size(),gridPts);
 
 		// Why does the tolerance need to be so crude?  Is there a fundamental reason for this?
-		JacobianChecker.jacobianPrint(func, alg, dataParam, 1e-3);
+//		JacobianChecker.jacobianPrint(func, alg, dataParam, 1e-3);
 		assertTrue(JacobianChecker.jacobian(func, alg, dataParam, 1e-3));
 	}
 }
