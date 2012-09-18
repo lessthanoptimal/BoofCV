@@ -85,7 +85,7 @@ public class ExampleStereoTwoViewsOneCamera {
 //		BufferedImage origRight = UtilImageIO.loadImage(imageDir+"mono_wall_02.jpg");
 		BufferedImage origRight = UtilImageIO.loadImage(imageDir + "mono_wall_03.jpg");
 
-		// distorted input images
+		// Input images with lens distortion
 		ImageUInt8 distortedLeft = ConvertBufferedImage.convertFrom(origLeft, (ImageUInt8) null);
 		ImageUInt8 distortedRight = ConvertBufferedImage.convertFrom(origRight, (ImageUInt8) null);
 
@@ -277,5 +277,4 @@ public class ExampleStereoTwoViewsOneCamera {
 
 		ShowImages.showWindow(gui, "Point Cloud");
 	}
-
 }

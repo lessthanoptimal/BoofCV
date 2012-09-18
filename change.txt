@@ -3,7 +3,7 @@ Change Log
 Date Format: year/month/day
 
 ---------------------------------------------
-Date    : 2012/
+Date    : 2012/09/18
 Version : Alpha 0.10
 
 - Association Score
