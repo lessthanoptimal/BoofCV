@@ -31,6 +31,9 @@ import java.awt.image.BufferedImage;
 
 
 /**
+ * Implementation of {@link SimpleImageSequence} for the Xuggler library.  Can ready many types of
+ * video formats.
+ *
  * @author Peter Abeles
  */
 public class XugglerSimplified<T extends ImageSingleBand> implements SimpleImageSequence<T> {

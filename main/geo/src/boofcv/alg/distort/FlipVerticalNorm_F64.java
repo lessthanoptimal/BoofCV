@@ -23,7 +23,8 @@ import georegression.struct.point.Point2D_F64;
 
 /**
  * <p>
- * Flips the image along the vertical axis and converted to normalized image coordinates.
+ * Flips the image along the vertical axis and converted to normalized image coordinates using the
+ * provided transform.
  * </p>
  *
  * @author Peter Abeles
