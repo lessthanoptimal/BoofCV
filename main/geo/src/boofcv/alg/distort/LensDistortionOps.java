@@ -134,7 +134,7 @@ public class LensDistortionOps {
 	}
 
 	/**
-	 * Removes radial distortion from the image and converts it into normalized image coordinates
+	 * Removes radial distortion from the image in pixel coordinates and converts it into normalized image coordinates
 	 *
 	 * @param param Intrinsic camera parameters
 	 * @return Distorted pixel to normalized image coordinates

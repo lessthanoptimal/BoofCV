@@ -18,16 +18,21 @@
 
 package boofcv.alg.distort;
 
+import boofcv.alg.geo.UtilIntrinsic;
 import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.distort.PointTransform_F32;
+import boofcv.struct.distort.PointTransform_F64;
+import georegression.geometry.GeometryMath_F64;
 import georegression.struct.affine.Affine2D_F32;
 import georegression.struct.point.Point2D_F32;
+import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.Rectangle2D_F32;
+import org.ejml.data.DenseMatrix64F;
+import org.ejml.ops.CommonOps;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
@@ -37,22 +42,6 @@ public class TestLensDistortionOps {
 	Point2D_F32 p = new Point2D_F32();
 	int width = 300;
 	int height = 350;
-
-
-	@Test
-	public void transformRadialToNorm_F64() {
-		fail("implement");
-	}
-
-	@Test
-	public void transformNormToRadial_F64() {
-		fail("implement");
-	}
-
-	@Test
-	public void transformPixelToRadial_F32() {
-		fail("implement");
-	}
 
 	/**
 	 * If a transform contains the full view then the border of the transform will only
@@ -125,6 +114,110 @@ public class TestLensDistortionOps {
 		String s = x+" "+y+" -> "+p.x+" "+p.y;
 		assertTrue(s,p.x >= -tol && p.x < width+tol );
 		assertTrue(s,p.y >= -tol && p.y < height+tol );
+	}
+
+	@Test
+	public void transformRadialToNorm_F64() {
+		transformRadialToNorm_F64(false);
+		transformRadialToNorm_F64(true);
+	}
+
+	private void transformRadialToNorm_F64( boolean flipY ) {
+		IntrinsicParameters param = new IntrinsicParameters(300,320,2,150,130,
+				width,height, flipY, new double[]{0.1,1e-4});
+
+		// Undistorted pixel
+		Point2D_F64 pixel = new Point2D_F64(20,120);
+
+		// Distorted pixel
+		AddRadialPtoP_F64 addRadial = new AddRadialPtoP_F64(param.fx,param.fy,param.skew,param.cx,param.cy,param.radial);
+		Point2D_F64 pixelD = new Point2D_F64();
+		addRadial.compute(pixel.x,pixel.y,pixelD);
+		if( flipY )
+			pixelD.y = param.height-pixelD.y-1;
+
+		// Normalized coordinates
+		Point2D_F64 norm = new Point2D_F64();
+		DenseMatrix64F K = UtilIntrinsic.calibrationMatrix(param,null);
+		DenseMatrix64F K_inv = new DenseMatrix64F(3,3);
+		CommonOps.invert(K,K_inv);
+		GeometryMath_F64.mult(K_inv,pixel,norm);
+
+		// test it
+		PointTransform_F64 alg = LensDistortionOps.transformRadialToNorm_F64(param);
+		Point2D_F64 found = new Point2D_F64();
+		alg.compute(pixelD.x,pixelD.y,found);
+
+		assertEquals(norm.x,found.x,1e-8);
+		assertEquals(norm.y,found.y,1e-8);
+	}
+
+	@Test
+	public void transformNormToRadial_F64() {
+		transformNormToRadial_F64(false);
+		transformNormToRadial_F64(true);
+	}
+
+	private void transformNormToRadial_F64( boolean flipY ) {
+		IntrinsicParameters param = new IntrinsicParameters(300,320,2,150,130,
+				width,height, flipY, new double[]{0.1,1e-4});
+
+		// Undistorted pixel
+		Point2D_F64 pixel = new Point2D_F64(20,120);
+
+		// Distorted pixel
+		AddRadialPtoP_F64 addRadial = new AddRadialPtoP_F64(param.fx,param.fy,param.skew,param.cx,param.cy,param.radial);
+		Point2D_F64 pixelD = new Point2D_F64();
+		addRadial.compute(pixel.x,pixel.y,pixelD);
+		if( flipY )
+			pixelD.y = param.height-pixelD.y-1;
+
+		// Normalized coordinates
+		Point2D_F64 norm = new Point2D_F64();
+		DenseMatrix64F K = UtilIntrinsic.calibrationMatrix(param,null);
+		DenseMatrix64F K_inv = new DenseMatrix64F(3,3);
+		CommonOps.invert(K,K_inv);
+		GeometryMath_F64.mult(K_inv,pixel,norm);
+
+		// test it
+		PointTransform_F64 alg = LensDistortionOps.transformNormToRadial_F64(param);
+		Point2D_F64 found = new Point2D_F64();
+		alg.compute(norm.x,norm.y,found);
+
+		assertEquals(pixelD.x,found.x,1e-4);
+		assertEquals(pixelD.y,found.y,1e-4);
+	}
+
+	@Test
+	public void transformPixelToRadial_F32() {
+		transformPixelToRadial_F32(false);
+		transformPixelToRadial_F32(true);
+	}
+
+	private void transformPixelToRadial_F32( boolean flipY ) {
+		IntrinsicParameters param = new IntrinsicParameters(300,320,2,150,130,
+				width,height, flipY, new double[]{0.1,1e-4});
+
+		// Undistorted pixel
+		Point2D_F64 pixel = new Point2D_F64(20,120);
+
+		// Distorted pixel
+		AddRadialPtoP_F64 addRadial = new AddRadialPtoP_F64(param.fx,param.fy,param.skew,param.cx,param.cy,param.radial);
+		Point2D_F64 pixelD = new Point2D_F64();
+		addRadial.compute(pixel.x,pixel.y,pixelD);
+		if( flipY )
+			pixelD.y = param.height-pixelD.y-1;
+
+		// test it
+		PointTransform_F32 alg = LensDistortionOps.transformPixelToRadial_F32(param);
+		Point2D_F32 found = new Point2D_F32();
+		if( flipY )
+			alg.compute((float)pixel.x,(float)(param.height-pixel.y-1),found);
+		else
+			alg.compute((float)pixel.x,(float)pixel.y,found);
+
+		assertEquals((float)pixelD.x,found.x,1e-4f);
+		assertEquals((float)pixelD.y,found.y,1e-4f);
 	}
 
 	@Test

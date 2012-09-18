@@ -32,7 +32,7 @@ import org.ejml.ops.CommonOps;
 public class AddRadialPtoP_F64 implements PointTransform_F64 {
 
 	// principle point / image center
-	private double x_c,y_c;
+	private double cx, cy;
 	// radial distortion
 	private double radial[];
 
@@ -42,8 +42,8 @@ public class AddRadialPtoP_F64 implements PointTransform_F64 {
 	public AddRadialPtoP_F64() {
 	}
 
-	public AddRadialPtoP_F64(double fx, double fy, double skew, double x_c, double y_c, double... radial) {
-		set(fx,fy,skew,x_c,y_c, radial);
+	public AddRadialPtoP_F64(double fx, double fy, double skew, double cx, double cy, double... radial) {
+		set(fx,fy,skew, cx, cy, radial);
 	}
 
 	/**
@@ -52,23 +52,23 @@ public class AddRadialPtoP_F64 implements PointTransform_F64 {
 	 * @param fx Focal length x-axis in pixels
 	 * @param fy Focal length y-axis in pixels
 	 * @param skew skew in pixels
-	 * @param x_c camera center x-axis in pixels
-	 * @param y_c center center y-axis in pixels
+	 * @param cx camera center x-axis in pixels
+	 * @param cy center center y-axis in pixels
 	 * @param radial Radial distortion parameters
 	 */
-	public void set(double fx, double fy, double skew, double x_c, double y_c, double[] radial) {
+	public void set(double fx, double fy, double skew, double cx, double cy, double[] radial) {
 
 		K_inv.set(0, 0, fx);
 		K_inv.set(1,1,fy);
 		K_inv.set(0,1,skew);
-		K_inv.set(0,2,x_c);
-		K_inv.set(1,2,y_c);
+		K_inv.set(0,2,cx);
+		K_inv.set(1,2,cy);
 		K_inv.set(2,2,1);
 
 		CommonOps.invert(K_inv);
 
-		this.x_c = x_c;
-		this.y_c = y_c;
+		this.cx = cx;
+		this.cy = cy;
 
 		this.radial = new double[radial.length];
 		for( int i = 0; i < radial.length; i++ ) {
@@ -101,7 +101,7 @@ public class AddRadialPtoP_F64 implements PointTransform_F64 {
 			r *= r2;
 		}
 
-		out.x = x + (x-x_c)*sum;
-		out.y = y + (y-y_c)*sum;
+		out.x = x + (x- cx)*sum;
+		out.y = y + (y- cy)*sum;
 	}
 }
