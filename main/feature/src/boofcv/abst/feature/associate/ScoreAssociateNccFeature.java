@@ -28,10 +28,10 @@ import boofcv.struct.feature.NccFeature;
  *
  * @author Peter Abeles
  */
-public class ScoreAssociateNccFeature implements ScoreAssociation<NccFeature>{
+public class ScoreAssociateNccFeature implements ScoreAssociation<NccFeature> {
 	@Override
 	public double score(NccFeature a, NccFeature b) {
-		return -Math.abs(DescriptorDistance.ncc(a, b));
+		return -DescriptorDistance.ncc(a, b);
 	}
 
 	@Override
