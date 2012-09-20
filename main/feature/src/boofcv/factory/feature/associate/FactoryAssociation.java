@@ -63,7 +63,9 @@ public class FactoryAssociation {
 	 */
 	public static <D>
 	ScoreAssociation<D> defaultScore( Class<D> tupleType ) {
-		if( TupleDesc_F64.class.isAssignableFrom(tupleType) ) {
+		if( NccFeature.class.isAssignableFrom(tupleType) ) {
+			return (ScoreAssociation)new ScoreAssociateNccFeature();
+		} else if( TupleDesc_F64.class.isAssignableFrom(tupleType) ) {
 			return (ScoreAssociation)new ScoreAssociateEuclideanSq_F64();
 		} else if( tupleType == TupleDesc_F32.class ) {
 			return (ScoreAssociation)new ScoreAssociateEuclideanSq_F32();

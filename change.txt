@@ -3,6 +3,17 @@ Change Log
 Date Format: year/month/day
 
 ---------------------------------------------
+Date    : 
+Version : Alpha 0.11
+
+- Association Score
+  * Normalized Cross Correlation (NCC) has been fixed (yet again) in ScoreAssociateNccFeature where the abs() was incorretly being taken.
+- FactoryAssociation
+  * Added NCC to defaultScore()
+- Template Matching
+  * Added NCC template matching algorithm
+
+---------------------------------------------
 Date    : 2012/09/18
 Version : Alpha 0.10
 
@@ -50,7 +61,7 @@ Version : Alpha 0.10
 - Functions inside of GThresholdImageOps did not return the number of blobs found like it should
   * Thanks jasonnn
 - NonMaxBlockStrict
-  * Figued bug where it assumed intensity values were all positive
+  * Fixed bug where it assumed intensity values are all positive
 - TemplateMatching
   * Added code for template matching
   * Added example code to demonstrate its use

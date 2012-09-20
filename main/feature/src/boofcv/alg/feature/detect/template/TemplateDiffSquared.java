@@ -24,11 +24,11 @@ import boofcv.struct.image.ImageUInt8;
 
 /**
  * <p>
- * Computes the difference between the template and the image using the difference squared.
+ * Scores the difference between the template and the image using difference squared error.
  * The error is multiplied by -1 to ensure that the best fits are peaks and not minimums.
  * </p>
- * <p/>
- * <p> error = Sum<sub>(o,u)</sub> [I(x,y) - T(x-o,y-u)]^2 </p>
+ *
+ * <p> error = -1*Sum<sub>(o,u)</sub> [I(x,y) - T(x-o,y-u)]^2 </p>
  *
  * @author Peter Abeles
  */

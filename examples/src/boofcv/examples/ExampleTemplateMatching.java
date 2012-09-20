@@ -81,7 +81,7 @@ public class ExampleTemplateMatching {
 		ImageFloat32 intensity = matchIntensity.getIntensity();
 
 		// adjust the intensity image so that white indicates a good match and black a poor match
-		// the scale is kept linear to highly how many local maximums and ambiguous the solution is
+		// the scale is kept linear to highlight how ambiguous the solution is
 		float min = PixelMath.min(intensity);
 		float max = PixelMath.max(intensity);
 		float range = max - min;
@@ -116,11 +116,11 @@ public class ExampleTemplateMatching {
 		// show match intensity image for this template
 		showMatchIntensity(image, templateX);
 
-		// Now it searches for a specific icon and there is known to only be one
+		// Now it searches for a specific icon for which there is only one match
 		g2.setColor(Color.BLUE);
 		drawRectangles(g2, image, templatePaint, 1);
 
-		// Look for the Google Chrome browser icon, which is not visible in this image.
+		// Look for the Google Chrome browser icon. There is no match for this icon..
 		g2.setColor(Color.ORANGE);
 		drawRectangles(g2, image, templateBrowser, 1);
 

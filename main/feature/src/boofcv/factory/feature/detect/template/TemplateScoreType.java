@@ -29,5 +29,14 @@ public enum TemplateScoreType {
 	 *
 	 * @see boofcv.alg.feature.detect.template.TemplateDiffSquared
 	 */
-	ERROR_SQUARED
+	ERROR_SQUARED,
+	/**
+	 * <p>
+	 * Normalized Cross Correlation (NCC) error metric.  Adds invariance to lighting conditions
+	 * but is more expensive to compute.
+	 * </p>
+	 *
+	 * @see boofcv.alg.feature.detect.template.TemplateNCC
+	 */
+	NCC
 }

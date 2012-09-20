@@ -21,6 +21,7 @@ package boofcv.factory.feature.detect.template;
 import boofcv.alg.feature.detect.template.TemplateDiffSquared;
 import boofcv.alg.feature.detect.template.TemplateMatching;
 import boofcv.alg.feature.detect.template.TemplateMatchingIntensity;
+import boofcv.alg.feature.detect.template.TemplateNCC;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
@@ -34,8 +35,8 @@ import boofcv.struct.image.ImageUInt8;
 public class FactoryTemplateMatching {
 
 	/**
-	 * Creates {@link boofcv.alg.feature.detect.template.TemplateMatchingIntensity} of the specified type.  Matches should be
-	 * extracted using {@link boofcv.abst.feature.detect.extract.FeatureExtractor}.
+	 * Creates {@link TemplateMatchingIntensity} of the specified type.  Likely
+	 * matches can be extracted using {@link boofcv.abst.feature.detect.extract.FeatureExtractor}.
 	 *
 	 * @param type      Type of error function
 	 * @param imageType Image type being processed
@@ -49,6 +50,15 @@ public class FactoryTemplateMatching {
 					return (TemplateMatchingIntensity<T>) new TemplateDiffSquared.U8();
 				} else if (imageType == ImageFloat32.class) {
 					return (TemplateMatchingIntensity<T>) new TemplateDiffSquared.F32();
+				} else {
+					throw new IllegalArgumentException("Image type not supported. " + imageType.getSimpleName());
+				}
+
+			case NCC:
+				if (imageType == ImageUInt8.class) {
+					return (TemplateMatchingIntensity<T>) new TemplateNCC.U8();
+				} else if (imageType == ImageFloat32.class) {
+					return (TemplateMatchingIntensity<T>) new TemplateNCC.F32();
 				} else {
 					throw new IllegalArgumentException("Image type not supported. " + imageType.getSimpleName());
 				}

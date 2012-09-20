@@ -16,30 +16,30 @@
  * limitations under the License.
  */
 
-package boofcv.abst.feature.associate;
+package boofcv.alg.feature.detect.template;
+
+import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageUInt8;
+import org.junit.Test;
 
 /**
- * Scores the quality of fit between two feature descriptions.
- * Designed to handle fit metrics with different statics.  In general it is assumed that
- * scores with lower values are better.  They can be limited to zero or go negative.
- *
  * @author Peter Abeles
  */
-public interface ScoreAssociation<T> {
+public class TestTemplateNCC {
 
-	/**
-	 * Compute the fit score between the two features.  A better fit score will have a lower value.
-	 *
-	 * @param a first feature
-	 * @param b second feature
-	 * @return Quality of fit score.  Lower is better.
-	 */
-	public double score( T a , T b );
+	@Test
+	public void instanceF32() {
+		TemplateNCC.F32 alg = new TemplateNCC.F32();
 
-	/**
-	 * Is the best/minimum score zero?
-	 *
-	 * @return true if the best zero is zero.
-	 */
-	public boolean isZeroMinimum();
+		new GeneralTemplateMatchTests<ImageFloat32>(alg, ImageFloat32.class) {
+		}.allTests();
+	}
+
+	@Test
+	public void instanceU8() {
+		TemplateNCC.U8 alg = new TemplateNCC.U8();
+
+		new GeneralTemplateMatchTests<ImageUInt8>(alg, ImageUInt8.class) {
+		}.allTests();
+	}
 }
