@@ -25,11 +25,13 @@ package boofcv.factory.feature.detect.template;
  */
 public enum TemplateScoreType {
 	/**
+	 * <p>Sum of the difference squared or Euclidean error squared.</p>
+	 *
 	 * <p>error = Sum<sub>(o,u)</sub> [ I(x,y) - T(x-o,y-u) ]^2 </p>
 	 *
 	 * @see boofcv.alg.feature.detect.template.TemplateDiffSquared
 	 */
-	ERROR_SQUARED,
+	SUM_DIFF_SQ,
 	/**
 	 * <p>
 	 * Normalized Cross Correlation (NCC) error metric.  Adds invariance to lighting conditions

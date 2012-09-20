@@ -45,7 +45,7 @@ public class FactoryTemplateMatching {
 	public static <T extends ImageSingleBand>
 	TemplateMatchingIntensity<T> createIntensity(TemplateScoreType type, Class<T> imageType) {
 		switch (type) {
-			case ERROR_SQUARED:
+			case SUM_DIFF_SQ:
 				if (imageType == ImageUInt8.class) {
 					return (TemplateMatchingIntensity<T>) new TemplateDiffSquared.U8();
 				} else if (imageType == ImageFloat32.class) {

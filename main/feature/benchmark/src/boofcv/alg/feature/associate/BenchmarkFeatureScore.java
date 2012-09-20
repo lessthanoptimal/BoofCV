@@ -18,16 +18,12 @@
 
 package boofcv.alg.feature.associate;
 
-import boofcv.abst.feature.associate.ScoreAssociateHamming_B;
-import boofcv.abst.feature.associate.ScoreAssociation;
+import boofcv.abst.feature.associate.*;
 import boofcv.misc.Performer;
 import boofcv.misc.PerformerBase;
 import boofcv.misc.ProfileOperation;
 import boofcv.struct.FastQueue;
-import boofcv.struct.feature.BriefFeatureQueue;
-import boofcv.struct.feature.TupleDescQueue;
-import boofcv.struct.feature.TupleDesc_B;
-import boofcv.struct.feature.TupleDesc_F64;
+import boofcv.struct.feature.*;
 
 import java.util.Random;
 
@@ -51,6 +47,9 @@ public class BenchmarkFeatureScore {
 
 	static final FastQueue<TupleDesc_B> briefA = createBriefSet();
 	static final FastQueue<TupleDesc_B> briefB = createBriefSet();
+
+	static final FastQueue<NccFeature> nccA = createNccSet();
+	static final FastQueue<NccFeature> nccB = createNccSet();
 
 	public static class General implements Performer {
 
@@ -87,6 +86,18 @@ public class BenchmarkFeatureScore {
 		}
 	}
 
+	public static class Ncc extends PerformerBase {
+
+		ScoreAssociateNccFeature scorer = new ScoreAssociateNccFeature();
+
+		@Override
+		public void process() {
+			for( int i = 0; i < nccA.size; i++ )
+				for( int j = 0; j < nccB.size; j++ )
+					scorer.score(nccA.data[i],nccB.data[j]);
+		}
+	}
+
 	private static FastQueue<TupleDesc_F64> createSet() {
 		FastQueue<TupleDesc_F64> ret = new TupleDescQueue<TupleDesc_F64>(TupleDesc_F64.class,DOF_TUPLE, true);
 
@@ -111,15 +122,30 @@ public class BenchmarkFeatureScore {
 		return ret;
 	}
 
+	private static FastQueue<NccFeature> createNccSet() {
+		FastQueue<NccFeature> ret = new NccFeatureQueue(DOF_TUPLE);
+
+		for( int i = 0; i < NUM_FEATURES; i++ ) {
+			NccFeature t = ret.pop();
+			for( int j = 0; j < t.value.length; j++ ) {
+				t.value[j] = (rand.nextDouble()-0.5)*20;
+			}
+			t.mean = (rand.nextDouble()-0.5)*20;
+			t.sigma = (rand.nextDouble()-0.5)*20;
+		}
+		return ret;
+	}
+
 	public static void main( String argsp[ ] ) {
 		System.out.println("=========  Profile Description Length "+ DOF_TUPLE +" ========== Num Features "+NUM_FEATURES);
 		System.out.println();
 
 		// the "fastest" seems to always be the first one tested
-//		ProfileOperation.printOpsPerSec(new General("Correlation", new ScoreAssociateCorrelation()),TEST_TIME);
-//		ProfileOperation.printOpsPerSec(new General("Euclidean", new ScoreAssociateEuclidean_F64()),TEST_TIME);
-//		ProfileOperation.printOpsPerSec(new General("Euclidean Sq", new ScoreAssociateEuclideanSq_F64()),TEST_TIME);
+		ProfileOperation.printOpsPerSec(new General("Correlation", new ScoreAssociateCorrelation()),TEST_TIME);
+		ProfileOperation.printOpsPerSec(new General("Euclidean", new ScoreAssociateEuclidean_F64()),TEST_TIME);
+		ProfileOperation.printOpsPerSec(new General("Euclidean Sq", new ScoreAssociateEuclideanSq_F64()),TEST_TIME);
 		ProfileOperation.printOpsPerSec(new Brief(),TEST_TIME);
+		ProfileOperation.printOpsPerSec(new Ncc(),TEST_TIME);
 
 	}
 }

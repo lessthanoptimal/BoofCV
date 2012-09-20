@@ -54,7 +54,7 @@ public class ExampleTemplateMatching {
 										   int expectedMatches) {
 		// create template matcher.
 		TemplateMatching<ImageFloat32> matcher =
-				FactoryTemplateMatching.createMatcher(TemplateScoreType.ERROR_SQUARED, ImageFloat32.class);
+				FactoryTemplateMatching.createMatcher(TemplateScoreType.SUM_DIFF_SQ, ImageFloat32.class);
 
 		// Find the points which match the template the best
 		matcher.setTemplate(template, expectedMatches);
@@ -72,7 +72,7 @@ public class ExampleTemplateMatching {
 
 		// create algorithm for computing intensity image
 		TemplateMatchingIntensity<ImageFloat32> matchIntensity =
-				FactoryTemplateMatching.createIntensity(TemplateScoreType.ERROR_SQUARED, ImageFloat32.class);
+				FactoryTemplateMatching.createIntensity(TemplateScoreType.SUM_DIFF_SQ, ImageFloat32.class);
 
 		// apply the template to the image
 		matchIntensity.process(image, template);
