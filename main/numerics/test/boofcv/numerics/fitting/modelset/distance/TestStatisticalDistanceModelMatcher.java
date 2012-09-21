@@ -19,17 +19,14 @@
 package boofcv.numerics.fitting.modelset.distance;
 
 import boofcv.numerics.fitting.modelset.*;
-import org.junit.Test;
 
 /**
  * @author Peter Abeles
  */
 public class TestStatisticalDistanceModelMatcher extends GenericModelSetTests {
-	@Test
-	public void standardTests() {
+
+	public TestStatisticalDistanceModelMatcher() {
 		configure(0.9, 0.1, false);
-		performSimpleModelFit();
-		runMultipleTimes();
 	}
 
 	@Override

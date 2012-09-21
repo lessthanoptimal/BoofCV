@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2011-2012, Peter Abeles. All Rights Reserved.
  *
- * This file is part of BoofCV (http://www.boofcv.org).
+ * This file is part of BoofCV (http://boofcv.org).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,8 @@ package boofcv.numerics.fitting.modelset.distance;
 
 import boofcv.numerics.fitting.modelset.DistanceFromModel;
 
-import java.util.List;
+import java.util.Iterator;
+import java.util.LinkedList;
 
 
 /**
@@ -30,8 +31,8 @@ import java.util.List;
  */
 public class FitByMeanStatistics<Model, Point> implements StatisticalFit<Model,Point> {
 
-	private DistanceFromModel<Model,Point> modelError;
-	private List<Point> inliers;
+	protected DistanceFromModel<Model,Point> modelError;
+	protected LinkedList<PointIndex<Point>> allPoints = new LinkedList<PointIndex<Point>>();
 
 	// the number of standard deviations away that points are pruned
 	private double pruneThreshold;
@@ -49,9 +50,10 @@ public class FitByMeanStatistics<Model, Point> implements StatisticalFit<Model,P
 	}
 
 	@Override
-	public void init(DistanceFromModel<Model,Point> modelError, List<Point> inliers) {
+	public void init(DistanceFromModel<Model,Point> modelError, LinkedList<PointIndex<Point>> allPoints ) {
+
 		this.modelError = modelError;
-		this.inliers = inliers;
+		this.allPoints = allPoints;
 	}
 
 	@Override
@@ -64,12 +66,13 @@ public class FitByMeanStatistics<Model, Point> implements StatisticalFit<Model,P
 	public void prune() {
 		double thresh = stdError * pruneThreshold;
 
-		for (int j = inliers.size() - 1; j >= 0; j--) {
-			Point pt = inliers.get(j);
+		Iterator<PointIndex<Point>> iter = allPoints.iterator();
+		while( iter.hasNext() ) {
+			Point pt = iter.next().data;
 
 			// only prune points which are less accurate than the mean
 			if (modelError.computeDistance(pt) - meanError > thresh) {
-				inliers.remove(j);
+				iter.remove();
 			}
 		}
 	}
@@ -85,9 +88,9 @@ public class FitByMeanStatistics<Model, Point> implements StatisticalFit<Model,P
 	private void computeMean() {
 		meanError = 0;
 
-		int size = inliers.size();
-		for (int i = 0; i < size; i++) {
-			Point pt = inliers.get(i);
+		int size = allPoints.size();
+		for (PointIndex<Point> inlier : allPoints) {
+			Point pt = inlier.data;
 
 			meanError += modelError.computeDistance(pt);
 		}
@@ -98,9 +101,9 @@ public class FitByMeanStatistics<Model, Point> implements StatisticalFit<Model,P
 
 	private void computeStandardDeviation() {
 		stdError = 0;
-		int size = inliers.size();
-		for (int i = 0; i < size; i++) {
-			Point pt = inliers.get(i);
+		int size = allPoints.size();
+		for (PointIndex<Point> inlier : allPoints) {
+			Point pt = inlier.data;
 
 			double e = modelError.computeDistance(pt) - meanError;
 			stdError += e * e;

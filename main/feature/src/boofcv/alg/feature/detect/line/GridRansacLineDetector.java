@@ -64,6 +64,8 @@ public class GridRansacLineDetector {
 
 	// size of a region's width/height in pixels
 	private int regionSize;
+	// the minimum number of points which must be fit to be accepted
+	private int minInlierSize;
 
 	// list of detected edge pixels in a region
 	private FastQueue<Edgel> edgels = new FastQueue<Edgel>(30,Edgel.class,true);
@@ -89,6 +91,8 @@ public class GridRansacLineDetector {
 		this.regionSize = regionSize;
 		this.maxDetectLines = maxDetectLines;
 		this.robustMatcher = robustMatcher;
+
+		this.minInlierSize = 2*regionSize/3;
 	}
 
 	/**
@@ -177,6 +181,11 @@ public class GridRansacLineDetector {
 
 			// remove the found edges from the main list
 			List<Edgel> matchSet = robustMatcher.getMatchSet();
+
+			// make sure the match set is large enough
+			if( matchSet.size() < minInlierSize )
+				break;
+
 			for( Edgel e : matchSet ) {
 				list.remove(e);
 			}

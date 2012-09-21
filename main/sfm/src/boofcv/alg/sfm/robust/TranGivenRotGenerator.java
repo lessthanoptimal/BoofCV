@@ -2,7 +2,6 @@ package boofcv.alg.sfm.robust;
 
 import boofcv.alg.geo.PointPositionPair;
 import boofcv.alg.geo.pose.PositionFromPairLinear2;
-import boofcv.numerics.fitting.modelset.HypothesisList;
 import boofcv.numerics.fitting.modelset.ModelGenerator;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
@@ -38,7 +37,7 @@ public class TranGivenRotGenerator implements ModelGenerator<Vector3D_F64,PointP
 	}
 
 	@Override
-	public void generate(List<PointPositionPair> dataSet, HypothesisList<Vector3D_F64> models) {
+	public boolean generate(List<PointPositionPair> dataSet, Vector3D_F64 model ) {
 		worldPts.clear();
 		observed.clear();
 		
@@ -49,8 +48,10 @@ public class TranGivenRotGenerator implements ModelGenerator<Vector3D_F64,PointP
 		}
 		
 		if( alg.process(R,worldPts,observed) ) {
-			models.pop().set(alg.getT());
+			model.set(alg.getT());
 		}
+
+		return true;
 	}
 
 	@Override

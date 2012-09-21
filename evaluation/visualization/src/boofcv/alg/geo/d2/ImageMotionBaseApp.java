@@ -37,7 +37,7 @@ import boofcv.numerics.fitting.modelset.DistanceFromModel;
 import boofcv.numerics.fitting.modelset.ModelFitter;
 import boofcv.numerics.fitting.modelset.ModelGenerator;
 import boofcv.numerics.fitting.modelset.ModelMatcher;
-import boofcv.numerics.fitting.modelset.ransac.SimpleInlierRansac;
+import boofcv.numerics.fitting.modelset.ransac.Ransac;
 import boofcv.struct.FastQueue;
 import boofcv.struct.distort.PixelTransform_F32;
 import boofcv.struct.image.ImageBase;
@@ -557,9 +557,7 @@ public abstract class ImageMotionBaseApp<I extends ImageSingleBand, D extends Im
 			throw new RuntimeException("Unknown model type");
 		}
 
-		int numSample =  fitter.getMinimumPoints();
-		modelMatcher = new SimpleInlierRansac(123123,
-				fitter,distance,maxIterations,numSample,numSample,10000,thresholdFit);
+		modelMatcher = new Ransac(123123,fitter,distance,maxIterations,thresholdFit);
 
 	}
 

@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2011-2012, Peter Abeles. All Rights Reserved.
  *
- * This file is part of BoofCV (http://www.boofcv.org).
+ * This file is part of BoofCV (http://boofcv.org).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,9 +20,9 @@ package boofcv.numerics.fitting.modelset.distance;
 
 import org.junit.Test;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
+import java.util.LinkedList;
+import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
 
@@ -31,16 +31,19 @@ import static org.junit.Assert.assertEquals;
  * @author Peter Abeles
  */
 public class TestFitByMedianStatistics {
+
+	Random rand = new Random(234);
+
 	@Test
 	public void metric_and_prune() {
-		List<Double> inliers = new ArrayList<Double>();
+		LinkedList<PointIndex<Double>> inliers = new LinkedList<PointIndex<Double>>();
 
 		for (int i = 0; i < 200; i++) {
-			inliers.add((double) i);
+			inliers.add(new PointIndex<Double>((double) i,i));
 		}
 
 		// randomize the inputs
-		Collections.sort(inliers);
+		Collections.shuffle(inliers, rand);
 
 		FitByMedianStatistics<double[],Double> fit = new FitByMedianStatistics<double[],Double>(0.90);
 

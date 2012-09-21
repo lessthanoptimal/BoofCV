@@ -19,18 +19,15 @@
 package boofcv.numerics.fitting.modelset.lmeds;
 
 import boofcv.numerics.fitting.modelset.*;
-import org.junit.Test;
 
 
 /**
  * @author Peter Abeles
  */
 public class TestLeastMedianOfSquares extends GenericModelSetTests {
-	@Test
-	public void standardTests() {
-		configure(0.9,0.1, false);
-		performSimpleModelFit();
-		runMultipleTimes();
+
+	public TestLeastMedianOfSquares() {
+		configure(0.9, 0.1, false);
 	}
 
 	@Override

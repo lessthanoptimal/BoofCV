@@ -35,10 +35,8 @@ public class MeanModelFitter implements ModelFitter<double[],Double> ,
 	}
 
 	@Override
-	public void generate(List<Double> dataSet, HypothesisList<double[]> models) {
-		double[] param = models.pop();
-
-		fitModel(dataSet,null,param);
+	public boolean generate(List<Double> dataSet, double[] param ) {
+		return fitModel(dataSet,null,param);
 	}
 
 	@Override

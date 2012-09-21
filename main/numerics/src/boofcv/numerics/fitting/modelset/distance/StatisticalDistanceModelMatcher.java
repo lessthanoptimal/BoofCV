@@ -24,6 +24,7 @@ import boofcv.numerics.fitting.modelset.ModelFitter;
 import boofcv.numerics.fitting.modelset.ModelMatcher;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 
@@ -52,9 +53,6 @@ public class StatisticalDistanceModelMatcher<Model, Point> implements ModelMatch
 	protected Model param;
 	protected Model currParam;
 
-	// set of points which fit the model
-	private List<Point> inliers = new ArrayList<Point>();
-
 	// what computes the error metrics
 	private StatisticalFit<Model,Point> errorAlg;
 
@@ -70,12 +68,19 @@ public class StatisticalDistanceModelMatcher<Model, Point> implements ModelMatch
 	private int minFitPoints;
 
 	// computes a set of model parameters from a list of points
-	ModelFitter<Model,Point> modelFitter;
+	private ModelFitter<Model,Point> modelFitter;
 	// computes the difference between the model and a point
-	DistanceFromModel<Model,Point> modelError;
+	private DistanceFromModel<Model,Point> modelError;
 
 	// converts the model into an array parameter format
 	private ModelCodec<Model> codec;
+
+	// list containing points that are to be pruned
+	LinkedList<PointIndex<Point>> pruneList = new LinkedList<PointIndex<Point>>();
+	// set of points which fit the model
+	private List<Point> inliers = new ArrayList<Point>();
+	// list of indexes converting it from match set to input list
+	private int []matchToInput = new int[1];
 
 	/**
 	 * Creates a new model matcher.  The type of statistics it uses is specified by "statistics".
@@ -135,17 +140,29 @@ public class StatisticalDistanceModelMatcher<Model, Point> implements ModelMatch
 		if (dataSet.size() < minFitPoints)
 			return false;
 
-		errorAlg.init(modelError, inliers);
+		if( dataSet.size() > matchToInput.length )
+			matchToInput = new int[ dataSet.size() ];
 
+		pruneList.clear();
 		inliers.clear();
-		inliers.addAll(dataSet);
+		for( int i = 0; i < dataSet.size(); i++ )
+			pruneList.add( new PointIndex<Point>(dataSet.get(i),i));
+		inliers.clear();
+
+		errorAlg.init(modelError, pruneList);
 
 		oldCenter = Double.MAX_VALUE;
 		boolean converged = false;
 
 		// iterate until it converges or the maximum number of iterations has been exceeded
 		int i = 0;
-		for (; i < maxIterations && !converged && inliers.size() >= minFitPoints; i++) {
+		for (; i < maxIterations && !converged && pruneList.size() >= minFitPoints; i++) {
+
+			inliers.clear();
+			for( PointIndex<Point> p : pruneList) {
+				inliers.add(p.data);
+			}
+
 			if (!modelFitter.fitModel(inliers, null, currParam)) {
 				// failed to fit the model, so stop before it screws things up
 				break;
@@ -172,10 +189,16 @@ public class StatisticalDistanceModelMatcher<Model, Point> implements ModelMatch
 			}
 		}
 
-		boolean ret = centerError < failError && inliers.size() >= minFitPoints;
+		boolean ret = centerError < failError && pruneList.size() >= minFitPoints;
 
-//        if( ret == false )
-//            System.out.println("ASDASD");
+		if( ret ) {
+			inliers.clear();
+			int index = 0;
+			for( PointIndex<Point> p : pruneList) {
+				inliers.add(p.data);
+				matchToInput[index++] = p.index;
+			}
+		}
 
 		return ret;
 	}
@@ -208,6 +231,11 @@ public class StatisticalDistanceModelMatcher<Model, Point> implements ModelMatch
 	@Override
 	public List<Point> getMatchSet() {
 		return inliers;
+	}
+
+	@Override
+	public int getInputIndex(int matchIndex) {
+		return matchToInput[matchIndex];
 	}
 
 	@Override

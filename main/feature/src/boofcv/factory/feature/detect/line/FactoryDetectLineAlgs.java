@@ -31,7 +31,7 @@ import boofcv.alg.feature.detect.line.gridline.GridLineModelDistance;
 import boofcv.alg.feature.detect.line.gridline.GridLineModelFitter;
 import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.numerics.fitting.modelset.ModelMatcher;
-import boofcv.numerics.fitting.modelset.ransac.SimpleInlierRansac;
+import boofcv.numerics.fitting.modelset.ransac.Ransac;
 import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.line.LinePolar2D_F32;
 
@@ -69,7 +69,7 @@ public class FactoryDetectLineAlgs {
 		GridLineModelFitter fitter = new GridLineModelFitter((float)thresholdAngle);
 
 		ModelMatcher<LinePolar2D_F32, Edgel> matcher =
-				new SimpleInlierRansac<LinePolar2D_F32,Edgel>(123123,fitter,distance,25,2,2*regionSize/3,1000,1);
+				new Ransac<LinePolar2D_F32,Edgel>(123123,fitter,distance,25,1);
 
 		GridRansacLineDetector alg = new GridRansacLineDetector(regionSize,10,matcher);
 

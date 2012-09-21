@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2011-2012, Peter Abeles. All Rights Reserved.
  *
- * This file is part of BoofCV (http://www.boofcv.org).
+ * This file is part of BoofCV (http://boofcv.org).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ package boofcv.numerics.fitting.modelset.distance;
 
 import boofcv.numerics.fitting.modelset.DistanceFromModel;
 
-import java.util.List;
+import java.util.LinkedList;
 
 
 /**
@@ -35,9 +35,9 @@ public interface StatisticalFit<Model, Point> {
 	 * This is called once to provide access to internal data structures of the owner.
 	 *
 	 * @param modelDistance Computes the error between a point and the model
-	 * @param inliers	   Contains all the points which are currently considered part of the model.
+	 * @param allPoints	   Contains all the points which are currently considered part of the model.
 	 */
-	void init(DistanceFromModel<Model,Point> modelDistance, List<Point> inliers);
+	void init(DistanceFromModel<Model,Point> modelDistance, LinkedList<PointIndex<Point>> allPoints );
 
 	/**
 	 * Returns the computed statistical error.

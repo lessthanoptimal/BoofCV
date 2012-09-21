@@ -44,7 +44,7 @@ import boofcv.misc.BoofMiscOps;
 import boofcv.numerics.fitting.modelset.DistanceFromModel;
 import boofcv.numerics.fitting.modelset.ModelGenerator;
 import boofcv.numerics.fitting.modelset.ModelMatcher;
-import boofcv.numerics.fitting.modelset.ransac.SimpleInlierRansac;
+import boofcv.numerics.fitting.modelset.ransac.Ransac;
 import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.distort.PointTransform_F64;
 import boofcv.struct.image.ImageFloat32;
@@ -149,14 +149,12 @@ public class ExampleStereoTwoViewsOneCamera {
 		DistanceFromModel<Se3_F64, AssociatedPair> distanceSe3 =
 				new DistanceSe3SymmetricSq(triangulate, intrinsic.fx, intrinsic.fy, intrinsic.skew);
 
-		int N = generateEpipolarMotion.getMinimumPoints();
-
 		// 1/2 a pixel tolerance for RANSAC inliers
 		double ransacTOL = 0.5 * 0.5 * 2.0;
 
 		ModelMatcher<Se3_F64, AssociatedPair> epipolarMotion =
-				new SimpleInlierRansac<Se3_F64, AssociatedPair>(2323, generateEpipolarMotion, distanceSe3,
-						200, N, N, 100000, ransacTOL);
+				new Ransac<Se3_F64, AssociatedPair>(2323, generateEpipolarMotion, distanceSe3,
+						200, ransacTOL);
 
 		if (!epipolarMotion.process(matchedNorm))
 			throw new RuntimeException("Motion estimation failed");

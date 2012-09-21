@@ -16,31 +16,19 @@
  * limitations under the License.
  */
 
-package boofcv.numerics.fitting.modelset.ransac;
-
-import boofcv.numerics.fitting.modelset.*;
-import org.junit.Test;
-
+package boofcv.numerics.fitting.modelset.distance;
 
 /**
+ * Contains a reference to a point and the original index of the point
+ *
  * @author Peter Abeles
  */
-public class TestSimpleInlierRansac extends GenericModelSetTests {
+public class PointIndex<Point> {
+	public Point data;
+	public int index;
 
-
-	@Test
-	public void performStandardTests() {
-		configure(0.9, 0.05, true);
-		performSimpleModelFit();
-		runMultipleTimes();
-	}
-
-	@Override
-	public ModelMatcher<double[],Double> createModelMatcher(DistanceFromModel<double[],Double> distance,
-															ModelGenerator<double[],Double> generator,
-															ModelFitter<double[],Double> fitter,
-															int minPoints,
-															double fitThreshold) {
-		return new SimpleInlierRansac<double[],Double>(344, generator, distance, 200, 2, minPoints, 1000, fitThreshold);
+	public PointIndex(Point data, int index) {
+		this.data = data;
+		this.index = index;
 	}
 }
