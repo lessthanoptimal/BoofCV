@@ -5,7 +5,6 @@ import boofcv.abst.geo.TriangulateTwoViewsCalibrated;
 import boofcv.alg.geo.AssociatedPair;
 import boofcv.factory.geo.FactoryEpipolar;
 import boofcv.factory.geo.FactoryTriangulate;
-import boofcv.numerics.fitting.modelset.HypothesisList;
 import georegression.geometry.RotationMatrixGenerator;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
@@ -60,15 +59,10 @@ public class TestSe3FromEssentialGenerator {
 
 		Se3FromEssentialGenerator alg = new Se3FromEssentialGenerator(essentialAlg,triangulate);
 
-		HypothesisList<Se3_F64> models = new HypothesisList<Se3_F64>(alg);
+		Se3_F64 found = alg.createModelInstance();
 
 		// recompute the motion
-		alg.generate(obs,models);
-
-		assertEquals(1,models.size());
-
-		// check results
-		Se3_F64 found = models.get(0);
+		assertTrue(alg.generate(obs, found));
 
 		// account for scale difference
 		double scale = found.getT().norm()/motion.getT().norm();

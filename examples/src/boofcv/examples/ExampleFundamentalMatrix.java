@@ -37,7 +37,7 @@ import boofcv.gui.feature.AssociationPanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.image.UtilImageIO;
 import boofcv.numerics.fitting.modelset.ModelMatcher;
-import boofcv.numerics.fitting.modelset.ransac.SimpleInlierRansac;
+import boofcv.numerics.fitting.modelset.ransac.Ransac;
 import boofcv.struct.FastQueue;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.SurfFeature;
@@ -88,8 +88,7 @@ public class ExampleFundamentalMatrix {
 
 		// Use RANSAC to estimate the Fundamental matrix
 		ModelMatcher<DenseMatrix64F,AssociatedPair> robustF =
-				new SimpleInlierRansac<DenseMatrix64F, AssociatedPair>(123123,generateF,errorMetric,
-						3000,generateF.getMinimumPoints(),20,-1,0.2);
+				new Ransac<DenseMatrix64F, AssociatedPair>(123123,generateF,errorMetric,3000,0.2);
 
 		// Estimate the fundamental matrix while removing outliers
 		if( !robustF.process(matches) )

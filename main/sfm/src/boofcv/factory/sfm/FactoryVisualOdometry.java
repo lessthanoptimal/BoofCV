@@ -31,7 +31,7 @@ import boofcv.factory.geo.FactoryTriangulate;
 import boofcv.numerics.fitting.modelset.DistanceFromModel;
 import boofcv.numerics.fitting.modelset.ModelGenerator;
 import boofcv.numerics.fitting.modelset.ModelMatcher;
-import boofcv.numerics.fitting.modelset.ransac.SimpleInlierRansac;
+import boofcv.numerics.fitting.modelset.ransac.Ransac;
 import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.distort.PointTransform_F32;
 import boofcv.struct.distort.PointTransform_F64;
@@ -69,12 +69,10 @@ public class FactoryVisualOdometry {
 
 		DistanceFromModel<Se3_F64,AssociatedPair> distanceSe3 =
 				new DistanceSe3SymmetricSq(triangulate,1,1,0); // TODO use intrinsic
-		
-		int N = generateEpipolarMotion.getMinimumPoints();
 
 		ModelMatcher<Se3_F64,AssociatedPair> epipolarMotion =
-				new SimpleInlierRansac<Se3_F64,AssociatedPair>(2323,generateEpipolarMotion,distanceSe3,
-						100,N,N,100000,2*noise*noise);
+				new Ransac<Se3_F64,AssociatedPair>(2323,generateEpipolarMotion,distanceSe3,
+						100,2*noise*noise);
 
 		RefineEpipolarMatrix refineE = FactoryEpipolar.refineFundamental(1e-8,400, EpipolarError.SIMPLE);
 
@@ -82,11 +80,10 @@ public class FactoryVisualOdometry {
 				new GenerateMotionPnP( FactoryEpipolar.pnpEfficientPnP(5,0.1));
 		DistanceFromModel<Se3_F64,PointPositionPair> distanceMotion =
 				new DistanceFromModelResidualN<Se3_F64,PointPositionPair>(new PnPResidualSimple());
-		N = generateMotion.getMinimumPoints();
-		
+
 		ModelMatcher<Se3_F64,PointPositionPair> computeMotion =
-				new SimpleInlierRansac<Se3_F64,PointPositionPair>(2323,generateMotion,distanceMotion,
-						100,N,N,100000,noise*noise);
+				new Ransac<Se3_F64,PointPositionPair>(2323,generateMotion,distanceMotion,
+						100,noise*noise);
 
 		RefinePerspectiveNPoint refineMotion = FactoryEpipolar.refinePnpEfficient(5,0.1);
 
@@ -121,10 +118,10 @@ public class FactoryVisualOdometry {
 		int N = generateEpipolarMotion.getMinimumPoints();
 
 		ModelMatcher<Se3_F64,AssociatedPair> epipolarMotion =
-				new SimpleInlierRansac<Se3_F64,AssociatedPair>(2323,generateEpipolarMotion,distanceSe3,
-						2000,N,N,100000,2*noise*noise);
+				new Ransac<Se3_F64,AssociatedPair>(2323,generateEpipolarMotion,distanceSe3,
+						2000,2*noise*noise);
 
-		ModelMatcherTranGivenRot estimateTran = new ModelMatcherTranGivenRot(234,2000,10000,noise*noise);
+		ModelMatcherTranGivenRot estimateTran = new ModelMatcherTranGivenRot(234,2000,noise*noise);
 
 
 		MonocularSeparatedMotion<T> mono =
@@ -170,10 +167,10 @@ public class FactoryVisualOdometry {
 				new GenerateMotionPnP( FactoryEpipolar.pnpEfficientPnP(5,0.1));
 		DistanceFromModel<Se3_F64,PointPositionPair> distanceMotion =
 				new DistanceFromModelResidualN<Se3_F64,PointPositionPair>(new PnPResidualSimple());
-		int N = generateMotion.getMinimumPoints();
+
 		ModelMatcher<Se3_F64,PointPositionPair> computeMotion =
-				new SimpleInlierRansac<Se3_F64,PointPositionPair>(2323,generateMotion,distanceMotion,
-						200,N,N,100000,errorTolNormPixel*errorTolNormPixel);
+				new Ransac<Se3_F64,PointPositionPair>(2323,generateMotion,distanceMotion,
+						200,errorTolNormPixel*errorTolNormPixel);
 
 		// Refine the PnP pose estimate
 		RefinePerspectiveNPoint refineMotion = FactoryEpipolar.refinePnP(1e-12, 200);

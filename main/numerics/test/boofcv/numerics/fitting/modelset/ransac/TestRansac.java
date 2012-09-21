@@ -18,9 +18,7 @@
 
 package boofcv.numerics.fitting.modelset.ransac;
 
-import boofcv.numerics.fitting.modelset.DistanceFromModel;
-import boofcv.numerics.fitting.modelset.HypothesisList;
-import boofcv.numerics.fitting.modelset.ModelGenerator;
+import boofcv.numerics.fitting.modelset.*;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -33,9 +31,26 @@ import static org.junit.Assert.*;
 /**
  * @author Peter Abeles
  */
-public class TestSimpleRansacCommon {
+public class TestRansac extends GenericModelSetTests {
 
-	Random rand = new Random(345);
+	Random rand = new Random(234);
+
+
+	public TestRansac() {
+		configure(0.9, 0.05, true);
+	}
+
+	@Override
+	public ModelMatcher<double[],Double> createModelMatcher(DistanceFromModel<double[],Double> distance,
+															ModelGenerator<double[],Double> generator,
+															ModelFitter<double[],Double> fitter,
+															int minPoints,
+															double fitThreshold) {
+		Ransac<double[],Double> ret = new Ransac<double[],Double>(344, generator, distance, 200, fitThreshold);
+		ret.setNumSample(minPoints);
+
+		return ret;
+	}
 
 	/**
 	 * See if it correctly randomly selects points when the initial set size is
@@ -51,7 +66,7 @@ public class TestSimpleRansacCommon {
 		}
 
 		List<Integer> initSet = new ArrayList<Integer>();
-		SimpleRansacCommon.randomDraw(dataSet, 150, initSet, rand);
+		Ransac.randomDraw(dataSet, 150, initSet, rand);
 
 		assertEquals(150, initSet.size());
 
@@ -78,7 +93,7 @@ public class TestSimpleRansacCommon {
 		assertTrue(numTheSame < initSet.size() * 0.9);
 
 		// call get init set once more and see if it was cleared
-		SimpleRansacCommon.randomDraw(dataSet, 150, initSet, rand);
+		Ransac.randomDraw(dataSet, 150, initSet, rand);
 		assertEquals(150, initSet.size());
 	}
 
@@ -96,7 +111,7 @@ public class TestSimpleRansacCommon {
 		}
 
 		List<Integer> initSet = new ArrayList<Integer>();
-		SimpleRansacCommon.randomDraw(dataSet, 15, initSet, rand);
+		Ransac.randomDraw(dataSet, 15, initSet, rand);
 
 		assertEquals(15, initSet.size());
 
@@ -118,7 +133,7 @@ public class TestSimpleRansacCommon {
 		}
 
 		// call get init set once more and see if it was cleared
-		SimpleRansacCommon.randomDraw(dataSet, 15, initSet, rand);
+		Ransac.randomDraw(dataSet, 15, initSet, rand);
 		assertEquals(15, initSet.size());
 	}
 
@@ -136,30 +151,15 @@ public class TestSimpleRansacCommon {
 		}
 
 		DebugModelStuff stuff = new DebugModelStuff((int) modelVal);
-		SimpleRansacCommon<double[],Integer> ransac = new RandsacDebug(stuff, stuff);
+		Ransac<double[],Integer> ransac = new Ransac<double[],Integer>(234,stuff,stuff,20,1);
+		ransac.setNumSample(5);
+		// declare the array so it doesn't blow up when accessed
+		ransac.matchToInput = new int[ dataSet.size()];
 		double param[] = new double[]{modelVal};
 
-		ransac.selectMatchSet(dataSet, 4, 5, param);
+		ransac.selectMatchSet(dataSet, 4, param);
 
 		assertTrue(ransac.candidatePoints.size() == 7);
-	}
-
-	public static class RandsacDebug extends SimpleRansacCommon<double[],Integer> {
-
-		public RandsacDebug(ModelGenerator<double[],Integer> integerModelFitter,
-							DistanceFromModel<double[],Integer> modelDistance) {
-			super(integerModelFitter, modelDistance, 0, 0);
-		}
-
-		@Override
-		public boolean process(List<Integer> dataSet) {
-			return false;
-		}
-
-		@Override
-		public double getError() {
-			return 0;
-		}
 	}
 
 	public static class DebugModelStuff implements
@@ -196,10 +196,8 @@ public class TestSimpleRansacCommon {
 		}
 
 		@Override
-		public void generate(List<Integer> dataSet, HypothesisList<double[]> models) {
+		public boolean generate(List<Integer> dataSet, double[] p) {
 
-			double p[] = models.pop();
-			
 			error = 0;
 
 			int offset = (int) p[0];
@@ -212,6 +210,8 @@ public class TestSimpleRansacCommon {
 
 			error += offset;
 			p[0] = error;
+
+			return true;
 		}
 
 		@Override

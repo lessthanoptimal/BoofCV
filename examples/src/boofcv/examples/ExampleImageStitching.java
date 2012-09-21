@@ -34,7 +34,7 @@ import boofcv.gui.image.HomographyStitchPanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.image.UtilImageIO;
 import boofcv.numerics.fitting.modelset.ModelMatcher;
-import boofcv.numerics.fitting.modelset.ransac.SimpleInlierRansac;
+import boofcv.numerics.fitting.modelset.ransac.Ransac;
 import boofcv.struct.FastQueue;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.SurfFeature;
@@ -163,9 +163,9 @@ public class ExampleImageStitching {
 		// fit the images using a homography.  This works well for rotations and distant objects.
 		GenerateHomographyLinear modelFitter = new GenerateHomographyLinear(true);
 		DistanceHomographySq distance = new DistanceHomographySq();
-		int minSamples = modelFitter.getMinimumPoints();
+
 		ModelMatcher<Homography2D_F64,AssociatedPair> modelMatcher =
-				new SimpleInlierRansac<Homography2D_F64,AssociatedPair>(123,modelFitter,distance,60,minSamples,30,1000,9);
+				new Ransac<Homography2D_F64,AssociatedPair>(123,modelFitter,distance,60,9);
 
 		Homography2D_F64 H = computeTransform(inputA, inputB, detector, describe, associate, modelMatcher);
 

@@ -19,7 +19,6 @@
 package boofcv.alg.feature.detect.line.gridline;
 
 
-import boofcv.numerics.fitting.modelset.HypothesisList;
 import boofcv.numerics.fitting.modelset.ModelGenerator;
 import georegression.fitting.line.FitLine_F32;
 import georegression.metric.UtilAngle;
@@ -49,7 +48,7 @@ public class GridLineModelFitter implements ModelGenerator<LinePolar2D_F32,Edgel
 	}
 
 	@Override
-	public void generate(List<Edgel> dataSet, HypothesisList<LinePolar2D_F32> models) {
+	public boolean generate(List<Edgel> dataSet, LinePolar2D_F32 model ) {
 
 		if( dataSet.size() == 2 ) {
 			Edgel a = dataSet.get(0);
@@ -63,13 +62,13 @@ public class GridLineModelFitter implements ModelGenerator<LinePolar2D_F32,Edgel
 
 			// see if their orientations are aligned with the line's angle
 			if(UtilAngle.distHalf(lineAngle, a.theta) > angleTol || UtilAngle.distHalf(lineAngle, b.theta) > angleTol)
-				return;
+				return false;
 		}
-
-		LinePolar2D_F32 model = models.pop();
 
 		// edgel extends Point2D_F32 so this should be legal
 		FitLine_F32.polar((List)dataSet,model);
+
+		return true;
 	}
 
 	@Override

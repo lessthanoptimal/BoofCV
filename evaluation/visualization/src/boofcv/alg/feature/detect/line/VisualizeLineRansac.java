@@ -33,7 +33,7 @@ import boofcv.gui.feature.ImageLinePanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.image.UtilImageIO;
 import boofcv.numerics.fitting.modelset.ModelMatcher;
-import boofcv.numerics.fitting.modelset.ransac.SimpleInlierRansac;
+import boofcv.numerics.fitting.modelset.ransac.Ransac;
 import boofcv.struct.feature.MatrixOfList;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSInt8;
@@ -77,7 +77,7 @@ public class VisualizeLineRansac<I extends ImageSingleBand, D extends ImageSingl
 		GridLineModelFitter fitter = new GridLineModelFitter((float)(Math.PI*0.75));
 
 		ModelMatcher<LinePolar2D_F32, Edgel> matcher =
-				new SimpleInlierRansac<LinePolar2D_F32,Edgel>(123123,fitter,distance,25,2,2*regionSize/3,1000,1);
+				new Ransac<LinePolar2D_F32,Edgel>(123123,fitter,distance,25,1);
 
 		ImageGradient<I,D> gradient = FactoryDerivative.sobel(imageType, derivType);
 

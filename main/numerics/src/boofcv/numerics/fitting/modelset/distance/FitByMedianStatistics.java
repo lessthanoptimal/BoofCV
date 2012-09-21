@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2011-2012, Peter Abeles. All Rights Reserved.
  *
- * This file is part of BoofCV (http://www.boofcv.org).
+ * This file is part of BoofCV (http://boofcv.org).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,8 @@ package boofcv.numerics.fitting.modelset.distance;
 import boofcv.numerics.fitting.modelset.DistanceFromModel;
 import pja.sorting.QuickSort_F64;
 
-import java.util.List;
+import java.util.Iterator;
+import java.util.LinkedList;
 
 
 /**
@@ -34,7 +35,7 @@ public class FitByMedianStatistics<Model, Point> implements StatisticalFit<Model
 
 	private DistanceFromModel<Model, Point> modelError;
 	// set of points which contains all the inliers
-	private List<Point> inliers;
+	private LinkedList<PointIndex<Point>> allPoints;
 
 	// The fraction of samples that are not pruned
 	private double pruneThreshold;
@@ -63,21 +64,27 @@ public class FitByMedianStatistics<Model, Point> implements StatisticalFit<Model
 	}
 
 	@Override
-	public void init(DistanceFromModel<Model, Point> modelError, List<Point> inliers) {
+	public void init(DistanceFromModel<Model, Point> modelError, LinkedList<PointIndex<Point>> allPoints ) {
 		this.modelError = modelError;
-		this.inliers = inliers;
+		this.allPoints = allPoints;
 	}
 
 	@Override
 	public void computeStatistics() {
-		int size = inliers.size();
+		int size = allPoints.size();
 
 		if (errors.length < size) {
 			errors = new double[size * 3 / 2];
 			origErrors = new double[errors.length];
 		}
 
-		modelError.computeDistance(inliers, errors);
+		Iterator<PointIndex<Point>> iter = allPoints.iterator();
+		int index = 0;
+		while( iter.hasNext() ) {
+			Point pt = iter.next().data;
+			errors[index++] = modelError.computeDistance(pt);
+		}
+
 		System.arraycopy(errors, 0, origErrors, 0, size);
 
 		int where = (int) (size * pruneThreshold);
@@ -92,11 +99,12 @@ public class FitByMedianStatistics<Model, Point> implements StatisticalFit<Model
 	 */
 	@Override
 	public void prune() {
-
-		for (int j = inliers.size() - 1; j >= 0; j--) {
-
-			if (origErrors[j] >= pruneVal) {
-				inliers.remove(j);
+		Iterator<PointIndex<Point>> iter = allPoints.iterator();
+		int index = 0;
+		while( iter.hasNext() ) {
+			iter.next();
+			if (origErrors[index++] >= pruneVal) {
+				iter.remove();
 			}
 		}
 	}

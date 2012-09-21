@@ -20,7 +20,6 @@ package boofcv.alg.feature.line.gridline;
 
 import boofcv.alg.feature.detect.line.gridline.Edgel;
 import boofcv.alg.feature.detect.line.gridline.GridLineModelFitter;
-import boofcv.numerics.fitting.modelset.HypothesisList;
 import georegression.metric.UtilAngle;
 import georegression.struct.line.LinePolar2D_F32;
 import org.junit.Test;
@@ -28,8 +27,7 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 
 /**
@@ -45,45 +43,43 @@ public class TestGridLineModelFitter {
 	@Test
 	public void checkFailInCompatible() {
 		GridLineModelFitter alg = new GridLineModelFitter(0.1f);
-		HypothesisList<LinePolar2D_F32> models = new HypothesisList<LinePolar2D_F32>(alg);
 
 		// angle test should use half-circle and this should pass
 		List<Edgel> l = new ArrayList<Edgel>();
 		l.add( new Edgel(0,0,(float)Math.PI/2f));
 		l.add( new Edgel(1,0,(float)-Math.PI/2f));
 
-		alg.generate(l,models);
-		assertEquals(1,models.size());
+		LinePolar2D_F32 model = alg.createModelInstance();
+		assertTrue(alg.generate(l, model));
 
 		// this one should fail
 		l.clear();
 		l.add( new Edgel(0,0,(float)Math.PI/2f));
 		l.add( new Edgel(1,0,(float)Math.PI/2f-0.5f));
 
-		models.reset();
-		alg.generate(l,models);
-		assertEquals(0, models.size());
+		assertFalse(alg.generate(l, model));
 	}
 
 	@Test
 	public void checkFit() {
 		GridLineModelFitter alg = new GridLineModelFitter(0.1f);
-		HypothesisList<LinePolar2D_F32> models = new HypothesisList<LinePolar2D_F32>(alg);
 
 		// angle test should use half-circle and this should pass
 		List<Edgel> l = new ArrayList<Edgel>();
 		l.add( new Edgel(1,0,0f));
 		l.add( new Edgel(1,2,(float)Math.PI));
 
-		alg.generate(l, models);
-		assertEquals(1,models.get(0).distance,1e-4f);
-		assertTrue(UtilAngle.distHalf(0, models.get(0).angle) < 1e-4f);
+		LinePolar2D_F32 model = alg.createModelInstance();
+		assertTrue(alg.generate(l, model));
+
+		assertEquals(1,model.distance,1e-4f);
+		assertTrue(UtilAngle.distHalf(0, model.angle) < 1e-4f);
 
 		// three points
 		l.add( new Edgel(1,3,(float)-Math.PI/2f));
-		models.reset();
-		alg.generate(l, models);
-		assertEquals(1,models.get(0).distance,1e-4f);
-		assertTrue(UtilAngle.distHalf(0, models.get(0).angle) < 1e-4f);
+
+		assertTrue(alg.generate(l, model));
+		assertEquals(1,model.distance,1e-4f);
+		assertTrue(UtilAngle.distHalf(0, model.angle) < 1e-4f);
 	}
 }

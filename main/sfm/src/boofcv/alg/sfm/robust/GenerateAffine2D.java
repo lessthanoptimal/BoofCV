@@ -19,7 +19,6 @@
 package boofcv.alg.sfm.robust;
 
 import boofcv.alg.geo.AssociatedPair;
-import boofcv.numerics.fitting.modelset.HypothesisList;
 import boofcv.numerics.fitting.modelset.ModelFitter;
 import boofcv.numerics.fitting.modelset.ModelGenerator;
 import georegression.fitting.affine.MotionAffinePoint2D_F64;
@@ -72,7 +71,7 @@ public class GenerateAffine2D implements
 	}
 
 	@Override
-	public void generate(List<AssociatedPair> dataSet, HypothesisList<Affine2D_F64> models) {
+	public boolean generate(List<AssociatedPair> dataSet, Affine2D_F64 model ) {
 
 		from.clear();
 		to.clear();
@@ -84,10 +83,11 @@ public class GenerateAffine2D implements
 		}
 
 		if( !fitter.process(from,to) )
-			return;
+			return false;
 
-		Affine2D_F64 foundParam = models.pop();
-		foundParam.set(fitter.getMotion());
+		model.set(fitter.getMotion());
+
+		return true;
 	}
 
 	@Override

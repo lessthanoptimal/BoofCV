@@ -19,6 +19,7 @@
 package boofcv.numerics.fitting.modelset;
 
 import boofcv.numerics.fitting.modelset.distance.DistanceFromMeanModel;
+import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -59,8 +60,9 @@ public abstract class GenericModelSetTests {
 
 	/**
 	 * Sees if it can correctly select a model set and determine the best fit parameters for
-	 * a simpel test case.
+	 * a simple test case.
 	 */
+	@Test
 	public void performSimpleModelFit() {
 		double mean = 2.5;
 		double tol = 0.2;
@@ -84,6 +86,7 @@ public abstract class GenericModelSetTests {
 	 * Multiple data sets are processed in an attempt to see if it is properly reinitializing
 	 * itself and returns the correct solutions.
 	 */
+	@Test
 	public void runMultipleTimes() {
 		double mean = 2.5;
 		double tol = 0.2;
@@ -113,8 +116,8 @@ public abstract class GenericModelSetTests {
 	/**
 	 * Creates a set of sample points that are part of the model and some outliers
 	 *
-	 * @param numPoints
-	 * @param mean		The model.
+	 * @param numPoints Number of sample points it will generate
+	 * @param mean		Mean of the distribution
 	 * @param modelDist   How close to the model do the points need to be.
 	 * @param fracOutlier Fraction of the points which will be outliers.
 	 * @return Set of sample points
@@ -149,6 +152,42 @@ public abstract class GenericModelSetTests {
 		Collections.shuffle(ret, rand);
 
 		return ret;
+	}
+
+	/**
+	 * Make sure the function getInputIndex() returns the original index
+	 */
+	@Test
+	public void checkMatchSetToInputIndex() {
+		double mean = 2.5;
+		double tol = 0.2;
+
+		// generate the points with a smaller tolerance to account for fitting error
+		// later on.
+		ModelMatcher<double[],Double> alg = createModel(4, tol * 0.95);
+
+		List<Double> samples = createSampleSet(100, mean, tol, 0.1);
+
+		assertTrue(alg.process(samples));
+
+		List<Double> matchSet = alg.getMatchSet();
+
+		// sanity check to make sure there is a large enough match set
+		assertTrue(matchSet.size() > 20 );
+
+		int orderNotTheSame = 0;
+		for( int i = 0; i < matchSet.size(); i++ ) {
+			int expected = samples.indexOf(matchSet.get(i));
+			int found = alg.getInputIndex(i);
+
+			if( found != i )
+				orderNotTheSame++;
+
+			assertEquals(expected,found);
+		}
+
+		// sanity check to make sure the order has been changed
+		assertTrue(orderNotTheSame != matchSet.size());
 	}
 
 	private ModelMatcher<double[],Double> createModel(int minPoints, double fitThreshold) {

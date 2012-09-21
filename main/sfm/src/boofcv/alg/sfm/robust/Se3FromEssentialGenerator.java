@@ -5,13 +5,9 @@ import boofcv.abst.geo.TriangulateTwoViewsCalibrated;
 import boofcv.alg.geo.AssociatedPair;
 import boofcv.alg.geo.DecomposeEssential;
 import boofcv.alg.geo.PositiveDepthConstraintCheck;
-import boofcv.numerics.fitting.modelset.HypothesisList;
 import boofcv.numerics.fitting.modelset.ModelGenerator;
-import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
-import georegression.transform.se.SePointOps_F64;
 import org.ejml.data.DenseMatrix64F;
-import org.ejml.ops.CommonOps;
 
 import java.util.List;
 
@@ -52,12 +48,12 @@ public class Se3FromEssentialGenerator implements ModelGenerator<Se3_F64,Associa
 	 * into the second camera frame.
 	 *
 	 * @param dataSet Associated pairs in normalized camera coordinates.
-	 * @param models The best pose according to the positive depth constraint.
+	 * @param model The best pose according to the positive depth constraint.
 	 */
 	@Override
-	public void generate(List<AssociatedPair> dataSet, HypothesisList<Se3_F64> models) {
+	public boolean generate(List<AssociatedPair> dataSet, Se3_F64 model ) {
 		if( !computeEssential.process(dataSet) )
-			return;
+			return false;
 
 		DenseMatrix64F E = computeEssential.getEpipolarMatrix();
 
@@ -83,7 +79,8 @@ public class Se3FromEssentialGenerator implements ModelGenerator<Se3_F64,Associa
 			}
 		}
 
-		models.pop().set(bestModel);
+		model.set(bestModel);
+		return true;
 	}
 
 	@Override

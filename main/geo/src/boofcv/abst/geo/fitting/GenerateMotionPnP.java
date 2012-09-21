@@ -20,7 +20,6 @@ package boofcv.abst.geo.fitting;
 
 import boofcv.abst.geo.PerspectiveNPoint;
 import boofcv.alg.geo.PointPositionPair;
-import boofcv.numerics.fitting.modelset.HypothesisList;
 import boofcv.numerics.fitting.modelset.ModelGenerator;
 import georegression.struct.se.Se3_F64;
 
@@ -45,9 +44,10 @@ public class GenerateMotionPnP implements ModelGenerator<Se3_F64,PointPositionPa
 	}
 
 	@Override
-	public void generate(List<PointPositionPair> dataSet, HypothesisList<Se3_F64> models) {
+	public boolean generate(List<PointPositionPair> dataSet, Se3_F64 model ) {
 		alg.process(dataSet);
-		models.pop().set(alg.getPose());
+		model.set(alg.getPose());
+		return true;
 	}
 
 	@Override

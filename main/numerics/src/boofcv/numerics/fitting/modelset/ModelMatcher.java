@@ -58,6 +58,14 @@ public interface ModelMatcher<Model, Point> {
 	public List<Point> getMatchSet();
 
 	/**
+	 * For an item in the match set, return the index of the item in the original input set.
+	 *
+	 * @param matchIndex Index of an element in the match set.
+	 * @return Index of the same element in the original input list.
+	 */
+	public int getInputIndex( int matchIndex );
+
+	/**
 	 * Returns the error of the matched set of points.  No guarantee is made for a larger
 	 * or smaller value being better or worse.
 	 *

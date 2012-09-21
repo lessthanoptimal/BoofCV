@@ -31,7 +31,7 @@ import boofcv.gui.image.ShowImages;
 import boofcv.gui.stereo.RectifiedPairPanel;
 import boofcv.io.image.UtilImageIO;
 import boofcv.numerics.fitting.modelset.ModelMatcher;
-import boofcv.numerics.fitting.modelset.ransac.SimpleInlierRansac;
+import boofcv.numerics.fitting.modelset.ransac.Ransac;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.MultiSpectral;
 import georegression.struct.affine.Affine2D_F64;
@@ -137,8 +137,8 @@ public class ExampleRectifyUncalibratedStereo {
 		DistanceAffine2D distance = new DistanceAffine2D();
 		int minSamples = modelFitter.getMinimumPoints();
 		ModelMatcher<Affine2D_F64,AssociatedPair> modelMatcher =
-				new SimpleInlierRansac<Affine2D_F64,AssociatedPair>(
-						123,modelFitter,distance,200,minSamples,30,1000,threshold);
+				new Ransac<Affine2D_F64,AssociatedPair>(
+						123,modelFitter,distance,200,threshold);
 
 		if( !modelMatcher.process(pairs) )
 			throw new RuntimeException("Prune affine failed");

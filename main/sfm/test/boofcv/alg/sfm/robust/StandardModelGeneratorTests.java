@@ -19,7 +19,6 @@
 package boofcv.alg.sfm.robust;
 
 
-import boofcv.numerics.fitting.modelset.HypothesisList;
 import boofcv.numerics.fitting.modelset.ModelGenerator;
 import org.junit.Test;
 
@@ -82,12 +81,11 @@ public abstract class StandardModelGeneratorTests<Model, Point> {
 
 		ModelGenerator<Model, Point> fitter = createAlg();
 
-		HypothesisList<Model> list = new HypothesisList<Model>(fitter);
-		fitter.generate(dataSet,list);
-		assertEquals(1,list.size());
+		Model found = fitter.createModelInstance();
+		assertTrue(fitter.generate(dataSet,found));
 
 		// test the found transform by seeing if it recomputes the current points
-		assertTrue(helper.doPointsFitModel(list.get(0), dataSet));
+		assertTrue(helper.doPointsFitModel(found, dataSet));
 	}
 
 }

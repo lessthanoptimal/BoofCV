@@ -20,10 +20,9 @@ package boofcv.numerics.fitting.modelset.lmeds;
 
 
 import boofcv.numerics.fitting.modelset.DistanceFromModel;
-import boofcv.numerics.fitting.modelset.HypothesisList;
 import boofcv.numerics.fitting.modelset.ModelGenerator;
 import boofcv.numerics.fitting.modelset.ModelMatcher;
-import boofcv.numerics.fitting.modelset.ransac.SimpleRansacCommon;
+import boofcv.numerics.fitting.modelset.ransac.Ransac;
 import pja.sorting.QuickSelectArray;
 
 import java.util.ArrayList;
@@ -59,14 +58,17 @@ public class LeastMedianOfSquares<Model, Point> implements ModelMatcher<Model, P
 	// where the initial small set of points is stored
 	private List<Point> smallSet = new ArrayList<Point>();
 
+	// parameter being considered
+	private Model candidate;
 	// the parameter with the best error
 	private Model bestParam;
 	private double bestMedian;
-	// temporary parameter
-	private HypothesisList<Model> candidates;
 
 	// stores all the errors for quicker sorting
-	private double []errors;
+	private double []errors = new double[1];
+
+	// list of indexes converting it from match set to input list
+	private int []matchToInput = new int[1];
 
 	private List<Point> inlierSet;
 	private double inlierFrac;
@@ -98,9 +100,7 @@ public class LeastMedianOfSquares<Model, Point> implements ModelMatcher<Model, P
 		this.errorMetric = errorMetric;
 
 		bestParam = generator.createModelInstance();
-		candidates = new HypothesisList<Model>(generator);
-
-		errors = new double[10];
+		candidate = generator.createModelInstance();
 
 		if( inlierFrac > 0.0 ) {
 			inlierSet = new ArrayList<Point>();
@@ -117,19 +117,17 @@ public class LeastMedianOfSquares<Model, Point> implements ModelMatcher<Model, P
 		int N = dataSet.size();
 
 		// make sure the array is large enough.  If not declare a new one that is
-		if( errors.length < N )
+		if( errors.length < N ) {
 			errors = new double[ N ];
+			matchToInput = new int[N];
+		}
 
 		bestMedian = Double.MAX_VALUE;
 
 		for( int i = 0; i < totalCycles; i++ ) {
-			SimpleRansacCommon.randomDraw(dataSet,sampleSize,smallSet,rand);
+			Ransac.randomDraw(dataSet, sampleSize, smallSet, rand);
 
-			candidates.reset();
-			generator.generate(smallSet,candidates);
-			for( int j = 0; j < candidates.size(); j++ ) {
-				Model candidate = candidates.get(j);
-
+			if( generator.generate(smallSet, candidate) ) {
 				errorMetric.setModel(candidate);
 				errorMetric.computeDistance(dataSet,errors);
 
@@ -137,9 +135,10 @@ public class LeastMedianOfSquares<Model, Point> implements ModelMatcher<Model, P
 
 				if( median < bestMedian ) {
 					bestMedian = median;
-					bestParam = candidates.swap(j,bestParam);
+					Model t = bestParam;
+					bestParam = candidate;
+					candidate = t;
 				}
-
 			}
 		}
 
@@ -160,7 +159,9 @@ public class LeastMedianOfSquares<Model, Point> implements ModelMatcher<Model, P
 			int []indexes = new int[n];
 			QuickSelectArray.selectIndex(errors,numPts, n,indexes);
 			for( int i = 0; i < numPts; i++ ) {
-				inlierSet.add( dataSet.get(indexes[i]) );
+				int origIndex = indexes[i];
+				inlierSet.add( dataSet.get(origIndex) );
+				matchToInput[i] = origIndex;
 			}
 		} else {
 			inlierSet = dataSet;
@@ -181,6 +182,11 @@ public class LeastMedianOfSquares<Model, Point> implements ModelMatcher<Model, P
 	@Override
 	public List<Point> getMatchSet() {
 		return inlierSet;
+	}
+
+	@Override
+	public int getInputIndex(int matchIndex) {
+		return matchToInput[matchIndex];
 	}
 
 	/**

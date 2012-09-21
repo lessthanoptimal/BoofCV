@@ -205,6 +205,11 @@ public class TestImageMotionPointKey {
 		}
 
 		@Override
+		public int getInputIndex(int matchIndex) {
+			return matchIndex;
+		}
+
+		@Override
 		public double getError() {
 			return 0;
 		}

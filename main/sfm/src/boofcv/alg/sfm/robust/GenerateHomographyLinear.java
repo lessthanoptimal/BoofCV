@@ -21,7 +21,6 @@ package boofcv.alg.sfm.robust;
 
 import boofcv.alg.geo.AssociatedPair;
 import boofcv.alg.geo.h.HomographyLinear4;
-import boofcv.numerics.fitting.modelset.HypothesisList;
 import boofcv.numerics.fitting.modelset.ModelFitter;
 import boofcv.numerics.fitting.modelset.ModelGenerator;
 import georegression.struct.homo.Homography2D_F64;
@@ -62,14 +61,15 @@ public class GenerateHomographyLinear implements
 	}
 
 	@Override
-	public void generate(List<AssociatedPair> dataSet, HypothesisList<Homography2D_F64> models) {
+	public boolean generate(List<AssociatedPair> dataSet, Homography2D_F64 model ) {
 
 		if( !alg.process(dataSet) )
-			return;
+			return false;
 
-		Homography2D_F64 foundModel = models.pop();
 		DenseMatrix64F m = alg.getHomography();
-		UtilHomography.convert(m,foundModel);
+		UtilHomography.convert(m,model);
+
+		return true;
 	}
 
 	@Override
