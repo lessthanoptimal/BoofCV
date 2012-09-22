@@ -39,9 +39,9 @@ public interface AccessPointTracks {
 	public long getTrackId( int index );
 
 	/**
-	 * All the points being actively tracked
+	 * All the points being actively tracked in pixel coordinates.
 	 *
-	 * @return all active tracks
+	 * @return all active tracks in pixel coordinates
 	 */
 	public List<Point2D_F64> getAllTracks();
 
@@ -49,14 +49,14 @@ public interface AccessPointTracks {
 	 * Tracks which are inliers to some algorithm.  For example, inlier set when estimating
 	 * the camera's motion
 	 *
-	 * @return inlier features
+	 * @return inlier features in pixel coordinates
 	 */
 	public List<Point2D_F64> getInlierTracks();
 
 	/**
 	 * Tracks that were just recently spawned
 	 *
-	 * @return newly spawned tracks
+	 * @return newly spawned tracks in pixel coordinates
 	 */
 	public List<Point2D_F64> getNewTracks();
 }

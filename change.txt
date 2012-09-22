@@ -13,7 +13,10 @@ Version : Alpha 0.11
 - Template Matching
   * Added NCC template matching algorithm
   * TemplateScoreType: ERROR_SQUARED renamed to SUM_DIFF_SQ
-
+- ModelSet
+  * Original index of inlier set can be requested now
+  * Removed the ability to generate multiple hypotheses.  Was not needed after all.
+  * RANSAC score has been deleted and RANSAC simplified
 ---------------------------------------------
 Date    : 2012/09/18
 Version : Alpha 0.10
