@@ -213,8 +213,10 @@ public class VisualizeStereoVisualOdometry implements MouseListener
 		StereoDisparitySparse<ImageFloat32> disparity =
 				FactoryStereoDisparity.regionSparseWta(2,100,3,3,40,-1,true,ImageFloat32.class);
 
-		StereoVisualOdometry<ImageFloat32> alg = FactoryVisualOdometry.stereoSimple(300,3,tracker,stereoParam,
-				disparity,ImageFloat32.class);
+//		StereoVisualOdometry<ImageFloat32> alg = FactoryVisualOdometry.stereoSimple(300,3,tracker,stereoParam,
+//				disparity,ImageFloat32.class);
+		StereoVisualOdometry<ImageFloat32> alg = FactoryVisualOdometry.stereoEpipolar(100, 1, tracker, stereoParam,
+				disparity, ImageFloat32.class);
 
 		VisualizeStereoVisualOdometry gui = new VisualizeStereoVisualOdometry();
 		gui.process(videoLeft, videoRight, alg);

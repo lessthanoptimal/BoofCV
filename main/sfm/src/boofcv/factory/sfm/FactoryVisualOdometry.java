@@ -18,10 +18,7 @@ import boofcv.alg.geo.RectifyImageOps;
 import boofcv.alg.geo.UtilIntrinsic;
 import boofcv.alg.geo.pose.PnPResidualSimple;
 import boofcv.alg.geo.rectify.RectifyCalibrated;
-import boofcv.alg.sfm.MonocularSeparatedMotion;
-import boofcv.alg.sfm.MonocularSimpleVo;
-import boofcv.alg.sfm.PointPoseTrack;
-import boofcv.alg.sfm.StereoSimpleVo;
+import boofcv.alg.sfm.*;
 import boofcv.alg.sfm.robust.DistanceSe3SymmetricSq;
 import boofcv.alg.sfm.robust.ModelMatcherTranGivenRot;
 import boofcv.alg.sfm.robust.Se3FromEssentialGenerator;
@@ -32,6 +29,7 @@ import boofcv.numerics.fitting.modelset.DistanceFromModel;
 import boofcv.numerics.fitting.modelset.ModelGenerator;
 import boofcv.numerics.fitting.modelset.ModelMatcher;
 import boofcv.numerics.fitting.modelset.ransac.Ransac;
+import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.distort.PointTransform_F32;
 import boofcv.struct.distort.PointTransform_F64;
@@ -193,5 +191,69 @@ public class FactoryVisualOdometry {
 		StereoSimpleVo<T> alg = new StereoSimpleVo<T>(keyTracker,pixelTo3D,computeMotion, refineMotion);
 
 		return new WrapStereoSimpleVo<T>(alg);
+	}
+
+	public static <T extends ImageSingleBand>
+	StereoVisualOdometry<T> stereoEpipolar( int minTracks , double inlierPixelTol ,
+											ImagePointTracker<T> tracker ,
+											StereoParameters stereoParam ,
+											StereoDisparitySparse<T> sparseDisparity ,
+											Class<T> imageType ) {
+		// compute rectification
+		RectifyCalibrated rectifyAlg = RectifyImageOps.createCalibrated();
+		Se3_F64 leftToRight = stereoParam.getRightToLeft().invert(null);
+
+		// original camera calibration matrices
+		DenseMatrix64F K1 = UtilIntrinsic.calibrationMatrix(stereoParam.getLeft(), null);
+		DenseMatrix64F K2 = UtilIntrinsic.calibrationMatrix(stereoParam.getRight(),null);
+
+		rectifyAlg.process(K1,new Se3_F64(),K2,leftToRight);
+
+		// rectification matrix for each image
+		DenseMatrix64F rect1 = rectifyAlg.getRect1();
+		DenseMatrix64F rect2 = rectifyAlg.getRect2();
+		// New calibration matrix,
+		// Both cameras have the same one after rectification.
+		DenseMatrix64F rectK = rectifyAlg.getCalibrationMatrix();
+
+		// Adjust the rectification to make the view area more useful
+		RectifyImageOps.fullViewLeft(stereoParam.left, rect1, rect2, rectK);
+
+		// motion estimation using essential matrix
+		EpipolarMatrixEstimator essentialAlg = FactoryEpipolar.computeFundamentalOne(5, false, 5);
+		TriangulateTwoViewsCalibrated triangulate = FactoryTriangulate.twoGeometric();
+		ModelGenerator<Se3_F64, AssociatedPair> generateEpipolarMotion =
+				new Se3FromEssentialGenerator(essentialAlg, triangulate);
+
+		IntrinsicParameters intrinsic = stereoParam.left;
+
+		DistanceFromModel<Se3_F64, AssociatedPair> distanceSe3 =
+				new DistanceSe3SymmetricSq(triangulate, intrinsic.fx, intrinsic.fy, intrinsic.skew);
+
+		// 1/2 a pixel tolerance for RANSAC inliers
+		double ransacTOL = inlierPixelTol * inlierPixelTol * 2.0;
+
+		ModelMatcher<Se3_F64, AssociatedPair> epipolarMotion =
+				new Ransac<Se3_F64, AssociatedPair>(2323, generateEpipolarMotion, distanceSe3,
+						200, ransacTOL);
+
+		// Range from sparse disparity
+		ImageDistort<T> rectLeft = RectifyImageOps.rectifyImage(stereoParam.left,rect1,imageType);
+		ImageDistort<T> rectRight = RectifyImageOps.rectifyImage(stereoParam.right,rect2,imageType);
+		PointTransform_F32 pixelToRectified = RectifyImageOps.rectifyTransform(stereoParam.left,rect1);
+		DisparityTo3D<T> pixelTo3D = new DisparityTo3D<T>(sparseDisparity,rectLeft,rectRight,
+				pixelToRectified,imageType);
+		pixelTo3D.configure(stereoParam.getBaseline(),rectK);
+
+		// transform to go from pixel coordinates to normalized coordinates
+		PointTransform_F64 pixelToNormalized = RectifyImageOps.rectifyNormalized_F64(stereoParam.left,rect1,rectK);
+
+		// setup the tracker
+		KeyFramePointTracker<T,PointPoseTrack> keyTracker =
+				new KeyFramePointTracker<T,PointPoseTrack>(tracker,pixelToNormalized,PointPoseTrack.class);
+
+		StereoVoEpipolar<T> alg = new StereoVoEpipolar<T>(minTracks,epipolarMotion,pixelTo3D,keyTracker,triangulate);
+
+		return new WrapStereoVoEpipolar<T>(alg);
 	}
 }
