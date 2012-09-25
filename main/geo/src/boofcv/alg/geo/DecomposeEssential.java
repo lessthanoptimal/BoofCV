@@ -49,6 +49,9 @@ public class DecomposeEssential {
 
 	private SingularValueDecomposition<DenseMatrix64F> svd = DecompositionFactory.svd(3, 3, true, true, false);
 
+	// storage for SVD
+	DenseMatrix64F U,S,V;
+
 	// storage for the four possible solutions
 	List<Se3_F64> solutions = new ArrayList<Se3_F64>();
 
@@ -85,9 +88,11 @@ public class DecomposeEssential {
 		if( !svd.decompose(E))
 			throw new RuntimeException("Svd some how failed");
 
-		DenseMatrix64F U = svd.getU(null,false);
-		DenseMatrix64F V = svd.getV(null,false);
-		DenseMatrix64F S = svd.getW(null);
+		U = svd.getU(U,false);
+		V = svd.getV(V,false);
+		S = svd.getW(S);
+
+		SingularOps.descendingOrder(U,false,S,V,false);
 
 		decompose(U, S, V);
 	}
@@ -100,8 +105,6 @@ public class DecomposeEssential {
 	 * @param V Orthogonal matrix from SVD.
 	 */
 	public void decompose( DenseMatrix64F U , DenseMatrix64F S , DenseMatrix64F V ) {
-		SingularOps.descendingOrder(U,false,S,V,false);
-
 		// this ensures the resulting rotation matrix will have a determinant of +1 and thus be a real rotation matrix
 		if( CommonOps.det(U) < 0 ) {
 			CommonOps.scale(-1,U);

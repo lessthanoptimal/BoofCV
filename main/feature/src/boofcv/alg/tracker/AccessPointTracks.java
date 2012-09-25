@@ -59,4 +59,9 @@ public interface AccessPointTracks {
 	 * @return newly spawned tracks in pixel coordinates
 	 */
 	public List<Point2D_F64> getNewTracks();
+
+	/**
+	 * Given the inlier index return the index in all
+	 */
+	public int fromInlierToAllIndex( int inlierIndex );
 }

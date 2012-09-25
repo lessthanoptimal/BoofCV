@@ -98,6 +98,11 @@ public class FactoryEpipolar {
 	 * </p>
 	 *
 	 * <p>
+	 * All estimated epipolar matrices will have the following constraint:<br>
+	 * x'*F*x = 0, where F is the epipolar matrix, x' = currLoc, and x = keyLoc.
+	 * </p>
+	 *
+	 * <p>
 	 * There are more differences between these algorithms than the minimum number of sample points.  Consult
 	 * the literature for information on critical surfaces which will work or not work with each algorithm.  In
 	 * general, algorithm which require fewer samples have less issues with critical surfaces than the 8-point
@@ -142,6 +147,11 @@ public class FactoryEpipolar {
 	 * the underlying algorithm generates multiple hypotheses they are resolved by considering additional
 	 * sample points. For example, if you are using the 7 point algorithm at least one additional sample point
 	 * is required to resolve that ambiguity.  So 8 or more sample points are now required.
+	 * </p>
+	 *
+	 * <p>
+	 * All estimated epipolar matrices will have the following constraint:<br>
+	 * x'*F*x = 0, where F is the epipolar matrix, x' = currLoc, and x = keyLoc.
 	 * </p>
 	 *
 	 * <p>

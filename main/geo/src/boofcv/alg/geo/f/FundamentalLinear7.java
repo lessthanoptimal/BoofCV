@@ -54,6 +54,8 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class FundamentalLinear7 extends FundamentalLinear {
+	// TODO don't extends FundamentalLinear
+	// can speed up SVD by not computing U
 
 	// extracted from the null space of A
 	protected DenseMatrix64F F1 = new DenseMatrix64F(3,3);
@@ -61,10 +63,13 @@ public class FundamentalLinear7 extends FundamentalLinear {
 
 	// temporary storage for cubic coefficients
 	private Polynomial poly = new Polynomial(4);
-	PolynomialRoots rootFinger = PolynomialSolver.createRootFinder(RootFinderType.EVD,4);
+	PolynomialRoots rootFinder = PolynomialSolver.createRootFinder(RootFinderType.EVD,4);
 
 	// where the found solutions are stored
 	FastQueue<DenseMatrix64F> solutions;
+
+	// Matrix from SVD
+	DenseMatrix64F V = new DenseMatrix64F(9,9);
 
 	/**
 	 * When computing the essential matrix normalization is optional because pixel coordinates
@@ -129,13 +134,14 @@ public class FundamentalLinear7 extends FundamentalLinear {
 	 * Computes the SVD of A and extracts the essential/fundamental matrix from its null space
 	 */
 	private boolean process(DenseMatrix64F A) {
-		if( !svd.decompose(A) )
+		if( !svdNull.decompose(A) )
 			return true;
 
 		// extract the two singular vectors
-		DenseMatrix64F V = svd.getV(null,false);
-		SpecializedOps.subvector(V, 0, 7, V.numCols, false, 0, F1);
-		SpecializedOps.subvector(V, 0, 8, V.numCols, false, 0, F2);
+		// no need to sort by singular values because the two automatic null spaces are being sampled
+		svdNull.getV(V,false);
+		SpecializedOps.subvector(V, 0, 7, 9, false, 0, F1);
+		SpecializedOps.subvector(V, 0, 8, 9, false, 0, F2);
 
 		return false;
 	}
@@ -151,10 +157,10 @@ public class FundamentalLinear7 extends FundamentalLinear {
 	 */
 	public void computeSolutions()
 	{
-		if( !rootFinger.process(poly))
+		if( !rootFinder.process(poly))
 			return;
 
-		List<Complex64F> zeros = rootFinger.getRoots();
+		List<Complex64F> zeros = rootFinder.getRoots();
 
 		for( Complex64F c : zeros ) {
 			if( !c.isReal() && Math.abs(c.imaginary) > 1e-10 )
@@ -169,15 +175,11 @@ public class FundamentalLinear7 extends FundamentalLinear {
 				F.data[i] = a*F1.data[i] + b*F2.data[i];
 			}
 
-			// Well these procedures might improve the quality of the result, but aren't strictly necessary
-			// since the singularity constraints has already been applied
-//			if( computeFundamental) {
-//				if( !projectOntoFundamentalSpace(F) )
-//					solutions.removeTail();
-//			} else {
-//				if( !projectOntoEssential(F) )
-//					solutions.removeTail();
-//			}
+			// det(F) = 0 is already enforced, but for essential matrices it needs to enforce
+			// that the first two singular values are zero and the last one is zero
+			if( !computeFundamental && !projectOntoEssential(F) ) {
+					solutions.removeTail();
+			}
 		}
 	}
 

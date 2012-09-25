@@ -28,8 +28,7 @@ import org.ejml.ops.CommonOps;
 import org.ejml.ops.MatrixFeatures;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * @author Peter Abeles
@@ -123,5 +122,15 @@ public class TestUtilIntrinsic {
 		assertTrue(ret.width == 100);
 		assertTrue(ret.height == 200);
 		assertTrue(ret.flipY);
+	}
+
+	@Test
+	public void convertNormToPixel() {
+		fail("implement");
+	}
+
+	@Test
+	public void convertPixelToNorm() {
+		fail("implement");
 	}
 }

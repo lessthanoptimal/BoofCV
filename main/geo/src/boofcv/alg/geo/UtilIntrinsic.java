@@ -18,10 +18,13 @@
 
 package boofcv.alg.geo;
 
+import boofcv.alg.distort.NormalizedToPixel_F64;
+import boofcv.alg.distort.PixelToNormalized_F64;
 import boofcv.alg.distort.PointTransformHomography_F32;
 import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.distort.PointTransform_F32;
 import boofcv.struct.distort.SequencePointTransform_F32;
+import georegression.struct.point.Point2D_F64;
 import org.ejml.data.DenseMatrix64F;
 import org.ejml.ops.CommonOps;
 
@@ -156,5 +159,59 @@ public class UtilIntrinsic {
 		param.flipY = flipY;
 
 		return param;
+	}
+
+	/**
+	 * <p>
+	 * Convenient function for converting from normalized image coordinates to the original image pixel coordinate.
+	 * If speed is a concern then {@link NormalizedToPixel_F64} should be used instead.
+	 * </p>
+	 * <p>
+	 * NOTE: Lens distortion handled!
+	 * </p>
+	 *
+	 * @param param Intrinsic camera parameters
+	 * @param x X-coordinate of normalized.
+	 * @param y Y-coordinate of normalized.
+	 * @param pixel Optional storage for output.  If null a new instance will be declared.
+	 * @return pixel image coordinate
+	 */
+	public static Point2D_F64 convertNormToPixel( IntrinsicParameters param , double x , double y , Point2D_F64 pixel ) {
+		if( pixel == null )
+			pixel = new Point2D_F64();
+
+		NormalizedToPixel_F64 alg = new NormalizedToPixel_F64();
+		alg.set(param.fx,param.fy,param.skew,param.cx,param.cy);
+
+		alg.compute(x,y,pixel);
+
+		return pixel;
+	}
+
+	/**
+	 * <p>
+	 * Convenient function for converting from original image pixel coordinate to normalized< image coordinates.
+	 * If speed is a concern then {@link PixelToNormalized_F64} should be used instead.
+	 * </p>
+	 * <p>
+	 * NOTE: Lens distortion is not removed!
+	 * </p>
+	 *
+	 * @param param Intrinsic camera parameters
+	 * @param x X-coordinate of image pixel.
+	 * @param y Y-coordinate of image pixel.
+	 * @param norm Optional storage for output.  If null a new instance will be declared.
+	 * @return normalized image coordinate
+	 */
+	public static Point2D_F64 convertPixelToNorm( IntrinsicParameters param , double x , double y , Point2D_F64 norm ) {
+		if( norm == null )
+			norm = new Point2D_F64();
+
+		PixelToNormalized_F64 alg = new PixelToNormalized_F64();
+		alg.set(param.fx,param.fy,param.skew,param.cx,param.cy);
+
+		alg.compute(x,y,norm);
+
+		return norm;
 	}
 }

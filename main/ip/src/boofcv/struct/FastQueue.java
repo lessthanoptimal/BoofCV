@@ -62,6 +62,9 @@ public class FastQueue<T> {
 	 * Returns a wrapper around FastQueue that allows it to act as a read only list.
 	 * There is little overhead in using this interface.
 	 *
+	 * NOTE: The same instead of a list is returned each time.  Be careful when writing
+	 * concurrent code and create a copy.
+	 *
 	 * @return List wrapper.
 	 */
 	public List<T> toList() {

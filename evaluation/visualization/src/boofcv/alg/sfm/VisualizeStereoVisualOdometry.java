@@ -46,6 +46,8 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.io.FileNotFoundException;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * @author Peter Abeles
@@ -59,20 +61,55 @@ public class VisualizeStereoVisualOdometry implements MouseListener
 		Graphics2D g2 = image.createGraphics();
 
 //		drawFeatureID(tracker, g2);
-		drawFeatureZ(tracker,g2);
+//		drawFeatureZ(tracker,g2);
 
 		for( Point2D_F64 p : tracker.getNewTracks() ) {
-			VisualizeFeatures.drawPoint(g2,(int)p.x,(int)p.y,3,Color.YELLOW);
+			VisualizeFeatures.drawPoint(g2,(int)p.x,(int)p.y,3,Color.GREEN);
 		}
 
 		g2.setColor(Color.BLUE);
+		g2.setStroke(new BasicStroke(3));
 		for( Point2D_F64 p : tracker.getAllTracks() ) {
 			VisualizeFeatures.drawCross(g2,(int)p.x,(int)p.y,3);
 		}
 
-		for( Point2D_F64 p : tracker.getInlierTracks() ) {
-			VisualizeFeatures.drawPoint(g2,(int)p.x,(int)p.y,3,Color.RED);
+		List<Point2D_F64> inliers = tracker.getInlierTracks();
+		if( inliers.size() > 0 ) {
+			double ranges[] = new double[tracker.getInlierTracks().size() ];
+			for( int i = 0; i < tracker.getInlierTracks().size(); i++ ) {
+
+				int indexAll = tracker.fromInlierToAllIndex(i);
+				Point3D_F64 p3 = tracker.getTrackLocation(indexAll);
+
+				ranges[i] = p3.z;
+			}
+			Arrays.sort(ranges);
+
+			double maxRange = ranges[(int)(ranges.length*0.8)];
+
+			for( int i = 0; i < tracker.getInlierTracks().size(); i++ ) {
+
+				int indexAll = tracker.fromInlierToAllIndex(i);
+
+				Point2D_F64 pixel = tracker.getInlierTracks().get(i);
+				Point3D_F64 p3 = tracker.getTrackLocation(indexAll);
+
+				double r = p3.z/maxRange;
+				if( r < 0 ) r = 0;
+				else if( r > 1 ) r = 1;
+
+				int color = (255 << 16) | ((int)(255*r) << 8);
+
+				VisualizeFeatures.drawPoint(g2,(int)pixel.x,(int)pixel.y,3,new Color(color));
+			}
+
 		}
+
+		g2.setColor(Color.BLACK);
+		g2.fillRect(25,15,80,45);
+		g2.setColor(Color.CYAN);
+		g2.drawString("Total: " + tracker.getAllTracks().size(), 30, 30);
+		g2.drawString("Inliers: "+inliers.size(),30,50);
 	}
 
 	private static void drawFeatureID(AccessSfmPointTracks tracker, Graphics2D g2) {
@@ -135,6 +172,8 @@ public class VisualizeStereoVisualOdometry implements MouseListener
 		ShowImages.showWindow(gui, "Left Video");
 		ShowImages.showWindow(orientation,"Orientation");
 
+		int totalInliers = 0;
+
 		while( videoLeft.hasNext() && videoRight.hasNext() ) {
 			ImageFloat32 left = videoLeft.next();
 			ImageFloat32 right = videoRight.next();
@@ -144,7 +183,12 @@ public class VisualizeStereoVisualOdometry implements MouseListener
 			long after = System.nanoTime();
 
 			BufferedImage imageGuiLeft = videoLeft.getGuiImage();
-			drawFeatures((AccessSfmPointTracks)alg,imageGuiLeft);
+
+			if( alg instanceof AccessSfmPointTracks ) {
+				drawFeatures((AccessSfmPointTracks)alg,imageGuiLeft);
+
+				totalInliers += ((AccessSfmPointTracks)alg).getInlierTracks().size();
+			}
 
 			if( worked ) {
 				Se3_F64 pose = alg.getCameraToWorld();
@@ -155,7 +199,7 @@ public class VisualizeStereoVisualOdometry implements MouseListener
 				orientation.setVector(v);
 				orientation.repaint();
 
-				System.out.println(frameNumber+"   location: "+pose.getT()+"  ms = "+(after-before)/1e6);
+				System.out.println(frameNumber+"   location: "+pose.getT()+"  ms = "+(after-before)/1e6+"  "+totalInliers);
 			} else {
 				System.out.println(frameNumber+"   failed");
 			}
@@ -208,15 +252,17 @@ public class VisualizeStereoVisualOdometry implements MouseListener
 //				new MjpegStreamSequence<ImageFloat32>(fileRight,ImageFloat32.class);
 
 		ImagePointTracker<ImageFloat32> tracker =
-				FactoryPointSequentialTracker.klt(300,new int[]{1,2,4,8},3,3,2,ImageFloat32.class,ImageFloat32.class);
+				FactoryPointSequentialTracker.klt(400,new int[]{1,2,4,8},3,3,2,ImageFloat32.class,ImageFloat32.class);
 
 		StereoDisparitySparse<ImageFloat32> disparity =
 				FactoryStereoDisparity.regionSparseWta(2,100,3,3,40,-1,true,ImageFloat32.class);
 
 //		StereoVisualOdometry<ImageFloat32> alg = FactoryVisualOdometry.stereoSimple(300,3,tracker,stereoParam,
 //				disparity,ImageFloat32.class);
-		StereoVisualOdometry<ImageFloat32> alg = FactoryVisualOdometry.stereoEpipolar(100, 1, tracker, stereoParam,
+		StereoVisualOdometry<ImageFloat32> alg = FactoryVisualOdometry.stereoDepth(75, 1, tracker, stereoParam,
 				disparity, ImageFloat32.class);
+//		StereoVisualOdometry<ImageFloat32> alg = FactoryVisualOdometry.stereoEpipolar(75, 1, tracker, stereoParam,
+//				disparity, ImageFloat32.class);
 
 		VisualizeStereoVisualOdometry gui = new VisualizeStereoVisualOdometry();
 		gui.process(videoLeft, videoRight, alg);
