@@ -36,7 +36,19 @@ import org.ejml.ops.CommonOps;
 import org.ejml.simple.SimpleMatrix;
 
 /**
- * Operations related to rectifying stereo image pairs.
+ * <p>
+ * Operations related to rectifying stereo image pairs. Provides functions for 1) creating rectification calculation
+ * algorithms, 2) rectification transforms, and 3) image distortion for rectification.
+ * </p>
+ *
+ * <p>
+ * Definition of transformed coordinate systems:
+ * <dl>
+ *     <dt>Pixel<dd>Original image coordinates in pixels.
+ *     <dt>Rect<dd>Rectified image coordinates in pixels.  Lens distortion has been removed.
+ *     <dt>RectNorm<dd>Rectified image coordinates in normalized coordinates.
+ * </dl>
+ * </p>
  *
  * @author Peter Abeles
  */
@@ -103,7 +115,7 @@ public class RectifyImageOps {
 		paramLeft = new IntrinsicParameters(paramLeft);
 		paramLeft.flipY = false;
 
-		PointTransform_F32 tranLeft = rectifyTransform(paramLeft, rectifyLeft);
+		PointTransform_F32 tranLeft = transformPixelToRect_F32(paramLeft, rectifyLeft);
 
 		Rectangle2D_F32 bound = DistortImageOps.boundBox_F32(paramLeft.width, paramLeft.height,
 				new PointToPixelTransform_F32(tranLeft));
@@ -168,7 +180,7 @@ public class RectifyImageOps {
 		paramLeft = new IntrinsicParameters(paramLeft);
 		paramLeft.flipY = false;
 
-		PointTransform_F32 tranLeft = rectifyTransform(paramLeft, rectifyLeft);
+		PointTransform_F32 tranLeft = transformPixelToRect_F32(paramLeft, rectifyLeft);
 
 		Rectangle2D_F32 bound = LensDistortionOps.boundBoxInside(paramLeft.width, paramLeft.height,
 				new PointToPixelTransform_F32(tranLeft));
@@ -274,21 +286,53 @@ public class RectifyImageOps {
 	 * @param rectify Transform for rectifying the image.
 	 * @return Transform from rectified to unrectified pixels
 	 */
-	public static PointTransform_F32 rectifyTransformInv(IntrinsicParameters param,
-														 DenseMatrix64F rectify )
+	public static PointTransform_F32 transformRectToPixel_F32(IntrinsicParameters param,
+															  DenseMatrix64F rectify)
 	{
-		AddRadialPtoP_F32 radialDistort = new AddRadialPtoP_F32();
-		radialDistort.set(param.fx, param.fy, param.skew, param.cx, param.cy, param.radial);
+		AddRadialPtoP_F32 addDistortion = new AddRadialPtoP_F32();
+		addDistortion.set(param.fx, param.fy, param.skew, param.cx, param.cy, param.radial);
 
 		DenseMatrix64F rectifyInv = new DenseMatrix64F(3,3);
 		CommonOps.invert(rectify,rectifyInv);
-		PointTransformHomography_F32 rectifyDistort = new PointTransformHomography_F32(rectifyInv);
+		PointTransformHomography_F32 removeRect = new PointTransformHomography_F32(rectifyInv);
 
 		if( param.flipY) {
 			PointTransform_F32 flip = new FlipVertical_F32(param.height);
-			return new SequencePointTransform_F32(flip,rectifyDistort,radialDistort,flip);
+			return new SequencePointTransform_F32(flip,removeRect,addDistortion,flip);
 		} else {
-			return new SequencePointTransform_F32(rectifyDistort,radialDistort);
+			return new SequencePointTransform_F32(removeRect,addDistortion);
+		}
+	}
+
+	/**
+	 * <p>
+	 * Creates a transform that goes from rectified to original distorted pixel coordinates.
+	 * Rectification includes removal of lens distortion.  Used for rendering rectified images.
+	 * </p>
+	 *
+	 * <p>
+	 * The original image coordinate system is maintained even if the intrinsic parameter flipY is true.
+	 * </p>
+	 *
+	 * @param param Intrinsic parameters.
+	 * @param rectify Transform for rectifying the image.
+	 * @return Transform from rectified to unrectified pixels
+	 */
+	public static PointTransform_F64 transformRectToPixel_F64(IntrinsicParameters param,
+															  DenseMatrix64F rectify)
+	{
+		AddRadialPtoP_F64 addDistortion = new AddRadialPtoP_F64();
+		addDistortion.set(param.fx, param.fy, param.skew, param.cx, param.cy, param.radial);
+
+		DenseMatrix64F rectifyInv = new DenseMatrix64F(3,3);
+		CommonOps.invert(rectify,rectifyInv);
+		PointTransformHomography_F64 removeRect = new PointTransformHomography_F64(rectifyInv);
+
+		if( param.flipY) {
+			PointTransform_F64 flip = new FlipVertical_F64(param.height);
+			return new SequencePointTransform_F64(flip,removeRect,addDistortion,flip);
+		} else {
+			return new SequencePointTransform_F64(removeRect,addDistortion);
 		}
 	}
 
@@ -305,8 +349,8 @@ public class RectifyImageOps {
 	 * @param rectify Transform for rectifying the image.
 	 * @return Transform from unrectified to rectified pixels
 	 */
-	public static PointTransform_F32 rectifyTransform(IntrinsicParameters param,
-													  DenseMatrix64F rectify )
+	public static PointTransform_F32 transformPixelToRect_F32(IntrinsicParameters param,
+															  DenseMatrix64F rectify)
 	{
 		RemoveRadialPtoP_F32 radialDistort = new RemoveRadialPtoP_F32();
 		radialDistort.set(param.fx, param.fy, param.skew, param.cx, param.cy, param.radial);
@@ -318,6 +362,35 @@ public class RectifyImageOps {
 			return new SequencePointTransform_F32(flip,radialDistort,rectifyDistort,flip);
 		} else {
 			return new SequencePointTransform_F32(radialDistort,rectifyDistort);
+		}
+	}
+
+	/**
+	 * <p>
+	 * Creates a transform that applies rectification to unrectified distorted pixels.
+	 * </p>
+	 *
+	 * <p>
+	 * The original image coordinate system is maintained even if the intrinsic parameter flipY is true.
+	 * </p>
+	 *
+	 * @param param Intrinsic parameters.
+	 * @param rectify Transform for rectifying the image.
+	 * @return Transform from unrectified to rectified pixels
+	 */
+	public static PointTransform_F64 transformPixelToRect_F64(IntrinsicParameters param,
+															  DenseMatrix64F rectify)
+	{
+		RemoveRadialPtoP_F64 radialDistort = new RemoveRadialPtoP_F64();
+		radialDistort.set(param.fx, param.fy, param.skew, param.cx, param.cy, param.radial);
+
+		PointTransformHomography_F64 rectifyDistort = new PointTransformHomography_F64(rectify);
+
+		if( param.flipY) {
+			PointTransform_F64 flip = new FlipVertical_F64(param.height);
+			return new SequencePointTransform_F64(flip,radialDistort,rectifyDistort,flip);
+		} else {
+			return new SequencePointTransform_F64(radialDistort,rectifyDistort);
 		}
 	}
 
@@ -336,9 +409,9 @@ public class RectifyImageOps {
 	 * @param rectifyK Camera calibration matrix after rectification
 	 * @return Transform from unrectified to rectified normalized pixels
 	 */
-	public static PointTransform_F64 rectifyNormalized_F64(IntrinsicParameters param,
-														   DenseMatrix64F rectify ,
-														   DenseMatrix64F rectifyK )
+	public static PointTransform_F64 transformPixelToRectNorm_F64(IntrinsicParameters param,
+																  DenseMatrix64F rectify,
+																  DenseMatrix64F rectifyK)
 	{
 		if( rectifyK.get(0,1) != 0 )
 			throw new IllegalArgumentException("Skew should be zero in rectified images");
@@ -404,7 +477,7 @@ public class RectifyImageOps {
 		// only compute the transform once
 		ImageDistort<T> ret = FactoryDistort.distortCached(interp,null,imageType);
 
-		PointTransform_F32 transform = rectifyTransformInv(param , rectify);
+		PointTransform_F32 transform = transformRectToPixel_F32(param, rectify);
 
 		ret.setModel(new PointToPixelTransform_F32(transform));
 

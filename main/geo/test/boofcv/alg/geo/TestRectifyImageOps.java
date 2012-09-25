@@ -29,8 +29,6 @@ import org.ejml.data.DenseMatrix64F;
 import org.ejml.ops.CommonOps;
 import org.junit.Test;
 
-import java.util.Random;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -42,8 +40,6 @@ public class TestRectifyImageOps {
 	Point2D_F32 p = new Point2D_F32();
 	int width = 300;
 	int height = 350;
-
-	Random rand = new Random(12);
 
 	/**
 	 * After the camera matrix has been adjusted and a forward rectification transform has been applied
@@ -69,7 +65,7 @@ public class TestRectifyImageOps {
 		RectifyImageOps.fullViewLeft(param,rect1,rect2,rectK);
 
 		// check left image
-		PointTransform_F32 tran = RectifyImageOps.rectifyTransform(param, rect1);
+		PointTransform_F32 tran = RectifyImageOps.transformPixelToRect_F32(param, rect1);
 		checkInside(tran);
 		// the right view is not checked since it is not part of the contract
 	}
@@ -114,7 +110,7 @@ public class TestRectifyImageOps {
 		RectifyImageOps.allInsideLeft(param, rect1, rect2, rectK);
 
 		// check left image
-		PointTransform_F32 tran = RectifyImageOps.rectifyTransformInv(param, rect1);
+		PointTransform_F32 tran = RectifyImageOps.transformRectToPixel_F32(param, rect1);
 		checkInside(tran);
 		// the right view is not checked since it is not part of the contract
 	}
@@ -153,19 +149,19 @@ public class TestRectifyImageOps {
 	 * Transforms and then performs the inverse transform to distorted rectified pixel
 	 */
 	@Test
-	public void rectifyTransform_and_rectifyTransformInv() {
-		rectifyTransform_and_rectifyTransformInv(true);
-		rectifyTransform_and_rectifyTransformInv(false);
+	public void transform_PixelToRect_and_RectToPixel_F32() {
+		transform_PixelToRect_and_RectToPixel_F32(true);
+		transform_PixelToRect_and_RectToPixel_F32(false);
 	}
 
-	public void rectifyTransform_and_rectifyTransformInv( boolean flipY ) {
+	public void transform_PixelToRect_and_RectToPixel_F32( boolean flipY ) {
 		IntrinsicParameters param =
 				new IntrinsicParameters(300,320,0,150,130,width,height, flipY, new double[]{0.1,1e-4});
 
 		DenseMatrix64F rect = new DenseMatrix64F(3,3,true,1.1,0,0,0,2,0,0.1,0,3);
 
-		PointTransform_F32 forward = RectifyImageOps.rectifyTransform(param,rect);
-		PointTransform_F32 inverse = RectifyImageOps.rectifyTransformInv(param, rect);
+		PointTransform_F32 forward = RectifyImageOps.transformPixelToRect_F32(param, rect);
+		PointTransform_F32 inverse = RectifyImageOps.transformRectToPixel_F32(param, rect);
 
 		float x = 20,y=30;
 		Point2D_F32 out = new Point2D_F32();
@@ -173,8 +169,8 @@ public class TestRectifyImageOps {
 		forward.compute(x,y,out);
 
 		// sanity check
-		assertTrue(Math.abs(x - out.x) > 1e-4);
-		assertTrue( Math.abs(y-out.y) > 1e-4);
+		assertTrue( Math.abs(x - out.x) > 1e-4);
+		assertTrue( Math.abs(y - out.y) > 1e-4);
 
 		inverse.compute(out.x,out.y,out);
 
@@ -182,16 +178,46 @@ public class TestRectifyImageOps {
 		assertEquals(y, out.y, 1e-4);
 	}
 
+	@Test
+	public void transform_PixelToRect_and_RectToPixel_F64() {
+		transform_PixelToRect_and_RectToPixel_F64(true);
+		transform_PixelToRect_and_RectToPixel_F64(false);
+	}
+
+	public void transform_PixelToRect_and_RectToPixel_F64( boolean flipY ) {
+		IntrinsicParameters param =
+				new IntrinsicParameters(300,320,0,150,130,width,height, flipY, new double[]{0.1,1e-4});
+
+		DenseMatrix64F rect = new DenseMatrix64F(3,3,true,1.1,0,0,0,2,0,0.1,0,3);
+
+		PointTransform_F64 forward = RectifyImageOps.transformPixelToRect_F64(param, rect);
+		PointTransform_F64 inverse = RectifyImageOps.transformRectToPixel_F64(param, rect);
+
+		double x = 20,y=30;
+		Point2D_F64 out = new Point2D_F64();
+
+		forward.compute(x,y,out);
+
+		// sanity check
+		assertTrue( Math.abs(x - out.x) > 1e-8);
+		assertTrue( Math.abs(y - out.y) > 1e-8);
+
+		inverse.compute(out.x,out.y,out);
+
+		assertEquals(x, out.x, 1e-6);
+		assertEquals(y, out.y, 1e-6);
+	}
+
 	/**
 	 * Test by using other tested functions, then manually applying the last step
 	 */
 	@Test
-	public void rectifyNormalized_F64() {
-		rectifyNormalized_F64(true);
-		rectifyNormalized_F64(false);
+	public void transformPixelToRectNorm_F64() {
+		transformPixelToRectNorm_F64(true);
+		transformPixelToRectNorm_F64(false);
 	}
 
-	public void rectifyNormalized_F64( boolean flipY ) {
+	public void transformPixelToRectNorm_F64(boolean flipY) {
 		IntrinsicParameters param =
 				new IntrinsicParameters(300,320,0,150,130,width,height, flipY, new double[]{0.1,1e-4});
 
@@ -201,8 +227,8 @@ public class TestRectifyImageOps {
 		DenseMatrix64F rectK_inv = new DenseMatrix64F(3,3);
 		CommonOps.invert(rectK,rectK_inv);
 
-		PointTransform_F32 tranRect = RectifyImageOps.rectifyTransform(param,rect);
-		PointTransform_F64 alg = RectifyImageOps.rectifyNormalized_F64(param,rect,rectK);
+		PointTransform_F32 tranRect = RectifyImageOps.transformPixelToRect_F32(param, rect);
+		PointTransform_F64 alg = RectifyImageOps.transformPixelToRectNorm_F64(param, rect, rectK);
 
 		double x=10,y=20;
 

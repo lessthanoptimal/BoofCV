@@ -43,25 +43,35 @@ public class DistanceSe3SymmetricSq implements DistanceFromModel<Se3_F64,Associa
 	private Point3D_F64 p = new Point3D_F64();
 
 	// ------- intrinsic camera parameters from calibration matrix
-	private double fx; // focal length x
-	private double fy; // focal length y
-	private double skew; // pixel skew
+	private double key_fx; // focal length x
+	private double key_fy; // focal length y
+	private double key_skew; // pixel skew
+	private double curr_fx; // focal length x
+	private double curr_fy; // focal length y
+	private double curr_skew; // pixel skew
 
 	/**
 	 * Configure distance calculation.   See comment above about how to specify error units using
 	 * intrinsic parameters.
 	 *
 	 * @param triangulate Triangulates the intersection of two observations
-	 * @param fx intrinsic parameter: focal length x
-	 * @param fy intrinsic parameter: focal length y
-	 * @param skew intrinsic parameter: skew  (usually zero)
+	 * @param key_fx intrinsic parameter: focal length x for key camera
+	 * @param key_fy intrinsic parameter: focal length y for key camera
+	 * @param key_skew intrinsic parameter: skew for key camera (usually zero)
+	 * @param curr_fx intrinsic parameter: focal length x for curr camera
+	 * @param curr_fy intrinsic parameter: focal length y for curr camera
+	 * @param curr_skew intrinsic parameter: skew for curr camera (usually zero)
 	 */
 	public DistanceSe3SymmetricSq(TriangulateTwoViewsCalibrated triangulate,
-								  double fx, double fy , double skew ) {
+								  double key_fx, double key_fy , double key_skew ,
+								  double curr_fx, double curr_fy , double curr_skew) {
 		this.triangulate = triangulate;
-		this.fx = fx;
-		this.fy = fy;
-		this.skew = skew;
+		this.key_fx = key_fx;
+		this.key_fy = key_fy;
+		this.key_skew = key_skew;
+		this.curr_fx = curr_fx;
+		this.curr_fy = curr_fy;
+		this.curr_skew = curr_skew;
 	}
 
 	@Override
@@ -86,16 +96,16 @@ public class DistanceSe3SymmetricSq implements DistanceFromModel<Se3_F64,Associa
 		
 		// compute observational error in each view
 		double dy1 = (obs.keyLoc.y - p.y/p.z);
-		double dx1 = (obs.keyLoc.x - p.x/p.z)*fx + dy1*skew;
-		dy1 *= fy;
+		double dx1 = (obs.keyLoc.x - p.x/p.z)*key_fx + dy1*key_skew;
+		dy1 *= key_fy;
 
 		SePointOps_F64.transform(keyToCurr,p,p);
 		if( p.z < 0 )
 			return Double.MAX_VALUE;
 
 		double dy2 = (obs.currLoc.y - p.y/p.z);
-		double dx2 = (obs.currLoc.x - p.x/p.z)*fx + dy2*skew;
-		dy2 *= fy;
+		double dx2 = (obs.currLoc.x - p.x/p.z)*curr_fx + dy2*curr_skew;
+		dy2 *= curr_fy;
 
 		// symmetric error
 		return dx1*dx1 + dy1*dy1 + dx2*dx2 + dy2*dy2;

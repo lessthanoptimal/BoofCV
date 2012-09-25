@@ -21,14 +21,9 @@ package boofcv.alg.geo.f;
 
 import boofcv.alg.geo.AssociatedPair;
 import boofcv.alg.geo.UtilEpipolar;
-import georegression.struct.point.Point2D_F64;
 import org.ejml.data.DenseMatrix64F;
-import org.ejml.factory.DecompositionFactory;
-import org.ejml.factory.SingularValueDecomposition;
-import org.ejml.ops.CommonOps;
 import org.ejml.ops.SingularOps;
 import org.ejml.ops.SpecializedOps;
-import org.ejml.simple.SimpleMatrix;
 
 import java.util.List;
 
@@ -110,15 +105,15 @@ public class FundamentalLinear8 extends FundamentalLinear {
 	 * Computes the SVD of A and extracts the essential/fundamental matrix from its null space
 	 */
 	protected boolean process(DenseMatrix64F A) {
-		if( !svd.decompose(A) )
+		if( !svdNull.decompose(A) )
 			return true;
 
 		if( A.numRows > 8 )
-			SingularOps.nullVector(svd,F);
+			SingularOps.nullVector(svdNull,F);
 		else {
 			// handle a special case since the matrix only has 8 singular values and won't select
 			// the correct column
-			DenseMatrix64F V = svd.getV(null,false);
+			DenseMatrix64F V = svdNull.getV(null,false);
 			SpecializedOps.subvector(V, 0, 8, V.numCols, false, 0, F);
 		}
 

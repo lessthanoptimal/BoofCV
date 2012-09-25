@@ -17,6 +17,9 @@ Version : Alpha 0.11
   * Original index of inlier set can be requested now
   * Removed the ability to generate multiple hypotheses.  Was not needed after all.
   * RANSAC score has been deleted and RANSAC simplified
+- RectifyImageOps
+  * Cleaned up function names and improved documentation
+
 ---------------------------------------------
 Date    : 2012/09/18
 Version : Alpha 0.10

@@ -12,6 +12,7 @@ import boofcv.abst.geo.fitting.DistanceFromModelResidualN;
 import boofcv.abst.geo.fitting.GenerateMotionPnP;
 import boofcv.abst.sfm.*;
 import boofcv.alg.distort.ImageDistort;
+import boofcv.alg.distort.LensDistortionOps;
 import boofcv.alg.geo.AssociatedPair;
 import boofcv.alg.geo.PointPositionPair;
 import boofcv.alg.geo.RectifyImageOps;
@@ -29,7 +30,6 @@ import boofcv.numerics.fitting.modelset.DistanceFromModel;
 import boofcv.numerics.fitting.modelset.ModelGenerator;
 import boofcv.numerics.fitting.modelset.ModelMatcher;
 import boofcv.numerics.fitting.modelset.ransac.Ransac;
-import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.distort.PointTransform_F32;
 import boofcv.struct.distort.PointTransform_F64;
@@ -66,7 +66,7 @@ public class FactoryVisualOdometry {
 				new Se3FromEssentialGenerator(essentialAlg,triangulate);
 
 		DistanceFromModel<Se3_F64,AssociatedPair> distanceSe3 =
-				new DistanceSe3SymmetricSq(triangulate,1,1,0); // TODO use intrinsic
+				new DistanceSe3SymmetricSq(triangulate,1,1,0,1,1,0); // TODO use intrinsic
 
 		ModelMatcher<Se3_F64,AssociatedPair> epipolarMotion =
 				new Ransac<Se3_F64,AssociatedPair>(2323,generateEpipolarMotion,distanceSe3,
@@ -111,7 +111,7 @@ public class FactoryVisualOdometry {
 				new Se3FromEssentialGenerator(essentialAlg,triangulate);
 
 		DistanceFromModel<Se3_F64,AssociatedPair> distanceSe3 =
-				new DistanceSe3SymmetricSq(triangulate,1,1,0); // TODO use intrinsic
+				new DistanceSe3SymmetricSq(triangulate,1,1,0,1,1,0); // TODO use intrinsic
 
 		int N = generateEpipolarMotion.getMinimumPoints();
 
@@ -176,13 +176,13 @@ public class FactoryVisualOdometry {
 		// Range from sparse disparity
 		ImageDistort<T> rectLeft = RectifyImageOps.rectifyImage(stereoParam.left,rect1,imageType);
 		ImageDistort<T> rectRight = RectifyImageOps.rectifyImage(stereoParam.right,rect2,imageType);
-		PointTransform_F32 pixelToRectified = RectifyImageOps.rectifyTransform(stereoParam.left,rect1);
+		PointTransform_F32 pixelToRectified = RectifyImageOps.transformPixelToRect_F32(stereoParam.left, rect1);
 		DisparityTo3D<T> pixelTo3D = new DisparityTo3D<T>(sparseDisparity,rectLeft,rectRight,
 				pixelToRectified,imageType);
 		pixelTo3D.configure(stereoParam.getBaseline(),rectK);
 
 		// transform to go from pixel coordinates to normalized coordinates
-		PointTransform_F64 pixelToNormalized = RectifyImageOps.rectifyNormalized_F64(stereoParam.left,rect1,rectK);
+		PointTransform_F64 pixelToNormalized = RectifyImageOps.transformPixelToRectNorm_F64(stereoParam.left, rect1, rectK);
 
 		// setup the tracker
 		KeyFramePointTracker<T,PointPoseTrack> keyTracker =
@@ -194,11 +194,11 @@ public class FactoryVisualOdometry {
 	}
 
 	public static <T extends ImageSingleBand>
-	StereoVisualOdometry<T> stereoEpipolar( int minTracks , double inlierPixelTol ,
-											ImagePointTracker<T> tracker ,
-											StereoParameters stereoParam ,
-											StereoDisparitySparse<T> sparseDisparity ,
-											Class<T> imageType ) {
+	StereoVisualOdometry<T> stereoDepth(int minTracks, double inlierPixelTol,
+										ImagePointTracker<T> tracker,
+										StereoParameters stereoParam,
+										StereoDisparitySparse<T> sparseDisparity,
+										Class<T> imageType) {
 		// compute rectification
 		RectifyCalibrated rectifyAlg = RectifyImageOps.createCalibrated();
 		Se3_F64 leftToRight = stereoParam.getRightToLeft().invert(null);
@@ -220,15 +220,15 @@ public class FactoryVisualOdometry {
 		RectifyImageOps.fullViewLeft(stereoParam.left, rect1, rect2, rectK);
 
 		// motion estimation using essential matrix
-		EpipolarMatrixEstimator essentialAlg = FactoryEpipolar.computeFundamentalOne(5, false, 5);
+		EpipolarMatrixEstimator essentialAlg = FactoryEpipolar.computeFundamentalOne(5, false, 2);
 		TriangulateTwoViewsCalibrated triangulate = FactoryTriangulate.twoGeometric();
 		ModelGenerator<Se3_F64, AssociatedPair> generateEpipolarMotion =
 				new Se3FromEssentialGenerator(essentialAlg, triangulate);
 
-		IntrinsicParameters intrinsic = stereoParam.left;
-
 		DistanceFromModel<Se3_F64, AssociatedPair> distanceSe3 =
-				new DistanceSe3SymmetricSq(triangulate, intrinsic.fx, intrinsic.fy, intrinsic.skew);
+				new DistanceSe3SymmetricSq(triangulate,
+						stereoParam.left.fx, stereoParam.left.fy, stereoParam.left.skew,
+						stereoParam.left.fx, stereoParam.left.fy, stereoParam.left.skew);
 
 		// 1/2 a pixel tolerance for RANSAC inliers
 		double ransacTOL = inlierPixelTol * inlierPixelTol * 2.0;
@@ -240,20 +240,76 @@ public class FactoryVisualOdometry {
 		// Range from sparse disparity
 		ImageDistort<T> rectLeft = RectifyImageOps.rectifyImage(stereoParam.left,rect1,imageType);
 		ImageDistort<T> rectRight = RectifyImageOps.rectifyImage(stereoParam.right,rect2,imageType);
-		PointTransform_F32 pixelToRectified = RectifyImageOps.rectifyTransform(stereoParam.left,rect1);
+		PointTransform_F32 pixelToRectified = RectifyImageOps.transformPixelToRect_F32(stereoParam.left, rect1);
 		DisparityTo3D<T> pixelTo3D = new DisparityTo3D<T>(sparseDisparity,rectLeft,rectRight,
 				pixelToRectified,imageType);
 		pixelTo3D.configure(stereoParam.getBaseline(),rectK);
 
 		// transform to go from pixel coordinates to normalized coordinates
-		PointTransform_F64 pixelToNormalized = RectifyImageOps.rectifyNormalized_F64(stereoParam.left,rect1,rectK);
+		PointTransform_F64 pixelToNormalized = RectifyImageOps.transformPixelToRectNorm_F64(stereoParam.left, rect1, rectK);
 
 		// setup the tracker
 		KeyFramePointTracker<T,PointPoseTrack> keyTracker =
 				new KeyFramePointTracker<T,PointPoseTrack>(tracker,pixelToNormalized,PointPoseTrack.class);
 
-		StereoVoEpipolar<T> alg = new StereoVoEpipolar<T>(minTracks,epipolarMotion,pixelTo3D,keyTracker,triangulate);
+		PixelDepthVoEpipolar<T> alg = new PixelDepthVoEpipolar<T>(minTracks,epipolarMotion,pixelTo3D,keyTracker,triangulate);
 
-		return new WrapStereoVoEpipolar<T>(alg);
+		return new WrapPixelDepthVoEpipolar<T>(alg);
+	}
+
+	public static <T extends ImageSingleBand>
+	StereoVisualOdometry<T> stereoEpipolar(int minTracks, double inlierPixelTol,
+										   ImagePointTracker<T> tracker,
+										   StereoParameters stereoParam,
+										   StereoDisparitySparse<T> sparseDisparity,
+										   Class<T> imageType)
+	{
+		int maxIterations = 200;
+
+		// motion estimation using essential matrix
+		EpipolarMatrixEstimator essentialAlg = FactoryEpipolar.computeFundamentalOne(5, false, 2);
+		TriangulateTwoViewsCalibrated triangulate = FactoryTriangulate.twoGeometric();
+		ModelGenerator<Se3_F64, AssociatedPair> generateSe3 =
+				new Se3FromEssentialGenerator(essentialAlg, triangulate);
+
+		// Distance metric for estimating motion between left camera key and current
+		DistanceFromModel<Se3_F64, AssociatedPair> distanceL2L =
+				new DistanceSe3SymmetricSq(triangulate,
+						stereoParam.left.fx, stereoParam.left.fy, stereoParam.left.skew,
+						stereoParam.left.fx, stereoParam.left.fy, stereoParam.left.skew);
+
+		// distance metric for estimating baseline between left and right camera
+		DistanceFromModel<Se3_F64, AssociatedPair> distanceL2R =
+				new DistanceSe3SymmetricSq(triangulate,
+						stereoParam.left.fx, stereoParam.left.fy, stereoParam.left.skew,
+						stereoParam.right.fx, stereoParam.right.fy, stereoParam.right.skew);
+
+		// pixel tolerance for RANSAC inliers
+		double ransacTOL = inlierPixelTol * inlierPixelTol * 2.0;
+
+		ModelMatcher<Se3_F64, AssociatedPair> robustMotionL2L =
+				new Ransac<Se3_F64, AssociatedPair>(2323, generateSe3, distanceL2L,
+						maxIterations, ransacTOL);
+
+		ModelMatcher<Se3_F64, AssociatedPair> robustMotionL2R =
+				new Ransac<Se3_F64, AssociatedPair>(2323, generateSe3, distanceL2R,
+						maxIterations, ransacTOL);
+
+		EpipolarMatrixEstimator crudeEssential = FactoryEpipolar.computeFundamentalOne(8, false, 0);
+		ModelGenerator<Se3_F64, AssociatedPair> crudeSe3 =
+				new Se3FromEssentialGenerator(crudeEssential, triangulate);
+
+		// used to match features in the right image
+		AssociateStereoPoint<T> stereoAssociate = new AssociateStereoPoint<T>(sparseDisparity,stereoParam,imageType);
+
+		// transform to go from pixel coordinates to normalized coordinates
+		PointTransform_F64 leftPixelToNorm = LensDistortionOps.transformRadialToNorm_F64(stereoParam.left);
+		PointTransform_F64 rightPixelToNorm = LensDistortionOps.transformRadialToNorm_F64(stereoParam.right);
+
+		StereoVoEpipolar<T> alg = new StereoVoEpipolar<T>(robustMotionL2L,robustMotionL2R,crudeSe3,
+				leftPixelToNorm,rightPixelToNorm,
+				tracker,stereoAssociate,stereoParam.rightToLeft,minTracks);
+
+		return new WrapStereoVoEpipolar<T>(alg,stereoAssociate);
 	}
 }

@@ -17,7 +17,6 @@ public class WrapStereoSimpleVo<T extends ImageSingleBand>
 		implements StereoVisualOdometry<T>, AccessSfmPointTracks
 
 {
-
 	StereoSimpleVo<T> alg;
 
 	Se3_F64 c2w = new Se3_F64();
@@ -80,6 +79,11 @@ public class WrapStereoSimpleVo<T extends ImageSingleBand>
 //		}
 
 		return ret;
+	}
+
+	@Override
+	public int fromInlierToAllIndex(int inlierIndex) {
+		return alg.getComputeMotion().getInputIndex(inlierIndex);
 	}
 
 	@Override

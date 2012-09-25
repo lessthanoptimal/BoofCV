@@ -26,7 +26,7 @@ public class TestDistanceSe3SymmetricSq {
 	DistanceSe3SymmetricSq alg;
 	
 	public TestDistanceSe3SymmetricSq() {
-		alg = new DistanceSe3SymmetricSq(triangulate,1,1,0);
+		alg = new DistanceSe3SymmetricSq(triangulate,1,1,0,1,1,0);
 	}
 	
 	@Test
@@ -102,8 +102,11 @@ public class TestDistanceSe3SymmetricSq {
 	public void testIntrinsicParameters() {
 		// intrinsic camera calibration matrix
 		DenseMatrix64F K = new DenseMatrix64F(3,3,true,100,0.01,200,0,150,200,0,0,1);
+		DenseMatrix64F K2 = new DenseMatrix64F(3,3,true,105,0.021,180,0,155,210,0,0,1);
 		DenseMatrix64F K_inv = new DenseMatrix64F(3,3);
+		DenseMatrix64F K2_inv = new DenseMatrix64F(3,3);
 		CommonOps.invert(K,K_inv);
+		CommonOps.invert(K2,K2_inv);
 
 		Se3_F64 keyToCurr = new Se3_F64();
 		keyToCurr.getT().set(0.1,-0.1,0.01);
@@ -123,7 +126,7 @@ public class TestDistanceSe3SymmetricSq {
 
 		// translate into pixels
 		GeometryMath_F64.mult(K,obs.keyLoc,obsP.keyLoc);
-		GeometryMath_F64.mult(K,obs.currLoc,obsP.currLoc);
+		GeometryMath_F64.mult(K2,obs.currLoc,obsP.currLoc);
 
 		// add some noise
 		obsP.keyLoc.x += 0.25;
@@ -133,7 +136,7 @@ public class TestDistanceSe3SymmetricSq {
 
 		// convert noisy into normalized coordinates
 		GeometryMath_F64.mult(K_inv,obsP.keyLoc,obsP.keyLoc);
-		GeometryMath_F64.mult(K_inv,obsP.currLoc,obsP.currLoc);
+		GeometryMath_F64.mult(K2_inv,obsP.currLoc,obsP.currLoc);
 
 		// triangulate the point's position given noisy data
 		LineParametric3D_F64 rayA = new LineParametric3D_F64();
@@ -156,22 +159,24 @@ public class TestDistanceSe3SymmetricSq {
 
 		// convert everything into pixels
 		GeometryMath_F64.mult(K,ugh.keyLoc,ugh.keyLoc);
-		GeometryMath_F64.mult(K,ugh.currLoc,ugh.currLoc);
+		GeometryMath_F64.mult(K2,ugh.currLoc,ugh.currLoc);
 		GeometryMath_F64.mult(K,obsP.keyLoc,obsP.keyLoc);
-		GeometryMath_F64.mult(K,obsP.currLoc,obsP.currLoc);
+		GeometryMath_F64.mult(K2,obsP.currLoc,obsP.currLoc);
 
 		double dx1 = ugh.keyLoc.x - obsP.keyLoc.x;
 		double dy1 = ugh.keyLoc.y - obsP.keyLoc.y;
 		double dx2 = ugh.currLoc.x - obsP.currLoc.x;
-		double dy2 = ugh.currLoc.y - obsP.currLoc.y;;
+		double dy2 = ugh.currLoc.y - obsP.currLoc.y;
 
 		double error = dx1*dx1 + dy1*dy1 + dx2*dx2 + dy2*dy2;
 
 		// convert noisy back into normalized coordinates
 		GeometryMath_F64.mult(K_inv,obsP.keyLoc,obsP.keyLoc);
-		GeometryMath_F64.mult(K_inv,obsP.currLoc,obsP.currLoc);
+		GeometryMath_F64.mult(K2_inv,obsP.currLoc,obsP.currLoc);
 
-		DistanceSe3SymmetricSq alg = new DistanceSe3SymmetricSq(triangulate,K.get(0,0),K.get(1,1),K.get(0,1));
+		DistanceSe3SymmetricSq alg = new DistanceSe3SymmetricSq(triangulate,
+				K.get(0,0),K.get(1,1),K.get(0,1),
+				K2.get(0,0),K2.get(1,1),K2.get(0,1));
 		alg.setModel(keyToCurr);
 		assertEquals(error, alg.computeDistance(obsP), 1e-8);
 	}

@@ -24,7 +24,15 @@ import org.ejml.data.DenseMatrix64F;
 import java.util.List;
 
 /**
- * Interface for computing the fundamental, essential, homography matrix given a set of associated pairs.
+ * <p>
+ * Interface for computing the fundamental, essential, or homography matrix given a set of associated pairs.
+ * Each of these matrices describes the relationship between two views.
+ * </p>
+ *
+ * <p>
+ * For Fundamental and Essential matrices the following constraint is always true:
+ * x'*F*x = 0, where F is the epipolar matrix, x' = currLoc, and x = keyLoc.
+ * </p>
  *
  * @author Peter Abeles
  */

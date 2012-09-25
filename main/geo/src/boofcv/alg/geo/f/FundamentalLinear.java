@@ -26,7 +26,6 @@ import org.ejml.factory.DecompositionFactory;
 import org.ejml.factory.SingularValueDecomposition;
 import org.ejml.ops.CommonOps;
 import org.ejml.ops.SingularOps;
-import org.ejml.simple.SimpleMatrix;
 
 import java.util.List;
 
@@ -47,7 +46,10 @@ public abstract class FundamentalLinear {
 
 	// contains the set of equations that are solved
 	protected DenseMatrix64F A = new DenseMatrix64F(1,9);
-	protected SingularValueDecomposition<DenseMatrix64F> svd = DecompositionFactory.svd(0, 0, true, true, false);
+	// svd used to extract the null space
+	protected SingularValueDecomposition<DenseMatrix64F> svdNull = DecompositionFactory.svd(9, 9, false, true, false);
+	// svd used to enforce constraings on 3x3 matrix
+	protected SingularValueDecomposition<DenseMatrix64F> svdConstraints = DecompositionFactory.svd(3, 3, true, true, false);
 
 	// SVD decomposition of F = U*S*V^T
 	protected DenseMatrix64F svdU;
@@ -78,12 +80,12 @@ public abstract class FundamentalLinear {
 	 * @return true if svd returned true.
 	 */
 	protected boolean projectOntoEssential( DenseMatrix64F E ) {
-		if( !svd.decompose(E) ) {
+		if( !svdConstraints.decompose(E) ) {
 			return false;
 		}
-		svdV = svd.getV(svdV,false);
-		svdU = svd.getU(svdU,false);
-		svdS = svd.getW(svdS);
+		svdV = svdConstraints.getV(svdV,false);
+		svdU = svdConstraints.getU(svdU,false);
+		svdS = svdConstraints.getW(svdS);
 
 		SingularOps.descendingOrder(svdU, false, svdS, svdV, false);
 
@@ -107,12 +109,12 @@ public abstract class FundamentalLinear {
 	 * @return true if svd returned true.
 	 */
 	protected boolean projectOntoFundamentalSpace( DenseMatrix64F F ) {
-		if( !svd.decompose(F) ) {
+		if( !svdConstraints.decompose(F) ) {
 			return false;
 		}
-		svdV = svd.getV(null,false);
-		svdU = svd.getU(null,false);
-		svdS = svd.getW(null);
+		svdV = svdConstraints.getV(svdV,false);
+		svdU = svdConstraints.getU(svdU,false);
+		svdS = svdConstraints.getW(svdS);
 
 		SingularOps.descendingOrder(svdU, false, svdS, svdV, false);
 
@@ -136,13 +138,9 @@ public abstract class FundamentalLinear {
 	 * @param N2 normalization matrix.
 	 */
 	protected void undoNormalizationF(DenseMatrix64F M, DenseMatrix64F N1, DenseMatrix64F N2) {
-		SimpleMatrix a = SimpleMatrix.wrap(M);
-		SimpleMatrix b = SimpleMatrix.wrap(N1);
-		SimpleMatrix c = SimpleMatrix.wrap(N2);
-
-		SimpleMatrix result = c.transpose().mult(a).mult(b);
-
-		M.set(result.getMatrix());
+		// M = N2^T * M * N1
+		CommonOps.multTransA(N2,M,temp0);
+		CommonOps.mult(temp0,N1,M);
 	}
 
 	/**
@@ -173,15 +171,15 @@ public abstract class FundamentalLinear {
 
 			// perform the Kronecker product with the two points being in
 			// homogeneous coordinates (z=1)
-			A.set(i,0,s_norm.x*f_norm.x);
-			A.set(i,1,s_norm.x*f_norm.y);
-			A.set(i,2,s_norm.x);
-			A.set(i,3,s_norm.y*f_norm.x);
-			A.set(i,4,s_norm.y*f_norm.y);
-			A.set(i,5,s_norm.y);
-			A.set(i,6,f_norm.x);
-			A.set(i,7,f_norm.y);
-			A.set(i,8,1);
+			A.unsafe_set(i,0,s_norm.x*f_norm.x);
+			A.unsafe_set(i,1,s_norm.x*f_norm.y);
+			A.unsafe_set(i,2,s_norm.x);
+			A.unsafe_set(i,3,s_norm.y*f_norm.x);
+			A.unsafe_set(i,4,s_norm.y*f_norm.y);
+			A.unsafe_set(i,5,s_norm.y);
+			A.unsafe_set(i,6,f_norm.x);
+			A.unsafe_set(i,7,f_norm.y);
+			A.unsafe_set(i,8,1);
 		}
 	}
 

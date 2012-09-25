@@ -18,11 +18,9 @@
 
 package boofcv.abst.geo.f;
 
-import boofcv.abst.geo.EpipolarMatrixEstimator;
 import boofcv.abst.geo.EpipolarMatrixEstimatorN;
 import boofcv.alg.geo.AssociatedPair;
 import boofcv.alg.geo.f.FundamentalLinear7;
-import boofcv.alg.geo.f.FundamentalLinear8;
 import org.ejml.data.DenseMatrix64F;
 
 import java.util.List;
@@ -52,5 +50,9 @@ public class WrapFundamentalLinear7 implements EpipolarMatrixEstimatorN {
 	@Override
 	public int getMinimumPoints() {
 		return 7;
+	}
+
+	public FundamentalLinear7 getAlgorithm() {
+		return alg;
 	}
 }
