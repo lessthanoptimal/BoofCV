@@ -26,7 +26,6 @@ import org.ejml.ops.NormOps;
 
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -57,6 +56,9 @@ public abstract class CommonFundamentalChecks extends EpipolarTestSimulation {
 			int totalPassedMatrix = 0;
 
 			for (DenseMatrix64F F : l) {
+				// normalize F to ensure a consistent scale
+				CommonOps.scale(1.0/CommonOps.elementMaxAbs(F),F);
+
 				// sanity check, F is not zero
 				if (NormOps.normF(F) <= 0.1)
 					continue;
@@ -66,12 +68,6 @@ public abstract class CommonFundamentalChecks extends EpipolarTestSimulation {
 					continue;
 
 				totalPassedMatrix++;
-
-				// The constraint should be consistent for all the points used in the calculation
-				for (AssociatedPair p : pairs) {
-					double val = GeometryMath_F64.innerProd(p.currLoc, F, p.keyLoc);
-					assertEquals(0, val, zeroTol);
-				}
 
 				// see if this hypothesis matched all the points
 				boolean matchedAll = true;

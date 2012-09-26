@@ -79,7 +79,7 @@ public class TriangulateLinearDLT {
 		if( !svd.decompose(A) )
 			throw new RuntimeException("SVD failed!?!?");
 
-		SingularOps.nullVector(svd,v);
+		SingularOps.nullVector(svd,true,v);
 
 		double w = v.get(3);
 		found.x = v.get(0)/w;
@@ -123,7 +123,7 @@ public class TriangulateLinearDLT {
 		if( !svd.decompose(A) )
 			throw new RuntimeException("SVD failed!?!?");
 
-		SingularOps.nullVector(svd,v);
+		SingularOps.nullVector(svd,true,v);
 		
 		double w = v.get(3);
 		foundInA.x = v.get(0)/w;

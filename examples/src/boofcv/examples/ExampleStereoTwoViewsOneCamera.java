@@ -147,7 +147,9 @@ public class ExampleStereoTwoViewsOneCamera {
 				new Se3FromEssentialGenerator(essentialAlg, triangulate);
 
 		DistanceFromModel<Se3_F64, AssociatedPair> distanceSe3 =
-				new DistanceSe3SymmetricSq(triangulate, intrinsic.fx, intrinsic.fy, intrinsic.skew);
+				new DistanceSe3SymmetricSq(triangulate,
+						intrinsic.fx, intrinsic.fy, intrinsic.skew,
+						intrinsic.fx, intrinsic.fy, intrinsic.skew);
 
 		// 1/2 a pixel tolerance for RANSAC inliers
 		double ransacTOL = 0.5 * 0.5 * 2.0;

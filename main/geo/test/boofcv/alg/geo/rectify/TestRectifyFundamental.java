@@ -20,7 +20,6 @@ package boofcv.alg.geo.rectify;
 
 import boofcv.alg.geo.AssociatedPair;
 import boofcv.alg.geo.GeoTestingOps;
-import boofcv.alg.geo.TestUtilEpipolar;
 import boofcv.alg.geo.UtilEpipolar;
 import georegression.geometry.GeometryMath_F64;
 import georegression.geometry.RotationMatrixGenerator;
@@ -116,7 +115,7 @@ public class TestRectifyFundamental {
 		motion.getT().set(-0.5,0.1,-0.05);
 
 		DenseMatrix64F E = UtilEpipolar.computeEssential(motion.getR(),motion.getT());
-		F = TestUtilEpipolar.computeF(E,K);
+		F = UtilEpipolar.computeFundamental(E, K);
 
 		// randomly generate points in space
 		List<Point3D_F64> worldPts = GeoTestingOps.randomPoints_F64(-1, 1, -1, 1, 2, 3, N, rand);

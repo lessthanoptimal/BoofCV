@@ -35,8 +35,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 
 /**
@@ -154,6 +153,11 @@ public class TestUtilEpipolar {
 	}
 
 	@Test
+	public void computeFundamental() {
+		fail("implement");
+	}
+
+	@Test
 	public void computeHomography_calibrated() {
 		DenseMatrix64F R = RotationMatrixGenerator.eulerXYZ(0.1,-0.01,0.2, null);
 		Vector3D_F64 T = new Vector3D_F64(1,1,0.1);
@@ -232,7 +236,7 @@ public class TestUtilEpipolar {
 		Vector3D_F64 T = new Vector3D_F64(0.5,0.7,-0.3);
 
 		DenseMatrix64F E = UtilEpipolar.computeEssential(R,T);
-		DenseMatrix64F F = computeF(E,K);
+		DenseMatrix64F F = UtilEpipolar.computeFundamental(E, K);
 
 		Point3D_F64 e1 = new Point3D_F64();
 		Point3D_F64 e2 = new Point3D_F64();
@@ -290,18 +294,5 @@ public class TestUtilEpipolar {
 
 		// see if the two projection matrices are the same
 		assertTrue(MatrixFeatures.isEquals(foundKP,KP,1e-8));
-	}
-
-	public static DenseMatrix64F computeF( DenseMatrix64F E , DenseMatrix64F K ) {
-		DenseMatrix64F K_inv = new DenseMatrix64F(3,3);
-		CommonOps.invert(K,K_inv);
-
-		DenseMatrix64F F = new DenseMatrix64F(3,3);
-		DenseMatrix64F temp = new DenseMatrix64F(3,3);
-
-		CommonOps.multTransA(K_inv,E,temp);
-		CommonOps.mult(temp,K_inv,F);
-
-		return F;
 	}
 }

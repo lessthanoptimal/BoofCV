@@ -109,7 +109,7 @@ public class FundamentalLinear8 extends FundamentalLinear {
 			return true;
 
 		if( A.numRows > 8 )
-			SingularOps.nullVector(svdNull,F);
+			SingularOps.nullVector(svdNull,true,F);
 		else {
 			// handle a special case since the matrix only has 8 singular values and won't select
 			// the correct column

@@ -46,4 +46,17 @@ public class TrifocalTensor {
 
 		throw new IllegalArgumentException("Invalid index");
 	}
+
+	/**
+	 * Returns a new copy of the TrifocalTensor
+	 *
+	 * @return Copy of the trifocal tensor
+	 */
+	public TrifocalTensor copy() {
+		TrifocalTensor ret = new TrifocalTensor();
+		ret.T1.set(T1);
+		ret.T2.set(T2);
+		ret.T3.set(T3);
+		return ret;
+	}
 }
