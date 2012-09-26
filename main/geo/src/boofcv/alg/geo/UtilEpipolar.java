@@ -150,6 +150,26 @@ public class UtilEpipolar {
 	}
 
 	/**
+	 * Computes a Fundamental matrix given an Essential matrix and the camera calibration matrix.
+	 *
+	 * @param E Essential matrix
+	 * @param K Intrinsic camera calibration matirx
+	 * @return Fundamental matrix
+	 */
+	public static DenseMatrix64F computeFundamental( DenseMatrix64F E , DenseMatrix64F K ) {
+		DenseMatrix64F K_inv = new DenseMatrix64F(3,3);
+		CommonOps.invert(K,K_inv);
+
+		DenseMatrix64F F = new DenseMatrix64F(3,3);
+		DenseMatrix64F temp = new DenseMatrix64F(3,3);
+
+		CommonOps.multTransA(K_inv,E,temp);
+		CommonOps.mult(temp,K_inv,F);
+
+		return F;
+	}
+
+	/**
 	 * <p>
 	 * Computes a homography matrix from a rotation, translation, plane normal and plane distance:<br>
 	 * H = R+(1/d)*T*N<sup>T</sup>
@@ -213,13 +233,13 @@ public class UtilEpipolar {
 	 * </p>
 	 *
 	 * <p>
-	 * e<sub>2</sub><sup>T</sup>*F = 0 <br>
-	 * F*e<sub>1</sub> = 0
+	 * Left: e<sub>2</sub><sup>T</sup>*F = 0 <br>
+	 * Right: F*e<sub>1</sub> = 0
 	 * </p>
 	 *
-	 * @param F Fundamental or Essential 3x3 matrix.  Not modified.        g
-	 * @param e1 Found right epipole in homogeneous coordinates, Modified.
-	 * @param e2 Found left epipole in homogeneous coordinates, Modified.
+	 * @param F Fundamental or Essential 3x3 matrix.  Not modified.
+	 * @param e1 Output: Right epipole in homogeneous coordinates, Modified.
+	 * @param e2 Output: Left epipole in homogeneous coordinates, Modified.
 	 */
 	public static void extractEpipoles( DenseMatrix64F F , Point3D_F64 e1 , Point3D_F64 e2 ) {
 		SimpleMatrix f = SimpleMatrix.wrap(F);
@@ -281,8 +301,12 @@ public class UtilEpipolar {
 	/**
 	 * <p>
 	 * Decomposes a camera matrix P=A*[R|T], where A is an upper triangular camera calibration
-	 * matrix, R is a rotation matrix, and T is a translation vector.  NOTE: There are multiple valid solutions
-	 * to this problem and only one solution is returned. NOTE: The camera center will be on the plane at infinity.
+	 * matrix, R is a rotation matrix, and T is a translation vector.
+	 *
+	 * <ul>
+	 * <li> NOTE: There are multiple valid solutions to this problem and only one solution is returned.
+	 * <li> NOTE: The camera center will be on the plane at infinity.
+	 * </ul>
 	 * </p>
 	 *
 	 * @param P Camera matrix, 3 by 4. Input

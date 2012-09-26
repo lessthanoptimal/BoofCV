@@ -162,7 +162,7 @@ public class PoseFromPairLinear6 {
 		if( !svd.decompose(A) )
 			throw new RuntimeException("SVD failed?");
 
-		SingularOps.nullVector(svd,x);
+		SingularOps.nullVector(svd,true,x);
 
 		DenseMatrix64F R = motion.getR();
 		Vector3D_F64 T = motion.getT();
