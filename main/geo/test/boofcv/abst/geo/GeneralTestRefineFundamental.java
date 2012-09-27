@@ -18,7 +18,7 @@
 
 package boofcv.abst.geo;
 
-import boofcv.alg.geo.UtilEpipolar;
+import boofcv.alg.geo.MultiViewOps;
 import boofcv.alg.geo.f.EpipolarTestSimulation;
 import georegression.struct.point.Vector3D_F64;
 import org.ejml.data.DenseMatrix64F;
@@ -41,7 +41,7 @@ public abstract class GeneralTestRefineFundamental extends EpipolarTestSimulatio
 		init(30,false);
 
 		// compute true essential matrix
-		DenseMatrix64F E = UtilEpipolar.computeEssential(motion.getR(), motion.getT());
+		DenseMatrix64F E = MultiViewOps.computeEssential(motion.getR(), motion.getT());
 
 		RefineEpipolarMatrix alg = createAlgorithm();
 
@@ -62,12 +62,12 @@ public abstract class GeneralTestRefineFundamental extends EpipolarTestSimulatio
 		init(30,false);
 
 		// compute true essential matrix
-		DenseMatrix64F E = UtilEpipolar.computeEssential(motion.getR(), motion.getT());
+		DenseMatrix64F E = MultiViewOps.computeEssential(motion.getR(), motion.getT());
 
 		// create an alternative incorrect matrix
 		Vector3D_F64 T = motion.getT().copy();
 		T.x += 0.1;
-		DenseMatrix64F Emod = UtilEpipolar.computeEssential(motion.getR(), T);
+		DenseMatrix64F Emod = MultiViewOps.computeEssential(motion.getR(), T);
 
 		RefineEpipolarMatrix alg = createAlgorithm();
 

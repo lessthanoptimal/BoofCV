@@ -16,26 +16,33 @@
  * limitations under the License.
  */
 
-package boofcv.struct.feature;
-
-import boofcv.struct.image.ImageBase;
+package boofcv.alg.sfm;
 
 /**
- * Returns the 3D coordinate of a point in camera coordinates.  Abstraction for optical
- * sensors with ranging capability, e.g. stereo vision or structured light.
+ * <p>
+ * Generalized interface for sensors which allow pixels in an image to be converted into
+ * 3D world coordinates.  3D points are returned in homogeneous coordinates so that
+ * points at infinity can be handled.  To convert points into 3D coordinates simply divide
+ * each number by 'w'.
+ * </p>
+ *
+ * <p>
+ * Homogeneous to 3D coordinates:<br>
+ * 3D: (x',y',z') = (x/w, y/w , z/w)
+ * </p>
+ *
+ * Examples of sensors: stereo cameras, flash LADAR, and structured light.
  *
  * @author Peter Abeles
  */
-public interface ComputePixelTo3D<T extends ImageBase> {
+public interface ImagePixelTo3D {
 
 	/**
-	 * Specify input images used to compute range.  If the input images
-	 * are assumed to be rectified or not is implementation specific.
-	 *
-	 * @param leftImage Left input image.
-	 * @param rightImage Right input image.
+	 * Must be called before process and after each time its internal data has
+	 * been updated.  The intended purpose of this function is to provide the
+	 * opportunity to avoid costly calculations when not in use.
 	 */
-	public void setImages( T leftImage , T rightImage );
+	public void initialize();
 
 	/**
 	 * Estimate the location of the pixel in 3D camera coordinates.
@@ -65,4 +72,12 @@ public interface ComputePixelTo3D<T extends ImageBase> {
 	 * @return z-coordinate
 	 */
 	public double getZ();
+
+	/**
+	 * Found w-coordinate of point in camera coordinate system.  If a point
+	 * is at infinity then this value will be zero.
+	 *
+	 * @return w-coordinate
+	 */
+	public double getW();
 }

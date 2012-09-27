@@ -23,11 +23,15 @@ import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Vector3D_F64;
+import georegression.struct.se.Se3_F64;
 import org.ejml.data.DenseMatrix64F;
 import org.ejml.factory.DecompositionFactory;
+import org.ejml.factory.QRDecomposition;
 import org.ejml.factory.SingularValueDecomposition;
 import org.ejml.ops.CommonOps;
 import org.ejml.ops.SingularOps;
+import org.ejml.simple.SimpleMatrix;
+import org.ejml.simple.SimpleSVD;
 
 /**
  * <p>
@@ -42,37 +46,6 @@ import org.ejml.ops.SingularOps;
  * @author Peter Abeles
  */
 public class MultiViewOps {
-
-	/**
-	 * Create a 3x4 camera matrix. For calibrated camera P = [R|T].  For uncalibrated camera it is P = K*[R|T].
-	 *
-	 * @param R Rotation matrix. 3x3
-	 * @param T Translation vector.
-	 * @param K Optional camera calibration matrix 3x3.
-	 * @param ret Storage for camera calibration matrix. If null a new instance will be created.
-	 * @return Camera calibration matrix.
-	 */
-	public static DenseMatrix64F createCameraMatrix( DenseMatrix64F R , Vector3D_F64 T , DenseMatrix64F K ,
-													 DenseMatrix64F ret ) {
-		if( ret == null )
-			ret = new DenseMatrix64F(3,4);
-
-		CommonOps.insert(R,ret,0,0);
-
-		ret.data[3] = T.x;
-		ret.data[7] = T.y;
-		ret.data[11] = T.z;
-
-		if( K == null )
-			return ret;
-
-		DenseMatrix64F temp = new DenseMatrix64F(3,4);
-		CommonOps.mult(K,ret,temp);
-
-		ret.set(temp);
-
-		return ret;
-	}
 
 	/**
 	 * Creates a trifocal tensor from two camera matrices. IMPORTANT: It is assumed that the first camera
@@ -410,5 +383,218 @@ public class MultiViewOps {
 			P3.set(2,i,column.z);
 			P3.set(i,3,e3.getIndex(i));
 		}
+	}
+
+	/**
+	 * <p>
+	 * Computes an essential matrix from a rotation and translation.  This motion
+	 * is the motion from the first camera frame into the second camera frame.  The essential
+	 * matrix 'E' is defined as:<br>
+	 * E = hat(T)*R<br>
+	 * where hat(T) is the skew symmetric cross product matrix for vector T.
+	 * </p>
+	 *
+	 * @param R Rotation matrix.
+	 * @param T Translation vector.
+	 * @return Essential matrix
+	 */
+	public static DenseMatrix64F computeEssential( DenseMatrix64F R , Vector3D_F64 T )
+	{
+		DenseMatrix64F E = new DenseMatrix64F(3,3);
+
+		DenseMatrix64F T_hat = GeometryMath_F64.crossMatrix(T, null);
+		CommonOps.mult(T_hat, R, E);
+
+		return E;
+	}
+
+	/**
+	 * Computes a Fundamental matrix given an Essential matrix and the camera calibration matrix.
+	 *
+	 * @param E Essential matrix
+	 * @param K Intrinsic camera calibration matirx
+	 * @return Fundamental matrix
+	 */
+	public static DenseMatrix64F computeFundamental( DenseMatrix64F E , DenseMatrix64F K ) {
+		DenseMatrix64F K_inv = new DenseMatrix64F(3,3);
+		CommonOps.invert(K,K_inv);
+
+		DenseMatrix64F F = new DenseMatrix64F(3,3);
+		DenseMatrix64F temp = new DenseMatrix64F(3,3);
+
+		CommonOps.multTransA(K_inv,E,temp);
+		CommonOps.mult(temp,K_inv,F);
+
+		return F;
+	}
+
+	/**
+	 * <p>
+	 * Computes a homography matrix from a rotation, translation, plane normal and plane distance:<br>
+	 * H = R+(1/d)*T*N<sup>T</sup>
+	 * </p>
+	 *
+	 * @param R Rotation matrix.
+	 * @param T Translation vector.
+	 * @param d Distance of closest point on plane to camera
+	 * @param N Normal of plane
+	 * @return Calibrated homography matrix
+	 */
+	public static DenseMatrix64F computeHomography( DenseMatrix64F R , Vector3D_F64 T ,
+													double d , Vector3D_F64 N )
+	{
+		DenseMatrix64F H = new DenseMatrix64F(3,3);
+
+		GeometryMath_F64.outerProd(T,N,H);
+		CommonOps.divide(d,H);
+		CommonOps.addEquals(H, R);
+
+		return H;
+	}
+
+	/**
+	 * <p>
+	 * Computes a homography matrix from a rotation, translation, plane normal, plane distance, and
+	 * calibration matrix:<br>
+	 * H = K*(R+(1/d)*T*N<sup>T</sup>)*K<sup>-1</sup>
+	 * </p>
+	 *
+	 * @param R Rotation matrix.
+	 * @param T Translation vector.
+	 * @param d Distance of closest point on plane to camera
+	 * @param N Normal of plane
+	 * @param K Intrinsic calibration matrix
+	 * @return Uncalibrated homography matrix
+	 */
+	public static DenseMatrix64F computeHomography( DenseMatrix64F R , Vector3D_F64 T ,
+													double d , Vector3D_F64 N ,
+													DenseMatrix64F K )
+	{
+		DenseMatrix64F temp = new DenseMatrix64F(3,3);
+		DenseMatrix64F K_inv = new DenseMatrix64F(3,3);
+
+		DenseMatrix64F H = computeHomography(R,T,d,N);
+
+		// apply calibration matrix to R
+		CommonOps.mult(K,H,temp);
+
+		CommonOps.invert(K,K_inv);
+		CommonOps.mult(temp,K_inv,H);
+
+		return H;
+	}
+
+	/**
+	 * <p>
+	 * Extracts the epipoles from an essential or fundamental matrix.  The epipoles are extracted
+	 * from the left and right null space of the provided matrix.  Note that the found epipoles are
+	 * in homogeneous coordinates.  If the epipole is at infinity then z=0
+	 * </p>
+	 *
+	 * <p>
+	 * Left: e<sub>2</sub><sup>T</sup>*F = 0 <br>
+	 * Right: F*e<sub>1</sub> = 0
+	 * </p>
+	 *
+	 * @param F Fundamental or Essential 3x3 matrix.  Not modified.
+	 * @param e1 Output: Right epipole in homogeneous coordinates, Modified.
+	 * @param e2 Output: Left epipole in homogeneous coordinates, Modified.
+	 */
+	public static void extractEpipoles( DenseMatrix64F F , Point3D_F64 e1 , Point3D_F64 e2 ) {
+		SimpleMatrix f = SimpleMatrix.wrap(F);
+		SimpleSVD svd = f.svd();
+
+		SimpleMatrix U = svd.getU();
+		SimpleMatrix V = svd.getV();
+
+		e2.set(U.get(0,2),U.get(1,2),U.get(2,2));
+		e1.set(V.get(0,2),V.get(1,2),V.get(2,2));
+	}
+
+	/**
+	 * <p>
+	 * Given a fundamental matrix a pair of projection matrices [R|T] can be extracted.  There are multiple
+	 * solutions which can be found, the canonical projection matrix is defined as: <br>
+	 * <pre>
+	 * P=[I|0] and P'= [M|-M*t] = [[e']*F + e'*v^t | lambda*e']
+	 * </pre>
+	 * where e' is the epipole F<sup>T</sup>e' = 0, [e'] is the cross product matrix for the enclosed vector,
+	 * v is an arbitrary 3-vector and lambda is a non-zero scalar.
+	 * </p>
+	 *
+	 * <p>
+	 * Page 256 in R. Hartley, and A. Zisserman, "Multiple View Geometry in Computer Vision", 2nd Ed, Cambridge 2003
+	 * </p>
+	 *
+	 * @see #extractEpipoles
+	 *
+	 * @param F A fundamental matrix
+	 * @param v Arbitrary 3-vector.  Just pick some value, say (1,1,1).
+	 * @param lambda A non zero scalar.  Try one.
+	 * @param e2 Left epipole of fundamental matrix, F<sup>T</sup>*e2 = 0.
+	 * @return The canonical camera matrix P'
+	 */
+	public static DenseMatrix64F canonicalCamera( DenseMatrix64F F , Point3D_F64 e2, Vector3D_F64 v , double lambda ) {
+
+		DenseMatrix64F crossMatrix = new DenseMatrix64F(3,3);
+		GeometryMath_F64.crossMatrix(e2, crossMatrix);
+
+		DenseMatrix64F outer = new DenseMatrix64F(3,3);
+		GeometryMath_F64.outerProd(e2,v,outer);
+
+		DenseMatrix64F KR = new DenseMatrix64F(3,3);
+		CommonOps.mult(crossMatrix, F, KR);
+		CommonOps.add(KR, outer, KR);
+
+		DenseMatrix64F P = new DenseMatrix64F(3,4);
+		CommonOps.insert(KR,P,0,0);
+
+		P.set(0,3,lambda*e2.x);
+		P.set(1,3,lambda*e2.y);
+		P.set(2,3,lambda*e2.z);
+
+		return P;
+	}
+
+	/**
+	 * <p>
+	 * Decomposes a camera matrix P=A*[R|T], where A is an upper triangular camera calibration
+	 * matrix, R is a rotation matrix, and T is a translation vector.
+	 *
+	 * <ul>
+	 * <li> NOTE: There are multiple valid solutions to this problem and only one solution is returned.
+	 * <li> NOTE: The camera center will be on the plane at infinity.
+	 * </ul>
+	 * </p>
+	 *
+	 * @param P Camera matrix, 3 by 4. Input
+	 * @param K Camera calibration matrix, 3 by 3.  Output.
+	 * @param pose The rotation and translation. Output.
+	 */
+	public static void decomposeCameraMatrix(DenseMatrix64F P, DenseMatrix64F K, Se3_F64 pose) {
+		DenseMatrix64F KR = new DenseMatrix64F(3,3);
+		CommonOps.extract(P, 0, 3, 0, 3, KR, 0, 0);
+
+		QRDecomposition<DenseMatrix64F> qr = DecompositionFactory.qr(3, 3);
+
+		if( !CommonOps.invert(KR) )
+			throw new RuntimeException("Inverse failed!  Bad input?");
+
+		if( !qr.decompose(KR) )
+			throw new RuntimeException("QR decomposition failed!  Bad input?");
+
+		DenseMatrix64F U = qr.getQ(null,false);
+		DenseMatrix64F B = qr.getR(null, false);
+
+		if( !CommonOps.invert(U,pose.getR()) )
+			throw new RuntimeException("Inverse failed!  Bad input?");
+
+		Point3D_F64 KT = new Point3D_F64(P.get(0,3),P.get(1,3),P.get(2,3));
+		GeometryMath_F64.mult(B, KT, pose.getT());
+
+		if( !CommonOps.invert(B,K) )
+			throw new RuntimeException("Inverse failed!  Bad input?");
+
+		CommonOps.scale(1.0/K.get(2,2),K);
 	}
 }

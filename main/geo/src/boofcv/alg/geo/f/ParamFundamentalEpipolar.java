@@ -18,7 +18,7 @@
 
 package boofcv.alg.geo.f;
 
-import boofcv.alg.geo.UtilEpipolar;
+import boofcv.alg.geo.MultiViewOps;
 import boofcv.numerics.fitting.modelset.ModelCodec;
 import georegression.struct.point.Point3D_F64;
 import org.ejml.UtilEjml;
@@ -128,7 +128,7 @@ public class ParamFundamentalEpipolar implements ModelCodec<DenseMatrix64F> {
 		Point3D_F64 e1 = new Point3D_F64();
 		Point3D_F64 e2 = new Point3D_F64();
 
-		UtilEpipolar.extractEpipoles(F, e1, e2);
+		MultiViewOps.extractEpipoles(F, e1, e2);
 
 		// if the right epipole lies at infinity (z=0) then don't use the first two columns
 		if( Math.abs(e2.z) <= UtilEjml.EPS ) {

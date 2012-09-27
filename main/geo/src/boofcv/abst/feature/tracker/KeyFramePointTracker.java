@@ -50,13 +50,13 @@ public class KeyFramePointTracker<I extends ImageBase, R extends KeyFrameTrack> 
 	PointTransform_F64 pixelToNorm;
 
 	public KeyFramePointTracker(ImagePointTracker<I> tracker,
-								PointTransform_F64 transform , 
+								PointTransform_F64 pixelToNorm ,
 								Class<R> trackType ) {
 		this.tracker = tracker;
-		if( transform == null )
+		if( pixelToNorm == null )
 			this.pixelToNorm = new DoNothingTransform_F64();
 		else
-			this.pixelToNorm = transform;
+			this.pixelToNorm = pixelToNorm;
 		this.trackType = trackType;
 	}
 

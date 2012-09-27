@@ -24,8 +24,8 @@ import boofcv.abst.geo.TriangulateTwoViewsCalibrated;
 import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.distort.LensDistortionOps;
 import boofcv.alg.geo.AssociatedPair;
+import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.RectifyImageOps;
-import boofcv.alg.geo.UtilIntrinsic;
 import boofcv.alg.geo.rectify.RectifyCalibrated;
 import boofcv.alg.sfm.robust.DistanceSe3SymmetricSq;
 import boofcv.alg.sfm.robust.Se3FromEssentialGenerator;
@@ -209,7 +209,7 @@ public class ExampleStereoTwoViewsOneCamera {
 		RectifyCalibrated rectifyAlg = RectifyImageOps.createCalibrated();
 
 		// original camera calibration matrices
-		DenseMatrix64F K = UtilIntrinsic.calibrationMatrix(intrinsic, null);
+		DenseMatrix64F K = PerspectiveOps.calibrationMatrix(intrinsic, null);
 
 		rectifyAlg.process(K, new Se3_F64(), K, leftToRight);
 
@@ -269,7 +269,7 @@ public class ExampleStereoTwoViewsOneCamera {
 
 		double baseline = motion.getT().norm();
 
-		DenseMatrix64F K = UtilIntrinsic.calibrationMatrix(intrinsic, null);
+		DenseMatrix64F K = PerspectiveOps.calibrationMatrix(intrinsic, null);
 
 		gui.configure(baseline, K, minDisparity, maxDisparity);
 		gui.process(disparity, left);

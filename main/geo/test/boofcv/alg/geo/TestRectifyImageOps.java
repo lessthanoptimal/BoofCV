@@ -60,7 +60,7 @@ public class TestRectifyImageOps {
 		// do nothing rectification
 		DenseMatrix64F rect1 = CommonOps.identity(3);
 		DenseMatrix64F rect2 = CommonOps.identity(3);
-		DenseMatrix64F rectK = UtilIntrinsic.calibrationMatrix(param,null);
+		DenseMatrix64F rectK = PerspectiveOps.calibrationMatrix(param, null);
 
 		RectifyImageOps.fullViewLeft(param,rect1,rect2,rectK);
 
@@ -105,7 +105,7 @@ public class TestRectifyImageOps {
 		// do nothing rectification
 		DenseMatrix64F rect1 = CommonOps.identity(3);
 		DenseMatrix64F rect2 = CommonOps.identity(3);
-		DenseMatrix64F rectK = UtilIntrinsic.calibrationMatrix(param,null);
+		DenseMatrix64F rectK = PerspectiveOps.calibrationMatrix(param, null);
 
 		RectifyImageOps.allInsideLeft(param, rect1, rect2, rectK);
 
@@ -222,7 +222,7 @@ public class TestRectifyImageOps {
 				new IntrinsicParameters(300,320,0,150,130,width,height, flipY, new double[]{0.1,1e-4});
 
 		DenseMatrix64F rect = new DenseMatrix64F(3,3,true,1.1,0,0,0,2,0,0.1,0,3);
-		DenseMatrix64F rectK = UtilIntrinsic.calibrationMatrix(param,null);
+		DenseMatrix64F rectK = PerspectiveOps.calibrationMatrix(param, null);
 
 		DenseMatrix64F rectK_inv = new DenseMatrix64F(3,3);
 		CommonOps.invert(rectK,rectK_inv);

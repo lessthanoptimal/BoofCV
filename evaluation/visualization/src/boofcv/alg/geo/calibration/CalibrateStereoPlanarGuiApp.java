@@ -20,8 +20,8 @@ package boofcv.alg.geo.calibration;
 
 import boofcv.abst.calib.PlanarCalibrationDetector;
 import boofcv.alg.distort.ImageDistort;
+import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.RectifyImageOps;
-import boofcv.alg.geo.UtilIntrinsic;
 import boofcv.alg.geo.rectify.RectifyCalibrated;
 import boofcv.app.CalibrateStereoPlanar;
 import boofcv.app.ParseStereoCalibrationConfig;
@@ -135,8 +135,8 @@ public class CalibrateStereoPlanarGuiApp extends JPanel
 	private void setRectification(StereoParameters param) {
 
 		// calibration matrix for left and right camera
-		DenseMatrix64F K1 = UtilIntrinsic.calibrationMatrix(param.getLeft(),null);
-		DenseMatrix64F K2 = UtilIntrinsic.calibrationMatrix(param.getRight(),null);
+		DenseMatrix64F K1 = PerspectiveOps.calibrationMatrix(param.getLeft(), null);
+		DenseMatrix64F K2 = PerspectiveOps.calibrationMatrix(param.getRight(), null);
 
 		RectifyCalibrated rectify = RectifyImageOps.createCalibrated();
 		rectify.process(K1,new Se3_F64(),K2,param.getRightToLeft().invert(null));

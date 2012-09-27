@@ -1,8 +1,8 @@
 package boofcv.alg.sfm;
 
 import boofcv.alg.distort.ImageDistort;
+import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.RectifyImageOps;
-import boofcv.alg.geo.UtilIntrinsic;
 import boofcv.alg.geo.rectify.RectifyCalibrated;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.calib.StereoParameters;
@@ -60,8 +60,8 @@ public class StereoProcessingBase<T extends ImageSingleBand> {
 		Se3_F64 leftToRight = stereoParam.getRightToLeft().invert(null);
 
 		// original camera calibration matrices
-		DenseMatrix64F K1 = UtilIntrinsic.calibrationMatrix(stereoParam.getLeft(), null);
-		DenseMatrix64F K2 = UtilIntrinsic.calibrationMatrix(stereoParam.getRight(),null);
+		DenseMatrix64F K1 = PerspectiveOps.calibrationMatrix(stereoParam.getLeft(), null);
+		DenseMatrix64F K2 = PerspectiveOps.calibrationMatrix(stereoParam.getRight(), null);
 
 		rectifyAlg.process(K1,new Se3_F64(),K2,leftToRight);
 

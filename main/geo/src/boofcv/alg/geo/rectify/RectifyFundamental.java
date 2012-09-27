@@ -19,7 +19,7 @@
 package boofcv.alg.geo.rectify;
 
 import boofcv.alg.geo.AssociatedPair;
-import boofcv.alg.geo.UtilEpipolar;
+import boofcv.alg.geo.MultiViewOps;
 import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
@@ -75,7 +75,7 @@ public class RectifyFundamental {
 		int centerX = width/2;
 		int centerY = height/2;
 
-		UtilEpipolar.extractEpipoles(F,epipole1,epipole2);
+		MultiViewOps.extractEpipoles(F, epipole1, epipole2);
 		checkEpipoleInside(width, height);
 
 
@@ -203,7 +203,7 @@ public class RectifyFundamental {
 		Vector3D_F64 v = new Vector3D_F64(.1,0.5,.2);
 
 		// need to make sure M is not singular for this technique to work
-		SimpleMatrix P = SimpleMatrix.wrap(UtilEpipolar.canonicalCamera(F, e2, v , 1));
+		SimpleMatrix P = SimpleMatrix.wrap(MultiViewOps.canonicalCamera(F, e2, v, 1));
 
 		SimpleMatrix M = P.extractMatrix(0, 3, 0, 3);
 

@@ -29,7 +29,7 @@ import georegression.transform.se.SePointOps_F64;
 import org.ejml.data.DenseMatrix64F;
 import org.ejml.ops.CommonOps;
 import org.ejml.ops.MatrixFeatures;
-import org.ejml.ops.RandomMatrices;
+import org.ejml.ops.NormOps;
 import org.ejml.simple.SimpleMatrix;
 import org.junit.Test;
 
@@ -71,45 +71,14 @@ public class TestMultiViewOps {
 		RotationMatrixGenerator.eulerXYZ(0.8,-0.02,0.003,se3.R);
 		se3.getT().set(0.6, 0.2, -0.02);
 
-		P2 = MultiViewOps.createCameraMatrix(se2.R,se2.T,K,null);
-		P3 = MultiViewOps.createCameraMatrix(se3.R,se3.T,K,null);
+		P2 = PerspectiveOps.createCameraMatrix(se2.R, se2.T, K, null);
+		P3 = PerspectiveOps.createCameraMatrix(se3.R, se3.T, K, null);
 		tensor = MultiViewOps.createTrifocal(P2, P3, null);
 
-		F2 = UtilEpipolar.computeEssential(se2.getR(),se2.getT());
-		F2 = UtilEpipolar.computeFundamental(F2,K);
-		F3 = UtilEpipolar.computeEssential(se3.getR(),se3.getT());
-		F3 = UtilEpipolar.computeFundamental(F3,K);
-	}
-
-	@Test
-	public void createCameraMatrix() {
-		SimpleMatrix R = SimpleMatrix.random(3, 3, -1, 1, rand);
-		Vector3D_F64 T = new Vector3D_F64(2,3,-4);
-		SimpleMatrix K = SimpleMatrix.wrap(RandomMatrices.createUpperTriangle(3, 0, -1, 1, rand));
-
-		SimpleMatrix T_ = new SimpleMatrix(3,1,true,T.x,T.y,T.z);
-
-		// test calibrated camera
-		DenseMatrix64F found = MultiViewOps.createCameraMatrix(R.getMatrix(),T,null,null);
-		for( int i = 0; i < 3; i++ ) {
-			assertEquals(found.get(i,3),T_.get(i),1e-8);
-			for( int j = 0; j < 3; j++ ) {
-				assertEquals(found.get(i,j),R.get(i,j),1e-8);
-			}
-		}
-
-		// test uncalibrated camera
-		found = MultiViewOps.createCameraMatrix(R.getMatrix(),T,K.getMatrix(),null);
-
-		SimpleMatrix expectedR = K.mult(R);
-		SimpleMatrix expectedT = K.mult(T_);
-
-		for( int i = 0; i < 3; i++ ) {
-			assertEquals(found.get(i,3),expectedT.get(i),1e-8);
-			for( int j = 0; j < 3; j++ ) {
-				assertEquals(found.get(i,j),expectedR.get(i,j),1e-8);
-			}
-		}
+		F2 = MultiViewOps.computeEssential(se2.getR(), se2.getT());
+		F2 = MultiViewOps.computeFundamental(F2, K);
+		F3 = MultiViewOps.computeEssential(se3.getR(), se3.getT());
+		F3 = MultiViewOps.computeFundamental(F3, K);
 	}
 
 	/**
@@ -185,7 +154,7 @@ public class TestMultiViewOps {
 	}
 
 	@Test
-	public void extractEpipoles() {
+	public void extractEpipoles_threeview() {
 		Point3D_F64 found2 = new Point3D_F64();
 		Point3D_F64 found3 = new Point3D_F64();
 
@@ -208,7 +177,11 @@ public class TestMultiViewOps {
 	}
 
 	@Test
-	public void extractFundamental() {
+	public void extractFundamental_threeview() {
+		DenseMatrix64F P2 = PerspectiveOps.createCameraMatrix(se2.R, se2.T, null, null);
+		DenseMatrix64F P3 = PerspectiveOps.createCameraMatrix(se3.R, se3.T, null, null);
+		TrifocalTensor tensor = MultiViewOps.createTrifocal(P2, P3, null);
+
 		DenseMatrix64F found2 = new DenseMatrix64F(3,3);
 		DenseMatrix64F found3 = new DenseMatrix64F(3,3);
 
@@ -224,9 +197,9 @@ public class TestMultiViewOps {
 
 		Point3D_F64 X = new Point3D_F64(0.1,0.05,2);
 
-		Point2D_F64 x1 = PerspectiveOps.renderPixel(new Se3_F64(),K,X);
-		Point2D_F64 x2 = PerspectiveOps.renderPixel(se2,K,X);
-		Point2D_F64 x3 = PerspectiveOps.renderPixel(se3,K,X);
+		Point2D_F64 x1 = PerspectiveOps.renderPixel(new Se3_F64(), null, X);
+		Point2D_F64 x2 = PerspectiveOps.renderPixel(se2, null, X);
+		Point2D_F64 x3 = PerspectiveOps.renderPixel(se3, null, X);
 
 		assertEquals(0, GeometryMath_F64.innerProd(x2, found2, x1), 1e-8);
 		assertEquals(0, GeometryMath_F64.innerProd(x3, found3, x1), 1e-8);
@@ -248,8 +221,8 @@ public class TestMultiViewOps {
 		Point3D_F64 X = new Point3D_F64(0.1,0.05,2);
 
 		Point2D_F64 x1 = new Point2D_F64(X.x/X.z,X.y/X.z);
-		Point2D_F64 x2 = PerspectiveOps.renderPixel(P2,X);
-		Point2D_F64 x3 = PerspectiveOps.renderPixel(P3,X);
+		Point2D_F64 x2 = PerspectiveOps.renderPixel(P2, X);
+		Point2D_F64 x3 = PerspectiveOps.renderPixel(P3, X);
 
 		// validate correctness by testing a constraint on the points
 		DenseMatrix64F A = new DenseMatrix64F(3,3);
@@ -260,5 +233,168 @@ public class TestMultiViewOps {
 				assertEquals(0,A.get(i,j),1e-7);
 			}
 		}
+	}
+
+	@Test
+	public void computeEssential() {
+		DenseMatrix64F R = RotationMatrixGenerator.eulerXYZ(0.05, -0.04, 0.1, null);
+		Vector3D_F64 T = new Vector3D_F64(2,1,-3);
+		T.normalize();
+
+		DenseMatrix64F E = MultiViewOps.computeEssential(R, T);
+
+		// Test using the following theorem:  x2^T*E*x1 = 0
+		Point3D_F64 P = new Point3D_F64(0.1,0.1,2);
+
+		Point2D_F64 x0 = new Point2D_F64(P.x/P.z,P.y/P.z);
+		SePointOps_F64.transform(new Se3_F64(R,T),P,P);
+		Point2D_F64 x1 = new Point2D_F64(P.x/P.z,P.y/P.z);
+
+		double val = GeometryMath_F64.innerProd(x1,E,x0);
+		assertEquals(0,val,1e-8);
+	}
+
+	@Test
+	public void computeFundamental() {
+		fail("implement");
+	}
+
+	@Test
+	public void computeHomography_calibrated() {
+		DenseMatrix64F R = RotationMatrixGenerator.eulerXYZ(0.1,-0.01,0.2, null);
+		Vector3D_F64 T = new Vector3D_F64(1,1,0.1);
+		T.normalize();
+		double d = 2;
+		Vector3D_F64 N = new Vector3D_F64(0,0,1);
+
+		DenseMatrix64F H = MultiViewOps.computeHomography(R, T, d, N);
+
+		// Test using the following theorem:  x2 = H*x1
+		Point3D_F64 P = new Point3D_F64(0.1,0.1,d); // a point on the plane
+
+		Point2D_F64 x0 = new Point2D_F64(P.x/P.z,P.y/P.z);
+		SePointOps_F64.transform(new Se3_F64(R,T),P,P);
+		Point2D_F64 x1 = new Point2D_F64(P.x/P.z,P.y/P.z);
+		Point2D_F64 found = new Point2D_F64();
+
+		GeometryMath_F64.mult(H, x0, found);
+		assertEquals(x1.x,found.x,1e-8);
+		assertEquals(x1.y,found.y,1e-8);
+	}
+
+	@Test
+	public void computeHomography_uncalibrated() {
+		DenseMatrix64F K = new DenseMatrix64F(3,3,true,0.1,0.001,200,0,0.2,250,0,0,1);
+		DenseMatrix64F R = RotationMatrixGenerator.eulerXYZ(0.1,-0.01,0.2, null);
+		Vector3D_F64 T = new Vector3D_F64(1,1,0.1);
+		T.normalize();
+		double d = 2;
+		Vector3D_F64 N = new Vector3D_F64(0,0,1);
+
+		DenseMatrix64F H = MultiViewOps.computeHomography(R, T, d, N, K);
+
+		// Test using the following theorem:  x2 = H*x1
+		Point3D_F64 P = new Point3D_F64(0.1,0.1,d); // a point on the plane
+
+		Point2D_F64 x0 = new Point2D_F64(P.x/P.z,P.y/P.z);
+		GeometryMath_F64.mult(K,x0,x0);
+		SePointOps_F64.transform(new Se3_F64(R,T),P,P);
+		Point2D_F64 x1 = new Point2D_F64(P.x/P.z,P.y/P.z);
+		GeometryMath_F64.mult(K,x1,x1);
+		Point2D_F64 found = new Point2D_F64();
+
+		GeometryMath_F64.mult(H, x0, found);
+		assertEquals(x1.x,found.x,1e-8);
+		assertEquals(x1.y,found.y,1e-8);
+	}
+
+	@Test
+	public void extractEpipoles_stereo() {
+		DenseMatrix64F R = RotationMatrixGenerator.eulerXYZ(1,2,-0.5,null);
+		Vector3D_F64 T = new Vector3D_F64(0.5,0.7,-0.3);
+
+		DenseMatrix64F E = MultiViewOps.computeEssential(R, T);
+
+		assertTrue(NormOps.normF(E)!=0);
+
+		Point3D_F64 e1 = new Point3D_F64();
+		Point3D_F64 e2 = new Point3D_F64();
+
+		MultiViewOps.extractEpipoles(E, e1, e2);
+
+		Point3D_F64 temp = new Point3D_F64();
+
+		GeometryMath_F64.mult(E,e1,temp);
+		assertEquals(0,temp.norm(),1e-8);
+
+		GeometryMath_F64.multTran(E,e2,temp);
+		assertEquals(0,temp.norm(),1e-8);
+	}
+
+	@Test
+	public void canonicalCamera() {
+		DenseMatrix64F K = PerspectiveOps.calibrationMatrix(200, 250, 0, 100, 110);
+		DenseMatrix64F R = RotationMatrixGenerator.eulerXYZ(1,2,-0.5,null);
+		Vector3D_F64 T = new Vector3D_F64(0.5,0.7,-0.3);
+
+		DenseMatrix64F E = MultiViewOps.computeEssential(R, T);
+		DenseMatrix64F F = MultiViewOps.computeFundamental(E, K);
+
+		Point3D_F64 e1 = new Point3D_F64();
+		Point3D_F64 e2 = new Point3D_F64();
+
+		CommonOps.scale(-2.0/F.get(0,1),F);
+		MultiViewOps.extractEpipoles(F, e1, e2);
+
+		DenseMatrix64F P = MultiViewOps.canonicalCamera(F, e2, new Vector3D_F64(1, 1, 1), 2);
+
+		// recompose the fundamental matrix using the special equation for canonical cameras
+		DenseMatrix64F foundF = new DenseMatrix64F(3,3);
+		DenseMatrix64F crossEpi = new DenseMatrix64F(3,3);
+
+		GeometryMath_F64.crossMatrix(e2, crossEpi);
+
+		DenseMatrix64F M = new DenseMatrix64F(3,3);
+		CommonOps.extract(P,0,3,0,3,M,0,0);
+		CommonOps.mult(crossEpi,M,foundF);
+
+		// see if they are equal up to a scale factor
+		CommonOps.scale(1.0 / foundF.get(0, 1), foundF);
+		CommonOps.scale(1.0 / F.get(0, 1), F);
+
+		assertTrue(MatrixFeatures.isIdentical(F,foundF,1e-8));
+	}
+
+	@Test
+	public void decomposeCameraMatrix() {
+		// compute an arbitrary projection matrix from known values
+		DenseMatrix64F K = PerspectiveOps.calibrationMatrix(200, 250, 0, 100, 110);
+		DenseMatrix64F R = RotationMatrixGenerator.eulerXYZ(1,2,-0.5,null);
+		Vector3D_F64 T = new Vector3D_F64(0.5,0.7,-0.3);
+
+		DenseMatrix64F P = new DenseMatrix64F(3,4);
+		DenseMatrix64F KP = new DenseMatrix64F(3,4);
+		CommonOps.insert(R,P,0,0);
+		P.set(0,3,T.x);
+		P.set(1,3,T.y);
+		P.set(2,3,T.z);
+
+		CommonOps.mult(K,P,KP);
+
+		// decompose the projection matrix
+		DenseMatrix64F foundK = new DenseMatrix64F(3,3);
+		Se3_F64 foundPose = new Se3_F64();
+		MultiViewOps.decomposeCameraMatrix(KP, foundK, foundPose);
+
+		// recompute the projection matrix found the found results
+		DenseMatrix64F foundKP = new DenseMatrix64F(3,4);
+		CommonOps.insert(foundPose.getR(),P,0,0);
+		P.set(0,3,foundPose.T.x);
+		P.set(1,3,foundPose.T.y);
+		P.set(2,3,foundPose.T.z);
+		CommonOps.mult(foundK,P,foundKP);
+
+		// see if the two projection matrices are the same
+		assertTrue(MatrixFeatures.isEquals(foundKP,KP,1e-8));
 	}
 }

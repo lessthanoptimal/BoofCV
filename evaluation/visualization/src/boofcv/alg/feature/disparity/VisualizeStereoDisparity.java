@@ -21,8 +21,8 @@ package boofcv.alg.feature.disparity;
 import boofcv.abst.feature.disparity.StereoDisparity;
 import boofcv.alg.distort.DistortImageOps;
 import boofcv.alg.distort.ImageDistort;
+import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.RectifyImageOps;
-import boofcv.alg.geo.UtilIntrinsic;
 import boofcv.alg.geo.rectify.RectifyCalibrated;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.core.image.GeneralizedImageOps;
@@ -237,8 +237,8 @@ public class VisualizeStereoDisparity <T extends ImageSingleBand, D extends Imag
 	 */
 	private void rectifyInputImages() {
 		// get intrinsic camera calibration matrices
-		DenseMatrix64F K1 = UtilIntrinsic.calibrationMatrix(calib.left, null);
-		DenseMatrix64F K2 = UtilIntrinsic.calibrationMatrix(calib.right,null);
+		DenseMatrix64F K1 = PerspectiveOps.calibrationMatrix(calib.left, null);
+		DenseMatrix64F K2 = PerspectiveOps.calibrationMatrix(calib.right, null);
 
 		// compute rectification matrices
 		rectifyAlg.process(K1,new Se3_F64(),K2,calib.getRightToLeft().invert(null));

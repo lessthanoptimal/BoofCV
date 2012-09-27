@@ -224,7 +224,7 @@ public class MonocularSimpleVo<T extends ImageBase> {
 			System.out.println("    Essential inliers "+inliers.size()+"  out of "+active.size());
 
 			// TODO hack
-			DenseMatrix64F initialE = UtilEpipolar.computeEssential(found.getR(),found.getT());
+			DenseMatrix64F initialE = MultiViewOps.computeEssential(found.getR(), found.getT());
 
 			// refine E using non-linear optimization
 			if( refineE.process(initialE,inliers) ) {

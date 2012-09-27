@@ -255,11 +255,11 @@ public class VisualizeStereoVisualOdometry implements MouseListener
 				FactoryPointSequentialTracker.klt(400,new int[]{1,2,4,8},3,3,2,ImageFloat32.class,ImageFloat32.class);
 
 		StereoDisparitySparse<ImageFloat32> disparity =
-				FactoryStereoDisparity.regionSparseWta(2,100,3,3,40,-1,true,ImageFloat32.class);
+				FactoryStereoDisparity.regionSparseWta(0,150,3,3,20,-1,true,ImageFloat32.class);
 
 //		StereoVisualOdometry<ImageFloat32> alg = FactoryVisualOdometry.stereoSimple(300,3,tracker,stereoParam,
 //				disparity,ImageFloat32.class);
-		StereoVisualOdometry<ImageFloat32> alg = FactoryVisualOdometry.stereoDepth(75, 1, tracker, stereoParam,
+		StereoVisualOdometry<ImageFloat32> alg = FactoryVisualOdometry.stereoDepth(100, 1, tracker, stereoParam,
 				disparity, ImageFloat32.class);
 //		StereoVisualOdometry<ImageFloat32> alg = FactoryVisualOdometry.stereoEpipolar(75, 1, tracker, stereoParam,
 //				disparity, ImageFloat32.class);

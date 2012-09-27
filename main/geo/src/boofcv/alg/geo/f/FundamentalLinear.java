@@ -19,7 +19,7 @@
 package boofcv.alg.geo.f;
 
 import boofcv.alg.geo.AssociatedPair;
-import boofcv.alg.geo.UtilEpipolar;
+import boofcv.alg.geo.PerspectiveOps;
 import georegression.struct.point.Point2D_F64;
 import org.ejml.data.DenseMatrix64F;
 import org.ejml.factory.DecompositionFactory;
@@ -166,8 +166,8 @@ public abstract class FundamentalLinear {
 			Point2D_F64 s = p.currLoc;
 
 			// normalize the points
-			UtilEpipolar.pixelToNormalized(f, f_norm, N1);
-			UtilEpipolar.pixelToNormalized(s, s_norm, N2);
+			PerspectiveOps.pixelToNormalized(f, f_norm, N1);
+			PerspectiveOps.pixelToNormalized(s, s_norm, N2);
 
 			// perform the Kronecker product with the two points being in
 			// homogeneous coordinates (z=1)
