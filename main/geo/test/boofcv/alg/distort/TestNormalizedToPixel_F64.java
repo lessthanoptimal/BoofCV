@@ -18,7 +18,7 @@
 
 package boofcv.alg.distort;
 
-import boofcv.alg.geo.UtilIntrinsic;
+import boofcv.alg.geo.PerspectiveOps;
 import boofcv.struct.calib.IntrinsicParameters;
 import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Point2D_F64;
@@ -36,7 +36,7 @@ public class TestNormalizedToPixel_F64 {
 	public void basicTest() {
 		IntrinsicParameters p = new IntrinsicParameters(1, 2, 3, 4, 5, 200, 300, false, null);
 
-		DenseMatrix64F K = UtilIntrinsic.calibrationMatrix(p, null);
+		DenseMatrix64F K = PerspectiveOps.calibrationMatrix(p, null);
 
 		Point2D_F64 pixel = new Point2D_F64(150, 200);
 		Point2D_F64 expected = new Point2D_F64();

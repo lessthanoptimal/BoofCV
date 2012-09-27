@@ -1,7 +1,7 @@
 package boofcv.alg.sfm;
 
 import boofcv.alg.distort.LensDistortionOps;
-import boofcv.alg.geo.UtilIntrinsic;
+import boofcv.alg.geo.PerspectiveOps;
 import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.distort.PointTransform_F32;
 import georegression.struct.point.Point2D_F32;
@@ -36,8 +36,8 @@ public class SfmTestHelper {
 		Point2D_F64 normRight = new Point2D_F64(rightX.x/rightX.z,rightX.y/rightX.z);
 
 		// convert into pixel coordinates
-		Point2D_F64 pixelLeft =  UtilIntrinsic.convertNormToPixel(param.left, normLeft.x, normRight.y, null);
-		Point2D_F64 pixelRight =  UtilIntrinsic.convertNormToPixel(param.right,normRight.x,normRight.y,null);
+		Point2D_F64 pixelLeft =  PerspectiveOps.convertNormToPixel(param.left, normLeft.x, normRight.y, null);
+		Point2D_F64 pixelRight =  PerspectiveOps.convertNormToPixel(param.right, normRight.x, normRight.y, null);
 
 		// take in account lens distortion
 		PointTransform_F32 distLeft = LensDistortionOps.transformPixelToRadial_F32(param.left);

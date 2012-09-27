@@ -18,7 +18,7 @@
 
 package boofcv.alg.distort;
 
-import boofcv.alg.geo.UtilIntrinsic;
+import boofcv.alg.geo.PerspectiveOps;
 import georegression.geometry.GeometryMath_F32;
 import georegression.struct.point.Point2D_F32;
 import org.ejml.data.DenseMatrix64F;
@@ -57,7 +57,7 @@ public class TestRemoveRadialPtoN_F32 {
 		alg.compute(distX, distY, point);
 
 		/// go from calibrated coordinates to pixel
-		DenseMatrix64F K = UtilIntrinsic.calibrationMatrix(fx, fy, skew, xc, yc);
+		DenseMatrix64F K = PerspectiveOps.calibrationMatrix(fx, fy, skew, xc, yc);
 
 		GeometryMath_F32.mult(K, point, point);
 

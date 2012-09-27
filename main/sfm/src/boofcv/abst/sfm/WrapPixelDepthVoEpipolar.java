@@ -4,6 +4,7 @@ import boofcv.abst.feature.tracker.PointTrack;
 import boofcv.alg.sfm.AccessSfmPointTracks;
 import boofcv.alg.sfm.PixelDepthVoEpipolar;
 import boofcv.alg.sfm.PointPoseTrack;
+import boofcv.alg.sfm.StereoSparse3D;
 import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
@@ -20,9 +21,11 @@ public class WrapPixelDepthVoEpipolar<T extends ImageSingleBand>
 
 	// low level algorithm
 	PixelDepthVoEpipolar<T> alg;
+	StereoSparse3D<T> stereo;
 
-	public WrapPixelDepthVoEpipolar(PixelDepthVoEpipolar<T> alg) {
+	public WrapPixelDepthVoEpipolar(PixelDepthVoEpipolar<T> alg, StereoSparse3D<T> stereo ) {
 		this.alg = alg;
+		this.stereo = stereo;
 	}
 
 	@Override
@@ -80,6 +83,7 @@ public class WrapPixelDepthVoEpipolar<T extends ImageSingleBand>
 
 	@Override
 	public boolean process(T leftImage, T rightImage) {
+		stereo.setImages(leftImage,rightImage);
 		return alg.process(leftImage,rightImage);
 	}
 

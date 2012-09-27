@@ -5,7 +5,6 @@ import boofcv.abst.geo.TriangulateTwoViewsCalibrated;
 import boofcv.alg.geo.AssociatedPair;
 import boofcv.factory.geo.FactoryTriangulate;
 import boofcv.numerics.fitting.modelset.ModelMatcher;
-import boofcv.struct.feature.ComputePixelTo3D;
 import boofcv.struct.image.ImageBase;
 import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Point2D_F64;
@@ -26,14 +25,14 @@ public class PixelDepthVoEpipolar<T extends ImageBase> {
 	// TODO Make relative to the last update or remove?
 	double MIN_PIXEL_CHANGE = 100;
 
-	double TOL_TRIANGULATE = 0.5*Math.PI/180.0;
+	double TOL_TRIANGULATE = 2*Math.PI/180.0;
 
 	int MIN_TRACKS = 100;
 
 	// tracks features in the image
 	private KeyFramePointTracker<T,PointPoseTrack> tracker;
 	// used to estimate a feature's 3D position from image range data
-	private ComputePixelTo3D<T> pixelTo3D;
+	private ImagePixelTo3D pixelTo3D;
 
 	// triangulate feature's 3D location
 	private TriangulateTwoViewsCalibrated triangulate =
@@ -55,7 +54,7 @@ public class PixelDepthVoEpipolar<T extends ImageBase> {
 	int motionFailed;
 
 	public PixelDepthVoEpipolar(int MIN_TRACKS, ModelMatcher<Se3_F64, AssociatedPair> motionEstimator,
-								ComputePixelTo3D<T> pixelTo3D,
+								ImagePixelTo3D pixelTo3D,
 								KeyFramePointTracker<T, PointPoseTrack> tracker,
 								TriangulateTwoViewsCalibrated triangulate)
 	{
@@ -84,9 +83,10 @@ public class PixelDepthVoEpipolar<T extends ImageBase> {
 		}
 
 		if( numTracksUsed < MIN_TRACKS || !foundMotion ) {
+			pixelTo3D.initialize();
+
 			System.out.println("----------- CHANGE KEY FRAME ---------------");
 			concatMotion();
-			pixelTo3D.setImages(leftImage,rightImage);
 
 			tracker.setKeyFrame();
 			tracker.spawnTracks();
@@ -97,10 +97,12 @@ public class PixelDepthVoEpipolar<T extends ImageBase> {
 			// estimate 3D coordinate using stereo vision
 			for( PointPoseTrack p : tracks ) {
 				Point2D_F64 pixel = p.getPixel().keyLoc;
-				if( !pixelTo3D.process(pixel.x,pixel.y) ) {
+				// discard point if it can't triangulate
+				if( !pixelTo3D.process(pixel.x,pixel.y) && pixelTo3D.getW() != 0 ) {
 					drop.add(p);
 				} else {
-					p.getLocation().set( pixelTo3D.getX() , pixelTo3D.getY(), pixelTo3D.getZ());
+					double w = pixelTo3D.getW();
+					p.getLocation().set( pixelTo3D.getX()/w , pixelTo3D.getY()/w, pixelTo3D.getZ()/w);
 				}
 			}
 

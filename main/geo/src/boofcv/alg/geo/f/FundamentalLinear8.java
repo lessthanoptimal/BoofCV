@@ -20,7 +20,7 @@ package boofcv.alg.geo.f;
 
 
 import boofcv.alg.geo.AssociatedPair;
-import boofcv.alg.geo.UtilEpipolar;
+import boofcv.alg.geo.PerspectiveOps;
 import org.ejml.data.DenseMatrix64F;
 import org.ejml.ops.SingularOps;
 import org.ejml.ops.SpecializedOps;
@@ -87,7 +87,7 @@ public class FundamentalLinear8 extends FundamentalLinear {
 		// use normalized coordinates for pixel and calibrated
 		// un-normalized passed unit tests in 8 point, but failed in 7 point, hinting
 		// that there could be situations where normalization might be needed in 8 point
-		UtilEpipolar.computeNormalization(N1, N2, points);
+		PerspectiveOps.computeNormalization(N1, N2, points);
 		createA(points,A);
 
 		if (process(A))

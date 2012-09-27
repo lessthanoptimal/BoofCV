@@ -20,8 +20,8 @@ package boofcv.alg.geo.rectify;
 
 import boofcv.alg.distort.DistortImageOps;
 import boofcv.alg.distort.ImageDistort;
+import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.RectifyImageOps;
-import boofcv.alg.geo.UtilIntrinsic;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.gui.ListDisplayPanel;
@@ -87,8 +87,8 @@ public class ShowRectifyCalibratedApp extends SelectAlgorithmAndInputPanel {
 		Se3_F64 leftToRight = param.getRightToLeft().invert(null);
 
 		// original camera calibration matrices
-		DenseMatrix64F K1 = UtilIntrinsic.calibrationMatrix(param.getLeft(),null);
-		DenseMatrix64F K2 = UtilIntrinsic.calibrationMatrix(param.getRight(),null);
+		DenseMatrix64F K1 = PerspectiveOps.calibrationMatrix(param.getLeft(), null);
+		DenseMatrix64F K2 = PerspectiveOps.calibrationMatrix(param.getRight(), null);
 
 		rectifyAlg.process(K1,new Se3_F64(),K2,leftToRight);
 

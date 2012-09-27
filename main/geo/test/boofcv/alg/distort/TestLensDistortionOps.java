@@ -18,7 +18,7 @@
 
 package boofcv.alg.distort;
 
-import boofcv.alg.geo.UtilIntrinsic;
+import boofcv.alg.geo.PerspectiveOps;
 import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.distort.PointTransform_F32;
 import boofcv.struct.distort.PointTransform_F64;
@@ -138,7 +138,7 @@ public class TestLensDistortionOps {
 
 		// Normalized coordinates
 		Point2D_F64 norm = new Point2D_F64();
-		DenseMatrix64F K = UtilIntrinsic.calibrationMatrix(param,null);
+		DenseMatrix64F K = PerspectiveOps.calibrationMatrix(param, null);
 		DenseMatrix64F K_inv = new DenseMatrix64F(3,3);
 		CommonOps.invert(K,K_inv);
 		GeometryMath_F64.mult(K_inv,pixel,norm);
@@ -174,7 +174,7 @@ public class TestLensDistortionOps {
 
 		// Normalized coordinates
 		Point2D_F64 norm = new Point2D_F64();
-		DenseMatrix64F K = UtilIntrinsic.calibrationMatrix(param,null);
+		DenseMatrix64F K = PerspectiveOps.calibrationMatrix(param, null);
 		DenseMatrix64F K_inv = new DenseMatrix64F(3,3);
 		CommonOps.invert(K,K_inv);
 		GeometryMath_F64.mult(K_inv,pixel,norm);

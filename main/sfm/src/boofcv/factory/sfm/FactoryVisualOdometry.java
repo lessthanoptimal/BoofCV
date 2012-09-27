@@ -1,6 +1,5 @@
 package boofcv.factory.sfm;
 
-import boofcv.abst.feature.disparity.DisparityTo3D;
 import boofcv.abst.feature.disparity.StereoDisparitySparse;
 import boofcv.abst.feature.tracker.ImagePointTracker;
 import boofcv.abst.feature.tracker.KeyFramePointTracker;
@@ -11,14 +10,10 @@ import boofcv.abst.geo.TriangulateTwoViewsCalibrated;
 import boofcv.abst.geo.fitting.DistanceFromModelResidualN;
 import boofcv.abst.geo.fitting.GenerateMotionPnP;
 import boofcv.abst.sfm.*;
-import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.distort.LensDistortionOps;
 import boofcv.alg.geo.AssociatedPair;
 import boofcv.alg.geo.PointPositionPair;
-import boofcv.alg.geo.RectifyImageOps;
-import boofcv.alg.geo.UtilIntrinsic;
 import boofcv.alg.geo.pose.PnPResidualSimple;
-import boofcv.alg.geo.rectify.RectifyCalibrated;
 import boofcv.alg.sfm.*;
 import boofcv.alg.sfm.robust.DistanceSe3SymmetricSq;
 import boofcv.alg.sfm.robust.ModelMatcherTranGivenRot;
@@ -31,13 +26,11 @@ import boofcv.numerics.fitting.modelset.ModelGenerator;
 import boofcv.numerics.fitting.modelset.ModelMatcher;
 import boofcv.numerics.fitting.modelset.ransac.Ransac;
 import boofcv.struct.calib.StereoParameters;
-import boofcv.struct.distort.PointTransform_F32;
 import boofcv.struct.distort.PointTransform_F64;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.se.Se3_F64;
-import org.ejml.data.DenseMatrix64F;
 
 /**
  * Factory for creating visual odometry algorithms.
@@ -130,94 +123,11 @@ public class FactoryVisualOdometry {
 	}
 
 	public static <T extends ImageSingleBand>
-	StereoVisualOdometry<T> stereoSimple( int minTracks , double inlierPixelError ,
-										  ImagePointTracker<T> tracker ,
-										  StereoParameters stereoParam ,
-										  StereoDisparitySparse<T> sparseDisparity ,
-										  Class<T> imageType )
-	{
-		// compute rectification
-		RectifyCalibrated rectifyAlg = RectifyImageOps.createCalibrated();
-		Se3_F64 leftToRight = stereoParam.getRightToLeft().invert(null);
-
-		// original camera calibration matrices
-		DenseMatrix64F K1 = UtilIntrinsic.calibrationMatrix(stereoParam.getLeft(), null);
-		DenseMatrix64F K2 = UtilIntrinsic.calibrationMatrix(stereoParam.getRight(),null);
-
-		rectifyAlg.process(K1,new Se3_F64(),K2,leftToRight);
-
-		// rectification matrix for each image
-		DenseMatrix64F rect1 = rectifyAlg.getRect1();
-		DenseMatrix64F rect2 = rectifyAlg.getRect2();
-		// New calibration matrix,
-		// Both cameras have the same one after rectification.
-		DenseMatrix64F rectK = rectifyAlg.getCalibrationMatrix();
-
-		// Adjust the rectification to make the view area more useful
-		RectifyImageOps.fullViewLeft(stereoParam.left, rect1, rect2, rectK);
-
-		// inlier error is relative to pixel error, approximate pixel error in normalized image coordinates
-		double focalLength = rectK.get(0,0);
-		double errorTolNormPixel =  inlierPixelError/focalLength;
-
-		// Estimator for PnP problem
-		ModelGenerator<Se3_F64,PointPositionPair> generateMotion =
-				new GenerateMotionPnP( FactoryEpipolar.pnpEfficientPnP(5,0.1));
-		DistanceFromModel<Se3_F64,PointPositionPair> distanceMotion =
-				new DistanceFromModelResidualN<Se3_F64,PointPositionPair>(new PnPResidualSimple());
-
-		ModelMatcher<Se3_F64,PointPositionPair> computeMotion =
-				new Ransac<Se3_F64,PointPositionPair>(2323,generateMotion,distanceMotion,
-						200,errorTolNormPixel*errorTolNormPixel);
-
-		// Refine the PnP pose estimate
-		RefinePerspectiveNPoint refineMotion = FactoryEpipolar.refinePnP(1e-12, 200);
-
-		// Range from sparse disparity
-		ImageDistort<T> rectLeft = RectifyImageOps.rectifyImage(stereoParam.left,rect1,imageType);
-		ImageDistort<T> rectRight = RectifyImageOps.rectifyImage(stereoParam.right,rect2,imageType);
-		PointTransform_F32 pixelToRectified = RectifyImageOps.transformPixelToRect_F32(stereoParam.left, rect1);
-		DisparityTo3D<T> pixelTo3D = new DisparityTo3D<T>(sparseDisparity,rectLeft,rectRight,
-				pixelToRectified,imageType);
-		pixelTo3D.configure(stereoParam.getBaseline(),rectK);
-
-		// transform to go from pixel coordinates to normalized coordinates
-		PointTransform_F64 pixelToNormalized = RectifyImageOps.transformPixelToRectNorm_F64(stereoParam.left, rect1, rectK);
-
-		// setup the tracker
-		KeyFramePointTracker<T,PointPoseTrack> keyTracker =
-				new KeyFramePointTracker<T,PointPoseTrack>(tracker,pixelToNormalized,PointPoseTrack.class);
-
-		StereoSimpleVo<T> alg = new StereoSimpleVo<T>(keyTracker,pixelTo3D,computeMotion, refineMotion);
-
-		return new WrapStereoSimpleVo<T>(alg);
-	}
-
-	public static <T extends ImageSingleBand>
 	StereoVisualOdometry<T> stereoDepth(int minTracks, double inlierPixelTol,
 										ImagePointTracker<T> tracker,
 										StereoParameters stereoParam,
 										StereoDisparitySparse<T> sparseDisparity,
 										Class<T> imageType) {
-		// compute rectification
-		RectifyCalibrated rectifyAlg = RectifyImageOps.createCalibrated();
-		Se3_F64 leftToRight = stereoParam.getRightToLeft().invert(null);
-
-		// original camera calibration matrices
-		DenseMatrix64F K1 = UtilIntrinsic.calibrationMatrix(stereoParam.getLeft(), null);
-		DenseMatrix64F K2 = UtilIntrinsic.calibrationMatrix(stereoParam.getRight(),null);
-
-		rectifyAlg.process(K1,new Se3_F64(),K2,leftToRight);
-
-		// rectification matrix for each image
-		DenseMatrix64F rect1 = rectifyAlg.getRect1();
-		DenseMatrix64F rect2 = rectifyAlg.getRect2();
-		// New calibration matrix,
-		// Both cameras have the same one after rectification.
-		DenseMatrix64F rectK = rectifyAlg.getCalibrationMatrix();
-
-		// Adjust the rectification to make the view area more useful
-		RectifyImageOps.fullViewLeft(stereoParam.left, rect1, rect2, rectK);
 
 		// motion estimation using essential matrix
 		EpipolarMatrixEstimator essentialAlg = FactoryEpipolar.computeFundamentalOne(5, false, 2);
@@ -238,23 +148,18 @@ public class FactoryVisualOdometry {
 						200, ransacTOL);
 
 		// Range from sparse disparity
-		ImageDistort<T> rectLeft = RectifyImageOps.rectifyImage(stereoParam.left,rect1,imageType);
-		ImageDistort<T> rectRight = RectifyImageOps.rectifyImage(stereoParam.right,rect2,imageType);
-		PointTransform_F32 pixelToRectified = RectifyImageOps.transformPixelToRect_F32(stereoParam.left, rect1);
-		DisparityTo3D<T> pixelTo3D = new DisparityTo3D<T>(sparseDisparity,rectLeft,rectRight,
-				pixelToRectified,imageType);
-		pixelTo3D.configure(stereoParam.getBaseline(),rectK);
+		StereoSparse3D<T> pixelTo3D = new StereoSparse3D<T>(sparseDisparity,stereoParam,imageType);
 
 		// transform to go from pixel coordinates to normalized coordinates
-		PointTransform_F64 pixelToNormalized = RectifyImageOps.transformPixelToRectNorm_F64(stereoParam.left, rect1, rectK);
+		PointTransform_F64 leftPixelToNorm = LensDistortionOps.transformRadialToNorm_F64(stereoParam.left);
 
 		// setup the tracker
 		KeyFramePointTracker<T,PointPoseTrack> keyTracker =
-				new KeyFramePointTracker<T,PointPoseTrack>(tracker,pixelToNormalized,PointPoseTrack.class);
+				new KeyFramePointTracker<T,PointPoseTrack>(tracker,leftPixelToNorm,PointPoseTrack.class);
 
 		PixelDepthVoEpipolar<T> alg = new PixelDepthVoEpipolar<T>(minTracks,epipolarMotion,pixelTo3D,keyTracker,triangulate);
 
-		return new WrapPixelDepthVoEpipolar<T>(alg);
+		return new WrapPixelDepthVoEpipolar<T>(alg,pixelTo3D);
 	}
 
 	public static <T extends ImageSingleBand>

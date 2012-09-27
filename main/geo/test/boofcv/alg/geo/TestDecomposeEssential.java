@@ -46,7 +46,7 @@ public class TestDecomposeEssential {
 		DenseMatrix64F R = RotationMatrixGenerator.eulerXYZ(0.1,-0.4,0.5,null);
 		Vector3D_F64 T = new Vector3D_F64(2,1,-3);
 
-		DenseMatrix64F E = UtilEpipolar.computeEssential(R,T);
+		DenseMatrix64F E = MultiViewOps.computeEssential(R, T);
 
 		DecomposeEssential alg = new DecomposeEssential();
 		alg.decompose(E);
@@ -68,7 +68,7 @@ public class TestDecomposeEssential {
 		DenseMatrix64F R = RotationMatrixGenerator.eulerXYZ(0.1,-0.4,0.5,null);
 		Vector3D_F64 T = new Vector3D_F64(2,1,-3);
 
-		DenseMatrix64F E = UtilEpipolar.computeEssential(R,T);
+		DenseMatrix64F E = MultiViewOps.computeEssential(R, T);
 
 		DecomposeEssential alg = new DecomposeEssential();
 		// call it twice and see if it breaks

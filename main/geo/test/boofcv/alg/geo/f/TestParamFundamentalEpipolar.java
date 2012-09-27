@@ -18,7 +18,7 @@
 
 package boofcv.alg.geo.f;
 
-import boofcv.alg.geo.UtilEpipolar;
+import boofcv.alg.geo.MultiViewOps;
 import georegression.geometry.RotationMatrixGenerator;
 import georegression.struct.point.Vector3D_F64;
 import org.ejml.data.DenseMatrix64F;
@@ -38,7 +38,7 @@ public class TestParamFundamentalEpipolar {
 		DenseMatrix64F R = RotationMatrixGenerator.eulerXYZ(1, 2, -0.5, null);
 		Vector3D_F64 T = new Vector3D_F64(0.5,0.7,-0.3);
 
-		DenseMatrix64F E = UtilEpipolar.computeEssential(R, T);
+		DenseMatrix64F E = MultiViewOps.computeEssential(R, T);
 		
 		double param[] = new double[7];
 		

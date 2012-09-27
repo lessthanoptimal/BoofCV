@@ -19,7 +19,7 @@
 package boofcv.alg.geo.f;
 
 import boofcv.alg.geo.AssociatedPair;
-import boofcv.alg.geo.UtilEpipolar;
+import boofcv.alg.geo.PerspectiveOps;
 import boofcv.numerics.solver.Polynomial;
 import boofcv.numerics.solver.PolynomialRoots;
 import boofcv.numerics.solver.PolynomialSolver;
@@ -101,7 +101,7 @@ public class FundamentalLinear7 extends FundamentalLinear {
 		solutions.reset();
 
 		// must normalize for when points are in either pixel or calibrated units
-		UtilEpipolar.computeNormalization(N1, N2, points);
+		PerspectiveOps.computeNormalization(N1, N2, points);
 
 		// extract F1 and F2 from two null spaces
 		createA(points,A);
