@@ -19,7 +19,7 @@
 package boofcv.alg.geo.pose;
 
 import boofcv.alg.geo.GeoTestingOps;
-import boofcv.alg.geo.PointPositionPair;
+import boofcv.struct.geo.PointPositionPair;
 import georegression.geometry.RotationMatrixGenerator;
 import georegression.struct.se.Se3_F64;
 import org.junit.Test;

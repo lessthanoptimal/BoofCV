@@ -18,8 +18,8 @@
 
 package boofcv.alg.geo.rectify;
 
-import boofcv.alg.geo.AssociatedPair;
 import boofcv.alg.geo.MultiViewOps;
+import boofcv.struct.geo.AssociatedPair;
 import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;

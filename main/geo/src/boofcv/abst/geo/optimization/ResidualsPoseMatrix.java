@@ -19,9 +19,9 @@
 package boofcv.abst.geo.optimization;
 
 import boofcv.alg.geo.ModelObservationResidualN;
-import boofcv.alg.geo.PointPositionPair;
 import boofcv.numerics.fitting.modelset.ModelCodec;
 import boofcv.numerics.optimization.functions.FunctionNtoM;
+import boofcv.struct.geo.PointPositionPair;
 import georegression.struct.se.Se3_F64;
 
 import java.util.List;

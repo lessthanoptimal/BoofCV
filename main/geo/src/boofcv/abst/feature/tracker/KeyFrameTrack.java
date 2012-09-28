@@ -18,7 +18,7 @@
 
 package boofcv.abst.feature.tracker;
 
-import boofcv.alg.geo.AssociatedPair;
+import boofcv.struct.geo.AssociatedPair;
 
 /**
  *

@@ -21,10 +21,17 @@ package boofcv.alg.geo;
 import boofcv.alg.distort.PointTransformHomography_F32;
 import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.distort.PointTransform_F32;
+import boofcv.struct.geo.AssociatedPair;
+import boofcv.struct.geo.AssociatedTriple;
 import georegression.geometry.GeometryMath_F32;
+import georegression.geometry.GeometryMath_F64;
+import georegression.geometry.RotationMatrixGenerator;
 import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_F64;
+import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Vector3D_F64;
+import georegression.struct.se.Se3_F64;
+import georegression.transform.se.SePointOps_F64;
 import org.ejml.data.DenseMatrix64F;
 import org.ejml.ops.CommonOps;
 import org.ejml.ops.MatrixFeatures;
@@ -146,7 +153,31 @@ public class TestPerspectiveOps {
 
 	@Test
 	public void renderPixel_SE() {
-		fail("implement");
+		Point3D_F64 X = new Point3D_F64(0.1,-0.05,3);
+
+		Se3_F64 worldToCamera = new Se3_F64();
+		RotationMatrixGenerator.eulerXYZ(0.1,-0.05,0.03,worldToCamera.getR());
+		worldToCamera.getT().set(0.2,0.01,-0.03);
+
+		DenseMatrix64F K = RandomMatrices.createUpperTriangle(3, 0, -1, 1, rand);
+
+		Point3D_F64 X_cam = SePointOps_F64.transform(worldToCamera,X,null);
+		Point2D_F64 found;
+
+		// calibrated case
+		found = PerspectiveOps.renderPixel(worldToCamera,null,X);
+		assertEquals(X_cam.x/X_cam.z,found.x,1e-8);
+		assertEquals(X_cam.y/X_cam.z,found.y,1e-8);
+
+		// uncalibrated case
+		Point2D_F64 expected = new Point2D_F64();
+		expected.x = X_cam.x/X_cam.z;
+		expected.y = X_cam.y/X_cam.z;
+		GeometryMath_F64.mult(K,expected,expected);
+
+		found = PerspectiveOps.renderPixel(worldToCamera,K,X);
+		assertEquals(expected.x,found.x,1e-8);
+		assertEquals(expected.y,found.y,1e-8);
 	}
 
 	@Test
@@ -155,7 +186,118 @@ public class TestPerspectiveOps {
 	}
 
 	@Test
+	public void splitAssociated_pair() {
+		List<AssociatedPair> list = new ArrayList<AssociatedPair>();
+		for( int i = 0; i < 12; i++ ) {
+			AssociatedPair p = new AssociatedPair();
+
+			p.currLoc.set(rand.nextDouble()*5,rand.nextDouble()*5);
+			p.keyLoc.set(rand.nextDouble() * 5, rand.nextDouble() * 5);
+
+			list.add(p);
+		}
+
+		List<Point2D_F64> list1 = new ArrayList<Point2D_F64>();
+		List<Point2D_F64> list2 = new ArrayList<Point2D_F64>();
+
+		PerspectiveOps.splitAssociated(list,list1,list2);
+
+		assertEquals(list.size(),list1.size());
+		assertEquals(list.size(),list2.size());
+
+		for( int i = 0; i < list.size(); i++ ) {
+			assertTrue(list.get(i).keyLoc == list1.get(i));
+			assertTrue(list.get(i).currLoc == list2.get(i));
+		}
+	}
+
+	@Test
+	public void splitAssociated_triple() {
+		List<AssociatedTriple> list = new ArrayList<AssociatedTriple>();
+		for( int i = 0; i < 12; i++ ) {
+			AssociatedTriple p = new AssociatedTriple();
+
+			p.p1.set(rand.nextDouble()*5,rand.nextDouble()*5);
+			p.p2.set(rand.nextDouble() * 5, rand.nextDouble() * 5);
+			p.p3.set(rand.nextDouble() * 5, rand.nextDouble() * 5);
+
+			list.add(p);
+		}
+
+		List<Point2D_F64> list1 = new ArrayList<Point2D_F64>();
+		List<Point2D_F64> list2 = new ArrayList<Point2D_F64>();
+		List<Point2D_F64> list3 = new ArrayList<Point2D_F64>();
+
+		PerspectiveOps.splitAssociated(list,list1,list2,list3);
+
+		assertEquals(list.size(),list1.size());
+		assertEquals(list.size(),list2.size());
+		assertEquals(list.size(),list3.size());
+
+		for( int i = 0; i < list.size(); i++ ) {
+			assertTrue(list.get(i).p1 == list1.get(i));
+			assertTrue(list.get(i).p2 == list2.get(i));
+			assertTrue(list.get(i).p3 == list3.get(i));
+		}
+	}
+
+	@Test
 	public void computeNormalization() {
+		List<Point2D_F64> list = new ArrayList<Point2D_F64>();
+		for( int i = 0; i < 12; i++ ) {
+			Point2D_F64 p = new Point2D_F64();
+
+			p.set(rand.nextDouble()*5,rand.nextDouble()*5);
+
+			list.add(p);
+		}
+
+		DenseMatrix64F N = new DenseMatrix64F(3,3);
+		PerspectiveOps.computeNormalization(list,N);
+
+		List<Point2D_F64> transformed = new ArrayList<Point2D_F64>();
+		for( Point2D_F64 p : list ) {
+			Point2D_F64 t = new Point2D_F64();
+			GeometryMath_F64.mult(N,p,t);
+			transformed.add(t);
+		}
+
+		// see if the transformed points have the expected statistical properties
+		double meanX0 = 0;
+		double meanY0 = 0;
+
+		for( Point2D_F64 p : transformed ) {
+			meanX0 += p.x;
+			meanY0 += p.y;
+		}
+
+		meanX0 /= list.size();
+		meanY0 /= list.size();
+
+		assertEquals(0,meanX0,1e-8);
+		assertEquals(0,meanY0,1e-8);
+
+		double sigmaX0 = 0;
+		double sigmaY0 = 0;
+
+		for( Point2D_F64 p : transformed ) {
+			sigmaX0 += Math.pow(p.x-meanX0,2);
+			sigmaY0 += Math.pow(p.y-meanY0,2);
+		}
+
+		sigmaX0 = Math.sqrt(sigmaX0/list.size());
+		sigmaY0 = Math.sqrt(sigmaY0/list.size());
+
+		assertEquals(1,sigmaX0,1e-8);
+		assertEquals(1,sigmaY0,1e-8);
+
+	}
+
+	/**
+	 * Compare to single list function
+	 */
+	@Test
+	public void computeNormalization_two() {
 
 		List<AssociatedPair> list = new ArrayList<AssociatedPair>();
 		for( int i = 0; i < 12; i++ ) {
@@ -167,58 +309,66 @@ public class TestPerspectiveOps {
 			list.add(p);
 		}
 
-		// compute statistics
-		double meanX0 = 0;
-		double meanY0 = 0;
-		double meanX1 = 0;
-		double meanY1 = 0;
+		List<Point2D_F64> list1 = new ArrayList<Point2D_F64>();
+		List<Point2D_F64> list2 = new ArrayList<Point2D_F64>();
 
-		for( AssociatedPair p : list ) {
-			meanX0 += p.keyLoc.x;
-			meanY0 += p.keyLoc.y;
-			meanX1 += p.currLoc.x;
-			meanY1 += p.currLoc.y;
+		PerspectiveOps.splitAssociated(list,list1,list2);
+
+		DenseMatrix64F expected1 = new DenseMatrix64F(3,3);
+		DenseMatrix64F expected2 = new DenseMatrix64F(3,3);
+
+		PerspectiveOps.computeNormalization(list1,expected1);
+		PerspectiveOps.computeNormalization(list2,expected2);
+
+		DenseMatrix64F found1 = new DenseMatrix64F(3,3);
+		DenseMatrix64F found2 = new DenseMatrix64F(3,3);
+
+		PerspectiveOps.computeNormalization(list,found1,found2);
+
+		assertTrue(MatrixFeatures.isIdentical(expected1,found1,1e-8));
+		assertTrue(MatrixFeatures.isIdentical(expected2,found2,1e-8));
+	}
+
+	/**
+	 * Compare to single list function
+	 */
+	@Test
+	public void computeNormalization_three() {
+
+		List<AssociatedTriple> list = new ArrayList<AssociatedTriple>();
+		for( int i = 0; i < 12; i++ ) {
+			AssociatedTriple p = new AssociatedTriple();
+
+			p.p1.set(rand.nextDouble()*5,rand.nextDouble()*5);
+			p.p2.set(rand.nextDouble() * 5, rand.nextDouble() * 5);
+			p.p3.set(rand.nextDouble() * 5, rand.nextDouble() * 5);
+
+			list.add(p);
 		}
 
-		meanX0 /= list.size();
-		meanY0 /= list.size();
-		meanX1 /= list.size();
-		meanY1 /= list.size();
+		List<Point2D_F64> list1 = new ArrayList<Point2D_F64>();
+		List<Point2D_F64> list2 = new ArrayList<Point2D_F64>();
+		List<Point2D_F64> list3 = new ArrayList<Point2D_F64>();
 
-		double sigmaX0 = 0;
-		double sigmaY0 = 0;
-		double sigmaX1 = 0;
-		double sigmaY1 = 0;
+		PerspectiveOps.splitAssociated(list,list1,list2,list3);
 
-		for( AssociatedPair p : list ) {
-			sigmaX0 += Math.pow(p.keyLoc.x-meanX0,2);
-			sigmaY0 += Math.pow(p.keyLoc.y-meanY0,2);
-			sigmaX1 += Math.pow(p.currLoc.x-meanX1,2);
-			sigmaY1 += Math.pow(p.currLoc.y-meanY1,2);
-		}
+		DenseMatrix64F expected1 = new DenseMatrix64F(3,3);
+		DenseMatrix64F expected2 = new DenseMatrix64F(3,3);
+		DenseMatrix64F expected3 = new DenseMatrix64F(3,3);
 
-		sigmaX0 = Math.sqrt(sigmaX0/list.size());
-		sigmaY0 = Math.sqrt(sigmaY0/list.size());
-		sigmaX1 = Math.sqrt(sigmaX1/list.size());
-		sigmaY1 = Math.sqrt(sigmaY1/list.size());
+		PerspectiveOps.computeNormalization(list1,expected1);
+		PerspectiveOps.computeNormalization(list2,expected2);
+		PerspectiveOps.computeNormalization(list3,expected3);
 
-		// test the output
-		DenseMatrix64F N1 = new DenseMatrix64F(3,3);
-		DenseMatrix64F N2 = new DenseMatrix64F(3,3);
+		DenseMatrix64F found1 = new DenseMatrix64F(3,3);
+		DenseMatrix64F found2 = new DenseMatrix64F(3,3);
+		DenseMatrix64F found3 = new DenseMatrix64F(3,3);
 
-		PerspectiveOps.computeNormalization(N1, N2, list);
+		PerspectiveOps.computeNormalization(list,found1,found2,found3);
 
-		assertEquals(1/sigmaX0, N1.get(0,0),1e-8);
-		assertEquals(1/sigmaY0, N1.get(1,1),1e-8);
-		assertEquals(-meanX0/sigmaX0, N1.get(0,2),1e-8);
-		assertEquals(-meanY0/sigmaY0, N1.get(1,2),1e-8);
-		assertEquals(1, N1.get(2,2),1e-8);
-
-		assertEquals(1/sigmaX1, N2.get(0,0),1e-8);
-		assertEquals(1/sigmaY1, N2.get(1,1),1e-8);
-		assertEquals(-meanX1/sigmaX1, N2.get(0,2),1e-8);
-		assertEquals(-meanY1/sigmaY1, N2.get(1,2),1e-8);
-		assertEquals(1, N2.get(2,2),1e-8);
+		assertTrue(MatrixFeatures.isIdentical(expected1,found1,1e-8));
+		assertTrue(MatrixFeatures.isIdentical(expected2,found2,1e-8));
+		assertTrue(MatrixFeatures.isIdentical(expected3,found3,1e-8));
 	}
 
 	/**
@@ -236,7 +386,7 @@ public class TestPerspectiveOps {
 		expected.y = a.y * N.get(1,1) + N.get(1,2);
 
 
-		PerspectiveOps.pixelToNormalized(a, found, N);
+		PerspectiveOps.pixelToNormalized(N, a, found);
 
 		assertEquals(found.x,expected.x,1e-8);
 		assertEquals(found.y,expected.y,1e-8);

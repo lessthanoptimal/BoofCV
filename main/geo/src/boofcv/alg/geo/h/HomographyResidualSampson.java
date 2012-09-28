@@ -18,8 +18,8 @@
 
 package boofcv.alg.geo.h;
 
-import boofcv.alg.geo.AssociatedPair;
 import boofcv.alg.geo.ModelObservationResidualN;
+import boofcv.struct.geo.AssociatedPair;
 import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Point2D_F64;
 import org.ejml.data.DenseMatrix64F;

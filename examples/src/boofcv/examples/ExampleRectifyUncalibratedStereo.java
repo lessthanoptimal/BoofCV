@@ -20,7 +20,6 @@ package boofcv.examples;
 
 import boofcv.alg.distort.DistortImageOps;
 import boofcv.alg.distort.ImageDistort;
-import boofcv.alg.geo.AssociatedPair;
 import boofcv.alg.geo.RectifyImageOps;
 import boofcv.alg.geo.rectify.RectifyFundamental;
 import boofcv.alg.sfm.robust.DistanceAffine2D;
@@ -32,6 +31,7 @@ import boofcv.gui.stereo.RectifiedPairPanel;
 import boofcv.io.image.UtilImageIO;
 import boofcv.numerics.fitting.modelset.ModelMatcher;
 import boofcv.numerics.fitting.modelset.ransac.Ransac;
+import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.MultiSpectral;
 import georegression.struct.affine.Affine2D_F64;

@@ -20,8 +20,8 @@ package boofcv.abst.geo.pose;
 
 import boofcv.abst.geo.PerspectiveNPoint;
 import boofcv.abst.geo.RefinePerspectiveNPoint;
-import boofcv.alg.geo.PointPositionPair;
 import boofcv.alg.geo.pose.PnPLepetitEPnP;
+import boofcv.struct.geo.PointPositionPair;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;

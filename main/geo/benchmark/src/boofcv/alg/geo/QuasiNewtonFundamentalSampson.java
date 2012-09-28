@@ -23,6 +23,7 @@ import boofcv.alg.geo.f.ParamFundamentalEpipolar;
 import boofcv.numerics.fitting.modelset.ModelCodec;
 import boofcv.numerics.optimization.FactoryOptimization;
 import boofcv.numerics.optimization.UnconstrainedMinimization;
+import boofcv.struct.geo.AssociatedPair;
 import org.ejml.data.DenseMatrix64F;
 
 import java.util.List;

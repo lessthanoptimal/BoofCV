@@ -18,7 +18,7 @@
 
 package boofcv.abst.geo;
 
-import boofcv.alg.geo.AssociatedPair;
+import boofcv.struct.geo.AssociatedPair;
 import org.ejml.data.DenseMatrix64F;
 
 import java.util.List;

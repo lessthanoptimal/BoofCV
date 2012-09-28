@@ -61,7 +61,7 @@ public class CommonTriangulationChecks {
 				tranWtoI.getT().set(0.2+rand.nextGaussian()*0.1, rand.nextGaussian()*0.1, rand.nextGaussian()*0.01);
 			}
 
-			DenseMatrix64F E = MultiViewOps.computeEssential(tranWtoI.getR(), tranWtoI.getT());
+			DenseMatrix64F E = MultiViewOps.createEssential(tranWtoI.getR(), tranWtoI.getT());
 
 			SePointOps_F64.transform(tranWtoI, worldPoint,cameraPoint);
 			

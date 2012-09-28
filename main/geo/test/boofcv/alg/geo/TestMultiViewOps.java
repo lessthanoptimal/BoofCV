@@ -60,7 +60,6 @@ public class TestMultiViewOps {
 	// trifocal tensor for these views
 	TrifocalTensor tensor;
 
-
 	public TestMultiViewOps() {
 		se2 = new Se3_F64();
 		se3 = new Se3_F64();
@@ -75,10 +74,10 @@ public class TestMultiViewOps {
 		P3 = PerspectiveOps.createCameraMatrix(se3.R, se3.T, K, null);
 		tensor = MultiViewOps.createTrifocal(P2, P3, null);
 
-		F2 = MultiViewOps.computeEssential(se2.getR(), se2.getT());
-		F2 = MultiViewOps.computeFundamental(F2, K);
-		F3 = MultiViewOps.computeEssential(se3.getR(), se3.getT());
-		F3 = MultiViewOps.computeFundamental(F3, K);
+		F2 = MultiViewOps.createEssential(se2.getR(), se2.getT());
+		F2 = MultiViewOps.createFundamental(F2, K);
+		F3 = MultiViewOps.createEssential(se3.getR(), se3.getT());
+		F3 = MultiViewOps.createFundamental(F3, K);
 	}
 
 	/**
@@ -104,27 +103,27 @@ public class TestMultiViewOps {
 	}
 
 	@Test
-	public void constraintTrifocal_lll() {
+	public void constraint_Trifocal_lll() {
 		fail("implement");
 	}
 
 	@Test
-	public void constraintTrifocal_pll() {
+	public void constraint_Trifocal_pll() {
 		fail("implement");
 	}
 
 	@Test
-	public void constraintTrifocal_plp() {
+	public void constraint_Trifocal_plp() {
 		fail("implement");
 	}
 
 	@Test
-	public void constraintTrifocal_ppl() {
+	public void constraint_Trifocal_ppl() {
 		fail("implement");
 	}
 
 	@Test
-	public void constraintTrifocal_ppp() {
+	public void constraint_Trifocal_ppp() {
 		// Point in 3D space being observed
 		Point3D_F64 X = new Point3D_F64(0.1,0.5,3);
 
@@ -144,13 +143,26 @@ public class TestMultiViewOps {
 		GeometryMath_F64.mult(K,p3,p3);
 
 		// check the constraint
-		DenseMatrix64F A = MultiViewOps.constraintTrifocal(tensor,p1,p2,p3,null);
+		DenseMatrix64F A = MultiViewOps.constraint(tensor, p1, p2, p3, null);
 
 		for( int i = 0; i < 3; i++ ) {
 			for( int j = 0; j < 3; j++ ) {
 				assertEquals(0,A.get(i,j),1e-7);
 			}
 		}
+	}
+
+	@Test
+	public void constraint_epipolar() {
+		Point3D_F64 X = new Point3D_F64(0.1,-0.05,2);
+
+		Point2D_F64 p1 = PerspectiveOps.renderPixel(new Se3_F64(),K,X);
+		Point2D_F64 p2 = PerspectiveOps.renderPixel(se2,K,X);
+
+		DenseMatrix64F E = MultiViewOps.createEssential(se2.R,se2.T);
+		DenseMatrix64F F = MultiViewOps.createFundamental(E, K);
+
+		assertEquals(0,MultiViewOps.constraint(F,p1,p2),1e-8);
 	}
 
 	@Test
@@ -178,10 +190,6 @@ public class TestMultiViewOps {
 
 	@Test
 	public void extractFundamental_threeview() {
-		DenseMatrix64F P2 = PerspectiveOps.createCameraMatrix(se2.R, se2.T, null, null);
-		DenseMatrix64F P3 = PerspectiveOps.createCameraMatrix(se3.R, se3.T, null, null);
-		TrifocalTensor tensor = MultiViewOps.createTrifocal(P2, P3, null);
-
 		DenseMatrix64F found2 = new DenseMatrix64F(3,3);
 		DenseMatrix64F found3 = new DenseMatrix64F(3,3);
 
@@ -197,12 +205,13 @@ public class TestMultiViewOps {
 
 		Point3D_F64 X = new Point3D_F64(0.1,0.05,2);
 
+		// remember the first view is assumed to have a projection matrix of [I|0]
 		Point2D_F64 x1 = PerspectiveOps.renderPixel(new Se3_F64(), null, X);
-		Point2D_F64 x2 = PerspectiveOps.renderPixel(se2, null, X);
-		Point2D_F64 x3 = PerspectiveOps.renderPixel(se3, null, X);
+		Point2D_F64 x2 = PerspectiveOps.renderPixel(se2, K, X);
+		Point2D_F64 x3 = PerspectiveOps.renderPixel(se3, K, X);
 
-		assertEquals(0, GeometryMath_F64.innerProd(x2, found2, x1), 1e-8);
-		assertEquals(0, GeometryMath_F64.innerProd(x3, found3, x1), 1e-8);
+		assertEquals(0, MultiViewOps.constraint(found2, x1, x2), 1e-8);
+		assertEquals(0, MultiViewOps.constraint(found3, x1, x3), 1e-8);
 	}
 
 	@Test
@@ -226,7 +235,7 @@ public class TestMultiViewOps {
 
 		// validate correctness by testing a constraint on the points
 		DenseMatrix64F A = new DenseMatrix64F(3,3);
-		MultiViewOps.constraintTrifocal(tensor,x1,x2,x3,A);
+		MultiViewOps.constraint(tensor, x1, x2, x3, A);
 
 		for( int i = 0; i < 3; i++ ) {
 			for( int j = 0; j < 3; j++ ) {
@@ -236,19 +245,18 @@ public class TestMultiViewOps {
 	}
 
 	@Test
-	public void computeEssential() {
+	public void createEssential() {
 		DenseMatrix64F R = RotationMatrixGenerator.eulerXYZ(0.05, -0.04, 0.1, null);
 		Vector3D_F64 T = new Vector3D_F64(2,1,-3);
 		T.normalize();
 
-		DenseMatrix64F E = MultiViewOps.computeEssential(R, T);
+		DenseMatrix64F E = MultiViewOps.createEssential(R, T);
 
 		// Test using the following theorem:  x2^T*E*x1 = 0
-		Point3D_F64 P = new Point3D_F64(0.1,0.1,2);
+		Point3D_F64 X = new Point3D_F64(0.1,0.1,2);
 
-		Point2D_F64 x0 = new Point2D_F64(P.x/P.z,P.y/P.z);
-		SePointOps_F64.transform(new Se3_F64(R,T),P,P);
-		Point2D_F64 x1 = new Point2D_F64(P.x/P.z,P.y/P.z);
+		Point2D_F64 x0 = PerspectiveOps.renderPixel(new Se3_F64(),null,X);
+		Point2D_F64 x1 = PerspectiveOps.renderPixel(new Se3_F64(R,T),null,X);
 
 		double val = GeometryMath_F64.innerProd(x1,E,x0);
 		assertEquals(0,val,1e-8);
@@ -256,18 +264,25 @@ public class TestMultiViewOps {
 
 	@Test
 	public void computeFundamental() {
-		fail("implement");
+		DenseMatrix64F E = MultiViewOps.createEssential(se2.R, se2.T);
+		DenseMatrix64F F = MultiViewOps.createFundamental(E, K);
+
+		Point3D_F64 X = new Point3D_F64(0.1,-0.1,2.5);
+		Point2D_F64 p1 = PerspectiveOps.renderPixel(new Se3_F64(),K,X);
+		Point2D_F64 p2 = PerspectiveOps.renderPixel(se2,K,X);
+
+		assertEquals(0,MultiViewOps.constraint(F,p1,p2),1e-8);
 	}
 
 	@Test
-	public void computeHomography_calibrated() {
+	public void createHomography_calibrated() {
 		DenseMatrix64F R = RotationMatrixGenerator.eulerXYZ(0.1,-0.01,0.2, null);
 		Vector3D_F64 T = new Vector3D_F64(1,1,0.1);
 		T.normalize();
 		double d = 2;
 		Vector3D_F64 N = new Vector3D_F64(0,0,1);
 
-		DenseMatrix64F H = MultiViewOps.computeHomography(R, T, d, N);
+		DenseMatrix64F H = MultiViewOps.createHomography(R, T, d, N);
 
 		// Test using the following theorem:  x2 = H*x1
 		Point3D_F64 P = new Point3D_F64(0.1,0.1,d); // a point on the plane
@@ -283,7 +298,7 @@ public class TestMultiViewOps {
 	}
 
 	@Test
-	public void computeHomography_uncalibrated() {
+	public void createHomography_uncalibrated() {
 		DenseMatrix64F K = new DenseMatrix64F(3,3,true,0.1,0.001,200,0,0.2,250,0,0,1);
 		DenseMatrix64F R = RotationMatrixGenerator.eulerXYZ(0.1,-0.01,0.2, null);
 		Vector3D_F64 T = new Vector3D_F64(1,1,0.1);
@@ -291,7 +306,7 @@ public class TestMultiViewOps {
 		double d = 2;
 		Vector3D_F64 N = new Vector3D_F64(0,0,1);
 
-		DenseMatrix64F H = MultiViewOps.computeHomography(R, T, d, N, K);
+		DenseMatrix64F H = MultiViewOps.createHomography(R, T, d, N, K);
 
 		// Test using the following theorem:  x2 = H*x1
 		Point3D_F64 P = new Point3D_F64(0.1,0.1,d); // a point on the plane
@@ -313,7 +328,7 @@ public class TestMultiViewOps {
 		DenseMatrix64F R = RotationMatrixGenerator.eulerXYZ(1,2,-0.5,null);
 		Vector3D_F64 T = new Vector3D_F64(0.5,0.7,-0.3);
 
-		DenseMatrix64F E = MultiViewOps.computeEssential(R, T);
+		DenseMatrix64F E = MultiViewOps.createEssential(R, T);
 
 		assertTrue(NormOps.normF(E)!=0);
 
@@ -337,8 +352,8 @@ public class TestMultiViewOps {
 		DenseMatrix64F R = RotationMatrixGenerator.eulerXYZ(1,2,-0.5,null);
 		Vector3D_F64 T = new Vector3D_F64(0.5,0.7,-0.3);
 
-		DenseMatrix64F E = MultiViewOps.computeEssential(R, T);
-		DenseMatrix64F F = MultiViewOps.computeFundamental(E, K);
+		DenseMatrix64F E = MultiViewOps.createEssential(R, T);
+		DenseMatrix64F F = MultiViewOps.createFundamental(E, K);
 
 		Point3D_F64 e1 = new Point3D_F64();
 		Point3D_F64 e2 = new Point3D_F64();

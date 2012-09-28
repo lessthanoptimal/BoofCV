@@ -18,12 +18,12 @@
 
 package boofcv.alg.geo.f;
 
-import boofcv.alg.geo.AssociatedPair;
 import boofcv.numerics.solver.Polynomial;
 import boofcv.numerics.solver.PolynomialRoots;
 import boofcv.numerics.solver.impl.FindRealRootsSturm;
 import boofcv.numerics.solver.impl.WrapRealRootsSturm;
 import boofcv.struct.FastQueue;
+import boofcv.struct.geo.AssociatedPair;
 import georegression.struct.point.Point2D_F64;
 import org.ejml.data.Complex64F;
 import org.ejml.data.DenseMatrix64F;

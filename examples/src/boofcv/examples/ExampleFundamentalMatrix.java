@@ -26,7 +26,6 @@ import boofcv.abst.geo.EpipolarMatrixEstimator;
 import boofcv.abst.geo.RefineEpipolarMatrix;
 import boofcv.abst.geo.fitting.DistanceFromModelResidual;
 import boofcv.abst.geo.fitting.GenerateEpipolarMatrix;
-import boofcv.alg.geo.AssociatedPair;
 import boofcv.alg.geo.f.FundamentalResidualSampson;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.feature.describe.FactoryDescribeRegionPoint;
@@ -41,6 +40,7 @@ import boofcv.numerics.fitting.modelset.ransac.Ransac;
 import boofcv.struct.FastQueue;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.SurfFeature;
+import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.image.ImageFloat32;
 import org.ejml.data.DenseMatrix64F;
 

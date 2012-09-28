@@ -20,6 +20,7 @@ package boofcv.alg.geo;
 
 import boofcv.numerics.fitting.modelset.ModelCodec;
 import boofcv.numerics.optimization.functions.FunctionNtoS;
+import boofcv.struct.geo.AssociatedPair;
 import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Point3D_F64;
 import org.ejml.data.DenseMatrix64F;

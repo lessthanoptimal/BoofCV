@@ -19,8 +19,8 @@
 package boofcv.abst.geo.h;
 
 import boofcv.abst.geo.EpipolarMatrixEstimator;
-import boofcv.alg.geo.AssociatedPair;
 import boofcv.alg.geo.h.HomographyLinear4;
+import boofcv.struct.geo.AssociatedPair;
 import org.ejml.data.DenseMatrix64F;
 
 import java.util.List;

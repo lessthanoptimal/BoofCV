@@ -19,8 +19,8 @@
 package boofcv.alg.geo.h;
 
 
-import boofcv.alg.geo.AssociatedPair;
 import boofcv.alg.geo.PerspectiveOps;
+import boofcv.struct.geo.AssociatedPair;
 import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Point2D_F64;
 import org.ejml.data.DenseMatrix64F;
@@ -104,7 +104,7 @@ public class HomographyLinear4 {
 			throw new IllegalArgumentException("Must be at least 4 points.");
 
 		if( normalize ) {
-			PerspectiveOps.computeNormalization(N1, N2, points);
+			PerspectiveOps.computeNormalization(points, N1, N2);
 
 			createANormalized(points, A);
 		} else {
@@ -209,8 +209,8 @@ public class HomographyLinear4 {
 			Point2D_F64 s = p.currLoc;
 
 			// normalize the points
-			PerspectiveOps.pixelToNormalized(f, f_norm, N1);
-			PerspectiveOps.pixelToNormalized(s, s_norm, N2);
+			PerspectiveOps.pixelToNormalized(N1, f, f_norm);
+			PerspectiveOps.pixelToNormalized(N2, s, s_norm);
 
 			A.set(i*2   , 3 , -f_norm.x);
 			A.set(i*2   , 4 , -f_norm.y);

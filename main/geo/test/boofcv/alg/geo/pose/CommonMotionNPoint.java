@@ -18,10 +18,10 @@
 
 package boofcv.alg.geo.pose;
 
-import boofcv.alg.geo.AssociatedPair;
 import boofcv.alg.geo.GeoTestingOps;
-import boofcv.alg.geo.PointPositionPair;
 import boofcv.alg.geo.h.CommonHomographyChecks;
+import boofcv.struct.geo.AssociatedPair;
+import boofcv.struct.geo.PointPositionPair;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;

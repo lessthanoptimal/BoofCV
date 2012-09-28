@@ -18,10 +18,10 @@
 
 package boofcv.abst.geo.optimization;
 
-import boofcv.alg.geo.AssociatedPair;
 import boofcv.alg.geo.ModelObservationResidual;
 import boofcv.numerics.fitting.modelset.ModelCodec;
 import boofcv.numerics.optimization.functions.FunctionNtoM;
+import boofcv.struct.geo.AssociatedPair;
 import org.ejml.data.DenseMatrix64F;
 
 import java.util.List;

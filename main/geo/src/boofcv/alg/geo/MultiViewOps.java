@@ -20,6 +20,7 @@ package boofcv.alg.geo;
 
 import boofcv.struct.geo.TrifocalTensor;
 import georegression.geometry.GeometryMath_F64;
+import georegression.geometry.UtilTrig_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Vector3D_F64;
@@ -65,8 +66,11 @@ public class MultiViewOps {
 
 			int index = 0;
 			for( int i = 0; i < 3; i++ ) {
+				double a_left = P2.get(i,col);
+				double a_right = P2.get(i,3);
+
 				for( int j = 0; j < 3; j++ ) {
-					T.data[index++] = P2.get(i,col)*P3.get(j,3) - P2.get(i,3)*P3.get(j,col);
+					T.data[index++] = a_left*P3.get(j,3) - a_right*P3.get(j,col);
 				}
 			}
 		}
@@ -87,9 +91,9 @@ public class MultiViewOps {
 	 * @param ret Storage for output.  If null a new instance will be declared.
 	 * @return Result of applying the constraint.  With perfect inputs will be zero.
 	 */
-	public static Vector3D_F64 constraintTrifocal( TrifocalTensor tensor ,
-												   Vector3D_F64 l1 , Vector3D_F64 l2 , Vector3D_F64 l3 ,
-												   Vector3D_F64 ret )
+	public static Vector3D_F64 constraint(TrifocalTensor tensor,
+										  Vector3D_F64 l1, Vector3D_F64 l2, Vector3D_F64 l3,
+										  Vector3D_F64 ret)
 	{
 		if( ret == null )
 			ret = new Vector3D_F64();
@@ -115,8 +119,8 @@ public class MultiViewOps {
 	 * @param l3 A line in the third view.
 	 * @return Result of applying the constraint.  With perfect inputs will be zero.
 	 */
-	public static double constraintTrifocal( TrifocalTensor tensor ,
-											 Point2D_F64 p1 , Vector3D_F64 l2 , Vector3D_F64 l3 )
+	public static double constraint(TrifocalTensor tensor,
+									Point2D_F64 p1, Vector3D_F64 l2, Vector3D_F64 l3)
 	{
 		DenseMatrix64F sum = new DenseMatrix64F(3,3);
 
@@ -139,9 +143,9 @@ public class MultiViewOps {
 	 * @param p3 A point in the third view.
 	 * @return Result of applying the constraint.  With perfect inputs will be zero.
 	 */
-	public static Vector3D_F64 constraintTrifocal( TrifocalTensor tensor ,
-												   Point2D_F64 p1 , Vector3D_F64 l2 , Point2D_F64 p3 ,
-												   Vector3D_F64 ret )
+	public static Vector3D_F64 constraint(TrifocalTensor tensor,
+										  Point2D_F64 p1, Vector3D_F64 l2, Point2D_F64 p3,
+										  Vector3D_F64 ret)
 	{
 		if( ret == null )
 			ret = new Vector3D_F64();
@@ -172,9 +176,9 @@ public class MultiViewOps {
 	 * @param l3 A line in the third view.
 	 * @return Result of applying the constraint.  With perfect inputs will be zero.
 	 */
-	public static Vector3D_F64 constraintTrifocal( TrifocalTensor tensor ,
-												   Point2D_F64 p1 , Point2D_F64 p2 , Vector3D_F64 l3 ,
-												   Vector3D_F64 ret )
+	public static Vector3D_F64 constraint(TrifocalTensor tensor,
+										  Point2D_F64 p1, Point2D_F64 p2, Vector3D_F64 l3,
+										  Vector3D_F64 ret)
 	{
 		if( ret == null )
 			ret = new Vector3D_F64();
@@ -208,9 +212,9 @@ public class MultiViewOps {
 	 * @param ret Optional storage for output. 3x3 matrix.  Modified.
 	 * @return Result of applying the constraint.  With perfect inputs will be zero.
 	 */
-	public static DenseMatrix64F constraintTrifocal( TrifocalTensor tensor ,
-													 Point2D_F64 p1 , Point2D_F64 p2 , Point2D_F64 p3 ,
-													 DenseMatrix64F ret )
+	public static DenseMatrix64F constraint(TrifocalTensor tensor,
+											Point2D_F64 p1, Point2D_F64 p2, Point2D_F64 p3,
+											DenseMatrix64F ret)
 	{
 		if( ret == null )
 			ret = new DenseMatrix64F(3,3);
@@ -229,6 +233,23 @@ public class MultiViewOps {
 		CommonOps.mult(temp, cross3, ret);
 
 		return ret;
+	}
+
+	/**
+	 * <p>
+	 * Applies the epipolar relationship constraint to an essential or fundamental matrix:<br>
+	 * 0 = p2<sup>T</sup>*F*p1<br>
+	 * Input points are in normalized image coordinates for an essential matrix and pixels for
+	 * fundamental.
+	 * </p>
+	 *
+	 * @param F 3x3 essential or fundamental matrix.
+	 * @param p1 Point in view 1.
+	 * @param p2 Point in view 1.
+	 * @return  Constraint value.
+	 */
+	public static double constraint( DenseMatrix64F F , Point2D_F64 p1, Point2D_F64 p2 ) {
+		return GeometryMath_F64.innerProd(p2,F,p1);
 	}
 
 	/**
@@ -300,8 +321,15 @@ public class MultiViewOps {
 	}
 
 	/**
+	 * <p>
 	 * Extract the fundamental matrices between views 1 + 2 and views 1 + 3.  The returned Fundamental
 	 * matrices will have the following properties: x<sub>i</sub><sup>T</sup>*Fi*x<sub>1</sub> = 0, where i is view 2 or 3.
+	 * </p>
+	 *
+	 * <p>
+	 * NOTE: The first camera is assumed to have the camera matrix of P1 = [I|0].  Thus observations in pixels for
+	 * the first camera will not meet the epipolar constraint.
+	 * </p>
 	 *
 	 * @param tensor Trifocal tensor.  Not modified.
 	 * @param F2 Output: Fundamental matrix for views 1 and 2. Modified.
@@ -313,6 +341,9 @@ public class MultiViewOps {
 		Point3D_F64 e3 = new Point3D_F64();
 
 		extractEpipoles(tensor, e2, e3);
+
+		UtilTrig_F64.normalize(e2);
+		UtilTrig_F64.normalize(e3);
 
 		// storage for intermediate results
 		Point3D_F64 temp0 = new Point3D_F64();
@@ -339,8 +370,13 @@ public class MultiViewOps {
 	}
 
 	/**
-	 * Extract the camera matrices up to a common projective transform.  The camera matrix for the
-	 * first view is assumed to be P1 = [I|0].
+	 * <p>
+	 * Extract the camera matrices up to a common projective transform.
+	 * </p>
+	 *
+	 * <p>
+	 * NOTE: The camera matrix for the first view is assumed to be P1 = [I|0].
+	 * </p>
 	 *
 	 * @param tensor Trifocal tensor.  Not modified.
 	 * @param P2 Output: 3x4 camera matrix for views 1 to 2. Modified.
@@ -352,6 +388,9 @@ public class MultiViewOps {
 		Point3D_F64 e3 = new Point3D_F64();
 
 		extractEpipoles(tensor, e2, e3);
+
+		UtilTrig_F64.normalize(e2);
+		UtilTrig_F64.normalize(e3);
 
 		// storage for intermediate results
 		Point3D_F64 temp0 = new Point3D_F64();
@@ -398,7 +437,7 @@ public class MultiViewOps {
 	 * @param T Translation vector.
 	 * @return Essential matrix
 	 */
-	public static DenseMatrix64F computeEssential( DenseMatrix64F R , Vector3D_F64 T )
+	public static DenseMatrix64F createEssential(DenseMatrix64F R, Vector3D_F64 T)
 	{
 		DenseMatrix64F E = new DenseMatrix64F(3,3);
 
@@ -412,10 +451,10 @@ public class MultiViewOps {
 	 * Computes a Fundamental matrix given an Essential matrix and the camera calibration matrix.
 	 *
 	 * @param E Essential matrix
-	 * @param K Intrinsic camera calibration matirx
+	 * @param K Intrinsic camera calibration matrix
 	 * @return Fundamental matrix
 	 */
-	public static DenseMatrix64F computeFundamental( DenseMatrix64F E , DenseMatrix64F K ) {
+	public static DenseMatrix64F createFundamental(DenseMatrix64F E, DenseMatrix64F K) {
 		DenseMatrix64F K_inv = new DenseMatrix64F(3,3);
 		CommonOps.invert(K,K_inv);
 
@@ -440,8 +479,8 @@ public class MultiViewOps {
 	 * @param N Normal of plane
 	 * @return Calibrated homography matrix
 	 */
-	public static DenseMatrix64F computeHomography( DenseMatrix64F R , Vector3D_F64 T ,
-													double d , Vector3D_F64 N )
+	public static DenseMatrix64F createHomography(DenseMatrix64F R, Vector3D_F64 T,
+												  double d, Vector3D_F64 N)
 	{
 		DenseMatrix64F H = new DenseMatrix64F(3,3);
 
@@ -466,14 +505,14 @@ public class MultiViewOps {
 	 * @param K Intrinsic calibration matrix
 	 * @return Uncalibrated homography matrix
 	 */
-	public static DenseMatrix64F computeHomography( DenseMatrix64F R , Vector3D_F64 T ,
-													double d , Vector3D_F64 N ,
-													DenseMatrix64F K )
+	public static DenseMatrix64F createHomography(DenseMatrix64F R, Vector3D_F64 T,
+												  double d, Vector3D_F64 N,
+												  DenseMatrix64F K)
 	{
 		DenseMatrix64F temp = new DenseMatrix64F(3,3);
 		DenseMatrix64F K_inv = new DenseMatrix64F(3,3);
 
-		DenseMatrix64F H = computeHomography(R,T,d,N);
+		DenseMatrix64F H = createHomography(R, T, d, N);
 
 		// apply calibration matrix to R
 		CommonOps.mult(K,H,temp);
@@ -496,7 +535,7 @@ public class MultiViewOps {
 	 * Right: F*e<sub>1</sub> = 0
 	 * </p>
 	 *
-	 * @param F Fundamental or Essential 3x3 matrix.  Not modified.
+	 * @param F Input: Fundamental or Essential 3x3 matrix.  Not modified.
 	 * @param e1 Output: Right epipole in homogeneous coordinates, Modified.
 	 * @param e2 Output: Left epipole in homogeneous coordinates, Modified.
 	 */

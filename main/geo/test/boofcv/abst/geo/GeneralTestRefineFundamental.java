@@ -41,7 +41,7 @@ public abstract class GeneralTestRefineFundamental extends EpipolarTestSimulatio
 		init(30,false);
 
 		// compute true essential matrix
-		DenseMatrix64F E = MultiViewOps.computeEssential(motion.getR(), motion.getT());
+		DenseMatrix64F E = MultiViewOps.createEssential(motion.getR(), motion.getT());
 
 		RefineEpipolarMatrix alg = createAlgorithm();
 
@@ -62,12 +62,12 @@ public abstract class GeneralTestRefineFundamental extends EpipolarTestSimulatio
 		init(30,false);
 
 		// compute true essential matrix
-		DenseMatrix64F E = MultiViewOps.computeEssential(motion.getR(), motion.getT());
+		DenseMatrix64F E = MultiViewOps.createEssential(motion.getR(), motion.getT());
 
 		// create an alternative incorrect matrix
 		Vector3D_F64 T = motion.getT().copy();
 		T.x += 0.1;
-		DenseMatrix64F Emod = MultiViewOps.computeEssential(motion.getR(), T);
+		DenseMatrix64F Emod = MultiViewOps.createEssential(motion.getR(), T);
 
 		RefineEpipolarMatrix alg = createAlgorithm();
 

@@ -18,8 +18,8 @@
 
 package boofcv.alg.geo.f;
 
-import boofcv.alg.geo.AssociatedPair;
 import boofcv.alg.geo.MultiViewOps;
+import boofcv.struct.geo.AssociatedPair;
 import org.ejml.data.DenseMatrix64F;
 import org.junit.Test;
 
@@ -40,7 +40,7 @@ public class TestFundamentalResidualSimple extends EpipolarTestSimulation {
 		init(30,false);
 
 		// compute true essential matrix
-		DenseMatrix64F E = MultiViewOps.computeEssential(motion.getR(), motion.getT());
+		DenseMatrix64F E = MultiViewOps.createEssential(motion.getR(), motion.getT());
 
 
 		FundamentalResidualSimple alg = new FundamentalResidualSimple();

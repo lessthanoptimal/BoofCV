@@ -46,7 +46,7 @@ public class TestDecomposeHomography {
 
 	@Test
 	public void checkAgainstKnown() {
-		DenseMatrix64F H = MultiViewOps.computeHomography(R, T, d, N);
+		DenseMatrix64F H = MultiViewOps.createHomography(R, T, d, N);
 
 		DecomposeHomography alg = new DecomposeHomography();
 
@@ -67,7 +67,7 @@ public class TestDecomposeHomography {
 	 */
 	@Test
 	public void multipleCalls() {
-		DenseMatrix64F H = MultiViewOps.computeHomography(R, T, d, N);
+		DenseMatrix64F H = MultiViewOps.createHomography(R, T, d, N);
 
 		DecomposeHomography alg = new DecomposeHomography();
 		// call it twice and see if things break

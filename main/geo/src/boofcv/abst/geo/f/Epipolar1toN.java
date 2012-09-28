@@ -20,7 +20,7 @@ package boofcv.abst.geo.f;
 
 import boofcv.abst.geo.EpipolarMatrixEstimator;
 import boofcv.abst.geo.EpipolarMatrixEstimatorN;
-import boofcv.alg.geo.AssociatedPair;
+import boofcv.struct.geo.AssociatedPair;
 import org.ejml.data.DenseMatrix64F;
 
 import java.util.ArrayList;
