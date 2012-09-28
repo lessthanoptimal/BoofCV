@@ -18,7 +18,7 @@
 
 package boofcv.abst.geo;
 
-import boofcv.alg.geo.PointPositionPair;
+import boofcv.struct.geo.PointPositionPair;
 import georegression.struct.se.Se3_F64;
 
 import java.util.List;

@@ -18,8 +18,8 @@
 
 package boofcv.alg.geo.h;
 
-import boofcv.alg.geo.AssociatedPair;
 import boofcv.alg.geo.ModelObservationResidualN;
+import boofcv.struct.geo.AssociatedPair;
 import org.ejml.data.DenseMatrix64F;
 import org.junit.Test;
 

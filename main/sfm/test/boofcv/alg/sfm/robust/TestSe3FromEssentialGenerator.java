@@ -2,9 +2,9 @@ package boofcv.alg.sfm.robust;
 
 import boofcv.abst.geo.EpipolarMatrixEstimator;
 import boofcv.abst.geo.TriangulateTwoViewsCalibrated;
-import boofcv.alg.geo.AssociatedPair;
 import boofcv.factory.geo.FactoryEpipolar;
 import boofcv.factory.geo.FactoryTriangulate;
+import boofcv.struct.geo.AssociatedPair;
 import georegression.geometry.RotationMatrixGenerator;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;

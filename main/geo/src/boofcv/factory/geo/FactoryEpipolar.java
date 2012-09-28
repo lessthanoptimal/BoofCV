@@ -26,7 +26,6 @@ import boofcv.abst.geo.h.LeastSquaresHomography;
 import boofcv.abst.geo.h.WrapHomographyLinear;
 import boofcv.abst.geo.pose.LeastSquaresPose;
 import boofcv.abst.geo.pose.WrapPnPLepetitEPnP;
-import boofcv.alg.geo.AssociatedPair;
 import boofcv.alg.geo.ModelObservationResidualN;
 import boofcv.alg.geo.h.HomographyLinear4;
 import boofcv.alg.geo.h.HomographyResidualSampson;
@@ -34,6 +33,7 @@ import boofcv.alg.geo.h.HomographyResidualTransfer;
 import boofcv.alg.geo.pose.PnPLepetitEPnP;
 import boofcv.alg.geo.pose.PoseRodriguesCodec;
 import boofcv.numerics.fitting.modelset.ModelGenerator;
+import boofcv.struct.geo.AssociatedPair;
 import org.ejml.data.DenseMatrix64F;
 
 /**

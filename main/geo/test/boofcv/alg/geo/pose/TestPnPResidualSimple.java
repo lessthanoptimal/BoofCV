@@ -18,7 +18,7 @@
 
 package boofcv.alg.geo.pose;
 
-import boofcv.alg.geo.PointPositionPair;
+import boofcv.struct.geo.PointPositionPair;
 import georegression.geometry.RotationMatrixGenerator;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;

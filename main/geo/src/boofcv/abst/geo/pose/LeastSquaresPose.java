@@ -20,11 +20,11 @@ package boofcv.abst.geo.pose;
 
 import boofcv.abst.geo.RefinePerspectiveNPoint;
 import boofcv.abst.geo.optimization.ResidualsPoseMatrix;
-import boofcv.alg.geo.PointPositionPair;
 import boofcv.alg.geo.pose.PoseResidualsSimple;
 import boofcv.numerics.fitting.modelset.ModelCodec;
 import boofcv.numerics.optimization.FactoryOptimization;
 import boofcv.numerics.optimization.UnconstrainedLeastSquares;
+import boofcv.struct.geo.PointPositionPair;
 import georegression.struct.se.Se3_F64;
 
 import java.util.List;

@@ -20,6 +20,7 @@ package boofcv.alg.geo;
 
 import boofcv.abst.geo.PerspectiveNPoint;
 import boofcv.factory.geo.FactoryEpipolar;
+import boofcv.struct.geo.PointPositionPair;
 import georegression.geometry.RotationMatrixGenerator;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;

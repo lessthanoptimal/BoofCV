@@ -18,9 +18,9 @@
 
 package boofcv.alg.sfm.robust;
 
-import boofcv.alg.geo.AssociatedPair;
 import boofcv.numerics.fitting.modelset.ModelFitter;
 import boofcv.numerics.fitting.modelset.ModelGenerator;
+import boofcv.struct.geo.AssociatedPair;
 import georegression.struct.affine.Affine2D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.transform.affine.AffinePointOps;

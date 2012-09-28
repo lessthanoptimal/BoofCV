@@ -59,4 +59,9 @@ public class TrifocalTensor {
 		ret.T3.set(T3);
 		return ret;
 	}
+
+	@Override
+	public String toString() {
+		return "TrifocalTensor{\nT1 = "+T1+"\nT2 = "+T2+"\nT3 = "+T3+" }";
+	}
 }

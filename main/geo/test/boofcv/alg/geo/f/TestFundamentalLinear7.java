@@ -18,8 +18,7 @@
 
 package boofcv.alg.geo.f;
 
-import boofcv.alg.geo.AssociatedPair;
-import boofcv.numerics.solver.Polynomial;
+import boofcv.struct.geo.AssociatedPair;
 import org.ejml.data.DenseMatrix64F;
 import org.ejml.simple.SimpleMatrix;
 import org.junit.Test;
@@ -29,7 +28,6 @@ import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles

@@ -1,7 +1,7 @@
 package boofcv.alg.sfm.robust;
 
-import boofcv.alg.geo.PointPositionPair;
 import boofcv.numerics.fitting.modelset.DistanceFromModel;
+import boofcv.struct.geo.PointPositionPair;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Vector3D_F64;

@@ -1,8 +1,8 @@
 package boofcv.alg.sfm.robust;
 
 import boofcv.abst.geo.TriangulateTwoViewsCalibrated;
-import boofcv.alg.geo.AssociatedPair;
 import boofcv.factory.geo.FactoryTriangulate;
+import boofcv.struct.geo.AssociatedPair;
 import georegression.geometry.GeometryMath_F64;
 import georegression.geometry.RotationMatrixGenerator;
 import georegression.metric.ClosestPoint3D_F64;

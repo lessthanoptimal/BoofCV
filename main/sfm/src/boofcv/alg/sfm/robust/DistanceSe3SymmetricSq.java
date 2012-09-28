@@ -1,8 +1,8 @@
 package boofcv.alg.sfm.robust;
 
 import boofcv.abst.geo.TriangulateTwoViewsCalibrated;
-import boofcv.alg.geo.AssociatedPair;
 import boofcv.numerics.fitting.modelset.DistanceFromModel;
+import boofcv.struct.geo.AssociatedPair;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;

@@ -20,10 +20,6 @@ package boofcv.abst.geo.f;
 
 import boofcv.abst.geo.GeneralTestRefineFundamental;
 import boofcv.abst.geo.RefineEpipolarMatrix;
-import boofcv.alg.geo.AssociatedPair;
-import org.ejml.data.DenseMatrix64F;
-
-import java.util.List;
 
 /**
  * @author Peter Abeles

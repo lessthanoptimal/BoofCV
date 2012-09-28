@@ -20,7 +20,6 @@ package boofcv.alg.geo.d2;
 
 import boofcv.abst.feature.tracker.ImagePointTracker;
 import boofcv.abst.feature.tracker.PointTrack;
-import boofcv.alg.geo.AssociatedPair;
 import boofcv.alg.sfm.d2.ImageMotionPointKey;
 import boofcv.alg.sfm.d2.RenderImageMotion;
 import boofcv.alg.sfm.d2.UtilImageMotion;
@@ -40,6 +39,7 @@ import boofcv.numerics.fitting.modelset.ModelMatcher;
 import boofcv.numerics.fitting.modelset.ransac.Ransac;
 import boofcv.struct.FastQueue;
 import boofcv.struct.distort.PixelTransform_F32;
+import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.InvertibleTransform;

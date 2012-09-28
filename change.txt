@@ -19,6 +19,13 @@ Version : Alpha 0.11
   * RANSAC score has been deleted and RANSAC simplified
 - RectifyImageOps
   * Cleaned up function names and improved documentation
+- Reorganized functions in geometric vision package
+  * Created MultiViewOps and PerspetiveOps
+  * Refactored/deleted other related Util classes
+- Moved AssociatedPair and PointPositionPair to boofcv.struct.geo package
+- Trifocal Tensor
+  * Added related functions to MultiViewOps
+  * Added linear estimator for 7+ points
 
 ---------------------------------------------
 Date    : 2012/09/18

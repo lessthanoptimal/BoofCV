@@ -22,6 +22,7 @@ import boofcv.abst.geo.EpipolarMatrixEstimator;
 import boofcv.factory.geo.FactoryEpipolar;
 import boofcv.misc.Performer;
 import boofcv.misc.ProfileOperation;
+import boofcv.struct.geo.AssociatedPair;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -19,8 +19,8 @@
 package boofcv.abst.geo.fitting;
 
 import boofcv.abst.geo.PerspectiveNPoint;
-import boofcv.alg.geo.PointPositionPair;
 import boofcv.numerics.fitting.modelset.ModelGenerator;
+import boofcv.struct.geo.PointPositionPair;
 import georegression.struct.se.Se3_F64;
 
 import java.util.List;

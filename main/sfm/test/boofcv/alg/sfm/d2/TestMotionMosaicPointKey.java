@@ -18,7 +18,7 @@
 
 package boofcv.alg.sfm.d2;
 
-import boofcv.alg.geo.AssociatedPair;
+import boofcv.struct.geo.AssociatedPair;
 import org.junit.Test;
 
 import java.util.ArrayList;

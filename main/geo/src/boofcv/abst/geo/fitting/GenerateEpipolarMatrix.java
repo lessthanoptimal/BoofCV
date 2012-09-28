@@ -19,8 +19,8 @@
 package boofcv.abst.geo.fitting;
 
 import boofcv.abst.geo.EpipolarMatrixEstimator;
-import boofcv.alg.geo.AssociatedPair;
 import boofcv.numerics.fitting.modelset.ModelGenerator;
+import boofcv.struct.geo.AssociatedPair;
 import org.ejml.data.DenseMatrix64F;
 
 import java.util.List;

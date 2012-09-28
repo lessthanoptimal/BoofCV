@@ -18,13 +18,13 @@
 
 package boofcv.alg.geo.f;
 
-import boofcv.alg.geo.AssociatedPair;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.numerics.solver.Polynomial;
 import boofcv.numerics.solver.PolynomialRoots;
 import boofcv.numerics.solver.PolynomialSolver;
 import boofcv.numerics.solver.RootFinderType;
 import boofcv.struct.FastQueue;
+import boofcv.struct.geo.AssociatedPair;
 import org.ejml.data.Complex64F;
 import org.ejml.data.DenseMatrix64F;
 import org.ejml.ops.SpecializedOps;
@@ -50,6 +50,7 @@ import java.util.List;
  * <ul>
  * <li> R. Hartley, and A. Zisserman, "Multiple View Geometry in Computer Vision", 2nd Ed, Cambridge 2003 </li>
  * </ul>
+ * </p>
  *
  * @author Peter Abeles
  */
@@ -101,7 +102,7 @@ public class FundamentalLinear7 extends FundamentalLinear {
 		solutions.reset();
 
 		// must normalize for when points are in either pixel or calibrated units
-		PerspectiveOps.computeNormalization(N1, N2, points);
+		PerspectiveOps.computeNormalization(points, N1, N2);
 
 		// extract F1 and F2 from two null spaces
 		createA(points,A);

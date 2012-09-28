@@ -18,9 +18,9 @@
 
 package boofcv.alg.geo.rectify;
 
-import boofcv.alg.geo.AssociatedPair;
 import boofcv.alg.geo.GeoTestingOps;
 import boofcv.alg.geo.MultiViewOps;
+import boofcv.struct.geo.AssociatedPair;
 import georegression.geometry.GeometryMath_F64;
 import georegression.geometry.RotationMatrixGenerator;
 import georegression.struct.point.Point2D_F64;
@@ -114,8 +114,8 @@ public class TestRectifyFundamental {
 		motion.getR().set(RotationMatrixGenerator.eulerXYZ(-0.01, 0.1, 0.05, null));
 		motion.getT().set(-0.5,0.1,-0.05);
 
-		DenseMatrix64F E = MultiViewOps.computeEssential(motion.getR(), motion.getT());
-		F = MultiViewOps.computeFundamental(E, K);
+		DenseMatrix64F E = MultiViewOps.createEssential(motion.getR(), motion.getT());
+		F = MultiViewOps.createFundamental(E, K);
 
 		// randomly generate points in space
 		List<Point3D_F64> worldPts = GeoTestingOps.randomPoints_F64(-1, 1, -1, 1, 2, 3, N, rand);

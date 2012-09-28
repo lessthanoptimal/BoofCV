@@ -1,6 +1,6 @@
 package boofcv.alg.sfm.robust;
 
-import boofcv.alg.geo.PointPositionPair;
+import boofcv.struct.geo.PointPositionPair;
 import georegression.geometry.RotationMatrixGenerator;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;

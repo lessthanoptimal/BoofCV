@@ -18,7 +18,7 @@
 
 package boofcv.alg.geo.f;
 
-import boofcv.alg.geo.AssociatedPair;
+import boofcv.struct.geo.AssociatedPair;
 import georegression.geometry.GeometryMath_F64;
 import org.ejml.data.DenseMatrix64F;
 import org.ejml.ops.CommonOps;

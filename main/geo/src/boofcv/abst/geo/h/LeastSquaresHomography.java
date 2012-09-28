@@ -20,10 +20,10 @@ package boofcv.abst.geo.h;
 
 import boofcv.abst.geo.RefineEpipolarMatrix;
 import boofcv.abst.geo.optimization.ResidualsEpipolarMatrixN;
-import boofcv.alg.geo.AssociatedPair;
 import boofcv.alg.geo.ModelObservationResidualN;
 import boofcv.numerics.optimization.FactoryOptimization;
 import boofcv.numerics.optimization.UnconstrainedLeastSquares;
+import boofcv.struct.geo.AssociatedPair;
 import org.ejml.data.DenseMatrix64F;
 
 import java.util.List;

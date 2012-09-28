@@ -6,7 +6,9 @@ import boofcv.abst.geo.BundleAdjustmentCalibrated;
 import boofcv.abst.geo.RefineEpipolarMatrix;
 import boofcv.abst.geo.RefinePerspectiveNPoint;
 import boofcv.abst.geo.TriangulateTwoViewsCalibrated;
-import boofcv.alg.geo.*;
+import boofcv.alg.geo.DecomposeEssential;
+import boofcv.alg.geo.MultiViewOps;
+import boofcv.alg.geo.PositiveDepthConstraintCheck;
 import boofcv.alg.geo.bundle.CalibratedPoseAndPoint;
 import boofcv.alg.geo.bundle.PointIndexObservation;
 import boofcv.alg.geo.bundle.ViewPointObservations;
@@ -14,6 +16,8 @@ import boofcv.factory.geo.FactoryTriangulate;
 import boofcv.numerics.fitting.modelset.ModelMatcher;
 import boofcv.struct.FastQueue;
 import boofcv.struct.distort.PointTransform_F64;
+import boofcv.struct.geo.AssociatedPair;
+import boofcv.struct.geo.PointPositionPair;
 import boofcv.struct.image.ImageBase;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
@@ -224,7 +228,7 @@ public class MonocularSimpleVo<T extends ImageBase> {
 			System.out.println("    Essential inliers "+inliers.size()+"  out of "+active.size());
 
 			// TODO hack
-			DenseMatrix64F initialE = MultiViewOps.computeEssential(found.getR(), found.getT());
+			DenseMatrix64F initialE = MultiViewOps.createEssential(found.getR(), found.getT());
 
 			// refine E using non-linear optimization
 			if( refineE.process(initialE,inliers) ) {

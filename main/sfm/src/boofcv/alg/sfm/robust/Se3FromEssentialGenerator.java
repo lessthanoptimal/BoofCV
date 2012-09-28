@@ -2,10 +2,10 @@ package boofcv.alg.sfm.robust;
 
 import boofcv.abst.geo.EpipolarMatrixEstimator;
 import boofcv.abst.geo.TriangulateTwoViewsCalibrated;
-import boofcv.alg.geo.AssociatedPair;
 import boofcv.alg.geo.DecomposeEssential;
 import boofcv.alg.geo.PositiveDepthConstraintCheck;
 import boofcv.numerics.fitting.modelset.ModelGenerator;
+import boofcv.struct.geo.AssociatedPair;
 import georegression.struct.se.Se3_F64;
 import org.ejml.data.DenseMatrix64F;
 

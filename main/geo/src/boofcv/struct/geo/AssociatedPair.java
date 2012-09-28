@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.geo;
+package boofcv.struct.geo;
 
 import georegression.struct.point.Point2D_F64;
 

@@ -2,9 +2,9 @@ package boofcv.alg.sfm;
 
 import boofcv.abst.feature.tracker.KeyFramePointTracker;
 import boofcv.abst.geo.TriangulateTwoViewsCalibrated;
-import boofcv.alg.geo.AssociatedPair;
 import boofcv.factory.geo.FactoryTriangulate;
 import boofcv.numerics.fitting.modelset.ModelMatcher;
+import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.image.ImageBase;
 import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Point2D_F64;

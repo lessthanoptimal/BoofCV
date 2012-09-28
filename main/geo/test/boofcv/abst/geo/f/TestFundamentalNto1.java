@@ -19,8 +19,8 @@
 package boofcv.abst.geo.f;
 
 import boofcv.abst.geo.EpipolarMatrixEstimatorN;
-import boofcv.alg.geo.AssociatedPair;
 import boofcv.alg.geo.f.EssentialNister5;
+import boofcv.struct.geo.AssociatedPair;
 import org.ejml.data.DenseMatrix64F;
 import org.ejml.ops.RandomMatrices;
 import org.junit.Test;
