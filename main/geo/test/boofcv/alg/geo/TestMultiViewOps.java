@@ -46,7 +46,6 @@ public class TestMultiViewOps {
 
 	// camera calibration matrix
 	DenseMatrix64F K = new DenseMatrix64F(3,3,true,60,0.01,200,0,80,150,0,0,1);
-//	DenseMatrix64F K = CommonOps.identity(3);
 
 	// camera locations
 	Se3_F64 se2,se3;
