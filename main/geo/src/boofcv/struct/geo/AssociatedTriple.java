@@ -54,4 +54,22 @@ public class AssociatedTriple {
 		this.p2 = new Point2D_F64();
 		this.p3 = new Point2D_F64();
 	}
+
+	public void set( AssociatedTriple a ) {
+		p1.set(a.p1);
+		p2.set(a.p2);
+		p3.set(a.p3);
+	}
+
+	public void set( Point2D_F64 p1, Point2D_F64 p2, Point2D_F64 p3 ) {
+		this.p1.set(p1);
+		this.p2.set(p2);
+		this.p3.set(p3);
+	}
+
+	public AssociatedTriple copy() {
+		AssociatedTriple r = new AssociatedTriple();
+		r.set(this);
+		return r;
+	}
 }

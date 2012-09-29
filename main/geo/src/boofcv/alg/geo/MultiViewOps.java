@@ -18,9 +18,9 @@
 
 package boofcv.alg.geo;
 
+import boofcv.alg.geo.trifocal.TrifocalExtractEpipoles;
 import boofcv.struct.geo.TrifocalTensor;
 import georegression.geometry.GeometryMath_F64;
-import georegression.geometry.UtilTrig_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Vector3D_F64;
@@ -28,9 +28,7 @@ import georegression.struct.se.Se3_F64;
 import org.ejml.data.DenseMatrix64F;
 import org.ejml.factory.DecompositionFactory;
 import org.ejml.factory.QRDecomposition;
-import org.ejml.factory.SingularValueDecomposition;
 import org.ejml.ops.CommonOps;
-import org.ejml.ops.SingularOps;
 import org.ejml.simple.SimpleMatrix;
 import org.ejml.simple.SimpleSVD;
 
@@ -49,8 +47,14 @@ import org.ejml.simple.SimpleSVD;
 public class MultiViewOps {
 
 	/**
-	 * Creates a trifocal tensor from two camera matrices. IMPORTANT: It is assumed that the first camera
-	 * has the following camera matrix P1 = [I|0], where I is an identify matrix.
+	 * <p>
+	 * Creates a trifocal tensor from two camera matrices.
+	 * </p>
+	 *
+	 * <p>
+	 * IMPORTANT: It is assumed that the first camera has the following camera matrix P1 = [I|0],
+	 * where I is an identify matrix.
+	 * </p>
 	 *
 	 * @param P2 Camera matrix from view 1 to view 2
 	 * @param P3 Camera matrix from view 1 to view 3
@@ -255,7 +259,7 @@ public class MultiViewOps {
 	/**
 	 * <p>
 	 * Computes the epipoles of the first camera in the second and third images.  Epipoles are found
-	 * in homogeneous coordinates.
+	 * in homogeneous coordinates and have a norm of 1.
 	 * </p>
 	 *
 	 * <p>
@@ -267,57 +271,16 @@ public class MultiViewOps {
 	 * where F1i is a fundamental matrix from image 1 to i.
 	 * </p>
 	 *
+	 * @see TrifocalExtractEpipoles
+	 *
 	 * @param tensor Trifocal tensor.  Not Modified
 	 * @param e2  Output: Epipole in image 2. Homogeneous coordinates. Modified
 	 * @param e3  Output: Epipole in image 3. Homogeneous coordinates. Modified
 	 */
 	public static void extractEpipoles( TrifocalTensor tensor , Point3D_F64 e2 , Point3D_F64 e3 ) {
-		SingularValueDecomposition<DenseMatrix64F> svd = DecompositionFactory.svd(3,3,true,true,false);
-		if( svd.inputModified() ) {
-			tensor = tensor.copy();
-		}
+		TrifocalExtractEpipoles extract = new TrifocalExtractEpipoles();
 
-		DenseMatrix64F u1 = new DenseMatrix64F(3,1);
-		DenseMatrix64F u2 = new DenseMatrix64F(3,1);
-		DenseMatrix64F u3 = new DenseMatrix64F(3,1);
-		DenseMatrix64F v1 = new DenseMatrix64F(3,1);
-		DenseMatrix64F v2 = new DenseMatrix64F(3,1);
-		DenseMatrix64F v3 = new DenseMatrix64F(3,1);
-
-		svd.decompose(tensor.T1);
-		SingularOps.nullVector(svd, true, v1);
-		SingularOps.nullVector(svd, false,u1);
-
-		svd.decompose(tensor.T2);
-		SingularOps.nullVector(svd,true,v2);
-		SingularOps.nullVector(svd,false,u2);
-
-		svd.decompose(tensor.T3);
-		SingularOps.nullVector(svd,true,v3);
-		SingularOps.nullVector(svd,false,u3);
-
-		DenseMatrix64F U = new DenseMatrix64F(3,3);
-		DenseMatrix64F V = new DenseMatrix64F(3,3);
-
-		for( int i = 0; i < 3; i++ ) {
-			U.set(i,0,u1.get(i));
-			U.set(i,1,u2.get(i));
-			U.set(i,2,u3.get(i));
-
-			V.set(i, 0, v1.get(i));
-			V.set(i, 1, v2.get(i));
-			V.set(i, 2, v3.get(i));
-		}
-
-		DenseMatrix64F tempE = new DenseMatrix64F(3,1);
-
-		svd.decompose(U);
-		SingularOps.nullVector(svd, false, tempE);
-		e2.set(tempE.get(0),tempE.get(1),tempE.get(2));
-
-		svd.decompose(V);
-		SingularOps.nullVector(svd, false, tempE);
-		e3.set(tempE.get(0),tempE.get(1),tempE.get(2));
+		extract.process(tensor,e2,e3);
 	}
 
 	/**
@@ -341,9 +304,6 @@ public class MultiViewOps {
 		Point3D_F64 e3 = new Point3D_F64();
 
 		extractEpipoles(tensor, e2, e3);
-
-		UtilTrig_F64.normalize(e2);
-		UtilTrig_F64.normalize(e3);
 
 		// storage for intermediate results
 		Point3D_F64 temp0 = new Point3D_F64();
@@ -388,9 +348,6 @@ public class MultiViewOps {
 		Point3D_F64 e3 = new Point3D_F64();
 
 		extractEpipoles(tensor, e2, e3);
-
-		UtilTrig_F64.normalize(e2);
-		UtilTrig_F64.normalize(e3);
 
 		// storage for intermediate results
 		Point3D_F64 temp0 = new Point3D_F64();

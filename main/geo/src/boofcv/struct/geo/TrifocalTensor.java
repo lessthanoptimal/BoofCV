@@ -47,6 +47,50 @@ public class TrifocalTensor {
 		throw new IllegalArgumentException("Invalid index");
 	}
 
+	public void set( TrifocalTensor a ) {
+		T1.set(a.T1);
+		T2.set(a.T2);
+		T3.set(a.T3);
+	}
+
+	/**
+	 * <p>
+	 * Converts the 27 element vector into a three matrix format:<br>
+	 * T_i(j,k) = m.data[ i*9 + j*3 + k ]
+	 * </p>
+	 *
+	 * @param m Input: Trifocal tensor encoded in a vector
+	 */
+	public void convertFrom( DenseMatrix64F m ) {
+		if( m.getNumElements() != 27 )
+			throw new IllegalArgumentException("Input matrix/vector must have 27 elements");
+
+		for( int i = 0; i < 9; i++ ) {
+			T1.data[i] = m.data[i];
+			T2.data[i] = m.data[i+9];
+			T3.data[i] = m.data[i+18];
+		}
+	}
+
+	/**
+	 * <p>
+	 * Converts this matrix formated trifocal into a 27 element vector:<br>
+	 * m.data[ i*9 + j*3 + k ] = T_i(j,k)
+	 * </p>
+	 *
+	 * @param m Output: Trifocal tensor encoded in a vector
+	 */
+	public void convertTo( DenseMatrix64F m ) {
+		if( m.getNumElements() != 27 )
+			throw new IllegalArgumentException("Input matrix/vector must have 27 elements");
+
+		for( int i = 0; i < 9; i++ ) {
+			m.data[i] = T1.data[i];
+			m.data[i+9] = T2.data[i];
+			m.data[i+18] = T3.data[i];
+		}
+	}
+
 	/**
 	 * Returns a new copy of the TrifocalTensor
 	 *
@@ -63,5 +107,9 @@ public class TrifocalTensor {
 	@Override
 	public String toString() {
 		return "TrifocalTensor{\nT1 = "+T1+"\nT2 = "+T2+"\nT3 = "+T3+" }";
+	}
+
+	public void print() {
+		System.out.println(this);
 	}
 }

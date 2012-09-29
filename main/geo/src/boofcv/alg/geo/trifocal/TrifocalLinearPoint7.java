@@ -22,6 +22,8 @@ import boofcv.alg.geo.PerspectiveOps;
 import boofcv.struct.geo.AssociatedTriple;
 import boofcv.struct.geo.TrifocalTensor;
 import georegression.struct.point.Point2D_F64;
+import georegression.struct.point.Point3D_F64;
+import org.ejml.alg.dense.decomposition.svd.SafeSvd;
 import org.ejml.data.DenseMatrix64F;
 import org.ejml.factory.DecompositionFactory;
 import org.ejml.factory.SingularValueDecomposition;
@@ -33,8 +35,9 @@ import java.util.List;
 /**
  * <p>
  * Estimates the {@link TrifocalTensor} using a linear algorithm from 7 or more image points correspondences
- * from three views, see page 394 of [1] for details.  Due to noise the returned solution might not be
- * geometrically valid.
+ * from three views, see page 394 of [1] for details.  After an initial linear solution has been computed
+ * it is improved upon by applying geometric constraints.  Note that the solution will not be optimal in a geometric
+ * or algebraic sense, but can be used as an initial estimate for refinement algorithms.
  * </p>
  *
  * <p>
@@ -44,14 +47,16 @@ import java.util.List;
  * </ul>
  * </p>
  *
+ * @see EnforceTrifocalGeometry
+ *
  * @author Peter Abeles
  */
 public class TrifocalLinearPoint7 {
 
 	// Output trifocal tensor
-	private TrifocalTensor solution = new TrifocalTensor();
+	protected TrifocalTensor solution = new TrifocalTensor();
 	// trifocal tensor computed from normalized coordinates
-	private TrifocalTensor solutionN = new TrifocalTensor();
+	protected TrifocalTensor solutionN = new TrifocalTensor();
 
 	// normalization matrices for points
 	protected DenseMatrix64F N1 = new DenseMatrix64F(3,3);
@@ -62,7 +67,7 @@ public class TrifocalLinearPoint7 {
 	protected DenseMatrix64F A = new DenseMatrix64F(7,27);
 
 	// svd used to extract the null space
-	protected SingularValueDecomposition<DenseMatrix64F> svdNull = DecompositionFactory.svd(24, 27, false, true, false);
+	protected SingularValueDecomposition<DenseMatrix64F> svdNull;
 
 	// Solution in vector format
 	protected DenseMatrix64F vectorizedSolution = new DenseMatrix64F(27,1);
@@ -72,6 +77,24 @@ public class TrifocalLinearPoint7 {
 	protected Point2D_F64 p2_norm = new Point2D_F64();
 	protected Point2D_F64 p3_norm = new Point2D_F64();
 
+	// enforces the geometry constraints
+	protected EnforceTrifocalGeometry enforce = new EnforceTrifocalGeometry();
+	protected TrifocalExtractEpipoles extractEpipoles = new TrifocalExtractEpipoles();
+	// Epipoles needed to enforce the above constraints
+	protected Point3D_F64 e2 = new Point3D_F64();
+	protected Point3D_F64 e3 = new Point3D_F64();
+
+	public TrifocalLinearPoint7() {
+		svdNull = DecompositionFactory.svd(24, 27, false, true, false);
+		svdNull = new SafeSvd(svdNull);
+	}
+
+	/**
+	 * Estimates the trifocal tensor given the set of observations
+	 *
+	 * @param observations Set of observations
+	 * @return true if successful and false if it fails
+	 */
 	public boolean process( List<AssociatedTriple> observations ) {
 
 		if( observations.size() < 7 )
@@ -86,6 +109,11 @@ public class TrifocalLinearPoint7 {
 		// solve for the trifocal tensor
 		solveLinearSystem();
 
+		// enforce geometric constraints to improve solution
+		extractEpipoles.process(solutionN,e2,e3);
+		enforce.process(e2,e3,A);
+		enforce.extractSolution(solutionN);
+
 		// undo normalization
 		removeNormalization();
 
@@ -93,7 +121,8 @@ public class TrifocalLinearPoint7 {
 	}
 
 	/**
-	 * Constructs the linear constraint matrix
+	 * Constructs the linear matrix that describes from the 3-point constraint with linear
+	 * dependent rows removed
 	 */
 	protected void createLinearSystem( List<AssociatedTriple> observations ) {
 		int N = observations.size();
@@ -184,6 +213,18 @@ public class TrifocalLinearPoint7 {
 		}
 	}
 
+	protected void createLinearSystem2( List<AssociatedTriple> observations ) {
+		int N = observations.size();
+
+		A.reshape(9*N,27);
+		A.zero();
+
+		int index1 = 0;
+		for( int indexObs = 0; indexObs < N; indexObs++ ) {
+
+		}
+	}
+
 	/**
 	 * Computes the null space of the linear system to find the trifocal tensor
 	 */
@@ -193,12 +234,7 @@ public class TrifocalLinearPoint7 {
 
 		SingularOps.nullVector(svdNull,true,vectorizedSolution);
 
-		// format the solution
-		for( int i = 0; i < 9; i++ ) {
-			solutionN.T1.data[i] = vectorizedSolution.data[i];
-			solutionN.T2.data[i] = vectorizedSolution.data[i+9];
-			solutionN.T3.data[i] = vectorizedSolution.data[i+18];
-		}
+		solutionN.convertFrom(vectorizedSolution);
 
 		return true;
 	}

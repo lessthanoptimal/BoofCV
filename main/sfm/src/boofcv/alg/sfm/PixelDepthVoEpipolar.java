@@ -21,6 +21,9 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
+
+// TODO Use the mode instead of median to resolve scale ambiguity
+
 public class PixelDepthVoEpipolar<T extends ImageBase> {
 	// TODO Make relative to the last update or remove?
 	double MIN_PIXEL_CHANGE = 100;
