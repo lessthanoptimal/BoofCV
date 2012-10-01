@@ -18,7 +18,7 @@
 
 package boofcv.alg.geo.f;
 
-import boofcv.alg.geo.PerspectiveOps;
+import boofcv.alg.geo.LowLevelMultiViewOps;
 import boofcv.struct.geo.AssociatedPair;
 import georegression.struct.point.Point2D_F64;
 import org.ejml.data.DenseMatrix64F;
@@ -166,8 +166,8 @@ public abstract class FundamentalLinear {
 			Point2D_F64 s = p.currLoc;
 
 			// normalize the points
-			PerspectiveOps.pixelToNormalized(N1, f, f_norm);
-			PerspectiveOps.pixelToNormalized(N2, s, s_norm);
+			LowLevelMultiViewOps.applyPixelNormalization(N1, f, f_norm);
+			LowLevelMultiViewOps.applyPixelNormalization(N2, s, s_norm);
 
 			// perform the Kronecker product with the two points being in
 			// homogeneous coordinates (z=1)

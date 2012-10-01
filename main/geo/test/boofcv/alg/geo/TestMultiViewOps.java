@@ -33,6 +33,7 @@ import org.ejml.ops.NormOps;
 import org.ejml.simple.SimpleMatrix;
 import org.junit.Test;
 
+import java.util.List;
 import java.util.Random;
 
 import static org.junit.Assert.*;
@@ -410,5 +411,38 @@ public class TestMultiViewOps {
 
 		// see if the two projection matrices are the same
 		assertTrue(MatrixFeatures.isEquals(foundKP,KP,1e-8));
+	}
+
+	@Test
+	public void decomposeEssential() {
+		DenseMatrix64F R = RotationMatrixGenerator.eulerXYZ(1,2,-0.5,null);
+		Vector3D_F64 T = new Vector3D_F64(0.5,0.7,-0.3);
+
+		DenseMatrix64F E = MultiViewOps.createEssential(R,T);
+
+		List<Se3_F64> found = MultiViewOps.decomposeEssential(E);
+
+		// the scale factor is lost
+		T.normalize();
+
+		int numMatched = 0;
+
+		for( Se3_F64 m : found ) {
+			DenseMatrix64F A = new DenseMatrix64F(3,3);
+
+			CommonOps.multTransA(R,m.getR(),A);
+
+			if( !MatrixFeatures.isIdentity(A,1e-8) ) {
+				continue;
+			}
+
+			Vector3D_F64 foundT = m.getT();
+			foundT.normalize();
+
+			if( foundT.isIdentical(T,1e-8) )
+				numMatched++;
+		}
+
+		assertEquals(1,numMatched);
 	}
 }

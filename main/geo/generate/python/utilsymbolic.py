@@ -47,6 +47,30 @@ def symVector( numRows , letter ):
 
   return A
 
+def symCrossMat3x3( v ):
+    """ Creates a 3x3 skew symmetric cross product matrix from the provided 3-vector
+    """
+
+    A = matrix(SR,3,3)
+    A[0,1] = -1*v[2][0]
+    A[0,2] =  v[1][0]
+    A[1,0] =  v[2][0]
+    A[1,2] = -1*v[0][0]
+    A[2,0] = -1*v[1][0]
+    A[2,1] =  v[0][0]
+
+    return A
+
+def multScalarMatrix( s , A ):
+    """ Multiplies the matrix symbolic matrix by the symbolic scalar
+    """
+
+    C = matrix(SR,A.nrows(),A.ncols())
+    for i in range(0,A.nrows()):
+        for j in range(0,A.ncols()):
+            C[i,j] = (s*A[i,j])[0]
+    return C
+
 def expandPower( expression ):
   """Expands out variables which are multiplied by an integer value
   For example x^2 = x*x and x^4 = x*x*x*x
@@ -85,7 +109,19 @@ def extractVarEq( expression , key ):
   if len(key) == 0:
     var = [w for w in s if len(w) != 1 and not any( c in chars for c in w )]
   else:
-    var = [w[:-(1+len(key))] for w in s if (w.endswith(key) and not any(c in chars for c in w[:-len(key)])) ]
+    var = [w[0:w.find(key)]+w[w.find(key)+len(key):] for w in s if w.find(key) != -1 ]
+
+  # Handle the case where the key was not found
+  if len(var) == 0:
+      return ''
+
+  # Fix problems left by stripping away the key
+  var = [w.replace('-*','-') for w in var]
+  for i in range(0,len(var)):
+      if len(var[i]) == 0: var[i] = '1'
+      elif len(var[i]) == 1 and var[i][0] == '-': var[i] = '-1'
+      elif var[i][-1] == '*': var[i] = var[i][:-1]
+      elif var[i][0] == '*': var[i] = var[i][1:]
 
   # Expand out power
   var = [expandPower(w) for w in var]

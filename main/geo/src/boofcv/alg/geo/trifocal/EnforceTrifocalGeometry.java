@@ -48,11 +48,13 @@ public class EnforceTrifocalGeometry {
 	// SVD which computes V and not U
 	private SingularValueDecomposition<DenseMatrix64F> svdV;
 
-	// Linear mapping from 18 unknowns to 27 trifocal unknowns
+	// Storage for SVD
 	private DenseMatrix64F U = new DenseMatrix64F(27,18);
+	// Contains the linear mapping from TODO
+	private DenseMatrix64F Up = new DenseMatrix64F(1,1);
 
-	// Storage for solution as a function of the 18 unknowns
-	private DenseMatrix64F xp = new DenseMatrix64F(18,1);
+	// Storage for solution as a function of the 18-nullity unknowns
+	private DenseMatrix64F xp = new DenseMatrix64F(1,1);
 
 	// Storage for the A*U, where A is the linear constraint matrix and U is the solution's subspace
 	private DenseMatrix64F AU = new DenseMatrix64F(1,1);
@@ -91,17 +93,25 @@ public class EnforceTrifocalGeometry {
 		svdU.decompose(E);
 		svdU.getU(U, false);
 
+		// Copy the parts of U which correspond to the non singular parts if the SVD
+		// since there are only really 18-nullity unknowns due to linear dependencies
+		SingularOps.descendingOrder(U,false,svdU.getSingularValues(),svdU.numberOfSingularValues(),null,false);
+		int rank = SingularOps.rank(svdU, 1e-13);
+		Up.reshape(U.numRows,rank);
+		CommonOps.extract(U,0,U.numRows,0,Up.numCols,Up,0,0);
+
 		// project the linear constraint matrix into this subspace
-		AU.reshape(A.numRows,U.numCols);
-		CommonOps.mult(A,U,AU);
+		AU.reshape(A.numRows,Up.numCols);
+		CommonOps.mult(A,Up,AU);
 
 		// Extract the solution of ||A*U*x|| = 0 from the null space
 		svdV.decompose(AU);
 
+		xp.reshape(rank,1);
 		SingularOps.nullVector(svdV,true,xp);
 
 		// Translate the solution from the subspace and into a valid trifocal tensor
-		CommonOps.mult(U,xp,vectorT);
+		CommonOps.mult(Up,xp,vectorT);
 
 		// the sign of vectorT is arbitrary, but make it positive for consistency
 		if( vectorT.data[0] > 0 )

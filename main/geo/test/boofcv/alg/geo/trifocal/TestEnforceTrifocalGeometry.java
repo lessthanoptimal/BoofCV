@@ -101,7 +101,7 @@ public class TestEnforceTrifocalGeometry extends CommonTrifocalChecks {
 		// Check if the found solution is valid by applying the trifocal constraint for 3 points
 		TrifocalTensor found = new TrifocalTensor();
 		alg.extractSolution(found);
-		checkTrifocalWithConstraint(found,1e-8);
+		checkTrifocalWithConstraint(found,1e-6);
 
 		// make sure the errors are zero too
 		DenseMatrix64F errors = new DenseMatrix64F(observations.size(),1);
