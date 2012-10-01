@@ -56,15 +56,17 @@ public abstract class CommonTrifocalChecks {
 	List<AssociatedTriple> observations = new ArrayList<AssociatedTriple>();
 	// observations where the first view is in normalized image coordinates
 	List<AssociatedTriple> observationsSpecial = new ArrayList<AssociatedTriple>();
+	// All observations are in normalized image coordinates
+	List<AssociatedTriple> observationsNorm = new ArrayList<AssociatedTriple>();
 
 	public CommonTrifocalChecks() {
 		se2 = new Se3_F64();
 		se3 = new Se3_F64();
 
-		RotationMatrixGenerator.eulerXYZ(0.2, 0.001, -0.02, se2.R);
+		RotationMatrixGenerator.eulerXYZ(0.05, 0.05, -0.02, se2.R);
 		se2.getT().set(0.3,0,0.05);
 
-		RotationMatrixGenerator.eulerXYZ(0.8,-0.02,0.003,se3.R);
+		RotationMatrixGenerator.eulerXYZ(0.1,-0.2,0.05,se3.R);
 		se3.getT().set(0.6, 0.2, -0.02);
 
 		computeStuffFromPose();
@@ -109,7 +111,7 @@ public abstract class CommonTrifocalChecks {
 			Point3D_F64 p = new Point3D_F64();
 			p.x = rand.nextGaussian()*0.5;
 			p.y = rand.nextGaussian()*0.5;
-			p.z = rand.nextGaussian()*0.5+2.5;
+			p.z = rand.nextGaussian()*0.5 + 2;
 
 			worldPts.add(p);
 
@@ -121,7 +123,14 @@ public abstract class CommonTrifocalChecks {
 			AssociatedTriple oS = o.copy();
 			oS.p1 = PerspectiveOps.renderPixel(new Se3_F64(), null, p);
 
+			AssociatedTriple oN = new AssociatedTriple();
+			oN.p1 = PerspectiveOps.renderPixel(new Se3_F64(), null, p);
+			oN.p2 = PerspectiveOps.renderPixel(se2,null,p);
+			oN.p3 = PerspectiveOps.renderPixel(se3,null,p);
+
 			observations.add(o);
+			observationsSpecial.add(oS);
+			observationsNorm.add(oN);
 		}
 	}
 }

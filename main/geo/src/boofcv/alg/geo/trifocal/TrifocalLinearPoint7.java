@@ -18,7 +18,7 @@
 
 package boofcv.alg.geo.trifocal;
 
-import boofcv.alg.geo.PerspectiveOps;
+import boofcv.alg.geo.LowLevelMultiViewOps;
 import boofcv.struct.geo.AssociatedTriple;
 import boofcv.struct.geo.TrifocalTensor;
 import georegression.struct.point.Point2D_F64;
@@ -101,7 +101,7 @@ public class TrifocalLinearPoint7 {
 			throw new IllegalArgumentException("At least 7 correspondences must be provided");
 
 		// compute normalization to reduce numerical errors
-		PerspectiveOps.computeNormalization(observations,N1,N2,N3);
+		LowLevelMultiViewOps.computeNormalization(observations, N1, N2, N3);
 
 		// compute solution in normalized pixel coordinates
 		createLinearSystem(observations);
@@ -134,9 +134,9 @@ public class TrifocalLinearPoint7 {
 		for( int i = 0; i < N; i++ ) {
 			AssociatedTriple t = observations.get(i);
 
-			PerspectiveOps.pixelToNormalized(N1,t.p1,p1_norm);
-			PerspectiveOps.pixelToNormalized(N2,t.p2,p2_norm);
-			PerspectiveOps.pixelToNormalized(N3,t.p3,p3_norm);
+			LowLevelMultiViewOps.applyPixelNormalization(N1, t.p1, p1_norm);
+			LowLevelMultiViewOps.applyPixelNormalization(N2, t.p2, p2_norm);
+			LowLevelMultiViewOps.applyPixelNormalization(N3, t.p3, p3_norm);
 
 			int index2 = index1+9;
 			int index3 = index1+18;
@@ -213,18 +213,6 @@ public class TrifocalLinearPoint7 {
 		}
 	}
 
-	protected void createLinearSystem2( List<AssociatedTriple> observations ) {
-		int N = observations.size();
-
-		A.reshape(9*N,27);
-		A.zero();
-
-		int index1 = 0;
-		for( int indexObs = 0; indexObs < N; indexObs++ ) {
-
-		}
-	}
-
 	/**
 	 * Computes the null space of the linear system to find the trifocal tensor
 	 */
@@ -270,6 +258,29 @@ public class TrifocalLinearPoint7 {
 					T.set(j,k,sum);
 				}
 			}
+		}
+	}
+
+	protected void removeNormalization2() {
+		DenseMatrix64F N2_inv = new DenseMatrix64F(3,3);
+		DenseMatrix64F N3_inv = new DenseMatrix64F(3,3);
+
+		CommonOps.invert(N2,N2_inv);
+		CommonOps.invert(N3,N3_inv);
+
+		DenseMatrix64F temp = new DenseMatrix64F(3,3);
+
+		for( int r = 0; r < 3; r++ ) {
+			CommonOps.mult(N2_inv,solutionN.getT(r),temp);
+			CommonOps.multTransB(temp,N3_inv,solutionN.getT(r));
+		}
+
+		for( int i = 0; i < 3; i++ ) {
+			DenseMatrix64F T = solution.getT(i);
+
+			CommonOps.scale(N1.get(0,i),solutionN.T1,T);
+			CommonOps.add(T,N1.get(1,i),solutionN.T2,T);
+			CommonOps.add(T,N1.get(2,i),solutionN.T3,T);
 		}
 	}
 

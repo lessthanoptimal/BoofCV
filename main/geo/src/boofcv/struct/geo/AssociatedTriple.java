@@ -72,4 +72,8 @@ public class AssociatedTriple {
 		r.set(this);
 		return r;
 	}
+
+	public void print() {
+		System.out.println("AssociatedTriple( "+p1+" , "+p2+" , "+p3+" )");
+	}
 }

@@ -43,7 +43,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Peter Abeles
@@ -142,13 +143,71 @@ public class TestPerspectiveOps {
 	}
 
 	@Test
-	public void convertNormToPixel() {
-		fail("implement");
+	public void convertNormToPixel_intrinsic() {
+		IntrinsicParameters intrinsic = new IntrinsicParameters(100,150,0.1,120,209,500,600,false,null);
+
+		DenseMatrix64F K = PerspectiveOps.calibrationMatrix(intrinsic, null);
+
+		Point2D_F64 norm = new Point2D_F64(-0.1,0.25);
+		Point2D_F64 expected = new Point2D_F64();
+
+		GeometryMath_F64.mult(K,norm,expected);
+
+		Point2D_F64 found = PerspectiveOps.convertNormToPixel(intrinsic,norm.x,norm.y,null);
+
+		assertEquals(expected.x,found.x,1e-8);
+		assertEquals(expected.y,found.y,1e-8);
 	}
 
 	@Test
-	public void convertPixelToNorm() {
-		fail("implement");
+	public void convertNormToPixel_matrix() {
+		DenseMatrix64F K = new DenseMatrix64F(3,3,true,100,0.1,120,0,150,209,0,0,1);
+
+		Point2D_F64 norm = new Point2D_F64(-0.1,0.25);
+		Point2D_F64 expected = new Point2D_F64();
+
+		GeometryMath_F64.mult(K,norm,expected);
+
+		Point2D_F64 found = PerspectiveOps.convertNormToPixel(K,norm.x,norm.y,null);
+
+		assertEquals(expected.x,found.x,1e-8);
+		assertEquals(expected.y,found.y,1e-8);
+	}
+
+	@Test
+	public void convertPixelToNorm_intrinsic() {
+		IntrinsicParameters intrinsic = new IntrinsicParameters(100,150,0.1,120,209,500,600,false,null);
+
+		DenseMatrix64F K = PerspectiveOps.calibrationMatrix(intrinsic, null);
+		DenseMatrix64F K_inv = new DenseMatrix64F(3,3);
+		CommonOps.invert(K,K_inv);
+
+		Point2D_F64 pixel = new Point2D_F64(100,120);
+		Point2D_F64 expected = new Point2D_F64();
+
+		GeometryMath_F64.mult(K_inv,pixel,expected);
+
+		Point2D_F64 found = PerspectiveOps.convertPixelToNorm(intrinsic,pixel.x,pixel.y,null);
+
+		assertEquals(expected.x, found.x, 1e-8);
+		assertEquals(expected.y, found.y, 1e-8);
+	}
+
+	@Test
+	public void convertPixelToNorm_matrix() {
+		DenseMatrix64F K = new DenseMatrix64F(3,3,true,100,0.1,120,0,150,209,0,0,1);
+		DenseMatrix64F K_inv = new DenseMatrix64F(3,3);
+		CommonOps.invert(K,K_inv);
+
+		Point2D_F64 pixel = new Point2D_F64(100,120);
+		Point2D_F64 expected = new Point2D_F64();
+
+		GeometryMath_F64.mult(K_inv,pixel,expected);
+
+		Point2D_F64 found = PerspectiveOps.convertPixelToNorm(K,pixel.x,pixel.y,null);
+
+		assertEquals(expected.x, found.x, 1e-8);
+		assertEquals(expected.y, found.y, 1e-8);
 	}
 
 	@Test
@@ -182,7 +241,27 @@ public class TestPerspectiveOps {
 
 	@Test
 	public void renderPixel_cameramatrix() {
-		fail("implement");
+		Point3D_F64 X = new Point3D_F64(0.1,-0.05,3);
+
+		Se3_F64 worldToCamera = new Se3_F64();
+		RotationMatrixGenerator.eulerXYZ(0.1,-0.05,0.03,worldToCamera.getR());
+		worldToCamera.getT().set(0.2,0.01,-0.03);
+
+		DenseMatrix64F K = RandomMatrices.createUpperTriangle(3, 0, -1, 1, rand);
+
+		Point3D_F64 X_cam = SePointOps_F64.transform(worldToCamera,X,null);
+		Point2D_F64 found;
+
+		DenseMatrix64F P = PerspectiveOps.createCameraMatrix(worldToCamera.R,worldToCamera.T,K,null);
+
+		Point2D_F64 expected = new Point2D_F64();
+		expected.x = X_cam.x/X_cam.z;
+		expected.y = X_cam.y/X_cam.z;
+		GeometryMath_F64.mult(K,expected,expected);
+
+		found = PerspectiveOps.renderPixel(P,X);
+		assertEquals(expected.x,found.x,1e-8);
+		assertEquals(expected.y,found.y,1e-8);
 	}
 
 	@Test
@@ -191,8 +270,8 @@ public class TestPerspectiveOps {
 		for( int i = 0; i < 12; i++ ) {
 			AssociatedPair p = new AssociatedPair();
 
-			p.currLoc.set(rand.nextDouble()*5,rand.nextDouble()*5);
-			p.keyLoc.set(rand.nextDouble() * 5, rand.nextDouble() * 5);
+			p.currLoc.set(rand.nextDouble()*5, rand.nextDouble()*5);
+			p.keyLoc.set(rand.nextDouble()*5, rand.nextDouble()*5);
 
 			list.add(p);
 		}
@@ -239,157 +318,6 @@ public class TestPerspectiveOps {
 			assertTrue(list.get(i).p2 == list2.get(i));
 			assertTrue(list.get(i).p3 == list3.get(i));
 		}
-	}
-
-	@Test
-	public void computeNormalization() {
-		List<Point2D_F64> list = new ArrayList<Point2D_F64>();
-		for( int i = 0; i < 12; i++ ) {
-			Point2D_F64 p = new Point2D_F64();
-
-			p.set(rand.nextDouble()*5,rand.nextDouble()*5);
-
-			list.add(p);
-		}
-
-		DenseMatrix64F N = new DenseMatrix64F(3,3);
-		PerspectiveOps.computeNormalization(list,N);
-
-		List<Point2D_F64> transformed = new ArrayList<Point2D_F64>();
-		for( Point2D_F64 p : list ) {
-			Point2D_F64 t = new Point2D_F64();
-			GeometryMath_F64.mult(N,p,t);
-			transformed.add(t);
-		}
-
-		// see if the transformed points have the expected statistical properties
-		double meanX0 = 0;
-		double meanY0 = 0;
-
-		for( Point2D_F64 p : transformed ) {
-			meanX0 += p.x;
-			meanY0 += p.y;
-		}
-
-		meanX0 /= list.size();
-		meanY0 /= list.size();
-
-		assertEquals(0,meanX0,1e-8);
-		assertEquals(0,meanY0,1e-8);
-
-		double sigmaX0 = 0;
-		double sigmaY0 = 0;
-
-		for( Point2D_F64 p : transformed ) {
-			sigmaX0 += Math.pow(p.x-meanX0,2);
-			sigmaY0 += Math.pow(p.y-meanY0,2);
-		}
-
-		sigmaX0 = Math.sqrt(sigmaX0/list.size());
-		sigmaY0 = Math.sqrt(sigmaY0/list.size());
-
-		assertEquals(1,sigmaX0,1e-8);
-		assertEquals(1,sigmaY0,1e-8);
-
-	}
-
-	/**
-	 * Compare to single list function
-	 */
-	@Test
-	public void computeNormalization_two() {
-
-		List<AssociatedPair> list = new ArrayList<AssociatedPair>();
-		for( int i = 0; i < 12; i++ ) {
-			AssociatedPair p = new AssociatedPair();
-
-			p.currLoc.set(rand.nextDouble()*5,rand.nextDouble()*5);
-			p.keyLoc.set(rand.nextDouble() * 5, rand.nextDouble() * 5);
-
-			list.add(p);
-		}
-
-		List<Point2D_F64> list1 = new ArrayList<Point2D_F64>();
-		List<Point2D_F64> list2 = new ArrayList<Point2D_F64>();
-
-		PerspectiveOps.splitAssociated(list,list1,list2);
-
-		DenseMatrix64F expected1 = new DenseMatrix64F(3,3);
-		DenseMatrix64F expected2 = new DenseMatrix64F(3,3);
-
-		PerspectiveOps.computeNormalization(list1,expected1);
-		PerspectiveOps.computeNormalization(list2,expected2);
-
-		DenseMatrix64F found1 = new DenseMatrix64F(3,3);
-		DenseMatrix64F found2 = new DenseMatrix64F(3,3);
-
-		PerspectiveOps.computeNormalization(list,found1,found2);
-
-		assertTrue(MatrixFeatures.isIdentical(expected1,found1,1e-8));
-		assertTrue(MatrixFeatures.isIdentical(expected2,found2,1e-8));
-	}
-
-	/**
-	 * Compare to single list function
-	 */
-	@Test
-	public void computeNormalization_three() {
-
-		List<AssociatedTriple> list = new ArrayList<AssociatedTriple>();
-		for( int i = 0; i < 12; i++ ) {
-			AssociatedTriple p = new AssociatedTriple();
-
-			p.p1.set(rand.nextDouble()*5,rand.nextDouble()*5);
-			p.p2.set(rand.nextDouble() * 5, rand.nextDouble() * 5);
-			p.p3.set(rand.nextDouble() * 5, rand.nextDouble() * 5);
-
-			list.add(p);
-		}
-
-		List<Point2D_F64> list1 = new ArrayList<Point2D_F64>();
-		List<Point2D_F64> list2 = new ArrayList<Point2D_F64>();
-		List<Point2D_F64> list3 = new ArrayList<Point2D_F64>();
-
-		PerspectiveOps.splitAssociated(list,list1,list2,list3);
-
-		DenseMatrix64F expected1 = new DenseMatrix64F(3,3);
-		DenseMatrix64F expected2 = new DenseMatrix64F(3,3);
-		DenseMatrix64F expected3 = new DenseMatrix64F(3,3);
-
-		PerspectiveOps.computeNormalization(list1,expected1);
-		PerspectiveOps.computeNormalization(list2,expected2);
-		PerspectiveOps.computeNormalization(list3,expected3);
-
-		DenseMatrix64F found1 = new DenseMatrix64F(3,3);
-		DenseMatrix64F found2 = new DenseMatrix64F(3,3);
-		DenseMatrix64F found3 = new DenseMatrix64F(3,3);
-
-		PerspectiveOps.computeNormalization(list,found1,found2,found3);
-
-		assertTrue(MatrixFeatures.isIdentical(expected1,found1,1e-8));
-		assertTrue(MatrixFeatures.isIdentical(expected2,found2,1e-8));
-		assertTrue(MatrixFeatures.isIdentical(expected3,found3,1e-8));
-	}
-
-	/**
-	 * Test it against a simple test case
-	 */
-	@Test
-	public void pixelToNormalized() {
-		DenseMatrix64F N = new DenseMatrix64F(3,3,true,1,2,3,4,5,6,7,8,9);
-
-		Point2D_F64 a = new Point2D_F64(3,4);
-		Point2D_F64 found = new Point2D_F64(3,4);
-		Point2D_F64 expected = new Point2D_F64(3,4);
-
-		expected.x = a.x * N.get(0,0) + N.get(0,2);
-		expected.y = a.y * N.get(1,1) + N.get(1,2);
-
-
-		PerspectiveOps.pixelToNormalized(N, a, found);
-
-		assertEquals(found.x,expected.x,1e-8);
-		assertEquals(found.y,expected.y,1e-8);
 	}
 
 	@Test

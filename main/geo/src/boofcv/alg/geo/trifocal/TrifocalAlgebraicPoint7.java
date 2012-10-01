@@ -18,7 +18,7 @@
 
 package boofcv.alg.geo.trifocal;
 
-import boofcv.alg.geo.PerspectiveOps;
+import boofcv.alg.geo.LowLevelMultiViewOps;
 import boofcv.numerics.optimization.UnconstrainedLeastSquares;
 import boofcv.numerics.optimization.functions.FunctionNtoM;
 import boofcv.numerics.optimization.impl.UtilOptimize;
@@ -81,10 +81,7 @@ public class TrifocalAlgebraicPoint7 extends TrifocalLinearPoint7 {
 			throw new IllegalArgumentException("At least 7 correspondences must be provided");
 
 		// compute normalization to reduce numerical errors
-		PerspectiveOps.computeNormalization(observations,N1,N2,N3);
-//		CommonOps.setIdentity(N1);
-//		CommonOps.setIdentity(N2);
-//		CommonOps.setIdentity(N3);
+		LowLevelMultiViewOps.computeNormalization(observations, N1, N2, N3);
 
 		// compute solution in normalized pixel coordinates
 		createLinearSystem(observations);
@@ -93,7 +90,7 @@ public class TrifocalAlgebraicPoint7 extends TrifocalLinearPoint7 {
 		solveLinearSystem();
 
 		// minimize geometric error
-		optimizeSolution();
+		minimizeWithGeometricConstraints();
 
 		// undo normalization
 		removeNormalization();
@@ -102,9 +99,9 @@ public class TrifocalAlgebraicPoint7 extends TrifocalLinearPoint7 {
 	}
 
 	/**
-	 * Minimize algebraic error using LM.  The two epipoles are the parameters being optimized.
+	 * Minimize the algebraic error using LM.  The two epipoles are the parameters being optimized.
 	 */
-	private void optimizeSolution() {
+	private void minimizeWithGeometricConstraints() {
 		extractEpipoles.process(solutionN, e2, e3);
 
 		// encode the parameters being optimized
@@ -113,12 +110,6 @@ public class TrifocalAlgebraicPoint7 extends TrifocalLinearPoint7 {
 
 		// adjust the error function for the current inputs
 		errorFunction.init();
-
-//		DenseMatrix64F errors = new DenseMatrix64F(A.numRows,1);
-//		errorFunction.process(param,errors.data);
-//
-//		DenseMatrix64F errors2 = new DenseMatrix64F(A.numRows,1);
-//		CommonOps.mult(A,vectorizedSolution,errors2);
 
 		// set up the optimization algorithm
 		optimizer.setFunction(errorFunction,null);

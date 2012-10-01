@@ -19,7 +19,7 @@
 package boofcv.alg.geo.f;
 
 
-import boofcv.alg.geo.PerspectiveOps;
+import boofcv.alg.geo.LowLevelMultiViewOps;
 import boofcv.struct.geo.AssociatedPair;
 import org.ejml.data.DenseMatrix64F;
 import org.ejml.ops.SingularOps;
@@ -87,7 +87,7 @@ public class FundamentalLinear8 extends FundamentalLinear {
 		// use normalized coordinates for pixel and calibrated
 		// un-normalized passed unit tests in 8 point, but failed in 7 point, hinting
 		// that there could be situations where normalization might be needed in 8 point
-		PerspectiveOps.computeNormalization(points, N1, N2);
+		LowLevelMultiViewOps.computeNormalization(points, N1, N2);
 		createA(points,A);
 
 		if (process(A))

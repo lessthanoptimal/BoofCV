@@ -19,6 +19,8 @@
 package boofcv.struct.geo;
 
 import org.ejml.data.DenseMatrix64F;
+import org.ejml.ops.CommonOps;
+import org.ejml.ops.SpecializedOps;
 
 /**
  * The trifocal tensor describes the projective relationship between three different camera views and is
@@ -104,9 +106,28 @@ public class TrifocalTensor {
 		return ret;
 	}
 
+	/**
+	 * The scale of the trifocal tensor is arbitrary.  However there are situations when comparing results that
+	 * using a consistent scale is useful.  This function normalizes the sensor such that its Euclidean length
+	 * (the f-norm) is equal to one.
+	 */
+	public void normalizeScale() {
+		double sum = 0;
+
+		sum += SpecializedOps.elementSumSq(T1);
+		sum += SpecializedOps.elementSumSq(T2);
+		sum += SpecializedOps.elementSumSq(T3);
+
+		double n = Math.sqrt(sum);
+
+		CommonOps.scale(1.0/n,T1);
+		CommonOps.scale(1.0/n,T2);
+		CommonOps.scale(1.0/n,T3);
+	}
+
 	@Override
 	public String toString() {
-		return "TrifocalTensor{\nT1 = "+T1+"\nT2 = "+T2+"\nT3 = "+T3+" }";
+		return "TrifocalTensor {\nT1:\n"+T1+"\nT2:\n"+T2+"\nT3\n"+T3+"}";
 	}
 
 	public void print() {

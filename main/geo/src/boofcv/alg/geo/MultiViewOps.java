@@ -32,6 +32,8 @@ import org.ejml.ops.CommonOps;
 import org.ejml.simple.SimpleMatrix;
 import org.ejml.simple.SimpleSVD;
 
+import java.util.List;
+
 /**
  * <p>
  * Contains commonly used operations used in 2-view and 3-view perspective geometry.
@@ -291,7 +293,7 @@ public class MultiViewOps {
 	 *
 	 * <p>
 	 * NOTE: The first camera is assumed to have the camera matrix of P1 = [I|0].  Thus observations in pixels for
-	 * the first camera will not meet the epipolar constraint.
+	 * the first camera will not meet the epipolar constraint when applied to the returned fundamental matrices.
 	 * </p>
 	 *
 	 * @param tensor Trifocal tensor.  Not modified.
@@ -361,7 +363,7 @@ public class MultiViewOps {
 			temp1.set(i,i , temp1.get(i,i) - 1);
 		}
 
-		// compute the Fundamental matrices one column at a time
+		// compute the camera matrices one column at a time
 		for( int i = 0; i < 3; i++ ) {
 			DenseMatrix64F T = tensor.getT(i);
 
@@ -563,9 +565,9 @@ public class MultiViewOps {
 	 * </ul>
 	 * </p>
 	 *
-	 * @param P Camera matrix, 3 by 4. Input
-	 * @param K Camera calibration matrix, 3 by 3.  Output.
-	 * @param pose The rotation and translation. Output.
+	 * @param P Input: Camera matrix, 3 by 4
+	 * @param K Output: Camera calibration matrix, 3 by 3.
+	 * @param pose Output: The rotation and translation.
 	 */
 	public static void decomposeCameraMatrix(DenseMatrix64F P, DenseMatrix64F K, Se3_F64 pose) {
 		DenseMatrix64F KR = new DenseMatrix64F(3,3);
@@ -592,5 +594,22 @@ public class MultiViewOps {
 			throw new RuntimeException("Inverse failed!  Bad input?");
 
 		CommonOps.scale(1.0/K.get(2,2),K);
+	}
+
+	/**
+	 * Decomposes an essential matrix into the rigid body motion which it was constructed from.  Due to ambiguities
+	 * there are four possible solutions.  See {@link DecomposeEssential} for the details.  The correct solution can
+	 * be found using triangulation and the positive depth constraint, e.g. the objects must be in front of the camera
+	 * to be seen.  Also note that the scale of the translation is lost, even with perfect data.
+	 *
+	 * @param E An essential matrix.
+	 * @return Four possible motions
+	 */
+	public static List<Se3_F64> decomposeEssential( DenseMatrix64F E ) {
+		DecomposeEssential d = new DecomposeEssential();
+
+		d.decompose(E);
+
+		return d.getSolutions();
 	}
 }
