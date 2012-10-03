@@ -152,4 +152,15 @@ public class TestPolynomialOps {
 
 		return ret;
 	}
+
+	@Test
+	public void cubicRealRoot() {
+		Polynomial p = Polynomial.wrap(4,-5,2,1.3);
+
+		double root = PolynomialOps.cubicRealRoot(p.c[0],p.c[1],p.c[2],p.c[3]);
+
+		double eval = p.evaluate(root);
+
+		assertEquals(0,eval,1e-8);
+	}
 }

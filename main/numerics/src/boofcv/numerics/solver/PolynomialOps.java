@@ -214,4 +214,46 @@ public class PolynomialOps {
 		throw new RuntimeException("Unknown algorithm");
 	}
 
+	/**
+	 * Returns a real root to the cubic polynomial: 0 = c0 + c1*x + c2*x^2 + c3*c^3.  There can be other
+	 * real roots.
+	 *
+	 * @param c0 Polynomial coefficient for power 0
+	 * @param c1 Polynomial coefficient for power 1
+	 * @param c2 Polynomial coefficient for power 2
+	 * @param c3 Polynomial coefficient for power 3
+	 * @return A real root of the polynomial
+	 */
+	public static double cubicRealRoot( double c0 , double c1 , double c2 , double c3 ) {
+		// convert it into this format:  r + q*x + p*x^2 + x^3 = 0
+		double p = c2/c3;
+		double q = c1/c3;
+		double r = c0/c3;
+
+		// reduce by substitution x = y - p/3 which results in y^3 + a*y + b = 0
+
+		double a = (3*q - p*p)/3.0;
+		double b = (2*p*p*p - 9*p*q + 27*r)/27.0;
+
+		double left = -b/2.0;
+		double right = Math.sqrt(b*b/4.0 + a*a*a/27.0);
+
+		double inner1 = left+right;
+		double inner2 = left-right;
+
+		double A,B;
+
+		if( inner1 < 0 )
+			A = -Math.pow(-inner1,1.0/3.0);
+		else
+			A = Math.pow(inner1,1.0/3.0);
+
+		if( inner2 < 0 )
+			B = -Math.pow(-inner2,1.0/3.0);
+		else
+			B = Math.pow(inner2,1.0/3.0);
+
+		return (A + B) - p/3.0;
+	}
+
 }
