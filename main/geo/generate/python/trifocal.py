@@ -27,12 +27,6 @@ swap=[
     ('xb0','p2_norm.x'),('xb1','p2_norm.y'),
     ('xc0','p3_norm.x'),('xc1','p3_norm.y')]
 
-def performSwap( s , table ):
-    for p in table:
-        s = s.replace(p[0],p[1])
-    return s
-
-
 def printCode( input ):
     for k in range(1,4):
         for row in range(0,3):

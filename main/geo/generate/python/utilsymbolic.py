@@ -73,26 +73,64 @@ def multScalarMatrix( s , A ):
 
 def expandPower( expression ):
   """Expands out variables which are multiplied by an integer value
-  For example x^2 = x*x and x^4 = x*x*x*x
+  For example x^2 = (x*x) and x^4 = (x*x*x*x)
   """
-  l = expression.split('*')
 
-  # handle special case with a minus sign in front
-  if l[0][0] == '-':
-    l[0] = l[0][1:]
-    expression = '-'
-  else:
-    expression = ''
+  start = 0
+  while start < len(expression):
+    l = expression[start:].find('*')
+    if l == -1: l = expression[start:].find('/')
+    if l == -1: l = len(expression)
+    l += start
+    varName = expression[start:l]
 
-  for s in l:
-    if len(s) >= 3 and s[-2] == '^':
-       var = s[:-2]
-       expanded = var
-       for i in range(int(s[-1])-1): expanded += '*'+var
-       expression += expanded + '*'
+    if len(varName) >= 3 and varName[-2] == '^':
+      # handle special case where the block is multiplied by -1
+      if varName[0] == '-':
+        varName = varName[1:]
+        start += 1
+
+      # The power it is being taken to
+      powerNum = int(varName[-1])
+      # strip away power symbol
+      varName = varName[:-2]
+
+      expanded = varName
+      for i in range(powerNum - 1): expanded += '*' + varName
+
+      if expression[start - 1] == '/':
+        expressionHead = expression[:start] + '(' + expanded + ')'
+      else:
+        expressionHead = expression[:start] + expanded
+      expression = expressionHead + expression[l:]
+      start = len(expressionHead) + 1
     else:
-       expression += s + '*'
-  return expression[:-1]
+      start = l + 1
+
+  return expression
+
+def extractNotVarEq( expression , key ):
+  """ Searches for blocks which do NOT include the specified key
+  """
+  # expand out and convert into a string
+  expression = str(expression.expand())
+  # Make sure negative symbols are not stripped and split into multiplicative blocks
+  s = expression.replace('- ','-').split(' ')
+  # Find blocks NOT multiplied by the key and save them
+  var = [ w for w in s if w.find(key) == -1 and w[0] != '+' ]
+
+  # Expand out power
+  var = [expandPower(w) for w in var]
+
+  # construct a string which can be compiled
+  ret = var[0]
+  for w in var[1:]:
+    if w[0] == '-':
+      ret += ' - '+w[1:]
+    else:
+      ret += ' + '+w
+
+  return ret
 
 def extractVarEq( expression , key ):
   """Expands the expression out and searches for all blocks of multiplication that are multiplied by the key.
@@ -100,16 +138,15 @@ def extractVarEq( expression , key ):
   Example:  "x*a*b + y*a*a*b - c*x*d"  would output "a*b - c*d" if the key was 'x'
   """
 
-  chars = set('xyz')
   # expand out and convert into a string
   expression = str(expression.expand())
   # Make sure negative symbols are not stripped and split into multiplicative blocks
   s = expression.replace('- ','-').split(' ')
+  # If the key does not have a power then strip away all blocks where it does
+  if key.find('^') == -1:
+    s = [ w for w in s if w.find(key+'^') == -1 ]
   # Find blocks multiplied by the key and remove the key from the string
-  if len(key) == 0:
-    var = [w for w in s if len(w) != 1 and not any( c in chars for c in w )]
-  else:
-    var = [w[0:w.find(key)]+w[w.find(key)+len(key):] for w in s if w.find(key) != -1 ]
+  var = [w[0:w.find(key)]+w[w.find(key)+len(key):] for w in s if w.find(key) != -1 ]
 
   # Handle the case where the key was not found
   if len(var) == 0:
@@ -117,6 +154,7 @@ def extractVarEq( expression , key ):
 
   # Fix problems left by stripping away the key
   var = [w.replace('-*','-') for w in var]
+  var = [w.replace('*/','/') for w in var]
   for i in range(0,len(var)):
       if len(var[i]) == 0: var[i] = '1'
       elif len(var[i]) == 1 and var[i][0] == '-': var[i] = '-1'
@@ -141,7 +179,11 @@ def printData( var , eqs , keys ):
   for row,eq in enumerate(eqs):
     index = len(keys)*row
     for k in keys:
-      f.write('%s.data[%d] = %s;\n'%(var,index,simplifyExpanded(extractVarEq(eq,k))))
+      if len(k) == 0:
+        s = extractNotVarEq(eq,k)
+      else:
+        s = extractVarEq(eq,k)
+      f.write('%s.data[%d] = %s;\n'%(var,index,simplifyExpanded(s)))
       index += 1
   f.close()
 
@@ -210,3 +252,10 @@ def simplifyExpanded( input ):
       output += ' + '+simplifyExpanded( reconstruct(exclude))
 
   return output
+
+def performSwap( s , table ):
+  """ Replaces a set of words
+  """
+  for p in table:
+    s = s.replace(p[0],p[1])
+  return s

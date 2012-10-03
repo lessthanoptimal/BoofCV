@@ -43,6 +43,10 @@ eqs = (eq1,eq2[0,0],eq2[0,1],eq2[0,2],eq2[1,0],eq2[1,1],eq2[1,2],eq2[2,0],eq2[2,
 keysA = ('x^3','y^3','x^2*y','x*y^2','x^2*z','x^2','y^2*z','y^2','x*y*z','x*y')
 keysB = ('x*z^2','x*z','x','y*z^2','y*z','y','z^3','z^2','z','')
 
+# WARNING: The code has been modified since it was originally written and can't handle and empty key any more
+#          Write a new funciton which can handle that case.  The offending function is extractVarEq() which was
+#          made more generic
+
 # print out machine code for the linear system
 printData('A',eqs,keysA)
 printData('B',eqs,keysB)

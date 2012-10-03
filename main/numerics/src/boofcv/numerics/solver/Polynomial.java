@@ -19,10 +19,14 @@
 package boofcv.numerics.solver;
 
 /**
+ * Data structure for storing polynomials.
+ *
  * @author Peter Abeles
  */
 public class Polynomial {
+	//  Polynomial's coefficients
 	public double c[];
+	// the number of coefficients (degree+1)
 	public int size;
 
 	public static Polynomial wrap( double ...coefficients ) {
@@ -32,9 +36,16 @@ public class Polynomial {
 		return p;
 	}
 
-	public Polynomial( int maxDegree ) {
-		c = new double[ maxDegree ];
-		this.size = maxDegree;
+	/**
+	 * Creates a polynomial which can hold the specified number of coefficients.  Note this is the polynomial's
+	 * degree+1.
+	 *
+	 * @param maxCoefficients The largest number of coefficients which can be stored.  Also the initial size
+	 *                        of the polynomial.
+	 */
+	public Polynomial( int maxCoefficients ) {
+		c = new double[ maxCoefficients ];
+		this.size = maxCoefficients;
 	}
 
 	public Polynomial( Polynomial original ) {
@@ -89,6 +100,11 @@ public class Polynomial {
 		System.arraycopy(coefficients,0,c,0,size);
 	}
 
+	/**
+	 * Change the maximum number of coefficients which can be stored inside this polynomial
+	 *
+	 * @param size New maximum number of coefficients.
+	 */
 	public void resize( int size ) {
 		if( c.length < size )
 			c = new double[size];
