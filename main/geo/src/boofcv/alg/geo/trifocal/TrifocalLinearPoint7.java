@@ -53,8 +53,6 @@ import java.util.List;
  */
 public class TrifocalLinearPoint7 {
 
-	// Output trifocal tensor
-	protected TrifocalTensor solution = new TrifocalTensor();
 	// trifocal tensor computed from normalized coordinates
 	protected TrifocalTensor solutionN = new TrifocalTensor();
 
@@ -93,9 +91,10 @@ public class TrifocalLinearPoint7 {
 	 * Estimates the trifocal tensor given the set of observations
 	 *
 	 * @param observations Set of observations
+	 * @param solution Output: Where the solution is written to
 	 * @return true if successful and false if it fails
 	 */
-	public boolean process( List<AssociatedTriple> observations ) {
+	public boolean process( List<AssociatedTriple> observations , TrifocalTensor solution ) {
 
 		if( observations.size() < 7 )
 			throw new IllegalArgumentException("At least 7 correspondences must be provided");
@@ -115,7 +114,7 @@ public class TrifocalLinearPoint7 {
 		enforce.extractSolution(solutionN);
 
 		// undo normalization
-		removeNormalization();
+		removeNormalization(solution);
 
 		return true;
 	}
@@ -230,7 +229,7 @@ public class TrifocalLinearPoint7 {
 	/**
 	 * Translates the trifocal tensor back into regular coordinate system
 	 */
-	protected void removeNormalization() {
+	protected void removeNormalization( TrifocalTensor solution ) {
 		DenseMatrix64F N2_inv = new DenseMatrix64F(3,3);
 		DenseMatrix64F N3_inv = new DenseMatrix64F(3,3);
 
@@ -259,37 +258,5 @@ public class TrifocalLinearPoint7 {
 				}
 			}
 		}
-	}
-
-	protected void removeNormalization2() {
-		DenseMatrix64F N2_inv = new DenseMatrix64F(3,3);
-		DenseMatrix64F N3_inv = new DenseMatrix64F(3,3);
-
-		CommonOps.invert(N2,N2_inv);
-		CommonOps.invert(N3,N3_inv);
-
-		DenseMatrix64F temp = new DenseMatrix64F(3,3);
-
-		for( int r = 0; r < 3; r++ ) {
-			CommonOps.mult(N2_inv,solutionN.getT(r),temp);
-			CommonOps.multTransB(temp,N3_inv,solutionN.getT(r));
-		}
-
-		for( int i = 0; i < 3; i++ ) {
-			DenseMatrix64F T = solution.getT(i);
-
-			CommonOps.scale(N1.get(0,i),solutionN.T1,T);
-			CommonOps.add(T,N1.get(1,i),solutionN.T2,T);
-			CommonOps.add(T,N1.get(2,i),solutionN.T3,T);
-		}
-	}
-
-	/**
-	 * Returns the found {@link TrifocalTensor}.
-	 *
-	 * @return Found solution.
-	 */
-	public TrifocalTensor getSolution() {
-		return solution;
 	}
 }

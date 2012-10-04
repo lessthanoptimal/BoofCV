@@ -16,14 +16,26 @@
  * limitations under the License.
  */
 
-package boofcv.abst.geo;
+package boofcv.factory.geo;
 
 /**
- * Marker interface for solutions to the Perspective N-Point (PnP) problem.  These algorithms estimate one or more
- * transformations from the world to camera frames given a set of paired observations and 3D feature coordinates.
+ * List of algorithms for estimating {@link boofcv.struct.geo.TrifocalTensor}.
  *
  * @author Peter Abeles
  */
-public interface PerspectiveNPoint  {
+public enum EnumTrifocal {
+	/**
+	 * Linearly estimates the trifocal tensor using 7 sets of observations.  Algebraic constraints are applied
+	 * only one.
+	 *
+	 * @see boofcv.alg.geo.trifocal.TrifocalLinearPoint7
+	 */
+	LINEAR7,
+	/**
+	 * Same as LINEAR7, but algebraic constraints are applied iteratively to improve compliance.
+	 *
+	 * @see boofcv.alg.geo.trifocal.TrifocalAlgebraicPoint7
+	 */
+	ALGEBRAIC7
 
 }

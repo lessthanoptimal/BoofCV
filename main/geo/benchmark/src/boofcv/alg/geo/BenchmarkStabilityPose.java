@@ -18,8 +18,8 @@
 
 package boofcv.alg.geo;
 
-import boofcv.factory.geo.FactoryEpipolar;
-import boofcv.struct.geo.GeoModelEstimator1;
+import boofcv.abst.geo.Estimate1ofPnP;
+import boofcv.factory.geo.FactoryMultiView;
 import boofcv.struct.geo.PointPosePair;
 import georegression.geometry.RotationMatrixGenerator;
 import georegression.struct.point.Vector3D_F64;
@@ -36,7 +36,7 @@ public class BenchmarkStabilityPose extends ArtificialStereoScene {
 
 	static final int NUM_POINTS = 500;
 
-	GeoModelEstimator1<Se3_F64,PointPosePair> target;
+	Estimate1ofPnP target;
 	Se3_F64 found = new Se3_F64();
 	
 	public void evaluateObservationNoise( double min , double max , int N , boolean isPlanar )
@@ -85,9 +85,9 @@ public class BenchmarkStabilityPose extends ArtificialStereoScene {
 		boolean planar = false;
 
 		BenchmarkStabilityPose app = new BenchmarkStabilityPose();
-		app.target = FactoryEpipolar.pnpEfficientPnP(0,1);
+		app.target = FactoryMultiView.computePnPwithEPnP(0, 1);
 		app.evaluateObservationNoise(0,max,20,planar);
-		app.target = FactoryEpipolar.pnpEfficientPnP(10, 0.1);
+		app.target = FactoryMultiView.computePnPwithEPnP(10, 0.1);
 		app.evaluateObservationNoise(0,max,20,planar);
 
 	}

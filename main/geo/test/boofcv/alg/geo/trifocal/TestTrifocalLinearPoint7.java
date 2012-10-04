@@ -20,7 +20,6 @@ package boofcv.alg.geo.trifocal;
 
 import boofcv.alg.geo.MultiViewOps;
 import boofcv.struct.geo.AssociatedTriple;
-import boofcv.struct.geo.TrifocalTensor;
 import org.ejml.data.DenseMatrix64F;
 import org.ejml.ops.CommonOps;
 import org.ejml.ops.NormOps;
@@ -71,9 +70,7 @@ public class TestTrifocalLinearPoint7 extends CommonTrifocalChecks {
 	public void fullTest() {
 		TrifocalLinearPoint7 alg = new TrifocalLinearPoint7();
 
-		assertTrue(alg.process(observations));
-
-		TrifocalTensor found = alg.getSolution();
+		assertTrue(alg.process(observations,found));
 
 		// validate the solution by using a constraint
 		for( AssociatedTriple a : observations ) {

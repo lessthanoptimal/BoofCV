@@ -18,24 +18,24 @@
 
 package boofcv.abst.geo.fitting;
 
+import boofcv.abst.geo.Estimate1ofEpipolar;
 import boofcv.numerics.fitting.modelset.ModelGenerator;
 import boofcv.struct.geo.AssociatedPair;
-import boofcv.struct.geo.GeoModelEstimator1;
 import org.ejml.data.DenseMatrix64F;
 
 import java.util.List;
 
 /**
- * Wrapper around {@link boofcv.abst.geo.EpipolarMatrixEstimator} for {@link ModelGenerator}.  Used for robust model
+ * Wrapper around {@link boofcv.abst.geo.Estimate1ofEpipolar} for {@link ModelGenerator}.  Used for robust model
  * fitting with outliers.
  * 
  * @author Peter Abeles
  */
 public class GenerateEpipolarMatrix implements ModelGenerator<DenseMatrix64F,AssociatedPair> {
 
-	GeoModelEstimator1<DenseMatrix64F,AssociatedPair> alg;
+	Estimate1ofEpipolar alg;
 
-	public GenerateEpipolarMatrix(GeoModelEstimator1<DenseMatrix64F,AssociatedPair> alg) {
+	public GenerateEpipolarMatrix(Estimate1ofEpipolar alg) {
 		this.alg = alg;
 	}
 

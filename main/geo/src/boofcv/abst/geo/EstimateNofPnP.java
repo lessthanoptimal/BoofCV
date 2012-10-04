@@ -16,36 +16,18 @@
  * limitations under the License.
  */
 
-package boofcv.struct.geo;
+package boofcv.abst.geo;
 
-import org.ejml.data.DenseMatrix64F;
+import boofcv.struct.geo.GeoModelEstimatorN;
+import boofcv.struct.geo.PointPosePair;
+import georegression.struct.se.Se3_F64;
 
 /**
- * {@link ObjectManager} for {@link DenseMatrix64F} of a fixed shape.
+ * Marker interface for computing multiple solution to the Perspective N-Point (PnP) problem.  Given a set of point
+ * observations from a single view and the known 3D location of the points being observed, estimate the camera
+ * location.  All observations must be in calibrated image coordinates.
  *
  * @author Peter Abeles
  */
-public class ObjectManagerMatrix implements ObjectManager<DenseMatrix64F> {
-
-	int numRows,numCols;
-
-	public ObjectManagerMatrix(int numRows, int numCols) {
-		this.numRows = numRows;
-		this.numCols = numCols;
-	}
-
-	@Override
-	public void copy(DenseMatrix64F src, DenseMatrix64F dst) {
-		dst.set(src);
-	}
-
-	@Override
-	public DenseMatrix64F createInstance() {
-		return new DenseMatrix64F(numRows,numCols);
-	}
-
-	@Override
-	public Class<DenseMatrix64F> getType() {
-		return DenseMatrix64F.class;
-	}
+public interface EstimateNofPnP extends GeoModelEstimatorN<Se3_F64,PointPosePair> {
 }

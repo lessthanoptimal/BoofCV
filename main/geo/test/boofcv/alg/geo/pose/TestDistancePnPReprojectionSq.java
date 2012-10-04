@@ -16,16 +16,20 @@
  * limitations under the License.
  */
 
-package boofcv.abst.geo.pose;
+package boofcv.alg.geo.pose;
 
-import boofcv.alg.geo.pose.PnPLepetitEPnP;
+import org.junit.Test;
+
+import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
  */
-public class TestWrapPnPLepetitEPnP extends CheckEstimate1ofPnP {
+public class TestDistancePnPReprojectionSq {
 
-	public TestWrapPnPLepetitEPnP() {
-		super( new WrapPnPLepetitEPnP(new PnPLepetitEPnP()),false);
+	@Test
+	public void stuff() {
+		fail("Implement");
 	}
+
 }

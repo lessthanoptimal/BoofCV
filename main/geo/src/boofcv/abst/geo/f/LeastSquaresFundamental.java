@@ -18,7 +18,7 @@
 
 package boofcv.abst.geo.f;
 
-import boofcv.abst.geo.EpipolarMatrixEstimator;
+import boofcv.abst.geo.RefineEpipolar;
 import boofcv.abst.geo.optimization.ResidualsEpipolarMatrix;
 import boofcv.alg.geo.ModelObservationResidual;
 import boofcv.alg.geo.f.FundamentalResidualSampson;
@@ -28,7 +28,6 @@ import boofcv.numerics.fitting.modelset.ModelCodec;
 import boofcv.numerics.optimization.FactoryOptimization;
 import boofcv.numerics.optimization.UnconstrainedLeastSquares;
 import boofcv.struct.geo.AssociatedPair;
-import boofcv.struct.geo.GeoModelRefine;
 import org.ejml.data.DenseMatrix64F;
 
 import java.util.List;
@@ -38,7 +37,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class LeastSquaresFundamental implements EpipolarMatrixEstimator, GeoModelRefine<DenseMatrix64F,AssociatedPair> {
+public class LeastSquaresFundamental implements RefineEpipolar {
 	ModelCodec<DenseMatrix64F> paramModel;
 	ResidualsEpipolarMatrix func;
 	double param[];

@@ -3,6 +3,7 @@ package boofcv.factory.sfm;
 import boofcv.abst.feature.disparity.StereoDisparitySparse;
 import boofcv.abst.feature.tracker.ImagePointTracker;
 import boofcv.abst.feature.tracker.KeyFramePointTracker;
+import boofcv.abst.geo.Estimate1ofEpipolar;
 import boofcv.abst.geo.TriangulateTwoViewsCalibrated;
 import boofcv.abst.sfm.StereoVisualOdometry;
 import boofcv.abst.sfm.WrapPixelDepthVoEpipolar;
@@ -12,7 +13,7 @@ import boofcv.alg.sfm.PointPoseTrack;
 import boofcv.alg.sfm.StereoSparse3D;
 import boofcv.alg.sfm.robust.DistanceSe3SymmetricSq;
 import boofcv.alg.sfm.robust.Se3FromEssentialGenerator;
-import boofcv.factory.geo.FactoryEpipolar;
+import boofcv.factory.geo.FactoryMultiView;
 import boofcv.factory.geo.FactoryTriangulate;
 import boofcv.numerics.fitting.modelset.DistanceFromModel;
 import boofcv.numerics.fitting.modelset.ModelGenerator;
@@ -21,10 +22,8 @@ import boofcv.numerics.fitting.modelset.ransac.Ransac;
 import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.distort.PointTransform_F64;
 import boofcv.struct.geo.AssociatedPair;
-import boofcv.struct.geo.GeoModelEstimator1;
 import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.se.Se3_F64;
-import org.ejml.data.DenseMatrix64F;
 
 /**
  * Factory for creating visual odometry algorithms.
@@ -46,7 +45,7 @@ public class FactoryVisualOdometry {
 //		pixelToNormalized.compute(0,0,tempB);
 //		double noise = (Math.abs(tempA.x-tempB.x) + Math.abs(tempA.y-tempB.y))/2;
 //
-//		EpipolarMatrixEstimator essentialAlg = FactoryEpipolar.computeFundamentalOne(7,false,1);
+//		EpipolarMatrixEstimator essentialAlg = FactoryMultiView.computeSingleFundamental(7,false,1);
 //		TriangulateTwoViewsCalibrated triangulate = FactoryTriangulate.twoGeometric();
 //
 //		ModelGenerator<Se3_F64,AssociatedPair> generateEpipolarMotion =
@@ -59,10 +58,10 @@ public class FactoryVisualOdometry {
 //				new Ransac<Se3_F64,AssociatedPair>(2323,generateEpipolarMotion,distanceSe3,
 //						100,2*noise*noise);
 //
-//		RefineEpipolarMatrix refineE = FactoryEpipolar.refineFundamental(1e-8,400, EpipolarError.SIMPLE);
+//		RefineEpipolarMatrix refineE = FactoryMultiView.refineFundamental(1e-8,400, EpipolarError.SIMPLE);
 //
 //		ModelGenerator<Se3_F64,PointPosePair> generateMotion =
-//				new GenerateMotionPnP( FactoryEpipolar.pnpEfficientPnP(5,0.1));
+//				new GenerateMotionPnP( FactoryMultiView.computePnPwithEPnP(5,0.1));
 //		DistanceFromModel<Se3_F64,PointPosePair> distanceMotion =
 //				new DistanceFromModelResidualN<Se3_F64,PointPosePair>(new PnPResidualSimple());
 //
@@ -70,7 +69,7 @@ public class FactoryVisualOdometry {
 //				new Ransac<Se3_F64,PointPosePair>(2323,generateMotion,distanceMotion,
 //						100,noise*noise);
 //
-//		RefinePerspectiveNPoint refineMotion = FactoryEpipolar.refinePnpEfficient(5,0.1);
+//		RefinePerspectiveNPoint refineMotion = FactoryMultiView.refinePnpEfficient(5,0.1);
 //
 //		MonocularSimpleVo<T> mono = new MonocularSimpleVo<T>(minTracks,minTracks*2,minPixelChange,tracker,pixelToNormalized,
 //				epipolarMotion,refineE,computeMotion,refineMotion);
@@ -91,7 +90,7 @@ public class FactoryVisualOdometry {
 //		pixelToNormalized.compute(0,0,tempB);
 //		double noise = (Math.abs(tempA.x-tempB.x) + Math.abs(tempA.y-tempB.y))/2;
 //
-//		EpipolarMatrixEstimator essentialAlg = FactoryEpipolar.computeFundamentalOne(7,false,1);
+//		EpipolarMatrixEstimator essentialAlg = FactoryMultiView.computeSingleFundamental(7,false,1);
 //		TriangulateTwoViewsCalibrated triangulate = FactoryTriangulate.twoGeometric();
 //
 //		ModelGenerator<Se3_F64,AssociatedPair> generateEpipolarMotion =
@@ -124,7 +123,7 @@ public class FactoryVisualOdometry {
 										Class<T> imageType) {
 
 		// motion estimation using essential matrix
-		GeoModelEstimator1<DenseMatrix64F,AssociatedPair> essentialAlg = FactoryEpipolar.computeFundamentalOne(5, false, 2);
+		Estimate1ofEpipolar essentialAlg = FactoryMultiView.computeSingleFundamental(5, false, 2);
 		TriangulateTwoViewsCalibrated triangulate = FactoryTriangulate.twoGeometric();
 		ModelGenerator<Se3_F64, AssociatedPair> generateEpipolarMotion =
 				new Se3FromEssentialGenerator(essentialAlg, triangulate);

@@ -18,18 +18,18 @@
 
 package boofcv.alg.geo;
 
+import boofcv.abst.geo.Estimate1ofEpipolar;
 import boofcv.alg.geo.h.HomographyLinear4;
 import boofcv.factory.geo.EpipolarError;
-import boofcv.factory.geo.FactoryEpipolar;
+import boofcv.factory.geo.FactoryMultiView;
 import boofcv.misc.Performer;
 import boofcv.misc.PerformerBase;
 import boofcv.misc.ProfileOperation;
 import boofcv.struct.geo.AssociatedPair;
-import boofcv.struct.geo.GeoModelEstimator1;
 import boofcv.struct.geo.GeoModelRefine;
 import org.ejml.data.DenseMatrix64F;
 
-import static boofcv.factory.geo.FactoryEpipolar.refineHomography;
+import static boofcv.factory.geo.FactoryMultiView.refineHomography;
 
 /**
  * @author Peter Abeles
@@ -82,7 +82,7 @@ public class BenchmarkRuntimeRefineHomography extends ArtificialStereoScene{
 
 		init(NUM_POINTS, PIXELS, true);
 
-		GeoModelEstimator1<DenseMatrix64F,AssociatedPair> computeAlg = FactoryEpipolar.computeHomography(true);
+		Estimate1ofEpipolar computeAlg = FactoryMultiView.computeHomography(true);
 		computeAlg.process(pairs,initialF);
 		initialF.data[0] += 0.1;
 		initialF.data[4] -= 0.15;

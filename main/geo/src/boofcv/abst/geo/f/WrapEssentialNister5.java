@@ -18,21 +18,20 @@
 
 package boofcv.abst.geo.f;
 
-import boofcv.abst.geo.EpipolarMatrixEstimator;
+import boofcv.abst.geo.EstimateNofEpipolar;
 import boofcv.alg.geo.f.EssentialNister5;
 import boofcv.struct.FastQueue;
 import boofcv.struct.geo.AssociatedPair;
-import boofcv.struct.geo.GeoModelEstimatorN;
 import org.ejml.data.DenseMatrix64F;
 
 import java.util.List;
 
 /**
- * Wrapper around either {@link boofcv.alg.geo.f.EssentialNister5} for {@link boofcv.abst.geo.EpipolarMatrixEstimator}.
+ * Wrapper around either {@link boofcv.alg.geo.f.EssentialNister5} for {@link boofcv.abst.geo.EstimateNofEpipolar}.
  *
  * @author Peter Abeles
  */
-public class WrapEssentialNister5 implements EpipolarMatrixEstimator, GeoModelEstimatorN<DenseMatrix64F,AssociatedPair> {
+public class WrapEssentialNister5 implements EstimateNofEpipolar {
 	EssentialNister5 alg;
 
 	public WrapEssentialNister5() {

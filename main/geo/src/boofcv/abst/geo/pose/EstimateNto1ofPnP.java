@@ -16,27 +16,30 @@
  * limitations under the License.
  */
 
-package boofcv.struct.geo;
+package boofcv.abst.geo.pose;
 
+import boofcv.abst.geo.Estimate1ofPnP;
+import boofcv.abst.geo.GeoModelEstimatorNto1;
+import boofcv.alg.geo.pose.DistancePnPReprojectionSq;
 import boofcv.struct.FastQueue;
+import boofcv.struct.geo.GeoModelEstimatorN;
+import boofcv.struct.geo.PointPosePair;
+import georegression.struct.se.Se3_F64;
 
 /**
- * TODO Comment
+ * Implementation of {@link GeoModelEstimatorNto1} for PnP problem.
  *
  * @author Peter Abeles
  */
-public class QueueObjectManager<O> extends FastQueue<O> {
-
-	ObjectManager<O> estimator;
-
-	public QueueObjectManager(int initialMaxSize, ObjectManager<O> manager) {
-		super(manager.getType(), true);
-		this.estimator = manager;
-		growArray(initialMaxSize);
+public class EstimateNto1ofPnP extends GeoModelEstimatorNto1<Se3_F64,PointPosePair>
+		implements Estimate1ofPnP
+{
+	public EstimateNto1ofPnP(GeoModelEstimatorN<Se3_F64, PointPosePair> alg, FastQueue<Se3_F64> solutions, int numTest) {
+		super(alg, new DistancePnPReprojectionSq(), solutions, numTest);
 	}
 
 	@Override
-	protected O createInstance() {
-		return estimator.createInstance();
+	protected void copy(Se3_F64 src, Se3_F64 dst) {
+		dst.set(src);
 	}
 }

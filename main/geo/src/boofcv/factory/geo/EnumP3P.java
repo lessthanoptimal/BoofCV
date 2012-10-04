@@ -16,20 +16,20 @@
  * limitations under the License.
  */
 
-package boofcv.struct.geo;
-
-import org.junit.Test;
-
-import static org.junit.Assert.fail;
+package boofcv.factory.geo;
 
 /**
+ * List of algorithms for solving the P3P problem
+ *
  * @author Peter Abeles
  */
-public class TestQueueObjectManager {
-
-	@Test
-	public void stuff() {
-		fail("Implement");
-	}
-
+public enum EnumP3P {
+	/**
+	 * @see boofcv.alg.geo.pose.P3PGrunert
+	 */
+	GRUNERT,
+	/**
+	 * @see boofcv.alg.geo.pose.P3PFinsterwalder
+	 */
+	FINSTERWALDER
 }

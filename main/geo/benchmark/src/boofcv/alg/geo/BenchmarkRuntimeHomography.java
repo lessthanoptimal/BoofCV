@@ -18,11 +18,11 @@
 
 package boofcv.alg.geo;
 
-import boofcv.factory.geo.FactoryEpipolar;
+import boofcv.abst.geo.Estimate1ofEpipolar;
+import boofcv.factory.geo.FactoryMultiView;
 import boofcv.misc.Performer;
 import boofcv.misc.ProfileOperation;
 import boofcv.struct.geo.AssociatedPair;
-import boofcv.struct.geo.GeoModelEstimator1;
 import org.ejml.data.DenseMatrix64F;
 
 import java.util.ArrayList;
@@ -42,11 +42,11 @@ public class BenchmarkRuntimeHomography extends ArtificialStereoScene {
 
 	public class Estimate implements Performer {
 
-		GeoModelEstimator1<DenseMatrix64F,AssociatedPair> alg;
+		Estimate1ofEpipolar alg;
 		String name;
 		List<AssociatedPair> list;
 		
-		public Estimate( String name , GeoModelEstimator1<DenseMatrix64F,AssociatedPair> alg , List<AssociatedPair> list ) {
+		public Estimate( String name , Estimate1ofEpipolar alg , List<AssociatedPair> list ) {
 			this.alg = alg;
 			this.name = name;
 			this.list = list;
@@ -74,11 +74,11 @@ public class BenchmarkRuntimeHomography extends ArtificialStereoScene {
 		}
 
 		System.out.println("Minimum Number");
-		ProfileOperation.printOpsPerSec(new Estimate("Linear 4 Norm", FactoryEpipolar.computeHomography(true), pairs4), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new Estimate("Linear 4 Unorm",FactoryEpipolar.computeHomography(false),pairs4), TEST_TIME);
+		ProfileOperation.printOpsPerSec(new Estimate("Linear 4 Norm", FactoryMultiView.computeHomography(true), pairs4), TEST_TIME);
+		ProfileOperation.printOpsPerSec(new Estimate("Linear 4 Unorm", FactoryMultiView.computeHomography(false),pairs4), TEST_TIME);
 
 		System.out.println("N");
-		ProfileOperation.printOpsPerSec(new Estimate("Linear 4", FactoryEpipolar.computeHomography(true),pairs), TEST_TIME);
+		ProfileOperation.printOpsPerSec(new Estimate("Linear 4", FactoryMultiView.computeHomography(true),pairs), TEST_TIME);
 
 	}
 	

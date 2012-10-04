@@ -18,10 +18,13 @@
 
 package boofcv.abst.geo;
 
-import boofcv.abst.geo.f.DistanceEpipolarConstraint;
+import boofcv.alg.geo.f.DistanceEpipolarConstraint;
 import boofcv.alg.geo.f.EssentialNister5;
+import boofcv.numerics.fitting.modelset.DistanceFromModel;
 import boofcv.struct.FastQueue;
-import boofcv.struct.geo.*;
+import boofcv.struct.geo.AssociatedPair;
+import boofcv.struct.geo.GeoModelEstimatorN;
+import boofcv.struct.geo.QueueMatrix;
 import org.ejml.data.DenseMatrix64F;
 import org.ejml.ops.MatrixFeatures;
 import org.ejml.ops.RandomMatrices;
@@ -41,7 +44,6 @@ public class TestGeoModelEstimatorNto1 {
 	Random rand = new Random(234);
 	List<AssociatedPair> obs = new ArrayList<AssociatedPair>();
 
-	ObjectManager<DenseMatrix64F> manager = new ObjectManagerMatrix(3,3);
 	DistanceEpipolarConstraint distance = new DistanceEpipolarConstraint();
 
 	DenseMatrix64F found = new DenseMatrix64F(3,3);
@@ -60,7 +62,7 @@ public class TestGeoModelEstimatorNto1 {
 	@Test
 	public void successButNoSolutions() {
 		GeoModelEstimatorNto1<DenseMatrix64F,AssociatedPair> alg =
-				new GeoModelEstimatorNto1<DenseMatrix64F,AssociatedPair>(new Dummy(0, true),manager,distance,2);
+				new DummyEstimator(new Dummy(0, true),distance,2);
 
 		assertFalse(alg.process(obs,found));
 	}
@@ -68,7 +70,7 @@ public class TestGeoModelEstimatorNto1 {
 	@Test
 	public void checkFailed() {
 		GeoModelEstimatorNto1<DenseMatrix64F,AssociatedPair>  alg =
-				new GeoModelEstimatorNto1<DenseMatrix64F,AssociatedPair>(new Dummy(0, false), manager,distance,2);
+				new DummyEstimator(new Dummy(0, false), distance,2);
 
 		assertFalse(alg.process(obs,found));
 	}
@@ -76,7 +78,7 @@ public class TestGeoModelEstimatorNto1 {
 	@Test
 	public void checkOneSolution() {
 		GeoModelEstimatorNto1<DenseMatrix64F,AssociatedPair>  alg =
-				new GeoModelEstimatorNto1<DenseMatrix64F,AssociatedPair>(new Dummy(1, true), manager,distance,2);
+				new DummyEstimator(new Dummy(1, true), distance,2);
 
 		assertTrue(alg.process(obs,found));
 	}
@@ -90,7 +92,7 @@ public class TestGeoModelEstimatorNto1 {
 		DenseMatrix64F correct = createSolution();
 
 		GeoModelEstimatorNto1<DenseMatrix64F,AssociatedPair>  alg =
-				new GeoModelEstimatorNto1<DenseMatrix64F,AssociatedPair>(new Dummy(correct, 7), manager,distance,2);
+				new DummyEstimator(new Dummy(correct, 7), distance,2);
 
 		assertTrue(alg.process(obs,found));
 
@@ -102,7 +104,7 @@ public class TestGeoModelEstimatorNto1 {
 		EssentialNister5 nister = new EssentialNister5();
 
 
-		FastQueue<DenseMatrix64F> solutions = new QueueMatrix(10,3,3);
+		FastQueue<DenseMatrix64F> solutions = new QueueMatrix(3, 3, 10);
 		assertTrue(nister.process(obs,solutions));
 
 		return solutions.get(0);
@@ -145,6 +147,20 @@ public class TestGeoModelEstimatorNto1 {
 		@Override
 		public int getMinimumPoints() {
 			return 3;
+		}
+	}
+
+	private class DummyEstimator extends GeoModelEstimatorNto1<DenseMatrix64F,AssociatedPair> {
+
+		public DummyEstimator(GeoModelEstimatorN<DenseMatrix64F, AssociatedPair> alg,
+							  DistanceFromModel<DenseMatrix64F, AssociatedPair> distance,
+							  int numTest) {
+			super(alg, distance, new QueueMatrix(3,3), numTest);
+		}
+
+		@Override
+		protected void copy(DenseMatrix64F src, DenseMatrix64F dst) {
+			dst.set(src);
 		}
 	}
 

@@ -18,11 +18,10 @@
 
 package boofcv.abst.geo.pose;
 
-import boofcv.abst.geo.PerspectiveNPoint;
+import boofcv.abst.geo.EstimateNofPnP;
 import boofcv.alg.geo.pose.P3PLineDistance;
 import boofcv.alg.geo.pose.PointDistance3;
 import boofcv.struct.FastQueue;
-import boofcv.struct.geo.GeoModelEstimatorN;
 import boofcv.struct.geo.PointPosePair;
 import georegression.fitting.MotionTransformPoint;
 import georegression.struct.point.Point3D_F64;
@@ -37,7 +36,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class WrapP3PLineDistance implements PerspectiveNPoint, GeoModelEstimatorN<Se3_F64,PointPosePair> {
+public class WrapP3PLineDistance implements EstimateNofPnP {
 
 	// estimates the distance the camera center is from each of the 3 points.
 	private P3PLineDistance alg;

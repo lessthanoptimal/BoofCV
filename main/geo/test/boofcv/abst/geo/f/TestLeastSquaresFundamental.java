@@ -18,18 +18,16 @@
 
 package boofcv.abst.geo.f;
 
-import boofcv.abst.geo.GeneralTestRefineFundamental;
-import boofcv.struct.geo.AssociatedPair;
-import boofcv.struct.geo.GeoModelRefine;
-import org.ejml.data.DenseMatrix64F;
+import boofcv.abst.geo.CheckRefineFundamental;
+import boofcv.abst.geo.RefineEpipolar;
 
 /**
  * @author Peter Abeles
  */
-public class TestLeastSquaresFundamental extends GeneralTestRefineFundamental {
+public class TestLeastSquaresFundamental extends CheckRefineFundamental {
 
 	@Override
-	public GeoModelRefine<DenseMatrix64F,AssociatedPair> createAlgorithm() {
+	public RefineEpipolar createAlgorithm() {
 		return new LeastSquaresFundamental(1e-16,200,false);
 	}
 }

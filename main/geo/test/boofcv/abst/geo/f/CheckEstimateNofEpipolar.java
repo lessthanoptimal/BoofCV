@@ -18,7 +18,7 @@
 
 package boofcv.abst.geo.f;
 
-import boofcv.abst.geo.EpipolarMatrixEstimator;
+import boofcv.abst.geo.EstimateNofEpipolar;
 import boofcv.alg.geo.f.EpipolarTestSimulation;
 import boofcv.struct.FastQueue;
 import boofcv.struct.geo.AssociatedPair;
@@ -34,25 +34,23 @@ import java.util.List;
 import static org.junit.Assert.assertTrue;
 
 /**
- * Applies various compliance tests for implementations of {@link boofcv.abst.geo.EpipolarMatrixEstimator}
+ * Applies various compliance tests for implementations of {@link boofcv.abst.geo.EstimateNofEpipolar}
  * amd {@link GeoModelEstimatorN}.
  *
  * @author Peter Abeles
  */
-public abstract class CheckEstimatorNforEpipolarMatrix extends EpipolarTestSimulation {
+public abstract class CheckEstimateNofEpipolar extends EpipolarTestSimulation {
 
 	// the algorithm being tested
-	GeoModelEstimatorN<DenseMatrix64F,AssociatedPair> alg;
+	EstimateNofEpipolar alg;
 
 	// true if pixels or false if normalized
 	boolean isPixels;
 
-	protected CheckEstimatorNforEpipolarMatrix(GeoModelEstimatorN<DenseMatrix64F, AssociatedPair> alg,
-											   boolean pixels) {
+	protected CheckEstimateNofEpipolar(EstimateNofEpipolar alg,
+									   boolean pixels) {
 		this.alg = alg;
 		isPixels = pixels;
-
-		assertTrue( alg instanceof EpipolarMatrixEstimator);
 	}
 
 	/**
@@ -72,7 +70,7 @@ public abstract class CheckEstimatorNforEpipolarMatrix extends EpipolarTestSimul
 
 		boolean workedOnce = false;
 
-		FastQueue<DenseMatrix64F> solutions = new QueueMatrix(10,3,3);
+		FastQueue<DenseMatrix64F> solutions = new QueueMatrix(3, 3, 10);
 
 		for( int i = 0; i < 10; i++ ) {
 			List<AssociatedPair> pairs = randomPairs(alg.getMinimumPoints());

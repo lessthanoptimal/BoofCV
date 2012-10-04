@@ -18,20 +18,18 @@
 
 package boofcv.abst.geo.h;
 
-import boofcv.abst.geo.GeneralTestRefineHomography;
+import boofcv.abst.geo.CheckRefineHomography;
+import boofcv.abst.geo.RefineEpipolar;
 import boofcv.alg.geo.ModelObservationResidualN;
 import boofcv.alg.geo.h.HomographyResidualSampson;
-import boofcv.struct.geo.AssociatedPair;
-import boofcv.struct.geo.GeoModelRefine;
-import org.ejml.data.DenseMatrix64F;
 
 /**
  * @author Peter Abeles
  */
-public class TestLeastSquaresHomography extends GeneralTestRefineHomography {
+public class TestLeastSquaresHomography extends CheckRefineHomography {
 
 	@Override
-	public GeoModelRefine<DenseMatrix64F,AssociatedPair> createAlgorithm() {
+	public RefineEpipolar createAlgorithm() {
 		ModelObservationResidualN r = new HomographyResidualSampson();
 		return new LeastSquaresHomography(1e-8,200,r);
 	}

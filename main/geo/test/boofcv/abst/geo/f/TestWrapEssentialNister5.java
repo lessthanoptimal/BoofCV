@@ -21,7 +21,7 @@ package boofcv.abst.geo.f;
 /**
  * @author Peter Abeles
  */
-public class TestWrapEssentialNister5 extends CheckEstimatorNforEpipolarMatrix {
+public class TestWrapEssentialNister5 extends CheckEstimateNofEpipolar {
 	public TestWrapEssentialNister5() {
 		super(new WrapEssentialNister5(), false);
 	}

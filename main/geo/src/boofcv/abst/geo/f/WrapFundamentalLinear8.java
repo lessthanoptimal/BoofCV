@@ -18,21 +18,19 @@
 
 package boofcv.abst.geo.f;
 
-import boofcv.abst.geo.EpipolarMatrixEstimator;
+import boofcv.abst.geo.Estimate1ofEpipolar;
 import boofcv.alg.geo.f.FundamentalLinear8;
 import boofcv.struct.geo.AssociatedPair;
-import boofcv.struct.geo.GeoModelEstimator1;
 import org.ejml.data.DenseMatrix64F;
 
 import java.util.List;
 
 /**
- * Wrapper around either {@link FundamentalLinear8} for {@link boofcv.abst.geo.EpipolarMatrixEstimator}.
+ * Wrapper around either {@link FundamentalLinear8} for {@link boofcv.abst.geo.Estimate1ofEpipolar}.
  * 
  * @author Peter Abeles
  */
-public class WrapFundamentalLinear8 implements EpipolarMatrixEstimator,
-		GeoModelEstimator1<DenseMatrix64F,AssociatedPair> {
+public class WrapFundamentalLinear8 implements Estimate1ofEpipolar {
 	FundamentalLinear8 alg;
 
 	public WrapFundamentalLinear8(boolean fundamental ) {

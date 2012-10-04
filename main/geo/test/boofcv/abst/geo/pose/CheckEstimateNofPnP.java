@@ -18,10 +18,9 @@
 
 package boofcv.abst.geo.pose;
 
-import boofcv.abst.geo.PerspectiveNPoint;
+import boofcv.abst.geo.EstimateNofPnP;
 import boofcv.alg.geo.f.EpipolarTestSimulation;
 import boofcv.struct.FastQueue;
-import boofcv.struct.geo.GeoModelEstimatorN;
 import boofcv.struct.geo.PointPosePair;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
@@ -36,37 +35,27 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 /**
- * General tests for implementations of PerspectiveNPoint.  Ensures that the returned motion estimate is in
+ * General tests for implementations of EstimateNofPnP.  Ensures that the returned motion estimate is in
  * the correct direction and works under nominal conditions
  *
  *
  * @author Peter Abeles
  */
-public abstract class GeneralEstimateNforPerspectiveNPoint extends EpipolarTestSimulation {
+public abstract class CheckEstimateNofPnP extends EpipolarTestSimulation {
 
 	// algorithm being tested
-	GeoModelEstimatorN<Se3_F64,PointPosePair> alg;
+	EstimateNofPnP alg;
 	// true if it can only process the minimum number of observations
 	boolean onlyMinimum;
 
 	FastQueue<Se3_F64> solutions = new FastQueue<Se3_F64>(1,Se3_F64.class,true);
 
-	protected GeneralEstimateNforPerspectiveNPoint(GeoModelEstimatorN<Se3_F64, PointPosePair> alg, boolean onlyMinimum) {
-		this.alg = alg;
+	protected CheckEstimateNofPnP(boolean onlyMinimum) {
 		this.onlyMinimum = onlyMinimum;
 	}
 
-	protected GeneralEstimateNforPerspectiveNPoint(boolean onlyMinimum) {
-		this.onlyMinimum = onlyMinimum;
-	}
-
-	public void setAlgorithm( GeoModelEstimatorN<Se3_F64,PointPosePair> alg ) {
+	public void setAlgorithm( EstimateNofPnP alg ) {
 		this.alg = alg;
-	}
-
-	@Test
-	public void checkMarkerInterface() {
-		assertTrue( alg instanceof  PerspectiveNPoint );
 	}
 
 	/**

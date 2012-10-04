@@ -18,13 +18,12 @@
 
 package boofcv.alg.geo;
 
-import boofcv.abst.geo.EpipolarMatrixEstimator;
+import boofcv.abst.geo.RefineEpipolar;
 import boofcv.alg.geo.f.ParamFundamentalEpipolar;
 import boofcv.numerics.fitting.modelset.ModelCodec;
 import boofcv.numerics.optimization.FactoryOptimization;
 import boofcv.numerics.optimization.UnconstrainedMinimization;
 import boofcv.struct.geo.AssociatedPair;
-import boofcv.struct.geo.GeoModelRefine;
 import org.ejml.data.DenseMatrix64F;
 
 import java.util.List;
@@ -36,8 +35,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class QuasiNewtonFundamentalSampson
-		implements EpipolarMatrixEstimator , GeoModelRefine<DenseMatrix64F,AssociatedPair> {
+public class QuasiNewtonFundamentalSampson implements RefineEpipolar {
 	ModelCodec<DenseMatrix64F> paramModel;
 	FunctionSampsonFundamental func = new FunctionSampsonFundamental();
 	double param[];

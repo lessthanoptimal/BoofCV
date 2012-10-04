@@ -18,10 +18,8 @@
 
 package boofcv.abst.geo.pose;
 
-import boofcv.abst.geo.PerspectiveNPoint;
+import boofcv.abst.geo.Estimate1ofPnP;
 import boofcv.alg.geo.pose.PnPLepetitEPnP;
-import boofcv.struct.geo.GeoModelEstimator1;
-import boofcv.struct.geo.GeoModelRefine;
 import boofcv.struct.geo.PointPosePair;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
@@ -31,12 +29,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Wrapper around {@link PnPLepetitEPnP} for {@link boofcv.abst.geo.PerspectiveNPoint}.
+ * Wrapper around {@link PnPLepetitEPnP} for {@link boofcv.abst.geo.Estimate1ofPnP}.
  * 
  * @author Peter Abeles
  */
-public class WrapPnPLepetitEPnP
-		implements PerspectiveNPoint , GeoModelRefine<Se3_F64,PointPosePair>, GeoModelEstimator1<Se3_F64,PointPosePair> {
+public class WrapPnPLepetitEPnP implements Estimate1ofPnP {
 
 	PnPLepetitEPnP alg;
 
@@ -61,12 +58,6 @@ public class WrapPnPLepetitEPnP
 		worldPts.clear();
 		observed.clear();
 
-		return true;
-	}
-
-	@Override
-	public boolean process(Se3_F64 worldToCamera, List<PointPosePair> obs, Se3_F64 output ) {
-		process(obs,output);
 		return true;
 	}
 

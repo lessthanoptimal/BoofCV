@@ -18,10 +18,13 @@
 
 package boofcv.alg.geo;
 
-import boofcv.abst.geo.GeoModelEstimatorNto1;
-import boofcv.abst.geo.f.DistanceEpipolarConstraint;
-import boofcv.factory.geo.FactoryEpipolar;
-import boofcv.struct.geo.*;
+import boofcv.abst.geo.Estimate1ofEpipolar;
+import boofcv.abst.geo.f.EstimateNto1ofEpipolar;
+import boofcv.alg.geo.f.DistanceEpipolarConstraint;
+import boofcv.factory.geo.FactoryMultiView;
+import boofcv.struct.geo.AssociatedPair;
+import boofcv.struct.geo.GeoModelEstimator1;
+import boofcv.struct.geo.GeoModelEstimatorN;
 import georegression.geometry.GeometryMath_F64;
 import georegression.geometry.RotationMatrixGenerator;
 import georegression.struct.point.Point3D_F64;
@@ -139,11 +142,10 @@ public class BenchmarkStabilityFundamental {
 
 	public void evaluateMinimal( GeoModelEstimatorN<DenseMatrix64F,AssociatedPair> estimatorN ) {
 
-		ObjectManager<DenseMatrix64F> manager = new ObjectManagerMatrix(3,3);
 		DistanceEpipolarConstraint distance = new DistanceEpipolarConstraint();
 
-		GeoModelEstimator1<DenseMatrix64F,AssociatedPair> estimator =
-				new GeoModelEstimatorNto1<DenseMatrix64F,AssociatedPair>(estimatorN,manager,distance,1);
+		Estimate1ofEpipolar estimator =
+				new EstimateNto1ofEpipolar(estimatorN,distance,1);
 
 		scores = new ArrayList<Double>();
 		int failed = 0;
@@ -228,14 +230,14 @@ public class BenchmarkStabilityFundamental {
 //		app.createScenePlane();
 		app.motionTranslate();
 		app.createObservations();
-		app.evaluateMinimal(FactoryEpipolar.computeFundamentalMulti(8, isPixels));
-		app.evaluateMinimal(FactoryEpipolar.computeFundamentalMulti(7, isPixels));
-		app.evaluateMinimal(FactoryEpipolar.computeFundamentalMulti(5, isPixels));
+		app.evaluateMinimal(FactoryMultiView.computeMultiFundamental(8, isPixels));
+		app.evaluateMinimal(FactoryMultiView.computeMultiFundamental(7, isPixels));
+		app.evaluateMinimal(FactoryMultiView.computeMultiFundamental(5, isPixels));
 
-//		app.evaluateMinimal(FactoryEpipolar.computeFundamental(8));
+//		app.evaluateMinimal(FactoryMultiView.computeFundamental(8));
 
 
-//		app.evaluateAll(FactoryEpipolar.computeEssential(8));
-//		app.evaluateAll(FactoryEpipolar.computeEssential(5));
+//		app.evaluateAll(FactoryMultiView.computeEssential(8));
+//		app.evaluateAll(FactoryMultiView.computeEssential(5));
 	}
 }

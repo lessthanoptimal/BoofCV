@@ -22,21 +22,42 @@ import boofcv.struct.FastQueue;
 import org.ejml.data.DenseMatrix64F;
 
 /**
- * TODO Comment
+ * {@link FastQueue} which will internally declare {@link DenseMatrix64F} of a specific shape.
  *
  * @author Peter Abeles
  */
 public class QueueMatrix extends FastQueue<DenseMatrix64F> {
 
-	int numRows,numCols;
+	// matrix shape
+	private int numRows,numCols;
 
-	public QueueMatrix(int initialMaxSize, int numRows , int numCols ) {
+	/**
+	 * Specifies the matrix shape and the number of elements in the internal array initially.
+	 *
+	 * @param numRows Number of rows in each matrix.
+	 * @param numCols Number of columns in each matrix.
+	 * @param initialMaxSize Initial number of matrices in storage.
+	 */
+	public QueueMatrix(int numRows, int numCols, int initialMaxSize) {
 		super(DenseMatrix64F.class,true);
 
 		this.numRows = numRows;
 		this.numCols = numCols;
 
 		growArray(initialMaxSize);
+	}
+
+	/**
+	 * Specifies the matrix shape.
+	 *
+	 * @param numRows Number of rows in each matrix.
+	 * @param numCols Number of columns in each matrix.
+	 */
+	public QueueMatrix( int numRows , int numCols ) {
+		super(DenseMatrix64F.class,true);
+
+		this.numRows = numRows;
+		this.numCols = numCols;
 	}
 
 	@Override

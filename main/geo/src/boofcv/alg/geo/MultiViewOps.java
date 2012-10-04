@@ -251,11 +251,33 @@ public class MultiViewOps {
 	 *
 	 * @param F 3x3 essential or fundamental matrix.
 	 * @param p1 Point in view 1.
-	 * @param p2 Point in view 1.
+	 * @param p2 Point in view 2.
 	 * @return  Constraint value.
 	 */
 	public static double constraint( DenseMatrix64F F , Point2D_F64 p1, Point2D_F64 p2 ) {
 		return GeometryMath_F64.innerProd(p2,F,p1);
+	}
+
+	/**
+	 * <p>
+	 * Applies the homography constraints to two points:<br>
+	 * z*p2 = H*p1<br>
+	 * where z is a scale factor and (p1,p2) are point observations.  Note that since 2D points are inputted
+	 * translation and normalization to homogeneous coordinates with z=1 is automatically handled.
+	 * </p>
+	 *
+	 * @param H 3x3 Homography matrix.
+	 * @param p1 Input: Point in view 1.
+	 * @param outputP2 Output: storage for point in view 2.
+	 * @return Predicted point in view 2
+	 */
+	public static Point2D_F64 constraintHomography( DenseMatrix64F H , Point2D_F64 p1 , Point2D_F64 outputP2 ) {
+		if( outputP2 == null )
+			outputP2 = new Point2D_F64();
+
+		GeometryMath_F64.mult(H,p1,outputP2);
+
+		return outputP2;
 	}
 
 	/**

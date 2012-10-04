@@ -16,39 +16,36 @@
  * limitations under the License.
  */
 
-package boofcv.abst.geo.f;
+package boofcv.abst.geo.trifocal;
 
-import boofcv.abst.geo.EstimateNofEpipolar;
-import boofcv.alg.geo.f.FundamentalLinear7;
-import boofcv.struct.FastQueue;
-import boofcv.struct.geo.AssociatedPair;
-import org.ejml.data.DenseMatrix64F;
+import boofcv.abst.geo.Estimate1ofTrifocalTensor;
+import boofcv.alg.geo.trifocal.TrifocalAlgebraicPoint7;
+import boofcv.alg.geo.trifocal.TrifocalLinearPoint7;
+import boofcv.struct.geo.AssociatedTriple;
+import boofcv.struct.geo.TrifocalTensor;
 
 import java.util.List;
 
 /**
- * Wrapper around either {@link boofcv.alg.geo.f.FundamentalLinear7} for {@link boofcv.abst.geo.EstimateNofEpipolar}.
+ * Wrapper around either {@link TrifocalLinearPoint7} for {@link boofcv.abst.geo.Estimate1ofTrifocalTensor}.
  *
  * @author Peter Abeles
  */
-public class WrapFundamentalLinear7 implements EstimateNofEpipolar {
-	FundamentalLinear7 alg;
+public class WrapTrifocalAlgebraicPoint7 implements Estimate1ofTrifocalTensor {
 
-	public WrapFundamentalLinear7(boolean fundamental) {
-		alg = new FundamentalLinear7(fundamental);
+	TrifocalAlgebraicPoint7 alg;
+
+	public WrapTrifocalAlgebraicPoint7(TrifocalAlgebraicPoint7 alg) {
+		this.alg = alg;
 	}
 
 	@Override
-	public boolean process(List<AssociatedPair> points, FastQueue<DenseMatrix64F> estimatedModels) {
-		return alg.process(points,estimatedModels);
+	public boolean process(List<AssociatedTriple> points, TrifocalTensor estimatedModel) {
+		return( alg.process(points,estimatedModel) );
 	}
 
 	@Override
 	public int getMinimumPoints() {
 		return 7;
-	}
-
-	public FundamentalLinear7 getAlgorithm() {
-		return alg;
 	}
 }

@@ -16,36 +16,18 @@
  * limitations under the License.
  */
 
-package boofcv.struct.geo;
+package boofcv.abst.geo;
+
+import boofcv.struct.geo.GeoModelEstimator1;
+import boofcv.struct.geo.PointPosePair;
+import georegression.struct.se.Se3_F64;
 
 /**
- * Provides information object a specific object and creates new instances of it.  Intended for use in highly
- * abstracted code.
+ * Marker interface for computing one solution to the Perspective N-Point (PnP) problem.  Given a set of point
+ * observations from a single view and the known 3D location of the points being observed, estimate the camera
+ * location.  All observations must be in calibrated image coordinates.
  *
  * @author Peter Abeles
  */
-public interface ObjectManager<O> {
-
-
-	/**
-	 * Creates a copy of 'src' in 'dst'
-	 *
-	 * @param src Input: Object being copied.
-	 * @param dst Output: Object that is being written into.
-	 */
-	public void copy( O src, O dst);
-
-	/**
-	 * Creates a new instance of the class.
-	 *
-	 * @return New instance of Type.
-	 */
-	public O createInstance();
-
-	/**
-	 * Class type of the object being created.
-	 *
-	 * @return Class type
-	 */
-	public Class<O> getType();
+public interface Estimate1ofPnP extends GeoModelEstimator1<Se3_F64,PointPosePair> {
 }

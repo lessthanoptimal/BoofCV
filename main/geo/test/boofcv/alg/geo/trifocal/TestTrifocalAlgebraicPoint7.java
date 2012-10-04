@@ -45,9 +45,7 @@ public class TestTrifocalAlgebraicPoint7 extends CommonTrifocalChecks {
 		UnconstrainedLeastSquares optimizer = FactoryOptimization.leastSquareLevenberg(1e-3);
 		TrifocalAlgebraicPoint7 alg = new TrifocalAlgebraicPoint7(optimizer,300,1e-20,1e-20);
 
-		assertTrue(alg.process(observations));
-
-		TrifocalTensor found = alg.getSolution();
+		assertTrue(alg.process(observations, found));
 
 		checkTrifocalWithConstraint(found,1e-8);
 	}
@@ -79,10 +77,8 @@ public class TestTrifocalAlgebraicPoint7 extends CommonTrifocalChecks {
 		UnconstrainedLeastSquares optimizer = FactoryOptimization.leastSquareLevenberg(1e-3);
 		TrifocalAlgebraicPoint7 alg = new TrifocalAlgebraicPoint7(optimizer,300,1e-20,1e-20);
 
-		assertTrue(alg.process(noisyObs));
+		assertTrue(alg.process(noisyObs,found));
 
-
-		TrifocalTensor found = alg.getSolution();
 		found.normalizeScale();
 
 		// OK I have no idea how to evaluate these noisy results.

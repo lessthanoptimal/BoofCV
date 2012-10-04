@@ -18,11 +18,11 @@
 
 package boofcv.alg.geo;
 
-import boofcv.factory.geo.FactoryEpipolar;
+import boofcv.abst.geo.Estimate1ofEpipolar;
+import boofcv.factory.geo.FactoryMultiView;
 import boofcv.misc.Performer;
 import boofcv.misc.ProfileOperation;
 import boofcv.struct.geo.AssociatedPair;
-import boofcv.struct.geo.GeoModelEstimator1;
 import org.ejml.data.DenseMatrix64F;
 
 import java.util.ArrayList;
@@ -45,12 +45,12 @@ public class BenchmarkRuntimeFundamental extends ArtificialStereoScene{
 
 	public class Estimate implements Performer {
 
-		GeoModelEstimator1<DenseMatrix64F,AssociatedPair> alg;
+		Estimate1ofEpipolar alg;
 		String name;
 		List<AssociatedPair> list;
 		
 		public Estimate( String name ,
-						 GeoModelEstimator1<DenseMatrix64F,AssociatedPair> alg ,
+						 Estimate1ofEpipolar alg ,
 						 List<AssociatedPair> list )
 		{
 			this.alg = alg;
@@ -87,10 +87,10 @@ public class BenchmarkRuntimeFundamental extends ArtificialStereoScene{
 		pairs8.add(pairs.get(7));
 
 		System.out.println("Minimum Number");
-		ProfileOperation.printOpsPerSec(new Estimate("Linear 8",FactoryEpipolar.computeFundamentalOne(8,FUNDAMENTAL,0),pairs8), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new Estimate("Linear 7",FactoryEpipolar.computeFundamentalOne(7,FUNDAMENTAL,1),pairs8), TEST_TIME);
+		ProfileOperation.printOpsPerSec(new Estimate("Linear 8", FactoryMultiView.computeSingleFundamental(8, FUNDAMENTAL, 0),pairs8), TEST_TIME);
+		ProfileOperation.printOpsPerSec(new Estimate("Linear 7", FactoryMultiView.computeSingleFundamental(7, FUNDAMENTAL, 1),pairs8), TEST_TIME);
 		if( !FUNDAMENTAL)
-			ProfileOperation.printOpsPerSec(new Estimate("Linear 5",FactoryEpipolar.computeFundamentalOne(5,false,1),pairs6), TEST_TIME);
+			ProfileOperation.printOpsPerSec(new Estimate("Linear 5", FactoryMultiView.computeSingleFundamental(5, false, 1),pairs6), TEST_TIME);
 
 	}
 	

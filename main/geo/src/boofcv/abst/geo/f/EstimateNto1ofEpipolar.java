@@ -18,37 +18,31 @@
 
 package boofcv.abst.geo.f;
 
-import boofcv.abst.geo.EstimateNofEpipolar;
-import boofcv.alg.geo.f.FundamentalLinear7;
-import boofcv.struct.FastQueue;
+import boofcv.abst.geo.Estimate1ofEpipolar;
+import boofcv.abst.geo.GeoModelEstimatorNto1;
+import boofcv.numerics.fitting.modelset.DistanceFromModel;
 import boofcv.struct.geo.AssociatedPair;
+import boofcv.struct.geo.GeoModelEstimatorN;
+import boofcv.struct.geo.QueueMatrix;
 import org.ejml.data.DenseMatrix64F;
 
-import java.util.List;
-
 /**
- * Wrapper around either {@link boofcv.alg.geo.f.FundamentalLinear7} for {@link boofcv.abst.geo.EstimateNofEpipolar}.
+ * Implementation of {@link GeoModelEstimatorNto1} for epipolar matrices.
  *
  * @author Peter Abeles
  */
-public class WrapFundamentalLinear7 implements EstimateNofEpipolar {
-	FundamentalLinear7 alg;
-
-	public WrapFundamentalLinear7(boolean fundamental) {
-		alg = new FundamentalLinear7(fundamental);
+public class EstimateNto1ofEpipolar
+		extends GeoModelEstimatorNto1<DenseMatrix64F,AssociatedPair>
+		implements Estimate1ofEpipolar
+{
+	public EstimateNto1ofEpipolar(GeoModelEstimatorN<DenseMatrix64F, AssociatedPair> alg,
+								  DistanceFromModel<DenseMatrix64F, AssociatedPair> distance,
+								  int numTest) {
+		super(alg, distance, new QueueMatrix(3,3), numTest);
 	}
 
 	@Override
-	public boolean process(List<AssociatedPair> points, FastQueue<DenseMatrix64F> estimatedModels) {
-		return alg.process(points,estimatedModels);
-	}
-
-	@Override
-	public int getMinimumPoints() {
-		return 7;
-	}
-
-	public FundamentalLinear7 getAlgorithm() {
-		return alg;
+	protected void copy(DenseMatrix64F src, DenseMatrix64F dst) {
+		dst.set(src);
 	}
 }
