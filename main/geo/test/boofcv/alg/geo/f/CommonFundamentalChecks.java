@@ -39,7 +39,7 @@ public abstract class CommonFundamentalChecks extends EpipolarTestSimulation {
 
 	double zeroTol = 1e-8;
 
-	FastQueue<DenseMatrix64F> solutions = new QueueMatrix(3, 3, 10);
+	FastQueue<DenseMatrix64F> solutions = new QueueMatrix(3, 3);
 
 	public abstract void computeFundamental(List<AssociatedPair> pairs , FastQueue<DenseMatrix64F> solutions );
 
