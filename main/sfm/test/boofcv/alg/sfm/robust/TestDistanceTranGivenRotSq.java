@@ -1,6 +1,6 @@
 package boofcv.alg.sfm.robust;
 
-import boofcv.struct.geo.PointPositionPair;
+import boofcv.struct.geo.PointPosePair;
 import georegression.geometry.RotationMatrixGenerator;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
@@ -29,7 +29,7 @@ public class TestDistanceTranGivenRotSq {
 
 		Point3D_F64 X = new Point3D_F64(0.1,-0.05,3);
 
-		PointPositionPair obs = new PointPositionPair();
+		PointPosePair obs = new PointPosePair();
 		obs.location = X.copy();
 
 		SePointOps_F64.transform(keyToCurr, X, X);
@@ -50,7 +50,7 @@ public class TestDistanceTranGivenRotSq {
 
 		Point3D_F64 X = new Point3D_F64(0.1,-0.05,3);
 
-		PointPositionPair obs = new PointPositionPair();
+		PointPosePair obs = new PointPosePair();
 		obs.location = X.copy();
 
 		SePointOps_F64.transform(keyToCurr, X, X);

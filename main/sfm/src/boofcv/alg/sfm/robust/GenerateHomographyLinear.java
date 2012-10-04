@@ -40,6 +40,7 @@ public class GenerateHomographyLinear implements
 {
 
 	HomographyLinear4 alg;
+	DenseMatrix64F H = new DenseMatrix64F(3,3);
 
 	public GenerateHomographyLinear( boolean normalizeInput ) {
 		alg = new HomographyLinear4(normalizeInput);
@@ -52,22 +53,20 @@ public class GenerateHomographyLinear implements
 
 	@Override
 	public boolean fitModel(List<AssociatedPair> dataSet, Homography2D_F64 initial, Homography2D_F64 found) {
-		if( !alg.process(dataSet) )
+		if( !alg.process(dataSet,H) )
 			return false;
 
-		DenseMatrix64F m = alg.getHomography();
-		UtilHomography.convert(m,found);
+		UtilHomography.convert(H,found);
 		return true;
 	}
 
 	@Override
 	public boolean generate(List<AssociatedPair> dataSet, Homography2D_F64 model ) {
 
-		if( !alg.process(dataSet) )
+		if( !alg.process(dataSet,H) )
 			return false;
 
-		DenseMatrix64F m = alg.getHomography();
-		UtilHomography.convert(m,model);
+		UtilHomography.convert(H,model);
 
 		return true;
 	}

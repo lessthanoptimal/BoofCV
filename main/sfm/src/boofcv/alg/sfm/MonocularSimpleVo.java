@@ -3,8 +3,6 @@ package boofcv.alg.sfm;
 import boofcv.abst.feature.tracker.ImagePointTracker;
 import boofcv.abst.feature.tracker.KeyFramePointTracker;
 import boofcv.abst.geo.BundleAdjustmentCalibrated;
-import boofcv.abst.geo.RefineEpipolarMatrix;
-import boofcv.abst.geo.RefinePerspectiveNPoint;
 import boofcv.abst.geo.TriangulateTwoViewsCalibrated;
 import boofcv.alg.geo.DecomposeEssential;
 import boofcv.alg.geo.MultiViewOps;
@@ -17,7 +15,8 @@ import boofcv.numerics.fitting.modelset.ModelMatcher;
 import boofcv.struct.FastQueue;
 import boofcv.struct.distort.PointTransform_F64;
 import boofcv.struct.geo.AssociatedPair;
-import boofcv.struct.geo.PointPositionPair;
+import boofcv.struct.geo.GeoModelRefine;
+import boofcv.struct.geo.PointPosePair;
 import boofcv.struct.image.ImageBase;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
@@ -67,9 +66,9 @@ public class MonocularSimpleVo<T extends ImageBase> {
 
 	PositiveDepthConstraintCheck depthChecker = new PositiveDepthConstraintCheck(triangulateAlg);
 
-	RefineEpipolarMatrix refineE;
-	ModelMatcher<Se3_F64,PointPositionPair> computeMotion;
-	RefinePerspectiveNPoint refineMotion;
+	GeoModelRefine<DenseMatrix64F,AssociatedPair> refineE;
+	ModelMatcher<Se3_F64,PointPosePair> computeMotion;
+	GeoModelRefine<Se3_F64,PointPosePair> refineMotion;
 
 	// transform from work to current image.  Only used for output purposes
 	Se3_F64 worldToCurr = new Se3_F64();
@@ -96,9 +95,12 @@ public class MonocularSimpleVo<T extends ImageBase> {
 	double distance[];
 	
    Se3_F64 temp = new Se3_F64();
+
+	DenseMatrix64F foundE = new DenseMatrix64F(3,3);
+	Se3_F64 refinedM = new Se3_F64();
 	
 	
-	FastQueue<PointPositionPair> queuePointPose = new FastQueue<PointPositionPair>(200,PointPositionPair.class,true);
+	FastQueue<PointPosePair> queuePointPose = new FastQueue<PointPosePair>(200,PointPosePair.class,true);
 
 	/**
 	 *
@@ -118,9 +120,9 @@ public class MonocularSimpleVo<T extends ImageBase> {
 							  ImagePointTracker<T> tracker ,
 							  PointTransform_F64 pixelToNormalized ,
 							  ModelMatcher<Se3_F64,AssociatedPair> epipolarMotion ,
-							  RefineEpipolarMatrix refineE ,
-							  ModelMatcher<Se3_F64,PointPositionPair> computeMotion ,
-							  RefinePerspectiveNPoint refineMotion )
+							  GeoModelRefine<DenseMatrix64F,AssociatedPair> refineE ,
+							  ModelMatcher<Se3_F64,PointPosePair> computeMotion ,
+							  GeoModelRefine<Se3_F64,PointPosePair> refineMotion )
 	{
 		this.minFeatures = minFeatures;
 		this.setKeyThreshold = setKeyThreshold;
@@ -231,9 +233,8 @@ public class MonocularSimpleVo<T extends ImageBase> {
 			DenseMatrix64F initialE = MultiViewOps.createEssential(found.getR(), found.getT());
 
 			// refine E using non-linear optimization
-			if( refineE.process(initialE,inliers) ) {
-				DenseMatrix64F E = refineE.getRefinement();
-				decomposeE.decompose(E);
+			if( refineE.process(initialE,inliers,foundE) ) {
+				decomposeE.decompose(foundE);
 
 				// select best possible motion from E
 				List<Se3_F64> solutions = decomposeE.getSolutions();
@@ -351,11 +352,11 @@ public class MonocularSimpleVo<T extends ImageBase> {
 	 */
 	private boolean updatePosition() {
 		queuePointPose.reset();
-		List<PointPositionPair> active = new ArrayList<PointPositionPair>();
+		List<PointPosePair> active = new ArrayList<PointPosePair>();
 		for( PointPoseTrack t : tracker.getPairs() ) {
 			if( !t.active )
 				continue;
-			PointPositionPair p = queuePointPose.pop();
+			PointPosePair p = queuePointPose.pop();
 			p.location = t.location;
 			p.observed = t.currLoc;
 			active.add(p);
@@ -368,14 +369,14 @@ public class MonocularSimpleVo<T extends ImageBase> {
 			return false;
 		}
 		
-		List<PointPositionPair> inliers = computeMotion.getMatchSet();
+		List<PointPosePair> inliers = computeMotion.getMatchSet();
 		inlierSize = inliers.size();
 		
 		System.out.println("   Motion inliers "+inlierSize+"  out of "+active.size());
 		
-		refineMotion.process(computeMotion.getModel(), inliers);
+		refineMotion.process(computeMotion.getModel(), inliers,refinedM);
 
-		keyToCurr.set(refineMotion.getRefinement());
+		keyToCurr.set(refinedM);
 
 		System.out.print("   after PnP Refine:  ");
 		if( computeResidualError(tracker.getPairs()) > outlierResidualError ) {

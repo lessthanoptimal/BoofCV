@@ -2,7 +2,6 @@ package boofcv.alg.sfm;
 
 import boofcv.abst.feature.tracker.ImagePointTracker;
 import boofcv.abst.feature.tracker.KeyFramePointTracker;
-import boofcv.abst.geo.RefinePerspectiveNPoint;
 import boofcv.abst.geo.TriangulateNViewsCalibrated;
 import boofcv.abst.geo.TriangulateTwoViewsCalibrated;
 import boofcv.alg.sfm.robust.ModelMatcherTranGivenRot;
@@ -11,7 +10,8 @@ import boofcv.factory.geo.FactoryTriangulate;
 import boofcv.numerics.fitting.modelset.ModelMatcher;
 import boofcv.struct.distort.PointTransform_F64;
 import boofcv.struct.geo.AssociatedPair;
-import boofcv.struct.geo.PointPositionPair;
+import boofcv.struct.geo.GeoModelRefine;
+import boofcv.struct.geo.PointPosePair;
 import boofcv.struct.image.ImageBase;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
@@ -63,7 +63,8 @@ import java.util.List;
 public class MonocularSeparatedMotion<T extends ImageBase> {
 
 	// refines the full pose estimate
-	private RefinePerspectiveNPoint refinePose = FactoryEpipolar.refinePnP(1e-20,300);
+	private GeoModelRefine<Se3_F64,PointPosePair> refinePose = FactoryEpipolar.refinePnP(1e-20,300);
+	private Se3_F64 poseRefined = new Se3_F64();
 
 	// tracks point features
 	private KeyFramePointTracker<T,MultiViewTrack> tracker;
@@ -244,11 +245,11 @@ public class MonocularSeparatedMotion<T extends ImageBase> {
 		estimateTran.setRotation(rotationToCurr);
 		
 		// compute translation from features with valid locations
-		List<PointPositionPair> list = new ArrayList<PointPositionPair>();
+		List<PointPosePair> list = new ArrayList<PointPosePair>();
 		
 		for( MultiViewTrack t : inliers ) {
 			if( t.views.size() > 1 ) {
-				list.add( new PointPositionPair(t.currLoc,t.location));
+				list.add( new PointPosePair(t.currLoc,t.location));
 			}
 		}
 
@@ -271,8 +272,8 @@ public class MonocularSeparatedMotion<T extends ImageBase> {
 				startToKey.getT().set(estimateTran.getModel());
 
 				// non-linear refinement of rotation and translation
-				refinePose.process(startToKey,estimateTran.getMatchSet());
-				startToKey.getT().set(refinePose.getRefinement().getT());
+				refinePose.process(startToKey,estimateTran.getMatchSet(),poseRefined);
+				startToKey.getT().set(poseRefined.getT());
 //				startToKey.set(refinePose.getRefinement());
 				
 			} else {
