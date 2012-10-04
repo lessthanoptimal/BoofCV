@@ -18,11 +18,10 @@
 
 package boofcv.alg.geo;
 
-import boofcv.abst.geo.EpipolarMatrixEstimator;
-import boofcv.abst.geo.EpipolarMatrixEstimatorN;
-import boofcv.abst.geo.f.FundamentalNto1;
+import boofcv.abst.geo.GeoModelEstimatorNto1;
+import boofcv.abst.geo.f.DistanceEpipolarConstraint;
 import boofcv.factory.geo.FactoryEpipolar;
-import boofcv.struct.geo.AssociatedPair;
+import boofcv.struct.geo.*;
 import georegression.geometry.GeometryMath_F64;
 import georegression.geometry.RotationMatrixGenerator;
 import georegression.struct.point.Point3D_F64;
@@ -138,9 +137,13 @@ public class BenchmarkStabilityFundamental {
 		}
 	}
 
-	public void evaluateMinimal( EpipolarMatrixEstimatorN estimatorN ) {
+	public void evaluateMinimal( GeoModelEstimatorN<DenseMatrix64F,AssociatedPair> estimatorN ) {
 
-		EpipolarMatrixEstimator estimator = new FundamentalNto1(estimatorN,1);
+		ObjectManager<DenseMatrix64F> manager = new ObjectManagerMatrix(3,3);
+		DistanceEpipolarConstraint distance = new DistanceEpipolarConstraint();
+
+		GeoModelEstimator1<DenseMatrix64F,AssociatedPair> estimator =
+				new GeoModelEstimatorNto1<DenseMatrix64F,AssociatedPair>(estimatorN,manager,distance,1);
 
 		scores = new ArrayList<Double>();
 		int failed = 0;
@@ -148,6 +151,8 @@ public class BenchmarkStabilityFundamental {
 		int numSamples = estimator.getMinimumPoints();
 
 		Random rand = new Random(234);
+
+		DenseMatrix64F F = new DenseMatrix64F(3,3);
 
 		for( int i = 0; i < 50; i++ ) {
 			List<AssociatedPair> pairs = new ArrayList<AssociatedPair>();
@@ -161,13 +166,10 @@ public class BenchmarkStabilityFundamental {
 				}
 			}
 
-			if( !estimator.process(pairs) ) {
+			if( !estimator.process(pairs,F) ) {
 				failed++;
 				continue;
 			}
-
-
-			DenseMatrix64F F = estimator.getEpipolarMatrix();
 
 			// normalize the scale of F
 			CommonOps.scale(1.0/CommonOps.elementMaxAbs(F),F);
@@ -189,18 +191,18 @@ public class BenchmarkStabilityFundamental {
 		System.out.printf(" Failures %3d  Score:  50%% = %6.3e  95%% = %6.3e\n", failed, scores.get(scores.size() / 2), scores.get((int) (scores.size() * 0.95)));
 	}
 
-	public void evaluateAll( EpipolarMatrixEstimator estimator ) {
+	public void evaluateAll( GeoModelEstimator1<DenseMatrix64F,AssociatedPair> estimator ) {
 		scores = new ArrayList<Double>();
 		int failed = 0;
 
+		DenseMatrix64F F = new DenseMatrix64F(3,3);
+
 		for( int i = 0; i < 50; i++ ) {
 
-			if( !estimator.process(observations) ) {
+			if( !estimator.process(observations,F) ) {
 				failed++;
 				continue;
 			}
-
-			DenseMatrix64F F = estimator.getEpipolarMatrix();
 
 			// normalize the scale of F
 			CommonOps.scale(1.0/CommonOps.elementMaxAbs(F),F);

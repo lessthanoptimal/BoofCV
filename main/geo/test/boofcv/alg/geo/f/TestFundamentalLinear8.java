@@ -18,11 +18,11 @@
 
 package boofcv.alg.geo.f;
 
+import boofcv.struct.FastQueue;
 import boofcv.struct.geo.AssociatedPair;
 import org.ejml.data.DenseMatrix64F;
 import org.junit.Test;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.assertTrue;
@@ -54,11 +54,8 @@ public class TestFundamentalLinear8 {
 			FundamentalLinear8 alg = new FundamentalLinear8(isFundamental);
 
 			@Override
-			public List<DenseMatrix64F> computeFundamental(List<AssociatedPair> pairs) {
-				assertTrue(alg.process(pairs));
-				List<DenseMatrix64F> l = new ArrayList<DenseMatrix64F>();
-				l.add(alg.getF());
-				return l;
+			public void computeFundamental(List<AssociatedPair> pairs,FastQueue<DenseMatrix64F> solutions) {
+				assertTrue(alg.process(pairs,solutions.pop()));
 			}
 		};
 	}

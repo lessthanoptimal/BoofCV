@@ -60,9 +60,6 @@ public class HomographyLinear4 {
 	protected DenseMatrix64F A = new DenseMatrix64F(1,9);
 	protected SingularValueDecomposition<DenseMatrix64F> svd = DecompositionFactory.svd(0, 0, true, true, false);
 
-	// either the fundamental or essential matrix
-	protected DenseMatrix64F H = new DenseMatrix64F(3,3);
-
 	// matrix used to normalize results
 	protected DenseMatrix64F N1 = new DenseMatrix64F(3,3);
 	protected DenseMatrix64F N2 = new DenseMatrix64F(3,3);
@@ -80,15 +77,6 @@ public class HomographyLinear4 {
 	}
 
 	/**
-	 * Returns the computed homography matrix.
-	 *
-	 * @return Homography matrix.
-	 */
-	public DenseMatrix64F getHomography() {
-		return H;
-	}
-
-	/**
 	 * <p>
 	 * Computes the homography matrix given a set of observed points in two images.  A set of {@link AssociatedPair}
 	 * is passed in.  The computed homography 'H' is found such that the attributes 'keyLoc' and 'currLoc' in {@link AssociatedPair}
@@ -97,9 +85,10 @@ public class HomographyLinear4 {
 	 * </p>
 	 *
 	 * @param points A set of observed image points that are generated from a planar object.  Minimum of 4 pairs required.
+	 * @param foundH Output: Storage for the found solution. 3x3 matrix.
 	 * @return true if the calculation was a success.
 	 */
-	public boolean process( List<AssociatedPair> points ) {
+	public boolean process( List<AssociatedPair> points , DenseMatrix64F foundH ) {
 		if( points.size() < 4 )
 			throw new IllegalArgumentException("Must be at least 4 points.");
 
@@ -112,18 +101,18 @@ public class HomographyLinear4 {
 		}
 
 		// compute the homograph matrix up to a scale factor
-		if (computeH(A))
+		if (computeH(A,foundH))
 			return false;
 
 		if( normalize )
-			undoNormalizationH(H,N1,N2);
+			undoNormalizationH(foundH,N1,N2);
 
 		// correctly scale the matrix
-		if( !findScaleH() )
+		if( !findScaleH(foundH) )
 			return false;
 
 		// ensure that positive results are returned for points in front of the camera
-		adjustHomographSign(points.get(0));
+		adjustHomographSign(points.get(0),foundH);
 
 		return true;
 	}
@@ -132,7 +121,7 @@ public class HomographyLinear4 {
 	/**
 	 * Computes the SVD of A and extracts the homography matrix from its null space
 	 */
-	protected boolean computeH(DenseMatrix64F A) {
+	protected boolean computeH(DenseMatrix64F A, DenseMatrix64F H) {
 		if( !svd.decompose(A) )
 			return true;
 
@@ -164,7 +153,7 @@ public class HomographyLinear4 {
 	/**
 	 * The scale of H is found by computing the second smallest singular value.
 	 */
-	protected boolean findScaleH() {
+	protected boolean findScaleH( DenseMatrix64F H ) {
 		if( !svd.decompose(H) )
 			return false;
 
@@ -182,7 +171,7 @@ public class HomographyLinear4 {
 	 *
 	 * @param p test point, used to determine the sign of the matrix.
 	 */
-	protected void adjustHomographSign( AssociatedPair p ) {
+	protected void adjustHomographSign( AssociatedPair p , DenseMatrix64F H ) {
 		double val = GeometryMath_F64.innerProd(p.currLoc,H,p.keyLoc);
 
 		if( val < 0 )

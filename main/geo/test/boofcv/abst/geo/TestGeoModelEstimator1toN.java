@@ -16,10 +16,12 @@
  * limitations under the License.
  */
 
-package boofcv.abst.geo.f;
+package boofcv.abst.geo;
 
-import boofcv.abst.geo.EpipolarMatrixEstimator;
+import boofcv.struct.FastQueue;
 import boofcv.struct.geo.AssociatedPair;
+import boofcv.struct.geo.GeoModelEstimator1;
+import boofcv.struct.geo.QueueMatrix;
 import org.ejml.data.DenseMatrix64F;
 import org.junit.Test;
 
@@ -31,22 +33,24 @@ import static org.junit.Assert.*;
 /**
  * @author Peter Abeles
  */
-public class TestEpipolar1toN {
+public class TestGeoModelEstimator1toN {
 
 	List<AssociatedPair> points = new ArrayList<AssociatedPair>();
+	FastQueue<DenseMatrix64F> solutions = new QueueMatrix(10,3,3);
 
 	@Test
 	public void basicTest() {
-		Epipolar1toN alg = new Epipolar1toN(new Dummy(true));
+		GeoModelEstimator1toN<DenseMatrix64F,AssociatedPair> alg =
+				new GeoModelEstimator1toN<DenseMatrix64F,AssociatedPair>(new Dummy(true));
 
-		assertTrue(alg.process(points));
+		assertTrue(alg.process(points,solutions));
 
-		List<DenseMatrix64F> l = alg.getSolutions();
-		assertEquals(1, l.size());
+		assertEquals(1, solutions.size());
 
-		alg = new Epipolar1toN(new Dummy(false));
+		alg = new GeoModelEstimator1toN<DenseMatrix64F,AssociatedPair>(new Dummy(false));
 
-		assertFalse(alg.process(points));
+		assertFalse(alg.process(points,solutions));
+		assertEquals(0,solutions.size);
 	}
 
 	/**
@@ -54,19 +58,20 @@ public class TestEpipolar1toN {
 	 */
 	@Test
 	public void multipleCalls() {
-		Epipolar1toN alg = new Epipolar1toN(new Dummy(true));
+		GeoModelEstimator1toN<DenseMatrix64F,AssociatedPair> alg =
+				new GeoModelEstimator1toN<DenseMatrix64F,AssociatedPair>(new Dummy(true));
 
-		assertTrue(alg.process(points));
-		assertEquals(1, alg.getSolutions().size());
-		assertTrue(alg.process(points));
-		assertEquals(1, alg.getSolutions().size());
+		assertTrue(alg.process(points,solutions));
+		assertEquals(1, solutions.size());
+		assertTrue(alg.process(points,solutions));
+		assertEquals(1, solutions.size());
 
-		alg = new Epipolar1toN(new Dummy(false));
-		assertFalse(alg.process(points));
-		assertFalse(alg.process(points));
+		alg = new GeoModelEstimator1toN<DenseMatrix64F,AssociatedPair>(new Dummy(false));
+		assertFalse(alg.process(points,solutions));
+		assertFalse(alg.process(points,solutions));
 	}
 
-	private static class Dummy implements EpipolarMatrixEstimator {
+	private static class Dummy implements GeoModelEstimator1<DenseMatrix64F,AssociatedPair> {
 		boolean hasSolution;
 
 		private Dummy(boolean hasSolution) {
@@ -74,14 +79,10 @@ public class TestEpipolar1toN {
 		}
 
 		@Override
-		public boolean process(List<AssociatedPair> points) {
+		public boolean process(List<AssociatedPair> points, DenseMatrix64F solution ) {
 			return hasSolution;
 		}
 
-		@Override
-		public DenseMatrix64F getEpipolarMatrix() {
-			return new DenseMatrix64F(3, 3);
-		}
 
 		@Override
 		public int getMinimumPoints() {

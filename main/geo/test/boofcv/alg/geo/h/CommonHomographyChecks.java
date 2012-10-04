@@ -47,6 +47,8 @@ public class CommonHomographyChecks {
 	protected List<AssociatedPair> pairs;
 	protected double d=3; // distance plane is from camera
 
+	protected DenseMatrix64F solution = new DenseMatrix64F(3,3);
+
 	public void createScene( int numPoints , boolean isPixels ) {
 		// define the camera's motion
 		motion = new Se3_F64();

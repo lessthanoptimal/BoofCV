@@ -18,9 +18,9 @@
 
 package boofcv.abst.geo.fitting;
 
-import boofcv.abst.geo.EpipolarMatrixEstimator;
 import boofcv.numerics.fitting.modelset.ModelGenerator;
 import boofcv.struct.geo.AssociatedPair;
+import boofcv.struct.geo.GeoModelEstimator1;
 import org.ejml.data.DenseMatrix64F;
 
 import java.util.List;
@@ -33,9 +33,9 @@ import java.util.List;
  */
 public class GenerateEpipolarMatrix implements ModelGenerator<DenseMatrix64F,AssociatedPair> {
 
-	EpipolarMatrixEstimator alg;
+	GeoModelEstimator1<DenseMatrix64F,AssociatedPair> alg;
 
-	public GenerateEpipolarMatrix(EpipolarMatrixEstimator alg) {
+	public GenerateEpipolarMatrix(GeoModelEstimator1<DenseMatrix64F,AssociatedPair> alg) {
 		this.alg = alg;
 	}
 
@@ -46,9 +46,7 @@ public class GenerateEpipolarMatrix implements ModelGenerator<DenseMatrix64F,Ass
 
 	@Override
 	public boolean generate(List<AssociatedPair> dataSet, DenseMatrix64F model ) {
-		if( alg.process(dataSet) ) {
-			DenseMatrix64F found = alg.getEpipolarMatrix();
-			model.set(found);
+		if( alg.process(dataSet,model) ) {
 			return true;
 		}
 		return false;

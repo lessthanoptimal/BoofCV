@@ -22,8 +22,6 @@ import boofcv.abst.feature.associate.GeneralAssociation;
 import boofcv.abst.feature.associate.ScoreAssociation;
 import boofcv.abst.feature.describe.DescribeRegionPoint;
 import boofcv.abst.feature.detect.interest.InterestPointDetector;
-import boofcv.abst.geo.EpipolarMatrixEstimator;
-import boofcv.abst.geo.RefineEpipolarMatrix;
 import boofcv.abst.geo.fitting.DistanceFromModelResidual;
 import boofcv.abst.geo.fitting.GenerateEpipolarMatrix;
 import boofcv.alg.geo.f.FundamentalResidualSampson;
@@ -41,6 +39,8 @@ import boofcv.struct.FastQueue;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.SurfFeature;
 import boofcv.struct.geo.AssociatedPair;
+import boofcv.struct.geo.GeoModelEstimator1;
+import boofcv.struct.geo.GeoModelRefine;
 import boofcv.struct.image.ImageFloat32;
 import org.ejml.data.DenseMatrix64F;
 
@@ -78,7 +78,7 @@ public class ExampleFundamentalMatrix {
 													List<AssociatedPair> inliers ) {
 
 		// Select which linear algorithm is to be used.  Try playing with the number of remove ambiguity points
-		EpipolarMatrixEstimator estimateF = FactoryEpipolar.computeFundamentalOne(7, true, 20);
+		GeoModelEstimator1<DenseMatrix64F,AssociatedPair> estimateF = FactoryEpipolar.computeFundamentalOne(7, true, 20);
 		// Wrapper so that this estimator can be used by the robust estimator
 		GenerateEpipolarMatrix generateF = new GenerateEpipolarMatrix(estimateF);
 
@@ -98,12 +98,14 @@ public class ExampleFundamentalMatrix {
 		inliers.addAll(robustF.getMatchSet());
 
 		// Improve the estimate of the fundamental matrix using non-linear optimization
-		RefineEpipolarMatrix refine = FactoryEpipolar.refineFundamental(1e-8, 400, EpipolarError.SAMPSON);
-		if( !refine.process(robustF.getModel(), inliers) )
+		DenseMatrix64F F = new DenseMatrix64F(3,3);
+		GeoModelRefine<DenseMatrix64F,AssociatedPair> refine =
+				FactoryEpipolar.refineFundamental(1e-8, 400, EpipolarError.SAMPSON);
+		if( !refine.process(robustF.getModel(), inliers,F) )
 			throw new IllegalArgumentException("Failed");
 
 		// Return the solution
-		return refine.getRefinement();
+		return F;
 	}
 
 	/**
@@ -113,16 +115,15 @@ public class ExampleFundamentalMatrix {
 	 */
 	public static DenseMatrix64F simpleFundamental( List<AssociatedPair> matches ) {
 		// Use the 8-point algorithm since it will work with an arbitrary number of points
-		EpipolarMatrixEstimator estimateF = FactoryEpipolar.computeFundamentalOne(8, true, 0);
+		GeoModelEstimator1<DenseMatrix64F,AssociatedPair> estimateF = FactoryEpipolar.computeFundamentalOne(8, true, 0);
 
-		if( !estimateF.process(matches) )
+		DenseMatrix64F F = new DenseMatrix64F(3,3);
+		if( !estimateF.process(matches,F) )
 			throw new IllegalArgumentException("Failed");
 
 		// while not done here, this initial linear estimate can be refined using non-linear optimization
 		// as was done above.
-
-		// Return the solution
-		return estimateF.getEpipolarMatrix();
+		return F;
 	}
 
 	/**

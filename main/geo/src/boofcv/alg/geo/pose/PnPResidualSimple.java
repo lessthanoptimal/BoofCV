@@ -19,7 +19,7 @@
 package boofcv.alg.geo.pose;
 
 import boofcv.alg.geo.ModelObservationResidualN;
-import boofcv.struct.geo.PointPositionPair;
+import boofcv.struct.geo.PointPosePair;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
@@ -31,7 +31,7 @@ import georegression.transform.se.SePointOps_F64;
  * @author Peter Abeles
  */
 public class PnPResidualSimple
-		implements ModelObservationResidualN<Se3_F64,PointPositionPair>
+		implements ModelObservationResidualN<Se3_F64,PointPosePair>
 {
 	Se3_F64 motion;
 
@@ -43,7 +43,7 @@ public class PnPResidualSimple
 	}
 
 	@Override
-	public int computeResiduals(PointPositionPair data, double[] residuals, int index) {
+	public int computeResiduals(PointPosePair data, double[] residuals, int index) {
 
 		SePointOps_F64.transform(motion,data.location,temp);
 

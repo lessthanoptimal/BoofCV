@@ -35,6 +35,9 @@ public interface RefineTriangulationEpipolar {
 	/**
 	 * Refines the triangulated point.
 	 *
+	 * NOTE: the epipolar matrix is configured such that x2<sup>T</sup>*F*x1 = 0, where x1 is the
+	 * observation in the world frame and x2 in the camera frame.
+	 *
 	 * @param observations Observations of feature in N views. Pixel or Normalized image coordinates.
 	 * @param fundamentalWorldToCam Fundamental or essential matrix for each view.  World to Camera.
 	 * @param worldPt Initial estimate of point in world coordinates.

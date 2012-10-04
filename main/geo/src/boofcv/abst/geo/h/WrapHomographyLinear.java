@@ -21,6 +21,7 @@ package boofcv.abst.geo.h;
 import boofcv.abst.geo.EpipolarMatrixEstimator;
 import boofcv.alg.geo.h.HomographyLinear4;
 import boofcv.struct.geo.AssociatedPair;
+import boofcv.struct.geo.GeoModelEstimator1;
 import org.ejml.data.DenseMatrix64F;
 
 import java.util.List;
@@ -30,8 +31,9 @@ import java.util.List;
  * 
  * @author Peter Abeles
  */
-public class WrapHomographyLinear implements EpipolarMatrixEstimator {
-
+public class WrapHomographyLinear implements EpipolarMatrixEstimator,
+		GeoModelEstimator1<DenseMatrix64F,AssociatedPair>
+{
 	HomographyLinear4 alg;
 
 	public WrapHomographyLinear(HomographyLinear4 alg) {
@@ -39,13 +41,8 @@ public class WrapHomographyLinear implements EpipolarMatrixEstimator {
 	}
 
 	@Override
-	public boolean process(List<AssociatedPair> points) {
-		return alg.process(points);
-	}
-
-	@Override
-	public DenseMatrix64F getEpipolarMatrix() {
-		return alg.getHomography();
+	public boolean process(List<AssociatedPair> points, DenseMatrix64F estimatedModel) {
+		return alg.process(points,estimatedModel);
 	}
 
 	@Override

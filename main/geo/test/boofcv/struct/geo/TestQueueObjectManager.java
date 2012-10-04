@@ -16,33 +16,20 @@
  * limitations under the License.
  */
 
-package boofcv.abst.geo;
+package boofcv.struct.geo;
 
-import boofcv.struct.geo.PointPositionPair;
-import georegression.struct.se.Se3_F64;
+import org.junit.Test;
 
-import java.util.List;
+import static org.junit.Assert.fail;
 
 /**
- * Refines a position estimate given a set of observed point feature locations and 3D location.
- *
  * @author Peter Abeles
  */
-public interface RefinePerspectiveNPoint {
+public class TestQueueObjectManager {
 
-	/**
-	 * Processes and refines the position estimate.
-	 *
-	 * @param pose Initial position estimate
-	 * @param obs List of observations.  Normalized coordinates.
-	 * @return true if it was successful.
-	 */
-	public boolean process( Se3_F64 pose , List<PointPositionPair> obs );
+	@Test
+	public void stuff() {
+		fail("Implement");
+	}
 
-	/**
-	 * The refined pose
-	 *
-	 * @return Found solution.
-	 */
-	public Se3_F64 getRefinement();
 }

@@ -19,7 +19,6 @@
 package boofcv.examples;
 
 import boofcv.abst.feature.disparity.StereoDisparity;
-import boofcv.abst.geo.EpipolarMatrixEstimator;
 import boofcv.abst.geo.TriangulateTwoViewsCalibrated;
 import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.distort.LensDistortionOps;
@@ -47,6 +46,7 @@ import boofcv.numerics.fitting.modelset.ransac.Ransac;
 import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.distort.PointTransform_F64;
 import boofcv.struct.geo.AssociatedPair;
+import boofcv.struct.geo.GeoModelEstimator1;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
@@ -140,8 +140,11 @@ public class ExampleStereoTwoViewsOneCamera {
 	 * @param inliers     OUTPUT: Set of inlier features from RANSAC
 	 * @return Found camera motion.  Note translation has an arbitrary scale
 	 */
-	public static Se3_F64 estimateCameraMotion(IntrinsicParameters intrinsic, List<AssociatedPair> matchedNorm, List<AssociatedPair> inliers) {
-		EpipolarMatrixEstimator essentialAlg = FactoryEpipolar.computeFundamentalOne(5, false, 5);
+	public static Se3_F64 estimateCameraMotion(IntrinsicParameters intrinsic,
+											   List<AssociatedPair> matchedNorm, List<AssociatedPair> inliers)
+	{
+		GeoModelEstimator1<DenseMatrix64F,AssociatedPair>
+				essentialAlg = FactoryEpipolar.computeFundamentalOne(5, false, 5);
 		TriangulateTwoViewsCalibrated triangulate = FactoryTriangulate.twoGeometric();
 		ModelGenerator<Se3_F64, AssociatedPair> generateEpipolarMotion =
 				new Se3FromEssentialGenerator(essentialAlg, triangulate);

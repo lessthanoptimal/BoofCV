@@ -43,6 +43,7 @@ import java.util.List;
 public class Zhang99ComputeTargetHomography {
 
 	HomographyLinear4 linear = new HomographyLinear4(true);
+	DenseMatrix64F found = new DenseMatrix64F(3,3);
 
 	// location of grid coordinates in the world frame.
 	// the z-axis is assumed to be zero
@@ -70,7 +71,7 @@ public class Zhang99ComputeTargetHomography {
 			pairs.add( new AssociatedPair(worldPoints.get(i),observedPoints.get(i),true));
 		}
 
-		if( !linear.process(pairs) )
+		if( !linear.process(pairs,found) )
 			return false;
 
 		// todo do non-linear refinement.  Take advantage of coordintes being fixed
@@ -83,6 +84,6 @@ public class Zhang99ComputeTargetHomography {
 	 * @return Homography matrix.
 	 */
 	public DenseMatrix64F getHomography() {
-		return linear.getHomography().copy();
+		return found.copy();
 	}
 }

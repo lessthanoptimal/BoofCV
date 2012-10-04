@@ -44,16 +44,16 @@ public abstract class EpipolarTestSimulation {
 	// create a reasonable calibration matrix
 	DenseMatrix64F K = new DenseMatrix64F(3,3,true,60,0.01,-200,0,80,-150,0,0,1);
 
-	protected Se3_F64 motion;
+	protected Se3_F64 worldToCamera;
 	protected List<Point3D_F64> worldPts;
 	protected List<AssociatedPair> pairs;
 	protected List<Point2D_F64> currentObs;
 	
 	public void init( int N , boolean isFundamental ) {
 		// define the camera's motion
-		motion = new Se3_F64();
-		motion.getR().set(RotationMatrixGenerator.eulerArbitrary(0, 1, 2, 0.05, -0.03, 0.02));
-		motion.getT().set(0.1,-0.1,0.01);
+		worldToCamera = new Se3_F64();
+		worldToCamera.getR().set(RotationMatrixGenerator.eulerArbitrary(0, 1, 2, 0.05, -0.03, 0.02));
+		worldToCamera.getT().set(0.1,-0.1,0.01);
 
 		// randomly generate points in space
 		worldPts = GeoTestingOps.randomPoints_F64(-1, 1, -1, 1, 2, 3, N, rand);
@@ -63,7 +63,7 @@ public abstract class EpipolarTestSimulation {
 		currentObs = new ArrayList<Point2D_F64>();
 
 		for(Point3D_F64 p1 : worldPts) {
-			Point3D_F64 p2 = SePointOps_F64.transform(motion, p1, null);
+			Point3D_F64 p2 = SePointOps_F64.transform(worldToCamera, p1, null);
 
 			AssociatedPair pair = new AssociatedPair();
 			pair.keyLoc.set(p1.x/p1.z,p1.y/p1.z);

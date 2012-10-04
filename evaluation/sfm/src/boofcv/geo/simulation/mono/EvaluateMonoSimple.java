@@ -20,7 +20,6 @@ package boofcv.geo.simulation.mono;
 
 import boofcv.abst.feature.tracker.ImagePointTracker;
 import boofcv.abst.sfm.MonocularVisualOdometry;
-import boofcv.factory.sfm.FactoryVisualOdometry;
 import boofcv.struct.distort.PointTransform_F64;
 
 import java.util.List;
@@ -41,7 +40,7 @@ public class EvaluateMonoSimple extends EvaluateMonoVisualOdometry {
 	{
 		int minTracks = targetTracks/3;
 
-		return FactoryVisualOdometry.monoSimple(minTracks,3,4,tracker,pixelToNormalized);
+		return null;//FactoryVisualOdometry.monoSimple(minTracks,3,4,tracker,pixelToNormalized);
 	}
 
 	public static void main( String args[] ) {

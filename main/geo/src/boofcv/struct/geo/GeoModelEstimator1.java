@@ -16,40 +16,31 @@
  * limitations under the License.
  */
 
-package boofcv.abst.geo;
-
-import boofcv.struct.geo.AssociatedPair;
-import org.ejml.data.DenseMatrix64F;
+package boofcv.struct.geo;
 
 import java.util.List;
 
 /**
- * Interface for computing fundamental, essential, or homography matrix given a set of associated pairs. Returns
- * a list of solutions.
+ * <p>
+ * Creates a single hypothesis for the parameters in a model a set of sample points/observations.
+ * </p>
  *
  * @author Peter Abeles
  */
-public interface EpipolarMatrixEstimatorN {
-
+public interface GeoModelEstimator1<Model,Sample> {
 	/**
-	 * Estimates the epipolar matrix given a set of observations.
+	 * Estimates the model given a set of observations.
 	 *
-	 * @param points Observations. Pixel if fundamental and normalized if essential.
+	 * @param points Input: Set of observations. Not modified.
+	 * @param estimatedModel Output: Storage for the estimated model.  Modified.
 	 * @return true if successful
 	 */
-	public boolean process(List<AssociatedPair> points);
+	public boolean process( List<Sample> points , Model estimatedModel );
 
 	/**
-	 * Set of estimated 3x3 epipolar matrices.
+	 * Minimum number of points required to estimate the model.
 	 *
-	 * @return Estimated matrices.
-	 */
-	public List<DenseMatrix64F> getSolutions();
-
-	/**
-	 * Minimum number of points required to estimate the fundamental matrix.
-	 *
-	 * @return number of points.
+	 * @return Minimum number of points.
 	 */
 	public int getMinimumPoints();
 }

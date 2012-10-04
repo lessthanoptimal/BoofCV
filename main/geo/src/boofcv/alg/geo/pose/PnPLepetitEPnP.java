@@ -98,6 +98,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
+// TODO change so that it returns a list of N solutions and let other algorithm select the best?  Re-read the paper
 public class PnPLepetitEPnP {
 
 	// used to solve various linear problems
@@ -133,9 +134,6 @@ public class PnPLepetitEPnP {
 
 	// estimates rigid body motion between two associated sets of points
 	private MotionTransformPoint<Se3_F64, Point3D_F64> motionFit = FitSpecialEuclideanOps_F64.fitPoints3D();
-
-	// the estimated camera motion.  from world to camera
-	private Se3_F64 solutionMotion = new Se3_F64();
 
 	// mean location of world points
 	private Point3D_F64 meanWorldPts;
@@ -203,8 +201,9 @@ public class PnPLepetitEPnP {
 	 *
 	 * @param worldPts Known location of features in 3D world coordinates
 	 * @param observed Observed location of features in normalized camera coordinates
+	 * @param solutionModel Output: Storage for the found solution.
 	 */
-	public void process( List<Point3D_F64> worldPts , List<Point2D_F64> observed )
+	public void process( List<Point3D_F64> worldPts , List<Point2D_F64> observed , Se3_F64 solutionModel )
 	{
 		if( worldPts.size() != observed.size() )
 			throw new IllegalArgumentException("Must have the same number of observations and world points");
@@ -243,14 +242,14 @@ public class PnPLepetitEPnP {
 				estimateCase3_planar(solutions.get(2));
 		}
 
-		computeResultFromBest();
+		computeResultFromBest(solutionModel);
 	}
 
 	/**
 	 * Selects the best motion hypothesis based on the actual observations and optionally
 	 * optimizes the solution.
 	 */
-	private void computeResultFromBest( ) {
+	private void computeResultFromBest( Se3_F64 solutionModel ) {
 		double bestScore = Double.MAX_VALUE;
 		int bestSolution=-1;
 		for( int i = 0; i < numControl; i++ ) {
@@ -270,7 +269,7 @@ public class PnPLepetitEPnP {
 		UtilLepetitEPnP.computeCameraControl(solution,nullPts,solutionPts,numControl);
 		motionFit.process(controlWorldPts.toList(), solutionPts.toList());
 
-		solutionMotion.set(motionFit.getMotion());
+		solutionModel.set(motionFit.getMotion());
 	}
 
 	/**
@@ -696,14 +695,5 @@ public class PnPLepetitEPnP {
 	 */
 	public int getMinPoints () {
 		return 5;
-	}
-
-	/**
-	 * The found motion from world to camera
-	 *
-	 * @return camera motion from world to camera
-	 */
-	public Se3_F64 getSolutionMotion() {
-		return solutionMotion;
 	}
 }

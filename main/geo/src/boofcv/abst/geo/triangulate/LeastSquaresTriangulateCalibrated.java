@@ -52,10 +52,10 @@ public class LeastSquaresTriangulateCalibrated implements RefineTriangulationCal
 	}
 
 	@Override
-	public boolean process(List<Point2D_F64> observations, List<Se3_F64> motionWorldToC,
+	public boolean process(List<Point2D_F64> observations, List<Se3_F64> worldToCamera,
 						Point3D_F64 worldPt, Point3D_F64 refinedPt)
 	{
-		func.setObservations(observations,motionWorldToC);
+		func.setObservations(observations, worldToCamera);
 		minimizer.setFunction(func,null);
 
 		param[0] = worldPt.x;

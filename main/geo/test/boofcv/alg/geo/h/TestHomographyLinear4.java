@@ -21,7 +21,6 @@ package boofcv.alg.geo.h;
 import boofcv.struct.geo.AssociatedPair;
 import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Point2D_F64;
-import org.ejml.data.DenseMatrix64F;
 import org.ejml.ops.NormOps;
 import org.junit.Test;
 
@@ -59,17 +58,16 @@ public class TestHomographyLinear4 extends CommonHomographyChecks{
 		createScene(N,isPixels);
 
 		// compute essential
-		assertTrue(alg.process(pairs));
+		assertTrue(alg.process(pairs,solution));
 
 		// validate by testing essential properties
-		DenseMatrix64F H = alg.getHomography();
 
 		// sanity check, F is not zero
-		assertTrue(NormOps.normF(H) > 0.001 );
+		assertTrue(NormOps.normF(solution) > 0.001 );
 
 		// see if it follows the epipolar constraint
 		for( AssociatedPair p : pairs ) {
-			Point2D_F64 a = GeometryMath_F64.mult(H,p.keyLoc,new Point2D_F64());
+			Point2D_F64 a = GeometryMath_F64.mult(solution,p.keyLoc,new Point2D_F64());
 
 			double diff = a.distance(p.currLoc);
 			assertEquals(0,diff,1e-8);

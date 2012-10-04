@@ -18,7 +18,7 @@
 
 package boofcv.alg.geo.pose;
 
-import boofcv.struct.geo.PointPositionPair;
+import boofcv.struct.geo.PointPosePair;
 import georegression.geometry.RotationMatrixGenerator;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
@@ -52,7 +52,7 @@ public class TestPnPResidualSimple {
 		// compute errors with perfect model
 		double error[] = new double[ alg.getN() ];
 		alg.setModel(motion);
-		int index = alg.computeResiduals(new PointPositionPair(obs,world),error,0);
+		int index = alg.computeResiduals(new PointPosePair(obs,world),error,0);
 		assertEquals(alg.getN(), index);
 		
 		assertEquals(0,error[0],1e-8);
@@ -61,7 +61,7 @@ public class TestPnPResidualSimple {
 		// compute errors with an incorrect model
 		motion.getR().set(2,1,2);
 		alg.setModel(motion);
-		index = alg.computeResiduals(new PointPositionPair(obs,world),error,0);
+		index = alg.computeResiduals(new PointPosePair(obs,world),error,0);
 		assertEquals(alg.getN(), index);
 
 		assertTrue(Math.abs(error[0]) > 1e-8);

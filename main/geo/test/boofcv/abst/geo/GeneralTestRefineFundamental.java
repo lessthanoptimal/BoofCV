@@ -20,6 +20,8 @@ package boofcv.abst.geo;
 
 import boofcv.alg.geo.MultiViewOps;
 import boofcv.alg.geo.f.EpipolarTestSimulation;
+import boofcv.struct.geo.AssociatedPair;
+import boofcv.struct.geo.GeoModelRefine;
 import georegression.struct.point.Vector3D_F64;
 import org.ejml.data.DenseMatrix64F;
 import org.ejml.ops.CommonOps;
@@ -34,21 +36,28 @@ import static org.junit.Assert.assertTrue;
 public abstract class GeneralTestRefineFundamental extends EpipolarTestSimulation {
 
 
-	public abstract RefineEpipolarMatrix createAlgorithm();
+	public abstract GeoModelRefine<DenseMatrix64F,AssociatedPair> createAlgorithm();
+
+	DenseMatrix64F found = new DenseMatrix64F(3,3);
+
+	@Test
+	public void checkMarkerInterface() {
+		GeoModelRefine<DenseMatrix64F,AssociatedPair> alg = createAlgorithm();
+
+		assertTrue( alg instanceof EpipolarMatrixEstimator);
+	}
 
 	@Test
 	public void perfectInput() {
 		init(30,false);
 
 		// compute true essential matrix
-		DenseMatrix64F E = MultiViewOps.createEssential(motion.getR(), motion.getT());
+		DenseMatrix64F E = MultiViewOps.createEssential(worldToCamera.getR(), worldToCamera.getT());
 
-		RefineEpipolarMatrix alg = createAlgorithm();
+		GeoModelRefine<DenseMatrix64F,AssociatedPair> alg = createAlgorithm();
 
 		//give it the perfect matrix and see if it screwed it up
-		assertTrue(alg.process(E, pairs));
-
-		DenseMatrix64F found = alg.getRefinement();
+		assertTrue(alg.process(E, pairs, found));
 
 		// normalize so that they are the same
 		CommonOps.divide(E.get(2, 2), E);
@@ -62,19 +71,17 @@ public abstract class GeneralTestRefineFundamental extends EpipolarTestSimulatio
 		init(30,false);
 
 		// compute true essential matrix
-		DenseMatrix64F E = MultiViewOps.createEssential(motion.getR(), motion.getT());
+		DenseMatrix64F E = MultiViewOps.createEssential(worldToCamera.getR(), worldToCamera.getT());
 
 		// create an alternative incorrect matrix
-		Vector3D_F64 T = motion.getT().copy();
+		Vector3D_F64 T = worldToCamera.getT().copy();
 		T.x += 0.1;
-		DenseMatrix64F Emod = MultiViewOps.createEssential(motion.getR(), T);
+		DenseMatrix64F Emod = MultiViewOps.createEssential(worldToCamera.getR(), T);
 
-		RefineEpipolarMatrix alg = createAlgorithm();
+		GeoModelRefine<DenseMatrix64F,AssociatedPair> alg = createAlgorithm();
 
 		// compute and compare results
-		assertTrue(alg.process(Emod, pairs));
-
-		DenseMatrix64F found = alg.getRefinement();
+		assertTrue(alg.process(Emod, pairs,found));
 
 		// normalize to allow comparison
 		CommonOps.divide(E.get(2,2),E);

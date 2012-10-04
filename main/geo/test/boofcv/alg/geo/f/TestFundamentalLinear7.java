@@ -18,6 +18,7 @@
 
 package boofcv.alg.geo.f;
 
+import boofcv.struct.FastQueue;
 import boofcv.struct.geo.AssociatedPair;
 import org.ejml.data.DenseMatrix64F;
 import org.ejml.simple.SimpleMatrix;
@@ -51,9 +52,8 @@ public class TestFundamentalLinear7 {
 			FundamentalLinear7 alg = new FundamentalLinear7(isFundamental);
 
 			@Override
-			public List<DenseMatrix64F> computeFundamental(List<AssociatedPair> pairs) {
-				assertTrue(alg.process(pairs));
-				return alg.getSolutions();
+			public void computeFundamental(List<AssociatedPair> pairs, FastQueue<DenseMatrix64F> solutions) {
+				assertTrue(alg.process(pairs,solutions));
 			}
 		};
 	}

@@ -22,6 +22,7 @@ import boofcv.alg.geo.pose.PnPLepetitEPnP;
 import boofcv.alg.geo.pose.PoseFromPairLinear6;
 import boofcv.misc.PerformerBase;
 import boofcv.misc.ProfileOperation;
+import georegression.struct.se.Se3_F64;
 
 /**
  * @author Peter Abeles
@@ -30,6 +31,8 @@ public class BenchmarkRuntimePose extends ArtificialStereoScene {
 	static final long TEST_TIME = 1000;
 	static final int NUM_POINTS = 500;
 	static final boolean FUNDAMENTAL = false;
+
+	Se3_F64 found = new Se3_F64();
 
 	public class EPnP extends PerformerBase {
 
@@ -42,7 +45,7 @@ public class BenchmarkRuntimePose extends ArtificialStereoScene {
 
 		@Override
 		public void process() {
-			alg.process(worldPoints,observationCurrent);
+			alg.process(worldPoints,observationCurrent,found);
 		}
 	}
 

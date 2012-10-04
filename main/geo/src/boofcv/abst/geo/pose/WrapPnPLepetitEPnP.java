@@ -19,9 +19,10 @@
 package boofcv.abst.geo.pose;
 
 import boofcv.abst.geo.PerspectiveNPoint;
-import boofcv.abst.geo.RefinePerspectiveNPoint;
 import boofcv.alg.geo.pose.PnPLepetitEPnP;
-import boofcv.struct.geo.PointPositionPair;
+import boofcv.struct.geo.GeoModelEstimator1;
+import boofcv.struct.geo.GeoModelRefine;
+import boofcv.struct.geo.PointPosePair;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
@@ -35,53 +36,42 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class WrapPnPLepetitEPnP
-		implements PerspectiveNPoint , RefinePerspectiveNPoint {
+		implements PerspectiveNPoint , GeoModelRefine<Se3_F64,PointPosePair>, GeoModelEstimator1<Se3_F64,PointPosePair> {
 
 	PnPLepetitEPnP alg;
 
 	List<Point3D_F64> worldPts = new ArrayList<Point3D_F64>();
 	List<Point2D_F64> observed = new ArrayList<Point2D_F64>();
 
-	Se3_F64 motion;
-
 	public WrapPnPLepetitEPnP(PnPLepetitEPnP alg ) {
 		this.alg = alg;
 	}
 
 	@Override
-	public void process(List<PointPositionPair> inputs) {
+	public boolean process(List<PointPosePair> inputs , Se3_F64 solution ) {
 		for( int i = 0; i < inputs.size(); i++ ) {
-			PointPositionPair pp = inputs.get(i);
+			PointPosePair pp = inputs.get(i);
 			
 			worldPts.add(pp.location);
 			observed.add(pp.observed);
 		}
 		
-		alg.process(worldPts,observed);
-		motion = alg.getSolutionMotion();
+		alg.process(worldPts,observed,solution);
 		
 		worldPts.clear();
 		observed.clear();
-	}
 
-	@Override
-	public boolean process(Se3_F64 pose, List<PointPositionPair> obs) {
-		process(obs);
 		return true;
 	}
 
 	@Override
-	public Se3_F64 getPose() {
-		return motion;
+	public boolean process(Se3_F64 worldToCamera, List<PointPosePair> obs, Se3_F64 output ) {
+		process(obs,output);
+		return true;
 	}
 
 	@Override
-	public int getMinPoints() {
+	public int getMinimumPoints() {
 		return alg.getMinPoints();
-	}
-
-	@Override
-	public Se3_F64 getRefinement() {
-		return motion;
 	}
 }
