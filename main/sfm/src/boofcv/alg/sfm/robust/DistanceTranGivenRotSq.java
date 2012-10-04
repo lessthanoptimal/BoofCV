@@ -1,7 +1,7 @@
 package boofcv.alg.sfm.robust;
 
 import boofcv.numerics.fitting.modelset.DistanceFromModel;
-import boofcv.struct.geo.PointPositionPair;
+import boofcv.struct.geo.PointPosePair;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Vector3D_F64;
@@ -14,7 +14,7 @@ import java.util.List;
 /**
  * @author Peter Abeles
  */
-public class DistanceTranGivenRotSq implements DistanceFromModel<Vector3D_F64,PointPositionPair> {
+public class DistanceTranGivenRotSq implements DistanceFromModel<Vector3D_F64,PointPosePair> {
 
 	Se3_F64 motion = new Se3_F64();
 
@@ -30,7 +30,7 @@ public class DistanceTranGivenRotSq implements DistanceFromModel<Vector3D_F64,Po
 	}
 
 	@Override
-	public double computeDistance(PointPositionPair pt) {
+	public double computeDistance(PointPosePair pt) {
 		Point3D_F64 X = pt.location;
 		Point2D_F64 obs = pt.observed;
 
@@ -43,7 +43,7 @@ public class DistanceTranGivenRotSq implements DistanceFromModel<Vector3D_F64,Po
 	}
 
 	@Override
-	public void computeDistance(List<PointPositionPair> data, double[] distance) {
+	public void computeDistance(List<PointPosePair> data, double[] distance) {
 		for( int i = 0; i < data.size(); i++ ) {
 			distance[i] = computeDistance(data.get(i));
 		}
