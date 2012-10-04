@@ -33,18 +33,16 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author Peter Abeles
  */
-public abstract class GeneralTestRefineFundamental extends EpipolarTestSimulation {
+public abstract class CheckRefineFundamental extends EpipolarTestSimulation {
 
 
-	public abstract GeoModelRefine<DenseMatrix64F,AssociatedPair> createAlgorithm();
+	public abstract RefineEpipolar createAlgorithm();
 
 	DenseMatrix64F found = new DenseMatrix64F(3,3);
 
 	@Test
 	public void checkMarkerInterface() {
 		GeoModelRefine<DenseMatrix64F,AssociatedPair> alg = createAlgorithm();
-
-		assertTrue( alg instanceof EpipolarMatrixEstimator);
 	}
 
 	@Test

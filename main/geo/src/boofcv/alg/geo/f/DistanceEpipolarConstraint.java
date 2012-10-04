@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.abst.geo.f;
+package boofcv.alg.geo.f;
 
 import boofcv.numerics.fitting.modelset.DistanceFromModel;
 import boofcv.struct.geo.AssociatedPair;
@@ -29,8 +29,6 @@ import java.util.List;
 /**
  * Computes error using the epipolar constraint.  The input matrix is normalized so that different matrices
  * can be compared at the same scale.
- *
- * @see boofcv.abst.geo.EpipolarMatrixEstimator
  *
  * @author Peter Abeles
  */

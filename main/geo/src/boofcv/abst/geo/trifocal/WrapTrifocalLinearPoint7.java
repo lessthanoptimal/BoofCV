@@ -16,20 +16,31 @@
  * limitations under the License.
  */
 
-package boofcv.struct.geo;
+package boofcv.abst.geo.trifocal;
 
-import org.junit.Test;
+import boofcv.abst.geo.Estimate1ofTrifocalTensor;
+import boofcv.alg.geo.trifocal.TrifocalLinearPoint7;
+import boofcv.struct.geo.AssociatedTriple;
+import boofcv.struct.geo.TrifocalTensor;
 
-import static org.junit.Assert.fail;
+import java.util.List;
 
 /**
+ * Wrapper around either {@link boofcv.alg.geo.trifocal.TrifocalLinearPoint7} for {@link boofcv.abst.geo.Estimate1ofTrifocalTensor}.
+ *
  * @author Peter Abeles
  */
-public class TestObjectManagerMatrix {
+public class WrapTrifocalLinearPoint7 implements Estimate1ofTrifocalTensor {
 
-	@Test
-	public void stuff() {
-		fail("Implement");
+	TrifocalLinearPoint7 alg = new TrifocalLinearPoint7();
+
+	@Override
+	public boolean process(List<AssociatedTriple> points, TrifocalTensor estimatedModel) {
+		return( alg.process(points,estimatedModel) );
 	}
 
+	@Override
+	public int getMinimumPoints() {
+		return 7;
+	}
 }

@@ -5,7 +5,7 @@ import boofcv.abst.feature.tracker.KeyFramePointTracker;
 import boofcv.abst.geo.TriangulateNViewsCalibrated;
 import boofcv.abst.geo.TriangulateTwoViewsCalibrated;
 import boofcv.alg.sfm.robust.ModelMatcherTranGivenRot;
-import boofcv.factory.geo.FactoryEpipolar;
+import boofcv.factory.geo.FactoryMultiView;
 import boofcv.factory.geo.FactoryTriangulate;
 import boofcv.numerics.fitting.modelset.ModelMatcher;
 import boofcv.struct.distort.PointTransform_F64;
@@ -63,7 +63,7 @@ import java.util.List;
 public class MonocularSeparatedMotion<T extends ImageBase> {
 
 	// refines the full pose estimate
-	private GeoModelRefine<Se3_F64,PointPosePair> refinePose = FactoryEpipolar.refinePnP(1e-20,300);
+	private GeoModelRefine<Se3_F64,PointPosePair> refinePose = FactoryMultiView.refinePnP(1e-20, 300);
 	private Se3_F64 poseRefined = new Se3_F64();
 
 	// tracks point features

@@ -18,23 +18,22 @@
 
 package boofcv.abst.geo.h;
 
-import boofcv.abst.geo.EpipolarMatrixEstimator;
+import boofcv.abst.geo.RefineEpipolar;
 import boofcv.abst.geo.optimization.ResidualsEpipolarMatrixN;
 import boofcv.alg.geo.ModelObservationResidualN;
 import boofcv.numerics.optimization.FactoryOptimization;
 import boofcv.numerics.optimization.UnconstrainedLeastSquares;
 import boofcv.struct.geo.AssociatedPair;
-import boofcv.struct.geo.GeoModelRefine;
 import org.ejml.data.DenseMatrix64F;
 
 import java.util.List;
 
 /**
- * Improves upon the initial estimate of the Fundamental matrix by minimizing the sampson error.
+ * Improves upon the initial estimate of the Homography matrix by minimizing residuals.
  *
  * @author Peter Abeles
  */
-public class LeastSquaresHomography implements EpipolarMatrixEstimator, GeoModelRefine<DenseMatrix64F,AssociatedPair> {
+public class LeastSquaresHomography implements RefineEpipolar {
 	ResidualsEpipolarMatrixN func;
 
 	UnconstrainedLeastSquares minimizer;

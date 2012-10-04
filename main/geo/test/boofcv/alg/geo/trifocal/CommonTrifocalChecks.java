@@ -48,6 +48,8 @@ public abstract class CommonTrifocalChecks {
 	Se3_F64 se2,se3;
 	DenseMatrix64F P2,P3;
 	TrifocalTensor tensor;
+	// storage for the found solution
+	TrifocalTensor found = new TrifocalTensor();
 
 	DenseMatrix64F F2,F3;
 

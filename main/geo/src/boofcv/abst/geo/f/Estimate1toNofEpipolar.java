@@ -16,26 +16,23 @@
  * limitations under the License.
  */
 
-package boofcv.abst.geo;
+package boofcv.abst.geo.f;
+
+import boofcv.abst.geo.EstimateNofEpipolar;
+import boofcv.abst.geo.GeoModelEstimator1toN;
+import boofcv.struct.geo.AssociatedPair;
+import boofcv.struct.geo.GeoModelEstimator1;
+import org.ejml.data.DenseMatrix64F;
 
 /**
- * <p>
- * Marker interface for computing the fundamental, essential, or homography matrix given a set of associated pairs.
- * Each of these matrices describes the relationship between two views.
- * </p>
- *
- * <p>
- * For Fundamental and Essential matrices the following constraint is always true:
- * x2<sup>T</sup>*F*x1 = 0, where F is the 3x3 epipolar matrix, x1 = keyLoc, and x2 = currLoc.
- * </p>
- *
- * <p>
- * Image coordinates: For fundamental matrix the input should be in pixels, for Essential it should be in normalized
- * image coordinates, and for homography it can be either.
- * </p>
+ * Implementation of {@link GeoModelEstimator1toN} for epipolar matrices.
  *
  * @author Peter Abeles
  */
-public interface EpipolarMatrixEstimator {
-
+public class Estimate1toNofEpipolar extends GeoModelEstimator1toN<DenseMatrix64F,AssociatedPair>
+	implements EstimateNofEpipolar
+{
+	public Estimate1toNofEpipolar(GeoModelEstimator1<DenseMatrix64F, AssociatedPair> alg) {
+		super(alg);
+	}
 }

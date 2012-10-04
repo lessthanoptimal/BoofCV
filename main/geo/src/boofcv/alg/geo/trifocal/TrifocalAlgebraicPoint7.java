@@ -23,6 +23,7 @@ import boofcv.numerics.optimization.UnconstrainedLeastSquares;
 import boofcv.numerics.optimization.functions.FunctionNtoM;
 import boofcv.numerics.optimization.impl.UtilOptimize;
 import boofcv.struct.geo.AssociatedTriple;
+import boofcv.struct.geo.TrifocalTensor;
 import georegression.struct.point.Point3D_F64;
 import org.ejml.data.DenseMatrix64F;
 
@@ -76,7 +77,7 @@ public class TrifocalAlgebraicPoint7 extends TrifocalLinearPoint7 {
 	}
 
 	@Override
-	public boolean process(List<AssociatedTriple> observations) {
+	public boolean process(List<AssociatedTriple> observations, TrifocalTensor solution ) {
 		if( observations.size() < 7 )
 			throw new IllegalArgumentException("At least 7 correspondences must be provided");
 
@@ -93,7 +94,7 @@ public class TrifocalAlgebraicPoint7 extends TrifocalLinearPoint7 {
 		minimizeWithGeometricConstraints();
 
 		// undo normalization
-		removeNormalization();
+		removeNormalization(solution);
 
 		return true;
 	}

@@ -22,8 +22,6 @@ import boofcv.numerics.fitting.modelset.DistanceFromModel;
 import boofcv.struct.FastQueue;
 import boofcv.struct.geo.GeoModelEstimator1;
 import boofcv.struct.geo.GeoModelEstimatorN;
-import boofcv.struct.geo.ObjectManager;
-import boofcv.struct.geo.QueueObjectManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,10 +33,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class GeoModelEstimatorNto1<Model,Point> implements GeoModelEstimator1<Model,Point> {
-
-	// used to create and copy model data
-	private ObjectManager<Model> modelManager;
+public abstract class GeoModelEstimatorNto1<Model,Point> implements GeoModelEstimator1<Model,Point> {
 
 	// Algorithm which generates multiple hypotheses
 	private GeoModelEstimatorN<Model,Point> alg;
@@ -56,15 +51,13 @@ public class GeoModelEstimatorNto1<Model,Point> implements GeoModelEstimator1<Mo
 	private FastQueue<Model> solutions;
 
 	public GeoModelEstimatorNto1(GeoModelEstimatorN<Model, Point> alg,
-								 ObjectManager<Model> modelManager ,
 								 DistanceFromModel<Model,Point> distance ,
+								 FastQueue<Model> solutions ,
 								 int numTest) {
 		this.alg = alg;
 		this.numTest = numTest;
-		this.modelManager = modelManager;
 		this.distance = distance;
-
-		solutions = new QueueObjectManager<Model>(1,modelManager);
+		this.solutions = solutions;
 	}
 
 	@Override
@@ -105,12 +98,17 @@ public class GeoModelEstimatorNto1<Model,Point> implements GeoModelEstimator1<Mo
 		}
 
 		if( best != null ) {
-			modelManager.copy(best,estimatedModel);
+			copy(best, estimatedModel);
 			return true;
 		}
 
 		return false;
 	}
+
+	/**
+	 * Copies src into dst
+	 */
+	protected abstract void copy( Model src, Model dst );
 
 	@Override
 	public int getMinimumPoints() {

@@ -18,21 +18,19 @@
 
 package boofcv.abst.geo.h;
 
-import boofcv.abst.geo.EpipolarMatrixEstimator;
+import boofcv.abst.geo.Estimate1ofEpipolar;
 import boofcv.alg.geo.h.HomographyLinear4;
 import boofcv.struct.geo.AssociatedPair;
-import boofcv.struct.geo.GeoModelEstimator1;
 import org.ejml.data.DenseMatrix64F;
 
 import java.util.List;
 
 /**
- * Wrapper around {@link HomographyLinear4} for {@link boofcv.abst.geo.EpipolarMatrixEstimator}.
+ * Wrapper around {@link HomographyLinear4} for {@link boofcv.abst.geo.Estimate1ofEpipolar}.
  * 
  * @author Peter Abeles
  */
-public class WrapHomographyLinear implements EpipolarMatrixEstimator,
-		GeoModelEstimator1<DenseMatrix64F,AssociatedPair>
+public class WrapHomographyLinear implements Estimate1ofEpipolar
 {
 	HomographyLinear4 alg;
 

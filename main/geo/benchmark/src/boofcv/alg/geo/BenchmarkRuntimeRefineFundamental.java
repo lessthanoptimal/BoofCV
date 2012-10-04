@@ -18,9 +18,8 @@
 
 package boofcv.alg.geo;
 
+import boofcv.abst.geo.RefineEpipolar;
 import boofcv.misc.Performer;
-import boofcv.struct.geo.AssociatedPair;
-import boofcv.struct.geo.GeoModelRefine;
 import org.ejml.data.DenseMatrix64F;
 
 /**
@@ -35,11 +34,11 @@ public class BenchmarkRuntimeRefineFundamental extends ArtificialStereoScene{
 
 	public class Refine implements Performer {
 
-		GeoModelRefine<DenseMatrix64F,AssociatedPair> alg;
+		RefineEpipolar alg;
 		String name;
 		DenseMatrix64F refinement = new DenseMatrix64F(3,3);
 
-		public Refine( String name , GeoModelRefine<DenseMatrix64F,AssociatedPair> alg) {
+		public Refine( String name , RefineEpipolar alg) {
 			this.alg = alg;
 			this.name = name;
 		}
@@ -65,7 +64,7 @@ public class BenchmarkRuntimeRefineFundamental extends ArtificialStereoScene{
 		init(NUM_POINTS,FUNDAMENTAL,false);
 
 //		EpipolarMatrixEstimator computeAlg =
-//				FUNDAMENTAL ? FactoryEpipolar.computeFundamental(8) : FactoryEpipolar.computeEssential(8);
+//				FUNDAMENTAL ? FactoryMultiView.computeFundamental(8) : FactoryMultiView.computeEssential(8);
 //		computeAlg.process(pairs);
 //		initialF = computeAlg.getEpipolarMatrix();
 //		initialF.data[0] += 0.1;

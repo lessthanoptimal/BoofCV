@@ -18,9 +18,8 @@
 
 package boofcv.abst.geo.pose;
 
-import boofcv.abst.geo.PerspectiveNPoint;
+import boofcv.abst.geo.Estimate1ofPnP;
 import boofcv.alg.geo.f.EpipolarTestSimulation;
-import boofcv.struct.geo.GeoModelEstimator1;
 import boofcv.struct.geo.PointPosePair;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
@@ -34,24 +33,23 @@ import java.util.List;
 import static org.junit.Assert.assertTrue;
 
 /**
- * General tests for implementations of PerspectiveNPoint.  Ensures that the returned motion estimate is in
+ * General tests for implementations of Estimate1ofPnP.  Ensures that the returned motion estimate is in
  * the correct direction and works under nominal conditions
  *
  *
  * @author Peter Abeles
  */
-public abstract class GeneralEstimate1forPerspectiveNPoint extends EpipolarTestSimulation {
+public abstract class CheckEstimate1ofPnP extends EpipolarTestSimulation {
 
 	// algorithm being tested
-	GeoModelEstimator1<Se3_F64,PointPosePair> alg;
+	Estimate1ofPnP alg;
 	// true if it can only process the minimum number of observations
 	boolean onlyMinimum;
 
-	protected GeneralEstimate1forPerspectiveNPoint(GeoModelEstimator1<Se3_F64, PointPosePair> alg, boolean onlyMinimum) {
+	protected CheckEstimate1ofPnP(Estimate1ofPnP alg, boolean onlyMinimum) {
 		this.alg = alg;
 		this.onlyMinimum = onlyMinimum;
 
-		assertTrue( alg instanceof  PerspectiveNPoint );
 	}
 
 	/**

@@ -32,19 +32,12 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author Peter Abeles
  */
-public abstract class GeneralTestRefineHomography extends CommonHomographyChecks {
+public abstract class CheckRefineHomography extends CommonHomographyChecks {
 
-	public abstract GeoModelRefine<DenseMatrix64F,AssociatedPair> createAlgorithm();
+	public abstract RefineEpipolar createAlgorithm();
 
 	DenseMatrix64F H = new DenseMatrix64F(3,3);
 	DenseMatrix64F found = new DenseMatrix64F(3,3);
-
-	@Test
-	public void checkMarkerInterface() {
-		GeoModelRefine<DenseMatrix64F,AssociatedPair> alg = createAlgorithm();
-
-		assertTrue( alg instanceof EpipolarMatrixEstimator);
-	}
 
 	@Test
 	public void perfectInput() {

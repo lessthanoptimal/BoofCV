@@ -24,7 +24,7 @@ import georegression.fitting.se.FitSpecialEuclideanOps_F64;
 /**
  * @author Peter Abeles
  */
-public class TestWrapP3PLineDistance extends GeneralEstimateNforPerspectiveNPoint {
+public class TestWrapP3PLineDistance extends CheckEstimateNofPnP {
 	public TestWrapP3PLineDistance() {
 		super(true);
 

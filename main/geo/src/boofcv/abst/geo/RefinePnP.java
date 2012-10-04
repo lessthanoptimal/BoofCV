@@ -16,16 +16,16 @@
  * limitations under the License.
  */
 
-package boofcv.abst.geo.pose;
+package boofcv.abst.geo;
 
-import boofcv.alg.geo.pose.PnPLepetitEPnP;
+import boofcv.struct.geo.GeoModelRefine;
+import boofcv.struct.geo.PointPosePair;
+import georegression.struct.se.Se3_F64;
 
 /**
+ * Refines a pose estimate given a set of observations and associated 3D point in world coordinates.
+ *
  * @author Peter Abeles
  */
-public class TestWrapPnPLepetitEPnP extends CheckEstimate1ofPnP {
-
-	public TestWrapPnPLepetitEPnP() {
-		super( new WrapPnPLepetitEPnP(new PnPLepetitEPnP()),false);
-	}
+public interface RefinePnP extends GeoModelRefine<Se3_F64,PointPosePair> {
 }

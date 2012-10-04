@@ -18,24 +18,23 @@
 
 package boofcv.abst.geo.fitting;
 
-import boofcv.abst.geo.PerspectiveNPoint;
+import boofcv.abst.geo.Estimate1ofPnP;
 import boofcv.numerics.fitting.modelset.ModelGenerator;
-import boofcv.struct.geo.GeoModelEstimator1;
 import boofcv.struct.geo.PointPosePair;
 import georegression.struct.se.Se3_F64;
 
 import java.util.List;
 
 /**
- * Wrapper around {@link PerspectiveNPoint} for {@link ModelGenerator}.
+ * Wrapper around {@link Estimate1ofPnP} for {@link ModelGenerator}.
  * 
  * @author Peter Abeles
  */
 public class GenerateMotionPnP implements ModelGenerator<Se3_F64,PointPosePair> {
 
-	GeoModelEstimator1<Se3_F64,PointPosePair> alg;
+	Estimate1ofPnP alg;
 
-	public GenerateMotionPnP(GeoModelEstimator1<Se3_F64,PointPosePair> alg) {
+	public GenerateMotionPnP(Estimate1ofPnP alg) {
 		this.alg = alg;
 	}
 

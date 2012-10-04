@@ -55,7 +55,7 @@ public class MonocularSimpleVo<T extends ImageBase> {
 
 	KeyFramePointTracker<T,PointPoseTrack> tracker;
 
-	BundleAdjustmentCalibrated bundle = null;//FactoryEpipolar.bundleCalibrated(1e-5, 30);
+	BundleAdjustmentCalibrated bundle = null;//FactoryMultiView.bundleCalibrated(1e-5, 30);
 	CalibratedPoseAndPoint bundleModel = new CalibratedPoseAndPoint();
 	List<ViewPointObservations> bundleObs = new ArrayList<ViewPointObservations>();
 

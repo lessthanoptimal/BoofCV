@@ -166,6 +166,11 @@ public class TestMultiViewOps {
 	}
 
 	@Test
+	public void constraint_homography() {
+		fail("Implement");
+	}
+
+	@Test
 	public void extractEpipoles_threeview() {
 		Point3D_F64 found2 = new Point3D_F64();
 		Point3D_F64 found3 = new Point3D_F64();

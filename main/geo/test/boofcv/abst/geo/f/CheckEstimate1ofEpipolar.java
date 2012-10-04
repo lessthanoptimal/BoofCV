@@ -18,7 +18,7 @@
 
 package boofcv.abst.geo.f;
 
-import boofcv.abst.geo.EpipolarMatrixEstimator;
+import boofcv.abst.geo.Estimate1ofEpipolar;
 import boofcv.alg.geo.f.EpipolarTestSimulation;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.geo.GeoModelEstimator1;
@@ -32,25 +32,23 @@ import java.util.List;
 import static org.junit.Assert.assertTrue;
 
 /**
- * Applies various compliance tests for implementations of {@link boofcv.abst.geo.EpipolarMatrixEstimator}
+ * Applies various compliance tests for implementations of {@link boofcv.abst.geo.Estimate1ofEpipolar}
  * and {@link GeoModelEstimator1}.
  *
  * @author Peter Abeles
  */
-public abstract class CheckEstimator1forEpipolarMatrix extends EpipolarTestSimulation {
+public abstract class CheckEstimate1ofEpipolar extends EpipolarTestSimulation {
 
 	// the algorithm being tested
-	GeoModelEstimator1<DenseMatrix64F,AssociatedPair> alg;
+	Estimate1ofEpipolar alg;
 
 	// true if pixels or false if normalized
 	boolean isPixels;
 
-	protected CheckEstimator1forEpipolarMatrix(GeoModelEstimator1<DenseMatrix64F, AssociatedPair> alg,
-											   boolean pixels) {
+	protected CheckEstimate1ofEpipolar(Estimate1ofEpipolar alg,
+									   boolean pixels) {
 		this.alg = alg;
 		isPixels = pixels;
-
-		assertTrue( alg instanceof EpipolarMatrixEstimator );
 	}
 
 	/**

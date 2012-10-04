@@ -16,16 +16,16 @@
  * limitations under the License.
  */
 
-package boofcv.abst.geo.pose;
+package boofcv.abst.geo;
 
-import boofcv.alg.geo.pose.PnPLepetitEPnP;
+import boofcv.struct.geo.AssociatedTriple;
+import boofcv.struct.geo.GeoModelEstimator1;
+import boofcv.struct.geo.TrifocalTensor;
 
 /**
+ * Marker interface for computing a single {@link TrifocalTensor} given a set of {@link AssociatedTriple} observations.
+ *
  * @author Peter Abeles
  */
-public class TestWrapPnPLepetitEPnP extends CheckEstimate1ofPnP {
-
-	public TestWrapPnPLepetitEPnP() {
-		super( new WrapPnPLepetitEPnP(new PnPLepetitEPnP()),false);
-	}
+public interface Estimate1ofTrifocalTensor extends GeoModelEstimator1<TrifocalTensor,AssociatedTriple>  {
 }

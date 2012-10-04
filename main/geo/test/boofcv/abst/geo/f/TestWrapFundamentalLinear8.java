@@ -21,7 +21,7 @@ package boofcv.abst.geo.f;
 /**
  * @author Peter Abeles
  */
-public class TestWrapFundamentalLinear8 extends CheckEstimator1forEpipolarMatrix {
+public class TestWrapFundamentalLinear8 extends CheckEstimate1ofEpipolar {
 	public TestWrapFundamentalLinear8() {
 		super(new WrapFundamentalLinear8(true), true);
 	}

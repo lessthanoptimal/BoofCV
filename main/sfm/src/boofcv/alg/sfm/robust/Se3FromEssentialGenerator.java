@@ -1,11 +1,11 @@
 package boofcv.alg.sfm.robust;
 
+import boofcv.abst.geo.Estimate1ofEpipolar;
 import boofcv.abst.geo.TriangulateTwoViewsCalibrated;
 import boofcv.alg.geo.DecomposeEssential;
 import boofcv.alg.geo.PositiveDepthConstraintCheck;
 import boofcv.numerics.fitting.modelset.ModelGenerator;
 import boofcv.struct.geo.AssociatedPair;
-import boofcv.struct.geo.GeoModelEstimator1;
 import georegression.struct.se.Se3_F64;
 import org.ejml.data.DenseMatrix64F;
 
@@ -21,7 +21,7 @@ import java.util.List;
 public class Se3FromEssentialGenerator implements ModelGenerator<Se3_F64,AssociatedPair> {
 
 	// Estimates essential matrix from observations
-	GeoModelEstimator1<DenseMatrix64F,AssociatedPair> computeEssential;
+	Estimate1ofEpipolar computeEssential;
 	// decomposes essential matrix to extract motion
 	DecomposeEssential decomposeE = new DecomposeEssential();
 	// used to select best hypothesis
@@ -34,7 +34,7 @@ public class Se3FromEssentialGenerator implements ModelGenerator<Se3_F64,Associa
 	 *
 	 * @param computeEssential Algorithm for computing the essential matrix
 	 */
-	public Se3FromEssentialGenerator(GeoModelEstimator1<DenseMatrix64F,AssociatedPair> computeEssential,
+	public Se3FromEssentialGenerator(Estimate1ofEpipolar computeEssential,
 									 TriangulateTwoViewsCalibrated triangulate ) {
 		this.computeEssential = computeEssential;
 		this.depthCheck = new PositiveDepthConstraintCheck(triangulate);

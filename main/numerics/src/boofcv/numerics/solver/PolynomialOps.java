@@ -202,6 +202,13 @@ public class PolynomialOps {
 		return sturm.countRealRoots(Double.NEGATIVE_INFINITY,Double.POSITIVE_INFINITY);
 	}
 
+	/**
+	 * Creates different polynomial root finders.
+	 *
+	 * @param maxCoefficients The maximum number of coefficients that will be processed. This is the order + 1
+	 * @param which 0 = Sturm and 1 = companion matrix.
+	 * @return PolynomialRoots
+	 */
 	public static PolynomialRoots createRootFinder( int maxCoefficients , int which ) {
 		switch( which ) {
 			case 0:

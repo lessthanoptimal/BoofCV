@@ -18,13 +18,12 @@
 
 package boofcv.abst.geo.pose;
 
-import boofcv.abst.geo.PerspectiveNPoint;
+import boofcv.abst.geo.RefinePnP;
 import boofcv.abst.geo.optimization.ResidualsPoseMatrix;
 import boofcv.alg.geo.pose.PoseResidualsSimple;
 import boofcv.numerics.fitting.modelset.ModelCodec;
 import boofcv.numerics.optimization.FactoryOptimization;
 import boofcv.numerics.optimization.UnconstrainedLeastSquares;
-import boofcv.struct.geo.GeoModelRefine;
 import boofcv.struct.geo.PointPosePair;
 import georegression.struct.se.Se3_F64;
 
@@ -35,7 +34,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class LeastSquaresPose implements PerspectiveNPoint , GeoModelRefine<Se3_F64,PointPosePair> {
+public class LeastSquaresPose implements RefinePnP {
 
 	ModelCodec<Se3_F64> paramModel;
 	ResidualsPoseMatrix func;
