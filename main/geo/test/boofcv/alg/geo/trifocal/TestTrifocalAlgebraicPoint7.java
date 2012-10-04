@@ -88,7 +88,7 @@ public class TestTrifocalAlgebraicPoint7 extends CommonTrifocalChecks {
 		// OK I have no idea how to evaluate these noisy results.
 		//
 		// 1) Strictly enforcing geometric constraints can cause an error metrics to get worse because
-		//    the linear model has more degrees of freedom and can git the data better.  Can't compare it to the
+		//    the linear model has more degrees of freedom and can fit the data better.  Can't compare it to the
 		//    non-optimized version.
 		// 2) When camera matrices are extracted from the tensor there is an unknown (but common) projective transform
 		//    being applied to them.  This is true even when normalized image coordinate are used.

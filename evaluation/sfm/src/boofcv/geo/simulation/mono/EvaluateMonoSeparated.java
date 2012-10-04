@@ -20,7 +20,6 @@ package boofcv.geo.simulation.mono;
 
 import boofcv.abst.feature.tracker.ImagePointTracker;
 import boofcv.abst.sfm.MonocularVisualOdometry;
-import boofcv.factory.sfm.FactoryVisualOdometry;
 import boofcv.struct.distort.PointTransform_F64;
 
 import java.util.List;
@@ -43,7 +42,7 @@ public class EvaluateMonoSeparated extends EvaluateMonoVisualOdometry {
 
 		double angle = 5*Math.PI/180.0;
 		
-		return FactoryVisualOdometry.monoSeparated(minTracks,5,1,angle,tracker,pixelToNormalized);
+		return null;//FactoryVisualOdometry.monoSeparated(minTracks,5,1,angle,tracker,pixelToNormalized);
 	}
 
 	public static void main( String args[] ) {

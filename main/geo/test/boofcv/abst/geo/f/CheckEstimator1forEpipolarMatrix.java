@@ -21,6 +21,7 @@ package boofcv.abst.geo.f;
 import boofcv.abst.geo.EpipolarMatrixEstimator;
 import boofcv.alg.geo.f.EpipolarTestSimulation;
 import boofcv.struct.geo.AssociatedPair;
+import boofcv.struct.geo.GeoModelEstimator1;
 import georegression.geometry.GeometryMath_F64;
 import org.ejml.data.DenseMatrix64F;
 import org.ejml.ops.CommonOps;
@@ -32,21 +33,24 @@ import static org.junit.Assert.assertTrue;
 
 /**
  * Applies various compliance tests for implementations of {@link boofcv.abst.geo.EpipolarMatrixEstimator}
+ * and {@link GeoModelEstimator1}.
  *
  * @author Peter Abeles
  */
-public abstract class CheckEpipolarMatrixEstimator extends EpipolarTestSimulation {
+public abstract class CheckEstimator1forEpipolarMatrix extends EpipolarTestSimulation {
 
 	// the algorithm being tested
-	EpipolarMatrixEstimator alg;
+	GeoModelEstimator1<DenseMatrix64F,AssociatedPair> alg;
 
 	// true if pixels or false if normalized
 	boolean isPixels;
 
-	protected CheckEpipolarMatrixEstimator(EpipolarMatrixEstimator alg,
-										   boolean pixels) {
+	protected CheckEstimator1forEpipolarMatrix(GeoModelEstimator1<DenseMatrix64F, AssociatedPair> alg,
+											   boolean pixels) {
 		this.alg = alg;
 		isPixels = pixels;
+
+		assertTrue( alg instanceof EpipolarMatrixEstimator );
 	}
 
 	/**
@@ -66,15 +70,15 @@ public abstract class CheckEpipolarMatrixEstimator extends EpipolarTestSimulatio
 
 		boolean workedOnce = false;
 
+		DenseMatrix64F F = new DenseMatrix64F(3,3);
+
 		for( int i = 0; i < 10; i++ ) {
 			List<AssociatedPair> pairs = randomPairs(alg.getMinimumPoints());
 
-			if( !alg.process(pairs)) {
+			if( !alg.process(pairs,F)) {
 				continue;
 			}
 			workedOnce = true;
-
-			DenseMatrix64F F = alg.getEpipolarMatrix();
 
 			// normalize to ensure proper scaling
 			double n = CommonOps.elementMaxAbs(F);

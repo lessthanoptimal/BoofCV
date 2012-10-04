@@ -21,7 +21,6 @@ package boofcv.factory.geo;
 import boofcv.abst.geo.*;
 import boofcv.abst.geo.bundle.BundleAdjustmentCalibratedDense;
 import boofcv.abst.geo.f.*;
-import boofcv.abst.geo.fitting.GenerateEpipolarMatrix;
 import boofcv.abst.geo.h.LeastSquaresHomography;
 import boofcv.abst.geo.h.WrapHomographyLinear;
 import boofcv.abst.geo.pose.LeastSquaresPose;
@@ -32,8 +31,8 @@ import boofcv.alg.geo.h.HomographyResidualSampson;
 import boofcv.alg.geo.h.HomographyResidualTransfer;
 import boofcv.alg.geo.pose.PnPLepetitEPnP;
 import boofcv.alg.geo.pose.PoseRodriguesCodec;
-import boofcv.numerics.fitting.modelset.ModelGenerator;
-import boofcv.struct.geo.AssociatedPair;
+import boofcv.struct.geo.*;
+import georegression.struct.se.Se3_F64;
 import org.ejml.data.DenseMatrix64F;
 
 /**
@@ -56,9 +55,11 @@ public class FactoryEpipolar {
 	 * Returns an algorithm for estimating a homography matrix given a set of
 	 * {@link AssociatedPair}.
 	 *
+	 * @see EpipolarMatrixEstimator
+	 *
 	 * @return Fundamental algorithm.
 	 */
-	public static EpipolarMatrixEstimator computeHomography( boolean normalize ) {
+	public static GeoModelEstimator1<DenseMatrix64F,AssociatedPair> computeHomography( boolean normalize ) {
 		HomographyLinear4 alg = new HomographyLinear4(normalize);
 		return new WrapHomographyLinear(alg);
 	}
@@ -66,11 +67,13 @@ public class FactoryEpipolar {
 	/**
 	 * Creates a non-linear optimizer for refining estimates of homography matrices.
 	 *
+	 * @see EpipolarMatrixEstimator
+	 *
 	 * @param tol Tolerance for convergence.  Try 1e-8
 	 * @param maxIterations Maximum number of iterations it will perform.  Try 100 or more.
 	 * @return Refinement
 	 */
-	public static RefineEpipolarMatrix refineHomography( double tol , int maxIterations  ,
+	public static GeoModelRefine<DenseMatrix64F,AssociatedPair> refineHomography( double tol , int maxIterations  ,
 														 EpipolarError type ) {
 		ModelObservationResidualN residuals;
 		switch( type ) {
@@ -123,14 +126,17 @@ public class FactoryEpipolar {
 	 * @see boofcv.alg.geo.f.EssentialNister5
 	 * @see boofcv.alg.geo.f.FundamentalLinear7
 	 * @see boofcv.alg.geo.f.FundamentalLinear8
+	 * @see EpipolarMatrixEstimator
 	 *
 	 * @param minimumSamples Selects which algorithms to use.  Can be 5, 7 or 8. See above.
 	 * @param isFundamental If true then a Fundamental matrix is estimated, otherwise false for essential matrix.
 	 * @return Fundamental or essential estimation algorithm that returns multiple hypotheses.
 	 */
-	public static EpipolarMatrixEstimatorN computeFundamentalMulti( int minimumSamples , boolean isFundamental ) {
+	public static GeoModelEstimatorN<DenseMatrix64F,AssociatedPair>
+	computeFundamentalMulti( int minimumSamples , boolean isFundamental )
+	{
 		if( minimumSamples == 8 ) {
-			return new Epipolar1toN(new WrapFundamentalLinear8(isFundamental));
+			return new GeoModelEstimator1toN<DenseMatrix64F,AssociatedPair>(new WrapFundamentalLinear8(isFundamental));
 		} else if( minimumSamples == 7 ) {
 			return new WrapFundamentalLinear7(isFundamental);
 		} else if( minimumSamples == 5 ) {
@@ -167,36 +173,29 @@ public class FactoryEpipolar {
 	 * inlier set,
 	 * </p>
 	 *
-	 * @see FundamentalNto1
+	 * @see EpipolarMatrixEstimator
+	 * @see GeoModelEstimatorNto1
 	 *
 	 * @param minimumSamples Selects which algorithms to use.  Can be 5, 7 or 8. See above.
 	 * @param isFundamental If true then a Fundamental matrix is estimated, otherwise false for essential matrix.
 	 * @param numRemoveAmbiguity Number of sample points used to prune hypotheses.
 	 * @return Fundamental or essential estimation algorithm that returns a single hypothesis.
 	 */
-	public static EpipolarMatrixEstimator computeFundamentalOne( int minimumSamples ,
-																 boolean isFundamental ,
-																 int numRemoveAmbiguity ) {
+	public static GeoModelEstimator1<DenseMatrix64F,AssociatedPair>
+	computeFundamentalOne( int minimumSamples ,  boolean isFundamental , int numRemoveAmbiguity )
+	{
 		if( minimumSamples == 8 ) {
 			return new WrapFundamentalLinear8(isFundamental);
 		} else {
 			if( numRemoveAmbiguity <= 0 )
 				throw new IllegalArgumentException("numRemoveAmbiguity must be greater than zero");
 
-			EpipolarMatrixEstimatorN alg = computeFundamentalMulti(minimumSamples,isFundamental);
-			return new FundamentalNto1(alg,numRemoveAmbiguity);
-		}
-	}
+			GeoModelEstimatorN alg = computeFundamentalMulti(minimumSamples,isFundamental);
+			ObjectManager<DenseMatrix64F> manager = new ObjectManagerMatrix(3,3);
+			DistanceEpipolarConstraint distance = new DistanceEpipolarConstraint();
 
-	/**
-	 * Creates a robust model generator for use with {@link boofcv.numerics.fitting.modelset.ModelMatcher},
-	 *
-	 * @param fundamentalAlg The algorithm which is being wrapped.
-	 * @return ModelGenerator
-	 */
-	public static ModelGenerator<DenseMatrix64F,AssociatedPair>
-	robustModel( EpipolarMatrixEstimator fundamentalAlg ) {
-		return new GenerateEpipolarMatrix(fundamentalAlg);
+			return new GeoModelEstimatorNto1<DenseMatrix64F,AssociatedPair>(alg,manager,distance,numRemoveAmbiguity);
+		}
 	}
 
 	/**
@@ -204,13 +203,15 @@ public class FactoryEpipolar {
 	 *
 	 * @see boofcv.alg.geo.f.FundamentalResidualSampson
 	 * @see boofcv.alg.geo.f.FundamentalResidualSimple
+	 * @see EpipolarMatrixEstimator
 	 *
 	 * @param tol Tolerance for convergence.  Try 1e-8
 	 * @param maxIterations Maximum number of iterations it will perform.  Try 100 or more.
 	 * @return Refinement
 	 */
-	public static RefineEpipolarMatrix refineFundamental( double tol , int maxIterations ,
-														  EpipolarError type ) {
+	public static GeoModelRefine<DenseMatrix64F,AssociatedPair>
+	refineFundamental( double tol , int maxIterations , EpipolarError type )
+	{
 		switch( type ) {
 			case SAMPSON:
 				return new LeastSquaresFundamental(tol,maxIterations,true);
@@ -226,12 +227,13 @@ public class FactoryEpipolar {
 	 * accurate algorithm.  Can handle general and planar scenario automatically.
 	 *
 	 * @see PnPLepetitEPnP
+	 * @see PerspectiveNPoint
 	 *
 	 * @param numIterations If more then zero then non-linear optimization is done.  More is not always better.  Try 10
 	 * @param magicNumber Affects how the problem is linearized.  See comments in {@link PnPLepetitEPnP}.  Try 0.1
 	 * @return  PerspectiveNPoint
 	 */
-	public static PerspectiveNPoint pnpEfficientPnP( int numIterations , double magicNumber ) {
+	public static GeoModelEstimator1<Se3_F64,PointPosePair> pnpEfficientPnP( int numIterations , double magicNumber ) {
 		PnPLepetitEPnP alg = new PnPLepetitEPnP(magicNumber);
 		alg.setNumIterations(numIterations);
 		return new WrapPnPLepetitEPnP(alg);
@@ -247,7 +249,7 @@ public class FactoryEpipolar {
 	 * @param magicNumber Affects how the problem is linearized.  See comments in {@link PnPLepetitEPnP}.  Try 0.1
 	 * @return  PerspectiveNPoint
 	 */
-	public static RefinePerspectiveNPoint refinePnpEfficient( int numIterations , double magicNumber ) {
+	public static GeoModelRefine<Se3_F64,PointPosePair> refinePnpEfficient( int numIterations , double magicNumber ) {
 		PnPLepetitEPnP alg = new PnPLepetitEPnP(magicNumber);
 		alg.setNumIterations(numIterations);
 		return new WrapPnPLepetitEPnP(alg);
@@ -259,7 +261,7 @@ public class FactoryEpipolar {
 	 * @param tol Convergence tolerance. Try 1e-8
 	 * @param maxIterations Maximum number of iterations.  Try 200
 	 */
-	public static RefinePerspectiveNPoint refinePnP( double tol , int maxIterations ) {
+	public static GeoModelRefine<Se3_F64,PointPosePair> refinePnP( double tol , int maxIterations ) {
 		return new LeastSquaresPose(tol,maxIterations,new PoseRodriguesCodec());
 	}
 }

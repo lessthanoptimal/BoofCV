@@ -24,7 +24,10 @@ package boofcv.alg.geo.pose;
  * @author Peter Abeles
  */
 public class PointDistance3 {
-	double dist1;
-	double dist2;
-	double dist3;
+	/** distance to point P1 */
+	public double dist1;
+	/** distance to point P2 */
+	public double dist2;
+	/** distance to point P3 */
+	public double dist3;
 }

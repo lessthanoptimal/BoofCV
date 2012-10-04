@@ -18,9 +18,11 @@
 
 package boofcv.abst.geo.f;
 
-import boofcv.abst.geo.EpipolarMatrixEstimatorN;
+import boofcv.abst.geo.EpipolarMatrixEstimator;
 import boofcv.alg.geo.f.FundamentalLinear7;
+import boofcv.struct.FastQueue;
 import boofcv.struct.geo.AssociatedPair;
+import boofcv.struct.geo.GeoModelEstimatorN;
 import org.ejml.data.DenseMatrix64F;
 
 import java.util.List;
@@ -30,7 +32,8 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class WrapFundamentalLinear7 implements EpipolarMatrixEstimatorN {
+public class WrapFundamentalLinear7 implements EpipolarMatrixEstimator,
+		GeoModelEstimatorN<DenseMatrix64F,AssociatedPair> {
 	FundamentalLinear7 alg;
 
 	public WrapFundamentalLinear7(boolean fundamental) {
@@ -38,13 +41,8 @@ public class WrapFundamentalLinear7 implements EpipolarMatrixEstimatorN {
 	}
 
 	@Override
-	public boolean process(List<AssociatedPair> points) {
-		return alg.process(points);
-	}
-
-	@Override
-	public List<DenseMatrix64F> getSolutions() {
-		return alg.getSolutions();
+	public boolean process(List<AssociatedPair> points, FastQueue<DenseMatrix64F> estimatedModels) {
+		return alg.process(points,estimatedModels);
 	}
 
 	@Override

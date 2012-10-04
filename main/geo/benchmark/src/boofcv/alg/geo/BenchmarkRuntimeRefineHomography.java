@@ -18,14 +18,15 @@
 
 package boofcv.alg.geo;
 
-import boofcv.abst.geo.EpipolarMatrixEstimator;
-import boofcv.abst.geo.RefineEpipolarMatrix;
 import boofcv.alg.geo.h.HomographyLinear4;
 import boofcv.factory.geo.EpipolarError;
 import boofcv.factory.geo.FactoryEpipolar;
 import boofcv.misc.Performer;
 import boofcv.misc.PerformerBase;
 import boofcv.misc.ProfileOperation;
+import boofcv.struct.geo.AssociatedPair;
+import boofcv.struct.geo.GeoModelEstimator1;
+import boofcv.struct.geo.GeoModelRefine;
 import org.ejml.data.DenseMatrix64F;
 
 import static boofcv.factory.geo.FactoryEpipolar.refineHomography;
@@ -39,21 +40,21 @@ public class BenchmarkRuntimeRefineHomography extends ArtificialStereoScene{
 	static final boolean PIXELS = false;
 	
 	protected DenseMatrix64F initialF;
+	DenseMatrix64F refinedF = new DenseMatrix64F(3,3);
 
 	public class Refine implements Performer {
 
-		RefineEpipolarMatrix alg;
+		GeoModelRefine<DenseMatrix64F,AssociatedPair> alg;
 		String name;
 
-		public Refine(String name ,RefineEpipolarMatrix alg) {
+		public Refine(String name ,GeoModelRefine<DenseMatrix64F,AssociatedPair> alg) {
 			this.name = name;
 			this.alg = alg;
 		}
 
 		@Override
 		public void process() {
-			alg.process(initialF,pairs);
-			alg.getRefinement();
+			alg.process(initialF, pairs, refinedF);
 		}
 
 		@Override
@@ -68,7 +69,7 @@ public class BenchmarkRuntimeRefineHomography extends ArtificialStereoScene{
 
 		@Override
 		public void process() {
-			alg.process(pairs);
+			alg.process(pairs,refinedF);
 		}
 	}
 	
@@ -81,9 +82,8 @@ public class BenchmarkRuntimeRefineHomography extends ArtificialStereoScene{
 
 		init(NUM_POINTS, PIXELS, true);
 
-		EpipolarMatrixEstimator computeAlg = FactoryEpipolar.computeHomography(true);
-		computeAlg.process(pairs);
-		initialF = computeAlg.getEpipolarMatrix();
+		GeoModelEstimator1<DenseMatrix64F,AssociatedPair> computeAlg = FactoryEpipolar.computeHomography(true);
+		computeAlg.process(pairs,initialF);
 		initialF.data[0] += 0.1;
 		initialF.data[4] -= 0.15;
 		initialF.data[7] -= 0.2;

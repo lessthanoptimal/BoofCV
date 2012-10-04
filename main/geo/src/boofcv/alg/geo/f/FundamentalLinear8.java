@@ -50,9 +50,6 @@ import java.util.List;
  */
 public class FundamentalLinear8 extends FundamentalLinear {
 
-	// either the fundamental or essential matrix
-	protected DenseMatrix64F F = new DenseMatrix64F(3,3);
-
 	/**
 	 * Specifies which type of matrix is to be computed
 	 *
@@ -60,15 +57,6 @@ public class FundamentalLinear8 extends FundamentalLinear {
 	 */
 	public FundamentalLinear8( boolean computeFundamental ) {
 		super(computeFundamental);
-	}
-
-	/**
-	 * Returns the computed Fundamental or Essential matrix.
-	 *
-	 * @return Fundamental or Essential matrix.
-	 */
-	public DenseMatrix64F getF() {
-		return F;
 	}
 
 	/**
@@ -80,7 +68,7 @@ public class FundamentalLinear8 extends FundamentalLinear {
 	 *               normalized coordinates for essential matrix.
 	 * @return true If successful or false if it failed
 	 */
-	public boolean process( List<AssociatedPair> points ) {
+	public boolean process( List<AssociatedPair> points , DenseMatrix64F solution ) {
 		if( points.size() < 8 )
 			throw new IllegalArgumentException("Must be at least 8 points. Was only "+points.size());
 
@@ -90,21 +78,21 @@ public class FundamentalLinear8 extends FundamentalLinear {
 		LowLevelMultiViewOps.computeNormalization(points, N1, N2);
 		createA(points,A);
 
-		if (process(A))
+		if (process(A,solution))
 			return false;
 
-		undoNormalizationF(F,N1,N2);
+		undoNormalizationF(solution,N1,N2);
 
 		if( computeFundamental )
-			return projectOntoFundamentalSpace(F);
+			return projectOntoFundamentalSpace(solution);
 		else
-			return projectOntoEssential(F);
+			return projectOntoEssential(solution);
 	}
 
 	/**
 	 * Computes the SVD of A and extracts the essential/fundamental matrix from its null space
 	 */
-	protected boolean process(DenseMatrix64F A) {
+	protected boolean process(DenseMatrix64F A, DenseMatrix64F F ) {
 		if( !svdNull.decompose(A) )
 			return true;
 

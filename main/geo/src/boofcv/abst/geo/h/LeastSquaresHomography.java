@@ -18,12 +18,13 @@
 
 package boofcv.abst.geo.h;
 
-import boofcv.abst.geo.RefineEpipolarMatrix;
+import boofcv.abst.geo.EpipolarMatrixEstimator;
 import boofcv.abst.geo.optimization.ResidualsEpipolarMatrixN;
 import boofcv.alg.geo.ModelObservationResidualN;
 import boofcv.numerics.optimization.FactoryOptimization;
 import boofcv.numerics.optimization.UnconstrainedLeastSquares;
 import boofcv.struct.geo.AssociatedPair;
+import boofcv.struct.geo.GeoModelRefine;
 import org.ejml.data.DenseMatrix64F;
 
 import java.util.List;
@@ -33,12 +34,11 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class LeastSquaresHomography implements RefineEpipolarMatrix {
+public class LeastSquaresHomography implements EpipolarMatrixEstimator, GeoModelRefine<DenseMatrix64F,AssociatedPair> {
 	ResidualsEpipolarMatrixN func;
 
 	UnconstrainedLeastSquares minimizer;
 
-	DenseMatrix64F found = new DenseMatrix64F(3,3);
 	int maxIterations;
 	double convergenceTol;
 
@@ -53,7 +53,7 @@ public class LeastSquaresHomography implements RefineEpipolarMatrix {
 	}
 
 	@Override
-	public boolean process(DenseMatrix64F F, List<AssociatedPair> obs) {
+	public boolean process(DenseMatrix64F F, List<AssociatedPair> obs, DenseMatrix64F refinedF ) {
 
 		func.setObservations(obs);
 		minimizer.setFunction(func,null);
@@ -64,14 +64,9 @@ public class LeastSquaresHomography implements RefineEpipolarMatrix {
 			if( minimizer.iterate() )
 				break;
 		}
-		
-		found.data = minimizer.getParameters();
+
+		System.arraycopy(minimizer.getParameters(),0,refinedF.data,0,9);
 
 		return true;
-	}
-
-	@Override
-	public DenseMatrix64F getRefinement() {
-		return found;
 	}
 }

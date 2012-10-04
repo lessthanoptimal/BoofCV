@@ -18,11 +18,12 @@
 
 package boofcv.alg.geo;
 
-import boofcv.abst.geo.EpipolarMatrixEstimator;
 import boofcv.factory.geo.FactoryEpipolar;
 import boofcv.misc.Performer;
 import boofcv.misc.ProfileOperation;
 import boofcv.struct.geo.AssociatedPair;
+import boofcv.struct.geo.GeoModelEstimator1;
+import org.ejml.data.DenseMatrix64F;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,13 +41,18 @@ public class BenchmarkRuntimeFundamental extends ArtificialStereoScene{
 	List<AssociatedPair> pairs6 = new ArrayList<AssociatedPair>();
 	List<AssociatedPair> pairs5 = new ArrayList<AssociatedPair>();
 
+	DenseMatrix64F found = new DenseMatrix64F(3,3);
+
 	public class Estimate implements Performer {
 
-		EpipolarMatrixEstimator alg;
+		GeoModelEstimator1<DenseMatrix64F,AssociatedPair> alg;
 		String name;
 		List<AssociatedPair> list;
 		
-		public Estimate( String name , EpipolarMatrixEstimator alg , List<AssociatedPair> list ) {
+		public Estimate( String name ,
+						 GeoModelEstimator1<DenseMatrix64F,AssociatedPair> alg ,
+						 List<AssociatedPair> list )
+		{
 			this.alg = alg;
 			this.name = name;
 			this.list = list;
@@ -54,8 +60,7 @@ public class BenchmarkRuntimeFundamental extends ArtificialStereoScene{
 
 		@Override
 		public void process() {
-			alg.process(list);
-			alg.getEpipolarMatrix();
+			alg.process(list, found);
 		}
 
 		@Override

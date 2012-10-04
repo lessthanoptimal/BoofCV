@@ -95,21 +95,14 @@ public class EssentialNister5 {
 	// private PolynomialRoots findRoots = new RootFinderCompanion();
 	private Polynomial poly = new Polynomial(11);
 
-	// found essential matrix
-	private FastQueue<DenseMatrix64F> solutions = new FastQueue<DenseMatrix64F>(11,DenseMatrix64F.class,false);
-
-	public EssentialNister5() {
-		for( int i = 0; i < solutions.data.length; i++ )
-			solutions.data[i] = new DenseMatrix64F(3,3);
-	}
-
 	/**
 	 * Computes the essential matrix from point correspondences.
 	 *
-	 * @param points List of points correspondences in normalized image coordinates.
+	 * @param points Input: List of points correspondences in normalized image coordinates
+	 * @param solutions Output: Storage for the found solutions.   .
 	 * @return true for success or false if a fault has been detected
 	 */
-	public boolean process( List<AssociatedPair> points ) {
+	public boolean process( List<AssociatedPair> points , FastQueue<DenseMatrix64F> solutions ) {
 		if( points.size() != 5 )
 			throw new IllegalArgumentException("Exactly 5 points are required, not "+points.size());
 		solutions.reset();
@@ -222,9 +215,5 @@ public class EssentialNister5 {
 
 		this.x = x.get(0,0);
 		this.y = x.get(1,0);
-	}
-
-	public List<DenseMatrix64F> getSolutions() {
-		return solutions.toList();
 	}
 }

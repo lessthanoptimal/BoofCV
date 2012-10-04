@@ -16,12 +16,14 @@
  * limitations under the License.
  */
 
-package boofcv.abst.geo.f;
+package boofcv.abst.geo;
 
-import boofcv.abst.geo.EpipolarMatrixEstimatorN;
+import boofcv.abst.geo.f.DistanceEpipolarConstraint;
 import boofcv.alg.geo.f.EssentialNister5;
-import boofcv.struct.geo.AssociatedPair;
+import boofcv.struct.FastQueue;
+import boofcv.struct.geo.*;
 import org.ejml.data.DenseMatrix64F;
+import org.ejml.ops.MatrixFeatures;
 import org.ejml.ops.RandomMatrices;
 import org.junit.Test;
 
@@ -34,12 +36,17 @@ import static org.junit.Assert.*;
 /**
  * @author Peter Abeles
  */
-public class TestFundamentalNto1 {
+public class TestGeoModelEstimatorNto1 {
 
 	Random rand = new Random(234);
 	List<AssociatedPair> obs = new ArrayList<AssociatedPair>();
 
-	public TestFundamentalNto1() {
+	ObjectManager<DenseMatrix64F> manager = new ObjectManagerMatrix(3,3);
+	DistanceEpipolarConstraint distance = new DistanceEpipolarConstraint();
+
+	DenseMatrix64F found = new DenseMatrix64F(3,3);
+
+	public TestGeoModelEstimatorNto1() {
 		for (int i = 0; i < 5; i++) {
 			double x0 = rand.nextDouble() * 2 - 1.0;
 			double x1 = rand.nextDouble() * 2 - 1.0;
@@ -52,25 +59,26 @@ public class TestFundamentalNto1 {
 
 	@Test
 	public void successButNoSolutions() {
-		FundamentalNto1 alg = new FundamentalNto1(new Dummy(0, true), 2);
+		GeoModelEstimatorNto1<DenseMatrix64F,AssociatedPair> alg =
+				new GeoModelEstimatorNto1<DenseMatrix64F,AssociatedPair>(new Dummy(0, true),manager,distance,2);
 
-		assertFalse(alg.process(obs));
+		assertFalse(alg.process(obs,found));
 	}
 
 	@Test
 	public void checkFailed() {
-		FundamentalNto1 alg = new FundamentalNto1(new Dummy(0, false), 2);
+		GeoModelEstimatorNto1<DenseMatrix64F,AssociatedPair>  alg =
+				new GeoModelEstimatorNto1<DenseMatrix64F,AssociatedPair>(new Dummy(0, false), manager,distance,2);
 
-		assertFalse(alg.process(obs));
+		assertFalse(alg.process(obs,found));
 	}
 
 	@Test
 	public void checkOneSolution() {
-		FundamentalNto1 alg = new FundamentalNto1(new Dummy(1, true), 2);
+		GeoModelEstimatorNto1<DenseMatrix64F,AssociatedPair>  alg =
+				new GeoModelEstimatorNto1<DenseMatrix64F,AssociatedPair>(new Dummy(1, true), manager,distance,2);
 
-		assertTrue(alg.process(obs));
-
-		assertTrue(null != alg.getEpipolarMatrix());
+		assertTrue(alg.process(obs,found));
 	}
 
 	/**
@@ -81,23 +89,26 @@ public class TestFundamentalNto1 {
 	public void checkSelectBestSolution() {
 		DenseMatrix64F correct = createSolution();
 
-		FundamentalNto1 alg = new FundamentalNto1(new Dummy(correct, 7), 2);
+		GeoModelEstimatorNto1<DenseMatrix64F,AssociatedPair>  alg =
+				new GeoModelEstimatorNto1<DenseMatrix64F,AssociatedPair>(new Dummy(correct, 7), manager,distance,2);
 
-		assertTrue(alg.process(obs));
+		assertTrue(alg.process(obs,found));
 
 		// See if it selected the correct matrix
-		assertTrue(correct == alg.getEpipolarMatrix());
+		assertTrue(MatrixFeatures.isIdentical(found, correct, 1e-8));
 	}
 
 	private DenseMatrix64F createSolution() {
 		EssentialNister5 nister = new EssentialNister5();
 
-		assertTrue(nister.process(obs));
 
-		return nister.getSolutions().get(0);
+		FastQueue<DenseMatrix64F> solutions = new QueueMatrix(10,3,3);
+		assertTrue(nister.process(obs,solutions));
+
+		return solutions.get(0);
 	}
 
-	private static class Dummy implements EpipolarMatrixEstimatorN {
+	private static class Dummy implements GeoModelEstimatorN<DenseMatrix64F,AssociatedPair> {
 		int numberOfSolutions;
 		boolean success;
 
@@ -115,24 +126,20 @@ public class TestFundamentalNto1 {
 		}
 
 		@Override
-		public boolean process(List<AssociatedPair> points) {
+		public boolean process(List<AssociatedPair> points , FastQueue<DenseMatrix64F> solutions ) {
 			assertEquals(3, points.size());
-			return success;
-		}
 
-		@Override
-		public List<DenseMatrix64F> getSolutions() {
+			solutions.reset();
 			Random rand = new Random(324);
 
-			List<DenseMatrix64F> ret = new ArrayList<DenseMatrix64F>();
 			for (int i = 0; i < numberOfSolutions; i++) {
-				ret.add(RandomMatrices.createRandom(3, 3, rand));
+				solutions.pop().set(RandomMatrices.createRandom(3, 3, rand));
 			}
 
 			if (correct != null)
-				ret.set(1, correct);
+				solutions.get(1).set(correct);
 
-			return ret;
+			return success;
 		}
 
 		@Override
@@ -140,4 +147,5 @@ public class TestFundamentalNto1 {
 			return 3;
 		}
 	}
+
 }

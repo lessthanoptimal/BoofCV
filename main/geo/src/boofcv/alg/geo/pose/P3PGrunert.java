@@ -33,10 +33,7 @@ import java.util.List;
  * implementation is based off the discussion in [1]. There are up to four solutions.
  * </p>
  *
- * <p>
- * Problem Description: Three points (P1,P2,P3) in 3D space are observed in the image plane in normalized image
- * coordinates (q1,q2,q3).  Solve for the distance between the camera's origin and each of the three points.
- * </p>
+ * <p> See {@link P3PLineDistance} for a more detailed problem description. </p>
  *
  * <p>
  * [1] Haralick, Robert M. and Lee, Chung-Nan and Ottenberg, Karsten and Nolle, Michael, "Review and analysis of
@@ -46,7 +43,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class P3PGrunert {
+public class P3PGrunert implements P3PLineDistance {
 
 	// used to solve the 4th order polynomial
 	private PolynomialRoots rootFinder;
@@ -62,16 +59,9 @@ public class P3PGrunert {
 	}
 
 	/**
-	 * Solve for the distance between the camera's origin and each of the 3 points.
-	 *
-	 * @param obs1 Observation of P1 in normalized image coordinates
-	 * @param obs2 Observation of P1 in normalized image coordinates
-	 * @param obs3 Observation of P1 in normalized image coordinates
-	 * @param length23 Distance between points P2 and P3
-	 * @param length13 Distance between points P1 and P3
-	 * @param length12 Distance between points P1 and P2
-	 * @return true if successful or false if it failed to generate any solutions
+	 * @inheritDoc
 	 */
+	@Override
 	public boolean process( Point2D_F64 obs1 , Point2D_F64 obs2, Point2D_F64 obs3,
 							double length23 , double length13 , double length12 ) {
 
@@ -134,8 +124,9 @@ public class P3PGrunert {
 	}
 
 	/**
-	 * Returns possible solutions
+	 * @inheritDoc
 	 */
+	@Override
 	public FastQueue<PointDistance3> getSolutions() {
 		return solutions;
 	}

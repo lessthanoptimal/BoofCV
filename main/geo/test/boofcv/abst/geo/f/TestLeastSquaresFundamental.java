@@ -19,7 +19,9 @@
 package boofcv.abst.geo.f;
 
 import boofcv.abst.geo.GeneralTestRefineFundamental;
-import boofcv.abst.geo.RefineEpipolarMatrix;
+import boofcv.struct.geo.AssociatedPair;
+import boofcv.struct.geo.GeoModelRefine;
+import org.ejml.data.DenseMatrix64F;
 
 /**
  * @author Peter Abeles
@@ -27,7 +29,7 @@ import boofcv.abst.geo.RefineEpipolarMatrix;
 public class TestLeastSquaresFundamental extends GeneralTestRefineFundamental {
 
 	@Override
-	public RefineEpipolarMatrix createAlgorithm() {
+	public GeoModelRefine<DenseMatrix64F,AssociatedPair> createAlgorithm() {
 		return new LeastSquaresFundamental(1e-16,200,false);
 	}
 }

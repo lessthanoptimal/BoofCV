@@ -31,7 +31,7 @@ import static org.junit.Assert.assertTrue;
  */
 public abstract class HomographyResidualTests extends CommonHomographyChecks {
 
-	public abstract ModelObservationResidualN createAlg();
+	public abstract ModelObservationResidualN<DenseMatrix64F,AssociatedPair> createAlg();
 
 	@Test
 	public void basicTest() {
@@ -39,15 +39,14 @@ public abstract class HomographyResidualTests extends CommonHomographyChecks {
 
 		// use the linear algorithm to compute the homography
 		HomographyLinear4 estimator = new HomographyLinear4(true);
-		estimator.process(pairs);
-		DenseMatrix64F H = estimator.getHomography();
+		estimator.process(pairs,solution);
 
-		ModelObservationResidualN alg = createAlg();
+		ModelObservationResidualN<DenseMatrix64F,AssociatedPair> alg = createAlg();
 
 		double residuals[] = new double[alg.getN()];
 		
 		// no noise
-		alg.setModel(H);
+		alg.setModel(solution);
 		for( AssociatedPair p : pairs ) {
 			int index = alg.computeResiduals(p,residuals,0);
 			for( int i = 0; i < alg.getN(); i++ ) {
@@ -58,9 +57,9 @@ public abstract class HomographyResidualTests extends CommonHomographyChecks {
 
 
 		// with model error
-		H.data[0] += 0.6;
-		H.data[4] += 0.6;
-		alg.setModel(H);
+		solution.data[0] += 0.6;
+		solution.data[4] += 0.6;
+		alg.setModel(solution);
 		for( AssociatedPair p : pairs ) {
 			int index = alg.computeResiduals(p,residuals,0);
 			for( int i = 0; i < alg.getN(); i++ ) {

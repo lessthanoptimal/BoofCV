@@ -34,8 +34,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * @author Peter Abeles
@@ -43,7 +42,12 @@ import static org.junit.Assert.assertTrue;
 public class TestPnPLepetitEPnP {
 
 	Random rand = new Random(234);
-	
+
+	@Test
+	public void seeCommentAboutSolutions() {
+		fail("consider");
+	}
+
 	@Test
 	public void standardTests() {
 		standardTest(0);
@@ -66,10 +70,12 @@ public class TestPnPLepetitEPnP {
 					currObs.add(a.currLoc);
 				}
 
-				alg.setNumIterations(numIterations);
-				alg.process(locations,currObs);
+				Se3_F64 solution = new Se3_F64();
 
-				return alg.getSolutionMotion();
+				alg.setNumIterations(numIterations);
+				alg.process(locations,currObs,solution);
+
+				return solution;
 			}
 		};
 

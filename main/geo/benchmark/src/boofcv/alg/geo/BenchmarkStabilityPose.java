@@ -18,9 +18,9 @@
 
 package boofcv.alg.geo;
 
-import boofcv.abst.geo.PerspectiveNPoint;
 import boofcv.factory.geo.FactoryEpipolar;
-import boofcv.struct.geo.PointPositionPair;
+import boofcv.struct.geo.GeoModelEstimator1;
+import boofcv.struct.geo.PointPosePair;
 import georegression.geometry.RotationMatrixGenerator;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
@@ -36,14 +36,15 @@ public class BenchmarkStabilityPose extends ArtificialStereoScene {
 
 	static final int NUM_POINTS = 500;
 
-	PerspectiveNPoint target;
+	GeoModelEstimator1<Se3_F64,PointPosePair> target;
+	Se3_F64 found = new Se3_F64();
 	
 	public void evaluateObservationNoise( double min , double max , int N , boolean isPlanar )
 	{
 		System.out.println("------------------------");
 		
 		rand = new Random(234);
-		List<PointPositionPair> inputs = new ArrayList<PointPositionPair>();
+		List<PointPosePair> inputs = new ArrayList<PointPosePair>();
 		
 		for( int i = 0; i <= N; i++ ) {
 			inputs.clear();
@@ -53,12 +54,11 @@ public class BenchmarkStabilityPose extends ArtificialStereoScene {
 			addPixelNoise(mag);
 			
 			for( int j = 0; j < NUM_POINTS; j++ ) {
-				inputs.add(new PointPositionPair(pairs.get(j).currLoc, worldPoints.get(j)));
+				inputs.add(new PointPosePair(pairs.get(j).currLoc, worldPoints.get(j)));
 			}
 			
-			target.process(inputs);
-
-			Se3_F64 found = target.getPose();
+			if( !target.process(inputs,found) )
+				throw new RuntimeException("Not expection it to fail");
 			
 			double expectedEuler[] = RotationMatrixGenerator.matrixToEulerXYZ(motion.getR());
 			double foundEuler[] = RotationMatrixGenerator.matrixToEulerXYZ(found.getR());

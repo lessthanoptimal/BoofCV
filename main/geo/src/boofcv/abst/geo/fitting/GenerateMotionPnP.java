@@ -20,7 +20,8 @@ package boofcv.abst.geo.fitting;
 
 import boofcv.abst.geo.PerspectiveNPoint;
 import boofcv.numerics.fitting.modelset.ModelGenerator;
-import boofcv.struct.geo.PointPositionPair;
+import boofcv.struct.geo.GeoModelEstimator1;
+import boofcv.struct.geo.PointPosePair;
 import georegression.struct.se.Se3_F64;
 
 import java.util.List;
@@ -30,11 +31,11 @@ import java.util.List;
  * 
  * @author Peter Abeles
  */
-public class GenerateMotionPnP implements ModelGenerator<Se3_F64,PointPositionPair> {
-	
-	PerspectiveNPoint alg;
+public class GenerateMotionPnP implements ModelGenerator<Se3_F64,PointPosePair> {
 
-	public GenerateMotionPnP(PerspectiveNPoint alg) {
+	GeoModelEstimator1<Se3_F64,PointPosePair> alg;
+
+	public GenerateMotionPnP(GeoModelEstimator1<Se3_F64,PointPosePair> alg) {
 		this.alg = alg;
 	}
 
@@ -44,14 +45,12 @@ public class GenerateMotionPnP implements ModelGenerator<Se3_F64,PointPositionPa
 	}
 
 	@Override
-	public boolean generate(List<PointPositionPair> dataSet, Se3_F64 model ) {
-		alg.process(dataSet);
-		model.set(alg.getPose());
-		return true;
+	public boolean generate(List<PointPosePair> dataSet, Se3_F64 model ) {
+		return alg.process(dataSet,model);
 	}
 
 	@Override
 	public int getMinimumPoints() {
-		return alg.getMinPoints();
+		return alg.getMinimumPoints();
 	}
 }

@@ -18,9 +18,12 @@
 
 package boofcv.abst.geo.f;
 
-import boofcv.abst.geo.EpipolarMatrixEstimatorN;
+import boofcv.abst.geo.EpipolarMatrixEstimator;
 import boofcv.alg.geo.f.EpipolarTestSimulation;
+import boofcv.struct.FastQueue;
 import boofcv.struct.geo.AssociatedPair;
+import boofcv.struct.geo.GeoModelEstimatorN;
+import boofcv.struct.geo.QueueMatrix;
 import georegression.geometry.GeometryMath_F64;
 import org.ejml.data.DenseMatrix64F;
 import org.ejml.ops.CommonOps;
@@ -31,22 +34,25 @@ import java.util.List;
 import static org.junit.Assert.assertTrue;
 
 /**
- * Applies various compliance tests for implementations of {@link boofcv.abst.geo.EpipolarMatrixEstimatorN}
+ * Applies various compliance tests for implementations of {@link boofcv.abst.geo.EpipolarMatrixEstimator}
+ * amd {@link GeoModelEstimatorN}.
  *
  * @author Peter Abeles
  */
-public abstract class CheckEpipolarMatrixEstimatorN extends EpipolarTestSimulation {
+public abstract class CheckEstimatorNforEpipolarMatrix extends EpipolarTestSimulation {
 
 	// the algorithm being tested
-	EpipolarMatrixEstimatorN alg;
+	GeoModelEstimatorN<DenseMatrix64F,AssociatedPair> alg;
 
 	// true if pixels or false if normalized
 	boolean isPixels;
 
-	protected CheckEpipolarMatrixEstimatorN(EpipolarMatrixEstimatorN alg,
-											boolean pixels) {
+	protected CheckEstimatorNforEpipolarMatrix(GeoModelEstimatorN<DenseMatrix64F, AssociatedPair> alg,
+											   boolean pixels) {
 		this.alg = alg;
 		isPixels = pixels;
+
+		assertTrue( alg instanceof EpipolarMatrixEstimator);
 	}
 
 	/**
@@ -66,21 +72,21 @@ public abstract class CheckEpipolarMatrixEstimatorN extends EpipolarTestSimulati
 
 		boolean workedOnce = false;
 
+		FastQueue<DenseMatrix64F> solutions = new QueueMatrix(10,3,3);
+
 		for( int i = 0; i < 10; i++ ) {
 			List<AssociatedPair> pairs = randomPairs(alg.getMinimumPoints());
 
-			if( !alg.process(pairs)) {
+			if( !alg.process(pairs,solutions)) {
 				continue;
 			}
-
-			List<DenseMatrix64F> solutions = alg.getSolutions();
 
 			if( solutions.size() <= 0 )
 				continue;
 
 			workedOnce = true;
 
-			for( DenseMatrix64F F : solutions ) {
+			for( DenseMatrix64F F : solutions.toList() ) {
 				// normalize to ensure proper scaling
 				double n = CommonOps.elementMaxAbs(F);
 				CommonOps.scale(1.0/n,F);

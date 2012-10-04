@@ -23,7 +23,6 @@ import boofcv.abst.feature.tracker.PointTrack;
 import boofcv.abst.sfm.MonocularVisualOdometry;
 import boofcv.alg.distort.LensDistortionOps;
 import boofcv.factory.feature.tracker.FactoryPointSequentialTracker;
-import boofcv.factory.sfm.FactoryVisualOdometry;
 import boofcv.gui.VideoProcessAppBase;
 import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.gui.image.ImagePanel;
@@ -83,7 +82,7 @@ extends VideoProcessAppBase<I,D> {
 	public void configure( IntrinsicParameters cameraParam )  {
 		PointTransform_F64 removeRadial = LensDistortionOps.transformRadialToNorm_F64(cameraParam);
 		
-		alg = FactoryVisualOdometry.monoSimple(maxFeatures/2, 20, 1, tracker, removeRadial);
+//		alg = FactoryVisualOdometry.monoSimple(maxFeatures/2, 20, 1, tracker, removeRadial);
 //		alg = FactoryVisualOdometry.monoSeparated(maxFeatures/2, 12, 2,  2*Math.PI/180.0, tracker, removeRadial);
 
 	}

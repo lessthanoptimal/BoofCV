@@ -40,7 +40,7 @@ public class TestFundamentalResidualSampson extends EpipolarTestSimulation {
 		init(30,false);
 
 		// compute true essential matrix
-		DenseMatrix64F E = MultiViewOps.createEssential(motion.getR(), motion.getT());
+		DenseMatrix64F E = MultiViewOps.createEssential(worldToCamera.getR(), worldToCamera.getT());
 	
 
 		FundamentalResidualSampson alg = new FundamentalResidualSampson();

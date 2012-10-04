@@ -35,8 +35,8 @@ public interface TriangulateNViewsCalibrated {
 	/**
 	 * Triangulate the points location.
 	 *
-	 * @param observations Observation of the point in normalized image coordinates.
-	 * @param worldToView Transform from world coordinate to different views
+	 * @param observations Observations of the 3D point in normalized image coordinates from different camera views..
+	 * @param worldToView Transform from world to each of the different camera views
 	 * @param location Computed location of feature in world coordinates.
 	 * @return true if successful, false otherwise.
 	 */

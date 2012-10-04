@@ -18,7 +18,9 @@
 
 package boofcv.alg.geo.f;
 
+import boofcv.struct.FastQueue;
 import boofcv.struct.geo.AssociatedPair;
+import boofcv.struct.geo.QueueMatrix;
 import georegression.geometry.GeometryMath_F64;
 import org.ejml.data.DenseMatrix64F;
 import org.ejml.ops.CommonOps;
@@ -37,7 +39,9 @@ public abstract class CommonFundamentalChecks extends EpipolarTestSimulation {
 
 	double zeroTol = 1e-8;
 
-	public abstract List<DenseMatrix64F> computeFundamental(List<AssociatedPair> pairs);
+	FastQueue<DenseMatrix64F> solutions = new QueueMatrix(10,3,3);
+
+	public abstract void computeFundamental(List<AssociatedPair> pairs , FastQueue<DenseMatrix64F> solutions );
 
 
 	public void checkEpipolarMatrix(int N, boolean isFundamental) {
@@ -47,15 +51,15 @@ public abstract class CommonFundamentalChecks extends EpipolarTestSimulation {
 		for (int trial = 0; trial < 20; trial++) {
 			List<AssociatedPair> pairs = randomPairs(N);
 
-			List<DenseMatrix64F> l = computeFundamental(pairs);
+			computeFundamental(pairs,solutions);
 
 			// At least one solution should have been found
-			assertTrue(l.size() > 0);
+			assertTrue(solutions.size() > 0);
 
 			int totalMatchedAll = 0;
 			int totalPassedMatrix = 0;
 
-			for (DenseMatrix64F F : l) {
+			for (DenseMatrix64F F : solutions.toList()) {
 				// normalize F to ensure a consistent scale
 				CommonOps.scale(1.0/CommonOps.elementMaxAbs(F),F);
 

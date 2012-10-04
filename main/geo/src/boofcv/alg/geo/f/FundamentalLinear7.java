@@ -66,9 +66,6 @@ public class FundamentalLinear7 extends FundamentalLinear {
 	private Polynomial poly = new Polynomial(4);
 	PolynomialRoots rootFinder = PolynomialSolver.createRootFinder(RootFinderType.EVD,4);
 
-	// where the found solutions are stored
-	FastQueue<DenseMatrix64F> solutions;
-
 	// Matrix from SVD
 	DenseMatrix64F V = new DenseMatrix64F(9,9);
 
@@ -79,10 +76,6 @@ public class FundamentalLinear7 extends FundamentalLinear {
 	 */
 	public FundamentalLinear7(boolean computeFundamental) {
 		super(computeFundamental);
-
-		solutions = new FastQueue<DenseMatrix64F>(3,DenseMatrix64F.class,false);
-		for( int i = 0; i < 3; i++)
-			solutions.data[i] = new DenseMatrix64F(3,3);
 	}
 
 	/**
@@ -90,11 +83,12 @@ public class FundamentalLinear7 extends FundamentalLinear {
 	 * Computes a fundamental or essential matrix from a set of associated point correspondences.
 	 * </p>
 	 *
-	 * @param points List of corresponding image coordinates. In pixel for fundamental matrix or
+	 * @param points Input: List of corresponding image coordinates. In pixel for fundamental matrix or
 	 *               normalized coordinates for essential matrix.
+	 * @param solutions Output: Storage for the found solutions.
 	 * @return true If successful or false if it failed
 	 */
-	public boolean process( List<AssociatedPair> points ) {
+	public boolean process( List<AssociatedPair> points , FastQueue<DenseMatrix64F> solutions ) {
 		if( points.size() != 7 )
 			throw new IllegalArgumentException("Must be exactly 7 points. Not "+points.size()+" you gelatinous piece of pond scum.");
 
@@ -117,18 +111,9 @@ public class FundamentalLinear7 extends FundamentalLinear {
 		computeCoefficients(F1, F2, poly.c);
 
 		// Find polynomial roots and solve for Fundamental matrices
-		computeSolutions();
+		computeSolutions( solutions );
 
 		return true;
-	}
-
-	/**
-	 * Set of found solutions.  Will be one or three.
-	 *
-	 * @return Solutions.
-	 */
-	public List<DenseMatrix64F> getSolutions() {
-		return solutions.toList();
 	}
 
 	/**
@@ -156,7 +141,7 @@ public class FundamentalLinear7 extends FundamentalLinear {
 	 * </p>
 
 	 */
-	public void computeSolutions()
+	public void computeSolutions( FastQueue<DenseMatrix64F> solutions )
 	{
 		if( !rootFinder.process(poly))
 			return;

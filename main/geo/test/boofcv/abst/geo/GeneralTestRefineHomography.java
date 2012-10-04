@@ -20,6 +20,8 @@ package boofcv.abst.geo;
 
 import boofcv.alg.geo.h.CommonHomographyChecks;
 import boofcv.alg.geo.h.HomographyLinear4;
+import boofcv.struct.geo.AssociatedPair;
+import boofcv.struct.geo.GeoModelRefine;
 import org.ejml.data.DenseMatrix64F;
 import org.ejml.ops.CommonOps;
 import org.ejml.ops.MatrixFeatures;
@@ -32,7 +34,17 @@ import static org.junit.Assert.assertTrue;
  */
 public abstract class GeneralTestRefineHomography extends CommonHomographyChecks {
 
-	public abstract RefineEpipolarMatrix createAlgorithm();
+	public abstract GeoModelRefine<DenseMatrix64F,AssociatedPair> createAlgorithm();
+
+	DenseMatrix64F H = new DenseMatrix64F(3,3);
+	DenseMatrix64F found = new DenseMatrix64F(3,3);
+
+	@Test
+	public void checkMarkerInterface() {
+		GeoModelRefine<DenseMatrix64F,AssociatedPair> alg = createAlgorithm();
+
+		assertTrue( alg instanceof EpipolarMatrixEstimator);
+	}
 
 	@Test
 	public void perfectInput() {
@@ -40,15 +52,12 @@ public abstract class GeneralTestRefineHomography extends CommonHomographyChecks
 
 		// use the linear algorithm to compute the homography
 		HomographyLinear4 estimator = new HomographyLinear4(true);
-		estimator.process(pairs);
-		DenseMatrix64F H = estimator.getHomography();
+		estimator.process(pairs,H);
 
-		RefineEpipolarMatrix alg = createAlgorithm();
+		GeoModelRefine<DenseMatrix64F,AssociatedPair> alg = createAlgorithm();
 
 		//give it the perfect matrix and see if it screwed it up
-		assertTrue(alg.process(H, pairs));
-
-		DenseMatrix64F found = alg.getRefinement();
+		assertTrue(alg.process(H, pairs, found));
 
 		// normalize so that they are the same
 		CommonOps.divide(H.get(2, 2), H);
@@ -63,18 +72,15 @@ public abstract class GeneralTestRefineHomography extends CommonHomographyChecks
 
 		// use the linear algorithm to compute the homography
 		HomographyLinear4 estimator = new HomographyLinear4(true);
-		estimator.process(pairs);
-		DenseMatrix64F H = estimator.getHomography();
+		estimator.process(pairs,H);
 
-		RefineEpipolarMatrix alg = createAlgorithm();
+		GeoModelRefine<DenseMatrix64F,AssociatedPair> alg = createAlgorithm();
 
 		//give it the perfect matrix and see if it screwed it up
 		DenseMatrix64F Hmod = H.copy();
 		Hmod.data[0] += 0.1;
 		Hmod.data[5] += 0.1;
-		assertTrue(alg.process(Hmod, pairs));
-
-		DenseMatrix64F found = alg.getRefinement();
+		assertTrue(alg.process(Hmod, pairs, found));
 
 		// normalize to allow comparison
 		CommonOps.divide(H.get(2,2),H);

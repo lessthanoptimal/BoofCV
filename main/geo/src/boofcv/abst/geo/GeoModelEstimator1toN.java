@@ -16,40 +16,40 @@
  * limitations under the License.
  */
 
-package boofcv.abst.geo.f;
+package boofcv.abst.geo;
 
-import boofcv.abst.geo.EpipolarMatrixEstimator;
-import boofcv.abst.geo.EpipolarMatrixEstimatorN;
-import boofcv.struct.geo.AssociatedPair;
-import org.ejml.data.DenseMatrix64F;
+import boofcv.struct.FastQueue;
+import boofcv.struct.geo.GeoModelEstimator1;
+import boofcv.struct.geo.GeoModelEstimatorN;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Wrapper around {@link EpipolarMatrixEstimator} which allows it to be used by {@link EpipolarMatrixEstimatorN}.
+ * Wrapper that allows {@link GeoModelEstimator1} to be used as a {@link GeoModelEstimatorN}.
  *
  * @author Peter Abeles
  */
-public class Epipolar1toN implements EpipolarMatrixEstimatorN {
+public class GeoModelEstimator1toN<Model,Point> implements GeoModelEstimatorN<Model,Point> {
 
-	EpipolarMatrixEstimator alg;
-	List<DenseMatrix64F> solution = new ArrayList<DenseMatrix64F>();
+	private GeoModelEstimator1<Model,Point> alg;
 
-	public Epipolar1toN(EpipolarMatrixEstimator alg) {
+	public GeoModelEstimator1toN(GeoModelEstimator1<Model, Point> alg) {
 		this.alg = alg;
 	}
 
 	@Override
-	public boolean process(List<AssociatedPair> points) {
-		return alg.process(points);
-	}
+	public boolean process(List<Point> points, FastQueue<Model> estimatedModels) {
+		estimatedModels.reset();
 
-	@Override
-	public List<DenseMatrix64F> getSolutions() {
-		solution.clear();
-		solution.add( alg.getEpipolarMatrix() );
-		return solution;
+		Model m = estimatedModels.pop();
+
+		if( alg.process(points,m) ) {
+			return true;
+		} else {
+			estimatedModels.reset();
+		}
+
+		return false;
 	}
 
 	@Override

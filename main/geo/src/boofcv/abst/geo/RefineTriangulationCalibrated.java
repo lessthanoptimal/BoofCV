@@ -36,12 +36,12 @@ public interface RefineTriangulationCalibrated {
 	 * Refines the triangulated point.
 	 *
 	 * @param observations Observations of feature in N views. Normalized image coordinates.
-	 * @param motionWorldToC Camera transforms in each view.  World to Camera.
+	 * @param worldToCamera Camera transforms in each view.  World to Camera.
 	 * @param worldPt Initial estimate of point in world coordinates.
 	 * @param refinedPt The refined estimated point position.
 	 * @return if successful or not
 	 */
 	public boolean process( List<Point2D_F64> observations ,
-							List<Se3_F64> motionWorldToC ,
+							List<Se3_F64> worldToCamera ,
 							Point3D_F64 worldPt , Point3D_F64 refinedPt );
 }

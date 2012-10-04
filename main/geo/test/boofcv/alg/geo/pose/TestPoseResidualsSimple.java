@@ -19,7 +19,7 @@
 package boofcv.alg.geo.pose;
 
 import boofcv.alg.geo.GeoTestingOps;
-import boofcv.struct.geo.PointPositionPair;
+import boofcv.struct.geo.PointPosePair;
 import georegression.geometry.RotationMatrixGenerator;
 import georegression.struct.se.Se3_F64;
 import org.junit.Test;
@@ -39,7 +39,7 @@ public class TestPoseResidualsSimple extends CommonMotionNPoint {
 		motion.getT().set(0.1,-0.1,0.01);
 
 		generateScene(10, motion, false);
-		PointPositionPair p = pointPose.get(0);
+		PointPosePair p = pointPose.get(0);
 
 		PoseResidualsSimple alg = new PoseResidualsSimple();
 
@@ -56,7 +56,7 @@ public class TestPoseResidualsSimple extends CommonMotionNPoint {
 		motion.getT().set(0.1,-0.1,0.01);
 
 		generateScene(10, motion, false);
-		PointPositionPair p = pointPose.get(0);
+		PointPosePair p = pointPose.get(0);
 
 		PoseResidualsSimple alg = new PoseResidualsSimple();
 

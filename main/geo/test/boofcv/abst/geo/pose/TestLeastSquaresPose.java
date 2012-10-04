@@ -20,6 +20,8 @@ package boofcv.abst.geo.pose;
 
 import boofcv.alg.geo.pose.CommonMotionNPoint;
 import boofcv.alg.geo.pose.PoseRodriguesCodec;
+import boofcv.struct.geo.GeoModelRefine;
+import boofcv.struct.geo.PointPosePair;
 import georegression.geometry.RotationMatrixGenerator;
 import georegression.struct.se.Se3_F64;
 import org.junit.Test;
@@ -32,6 +34,8 @@ import static org.junit.Assert.assertTrue;
  */
 public class TestLeastSquaresPose extends CommonMotionNPoint {
 
+	Se3_F64 found = new Se3_F64();
+
 	@Test
 	public void perfect() {
 
@@ -41,12 +45,10 @@ public class TestLeastSquaresPose extends CommonMotionNPoint {
 
 		generateScene(10,motion,false);
 
-		LeastSquaresPose alg = new LeastSquaresPose(1e-8,200,new PoseRodriguesCodec());
+		GeoModelRefine<Se3_F64,PointPosePair> alg = new LeastSquaresPose(1e-8,200,new PoseRodriguesCodec());
 		
-		assertTrue(alg.process(motion, pointPose));
-		
-		Se3_F64 found = alg.getRefinement();
-		
+		assertTrue(alg.process(motion, pointPose, found));
+
 		assertEquals(motion.getT().getX(),found.getX(),1e-8);
 		assertEquals(motion.getT().getY(),found.getY(),1e-8);
 		assertEquals(motion.getT().getZ(),found.getZ(),1e-8);
@@ -66,9 +68,7 @@ public class TestLeastSquaresPose extends CommonMotionNPoint {
 		Se3_F64 n = motion.copy();
 		n.getT().setX(0);
 		
-		assertTrue(alg.process(n, pointPose));
-
-		Se3_F64 found = alg.getRefinement();
+		assertTrue(alg.process(n, pointPose,found));
 
 		assertEquals(motion.getT().getX(),found.getX(),1e-5);
 		assertEquals(motion.getT().getY(),found.getY(),1e-5);

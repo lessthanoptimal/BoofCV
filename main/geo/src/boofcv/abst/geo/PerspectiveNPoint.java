@@ -18,36 +18,12 @@
 
 package boofcv.abst.geo;
 
-import boofcv.struct.geo.PointPositionPair;
-import georegression.struct.se.Se3_F64;
-
-import java.util.List;
-
 /**
- * Solve the Perspective N-Point (PnP) problem.
+ * Marker interface for solutions to the Perspective N-Point (PnP) problem.  These algorithms estimate one or more
+ * transformations from the world to camera frames given a set of paired observations and 3D feature coordinates.
  *
  * @author Peter Abeles
  */
-public interface PerspectiveNPoint {
+public interface PerspectiveNPoint  {
 
-	/**
-	 * Estimate camera location given the set of observations.
-	 *
-	 * @param inputs Observation and location pairs. Observations are in normalized coordinates.
-	 */
-	public void process( List<PointPositionPair> inputs );
-
-	/**
-	 * Estimated camera location.
-	 *
-	 * @return Camera position and orientation
-	 */
-	public Se3_F64 getPose();
-
-	/**
-	 * Minimum number of points required to estimate the fundamental matrix.
-	 *
-	 * @return number of points.
-	 */
-	public int getMinPoints();
 }

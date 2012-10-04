@@ -18,45 +18,24 @@
 
 package boofcv.abst.geo;
 
-import boofcv.struct.geo.AssociatedPair;
-import org.ejml.data.DenseMatrix64F;
-
-import java.util.List;
-
 /**
  * <p>
- * Interface for computing the fundamental, essential, or homography matrix given a set of associated pairs.
+ * Marker interface for computing the fundamental, essential, or homography matrix given a set of associated pairs.
  * Each of these matrices describes the relationship between two views.
  * </p>
  *
  * <p>
  * For Fundamental and Essential matrices the following constraint is always true:
- * x'*F*x = 0, where F is the epipolar matrix, x' = currLoc, and x = keyLoc.
+ * x2<sup>T</sup>*F*x1 = 0, where F is the 3x3 epipolar matrix, x1 = keyLoc, and x2 = currLoc.
+ * </p>
+ *
+ * <p>
+ * Image coordinates: For fundamental matrix the input should be in pixels, for Essential it should be in normalized
+ * image coordinates, and for homography it can be either.
  * </p>
  *
  * @author Peter Abeles
  */
 public interface EpipolarMatrixEstimator {
 
-	/**
-	 * Estimates the epipolar matrix given a set of observations.
-	 *
-	 * @param points Observations. Pixel if fundamental and normalized if essential.
-	 * @return true if successful
-	 */
-	public boolean process( List<AssociatedPair> points );
-
-	/**
-	 * Estimated epipolar 3x3 matrix.
-	 *
-	 * @return Estimated matrix.
-	 */
-	public DenseMatrix64F getEpipolarMatrix();
-
-	/**
-	 * Minimum number of points required to estimate the fundamental matrix.
-	 *
-	 * @return number of points.
-	 */
-	public int getMinimumPoints();
 }
