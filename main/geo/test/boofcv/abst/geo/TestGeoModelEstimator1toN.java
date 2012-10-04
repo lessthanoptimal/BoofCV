@@ -36,7 +36,7 @@ import static org.junit.Assert.*;
 public class TestGeoModelEstimator1toN {
 
 	List<AssociatedPair> points = new ArrayList<AssociatedPair>();
-	FastQueue<DenseMatrix64F> solutions = new QueueMatrix(3, 3, 10);
+	FastQueue<DenseMatrix64F> solutions = new QueueMatrix(3, 3);
 
 	@Test
 	public void basicTest() {

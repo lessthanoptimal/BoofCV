@@ -70,7 +70,7 @@ public abstract class CheckEstimateNofEpipolar extends EpipolarTestSimulation {
 
 		boolean workedOnce = false;
 
-		FastQueue<DenseMatrix64F> solutions = new QueueMatrix(3, 3, 10);
+		FastQueue<DenseMatrix64F> solutions = new QueueMatrix(3, 3);
 
 		for( int i = 0; i < 10; i++ ) {
 			List<AssociatedPair> pairs = randomPairs(alg.getMinimumPoints());

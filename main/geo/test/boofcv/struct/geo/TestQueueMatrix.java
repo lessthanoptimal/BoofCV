@@ -18,9 +18,10 @@
 
 package boofcv.struct.geo;
 
+import org.ejml.data.DenseMatrix64F;
 import org.junit.Test;
 
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Peter Abeles
@@ -28,8 +29,29 @@ import static org.junit.Assert.fail;
 public class TestQueueMatrix {
 
 	@Test
-	public void stuff() {
-		fail("Implement");
+	public void constructor_withmax() {
+		QueueMatrix alg = new QueueMatrix(3,4,5);
+
+		assertEquals(0,alg.size);
+		assertEquals(5,alg.data.length);
+
+		DenseMatrix64F M = alg.pop();
+
+		assertEquals(3,M.numRows);
+		assertEquals(4,M.numCols);
+	}
+
+	@Test
+	public void constructor_regular() {
+		QueueMatrix alg = new QueueMatrix(3,4);
+
+		assertEquals(0,alg.size);
+		assertEquals(0,alg.data.length);
+
+		DenseMatrix64F M = alg.pop();
+
+		assertEquals(3,M.numRows);
+		assertEquals(4, M.numCols);
 	}
 
 }

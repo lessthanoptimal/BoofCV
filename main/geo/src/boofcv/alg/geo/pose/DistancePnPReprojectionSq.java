@@ -28,9 +28,14 @@ import georegression.transform.se.SePointOps_F64;
 import java.util.List;
 
 /**
+ * <p>
  * Computes the reprojection error squared for a given motion and {@link PointPosePair}.  If the intrinsic
  * parameters are provided then the error will be computed in pixels.   Observations are assumed to be
  * in normalized image coordinates.
+ * <center>error = (x'-x)^2 + (y' - y)^2</center>
+ * where (x,y) is the observed point location and (x',y') is the reprojected point from the 3D coordinate and coordinate
+ * transformation.
+ * </p>
  *
  * @author Peter Abeles
  */

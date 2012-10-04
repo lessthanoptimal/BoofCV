@@ -104,7 +104,7 @@ public class TestGeoModelEstimatorNto1 {
 		EssentialNister5 nister = new EssentialNister5();
 
 
-		FastQueue<DenseMatrix64F> solutions = new QueueMatrix(3, 3, 10);
+		FastQueue<DenseMatrix64F> solutions = new QueueMatrix(3, 3);
 		assertTrue(nister.process(obs,solutions));
 
 		return solutions.get(0);
