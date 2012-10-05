@@ -19,6 +19,7 @@
 package boofcv.alg.geo;
 
 import boofcv.abst.geo.Estimate1ofEpipolar;
+import boofcv.factory.geo.EnumEpipolar;
 import boofcv.factory.geo.FactoryMultiView;
 import boofcv.misc.Performer;
 import boofcv.misc.ProfileOperation;
@@ -87,10 +88,14 @@ public class BenchmarkRuntimeFundamental extends ArtificialStereoScene{
 		pairs8.add(pairs.get(7));
 
 		System.out.println("Minimum Number");
-		ProfileOperation.printOpsPerSec(new Estimate("Linear 8", FactoryMultiView.computeSingleFundamental(8, FUNDAMENTAL, 0),pairs8), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new Estimate("Linear 7", FactoryMultiView.computeSingleFundamental(7, FUNDAMENTAL, 1),pairs8), TEST_TIME);
-		if( !FUNDAMENTAL)
-			ProfileOperation.printOpsPerSec(new Estimate("Linear 5", FactoryMultiView.computeSingleFundamental(5, false, 1),pairs6), TEST_TIME);
+		if( FUNDAMENTAL ) {
+			ProfileOperation.printOpsPerSec(new Estimate("Linear 8", FactoryMultiView.computeFundamental_1(EnumEpipolar.FUNDAMENTAL_8_LINEAR, 0),pairs8), TEST_TIME);
+			ProfileOperation.printOpsPerSec(new Estimate("Linear 7", FactoryMultiView.computeFundamental_1(EnumEpipolar.FUNDAMENTAL_7_LINEAR, 1),pairs8), TEST_TIME);
+		} else {
+			ProfileOperation.printOpsPerSec(new Estimate("Linear 8", FactoryMultiView.computeFundamental_1(EnumEpipolar.ESSENTIAL_8_LINEAR, 0),pairs8), TEST_TIME);
+			ProfileOperation.printOpsPerSec(new Estimate("Linear 7", FactoryMultiView.computeFundamental_1(EnumEpipolar.ESSENTIAL_7_LINEAR, 1),pairs8), TEST_TIME);
+			ProfileOperation.printOpsPerSec(new Estimate("Linear 5", FactoryMultiView.computeFundamental_1(EnumEpipolar.ESSENTIAL_5_NISTER, 1),pairs6), TEST_TIME);
+		}
 
 	}
 	

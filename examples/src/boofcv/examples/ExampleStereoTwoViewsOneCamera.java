@@ -31,6 +31,7 @@ import boofcv.alg.sfm.robust.Se3FromEssentialGenerator;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.factory.feature.disparity.DisparityAlgorithms;
 import boofcv.factory.feature.disparity.FactoryStereoDisparity;
+import boofcv.factory.geo.EnumEpipolar;
 import boofcv.factory.geo.FactoryMultiView;
 import boofcv.factory.geo.FactoryTriangulate;
 import boofcv.gui.d3.PointCloudTiltPanel;
@@ -143,7 +144,7 @@ public class ExampleStereoTwoViewsOneCamera {
 	public static Se3_F64 estimateCameraMotion(IntrinsicParameters intrinsic,
 											   List<AssociatedPair> matchedNorm, List<AssociatedPair> inliers)
 	{
-		Estimate1ofEpipolar essentialAlg = FactoryMultiView.computeSingleFundamental(5, false, 5);
+		Estimate1ofEpipolar essentialAlg = FactoryMultiView.computeFundamental_1(EnumEpipolar.ESSENTIAL_5_NISTER, 5);
 		TriangulateTwoViewsCalibrated triangulate = FactoryTriangulate.twoGeometric();
 		ModelGenerator<Se3_F64, AssociatedPair> generateEpipolarMotion =
 				new Se3FromEssentialGenerator(essentialAlg, triangulate);

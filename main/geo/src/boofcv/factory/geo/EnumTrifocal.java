@@ -25,17 +25,22 @@ package boofcv.factory.geo;
  */
 public enum EnumTrifocal {
 	/**
-	 * Linearly estimates the trifocal tensor using 7 sets of observations.  Algebraic constraints are applied
-	 * only one.
+	 * <ul>
+	 *     <li> Requires 7 sets of observations
+	 *     <li> Suboptimal enforcement of geometric constraints
+	 * </ul>
 	 *
 	 * @see boofcv.alg.geo.trifocal.TrifocalLinearPoint7
 	 */
-	LINEAR7,
+	LINEAR_7,
 	/**
-	 * Same as LINEAR7, but algebraic constraints are applied iteratively to improve compliance.
+	 * <ul>
+	 *     <li> Requires 7 sets of observations
+	 *     <li> Same as linear, but iterates to enforce geometric constraints
+	 * </ul>
 	 *
 	 * @see boofcv.alg.geo.trifocal.TrifocalAlgebraicPoint7
 	 */
-	ALGEBRAIC7
+	ALGEBRAIC_7
 
 }

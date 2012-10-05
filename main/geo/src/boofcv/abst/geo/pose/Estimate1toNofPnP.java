@@ -16,27 +16,23 @@
  * limitations under the License.
  */
 
-package boofcv.alg.geo.pose;
+package boofcv.abst.geo.pose;
 
-import boofcv.numerics.solver.PolynomialOps;
-import georegression.struct.point.Point2D_F64;
-
-import java.util.List;
-
-import static org.junit.Assert.assertTrue;
+import boofcv.abst.geo.EstimateNofPnP;
+import boofcv.abst.geo.GeoModelEstimator1toN;
+import boofcv.struct.geo.GeoModelEstimator1;
+import boofcv.struct.geo.PointPosePair;
+import georegression.struct.se.Se3_F64;
 
 /**
+ * Implementation of {@link GeoModelEstimator1toN} for PnP.
+ *
  * @author Peter Abeles
  */
-public class TestP3PFinsterwalder extends CommonP3PSideChecks {
-
-	P3PFinsterwalder alg = new P3PFinsterwalder(PolynomialOps.createRootFinder(4, 0));
-
-	@Override
-	public List<PointDistance3> computeSolutions(Point2D_F64 p1, Point2D_F64 p2, Point2D_F64 p3, double length23, double length13, double length12) {
-		assertTrue(alg.process(p1,p2,p3,length23,length13,length12));
-
-		return alg.getSolutions().toList();
+public class Estimate1toNofPnP extends GeoModelEstimator1toN<Se3_F64,PointPosePair>
+		implements EstimateNofPnP
+{
+	public Estimate1toNofPnP(GeoModelEstimator1<Se3_F64, PointPosePair> alg) {
+		super(alg);
 	}
-
 }

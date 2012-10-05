@@ -23,10 +23,7 @@ import boofcv.abst.geo.bundle.BundleAdjustmentCalibratedDense;
 import boofcv.abst.geo.f.*;
 import boofcv.abst.geo.h.LeastSquaresHomography;
 import boofcv.abst.geo.h.WrapHomographyLinear;
-import boofcv.abst.geo.pose.EstimateNto1ofPnP;
-import boofcv.abst.geo.pose.LeastSquaresPose;
-import boofcv.abst.geo.pose.WrapP3PLineDistance;
-import boofcv.abst.geo.pose.WrapPnPLepetitEPnP;
+import boofcv.abst.geo.pose.*;
 import boofcv.abst.geo.trifocal.WrapTrifocalAlgebraicPoint7;
 import boofcv.abst.geo.trifocal.WrapTrifocalLinearPoint7;
 import boofcv.alg.geo.ModelObservationResidualN;
@@ -34,10 +31,7 @@ import boofcv.alg.geo.f.DistanceEpipolarConstraint;
 import boofcv.alg.geo.h.HomographyLinear4;
 import boofcv.alg.geo.h.HomographyResidualSampson;
 import boofcv.alg.geo.h.HomographyResidualTransfer;
-import boofcv.alg.geo.pose.P3PFinsterwalder;
-import boofcv.alg.geo.pose.P3PGrunert;
-import boofcv.alg.geo.pose.PnPLepetitEPnP;
-import boofcv.alg.geo.pose.PoseRodriguesCodec;
+import boofcv.alg.geo.pose.*;
 import boofcv.alg.geo.trifocal.TrifocalAlgebraicPoint7;
 import boofcv.numerics.optimization.FactoryOptimization;
 import boofcv.numerics.optimization.UnconstrainedLeastSquares;
@@ -138,27 +132,34 @@ public class FactoryMultiView {
 	 * @see boofcv.alg.geo.f.FundamentalLinear7
 	 * @see boofcv.alg.geo.f.FundamentalLinear8
 	 *
-	 * @param minimumSamples Selects which algorithms to use.  Can be 5, 7 or 8. See above.
-	 * @param isFundamental If true then a Fundamental matrix is estimated, otherwise false for essential matrix.
+	 * @param which Specifies which algorithm is to be created
 	 * @return Fundamental or essential estimation algorithm that returns multiple hypotheses.
 	 */
-	public static EstimateNofEpipolar computeMultiFundamental(int minimumSamples, boolean isFundamental)
+	public static EstimateNofEpipolar computeFundamental_N( EnumEpipolar which )
 	{
-		if( minimumSamples == 8 ) {
-			return new Estimate1toNofEpipolar(new WrapFundamentalLinear8(isFundamental));
-		} else if( minimumSamples == 7 ) {
-			return new WrapFundamentalLinear7(isFundamental);
-		} else if( minimumSamples == 5 ) {
-			if( isFundamental )
-				throw new IllegalArgumentException("The 5-point algorithm only generates essential matrices");
-			return new WrapEssentialNister5();
+		switch( which ) {
+			case FUNDAMENTAL_8_LINEAR:
+				return new Estimate1toNofEpipolar(new WrapFundamentalLinear8(true));
+
+			case ESSENTIAL_8_LINEAR:
+				return new Estimate1toNofEpipolar(new WrapFundamentalLinear8(false));
+
+			case FUNDAMENTAL_7_LINEAR:
+				return new WrapFundamentalLinear7(true);
+
+			case ESSENTIAL_7_LINEAR:
+				return new WrapFundamentalLinear7(false);
+
+			case ESSENTIAL_5_NISTER:
+				return new WrapEssentialNister5();
 		}
-		throw new IllegalArgumentException("No algorithm matches specified parameters");
+
+		throw new IllegalArgumentException("Unknown algorithm "+which);
 	}
 
 	/**
 	 * <p>
-	 * Similar to {@link #computeMultiFundamental}, but it returns only a single hypothesis.  If
+	 * Similar to {@link #computeFundamental_N}, but it returns only a single hypothesis.  If
 	 * the underlying algorithm generates multiple hypotheses they are resolved by considering additional
 	 * sample points. For example, if you are using the 7 point algorithm at least one additional sample point
 	 * is required to resolve that ambiguity.  So 8 or more sample points are now required.
@@ -170,7 +171,7 @@ public class FactoryMultiView {
 	 * </p>
 	 *
 	 * <p>
-	 * See {@link #computeMultiFundamental} for a description of the algorithms and what 'minimumSamples'
+	 * See {@link #computeFundamental_N} for a description of the algorithms and what 'minimumSamples'
 	 * and 'isFundamental' do.
 	 * </p>
 	 *
@@ -184,25 +185,27 @@ public class FactoryMultiView {
 	 *
 	 * @see GeoModelEstimatorNto1
 	 *
-	 * @param minimumSamples Selects which algorithms to use.  Can be 5, 7 or 8. See above.
-	 * @param isFundamental If true then a Fundamental matrix is estimated, otherwise false for essential matrix.
-	 * @param numRemoveAmbiguity Number of sample points used to prune hypotheses.
+	 * @param which Specifies which algorithm is to be created
+	 * @param numRemoveAmbiguity Number of sample points used to prune hypotheses. Ignored if only a single solution.
 	 * @return Fundamental or essential estimation algorithm that returns a single hypothesis.
 	 */
-	public static Estimate1ofEpipolar computeSingleFundamental(int minimumSamples,
-															   boolean isFundamental, int numRemoveAmbiguity)
+	public static Estimate1ofEpipolar computeFundamental_1( EnumEpipolar which, int numRemoveAmbiguity)
 	{
-		if( minimumSamples == 8 ) {
-			return new WrapFundamentalLinear8(isFundamental);
-		} else {
-			if( numRemoveAmbiguity <= 0 )
-				throw new IllegalArgumentException("numRemoveAmbiguity must be greater than zero");
+		switch( which ) {
+			case FUNDAMENTAL_8_LINEAR:
+				return new WrapFundamentalLinear8(true);
 
-			EstimateNofEpipolar alg = computeMultiFundamental(minimumSamples, isFundamental);
-			DistanceEpipolarConstraint distance = new DistanceEpipolarConstraint();
-
-			return new EstimateNto1ofEpipolar(alg,distance,numRemoveAmbiguity);
+			case ESSENTIAL_8_LINEAR:
+				return new WrapFundamentalLinear8(false);
 		}
+
+		if( numRemoveAmbiguity <= 0 )
+			throw new IllegalArgumentException("numRemoveAmbiguity must be greater than zero");
+
+		EstimateNofEpipolar alg = computeFundamental_N(which);
+		DistanceEpipolarConstraint distance = new DistanceEpipolarConstraint();
+
+		return new EstimateNto1ofEpipolar(alg,distance,numRemoveAmbiguity);
 	}
 
 	/**
@@ -234,12 +237,12 @@ public class FactoryMultiView {
 	 * @param iterations If the algorithm is iterative, then this is the number of iterations.  Try 200
 	 * @return Trifocal tensor estimator
 	 */
-	public static Estimate1ofTrifocalTensor estimateTrifocal( EnumTrifocal type, int iterations ) {
+	public static Estimate1ofTrifocalTensor estimateTrifocal_1(EnumTrifocal type, int iterations) {
 		switch( type ) {
-			case LINEAR7:
+			case LINEAR_7:
 				return new WrapTrifocalLinearPoint7();
 
-			case ALGEBRAIC7:
+			case ALGEBRAIC_7:
 				UnconstrainedLeastSquares optimizer = FactoryOptimization.leastSquaresLM(1e-3, false);
 				TrifocalAlgebraicPoint7 alg = new TrifocalAlgebraicPoint7(optimizer,iterations,1e-12,1e-12);
 
@@ -254,20 +257,26 @@ public class FactoryMultiView {
 	 * and known as P3P.
 	 *
 	 * @param which The algorithm which is to be returned.
-	 * @return The estimator.
+	 * @param numIterations Number of iterations. Only used by some algorithms and recommended number varies
+	 *                      significantly by algorithm.
+	 * @return An estimator which can return multiple estimates.
 	 */
-	public static EstimateNofPnP computeMultiP3P( EnumP3P which ) {
+	public static EstimateNofPnP computePnP_N(EnumPNP which , int numIterations ) {
 
 		MotionTransformPoint<Se3_F64, Point3D_F64> motionFit = FitSpecialEuclideanOps_F64.fitPoints3D();
 
 		switch( which ) {
-			case GRUNERT:
+			case P3P_GRUNERT:
 				P3PGrunert grunert = new P3PGrunert(PolynomialOps.createRootFinder(5,0));
 				return new WrapP3PLineDistance(grunert,motionFit);
 
-			case FINSTERWALDER:
-				P3PFinsterwalder finster = new P3PFinsterwalder();
+			case P3P_FINSTERWALDER:
+				P3PFinsterwalder finster = new P3PFinsterwalder(PolynomialOps.createRootFinder(4,0));
 				return new WrapP3PLineDistance(finster,motionFit);
+
+			case EPNP:
+				Estimate1ofPnP epnp = computePnP_1(which,numIterations,0);
+				return new Estimate1toNofPnP(epnp);
 		}
 
 		throw new IllegalArgumentException("Type "+which+" not known");
@@ -277,15 +286,28 @@ public class FactoryMultiView {
 	 * Created an estimator for the P3P problem that selects a single solution by considering additional
 	 * observations.
 	 *
+	 * <p>
+	 * NOTE: EPnP has several tuning parameters and the defaults here might not be the best for your situation.
+	 * </p>
+	 *
 	 * @param which The algorithm which is to be returned.
-	 * @param numTest How many additional sample points are used to remove ambiguity in the solutions.
-	 * @return The estimator.
+	 * @param numIterations Number of iterations. Only used by some algorithms and recommended number varies
+	 *                      significantly by algorithm.
+	 * @param numTest How many additional sample points are used to remove ambiguity in the solutions.  Not used
+	 *                if only a single solution is found.
+	 * @return An estimator which returns a single estimate.
 	 */
-	public static Estimate1ofPnP computeSingleP3P( EnumP3P which , int numTest ) {
+	public static Estimate1ofPnP computePnP_1(EnumPNP which, int numIterations , int numTest) {
+
+		if( which == EnumPNP.EPNP ) {
+			PnPLepetitEPnP alg = new PnPLepetitEPnP(0.1);
+			alg.setNumIterations(numIterations);
+			return new WrapPnPLepetitEPnP(alg);
+		}
 
 		FastQueue<Se3_F64> solutions = new FastQueue<Se3_F64>(4,Se3_F64.class,true);
 
-		return new EstimateNto1ofPnP(computeMultiP3P(which),solutions,numTest);
+		return new EstimateNto1ofPnP(computePnP_N(which,-1),solutions,numTest);
 	}
 
 	/**
@@ -312,5 +334,14 @@ public class FactoryMultiView {
 	 */
 	public static RefinePnP refinePnP( double tol , int maxIterations ) {
 		return new LeastSquaresPose(tol,maxIterations,new PoseRodriguesCodec());
+	}
+
+	/**
+	 * Estimate the camera motion give two observations and the 3D world coordinate of each points.
+	 *
+	 * @return PoseFromPairLinear6
+	 */
+	public static PoseFromPairLinear6 computePoseFromPair() {
+		return new PoseFromPairLinear6();
 	}
 }

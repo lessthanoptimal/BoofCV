@@ -1,5 +1,3 @@
-- Remove distortion parameters from IntrinsicParameters
-
 - Fundamental Sampson Distance
   * Create this class, residual requires an unnecessary sqrt() for distance calculations
 
@@ -13,10 +11,15 @@
   * Vary acute angle
 
 - Trifocal Tensor
+  * Refine with Sampson error
+  * 6pt algorithm
+  * Runtime benchmark
+
+- P3P
+  * Implement that complex algorithm
 
 - Long Term
  * Sparse Bundle Adjustment
- * P3P algorithm
  * SVD/Linear PnP  See Long Quan paper
  * Switch homography from DenseMatrix64F to Homography2D_F64?
   - Need to add functions to geometry math or create a new class

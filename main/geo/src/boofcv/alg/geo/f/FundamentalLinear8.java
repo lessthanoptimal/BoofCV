@@ -73,8 +73,7 @@ public class FundamentalLinear8 extends FundamentalLinear {
 			throw new IllegalArgumentException("Must be at least 8 points. Was only "+points.size());
 
 		// use normalized coordinates for pixel and calibrated
-		// un-normalized passed unit tests in 8 point, but failed in 7 point, hinting
-		// that there could be situations where normalization might be needed in 8 point
+		// TODO re-evaluate decision to normalize for calibrated case
 		LowLevelMultiViewOps.computeNormalization(points, N1, N2);
 		createA(points,A);
 

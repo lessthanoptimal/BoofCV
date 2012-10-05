@@ -19,17 +19,38 @@
 package boofcv.factory.geo;
 
 /**
- * List of algorithms for solving the P3P problem
+ * List of algorithms for solving the Perspective n-Point (PnP) problem
  *
  * @author Peter Abeles
  */
-public enum EnumP3P {
+public enum EnumPNP {
 	/**
+	 * <ul>
+	 *     <li> Minimal 3-point solution
+	 *     <li> At most 4 solutions.
+	 * </ul>
+	 *
 	 * @see boofcv.alg.geo.pose.P3PGrunert
 	 */
-	GRUNERT,
+	P3P_GRUNERT,
 	/**
+	 * <ul>
+	 *     <li> Minimal 3-point solution
+	 *     <li> At most 4 solutions.
+	 * </ul>
+	 *
 	 * @see boofcv.alg.geo.pose.P3PFinsterwalder
 	 */
-	FINSTERWALDER
+	P3P_FINSTERWALDER,
+	/**
+	 * <ul>
+	 *     <li> Four or more points.
+	 *     <li> Single solution
+	 *     <li> Requires iteration.  See class JavaDoc for recommendations and peculiarities.
+	 *     <li> Efficient algorithm for many sample points
+	 * </ul>
+	 *
+	 * @see boofcv.alg.geo.pose.PnPLepetitEPnP
+	 */
+	EPNP
 }

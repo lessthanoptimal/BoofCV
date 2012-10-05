@@ -19,7 +19,7 @@
 package boofcv.alg.geo;
 
 import boofcv.struct.geo.AssociatedPair;
-import georegression.geometry.GeometryMath_F64;
+import boofcv.struct.geo.PointPosePair;
 import georegression.geometry.RotationMatrixGenerator;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
@@ -46,6 +46,7 @@ public class ArtificialStereoScene {
 	protected List<AssociatedPair> pairs;
 	protected List<Point2D_F64> observationCurrent;
 	protected List<Point3D_F64> worldPoints;
+	protected List<PointPosePair> observationPose;
 	protected boolean isPixels;
 
 	public ArtificialStereoScene() {
@@ -68,6 +69,8 @@ public class ArtificialStereoScene {
 		// transform points into second camera's reference frame
 		pairs = new ArrayList<AssociatedPair>();
 		observationCurrent = new ArrayList<Point2D_F64>();
+		observationPose = new ArrayList<PointPosePair>();
+
 		for(Point3D_F64 p1 : worldPoints) {
 			Point3D_F64 p2 = SePointOps_F64.transform(motion, p1, null);
 
@@ -77,37 +80,34 @@ public class ArtificialStereoScene {
 			pairs.add(pair);
 
 			observationCurrent.add(pair.currLoc);
+			observationPose.add( new PointPosePair(pair.currLoc,p1));
 
 			if( isPixels ) {
-				GeometryMath_F64.mult(K, pair.keyLoc, pair.keyLoc);
-				GeometryMath_F64.mult(K,pair.currLoc,pair.currLoc);
+				PerspectiveOps.convertNormToPixel(K,pair.keyLoc.x,pair.keyLoc.y,pair.keyLoc);
+				PerspectiveOps.convertNormToPixel(K,pair.currLoc.x,pair.currLoc.y,pair.currLoc);
 			}
 		}
 	}
 	
-	public void addPixelNoise( double mag ) {
-
-		Point3D_F64 noiseCurr = new Point3D_F64();
-		Point3D_F64 noiseKey = new Point3D_F64();
+	public void addPixelNoise( double noiseSigma ) {
 
 		for( AssociatedPair p : pairs ) {
-			double cx=0,cy=0,kx=0,ky=0;
 
-			noiseCurr.x = rand.nextGaussian()*mag;
-			noiseCurr.y = rand.nextGaussian()*mag;
-			noiseKey.x = rand.nextGaussian()*mag;
-			noiseKey.y = rand.nextGaussian()*mag;
-			
 			if( !isPixels ) {
-				GeometryMath_F64.mult(K_inv,noiseCurr,noiseCurr);
-				GeometryMath_F64.mult(K_inv,noiseKey,noiseKey);
+				PerspectiveOps.convertNormToPixel(K, p.keyLoc.x, p.keyLoc.y, p.keyLoc);
+				PerspectiveOps.convertNormToPixel(K, p.currLoc.x, p.currLoc.y, p.currLoc);
 			}
 
-			p.currLoc.x += noiseCurr.x;
-			p.currLoc.y += noiseCurr.y;
+			p.currLoc.x += rand.nextGaussian()*noiseSigma;
+			p.currLoc.y += rand.nextGaussian()*noiseSigma;
 
-			p.keyLoc.x += noiseKey.x;
-			p.keyLoc.y += noiseKey.y;
+			p.keyLoc.x += rand.nextGaussian()*noiseSigma;
+			p.keyLoc.y += rand.nextGaussian()*noiseSigma;
+
+			if( !isPixels ) {
+				PerspectiveOps.convertPixelToNorm(K, p.keyLoc.x, p.keyLoc.y, p.keyLoc);
+				PerspectiveOps.convertPixelToNorm(K, p.currLoc.x, p.currLoc.y, p.currLoc);
+			}
 		}
 
 		// observationCurrent simply references the data in pairs
