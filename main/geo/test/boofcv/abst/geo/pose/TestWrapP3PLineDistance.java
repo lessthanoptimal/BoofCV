@@ -19,6 +19,7 @@
 package boofcv.abst.geo.pose;
 
 import boofcv.alg.geo.pose.P3PFinsterwalder;
+import boofcv.numerics.solver.PolynomialOps;
 import georegression.fitting.se.FitSpecialEuclideanOps_F64;
 
 /**
@@ -29,7 +30,7 @@ public class TestWrapP3PLineDistance extends CheckEstimateNofPnP {
 		super(true);
 
 		// arbitrarily select one of the real algorithms
-		P3PFinsterwalder grunert = new P3PFinsterwalder();
+		P3PFinsterwalder grunert = new P3PFinsterwalder(PolynomialOps.createRootFinder(4, 0));
 
 		WrapP3PLineDistance alg = new WrapP3PLineDistance(grunert, FitSpecialEuclideanOps_F64.fitPoints3D());
 

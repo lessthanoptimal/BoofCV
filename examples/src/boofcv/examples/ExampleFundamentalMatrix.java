@@ -29,6 +29,7 @@ import boofcv.alg.geo.f.FundamentalResidualSampson;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.feature.describe.FactoryDescribeRegionPoint;
 import boofcv.factory.feature.detect.interest.FactoryInterestPoint;
+import boofcv.factory.geo.EnumEpipolar;
 import boofcv.factory.geo.EpipolarError;
 import boofcv.factory.geo.FactoryMultiView;
 import boofcv.gui.feature.AssociationPanel;
@@ -78,7 +79,7 @@ public class ExampleFundamentalMatrix {
 													List<AssociatedPair> inliers ) {
 
 		// Select which linear algorithm is to be used.  Try playing with the number of remove ambiguity points
-		Estimate1ofEpipolar estimateF = FactoryMultiView.computeSingleFundamental(7, true, 20);
+		Estimate1ofEpipolar estimateF = FactoryMultiView.computeFundamental_1(EnumEpipolar.FUNDAMENTAL_7_LINEAR, 20);
 		// Wrapper so that this estimator can be used by the robust estimator
 		GenerateEpipolarMatrix generateF = new GenerateEpipolarMatrix(estimateF);
 
@@ -115,7 +116,7 @@ public class ExampleFundamentalMatrix {
 	 */
 	public static DenseMatrix64F simpleFundamental( List<AssociatedPair> matches ) {
 		// Use the 8-point algorithm since it will work with an arbitrary number of points
-		Estimate1ofEpipolar estimateF = FactoryMultiView.computeSingleFundamental(8, true, 0);
+		Estimate1ofEpipolar estimateF = FactoryMultiView.computeFundamental_1(EnumEpipolar.FUNDAMENTAL_8_LINEAR, 0);
 
 		DenseMatrix64F F = new DenseMatrix64F(3,3);
 		if( !estimateF.process(matches,F) )

@@ -225,6 +225,8 @@ public class PolynomialOps {
 	 * Returns a real root to the cubic polynomial: 0 = c0 + c1*x + c2*x^2 + c3*c^3.  There can be other
 	 * real roots.
 	 *
+	 * WARNING: This technique is much less stable than using one of the RootFinder algorithms
+	 *
 	 * @param c0 Polynomial coefficient for power 0
 	 * @param c1 Polynomial coefficient for power 1
 	 * @param c2 Polynomial coefficient for power 2

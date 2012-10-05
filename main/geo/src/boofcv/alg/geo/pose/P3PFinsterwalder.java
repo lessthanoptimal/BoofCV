@@ -18,9 +18,11 @@
 
 package boofcv.alg.geo.pose;
 
-import boofcv.numerics.solver.PolynomialOps;
+import boofcv.numerics.solver.Polynomial;
+import boofcv.numerics.solver.PolynomialRoots;
 import boofcv.struct.FastQueue;
 import georegression.struct.point.Point2D_F64;
+import org.ejml.data.Complex64F;
 
 import static boofcv.alg.geo.pose.P3PGrunert.computeCosine;
 import static boofcv.alg.geo.pose.P3PGrunert.pow2;
@@ -56,6 +58,21 @@ public class P3PFinsterwalder implements P3PLineDistance {
 	// storage for intermediate results
 	double p,q;
 
+	// used to solve the 4th order polynomial
+	private PolynomialRoots rootFinder;
+
+	// polynomial which is to be solved
+	private Polynomial poly = new Polynomial(4);
+
+	/**
+	 * Configure
+	 *
+	 * @param rootFinder Root finder for a 3rd order polynomial with real roots
+	 */
+	public P3PFinsterwalder(PolynomialRoots rootFinder) {
+		this.rootFinder = rootFinder;
+	}
+
 	/**
 	 * @inheritDoc
 	 */
@@ -75,20 +92,34 @@ public class P3PFinsterwalder implements P3PLineDistance {
 
 		a2=a*a;  b2=b*b;  c2 = c*c;
 
-//		double G = c2*(c2*pow2(sin13) - b2*pow2(sin12) );
-//		double H = b2*(b2-a2)*pow2(sin12) + c2*(c2 + 2*a2)*pow2(sin13) + 2*b2*c2*(-1 + cos23*cos13*cos12);
-//		double I = b2*(b2-c2)*pow2(sin23) + a2*(a2 + 2*c2)*pow2(sin13) + 2*a2*b2*(-1 + cos23*cos13*cos12);
-//		double J = a2*(a2*pow2(sin13) - b2*pow2(sin23));
+//		poly.c[0] = a2*(a2*pow2(sin13) - b2*pow2(sin23));
+//		poly.c[1] = b2*(b2-c2)*pow2(sin23) + a2*(a2 + 2*c2)*pow2(sin13) + 2*a2*b2*(-1 + cos23*cos13*cos12);
+//		poly.c[2] = b2*(b2-a2)*pow2(sin12) + c2*(c2 + 2*a2)*pow2(sin13) + 2*b2*c2*(-1 + cos23*cos13*cos12);
+//		poly.c[3] = c2*(c2*pow2(sin13) - b2*pow2(sin12) );
 
 		// Auto generated code + hand simplification.  See P3PFinsterwalder.py  I prefer it over the equations found
 		// in the paper (commented out above) since it does not require sin(theta).
-		double J = a2*(a2*(1 - pow2(cos13)) + b2*(pow2(cos23) - 1));
-		double I = 2*a2*b2*(cos12*cos13*cos23 - 1) + a2*(a2 + 2*c2)*(1 - pow2(cos13)) + b2*(b2 - c2)*( 1 - pow2(cos23));
-		double H = 2*c2*b2*(cos12*cos13*cos23 - 1) + c2*(c2 + 2*a2)*(1 - pow2(cos13)) + b2*(b2 - a2)*( 1 - pow2(cos12));
-		double G = c2*(b2*(pow2(cos12) - 1) + c2*( 1 - pow2(cos13)));
+		poly.c[0] = a2*(a2*(1 - pow2(cos13)) + b2*(pow2(cos23) - 1));
+		poly.c[1] = 2*a2*b2*(cos12*cos13*cos23 - 1) + a2*(a2 + 2*c2)*(1 - pow2(cos13)) + b2*(b2 - c2)*( 1 - pow2(cos23));
+		poly.c[2] = 2*c2*b2*(cos12*cos13*cos23 - 1) + c2*(c2 + 2*a2)*(1 - pow2(cos13)) + b2*(b2 - a2)*( 1 - pow2(cos12));
+		poly.c[3] = c2*(b2*(pow2(cos12) - 1) + c2*( 1 - pow2(cos13)));
 
+		if( !rootFinder.process(poly) )
+			return false;
 
-		double lambda = PolynomialOps.cubicRealRoot(J,I,H,G);
+		// search for real roots
+		Complex64F root = null;
+		for( Complex64F r : rootFinder.getRoots() ) {
+			if( r.isReal() ) {
+				root = r;
+				break;
+			}
+		}
+
+		if( root == null )
+			return false;
+
+		double lambda = root.real;
 
 		double A = 1 + lambda;
 		double B = -cos23;

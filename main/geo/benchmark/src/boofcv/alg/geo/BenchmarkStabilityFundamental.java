@@ -21,6 +21,7 @@ package boofcv.alg.geo;
 import boofcv.abst.geo.Estimate1ofEpipolar;
 import boofcv.abst.geo.f.EstimateNto1ofEpipolar;
 import boofcv.alg.geo.f.DistanceEpipolarConstraint;
+import boofcv.factory.geo.EnumEpipolar;
 import boofcv.factory.geo.FactoryMultiView;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.geo.GeoModelEstimator1;
@@ -230,9 +231,14 @@ public class BenchmarkStabilityFundamental {
 //		app.createScenePlane();
 		app.motionTranslate();
 		app.createObservations();
-		app.evaluateMinimal(FactoryMultiView.computeMultiFundamental(8, isPixels));
-		app.evaluateMinimal(FactoryMultiView.computeMultiFundamental(7, isPixels));
-		app.evaluateMinimal(FactoryMultiView.computeMultiFundamental(5, isPixels));
+		if( isPixels ){
+			app.evaluateMinimal(FactoryMultiView.computeFundamental_N(EnumEpipolar.FUNDAMENTAL_8_LINEAR));
+			app.evaluateMinimal(FactoryMultiView.computeFundamental_N(EnumEpipolar.FUNDAMENTAL_7_LINEAR));
+		} else {
+			app.evaluateMinimal(FactoryMultiView.computeFundamental_N(EnumEpipolar.ESSENTIAL_8_LINEAR));
+			app.evaluateMinimal(FactoryMultiView.computeFundamental_N(EnumEpipolar.ESSENTIAL_7_LINEAR));
+			app.evaluateMinimal(FactoryMultiView.computeFundamental_N(EnumEpipolar.ESSENTIAL_5_NISTER));
+		}
 
 //		app.evaluateMinimal(FactoryMultiView.computeFundamental(8));
 

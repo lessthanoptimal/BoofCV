@@ -55,19 +55,16 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class FundamentalLinear7 extends FundamentalLinear {
-	// TODO don't extends FundamentalLinear
-	// can speed up SVD by not computing U
-
 	// extracted from the null space of A
 	protected DenseMatrix64F F1 = new DenseMatrix64F(3,3);
 	protected DenseMatrix64F F2 = new DenseMatrix64F(3,3);
 
 	// temporary storage for cubic coefficients
 	private Polynomial poly = new Polynomial(4);
-	PolynomialRoots rootFinder = PolynomialSolver.createRootFinder(RootFinderType.EVD,4);
+	private PolynomialRoots rootFinder = PolynomialSolver.createRootFinder(RootFinderType.EVD,4);
 
 	// Matrix from SVD
-	DenseMatrix64F V = new DenseMatrix64F(9,9);
+	private DenseMatrix64F V = new DenseMatrix64F(9,9);
 
 	/**
 	 * When computing the essential matrix normalization is optional because pixel coordinates
@@ -96,12 +93,13 @@ public class FundamentalLinear7 extends FundamentalLinear {
 		solutions.reset();
 
 		// must normalize for when points are in either pixel or calibrated units
+		// TODO re-evaluate decision to normalize for calibrated case
 		LowLevelMultiViewOps.computeNormalization(points, N1, N2);
 
 		// extract F1 and F2 from two null spaces
 		createA(points,A);
 
-		if (process(A))
+		if (!process(A))
 			return false;
 
 		undoNormalizationF(F1,N1,N2);
@@ -121,7 +119,7 @@ public class FundamentalLinear7 extends FundamentalLinear {
 	 */
 	private boolean process(DenseMatrix64F A) {
 		if( !svdNull.decompose(A) )
-			return true;
+			return false;
 
 		// extract the two singular vectors
 		// no need to sort by singular values because the two automatic null spaces are being sampled
@@ -129,7 +127,7 @@ public class FundamentalLinear7 extends FundamentalLinear {
 		SpecializedOps.subvector(V, 0, 7, 9, false, 0, F1);
 		SpecializedOps.subvector(V, 0, 8, 9, false, 0, F2);
 
-		return false;
+		return true;
 	}
 
 	/**
@@ -176,8 +174,8 @@ public class FundamentalLinear7 extends FundamentalLinear {
 	 * det(&alpha*F1 + (1-&alpha;)*F2 ) = c<sub>0</sub> + c<sub>1</sub>*&alpha; + c<sub>2</sub>*&alpha;<sup>2</sup>  + c<sub>2</sub>*&alpha;<sup>3</sup><br>
 	 * </p>
 	 *
-	 * @param F1 a matrix
-	 * @param F2 a matrix
+	 * @param F1 a fundamental matrix
+	 * @param F2 a fundamental matrix
 	 * @param coefs Where results are returned.
 	 */
 	public static void computeCoefficients( DenseMatrix64F F1 ,
@@ -209,18 +207,18 @@ public class FundamentalLinear7 extends FundamentalLinear {
 											double x2 , double y2 , double z2 ,
 											double coefs[] )
 	{
-		coefs[3] += x1*y1*z1 - x1*y1*z2 - x1*y2*z1 + x1*y2*z2 - x2*y1*z1 + x2*y1*z2 + x2*y2*z1 - x2*y2*z2;
-		coefs[2] += x1*y1*z2 + x1*y2*z1 - 2*x1*y2*z2 + x2*y1*z1 - 2*x2*y1*z2 - 2*x2*y2*z1 + 3*x2*y2*z2;
-		coefs[1] += x1*y2*z2 + x2*y1*z2 + x2*y2*z1 - 3*x2*y2*z2;
+		coefs[3] += x1*(y1*(z1 - z2) + y2*(z2 - z1)) + x2*( y1*(z2 - z1) + y2*(z1 - z2));
+		coefs[2] += x1*(y1*z2 + y2*(z1 - 2*z2)) + x2*(y1*(z1 - 2*z2) + y2*( 3*z2 - 2*z1) );
+		coefs[1] += x1*y2*z2 + x2*(y1*z2 + y2*(z1 - 3*z2));
 		coefs[0] += x2*y2*z2;
 	}
 	public static void computeCoefficientsMinus( double x1 , double y1 , double z1 ,
 												 double x2 , double y2 , double z2 ,
 												 double coefs[] )
 	{
-		coefs[3] -= x1*y1*z1 - x1*y1*z2 - x1*y2*z1 + x1*y2*z2 - x2*y1*z1 + x2*y1*z2 + x2*y2*z1 - x2*y2*z2;
-		coefs[2] -= x1*y1*z2 + x1*y2*z1 - 2*x1*y2*z2 + x2*y1*z1 - 2*x2*y1*z2 - 2*x2*y2*z1 + 3*x2*y2*z2;
-		coefs[1] -= x1*y2*z2 + x2*y1*z2 + x2*y2*z1 - 3*x2*y2*z2;
+		coefs[3] -= x1*(y1*(z1 - z2) + y2*(z2 - z1)) + x2*( y1*(z2 - z1) + y2*(z1 - z2));
+		coefs[2] -= x1*(y1*z2 + y2*(z1 - 2*z2)) + x2*(y1*(z1 - 2*z2) + y2*( 3*z2 - 2*z1) );
+		coefs[1] -= x1*y2*z2 + x2*(y1*z2 + y2*(z1 - 3*z2));
 		coefs[0] -= x2*y2*z2;
 	}
 }
