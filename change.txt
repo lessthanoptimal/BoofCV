@@ -22,10 +22,15 @@ Version : Alpha 0.11
 - Reorganized functions in geometric vision package
   * Created MultiViewOps and PerspetiveOps
   * Refactored/deleted other related Util classes
+  * Enums are now used to select which algorithm is returned in the Factory in many cases
+  * New interfaces for each problem and improved JavaDoc
 - Moved AssociatedPair and PointPositionPair to boofcv.struct.geo package
 - Trifocal Tensor
   * Added related functions to MultiViewOps
   * Added linear estimator for 7+ points
+- PnP Problem
+  * Added two P3P solutions
+
 
 ---------------------------------------------
 Date    : 2012/09/18

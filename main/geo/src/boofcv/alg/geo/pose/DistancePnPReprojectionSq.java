@@ -82,6 +82,10 @@ public class DistancePnPReprojectionSq implements DistanceFromModel<Se3_F64,Poin
 		// compute point location in camera frame
 		SePointOps_F64.transform(worldToCamera,pt.location,X);
 
+		// very large error if behind the camera
+		if( X.z < 0 )
+			return Double.MAX_VALUE;
+
 		Point2D_F64 p = pt.getObserved();
 
 		double dy = X.y/X.z - p.y;

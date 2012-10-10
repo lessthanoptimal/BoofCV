@@ -23,6 +23,8 @@ package boofcv.abst.feature.associate;
  * Designed to handle fit metrics with different statics.  In general it is assumed that
  * scores with lower values are better.  They can be limited to zero or go negative.
  *
+ * @param <T> Feature description type.
+ *
  * @author Peter Abeles
  */
 public interface ScoreAssociation<T> {
