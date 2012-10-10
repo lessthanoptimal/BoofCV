@@ -21,6 +21,7 @@ package boofcv.alg.geo;
 import boofcv.alg.geo.trifocal.TrifocalExtractEpipoles;
 import boofcv.struct.geo.TrifocalTensor;
 import georegression.geometry.GeometryMath_F64;
+import georegression.struct.line.LineGeneral2D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Vector3D_F64;
@@ -266,7 +267,7 @@ public class MultiViewOps {
 	 * translation and normalization to homogeneous coordinates with z=1 is automatically handled.
 	 * </p>
 	 *
-	 * @param H 3x3 Homography matrix.
+	 * @param H Input: 3x3 Homography matrix.
 	 * @param p1 Input: Point in view 1.
 	 * @param outputP2 Output: storage for point in view 2.
 	 * @return Predicted point in view 2
@@ -278,6 +279,59 @@ public class MultiViewOps {
 		GeometryMath_F64.mult(H,p1,outputP2);
 
 		return outputP2;
+	}
+
+
+	/**
+	 * Computes the homography induced from view 1 to 3 by a line in view 2.
+	 *
+	 * @param tensor Input: Trifocal tensor
+	 * @param line Input: Line in view 2.  {@link LineGeneral2D_F64 General notation}.
+	 * @param output Output: Optional storage for homography. 3x3 matrix
+	 * @return Homography from view 1 to 3
+	 */
+	public static DenseMatrix64F inducedHomography13( TrifocalTensor tensor ,
+													  Vector3D_F64 line ,
+													  DenseMatrix64F output ) {
+		if( output == null )
+			output = new DenseMatrix64F(3,3);
+
+		Vector3D_F64 temp = new Vector3D_F64();
+
+		for( int i = 0; i < 3; i++ ) {
+			GeometryMath_F64.multTran(tensor.getT(i),line,temp);
+			output.unsafe_set(0,i,temp.x);
+			output.unsafe_set(1,i,temp.y);
+			output.unsafe_set(2,i,temp.z);
+		}
+
+		return output;
+	}
+
+	/**
+	 * Computes the homography induced from view 1 to 2 by a line in view 3.
+	 *
+	 * @param tensor Input: Trifocal tensor
+	 * @param line Input: Line in view 3.  {@link LineGeneral2D_F64 General notation}.
+	 * @param output Output: Optional storage for homography. 3x3 matrix
+	 * @return Homography from view 1 to 2
+	 */
+	public static DenseMatrix64F inducedHomography12( TrifocalTensor tensor ,
+													  Vector3D_F64 line ,
+													  DenseMatrix64F output ) {
+		if( output == null )
+			output = new DenseMatrix64F(3,3);
+
+		Vector3D_F64 temp = new Vector3D_F64();
+
+		for( int i = 0; i < 3; i++ ) {
+			GeometryMath_F64.mult(tensor.getT(i), line, temp);
+			output.unsafe_set(0,i,temp.x);
+			output.unsafe_set(1,i,temp.y);
+			output.unsafe_set(2,i,temp.z);
+		}
+
+		return output;
 	}
 
 	/**

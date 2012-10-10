@@ -27,6 +27,8 @@ import georegression.struct.se.Se3_F64;
  * observations from a single view and the known 3D location of the points being observed, estimate the camera
  * location.  All observations must be in calibrated image coordinates.
  *
+ * Estimated motion is from the world frame into the camera frame.
+ *
  * @author Peter Abeles
  */
 public interface EstimateNofPnP extends GeoModelEstimatorN<Se3_F64,PointPosePair> {

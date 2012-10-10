@@ -36,7 +36,8 @@ import org.junit.Test;
 import java.util.List;
 import java.util.Random;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Peter Abeles
@@ -49,7 +50,7 @@ public class TestMultiViewOps {
 	DenseMatrix64F K = new DenseMatrix64F(3,3,true,60,0.01,200,0,80,150,0,0,1);
 
 	// camera locations
-	Se3_F64 se2,se3;
+	Se3_F64 worldToCam2, worldToCam3;
 
 	// camera matrix for views 2 and 3
 	DenseMatrix64F P2,P3;
@@ -60,23 +61,29 @@ public class TestMultiViewOps {
 	// trifocal tensor for these views
 	TrifocalTensor tensor;
 
+	// storage for lines in 3 views
+	Vector3D_F64 line1 = new Vector3D_F64();
+	Vector3D_F64 line2 = new Vector3D_F64();
+	Vector3D_F64 line3 = new Vector3D_F64();
+
 	public TestMultiViewOps() {
-		se2 = new Se3_F64();
-		se3 = new Se3_F64();
+		worldToCam2 = new Se3_F64();
+		worldToCam3 = new Se3_F64();
 
-		RotationMatrixGenerator.eulerXYZ(0.2,0.001,-0.02,se2.R);
-		se2.getT().set(0.3,0,0.05);
+		RotationMatrixGenerator.eulerXYZ(0.2, 0.001, -0.02, worldToCam2.R);
+		worldToCam2.getT().set(0.3, 0, 0.05);
 
-		RotationMatrixGenerator.eulerXYZ(0.8,-0.02,0.003,se3.R);
-		se3.getT().set(0.6, 0.2, -0.02);
+		RotationMatrixGenerator.eulerXYZ(0.8, -0.02, 0.003, worldToCam3.R);
+		worldToCam3.getT().set(0.6, 0.2, -0.02);
 
-		P2 = PerspectiveOps.createCameraMatrix(se2.R, se2.T, K, null);
-		P3 = PerspectiveOps.createCameraMatrix(se3.R, se3.T, K, null);
+		P2 = PerspectiveOps.createCameraMatrix(worldToCam2.R, worldToCam2.T, K, null);
+		P3 = PerspectiveOps.createCameraMatrix(worldToCam3.R, worldToCam3.T, K, null);
 		tensor = MultiViewOps.createTrifocal(P2, P3, null);
+		tensor.normalizeScale();
 
-		F2 = MultiViewOps.createEssential(se2.getR(), se2.getT());
+		F2 = MultiViewOps.createEssential(worldToCam2.getR(), worldToCam2.getT());
 		F2 = MultiViewOps.createFundamental(F2, K);
-		F3 = MultiViewOps.createEssential(se3.getR(), se3.getT());
+		F3 = MultiViewOps.createEssential(worldToCam3.getR(), worldToCam3.getT());
 		F3 = MultiViewOps.createFundamental(F3, K);
 	}
 
@@ -104,22 +111,66 @@ public class TestMultiViewOps {
 
 	@Test
 	public void constraint_Trifocal_lll() {
-		fail("implement");
+		Point3D_F64 X = new Point3D_F64(0.1,-0.05,2);
+
+		computeLines(X, line1, line2, line3);
+
+		Vector3D_F64 found = MultiViewOps.constraint(tensor,line1,line2,line3,null);
+
+		assertEquals(0,found.x,1e-12);
+		assertEquals(0,found.y,1e-12);
+		assertEquals(0,found.z,1e-12);
 	}
 
 	@Test
 	public void constraint_Trifocal_pll() {
-		fail("implement");
+		Point3D_F64 X = new Point3D_F64(0.1,-0.05,2);
+
+		computeLines(X,line1,line2,line3);
+
+		// When the tensor was constructed the first view was assumed to be [I|0], which
+		// is why normalized image coordinates are used for the first view
+		Point2D_F64 x1 = PerspectiveOps.renderPixel(new Se3_F64(),null,X);
+
+		double found = MultiViewOps.constraint(tensor,x1,line2,line3);
+
+		assertEquals(0,found,1e-12);
 	}
 
 	@Test
 	public void constraint_Trifocal_plp() {
-		fail("implement");
+		Point3D_F64 X = new Point3D_F64(0.1,-0.05,2);
+
+		computeLines(X,line1,line2,line3);
+
+		// When the tensor was constructed the first view was assumed to be [I|0], which
+		// is why normalized image coordinates are used for the first view
+		Point2D_F64 x1 = PerspectiveOps.renderPixel(new Se3_F64(),null,X);
+		Point2D_F64 x3 = PerspectiveOps.renderPixel(worldToCam3,K,X);
+
+		Vector3D_F64 found = MultiViewOps.constraint(tensor,x1,line2,x3,null);
+
+		assertEquals(0,found.x,1e-12);
+		assertEquals(0,found.y,1e-12);
+		assertEquals(0, found.z, 1e-12);
 	}
 
 	@Test
 	public void constraint_Trifocal_ppl() {
-		fail("implement");
+		Point3D_F64 X = new Point3D_F64(0.1,-0.05,2);
+
+		computeLines(X,line1,line2,line3);
+
+		// When the tensor was constructed the first view was assumed to be [I|0], which
+		// is why normalized image coordinates are used for the first view
+		Point2D_F64 x1 = PerspectiveOps.renderPixel(new Se3_F64(),null,X);
+		Point2D_F64 x2 = PerspectiveOps.renderPixel(worldToCam2,K,X);
+
+		Vector3D_F64 found = MultiViewOps.constraint(tensor,x1,x2,line3,null);
+
+		assertEquals(0,found.x,1e-12);
+		assertEquals(0,found.y,1e-12);
+		assertEquals(0, found.z, 1e-12);
 	}
 
 	@Test
@@ -127,27 +178,18 @@ public class TestMultiViewOps {
 		// Point in 3D space being observed
 		Point3D_F64 X = new Point3D_F64(0.1,0.5,3);
 
-		// compute normalized image coordinates
-		Point2D_F64 p1 = new Point2D_F64(X.x/X.z,X.y/X.z);
-
-		Point3D_F64 temp = new Point3D_F64();
-		SePointOps_F64.transform(se2,X,temp);
-		Point2D_F64 p2 = new Point2D_F64(temp.x/temp.z,temp.y/temp.z);
-
-		SePointOps_F64.transform(se3,X,temp);
-		Point2D_F64 p3 = new Point2D_F64(temp.x/temp.z,temp.y/temp.z);
-
-		// convert into pixel coordinates
-		// don't convert the first view to pixels since it is assumed to be P1=[I|0]
-		GeometryMath_F64.mult(K,p2,p2);
-		GeometryMath_F64.mult(K,p3,p3);
+		// When the tensor was constructed the first view was assumed to be [I|0], which
+		// is why normalized image coordinates are used for the first view
+		Point2D_F64 p1 = PerspectiveOps.renderPixel(new Se3_F64(),null,X);
+		Point2D_F64 p2 = PerspectiveOps.renderPixel(worldToCam2,K,X);
+		Point2D_F64 p3 = PerspectiveOps.renderPixel(worldToCam3,K,X);
 
 		// check the constraint
 		DenseMatrix64F A = MultiViewOps.constraint(tensor, p1, p2, p3, null);
 
 		for( int i = 0; i < 3; i++ ) {
 			for( int j = 0; j < 3; j++ ) {
-				assertEquals(0,A.get(i,j),1e-7);
+				assertEquals(0,A.get(i,j),1e-11);
 			}
 		}
 	}
@@ -157,9 +199,9 @@ public class TestMultiViewOps {
 		Point3D_F64 X = new Point3D_F64(0.1,-0.05,2);
 
 		Point2D_F64 p1 = PerspectiveOps.renderPixel(new Se3_F64(),K,X);
-		Point2D_F64 p2 = PerspectiveOps.renderPixel(se2,K,X);
+		Point2D_F64 p2 = PerspectiveOps.renderPixel(worldToCam2,K,X);
 
-		DenseMatrix64F E = MultiViewOps.createEssential(se2.R,se2.T);
+		DenseMatrix64F E = MultiViewOps.createEssential(worldToCam2.R, worldToCam2.T);
 		DenseMatrix64F F = MultiViewOps.createFundamental(E, K);
 
 		assertEquals(0,MultiViewOps.constraint(F,p1,p2),1e-8);
@@ -167,8 +209,99 @@ public class TestMultiViewOps {
 
 	@Test
 	public void constraint_homography() {
-		fail("Implement");
+
+		double d = 2;
+		Vector3D_F64 N = new Vector3D_F64(0,0,1);
+		Point3D_F64 X = new Point3D_F64(0.1,-0.4,d);
+
+
+		DenseMatrix64F H = MultiViewOps.createHomography(worldToCam2.getR(),worldToCam2.getT(),d,N);
+
+		Point2D_F64 p1 = PerspectiveOps.renderPixel(new Se3_F64(),null,X);
+		Point2D_F64 p2 = PerspectiveOps.renderPixel(worldToCam2,null,X);
+
+		Point2D_F64 found = MultiViewOps.constraintHomography(H,p1,null);
+
+		assertEquals(p2.x,found.x,1e-8);
+		assertEquals(p2.y,found.y,1e-8);
 	}
+
+	@Test
+	public void inducedHomography13() {
+		Point3D_F64 X = new Point3D_F64(0.1,-0.05,2);
+
+		computeLines(X,line1,line2,line3);
+
+		// When the tensor was constructed the first view was assumed to be [I|0], which
+		// is why normalized image coordinates are used for the first view
+		Point2D_F64 p1 = PerspectiveOps.renderPixel(new Se3_F64(),null,X);
+		Point2D_F64 p3 = PerspectiveOps.renderPixel(worldToCam3,K,X);
+
+		DenseMatrix64F H13 = MultiViewOps.inducedHomography13(tensor,line2,null);
+
+		Point2D_F64 found = new Point2D_F64();
+
+		GeometryMath_F64.mult(H13,p1,found);
+
+		assertEquals(p3.x,found.x,1e-8);
+		assertEquals(p3.y,found.y,1e-8);
+	}
+
+	@Test
+	public void inducedHomography12() {
+		Point3D_F64 X = new Point3D_F64(0.1,-0.05,2);
+
+		computeLines(X,line1,line2,line3);
+
+		// When the tensor was constructed the first view was assumed to be [I|0], which
+		// is why normalized image coordinates are used for the first view
+		Point2D_F64 p1 = PerspectiveOps.renderPixel(new Se3_F64(),null,X);
+		Point2D_F64 p2 = PerspectiveOps.renderPixel(worldToCam2,K,X);
+
+		DenseMatrix64F H12 = MultiViewOps.inducedHomography12(tensor, line3, null);
+
+		Point2D_F64 found = new Point2D_F64();
+
+		GeometryMath_F64.mult(H12,p1,found);
+
+		assertEquals(p2.x,found.x,1e-8);
+		assertEquals(p2.y,found.y,1e-8);
+	}
+
+	/**
+	 * Compute lines in each view using epipolar geometry that include point X. The first view is
+	 * in normalized image coordinates
+	 */
+	private void computeLines( Point3D_F64 X , Vector3D_F64 line1 , Vector3D_F64 line2, Vector3D_F64 line3 ) {
+		Point3D_F64 X2 = X.copy();
+		X2.y += 1;
+
+		// When the tensor was constructed the first view was assumed to be [I|0], which
+		// is why normalized image coordinates are used for the first view
+		line1.set(computeLine(X,X2,new Se3_F64(),null));
+		line2.set(computeLine(X,X2,worldToCam2,K));
+		line3.set(computeLine(X,X2,worldToCam3,K));
+	}
+
+	private Vector3D_F64 computeLine( Point3D_F64 X1, Point3D_F64 X2 , Se3_F64 worldToCam , DenseMatrix64F K ) {
+		Point2D_F64 a = PerspectiveOps.renderPixel(worldToCam,K,X1);
+		Point2D_F64 b = PerspectiveOps.renderPixel(worldToCam,K,X2);
+
+		Vector3D_F64 v1 = new Vector3D_F64(b.x-a.x,b.y-a.y,0);
+		Vector3D_F64 v2 = new Vector3D_F64(a.x,a.y,1);
+		Vector3D_F64 norm = new Vector3D_F64();
+
+		GeometryMath_F64.cross(v1,v2,norm);
+
+		norm.normalize();
+
+		double sanity1 = a.x*norm.x + a.y*norm.y + norm.z;
+		double sanity2 = b.x*norm.x + b.y*norm.y + norm.z;
+
+
+		return norm;
+	}
+
 
 	@Test
 	public void extractEpipoles_threeview() {
@@ -212,8 +345,8 @@ public class TestMultiViewOps {
 
 		// remember the first view is assumed to have a projection matrix of [I|0]
 		Point2D_F64 x1 = PerspectiveOps.renderPixel(new Se3_F64(), null, X);
-		Point2D_F64 x2 = PerspectiveOps.renderPixel(se2, K, X);
-		Point2D_F64 x3 = PerspectiveOps.renderPixel(se3, K, X);
+		Point2D_F64 x2 = PerspectiveOps.renderPixel(worldToCam2, K, X);
+		Point2D_F64 x3 = PerspectiveOps.renderPixel(worldToCam3, K, X);
 
 		assertEquals(0, MultiViewOps.constraint(found2, x1, x2), 1e-8);
 		assertEquals(0, MultiViewOps.constraint(found3, x1, x3), 1e-8);
@@ -269,12 +402,12 @@ public class TestMultiViewOps {
 
 	@Test
 	public void computeFundamental() {
-		DenseMatrix64F E = MultiViewOps.createEssential(se2.R, se2.T);
+		DenseMatrix64F E = MultiViewOps.createEssential(worldToCam2.R, worldToCam2.T);
 		DenseMatrix64F F = MultiViewOps.createFundamental(E, K);
 
 		Point3D_F64 X = new Point3D_F64(0.1,-0.1,2.5);
 		Point2D_F64 p1 = PerspectiveOps.renderPixel(new Se3_F64(),K,X);
-		Point2D_F64 p2 = PerspectiveOps.renderPixel(se2,K,X);
+		Point2D_F64 p2 = PerspectiveOps.renderPixel(worldToCam2,K,X);
 
 		assertEquals(0,MultiViewOps.constraint(F,p1,p2),1e-8);
 	}

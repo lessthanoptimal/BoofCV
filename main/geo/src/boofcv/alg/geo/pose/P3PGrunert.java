@@ -101,8 +101,6 @@ public class P3PGrunert implements P3PLineDistance {
 			}
 
 			double v = r.real;
-//			double u = ((-1 + (a*a - c*c)/(b*b))*v*v - 2*((a*a - c*c)/(b*b))*cos13*v + 1 + (a*a - c*c)/(b*b))/
-//					(2*(cos12 - v*cos23));
 			double u = ((-1 + a2_div_b2 - c2_div_b2)*v*v - 2*(a2_div_b2 - c2_div_b2)*cos13*v + 1 + a2_div_b2 - c2_div_b2)/
 					(2*(cos12 - v*cos23));
 

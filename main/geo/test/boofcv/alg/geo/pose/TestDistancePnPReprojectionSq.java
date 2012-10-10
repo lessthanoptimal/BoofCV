@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Peter Abeles
@@ -73,6 +74,32 @@ public class TestDistancePnPReprojectionSq {
 		assertEquals(expected,found,1e-8);
 	}
 
+	/**
+	 * A very large error should be returned if the point appears behind the second camera
+	 */
+	@Test
+	public void checkBehindCamera() {
+		DenseMatrix64F K = new DenseMatrix64F(3,3,true,100,0.01,200,0,150,200,0,0,1);
+
+		Se3_F64 worldToCamera = new Se3_F64();
+		worldToCamera.getT().set(0.1,-0.1,-2.5);
+
+		// Point location in world frame
+		Point3D_F64 X = new Point3D_F64(0.1,-0.04,2.3);
+
+		Point2D_F64 observed = PerspectiveOps.renderPixel(worldToCamera, K, X);
+
+		DistancePnPReprojectionSq alg = new DistancePnPReprojectionSq(K.get(0,0),K.get(1,1),K.get(0,1));
+		alg.setModel(worldToCamera);
+
+		double found = alg.computeDistance(new PointPosePair(observed,X));
+
+		assertTrue(Double.MAX_VALUE == found );
+	}
+
+	/**
+	 * Check the array error function for accuracy
+	 */
 	@Test
 	public void checkErrorArray() {
 		double expected[] = new double[5];

@@ -74,7 +74,7 @@ public class BenchmarkStabilityPnP extends ArtificialStereoScene {
 	}
 
 	public void evaluateAllMinimal() {
-		double pixelSigma = 0.1;
+		double pixelSigma = 0.5;
 		boolean isPlanar = false;
 		int numTrials = 1000;
 		int numTestPoints = 1;
@@ -117,6 +117,8 @@ public class BenchmarkStabilityPnP extends ArtificialStereoScene {
 			Vector3D_F64 foundTran = found.getT();
 
 			double errorTran = expectedTran.distance(foundTran);
+			double distanceTrue = expectedTran.norm();
+
 			double errorEuler = 0;
 			double sum = 0;
 			for( int j = 0; j < 3; j++ ) {
@@ -124,9 +126,10 @@ public class BenchmarkStabilityPnP extends ArtificialStereoScene {
 				errorEuler += e*e;
 				sum += expectedEuler[j];
 			}
-			errorEuler = 100*Math.sqrt(errorEuler)/Math.sqrt(sum);
+			errorEuler = 100.0*Math.sqrt(errorEuler)/Math.sqrt(sum);
+			errorTran = 100.0*(errorTran/distanceTrue);
 
-//			System.out.println(errorEuler);
+//			System.out.println(errorTran);
 
 			totalEuler += errorEuler;
 			totalTran += errorTran;
@@ -134,7 +137,7 @@ public class BenchmarkStabilityPnP extends ArtificialStereoScene {
 
 		int N = numTrials-totalFail;
 
-		System.out.printf("%20s N = %d failed %.3f%% euler = %3f%% tran = %5f\n", name, target.getMinimumPoints(),
+		System.out.printf("%20s N = %d failed %.3f%% euler = %3f%% tran = %3f%%\n", name, target.getMinimumPoints(),
 				(totalFail/(double)numTrials), (totalEuler / N), (totalTran / N));
 
 	}

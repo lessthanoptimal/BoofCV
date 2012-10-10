@@ -39,12 +39,14 @@ import pja.storage.GrowQueue_I32;
  * associated with feature in src.
  * </p>
  *
+ * @param <D> Feature description type.
+ *
  * @author Peter Abeles
  */
-public class AssociateGreedy<T> {
+public class AssociateGreedy<D> {
 
 	// computes association score
-	private ScoreAssociation<T> score;
+	private ScoreAssociation<D> score;
 	// worst allowed fit score to associate
 	private double maxFitError;
 	// stores the quality of fit score
@@ -63,7 +65,7 @@ public class AssociateGreedy<T> {
 	 * @param maxFitError Maximum allowed fit error.  To disable set to Double.MAX_VALUE
 	 * @param backwardsValidation If true then backwards validation is performed.
 	 */
-	public AssociateGreedy(ScoreAssociation<T> score,
+	public AssociateGreedy(ScoreAssociation<D> score,
 						   double maxFitError,
 						   boolean backwardsValidation) {
 		this.score = score;
@@ -77,20 +79,20 @@ public class AssociateGreedy<T> {
 	 * @param src Source list.
 	 * @param dst Destination list.
 	 */
-	public void associate( FastQueue<T> src ,
-						   FastQueue<T> dst )
+	public void associate( FastQueue<D> src ,
+						   FastQueue<D> dst )
 	{
 		fitQuality.reset();
 		pairs.reset();
 		workBuffer.reset();
 
 		for( int i = 0; i < src.size; i++ ) {
-			T a = src.data[i];
+			D a = src.data[i];
 			double bestScore = maxFitError;
 			int bestIndex = -1;
 
 			for( int j = 0; j < dst.size; j++ ) {
-				T b = dst.data[j];
+				D b = dst.data[j];
 
 				double fit = score.score(a,b);
 				workBuffer.push(fit);

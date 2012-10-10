@@ -40,11 +40,18 @@ public class GrowingArrayInt {
 
 	public void add( int value ) {
 		if( size >= data.length ) {
-			int temp[] = new int[ size*size ];
+			int temp[] = new int[ data.length*2 ];
 			System.arraycopy(data,0,temp,0,size);
 			data = temp;
 		}
 		data[size++] = value;
 	}
 
+	public int get( int index ) {
+		return data[index];
+	}
+
+	public int size() {
+		return size;
+	}
 }
