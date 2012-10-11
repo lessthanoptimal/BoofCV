@@ -105,7 +105,7 @@ public class P3PGrunert implements P3PLineDistance {
 					(2*(cos12 - v*cos23));
 
 			// compute the distance of each point
-			PointDistance3 s = solutions.pop();
+			PointDistance3 s = solutions.grow();
 
 			s.dist1 = Math.sqrt(a*a/(u*u + v*v - 2*u*v*cos23));
 			s.dist2 = s.dist1*u;

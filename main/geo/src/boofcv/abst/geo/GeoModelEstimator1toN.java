@@ -41,7 +41,7 @@ public class GeoModelEstimator1toN<Model,Point> implements GeoModelEstimatorN<Mo
 	public boolean process(List<Point> points, FastQueue<Model> estimatedModels) {
 		estimatedModels.reset();
 
-		Model m = estimatedModels.pop();
+		Model m = estimatedModels.grow();
 
 		if( alg.process(points,m) ) {
 			return true;

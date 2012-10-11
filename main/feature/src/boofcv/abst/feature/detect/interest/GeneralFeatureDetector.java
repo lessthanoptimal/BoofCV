@@ -192,7 +192,7 @@ public class GeneralFeatureDetector<I extends ImageSingleBand, D extends ImageSi
 
 				for (int k = 0; k < q.size; k++) {
 					Point2D_I16 p = q.get(k);
-					foundCorners.pop().set(p.x + x0, p.y + y0);
+					foundCorners.grow().set(p.x + x0, p.y + y0);
 				}
 			}
 		}

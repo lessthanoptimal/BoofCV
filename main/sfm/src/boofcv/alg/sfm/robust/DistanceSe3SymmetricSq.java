@@ -1,6 +1,7 @@
 package boofcv.alg.sfm.robust;
 
 import boofcv.abst.geo.TriangulateTwoViewsCalibrated;
+import boofcv.alg.geo.NormalizedToPixelError;
 import boofcv.numerics.fitting.modelset.DistanceFromModel;
 import boofcv.struct.geo.AssociatedPair;
 import georegression.struct.point.Point3D_F64;
@@ -42,13 +43,9 @@ public class DistanceSe3SymmetricSq implements DistanceFromModel<Se3_F64,Associa
 	// working storage
 	private Point3D_F64 p = new Point3D_F64();
 
-	// ------- intrinsic camera parameters from calibration matrix
-	private double key_fx; // focal length x
-	private double key_fy; // focal length y
-	private double key_skew; // pixel skew
-	private double curr_fx; // focal length x
-	private double curr_fy; // focal length y
-	private double curr_skew; // pixel skew
+	// Used to compute error in pixels
+	private NormalizedToPixelError errorKey;
+	private NormalizedToPixelError errorCurr;
 
 	/**
 	 * Configure distance calculation.   See comment above about how to specify error units using
@@ -66,12 +63,8 @@ public class DistanceSe3SymmetricSq implements DistanceFromModel<Se3_F64,Associa
 								  double key_fx, double key_fy , double key_skew ,
 								  double curr_fx, double curr_fy , double curr_skew) {
 		this.triangulate = triangulate;
-		this.key_fx = key_fx;
-		this.key_fy = key_fy;
-		this.key_skew = key_skew;
-		this.curr_fx = curr_fx;
-		this.curr_fy = curr_fy;
-		this.curr_skew = curr_skew;
+		errorKey = new NormalizedToPixelError(key_fx,key_fy,key_skew);
+		errorCurr = new NormalizedToPixelError(curr_fx,curr_fy,curr_skew);
 	}
 
 	@Override
@@ -93,22 +86,17 @@ public class DistanceSe3SymmetricSq implements DistanceFromModel<Se3_F64,Associa
 
 		if( p.z < 0 )
 			return Double.MAX_VALUE;
-		
+
 		// compute observational error in each view
-		double dy1 = (obs.keyLoc.y - p.y/p.z);
-		double dx1 = (obs.keyLoc.x - p.x/p.z)*key_fx + dy1*key_skew;
-		dy1 *= key_fy;
+		double error = errorKey.errorSq(obs.keyLoc.x,obs.keyLoc.y,p.x/p.z,p.y/p.z);
 
 		SePointOps_F64.transform(keyToCurr,p,p);
 		if( p.z < 0 )
 			return Double.MAX_VALUE;
 
-		double dy2 = (obs.currLoc.y - p.y/p.z);
-		double dx2 = (obs.currLoc.x - p.x/p.z)*curr_fx + dy2*curr_skew;
-		dy2 *= curr_fy;
+		error += errorCurr.errorSq(obs.currLoc.x,obs.currLoc.y, p.x/p.z , p.y/p.z);
 
-		// symmetric error
-		return dx1*dx1 + dy1*dy1 + dx2*dx2 + dy2*dy2;
+		return error;
 	}
 
 	@Override

@@ -244,7 +244,7 @@ public class TestPnPLepetitEPnP {
 		double beta = 10;
 		for( int i = 0; i < alg.numControl; i++ ) {
 			Point3D_F64 p = alg.nullPts[0].get(i);
-			Point3D_F64 c = alg.controlWorldPts.pop();
+			Point3D_F64 c = alg.controlWorldPts.grow();
 			c.x = p.x*beta;
 			c.y = p.y*beta;
 			c.z = p.z*beta;

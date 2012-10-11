@@ -102,7 +102,7 @@ public class BenchmarkFeatureScore {
 		FastQueue<TupleDesc_F64> ret = new TupleDescQueue<TupleDesc_F64>(TupleDesc_F64.class,DOF_TUPLE, true);
 
 		for( int i = 0; i < NUM_FEATURES; i++ ) {
-			TupleDesc_F64 t = ret.pop();
+			TupleDesc_F64 t = ret.grow();
 			for( int j = 0; j < DOF_TUPLE; j++ ) {
 				t.value[j] = (rand.nextDouble()-0.5)*20;
 			}
@@ -114,7 +114,7 @@ public class BenchmarkFeatureScore {
 		FastQueue<TupleDesc_B> ret = new BriefFeatureQueue(DOF_BRIEF);
 
 		for( int i = 0; i < NUM_FEATURES; i++ ) {
-			TupleDesc_B t = ret.pop();
+			TupleDesc_B t = ret.grow();
 			for( int j = 0; j < t.data.length; j++ ) {
 				t.data[j] = rand.nextInt();
 			}
@@ -126,7 +126,7 @@ public class BenchmarkFeatureScore {
 		FastQueue<NccFeature> ret = new NccFeatureQueue(DOF_TUPLE);
 
 		for( int i = 0; i < NUM_FEATURES; i++ ) {
-			NccFeature t = ret.pop();
+			NccFeature t = ret.grow();
 			for( int j = 0; j < t.value.length; j++ ) {
 				t.value[j] = (rand.nextDouble()-0.5)*20;
 			}

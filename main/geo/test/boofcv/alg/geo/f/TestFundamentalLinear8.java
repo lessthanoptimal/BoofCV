@@ -55,7 +55,7 @@ public class TestFundamentalLinear8 {
 
 			@Override
 			public void computeFundamental(List<AssociatedPair> pairs,FastQueue<DenseMatrix64F> solutions) {
-				assertTrue(alg.process(pairs,solutions.pop()));
+				assertTrue(alg.process(pairs,solutions.grow()));
 			}
 		};
 	}

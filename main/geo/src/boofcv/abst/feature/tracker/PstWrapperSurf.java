@@ -91,14 +91,14 @@ public class PstWrapperSurf<I extends ImageSingleBand,II extends ImageSingleBand
 		// extract feature descriptions
 		orientation.setImage(integralImage);
 		describe.setImage(integralImage);
-		SurfFeature tmpFeat = description.pop();
+		SurfFeature tmpFeat = description.grow();
 		for( ScalePoint p : points ) {
 			orientation.setScale(p.scale);
 			double angle = orientation.compute(p.x,p.y);
 
 			describe.describe(p.x,p.y,p.scale,angle,tmpFeat);
-			location.pop().set(p.x,p.y);
-			tmpFeat = description.pop();
+			location.grow().set(p.x,p.y);
+			tmpFeat = description.grow();
 		}
 		description.removeTail();
 	}

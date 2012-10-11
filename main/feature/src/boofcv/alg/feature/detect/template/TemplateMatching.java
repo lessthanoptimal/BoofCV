@@ -139,7 +139,7 @@ public class TemplateMatching<T extends ImageBase> {
 		for (int i = 0; i < N; i++) {
 			Point2D_I16 p = candidates.get(indexes[i]);
 
-			Match m = results.pop();
+			Match m = results.grow();
 			m.score = -scores[i];
 			m.set(p.x - offsetX, p.y - offsetY);
 		}

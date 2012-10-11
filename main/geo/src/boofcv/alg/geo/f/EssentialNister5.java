@@ -132,7 +132,7 @@ public class EssentialNister5 {
 
 			solveForXandY(c.real);
 
-			DenseMatrix64F E = solutions.pop();
+			DenseMatrix64F E = solutions.grow();
 
 			for( int i = 0; i < 9; i++ ) {
 				E.data[i] = x*X[i] + y*Y[i] + z*Z[i] + W[i];

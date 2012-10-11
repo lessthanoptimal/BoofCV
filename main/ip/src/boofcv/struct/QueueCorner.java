@@ -34,10 +34,10 @@ public class QueueCorner extends FastQueue<Point2D_I16>{
 	}
 
 	public final void add(int x, int y) {
-		pop().set((short)x,(short)y);
+		grow().set((short)x,(short)y);
 	}
 
 	public final void add( Point2D_I16 pt ) {
-		pop().set(pt.x, pt.y);
+		grow().set(pt.x, pt.y);
 	}
 }

@@ -135,7 +135,7 @@ public class TestGeoModelEstimatorNto1 {
 			Random rand = new Random(324);
 
 			for (int i = 0; i < numberOfSolutions; i++) {
-				solutions.pop().set(RandomMatrices.createRandom(3, 3, rand));
+				solutions.grow().set(RandomMatrices.createRandom(3, 3, rand));
 			}
 
 			if (correct != null)

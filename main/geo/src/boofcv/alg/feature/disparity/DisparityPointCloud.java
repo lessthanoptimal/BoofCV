@@ -19,7 +19,6 @@
 package boofcv.alg.feature.disparity;
 
 import boofcv.struct.FastQueue;
-import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.image.ImageUInt8;
 import georegression.struct.point.Point3D_F64;
 
@@ -76,7 +75,7 @@ public class DisparityPointCloud {
 				if( value == 0 )
 					continue;
 
-				Point3D_F64 p = cloud.pop();
+				Point3D_F64 p = cloud.grow();
 
 				p.z = baseline*focalLengthX/value;
 				p.x = p.z*(x - centerX)/focalLengthX;

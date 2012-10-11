@@ -45,7 +45,7 @@ public class UtilLepetitEPnP {
 	{
 		cameraPts.reset();
 		for( int i = 0; i < numControl; i++ ) {
-			cameraPts.pop().set(0,0,0);
+			cameraPts.grow().set(0,0,0);
 		}
 
 		for( int i = 0; i < numControl; i++ ) {

@@ -36,8 +36,7 @@ import org.junit.Test;
 import java.util.List;
 import java.util.Random;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * @author Peter Abeles
@@ -91,7 +90,32 @@ public class TestMultiViewOps {
 	 * Check the trifocal tensor using its definition
 	 */
 	@Test
-	public void createTrifocal() {
+	public void createTrifocal_CameraMatrix() {
+
+		SimpleMatrix P1 = SimpleMatrix.wrap(
+				PerspectiveOps.createCameraMatrix(worldToCam2.getR(), worldToCam2.getT(), null, null));
+		SimpleMatrix P2 = SimpleMatrix.wrap(
+				PerspectiveOps.createCameraMatrix(worldToCam3.getR(), worldToCam3.getT(), null, null));
+
+		TrifocalTensor found = MultiViewOps.createTrifocal(worldToCam2,worldToCam3,null);
+
+		for( int i = 0; i < 3; i++ ) {
+			SimpleMatrix ai = P1.extractVector(false,i);
+			SimpleMatrix b4 = P2.extractVector(false,3);
+			SimpleMatrix a4 = P1.extractVector(false,3);
+			SimpleMatrix bi = P2.extractVector(false,i);
+
+			SimpleMatrix expected = ai.mult(b4.transpose()).minus(a4.mult(bi.transpose()));
+
+			assertTrue(MatrixFeatures.isIdentical(expected.getMatrix(),found.getT(i),1e-8));
+		}
+	}
+
+	/**
+	 * Check the trifocal tensor using its definition
+	 */
+	@Test
+	public void createTrifocal_SE() {
 		SimpleMatrix P1 = SimpleMatrix.random(3,4,-1,1,rand);
 		SimpleMatrix P2 = SimpleMatrix.random(3,4,-1,1,rand);
 
@@ -107,6 +131,8 @@ public class TestMultiViewOps {
 
 			assertTrue(MatrixFeatures.isIdentical(expected.getMatrix(),found.getT(i),1e-8));
 		}
+
+		fail("Update for SE motion");
 	}
 
 	@Test

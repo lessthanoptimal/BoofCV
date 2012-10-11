@@ -330,8 +330,8 @@ public class MonocularSimpleVo<T extends ImageBase> {
 		for( int i = 0; i < inliers.size(); i++ ) {
 			PointPoseTrack p = inliers.get(i);
 			
-			v0.pop().set(i,p.keyLoc);
-			v1.pop().set(i,p.currLoc);
+			v0.grow().set(i,p.keyLoc);
+			v1.grow().set(i,p.currLoc);
 			bundleModel.getPoint(i).set(p.location);
 		}
 
@@ -356,7 +356,7 @@ public class MonocularSimpleVo<T extends ImageBase> {
 		for( PointPoseTrack t : tracker.getPairs() ) {
 			if( !t.active )
 				continue;
-			PointPosePair p = queuePointPose.pop();
+			PointPosePair p = queuePointPose.grow();
 			p.location = t.location;
 			p.observed = t.currLoc;
 			active.add(p);

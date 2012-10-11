@@ -68,7 +68,7 @@ public class BenchmarkAssociationAlgs {
 		FastQueue<TupleDesc_F64> ret = new TupleDescQueue<TupleDesc_F64>(TupleDesc_F64.class,DOF, true);
 
 		for( int i = 0; i < NUM_FEATURES; i++ ) {
-			TupleDesc_F64 t = ret.pop();
+			TupleDesc_F64 t = ret.grow();
 			for( int j = 0; j < DOF; j++ ) {
 				t.value[j] = (rand.nextDouble()-0.5)*20;
 			}

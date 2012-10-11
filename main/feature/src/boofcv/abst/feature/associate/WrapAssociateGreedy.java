@@ -76,7 +76,7 @@ public class WrapAssociateGreedy<T> implements GeneralAssociation<T> {
 			for( int i = 0; i < listSrc.size; i++ ) {
 				int dst = pairs[i];
 				if( dst >= 0 )
-					matches.pop().setAssociation(i,dst,score[i]);
+					matches.grow().setAssociation(i,dst,score[i]);
 			}
 			
 		} else {
@@ -87,7 +87,7 @@ public class WrapAssociateGreedy<T> implements GeneralAssociation<T> {
 				if( dst == -1 ) {
 					break;
 				}
-				matches.pop().setAssociation(src,dst,score[src]);
+				matches.grow().setAssociation(src,dst,score[src]);
 			}
 		}
 	}

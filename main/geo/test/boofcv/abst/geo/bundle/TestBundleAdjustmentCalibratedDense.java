@@ -152,7 +152,7 @@ public class TestBundleAdjustmentCalibratedDense {
 				obs.x = cameraPt.x / cameraPt.z;
 				obs.y = cameraPt.y / cameraPt.z;
 
-				PointIndexObservation p = l.getPoints().pop();
+				PointIndexObservation p = l.getPoints().grow();
 				p.set(j,obs);
 			}
 			

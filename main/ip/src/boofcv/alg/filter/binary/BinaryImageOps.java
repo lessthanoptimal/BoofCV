@@ -449,7 +449,7 @@ public class BinaryImageOps {
 			for( int index = start; index < end; index++ ) {
 				int v = labelImage.data[index];
 				if( v > 0 ) {
-					Point2D_I32 p = queue.pop();
+					Point2D_I32 p = queue.grow();
 					p.set(index-start,y);
 					ret.get(v).add(p);
 				}
@@ -494,7 +494,7 @@ public class BinaryImageOps {
 					continue;
 				// see if any part of it (4-connect) is touching a non-member pixel
 				if( in.get(x-1,y) == 0 || in.get(x+1,y) == 0 || in.get(x,y-1) == 0 || in.get(x,y+1) == 0 ) {
-					Point2D_I32 p = queue.pop();
+					Point2D_I32 p = queue.grow();
 					p.set(x,y);
 					ret.get(v).add(p);
 				}

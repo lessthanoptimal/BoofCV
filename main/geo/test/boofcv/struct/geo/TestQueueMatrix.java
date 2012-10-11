@@ -35,7 +35,7 @@ public class TestQueueMatrix {
 		assertEquals(0,alg.size);
 		assertEquals(5,alg.data.length);
 
-		DenseMatrix64F M = alg.pop();
+		DenseMatrix64F M = alg.grow();
 
 		assertEquals(3,M.numRows);
 		assertEquals(4,M.numCols);
@@ -48,7 +48,7 @@ public class TestQueueMatrix {
 		assertEquals(0,alg.size);
 		assertEquals(0,alg.data.length);
 
-		DenseMatrix64F M = alg.pop();
+		DenseMatrix64F M = alg.grow();
 
 		assertEquals(3,M.numRows);
 		assertEquals(4, M.numCols);
