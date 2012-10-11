@@ -116,7 +116,7 @@ public class WrapP3PLineDistance implements EstimateNofPnP {
 			if( !motionFit.process(cloudWorld,cloudCamera) )
 				continue;
 
-			Se3_F64 found = solutions.pop();
+			Se3_F64 found = solutions.grow();
 			found.set( motionFit.getMotion() );
 		}
 

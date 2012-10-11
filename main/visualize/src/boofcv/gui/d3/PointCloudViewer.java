@@ -133,7 +133,7 @@ public class PointCloudViewer extends JPanel {
 				if( value == 0 )
 					continue;
 
-				ColorPoint3D p = cloud.pop();
+				ColorPoint3D p = cloud.grow();
 
 				p.z = baseline*focalLengthX/value;
 				p.x = p.z*(x - centerX)/focalLengthX;
@@ -161,7 +161,7 @@ public class PointCloudViewer extends JPanel {
 				if( value == 0 )
 					continue;
 
-				ColorPoint3D p = cloud.pop();
+				ColorPoint3D p = cloud.grow();
 
 				p.z = baseline*focalLengthX/value;
 				p.x = p.z*(x - centerX)/focalLengthX;

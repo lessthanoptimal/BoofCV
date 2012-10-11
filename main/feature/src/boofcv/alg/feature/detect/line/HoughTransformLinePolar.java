@@ -145,7 +145,7 @@ public class HoughTransformLinePolar {
 			float y0 = r*s+originY;
 
 			foundIntensity.push( transform.get(p.x,p.y));
-			LineParametric2D_F32 l = lines.pop();
+			LineParametric2D_F32 l = lines.grow();
 			l.p.set(x0,y0);
 			l.slope.set(-s,c);
 		}

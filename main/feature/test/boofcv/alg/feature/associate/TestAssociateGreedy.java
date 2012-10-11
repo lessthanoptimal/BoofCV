@@ -103,7 +103,7 @@ public class TestAssociateGreedy {
 		FastQueue<TupleDesc_F64> ret = new TupleDescQueue<TupleDesc_F64>(TupleDesc_F64.class,1, true);
 
 		for( int i = 0; i < values.length; i++ ) {
-			ret.pop().set(values[i]);
+			ret.grow().set(values[i]);
 		}
 
 		return ret;

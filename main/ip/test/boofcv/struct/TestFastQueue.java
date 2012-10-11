@@ -51,9 +51,9 @@ public class TestFastQueue {
 		List<Point2D_I32> l = alg.toList();
 		assertEquals(0,l.size());
 		
-		alg.pop().set(1,2);
-		alg.pop().set(1,2);
-		alg.pop().set(2,3);
+		alg.grow().set(1,2);
+		alg.grow().set(1,2);
+		alg.grow().set(2,3);
 		alg.removeTail();
 
 		l = alg.toList();
@@ -66,7 +66,7 @@ public class TestFastQueue {
 	public void removeTail() {
 		FastQueue<Point2D_I32> alg = new FastQueue<Point2D_I32>(10,Point2D_I32.class,true);
 
-		alg.pop();
+		alg.grow();
 		assertEquals(1,alg.size);
 		alg.removeTail();
 		assertEquals(0,alg.size);
@@ -76,7 +76,7 @@ public class TestFastQueue {
 	public void getTail() {
 		FastQueue<Point2D_I32> alg = new FastQueue<Point2D_I32>(10,Point2D_I32.class,true);
 
-		alg.pop();alg.pop();
+		alg.grow();alg.grow();
 
 		assertTrue(alg.data[1] == alg.getTail());
 	}
@@ -91,7 +91,7 @@ public class TestFastQueue {
 			fail("Didn't fail");
 		} catch( IllegalArgumentException e ) {}
 
-		alg.pop();
+		alg.grow();
 		alg.get(0);
 	}
 
@@ -99,7 +99,7 @@ public class TestFastQueue {
 	public void size() {
 		FastQueue<Point2D_I32> alg = new FastQueue<Point2D_I32>(Point2D_I32.class,true);
 		assertEquals(0,alg.size);
-		alg.pop();
+		alg.grow();
 		assertEquals(1,alg.size);
 	}
 
@@ -115,8 +115,8 @@ public class TestFastQueue {
 	@Test
 	public void addAll() {
 		FastQueue<Point2D_I32> alg = new FastQueue<Point2D_I32>(Point2D_I32.class,true);
-		alg.pop();
-		alg.pop();
+		alg.grow();
+		alg.grow();
 
 		FastQueue<Point2D_I32> alg2 = new FastQueue<Point2D_I32>(Point2D_I32.class,false);
 
@@ -135,7 +135,7 @@ public class TestFastQueue {
 
 		int before = alg.getMaxSize();
 		for( int i = 0; i < 20; i++ ) {
-			alg.pop();
+			alg.grow();
 		}
 		alg.get(19);
 		int after = alg.getMaxSize();
@@ -146,7 +146,7 @@ public class TestFastQueue {
 	public void growArray() {
 		FastQueue<Point2D_I32> alg = new FastQueue<Point2D_I32>(1,Point2D_I32.class,true);
 
-		alg.pop().set(10,12);
+		alg.grow().set(10,12);
 		int before = alg.getMaxSize();
 		alg.growArray(before+5);
 		assertEquals(10,alg.get(0).getX());

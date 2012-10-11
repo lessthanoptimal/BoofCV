@@ -28,7 +28,7 @@ public class PixelDepthVoEpipolar<T extends ImageBase> {
 	// TODO Make relative to the last update or remove?
 	double MIN_PIXEL_CHANGE = 100;
 
-	double TOL_TRIANGULATE = 2*Math.PI/180.0;
+	double TOL_TRIANGULATE = 20*Math.PI/180.0;
 
 	int MIN_TRACKS = 100;
 
@@ -78,6 +78,8 @@ public class PixelDepthVoEpipolar<T extends ImageBase> {
 	public boolean process( T leftImage , T rightImage ) {
 		tracker.process(leftImage);
 
+		checkForReallyCloseTrack();
+
 		boolean foundMotion = estimateMotion();
 
 		if( !foundMotion ) {
@@ -101,11 +103,15 @@ public class PixelDepthVoEpipolar<T extends ImageBase> {
 			for( PointPoseTrack p : tracks ) {
 				Point2D_F64 pixel = p.getPixel().keyLoc;
 				// discard point if it can't triangulate
-				if( !pixelTo3D.process(pixel.x,pixel.y) && pixelTo3D.getW() != 0 ) {
+				if( !pixelTo3D.process(pixel.x,pixel.y) || pixelTo3D.getW() == 0 ) {
 					drop.add(p);
 				} else {
 					double w = pixelTo3D.getW();
 					p.getLocation().set( pixelTo3D.getX()/w , pixelTo3D.getY()/w, pixelTo3D.getZ()/w);
+
+					System.out.println("Stereo z = "+p.getLocation().getZ());
+					if( p.getLocation().z < 100 )
+						System.out.println("   * ");
 				}
 			}
 
@@ -116,9 +122,23 @@ public class PixelDepthVoEpipolar<T extends ImageBase> {
 
 			hasSignificantChange = false;
 
+			checkForReallyCloseTrack();
+
 			return foundMotion;
 		} else {
+
+			checkForReallyCloseTrack();
 			return true;
+		}
+
+
+	}
+
+	private void checkForReallyCloseTrack() {
+		List<PointPoseTrack> tracks = tracker.getPairs();
+		for( PointPoseTrack p : tracks ) {
+			if( p.getLocation().z < 100 )
+				System.out.println("Oh Crap");
 
 		}
 	}
@@ -178,6 +198,8 @@ public class PixelDepthVoEpipolar<T extends ImageBase> {
 
 			triangulate.triangulate(t.currLoc,t.keyLoc,candidateCurrToKey,P);
 			ratio[i] = origZ/P.z;
+
+			System.out.println("  orig z = "+origZ);
 		}
 
 		Arrays.sort(ratio);
@@ -189,8 +211,14 @@ public class PixelDepthVoEpipolar<T extends ImageBase> {
 		GeometryMath_F64.scale(currToKey.getT(),scale);
 
 		for( PointPoseTrack t : good ) {
+			double before = t.getLocation().z;
+
 			GeometryMath_F64.scale(t.getLocation(),scale);
+
+			System.out.printf("Triangulate before = %.5f after z = %.5f\n",before,t.getLocation().getZ());
 		}
+
+		System.out.println("-----------------------");
 
 		return true;
 	}

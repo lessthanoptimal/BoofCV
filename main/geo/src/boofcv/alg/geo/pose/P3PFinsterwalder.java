@@ -159,7 +159,7 @@ public class P3PFinsterwalder implements P3PLineDistance {
 		double inner = a2 / (u*u + v*v - 2*u*v*cos23);
 
 		if( inner >= 0 ) {
-			PointDistance3 s = solutions.pop();
+			PointDistance3 s = solutions.grow();
 			s.dist1 = Math.sqrt(inner);
 			s.dist2 = s.dist1*u;
 			s.dist3 = s.dist1*v;

@@ -71,10 +71,16 @@ public class FastQueue<T> {
 		return list;
 	}
 
-	public void removeTail() {
-		if( size > 0 )
+	/**
+	 * Shrinks the size of the array by one and returns the element stored at the former last element.
+	 *
+	 * @return The last element in the list that was removed.
+	 */
+	public T removeTail() {
+		if( size > 0 ) {
 			size--;
-		else
+			return data[size];
+		} else
 			throw new IllegalArgumentException("Size is already zero");
 	}
 
@@ -111,7 +117,7 @@ public class FastQueue<T> {
 	 *
 	 * @return A new instance.
 	 */
-	public T pop() {
+	public T grow() {
 		if( size < data.length ) {
 			return data[size++];
 		} else {

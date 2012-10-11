@@ -274,7 +274,7 @@ public class RefineCornerSegmentFit {
 		for( int y = 0; y < height; y++ ) {
 			for( int x = 0; x < width; x++ ) {
 				if( binary.get(x,y) == 1 ) {
-					PointInfo p = points.pop();
+					PointInfo p = points.grow();
 					p.set(x,y);
 					double v = image.get(x,y);
 					// weight pixels more that are close to the middle value since only an

@@ -66,7 +66,7 @@ public class TestCalibPoseAndPointResiduals {
 			for( int i = 0; i < numPoints; i++ ) {
 				SePointOps_F64.transform(m,model.getPoint(i),cameraPt);
 				
-				PointIndexObservation o = v.getPoints().pop();
+				PointIndexObservation o = v.getPoints().grow();
 				o.pointIndex = i;
 				o.obs = new Point2D_F64();
 				o.obs.x = cameraPt.x/cameraPt.z;

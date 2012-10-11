@@ -112,11 +112,11 @@ public class TestRelinearlize {
 		// using the provided beta compute the world points
 		// this way the constraint matrix will be consistent
 		FastQueue<Point3D_F64> worldPts = new FastQueue<Point3D_F64>(4,Point3D_F64.class,true);
-		worldPts.pop().set(1,0,0);
-		worldPts.pop().set(0,1,0);
-		worldPts.pop().set(0,0,1);
+		worldPts.grow().set(1,0,0);
+		worldPts.grow().set(0,1,0);
+		worldPts.grow().set(0,0,1);
 		if( numControl == 4 )
-			worldPts.pop().set(0, 0, 0);
+			worldPts.grow().set(0, 0, 0);
 
 		if( numControl == 4 )
 			UtilLepetitEPnP.constraintMatrix6x10(L_full,y,worldPts,nullPts);

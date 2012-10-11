@@ -75,7 +75,7 @@ public class RefineCornerCanny {
 			for( Point2D_I32 p : l ) {
 //				binary.set(p.x,p.y,1);
 				all.add(p);
-				points.pop().set(p.x,p.y);
+				points.grow().set(p.x,p.y);
 			}
 
 //		UtilImageIO.print(image);

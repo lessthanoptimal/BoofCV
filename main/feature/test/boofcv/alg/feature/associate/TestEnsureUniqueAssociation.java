@@ -34,11 +34,11 @@ public class TestEnsureUniqueAssociation {
 
 		FastQueue<AssociatedIndex> matches = new FastQueue<AssociatedIndex>(10,AssociatedIndex.class,true);
 
-		matches.pop().setAssociation(0,1,10);
-		matches.pop().setAssociation(1,0,20);
-		matches.pop().setAssociation(2,2,30);
+		matches.grow().setAssociation(0,1,10);
+		matches.grow().setAssociation(1,0,20);
+		matches.grow().setAssociation(2,2,30);
 		// add a duplicate dst
-		matches.pop().setAssociation(3,1,5);
+		matches.grow().setAssociation(3,1,5);
 
 		EnsureUniqueAssociation alg = new EnsureUniqueAssociation();
 

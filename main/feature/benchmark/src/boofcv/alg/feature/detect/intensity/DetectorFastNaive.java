@@ -95,7 +95,7 @@ public class DetectorFastNaive {
 				}
 
 				if( isCorner ) {
-					candidates.pop().set(x,y);
+					candidates.grow().set(x,y);
 				}
 			}
 		}

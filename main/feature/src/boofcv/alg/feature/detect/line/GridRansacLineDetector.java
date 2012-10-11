@@ -148,7 +148,7 @@ public class GridRansacLineDetector {
 
 			for( int x = 0; x < regionSize; x++ ) {
 				if( binaryEdges.data[index++] != 0 ) {
-					Edgel e = edgels.pop();
+					Edgel e = edgels.grow();
 					int xx = x0+x;
 					int yy = y0+y;
 

@@ -79,9 +79,9 @@ public class PstWrapperPixelNcc<I extends ImageSingleBand>
 			Point2D_F64 p = detector.getLocation(i);
 
 			if( alg.isInBounds((int) p.x, (int) p.y) ) {
-				alg.process((int)p.x,(int)p.y,description.pop());
+				alg.process((int)p.x,(int)p.y,description.grow());
 
-				location.pop().set(p.x, p.y);
+				location.grow().set(p.x, p.y);
 			}
 		}
 	}

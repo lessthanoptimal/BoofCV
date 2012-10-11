@@ -87,6 +87,46 @@ public class MultiViewOps {
 
 	/**
 	 * <p>
+	 * Creates a trifocal tensor from two rigid body motions.  This is for the calibrated camera case.
+	 * </p>
+	 *
+	 * <p>
+	 * NOTE: View 1 is the world coordinate system.
+	 * </p>
+	 *
+	 * @param P2 Transform from view 1 to view 2.
+	 * @param P3 Transform from view 1 to view 3.
+	 * @param ret Storage for trifocal tensor.  If null a new instance will be created.
+	 * @return The trifocal tensor
+	 */
+	public static TrifocalTensor createTrifocal( Se3_F64 P2 , Se3_F64 P3 , TrifocalTensor ret ) {
+		if( ret == null )
+			ret = new TrifocalTensor();
+
+		DenseMatrix64F R2 = P2.getR();
+		DenseMatrix64F R3 = P3.getR();
+		Vector3D_F64 T2 = P2.getT();
+		Vector3D_F64 T3 = P3.getT();
+
+		for( int col = 0; col < 3; col++ ) {
+			DenseMatrix64F T = ret.getT(col);
+
+			int index = 0;
+			for( int i = 0; i < 3; i++ ) {
+				double a_left = R2.unsafe_get(i,col);
+				double a_right = T2.getIndex(i);
+
+				for( int j = 0; j < 3; j++ ) {
+					T.data[index++] = a_left*T3.getIndex(j) - a_right*R3.unsafe_get(j,col);
+				}
+			}
+		}
+
+		return ret;
+	}
+
+	/**
+	 * <p>
 	 * Trifocal tensor with line-line-line correspondence:<br>
 	 * (l2<sup>T</sup>*[T1,T2,T3]*L2)*[l1]<sub>x</sub> = 0
 	 * </p>
@@ -285,25 +325,46 @@ public class MultiViewOps {
 	/**
 	 * Computes the homography induced from view 1 to 3 by a line in view 2.
 	 *
+	 * p3 = H13*p1
+	 *
 	 * @param tensor Input: Trifocal tensor
-	 * @param line Input: Line in view 2.  {@link LineGeneral2D_F64 General notation}.
+	 * @param line2 Input: Line in view 2.  {@link LineGeneral2D_F64 General notation}.
 	 * @param output Output: Optional storage for homography. 3x3 matrix
 	 * @return Homography from view 1 to 3
 	 */
 	public static DenseMatrix64F inducedHomography13( TrifocalTensor tensor ,
-													  Vector3D_F64 line ,
+													  Vector3D_F64 line2 ,
 													  DenseMatrix64F output ) {
 		if( output == null )
 			output = new DenseMatrix64F(3,3);
 
-		Vector3D_F64 temp = new Vector3D_F64();
+		DenseMatrix64F T = tensor.T1;
 
-		for( int i = 0; i < 3; i++ ) {
-			GeometryMath_F64.multTran(tensor.getT(i),line,temp);
-			output.unsafe_set(0,i,temp.x);
-			output.unsafe_set(1,i,temp.y);
-			output.unsafe_set(2,i,temp.z);
-		}
+		// H(:,0) = transpose(T1)*line
+		output.data[0] = T.data[0]*line2.x + T.data[3]*line2.y + T.data[6]*line2.z;
+		output.data[3] = T.data[1]*line2.x + T.data[4]*line2.y + T.data[7]*line2.z;
+		output.data[6] = T.data[2]*line2.x + T.data[5]*line2.y + T.data[8]*line2.z;
+
+		// H(:,1) = transpose(T2)*line
+		T = tensor.T2;
+		output.data[1] = T.data[0]*line2.x + T.data[3]*line2.y + T.data[6]*line2.z;
+		output.data[4] = T.data[1]*line2.x + T.data[4]*line2.y + T.data[7]*line2.z;
+		output.data[7] = T.data[2]*line2.x + T.data[5]*line2.y + T.data[8]*line2.z;
+
+		// H(:,2) = transpose(T3)*line
+		T = tensor.T3;
+		output.data[2] = T.data[0]*line2.x + T.data[3]*line2.y + T.data[6]*line2.z;
+		output.data[5] = T.data[1]*line2.x + T.data[4]*line2.y + T.data[7]*line2.z;
+		output.data[8] = T.data[2]*line2.x + T.data[5]*line2.y + T.data[8]*line2.z;
+
+//		Vector3D_F64 temp = new Vector3D_F64();
+//
+//		for( int i = 0; i < 3; i++ ) {
+//			GeometryMath_F64.multTran(tensor.getT(i),line,temp);
+//			output.unsafe_set(0,i,temp.x);
+//			output.unsafe_set(1,i,temp.y);
+//			output.unsafe_set(2,i,temp.z);
+//		}
 
 		return output;
 	}
@@ -311,25 +372,45 @@ public class MultiViewOps {
 	/**
 	 * Computes the homography induced from view 1 to 2 by a line in view 3.
 	 *
+	 * p2 = H12*p1
+	 *
 	 * @param tensor Input: Trifocal tensor
-	 * @param line Input: Line in view 3.  {@link LineGeneral2D_F64 General notation}.
+	 * @param line3 Input: Line in view 3.  {@link LineGeneral2D_F64 General notation}.
 	 * @param output Output: Optional storage for homography. 3x3 matrix
 	 * @return Homography from view 1 to 2
 	 */
 	public static DenseMatrix64F inducedHomography12( TrifocalTensor tensor ,
-													  Vector3D_F64 line ,
+													  Vector3D_F64 line3 ,
 													  DenseMatrix64F output ) {
 		if( output == null )
 			output = new DenseMatrix64F(3,3);
 
-		Vector3D_F64 temp = new Vector3D_F64();
+		// H(:,0) = T1*line
+		DenseMatrix64F T = tensor.T1;
+		output.data[0] = T.data[0]*line3.x + T.data[1]*line3.y + T.data[2]*line3.z;
+		output.data[3] = T.data[3]*line3.x + T.data[4]*line3.y + T.data[5]*line3.z;
+		output.data[6] = T.data[6]*line3.x + T.data[7]*line3.y + T.data[8]*line3.z;
 
-		for( int i = 0; i < 3; i++ ) {
-			GeometryMath_F64.mult(tensor.getT(i), line, temp);
-			output.unsafe_set(0,i,temp.x);
-			output.unsafe_set(1,i,temp.y);
-			output.unsafe_set(2,i,temp.z);
-		}
+		// H(:,0) = T2*line
+		T = tensor.T2;
+		output.data[1] = T.data[0]*line3.x + T.data[1]*line3.y + T.data[2]*line3.z;
+		output.data[4] = T.data[3]*line3.x + T.data[4]*line3.y + T.data[5]*line3.z;
+		output.data[7] = T.data[6]*line3.x + T.data[7]*line3.y + T.data[8]*line3.z;
+
+		// H(:,0) = T3*line
+		T = tensor.T3;
+		output.data[2] = T.data[0]*line3.x + T.data[1]*line3.y + T.data[2]*line3.z;
+		output.data[5] = T.data[3]*line3.x + T.data[4]*line3.y + T.data[5]*line3.z;
+		output.data[8] = T.data[6]*line3.x + T.data[7]*line3.y + T.data[8]*line3.z;
+
+//		Vector3D_F64 temp = new Vector3D_F64();
+//
+//		for( int i = 0; i < 3; i++ ) {
+//			GeometryMath_F64.mult(tensor.getT(i), line, temp);
+//			output.unsafe_set(0,i,temp.x);
+//			output.unsafe_set(1,i,temp.y);
+//			output.unsafe_set(2,i,temp.z);
+//		}
 
 		return output;
 	}

@@ -150,7 +150,7 @@ public class FundamentalLinear7 extends FundamentalLinear {
 			if( !c.isReal() && Math.abs(c.imaginary) > 1e-10 )
 				continue;
 
-			DenseMatrix64F F = solutions.pop();
+			DenseMatrix64F F = solutions.grow();
 
 			double a = c.real;
 			double b = 1-c.real;

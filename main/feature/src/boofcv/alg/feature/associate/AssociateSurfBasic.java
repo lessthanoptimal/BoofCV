@@ -86,7 +86,7 @@ public class AssociateSurfBasic {
 			AssociatedIndex a = m.data[i];
 			int globalSrcIndex = srcPositive.data[a.src].index;
 			int globalDstIndex = dstPositive.data[a.dst].index;
-			matches.pop().setAssociation(globalSrcIndex,globalDstIndex,a.fitScore);
+			matches.grow().setAssociation(globalSrcIndex,globalDstIndex,a.fitScore);
 		}
 		assoc.associate((FastQueue)srcNegative,(FastQueue)dstNegative);
 		m = assoc.getMatches();
@@ -94,7 +94,7 @@ public class AssociateSurfBasic {
 			AssociatedIndex a = m.data[i];
 			int globalSrcIndex = srcNegative.data[a.src].index;
 			int globalDstIndex = dstNegative.data[a.dst].index;
-			matches.pop().setAssociation(globalSrcIndex,globalDstIndex,a.fitScore);
+			matches.grow().setAssociation(globalSrcIndex,globalDstIndex,a.fitScore);
 		}
 	}
 
@@ -118,9 +118,9 @@ public class AssociateSurfBasic {
 		for( int i = 0; i < input.size; i++ ) {
 			SurfFeature f = input.get(i);
 			if( f.laplacianPositive ) {
-				pos.pop().wrap(f,i);
+				pos.grow().wrap(f,i);
 			} else {
-				neg.pop().wrap(f,i);
+				neg.grow().wrap(f,i);
 			}
 		}
 	}

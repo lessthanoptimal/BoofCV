@@ -133,7 +133,7 @@ public class HoughTransformLineFootOfNorm {
 
 			if( Math.abs(x0) >= minDistanceFromOrigin ||
 					Math.abs(y0) >= minDistanceFromOrigin ) {
-				LineParametric2D_F32 l = lines.pop();
+				LineParametric2D_F32 l = lines.grow();
 				l.p.set(p.x,p.y);
 				l.slope.set(-y0,x0);
 				foundIntensity.push(transform.get(p.x,p.y));
