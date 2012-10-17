@@ -28,6 +28,7 @@ public enum EnumPNP {
 	 * <ul>
 	 *     <li> Minimal 3-point solution
 	 *     <li> At most 4 solutions.
+	 *     <li> No iteration
 	 * </ul>
 	 *
 	 * @see boofcv.alg.geo.pose.P3PGrunert
@@ -37,6 +38,7 @@ public enum EnumPNP {
 	 * <ul>
 	 *     <li> Minimal 3-point solution
 	 *     <li> At most 4 solutions.
+	 *     <li> No iteration
 	 * </ul>
 	 *
 	 * @see boofcv.alg.geo.pose.P3PFinsterwalder

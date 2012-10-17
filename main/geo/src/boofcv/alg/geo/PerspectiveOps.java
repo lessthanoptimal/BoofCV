@@ -202,24 +202,46 @@ public class PerspectiveOps {
 	 * Convenient function for converting from normalized image coordinates to the original image pixel coordinate.
 	 * If speed is a concern then {@link NormalizedToPixel_F64} should be used instead.
 	 * </p>
+	 *
 	 * <p>
 	 * NOTE: Lens distortion handled!
 	 * </p>
 	 *
-	 * @param K Intrinsic camera calibration matrix
-	 * @param x X-coordinate of normalized.
-	 * @param y Y-coordinate of normalized.
+	 * NOTE: norm and pixel can be the same instance.
+	 *
+	 * @param param Intrinsic camera parameters
+	 * @param norm Normalized image coordinate.
 	 * @param pixel Optional storage for output.  If null a new instance will be declared.
 	 * @return pixel image coordinate
 	 */
-	public static Point2D_F64 convertNormToPixel( DenseMatrix64F K, double x , double y , Point2D_F64 pixel ) {
+	public static Point2D_F64 convertNormToPixel( IntrinsicParameters param , Point2D_F64 norm , Point2D_F64 pixel ) {
+		return convertNormToPixel(param,norm.x,norm.y,pixel);
+	}
+
+	/**
+	 * <p>
+	 * Convenient function for converting from normalized image coordinates to the original image pixel coordinate.
+	 * If speed is a concern then {@link NormalizedToPixel_F64} should be used instead.
+	 * </p>
+	 * <p>
+	 * NOTE: Lens distortion handled!
+	 * </p>
+	 *
+	 * NOTE: norm and pixel can be the same instance.
+	 *
+	 * @param K Intrinsic camera calibration matrix
+	 * @param norm Normalized image coordinate.
+	 * @param pixel Optional storage for output.  If null a new instance will be declared.
+	 * @return pixel image coordinate
+	 */
+	public static Point2D_F64 convertNormToPixel( DenseMatrix64F K, Point2D_F64 norm , Point2D_F64 pixel ) {
 		if( pixel == null )
 			pixel = new Point2D_F64();
 
 		NormalizedToPixel_F64 alg = new NormalizedToPixel_F64();
 		alg.set(K.get(0,0),K.get(1,1),K.get(0,1),K.get(0,2),K.get(1,2));
 
-		alg.compute(x,y,pixel);
+		alg.compute(norm.x,norm.y,pixel);
 
 		return pixel;
 	}
@@ -233,20 +255,21 @@ public class PerspectiveOps {
 	 * NOTE: Lens distortion is not removed!
 	 * </p>
 	 *
+	 * NOTE: norm and pixel can be the same instance.
+	 *
 	 * @param param Intrinsic camera parameters
-	 * @param x X-coordinate of image pixel.
-	 * @param y Y-coordinate of image pixel.
+	 * @param pixel Pixel coordinate
 	 * @param norm Optional storage for output.  If null a new instance will be declared.
 	 * @return normalized image coordinate
 	 */
-	public static Point2D_F64 convertPixelToNorm( IntrinsicParameters param , double x , double y , Point2D_F64 norm ) {
+	public static Point2D_F64 convertPixelToNorm( IntrinsicParameters param , Point2D_F64 pixel , Point2D_F64 norm ) {
 		if( norm == null )
 			norm = new Point2D_F64();
 
 		PixelToNormalized_F64 alg = new PixelToNormalized_F64();
 		alg.set(param.fx,param.fy,param.skew,param.cx,param.cy);
 
-		alg.compute(x,y,norm);
+		alg.compute(pixel.x,pixel.y,norm);
 
 		return norm;
 	}
@@ -257,20 +280,21 @@ public class PerspectiveOps {
 	 * If speed is a concern then {@link PixelToNormalized_F64} should be used instead.
 	 * </p>
 	 *
+	 * NOTE: norm and pixel can be the same instance.
+	 *
 	 * @param K Intrinsic camera calibration matrix
-	 * @param x X-coordinate of image pixel.
-	 * @param y Y-coordinate of image pixel.
+	 * @param pixel Pixel coordinate.
 	 * @param norm Optional storage for output.  If null a new instance will be declared.
 	 * @return normalized image coordinate
 	 */
-	public static Point2D_F64 convertPixelToNorm( DenseMatrix64F K , double x , double y , Point2D_F64 norm ) {
+	public static Point2D_F64 convertPixelToNorm( DenseMatrix64F K , Point2D_F64 pixel , Point2D_F64 norm ) {
 		if( norm == null )
 			norm = new Point2D_F64();
 
 		PixelToNormalized_F64 alg = new PixelToNormalized_F64();
 		alg.set(K.get(0,0),K.get(1,1),K.get(0,1),K.get(0,2),K.get(1,2));
 
-		alg.compute(x,y,norm);
+		alg.compute(pixel.x,pixel.y,norm);
 
 		return norm;
 	}

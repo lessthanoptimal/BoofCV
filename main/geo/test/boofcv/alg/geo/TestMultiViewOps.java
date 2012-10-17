@@ -439,6 +439,20 @@ public class TestMultiViewOps {
 	}
 
 	@Test
+	public void computeFundamental2() {
+		DenseMatrix64F K2 = new DenseMatrix64F(3,3,true,80,0.02,190,0,30,170,0,0,1);
+
+		DenseMatrix64F E = MultiViewOps.createEssential(worldToCam2.R, worldToCam2.T);
+		DenseMatrix64F F = MultiViewOps.createFundamental(E, K,K2);
+
+		Point3D_F64 X = new Point3D_F64(0.1,-0.1,2.5);
+		Point2D_F64 p1 = PerspectiveOps.renderPixel(new Se3_F64(),K,X);
+		Point2D_F64 p2 = PerspectiveOps.renderPixel(worldToCam2,K2,X);
+
+		assertEquals(0,MultiViewOps.constraint(F,p1,p2),1e-8);
+	}
+
+	@Test
 	public void createHomography_calibrated() {
 		DenseMatrix64F R = RotationMatrixGenerator.eulerXYZ(0.1,-0.01,0.2, null);
 		Vector3D_F64 T = new Vector3D_F64(1,1,0.1);

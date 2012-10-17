@@ -139,7 +139,7 @@ public class ExampleImageStitching {
 
 			// extract the description and save the results into the provided description
 			if( describe.isInBounds(p.x,p.y,yaw,scale) ) {
-				describe.process(p.x, p.y, yaw, scale, listDescs.pop());
+				describe.process(p.x, p.y, yaw, scale, listDescs.grow());
 				points.add(p.copy());
 			}
 		}

@@ -31,8 +31,7 @@ import org.ejml.data.DenseMatrix64F;
 import org.ejml.ops.CommonOps;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * @author Peter Abeles
@@ -150,6 +149,11 @@ public class TestLensDistortionOps {
 
 		assertEquals(norm.x,found.x,1e-8);
 		assertEquals(norm.y,found.y,1e-8);
+	}
+
+	@Test
+	public void transformRadialToPixel_F64() {
+		fail("IMplement");
 	}
 
 	@Test

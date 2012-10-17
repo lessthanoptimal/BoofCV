@@ -140,7 +140,7 @@ public class DescribeEvaluator<T extends ImageSingleBand, D extends TupleDesc>
 			theta[i] = orientationAlg.compute(p.x,p.y);
 
 			if( extract.isInBounds(p.x,p.y,theta[i],1) ) {
-				extract.process(p.x,p.y,theta[i],1,initial.pop());
+				extract.process(p.x,p.y,theta[i],1,initial.grow());
 				initList.add(initial.getTail());
 				initIndexes[initial.size()-1] = i;
 			} else {
@@ -167,7 +167,7 @@ public class DescribeEvaluator<T extends ImageSingleBand, D extends TupleDesc>
 
 			// extract the description
 			if( extract.isInBounds(p.x, p.y, ang, scale) ) {
-				extract.process(p.x,p.y,ang,scale,current.pop());
+				extract.process(p.x,p.y,ang,scale,current.grow());
 				currentList.add(current.getTail());
 				currentIndexes[current.size()-1] = i;
 			} else {

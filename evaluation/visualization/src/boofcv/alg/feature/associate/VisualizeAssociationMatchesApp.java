@@ -231,7 +231,7 @@ public class VisualizeAssociationMatchesApp<T extends ImageSingleBand, D extends
 				}
 
 				if (describe.isInBounds(pt.x, pt.y, yaw, scale)) {
-					describe.process(pt.x, pt.y, yaw, scale, descs.pop());
+					describe.process(pt.x, pt.y, yaw, scale, descs.grow());
 					locs.add(pt.copy());
 				}
 			}
@@ -248,7 +248,7 @@ public class VisualizeAssociationMatchesApp<T extends ImageSingleBand, D extends
 				TupleDesc d = describe.createDescription();
 
 				if (describe.isInBounds(pt.x, pt.y, yaw, 1)) {
-					describe.process(pt.x, pt.y, yaw, 1, descs.pop());
+					describe.process(pt.x, pt.y, yaw, 1, descs.grow());
 					locs.add(pt.copy());
 				}
 			}

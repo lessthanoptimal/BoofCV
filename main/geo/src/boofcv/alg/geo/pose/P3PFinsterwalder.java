@@ -156,7 +156,11 @@ public class P3PFinsterwalder implements P3PLineDistance {
 
 	private void computeSolution( double u , double v ) {
 
-		double inner = a2 / (u*u + v*v - 2*u*v*cos23);
+		double bottom = u*u + v*v - 2*u*v*cos23;
+		if( bottom == 0 )
+			return;
+
+		double inner = a2 / bottom;
 
 		if( inner >= 0 ) {
 			PointDistance3 s = solutions.grow();
