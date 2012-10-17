@@ -32,6 +32,10 @@ import java.util.List;
  * NOTE: If a point does not pass the positive depth constraint then a very large error is returned.
  * </p>
  *
+ * <p>
+ * NOTE: The provided transform must be from the key frame into the current frame.
+ * </p>
+ *
  * @author Peter Abeles
  */
 public class DistanceSe3SymmetricSq implements DistanceFromModel<Se3_F64,AssociatedPair> {

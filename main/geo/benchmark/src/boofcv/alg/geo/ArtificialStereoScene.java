@@ -83,8 +83,8 @@ public class ArtificialStereoScene {
 			observationPose.add( new PointPosePair(pair.currLoc,p1));
 
 			if( isPixels ) {
-				PerspectiveOps.convertNormToPixel(K,pair.keyLoc.x,pair.keyLoc.y,pair.keyLoc);
-				PerspectiveOps.convertNormToPixel(K,pair.currLoc.x,pair.currLoc.y,pair.currLoc);
+				PerspectiveOps.convertNormToPixel(K,pair.keyLoc,pair.keyLoc);
+				PerspectiveOps.convertNormToPixel(K,pair.currLoc,pair.currLoc);
 			}
 		}
 	}
@@ -94,8 +94,8 @@ public class ArtificialStereoScene {
 		for( AssociatedPair p : pairs ) {
 
 			if( !isPixels ) {
-				PerspectiveOps.convertNormToPixel(K, p.keyLoc.x, p.keyLoc.y, p.keyLoc);
-				PerspectiveOps.convertNormToPixel(K, p.currLoc.x, p.currLoc.y, p.currLoc);
+				PerspectiveOps.convertNormToPixel(K, p.keyLoc, p.keyLoc);
+				PerspectiveOps.convertNormToPixel(K, p.currLoc, p.currLoc);
 			}
 
 			p.currLoc.x += rand.nextGaussian()*noiseSigma;
@@ -105,8 +105,8 @@ public class ArtificialStereoScene {
 			p.keyLoc.y += rand.nextGaussian()*noiseSigma;
 
 			if( !isPixels ) {
-				PerspectiveOps.convertPixelToNorm(K, p.keyLoc.x, p.keyLoc.y, p.keyLoc);
-				PerspectiveOps.convertPixelToNorm(K, p.currLoc.x, p.currLoc.y, p.currLoc);
+				PerspectiveOps.convertPixelToNorm(K, p.keyLoc, p.keyLoc);
+				PerspectiveOps.convertPixelToNorm(K, p.currLoc, p.currLoc);
 			}
 		}
 

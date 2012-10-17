@@ -50,7 +50,7 @@ public class DisplayMonoPath extends JPanel {
 			if( Math.abs(p.z) > max ) {
 				max = Math.abs(p.z);
 			}
-			Point3D_F64 q = points.pop();
+			Point3D_F64 q = points.grow();
 			q.set(p);
 		}
 	}
@@ -65,7 +65,7 @@ public class DisplayMonoPath extends JPanel {
 		if( Math.abs(p.z) > max ) {
 			max = Math.abs(p.z);
 		}
-		Point3D_F64 q = points.pop();
+		Point3D_F64 q = points.grow();
 		q.set(p.x,p.y,p.z);
 	}
 

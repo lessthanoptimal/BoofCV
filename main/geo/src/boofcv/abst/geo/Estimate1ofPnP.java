@@ -23,11 +23,14 @@ import boofcv.struct.geo.PointPosePair;
 import georegression.struct.se.Se3_F64;
 
 /**
+ * <p>
  * Marker interface for computing one solution to the Perspective N-Point (PnP) problem.  Given a set of point
  * observations from a single view and the known 3D location of the points being observed, estimate the camera
  * location.  All observations must be in calibrated image coordinates.
- *
+ * </p>
+ * <p>
  * Estimated motion is from the world frame into the camera frame.
+ * </p>
  *
  * @author Peter Abeles
  */

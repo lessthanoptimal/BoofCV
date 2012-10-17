@@ -234,7 +234,9 @@ public class VisualizeStereoVisualOdometry implements MouseListener
 
 		MediaManager media = DefaultMediaManager.INSTANCE;
 
-		StereoParameters stereoParam = BoofMiscOps.loadXML("stereo.xml");
+		StereoParameters stereoParam = BoofMiscOps.loadXML(
+				"../../boofcv/data/applet/calibration/stereo/Bumblebee2_Chess/stereo.xml"
+		);
 
 		String fileLeft = "/home/pja/temp/left.mjpeg";
 		String fileRight = "/home/pja/temp/right.mjpeg";
@@ -244,7 +246,7 @@ public class VisualizeStereoVisualOdometry implements MouseListener
 		SimpleImageSequence<ImageFloat32> videoLeft =
 				new XugglerSimplified<ImageFloat32>(fileLeft, ImageFloat32.class);
 		SimpleImageSequence<ImageFloat32> videoRight =
-				new XugglerSimplified<ImageFloat32>(fileLeft, ImageFloat32.class);
+				new XugglerSimplified<ImageFloat32>(fileRight, ImageFloat32.class);
 
 //		SimpleImageSequence<ImageFloat32> videoLeft =
 //				new MjpegStreamSequence<ImageFloat32>(fileLeft,ImageFloat32.class);

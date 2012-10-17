@@ -566,6 +566,8 @@ public class MultiViewOps {
 	/**
 	 * Computes a Fundamental matrix given an Essential matrix and the camera calibration matrix.
 	 *
+	 * F = (K<sup>-1</sup>)<sup>T</sup>*E*K<sup>-1</sup>
+	 *
 	 * @param E Essential matrix
 	 * @param K Intrinsic camera calibration matrix
 	 * @return Fundamental matrix
@@ -579,6 +581,32 @@ public class MultiViewOps {
 
 		CommonOps.multTransA(K_inv,E,temp);
 		CommonOps.mult(temp,K_inv,F);
+
+		return F;
+	}
+
+	/**
+	 * Computes a Fundamental matrix given an Essential matrix and the camera calibration matrix.
+	 *
+	 * F = (K2<sup>-1</sup>)<sup>T</sup>*E*K1<sup>-1</sup>
+	 *
+	 * @param E Essential matrix
+	 * @param K1 Intrinsic camera calibration matrix for camera 1
+	 * @param K2 Intrinsic camera calibration matrix for camera 2
+	 * @return Fundamental matrix
+	 */
+	public static DenseMatrix64F createFundamental(DenseMatrix64F E,
+												   DenseMatrix64F K1,  DenseMatrix64F K2) {
+		DenseMatrix64F K1_inv = new DenseMatrix64F(3,3);
+		CommonOps.invert(K1,K1_inv);
+		DenseMatrix64F K2_inv = new DenseMatrix64F(3,3);
+		CommonOps.invert(K2,K2_inv);
+
+		DenseMatrix64F F = new DenseMatrix64F(3,3);
+		DenseMatrix64F temp = new DenseMatrix64F(3,3);
+
+		CommonOps.multTransA(K2_inv,E,temp);
+		CommonOps.mult(temp,K1_inv,F);
 
 		return F;
 	}

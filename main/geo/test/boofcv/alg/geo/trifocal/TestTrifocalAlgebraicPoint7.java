@@ -31,6 +31,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
@@ -97,6 +98,8 @@ public class TestTrifocalAlgebraicPoint7 extends CommonTrifocalChecks {
 		// noise.
 
 		double a = computeError(found, noisyObs);
+
+		fail("use translated thingy");
 	}
 
 	public double computeError( TrifocalTensor tensor , List<AssociatedTriple> observations ) {

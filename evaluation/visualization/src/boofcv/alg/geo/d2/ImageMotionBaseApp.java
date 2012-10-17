@@ -441,7 +441,7 @@ public abstract class ImageMotionBaseApp<I extends ImageSingleBand, D extends Im
 
 			if( list != null ) {
 				for( AssociatedPair p : list ) {
-					inliers.pop().set((float)p.currLoc.x,(float)p.currLoc.y);
+					inliers.grow().set((float)p.currLoc.x,(float)p.currLoc.y);
 				}
 			}
 		}
@@ -451,7 +451,7 @@ public abstract class ImageMotionBaseApp<I extends ImageSingleBand, D extends Im
 
 			if( list != null ) {
 				for( PointTrack p : list ) {
-					allTracks.pop().set((float)p.x,(float)p.y);
+					allTracks.grow().set((float)p.x,(float)p.y);
 				}
 			}
 		}

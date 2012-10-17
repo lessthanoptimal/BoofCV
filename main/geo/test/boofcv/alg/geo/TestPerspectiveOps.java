@@ -168,7 +168,7 @@ public class TestPerspectiveOps {
 
 		GeometryMath_F64.mult(K,norm,expected);
 
-		Point2D_F64 found = PerspectiveOps.convertNormToPixel(K,norm.x,norm.y,null);
+		Point2D_F64 found = PerspectiveOps.convertNormToPixel(K,norm,null);
 
 		assertEquals(expected.x,found.x,1e-8);
 		assertEquals(expected.y,found.y,1e-8);
@@ -187,7 +187,7 @@ public class TestPerspectiveOps {
 
 		GeometryMath_F64.mult(K_inv,pixel,expected);
 
-		Point2D_F64 found = PerspectiveOps.convertPixelToNorm(intrinsic,pixel.x,pixel.y,null);
+		Point2D_F64 found = PerspectiveOps.convertPixelToNorm(intrinsic,pixel,null);
 
 		assertEquals(expected.x, found.x, 1e-8);
 		assertEquals(expected.y, found.y, 1e-8);
@@ -204,7 +204,7 @@ public class TestPerspectiveOps {
 
 		GeometryMath_F64.mult(K_inv,pixel,expected);
 
-		Point2D_F64 found = PerspectiveOps.convertPixelToNorm(K,pixel.x,pixel.y,null);
+		Point2D_F64 found = PerspectiveOps.convertPixelToNorm(K,pixel,null);
 
 		assertEquals(expected.x, found.x, 1e-8);
 		assertEquals(expected.y, found.y, 1e-8);

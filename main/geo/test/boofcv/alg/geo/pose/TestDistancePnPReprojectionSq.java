@@ -63,7 +63,7 @@ public class TestDistancePnPReprojectionSq {
 		observed.y += deltaY;
 
 		// convert to normalized image coordinates
-		PerspectiveOps.convertPixelToNorm(K,observed.x,observed.y,observed);
+		PerspectiveOps.convertPixelToNorm(K,observed,observed);
 
 		DistancePnPReprojectionSq alg = new DistancePnPReprojectionSq(K.get(0,0),K.get(1,1),K.get(0,1));
 		alg.setModel(worldToCamera);
@@ -124,7 +124,7 @@ public class TestDistancePnPReprojectionSq {
 			observed.y += deltaY;
 
 			// convert to normalized image coordinates
-			PerspectiveOps.convertPixelToNorm(K,observed.x,observed.y,observed);
+			PerspectiveOps.convertPixelToNorm(K,observed,observed);
 
 			obs.add( new PointPosePair(observed,X));
 

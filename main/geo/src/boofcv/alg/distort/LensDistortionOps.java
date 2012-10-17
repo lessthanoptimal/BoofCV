@@ -152,6 +152,25 @@ public class LensDistortionOps {
 	}
 
 	/**
+	 * Removes radial distortion from the pixel coordinate.
+	 *
+	 * @param param Intrinsic camera parameters
+	 * @return Transformation into undistorted pixel coordinates
+	 */
+	public static PointTransform_F64 transformRadialToPixel_F64( IntrinsicParameters param )
+	{
+		RemoveRadialPtoP_F64 removeRadial = new RemoveRadialPtoP_F64();
+		removeRadial.set(param.fx, param.fy, param.skew, param.cx, param.cy, param.radial);
+
+		if( param.flipY) {
+			PointTransform_F64 flip = new FlipVertical_F64(param.height);
+			return new SequencePointTransform_F64(flip,removeRadial,flip);
+		} else {
+			return removeRadial;
+		}
+	}
+
+	/**
 	 * Converts normalized image coordinates into distorted pixel coordinates.
 	 *
 	 * @param param Intrinsic camera parameters

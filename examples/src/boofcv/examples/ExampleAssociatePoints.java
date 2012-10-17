@@ -123,7 +123,7 @@ public class ExampleAssociatePoints<T extends ImageSingleBand, FD extends TupleD
 
 			// extract the description and save the results into the provided description
 			if( describe.isInBounds(p.x,p.y,yaw,scale)) {
-			   describe.process(p.x, p.y, yaw, scale, descs.pop());
+			   describe.process(p.x, p.y, yaw, scale, descs.grow());
 				points.add(p.copy());
 			}
 		}
