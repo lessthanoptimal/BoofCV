@@ -4,6 +4,7 @@ import boofcv.abst.feature.tracker.KeyFramePointTracker;
 import boofcv.abst.geo.TriangulateTwoViewsCalibrated;
 import boofcv.factory.geo.FactoryTriangulate;
 import boofcv.numerics.fitting.modelset.ModelMatcher;
+import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.image.ImageBase;
 import georegression.geometry.GeometryMath_F64;
@@ -28,7 +29,7 @@ public class PixelDepthVoEpipolar<T extends ImageBase> {
 	// TODO Make relative to the last update or remove?
 	double MIN_PIXEL_CHANGE = 100;
 
-	double TOL_TRIANGULATE = 20*Math.PI/180.0;
+	double TOL_TRIANGULATE = 3*Math.PI/180.0;
 
 	int MIN_TRACKS = 100;
 
@@ -44,7 +45,7 @@ public class PixelDepthVoEpipolar<T extends ImageBase> {
 	// estimate the camera motion up to a scale factor from two sets of point correspondences
 	private ModelMatcher<Se3_F64, AssociatedPair> motionEstimator;
 
-	SelectTriangulationPoints selectScalePoints = new SelectTriangulationPoints();
+	ComputeObservationAcuteAngle selectScalePoints = new ComputeObservationAcuteAngle();
 
 	Se3_F64 keyToWorld = new Se3_F64();
 	Se3_F64 currToKey = new Se3_F64();
@@ -66,6 +67,10 @@ public class PixelDepthVoEpipolar<T extends ImageBase> {
 		this.pixelTo3D = pixelTo3D;
 		this.tracker = tracker;
 		this.triangulate = triangulate;
+	}
+
+	public void setCalibration( StereoParameters config ) {
+
 	}
 
 	public void reset() {
@@ -109,9 +114,9 @@ public class PixelDepthVoEpipolar<T extends ImageBase> {
 					double w = pixelTo3D.getW();
 					p.getLocation().set( pixelTo3D.getX()/w , pixelTo3D.getY()/w, pixelTo3D.getZ()/w);
 
-					System.out.println("Stereo z = "+p.getLocation().getZ());
-					if( p.getLocation().z < 100 )
-						System.out.println("   * ");
+//					System.out.println("Stereo z = "+p.getLocation().getZ());
+//					if( p.getLocation().z < 100 )
+//						System.out.println("   * ");
 				}
 			}
 
@@ -199,7 +204,7 @@ public class PixelDepthVoEpipolar<T extends ImageBase> {
 			triangulate.triangulate(t.currLoc,t.keyLoc,candidateCurrToKey,P);
 			ratio[i] = origZ/P.z;
 
-			System.out.println("  orig z = "+origZ);
+//			System.out.println("  orig z = "+origZ);
 		}
 
 		Arrays.sort(ratio);
@@ -211,14 +216,14 @@ public class PixelDepthVoEpipolar<T extends ImageBase> {
 		GeometryMath_F64.scale(currToKey.getT(),scale);
 
 		for( PointPoseTrack t : good ) {
-			double before = t.getLocation().z;
+//			double before = t.getLocation().z;
 
 			GeometryMath_F64.scale(t.getLocation(),scale);
 
-			System.out.printf("Triangulate before = %.5f after z = %.5f\n",before,t.getLocation().getZ());
+//			System.out.printf("Triangulate before = %.5f after z = %.5f\n",before,t.getLocation().getZ());
 		}
 
-		System.out.println("-----------------------");
+//		System.out.println("-----------------------");
 
 		return true;
 	}

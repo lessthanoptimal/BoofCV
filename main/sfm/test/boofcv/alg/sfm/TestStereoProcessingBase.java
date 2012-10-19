@@ -44,7 +44,8 @@ public class TestStereoProcessingBase {
 		right.set((int)lensRight.x,(int)lensRight.y,200);
 
 		// test the algorithm
-		StereoProcessingBase<ImageUInt8> alg = new StereoProcessingBase<ImageUInt8>(param,ImageUInt8.class);
+		StereoProcessingBase<ImageUInt8> alg = new StereoProcessingBase<ImageUInt8>(ImageUInt8.class);
+		alg.setCalibration(param);
 
 		alg.setImages(left,right);
 		alg.initialize();

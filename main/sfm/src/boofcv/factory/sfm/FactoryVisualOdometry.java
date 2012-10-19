@@ -7,7 +7,7 @@ import boofcv.abst.geo.Estimate1ofEpipolar;
 import boofcv.abst.geo.TriangulateTwoViewsCalibrated;
 import boofcv.abst.sfm.StereoVisualOdometry;
 import boofcv.abst.sfm.WrapPixelDepthVoEpipolar;
-import boofcv.alg.distort.LensDistortionOps;
+import boofcv.alg.geo.DistanceModelStereoPixels;
 import boofcv.alg.sfm.PixelDepthVoEpipolar;
 import boofcv.alg.sfm.PointPoseTrack;
 import boofcv.alg.sfm.StereoSparse3D;
@@ -16,12 +16,9 @@ import boofcv.alg.sfm.robust.Se3FromEssentialGenerator;
 import boofcv.factory.geo.EnumEpipolar;
 import boofcv.factory.geo.FactoryMultiView;
 import boofcv.factory.geo.FactoryTriangulate;
-import boofcv.numerics.fitting.modelset.DistanceFromModel;
 import boofcv.numerics.fitting.modelset.ModelGenerator;
 import boofcv.numerics.fitting.modelset.ModelMatcher;
 import boofcv.numerics.fitting.modelset.ransac.Ransac;
-import boofcv.struct.calib.StereoParameters;
-import boofcv.struct.distort.PointTransform_F64;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.se.Se3_F64;
@@ -119,7 +116,6 @@ public class FactoryVisualOdometry {
 	public static <T extends ImageSingleBand>
 	StereoVisualOdometry<T> stereoDepth(int minTracks, double inlierPixelTol,
 										ImagePointTracker<T> tracker,
-										StereoParameters stereoParam,
 										StereoDisparitySparse<T> sparseDisparity,
 										Class<T> imageType) {
 
@@ -129,10 +125,8 @@ public class FactoryVisualOdometry {
 		ModelGenerator<Se3_F64, AssociatedPair> generateEpipolarMotion =
 				new Se3FromEssentialGenerator(essentialAlg, triangulate);
 
-		DistanceFromModel<Se3_F64, AssociatedPair> distanceSe3 =
-				new DistanceSe3SymmetricSq(triangulate,
-						stereoParam.left.fx, stereoParam.left.fy, stereoParam.left.skew,
-						stereoParam.left.fx, stereoParam.left.fy, stereoParam.left.skew);
+		DistanceModelStereoPixels<Se3_F64,AssociatedPair> distanceSe3 =
+				new DistanceSe3SymmetricSq(triangulate);
 
 		// 1/2 a pixel tolerance for RANSAC inliers
 		double ransacTOL = inlierPixelTol * inlierPixelTol * 2.0;
@@ -142,17 +136,14 @@ public class FactoryVisualOdometry {
 						200, ransacTOL);
 
 		// Range from sparse disparity
-		StereoSparse3D<T> pixelTo3D = new StereoSparse3D<T>(sparseDisparity,stereoParam,imageType);
-
-		// transform to go from pixel coordinates to normalized coordinates
-		PointTransform_F64 leftPixelToNorm = LensDistortionOps.transformRadialToNorm_F64(stereoParam.left);
+		StereoSparse3D<T> pixelTo3D = new StereoSparse3D<T>(sparseDisparity,imageType);
 
 		// setup the tracker
 		KeyFramePointTracker<T,PointPoseTrack> keyTracker =
-				new KeyFramePointTracker<T,PointPoseTrack>(tracker,leftPixelToNorm,PointPoseTrack.class);
+				new KeyFramePointTracker<T,PointPoseTrack>(tracker,null,PointPoseTrack.class);
 
 		PixelDepthVoEpipolar<T> alg = new PixelDepthVoEpipolar<T>(minTracks,epipolarMotion,pixelTo3D,keyTracker,triangulate);
 
-		return new WrapPixelDepthVoEpipolar<T>(alg,pixelTo3D);
+		return new WrapPixelDepthVoEpipolar<T>(alg,pixelTo3D,keyTracker,distanceSe3,imageType);
 	}
 }

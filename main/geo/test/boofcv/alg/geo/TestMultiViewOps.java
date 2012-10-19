@@ -36,7 +36,8 @@ import org.junit.Test;
 import java.util.List;
 import java.util.Random;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Peter Abeles
@@ -116,23 +117,30 @@ public class TestMultiViewOps {
 	 */
 	@Test
 	public void createTrifocal_SE() {
-		SimpleMatrix P1 = SimpleMatrix.random(3,4,-1,1,rand);
-		SimpleMatrix P2 = SimpleMatrix.random(3,4,-1,1,rand);
 
-		TrifocalTensor found = MultiViewOps.createTrifocal(P1.getMatrix(),P2.getMatrix(),null);
+		TrifocalTensor found = MultiViewOps.createTrifocal(worldToCam2,worldToCam3,null);
+
+		SimpleMatrix R2 = SimpleMatrix.wrap(worldToCam2.getR());
+		SimpleMatrix R3 = SimpleMatrix.wrap(worldToCam3.getR());
+		SimpleMatrix b4 = new SimpleMatrix(3,1);
+		SimpleMatrix a4 = new SimpleMatrix(3,1);
+
+		b4.set(0,worldToCam3.getX());
+		b4.set(1,worldToCam3.getY());
+		b4.set(2,worldToCam3.getZ());
+
+		a4.set(0,worldToCam2.getX());
+		a4.set(1,worldToCam2.getY());
+		a4.set(2,worldToCam2.getZ());
 
 		for( int i = 0; i < 3; i++ ) {
-			SimpleMatrix ai = P1.extractVector(false,i);
-			SimpleMatrix b4 = P2.extractVector(false,3);
-			SimpleMatrix a4 = P1.extractVector(false,3);
-			SimpleMatrix bi = P2.extractVector(false,i);
+			SimpleMatrix ai = R2.extractVector(false, i);
+			SimpleMatrix bi = R3.extractVector(false,i);
 
 			SimpleMatrix expected = ai.mult(b4.transpose()).minus(a4.mult(bi.transpose()));
 
 			assertTrue(MatrixFeatures.isIdentical(expected.getMatrix(),found.getT(i),1e-8));
 		}
-
-		fail("Update for SE motion");
 	}
 
 	@Test

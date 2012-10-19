@@ -18,7 +18,8 @@
 
 package boofcv.alg.geo.pose;
 
-import boofcv.numerics.fitting.modelset.DistanceFromModel;
+import boofcv.alg.geo.DistanceModelMonoPixels;
+import boofcv.alg.geo.NormalizedToPixelError;
 import boofcv.struct.geo.PointPosePair;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
@@ -39,7 +40,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class DistancePnPReprojectionSq implements DistanceFromModel<Se3_F64,PointPosePair> {
+public class DistancePnPReprojectionSq implements DistanceModelMonoPixels<Se3_F64,PointPosePair> {
 
 	// transform from world to camera
 	private Se3_F64 worldToCamera;
@@ -47,10 +48,8 @@ public class DistancePnPReprojectionSq implements DistanceFromModel<Se3_F64,Poin
 	// storage for point in camera frame
 	private Point3D_F64 X = new Point3D_F64();
 
-	// ------- intrinsic camera parameters from calibration matrix
-	private double fx; // focal length x
-	private double fy; // focal length y
-	private double skew; // pixel skew
+	// computes the error in units of pixels
+	private NormalizedToPixelError pixelError;
 
 	/**
 	 * Computes reprojection error in units of normalized image coordinates
@@ -67,9 +66,12 @@ public class DistancePnPReprojectionSq implements DistanceFromModel<Se3_F64,Poin
 	 * @param skew pixel skew
 	 */
 	public DistancePnPReprojectionSq(double fx, double fy, double skew) {
-		this.fx = fx;
-		this.fy = fy;
-		this.skew = skew;
+		setIntrinsic(fx,fy,skew);
+	}
+
+	@Override
+	public void setIntrinsic(double fx, double fy, double skew) {
+		pixelError = new NormalizedToPixelError(fx,fy,skew);
 	}
 
 	@Override
@@ -83,16 +85,12 @@ public class DistancePnPReprojectionSq implements DistanceFromModel<Se3_F64,Poin
 		SePointOps_F64.transform(worldToCamera,pt.location,X);
 
 		// very large error if behind the camera
-		if( X.z < 0 )
+		if( X.z <= 0 )
 			return Double.MAX_VALUE;
 
 		Point2D_F64 p = pt.getObserved();
 
-		double dy = X.y/X.z - p.y;
-		double dx = (X.x/X.z - p.x)*fx + dy*skew;
-		dy *= fy;
-
-		return dx*dx + dy*dy;
+		return pixelError.errorSq(X.x/X.z,X.y/X.z,p.x,p.y);
 	}
 
 	@Override

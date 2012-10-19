@@ -5,6 +5,7 @@ import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.RectifyImageOps;
 import boofcv.alg.geo.rectify.RectifyCalibrated;
 import boofcv.core.image.GeneralizedImageOps;
+import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.se.Se3_F64;
@@ -38,30 +39,38 @@ public class StereoProcessingBase<T extends ImageSingleBand> {
 	protected DenseMatrix64F rectK;
 
 	/**
-	 * Configures stereo processing and computes rectification distortions.
+	 * Declares internal data structures
 	 *
-	 * @param stereoParam Stereo camera parameters
 	 * @param imageType Input image type
 	 */
-	public StereoProcessingBase(StereoParameters stereoParam ,
-								Class<T> imageType ) {
-		// declare storage for rectified images
-		int leftW = stereoParam.getLeft().getWidth();
-		int leftH = stereoParam.getLeft().getHeight();
+	public StereoProcessingBase( Class<T> imageType ) {
 
-		int rightW = stereoParam.getRight().getWidth();
-		int rightH = stereoParam.getRight().getHeight();
+		// predeclare input images
+		imageLeftRect = GeneralizedImageOps.createSingleBand(imageType, 1,1);
+		imageRightRect = GeneralizedImageOps.createSingleBand(imageType,1,1);
 
-		imageLeftRect = GeneralizedImageOps.createSingleBand(imageType, leftW, leftH);
-		imageRightRect = GeneralizedImageOps.createSingleBand(imageType,rightW,rightH);
+	}
+
+	/**
+	 * Specifies stereo parameters
+	 *
+	 * @param stereoParam stereo parameters
+	 */
+	public void setCalibration(StereoParameters stereoParam) {
+		IntrinsicParameters left = stereoParam.getLeft();
+		IntrinsicParameters right = stereoParam.getRight();
+
+		// adjust image size
+		imageLeftRect.reshape(left.getWidth(), left.getHeight());
+		imageRightRect.reshape(right.getWidth(), right.getHeight());
 
 		// compute rectification
 		RectifyCalibrated rectifyAlg = RectifyImageOps.createCalibrated();
 		Se3_F64 leftToRight = stereoParam.getRightToLeft().invert(null);
 
 		// original camera calibration matrices
-		DenseMatrix64F K1 = PerspectiveOps.calibrationMatrix(stereoParam.getLeft(), null);
-		DenseMatrix64F K2 = PerspectiveOps.calibrationMatrix(stereoParam.getRight(), null);
+		DenseMatrix64F K1 = PerspectiveOps.calibrationMatrix(left, null);
+		DenseMatrix64F K2 = PerspectiveOps.calibrationMatrix(right, null);
 
 		rectifyAlg.process(K1,new Se3_F64(),K2,leftToRight);
 
@@ -74,6 +83,7 @@ public class StereoProcessingBase<T extends ImageSingleBand> {
 		// Adjust the rectification to make the view area more useful
 		RectifyImageOps.fullViewLeft(stereoParam.left, rect1, rect2, rectK);
 
+		Class<T> imageType = imageLeftRect.getTypeInfo().getImageClass();
 		distortLeftRect = RectifyImageOps.rectifyImage(stereoParam.left, rect1, imageType);
 		distortRightRect = RectifyImageOps.rectifyImage(stereoParam.right, rect2, imageType);
 	}

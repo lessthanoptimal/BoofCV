@@ -26,7 +26,8 @@ public class TestDistanceSe3SymmetricSq {
 	DistanceSe3SymmetricSq alg;
 	
 	public TestDistanceSe3SymmetricSq() {
-		alg = new DistanceSe3SymmetricSq(triangulate,1,1,0,1,1,0);
+		alg = new DistanceSe3SymmetricSq(triangulate);
+		alg.setIntrinsic(1,1,0,1,1,0);
 	}
 	
 	@Test
@@ -174,8 +175,8 @@ public class TestDistanceSe3SymmetricSq {
 		GeometryMath_F64.mult(K_inv,obsP.keyLoc,obsP.keyLoc);
 		GeometryMath_F64.mult(K2_inv,obsP.currLoc,obsP.currLoc);
 
-		DistanceSe3SymmetricSq alg = new DistanceSe3SymmetricSq(triangulate,
-				K.get(0,0),K.get(1,1),K.get(0,1),
+		DistanceSe3SymmetricSq alg = new DistanceSe3SymmetricSq(triangulate);
+		alg.setIntrinsic(K.get(0,0),K.get(1,1),K.get(0,1),
 				K2.get(0,0),K2.get(1,1),K2.get(0,1));
 		alg.setModel(keyToCurr);
 		assertEquals(error, alg.computeDistance(obsP), 1e-8);
