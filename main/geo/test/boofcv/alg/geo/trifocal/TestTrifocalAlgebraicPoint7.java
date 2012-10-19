@@ -23,15 +23,17 @@ import boofcv.numerics.optimization.FactoryOptimization;
 import boofcv.numerics.optimization.UnconstrainedLeastSquares;
 import boofcv.struct.geo.AssociatedTriple;
 import boofcv.struct.geo.TrifocalTensor;
+import georegression.geometry.GeometryMath_F64;
+import georegression.struct.point.Point2D_F64;
+import georegression.struct.point.Vector3D_F64;
 import org.ejml.data.DenseMatrix64F;
-import org.ejml.ops.SpecializedOps;
 import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
@@ -48,20 +50,19 @@ public class TestTrifocalAlgebraicPoint7 extends CommonTrifocalChecks {
 
 		assertTrue(alg.process(observations, found));
 
-		checkTrifocalWithConstraint(found,1e-8);
+		checkTrifocalWithConstraint(found, 1e-8);
+		checkInducedErrors(found,observations,1e-8);
 	}
 
 	/**
 	 * Give it noisy inputs and see if it produces a better solution than the non-iterative algorithm.
-	 *
-	 * NO TEST IS ACTUALLY PERFORMED HERE.  SEE COMMENTS BELOW.
 	 */
 	@Test
 	public void noisy() {
 		List<AssociatedTriple> noisyObs = new ArrayList<AssociatedTriple>();
 
 		// create a noisy set of observations
-		double noiseLevel = 0.5;
+		double noiseLevel = 0.25;
 		for( AssociatedTriple p : observations ) {
 			AssociatedTriple n = p.copy();
 
@@ -82,39 +83,42 @@ public class TestTrifocalAlgebraicPoint7 extends CommonTrifocalChecks {
 
 		found.normalizeScale();
 
-		// OK I have no idea how to evaluate these noisy results.
-		//
-		// 1) Strictly enforcing geometric constraints can cause an error metrics to get worse because
-		//    the linear model has more degrees of freedom and can fit the data better.  Can't compare it to the
-		//    non-optimized version.
-		// 2) When camera matrices are extracted from the tensor there is an unknown (but common) projective transform
-		//    being applied to them.  This is true even when normalized image coordinate are used.
-		// 2a) Because the projective transform is unknown any error metrics calculated in the distorted image
-		//    will have an unknown magnitude.
-		//
-		// When computing the error using the 3-pt constraint the error values seem very high.  The same test was
-		// performed using matlab code found online and it exhibited the same behavior.  See ValidationBoof project.
-		// So I think this algorithm is correctly implemented, but I have no way of sanity check its sensitivity to
-		// noise.
-
-		double a = computeError(found, noisyObs);
-
-		fail("use translated thingy");
+		// only the induced error is tested since the constraint error has unknown units and is quite large
+		checkInducedErrors(found,noisyObs,2);
 	}
 
-	public double computeError( TrifocalTensor tensor , List<AssociatedTriple> observations ) {
+	/**
+	 * Computes the error using induced homographies.
+	 */
+	public void checkInducedErrors( TrifocalTensor tensor , List<AssociatedTriple> observations , double tol )
+	{
+		for( AssociatedTriple o : observations ) {
 
-		double sum = 0;
+			// homogeneous vector for observations in views 2 and 3
+			Vector3D_F64 obs2 = new Vector3D_F64(o.p2.x,o.p2.y,1);
+			Vector3D_F64 obs3 = new Vector3D_F64(o.p3.x,o.p3.y,1);
 
-		for( int i = 0; i < observations.size(); i++ ) {
-			AssociatedTriple o = observations.get(i);
+			// compute lines which pass through the observations
+			Vector3D_F64 axisY = new Vector3D_F64(0,1,0);
 
-			DenseMatrix64F c = MultiViewOps.constraint(tensor, o.p1, o.p2, o.p3, null);
+			Vector3D_F64 line2 = new Vector3D_F64();
+			Vector3D_F64 line3 = new Vector3D_F64();
 
-			sum += SpecializedOps.elementSumSq(c);
+			GeometryMath_F64.cross(obs2,axisY,line2);
+			GeometryMath_F64.cross(obs3,axisY,line3);
+
+			// compute induced homographies
+			DenseMatrix64F H12 = MultiViewOps.inducedHomography12(tensor,line3,null);
+			DenseMatrix64F H13 = MultiViewOps.inducedHomography13(tensor, line2, null);
+
+			Point2D_F64 induced2 = new Point2D_F64();
+			Point2D_F64 induced3 = new Point2D_F64();
+
+			GeometryMath_F64.mult(H12,o.p1,induced2);
+			GeometryMath_F64.mult(H13,o.p1,induced3);
+
+			assertEquals(0,induced2.distance(o.p2),tol);
+			assertEquals(0,induced3.distance(o.p3),tol);
 		}
-
-		return sum/2.0;
 	}
-
 }

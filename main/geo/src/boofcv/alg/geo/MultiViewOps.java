@@ -323,7 +323,8 @@ public class MultiViewOps {
 
 
 	/**
-	 * Computes the homography induced from view 1 to 3 by a line in view 2.
+	 * Computes the homography induced from view 1 to 3 by a line in view 2.  The provided line in
+	 * view 2 must contain the view 2 observation.
 	 *
 	 * p3 = H13*p1
 	 *
@@ -370,7 +371,8 @@ public class MultiViewOps {
 	}
 
 	/**
-	 * Computes the homography induced from view 1 to 2 by a line in view 3.
+	 * Computes the homography induced from view 1 to 2 by a line in view 3.  The provided line in
+	 * view 3 must contain the view 3 observation.
 	 *
 	 * p2 = H12*p1
 	 *

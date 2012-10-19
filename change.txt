@@ -19,6 +19,8 @@ Version : Alpha 0.11
   * RANSAC score has been deleted and RANSAC simplified
 - RectifyImageOps
   * Cleaned up function names and improved documentation
+- LensDistortionOps
+  * Added transformRadialToPixel_F64()
 - Reorganized functions in geometric vision package
   * Created MultiViewOps and PerspetiveOps
   * Refactored/deleted other related Util classes

@@ -35,14 +35,18 @@ public class StereoSparse3D<T extends ImageSingleBand>
 	private double cx,cy,fx,fy;
 
 	/**
-	 * Configures stereo processing and computes rectification distortions.
+	 * Configures and declares internal data
 	 *
-	 * @param stereoParam Stereo camera parameters
 	 * @param imageType   Input image type
 	 */
-	public StereoSparse3D(StereoDisparitySparse<T> disparity, StereoParameters stereoParam, Class<T> imageType) {
-		super(stereoParam, imageType);
+	public StereoSparse3D(StereoDisparitySparse<T> disparity, Class<T> imageType) {
+		super(imageType);
 		this.disparity = disparity;
+	}
+
+	@Override
+	public void setCalibration(StereoParameters stereoParam) {
+		super.setCalibration(stereoParam);
 
 		leftPixelToRect = RectifyImageOps.transformPixelToRect_F64(stereoParam.left,rect1);
 

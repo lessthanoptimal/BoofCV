@@ -31,7 +31,8 @@ import org.ejml.data.DenseMatrix64F;
 import org.ejml.ops.CommonOps;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Peter Abeles
@@ -153,7 +154,35 @@ public class TestLensDistortionOps {
 
 	@Test
 	public void transformRadialToPixel_F64() {
-		fail("IMplement");
+		transformRadialToPixel_F64(false);
+		transformRadialToPixel_F64(true);
+	}
+
+	private void transformRadialToPixel_F64( boolean flipY ) {
+		IntrinsicParameters param = new IntrinsicParameters(300,320,2,150,130,
+				width,height, flipY, new double[]{0.1,1e-4});
+
+		// Undistorted pixel
+		Point2D_F64 pixel = new Point2D_F64(20,120);
+
+		// Distorted pixel
+		AddRadialPtoP_F64 addRadial = new AddRadialPtoP_F64(param.fx,param.fy,param.skew,param.cx,param.cy,param.radial);
+		Point2D_F64 pixelD = new Point2D_F64();
+
+		if( flipY ) {
+			addRadial.compute(pixel.x,param.height-pixel.y-1,pixelD);
+			pixelD.y = param.height-pixelD.y-1;
+		} else {
+			addRadial.compute(pixel.x,pixel.y,pixelD);
+		}
+
+		// test it
+		PointTransform_F64 alg = LensDistortionOps.transformRadialToPixel_F64(param);
+		Point2D_F64 found = new Point2D_F64();
+		alg.compute(pixelD.x,pixelD.y,found);
+
+		assertEquals(pixel.x,found.x,1e-6);
+		assertEquals(pixel.y,found.y,1e-6);
 	}
 
 	@Test

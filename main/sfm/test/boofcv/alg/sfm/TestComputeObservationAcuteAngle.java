@@ -7,7 +7,7 @@ import static org.junit.Assert.fail;
 /**
  * @author Peter Abeles
  */
-public class TestSelectTriangulationPoints {
+public class TestComputeObservationAcuteAngle {
 
 	@Test
 	public void stuff() {

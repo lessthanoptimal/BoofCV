@@ -6,11 +6,12 @@ import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 
 /**
- * Select points with a favorable geometry for triangulation.
+ * Computes the acute angle between two observations.  The acute angle can be used to determine if two
+ * observations have a favorable geometry for triangulation.
  *
  * @author Peter Abeles
  */
-public class SelectTriangulationPoints {
+public class ComputeObservationAcuteAngle {
 
 	Se3_F64 fromAtoB;
 

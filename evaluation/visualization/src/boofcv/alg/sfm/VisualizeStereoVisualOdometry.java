@@ -238,10 +238,10 @@ public class VisualizeStereoVisualOdometry implements MouseListener
 				"../../boofcv/data/applet/calibration/stereo/Bumblebee2_Chess/stereo.xml"
 		);
 
-		String fileLeft = "/home/pja/temp/left.mjpeg";
-		String fileRight = "/home/pja/temp/right.mjpeg";
-//		String fileLeft = "/home/pja/temp/left_test.avi";
-//		String fileRight = "/home/pja/temp/right_test.avi";
+		String dir = "/mnt/data/datasets/2012/stereo/october/towpath/data01";
+
+		String fileLeft = dir+"/left.avi";
+		String fileRight = dir+"/right.avi";
 
 		SimpleImageSequence<ImageFloat32> videoLeft =
 				new XugglerSimplified<ImageFloat32>(fileLeft, ImageFloat32.class);
@@ -259,12 +259,10 @@ public class VisualizeStereoVisualOdometry implements MouseListener
 		StereoDisparitySparse<ImageFloat32> disparity =
 				FactoryStereoDisparity.regionSparseWta(0,150,3,3,20,-1,true,ImageFloat32.class);
 
-//		StereoVisualOdometry<ImageFloat32> alg = FactoryVisualOdometry.stereoSimple(300,3,tracker,stereoParam,
-//				disparity,ImageFloat32.class);
-		StereoVisualOdometry<ImageFloat32> alg = FactoryVisualOdometry.stereoDepth(100, 1, tracker, stereoParam,
+		StereoVisualOdometry<ImageFloat32> alg = FactoryVisualOdometry.stereoDepth(100, 1, tracker,
 				disparity, ImageFloat32.class);
-//		StereoVisualOdometry<ImageFloat32> alg = FactoryVisualOdometry.stereoEpipolar(75, 1, tracker, stereoParam,
-//				disparity, ImageFloat32.class);
+
+		alg.setCalibration(stereoParam);
 
 		VisualizeStereoVisualOdometry gui = new VisualizeStereoVisualOdometry();
 		gui.process(videoLeft, videoRight, alg);

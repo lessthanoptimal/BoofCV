@@ -30,15 +30,17 @@ public class AssociateStereoPoint<T extends ImageSingleBand> extends StereoProce
 	 * Configures the algorithm.
 	 *
 	 * @param sparseDisparity Computes disparity for a single point.
-	 * @param stereoParam Stereo camera parameters
 	 * @param imageType Input image type
 	 */
 	public AssociateStereoPoint(StereoDisparitySparse<T> sparseDisparity,
-								StereoParameters stereoParam ,
 								Class<T> imageType ) {
-		super(stereoParam,imageType);
+		super(imageType);
 		this.sparseDisparity = sparseDisparity;
+	}
 
+	@Override
+	public void setCalibration(StereoParameters stereoParam) {
+		super.setCalibration(stereoParam);
 		leftPixelToRect = RectifyImageOps.transformPixelToRect_F64(stereoParam.left, rect1);
 		rightRectToPixel = RectifyImageOps.transformRectToPixel_F64(stereoParam.right, rect2);
 	}

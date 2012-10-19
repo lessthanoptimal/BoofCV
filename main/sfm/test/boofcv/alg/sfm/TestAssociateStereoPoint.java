@@ -32,7 +32,8 @@ public class TestAssociateStereoPoint {
 		int disparity = 50;
 
 		StereoParameters param = createStereoParam(width,height,false);
-		AssociateStereoPoint alg = new AssociateStereoPoint(new DummyDisparity(disparity),param, ImageUInt8.class);
+		AssociateStereoPoint alg = new AssociateStereoPoint(new DummyDisparity(disparity),ImageUInt8.class);
+		alg.setCalibration(param);
 
 		PointTransform_F64 leftPixelToRect = RectifyImageOps.transformPixelToRect_F64(param.left, alg.rect1);
 		PointTransform_F64 rightRectToPixel = RectifyImageOps.transformRectToPixel_F64(param.right, alg.rect2);
