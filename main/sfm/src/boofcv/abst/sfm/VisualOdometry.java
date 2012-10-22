@@ -26,5 +26,5 @@ public interface VisualOdometry {
 	 *
 	 * @return Found pose.
 	 */
-	public Se3_F64 getCameraToWorld();
+	public Se3_F64 getLeftToWorld();
 }

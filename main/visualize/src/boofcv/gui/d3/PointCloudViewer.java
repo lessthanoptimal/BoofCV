@@ -83,7 +83,7 @@ public class PointCloudViewer extends JPanel {
 	/**
 	 * Stereo and intrinsic camera parameters
 	 * @param baseline Stereo baseline (world units)
-	 * @param K Intrinsic camera calibration matrix
+	 * @param K Intrinsic camera calibration matrix of rectified camera
 	 * @param minDisparity Minimum disparity that's computed (pixels)
 	 * @param maxDisparity Maximum disparity that's computed (pixels)
 	 */
@@ -135,6 +135,8 @@ public class PointCloudViewer extends JPanel {
 
 				ColorPoint3D p = cloud.grow();
 
+				// Note that this will be in the rectified left camera's reference frame.
+				// An additional rotation is needed to put it into the original left camera frame.
 				p.z = baseline*focalLengthX/value;
 				p.x = p.z*(x - centerX)/focalLengthX;
 				p.y = p.z*(y - centerY)/focalLengthY;
