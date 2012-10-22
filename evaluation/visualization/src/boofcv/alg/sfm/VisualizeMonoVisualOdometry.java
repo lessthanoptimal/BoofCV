@@ -118,7 +118,7 @@ extends VideoProcessAppBase<I,D> {
 	@Override
 	protected void updateAlgGUI(I frame, BufferedImage imageGUI, double fps) {
 
-		Se3_F64 cameraToWorld = alg.getCameraToWorld();
+		Se3_F64 cameraToWorld = alg.getLeftToWorld();
 		pathGui.addLocation(cameraToWorld.getT());
 		pathGui.repaint();
 

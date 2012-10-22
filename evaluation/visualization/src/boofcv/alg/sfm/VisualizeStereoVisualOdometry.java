@@ -191,7 +191,7 @@ public class VisualizeStereoVisualOdometry implements MouseListener
 			}
 
 			if( worked ) {
-				Se3_F64 pose = alg.getCameraToWorld();
+				Se3_F64 pose = alg.getLeftToWorld();
 
 				Vector3D_F64 v = new Vector3D_F64(0,0,1);
 				GeometryMath_F64.mult(pose.getR(), v, v);

@@ -64,6 +64,9 @@ public class RectifyCalibrated {
 	// Camera calibration matrix.
 	SimpleMatrix K = new SimpleMatrix(3,3);
 
+	// rotation matrix of rectified cameras
+	DenseMatrix64F rectifiedR;
+
 	/**
 	 * Computes rectification transforms for both cameras and optionally a single calibration
 	 * matrix.
@@ -108,13 +111,14 @@ public class RectifyCalibrated {
 		K = sK1.plus(sK2).scale(0.5);
 		K.set(0,1,0);// set skew to zero
 
-
 		// new projection rotation matrices
 		SimpleMatrix KRR = K.mult(RR);
 
 		// rectification transforms
 		rect1.set(KRR.mult(KR1.invert()).getMatrix());
 		rect2.set(KRR.mult(KR2.invert()).getMatrix());
+
+		rectifiedR = RR.getMatrix();
 	}
 
 	/**
@@ -163,5 +167,14 @@ public class RectifyCalibrated {
 	 */
 	public DenseMatrix64F getCalibrationMatrix() {
 		return K.getMatrix();
+	}
+
+	/**
+	 * Rotation matrix of rectified coordinate system
+	 *
+	 * @return Rotation matrix
+	 */
+	public DenseMatrix64F getRectifiedRotation() {
+		return rectifiedR;
 	}
 }

@@ -127,7 +127,7 @@ public class ExampleStereoTwoViewsOneCamera {
 		ShowImages.showWindow(new RectifiedPairPanel(true, outLeft, outRight), "Rectification");
 		ShowImages.showWindow(visualized, "Disparity");
 
-		showPointCloud(disparity, outLeft, leftToRight, intrinsic, minDisparity, maxDisparity);
+		showPointCloud(disparity, outLeft, leftToRight, rectifiedK, minDisparity, maxDisparity);
 
 		System.out.println("Total found " + matchedCalibrated.size());
 		System.out.println("Total Inliers " + inliers.size());
@@ -266,15 +266,13 @@ public class ExampleStereoTwoViewsOneCamera {
 	 * Show results as a point cloud
 	 */
 	public static void showPointCloud(ImageSingleBand disparity, BufferedImage left,
-									  Se3_F64 motion, IntrinsicParameters intrinsic,
+									  Se3_F64 motion, DenseMatrix64F rectR ,
 									  int minDisparity, int maxDisparity) {
 		PointCloudTiltPanel gui = new PointCloudTiltPanel();
 
 		double baseline = motion.getT().norm();
 
-		DenseMatrix64F K = PerspectiveOps.calibrationMatrix(intrinsic, null);
-
-		gui.configure(baseline, K, minDisparity, maxDisparity);
+		gui.configure(baseline, rectR, minDisparity, maxDisparity);
 		gui.process(disparity, left);
 		gui.setPreferredSize(new Dimension(left.getWidth(), left.getHeight()));
 

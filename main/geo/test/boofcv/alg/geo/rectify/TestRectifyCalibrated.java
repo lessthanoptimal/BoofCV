@@ -18,6 +18,7 @@
 
 package boofcv.alg.geo.rectify;
 
+import boofcv.alg.geo.PerspectiveOps;
 import georegression.geometry.GeometryMath_F64;
 import georegression.geometry.RotationMatrixGenerator;
 import georegression.struct.point.Point2D_F64;
@@ -28,6 +29,7 @@ import org.ejml.ops.CommonOps;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Peter Abeles
@@ -38,7 +40,7 @@ public class TestRectifyCalibrated {
 	 * Compare results from rectified transform and a set of camera which are already rectified.
 	 */
 	@Test
-	public void compareTransforms() {
+	public void compareWithKnown() {
 		DenseMatrix64F K = new DenseMatrix64F(3,3,true,300,0,200,0,400,205,0,0,1);
 
 		// transforms are world to camera, but I'm thinking camera to world, which is why invert
@@ -53,12 +55,11 @@ public class TestRectifyCalibrated {
 		RectifyCalibrated alg = new RectifyCalibrated();
 		alg.process(K,poseA1,K,poseA2);
 
-		DenseMatrix64F expectedP1 = computeP(K,poseR1);
-		DenseMatrix64F expectedP2 = computeP(K,poseR2);
+		// original camera matrix
+		DenseMatrix64F foundP1 = PerspectiveOps.createCameraMatrix(poseA1.getR(),poseA1.getT(),K,null);
+		DenseMatrix64F foundP2 = PerspectiveOps.createCameraMatrix(poseA2.getR(),poseA2.getT(),K,null);
 
-		DenseMatrix64F foundP1 = computeP(K,poseA1);
-		DenseMatrix64F foundP2 = computeP(K,poseA2);
-
+		// apply rectification transform
 		DenseMatrix64F temp = new DenseMatrix64F(3,4);
 		CommonOps.mult(alg.getRect1(),foundP1,temp);
 		foundP1.set(temp);
@@ -70,10 +71,10 @@ public class TestRectifyCalibrated {
 		Point3D_F64 X = new Point3D_F64(0,0,3);
 
 		// compare results, both should match because of rotation only being around y-axis
-		assertEquals(apply(expectedP1,X).x,apply(foundP1,X).x,1e-5);
-		assertEquals(apply(expectedP1,X).y,apply(foundP1,X).y,1e-5);
-		assertEquals(apply(expectedP2,X).x,apply(foundP2,X).x,1e-5);
-		assertEquals(apply(expectedP2,X).y,apply(foundP2,X).y,1e-5);
+		assertEquals(PerspectiveOps.renderPixel(poseR1,K,X).x,PerspectiveOps.renderPixel(foundP1,X).x,1e-5);
+		assertEquals(PerspectiveOps.renderPixel(poseR1,K,X).y,PerspectiveOps.renderPixel(foundP1,X).y,1e-5);
+		assertEquals(PerspectiveOps.renderPixel(poseR2,K,X).x,PerspectiveOps.renderPixel(foundP2,X).x,1e-5);
+		assertEquals(PerspectiveOps.renderPixel(poseR2,K,X).y,PerspectiveOps.renderPixel(foundP2,X).y,1e-5);
 	}
 
 	/**
@@ -88,12 +89,9 @@ public class TestRectifyCalibrated {
 		Se3_F64 poseA1 = createPose(-0.3,0.05,0.07,   0.1,0,0.1).invert(null);
 		Se3_F64 poseA2 = createPose(0.2,-0.1,0.02,    1  ,0,0.1).invert(null);
 
-		DenseMatrix64F P1 = computeP(K,poseA1);
-		DenseMatrix64F P2 = computeP(K,poseA2);
-
 		// project epipoles
-		Point2D_F64 epi1 = apply(P1,new Point3D_F64(1,0,0.1));
-		Point2D_F64 epi2 = apply(P2,new Point3D_F64(0.1,0,0.1));
+		Point2D_F64 epi1 = PerspectiveOps.renderPixel(poseA1, K, new Point3D_F64(1, 0, 0.1));
+		Point2D_F64 epi2 = PerspectiveOps.renderPixel(poseA2, K, new Point3D_F64(0.1, 0, 0.1));
 
 		// compute transforms
 		RectifyCalibrated alg = new RectifyCalibrated();
@@ -115,33 +113,46 @@ public class TestRectifyCalibrated {
 	 */
 	@Test
 	public void alignY() {
-		DenseMatrix64F K = new DenseMatrix64F(3,3,true,300,0,200,0,400,205,0,0,1);
+		// different calibration matrices
+		DenseMatrix64F K1 = new DenseMatrix64F(3,3,true,300,0,200,0,400,205,0,0,1);
+		DenseMatrix64F K2 = new DenseMatrix64F(3,3,true,180,0,195,0,370,210,0,0,1);
 
 		// only rotate around the y-axis so that the rectified coordinate system will have to be
 		// the same as the global
-		Se3_F64 poseA1 = createPose(-0.3,0.05,0.07,   0.1,0,0.1).invert(null);
-		Se3_F64 poseA2 = createPose(0.2,-0.1,0.02,    1  ,0,0.1).invert(null);
+		Se3_F64 poseA1 = createPose(-0.3,0.05,0.07,   0.1,0,0.1);
+		Se3_F64 poseA2 = createPose(0.2,-0.1,0.02,    1  ,0,0.1);
+		alignY(K1, poseA1, K2, poseA2);
 
+		// the (Y,Z) coordinates are now different
+		poseA1 = createPose(-0.3,0.05,0.1,   0.1, 0.05, -0.1);
+		poseA2 = createPose(0.2,-0.1,0.02,    1  ,-0.4, 0.2);
+		alignY(K1, poseA1, K2, poseA2);
+
+		poseA1 = createPose(0,0,0, 0  ,0, 0);
+		poseA2 = createPose(0,0,0, -0.2  ,0, -0.1);
+		alignY(K1, poseA1, K2, poseA2);
+	}
+
+	private void alignY(DenseMatrix64F K1, Se3_F64 poseA1, DenseMatrix64F K2 , Se3_F64 poseA2) {
 		// point being observed
 		Point3D_F64 X = new Point3D_F64(0,0,4);
 
-		// unrectified projection matrices
-		DenseMatrix64F P1 = computeP(K,poseA1);
-		DenseMatrix64F P2 = computeP(K,poseA2);
-
 		// unrectified observation
-		Point2D_F64 o1 = apply(P1,X);
-		Point2D_F64 o2 = apply(P2,X);
+		Point2D_F64 o1 = PerspectiveOps.renderPixel(poseA1, K1, X);
+		Point2D_F64 o2 = PerspectiveOps.renderPixel(poseA2, K2, X);
+
+		// original observations should not line up
+		assertTrue(Math.abs(o1.y - o2.y) > 1e-8 );
 
 		// compute transforms
 		RectifyCalibrated alg = new RectifyCalibrated();
-		alg.process(K,poseA1,K,poseA2);
+		alg.process(K1,poseA1, K2,poseA2);
 
 		// apply transform to create rectified observations
 		Point2D_F64 r1 = new Point2D_F64();
 		Point2D_F64 r2 = new Point2D_F64();
 
-		GeometryMath_F64.mult(alg.getRect1(),o1,r1);
+		GeometryMath_F64.mult(alg.getRect1(), o1, r1);
 		GeometryMath_F64.mult(alg.getRect2(),o2,r2);
 
 		// see if they line up
@@ -156,27 +167,4 @@ public class TestRectifyCalibrated {
 		return ret;
 	}
 
-	public static DenseMatrix64F computeP( DenseMatrix64F K , Se3_F64 pose ) {
-		DenseMatrix64F A = new DenseMatrix64F(3,4);
-		CommonOps.insert(pose.getR(), A, 0, 0);
-
-		A.set(0,3,pose.getX());
-		A.set(1,3,pose.getY());
-		A.set(2,3,pose.getZ());
-
-		DenseMatrix64F P = new DenseMatrix64F(3,4);
-		CommonOps.mult(K,A,P);
-
-		return P;
-	}
-
-	private Point2D_F64 apply( DenseMatrix64F P , Point3D_F64 X ) {
-
-		DenseMatrix64F W = new DenseMatrix64F(4,1,true,X.x,X.y,X.z,1);
-		DenseMatrix64F Q = new DenseMatrix64F(3,1);
-		CommonOps.mult(P,W,Q);
-
-		double z = Q.get(2);
-		return new Point2D_F64(Q.get(0)/z,Q.get(1)/z);
-	}
 }

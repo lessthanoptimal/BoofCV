@@ -342,7 +342,7 @@ public class DistortImageOps {
 		ImageRectangle_F32 r=new ImageRectangle_F32();
 
 		r.x0=r.y0=Float.MAX_VALUE;
-		r.x1=r.y1=Float.MIN_VALUE;
+		r.x1=r.y1=-Float.MAX_VALUE;
 
 		for( int y = 0; y < srcHeight; y++ ) {
 			transform.compute(0, y);

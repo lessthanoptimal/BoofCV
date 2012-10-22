@@ -46,6 +46,27 @@ public class ShowImages {
 	}
 
 	/**
+	 * Shows a set of images in a grid pattern.
+	 *
+	 * @param numColumns How many columns are in the grid
+	 * @param title Number of the window
+	 * @param images List of images to show
+	 * @return Display panel
+	 */
+	public static ImageGridPanel showGrid( int numColumns , String title , BufferedImage ...images ) {
+		JFrame frame = new JFrame(title);
+
+		ImageGridPanel panel = new ImageGridPanel(images.length/numColumns,numColumns,images);
+
+		frame.add(panel, BorderLayout.CENTER);
+
+		frame.pack();
+		frame.setVisible(true);
+
+		return panel;
+	}
+
+	/**
 	 * Creates a window showing the specified image.
 	 */
 	public static ImagePanel showWindow(BufferedImage img, String title) {

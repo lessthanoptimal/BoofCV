@@ -5,7 +5,9 @@ import boofcv.alg.geo.RectifyImageOps;
 import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.distort.PointTransform_F64;
 import boofcv.struct.image.ImageSingleBand;
+import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Point2D_F64;
+import georegression.struct.point.Point3D_F64;
 
 /**
  * Computes stereo disparity on a per pixel basis as requested.
@@ -34,6 +36,12 @@ public class StereoSparse3D<T extends ImageSingleBand>
 	// skew is always set to zero in rectified camera
 	private double cx,cy,fx,fy;
 
+	// 3D coordinate in rectified left camera
+	private Point3D_F64 pointRect = new Point3D_F64();
+
+	// 3D coordinate in the left camera
+	private Point3D_F64 pointLeft = new Point3D_F64();
+
 	/**
 	 * Configures and declares internal data
 	 *
@@ -51,10 +59,10 @@ public class StereoSparse3D<T extends ImageSingleBand>
 		leftPixelToRect = RectifyImageOps.transformPixelToRect_F64(stereoParam.left,rect1);
 
 		baseline = stereoParam.getBaseline();
-		cx = rectK.get(0, 0);
-		cy = rectK.get(1,1);
-		fx = rectK.get(0,2);
-		fy = rectK.get(1,2);
+		fx = rectK.get(0,0);
+		fy = rectK.get(1,1);
+		cx = rectK.get(0,2);
+		cy = rectK.get(1,2);
 	}
 
 	@Override
@@ -75,15 +83,22 @@ public class StereoSparse3D<T extends ImageSingleBand>
 
 		leftPixelToRect.compute(x,y,pixelRect);
 
-		if( !disparity.process((int)pixelRect.x,(int)pixelRect.y) )
+		// round to the nearest pixel
+		if( !disparity.process((int)(pixelRect.x+0.5),(int)(pixelRect.y+0.5)) )
 			return false;
 
-		double d = disparity.getDisparity();
+		// Coordinate in rectified camera frame
+		this.w = disparity.getDisparity();
+		pointRect.z = baseline*fx;
+		pointRect.x = pointRect.z*(pixelRect.x - cx)/fx;
+		pointRect.y = pointRect.z*(pixelRect.y - cy)/fy;
 
-		this.w = d;
-		this.z = baseline*fx;
-		this.x = z*(x - cx)/fx;
-		this.y = z*(y - cy)/fy;
+		// rotate into the original left camera frame
+		GeometryMath_F64.multTran(rectR,pointRect,pointLeft);
+
+		this.x = pointLeft.x;
+		this.y = pointLeft.y;
+		this.z = pointLeft.z;
 
 		return true;
 	}

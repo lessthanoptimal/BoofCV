@@ -99,6 +99,9 @@ public class PointCloudTiltPanel extends JPanel
 
 	/**
 	 * Specified intrinsic camera parameters and disparity settings
+	 *
+	 * @param baseline Stereo baseline
+	 * @param K rectified camera calibration matrix
 	 */
 	public void configure(double baseline,
 						  DenseMatrix64F K,

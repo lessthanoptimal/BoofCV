@@ -29,7 +29,7 @@ public class PixelDepthVoEpipolar<T extends ImageBase> {
 	// TODO Make relative to the last update or remove?
 	double MIN_PIXEL_CHANGE = 100;
 
-	double TOL_TRIANGULATE = 3*Math.PI/180.0;
+	double TOL_TRIANGULATE = 0.5*Math.PI/180.0;
 
 	int MIN_TRACKS = 100;
 
@@ -45,7 +45,7 @@ public class PixelDepthVoEpipolar<T extends ImageBase> {
 	// estimate the camera motion up to a scale factor from two sets of point correspondences
 	private ModelMatcher<Se3_F64, AssociatedPair> motionEstimator;
 
-	ComputeObservationAcuteAngle selectScalePoints = new ComputeObservationAcuteAngle();
+	ComputeObservationAcuteAngle computeObsAngle = new ComputeObservationAcuteAngle();
 
 	Se3_F64 keyToWorld = new Se3_F64();
 	Se3_F64 currToKey = new Se3_F64();
@@ -80,10 +80,9 @@ public class PixelDepthVoEpipolar<T extends ImageBase> {
 		motionFailed = 0;
 	}
 
-	public boolean process( T leftImage , T rightImage ) {
+	// TODO indicate FULL_MOTION, ANGLE_ONLY,NO_MOTION,FAULT
+	public boolean process( T leftImage ) {
 		tracker.process(leftImage);
-
-		checkForReallyCloseTrack();
 
 		boolean foundMotion = estimateMotion();
 
@@ -92,7 +91,7 @@ public class PixelDepthVoEpipolar<T extends ImageBase> {
 			motionFailed++;
 		}
 
-		if( numTracksUsed < MIN_TRACKS || !foundMotion ) {
+		if( numTracksUsed < MIN_TRACKS ) {
 			pixelTo3D.initialize();
 
 			System.out.println("----------- CHANGE KEY FRAME ---------------");
@@ -127,25 +126,12 @@ public class PixelDepthVoEpipolar<T extends ImageBase> {
 
 			hasSignificantChange = false;
 
-			checkForReallyCloseTrack();
-
 			return foundMotion;
 		} else {
-
-			checkForReallyCloseTrack();
-			return true;
+			return foundMotion;
 		}
 
 
-	}
-
-	private void checkForReallyCloseTrack() {
-		List<PointPoseTrack> tracks = tracker.getPairs();
-		for( PointPoseTrack p : tracks ) {
-			if( p.getLocation().z < 100 )
-				System.out.println("Oh Crap");
-
-		}
 	}
 
 	private boolean estimateMotion() {
@@ -159,7 +145,7 @@ public class PixelDepthVoEpipolar<T extends ImageBase> {
 				hasSignificantChange = true;
 			else {
 				numTracksUsed = tracker.getPairs().size();
-				return true;
+				return false;
 			}
 		}
 
@@ -175,21 +161,21 @@ public class PixelDepthVoEpipolar<T extends ImageBase> {
 		// estimate the scale factor using previously triangulated point locations
 		int N = numTracksUsed = motionEstimator.getMatchSet().size();
 
-		selectScalePoints.setFromAtoB(candidateCurrToKey);
+		computeObsAngle.setFromAtoB(candidateCurrToKey);
 
 		List<PointPoseTrack> good = new ArrayList<PointPoseTrack>();
 		for( int i = 0; i < N; i++ ) {
 			PointPoseTrack t = tracker.getPairs().get( motionEstimator.getInputIndex(i) );
 
-			if( selectScalePoints.computeAcuteAngle(t.currLoc,t.keyLoc) >= TOL_TRIANGULATE ) {
+			if( computeObsAngle.computeAcuteAngle(t.currLoc,t.keyLoc) >= TOL_TRIANGULATE ) {
 				good.add(t);
 			}
 		}
 
 		if( good.size() < 5 ) {
 			// only use the rotation estimate
-			currToKey.getR().set(candidateCurrToKey.getR());
-			return true;
+//			currToKey.getR().set(candidateCurrToKey.getR());
+			return false;
 		}
 
 		// update the translation and rotation
@@ -216,11 +202,8 @@ public class PixelDepthVoEpipolar<T extends ImageBase> {
 		GeometryMath_F64.scale(currToKey.getT(),scale);
 
 		for( PointPoseTrack t : good ) {
-//			double before = t.getLocation().z;
-
 			GeometryMath_F64.scale(t.getLocation(),scale);
-
-//			System.out.printf("Triangulate before = %.5f after z = %.5f\n",before,t.getLocation().getZ());
+//			System.out.printf("Triangulate scale z = %.5f\n",t.getLocation().getZ());
 		}
 
 //		System.out.println("-----------------------");

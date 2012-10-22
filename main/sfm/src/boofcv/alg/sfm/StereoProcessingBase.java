@@ -38,6 +38,9 @@ public class StereoProcessingBase<T extends ImageSingleBand> {
 	// calibration matrix for both cameras after rectification
 	protected DenseMatrix64F rectK;
 
+	// rotation matrix for both rectified cameras
+	protected DenseMatrix64F rectR;
+
 	/**
 	 * Declares internal data structures
 	 *
@@ -45,10 +48,9 @@ public class StereoProcessingBase<T extends ImageSingleBand> {
 	 */
 	public StereoProcessingBase( Class<T> imageType ) {
 
-		// predeclare input images
+		// pre-declare input images
 		imageLeftRect = GeneralizedImageOps.createSingleBand(imageType, 1,1);
 		imageRightRect = GeneralizedImageOps.createSingleBand(imageType,1,1);
-
 	}
 
 	/**
@@ -77,11 +79,9 @@ public class StereoProcessingBase<T extends ImageSingleBand> {
 		// rectification matrix for each image
 		rect1 = rectifyAlg.getRect1();
 		rect2 = rectifyAlg.getRect2();
-		// New calibration matrix, Both cameras have the same one after rectification.
+		// New calibration and rotation matrix, Both cameras are the same after rectification.
 		rectK = rectifyAlg.getCalibrationMatrix();
-
-		// Adjust the rectification to make the view area more useful
-		RectifyImageOps.fullViewLeft(stereoParam.left, rect1, rect2, rectK);
+		rectR = rectifyAlg.getRectifiedRotation();
 
 		Class<T> imageType = imageLeftRect.getTypeInfo().getImageClass();
 		distortLeftRect = RectifyImageOps.rectifyImage(stereoParam.left, rect1, imageType);

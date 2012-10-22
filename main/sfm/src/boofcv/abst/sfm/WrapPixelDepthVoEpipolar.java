@@ -29,18 +29,18 @@ public class WrapPixelDepthVoEpipolar<T extends ImageSingleBand>
 	PixelDepthVoEpipolar<T> alg;
 	StereoSparse3D<T> stereo;
 	KeyFramePointTracker<T,PointPoseTrack> tracker;
-	DistanceModelStereoPixels<Se3_F64,AssociatedPair> distance;
+	DistanceModelStereoPixels<Se3_F64,AssociatedPair> fitError;
 	Class<T> imageType;
 
 	public WrapPixelDepthVoEpipolar(PixelDepthVoEpipolar<T> alg,
 									StereoSparse3D<T> stereo,
 									KeyFramePointTracker<T,PointPoseTrack> tracker ,
-									DistanceModelStereoPixels<Se3_F64,AssociatedPair> distance ,
+									DistanceModelStereoPixels<Se3_F64,AssociatedPair> fitError,
 									Class<T> imageType ) {
 		this.alg = alg;
 		this.stereo = stereo;
 		this.tracker = tracker;
-		this.distance = distance;
+		this.fitError = fitError;
 		this.imageType = imageType;
 	}
 
@@ -104,14 +104,14 @@ public class WrapPixelDepthVoEpipolar<T extends ImageSingleBand>
 		PointTransform_F64 leftPixelToNorm = LensDistortionOps.transformRadialToNorm_F64(parameters.left);
 		tracker.setPixelToNorm(leftPixelToNorm);
 
-		distance.setIntrinsic(parameters.left.fx, parameters.left.fy, parameters.left.skew,
+		fitError.setIntrinsic(parameters.left.fx, parameters.left.fy, parameters.left.skew,
 				parameters.left.fx, parameters.left.fy, parameters.left.skew);
 	}
 
 	@Override
 	public boolean process(T leftImage, T rightImage) {
 		stereo.setImages(leftImage,rightImage);
-		return alg.process(leftImage,rightImage);
+		return alg.process(leftImage);
 	}
 
 	@Override
@@ -135,7 +135,7 @@ public class WrapPixelDepthVoEpipolar<T extends ImageSingleBand>
 	}
 
 	@Override
-	public Se3_F64 getCameraToWorld() {
+	public Se3_F64 getLeftToWorld() {
 		return alg.getCurrToWorld();
 	}
 }

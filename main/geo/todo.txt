@@ -18,6 +18,9 @@
 - P3P
   * Implement that complex algorithm
 
+- RectifyImageOps
+  * delete fullViewLeft() due to potential pathological cases?
+
 - Long Term
  * Sparse Bundle Adjustment
  * SVD/Linear PnP  See Long Quan paper

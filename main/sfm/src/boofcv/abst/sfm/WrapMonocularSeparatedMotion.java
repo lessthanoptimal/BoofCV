@@ -40,7 +40,7 @@ public class WrapMonocularSeparatedMotion<T extends ImageBase>
 	}
 
 	@Override
-	public Se3_F64 getCameraToWorld() {
+	public Se3_F64 getLeftToWorld() {
 		Se3_F64 w2c = alg.getWorldToKey();
 		w2c.invert(c2w);
 		return c2w;
