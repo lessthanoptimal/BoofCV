@@ -3,23 +3,22 @@ package boofcv.factory.sfm;
 import boofcv.abst.feature.disparity.StereoDisparitySparse;
 import boofcv.abst.feature.tracker.ImagePointTracker;
 import boofcv.abst.feature.tracker.KeyFramePointTracker;
-import boofcv.abst.geo.Estimate1ofEpipolar;
+import boofcv.abst.geo.Estimate1ofPnP;
 import boofcv.abst.geo.TriangulateTwoViewsCalibrated;
 import boofcv.abst.sfm.StereoVisualOdometry;
 import boofcv.abst.sfm.WrapPixelDepthVoEpipolar;
-import boofcv.alg.geo.DistanceModelStereoPixels;
+import boofcv.alg.geo.DistanceModelMonoPixels;
+import boofcv.alg.geo.pose.DistancePnPReprojectionSq;
 import boofcv.alg.sfm.PixelDepthVoEpipolar;
 import boofcv.alg.sfm.PointPoseTrack;
 import boofcv.alg.sfm.StereoSparse3D;
-import boofcv.alg.sfm.robust.DistanceSe3SymmetricSq;
-import boofcv.alg.sfm.robust.Se3FromEssentialGenerator;
-import boofcv.factory.geo.EnumEpipolar;
+import boofcv.alg.sfm.robust.EstimatorToGenerator;
+import boofcv.factory.geo.EnumPNP;
 import boofcv.factory.geo.FactoryMultiView;
 import boofcv.factory.geo.FactoryTriangulate;
-import boofcv.numerics.fitting.modelset.ModelGenerator;
 import boofcv.numerics.fitting.modelset.ModelMatcher;
 import boofcv.numerics.fitting.modelset.ransac.Ransac;
-import boofcv.struct.geo.AssociatedPair;
+import boofcv.struct.geo.PointPosePair;
 import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.se.Se3_F64;
 
@@ -120,30 +119,37 @@ public class FactoryVisualOdometry {
 										Class<T> imageType) {
 
 		// motion estimation using essential matrix
-		Estimate1ofEpipolar essentialAlg = FactoryMultiView.computeFundamental_1(EnumEpipolar.ESSENTIAL_5_NISTER, 2);
-		TriangulateTwoViewsCalibrated triangulate = FactoryTriangulate.twoGeometric();
-		ModelGenerator<Se3_F64, AssociatedPair> generateEpipolarMotion =
-				new Se3FromEssentialGenerator(essentialAlg, triangulate);
+		Estimate1ofPnP estimator = FactoryMultiView.computePnP_1(EnumPNP.P3P_FINSTERWALDER,-1,2);
+		DistanceModelMonoPixels<Se3_F64,PointPosePair> distance = new DistancePnPReprojectionSq();
 
-		DistanceModelStereoPixels<Se3_F64,AssociatedPair> distanceSe3 =
-				new DistanceSe3SymmetricSq(triangulate);
+		EstimatorToGenerator<Se3_F64,PointPosePair> generator =
+				new EstimatorToGenerator<Se3_F64,PointPosePair>(estimator) {
+					@Override
+					public Se3_F64 createModelInstance() {
+						return new Se3_F64();
+					}
+				};
+
 
 		// 1/2 a pixel tolerance for RANSAC inliers
-		double ransacTOL = inlierPixelTol * inlierPixelTol * 2.0;
+		double ransacTOL = inlierPixelTol * inlierPixelTol;
 
-		ModelMatcher<Se3_F64, AssociatedPair> epipolarMotion =
-				new Ransac<Se3_F64, AssociatedPair>(2323, generateEpipolarMotion, distanceSe3,
+		ModelMatcher<Se3_F64, PointPosePair> motion =
+				new Ransac<Se3_F64, PointPosePair>(2323, generator, distance,
 						200, ransacTOL);
 
 		// Range from sparse disparity
 		StereoSparse3D<T> pixelTo3D = new StereoSparse3D<T>(sparseDisparity,imageType);
 
+		// triangulate the two views
+		TriangulateTwoViewsCalibrated triangulate = FactoryTriangulate.twoGeometric();
+
 		// setup the tracker
 		KeyFramePointTracker<T,PointPoseTrack> keyTracker =
 				new KeyFramePointTracker<T,PointPoseTrack>(tracker,null,PointPoseTrack.class);
 
-		PixelDepthVoEpipolar<T> alg = new PixelDepthVoEpipolar<T>(minTracks,epipolarMotion,pixelTo3D,keyTracker,triangulate);
+		PixelDepthVoEpipolar<T> alg = new PixelDepthVoEpipolar<T>(minTracks,motion,pixelTo3D,keyTracker,triangulate);
 
-		return new WrapPixelDepthVoEpipolar<T>(alg,pixelTo3D,keyTracker,distanceSe3,imageType);
+		return new WrapPixelDepthVoEpipolar<T>(alg,pixelTo3D,keyTracker,distance,imageType);
 	}
 }

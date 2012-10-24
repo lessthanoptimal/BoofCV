@@ -51,9 +51,6 @@ public class DistancePnPReprojectionSq implements DistanceModelMonoPixels<Se3_F6
 	// computes the error in units of pixels
 	private NormalizedToPixelError pixelError;
 
-	/**
-	 * Computes reprojection error in units of normalized image coordinates
-	 */
 	public DistancePnPReprojectionSq() {
 		this(1,1,0);
 	}

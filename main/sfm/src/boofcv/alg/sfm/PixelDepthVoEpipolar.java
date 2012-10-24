@@ -6,14 +6,12 @@ import boofcv.factory.geo.FactoryTriangulate;
 import boofcv.numerics.fitting.modelset.ModelMatcher;
 import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.geo.AssociatedPair;
+import boofcv.struct.geo.PointPosePair;
 import boofcv.struct.image.ImageBase;
-import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Point2D_F64;
-import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -29,7 +27,7 @@ public class PixelDepthVoEpipolar<T extends ImageBase> {
 	// TODO Make relative to the last update or remove?
 	double MIN_PIXEL_CHANGE = 100;
 
-	double TOL_TRIANGULATE = 0.5*Math.PI/180.0;
+	double TOL_TRIANGULATE = 2*Math.PI/180.0;
 
 	int MIN_TRACKS = 100;
 
@@ -43,7 +41,7 @@ public class PixelDepthVoEpipolar<T extends ImageBase> {
 			FactoryTriangulate.twoGeometric();
 
 	// estimate the camera motion up to a scale factor from two sets of point correspondences
-	private ModelMatcher<Se3_F64, AssociatedPair> motionEstimator;
+	private ModelMatcher<Se3_F64, PointPosePair> motionEstimator;
 
 	ComputeObservationAcuteAngle computeObsAngle = new ComputeObservationAcuteAngle();
 
@@ -57,7 +55,9 @@ public class PixelDepthVoEpipolar<T extends ImageBase> {
 
 	int motionFailed;
 
-	public PixelDepthVoEpipolar(int MIN_TRACKS, ModelMatcher<Se3_F64, AssociatedPair> motionEstimator,
+	boolean motionEstimated;
+
+	public PixelDepthVoEpipolar(int MIN_TRACKS, ModelMatcher<Se3_F64, PointPosePair> motionEstimator,
 								ImagePixelTo3D pixelTo3D,
 								KeyFramePointTracker<T, PointPoseTrack> tracker,
 								TriangulateTwoViewsCalibrated triangulate)
@@ -87,10 +87,11 @@ public class PixelDepthVoEpipolar<T extends ImageBase> {
 		boolean foundMotion = estimateMotion();
 
 		if( !foundMotion ) {
-			System.out.println("MOTION FAILED!");
+//			System.out.println("MOTION FAILED!");
 			motionFailed++;
 		}
 
+//		System.out.println(" numTracksUsed = "+numTracksUsed);
 		if( numTracksUsed < MIN_TRACKS ) {
 			pixelTo3D.initialize();
 
@@ -125,16 +126,16 @@ public class PixelDepthVoEpipolar<T extends ImageBase> {
 			}
 
 			hasSignificantChange = false;
-
+			motionEstimated = false;
 			return foundMotion;
 		} else {
 			return foundMotion;
 		}
-
-
 	}
 
 	private boolean estimateMotion() {
+
+		motionEstimated = false;
 
 		if( tracker.getPairs().size() <= 0 )
 			return false;
@@ -149,64 +150,35 @@ public class PixelDepthVoEpipolar<T extends ImageBase> {
 			}
 		}
 
+		List<PointPosePair> obs = new ArrayList<PointPosePair>();
+
+		for( PointPoseTrack t : tracker.getPairs() ) {
+			PointPosePair p = new PointPosePair();
+
+			p.location = t.getLocation();
+			p.observed = t.currLoc;
+
+			obs.add(p);
+		}
+
 		// estimate the motion up to a scale factor in translation
-		if( !motionEstimator.process( (List)tracker.getPairs()) )
+		if( !motionEstimator.process( obs ) )
 			return false;
 
 		// TODO add non-linear refinement
 
-		Se3_F64 candidateCurrToKey = new Se3_F64();
-		motionEstimator.getModel().invert(candidateCurrToKey);
+		motionEstimator.getModel().invert(currToKey);
 
-		// estimate the scale factor using previously triangulated point locations
-		int N = numTracksUsed = motionEstimator.getMatchSet().size();
+		// update feature locations using triangulation
+//		computeObsAngle.setFromAtoB(currToKey);
+//		for( PointPoseTrack t : tracker.getPairs() ) {
+//			if( computeObsAngle.computeAcuteAngle(t.currLoc,t.keyLoc) >= TOL_TRIANGULATE ) {
+//				triangulate.triangulate(t.currLoc,t.keyLoc,currToKey,t.location);
+//			}
+//		}
 
-		computeObsAngle.setFromAtoB(candidateCurrToKey);
-
-		List<PointPoseTrack> good = new ArrayList<PointPoseTrack>();
-		for( int i = 0; i < N; i++ ) {
-			PointPoseTrack t = tracker.getPairs().get( motionEstimator.getInputIndex(i) );
-
-			if( computeObsAngle.computeAcuteAngle(t.currLoc,t.keyLoc) >= TOL_TRIANGULATE ) {
-				good.add(t);
-			}
-		}
-
-		if( good.size() < 5 ) {
-			// only use the rotation estimate
-//			currToKey.getR().set(candidateCurrToKey.getR());
-			return false;
-		}
-
-		// update the translation and rotation
-		double ratio[] = new double[good.size()];
-
-		for( int i = 0; i < good.size(); i++ ) {
-			PointPoseTrack t = good.get(i);
-
-			Point3D_F64 P = t.getLocation();
-			double origZ = P.z;
-
-			triangulate.triangulate(t.currLoc,t.keyLoc,candidateCurrToKey,P);
-			ratio[i] = origZ/P.z;
-
-//			System.out.println("  orig z = "+origZ);
-		}
-
-		Arrays.sort(ratio);
-
-		double scale = ratio[ ratio.length/2 ];
-
-		// correct the scale factors
-		currToKey.set(candidateCurrToKey);
-		GeometryMath_F64.scale(currToKey.getT(),scale);
-
-		for( PointPoseTrack t : good ) {
-			GeometryMath_F64.scale(t.getLocation(),scale);
-//			System.out.printf("Triangulate scale z = %.5f\n",t.getLocation().getZ());
-		}
-
-//		System.out.println("-----------------------");
+		numTracksUsed = motionEstimator.getMatchSet().size();
+		motionEstimated = true;
 
 		return true;
 	}
@@ -241,7 +213,11 @@ public class PixelDepthVoEpipolar<T extends ImageBase> {
 		return tracker;
 	}
 
-	public ModelMatcher<Se3_F64, AssociatedPair> getMotionEstimator() {
+	public ModelMatcher<Se3_F64, PointPosePair> getMotionEstimator() {
 		return motionEstimator;
+	}
+
+	public boolean isMotionEstimated() {
+		return motionEstimated;
 	}
 }

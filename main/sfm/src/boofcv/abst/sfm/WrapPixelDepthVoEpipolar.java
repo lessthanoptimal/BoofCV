@@ -3,14 +3,14 @@ package boofcv.abst.sfm;
 import boofcv.abst.feature.tracker.KeyFramePointTracker;
 import boofcv.abst.feature.tracker.PointTrack;
 import boofcv.alg.distort.LensDistortionOps;
-import boofcv.alg.geo.DistanceModelStereoPixels;
+import boofcv.alg.geo.DistanceModelMonoPixels;
 import boofcv.alg.sfm.AccessSfmPointTracks;
 import boofcv.alg.sfm.PixelDepthVoEpipolar;
 import boofcv.alg.sfm.PointPoseTrack;
 import boofcv.alg.sfm.StereoSparse3D;
 import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.distort.PointTransform_F64;
-import boofcv.struct.geo.AssociatedPair;
+import boofcv.struct.geo.PointPosePair;
 import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
@@ -29,13 +29,15 @@ public class WrapPixelDepthVoEpipolar<T extends ImageSingleBand>
 	PixelDepthVoEpipolar<T> alg;
 	StereoSparse3D<T> stereo;
 	KeyFramePointTracker<T,PointPoseTrack> tracker;
-	DistanceModelStereoPixels<Se3_F64,AssociatedPair> fitError;
+	DistanceModelMonoPixels<Se3_F64,PointPosePair> fitError;
 	Class<T> imageType;
+	boolean failed;
+
 
 	public WrapPixelDepthVoEpipolar(PixelDepthVoEpipolar<T> alg,
 									StereoSparse3D<T> stereo,
 									KeyFramePointTracker<T,PointPoseTrack> tracker ,
-									DistanceModelStereoPixels<Se3_F64,AssociatedPair> fitError,
+									DistanceModelMonoPixels<Se3_F64,PointPosePair> fitError,
 									Class<T> imageType ) {
 		this.alg = alg;
 		this.stereo = stereo;
@@ -69,13 +71,15 @@ public class WrapPixelDepthVoEpipolar<T extends ImageSingleBand>
 	public List<Point2D_F64> getInlierTracks() {
 		List<Point2D_F64> pixels = new ArrayList<Point2D_F64>();
 
-		List<PointPoseTrack> tracks = alg.getTracker().getPairs();
+		if( alg.isMotionEstimated() ) {
+			List<PointPoseTrack> tracks = alg.getTracker().getPairs();
 
-		int N = alg.getMotionEstimator().getMatchSet().size();
-		for( int i = 0; i < N; i++ ) {
-			int index = alg.getMotionEstimator().getInputIndex(i);
+			int N = alg.getMotionEstimator().getMatchSet().size();
+			for( int i = 0; i < N; i++ ) {
+				int index = alg.getMotionEstimator().getInputIndex(i);
 
-			pixels.add( tracks.get(index).getPixel().currLoc );
+				pixels.add( tracks.get(index).getPixel().currLoc );
+			}
 		}
 
 		return pixels;
@@ -104,14 +108,14 @@ public class WrapPixelDepthVoEpipolar<T extends ImageSingleBand>
 		PointTransform_F64 leftPixelToNorm = LensDistortionOps.transformRadialToNorm_F64(parameters.left);
 		tracker.setPixelToNorm(leftPixelToNorm);
 
-		fitError.setIntrinsic(parameters.left.fx, parameters.left.fy, parameters.left.skew,
-				parameters.left.fx, parameters.left.fy, parameters.left.skew);
+		fitError.setIntrinsic(parameters.left.fx, parameters.left.fy, parameters.left.skew);
 	}
 
 	@Override
 	public boolean process(T leftImage, T rightImage) {
 		stereo.setImages(leftImage,rightImage);
-		return alg.process(leftImage);
+		failed = alg.process(leftImage);
+		return failed;
 	}
 
 	@Override
