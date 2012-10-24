@@ -55,7 +55,6 @@ public class ImageGridPanel extends JPanel {
 		int width = 0;
 		int height = 0;
 
-
 		for( int row = 0; row < numRows; row++ ) {
 			int h = 0;
 			int w = 0;
