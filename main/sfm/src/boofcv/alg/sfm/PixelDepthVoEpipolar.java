@@ -1,7 +1,9 @@
 package boofcv.alg.sfm;
 
 import boofcv.abst.feature.tracker.KeyFramePointTracker;
+import boofcv.abst.geo.RefinePnP;
 import boofcv.abst.geo.TriangulateTwoViewsCalibrated;
+import boofcv.factory.geo.FactoryMultiView;
 import boofcv.factory.geo.FactoryTriangulate;
 import boofcv.numerics.fitting.modelset.ModelMatcher;
 import boofcv.struct.calib.StereoParameters;
@@ -21,7 +23,8 @@ import java.util.List;
  * @author Peter Abeles
  */
 
-// TODO Use the mode instead of median to resolve scale ambiguity
+
+// TODO Add features before keyframe change.  Discard keyframe when original tracks are dropped
 
 public class PixelDepthVoEpipolar<T extends ImageBase> {
 	// TODO Make relative to the last update or remove?
@@ -35,6 +38,8 @@ public class PixelDepthVoEpipolar<T extends ImageBase> {
 	private KeyFramePointTracker<T,PointPoseTrack> tracker;
 	// used to estimate a feature's 3D position from image range data
 	private ImagePixelTo3D pixelTo3D;
+
+	RefinePnP refine = FactoryMultiView.refinePnP(1e-6,100);
 
 	// triangulate feature's 3D location
 	private TriangulateTwoViewsCalibrated triangulate =
@@ -165,9 +170,19 @@ public class PixelDepthVoEpipolar<T extends ImageBase> {
 		if( !motionEstimator.process( obs ) )
 			return false;
 
+		Se3_F64 keyToCurr;
+
+		if( refine != null ) {
+			keyToCurr = new Se3_F64();
+			if( !refine.process(motionEstimator.getModel(),motionEstimator.getMatchSet(),keyToCurr) )
+				return false;
+		} else {
+			keyToCurr = motionEstimator.getModel();
+		}
+
 		// TODO add non-linear refinement
 
-		motionEstimator.getModel().invert(currToKey);
+		keyToCurr.invert(currToKey);
 
 		// update feature locations using triangulation
 //		computeObsAngle.setFromAtoB(currToKey);

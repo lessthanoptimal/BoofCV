@@ -8,7 +8,7 @@ import boofcv.abst.geo.TriangulateTwoViewsCalibrated;
 import boofcv.abst.sfm.StereoVisualOdometry;
 import boofcv.abst.sfm.WrapPixelDepthVoEpipolar;
 import boofcv.alg.geo.DistanceModelMonoPixels;
-import boofcv.alg.geo.pose.DistancePnPReprojectionSq;
+import boofcv.alg.geo.pose.PnPDistanceReprojectionSq;
 import boofcv.alg.sfm.PixelDepthVoEpipolar;
 import boofcv.alg.sfm.PointPoseTrack;
 import boofcv.alg.sfm.StereoSparse3D;
@@ -60,7 +60,7 @@ public class FactoryVisualOdometry {
 //		ModelGenerator<Se3_F64,PointPosePair> generateMotion =
 //				new GenerateMotionPnP( FactoryMultiView.computePnPwithEPnP(5,0.1));
 //		DistanceFromModel<Se3_F64,PointPosePair> distanceMotion =
-//				new DistanceFromModelResidualN<Se3_F64,PointPosePair>(new PnPResidualSimple());
+//				new DistanceFromModelResidualN<Se3_F64,PointPosePair>(new PnPResidualReprojection());
 //
 //		ModelMatcher<Se3_F64,PointPosePair> computeMotion =
 //				new Ransac<Se3_F64,PointPosePair>(2323,generateMotion,distanceMotion,
@@ -120,7 +120,7 @@ public class FactoryVisualOdometry {
 
 		// motion estimation using essential matrix
 		Estimate1ofPnP estimator = FactoryMultiView.computePnP_1(EnumPNP.P3P_FINSTERWALDER,-1,2);
-		DistanceModelMonoPixels<Se3_F64,PointPosePair> distance = new DistancePnPReprojectionSq();
+		DistanceModelMonoPixels<Se3_F64,PointPosePair> distance = new PnPDistanceReprojectionSq();
 
 		EstimatorToGenerator<Se3_F64,PointPosePair> generator =
 				new EstimatorToGenerator<Se3_F64,PointPosePair>(estimator) {

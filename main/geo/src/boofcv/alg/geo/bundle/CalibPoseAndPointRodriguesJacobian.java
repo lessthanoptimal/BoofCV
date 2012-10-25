@@ -113,8 +113,6 @@ public class CalibPoseAndPointRodriguesJacobian implements FunctionNtoMxN {
 
 	@Override
 	public void process(double[] input, double[] output) {
-//		long before = System.nanoTime();
-		
 		this.output = output;
 		int paramIndex = 0;
 		countPointObs = 0;
@@ -146,7 +144,6 @@ public class CalibPoseAndPointRodriguesJacobian implements FunctionNtoMxN {
 				gradientViewPoint(input, obs);
 			}
 		}
-//		System.out.println("    Done Jacobian:  "+(System.nanoTime()-before)/1e6+" (ms)");
 	}
 
 	/**

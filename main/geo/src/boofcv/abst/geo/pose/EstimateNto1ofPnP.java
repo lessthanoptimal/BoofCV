@@ -20,7 +20,7 @@ package boofcv.abst.geo.pose;
 
 import boofcv.abst.geo.Estimate1ofPnP;
 import boofcv.abst.geo.GeoModelEstimatorNto1;
-import boofcv.alg.geo.pose.DistancePnPReprojectionSq;
+import boofcv.alg.geo.pose.PnPDistanceReprojectionSq;
 import boofcv.struct.FastQueue;
 import boofcv.struct.geo.GeoModelEstimatorN;
 import boofcv.struct.geo.PointPosePair;
@@ -35,7 +35,7 @@ public class EstimateNto1ofPnP extends GeoModelEstimatorNto1<Se3_F64,PointPosePa
 		implements Estimate1ofPnP
 {
 	public EstimateNto1ofPnP(GeoModelEstimatorN<Se3_F64, PointPosePair> alg, FastQueue<Se3_F64> solutions, int numTest) {
-		super(alg, new DistancePnPReprojectionSq(), solutions, numTest);
+		super(alg, new PnPDistanceReprojectionSq(), solutions, numTest);
 	}
 
 	@Override

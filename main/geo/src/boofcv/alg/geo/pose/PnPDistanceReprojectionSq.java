@@ -40,7 +40,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class DistancePnPReprojectionSq implements DistanceModelMonoPixels<Se3_F64,PointPosePair> {
+public class PnPDistanceReprojectionSq implements DistanceModelMonoPixels<Se3_F64,PointPosePair> {
 
 	// transform from world to camera
 	private Se3_F64 worldToCamera;
@@ -51,7 +51,7 @@ public class DistancePnPReprojectionSq implements DistanceModelMonoPixels<Se3_F6
 	// computes the error in units of pixels
 	private NormalizedToPixelError pixelError;
 
-	public DistancePnPReprojectionSq() {
+	public PnPDistanceReprojectionSq() {
 		this(1,1,0);
 	}
 
@@ -62,7 +62,7 @@ public class DistancePnPReprojectionSq implements DistanceModelMonoPixels<Se3_F6
 	 * @param fy focal length y
 	 * @param skew pixel skew
 	 */
-	public DistancePnPReprojectionSq(double fx, double fy, double skew) {
+	public PnPDistanceReprojectionSq(double fx, double fy, double skew) {
 		setIntrinsic(fx,fy,skew);
 	}
 

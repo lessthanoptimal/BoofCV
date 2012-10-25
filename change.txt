@@ -32,6 +32,11 @@ Version : Alpha 0.11
   * Added linear estimator for 7+ points
 - PnP Problem
   * Added two P3P solutions
+  * Analytic Jacobian for non-linear refinement
+  * Refactored class names for better consistency
+- Fixed bugs in StereoSparse3D
+- Fixed bug in DistortImageOps.boundBox_F32()
+- Added ImageGridPanel to display a set of images as a grid
 
 
 ---------------------------------------------

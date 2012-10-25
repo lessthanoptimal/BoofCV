@@ -31,7 +31,10 @@ import boofcv.alg.geo.f.DistanceEpipolarConstraint;
 import boofcv.alg.geo.h.HomographyLinear4;
 import boofcv.alg.geo.h.HomographyResidualSampson;
 import boofcv.alg.geo.h.HomographyResidualTransfer;
-import boofcv.alg.geo.pose.*;
+import boofcv.alg.geo.pose.P3PFinsterwalder;
+import boofcv.alg.geo.pose.P3PGrunert;
+import boofcv.alg.geo.pose.PnPLepetitEPnP;
+import boofcv.alg.geo.pose.PoseFromPairLinear6;
 import boofcv.alg.geo.trifocal.TrifocalAlgebraicPoint7;
 import boofcv.numerics.optimization.FactoryOptimization;
 import boofcv.numerics.optimization.UnconstrainedLeastSquares;
@@ -333,7 +336,7 @@ public class FactoryMultiView {
 	 * @param maxIterations Maximum number of iterations.  Try 200
 	 */
 	public static RefinePnP refinePnP( double tol , int maxIterations ) {
-		return new LeastSquaresPose(tol,maxIterations,new PoseRodriguesCodec());
+		return new PnPRefineRodrigues(tol,maxIterations);
 	}
 
 	/**

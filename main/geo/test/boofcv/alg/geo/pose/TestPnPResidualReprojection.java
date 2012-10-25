@@ -32,7 +32,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestPnPResidualSimple {
+public class TestPnPResidualReprojection {
 	
 	@Test
 	public void basicTest() {
@@ -47,7 +47,7 @@ public class TestPnPResidualSimple {
 		obs.x = temp.x/temp.z;
 		obs.y = temp.y/temp.z;
 
-		PnPResidualSimple alg = new PnPResidualSimple();
+		PnPResidualReprojection alg = new PnPResidualReprojection();
 		
 		// compute errors with perfect model
 		double error[] = new double[ alg.getN() ];

@@ -36,7 +36,7 @@ public class TestPoseRodriguesCodec {
 		
 		Se3_F64 encoded = new Se3_F64();
 		
-		PoseRodriguesCodec codec = new PoseRodriguesCodec();
+		PnPRodriguesCodec codec = new PnPRodriguesCodec();
 		
 		assertEquals(6,codec.getParamLength());
 		

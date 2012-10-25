@@ -36,7 +36,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestDistancePnPReprojectionSq {
+public class TestPnPDistanceReprojectionSq {
 
 	Random rand = new Random(234);
 
@@ -65,7 +65,7 @@ public class TestDistancePnPReprojectionSq {
 		// convert to normalized image coordinates
 		PerspectiveOps.convertPixelToNorm(K,observed,observed);
 
-		DistancePnPReprojectionSq alg = new DistancePnPReprojectionSq(K.get(0,0),K.get(1,1),K.get(0,1));
+		PnPDistanceReprojectionSq alg = new PnPDistanceReprojectionSq(K.get(0,0),K.get(1,1),K.get(0,1));
 		alg.setModel(worldToCamera);
 
 		double found = alg.computeDistance(new PointPosePair(observed,X));
@@ -89,7 +89,7 @@ public class TestDistancePnPReprojectionSq {
 
 		Point2D_F64 observed = PerspectiveOps.renderPixel(worldToCamera, K, X);
 
-		DistancePnPReprojectionSq alg = new DistancePnPReprojectionSq(K.get(0,0),K.get(1,1),K.get(0,1));
+		PnPDistanceReprojectionSq alg = new PnPDistanceReprojectionSq(K.get(0,0),K.get(1,1),K.get(0,1));
 		alg.setModel(worldToCamera);
 
 		double found = alg.computeDistance(new PointPosePair(observed,X));
@@ -131,7 +131,7 @@ public class TestDistancePnPReprojectionSq {
 			expected[i] = deltaX*deltaX + deltaY*deltaY;
 		}
 
-		DistancePnPReprojectionSq alg = new DistancePnPReprojectionSq(K.get(0,0),K.get(1,1),K.get(0,1));
+		PnPDistanceReprojectionSq alg = new PnPDistanceReprojectionSq(K.get(0,0),K.get(1,1),K.get(0,1));
 		alg.setModel(worldToCamera);
 		double found[] = new double[5];
 		alg.computeDistance(obs,found);
