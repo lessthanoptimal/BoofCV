@@ -20,7 +20,9 @@ package boofcv.abst.geo.pose;
 
 import boofcv.abst.geo.RefinePnP;
 import boofcv.abst.geo.optimization.ResidualsPoseMatrix;
-import boofcv.alg.geo.pose.PoseResidualsSimple;
+import boofcv.alg.geo.pose.PnPJacobianRodrigues;
+import boofcv.alg.geo.pose.PnPResidualReprojection;
+import boofcv.alg.geo.pose.PnPRodriguesCodec;
 import boofcv.numerics.fitting.modelset.ModelCodec;
 import boofcv.numerics.optimization.FactoryOptimization;
 import boofcv.numerics.optimization.UnconstrainedLeastSquares;
@@ -31,28 +33,28 @@ import java.util.List;
 
 /**
  * Minimizes the projection residual error in a calibrated camera for a pose estimate.
+ * Rotation is encoded using rodrigues coordinates.
  *
  * @author Peter Abeles
  */
-public class LeastSquaresPose implements RefinePnP {
+public class PnPRefineRodrigues implements RefinePnP {
 
-	ModelCodec<Se3_F64> paramModel;
+	ModelCodec<Se3_F64> paramModel = new PnPRodriguesCodec();
 	ResidualsPoseMatrix func;
-	double param[];
+	PnPJacobianRodrigues jacobian = new PnPJacobianRodrigues();
 
+	double param[];
 	UnconstrainedLeastSquares minimizer;
 	int maxIterations;
 	double convergenceTol;
 
-	public LeastSquaresPose( double convergenceTol , int maxIterations ,
-							 ModelCodec<Se3_F64> paramModel )
+	public PnPRefineRodrigues(double convergenceTol, int maxIterations )
 	{
 		this.maxIterations = maxIterations;
-		this.paramModel = paramModel;
 		this.convergenceTol = convergenceTol;
 		this.minimizer = FactoryOptimization.leastSquareLevenberg(1e-3);
 
-		func = new ResidualsPoseMatrix(paramModel,new PoseResidualsSimple());
+		func = new ResidualsPoseMatrix(paramModel,new PnPResidualReprojection());
 
 		param = new double[paramModel.getParamLength()];
 	}
@@ -63,8 +65,9 @@ public class LeastSquaresPose implements RefinePnP {
 		paramModel.encode(worldToCamera, param);
 
 		func.setObservations(obs);
+		jacobian.setObservations(obs);
 
-		minimizer.setFunction(func,null);
+		minimizer.setFunction(func,jacobian);
 
 		minimizer.initialize(param,0,convergenceTol*obs.size());
 

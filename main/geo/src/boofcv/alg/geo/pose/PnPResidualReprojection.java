@@ -30,7 +30,7 @@ import georegression.transform.se.SePointOps_F64;
  *
  * @author Peter Abeles
  */
-public class PnPResidualSimple
+public class PnPResidualReprojection
 		implements ModelObservationResidualN<Se3_F64,PointPosePair>
 {
 	Se3_F64 motion;

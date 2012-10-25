@@ -18,8 +18,19 @@
 - P3P
   * Implement that complex algorithm
 
+- PoseFromPairLinear6
+  * Create abstract interface for this one
+
 - RectifyImageOps
   * delete fullViewLeft() due to potential pathological cases?
+
+- Alternative rotation matrix encoding
+  * Look at alternatives to rodrigues 3 because of the singularity
+  * Rodrigues 4
+  * Euler
+  * Quaternions
+
+- Combine common elements of PnPJacobianRodrigues and CalibPoseAndPointRodriguesJacobian?
 
 - Long Term
  * Sparse Bundle Adjustment

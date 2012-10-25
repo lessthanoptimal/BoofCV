@@ -19,7 +19,6 @@
 package boofcv.abst.geo.pose;
 
 import boofcv.alg.geo.pose.CommonMotionNPoint;
-import boofcv.alg.geo.pose.PoseRodriguesCodec;
 import boofcv.struct.geo.GeoModelRefine;
 import boofcv.struct.geo.PointPosePair;
 import georegression.geometry.RotationMatrixGenerator;
@@ -32,7 +31,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestLeastSquaresPose extends CommonMotionNPoint {
+public class TestPnPRefineRodrigues extends CommonMotionNPoint {
 
 	Se3_F64 found = new Se3_F64();
 
@@ -45,7 +44,7 @@ public class TestLeastSquaresPose extends CommonMotionNPoint {
 
 		generateScene(10,motion,false);
 
-		GeoModelRefine<Se3_F64,PointPosePair> alg = new LeastSquaresPose(1e-8,200,new PoseRodriguesCodec());
+		GeoModelRefine<Se3_F64,PointPosePair> alg = new PnPRefineRodrigues(1e-8,200);
 		
 		assertTrue(alg.process(motion, pointPose, found));
 
@@ -63,7 +62,7 @@ public class TestLeastSquaresPose extends CommonMotionNPoint {
 
 		generateScene(50,motion,false);
 
-		LeastSquaresPose alg = new LeastSquaresPose(1e-20,500,new PoseRodriguesCodec());
+		PnPRefineRodrigues alg = new PnPRefineRodrigues(1e-20,500);
 
 		Se3_F64 n = motion.copy();
 		n.getT().setX(0);

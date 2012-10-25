@@ -18,7 +18,6 @@
 
 package boofcv.alg.geo;
 
-import org.ejml.UtilEjml;
 import org.ejml.data.DenseMatrix64F;
 
 /**
@@ -47,8 +46,10 @@ public class RodriguesRotationJacobian {
 
 		double theta2 = x*x + y*y + z*z;
 		double theta = Math.sqrt(theta2);
+		double theta4 = theta2*theta2;
+		double theta3 = theta2*theta;
 
-		if( theta <= UtilEjml.EPS ) {
+		if( theta4 == 0 ) {
 			Rx.zero();Ry.zero();Rz.zero();
 
 			Rx.set(1,2,1);
@@ -64,9 +65,6 @@ public class RodriguesRotationJacobian {
 			// R = I + (hat(w)/theta)*sin(theta) + ((hat(w)/theta)^2)*(1-cos(theta))
 			// theta = sqrt(x*x + y*y + z*z)
 			// Then the equations were further simplified by hand
-
-			double theta4 = theta2*theta2;
-			double theta3 = theta2*theta;
 
 			double s = Math.sin(theta);
 			double c = Math.cos(theta);
