@@ -85,9 +85,8 @@ public class BundleAdjustmentCalibratedDense
 		func.configure(codec,initialModel,observations);
 		jacobian.configure(observations,initialModel.getNumPoints(),extrinsic);
 
-		// use a numerical jacobian
 		minimizer.setFunction(func,jacobian);
-		minimizer.initialize(param,0,convergenceTol*observations.size());
+		minimizer.initialize(param, 0, convergenceTol * observations.size());
 
 		for( int i = 0; i < maxIterations; i++ ) {
 			if( minimizer.iterate() )

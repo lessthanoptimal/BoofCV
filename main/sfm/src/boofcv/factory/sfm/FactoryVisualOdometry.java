@@ -6,12 +6,12 @@ import boofcv.abst.feature.tracker.KeyFramePointTracker;
 import boofcv.abst.geo.Estimate1ofPnP;
 import boofcv.abst.geo.TriangulateTwoViewsCalibrated;
 import boofcv.abst.sfm.StereoVisualOdometry;
-import boofcv.abst.sfm.WrapPixelDepthVoEpipolar;
+import boofcv.abst.sfm.WrapVisOdomPixelDepthPnP;
 import boofcv.alg.geo.DistanceModelMonoPixels;
 import boofcv.alg.geo.pose.PnPDistanceReprojectionSq;
-import boofcv.alg.sfm.PixelDepthVoEpipolar;
 import boofcv.alg.sfm.PointPoseTrack;
 import boofcv.alg.sfm.StereoSparse3D;
+import boofcv.alg.sfm.VisOdomPixelDepthPnP;
 import boofcv.alg.sfm.robust.EstimatorToGenerator;
 import boofcv.factory.geo.EnumPNP;
 import boofcv.factory.geo.FactoryMultiView;
@@ -148,8 +148,8 @@ public class FactoryVisualOdometry {
 		KeyFramePointTracker<T,PointPoseTrack> keyTracker =
 				new KeyFramePointTracker<T,PointPoseTrack>(tracker,null,PointPoseTrack.class);
 
-		PixelDepthVoEpipolar<T> alg = new PixelDepthVoEpipolar<T>(minTracks,motion,pixelTo3D,keyTracker,triangulate);
+		VisOdomPixelDepthPnP<T> alg = new VisOdomPixelDepthPnP<T>(minTracks,motion,pixelTo3D,keyTracker,triangulate);
 
-		return new WrapPixelDepthVoEpipolar<T>(alg,pixelTo3D,keyTracker,distance,imageType);
+		return new WrapVisOdomPixelDepthPnP<T>(alg,pixelTo3D,keyTracker,distance,imageType);
 	}
 }

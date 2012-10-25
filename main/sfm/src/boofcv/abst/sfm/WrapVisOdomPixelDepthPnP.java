@@ -5,9 +5,9 @@ import boofcv.abst.feature.tracker.PointTrack;
 import boofcv.alg.distort.LensDistortionOps;
 import boofcv.alg.geo.DistanceModelMonoPixels;
 import boofcv.alg.sfm.AccessSfmPointTracks;
-import boofcv.alg.sfm.PixelDepthVoEpipolar;
 import boofcv.alg.sfm.PointPoseTrack;
 import boofcv.alg.sfm.StereoSparse3D;
+import boofcv.alg.sfm.VisOdomPixelDepthPnP;
 import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.distort.PointTransform_F64;
 import boofcv.struct.geo.PointPosePair;
@@ -22,11 +22,11 @@ import java.util.List;
 /**
  * @author Peter Abeles
  */
-public class WrapPixelDepthVoEpipolar<T extends ImageSingleBand>
+public class WrapVisOdomPixelDepthPnP<T extends ImageSingleBand>
 		implements StereoVisualOdometry<T>, AccessSfmPointTracks {
 
 	// low level algorithm
-	PixelDepthVoEpipolar<T> alg;
+	VisOdomPixelDepthPnP<T> alg;
 	StereoSparse3D<T> stereo;
 	KeyFramePointTracker<T,PointPoseTrack> tracker;
 	DistanceModelMonoPixels<Se3_F64,PointPosePair> fitError;
@@ -34,11 +34,11 @@ public class WrapPixelDepthVoEpipolar<T extends ImageSingleBand>
 	boolean failed;
 
 
-	public WrapPixelDepthVoEpipolar(PixelDepthVoEpipolar<T> alg,
+	public WrapVisOdomPixelDepthPnP(VisOdomPixelDepthPnP<T> alg,
 									StereoSparse3D<T> stereo,
-									KeyFramePointTracker<T,PointPoseTrack> tracker ,
-									DistanceModelMonoPixels<Se3_F64,PointPosePair> fitError,
-									Class<T> imageType ) {
+									KeyFramePointTracker<T, PointPoseTrack> tracker,
+									DistanceModelMonoPixels<Se3_F64, PointPosePair> fitError,
+									Class<T> imageType) {
 		this.alg = alg;
 		this.stereo = stereo;
 		this.tracker = tracker;

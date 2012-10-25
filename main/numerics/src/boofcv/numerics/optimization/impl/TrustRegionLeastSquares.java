@@ -130,6 +130,7 @@ public class TrustRegionLeastSquares {
 		fx = cost(residuals);
 		fx_prev = 0;
 		regionRadius = maxRadius;
+		mode = 0;
 	}
 
 	/**

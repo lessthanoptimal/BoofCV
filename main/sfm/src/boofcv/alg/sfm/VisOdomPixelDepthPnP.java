@@ -1,9 +1,11 @@
 package boofcv.alg.sfm;
 
 import boofcv.abst.feature.tracker.KeyFramePointTracker;
+import boofcv.abst.geo.BundleAdjustmentCalibrated;
 import boofcv.abst.geo.RefinePnP;
 import boofcv.abst.geo.TriangulateTwoViewsCalibrated;
-import boofcv.factory.geo.FactoryMultiView;
+import boofcv.alg.geo.bundle.CalibratedPoseAndPoint;
+import boofcv.alg.geo.bundle.ViewPointObservations;
 import boofcv.factory.geo.FactoryTriangulate;
 import boofcv.numerics.fitting.modelset.ModelMatcher;
 import boofcv.struct.calib.StereoParameters;
@@ -23,14 +25,15 @@ import java.util.List;
  * @author Peter Abeles
  */
 
-
 // TODO Add features before keyframe change.  Discard keyframe when original tracks are dropped
 
-public class PixelDepthVoEpipolar<T extends ImageBase> {
+// TODO Spawn large regions are lacking them
+
+public class VisOdomPixelDepthPnP<T extends ImageBase> {
 	// TODO Make relative to the last update or remove?
 	double MIN_PIXEL_CHANGE = 100;
 
-	double TOL_TRIANGULATE = 2*Math.PI/180.0;
+	double TOL_TRIANGULATE = 3*Math.PI/180.0;
 
 	int MIN_TRACKS = 100;
 
@@ -39,7 +42,8 @@ public class PixelDepthVoEpipolar<T extends ImageBase> {
 	// used to estimate a feature's 3D position from image range data
 	private ImagePixelTo3D pixelTo3D;
 
-	RefinePnP refine = FactoryMultiView.refinePnP(1e-6,100);
+	RefinePnP refine = null;//FactoryMultiView.refinePnP(1e-6,100);
+	BundleAdjustmentCalibrated bundle = null;//FactoryMultiView.bundleCalibrated(1e-8,300);
 
 	// triangulate feature's 3D location
 	private TriangulateTwoViewsCalibrated triangulate =
@@ -62,7 +66,7 @@ public class PixelDepthVoEpipolar<T extends ImageBase> {
 
 	boolean motionEstimated;
 
-	public PixelDepthVoEpipolar(int MIN_TRACKS, ModelMatcher<Se3_F64, PointPosePair> motionEstimator,
+	public VisOdomPixelDepthPnP(int MIN_TRACKS, ModelMatcher<Se3_F64, PointPosePair> motionEstimator,
 								ImagePixelTo3D pixelTo3D,
 								KeyFramePointTracker<T, PointPoseTrack> tracker,
 								TriangulateTwoViewsCalibrated triangulate)
@@ -99,6 +103,9 @@ public class PixelDepthVoEpipolar<T extends ImageBase> {
 //		System.out.println(" numTracksUsed = "+numTracksUsed);
 		if( numTracksUsed < MIN_TRACKS ) {
 			pixelTo3D.initialize();
+
+			if( bundle != null )
+				bundleAdjustment();
 
 			System.out.println("----------- CHANGE KEY FRAME ---------------");
 			concatMotion();
@@ -180,8 +187,6 @@ public class PixelDepthVoEpipolar<T extends ImageBase> {
 			keyToCurr = motionEstimator.getModel();
 		}
 
-		// TODO add non-linear refinement
-
 		keyToCurr.invert(currToKey);
 
 		// update feature locations using triangulation
@@ -196,6 +201,67 @@ public class PixelDepthVoEpipolar<T extends ImageBase> {
 		motionEstimated = true;
 
 		return true;
+	}
+
+	// TODO only do bundle adjustment if X points have an angle greater than Y?
+	private boolean bundleAdjustment() {
+		List<PointPosePair> inliers = motionEstimator.getMatchSet();
+		List<PointPoseTrack> all = tracker.getPairs();
+
+		CalibratedPoseAndPoint model = new CalibratedPoseAndPoint();
+		ViewPointObservations view1 = new ViewPointObservations();
+		ViewPointObservations view2 = new ViewPointObservations();
+
+		model.configure(2,inliers.size());
+		model.getWorldToCamera(0).reset();
+		model.getWorldToCamera(1).set(motionEstimator.getModel());
+		model.setViewKnown(0,true);
+		model.setViewKnown(1,false);
+
+		int numGoodAngle = 0;
+
+		computeObsAngle.setFromAtoB(model.getWorldToCamera(1));
+
+		for( int i = 0; i < inliers.size(); i++ ) {
+			PointPoseTrack t = all.get( motionEstimator.getInputIndex(i));
+
+			view1.getPoints().grow().set(i,t.keyLoc);
+			view2.getPoints().grow().set(i,t.currLoc);
+
+			model.getPoint(i).set(t.getLocation());
+
+			double acute =  computeObsAngle.computeAcuteAngle(t.keyLoc,t.currLoc);
+			if( acute > TOL_TRIANGULATE )
+				numGoodAngle++;
+		}
+
+		if( numGoodAngle < 5 ) {
+			System.out.println("  NOOOOOO UPDATE BUNDLE");
+			return true;
+		}
+
+		List<ViewPointObservations> l = new ArrayList<ViewPointObservations>();
+		l.add(view1);
+		l.add(view2);
+
+		if( !bundle.process(model,l) ) {
+			return false;
+		}
+
+		for( int i = 0; i < inliers.size(); i++ ) {
+			PointPoseTrack t = all.get( motionEstimator.getInputIndex(i));
+
+//			System.out.println("Before Z = "+t.getLocation().z+"  after "+model.getPoint(i).z);
+
+			t.getLocation().set( model.getPoint(i) );
+		}
+
+		motionEstimator.getModel().getT().print();
+		model.getWorldToCamera(1).getT().print();
+
+		model.getWorldToCamera(1).invert(currToKey);
+
+		return false;
 	}
 
 	private boolean checkSignificantMotion() {
