@@ -20,7 +20,7 @@ package boofcv.alg.geo.pose;
 
 import boofcv.alg.geo.DistanceModelMonoPixels;
 import boofcv.alg.geo.NormalizedToPixelError;
-import boofcv.struct.geo.PointPosePair;
+import boofcv.struct.geo.Point2D3D;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
@@ -30,7 +30,7 @@ import java.util.List;
 
 /**
  * <p>
- * Computes the reprojection error squared for a given motion and {@link PointPosePair}.  If the intrinsic
+ * Computes the reprojection error squared for a given motion and {@link boofcv.struct.geo.Point2D3D}.  If the intrinsic
  * parameters are provided then the error will be computed in pixels.   Observations are assumed to be
  * in normalized image coordinates.
  * <center>error = (x'-x)^2 + (y' - y)^2</center>
@@ -40,7 +40,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class PnPDistanceReprojectionSq implements DistanceModelMonoPixels<Se3_F64,PointPosePair> {
+public class PnPDistanceReprojectionSq implements DistanceModelMonoPixels<Se3_F64,Point2D3D> {
 
 	// transform from world to camera
 	private Se3_F64 worldToCamera;
@@ -77,7 +77,7 @@ public class PnPDistanceReprojectionSq implements DistanceModelMonoPixels<Se3_F6
 	}
 
 	@Override
-	public double computeDistance(PointPosePair pt) {
+	public double computeDistance(Point2D3D pt) {
 		// compute point location in camera frame
 		SePointOps_F64.transform(worldToCamera,pt.location,X);
 
@@ -85,13 +85,13 @@ public class PnPDistanceReprojectionSq implements DistanceModelMonoPixels<Se3_F6
 		if( X.z <= 0 )
 			return Double.MAX_VALUE;
 
-		Point2D_F64 p = pt.getObserved();
+		Point2D_F64 p = pt.getObservation();
 
 		return pixelError.errorSq(X.x/X.z,X.y/X.z,p.x,p.y);
 	}
 
 	@Override
-	public void computeDistance(List<PointPosePair> obserations, double[] distance) {
+	public void computeDistance(List<Point2D3D> obserations, double[] distance) {
 		for( int i = 0; i < obserations.size(); i++ )
 			distance[i] = computeDistance(obserations.get(i));
 	}

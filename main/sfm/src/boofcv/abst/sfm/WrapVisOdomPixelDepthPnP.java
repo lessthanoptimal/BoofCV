@@ -10,7 +10,7 @@ import boofcv.alg.sfm.StereoSparse3D;
 import boofcv.alg.sfm.VisOdomPixelDepthPnP;
 import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.distort.PointTransform_F64;
-import boofcv.struct.geo.PointPosePair;
+import boofcv.struct.geo.Point2D3D;
 import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
@@ -29,7 +29,7 @@ public class WrapVisOdomPixelDepthPnP<T extends ImageSingleBand>
 	VisOdomPixelDepthPnP<T> alg;
 	StereoSparse3D<T> stereo;
 	KeyFramePointTracker<T,PointPoseTrack> tracker;
-	DistanceModelMonoPixels<Se3_F64,PointPosePair> fitError;
+	DistanceModelMonoPixels<Se3_F64,Point2D3D> fitError;
 	Class<T> imageType;
 	boolean failed;
 
@@ -37,7 +37,7 @@ public class WrapVisOdomPixelDepthPnP<T extends ImageSingleBand>
 	public WrapVisOdomPixelDepthPnP(VisOdomPixelDepthPnP<T> alg,
 									StereoSparse3D<T> stereo,
 									KeyFramePointTracker<T, PointPoseTrack> tracker,
-									DistanceModelMonoPixels<Se3_F64, PointPosePair> fitError,
+									DistanceModelMonoPixels<Se3_F64, Point2D3D> fitError,
 									Class<T> imageType) {
 		this.alg = alg;
 		this.stereo = stereo;
@@ -71,7 +71,7 @@ public class WrapVisOdomPixelDepthPnP<T extends ImageSingleBand>
 	public List<Point2D_F64> getInlierTracks() {
 		List<Point2D_F64> pixels = new ArrayList<Point2D_F64>();
 
-		if( alg.isMotionEstimated() ) {
+		if( alg.isInliersValid() ) {
 			List<PointPoseTrack> tracks = alg.getTracker().getPairs();
 
 			int N = alg.getMotionEstimator().getMatchSet().size();

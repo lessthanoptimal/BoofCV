@@ -23,7 +23,7 @@ import boofcv.abst.geo.GeoModelEstimatorNto1;
 import boofcv.alg.geo.pose.PnPDistanceReprojectionSq;
 import boofcv.struct.FastQueue;
 import boofcv.struct.geo.GeoModelEstimatorN;
-import boofcv.struct.geo.PointPosePair;
+import boofcv.struct.geo.Point2D3D;
 import georegression.struct.se.Se3_F64;
 
 /**
@@ -31,10 +31,10 @@ import georegression.struct.se.Se3_F64;
  *
  * @author Peter Abeles
  */
-public class EstimateNto1ofPnP extends GeoModelEstimatorNto1<Se3_F64,PointPosePair>
+public class EstimateNto1ofPnP extends GeoModelEstimatorNto1<Se3_F64,Point2D3D>
 		implements Estimate1ofPnP
 {
-	public EstimateNto1ofPnP(GeoModelEstimatorN<Se3_F64, PointPosePair> alg, FastQueue<Se3_F64> solutions, int numTest) {
+	public EstimateNto1ofPnP(GeoModelEstimatorN<Se3_F64, Point2D3D> alg, FastQueue<Se3_F64> solutions, int numTest) {
 		super(alg, new PnPDistanceReprojectionSq(), solutions, numTest);
 	}
 

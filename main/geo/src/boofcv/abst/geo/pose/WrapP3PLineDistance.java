@@ -22,7 +22,7 @@ import boofcv.abst.geo.EstimateNofPnP;
 import boofcv.alg.geo.pose.P3PLineDistance;
 import boofcv.alg.geo.pose.PointDistance3;
 import boofcv.struct.FastQueue;
-import boofcv.struct.geo.PointPosePair;
+import boofcv.struct.geo.Point2D3D;
 import georegression.fitting.MotionTransformPoint;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Vector3D_F64;
@@ -70,22 +70,22 @@ public class WrapP3PLineDistance implements EstimateNofPnP {
 	}
 
 	@Override
-	public boolean process(List<PointPosePair> inputs , FastQueue<Se3_F64> solutions ) {
+	public boolean process(List<Point2D3D> inputs , FastQueue<Se3_F64> solutions ) {
 		if( inputs.size() != 3 )
 			throw new IllegalArgumentException("Three and only three inputs are required.  Not "+inputs.size());
 
 		solutions.reset();
 
-		PointPosePair P1 = inputs.get(0);
-		PointPosePair P2 = inputs.get(1);
-		PointPosePair P3 = inputs.get(2);
+		Point2D3D P1 = inputs.get(0);
+		Point2D3D P2 = inputs.get(1);
+		Point2D3D P3 = inputs.get(2);
 
 		// Compute the length of each side in the triangle
 		double length12 = P1.location.distance(P2.getLocation());
 		double length13 = P1.location.distance(P3.getLocation());
 		double length23 = P2.location.distance(P3.getLocation());
 
-		if( !alg.process(P1.observed,P2.observed,P3.observed,length23,length13,length12))
+		if( !alg.process(P1.observation,P2.observation,P3.observation,length23,length13,length12))
 			return false;
 
 		FastQueue<PointDistance3> distances = alg.getSolutions();
@@ -94,9 +94,9 @@ public class WrapP3PLineDistance implements EstimateNofPnP {
 			return false;
 
 		// convert observations into a 3D pointing vector and normalize to one
-		u1.set(P1.observed.x,P1.observed.y,1); // homogeneous coordinates
-		u2.set(P2.observed.x,P2.observed.y,1);
-		u3.set(P3.observed.x,P3.observed.y,1);
+		u1.set(P1.observation.x,P1.observation.y,1); // homogeneous coordinates
+		u2.set(P2.observation.x,P2.observation.y,1);
+		u3.set(P3.observation.x,P3.observation.y,1);
 
 		u1.normalize(); u2.normalize(); u3.normalize();
 

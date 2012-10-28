@@ -22,36 +22,36 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 
 /**
- * Observed point feature location on the image plane and its 3D position in world coordinates.
+ * Observed point feature location on the image plane and its 3D position.
  *
  * @author Peter Abeles
  */
-public class PointPosePair {
+public class Point2D3D {
 	/**
 	 * Observed location of the feature on the image plane
 	 */
-	public Point2D_F64 observed;
+	public Point2D_F64 observation;
 	/**
 	 * 3D location of the feature in world coordinates
 	 */
 	public Point3D_F64 location;
 
-	public PointPosePair() {
-		observed = new Point2D_F64();
+	public Point2D3D() {
+		observation = new Point2D_F64();
 		location = new Point3D_F64();
 	}
 
-	public PointPosePair(Point2D_F64 observed, Point3D_F64 location) {
-		this.observed = observed;
+	public Point2D3D(Point2D_F64 observation, Point3D_F64 location) {
+		this.observation = observation;
 		this.location = location;
 	}
 
-	public Point2D_F64 getObserved() {
-		return observed;
+	public Point2D_F64 getObservation() {
+		return observation;
 	}
 
-	public void setObserved(Point2D_F64 observed) {
-		this.observed = observed;
+	public void setObservation(Point2D_F64 observation) {
+		this.observation = observation;
 	}
 
 	public Point3D_F64 getLocation() {

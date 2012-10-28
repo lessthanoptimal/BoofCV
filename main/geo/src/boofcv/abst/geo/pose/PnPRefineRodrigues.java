@@ -26,7 +26,7 @@ import boofcv.alg.geo.pose.PnPRodriguesCodec;
 import boofcv.numerics.fitting.modelset.ModelCodec;
 import boofcv.numerics.optimization.FactoryOptimization;
 import boofcv.numerics.optimization.UnconstrainedLeastSquares;
-import boofcv.struct.geo.PointPosePair;
+import boofcv.struct.geo.Point2D3D;
 import georegression.struct.se.Se3_F64;
 
 import java.util.List;
@@ -60,7 +60,7 @@ public class PnPRefineRodrigues implements RefinePnP {
 	}
 
 	@Override
-	public boolean process(Se3_F64 worldToCamera, List<PointPosePair> obs, Se3_F64 refinedWorldToCamera ) {
+	public boolean process(Se3_F64 worldToCamera, List<Point2D3D> obs, Se3_F64 refinedWorldToCamera ) {
 
 		paramModel.encode(worldToCamera, param);
 

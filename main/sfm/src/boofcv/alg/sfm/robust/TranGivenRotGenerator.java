@@ -2,7 +2,7 @@ package boofcv.alg.sfm.robust;
 
 import boofcv.alg.geo.pose.PositionFromPairLinear2;
 import boofcv.numerics.fitting.modelset.ModelGenerator;
-import boofcv.struct.geo.PointPosePair;
+import boofcv.struct.geo.Point2D3D;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Vector3D_F64;
@@ -16,7 +16,7 @@ import java.util.List;
  * 
  * @author Peter Abeles
  */
-public class TranGivenRotGenerator implements ModelGenerator<Vector3D_F64,PointPosePair>
+public class TranGivenRotGenerator implements ModelGenerator<Vector3D_F64,Point2D3D>
 {
 	PositionFromPairLinear2 alg = new PositionFromPairLinear2();
 	
@@ -37,14 +37,14 @@ public class TranGivenRotGenerator implements ModelGenerator<Vector3D_F64,PointP
 	}
 
 	@Override
-	public boolean generate(List<PointPosePair> dataSet, Vector3D_F64 model ) {
+	public boolean generate(List<Point2D3D> dataSet, Vector3D_F64 model ) {
 		worldPts.clear();
 		observed.clear();
 		
 		for( int i = 0; i < dataSet.size(); i++ ) {
-			PointPosePair p = dataSet.get(i);
+			Point2D3D p = dataSet.get(i);
 			worldPts.add( p.location );
-			observed.add( p.observed );
+			observed.add( p.observation);
 		}
 		
 		if( alg.process(R,worldPts,observed) ) {

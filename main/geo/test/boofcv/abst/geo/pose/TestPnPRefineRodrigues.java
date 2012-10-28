@@ -20,7 +20,7 @@ package boofcv.abst.geo.pose;
 
 import boofcv.alg.geo.pose.CommonMotionNPoint;
 import boofcv.struct.geo.GeoModelRefine;
-import boofcv.struct.geo.PointPosePair;
+import boofcv.struct.geo.Point2D3D;
 import georegression.geometry.RotationMatrixGenerator;
 import georegression.struct.se.Se3_F64;
 import org.junit.Test;
@@ -44,7 +44,7 @@ public class TestPnPRefineRodrigues extends CommonMotionNPoint {
 
 		generateScene(10,motion,false);
 
-		GeoModelRefine<Se3_F64,PointPosePair> alg = new PnPRefineRodrigues(1e-8,200);
+		GeoModelRefine<Se3_F64,Point2D3D> alg = new PnPRefineRodrigues(1e-8,200);
 		
 		assertTrue(alg.process(motion, pointPose, found));
 

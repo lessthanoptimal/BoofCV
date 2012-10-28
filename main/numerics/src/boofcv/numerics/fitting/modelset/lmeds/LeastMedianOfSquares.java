@@ -197,4 +197,9 @@ public class LeastMedianOfSquares<Model, Point> implements ModelMatcher<Model, P
 	public double getError() {
 		return bestMedian;
 	}
+
+	@Override
+	public int getMinimumSize() {
+		return sampleSize;
+	}
 }

@@ -1,6 +1,6 @@
 package boofcv.alg.sfm.robust;
 
-import boofcv.struct.geo.PointPosePair;
+import boofcv.struct.geo.Point2D3D;
 import georegression.geometry.RotationMatrixGenerator;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
@@ -29,13 +29,13 @@ public class TestDistanceTranGivenRotSq {
 
 		Point3D_F64 X = new Point3D_F64(0.1,-0.05,3);
 
-		PointPosePair obs = new PointPosePair();
+		Point2D3D obs = new Point2D3D();
 		obs.location = X.copy();
 
 		SePointOps_F64.transform(keyToCurr, X, X);
 
-		obs.observed.x = X.x/X.z;
-		obs.observed.y = X.y/X.z;
+		obs.observation.x = X.x/X.z;
+		obs.observation.y = X.y/X.z;
 
 		alg.setRotation(keyToCurr.getR());
 		alg.setModel(keyToCurr.getT());
@@ -50,13 +50,13 @@ public class TestDistanceTranGivenRotSq {
 
 		Point3D_F64 X = new Point3D_F64(0.1,-0.05,3);
 
-		PointPosePair obs = new PointPosePair();
+		Point2D3D obs = new Point2D3D();
 		obs.location = X.copy();
 
 		SePointOps_F64.transform(keyToCurr, X, X);
 
-		obs.observed.x = X.x/X.z+1;
-		obs.observed.y = X.y/X.z+1;
+		obs.observation.x = X.x/X.z+1;
+		obs.observation.y = X.y/X.z+1;
 
 		alg.setRotation(keyToCurr.getR());
 		alg.setModel(keyToCurr.getT());

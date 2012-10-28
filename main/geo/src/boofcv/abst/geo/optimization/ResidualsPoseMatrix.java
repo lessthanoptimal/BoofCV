@@ -21,7 +21,7 @@ package boofcv.abst.geo.optimization;
 import boofcv.alg.geo.ModelObservationResidualN;
 import boofcv.numerics.fitting.modelset.ModelCodec;
 import boofcv.numerics.optimization.functions.FunctionNtoM;
-import boofcv.struct.geo.PointPosePair;
+import boofcv.struct.geo.Point2D3D;
 import georegression.struct.se.Se3_F64;
 
 import java.util.List;
@@ -35,9 +35,9 @@ public class ResidualsPoseMatrix implements FunctionNtoM {
 	// converts parameters to and from the motion
 	protected ModelCodec<Se3_F64> param;
 	// list of observations
-	protected List<PointPosePair> obs;
+	protected List<Point2D3D> obs;
 	// error function
-	protected ModelObservationResidualN<Se3_F64,PointPosePair> residual;
+	protected ModelObservationResidualN<Se3_F64,Point2D3D> residual;
 
 	// pre-declare temporary storage
 	protected Se3_F64 pose = new Se3_F64();
@@ -49,12 +49,12 @@ public class ResidualsPoseMatrix implements FunctionNtoM {
 	 * @param residual Function for computing the residuals
 	 */
 	public ResidualsPoseMatrix(ModelCodec<Se3_F64> param,
-							   ModelObservationResidualN<Se3_F64,PointPosePair> residual) {
+							   ModelObservationResidualN<Se3_F64,Point2D3D> residual) {
 		this.param = param;
 		this.residual = residual;
 	}
 
-	public void setObservations( List<PointPosePair> obs ) {
+	public void setObservations( List<Point2D3D> obs ) {
 		this.obs = obs;
 	}
 

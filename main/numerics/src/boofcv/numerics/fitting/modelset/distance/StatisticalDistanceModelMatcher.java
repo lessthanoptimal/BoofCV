@@ -242,4 +242,9 @@ public class StatisticalDistanceModelMatcher<Model, Point> implements ModelMatch
 	public double getError() {
 		return centerError;
 	}
+
+	@Override
+	public int getMinimumSize() {
+		return minFitPoints;
+	}
 }

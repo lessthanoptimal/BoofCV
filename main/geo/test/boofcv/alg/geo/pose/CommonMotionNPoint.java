@@ -21,7 +21,7 @@ package boofcv.alg.geo.pose;
 import boofcv.alg.geo.GeoTestingOps;
 import boofcv.alg.geo.h.CommonHomographyChecks;
 import boofcv.struct.geo.AssociatedPair;
-import boofcv.struct.geo.PointPosePair;
+import boofcv.struct.geo.Point2D3D;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
@@ -49,7 +49,7 @@ public class CommonMotionNPoint {
 	// list of observation pairs in both reference frames
 	protected List<AssociatedPair> assocPairs;
 	// list of point pairs
-	protected List<PointPosePair> pointPose;
+	protected List<Point2D3D> pointPose;
 
 	protected void generateScene(int N, Se3_F64 motion, boolean planar) {
 		this.motion = motion;
@@ -65,7 +65,7 @@ public class CommonMotionNPoint {
 
 		// transform points into second camera's reference frame
 		assocPairs = new ArrayList<AssociatedPair>();
-		pointPose = new ArrayList<PointPosePair>();
+		pointPose = new ArrayList<Point2D3D>();
 		for(Point3D_F64 p1 : worldPts ) {
 			Point3D_F64 p2 = SePointOps_F64.transform(motion, p1, null);
 
@@ -73,7 +73,7 @@ public class CommonMotionNPoint {
 			pair.keyLoc.set(p1.x/p1.z,p1.y/p1.z);
 			pair.currLoc.set(p2.x/p2.z,p2.y/p2.z);
 			assocPairs.add(pair);
-			pointPose.add( new PointPosePair(pair.currLoc,p1));
+			pointPose.add( new Point2D3D(pair.currLoc,p1));
 
 			cameraPts.add(p2);
 		}

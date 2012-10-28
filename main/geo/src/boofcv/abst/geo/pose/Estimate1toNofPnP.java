@@ -21,7 +21,7 @@ package boofcv.abst.geo.pose;
 import boofcv.abst.geo.EstimateNofPnP;
 import boofcv.abst.geo.GeoModelEstimator1toN;
 import boofcv.struct.geo.GeoModelEstimator1;
-import boofcv.struct.geo.PointPosePair;
+import boofcv.struct.geo.Point2D3D;
 import georegression.struct.se.Se3_F64;
 
 /**
@@ -29,10 +29,10 @@ import georegression.struct.se.Se3_F64;
  *
  * @author Peter Abeles
  */
-public class Estimate1toNofPnP extends GeoModelEstimator1toN<Se3_F64,PointPosePair>
+public class Estimate1toNofPnP extends GeoModelEstimator1toN<Se3_F64,Point2D3D>
 		implements EstimateNofPnP
 {
-	public Estimate1toNofPnP(GeoModelEstimator1<Se3_F64, PointPosePair> alg) {
+	public Estimate1toNofPnP(GeoModelEstimator1<Se3_F64, Point2D3D> alg) {
 		super(alg);
 	}
 }
