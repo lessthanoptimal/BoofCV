@@ -21,7 +21,7 @@ package boofcv.alg.geo.pose;
 import boofcv.abst.geo.optimization.ResidualsPoseMatrix;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.numerics.optimization.JacobianChecker;
-import boofcv.struct.geo.PointPosePair;
+import boofcv.struct.geo.Point2D3D;
 import georegression.geometry.RotationMatrixGenerator;
 import georegression.struct.se.Se3_F64;
 import org.junit.Test;
@@ -58,18 +58,18 @@ public class TestPnPJacobianRodrigues {
 		RotationMatrixGenerator.eulerXYZ(0.1, 1, -0.2, worldToCamera.getR());
 		worldToCamera.getT().set(-0.3,0.4,1);
 
-		List<PointPosePair> observations = new ArrayList<PointPosePair>();
+		List<Point2D3D> observations = new ArrayList<Point2D3D>();
 
 		for( int i = 0; i < numPoints; i++ ) {
-			PointPosePair p = new PointPosePair();
+			Point2D3D p = new Point2D3D();
 
 			p.location.set( rand.nextGaussian()*0.1,
 					rand.nextGaussian()*0.2 , 3 + rand.nextGaussian() );
 
-			p.observed = PerspectiveOps.renderPixel(worldToCamera, null, p.location);
+			p.observation = PerspectiveOps.renderPixel(worldToCamera, null, p.location);
 
-			p.observed.x += rand.nextGaussian()*noise;
-			p.observed.y += rand.nextGaussian()*noise;
+			p.observation.x += rand.nextGaussian()*noise;
+			p.observation.y += rand.nextGaussian()*noise;
 
 			observations.add(p);
 		}

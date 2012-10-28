@@ -20,7 +20,7 @@ package boofcv.alg.geo.pose;
 
 import boofcv.alg.geo.RodriguesRotationJacobian;
 import boofcv.numerics.optimization.functions.FunctionNtoMxN;
-import boofcv.struct.geo.PointPosePair;
+import boofcv.struct.geo.Point2D3D;
 import georegression.geometry.RotationMatrixGenerator;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
@@ -41,7 +41,7 @@ public class PnPJacobianRodrigues implements FunctionNtoMxN {
 
 	// transformation from world to camera frame
 	private Se3_F64 worldToCamera = new Se3_F64();
-	private List<PointPosePair> observations;
+	private List<Point2D3D> observations;
 
 	// used to compute the Jacobian from Rodrigues coordinates
 	private RodriguesRotationJacobian rodJacobian = new RodriguesRotationJacobian();
@@ -58,7 +58,7 @@ public class PnPJacobianRodrigues implements FunctionNtoMxN {
 	private int indexX;
 	private int indexY;
 
-	public void setObservations(List<PointPosePair> observations) {
+	public void setObservations(List<Point2D3D> observations) {
 		this.observations = observations;
 	}
 
@@ -89,7 +89,7 @@ public class PnPJacobianRodrigues implements FunctionNtoMxN {
 
 		// compute the gradient for each observation
 		for( int i = 0; i < observations.size(); i++ ) {
-			PointPosePair o = observations.get(i);
+			Point2D3D o = observations.get(i);
 
 			SePointOps_F64.transform(worldToCamera,o.location, cameraPt);
 

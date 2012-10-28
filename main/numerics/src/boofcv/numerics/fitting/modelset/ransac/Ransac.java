@@ -46,7 +46,7 @@ import java.util.Random;
  */
 public class Ransac<Model, Point> implements ModelMatcher<Model,Point> {
 	// how many points are drawn to generate the model
-	protected int numSample;
+	protected int sampleSize;
 
 	// how close a point needs to be considered part of the model
 	protected double thresholdFit;
@@ -82,7 +82,7 @@ public class Ransac<Model, Point> implements ModelMatcher<Model,Point> {
 
 	/**
 	 * Creates a new instance of the ransac algorithm.  The number of points sampled will default to the
-	 * minimum number.  To override this default invoke {@link #setNumSample(int)}.
+	 * minimum number.  To override this default invoke {@link #setSampleSize(int)}.
 	 *
 	 * @param randSeed		 The random seed used by the random number generator.
 	 * @param modelGenerator	Creates new model(s) given a small number of points.
@@ -104,7 +104,7 @@ public class Ransac<Model, Point> implements ModelMatcher<Model,Point> {
 		this.bestFitParam = modelGenerator.createModelInstance();
 		this.candidateParam = modelGenerator.createModelInstance();
 
-		this.numSample = modelGenerator.getMinimumPoints();
+		this.sampleSize = modelGenerator.getMinimumPoints();
 		this.thresholdFit = thresholdFit;
 	}
 
@@ -122,7 +122,7 @@ public class Ransac<Model, Point> implements ModelMatcher<Model,Point> {
 		// is in the inlier set
 		for (int i = 0; i < maxIterations && bestFitPoints.size() != dataSet.size(); i++) {
 			// sample the a small set of points
-			randomDraw(dataSet, numSample, initialSample, rand);
+			randomDraw(dataSet, sampleSize, initialSample, rand);
 			
 			// get the candidate(s) for this sample set
 			if( modelGenerator.generate(initialSample, candidateParam ) ) {
@@ -247,18 +247,19 @@ public class Ransac<Model, Point> implements ModelMatcher<Model,Point> {
 		this.maxIterations = maxIterations;
 	}
 
-	public int getNumSample() {
-		return numSample;
+	@Override
+	public int getMinimumSize() {
+		return sampleSize;
 	}
 
 	/**
 	 * Override the number of points that are sampled and used to generate models.  If this value
 	 * is not set it defaults to the minimum number.
 	 *
-	 * @param numSample Sample of sample points.
+	 * @param sampleSize Number of sample points.
 	 */
-	public void setNumSample(int numSample) {
-		this.numSample = numSample;
+	public void setSampleSize(int sampleSize) {
+		this.sampleSize = sampleSize;
 	}
 
 	public double getThresholdFit() {

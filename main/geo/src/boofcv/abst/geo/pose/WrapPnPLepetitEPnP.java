@@ -20,7 +20,7 @@ package boofcv.abst.geo.pose;
 
 import boofcv.abst.geo.Estimate1ofPnP;
 import boofcv.alg.geo.pose.PnPLepetitEPnP;
-import boofcv.struct.geo.PointPosePair;
+import boofcv.struct.geo.Point2D3D;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
@@ -45,12 +45,12 @@ public class WrapPnPLepetitEPnP implements Estimate1ofPnP {
 	}
 
 	@Override
-	public boolean process(List<PointPosePair> inputs , Se3_F64 solution ) {
+	public boolean process(List<Point2D3D> inputs , Se3_F64 solution ) {
 		for( int i = 0; i < inputs.size(); i++ ) {
-			PointPosePair pp = inputs.get(i);
+			Point2D3D pp = inputs.get(i);
 			
 			worldPts.add(pp.location);
-			observed.add(pp.observed);
+			observed.add(pp.observation);
 		}
 		
 		alg.process(worldPts,observed,solution);

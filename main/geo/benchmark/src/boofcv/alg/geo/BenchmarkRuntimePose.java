@@ -25,7 +25,7 @@ import boofcv.factory.geo.EnumPNP;
 import boofcv.factory.geo.FactoryMultiView;
 import boofcv.misc.PerformerBase;
 import boofcv.misc.ProfileOperation;
-import boofcv.struct.geo.PointPosePair;
+import boofcv.struct.geo.Point2D3D;
 import georegression.struct.se.Se3_F64;
 
 import java.util.ArrayList;
@@ -61,7 +61,7 @@ public class BenchmarkRuntimePose extends ArtificialStereoScene {
 		Estimate1ofPnP alg;
 		String name;
 
-		List<PointPosePair> obs = new ArrayList<PointPosePair>();
+		List<Point2D3D> obs = new ArrayList<Point2D3D>();
 
 		public InterfacePNP(String name , Estimate1ofPnP alg) {
 			this.alg = alg;

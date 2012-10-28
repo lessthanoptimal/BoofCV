@@ -4,7 +4,6 @@ import boofcv.abst.feature.disparity.StereoDisparitySparse;
 import boofcv.abst.feature.tracker.ImagePointTracker;
 import boofcv.abst.feature.tracker.KeyFramePointTracker;
 import boofcv.abst.geo.Estimate1ofPnP;
-import boofcv.abst.geo.TriangulateTwoViewsCalibrated;
 import boofcv.abst.sfm.StereoVisualOdometry;
 import boofcv.abst.sfm.WrapVisOdomPixelDepthPnP;
 import boofcv.alg.geo.DistanceModelMonoPixels;
@@ -15,10 +14,9 @@ import boofcv.alg.sfm.VisOdomPixelDepthPnP;
 import boofcv.alg.sfm.robust.EstimatorToGenerator;
 import boofcv.factory.geo.EnumPNP;
 import boofcv.factory.geo.FactoryMultiView;
-import boofcv.factory.geo.FactoryTriangulate;
 import boofcv.numerics.fitting.modelset.ModelMatcher;
 import boofcv.numerics.fitting.modelset.ransac.Ransac;
-import boofcv.struct.geo.PointPosePair;
+import boofcv.struct.geo.Point2D3D;
 import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.se.Se3_F64;
 
@@ -57,13 +55,13 @@ public class FactoryVisualOdometry {
 //
 //		RefineEpipolarMatrix refineE = FactoryMultiView.refineFundamental(1e-8,400, EpipolarError.SIMPLE);
 //
-//		ModelGenerator<Se3_F64,PointPosePair> generateMotion =
+//		ModelGenerator<Se3_F64,Point2D3D> generateMotion =
 //				new GenerateMotionPnP( FactoryMultiView.computePnPwithEPnP(5,0.1));
-//		DistanceFromModel<Se3_F64,PointPosePair> distanceMotion =
-//				new DistanceFromModelResidualN<Se3_F64,PointPosePair>(new PnPResidualReprojection());
+//		DistanceFromModel<Se3_F64,Point2D3D> distanceMotion =
+//				new DistanceFromModelResidualN<Se3_F64,Point2D3D>(new PnPResidualReprojection());
 //
-//		ModelMatcher<Se3_F64,PointPosePair> computeMotion =
-//				new Ransac<Se3_F64,PointPosePair>(2323,generateMotion,distanceMotion,
+//		ModelMatcher<Se3_F64,Point2D3D> computeMotion =
+//				new Ransac<Se3_F64,Point2D3D>(2323,generateMotion,distanceMotion,
 //						100,noise*noise);
 //
 //		RefinePerspectiveNPoint refineMotion = FactoryMultiView.refinePnpEfficient(5,0.1);
@@ -96,7 +94,7 @@ public class FactoryVisualOdometry {
 //		DistanceFromModel<Se3_F64,AssociatedPair> distanceSe3 =
 //				new DistanceSe3SymmetricSq(triangulate,1,1,0,1,1,0); // TODO use intrinsic
 //
-//		int N = generateEpipolarMotion.getMinimumPoints();
+//		int N = generateEpipolarMotion.getMinimumSize();
 //
 //		ModelMatcher<Se3_F64,AssociatedPair> epipolarMotion =
 //				new Ransac<Se3_F64,AssociatedPair>(2323,generateEpipolarMotion,distanceSe3,
@@ -120,10 +118,10 @@ public class FactoryVisualOdometry {
 
 		// motion estimation using essential matrix
 		Estimate1ofPnP estimator = FactoryMultiView.computePnP_1(EnumPNP.P3P_FINSTERWALDER,-1,2);
-		DistanceModelMonoPixels<Se3_F64,PointPosePair> distance = new PnPDistanceReprojectionSq();
+		DistanceModelMonoPixels<Se3_F64,Point2D3D> distance = new PnPDistanceReprojectionSq();
 
-		EstimatorToGenerator<Se3_F64,PointPosePair> generator =
-				new EstimatorToGenerator<Se3_F64,PointPosePair>(estimator) {
+		EstimatorToGenerator<Se3_F64,Point2D3D> generator =
+				new EstimatorToGenerator<Se3_F64,Point2D3D>(estimator) {
 					@Override
 					public Se3_F64 createModelInstance() {
 						return new Se3_F64();
@@ -134,21 +132,18 @@ public class FactoryVisualOdometry {
 		// 1/2 a pixel tolerance for RANSAC inliers
 		double ransacTOL = inlierPixelTol * inlierPixelTol;
 
-		ModelMatcher<Se3_F64, PointPosePair> motion =
-				new Ransac<Se3_F64, PointPosePair>(2323, generator, distance,
+		ModelMatcher<Se3_F64, Point2D3D> motion =
+				new Ransac<Se3_F64, Point2D3D>(2323, generator, distance,
 						200, ransacTOL);
 
 		// Range from sparse disparity
 		StereoSparse3D<T> pixelTo3D = new StereoSparse3D<T>(sparseDisparity,imageType);
 
-		// triangulate the two views
-		TriangulateTwoViewsCalibrated triangulate = FactoryTriangulate.twoGeometric();
-
 		// setup the tracker
 		KeyFramePointTracker<T,PointPoseTrack> keyTracker =
 				new KeyFramePointTracker<T,PointPoseTrack>(tracker,null,PointPoseTrack.class);
 
-		VisOdomPixelDepthPnP<T> alg = new VisOdomPixelDepthPnP<T>(minTracks,motion,pixelTo3D,keyTracker,triangulate);
+		VisOdomPixelDepthPnP<T> alg = new VisOdomPixelDepthPnP<T>(minTracks,motion,pixelTo3D,keyTracker);
 
 		return new WrapVisOdomPixelDepthPnP<T>(alg,pixelTo3D,keyTracker,distance,imageType);
 	}

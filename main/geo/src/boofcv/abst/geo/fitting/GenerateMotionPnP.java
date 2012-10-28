@@ -20,7 +20,7 @@ package boofcv.abst.geo.fitting;
 
 import boofcv.abst.geo.Estimate1ofPnP;
 import boofcv.numerics.fitting.modelset.ModelGenerator;
-import boofcv.struct.geo.PointPosePair;
+import boofcv.struct.geo.Point2D3D;
 import georegression.struct.se.Se3_F64;
 
 import java.util.List;
@@ -30,7 +30,7 @@ import java.util.List;
  * 
  * @author Peter Abeles
  */
-public class GenerateMotionPnP implements ModelGenerator<Se3_F64,PointPosePair> {
+public class GenerateMotionPnP implements ModelGenerator<Se3_F64,Point2D3D> {
 
 	Estimate1ofPnP alg;
 
@@ -44,7 +44,7 @@ public class GenerateMotionPnP implements ModelGenerator<Se3_F64,PointPosePair> 
 	}
 
 	@Override
-	public boolean generate(List<PointPosePair> dataSet, Se3_F64 model ) {
+	public boolean generate(List<Point2D3D> dataSet, Se3_F64 model ) {
 		return alg.process(dataSet,model);
 	}
 

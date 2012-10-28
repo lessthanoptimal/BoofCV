@@ -11,7 +11,7 @@ import boofcv.numerics.fitting.modelset.ModelMatcher;
 import boofcv.struct.distort.PointTransform_F64;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.geo.GeoModelRefine;
-import boofcv.struct.geo.PointPosePair;
+import boofcv.struct.geo.Point2D3D;
 import boofcv.struct.image.ImageBase;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
@@ -63,7 +63,7 @@ import java.util.List;
 public class MonocularSeparatedMotion<T extends ImageBase> {
 
 	// refines the full pose estimate
-	private GeoModelRefine<Se3_F64,PointPosePair> refinePose = FactoryMultiView.refinePnP(1e-20, 300);
+	private GeoModelRefine<Se3_F64,Point2D3D> refinePose = FactoryMultiView.refinePnP(1e-20, 300);
 	private Se3_F64 poseRefined = new Se3_F64();
 
 	// tracks point features
@@ -245,11 +245,11 @@ public class MonocularSeparatedMotion<T extends ImageBase> {
 		estimateTran.setRotation(rotationToCurr);
 		
 		// compute translation from features with valid locations
-		List<PointPosePair> list = new ArrayList<PointPosePair>();
+		List<Point2D3D> list = new ArrayList<Point2D3D>();
 		
 		for( MultiViewTrack t : inliers ) {
 			if( t.views.size() > 1 ) {
-				list.add( new PointPosePair(t.currLoc,t.location));
+				list.add( new Point2D3D(t.currLoc,t.location));
 			}
 		}
 

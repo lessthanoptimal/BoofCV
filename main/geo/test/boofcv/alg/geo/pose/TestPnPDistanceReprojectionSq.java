@@ -19,7 +19,7 @@
 package boofcv.alg.geo.pose;
 
 import boofcv.alg.geo.PerspectiveOps;
-import boofcv.struct.geo.PointPosePair;
+import boofcv.struct.geo.Point2D3D;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
@@ -68,7 +68,7 @@ public class TestPnPDistanceReprojectionSq {
 		PnPDistanceReprojectionSq alg = new PnPDistanceReprojectionSq(K.get(0,0),K.get(1,1),K.get(0,1));
 		alg.setModel(worldToCamera);
 
-		double found = alg.computeDistance(new PointPosePair(observed,X));
+		double found = alg.computeDistance(new Point2D3D(observed,X));
 		double expected = deltaX*deltaX + deltaY*deltaY;
 
 		assertEquals(expected,found,1e-8);
@@ -92,7 +92,7 @@ public class TestPnPDistanceReprojectionSq {
 		PnPDistanceReprojectionSq alg = new PnPDistanceReprojectionSq(K.get(0,0),K.get(1,1),K.get(0,1));
 		alg.setModel(worldToCamera);
 
-		double found = alg.computeDistance(new PointPosePair(observed,X));
+		double found = alg.computeDistance(new Point2D3D(observed,X));
 
 		assertTrue(Double.MAX_VALUE == found );
 	}
@@ -109,7 +109,7 @@ public class TestPnPDistanceReprojectionSq {
 		Se3_F64 worldToCamera = new Se3_F64();
 		worldToCamera.getT().set(0.1,-0.1,0.2);
 
-		List<PointPosePair> obs = new ArrayList<PointPosePair>();
+		List<Point2D3D> obs = new ArrayList<Point2D3D>();
 		for( int i = 0; i < expected.length; i++ ) {
 			Point3D_F64 X =
 					new Point3D_F64(rand.nextGaussian()*0.2,rand.nextGaussian()*0.2,2.3+rand.nextGaussian()*0.2);
@@ -126,7 +126,7 @@ public class TestPnPDistanceReprojectionSq {
 			// convert to normalized image coordinates
 			PerspectiveOps.convertPixelToNorm(K,observed,observed);
 
-			obs.add( new PointPosePair(observed,X));
+			obs.add( new Point2D3D(observed,X));
 
 			expected[i] = deltaX*deltaX + deltaY*deltaY;
 		}

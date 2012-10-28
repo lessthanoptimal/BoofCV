@@ -16,7 +16,7 @@ import boofcv.struct.FastQueue;
 import boofcv.struct.distort.PointTransform_F64;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.geo.GeoModelRefine;
-import boofcv.struct.geo.PointPosePair;
+import boofcv.struct.geo.Point2D3D;
 import boofcv.struct.image.ImageBase;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
@@ -67,8 +67,8 @@ public class MonocularSimpleVo<T extends ImageBase> {
 	PositiveDepthConstraintCheck depthChecker = new PositiveDepthConstraintCheck(triangulateAlg);
 
 	GeoModelRefine<DenseMatrix64F,AssociatedPair> refineE;
-	ModelMatcher<Se3_F64,PointPosePair> computeMotion;
-	GeoModelRefine<Se3_F64,PointPosePair> refineMotion;
+	ModelMatcher<Se3_F64,Point2D3D> computeMotion;
+	GeoModelRefine<Se3_F64,Point2D3D> refineMotion;
 
 	// transform from work to current image.  Only used for output purposes
 	Se3_F64 worldToCurr = new Se3_F64();
@@ -100,7 +100,7 @@ public class MonocularSimpleVo<T extends ImageBase> {
 	Se3_F64 refinedM = new Se3_F64();
 	
 	
-	FastQueue<PointPosePair> queuePointPose = new FastQueue<PointPosePair>(200,PointPosePair.class,true);
+	FastQueue<Point2D3D> queuePointPose = new FastQueue<Point2D3D>(200,Point2D3D.class,true);
 
 	/**
 	 *
@@ -121,8 +121,8 @@ public class MonocularSimpleVo<T extends ImageBase> {
 							  PointTransform_F64 pixelToNormalized ,
 							  ModelMatcher<Se3_F64,AssociatedPair> epipolarMotion ,
 							  GeoModelRefine<DenseMatrix64F,AssociatedPair> refineE ,
-							  ModelMatcher<Se3_F64,PointPosePair> computeMotion ,
-							  GeoModelRefine<Se3_F64,PointPosePair> refineMotion )
+							  ModelMatcher<Se3_F64,Point2D3D> computeMotion ,
+							  GeoModelRefine<Se3_F64,Point2D3D> refineMotion )
 	{
 		this.minFeatures = minFeatures;
 		this.setKeyThreshold = setKeyThreshold;
@@ -352,13 +352,13 @@ public class MonocularSimpleVo<T extends ImageBase> {
 	 */
 	private boolean updatePosition() {
 		queuePointPose.reset();
-		List<PointPosePair> active = new ArrayList<PointPosePair>();
+		List<Point2D3D> active = new ArrayList<Point2D3D>();
 		for( PointPoseTrack t : tracker.getPairs() ) {
 			if( !t.active )
 				continue;
-			PointPosePair p = queuePointPose.grow();
+			Point2D3D p = queuePointPose.grow();
 			p.location = t.location;
-			p.observed = t.currLoc;
+			p.observation = t.currLoc;
 			active.add(p);
 		}
 		if( queuePointPose.size <= 0 )
@@ -369,7 +369,7 @@ public class MonocularSimpleVo<T extends ImageBase> {
 			return false;
 		}
 		
-		List<PointPosePair> inliers = computeMotion.getMatchSet();
+		List<Point2D3D> inliers = computeMotion.getMatchSet();
 		inlierSize = inliers.size();
 		
 		System.out.println("   Motion inliers "+inlierSize+"  out of "+active.size());

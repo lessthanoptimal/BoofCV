@@ -2,7 +2,7 @@ package boofcv.alg.sfm.robust;
 
 import boofcv.numerics.fitting.modelset.ModelMatcher;
 import boofcv.numerics.fitting.modelset.ransac.Ransac;
-import boofcv.struct.geo.PointPosePair;
+import boofcv.struct.geo.Point2D3D;
 import georegression.struct.point.Vector3D_F64;
 import org.ejml.data.DenseMatrix64F;
 
@@ -11,15 +11,15 @@ import java.util.List;
 /**
  * @author Peter Abeles
  */
-public class ModelMatcherTranGivenRot implements ModelMatcher<Vector3D_F64,PointPosePair> {
+public class ModelMatcherTranGivenRot implements ModelMatcher<Vector3D_F64,Point2D3D> {
 
-	Ransac<Vector3D_F64,PointPosePair> alg;
+	Ransac<Vector3D_F64,Point2D3D> alg;
 	DistanceTranGivenRotSq dist = new DistanceTranGivenRotSq();
 	TranGivenRotGenerator gen = new TranGivenRotGenerator();
 
 	public ModelMatcherTranGivenRot(long randSeed, int maxIterations,
 									double thresholdFit) {
-		alg = new Ransac<Vector3D_F64, PointPosePair>(randSeed, gen, dist,
+		alg = new Ransac<Vector3D_F64, Point2D3D>(randSeed, gen, dist,
 				maxIterations, thresholdFit);
 	}
 
@@ -29,7 +29,7 @@ public class ModelMatcherTranGivenRot implements ModelMatcher<Vector3D_F64,Point
 	}
 
 	@Override
-	public boolean process(List<PointPosePair> dataSet) {
+	public boolean process(List<Point2D3D> dataSet) {
 		return alg.process(dataSet);
 	}
 
@@ -39,7 +39,7 @@ public class ModelMatcherTranGivenRot implements ModelMatcher<Vector3D_F64,Point
 	}
 
 	@Override
-	public List<PointPosePair> getMatchSet() {
+	public List<Point2D3D> getMatchSet() {
 		return alg.getMatchSet();
 	}
 
@@ -51,5 +51,10 @@ public class ModelMatcherTranGivenRot implements ModelMatcher<Vector3D_F64,Point
 	@Override
 	public double getError() {
 		return alg.getError();
+	}
+
+	@Override
+	public int getMinimumSize() {
+		return alg.getMinimumSize();
 	}
 }

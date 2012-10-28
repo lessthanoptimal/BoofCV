@@ -47,7 +47,7 @@ public class TestRansac extends GenericModelSetTests {
 															int minPoints,
 															double fitThreshold) {
 		Ransac<double[],Double> ret = new Ransac<double[],Double>(344, generator, distance, 200, fitThreshold);
-		ret.setNumSample(minPoints);
+		ret.setSampleSize(minPoints);
 
 		return ret;
 	}
@@ -152,7 +152,7 @@ public class TestRansac extends GenericModelSetTests {
 
 		DebugModelStuff stuff = new DebugModelStuff((int) modelVal);
 		Ransac<double[],Integer> ransac = new Ransac<double[],Integer>(234,stuff,stuff,20,1);
-		ransac.setNumSample(5);
+		ransac.setSampleSize(5);
 		// declare the array so it doesn't blow up when accessed
 		ransac.matchToInput = new int[ dataSet.size()];
 		double param[] = new double[]{modelVal};

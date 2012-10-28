@@ -214,6 +214,11 @@ public class TestImageMotionPointKey {
 			return 0;
 		}
 
+		@Override
+		public int getMinimumSize() {
+			return matchSetSize;
+		}
+
 		public void setMotion(T se) {
 			found = se;
 		}

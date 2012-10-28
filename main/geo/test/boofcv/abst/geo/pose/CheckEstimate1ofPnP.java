@@ -20,7 +20,7 @@ package boofcv.abst.geo.pose;
 
 import boofcv.abst.geo.Estimate1ofPnP;
 import boofcv.alg.geo.f.EpipolarTestSimulation;
-import boofcv.struct.geo.PointPosePair;
+import boofcv.struct.geo.Point2D3D;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
@@ -68,13 +68,13 @@ public abstract class CheckEstimate1ofPnP extends EpipolarTestSimulation {
 	private void perfectObservations( int numSample ) {
 		init(numSample,false);
 
-		List<PointPosePair> inputs = new ArrayList<PointPosePair>();
+		List<Point2D3D> inputs = new ArrayList<Point2D3D>();
 
 		for( int i = 0; i < currentObs.size(); i++ ) {
 			Point2D_F64 o = currentObs.get(i);
 			Point3D_F64 X = worldPts.get(i);
 
-			inputs.add( new PointPosePair(o,X));
+			inputs.add( new Point2D3D(o,X));
 		}
 
 		Se3_F64 found = new Se3_F64();

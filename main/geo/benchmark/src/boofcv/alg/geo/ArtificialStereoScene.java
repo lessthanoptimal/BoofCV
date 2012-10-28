@@ -19,7 +19,7 @@
 package boofcv.alg.geo;
 
 import boofcv.struct.geo.AssociatedPair;
-import boofcv.struct.geo.PointPosePair;
+import boofcv.struct.geo.Point2D3D;
 import georegression.geometry.RotationMatrixGenerator;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
@@ -46,7 +46,7 @@ public class ArtificialStereoScene {
 	protected List<AssociatedPair> pairs;
 	protected List<Point2D_F64> observationCurrent;
 	protected List<Point3D_F64> worldPoints;
-	protected List<PointPosePair> observationPose;
+	protected List<Point2D3D> observationPose;
 	protected boolean isPixels;
 
 	public ArtificialStereoScene() {
@@ -69,7 +69,7 @@ public class ArtificialStereoScene {
 		// transform points into second camera's reference frame
 		pairs = new ArrayList<AssociatedPair>();
 		observationCurrent = new ArrayList<Point2D_F64>();
-		observationPose = new ArrayList<PointPosePair>();
+		observationPose = new ArrayList<Point2D3D>();
 
 		for(Point3D_F64 p1 : worldPoints) {
 			Point3D_F64 p2 = SePointOps_F64.transform(motion, p1, null);
@@ -80,7 +80,7 @@ public class ArtificialStereoScene {
 			pairs.add(pair);
 
 			observationCurrent.add(pair.currLoc);
-			observationPose.add( new PointPosePair(pair.currLoc,p1));
+			observationPose.add( new Point2D3D(pair.currLoc,p1));
 
 			if( isPixels ) {
 				PerspectiveOps.convertNormToPixel(K,pair.keyLoc,pair.keyLoc);

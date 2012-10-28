@@ -72,4 +72,11 @@ public interface ModelMatcher<Model, Point> {
 	 * @return Error of matched set of points
 	 */
 	public double getError();
+
+	/**
+	 * This is the minimum number of observations which can be input and produce a valid model.
+	 *
+	 * @return Minimum number of sample points
+	 */
+	public int getMinimumSize();
 }
