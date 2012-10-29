@@ -19,6 +19,7 @@ public class PointPoseTrack extends KeyFrameTrack {
 	// feature location at the spawn point
 	public Point2D_F64 spawnLoc = new Point2D_F64();
 
+	long lastInlier;
 	boolean original;
 
 	@Override
