@@ -9,10 +9,12 @@ import boofcv.numerics.fitting.modelset.ModelMatcher;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.geo.Point2D3D;
 import boofcv.struct.image.ImageBase;
+import georegression.geometry.RotationMatrixGenerator;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
+import org.ejml.data.DenseMatrix64F;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,11 +23,19 @@ import java.util.List;
  * Visual odometry where a ranging device is assumed for pixels in the primary view.  Typical
  * inputs would include a stereo or depth camera.
  *
+ * Technote discussion:
+ * - Better than keyframe based approach because that technique forces a hard decision and good tracks are dropped
+ *   while its hard to detect false positives just after a new keyframe has been created.  A feature can have an
+ *   incorrect range/associated pair and that not be found until there has been more significant motion
+ * - Before the above change MIN_PIXEL_CHANGE significantly effected performance
+ *
  * @author Peter Abeles
  */
 
-// TODO Why does changing MIN_PIXEL_CHANGE affect accuracy?
-// TODO Dynamically select keyframe thresholds
+// TODO Dynamically select add tracks thresholds
+//      I think during some turns it should immediately spawn new tracks.  so check the 2D distribution of the points
+//      and see if it has degraded significantly since being spawned?
+//      only target depletion caused by rotation
 
 public class VisOdomPixelDepthPnP<T extends ImageBase> {
 	// TODO Make relative to the last update or remove?
@@ -33,18 +43,26 @@ public class VisOdomPixelDepthPnP<T extends ImageBase> {
 
 	double TOL_TRIANGULATE = 3*Math.PI/180.0;
 
-	int MIN_TRACKS = 100;
+	double MIN_FRACTION = 0.6;
+	int thresholdAdd;
+	int absoluteMinimum;
+
+	int RETIRE_TRACKS = 2;
 
 	// tracks features in the image
 	private KeyFramePointTracker<T,PointPoseTrack> tracker;
 	// used to estimate a feature's 3D position from image range data
 	private ImagePixelTo3D pixelTo3D;
 
+	TrackDistributionCheck trackDistribution = new TrackGaussianCheck(1);
+
 	RefinePnP refine = null;//FactoryMultiView.refinePnP(1e-6, 100);
 	BundleAdjustmentCalibrated bundle = null;//FactoryMultiView.bundleCalibrated(1e-8,300);
 
 	// estimate the camera motion up to a scale factor from two sets of point correspondences
 	private ModelMatcher<Se3_F64, Point2D3D> motionEstimator;
+
+	private List<Point2D_F64> inlierPixels = new ArrayList<Point2D_F64>();
 
 	ComputeObservationAcuteAngle computeObsAngle = new ComputeObservationAcuteAngle();
 
@@ -60,16 +78,20 @@ public class VisOdomPixelDepthPnP<T extends ImageBase> {
 	int motionFailed;
 	boolean inliersValid;
 
+	boolean firstEstimate;
 	boolean first = true;
+	long tick;
 
-	public VisOdomPixelDepthPnP(int MIN_TRACKS, ModelMatcher<Se3_F64, Point2D3D> motionEstimator,
+	public VisOdomPixelDepthPnP(int thresholdAdd, ModelMatcher<Se3_F64, Point2D3D> motionEstimator,
 								ImagePixelTo3D pixelTo3D,
 								KeyFramePointTracker<T, PointPoseTrack> tracker )
 	{
-		this.MIN_TRACKS = MIN_TRACKS;
+//		this.thresholdAdd = thresholdAdd;
 		this.motionEstimator = motionEstimator;
 		this.pixelTo3D = pixelTo3D;
 		this.tracker = tracker;
+
+		absoluteMinimum = thresholdAdd;//motionEstimator.getMinimumSize()*2;
 	}
 
 	public void reset() {
@@ -78,6 +100,8 @@ public class VisOdomPixelDepthPnP<T extends ImageBase> {
 		currToKey.reset();
 		motionFailed = 0;
 		first = true;
+		tick = 0;
+		firstEstimate = false;
 	}
 
 	// TODO indicate FULL_MOTION, ANGLE_ONLY,NO_MOTION,FAULT
@@ -85,6 +109,7 @@ public class VisOdomPixelDepthPnP<T extends ImageBase> {
 		tracker.process(leftImage);
 
 		inliersValid = false;
+		inlierPixels.clear();
 
 		if( !hasSignificantChange ) {
 			if( !checkSignificantMotion() ) {
@@ -102,16 +127,83 @@ public class VisOdomPixelDepthPnP<T extends ImageBase> {
 				return false;
 			}
 
-			System.out.println(" numTracksUsed = "+numTracksUsed+"  original "+numOriginalUsed+" total "+tracker.getPairs().size());
-			if( numOriginalUsed < MIN_TRACKS/2 ) {
-				setNewKeyFrame();
-				inliersValid = false;
-			} else if( numTracksUsed < MIN_TRACKS ) {
+			if( firstEstimate ) {
+//				thresholdAdd = (int)(motionEstimator.getMatchSet().size()*MIN_FRACTION);
+//				if( thresholdAdd < absoluteMinimum )
+					thresholdAdd = absoluteMinimum;
+				firstEstimate = false;
+				trackDistribution.setInitialLocation(inlierPixels);
+			}
+
+			List<PointPoseTrack> drop = dropUnusedTracks();
+
+			int N = motionEstimator.getMatchSet().size();
+
+			// todo on first trackDist is pointless
+//			if( N < thresholdAdd || computeRotationAngle() > 0.01 || trackDistribution.checkDistribution(inlierPixels) ) {
+			if( N < thresholdAdd ) {
+//				if( computeRotationAngle() > 0.01 )
+//					System.out.println("****** LARGE ROTATION");
+
+				changePoseToReference();
 				addNewTracks();
 			}
+
+			System.out.println("  num inliers = "+N+"  num dropped "+drop.size()+" total "+tracker.getPairs().size());
+
+			inliersValid = false;
+			tick++;
 		}
 
 		return true;
+	}
+
+	private double computeRotationAngle() {
+		Se3_F64 m = motionEstimator.getModel();
+
+		DenseMatrix64F R = m.getR();
+		double euler[] = RotationMatrixGenerator.matrixToEulerXYZ(R);
+
+		return Math.sqrt( euler[0]*euler[0] + euler[1]*euler[1]+ euler[2]*euler[2] );
+	}
+
+	/**
+	 * Updates the relative position of all points so that the current frame is the reference frame.  Mathematically
+	 * this is not needed, but should help keep numbers from getting too large.
+	 */
+	private void changePoseToReference() {
+		Se3_F64 keyToCurr = currToKey.invert(null);
+
+		List<PointPoseTrack> all = tracker.getPairs();
+
+		for( PointPoseTrack t : all ) {
+			SePointOps_F64.transform(keyToCurr,t.location,t.location);
+		}
+
+		concatMotion();
+	}
+
+	private List<PointPoseTrack> dropUnusedTracks() {
+		int N = motionEstimator.getMatchSet().size();
+
+		List<PointPoseTrack> all = tracker.getPairs();
+
+		for( int i = 0; i < N; i++ ) {
+			PointPoseTrack t = all.get( motionEstimator.getInputIndex(i));
+			t.lastInlier = tick;
+		}
+
+		List<PointPoseTrack> drop = new ArrayList<PointPoseTrack>();
+		for( PointPoseTrack t : all ) {
+			if( tick - t.lastInlier >= RETIRE_TRACKS ) {
+				drop.add(t);
+			}
+		}
+
+		for( PointPoseTrack t : drop ) {
+			tracker.dropTrack(t);
+		}
+		return drop;
 	}
 
 	private void setNewKeyFrame() {
@@ -139,6 +231,7 @@ public class VisOdomPixelDepthPnP<T extends ImageBase> {
 				double w = pixelTo3D.getW();
 				p.getLocation().set( pixelTo3D.getX()/w , pixelTo3D.getY()/w, pixelTo3D.getZ()/w);
 				p.original = true;
+				p.lastInlier = tick;
 
 //					System.out.println("Stereo z = "+p.getLocation().getZ());
 //					if( p.getLocation().z < 100 )
@@ -152,6 +245,7 @@ public class VisOdomPixelDepthPnP<T extends ImageBase> {
 		}
 
 		hasSignificantChange = false;
+		firstEstimate = true;
 	}
 
 	private void addNewTracks() {
@@ -165,6 +259,7 @@ public class VisOdomPixelDepthPnP<T extends ImageBase> {
 		// estimate 3D coordinate using stereo vision
 		for( PointPoseTrack p : spawned ) {
 			Point2D_F64 pixel = p.getPixel().keyLoc;
+
 			// discard point if it can't triangulate
 			if( !pixelTo3D.process(pixel.x,pixel.y) || pixelTo3D.getW() == 0 ) {
 				drop.add(p);
@@ -175,9 +270,10 @@ public class VisOdomPixelDepthPnP<T extends ImageBase> {
 				X.set(pixelTo3D.getX() / w, pixelTo3D.getY() / w, pixelTo3D.getZ() / w);
 
 				// translate the point into the key frame
-				SePointOps_F64.transform(currToKey,X,X);
+				SePointOps_F64.transform(currToKey,X,X); // todo technically not needed now
 
 				p.original = false;
+				p.lastInlier = tick;
 
 				// create a synthetic observation in the key frame
 //				Point2D_F64 s = p.getSpawnLoc();
@@ -190,6 +286,8 @@ public class VisOdomPixelDepthPnP<T extends ImageBase> {
 		for( PointPoseTrack p : drop ) {
 			tracker.dropTrack(p);
 		}
+
+		firstEstimate = true;
 	}
 
 
@@ -234,7 +332,10 @@ public class VisOdomPixelDepthPnP<T extends ImageBase> {
 		int N = motionEstimator.getMatchSet().size();
 		for( int i = 0; i < N; i++ ) {
 			int index = motionEstimator.getInputIndex(i);
-			if( tracker.getPairs().get(index).original )
+			PointPoseTrack t = tracker.getPairs().get(index);
+
+			inlierPixels.add( t.getPixel().currLoc );
+			if( t.original )
 				numOriginalUsed++;
 		}
 
@@ -341,5 +442,9 @@ public class VisOdomPixelDepthPnP<T extends ImageBase> {
 
 	public boolean isInliersValid() {
 		return inliersValid;
+	}
+
+	public List<Point2D_F64> getInlierPixels() {
+		return inlierPixels;
 	}
 }

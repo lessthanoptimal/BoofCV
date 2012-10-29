@@ -69,20 +69,7 @@ public class WrapVisOdomPixelDepthPnP<T extends ImageSingleBand>
 
 	@Override
 	public List<Point2D_F64> getInlierTracks() {
-		List<Point2D_F64> pixels = new ArrayList<Point2D_F64>();
-
-		if( alg.isInliersValid() ) {
-			List<PointPoseTrack> tracks = alg.getTracker().getPairs();
-
-			int N = alg.getMotionEstimator().getMatchSet().size();
-			for( int i = 0; i < N; i++ ) {
-				int index = alg.getMotionEstimator().getInputIndex(i);
-
-				pixels.add( tracks.get(index).getPixel().currLoc );
-			}
-		}
-
-		return pixels;
+		return alg.getInlierPixels();
 	}
 
 	@Override

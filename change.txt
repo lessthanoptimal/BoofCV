@@ -37,7 +37,8 @@ Version : Alpha 0.11
 - Fixed bugs in StereoSparse3D
 - Fixed bug in DistortImageOps.boundBox_F32()
 - Added ImageGridPanel to display a set of images as a grid
-
+- ModelMatcher added getMinimumSize()
+- Renamed PointPosePair to Point2D3D since the old name was misleading
 
 ---------------------------------------------
 Date    : 2012/09/18
