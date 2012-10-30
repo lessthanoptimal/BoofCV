@@ -20,7 +20,6 @@ public class PointPoseTrack extends KeyFrameTrack {
 	public Point2D_F64 spawnLoc = new Point2D_F64();
 
 	long lastInlier;
-	boolean original;
 
 	@Override
 	public void reset() {
