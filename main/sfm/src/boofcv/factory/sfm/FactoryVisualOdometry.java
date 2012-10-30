@@ -4,6 +4,7 @@ import boofcv.abst.feature.disparity.StereoDisparitySparse;
 import boofcv.abst.feature.tracker.ImagePointTracker;
 import boofcv.abst.feature.tracker.KeyFramePointTracker;
 import boofcv.abst.geo.Estimate1ofPnP;
+import boofcv.abst.geo.RefinePnP;
 import boofcv.abst.sfm.StereoVisualOdometry;
 import boofcv.abst.sfm.WrapVisOdomPixelDepthPnP;
 import boofcv.alg.geo.DistanceModelMonoPixels;
@@ -27,93 +28,28 @@ import georegression.struct.se.Se3_F64;
  */
 public class FactoryVisualOdometry {
 
-//	public static <T extends ImageBase>
-//	MonocularVisualOdometry<T> monoSimple( int minTracks , double minPixelChange ,
-//										   double pixelNoise ,
-//										   ImagePointTracker<T> tracker ,
-//										   PointTransform_F64 pixelToNormalized )
-//	{
-//		// translate from pixel to normalized coordinate error
-//		Point2D_F64 tempA = new Point2D_F64();
-//		Point2D_F64 tempB = new Point2D_F64();
-//		pixelToNormalized.compute(pixelNoise,pixelNoise,tempA);
-//		pixelToNormalized.compute(0,0,tempB);
-//		double noise = (Math.abs(tempA.x-tempB.x) + Math.abs(tempA.y-tempB.y))/2;
-//
-//		EpipolarMatrixEstimator essentialAlg = FactoryMultiView.computeSingleFundamental(7,false,1);
-//		TriangulateTwoViewsCalibrated triangulate = FactoryTriangulate.twoGeometric();
-//
-//		ModelGenerator<Se3_F64,AssociatedPair> generateEpipolarMotion =
-//				new Se3FromEssentialGenerator(essentialAlg,triangulate);
-//
-//		DistanceFromModel<Se3_F64,AssociatedPair> distanceSe3 =
-//				new DistanceSe3SymmetricSq(triangulate,1,1,0,1,1,0); // TODO use intrinsic
-//
-//		ModelMatcher<Se3_F64,AssociatedPair> epipolarMotion =
-//				new Ransac<Se3_F64,AssociatedPair>(2323,generateEpipolarMotion,distanceSe3,
-//						100,2*noise*noise);
-//
-//		RefineEpipolarMatrix refineE = FactoryMultiView.refineFundamental(1e-8,400, EpipolarError.SIMPLE);
-//
-//		ModelGenerator<Se3_F64,Point2D3D> generateMotion =
-//				new GenerateMotionPnP( FactoryMultiView.computePnPwithEPnP(5,0.1));
-//		DistanceFromModel<Se3_F64,Point2D3D> distanceMotion =
-//				new DistanceFromModelResidualN<Se3_F64,Point2D3D>(new PnPResidualReprojection());
-//
-//		ModelMatcher<Se3_F64,Point2D3D> computeMotion =
-//				new Ransac<Se3_F64,Point2D3D>(2323,generateMotion,distanceMotion,
-//						100,noise*noise);
-//
-//		RefinePerspectiveNPoint refineMotion = FactoryMultiView.refinePnpEfficient(5,0.1);
-//
-//		MonocularSimpleVo<T> mono = new MonocularSimpleVo<T>(minTracks,minTracks*2,minPixelChange,tracker,pixelToNormalized,
-//				epipolarMotion,refineE,computeMotion,refineMotion);
-//
-//		return new WrapMonocularSimpleVo<T>(mono);
-//	}
-
-//	public static <T extends ImageBase>
-//	MonocularVisualOdometry<T> monoSeparated( int minTracks , double minPixelChange ,
-//											  double pixelNoise , double triangulateAngle ,
-//											  ImagePointTracker<T> tracker ,
-//											  PointTransform_F64 pixelToNormalized )
-//	{
-//		// translate from pixel to normalized coordinate error
-//		Point2D_F64 tempA = new Point2D_F64();
-//		Point2D_F64 tempB = new Point2D_F64();
-//		pixelToNormalized.compute(pixelNoise,pixelNoise,tempA);
-//		pixelToNormalized.compute(0,0,tempB);
-//		double noise = (Math.abs(tempA.x-tempB.x) + Math.abs(tempA.y-tempB.y))/2;
-//
-//		EpipolarMatrixEstimator essentialAlg = FactoryMultiView.computeSingleFundamental(7,false,1);
-//		TriangulateTwoViewsCalibrated triangulate = FactoryTriangulate.twoGeometric();
-//
-//		ModelGenerator<Se3_F64,AssociatedPair> generateEpipolarMotion =
-//				new Se3FromEssentialGenerator(essentialAlg,triangulate);
-//
-//		DistanceFromModel<Se3_F64,AssociatedPair> distanceSe3 =
-//				new DistanceSe3SymmetricSq(triangulate,1,1,0,1,1,0); // TODO use intrinsic
-//
-//		int N = generateEpipolarMotion.getMinimumSize();
-//
-//		ModelMatcher<Se3_F64,AssociatedPair> epipolarMotion =
-//				new Ransac<Se3_F64,AssociatedPair>(2323,generateEpipolarMotion,distanceSe3,
-//						2000,2*noise*noise);
-//
-//		ModelMatcherTranGivenRot estimateTran = new ModelMatcherTranGivenRot(234,2000,noise*noise);
-//
-//
-//		MonocularSeparatedMotion<T> mono =
-//				new MonocularSeparatedMotion<T>(tracker,pixelToNormalized,epipolarMotion,estimateTran,
-//						4*noise,minPixelChange,triangulateAngle);
-//
-//		return new WrapMonocularSeparatedMotion<T>(mono);
-//	}
-
+	/**
+	 * Stereo visual odometry algorithm which only uses the right camera to estimate a points 3D location.  The camera's
+	 * pose is updated relative to the left camera using PnP algorithms.  See {@link VisOdomPixelDepthPnP} for more
+	 * details.
+	 *
+	 * @param thresholdAdd Add new tracks when less than this number are in the inlier set.  Tracker dependent. Set to
+	 *                     a value <= 0 to add features every frame.
+	 * @param thresholdRetire Discard a track if it is not in the inlier set after this many updates.  Try 2
+	 * @param inlierPixelTol Tolerance for what defines a fit to the motin model.  Try a value between 1 and 2
+	 * @param tracker Feature tracker
+	 * @param sparseDisparity Estimates the 3D location of features
+	 * @param refineIterations Number of iterations used to refine the estimate.  Try 100 or 0 to turn off refinement.
+	 * @param imageType Type of image being processed.
+	 * @return StereoVisualOdometry
+	 */
 	public static <T extends ImageSingleBand>
-	StereoVisualOdometry<T> stereoDepth(int minTracks, double inlierPixelTol,
+	StereoVisualOdometry<T> stereoDepth(int thresholdAdd,
+										int thresholdRetire ,
+										double inlierPixelTol,
 										ImagePointTracker<T> tracker,
 										StereoDisparitySparse<T> sparseDisparity,
+										int refineIterations ,
 										Class<T> imageType) {
 
 		// motion estimation using essential matrix
@@ -127,7 +63,6 @@ public class FactoryVisualOdometry {
 						return new Se3_F64();
 					}
 				};
-
 
 		// 1/2 a pixel tolerance for RANSAC inliers
 		double ransacTOL = inlierPixelTol * inlierPixelTol;
@@ -143,7 +78,13 @@ public class FactoryVisualOdometry {
 		KeyFramePointTracker<T,PointPoseTrack> keyTracker =
 				new KeyFramePointTracker<T,PointPoseTrack>(tracker,null,PointPoseTrack.class);
 
-		VisOdomPixelDepthPnP<T> alg = new VisOdomPixelDepthPnP<T>(minTracks,motion,pixelTo3D,keyTracker);
+		RefinePnP refine = null;
+
+		if( refineIterations > 0 ) {
+			refine = FactoryMultiView.refinePnP(1e-12,refineIterations);
+		}
+
+		VisOdomPixelDepthPnP<T> alg = new VisOdomPixelDepthPnP<T>(thresholdAdd,thresholdRetire , motion,pixelTo3D,refine,keyTracker);
 
 		return new WrapVisOdomPixelDepthPnP<T>(alg,pixelTo3D,keyTracker,distance,imageType);
 	}
