@@ -50,18 +50,18 @@ public class DistanceAffine2DSq implements DistanceFromModel<Affine2D_F64,Associ
 
 	@Override
 	public double computeDistance(AssociatedPair pt) {
-		AffinePointOps.transform(model,pt.keyLoc,expected);
+		AffinePointOps.transform(model,pt.p1,expected);
 
-		return expected.distance2(pt.currLoc);
+		return expected.distance2(pt.p2);
 	}
 
 	@Override
 	public void computeDistance(List<AssociatedPair> points, double[] distance) {
 		for( int i = 0; i < points.size(); i++ ) {
 			AssociatedPair p = points.get(i);
-			AffinePointOps.transform(model,p.keyLoc,expected);
+			AffinePointOps.transform(model,p.p1,expected);
 
-			distance[i] = expected.distance2(p.currLoc);
+			distance[i] = expected.distance2(p.p2);
 		}
 	}
 }

@@ -75,16 +75,16 @@ public class ArtificialStereoScene {
 			Point3D_F64 p2 = SePointOps_F64.transform(motion, p1, null);
 
 			AssociatedPair pair = new AssociatedPair();
-			pair.keyLoc.set(p1.x/p1.z,p1.y/p1.z);
-			pair.currLoc.set(p2.x/p2.z,p2.y/p2.z);
+			pair.p1.set(p1.x/p1.z,p1.y/p1.z);
+			pair.p2.set(p2.x/p2.z,p2.y/p2.z);
 			pairs.add(pair);
 
-			observationCurrent.add(pair.currLoc);
-			observationPose.add( new Point2D3D(pair.currLoc,p1));
+			observationCurrent.add(pair.p2);
+			observationPose.add( new Point2D3D(pair.p2,p1));
 
 			if( isPixels ) {
-				PerspectiveOps.convertNormToPixel(K,pair.keyLoc,pair.keyLoc);
-				PerspectiveOps.convertNormToPixel(K,pair.currLoc,pair.currLoc);
+				PerspectiveOps.convertNormToPixel(K,pair.p1,pair.p1);
+				PerspectiveOps.convertNormToPixel(K,pair.p2,pair.p2);
 			}
 		}
 	}
@@ -94,19 +94,19 @@ public class ArtificialStereoScene {
 		for( AssociatedPair p : pairs ) {
 
 			if( !isPixels ) {
-				PerspectiveOps.convertNormToPixel(K, p.keyLoc, p.keyLoc);
-				PerspectiveOps.convertNormToPixel(K, p.currLoc, p.currLoc);
+				PerspectiveOps.convertNormToPixel(K, p.p1, p.p1);
+				PerspectiveOps.convertNormToPixel(K, p.p2, p.p2);
 			}
 
-			p.currLoc.x += rand.nextGaussian()*noiseSigma;
-			p.currLoc.y += rand.nextGaussian()*noiseSigma;
+			p.p2.x += rand.nextGaussian()*noiseSigma;
+			p.p2.y += rand.nextGaussian()*noiseSigma;
 
-			p.keyLoc.x += rand.nextGaussian()*noiseSigma;
-			p.keyLoc.y += rand.nextGaussian()*noiseSigma;
+			p.p1.x += rand.nextGaussian()*noiseSigma;
+			p.p1.y += rand.nextGaussian()*noiseSigma;
 
 			if( !isPixels ) {
-				PerspectiveOps.convertPixelToNorm(K, p.keyLoc, p.keyLoc);
-				PerspectiveOps.convertPixelToNorm(K, p.currLoc, p.currLoc);
+				PerspectiveOps.convertPixelToNorm(K, p.p1, p.p1);
+				PerspectiveOps.convertPixelToNorm(K, p.p2, p.p2);
 			}
 		}
 

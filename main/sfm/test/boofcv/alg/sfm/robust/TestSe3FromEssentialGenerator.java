@@ -42,14 +42,14 @@ public class TestSe3FromEssentialGenerator {
 
 			AssociatedPair o = new AssociatedPair();
 
-			o.keyLoc.x = p.x/p.z;
-			o.keyLoc.y = p.y/p.z;
+			o.p1.x = p.x/p.z;
+			o.p1.y = p.y/p.z;
 
 			Point3D_F64 pp = new Point3D_F64();
 			SePointOps_F64.transform(motion,p,pp);
 
-			o.currLoc.x = pp.x/pp.z;
-			o.currLoc.y = pp.y/pp.z;
+			o.p2.x = pp.x/pp.z;
+			o.p2.y = pp.y/pp.z;
 
 			obs.add(o);
 		}

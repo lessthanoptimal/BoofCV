@@ -82,10 +82,10 @@ public class TestGenerateHomographyLinear implements ModelTestingInterface<Homog
 	@Override
 	public AssociatedPair createRandomPointFromModel(Homography2D_F64 transform) {
 		AssociatedPair ret = new AssociatedPair();
-		ret.keyLoc.x = rand.nextDouble()*10;
-		ret.keyLoc.y = rand.nextDouble()*10;
+		ret.p1.x = rand.nextDouble()*10;
+		ret.p1.y = rand.nextDouble()*10;
 
-		HomographyPointOps_F64.transform(transform, ret.keyLoc, ret.currLoc);
+		HomographyPointOps_F64.transform(transform, ret.p1, ret.p2);
 
 		return ret;
 	}
@@ -95,9 +95,9 @@ public class TestGenerateHomographyLinear implements ModelTestingInterface<Homog
 		Point2D_F64 expected = new Point2D_F64();
 
 		for( AssociatedPair p : dataSet ) {
-			HomographyPointOps_F64.transform(transform, p.keyLoc, expected);
+			HomographyPointOps_F64.transform(transform, p.p1, expected);
 
-			if( expected.distance(p.currLoc) > 0.01 )
+			if( expected.distance(p.p2) > 0.01 )
 				return false;
 		}
 

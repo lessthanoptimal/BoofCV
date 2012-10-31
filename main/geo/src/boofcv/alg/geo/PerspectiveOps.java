@@ -351,14 +351,14 @@ public class PerspectiveOps {
 	 * Takes a list of {@link AssociatedPair} as input and breaks it up into two lists for each view.
 	 *
 	 * @param pairs Input: List of associated pairs.
-	 * @param view1 Output: List of observations from 'key' view
-	 * @param view2 Output: List of observations from 'curr' view
+	 * @param view1 Output: List of observations from view 1
+	 * @param view2 Output: List of observations from view 2
 	 */
 	public static void splitAssociated( List<AssociatedPair> pairs ,
 										List<Point2D_F64> view1 , List<Point2D_F64> view2 ) {
 		for( AssociatedPair p : pairs ) {
-			view1.add(p.keyLoc);
-			view2.add(p.currLoc);
+			view1.add(p.p1);
+			view2.add(p.p2);
 		}
 	}
 

@@ -50,18 +50,18 @@ public class DistanceHomographySq implements DistanceFromModel<Homography2D_F64,
 
 	@Override
 	public double computeDistance(AssociatedPair pt) {
-		HomographyPointOps_F64.transform(model, pt.keyLoc, expected);
+		HomographyPointOps_F64.transform(model, pt.p1, expected);
 
-		return expected.distance2(pt.currLoc);
+		return expected.distance2(pt.p2);
 	}
 
 	@Override
 	public void computeDistance(List<AssociatedPair> points, double[] distance) {
 		for( int i = 0; i < points.size(); i++ ) {
 			AssociatedPair p = points.get(i);
-			HomographyPointOps_F64.transform(model, p.keyLoc, expected);
+			HomographyPointOps_F64.transform(model, p.p1, expected);
 
-			distance[i] = expected.distance2(p.currLoc);
+			distance[i] = expected.distance2(p.p2);
 		}
 	}
 }

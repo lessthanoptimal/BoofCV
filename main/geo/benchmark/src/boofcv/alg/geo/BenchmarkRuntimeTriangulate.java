@@ -45,7 +45,7 @@ public class BenchmarkRuntimeTriangulate extends ArtificialStereoScene {
 		@Override
 		public void process() {
 			for( int i = 0; i < NUM_POINTS; i++ )
-				alg.triangulate(pairs.get(i).keyLoc,pairs.get(i).currLoc,motion,found);
+				alg.triangulate(pairs.get(i).p1,pairs.get(i).p2,motion,found);
 		}
 	}
 
@@ -61,7 +61,7 @@ public class BenchmarkRuntimeTriangulate extends ArtificialStereoScene {
 		@Override
 		public void process() {
 			for( int i = 0; i < NUM_POINTS; i++ )
-				alg.triangulate(pairs.get(i).keyLoc,pairs.get(i).currLoc,motion,found);
+				alg.triangulate(pairs.get(i).p1,pairs.get(i).p2,motion,found);
 		}
 	}
 
@@ -76,7 +76,7 @@ public class BenchmarkRuntimeTriangulate extends ArtificialStereoScene {
 		@Override
 		public void process() {
 			for( int i = 0; i < NUM_POINTS; i++ )
-				alg.depth2View(pairs.get(i).keyLoc,pairs.get(i).currLoc,motion);
+				alg.depth2View(pairs.get(i).p1,pairs.get(i).p2,motion);
 		}
 	}
 

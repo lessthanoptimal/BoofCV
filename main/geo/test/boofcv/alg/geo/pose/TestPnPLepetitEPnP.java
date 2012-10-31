@@ -67,7 +67,7 @@ public class TestPnPLepetitEPnP {
 
 				List<Point2D_F64> currObs = new ArrayList<Point2D_F64>();
 				for( AssociatedPair a : obs ) {
-					currObs.add(a.currLoc);
+					currObs.add(a.p2);
 				}
 
 				Se3_F64 solution = new Se3_F64();

@@ -33,8 +33,7 @@ import org.ejml.data.DenseMatrix64F;
  * {@link boofcv.alg.geo.MultiViewOps#constraint(org.ejml.data.DenseMatrix64F,
  * georegression.struct.point.Point2D_F64, georegression.struct.point.Point2D_F64) constraint Fundamental}
  * and {@link boofcv.alg.geo.MultiViewOps#constraintHomography(org.ejml.data.DenseMatrix64F,
- * georegression.struct.point.Point2D_F64, georegression.struct.point.Point2D_F64) constraint Homography},
- * where p1 = keyLoc and p2 = currLoc.
+ * georegression.struct.point.Point2D_F64, georegression.struct.point.Point2D_F64) constraint Homography}.
  * </p>
  *
  * @author Peter Abeles

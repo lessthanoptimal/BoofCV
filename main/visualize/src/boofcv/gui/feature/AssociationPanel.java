@@ -78,8 +78,8 @@ public class AssociationPanel extends CompareTwoImagePanel implements MouseListe
 		List<Point2D_F64> rightPts = new ArrayList<Point2D_F64>();
 
 		for( AssociatedPair p : matches ) {
-			leftPts.add(p.keyLoc);
-			rightPts.add(p.currLoc);
+			leftPts.add(p.p1);
+			rightPts.add(p.p2);
 		}
 
 		setLocation(leftPts,rightPts);

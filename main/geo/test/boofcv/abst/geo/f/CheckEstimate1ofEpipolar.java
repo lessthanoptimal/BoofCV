@@ -83,8 +83,8 @@ public abstract class CheckEstimate1ofEpipolar extends EpipolarTestSimulation {
 			CommonOps.scale(1.0/n,F);
 
 			for( AssociatedPair p : pairs ) {
-				double correct = Math.abs(GeometryMath_F64.innerProd(p.currLoc, F, p.keyLoc));
-				double wrong = Math.abs(GeometryMath_F64.innerProd(p.keyLoc, F, p.currLoc));
+				double correct = Math.abs(GeometryMath_F64.innerProd(p.p2, F, p.p1));
+				double wrong = Math.abs(GeometryMath_F64.innerProd(p.p1, F, p.p2));
 
 				assertTrue(correct < wrong*0.001);
 			}

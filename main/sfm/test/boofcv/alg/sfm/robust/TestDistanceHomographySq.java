@@ -69,7 +69,7 @@ public class TestDistanceHomographySq extends StandardDistanceTest<Homography2D_
 
 		Point2D_F64 result = new Point2D_F64();
 
-		HomographyPointOps_F64.transform(h, associatedPair.keyLoc, result);
-		return result.distance2(associatedPair.currLoc);
+		HomographyPointOps_F64.transform(h, associatedPair.p1, result);
+		return result.distance2(associatedPair.p2);
 	}
 }

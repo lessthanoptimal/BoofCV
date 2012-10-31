@@ -178,8 +178,8 @@ public class RectifyFundamental {
 		for( int i = 0; i < observations.size(); i++ ) {
 			AssociatedPair a = observations.get(i);
 
-			GeometryMath_F64.mult(Hzero, a.keyLoc, k);
-			GeometryMath_F64.mult(H,a.currLoc,c);
+			GeometryMath_F64.mult(Hzero, a.p1, k);
+			GeometryMath_F64.mult(H,a.p2,c);
 
 			A.setRow(i,0,k.x,k.y,1);
 			b.set(i,0,c.x);

@@ -99,8 +99,8 @@ public class TestRectifyFundamental {
 		Point2D_F64 r1 = new Point2D_F64();
 		Point2D_F64 r2 = new Point2D_F64();
 
-		GeometryMath_F64.mult(alg.getRect1(),unrect.keyLoc,r1);
-		GeometryMath_F64.mult(alg.getRect2(),unrect.currLoc,r2);
+		GeometryMath_F64.mult(alg.getRect1(),unrect.p1,r1);
+		GeometryMath_F64.mult(alg.getRect2(),unrect.p2,r2);
 
 		assertEquals(r1.y,r2.y,1e-8);
 	}
@@ -127,12 +127,12 @@ public class TestRectifyFundamental {
 			Point3D_F64 p2 = SePointOps_F64.transform(motion, p1, null);
 
 			AssociatedPair pair = new AssociatedPair();
-			pair.keyLoc.set(p1.x/p1.z,p1.y/p1.z);
-			pair.currLoc.set(p2.x/p2.z,p2.y/p2.z);
+			pair.p1.set(p1.x/p1.z,p1.y/p1.z);
+			pair.p2.set(p2.x/p2.z,p2.y/p2.z);
 			pairs.add(pair);
 
-			GeometryMath_F64.mult(K, pair.keyLoc, pair.keyLoc);
-			GeometryMath_F64.mult(K, pair.currLoc, pair.currLoc);
+			GeometryMath_F64.mult(K, pair.p1, pair.p1);
+			GeometryMath_F64.mult(K, pair.p2, pair.p2);
 		}
 	}
 }

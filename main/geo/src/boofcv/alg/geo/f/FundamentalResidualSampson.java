@@ -51,10 +51,10 @@ public class FundamentalResidualSampson
 	public double computeResidual(AssociatedPair observation) {
 		double bottom = 0;
 
-		GeometryMath_F64.mult(F, observation.keyLoc, temp);
+		GeometryMath_F64.mult(F, observation.p1, temp);
 		bottom += temp.x*temp.x + temp.y*temp.y;
 
-		GeometryMath_F64.multTran(F, observation.currLoc, temp);
+		GeometryMath_F64.multTran(F, observation.p2, temp);
 		bottom += temp.x*temp.x + temp.y*temp.y;
 
 		bottom = Math.sqrt(bottom);
@@ -62,9 +62,9 @@ public class FundamentalResidualSampson
 		if( bottom <= UtilEjml.EPS) {
 			return Double.MAX_VALUE;
 		} else {
-			GeometryMath_F64.multTran(F,observation.currLoc,temp);
+			GeometryMath_F64.multTran(F,observation.p2,temp);
 
-			return (temp.x*observation.keyLoc.x + temp.y*observation.keyLoc.y + temp.z)/bottom;
+			return (temp.x*observation.p1.x + temp.y*observation.p1.y + temp.z)/bottom;
 		}
 	}
 }

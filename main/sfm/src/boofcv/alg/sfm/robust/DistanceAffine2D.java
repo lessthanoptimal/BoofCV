@@ -45,18 +45,18 @@ public class DistanceAffine2D implements DistanceFromModel<Affine2D_F64,Associat
 
 	@Override
 	public double computeDistance(AssociatedPair pt) {
-		AffinePointOps.transform(model,pt.keyLoc,expected);
+		AffinePointOps.transform(model,pt.p1,expected);
 
-		return expected.distance(pt.currLoc);
+		return expected.distance(pt.p2);
 	}
 
 	@Override
 	public void computeDistance(List<AssociatedPair> points, double[] distance) {
 		for( int i = 0; i < points.size(); i++ ) {
 			AssociatedPair p = points.get(i);
-			AffinePointOps.transform(model,p.keyLoc,expected);
+			AffinePointOps.transform(model,p.p1,expected);
 
-			distance[i] = expected.distance(p.currLoc);
+			distance[i] = expected.distance(p.p2);
 		}
 	}
 }

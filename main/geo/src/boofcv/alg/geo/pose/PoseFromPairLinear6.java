@@ -123,8 +123,8 @@ public class PoseFromPairLinear6 {
 			AssociatedPair p = observations.get(i);
 			Point3D_F64 loc = locations.get(i);
 
-			Point2D_F64 pt1 = p.keyLoc;
-			Point2D_F64 pt2 = p.currLoc;
+			Point2D_F64 pt1 = p.p1;
+			Point2D_F64 pt2 = p.p2;
 
 			// normalize the points
 			int w=i*2;

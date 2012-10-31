@@ -47,10 +47,10 @@ public class HomographyResidualTransfer
 	@Override
 	public int computeResiduals(AssociatedPair p, double[] residuals, int index) {
 
-		GeometryMath_F64.mult(H, p.keyLoc, temp);
+		GeometryMath_F64.mult(H, p.p1, temp);
 
-		residuals[index++] = temp.x-p.currLoc.x;
-		residuals[index++] = temp.y-p.currLoc.y;
+		residuals[index++] = temp.x-p.p2.x;
+		residuals[index++] = temp.y-p.p2.y;
 
 		return index;
 	}

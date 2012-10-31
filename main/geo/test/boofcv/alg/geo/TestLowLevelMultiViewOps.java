@@ -102,8 +102,8 @@ public class TestLowLevelMultiViewOps {
 		for( int i = 0; i < 12; i++ ) {
 			AssociatedPair p = new AssociatedPair();
 
-			p.currLoc.set(rand.nextDouble()*5,rand.nextDouble()*5);
-			p.keyLoc.set(rand.nextDouble() * 5, rand.nextDouble() * 5);
+			p.p2.set(rand.nextDouble()*5,rand.nextDouble()*5);
+			p.p1.set(rand.nextDouble() * 5, rand.nextDouble() * 5);
 
 			list.add(p);
 		}

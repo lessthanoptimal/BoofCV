@@ -270,8 +270,8 @@ public class TestPerspectiveOps {
 		for( int i = 0; i < 12; i++ ) {
 			AssociatedPair p = new AssociatedPair();
 
-			p.currLoc.set(rand.nextDouble()*5, rand.nextDouble()*5);
-			p.keyLoc.set(rand.nextDouble()*5, rand.nextDouble()*5);
+			p.p2.set(rand.nextDouble()*5, rand.nextDouble()*5);
+			p.p1.set(rand.nextDouble()*5, rand.nextDouble()*5);
 
 			list.add(p);
 		}
@@ -285,8 +285,8 @@ public class TestPerspectiveOps {
 		assertEquals(list.size(),list2.size());
 
 		for( int i = 0; i < list.size(); i++ ) {
-			assertTrue(list.get(i).keyLoc == list1.get(i));
-			assertTrue(list.get(i).currLoc == list2.get(i));
+			assertTrue(list.get(i).p1 == list1.get(i));
+			assertTrue(list.get(i).p2 == list2.get(i));
 		}
 	}
 

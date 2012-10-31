@@ -102,8 +102,8 @@ public class LowLevelMultiViewOps {
 		double meanX2 = 0; double meanY2 = 0;
 
 		for( AssociatedPair p : points ) {
-			meanX1 += p.keyLoc.x;  meanY1 += p.keyLoc.y;
-			meanX2 += p.currLoc.x; meanY2 += p.currLoc.y;
+			meanX1 += p.p1.x;  meanY1 += p.p1.y;
+			meanX2 += p.p2.x; meanY2 += p.p2.y;
 		}
 
 		meanX1 /= points.size(); meanY1 /= points.size();
@@ -113,13 +113,13 @@ public class LowLevelMultiViewOps {
 		double stdX2 = 0; double stdY2 = 0;
 
 		for( AssociatedPair p : points ) {
-			double dx = p.keyLoc.x - meanX1;
-			double dy = p.keyLoc.y - meanY1;
+			double dx = p.p1.x - meanX1;
+			double dy = p.p1.y - meanY1;
 			stdX1 += dx*dx;
 			stdY1 += dy*dy;
 
-			dx = p.currLoc.x - meanX2;
-			dy = p.currLoc.y - meanY2;
+			dx = p.p2.x - meanX2;
+			dy = p.p2.y - meanY2;
 			stdX2 += dx*dx;
 			stdY2 += dy*dy;
 		}
