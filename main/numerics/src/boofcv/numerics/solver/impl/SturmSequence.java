@@ -103,7 +103,7 @@ public class SturmSequence {
 		}
 
 		// General cases
-		for( int i = 2; i < poly.size; i++ ) {
+		for( int i = 2; i < poly.size && next.size > 0; i++ ) {
 			PolynomialOps.divide(previous, next, sequence[i-1], result);
 
 			negative(result);

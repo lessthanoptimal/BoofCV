@@ -103,15 +103,26 @@ public class PolynomialOps {
 	 * @param remainder Output remainder. Modified.
 	 */
 	public static void divide( Polynomial numerator , Polynomial denominator , Polynomial quotient , Polynomial remainder  ) {
+		if( denominator.size <= 0 )
+			throw new IllegalArgumentException("Trying to device by a polynomial of size 0");
+
 		int nn = numerator.size-1; int nd = denominator.size-1;
 
 		while( nd >= 0 && denominator.c[nd] == 0 )
 			nd -= 1;
 
+		// divide by zero error
+		if( nd < 0 ) {
+			throw new IllegalArgumentException("Divide by zero error");
+		}
+
+
 		quotient.size = nn-nd+1;
 		remainder.setTo(numerator);
 
 		for( int k = nn-nd; k >= 0; k-- ) {
+			if( nd < 0 || k < 0 )
+				System.out.println("EGADS");
 			double c = quotient.c[k] = remainder.c[nd+k]/denominator.c[nd];
 			for( int j = k+nd; j >= k; j-- ) {
 				remainder.c[j] -= c*denominator.c[j-k];

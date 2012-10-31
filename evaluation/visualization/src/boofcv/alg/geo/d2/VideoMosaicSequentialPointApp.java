@@ -68,8 +68,8 @@ public class VideoMosaicSequentialPointApp<I extends ImageSingleBand, D extends 
 		config.pyramidScaling = new int[]{1,2,4,8};
 
 		addAlgorithm(0, "KLT", FactoryPointSequentialTracker.klt(config));
-		addAlgorithm(0, "BRIEF", FactoryPointSequentialTracker.brief(300, 200, 10, imageType));
-		addAlgorithm(0, "SURF", FactoryPointSequentialTracker.surf(300, 200, 2, imageType));
+		addAlgorithm(0, "BRIEF", FactoryPointSequentialTracker.dat_ShiTomasi_BRIEF(300, 200, 1, 10, imageType));
+		addAlgorithm(0, "SURF", FactoryPointSequentialTracker.dat_SF_SURF(300, 200, 2, imageType));
 
 		addAlgorithm(1,"Affine", new Affine2D_F64());
 		addAlgorithm(1,"Homography", new Homography2D_F64());

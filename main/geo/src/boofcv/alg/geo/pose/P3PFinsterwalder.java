@@ -104,6 +104,9 @@ public class P3PFinsterwalder implements P3PLineDistance {
 		poly.c[2] = 2*c2*b2*(cos12*cos13*cos23 - 1) + c2*(c2 + 2*a2)*(1 - pow2(cos13)) + b2*(b2 - a2)*( 1 - pow2(cos12));
 		poly.c[3] = c2*(b2*(pow2(cos12) - 1) + c2*( 1 - pow2(cos13)));
 
+		if( poly.computeDegree() < 0 )
+			return false;
+
 		if( !rootFinder.process(poly) )
 			return false;
 
