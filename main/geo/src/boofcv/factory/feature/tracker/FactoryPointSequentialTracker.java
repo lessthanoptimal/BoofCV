@@ -18,14 +18,18 @@
 
 package boofcv.factory.feature.tracker;
 
-import boofcv.abst.feature.associate.GeneralAssociation;
-import boofcv.abst.feature.associate.ScoreAssociateHamming_B;
-import boofcv.abst.feature.associate.ScoreAssociateNccFeature;
-import boofcv.abst.feature.associate.ScoreAssociation;
+import boofcv.abst.feature.associate.*;
+import boofcv.abst.feature.describe.DescribeRegionPoint;
+import boofcv.abst.feature.describe.WrapDescribeBrief;
+import boofcv.abst.feature.describe.WrapDescribePixelRegionNCC;
+import boofcv.abst.feature.describe.WrapDescribeSurf;
 import boofcv.abst.feature.detect.extract.FeatureExtractor;
 import boofcv.abst.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.abst.feature.detect.interest.InterestPointDetector;
-import boofcv.abst.feature.tracker.*;
+import boofcv.abst.feature.detect.interest.WrapFHtoInterestPoint;
+import boofcv.abst.feature.tracker.DetectAssociateTracker;
+import boofcv.abst.feature.tracker.ImagePointTracker;
+import boofcv.abst.feature.tracker.PstWrapperKltPyramid;
 import boofcv.alg.feature.associate.AssociateSurfBasic;
 import boofcv.alg.feature.describe.DescribePointBrief;
 import boofcv.alg.feature.describe.DescribePointPixelRegionNCC;
@@ -46,9 +50,7 @@ import boofcv.factory.feature.detect.interest.FactoryInterestPoint;
 import boofcv.factory.feature.orientation.FactoryOrientationAlgs;
 import boofcv.factory.filter.blur.FactoryBlurFilter;
 import boofcv.factory.interpolate.FactoryInterpolation;
-import boofcv.struct.feature.NccFeature;
-import boofcv.struct.feature.TupleDesc_B;
-import boofcv.struct.feature.TupleDesc_F64;
+import boofcv.struct.feature.*;
 import boofcv.struct.image.ImageSingleBand;
 
 import java.util.Random;
@@ -123,8 +125,8 @@ public class FactoryPointSequentialTracker {
 	 * @return SURF based tracker.
 	 */
 	public static <I extends ImageSingleBand, II extends ImageSingleBand>
-	ImagePointTracker<I> surf(int maxMatches, int detectPerScale, int minSeparation,
-							  Class<I> imageType) {
+	ImagePointTracker<I> dat_SF_SURF(int maxMatches, int detectPerScale, int minSeparation,
+									 Class<I> imageType) {
 		Class<II> integralType = GIntegralImageOps.getIntegralType(imageType);
 
 		FeatureExtractor extractor = FactoryFeatureExtractor.nonmax(minSeparation, 1, 10, true);
@@ -136,7 +138,11 @@ public class FactoryPointSequentialTracker {
 		ScoreAssociation<TupleDesc_F64> score = FactoryAssociation.scoreEuclidean(TupleDesc_F64.class, true);
 		AssociateSurfBasic assoc = new AssociateSurfBasic(FactoryAssociation.greedy(score, 100000, maxMatches, true));
 
-		return new PstWrapperSurf<I, II>(detector, orientation, describe, assoc, integralType);
+		InterestPointDetector<I> id = new WrapFHtoInterestPoint<I,II>(detector);
+		DescribeRegionPoint<I,SurfFeature> regionDesc = new WrapDescribeSurf<I,II>(describe,orientation);
+		GeneralAssociation<SurfFeature> generalAssoc = new WrapAssociateSurfBasic(assoc);
+
+		return new DetectAssociateTracker<I,SurfFeature>(id, regionDesc, generalAssoc);
 	}
 
 	/**
@@ -144,16 +150,17 @@ public class FactoryPointSequentialTracker {
 	 *
 	 * @param maxFeatures         Maximum number of features it will track.
 	 * @param maxAssociationError Maximum allowed association error.  Try 200.
+	 * @param detectionRadius     Size of feature detection region.  Try 2.
 	 * @param cornerThreshold     Tolerance for detecting corner features.  Tune. Start at 1.
 	 * @param imageType           Type of image being processed.
 	 */
 	public static <I extends ImageSingleBand>
-	ImagePointTracker<I> brief(int maxFeatures, int maxAssociationError, float cornerThreshold, Class<I> imageType) {
+	ImagePointTracker<I> dat_ShiTomasi_BRIEF(int maxFeatures, int maxAssociationError, int detectionRadius, float cornerThreshold, Class<I> imageType) {
 		DescribePointBrief<I> alg = FactoryDescribePointAlgs.brief(FactoryBriefDefinition.gaussian2(new Random(123), 16, 512),
 				FactoryBlurFilter.gaussian(imageType, 0, 4));
 
 		Class derivType = GImageDerivativeOps.getDerivativeType(imageType);
-		GeneralFeatureDetector corner = FactoryDetectPoint.createShiTomasi(3,false,cornerThreshold, maxFeatures, derivType);
+		GeneralFeatureDetector corner = FactoryDetectPoint.createShiTomasi(detectionRadius,false,cornerThreshold, maxFeatures, derivType);
 
 		InterestPointDetector<I> detector = FactoryInterestPoint.wrapPoint(corner, imageType, derivType);
 		ScoreAssociateHamming_B score = new ScoreAssociateHamming_B();
@@ -161,7 +168,7 @@ public class FactoryPointSequentialTracker {
 		GeneralAssociation<TupleDesc_B> association =
 				FactoryAssociation.greedy(score, maxAssociationError, maxFeatures, true);
 
-		return new PstWrapperBrief<I>(alg, detector, association);
+		return new DetectAssociateTracker<I,TupleDesc_B>(detector, new WrapDescribeBrief<I>(alg), association);
 	}
 
 	/**
@@ -175,8 +182,8 @@ public class FactoryPointSequentialTracker {
 	 * @param imageType      Type of image being processed.
 	 */
 	public static <I extends ImageSingleBand, D extends ImageSingleBand>
-	ImagePointTracker<I> pixelNCC(int maxFeatures, int regionWidth, int regionHeight,
-								  float cornerThreshold, Class<I> imageType, Class<D> derivType) {
+	ImagePointTracker<I> dat_ShiTomasi_NCC(int maxFeatures, int regionWidth, int regionHeight,
+										   float cornerThreshold, Class<I> imageType, Class<D> derivType) {
 		DescribePointPixelRegionNCC<I> alg = FactoryDescribePointAlgs.pixelRegionNCC(regionWidth, regionHeight, imageType);
 
 		GeneralFeatureDetector corner = FactoryDetectPoint.createShiTomasi(3, false, cornerThreshold, maxFeatures, derivType);
@@ -187,6 +194,32 @@ public class FactoryPointSequentialTracker {
 		GeneralAssociation<NccFeature> association =
 				FactoryAssociation.greedy(score, 0, maxFeatures, true);
 
-		return new PstWrapperPixelNcc<I>(alg, detector, association);
+		return new DetectAssociateTracker<I,NccFeature>(detector, new WrapDescribePixelRegionNCC<I>(alg), association);
+	}
+
+	/**
+	 * Creates a tracker which uses the detect, describe, associate architecture.
+	 *
+	 * @param detector Interest point detector.
+	 * @param describe Region description.
+	 * @param associate Description association.
+	 * @param updateDescription After a track has been associated should the description be changed?  Try false.
+	 * @param pruneAfter Prune tracks which have not been associated with any features after this many images.  Try 2.
+	 * @param <I> Type of input image.
+	 * @param <Desc> Type of region description
+	 * @return tracker
+	 */
+	public static <I extends ImageSingleBand, Desc extends TupleDesc>
+	DetectAssociateTracker<I,Desc> detectDescribeAssociate(InterestPointDetector<I> detector,
+														   DescribeRegionPoint<I, Desc> describe,
+														   GeneralAssociation<Desc> associate ,
+														   boolean updateDescription ,
+														   int pruneAfter ) {
+
+		DetectAssociateTracker<I,Desc> dat = new DetectAssociateTracker<I,Desc>(detector, describe, associate);
+		dat.setPruneThreshold(pruneAfter);
+		dat.setUpdateState(updateDescription);
+
+		return dat;
 	}
 }

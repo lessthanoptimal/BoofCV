@@ -18,8 +18,13 @@
 
 package boofcv.abst.feature.tracker;
 
+import boofcv.abst.feature.associate.GeneralAssociation;
+import boofcv.abst.feature.describe.DescribeRegionPoint;
+import boofcv.abst.feature.detect.interest.InterestPointDetector;
 import boofcv.struct.FastQueue;
 import boofcv.struct.feature.AssociatedIndex;
+import boofcv.struct.feature.TupleDesc;
+import boofcv.struct.feature.TupleDescQueue;
 import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.point.Point2D_F64;
 
@@ -37,8 +42,13 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public abstract class DetectAssociateTracker<I extends ImageSingleBand, D >
+public class DetectAssociateTracker<I extends ImageSingleBand, D extends TupleDesc>
 		implements ImagePointTracker<I> {
+
+
+	InterestPointDetector<I> detector;
+	DescribeRegionPoint<I,D> describe;
+	GeneralAssociation<D> associate;
 
 	// location of interest points
 	private FastQueue<Point2D_F64> locDst = new FastQueue<Point2D_F64>(10,Point2D_F64.class,true);
@@ -68,16 +78,16 @@ public abstract class DetectAssociateTracker<I extends ImageSingleBand, D >
 	// how many frames have been processed
 	long tick;
 
-	public abstract void setInputImage( I input );
+	public DetectAssociateTracker(InterestPointDetector<I> detector,
+								  DescribeRegionPoint<I, D> describe,
+								  GeneralAssociation<D> associate ) {
+		this.detector = detector;
+		this.describe = describe;
+		this.associate = associate;
 
-	public abstract FastQueue<D> createFeatureDescQueue( boolean declareData );
-
-	public abstract D createDescription();
-
-	public abstract void detectFeatures( FastQueue<Point2D_F64> location ,
-										 FastQueue<D> description );
-
-	public abstract FastQueue<AssociatedIndex> associate( FastQueue<D> featSrc , FastQueue<D> featDst );
+		featSrc = new TupleDescQueue<D>(describe,false);
+		featDst = new TupleDescQueue<D>(describe,true);
+	}
 
 	public boolean isUpdateState() {
 		return updateState;
@@ -100,12 +110,10 @@ public abstract class DetectAssociateTracker<I extends ImageSingleBand, D >
 
 	@Override
 	public void process( I input ) {
-		if( featSrc == null ) {
-			featSrc = createFeatureDescQueue(false);
-			featDst = createFeatureDescQueue(true);
-		}
 
-		setInputImage(input);
+		detector.detect(input);
+		describe.setImage(input);
+
 		tick++;
 
 		tracksActive.clear();
@@ -115,13 +123,25 @@ public abstract class DetectAssociateTracker<I extends ImageSingleBand, D >
 		featDst.reset();
 		locDst.reset();
 
-		detectFeatures(locDst,featDst);
+		int N = detector.getNumberOfFeatures();
+		for( int i = 0; i < N; i++ ) {
+			Point2D_F64 p = locDst.grow();
+			p.set(detector.getLocation(i));
+
+			double yaw = detector.getOrientation(i);
+			double scale = detector.getScale(i);
+
+			D desc = featDst.grow();
+			describe.process(p.x,p.y,yaw,scale,desc);
+		}
 
 		pruneTracks();
 
 		// if the keyframe has been set associate
 		if( keyFrameSet ) {
-			matches = associate(featSrc,featDst);
+			associate.associate(featSrc,featDst);
+
+			matches = associate.getMatches();
 
 			for( int i = 0; i < matches.size; i++ ) {
 				AssociatedIndex indexes = matches.data[i];
@@ -129,12 +149,12 @@ public abstract class DetectAssociateTracker<I extends ImageSingleBand, D >
 				Point2D_F64 loc = locDst.data[indexes.dst];
 				track.set(loc.x, loc.y);
 				tracksActive.add(track);
-				TrackInfo info = (TrackInfo)track.getDescription();
+				TrackInfo info = track.getDescription();
 				info.lastAssociated = tick;
 
 				// update the description
 				if( updateState ) {
-					setDescription(info.desc, featDst.get(indexes.dst));
+					info.desc.setTo(featDst.get(indexes.dst));
 				}
 //				System.out.println("i = "+i+"  x = "+loc.x+" y = "+loc.y);
 			}
@@ -158,11 +178,6 @@ public abstract class DetectAssociateTracker<I extends ImageSingleBand, D >
 		}
 	}
 
-	/**
-	 * Sets the 'src' description equal to 'dst'
-	 */
-	protected abstract void setDescription(D src, D dst);
-
 	@Override
 	public boolean addTrack(double x, double y) {
 		throw new IllegalArgumentException("Not supported.  SURF features need to know the scale.");
@@ -184,7 +199,7 @@ public abstract class DetectAssociateTracker<I extends ImageSingleBand, D >
 			PointTrack p = getUnused();
 			Point2D_F64 loc = locDst.get(i);
 			p.set(loc.x,loc.y);
-			setDescription(((TrackInfo)p.getDescription()).desc, featDst.get(i));
+			((TrackInfo)p.getDescription()).desc.setTo(featDst.get(i));
 			p.featureId = featureID++;
 
 			tracksNew.add(p);
@@ -208,7 +223,7 @@ public abstract class DetectAssociateTracker<I extends ImageSingleBand, D >
 		} else {
 			p = new PointTrack();
 			TrackInfo info = new TrackInfo();
-			info.desc = createDescription();
+			info.desc = describe.createDescription();
 			p.setDescription(info);
 		}
 		return p;

@@ -39,6 +39,11 @@ Version : Alpha 0.11
 - Added ImageGridPanel to display a set of images as a grid
 - ModelMatcher added getMinimumSize()
 - Renamed PointPosePair to Point2D3D since the old name was misleading
+- Visual Odometry
+  * Added stereo camera based algorithm that uses PnP
+- DetectAssociateTracker
+  * Changed from an abstract class into a regular class
+  * Deleted SURF,BRIEF,NCC specific implementations since they are no longer needed
 
 ---------------------------------------------
 Date    : 2012/09/18

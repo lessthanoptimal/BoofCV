@@ -64,10 +64,10 @@ public class VideoStabilizeSequentialPointApp<I extends ImageSingleBand, D exten
 		config.pyramidScaling = new int[]{1,2,4,8};
 
 		addAlgorithm(0, "KLT", FactoryPointSequentialTracker.klt(config));
-		addAlgorithm(0, "BRIEF", FactoryPointSequentialTracker.brief(300, 200, 10, imageType));
-		addAlgorithm(0, "SURF", FactoryPointSequentialTracker.surf(300, 200, 2, imageType));
+		addAlgorithm(0, "BRIEF", FactoryPointSequentialTracker.dat_ShiTomasi_BRIEF(300, 200, 1, 10, imageType));
+		addAlgorithm(0, "SURF", FactoryPointSequentialTracker.dat_SF_SURF(300, 200, 2, imageType));
 		// size of the description region has been increased to improve quality.
-		addAlgorithm(0, "NCC", FactoryPointSequentialTracker.pixelNCC(500,11,11,10,imageType,derivType));
+		addAlgorithm(0, "NCC", FactoryPointSequentialTracker.dat_ShiTomasi_NCC(500, 11, 11, 10, imageType, derivType));
 
 		addAlgorithm(1,"Affine", new Affine2D_F64());
 		addAlgorithm(1,"Homography", new Homography2D_F64());

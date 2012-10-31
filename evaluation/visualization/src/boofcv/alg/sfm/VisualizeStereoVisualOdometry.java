@@ -259,8 +259,8 @@ public class VisualizeStereoVisualOdometry implements MouseListener
 		StereoDisparitySparse<ImageFloat32> disparity =
 				FactoryStereoDisparity.regionSparseWta(0,150,3,3,20,-1,true,ImageFloat32.class);
 
-		StereoVisualOdometry<ImageFloat32> alg = FactoryVisualOdometry.stereoDepth(100, 1, tracker,
-				disparity, ImageFloat32.class);
+		StereoVisualOdometry<ImageFloat32> alg = FactoryVisualOdometry.stereoDepth(100, 1, 1.2, tracker,
+				disparity, 100, ImageFloat32.class);
 
 		alg.setCalibration(stereoParam);
 
