@@ -76,7 +76,7 @@ public abstract class CommonFundamentalChecks extends EpipolarTestSimulation {
 				// see if this hypothesis matched all the points
 				boolean matchedAll = true;
 				for (AssociatedPair p : this.pairs) {
-					double val = GeometryMath_F64.innerProd(p.currLoc, F, p.keyLoc);
+					double val = GeometryMath_F64.innerProd(p.p2, F, p.p1);
 					if (val > zeroTol) {
 						matchedAll = false;
 						break;

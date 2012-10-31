@@ -67,9 +67,9 @@ public class TestHomographyLinear4 extends CommonHomographyChecks{
 
 		// see if it follows the epipolar constraint
 		for( AssociatedPair p : pairs ) {
-			Point2D_F64 a = GeometryMath_F64.mult(solution,p.keyLoc,new Point2D_F64());
+			Point2D_F64 a = GeometryMath_F64.mult(solution,p.p1,new Point2D_F64());
 
-			double diff = a.distance(p.currLoc);
+			double diff = a.distance(p.p2);
 			assertEquals(0,diff,1e-8);
 		}
 	}

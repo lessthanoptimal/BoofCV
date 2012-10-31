@@ -143,14 +143,14 @@ public class MotionMosaicPointKey<I extends ImageSingleBand, T extends Invertibl
 		double y1 = 0;
 
 		for( AssociatedPair p : tracks ) {
-			if( p.currLoc.x < x0 )
-				x0 = p.currLoc.x;
-			if( p.currLoc.x >= x1 )
-				x1 = p.currLoc.x;
-			if( p.currLoc.y < y0 )
-				y0 = p.currLoc.y;
-			if( p.currLoc.y >= y1 )
-				y1 = p.currLoc.y;
+			if( p.p2.x < x0 )
+				x0 = p.p2.x;
+			if( p.p2.x >= x1 )
+				x1 = p.p2.x;
+			if( p.p2.y < y0 )
+				y0 = p.p2.y;
+			if( p.p2.y >= y1 )
+				y1 = p.p2.y;
 		}
 		return ((x1-x0)*(y1-y0))/(width*height);
 	}

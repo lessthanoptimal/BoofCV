@@ -172,7 +172,7 @@ public class HomographyLinear4 {
 	 * @param p test point, used to determine the sign of the matrix.
 	 */
 	protected void adjustHomographSign( AssociatedPair p , DenseMatrix64F H ) {
-		double val = GeometryMath_F64.innerProd(p.currLoc,H,p.keyLoc);
+		double val = GeometryMath_F64.innerProd(p.p2,H,p.p1);
 
 		if( val < 0 )
 			CommonOps.scale(-1, H);
@@ -193,9 +193,9 @@ public class HomographyLinear4 {
 			AssociatedPair p = points.get(i);
 
 			// the first image
-			Point2D_F64 f = p.keyLoc;
+			Point2D_F64 f = p.p1;
 			// the second image
-			Point2D_F64 s = p.currLoc;
+			Point2D_F64 s = p.p2;
 
 			// normalize the points
 			LowLevelMultiViewOps.applyPixelNormalization(N1, f, f_norm);
@@ -228,9 +228,9 @@ public class HomographyLinear4 {
 			AssociatedPair p = points.get(i);
 
 			// the first image
-			Point2D_F64 f = p.keyLoc;
+			Point2D_F64 f = p.p1;
 			// the second image
-			Point2D_F64 s = p.currLoc;
+			Point2D_F64 s = p.p2;
 
 			A.set(i*2   , 3 , -f.x);
 			A.set(i*2   , 4 , -f.y);

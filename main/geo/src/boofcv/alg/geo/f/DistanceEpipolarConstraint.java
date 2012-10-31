@@ -46,7 +46,7 @@ public class DistanceEpipolarConstraint implements DistanceFromModel<DenseMatrix
 
 	@Override
 	public double computeDistance(AssociatedPair pt) {
-		return Math.abs(GeometryMath_F64.innerProd(pt.currLoc, M, pt.keyLoc));
+		return Math.abs(GeometryMath_F64.innerProd(pt.p2, M, pt.p1));
 	}
 
 	@Override

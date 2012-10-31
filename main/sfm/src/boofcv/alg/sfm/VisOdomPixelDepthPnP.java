@@ -1,21 +1,14 @@
 package boofcv.alg.sfm;
 
 import boofcv.abst.feature.tracker.KeyFramePointTracker;
-import boofcv.abst.geo.BundleAdjustmentCalibrated;
 import boofcv.abst.geo.RefinePnP;
-import boofcv.alg.geo.bundle.CalibratedPoseAndPoint;
-import boofcv.alg.geo.bundle.ViewPointObservations;
-import boofcv.factory.geo.FactoryMultiView;
 import boofcv.numerics.fitting.modelset.ModelMatcher;
-import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.geo.Point2D3D;
 import boofcv.struct.image.ImageBase;
-import georegression.geometry.RotationMatrixGenerator;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
-import org.ejml.data.DenseMatrix64F;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,7 +27,6 @@ import java.util.List;
  *
  * Due to the level of abstraction, it can't take full advantage of the sensors used to estimate 3D feature locations.
  * For example if a stereo camera is used then 3-view geometry can't be used to improve performance.
-
  *
  * @author Peter Abeles
  */
@@ -202,7 +194,7 @@ public class VisOdomPixelDepthPnP<T extends ImageBase> {
 
 		// estimate 3D coordinate using stereo vision
 		for( PointPoseTrack p : spawned ) {
-			Point2D_F64 pixel = p.getPixel().keyLoc;
+			Point2D_F64 pixel = p.getPixel().p1;
 
 			// discard point if it can't localized
 			if( !pixelTo3D.process(pixel.x,pixel.y) || pixelTo3D.getW() == 0 ) {
@@ -240,7 +232,7 @@ public class VisOdomPixelDepthPnP<T extends ImageBase> {
 			Point2D3D p = new Point2D3D();
 
 			p.location = t.getLocation();
-			p.observation = t.currLoc;
+			p.observation = t.p2;
 
 			obs.add(p);
 		}
@@ -266,7 +258,7 @@ public class VisOdomPixelDepthPnP<T extends ImageBase> {
 			int index = motionEstimator.getInputIndex(i);
 			PointPoseTrack t = tracker.getPairs().get(index);
 
-			inlierPixels.add( t.getPixel().currLoc );
+			inlierPixels.add( t.getPixel().p2);
 		}
 
 		return true;

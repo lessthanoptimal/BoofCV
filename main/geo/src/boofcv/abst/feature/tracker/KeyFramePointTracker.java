@@ -84,8 +84,8 @@ public class KeyFramePointTracker<I extends ImageBase, R extends KeyFrameTrack> 
 		List<PointTrack> tracks = tracker.getActiveTracks();
 		for( PointTrack t : tracks ) {
 			R p = t.getCookie();
-			p.pixel.currLoc.set(t);
-			pixelToNorm.compute(t.x, t.y, p.currLoc);
+			p.pixel.p2.set(t);
+			pixelToNorm.compute(t.x, t.y, p.p2);
 			pairs.add(p);
 		}
 	}
@@ -102,10 +102,10 @@ public class KeyFramePointTracker<I extends ImageBase, R extends KeyFrameTrack> 
 			if( t.cookie == null )
 				throw new RuntimeException("Bug, cookie should have been set");
 			R p = t.getCookie();
-			p.pixel.keyLoc.set(t);
-			p.pixel.currLoc.set(t);
-			pixelToNorm.compute(t.x, t.y, p.keyLoc);
-			p.currLoc.set(p.keyLoc);
+			p.pixel.p1.set(t);
+			p.pixel.p2.set(t);
+			pixelToNorm.compute(t.x, t.y, p.p1);
+			p.p2.set(p.p1);
 			pairs.add(p);
 		}
 	}
@@ -130,10 +130,10 @@ public class KeyFramePointTracker<I extends ImageBase, R extends KeyFrameTrack> 
 			R p = t.getCookie();
 			p.reset();
 			p.trackID = t.featureId;
-			p.pixel.keyLoc.set(t);
-			p.pixel.currLoc.set(t);
-			pixelToNorm.compute(t.x, t.y, p.keyLoc);
-			p.currLoc.set(p.keyLoc);
+			p.pixel.p1.set(t);
+			p.pixel.p2.set(t);
+			pixelToNorm.compute(t.x, t.y, p.p1);
+			p.p2.set(p.p1);
 			pairs.add(p);
 			spawned.add(p);
 		}

@@ -40,8 +40,8 @@ public class TestDistanceAffine2DSq extends TestDistanceAffine2D {
 
 		Point2D_F64 result = new Point2D_F64();
 
-		AffinePointOps.transform(affine,associatedPair.keyLoc,result);
+		AffinePointOps.transform(affine,associatedPair.p1,result);
 
-		return result.distance2(associatedPair.currLoc);
+		return result.distance2(associatedPair.p2);
 	}
 }

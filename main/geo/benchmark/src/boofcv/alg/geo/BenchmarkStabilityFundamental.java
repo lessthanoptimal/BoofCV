@@ -119,24 +119,24 @@ public class BenchmarkStabilityFundamental {
 				continue;
 
 			AssociatedPair pair = new AssociatedPair();
-			pair.keyLoc.set(p1.x/p1.z,p1.y/p1.z);
-			pair.currLoc.set(p2.x/p2.z,p2.y/p2.z);
+			pair.p1.set(p1.x/p1.z,p1.y/p1.z);
+			pair.p2.set(p2.x/p2.z,p2.y/p2.z);
 			observations.add(pair);
 
 			// convert to pixels
-			GeometryMath_F64.mult(K, pair.keyLoc, pair.keyLoc);
-			GeometryMath_F64.mult(K, pair.currLoc,pair.currLoc);
+			GeometryMath_F64.mult(K, pair.p1, pair.p1);
+			GeometryMath_F64.mult(K, pair.p2,pair.p2);
 
 			// add noise
-			pair.keyLoc.x += rand.nextGaussian()*sigmaPixels;
-			pair.keyLoc.y += rand.nextGaussian()*sigmaPixels;
-			pair.currLoc.x += rand.nextGaussian()*sigmaPixels;
-			pair.currLoc.y += rand.nextGaussian()*sigmaPixels;
+			pair.p1.x += rand.nextGaussian()*sigmaPixels;
+			pair.p1.y += rand.nextGaussian()*sigmaPixels;
+			pair.p2.x += rand.nextGaussian()*sigmaPixels;
+			pair.p2.y += rand.nextGaussian()*sigmaPixels;
 
 			// if needed, convert back into normalized image coordinates
 			if( !isPixels ) {
-				GeometryMath_F64.mult(K_inv, pair.keyLoc, pair.keyLoc);
-				GeometryMath_F64.mult(K_inv, pair.currLoc,pair.currLoc);
+				GeometryMath_F64.mult(K_inv, pair.p1, pair.p1);
+				GeometryMath_F64.mult(K_inv, pair.p2,pair.p2);
 			}
 		}
 	}
@@ -180,7 +180,7 @@ public class BenchmarkStabilityFundamental {
 			double totalScore = 0;
 			// score against all observations
 			for( AssociatedPair p : observations ) {
-				double score = Math.abs(GeometryMath_F64.innerProd(p.currLoc, F, p.keyLoc));
+				double score = Math.abs(GeometryMath_F64.innerProd(p.p2, F, p.p1));
 				if( Double.isNaN(score))
 					System.out.println("Score is NaN");
 				scores.add(score);
@@ -212,7 +212,7 @@ public class BenchmarkStabilityFundamental {
 
 			// score against all observations
 			for( AssociatedPair p : observations ) {
-				double score = Math.abs(GeometryMath_F64.innerProd(p.currLoc, F, p.keyLoc));
+				double score = Math.abs(GeometryMath_F64.innerProd(p.p2, F, p.p1));
 				if( Double.isNaN(score))
 					System.out.println("Score is NaN");
 				scores.add(score);

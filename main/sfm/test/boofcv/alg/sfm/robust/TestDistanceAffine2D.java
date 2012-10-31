@@ -66,8 +66,8 @@ public class TestDistanceAffine2D extends StandardDistanceTest<Affine2D_F64, Ass
 
 		Point2D_F64 result = new Point2D_F64();
 
-		AffinePointOps.transform(affine,associatedPair.keyLoc,result);
+		AffinePointOps.transform(affine,associatedPair.p1,result);
 
-		return result.distance(associatedPair.currLoc);
+		return result.distance(associatedPair.p2);
 	}
 }

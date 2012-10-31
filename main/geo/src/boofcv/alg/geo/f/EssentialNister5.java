@@ -154,8 +154,8 @@ public class EssentialNister5 {
 		for( int i = 0; i < points.size(); i++ ) {
 			AssociatedPair p = points.get(i);
 
-			Point2D_F64 a = p.currLoc;
-			Point2D_F64 b = p.keyLoc;
+			Point2D_F64 a = p.p2;
+			Point2D_F64 b = p.p1;
 
 			// The points are assumed to be in homogeneous coordinates.  This means z = 1
 			Q.data[index++] =  a.x*b.x;

@@ -162,8 +162,8 @@ public abstract class FundamentalLinear {
 		for( int i = 0; i < size; i++ ) {
 			AssociatedPair p = points.get(i);
 
-			Point2D_F64 f = p.keyLoc;
-			Point2D_F64 s = p.currLoc;
+			Point2D_F64 f = p.p1;
+			Point2D_F64 s = p.p2;
 
 			// normalize the points
 			LowLevelMultiViewOps.applyPixelNormalization(N1, f, f_norm);

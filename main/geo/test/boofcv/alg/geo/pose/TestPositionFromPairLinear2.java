@@ -53,7 +53,7 @@ public class TestPositionFromPairLinear2 extends ChecksMotionNPoint {
 		List<Point2D_F64> l = new ArrayList<Point2D_F64>();
 		
 		for( AssociatedPair p : obs )
-			l.add(p.currLoc);
+			l.add(p.p2);
 		
 		
 		assertTrue(alg.process(motion.getR(), locations, l));

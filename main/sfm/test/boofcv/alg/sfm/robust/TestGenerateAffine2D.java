@@ -80,10 +80,10 @@ public class TestGenerateAffine2D implements ModelTestingInterface<Affine2D_F64,
 	@Override
 	public AssociatedPair createRandomPointFromModel(Affine2D_F64 affine) {
 		AssociatedPair ret = new AssociatedPair();
-		ret.keyLoc.x = rand.nextDouble()*10;
-		ret.keyLoc.y = rand.nextDouble()*10;
+		ret.p1.x = rand.nextDouble()*10;
+		ret.p1.y = rand.nextDouble()*10;
 
-		AffinePointOps.transform(affine,ret.keyLoc,ret.currLoc);
+		AffinePointOps.transform(affine,ret.p1,ret.p2);
 
 		return ret;
 	}
@@ -94,9 +94,9 @@ public class TestGenerateAffine2D implements ModelTestingInterface<Affine2D_F64,
 		Point2D_F64 expected = new Point2D_F64();
 
 		for( AssociatedPair p : dataSet ) {
-			AffinePointOps.transform(affine,p.keyLoc,expected);
+			AffinePointOps.transform(affine,p.p1,expected);
 
-			if( expected.distance(p.currLoc) > 0.01 )
+			if( expected.distance(p.p2) > 0.01 )
 				return false;
 		}
 

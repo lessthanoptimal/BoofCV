@@ -59,8 +59,8 @@ public class GenerateAffine2D implements
 
 		for( int i = 0; i < dataSet.size(); i++ ) {
 			AssociatedPair p = dataSet.get(i);
-			from.add(p.keyLoc);
-			to.add(p.currLoc);
+			from.add(p.p1);
+			to.add(p.p2);
 		}
 
 		if( !fitter.process(from,to) )
@@ -78,8 +78,8 @@ public class GenerateAffine2D implements
 
 		for( int i = 0; i < dataSet.size(); i++ ) {
 			AssociatedPair p = dataSet.get(i);
-			from.add(p.keyLoc);
-			to.add(p.currLoc);
+			from.add(p.p1);
+			to.add(p.p2);
 		}
 
 		if( !fitter.process(from,to) )

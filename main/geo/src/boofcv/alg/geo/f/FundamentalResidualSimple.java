@@ -43,8 +43,8 @@ public class FundamentalResidualSimple
 
 	@Override
 	public double computeResidual(AssociatedPair observation) {
-		GeometryMath_F64.multTran(F,observation.currLoc,temp);
+		GeometryMath_F64.multTran(F,observation.p2,temp);
 
-		return temp.x*observation.keyLoc.x + temp.y*observation.keyLoc.y + temp.z;
+		return temp.x*observation.p1.x + temp.y*observation.p1.y + temp.z;
 	}
 }

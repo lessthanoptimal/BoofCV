@@ -33,57 +33,77 @@ import georegression.struct.point.Point2D_F64;
 public class AssociatedPair {
 
 	/**
-	 * Location of the feature in the key frame.
+	 * Location of the feature in the first image
 	 */
-	public Point2D_F64 keyLoc;
+	public Point2D_F64 p1;
 	/**
-	 * Location of the feature in the current frame.
+	 * Location of the feature in the second image.
 	 */
-	public Point2D_F64 currLoc;
+	public Point2D_F64 p2;
 
 	public AssociatedPair() {
-		keyLoc = new Point2D_F64();
-		currLoc = new Point2D_F64();
+		p1 = new Point2D_F64();
+		p2 = new Point2D_F64();
+	}
+
+	/**
+	 * Constructor which allows the points to not be declared.
+	 *
+	 * @param declare If true then new points will be declared
+	 */
+	public AssociatedPair( boolean declare ) {
+		if( declare ) {
+			p1 = new Point2D_F64();
+			p2 = new Point2D_F64();
+		}
 	}
 
 	/**
 	 * Creates a new associated point from the two provided points.
 	 *
-	 * @param x1 keyframe location x-axis.
-	 * @param y1 keyframe location y-axis.
-	 * @param x2 current location x-axis.
-	 * @param y2 current location y-axis.
+	 * @param x1 image 1 location x-axis.
+	 * @param y1 image 1 location y-axis.
+	 * @param x2 image 2 location x-axis.
+	 * @param y2 image 2 location y-axis.
 	 */
 	public AssociatedPair(double x1, double y1,
 						  double x2, double y2) {
-		keyLoc = new Point2D_F64(x1, y1);
-		currLoc = new Point2D_F64(x2, y2);
+		p1 = new Point2D_F64(x1, y1);
+		p2 = new Point2D_F64(x2, y2);
 	}
 
 	/**
 	 * Creates a new associated point from the two provided points.
 	 *
-	 * @param keyLoc keyframe location
-	 * @param currLoc current location
+	 * @param p1 image 1 location
+	 * @param p2 image 2 location
 	 */
-	public AssociatedPair(Point2D_F64 keyLoc, Point2D_F64 currLoc) {
-		this(keyLoc,currLoc,true);
+	public AssociatedPair(Point2D_F64 p1, Point2D_F64 p2) {
+		this(p1, p2,true);
 	}
 
 	/**
 	 * Creates a new associated point from the two provided points.
 	 *
-	 * @param keyLoc keyframe location
-	 * @param currLoc current location
+	 * @param p1 image 1 location
+	 * @param p2 image 2 location
 	 * @param newInstance Should it create new points or save a reference to these instances.
 	 */
-	public AssociatedPair(Point2D_F64 keyLoc, Point2D_F64 currLoc, boolean newInstance) {
+	public AssociatedPair(Point2D_F64 p1, Point2D_F64 p2, boolean newInstance) {
 		if (newInstance) {
-			this.keyLoc = new Point2D_F64(keyLoc);
-			this.currLoc = new Point2D_F64(currLoc);
+			this.p1 = new Point2D_F64(p1);
+			this.p2 = new Point2D_F64(p2);
 		} else {
-			this.keyLoc = keyLoc;
-			this.currLoc = currLoc;
+			this.p1 = p1;
+			this.p2 = p2;
 		}
+	}
+
+	public Point2D_F64 getP1() {
+		return p1;
+	}
+
+	public Point2D_F64 getP2() {
+		return p2;
 	}
 }

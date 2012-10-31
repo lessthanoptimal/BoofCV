@@ -441,7 +441,7 @@ public abstract class ImageMotionBaseApp<I extends ImageSingleBand, D extends Im
 
 			if( list != null ) {
 				for( AssociatedPair p : list ) {
-					inliers.grow().set((float)p.currLoc.x,(float)p.currLoc.y);
+					inliers.grow().set((float)p.p2.x,(float)p.p2.y);
 				}
 			}
 		}

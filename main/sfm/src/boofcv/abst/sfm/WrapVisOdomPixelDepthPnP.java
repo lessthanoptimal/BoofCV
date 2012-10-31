@@ -61,7 +61,7 @@ public class WrapVisOdomPixelDepthPnP<T extends ImageSingleBand>
 		List<Point2D_F64> pixels = new ArrayList<Point2D_F64>();
 
 		for(PointPoseTrack t : alg.getTracker().getPairs() ) {
-			pixels.add(t.getPixel().currLoc);
+			pixels.add(t.getPixel().p2);
 		}
 
 		return pixels;

@@ -182,8 +182,8 @@ public class ExampleStereoTwoViewsOneCamera {
 		for (AssociatedPair p : matchedFeatures) {
 			AssociatedPair c = new AssociatedPair();
 
-			tran.compute(p.keyLoc.x, p.keyLoc.y, c.keyLoc);
-			tran.compute(p.currLoc.x, p.currLoc.y, c.currLoc);
+			tran.compute(p.p1.x, p.p1.y, c.p1);
+			tran.compute(p.p2.x, p.p2.y, c.p2);
 
 			calibratedFeatures.add(c);
 		}
@@ -248,8 +248,8 @@ public class ExampleStereoTwoViewsOneCamera {
 		for (AssociatedPair n : normalized) {
 			AssociatedPair p = new AssociatedPair();
 
-			tran.compute(n.keyLoc.x, n.keyLoc.y, p.keyLoc);
-			tran.compute(n.currLoc.x, n.currLoc.y, p.currLoc);
+			tran.compute(n.p1.x, n.p1.y, p.p1);
+			tran.compute(n.p2.x, n.p2.y, p.p2);
 
 			pixels.add(p);
 		}

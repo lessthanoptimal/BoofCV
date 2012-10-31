@@ -76,15 +76,15 @@ public class FunctionSampsonFundamental implements FunctionNtoS {
 		for( int i = 0; i < obs.size(); i++ ) {
 			AssociatedPair p = obs.get(i);
 
-			double top = GeometryMath_F64.innerProd(p.currLoc,F,p.keyLoc);
+			double top = GeometryMath_F64.innerProd(p.p2,F,p.p1);
 			top *= top;
 			
 			double bottom = 0;
 			
-			GeometryMath_F64.mult(F,p.keyLoc,temp);
+			GeometryMath_F64.mult(F,p.p1,temp);
 			bottom += temp.x * temp.x + temp.y*temp.y;
 
-			GeometryMath_F64.multTran(F, p.currLoc, temp);
+			GeometryMath_F64.multTran(F, p.p2, temp);
 			bottom += temp.x * temp.x + temp.y*temp.y;
 
 			if( bottom <= 1e-12 )

@@ -68,7 +68,7 @@ public class Se3FromEssentialGenerator implements ModelGenerator<Se3_F64,Associa
 			Se3_F64 s = candidates.get(i);
 			int count = 0;
 			for( AssociatedPair p : dataSet ) {
-				if( depthCheck.checkConstraint(p.keyLoc,p.currLoc,s)) {
+				if( depthCheck.checkConstraint(p.p1,p.p2,s)) {
 					count++;
 				}
 			}

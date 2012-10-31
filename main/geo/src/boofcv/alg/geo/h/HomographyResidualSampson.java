@@ -64,12 +64,12 @@ public class HomographyResidualSampson
 	@Override
 	public int computeResiduals(AssociatedPair p, double[] residuals, int index) {
 
-		GeometryMath_F64.mult(H, p.keyLoc, temp);
+		GeometryMath_F64.mult(H, p.p1, temp);
 
-		double top1 = error1(p.keyLoc.x,p.keyLoc.y,p.currLoc.x,p.currLoc.y);
-		double top2 = error2(p.keyLoc.x, p.keyLoc.y, p.currLoc.x, p.currLoc.y);
+		double top1 = error1(p.p1.x,p.p1.y,p.p2.x,p.p2.y);
+		double top2 = error2(p.p1.x, p.p1.y, p.p2.x, p.p2.y);
 
-		computeJacobian(p.keyLoc,p.currLoc);
+		computeJacobian(p.p1,p.p2);
 		// JJ = J*J'
 		CommonOps.multTransB(J, J, JJ);
 

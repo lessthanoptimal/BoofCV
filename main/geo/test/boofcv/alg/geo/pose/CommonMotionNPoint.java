@@ -70,10 +70,10 @@ public class CommonMotionNPoint {
 			Point3D_F64 p2 = SePointOps_F64.transform(motion, p1, null);
 
 			AssociatedPair pair = new AssociatedPair();
-			pair.keyLoc.set(p1.x/p1.z,p1.y/p1.z);
-			pair.currLoc.set(p2.x/p2.z,p2.y/p2.z);
+			pair.p1.set(p1.x/p1.z,p1.y/p1.z);
+			pair.p2.set(p2.x/p2.z,p2.y/p2.z);
 			assocPairs.add(pair);
-			pointPose.add( new Point2D3D(pair.currLoc,p1));
+			pointPose.add( new Point2D3D(pair.p2,p1));
 
 			cameraPts.add(p2);
 		}
