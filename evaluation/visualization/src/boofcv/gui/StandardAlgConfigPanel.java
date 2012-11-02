@@ -43,6 +43,15 @@ public class StandardAlgConfigPanel extends JPanel {
 		owner.add(p);
 	}
 
+	public void addAlignCenter( JComponent target, JPanel owner ) {
+		JPanel p = new JPanel();
+		p.setLayout(new BoxLayout(p,BoxLayout.X_AXIS));
+		p.add(Box.createHorizontalGlue());
+		p.add(target);
+		p.add(Box.createHorizontalGlue());
+		owner.add(p);
+	}
+
 	protected void addCenterLabel( String text , JPanel owner ) {
 		JLabel l = new JLabel(text);
 		l.setAlignmentX(Component.CENTER_ALIGNMENT);

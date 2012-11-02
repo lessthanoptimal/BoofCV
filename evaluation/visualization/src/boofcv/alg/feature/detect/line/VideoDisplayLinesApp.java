@@ -43,7 +43,7 @@ import java.util.ArrayList;
  * @author Peter Abeles
  */
 public class VideoDisplayLinesApp<I extends ImageSingleBand, D extends ImageSingleBand>
-		extends VideoProcessAppBase<I,D> implements MouseListener
+		extends VideoProcessAppBase<I> implements MouseListener
 {
 	I blur;
 

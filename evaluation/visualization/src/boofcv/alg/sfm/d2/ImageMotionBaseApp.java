@@ -16,13 +16,10 @@
  * limitations under the License.
  */
 
-package boofcv.alg.geo.d2;
+package boofcv.alg.sfm.d2;
 
 import boofcv.abst.feature.tracker.ImagePointTracker;
 import boofcv.abst.feature.tracker.PointTrack;
-import boofcv.alg.sfm.d2.ImageMotionPointKey;
-import boofcv.alg.sfm.d2.RenderImageMotion;
-import boofcv.alg.sfm.d2.UtilImageMotion;
 import boofcv.alg.sfm.robust.DistanceAffine2DSq;
 import boofcv.alg.sfm.robust.DistanceHomographySq;
 import boofcv.alg.sfm.robust.GenerateAffine2D;
@@ -60,9 +57,9 @@ import java.awt.image.BufferedImage;
  *
  * @author Peter Abeles
  */
-public abstract class ImageMotionBaseApp<I extends ImageSingleBand, D extends ImageSingleBand ,
+public abstract class ImageMotionBaseApp<I extends ImageSingleBand,
 		T extends InvertibleTransform>
-		extends VideoProcessAppBase<I,D> implements VisualizeApp
+		extends VideoProcessAppBase<I> implements VisualizeApp
 {
 	// If the input and output images are being shown, this is the width of a border between them.
 	private final static int outputBorder = 10;

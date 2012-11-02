@@ -19,6 +19,8 @@
 package boofcv.gui;
 
 import boofcv.io.image.SimpleImageSequence;
+import boofcv.misc.BoofMiscOps;
+import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.image.ImageSingleBand;
 
 import javax.swing.*;
@@ -27,16 +29,21 @@ import javax.swing.event.ChangeListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.Reader;
 
 /**
- * Base class which handles starting and stopping of video streams for apps that process video streams.
+ * Base class for processing sequences of stereo images.
  *
  * @author Peter Abeles
  */
-public abstract class VideoProcessAppBase<I extends ImageSingleBand>
-		extends SelectAlgorithmAndInputPanel implements VisualizeApp, MouseListener , ChangeListener
+public abstract class StereoVideoAppBase <I extends ImageSingleBand>
+		extends SelectAlgorithmAndInputPanel implements VisualizeApp, MouseListener, ChangeListener
 {
-	protected SimpleImageSequence<I> sequence;
+	protected StereoParameters config;
+	protected SimpleImageSequence<I> sequence1;
+	protected SimpleImageSequence<I> sequence2;
 
 	volatile boolean requestStop = false;
 	volatile boolean isRunning = false;
@@ -45,10 +52,10 @@ public abstract class VideoProcessAppBase<I extends ImageSingleBand>
 	long framePeriod = 100;
 
 	JSpinner periodSpinner;
-	
-	Class<I> imageType;
 
-	public VideoProcessAppBase(int numAlgFamilies, Class<I> imageType) {
+	protected Class<I> imageType;
+
+	public StereoVideoAppBase(int numAlgFamilies, Class<I> imageType) {
 		super(numAlgFamilies);
 
 		this.imageType = imageType;
@@ -73,17 +80,33 @@ public abstract class VideoProcessAppBase<I extends ImageSingleBand>
 		new WorkThread().start();
 	}
 
-	protected abstract void process( SimpleImageSequence<I> sequence );
+	protected abstract void process( SimpleImageSequence<I> sequence1,
+									 SimpleImageSequence<I> sequence2 );
 
-	protected abstract void updateAlg(I frame, BufferedImage buffImage );
+	protected abstract void updateAlg(I frame1, BufferedImage buffImage1,
+									  I frame2, BufferedImage buffImage2 );
 
-	protected abstract void updateAlgGUI( I frame , BufferedImage imageGUI , double fps );
+	protected abstract void updateAlgGUI( I frame1 , BufferedImage buffImage1 ,
+										  I frame2 , BufferedImage buffImage2 ,double fps );
 
 	@Override
 	public void changeInput(String name, int index) {
 		stopWorker();
-		SimpleImageSequence<I> video = media.openVideo(inputRefs.get(index).getPath(),imageType);
-		process(video);
+		Reader r = media.openFile(inputRefs.get(index).getPath());
+		BufferedReader in = new BufferedReader(r);
+		try {
+			String lineConfig = in.readLine();
+			String line1 = in.readLine();
+			String line2 = in.readLine();
+
+			config = BoofMiscOps.loadXML(media.openFile(lineConfig));
+			SimpleImageSequence<I> video1 = media.openVideo(line1,imageType);
+			SimpleImageSequence<I> video2 = media.openVideo(line2,imageType);
+
+			process(video1,video2);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	protected void stopWorker() {
@@ -103,6 +126,8 @@ public abstract class VideoProcessAppBase<I extends ImageSingleBand>
 			long totalTrackerTime = 0;
 			long totalFrames = 0;
 
+			handleRunningStatus(0);
+
 			while( requestStop == false ) {
 				long startTime = System.currentTimeMillis();
 				if( !isPaused ) {
@@ -112,19 +137,25 @@ public abstract class VideoProcessAppBase<I extends ImageSingleBand>
 						totalTrackerTime = 0;
 					}
 
-					if( sequence.hasNext() ) {
-						I frame = sequence.next();
-						BufferedImage buffImage = sequence.getGuiImage();
+					if( sequence1.hasNext() && sequence2.hasNext() ) {
+						I frame1 = sequence1.next();
+						I frame2 = sequence2.next();
+
+						BufferedImage buffImage1 = sequence1.getGuiImage();
+						BufferedImage buffImage2 = sequence2.getGuiImage();
 
 						long startTracker = System.nanoTime();
-						updateAlg(frame, buffImage);
+						updateAlg(frame1, buffImage1,frame2, buffImage2);
 						totalTrackerTime += System.nanoTime()-startTracker;
 						totalFrames++;
 
-						updateAlgGUI(frame,buffImage,1e9/(totalTrackerTime/totalFrames));
+						updateAlgGUI(frame1,buffImage1,frame2,buffImage2,
+								1e9/(totalTrackerTime/totalFrames));
 
 						gui.repaint();
 
+					} else {
+						break;
 					}
 				}
 				while( System.currentTimeMillis()-startTime < framePeriod ) {
@@ -140,12 +171,28 @@ public abstract class VideoProcessAppBase<I extends ImageSingleBand>
 			}
 
 			isRunning = false;
+			handleRunningStatus(2);
 		}
 	}
 
+	/**
+	 * 0 = running
+	 * 1 = paused
+	 * 2 = finished
+	 */
+	abstract protected void handleRunningStatus( int status );
+
 	@Override
 	public void mouseClicked(MouseEvent e) {
+		if( !isRunning )
+			return;
+
 		isPaused = !isPaused;
+
+		if( isPaused )
+			handleRunningStatus(1);
+		else
+			handleRunningStatus(0);
 	}
 
 	@Override

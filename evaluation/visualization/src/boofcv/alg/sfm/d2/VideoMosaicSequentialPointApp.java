@@ -16,10 +16,8 @@
  * limitations under the License.
  */
 
-package boofcv.alg.geo.d2;
+package boofcv.alg.sfm.d2;
 
-import boofcv.alg.sfm.d2.MotionMosaicPointKey;
-import boofcv.alg.sfm.d2.UtilImageMotion;
 import boofcv.alg.tracker.pklt.PkltManagerConfig;
 import boofcv.factory.feature.tracker.FactoryPointSequentialTracker;
 import boofcv.gui.image.ShowImages;
@@ -50,7 +48,7 @@ import java.util.List;
  */
 // TODO change scale in info panel
 public class VideoMosaicSequentialPointApp<I extends ImageSingleBand, D extends ImageSingleBand, T extends InvertibleTransform<T>>
-		extends ImageMotionBaseApp<I,D,T>
+		extends ImageMotionBaseApp<I,T>
 {
 	private final static int maxFeatures = 250;
 	private final static int maxIterations = 100;
@@ -68,8 +66,8 @@ public class VideoMosaicSequentialPointApp<I extends ImageSingleBand, D extends 
 		config.pyramidScaling = new int[]{1,2,4,8};
 
 		addAlgorithm(0, "KLT", FactoryPointSequentialTracker.klt(config));
-		addAlgorithm(0, "BRIEF", FactoryPointSequentialTracker.dat_ShiTomasi_BRIEF(300, 200, 1, 10, imageType));
-		addAlgorithm(0, "SURF", FactoryPointSequentialTracker.dat_SF_SURF(300, 200, 2, imageType));
+		addAlgorithm(0, "BRIEF", FactoryPointSequentialTracker.dda_ShiTomasi_BRIEF(300, 200, 1, 10, imageType));
+		addAlgorithm(0, "SURF", FactoryPointSequentialTracker.dda_FH_SURF(300, 200, 2, imageType));
 
 		addAlgorithm(1,"Affine", new Affine2D_F64());
 		addAlgorithm(1,"Homography", new Homography2D_F64());

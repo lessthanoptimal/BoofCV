@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.geo.d2;
+package boofcv.alg.sfm.d2;
 
 import boofcv.gui.StandardAlgConfigPanel;
 

@@ -125,7 +125,7 @@ public class FactoryPointSequentialTracker {
 	 * @return SURF based tracker.
 	 */
 	public static <I extends ImageSingleBand, II extends ImageSingleBand>
-	ImagePointTracker<I> dat_SF_SURF(int maxMatches, int detectPerScale, int minSeparation,
+	ImagePointTracker<I> dda_FH_SURF(int maxMatches, int detectPerScale, int minSeparation,
 									 Class<I> imageType) {
 		Class<II> integralType = GIntegralImageOps.getIntegralType(imageType);
 
@@ -155,7 +155,7 @@ public class FactoryPointSequentialTracker {
 	 * @param imageType           Type of image being processed.
 	 */
 	public static <I extends ImageSingleBand>
-	ImagePointTracker<I> dat_ShiTomasi_BRIEF(int maxFeatures, int maxAssociationError, int detectionRadius, float cornerThreshold, Class<I> imageType) {
+	ImagePointTracker<I> dda_ShiTomasi_BRIEF(int maxFeatures, int maxAssociationError, int detectionRadius, float cornerThreshold, Class<I> imageType) {
 		DescribePointBrief<I> alg = FactoryDescribePointAlgs.brief(FactoryBriefDefinition.gaussian2(new Random(123), 16, 512),
 				FactoryBlurFilter.gaussian(imageType, 0, 4));
 
@@ -182,7 +182,7 @@ public class FactoryPointSequentialTracker {
 	 * @param imageType      Type of image being processed.
 	 */
 	public static <I extends ImageSingleBand, D extends ImageSingleBand>
-	ImagePointTracker<I> dat_ShiTomasi_NCC(int maxFeatures, int regionWidth, int regionHeight,
+	ImagePointTracker<I> dda_ShiTomasi_NCC(int maxFeatures, int regionWidth, int regionHeight,
 										   float cornerThreshold, Class<I> imageType, Class<D> derivType) {
 		DescribePointPixelRegionNCC<I> alg = FactoryDescribePointAlgs.pixelRegionNCC(regionWidth, regionHeight, imageType);
 

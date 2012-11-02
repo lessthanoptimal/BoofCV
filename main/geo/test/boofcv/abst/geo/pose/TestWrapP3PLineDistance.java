@@ -30,9 +30,9 @@ public class TestWrapP3PLineDistance extends CheckEstimateNofPnP {
 		super(true);
 
 		// arbitrarily select one of the real algorithms
-		P3PFinsterwalder grunert = new P3PFinsterwalder(PolynomialOps.createRootFinder(4, 0));
+		P3PFinsterwalder finster = new P3PFinsterwalder(PolynomialOps.createRootFinder(4, 0));
 
-		WrapP3PLineDistance alg = new WrapP3PLineDistance(grunert, FitSpecialEuclideanOps_F64.fitPoints3D());
+		WrapP3PLineDistance alg = new WrapP3PLineDistance(finster, FitSpecialEuclideanOps_F64.fitPoints3D());
 
 		setAlgorithm(alg);
 	}

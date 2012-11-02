@@ -26,6 +26,7 @@ import org.junit.Test;
 
 import java.util.List;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -34,7 +35,8 @@ import static org.junit.Assert.assertTrue;
 public abstract class CommonP3PSideChecks {
 
 	public abstract List<PointDistance3> computeSolutions( Point2D_F64 obs1 , Point2D_F64 obs2, Point2D_F64 obs3,
-														   double length23 , double length13 , double length12);
+														   double length23 , double length13 , double length12,
+														   boolean shouldSucceed );
 
 
 	@Test
@@ -52,7 +54,7 @@ public abstract class CommonP3PSideChecks {
 		double length23 = P2.distance(P3);
 		double length13 = P1.distance(P3);
 
-		List<PointDistance3> solutions = computeSolutions(p1,p2,p3,length23,length13,length12);
+		List<PointDistance3> solutions = computeSolutions(p1,p2,p3,length23,length13,length12,true);
 
 		int numCorrect = 0;
 		double tol = 1e-8;
@@ -74,5 +76,27 @@ public abstract class CommonP3PSideChecks {
 		}
 
 		assertTrue(numCorrect >= 1);
+	}
+
+	/**
+	 * Check a pathological case where everything is zero
+	 */
+	@Test
+	public void pathological1() {
+		Point3D_F64 P1 = new Point3D_F64();
+		Point3D_F64 P2 = new Point3D_F64();
+		Point3D_F64 P3 = new Point3D_F64();
+
+		Point2D_F64 p1 = new Point2D_F64();
+		Point2D_F64 p2 = new Point2D_F64();
+		Point2D_F64 p3 = new Point2D_F64();
+
+		double length12 = P1.distance(P2);
+		double length23 = P2.distance(P3);
+		double length13 = P1.distance(P3);
+
+		List<PointDistance3> solutions = computeSolutions(p1,p2,p3,length23,length13,length12,false);
+
+		assertEquals(0,solutions.size());
 	}
 }

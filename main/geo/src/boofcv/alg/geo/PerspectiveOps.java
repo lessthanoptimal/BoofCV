@@ -43,6 +43,21 @@ import java.util.List;
 public class PerspectiveOps {
 
 	/**
+	 * Multiplies each element of the intrinsic parameters by the provided scale factor.  Useful
+	 * if the image has been rescaled.
+	 *
+	 * @param param Intrinsic parameters
+	 * @param scale Scale factor that input image is being scaled by.
+	 */
+	public static void scaleIntrinsic( IntrinsicParameters param , double scale ) {
+		param.cx *= scale;
+		param.cy *= scale;
+		param.fx *= scale;
+		param.fy *= scale;
+		param.skew *= scale;
+	}
+
+	/**
 	 * <p>
 	 * Creates a new {@link PointTransform_F32} which is the same as applying a homography transform
 	 * and another arbitrary transform.  A typical application is removing lens distortion from

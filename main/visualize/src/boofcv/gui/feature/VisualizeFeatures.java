@@ -52,13 +52,19 @@ public class VisualizeFeatures {
 	}
 
 	public static void drawPoint( Graphics2D g2 , int x , int y ,int r,  Color color ) {
+		drawPoint(g2,x,y,r,color,true);
+	}
+
+	public static void drawPoint( Graphics2D g2 , int x , int y ,int r,  Color color , boolean hasBorder) {
 		int w = r*2+1;
 
-		int r2 = r+2;
-		int w2 = r2*2+1;
+		if( hasBorder ) {
+			int r2 = r+2;
+			int w2 = r2*2+1;
 
-		g2.setColor(Color.BLACK);
-		g2.fillOval(x-r2,y-r2,w2,w2);
+			g2.setColor(Color.BLACK);
+			g2.fillOval(x-r2,y-r2,w2,w2);
+		}
 
 		g2.setColor(color);
 		g2.fillOval(x-r,y-r,w,w);
