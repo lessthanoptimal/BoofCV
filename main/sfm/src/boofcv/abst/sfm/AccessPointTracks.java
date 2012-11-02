@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.tracker;
+package boofcv.abst.sfm;
 
 import georegression.struct.point.Point2D_F64;
 
@@ -46,22 +46,19 @@ public interface AccessPointTracks {
 	public List<Point2D_F64> getAllTracks();
 
 	/**
-	 * Tracks which are inliers to some algorithm.  For example, inlier set when estimating
-	 * the camera's motion
+	 * True if the specified track is an inlier used in motion estimation
 	 *
-	 * @return inlier features in pixel coordinates
+	 * @param index The index in all
+	 * @return if it is an inlier or not
 	 */
-	public List<Point2D_F64> getInlierTracks();
+	public boolean isInlier( int index );
 
 	/**
-	 * Tracks that were just recently spawned
+	 * True if the specified track was just spawned
 	 *
-	 * @return newly spawned tracks in pixel coordinates
+	 * @param index The index in all
+	 * @return if it is new or not
 	 */
-	public List<Point2D_F64> getNewTracks();
+	public boolean isNew( int index );
 
-	/**
-	 * Given the inlier index return the index in all
-	 */
-	public int fromInlierToAllIndex( int inlierIndex );
 }

@@ -49,8 +49,10 @@ public class VisOdomPixelDepthPnP<T extends ImageBase> {
 	// estimate the camera motion up to a scale factor from two sets of point correspondences
 	private ModelMatcher<Se3_F64, Point2D3D> motionEstimator;
 
-	// location of tracks in the image that are included in the inlie set
-	private List<Point2D_F64> inlierPixels = new ArrayList<Point2D_F64>();
+	// location of tracks in the image that are included in the inlier set
+	private List<PointPoseTrack> inlierTracks = new ArrayList<PointPoseTrack>();
+	// list of tracks which were just spawned
+	private List<PointPoseTrack> spawnedTracks = new ArrayList<PointPoseTrack>();
 
 	// transform from key frame to world frame
 	private Se3_F64 keyToWorld = new Se3_F64();
@@ -111,7 +113,8 @@ public class VisOdomPixelDepthPnP<T extends ImageBase> {
 	public boolean process( T image ) {
 		tracker.process(image);
 
-		inlierPixels.clear();
+		inlierTracks.clear();
+		spawnedTracks.clear();
 
 		if( first ) {
 			addNewTracks();
@@ -121,7 +124,7 @@ public class VisOdomPixelDepthPnP<T extends ImageBase> {
 				return false;
 			}
 
-			int numDropped = dropUnusedTracks();
+			dropUnusedTracks();
 			int N = motionEstimator.getMatchSet().size();
 
 			if( thresholdAdd <= 0 || N < thresholdAdd ) {
@@ -159,14 +162,8 @@ public class VisOdomPixelDepthPnP<T extends ImageBase> {
 	 * @return Number of dropped tracks
 	 */
 	private int dropUnusedTracks() {
-		int N = motionEstimator.getMatchSet().size();
 
 		List<PointPoseTrack> all = tracker.getPairs();
-
-		for( int i = 0; i < N; i++ ) {
-			PointPoseTrack t = all.get( motionEstimator.getInputIndex(i));
-			t.lastInlier = tick;
-		}
 
 		List<PointPoseTrack> drop = new ArrayList<PointPoseTrack>();
 		for( PointPoseTrack t : all ) {
@@ -210,6 +207,8 @@ public class VisOdomPixelDepthPnP<T extends ImageBase> {
 				// not needed since the current frame was just set to be the key frame
 
 				p.lastInlier = tick;
+
+				spawnedTracks.add(p);
 			}
 		}
 
@@ -253,12 +252,13 @@ public class VisOdomPixelDepthPnP<T extends ImageBase> {
 
 		keyToCurr.invert(currToKey);
 
+		// mark tracks as being inliers and add to inlier list
 		int N = motionEstimator.getMatchSet().size();
 		for( int i = 0; i < N; i++ ) {
 			int index = motionEstimator.getInputIndex(i);
 			PointPoseTrack t = tracker.getPairs().get(index);
-
-			inlierPixels.add( t.getPixel().p2);
+			t.lastInlier = tick;
+			inlierTracks.add( t );
 		}
 
 		return true;
@@ -284,7 +284,11 @@ public class VisOdomPixelDepthPnP<T extends ImageBase> {
 		return motionEstimator;
 	}
 
-	public List<Point2D_F64> getInlierPixels() {
-		return inlierPixels;
+	public List<PointPoseTrack> getInlierTracks() {
+		return inlierTracks;
+	}
+
+	public List<PointPoseTrack> getSpawnedTracks() {
+		return spawnedTracks;
 	}
 }

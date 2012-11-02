@@ -43,8 +43,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * @author Peter Abeles
@@ -52,6 +51,11 @@ import static org.junit.Assert.assertTrue;
 public class TestPerspectiveOps {
 
 	Random rand = new Random(234);
+
+	@Test
+	public void scaleIntrinsic() {
+		fail("Implement");
+	}
 
 	@Test
 	public void adjustDistortion_F32() {

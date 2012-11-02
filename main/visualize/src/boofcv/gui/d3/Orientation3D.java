@@ -39,6 +39,8 @@ public class Orientation3D extends JPanel {
 
 	public Orientation3D() {
 		setPreferredSize(new Dimension(a+b+a+25,a+b+a));
+		setMaximumSize(getPreferredSize());
+		setMinimumSize(getPreferredSize());
 	}
 
 	public void setVector( Vector3D_F64 v ) {

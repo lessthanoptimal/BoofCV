@@ -16,9 +16,8 @@
  * limitations under the License.
  */
 
-package boofcv.alg.sfm;
+package boofcv.abst.sfm;
 
-import boofcv.alg.tracker.AccessPointTracks;
 import georegression.struct.point.Point3D_F64;
 
 /**
@@ -26,7 +25,7 @@ import georegression.struct.point.Point3D_F64;
  *
  * @author Peter Abeles
  */
-public interface AccessSfmPointTracks extends AccessPointTracks {
+public interface AccessPointTracks3D extends AccessPointTracks {
 
 	/**
 	 * Returns the 3D location of the active track.  If there is no location estimate

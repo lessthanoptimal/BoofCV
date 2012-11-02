@@ -1,10 +1,8 @@
 package boofcv.abst.sfm;
 
 import boofcv.abst.feature.tracker.KeyFramePointTracker;
-import boofcv.abst.feature.tracker.PointTrack;
 import boofcv.alg.distort.LensDistortionOps;
 import boofcv.alg.geo.DistanceModelMonoPixels;
-import boofcv.alg.sfm.AccessSfmPointTracks;
 import boofcv.alg.sfm.PointPoseTrack;
 import boofcv.alg.sfm.StereoSparse3D;
 import boofcv.alg.sfm.VisOdomPixelDepthPnP;
@@ -23,7 +21,7 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class WrapVisOdomPixelDepthPnP<T extends ImageSingleBand>
-		implements StereoVisualOdometry<T>, AccessSfmPointTracks {
+		implements StereoVisualOdometry<T>, AccessPointTracks3D {
 
 	// low level algorithm
 	VisOdomPixelDepthPnP<T> alg;
@@ -68,24 +66,15 @@ public class WrapVisOdomPixelDepthPnP<T extends ImageSingleBand>
 	}
 
 	@Override
-	public List<Point2D_F64> getInlierTracks() {
-		return alg.getInlierPixels();
+	public boolean isInlier(int index) {
+		PointPoseTrack t = alg.getTracker().getPairs().get(index);
+		return alg.getInlierTracks().contains(t);
 	}
 
 	@Override
-	public int fromInlierToAllIndex(int inlierIndex) {
-		return alg.getMotionEstimator().getInputIndex(inlierIndex);
-	}
-
-	@Override
-	public List<Point2D_F64> getNewTracks() {
-		List<Point2D_F64> pixels = new ArrayList<Point2D_F64>();
-
-		for(PointTrack t : alg.getTracker().getTracker().getNewTracks() ) {
-			pixels.add(t);
-		}
-
-		return pixels;
+	public boolean isNew(int index) {
+		PointPoseTrack t = alg.getTracker().getPairs().get(index);
+		return alg.getSpawnedTracks().contains(t);
 	}
 
 	@Override

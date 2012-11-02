@@ -31,8 +31,7 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * General tests for implementations of EstimateNofPnP.  Ensures that the returned motion estimate is in
@@ -143,5 +142,17 @@ public abstract class CheckEstimateNofPnP extends EpipolarTestSimulation {
 	@Test
 	public void checkMinimumPoints() {
 		assertTrue(alg.getMinimumPoints() != 0);
+	}
+
+	@Test
+	public void checkZerosInput() {
+		List<Point2D3D> inputs = new ArrayList<Point2D3D>();
+
+		for( int i = 0; i < 3; i++ ) {
+			inputs.add( new Point2D3D());
+		}
+
+		assertFalse(alg.process(inputs, solutions));
+		assertTrue(solutions.size() == 0 );
 	}
 }

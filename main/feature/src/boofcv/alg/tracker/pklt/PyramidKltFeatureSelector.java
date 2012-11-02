@@ -28,8 +28,9 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public interface PyramidKltFeatureSelector<InputImage extends ImageSingleBand, DerivativeImage extends ImageSingleBand> {
-
+public interface PyramidKltFeatureSelector
+		<InputImage extends ImageSingleBand, DerivativeImage extends ImageSingleBand>
+{
 	/**
 	 * Given the image and its gradient, select features for the tracker to track.
 	 *

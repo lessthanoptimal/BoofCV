@@ -44,6 +44,9 @@ Version : Alpha 0.11
 - DetectAssociateTracker
   * Changed from an abstract class into a regular class
   * Deleted SURF,BRIEF,NCC specific implementations since they are no longer needed
+- AssociatedPair
+  * renamed key and curr points to p1 and p2
+  * new names are more generic and consistent 
 
 ---------------------------------------------
 Date    : 2012/09/18
