@@ -49,6 +49,9 @@ public class KeyFramePointTracker<I extends ImageBase, R extends KeyFrameTrack> 
 	// can be used to convert points into normalized image coordinates
 	PointTransform_F64 pixelToNorm;
 
+	// storage for tracks
+	List<PointTrack> tracks = new ArrayList<PointTrack>();
+
 	public KeyFramePointTracker(ImagePointTracker<I> tracker,
 								PointTransform_F64 pixelToNorm ,
 								Class<R> trackType ) {
@@ -81,7 +84,7 @@ public class KeyFramePointTracker<I extends ImageBase, R extends KeyFrameTrack> 
 		tracker.process(image);
 
 		activePairs.clear();
-		List<PointTrack> tracks = tracker.getActiveTracks();
+		List<PointTrack> tracks = tracker.getActiveTracks(null);
 		for( PointTrack t : tracks ) {
 			R p = t.getCookie();
 			p.pixel.p2.set(t);
@@ -97,7 +100,7 @@ public class KeyFramePointTracker<I extends ImageBase, R extends KeyFrameTrack> 
 		activePairs.clear();
 
 		// todo purge non-active tracks here
-		List<PointTrack> tracks = tracker.getActiveTracks();
+		List<PointTrack> tracks = tracker.getActiveTracks(null);
 		for( PointTrack t : tracks ) {
 			if( t.cookie == null )
 				throw new RuntimeException("Bug, cookie should have been set");
@@ -113,11 +116,13 @@ public class KeyFramePointTracker<I extends ImageBase, R extends KeyFrameTrack> 
 	/**
 	 * Requests that the tracker spawn new tracks
 	 */
-	public List<R> spawnTracks() {
-		List<R> spawned = new ArrayList<R>();
+	public List<R> spawnTracks( List<R> spawned ) {
+		if( spawned == null )
+			spawned = new ArrayList<R>();
 		
 		tracker.spawnTracks();
-		List<PointTrack> tracks = tracker.getNewTracks();
+		tracks.clear();
+		tracker.getNewTracks(tracks);
 		for( PointTrack t : tracks ) {
 			if( t.cookie == null )
 				try {
@@ -154,7 +159,9 @@ public class KeyFramePointTracker<I extends ImageBase, R extends KeyFrameTrack> 
 	}
 
 	public void dropTrack( R track ) {
-		for( PointTrack t : tracker.getAllTracks() ) {
+		tracks.clear();
+		tracker.getAllTracks(tracks);
+		for( PointTrack t : tracks ) {
 			if( t.getCookie() == track ) {
 				dropTrack(t);
 				return;
@@ -168,8 +175,8 @@ public class KeyFramePointTracker<I extends ImageBase, R extends KeyFrameTrack> 
 	 *
 	 * @return active tracks
 	 */
-	public List<PointTrack> getActiveTracks() {
-		return tracker.getActiveTracks();
+	public List<PointTrack> getActiveTracks( List<PointTrack> tracks ) {
+		return tracker.getActiveTracks(tracks);
 	}
 
 	/**
@@ -177,13 +184,21 @@ public class KeyFramePointTracker<I extends ImageBase, R extends KeyFrameTrack> 
 	 *
 	 * @return associated pairs
 	 */
-	public List<R> getActivePairs() {
-		return activePairs;
+	public List<R> getActivePairs(  List<R> l ) {
+		if( l == null )
+			l = new ArrayList<R>();
+
+		l.addAll(activePairs);
+
+		return l;
 	}
 
-	public List<R> getAllPairs() {
-		List<R> l = new ArrayList<R>();
-		List<PointTrack> tracks = tracker.getAllTracks();
+	public List<R> getAllPairs( List<R> l ) {
+		if( l == null )
+			l = new ArrayList<R>();
+
+		tracks.clear();
+		tracker.getAllTracks(tracks);
 
 		for( PointTrack t : tracks ) {
 			l.add( (R)t.getCookie() );

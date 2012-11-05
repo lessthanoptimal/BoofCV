@@ -85,7 +85,7 @@ public class ExamplePointFeatureTracker< T extends ImageSingleBand, D extends Im
 			tracker.process(frame);
 
 			// if there are too few tracks spawn more
-			if( tracker.getActiveTracks().size() < 100 )
+			if( tracker.getActiveTracks(null).size() < 100 )
 				tracker.spawnTracks();
 
 			// visualize tracking results
@@ -104,12 +104,12 @@ public class ExamplePointFeatureTracker< T extends ImageSingleBand, D extends Im
 		Graphics2D g2 = orig.createGraphics();
 
 		// draw active tracks as blue dots
-		for( PointTrack p : tracker.getActiveTracks() ) {
+		for( PointTrack p : tracker.getActiveTracks(null) ) {
 			VisualizeFeatures.drawPoint(g2, (int)p.x, (int)p.y, Color.blue);
 		}
 
 		// draw tracks which have just been spawned green
-		for( PointTrack p : tracker.getNewTracks() ) {
+		for( PointTrack p : tracker.getNewTracks(null) ) {
 			VisualizeFeatures.drawPoint(g2, (int)p.x, (int)p.y, Color.green);
 		}
 

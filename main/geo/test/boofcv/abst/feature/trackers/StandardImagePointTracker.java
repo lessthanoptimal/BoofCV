@@ -69,37 +69,37 @@ public abstract class StandardImagePointTracker <T extends ImageSingleBand> {
 	public void spawnTracks() {
 		tracker = createTracker();
 
-		assertEquals(0,tracker.getActiveTracks().size());
-		assertTrue(tracker.getNewTracks().size() == 0 );
+		assertEquals(0,tracker.getActiveTracks(null).size());
+		assertTrue(tracker.getNewTracks(null).size() == 0 );
 
 		tracker.spawnTracks();
 
-		assertTrue(tracker.getActiveTracks().size()>0);
-		assertTrue(tracker.getNewTracks().size() > 0 );
+		assertTrue(tracker.getActiveTracks(null).size()>0);
+		assertTrue(tracker.getNewTracks(null).size() > 0 );
 	}
 
 	@Test
 	public void dropAllTracks() {
 		tracker = createTracker();
 		addTracks(5);
-		assertEquals(5,tracker.getActiveTracks().size());
+		assertEquals(5,tracker.getActiveTracks(null).size());
 		tracker.dropAllTracks();
-		assertEquals(0,tracker.getActiveTracks().size());
+		assertEquals(0,tracker.getActiveTracks(null).size());
 		// tracks which have been dropped by request should not be included in this list
-		assertEquals(0,tracker.getDroppedTracks().size());
+		assertEquals(0,tracker.getDroppedTracks(null).size());
 	}
 
 	@Test
 	public void testUpdateTrackDrop() {
 		tracker = createTracker();
 		addTracks(5);
-		assertEquals(5,tracker.getActiveTracks().size());
-		assertEquals(0,tracker.getDroppedTracks().size());
+		assertEquals(5,tracker.getActiveTracks(null).size());
+		assertEquals(0,tracker.getDroppedTracks(null).size());
 
 		trackUpdateDrop(tracker);
 
-		assertEquals(0,tracker.getActiveTracks().size());
-		assertEquals(5,tracker.getDroppedTracks().size());
+		assertEquals(0,tracker.getActiveTracks(null).size());
+		assertEquals(5,tracker.getDroppedTracks(null).size());
 	}
 	
 	@Test
@@ -107,20 +107,20 @@ public abstract class StandardImagePointTracker <T extends ImageSingleBand> {
 		tracker = createTracker();
 		addTracks(5);
 		
-		List<PointTrack> tracks = tracker.getActiveTracks();
+		List<PointTrack> tracks = tracker.getActiveTracks(null);
 		
 		tracker.dropTrack(tracks.get(2));
 		
-		assertEquals(4,tracker.getActiveTracks().size());
+		assertEquals(4,tracker.getActiveTracks(null).size());
 		// tracks which have been dropped by request should not be included in this list
-		assertEquals(0,tracker.getDroppedTracks().size());
+		assertEquals(0,tracker.getDroppedTracks(null).size());
 	}
 
 	@Test
 	public void testTrackUpdate() {
 		tracker = createTracker();
 		addTracks(5);
-		assertEquals(5,tracker.getActiveTracks().size());
+		assertEquals(5,tracker.getActiveTracks(null).size());
 		checkUniqueFeatureID();
 
 		// by adding a little bit of noise the features should move slightly
@@ -130,7 +130,7 @@ public abstract class StandardImagePointTracker <T extends ImageSingleBand> {
 
 		// hmm it is totally possible that some features would be dropped.  might
 		// have to make this more robust in the future
-		assertEquals(5,tracker.getActiveTracks().size());
+		assertEquals(5,tracker.getActiveTracks(null).size());
 	}
 
 	@Test
@@ -151,7 +151,7 @@ public abstract class StandardImagePointTracker <T extends ImageSingleBand> {
 	 * Makes sure each feature has a unique feature number
 	 */
 	private void checkUniqueFeatureID() {
-		List<PointTrack> l = tracker.getActiveTracks();
+		List<PointTrack> l = tracker.getActiveTracks(null);
 
 		for( int i = 0; i < l.size(); i++ ) {
 			PointTrack a = l.get(i);

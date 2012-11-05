@@ -8,6 +8,7 @@ Version : Alpha 0.11
 
 - Association Score
   * Normalized Cross Correlation (NCC) has been fixed (yet again) in ScoreAssociateNccFeature where the abs() was incorretly being taken.
+  * Fixed bug in NccFeature.setTo()
 - FactoryAssociation
   * Added NCC to defaultScore()
 - Template Matching
@@ -40,13 +41,22 @@ Version : Alpha 0.11
 - ModelMatcher added getMinimumSize()
 - Renamed PointPosePair to Point2D3D since the old name was misleading
 - Visual Odometry
-  * Added stereo camera based algorithm that uses PnP
+  * Added stereo camera based algorithm that uses PnP for pose estimation
+  * Removed broken mono and stereo algorithms
 - DetectAssociateTracker
   * Changed from an abstract class into a regular class
   * Deleted SURF,BRIEF,NCC specific implementations since they are no longer needed
 - AssociatedPair
   * renamed key and curr points to p1 and p2
   * new names are more generic and consistent 
+- DetectAssociateTracker
+  * Changed internal design a bit and fixed bugs
+  * Performs well in structure from motion applications (2D and 3D)
+- ImagePointTracker accessors changed so that a storage list is requested
+  * Makes usage easier since now its impossible to drop a track while reading
+    from the main list.
+  * Updated implementations so that the internal list is not returned
+ 
 
 ---------------------------------------------
 Date    : 2012/09/18

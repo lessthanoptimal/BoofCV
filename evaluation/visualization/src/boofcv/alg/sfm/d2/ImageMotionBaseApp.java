@@ -222,7 +222,7 @@ public abstract class ImageMotionBaseApp<I extends ImageSingleBand,
 		else
 			gui.setInliers(null);
 		if( infoPanel.getShowAll())
-			gui.setAllTracks(tracker.getActiveTracks());
+			gui.setAllTracks(tracker.getActiveTracks(null));
 		else
 			gui.setAllTracks(null);
 
@@ -231,7 +231,7 @@ public abstract class ImageMotionBaseApp<I extends ImageSingleBand,
 		gui.setImages(imageGUI,distortedImage);
 
 		final int numAssociated = modelMatcher.getMatchSet().size();
-		final int numFeatures = tracker.getActiveTracks().size();
+		final int numFeatures = tracker.getActiveTracks(null).size();
 
 		// update GUI
 		SwingUtilities.invokeLater(new Runnable() {

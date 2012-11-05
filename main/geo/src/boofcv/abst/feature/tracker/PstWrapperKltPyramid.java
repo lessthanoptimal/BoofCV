@@ -180,23 +180,38 @@ public class PstWrapperKltPyramid <I extends ImageSingleBand,D extends ImageSing
 	}
 
 	@Override
-	public List<PointTrack> getActiveTracks() {
-		return active;
+	public List<PointTrack> getActiveTracks( List<PointTrack> list ) {
+		if( list == null )
+			list = new ArrayList<PointTrack>();
+
+		list.addAll(active);
+		return list;
 	}
 
 	@Override
-	public List<PointTrack> getDroppedTracks() {
+	public List<PointTrack> getDroppedTracks( List<PointTrack> list ) {
+		if( list == null )
+			list = new ArrayList<PointTrack>();
+
+		list.addAll(dropped);
 		return dropped;
 	}
 
 	@Override
-	public List<PointTrack> getNewTracks() {
+	public List<PointTrack> getNewTracks( List<PointTrack> list ) {
+		if( list == null )
+			list = new ArrayList<PointTrack>();
+
+		list.addAll(spawned);
 		return spawned;
 	}
 
 	@Override
-	public List<PointTrack> getAllTracks() {
-		return active;
+	public List<PointTrack> getAllTracks( List<PointTrack> list ) {
+		if( list == null )
+			list = new ArrayList<PointTrack>();
+
+		return getActiveTracks(list);
 	}
 
 	@Override

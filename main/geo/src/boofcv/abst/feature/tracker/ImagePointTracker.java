@@ -24,26 +24,21 @@ import java.util.List;
 
 /**
  * <p>
- * Interface for tracking point features in a sequence of images for SFM applications.
- * </p>
- * <p>
- * Lower level/mundane track maintenance is handled by implementations of this interface. This
- * includes selecting features, dropping features, and updating features. THe ability to manually
- * add tracks has intentionally been omitted from this interface for simplicity.  If that level
- * of control is needed then a more complex tracker should be used.
+ * Interface for tracking point features in a sequence of images.  Features are automatically
+ * detected and tracked between consecutive frames in a video sequence. Access is provided
+ * to the pixel location of each track.  Implementation specific track information is hidden
+ * from the user.
  * </p>
  *
  * <p>
- * Contract:
- * <ul>
- * <li> The current location of a feature in AssociatedPair will be used by the tracker if it
- * can affect the tracking outcome. </li>
- * <li> If a track is dropped its description will not be modified.</li>
- * <li> Each time a new track is spawned it is given a new unique ID </li>
- * </ul>
- * </p>
+ * Each track can have the following states, active, new, and dropped.  An active track is one
+ * which was recently updated in the latest image. New tracks were spawned in the most recent
+ * image.  Dropped tracks are tracks which were automatically dropped in the most recent update.
+ * <p>
  *
- * TODO UPDATE THIS
+ * <p>
+ * NOTE: Tracks dropped by the user will not be included in the dropped list.
+ * </p>
  *
  * @author Peter Abeles
  */
@@ -94,27 +89,41 @@ public interface ImagePointTracker <T extends ImageBase> {
 
 
 	/**
-	 * Returns a list of all features that it is currently tracking
-	 * @return
+	 * Returns a list of all features that are currently being tracked
+	 *
+	 * @param list Optional storage for the list of tracks.
+	 *             If null a new list will be declared internally.
+	 * @return List of tracks.
 	 */
-	public List<PointTrack> getAllTracks();
+	public List<PointTrack> getAllTracks( List<PointTrack> list );
 
 	/**
 	 * Returns a list of active tracks. An active track is defined as a track
 	 * which was found in the most recently processed image.
+	 *
+	 * @param list Optional storage for the list of tracks.
+	 *             If null a new list will be declared internally.
+	 * @return List of tracks.
 	 */
-	public List<PointTrack> getActiveTracks();
+	public List<PointTrack> getActiveTracks(  List<PointTrack> list );
 
 	/**
 	 * Returns a list of tracks dropped by the tracker during the most recent update.
-	 * Tracks dropped by invoking {@link #dropAllTracks()} or {@link #dropTrack(PointTrack)}
-	 * will not be included.
+	 * Tracks dropped by user request are not included in this list.
+	 *
+	 * @param list Optional storage for the list of tracks.
+	 *             If null a new list will be declared internally.
+	 * @return List of tracks.
 	 */
-	public List<PointTrack> getDroppedTracks();
+	public List<PointTrack> getDroppedTracks( List<PointTrack> list );
 
 	/**
 	 * Returns a list of tracks that have been added since process was called.
+	 *
+	 * @param list Optional storage for the list of tracks.
+	 *             If null a new list will be declared internally.
+	 * @return List of tracks.
 	 */
-	public List<PointTrack> getNewTracks();
+	public List<PointTrack> getNewTracks( List<PointTrack> list );
 }
 

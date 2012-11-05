@@ -122,14 +122,14 @@ public class VideoTrackFeaturesApp<I extends ImageSingleBand, D extends ImageSin
 		Graphics2D g2 = workImage.createGraphics();
 
 		g2.drawImage(orig,0,0,orig.getWidth(),orig.getHeight(),null);
-		for( PointTrack p : tracker.getActiveTracks() ) {
+		for( PointTrack p : tracker.getActiveTracks(null) ) {
 			int x = (int)p.x;
 			int y = (int)p.y;
 
 			VisualizeFeatures.drawPoint(g2,x,y,Color.blue);
 		}
 
-		for( PointTrack p : tracker.getNewTracks() ) {
+		for( PointTrack p : tracker.getNewTracks(null) ) {
 			int x = (int)p.x;
 			int y = (int)p.y;
 
@@ -146,7 +146,7 @@ public class VideoTrackFeaturesApp<I extends ImageSingleBand, D extends ImageSin
 	protected void updateAlg(I frame, BufferedImage buffImage) {
 		tracker.process(frame);
 
-		if( tracker.getActiveTracks().size() < minFeatures ) {
+		if( tracker.getActiveTracks(null).size() < minFeatures ) {
 			tracker.spawnTracks();
 		}
 	}
