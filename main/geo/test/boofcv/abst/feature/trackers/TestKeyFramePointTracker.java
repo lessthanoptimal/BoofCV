@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.geo.trackers;
+package boofcv.abst.feature.trackers;
 
 import boofcv.abst.feature.tracker.ImagePointTracker;
 import boofcv.abst.feature.tracker.KeyFramePointTracker;
@@ -41,16 +41,16 @@ public class TestKeyFramePointTracker {
 		KeyFramePointTracker alg = new KeyFramePointTracker(tracker);
 
 		assertEquals(0, alg.getActiveTracks().size());
-		assertEquals(0, alg.getPairs().size());
+		assertEquals(0, alg.getActivePairs().size());
 
 		alg.spawnTracks();
 		alg.setKeyFrame();
-		assertEquals(5, alg.getPairs().size());
+		assertEquals(5, alg.getActivePairs().size());
 
 		alg.process(null);
 
 		assertEquals(3, alg.getActiveTracks().size());
-		assertEquals(3, alg.getPairs().size());
+		assertEquals(3, alg.getActivePairs().size());
 		assertEquals(1, tracker.numCalledSpawn);
 	}
 
@@ -59,13 +59,13 @@ public class TestKeyFramePointTracker {
 		Dummy tracker = new Dummy(0,0,5);
 		KeyFramePointTracker alg = new KeyFramePointTracker(tracker);
 
-		assertEquals(0, alg.getPairs().size());
+		assertEquals(0, alg.getActivePairs().size());
 
 		alg.spawnTracks();
 		alg.setKeyFrame();
 
 		assertEquals(5, alg.getActiveTracks().size());
-		assertEquals(5, alg.getPairs().size());
+		assertEquals(5, alg.getActivePairs().size());
 		assertEquals(1, tracker.numCalledSpawn);
 	}
 
@@ -76,7 +76,7 @@ public class TestKeyFramePointTracker {
 		
 		alg.spawnTracks();
 
-		assertEquals(5, alg.getPairs().size());
+		assertEquals(5, alg.getActivePairs().size());
 		assertEquals(1, tracker.numCalledSpawn);
 	}
 
@@ -90,7 +90,7 @@ public class TestKeyFramePointTracker {
 		alg.dropTrack(tracker.active.get(0));
 
 		assertEquals(4, alg.getActiveTracks().size());
-		assertEquals(4, alg.getPairs().size());
+		assertEquals(4, alg.getActivePairs().size());
 	}
 
 	@Test
@@ -100,11 +100,11 @@ public class TestKeyFramePointTracker {
 
 		alg.spawnTracks();
 		alg.setKeyFrame();
-		assertEquals(5, alg.getPairs().size());
+		assertEquals(5, alg.getActivePairs().size());
 
 		alg.reset();
 
-		assertEquals(0, alg.getPairs().size());
+		assertEquals(0, alg.getActivePairs().size());
 		assertEquals(1,tracker.numCalledDrop);
 	}
 
@@ -133,6 +133,10 @@ public class TestKeyFramePointTracker {
 		}
 
 		@Override
+		public void reset() {
+		}
+
+		@Override
 		public void process(ImageBase image) {
 			numCalledProcess++;
 			
@@ -157,13 +161,18 @@ public class TestKeyFramePointTracker {
 		}
 
 		@Override
-		public void dropTracks() {
+		public void dropAllTracks() {
 			numCalledDrop++;
 		}
 
 		@Override
 		public void dropTrack(PointTrack track) {
 			active.remove(track);
+		}
+
+		@Override
+		public List<PointTrack> getAllTracks() {
+			return null;
 		}
 
 		@Override

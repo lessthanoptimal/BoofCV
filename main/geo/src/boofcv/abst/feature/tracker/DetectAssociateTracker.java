@@ -58,12 +58,17 @@ public class DetectAssociateTracker<I extends ImageSingleBand, D extends TupleDe
 
 	private boolean keyFrameSet = false;
 
+	// all tracks
 	private List<PointTrack> tracksAll = new ArrayList<PointTrack>();
+	// recently associated tracks
 	private List<PointTrack> tracksActive = new ArrayList<PointTrack>();
+	// tracks dropped by the tracker
 	private List<PointTrack> tracksDropped = new ArrayList<PointTrack>();
+	// tracks recently spawned
 	private List<PointTrack> tracksNew = new ArrayList<PointTrack>();
 
-	private List<PointTrack> unused = new ArrayList<PointTrack>();
+	// previously declared tracks which are being recycled
+	protected List<PointTrack> unused = new ArrayList<PointTrack>();
 
 	private FastQueue<AssociatedIndex> matches;
 
@@ -109,12 +114,20 @@ public class DetectAssociateTracker<I extends ImageSingleBand, D extends TupleDe
 	}
 
 	@Override
+	public void reset() {
+		dropAllTracks();
+		featureID = 0;
+		tick = 0;
+		featDst.reset();
+		locDst.reset();
+		matches = null;
+	}
+
+	@Override
 	public void process( I input ) {
 
 		detector.detect(input);
 		describe.setImage(input);
-
-		tick++;
 
 		tracksActive.clear();
 		tracksDropped.clear();
@@ -135,14 +148,22 @@ public class DetectAssociateTracker<I extends ImageSingleBand, D extends TupleDe
 			describe.process(p.x,p.y,yaw,scale,desc);
 		}
 
-		pruneTracks();
-
 		// if the keyframe has been set associate
 		if( keyFrameSet ) {
+			// create a list of previously detected features
+			if( featSrc.size != 0 )
+				throw new RuntimeException("BUG");
+
+			for( int i = 0; i < tracksAll.size(); i++ ) {
+				TrackInfo info = tracksAll.get(i).getDescription();
+				featSrc.add(info.desc);
+			}
+
+			// pair of old and newly detected features
 			associate.associate(featSrc,featDst);
 
+			// update tracks
 			matches = associate.getMatches();
-
 			for( int i = 0; i < matches.size; i++ ) {
 				AssociatedIndex indexes = matches.data[i];
 				PointTrack track = tracksAll.get(indexes.src);
@@ -158,12 +179,18 @@ public class DetectAssociateTracker<I extends ImageSingleBand, D extends TupleDe
 				}
 //				System.out.println("i = "+i+"  x = "+loc.x+" y = "+loc.y);
 			}
-//			System.out.println("----------------- matched "+matches.size()+"  tracked "+locDst.size());
+
+//			System.out.println("----------------- matched "+matches.size()+"  tracked "+tracksAll.size());
+
+			// clean up
+			featSrc.reset();
 		}
+
+		pruneTracks();
+		tick++;
 	}
 
 	private void pruneTracks() {
-		featSrc.reset();
 		Iterator<PointTrack> iter = tracksAll.iterator();
 		while( iter.hasNext() ) {
 			PointTrack p = iter.next();
@@ -172,15 +199,13 @@ public class DetectAssociateTracker<I extends ImageSingleBand, D extends TupleDe
 				tracksDropped.add(p);
 				unused.add(p);
 				iter.remove();
-			} else {
-				featSrc.add(info.desc);
 			}
 		}
 	}
 
 	@Override
 	public boolean addTrack(double x, double y) {
-		throw new IllegalArgumentException("Not supported.  SURF features need to know the scale.");
+		throw new IllegalArgumentException("Not supported.  Need to know orientation and/or scale.");
 	}
 
 	/**
@@ -188,14 +213,26 @@ public class DetectAssociateTracker<I extends ImageSingleBand, D extends TupleDe
 	 */
 	@Override
 	public void spawnTracks() {
-		tracksNew.clear();
-		tracksDropped.clear();
-		tracksActive.clear();
-		unused.addAll(tracksAll);
-		tracksAll.clear();
-
 		// create new tracks from latest detected features
 		for( int i = 0; i < featDst.size; i++ ) {
+			// if a keyframe has already been set then that means associate has been called
+			if( keyFrameSet ) {
+				// only spawn tracks at points which have not been associated
+				boolean found = false;
+
+				// *** NOTE *** could speed up using by creating a lookup table first
+				for( int j = 0; j < matches.size; j++ ) {
+					AssociatedIndex indexes = matches.data[j];
+					if( indexes.dst == i ) {
+						found = true;
+						break;
+					}
+				}
+
+				if( found )
+					continue;
+			}
+
 			PointTrack p = getUnused();
 			Point2D_F64 loc = locDst.get(i);
 			p.set(loc.x,loc.y);
@@ -205,11 +242,6 @@ public class DetectAssociateTracker<I extends ImageSingleBand, D extends TupleDe
 			tracksNew.add(p);
 			tracksActive.add(p);
 			tracksAll.add(p);
-		}
-
-		featSrc.reset();
-		for( PointTrack p : tracksAll ) {
-			featSrc.add(p.<TrackInfo>getDescription().desc);
 		}
 
 		keyFrameSet = true;
@@ -230,20 +262,14 @@ public class DetectAssociateTracker<I extends ImageSingleBand, D extends TupleDe
 	}
 
 	@Override
-	public void dropTracks() {
+	public void dropAllTracks() {
 		unused.addAll(tracksAll);
 		tracksDropped.clear();
 		tracksDropped.addAll(tracksActive);
 		tracksActive.clear();
 		tracksAll.clear();
 		tracksNew.clear();
-		matches = null;
-
 		keyFrameSet = false;
-//		if( featSrc != null ) {
-//			featSrc.reset();
-//			featDst.reset();
-//		}
 	}
 
 	/**
@@ -253,12 +279,13 @@ public class DetectAssociateTracker<I extends ImageSingleBand, D extends TupleDe
 	 */
 	@Override
 	public void dropTrack(PointTrack track) {
-		// first mark the track as being old so that it will get dropped on the next cycle
-		TrackInfo info = track.getDescription();
-		info.lastAssociated = -pruneThreshold;
-
-		// remove it from the active list
+		// the track may or may not be in the active list
 		tracksActive.remove(track);
+		// it must be in the all list
+		if( !tracksAll.remove(track) )
+			throw new IllegalArgumentException("Track not found in all list");
+		// recycle the data
+		unused.add(track);
 	}
 
 	@Override
@@ -276,7 +303,8 @@ public class DetectAssociateTracker<I extends ImageSingleBand, D extends TupleDe
 		return tracksNew;
 	}
 
-	public List<PointTrack> getTracksAll() {
+	@Override
+	public List<PointTrack> getAllTracks() {
 		return tracksAll;
 	}
 

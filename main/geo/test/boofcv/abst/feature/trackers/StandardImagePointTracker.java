@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.geo.trackers;
+package boofcv.abst.feature.trackers;
 
 import boofcv.abst.feature.tracker.ImagePointTracker;
 import boofcv.abst.feature.tracker.PointTrack;
@@ -29,8 +29,7 @@ import org.junit.Test;
 import java.util.List;
 import java.util.Random;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 
 /**
@@ -84,9 +83,10 @@ public abstract class StandardImagePointTracker <T extends ImageSingleBand> {
 		tracker = createTracker();
 		addTracks(5);
 		assertEquals(5,tracker.getActiveTracks().size());
-		tracker.dropTracks();
+		tracker.dropAllTracks();
 		assertEquals(0,tracker.getActiveTracks().size());
-		assertEquals(5,tracker.getDroppedTracks().size());
+		// tracks which have been dropped by request should not be included in this list
+		assertEquals(0,tracker.getDroppedTracks().size());
 	}
 
 	@Test
@@ -112,7 +112,8 @@ public abstract class StandardImagePointTracker <T extends ImageSingleBand> {
 		tracker.dropTrack(tracks.get(2));
 		
 		assertEquals(4,tracker.getActiveTracks().size());
-		assertEquals(1,tracker.getDroppedTracks().size());
+		// tracks which have been dropped by request should not be included in this list
+		assertEquals(0,tracker.getDroppedTracks().size());
 	}
 
 	@Test
@@ -130,6 +131,11 @@ public abstract class StandardImagePointTracker <T extends ImageSingleBand> {
 		// hmm it is totally possible that some features would be dropped.  might
 		// have to make this more robust in the future
 		assertEquals(5,tracker.getActiveTracks().size());
+	}
+
+	@Test
+	public void reset() {
+		fail("IMplement");
 	}
 
 	private void addTracks( int num ) {

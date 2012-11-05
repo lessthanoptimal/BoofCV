@@ -45,7 +45,7 @@ public class Orientation3D extends JPanel {
 
 	public void setVector( Vector3D_F64 v ) {
 		yaw = Math.atan2( v.x , v.z );
-		tilt = UtilAngle.atanSafe(-v.y,v.z);
+		tilt = UtilAngle.atanSafe(-v.y,Math.abs(v.z));
 	}
 
 	public void setTilt(double tilt) {
@@ -61,8 +61,6 @@ public class Orientation3D extends JPanel {
 		super.paintComponent(g);
 
 		Graphics2D g2 = (Graphics2D)g;
-
-
 
 		g2.setColor(Color.BLACK);
 		g2.setStroke(new BasicStroke(5));

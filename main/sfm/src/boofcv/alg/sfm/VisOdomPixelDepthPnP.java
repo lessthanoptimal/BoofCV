@@ -132,9 +132,9 @@ public class VisOdomPixelDepthPnP<T extends ImageBase> {
 				addNewTracks();
 			}
 
-//			System.out.println("  num inliers = "+N+"  num dropped "+numDropped+" total "+tracker.getPairs().size());
-			tick++;
+//			System.out.println("  num inliers = "+N+"  num dropped "+numDropped+" total active "+tracker.getActivePairs().size());
 		}
+		tick++;
 
 		return true;
 	}
@@ -147,7 +147,7 @@ public class VisOdomPixelDepthPnP<T extends ImageBase> {
 	private void changePoseToReference() {
 		Se3_F64 keyToCurr = currToKey.invert(null);
 
-		List<PointPoseTrack> all = tracker.getPairs();
+		List<PointPoseTrack> all = tracker.getAllPairs();
 
 		for( PointPoseTrack t : all ) {
 			SePointOps_F64.transform(keyToCurr,t.location,t.location);
@@ -163,7 +163,7 @@ public class VisOdomPixelDepthPnP<T extends ImageBase> {
 	 */
 	private int dropUnusedTracks() {
 
-		List<PointPoseTrack> all = tracker.getPairs();
+		List<PointPoseTrack> all = tracker.getAllPairs();
 
 		List<PointPoseTrack> drop = new ArrayList<PointPoseTrack>();
 		for( PointPoseTrack t : all ) {
@@ -227,7 +227,7 @@ public class VisOdomPixelDepthPnP<T extends ImageBase> {
 
 		List<Point2D3D> obs = new ArrayList<Point2D3D>();
 
-		for( PointPoseTrack t : tracker.getPairs() ) {
+		for( PointPoseTrack t : tracker.getActivePairs() ) {
 			Point2D3D p = new Point2D3D();
 
 			p.location = t.getLocation();
@@ -245,7 +245,6 @@ public class VisOdomPixelDepthPnP<T extends ImageBase> {
 		if( refine != null ) {
 			keyToCurr = new Se3_F64();
 			refine.process(motionEstimator.getModel(),motionEstimator.getMatchSet(),keyToCurr);
-//				return false;
 		} else {
 			keyToCurr = motionEstimator.getModel();
 		}
@@ -256,7 +255,7 @@ public class VisOdomPixelDepthPnP<T extends ImageBase> {
 		int N = motionEstimator.getMatchSet().size();
 		for( int i = 0; i < N; i++ ) {
 			int index = motionEstimator.getInputIndex(i);
-			PointPoseTrack t = tracker.getPairs().get(index);
+			PointPoseTrack t = tracker.getActivePairs().get(index);
 			t.lastInlier = tick;
 			inlierTracks.add( t );
 		}

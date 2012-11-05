@@ -143,6 +143,11 @@ public class TestImageMotionPointKey {
 		public int numDropped = 0;
 
 		@Override
+		public void reset() {
+			//To change body of implemented methods use File | Settings | File Templates.
+		}
+
+		@Override
 		public void process(ImageUInt8 image) {}
 
 		@Override
@@ -154,10 +159,13 @@ public class TestImageMotionPointKey {
 		public void spawnTracks() {numSpawn++;}
 
 		@Override
-		public void dropTracks() {}
+		public void dropAllTracks() {}
 
 		@Override
 		public void dropTrack(PointTrack track) {numDropped++;}
+
+		@Override
+		public List<PointTrack> getAllTracks() {return null;}
 
 		@Override
 		public List<PointTrack> getActiveTracks() {
