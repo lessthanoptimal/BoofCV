@@ -18,28 +18,17 @@
 
 package boofcv.struct.feature;
 
+import org.junit.Test;
+
+import static org.junit.Assert.fail;
+
 /**
- * Description for normalized cross correlation (NCC).  The descriptor's value
- * in a NCC feature is the pixel intensity value minus the mean pixel intensity value.
- *
  * @author Peter Abeles
  */
-public class NccFeature extends TupleDesc_F64 {
+public class TestNccFeature {
 
-	/** mean pixel intensity */
-	public double mean;
-	/** standard deviation of pixel intensity*/
-	public double sigma;
-
-	public NccFeature(int numFeatures) {
-		super(numFeatures);
-	}
-
-	@Override
-	public void setTo(TupleDesc_F64 source) {
-		super.setTo(source);
-		NccFeature ncc = (NccFeature)source;
-		this.mean = ncc.mean;
-		this.sigma = ncc.sigma;
+	@Test
+	public void setTo() {
+		fail("implement");
 	}
 }

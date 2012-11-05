@@ -116,7 +116,7 @@ public class PstWrapperKltPyramid <I extends ImageSingleBand,D extends ImageSing
 	}
 
 	@Override
-	public void dropTracks() {
+	public void dropAllTracks() {
 		trackManager.dropAllTracks();
 		dropped.addAll(active);
 		active.clear();
@@ -192,6 +192,17 @@ public class PstWrapperKltPyramid <I extends ImageSingleBand,D extends ImageSing
 	@Override
 	public List<PointTrack> getNewTracks() {
 		return spawned;
+	}
+
+	@Override
+	public List<PointTrack> getAllTracks() {
+		return active;
+	}
+
+	@Override
+	public void reset() {
+		dropAllTracks();
+		totalFeatures = 0;
 	}
 
 	public PkltManager<I, D> getTrackManager() {

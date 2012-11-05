@@ -23,22 +23,27 @@ import boofcv.abst.feature.tracker.ImagePointTracker;
 import boofcv.abst.sfm.AccessPointTracks3D;
 import boofcv.abst.sfm.StereoVisualOdometry;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
+import boofcv.alg.geo.PerspectiveOps;
 import boofcv.factory.feature.disparity.FactoryStereoDisparity;
 import boofcv.factory.feature.tracker.FactoryPointSequentialTracker;
 import boofcv.factory.sfm.FactoryVisualOdometry;
 import boofcv.gui.StereoVideoAppBase;
 import boofcv.gui.VisualizeApp;
+import boofcv.gui.d3.Polygon3DSequenceViewer;
 import boofcv.gui.feature.VisualizeFeatures;
-import boofcv.gui.image.ImageGridPanel;
+import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.PathLabel;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.wrapper.xuggler.XugglerMediaManager;
+import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
+import georegression.transform.se.SePointOps_F64;
+import org.ejml.data.DenseMatrix64F;
 
 import javax.swing.*;
 import java.awt.*;
@@ -52,11 +57,14 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class VisualizeStereoVisualOdometryApp <I extends ImageSingleBand>
-		extends StereoVideoAppBase<I> implements VisualizeApp
+		extends StereoVideoAppBase<I> implements VisualizeApp, VisualOdometryPanel.Listener
 {
 
-	ImageGridPanel guiImages;
 	VisualOdometryPanel guiInfo;
+
+	ImagePanel guiLeft;
+	ImagePanel guiRight;
+	Polygon3DSequenceViewer guiCam3D;
 
 	StereoVisualOdometry<I> alg;
 
@@ -74,17 +82,20 @@ public class VisualizeStereoVisualOdometryApp <I extends ImageSingleBand>
 	public VisualizeStereoVisualOdometryApp( Class<I> imageType ) {
 		super(1, imageType);
 
-		addAlgorithm(0, "KLT - Depth P3P", 0);
-		addAlgorithm(0, "BRIEF - Depth P3P", 1);
-
+		addAlgorithm(0, "Depth P3P - KLT", 0);
+		addAlgorithm(0, "Depth P3P - SHI-BRIEF", 1);
 
 		guiInfo = new VisualOdometryPanel();
-		guiImages = new ImageGridPanel(1,2);
+		guiLeft = new ImagePanel();
+		guiRight = new ImagePanel();
+		guiCam3D = new Polygon3DSequenceViewer();
 
 		add(guiInfo, BorderLayout.WEST);
-		setMainGUI(guiImages);
+		add(guiRight, BorderLayout.EAST);
+		setMainGUI(guiLeft);
 
-		guiImages.addMouseListener(this);
+		guiLeft.addMouseListener(this);
+		guiInfo.setListener(this);
 	}
 
 	private void drawFeatures( AccessPointTracks3D tracker , BufferedImage image )  {
@@ -166,15 +177,26 @@ public class VisualizeStereoVisualOdometryApp <I extends ImageSingleBand>
 	}
 
 	@Override
-	protected void updateAlgGUI(I frame1, BufferedImage buffImage1,
-								I frame2, BufferedImage buffImage2, final double fps) {
+	protected void updateAlgGUI(I frame1, final BufferedImage buffImage1,
+								I frame2, final BufferedImage buffImage2, final double fps) {
 		if( !noFault)
 			numFaults++;
+
+		showTracks = guiInfo.isShowAll();
+		showInliers = guiInfo.isShowInliers();
+		drawFeatures((AccessPointTracks3D)alg,buffImage1);
 
 		final Se3_F64 leftToWorld = alg.getLeftToWorld().copy();
 
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
+				guiLeft.setBufferedImage(buffImage1);
+				guiRight.setBufferedImage(buffImage2);
+				guiLeft.autoSetPreferredSize();
+				guiRight.autoSetPreferredSize();
+				guiLeft.repaint();
+				guiRight.repaint();
+
 				guiInfo.setCameraToWorld(leftToWorld);
 				guiInfo.setNumFaults(numFaults);
 				guiInfo.setNumTracks(numTracks);
@@ -183,14 +205,21 @@ public class VisualizeStereoVisualOdometryApp <I extends ImageSingleBand>
 			}
 		});
 
-		showTracks = guiInfo.isShowAll();
-		showInliers = guiInfo.isShowInliers();
-		drawFeatures((AccessPointTracks3D)alg,buffImage1);
 
-		guiImages.setImage(0,0,buffImage1);
-		guiImages.setImage(0,1,buffImage2);
+		double r = config.getBaseline();
 
-		guiImages.autoSetPreferredSize();
+		Point3D_F64 p1 = new Point3D_F64(-r,-r,0);
+		Point3D_F64 p2 = new Point3D_F64(r,-r,0);
+		Point3D_F64 p3 = new Point3D_F64(r,r,0);
+		Point3D_F64 p4 = new Point3D_F64(-r,r,0);
+
+		SePointOps_F64.transform(leftToWorld,p1,p1);
+		SePointOps_F64.transform(leftToWorld,p2,p2);
+		SePointOps_F64.transform(leftToWorld,p3,p3);
+		SePointOps_F64.transform(leftToWorld,p4,p4);
+
+		guiCam3D.add(p1,p2,p3,p4);
+		guiCam3D.repaint();
 
 		hasProcessedImage = true;
 	}
@@ -207,24 +236,40 @@ public class VisualizeStereoVisualOdometryApp <I extends ImageSingleBand>
 
 		handleRunningStatus(2);
 
+		IntrinsicParameters right = config.right;
+		DenseMatrix64F K = PerspectiveOps.calibrationMatrix(config.left,null);
+		guiCam3D.clearPolygons();
+		guiCam3D.setK(K);
+		guiCam3D.setStepSize(config.getBaseline());
+		guiCam3D.setPreferredSize(new Dimension(right.width, right.height));
+		guiCam3D.setMaximumSize(guiCam3D.getPreferredSize());
 		startWorkerThread();
 	}
 
 	private StereoVisualOdometry<I> createStereoDepth( boolean useKlt ) {
 		ImagePointTracker<I> tracker;
 
+		int thresholdAdd;
+		int thresholdRetire;
+
 		if( useKlt ) {
+			thresholdAdd = 120;
+			thresholdRetire = 2;
 			Class derivType = GImageDerivativeOps.getDerivativeType(imageType);
 			tracker = FactoryPointSequentialTracker.klt(600,new int[]{1,2,4,8},3,3,2,imageType,derivType);
 		} else {
-//			tracker = FactoryPointSequentialTracker.dda_FH_SURF(600, 200, 1, imageType);
-			tracker = FactoryPointSequentialTracker.dda_ShiTomasi_BRIEF(400, 200, 2, 0, imageType);
+			thresholdAdd = 80;
+			thresholdRetire = 3;
+//			tracker = FactoryPointSequentialTracker.dda_FH_SURF(600, 200, 1, 2,imageType);
+			tracker = FactoryPointSequentialTracker.dda_ShiTomasi_BRIEF(600, 200, 2, 0, 4, imageType, null);
+//			tracker = FactoryPointSequentialTracker.dda_ShiTomasi_NCC(600, 7, 7, 0, 2, imageType, null);
 		}
 
 		StereoDisparitySparse<I> disparity =
 				FactoryStereoDisparity.regionSparseWta(0,150,3,3,30,-1,true,imageType);
 
-		return FactoryVisualOdometry.stereoDepth(120, 4, 1.5, tracker, disparity, 0, imageType);
+		return FactoryVisualOdometry.stereoDepth(thresholdAdd, thresholdRetire,
+				1.5, tracker, disparity, 0, imageType);
 	}
 
 	@Override
@@ -280,6 +325,22 @@ public class VisualizeStereoVisualOdometryApp <I extends ImageSingleBand>
 			}});
 	}
 
+	@Override
+	public void eventVoPanel(final int view) {
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				if( view == 0 ) {
+					remove(guiCam3D);
+					add(guiRight, BorderLayout.EAST);
+				} else {
+					remove(guiRight);
+					add(guiCam3D,BorderLayout.EAST);
+				}
+				revalidate();
+				repaint();
+			}});
+	}
+
 	public static void main( String args[] ) throws FileNotFoundException {
 
 		Class type = ImageFloat32.class;
@@ -290,7 +351,7 @@ public class VisualizeStereoVisualOdometryApp <I extends ImageSingleBand>
 		app.setMediaManager(new XugglerMediaManager());
 
 		List<PathLabel> inputs = new ArrayList<PathLabel>();
-		inputs.add(new PathLabel("Outdoors", "/home/pja/temp/config.txt"));
+		inputs.add(new PathLabel("Backyard", "../data/applet/vo/backyard/config.txt"));
 
 		app.setInputList(inputs);
 

@@ -64,7 +64,9 @@ import java.util.Random;
 public class FactoryPointSequentialTracker {
 
 	/**
-	 * Creates a tracker using KLT features/tracker.
+	 * Pyramid KLT feature tracker.
+	 *
+	 * @see boofcv.struct.pyramid.PyramidUpdaterDiscrete
 	 *
 	 * @param maxFeatures   Maximum number of features it can detect/track. Try 200 initially.
 	 * @param scaling       Scales in the image pyramid. Recommend [1,2,4] or [2,4]
@@ -100,7 +102,9 @@ public class FactoryPointSequentialTracker {
 	}
 
 	/**
-	 * Creates a tracker using KLT features/tracker.
+	 * Pyramid KLT feature tracker.
+	 *
+	 * @see boofcv.struct.pyramid.PyramidUpdaterDiscrete
 	 *
 	 * @param config Config for the tracker. Try PkltManagerConfig.createDefault().
 	 * @return KLT based tracker.
@@ -113,7 +117,11 @@ public class FactoryPointSequentialTracker {
 	}
 
 	/**
-	 * Creates a tracker using SURF features.
+	 * Creates a tracker which detects Fast-Hessian features and describes them with SURF.
+	 *
+	 * @see boofcv.alg.feature.detect.intensity.ShiTomasiCornerIntensity
+	 * @see DescribePointSurf
+	 * @see DetectAssociateTracker
 	 *
 	 * @param maxMatches     The maximum number of matched features that will be considered.
 	 *                       Set to a value <= 0 to not bound the number of matches.
@@ -126,7 +134,7 @@ public class FactoryPointSequentialTracker {
 	 */
 	public static <I extends ImageSingleBand, II extends ImageSingleBand>
 	ImagePointTracker<I> dda_FH_SURF(int maxMatches, int detectPerScale, int minSeparation,
-									 Class<I> imageType) {
+									 int pruneAfter, Class<I> imageType) {
 		Class<II> integralType = GIntegralImageOps.getIntegralType(imageType);
 
 		FeatureExtractor extractor = FactoryFeatureExtractor.nonmax(minSeparation, 1, 10, true);
@@ -142,25 +150,41 @@ public class FactoryPointSequentialTracker {
 		DescribeRegionPoint<I,SurfFeature> regionDesc = new WrapDescribeSurf<I,II>(describe,orientation);
 		GeneralAssociation<SurfFeature> generalAssoc = new WrapAssociateSurfBasic(assoc);
 
-		return new DetectAssociateTracker<I,SurfFeature>(id, regionDesc, generalAssoc);
+		DetectAssociateTracker<I,SurfFeature> dat = new DetectAssociateTracker<I,SurfFeature>(id, regionDesc, generalAssoc);
+
+		dat.setPruneThreshold(pruneAfter);
+
+		return dat;
 	}
 
 	/**
-	 * Creates a tracker for BRIEF features.
+	 * Creates a tracker which detects Shi-Tomasi corner features and describes them with BRIEF.
+	 *
+	 * @see boofcv.alg.feature.detect.intensity.ShiTomasiCornerIntensity
+	 * @see DescribePointBrief
+	 * @see DetectAssociateTracker
 	 *
 	 * @param maxFeatures         Maximum number of features it will track.
 	 * @param maxAssociationError Maximum allowed association error.  Try 200.
 	 * @param detectionRadius     Size of feature detection region.  Try 2.
 	 * @param cornerThreshold     Tolerance for detecting corner features.  Tune. Start at 1.
+	 * @param pruneAfter Prune tracks which have not been associated with any features after this many images.  Try 2.
 	 * @param imageType           Type of image being processed.
+	 * @param derivType Type of image used to store the image derivative. null == use default
 	 */
-	public static <I extends ImageSingleBand>
-	ImagePointTracker<I> dda_ShiTomasi_BRIEF(int maxFeatures, int maxAssociationError, int detectionRadius, float cornerThreshold, Class<I> imageType) {
+	public static <I extends ImageSingleBand, D extends ImageSingleBand>
+	ImagePointTracker<I> dda_ShiTomasi_BRIEF(int maxFeatures, int maxAssociationError,
+											 int detectionRadius,
+											 float cornerThreshold,
+											 int pruneAfter, Class<I> imageType , Class<D> derivType )
+	{
+		if( derivType == null )
+			derivType = GImageDerivativeOps.getDerivativeType(imageType);
+
 		DescribePointBrief<I> alg = FactoryDescribePointAlgs.brief(FactoryBriefDefinition.gaussian2(new Random(123), 16, 512),
 				FactoryBlurFilter.gaussian(imageType, 0, 4));
 
-		Class derivType = GImageDerivativeOps.getDerivativeType(imageType);
-		GeneralFeatureDetector corner = FactoryDetectPoint.createShiTomasi(detectionRadius,false,cornerThreshold, maxFeatures, derivType);
+		GeneralFeatureDetector<I,D> corner = FactoryDetectPoint.createShiTomasi(detectionRadius,false,cornerThreshold, maxFeatures, derivType);
 
 		InterestPointDetector<I> detector = FactoryInterestPoint.wrapPoint(corner, imageType, derivType);
 		ScoreAssociateHamming_B score = new ScoreAssociateHamming_B();
@@ -168,22 +192,36 @@ public class FactoryPointSequentialTracker {
 		GeneralAssociation<TupleDesc_B> association =
 				FactoryAssociation.greedy(score, maxAssociationError, maxFeatures, true);
 
-		return new DetectAssociateTracker<I,TupleDesc_B>(detector, new WrapDescribeBrief<I>(alg), association);
+		DetectAssociateTracker<I,TupleDesc_B> dat = new DetectAssociateTracker<I,TupleDesc_B>(detector, new WrapDescribeBrief<I>(alg), association);
+
+		dat.setPruneThreshold(pruneAfter);
+
+		return dat;
 	}
 
 	/**
-	 * Creates a tracker for rectangular pixel regions that are associated using normalized
-	 * cross correlation (NCC)..
+	 * Creates a tracker which detects Shi-Tomasi corner features and describes them with NCC.
+	 *
+	 * @see boofcv.alg.feature.detect.intensity.ShiTomasiCornerIntensity
+	 * @see DescribePointPixelRegionNCC
+	 * @see DetectAssociateTracker
 	 *
 	 * @param maxFeatures    Maximum number of features it will track.
 	 * @param regionWidth    How wide the region is.  Try 5
 	 * @param regionHeight   How tall the region is.  Try 5
 	 * @param cornerThreshold     Tolerance for detecting corner features.  Tune. Start at 1.
+	 * @param pruneAfter Prune tracks which have not been associated with any features after this many images.  Try 2.
 	 * @param imageType      Type of image being processed.
+	 * @param derivType      Type of image used to store the image derivative. null == use default
 	 */
 	public static <I extends ImageSingleBand, D extends ImageSingleBand>
 	ImagePointTracker<I> dda_ShiTomasi_NCC(int maxFeatures, int regionWidth, int regionHeight,
-										   float cornerThreshold, Class<I> imageType, Class<D> derivType) {
+										   float cornerThreshold,
+										   int pruneAfter, Class<I> imageType, Class<D> derivType) {
+
+		if( derivType == null )
+			derivType = GImageDerivativeOps.getDerivativeType(imageType);
+
 		DescribePointPixelRegionNCC<I> alg = FactoryDescribePointAlgs.pixelRegionNCC(regionWidth, regionHeight, imageType);
 
 		GeneralFeatureDetector corner = FactoryDetectPoint.createShiTomasi(3, false, cornerThreshold, maxFeatures, derivType);
@@ -192,9 +230,14 @@ public class FactoryPointSequentialTracker {
 		ScoreAssociateNccFeature score = new ScoreAssociateNccFeature();
 
 		GeneralAssociation<NccFeature> association =
-				FactoryAssociation.greedy(score, 0, maxFeatures, true);
+				FactoryAssociation.greedy(score, Double.MAX_VALUE, maxFeatures, true);
 
-		return new DetectAssociateTracker<I,NccFeature>(detector, new WrapDescribePixelRegionNCC<I>(alg), association);
+		DetectAssociateTracker<I,NccFeature> dat =
+				new DetectAssociateTracker<I,NccFeature>(detector, new WrapDescribePixelRegionNCC<I>(alg), association);
+
+		dat.setPruneThreshold(pruneAfter);
+
+		return dat;
 	}
 
 	/**

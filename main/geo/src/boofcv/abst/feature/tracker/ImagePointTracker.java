@@ -50,6 +50,11 @@ import java.util.List;
 public interface ImagePointTracker <T extends ImageBase> {
 
 	/**
+	 * Discard memory of all current and past tracks.
+	 */
+	void reset();
+
+	/**
 	 * Process input image and perform tracking.
 	 *
 	 * @param image Next image in the sequence
@@ -68,13 +73,15 @@ public interface ImagePointTracker <T extends ImageBase> {
 
 	/**
 	 * Automatically selects new features in the image to track.
+	 *
+	 * TODO add requirement that there be no sumplicate
 	 */
 	public void spawnTracks();
 
 	/**
 	 * Drops all feature currently being tracked
 	 */
-	public void dropTracks();
+	public void dropAllTracks();
 
 	/**
 	 * Manually forces a track to be dropped.
@@ -85,14 +92,23 @@ public interface ImagePointTracker <T extends ImageBase> {
 	// this will be slow since it need to searh through the whole list
 	public void dropTrack(PointTrack track);
 
+
 	/**
-	 * Returns a list of active tracks.
+	 * Returns a list of all features that it is currently tracking
+	 * @return
+	 */
+	public List<PointTrack> getAllTracks();
+
+	/**
+	 * Returns a list of active tracks. An active track is defined as a track
+	 * which was found in the most recently processed image.
 	 */
 	public List<PointTrack> getActiveTracks();
 
 	/**
-	 * Returns a list of tracks that were dropped the last time track features was
-	 * called.
+	 * Returns a list of tracks dropped by the tracker during the most recent update.
+	 * Tracks dropped by invoking {@link #dropAllTracks()} or {@link #dropTrack(PointTrack)}
+	 * will not be included.
 	 */
 	public List<PointTrack> getDroppedTracks();
 

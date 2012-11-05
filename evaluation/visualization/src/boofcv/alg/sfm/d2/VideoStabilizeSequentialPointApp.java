@@ -63,10 +63,12 @@ public class VideoStabilizeSequentialPointApp<I extends ImageSingleBand, D exten
 		config.pyramidScaling = new int[]{1,2,4,8};
 
 		addAlgorithm(0, "KLT", FactoryPointSequentialTracker.klt(config));
-		addAlgorithm(0, "BRIEF", FactoryPointSequentialTracker.dda_ShiTomasi_BRIEF(300, 200, 1, 10, imageType));
-		addAlgorithm(0, "SURF", FactoryPointSequentialTracker.dda_FH_SURF(300, 200, 2, imageType));
+		addAlgorithm(0, "BRIEF", FactoryPointSequentialTracker.
+				dda_ShiTomasi_BRIEF(400, 100, 1, 10, 2, imageType, derivType));
+		addAlgorithm(0, "SURF", FactoryPointSequentialTracker.dda_FH_SURF(300, 200, 2, 2,imageType));
 		// size of the description region has been increased to improve quality.
-		addAlgorithm(0, "NCC", FactoryPointSequentialTracker.dda_ShiTomasi_NCC(500, 11, 11, 10, imageType, derivType));
+		addAlgorithm(0, "NCC", FactoryPointSequentialTracker.
+				dda_ShiTomasi_NCC(500, 11, 11, 10, 2, imageType, derivType));
 
 		addAlgorithm(1,"Affine", new Affine2D_F64());
 		addAlgorithm(1,"Homography", new Homography2D_F64());
@@ -105,7 +107,7 @@ public class VideoStabilizeSequentialPointApp<I extends ImageSingleBand, D exten
 	@Override
 	protected void startEverything() {
 		// make sure there is nothing left over from before
-		tracker.dropTracks();
+		tracker.dropAllTracks();
 		createModelMatcher(maxIterations,4);
 		distortAlg = new MotionStabilizePointKey<I,T>(tracker,modelMatcher,modelRefiner,fitModel,
 				thresholdKeyFrame,thresholdReset,largeMotionThreshold);

@@ -27,6 +27,8 @@ import georegression.struct.se.Se3_F64;
 import javax.swing.*;
 import javax.swing.border.EtchedBorder;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 
@@ -35,9 +37,11 @@ import java.awt.event.ItemListener;
  */
 public class VisualOdometryPanel
 		extends StandardAlgConfigPanel
-		implements ItemListener
+		implements ItemListener, ActionListener
 {
 	JLabel displayStatus;
+
+	JComboBox selectView;
 
 	JTextArea displayX;
 	JTextArea displayY;
@@ -62,12 +66,18 @@ public class VisualOdometryPanel
 	Se3_F64 prevToWorld;
 	double integral;
 
+	Listener listener;
+
 	public VisualOdometryPanel() {
 		setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
 		setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
 
 		displayStatus = new JLabel();
 		displayStatus.setFont(new Font("Dialog",Font.BOLD,16));
+
+		selectView = new JComboBox(new String[]{"Right","3D"});
+		selectView.addActionListener(this);
+		selectView.setMaximumSize(selectView.getPreferredSize());
 
 		displayX = createTextInfo();
 		displayY = createTextInfo();
@@ -89,6 +99,7 @@ public class VisualOdometryPanel
 		displayFps = createTextInfo();
 
 		addAlignCenter(displayStatus, this);
+		addLabeled(selectView,  "View", this);
 		addSeparator(150);
 		addLabeled(displayTracks,  "Tracks", this);
 		addLabeled(displayInliers, "Inliers", this);
@@ -106,8 +117,6 @@ public class VisualOdometryPanel
 		addAlignLeft(showAll, this);
 		addAlignLeft(showInliers, this);
 		addVerticalGlue(this);
-
-		setPreferredSize(new Dimension(175,300));
 	}
 
 	public void reset() {
@@ -182,5 +191,25 @@ public class VisualOdometryPanel
 
 	public boolean isShowInliers() {
 		return setShowInliers;
+	}
+
+	public Listener getListener() {
+		return listener;
+	}
+
+	public void setListener(Listener listener) {
+		this.listener = listener;
+	}
+
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		if( e.getSource() == selectView ) {
+			if( listener != null )
+				listener.eventVoPanel(selectView.getSelectedIndex());
+		}
+	}
+
+	public static interface Listener {
+		public void eventVoPanel( int view );
 	}
 }

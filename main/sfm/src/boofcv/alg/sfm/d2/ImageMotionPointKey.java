@@ -134,18 +134,12 @@ public class ImageMotionPointKey<I extends ImageSingleBand, T extends Invertible
 		tracker.process(frame);
 		totalProcessed++;
 
-		// set up data structures and spawn tracks
-		if( totalProcessed == 1 ) {
-			tracker.spawnTracks();
-			tracker.setKeyFrame();
+		List<KeyFrameTrack> pairs = tracker.getActivePairs();
 
-			worldToKey.set(worldToInit);
-			worldToCurr.set(worldToInit);
-			return true;
-		}
+		if( pairs.size() == 0 )
+			return false;
 
 		// fit the motion model to the feature tracks
-		List<KeyFrameTrack> pairs = tracker.getPairs();
 		if( !modelMatcher.process((List)pairs) ) {
 			return false;
 		}

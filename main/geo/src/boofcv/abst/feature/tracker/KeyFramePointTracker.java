@@ -43,7 +43,7 @@ public class KeyFramePointTracker<I extends ImageBase, R extends KeyFrameTrack> 
 	Class<R> trackType;
 
 	// pairs of associated tracks
-	List<R> pairs = new ArrayList<R>();
+	List<R> activePairs = new ArrayList<R>();
 
 	// applies a distortion to each feature's track location
 	// can be used to convert points into normalized image coordinates
@@ -80,13 +80,13 @@ public class KeyFramePointTracker<I extends ImageBase, R extends KeyFrameTrack> 
 	public void process( I image ) {
 		tracker.process(image);
 
-		pairs.clear();
+		activePairs.clear();
 		List<PointTrack> tracks = tracker.getActiveTracks();
 		for( PointTrack t : tracks ) {
 			R p = t.getCookie();
 			p.pixel.p2.set(t);
 			pixelToNorm.compute(t.x, t.y, p.p2);
-			pairs.add(p);
+			activePairs.add(p);
 		}
 	}
 
@@ -94,7 +94,7 @@ public class KeyFramePointTracker<I extends ImageBase, R extends KeyFrameTrack> 
 	 * Makes the most recently processed image the keyframe.
 	 */
 	public void setKeyFrame() {
-		pairs.clear();
+		activePairs.clear();
 
 		// todo purge non-active tracks here
 		List<PointTrack> tracks = tracker.getActiveTracks();
@@ -106,7 +106,7 @@ public class KeyFramePointTracker<I extends ImageBase, R extends KeyFrameTrack> 
 			p.pixel.p2.set(t);
 			pixelToNorm.compute(t.x, t.y, p.p1);
 			p.p2.set(p.p1);
-			pairs.add(p);
+			activePairs.add(p);
 		}
 	}
 
@@ -134,7 +134,7 @@ public class KeyFramePointTracker<I extends ImageBase, R extends KeyFrameTrack> 
 			p.pixel.p2.set(t);
 			pixelToNorm.compute(t.x, t.y, p.p1);
 			p.p2.set(p.p1);
-			pairs.add(p);
+			activePairs.add(p);
 			spawned.add(p);
 		}
 
@@ -147,15 +147,14 @@ public class KeyFramePointTracker<I extends ImageBase, R extends KeyFrameTrack> 
 	 * @param track The track which is to be dropped
 	 */
 	public void dropTrack( PointTrack track ) {
-		//noinspection SuspiciousMethodCalls
-		if( !pairs.remove(track.cookie) )
-			throw new IllegalArgumentException("Bug: Dropped track does not exist");
+		// not checking return value because track might not be in the active list.
+		activePairs.remove(track.cookie);
 
 		tracker.dropTrack(track);
 	}
 
 	public void dropTrack( R track ) {
-		for( PointTrack t : tracker.getActiveTracks() ) {
+		for( PointTrack t : tracker.getAllTracks() ) {
 			if( t.getCookie() == track ) {
 				dropTrack(t);
 				return;
@@ -178,16 +177,27 @@ public class KeyFramePointTracker<I extends ImageBase, R extends KeyFrameTrack> 
 	 *
 	 * @return associated pairs
 	 */
-	public List<R> getPairs() {
-		return pairs;
+	public List<R> getActivePairs() {
+		return activePairs;
+	}
+
+	public List<R> getAllPairs() {
+		List<R> l = new ArrayList<R>();
+		List<PointTrack> tracks = tracker.getAllTracks();
+
+		for( PointTrack t : tracks ) {
+			l.add( (R)t.getCookie() );
+		}
+
+		return l;
 	}
 
 	/**
 	 * Drops all tracks and clears all associated pairs.
 	 */
 	public void reset() {
-		pairs.clear();
-		tracker.dropTracks();
+		activePairs.clear();
+		tracker.dropAllTracks();
 	}
 
 	public ImagePointTracker<I> getTracker() {

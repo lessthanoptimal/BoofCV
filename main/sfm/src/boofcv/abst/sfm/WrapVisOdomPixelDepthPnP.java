@@ -46,19 +46,19 @@ public class WrapVisOdomPixelDepthPnP<T extends ImageSingleBand>
 
 	@Override
 	public Point3D_F64 getTrackLocation(int index) {
-		return alg.getTracker().getPairs().get(index).getLocation();
+		return alg.getTracker().getActivePairs().get(index).getLocation();
 	}
 
 	@Override
 	public long getTrackId(int index) {
-		return alg.getTracker().getPairs().get(index).getTrackID();
+		return alg.getTracker().getActivePairs().get(index).getTrackID();
 	}
 
 	@Override
 	public List<Point2D_F64> getAllTracks() {
 		List<Point2D_F64> pixels = new ArrayList<Point2D_F64>();
 
-		for(PointPoseTrack t : alg.getTracker().getPairs() ) {
+		for(PointPoseTrack t : alg.getTracker().getActivePairs() ) {
 			pixels.add(t.getPixel().p2);
 		}
 
@@ -67,13 +67,13 @@ public class WrapVisOdomPixelDepthPnP<T extends ImageSingleBand>
 
 	@Override
 	public boolean isInlier(int index) {
-		PointPoseTrack t = alg.getTracker().getPairs().get(index);
+		PointPoseTrack t = alg.getTracker().getActivePairs().get(index);
 		return alg.getInlierTracks().contains(t);
 	}
 
 	@Override
 	public boolean isNew(int index) {
-		PointPoseTrack t = alg.getTracker().getPairs().get(index);
+		PointPoseTrack t = alg.getTracker().getActivePairs().get(index);
 		return alg.getSpawnedTracks().contains(t);
 	}
 

@@ -30,6 +30,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
 
@@ -95,9 +96,11 @@ public abstract class StereoVideoAppBase <I extends ImageSingleBand>
 		Reader r = media.openFile(inputRefs.get(index).getPath());
 		BufferedReader in = new BufferedReader(r);
 		try {
-			String lineConfig = in.readLine();
-			String line1 = in.readLine();
-			String line2 = in.readLine();
+			String path = new File(inputRefs.get(index).getPath()).getParent();
+
+			String lineConfig = path+"/"+in.readLine();
+			String line1 = path+"/"+in.readLine();
+			String line2 = path+"/"+in.readLine();
 
 			config = BoofMiscOps.loadXML(media.openFile(lineConfig));
 			SimpleImageSequence<I> video1 = media.openVideo(line1,imageType);
