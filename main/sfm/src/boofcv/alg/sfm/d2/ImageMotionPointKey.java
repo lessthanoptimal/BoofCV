@@ -104,7 +104,7 @@ public class ImageMotionPointKey<I extends ImageSingleBand, T extends Invertible
 		keyToCurr.set(worldToInit);
 		worldToCurr.set(worldToInit);
 		tracker.reset();
-		tracker.spawnTracks();
+		tracker.spawnTracks(null);
 		tracker.setKeyFrame();
 		totalProcessed = 0;
 	}
@@ -134,7 +134,7 @@ public class ImageMotionPointKey<I extends ImageSingleBand, T extends Invertible
 		tracker.process(frame);
 		totalProcessed++;
 
-		List<KeyFrameTrack> pairs = tracker.getActivePairs();
+		List<KeyFrameTrack> pairs = tracker.getActivePairs(null);
 
 		if( pairs.size() == 0 )
 			return false;
@@ -161,10 +161,10 @@ public class ImageMotionPointKey<I extends ImageSingleBand, T extends Invertible
 	 * Make the current frame the first frame in the sequence
 	 */
 	public void changeKeyFrame() {
-		tracker.spawnTracks();
+		tracker.spawnTracks(null);
 		tracker.setKeyFrame();
 
-		totalSpawned = tracker.getActiveTracks().size();
+		totalSpawned = tracker.getActiveTracks(null).size();
 		worldToKey.set(worldToCurr);
 	}
 

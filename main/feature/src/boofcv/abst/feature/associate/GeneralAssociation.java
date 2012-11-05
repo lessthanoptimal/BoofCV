@@ -32,6 +32,7 @@ import boofcv.struct.feature.AssociatedIndex;
  * micro benchmark it produced results that were about 20% faster consistently.  Which is surprising since
  * one would think the comparisons would dominate.
  * </p>
+ *
  * @author Peter Abeles
  */
 public interface GeneralAssociation<T> {

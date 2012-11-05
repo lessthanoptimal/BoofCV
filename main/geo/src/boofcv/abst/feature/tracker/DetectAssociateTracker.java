@@ -45,9 +45,11 @@ import java.util.List;
 public class DetectAssociateTracker<I extends ImageSingleBand, D extends TupleDesc>
 		implements ImagePointTracker<I> {
 
-
+	// detects features inside the image
 	InterestPointDetector<I> detector;
+	// describes features using local information
 	DescribeRegionPoint<I,D> describe;
+	// associates features between two images together
 	GeneralAssociation<D> associate;
 
 	// location of interest points
@@ -289,22 +291,38 @@ public class DetectAssociateTracker<I extends ImageSingleBand, D extends TupleDe
 	}
 
 	@Override
-	public List<PointTrack> getActiveTracks() {
+	public List<PointTrack> getActiveTracks( List<PointTrack> list ) {
+		if( list == null )
+			list = new ArrayList<PointTrack>();
+
+		list.addAll(tracksActive);
 		return tracksActive;
 	}
 
 	@Override
-	public List<PointTrack> getDroppedTracks() {
+	public List<PointTrack> getDroppedTracks( List<PointTrack> list ) {
+		if( list == null )
+			list = new ArrayList<PointTrack>();
+
+		list.addAll(tracksDropped);
 		return tracksDropped;
 	}
 
 	@Override
-	public List<PointTrack> getNewTracks() {
+	public List<PointTrack> getNewTracks( List<PointTrack> list ) {
+		if( list == null )
+			list = new ArrayList<PointTrack>();
+
+		list.addAll(tracksNew);
 		return tracksNew;
 	}
 
 	@Override
-	public List<PointTrack> getAllTracks() {
+	public List<PointTrack> getAllTracks( List<PointTrack> list ) {
+		if( list == null )
+			list = new ArrayList<PointTrack>();
+
+		list.addAll(tracksAll);
 		return tracksAll;
 	}
 

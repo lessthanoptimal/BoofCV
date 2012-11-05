@@ -30,8 +30,8 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 
 /**
- * @author Peter Abeles
- */
+* @author Peter Abeles
+*/
 @SuppressWarnings("unchecked")
 public class TestKeyFramePointTracker {
 
@@ -40,17 +40,17 @@ public class TestKeyFramePointTracker {
 		Dummy tracker = new Dummy(0,2,5);
 		KeyFramePointTracker alg = new KeyFramePointTracker(tracker);
 
-		assertEquals(0, alg.getActiveTracks().size());
-		assertEquals(0, alg.getActivePairs().size());
+		assertEquals(0, alg.getActiveTracks(null).size());
+		assertEquals(0, alg.getActivePairs(null).size());
 
-		alg.spawnTracks();
+		alg.spawnTracks(null);
 		alg.setKeyFrame();
-		assertEquals(5, alg.getActivePairs().size());
+		assertEquals(5, alg.getActivePairs(null).size());
 
 		alg.process(null);
 
-		assertEquals(3, alg.getActiveTracks().size());
-		assertEquals(3, alg.getActivePairs().size());
+		assertEquals(3, alg.getActiveTracks(null).size());
+		assertEquals(3, alg.getActivePairs(null).size());
 		assertEquals(1, tracker.numCalledSpawn);
 	}
 
@@ -59,13 +59,13 @@ public class TestKeyFramePointTracker {
 		Dummy tracker = new Dummy(0,0,5);
 		KeyFramePointTracker alg = new KeyFramePointTracker(tracker);
 
-		assertEquals(0, alg.getActivePairs().size());
+		assertEquals(0, alg.getActivePairs(null).size());
 
-		alg.spawnTracks();
+		alg.spawnTracks(null);
 		alg.setKeyFrame();
 
-		assertEquals(5, alg.getActiveTracks().size());
-		assertEquals(5, alg.getActivePairs().size());
+		assertEquals(5, alg.getActiveTracks(null).size());
+		assertEquals(5, alg.getActivePairs(null).size());
 		assertEquals(1, tracker.numCalledSpawn);
 	}
 
@@ -73,10 +73,10 @@ public class TestKeyFramePointTracker {
 	public void spawnTracks() {
 		Dummy tracker = new Dummy(0,0,5);
 		KeyFramePointTracker alg = new KeyFramePointTracker(tracker);
-		
-		alg.spawnTracks();
 
-		assertEquals(5, alg.getActivePairs().size());
+		alg.spawnTracks(null);
+
+		assertEquals(5, alg.getActivePairs(null).size());
 		assertEquals(1, tracker.numCalledSpawn);
 	}
 
@@ -84,13 +84,13 @@ public class TestKeyFramePointTracker {
 	public void dropTrack() {
 		Dummy tracker = new Dummy(0,0,5);
 		KeyFramePointTracker alg = new KeyFramePointTracker(tracker);
-		
-		alg.spawnTracks();
+
+		alg.spawnTracks(null);
 		alg.setKeyFrame();
 		alg.dropTrack(tracker.active.get(0));
 
-		assertEquals(4, alg.getActiveTracks().size());
-		assertEquals(4, alg.getActivePairs().size());
+		assertEquals(4, alg.getActiveTracks(null).size());
+		assertEquals(4, alg.getActivePairs(null).size());
 	}
 
 	@Test
@@ -98,17 +98,17 @@ public class TestKeyFramePointTracker {
 		Dummy tracker = new Dummy(0,0,5);
 		KeyFramePointTracker alg = new KeyFramePointTracker(tracker);
 
-		alg.spawnTracks();
+		alg.spawnTracks(null);
 		alg.setKeyFrame();
-		assertEquals(5, alg.getActivePairs().size());
+		assertEquals(5, alg.getActivePairs(null).size());
 
 		alg.reset();
 
-		assertEquals(0, alg.getActivePairs().size());
+		assertEquals(0, alg.getActivePairs(null).size());
 		assertEquals(1,tracker.numCalledDrop);
 	}
 
-	private static class Dummy implements ImagePointTracker {
+	private static class Dummy implements ImagePointTracker<ImageBase> {
 
 		List<PointTrack> spawned = new ArrayList<PointTrack>();
 		List<PointTrack> active = new ArrayList<PointTrack>();
@@ -117,13 +117,13 @@ public class TestKeyFramePointTracker {
 		int numCalledSpawn = 0;
 		int numCalledProcess = 0;
 		int numCalledDrop= 0;
-		
+
 		int numDrop;
 		int numToSpawn;
 
 		public Dummy() {
 		}
-		
+
 		public Dummy( int numActive , int numDrop , int numToSpawn ) {
 			for( int i = 0; i < numActive; i++ ) {
 				active.add( new PointTrack());
@@ -139,7 +139,7 @@ public class TestKeyFramePointTracker {
 		@Override
 		public void process(ImageBase image) {
 			numCalledProcess++;
-			
+
 			for( int i = 0; i < numDrop; i++ ) {
 				dropped.add( active.remove(i) );
 			}
@@ -171,22 +171,22 @@ public class TestKeyFramePointTracker {
 		}
 
 		@Override
-		public List<PointTrack> getAllTracks() {
+		public List<PointTrack> getAllTracks(List<PointTrack> list) {
 			return null;
 		}
 
 		@Override
-		public List<PointTrack> getActiveTracks() {
+		public List<PointTrack> getActiveTracks( List<PointTrack> list ) {
 			return active;
 		}
 
 		@Override
-		public List<PointTrack> getDroppedTracks() {
+		public List<PointTrack> getDroppedTracks( List<PointTrack> list ) {
 			return dropped;
 		}
 
 		@Override
-		public List<PointTrack> getNewTracks() {
+		public List<PointTrack> getNewTracks( List<PointTrack> list ) {
 			return spawned;
 		}
 	}

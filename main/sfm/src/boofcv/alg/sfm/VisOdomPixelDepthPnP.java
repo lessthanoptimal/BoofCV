@@ -147,7 +147,7 @@ public class VisOdomPixelDepthPnP<T extends ImageBase> {
 	private void changePoseToReference() {
 		Se3_F64 keyToCurr = currToKey.invert(null);
 
-		List<PointPoseTrack> all = tracker.getAllPairs();
+		List<PointPoseTrack> all = tracker.getAllPairs(null);
 
 		for( PointPoseTrack t : all ) {
 			SePointOps_F64.transform(keyToCurr,t.location,t.location);
@@ -163,19 +163,17 @@ public class VisOdomPixelDepthPnP<T extends ImageBase> {
 	 */
 	private int dropUnusedTracks() {
 
-		List<PointPoseTrack> all = tracker.getAllPairs();
+		List<PointPoseTrack> all = tracker.getAllPairs(null);
+		int num = 0;
 
-		List<PointPoseTrack> drop = new ArrayList<PointPoseTrack>();
 		for( PointPoseTrack t : all ) {
 			if( tick - t.lastInlier >= thresholdRetire ) {
-				drop.add(t);
+				tracker.dropTrack(t);
+				num++;
 			}
 		}
 
-		for( PointPoseTrack t : drop ) {
-			tracker.dropTrack(t);
-		}
-		return drop.size();
+		return num;
 	}
 
 	/**
@@ -185,9 +183,7 @@ public class VisOdomPixelDepthPnP<T extends ImageBase> {
 //		System.out.println("----------- Adding new tracks ---------------");
 
 		pixelTo3D.initialize();
-		List<PointPoseTrack> spawned = tracker.spawnTracks();
-
-		List<PointPoseTrack> drop = new ArrayList<PointPoseTrack>();
+		List<PointPoseTrack> spawned = tracker.spawnTracks(null);
 
 		// estimate 3D coordinate using stereo vision
 		for( PointPoseTrack p : spawned ) {
@@ -195,7 +191,7 @@ public class VisOdomPixelDepthPnP<T extends ImageBase> {
 
 			// discard point if it can't localized
 			if( !pixelTo3D.process(pixel.x,pixel.y) || pixelTo3D.getW() == 0 ) {
-				drop.add(p);
+				tracker.dropTrack(p);
 			} else {
 				Point3D_F64 X = p.getLocation();
 
@@ -211,11 +207,6 @@ public class VisOdomPixelDepthPnP<T extends ImageBase> {
 				spawnedTracks.add(p);
 			}
 		}
-
-		// drop tracks which couldn't be triangulated
-		for( PointPoseTrack p : drop ) {
-			tracker.dropTrack(p);
-		}
 	}
 
 	/**
@@ -227,7 +218,7 @@ public class VisOdomPixelDepthPnP<T extends ImageBase> {
 
 		List<Point2D3D> obs = new ArrayList<Point2D3D>();
 
-		for( PointPoseTrack t : tracker.getActivePairs() ) {
+		for( PointPoseTrack t : tracker.getActivePairs(null) ) {
 			Point2D3D p = new Point2D3D();
 
 			p.location = t.getLocation();
@@ -255,7 +246,7 @@ public class VisOdomPixelDepthPnP<T extends ImageBase> {
 		int N = motionEstimator.getMatchSet().size();
 		for( int i = 0; i < N; i++ ) {
 			int index = motionEstimator.getInputIndex(i);
-			PointPoseTrack t = tracker.getActivePairs().get(index);
+			PointPoseTrack t = tracker.getActivePairs(null).get(index);
 			t.lastInlier = tick;
 			inlierTracks.add( t );
 		}

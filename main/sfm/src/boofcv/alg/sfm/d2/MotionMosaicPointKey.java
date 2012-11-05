@@ -113,7 +113,7 @@ public class MotionMosaicPointKey<I extends ImageSingleBand, T extends Invertibl
 				pruneClose.resize(width,height);
 				// prune some of the ones which are too close
 				prune.clear();
-				pruneClose.process(tracker.getActiveTracks(),prune);
+				pruneClose.process(tracker.getActiveTracks(null),prune);
 				for( PointTrack t : prune ) {
 					tracker.dropTrack(t);
 				}
