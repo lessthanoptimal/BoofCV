@@ -16,15 +16,11 @@
  * limitations under the License.
  */
 
-package boofcv.abst.feature.trackers;
+package boofcv.abst.feature.tracker;
 
-import boofcv.abst.feature.tracker.ImagePointTracker;
-import boofcv.abst.feature.tracker.PstWrapperKltPyramid;
 import boofcv.alg.tracker.pklt.PkltManager;
 import boofcv.alg.tracker.pklt.PkltManagerConfig;
-import boofcv.alg.tracker.pklt.PyramidKltFeature;
 import boofcv.struct.image.ImageFloat32;
-import org.junit.Before;
 
 
 /**
@@ -36,34 +32,11 @@ public class TestPstWrapperKltPyramid extends StandardImagePointTracker<ImageFlo
 	PkltManager<ImageFloat32,ImageFloat32> manager;
 	PstWrapperKltPyramid<ImageFloat32,ImageFloat32> pointTracker;
 
-	@Before
-	public void init() {
+	@Override
+	public ImagePointTracker<ImageFloat32> createTracker() {
 		config = PkltManagerConfig.createDefault(ImageFloat32.class,ImageFloat32.class);
 		manager = new PkltManager<ImageFloat32,ImageFloat32>(config);
 		pointTracker = new PstWrapperKltPyramid<ImageFloat32,ImageFloat32>(manager);
-	}
-
-	@Override
-	public void trackUpdateDrop(ImagePointTracker<ImageFloat32> tracker) {
-		PkltManager<?,?> m = ((PstWrapperKltPyramid)tracker).getTrackManager();
-
-		// this will force it to drop the tracks
-		for( PyramidKltFeature f : m.getTracks() ) {
-			f.desc[0].Gxx = 0;
-			f.desc[0].Gyy = 0;
-			f.desc[0].Gxy = 0;
-		}
-		tracker.process(image);
-	}
-
-	@Override
-	public void trackUpdateChangePosition(ImagePointTracker<ImageFloat32> tracker) {
-		tracker.process(image);
-	}
-
-	@Override
-	public ImagePointTracker<ImageFloat32> createTracker() {
-		pointTracker.process(image);
 		return pointTracker;
 	}
 }

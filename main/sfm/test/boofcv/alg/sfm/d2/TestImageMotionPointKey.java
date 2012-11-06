@@ -30,8 +30,7 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
 * @author Peter Abeles
@@ -58,13 +57,13 @@ public class TestImageMotionPointKey {
 		// specify an initial transform
 		alg.setInitialTransform(initial);
 
-		// the first time it processes an image it should always return true since no motion is estimated
-		assertTrue(alg.process(input));
+		// the first time it processes an image it should always return false since no motion can be estimated
+		assertFalse(alg.process(input));
+		assertEquals(0, tracker.numSpawn);
 
-		// the transform should be the same as the initial one
-		// and requested that new tracks be spawned
-		Se2_F32 found = alg.getWorldToCurr();
-		assertEquals(initial.getX(), found.getX(), 1e-8);
+		// make the current frame into the keyframe
+		// request that the current frame is a keyframe
+		alg.changeKeyFrame();
 		assertEquals(1, tracker.numSpawn);
 
 		// now it should compute some motion
@@ -79,7 +78,7 @@ public class TestImageMotionPointKey {
 
 		// see if this transform was correctly computed
 		Se2_F32 worldToCurr = initial.concat(keyToCurr, null);
-		found = alg.getWorldToCurr();
+		Se2_F32 found = alg.getWorldToCurr();
 		assertEquals(worldToCurr.getX(), found.getX(), 1e-8);
 	}
 
@@ -119,6 +118,7 @@ public class TestImageMotionPointKey {
 
 		// process twice to change the transforms
 		alg.process(input);
+		alg.changeKeyFrame();
 		alg.process(input);
 
 		// sanity check
@@ -142,21 +142,25 @@ public class TestImageMotionPointKey {
 		public int numSpawn = 0;
 		public int numDropped = 0;
 
+		List<PointTrack> list = new ArrayList<PointTrack>();
+		List<PointTrack> listSpawned = new ArrayList<PointTrack>();
+
 		@Override
-		public void reset() {
-			//To change body of implemented methods use File | Settings | File Templates.
-		}
+		public void reset() {}
 
 		@Override
 		public void process(ImageUInt8 image) {}
 
 		@Override
-		public boolean addTrack(double x, double y) {
-			return true;
+		public void spawnTracks() {
+			numSpawn++;
+			listSpawned.clear();
+			for( int i = 0; i < 5; i++ ){
+				PointTrack t = new PointTrack();
+				listSpawned.add(t);
+				list.add(t);
+			}
 		}
-
-		@Override
-		public void spawnTracks() {numSpawn++;}
 
 		@Override
 		public void dropAllTracks() {}
@@ -165,11 +169,15 @@ public class TestImageMotionPointKey {
 		public void dropTrack(PointTrack track) {numDropped++;}
 
 		@Override
-		public List<PointTrack> getAllTracks( List<PointTrack> list ) {return null;}
+		public List<PointTrack> getAllTracks( List<PointTrack> list ) {
+			if( list == null ) list = new ArrayList<PointTrack>();
+			list.addAll(this.list);
+			return list;
+		}
 
 		@Override
 		public List<PointTrack> getActiveTracks(List<PointTrack> list) {
-			return new ArrayList<PointTrack>();
+			return getAllTracks(list);
 		}
 
 		@Override
@@ -179,7 +187,9 @@ public class TestImageMotionPointKey {
 
 		@Override
 		public List<PointTrack> getNewTracks(List<PointTrack> list) {
-			return new ArrayList<PointTrack>();
+			if( list == null ) list = new ArrayList<PointTrack>();
+			list.addAll(this.listSpawned);
+			return list;
 		}
 	}
 

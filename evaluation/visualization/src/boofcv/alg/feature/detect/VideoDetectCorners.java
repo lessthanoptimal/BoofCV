@@ -151,7 +151,7 @@ public class VideoDetectCorners<T extends ImageSingleBand, D extends ImageSingle
 		String fileName;
 
 		if (args.length == 0) {
-			fileName = "/media/backup/datasets/2010/snow_videos/snow_norail_stabilization.avi";
+			fileName = "../applet/data/zoom.mjpeg";
 		} else {
 			fileName = args[0];
 		}

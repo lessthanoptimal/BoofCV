@@ -118,11 +118,9 @@ public class PstWrapperKltPyramid <I extends ImageSingleBand,D extends ImageSing
 	@Override
 	public void dropAllTracks() {
 		trackManager.dropAllTracks();
-		dropped.addAll(active);
 		active.clear();
 	}
 
-	@Override
 	public boolean addTrack(double x, double y) {
 		if( trackManager.addTrack((float)x,(float)y) ) {
 			List<PyramidKltFeature> spawnList = trackManager.getSpawned();
@@ -176,7 +174,6 @@ public class PstWrapperKltPyramid <I extends ImageSingleBand,D extends ImageSing
 			throw new RuntimeException("Not in active list!");
 		}
 		trackManager.dropTrack( (PyramidKltFeature)track.getDescription() );
-		dropped.add(track);
 	}
 
 	@Override

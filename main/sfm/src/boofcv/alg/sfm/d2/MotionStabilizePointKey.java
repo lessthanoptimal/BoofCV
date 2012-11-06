@@ -81,18 +81,19 @@ public class MotionStabilizePointKey<I extends ImageSingleBand, T extends Invert
 	
 	@Override
 	public boolean process( I frame ) {
-		if( !super.process(frame) )
-			return false;
+		if( !super.process(frame) ) {
+			if( totalProcessed == 1 ) {
+				// it just started tracking of there will be of course no motion so the motion
+				// matcher has not been run
+				isKeyFrame = true;
+				changeKeyFrame();
+				return true;
+			} else
+				return false;
+		}
 
 		isReset = false;
 		isKeyFrame = false;
-
-		if( totalProcessed == 1 ) {
-			// it just started tracking of there will be of course no motion so the motion
-			// matcher has not been run
-			isKeyFrame = true;
-			return true;
-		}
 
 		int inliers = modelMatcher.getMatchSet().size();
 

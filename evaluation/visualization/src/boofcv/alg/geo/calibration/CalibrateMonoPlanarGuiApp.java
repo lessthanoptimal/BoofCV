@@ -208,6 +208,7 @@ public class CalibrateMonoPlanarGuiApp extends JPanel
 //		String directory = "../data/evaluation/calibration/stereo/Bumblebee2_Square";
 
 		CalibrateMonoPlanarGuiApp app = new CalibrateMonoPlanarGuiApp();
+//		app.configure(detector,target,BoofMiscOps.directoryList(directory, "frame" ),false);
 //		app.configure(detector,target,BoofMiscOps.directoryList(directory, "left" ),false);
 		app.configure(detector,target,BoofMiscOps.directoryList(directory, "CalibIm" ),false);
 

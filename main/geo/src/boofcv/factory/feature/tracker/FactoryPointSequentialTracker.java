@@ -181,7 +181,7 @@ public class FactoryPointSequentialTracker {
 		if( derivType == null )
 			derivType = GImageDerivativeOps.getDerivativeType(imageType);
 
-		DescribePointBrief<I> alg = FactoryDescribePointAlgs.brief(FactoryBriefDefinition.gaussian2(new Random(123), 16, 512),
+		DescribePointBrief<I> brief = FactoryDescribePointAlgs.brief(FactoryBriefDefinition.gaussian2(new Random(123), 16, 512),
 				FactoryBlurFilter.gaussian(imageType, 0, 4));
 
 		GeneralFeatureDetector<I,D> corner = FactoryDetectPoint.createShiTomasi(detectionRadius,false,cornerThreshold, maxFeatures, derivType);
@@ -192,7 +192,7 @@ public class FactoryPointSequentialTracker {
 		GeneralAssociation<TupleDesc_B> association =
 				FactoryAssociation.greedy(score, maxAssociationError, maxFeatures, true);
 
-		DetectAssociateTracker<I,TupleDesc_B> dat = new DetectAssociateTracker<I,TupleDesc_B>(detector, new WrapDescribeBrief<I>(alg), association);
+		DetectAssociateTracker<I,TupleDesc_B> dat = new DetectAssociateTracker<I,TupleDesc_B>(detector, new WrapDescribeBrief<I>(brief), association);
 
 		dat.setPruneThreshold(pruneAfter);
 

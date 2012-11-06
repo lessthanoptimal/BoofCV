@@ -126,7 +126,7 @@ public class VideoDetectInterestPoints<T extends ImageSingleBand>
 		String fileName;
 
 		if (args.length == 0) {
-			fileName = "/home/pja/projects/boofcv/snow_norail_stabilization.avi";
+			fileName = "../applet/data/zoom.mjpeg";
 		} else {
 			fileName = args[0];
 		}

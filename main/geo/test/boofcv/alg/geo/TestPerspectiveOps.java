@@ -43,7 +43,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Peter Abeles
@@ -54,7 +55,22 @@ public class TestPerspectiveOps {
 
 	@Test
 	public void scaleIntrinsic() {
-		fail("Implement");
+		Point3D_F64 X = new Point3D_F64(0.1,0.3,2);
+
+		IntrinsicParameters param = new IntrinsicParameters(200,300,2,250,260,200,300, true, null);
+		DenseMatrix64F K = PerspectiveOps.calibrationMatrix(param,null);
+
+		// find the pixel location in the unscaled image
+		Point2D_F64 a = PerspectiveOps.renderPixel(new Se3_F64(),K,X);
+
+		PerspectiveOps.scaleIntrinsic(param,0.5);
+		K = PerspectiveOps.calibrationMatrix(param,null);
+
+		// find the pixel location in the scaled image
+		Point2D_F64 b = PerspectiveOps.renderPixel(new Se3_F64(),K,X);
+
+		assertEquals(a.x*0.5,b.x,1e-8);
+		assertEquals(a.y*0.5,b.y,1e-8);
 	}
 
 	@Test

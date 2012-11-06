@@ -106,6 +106,11 @@ public class DetectSquareCalibrationPoints {
 	 */
 	public boolean process( ImageUInt8 thresholded )
 	{
+		// discard old results
+		interestPoints = new ArrayList<Point2D_F64>();
+		interestSquares = new ArrayList<QuadBlob>();
+
+		// initialize data structures
 		binaryA.reshape(thresholded.width,thresholded.height);
 		binaryB.reshape(thresholded.width,thresholded.height);
 
