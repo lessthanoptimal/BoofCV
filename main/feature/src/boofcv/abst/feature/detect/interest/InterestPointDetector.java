@@ -80,6 +80,10 @@ public interface InterestPointDetector< T extends ImageSingleBand > {
 	/**
 	 * The radius of a feature at a scale of one in pixels.
 	 *
+	 * TODO See comment in feature_todo.txt  This function might need to be redfined.
+	 *
+	 * Possible redefintion: radius of the detected blob's contour.  Get rid of scale?
+	 *
 	 * @return Size of a feature at scale one in pixels.
 	 */
 	double getCanonicalRadius();

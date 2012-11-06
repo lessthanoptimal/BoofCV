@@ -16,6 +16,9 @@ Trackers
   * FH detector is probably incorrect
   * Make sure trackers use canonical radius and add a tuning parameter to scale up or down
     - This will allow detectors to be swapped with less problems
+  * See ExampleInterestPoint.  The returned InterestPointDetector.getCanonicalRadius() is too large in SURF
+  * Display shows what is visually pleasing to a person.  Descriptor needs a radius that corresponds to the area
+    that it samples.
 
 - BRIEF association
  * Look up table for hamming distance to speed things up

@@ -63,7 +63,9 @@ public class ExampleInterestPoint {
 		Graphics2D g2 = image.createGraphics();
 		FancyInterestPointRender render = new FancyInterestPointRender();
 
-		double detectorRadius = detector.getCanonicalRadius();
+		// detector radius tends to be bigger than what's visually pleasing because it includes the contour
+		// region which is being sampled
+		double detectorRadius = detector.getCanonicalRadius()*0.6;
 
 		for( int i = 0; i < detector.getNumberOfFeatures(); i++ ) {
 			Point2D_F64 pt = detector.getLocation(i);
