@@ -184,7 +184,7 @@ public class KeyFramePointTracker<I extends ImageBase, R extends KeyFrameTrack> 
 	 *
 	 * @return associated pairs
 	 */
-	public List<R> getActivePairs(  List<R> l ) {
+	public List<R> getActivePairs( List<R> l ) {
 		if( l == null )
 			l = new ArrayList<R>();
 

@@ -45,7 +45,8 @@ public class ConvertBufferedImage {
 	 * @return An image whose internal data is the same as the input image.
 	 */
 	public static ImageInterleavedInt8 extractInterlacedInt8(BufferedImage img) {
-		if (img.getRaster() instanceof ByteInterleavedRaster) {
+		if (img.getRaster() instanceof ByteInterleavedRaster &&
+				img.getType() != BufferedImage.TYPE_BYTE_INDEXED ) {
 			ByteInterleavedRaster raster = (ByteInterleavedRaster) img.getRaster();
 			ImageInterleavedInt8 ret = new ImageInterleavedInt8();
 
@@ -57,7 +58,7 @@ public class ConvertBufferedImage {
 
 			return ret;
 		}
-		throw new IllegalArgumentException("Buffered image does not have a byte raster");
+		throw new IllegalArgumentException("Buffered image does not have an interlaced int raster");
 	}
 
 	/**
@@ -70,7 +71,8 @@ public class ConvertBufferedImage {
 	 * @return An image whose internal data is the same as the input image.
 	 */
 	public static ImageUInt8 extractImageInt8(BufferedImage img) {
-		if (img.getRaster() instanceof ByteInterleavedRaster) {
+		if (img.getRaster() instanceof ByteInterleavedRaster &&
+				img.getType() != BufferedImage.TYPE_BYTE_INDEXED ) {
 			ByteInterleavedRaster raster = (ByteInterleavedRaster) img.getRaster();
 			if (raster.getNumBands() != 1)
 				throw new IllegalArgumentException("Input image has more than one channel");
@@ -83,7 +85,7 @@ public class ConvertBufferedImage {
 
 			return ret;
 		}
-		throw new IllegalArgumentException("Buffered image does not have a byte raster");
+		throw new IllegalArgumentException("Buffered image does not have a gray scale byte raster");
 	}
 
 	/**
@@ -226,7 +228,8 @@ public class ConvertBufferedImage {
 		}
 
 		try {
-			if (src.getRaster() instanceof ByteInterleavedRaster) {
+			if (src.getRaster() instanceof ByteInterleavedRaster &&
+					src.getType() != BufferedImage.TYPE_BYTE_INDEXED ) {
 				ConvertRaster.bufferedToGray((ByteInterleavedRaster) src.getRaster(), dst);
 			} else if (src.getRaster() instanceof IntegerInterleavedRaster) {
 				ConvertRaster.bufferedToGray((IntegerInterleavedRaster) src.getRaster(), dst);
@@ -259,7 +262,8 @@ public class ConvertBufferedImage {
 		}
 
 		try {
-			if (src.getRaster() instanceof ByteInterleavedRaster ) {
+			if (src.getRaster() instanceof ByteInterleavedRaster &&
+					src.getType() != BufferedImage.TYPE_BYTE_INDEXED ) {
 				ConvertRaster.bufferedToGray((ByteInterleavedRaster) src.getRaster(), dst);
 			} else if (src.getRaster() instanceof IntegerInterleavedRaster) {
 				ConvertRaster.bufferedToGray((IntegerInterleavedRaster) src.getRaster(), dst);
@@ -297,8 +301,13 @@ public class ConvertBufferedImage {
 		if( type == ImageUInt8.class ) {
 			try {
 				if (src.getRaster() instanceof ByteInterleavedRaster &&
-						src.getType() != BufferedImage.TYPE_BYTE_GRAY ) {
-					ConvertRaster.bufferedToMulti_U8((ByteInterleavedRaster) src.getRaster(), (MultiSpectral<ImageUInt8>)dst);
+						src.getType() != BufferedImage.TYPE_BYTE_INDEXED ) {
+					if( src.getType() == BufferedImage.TYPE_BYTE_GRAY)  {
+						for( int i = 0; i < dst.getNumBands(); i++ )
+							ConvertRaster.bufferedToGray(src, ((MultiSpectral<ImageUInt8>) dst).getBand(i));
+					} else {
+						ConvertRaster.bufferedToMulti_U8((ByteInterleavedRaster) src.getRaster(), (MultiSpectral<ImageUInt8>)dst);
+					}
 				} else if (src.getRaster() instanceof IntegerInterleavedRaster) {
 					ConvertRaster.bufferedToMulti_U8((IntegerInterleavedRaster) src.getRaster(), (MultiSpectral<ImageUInt8>)dst);
 				} else {
@@ -310,7 +319,8 @@ public class ConvertBufferedImage {
 			}
 		} else if( type == ImageFloat32.class ) {
 			try {
-				if (src.getRaster() instanceof ByteInterleavedRaster ) {
+				if (src.getRaster() instanceof ByteInterleavedRaster &&
+						src.getType() != BufferedImage.TYPE_BYTE_INDEXED  ) {
 					if( src.getType() == BufferedImage.TYPE_BYTE_GRAY)  {
 						for( int i = 0; i < dst.getNumBands(); i++ )
 							ConvertRaster.bufferedToGray(src,((MultiSpectral<ImageFloat32>)dst).getBand(i));
@@ -377,7 +387,8 @@ public class ConvertBufferedImage {
 		dst = checkInputs(src, dst);
 
 		try {
-			if (dst.getRaster() instanceof ByteInterleavedRaster) {
+			if (dst.getRaster() instanceof ByteInterleavedRaster &&
+					dst.getType() != BufferedImage.TYPE_BYTE_INDEXED ) {
 				ConvertRaster.grayToBuffered(src, (ByteInterleavedRaster) dst.getRaster());
 			} else if (dst.getRaster() instanceof IntegerInterleavedRaster) {
 				ConvertRaster.grayToBuffered(src, (IntegerInterleavedRaster) dst.getRaster());
@@ -405,7 +416,8 @@ public class ConvertBufferedImage {
 		dst = checkInputs(src, dst);
 
 		try {
-			if (dst.getRaster() instanceof ByteInterleavedRaster) {
+			if (dst.getRaster() instanceof ByteInterleavedRaster &&
+					dst.getType() != BufferedImage.TYPE_BYTE_INDEXED ) {
 				ConvertRaster.grayToBuffered(src, (ByteInterleavedRaster) dst.getRaster());
 			} else if (dst.getRaster() instanceof IntegerInterleavedRaster) {
 				ConvertRaster.grayToBuffered(src, (IntegerInterleavedRaster) dst.getRaster());
@@ -434,7 +446,8 @@ public class ConvertBufferedImage {
 		dst = checkInputs(src, dst);
 
 		try {
-			if (dst.getRaster() instanceof ByteInterleavedRaster) {
+			if (dst.getRaster() instanceof ByteInterleavedRaster &&
+					dst.getType() != BufferedImage.TYPE_BYTE_INDEXED ) {
 				ConvertRaster.grayToBuffered(src, (ByteInterleavedRaster) dst.getRaster());
 			} else if (dst.getRaster() instanceof IntegerInterleavedRaster) {
 				ConvertRaster.grayToBuffered(src, (IntegerInterleavedRaster) dst.getRaster());
@@ -462,7 +475,8 @@ public class ConvertBufferedImage {
 		dst = checkInputs(src, dst);
 
 		try {
-			if (dst.getRaster() instanceof ByteInterleavedRaster) {
+			if (dst.getRaster() instanceof ByteInterleavedRaster &&
+					dst.getType() != BufferedImage.TYPE_BYTE_INDEXED ) {
 				ConvertRaster.multToBuffered_U8(src, (ByteInterleavedRaster) dst.getRaster());
 			} else if (dst.getRaster() instanceof IntegerInterleavedRaster) {
 				ConvertRaster.multToBuffered_U8(src, (IntegerInterleavedRaster) dst.getRaster());
@@ -490,7 +504,8 @@ public class ConvertBufferedImage {
 		dst = checkInputs(src, dst);
 
 		try {
-			if (dst.getRaster() instanceof ByteInterleavedRaster) {
+			if (dst.getRaster() instanceof ByteInterleavedRaster &&
+					dst.getType() != BufferedImage.TYPE_BYTE_INDEXED ) {
 				ConvertRaster.multToBuffered_F32(src, (ByteInterleavedRaster) dst.getRaster());
 			} else if (dst.getRaster() instanceof IntegerInterleavedRaster) {
 				ConvertRaster.multToBuffered_F32(src, (IntegerInterleavedRaster) dst.getRaster());

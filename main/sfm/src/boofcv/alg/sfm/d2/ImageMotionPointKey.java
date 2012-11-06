@@ -94,6 +94,8 @@ public class ImageMotionPointKey<I extends ImageSingleBand, T extends Invertible
 	 */
 	public void setInitialTransform( T worldToInit) {
 		this.worldToInit.set(worldToInit);
+		this.keyToCurr.set(worldToInit);
+		this.worldToCurr.set(worldToInit);
 	}
 
 	/**
@@ -127,7 +129,7 @@ public class ImageMotionPointKey<I extends ImageSingleBand, T extends Invertible
 	 * Processes the next frame in the sequence.
 	 *
 	 * @param frame Next frame in the video sequence
-	 * @return If a fatal error occurred or not.
+	 * @return true if motion was estimated and false if no motion was estimated
 	 */
 	public boolean process( I frame ) {
 		// update the feature tracker

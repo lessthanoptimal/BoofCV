@@ -34,6 +34,8 @@ import static org.junit.Assert.*;
 /**
  * @author Peter Abeles
  */
+// TODO Add unit tests for converting to and from BufferedImage.TYPE_BYTE_INDEXED
+//      Maybe just compare to RGB convert?  that's what it should be calling
 public class TestConvertBufferedImage {
 
 	Random rand = new Random(234);
@@ -52,6 +54,13 @@ public class TestConvertBufferedImage {
 		assertEquals(3, found.numBands);
 		assertTrue(found.data != null);
 		assertEquals(imgWidth * imgHeight * 3, found.data.length);
+	}
+
+	@Test(expected=IllegalArgumentException.class)
+	public void extractInterlacedInt8_indexed() {
+		BufferedImage origImg = new BufferedImage(imgWidth,imgHeight,BufferedImage.TYPE_BYTE_INDEXED);
+
+		ConvertBufferedImage.extractInterlacedInt8(origImg);
 	}
 
 	@Test
@@ -74,6 +83,13 @@ public class TestConvertBufferedImage {
 		assertEquals(imgHeight, found.height);
 		assertTrue(found.data != null);
 		assertEquals(imgWidth * imgHeight, found.data.length);
+	}
+
+	@Test(expected=IllegalArgumentException.class)
+	public void extractImageInt8_indexed() {
+		BufferedImage origImg = new BufferedImage(imgWidth,imgHeight,BufferedImage.TYPE_BYTE_INDEXED);
+
+		ConvertBufferedImage.extractImageInt8(origImg);
 	}
 
 	@Test

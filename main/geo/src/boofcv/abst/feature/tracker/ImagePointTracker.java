@@ -24,7 +24,7 @@ import java.util.List;
 
 /**
  * <p>
- * Interface for tracking point features in a sequence of images.  Features are automatically
+ * Interface for tracking natural point features in a sequence of images.  Features are automatically
  * detected and tracked between consecutive frames in a video sequence. Access is provided
  * to the pixel location of each track.  Implementation specific track information is hidden
  * from the user.
@@ -55,16 +55,6 @@ public interface ImagePointTracker <T extends ImageBase> {
 	 * @param image Next image in the sequence
 	 */
 	void process( T image );
-
-	/**
-	 * Adds a new feature to be tracked at the specified location.
-	 *
-	 * @param x coordinate of the new feature being tracked.
-	 * @param y coordinate of the new feature being tracked.
-	 * @return If a new track was added or not.
-	 */
-	// TODO remove this function?
-	public boolean addTrack( double x , double y );
 
 	/**
 	 * Automatically selects new features in the image to track.

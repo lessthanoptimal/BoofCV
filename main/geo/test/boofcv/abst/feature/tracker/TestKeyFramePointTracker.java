@@ -16,11 +16,8 @@
  * limitations under the License.
  */
 
-package boofcv.abst.feature.trackers;
+package boofcv.abst.feature.tracker;
 
-import boofcv.abst.feature.tracker.ImagePointTracker;
-import boofcv.abst.feature.tracker.KeyFramePointTracker;
-import boofcv.abst.feature.tracker.PointTrack;
 import boofcv.struct.image.ImageBase;
 import org.junit.Test;
 
@@ -146,11 +143,6 @@ public class TestKeyFramePointTracker {
 		}
 
 		@Override
-		public boolean addTrack(double x, double y) {
-			return false;
-		}
-
-		@Override
 		public void spawnTracks() {
 			for( int i = 0; i < numToSpawn; i++ ) {
 				spawned.add( new PointTrack() );
@@ -177,17 +169,26 @@ public class TestKeyFramePointTracker {
 
 		@Override
 		public List<PointTrack> getActiveTracks( List<PointTrack> list ) {
-			return active;
+			if( list == null )
+				list = new ArrayList<PointTrack>();
+			list.addAll(active);
+			return list;
 		}
 
 		@Override
 		public List<PointTrack> getDroppedTracks( List<PointTrack> list ) {
-			return dropped;
+			if( list == null )
+				list = new ArrayList<PointTrack>();
+			list.addAll(dropped);
+			return list;
 		}
 
 		@Override
 		public List<PointTrack> getNewTracks( List<PointTrack> list ) {
-			return spawned;
+			if( list == null )
+				list = new ArrayList<PointTrack>();
+			list.addAll(spawned);
+			return list;
 		}
 	}
 }

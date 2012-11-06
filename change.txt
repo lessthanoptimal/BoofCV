@@ -56,6 +56,9 @@ Version : Alpha 0.11
   * Makes usage easier since now its impossible to drop a track while reading
     from the main list.
   * Updated implementations so that the internal list is not returned
+  * Removed addTrack() since only KLT supported that functionality, hence not generic.
+- ConvertBufferedImage
+  * Fixed bug where INDEXED images where not being converted correctly
  
 
 ---------------------------------------------

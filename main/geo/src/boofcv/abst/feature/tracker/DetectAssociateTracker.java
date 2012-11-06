@@ -61,13 +61,13 @@ public class DetectAssociateTracker<I extends ImageSingleBand, D extends TupleDe
 	private boolean keyFrameSet = false;
 
 	// all tracks
-	private List<PointTrack> tracksAll = new ArrayList<PointTrack>();
+	protected List<PointTrack> tracksAll = new ArrayList<PointTrack>();
 	// recently associated tracks
-	private List<PointTrack> tracksActive = new ArrayList<PointTrack>();
+	protected List<PointTrack> tracksActive = new ArrayList<PointTrack>();
 	// tracks dropped by the tracker
-	private List<PointTrack> tracksDropped = new ArrayList<PointTrack>();
+	protected List<PointTrack> tracksDropped = new ArrayList<PointTrack>();
 	// tracks recently spawned
-	private List<PointTrack> tracksNew = new ArrayList<PointTrack>();
+	protected List<PointTrack> tracksNew = new ArrayList<PointTrack>();
 
 	// previously declared tracks which are being recycled
 	protected List<PointTrack> unused = new ArrayList<PointTrack>();
@@ -205,11 +205,6 @@ public class DetectAssociateTracker<I extends ImageSingleBand, D extends TupleDe
 		}
 	}
 
-	@Override
-	public boolean addTrack(double x, double y) {
-		throw new IllegalArgumentException("Not supported.  Need to know orientation and/or scale.");
-	}
-
 	/**
 	 * Takes the current crop of detected features and makes them the keyframe
 	 */
@@ -249,7 +244,10 @@ public class DetectAssociateTracker<I extends ImageSingleBand, D extends TupleDe
 		keyFrameSet = true;
 	}
 
-	private PointTrack getUnused() {
+	/**
+	 * Returns an unused track.  If there are no unused tracks then it creates a ne one.
+	 */
+	protected PointTrack getUnused() {
 		PointTrack p;
 		if( unused.size() > 0 ) {
 			p = unused.remove( unused.size()-1 );
@@ -266,8 +264,6 @@ public class DetectAssociateTracker<I extends ImageSingleBand, D extends TupleDe
 	@Override
 	public void dropAllTracks() {
 		unused.addAll(tracksAll);
-		tracksDropped.clear();
-		tracksDropped.addAll(tracksActive);
 		tracksActive.clear();
 		tracksAll.clear();
 		tracksNew.clear();
@@ -326,7 +322,7 @@ public class DetectAssociateTracker<I extends ImageSingleBand, D extends TupleDe
 		return tracksAll;
 	}
 
-	private class TrackInfo
+	protected class TrackInfo
 	{
 		// which tick was it last associated at.  Used for dropping tracks
 		long lastAssociated;

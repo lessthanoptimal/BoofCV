@@ -21,14 +21,12 @@ package boofcv.alg.denoise;
 import boofcv.abst.denoise.WaveletDenoiseFilter;
 import boofcv.abst.filter.FilterImageInterface;
 import boofcv.abst.wavelet.WaveletTransform;
-import boofcv.alg.denoise.wavelet.DenoiseBayesShrink_F32;
-import boofcv.alg.denoise.wavelet.DenoiseSureShrink_F32;
-import boofcv.alg.denoise.wavelet.DenoiseVisuShrink_F32;
 import boofcv.alg.filter.derivative.LaplacianEdge;
 import boofcv.alg.misc.ImageTestingOps;
 import boofcv.alg.misc.PixelMath;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.core.image.border.BorderType;
+import boofcv.factory.denoise.FactoryDenoiseWaveletAlg;
 import boofcv.factory.filter.blur.FactoryBlurFilter;
 import boofcv.factory.transform.wavelet.FactoryWaveletCoiflet;
 import boofcv.factory.transform.wavelet.FactoryWaveletDaub;
@@ -122,12 +120,13 @@ public class DenoiseAccuracyStudyApp {
 
 		WaveletTransform<ImageFloat32, ImageFloat32,WlCoef_F32> waveletTran = FactoryWaveletTransform.create_F32(waveletDesc,numLevels);
 
+
 		FilterImageInterface<ImageFloat32,ImageFloat32> filter;
-		filter = new WaveletDenoiseFilter<ImageFloat32>(waveletTran,new DenoiseVisuShrink_F32());
+		filter = new WaveletDenoiseFilter<ImageFloat32>(waveletTran,FactoryDenoiseWaveletAlg.visu(ImageFloat32.class));
 		ret.add( new TestItem(filter,"Visu "+waveletName+" L = "+numLevels));
-		filter = new WaveletDenoiseFilter<ImageFloat32>(waveletTran,new DenoiseBayesShrink_F32(null));
+		filter = new WaveletDenoiseFilter<ImageFloat32>(waveletTran, FactoryDenoiseWaveletAlg.bayes(null,ImageFloat32.class));
 		ret.add( new TestItem(filter,"Bayes "+waveletName+" L = "+numLevels));
-		filter = new WaveletDenoiseFilter<ImageFloat32>(waveletTran,new DenoiseSureShrink_F32());
+		filter = new WaveletDenoiseFilter<ImageFloat32>(waveletTran,FactoryDenoiseWaveletAlg.sure(ImageFloat32.class));
 		ret.add( new TestItem(filter,"Sure "+waveletName+" L = "+numLevels));
 
 		return ret;
@@ -192,7 +191,7 @@ public class DenoiseAccuracyStudyApp {
 	public static void main( String args[] ) {
 		DenoiseAccuracyStudyApp app = new DenoiseAccuracyStudyApp();
 
-		String path = "data/evaluation/standard/";
+		String path = "../data/evaluation/standard/";
 
 		List<String> fileNames = new ArrayList<String>();
 		fileNames.add(path+"barbara.png");

@@ -62,6 +62,9 @@
 - Improve Sort Median Filter
  * Use bubble sort to avoid resorting each time
 
+- ConvertBufferedImage
+  * Add unit tests for converting to and from INDEXED BufferedImage
+
 - Have a morphological filter section?
  * Add gray scale morphological operators
  * Handle image edges for binary and gray scale

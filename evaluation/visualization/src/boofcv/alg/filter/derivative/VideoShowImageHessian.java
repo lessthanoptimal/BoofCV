@@ -95,7 +95,7 @@ public class VideoShowImageHessian extends ProcessImageSequence<ImageUInt8> {
 		String fileName;
 
 		if (args.length == 0) {
-			fileName = "/home/pja/uav_video.avi";
+			fileName = "../data/applet/zoom.mjpeg";
 		} else {
 			fileName = args[0];
 		}

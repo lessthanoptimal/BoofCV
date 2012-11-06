@@ -172,25 +172,24 @@ public class DetectCalibrationSquaresApp
 		}
 		Graphics2D g2 = workImage.createGraphics();
 		List<Point2D_F64> targetBounds = alg.getTargetQuadrilateral();
-		if( foundTarget ) {
 
-			List<Point2D_F64> targetPoints = alg.getInterestPoints();
-			if( calibGUI.isShowPoints())
-				drawPoints(g2, targetPoints);
+		List<Point2D_F64> targetPoints = alg.getInterestPoints();
+		if( calibGUI.isShowPoints())
+			drawPoints(g2, targetPoints);
+
+		if( foundTarget ) {
 			if( calibGUI.isShowNumbers())
 				drawNumbers(g2, targetPoints);
 			if( calibGUI.isShowGraph())
 				drawGraph(g2, alg.getInterestSquares());
-
+			if( calibGUI.isShowBound())
+				drawBounds(g2,targetBounds);
 			calibGUI.setSuccessMessage("FOUND",true);
 		} else {
-			drawSquareCorners(g2,alg.getInterestSquares(),Color.RED);
 			drawSquareCorners(g2,alg.getSquaresBad(),Color.BLUE);
 
 			calibGUI.setSuccessMessage("FAILED", false);
 		}
-		if( calibGUI.isShowBound())
-			drawBounds(g2,targetBounds);
 		
 		gui.setBufferedImage(workImage);
 		gui.setScale(calibGUI.getScale());
@@ -326,18 +325,20 @@ public class DetectCalibrationSquaresApp
 		DetectCalibrationSquaresApp app = new DetectCalibrationSquaresApp();
 
 //		String prefix = "../data/evaluation/calibration/mono/Sony_DSC-HX5V_Square/";
-		String prefix = "../data/evaluation/calibration/stereo/Bumblebee2_Square/";
+//		String prefix = "../data/evaluation/calibration/stereo/Bumblebee2_Square/";
+		String prefix = "../data/evaluation/calibration/mono/PULNiX_CCD_6mm_Zhang/";
 
 		app.loadConfigurationFile(prefix + "info.txt");
 
 		List<PathLabel> inputs = new ArrayList<PathLabel>();
 
-		for( int i = 1; i < 13; i++ ) {
+		for( int i = 1; i < 6; i++ ) {
 			String name = String.format("View %02d",i);
 //			String fileName = String.format("frame%02d.jpg",i);
 //			String fileName = String.format("left%02d.jpg",i);
-			String fileName = String.format("right%02d.jpg",i);
-			inputs.add(new PathLabel(name,prefix+fileName));
+//			String fileName = String.format("right%02d.jpg",i);
+			String fileName = String.format("CalibIm%d.gif",i);
+			inputs.add(new PathLabel(name, prefix + fileName));
 		}
 //		inputs.add(new PathLabel("View 01",prefix+"right02.jpg"));
 
