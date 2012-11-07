@@ -35,7 +35,6 @@ import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.PathLabel;
 import boofcv.io.image.SimpleImageSequence;
-import boofcv.io.wrapper.xuggler.XugglerMediaManager;
 import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
@@ -348,7 +347,7 @@ public class VisualizeStereoVisualOdometryApp <I extends ImageSingleBand>
 
 		VisualizeStereoVisualOdometryApp app = new VisualizeStereoVisualOdometryApp(type);
 
-		app.setMediaManager(new XugglerMediaManager());
+//		app.setMediaManager(new XugglerMediaManager());
 
 		List<PathLabel> inputs = new ArrayList<PathLabel>();
 		inputs.add(new PathLabel("Backyard", "../data/applet/vo/backyard/config.txt"));
