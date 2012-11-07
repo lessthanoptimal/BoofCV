@@ -136,7 +136,7 @@ public class ExampleAssociatePoints<T extends ImageSingleBand, FD extends TupleD
 		// select which algorithms to use
 		InterestPointDetector detector = FactoryInterestPoint.fastHessian(1, 2, 200, 1, 9, 4, 4);
 		DescribeRegionPoint describe = FactoryDescribeRegionPoint.surf(true, imageType);
-//		DescribeRegionPoint describe = FactoryDescribeRegionPoint.dat_ShiTomasi_BRIEF(16,512,-1,4,true, imageType);
+//		DescribeRegionPoint describe = FactoryDescribeRegionPoint.brief(16,512,-1,4,true, imageType);
 
 		ScoreAssociation scorer = FactoryAssociation.defaultScore(describe.getDescriptorType());
 		GeneralAssociation associate = FactoryAssociation.greedy(scorer, Double.MAX_VALUE, -1, true);

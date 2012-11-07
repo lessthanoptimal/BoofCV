@@ -29,7 +29,7 @@ public class BoofDefaults {
 	/**
 	 * String specifying BoofCV's version.
 	 */
-	public static String version = "0.10";
+	public static String version = "0.11";
 
 	// Use extended borders when computing image derivatives 
 	public static BorderType DERIV_BORDER_TYPE = BorderType.EXTENDED;
