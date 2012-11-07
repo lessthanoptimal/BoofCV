@@ -59,7 +59,7 @@ public class ExampleFeatureSurf {
 		// create the detector and descriptors
 		InterestPointDetector<ImageFloat32> detector = FactoryInterestPoint.fastHessian(0, 2, 200, 2, 9, 4, 4);
 		// BoofCV has two SURF implementations.
-		// surfm() = slower, but more accurate.  dat_SF_SURF() = faster and less accurate
+		// surfm() = slower, but more accurate.  surf() = faster and less accurate
 		DescribeRegionPoint<ImageFloat32,SurfFeature> descriptor =
 				FactoryDescribeRegionPoint.surfm(true,ImageFloat32.class);
 		
