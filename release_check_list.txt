@@ -1,4 +1,5 @@
 - Update BoofDefaults.version
+- Set release data in change.txt
 - Make sure all examples work
 - Make sure all applications in evaluation work
 - Update examples on website
