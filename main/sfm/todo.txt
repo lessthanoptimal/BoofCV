@@ -1,15 +1,3 @@
-- Stereo VO
- * Camera calibration
- * Stereo Rectification
- * Sparse Stereo Ranging
- * Use Mono Code from here
-
-- Simple Mono
-- Simple Stereo
-- Nister Mono
-- Nister Stereo
-
-- Simple Mono
-  * 3D world points
-  *Also try 3D homogeneous.
-   With right algorithms this might be able to handle points at infinity (rotations/distance) smoothly
+- Stereo VO using 3 views
+- High level interface for 2D image motion
+  * Image stitching with added distortion

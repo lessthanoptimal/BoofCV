@@ -29,9 +29,9 @@ import boofcv.struct.wavelet.WaveletDescription;
 import boofcv.testing.BoofTesting;
 import org.junit.Test;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.Random;
+
+import static org.junit.Assert.fail;
 
 
 /**
@@ -48,16 +48,43 @@ public class TestWaveletTransformOps {
 	Class<?> types[]={ImageFloat32.class,ImageSInt32.class};
 
 	/**
-	 * See if images which are the smallest possible can be transformed.
+	 * See if it is possible to overflow the image
 	 */
 	@Test
-	public void smallImage(){
+	public void checkOverflow1() {
 		for( Class t : types ) {
-			testSmallImage(t);
+			checkOverflow1(t);
 		}
 	}
 
-	public <T extends ImageSingleBand> void testSmallImage( Class<T> typeInput ) {
+	public <T extends ImageSingleBand> void checkOverflow1( Class<T> typeInput ) {
+		this.typeInput = typeInput;
+		WaveletDescription<?> desc = createDesc(typeInput);
+
+		int width = 20;
+		int height = 22;
+
+		T transform = GeneralizedImageOps.createSingleBand(typeInput, width + (width % 2), height + (height % 2));
+		T found = GeneralizedImageOps.createSingleBand(typeInput, width, height);
+
+		GeneralizedImageOps.randomize(transform,rand,100,150);
+
+		invokeTransform(desc, null, transform, found,100,150);
+
+		checkBounds(found,100,150);
+	}
+
+	/**
+	 * See if images which are the smallest possible can be transformed.
+	 */
+	@Test
+	public void smallImage1(){
+		for( Class t : types ) {
+			testSmallImage1(t);
+		}
+	}
+
+	public <T extends ImageSingleBand> void testSmallImage1( Class<T> typeInput ) {
 		this.typeInput = typeInput;
 		WaveletDescription<?> desc = createDesc(typeInput);
 
@@ -71,9 +98,9 @@ public class TestWaveletTransformOps {
 
 			GeneralizedImageOps.randomize(input,rand,0,50);
 
-			invokeTransform("transform1","inverse1",desc, input, output, found);
+			invokeTransform(desc, input, output, found,0,255);
 
-			BoofTesting.assertEqualsGeneric(input,found,0,1e-4f);
+			BoofTesting.assertEqualsGeneric(input, found, 0, 1e-4f);
 		}
 	}
 
@@ -93,11 +120,11 @@ public class TestWaveletTransformOps {
 	@Test
 	public void multipleLevel() {
 		for( Class<?> t : types ) {
-			testMultipleLEvels(t);
+			testMultipleLevels(t);
 		}
 	}
 
-	private void testMultipleLEvels( Class typeInput ) {
+	private void testMultipleLevels(Class typeInput) {
 		this.typeInput = typeInput;
 
 		WaveletDescription<?> desc = createDesc(typeInput);
@@ -116,43 +143,92 @@ public class TestWaveletTransformOps {
 				ImageSingleBand output = GeneralizedImageOps.createSingleBand(typeInput, dim.width, dim.height);
 //				System.out.println("adjust "+adjust+" level "+level+" scale "+ div);
 
-				invokeTransform("transformN","inverseN",desc, input.clone(), output, found,level);
+				invokeTransformN(desc, input.clone(), output, found, level, 0, 255);
 
 				BoofTesting.assertEqualsGeneric(input,found,0,1e-4f);
 			}
 		}
 	}
 
-	private void invokeTransform(String nameTran , String nameInv , WaveletDescription<?> desc, ImageSingleBand input, ImageSingleBand output, ImageSingleBand found) {
-		try {
-			Method m = WaveletTransformOps.class.getMethod(nameTran,desc.getClass(),typeInput,typeInput,typeInput);
-			m.invoke(null,desc,input,output,null);
-			m = WaveletTransformOps.class.getMethod(nameInv,desc.getClass(),typeInput,typeInput,typeInput);
-			m.invoke(null,desc,output,found,null);
-		} catch (NoSuchMethodException e) {
-			throw new RuntimeException(e);
-		} catch (InvocationTargetException e) {
-			throw new RuntimeException(e);
-		} catch (IllegalAccessException e) {
-			throw new RuntimeException(e);
+	/**
+	 * See if it is possible to overflow the image
+	 */
+	@Test
+	public void checkOverflowN() {
+		for( Class t : types ) {
+			checkOverflowN(t);
 		}
 	}
 
-	private void invokeTransform(String nameTran , String nameInv ,
-								 WaveletDescription<?> desc,
-								 ImageSingleBand input, ImageSingleBand output, ImageSingleBand found,
-								 int level) {
-		try {
-			Method m = WaveletTransformOps.class.getMethod(nameTran,desc.getClass(),typeInput,typeInput,typeInput,int.class);
-			m.invoke(null,desc,input,output,null,level);
-			m = WaveletTransformOps.class.getMethod(nameInv,desc.getClass(),typeInput,typeInput,typeInput,int.class);
-			m.invoke(null,desc,output,found,null,level);
-		} catch (NoSuchMethodException e) {
-			throw new RuntimeException(e);
-		} catch (InvocationTargetException e) {
-			throw new RuntimeException(e);
-		} catch (IllegalAccessException e) {
-			throw new RuntimeException(e);
+	public <T extends ImageSingleBand> void checkOverflowN( Class<T> typeInput ) {
+		this.typeInput = typeInput;
+		WaveletDescription<?> desc = createDesc(typeInput);
+
+		int width = 20;
+		int height = 22;
+		int level = 3;
+
+		ImageDimension dim = UtilWavelet.transformDimension(width,height,level);
+
+		T transform = GeneralizedImageOps.createSingleBand(typeInput, dim.width,dim.height);
+		T found = GeneralizedImageOps.createSingleBand(typeInput, width, height);
+
+		GeneralizedImageOps.randomize(transform,rand,100,150);
+
+		invokeTransformN(desc, null, transform, found, 3, 100, 150);
+
+		checkBounds(found,100,150);
+	}
+
+	private void invokeTransform( WaveletDescription desc,
+								  ImageSingleBand input, ImageSingleBand output, ImageSingleBand found,
+								  double minValue , double maxValue ) {
+		if( input != null ) {
+			if( input.getTypeInfo().isInteger() ) {
+				WaveletTransformOps.transform1(desc, (ImageSInt32) input, (ImageSInt32) output, null);
+			} else {
+				WaveletTransformOps.transform1(desc, (ImageFloat32) input, (ImageFloat32) output, null);
+			}
+		}
+
+		if( output.getTypeInfo().isInteger() ) {
+			WaveletTransformOps.inverse1(desc,(ImageSInt32)output,(ImageSInt32)found,null,
+					(int)minValue,(int)maxValue);
+		} else {
+			WaveletTransformOps.inverse1(desc,(ImageFloat32)output,(ImageFloat32)found,null,
+					(float)minValue,(float)maxValue);
+		}
+	}
+
+	private void invokeTransformN( WaveletDescription desc,
+								   ImageSingleBand input, ImageSingleBand output, ImageSingleBand found,
+								   int numLevels ,
+								   double minValue , double maxValue ) {
+		if( input != null ) {
+			if( input.getTypeInfo().isInteger() ) {
+				WaveletTransformOps.transformN(desc, (ImageSInt32) input, (ImageSInt32) output, null, numLevels);
+			} else {
+				WaveletTransformOps.transformN(desc, (ImageFloat32) input, (ImageFloat32) output, null, numLevels);
+			}
+		}
+
+		if( output.getTypeInfo().isInteger() ) {
+			WaveletTransformOps.inverseN(desc, (ImageSInt32) output, (ImageSInt32) found, null, numLevels,
+					(int) minValue, (int) maxValue);
+		} else {
+			WaveletTransformOps.inverseN(desc, (ImageFloat32) output, (ImageFloat32) found, null, numLevels,
+					(float) minValue, (float) maxValue);
+		}
+	}
+
+
+	private void checkBounds( ImageSingleBand image , double low , double upper ) {
+		for( int y = 0; y < image.height; y++ ) {
+			for( int x = 0; x < image.width; x++ ) {
+				double v = GeneralizedImageOps.get(image,x,y);
+				if( v < low || v > upper )
+					fail("out of bounds");
+			}
 		}
 	}
 }

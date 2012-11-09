@@ -47,13 +47,15 @@ public class FactoryImageDenoise {
 	 *
 	 * @param imageType The type of image being transform.
 	 * @param numLevels Number of levels in the wavelet transform.  If not sure, try using 3.
+	 * @param minPixelValue Minimum allowed pixel intensity value
+	 * @param maxPixelValue Maximum allowed pixel intensity value
 	 * @return filter for image noise removal.
 	 */
 	public static <T extends ImageSingleBand> WaveletDenoiseFilter<T>
-	waveletVisu( Class<T> imageType , int numLevels )
+	waveletVisu( Class<T> imageType , int numLevels , double minPixelValue , double maxPixelValue )
 	{
 		ImageTypeInfo info = ImageTypeInfo.classToType(imageType);
-		WaveletTransform descTran = createDefaultShrinkTransform(info, numLevels);
+		WaveletTransform descTran = createDefaultShrinkTransform(info, numLevels,minPixelValue,maxPixelValue);
 		DenoiseWavelet denoiser  = FactoryDenoiseWaveletAlg.visu(imageType);
 
 		return new WaveletDenoiseFilter<T>(descTran,denoiser);
@@ -64,13 +66,15 @@ public class FactoryImageDenoise {
 	 *
 	 * @param imageType The type of image being transform.
 	 * @param numLevels Number of levels in the wavelet transform.  If not sure, try using 3.
+	 * @param minPixelValue Minimum allowed pixel intensity value
+	 * @param maxPixelValue Maximum allowed pixel intensity value
 	 * @return filter for image noise removal.
 	 */
 	public static <T extends ImageSingleBand> WaveletDenoiseFilter<T>
-	waveletBayes( Class<T> imageType , int numLevels )
+	waveletBayes( Class<T> imageType , int numLevels , double minPixelValue , double maxPixelValue )
 	{
 		ImageTypeInfo info = ImageTypeInfo.classToType(imageType);
-		WaveletTransform descTran = createDefaultShrinkTransform(info, numLevels);
+		WaveletTransform descTran = createDefaultShrinkTransform(info, numLevels,minPixelValue,maxPixelValue);
 		DenoiseWavelet denoiser = FactoryDenoiseWaveletAlg.bayes(null, imageType);
 
 		return new WaveletDenoiseFilter<T>(descTran,denoiser);
@@ -81,13 +85,15 @@ public class FactoryImageDenoise {
 	 *
 	 * @param imageType The type of image being transform.
 	 * @param numLevels Number of levels in the wavelet transform.  If not sure, try using 3.
+	 * @param minPixelValue Minimum allowed pixel intensity value
+	 * @param maxPixelValue Maximum allowed pixel intensity value
 	 * @return filter for image noise removal.
 	 */
 	public static <T extends ImageSingleBand> WaveletDenoiseFilter<T>
-	waveletSure( Class<T> imageType , int numLevels )
+	waveletSure( Class<T> imageType , int numLevels , double minPixelValue , double maxPixelValue )
 	{
 		ImageTypeInfo info = ImageTypeInfo.classToType(imageType);
-		WaveletTransform descTran = createDefaultShrinkTransform(info, numLevels);
+		WaveletTransform descTran = createDefaultShrinkTransform(info, numLevels,minPixelValue,maxPixelValue);
 		DenoiseWavelet denoiser = FactoryDenoiseWaveletAlg.sure(imageType);
 
 		return new WaveletDenoiseFilter<T>(descTran,denoiser);
@@ -96,16 +102,19 @@ public class FactoryImageDenoise {
 	/**
 	 * Default wavelet transform used for denoising images.
 	 */
-	private static WaveletTransform createDefaultShrinkTransform(ImageTypeInfo imageType, int numLevels) {
+	private static WaveletTransform createDefaultShrinkTransform(ImageTypeInfo imageType, int numLevels,
+																 double minPixelValue , double maxPixelValue ) {
 
 		WaveletTransform descTran;
 
 		if( !imageType.isInteger()) {
 			WaveletDescription<WlCoef_F32> waveletDesc_F32 = FactoryWaveletDaub.daubJ_F32(4);
-			descTran = FactoryWaveletTransform.create_F32(waveletDesc_F32,numLevels);
+			descTran = FactoryWaveletTransform.create_F32(waveletDesc_F32,numLevels,
+					(float)minPixelValue,(float)maxPixelValue);
 		} else {
 			WaveletDescription<WlCoef_I32> waveletDesc_I32 = FactoryWaveletDaub.biorthogonal_I32(5, BorderType.REFLECT);
-			descTran = FactoryWaveletTransform.create_I(waveletDesc_I32,numLevels,imageType.getImageClass());
+			descTran = FactoryWaveletTransform.create_I(waveletDesc_I32,numLevels,
+					(int)minPixelValue,(int)maxPixelValue,imageType.getImageClass());
 		}
 		return descTran;
 	}

@@ -42,12 +42,15 @@ public class FactoryWaveletTransform {
 
 	@SuppressWarnings({"unchecked"})
 	public static <T extends ImageSingleBand, W extends ImageSingleBand, C extends WlCoef>
-	WaveletTransform<T,W,C> create( Class<T> imageType , WaveletDescription<C> waveletDesc , int numLevels )
+	WaveletTransform<T,W,C> create( Class<T> imageType , WaveletDescription<C> waveletDesc , int numLevels ,
+									double minPixelValue , double maxPixelValue)
 	{
 		if( waveletDesc.getForward().getType() == float.class ) {
-			return (WaveletTransform<T,W,C>)create_F32((WaveletDescription)waveletDesc,numLevels);
+			return (WaveletTransform<T,W,C>)create_F32((WaveletDescription)waveletDesc,numLevels,
+					(float)minPixelValue,(float)maxPixelValue);
 		} else if( waveletDesc.getForward().getType() == int.class ) {
-			return (WaveletTransform<T,W,C>)create_I((WaveletDescription)waveletDesc,numLevels,(Class)imageType);
+			return (WaveletTransform<T,W,C>)create_I((WaveletDescription)waveletDesc,numLevels,
+			(int)minPixelValue,(int)maxPixelValue,(Class)imageType);
 		} else {
 			throw new RuntimeException("Add support for this image type");
 		}
@@ -58,15 +61,17 @@ public class FactoryWaveletTransform {
 	 *
 	 * @param waveletDesc Description of the wavelet.
 	 * @param numLevels Number of levels in the multi-level transform.
+	 * @param minPixelValue Minimum pixel intensity value
+	 * @param maxPixelValue Maximum pixel intensity value
 	 * @return The transform class.
 	 */
 	public static <T extends ImageInteger>
 	WaveletTransform<T, ImageSInt32,WlCoef_I32>
 	create_I( WaveletDescription<WlCoef_I32> waveletDesc ,
-			  int numLevels ,
+			  int numLevels , int minPixelValue , int maxPixelValue ,
 			  Class<T> imageType )
 	{
-		return new WaveletTransformInt<T>(waveletDesc,numLevels,imageType);
+		return new WaveletTransformInt<T>(waveletDesc,numLevels,minPixelValue,maxPixelValue,imageType);
 	}
 
 	/**
@@ -74,13 +79,15 @@ public class FactoryWaveletTransform {
 	 *
 	 * @param waveletDesc Description of the wavelet.
 	 * @param numLevels Number of levels in the multi-level transform.
+	 * @param minPixelValue Minimum pixel intensity value
+	 * @param maxPixelValue Maximum pixel intensity value
 	 * @return The transform class.
 	 */
 	public static
 	WaveletTransform<ImageFloat32, ImageFloat32,WlCoef_F32>
 	create_F32( WaveletDescription<WlCoef_F32> waveletDesc ,
-				int numLevels )
+				int numLevels, float minPixelValue , float maxPixelValue )
 	{
-		return new WaveletTransformFloat32(waveletDesc,numLevels);
+		return new WaveletTransformFloat32(waveletDesc,numLevels,minPixelValue,maxPixelValue);
 	}
 }

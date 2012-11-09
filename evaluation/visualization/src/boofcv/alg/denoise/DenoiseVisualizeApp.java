@@ -204,7 +204,8 @@ public class DenoiseVisualizeApp<T extends ImageSingleBand,D extends ImageSingle
 
 	private synchronized void performDenoising() {
 		if( denoiser != null ) {
-			WaveletTransform<T, T,W> waveletTran = FactoryWaveletTransform.create(imageType,waveletDesc,numLevels);
+			WaveletTransform<T, T,W> waveletTran =
+					FactoryWaveletTransform.create(imageType,waveletDesc,numLevels,0,255);
 			FilterImageInterface<T,T> filter = new WaveletDenoiseFilter<T>(waveletTran,denoiser);
 
 			filter.process(noisy,output);

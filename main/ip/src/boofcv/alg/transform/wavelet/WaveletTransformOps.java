@@ -19,6 +19,7 @@
 package boofcv.alg.transform.wavelet;
 
 import boofcv.alg.InputSanityCheck;
+import boofcv.alg.misc.PixelMath;
 import boofcv.alg.transform.wavelet.impl.ImplWaveletTransformBorder;
 import boofcv.alg.transform.wavelet.impl.ImplWaveletTransformInner;
 import boofcv.alg.transform.wavelet.impl.ImplWaveletTransformNaive;
@@ -166,10 +167,12 @@ public class WaveletTransformOps {
 	 * @param output Reconstruction of original image. Modified.
 	 * @param storage Optional storage image.  Should be the same size as the input image. If null then
 	 * an image is declared internally.
+	 * @param minValue Minimum allowed pixel value
+	 * @param maxValue Maximum allowed pixel value
 	 */
 	public static void inverse1( WaveletDescription<WlCoef_F32> desc ,
 								 ImageFloat32 input , ImageFloat32 output ,
-								 ImageFloat32 storage )
+								 ImageFloat32 storage , float minValue , float maxValue )
 	{
 		UtilWavelet.checkShape(output,input);
 		WlCoef_F32 coef = desc.getForward();
@@ -183,14 +186,16 @@ public class WaveletTransformOps {
 		int minSize = Math.max(coef.getScalingLength(),coef.getWaveletLength())*3;
 
 		if( output.getWidth() <= minSize || output.getHeight() <= minSize ) {
-			ImplWaveletTransformNaive.verticalInverse(desc.getBorder(),desc.getInverse(),input,storage);
-			ImplWaveletTransformNaive.horizontalInverse(desc.getBorder(),desc.getInverse(),storage,output);
+			ImplWaveletTransformNaive.verticalInverse(desc.getBorder(), desc.getInverse(), input, storage);
+			ImplWaveletTransformNaive.horizontalInverse(desc.getBorder(), desc.getInverse(), storage, output);
 		} else {
 			ImplWaveletTransformInner.verticalInverse(desc.getInverse().getInnerCoefficients(),input,storage);
 			ImplWaveletTransformBorder.verticalInverse(desc.getBorder(),desc.getInverse(),input,storage);
 			ImplWaveletTransformInner.horizontalInverse(desc.getInverse().getInnerCoefficients(),storage,output);
 			ImplWaveletTransformBorder.horizontalInverse(desc.getBorder(),desc.getInverse(),storage,output);
 		}
+		if( minValue != -Float.MAX_VALUE && maxValue != Float.MAX_VALUE )
+			PixelMath.boundImage(output,minValue,maxValue);
 	}
 
 	/**
@@ -204,14 +209,17 @@ public class WaveletTransformOps {
 	 * @param storage Optional storage image.  Should be the same size as the input image. If null then
 	 * an image is declared internally.
 	 * @param numLevels Number of levels in the transform.
+	 * @param minValue Minimum allowed pixel value
+	 * @param maxValue Maximum allowed pixel value
 	 */
 	public static void inverseN( WaveletDescription<WlCoef_F32> desc ,
 								 ImageFloat32 input , ImageFloat32 output ,
 								 ImageFloat32 storage,
-								 int numLevels )
+								 int numLevels ,
+								 float minValue , float maxValue)
 	{
 		if( numLevels == 1 ) {
-			inverse1(desc,input,output, storage);
+			inverse1(desc,input,output, storage,minValue,maxValue);
 			return;
 		}
 
@@ -231,7 +239,7 @@ public class WaveletTransformOps {
 		ImageFloat32 levelIn = input.subimage(0,0,width,height);
 		ImageFloat32 levelOut = output.subimage(0,0,width,height);
 		storage.reshape(width,height);
-		inverse1(desc,levelIn,levelOut, storage);
+		inverse1(desc,levelIn,levelOut, storage,-Float.MAX_VALUE,Float.MAX_VALUE);
 
 		for( int i = numLevels-1; i >= 1; i-- ) {
 			// copy the decoded segment into the input
@@ -252,8 +260,11 @@ public class WaveletTransformOps {
 			}
 
 			storage.reshape(levelIn.width,levelIn.height);
-			inverse1(desc,levelIn,levelOut, storage);
+			inverse1(desc,levelIn,levelOut, storage,-Float.MAX_VALUE,Float.MAX_VALUE);
 		}
+
+		if( minValue != -Float.MAX_VALUE && maxValue != Float.MAX_VALUE )
+			PixelMath.boundImage(output,minValue,maxValue);
 	}
 
 	/**
@@ -353,10 +364,12 @@ public class WaveletTransformOps {
 	 * @param output Reconstruction of original image. Modified.
 	 * @param storage Optional storage image.  Should be the same size as the input image. If null then
 	 * an image is declared internally.
+	 * @param minValue Minimum allowed pixel intensity value
+	 * @param maxValue Maximum allowed pixel intensity value
 	 */
 	public static void inverse1( WaveletDescription<WlCoef_I32> desc ,
 								 ImageSInt32 input , ImageSInt32 output ,
-								 ImageSInt32 storage )
+								 ImageSInt32 storage , int minValue , int maxValue )
 	{
 		UtilWavelet.checkShape(output,input);
 		WlCoef_I32 coef = desc.getForward();
@@ -378,6 +391,9 @@ public class WaveletTransformOps {
 			ImplWaveletTransformInner.horizontalInverse(desc.getInverse().getInnerCoefficients(),storage,output);
 			ImplWaveletTransformBorder.horizontalInverse(desc.getBorder(),desc.getInverse(),storage,output);
 		}
+
+		if( minValue != Integer.MIN_VALUE && maxValue != Integer.MAX_VALUE )
+			PixelMath.boundImage(output,minValue,maxValue);
 	}
 
 	/**
@@ -391,14 +407,18 @@ public class WaveletTransformOps {
 	 * @param storage Optional storage image.  Should be the same size as the input image. If null then
 	 * an image is declared internally.
 	 * @param numLevels Number of levels in the transform.
+	 * @param minValue Minimum allowed pixel intensity value
+	 * @param maxValue Maximum allowed pixel intensity value
 	 */
 	public static void inverseN( WaveletDescription<WlCoef_I32> desc ,
 								 ImageSInt32 input , ImageSInt32 output ,
 								 ImageSInt32 storage,
-								 int numLevels )
+								 int numLevels ,
+								 int minValue , int maxValue )
 	{
 		if( numLevels == 1 ) {
-			inverse1(desc,input,output, storage);
+			inverse1(desc,input,output, storage,minValue,maxValue);
+			PixelMath.boundImage(output,minValue,maxValue);
 			return;
 		}
 
@@ -418,7 +438,7 @@ public class WaveletTransformOps {
 		ImageSInt32 levelIn = input.subimage(0,0,width,height);
 		ImageSInt32 levelOut = output.subimage(0,0,width,height);
 		storage.reshape(width,height);
-		inverse1(desc,levelIn,levelOut, storage);
+		inverse1(desc,levelIn,levelOut, storage,Integer.MIN_VALUE,Integer.MAX_VALUE);
 
 		for( int i = numLevels-1; i >= 1; i-- ) {
 			// copy the decoded segment into the input
@@ -439,8 +459,11 @@ public class WaveletTransformOps {
 			}
 
 			storage.reshape(levelIn.width,levelIn.height);
-			inverse1(desc,levelIn,levelOut, storage);
+			inverse1(desc,levelIn,levelOut, storage,-Integer.MAX_VALUE,Integer.MAX_VALUE);
 		}
+
+		if( minValue != Integer.MIN_VALUE && maxValue != Integer.MAX_VALUE )
+			PixelMath.boundImage(output,minValue,maxValue);
 	}
 
 

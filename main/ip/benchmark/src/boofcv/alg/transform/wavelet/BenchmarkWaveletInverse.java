@@ -55,8 +55,8 @@ public class BenchmarkWaveletInverse {
 
 		@Override
 		public void process() {
-			ImplWaveletTransformNaive.verticalInverse(desc_F32.getBorder(),desc_F32.getInverse(), tran_F32,temp1_F32);
-			ImplWaveletTransformNaive.horizontalInverse(desc_F32.getBorder(),desc_F32.getInverse(),temp1_F32,temp2_F32);
+			ImplWaveletTransformNaive.verticalInverse(desc_F32.getBorder(), desc_F32.getInverse(), tran_F32, temp1_F32);
+			ImplWaveletTransformNaive.horizontalInverse(desc_F32.getBorder(), desc_F32.getInverse(), temp1_F32, temp2_F32);
 		}
 	}
 
@@ -64,8 +64,8 @@ public class BenchmarkWaveletInverse {
 
 		@Override
 		public void process() {
-			ImplWaveletTransformNaive.verticalInverse(desc_I32.getBorder(),desc_I32.getInverse(), tran_I32,temp1_I32);
-			ImplWaveletTransformNaive.horizontalInverse(desc_I32.getBorder(),desc_I32.getInverse(),temp1_I32,temp2_I32);
+			ImplWaveletTransformNaive.verticalInverse(desc_I32.getBorder(), desc_I32.getInverse(), tran_I32, temp1_I32);
+			ImplWaveletTransformNaive.horizontalInverse(desc_I32.getBorder(), desc_I32.getInverse(), temp1_I32, temp2_I32);
 		}
 	}
 
@@ -73,7 +73,7 @@ public class BenchmarkWaveletInverse {
 
 		@Override
 		public void process() {
-			WaveletTransformOps.inverse1(desc_F32,tran_F32,temp1_F32,temp1_F32);
+			WaveletTransformOps.inverse1(desc_F32,tran_F32,temp1_F32,temp1_F32,0,255);
 		}
 	}
 
@@ -81,7 +81,7 @@ public class BenchmarkWaveletInverse {
 
 		@Override
 		public void process() {
-			WaveletTransformOps.inverse1(desc_I32,tran_I32,temp1_I32,temp1_I32);
+			WaveletTransformOps.inverse1(desc_I32,tran_I32,temp1_I32,temp1_I32,0,255);
 		}
 	}
 

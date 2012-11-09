@@ -20,11 +20,8 @@ package boofcv.alg.transform.wavelet.impl;
 
 import boofcv.misc.AutoTypeImage;
 import boofcv.misc.CodeGeneratorBase;
-import boofcv.misc.CodeGeneratorUtil;
 
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.PrintStream;
 
 
 /**
@@ -32,8 +29,6 @@ import java.io.PrintStream;
  */
 public class GenerateImplWaveletTransformInner extends CodeGeneratorBase {
 	String className = "ImplWaveletTransformInner";
-
-	PrintStream out;
 
 	AutoTypeImage imageIn;
 	AutoTypeImage imageOut;
@@ -43,7 +38,7 @@ public class GenerateImplWaveletTransformInner extends CodeGeneratorBase {
 	String outputCast;
 
 	public GenerateImplWaveletTransformInner() throws FileNotFoundException {
-		out = new PrintStream(new FileOutputStream(className + ".java"));
+		setOutputFile(className);
 	}
 
 	@Override
@@ -58,10 +53,8 @@ public class GenerateImplWaveletTransformInner extends CodeGeneratorBase {
 	}
 
 	private void printPreamble() {
-		out.print(CodeGeneratorUtil.copyright);
-		out.print("package boofcv.alg.wavelet.impl;\n" +
-				"\n" +
-				"import boofcv.alg.wavelet.UtilWavelet;\n" +
+
+		out.print("import boofcv.alg.transform.wavelet.UtilWavelet;\n" +
 				"import boofcv.struct.image.*;\n" +
 				"import boofcv.struct.wavelet.WlCoef_F32;\n" +
 				"import boofcv.struct.wavelet.WlCoef_I32;\n" +

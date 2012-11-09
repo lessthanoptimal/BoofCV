@@ -38,11 +38,19 @@ public class WaveletTransformFloat32 implements WaveletTransform<ImageFloat32,Im
 	ImageFloat32 copy = new ImageFloat32(1,1);
 	ImageFloat32 temp = new ImageFloat32(1,1);
 	WaveletDescription<WlCoef_F32> desc;
+	// number of levels in the transform
 	int numLevels;
 
-	public WaveletTransformFloat32(WaveletDescription<WlCoef_F32> desc, int numLevels) {
+	// minimum and maximum allowed pixel values
+	float minPixelValue;
+	float maxPixelValue;
+
+	public WaveletTransformFloat32(WaveletDescription<WlCoef_F32> desc, int numLevels,
+								   float minPixelValue , float maxPixelValue ) {
 		this.desc = desc;
 		this.numLevels = numLevels;
+		this.minPixelValue = minPixelValue;
+		this.maxPixelValue = maxPixelValue;
 	}
 
 	@Override
@@ -67,7 +75,7 @@ public class WaveletTransformFloat32 implements WaveletTransform<ImageFloat32,Im
 		copy.reshape(transformed.width,transformed.height);
 		copy.setTo(transformed);
 
-		WaveletTransformOps.inverseN(desc,copy,original,temp,numLevels);
+		WaveletTransformOps.inverseN(desc,copy,original,temp,numLevels,minPixelValue,maxPixelValue);
 	}
 
 	@Override

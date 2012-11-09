@@ -56,11 +56,17 @@ public class WaveletTransformInt<T extends ImageInteger> implements WaveletTrans
 	//  the class can really take any integer image as input, but this adds strong typeing
 	Class<T> inputType;
 
+	// minimum and maximum allowed pixel values
+	int minPixelValue;
+	int maxPixelValue;
+
 	public WaveletTransformInt(WaveletDescription<WlCoef_I32> desc, int numLevels,
-							   Class<T> inputType ) {
+							   int minPixelValue , int maxPixelValue, Class<T> inputType  ) {
 		this.desc = desc;
 		this.numLevels = numLevels;
 		this.inputType = inputType;
+		this.minPixelValue = minPixelValue;
+		this.maxPixelValue = maxPixelValue;
 	}
 
 	@Override
@@ -90,10 +96,11 @@ public class WaveletTransformInt<T extends ImageInteger> implements WaveletTrans
 		copyInput.setTo(transformed);
 
 		if( original.getTypeInfo().getDataType() == int.class ) {
-			WaveletTransformOps.inverseN(desc, copyInput,(ImageSInt32)original,temp,numLevels);
+			WaveletTransformOps.
+					inverseN(desc, copyInput, (ImageSInt32) original, temp, numLevels, minPixelValue, maxPixelValue);
 		} else {
 			copyOutput.reshape(original.width,original.height);
-			WaveletTransformOps.inverseN(desc, copyInput, copyOutput,temp,numLevels);
+			WaveletTransformOps.inverseN(desc, copyInput, copyOutput,temp,numLevels,minPixelValue,maxPixelValue);
 			GeneralizedImageOps.convert(copyOutput,original);
 		}
 	}
