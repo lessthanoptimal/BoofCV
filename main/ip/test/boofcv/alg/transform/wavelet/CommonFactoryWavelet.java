@@ -80,7 +80,7 @@ public class CommonFactoryWavelet {
 			// also correctly does a transform with these wavelets
 			// more of a robustness test of WaveletTransformOps than anything else
 			WaveletTransformOps.transform1(waveletDesc,orig,tran,null);
-			WaveletTransformOps.inverse1(waveletDesc,tran,rev,null);
+			WaveletTransformOps.inverse1(waveletDesc,tran,rev,null,0,255);
 
 //			BoofTesting.printDiff(orig,rev);
 			BoofTesting.assertEquals(orig,rev,0,1e-4f);
@@ -113,7 +113,7 @@ public class CommonFactoryWavelet {
 			// also correctly does a transform with these wavelets
 			// more of a robustness test of WaveletTransformOps than anything else
 			WaveletTransformOps.transform1(waveletDesc,orig,tran,null);
-			WaveletTransformOps.inverse1(waveletDesc,tran,rev,null);
+			WaveletTransformOps.inverse1(waveletDesc,tran,rev,null,Integer.MIN_VALUE,Integer.MAX_VALUE);
 
 			BoofTesting.assertEquals(orig,rev,0);
 		}

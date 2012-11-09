@@ -79,13 +79,14 @@ public class Polygon3DSequenceViewer extends JPanel implements KeyListener, Mous
 		this.stepSize = stepSize;
 	}
 
-	public void clearPolygons() {
+	public void init() {
 		SwingUtilities.invokeLater( new Runnable() {
 			@Override
 			public void run() {
 				polygons.clear();
 			}
 		});
+
 	}
 
 	/**

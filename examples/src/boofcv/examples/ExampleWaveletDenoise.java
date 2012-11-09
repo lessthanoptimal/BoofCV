@@ -49,7 +49,8 @@ public class ExampleWaveletDenoise {
 		// How many levels in wavelet transform
 		int numLevels = 4;
 		// Create the noise removal algorithm
-		WaveletDenoiseFilter<ImageFloat32> denoiser = FactoryImageDenoise.waveletBayes(ImageFloat32.class,numLevels);
+		WaveletDenoiseFilter<ImageFloat32> denoiser =
+				FactoryImageDenoise.waveletBayes(ImageFloat32.class,numLevels,0,255);
 
 		// remove noise from the image
 		denoiser.process(noisy,denoised);

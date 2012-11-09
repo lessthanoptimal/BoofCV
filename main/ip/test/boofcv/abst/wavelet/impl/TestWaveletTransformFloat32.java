@@ -58,7 +58,7 @@ public class TestWaveletTransformFloat32 {
 		ImageFloat32 storage = new ImageFloat32(dimen.width,dimen.height);
 		WaveletTransformOps.transformN(desc,orig.clone(),expected,storage,N);
 
-		WaveletTransformFloat32 alg = new WaveletTransformFloat32(desc,N);
+		WaveletTransformFloat32 alg = new WaveletTransformFloat32(desc,N,0,255);
 		alg.transform(orig,found);
 
 		// make sure the original input was not modified like it is in WaveletTransformOps

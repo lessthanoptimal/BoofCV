@@ -104,7 +104,8 @@ public class WaveletVisualizeApp
 			return;
 
 		WaveletDescription<C> desc = (WaveletDescription<C>)cookie;
-		WaveletTransform<T,W,C> waveletTran = FactoryWaveletTransform.create((Class)image.getClass(),desc,numLevels);
+		WaveletTransform<T,W,C> waveletTran =
+				FactoryWaveletTransform.create((Class)image.getClass(),desc,numLevels,0,255);
 
 		panel.reset();
 

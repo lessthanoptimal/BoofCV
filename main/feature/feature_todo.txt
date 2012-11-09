@@ -1,12 +1,4 @@
 
-- Associate
- * Clean up interface and make it more elegant
-
-Trackers
-- Detect region/normalized cross correlation
-
-- Modify BRIEF/BRIEFSO to compute descriptors with features partially outside image like in SURF
-
 - Faster association
   - FLANN?
 
@@ -19,9 +11,6 @@ Trackers
   * See ExampleInterestPoint.  The returned InterestPointDetector.getCanonicalRadius() is too large in SURF
   * Display shows what is visually pleasing to a person.  Descriptor needs a radius that corresponds to the area
     that it samples.
-
-- BRIEF association
- * Look up table for hamming distance to speed things up
 
 - Non-maximum suppression extraction
  * Non-Maximum Suppression for edges
@@ -39,10 +28,6 @@ Trackers
 - Ignore Borders
   * WrapperKitRosCornerIntensity: add ignore border parameter for when the derivative has an ignore border?
   * WrapperLaplacianBlobIntensity: same
-
-- InterestPointDetector
-  * change scale into size or radius in pixels so its not detector dependent
-  * Would need to update descriptor interface to accommodate this change, DescribeRegionPoint
 
 - Hough Detectors
   * Used round to reduce round off error?  Right now it is equivalent of floor

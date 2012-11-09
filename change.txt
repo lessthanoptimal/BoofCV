@@ -3,6 +3,13 @@ Change Log
 Date Format: year/month/day
 
 ---------------------------------------------
+Date    : 
+Version : Alpha 0.12
+
+- Fixed inverse wavelet transform so that it bounds the pixel values
+  * Wavelet denoising sometimes overflowed
+
+---------------------------------------------
 Date    : 2012/11/6
 Version : Alpha 0.11
 

@@ -98,9 +98,17 @@ public abstract class StereoVideoAppBase <I extends ImageSingleBand>
 		try {
 			String path = new File(inputRefs.get(index).getPath()).getParent();
 
-			String lineConfig = path+"/"+in.readLine();
-			String line1 = path+"/"+in.readLine();
-			String line2 = path+"/"+in.readLine();
+			String lineConfig = in.readLine();
+			String line1 = in.readLine();
+			String line2 = in.readLine();
+
+			// adjust for relative paths
+			if( lineConfig.charAt(0) != '/' )
+				lineConfig = path+"/"+lineConfig;
+			if( line1.charAt(0) != '/' )
+				line1 = path+"/"+line1;
+			if( line2.charAt(0) != '/' )
+				line2 = path+"/"+line2;
 
 			config = BoofMiscOps.loadXML(media.openFile(lineConfig));
 			SimpleImageSequence<I> video1 = media.openVideo(line1,imageType);

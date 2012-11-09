@@ -35,6 +35,7 @@ import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.PathLabel;
 import boofcv.io.image.SimpleImageSequence;
+import boofcv.io.wrapper.xuggler.XugglerMediaManager;
 import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
@@ -237,7 +238,7 @@ public class VisualizeStereoVisualOdometryApp <I extends ImageSingleBand>
 
 		IntrinsicParameters right = config.right;
 		DenseMatrix64F K = PerspectiveOps.calibrationMatrix(config.left,null);
-		guiCam3D.clearPolygons();
+		guiCam3D.init();
 		guiCam3D.setK(K);
 		guiCam3D.setStepSize(config.getBaseline());
 		guiCam3D.setPreferredSize(new Dimension(right.width, right.height));
@@ -347,10 +348,11 @@ public class VisualizeStereoVisualOdometryApp <I extends ImageSingleBand>
 
 		VisualizeStereoVisualOdometryApp app = new VisualizeStereoVisualOdometryApp(type);
 
-//		app.setMediaManager(new XugglerMediaManager());
+		app.setMediaManager(new XugglerMediaManager());
 
 		List<PathLabel> inputs = new ArrayList<PathLabel>();
-		inputs.add(new PathLabel("Backyard", "../data/applet/vo/backyard/config.txt"));
+		inputs.add(new PathLabel("Outside", "../data/applet/vo/backyard/config.txt"));
+		inputs.add(new PathLabel("Urban", "../data/applet/vo/rockville/config.txt"));
 
 		app.setInputList(inputs);
 

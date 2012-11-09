@@ -38,6 +38,8 @@ import org.ejml.ops.CommonOps;
 import java.util.List;
 
 /**
+ * Functions related to perspective geometry and intrinsic camera calibration.
+ *
  * @author Peter Abeles
  */
 public class PerspectiveOps {
@@ -67,7 +69,7 @@ public class PerspectiveOps {
 	 *
 	 * <p>
 	 * When removing camera distortion, the undistorted image is likely to have a different shape not
-	 * entirely encloded by the original image.  This can be compensated for by transforming the undistorted
+	 * entirely enclosed by the original image.  This can be compensated for by transforming the undistorted
 	 * image using a homography transform.  Typically this will translate and scale the undistorted image.
 	 * The end result is a new virtual camera which has the adjusted intrinsic camera parameters.
 	 * </p>

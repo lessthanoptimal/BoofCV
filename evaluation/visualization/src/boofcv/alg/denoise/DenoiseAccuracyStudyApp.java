@@ -114,11 +114,13 @@ public class DenoiseAccuracyStudyApp {
 		return ret;
 	}
 
-	protected static List<TestItem> createWaveletFilters( WaveletDescription<WlCoef_F32> waveletDesc , int numLevels , String waveletName )
+	protected static List<TestItem> createWaveletFilters( WaveletDescription<WlCoef_F32> waveletDesc ,
+														  int numLevels , String waveletName )
 	{
 		List<TestItem> ret = new ArrayList<TestItem>();
 
-		WaveletTransform<ImageFloat32, ImageFloat32,WlCoef_F32> waveletTran = FactoryWaveletTransform.create_F32(waveletDesc,numLevels);
+		WaveletTransform<ImageFloat32, ImageFloat32,WlCoef_F32> waveletTran =
+				FactoryWaveletTransform.create_F32(waveletDesc,numLevels,0,255);
 
 
 		FilterImageInterface<ImageFloat32,ImageFloat32> filter;

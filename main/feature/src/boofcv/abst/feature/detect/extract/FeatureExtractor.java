@@ -63,7 +63,7 @@ public interface FeatureExtractor {
 						QueueCorner foundFeature);
 
 	/**
-	 * If it requires a list of candidate corners.
+	 * Returns true if the algorithm requires a candidate list of corners
 	 *
 	 * @return true if candidates are required.
 	 */
