@@ -16,18 +16,18 @@
  * limitations under the License.
  */
 
-package boofcv.alg.tracker.pklt;
+package boofcv.abst.feature.tracker;
 
 import boofcv.alg.tracker.klt.KltConfig;
 import boofcv.struct.image.ImageSingleBand;
 
 
 /**
- * Configuration class for {@link PkltManager}.
+ * Configuration class for {@link PointTrackerKltPyramid}.
  *
  * @author Peter Abeles
  */
-public class PkltManagerConfig<I extends ImageSingleBand, D extends ImageSingleBand> {
+public class PkltConfig<I extends ImageSingleBand, D extends ImageSingleBand> {
 	/** configuration for low level KLT tracker */
 	public KltConfig config;
 	/** Maximum number of features it can track.  Determines how many features are spawned */
@@ -49,9 +49,9 @@ public class PkltManagerConfig<I extends ImageSingleBand, D extends ImageSingleB
 	 * @return
 	 */
 	public static <I extends ImageSingleBand, D extends ImageSingleBand>
-	PkltManagerConfig<I,D> createDefault(Class<I> typeInput,
+	PkltConfig<I,D> createDefault(Class<I> typeInput,
 										 Class<D> typeDeriv) {
-		PkltManagerConfig<I,D> ret = new PkltManagerConfig<I,D>();
+		PkltConfig<I,D> ret = new PkltConfig<I,D>();
 
 		ret.typeInput = typeInput;
 		ret.typeDeriv = typeDeriv;

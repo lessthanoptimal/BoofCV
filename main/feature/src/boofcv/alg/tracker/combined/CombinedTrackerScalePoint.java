@@ -107,14 +107,18 @@ public class CombinedTrackerScalePoint
 	}
 
 	/**
-	 * Sets the tracker into its initial state.
+	 * Sets the tracker into its initial state.  Previously declared track data structures are saved
+	 * for re-use.
 	 */
 	public void reset() {
+		tracksUnused.addAll(tracksSpawned);
+		tracksUnused.addAll(tracksPureKlt);
+		tracksUnused.addAll(tracksReactivated);
+
 		tracksPureKlt.clear();
 		tracksReactivated.clear();
 		tracksDormant.clear();
 		tracksSpawned.clear();
-		tracksUnused.clear();
 		totalTracks = 0;
 	}
 
@@ -131,6 +135,7 @@ public class CombinedTrackerScalePoint
 							  PyramidDiscrete<I> pyramid ,
 							  PyramidDiscrete<D> derivX,
 							  PyramidDiscrete<D> derivY ) {
+		System.out.println("   updated");
 		// forget recently dropped or spawned tracks
 		tracksSpawned.clear();
 
@@ -162,25 +167,28 @@ public class CombinedTrackerScalePoint
 	}
 
 	/**
-	 * Selects new interest points in the image.
-	 */
-	public void detectInterestPoints() {
-		// detect new interest points
-		detector.detect(input);
-	}
-
-	/**
 	 * From the found interest points create new tracks.  Tracks are only created at points
 	 * where there are no existing tracks.
+	 *
+	 * Note: Must be called after {@link #associateTaintedToDetected}.
 	 */
-	public void spawnTracksFromPoints() {
+	public void spawnTracksFromDetected() {
+		System.out.println("   spawned");
 
-		identifyAvailableFeatures();
+		// mark detected features with no matches as available
+		FastQueue<AssociatedIndex> matches = associate.getMatches();
 
 		int N = detector.getNumberOfFeatures();
+		for( int i = 0; i < N; i++ )
+			associated[i] = false;
 
+		for( AssociatedIndex i : matches.toList() ) {
+			associated[i.dst] = true;
+		}
+
+		// spawn new tracks for unassociated detected features
 		for( int i = 0; i < N; i++ ) {
-			if( !associated[i])
+			if( associated[i])
 				continue;
 
 			Point2D_F64 p = detector.getLocation(i);
@@ -210,31 +218,6 @@ public class CombinedTrackerScalePoint
 		}
 	}
 
-	/**
-	 * Associate active tracks to detected features.  Make a list of features which do
-	 * not match any existing tracks.  These features can be used to spawn new tracks.
-	 */
-	protected void identifyAvailableFeatures() {
-
-		// associate existing to detected features
-		// initialize data structures
-		List<CombinedTrack<TD>> active = new ArrayList<CombinedTrack<TD>>();
-		active.addAll(tracksReactivated);
-		active.addAll(tracksPureKlt);
-
-		associateToDetected(active);
-
-		// mark detected features with no matches as available
-		FastQueue<AssociatedIndex> matches = associate.getMatches();
-
-		int N = detector.getNumberOfFeatures();
-		for( int i = 0; i < N; i++ )
-			associated[i] = true;
-
-		for( AssociatedIndex i : matches.toList() ) {
-			associated[i.dst] = false;
-		}
-	}
 
 	/**
 	 * Associates pre-existing tracks to newly detected features
@@ -280,8 +263,8 @@ public class CombinedTrackerScalePoint
 	 * Associate tracks which have at some point been dropped by KLT to newly detected features.  When
 	 * associating, consider pure-KLT tracks to help remove false positives.
 	 */
-	public void associateTaintedToPoints() {
-
+	public void associateTaintedToDetected() {
+		System.out.println("   reactivated");
 		// initialize data structures
 		List<CombinedTrack<TD>> all = new ArrayList<CombinedTrack<TD>>();
 		all.addAll(tracksReactivated);
@@ -293,6 +276,8 @@ public class CombinedTrackerScalePoint
 		tracksReactivated.clear();
 		tracksDormant.clear();
 
+		// detect features
+		detector.detect(input);
 		// associate features
 		associateToDetected(all);
 

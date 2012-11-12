@@ -19,13 +19,14 @@
 package boofcv.abst.feature.tracker;
 
 import boofcv.abst.filter.derivative.ImageGradient;
-import boofcv.alg.tracker.pklt.PkltManager;
-import boofcv.alg.tracker.pklt.PkltManagerConfig;
+import boofcv.alg.interpolate.InterpolateRectangle;
+import boofcv.alg.tracker.klt.KltTrackFault;
+import boofcv.alg.tracker.klt.KltTracker;
+import boofcv.alg.tracker.pklt.GenericPkltFeatSelector;
 import boofcv.alg.tracker.pklt.PyramidKltFeature;
+import boofcv.alg.tracker.pklt.PyramidKltFeatureSelector;
+import boofcv.alg.tracker.pklt.PyramidKltTracker;
 import boofcv.alg.transform.pyramid.PyramidOps;
-import boofcv.alg.transform.pyramid.PyramidUpdateIntegerDown;
-import boofcv.factory.filter.derivative.FactoryDerivative;
-import boofcv.factory.transform.pyramid.FactoryPyramid;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.pyramid.ImagePyramid;
 import boofcv.struct.pyramid.PyramidDiscrete;
@@ -40,11 +41,9 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class PstWrapperKltPyramid <I extends ImageSingleBand,D extends ImageSingleBand>
+public class PointTrackerKltPyramid<I extends ImageSingleBand,D extends ImageSingleBand>
 		implements ImagePointTracker<I>
 {
-
-	PkltManager<I,D> trackManager;
 	PyramidUpdaterDiscrete<I>  inputPyramidUpdater;
 	ImageGradient<I,D> gradient;
 
@@ -52,33 +51,59 @@ public class PstWrapperKltPyramid <I extends ImageSingleBand,D extends ImageSing
 	ImagePyramid<D> derivX;
 	ImagePyramid<D> derivY;
 
-	List<PointTrack> active = new ArrayList<PointTrack>();
-	List<PointTrack> spawned = new ArrayList<PointTrack>();
-	List<PointTrack> dropped = new ArrayList<PointTrack>();
+	// configuration for the track manager
+	protected PkltConfig<I, D> config;
+
+	// list of features which are actively being tracked
+	protected List<PyramidKltFeature> active = new ArrayList<PyramidKltFeature>();
+	// list of features which were just spawned
+	protected List<PyramidKltFeature> spawned = new ArrayList<PyramidKltFeature>();
+	// list of features which were just dropped
+	protected List<PyramidKltFeature> dropped = new ArrayList<PyramidKltFeature>();
+	// feature data available for future tracking
+	protected List<PyramidKltFeature> unused = new ArrayList<PyramidKltFeature>();
+
+	// the tracker
+	protected PyramidKltTracker<I, D> tracker;
+
+	// used to automatically select new features in the image
+	protected PyramidKltFeatureSelector<I, D> featureSelector;
 
 	long totalFeatures = 0;
 
 	/**
 	 * Constructor which specified the KLT track manager and how the image pyramids are computed.
 	 *
-	 * @param trackManager KLT tracker
+	 * @param config KLT tracker configuration
 	 * @param inputPyramidUpdater Computes the main image pyramid.
 	 * @param gradient Computes gradient image pyramid.
 	 */
-	public PstWrapperKltPyramid(PkltManager<I, D> trackManager,
-								PyramidUpdateIntegerDown<I> inputPyramidUpdater,
-								ImageGradient<I,D> gradient) {
-		setup(trackManager, inputPyramidUpdater, gradient);
-	}
-
-	private void setup(PkltManager<I, D> trackManager,
-					   PyramidUpdaterDiscrete<I> inputPyramidUpdater,
-					   ImageGradient<I,D> gradient ) {
-		this.trackManager = trackManager;
+	public PointTrackerKltPyramid(PkltConfig<I, D> config,
+								  PyramidUpdaterDiscrete<I> inputPyramidUpdater,
+								  GenericPkltFeatSelector<I, D> featureSelector,
+								  ImageGradient<I, D> gradient,
+								  InterpolateRectangle<I> interpInput,
+								  InterpolateRectangle<D> interpDeriv) {
+		this.config = config;
 		this.gradient = gradient;
+		this.featureSelector = featureSelector;
 		this.inputPyramidUpdater = inputPyramidUpdater;
 
-		PkltManagerConfig<I, D> config = trackManager.getConfig();
+		KltTracker<I, D> klt = new KltTracker<I, D>(interpInput, interpDeriv, config.config);
+		tracker = new PyramidKltTracker<I, D>(klt);
+		featureSelector.setTracker(tracker);
+
+		// pre-declare image features
+		int numLayers = config.pyramidScaling.length;
+		for (int i = 0; i < config.maxFeatures; i++) {
+			PyramidKltFeature t = new PyramidKltFeature(numLayers, config.featureRadius);
+
+			PointTrack p = new PointTrack();
+			p.setDescription(t);
+			t.cookie = p;
+
+			unused.add(t);
+		}
 
 		// declare the image pyramid
 		basePyramid = new PyramidDiscrete<I>(config.typeInput,true,config.pyramidScaling);
@@ -86,63 +111,34 @@ public class PstWrapperKltPyramid <I extends ImageSingleBand,D extends ImageSing
 		derivY = new PyramidDiscrete<D>(config.typeDeriv,false,config.pyramidScaling);
 	}
 
-	/**
-	 * Uses a default algorithm for computing image pyramids.
-	 *
-	 * @param trackManager
-	 */
-	public PstWrapperKltPyramid(PkltManager<I, D> trackManager ) {
-		Class<I> typeInput = trackManager.getConfig().typeInput;
-		Class<D> typeDeriv = trackManager.getConfig().typeDeriv;
-
-		ImageGradient<I,D> gradient = FactoryDerivative.sobel(typeInput,typeDeriv);
-
-		PyramidUpdaterDiscrete<I> pyrUpdater = FactoryPyramid.discreteGaussian(typeInput,-1,2);
-
-		setup(trackManager,pyrUpdater, gradient);
-	}
-
 	@Override
 	public void spawnTracks() {
 		spawned.clear();
-		
-		trackManager.spawnTracks(basePyramid,derivX,derivY);
 
-		// add new ones
-		for( PyramidKltFeature t : trackManager.getSpawned() ) {
-			// create the AssociatedPair, add it to the active and spawned track lists
-			addSpawnedFeature(t);
+		int numBefore = active.size();
+		featureSelector.setInputs(basePyramid, derivX, derivY);
+		featureSelector.compute(active, unused);
+
+		// add new features which were just added
+		for (int i = numBefore; i < active.size(); i++) {
+			PyramidKltFeature t = active.get(i);
+			PointTrack p = t.getCookie();
+			p.featureId = totalFeatures++;
+			p.set(t.x,t.y);
+			spawned.add(t);
 		}
 	}
 
 	@Override
 	public void dropAllTracks() {
-		trackManager.dropAllTracks();
+		unused.addAll(active);
 		active.clear();
-	}
-
-	public boolean addTrack(double x, double y) {
-		if( trackManager.addTrack((float)x,(float)y) ) {
-			List<PyramidKltFeature> spawnList = trackManager.getSpawned();
-			PyramidKltFeature t = spawnList.get( spawnList.size()-1 );
-			addSpawnedFeature(t);
-			return true;
-		}
-		return false;
-	}
-
-	private void addSpawnedFeature(PyramidKltFeature t) {
-		PointTrack p = new PointTrack(t.x,t.y,totalFeatures++);
-		p.setDescription(t);
-		t.setCookie(p);
-
-		active.add(p);
-		spawned.add(p);
 	}
 
 	@Override
 	public void process(I image) {
 		spawned.clear();
+		unused.addAll(dropped);
 		dropped.clear();
 		
 		// update image pyramids
@@ -150,30 +146,27 @@ public class PstWrapperKltPyramid <I extends ImageSingleBand,D extends ImageSing
 		PyramidOps.gradient(basePyramid, gradient, derivX,derivY);
 
 		// track features
-		trackManager.processFrame(basePyramid,derivX,derivY);
+		tracker.setImage(basePyramid,derivX,derivY);
+		for( int i = 0; i < active.size(); ) {
+			PyramidKltFeature t = active.get(i);
+			KltTrackFault ret = tracker.track(t);
 
-		// remove dropped features
-		for( PyramidKltFeature t : trackManager.getDropped() ) {
-			dropped.add( (PointTrack)t.cookie);
-			// todo slow way to remove features from a large list
-			if( !active.remove(t.cookie) )
-				throw new IllegalArgumentException("Feature dropped not in active list");
-			t.cookie = null;
-		}
-
-		// update the position of all active tracks
-		for( PointTrack t : active ) {
-			PyramidKltFeature p = t.getDescription();
-			t.set(p.x,p.y);
+			if( ret == KltTrackFault.SUCCESS ) {
+				PointTrack p = t.getCookie();
+				p.set(t.x,t.y);
+				i++;
+			} else {
+				active.remove(i);
+				dropped.add( t );
+			}
 		}
 	}
 
 	@Override
 	public void dropTrack(PointTrack track) {
-		if( !active.remove(track) ) {
+		if( !active.remove((PyramidKltFeature)track.getDescription()) ) {
 			throw new RuntimeException("Not in active list!");
 		}
-		trackManager.dropTrack( (PyramidKltFeature)track.getDescription() );
 	}
 
 	@Override
@@ -181,7 +174,8 @@ public class PstWrapperKltPyramid <I extends ImageSingleBand,D extends ImageSing
 		if( list == null )
 			list = new ArrayList<PointTrack>();
 
-		list.addAll(active);
+		addToList(active,list);
+
 		return list;
 	}
 
@@ -190,8 +184,9 @@ public class PstWrapperKltPyramid <I extends ImageSingleBand,D extends ImageSing
 		if( list == null )
 			list = new ArrayList<PointTrack>();
 
-		list.addAll(dropped);
-		return dropped;
+		addToList(dropped,list);
+
+		return list;
 	}
 
 	@Override
@@ -199,25 +194,25 @@ public class PstWrapperKltPyramid <I extends ImageSingleBand,D extends ImageSing
 		if( list == null )
 			list = new ArrayList<PointTrack>();
 
-		list.addAll(spawned);
-		return spawned;
+		addToList(spawned,list);
+
+		return list;
 	}
 
 	@Override
 	public List<PointTrack> getAllTracks( List<PointTrack> list ) {
-		if( list == null )
-			list = new ArrayList<PointTrack>();
-
 		return getActiveTracks(list);
+	}
+
+	private void addToList( List<PyramidKltFeature> in , List<PointTrack> out ) {
+		for( PyramidKltFeature t : in ) {
+			out.add( (PointTrack)t.cookie );
+		}
 	}
 
 	@Override
 	public void reset() {
 		dropAllTracks();
 		totalFeatures = 0;
-	}
-
-	public PkltManager<I, D> getTrackManager() {
-		return trackManager;
 	}
 }

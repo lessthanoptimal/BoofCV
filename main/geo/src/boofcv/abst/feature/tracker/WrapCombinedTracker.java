@@ -36,6 +36,8 @@ import java.util.Stack;
 /**
  * @author Peter Abeles
  */
+// TODO drop after no associate after X detections
+// TODO Speed up combination of respawn and spawn
 public class WrapCombinedTracker<I extends ImageSingleBand, D extends ImageSingleBand, TD extends TupleDesc>
 		implements ImagePointTracker<I> {
 
@@ -50,10 +52,10 @@ public class WrapCombinedTracker<I extends ImageSingleBand, D extends ImageSingl
 	ImageGradient<I,D> gradient;
 
 	int reactivateThreshold;
+	int dropThreshold=2;
 	int previousSpawn;
 
-	// temporary storage for tracks
-	protected List<PointTrack> pointTracks = new ArrayList<PointTrack>();
+	boolean detected;
 
 	Stack<PointTrack> unused = new Stack<PointTrack>();
 
@@ -79,10 +81,15 @@ public class WrapCombinedTracker<I extends ImageSingleBand, D extends ImageSingl
 	public void reset() {
 		tracker.reset();
 		previousSpawn = 0;
+		detected = false;
 	}
 
 	@Override
 	public void process(I image) {
+		System.out.println("------------ Process");
+
+		detected = false;
+
 		// update the image pyramid
 		updaterP.update(image,pyramid);
 		PyramidOps.gradient(pyramid, gradient, derivX, derivY);
@@ -97,22 +104,32 @@ public class WrapCombinedTracker<I extends ImageSingleBand, D extends ImageSingl
 		int numActive = tracker.getPureKlt().size() + tracker.getReactivated().size();
 
 		if( previousSpawn-numActive > reactivateThreshold) {
-			tracker.detectInterestPoints();
-			tracker.associateTaintedToPoints();
+			detected = true;
+			tracker.associateTaintedToDetected();
 			previousSpawn = tracker.getPureKlt().size() + tracker.getReactivated().size();
+		}
+
+		for( CombinedTrack<TD> t : tracker.getPureKlt() ) {
+			((PointTrack)t.getCookie()).set(t);
+		}
+		for( CombinedTrack<TD> t : tracker.getReactivated() ) {
+			((PointTrack)t.getCookie()).set(t);
 		}
 	}
 
 	@Override
 	public void spawnTracks() {
-		tracker.detectInterestPoints();
-		tracker.spawnTracksFromPoints();
+		if( !detected ) {
+			tracker.associateTaintedToDetected();
+		}
+		tracker.spawnTracksFromDetected();
 
 		List<CombinedTrack<TD>> spawned = tracker.getSpawned();
 
 		for( CombinedTrack<TD> t : spawned ) {
 			PointTrack p = unused.isEmpty() ? new PointTrack() : unused.pop();
 
+			p.set(t);
 			p.setDescription(t);
 			t.setCookie(p);
 			p.featureId = t.featureId;
@@ -133,39 +150,48 @@ public class WrapCombinedTracker<I extends ImageSingleBand, D extends ImageSingl
 
 	@Override
 	public List<PointTrack> getAllTracks(List<PointTrack> list) {
-		pointTracks.clear();
+		if( list == null ) {
+			list = new ArrayList<PointTrack>();
+		}
 
-		addToList(tracker.getReactivated(),pointTracks);
-		addToList(tracker.getPureKlt(),pointTracks);
-		addToList(tracker.getDormant(),pointTracks);
+		addToList(tracker.getReactivated(),list);
+		addToList(tracker.getPureKlt(),list);
+		addToList(tracker.getDormant(),list);
 
-		return pointTracks;
+		return list;
 	}
 
 	@Override
 	public List<PointTrack> getActiveTracks(List<PointTrack> list) {
-		pointTracks.clear();
+		if( list == null ) {
+			list = new ArrayList<PointTrack>();
+		}
 
-		addToList(tracker.getReactivated(),pointTracks);
-		addToList(tracker.getPureKlt(),pointTracks);
+		addToList(tracker.getReactivated(),list);
+		addToList(tracker.getPureKlt(),list);
 
-		return pointTracks;
+		return list;
 	}
 
 	@Override
 	public List<PointTrack> getDroppedTracks(List<PointTrack> list) {
+		if( list == null ) {
+			list = new ArrayList<PointTrack>();
+		}
+
 		// it never drops tracks
-		pointTracks.clear();
-		return pointTracks;
+		return list;
 	}
 
 	@Override
 	public List<PointTrack> getNewTracks(List<PointTrack> list) {
-		pointTracks.clear();
+		if( list == null ) {
+			list = new ArrayList<PointTrack>();
+		}
 
-		addToList(tracker.getSpawned(),pointTracks);
+		addToList(tracker.getSpawned(),list);
 
-		return pointTracks;
+		return list;
 	}
 
 	private void addToList( List<CombinedTrack<TD>> in , List<PointTrack> out ) {

@@ -27,10 +27,8 @@ import boofcv.abst.feature.detect.extract.FeatureExtractor;
 import boofcv.abst.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.abst.feature.detect.interest.InterestPointDetector;
 import boofcv.abst.feature.detect.interest.WrapFHtoInterestPoint;
-import boofcv.abst.feature.tracker.DetectAssociateTracker;
-import boofcv.abst.feature.tracker.ImagePointTracker;
-import boofcv.abst.feature.tracker.PstWrapperKltPyramid;
-import boofcv.abst.feature.tracker.WrapCombinedTracker;
+import boofcv.abst.feature.tracker.*;
+import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.alg.feature.associate.AssociateSurfBasic;
 import boofcv.alg.feature.describe.DescribePointBrief;
 import boofcv.alg.feature.describe.DescribePointPixelRegionNCC;
@@ -39,12 +37,11 @@ import boofcv.alg.feature.describe.brief.FactoryBriefDefinition;
 import boofcv.alg.feature.detect.interest.FastHessianFeatureDetector;
 import boofcv.alg.feature.orientation.OrientationIntegral;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
+import boofcv.alg.interpolate.InterpolateRectangle;
 import boofcv.alg.tracker.combined.CombinedTrackerScalePoint;
 import boofcv.alg.tracker.combined.PyramidKltForCombined;
 import boofcv.alg.tracker.klt.KltConfig;
 import boofcv.alg.tracker.pklt.GenericPkltFeatSelector;
-import boofcv.alg.tracker.pklt.PkltManager;
-import boofcv.alg.tracker.pklt.PkltManagerConfig;
 import boofcv.alg.transform.ii.GIntegralImageOps;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.feature.describe.FactoryDescribePointAlgs;
@@ -53,9 +50,12 @@ import boofcv.factory.feature.detect.interest.FactoryDetectPoint;
 import boofcv.factory.feature.detect.interest.FactoryInterestPoint;
 import boofcv.factory.feature.orientation.FactoryOrientationAlgs;
 import boofcv.factory.filter.blur.FactoryBlurFilter;
+import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.factory.interpolate.FactoryInterpolation;
+import boofcv.factory.transform.pyramid.FactoryPyramid;
 import boofcv.struct.feature.*;
 import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.pyramid.PyramidUpdaterDiscrete;
 
 import java.util.Random;
 
@@ -83,26 +83,13 @@ public class FactoryPointSequentialTracker {
 	 */
 	public static <I extends ImageSingleBand, D extends ImageSingleBand>
 	ImagePointTracker<I> klt(int maxFeatures, int scaling[], int featureRadius, int spawnSubW, int spawnSubH, Class<I> imageType, Class<D> derivType) {
-		PkltManagerConfig<I, D> config =
-				PkltManagerConfig.createDefault(imageType, derivType);
+		PkltConfig<I, D> config =
+				PkltConfig.createDefault(imageType, derivType);
 		config.pyramidScaling = scaling;
 		config.maxFeatures = maxFeatures;
 		config.featureRadius = featureRadius;
 
-		GeneralFeatureDetector<I, D> detector =
-				FactoryDetectPoint.createShiTomasi(config.featureRadius, false, config.config.minDeterminant, config.maxFeatures, config.typeDeriv);
-		detector.setRegions(spawnSubW, spawnSubH);
-
-		GenericPkltFeatSelector<I, D> featureSelector = new GenericPkltFeatSelector<I, D>(detector, null);
-
-
-		PkltManager<I, D> trackManager = new PkltManager<I, D>();
-		trackManager.configure(config,
-				FactoryInterpolation.<I>bilinearRectangle(config.typeInput),
-				FactoryInterpolation.<D>bilinearRectangle(config.typeDeriv),
-				featureSelector);
-
-		return new PstWrapperKltPyramid<I, D>(trackManager);
+		return klt(config,spawnSubW,spawnSubH);
 	}
 
 	/**
@@ -110,14 +97,28 @@ public class FactoryPointSequentialTracker {
 	 *
 	 * @see boofcv.struct.pyramid.PyramidUpdaterDiscrete
 	 *
-	 * @param config Config for the tracker. Try PkltManagerConfig.createDefault().
+	 * @param config Config for the tracker. Try PkltConfig.createDefault().
+	 * @param spawnSubW     Forces a more even distribution of features.  Width.  Try 2
+	 * @param spawnSubH     Forces a more even distribution of features.  Height.  Try 3
 	 * @return KLT based tracker.
 	 */
 	public static <I extends ImageSingleBand, D extends ImageSingleBand>
-	ImagePointTracker<I> klt(PkltManagerConfig<I, D> config) {
-		PkltManager<I, D> trackManager = new PkltManager<I, D>(config);
+	ImagePointTracker<I> klt(PkltConfig<I, D> config, int spawnSubW, int spawnSubH) {
+		GeneralFeatureDetector<I, D> detector =
+				FactoryDetectPoint.createShiTomasi(config.featureRadius, false, config.config.minDeterminant, config.maxFeatures, config.typeDeriv);
+		detector.setRegions(spawnSubW, spawnSubH);
 
-		return new PstWrapperKltPyramid<I, D>(trackManager);
+		GenericPkltFeatSelector<I, D> featureSelector = new GenericPkltFeatSelector<I, D>(detector, null);
+
+		InterpolateRectangle<I> interpInput = FactoryInterpolation.<I>bilinearRectangle(config.typeInput);
+		InterpolateRectangle<D> interpDeriv = FactoryInterpolation.<D>bilinearRectangle(config.typeDeriv);
+
+		ImageGradient<I,D> gradient = FactoryDerivative.sobel(config.typeInput, config.typeDeriv);
+
+		PyramidUpdaterDiscrete<I> pyramidUpdater = FactoryPyramid.discreteGaussian(config.typeInput, -1, 2);
+
+		return new PointTrackerKltPyramid<I, D>(config,pyramidUpdater,featureSelector,
+				gradient,interpInput,interpDeriv);
 	}
 
 	/**
@@ -271,6 +272,47 @@ public class FactoryPointSequentialTracker {
 		dat.setUpdateState(updateDescription);
 
 		return dat;
+	}
+
+	/**
+	 * Creates a tracker which detects Fast-Hessian features and describes them with SURF.
+	 *
+	 * @see boofcv.alg.feature.detect.intensity.ShiTomasiCornerIntensity
+	 * @see DescribePointSurf
+	 * @see DetectAssociateTracker
+	 *
+	 * @param maxMatches     The maximum number of matched features that will be considered.
+	 *                       Set to a value <= 0 to not bound the number of matches.
+	 * @param detectPerScale Controls how many features can be detected.  Try a value of 200 initially.
+	 * @param featureRadius  Size of tracked KLT feature and how close detected features can be.  Recommended value = 2.
+	 * @param imageType      Type of image the input is.
+	 * @param <I>            Input image type.
+	 * @param <II>           Integral image type.
+	 * @return SURF based tracker.
+	 */
+	public static <I extends ImageSingleBand, II extends ImageSingleBand>
+	ImagePointTracker<I> combined_FH_SURF_KLT(int maxMatches, int detectPerScale, int featureRadius,
+											  KltConfig configKlt, int[] pyramidScalingKlt ,
+											  int reactiveThreshold ,
+											  Class<I> imageType) {
+		Class<II> integralType = GIntegralImageOps.getIntegralType(imageType);
+
+		FeatureExtractor extractor = FactoryFeatureExtractor.nonmax(featureRadius, 1, 10, true);
+
+		FastHessianFeatureDetector<II> detector = new FastHessianFeatureDetector<II>(extractor, detectPerScale, 2, 9, 4, 4);
+		OrientationIntegral<II> orientation = FactoryOrientationAlgs.average_ii(6, 1, 6, 0, integralType);
+		DescribePointSurf<II> describe = new DescribePointSurf<II>(integralType);
+
+		ScoreAssociation<TupleDesc_F64> score = FactoryAssociation.scoreEuclidean(TupleDesc_F64.class, true);
+		AssociateSurfBasic assoc = new AssociateSurfBasic(FactoryAssociation.greedy(score, 100000, maxMatches, true));
+
+		InterestPointDetector<I> id = new WrapFHtoInterestPoint<I,II>(detector);
+		DescribeRegionPoint<I,SurfFeature> regionDesc = new WrapDescribeSurf<I,II>(describe,orientation);
+		GeneralAssociation<SurfFeature> generalAssoc = new WrapAssociateSurfBasic(assoc);
+
+
+		return combined(id,regionDesc,generalAssoc,configKlt,featureRadius,pyramidScalingKlt,reactiveThreshold,
+				imageType);
 	}
 
 	/**

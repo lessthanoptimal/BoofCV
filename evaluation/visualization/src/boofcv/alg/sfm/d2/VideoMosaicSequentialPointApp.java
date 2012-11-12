@@ -18,7 +18,7 @@
 
 package boofcv.alg.sfm.d2;
 
-import boofcv.alg.tracker.pklt.PkltManagerConfig;
+import boofcv.abst.feature.tracker.PkltConfig;
 import boofcv.factory.feature.tracker.FactoryPointSequentialTracker;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.PathLabel;
@@ -59,15 +59,17 @@ public class VideoMosaicSequentialPointApp<I extends ImageSingleBand, D extends 
 		// size of the mosaic image
 		setOutputSize(1000,600);
 
-		PkltManagerConfig<I, D> config =
-				PkltManagerConfig.createDefault(imageType,derivType);
+		PkltConfig<I, D> config =
+				PkltConfig.createDefault(imageType, derivType);
 		config.maxFeatures = maxFeatures;
 		config.featureRadius = 3;
 		config.pyramidScaling = new int[]{1,2,4,8};
 
-		addAlgorithm(0, "KLT", FactoryPointSequentialTracker.klt(config));
+		addAlgorithm(0, "KLT", FactoryPointSequentialTracker.klt(config,1,1));
 		addAlgorithm(0, "BRIEF", FactoryPointSequentialTracker.dda_ShiTomasi_BRIEF(400, 150, 1, 10, 2,imageType,null));
 		addAlgorithm(0, "SURF", FactoryPointSequentialTracker.dda_FH_SURF(300, 200, 2, 2,imageType));
+		addAlgorithm(0, "SURF-KLT", FactoryPointSequentialTracker.combined_FH_SURF_KLT(300, 200, 3,
+				config.config,config.pyramidScaling,200,imageType));
 
 		addAlgorithm(1,"Affine", new Affine2D_F64());
 		addAlgorithm(1,"Homography", new Homography2D_F64());
