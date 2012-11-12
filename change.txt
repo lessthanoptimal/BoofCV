@@ -8,6 +8,10 @@ Version : Alpha 0.12
 
 - Fixed inverse wavelet transform so that it bounds the pixel values
   * Wavelet denoising sometimes overflowed
+- Adding new feature tracker which combines KLT and DDA style tracking
+- Removed PkltTrackManager and pushed its functionality into the ImagePointTracker implementation
+  * Was only separate for historical reasons
+  * renamed PstWrapperPyramidKlt to PointTrackerKltPyramid
 
 ---------------------------------------------
 Date    : 2012/11/6

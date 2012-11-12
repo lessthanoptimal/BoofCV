@@ -19,9 +19,9 @@
 package boofcv.examples;
 
 import boofcv.abst.feature.tracker.ImagePointTracker;
+import boofcv.abst.feature.tracker.PkltConfig;
 import boofcv.abst.feature.tracker.PointTrack;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
-import boofcv.alg.tracker.pklt.PkltManagerConfig;
 import boofcv.factory.feature.tracker.FactoryPointSequentialTracker;
 import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.gui.image.ImagePanel;
@@ -122,12 +122,12 @@ public class ExamplePointFeatureTracker< T extends ImageSingleBand, D extends Im
 	 * A simple way to create a Kanade-Lucas-Tomasi (KLT) tracker.
 	 */
 	public void createKLT() {
-		PkltManagerConfig<T, D> config = PkltManagerConfig.createDefault(imageType,derivType);
+		PkltConfig<T, D> config = PkltConfig.createDefault(imageType, derivType);
 		config.maxFeatures = 200;
 		config.featureRadius = 3;
 		config.pyramidScaling = new int[]{1,2,4,8};
 
-		tracker = FactoryPointSequentialTracker.klt(config);
+		tracker = FactoryPointSequentialTracker.klt(config,1,1);
 	}
 
 	/**

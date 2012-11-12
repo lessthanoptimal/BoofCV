@@ -18,25 +18,20 @@
 
 package boofcv.abst.feature.tracker;
 
-import boofcv.alg.tracker.pklt.PkltManager;
-import boofcv.alg.tracker.pklt.PkltManagerConfig;
+import boofcv.factory.feature.tracker.FactoryPointSequentialTracker;
 import boofcv.struct.image.ImageFloat32;
 
 
 /**
  * @author Peter Abeles
  */
-public class TestPstWrapperKltPyramid extends StandardImagePointTracker<ImageFloat32> {
+public class TestPointTrackerKltPyramid extends StandardImagePointTracker<ImageFloat32> {
 
-	PkltManagerConfig<ImageFloat32,ImageFloat32> config;
-	PkltManager<ImageFloat32,ImageFloat32> manager;
-	PstWrapperKltPyramid<ImageFloat32,ImageFloat32> pointTracker;
+	PkltConfig<ImageFloat32,ImageFloat32> config;
 
 	@Override
 	public ImagePointTracker<ImageFloat32> createTracker() {
-		config = PkltManagerConfig.createDefault(ImageFloat32.class,ImageFloat32.class);
-		manager = new PkltManager<ImageFloat32,ImageFloat32>(config);
-		pointTracker = new PstWrapperKltPyramid<ImageFloat32,ImageFloat32>(manager);
-		return pointTracker;
+		config = PkltConfig.createDefault(ImageFloat32.class, ImageFloat32.class);
+		return FactoryPointSequentialTracker.klt(config,1,1);
 	}
 }

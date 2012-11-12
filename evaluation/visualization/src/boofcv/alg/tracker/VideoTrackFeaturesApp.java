@@ -19,8 +19,8 @@
 package boofcv.alg.tracker;
 
 import boofcv.abst.feature.tracker.ImagePointTracker;
+import boofcv.abst.feature.tracker.PkltConfig;
 import boofcv.abst.feature.tracker.PointTrack;
-import boofcv.alg.tracker.pklt.PkltManagerConfig;
 import boofcv.factory.feature.tracker.FactoryPointSequentialTracker;
 import boofcv.gui.VideoProcessAppBase;
 import boofcv.gui.feature.VisualizeFeatures;
@@ -59,13 +59,13 @@ public class VideoTrackFeaturesApp<I extends ImageSingleBand, D extends ImageSin
 	public VideoTrackFeaturesApp( Class<I> imageType , Class<D> derivType ) {
 		super(1,imageType);
 
-		PkltManagerConfig<I, D> config =
-				PkltManagerConfig.createDefault(imageType,derivType);
+		PkltConfig<I, D> config =
+				PkltConfig.createDefault(imageType, derivType);
 		config.maxFeatures = maxFeatures;
 		config.featureRadius = 3;
 		config.pyramidScaling = new int[]{1,2,4,8};
 
-		addAlgorithm(0,"KLT", FactoryPointSequentialTracker.klt(config));
+		addAlgorithm(0,"KLT", FactoryPointSequentialTracker.klt(config,1,1));
 		addAlgorithm(0,"BRIEF", FactoryPointSequentialTracker.dda_ShiTomasi_BRIEF(300, 200, 1, 1,2, imageType,derivType));
 		addAlgorithm(0,"SURF", FactoryPointSequentialTracker.dda_FH_SURF(300, 200, 2, 2,imageType));
 		addAlgorithm(0,"NCC", FactoryPointSequentialTracker.dda_ShiTomasi_NCC(500, 5, 5, 20, 2,imageType, derivType));

@@ -188,7 +188,7 @@ public abstract class StandardImagePointTracker <T extends ImageSingleBand> {
 		tracker.process((T)image);
 		tracker.spawnTracks();
 		assertTrue(tracker.getAllTracks(null).size() > 0);
-		assertTrue(tracker.getAllTracks(null).get(0).featureId == 0 );
+		assertEquals(0, tracker.getAllTracks(null).get(0).featureId);
 
 		tracker.reset();
 
@@ -200,7 +200,7 @@ public abstract class StandardImagePointTracker <T extends ImageSingleBand> {
 		// old tracks should be discarded
 		assertTrue(tracker.getAllTracks(null).size() > 0);
 		// checks to see if feature ID counter was reset
-		assertTrue(tracker.getAllTracks(null).get(0).featureId == 0 );
+		assertEquals(0, tracker.getAllTracks(null).get(0).featureId);
 	}
 
 
