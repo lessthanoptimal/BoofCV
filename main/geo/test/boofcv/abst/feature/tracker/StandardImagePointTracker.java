@@ -55,6 +55,22 @@ public abstract class StandardImagePointTracker <T extends ImageSingleBand> {
 	 */
 	public abstract ImagePointTracker<T> createTracker();
 
+	/**
+	 * The cookie for tracks should not be set
+	 */
+	@Test
+	public void checkCookieNull() {
+		tracker = createTracker();
+		tracker.process((T)image);
+		tracker.spawnTracks();
+
+		assertTrue(tracker.getAllTracks(null).size() > 0);
+
+		for( PointTrack t : tracker.getActiveTracks(null) ) {
+			assertTrue(t.cookie==null);
+		}
+	}
+
 	@Test
 	public void spawnTracks() {
 		tracker = createTracker();
@@ -137,7 +153,7 @@ public abstract class StandardImagePointTracker <T extends ImageSingleBand> {
 		tracker.spawnTracks();
 		List<PointTrack> tracks = tracker.getActiveTracks(null);
 
-		int before = tracker.getActiveTracks(null).size();
+		int before = tracks.size();
 		assertTrue(before > 0);
 		tracker.dropTrack(tracks.get(0));
 		

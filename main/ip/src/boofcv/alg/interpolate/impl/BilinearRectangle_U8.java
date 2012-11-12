@@ -62,10 +62,10 @@ public class BilinearRectangle_U8 implements InterpolateRectangle<ImageUInt8> {
 	}
 
 	@Override
-	public void region(float lt_x, float tl_y, ImageFloat32 output ) {
-		int xt = (int) lt_x;
+	public void region(float tl_x, float tl_y, ImageFloat32 output ) {
+		int xt = (int) tl_x;
 		int yt = (int) tl_y;
-		float ax = lt_x - xt;
+		float ax = tl_x - xt;
 		float ay = tl_y - yt;
 
 		float bx = 1.0f - ax;

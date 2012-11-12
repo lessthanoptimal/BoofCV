@@ -30,6 +30,7 @@ import boofcv.abst.feature.detect.interest.WrapFHtoInterestPoint;
 import boofcv.abst.feature.tracker.DetectAssociateTracker;
 import boofcv.abst.feature.tracker.ImagePointTracker;
 import boofcv.abst.feature.tracker.PstWrapperKltPyramid;
+import boofcv.abst.feature.tracker.WrapCombinedTracker;
 import boofcv.alg.feature.associate.AssociateSurfBasic;
 import boofcv.alg.feature.describe.DescribePointBrief;
 import boofcv.alg.feature.describe.DescribePointPixelRegionNCC;
@@ -38,6 +39,9 @@ import boofcv.alg.feature.describe.brief.FactoryBriefDefinition;
 import boofcv.alg.feature.detect.interest.FastHessianFeatureDetector;
 import boofcv.alg.feature.orientation.OrientationIntegral;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
+import boofcv.alg.tracker.combined.CombinedTrackerScalePoint;
+import boofcv.alg.tracker.combined.PyramidKltForCombined;
+import boofcv.alg.tracker.klt.KltConfig;
 import boofcv.alg.tracker.pklt.GenericPkltFeatSelector;
 import boofcv.alg.tracker.pklt.PkltManager;
 import boofcv.alg.tracker.pklt.PkltManagerConfig;
@@ -176,7 +180,8 @@ public class FactoryPointSequentialTracker {
 	ImagePointTracker<I> dda_ShiTomasi_BRIEF(int maxFeatures, int maxAssociationError,
 											 int detectionRadius,
 											 float cornerThreshold,
-											 int pruneAfter, Class<I> imageType , Class<D> derivType )
+											 int pruneAfter,
+											 Class<I> imageType , Class<D> derivType )
 	{
 		if( derivType == null )
 			derivType = GImageDerivativeOps.getDerivativeType(imageType);
@@ -248,6 +253,7 @@ public class FactoryPointSequentialTracker {
 	 * @param associate Description association.
 	 * @param updateDescription After a track has been associated should the description be changed?  Try false.
 	 * @param pruneAfter Prune tracks which have not been associated with any features after this many images.  Try 2.
+	 * @param imageType     Input image type.
 	 * @param <I> Type of input image.
 	 * @param <Desc> Type of region description
 	 * @return tracker
@@ -257,12 +263,52 @@ public class FactoryPointSequentialTracker {
 														   DescribeRegionPoint<I, Desc> describe,
 														   GeneralAssociation<Desc> associate ,
 														   boolean updateDescription ,
-														   int pruneAfter ) {
+														   int pruneAfter ,
+														   Class<I> imageType ) {
 
 		DetectAssociateTracker<I,Desc> dat = new DetectAssociateTracker<I,Desc>(detector, describe, associate);
 		dat.setPruneThreshold(pruneAfter);
 		dat.setUpdateState(updateDescription);
 
 		return dat;
+	}
+
+	/**
+	 * Creates a tracker that is a hybrid between KLT and Detect-Describe-Associate (DDA) trackers.
+	 *
+	 * @see CombinedTrackerScalePoint
+	 *
+	 * @param detector Feature detector.
+	 * @param describe Feature description
+	 * @param associate Association algorithm.
+	 * @param configKlt KLT configuration
+	 * @param featureRadiusKlt KLT feature radius
+	 * @param pyramidScalingKlt KLT pyramid configuration
+	 * @param reactiveThreshold Threshold for when dormant tracks are.  Try 10% of expected number of tracks.
+	 * @param imageType Input image type.
+	 * @param <I> Input image type.
+	 * @param <D> Derivative image type.
+	 * @param <Desc> Feature description type.
+	 * @return Feature tracker
+	 */
+	public static <I extends ImageSingleBand, D extends ImageSingleBand, Desc extends TupleDesc>
+	ImagePointTracker<I> combined( InterestPointDetector<I> detector,
+								   DescribeRegionPoint<I, Desc> describe,
+								   GeneralAssociation<Desc> associate ,
+								   KltConfig configKlt,
+								   int featureRadiusKlt,
+								   int[] pyramidScalingKlt ,
+								   int reactiveThreshold,
+								   Class<I> imageType )
+	{
+		Class<D> derivType = GImageDerivativeOps.getDerivativeType(imageType);
+
+		PyramidKltForCombined<I,D> klt = new PyramidKltForCombined<I, D>(configKlt,
+				featureRadiusKlt,pyramidScalingKlt,imageType,derivType);
+
+		CombinedTrackerScalePoint<I, D,Desc> tracker =
+				new CombinedTrackerScalePoint<I, D, Desc>(klt,detector,describe,associate);
+
+		return new WrapCombinedTracker<I,D,Desc>(tracker,reactiveThreshold,imageType,derivType);
 	}
 }

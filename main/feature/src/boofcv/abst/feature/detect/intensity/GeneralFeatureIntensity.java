@@ -29,8 +29,12 @@ import boofcv.struct.image.ImageSingleBand;
  * @see boofcv.alg.feature.detect.intensity
  * @see boofcv.abst.feature.detect.extract
  *
+ * @param <I> Input image type.
+ * @param <D> Image derivative type.
+ *
  * @author Peter Abeles
  */
+
 public interface GeneralFeatureIntensity<I extends ImageSingleBand,D extends ImageSingleBand> {
 
 	/**

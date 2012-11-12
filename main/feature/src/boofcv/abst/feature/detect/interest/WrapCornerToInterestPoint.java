@@ -32,6 +32,9 @@ import java.util.List;
 /**
  * Wrapper around {@link GeneralFeatureDetector} to make it compatible with {@link InterestPointDetector}.
  *
+ * @param <T> Input image type.
+ * @param <D> Image derivative type.
+ *
  * @author Peter Abeles
  */
 public class WrapCornerToInterestPoint<T extends ImageSingleBand, D extends ImageSingleBand> implements InterestPointDetector<T> {
