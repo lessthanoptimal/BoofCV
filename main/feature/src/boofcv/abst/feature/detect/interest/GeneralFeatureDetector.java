@@ -36,6 +36,9 @@ import java.util.Arrays;
  * to be passed in, allowing for tighter integration of algorithms.
  * </p>
  *
+ * @param <I> Input image type.
+ * @param <D> Image derivative type.
+ *
  * @author Peter Abeles
  */
 public class GeneralFeatureDetector<I extends ImageSingleBand, D extends ImageSingleBand> {
