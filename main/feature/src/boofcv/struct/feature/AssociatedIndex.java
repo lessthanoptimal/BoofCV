@@ -20,17 +20,17 @@ package boofcv.struct.feature;
 
 
 /**
- * Indexes of two associated features.
+ * Indexes of two associated features and the fit score..
  *
  * @author Peter Abeles
  */
 public class AssociatedIndex {
 
-	// index of the feature in the source image
+	/** index of the feature in the source image */
 	public int src;
-	// index of the feature in the destination image
+	/** index of the feature in the destination image */
 	public int dst;
-	// The association score.  Meaning will very depending on implementation
+	/** The association score.  Meaning will very depending on implementation */
 	public double fitScore;
 
 	public void setAssociation(int src , int dst , double fitScore ) {

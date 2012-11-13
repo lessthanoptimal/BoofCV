@@ -55,7 +55,6 @@ public class VideoStabilizeSequentialPointApp<I extends ImageSingleBand, D exten
 	public VideoStabilizeSequentialPointApp(Class<I> imageType, Class<D> derivType) {
 		super(true,imageType,2);
 
-
 		PkltConfig<I, D> config =
 				PkltConfig.createDefault(imageType, derivType);
 		config.maxFeatures = maxFeatures;
@@ -64,11 +63,11 @@ public class VideoStabilizeSequentialPointApp<I extends ImageSingleBand, D exten
 
 		addAlgorithm(0, "KLT", FactoryPointSequentialTracker.klt(config,1,1));
 		addAlgorithm(0, "BRIEF", FactoryPointSequentialTracker.
-				dda_ShiTomasi_BRIEF(400, 100, 1, 10, 2, imageType, derivType));
-		addAlgorithm(0, "SURF", FactoryPointSequentialTracker.dda_FH_SURF(300, 200, 2, 2,imageType));
+				dda_ShiTomasi_BRIEF(400, 100, 1, 10, imageType, derivType));
+		addAlgorithm(0, "SURF", FactoryPointSequentialTracker.dda_FH_SURF(300, 200, 2, imageType));
 		// size of the description region has been increased to improve quality.
 		addAlgorithm(0, "NCC", FactoryPointSequentialTracker.
-				dda_ShiTomasi_NCC(500, 11, 11, 10, 2, imageType, derivType));
+				dda_ShiTomasi_NCC(500, 11, 11, 10, imageType, derivType));
 		addAlgorithm(0, "SURF-KLT", FactoryPointSequentialTracker.combined_FH_SURF_KLT(300, 200, 2,
 				config.config,config.pyramidScaling,100,imageType));
 

@@ -122,7 +122,7 @@ public class KeyFramePointTracker<I extends ImageBase, R extends KeyFrameTrack> 
 		
 		tracker.spawnTracks();
 		tracks.clear();
-		tracker.getNewTracks(tracks);
+		tracker.getActiveTracks(tracks);
 		for( PointTrack t : tracks ) {
 			if( t.cookie == null )
 				try {

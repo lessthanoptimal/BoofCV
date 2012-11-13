@@ -20,6 +20,9 @@ package boofcv.abst.feature.tracker;
 
 import boofcv.factory.feature.tracker.FactoryPointSequentialTracker;
 import boofcv.struct.image.ImageFloat32;
+import org.junit.Test;
+
+import static org.junit.Assert.fail;
 
 
 /**
@@ -33,5 +36,25 @@ public class TestPointTrackerKltPyramid extends StandardImagePointTracker<ImageF
 	public ImagePointTracker<ImageFloat32> createTracker() {
 		config = PkltConfig.createDefault(ImageFloat32.class, ImageFloat32.class);
 		return FactoryPointSequentialTracker.klt(config,1,1);
+	}
+
+	@Test
+	public void checkRecycleProcess() {
+		fail("implement");
+	}
+
+	@Test
+	public void checkRecycleSpawn() {
+		fail("implement");
+	}
+
+	@Test
+	public void checkRecycleDropAll() {
+		fail("implement");
+	}
+
+	@Test
+	public void checkRecycleDropTrack() {
+		fail("implement");
 	}
 }

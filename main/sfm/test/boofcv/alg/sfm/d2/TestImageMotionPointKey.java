@@ -181,6 +181,11 @@ public class TestImageMotionPointKey {
 		}
 
 		@Override
+		public List<PointTrack> getInactiveTracks(List<PointTrack> list) {
+			return null;  //To change body of implemented methods use File | Settings | File Templates.
+		}
+
+		@Override
 		public List<PointTrack> getDroppedTracks(List<PointTrack> list) {
 			return new ArrayList<PointTrack>();
 		}

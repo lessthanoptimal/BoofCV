@@ -29,7 +29,6 @@ import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.point.Point2D_F64;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 
@@ -58,12 +57,12 @@ public class DetectAssociateTracker<I extends ImageSingleBand, D extends TupleDe
 	private FastQueue<D> featSrc;
 	private FastQueue<D> featDst;
 
-	private boolean keyFrameSet = false;
-
 	// all tracks
 	protected List<PointTrack> tracksAll = new ArrayList<PointTrack>();
 	// recently associated tracks
 	protected List<PointTrack> tracksActive = new ArrayList<PointTrack>();
+	// tracks not matched to any recent features
+	protected List<PointTrack> tracksInactive = new ArrayList<PointTrack>();
 	// tracks dropped by the tracker
 	protected List<PointTrack> tracksDropped = new ArrayList<PointTrack>();
 	// tracks recently spawned
@@ -72,54 +71,55 @@ public class DetectAssociateTracker<I extends ImageSingleBand, D extends TupleDe
 	// previously declared tracks which are being recycled
 	protected List<PointTrack> unused = new ArrayList<PointTrack>();
 
+	// Data returned by associate
 	private FastQueue<AssociatedIndex> matches;
 
+	// number of features created.  Used to assign unique IDs
 	long featureID = 0;
 
-	// if a track goes unassociated for this long it is pruned
-	int pruneThreshold = 2;
-
 	// should it update the feature description after each association?
-	boolean updateState = true;
+	boolean updateDescription;
 
-	// how many frames have been processed
-	long tick;
+	// indicates if a feature was associated or not
+	boolean srcAssociated[] = new boolean[1];
 
+	/**
+	 * Configures tracker
+	 *
+	 * @param detector Feature detector
+	 * @param describe Feature descriptor
+	 * @param associate Association
+	 * @param updateDescription If true then the feature description will be updated after each image.
+	 *                          Typically this should be false.
+	 */
 	public DetectAssociateTracker(InterestPointDetector<I> detector,
 								  DescribeRegionPoint<I, D> describe,
-								  GeneralAssociation<D> associate ) {
+								  GeneralAssociation<D> associate ,
+								  boolean updateDescription ) {
 		this.detector = detector;
 		this.describe = describe;
 		this.associate = associate;
+		this.updateDescription = updateDescription;
 
 		featSrc = new TupleDescQueue<D>(describe,false);
 		featDst = new TupleDescQueue<D>(describe,true);
 	}
 
-	public boolean isUpdateState() {
-		return updateState;
+	public boolean isUpdateDescription() {
+		return updateDescription;
 	}
 
 	/**
 	 * If a feature is associated should the description be updated with the latest observation?
 	 */
-	public void setUpdateState(boolean updateState) {
-		this.updateState = updateState;
-	}
-
-	public int getPruneThreshold() {
-		return pruneThreshold;
-	}
-
-	public void setPruneThreshold(int pruneThreshold) {
-		this.pruneThreshold = pruneThreshold;
+	public void setUpdateDescription(boolean updateDescription) {
+		this.updateDescription = updateDescription;
 	}
 
 	@Override
 	public void reset() {
 		dropAllTracks();
 		featureID = 0;
-		tick = 0;
 		featDst.reset();
 		locDst.reset();
 		matches = null;
@@ -138,6 +138,10 @@ public class DetectAssociateTracker<I extends ImageSingleBand, D extends TupleDe
 		featDst.reset();
 		locDst.reset();
 
+		if( srcAssociated.length < tracksAll.size() ) {
+			srcAssociated = new boolean[ tracksAll.size() ];
+		}
+
 		int N = detector.getNumberOfFeatures();
 		for( int i = 0; i < N; i++ ) {
 			Point2D_F64 p = locDst.grow();
@@ -150,15 +154,16 @@ public class DetectAssociateTracker<I extends ImageSingleBand, D extends TupleDe
 			describe.process(p.x,p.y,yaw,scale,desc);
 		}
 
-		// if the keyframe has been set associate
-		if( keyFrameSet ) {
+		// skip if there are no features to match with the current image
+		if( !tracksAll.isEmpty() ) {
 			// create a list of previously detected features
 			if( featSrc.size != 0 )
 				throw new RuntimeException("BUG");
 
 			for( int i = 0; i < tracksAll.size(); i++ ) {
-				TrackInfo info = tracksAll.get(i).getDescription();
-				featSrc.add(info.desc);
+				D desc = tracksAll.get(i).getDescription();
+				featSrc.add(desc);
+				srcAssociated[i] = false;
 			}
 
 			// pair of old and newly detected features
@@ -172,36 +177,24 @@ public class DetectAssociateTracker<I extends ImageSingleBand, D extends TupleDe
 				Point2D_F64 loc = locDst.data[indexes.dst];
 				track.set(loc.x, loc.y);
 				tracksActive.add(track);
-				TrackInfo info = track.getDescription();
-				info.lastAssociated = tick;
 
 				// update the description
-				if( updateState ) {
-					info.desc.setTo(featDst.get(indexes.dst));
+				if(updateDescription) {
+					((D)track.getDescription()).setTo(featDst.get(indexes.dst));
 				}
+
+				srcAssociated[indexes.src] = true;
 //				System.out.println("i = "+i+"  x = "+loc.x+" y = "+loc.y);
 			}
 
-//			System.out.println("----------------- matched "+matches.size()+"  tracked "+tracksAll.size());
+			// add unassociated to the list
+			for( int i = 0; i < tracksAll.size(); i++ ) {
+				if( !srcAssociated[i] )
+					tracksInactive.add(tracksAll.get(i));
+			}
 
 			// clean up
 			featSrc.reset();
-		}
-
-		pruneTracks();
-		tick++;
-	}
-
-	private void pruneTracks() {
-		Iterator<PointTrack> iter = tracksAll.iterator();
-		while( iter.hasNext() ) {
-			PointTrack p = iter.next();
-			TrackInfo info = p.getDescription();
-			if( tick - info.lastAssociated > pruneThreshold ) {
-				tracksDropped.add(p);
-				unused.add(p);
-				iter.remove();
-			}
 		}
 	}
 
@@ -212,8 +205,8 @@ public class DetectAssociateTracker<I extends ImageSingleBand, D extends TupleDe
 	public void spawnTracks() {
 		// create new tracks from latest detected features
 		for( int i = 0; i < featDst.size; i++ ) {
-			// if a keyframe has already been set then that means associate has been called
-			if( keyFrameSet ) {
+
+			if( matches != null ) {
 				// only spawn tracks at points which have not been associated
 				boolean found = false;
 
@@ -233,15 +226,13 @@ public class DetectAssociateTracker<I extends ImageSingleBand, D extends TupleDe
 			PointTrack p = getUnused();
 			Point2D_F64 loc = locDst.get(i);
 			p.set(loc.x,loc.y);
-			((TrackInfo)p.getDescription()).desc.setTo(featDst.get(i));
+			((D)p.getDescription()).setTo(featDst.get(i));
 			p.featureId = featureID++;
 
 			tracksNew.add(p);
 			tracksActive.add(p);
 			tracksAll.add(p);
 		}
-
-		keyFrameSet = true;
 	}
 
 	/**
@@ -251,12 +242,9 @@ public class DetectAssociateTracker<I extends ImageSingleBand, D extends TupleDe
 		PointTrack p;
 		if( unused.size() > 0 ) {
 			p = unused.remove( unused.size()-1 );
-			((TrackInfo)p.getDescription()).reset();
 		} else {
 			p = new PointTrack();
-			TrackInfo info = new TrackInfo();
-			info.desc = describe.createDescription();
-			p.setDescription(info);
+			p.setDescription(describe.createDescription());
 		}
 		return p;
 	}
@@ -267,7 +255,6 @@ public class DetectAssociateTracker<I extends ImageSingleBand, D extends TupleDe
 		tracksActive.clear();
 		tracksAll.clear();
 		tracksNew.clear();
-		keyFrameSet = false;
 	}
 
 	/**
@@ -292,7 +279,7 @@ public class DetectAssociateTracker<I extends ImageSingleBand, D extends TupleDe
 			list = new ArrayList<PointTrack>();
 
 		list.addAll(tracksActive);
-		return tracksActive;
+		return list;
 	}
 
 	@Override
@@ -301,7 +288,7 @@ public class DetectAssociateTracker<I extends ImageSingleBand, D extends TupleDe
 			list = new ArrayList<PointTrack>();
 
 		list.addAll(tracksDropped);
-		return tracksDropped;
+		return list;
 	}
 
 	@Override
@@ -310,7 +297,7 @@ public class DetectAssociateTracker<I extends ImageSingleBand, D extends TupleDe
 			list = new ArrayList<PointTrack>();
 
 		list.addAll(tracksNew);
-		return tracksNew;
+		return list;
 	}
 
 	@Override
@@ -319,18 +306,16 @@ public class DetectAssociateTracker<I extends ImageSingleBand, D extends TupleDe
 			list = new ArrayList<PointTrack>();
 
 		list.addAll(tracksAll);
-		return tracksAll;
+		return list;
 	}
 
-	protected class TrackInfo
-	{
-		// which tick was it last associated at.  Used for dropping tracks
-		long lastAssociated;
-		// description of the feature
-		D desc;
+	@Override
+	public List<PointTrack> getInactiveTracks(List<PointTrack> list) {
+		if( list == null )
+			list = new ArrayList<PointTrack>();
 
-		public void reset() {
-			lastAssociated = tick;
-		}
+		list.addAll(tracksInactive);
+		return list;
 	}
+
 }

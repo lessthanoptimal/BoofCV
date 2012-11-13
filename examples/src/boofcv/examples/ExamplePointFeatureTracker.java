@@ -134,7 +134,7 @@ public class ExamplePointFeatureTracker< T extends ImageSingleBand, D extends Im
 	 * Creates a SURF feature tracker.
 	 */
 	public void createSURF() {
-		tracker = FactoryPointSequentialTracker.dda_FH_SURF(200, 80, 3, 4, imageType);
+		tracker = FactoryPointSequentialTracker.dda_FH_SURF(200, 80, 3, imageType);
 	}
 
 	public static void main( String args[] ) throws FileNotFoundException {
