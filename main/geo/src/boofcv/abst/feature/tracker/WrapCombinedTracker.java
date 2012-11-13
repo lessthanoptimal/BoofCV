@@ -31,7 +31,6 @@ import boofcv.struct.pyramid.PyramidUpdaterDiscrete;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Stack;
 
 /**
  * @author Peter Abeles
@@ -52,12 +51,9 @@ public class WrapCombinedTracker<I extends ImageSingleBand, D extends ImageSingl
 	ImageGradient<I,D> gradient;
 
 	int reactivateThreshold;
-	int dropThreshold=2;
 	int previousSpawn;
 
 	boolean detected;
-
-	Stack<PointTrack> unused = new Stack<PointTrack>();
 
 	public WrapCombinedTracker(CombinedTrackerScalePoint<I, D,TD> tracker ,
 							   int reactivateThreshold ,
@@ -127,11 +123,14 @@ public class WrapCombinedTracker<I extends ImageSingleBand, D extends ImageSingl
 		List<CombinedTrack<TD>> spawned = tracker.getSpawned();
 
 		for( CombinedTrack<TD> t : spawned ) {
-			PointTrack p = unused.isEmpty() ? new PointTrack() : unused.pop();
+			PointTrack p = t.getCookie();
+			if( p == null ) {
+				p = new PointTrack();
+				t.setCookie(p);
+			}
 
 			p.set(t);
 			p.setDescription(t);
-			t.setCookie(p);
 			p.featureId = t.featureId;
 		}
 
@@ -169,6 +168,17 @@ public class WrapCombinedTracker<I extends ImageSingleBand, D extends ImageSingl
 
 		addToList(tracker.getReactivated(),list);
 		addToList(tracker.getPureKlt(),list);
+
+		return list;
+	}
+
+	@Override
+	public List<PointTrack> getInactiveTracks(List<PointTrack> list) {
+		if( list == null ) {
+			list = new ArrayList<PointTrack>();
+		}
+
+		addToList(tracker.getDormant(),list);
 
 		return list;
 	}

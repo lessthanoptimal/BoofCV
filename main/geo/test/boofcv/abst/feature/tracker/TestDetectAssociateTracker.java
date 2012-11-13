@@ -89,7 +89,6 @@ public class TestDetectAssociateTracker extends StandardImagePointTracker<ImageF
 	@Test
 	public void process_drop_Recycle() {
 		createTracker();
-		dat.setPruneThreshold(0);
 		dat.process(image);
 		dat.spawnTracks();
 
@@ -119,7 +118,7 @@ public class TestDetectAssociateTracker extends StandardImagePointTracker<ImageF
 				FactoryAssociation.greedy(score, 400, 300, true);
 
 		dat = new DetectAssociateTracker<ImageFloat32,TupleDesc_B>(detector,
-				new WrapDescribeBrief<ImageFloat32>(brief), association);
+				new WrapDescribeBrief<ImageFloat32>(brief), association,false);
 
 
 		return dat;

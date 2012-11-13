@@ -132,7 +132,9 @@ public class PointTrackerKltPyramid<I extends ImageSingleBand,D extends ImageSin
 	@Override
 	public void dropAllTracks() {
 		unused.addAll(active);
+		unused.addAll(dropped);
 		active.clear();
+		dropped.clear();
 	}
 
 	@Override
@@ -164,6 +166,7 @@ public class PointTrackerKltPyramid<I extends ImageSingleBand,D extends ImageSin
 
 	@Override
 	public void dropTrack(PointTrack track) {
+		unused.add((PyramidKltFeature)track.getDescription());
 		if( !active.remove((PyramidKltFeature)track.getDescription()) ) {
 			throw new RuntimeException("Not in active list!");
 		}
@@ -175,6 +178,17 @@ public class PointTrackerKltPyramid<I extends ImageSingleBand,D extends ImageSin
 			list = new ArrayList<PointTrack>();
 
 		addToList(active,list);
+
+		return list;
+	}
+
+	/**
+	 * KLT does not have inactive tracks since all tracks are dropped if a problem occurs.
+	 */
+	@Override
+	public List<PointTrack> getInactiveTracks(List<PointTrack> list) {
+		if( list == null )
+			list = new ArrayList<PointTrack>();
 
 		return list;
 	}

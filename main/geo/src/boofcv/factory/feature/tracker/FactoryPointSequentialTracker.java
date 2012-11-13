@@ -139,7 +139,7 @@ public class FactoryPointSequentialTracker {
 	 */
 	public static <I extends ImageSingleBand, II extends ImageSingleBand>
 	ImagePointTracker<I> dda_FH_SURF(int maxMatches, int detectPerScale, int minSeparation,
-									 int pruneAfter, Class<I> imageType) {
+									 Class<I> imageType) {
 		Class<II> integralType = GIntegralImageOps.getIntegralType(imageType);
 
 		FeatureExtractor extractor = FactoryFeatureExtractor.nonmax(minSeparation, 1, 10, true);
@@ -155,11 +155,7 @@ public class FactoryPointSequentialTracker {
 		DescribeRegionPoint<I,SurfFeature> regionDesc = new WrapDescribeSurf<I,II>(describe,orientation);
 		GeneralAssociation<SurfFeature> generalAssoc = new WrapAssociateSurfBasic(assoc);
 
-		DetectAssociateTracker<I,SurfFeature> dat = new DetectAssociateTracker<I,SurfFeature>(id, regionDesc, generalAssoc);
-
-		dat.setPruneThreshold(pruneAfter);
-
-		return dat;
+		return new DetectAssociateTracker<I,SurfFeature>(id, regionDesc, generalAssoc,false);
 	}
 
 	/**
@@ -173,7 +169,6 @@ public class FactoryPointSequentialTracker {
 	 * @param maxAssociationError Maximum allowed association error.  Try 200.
 	 * @param detectionRadius     Size of feature detection region.  Try 2.
 	 * @param cornerThreshold     Tolerance for detecting corner features.  Tune. Start at 1.
-	 * @param pruneAfter Prune tracks which have not been associated with any features after this many images.  Try 2.
 	 * @param imageType           Type of image being processed.
 	 * @param derivType Type of image used to store the image derivative. null == use default
 	 */
@@ -181,7 +176,6 @@ public class FactoryPointSequentialTracker {
 	ImagePointTracker<I> dda_ShiTomasi_BRIEF(int maxFeatures, int maxAssociationError,
 											 int detectionRadius,
 											 float cornerThreshold,
-											 int pruneAfter,
 											 Class<I> imageType , Class<D> derivType )
 	{
 		if( derivType == null )
@@ -198,11 +192,8 @@ public class FactoryPointSequentialTracker {
 		GeneralAssociation<TupleDesc_B> association =
 				FactoryAssociation.greedy(score, maxAssociationError, maxFeatures, true);
 
-		DetectAssociateTracker<I,TupleDesc_B> dat = new DetectAssociateTracker<I,TupleDesc_B>(detector, new WrapDescribeBrief<I>(brief), association);
-
-		dat.setPruneThreshold(pruneAfter);
-
-		return dat;
+		return new DetectAssociateTracker<I,TupleDesc_B>
+				(detector, new WrapDescribeBrief<I>(brief), association,false);
 	}
 
 	/**
@@ -216,14 +207,13 @@ public class FactoryPointSequentialTracker {
 	 * @param regionWidth    How wide the region is.  Try 5
 	 * @param regionHeight   How tall the region is.  Try 5
 	 * @param cornerThreshold     Tolerance for detecting corner features.  Tune. Start at 1.
-	 * @param pruneAfter Prune tracks which have not been associated with any features after this many images.  Try 2.
 	 * @param imageType      Type of image being processed.
 	 * @param derivType      Type of image used to store the image derivative. null == use default
 	 */
 	public static <I extends ImageSingleBand, D extends ImageSingleBand>
 	ImagePointTracker<I> dda_ShiTomasi_NCC(int maxFeatures, int regionWidth, int regionHeight,
 										   float cornerThreshold,
-										   int pruneAfter, Class<I> imageType, Class<D> derivType) {
+										   Class<I> imageType, Class<D> derivType) {
 
 		if( derivType == null )
 			derivType = GImageDerivativeOps.getDerivativeType(imageType);
@@ -238,12 +228,8 @@ public class FactoryPointSequentialTracker {
 		GeneralAssociation<NccFeature> association =
 				FactoryAssociation.greedy(score, Double.MAX_VALUE, maxFeatures, true);
 
-		DetectAssociateTracker<I,NccFeature> dat =
-				new DetectAssociateTracker<I,NccFeature>(detector, new WrapDescribePixelRegionNCC<I>(alg), association);
-
-		dat.setPruneThreshold(pruneAfter);
-
-		return dat;
+		return new DetectAssociateTracker<I,NccFeature>
+				(detector, new WrapDescribePixelRegionNCC<I>(alg), association,false);
 	}
 
 	/**
@@ -253,7 +239,6 @@ public class FactoryPointSequentialTracker {
 	 * @param describe Region description.
 	 * @param associate Description association.
 	 * @param updateDescription After a track has been associated should the description be changed?  Try false.
-	 * @param pruneAfter Prune tracks which have not been associated with any features after this many images.  Try 2.
 	 * @param imageType     Input image type.
 	 * @param <I> Type of input image.
 	 * @param <Desc> Type of region description
@@ -264,12 +249,10 @@ public class FactoryPointSequentialTracker {
 														   DescribeRegionPoint<I, Desc> describe,
 														   GeneralAssociation<Desc> associate ,
 														   boolean updateDescription ,
-														   int pruneAfter ,
 														   Class<I> imageType ) {
 
-		DetectAssociateTracker<I,Desc> dat = new DetectAssociateTracker<I,Desc>(detector, describe, associate);
-		dat.setPruneThreshold(pruneAfter);
-		dat.setUpdateState(updateDescription);
+		DetectAssociateTracker<I,Desc> dat = new DetectAssociateTracker<I,Desc>(detector, describe, associate,false);
+		dat.setUpdateDescription(updateDescription);
 
 		return dat;
 	}

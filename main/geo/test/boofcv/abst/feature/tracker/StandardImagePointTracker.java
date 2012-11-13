@@ -25,6 +25,7 @@ import boofcv.struct.image.ImageSingleBand;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -69,6 +70,39 @@ public abstract class StandardImagePointTracker <T extends ImageSingleBand> {
 		for( PointTrack t : tracker.getActiveTracks(null) ) {
 			assertTrue(t.cookie==null);
 		}
+	}
+
+	/**
+	 * After a track has been dropped the cookie should not be modified and returned when
+	 * the track is recycled.
+	 *
+	 * NOTE: This test will return incorrect results if a large group of tracks are predeclared
+	 * and recycled tracks are put at the end of the queue
+	 */
+	@Test
+	public void checkCookieSaved() {
+		// create tracks
+		tracker = createTracker();
+		tracker.process((T)image);
+		tracker.spawnTracks();
+
+		assertTrue(tracker.getAllTracks(null).size() > 0);
+
+		tracker.getActiveTracks(null).get(0).setCookie(1);
+
+		// drop tracks
+		tracker.dropAllTracks();
+
+		// respawn and look for a cookie that's not null
+		tracker.process((T)image);
+		tracker.spawnTracks();
+
+		int numFound = 0;
+		for( PointTrack t : tracker.getActiveTracks(null) ) {
+			if( t.getCookie() != null )
+				numFound++;
+		}
+		assertEquals(1,numFound);
 	}
 
 	@Test
@@ -143,6 +177,8 @@ public abstract class StandardImagePointTracker <T extends ImageSingleBand> {
 
 		assertTrue(afterAll <= beforeAll );
 		assertEquals(0,tracker.getActiveTracks(null).size());
+		// note that some trackers will not add any features to the dropped list since
+		// it will try to respawn them
 		assertEquals(beforeAll-afterAll,tracker.getDroppedTracks(null).size());
 	}
 	
@@ -217,6 +253,101 @@ public abstract class StandardImagePointTracker <T extends ImageSingleBand> {
 
 				assertTrue(a.featureId != b.featureId);
 			}
+		}
+	}
+
+	@Test
+	public void getAllTracks() {
+		tracker = createTracker();
+		tracker.process((T)image);
+		tracker.spawnTracks();
+
+		List<PointTrack> input = new ArrayList<PointTrack>();
+		assertTrue(input == tracker.getAllTracks(input));
+
+		List<PointTrack> ret = tracker.getAllTracks(null);
+
+		//sanity check
+		assertTrue(ret.size() > 0 );
+
+		checkIdentical(input,ret);
+	}
+
+	@Test
+	public void getActiveTracks() {
+		tracker = createTracker();
+		tracker.process((T)image);
+		tracker.spawnTracks();
+
+		List<PointTrack> input = new ArrayList<PointTrack>();
+		assertTrue( input == tracker.getActiveTracks(input));
+
+		List<PointTrack> ret = tracker.getActiveTracks(null);
+
+		//sanity check
+		assertTrue(ret.size() > 0 );
+
+		checkIdentical(input, ret);
+	}
+
+	@Test
+	public void getInactiveTracks() {
+		tracker = createTracker();
+		tracker.process((T)image);
+		tracker.spawnTracks();
+
+		// create a situation where tracks might become inactive
+		GeneralizedImageOps.fill(image, 0);
+		tracker.process((T) image);
+
+		List<PointTrack> input = new ArrayList<PointTrack>();
+		assertTrue( input == tracker.getInactiveTracks(input));
+
+		List<PointTrack> ret = tracker.getInactiveTracks(null);
+
+		checkIdentical(input, ret);
+	}
+
+	@Test
+	public void getDroppedTracks() {
+		tracker = createTracker();
+		tracker.process((T)image);
+		tracker.spawnTracks();
+
+		// create a situation where tracks might be dropped
+		GeneralizedImageOps.fill(image, 0);
+		tracker.process((T) image);
+
+		List<PointTrack> input = new ArrayList<PointTrack>();
+		assertTrue( input == tracker.getDroppedTracks(input));
+
+		List<PointTrack> ret = tracker.getDroppedTracks(null);
+
+		checkIdentical(input, ret);
+	}
+
+	@Test
+	public void getNewTracks() {
+		tracker = createTracker();
+		tracker.process((T)image);
+		tracker.spawnTracks();
+
+		List<PointTrack> input = new ArrayList<PointTrack>();
+		assertTrue( input == tracker.getNewTracks(input));
+
+		List<PointTrack> ret = tracker.getNewTracks(null);
+
+		//sanity check
+		assertTrue(ret.size() > 0 );
+
+		checkIdentical(input, ret);
+	}
+
+	private void checkIdentical( List<PointTrack> a , List<PointTrack> b ){
+		assertEquals(a.size(),b.size());
+
+		for( int i = 0; i < a.size(); i++ ) {
+			assertTrue(a.get(i) == b.get(i));
 		}
 	}
 }
