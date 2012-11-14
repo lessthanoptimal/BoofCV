@@ -49,6 +49,7 @@ public class VideoStabilizeSequentialPointApp<I extends ImageSingleBand, D exten
 	private static int thresholdKeyFrame = 80;
 	private static int thresholdReset = 20;
 	private static int maxIterations = 80;
+	private static int pruneThreshold = 10;
 	
 	int largeMotionThreshold = 5000;
 
@@ -62,13 +63,13 @@ public class VideoStabilizeSequentialPointApp<I extends ImageSingleBand, D exten
 		config.pyramidScaling = new int[]{1,2,4,8};
 
 		addAlgorithm(0, "KLT", FactoryPointSequentialTracker.klt(config,1,1));
-		addAlgorithm(0, "BRIEF", FactoryPointSequentialTracker.
+		addAlgorithm(0, "ST-BRIEF", FactoryPointSequentialTracker.
 				dda_ShiTomasi_BRIEF(400, 100, 1, 10, imageType, derivType));
-		addAlgorithm(0, "SURF", FactoryPointSequentialTracker.dda_FH_SURF(300, 200, 2, imageType));
 		// size of the description region has been increased to improve quality.
-		addAlgorithm(0, "NCC", FactoryPointSequentialTracker.
+		addAlgorithm(0, "ST-NCC", FactoryPointSequentialTracker.
 				dda_ShiTomasi_NCC(500, 11, 11, 10, imageType, derivType));
-		addAlgorithm(0, "SURF-KLT", FactoryPointSequentialTracker.combined_FH_SURF_KLT(300, 200, 2,
+		addAlgorithm(0, "FH-SURF", FactoryPointSequentialTracker.dda_FH_SURF(400, 2, 200, 2, imageType));
+		addAlgorithm(0, "FH-SURF-KLT", FactoryPointSequentialTracker.combined_FH_SURF_KLT(300, 200, 2,
 				config.config,config.pyramidScaling,100,imageType));
 
 		addAlgorithm(1,"Affine", new Affine2D_F64());
@@ -111,7 +112,7 @@ public class VideoStabilizeSequentialPointApp<I extends ImageSingleBand, D exten
 		tracker.dropAllTracks();
 		createModelMatcher(maxIterations,4);
 		distortAlg = new MotionStabilizePointKey<I,T>(tracker,modelMatcher,modelRefiner,fitModel,
-				thresholdKeyFrame,thresholdReset,largeMotionThreshold);
+				thresholdKeyFrame,thresholdReset,pruneThreshold,largeMotionThreshold);
 //		distortAlg.setInitialTransform(createInitialTransform());
 
 		totalKeyFrames = 0;

@@ -52,7 +52,8 @@ public class TestImageMotionPointKey {
 
 		ImageUInt8 input = new ImageUInt8(20,30);
 
-		ImageMotionPointKey<ImageUInt8,Se2_F32> alg = new ImageMotionPointKey<ImageUInt8,Se2_F32>(tracker,matcher,null,model);
+		ImageMotionPointKey<ImageUInt8,Se2_F32> alg =
+				new ImageMotionPointKey<ImageUInt8,Se2_F32>(tracker,matcher,null,model,1000);
 
 		// specify an initial transform
 		alg.setInitialTransform(initial);
@@ -88,7 +89,7 @@ public class TestImageMotionPointKey {
 		Se2_F32 model = new Se2_F32();
 
 		// the world frame will initially be the identify matrix
-		ImageMotionPointKey<ImageUInt8,Se2_F32> alg = new ImageMotionPointKey<ImageUInt8,Se2_F32>(null,null,null,model);
+		ImageMotionPointKey<ImageUInt8,Se2_F32> alg = new ImageMotionPointKey<ImageUInt8,Se2_F32>(null,null,null,model,1000);
 
 		// change it to this frame
 		alg.changeWorld(oldToNew);
@@ -114,7 +115,7 @@ public class TestImageMotionPointKey {
 
 		ImageUInt8 input = new ImageUInt8(20,30);
 
-		ImageMotionPointKey<ImageUInt8,Se2_F32> alg = new ImageMotionPointKey<ImageUInt8,Se2_F32>(tracker,matcher,null,model);
+		ImageMotionPointKey<ImageUInt8,Se2_F32> alg = new ImageMotionPointKey<ImageUInt8,Se2_F32>(tracker,matcher,null,model,100);
 
 		// process twice to change the transforms
 		alg.process(input);
@@ -135,6 +136,12 @@ public class TestImageMotionPointKey {
 		// worldToKey should now be equal to worldToCurr
 		worldToKey = alg.getWorldToKey();
 		assertEquals(computed.getX(), worldToKey.getX(), 1e-8);
+	}
+
+
+	@Test
+	public void testPrune() {
+		fail("Implement");
 	}
 
 	public static class DummyTracker implements ImagePointTracker<ImageUInt8>

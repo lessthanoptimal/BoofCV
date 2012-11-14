@@ -62,6 +62,9 @@ public class ImageMotionPointKey<I extends ImageSingleBand, T extends Invertible
 	// transform from world to current frame
 	protected T worldToCurr;
 
+	// tracks which are not in the inlier set for this many frames in a row are pruned
+	int pruneThreshold;
+
 	/**
 	 * Specify algorithms to use internally.  Each of these classes must work with
 	 * compatible data structures.
@@ -70,15 +73,18 @@ public class ImageMotionPointKey<I extends ImageSingleBand, T extends Invertible
 	 * @param modelMatcher Fits model to track data
 	 * @param modelRefiner (Optional) Refines the found model using the entire inlier set. Can be null.
 	 * @param model Motion model data structure
+	 * @param pruneThreshold Tracks not in the inlier set for this many frames in a row are pruned
 	 */
 	public ImageMotionPointKey(ImagePointTracker<I> tracker,
 							   ModelMatcher<T, AssociatedPair> modelMatcher,
 							   ModelFitter<T,AssociatedPair> modelRefiner,
-							   T model)
+							   T model ,
+							   int pruneThreshold )
 	{
 		this.tracker = tracker;
 		this.modelMatcher = modelMatcher;
 		this.modelRefiner = modelRefiner;
+		this.pruneThreshold = pruneThreshold;
 		
 		worldToInit = (T)model.createInstance();
 		worldToKey = (T)model.createInstance();
@@ -150,6 +156,11 @@ public class ImageMotionPointKey<I extends ImageSingleBand, T extends Invertible
 			return false;
 		}
 
+		// mark that the track is in the inlier set
+		for( AssociatedPair p : modelMatcher.getMatchSet() ) {
+			((AssociatedPairTrack)p).lastUsed = totalProcessed;
+		}
+
 		// refine the motion estimate
 		if( modelRefiner == null ||
 				!modelRefiner.fitModel(modelMatcher.getMatchSet(),modelMatcher.getModel(),keyToCurr))
@@ -159,6 +170,17 @@ public class ImageMotionPointKey<I extends ImageSingleBand, T extends Invertible
 
 		// Update the motion
 		worldToKey.concat(keyToCurr, worldToCurr);
+
+		// prune tracks which aren't being used
+		List<PointTrack> all = tracker.getAllTracks(null);
+		for( PointTrack t : all ) {
+			AssociatedPairTrack p = t.getCookie();
+
+			if( totalProcessed - p.lastUsed >= pruneThreshold ) {
+				System.out.println("Delta "+(totalProcessed-p.lastUsed));
+				tracker.dropTrack(t);
+			}
+		}
 
 		return true;
 	}
@@ -173,15 +195,16 @@ public class ImageMotionPointKey<I extends ImageSingleBand, T extends Invertible
 		List<PointTrack> spawned = tracker.getNewTracks(null);
 
 		for( PointTrack l : spawned ) {
-			AssociatedPair p = l.getCookie();
+			AssociatedPairTrack p = l.getCookie();
 			if( p == null ) {
-				l.cookie = p = new AssociatedPair();
+				l.cookie = p = new AssociatedPairTrack();
 				// little bit of trickery here.  Save the reference so that the point
 				// in the current frame is updated for free as PointTrack is
 				p.p2 = l;
 				l.cookie = p;
 			}
-			p.p1.set(p.p2);
+			p.p1.set(l);
+			p.lastUsed = totalProcessed;
 		}
 
 		totalSpawned = spawned.size();

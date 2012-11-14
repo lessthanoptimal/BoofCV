@@ -70,9 +70,10 @@ public class MotionMosaicPointKey<I extends ImageSingleBand, T extends Invertibl
 								ModelFitter<T,AssociatedPair> modelRefiner,
 								T model,
 								int absoluteMinimumTracks, double respawnTrackFraction,
+								int pruneThreshold ,
 								double respawnCoverageFraction)
 	{
-		super(tracker, modelMatcher, modelRefiner, model);
+		super(tracker, modelMatcher, modelRefiner, model,pruneThreshold);
 		
 		this.absoluteMinimumTracks = absoluteMinimumTracks;
 		this.respawnTrackFraction = respawnTrackFraction;

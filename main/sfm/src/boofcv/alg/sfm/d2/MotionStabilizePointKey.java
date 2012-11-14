@@ -66,9 +66,10 @@ public class MotionStabilizePointKey<I extends ImageSingleBand, T extends Invert
 								   ModelFitter<T,AssociatedPair> modelRefiner,
 								   T model ,
 								   int thresholdKeyFrame , int thresholdReset ,
+								   int pruneThreshold ,
 								   int largeMotionThreshold )
 	{
-		super(tracker, modelMatcher, modelRefiner, model);
+		super(tracker, modelMatcher, modelRefiner, model,pruneThreshold);
 
 		if( thresholdKeyFrame < thresholdReset ) {
 			throw new IllegalArgumentException("Threshold for key frame should be more than reset");

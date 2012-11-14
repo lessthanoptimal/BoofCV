@@ -52,6 +52,7 @@ public class VideoMosaicSequentialPointApp<I extends ImageSingleBand, D extends 
 {
 	private final static int maxFeatures = 250;
 	private final static int maxIterations = 100;
+	private final static int pruneThreshold = 10;
 	
 	public VideoMosaicSequentialPointApp(Class<I> imageType, Class<D> derivType) {
 		super(false,imageType,2);
@@ -66,9 +67,12 @@ public class VideoMosaicSequentialPointApp<I extends ImageSingleBand, D extends 
 		config.pyramidScaling = new int[]{1,2,4,8};
 
 		addAlgorithm(0, "KLT", FactoryPointSequentialTracker.klt(config,1,1));
-		addAlgorithm(0, "BRIEF", FactoryPointSequentialTracker.dda_ShiTomasi_BRIEF(400, 150, 1, 10, imageType,null));
-		addAlgorithm(0, "SURF", FactoryPointSequentialTracker.dda_FH_SURF(300, 200, 2, imageType));
-		addAlgorithm(0, "SURF-KLT", FactoryPointSequentialTracker.combined_FH_SURF_KLT(300, 200, 3,
+		addAlgorithm(0, "ST-BRIEF", FactoryPointSequentialTracker.dda_ShiTomasi_BRIEF(400, 150, 1, 10, imageType,null));
+		// size of the description region has been increased to improve quality.
+		addAlgorithm(0, "ST-NCC", FactoryPointSequentialTracker.
+				dda_ShiTomasi_NCC(500, 11, 11, 10, imageType, derivType));
+		addAlgorithm(0, "FH-SURF", FactoryPointSequentialTracker.dda_FH_SURF(300, 2, 200, 1 , imageType));
+		addAlgorithm(0, "FH-SURF-KLT", FactoryPointSequentialTracker.combined_FH_SURF_KLT(300, 200, 3,
 				config.config,config.pyramidScaling,200,imageType));
 
 		addAlgorithm(1,"Affine", new Affine2D_F64());
@@ -155,7 +159,7 @@ public class VideoMosaicSequentialPointApp<I extends ImageSingleBand, D extends 
 		// make sure there is nothing left over from before
 		tracker.dropAllTracks();
 		createModelMatcher(maxIterations,4);
-		distortAlg = new MotionMosaicPointKey<I,T>(tracker,modelMatcher,modelRefiner,fitModel,40,0.3,0.8);
+		distortAlg = new MotionMosaicPointKey<I,T>(tracker,modelMatcher,modelRefiner,fitModel,40,0.3,pruneThreshold,0.8);
 		T initTran = ConvertTransform_F64.convert(createInitialTransform(), fitModel.createInstance());
 		distortAlg.setInitialTransform(initTran);
 		totalKeyFrames = 0;

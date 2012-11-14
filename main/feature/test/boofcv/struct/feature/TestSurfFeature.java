@@ -20,32 +20,16 @@ package boofcv.struct.feature;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
  */
-public class TestNccFeature {
+public class TestSurfFeature {
 
 	@Test
 	public void setTo() {
-		NccFeature a = new NccFeature(4);
-		a.mean = 0.5;
-		a.sigma = 1.5;
-
-		for( int i = 0; i < 4; i++ )
-			a.value[i] = i+0.1;
-
-		NccFeature b = new NccFeature(4);
-
-		b.setTo(a);
-
-		assertEquals(a.mean,b.mean,1e-8);
-		assertEquals(a.sigma,b.sigma,1e-8);
-
-		for( int i = 0; i < 4; i++ )
-			assertEquals(a.value[i],b.value[i],1e-8);
+		fail("IMplement");
 	}
 
 	@Test
