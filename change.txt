@@ -12,6 +12,11 @@ Version : Alpha 0.12
 - Removed PkltTrackManager and pushed its functionality into the ImagePointTracker implementation
   * Was only separate for historical reasons
   * renamed PstWrapperPyramidKlt to PointTrackerKltPyramid
+- ImagePointTracker
+  * Changed contract, more fully specified contract, improved tests
+  * Updated behavior of implementing classes 
+- Deleted KeyFramePointTracker
+  * Added pointless complexity.  Use ImagePointTracker instead
 
 ---------------------------------------------
 Date    : 2012/11/6

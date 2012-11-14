@@ -145,5 +145,7 @@ public interface ImagePointTracker <T extends ImageBase> {
 	 * @return List of tracks.
 	 */
 	public List<PointTrack> getNewTracks( List<PointTrack> list );
+
+
 }
 
