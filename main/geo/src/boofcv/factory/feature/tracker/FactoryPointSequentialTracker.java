@@ -128,28 +128,30 @@ public class FactoryPointSequentialTracker {
 	 * @see DescribePointSurf
 	 * @see DetectAssociateTracker
 	 *
-	 * @param maxMatches     The maximum number of matched features that will be considered.
-	 *                       Set to a value <= 0 to not bound the number of matches.
-	 * @param detectPerScale Controls how many features can be detected.  Try a value of 200 initially.
+	 * @param maxTracks The maximum number of tracks it will return. A value <= 0 will return all.
 	 * @param minSeparation  How close together detected features can be.  Recommended value = 2.
-	 * @param imageType      Type of image the input is.
-	 * @param <I>            Input image type.
-	 * @param <II>           Integral image type.
-	 * @return SURF based tracker.
+	 * @param detectPerScale Number of features it will detect per scale.
+	 * @param sampleRateFH   Sample rate used by Fast-Hessian detector.  Typically 1 or 2
+	 * @param imageType      Type of image the input is.    @return SURF based tracker.
 	 */
 	public static <I extends ImageSingleBand, II extends ImageSingleBand>
-	ImagePointTracker<I> dda_FH_SURF(int maxMatches, int detectPerScale, int minSeparation,
+	ImagePointTracker<I> dda_FH_SURF(int maxTracks, int minSeparation, int detectPerScale, int sampleRateFH,
 									 Class<I> imageType) {
 		Class<II> integralType = GIntegralImageOps.getIntegralType(imageType);
 
 		FeatureExtractor extractor = FactoryFeatureExtractor.nonmax(minSeparation, 1, 10, true);
 
-		FastHessianFeatureDetector<II> detector = new FastHessianFeatureDetector<II>(extractor, detectPerScale, 2, 9, 4, 4);
+		int numScalesPerOctave = 4;
+		int numOctaves = 4;
+
+		FastHessianFeatureDetector<II> detector =
+				new FastHessianFeatureDetector<II>(extractor, detectPerScale,
+						sampleRateFH, 9, numScalesPerOctave, numOctaves);
 		OrientationIntegral<II> orientation = FactoryOrientationAlgs.average_ii(6, 1, 6, 0, integralType);
 		DescribePointSurf<II> describe = new DescribePointSurf<II>(integralType);
 
 		ScoreAssociation<TupleDesc_F64> score = FactoryAssociation.scoreEuclidean(TupleDesc_F64.class, true);
-		AssociateSurfBasic assoc = new AssociateSurfBasic(FactoryAssociation.greedy(score, 100000, maxMatches, true));
+		AssociateSurfBasic assoc = new AssociateSurfBasic(FactoryAssociation.greedy(score, 100000, maxTracks, true));
 
 		InterestPointDetector<I> id = new WrapFHtoInterestPoint<I,II>(detector);
 		DescribeRegionPoint<I,SurfFeature> regionDesc = new WrapDescribeSurf<I,II>(describe,orientation);

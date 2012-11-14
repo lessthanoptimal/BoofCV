@@ -42,7 +42,7 @@ public class TestMotionStabilizePointKey {
 		ImageUInt8 input = new ImageUInt8(20,30);
 
 		MotionStabilizePointKey<ImageUInt8,Affine2D_F32> alg =
-				new MotionStabilizePointKey<ImageUInt8,Affine2D_F32>(tracker,matcher,null,model,5,3,10);
+				new MotionStabilizePointKey<ImageUInt8,Affine2D_F32>(tracker,matcher,null,model,5,3,10,10);
 
 		// sanity check here
 		assertTrue(alg.process(input));

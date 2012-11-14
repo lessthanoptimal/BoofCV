@@ -24,6 +24,7 @@ import org.junit.Test;
 import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
@@ -48,6 +49,11 @@ public class TestTupleDesc_B {
 		for( int i = 0; i < N; i++ ) {
 			assertEquals(desc.isBitTrue(i),expected[i]);
 		}
+	}
+
+	@Test
+	public void setTo() {
+		fail("IMplement");
 	}
 
 	@Test

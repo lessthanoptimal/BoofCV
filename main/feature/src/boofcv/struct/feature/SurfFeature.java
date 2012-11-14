@@ -33,6 +33,13 @@ public class SurfFeature extends TupleDesc_F64 {
 	}
 
 	@Override
+	public void setTo(TupleDesc_F64 source) {
+		SurfFeature f = (SurfFeature)source;
+		laplacianPositive = f.laplacianPositive;
+		System.arraycopy(f.value,0,value,0,value.length);
+	}
+
+	@Override
 	public SurfFeature copy() {
 		SurfFeature ret = new SurfFeature( value.length );
 		ret.laplacianPositive = laplacianPositive;
