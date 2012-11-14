@@ -1,9 +1,10 @@
 package boofcv.abst.sfm;
 
-import boofcv.abst.feature.tracker.KeyFramePointTracker;
+import boofcv.abst.feature.tracker.ImagePointTracker;
+import boofcv.abst.feature.tracker.PointTrack;
 import boofcv.alg.distort.LensDistortionOps;
 import boofcv.alg.geo.DistanceModelMonoPixels;
-import boofcv.alg.sfm.PointPoseTrack;
+import boofcv.alg.sfm.Point2D3DTrack;
 import boofcv.alg.sfm.StereoSparse3D;
 import boofcv.alg.sfm.VisOdomPixelDepthPnP;
 import boofcv.struct.calib.StereoParameters;
@@ -14,7 +15,6 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -26,7 +26,7 @@ public class WrapVisOdomPixelDepthPnP<T extends ImageSingleBand>
 	// low level algorithm
 	VisOdomPixelDepthPnP<T> alg;
 	StereoSparse3D<T> stereo;
-	KeyFramePointTracker<T,PointPoseTrack> tracker;
+	ImagePointTracker<T> tracker;
 	DistanceModelMonoPixels<Se3_F64,Point2D3D> fitError;
 	Class<T> imageType;
 	boolean failed;
@@ -34,7 +34,7 @@ public class WrapVisOdomPixelDepthPnP<T extends ImageSingleBand>
 
 	public WrapVisOdomPixelDepthPnP(VisOdomPixelDepthPnP<T> alg,
 									StereoSparse3D<T> stereo,
-									KeyFramePointTracker<T, PointPoseTrack> tracker,
+									ImagePointTracker<T> tracker,
 									DistanceModelMonoPixels<Se3_F64, Point2D3D> fitError,
 									Class<T> imageType) {
 		this.alg = alg;
@@ -46,35 +46,31 @@ public class WrapVisOdomPixelDepthPnP<T extends ImageSingleBand>
 
 	@Override
 	public Point3D_F64 getTrackLocation(int index) {
-		return alg.getTracker().getActivePairs(null).get(index).getLocation();
+		PointTrack t = alg.getTracker().getActiveTracks(null).get(index);
+		return ((Point2D3D)t.getCookie()).getLocation();
 	}
 
 	@Override
 	public long getTrackId(int index) {
-		return alg.getTracker().getActivePairs(null).get(index).getTrackID();
+		PointTrack t = alg.getTracker().getActiveTracks(null).get(index);
+		return t.featureId;
 	}
 
 	@Override
 	public List<Point2D_F64> getAllTracks() {
-		List<Point2D_F64> pixels = new ArrayList<Point2D_F64>();
-
-		for(PointPoseTrack t : alg.getTracker().getActivePairs(null) ) {
-			pixels.add(t.getPixel().p2);
-		}
-
-		return pixels;
+		return (List)alg.getTracker().getActiveTracks(null);
 	}
 
 	@Override
 	public boolean isInlier(int index) {
-		PointPoseTrack t = alg.getTracker().getActivePairs(null).get(index);
+		Point2D3DTrack t = alg.getTracker().getActiveTracks(null).get(index).getCookie();
 		return alg.getInlierTracks().contains(t);
 	}
 
 	@Override
 	public boolean isNew(int index) {
-		PointPoseTrack t = alg.getTracker().getActivePairs(null).get(index);
-		return alg.getSpawnedTracks().contains(t);
+		PointTrack t = alg.getTracker().getActiveTracks(null).get(index);
+		return alg.getTracker().getNewTracks(null).contains(t);
 	}
 
 	@Override
@@ -82,7 +78,7 @@ public class WrapVisOdomPixelDepthPnP<T extends ImageSingleBand>
 		stereo.setCalibration(parameters);
 
 		PointTransform_F64 leftPixelToNorm = LensDistortionOps.transformRadialToNorm_F64(parameters.left);
-		tracker.setPixelToNorm(leftPixelToNorm);
+		alg.setPixelToNorm(leftPixelToNorm);
 
 		fitError.setIntrinsic(parameters.left.fx, parameters.left.fy, parameters.left.skew);
 	}

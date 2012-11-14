@@ -2,14 +2,12 @@ package boofcv.factory.sfm;
 
 import boofcv.abst.feature.disparity.StereoDisparitySparse;
 import boofcv.abst.feature.tracker.ImagePointTracker;
-import boofcv.abst.feature.tracker.KeyFramePointTracker;
 import boofcv.abst.geo.Estimate1ofPnP;
 import boofcv.abst.geo.RefinePnP;
 import boofcv.abst.sfm.StereoVisualOdometry;
 import boofcv.abst.sfm.WrapVisOdomPixelDepthPnP;
 import boofcv.alg.geo.DistanceModelMonoPixels;
 import boofcv.alg.geo.pose.PnPDistanceReprojectionSq;
-import boofcv.alg.sfm.PointPoseTrack;
 import boofcv.alg.sfm.StereoSparse3D;
 import boofcv.alg.sfm.VisOdomPixelDepthPnP;
 import boofcv.alg.sfm.robust.EstimatorToGenerator;
@@ -74,9 +72,6 @@ public class FactoryVisualOdometry {
 		// Range from sparse disparity
 		StereoSparse3D<T> pixelTo3D = new StereoSparse3D<T>(sparseDisparity,imageType);
 
-		// setup the tracker
-		KeyFramePointTracker<T,PointPoseTrack> keyTracker =
-				new KeyFramePointTracker<T,PointPoseTrack>(tracker,null,PointPoseTrack.class);
 
 		RefinePnP refine = null;
 
@@ -84,8 +79,8 @@ public class FactoryVisualOdometry {
 			refine = FactoryMultiView.refinePnP(1e-12,refineIterations);
 		}
 
-		VisOdomPixelDepthPnP<T> alg = new VisOdomPixelDepthPnP<T>(thresholdAdd,thresholdRetire , motion,pixelTo3D,refine,keyTracker);
+		VisOdomPixelDepthPnP<T> alg = new VisOdomPixelDepthPnP<T>(thresholdAdd,thresholdRetire ,motion,pixelTo3D,refine,tracker,null);
 
-		return new WrapVisOdomPixelDepthPnP<T>(alg,pixelTo3D,keyTracker,distance,imageType);
+		return new WrapVisOdomPixelDepthPnP<T>(alg,pixelTo3D,tracker,distance,imageType);
 	}
 }

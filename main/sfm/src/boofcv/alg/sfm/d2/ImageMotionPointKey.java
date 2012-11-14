@@ -19,14 +19,14 @@
 package boofcv.alg.sfm.d2;
 
 import boofcv.abst.feature.tracker.ImagePointTracker;
-import boofcv.abst.feature.tracker.KeyFramePointTracker;
-import boofcv.abst.feature.tracker.KeyFrameTrack;
+import boofcv.abst.feature.tracker.PointTrack;
 import boofcv.numerics.fitting.modelset.ModelFitter;
 import boofcv.numerics.fitting.modelset.ModelMatcher;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.InvertibleTransform;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -46,7 +46,7 @@ public class ImageMotionPointKey<I extends ImageSingleBand, T extends Invertible
 	// total number of frames processed
 	protected int totalProcessed = 0;
 	// feature tracker
-	protected KeyFramePointTracker<I,KeyFrameTrack> tracker;
+	protected ImagePointTracker<I> tracker;
 	// Fits a model to the tracked features
 	protected ModelMatcher<T,AssociatedPair> modelMatcher;
 	// Refines the model using the complete inlier set
@@ -76,7 +76,7 @@ public class ImageMotionPointKey<I extends ImageSingleBand, T extends Invertible
 							   ModelFitter<T,AssociatedPair> modelRefiner,
 							   T model)
 	{
-		this.tracker = new KeyFramePointTracker<I,KeyFrameTrack>(tracker);
+		this.tracker = tracker;
 		this.modelMatcher = modelMatcher;
 		this.modelRefiner = modelRefiner;
 		
@@ -105,10 +105,9 @@ public class ImageMotionPointKey<I extends ImageSingleBand, T extends Invertible
 		worldToKey.set(worldToInit);
 		keyToCurr.set(worldToInit);
 		worldToCurr.set(worldToInit);
-		tracker.reset();
-		tracker.spawnTracks(null);
-		tracker.setKeyFrame();
 		totalProcessed = 0;
+
+		changeKeyFrame();
 	}
 
 	/**
@@ -136,10 +135,15 @@ public class ImageMotionPointKey<I extends ImageSingleBand, T extends Invertible
 		tracker.process(frame);
 		totalProcessed++;
 
-		List<KeyFrameTrack> pairs = tracker.getActivePairs(null);
+		List<PointTrack> tracks = tracker.getActiveTracks(null);
 
-		if( pairs.size() == 0 )
+		if( tracks.size() == 0 )
 			return false;
+
+		List<AssociatedPair> pairs = new ArrayList<AssociatedPair>();
+		for( PointTrack t : tracks ) {
+			pairs.add((AssociatedPair)t.getCookie());
+		}
 
 		// fit the motion model to the feature tracks
 		if( !modelMatcher.process((List)pairs) ) {
@@ -163,10 +167,24 @@ public class ImageMotionPointKey<I extends ImageSingleBand, T extends Invertible
 	 * Make the current frame the first frame in the sequence
 	 */
 	public void changeKeyFrame() {
-		tracker.spawnTracks(null);
-		tracker.setKeyFrame();
+		tracker.dropAllTracks();
+		tracker.spawnTracks();
 
-		totalSpawned = tracker.getActiveTracks(null).size();
+		List<PointTrack> spawned = tracker.getNewTracks(null);
+
+		for( PointTrack l : spawned ) {
+			AssociatedPair p = l.getCookie();
+			if( p == null ) {
+				l.cookie = p = new AssociatedPair();
+				// little bit of trickery here.  Save the reference so that the point
+				// in the current frame is updated for free as PointTrack is
+				p.p2 = l;
+				l.cookie = p;
+			}
+			p.p1.set(p.p2);
+		}
+
+		totalSpawned = spawned.size();
 		worldToKey.set(worldToCurr);
 	}
 
@@ -183,7 +201,7 @@ public class ImageMotionPointKey<I extends ImageSingleBand, T extends Invertible
 	}
 
 	public ImagePointTracker<I> getTracker() {
-		return tracker.getTracker();
+		return tracker;
 	}
 
 	public ModelMatcher<T, AssociatedPair> getModelMatcher() {
