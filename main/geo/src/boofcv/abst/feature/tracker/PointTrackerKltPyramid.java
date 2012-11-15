@@ -132,7 +132,6 @@ public class PointTrackerKltPyramid<I extends ImageSingleBand,D extends ImageSin
 	@Override
 	public void dropAllTracks() {
 		unused.addAll(active);
-		unused.addAll(dropped);
 		active.clear();
 		dropped.clear();
 	}
@@ -140,7 +139,6 @@ public class PointTrackerKltPyramid<I extends ImageSingleBand,D extends ImageSin
 	@Override
 	public void process(I image) {
 		spawned.clear();
-		unused.addAll(dropped);
 		dropped.clear();
 		
 		// update image pyramids
@@ -154,12 +152,14 @@ public class PointTrackerKltPyramid<I extends ImageSingleBand,D extends ImageSin
 			KltTrackFault ret = tracker.track(t);
 
 			if( ret == KltTrackFault.SUCCESS ) {
+				tracker.setDescription(t);
 				PointTrack p = t.getCookie();
 				p.set(t.x,t.y);
 				i++;
 			} else {
 				active.remove(i);
 				dropped.add( t );
+				unused.add( t );
 			}
 		}
 	}
