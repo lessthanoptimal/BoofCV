@@ -351,6 +351,7 @@ public class VisualizeStereoVisualOdometryApp <I extends ImageSingleBand>
 		app.setMediaManager(new XugglerMediaManager());
 
 		List<PathLabel> inputs = new ArrayList<PathLabel>();
+		inputs.add(new PathLabel("Inside", "../data/applet/vo/library/config.txt"));
 		inputs.add(new PathLabel("Outside", "../data/applet/vo/backyard/config.txt"));
 		inputs.add(new PathLabel("Urban", "../data/applet/vo/rockville/config.txt"));
 

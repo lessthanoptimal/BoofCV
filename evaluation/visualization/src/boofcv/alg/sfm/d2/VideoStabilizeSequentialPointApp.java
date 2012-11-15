@@ -67,7 +67,7 @@ public class VideoStabilizeSequentialPointApp<I extends ImageSingleBand, D exten
 				dda_ShiTomasi_BRIEF(400, 100, 1, 10, imageType, derivType));
 		// size of the description region has been increased to improve quality.
 		addAlgorithm(0, "ST-NCC", FactoryPointSequentialTracker.
-				dda_ShiTomasi_NCC(500, 11, 11, 10, imageType, derivType));
+				dda_ShiTomasi_NCC(500, 3, 5, 10, imageType, derivType));
 		addAlgorithm(0, "FH-SURF", FactoryPointSequentialTracker.dda_FH_SURF(400, 2, 200, 2, imageType));
 		addAlgorithm(0, "FH-SURF-KLT", FactoryPointSequentialTracker.combined_FH_SURF_KLT(300, 200, 2,
 				config.config,config.pyramidScaling,100,imageType));

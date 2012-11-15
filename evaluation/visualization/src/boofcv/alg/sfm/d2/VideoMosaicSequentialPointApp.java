@@ -70,8 +70,8 @@ public class VideoMosaicSequentialPointApp<I extends ImageSingleBand, D extends 
 		addAlgorithm(0, "ST-BRIEF", FactoryPointSequentialTracker.dda_ShiTomasi_BRIEF(400, 150, 1, 10, imageType,null));
 		// size of the description region has been increased to improve quality.
 		addAlgorithm(0, "ST-NCC", FactoryPointSequentialTracker.
-				dda_ShiTomasi_NCC(500, 11, 11, 10, imageType, derivType));
-		addAlgorithm(0, "FH-SURF", FactoryPointSequentialTracker.dda_FH_SURF(300, 2, 200, 1 , imageType));
+				dda_ShiTomasi_NCC(500, 3, 9, 10, imageType, derivType));
+		addAlgorithm(0, "FH-SURF", FactoryPointSequentialTracker.dda_FH_SURF(400, 2, 200, 2 , imageType));
 		addAlgorithm(0, "FH-SURF-KLT", FactoryPointSequentialTracker.combined_FH_SURF_KLT(300, 200, 3,
 				config.config,config.pyramidScaling,200,imageType));
 

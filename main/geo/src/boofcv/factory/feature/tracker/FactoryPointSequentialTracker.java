@@ -129,17 +129,17 @@ public class FactoryPointSequentialTracker {
 	 * @see DetectAssociateTracker
 	 *
 	 * @param maxTracks The maximum number of tracks it will return. A value <= 0 will return all.
-	 * @param minSeparation  How close together detected features can be.  Recommended value = 2.
+	 * @param detectionRadius  How close together detected features can be.  Recommended value = 2.
 	 * @param detectPerScale Number of features it will detect per scale.
 	 * @param sampleRateFH   Sample rate used by Fast-Hessian detector.  Typically 1 or 2
 	 * @param imageType      Type of image the input is.    @return SURF based tracker.
 	 */
 	public static <I extends ImageSingleBand, II extends ImageSingleBand>
-	ImagePointTracker<I> dda_FH_SURF(int maxTracks, int minSeparation, int detectPerScale, int sampleRateFH,
+	ImagePointTracker<I> dda_FH_SURF(int maxTracks, int detectionRadius, int detectPerScale, int sampleRateFH,
 									 Class<I> imageType) {
 		Class<II> integralType = GIntegralImageOps.getIntegralType(imageType);
 
-		FeatureExtractor extractor = FactoryFeatureExtractor.nonmax(minSeparation, 1, 10, true);
+		FeatureExtractor extractor = FactoryFeatureExtractor.nonmax(detectionRadius, 1, 10, true);
 
 		int numScalesPerOctave = 4;
 		int numOctaves = 4;
@@ -206,23 +206,24 @@ public class FactoryPointSequentialTracker {
 	 * @see DetectAssociateTracker
 	 *
 	 * @param maxFeatures    Maximum number of features it will track.
-	 * @param regionWidth    How wide the region is.  Try 5
-	 * @param regionHeight   How tall the region is.  Try 5
+	 * @param detectRadius   Size of search region used when extracting image features.  Try 2.
+	 * @param describeRadius Radius of the region being described.  Try 2.
 	 * @param cornerThreshold     Tolerance for detecting corner features.  Tune. Start at 1.
 	 * @param imageType      Type of image being processed.
-	 * @param derivType      Type of image used to store the image derivative. null == use default
-	 */
+	 * @param derivType      Type of image used to store the image derivative. null == use default     */
 	public static <I extends ImageSingleBand, D extends ImageSingleBand>
-	ImagePointTracker<I> dda_ShiTomasi_NCC(int maxFeatures, int regionWidth, int regionHeight,
+	ImagePointTracker<I> dda_ShiTomasi_NCC(int maxFeatures, int detectRadius, int describeRadius,
 										   float cornerThreshold,
 										   Class<I> imageType, Class<D> derivType) {
 
 		if( derivType == null )
 			derivType = GImageDerivativeOps.getDerivativeType(imageType);
 
-		DescribePointPixelRegionNCC<I> alg = FactoryDescribePointAlgs.pixelRegionNCC(regionWidth, regionHeight, imageType);
+		int w = 2*describeRadius+1;
 
-		GeneralFeatureDetector corner = FactoryDetectPoint.createShiTomasi(3, false, cornerThreshold, maxFeatures, derivType);
+		DescribePointPixelRegionNCC<I> alg = FactoryDescribePointAlgs.pixelRegionNCC(w, w, imageType);
+
+		GeneralFeatureDetector corner = FactoryDetectPoint.createShiTomasi(detectRadius, false, cornerThreshold, maxFeatures, derivType);
 
 		InterestPointDetector<I> detector = FactoryInterestPoint.wrapPoint(corner, imageType, derivType);
 		ScoreAssociateNccFeature score = new ScoreAssociateNccFeature();
