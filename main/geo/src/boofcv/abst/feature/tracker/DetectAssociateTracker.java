@@ -150,8 +150,12 @@ public class DetectAssociateTracker<I extends ImageSingleBand, D extends TupleDe
 			double yaw = detector.getOrientation(i);
 			double scale = detector.getScale(i);
 
-			D desc = featDst.grow();
-			describe.process(p.x,p.y,yaw,scale,desc);
+			if( describe.isInBounds(p.x,p.y,yaw,scale)) {
+				D desc = featDst.grow();
+				describe.process(p.x,p.y,yaw,scale,desc);
+			} else {
+				locDst.removeTail();
+			}
 		}
 
 		// skip if there are no features to match with the current image

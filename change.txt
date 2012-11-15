@@ -17,6 +17,9 @@ Version : Alpha 0.12
   * Updated behavior of implementing classes 
 - Deleted KeyFramePointTracker
   * Added pointless complexity.  Use ImagePointTracker instead
+  * Changed 2D and 3D SFM algorithms which were using it
+- Fixed bug in SurfFeature.setTo()
+- FactoryPointSequentialTracker has been tweaked a bit
 
 ---------------------------------------------
 Date    : 2012/11/6
