@@ -249,7 +249,9 @@ public class CombinedTrackerScalePoint
 		}
 
 		// associate features
-		associate.associate(knownDesc, detectedDesc);
+		associate.setSource(knownDesc);
+		associate.setDestination(detectedDesc);
+		associate.associate();
 
 		// clean up
 		descUnused.addAll(detectedDesc.toList());

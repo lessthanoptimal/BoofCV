@@ -16,9 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.tracker.pklt;
-
-import boofcv.alg.tracker.klt.KltFeature;
+package boofcv.alg.tracker.klt;
 
 /**
  * Feature which is tracked by the {@link PyramidKltTracker}.  Each layer has its own feature description.

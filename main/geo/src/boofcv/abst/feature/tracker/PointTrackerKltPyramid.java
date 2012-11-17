@@ -18,26 +18,27 @@
 
 package boofcv.abst.feature.tracker;
 
+import boofcv.abst.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.alg.interpolate.InterpolateRectangle;
 import boofcv.alg.tracker.klt.KltTrackFault;
 import boofcv.alg.tracker.klt.KltTracker;
-import boofcv.alg.tracker.pklt.GenericPkltFeatSelector;
-import boofcv.alg.tracker.pklt.PyramidKltFeature;
-import boofcv.alg.tracker.pklt.PyramidKltFeatureSelector;
-import boofcv.alg.tracker.pklt.PyramidKltTracker;
+import boofcv.alg.tracker.klt.PyramidKltFeature;
+import boofcv.alg.tracker.klt.PyramidKltTracker;
 import boofcv.alg.transform.pyramid.PyramidOps;
+import boofcv.struct.QueueCorner;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.pyramid.ImagePyramid;
 import boofcv.struct.pyramid.PyramidDiscrete;
 import boofcv.struct.pyramid.PyramidUpdaterDiscrete;
+import georegression.struct.point.Point2D_I16;
 
 import java.util.ArrayList;
 import java.util.List;
 
 
 /**
- * Wrapper around {@link boofcv.alg.tracker.pklt.PyramidKltTracker} for {@link ImagePointTracker}
+ * Wrapper around {@link boofcv.alg.tracker.klt.PyramidKltTracker} for {@link ImagePointTracker}
  *
  * @author Peter Abeles
  */
@@ -66,8 +67,10 @@ public class PointTrackerKltPyramid<I extends ImageSingleBand,D extends ImageSin
 	// the tracker
 	protected PyramidKltTracker<I, D> tracker;
 
-	// used to automatically select new features in the image
-	protected PyramidKltFeatureSelector<I, D> featureSelector;
+	// selects point features
+	GeneralFeatureDetector<I, D> detector;
+	// list of corners which should be ignored by the corner detector
+	QueueCorner excludeList = new QueueCorner(10);
 
 	long totalFeatures = 0;
 
@@ -80,18 +83,20 @@ public class PointTrackerKltPyramid<I extends ImageSingleBand,D extends ImageSin
 	 */
 	public PointTrackerKltPyramid(PkltConfig<I, D> config,
 								  PyramidUpdaterDiscrete<I> inputPyramidUpdater,
-								  GenericPkltFeatSelector<I, D> featureSelector,
+								  GeneralFeatureDetector<I, D> detector,
 								  ImageGradient<I, D> gradient,
 								  InterpolateRectangle<I> interpInput,
 								  InterpolateRectangle<D> interpDeriv) {
+		if( detector.getRequiresHessian() )
+			throw new IllegalArgumentException("Hessian based feature detectors not yet supported");
+
 		this.config = config;
 		this.gradient = gradient;
-		this.featureSelector = featureSelector;
+		this.detector = detector;
 		this.inputPyramidUpdater = inputPyramidUpdater;
 
 		KltTracker<I, D> klt = new KltTracker<I, D>(interpInput, interpDeriv, config.config);
 		tracker = new PyramidKltTracker<I, D>(klt);
-		featureSelector.setTracker(tracker);
 
 		// pre-declare image features
 		int numLayers = config.pyramidScaling.length;
@@ -115,16 +120,40 @@ public class PointTrackerKltPyramid<I extends ImageSingleBand,D extends ImageSin
 	public void spawnTracks() {
 		spawned.clear();
 
-		int numBefore = active.size();
-		featureSelector.setInputs(basePyramid, derivX, derivY);
-		featureSelector.compute(active, unused);
+		float scaleBottom = (float) basePyramid.getScale(0);
 
-		// add new features which were just added
-		for (int i = numBefore; i < active.size(); i++) {
-			PyramidKltFeature t = active.get(i);
+		// exclude active tracks
+		excludeList.reset();
+		for (int i = 0; i < active.size(); i++) {
+			PyramidKltFeature f = active.get(i);
+			excludeList.add((int) (f.x / scaleBottom), (int) (f.y / scaleBottom));
+		}
+
+		// find new tracks, but no more than the max
+		detector.setExcludedCorners(excludeList);
+		detector.setMaxFeatures(excludeList.size() + unused.size());
+		detector.process(basePyramid.getLayer(0), derivX.getLayer(0), derivY.getLayer(0), null, null, null);
+
+		// extract the features
+		QueueCorner found = detector.getFeatures();
+
+		for (int i = 0; i < found.size() && !unused.isEmpty(); i++) {
+			Point2D_I16 pt = found.get(i);
+
+			// set up pyramid description
+			PyramidKltFeature t = unused.remove(unused.size() - 1);
+			t.x = pt.x * scaleBottom;
+			t.y = pt.y * scaleBottom;
+
+			tracker.setDescription(t);
+
+			// set up point description
 			PointTrack p = t.getCookie();
 			p.featureId = totalFeatures++;
 			p.set(t.x,t.y);
+
+			// add to appropriate lists
+			active.add(t);
 			spawned.add(t);
 		}
 	}

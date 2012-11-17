@@ -19,11 +19,7 @@
 package boofcv.alg.tracker.combined;
 
 import boofcv.alg.interpolate.InterpolateRectangle;
-import boofcv.alg.tracker.klt.KltConfig;
-import boofcv.alg.tracker.klt.KltTrackFault;
-import boofcv.alg.tracker.klt.KltTracker;
-import boofcv.alg.tracker.pklt.PyramidKltFeature;
-import boofcv.alg.tracker.pklt.PyramidKltTracker;
+import boofcv.alg.tracker.klt.*;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.pyramid.ImagePyramid;

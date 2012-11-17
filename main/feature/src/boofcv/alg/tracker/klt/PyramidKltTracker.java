@@ -16,10 +16,8 @@
  * limitations under the License.
  */
 
-package boofcv.alg.tracker.pklt;
+package boofcv.alg.tracker.klt;
 
-import boofcv.alg.tracker.klt.KltTrackFault;
-import boofcv.alg.tracker.klt.KltTracker;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.pyramid.ImagePyramid;
 

@@ -41,7 +41,6 @@ import boofcv.alg.interpolate.InterpolateRectangle;
 import boofcv.alg.tracker.combined.CombinedTrackerScalePoint;
 import boofcv.alg.tracker.combined.PyramidKltForCombined;
 import boofcv.alg.tracker.klt.KltConfig;
-import boofcv.alg.tracker.pklt.GenericPkltFeatSelector;
 import boofcv.alg.transform.ii.GIntegralImageOps;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.feature.describe.FactoryDescribePointAlgs;
@@ -108,8 +107,6 @@ public class FactoryPointSequentialTracker {
 				FactoryDetectPoint.createShiTomasi(config.featureRadius, false, config.config.minDeterminant, config.maxFeatures, config.typeDeriv);
 		detector.setRegions(spawnSubW, spawnSubH);
 
-		GenericPkltFeatSelector<I, D> featureSelector = new GenericPkltFeatSelector<I, D>(detector, null);
-
 		InterpolateRectangle<I> interpInput = FactoryInterpolation.<I>bilinearRectangle(config.typeInput);
 		InterpolateRectangle<D> interpDeriv = FactoryInterpolation.<D>bilinearRectangle(config.typeDeriv);
 
@@ -117,7 +114,7 @@ public class FactoryPointSequentialTracker {
 
 		PyramidUpdaterDiscrete<I> pyramidUpdater = FactoryPyramid.discreteGaussian(config.typeInput, -1, 2);
 
-		return new PointTrackerKltPyramid<I, D>(config,pyramidUpdater,featureSelector,
+		return new PointTrackerKltPyramid<I, D>(config,pyramidUpdater,detector,
 				gradient,interpInput,interpDeriv);
 	}
 

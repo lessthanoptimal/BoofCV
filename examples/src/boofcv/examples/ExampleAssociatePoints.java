@@ -95,7 +95,9 @@ public class ExampleAssociatePoints<T extends ImageSingleBand, FD extends TupleD
 		describeImage(inputB,pointsB,descB);
 
 		// Associate features between the two images
-		associate.associate(descA,descB);
+		associate.setSource(descA);
+		associate.setDestination(descB);
+		associate.associate();
 
 		// display the results
 		AssociationPanel panel = new AssociationPanel(20);

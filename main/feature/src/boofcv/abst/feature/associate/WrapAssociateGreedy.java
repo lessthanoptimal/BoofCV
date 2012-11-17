@@ -37,6 +37,10 @@ public class WrapAssociateGreedy<T> implements GeneralAssociation<T> {
 	int indexes[] = new int[1];
 	int maxAssociations;
 
+	// reference to input list
+	FastQueue<T> listSrc;
+	FastQueue<T> listDst;
+
 	/**
 	 *
 	 * @param alg
@@ -48,12 +52,22 @@ public class WrapAssociateGreedy<T> implements GeneralAssociation<T> {
 	}
 
 	@Override
+	public void setSource(FastQueue<T> listSrc) {
+		this.listSrc = listSrc;
+	}
+
+	@Override
+	public void setDestination(FastQueue<T> listDst) {
+		this.listDst = listDst;
+	}
+
+	@Override
 	public FastQueue<AssociatedIndex> getMatches() {
 		return matches;
 	}
 
 	@Override
-	public void associate(FastQueue<T> listSrc, FastQueue<T> listDst) {
+	public void associate() {
 		alg.associate(listSrc,listDst);
 
 		int pairs[] = alg.getPairs();

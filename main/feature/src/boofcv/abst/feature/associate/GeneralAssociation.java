@@ -24,13 +24,16 @@ import boofcv.struct.feature.AssociatedIndex;
 
 /**
  * <p>
- * Generalized interface for associating features.
+ * Generalized interface for associating features.   Exhaustively finds matches for each feature in the source
+ * list to one in the destination list.  There is only one match found for each member of source, but multiple
+ * matches can be found for destination.  If the best match has an error which is too high then a member of
+ * source might not be matched.
  * </p>
  *
  * <p>
  * DESIGN NOTE: {@link FastQueue} is used instead of {@link java.util.List} because in the association
  * micro benchmark it produced results that were about 20% faster consistently.  Which is surprising since
- * one would think the comparisons would dominate.
+ * one would think descriptor comparisons would dominate.
  * </p>
  *
  * @author Peter Abeles
@@ -38,12 +41,28 @@ import boofcv.struct.feature.AssociatedIndex;
 public interface GeneralAssociation<T> {
 
 	/**
-	 * Finds the best match for each item in the src list with an item in the 'dst' list.
+	 * Sets the list of source features.
 	 *
-	 * @param listSrc Source list that is being matched to dst list.
-	 * @param listDst Destination list of items that are matched to source.
+	 * NOTE: A reference to the input list might be saved internally until the next call to this function.
+	 *
+	 * @param listSrc List of features
 	 */
-	public void associate( FastQueue<T> listSrc , FastQueue<T> listDst );
+	public void setSource(  FastQueue<T> listSrc );
+
+	/**
+	 * Sets the list of destination features
+	 *
+	 * NOTE: A reference to the input list might be saved internally until the next call to this function.
+	 *
+	 * @param listDst List of features
+	 */
+	public void setDestination(  FastQueue<T> listDst );
+
+
+	/**
+	 * Finds the best match for each item in the source list with an item in the destination list.
+	 */
+	public void associate();
 
 	/**
 	 * List of associated features.  Indexes refer to the index inside the input lists.
