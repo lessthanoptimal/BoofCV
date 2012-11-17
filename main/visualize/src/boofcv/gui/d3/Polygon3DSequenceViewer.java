@@ -42,7 +42,7 @@ public class Polygon3DSequenceViewer extends JPanel implements KeyListener, Mous
 		MouseMotionListener {
 
 	// the shapes it's drawing
-	List<Point3D_F64[]> polygons = new ArrayList<Point3D_F64[]>();
+	List<Poly> polygons = new ArrayList<Poly>();
 
 	// transform from world frame to camera frame
 	Se3_F64 worldToCamera = new Se3_F64();
@@ -86,7 +86,28 @@ public class Polygon3DSequenceViewer extends JPanel implements KeyListener, Mous
 				polygons.clear();
 			}
 		});
+	}
 
+	/**
+	 * Adds a polygon to the viewer.  GUI Thread safe.
+	 *
+	 * @param polygon shape being added
+	 */
+	public void add( Color color , Point3D_F64... polygon ) {
+
+		final Poly p = new Poly(polygon.length,color);
+
+		for( int i = 0; i < polygon.length; i++ )
+			p.pts[i] = polygon[i].copy();
+
+
+
+		SwingUtilities.invokeLater( new Runnable() {
+			@Override
+			public void run() {
+				polygons.add( p );
+			}
+		});
 	}
 
 	/**
@@ -96,10 +117,12 @@ public class Polygon3DSequenceViewer extends JPanel implements KeyListener, Mous
 	 */
 	public void add( Point3D_F64... polygon ) {
 
-		final Point3D_F64[] p = new Point3D_F64[polygon.length];
+		final Poly p = new Poly(polygon.length,Color.BLACK);
 
 		for( int i = 0; i < polygon.length; i++ )
-			p[i] = polygon[i].copy();
+			p.pts[i] = polygon[i].copy();
+
+
 
 		SwingUtilities.invokeLater( new Runnable() {
 			@Override
@@ -122,17 +145,19 @@ public class Polygon3DSequenceViewer extends JPanel implements KeyListener, Mous
 		Point2D_F64 x2 = new Point2D_F64();
 
 
-		for( Point3D_F64[] poly : polygons ) {
-			SePointOps_F64.transform(worldToCamera, poly[0], p1);
+		for( Poly poly : polygons ) {
+			SePointOps_F64.transform(worldToCamera, poly.pts[0], p1);
 			GeometryMath_F64.mult(K,p1,x1);
 
 			// don't render what's behind the camera
 			if( p1.z < 0 )
 				continue;
 
+			g2.setColor(poly.color);
+
 			boolean skip = false;
-			for( int i = 1; i < poly.length; i++ ) {
-				SePointOps_F64.transform(worldToCamera,poly[i],p2);
+			for( int i = 1; i < poly.pts.length; i++ ) {
+				SePointOps_F64.transform(worldToCamera,poly.pts[i],p2);
 				GeometryMath_F64.mult(K,p2,x2);
 
 				if( p2.z < 0 ) {
@@ -149,7 +174,7 @@ public class Polygon3DSequenceViewer extends JPanel implements KeyListener, Mous
 				x1=x2;x2=tempX;
 			}
 			if( !skip ) {
-				SePointOps_F64.transform(worldToCamera, poly[0], p2);
+				SePointOps_F64.transform(worldToCamera, poly.pts[0], p2);
 				GeometryMath_F64.mult(K,p2,x2);
 				g2.drawLine((int)x1.x,(int)x1.y,(int)x2.x,(int)x2.y);
 			}
@@ -228,4 +253,18 @@ public class Polygon3DSequenceViewer extends JPanel implements KeyListener, Mous
 
 	@Override
 	public void mouseMoved(MouseEvent e) {}
+
+	private static class Poly
+	{
+		Point3D_F64[] pts;
+		Color color;
+
+		public Poly() {
+		}
+
+		public Poly(int length, Color color) {
+			this.pts = new Point3D_F64[length];
+			this.color = color;
+		}
+	}
 }

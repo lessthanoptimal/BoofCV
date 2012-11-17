@@ -55,7 +55,9 @@ public class BenchmarkAssociationAlgs {
 
 		@Override
 		public void process() {
-			alg.associate(listA,listB);
+			alg.setSource(listA);
+			alg.setDestination(listB);
+			alg.associate();
 		}
 
 		@Override

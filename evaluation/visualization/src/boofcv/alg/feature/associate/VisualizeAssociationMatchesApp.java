@@ -203,7 +203,9 @@ public class VisualizeAssociationMatchesApp<T extends ImageSingleBand, D extends
 		progress++;
 		extractImageFeatures(imageRight, rightDesc, rightPts);
 		progress++;
-		matcher.associate(leftDesc, rightDesc);
+		matcher.setSource(leftDesc);
+		matcher.setDestination(rightDesc);
+		matcher.associate();
 		progress = 3;
 
 		SwingUtilities.invokeLater(new Runnable() {

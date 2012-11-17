@@ -55,7 +55,9 @@ public class TestWrapAssociateGreedy {
 
 		}
 
-		alg.associate(listSrc,listDst);
+		alg.setSource(listSrc);
+		alg.setDestination(listDst);
+		alg.associate();
 
 		FastQueue<AssociatedIndex> matches = alg.getMatches();
 

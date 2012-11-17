@@ -16,12 +16,10 @@
  * limitations under the License.
  */
 
-package boofcv.alg.tracker.pklt;
+package boofcv.alg.tracker.klt;
 
 import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.alg.misc.ImageTestingOps;
-import boofcv.alg.tracker.klt.KltTracker;
-import boofcv.alg.tracker.klt.TestKltTracker;
 import boofcv.alg.transform.pyramid.PyramidOps;
 import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.factory.transform.pyramid.FactoryPyramid;

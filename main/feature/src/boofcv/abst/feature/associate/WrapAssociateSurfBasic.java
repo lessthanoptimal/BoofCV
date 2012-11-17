@@ -37,9 +37,17 @@ public class WrapAssociateSurfBasic implements GeneralAssociation<SurfFeature> {
 	}
 
 	@Override
-	public void associate(FastQueue<SurfFeature> listSrc, FastQueue<SurfFeature> listDst) {
+	public void setSource(FastQueue<SurfFeature> listSrc) {
 		alg.setSrc(listSrc);
+	}
+
+	@Override
+	public void setDestination(FastQueue<SurfFeature> listDst) {
 		alg.setDst(listDst);
+	}
+
+	@Override
+	public void associate() {
 		alg.associate();
 	}
 

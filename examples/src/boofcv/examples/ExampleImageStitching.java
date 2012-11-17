@@ -95,7 +95,9 @@ public class ExampleImageStitching {
 		describeImage(imageB, detector, describe, pointsB, descB);
 
 		// Associate features between the two images
-		associate.associate(descA,descB);
+		associate.setSource(descA);
+		associate.setDestination(descB);
+		associate.associate();
 
 		// create a list of AssociatedPairs that tell the model matcher how a feature moved
 		FastQueue<AssociatedIndex> matches = associate.getMatches();

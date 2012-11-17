@@ -16,11 +16,10 @@
  * limitations under the License.
  */
 
-package boofcv.alg.tracker.pklt;
+package boofcv.alg.tracker.klt;
 
 import boofcv.alg.filter.derivative.GradientSobel;
 import boofcv.alg.misc.ImageTestingOps;
-import boofcv.alg.tracker.klt.KltTrackFault;
 import boofcv.core.image.border.BorderIndex1D_Extend;
 import boofcv.core.image.border.ImageBorder1D_F32;
 import org.junit.Before;

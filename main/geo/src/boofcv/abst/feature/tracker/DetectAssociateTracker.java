@@ -171,7 +171,9 @@ public class DetectAssociateTracker<I extends ImageSingleBand, D extends TupleDe
 			}
 
 			// pair of old and newly detected features
-			associate.associate(featSrc,featDst);
+			associate.setSource(featSrc);
+			associate.setDestination(featDst);
+			associate.associate();
 
 			// update tracks
 			matches = associate.getMatches();

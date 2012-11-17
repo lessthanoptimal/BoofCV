@@ -9,9 +9,12 @@ Version : Alpha 0.12
 - Fixed inverse wavelet transform so that it bounds the pixel values
   * Wavelet denoising sometimes overflowed
 - Adding new feature tracker which combines KLT and DDA style tracking
-- Removed PkltTrackManager and pushed its functionality into the ImagePointTracker implementation
+- Updated Pyramid KLT tracker
+  * Removed PkltTrackManager and pushed its functionality into the ImagePointTracker implementation
   * Was only separate for historical reasons
   * renamed PstWrapperPyramidKlt to PointTrackerKltPyramid
+  * Deleted GenericPkltFeatureSelector and put into KLT point tracker
+  * Moved what was left into KLT directory
 - ImagePointTracker
   * Changed contract, more fully specified contract, improved tests
   * Updated behavior of implementing classes 
@@ -20,6 +23,9 @@ Version : Alpha 0.12
   * Changed 2D and 3D SFM algorithms which were using it
 - Fixed bug in SurfFeature.setTo()
 - FactoryPointSequentialTracker has been tweaked a bit
+- GeneralAssociation provides two functions for specifying the source and destination lists
+  * Allows better optimization since preprocessing might only need to be done once
+
 
 ---------------------------------------------
 Date    : 2012/11/6

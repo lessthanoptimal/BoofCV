@@ -177,7 +177,9 @@ public class DescribeEvaluator<T extends ImageSingleBand, D extends TupleDesc>
 	}
 
 	private double computeAssociationScore(List<Integer> indexes) {
-		matcher.associate(initial,current);
+		matcher.setSource(initial);
+		matcher.setDestination(current);
+		matcher.associate();
 
 		FastQueue<AssociatedIndex> matches =  matcher.getMatches();
 

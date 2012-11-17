@@ -105,14 +105,19 @@ public abstract class StandardImagePointTracker <T extends ImageSingleBand> {
 		assertEquals(1,numFound);
 	}
 
+	/**
+	 * High level spawn tracks test.
+	 */
 	@Test
 	public void spawnTracks() {
+		// Process an image and make sure no new tracks have been spawned until requested
 		tracker = createTracker();
 		tracker.process((T)image);
 		assertEquals(0,tracker.getAllTracks(null).size());
 		assertEquals(0,tracker.getActiveTracks(null).size());
 		assertTrue(tracker.getNewTracks(null).size() == 0 );
 
+		// Request that new tracks be spawned and ensure that all lists have been updated
 		tracker.spawnTracks();
 
 		assertTrue(tracker.getAllTracks(null).size() > 0);
@@ -120,6 +125,7 @@ public abstract class StandardImagePointTracker <T extends ImageSingleBand> {
 		assertTrue(tracker.getActiveTracks(null).size() ==
 				tracker.getNewTracks(null).size() );
 
+		// Tweak the input image and make sure that everything has the expected size
 		ImageTestingOps.addGaussian(image,rand,1,0,255);
 		tracker.process((T)image);
 
@@ -128,7 +134,9 @@ public abstract class StandardImagePointTracker <T extends ImageSingleBand> {
 
 		assertTrue(beforeAll > 0);
 		assertTrue(beforeActive>0);
+		assertTrue(tracker.getNewTracks(null).size() == 0 );
 
+		// Call spawn again.  There should be more tracks now
 		tracker.spawnTracks();
 
 		assertTrue(beforeAll < tracker.getAllTracks(null).size());
@@ -137,6 +145,38 @@ public abstract class StandardImagePointTracker <T extends ImageSingleBand> {
 		// there should be some pre-existing tracks
 		assertTrue(tracker.getActiveTracks(null).size() !=
 				tracker.getNewTracks(null).size() );
+	}
+
+	/**
+	 * When spawn is called, make sure that it doesn't return identical tracks
+	 */
+	@Test
+	public void spawnTracks_NoDuplicates() {
+		tracker = createTracker();
+		tracker.process((T)image);
+		tracker.spawnTracks();
+		assertTrue(tracker.getActiveTracks(null).size()>0);
+
+		int initialSize = tracker.getNewTracks(null).size();
+
+		// drop a track
+		PointTrack dropped = tracker.getActiveTracks(null).get(0);
+		tracker.dropTrack(dropped);
+		double x = dropped.x;
+		double y = dropped.y;
+
+		// no change to the image
+		// I think in just about every tracker nothing should change. Might need to change test for some
+		tracker.process((T)image);
+
+		// should just spawn one track
+		tracker.spawnTracks();
+		assertEquals(1,tracker.getNewTracks(null).size());
+
+		PointTrack found = tracker.getNewTracks(null).get(0);
+
+		assertTrue(x == found.x);
+		assertTrue(y == found.y);
 	}
 
 	@Test

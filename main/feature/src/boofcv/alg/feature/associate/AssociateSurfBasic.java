@@ -80,7 +80,9 @@ public class AssociateSurfBasic {
 	{
 		// find and add the matches
 		matches.reset();
-		assoc.associate((FastQueue)srcPositive,(FastQueue)dstPositive);
+		assoc.setSource((FastQueue)srcPositive);
+		assoc.setDestination((FastQueue) dstPositive);
+		assoc.associate();
 		FastQueue<AssociatedIndex> m = assoc.getMatches();
 		for( int i = 0; i < m.size; i++ ) {
 			AssociatedIndex a = m.data[i];
@@ -88,7 +90,9 @@ public class AssociateSurfBasic {
 			int globalDstIndex = dstPositive.data[a.dst].index;
 			matches.grow().setAssociation(globalSrcIndex,globalDstIndex,a.fitScore);
 		}
-		assoc.associate((FastQueue)srcNegative,(FastQueue)dstNegative);
+		assoc.setSource((FastQueue)srcNegative);
+		assoc.setDestination((FastQueue) dstNegative);
+		assoc.associate();
 		m = assoc.getMatches();
 		for( int i = 0; i < m.size; i++ ) {
 			AssociatedIndex a = m.data[i];

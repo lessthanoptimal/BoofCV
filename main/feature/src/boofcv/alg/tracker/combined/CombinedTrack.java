@@ -18,7 +18,7 @@
 
 package boofcv.alg.tracker.combined;
 
-import boofcv.alg.tracker.pklt.PyramidKltFeature;
+import boofcv.alg.tracker.klt.PyramidKltFeature;
 import boofcv.struct.feature.TupleDesc;
 import georegression.struct.point.Point2D_F64;
 
