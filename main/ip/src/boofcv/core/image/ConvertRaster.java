@@ -48,8 +48,12 @@ public class ConvertRaster {
 
 		int size = dst.getWidth() * dst.getHeight();
 
+		int srcStride = src.getScanlineStride();
+		int srcOffset = src.getDataOffset(0)-src.getPixelStride()+1;
+		int srcStrideDiff = srcStride-src.getPixelStride()*dst.width;
+
 		if (numBands == 3) {
-			int indexSrc = 0;
+			int indexSrc = srcOffset;
 			for (int y = 0; y < dst.height; y++) {
 				int indexDst = dst.startIndex + dst.stride * y;
 				int indexDstEnd = indexDst + dst.width;
@@ -62,20 +66,21 @@ public class ConvertRaster {
 
 					data[indexDst] = (byte) ave;
 				}
+				indexSrc += srcStrideDiff;
 			}
 		} else if (numBands == 1) {
-			if (dst.startIndex == 0 && dst.width == dst.stride)
+			if (dst.startIndex == 0 && dst.width == dst.stride && srcStrideDiff == 0 && srcOffset == 0 )
 				System.arraycopy(srcData, 0, data, 0, size);
 			else {
 				for (int y = 0; y < dst.height; y++) {
 					int indexDst = dst.startIndex + dst.stride * y;
-					int indexSrc = dst.width * y;
+					int indexSrc = srcOffset + srcStride * y;
 
 					System.arraycopy(srcData, indexSrc, dst.data, indexDst, dst.width);
 				}
 			}
 		} else if (numBands == 4) {
-			int indexSrc = 0;
+			int indexSrc = srcOffset;
 			for (int y = 0; y < dst.height; y++) {
 				int indexDst = dst.startIndex + dst.stride * y;
 				int indexDstEnd = indexDst + dst.width;
@@ -89,6 +94,7 @@ public class ConvertRaster {
 
 					data[indexDst] = (byte) ave;
 				}
+				indexSrc += srcStrideDiff;
 			}
 		} else {
 			throw new RuntimeException("Write more code here.");
@@ -105,8 +111,12 @@ public class ConvertRaster {
 
 		int numBands = src.getNumBands();
 
+		int srcStride = src.getScanlineStride();
+		int srcOffset = src.getDataOffset(0)-numBands+1;
+		int srcStrideDiff = srcStride-src.getPixelStride()*dst.width;
+
 		if (numBands == 3) {
-			int indexSrc = 0;
+			int indexSrc = srcOffset;
 			for (int y = 0; y < dst.height; y++) {
 				int indexDst = dst.startIndex + dst.stride * y;
 				int indexDstEnd = indexDst + dst.width;
@@ -119,19 +129,20 @@ public class ConvertRaster {
 
 					data[indexDst] = ave;
 				}
+				indexSrc += srcStrideDiff;
 			}
 		} else if (numBands == 1) {
 			for (int y = 0; y < dst.height; y++) {
 				int indexDst = dst.startIndex + dst.stride * y;
 				int indexDstEnd = indexDst + dst.width;
-				int indexSrc = dst.width * y;
+				int indexSrc = srcOffset + srcStride * y;
 
 				for (; indexDst < indexDstEnd; indexDst++) {
 					data[indexDst] = srcData[indexSrc++] & 0xFF;
 				}
 			}
 		} else if (numBands == 4) {
-			int indexSrc = 0;
+			int indexSrc = srcOffset;
 			for (int y = 0; y < dst.height; y++) {
 				int indexDst = dst.startIndex + dst.stride * y;
 				int indexDstEnd = indexDst + dst.width;
@@ -145,6 +156,7 @@ public class ConvertRaster {
 
 					data[indexDst] = ave;
 				}
+				indexSrc += srcStrideDiff;
 			}
 		} else {
 			throw new RuntimeException("Write more code here.");
@@ -159,12 +171,16 @@ public class ConvertRaster {
 
 		int numBands = src.getNumBands();
 
+		int srcStride = src.getScanlineStride();
+		int srcOffset = src.getDataOffset(0)-numBands+1;
+		int srcStrideDiff = srcStride-src.getPixelStride()*dst.width;
+
 		if (numBands == 3) {
 			byte[] band1 = dst.getBand(0).data;
 			byte[] band2 = dst.getBand(1).data;
 			byte[] band3 = dst.getBand(2).data;
 
-			int indexSrc = 0;
+			int indexSrc = srcOffset;
 			for (int y = 0; y < dst.height; y++) {
 				int indexDst = dst.startIndex + dst.stride * y;
 				int indexDstEnd = indexDst + dst.width;
@@ -173,23 +189,16 @@ public class ConvertRaster {
 					band2[indexDst] = srcData[indexSrc++];
 					band3[indexDst] = srcData[indexSrc++];
 				}
+				indexSrc += srcStrideDiff;
 			}
 		} else if (numBands == 1) {
-			byte[][] bands = new byte[numBands][];
+			byte dstData[] = dst.getBand(0).data;
 
-			for (int i = 0; i < numBands; i++) {
-				bands[i] = dst.getBand(i).data;
-			}
-
-			int indexSrc = 0;
 			for (int y = 0; y < dst.height; y++) {
 				int indexDst = dst.startIndex + dst.stride * y;
-				int indexDstEnd = indexDst + dst.width;
-				for (; indexDst < indexDstEnd; indexDst++) {
-					for (int b = 0; b < numBands; b++) {
-						bands[b][indexDst] = srcData[indexSrc++];
-					}
-				}
+				int indexSrc = srcOffset + srcStride * y;
+
+				System.arraycopy(srcData, indexSrc, dstData, indexDst, dst.width);
 			}
 		} else if (numBands == 4) {
 			byte[] band1 = dst.getBand(0).data;
@@ -197,7 +206,7 @@ public class ConvertRaster {
 			byte[] band3 = dst.getBand(2).data;
 			byte[] band4 = dst.getBand(3).data;
 
-			int indexSrc = 0;
+			int indexSrc = srcOffset;
 			for (int y = 0; y < dst.height; y++) {
 				int indexDst = dst.startIndex + dst.stride * y;
 				int indexDstEnd = indexDst + dst.width;
@@ -207,6 +216,7 @@ public class ConvertRaster {
 					band3[indexDst] = srcData[indexSrc++];
 					band4[indexDst] = srcData[indexSrc++];
 				}
+				indexSrc += srcStrideDiff;
 			}
 		} else {
 			throw new RuntimeException("Write more code here.");
@@ -221,12 +231,16 @@ public class ConvertRaster {
 
 		int numBands = src.getNumBands();
 
+		int srcStride = src.getScanlineStride();
+		int srcOffset = src.getDataOffset(0)-src.getPixelStride()+1;
+		int srcStrideDiff = srcStride-src.getPixelStride()*dst.width;
+
 		if (numBands == 3) {
 			float[] band1 = dst.getBand(0).data;
 			float[] band2 = dst.getBand(1).data;
 			float[] band3 = dst.getBand(2).data;
 
-			int indexSrc = 0;
+			int indexSrc = srcOffset;
 			for (int y = 0; y < dst.height; y++) {
 				int indexDst = dst.startIndex + dst.stride * y;
 				int indexDstEnd = indexDst + dst.width;
@@ -235,22 +249,18 @@ public class ConvertRaster {
 					band2[indexDst] = srcData[indexSrc++] & 0xFF;
 					band3[indexDst] = srcData[indexSrc++] & 0xFF;
 				}
+				indexSrc += srcStrideDiff;
 			}
 		} else if (numBands == 1) {
-			float[][] bands = new float[numBands][];
+			float[] data = dst.getBand(0).data;
 
-			for (int i = 0; i < numBands; i++) {
-				bands[i] = dst.getBand(i).data;
-			}
-
-			int indexSrc = 0;
 			for (int y = 0; y < dst.height; y++) {
 				int indexDst = dst.startIndex + dst.stride * y;
 				int indexDstEnd = indexDst + dst.width;
+				int indexSrc = srcOffset + srcStride * y;
+
 				for (; indexDst < indexDstEnd; indexDst++) {
-					for (int b = 0; b < numBands; b++) {
-						bands[b][indexDst] = srcData[indexSrc++] & 0xFF;
-					}
+					data[indexDst] = srcData[indexSrc++] & 0xFF;
 				}
 			}
 		} else if (numBands == 4) {
@@ -259,7 +269,7 @@ public class ConvertRaster {
 			float[] band3 = dst.getBand(2).data;
 			float[] band4 = dst.getBand(3).data;
 
-			int indexSrc = 0;
+			int indexSrc = srcOffset;
 			for (int y = 0; y < dst.height; y++) {
 				int indexDst = dst.startIndex + dst.stride * y;
 				int indexDstEnd = indexDst + dst.width;
@@ -269,6 +279,8 @@ public class ConvertRaster {
 					band3[indexDst] = srcData[indexSrc++] & 0xFF;
 					band4[indexDst] = srcData[indexSrc++] & 0xFF;
 				}
+
+				indexSrc += srcStrideDiff;
 			}
 		} else {
 			throw new RuntimeException("Write more code here.");
@@ -283,7 +295,11 @@ public class ConvertRaster {
 
 		byte[] data = dst.data;
 
-		int indexSrc = 0;
+		int srcStride = src.getScanlineStride();
+		int srcOffset = src.getDataOffset(0)-src.getPixelStride()+1;
+		int srcStrideDiff = srcStride-src.getPixelStride()*dst.width;
+
+		int indexSrc = srcOffset;
 		for (int y = 0; y < dst.height; y++) {
 			int indexDst = dst.startIndex + y * dst.stride;
 			for (int x = 0; x < dst.width; x++) {
@@ -298,6 +314,7 @@ public class ConvertRaster {
 
 				data[indexDst++] = (byte) ave;
 			}
+			indexSrc += srcStrideDiff;
 		}
 	}
 
@@ -309,7 +326,11 @@ public class ConvertRaster {
 
 		float[] data = dst.data;
 
-		int indexSrc = 0;
+		int srcStride = src.getScanlineStride();
+		int srcOffset = src.getDataOffset(0)-src.getPixelStride()+1;
+		int srcStrideDiff = srcStride-src.getPixelStride()*dst.width;
+
+		int indexSrc = srcOffset;
 		for (int y = 0; y < dst.height; y++) {
 			int indexDst = dst.startIndex + y * dst.stride;
 			for (int x = 0; x < dst.width; x++) {
@@ -324,6 +345,7 @@ public class ConvertRaster {
 
 				data[indexDst++] = ave;
 			}
+			indexSrc += srcStrideDiff;
 		}
 	}
 
@@ -333,11 +355,15 @@ public class ConvertRaster {
 	public static void bufferedToMulti_U8(IntegerInterleavedRaster src, MultiSpectral<ImageUInt8> dst) {
 		int[] srcData = src.getDataStorage();
 
+		int srcStride = src.getScanlineStride();
+		int srcOffset = src.getDataOffset(0)-src.getPixelStride()+1;
+		int srcStrideDiff = srcStride-src.getPixelStride()*dst.width;
+
 		byte[] data1 = dst.getBand(0).data;
 		byte[] data2 = dst.getBand(1).data;
 		byte[] data3 = dst.getBand(2).data;
 
-		int indexSrc = 0;
+		int indexSrc = srcOffset;
 		for (int y = 0; y < dst.height; y++) {
 			int indexDst = dst.startIndex + y * dst.stride;
 			for (int x = 0; x < dst.width; x++, indexDst++) {
@@ -348,6 +374,8 @@ public class ConvertRaster {
 				data2[indexDst] = (byte) (rgb >>> 8);
 				data3[indexDst] = (byte) rgb;
 			}
+
+			indexSrc += srcStrideDiff;
 		}
 	}
 
@@ -357,11 +385,15 @@ public class ConvertRaster {
 	public static void bufferedToMulti_F32(IntegerInterleavedRaster src, MultiSpectral<ImageFloat32> dst) {
 		int[] srcData = src.getDataStorage();
 
+		int srcStride = src.getScanlineStride();
+		int srcOffset = src.getDataOffset(0)-src.getPixelStride()+1;
+		int srcStrideDiff = srcStride-src.getPixelStride()*dst.width;
+
 		float[] data1 = dst.getBand(0).data;
 		float[] data2 = dst.getBand(1).data;
 		float[] data3 = dst.getBand(2).data;
 
-		int indexSrc = 0;
+		int indexSrc = srcOffset;
 		for (int y = 0; y < dst.height; y++) {
 			int indexDst = dst.startIndex + y * dst.stride;
 			for (int x = 0; x < dst.width; x++, indexDst++) {
@@ -372,6 +404,8 @@ public class ConvertRaster {
 				data2[indexDst] = (rgb >>> 8) & 0xFF;
 				data3[indexDst] = rgb & 0xFF;
 			}
+
+			indexSrc += srcStrideDiff;
 		}
 	}
 

@@ -34,8 +34,6 @@ import static org.junit.Assert.*;
 /**
  * @author Peter Abeles
  */
-// TODO Add unit tests for converting to and from BufferedImage.TYPE_BYTE_INDEXED
-//      Maybe just compare to RGB convert?  that's what it should be calling
 public class TestConvertBufferedImage {
 
 	Random rand = new Random(234);
@@ -169,28 +167,71 @@ public class TestConvertBufferedImage {
 
 	@Test
 	public void convertFromSingle() {
-		BufferedImage origImg = TestConvertRaster.createByteBuff(imgWidth, imgHeight, 1, rand);
+		BufferedImage origImg;
 
-		ImageUInt8 imgInt8 = ConvertBufferedImage.convertFromSingle(origImg, (ImageUInt8) null, ImageUInt8.class);
-		assertEquals(imgWidth, imgInt8.width);
-		assertEquals(imgHeight, imgInt8.height);
+		for( int i = 0; i < 4; i++ ) {
 
-		ImageFloat32 imgF32 = ConvertBufferedImage.convertFromSingle(origImg, (ImageFloat32) null, ImageFloat32.class);
-		assertEquals(imgWidth, imgF32.width);
-		assertEquals(imgHeight, imgF32.height);
+			if( i == 0 )
+				origImg = TestConvertRaster.createByteBuff(imgWidth, imgHeight, 1, rand);
+			else if( i == 1 )
+				origImg = TestConvertRaster.createByteBuff(imgWidth, imgHeight, 3, rand);
+			else if( i == 2 )
+				origImg = TestConvertRaster.createByteBuff(imgWidth, imgHeight, 4, rand);
+			else if( i == 3 )
+				origImg = TestConvertRaster.createByteIndexed(imgWidth, imgHeight, rand );
+			else
+				origImg = TestConvertRaster.createIntBuff(imgWidth,imgHeight,rand);
+
+			for( int j = 0; j < 2; j++ ) {
+				if( j == 1 ) {
+					origImg = origImg.getSubimage(1,2,imgWidth-1,imgHeight-2);
+				}
+
+				ImageUInt8 imgInt8 = ConvertBufferedImage.convertFromSingle(origImg, null, ImageUInt8.class);
+				assertEquals(origImg.getWidth(), imgInt8.width);
+				assertEquals(origImg.getHeight(), imgInt8.height);
+				BoofTesting.checkEquals(origImg, imgInt8, 1);
+
+				ImageFloat32 imgF32 = ConvertBufferedImage.convertFromSingle(origImg, null, ImageFloat32.class);
+				assertEquals(origImg.getWidth(), imgF32.width);
+				assertEquals(origImg.getHeight(), imgF32.height);
+				BoofTesting.checkEquals(origImg, imgF32, 1);
+			}
+		}
 	}
 
 	@Test
 	public void convertFromMulti() {
-		BufferedImage origImg = TestConvertRaster.createByteBuff(imgWidth, imgHeight, 1, rand);
+		BufferedImage origImg;
 
-		MultiSpectral<ImageUInt8> imgInt8 = ConvertBufferedImage.convertFromMulti(origImg, null, ImageUInt8.class);
-		assertEquals(imgWidth, imgInt8.width);
-		assertEquals(imgHeight, imgInt8.height);
+		for( int i = 0; i < 4; i++ ) {
 
-		MultiSpectral<ImageFloat32> imgF32 = ConvertBufferedImage.convertFromMulti(origImg, null, ImageFloat32.class);
-		assertEquals(imgWidth, imgF32.width);
-		assertEquals(imgHeight, imgF32.height);
+			if( i == 0 )
+				origImg = TestConvertRaster.createByteBuff(imgWidth, imgHeight, 1, rand);
+			else if( i == 1 )
+				origImg = TestConvertRaster.createByteBuff(imgWidth, imgHeight, 3, rand);
+			else if( i == 2 )
+				origImg = TestConvertRaster.createByteBuff(imgWidth, imgHeight, 4, rand);
+			else if( i == 3 )
+				origImg = TestConvertRaster.createByteIndexed(imgWidth, imgHeight, rand );
+			else
+				origImg = TestConvertRaster.createIntBuff(imgWidth, imgHeight, rand);
+
+			for( int j = 0; j < 2; j++ ) {
+				if( j == 1 ) {
+					origImg = origImg.getSubimage(1,2,imgWidth-1,imgHeight-2);
+				}
+				MultiSpectral<ImageUInt8> imgInt8 = ConvertBufferedImage.convertFromMulti(origImg, null, ImageUInt8.class);
+				assertEquals(origImg.getWidth(), imgInt8.width);
+				assertEquals(origImg.getHeight(), imgInt8.height);
+				BoofTesting.checkEquals(origImg, imgInt8, 1);
+
+				MultiSpectral<ImageFloat32> imgF32 = ConvertBufferedImage.convertFromMulti(origImg, null, ImageFloat32.class);
+				assertEquals(origImg.getWidth(), imgF32.width);
+				assertEquals(origImg.getHeight(), imgF32.height);
+				BoofTesting.checkEquals(origImg, imgF32, 1);
+			}
+		}
 	}
 
 	/**
@@ -199,7 +240,6 @@ public class TestConvertBufferedImage {
 	@Test
 	public void convertTo_single_ms() {
 		Class[] types = new Class[]{ImageUInt8.class, ImageFloat32.class};
-
 
 		for (Class t : types) {
 			for (int i = 0; i < 2; i++) {
@@ -270,5 +310,24 @@ public class TestConvertBufferedImage {
 		assertTrue(band0 == input.getBand(0));
 		assertTrue(band1 == input.getBand(1));
 		assertTrue(band2 == input.getBand(2));
+	}
+
+	@Test
+	public void isSubImage() {
+		BufferedImage a = new BufferedImage(20,30,BufferedImage.TYPE_BYTE_GRAY);
+
+		assertFalse(ConvertBufferedImage.isSubImage(a));
+
+		BufferedImage b = a.getSubimage(0,0,20,29);
+		assertTrue(ConvertBufferedImage.isSubImage(b));
+
+		b = a.getSubimage(0,0,19,30);
+		assertTrue(ConvertBufferedImage.isSubImage(b));
+
+		b = a.getSubimage(0,1,20,29);
+		assertTrue(ConvertBufferedImage.isSubImage(b));
+
+		b = a.getSubimage(1,0,19,30);
+		assertTrue(ConvertBufferedImage.isSubImage(b));
 	}
 }

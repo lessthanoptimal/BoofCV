@@ -45,6 +45,13 @@ public abstract class StandardImagePointTracker <T extends ImageSingleBand> {
 	int width = 100;
 	int height = 80;
 	ImageFloat32 image = new ImageFloat32(width,height);
+	boolean shouldDropTracks;
+	boolean shouldCreateInactive;
+
+	protected StandardImagePointTracker(boolean shouldCreateInactive, boolean shouldDropTracks) {
+		this.shouldCreateInactive = shouldCreateInactive;
+		this.shouldDropTracks = shouldDropTracks;
+	}
 
 	@Before
 	public void initStandard() {
@@ -195,6 +202,9 @@ public abstract class StandardImagePointTracker <T extends ImageSingleBand> {
 		assertEquals(0,tracker.getDroppedTracks(null).size());
 	}
 
+	/**
+	 * Cause tracks to be dropped during the update
+	 */
 	@Test
 	public void testUpdateTrackDrop() {
 		tracker = createTracker();
@@ -212,14 +222,35 @@ public abstract class StandardImagePointTracker <T extends ImageSingleBand> {
 
 		int afterAll = tracker.getAllTracks(null).size();
 		int afterActive = tracker.getActiveTracks(null).size();
+		int afterDropped =  tracker.getDroppedTracks(null).size();
+		int afterInactive =  tracker.getInactiveTracks(null).size();
 
+		// make sure some change happened
 		assertTrue(afterActive < beforeActive);
 
-		assertTrue(afterAll <= beforeAll );
-		assertEquals(0,tracker.getActiveTracks(null).size());
+		// algorithm specific checks
+		if( shouldDropTracks ) {
+			assertTrue(afterDropped>0);
+			assertTrue(afterAll < beforeAll );
+		} else  {
+			assertEquals(0,afterDropped);
+			assertTrue(afterAll == beforeAll );
+		}
+
+		if( shouldCreateInactive )
+			assertTrue(afterInactive>0);
+		else
+			assertEquals(0,afterInactive);
+
+		// this might not be true for all trackers...
+		assertEquals(0,afterActive);
+		// some tracks should either be dropped or become inactive
+		assertTrue(afterDropped+afterInactive>0);
 		// note that some trackers will not add any features to the dropped list since
 		// it will try to respawn them
 		assertEquals(beforeAll-afterAll,tracker.getDroppedTracks(null).size());
+
+
 	}
 	
 	@Test
