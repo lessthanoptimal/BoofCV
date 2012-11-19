@@ -82,8 +82,6 @@ public class WrapCombinedTracker<I extends ImageSingleBand, D extends ImageSingl
 
 	@Override
 	public void process(I image) {
-		System.out.println("------------ Process");
-
 		detected = false;
 
 		// update the image pyramid
@@ -101,7 +99,7 @@ public class WrapCombinedTracker<I extends ImageSingleBand, D extends ImageSingl
 
 		if( previousSpawn-numActive > reactivateThreshold) {
 			detected = true;
-			tracker.associateTaintedToDetected();
+			tracker.associateAllToDetected();
 			previousSpawn = tracker.getPureKlt().size() + tracker.getReactivated().size();
 		}
 
@@ -116,7 +114,7 @@ public class WrapCombinedTracker<I extends ImageSingleBand, D extends ImageSingl
 	@Override
 	public void spawnTracks() {
 		if( !detected ) {
-			tracker.associateTaintedToDetected();
+			tracker.associateAllToDetected();
 		}
 		tracker.spawnTracksFromDetected();
 

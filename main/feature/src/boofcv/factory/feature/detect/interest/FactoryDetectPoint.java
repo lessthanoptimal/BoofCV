@@ -101,6 +101,7 @@ public class FactoryDetectPoint {
 	 * Creates a Fast corner detector.
 	 *
 	 * @param extractRadius   Radius of non-maximum suppression region. Try 1 or 2.
+	 * @param minContinuous   Minimum number of pixels around the circle that are required to be a corner.  Can be 9 to 12
 	 * @param detectThreshold Minimum feature intensity.  Image dependent.  Start tuning at 0 or 1.
 	 * @param maxFeatures     The maximum number of detected features it will return.  Try 300
 	 * @param imageType       Type of input image.
@@ -108,8 +109,9 @@ public class FactoryDetectPoint {
 	 */
 	public static <T extends ImageSingleBand, D extends ImageSingleBand>
 	GeneralFeatureDetector<T, D> createFast(int extractRadius,
+											int minContinuous,
 											int detectThreshold, int maxFeatures, Class<T> imageType) {
-		FastCornerIntensity<T> alg = FactoryIntensityPointAlg.fast(detectThreshold, 9, imageType);
+		FastCornerIntensity<T> alg = FactoryIntensityPointAlg.fast(detectThreshold, minContinuous, imageType);
 		GeneralFeatureIntensity<T, D> intensity = new WrapperFastCornerIntensity<T, D>(alg);
 		return createGeneral(intensity, extractRadius, detectThreshold, maxFeatures);
 	}

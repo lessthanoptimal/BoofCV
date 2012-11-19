@@ -66,9 +66,9 @@ public class VideoTrackFeaturesApp<I extends ImageSingleBand, D extends ImageSin
 		config.pyramidScaling = new int[]{1,2,4,8};
 
 		addAlgorithm(0,"KLT", FactoryPointSequentialTracker.klt(config,1,1));
-		addAlgorithm(0,"ST-BRIEF", FactoryPointSequentialTracker.dda_ShiTomasi_BRIEF(300, 200, 1, 1,imageType,derivType));
-		addAlgorithm(0,"ST-NCC", FactoryPointSequentialTracker.dda_ShiTomasi_NCC(500, 3, 2, 20, imageType, derivType));
-		addAlgorithm(0,"FH-SURF", FactoryPointSequentialTracker.dda_FH_SURF(300, 2, 200, 1 , imageType));
+		addAlgorithm(0,"ST-BRIEF", FactoryPointSequentialTracker.dda_ST_BRIEF(300, 200, 1, 1, imageType, derivType));
+		addAlgorithm(0,"ST-NCC", FactoryPointSequentialTracker.dda_ST_NCC(500, 3, 2, 20, imageType, derivType));
+		addAlgorithm(0,"FH-SURF", FactoryPointSequentialTracker.dda_FH_SURF(300, 3, 200, 1 , false,imageType));
 
 
 		gui.addMouseListener(this);

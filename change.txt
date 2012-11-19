@@ -25,6 +25,8 @@ Version : Alpha 0.12
 - FactoryPointSequentialTracker has been tweaked a bit
 - GeneralAssociation provides two functions for specifying the source and destination lists
   * Allows better optimization since preprocessing might only need to be done once
+- ConvertBufferedImage
+  * Added support for sub-image BufferedImages
 
 
 ---------------------------------------------

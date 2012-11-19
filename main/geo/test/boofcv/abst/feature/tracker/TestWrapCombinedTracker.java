@@ -25,7 +25,6 @@ import boofcv.abst.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.abst.feature.detect.interest.InterestPointDetector;
 import boofcv.alg.feature.describe.DescribePointBrief;
 import boofcv.alg.feature.describe.brief.FactoryBriefDefinition;
-import boofcv.alg.tracker.klt.KltConfig;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.feature.describe.FactoryDescribePointAlgs;
 import boofcv.factory.feature.detect.interest.FactoryDetectPoint;
@@ -66,7 +65,7 @@ public class TestWrapCombinedTracker extends StandardImagePointTracker<ImageFloa
 		pointTracker = FactoryPointSequentialTracker.combined(
 				detector,
 				new WrapDescribeBrief<ImageFloat32>(brief),
-				association,KltConfig.createDefault(),2,new int[]{1,2,4},20,ImageFloat32.class);
+				association,2,new int[]{1,2,4},20,ImageFloat32.class);
 
 		return pointTracker;
 	}
