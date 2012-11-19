@@ -143,6 +143,8 @@ public class WrapCombinedTracker<I extends ImageSingleBand, D extends ImageSingl
 	@Override
 	public void dropTrack(PointTrack track) {
 		tracker.dropTrack((CombinedTrack<TD>) track.getDescription());
+		// make sure if the user drops a lot of tracks that doesn't force a constant respawn
+		previousSpawn--;
 	}
 
 	@Override
