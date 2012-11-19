@@ -22,11 +22,8 @@ import boofcv.abst.feature.associate.*;
 import boofcv.abst.feature.describe.DescribeRegionPoint;
 import boofcv.abst.feature.describe.WrapDescribeBrief;
 import boofcv.abst.feature.describe.WrapDescribePixelRegionNCC;
-import boofcv.abst.feature.describe.WrapDescribeSurf;
-import boofcv.abst.feature.detect.extract.FeatureExtractor;
 import boofcv.abst.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.abst.feature.detect.interest.InterestPointDetector;
-import boofcv.abst.feature.detect.interest.WrapFHtoInterestPoint;
 import boofcv.abst.feature.tracker.*;
 import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.alg.feature.associate.AssociateSurfBasic;
@@ -34,20 +31,16 @@ import boofcv.alg.feature.describe.DescribePointBrief;
 import boofcv.alg.feature.describe.DescribePointPixelRegionNCC;
 import boofcv.alg.feature.describe.DescribePointSurf;
 import boofcv.alg.feature.describe.brief.FactoryBriefDefinition;
-import boofcv.alg.feature.detect.interest.FastHessianFeatureDetector;
-import boofcv.alg.feature.orientation.OrientationIntegral;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.alg.interpolate.InterpolateRectangle;
 import boofcv.alg.tracker.combined.CombinedTrackerScalePoint;
 import boofcv.alg.tracker.combined.PyramidKltForCombined;
 import boofcv.alg.tracker.klt.KltConfig;
-import boofcv.alg.transform.ii.GIntegralImageOps;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.feature.describe.FactoryDescribePointAlgs;
-import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
+import boofcv.factory.feature.describe.FactoryDescribeRegionPoint;
 import boofcv.factory.feature.detect.interest.FactoryDetectPoint;
 import boofcv.factory.feature.detect.interest.FactoryInterestPoint;
-import boofcv.factory.feature.orientation.FactoryOrientationAlgs;
 import boofcv.factory.filter.blur.FactoryBlurFilter;
 import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.factory.interpolate.FactoryInterpolation;
@@ -126,32 +119,31 @@ public class FactoryPointSequentialTracker {
 	 * @see DetectAssociateTracker
 	 *
 	 * @param maxTracks The maximum number of tracks it will return. A value <= 0 will return all.
-	 * @param detectionRadius  How close together detected features can be.  Recommended value = 2.
+	 * @param detectRadius  How close together detected features can be.  Recommended value = 2.
 	 * @param detectPerScale Number of features it will detect per scale.
 	 * @param sampleRateFH   Sample rate used by Fast-Hessian detector.  Typically 1 or 2
-	 * @param imageType      Type of image the input is.    @return SURF based tracker.
+	 * @param modifiedSURF   true for more robust but slower descriptor and false for faster but less robust
+	 * @param imageType      Type of image the input is.
+	 * @return SURF based tracker.
 	 */
-	public static <I extends ImageSingleBand, II extends ImageSingleBand>
-	ImagePointTracker<I> dda_FH_SURF(int maxTracks, int detectionRadius, int detectPerScale, int sampleRateFH,
-									 Class<I> imageType) {
-		Class<II> integralType = GIntegralImageOps.getIntegralType(imageType);
-
-		FeatureExtractor extractor = FactoryFeatureExtractor.nonmax(detectionRadius, 1, 10, true);
-
-		int numScalesPerOctave = 4;
-		int numOctaves = 4;
-
-		FastHessianFeatureDetector<II> detector =
-				new FastHessianFeatureDetector<II>(extractor, detectPerScale,
-						sampleRateFH, 9, numScalesPerOctave, numOctaves);
-		OrientationIntegral<II> orientation = FactoryOrientationAlgs.average_ii(6, 1, 6, 0, integralType);
-		DescribePointSurf<II> describe = new DescribePointSurf<II>(integralType);
+	public static <I extends ImageSingleBand>
+	ImagePointTracker<I> dda_FH_SURF(int maxTracks, int detectRadius, int detectPerScale, int sampleRateFH,
+									 boolean modifiedSURF ,
+									 Class<I> imageType)
+	{
+		InterestPointDetector<I> id = FactoryInterestPoint.fastHessian(1,detectRadius,detectPerScale, sampleRateFH, 9, 4, 4);
 
 		ScoreAssociation<TupleDesc_F64> score = FactoryAssociation.scoreEuclidean(TupleDesc_F64.class, true);
 		AssociateSurfBasic assoc = new AssociateSurfBasic(FactoryAssociation.greedy(score, 100000, maxTracks, true));
 
-		InterestPointDetector<I> id = new WrapFHtoInterestPoint<I,II>(detector);
-		DescribeRegionPoint<I,SurfFeature> regionDesc = new WrapDescribeSurf<I,II>(describe,orientation);
+		DescribeRegionPoint<I,SurfFeature> regionDesc;
+
+		if( modifiedSURF ) {
+			regionDesc = FactoryDescribeRegionPoint.surfm(true, imageType);
+		} else {
+			regionDesc = FactoryDescribeRegionPoint.surf(true,imageType);
+		}
+
 		GeneralAssociation<SurfFeature> generalAssoc = new WrapAssociateSurfBasic(assoc);
 
 		return new DetectAssociateTracker<I,SurfFeature>(id, regionDesc, generalAssoc,false);
@@ -167,15 +159,15 @@ public class FactoryPointSequentialTracker {
 	 * @param maxFeatures         Maximum number of features it will track.
 	 * @param maxAssociationError Maximum allowed association error.  Try 200.
 	 * @param detectionRadius     Size of feature detection region.  Try 2.
-	 * @param cornerThreshold     Tolerance for detecting corner features.  Tune. Start at 1.
+	 * @param detectThreshold     Tolerance for detecting corner features.  Tune. Start at 1.
 	 * @param imageType           Type of image being processed.
 	 * @param derivType Type of image used to store the image derivative. null == use default
 	 */
 	public static <I extends ImageSingleBand, D extends ImageSingleBand>
-	ImagePointTracker<I> dda_ShiTomasi_BRIEF(int maxFeatures, int maxAssociationError,
-											 int detectionRadius,
-											 float cornerThreshold,
-											 Class<I> imageType , Class<D> derivType )
+	ImagePointTracker<I> dda_ST_BRIEF(int maxFeatures, int maxAssociationError,
+									  int detectionRadius,
+									  float detectThreshold,
+									  Class<I> imageType, Class<D> derivType)
 	{
 		if( derivType == null )
 			derivType = GImageDerivativeOps.getDerivativeType(imageType);
@@ -183,9 +175,45 @@ public class FactoryPointSequentialTracker {
 		DescribePointBrief<I> brief = FactoryDescribePointAlgs.brief(FactoryBriefDefinition.gaussian2(new Random(123), 16, 512),
 				FactoryBlurFilter.gaussian(imageType, 0, 4));
 
-		GeneralFeatureDetector<I,D> corner = FactoryDetectPoint.createShiTomasi(detectionRadius,false,cornerThreshold, maxFeatures, derivType);
+		GeneralFeatureDetector<I,D> corner = FactoryDetectPoint.createShiTomasi(detectionRadius,false,detectThreshold, maxFeatures, derivType);
 
 		InterestPointDetector<I> detector = FactoryInterestPoint.wrapPoint(corner, imageType, derivType);
+		ScoreAssociateHamming_B score = new ScoreAssociateHamming_B();
+
+		GeneralAssociation<TupleDesc_B> association =
+				FactoryAssociation.greedy(score, maxAssociationError, maxFeatures, true);
+
+		return new DetectAssociateTracker<I,TupleDesc_B>
+				(detector, new WrapDescribeBrief<I>(brief), association,false);
+	}
+
+	/**
+	 * Creates a tracker which detects FAST corner features and describes them with BRIEF.
+	 *
+	 * @see boofcv.alg.feature.detect.intensity.FastCornerIntensity
+	 * @see DescribePointBrief
+	 * @see DetectAssociateTracker
+	 *
+	 * @param maxFeatures         Maximum number of features it will track.
+	 * @param maxAssociationError Maximum allowed association error.  Try 200.
+	 * @param detectionRadius     Size of feature detection region.  Try 3.
+	 * @param minContinuous       Minimum number of pixels in a row for a circle to be declared a corner.  9 to 12
+	 * @param detectThreshold     Tolerance for detecting corner features.  Tune. Try 15.
+	 * @param imageType           Type of image being processed.
+	 */
+	public static <I extends ImageSingleBand, D extends ImageSingleBand>
+	ImagePointTracker<I> dda_FAST_BRIEF(int maxFeatures, int maxAssociationError,
+										int detectionRadius,
+										int minContinuous,
+										int detectThreshold,
+										Class<I> imageType )
+	{
+		DescribePointBrief<I> brief = FactoryDescribePointAlgs.brief(FactoryBriefDefinition.gaussian2(new Random(123), 16, 512),
+				FactoryBlurFilter.gaussian(imageType, 0, 4));
+
+		GeneralFeatureDetector<I,D> corner = FactoryDetectPoint.createFast(detectionRadius, minContinuous, detectThreshold, maxFeatures, imageType);
+
+		InterestPointDetector<I> detector = FactoryInterestPoint.wrapPoint(corner, imageType, null);
 		ScoreAssociateHamming_B score = new ScoreAssociateHamming_B();
 
 		GeneralAssociation<TupleDesc_B> association =
@@ -209,9 +237,9 @@ public class FactoryPointSequentialTracker {
 	 * @param imageType      Type of image being processed.
 	 * @param derivType      Type of image used to store the image derivative. null == use default     */
 	public static <I extends ImageSingleBand, D extends ImageSingleBand>
-	ImagePointTracker<I> dda_ShiTomasi_NCC(int maxFeatures, int detectRadius, int describeRadius,
-										   float cornerThreshold,
-										   Class<I> imageType, Class<D> derivType) {
+	ImagePointTracker<I> dda_ST_NCC(int maxFeatures, int detectRadius, int describeRadius,
+									float cornerThreshold,
+									Class<I> imageType, Class<D> derivType) {
 
 		if( derivType == null )
 			derivType = GImageDerivativeOps.getDerivativeType(imageType);
@@ -258,7 +286,7 @@ public class FactoryPointSequentialTracker {
 	}
 
 	/**
-	 * Creates a tracker which detects Fast-Hessian features and describes them with SURF.
+	 * Creates a tracker which detects Shi-Tomasi corner features and describes them with SURF.
 	 *
 	 * @see boofcv.alg.feature.detect.intensity.ShiTomasiCornerIntensity
 	 * @see DescribePointSurf
@@ -267,34 +295,95 @@ public class FactoryPointSequentialTracker {
 	 * @param maxMatches     The maximum number of matched features that will be considered.
 	 *                       Set to a value <= 0 to not bound the number of matches.
 	 * @param detectPerScale Controls how many features can be detected.  Try a value of 200 initially.
-	 * @param featureRadius  Size of tracked KLT feature and how close detected features can be.  Recommended value = 2.
+	 * @param sampleRateFH   Sample rate used by Fast-Hessian detector.  Typically 1 or 2
+	 * @param detectRadius  Size of tracked KLT feature and how close detected features can be.  Recommended value = 2.
+	 * @param trackRadius Size of feature being tracked by KLT
+	 * @param pyramidScalingKlt Image pyramid used for KLT
+	 * @param reactivateThreshold Tracks are reactivated after this many have been dropped.  Try 10% of maxMatches
 	 * @param imageType      Type of image the input is.
 	 * @param <I>            Input image type.
-	 * @param <II>           Integral image type.
 	 * @return SURF based tracker.
 	 */
-	public static <I extends ImageSingleBand, II extends ImageSingleBand>
-	ImagePointTracker<I> combined_FH_SURF_KLT(int maxMatches, int detectPerScale, int featureRadius,
-											  KltConfig configKlt, int[] pyramidScalingKlt ,
-											  int reactiveThreshold ,
+	public static <I extends ImageSingleBand>
+	ImagePointTracker<I> combined_FH_SURF_KLT(int maxMatches, int detectPerScale,
+											  int detectRadius,
+											  int sampleRateFH,
+											  int trackRadius,
+											  int[] pyramidScalingKlt ,
+											  int reactivateThreshold ,
+											  boolean modifiedSURF ,
 											  Class<I> imageType) {
-		Class<II> integralType = GIntegralImageOps.getIntegralType(imageType);
-
-		FeatureExtractor extractor = FactoryFeatureExtractor.nonmax(featureRadius, 1, 10, true);
-
-		FastHessianFeatureDetector<II> detector = new FastHessianFeatureDetector<II>(extractor, detectPerScale, 2, 9, 4, 4);
-		OrientationIntegral<II> orientation = FactoryOrientationAlgs.average_ii(6, 1, 6, 0, integralType);
-		DescribePointSurf<II> describe = new DescribePointSurf<II>(integralType);
 
 		ScoreAssociation<TupleDesc_F64> score = FactoryAssociation.scoreEuclidean(TupleDesc_F64.class, true);
 		AssociateSurfBasic assoc = new AssociateSurfBasic(FactoryAssociation.greedy(score, 100000, maxMatches, true));
 
-		InterestPointDetector<I> id = new WrapFHtoInterestPoint<I,II>(detector);
-		DescribeRegionPoint<I,SurfFeature> regionDesc = new WrapDescribeSurf<I,II>(describe,orientation);
+		InterestPointDetector<I> id = FactoryInterestPoint.fastHessian(1,detectRadius,detectPerScale, sampleRateFH, 9, 4, 4);
 		GeneralAssociation<SurfFeature> generalAssoc = new WrapAssociateSurfBasic(assoc);
 
+		DescribeRegionPoint<I,SurfFeature> regionDesc;
+		if( modifiedSURF ) {
+			regionDesc = FactoryDescribeRegionPoint.surfm(true,imageType);
+		} else {
+			regionDesc = FactoryDescribeRegionPoint.surf(true,imageType);
+		}
 
-		return combined(id,regionDesc,generalAssoc,configKlt,featureRadius,pyramidScalingKlt,reactiveThreshold,
+
+		return combined(id,regionDesc,generalAssoc,trackRadius,pyramidScalingKlt,reactivateThreshold,
+				imageType);
+	}
+
+	/**
+	 * Creates a tracker which detects Fast-Hessian features and describes them with SURF.
+	 *
+	 * @see boofcv.alg.feature.detect.intensity.ShiTomasiCornerIntensity
+	 * @see DescribePointSurf
+	 * @see DetectAssociateTracker
+	 *
+	 * @param maxMatches     The maximum number of matched features that will be considered.
+	 *                       Set to a value <= 0 to not bound the number of matches.
+	 * @param detectRadius  Size of tracked KLT feature and how close detected features can be.  Recommended value = 2.
+	 * @param detectThreshold Tolerance for detecting corner features.  Tune. Start at 1.
+	 * @param trackRadius Size of feature being tracked by KLT
+	 * @param pyramidScalingKlt Image pyramid used for KLT
+	 * @param reactivateThreshold Tracks are reactivated after this many have been dropped.  Try 10% of maxMatches
+	 * @param modifiedSURF   true for more robust but slower descriptor and false for faster but less robust
+	 * @param imageType      Type of image the input is.
+	 * @param derivType      Image derivative type.
+	 * @param <I>            Input image type.
+	 * @return SURF based tracker.
+	 */
+	public static <I extends ImageSingleBand, D extends ImageSingleBand>
+	ImagePointTracker<I> combined_ST_SURF_KLT(int maxMatches,
+											  int detectRadius,
+											  float detectThreshold,
+											  int trackRadius,
+											  int[] pyramidScalingKlt ,
+											  int reactivateThreshold ,
+											  boolean modifiedSURF ,
+											  Class<I> imageType,
+											  Class<D> derivType ) {
+
+		if( derivType == null )
+			derivType = GImageDerivativeOps.getDerivativeType(imageType);
+
+		GeneralFeatureDetector corner = FactoryDetectPoint.createShiTomasi(detectRadius, false, detectThreshold, maxMatches, derivType);
+
+		InterestPointDetector<I> detector = FactoryInterestPoint.wrapPoint(corner, imageType, derivType);
+
+		DescribeRegionPoint<I,SurfFeature> regionDesc;
+
+		if( modifiedSURF ) {
+			regionDesc = FactoryDescribeRegionPoint.surfm(true, imageType);
+		} else {
+			regionDesc = FactoryDescribeRegionPoint.surf(true,imageType);
+		}
+
+		ScoreAssociation<TupleDesc_F64> score = FactoryAssociation.scoreEuclidean(TupleDesc_F64.class, true);
+		AssociateSurfBasic assoc = new AssociateSurfBasic(FactoryAssociation.greedy(score, 100000, maxMatches, true));
+
+		GeneralAssociation<SurfFeature> generalAssoc = new WrapAssociateSurfBasic(assoc);
+
+		return combined(detector,regionDesc,generalAssoc,trackRadius,pyramidScalingKlt,reactivateThreshold,
 				imageType);
 	}
 
@@ -306,10 +395,9 @@ public class FactoryPointSequentialTracker {
 	 * @param detector Feature detector.
 	 * @param describe Feature description
 	 * @param associate Association algorithm.
-	 * @param configKlt KLT configuration
 	 * @param featureRadiusKlt KLT feature radius
 	 * @param pyramidScalingKlt KLT pyramid configuration
-	 * @param reactiveThreshold Threshold for when dormant tracks are.  Try 10% of expected number of tracks.
+	 * @param reactivateThreshold Tracks are reactivated after this many have been dropped.  Try 10% of maxMatches
 	 * @param imageType Input image type.
 	 * @param <I> Input image type.
 	 * @param <D> Derivative image type.
@@ -320,13 +408,14 @@ public class FactoryPointSequentialTracker {
 	ImagePointTracker<I> combined( InterestPointDetector<I> detector,
 								   DescribeRegionPoint<I, Desc> describe,
 								   GeneralAssociation<Desc> associate ,
-								   KltConfig configKlt,
 								   int featureRadiusKlt,
 								   int[] pyramidScalingKlt ,
-								   int reactiveThreshold,
+								   int reactivateThreshold,
 								   Class<I> imageType )
 	{
 		Class<D> derivType = GImageDerivativeOps.getDerivativeType(imageType);
+
+		KltConfig configKlt =  KltConfig.createDefault();
 
 		PyramidKltForCombined<I,D> klt = new PyramidKltForCombined<I, D>(configKlt,
 				featureRadiusKlt,pyramidScalingKlt,imageType,derivType);
@@ -334,6 +423,6 @@ public class FactoryPointSequentialTracker {
 		CombinedTrackerScalePoint<I, D,Desc> tracker =
 				new CombinedTrackerScalePoint<I, D, Desc>(klt,detector,describe,associate);
 
-		return new WrapCombinedTracker<I,D,Desc>(tracker,reactiveThreshold,imageType,derivType);
+		return new WrapCombinedTracker<I,D,Desc>(tracker,reactivateThreshold,imageType,derivType);
 	}
 }

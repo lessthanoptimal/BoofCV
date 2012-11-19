@@ -80,7 +80,7 @@ public class DetectFeaturePointApp<T extends ImageSingleBand, D extends ImageSin
 		addAlgorithm(0, "KLT", FactoryInterestPoint.wrapPoint(alg, imageType, derivType));
 		alg = FactoryDetectPoint.createShiTomasi(radius, true, thresh, maxFeatures, derivType);
 		addAlgorithm(0, "KLT Weighted", FactoryInterestPoint.wrapPoint(alg, imageType, derivType));
-		alg = FactoryDetectPoint.createFast(radius, 10, maxFeatures, imageType);
+		alg = FactoryDetectPoint.createFast(radius, 9,10, maxFeatures, imageType);
 		addAlgorithm(0, "Fast", FactoryInterestPoint.wrapPoint(alg, imageType, derivType));
 		alg = FactoryDetectPoint.createKitRos(radius, thresh, maxFeatures, derivType);
 		addAlgorithm(0, "KitRos", FactoryInterestPoint.wrapPoint(alg, imageType, derivType));

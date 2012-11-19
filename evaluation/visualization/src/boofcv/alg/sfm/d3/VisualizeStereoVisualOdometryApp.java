@@ -261,7 +261,7 @@ public class VisualizeStereoVisualOdometryApp <I extends ImageSingleBand>
 			thresholdAdd = 80;
 			thresholdRetire = 3;
 //			tracker = FactoryPointSequentialTracker.dda_FH_SURF(600, 200, 1, 2,imageType);
-			tracker = FactoryPointSequentialTracker.dda_ShiTomasi_BRIEF(600, 200, 2, 0, imageType, null);
+			tracker = FactoryPointSequentialTracker.dda_ST_BRIEF(600, 200, 2, 0, imageType, null);
 //			tracker = FactoryPointSequentialTracker.dda_ShiTomasi_NCC(600, 7, 7, 0, 2, imageType, null);
 		}
 

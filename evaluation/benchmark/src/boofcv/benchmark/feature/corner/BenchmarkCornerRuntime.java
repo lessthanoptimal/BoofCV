@@ -108,7 +108,7 @@ public class BenchmarkCornerRuntime {
 	}
 
 	public static GeneralFeatureDetector<?, ?> createFast12() {
-		return FactoryDetectPoint.createFast(windowRadius, 30, maxFeatures, imageType);
+		return FactoryDetectPoint.createFast(windowRadius,9, 30, maxFeatures, imageType);
 	}
 
 	public static GeneralFeatureDetector<?, ?> createHarris() {

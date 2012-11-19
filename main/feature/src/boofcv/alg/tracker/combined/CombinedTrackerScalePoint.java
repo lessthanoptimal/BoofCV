@@ -88,14 +88,6 @@ public class CombinedTrackerScalePoint
 									 InterestPointDetector<I> detector,
 									 DescribeRegionPoint<I, TD> describe,
 									 GeneralAssociation<TD> associate ) {
-
-		if( describe != null ) {
-			if( describe.requiresOrientation() && !detector.hasOrientation() )
-				throw new IllegalArgumentException("Descriptor requires orientation");
-			if( describe.requiresScale() && !detector.hasScale() )
-				throw new IllegalArgumentException("Descriptor requires scale");
-		}
-
 		this.trackerKlt = trackerKlt;
 		this.detector = detector;
 		this.describe = describe;
@@ -135,7 +127,6 @@ public class CombinedTrackerScalePoint
 							  PyramidDiscrete<I> pyramid ,
 							  PyramidDiscrete<D> derivX,
 							  PyramidDiscrete<D> derivY ) {
-		System.out.println("   updated");
 		// forget recently dropped or spawned tracks
 		tracksSpawned.clear();
 
@@ -170,11 +161,9 @@ public class CombinedTrackerScalePoint
 	 * From the found interest points create new tracks.  Tracks are only created at points
 	 * where there are no existing tracks.
 	 *
-	 * Note: Must be called after {@link #associateTaintedToDetected}.
+	 * Note: Must be called after {@link #associateAllToDetected}.
 	 */
 	public void spawnTracksFromDetected() {
-		System.out.println("   spawned");
-
 		// mark detected features with no matches as available
 		FastQueue<AssociatedIndex> matches = associate.getMatches();
 
@@ -262,11 +251,9 @@ public class CombinedTrackerScalePoint
 	}
 
 	/**
-	 * Associate tracks which have at some point been dropped by KLT to newly detected features.  When
-	 * associating, consider pure-KLT tracks to help remove false positives.
+	 * Associate all tracks in any state to the latest observations
 	 */
-	public void associateTaintedToDetected() {
-		System.out.println("   reactivated");
+	public void associateAllToDetected() {
 		// initialize data structures
 		List<CombinedTrack<TD>> all = new ArrayList<CombinedTrack<TD>>();
 		all.addAll(tracksReactivated);

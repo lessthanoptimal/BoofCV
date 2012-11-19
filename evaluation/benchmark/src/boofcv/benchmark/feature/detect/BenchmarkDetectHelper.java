@@ -54,7 +54,7 @@ public class BenchmarkDetectHelper {
 		GeneralFeatureDetector<T, D> alg;
 		int thresh = 1;
 
-		alg = FactoryDetectPoint.createFast(radius, 20, maxFeatures, imageType);
+		alg = FactoryDetectPoint.createFast(radius, 9,20, maxFeatures, imageType);
 		ret.add(new BenchmarkAlgorithm("Fast", FactoryInterestPoint.wrapPoint(alg, imageType, derivType)));
 		alg = FactoryDetectPoint.createHarris(radius, false, thresh, maxFeatures, derivType);
 		ret.add(new BenchmarkAlgorithm("Harris", FactoryInterestPoint.wrapPoint(alg, imageType, derivType)));
