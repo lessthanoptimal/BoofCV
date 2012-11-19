@@ -45,9 +45,11 @@ public class ConvertBufferedImage {
 	 * @return An image whose internal data is the same as the input image.
 	 */
 	public static ImageInterleavedInt8 extractInterlacedInt8(BufferedImage img) {
+
 		if (img.getRaster() instanceof ByteInterleavedRaster &&
 				img.getType() != BufferedImage.TYPE_BYTE_INDEXED ) {
 			ByteInterleavedRaster raster = (ByteInterleavedRaster) img.getRaster();
+
 			ImageInterleavedInt8 ret = new ImageInterleavedInt8();
 
 			ret.width = img.getWidth();
@@ -73,6 +75,9 @@ public class ConvertBufferedImage {
 	public static ImageUInt8 extractImageInt8(BufferedImage img) {
 		if (img.getRaster() instanceof ByteInterleavedRaster &&
 				img.getType() != BufferedImage.TYPE_BYTE_INDEXED ) {
+			if( isSubImage(img) )
+				throw new IllegalArgumentException("Sub-images of BufferedImages are not yet supported");
+
 			ByteInterleavedRaster raster = (ByteInterleavedRaster) img.getRaster();
 			if (raster.getNumBands() != 1)
 				throw new IllegalArgumentException("Input image has more than one channel");
@@ -294,12 +299,23 @@ public class ConvertBufferedImage {
 			if (src.getWidth() != dst.getWidth() || src.getHeight() != dst.getHeight()) {
 				throw new IllegalArgumentException("image dimension are different");
 			}
-		} else {
-			dst = new MultiSpectral<T>(type,src.getWidth(),src.getHeight(),3);
 		}
 
-		if( type == ImageUInt8.class ) {
-			try {
+		try {
+			WritableRaster raster = src.getRaster();
+
+			int numBands;
+			if( src.getType() == BufferedImage.TYPE_BYTE_INDEXED )
+				numBands = 3;
+			else
+				numBands = raster.getNumBands();
+
+			if( dst == null)
+				dst = new MultiSpectral<T>(type,src.getWidth(),src.getHeight(),numBands);
+			else if( dst.getNumBands() != numBands )
+				throw new IllegalArgumentException("Expected "+numBands+" in dst");
+
+			if( type == ImageUInt8.class ) {
 				if (src.getRaster() instanceof ByteInterleavedRaster &&
 						src.getType() != BufferedImage.TYPE_BYTE_INDEXED ) {
 					if( src.getType() == BufferedImage.TYPE_BYTE_GRAY)  {
@@ -313,12 +329,7 @@ public class ConvertBufferedImage {
 				} else {
 					ConvertRaster.bufferedToMulti_U8(src, (MultiSpectral<ImageUInt8>)dst);
 				}
-			} catch( java.security.AccessControlException e) {
-				// Applets don't allow access to the raster()
-				ConvertRaster.bufferedToMulti_U8(src, (MultiSpectral<ImageUInt8>)dst);
-			}
-		} else if( type == ImageFloat32.class ) {
-			try {
+			} else if( type == ImageFloat32.class ) {
 				if (src.getRaster() instanceof ByteInterleavedRaster &&
 						src.getType() != BufferedImage.TYPE_BYTE_INDEXED  ) {
 					if( src.getType() == BufferedImage.TYPE_BYTE_GRAY)  {
@@ -332,12 +343,18 @@ public class ConvertBufferedImage {
 				} else {
 					ConvertRaster.bufferedToMulti_F32(src, (MultiSpectral<ImageFloat32>)dst);
 				}
-			} catch( java.security.AccessControlException e) {
-				// Applets don't allow access to the raster()
+			} else {
+				throw new IllegalArgumentException("Band type not supported yet");
+			}
+
+		} catch( java.security.AccessControlException e) {
+			// Applets don't allow access to the raster()
+			dst = new MultiSpectral<T>(type,src.getWidth(),src.getHeight(),3);
+			if( type == ImageUInt8.class ) {
+				ConvertRaster.bufferedToMulti_U8(src, (MultiSpectral<ImageUInt8>)dst);
+			} else if( type == ImageFloat32.class ) {
 				ConvertRaster.bufferedToMulti_F32(src, (MultiSpectral<ImageFloat32>)dst);
 			}
-		} else {
-			throw new IllegalArgumentException("Band type not supported yet");
 		}
 
 		return dst;
@@ -591,5 +608,14 @@ public class ConvertBufferedImage {
 			image.bands[1] = temp[1];
 			image.bands[2] = temp[2];
 		}
+	}
+
+	/**
+	 * Checks to see if the input image is a subImage().
+	 * @param img
+	 * @return
+	 */
+	public static boolean isSubImage( BufferedImage img ) {
+		return img.getRaster().getParent() != null;
 	}
 }

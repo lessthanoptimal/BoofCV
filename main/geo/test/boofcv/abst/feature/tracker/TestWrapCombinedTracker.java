@@ -44,6 +44,10 @@ public class TestWrapCombinedTracker extends StandardImagePointTracker<ImageFloa
 
 	ImagePointTracker<ImageFloat32> pointTracker;
 
+	public TestWrapCombinedTracker() {
+		super(true, false);
+	}
+
 	@Override
 	public ImagePointTracker<ImageFloat32> createTracker() {
 		DescribePointBrief<ImageFloat32> brief = FactoryDescribePointAlgs.brief(FactoryBriefDefinition.gaussian2(new Random(123), 16, 512),

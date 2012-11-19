@@ -25,7 +25,6 @@ import boofcv.abst.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.abst.feature.detect.interest.InterestPointDetector;
 import boofcv.alg.feature.describe.DescribePointBrief;
 import boofcv.alg.feature.describe.brief.FactoryBriefDefinition;
-import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.feature.describe.FactoryDescribePointAlgs;
 import boofcv.factory.feature.detect.interest.FactoryDetectPoint;
@@ -38,7 +37,6 @@ import org.junit.Test;
 import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 /**
  * @author Peter Abeles
@@ -46,6 +44,10 @@ import static org.junit.Assert.assertTrue;
 public class TestDetectAssociateTracker extends StandardImagePointTracker<ImageFloat32> {
 
 	DetectAssociateTracker<ImageFloat32,TupleDesc_B> dat;
+
+	public TestDetectAssociateTracker() {
+		super(true, false);
+	}
 
 	/**
 	 * Make sure drop track is correctly recycling the data
@@ -81,25 +83,6 @@ public class TestDetectAssociateTracker extends StandardImagePointTracker<ImageF
 		dat.dropAllTracks();
 		assertEquals(3,dat.unused.size());
 		assertEquals(0, dat.tracksAll.size());
-	}
-
-	/**
-	 * Make sure drop tracks dropped during process are correctly recycled
-	 */
-	@Test
-	public void process_drop_Recycle() {
-		createTracker();
-		dat.process(image);
-		dat.spawnTracks();
-
-		int before = dat.getAllTracks(null).size();
-		GeneralizedImageOps.fill(image,0);
-		dat.process(image);
-		int after = dat.getAllTracks(null).size();
-
-		assertTrue(after<before);
-
-		assertEquals(before-after,dat.unused.size());
 	}
 
 	@Override

@@ -124,8 +124,14 @@ public class TestConvertRaster {
 		input = createBufferedTestImages(paramTypes[0]);
 
 		for (int i = 0; i < input.length; i++) {
+			// regular image
 			ImageBase output = createImage(m, paramTypes[1], input[i]);
 			BoofTesting.checkSubImage(this, "performBufferedTo", true, m, input[i], output);
+
+			// subimage input
+			BufferedImage subimage = input[i].getSubimage(1,2,imgWidth-1,imgHeight-2);
+			output = createImage(m, paramTypes[1], subimage);
+			BoofTesting.checkSubImage(this, "performBufferedTo", true, m, subimage, output);
 		}
 	}
 
@@ -135,7 +141,7 @@ public class TestConvertRaster {
 
 		ImageBase output;
 		if (ImageSingleBand.class.isAssignableFrom(imageType)) {
-			output = GeneralizedImageOps.createSingleBand(imageType, imgWidth, imgHeight);
+			output = GeneralizedImageOps.createSingleBand(imageType, inputBuff.getWidth(), inputBuff.getHeight());
 		} else {
 			Class type;
 			if (m.getName().contains("U8")) {
@@ -146,7 +152,7 @@ public class TestConvertRaster {
 				throw new IllegalArgumentException("Unexpected: " + m.getName());
 			}
 
-			output = new MultiSpectral(type, imgWidth, imgHeight, numBands);
+			output = new MultiSpectral(type, inputBuff.getWidth(), inputBuff.getHeight(), numBands);
 		}
 		return output;
 	}
@@ -230,6 +236,14 @@ public class TestConvertRaster {
 		} else {
 			throw new RuntimeException("Unexpected number of bands");
 		}
+
+		randomize(ret, rand);
+
+		return ret;
+	}
+
+	public static BufferedImage createByteIndexed(int width, int height, Random rand) {
+		BufferedImage ret = new BufferedImage(width,height,BufferedImage.TYPE_BYTE_INDEXED);
 
 		randomize(ret, rand);
 

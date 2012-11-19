@@ -616,20 +616,24 @@ public class BoofTesting {
 	 */
 	public static void checkEquals(BufferedImage imgA, ImageUInt8 imgB) {
 
-		if (imgA.getRaster() instanceof ByteInterleavedRaster) {
+		if (imgA.getRaster() instanceof ByteInterleavedRaster &&
+				imgA.getType() != BufferedImage.TYPE_BYTE_INDEXED) {
 			ByteInterleavedRaster raster = (ByteInterleavedRaster) imgA.getRaster();
 
 			if (raster.getNumBands() == 1) {
+				int strideA = raster.getScanlineStride();
+				int offsetA = raster.getDataOffset(0)-raster.getNumBands()+1;
+
 				// handle a special case where the RGB conversion is screwed
 				for (int i = 0; i < imgA.getHeight(); i++) {
 					for (int j = 0; j < imgA.getWidth(); j++) {
 						int valB = imgB.get(j, i);
-						int valA = raster.getDataStorage()[i * imgA.getWidth() + j];
+						int valA = raster.getDataStorage()[ offsetA + i*strideA + j];
 						if (!imgB.getTypeInfo().isSigned())
 							valA &= 0xFF;
 
 						if (valA != valB)
-							throw new RuntimeException("Images are not equal");
+							throw new RuntimeException("Images are not equal: "+valA+" "+valB);
 					}
 				}
 				return;
@@ -660,15 +664,19 @@ public class BoofTesting {
 	 */
 	public static void checkEquals(BufferedImage imgA, ImageFloat32 imgB, float tol) {
 
-		if (imgA.getRaster() instanceof ByteInterleavedRaster) {
+		if (imgA.getRaster() instanceof ByteInterleavedRaster &&
+				imgA.getType() != BufferedImage.TYPE_BYTE_INDEXED ) {
 			ByteInterleavedRaster raster = (ByteInterleavedRaster) imgA.getRaster();
 
 			if (raster.getNumBands() == 1) {
+				int strideA = raster.getScanlineStride();
+				int offsetA = raster.getDataOffset(0)-raster.getNumBands()+1;
+
 				// handle a special case where the RGB conversion is screwed
 				for (int i = 0; i < imgA.getHeight(); i++) {
 					for (int j = 0; j < imgA.getWidth(); j++) {
 						float valB = imgB.get(j, i);
-						int valA = raster.getDataStorage()[i * imgA.getWidth() + j];
+						int valA = raster.getDataStorage()[offsetA + i * strideA + j];
 						valA &= 0xFF;
 
 						if (Math.abs(valA - valB) > tol)
@@ -739,17 +747,21 @@ public class BoofTesting {
 
 	public static void checkEquals(BufferedImage imgA, MultiSpectral imgB, float tol) {
 
-		if (imgA.getRaster() instanceof ByteInterleavedRaster) {
+		if (imgA.getRaster() instanceof ByteInterleavedRaster &&
+				imgA.getType() != BufferedImage.TYPE_BYTE_INDEXED ) {
 			ByteInterleavedRaster raster = (ByteInterleavedRaster) imgA.getRaster();
 
 			if (raster.getNumBands() == 1) {
 				GImageSingleBand band = FactoryGImageSingleBand.wrap(imgB.getBand(0));
 
+				int strideA = raster.getScanlineStride();
+				int offsetA = raster.getDataOffset(0)-raster.getPixelStride()+1;
+
 				// handle a special case where the RGB conversion is screwed
 				for (int i = 0; i < imgA.getHeight(); i++) {
 					for (int j = 0; j < imgA.getWidth(); j++) {
 						double valB = band.get(j, i).doubleValue();
-						int valA = raster.getDataStorage()[i * imgA.getWidth() + j];
+						int valA = raster.getDataStorage()[offsetA + i * strideA + j];
 						valA &= 0xFF;
 
 						if (Math.abs(valA - valB) > tol)
@@ -762,11 +774,13 @@ public class BoofTesting {
 
 		GImageSingleBand band1, band2, band3;
 
-		if (imgA.getType() == BufferedImage.TYPE_3BYTE_BGR || imgA.getType() == BufferedImage.TYPE_INT_BGR) {
+		if (imgA.getType() == BufferedImage.TYPE_3BYTE_BGR ||
+				imgA.getType() == BufferedImage.TYPE_INT_BGR ) {
 			band1 = FactoryGImageSingleBand.wrap(imgB.getBand(2));
 			band2 = FactoryGImageSingleBand.wrap(imgB.getBand(1));
 			band3 = FactoryGImageSingleBand.wrap(imgB.getBand(0));
-		} else if (imgA.getType() == BufferedImage.TYPE_INT_RGB) {
+		} else if (imgA.getType() == BufferedImage.TYPE_INT_RGB ||
+				imgA.getType() == BufferedImage.TYPE_BYTE_INDEXED ) {
 			band1 = FactoryGImageSingleBand.wrap(imgB.getBand(0));
 			band2 = FactoryGImageSingleBand.wrap(imgB.getBand(1));
 			band3 = FactoryGImageSingleBand.wrap(imgB.getBand(2));
@@ -793,7 +807,6 @@ public class BoofTesting {
 				float mult1 = band1.get(x, y).floatValue();
 				float mult2 = band2.get(x, y).floatValue();
 				float mult3 = band3.get(x, y).floatValue();
-
 
 				if (Math.abs(val1 - mult1) > tol) {
 					throw new RuntimeException("images are not equal: A = " + val1 + " B = " + mult1);
