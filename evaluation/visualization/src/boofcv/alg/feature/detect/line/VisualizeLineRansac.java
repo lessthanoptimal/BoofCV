@@ -32,8 +32,6 @@ import boofcv.gui.binary.VisualizeBinaryData;
 import boofcv.gui.feature.ImageLinePanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.image.UtilImageIO;
-import boofcv.numerics.fitting.modelset.ModelMatcher;
-import boofcv.numerics.fitting.modelset.ransac.Ransac;
 import boofcv.struct.feature.MatrixOfList;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSInt8;
@@ -41,6 +39,8 @@ import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
 import georegression.struct.line.LinePolar2D_F32;
 import georegression.struct.line.LineSegment2D_F32;
+import org.ddogleg.fitting.modelset.ModelMatcher;
+import org.ddogleg.fitting.modelset.ransac.Ransac;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;

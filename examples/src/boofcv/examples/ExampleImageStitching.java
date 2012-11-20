@@ -32,8 +32,6 @@ import boofcv.factory.feature.detect.interest.FactoryInterestPoint;
 import boofcv.gui.image.HomographyStitchPanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.image.UtilImageIO;
-import boofcv.numerics.fitting.modelset.ModelMatcher;
-import boofcv.numerics.fitting.modelset.ransac.Ransac;
 import boofcv.struct.FastQueue;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.SurfFeature;
@@ -44,6 +42,8 @@ import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.homo.Homography2D_F64;
 import georegression.struct.point.Point2D_F64;
+import org.ddogleg.fitting.modelset.ModelMatcher;
+import org.ddogleg.fitting.modelset.ransac.Ransac;
 
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;

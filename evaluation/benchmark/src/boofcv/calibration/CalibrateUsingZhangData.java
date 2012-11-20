@@ -23,8 +23,8 @@ import boofcv.alg.geo.calibration.PlanarCalibrationTarget;
 import boofcv.alg.geo.calibration.Zhang99Parameters;
 import boofcv.app.CalibrateMonoPlanar;
 import boofcv.app.ImageResults;
-import boofcv.numerics.optimization.UnconstrainedLeastSquares;
 import georegression.struct.point.Point2D_F64;
+import org.ddogleg.optimization.UnconstrainedLeastSquares;
 
 import java.io.BufferedReader;
 import java.io.FileReader;

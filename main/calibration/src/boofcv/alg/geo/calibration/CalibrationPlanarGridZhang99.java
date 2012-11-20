@@ -18,12 +18,12 @@
 
 package boofcv.alg.geo.calibration;
 
-import boofcv.numerics.optimization.FactoryOptimization;
-import boofcv.numerics.optimization.UnconstrainedLeastSquares;
-import boofcv.numerics.optimization.impl.UtilOptimize;
 import georegression.geometry.RotationMatrixGenerator;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.se.Se3_F64;
+import org.ddogleg.optimization.FactoryOptimization;
+import org.ddogleg.optimization.UnconstrainedLeastSquares;
+import org.ddogleg.optimization.impl.UtilOptimize;
 import org.ejml.data.DenseMatrix64F;
 
 import java.util.ArrayList;

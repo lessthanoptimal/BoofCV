@@ -1,9 +1,9 @@
 package boofcv.alg.sfm.robust;
 
-import boofcv.numerics.fitting.modelset.ModelMatcher;
-import boofcv.numerics.fitting.modelset.ransac.Ransac;
 import boofcv.struct.geo.Point2D3D;
 import georegression.struct.point.Vector3D_F64;
+import org.ddogleg.fitting.modelset.ModelMatcher;
+import org.ddogleg.fitting.modelset.ransac.Ransac;
 import org.ejml.data.DenseMatrix64F;
 
 import java.util.List;

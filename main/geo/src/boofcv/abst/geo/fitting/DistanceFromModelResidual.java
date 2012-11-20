@@ -19,7 +19,7 @@
 package boofcv.abst.geo.fitting;
 
 import boofcv.alg.geo.ModelObservationResidual;
-import boofcv.numerics.fitting.modelset.DistanceFromModel;
+import org.ddogleg.fitting.modelset.DistanceFromModel;
 
 import java.util.List;
 

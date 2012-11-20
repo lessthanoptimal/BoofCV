@@ -4,9 +4,9 @@ import boofcv.abst.geo.Estimate1ofEpipolar;
 import boofcv.abst.geo.TriangulateTwoViewsCalibrated;
 import boofcv.alg.geo.DecomposeEssential;
 import boofcv.alg.geo.PositiveDepthConstraintCheck;
-import boofcv.numerics.fitting.modelset.ModelGenerator;
 import boofcv.struct.geo.AssociatedPair;
 import georegression.struct.se.Se3_F64;
+import org.ddogleg.fitting.modelset.ModelGenerator;
 import org.ejml.data.DenseMatrix64F;
 
 import java.util.List;

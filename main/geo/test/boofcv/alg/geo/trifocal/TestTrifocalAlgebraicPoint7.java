@@ -19,13 +19,13 @@
 package boofcv.alg.geo.trifocal;
 
 import boofcv.alg.geo.MultiViewOps;
-import boofcv.numerics.optimization.FactoryOptimization;
-import boofcv.numerics.optimization.UnconstrainedLeastSquares;
 import boofcv.struct.geo.AssociatedTriple;
 import boofcv.struct.geo.TrifocalTensor;
 import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Vector3D_F64;
+import org.ddogleg.optimization.FactoryOptimization;
+import org.ddogleg.optimization.UnconstrainedLeastSquares;
 import org.ejml.data.DenseMatrix64F;
 import org.junit.Test;
 

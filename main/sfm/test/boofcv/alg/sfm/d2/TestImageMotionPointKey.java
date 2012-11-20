@@ -20,11 +20,11 @@ package boofcv.alg.sfm.d2;
 
 import boofcv.abst.feature.tracker.ImagePointTracker;
 import boofcv.abst.feature.tracker.PointTrack;
-import boofcv.numerics.fitting.modelset.ModelMatcher;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.image.ImageUInt8;
 import georegression.struct.InvertibleTransform;
 import georegression.struct.se.Se2_F32;
+import org.ddogleg.fitting.modelset.ModelMatcher;
 import org.junit.Test;
 
 import java.util.ArrayList;

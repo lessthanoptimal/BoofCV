@@ -19,9 +19,9 @@
 package boofcv.abst.geo.fitting;
 
 import boofcv.abst.geo.Estimate1ofPnP;
-import boofcv.numerics.fitting.modelset.ModelGenerator;
 import boofcv.struct.geo.Point2D3D;
 import georegression.struct.se.Se3_F64;
+import org.ddogleg.fitting.modelset.ModelGenerator;
 
 import java.util.List;
 

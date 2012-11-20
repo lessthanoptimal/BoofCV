@@ -18,12 +18,12 @@
 
 package boofcv.alg.sfm.robust;
 
-import boofcv.numerics.fitting.modelset.ModelFitter;
-import boofcv.numerics.fitting.modelset.ModelGenerator;
 import boofcv.struct.geo.AssociatedPair;
 import georegression.struct.affine.Affine2D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.transform.affine.AffinePointOps;
+import org.ddogleg.fitting.modelset.ModelFitter;
+import org.ddogleg.fitting.modelset.ModelGenerator;
 import org.junit.Test;
 
 import java.util.List;

@@ -18,11 +18,11 @@
 
 package boofcv.app;
 
-import boofcv.numerics.optimization.OptimizationException;
-import boofcv.numerics.optimization.UnconstrainedLeastSquares;
-import boofcv.numerics.optimization.functions.FunctionNtoM;
-import boofcv.numerics.optimization.functions.FunctionNtoMxN;
-import boofcv.numerics.optimization.impl.NumericalJacobianForward;
+import org.ddogleg.optimization.OptimizationException;
+import org.ddogleg.optimization.UnconstrainedLeastSquares;
+import org.ddogleg.optimization.functions.FunctionNtoM;
+import org.ddogleg.optimization.functions.FunctionNtoMxN;
+import org.ddogleg.optimization.impl.NumericalJacobianForward;
 import org.apache.commons.math3.analysis.DifferentiableMultivariateVectorFunction;
 import org.apache.commons.math3.optimization.general.LevenbergMarquardtOptimizer;
 

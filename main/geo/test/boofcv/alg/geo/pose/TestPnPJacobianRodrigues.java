@@ -20,10 +20,10 @@ package boofcv.alg.geo.pose;
 
 import boofcv.abst.geo.optimization.ResidualsPoseMatrix;
 import boofcv.alg.geo.PerspectiveOps;
-import boofcv.numerics.optimization.JacobianChecker;
 import boofcv.struct.geo.Point2D3D;
 import georegression.geometry.RotationMatrixGenerator;
 import georegression.struct.se.Se3_F64;
+import org.ddogleg.optimization.JacobianChecker;
 import org.junit.Test;
 
 import java.util.ArrayList;

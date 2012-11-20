@@ -22,13 +22,13 @@ import boofcv.alg.feature.detect.line.GridRansacLineDetector;
 import boofcv.alg.feature.detect.line.gridline.Edgel;
 import boofcv.alg.feature.detect.line.gridline.GridLineModelDistance;
 import boofcv.alg.feature.detect.line.gridline.GridLineModelFitter;
-import boofcv.numerics.fitting.modelset.ModelMatcher;
-import boofcv.numerics.fitting.modelset.ransac.Ransac;
 import boofcv.struct.feature.MatrixOfList;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageUInt8;
 import georegression.struct.line.LinePolar2D_F32;
 import georegression.struct.line.LineSegment2D_F32;
+import org.ddogleg.fitting.modelset.ModelMatcher;
+import org.ddogleg.fitting.modelset.ransac.Ransac;
 import org.junit.Test;
 
 import java.util.List;

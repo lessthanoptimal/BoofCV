@@ -16,49 +16,53 @@
  * limitations under the License.
  */
 
-package boofcv.evaluation;
-
-import org.ddogleg.sorting.QuickSort_F64;
+package boofcv.struct;
 
 
 /**
- * Computes different statistics
+ * This is a queue that is composed of integers.  Elements are added and removed from the tail
  *
  * @author Peter Abeles
  */
-public class ErrorStatistics {
-	double errors[];
-	int size = 0;
-	boolean fixated = false;
+public class GrowQueue_I32 {
 
-	QuickSort_F64 sort = new QuickSort_F64();
+    public int data[];
+    public int size;
 
-	public ErrorStatistics( int initialSize ) {
-		this.errors = new double[ initialSize ];
-	}
+    public GrowQueue_I32( int maxSize ) {
+        data = new int[ maxSize ];
+        this.size = 0;
+    }
 
 	public void reset() {
 		size = 0;
-		fixated = false;
 	}
 
-	public void add( double e ) {
-		if( size >= errors.length ) {
-			double t[] = new double[ errors.length*2 ];
-			System.arraycopy(errors,0,t,0,errors.length );
-			errors = t;
+    public void push( int val ) {
+        if( size == data.length ) {
+			int temp[] = new int[ size * 2];
+			System.arraycopy(data,0,temp,0,size);
+			data = temp;
 		}
-		errors[size++] = e;
+		data[size++] = val;
+    }
+
+	public int get( int index ) {
+		return data[index];
 	}
 
-	public void fixate() {
-		sort.sort(errors,size);
-		fixated = true;
+	public void resize( int size ) {
+		if( data.length < size ) {
+			data = new int[size];
+		}
+		this.size = size;
 	}
 
-	public double getFraction( double frac ) {
-		if( !fixated )
-			fixate();
-		return errors[ (int)(size*frac)];
+	public int getSize() {
+		return size;
 	}
+
+    public int pop() {
+        return data[--size];
+    }
 }

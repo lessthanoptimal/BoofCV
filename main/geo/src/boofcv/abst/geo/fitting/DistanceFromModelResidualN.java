@@ -19,12 +19,12 @@
 package boofcv.abst.geo.fitting;
 
 import boofcv.alg.geo.ModelObservationResidualN;
-import boofcv.numerics.fitting.modelset.DistanceFromModel;
+import org.ddogleg.fitting.modelset.DistanceFromModel;
 
 import java.util.List;
 
 /**
- * Computes the error using {@link boofcv.alg.geo.ModelObservationResidual} for {@link boofcv.numerics.fitting.modelset.DistanceFromModel}.
+ * Computes the error using {@link boofcv.alg.geo.ModelObservationResidual} for {@link org.ddogleg.fitting.modelset.DistanceFromModel}.
  *
  * @author Peter Abeles
  */

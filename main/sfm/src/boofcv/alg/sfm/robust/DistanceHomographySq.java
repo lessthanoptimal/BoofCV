@@ -18,11 +18,11 @@
 
 package boofcv.alg.sfm.robust;
 
-import boofcv.numerics.fitting.modelset.DistanceFromModel;
 import boofcv.struct.geo.AssociatedPair;
 import georegression.struct.homo.Homography2D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.transform.homo.HomographyPointOps_F64;
+import org.ddogleg.fitting.modelset.DistanceFromModel;
 
 import java.util.List;
 

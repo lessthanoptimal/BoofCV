@@ -20,7 +20,7 @@ package boofcv.alg.filter.blur.impl;
 
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageInteger;
-import pja.sorting.QuickSelectArray;
+import org.ddogleg.sorting.QuickSelectArray;
 
 /**
  * <p>
@@ -72,7 +72,7 @@ public class ImplMedianSortEdgeNaive {
 				}
 				
 				// use quick select to avoid sorting the whole list
-				float median = QuickSelectArray.select(storage,index/2,index);
+				float median = QuickSelectArray.select(storage, index / 2, index);
 				output.set(x,y, median );
 			}
 		}

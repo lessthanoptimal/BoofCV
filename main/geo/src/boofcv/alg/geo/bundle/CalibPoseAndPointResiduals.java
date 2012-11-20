@@ -18,12 +18,12 @@
 
 package boofcv.alg.geo.bundle;
 
-import boofcv.numerics.fitting.modelset.ModelCodec;
-import boofcv.numerics.optimization.functions.FunctionNtoM;
 import boofcv.struct.FastQueue;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
+import org.ddogleg.fitting.modelset.ModelCodec;
+import org.ddogleg.optimization.functions.FunctionNtoM;
 
 import java.util.List;
 

@@ -18,9 +18,9 @@
 
 package boofcv.alg.geo.f;
 
-import boofcv.numerics.fitting.modelset.DistanceFromModel;
 import boofcv.struct.geo.AssociatedPair;
 import georegression.geometry.GeometryMath_F64;
+import org.ddogleg.fitting.modelset.DistanceFromModel;
 import org.ejml.data.DenseMatrix64F;
 import org.ejml.ops.CommonOps;
 

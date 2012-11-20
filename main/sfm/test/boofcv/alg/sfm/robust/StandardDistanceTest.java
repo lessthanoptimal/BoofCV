@@ -18,7 +18,7 @@
 
 package boofcv.alg.sfm.robust;
 
-import boofcv.numerics.fitting.modelset.DistanceFromModel;
+import org.ddogleg.fitting.modelset.DistanceFromModel;
 import org.junit.Test;
 
 import java.util.ArrayList;

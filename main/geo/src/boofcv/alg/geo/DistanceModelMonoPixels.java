@@ -18,7 +18,7 @@
 
 package boofcv.alg.geo;
 
-import boofcv.numerics.fitting.modelset.DistanceFromModel;
+import org.ddogleg.fitting.modelset.DistanceFromModel;
 
 /**
  * Compute the distance between a model and an observation for a single camera in pixels

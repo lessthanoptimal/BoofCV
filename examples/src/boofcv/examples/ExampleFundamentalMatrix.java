@@ -35,14 +35,14 @@ import boofcv.factory.geo.FactoryMultiView;
 import boofcv.gui.feature.AssociationPanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.image.UtilImageIO;
-import boofcv.numerics.fitting.modelset.ModelMatcher;
-import boofcv.numerics.fitting.modelset.ransac.Ransac;
 import boofcv.struct.FastQueue;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.SurfFeature;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.geo.GeoModelRefine;
 import boofcv.struct.image.ImageFloat32;
+import org.ddogleg.fitting.modelset.ModelMatcher;
+import org.ddogleg.fitting.modelset.ransac.Ransac;
 import org.ejml.data.DenseMatrix64F;
 
 import java.awt.image.BufferedImage;

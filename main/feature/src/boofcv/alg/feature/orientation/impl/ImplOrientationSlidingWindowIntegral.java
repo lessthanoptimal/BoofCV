@@ -22,7 +22,7 @@ import boofcv.alg.feature.orientation.OrientationIntegralBase;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.sparse.GradientValue;
 import georegression.metric.UtilAngle;
-import pja.sorting.QuickSort_F64;
+import org.ddogleg.sorting.QuickSort_F64;
 
 
 /**

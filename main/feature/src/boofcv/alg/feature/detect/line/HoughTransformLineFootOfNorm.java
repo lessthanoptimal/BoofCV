@@ -23,11 +23,11 @@ import boofcv.abst.feature.detect.extract.FeatureExtractor;
 import boofcv.alg.InputSanityCheck;
 import boofcv.alg.misc.ImageTestingOps;
 import boofcv.struct.FastQueue;
+import boofcv.struct.GrowQueue_F32;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.image.*;
 import georegression.struct.line.LineParametric2D_F32;
 import georegression.struct.point.Point2D_I16;
-import pja.storage.GrowQueue_F32;
 
 /**
  * <p>
@@ -67,7 +67,7 @@ public class HoughTransformLineFootOfNorm {
 	QueueCorner foundLines = new QueueCorner(10);
 	// list of points in the transform with non-zero values
 	QueueCorner candidates = new QueueCorner(10);
-		// line intensities for later pruning
+	// line intensities for later pruning
 	GrowQueue_F32 foundIntensity = new GrowQueue_F32(10);
 
 	/**

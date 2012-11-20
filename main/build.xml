@@ -9,7 +9,6 @@
     <path id="source.classpath">
       <pathelement path="ip/src"/>
       <pathelement path="io/src"/>
-      <pathelement path="numerics/src"/>
       <pathelement path="feature/src"/>
       <pathelement path="geo/src"/>
       <pathelement path="visualize/src"/>
@@ -81,7 +80,6 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
 
     <target name="test">
 	<ant dir="ip/" target="test"/>
-	<ant dir="numerics/" target="test"/>
 	<ant dir="feature/" target="test"/>
 	<ant dir="geo/" target="test"/>
 	<ant dir="io/" target="test"/>
@@ -102,7 +100,6 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
 	<delete dir="${testreport.dir}"/>
 	<delete file="${lib.dir}/${ant.project.name}.jar"/>
 	<ant dir="ip/" target="clean"/>
-	<ant dir="numerics/" target="clean"/>
 	<ant dir="feature/" target="clean"/>
 	<ant dir="geo/" target="clean"/>
 	<ant dir="io/" target="clean"/>
@@ -114,7 +111,6 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
     <target name="jar">
         <mkdir dir="${jar.dir}"/>
 	<ant dir="ip" inheritAll="false"/>
-	<ant dir="numerics" inheritAll="false"/>
 	<ant dir="feature" inheritAll="false"/>
 	<ant dir="geo" inheritAll="false"/>
 	<ant dir="io" inheritAll="false"/>

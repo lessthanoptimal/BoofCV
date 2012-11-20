@@ -30,10 +30,10 @@ import boofcv.alg.feature.detect.line.gridline.Edgel;
 import boofcv.alg.feature.detect.line.gridline.GridLineModelDistance;
 import boofcv.alg.feature.detect.line.gridline.GridLineModelFitter;
 import boofcv.factory.filter.derivative.FactoryDerivative;
-import boofcv.numerics.fitting.modelset.ModelMatcher;
-import boofcv.numerics.fitting.modelset.ransac.Ransac;
 import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.line.LinePolar2D_F32;
+import org.ddogleg.fitting.modelset.ModelMatcher;
+import org.ddogleg.fitting.modelset.ransac.Ransac;
 
 /**
  * Factory for creating line and line segment detectors.

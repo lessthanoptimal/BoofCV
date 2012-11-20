@@ -18,11 +18,11 @@
 
 package boofcv.alg.geo.triangulate;
 
-import boofcv.numerics.optimization.functions.FunctionNtoM;
 import georegression.geometry.GeometryMath_F64;
 import georegression.geometry.UtilTrig_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
+import org.ddogleg.optimization.functions.FunctionNtoM;
 import org.ejml.data.DenseMatrix64F;
 
 import java.util.List;

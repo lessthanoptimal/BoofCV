@@ -19,8 +19,8 @@
 package boofcv.alg.geo.f;
 
 import boofcv.alg.geo.MultiViewOps;
-import boofcv.numerics.fitting.modelset.ModelCodec;
 import georegression.struct.point.Point3D_F64;
+import org.ddogleg.fitting.modelset.ModelCodec;
 import org.ejml.UtilEjml;
 import org.ejml.data.DenseMatrix64F;
 import org.ejml.simple.SimpleMatrix;

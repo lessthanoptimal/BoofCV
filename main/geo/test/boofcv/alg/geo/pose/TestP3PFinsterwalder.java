@@ -18,8 +18,8 @@
 
 package boofcv.alg.geo.pose;
 
-import boofcv.numerics.solver.PolynomialOps;
 import georegression.struct.point.Point2D_F64;
+import org.ddogleg.solver.PolynomialOps;
 
 import java.util.List;
 

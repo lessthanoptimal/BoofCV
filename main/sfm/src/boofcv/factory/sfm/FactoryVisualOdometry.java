@@ -13,11 +13,11 @@ import boofcv.alg.sfm.VisOdomPixelDepthPnP;
 import boofcv.alg.sfm.robust.EstimatorToGenerator;
 import boofcv.factory.geo.EnumPNP;
 import boofcv.factory.geo.FactoryMultiView;
-import boofcv.numerics.fitting.modelset.ModelMatcher;
-import boofcv.numerics.fitting.modelset.ransac.Ransac;
 import boofcv.struct.geo.Point2D3D;
 import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.se.Se3_F64;
+import org.ddogleg.fitting.modelset.ModelMatcher;
+import org.ddogleg.fitting.modelset.ransac.Ransac;
 
 /**
  * Factory for creating visual odometry algorithms.

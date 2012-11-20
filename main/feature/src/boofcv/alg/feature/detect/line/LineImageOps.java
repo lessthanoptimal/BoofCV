@@ -28,7 +28,7 @@ import georegression.metric.UtilAngle;
 import georegression.struct.line.LineParametric2D_F32;
 import georegression.struct.line.LineSegment2D_F32;
 import georegression.struct.point.Point2D_F32;
-import pja.sorting.QuickSort_F32;
+import org.ddogleg.sorting.QuickSort_F32;
 
 import java.util.ArrayList;
 import java.util.Iterator;

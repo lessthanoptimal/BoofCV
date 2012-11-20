@@ -20,10 +20,6 @@ package boofcv.alg.feature.detect.grid.refine;
 
 import boofcv.abst.feature.detect.edge.DetectEdgeContour;
 import boofcv.factory.feature.detect.edge.FactoryDetectEdgeContour;
-import boofcv.numerics.optimization.FactoryOptimization;
-import boofcv.numerics.optimization.UnconstrainedMinimization;
-import boofcv.numerics.optimization.functions.FunctionNtoS;
-import boofcv.numerics.optimization.impl.UtilOptimize;
 import boofcv.struct.FastQueue;
 import boofcv.struct.image.ImageFloat32;
 import georegression.geometry.UtilPoint2D_F64;
@@ -31,6 +27,10 @@ import georegression.metric.Distance2D_F64;
 import georegression.struct.line.LineParametric2D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I32;
+import org.ddogleg.optimization.FactoryOptimization;
+import org.ddogleg.optimization.UnconstrainedMinimization;
+import org.ddogleg.optimization.functions.FunctionNtoS;
+import org.ddogleg.optimization.impl.UtilOptimize;
 
 import java.util.ArrayList;
 import java.util.List;

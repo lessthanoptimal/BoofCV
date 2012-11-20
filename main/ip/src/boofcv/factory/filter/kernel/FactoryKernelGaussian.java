@@ -22,7 +22,7 @@ import boofcv.alg.filter.kernel.KernelMath;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.convolve.*;
 import boofcv.struct.image.ImageSingleBand;
-import pja.stats.UtilGaussian;
+import org.ddogleg.stats.UtilGaussian;
 
 
 /**

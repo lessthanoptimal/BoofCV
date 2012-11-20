@@ -20,10 +20,10 @@ package boofcv.alg.geo;
 
 import boofcv.abst.geo.RefineEpipolar;
 import boofcv.alg.geo.f.ParamFundamentalEpipolar;
-import boofcv.numerics.fitting.modelset.ModelCodec;
-import boofcv.numerics.optimization.FactoryOptimization;
-import boofcv.numerics.optimization.UnconstrainedMinimization;
 import boofcv.struct.geo.AssociatedPair;
+import org.ddogleg.fitting.modelset.ModelCodec;
+import org.ddogleg.optimization.FactoryOptimization;
+import org.ddogleg.optimization.UnconstrainedMinimization;
 import org.ejml.data.DenseMatrix64F;
 
 import java.util.List;

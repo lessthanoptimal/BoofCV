@@ -19,8 +19,8 @@
 package boofcv.abst.geo.pose;
 
 import boofcv.alg.geo.pose.P3PFinsterwalder;
-import boofcv.numerics.solver.PolynomialOps;
 import georegression.fitting.se.FitSpecialEuclideanOps_F64;
+import org.ddogleg.solver.PolynomialOps;
 
 /**
  * @author Peter Abeles

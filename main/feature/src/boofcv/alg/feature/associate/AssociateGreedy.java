@@ -20,9 +20,9 @@ package boofcv.alg.feature.associate;
 
 import boofcv.abst.feature.associate.ScoreAssociation;
 import boofcv.struct.FastQueue;
+import boofcv.struct.GrowQueue_F64;
+import boofcv.struct.GrowQueue_I32;
 import boofcv.struct.feature.TupleDesc_F64;
-import pja.storage.GrowQueue_F64;
-import pja.storage.GrowQueue_I32;
 
 
 /**

@@ -18,8 +18,8 @@
 
 package boofcv.app;
 
-import boofcv.numerics.optimization.functions.FunctionNtoM;
-import boofcv.numerics.optimization.functions.FunctionNtoMxN;
+import org.ddogleg.optimization.functions.FunctionNtoM;
+import org.ddogleg.optimization.functions.FunctionNtoMxN;
 import org.apache.commons.math3.analysis.DifferentiableMultivariateVectorFunction;
 import org.apache.commons.math3.analysis.MultivariateMatrixFunction;
 

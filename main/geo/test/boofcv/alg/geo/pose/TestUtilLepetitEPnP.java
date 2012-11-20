@@ -18,9 +18,9 @@
 
 package boofcv.alg.geo.pose;
 
-import boofcv.numerics.optimization.JacobianChecker;
-import boofcv.numerics.optimization.functions.FunctionNtoM;
-import boofcv.numerics.optimization.functions.FunctionNtoMxN;
+import org.ddogleg.optimization.JacobianChecker;
+import org.ddogleg.optimization.functions.FunctionNtoM;
+import org.ddogleg.optimization.functions.FunctionNtoMxN;
 import org.ejml.data.DenseMatrix64F;
 import org.ejml.ops.RandomMatrices;
 import org.junit.Test;

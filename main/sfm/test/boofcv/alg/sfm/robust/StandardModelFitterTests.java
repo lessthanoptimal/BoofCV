@@ -19,7 +19,7 @@
 package boofcv.alg.sfm.robust;
 
 
-import boofcv.numerics.fitting.modelset.ModelFitter;
+import org.ddogleg.fitting.modelset.ModelFitter;
 import org.junit.Test;
 
 import java.util.ArrayList;

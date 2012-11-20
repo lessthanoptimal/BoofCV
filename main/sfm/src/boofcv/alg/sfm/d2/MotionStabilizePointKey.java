@@ -19,12 +19,12 @@
 package boofcv.alg.sfm.d2;
 
 import boofcv.abst.feature.tracker.ImagePointTracker;
-import boofcv.numerics.fitting.modelset.ModelFitter;
-import boofcv.numerics.fitting.modelset.ModelMatcher;
 import boofcv.struct.distort.PixelTransform_F32;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.InvertibleTransform;
+import org.ddogleg.fitting.modelset.ModelFitter;
+import org.ddogleg.fitting.modelset.ModelMatcher;
 
 /**
  * Extension of {@link ImageMotionPointKey} specifically designed to stabilize image motion.  The algorithm
