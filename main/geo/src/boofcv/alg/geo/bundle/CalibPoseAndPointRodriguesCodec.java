@@ -18,12 +18,12 @@
 
 package boofcv.alg.geo.bundle;
 
-import boofcv.numerics.fitting.modelset.ModelCodec;
 import georegression.geometry.RotationMatrixGenerator;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.struct.so.Rodrigues;
+import org.ddogleg.fitting.modelset.ModelCodec;
 import org.ejml.data.DenseMatrix64F;
 import org.ejml.factory.DecompositionFactory;
 import org.ejml.factory.SingularValueDecomposition;

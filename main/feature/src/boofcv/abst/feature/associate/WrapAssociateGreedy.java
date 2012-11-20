@@ -21,7 +21,7 @@ package boofcv.abst.feature.associate;
 import boofcv.alg.feature.associate.AssociateGreedy;
 import boofcv.struct.FastQueue;
 import boofcv.struct.feature.AssociatedIndex;
-import pja.sorting.QuickSelectArray;
+import org.ddogleg.sorting.QuickSelectArray;
 
 
 /**
@@ -94,7 +94,7 @@ public class WrapAssociateGreedy<T> implements GeneralAssociation<T> {
 			}
 			
 		} else {
-			QuickSelectArray.selectIndex(score,maxAssociations,listSrc.size,indexes);
+			QuickSelectArray.selectIndex(score, maxAssociations, listSrc.size, indexes);
 			for( int i = 0; i < maxAssociations; i++ ) {
 				int src = indexes[i];
 				int dst = pairs[src];

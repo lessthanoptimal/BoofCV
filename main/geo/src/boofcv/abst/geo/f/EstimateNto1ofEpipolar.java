@@ -20,10 +20,10 @@ package boofcv.abst.geo.f;
 
 import boofcv.abst.geo.Estimate1ofEpipolar;
 import boofcv.abst.geo.GeoModelEstimatorNto1;
-import boofcv.numerics.fitting.modelset.DistanceFromModel;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.geo.GeoModelEstimatorN;
 import boofcv.struct.geo.QueueMatrix;
+import org.ddogleg.fitting.modelset.DistanceFromModel;
 import org.ejml.data.DenseMatrix64F;
 
 /**

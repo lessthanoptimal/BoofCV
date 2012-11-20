@@ -10,13 +10,12 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="module" module-name="libpja" />
     <orderEntry type="module" module-name="BoofCV Image Processing" />
     <orderEntry type="module" module-name="ejml" />
     <orderEntry type="module" module-name="GeoRegression" />
     <orderEntry type="library" scope="TEST" name="testing" level="project" />
-    <orderEntry type="module" module-name="BoofCV Numerics" />
     <orderEntry type="module" module-name="BoofCV Feature" />
+    <orderEntry type="module" module-name="DDogleg" />
   </component>
 </module>
 

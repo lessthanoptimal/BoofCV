@@ -18,8 +18,8 @@
 
 package boofcv.alg.geo.bundle;
 
-import boofcv.numerics.optimization.JacobianChecker;
 import georegression.struct.se.Se3_F64;
+import org.ddogleg.optimization.JacobianChecker;
 import org.junit.Test;
 
 import java.util.List;

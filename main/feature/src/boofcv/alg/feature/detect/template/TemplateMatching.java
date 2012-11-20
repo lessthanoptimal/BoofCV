@@ -26,7 +26,7 @@ import boofcv.struct.feature.Match;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
 import georegression.struct.point.Point2D_I16;
-import pja.sorting.QuickSelectArray;
+import org.ddogleg.sorting.QuickSelectArray;
 
 /**
  * Runs a template matching algorithm across the image. Local peaks are found in the resulting

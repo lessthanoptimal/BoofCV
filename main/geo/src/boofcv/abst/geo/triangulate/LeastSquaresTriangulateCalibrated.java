@@ -20,11 +20,11 @@ package boofcv.abst.geo.triangulate;
 
 import boofcv.abst.geo.RefineTriangulationCalibrated;
 import boofcv.alg.geo.triangulate.ResidualsTriangulateSimple;
-import boofcv.numerics.optimization.FactoryOptimization;
-import boofcv.numerics.optimization.UnconstrainedLeastSquares;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
+import org.ddogleg.optimization.FactoryOptimization;
+import org.ddogleg.optimization.UnconstrainedLeastSquares;
 
 import java.util.List;
 

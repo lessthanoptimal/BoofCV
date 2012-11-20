@@ -18,7 +18,7 @@
 
 package boofcv.abst.geo.optimization;
 
-import boofcv.numerics.fitting.modelset.ModelCodec;
+import org.ddogleg.fitting.modelset.ModelCodec;
 import org.ejml.data.DenseMatrix64F;
 
 /**

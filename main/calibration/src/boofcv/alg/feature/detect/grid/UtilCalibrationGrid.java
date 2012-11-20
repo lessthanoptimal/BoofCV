@@ -20,7 +20,7 @@ package boofcv.alg.feature.detect.grid;
 
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I32;
-import pja.sorting.QuickSort_F64;
+import org.ddogleg.sorting.QuickSort_F64;
 
 import java.util.ArrayList;
 import java.util.List;

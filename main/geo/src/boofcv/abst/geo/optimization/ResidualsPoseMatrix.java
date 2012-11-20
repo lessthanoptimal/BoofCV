@@ -19,10 +19,10 @@
 package boofcv.abst.geo.optimization;
 
 import boofcv.alg.geo.ModelObservationResidualN;
-import boofcv.numerics.fitting.modelset.ModelCodec;
-import boofcv.numerics.optimization.functions.FunctionNtoM;
 import boofcv.struct.geo.Point2D3D;
 import georegression.struct.se.Se3_F64;
+import org.ddogleg.fitting.modelset.ModelCodec;
+import org.ddogleg.optimization.functions.FunctionNtoM;
 
 import java.util.List;
 

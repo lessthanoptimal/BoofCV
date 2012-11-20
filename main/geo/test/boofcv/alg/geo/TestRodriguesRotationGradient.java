@@ -18,11 +18,11 @@
 
 package boofcv.alg.geo;
 
-import boofcv.numerics.optimization.JacobianChecker;
-import boofcv.numerics.optimization.functions.FunctionNtoM;
-import boofcv.numerics.optimization.functions.FunctionNtoMxN;
 import georegression.geometry.RotationMatrixGenerator;
 import georegression.struct.so.Rodrigues;
+import org.ddogleg.optimization.JacobianChecker;
+import org.ddogleg.optimization.functions.FunctionNtoM;
+import org.ddogleg.optimization.functions.FunctionNtoMxN;
 import org.ejml.data.DenseMatrix64F;
 import org.ejml.ops.CommonOps;
 import org.junit.Test;

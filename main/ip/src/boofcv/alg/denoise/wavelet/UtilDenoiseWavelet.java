@@ -20,7 +20,7 @@ package boofcv.alg.denoise.wavelet;
 
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
-import pja.sorting.QuickSelectArray;
+import org.ddogleg.sorting.QuickSelectArray;
 
 
 /**
@@ -55,7 +55,7 @@ public class UtilDenoiseWavelet {
 		storage = subbandAbsVal(subband, storage );
 
 		int N = subband.width*subband.height;
-		return QuickSelectArray.select(storage,N/2,N)/0.6745f;
+		return QuickSelectArray.select(storage, N / 2, N)/0.6745f;
 	}
 
 	/**

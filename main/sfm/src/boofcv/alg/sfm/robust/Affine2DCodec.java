@@ -18,8 +18,8 @@
 
 package boofcv.alg.sfm.robust;
 
-import boofcv.numerics.fitting.modelset.ModelCodec;
 import georegression.struct.affine.Affine2D_F64;
+import org.ddogleg.fitting.modelset.ModelCodec;
 
 
 /**

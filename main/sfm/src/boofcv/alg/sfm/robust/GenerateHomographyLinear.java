@@ -20,11 +20,11 @@ package boofcv.alg.sfm.robust;
 
 
 import boofcv.alg.geo.h.HomographyLinear4;
-import boofcv.numerics.fitting.modelset.ModelFitter;
-import boofcv.numerics.fitting.modelset.ModelGenerator;
 import boofcv.struct.geo.AssociatedPair;
 import georegression.struct.homo.Homography2D_F64;
 import georegression.struct.homo.UtilHomography;
+import org.ddogleg.fitting.modelset.ModelFitter;
+import org.ddogleg.fitting.modelset.ModelGenerator;
 import org.ejml.data.DenseMatrix64F;
 
 import java.util.List;

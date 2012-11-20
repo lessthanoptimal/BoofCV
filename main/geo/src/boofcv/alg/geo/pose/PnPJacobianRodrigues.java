@@ -19,13 +19,13 @@
 package boofcv.alg.geo.pose;
 
 import boofcv.alg.geo.RodriguesRotationJacobian;
-import boofcv.numerics.optimization.functions.FunctionNtoMxN;
 import boofcv.struct.geo.Point2D3D;
 import georegression.geometry.RotationMatrixGenerator;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.struct.so.Rodrigues;
 import georegression.transform.se.SePointOps_F64;
+import org.ddogleg.optimization.functions.FunctionNtoMxN;
 import org.ejml.data.DenseMatrix64F;
 
 import java.util.List;

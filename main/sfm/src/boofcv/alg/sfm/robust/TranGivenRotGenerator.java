@@ -1,11 +1,11 @@
 package boofcv.alg.sfm.robust;
 
 import boofcv.alg.geo.pose.PositionFromPairLinear2;
-import boofcv.numerics.fitting.modelset.ModelGenerator;
 import boofcv.struct.geo.Point2D3D;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Vector3D_F64;
+import org.ddogleg.fitting.modelset.ModelGenerator;
 import org.ejml.data.DenseMatrix64F;
 
 import java.util.ArrayList;

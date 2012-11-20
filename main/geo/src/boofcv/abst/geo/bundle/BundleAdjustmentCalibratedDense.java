@@ -20,10 +20,10 @@ package boofcv.abst.geo.bundle;
 
 import boofcv.abst.geo.BundleAdjustmentCalibrated;
 import boofcv.alg.geo.bundle.*;
-import boofcv.numerics.optimization.FactoryOptimization;
-import boofcv.numerics.optimization.RegionStepType;
-import boofcv.numerics.optimization.UnconstrainedLeastSquares;
 import georegression.struct.se.Se3_F64;
+import org.ddogleg.optimization.FactoryOptimization;
+import org.ddogleg.optimization.RegionStepType;
+import org.ddogleg.optimization.UnconstrainedLeastSquares;
 
 import java.util.List;
 

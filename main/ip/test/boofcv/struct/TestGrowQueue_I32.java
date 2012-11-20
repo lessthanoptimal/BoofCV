@@ -16,23 +16,19 @@
  * limitations under the License.
  */
 
-package boofcv.alg.geo.triangulate;
+package boofcv.struct;
 
-import georegression.struct.point.Point2D_F64;
-import georegression.struct.se.Se3_F64;
-import org.ddogleg.optimization.functions.FunctionNtoM;
+import org.junit.Test;
 
-import java.util.List;
+import static org.junit.Assert.fail;
+
 
 /**
  * @author Peter Abeles
  */
-public class TestResidualsTriangulateSampson extends ResidualTriangulateChecks {
-
-	@Override
-	public FunctionNtoM createAlg(List<Point2D_F64> observations, List<Se3_F64> motionGtoC) {
-		ResidualsTriangulateSampson alg = new ResidualsTriangulateSampson();
-		alg.setObservations(observations, essential);
-		return alg;
+public class TestGrowQueue_I32 {
+	@Test
+	public void stuff() {
+		fail("implement");
 	}
 }

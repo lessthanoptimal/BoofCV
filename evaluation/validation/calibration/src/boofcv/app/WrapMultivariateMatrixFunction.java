@@ -18,7 +18,7 @@
 
 package boofcv.app;
 
-import boofcv.numerics.optimization.functions.FunctionNtoMxN;
+import org.ddogleg.optimization.functions.FunctionNtoMxN;
 import org.apache.commons.math3.analysis.MultivariateMatrixFunction;
 import org.ejml.data.DenseMatrix64F;
 

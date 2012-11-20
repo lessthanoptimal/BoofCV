@@ -19,12 +19,12 @@
 package boofcv.alg.feature.detect.line.gridline;
 
 
-import boofcv.numerics.fitting.modelset.DistanceFromModel;
 import georegression.geometry.UtilLine2D_F32;
 import georegression.metric.Distance2D_F32;
 import georegression.metric.UtilAngle;
 import georegression.struct.line.LineParametric2D_F32;
 import georegression.struct.line.LinePolar2D_F32;
+import org.ddogleg.fitting.modelset.DistanceFromModel;
 
 import java.util.List;
 

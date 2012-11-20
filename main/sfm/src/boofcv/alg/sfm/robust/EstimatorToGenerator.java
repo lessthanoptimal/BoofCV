@@ -1,7 +1,7 @@
 package boofcv.alg.sfm.robust;
 
-import boofcv.numerics.fitting.modelset.ModelGenerator;
 import boofcv.struct.geo.GeoModelEstimator1;
+import org.ddogleg.fitting.modelset.ModelGenerator;
 
 import java.util.List;
 

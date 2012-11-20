@@ -20,8 +20,8 @@ package boofcv.factory.filter.kernel;
 
 import boofcv.alg.filter.kernel.KernelMath;
 import boofcv.struct.convolve.*;
+import org.ddogleg.stats.UtilGaussian;
 import org.junit.Test;
-import pja.stats.UtilGaussian;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;

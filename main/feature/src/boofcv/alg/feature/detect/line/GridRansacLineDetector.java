@@ -21,7 +21,6 @@ package boofcv.alg.feature.detect.line;
 
 import boofcv.alg.InputSanityCheck;
 import boofcv.alg.feature.detect.line.gridline.Edgel;
-import boofcv.numerics.fitting.modelset.ModelMatcher;
 import boofcv.struct.FastQueue;
 import boofcv.struct.feature.MatrixOfList;
 import boofcv.struct.image.ImageFloat32;
@@ -33,6 +32,7 @@ import georegression.struct.line.LineParametric2D_F32;
 import georegression.struct.line.LinePolar2D_F32;
 import georegression.struct.line.LineSegment2D_F32;
 import georegression.struct.point.Point2D_F32;
+import org.ddogleg.fitting.modelset.ModelMatcher;
 
 import java.util.List;
 

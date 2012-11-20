@@ -16,23 +16,46 @@
  * limitations under the License.
  */
 
-package boofcv.alg.geo.triangulate;
+package boofcv.struct;
 
-import georegression.struct.point.Point2D_F64;
-import georegression.struct.se.Se3_F64;
-import org.ddogleg.optimization.functions.FunctionNtoM;
-
-import java.util.List;
 
 /**
+ * This is a queue that is composed of integers.  Elements are added and removed from the tail
+ *
  * @author Peter Abeles
  */
-public class TestResidualsTriangulateSampson extends ResidualTriangulateChecks {
+public class GrowQueue_F32 {
 
-	@Override
-	public FunctionNtoM createAlg(List<Point2D_F64> observations, List<Se3_F64> motionGtoC) {
-		ResidualsTriangulateSampson alg = new ResidualsTriangulateSampson();
-		alg.setObservations(observations, essential);
-		return alg;
+    public float queue[];
+    public int size;
+
+    public GrowQueue_F32( int maxSize ) {
+        queue = new float[ maxSize ];
+        this.size = 0;
+    }
+
+	public void reset() {
+		size = 0;
 	}
+
+    public void push( float val ) {
+        if( size == queue.length ) {
+			float temp[] = new float[ size * 2];
+			System.arraycopy(queue,0,temp,0,size);
+			queue = temp;
+		}
+		queue[size++] = val;
+    }
+
+	public float get( int index ) {
+		return queue[index];
+	}
+
+	public int getSize() {
+		return size;
+	}
+
+    public float pop() {
+        return queue[--size];
+    }
 }

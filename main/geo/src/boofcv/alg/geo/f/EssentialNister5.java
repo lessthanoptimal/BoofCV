@@ -18,13 +18,13 @@
 
 package boofcv.alg.geo.f;
 
-import boofcv.numerics.solver.Polynomial;
-import boofcv.numerics.solver.PolynomialRoots;
-import boofcv.numerics.solver.impl.FindRealRootsSturm;
-import boofcv.numerics.solver.impl.WrapRealRootsSturm;
 import boofcv.struct.FastQueue;
 import boofcv.struct.geo.AssociatedPair;
 import georegression.struct.point.Point2D_F64;
+import org.ddogleg.solver.Polynomial;
+import org.ddogleg.solver.PolynomialRoots;
+import org.ddogleg.solver.impl.FindRealRootsSturm;
+import org.ddogleg.solver.impl.WrapRealRootsSturm;
 import org.ejml.data.Complex64F;
 import org.ejml.data.DenseMatrix64F;
 import org.ejml.factory.DecompositionFactory;

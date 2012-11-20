@@ -19,12 +19,12 @@
 package boofcv.alg.geo.f;
 
 import boofcv.alg.geo.LowLevelMultiViewOps;
-import boofcv.numerics.solver.Polynomial;
-import boofcv.numerics.solver.PolynomialRoots;
-import boofcv.numerics.solver.PolynomialSolver;
-import boofcv.numerics.solver.RootFinderType;
 import boofcv.struct.FastQueue;
 import boofcv.struct.geo.AssociatedPair;
+import org.ddogleg.solver.Polynomial;
+import org.ddogleg.solver.PolynomialRoots;
+import org.ddogleg.solver.PolynomialSolver;
+import org.ddogleg.solver.RootFinderType;
 import org.ejml.data.Complex64F;
 import org.ejml.data.DenseMatrix64F;
 import org.ejml.ops.SpecializedOps;

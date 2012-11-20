@@ -27,7 +27,7 @@ import boofcv.struct.image.ImageSInt32;
 import boofcv.struct.image.ImageUInt8;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I32;
-import pja.util.Combinations;
+import org.ddogleg.permute.Combinations;
 
 import java.util.ArrayList;
 import java.util.List;

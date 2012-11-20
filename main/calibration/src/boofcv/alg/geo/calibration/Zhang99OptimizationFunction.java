@@ -18,12 +18,12 @@
 
 package boofcv.alg.geo.calibration;
 
-import boofcv.numerics.optimization.functions.FunctionNtoM;
 import georegression.geometry.RotationMatrixGenerator;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
+import org.ddogleg.optimization.functions.FunctionNtoM;
 
 import java.util.ArrayList;
 import java.util.List;

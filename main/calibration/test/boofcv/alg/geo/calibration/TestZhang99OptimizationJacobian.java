@@ -19,8 +19,8 @@
 package boofcv.alg.geo.calibration;
 
 import boofcv.factory.calib.FactoryPlanarCalibrationTarget;
-import boofcv.numerics.optimization.JacobianChecker;
 import georegression.struct.point.Point2D_F64;
+import org.ddogleg.optimization.JacobianChecker;
 import org.junit.Test;
 
 import java.util.ArrayList;

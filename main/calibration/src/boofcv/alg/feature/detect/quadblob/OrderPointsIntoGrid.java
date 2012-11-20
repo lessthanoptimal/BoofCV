@@ -21,7 +21,6 @@ package boofcv.alg.feature.detect.quadblob;
 import boofcv.alg.feature.detect.InvalidCalibrationTarget;
 import georegression.metric.UtilAngle;
 import georegression.struct.point.Point2D_F64;
-import pja.sorting.QuickSort_F64;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,7 +28,7 @@ import java.util.List;
 
 /**
  * Given a set of points that form an approximate grid, put them into grid order.  The order shall be in a row
- * major format moving in the counter clockwise direction.  If the data is found to not be a grid then an expception
+ * major format moving in the counter clockwise direction.  If the data is found to not be a grid then an exception
  * is thrown.  Besides ordering points, the number of rows and columns is determined.  The initial starting point
  * of the grid is arbitrary leading to the possibility that the orientation of the grid can be off.
  */
@@ -39,8 +38,6 @@ public class OrderPointsIntoGrid {
 
 	// bounding quadrilateral 
 	List<Point2D_F64> targetCorners;
-	// sorting algorithm
-	private QuickSort_F64 sort = new QuickSort_F64();
 
 	// number of elements in each row
 	private int numCols;

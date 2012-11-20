@@ -22,7 +22,7 @@ import boofcv.alg.feature.detect.grid.UtilCalibrationGrid;
 import georegression.geometry.UtilPoint2D_I32;
 import georegression.metric.UtilAngle;
 import georegression.struct.point.Point2D_I32;
-import pja.sorting.QuickSort_F64;
+import org.ddogleg.sorting.QuickSort_F64;
 
 import java.util.ArrayList;
 import java.util.List;

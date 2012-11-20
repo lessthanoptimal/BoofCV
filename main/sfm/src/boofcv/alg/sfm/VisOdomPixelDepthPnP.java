@@ -3,13 +3,13 @@ package boofcv.alg.sfm;
 import boofcv.abst.feature.tracker.ImagePointTracker;
 import boofcv.abst.feature.tracker.PointTrack;
 import boofcv.abst.geo.RefinePnP;
-import boofcv.numerics.fitting.modelset.ModelMatcher;
 import boofcv.struct.distort.PointTransform_F64;
 import boofcv.struct.geo.Point2D3D;
 import boofcv.struct.image.ImageBase;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
+import org.ddogleg.fitting.modelset.ModelMatcher;
 
 import java.util.ArrayList;
 import java.util.List;

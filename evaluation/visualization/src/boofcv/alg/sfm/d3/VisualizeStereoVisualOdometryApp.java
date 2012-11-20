@@ -84,7 +84,7 @@ public class VisualizeStereoVisualOdometryApp <I extends ImageSingleBand>
 
 		addAlgorithm(0, "Depth P3P - KLT", 0);
 		addAlgorithm(0, "Depth P3P - ST-BRIEF", 1);
-		addAlgorithm(0, "Depth P3P - ST-SURF-KLT", 1);
+		addAlgorithm(0, "Depth P3P - ST-SURF-KLT", 2);
 
 		guiInfo = new VisualOdometryPanel();
 		guiLeft = new ImagePanel();
@@ -258,13 +258,13 @@ public class VisualizeStereoVisualOdometryApp <I extends ImageSingleBand>
 		if( whichAlg == 0 ) {
 			thresholdAdd = 120;
 			thresholdRetire = 2;
-			tracker = FactoryPointSequentialTracker.klt(600,new int[]{1,2,4,8},3,1,1,imageType,derivType);
+			tracker = FactoryPointSequentialTracker.klt(600,new int[]{1,2,4,8},3,3,2,imageType,derivType);
 		} else if( whichAlg == 1 ) {
 			thresholdAdd = 80;
 			thresholdRetire = 3;
 //			tracker = FactoryPointSequentialTracker.dda_FH_SURF(600, 200, 1, 2,imageType);
 			tracker = FactoryPointSequentialTracker.dda_ST_BRIEF(600, 200, 2, 0, imageType, null);
-//			tracker = FactoryPointSequentialTracker.dda_ShiTomasi_NCC(600, 7, 7, 0, 2, imageType, null);
+//			tracker = FactoryPointSequentialTracker.dda_ST_NCC(600, 3, 7, 0, imageType, null);
 		} else {
 			thresholdAdd = 80;
 			thresholdRetire = 3;
