@@ -19,7 +19,7 @@
 package boofcv.alg.tracker.klt;
 
 import boofcv.alg.filter.derivative.GradientSobel;
-import boofcv.alg.misc.ImageTestingOps;
+import boofcv.alg.misc.ImageMiscOps;
 import boofcv.core.image.border.BorderIndex1D_Extend;
 import boofcv.core.image.border.ImageBorder1D_F32;
 import org.junit.Before;
@@ -39,8 +39,8 @@ public class TestPyramidKltTracker extends PyramidKltTestBase {
 	}
 
 	private void setTargetLocation( int x , int y ) {
-		ImageTestingOps.randomize(image,rand,0,1);
-		ImageTestingOps.fillRectangle(image,100,cornerX,cornerY,20,20);
+		ImageMiscOps.fillUniform(image,rand,0,1);
+		ImageMiscOps.fillRectangle(image,100,cornerX,cornerY,20,20);
 		updater.update(image,pyramid);
 
 		for( int i = 0; i < derivX.getNumLayers(); i++ ) {

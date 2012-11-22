@@ -20,7 +20,7 @@ package boofcv.alg.filter.kernel;
 
 import boofcv.alg.distort.DistortImageOps;
 import boofcv.alg.interpolate.TypeInterpolate;
-import boofcv.alg.misc.GPixelMath;
+import boofcv.alg.misc.GImageStatistics;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.filter.kernel.FactoryKernel;
 import boofcv.factory.filter.kernel.FactoryKernelGaussian;
@@ -89,7 +89,7 @@ public class DisplayGaussianKernelApp<T extends ImageSingleBand> extends SelectA
 			T smallImg = GKernelMath.convertToImage(kernel);
 			DistortImageOps.scale(smallImg,largeImg, TypeInterpolate.NEAREST_NEIGHBOR);
 
-			double maxValue = GPixelMath.maxAbs(largeImg);
+			double maxValue = GImageStatistics.maxAbs(largeImg);
 			BufferedImage out = VisualizeImageData.colorizeSign(largeImg,null,maxValue);
 
 			panel.addImage(out,String.format("%5d",radius));

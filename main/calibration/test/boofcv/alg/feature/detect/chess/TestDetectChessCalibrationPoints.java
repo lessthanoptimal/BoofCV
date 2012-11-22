@@ -18,7 +18,7 @@
 
 package boofcv.alg.feature.detect.chess;
 
-import boofcv.alg.misc.ImageTestingOps;
+import boofcv.alg.misc.ImageMiscOps;
 import boofcv.struct.image.ImageFloat32;
 import georegression.struct.point.Point2D_F64;
 import org.junit.Test;
@@ -46,7 +46,7 @@ public class TestDetectChessCalibrationPoints {
 		int w = 400;
 		int h = 500;
 		ImageFloat32 gray = new ImageFloat32(w,h);
-		ImageTestingOps.fill(gray,80f);
+		ImageMiscOps.fill(gray,80f);
 
 		// create the grid
 		for( int y = 0; y < 3; y++) {
@@ -54,7 +54,7 @@ public class TestDetectChessCalibrationPoints {
 				int pixelY = 2*y*squareLength+10;
 				int pixelX = 2*x*squareLength+15;
 
-				ImageTestingOps.fillRectangle(gray, 20, pixelX, pixelY, squareLength, squareLength);
+				ImageMiscOps.fillRectangle(gray, 20, pixelX, pixelY, squareLength, squareLength);
 			}
 		}
 		for( int y = 0; y < 2; y++) {
@@ -62,10 +62,10 @@ public class TestDetectChessCalibrationPoints {
 				int pixelY = 2*y*squareLength+10+squareLength;
 				int pixelX = 2*x*squareLength+15+squareLength;
 
-				ImageTestingOps.fillRectangle(gray, 20, pixelX, pixelY, squareLength, squareLength);
+				ImageMiscOps.fillRectangle(gray, 20, pixelX, pixelY, squareLength, squareLength);
 			}
 		}
-		ImageTestingOps.addGaussian(gray,rand,0.1,0,255);
+		ImageMiscOps.addGaussian(gray,rand,0.1,0,255);
 
 		DetectChessCalibrationPoints alg = new DetectChessCalibrationPoints(4,3,5,20,255,ImageFloat32.class);
 

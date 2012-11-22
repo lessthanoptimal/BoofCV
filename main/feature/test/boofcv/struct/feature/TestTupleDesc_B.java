@@ -24,7 +24,6 @@ import org.junit.Test;
 import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
@@ -53,7 +52,20 @@ public class TestTupleDesc_B {
 
 	@Test
 	public void setTo() {
-		fail("IMplement");
+		int N = 40;
+		TupleDesc_B a = new TupleDesc_B(N);
+
+		for( int i = 0; i < a.data.length; i++ ) {
+			a.data[i] = rand.nextInt();
+		}
+
+		TupleDesc_B b = new TupleDesc_B(80);
+		b.setTo(a);
+
+		for( int i = 0; i < a.data.length; i++ ) {
+			assertEquals(a.data[i],b.data[i]);
+		}
+		assertEquals(a.numBits,b.numBits);
 	}
 
 	@Test
@@ -68,5 +80,7 @@ public class TestTupleDesc_B {
 		for( int i = 0; i < a.data.length; i++ ) {
 			assertEquals(100+i,a.data[i]);
 		}
+
+		assertEquals(a.numBits,b.numBits);
 	}
 }

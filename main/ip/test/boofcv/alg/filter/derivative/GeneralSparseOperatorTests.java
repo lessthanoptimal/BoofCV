@@ -18,6 +18,7 @@
 
 package boofcv.alg.filter.derivative;
 
+import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.sparse.SparseImageOperator;
@@ -61,7 +62,7 @@ public abstract class GeneralSparseOperatorTests
 
 		input = GeneralizedImageOps.createSingleBand(inputType, width, height);
 
-		GeneralizedImageOps.randomize(input,rand,0,100);
+		GImageMiscOps.fillUniform(input, rand, 0, 100);
 	}
 
 

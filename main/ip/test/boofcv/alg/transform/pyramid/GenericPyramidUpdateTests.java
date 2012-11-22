@@ -18,6 +18,8 @@
 
 package boofcv.alg.transform.pyramid;
 
+import boofcv.alg.misc.GImageMiscOps;
+import boofcv.alg.misc.GImageStatistics;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.pyramid.ImagePyramid;
@@ -68,7 +70,7 @@ public abstract class GenericPyramidUpdateTests<T extends ImageSingleBand> {
 	public void checkModifiesLayersOnUpdate() {
 		ImageSingleBand input = GeneralizedImageOps.createSingleBand(imageType, width, height);
 		ImagePyramid pyramid = createPyramid(1,2,4);
-		GeneralizedImageOps.randomize(input,rand,0,100);
+		GImageMiscOps.fillUniform(input, rand, 0, 100);
 
 		PyramidUpdater updater = createUpdater();
 		updater.update(input,pyramid);
@@ -76,7 +78,7 @@ public abstract class GenericPyramidUpdateTests<T extends ImageSingleBand> {
 		for( int i = 0; i < pyramid.getNumLayers(); i++ ) {
 			ImageSingleBand image = pyramid.getLayer(i);
 
-			assertTrue( GeneralizedImageOps.sum(image) > 0 );
+			assertTrue( GImageStatistics.sum(image) > 0 );
 		}
 	}
 

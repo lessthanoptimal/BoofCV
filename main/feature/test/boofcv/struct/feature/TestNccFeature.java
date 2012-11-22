@@ -21,7 +21,7 @@ package boofcv.struct.feature;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Peter Abeles
@@ -41,15 +41,28 @@ public class TestNccFeature {
 
 		b.setTo(a);
 
-		assertEquals(a.mean,b.mean,1e-8);
-		assertEquals(a.sigma,b.sigma,1e-8);
-
-		for( int i = 0; i < 4; i++ )
-			assertEquals(a.value[i],b.value[i],1e-8);
+		checkIdentical(a, b);
 	}
 
 	@Test
 	public void copy() {
-		fail("IMplement");
+		NccFeature a = new NccFeature(4);
+		a.mean = 0.5;
+		a.sigma = 1.5;
+
+		for( int i = 0; i < 4; i++ )
+			a.value[i] = i+0.1;
+
+		NccFeature b = a.copy();
+
+		checkIdentical(a, b);
+	}
+
+	private void checkIdentical(NccFeature a, NccFeature b) {
+		assertEquals(a.mean,b.mean,1e-8);
+		assertEquals(a.sigma,b.sigma,1e-8);
+
+		for( int i = 0; i < 4; i++ )
+			assertTrue(a.value[i] == b.value[i]);
 	}
 }

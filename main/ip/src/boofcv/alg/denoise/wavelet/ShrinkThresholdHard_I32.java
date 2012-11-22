@@ -19,7 +19,7 @@
 package boofcv.alg.denoise.wavelet;
 
 import boofcv.alg.denoise.ShrinkThresholdRule;
-import boofcv.alg.misc.ImageTestingOps;
+import boofcv.alg.misc.ImageMiscOps;
 import boofcv.struct.image.ImageSInt32;
 
 
@@ -38,7 +38,7 @@ public class ShrinkThresholdHard_I32 implements ShrinkThresholdRule<ImageSInt32>
 
 		// see if all the coefficients should be set to zero
 		if( f == Integer.MAX_VALUE ) {
-			ImageTestingOps.fill(image,0);
+			ImageMiscOps.fill(image, 0);
 			return;
 		}
 

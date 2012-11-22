@@ -19,7 +19,7 @@
 package boofcv.alg.feature.detect.intensity;
 
 import boofcv.abst.feature.detect.intensity.*;
-import boofcv.alg.misc.PixelMath;
+import boofcv.alg.misc.ImageStatistics;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.factory.feature.detect.intensity.FactoryIntensityPointAlg;
 import boofcv.factory.filter.blur.FactoryBlurFilter;
@@ -112,7 +112,7 @@ public class IntensityFeatureScaleSpaceApp<T extends ImageSingleBand, D extends 
 			intensity.process(scaledImage,derivX,derivY,derivXX,derivYY,derivXY);
 			ImageFloat32 featureImg = intensity.getIntensity();
 
-			b = VisualizeImageData.colorizeSign(featureImg,null, PixelMath.maxAbs(featureImg));
+			b = VisualizeImageData.colorizeSign(featureImg,null, ImageStatistics.maxAbs(featureImg));
 			gui.addImage(b,String.format("Scale %6.2f",scale));
 
 			final int progressStatus = i+1;

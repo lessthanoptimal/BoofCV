@@ -19,7 +19,7 @@
 package boofcv.abst.filter.derivative;
 
 import boofcv.alg.filter.derivative.GradientThree;
-import boofcv.core.image.GeneralizedImageOps;
+import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.ImageGenerator;
 import boofcv.core.image.inst.SingleBandGenerator;
 import boofcv.factory.filter.derivative.FactoryDerivative;
@@ -54,7 +54,7 @@ public class TestAnyImageDerivative {
 		alg.getDerivative(true);
 
 		ImageFloat32 smaller = new ImageFloat32(width-5,height-5);
-		GeneralizedImageOps.randomize(smaller,rand,0,40);
+		GImageMiscOps.fillUniform(smaller, rand, 0, 40);
 
 		// assume that if it can't handle variable sized inputs then an exception is thrown
 		alg.setInput(smaller);
@@ -74,7 +74,7 @@ public class TestAnyImageDerivative {
 		ImageFloat32 derivYYX = new ImageFloat32(width,height);
 		ImageFloat32 derivYYY = new ImageFloat32(width,height);
 
-		GeneralizedImageOps.randomize(original,rand,0,40);
+		GImageMiscOps.fillUniform(original, rand, 0, 40);
 		g.process(original,derivX,derivY);
 		g.process(derivX,derivXX,derivXY);
 		g.process(derivY,derivYX,derivYY);

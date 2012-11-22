@@ -20,12 +20,12 @@ package boofcv.alg.feature.disparity.impl;
 
 import boofcv.alg.feature.disparity.DisparitySelect;
 import boofcv.alg.feature.disparity.SelectRectStandard;
+import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.ImageSingleBand;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 
 /**
  * Unit tests for implementers of {@Link SelectRectStandardBase_S32}
@@ -55,7 +55,7 @@ public abstract class ChecksSelectRectStandardBase<ArrayData,T extends ImageSing
 		this.minDisparity = min;
 		this.maxDisparity = max;
 		this.reject = (max-min)+1;
-		GeneralizedImageOps.fill(disparity,reject);
+		GImageMiscOps.fill(disparity, reject);
 	}
 
 	public abstract SelectRectStandard<ArrayData,T> createSelector( int maxError, int rightToLeftTolerance, double texture );

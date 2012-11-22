@@ -19,6 +19,7 @@
 package boofcv.alg.feature.disparity.impl;
 
 import boofcv.alg.feature.disparity.DisparitySelect;
+import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageUInt8;
@@ -78,8 +79,8 @@ public class TestImplDisparityScoreSadRectFive_F32 {
 		ImageUInt8 left = new ImageUInt8(w,h);
 		ImageUInt8 right = new ImageUInt8(w,h);
 
-		GeneralizedImageOps.randomize(left,rand,0,20);
-		GeneralizedImageOps.randomize(right,rand,0,20);
+		GImageMiscOps.fillUniform(left, rand, 0, 20);
+		GImageMiscOps.fillUniform(right, rand, 0, 20);
 
 		int radiusX = 3;
 		int radiusY = 2;

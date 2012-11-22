@@ -22,7 +22,7 @@ import boofcv.abst.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.alg.filter.derivative.GradientSobel;
 import boofcv.alg.filter.derivative.GradientThree;
 import boofcv.alg.filter.derivative.HessianFromGradient;
-import boofcv.alg.misc.ImageTestingOps;
+import boofcv.alg.misc.ImageMiscOps;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.factory.feature.detect.interest.FactoryDetectPoint;
 import boofcv.gui.image.ShowImages;
@@ -115,7 +115,7 @@ public class BenchmarkCornerAccuracy {
 		addRectangle(g2, tran, -120, 200, 60, 40);
 
 		ConvertBufferedImage.convertFrom(workImg, image);
-		ImageTestingOps.addUniform(image, rand, -2, 2);
+		ImageMiscOps.addUniform(image, rand, -2, 2);
 		GradientSobel.process(image, derivX, derivY, BoofDefaults.DERIV_BORDER_I32);
 	}
 

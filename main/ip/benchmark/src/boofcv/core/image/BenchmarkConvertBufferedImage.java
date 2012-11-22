@@ -18,6 +18,7 @@
 
 package boofcv.core.image;
 
+import boofcv.alg.misc.GImageMiscOps;
 import boofcv.misc.PerformerBase;
 import boofcv.misc.ProfileOperation;
 import boofcv.struct.image.ImageBase;
@@ -109,9 +110,9 @@ public class BenchmarkConvertBufferedImage {
 		imgInt8 = new ImageUInt8(imgWidth,imgHeight);
 		multiInt8 = new MultiSpectral<ImageUInt8>(ImageUInt8.class,imgWidth,imgHeight,3);
 		
-		GeneralizedImageOps.randomize(imgInt8,rand,0,100);
+		GImageMiscOps.fillUniform(imgInt8, rand, 0, 100);
 		for( int i = 0; i < multiInt8.getNumBands(); i++ )
-			GeneralizedImageOps.randomize(multiInt8.getBand(0),rand,0,100);
+			GImageMiscOps.fillUniform(multiInt8.getBand(0), rand, 0, 100);
 
 		System.out.println("=========  Profiling for ImageUInt8 ==========");
 		System.out.println();

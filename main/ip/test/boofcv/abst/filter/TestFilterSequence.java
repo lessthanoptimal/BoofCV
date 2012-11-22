@@ -19,7 +19,7 @@
 package boofcv.abst.filter;
 
 import boofcv.alg.filter.convolve.ConvolveImageNoBorder;
-import boofcv.alg.misc.ImageTestingOps;
+import boofcv.alg.misc.ImageMiscOps;
 import boofcv.core.image.border.BorderType;
 import boofcv.factory.filter.convolve.FactoryConvolve;
 import boofcv.factory.filter.kernel.FactoryKernel;
@@ -54,7 +54,7 @@ public class TestFilterSequence {
 		Kernel1D_F32 ker3 = FactoryKernel.random1D_F32(radius+2,0,5,rand);
 
 		ImageFloat32 input = new ImageFloat32(width,height);
-		ImageTestingOps.randomize(input,rand,0,10);
+		ImageMiscOps.fillUniform(input,rand,0,10);
 		ImageFloat32 found = new ImageFloat32(width,height);
 		ImageFloat32 expected = new ImageFloat32(width,height);
 

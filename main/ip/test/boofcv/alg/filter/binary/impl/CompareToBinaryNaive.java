@@ -18,7 +18,7 @@
 
 package boofcv.alg.filter.binary.impl;
 
-import boofcv.alg.misc.ImageTestingOps;
+import boofcv.alg.misc.ImageMiscOps;
 import boofcv.struct.image.ImageUInt8;
 import boofcv.testing.CompareIdenticalFunctions;
 
@@ -45,7 +45,7 @@ public class CompareToBinaryNaive extends CompareIdenticalFunctions {
 		ImageUInt8 input = new ImageUInt8(width, height);
 		ImageUInt8 output = new ImageUInt8(width, height);
 
-		ImageTestingOps.randomize(input, rand, 0, 1);
+		ImageMiscOps.fillUniform(input, rand, 0, 1);
 
 		return new Object[][]{{input, output}};
 	}

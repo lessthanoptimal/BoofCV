@@ -19,9 +19,9 @@
 package boofcv.alg.filter.convolve;
 
 import boofcv.alg.filter.convolve.border.CompareImageBorder;
+import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.FactoryGImageSingleBand;
 import boofcv.core.image.GImageSingleBand;
-import boofcv.core.image.GeneralizedImageOps;
 import boofcv.core.image.border.BorderType;
 import boofcv.core.image.border.FactoryImageBorder;
 import boofcv.struct.image.ImageSingleBand;
@@ -115,7 +115,7 @@ public class TestConvolveWithBorder extends CompareImageBorder {
 		Object kernel = createKernel(paramTypes[0]);
 
 		ImageSingleBand src = ConvolutionTestHelper.createImage(validation.getParameterTypes()[1], width, height);
-		GeneralizedImageOps.randomize(src, rand, 0, 5);
+		GImageMiscOps.fillUniform(src, rand, 0, 5);
 		ImageSingleBand dst = ConvolutionTestHelper.createImage(validation.getParameterTypes()[2], width, height);
 
 		Object[][] ret = new Object[1][paramTypes.length];

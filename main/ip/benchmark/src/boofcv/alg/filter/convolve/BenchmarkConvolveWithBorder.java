@@ -18,7 +18,7 @@
 
 package boofcv.alg.filter.convolve;
 
-import boofcv.alg.misc.ImageTestingOps;
+import boofcv.alg.misc.ImageMiscOps;
 import boofcv.core.image.border.*;
 import boofcv.factory.filter.kernel.FactoryKernelGaussian;
 import boofcv.struct.convolve.Kernel1D_F32;
@@ -71,9 +71,9 @@ public class BenchmarkConvolveWithBorder extends SimpleBenchmark {
 		out_F32 = new ImageFloat32(imgWidth,imgHeight);
 
 		Random rand = new Random(234234);
-		ImageTestingOps.randomize(imgInt8,rand, 0, 100);
-		ImageTestingOps.randomize(imgInt16,rand,0,200);
-		ImageTestingOps.randomize(imgFloat32,rand,0,200);
+		ImageMiscOps.fillUniform(imgInt8,rand, 0, 100);
+		ImageMiscOps.fillUniform(imgInt16,rand,0,200);
+		ImageMiscOps.fillUniform(imgFloat32,rand,0,200);
 	}
 
 	@Override protected void setUp() throws Exception {

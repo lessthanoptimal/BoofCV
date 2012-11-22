@@ -26,11 +26,11 @@ package boofcv.struct;
  */
 public class GrowQueue_F32 {
 
-    public float queue[];
+    public float data[];
     public int size;
 
     public GrowQueue_F32( int maxSize ) {
-        queue = new float[ maxSize ];
+        data = new float[ maxSize ];
         this.size = 0;
     }
 
@@ -39,16 +39,16 @@ public class GrowQueue_F32 {
 	}
 
     public void push( float val ) {
-        if( size == queue.length ) {
+        if( size == data.length ) {
 			float temp[] = new float[ size * 2];
-			System.arraycopy(queue,0,temp,0,size);
-			queue = temp;
+			System.arraycopy(data,0,temp,0,size);
+			data = temp;
 		}
-		queue[size++] = val;
+		data[size++] = val;
     }
 
 	public float get( int index ) {
-		return queue[index];
+		return data[index];
 	}
 
 	public int getSize() {
@@ -56,6 +56,6 @@ public class GrowQueue_F32 {
 	}
 
     public float pop() {
-        return queue[--size];
+        return data[--size];
     }
 }

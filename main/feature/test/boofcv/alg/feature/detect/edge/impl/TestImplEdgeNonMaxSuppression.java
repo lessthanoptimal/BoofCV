@@ -18,8 +18,8 @@
 
 package boofcv.alg.feature.detect.edge.impl;
 
-import boofcv.alg.misc.ImageTestingOps;
-import boofcv.core.image.GeneralizedImageOps;
+import boofcv.alg.misc.GImageMiscOps;
+import boofcv.alg.misc.ImageMiscOps;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSInt8;
 import boofcv.testing.BoofTesting;
@@ -49,7 +49,7 @@ public class TestImplEdgeNonMaxSuppression {
 		for( int dir = -1; dir < 3; dir++ ) {
 			direction.set(1,1,dir);
 
-			GeneralizedImageOps.fill(intensity,0);
+			GImageMiscOps.fill(intensity, 0);
 			intensity.set(1,1,10);
 
 			// test suppress
@@ -92,7 +92,7 @@ public class TestImplEdgeNonMaxSuppression {
 		for( int dir = -3; dir < 5; dir++ ) {
 			direction.set(1,1,dir);
 
-			GeneralizedImageOps.fill(intensity,0);
+			GImageMiscOps.fill(intensity,0);
 			intensity.set(1,1,10);
 
 			// test suppress
@@ -132,8 +132,8 @@ public class TestImplEdgeNonMaxSuppression {
 		ImageFloat32 expected = new ImageFloat32(width,height);
 		ImageFloat32 found = new ImageFloat32(width,height);
 
-		ImageTestingOps.randomize(intensity,rand,0,100);
-		ImageTestingOps.randomize(direction,rand,-1,3);
+		ImageMiscOps.fillUniform(intensity, rand, 0, 100);
+		ImageMiscOps.fillUniform(direction, rand, -1, 3);
 
 		BoofTesting.checkSubImage(this,"inner4",true,intensity, direction, expected, found);
 	}
@@ -154,8 +154,8 @@ public class TestImplEdgeNonMaxSuppression {
 		ImageFloat32 expected = new ImageFloat32(width,height);
 		ImageFloat32 found = new ImageFloat32(width,height);
 
-		ImageTestingOps.randomize(intensity,rand,0,100);
-		ImageTestingOps.randomize(direction,rand,-3,5);
+		ImageMiscOps.fillUniform(intensity, rand, 0, 100);
+		ImageMiscOps.fillUniform(direction, rand, -3, 5);
 
 		BoofTesting.checkSubImage(this,"inner8",true,intensity, direction, expected, found);
 	}
@@ -176,8 +176,8 @@ public class TestImplEdgeNonMaxSuppression {
 		ImageFloat32 expected = new ImageFloat32(width,height);
 		ImageFloat32 found = new ImageFloat32(width,height);
 
-		ImageTestingOps.randomize(intensity,rand,0,100);
-		ImageTestingOps.randomize(direction,rand,-1,3);
+		ImageMiscOps.fillUniform(intensity, rand, 0, 100);
+		ImageMiscOps.fillUniform(direction, rand, -1, 3);
 
 		BoofTesting.checkSubImage(this,"border4",true,intensity, direction, expected, found);
 	}
@@ -197,8 +197,8 @@ public class TestImplEdgeNonMaxSuppression {
 		ImageFloat32 expected = new ImageFloat32(width,height);
 		ImageFloat32 found = new ImageFloat32(width,height);
 
-		ImageTestingOps.randomize(intensity,rand,0,100);
-		ImageTestingOps.randomize(direction,rand,-3,5);
+		ImageMiscOps.fillUniform(intensity, rand, 0, 100);
+		ImageMiscOps.fillUniform(direction, rand, -3, 5);
 
 		BoofTesting.checkSubImage(this,"border8",true,intensity, direction, expected, found);
 	}

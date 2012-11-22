@@ -18,14 +18,13 @@
 
 package boofcv.alg.feature.disparity.impl;
 
-import boofcv.core.image.GeneralizedImageOps;
+import boofcv.alg.misc.GImageMiscOps;
 import boofcv.struct.image.ImageUInt8;
 import org.junit.Test;
 
 import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
@@ -46,8 +45,8 @@ public class TestImplDisparitySparseScoreSadRect_U8 {
 		ImageUInt8 left = new ImageUInt8(w,h);
 		ImageUInt8 right = new ImageUInt8(w,h);
 
-		GeneralizedImageOps.randomize(left, rand, 0, 20);
-		GeneralizedImageOps.randomize(right,rand,0,20);
+		GImageMiscOps.fillUniform(left, rand, 0, 20);
+		GImageMiscOps.fillUniform(right, rand, 0, 20);
 
 		compareToDense(left, right, 0);
 		compareToDense(left, right, 2);

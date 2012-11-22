@@ -23,7 +23,7 @@ import boofcv.alg.filter.binary.impl.ImplBinaryBlobLabeling;
 import boofcv.alg.filter.binary.impl.ImplBinaryBorderOps;
 import boofcv.alg.filter.binary.impl.ImplBinaryInnerOps;
 import boofcv.alg.filter.binary.impl.LabelNode;
-import boofcv.alg.misc.ImageTestingOps;
+import boofcv.alg.misc.ImageMiscOps;
 import boofcv.core.image.border.ImageBorderValue;
 import boofcv.core.image.border.ImageBorder_I32;
 import boofcv.struct.FastQueue;
@@ -516,7 +516,7 @@ public class BinaryImageOps {
 	public static void clusterToBinary( List<List<Point2D_I32>> clusters ,
 										ImageUInt8 binary )
 	{
-		ImageTestingOps.fill(binary,0);
+		ImageMiscOps.fill(binary, 0);
 		
 		for( List<Point2D_I32> l : clusters ) {
 			for( Point2D_I32 p : l ) {

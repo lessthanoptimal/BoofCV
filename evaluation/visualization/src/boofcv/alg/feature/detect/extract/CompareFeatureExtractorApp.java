@@ -24,7 +24,7 @@ import boofcv.abst.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.abst.filter.derivative.AnyImageDerivative;
 import boofcv.alg.feature.detect.intensity.HessianBlobIntensity;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
-import boofcv.alg.misc.PixelMath;
+import boofcv.alg.misc.ImageStatistics;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.core.image.inst.FactoryImageGenerator;
 import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
@@ -153,9 +153,9 @@ public class CompareFeatureExtractorApp<T extends ImageSingleBand, D extends Ima
 
 		intensityAlg.process(grayImage, derivX, derivY, derivXX, derivYY, derivXY);
 		ImageFloat32 intensity = intensityAlg.getIntensity();
-		intensityImage = VisualizeImageData.colorizeSign(intensityAlg.getIntensity(), null, PixelMath.maxAbs(intensity));
+		intensityImage = VisualizeImageData.colorizeSign(intensityAlg.getIntensity(), null, ImageStatistics.maxAbs(intensity));
 
-		float max = PixelMath.maxAbs(intensity);
+		float max = ImageStatistics.maxAbs(intensity);
 		float threshold = max * thresholdFraction;
 
 		FeatureExtractor extractor = FactoryFeatureExtractor.nonmax(minSeparation, threshold, radius, true);

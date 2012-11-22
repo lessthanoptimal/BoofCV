@@ -20,7 +20,7 @@ package boofcv.abst.filter.derivative;
 
 import boofcv.abst.filter.ImageFunctionSparse;
 import boofcv.alg.filter.derivative.LaplacianEdge;
-import boofcv.core.image.GeneralizedImageOps;
+import boofcv.alg.misc.GImageMiscOps;
 import boofcv.factory.filter.derivative.FactoryDerivativeSparse;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSInt16;
@@ -45,7 +45,7 @@ public class TestFactoryDerivativeSparse {
 	public void laplacian_F32() {
 		ImageFloat32 input = new ImageFloat32(width,height);
 		ImageFloat32 expected = new ImageFloat32(width,height);
-		GeneralizedImageOps.randomize(input,rand,0,20);
+		GImageMiscOps.fillUniform(input, rand, 0, 20);
 
 		LaplacianEdge.process(input,expected);
 
@@ -61,7 +61,7 @@ public class TestFactoryDerivativeSparse {
 	public void laplacian_I() {
 		ImageUInt8 input = new ImageUInt8(width,height);
 		ImageSInt16 expected = new ImageSInt16(width,height);
-		GeneralizedImageOps.randomize(input,rand,0,20);
+		GImageMiscOps.fillUniform(input, rand, 0, 20);
 
 		LaplacianEdge.process(input,expected);
 

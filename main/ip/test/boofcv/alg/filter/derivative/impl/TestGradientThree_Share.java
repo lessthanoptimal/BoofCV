@@ -18,7 +18,7 @@
 
 package boofcv.alg.filter.derivative.impl;
 
-import boofcv.alg.misc.ImageTestingOps;
+import boofcv.alg.misc.ImageMiscOps;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.testing.BoofTesting;
 import org.junit.Test;
@@ -38,7 +38,7 @@ public class TestGradientThree_Share {
 	@Test
 	public void derivX_F32() {
 		ImageFloat32 img = new ImageFloat32(width, height);
-		ImageTestingOps.randomize(img, rand, 0f, 255f);
+		ImageMiscOps.fillUniform(img, rand, 0f, 255f);
 
 		ImageFloat32 derivX = new ImageFloat32(width, height);
 

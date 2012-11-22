@@ -20,20 +20,52 @@ package boofcv.struct.feature;
 
 import org.junit.Test;
 
-import static org.junit.Assert.fail;
+import java.util.Random;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Peter Abeles
  */
 public class TestSurfFeature {
 
+	Random rand = new Random(234);
+
 	@Test
 	public void setTo() {
-		fail("IMplement");
+
+		SurfFeature a = new SurfFeature(10);
+		a.laplacianPositive = true;
+		for( int i = 0; i < a.value.length; i++ )
+			a.value[i] = rand.nextDouble();
+
+		SurfFeature b = new SurfFeature(10);
+
+		b.setTo(a);
+
+		checkIdentical(a, b);
 	}
 
 	@Test
 	public void copy() {
-		fail("IMplement");
+		SurfFeature a = new SurfFeature(10);
+		a.laplacianPositive = true;
+		for( int i = 0; i < a.value.length; i++ )
+			a.value[i] = rand.nextDouble();
+
+		SurfFeature b = a.copy();
+
+		checkIdentical(a, b);
 	}
+
+	private void checkIdentical(SurfFeature a, SurfFeature b) {
+		assertTrue(a.laplacianPositive==b.laplacianPositive);
+		assertEquals(a.value.length,b.value.length);
+		for( int i = 0; i < a.value.length; i++ ) {
+			assertTrue(a.value[i] == b.value[i]);
+		}
+	}
+
+
 }

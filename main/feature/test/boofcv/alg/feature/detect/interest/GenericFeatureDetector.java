@@ -18,7 +18,7 @@
 
 package boofcv.alg.feature.detect.interest;
 
-import boofcv.core.image.GeneralizedImageOps;
+import boofcv.alg.misc.GImageMiscOps;
 import boofcv.struct.image.ImageFloat32;
 import georegression.geometry.UtilPoint2D_I32;
 import georegression.struct.point.Point2D_I32;
@@ -56,10 +56,10 @@ public abstract class GenericFeatureDetector {
 		ImageFloat32 input = new ImageFloat32(width,height);
 
 		// give it a bunch of features that any of the detectors should be able to see
-		GeneralizedImageOps.fillRectangle(input,100,10,10,15,15);
-		GeneralizedImageOps.fillRectangle(input,100,30,10,35,15);
-		GeneralizedImageOps.fillRectangle(input,100,10,30,15,35);
-		GeneralizedImageOps.fillRectangle(input,100,30,30,35,35);
+		GImageMiscOps.fillRectangle(input,100,10,10,15,15);
+		GImageMiscOps.fillRectangle(input, 100, 30, 10, 35, 15);
+		GImageMiscOps.fillRectangle(input,100,10,30,15,35);
+		GImageMiscOps.fillRectangle(input,100,30,30,35,35);
 
 		// limit it to "one" feature
 		Object alg = createDetector(1);
@@ -81,7 +81,7 @@ public abstract class GenericFeatureDetector {
 		ImageFloat32 input = new ImageFloat32(width,height);
 
 		// provide a rectangle and circular feature
-		GeneralizedImageOps.fillRectangle(input,20,5,5,25,25);
+		GImageMiscOps.fillRectangle(input,20,5,5,25,25);
 		drawCircle(input,10,10,r*2);
 
 		Object alg = createDetector(50);

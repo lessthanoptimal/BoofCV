@@ -18,7 +18,7 @@
 
 package boofcv.alg.feature.detect.grid.refine;
 
-import boofcv.alg.misc.ImageTestingOps;
+import boofcv.alg.misc.ImageMiscOps;
 import boofcv.struct.image.ImageFloat32;
 import georegression.struct.point.Point2D_F64;
 import org.junit.Test;
@@ -37,8 +37,8 @@ public class TestRefineCornerSegmentFit {
 	public void simpleCase() {
 		ImageFloat32 orig = new ImageFloat32(width,height);
 
-		ImageTestingOps.fillRectangle(orig, 210, 0, 0, width, height);
-		ImageTestingOps.fillRectangle(orig, 52, 20, 15, width, height);
+		ImageMiscOps.fillRectangle(orig, 210, 0, 0, width, height);
+		ImageMiscOps.fillRectangle(orig, 52, 20, 15, width, height);
 
 		RefineCornerSegmentFit alg = new RefineCornerSegmentFit();
 

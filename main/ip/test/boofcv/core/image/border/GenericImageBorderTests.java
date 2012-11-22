@@ -18,7 +18,7 @@
 
 package boofcv.core.image.border;
 
-import boofcv.alg.misc.ImageTestingOps;
+import boofcv.alg.misc.ImageMiscOps;
 import boofcv.core.image.FactoryGImageSingleBand;
 import boofcv.core.image.GImageSingleBand;
 import boofcv.struct.image.ImageFloat32;
@@ -58,7 +58,7 @@ public abstract class GenericImageBorderTests {
 	@Test
 	public void get_I8() {
 		ImageUInt8 imgA = new ImageUInt8(width,height);
-		ImageTestingOps.randomize(imgA,rand, 0, 100);
+		ImageMiscOps.fillUniform(imgA,rand, 0, 100);
 
 		ImageBorder_I32 fooA = wrap(imgA);
 
@@ -71,7 +71,7 @@ public abstract class GenericImageBorderTests {
 	@Test
 	public void get_F32() {
 		ImageFloat32 imgA = new ImageFloat32(width,height);
-		ImageTestingOps.randomize(imgA,rand,0,5);
+		ImageMiscOps.fillUniform(imgA,rand,0,5);
 
 		ImageBorder_F32 fooA = wrap(imgA);
 
@@ -106,7 +106,7 @@ public abstract class GenericImageBorderTests {
 	@Test
 	public void set_I8() {
 		ImageUInt8 imgA = new ImageUInt8(width,height);
-		ImageTestingOps.randomize(imgA,rand, 0, 100);
+		ImageMiscOps.fillUniform(imgA,rand, 0, 100);
 
 		ImageBorder_I32 fooA = wrap(imgA);
 
@@ -119,7 +119,7 @@ public abstract class GenericImageBorderTests {
 	@Test
 	public void set_F32() {
 		ImageFloat32 imgA = new ImageFloat32(width,height);
-		ImageTestingOps.randomize(imgA,rand,0,5);
+		ImageMiscOps.fillUniform(imgA,rand,0,5);
 
 		ImageBorder_F32 fooA = wrap(imgA);
 

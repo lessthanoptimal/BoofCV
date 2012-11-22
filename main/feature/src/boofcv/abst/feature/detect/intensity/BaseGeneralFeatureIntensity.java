@@ -18,7 +18,7 @@
 
 package boofcv.abst.feature.detect.intensity;
 
-import boofcv.core.image.GeneralizedImageOps;
+import boofcv.alg.misc.GImageMiscOps;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 
@@ -37,7 +37,7 @@ public abstract class BaseGeneralFeatureIntensity <I extends ImageSingleBand, D 
 		if( intensity.width != width || intensity.height != height ) {
 			intensity.reshape(width,height);
 			// zero the image to make sure it's borders values are zero
-			GeneralizedImageOps.fill(intensity, 0);
+			GImageMiscOps.fill(intensity, 0);
 		}
 	}
 

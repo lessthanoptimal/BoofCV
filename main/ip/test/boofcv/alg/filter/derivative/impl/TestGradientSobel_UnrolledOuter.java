@@ -18,7 +18,7 @@
 
 package boofcv.alg.filter.derivative.impl;
 
-import boofcv.alg.misc.ImageTestingOps;
+import boofcv.alg.misc.ImageMiscOps;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSInt16;
 import boofcv.struct.image.ImageUInt8;
@@ -45,7 +45,7 @@ public class TestGradientSobel_UnrolledOuter {
 			for( int offX = 0; offX < 3; offX++ ) {
 				int w = width+offX; int h = height+offY;
 				ImageUInt8 img = new ImageUInt8(w, h);
-				ImageTestingOps.randomize(img, new Random(0xfeed), 0, 100);
+				ImageMiscOps.fillUniform(img, new Random(0xfeed), 0, 100);
 
 				ImageSInt16 derivX = new ImageSInt16(w, h);
 				ImageSInt16 derivY = new ImageSInt16(w, h);
@@ -72,7 +72,7 @@ public class TestGradientSobel_UnrolledOuter {
 				int w = width+offX; int h = height+offY;
 
 				ImageFloat32 img = new ImageFloat32(w, h);
-				ImageTestingOps.randomize(img, rand, 0f, 255f);
+				ImageMiscOps.fillUniform(img, rand, 0f, 255f);
 
 				ImageFloat32 derivX = new ImageFloat32(w, h);
 				ImageFloat32 derivY = new ImageFloat32(w, h);
@@ -95,7 +95,7 @@ public class TestGradientSobel_UnrolledOuter {
 			for( int offX = 0; offX < 3; offX++ ) {
 				int w = width+offX; int h = height+offY;
 				ImageFloat32 img = new ImageFloat32(w, h);
-				ImageTestingOps.randomize(img, rand, 0f, 255f);
+				ImageMiscOps.fillUniform(img, rand, 0f, 255f);
 
 				ImageFloat32 derivX = new ImageFloat32(w, h);
 				ImageFloat32 derivY = new ImageFloat32(w, h);

@@ -18,8 +18,9 @@
 
 package boofcv.struct.gss;
 
+import boofcv.alg.misc.GImageMiscOps;
+import boofcv.alg.misc.GImageStatistics;
 import boofcv.alg.transform.gss.ScaleSpacePyramid;
-import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.ImageFloat32;
 import org.junit.Test;
 
@@ -49,14 +50,14 @@ public class TestScaleSpacePyramid {
 		ScaleSpacePyramid<ImageFloat32> ss = new ScaleSpacePyramid<ImageFloat32>(ImageFloat32.class,1,2,3,4);
 
 		ImageFloat32 input = new ImageFloat32(width,height);
-		GeneralizedImageOps.randomize(input,rand,0,100);
+		GImageMiscOps.fillUniform(input, rand, 0, 100);
 
 		ss.setImage(input);
 
 		assertEquals(4,ss.getNumLayers());
 
 		for( int i = 0; i < 4; i++ ) {
-			assertTrue(GeneralizedImageOps.sum(ss.getLayer(i))>0);
+			assertTrue(GImageStatistics.sum(ss.getLayer(i))>0);
 		}
 	}
 }

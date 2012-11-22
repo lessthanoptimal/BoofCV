@@ -19,6 +19,7 @@
 package boofcv.abst.feature.detect.line;
 
 
+import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.testing.BoofTesting;
@@ -77,7 +78,7 @@ public abstract class GeneralDetectLineTests {
 	private <T extends ImageSingleBand> void obviousLine( Class<T> imageType ) {
 		T input = GeneralizedImageOps.createSingleBand(imageType, width, height);
 
-		GeneralizedImageOps.fillRectangle(input,30,0,0,lineLocation,height);
+		GImageMiscOps.fillRectangle(input, 30, 0, 0, lineLocation, height);
 
 		DetectLine<T> alg = createAlg(imageType);
 
@@ -106,7 +107,7 @@ public abstract class GeneralDetectLineTests {
 	private <T extends ImageSingleBand> void subImages( Class<T> imageType ) {
 		T input = GeneralizedImageOps.createSingleBand(imageType, width, height);
 
-		GeneralizedImageOps.fillRectangle(input,30,0,0,lineLocation,height);
+		GImageMiscOps.fillRectangle(input,30,0,0,lineLocation,height);
 		T sub = BoofTesting.createSubImageOf(input);
 
 		List<LineParametric2D_F32> foundA = createAlg(imageType).detect(input);

@@ -21,10 +21,10 @@ package boofcv.alg.feature.describe;
 import boofcv.abst.filter.blur.BlurFilter;
 import boofcv.alg.feature.describe.brief.BriefDefinition_I32;
 import boofcv.alg.feature.describe.brief.FactoryBriefDefinition;
+import boofcv.alg.misc.GImageMiscOps;
 import boofcv.alg.misc.GPixelMath;
 import boofcv.core.image.FactoryGImageSingleBand;
 import boofcv.core.image.GImageSingleBand;
-import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.feature.describe.FactoryDescribePointAlgs;
 import boofcv.factory.filter.blur.FactoryBlurFilter;
 import boofcv.struct.feature.TupleDesc_B;
@@ -56,7 +56,7 @@ public class TestDescribePointBriefSO {
 
 	protected  ImageFloat32 createImage( int width , int height ) {
 		ImageFloat32 ret = new ImageFloat32(width,height);
-		GeneralizedImageOps.randomize(ret,rand,0,50);
+		GImageMiscOps.fillUniform(ret, rand, 0, 50);
 		return ret;
 	}
 
@@ -164,7 +164,7 @@ public class TestDescribePointBriefSO {
 		ImageFloat32 input = createImage(width,height);
 		ImageFloat32 mod = input.clone();
 
-		GPixelMath.multiply(input, mod, 2);
+		GPixelMath.multiply(input, 2, mod);
 
 		DescribePointBriefSO<ImageFloat32> alg = createAlg();
 

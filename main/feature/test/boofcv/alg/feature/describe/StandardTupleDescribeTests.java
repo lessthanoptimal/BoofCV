@@ -18,7 +18,7 @@
 
 package boofcv.alg.feature.describe;
 
-import boofcv.core.image.GeneralizedImageOps;
+import boofcv.alg.misc.GImageMiscOps;
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.testing.BoofTesting;
@@ -47,7 +47,7 @@ public abstract class StandardTupleDescribeTests {
 	ImageFloat32 image = new ImageFloat32(width,height);
 
 	public StandardTupleDescribeTests() {
-		GeneralizedImageOps.randomize(image,rand,0,100);
+		GImageMiscOps.fillUniform(image, rand, 0, 100);
 	}
 
 	public abstract TupleDesc_F64 describe( int x , int y , double theta , ImageFloat32 image );

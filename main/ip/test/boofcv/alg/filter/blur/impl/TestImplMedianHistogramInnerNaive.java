@@ -18,7 +18,7 @@
 
 package boofcv.alg.filter.blur.impl;
 
-import boofcv.alg.misc.ImageTestingOps;
+import boofcv.alg.misc.ImageMiscOps;
 import boofcv.struct.image.ImageUInt8;
 import boofcv.testing.BoofTesting;
 import org.junit.Test;
@@ -33,7 +33,7 @@ public class TestImplMedianHistogramInnerNaive {
 	@Test
 	public void compareToSort() {
 		ImageUInt8 image = new ImageUInt8(20,30);
-		ImageTestingOps.randomize(image,new Random(234), 0, 100);
+		ImageMiscOps.fillUniform(image,new Random(234), 0, 100);
 
 		ImageUInt8 found = new ImageUInt8( image.width , image.height );
 		ImageUInt8 expected = new ImageUInt8( image.width , image.height );

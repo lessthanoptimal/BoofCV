@@ -43,6 +43,7 @@ public enum AutoTypeImage {
 	private String dataType;
 	private String bitWise;
 	private String sumType;
+	private String largeSumType;
 	private boolean isInteger;
 	private boolean isSigned;
 	private int numBits;
@@ -66,6 +67,11 @@ public enum AutoTypeImage {
 					sumType = "int";
 				else
 					sumType = "long";
+				if( numBits <= 16 )
+					largeSumType = "int";
+				else
+					largeSumType = "long";
+
 				if( !img.getTypeInfo().isSigned() ) {
 					abbreviatedType = "U";
 					isSigned = false;
@@ -78,6 +84,7 @@ public enum AutoTypeImage {
 					abbreviatedType = "S";
 					isSigned = true;
 				}
+
 			} else {
 				abbreviatedType = "F";
 				isSigned = true;
@@ -87,6 +94,7 @@ public enum AutoTypeImage {
 				} else {
 					sumType = "double";
 				}
+				largeSumType = "double";
 			}
 
 			abbreviatedType += numBits;
@@ -156,6 +164,10 @@ public enum AutoTypeImage {
 
 	public String getSumType() {
 		return sumType;
+	}
+
+	public String getLargeSumType() {
+		return largeSumType;
 	}
 
 	public boolean isInteger() {

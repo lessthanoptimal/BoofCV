@@ -66,7 +66,7 @@ public class RefineCornerCanny {
 		List<List<Point2D_I32>> edges = detectEdge.getContours();
 
 //		ImageUInt8 binary = new ImageUInt8(1,1);
-//		GeneralizedImageOps.fill(binary,0);
+//		GImageMiscOps.fill(binary,0);
 		
 		List<Point2D_I32> all = new ArrayList<Point2D_I32>();
 		

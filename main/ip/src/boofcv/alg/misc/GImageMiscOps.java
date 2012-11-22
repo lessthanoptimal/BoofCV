@@ -1,0 +1,201 @@
+/*
+ * Copyright (c) 2011-2012, Peter Abeles. All Rights Reserved.
+ *
+ * This file is part of BoofCV (http://boofcv.org).
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package boofcv.alg.misc;
+
+import boofcv.struct.image.*;
+
+import java.util.Random;
+
+/**
+ * @author Peter Abeles
+ */
+public class GImageMiscOps {
+
+	/**
+	 * Computes the mean of the absolute value of the difference between the two images.
+	 *
+	 * @param input Input image. Not modified.
+	 * @param value fill value
+	 */
+	public static void fill( ImageBase input , double value ) {
+		if( input instanceof ImageSingleBand ) {
+			if( ImageInt8.class.isAssignableFrom(input.getClass()) ) {
+				ImageMiscOps.fill((ImageInt8)input,(int)value);
+			} else if( ImageInt16.class.isAssignableFrom(input.getClass()) ) {
+				ImageMiscOps.fill((ImageInt16)input,(int)value);
+			} else if( ImageSInt32.class == input.getClass() ) {
+				ImageMiscOps.fill((ImageSInt32)input,(int)value);
+			} else if( ImageSInt64.class == input.getClass() ) {
+				ImageMiscOps.fill((ImageSInt64)input,(long)value);
+			} else if( ImageFloat32.class == input.getClass() ) {
+				ImageMiscOps.fill((ImageFloat32)input,(float)value);
+			} else if( ImageFloat64.class == input.getClass() ) {
+				ImageMiscOps.fill((ImageFloat64)input,value);
+			} else {
+				throw new IllegalArgumentException("Unknown image Type: "+input.getClass().getSimpleName());
+			}
+		} else if( input instanceof MultiSpectral ) {
+			MultiSpectral m = (MultiSpectral)input;
+			for( int i = 0; i < m.getNumBands(); i++ )
+				fill(m.getBand(i),value);
+		} else {
+			throw new IllegalArgumentException("Unknown image type: " + input.getClass().getSimpleName());
+		}
+	}
+
+	public static void fillRectangle( ImageBase input , double value, int x0, int y0, int width, int height ) {
+		if( input instanceof ImageSingleBand ) {
+			if( ImageInt8.class.isAssignableFrom(input.getClass()) ) {
+				ImageMiscOps.fillRectangle((ImageInt8)input,(int)value,x0,y0,width,height);
+			} else if( ImageInt16.class.isAssignableFrom(input.getClass()) ) {
+				ImageMiscOps.fillRectangle((ImageInt16)input,(int)value,x0,y0,width,height);
+			} else if( ImageSInt32.class == input.getClass() ) {
+				ImageMiscOps.fillRectangle((ImageSInt32)input,(int)value,x0,y0,width,height);
+			} else if( ImageSInt64.class == input.getClass() ) {
+				ImageMiscOps.fillRectangle((ImageSInt64)input,(long)value,x0,y0,width,height);
+			} else if( ImageFloat32.class == input.getClass() ) {
+				ImageMiscOps.fillRectangle((ImageFloat32)input,(float)value,x0,y0,width,height);
+			} else if( ImageFloat64.class == input.getClass() ) {
+				ImageMiscOps.fillRectangle((ImageFloat64)input,value,x0,y0,width,height);
+			} else {
+				throw new IllegalArgumentException("Unknown image Type: "+input.getClass().getSimpleName());
+			}
+		} else if( input instanceof MultiSpectral ) {
+			MultiSpectral m = (MultiSpectral)input;
+			for( int i = 0; i < m.getNumBands(); i++ )
+				fillRectangle(m.getBand(i),value,x0,y0,width,height);
+		} else {
+			throw new IllegalArgumentException("Unknown image type: " + input.getClass().getSimpleName());
+		}
+	}
+
+	public static void fillUniform( ImageBase input , Random rand , double min , double max  ) {
+		if( input instanceof ImageSingleBand ) {
+			if( ImageInt8.class.isAssignableFrom(input.getClass()) ) {
+				ImageMiscOps.fillUniform((ImageInt8) input, rand, (int) min, (int) max);
+			} else if( ImageInt16.class.isAssignableFrom(input.getClass()) ) {
+				ImageMiscOps.fillUniform((ImageInt16) input, rand, (int) min, (int) max);
+			} else if( ImageSInt32.class == input.getClass() ) {
+				ImageMiscOps.fillUniform((ImageSInt32) input, rand, (int) min, (int) max);
+			} else if( ImageSInt64.class == input.getClass() ) {
+				ImageMiscOps.fillUniform((ImageSInt64) input, rand, (long) min, (long) max);
+			} else if( ImageFloat32.class == input.getClass() ) {
+				ImageMiscOps.fillUniform((ImageFloat32) input, rand, (float)min, (float) max);
+			} else if( ImageFloat64.class == input.getClass() ) {
+				ImageMiscOps.fillUniform((ImageFloat64) input, rand, min,  max);
+			} else {
+				throw new IllegalArgumentException("Unknown image Type: "+input.getClass().getSimpleName());
+			}
+		} else if( input instanceof MultiSpectral ) {
+			MultiSpectral m = (MultiSpectral)input;
+			for( int i = 0; i < m.getNumBands(); i++ )
+				fillUniform(m.getBand(i), rand , min, max);
+		} else {
+			throw new IllegalArgumentException("Unknown image type: " + input.getClass().getSimpleName());
+		}
+	}
+
+	public static void addGaussian( ImageBase input, Random rand , double sigma ,
+									double lowerBound , double upperBound  )
+	{
+		if( input instanceof ImageSingleBand ) {
+			if( ImageUInt8.class == input.getClass() ) {
+				ImageMiscOps.addGaussian((ImageUInt8) input, rand, sigma, (int) lowerBound, (int) upperBound);
+			} else if( ImageSInt8.class == input.getClass() ) {
+				ImageMiscOps.addGaussian((ImageSInt8) input, rand, sigma, (int) lowerBound, (int) upperBound);
+			} else if( ImageUInt16.class == input.getClass() ) {
+				ImageMiscOps.addGaussian((ImageUInt16) input, rand, sigma, (int) lowerBound, (int) upperBound);
+			} else if( ImageSInt16.class == input.getClass() ) {
+				ImageMiscOps.addGaussian((ImageSInt16) input, rand, sigma, (int) lowerBound, (int) upperBound);
+			} else if( ImageSInt32.class == input.getClass() ) {
+				ImageMiscOps.addGaussian((ImageSInt32) input, rand, sigma, (int) lowerBound, (int) upperBound);
+			} else if( ImageSInt64.class == input.getClass() ) {
+				ImageMiscOps.addGaussian((ImageSInt64) input, rand, sigma, (long) lowerBound, (long) upperBound);
+			} else if( ImageFloat32.class == input.getClass() ) {
+				ImageMiscOps.addGaussian((ImageFloat32) input, rand, sigma, (float) lowerBound, (float) upperBound);
+			} else if( ImageFloat64.class == input.getClass() ) {
+				ImageMiscOps.addGaussian((ImageFloat64) input, rand, sigma, lowerBound, upperBound);
+			} else {
+				throw new IllegalArgumentException("Unknown image Type: "+input.getClass().getSimpleName());
+			}
+		} else if( input instanceof MultiSpectral ) {
+			MultiSpectral m = (MultiSpectral)input;
+			for( int i = 0; i < m.getNumBands(); i++ )
+				addGaussian(m.getBand(i), rand, sigma, lowerBound, upperBound);
+		} else {
+			throw new IllegalArgumentException("Unknown image type: " + input.getClass().getSimpleName());
+		}
+	}
+
+	public static void addUniform( ImageBase input, Random rand , double min , double max  ) {
+		if( input instanceof ImageSingleBand ) {
+			if( ImageUInt8.class == input.getClass() ) {
+				ImageMiscOps.addUniform((ImageUInt8) input, rand, (int) min, (int) max);
+			} else if( ImageSInt8.class == input.getClass() ) {
+				ImageMiscOps.addUniform((ImageSInt8) input, rand, (int) min, (int) max);
+			} else if( ImageUInt16.class == input.getClass() ) {
+				ImageMiscOps.addUniform((ImageUInt16) input, rand, (int) min, (int) max);
+			} else if( ImageSInt16.class == input.getClass() ) {
+				ImageMiscOps.addUniform((ImageSInt16) input, rand, (int) min, (int) max);
+			} else if( ImageSInt32.class == input.getClass() ) {
+				ImageMiscOps.addUniform((ImageSInt32) input, rand, (int) min, (int) max);
+			} else if( ImageSInt64.class == input.getClass() ) {
+				ImageMiscOps.addUniform((ImageSInt64) input, rand, (long) min, (long) max);
+			} else if( ImageFloat32.class == input.getClass() ) {
+				ImageMiscOps.addUniform((ImageFloat32) input, rand, (float) min, (float) max);
+			} else if( ImageFloat64.class == input.getClass() ) {
+				ImageMiscOps.addUniform((ImageFloat64) input, rand, min, max);
+			} else {
+				throw new IllegalArgumentException("Unknown image Type: "+input.getClass().getSimpleName());
+			}
+		} else if( input instanceof MultiSpectral ) {
+			MultiSpectral m = (MultiSpectral)input;
+			for( int i = 0; i < m.getNumBands(); i++ )
+				addUniform(m.getBand(i), rand, min, max);
+		} else {
+			throw new IllegalArgumentException("Unknown image type: " + input.getClass().getSimpleName());
+		}
+	}
+
+	public static void flipVertical( ImageBase img ) {
+		if( img instanceof ImageSingleBand ) {
+			if( ImageInt8.class.isAssignableFrom(img.getClass()) ) {
+				ImageMiscOps.flipVertical((ImageInt8)img);
+			} else if( ImageInt16.class.isAssignableFrom(img.getClass()) ) {
+				ImageMiscOps.flipVertical((ImageInt16)img);
+			} else if ( ImageSInt32.class.isAssignableFrom(img.getClass()) ) {
+				ImageMiscOps.flipVertical((ImageSInt32)img);
+			} else if ( ImageSInt64.class.isAssignableFrom(img.getClass()) ) {
+				ImageMiscOps.flipVertical((ImageSInt64)img);
+			} else if (ImageFloat32.class.isAssignableFrom(img.getClass()) ) {
+				ImageMiscOps.flipVertical((ImageFloat32)img);
+			} else if (ImageFloat64.class.isAssignableFrom(img.getClass()) ) {
+				ImageMiscOps.flipVertical((ImageFloat64)img);
+			} else {
+				throw new IllegalArgumentException("Unknown or incompatible image type: " + img.getClass().getSimpleName());
+			}
+		} else if( img instanceof MultiSpectral ) {
+			MultiSpectral m = (MultiSpectral)img;
+			for( int i = 0; i < m.getNumBands(); i++ )
+				flipVertical(m.getBand(i));
+		} else {
+			throw new IllegalArgumentException("Unknown image type: " + img.getClass().getSimpleName());
+		}
+	}
+}

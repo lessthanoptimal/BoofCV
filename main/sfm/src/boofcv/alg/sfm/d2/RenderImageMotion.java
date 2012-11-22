@@ -23,6 +23,7 @@ import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.distort.impl.DistortSupport;
 import boofcv.alg.interpolate.InterpolatePixel;
 import boofcv.alg.interpolate.TypeInterpolate;
+import boofcv.alg.misc.GImageMiscOps;
 import boofcv.alg.misc.GPixelMath;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.core.image.GeneralizedImageOps;
@@ -142,7 +143,7 @@ public class RenderImageMotion<I extends ImageSingleBand, O extends ImageBase> {
 	 */
 	public synchronized void distortMosaic( PixelTransform_F32 oldToNew ) {
 		distorter.setModel(oldToNew);
-		GeneralizedImageOps.fill(tempMosaic,0);
+		GImageMiscOps.fill(tempMosaic,0);
 		distorter.apply(imageMosaic, tempMosaic);
 
 		// swap the two images
@@ -162,7 +163,7 @@ public class RenderImageMotion<I extends ImageSingleBand, O extends ImageBase> {
 	 * Makes the mosaic all black.
 	 */
 	public void clear() {
-		GeneralizedImageOps.fill(imageMosaic,0);
+		GImageMiscOps.fill(imageMosaic, 0);
 	}
 
 	/**

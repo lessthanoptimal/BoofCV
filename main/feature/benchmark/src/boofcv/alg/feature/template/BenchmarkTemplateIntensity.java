@@ -19,6 +19,7 @@
 package boofcv.alg.feature.template;
 
 import boofcv.alg.feature.detect.template.TemplateMatchingIntensity;
+import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.feature.detect.template.FactoryTemplateMatching;
 import boofcv.factory.feature.detect.template.TemplateScoreType;
@@ -50,8 +51,8 @@ public class BenchmarkTemplateIntensity<T extends ImageSingleBand> {
 		image = GeneralizedImageOps.createSingleBand(imageType,width,height);
 		template = GeneralizedImageOps.createSingleBand(imageType,20,30);
 
-		GeneralizedImageOps.randomize(image,rand,0,200);
-		GeneralizedImageOps.randomize(template,rand,0,200);
+		GImageMiscOps.fillUniform(image, rand, 0, 200);
+		GImageMiscOps.fillUniform(template, rand, 0, 200);
 	}
 
 	public class TemplatePerformer implements Performer {

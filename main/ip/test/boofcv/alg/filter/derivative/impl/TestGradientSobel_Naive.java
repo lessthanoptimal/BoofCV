@@ -18,7 +18,7 @@
 
 package boofcv.alg.filter.derivative.impl;
 
-import boofcv.alg.misc.ImageTestingOps;
+import boofcv.alg.misc.ImageMiscOps;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSInt16;
 import boofcv.struct.image.ImageUInt8;
@@ -45,7 +45,7 @@ public class TestGradientSobel_Naive {
 	@Test
 	public void compareToKnown_I8() {
 		ImageUInt8 img = new ImageUInt8(width, height);
-		ImageTestingOps.randomize(img, rand, 0, 100);
+		ImageMiscOps.fillUniform(img, rand, 0, 100);
 
 		ImageSInt16 derivX = new ImageSInt16(width, height);
 		ImageSInt16 derivY = new ImageSInt16(width, height);
@@ -72,7 +72,7 @@ public class TestGradientSobel_Naive {
 	@Test
 	public void compareToKnown_F32() {
 		ImageFloat32 img = new ImageFloat32(width, height);
-		ImageTestingOps.randomize(img, rand, 0, 255);
+		ImageMiscOps.fillUniform(img, rand, 0, 255);
 
 		ImageFloat32 derivX = new ImageFloat32(width, height);
 		ImageFloat32 derivY = new ImageFloat32(width, height);

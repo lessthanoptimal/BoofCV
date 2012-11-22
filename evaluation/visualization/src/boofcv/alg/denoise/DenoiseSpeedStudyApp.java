@@ -18,7 +18,7 @@
 
 package boofcv.alg.denoise;
 
-import boofcv.alg.misc.ImageTestingOps;
+import boofcv.alg.misc.ImageMiscOps;
 import boofcv.misc.Performer;
 import boofcv.misc.ProfileOperation;
 import boofcv.struct.image.ImageFloat32;
@@ -67,7 +67,7 @@ public class DenoiseSpeedStudyApp {
 
 	public void process( List<TestItem> filters ) {
 
-		ImageTestingOps.randomize(image,rand,0,20);
+		ImageMiscOps.fillUniform(image,rand,0,20);
 
 		for( TestItem i : filters ) {
 			System.out.print("-");

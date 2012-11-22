@@ -1,6 +1,6 @@
 package boofcv.alg.sfm;
 
-import boofcv.alg.misc.PixelMath;
+import boofcv.alg.misc.ImageStatistics;
 import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.image.ImageUInt8;
 import georegression.struct.point.Point2D_F64;
@@ -68,7 +68,7 @@ public class TestStereoProcessingBase {
 	public static Point2D_F64 centroid( ImageUInt8 image ) {
 		double meanX = 0;
 		double meanY = 0;
-		double totalPixel = PixelMath.sum(image);
+		double totalPixel = ImageStatistics.sum(image);
 
 		for( int i = 0; i < image.height; i++ ) {
 			for( int j = 0; j < image.width; j++ ) {

@@ -18,7 +18,7 @@
 
 package boofcv;
 
-import boofcv.alg.misc.ImageTestingOps;
+import boofcv.alg.misc.ImageMiscOps;
 import boofcv.misc.PerformerBase;
 import boofcv.misc.ProfileOperation;
 import boofcv.struct.image.ImageFloat32;
@@ -141,7 +141,7 @@ public class AreGenericsSlower {
 	}
 
 	public void performTest() {
-		ImageTestingOps.randomize(image,rand,0,100);
+		ImageMiscOps.fillUniform(image,rand,0,100);
 
 		System.out.println("=========  Profile Image Size " + width + " x " + height + " ==========");
 		System.out.println();

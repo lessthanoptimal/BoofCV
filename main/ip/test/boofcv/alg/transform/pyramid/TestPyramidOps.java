@@ -20,7 +20,7 @@ package boofcv.alg.transform.pyramid;
 
 import boofcv.abst.filter.FilterImageInterface;
 import boofcv.abst.filter.derivative.ImageGradient;
-import boofcv.alg.misc.PixelMath;
+import boofcv.alg.misc.ImageStatistics;
 import boofcv.factory.filter.blur.FactoryBlurFilter;
 import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.struct.image.ImageFloat32;
@@ -52,7 +52,7 @@ public class TestPyramidOps {
 
 		for( int i = 0; i < scales.length; i++ ) {
 			ImageFloat32 input = in.getLayer(i);
-			assertTrue(PixelMath.sum(input)>0);
+			assertTrue(ImageStatistics.sum(input)>0);
 		}
 	}
 

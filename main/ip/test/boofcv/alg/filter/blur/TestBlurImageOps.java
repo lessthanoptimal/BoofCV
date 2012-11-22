@@ -20,8 +20,8 @@ package boofcv.alg.filter.blur;
 
 import boofcv.alg.filter.blur.impl.ImplMedianSortNaive;
 import boofcv.alg.filter.convolve.ConvolveNormalized;
-import boofcv.alg.misc.ImageTestingOps;
-import boofcv.core.image.GeneralizedImageOps;
+import boofcv.alg.misc.GImageMiscOps;
+import boofcv.alg.misc.ImageMiscOps;
 import boofcv.factory.filter.kernel.FactoryKernel;
 import boofcv.factory.filter.kernel.FactoryKernelGaussian;
 import boofcv.struct.convolve.Kernel1D_F32;
@@ -51,11 +51,11 @@ public class TestBlurImageOps {
 
 		ImageUInt8 storage = new ImageUInt8(width,height);
 
-		GeneralizedImageOps.randomize(input,rand,0,20);
+		GImageMiscOps.fillUniform(input, rand, 0, 20);
 
 		for( int radius = 1; radius <= 4; radius++ ) {
-			ImageTestingOps.fill(expected,0);
-			ImageTestingOps.fill(found,0);
+			ImageMiscOps.fill(expected,0);
+			ImageMiscOps.fill(found,0);
 
 			Kernel1D_I32 kernel = FactoryKernel.table1D_I32(radius);
 			ConvolveNormalized.horizontal(kernel,input,storage);
@@ -75,11 +75,11 @@ public class TestBlurImageOps {
 
 		ImageFloat32 storage = new ImageFloat32(width,height);
 
-		GeneralizedImageOps.randomize(input,rand,0,20);
+		GImageMiscOps.fillUniform(input, rand, 0, 20);
 
 		for( int radius = 1; radius <= 4; radius++ ) {
-			ImageTestingOps.fill(expected,0);
-			ImageTestingOps.fill(found,0);
+			ImageMiscOps.fill(expected,0);
+			ImageMiscOps.fill(found,0);
 
 			Kernel1D_F32 kernel = FactoryKernel.table1D_F32(radius,true);
 			ConvolveNormalized.horizontal(kernel,input,storage);
@@ -98,7 +98,7 @@ public class TestBlurImageOps {
 		ImageUInt8 found = new ImageUInt8(width,height);
 		ImageUInt8 expected = new ImageUInt8(width,height);
 
-		GeneralizedImageOps.randomize(input,rand,0,20);
+		GImageMiscOps.fillUniform(input, rand, 0, 20);
 
 		for( int radius = 1; radius <= 4; radius++ ) {
 			ImplMedianSortNaive.process(input,expected,radius,null);
@@ -114,7 +114,7 @@ public class TestBlurImageOps {
 		ImageFloat32 found = new ImageFloat32(width,height);
 		ImageFloat32 expected = new ImageFloat32(width,height);
 
-		GeneralizedImageOps.randomize(input,rand,0,20);
+		GImageMiscOps.fillUniform(input, rand, 0, 20);
 
 		for( int radius = 1; radius <= 4; radius++ ) {
 			ImplMedianSortNaive.process(input,expected,radius,null);
@@ -132,11 +132,11 @@ public class TestBlurImageOps {
 
 		ImageUInt8 storage = new ImageUInt8(width,height);
 
-		GeneralizedImageOps.randomize(input,rand,0,20);
+		GImageMiscOps.fillUniform(input, rand, 0, 20);
 
 		for( int radius = 1; radius <= 4; radius++ ) {
-			ImageTestingOps.fill(expected,0);
-			ImageTestingOps.fill(found,0);
+			ImageMiscOps.fill(expected,0);
+			ImageMiscOps.fill(found,0);
 
 			Kernel1D_I32 kernel = FactoryKernelGaussian.gaussian(Kernel1D_I32.class,-1,radius);
 			ConvolveNormalized.horizontal(kernel,input,storage);
@@ -158,11 +158,11 @@ public class TestBlurImageOps {
 
 		ImageFloat32 storage = new ImageFloat32(width,height);
 
-		GeneralizedImageOps.randomize(input,rand,0,20);
+		GImageMiscOps.fillUniform(input, rand, 0, 20);
 
 		for( int radius = 1; radius <= 4; radius++ ) {
-			ImageTestingOps.fill(expected,0);
-			ImageTestingOps.fill(found,0);
+			ImageMiscOps.fill(expected,0);
+			ImageMiscOps.fill(found,0);
 
 			Kernel1D_F32 kernel = FactoryKernelGaussian.gaussian(Kernel1D_F32.class,-1,radius);
 			ConvolveNormalized.horizontal(kernel,input,storage);

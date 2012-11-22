@@ -19,7 +19,7 @@
 package boofcv.examples;
 
 import boofcv.abst.feature.detect.edge.DetectEdgeContour;
-import boofcv.alg.misc.GPixelMath;
+import boofcv.alg.misc.GImageStatistics;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.factory.feature.detect.edge.FactoryDetectEdgeContour;
 import boofcv.gui.image.ShowImages;
@@ -46,7 +46,7 @@ public class ExampleContours {
 		ImageUInt8 gray = ConvertBufferedImage.convertFrom(image,(ImageUInt8)null);
 
 		// In many situations the mean pixel value produces reasonable results as a threshold
-		double mean = GPixelMath.sum(gray)/(gray.width*gray.height);
+		double mean = GImageStatistics.mean(gray);
 		DetectEdgeContour<ImageUInt8> simple =
 				FactoryDetectEdgeContour.binarySimple(mean,true);
 

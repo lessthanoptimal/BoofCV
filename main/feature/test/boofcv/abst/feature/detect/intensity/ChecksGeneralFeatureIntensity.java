@@ -18,6 +18,7 @@
 
 package boofcv.abst.feature.detect.intensity;
 
+import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
@@ -92,12 +93,12 @@ public abstract class ChecksGeneralFeatureIntensity<I extends ImageSingleBand , 
 		derivYY = GeneralizedImageOps.createSingleBand(derivType,width,height);
 		derivXY = GeneralizedImageOps.createSingleBand(derivType,width,height);
 
-		GeneralizedImageOps.randomize(input,rand,0,255);
-		GeneralizedImageOps.randomize(derivX,rand,-100,100);
-		GeneralizedImageOps.randomize(derivY,rand,-100,100);
-		GeneralizedImageOps.randomize(derivXX,rand,-100,100);
-		GeneralizedImageOps.randomize(derivYY,rand,-100,100);
-		GeneralizedImageOps.randomize(derivXY,rand,-100,100);
+		GImageMiscOps.fillUniform(input, rand, 0, 255);
+		GImageMiscOps.fillUniform(derivX, rand, -100, 100);
+		GImageMiscOps.fillUniform(derivY, rand, -100, 100);
+		GImageMiscOps.fillUniform(derivXX, rand, -100, 100);
+		GImageMiscOps.fillUniform(derivYY, rand, -100, 100);
+		GImageMiscOps.fillUniform(derivXY, rand, -100, 100);
 	}
 
 	private void checkBorderZero(ImageFloat32 intensity, int r) {

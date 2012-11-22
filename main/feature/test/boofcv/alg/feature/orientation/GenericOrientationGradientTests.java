@@ -18,6 +18,7 @@
 
 package boofcv.alg.feature.orientation;
 
+import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.ImageSingleBand;
 import georegression.metric.UtilAngle;
@@ -84,12 +85,12 @@ public class GenericOrientationGradientTests<D extends ImageSingleBand> {
 			double c = Math.cos(angle);
 			double s = Math.sin(angle);
 
-			GeneralizedImageOps.fill(derivX,0);
-			GeneralizedImageOps.fill(derivY,0);
+			GImageMiscOps.fill(derivX,0);
+			GImageMiscOps.fill(derivY, 0);
 			// only fill in the around around the region so that it also checks to see if the estimate
 			// is localized
-			GeneralizedImageOps.fillRectangle(derivX,c*100,x-regionSize/2,y-regionSize/2,regionSize,regionSize);
-			GeneralizedImageOps.fillRectangle(derivY,s*100,x-regionSize/2,y-regionSize/2,regionSize,regionSize);
+			GImageMiscOps.fillRectangle(derivX,c*100,x-regionSize/2,y-regionSize/2,regionSize,regionSize);
+			GImageMiscOps.fillRectangle(derivY,s*100,x-regionSize/2,y-regionSize/2,regionSize,regionSize);
 
 			alg.setImage(derivX,derivY);
 
@@ -106,10 +107,10 @@ public class GenericOrientationGradientTests<D extends ImageSingleBand> {
 		double c = Math.cos(angle);
 		double s = Math.sin(angle);
 
-		GeneralizedImageOps.fill(derivX,0);
-		GeneralizedImageOps.fill(derivY,0);
-		GeneralizedImageOps.fillRectangle(derivX,c*100,5,0,regionSize+5,regionSize);
-		GeneralizedImageOps.fillRectangle(derivY,s*100,5,0,regionSize+5,regionSize);
+		GImageMiscOps.fill(derivX,0);
+		GImageMiscOps.fill(derivY,0);
+		GImageMiscOps.fillRectangle(derivX,c*100,5,0,regionSize+5,regionSize);
+		GImageMiscOps.fillRectangle(derivY,s*100,5,0,regionSize+5,regionSize);
 
 		D subX = (D)derivX.subimage(5,0,regionSize+5,regionSize);
 		D subY = (D)derivY.subimage(5,0,regionSize+5,regionSize);
@@ -132,8 +133,8 @@ public class GenericOrientationGradientTests<D extends ImageSingleBand> {
 		double c = Math.cos(angle);
 		double s = Math.sin(angle);
 
-		GeneralizedImageOps.fill(derivX,c*100);
-		GeneralizedImageOps.fill(derivY,s*100);
+		GImageMiscOps.fill(derivX,c*100);
+		GImageMiscOps.fill(derivY,s*100);
 
 		alg.setImage(derivX,derivY);
 		alg.setScale(1);

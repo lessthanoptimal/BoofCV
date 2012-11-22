@@ -21,6 +21,7 @@ package boofcv.alg.feature.describe;
 import boofcv.abst.feature.describe.DescribeRegionPoint;
 import boofcv.alg.feature.describe.brief.FactoryBriefDefinition;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
+import boofcv.alg.misc.GImageMiscOps;
 import boofcv.alg.transform.ii.GIntegralImageOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.feature.describe.FactoryDescribePointAlgs;
@@ -70,7 +71,7 @@ public class BenchmarkDescribe<I extends ImageSingleBand, D extends ImageSingleB
 
 		image = GeneralizedImageOps.createSingleBand(imageType, width, height);
 
-		GeneralizedImageOps.randomize(image,rand,0,100);
+		GImageMiscOps.fillUniform(image, rand, 0, 100);
 
 		pts = new Point2D_I32[ NUM_POINTS ];
 		scales = new double[ NUM_POINTS ];

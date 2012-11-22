@@ -20,7 +20,7 @@ package boofcv.alg.filter.kernel;
 
 import boofcv.alg.distort.DistortImageOps;
 import boofcv.alg.interpolate.TypeInterpolate;
-import boofcv.alg.misc.GPixelMath;
+import boofcv.alg.misc.GImageStatistics;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.gui.ListDisplayPanel;
 import boofcv.gui.SelectAlgorithmPanel;
@@ -92,7 +92,7 @@ public abstract class DisplaySteerableBase<T extends ImageSingleBand, K extends 
 			T smallImg = GKernelMath.convertToImage(steerable.getBasis(i));
 			DistortImageOps.scale(smallImg,largeImg, TypeInterpolate.NEAREST_NEIGHBOR);
 
-			double maxValue = GPixelMath.maxAbs(largeImg);
+			double maxValue = GImageStatistics.maxAbs(largeImg);
 			BufferedImage out = VisualizeImageData.colorizeSign(largeImg,null,maxValue);
 			basisPanel.addImage(out,"Basis "+i);
 		}
@@ -108,7 +108,7 @@ public abstract class DisplaySteerableBase<T extends ImageSingleBand, K extends 
 			T smallImg = GKernelMath.convertToImage(kernel);
 			DistortImageOps.scale(smallImg,largeImg, TypeInterpolate.NEAREST_NEIGHBOR);
 
-			double maxValue = GPixelMath.maxAbs(largeImg);
+			double maxValue = GImageStatistics.maxAbs(largeImg);
 			BufferedImage out = VisualizeImageData.colorizeSign(largeImg,null,maxValue);
 
 			steerPanel.addImage(out,String.format("%5d",(int)(180.0*angle/Math.PI)));

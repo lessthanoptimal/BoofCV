@@ -18,6 +18,7 @@
 
 package boofcv.alg.transform.wavelet;
 
+import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.core.image.border.BorderType;
 import boofcv.factory.transform.wavelet.FactoryWaveletDaub;
@@ -67,7 +68,7 @@ public class TestWaveletTransformOps {
 		T transform = GeneralizedImageOps.createSingleBand(typeInput, width + (width % 2), height + (height % 2));
 		T found = GeneralizedImageOps.createSingleBand(typeInput, width, height);
 
-		GeneralizedImageOps.randomize(transform,rand,100,150);
+		GImageMiscOps.fillUniform(transform, rand, 100, 150);
 
 		invokeTransform(desc, null, transform, found,100,150);
 
@@ -96,7 +97,7 @@ public class TestWaveletTransformOps {
 			T output = GeneralizedImageOps.createSingleBand(typeInput, input.width + (input.width % 2), input.height + (input.height % 2));
 			T found = GeneralizedImageOps.createSingleBand(typeInput, input.width, input.height);
 
-			GeneralizedImageOps.randomize(input,rand,0,50);
+			GImageMiscOps.fillUniform(input, rand, 0, 50);
 
 			invokeTransform(desc, input, output, found,0,255);
 
@@ -136,7 +137,7 @@ public class TestWaveletTransformOps {
 			ImageSingleBand input = GeneralizedImageOps.createSingleBand(typeInput, w, h);
 			ImageSingleBand found = GeneralizedImageOps.createSingleBand(typeInput, w, h);
 
-			GeneralizedImageOps.randomize(input,rand,0,50);
+			GImageMiscOps.fillUniform(input, rand, 0, 50);
 
 			for( int level = 1; level <= 5; level++ ) {
 				ImageDimension dim = UtilWavelet.transformDimension(w,h,level);
@@ -173,7 +174,7 @@ public class TestWaveletTransformOps {
 		T transform = GeneralizedImageOps.createSingleBand(typeInput, dim.width,dim.height);
 		T found = GeneralizedImageOps.createSingleBand(typeInput, width, height);
 
-		GeneralizedImageOps.randomize(transform,rand,100,150);
+		GImageMiscOps.fillUniform(transform, rand, 100, 150);
 
 		invokeTransformN(desc, null, transform, found, 3, 100, 150);
 

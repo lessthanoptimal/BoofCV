@@ -19,7 +19,7 @@
 package boofcv.alg.feature.detect.grid;
 
 import boofcv.alg.feature.detect.quadblob.QuadBlob;
-import boofcv.alg.misc.ImageTestingOps;
+import boofcv.alg.misc.ImageMiscOps;
 import boofcv.struct.image.ImageUInt8;
 import org.junit.Test;
 
@@ -49,12 +49,12 @@ public class TestDetectSquareCalibrationPoints {
 				int pixelY = y*(squareLength+10)+10;
 				int pixelX = x*(squareLength+10)+15;
 
-				ImageTestingOps.fillRectangle(binary,1,pixelX,pixelY,squareLength,squareLength);
+				ImageMiscOps.fillRectangle(binary,1,pixelX,pixelY,squareLength,squareLength);
 			}
 		}
 		
 		// add a bit of noise
-		ImageTestingOps.fillRectangle(binary,1,400,100,25,22);
+		ImageMiscOps.fillRectangle(binary,1,400,100,25,22);
 
 		DetectSquareCalibrationPoints alg = new DetectSquareCalibrationPoints(100,3,4);
 

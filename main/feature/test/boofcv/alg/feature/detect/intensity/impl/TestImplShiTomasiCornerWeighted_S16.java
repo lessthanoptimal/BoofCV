@@ -21,7 +21,7 @@ package boofcv.alg.feature.detect.intensity.impl;
 import boofcv.alg.feature.detect.intensity.GenericCornerIntensityGradientTests;
 import boofcv.alg.feature.detect.intensity.GenericCornerIntensityTests;
 import boofcv.alg.filter.derivative.GradientSobel;
-import boofcv.alg.misc.ImageTestingOps;
+import boofcv.alg.misc.ImageMiscOps;
 import boofcv.core.image.border.BorderIndex1D_Extend;
 import boofcv.core.image.border.ImageBorder1D_I32;
 import boofcv.struct.image.ImageFloat32;
@@ -60,7 +60,7 @@ public class TestImplShiTomasiCornerWeighted_S16 {
 	@Test
 	public void compareToNaive() {
 		ImageUInt8 img = new ImageUInt8(width, height);
-		ImageTestingOps.randomize(img, new Random(0xfeed), 0, 100);
+		ImageMiscOps.fillUniform(img, new Random(0xfeed), 0, 100);
 
 		ImageSInt16 derivX = new ImageSInt16(img.getWidth(), img.getHeight());
 		ImageSInt16 derivY = new ImageSInt16(img.getWidth(), img.getHeight());

@@ -18,7 +18,7 @@
 
 package boofcv.alg.transform.ii;
 
-import boofcv.alg.misc.ImageTestingOps;
+import boofcv.alg.misc.ImageMiscOps;
 import boofcv.misc.PerformerBase;
 import boofcv.misc.ProfileOperation;
 import boofcv.struct.image.ImageFloat32;
@@ -72,7 +72,7 @@ public class BenchmarkIntegralImage {
 	public static void main(String args[]) {
 
 		Random rand = new Random(234);
-		ImageTestingOps.randomize(input, rand, 0, 100);
+		ImageMiscOps.fillUniform(input, rand, 0, 100);
 		IntegralImageOps.transform(input,integral);
 
 		System.out.println("=========  Profile Image Size " + width + " x " + height + " ==========");

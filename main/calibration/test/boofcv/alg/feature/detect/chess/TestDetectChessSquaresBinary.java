@@ -19,7 +19,7 @@
 package boofcv.alg.feature.detect.chess;
 
 import boofcv.alg.feature.detect.quadblob.QuadBlob;
-import boofcv.alg.misc.ImageTestingOps;
+import boofcv.alg.misc.ImageMiscOps;
 import boofcv.struct.image.ImageUInt8;
 import org.junit.Test;
 
@@ -50,7 +50,7 @@ public class TestDetectChessSquaresBinary {
 				int pixelY = 2*y*squareLength+10;
 				int pixelX = 2*x*squareLength+15;
 
-				ImageTestingOps.fillRectangle(binary, 1, pixelX, pixelY, squareLength, squareLength);
+				ImageMiscOps.fillRectangle(binary, 1, pixelX, pixelY, squareLength, squareLength);
 			}
 		}
 		for( int y = 0; y < 2; y++) {
@@ -58,7 +58,7 @@ public class TestDetectChessSquaresBinary {
 				int pixelY = 2*y*squareLength+10+squareLength+1;
 				int pixelX = 2*x*squareLength+15+squareLength+1;
 
-				ImageTestingOps.fillRectangle(binary, 1, pixelX, pixelY, squareLength2, squareLength2);
+				ImageMiscOps.fillRectangle(binary, 1, pixelX, pixelY, squareLength2, squareLength2);
 			}
 		}
 		

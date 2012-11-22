@@ -19,7 +19,7 @@
 package boofcv.alg.transform.pyramid;
 
 import boofcv.alg.interpolate.InterpolatePixel;
-import boofcv.alg.misc.ImageTestingOps;
+import boofcv.alg.misc.ImageMiscOps;
 import boofcv.factory.filter.kernel.FactoryKernelGaussian;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.misc.PerformerBase;
@@ -88,7 +88,7 @@ public class BenchmarkImagePyramids {
 	public static void main(String args[]) {
 
 		Random rand = new Random(234);
-		ImageTestingOps.randomize(input, rand, 0, 100);
+		ImageMiscOps.fillUniform(input, rand, 0, 100);
 		createUpdate();
 
 		System.out.println("=========  Profile Image Size " + width + " x " + height + " ==========");

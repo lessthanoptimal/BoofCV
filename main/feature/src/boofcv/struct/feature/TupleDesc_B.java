@@ -55,7 +55,11 @@ public class TupleDesc_B implements TupleDesc<TupleDesc_B> {
 
 	@Override
 	public void setTo(TupleDesc_B source) {
-		System.arraycopy(source.data,0,data,0,data.length);
+		if( data.length < source.data.length )
+			throw new IllegalArgumentException("Data array is too small to store the source array.");
+
+		this.numBits = source.numBits;
+		System.arraycopy(source.data,0,data,0,source.data.length);
 	}
 
 	@Override

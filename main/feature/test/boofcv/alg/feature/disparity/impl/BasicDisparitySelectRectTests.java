@@ -19,12 +19,12 @@
 package boofcv.alg.feature.disparity.impl;
 
 import boofcv.alg.feature.disparity.DisparitySelect;
+import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.ImageSingleBand;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 
 /**
  * Basic tests for selecting disparity
@@ -66,7 +66,7 @@ public abstract class BasicDisparitySelectRectTests <ArrayData , D extends Image
 
 		int y = 3;
 
-		GeneralizedImageOps.fill(disparity,0);
+		GImageMiscOps.fill(disparity, 0);
 		alg.configure(disparity,0,maxDisparity,2);
 
 		int scores[] = new int[w*maxDisparity];
@@ -122,7 +122,7 @@ public abstract class BasicDisparitySelectRectTests <ArrayData , D extends Image
 
 		int y = 3;
 
-		GeneralizedImageOps.fill(disparity,0);
+		GImageMiscOps.fill(disparity,0);
 		alg.configure(disparity,minDisparity,maxDisparity,r);
 
 		int scores[] = new int[w*range];

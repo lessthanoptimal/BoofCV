@@ -19,7 +19,7 @@
 package boofcv.alg.feature.detect.edge;
 
 import boofcv.alg.feature.detect.edge.impl.ImplEdgeNonMaxSuppression;
-import boofcv.alg.misc.ImageTestingOps;
+import boofcv.alg.misc.ImageMiscOps;
 import boofcv.misc.PerformerBase;
 import boofcv.misc.ProfileOperation;
 import boofcv.struct.image.ImageFloat32;
@@ -78,9 +78,9 @@ public class BenchmarkEdgeNonMaxSupression {
 	}
 
 	public static void main(String args[]) {
-		ImageTestingOps.randomize(intensity, rand, 0, 100);
-		ImageTestingOps.randomize(direction4, rand, -1, 3);
-		ImageTestingOps.randomize(direction8, rand, -3, 5);
+		ImageMiscOps.fillUniform(intensity, rand, 0, 100);
+		ImageMiscOps.fillUniform(direction4, rand, -1, 3);
+		ImageMiscOps.fillUniform(direction8, rand, -3, 5);
 
 		System.out.println("=========  Profile Image Size " + width + " x " + height + " ==========");
 		System.out.println();

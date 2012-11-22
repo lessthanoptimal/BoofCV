@@ -18,7 +18,7 @@
 
 package boofcv.alg.filter.derivative;
 
-import boofcv.alg.misc.ImageTestingOps;
+import boofcv.alg.misc.ImageMiscOps;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSInt16;
 import boofcv.struct.image.ImageUInt8;
@@ -47,7 +47,7 @@ public class TestLaplacianEdge {
 	@Test
 	public void process_I8() {
 		ImageUInt8 img = new ImageUInt8(width, height);
-		ImageTestingOps.randomize(img, rand, 0, 100);
+		ImageMiscOps.fillUniform(img, rand, 0, 100);
 
 		ImageSInt16 deriv = new ImageSInt16(width, height);
 		BoofTesting.checkSubImage(this, "process_I8", true, img, deriv);
@@ -65,7 +65,7 @@ public class TestLaplacianEdge {
 	@Test
 	public void process_F32() {
 		ImageFloat32 img = new ImageFloat32(width, height);
-		ImageTestingOps.randomize(img, rand, 0, 1);
+		ImageMiscOps.fillUniform(img, rand, 0, 1);
 
 		ImageFloat32 deriv = new ImageFloat32(width, height);
 		BoofTesting.checkSubImage(this, "process_F32", true, img, deriv);

@@ -21,7 +21,7 @@ package boofcv.alg.feature.detect.line;
 
 import boofcv.abst.feature.detect.extract.FeatureExtractor;
 import boofcv.alg.InputSanityCheck;
-import boofcv.alg.misc.ImageTestingOps;
+import boofcv.alg.misc.ImageMiscOps;
 import boofcv.struct.FastQueue;
 import boofcv.struct.GrowQueue_F32;
 import boofcv.struct.QueueCorner;
@@ -97,7 +97,7 @@ public class HoughTransformLineFootOfNorm {
 		InputSanityCheck.checkSameShape(derivX,derivY,binary);
 
 		transform.reshape(derivX.width,derivY.height);
-		ImageTestingOps.fill(transform,0);
+		ImageMiscOps.fill(transform,0);
 
 		originX = derivX.width/2;
 		originY = derivX.height/2;
@@ -188,7 +188,7 @@ public class HoughTransformLineFootOfNorm {
 	 * @return Array containing line intensities.
 	 */
 	public float[] getFoundIntensity() {
-		return foundIntensity.queue;
+		return foundIntensity.data;
 	}
 
 	private void _transform( ImageFloat32 derivX , ImageFloat32 derivY , ImageUInt8 binary )

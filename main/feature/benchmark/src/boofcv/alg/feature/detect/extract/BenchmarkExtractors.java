@@ -22,7 +22,7 @@ import boofcv.abst.feature.detect.extract.FeatureExtractor;
 import boofcv.abst.feature.detect.extract.WrapperNonMaximumBlock;
 import boofcv.abst.feature.detect.extract.WrapperNonMaximumNaive;
 import boofcv.abst.feature.detect.extract.WrapperThreshold;
-import boofcv.alg.misc.ImageTestingOps;
+import boofcv.alg.misc.ImageMiscOps;
 import boofcv.misc.Performer;
 import boofcv.misc.ProfileOperation;
 import boofcv.struct.QueueCorner;
@@ -74,7 +74,7 @@ public class BenchmarkExtractors {
 		corners = new QueueCorner(imgWidth * imgHeight);
 
 		// have about 1/20 the image below threshold
-		ImageTestingOps.randomize(intensity, rand, 0, threshold * 20.0f);
+		ImageMiscOps.fillUniform(intensity, rand, 0, threshold * 20.0f);
 
 		System.out.println("=========  Profile Image Size " + imgWidth + " x " + imgHeight + " ==========");
 		System.out.println();

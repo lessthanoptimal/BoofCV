@@ -18,6 +18,7 @@
 
 package boofcv.alg.feature.describe;
 
+import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
@@ -60,7 +61,7 @@ public class BenchmarkSurfDescribeOps<T extends ImageSingleBand>
 		this.imageType = imageType;
 		Random rand = new Random(234);
 		input = GeneralizedImageOps.createSingleBand(imageType,imgWidth,imgHeight);
-		GeneralizedImageOps.randomize(input, rand, 0, 1);
+		GImageMiscOps.fillUniform(input, rand, 0, 1);
 		g = SurfDescribeOps.createGradient(false,(int)(kernelWidth+0.5),imageType);
 		g.setImage(input);
 	}

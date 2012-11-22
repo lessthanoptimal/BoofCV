@@ -20,7 +20,7 @@ package boofcv.alg.tracker.klt;
 
 import boofcv.alg.filter.derivative.GradientSobel;
 import boofcv.alg.interpolate.InterpolateRectangle;
-import boofcv.alg.misc.ImageTestingOps;
+import boofcv.alg.misc.ImageMiscOps;
 import boofcv.core.image.border.BorderIndex1D_Extend;
 import boofcv.core.image.border.ImageBorder1D_F32;
 import boofcv.factory.interpolate.FactoryInterpolation;
@@ -90,8 +90,8 @@ public class TestKltTracker {
 	 * @param deltaY motion in y direction
 	 */
 	private void checkMovement(int radius, int deltaX, int deltaY) {
-		ImageTestingOps.fill(image, 0);
-		ImageTestingOps.fillRectangle(image, 100, 20, 20, imageWidth-20, imageHeight-20);
+		ImageMiscOps.fill(image, 0);
+		ImageMiscOps.fillRectangle(image, 100, 20, 20, imageWidth-20, imageHeight-20);
 		GradientSobel.process(image, derivX, derivY, new ImageBorder1D_F32(BorderIndex1D_Extend.class));
 
 		KltTracker<ImageFloat32, ImageFloat32> tracker = createDefaultTracker();
@@ -103,8 +103,8 @@ public class TestKltTracker {
 		tracker.setDescription(feature);
 
 		// move the rectangle a bit
-		ImageTestingOps.fill(image, 0);
-		ImageTestingOps.fillRectangle(image, 100, 20 + deltaX, 20 + deltaY, imageWidth, imageHeight);
+		ImageMiscOps.fill(image, 0);
+		ImageMiscOps.fillRectangle(image, 100, 20 + deltaX, 20 + deltaY, imageWidth, imageHeight);
 		GradientSobel.process(image, derivX, derivY, new ImageBorder1D_F32(BorderIndex1D_Extend.class));
 
 		// update the feature's position

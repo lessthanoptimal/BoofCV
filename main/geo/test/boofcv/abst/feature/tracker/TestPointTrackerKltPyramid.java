@@ -18,11 +18,14 @@
 
 package boofcv.abst.feature.tracker;
 
+import boofcv.alg.misc.GImageMiscOps;
+import boofcv.alg.tracker.klt.PyramidKltFeature;
 import boofcv.factory.feature.tracker.FactoryPointSequentialTracker;
 import boofcv.struct.image.ImageFloat32;
 import org.junit.Test;
 
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 
 /**
@@ -42,23 +45,66 @@ public class TestPointTrackerKltPyramid extends StandardImagePointTracker<ImageF
 		return FactoryPointSequentialTracker.klt(config,1,1);
 	}
 
+	/**
+	 * Checks to see if tracks are correctly recycled by process and spawn
+	 */
 	@Test
-	public void checkRecycleProcess() {
-		fail("implement");
-	}
+	public void checkRecycle_Process_Spawn() {
+		PointTrackerKltPyramid<ImageFloat32,ImageFloat32> alg =
+				(PointTrackerKltPyramid<ImageFloat32,ImageFloat32>)createTracker();
 
-	@Test
-	public void checkRecycleSpawn() {
-		fail("implement");
+		alg.process(image);
+		alg.spawnTracks();
+
+		int max = alg.config.maxFeatures;
+		int total = alg.active.size();
+
+		assertTrue( total > 0 );
+		assertEquals(0,alg.dropped.size());
+		assertEquals(max-total,alg.unused.size());
+
+		// drastically change the image causing tracks to be dropped
+		GImageMiscOps.fill(image, 0);
+		alg.process(image);
+
+		int difference = total - alg.active.size();
+		assertEquals(difference,alg.dropped.size());
+		assertEquals(max-alg.active.size(),alg.unused.size());
 	}
 
 	@Test
 	public void checkRecycleDropAll() {
-		fail("implement");
+		PointTrackerKltPyramid<ImageFloat32,ImageFloat32> alg =
+				(PointTrackerKltPyramid<ImageFloat32,ImageFloat32>)createTracker();
+
+		alg.process(image);
+		alg.spawnTracks();
+
+		assertTrue( alg.active.size() > 0 );
+
+		alg.dropAllTracks();
+
+		assertEquals( 0, alg.active.size());
+		assertEquals( 0, alg.dropped.size());
+		assertEquals(alg.config.maxFeatures, alg.unused.size());
 	}
 
 	@Test
 	public void checkRecycleDropTrack() {
-		fail("implement");
+		PointTrackerKltPyramid<ImageFloat32,ImageFloat32> alg =
+				(PointTrackerKltPyramid<ImageFloat32,ImageFloat32>)createTracker();
+
+		alg.process(image);
+		alg.spawnTracks();
+
+		int before = alg.active.size();
+		assertTrue( before > 2 );
+
+		PyramidKltFeature f = alg.active.get(2);
+
+		alg.dropTrack((PointTrack)f.cookie);
+
+		assertEquals( before-1, alg.active.size());
+		assertEquals(alg.config.maxFeatures-alg.active.size(),alg.unused.size());
 	}
 }

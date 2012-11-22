@@ -20,7 +20,7 @@ package boofcv.alg.transform.pyramid;
 
 import boofcv.abst.filter.FilterImageInterface;
 import boofcv.abst.filter.derivative.ImageGradient;
-import boofcv.core.image.GeneralizedImageOps;
+import boofcv.alg.misc.GImageMiscOps;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.pyramid.ImagePyramid;
 
@@ -47,7 +47,7 @@ public class PyramidOps {
 
 		for( int i = 0; i < pyramid.getNumLayers(); i++ ) {
 			I imageIn = pyramid.getLayer(i);
-			GeneralizedImageOps.randomize(imageIn,rand,min,max);
+			GImageMiscOps.fillUniform(imageIn, rand, min, max);
 		}
 	}
 

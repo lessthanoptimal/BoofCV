@@ -20,7 +20,7 @@ package boofcv.alg.feature.detect.intensity.impl;
 
 import boofcv.alg.feature.detect.intensity.DetectorFastNaive;
 import boofcv.alg.feature.detect.intensity.FastCornerIntensity;
-import boofcv.core.image.GeneralizedImageOps;
+import boofcv.alg.misc.GImageMiscOps;
 import boofcv.misc.DiscretizedCircle;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageUInt8;
@@ -53,7 +53,7 @@ public abstract class GenericImplFastIntensity {
 	public void compareToNaiveDetection() {
 
 		ImageUInt8 input = new ImageUInt8(40,50);
-		GeneralizedImageOps.randomize(input, rand, 0, 50);
+		GImageMiscOps.fillUniform(input, rand, 0, 50);
 		ImageFloat32 intensity = new ImageFloat32(input.width,input.height);
 
 		DetectorFastNaive validator = new DetectorFastNaive(3,minContinuous,detectDifference);

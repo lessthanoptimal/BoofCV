@@ -19,7 +19,7 @@
 package boofcv.alg.tracker.klt;
 
 import boofcv.abst.filter.derivative.ImageGradient;
-import boofcv.alg.misc.ImageTestingOps;
+import boofcv.alg.misc.ImageMiscOps;
 import boofcv.alg.transform.pyramid.PyramidOps;
 import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.factory.transform.pyramid.FactoryPyramid;
@@ -65,8 +65,8 @@ public class PyramidKltTestBase {
 		pyramid = new PyramidDiscrete<ImageFloat32>(ImageFloat32.class,false,scales);
 		derivX = new PyramidDiscrete<ImageFloat32>(ImageFloat32.class,false,scales);
 		derivY = new PyramidDiscrete<ImageFloat32>(ImageFloat32.class,false,scales);
-		ImageTestingOps.randomize(image,rand,0,1);
-		ImageTestingOps.fillRectangle(image,100,cornerX,cornerY,20,20);
+		ImageMiscOps.fillUniform(image,rand,0,1);
+		ImageMiscOps.fillRectangle(image,100,cornerX,cornerY,20,20);
 		updater.update(image,pyramid);
 
 		ImageGradient<ImageFloat32,ImageFloat32> gradient = FactoryDerivative.sobel(ImageFloat32.class,ImageFloat32.class);

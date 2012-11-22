@@ -19,14 +19,14 @@
 package boofcv.alg.feature.detect.grid;
 
 import boofcv.alg.feature.detect.quadblob.QuadBlob;
-import boofcv.alg.misc.ImageTestingOps;
+import boofcv.alg.misc.ImageMiscOps;
 import boofcv.struct.image.ImageFloat32;
 import org.junit.Test;
 
 import java.util.List;
 import java.util.Random;
 
-import static boofcv.alg.misc.ImageTestingOps.fillRectangle;
+import static boofcv.alg.misc.ImageMiscOps.fillRectangle;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -60,7 +60,7 @@ public class TestAutoThresholdCalibrationGrid {
 		}
 
 		// add a little bit of noise
-		ImageTestingOps.addGaussian(gray,rand,0.5,0,255);
+		ImageMiscOps.addGaussian(gray,rand,0.5,0,255);
 
 
 		AutoThresholdCalibrationGrid alg = new AutoThresholdCalibrationGrid(255,20);

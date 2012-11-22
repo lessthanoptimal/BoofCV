@@ -18,7 +18,7 @@
 
 package boofcv.alg.filter.kernel;
 
-import boofcv.alg.misc.ImageTestingOps;
+import boofcv.alg.misc.ImageMiscOps;
 import boofcv.factory.filter.kernel.FactoryKernel;
 import boofcv.struct.convolve.*;
 import boofcv.struct.image.ImageFloat32;
@@ -231,7 +231,7 @@ public class TestKernelMath {
 	@Test
 	public void convertToKernel_F32() {
 		ImageFloat32 image = new ImageFloat32(7,7);
-		ImageTestingOps.randomize(image,rand,-10,10);
+		ImageMiscOps.fillUniform(image,rand,-10,10);
 		Kernel2D_F32 kernel = KernelMath.convertToKernel(image);
 
 		assertEquals(kernel.width,image.width);
@@ -247,7 +247,7 @@ public class TestKernelMath {
 	@Test
 	public void convertToKernel_I32() {
 		ImageSInt32 image = new ImageSInt32(7,7);
-		ImageTestingOps.randomize(image,rand,-10,10);
+		ImageMiscOps.fillUniform(image,rand,-10,10);
 		Kernel2D_I32 kernel = KernelMath.convertToKernel(image);
 
 		assertEquals(kernel.width,image.width);

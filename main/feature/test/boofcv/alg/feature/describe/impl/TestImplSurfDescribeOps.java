@@ -19,10 +19,10 @@
 package boofcv.alg.feature.describe.impl;
 
 import boofcv.alg.feature.describe.SurfDescribeOps;
+import boofcv.alg.misc.GImageMiscOps;
 import boofcv.alg.transform.ii.IntegralImageOps;
 import boofcv.core.image.FactoryGImageSingleBand;
 import boofcv.core.image.GImageSingleBand;
-import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSInt32;
 import boofcv.struct.image.ImageSingleBand;
@@ -47,7 +47,7 @@ public class TestImplSurfDescribeOps {
 	@Test
 	public void gradientInner_F32() {
 		ImageFloat32 ii = new ImageFloat32(width,height);
-		GeneralizedImageOps.randomize(ii,rand,0,100);
+		GImageMiscOps.fillUniform(ii, rand, 0, 100);
 		int r = 2;
 		int w = r*2+1;
 
@@ -77,7 +77,7 @@ public class TestImplSurfDescribeOps {
 	@Test
 	public void gradientInner_I32() {
 		ImageSInt32 ii = new ImageSInt32(width,height);
-		GeneralizedImageOps.randomize(ii,rand,0,100);
+		GImageMiscOps.fillUniform(ii, rand, 0, 100);
 		int r = 2;
 		int w = r*2+1;
 

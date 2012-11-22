@@ -20,7 +20,8 @@ package boofcv.alg.geo.calibration;
 
 import boofcv.alg.feature.detect.chess.DetectChessCalibrationPoints;
 import boofcv.alg.feature.detect.quadblob.DetectQuadBlobsBinary;
-import boofcv.alg.misc.PixelMath;
+import boofcv.alg.misc.GImageMiscOps;
+import boofcv.alg.misc.ImageStatistics;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.gui.SelectInputPanel;
@@ -167,9 +168,9 @@ public class DetectCalibrationChessApp<T extends ImageSingleBand, D extends Imag
 				break;
 
 			case 3:
-				GeneralizedImageOps.fill(intensity,0);
+				GImageMiscOps.fill(intensity, 0);
 				alg.renderIntensity(intensity);
-				float max = PixelMath.maxAbs(intensity);
+				float max = ImageStatistics.maxAbs(intensity);
 				VisualizeImageData.colorizeSign(intensity,workImage,max);
 				break;
 

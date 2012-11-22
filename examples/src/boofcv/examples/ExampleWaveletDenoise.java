@@ -20,8 +20,8 @@ package boofcv.examples;
 
 import boofcv.abst.denoise.FactoryImageDenoise;
 import boofcv.abst.denoise.WaveletDenoiseFilter;
+import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.ConvertBufferedImage;
-import boofcv.core.image.GeneralizedImageOps;
 import boofcv.gui.ListDisplayPanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.image.UtilImageIO;
@@ -43,7 +43,7 @@ public class ExampleWaveletDenoise {
 		ImageFloat32 input = UtilImageIO.loadImage("../data/evaluation/standard/lena512.bmp",ImageFloat32.class);
 
 		ImageFloat32 noisy = input.clone();
-		GeneralizedImageOps.addGaussian(noisy,rand,20,0,255);
+		GImageMiscOps.addGaussian(noisy, rand, 20, 0, 255);
 		ImageFloat32 denoised = new ImageFloat32(input.width,input.height);
 
 		// How many levels in wavelet transform

@@ -18,6 +18,7 @@
 
 package boofcv.alg.filter.convolve;
 
+import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.filter.kernel.FactoryKernel;
 import boofcv.struct.convolve.Kernel1D_F32;
@@ -83,7 +84,7 @@ public class TestConvolveImageMean extends CompareEquivalentFunctions {
 		ImageSingleBand input = GeneralizedImageOps.createSingleBand(c[0], width, height);
 		ImageSingleBand output = GeneralizedImageOps.createSingleBand(c[1], width, height);
 
-		GeneralizedImageOps.randomize(input,rand,0,20);
+		GImageMiscOps.fillUniform(input, rand, 0, 20);
 
 		Object[][] ret = new Object[1][];
 		ret[0] = new Object[]{input,output,kernelRadius};

@@ -18,7 +18,7 @@
 
 package boofcv.alg.feature.detect.template;
 
-import boofcv.core.image.GeneralizedImageOps;
+import boofcv.alg.misc.GImageMiscOps;
 import boofcv.struct.feature.Match;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
@@ -139,7 +139,7 @@ public class TestTemplateMatching {
 
 		@Override
 		public void process(ImageBase image, ImageBase template) {
-			GeneralizedImageOps.fill(intensity, 0);
+			GImageMiscOps.fill(intensity, 0);
 
 			for (Match m : expected) {
 				intensity.set(m.x, m.y, (float) m.score);

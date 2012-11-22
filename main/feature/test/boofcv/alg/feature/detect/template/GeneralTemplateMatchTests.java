@@ -19,6 +19,7 @@
 package boofcv.alg.feature.detect.template;
 
 import boofcv.abst.feature.detect.extract.FeatureExtractor;
+import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
 import boofcv.struct.QueueCorner;
@@ -57,7 +58,7 @@ public abstract class GeneralTemplateMatchTests<T extends ImageSingleBand> {
 		image = GeneralizedImageOps.createSingleBand(imageType, 30, 40);
 		template = GeneralizedImageOps.createSingleBand(imageType, 5, 8);
 
-		GeneralizedImageOps.randomize(template, rand, 50, 100);
+		GImageMiscOps.fillUniform(template, rand, 50, 100);
 	}
 
 	public void allTests() {
@@ -69,7 +70,7 @@ public abstract class GeneralTemplateMatchTests<T extends ImageSingleBand> {
 
 	@Test
 	public void negativeCase() {
-		GeneralizedImageOps.randomize(image, rand, 0, 200);
+		GImageMiscOps.fillUniform(image, rand, 0, 200);
 
 		alg.process(image, template);
 
@@ -96,7 +97,7 @@ public abstract class GeneralTemplateMatchTests<T extends ImageSingleBand> {
 	 */
 	@Test
 	public void singleCase() {
-		GeneralizedImageOps.randomize(image, rand, 0, 200);
+		GImageMiscOps.fillUniform(image, rand, 0, 200);
 
 		int locationX = 10;
 		int locationY = 12;
@@ -114,7 +115,7 @@ public abstract class GeneralTemplateMatchTests<T extends ImageSingleBand> {
 	 */
 	@Test
 	public void multipleCases() {
-		GeneralizedImageOps.randomize(image, rand, 0, 200);
+		GImageMiscOps.fillUniform(image, rand, 0, 200);
 
 		Point2D_I32 a = new Point2D_I32(10, 12);
 		Point2D_I32 b = new Point2D_I32(20, 16);
@@ -132,7 +133,7 @@ public abstract class GeneralTemplateMatchTests<T extends ImageSingleBand> {
 	 */
 	@Test
 	public void subImage() {
-		GeneralizedImageOps.randomize(image, rand, 0, 200);
+		GImageMiscOps.fillUniform(image, rand, 0, 200);
 
 		Point2D_I32 a = new Point2D_I32(10, 12);
 		Point2D_I32 b = new Point2D_I32(20, 16);

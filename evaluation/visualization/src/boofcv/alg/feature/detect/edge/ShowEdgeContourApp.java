@@ -23,7 +23,7 @@ import boofcv.abst.feature.detect.edge.DetectEdgeContour;
 import boofcv.abst.filter.blur.BlurFilter;
 import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.alg.binary.SelectHistogramThresholdPanel;
-import boofcv.alg.misc.GPixelMath;
+import boofcv.alg.misc.GImageStatistics;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.factory.feature.detect.edge.FactoryDetectEdgeContour;
 import boofcv.factory.filter.blur.FactoryBlurFilter;
@@ -92,7 +92,7 @@ public class ShowEdgeContourApp<T extends ImageSingleBand, D extends ImageSingle
 		workImage = ConvertBufferedImage.convertFromSingle(input, null, imageType);
 
 		// update the binary histogram threshold for this image
-		final double threshold = GPixelMath.sum(workImage)/(workImage.width*workImage.height);
+		final double threshold = GImageStatistics.mean(workImage);
 
 
 		final int width = input.getWidth();

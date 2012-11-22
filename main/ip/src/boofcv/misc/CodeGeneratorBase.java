@@ -44,7 +44,8 @@ public abstract class CodeGeneratorBase {
 		this.className = className;
 		out = new PrintStream(new FileOutputStream(className + ".java"));
 		out.print(CodeGeneratorUtil.copyright);
-		out.println("package "+getPackage()+";");
+		out.println();
+		out.println("package " + getPackage() + ";");
 		out.println();
 	}
 

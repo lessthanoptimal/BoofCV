@@ -18,7 +18,7 @@
 
 package boofcv.alg.transform.wavelet;
 
-import boofcv.alg.misc.ImageTestingOps;
+import boofcv.alg.misc.ImageMiscOps;
 import boofcv.alg.transform.wavelet.impl.ImplWaveletTransformNaive;
 import boofcv.core.image.border.BorderIndex1D;
 import boofcv.struct.image.ImageFloat32;
@@ -61,7 +61,7 @@ public class CommonFactoryWavelet {
 			ImageFloat32 tran = new ImageFloat32(width,height);
 			ImageFloat32 rev = new ImageFloat32(width-makeOdd,height-makeOdd);
 
-			ImageTestingOps.randomize(orig,rand,0,50);
+			ImageMiscOps.fillUniform(orig,rand,0,50);
 
 			BorderIndex1D border = waveletDesc.getBorder();
 
@@ -100,7 +100,7 @@ public class CommonFactoryWavelet {
 			ImageSInt32 tran = new ImageSInt32(width,height);
 			ImageSInt32 rev = new ImageSInt32(width-makeOdd,height-makeOdd);
 
-			ImageTestingOps.randomize(orig,rand,-50,50);
+			ImageMiscOps.fillUniform(orig,rand,-50,50);
 
 			BorderIndex1D border = waveletDesc.getBorder();
 

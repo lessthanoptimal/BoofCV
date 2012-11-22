@@ -19,7 +19,7 @@
 package boofcv.alg.feature.describe;
 
 import boofcv.alg.feature.describe.impl.ImplSurfDescribeOps;
-import boofcv.core.image.GeneralizedImageOps;
+import boofcv.alg.misc.GImageMiscOps;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSInt32;
 import boofcv.testing.BoofTesting;
@@ -49,8 +49,8 @@ public class TestSurfDescribeOps {
 	public TestSurfDescribeOps() {
 		inputF32 = new ImageFloat32(width,height);
 		inputI32 = new ImageSInt32(width,height);
-		GeneralizedImageOps.randomize(inputF32,rand,0,100);
-		GeneralizedImageOps.randomize(inputI32,rand,0,100);
+		GImageMiscOps.fillUniform(inputF32, rand, 0, 100);
+		GImageMiscOps.fillUniform(inputI32, rand, 0, 100);
 	}
 
 	@Test

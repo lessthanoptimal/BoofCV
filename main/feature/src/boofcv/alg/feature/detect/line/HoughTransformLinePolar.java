@@ -20,7 +20,7 @@ package boofcv.alg.feature.detect.line;
 
 
 import boofcv.abst.feature.detect.extract.FeatureExtractor;
-import boofcv.alg.misc.ImageTestingOps;
+import boofcv.alg.misc.ImageMiscOps;
 import boofcv.struct.FastQueue;
 import boofcv.struct.GrowQueue_F32;
 import boofcv.struct.QueueCorner;
@@ -102,7 +102,7 @@ public class HoughTransformLinePolar {
 	 */
 	public void transform( ImageUInt8 binary )
 	{
-		ImageTestingOps.fill(transform, 0);
+		ImageMiscOps.fill(transform, 0);
 
 		originX = binary.width/2;
 		originY = binary.height/2;
@@ -189,6 +189,6 @@ public class HoughTransformLinePolar {
 	 * @return Array containing line intensities.
 	 */
 	public float[] getFoundIntensity() {
-		return foundIntensity.queue;
+		return foundIntensity.data;
 	}
 }

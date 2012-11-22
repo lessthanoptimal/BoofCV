@@ -18,8 +18,8 @@
 
 package boofcv.abst.feature.tracker;
 
-import boofcv.alg.misc.ImageTestingOps;
-import boofcv.core.image.GeneralizedImageOps;
+import boofcv.alg.misc.GImageMiscOps;
+import boofcv.alg.misc.ImageMiscOps;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 import org.junit.Before;
@@ -55,7 +55,7 @@ public abstract class StandardImagePointTracker <T extends ImageSingleBand> {
 
 	@Before
 	public void initStandard() {
-		ImageTestingOps.randomize(image,rand,0,100);
+		ImageMiscOps.fillUniform(image, rand, 0, 100);
 	}
 
 	/**
@@ -133,7 +133,7 @@ public abstract class StandardImagePointTracker <T extends ImageSingleBand> {
 				tracker.getNewTracks(null).size() );
 
 		// Tweak the input image and make sure that everything has the expected size
-		ImageTestingOps.addGaussian(image,rand,1,0,255);
+		ImageMiscOps.addGaussian(image,rand,1,0,255);
 		tracker.process((T)image);
 
 		int beforeAll = tracker.getAllTracks(null).size();
@@ -163,8 +163,6 @@ public abstract class StandardImagePointTracker <T extends ImageSingleBand> {
 		tracker.process((T)image);
 		tracker.spawnTracks();
 		assertTrue(tracker.getActiveTracks(null).size()>0);
-
-		int initialSize = tracker.getNewTracks(null).size();
 
 		// drop a track
 		PointTrack dropped = tracker.getActiveTracks(null).get(0);
@@ -217,7 +215,7 @@ public abstract class StandardImagePointTracker <T extends ImageSingleBand> {
 		assertEquals(0,tracker.getDroppedTracks(null).size());
 
 		// make the image a poor match, causing tracks to be dropped
-		GeneralizedImageOps.fill(image, 0);
+		GImageMiscOps.fill(image, 0);
 		tracker.process((T) image);
 
 		int afterAll = tracker.getAllTracks(null).size();
@@ -249,8 +247,6 @@ public abstract class StandardImagePointTracker <T extends ImageSingleBand> {
 		// note that some trackers will not add any features to the dropped list since
 		// it will try to respawn them
 		assertEquals(beforeAll-afterAll,tracker.getDroppedTracks(null).size());
-
-
 	}
 	
 	@Test
@@ -280,7 +276,7 @@ public abstract class StandardImagePointTracker <T extends ImageSingleBand> {
 		checkUniqueFeatureID();
 
 		// by adding a little bit of noise the features should move slightly
-		ImageTestingOps.addUniform(image,rand,0,5);
+		ImageMiscOps.addUniform(image,rand,0,5);
 		tracker.process((T)image);
 		checkUniqueFeatureID();
 
@@ -300,7 +296,7 @@ public abstract class StandardImagePointTracker <T extends ImageSingleBand> {
 		tracker.reset();
 
 		// add several tracks
-		ImageTestingOps.addUniform(image,rand,0,5);
+		ImageMiscOps.addUniform(image,rand,0,5);
 		tracker.process((T)image);
 		tracker.spawnTracks();
 
@@ -368,7 +364,7 @@ public abstract class StandardImagePointTracker <T extends ImageSingleBand> {
 		tracker.spawnTracks();
 
 		// create a situation where tracks might become inactive
-		GeneralizedImageOps.fill(image, 0);
+		GImageMiscOps.fill(image, 0);
 		tracker.process((T) image);
 
 		List<PointTrack> input = new ArrayList<PointTrack>();
@@ -386,7 +382,7 @@ public abstract class StandardImagePointTracker <T extends ImageSingleBand> {
 		tracker.spawnTracks();
 
 		// create a situation where tracks might be dropped
-		GeneralizedImageOps.fill(image, 0);
+		GImageMiscOps.fill(image, 0);
 		tracker.process((T) image);
 
 		List<PointTrack> input = new ArrayList<PointTrack>();

@@ -21,7 +21,7 @@ package boofcv.alg.filter.convolve;
 import boofcv.abst.filter.blur.BlurFilter;
 import boofcv.alg.filter.blur.BlurImageOps;
 import boofcv.alg.filter.convolve.noborder.ImplConvolveMean;
-import boofcv.alg.misc.ImageTestingOps;
+import boofcv.alg.misc.ImageMiscOps;
 import boofcv.factory.filter.blur.FactoryBlurFilter;
 import boofcv.factory.filter.kernel.FactoryKernel;
 import boofcv.struct.convolve.Kernel1D_F32;
@@ -60,9 +60,9 @@ public class BenchmarkConvolveMean extends SimpleBenchmark {
 	@Param({"1", "2", "3", "5","10"}) private int radius;
 
 	public BenchmarkConvolveMean() {
-		ImageTestingOps.randomize(input_I8,rand,0,20);
-		ImageTestingOps.randomize(input_I16,rand,0,20);
-		ImageTestingOps.randomize(input_F32,rand,0,20);
+		ImageMiscOps.fillUniform(input_I8,rand,0,20);
+		ImageMiscOps.fillUniform(input_I16,rand,0,20);
+		ImageMiscOps.fillUniform(input_F32,rand,0,20);
 	}
 
 	@Override protected void setUp() throws Exception {

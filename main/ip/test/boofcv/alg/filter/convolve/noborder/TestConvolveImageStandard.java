@@ -18,6 +18,7 @@
 
 package boofcv.alg.filter.convolve.noborder;
 
+import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.filter.kernel.FactoryKernel;
 import boofcv.factory.filter.kernel.FactoryKernelGaussian;
@@ -93,7 +94,7 @@ public class TestConvolveImageStandard {
 		ImageSingleBand input = GeneralizedImageOps.createSingleBand(param[1], width, height);
 		ImageSingleBand output = GeneralizedImageOps.createSingleBand(param[2], width, height);
 
-		GeneralizedImageOps.randomize(input, rand, 1,10);
+		GImageMiscOps.fillUniform(input, rand, 1, 10);
 
 		if( m.getName().contentEquals("horizontal")) {
 			if( param.length == 4 ) {

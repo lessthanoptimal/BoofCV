@@ -21,7 +21,7 @@ package boofcv.examples;
 
 import boofcv.alg.filter.binary.BinaryImageOps;
 import boofcv.alg.filter.binary.ThresholdImageOps;
-import boofcv.alg.misc.PixelMath;
+import boofcv.alg.misc.ImageStatistics;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.gui.binary.VisualizeBinaryData;
 import boofcv.gui.image.ShowImages;
@@ -49,7 +49,7 @@ public class ExampleBinaryImage {
 		ImageUInt8 binary = new ImageUInt8(input.width,input.height);
 
 		// the mean pixel value is often a reasonable threshold when creating a binary image
-		float mean = PixelMath.sum(input)/(input.width*input.height);
+		float mean = (float)ImageStatistics.mean(input);
 
 		// create a binary image
 		ThresholdImageOps.threshold(input,binary,mean,true);
@@ -70,7 +70,7 @@ public class ExampleBinaryImage {
 		ImageSInt32 blobs = new ImageSInt32(input.width,input.height);
 
 		// the mean pixel value is often a reasonable threshold when creating a binary image
-		float mean = PixelMath.sum(input)/(input.width*input.height);
+		float mean = (float)ImageStatistics.sum(input);
 
 		// create a binary image
 		ThresholdImageOps.threshold(input,binary,mean,true);

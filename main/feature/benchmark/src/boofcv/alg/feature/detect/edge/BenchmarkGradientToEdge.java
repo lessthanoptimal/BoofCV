@@ -18,7 +18,7 @@
 
 package boofcv.alg.feature.detect.edge;
 
-import boofcv.alg.misc.ImageTestingOps;
+import boofcv.alg.misc.ImageMiscOps;
 import boofcv.misc.PerformerBase;
 import boofcv.misc.ProfileOperation;
 import boofcv.struct.image.ImageFloat32;
@@ -94,9 +94,9 @@ public class BenchmarkGradientToEdge {
 	}
 
 	public static void main(String args[]) {
-		ImageTestingOps.randomize(derivX_F32, rand, 0, 255);
-		ImageTestingOps.randomize(derivY_F32, rand, 0, 255);
-		ImageTestingOps.randomize(orientation_F32, rand, (float)(-Math.PI/2.0), (float)(Math.PI/2.0));
+		ImageMiscOps.fillUniform(derivX_F32, rand, 0, 255);
+		ImageMiscOps.fillUniform(derivY_F32, rand, 0, 255);
+		ImageMiscOps.fillUniform(orientation_F32, rand, (float)(-Math.PI/2.0), (float)(Math.PI/2.0));
 
 		System.out.println("=========  Profile Image Size " + width + " x " + height + " ==========");
 		System.out.println();
