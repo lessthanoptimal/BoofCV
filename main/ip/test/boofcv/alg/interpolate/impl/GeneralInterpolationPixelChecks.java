@@ -19,7 +19,7 @@
 package boofcv.alg.interpolate.impl;
 
 import boofcv.alg.interpolate.InterpolatePixel;
-import boofcv.core.image.GeneralizedImageOps;
+import boofcv.alg.misc.GImageMiscOps;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.testing.BoofTesting;
 import org.junit.Test;
@@ -52,7 +52,7 @@ public abstract class GeneralInterpolationPixelChecks< T extends ImageSingleBand
 	@Test
 	public void get() {
 		T img = createImage(width, height);
-		GeneralizedImageOps.randomize(img, rand, 0,100);
+		GImageMiscOps.fillUniform(img, rand, 0, 100);
 
 		BoofTesting.checkSubImage(this, "get", false, img);
 	}
@@ -72,7 +72,7 @@ public abstract class GeneralInterpolationPixelChecks< T extends ImageSingleBand
 	@Test
 	public void get_edges() {
 		T img = createImage(width, height);
-		GeneralizedImageOps.randomize(img, rand, 0,100);
+		GImageMiscOps.fillUniform(img, rand, 0, 100);
 
 		BoofTesting.checkSubImage(this, "get_edges", false, img);
 	}
@@ -124,7 +124,7 @@ public abstract class GeneralInterpolationPixelChecks< T extends ImageSingleBand
 	@Test
 	public void get_unsafe() {
 		T img = createImage(width, height);
-		GeneralizedImageOps.randomize(img, rand, 0,100);
+		GImageMiscOps.fillUniform(img, rand, 0, 100);
 
 		BoofTesting.checkSubImage(this, "get_unsafe", false, img);
 	}
@@ -152,7 +152,7 @@ public abstract class GeneralInterpolationPixelChecks< T extends ImageSingleBand
 	@Test
 	public void isInSafeBounds() {
 		T img = createImage(width, height);
-		GeneralizedImageOps.randomize(img, rand, 0,100);
+		GImageMiscOps.fillUniform(img, rand, 0, 100);
 		InterpolatePixel<T> interp = wrap(img, 0, 100);
 
 		for( int y = 0; y < height; y++ ) {
@@ -172,7 +172,7 @@ public abstract class GeneralInterpolationPixelChecks< T extends ImageSingleBand
 	@Test
 	public void checkSafeGetAlongBorder() {
 		T img = createImage(width, height);
-		GeneralizedImageOps.randomize(img, rand, 0,100);
+		GImageMiscOps.fillUniform(img, rand, 0, 100);
 		InterpolatePixel<T> interp = wrap(img, 0, 100);
 
 		// will it blow up?
@@ -190,7 +190,7 @@ public abstract class GeneralInterpolationPixelChecks< T extends ImageSingleBand
 	@Test
 	public void checkPixelValueBoundsHonored() {
 		T img = createImage(20, 30);
-		GeneralizedImageOps.randomize(img, rand, 0,100);
+		GImageMiscOps.fillUniform(img, rand, 0, 100);
 		InterpolatePixel<T> interp = wrap(img, 0, 100);
 
 		for( int y = 0; y < img.height; y++ ) {

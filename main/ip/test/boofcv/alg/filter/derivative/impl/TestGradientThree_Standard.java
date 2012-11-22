@@ -20,7 +20,7 @@ package boofcv.alg.filter.derivative.impl;
 
 import boofcv.alg.filter.derivative.CompareDerivativeToConvolution;
 import boofcv.alg.filter.derivative.GradientThree;
-import boofcv.alg.misc.ImageTestingOps;
+import boofcv.alg.misc.ImageMiscOps;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSInt16;
 import boofcv.struct.image.ImageUInt8;
@@ -48,7 +48,7 @@ public class TestGradientThree_Standard {
 		validator.setKernel(1, GradientThree.kernelDeriv_I32,false);
 
 		ImageUInt8 input = new ImageUInt8(width,height);
-		ImageTestingOps.randomize(input, rand, 0, 10);
+		ImageMiscOps.fillUniform(input, rand, 0, 10);
 		ImageSInt16 derivX = new ImageSInt16(width,height);
 		ImageSInt16 derivY = new ImageSInt16(width,height);
 
@@ -65,7 +65,7 @@ public class TestGradientThree_Standard {
 		validator.setKernel(1, GradientThree.kernelDeriv_F32,false);
 
 		ImageFloat32 input = new ImageFloat32(width,height);
-		ImageTestingOps.randomize(input, rand, 0, 10);
+		ImageMiscOps.fillUniform(input, rand, 0, 10);
 		ImageFloat32 derivX = new ImageFloat32(width,height);
 		ImageFloat32 derivY = new ImageFloat32(width,height);
 

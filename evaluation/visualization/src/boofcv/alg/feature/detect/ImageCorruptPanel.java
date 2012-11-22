@@ -19,8 +19,8 @@
 package boofcv.alg.feature.detect;
 
 import boofcv.alg.filter.basic.GGrayImageOps;
+import boofcv.alg.misc.GImageMiscOps;
 import boofcv.alg.misc.GPixelMath;
-import boofcv.core.image.GeneralizedImageOps;
 import boofcv.gui.StandardAlgConfigPanel;
 import boofcv.struct.image.ImageSingleBand;
 
@@ -95,7 +95,7 @@ public class ImageCorruptPanel extends StandardAlgConfigPanel implements ChangeL
 	public <T extends ImageSingleBand> void corruptImage( T original , T corrupted )
 	{
 		GGrayImageOps.stretch(original, valueScale, valueOffset, 255.0, corrupted);
-		GeneralizedImageOps.addGaussian(corrupted,rand,valueNoise,0,255);
+		GImageMiscOps.addGaussian(corrupted, rand, valueNoise, 0, 255);
 		GPixelMath.boundImage(corrupted,0,255);
 	}
 

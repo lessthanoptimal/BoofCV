@@ -19,7 +19,7 @@
 package boofcv.alg.denoise;
 
 import boofcv.alg.denoise.wavelet.UtilDenoiseWavelet;
-import boofcv.alg.misc.ImageTestingOps;
+import boofcv.alg.misc.ImageMiscOps;
 import boofcv.struct.image.ImageFloat32;
 import org.junit.Test;
 
@@ -43,7 +43,7 @@ public class TestUtilDenoiseWavelet {
 		ImageFloat32 image = new ImageFloat32(width,height);
 
 		double sigma = 12;
-		ImageTestingOps.addGaussian(image,rand,sigma,-10000,10000);
+		ImageMiscOps.addGaussian(image,rand,sigma,-10000,10000);
 
 		double found = UtilDenoiseWavelet.estimateNoiseStdDev(image,null);
 

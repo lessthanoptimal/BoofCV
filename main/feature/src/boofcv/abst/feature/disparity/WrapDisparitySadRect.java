@@ -19,6 +19,7 @@
 package boofcv.abst.feature.disparity;
 
 import boofcv.alg.feature.disparity.DisparityScoreRowFormat;
+import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.ImageSingleBand;
 
@@ -40,7 +41,7 @@ public class WrapDisparitySadRect <T extends ImageSingleBand, D extends ImageSin
 		if( disparity == null || disparity.width != imageLeft.width || disparity.height != imageLeft.height )  {
 			// make sure the image borders are marked as invalid
 			disparity = GeneralizedImageOps.createSingleBand(alg.getDisparityType(),imageLeft.width,imageLeft.height);
-			GeneralizedImageOps.fill(disparity,getMaxDisparity()+1);
+			GImageMiscOps.fill(disparity, getMaxDisparity() + 1);
 		}
 
 		alg.process(imageLeft,imageRight,disparity);

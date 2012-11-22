@@ -18,7 +18,7 @@
 
 package boofcv.alg.feature.detect.quadblob;
 
-import boofcv.alg.misc.ImageTestingOps;
+import boofcv.alg.misc.ImageMiscOps;
 import boofcv.struct.image.ImageUInt8;
 import org.junit.Test;
 
@@ -46,15 +46,15 @@ public class TestDetectQuadBlobsBinary {
 				int pixelY = y*(squareLength+10)+10;
 				int pixelX = x*(squareLength+10)+15;
 
-				ImageTestingOps.fillRectangle(binary, 1, pixelX, pixelY, squareLength, squareLength);
+				ImageMiscOps.fillRectangle(binary, 1, pixelX, pixelY, squareLength, squareLength);
 			}
 		}
 
 		// add a rectangle that is too skinny
-		ImageTestingOps.fillRectangle(binary, 1, w-50, 100, 25, 2);
+		ImageMiscOps.fillRectangle(binary, 1, w-50, 100, 25, 2);
 
 		// another one touching the border
-		ImageTestingOps.fillRectangle(binary, 1, w-20, h-20, 20, 20);
+		ImageMiscOps.fillRectangle(binary, 1, w-20, h-20, 20, 20);
 		
 		DetectQuadBlobsBinary alg = new DetectQuadBlobsBinary(15,0.25,0);
 		

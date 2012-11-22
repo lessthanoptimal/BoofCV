@@ -18,6 +18,8 @@
 
 package boofcv.alg.denoise;
 
+import boofcv.alg.misc.GImageMiscOps;
+import boofcv.alg.misc.GImageStatistics;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.testing.BoofTesting;
@@ -63,8 +65,8 @@ public abstract class GenericDenoiseTests<T extends ImageSingleBand> {
 	public void performTest( T imageNoisy , T imageDenoised ) {
 		denoiseImage(imageNoisy,imageDenoised);
 
-		double noisyMSE = GeneralizedImageOps.computeMeanSquaredError(image,imageNoisy);
-		double denoisedMSE = GeneralizedImageOps.computeMeanSquaredError(image,imageDenoised);
+		double noisyMSE = GImageStatistics.meanDiffSq(image, imageNoisy);
+		double denoisedMSE = GImageStatistics.meanDiffSq(image, imageDenoised);
 
 		assertTrue( denoisedMSE < noisyMSE );
 	}
@@ -74,12 +76,12 @@ public abstract class GenericDenoiseTests<T extends ImageSingleBand> {
 		imageDenoised = GeneralizedImageOps.createSingleBand(imageType, width, height);
 
 		// render a simple scene
-		GeneralizedImageOps.fill(image,20);
-		GeneralizedImageOps.fillRectangle(image,10,5,5,10,10);
-		GeneralizedImageOps.fillRectangle(image,10,15,15,20,20);
+		GImageMiscOps.fill(image, 20);
+		GImageMiscOps.fillRectangle(image,10,5,5,10,10);
+		GImageMiscOps.fillRectangle(image,10,15,15,20,20);
 
 		// create the noisy image
 		imageNoisy = (T)image.clone();
-		GeneralizedImageOps.addGaussian(imageNoisy,rand,noiseSigma,0,255);
+		GImageMiscOps.addGaussian(imageNoisy,rand,noiseSigma,0,255);
 	}
 }

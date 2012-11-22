@@ -18,6 +18,7 @@
 
 package boofcv.alg.filter.convolve;
 
+import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.core.image.border.*;
 import boofcv.factory.filter.kernel.FactoryKernelGaussian;
@@ -100,7 +101,7 @@ public class TestConvolveWithBorderSparse {
 		Class outputType = borderToOutputType(borderType);
 
 		ImageSingleBand input = GeneralizedImageOps.createSingleBand(inputType, width, height);
-		GeneralizedImageOps.randomize(input,rand,0,20);
+		GImageMiscOps.fillUniform(input, rand, 0, 20);
 
 		ImageSingleBand expected = GeneralizedImageOps.createSingleBand(outputType, width, height);
 		Object kernel = createKernel(kernelType,2);

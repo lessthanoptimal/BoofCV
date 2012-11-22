@@ -18,7 +18,7 @@
 
 package boofcv.alg.feature.describe.impl;
 
-import boofcv.core.image.GeneralizedImageOps;
+import boofcv.alg.misc.GImageMiscOps;
 import boofcv.struct.feature.NccFeature;
 import boofcv.struct.image.ImageUInt8;
 import boofcv.testing.BoofTesting;
@@ -38,7 +38,7 @@ public class TestImplDescribePointPixelRegionNCC_U8 {
 	ImageUInt8 img = new ImageUInt8(20,30);
 
 	public TestImplDescribePointPixelRegionNCC_U8() {
-		GeneralizedImageOps.randomize(img, rand, 0, 30);
+		GImageMiscOps.fillUniform(img, rand, 0, 30);
 	}
 
 	@Test

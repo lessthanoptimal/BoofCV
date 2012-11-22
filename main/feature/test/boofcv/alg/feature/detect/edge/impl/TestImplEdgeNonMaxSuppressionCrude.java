@@ -18,6 +18,7 @@
 
 package boofcv.alg.feature.detect.edge.impl;
 
+import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.core.image.border.FactoryImageBorderAlgs;
 import boofcv.core.image.border.ImageBorder_F32;
@@ -139,9 +140,9 @@ public class TestImplEdgeNonMaxSuppressionCrude {
 		ImageSingleBand derivY = GeneralizedImageOps.createSingleBand(derivType, width, height);
 
 		Random rand = new Random(123);
-		GeneralizedImageOps.randomize(input,rand,0,30);
-		GeneralizedImageOps.randomize(derivX,rand,-30,30);
-		GeneralizedImageOps.randomize(derivY,rand,-30,30);
+		GImageMiscOps.fillUniform(input, rand, 0, 30);
+		GImageMiscOps.fillUniform(derivX, rand, -30, 30);
+		GImageMiscOps.fillUniform(derivY, rand, -30, 30);
 
 		BoofTesting.checkSubImage(this, "border", true, m, input, derivX, derivY, output );
 	}

@@ -19,7 +19,7 @@
 package boofcv.alg.filter.derivative;
 
 import boofcv.abst.filter.derivative.ImageHessianDirect;
-import boofcv.alg.misc.PixelMath;
+import boofcv.alg.misc.ImageStatistics;
 import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ProcessImageSequence;
@@ -79,9 +79,9 @@ public class VideoShowImageHessian extends ProcessImageSequence<ImageUInt8> {
 			addComponent(panelYY);
 			addComponent(panelXY);
 		} else {
-			int maxX = PixelMath.maxAbs(derivXX);
-			int maxY = PixelMath.maxAbs(derivYY);
-			int maxXY = PixelMath.maxAbs(derivXY);
+			int maxX = ImageStatistics.maxAbs(derivXX);
+			int maxY = ImageStatistics.maxAbs(derivYY);
+			int maxXY = ImageStatistics.maxAbs(derivXY);
 			VisualizeImageData.colorizeSign(derivXX, panelXX.getImage(),maxX);
 			VisualizeImageData.colorizeSign(derivYY, panelYY.getImage(),maxY);
 			VisualizeImageData.colorizeSign(derivXY, panelXY.getImage(),maxXY);

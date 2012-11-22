@@ -18,9 +18,9 @@
 
 package boofcv.abst.wavelet.impl;
 
+import boofcv.alg.misc.GImageMiscOps;
 import boofcv.alg.transform.wavelet.UtilWavelet;
 import boofcv.alg.transform.wavelet.WaveletTransformOps;
-import boofcv.core.image.GeneralizedImageOps;
 import boofcv.core.image.border.BorderType;
 import boofcv.factory.transform.wavelet.FactoryWaveletDaub;
 import boofcv.struct.image.ImageDimension;
@@ -44,7 +44,7 @@ public class TestWaveletTransformFloat32 {
 	@Test
 	public void compareToWaveletTransformOps() {
 		ImageFloat32 orig = new ImageFloat32(width,height);
-		GeneralizedImageOps.randomize(orig,rand,0,20);
+		GImageMiscOps.fillUniform(orig, rand, 0, 20);
 		ImageFloat32 origCopy = orig.clone();
 
 		int N = 3;

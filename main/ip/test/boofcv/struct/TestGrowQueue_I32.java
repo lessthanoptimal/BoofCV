@@ -20,7 +20,8 @@ package boofcv.struct;
 
 import org.junit.Test;
 
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 
 /**
@@ -28,7 +29,46 @@ import static org.junit.Assert.fail;
  */
 public class TestGrowQueue_I32 {
 	@Test
-	public void stuff() {
-		fail("implement");
+	public void auto_grow() {
+		GrowQueue_I32 alg = new GrowQueue_I32(3);
+
+		assertEquals(3,alg.data.length);
+
+		for( int i = 0; i < 10; i++ )
+			alg.push(i);
+
+		assertEquals(10,alg.size);
+
+		for( int i = 0; i < 10; i++ )
+			assertEquals(i,alg.get(i),1e-8);
+	}
+
+	@Test
+	public void reset() {
+		GrowQueue_I32 alg = new GrowQueue_I32(10);
+
+		alg.push(1);
+		alg.push(3);
+		alg.push(-2);
+
+		assertTrue(1.0 == alg.get(0));
+		assertEquals(3,alg.size);
+
+		alg.reset();
+
+		assertEquals(0,alg.size);
+	}
+
+	@Test
+	public void push_pop() {
+		GrowQueue_I32 alg = new GrowQueue_I32(10);
+
+		alg.push(1);
+		alg.push(3);
+
+		assertEquals(2,alg.size);
+		assertTrue(3==alg.pop());
+		assertTrue(1==alg.pop());
+		assertEquals(0, alg.size);
 	}
 }

@@ -18,7 +18,7 @@
 
 package boofcv.alg.feature.detect.intensity;
 
-import boofcv.alg.misc.PixelMath;
+import boofcv.alg.misc.ImageStatistics;
 import boofcv.alg.transform.ii.IntegralImageOps;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.gui.ListDisplayPanel;
@@ -66,7 +66,7 @@ public class IntensityFastHessianApp {
 				int size = 3*block;
 
 				IntegralImageFeatureIntensity.hessian(integral,1,size,intensity);
-				float maxAbs = PixelMath.maxAbs(intensity);
+				float maxAbs = ImageStatistics.maxAbs(intensity);
 				BufferedImage b = VisualizeImageData.colorizeSign(intensity,null,maxAbs);
 				guiIntensity.addImage(b,String.format("Oct = %2d size %3d",octave+1,size));
 			}

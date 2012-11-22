@@ -21,7 +21,7 @@ package boofcv.alg.filter.blur;
 import boofcv.alg.filter.blur.impl.ImplMedianHistogramInner;
 import boofcv.alg.filter.blur.impl.ImplMedianHistogramInnerNaive;
 import boofcv.alg.filter.blur.impl.ImplMedianSortNaive;
-import boofcv.alg.misc.ImageTestingOps;
+import boofcv.alg.misc.ImageMiscOps;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSInt16;
 import boofcv.struct.image.ImageSInt32;
@@ -54,8 +54,8 @@ public class BenchmarkMedianFilter extends SimpleBenchmark {
 
 	public BenchmarkMedianFilter() {
 		Random rand = new Random(234);
-		ImageTestingOps.randomize(imgInt8,rand, 0, 100);
-		ImageTestingOps.randomize(imgFloat32,rand,0,200);
+		ImageMiscOps.fillUniform(imgInt8,rand, 0, 100);
+		ImageMiscOps.fillUniform(imgFloat32,rand,0,200);
 	}
 
 	public int timeBlurImageOps_I8(int reps) {

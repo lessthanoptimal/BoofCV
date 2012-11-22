@@ -20,7 +20,7 @@ package boofcv.alg.filter.binary;
 
 import boofcv.alg.filter.binary.impl.ImplBinaryInnerOps;
 import boofcv.alg.filter.binary.impl.ImplBinaryNaiveOps;
-import boofcv.alg.misc.ImageTestingOps;
+import boofcv.alg.misc.ImageMiscOps;
 import boofcv.struct.image.ImageUInt8;
 import com.google.caliper.Runner;
 import com.google.caliper.SimpleBenchmark;
@@ -43,8 +43,8 @@ public class BenchmarkBinaryOps extends SimpleBenchmark {
 		Random rand = new Random(234);
 		// test structures and unstructured images
 		// naive is some times faster in unstructured because it can escape earlier
-		ImageTestingOps.randomize(input, rand, 0, 1);
-//		ImageTestingOps.fillRectangle(input,1,100,200,150,100);
+		ImageMiscOps.fillUniform(input, rand, 0, 1);
+//		ImageMiscOps.fillRectangle(input,1,100,200,150,100);
 	}
 
 	public int timeNaiveErode4(int reps) {

@@ -18,7 +18,7 @@
 
 package boofcv.alg.feature.disparity.impl;
 
-import boofcv.core.image.GeneralizedImageOps;
+import boofcv.alg.misc.GImageMiscOps;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageUInt8;
 import org.junit.Test;
@@ -46,8 +46,8 @@ public class TestImplDisparitySparseScoreSadRect_F32 {
 		ImageFloat32 left = new ImageFloat32(w,h);
 		ImageFloat32 right = new ImageFloat32(w,h);
 
-		GeneralizedImageOps.randomize(left, rand, 0, 20);
-		GeneralizedImageOps.randomize(right,rand,0,20);
+		GImageMiscOps.fillUniform(left, rand, 0, 20);
+		GImageMiscOps.fillUniform(right, rand, 0, 20);
 
 		compareToDense(left, right, 0);
 		compareToDense(left, right, 2);

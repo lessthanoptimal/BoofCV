@@ -38,19 +38,23 @@ import java.util.List;
 
 
 /**
- * Wrapper around {@link boofcv.alg.tracker.klt.PyramidKltTracker} for {@link ImagePointTracker}
+ * Wrapper around {@link boofcv.alg.tracker.klt.PyramidKltTracker} for {@link ImagePointTracker}.  Every track
+ * will have the same size and shaped descriptor.  If any fault is encountered the track will be dropped.
  *
  * @author Peter Abeles
  */
 public class PointTrackerKltPyramid<I extends ImageSingleBand,D extends ImageSingleBand>
 		implements ImagePointTracker<I>
 {
-	PyramidUpdaterDiscrete<I>  inputPyramidUpdater;
-	ImageGradient<I,D> gradient;
+	// update the image pyramid
+	private PyramidUpdaterDiscrete<I> inputPyramidUpdater;
+	// Updates the image pyramid's gradient.
+	private ImageGradient<I,D> gradient;
 
-	PyramidDiscrete<I> basePyramid;
-	ImagePyramid<D> derivX;
-	ImagePyramid<D> derivY;
+	// storage for image pyramid
+	private PyramidDiscrete<I> basePyramid;
+	private ImagePyramid<D> derivX;
+	private ImagePyramid<D> derivY;
 
 	// configuration for the track manager
 	protected PkltConfig<I, D> config;
@@ -68,11 +72,12 @@ public class PointTrackerKltPyramid<I extends ImageSingleBand,D extends ImageSin
 	protected PyramidKltTracker<I, D> tracker;
 
 	// selects point features
-	GeneralFeatureDetector<I, D> detector;
+	private GeneralFeatureDetector<I, D> detector;
 	// list of corners which should be ignored by the corner detector
-	QueueCorner excludeList = new QueueCorner(10);
+	private QueueCorner excludeList = new QueueCorner(10);
 
-	long totalFeatures = 0;
+	// number of features tracked so far
+	private long totalFeatures = 0;
 
 	/**
 	 * Constructor which specified the KLT track manager and how the image pyramids are computed.
@@ -120,6 +125,7 @@ public class PointTrackerKltPyramid<I extends ImageSingleBand,D extends ImageSin
 	public void spawnTracks() {
 		spawned.clear();
 
+		// used to convert it from the scale if the bottom layer into the original image
 		float scaleBottom = (float) basePyramid.getScale(0);
 
 		// exclude active tracks

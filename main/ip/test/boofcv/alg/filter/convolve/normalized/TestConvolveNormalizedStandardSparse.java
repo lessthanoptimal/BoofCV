@@ -19,7 +19,7 @@
 package boofcv.alg.filter.convolve.normalized;
 
 import boofcv.alg.filter.convolve.ConvolveNormalized;
-import boofcv.alg.misc.ImageTestingOps;
+import boofcv.alg.misc.ImageMiscOps;
 import boofcv.core.image.ConvertImage;
 import boofcv.factory.filter.kernel.FactoryKernelGaussian;
 import boofcv.struct.convolve.Kernel1D_F32;
@@ -96,7 +96,7 @@ public class TestConvolveNormalizedStandardSparse {
 
 	private void checkMethod(Method method, int width, int height, int kernelRadius, Random rand) {
 		ImageUInt8 seedImage = new ImageUInt8(width,height);
-		ImageTestingOps.randomize(seedImage,rand,0,255);
+		ImageMiscOps.fillUniform(seedImage,rand,0,255);
 
 		// creates a floating point image with integer elements
 		ImageFloat32 floatImage = new ImageFloat32(width,height);

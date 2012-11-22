@@ -18,6 +18,7 @@
 
 package boofcv.core.image;
 
+import boofcv.alg.misc.GImageMiscOps;
 import boofcv.struct.image.ImageInteger;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.testing.BoofTesting;
@@ -77,9 +78,9 @@ public class TestConvertImage {
 
 	   // only provide signed numbers of both data types can handle them
 		if( inputSigned && outputSigned ) {
-			GeneralizedImageOps.randomize(input, rand, -10,10);
+			GImageMiscOps.fillUniform(input, rand, -10, 10);
 		} else {
-			GeneralizedImageOps.randomize(input, rand, 0,20);
+			GImageMiscOps.fillUniform(input, rand, 0, 20);
 		}
 
 		BoofTesting.checkSubImage(this,"checkConvert",true,m,input,output);

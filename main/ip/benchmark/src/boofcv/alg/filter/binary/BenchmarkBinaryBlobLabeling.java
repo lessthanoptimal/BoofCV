@@ -19,7 +19,7 @@
 package boofcv.alg.filter.binary;
 
 import boofcv.alg.filter.binary.impl.ImplBinaryBlobLabeling;
-import boofcv.alg.misc.ImageTestingOps;
+import boofcv.alg.misc.ImageMiscOps;
 import boofcv.struct.image.ImageSInt32;
 import boofcv.struct.image.ImageUInt8;
 import com.google.caliper.Runner;
@@ -41,7 +41,7 @@ public class BenchmarkBinaryBlobLabeling extends SimpleBenchmark {
 
 	public BenchmarkBinaryBlobLabeling() {
 		Random rand = new Random(234);
-		ImageTestingOps.randomize(input, rand, 0, 1);
+		ImageMiscOps.fillUniform(input, rand, 0, 1);
 	}
 
 	public int timeNormal8(int reps) {

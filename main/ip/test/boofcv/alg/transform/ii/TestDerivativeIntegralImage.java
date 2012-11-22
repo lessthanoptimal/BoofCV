@@ -21,7 +21,7 @@ package boofcv.alg.transform.ii;
 import boofcv.alg.filter.convolve.ConvolveImageNoBorder;
 import boofcv.alg.filter.convolve.ConvolveWithBorder;
 import boofcv.alg.filter.kernel.KernelMath;
-import boofcv.alg.misc.ImageTestingOps;
+import boofcv.alg.misc.ImageMiscOps;
 import boofcv.core.image.border.FactoryImageBorderAlgs;
 import boofcv.core.image.border.ImageBorder_F32;
 import boofcv.struct.convolve.Kernel2D_F32;
@@ -46,7 +46,7 @@ public class TestDerivativeIntegralImage {
 		ImageFloat32 orig = new ImageFloat32(width,height);
 		ImageFloat32 integral = new ImageFloat32(width,height);
 
-		ImageTestingOps.randomize(orig,rand,0,20);
+		ImageMiscOps.fillUniform(orig,rand,0,20);
 
 		ImageFloat32 expected = new ImageFloat32(width,height);
 		ImageFloat32 found = new ImageFloat32(width,height);
@@ -71,7 +71,7 @@ public class TestDerivativeIntegralImage {
 		ImageFloat32 orig = new ImageFloat32(width,height);
 		ImageFloat32 integral = new ImageFloat32(width,height);
 
-		ImageTestingOps.randomize(orig,rand,0,20);
+		ImageMiscOps.fillUniform(orig,rand,0,20);
 
 		ImageFloat32 expected = new ImageFloat32(width,height);
 		ImageFloat32 found = new ImageFloat32(width,height);
@@ -97,7 +97,7 @@ public class TestDerivativeIntegralImage {
 		ImageFloat32 orig = new ImageFloat32(width,height);
 		ImageFloat32 integral = new ImageFloat32(width,height);
 
-		ImageTestingOps.randomize(orig,rand,0,20);
+		ImageMiscOps.fillUniform(orig,rand,0,20);
 
 		ImageFloat32 expected = new ImageFloat32(width,height);
 		ImageFloat32 found = new ImageFloat32(width,height);
@@ -122,7 +122,7 @@ public class TestDerivativeIntegralImage {
 		ImageFloat32 orig = new ImageFloat32(width,height);
 		ImageFloat32 integral = new ImageFloat32(width,height);
 
-		ImageTestingOps.randomize(orig,rand,0,20);
+		ImageMiscOps.fillUniform(orig,rand,0,20);
 
 		ImageFloat32 expected = new ImageFloat32(width,height);
 		ImageFloat32 found = new ImageFloat32(width,height);
@@ -149,7 +149,7 @@ public class TestDerivativeIntegralImage {
 		ImageFloat32 orig = new ImageFloat32(width,height);
 		ImageFloat32 integral = new ImageFloat32(width,height);
 
-		ImageTestingOps.randomize(orig,rand,0,20);
+		ImageMiscOps.fillUniform(orig,rand,0,20);
 
 		ImageFloat32 expected = new ImageFloat32(width,height);
 		ImageFloat32 found = new ImageFloat32(width,height);
@@ -175,7 +175,7 @@ public class TestDerivativeIntegralImage {
 		ImageFloat32 orig = new ImageFloat32(width,height);
 		ImageFloat32 integral = new ImageFloat32(width,height);
 
-		ImageTestingOps.randomize(orig,rand,0,20);
+		ImageMiscOps.fillUniform(orig,rand,0,20);
 
 		ImageFloat32 expected = new ImageFloat32(width,height);
 		ImageFloat32 found = new ImageFloat32(width,height);
@@ -201,7 +201,7 @@ public class TestDerivativeIntegralImage {
 		ImageFloat32 orig = new ImageFloat32(width,height);
 		ImageFloat32 integral = new ImageFloat32(width,height);
 
-		ImageTestingOps.randomize(orig,rand,0,20);
+		ImageMiscOps.fillUniform(orig,rand,0,20);
 
 		ImageFloat32 expected = new ImageFloat32(width,height);
 		ImageFloat32 found = new ImageFloat32(width,height);
@@ -228,7 +228,7 @@ public class TestDerivativeIntegralImage {
 		ImageFloat32 orig = new ImageFloat32(width,height);
 		ImageFloat32 integral = new ImageFloat32(width,height);
 
-		ImageTestingOps.randomize(orig,rand,0,20);
+		ImageMiscOps.fillUniform(orig,rand,0,20);
 
 		ImageFloat32 expected = new ImageFloat32(width,height);
 		ImageFloat32 found = new ImageFloat32(width,height);
@@ -256,7 +256,7 @@ public class TestDerivativeIntegralImage {
 		ImageFloat32 orig = new ImageFloat32(width,height);
 		ImageFloat32 integral = new ImageFloat32(width,height);
 
-		ImageTestingOps.randomize(orig,rand,0,20);
+		ImageMiscOps.fillUniform(orig,rand,0,20);
 
 		ImageFloat32 expected = new ImageFloat32(width,height);
 		ImageFloat32 found = new ImageFloat32(width,height);
@@ -282,7 +282,7 @@ public class TestDerivativeIntegralImage {
 		ImageFloat32 orig = new ImageFloat32(width,height);
 		ImageFloat32 integral = new ImageFloat32(width,height);
 
-		ImageTestingOps.randomize(orig,rand,0,20);
+		ImageMiscOps.fillUniform(orig,rand,0,20);
 
 		ImageFloat32 expected = new ImageFloat32(width,height);
 		ImageFloat32 found = new ImageFloat32(width,height);

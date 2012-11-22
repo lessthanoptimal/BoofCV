@@ -19,7 +19,7 @@
 package boofcv.alg.filter.convolve;
 
 import boofcv.alg.filter.convolve.noborder.*;
-import boofcv.alg.misc.ImageTestingOps;
+import boofcv.alg.misc.ImageMiscOps;
 import boofcv.core.image.border.BorderIndex1D_Extend;
 import boofcv.core.image.border.ImageBorder1D_I32;
 import boofcv.factory.filter.kernel.FactoryKernelGaussian;
@@ -64,9 +64,9 @@ public class BenchmarkConvolve extends SimpleBenchmark {
 	@Param({"1", "2"}) private int radius;
 
 	public BenchmarkConvolve() {
-		ImageTestingOps.randomize(input_U8,rand,0,20);
-		ImageTestingOps.randomize(input_S16,rand,0,20);
-		ImageTestingOps.randomize(input_F32,rand,0,20);
+		ImageMiscOps.fillUniform(input_U8,rand,0,20);
+		ImageMiscOps.fillUniform(input_S16,rand,0,20);
+		ImageMiscOps.fillUniform(input_F32,rand,0,20);
 	}
 
 	@Override protected void setUp() throws Exception {

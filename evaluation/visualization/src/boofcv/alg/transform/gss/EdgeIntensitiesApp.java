@@ -23,6 +23,7 @@ import boofcv.abst.filter.convolve.ConvolveInterface;
 import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.alg.filter.derivative.GradientThree;
 import boofcv.alg.filter.kernel.GKernelMath;
+import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.core.image.border.BorderType;
 import boofcv.factory.filter.blur.FactoryBlurFilter;
@@ -59,7 +60,7 @@ public class EdgeIntensitiesApp<T extends ImageSingleBand> {
 	}
 
 	public void init() {
-		GeneralizedImageOps.fillRectangle(input,100,width/2,0,width/2,height);
+		GImageMiscOps.fillRectangle(input, 100, width / 2, 0, width / 2, height);
 	}
 
 	private void printIntensity( String message , T deriv ) {

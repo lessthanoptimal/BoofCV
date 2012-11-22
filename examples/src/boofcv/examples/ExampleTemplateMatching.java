@@ -20,6 +20,7 @@ package boofcv.examples;
 
 import boofcv.alg.feature.detect.template.TemplateMatching;
 import boofcv.alg.feature.detect.template.TemplateMatchingIntensity;
+import boofcv.alg.misc.ImageStatistics;
 import boofcv.alg.misc.PixelMath;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.factory.feature.detect.template.FactoryTemplateMatching;
@@ -82,12 +83,12 @@ public class ExampleTemplateMatching {
 
 		// adjust the intensity image so that white indicates a good match and black a poor match
 		// the scale is kept linear to highlight how ambiguous the solution is
-		float min = PixelMath.min(intensity);
-		float max = PixelMath.max(intensity);
+		float min = ImageStatistics.min(intensity);
+		float max = ImageStatistics.max(intensity);
 		float range = max - min;
-		PixelMath.plus(intensity, intensity, -min);
-		PixelMath.divide(intensity, intensity, range);
-		PixelMath.multiply(intensity, intensity, 255.0f);
+		PixelMath.plus(intensity, -min, intensity);
+		PixelMath.divide(intensity, range, intensity);
+		PixelMath.multiply(intensity, 255.0f, intensity);
 
 		BufferedImage output = new BufferedImage(image.width, image.height, BufferedImage.TYPE_INT_BGR);
 		VisualizeImageData.grayMagnitude(intensity, output, -1);

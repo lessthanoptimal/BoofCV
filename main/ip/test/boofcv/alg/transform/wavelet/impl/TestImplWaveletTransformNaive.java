@@ -18,7 +18,7 @@
 
 package boofcv.alg.transform.wavelet.impl;
 
-import boofcv.alg.misc.ImageTestingOps;
+import boofcv.alg.misc.ImageMiscOps;
 import boofcv.core.image.border.BorderType;
 import boofcv.factory.transform.wavelet.FactoryWaveletDaub;
 import boofcv.struct.image.ImageFloat32;
@@ -75,7 +75,7 @@ public class TestImplWaveletTransformNaive {
 	private void testEncodeDecode_F32( int widthOrig , int heightOrig ,
 									   int widthOut , int heightOut ) {
 		ImageFloat32 orig = new ImageFloat32(widthOrig, heightOrig);
-		ImageTestingOps.randomize(orig,rand,0,30);
+		ImageMiscOps.fillUniform(orig,rand,0,30);
 
 		ImageFloat32 transformed = new ImageFloat32(widthOut,heightOut);
 		ImageFloat32 reconstructed = new ImageFloat32(widthOrig, heightOrig);
@@ -101,7 +101,7 @@ public class TestImplWaveletTransformNaive {
 	private void testEncodeDecode_I32( int widthOrig , int heightOrig ,
 									   int widthOut , int heightOut ) {
 		ImageUInt8 orig = new ImageUInt8(widthOrig, heightOrig);
-		ImageTestingOps.randomize(orig,rand,0,10);
+		ImageMiscOps.fillUniform(orig,rand,0,10);
 
 		ImageSInt32 transformed = new ImageSInt32(widthOut,heightOut);
 		ImageUInt8 reconstructed = new ImageUInt8(widthOrig, heightOrig);

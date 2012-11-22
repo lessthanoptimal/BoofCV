@@ -19,6 +19,7 @@
 package boofcv.alg.feature.orientation;
 
 import boofcv.abst.filter.derivative.ImageGradient;
+import boofcv.alg.misc.GImageMiscOps;
 import boofcv.alg.transform.ii.GIntegralImageOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.filter.derivative.FactoryDerivative;
@@ -69,7 +70,7 @@ public class BenchmarkOrientation<I extends ImageSingleBand, D extends ImageSing
 		derivX = GeneralizedImageOps.createSingleBand(derivType, width, height);
 		derivY = GeneralizedImageOps.createSingleBand(derivType, width, height);
 
-		GeneralizedImageOps.randomize(image,rand,0,100);
+		GImageMiscOps.fillUniform(image, rand, 0, 100);
 		GIntegralImageOps.transform(image,ii);
 
 		ImageGradient<I,D> gradient = FactoryDerivative.sobel(imageType,derivType);

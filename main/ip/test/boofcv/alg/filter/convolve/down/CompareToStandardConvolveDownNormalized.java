@@ -19,7 +19,7 @@
 package boofcv.alg.filter.convolve.down;
 
 import boofcv.alg.filter.convolve.ConvolutionTestHelper;
-import boofcv.core.image.GeneralizedImageOps;
+import boofcv.alg.misc.GImageMiscOps;
 import boofcv.factory.filter.kernel.FactoryKernelGaussian;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.testing.CompareIdenticalFunctions;
@@ -66,7 +66,7 @@ public class CompareToStandardConvolveDownNormalized extends CompareIdenticalFun
 		}
 
 		ImageSingleBand src = ConvolutionTestHelper.createImage(paramTypes[1], width, height);
-		GeneralizedImageOps.randomize(src, rand, 1, 10);
+		GImageMiscOps.fillUniform(src, rand, 1, 10);
 		ImageSingleBand dst = ConvolutionTestHelper.createImage(paramTypes[2], width/divW, height/divH);
 
 		Object[][] ret = new Object[1][paramTypes.length];

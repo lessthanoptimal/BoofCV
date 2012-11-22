@@ -22,6 +22,7 @@ package boofcv.alg.feature.describe;
 import boofcv.abst.filter.blur.BlurFilter;
 import boofcv.alg.feature.describe.brief.BriefDefinition_I32;
 import boofcv.alg.feature.describe.brief.FactoryBriefDefinition;
+import boofcv.alg.misc.GImageMiscOps;
 import boofcv.alg.misc.GPixelMath;
 import boofcv.core.image.FactoryGImageSingleBand;
 import boofcv.core.image.GImageSingleBand;
@@ -59,7 +60,7 @@ public abstract class BaseTestDescribeBrief <T extends ImageSingleBand> {
 
 	protected  T createImage( int width , int height ) {
 		T ret = GeneralizedImageOps.createSingleBand(imageType, width, height);
-		GeneralizedImageOps.randomize(ret,rand,0,50);
+		GImageMiscOps.fillUniform(ret, rand, 0, 50);
 		return ret;
 	}
 
@@ -115,7 +116,7 @@ public abstract class BaseTestDescribeBrief <T extends ImageSingleBand> {
 		T input = createImage(width,height);
 		T mod = (T)input.clone();
 
-		GPixelMath.multiply(input, mod, 2);
+		GPixelMath.multiply(input, 2, mod);
 
 		DescribePointBrief<T> alg = FactoryDescribePointAlgs.brief(def, filterBlur);
 

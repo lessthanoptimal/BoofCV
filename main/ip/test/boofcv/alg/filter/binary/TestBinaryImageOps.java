@@ -21,8 +21,8 @@ package boofcv.alg.filter.binary;
 import boofcv.alg.filter.binary.impl.CompareToBinaryNaive;
 import boofcv.alg.filter.binary.impl.ImplBinaryBlobLabeling;
 import boofcv.alg.filter.binary.impl.TestImplBinaryBlobLabeling;
-import boofcv.alg.misc.PixelMath;
-import boofcv.core.image.GeneralizedImageOps;
+import boofcv.alg.misc.GImageMiscOps;
+import boofcv.alg.misc.ImageStatistics;
 import boofcv.struct.FastQueue;
 import boofcv.struct.image.ImageSInt32;
 import boofcv.struct.image.ImageUInt8;
@@ -160,7 +160,7 @@ public class TestBinaryImageOps {
 		expected.data = expectedData;
 
 		// randomize output data to simulate using the same output multiple times
-		GeneralizedImageOps.randomize(found,rand,0,20);
+		GImageMiscOps.fillUniform(found, rand, 0, 20);
 
 		int numFount = rule8 ? BinaryImageOps.labelBlobs8(input,found) : BinaryImageOps.labelBlobs4(input,found);
 		assertEquals(numExpected,numFount);
@@ -252,7 +252,7 @@ public class TestBinaryImageOps {
 		ImageUInt8 expected = new ImageUInt8(w,w);
 		
 		// create a random image and find clusters
-		GeneralizedImageOps.randomize(binary,rand,0,2);
+		GImageMiscOps.fillUniform(binary, rand, 0, 2);
 		// make sure there are some islands
 		for( int i = 0; i < w; i++ ) {
 			binary.set(w2,i,0);
@@ -277,6 +277,6 @@ public class TestBinaryImageOps {
 		}
 
 		// should be the same number
-		assertEquals(PixelMath.sum(expected),total);
+		assertEquals(ImageStatistics.sum(expected),total);
 	}
 }

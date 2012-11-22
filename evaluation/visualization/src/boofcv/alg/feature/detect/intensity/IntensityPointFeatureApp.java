@@ -21,7 +21,7 @@ package boofcv.alg.feature.detect.intensity;
 import boofcv.abst.feature.detect.intensity.*;
 import boofcv.abst.filter.derivative.AnyImageDerivative;
 import boofcv.alg.filter.derivative.GradientThree;
-import boofcv.alg.misc.PixelMath;
+import boofcv.alg.misc.ImageStatistics;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.core.image.ImageGenerator;
@@ -107,7 +107,7 @@ public class IntensityPointFeatureApp<T extends ImageSingleBand, D extends Image
 		intensity.process(workImage,derivX,derivY,derivXX,derivYY,derivXY);
 
 		ImageFloat32 featureImg = intensity.getIntensity();
-		VisualizeImageData.colorizeSign(featureImg,temp, PixelMath.maxAbs(featureImg));
+		VisualizeImageData.colorizeSign(featureImg,temp, ImageStatistics.maxAbs(featureImg));
 		gui.setBufferedImage(temp);
 		gui.repaint();
 		gui.requestFocusInWindow();

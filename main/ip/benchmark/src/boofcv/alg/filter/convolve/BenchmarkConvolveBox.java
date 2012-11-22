@@ -19,7 +19,7 @@
 package boofcv.alg.filter.convolve;
 
 import boofcv.alg.filter.convolve.noborder.ImplConvolveBox;
-import boofcv.alg.misc.ImageTestingOps;
+import boofcv.alg.misc.ImageMiscOps;
 import boofcv.factory.filter.kernel.FactoryKernel;
 import boofcv.struct.convolve.Kernel1D_F32;
 import boofcv.struct.convolve.Kernel1D_I32;
@@ -60,9 +60,9 @@ public class BenchmarkConvolveBox extends SimpleBenchmark {
 	@Param({"1", "2", "3", "5","10"}) private int radius;
 
 	public BenchmarkConvolveBox() {
-		ImageTestingOps.randomize(input_I8,rand,0,20);
-		ImageTestingOps.randomize(input_I16,rand,0,20);
-		ImageTestingOps.randomize(input_F32,rand,0,20);
+		ImageMiscOps.fillUniform(input_I8,rand,0,20);
+		ImageMiscOps.fillUniform(input_I16,rand,0,20);
+		ImageMiscOps.fillUniform(input_F32,rand,0,20);
 	}
 
 	@Override protected void setUp() throws Exception {

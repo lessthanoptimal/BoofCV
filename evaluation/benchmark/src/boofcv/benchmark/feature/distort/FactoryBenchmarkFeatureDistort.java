@@ -24,8 +24,8 @@ import boofcv.alg.distort.PixelTransformAffine_F32;
 import boofcv.alg.filter.basic.GGrayImageOps;
 import boofcv.alg.interpolate.InterpolatePixel;
 import boofcv.alg.interpolate.TypeInterpolate;
+import boofcv.alg.misc.GImageMiscOps;
 import boofcv.benchmark.feature.orientation.UtilOrientationBenchmark;
-import boofcv.core.image.GeneralizedImageOps;
 import boofcv.core.image.border.FactoryImageBorder;
 import boofcv.factory.distort.FactoryDistort;
 import boofcv.factory.interpolate.FactoryInterpolation;
@@ -77,7 +77,7 @@ public class FactoryBenchmarkFeatureDistort {
 		protected void distortImage(T image, T distortedImage ,double sigma) {
 			distortedImage.reshape(image.width,image.height);
 			distortedImage.setTo(image);
-			GeneralizedImageOps.addGaussian(distortedImage,rand,sigma,0,255);
+			GImageMiscOps.addGaussian(distortedImage, rand, sigma, 0, 255);
 		}
 
 		@Override

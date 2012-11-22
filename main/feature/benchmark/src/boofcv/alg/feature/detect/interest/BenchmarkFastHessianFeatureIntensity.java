@@ -20,7 +20,7 @@ package boofcv.alg.feature.detect.interest;
 
 import boofcv.alg.feature.detect.intensity.IntegralImageFeatureIntensity;
 import boofcv.alg.feature.detect.intensity.impl.ImplIntegralImageFeatureIntensity;
-import boofcv.alg.misc.ImageTestingOps;
+import boofcv.alg.misc.ImageMiscOps;
 import boofcv.alg.transform.ii.IntegralImageOps;
 import boofcv.misc.PerformerBase;
 import boofcv.misc.ProfileOperation;
@@ -63,7 +63,7 @@ public class BenchmarkFastHessianFeatureIntensity {
 	}
 
 	public static void main(String args[]) {
-		ImageTestingOps.randomize(original,rand,0,200);
+		ImageMiscOps.fillUniform(original,rand,0,200);
 		IntegralImageOps.transform(original,integral);
 
 		System.out.println("=========  Profile Image Size " + width + " x " + height + " ==========");

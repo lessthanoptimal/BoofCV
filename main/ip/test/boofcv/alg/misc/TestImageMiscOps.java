@@ -35,7 +35,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestImageTestingOps {
+public class TestImageMiscOps {
 
 	int width = 10;
 	int height = 15;
@@ -44,7 +44,7 @@ public class TestImageTestingOps {
 	@Test
 	public void checkAll() {
 		int numExpected = 46;
-		Method methods[] = ImageTestingOps.class.getMethods();
+		Method methods[] = ImageMiscOps.class.getMethods();
 
 		// sanity check to make sure the functions are being found
 		int numFound = 0;
@@ -96,7 +96,7 @@ public class TestImageTestingOps {
 	private void testFill( Method m ) throws InvocationTargetException, IllegalAccessException {
 		Class paramTypes[] = m.getParameterTypes();
 		ImageSingleBand orig = GeneralizedImageOps.createSingleBand(paramTypes[0], width, height);
-		GeneralizedImageOps.randomize(orig, rand, 0,20);
+		GImageMiscOps.fillUniform(orig, rand, 0,20);
 
 		if( orig.getTypeInfo().isInteger()) {
 			m.invoke(null,orig,10);
@@ -170,7 +170,7 @@ public class TestImageTestingOps {
 	private void testAddUniform( Method m ) throws InvocationTargetException, IllegalAccessException {
 		Class paramTypes[] = m.getParameterTypes();
 		ImageSingleBand orig = GeneralizedImageOps.createSingleBand(paramTypes[0], width, height);
-		GeneralizedImageOps.fill(orig,1);
+		GImageMiscOps.fill(orig,1);
 
 		if( orig.getTypeInfo().isInteger() ) {
 			m.invoke(null,orig,rand,1,10);
@@ -194,7 +194,7 @@ public class TestImageTestingOps {
 		Class paramTypes[] = m.getParameterTypes();
 		ImageSingleBand orig = GeneralizedImageOps.createSingleBand(paramTypes[0], width, height);
 
-		GeneralizedImageOps.fill(orig,mean);
+		GImageMiscOps.fill(orig,mean);
 		m.invoke(null,orig,rand,2.0,0,255);
 
 		double stdev2 = 0;
@@ -206,7 +206,7 @@ public class TestImageTestingOps {
 			}
 		}
 
-		GeneralizedImageOps.fill(orig,mean);
+		GImageMiscOps.fill(orig,mean);
 		m.invoke(null,orig,rand,10.0,0,255);
 
 		double stdev10 = 0;
@@ -226,7 +226,7 @@ public class TestImageTestingOps {
 		Class paramTypes[] = m.getParameterTypes();
 		ImageSingleBand imgA = GeneralizedImageOps.createSingleBand(paramTypes[0], width, height);
 
-		GeneralizedImageOps.fill(imgA,10);
+		GImageMiscOps.fill(imgA,10);
 		ImageSingleBand imgB = imgA.clone();
 
 		GImageSingleBand b = FactoryGImageSingleBand.wrap(imgB);
@@ -249,7 +249,7 @@ public class TestImageTestingOps {
 		Class paramTypes[] = m.getParameterTypes();
 		ImageSingleBand imgA = GeneralizedImageOps.createSingleBand(paramTypes[0], width, height);
 
-		GeneralizedImageOps.randomize(imgA,rand,0,100);
+		GImageMiscOps.fillUniform(imgA,rand,0,100);
 		ImageSingleBand imgB = imgA.clone();
 
 		m.invoke(null,imgB);

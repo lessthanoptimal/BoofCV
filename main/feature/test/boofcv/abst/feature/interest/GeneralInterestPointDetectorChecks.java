@@ -19,6 +19,7 @@
 package boofcv.abst.feature.interest;
 
 import boofcv.abst.feature.detect.interest.InterestPointDetector;
+import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.testing.BoofTesting;
@@ -66,7 +67,7 @@ public abstract class GeneralInterestPointDetectorChecks<T extends ImageSingleBa
 
 		// create a random input image
 		image = GeneralizedImageOps.createSingleBand(imageType,60,80);
-		GeneralizedImageOps.randomize(image,rand,0,100);
+		GImageMiscOps.fillUniform(image, rand, 0, 100);
 	}
 
 	public void performAllTests() {

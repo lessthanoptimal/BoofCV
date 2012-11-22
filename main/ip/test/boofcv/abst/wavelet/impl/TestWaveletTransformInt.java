@@ -18,10 +18,10 @@
 
 package boofcv.abst.wavelet.impl;
 
+import boofcv.alg.misc.GImageMiscOps;
 import boofcv.alg.transform.wavelet.UtilWavelet;
 import boofcv.alg.transform.wavelet.WaveletTransformOps;
 import boofcv.core.image.ConvertImage;
-import boofcv.core.image.GeneralizedImageOps;
 import boofcv.core.image.border.BorderType;
 import boofcv.factory.transform.wavelet.FactoryWaveletDaub;
 import boofcv.struct.image.ImageDimension;
@@ -47,7 +47,7 @@ public class TestWaveletTransformInt {
 	@Test
 	public void compareToWaveletTransformOps() {
 		ImageSInt32 orig = new ImageSInt32(width,height);
-		GeneralizedImageOps.randomize(orig,rand,0,20);
+		GImageMiscOps.fillUniform(orig, rand, 0, 20);
 		ImageSInt32 origCopy = orig.clone();
 
 		int N = 3;
@@ -83,7 +83,7 @@ public class TestWaveletTransformInt {
 	@Test
 	public void checkOtherType() {
 		ImageSInt32 orig = new ImageSInt32(width,height);
-		GeneralizedImageOps.randomize(orig,rand,0,20);
+		GImageMiscOps.fillUniform(orig, rand, 0, 20);
 		ImageUInt8 orig8 = ConvertImage.convert(orig,(ImageUInt8)null);
 
 		int N = 3;

@@ -22,6 +22,7 @@ import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.distort.ImageDistortCache;
 import boofcv.alg.distort.PixelTransformAffine_F32;
 import boofcv.alg.interpolate.InterpolatePixel;
+import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.core.image.border.FactoryImageBorder;
 import boofcv.core.image.border.ImageBorder;
@@ -62,7 +63,7 @@ public abstract class CommonImageDistortCacheTests<T extends ImageSingleBand> {
 		dst0 = GeneralizedImageOps.createSingleBand(imageType,200,300);
 		dst1 = GeneralizedImageOps.createSingleBand(imageType,200,300);
 
-		GeneralizedImageOps.addGaussian(src,rand,10,0,255);
+		GImageMiscOps.addGaussian(src, rand, 10, 0, 255);
 	}
 
 	@Test

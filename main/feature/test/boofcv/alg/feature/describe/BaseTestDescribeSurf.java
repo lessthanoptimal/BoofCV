@@ -19,6 +19,7 @@
 package boofcv.alg.feature.describe;
 
 import boofcv.alg.feature.describe.impl.TestImplSurfDescribeOps;
+import boofcv.alg.misc.GImageMiscOps;
 import boofcv.alg.transform.ii.GIntegralImageOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.feature.SurfFeature;
@@ -59,7 +60,7 @@ public abstract class BaseTestDescribeSurf<I extends ImageSingleBand,II extends 
 	 */
 	@Test
 	public void checkSubImage() {
-		GeneralizedImageOps.randomize(ii, rand, 0, 100);
+		GImageMiscOps.fillUniform(ii, rand, 0, 100);
 		alg.setImage(ii);
 		SurfFeature expected = alg.createDescription();
 		alg.describe(c_x,c_y,1,0,expected);
@@ -78,7 +79,7 @@ public abstract class BaseTestDescribeSurf<I extends ImageSingleBand,II extends 
 	 */
 	@Test
 	public void changeScale() {
-		GeneralizedImageOps.randomize(ii, rand, 0, 100);
+		GImageMiscOps.fillUniform(ii, rand, 0, 100);
 		alg.setImage(ii);
 		SurfFeature a = alg.createDescription();
 		SurfFeature b = alg.createDescription();
@@ -93,7 +94,7 @@ public abstract class BaseTestDescribeSurf<I extends ImageSingleBand,II extends 
 	 */
 	@Test
 	public void changeRotation() {
-		GeneralizedImageOps.randomize(ii, rand, 0, 100);
+		GImageMiscOps.fillUniform(ii, rand, 0, 100);
 		alg.setImage(ii);
 		SurfFeature a = alg.createDescription();
 		SurfFeature b = alg.createDescription();
@@ -136,7 +137,7 @@ public abstract class BaseTestDescribeSurf<I extends ImageSingleBand,II extends 
 	 */
 	@Test
 	public void features_constant() {
-		GeneralizedImageOps.fill(input, 50);
+		GImageMiscOps.fill(input, 50);
 
 		GIntegralImageOps.transform(input, ii);
 		sparse = TestImplSurfDescribeOps.createGradient(ii, 1);

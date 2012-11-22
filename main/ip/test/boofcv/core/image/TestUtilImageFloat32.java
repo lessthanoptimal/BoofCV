@@ -18,7 +18,7 @@
 
 package boofcv.core.image;
 
-import boofcv.alg.misc.ImageTestingOps;
+import boofcv.alg.misc.ImageMiscOps;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.testing.BoofTesting;
 import org.junit.Test;
@@ -43,7 +43,7 @@ public class TestUtilImageFloat32 {
 	}
 
 	public void checkFill(ImageFloat32 image) {
-		ImageTestingOps.fill(image, 1.1f);
+		ImageMiscOps.fill(image, 1.1f);
 
 		for (int y = 0; y < image.getHeight(); y++) {
 			for (int x = 0; x < image.getWidth(); x++) {
@@ -60,7 +60,7 @@ public class TestUtilImageFloat32 {
 	}
 
 	public void checkRandomize(ImageFloat32 image) {
-		ImageTestingOps.randomize(image, rand, -20f, 20f);
+		ImageMiscOps.fillUniform(image, rand, -20f, 20f);
 
 		for (int y = 0; y < image.getHeight(); y++) {
 			for (int x = 0; x < image.getWidth(); x++) {

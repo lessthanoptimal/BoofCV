@@ -18,6 +18,7 @@
 
 package boofcv.alg.feature.detect.edge.impl;
 
+import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
@@ -54,8 +55,8 @@ public class TestImplGradientToEdgeFeatures {
 		ImageSingleBand derivX = GeneralizedImageOps.createSingleBand(derivType, width, height);
 		ImageSingleBand derivY = GeneralizedImageOps.createSingleBand(derivType, width, height);
 
-		GeneralizedImageOps.randomize(derivX,rand,-20,20);
-	    GeneralizedImageOps.randomize(derivY,rand,-20,20);
+		GImageMiscOps.fillUniform(derivX, rand, -20, 20);
+	    GImageMiscOps.fillUniform(derivY, rand, -20, 20);
 
 		ImageFloat32 intensity = new ImageFloat32(width,height);
 
@@ -85,8 +86,8 @@ public class TestImplGradientToEdgeFeatures {
 		ImageSingleBand derivX = GeneralizedImageOps.createSingleBand(derivType, width, height);
 		ImageSingleBand derivY = GeneralizedImageOps.createSingleBand(derivType, width, height);
 
-		GeneralizedImageOps.randomize(derivX,rand,-20,20);
-	    GeneralizedImageOps.randomize(derivY,rand,-20,20);
+		GImageMiscOps.fillUniform(derivX, rand, -20, 20);
+	    GImageMiscOps.fillUniform(derivY, rand, -20, 20);
 
 		ImageFloat32 intensity = new ImageFloat32(width,height);
 
@@ -116,8 +117,8 @@ public class TestImplGradientToEdgeFeatures {
 		ImageSingleBand derivX = GeneralizedImageOps.createSingleBand(derivType, width, height);
 		ImageSingleBand derivY = GeneralizedImageOps.createSingleBand(derivType, width, height);
 
-		GeneralizedImageOps.randomize(derivX,rand,-20,20);
-	    GeneralizedImageOps.randomize(derivY,rand,-20,20);
+		GImageMiscOps.fillUniform(derivX, rand, -20, 20);
+	    GImageMiscOps.fillUniform(derivY, rand, -20, 20);
 
 		ImageFloat32 angle = new ImageFloat32(width,height);
 
@@ -147,8 +148,8 @@ public class TestImplGradientToEdgeFeatures {
 		ImageSingleBand derivX = GeneralizedImageOps.createSingleBand(derivType, width, height);
 		ImageSingleBand derivY = GeneralizedImageOps.createSingleBand(derivType, width, height);
 
-		GeneralizedImageOps.randomize(derivX,rand,-20,20);
-	    GeneralizedImageOps.randomize(derivY,rand,-20,20);
+		GImageMiscOps.fillUniform(derivX, rand, -20, 20);
+	    GImageMiscOps.fillUniform(derivY, rand, -20, 20);
 
 		ImageFloat32 angle = new ImageFloat32(width,height);
 

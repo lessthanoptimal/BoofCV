@@ -18,6 +18,7 @@
 
 package boofcv.alg.filter.basic.impl;
 
+import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.FactoryGImageSingleBand;
 import boofcv.core.image.GImageSingleBand;
 import boofcv.core.image.GeneralizedImageOps;
@@ -29,7 +30,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Random;
 
-import static junit.framework.Assert.assertEquals;
+import static org.junit.Assert.assertEquals;
 
 
 /**
@@ -51,7 +52,7 @@ public class TestImplGrayImageOps {
 	public void invert( Method m ) throws InvocationTargetException, IllegalAccessException {
 		Class param[] = m.getParameterTypes();
 		ImageSingleBand input = GeneralizedImageOps.createSingleBand(param[0], width, height);
-		GeneralizedImageOps.randomize(input, rand, 0, 100);
+		GImageMiscOps.fillUniform(input, rand, 0, 100);
 		ImageSingleBand output = GeneralizedImageOps.createSingleBand(param[0], width, height);
 
 		m.invoke(null,input, 255, output);
@@ -76,7 +77,7 @@ public class TestImplGrayImageOps {
 		Class param[] = m.getParameterTypes();
 		ImageSingleBand input = GeneralizedImageOps.createSingleBand(param[0], width, height);
 		ImageSingleBand output = GeneralizedImageOps.createSingleBand(param[0], width, height);
-		GeneralizedImageOps.fill(input, 23);
+		GImageMiscOps.fill(input, 23);
 
 		m.invoke(null,input, 10,255, output);
 
@@ -107,7 +108,7 @@ public class TestImplGrayImageOps {
 		Class param[] = m.getParameterTypes();
 		ImageSingleBand input = GeneralizedImageOps.createSingleBand(param[0], width, height);
 		ImageSingleBand output = GeneralizedImageOps.createSingleBand(param[0], width, height);
-		GeneralizedImageOps.fill(input, 23);
+		GImageMiscOps.fill(input, 23);
 
 		m.invoke(null,input, 2.5,10,255, output);
 

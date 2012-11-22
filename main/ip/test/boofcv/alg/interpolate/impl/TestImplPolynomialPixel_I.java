@@ -21,7 +21,7 @@ package boofcv.alg.interpolate.impl;
 import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.distort.PixelTransformAffine_F32;
 import boofcv.alg.interpolate.InterpolatePixel;
-import boofcv.core.image.GeneralizedImageOps;
+import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.border.FactoryImageBorder;
 import boofcv.core.image.border.ImageBorder;
 import boofcv.factory.distort.FactoryDistort;
@@ -54,7 +54,7 @@ public class TestImplPolynomialPixel_I extends GeneralInterpolationPixelChecks<I
 		ImageUInt8 expected = new ImageUInt8(width,height);
 		ImageUInt8 found = new ImageUInt8(width,height);
 
-		GeneralizedImageOps.randomize(img,rand,0,255);
+		GImageMiscOps.fillUniform(img, rand, 0, 255);
 
 		Affine2D_F32 tran = new Affine2D_F32(1,0,0,1,0.25f,0.25f);
 

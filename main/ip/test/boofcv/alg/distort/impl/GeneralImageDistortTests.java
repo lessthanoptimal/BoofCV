@@ -20,6 +20,7 @@ package boofcv.alg.distort.impl;
 
 import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.interpolate.InterpolatePixel;
+import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.core.image.ImageGenerator;
 import boofcv.core.image.border.BorderType;
@@ -77,7 +78,7 @@ public abstract class GeneralImageDistortTests<T extends ImageSingleBand> {
 		T src = generator.createInstance(width,height);
 		T dst = generator.createInstance(width,height);
 
-		GeneralizedImageOps.randomize(src, rand, 0,10);
+		GImageMiscOps.fillUniform(src, rand, 0, 10);
 
 		ImageBorder border = withBorder ? this.border : null;
 
@@ -115,7 +116,7 @@ public abstract class GeneralImageDistortTests<T extends ImageSingleBand> {
 		T src = generator.createInstance(width,height);
 		T dst = generator.createInstance(width,height);
 
-		GeneralizedImageOps.randomize(src, rand, 0,10);
+		GImageMiscOps.fillUniform(src, rand, 0, 10);
 
 		ImageBorder border = withBorder ? this.border : null;
 
@@ -161,7 +162,7 @@ public abstract class GeneralImageDistortTests<T extends ImageSingleBand> {
 		T src = generator.createInstance(width,height);
 		T dst = generator.createInstance(width,height);
 
-		GeneralizedImageOps.randomize(src, rand, 0,10);
+		GImageMiscOps.fillUniform(src, rand, 0, 10);
 
 		ImageBorder border = withBorder ? this.border : null;
 

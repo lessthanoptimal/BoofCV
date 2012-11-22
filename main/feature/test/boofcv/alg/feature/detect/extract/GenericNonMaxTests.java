@@ -19,7 +19,7 @@
 package boofcv.alg.feature.detect.extract;
 
 
-import boofcv.alg.misc.ImageTestingOps;
+import boofcv.alg.misc.ImageMiscOps;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.testing.BoofTesting;
@@ -66,7 +66,7 @@ public abstract class GenericNonMaxTests {
 
 
 	public void reset() {
-		ImageTestingOps.fill(intensity, 0);
+		ImageMiscOps.fill(intensity, 0);
 	}
 
 	public void allStandard() {
@@ -184,7 +184,7 @@ public abstract class GenericNonMaxTests {
 	 * the peak easily
 	 */
 	public void negativeValuedIntensity() {
-		ImageTestingOps.fill(intensity, -Float.MAX_VALUE);
+		ImageMiscOps.fill(intensity, -Float.MAX_VALUE);
 
 		intensity.set(15, 20, -1000);
 
@@ -234,7 +234,7 @@ public abstract class GenericNonMaxTests {
 				reg.setThreshold(0.6f);
 
 				for (int i = 0; i < 10; i++) {
-					ImageTestingOps.randomize(inten, rand, 0, 10);
+					ImageMiscOps.fillUniform(inten, rand, 0, 10);
 
 
 					// detect the corners

@@ -36,6 +36,13 @@ public class NccFeature extends TupleDesc_F64 {
 	}
 
 	@Override
+	public NccFeature copy() {
+		NccFeature ret = new NccFeature( value.length );
+		ret.setTo(this);
+		return ret;
+	}
+
+	@Override
 	public void setTo(TupleDesc_F64 source) {
 		super.setTo(source);
 		NccFeature ncc = (NccFeature)source;

@@ -23,7 +23,7 @@ import boofcv.abst.filter.derivative.AnyImageDerivative;
 import boofcv.alg.distort.DistortImageOps;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.alg.interpolate.TypeInterpolate;
-import boofcv.alg.misc.PixelMath;
+import boofcv.alg.misc.ImageStatistics;
 import boofcv.alg.transform.gss.ScaleSpacePyramid;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.core.image.inst.FactoryImageGenerator;
@@ -117,7 +117,7 @@ public class IntensityFeatureScaleSpacePyramidApp<T extends ImageSingleBand, D e
 			// scale it up to full resolution
 			DistortImageOps.scale(featureImg,scaledIntensity, TypeInterpolate.NEAREST_NEIGHBOR);
 			// visualize the rescaled intensity
-			b = VisualizeImageData.colorizeSign(scaledIntensity,null, PixelMath.maxAbs(scaledIntensity));
+			b = VisualizeImageData.colorizeSign(scaledIntensity,null, ImageStatistics.maxAbs(scaledIntensity));
 			gui.addImage(b,String.format("Scale %6.2f",scale));
 
 			final int progressStatus = i+1;

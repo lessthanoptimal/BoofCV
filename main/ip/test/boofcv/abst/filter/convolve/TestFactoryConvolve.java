@@ -21,7 +21,7 @@ package boofcv.abst.filter.convolve;
 import boofcv.alg.filter.convolve.ConvolveImageNoBorder;
 import boofcv.alg.filter.convolve.ConvolveNormalized;
 import boofcv.alg.filter.convolve.ConvolveWithBorder;
-import boofcv.alg.misc.ImageTestingOps;
+import boofcv.alg.misc.ImageMiscOps;
 import boofcv.core.image.border.BorderIndex1D_Extend;
 import boofcv.core.image.border.BorderType;
 import boofcv.core.image.border.ImageBorder1D_F32;
@@ -61,7 +61,7 @@ public class TestFactoryConvolve {
 		ImageFloat32 found = new ImageFloat32(width,height);
 		ImageFloat32 expected = new ImageFloat32(width,height);
 
-		ImageTestingOps.randomize(input,rand,0,5);
+		ImageMiscOps.fillUniform(input,rand,0,5);
 
 		// CHECK NO BORDER
 		conv = FactoryConvolve.convolve( kernel,ImageFloat32.class,ImageFloat32.class,BorderType.SKIP,true);
@@ -93,7 +93,7 @@ public class TestFactoryConvolve {
 		ImageSInt16 found = new ImageSInt16(width,height);
 		ImageSInt16 expected = new ImageSInt16(width,height);
 
-		ImageTestingOps.randomize(input,rand,0,5);
+		ImageMiscOps.fillUniform(input,rand,0,5);
 
 		// CHECK NO BORDER
 		conv = FactoryConvolve.convolve( kernel,ImageUInt8.class,ImageInt16.class, BorderType.SKIP,true);
@@ -126,7 +126,7 @@ public class TestFactoryConvolve {
 		ImageFloat32 found = new ImageFloat32(width,height);
 		ImageFloat32 expected = new ImageFloat32(width,height);
 
-		ImageTestingOps.randomize(input,rand,0,5);
+		ImageMiscOps.fillUniform(input,rand,0,5);
 
 		// CHECK NO BORDER
 		conv = FactoryConvolve.convolve( kernel,ImageFloat32.class,ImageFloat32.class,BorderType.SKIP);
@@ -158,7 +158,7 @@ public class TestFactoryConvolve {
 		ImageSInt16 found = new ImageSInt16(width,height);
 		ImageSInt16 expected = new ImageSInt16(width,height);
 
-		ImageTestingOps.randomize(input,rand,0,5);
+		ImageMiscOps.fillUniform(input,rand,0,5);
 
 		// CHECK NO BORDER
 		conv = FactoryConvolve.convolve( kernel,ImageUInt8.class,ImageInt16.class,BorderType.SKIP);

@@ -21,7 +21,7 @@ package boofcv.alg.misc;
 import boofcv.struct.image.*;
 
 /**
- * Image type agnostic implementation of {@link PixelMath}.
+ * Image type agnostic wrapper for {@link PixelMath}.
  *
  * @author Peter Abeles
  */
@@ -37,153 +37,146 @@ public class GPixelMath {
 	public static <T extends ImageSingleBand> void abs( T input , T output )
 	{
 		if( ImageSInt8.class == input.getClass() ) {
-			PixelMath.abs((ImageSInt8)input,(ImageSInt8)output);
+			PixelMath.abs((ImageSInt8) input, (ImageSInt8) output);
 		} else if( ImageSInt16.class == input.getClass() ) {
-			PixelMath.abs((ImageSInt16)input,(ImageSInt16)output);
+			PixelMath.abs((ImageSInt16) input, (ImageSInt16) output);
 		} else if( ImageSInt32.class == input.getClass() ) {
-			PixelMath.abs((ImageSInt32)input,(ImageSInt32)output);
+			PixelMath.abs((ImageSInt32) input, (ImageSInt32) output);
+		} else if( ImageSInt64.class == input.getClass() ) {
+			PixelMath.abs((ImageSInt64) input, (ImageSInt64) output);
 		} else if( ImageFloat32.class == input.getClass() ) {
-			PixelMath.abs((ImageFloat32)input,(ImageFloat32)output);
-		} else {
-			throw new IllegalArgumentException("Unknown Image Type");
+			PixelMath.abs((ImageFloat32) input, (ImageFloat32) output);
+		} else if( ImageFloat64.class == input.getClass() ) {
+			PixelMath.abs((ImageFloat64) input, (ImageFloat64) output);
 		}
+		// otherwise assume it is an unsigned image type
 	}
 
 	/**
-	 * Returns the absolute value of the element with the largest absolute value.
-	 *
-	 * @param input Input image. Not modified.
-	 * @return Largest pixel absolute value.
-	 */
-	public static double maxAbs( ImageSingleBand input ) {
-		if( ImageUInt8.class == input.getClass() ) {
-			return PixelMath.maxAbs((ImageUInt8)input);
-		} else if( ImageSInt8.class == input.getClass() ) {
-			return PixelMath.maxAbs((ImageSInt8)input);
-		} else if( ImageUInt16.class == input.getClass() ) {
-			return PixelMath.maxAbs((ImageUInt16)input);
-		} else if( ImageSInt16.class == input.getClass() ) {
-			return PixelMath.maxAbs((ImageSInt16)input);
-		} else if( ImageSInt32.class == input.getClass() ) {
-			return PixelMath.maxAbs((ImageSInt32)input);
-		} else if( ImageFloat32.class == input.getClass() ) {
-			return PixelMath.maxAbs((ImageFloat32)input);
-		} else {
-			throw new IllegalArgumentException("Unknown Image Type");
-		}
-	}
-
-	/**
-	 * Returns the maximum pixel value.
-	 *
-	 * @param input Input image. Not modified.
-	 * @return Maximum pixel value.
-	 */
-	public static double max( ImageSingleBand input ) {
-		if( ImageUInt8.class == input.getClass() ) {
-			return PixelMath.max((ImageUInt8) input);
-		} else if( ImageSInt8.class == input.getClass() ) {
-			return PixelMath.max((ImageSInt8) input);
-		} else if( ImageUInt16.class == input.getClass() ) {
-			return PixelMath.max((ImageUInt16) input);
-		} else if( ImageSInt16.class == input.getClass() ) {
-			return PixelMath.max((ImageSInt16) input);
-		} else if( ImageSInt32.class == input.getClass() ) {
-			return PixelMath.max((ImageSInt32) input);
-		} else if( ImageFloat32.class == input.getClass() ) {
-			return PixelMath.max((ImageFloat32) input);
-		} else {
-			throw new IllegalArgumentException("Unknown Image Type");
-		}
-	}
-
-	/**
-	 * Returns the minimum pixel value.
-	 *
-	 * @param input Input image. Not modified.
-	 * @return Minimum pixel value.
-	 */
-	public static double min( ImageSingleBand input ) {
-		if( ImageUInt8.class == input.getClass() ) {
-			return PixelMath.min((ImageUInt8) input);
-		} else if( ImageSInt8.class == input.getClass() ) {
-			return PixelMath.min((ImageSInt8) input);
-		} else if( ImageUInt16.class == input.getClass() ) {
-			return PixelMath.min((ImageUInt16) input);
-		} else if( ImageSInt16.class == input.getClass() ) {
-			return PixelMath.min((ImageSInt16) input);
-		} else if( ImageSInt32.class == input.getClass() ) {
-			return PixelMath.min((ImageSInt32) input);
-		} else if( ImageFloat32.class == input.getClass() ) {
-			return PixelMath.min((ImageFloat32) input);
-		} else {
-			throw new IllegalArgumentException("Unknown Image Type");
-		}
-	}
-
-	/**
-	 * Divides each element by the denominator. Both input and output images can
-	 * be the same.
+	 * Divide each element by a scalar value. Both input and output images can be the same instance.
 	 *
 	 * @param input The input image. Not modified.
-	 * @param output The output image. Modified.
 	 * @param denominator What each element is divided by.
+	 * @param output The output image. Modified.
 	 */
-	public static <T extends ImageSingleBand> void divide( T input , T output , double denominator ) {
+	public static <T extends ImageSingleBand> void divide(T input, double denominator, T output) {
 
-		if( ImageInteger.class.isAssignableFrom(input.getClass())) {
-			if( ImageUInt8.class == input.getClass() ) {
-				PixelMath.divide((ImageUInt8)input,(ImageUInt8)output, denominator);
-			} else if( ImageSInt8.class == input.getClass() ) {
-				PixelMath.divide((ImageSInt8)input,(ImageSInt8)output, denominator);
-			} else if( ImageUInt16.class == input.getClass() ) {
-				PixelMath.divide((ImageUInt16)input,(ImageUInt16)output, denominator);
-			} else if( ImageSInt16.class == input.getClass() ) {
-				PixelMath.divide((ImageSInt16)input,(ImageSInt16)output, denominator);
-			} else if( ImageSInt32.class == input.getClass() ) {
-				PixelMath.divide((ImageSInt32)input,(ImageSInt32)output, denominator);
-			} else {
-				throw new IllegalArgumentException("Unknown integer image Type");
-			}
+		if( ImageUInt8.class == input.getClass() ) {
+			PixelMath.divide((ImageUInt8)input,denominator,(ImageUInt8)output);
+		} else if( ImageSInt8.class == input.getClass() ) {
+			PixelMath.divide((ImageSInt8)input,denominator,(ImageSInt8)output);
+		} else if( ImageUInt16.class == input.getClass() ) {
+			PixelMath.divide((ImageUInt16)input,denominator,(ImageUInt16)output);
+		} else if( ImageSInt16.class == input.getClass() ) {
+			PixelMath.divide((ImageSInt16)input,denominator,(ImageSInt16)output);
+		} else if( ImageSInt32.class == input.getClass() ) {
+			PixelMath.divide((ImageSInt32)input,denominator,(ImageSInt32)output);
+		} else if( ImageSInt64.class == input.getClass() ) {
+			PixelMath.divide((ImageSInt64)input,denominator,(ImageSInt64)output);
+		} else if( ImageFloat32.class == input.getClass() ) {
+			PixelMath.divide((ImageFloat32)input,(float)denominator,(ImageFloat32)output);
+		} else if( ImageFloat64.class == input.getClass() ) {
+			PixelMath.divide((ImageFloat64)input,denominator,(ImageFloat64)output);
 		} else {
-			if( ImageFloat32.class == input.getClass() ) {
-				PixelMath.divide((ImageFloat32)input,(ImageFloat32)output, (float)denominator);
-			} else {
-				throw new IllegalArgumentException("Unknown integer image Type");
-			}
+			throw new IllegalArgumentException("Unknown image Type: "+input.getClass().getSimpleName());
 		}
 	}
 
 	/**
-	 * Multiplied each element by the scale factor. Both input and output images can
-	 * be the same.
+	 * Divide each element by a scalar value and bounds the result. Both input and output images can be the same instance.
 	 *
 	 * @param input The input image. Not modified.
+	 * @param denominator What each element is divided by.
+	 * @param lower Lower bound on output
+	 * @param upper Upper bound on output
 	 * @param output The output image. Modified.
-	 * @param scale What each element is divided by.
 	 */
-	public static <T extends ImageSingleBand> void multiply( T input , T output , double scale ) {
-
-		if( ImageInteger.class.isAssignableFrom(input.getClass())) {
-			if( ImageUInt8.class == input.getClass() ) {
-				PixelMath.multiply((ImageUInt8)input,(ImageUInt8)output, scale);
-			} else if( ImageSInt8.class == input.getClass() ) {
-				PixelMath.multiply((ImageSInt8)input,(ImageSInt8)output, scale);
-			} else if( ImageUInt16.class == input.getClass() ) {
-				PixelMath.multiply((ImageUInt16)input,(ImageUInt16)output, scale);
-			} else if( ImageSInt16.class == input.getClass() ) {
-				PixelMath.multiply((ImageSInt16)input,(ImageSInt16)output, scale);
-			} else if( ImageSInt32.class == input.getClass() ) {
-				PixelMath.multiply((ImageSInt32)input,(ImageSInt32)output, scale);
-			} else {
-				throw new IllegalArgumentException("Unknown integer image Type");
-			}
+	public static <T extends ImageSingleBand> void divide(T input, double denominator,
+														  double lower , double upper  , T output)
+	{
+		if( ImageUInt8.class == input.getClass() ) {
+			PixelMath.divide((ImageUInt8)input,denominator,(int)lower,(int)upper,(ImageUInt8)output);
+		} else if( ImageSInt8.class == input.getClass() ) {
+			PixelMath.divide((ImageSInt8)input,denominator,(int)lower,(int)upper,(ImageSInt8)output);
+		} else if( ImageUInt16.class == input.getClass() ) {
+			PixelMath.divide((ImageUInt16)input,denominator,(int)lower,(int)upper,(ImageUInt16)output);
+		} else if( ImageSInt16.class == input.getClass() ) {
+			PixelMath.divide((ImageSInt16)input,denominator,(int)lower,(int)upper,(ImageSInt16)output);
+		} else if( ImageSInt32.class == input.getClass() ) {
+			PixelMath.divide((ImageSInt32)input,denominator,(int)lower,(int)upper,(ImageSInt32)output);
+		} else if( ImageSInt64.class == input.getClass() ) {
+			PixelMath.divide((ImageSInt64)input,denominator,(long)lower,(long)upper,(ImageSInt64)output);
+		} else if( ImageFloat32.class == input.getClass() ) {
+			PixelMath.divide((ImageFloat32)input,(float)denominator,(float)lower,(float)upper,(ImageFloat32)output);
+		} else if( ImageFloat64.class == input.getClass() ) {
+			PixelMath.divide((ImageFloat64)input,denominator,lower,upper,(ImageFloat64)output);
 		} else {
-			if( ImageFloat32.class == input.getClass() ) {
-				PixelMath.multiply((ImageFloat32)input,(ImageFloat32)output, (float)scale);
-			} else {
-				throw new IllegalArgumentException("Unknown integer image Type");
-			}
+			throw new IllegalArgumentException("Unknown image Type: "+input.getClass().getSimpleName());
+		}
+	}
+
+	/**
+	 * Multiply each element by a scalar value. Both input and output images can
+	 * be the same instance.
+	 *
+	 * @param input The input image. Not modified.
+	 * @param value What each element is multiplied by.
+	 * @param output The output image. Modified.
+	 */
+	public static <T extends ImageSingleBand> void multiply(T input, double value, T output) {
+
+		if( ImageUInt8.class == input.getClass() ) {
+			PixelMath.multiply((ImageUInt8) input, value, (ImageUInt8) output);
+		} else if( ImageSInt8.class == input.getClass() ) {
+			PixelMath.multiply((ImageSInt8) input, value, (ImageSInt8) output);
+		} else if( ImageUInt16.class == input.getClass() ) {
+			PixelMath.multiply((ImageUInt16) input, value, (ImageUInt16) output);
+		} else if( ImageSInt16.class == input.getClass() ) {
+			PixelMath.multiply((ImageSInt16) input, value, (ImageSInt16) output);
+		} else if( ImageSInt32.class == input.getClass() ) {
+			PixelMath.multiply((ImageSInt32) input, value, (ImageSInt32) output);
+		} else if( ImageSInt64.class == input.getClass() ) {
+			PixelMath.multiply((ImageSInt64) input, value, (ImageSInt64) output);
+		} else if( ImageFloat32.class == input.getClass() ) {
+			PixelMath.multiply((ImageFloat32) input, (float) value, (ImageFloat32) output);
+		} else if( ImageFloat64.class == input.getClass() ) {
+			PixelMath.multiply((ImageFloat64) input, value, (ImageFloat64) output);
+		} else {
+			throw new IllegalArgumentException("Unknown image Type: "+input.getClass().getSimpleName());
+		}
+	}
+
+	/**
+	 * Multiply each element by a scalar value and bounds the result. Both input and output images can
+	 * be the same instance.
+	 *
+	 * @param input The input image. Not modified.
+	 * @param value What each element is multiplied by.
+	 * @param lower Lower bound on output
+	 * @param upper Upper bound on output
+	 * @param output The output image. Modified.
+	 */
+	public static <T extends ImageSingleBand> void multiply(T input, double value,
+														  double lower , double upper , T output)
+	{
+		if( ImageUInt8.class == input.getClass() ) {
+			PixelMath.multiply((ImageUInt8)input,value,(int)lower,(int)upper,(ImageUInt8)output);
+		} else if( ImageSInt8.class == input.getClass() ) {
+			PixelMath.multiply((ImageSInt8)input,value,(int)lower,(int)upper,(ImageSInt8)output);
+		} else if( ImageUInt16.class == input.getClass() ) {
+			PixelMath.multiply((ImageUInt16)input,value,(int)lower,(int)upper,(ImageUInt16)output);
+		} else if( ImageSInt16.class == input.getClass() ) {
+			PixelMath.multiply((ImageSInt16)input,value,(int)lower,(int)upper,(ImageSInt16)output);
+		} else if( ImageSInt32.class == input.getClass() ) {
+			PixelMath.multiply((ImageSInt32)input,value,(int)lower,(int)upper,(ImageSInt32)output);
+		} else if( ImageSInt64.class == input.getClass() ) {
+			PixelMath.multiply((ImageSInt64)input,value,(long)lower,(long)upper,(ImageSInt64)output);
+		} else if( ImageFloat32.class == input.getClass() ) {
+			PixelMath.multiply((ImageFloat32)input,(float)value,(float)lower,(float)upper,(ImageFloat32)output);
+		} else if( ImageFloat64.class == input.getClass() ) {
+			PixelMath.multiply((ImageFloat64)input,value,lower,upper,(ImageFloat64)output);
+		} else {
+			throw new IllegalArgumentException("Unknown image Type: "+input.getClass().getSimpleName());
 		}
 	}
 
@@ -192,60 +185,125 @@ public class GPixelMath {
 	 * be the same.
 	 *
 	 * @param input The input image. Not modified.
-	 * @param output The output image. Modified.
 	 * @param value What is added to each element.
+	 * @param output The output image. Modified.
 	 */
-	public static <T extends ImageSingleBand> void plus( T input , T output, double value ) {
-		if( ImageInteger.class.isAssignableFrom(input.getClass())) {
-			int scaleI = (int)value;
-
-			if( ImageUInt8.class == input.getClass() ) {
-				PixelMath.plus((ImageUInt8)input,(ImageUInt8)output, scaleI);
-			} else if( ImageSInt8.class == input.getClass() ) {
-				PixelMath.plus((ImageSInt8)input,(ImageSInt8)output, scaleI);
-			} else if( ImageUInt16.class == input.getClass() ) {
-				PixelMath.plus((ImageUInt16)input,(ImageUInt16)output, scaleI);
-			} else if( ImageSInt16.class == input.getClass() ) {
-				PixelMath.plus((ImageSInt16)input,(ImageSInt16)output, scaleI);
-			} else if( ImageSInt32.class == input.getClass() ) {
-				PixelMath.plus((ImageSInt32)input,(ImageSInt32)output, scaleI);
-			} else {
-				throw new IllegalArgumentException("Unknown integer image Type");
-			}
+	public static <T extends ImageSingleBand> void plus(T input, double value, T output) {
+		if( ImageUInt8.class == input.getClass() ) {
+			PixelMath.plus((ImageUInt8) input, (int)value, (ImageUInt8) output);
+		} else if( ImageSInt8.class == input.getClass() ) {
+			PixelMath.plus((ImageSInt8) input, (int)value, (ImageSInt8) output);
+		} else if( ImageUInt16.class == input.getClass() ) {
+			PixelMath.plus((ImageUInt16) input, (int)value, (ImageUInt16) output);
+		} else if( ImageSInt16.class == input.getClass() ) {
+			PixelMath.plus((ImageSInt16) input, (int)value, (ImageSInt16) output);
+		} else if( ImageSInt32.class == input.getClass() ) {
+			PixelMath.plus((ImageSInt32) input, (int)value, (ImageSInt32) output);
+		} else if( ImageSInt64.class == input.getClass() ) {
+			PixelMath.plus((ImageSInt64) input, (int)value, (ImageSInt64) output);
+		} else if( ImageFloat32.class == input.getClass() ) {
+			PixelMath.plus((ImageFloat32) input, (float) value, (ImageFloat32) output);
+		} else if( ImageFloat64.class == input.getClass() ) {
+			PixelMath.plus((ImageFloat64) input, value, (ImageFloat64) output);
 		} else {
-			if( ImageFloat32.class == input.getClass() ) {
-				PixelMath.plus((ImageFloat32)input,(ImageFloat32)output, (float)value);
-			} else {
-				throw new IllegalArgumentException("Unknown integer image Type");
-			}
+			throw new IllegalArgumentException("Unknown image Type: "+input.getClass().getSimpleName());
+		}
+	}
+
+	/**
+	 * Add a scalar value to each element and bounds the result. Both input and output images can be the same instance.
+	 *
+	 * @param input The input image. Not modified.
+	 * @param value What is added to each element.
+	 * @param lower Lower bound on output
+	 * @param upper Upper bound on output
+	 * @param output The output image. Modified.
+	 */
+	public static <T extends ImageSingleBand> void plus(T input, double value,
+															double lower , double upper , T output)
+	{
+		if( ImageUInt8.class == input.getClass() ) {
+			PixelMath.plus((ImageUInt8)input,(int)value,(int)lower,(int)upper,(ImageUInt8)output);
+		} else if( ImageSInt8.class == input.getClass() ) {
+			PixelMath.plus((ImageSInt8)input,(int)value,(int)lower,(int)upper,(ImageSInt8)output);
+		} else if( ImageUInt16.class == input.getClass() ) {
+			PixelMath.plus((ImageUInt16)input,(int)value,(int)lower,(int)upper,(ImageUInt16)output);
+		} else if( ImageSInt16.class == input.getClass() ) {
+			PixelMath.plus((ImageSInt16)input,(int)value,(int)lower,(int)upper,(ImageSInt16)output);
+		} else if( ImageSInt32.class == input.getClass() ) {
+			PixelMath.plus((ImageSInt32)input,(int)value,(int)lower,(int)upper,(ImageSInt32)output);
+		} else if( ImageSInt64.class == input.getClass() ) {
+			PixelMath.plus((ImageSInt64)input,(int)value,(long)lower,(long)upper,(ImageSInt64)output);
+		} else if( ImageFloat32.class == input.getClass() ) {
+			PixelMath.plus((ImageFloat32)input,(float)value,(float)lower,(float)upper,(ImageFloat32)output);
+		} else if( ImageFloat64.class == input.getClass() ) {
+			PixelMath.plus((ImageFloat64)input,value,lower,upper,(ImageFloat64)output);
+		} else {
+			throw new IllegalArgumentException("Unknown image Type: "+input.getClass().getSimpleName());
 		}
 	}
 
 	/**
 	 * <p>
-	 * Returns the sum of all the pixels in the image.
+	 * Performs pixel-wise addition<br>
+	 * d(x,y) = inputA(x,y) + inputB(x,y)
 	 * </p>
-	 *
-	 * @param input Input image. Not modified.
+	 * @param inputA Input image. Not modified.
+	 * @param inputB Input image. Not modified.
+	 * @param output Output image. Modified.
 	 */
-	public static <T extends ImageSingleBand> double sum( T input ) {
-
-		if( ImageUInt8.class == input.getClass() ) {
-			return PixelMath.sum((ImageUInt8)input);
-		} else if( ImageSInt8.class == input.getClass() ) {
-			return PixelMath.sum((ImageSInt8)input);
-		} else if( ImageUInt16.class == input.getClass() ) {
-			return PixelMath.sum((ImageUInt16)input);
-		} else if( ImageSInt16.class == input.getClass() ) {
-			return PixelMath.sum((ImageSInt16)input);
-		} else if( ImageSInt32.class == input.getClass() ) {
-			return PixelMath.sum((ImageSInt32)input);
-		} else if( ImageFloat32.class == input.getClass() ) {
-			return PixelMath.sum((ImageFloat32)input);
-		} else if( ImageFloat64.class == input.getClass() ) {
-			return PixelMath.sum((ImageFloat64)input);
+	public static <T extends ImageSingleBand, O extends ImageSingleBand>
+	void add(T inputA, T inputB, O output) {
+		if( ImageUInt8.class == inputA.getClass() ) {
+			PixelMath.add((ImageUInt8) inputA, (ImageUInt8)inputB, (ImageUInt16) output);
+		} else if( ImageSInt8.class == inputA.getClass() ) {
+			PixelMath.add((ImageSInt8) inputA, (ImageSInt8)inputB, (ImageSInt16) output);
+		} else if( ImageUInt16.class == inputA.getClass() ) {
+			PixelMath.add((ImageUInt16) inputA, (ImageUInt16)inputB, (ImageSInt32) output);
+		} else if( ImageSInt16.class == inputA.getClass() ) {
+			PixelMath.add((ImageSInt16) inputA, (ImageSInt16)inputB, (ImageSInt32) output);
+		} else if( ImageSInt32.class == inputA.getClass() ) {
+			PixelMath.add((ImageSInt32) inputA, (ImageSInt32)inputB, (ImageSInt32) output);
+		} else if( ImageSInt64.class == inputA.getClass() ) {
+			PixelMath.add((ImageSInt64) inputA, (ImageSInt64)inputB, (ImageSInt64) output);
+		} else if( ImageFloat32.class == inputA.getClass() ) {
+			PixelMath.add((ImageFloat32) inputA, (ImageFloat32)inputB, (ImageFloat32) output);
+		} else if( ImageFloat64.class == inputA.getClass() ) {
+			PixelMath.add((ImageFloat64) inputA, (ImageFloat64)inputB, (ImageFloat64) output);
 		} else {
-			throw new IllegalArgumentException("Unknown integer image Type");
+			throw new IllegalArgumentException("Unknown image Type: "+inputA.getClass().getSimpleName());
+		}
+	}
+
+	/**
+	 * <p>
+	 * Performs pixel-wise subtraction, but ensures the result is between two bounds.<br>
+	 * d(x,y) = imgA(x,y) - imgB(x,y)
+	 * </p>
+	 * @param inputA Input image. Not modified.
+	 * @param inputB Input image. Not modified.
+	 * @param output Output image. Modified.
+	 */
+	public static <T extends ImageSingleBand, O extends ImageSingleBand>
+	void subtract(T inputA, T inputB, O output) {
+		if( ImageUInt8.class == inputA.getClass() ) {
+			PixelMath.subtract((ImageUInt8) inputA, (ImageUInt8)inputB, (ImageUInt16) output);
+		} else if( ImageSInt8.class == inputA.getClass() ) {
+			PixelMath.subtract((ImageSInt8) inputA, (ImageSInt8)inputB, (ImageSInt16) output);
+		} else if( ImageUInt16.class == inputA.getClass() ) {
+			PixelMath.subtract((ImageUInt16) inputA, (ImageUInt16)inputB, (ImageSInt32) output);
+		} else if( ImageSInt16.class == inputA.getClass() ) {
+			PixelMath.subtract((ImageSInt16) inputA, (ImageSInt16)inputB, (ImageSInt32) output);
+		} else if( ImageSInt32.class == inputA.getClass() ) {
+			PixelMath.subtract((ImageSInt32) inputA, (ImageSInt32)inputB, (ImageSInt32) output);
+		} else if( ImageSInt64.class == inputA.getClass() ) {
+			PixelMath.subtract((ImageSInt64) inputA, (ImageSInt64)inputB, (ImageSInt64) output);
+		} else if( ImageFloat32.class == inputA.getClass() ) {
+			PixelMath.subtract((ImageFloat32) inputA, (ImageFloat32)inputB, (ImageFloat32) output);
+		} else if( ImageFloat64.class == inputA.getClass() ) {
+			PixelMath.subtract((ImageFloat64) inputA, (ImageFloat64)inputB, (ImageFloat64) output);
+		} else {
+			throw new IllegalArgumentException("Unknown image Type: "+inputA.getClass().getSimpleName());
 		}
 	}
 
@@ -268,12 +326,14 @@ public class GPixelMath {
 			PixelMath.boundImage((ImageSInt16)input,(int)min,(int)max);
 		} else if( ImageSInt32.class == input.getClass() ) {
 			PixelMath.boundImage((ImageSInt32)input,(int)min,(int)max);
+		} else if( ImageSInt64.class == input.getClass() ) {
+			PixelMath.boundImage((ImageSInt64)input,(long)min,(long)max);
 		} else if( ImageFloat32.class == input.getClass() ) {
 			PixelMath.boundImage((ImageFloat32)input,(float)min,(float)max);
 		} else if( ImageFloat64.class == input.getClass() ) {
-			PixelMath.boundImage((ImageFloat64)input,(int)min,(int)max);
+			PixelMath.boundImage((ImageFloat64)input,min,max);
 		} else {
-			throw new IllegalArgumentException("Unknown integer image Type");
+			throw new IllegalArgumentException("Unknown image Type: "+input.getClass().getSimpleName());
 		}
 	}
 
@@ -286,21 +346,21 @@ public class GPixelMath {
 	public static <T extends ImageSingleBand> void bandAve( MultiSpectral<T> input , T output) {
 
 		if( ImageUInt8.class == input.getType() ) {
-			PixelMath.bandAve((MultiSpectral<ImageUInt8>)input,(ImageUInt8)output);
+			PixelMath.averageBand((MultiSpectral<ImageUInt8>) input, (ImageUInt8) output);
 		} else if( ImageSInt8.class == input.getType() ) {
-			PixelMath.bandAve((MultiSpectral<ImageSInt8>)input,(ImageSInt8)output);
+			PixelMath.averageBand((MultiSpectral<ImageSInt8>) input, (ImageSInt8) output);
 		} else if( ImageUInt16.class == input.getType() ) {
-			PixelMath.bandAve((MultiSpectral<ImageUInt16>)input,(ImageUInt16)output);
+			PixelMath.averageBand((MultiSpectral<ImageUInt16>) input, (ImageUInt16) output);
 		} else if( ImageSInt16.class == input.getType() ) {
-			PixelMath.bandAve((MultiSpectral<ImageSInt16>)input,(ImageSInt16)output);
+			PixelMath.averageBand((MultiSpectral<ImageSInt16>) input, (ImageSInt16) output);
 		} else if( ImageSInt32.class == input.getType() ) {
-			PixelMath.bandAve((MultiSpectral<ImageSInt32>)input,(ImageSInt32)output);
+			PixelMath.averageBand((MultiSpectral<ImageSInt32>) input, (ImageSInt32) output);
 		} else if( ImageFloat32.class == input.getType() ) {
-			PixelMath.bandAve((MultiSpectral<ImageFloat32>)input,(ImageFloat32)output);
+			PixelMath.averageBand((MultiSpectral<ImageFloat32>) input, (ImageFloat32) output);
 		} else if( ImageFloat64.class == input.getType() ) {
-			PixelMath.bandAve((MultiSpectral<ImageFloat64>)input,(ImageFloat64)output);
+			PixelMath.averageBand((MultiSpectral<ImageFloat64>) input, (ImageFloat64) output);
 		} else {
-			throw new IllegalArgumentException("Unknown integer image Type");
+			throw new IllegalArgumentException("Unknown image Type: "+input.getType().getSimpleName());
 		}
 	}
 }

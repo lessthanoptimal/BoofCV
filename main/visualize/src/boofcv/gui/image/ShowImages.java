@@ -18,7 +18,7 @@
 
 package boofcv.gui.image;
 
-import boofcv.alg.misc.PixelMath;
+import boofcv.alg.misc.ImageStatistics;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSInt16;
@@ -89,7 +89,7 @@ public class ShowImages {
 	}
 
 	public static ImagePanel showWindow( ImageSInt16 img , String title ) {
-		int max = PixelMath.maxAbs(img);
+		int max = ImageStatistics.maxAbs(img);
 		BufferedImage buff;
 		if( img.getTypeInfo().isSigned() )
 			buff = VisualizeImageData.colorizeSign(img,null,max);
@@ -100,7 +100,7 @@ public class ShowImages {
 	}
 
 	public static ImagePanel showWindow( ImageFloat32 img , String title , boolean showMagnitude) {
-		float max = PixelMath.maxAbs(img);
+		float max = ImageStatistics.maxAbs(img);
 		BufferedImage buff;
 		if( showMagnitude )
 			buff = VisualizeImageData.grayMagnitude(img,null,max);

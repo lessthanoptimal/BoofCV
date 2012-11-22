@@ -18,8 +18,9 @@
 
 package boofcv.core.image;
 
+import boofcv.alg.misc.GImageMiscOps;
 import boofcv.alg.misc.ImageInterleavedTestingOps;
-import boofcv.alg.misc.ImageTestingOps;
+import boofcv.alg.misc.ImageMiscOps;
 import boofcv.struct.image.*;
 import boofcv.testing.BoofTesting;
 import org.junit.Test;
@@ -129,7 +130,7 @@ public class TestConvertBufferedImage {
 	public void extractBuffered_Int8() {
 		// use a signed image because it is checked against a byte array
 		ImageUInt8 srcImg = new ImageUInt8(imgWidth, imgHeight);
-		ImageTestingOps.randomize(srcImg, rand, 0, 100);
+		ImageMiscOps.fillUniform(srcImg, rand, 0, 100);
 
 		BufferedImage img = ConvertBufferedImage.extractBuffered(srcImg);
 
@@ -249,7 +250,7 @@ public class TestConvertBufferedImage {
 				} else {
 					image = new MultiSpectral(t, imgWidth, imgHeight, 3);
 				}
-				GeneralizedImageOps.randomize(image, rand, 0, 100);
+				GImageMiscOps.fillUniform(image, rand, 0, 100);
 
 				BoofTesting.checkSubImage(this, "convertTo_single_ms", false, image);
 			}

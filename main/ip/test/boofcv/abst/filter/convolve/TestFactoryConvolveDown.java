@@ -21,7 +21,7 @@ package boofcv.abst.filter.convolve;
 import boofcv.abst.filter.FilterImageInterface;
 import boofcv.alg.filter.convolve.ConvolveDownNoBorder;
 import boofcv.alg.filter.convolve.ConvolveDownNormalized;
-import boofcv.alg.misc.ImageTestingOps;
+import boofcv.alg.misc.ImageMiscOps;
 import boofcv.core.image.border.BorderType;
 import boofcv.factory.filter.convolve.FactoryConvolveDown;
 import boofcv.factory.filter.kernel.FactoryKernel;
@@ -59,7 +59,7 @@ public class TestFactoryConvolveDown {
 		ImageFloat32 found = new ImageFloat32(width/skip,height);
 		ImageFloat32 expected = new ImageFloat32(width/skip,height);
 
-		ImageTestingOps.randomize(input,rand,0,5);
+		ImageMiscOps.fillUniform(input,rand,0,5);
 
 		// CHECK NO BORDER
 		conv = FactoryConvolveDown.convolve( kernel,ImageFloat32.class,ImageFloat32.class,BorderType.SKIP,true,skip);
@@ -91,7 +91,7 @@ public class TestFactoryConvolveDown {
 		ImageSInt16 found = new ImageSInt16(width/skip,height);
 		ImageSInt16 expected = new ImageSInt16(width/skip,height);
 
-		ImageTestingOps.randomize(input,rand,0,5);
+		ImageMiscOps.fillUniform(input,rand,0,5);
 
 		// CHECK NO BORDER
 		conv = FactoryConvolveDown.convolve( kernel,ImageUInt8.class,ImageInt16.class,BorderType.SKIP,true,skip);
@@ -124,7 +124,7 @@ public class TestFactoryConvolveDown {
 		ImageFloat32 found = new ImageFloat32(width/skip,height/skip);
 		ImageFloat32 expected = new ImageFloat32(width/skip,height/skip);
 
-		ImageTestingOps.randomize(input,rand,0,5);
+		ImageMiscOps.fillUniform(input,rand,0,5);
 
 		// CHECK NO BORDER
 		conv = FactoryConvolveDown.convolve( kernel,ImageFloat32.class,ImageFloat32.class,BorderType.SKIP,skip);
@@ -156,7 +156,7 @@ public class TestFactoryConvolveDown {
 		ImageSInt16 found = new ImageSInt16(width/skip,height/skip);
 		ImageSInt16 expected = new ImageSInt16(width/skip,height/skip);
 
-		ImageTestingOps.randomize(input,rand,0,5);
+		ImageMiscOps.fillUniform(input,rand,0,5);
 
 		// CHECK NO BORDER
 		conv = FactoryConvolveDown.convolve( kernel,ImageUInt8.class,ImageInt16.class,BorderType.SKIP,skip);

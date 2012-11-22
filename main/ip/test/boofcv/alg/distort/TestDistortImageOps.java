@@ -20,7 +20,7 @@ package boofcv.alg.distort;
 
 import boofcv.alg.interpolate.InterpolatePixel;
 import boofcv.alg.interpolate.TypeInterpolate;
-import boofcv.core.image.GeneralizedImageOps;
+import boofcv.alg.misc.GImageMiscOps;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.image.ImageFloat32;
 import georegression.struct.affine.Affine2D_F32;
@@ -52,7 +52,7 @@ public class TestDistortImageOps {
 		ImageFloat32 input = new ImageFloat32(width,height);
 		ImageFloat32 output = new ImageFloat32(width,height);
 
-		GeneralizedImageOps.randomize(input,rand,0,100);
+		GImageMiscOps.fillUniform(input, rand, 0, 100);
 
 		DistortImageOps.scale(input,output, TypeInterpolate.BILINEAR);
 
@@ -84,7 +84,7 @@ public class TestDistortImageOps {
 		ImageFloat32 input = new ImageFloat32(width,height);
 		ImageFloat32 output = new ImageFloat32(width/2,height/2);
 
-		GeneralizedImageOps.randomize(input,rand,0,100);
+		GImageMiscOps.fillUniform(input, rand, 0, 100);
 
 		DistortImageOps.scale(input, output, TypeInterpolate.BILINEAR);
 
@@ -106,7 +106,7 @@ public class TestDistortImageOps {
 		ImageFloat32 input = new ImageFloat32(width,height);
 		ImageFloat32 output = new ImageFloat32(height,width);
 
-		GeneralizedImageOps.randomize(input,rand,0,100);
+		GImageMiscOps.fillUniform(input, rand, 0, 100);
 
 		DistortImageOps.rotate(input, output, TypeInterpolate.BILINEAR, (float) Math.PI / 2f);
 

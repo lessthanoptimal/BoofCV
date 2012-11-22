@@ -20,7 +20,7 @@ package boofcv.alg.filter.derivative;
 
 import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.abst.filter.derivative.ImageHessian;
-import boofcv.alg.misc.GPixelMath;
+import boofcv.alg.misc.GImageStatistics;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.gui.ListDisplayPanel;
@@ -119,15 +119,15 @@ public class ShowImageDerivative<T extends ImageSingleBand, D extends ImageSingl
 
 		double max;
 
-		max = GPixelMath.maxAbs(derivX);
+		max = GImageStatistics.maxAbs(derivX);
 		panel.addImage(VisualizeImageData.colorizeSign(derivX,null,max),"X-derivative");
-		max = GPixelMath.maxAbs(derivY);
+		max = GImageStatistics.maxAbs(derivY);
 		panel.addImage(VisualizeImageData.colorizeSign(derivY,null,max),"Y-derivative");
-		max = GPixelMath.maxAbs(derivXX);
+		max = GImageStatistics.maxAbs(derivXX);
 		panel.addImage(VisualizeImageData.colorizeSign(derivXX,null,max),"XX-derivative");
-		max = GPixelMath.maxAbs(derivYY);
+		max = GImageStatistics.maxAbs(derivYY);
 		panel.addImage(VisualizeImageData.colorizeSign(derivYY,null,max),"YY-derivative");
-		max = GPixelMath.maxAbs(derivXY);
+		max = GImageStatistics.maxAbs(derivXY);
 		panel.addImage(VisualizeImageData.colorizeSign(derivXY,null,max),"XY-derivative");
 
 		processedImage = true;

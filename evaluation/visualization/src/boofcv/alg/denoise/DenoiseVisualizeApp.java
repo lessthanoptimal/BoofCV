@@ -23,6 +23,7 @@ import boofcv.abst.filter.FilterImageInterface;
 import boofcv.abst.filter.blur.BlurFilter;
 import boofcv.abst.wavelet.WaveletTransform;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
+import boofcv.alg.misc.GImageMiscOps;
 import boofcv.alg.misc.GPixelMath;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.core.image.GeneralizedImageOps;
@@ -146,7 +147,7 @@ public class DenoiseVisualizeApp<T extends ImageSingleBand,D extends ImageSingle
 
 		// add noise to the image
 		noisy.setTo(input);
-		GeneralizedImageOps.addGaussian(noisy,rand,noiseSigma,0,255);
+		GImageMiscOps.addGaussian(noisy, rand, noiseSigma, 0, 255);
 		GPixelMath.boundImage(noisy,0,255);
 		// compute edge image for weighted error
 		GImageDerivativeOps.laplace(input,deriv);
@@ -246,7 +247,7 @@ public class DenoiseVisualizeApp<T extends ImageSingleBand,D extends ImageSingle
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				noisy.setTo(input);
-				GeneralizedImageOps.addGaussian(noisy,rand,noiseSigma,0,255);
+				GImageMiscOps.addGaussian(noisy,rand,noiseSigma,0,255);
 				GPixelMath.boundImage(noisy,0,255);
 				performDenoising();
 			}});

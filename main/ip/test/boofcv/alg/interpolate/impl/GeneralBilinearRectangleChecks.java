@@ -20,7 +20,7 @@ package boofcv.alg.interpolate.impl;
 
 import boofcv.alg.interpolate.InterpolatePixel;
 import boofcv.alg.interpolate.InterpolateRectangle;
-import boofcv.core.image.GeneralizedImageOps;
+import boofcv.alg.misc.GImageMiscOps;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
@@ -95,7 +95,7 @@ public abstract class GeneralBilinearRectangleChecks<T extends ImageSingleBand> 
 	 */
 	public void checkRegion(int regionWidth, int regionHeight, float x, float y) {
 		T img = createImage(width, height);
-		GeneralizedImageOps.randomize(img, rand, 0,20);
+		GImageMiscOps.fillUniform(img, rand, 0, 20);
 
 		this.regionWidth = regionWidth;
 		this.regionHeight = regionHeight;

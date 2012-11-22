@@ -19,6 +19,7 @@
 package boofcv.alg.feature.disparity;
 
 import boofcv.alg.feature.disparity.impl.*;
+import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.misc.PerformerBase;
 import boofcv.misc.ProfileOperation;
@@ -123,8 +124,8 @@ public class BenchmarkDisparityAlgs {
 		System.out.println("=========  Image Size "+ width +" "+height+"  disparity "+max);
 		System.out.println();
 
-		GeneralizedImageOps.randomize(left,rand,0,30);
-		GeneralizedImageOps.randomize(right,rand,0,30);
+		GImageMiscOps.fillUniform(left, rand, 0, 30);
+		GImageMiscOps.fillUniform(right, rand, 0, 30);
 		GeneralizedImageOps.convert(left, left_F32);
 		GeneralizedImageOps.convert(right,right_F32);
 

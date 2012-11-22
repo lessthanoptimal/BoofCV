@@ -18,6 +18,7 @@
 
 package boofcv.alg.feature.detect.intensity.impl;
 
+import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.misc.DiscretizedCircle;
 import boofcv.struct.image.ImageSingleBand;
@@ -46,7 +47,7 @@ public abstract class GenericImplFastHelperTests<T extends ImageSingleBand> {
 
 	@Test
 	public void scoreLower() {
-		GeneralizedImageOps.fill(image, 0);
+		GImageMiscOps.fill(image, 0);
 
 		alg.setImage(image,offsets);
 
@@ -70,7 +71,7 @@ public abstract class GenericImplFastHelperTests<T extends ImageSingleBand> {
 
 	@Test
 	public void scoreUpper() {
-		GeneralizedImageOps.fill(image, 0);
+		GImageMiscOps.fill(image, 0);
 
 		alg.setImage(image,offsets);
 
@@ -94,7 +95,7 @@ public abstract class GenericImplFastHelperTests<T extends ImageSingleBand> {
 
 	@Test
 	public void checkPixelLower() {
-		GeneralizedImageOps.fill(image, 0);
+		GImageMiscOps.fill(image, 0);
 
 		alg.setImage(image,offsets);
 		GeneralizedImageOps.set(image,10,11,30);
@@ -111,7 +112,7 @@ public abstract class GenericImplFastHelperTests<T extends ImageSingleBand> {
 
 	@Test
 	public void checkPixelUpper() {
-		GeneralizedImageOps.fill(image, 0);
+		GImageMiscOps.fill(image, 0);
 
 		alg.setImage(image,offsets);
 		GeneralizedImageOps.set(image,10,11,30);

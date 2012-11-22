@@ -21,6 +21,7 @@ package boofcv.benchmark.feature.describe;
 import boofcv.abst.feature.describe.DescribeRegionPoint;
 import boofcv.alg.distort.DistortImageOps;
 import boofcv.alg.interpolate.TypeInterpolate;
+import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.feature.describe.FactoryDescribeRegionPoint;
 import boofcv.struct.feature.SurfFeature;
@@ -46,7 +47,7 @@ public class DebugDescribeTransform {
 
 		T orig = GeneralizedImageOps.createSingleBand(imageType, w, w);
 
-		GeneralizedImageOps.randomize(orig,new Random(123),0,100);
+		GImageMiscOps.fillUniform(orig, new Random(123), 0, 100);
 
 		double scale = 1;
 		double theta = Math.PI+0.4;

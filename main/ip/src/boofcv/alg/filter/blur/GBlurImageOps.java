@@ -24,10 +24,23 @@ import boofcv.struct.image.ImageUInt8;
 
 
 /**
+ * Generalized functions for applying different image blur operators.  Invokes functions
+ * from {@link BlurImageOps}, which provides type specific functions.
+ *
  * @author Peter Abeles
  */
 public class GBlurImageOps {
 
+	/**
+	 * Applies a mean box filter.
+	 *
+	 * @param input Input image.  Not modified.
+	 * @param output Optional storage for output image, can be null.  Modified.
+	 * @param radius Radius of the box blur function.
+	 * @param storage Optional storage for intermediate results.  Same size as input image.  Can be null.
+	 * @param <T> Input image type.
+	 * @return Output blurred image.
+	 */
 	public static <T extends ImageSingleBand>
 	T mean(T input, T output, int radius, T storage ) {
 		if( input instanceof ImageUInt8 ) {
@@ -39,6 +52,15 @@ public class GBlurImageOps {
 		}
 	}
 
+	/**
+	 * Applies a median filter.
+	 *
+	 * @param input Input image.  Not modified.
+	 * @param output Optional storage for output image, can be null.  Modified.
+	 * @param radius Radius of the median blur function.
+	 * @param <T> Input image type.
+	 * @return Output blurred image.
+	 */
 	public static <T extends ImageSingleBand>
 	T median(T input, T output, int radius ) {
 		if( input instanceof ImageUInt8 ) {
@@ -50,6 +72,17 @@ public class GBlurImageOps {
 		}
 	}
 
+	/**
+	 * Applies Gaussian blur.
+	 *
+	 * @param input Input image.  Not modified.
+	 * @param output Optional storage for output image, can be null.  Modified.
+	 * @param sigma Gaussian distribution's sigma.  If <= 0 then will be selected based on radius.
+	 * @param radius Radius of the Gaussian blur function. If <= 0 then radius will be determined by sigma.
+	 * @param storage Optional storage for intermediate results.  Same size as input image.  Can be null.
+	 * @param <T> Input image type.
+	 * @return Output blurred image.
+	 */
 	public static <T extends ImageSingleBand>
 	T gaussian(T input, T output, double sigma , int radius, T storage ) {
 		if( input instanceof ImageUInt8 ) {

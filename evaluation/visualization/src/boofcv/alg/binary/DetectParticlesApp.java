@@ -20,7 +20,7 @@ package boofcv.alg.binary;
 
 import boofcv.alg.filter.binary.BinaryImageOps;
 import boofcv.alg.filter.binary.ThresholdImageOps;
-import boofcv.alg.misc.PixelMath;
+import boofcv.alg.misc.ImageStatistics;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.gui.ListDisplayPanel;
 import boofcv.gui.binary.VisualizeBinaryData;
@@ -51,7 +51,7 @@ public class DetectParticlesApp {
 			colors[i] = rand.nextInt(0xFFFFFF);
 		}
 
-		double average = PixelMath.sum(original)/(double)(original.width*original.height);
+		double average = ImageStatistics.mean(original);
 
 		average *= 0.8;
 

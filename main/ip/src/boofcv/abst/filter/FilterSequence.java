@@ -18,7 +18,7 @@
 
 package boofcv.abst.filter;
 
-import boofcv.core.image.GeneralizedImageOps;
+import boofcv.alg.misc.GImageMiscOps;
 import boofcv.struct.image.ImageSingleBand;
 
 
@@ -69,7 +69,7 @@ public class FilterSequence<Input extends ImageSingleBand, Output extends ImageS
 			Output swap = temp1;
 			temp1 = temp2;
 			temp2 = swap;
-			GeneralizedImageOps.fill(temp2,0);
+			GImageMiscOps.fill(temp2, 0);
 		}
 
 		output.setTo(temp1);

@@ -19,7 +19,7 @@
 package boofcv.alg.feature.detect.intensity.impl;
 
 import boofcv.alg.filter.derivative.GradientSobel;
-import boofcv.core.image.GeneralizedImageOps;
+import boofcv.alg.misc.GImageMiscOps;
 import boofcv.struct.BoofDefaults;
 import boofcv.struct.image.ImageFloat32;
 import org.junit.Test;
@@ -53,7 +53,7 @@ public class TestImplSsdCorner_F32 {
 	 */
 	@Test
 	public void compareToManual() {
-		GeneralizedImageOps.randomize(input,rand,0,100);
+		GImageMiscOps.fillUniform(input, rand, 0, 100);
 
 		GradientSobel.process(input,derivX,derivY, BoofDefaults.DERIV_BORDER_F32);
 

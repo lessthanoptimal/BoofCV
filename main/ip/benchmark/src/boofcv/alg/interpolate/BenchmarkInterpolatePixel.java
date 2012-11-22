@@ -23,7 +23,7 @@ import boofcv.alg.interpolate.impl.ImplInterpolatePixelConvolution_F32;
 import boofcv.alg.interpolate.impl.ImplPolynomialPixel_F32;
 import boofcv.alg.interpolate.impl.NearestNeighborPixel_F32;
 import boofcv.alg.interpolate.kernel.BicubicKernel_F32;
-import boofcv.alg.misc.ImageTestingOps;
+import boofcv.alg.misc.ImageMiscOps;
 import boofcv.misc.PerformerBase;
 import boofcv.misc.ProfileOperation;
 import boofcv.struct.image.ImageFloat32;
@@ -111,8 +111,8 @@ public class BenchmarkInterpolatePixel {
 		imgFloat32 = new ImageFloat32(imgWidth, imgHeight);
 
 		Random rand = new Random(234);
-		ImageTestingOps.randomize(imgInt8, rand, 0, 100);
-		ImageTestingOps.randomize(imgFloat32, rand, 0, 200);
+		ImageMiscOps.fillUniform(imgInt8, rand, 0, 100);
+		ImageMiscOps.fillUniform(imgFloat32, rand, 0, 200);
 
 		System.out.println("=========  Profile Image Size " + imgWidth + " x " + imgHeight + " ==========");
 		System.out.println();

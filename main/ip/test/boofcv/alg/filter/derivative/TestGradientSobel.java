@@ -18,7 +18,7 @@
 
 package boofcv.alg.filter.derivative;
 
-import boofcv.alg.misc.ImageTestingOps;
+import boofcv.alg.misc.ImageMiscOps;
 import boofcv.core.image.border.ImageBorder_F32;
 import boofcv.core.image.border.ImageBorder_I32;
 import boofcv.struct.image.ImageFloat32;
@@ -53,7 +53,7 @@ public class TestGradientSobel {
 		validator.setKernel(1,GradientSobel.kernelDerivY_I32);
 
 		ImageUInt8 input = new ImageUInt8(width,height);
-		ImageTestingOps.randomize(input, rand, 0, 10);
+		ImageMiscOps.fillUniform(input, rand, 0, 10);
 		ImageSInt16 derivX = new ImageSInt16(width,height);
 		ImageSInt16 derivY = new ImageSInt16(width,height);
 
@@ -70,7 +70,7 @@ public class TestGradientSobel {
 		validator.setKernel(1,GradientSobel.kernelDerivY_I32);
 
 		ImageSInt16 input = new ImageSInt16(width,height);
-		ImageTestingOps.randomize(input, rand, 0, 10);
+		ImageMiscOps.fillUniform(input, rand, 0, 10);
 		ImageSInt16 derivX = new ImageSInt16(width,height);
 		ImageSInt16 derivY = new ImageSInt16(width,height);
 
@@ -87,7 +87,7 @@ public class TestGradientSobel {
 		validator.setKernel(1,GradientSobel.kernelDerivY_F32);
 
 		ImageFloat32 input = new ImageFloat32(width,height);
-		ImageTestingOps.randomize(input, rand, 0, 10);
+		ImageMiscOps.fillUniform(input, rand, 0, 10);
 		ImageFloat32 derivX = new ImageFloat32(width,height);
 		ImageFloat32 derivY = new ImageFloat32(width,height);
 

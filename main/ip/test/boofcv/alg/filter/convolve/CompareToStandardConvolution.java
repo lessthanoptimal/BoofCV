@@ -19,7 +19,7 @@
 package boofcv.alg.filter.convolve;
 
 import boofcv.alg.filter.convolve.noborder.ConvolveImageStandard;
-import boofcv.core.image.GeneralizedImageOps;
+import boofcv.alg.misc.GImageMiscOps;
 import boofcv.factory.filter.kernel.FactoryKernel;
 import boofcv.struct.convolve.Kernel1D_F32;
 import boofcv.struct.convolve.Kernel1D_I32;
@@ -71,7 +71,7 @@ public class CompareToStandardConvolution extends CompareIdenticalFunctions
 		}
 
 		ImageSingleBand src = ConvolutionTestHelper.createImage(paramTypes[1], width, height);
-		GeneralizedImageOps.randomize(src, rand, 0, 130);
+		GImageMiscOps.fillUniform(src, rand, 0, 130);
 		ImageSingleBand dst = ConvolutionTestHelper.createImage(paramTypes[2], width, height);
 
 		if( candidate.getName().compareTo("convolve") != 0 ) {

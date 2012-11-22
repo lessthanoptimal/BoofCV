@@ -23,8 +23,8 @@ import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.distort.LensDistortionOps;
 import boofcv.alg.distort.PointToPixelTransform_F32;
 import boofcv.alg.interpolate.InterpolatePixel;
+import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.ConvertBufferedImage;
-import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.distort.FactoryDistort;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.gui.ListDisplayPanel;
@@ -97,17 +97,17 @@ public class ExampleRemoveLensDistortion {
 				distortedImg.getWidth(),distortedImg.getHeight(),distortedImg.getNumBands());
 
 		distort.setModel(new PointToPixelTransform_F32(tran));
-		GeneralizedImageOps.fill(undistortedImg, 0);
+		GImageMiscOps.fill(undistortedImg, 0);
 		DistortImageOps.distortMS(distortedImg, undistortedImg, distort);
 		BufferedImage out1 = ConvertBufferedImage.convertTo(undistortedImg, null);
 
 		distort.setModel(new PointToPixelTransform_F32(fullView));
-		GeneralizedImageOps.fill(undistortedImg,0);
+		GImageMiscOps.fill(undistortedImg,0);
 		DistortImageOps.distortMS(distortedImg,undistortedImg,distort);
 		BufferedImage out2 = ConvertBufferedImage.convertTo(undistortedImg,null);
 
 		distort.setModel(new PointToPixelTransform_F32(allInside));
-		GeneralizedImageOps.fill(undistortedImg,0);
+		GImageMiscOps.fill(undistortedImg,0);
 		DistortImageOps.distortMS(distortedImg,undistortedImg,distort);
 		BufferedImage out3 = ConvertBufferedImage.convertTo(undistortedImg,null);
 

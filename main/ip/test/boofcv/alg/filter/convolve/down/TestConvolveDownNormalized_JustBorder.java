@@ -20,9 +20,9 @@ package boofcv.alg.filter.convolve.down;
 
 import boofcv.alg.filter.convolve.ConvolutionTestHelper;
 import boofcv.alg.filter.convolve.normalized.ConvolveNormalizedNaive;
+import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.FactoryGImageSingleBand;
 import boofcv.core.image.GImageSingleBand;
-import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.filter.kernel.FactoryKernel;
 import boofcv.struct.convolve.KernelBase;
 import boofcv.struct.image.ImageSingleBand;
@@ -88,7 +88,7 @@ public class TestConvolveDownNormalized_JustBorder {
 			}
 
 			ImageSingleBand src = ConvolutionTestHelper.createImage(paramTypes[1], width, height);
-			GeneralizedImageOps.randomize(src, rand, 0, 130);
+			GImageMiscOps.fillUniform(src, rand, 0, 130);
 			ImageSingleBand dst = ConvolutionTestHelper.createImage(paramTypes[2], width/divW, height/divH);
 
 			Object[][] ret = new Object[1][paramTypes.length];

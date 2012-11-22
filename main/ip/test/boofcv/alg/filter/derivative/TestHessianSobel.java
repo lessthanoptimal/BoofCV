@@ -18,7 +18,7 @@
 
 package boofcv.alg.filter.derivative;
 
-import boofcv.alg.misc.ImageTestingOps;
+import boofcv.alg.misc.ImageMiscOps;
 import boofcv.core.image.border.ImageBorder_F32;
 import boofcv.core.image.border.ImageBorder_I32;
 import boofcv.struct.image.ImageFloat32;
@@ -49,7 +49,7 @@ public class TestHessianSobel {
 		validator.setKernel(2, HessianSobel.kernelXY_I32);
 
 		ImageUInt8 input = new ImageUInt8(width,height);
-		ImageTestingOps.randomize(input, rand, 0, 10);
+		ImageMiscOps.fillUniform(input, rand, 0, 10);
 		ImageSInt16 derivXX = new ImageSInt16(width,height);
 		ImageSInt16 derivYY = new ImageSInt16(width,height);
 		ImageSInt16 derivXY = new ImageSInt16(width,height);
@@ -68,7 +68,7 @@ public class TestHessianSobel {
 		validator.setKernel(2, HessianSobel.kernelXY_F32);
 
 		ImageFloat32 input = new ImageFloat32(width,height);
-		ImageTestingOps.randomize(input, rand, 0, 10);
+		ImageMiscOps.fillUniform(input, rand, 0, 10);
 		ImageFloat32 derivXX = new ImageFloat32(width,height);
 		ImageFloat32 derivYY = new ImageFloat32(width,height);
 		ImageFloat32 derivXY = new ImageFloat32(width,height);

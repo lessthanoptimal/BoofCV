@@ -18,7 +18,7 @@
 
 package boofcv.alg.feature.describe.impl;
 
-import boofcv.core.image.GeneralizedImageOps;
+import boofcv.alg.misc.GImageMiscOps;
 import boofcv.struct.feature.TupleDesc_F32;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.testing.BoofTesting;
@@ -38,7 +38,7 @@ public class TestImplDescribePointPixelRegion_F32 {
 	ImageFloat32 img = new ImageFloat32(20,30);
 
 	public TestImplDescribePointPixelRegion_F32() {
-		GeneralizedImageOps.randomize(img,rand,0,30);
+		GImageMiscOps.fillUniform(img, rand, 0, 30);
 	}
 
 	@Test

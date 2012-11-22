@@ -18,6 +18,7 @@
 
 package boofcv.alg.feature.detect.intensity.impl;
 
+import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.FactoryGImageSingleBand;
 import boofcv.core.image.GImageSingleBand;
 import boofcv.core.image.GeneralizedImageOps;
@@ -59,9 +60,9 @@ public class TestImplHessianBlobIntensity {
 			ImageSingleBand derivXY = GeneralizedImageOps.createSingleBand(param[1], width, height);
 			ImageFloat32 intensity = new ImageFloat32(width,height);
 
-			GeneralizedImageOps.randomize(derivXX,rand,-10,10);
-			GeneralizedImageOps.randomize(derivYY,rand,-10,10);
-			GeneralizedImageOps.randomize(derivXY,rand,-10,10);
+			GImageMiscOps.fillUniform(derivXX, rand, -10, 10);
+			GImageMiscOps.fillUniform(derivYY, rand, -10, 10);
+			GImageMiscOps.fillUniform(derivXY, rand, -10, 10);
 
 			BoofTesting.checkSubImage(this,"performDeterminant",true,m,intensity,derivXX,derivYY,derivXY);
 			total++;
@@ -100,8 +101,8 @@ public class TestImplHessianBlobIntensity {
 			ImageSingleBand derivYY = GeneralizedImageOps.createSingleBand(param[1], width, height);
 			ImageFloat32 intensity = new ImageFloat32(width,height);
 
-			GeneralizedImageOps.randomize(derivXX,rand,-10,10);
-			GeneralizedImageOps.randomize(derivYY,rand,-10,10);
+			GImageMiscOps.fillUniform(derivXX, rand, -10, 10);
+			GImageMiscOps.fillUniform(derivYY, rand, -10, 10);
 
 			BoofTesting.checkSubImage(this,"performTrace",true,m,intensity,derivXX,derivYY);
 			total++;

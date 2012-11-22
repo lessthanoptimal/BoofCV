@@ -19,7 +19,7 @@
 package boofcv.alg.denoise.wavelet;
 
 import boofcv.alg.denoise.ShrinkThresholdRule;
-import boofcv.alg.misc.PixelMath;
+import boofcv.alg.misc.ImageStatistics;
 import boofcv.struct.image.ImageFloat32;
 
 
@@ -55,7 +55,7 @@ public class DenoiseBayesShrink_F32 extends SubbandShrink<ImageFloat32> {
 	{
 		// the maximum magnitude coefficient is used to normalize all the other coefficients
 		// and reduce numerical round-off error
-		float max = PixelMath.maxAbs(subband);
+		float max = ImageStatistics.maxAbs(subband);
 		float varianceY = 0;
 		for( int y = 0; y < subband.height; y++ ) {
 			int index = subband.startIndex + subband.stride*y;

@@ -18,6 +18,7 @@
 
 package boofcv.alg.filter.binary;
 
+import boofcv.alg.misc.GImageStatistics;
 import boofcv.core.image.FactoryGImageSingleBand;
 import boofcv.core.image.GImageSingleBand;
 import boofcv.core.image.GeneralizedImageOps;
@@ -88,10 +89,10 @@ public class TestThresholdImageOps {
 			throws InvocationTargetException, IllegalAccessException
 	{
 		m.invoke(null,input,output,7,true);
-		assertEquals(240, GeneralizedImageOps.sum(output),1e-4);
+		assertEquals(240, GImageStatistics.sum(output),1e-4);
 
 		m.invoke(null,input,output,7,false);
-		assertEquals(390, GeneralizedImageOps.sum(output),1e-4);
+		assertEquals(390, GImageStatistics.sum(output),1e-4);
 	}
 
 	@Test

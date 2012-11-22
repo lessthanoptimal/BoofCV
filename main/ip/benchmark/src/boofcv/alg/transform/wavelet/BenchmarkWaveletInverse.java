@@ -18,7 +18,7 @@
 
 package boofcv.alg.transform.wavelet;
 
-import boofcv.alg.misc.ImageTestingOps;
+import boofcv.alg.misc.ImageMiscOps;
 import boofcv.alg.transform.wavelet.impl.ImplWaveletTransformNaive;
 import boofcv.core.image.border.BorderType;
 import boofcv.factory.transform.wavelet.FactoryWaveletDaub;
@@ -89,8 +89,8 @@ public class BenchmarkWaveletInverse {
 	public static void main(String args[]) {
 
 		Random rand = new Random(234);
-		ImageTestingOps.randomize(tran_F32, rand, 0, 100);
-		ImageTestingOps.randomize(tran_I32, rand, 0, 100);
+		ImageMiscOps.fillUniform(tran_F32, rand, 0, 100);
+		ImageMiscOps.fillUniform(tran_I32, rand, 0, 100);
 
 		System.out.println("=========  Profile Image Size " + imgWidth + " x " + imgHeight + " ==========");
 		System.out.println();

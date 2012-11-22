@@ -18,7 +18,7 @@
 
 package boofcv.alg.filter.derivative;
 
-import boofcv.alg.misc.ImageTestingOps;
+import boofcv.alg.misc.ImageMiscOps;
 import boofcv.core.image.border.ImageBorder_F32;
 import boofcv.core.image.border.ImageBorder_I32;
 import boofcv.struct.image.ImageFloat32;
@@ -48,8 +48,8 @@ public class TestHessianFromGradient {
 
 		ImageSInt16 derivX = new ImageSInt16(width,height);
 		ImageSInt16 derivY = new ImageSInt16(width,height);
-		ImageTestingOps.randomize(derivX, rand, -10, 10);
-		ImageTestingOps.randomize(derivY, rand, -10, 10);
+		ImageMiscOps.fillUniform(derivX, rand, -10, 10);
+		ImageMiscOps.fillUniform(derivY, rand, -10, 10);
 		ImageSInt16 derivXX = new ImageSInt16(width,height);
 		ImageSInt16 derivYY = new ImageSInt16(width,height);
 		ImageSInt16 derivXY = new ImageSInt16(width,height);
@@ -68,8 +68,8 @@ public class TestHessianFromGradient {
 
 		ImageFloat32 derivX = new ImageFloat32(width,height);
 		ImageFloat32 derivY = new ImageFloat32(width,height);
-		ImageTestingOps.randomize(derivX, rand, -10, 10);
-		ImageTestingOps.randomize(derivY, rand, -10, 10);
+		ImageMiscOps.fillUniform(derivX, rand, -10, 10);
+		ImageMiscOps.fillUniform(derivY, rand, -10, 10);
 		ImageFloat32 derivXX = new ImageFloat32(width,height);
 		ImageFloat32 derivYY = new ImageFloat32(width,height);
 		ImageFloat32 derivXY = new ImageFloat32(width,height);
@@ -88,8 +88,8 @@ public class TestHessianFromGradient {
 
 		ImageSInt16 derivX = new ImageSInt16(width,height);
 		ImageSInt16 derivY = new ImageSInt16(width,height);
-		ImageTestingOps.randomize(derivX, rand, -10, 10);
-		ImageTestingOps.randomize(derivY, rand, -10, 10);
+		ImageMiscOps.fillUniform(derivX, rand, -10, 10);
+		ImageMiscOps.fillUniform(derivY, rand, -10, 10);
 		ImageSInt16 derivXX = new ImageSInt16(width,height);
 		ImageSInt16 derivYY = new ImageSInt16(width,height);
 		ImageSInt16 derivXY = new ImageSInt16(width,height);
@@ -108,8 +108,8 @@ public class TestHessianFromGradient {
 
 		ImageFloat32 derivX = new ImageFloat32(width,height);
 		ImageFloat32 derivY = new ImageFloat32(width,height);
-		ImageTestingOps.randomize(derivX, rand, -10, 10);
-		ImageTestingOps.randomize(derivY, rand, -10, 10);
+		ImageMiscOps.fillUniform(derivX, rand, -10, 10);
+		ImageMiscOps.fillUniform(derivY, rand, -10, 10);
 		ImageFloat32 derivXX = new ImageFloat32(width,height);
 		ImageFloat32 derivYY = new ImageFloat32(width,height);
 		ImageFloat32 derivXY = new ImageFloat32(width,height);
@@ -128,8 +128,8 @@ public class TestHessianFromGradient {
 
 		ImageSInt16 derivX = new ImageSInt16(width,height);
 		ImageSInt16 derivY = new ImageSInt16(width,height);
-		ImageTestingOps.randomize(derivX, rand, -10, 10);
-		ImageTestingOps.randomize(derivY, rand, -10, 10);
+		ImageMiscOps.fillUniform(derivX, rand, -10, 10);
+		ImageMiscOps.fillUniform(derivY, rand, -10, 10);
 		ImageSInt16 derivXX = new ImageSInt16(width,height);
 		ImageSInt16 derivYY = new ImageSInt16(width,height);
 		ImageSInt16 derivXY = new ImageSInt16(width,height);
@@ -148,8 +148,8 @@ public class TestHessianFromGradient {
 
 		ImageFloat32 derivX = new ImageFloat32(width,height);
 		ImageFloat32 derivY = new ImageFloat32(width,height);
-		ImageTestingOps.randomize(derivX, rand, -10, 10);
-		ImageTestingOps.randomize(derivY, rand, -10, 10);
+		ImageMiscOps.fillUniform(derivX, rand, -10, 10);
+		ImageMiscOps.fillUniform(derivY, rand, -10, 10);
 		ImageFloat32 derivXX = new ImageFloat32(width,height);
 		ImageFloat32 derivYY = new ImageFloat32(width,height);
 		ImageFloat32 derivXY = new ImageFloat32(width,height);

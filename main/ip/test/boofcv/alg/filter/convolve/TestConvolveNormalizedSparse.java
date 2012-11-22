@@ -19,7 +19,7 @@
 package boofcv.alg.filter.convolve;
 
 import boofcv.alg.filter.convolve.normalized.ConvolveNormalizedStandardSparse;
-import boofcv.core.image.GeneralizedImageOps;
+import boofcv.alg.misc.GImageMiscOps;
 import boofcv.factory.filter.kernel.FactoryKernelGaussian;
 import boofcv.struct.convolve.Kernel1D_F32;
 import boofcv.struct.convolve.Kernel1D_I32;
@@ -90,7 +90,7 @@ public class TestConvolveNormalizedSparse {
 			}
 
 			ImageSingleBand src = ConvolutionTestHelper.createImage(paramTypes[2], width, height);
-			GeneralizedImageOps.randomize(src, rand, 0, 5);
+			GImageMiscOps.fillUniform(src, rand, 0, 5);
 
 
 			Object[][] ret = new Object[1][paramTypes.length];

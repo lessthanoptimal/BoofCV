@@ -24,7 +24,7 @@ import boofcv.alg.filter.kernel.SteerableKernel;
 import boofcv.alg.filter.kernel.impl.SteerableKernel_F32;
 import boofcv.alg.filter.kernel.impl.SteerableKernel_I32;
 import boofcv.alg.interpolate.TypeInterpolate;
-import boofcv.core.image.GeneralizedImageOps;
+import boofcv.alg.misc.GImageMiscOps;
 import boofcv.struct.convolve.Kernel1D;
 import boofcv.struct.convolve.Kernel2D;
 import boofcv.struct.convolve.Kernel2D_F32;
@@ -89,7 +89,7 @@ public class FactorySteerable {
 		for( int index = 1; index <= order; index++ ) {
 			float angle = (float)(angleStep*index);
 
-			GeneralizedImageOps.fill(imageRotated,0);
+			GImageMiscOps.fill(imageRotated, 0);
 			DistortImageOps.rotate(image,imageRotated, TypeInterpolate.BILINEAR,angle);
 
 			basis[index] = GKernelMath.convertToKernel(imageRotated);

@@ -19,6 +19,7 @@
 package boofcv.alg.transform.ii;
 
 import boofcv.alg.filter.convolve.ConvolveWithBorder;
+import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.FactoryGImageSingleBand;
 import boofcv.core.image.GImageSingleBand;
 import boofcv.core.image.GeneralizedImageOps;
@@ -64,7 +65,7 @@ public class TestIntegralImageOps {
 		ImageSingleBand input = GeneralizedImageOps.createSingleBand(inputType, width, height);
 		ImageSingleBand integral = GeneralizedImageOps.createSingleBand(outputType, width, height);
 
-		GeneralizedImageOps.randomize(input,rand,0,100);
+		GImageMiscOps.fillUniform(input, rand, 0, 100);
 
 		BoofTesting.checkSubImage(this,"checkTransformResults",true,m,input,integral);
 	}
@@ -106,7 +107,7 @@ public class TestIntegralImageOps {
 		ImageSingleBand input = GeneralizedImageOps.createSingleBand(origType, width, height);
 		ImageSingleBand integral = GeneralizedImageOps.createSingleBand(outputType, width, height);
 
-		GeneralizedImageOps.randomize(input,rand,0,10);
+		GImageMiscOps.fillUniform(input, rand, 0, 10);
 		GIntegralImageOps.transform(input,integral);
 
 		ImageSingleBand expected = GeneralizedImageOps.createSingleBand(outputType, width, height);
@@ -148,7 +149,7 @@ public class TestIntegralImageOps {
 		ImageSingleBand input = GeneralizedImageOps.createSingleBand(origType, width, height);
 		ImageSingleBand integral = GeneralizedImageOps.createSingleBand(outputType, width, height);
 
-		GeneralizedImageOps.randomize(input,rand,0,10);
+		GImageMiscOps.fillUniform(input, rand, 0, 10);
 		GIntegralImageOps.transform(input,integral);
 
 		ImageSingleBand expected = GeneralizedImageOps.createSingleBand(outputType, width, height);
@@ -186,7 +187,7 @@ public class TestIntegralImageOps {
 
 		ImageSingleBand integral = GeneralizedImageOps.createSingleBand(inputType, width, height);
 
-		GeneralizedImageOps.randomize(integral,rand,0,1000);
+		GImageMiscOps.fillUniform(integral, rand, 0, 1000);
 
 		ImageSingleBand expected = GeneralizedImageOps.createSingleBand(inputType, width, height);
 
@@ -222,7 +223,7 @@ public class TestIntegralImageOps {
 		ImageSingleBand input = GeneralizedImageOps.createSingleBand(origType, width, height);
 		ImageSingleBand integral = GeneralizedImageOps.createSingleBand(inputType, width, height);
 
-		GeneralizedImageOps.fill(input,1);
+		GImageMiscOps.fill(input,1);
 		GIntegralImageOps.transform(input,integral);
 
 		double found0 = ((Number)m.invoke(null,integral,4,5,8,8)).doubleValue();
@@ -244,7 +245,7 @@ public class TestIntegralImageOps {
 		ImageSingleBand input = GeneralizedImageOps.createSingleBand(origType, width, height);
 		ImageSingleBand integral = GeneralizedImageOps.createSingleBand(inputType, width, height);
 
-		GeneralizedImageOps.fill(input,1);
+		GImageMiscOps.fill(input,1);
 		GIntegralImageOps.transform(input,integral);
 
 		double found = ((Number)m.invoke(null,integral,4,5,8,8)).doubleValue();

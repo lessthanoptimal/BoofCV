@@ -22,7 +22,8 @@ import boofcv.abst.denoise.WaveletDenoiseFilter;
 import boofcv.abst.filter.FilterImageInterface;
 import boofcv.abst.wavelet.WaveletTransform;
 import boofcv.alg.filter.derivative.LaplacianEdge;
-import boofcv.alg.misc.ImageTestingOps;
+import boofcv.alg.misc.ImageMiscOps;
+import boofcv.alg.misc.ImageStatistics;
 import boofcv.alg.misc.PixelMath;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.core.image.border.BorderType;
@@ -75,10 +76,10 @@ public class DenoiseAccuracyStudyApp {
 			double bestScore = Double.MAX_VALUE;
 
 			for( TestItem i : filters ) {
-				ImageTestingOps.fill(imageDenoised,0);
+				ImageMiscOps.fill(imageDenoised,0);
 				i.filter.process(imageNoisy,imageDenoised);
 
-				if( ImageTestingOps.computeMeanSquaredError(image,originalImage) != 0 )
+				if( ImageStatistics.meanDiffSq(image,originalImage) != 0 )
 					throw new RuntimeException("Filter modified input image");
 
 				double error = computeMSE(imageDenoised);
@@ -156,16 +157,16 @@ public class DenoiseAccuracyStudyApp {
 	}
 
 	private double computeMSE(ImageFloat32 imageInv) {
-		return ImageTestingOps.computeMeanSquaredError(imageInv,image);
+		return ImageStatistics.meanDiffSq(imageInv,image);
 	}
 
 	private double computeEdgeMSE(ImageFloat32 imageInv) {
 		ImageFloat32 edge = new ImageFloat32(imageInv.width,imageInv.height);
 		LaplacianEdge.process(image,edge);
 		PixelMath.abs(edge,edge);
-		float max = PixelMath.maxAbs(edge);
-		PixelMath.divide(edge,edge,max);
-		float total = PixelMath.sum(edge);
+		float max = ImageStatistics.maxAbs(edge);
+		PixelMath.divide(edge,max,edge);
+		float total = ImageStatistics.sum(edge);
 
 		double error = 0;
 		for( int y = 0; y < image.height; y++ ) {
@@ -186,7 +187,7 @@ public class DenoiseAccuracyStudyApp {
 
 	private void addNoiseToImage() {
 		imageNoisy = image.clone();
-		ImageTestingOps.addGaussian(imageNoisy,rand,noiseSigma,0,255);
+		ImageMiscOps.addGaussian(imageNoisy,rand,noiseSigma,0,255);
 	}
 
 

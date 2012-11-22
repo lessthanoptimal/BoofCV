@@ -18,8 +18,8 @@
 
 package boofcv.alg.feature.detect.intensity.impl;
 
+import boofcv.alg.misc.GImageMiscOps;
 import boofcv.alg.transform.ii.IntegralImageOps;
-import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSInt32;
 import boofcv.testing.BoofTesting;
@@ -47,7 +47,7 @@ public class TestImplIntegralImageFeatureIntensity {
 		ImageFloat32 found = new ImageFloat32(width,height);
 		ImageFloat32 expected = new ImageFloat32(width,height);
 
-		GeneralizedImageOps.randomize(original,rand,0,50);
+		GImageMiscOps.fillUniform(original, rand, 0, 50);
 		IntegralImageOps.transform(original,integral);
 
 		int size = 9;
@@ -78,7 +78,7 @@ public class TestImplIntegralImageFeatureIntensity {
 		ImageFloat32 found = new ImageFloat32(width,height);
 		ImageFloat32 expected = new ImageFloat32(width,height);
 
-		GeneralizedImageOps.randomize(original,rand,0,50);
+		GImageMiscOps.fillUniform(original, rand, 0, 50);
 		IntegralImageOps.transform(original,integral);
 
 		int size = 9;

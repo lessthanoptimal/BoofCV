@@ -20,7 +20,7 @@ package boofcv.alg.transform.gss;
 
 import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.alg.filter.blur.BlurImageOps;
-import boofcv.core.image.GeneralizedImageOps;
+import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.ImageGenerator;
 import boofcv.core.image.inst.SingleBandGenerator;
 import boofcv.factory.filter.derivative.FactoryDerivative;
@@ -48,7 +48,7 @@ public class TestNoCacheScaleSpace {
 
 	@Before
 	public void setup() {
-		GeneralizedImageOps.randomize(original,rand,0,40);
+		GImageMiscOps.fillUniform(original, rand, 0, 40);
 	}
 
 	@Test

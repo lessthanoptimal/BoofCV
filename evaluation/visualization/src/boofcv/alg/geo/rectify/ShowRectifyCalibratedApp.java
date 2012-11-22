@@ -22,8 +22,8 @@ import boofcv.alg.distort.DistortImageOps;
 import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.RectifyImageOps;
+import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.ConvertBufferedImage;
-import boofcv.core.image.GeneralizedImageOps;
 import boofcv.gui.ListDisplayPanel;
 import boofcv.gui.SelectAlgorithmAndInputPanel;
 import boofcv.gui.image.ShowImages;
@@ -123,8 +123,8 @@ public class ShowRectifyCalibratedApp extends SelectAlgorithmAndInputPanel {
 				RectifyImageOps.rectifyImage(param.getRight(), rect2,ImageFloat32.class);
 
 		// Fill the image with all black
-		GeneralizedImageOps.fill(rectLeft,0);
-		GeneralizedImageOps.fill(rectRight,0);
+		GImageMiscOps.fill(rectLeft, 0);
+		GImageMiscOps.fill(rectRight,0);
 
 		// Render the rectified image
 		DistortImageOps.distortMS(distLeft, rectLeft, imageDistortLeft);

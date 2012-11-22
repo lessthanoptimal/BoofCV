@@ -18,6 +18,7 @@
 
 package boofcv.core.image;
 
+import boofcv.alg.misc.GImageMiscOps;
 import boofcv.struct.image.*;
 import boofcv.testing.BoofTesting;
 import org.junit.Test;
@@ -202,7 +203,7 @@ public class TestConvertRaster {
 
 		for (int i = 0; i < output.length; i++) {
 			ImageBase input = createImage(m, paramTypes[0], output[i]);
-			GeneralizedImageOps.randomize(input, rand, 0, 50);
+			GImageMiscOps.fillUniform(input, rand, 0, 50);
 
 			BoofTesting.checkSubImage(this, "performGrayTo", true, m, input, output[i]);
 		}

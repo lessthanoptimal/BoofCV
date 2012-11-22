@@ -19,7 +19,7 @@
 package boofcv.alg.filter.derivative;
 
 import boofcv.abst.filter.derivative.ImageGradient;
-import boofcv.alg.misc.PixelMath;
+import boofcv.alg.misc.ImageStatistics;
 import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ProcessImageSequence;
@@ -80,8 +80,8 @@ public class VideoShowImageDerivative extends ProcessImageSequence<ImageUInt8> {
 			addComponent(panelY);
 		} else {
 			original.setBufferedImage(guiImage);
-			int maxX = PixelMath.maxAbs(derivX);
-			int maxY = PixelMath.maxAbs(derivY);
+			int maxX = ImageStatistics.maxAbs(derivX);
+			int maxY = ImageStatistics.maxAbs(derivY);
 
 			if( drawGray ) {
 				VisualizeImageData.grayMagnitude(derivX,panelX.getImage(),maxX);

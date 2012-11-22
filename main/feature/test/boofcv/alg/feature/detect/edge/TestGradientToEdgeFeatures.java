@@ -19,7 +19,8 @@
 package boofcv.alg.feature.detect.edge;
 
 import boofcv.alg.feature.detect.edge.impl.ImplEdgeNonMaxSuppression;
-import boofcv.alg.misc.ImageTestingOps;
+import boofcv.alg.misc.GImageMiscOps;
+import boofcv.alg.misc.ImageMiscOps;
 import boofcv.core.image.FactoryGImageSingleBand;
 import boofcv.core.image.GImageSingleBand;
 import boofcv.core.image.GeneralizedImageOps;
@@ -64,8 +65,8 @@ public class TestGradientToEdgeFeatures {
 		ImageSingleBand derivX = GeneralizedImageOps.createSingleBand(params[0], width, height);
 		ImageSingleBand derivY = GeneralizedImageOps.createSingleBand(params[0], width, height);
 
-		GeneralizedImageOps.randomize(derivX,rand,0,10);
-		GeneralizedImageOps.randomize(derivY,rand,0,10);
+		GImageMiscOps.fillUniform(derivX, rand, 0, 10);
+		GImageMiscOps.fillUniform(derivY, rand, 0, 10);
 
 		BoofTesting.checkSubImage(this,"intensityE",true,m,derivX,derivY,intensity);
 	}
@@ -97,8 +98,8 @@ public class TestGradientToEdgeFeatures {
 		ImageSingleBand derivX = GeneralizedImageOps.createSingleBand(params[0], width, height);
 		ImageSingleBand derivY = GeneralizedImageOps.createSingleBand(params[0], width, height);
 
-		GeneralizedImageOps.randomize(derivX,rand,0,10);
-		GeneralizedImageOps.randomize(derivY,rand,0,10);
+		GImageMiscOps.fillUniform(derivX, rand, 0, 10);
+		GImageMiscOps.fillUniform(derivY, rand, 0, 10);
 
 		BoofTesting.checkSubImage(this,"intensityAbs",true,m,derivX,derivY,intensity);
 	}
@@ -131,8 +132,8 @@ public class TestGradientToEdgeFeatures {
 		ImageSingleBand derivX = GeneralizedImageOps.createSingleBand(params[0], width, height);
 		ImageSingleBand derivY = GeneralizedImageOps.createSingleBand(params[0], width, height);
 
-		GeneralizedImageOps.randomize(derivX,rand,0,10);
-		GeneralizedImageOps.randomize(derivY,rand,0,10);
+		GImageMiscOps.fillUniform(derivX, rand, 0, 10);
+		GImageMiscOps.fillUniform(derivY, rand, 0, 10);
 
 		BoofTesting.checkSubImage(this,"direction",true,m,derivX,derivY,intensity);
 	}
@@ -198,8 +199,8 @@ public class TestGradientToEdgeFeatures {
 		ImageFloat32 expected = new ImageFloat32(width,height);
 		ImageFloat32 found = new ImageFloat32(width,height);
 
-		ImageTestingOps.randomize(intensity,rand,0,100);
-		ImageTestingOps.randomize(direction,rand,0,4);
+		ImageMiscOps.fillUniform(intensity, rand, 0, 100);
+		ImageMiscOps.fillUniform(direction, rand, 0, 4);
 
 		BoofTesting.checkSubImage(this,"nonMaxSuppression4",true,intensity, direction, expected, found);
 	}

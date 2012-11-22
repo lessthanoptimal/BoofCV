@@ -18,9 +18,9 @@
 
 package boofcv.alg.transform.ii.impl;
 
+import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.FactoryGImageSingleBand;
 import boofcv.core.image.GImageSingleBand;
-import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSInt32;
 import boofcv.struct.image.ImageSingleBand;
@@ -45,7 +45,7 @@ public class TestImplIntegralImageOps {
 	@Test
 	public void transform_F32() {
 		ImageFloat32 a = new ImageFloat32(width,height);
-		GeneralizedImageOps.randomize(a,rand,0,100);
+		GImageMiscOps.fillUniform(a, rand, 0, 100);
 
 		ImageFloat32 b = new ImageFloat32(width,height);
 		ImplIntegralImageOps.transform(a,b);
@@ -56,7 +56,7 @@ public class TestImplIntegralImageOps {
 	@Test
 	public void transform_U8() {
 		ImageUInt8 a = new ImageUInt8(width,height);
-		GeneralizedImageOps.randomize(a,rand,0,100);
+		GImageMiscOps.fillUniform(a, rand, 0, 100);
 
 		ImageSInt32 b = new ImageSInt32(width,height);
 		ImplIntegralImageOps.transform(a,b);

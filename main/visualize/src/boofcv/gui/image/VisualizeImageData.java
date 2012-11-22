@@ -18,8 +18,8 @@
 
 package boofcv.gui.image;
 
-import boofcv.alg.misc.GPixelMath;
-import boofcv.alg.misc.PixelMath;
+import boofcv.alg.misc.GImageStatistics;
+import boofcv.alg.misc.ImageStatistics;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageInteger;
@@ -40,19 +40,19 @@ public class VisualizeImageData {
 			ImageInteger srcInt = (ImageInteger) src;
 
 			if (src.getTypeInfo().isSigned()) {
-				double max = GPixelMath.maxAbs(srcInt);
+				double max = GImageStatistics.maxAbs(srcInt);
 				return colorizeSign(srcInt, dst, (int) max);
 			} else {
 				if (src.getTypeInfo().getNumBits() == 8) {
 					dst = ConvertBufferedImage.convertTo((ImageUInt8) src, dst);
 				} else {
-					double max = GPixelMath.maxAbs(srcInt);
+					double max = GImageStatistics.maxAbs(srcInt);
 					dst = grayUnsigned(srcInt, dst, (int) max);
 				}
 			}
 		} else if (ImageFloat32.class.isAssignableFrom(src.getClass())) {
 			ImageFloat32 img = (ImageFloat32) src;
-			float max = PixelMath.maxAbs(img);
+			float max = ImageStatistics.maxAbs(img);
 
 			boolean hasNegative = false;
 			for (int i = 0; i < img.getHeight(); i++) {
@@ -88,7 +88,7 @@ public class VisualizeImageData {
 		dst = ConvertBufferedImage.checkInputs(src, dst);
 
 		if (normalize <= 0) {
-			normalize = GPixelMath.maxAbs(src);
+			normalize = GImageStatistics.maxAbs(src);
 		}
 
 		if (normalize == 0)
@@ -153,7 +153,7 @@ public class VisualizeImageData {
 	 */
 	public static BufferedImage grayMagnitude(ImageSingleBand src, BufferedImage dst, double normalize) {
 		if (normalize < 0)
-			normalize = GPixelMath.maxAbs(src);
+			normalize = GImageStatistics.maxAbs(src);
 
 		dst = ConvertBufferedImage.checkInputs(src, dst);
 
@@ -176,7 +176,7 @@ public class VisualizeImageData {
 	 */
 	public static BufferedImage grayMagnitudeTemp(ImageSingleBand src, BufferedImage dst, double normalize) {
 		if (normalize < 0)
-			normalize = GPixelMath.maxAbs(src);
+			normalize = GImageStatistics.maxAbs(src);
 
 		dst = ConvertBufferedImage.checkInputs(src, dst);
 
@@ -335,7 +335,7 @@ public class VisualizeImageData {
 		dst = ConvertBufferedImage.checkInputs(src, dst);
 
 		if (maxAbsValue < 0)
-			maxAbsValue = PixelMath.maxAbs(src);
+			maxAbsValue = ImageStatistics.maxAbs(src);
 
 		for (int y = 0; y < src.height; y++) {
 			for (int x = 0; x < src.width; x++) {
