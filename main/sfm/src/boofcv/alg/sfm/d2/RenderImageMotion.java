@@ -94,7 +94,7 @@ public class RenderImageMotion<I extends ImageSingleBand, O extends ImageBase> {
 			// convert the previous mosaic into a gray scale image
 			ImageSingleBand temp = GeneralizedImageOps.createSingleBand(imageType, mosaicWidth, mosaicHeight);
 			if( imageMosaic != null ) {
-				GPixelMath.bandAve((MultiSpectral)imageMosaic,temp);
+				GPixelMath.averageBand((MultiSpectral) imageMosaic, temp);
 			}
 			imageMosaic = (O) temp;
 			tempMosaic = (O)GeneralizedImageOps.createSingleBand(imageType, mosaicWidth, mosaicHeight);

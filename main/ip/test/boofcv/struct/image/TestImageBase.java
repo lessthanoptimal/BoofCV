@@ -89,6 +89,9 @@ public class TestImageBase {
 		public void reshape(int width, int height) {}
 
 		@Override
+		public void setTo(ImageBase orig) {}
+
+		@Override
 		public ImageBase _createNew(int imgWidth, int imgHeight) {
 			return null;
 		}

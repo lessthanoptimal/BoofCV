@@ -23,6 +23,8 @@ import boofcv.struct.image.*;
 import java.util.Random;
 
 /**
+ * Generalized version of {@link ImageMiscOps}.  Type checking is performed at runtime instead of at compile type.
+ *
  * @author Peter Abeles
  */
 public class GImageMiscOps {
@@ -59,6 +61,16 @@ public class GImageMiscOps {
 		}
 	}
 
+	/**
+	 * Draws a filled rectangle that is aligned along the image axis inside the image.
+	 *
+	 * @param input Image the rectangle is drawn in.  Modified
+	 * @param value Value of the rectangle
+	 * @param x0 Top left x-coordinate
+	 * @param y0 Top left y-coordinate
+	 * @param width Rectangle width
+	 * @param height Rectangle height
+	 */
 	public static void fillRectangle( ImageBase input , double value, int x0, int y0, int width, int height ) {
 		if( input instanceof ImageSingleBand ) {
 			if( ImageInt8.class.isAssignableFrom(input.getClass()) ) {
@@ -85,6 +97,52 @@ public class GImageMiscOps {
 		}
 	}
 
+	/**
+	 * Sets each value in the image to a value drawn from a Gaussian distribution.  A user
+	 * specified lower and upper bound is provided to ensure that the values are within a legal
+	 * range.  A drawn value outside the allowed range will be set to the closest bound.
+	 *
+	 * @param input Input image.  Modified.
+	 * @param rand Random number generator
+	 * @param mean Distribution's mean.
+	 * @param sigma Distribution's standard deviation.
+	 * @param lowerBound Lower bound of value clip
+	 * @param upperBound Upper bound of value clip
+	 */
+	public static void fillGaussian( ImageBase input , Random rand , double mean , double sigma , double lowerBound , double upperBound ) {
+		if( input instanceof ImageSingleBand ) {
+			if( ImageInt8.class.isAssignableFrom(input.getClass()) ) {
+				ImageMiscOps.fillGaussian((ImageInt8) input, rand, mean, sigma, (int) lowerBound, (int) upperBound);
+			} else if( ImageInt16.class.isAssignableFrom(input.getClass()) ) {
+				ImageMiscOps.fillGaussian((ImageInt16) input, rand, mean, sigma, (int) lowerBound, (int) upperBound);
+			} else if( ImageSInt32.class == input.getClass() ) {
+				ImageMiscOps.fillGaussian((ImageSInt32) input, rand, mean, sigma, (int) lowerBound, (int) upperBound);
+			} else if( ImageSInt64.class == input.getClass() ) {
+				ImageMiscOps.fillGaussian((ImageSInt64) input, rand, mean, sigma, (long) lowerBound, (long) upperBound);
+			} else if( ImageFloat32.class == input.getClass() ) {
+				ImageMiscOps.fillGaussian((ImageFloat32) input, rand, mean, sigma, (float) lowerBound, (float) upperBound);
+			} else if( ImageFloat64.class == input.getClass() ) {
+				ImageMiscOps.fillGaussian((ImageFloat64) input, rand, mean, sigma, lowerBound, upperBound);
+			} else {
+				throw new IllegalArgumentException("Unknown image Type: "+input.getClass().getSimpleName());
+			}
+		} else if( input instanceof MultiSpectral ) {
+			MultiSpectral m = (MultiSpectral)input;
+			for( int i = 0; i < m.getNumBands(); i++ )
+				fillGaussian(input, rand, mean, sigma, lowerBound, upperBound);
+		} else {
+			throw new IllegalArgumentException("Unknown image type: " + input.getClass().getSimpleName());
+		}
+	}
+
+	/**
+	 * Sets each value in the image to a value drawn from an uniform distribution that has a range of min <= X < max.
+	 *
+	 * @param input Image which is to be filled.  Modified,
+	 * @param rand Random number generator
+	 * @param min Minimum value of the distribution
+	 * @param max Maximum value of the distribution
+	 */
 	public static void fillUniform( ImageBase input , Random rand , double min , double max  ) {
 		if( input instanceof ImageSingleBand ) {
 			if( ImageInt8.class.isAssignableFrom(input.getClass()) ) {
@@ -111,6 +169,16 @@ public class GImageMiscOps {
 		}
 	}
 
+	/**
+	 * Adds Gaussian/normal i.i.d noise to each pixel in the image.  If a value exceeds the specified
+	 * it will be set to the closest bound.
+	 *
+	 * @param input Input image.  Modified.
+	 * @param rand Random number generator.
+	 * @param sigma Distributions standard deviation.
+	 * @param lowerBound Allowed lower bound
+	 * @param upperBound Allowed upper bound
+	 */
 	public static void addGaussian( ImageBase input, Random rand , double sigma ,
 									double lowerBound , double upperBound  )
 	{
@@ -143,6 +211,9 @@ public class GImageMiscOps {
 		}
 	}
 
+	/**
+	 * Adds uniform i.i.d noise to each pixel in the image.  Noise range is min <= X < max.
+	 */
 	public static void addUniform( ImageBase input, Random rand , double min , double max  ) {
 		if( input instanceof ImageSingleBand ) {
 			if( ImageUInt8.class == input.getClass() ) {
@@ -173,6 +244,9 @@ public class GImageMiscOps {
 		}
 	}
 
+	/**
+	 * Flips the image from top to bottom
+	 */
 	public static void flipVertical( ImageBase img ) {
 		if( img instanceof ImageSingleBand ) {
 			if( ImageInt8.class.isAssignableFrom(img.getClass()) ) {

@@ -53,23 +53,22 @@ public abstract class CompareEquivalentFunctions {
 			if( !isTestMethod(m))
 				continue;
 
+			// check for equivalence for each match
 			Method candidates[] = validationClass.getMethods();
-			Method matched = null;
+			boolean foundMatch = false;
 			for( Method c : candidates ) {
 				if( isEquivalent(c, m)) {
-					matched = c;
-					break;
+					System.out.println("Examining: "+m.getName());
+					foundMatch = true;
+					compareMethods(m, c);
 				}
 			}
 
-			if( matched == null ) {
+			if( !foundMatch ) {
 				System.out.println("Can't find an equivalent function in validation class");
-				continue;
+			} else {
+				numFound++;
 			}
-
-			System.out.println("Examining: "+m.getName());
-			compareMethods(m, matched);
-			numFound++;
 		}
 
 		// update this as needed when new functions are added
@@ -160,7 +159,7 @@ public abstract class CompareEquivalentFunctions {
 	protected abstract Object[][] createInputParam( Method candidate, Method validation );
 
 	/**
-	 * Adjusts the input for the validation method.  Allows methods with different paramter
+	 * Adjusts the input for the validation method.  Allows methods with different parameter
 	 * sets to be used.
 	 */
 	protected abstract Object[] reformatForValidation( Method m , Object[] targetParam);

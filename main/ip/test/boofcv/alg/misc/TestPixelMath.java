@@ -43,7 +43,7 @@ public class TestPixelMath {
 
 	@Test
 	public void checkAll() {
-		int numExpected = 86;
+		int numExpected = 6+11*8;
 		Method methods[] = PixelMath.class.getMethods();
 
 		// sanity check to make sure the functions are being found
@@ -54,17 +54,32 @@ public class TestPixelMath {
 			try {
 				System.out.println(m.getName());
 				if( m.getName().compareTo("divide") == 0 ) {
-					testDivide(m);
+					if( m.getParameterTypes().length == 3 )
+						testDivide(m);
+					else
+						testDivideBounded(m);
 				} else if( m.getName().compareTo("multiply") == 0 ) {
-				    testMultiply(m);
+					if( m.getParameterTypes().length == 3 )
+						testMultiply(m);
+					else
+						testMultiplyBounded(m);
 				} else if( m.getName().compareTo("plus") == 0 ) {
-				    testPlus(m);
+					if( m.getParameterTypes().length == 3 )
+						testPlus(m);
+					else
+						testPlusBounded(m);
+				} else if( m.getName().compareTo("add") == 0 ) {
+					testAdd(m);
+				} else if( m.getName().compareTo("subtract") == 0 ) {
+					testSubtract(m);
 				} else if( m.getName().compareTo("boundImage") == 0 ) {
 				    testBound(m);
+				} else if( m.getName().compareTo("abs") == 0 ) {
+					testAbs(m);
 				} else if( m.getName().compareTo("diffAbs") == 0 ) {
 				    testDiffAbs(m);
-				} else if( m.getName().compareTo("bandAve") == 0 ) {
-					testBandAve(m);
+				} else if( m.getName().compareTo("averageBand") == 0 ) {
+					TestAverageBand(m);
 				} else {
 					throw new RuntimeException("Unknown function: "+m.getName());
 				}
@@ -95,7 +110,7 @@ public class TestPixelMath {
 	private void testDivide( Method m ) throws InvocationTargetException, IllegalAccessException {
 		Class paramTypes[] = m.getParameterTypes();
 		ImageSingleBand input = GeneralizedImageOps.createSingleBand(paramTypes[0], width, height);
-		ImageSingleBand output = GeneralizedImageOps.createSingleBand(paramTypes[0], width, height);
+		ImageSingleBand output = GeneralizedImageOps.createSingleBand(paramTypes[2], width, height);
 		GImageMiscOps.fillUniform(input, rand, 0,20);
 
 		if( input.getTypeInfo().isSigned() ) {
@@ -105,9 +120,9 @@ public class TestPixelMath {
 		}
 
 		if( input.getTypeInfo().isInteger() )
-			m.invoke(null,input,output,10);
+			m.invoke(null,input,10,output);
 		else
-			m.invoke(null,input,output,10.0f);
+			m.invoke(null,input,10.0f,output);
 
 		GImageSingleBand a = FactoryGImageSingleBand.wrap(input);
 		GImageSingleBand b = FactoryGImageSingleBand.wrap(output);
@@ -126,10 +141,10 @@ public class TestPixelMath {
 		}
 	}
 
-	private void testMultiply( Method m ) throws InvocationTargetException, IllegalAccessException {
+	private void testDivideBounded( Method m ) throws InvocationTargetException, IllegalAccessException {
 		Class paramTypes[] = m.getParameterTypes();
 		ImageSingleBand input = GeneralizedImageOps.createSingleBand(paramTypes[0], width, height);
-		ImageSingleBand output = GeneralizedImageOps.createSingleBand(paramTypes[0], width, height);
+		ImageSingleBand output = GeneralizedImageOps.createSingleBand(paramTypes[4], width, height);
 		GImageMiscOps.fillUniform(input, rand, 0,20);
 
 		if( input.getTypeInfo().isSigned() ) {
@@ -139,9 +154,53 @@ public class TestPixelMath {
 		}
 
 		if( input.getTypeInfo().isInteger() )
-			m.invoke(null,input,output,2);
+			m.invoke(null,input,10,-1,1,output);
 		else
-			m.invoke(null,input,output,2.0f);
+			m.invoke(null,input,10.0f,-1f,1f,output);
+
+		GImageSingleBand a = FactoryGImageSingleBand.wrap(input);
+		GImageSingleBand b = FactoryGImageSingleBand.wrap(output);
+		if( input.getTypeInfo().isInteger() ) {
+			for( int i = 0; i < height; i++ ) {
+				for( int j = 0; j < width; j++ ) {
+					int expected = a.get(j,i).intValue()/10;
+					int found = b.get(j,i).intValue();
+					if( expected < -1 ) expected = -1;
+					if( expected > 1 ) expected = 1;
+
+					assertEquals(expected,found);
+				}
+			}
+		} else {
+			for( int i = 0; i < height; i++ ) {
+				for( int j = 0; j < width; j++ ) {
+					float expected = a.get(j,i).floatValue()/10.0f;
+					float found = b.get(j,i).floatValue();
+					if( expected < -1 ) expected = -1;
+					if( expected > 1 ) expected = 1;
+
+					assertEquals(expected, found, 1e-4);
+				}
+			}
+		}
+	}
+
+	private void testMultiply( Method m ) throws InvocationTargetException, IllegalAccessException {
+		Class paramTypes[] = m.getParameterTypes();
+		ImageSingleBand input = GeneralizedImageOps.createSingleBand(paramTypes[0], width, height);
+		ImageSingleBand output = GeneralizedImageOps.createSingleBand(paramTypes[2], width, height);
+		GImageMiscOps.fillUniform(input, rand, 0,20);
+
+		if( input.getTypeInfo().isSigned() ) {
+			GImageMiscOps.fillUniform(input, rand, -20,20);
+		} else {
+			GImageMiscOps.fillUniform(input, rand, 0,20);
+		}
+
+		if( input.getTypeInfo().isInteger() )
+			m.invoke(null,input,2,output);
+		else
+			m.invoke(null,input,2.0f,output);
 
 		GImageSingleBand a = FactoryGImageSingleBand.wrap(input);
 		GImageSingleBand b = FactoryGImageSingleBand.wrap(output);
@@ -160,6 +219,50 @@ public class TestPixelMath {
 		}
 	}
 
+	private void testMultiplyBounded( Method m ) throws InvocationTargetException, IllegalAccessException {
+		Class paramTypes[] = m.getParameterTypes();
+		ImageSingleBand input = GeneralizedImageOps.createSingleBand(paramTypes[0], width, height);
+		ImageSingleBand output = GeneralizedImageOps.createSingleBand(paramTypes[4], width, height);
+		GImageMiscOps.fillUniform(input, rand, 0,20);
+
+		if( input.getTypeInfo().isSigned() ) {
+			GImageMiscOps.fillUniform(input, rand, -20,20);
+		} else {
+			GImageMiscOps.fillUniform(input, rand, 0,20);
+		}
+
+		if( input.getTypeInfo().isInteger() )
+			m.invoke(null,input,2,-30,30,output);
+		else
+			m.invoke(null,input,2.0f,-30f,30f,output);
+
+		GImageSingleBand a = FactoryGImageSingleBand.wrap(input);
+		GImageSingleBand b = FactoryGImageSingleBand.wrap(output);
+		if( input.getTypeInfo().isInteger() ) {
+			for( int i = 0; i < height; i++ ) {
+				for( int j = 0; j < width; j++ ) {
+					int expected = a.get(j,i).intValue()*2;
+					int found = b.get(j,i).intValue();
+					if( expected < -30 ) expected = -30;
+					if( expected > 30 ) expected = 30;
+
+					assertEquals(expected,found);
+				}
+			}
+		} else {
+			for( int i = 0; i < height; i++ ) {
+				for( int j = 0; j < width; j++ ) {
+					float expected = a.get(j,i).floatValue()*2f;
+					float found = b.get(j,i).floatValue();
+					if( expected < -30 ) expected = -30;
+					if( expected > 30 ) expected = 30;
+
+					assertEquals(expected,found,1e-4);
+				}
+			}
+		}
+	}
+
 	private void testPlus( Method m ) throws InvocationTargetException, IllegalAccessException {
 		Class paramTypes[] = m.getParameterTypes();
 		ImageSingleBand input = GeneralizedImageOps.createSingleBand(paramTypes[0], width, height);
@@ -172,9 +275,9 @@ public class TestPixelMath {
 		}
 
 		if( input.getTypeInfo().isInteger() )
-			m.invoke(null,input,output,2);
+			m.invoke(null,input,2,output);
 		else
-			m.invoke(null,input,output,2.0f);
+			m.invoke(null,input,2.0f,output);
 
 		GImageSingleBand a = FactoryGImageSingleBand.wrap(input);
 		GImageSingleBand b = FactoryGImageSingleBand.wrap(output);
@@ -188,6 +291,49 @@ public class TestPixelMath {
 			for( int i = 0; i < height; i++ ) {
 				for( int j = 0; j < width; j++ ) {
 					assertEquals(a.get(j,i).doubleValue()+2f,b.get(j,i).doubleValue(),1e-4);
+				}
+			}
+		}
+	}
+
+	private void testPlusBounded( Method m ) throws InvocationTargetException, IllegalAccessException {
+		Class paramTypes[] = m.getParameterTypes();
+		ImageSingleBand input = GeneralizedImageOps.createSingleBand(paramTypes[0], width, height);
+		ImageSingleBand output = GeneralizedImageOps.createSingleBand(paramTypes[0], width, height);
+
+		if( input.getTypeInfo().isSigned() ) {
+			GImageMiscOps.fillUniform(input, rand, -20,20);
+		} else {
+			GImageMiscOps.fillUniform(input, rand, 0,20);
+		}
+
+		if( input.getTypeInfo().isInteger() )
+			m.invoke(null,input,2,-10,12,output);
+		else
+			m.invoke(null,input,2.0f,-10f,12f,output);
+
+		GImageSingleBand a = FactoryGImageSingleBand.wrap(input);
+		GImageSingleBand b = FactoryGImageSingleBand.wrap(output);
+		if( input.getTypeInfo().isInteger() ) {
+			for( int i = 0; i < height; i++ ) {
+				for( int j = 0; j < width; j++ ) {
+					int expected = a.get(j,i).intValue() + 2;
+					int found = b.get(j,i).intValue();
+					if( expected < -10 ) expected = -10;
+					if( expected > 12 ) expected = 12;
+
+					assertEquals(expected,found);
+				}
+			}
+		} else {
+			for( int i = 0; i < height; i++ ) {
+				for( int j = 0; j < width; j++ ) {
+					float expected = a.get(j,i).floatValue() + 2f;
+					float found = b.get(j,i).floatValue();
+					if( expected < -10 ) expected = -10;
+					if( expected > 12 ) expected = 12;
+
+					assertEquals(expected,found,1e-4);
 				}
 			}
 		}
@@ -225,6 +371,29 @@ public class TestPixelMath {
 		}
 	}
 
+	private void testAbs(Method m) throws InvocationTargetException, IllegalAccessException {
+		Class paramTypes[] = m.getParameterTypes();
+		ImageSingleBand inputA = GeneralizedImageOps.createSingleBand(paramTypes[0], width, height);
+		ImageSingleBand inputB = GeneralizedImageOps.createSingleBand(paramTypes[1], width, height);
+
+		if( inputA.getTypeInfo().isSigned() ) {
+			GImageMiscOps.fillUniform(inputA, rand, -20,20);
+		} else {
+			GImageMiscOps.fillUniform(inputA, rand, 0,20);
+		}
+
+		m.invoke(null,inputA,inputB);
+
+		for( int i = 0; i < height; i++ ) {
+			for( int j = 0; j < width; j++ ) {
+				double a = GeneralizedImageOps.get(inputA,j,i);
+				double b = GeneralizedImageOps.get(inputB,j,i);
+
+				assertEquals(Math.abs(a),b,1e-4);
+			}
+		}
+	}
+
 	private void testDiffAbs( Method m ) throws InvocationTargetException, IllegalAccessException {
 		Class paramTypes[] = m.getParameterTypes();
 		ImageSingleBand inputA = GeneralizedImageOps.createSingleBand(paramTypes[0], width, height);
@@ -253,7 +422,61 @@ public class TestPixelMath {
 		}
 	}
 
-	private void testBandAve( Method m ) throws InvocationTargetException, IllegalAccessException {
+	private void testAdd(Method m) throws InvocationTargetException, IllegalAccessException {
+		Class paramTypes[] = m.getParameterTypes();
+		ImageSingleBand inputA = GeneralizedImageOps.createSingleBand(paramTypes[0], width, height);
+		ImageSingleBand inputB = GeneralizedImageOps.createSingleBand(paramTypes[1], width, height);
+		ImageSingleBand inputC = GeneralizedImageOps.createSingleBand(paramTypes[2], width, height);
+
+		if( inputA.getTypeInfo().isSigned() ) {
+			GImageMiscOps.fillUniform(inputA, rand, -20,20);
+			GImageMiscOps.fillUniform(inputB, rand, -20,20);
+		} else {
+			GImageMiscOps.fillUniform(inputA, rand, 0,20);
+			GImageMiscOps.fillUniform(inputB, rand, -20,20);
+		}
+
+		m.invoke(null,inputA,inputB,inputC);
+
+		for( int i = 0; i < height; i++ ) {
+			for( int j = 0; j < width; j++ ) {
+				double a = GeneralizedImageOps.get(inputA,j,i);
+				double b = GeneralizedImageOps.get(inputB,j,i);
+				double c = GeneralizedImageOps.get(inputC,j,i);
+
+				assertEquals(a+b,c,1e-4);
+			}
+		}
+	}
+
+	private void testSubtract(Method m) throws InvocationTargetException, IllegalAccessException {
+		Class paramTypes[] = m.getParameterTypes();
+		ImageSingleBand inputA = GeneralizedImageOps.createSingleBand(paramTypes[0], width, height);
+		ImageSingleBand inputB = GeneralizedImageOps.createSingleBand(paramTypes[1], width, height);
+		ImageSingleBand inputC = GeneralizedImageOps.createSingleBand(paramTypes[2], width, height);
+
+		if( inputA.getTypeInfo().isSigned() ) {
+			GImageMiscOps.fillUniform(inputA, rand, -20,20);
+			GImageMiscOps.fillUniform(inputB, rand, -20,20);
+		} else {
+			GImageMiscOps.fillUniform(inputA, rand, 20,40);
+			GImageMiscOps.fillUniform(inputB, rand, 5,15);
+		}
+
+		m.invoke(null,inputA,inputB,inputC);
+
+		for( int i = 0; i < height; i++ ) {
+			for( int j = 0; j < width; j++ ) {
+				double a = GeneralizedImageOps.get(inputA,j,i);
+				double b = GeneralizedImageOps.get(inputB,j,i);
+				double c = GeneralizedImageOps.get(inputC,j,i);
+
+				assertEquals(a-b,c,1e-4);
+			}
+		}
+	}
+
+	private void TestAverageBand(Method m) throws InvocationTargetException, IllegalAccessException {
 		Class paramTypes[] = m.getParameterTypes();
 		MultiSpectral input = new MultiSpectral(paramTypes[1], width, height,3);
 		ImageSingleBand output = GeneralizedImageOps.createSingleBand(paramTypes[1], width, height);

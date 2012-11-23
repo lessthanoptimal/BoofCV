@@ -48,9 +48,9 @@ BoofCV is in general very easy to build on just about any system.  Because it is
 
 BoofCV depends on a few other packages and if you are getting lot of errors when compiling your source code you probably forgot to include them.  All libraries that BoofCV depends on are included with BoofCV and are contained in the boofcv/lib directory.
 
-EJML.jar             http://code.google.com/p/efficient-java-matrix-library/
-GeoRegression.jar    http://georegression.org/
-libpja.jar           Various utility functions
+EJML.jar             http://code.google.com/p/efficient-java-matrix-library
+GeoRegression.jar    http://georegression.org
+DDogleg.jar          http://ddogleg.org
 
 ========= Developing With BoofCV =============
 

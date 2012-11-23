@@ -386,7 +386,10 @@ public class BoofTesting {
 	public static void assertEqualsGeneric(ImageSingleBand imgA, ImageSingleBand imgB, int tolInt, double tolFloat) {
 
 		if (imgA.getTypeInfo().isInteger() && imgB.getTypeInfo().isInteger()) {
-			assertEquals((ImageInteger) imgA, (ImageInteger) imgB, tolInt);
+			if( imgA.getTypeInfo().getNumBits() != 64 )
+				assertEquals((ImageInteger) imgA, (ImageInteger) imgB, tolInt);
+			else
+				assertEquals((ImageSInt64) imgA, (ImageSInt64) imgB, tolInt);
 		} else if (imgA.getTypeInfo().isInteger() || imgB.getTypeInfo().isInteger()) {
 			ImageInteger imgInt = (ImageInteger) (imgA.getTypeInfo().isInteger() ? imgA : imgB);
 			ImageFloat imgFloat = (ImageFloat) (imgA.getTypeInfo().isInteger() ? imgB : imgA);
@@ -462,6 +465,21 @@ public class BoofTesting {
 			for (int x = ignoreBorder; x < imgA.getWidth() - ignoreBorder; x++) {
 				if (imgA.get(x, y) != (int) imgB.get(x, y))
 					throw new RuntimeException("values not equal at (" + x + " " + y + ") vals " + imgA.get(x, y) + " " + (int) imgB.get(x, y));
+			}
+		}
+	}
+
+	public static void assertEquals(ImageSInt64 imgA, ImageSInt64 imgB, int ignoreBorder) {
+		if (imgA.getWidth() != imgB.getWidth())
+			throw new RuntimeException("Widths are not equals");
+
+		if (imgA.getHeight() != imgB.getHeight())
+			throw new RuntimeException("Heights are not equals");
+
+		for (int y = ignoreBorder; y < imgA.getHeight() - ignoreBorder; y++) {
+			for (int x = ignoreBorder; x < imgA.getWidth() - ignoreBorder; x++) {
+				if (imgA.get(x, y) != imgB.get(x, y))
+					throw new RuntimeException("values not equal at (" + x + " " + y + ") vals " + imgA.get(x, y) + " " + imgB.get(x, y) + " Subimages = " + imgA.isSubimage() + " " + imgB.isSubimage());
 			}
 		}
 	}
