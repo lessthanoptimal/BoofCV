@@ -21,13 +21,24 @@ Version : Alpha 0.12
 - Deleted KeyFramePointTracker
   * Added pointless complexity.  Use ImagePointTracker instead
   * Changed 2D and 3D SFM algorithms which were using it
-- Fixed bug in SurfFeature.setTo()
+- Fixed bugs in various feature descriptors setTo() and copy() functions:
+  * SurfFeature
+  * TupleDesc_B
+  * NccFeature
 - FactoryPointSequentialTracker has been tweaked a bit
 - GeneralAssociation provides two functions for specifying the source and destination lists
   * Allows better optimization since preprocessing might only need to be done once
 - ConvertBufferedImage
   * Added support for sub-image BufferedImages
-
+- All numerics code has been put into its own project
+  * http://ddogleg.org
+- Reworking several basic image operations
+  * Created ImageMiscOps
+  * Created ImageStatistics
+  * Deleted ImageTestingOps
+  * Changed PixelMath
+  * Changed GeneralizedImageOps
+- Added setTo() in ImageBase
 
 ---------------------------------------------
 Date    : 2012/11/6

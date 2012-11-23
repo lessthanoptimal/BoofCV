@@ -21,6 +21,8 @@ package boofcv.alg.misc;
 import boofcv.struct.image.*;
 
 /**
+ * Generalized version of {@link ImageStatistics}.  Type checking is performed at runtime instead of at compile type.
+ *
  * @author Peter Abeles
  */
 public class GImageStatistics {
@@ -41,10 +43,14 @@ public class GImageStatistics {
 			return ImageStatistics.maxAbs((ImageSInt16)input);
 		} else if( ImageSInt32.class == input.getClass() ) {
 			return ImageStatistics.maxAbs((ImageSInt32)input);
+		} else if( ImageSInt64.class == input.getClass() ) {
+			return ImageStatistics.maxAbs((ImageSInt64)input);
 		} else if( ImageFloat32.class == input.getClass() ) {
 			return ImageStatistics.maxAbs((ImageFloat32)input);
+		} else if( ImageFloat64.class == input.getClass() ) {
+			return ImageStatistics.maxAbs((ImageFloat64)input);
 		} else {
-			throw new IllegalArgumentException("Unknown Image Type");
+			throw new IllegalArgumentException("Unknown Image Type: "+input.getClass().getSimpleName());
 		}
 	}
 
@@ -65,8 +71,12 @@ public class GImageStatistics {
 			return ImageStatistics.max((ImageSInt16) input);
 		} else if( ImageSInt32.class == input.getClass() ) {
 			return ImageStatistics.max((ImageSInt32) input);
+		} else if( ImageSInt64.class == input.getClass() ) {
+			return ImageStatistics.max((ImageSInt64) input);
 		} else if( ImageFloat32.class == input.getClass() ) {
 			return ImageStatistics.max((ImageFloat32) input);
+		} else if( ImageFloat64.class == input.getClass() ) {
+			return ImageStatistics.max((ImageFloat64) input);
 		} else {
 			throw new IllegalArgumentException("Unknown Image Type");
 		}
@@ -89,10 +99,14 @@ public class GImageStatistics {
 			return ImageStatistics.min((ImageSInt16) input);
 		} else if( ImageSInt32.class == input.getClass() ) {
 			return ImageStatistics.min((ImageSInt32) input);
+		} else if( ImageSInt64.class == input.getClass() ) {
+			return ImageStatistics.min((ImageSInt64) input);
 		} else if( ImageFloat32.class == input.getClass() ) {
 			return ImageStatistics.min((ImageFloat32) input);
+		} else if( ImageFloat64.class == input.getClass() ) {
+			return ImageStatistics.min((ImageFloat64) input);
 		} else {
-			throw new IllegalArgumentException("Unknown Image Type");
+			throw new IllegalArgumentException("Unknown Image Type: "+input.getClass().getSimpleName());
 		}
 	}
 
@@ -116,6 +130,8 @@ public class GImageStatistics {
 			return ImageStatistics.sum((ImageSInt16)input);
 		} else if( ImageSInt32.class == input.getClass() ) {
 			return ImageStatistics.sum((ImageSInt32)input);
+		} else if( ImageSInt64.class == input.getClass() ) {
+			return ImageStatistics.sum((ImageSInt64)input);
 		} else if( ImageFloat32.class == input.getClass() ) {
 			return ImageStatistics.sum((ImageFloat32)input);
 		} else if( ImageFloat64.class == input.getClass() ) {
@@ -143,6 +159,8 @@ public class GImageStatistics {
 			return ImageStatistics.mean((ImageSInt16)input);
 		} else if( ImageSInt32.class == input.getClass() ) {
 			return ImageStatistics.mean((ImageSInt32)input);
+		} else if( ImageSInt64.class == input.getClass() ) {
+			return ImageStatistics.mean((ImageSInt64)input);
 		} else if( ImageFloat32.class == input.getClass() ) {
 			return ImageStatistics.mean((ImageFloat32)input);
 		} else if( ImageFloat64.class == input.getClass() ) {
@@ -171,6 +189,8 @@ public class GImageStatistics {
 			return ImageStatistics.variance((ImageSInt16)input,mean);
 		} else if( ImageSInt32.class == input.getClass() ) {
 			return ImageStatistics.variance((ImageSInt32)input,mean);
+		} else if( ImageSInt64.class == input.getClass() ) {
+			return ImageStatistics.variance((ImageSInt64)input,mean);
 		} else if( ImageFloat32.class == input.getClass() ) {
 			return ImageStatistics.variance((ImageFloat32)input,mean);
 		} else if( ImageFloat64.class == input.getClass() ) {
@@ -199,6 +219,8 @@ public class GImageStatistics {
 			return ImageStatistics.meanDiffSq((ImageSInt16)inputA,(ImageSInt16)inputB);
 		} else if( ImageSInt32.class == inputA.getClass() ) {
 			return ImageStatistics.meanDiffSq((ImageSInt32)inputA,(ImageSInt32)inputB);
+		} else if( ImageSInt64.class == inputA.getClass() ) {
+			return ImageStatistics.meanDiffSq((ImageSInt64)inputA,(ImageSInt64)inputB);
 		} else if( ImageFloat32.class == inputA.getClass() ) {
 			return ImageStatistics.meanDiffSq((ImageFloat32)inputA,(ImageFloat32)inputB);
 		} else if( ImageFloat64.class == inputA.getClass() ) {
@@ -227,6 +249,8 @@ public class GImageStatistics {
 			return ImageStatistics.meanDiffAbs((ImageSInt16)inputA,(ImageSInt16)inputB);
 		} else if( ImageSInt32.class == inputA.getClass() ) {
 			return ImageStatistics.meanDiffAbs((ImageSInt32)inputA,(ImageSInt32)inputB);
+		} else if( ImageSInt64.class == inputA.getClass() ) {
+			return ImageStatistics.meanDiffAbs((ImageSInt64)inputA,(ImageSInt64)inputB);
 		} else if( ImageFloat32.class == inputA.getClass() ) {
 			return ImageStatistics.meanDiffAbs((ImageFloat32)inputA,(ImageFloat32)inputB);
 		} else if( ImageFloat64.class == inputA.getClass() ) {

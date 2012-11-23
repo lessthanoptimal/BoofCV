@@ -136,7 +136,7 @@ public class ExampleMultiSpectralImages {
 		ImageUInt8 gray = new ImageUInt8( image.width,image.height);
 		
 		// creates a gray scale image by averaging intensity value across pixels
-		GPixelMath.bandAve(image, gray);
+		GPixelMath.averageBand(image, gray);
 		BufferedImage outputAve = ConvertBufferedImage.convertTo(gray,null);
 
 		// create an output image just from the first band

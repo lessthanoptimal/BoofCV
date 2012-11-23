@@ -30,7 +30,6 @@ import java.lang.reflect.Method;
 import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
@@ -42,8 +41,8 @@ public class TestImageStatistics {
 
 	@Test
 	public void checkAll() {
-		int numExpected = 8*9;
-		Method methods[] = PixelMath.class.getMethods();
+		int numExpected = 8*8;
+		Method methods[] = ImageStatistics.class.getMethods();
 
 		// sanity check to make sure the functions are being found
 		int numFound = 0;
@@ -52,14 +51,13 @@ public class TestImageStatistics {
 				continue;
 			try {
 				System.out.println(m.getName());
-				if( m.getName().compareTo("abs") == 0 ) {
-					testAbs(m);
-				} else if( m.getName().compareTo("maxAbs") == 0 ) {
-					testMaxAbs(m);
-				} else if( m.getName().compareTo("min") == 0 ) {
+
+				if( m.getName().compareTo("min") == 0 ) {
 					testMin(m);
 				} else if( m.getName().compareTo("max") == 0 ) {
 					testMax(m);
+				} else if( m.getName().compareTo("maxAbs") == 0 ) {
+					testMaxAbs(m);
 				} else if( m.getName().compareTo("sum") == 0 ) {
 					testSum(m);
 				} else if( m.getName().compareTo("mean") == 0 ) {
@@ -67,9 +65,9 @@ public class TestImageStatistics {
 				} else if( m.getName().compareTo("variance") == 0 ) {
 					testVariance(m);
 				} else if( m.getName().compareTo("meanDiffSq") == 0 ) {
-					testMeanDiffAbs(m);
-				} else if( m.getName().compareTo("meanDiffAbs") == 0 ) {
 					testMeanDiffSq(m);
+				} else if( m.getName().compareTo("meanDiffAbs") == 0 ) {
+					testMeanDiffAbs(m);
 				} else {
 					throw new RuntimeException("Unknown function: "+m.getName());
 				}
@@ -95,23 +93,6 @@ public class TestImageStatistics {
 			return false;
 
 		return ImageBase.class.isAssignableFrom(param[0]);
-	}
-
-	private void testAbs( Method m ) throws InvocationTargetException, IllegalAccessException {
-		Class paramTypes[] = m.getParameterTypes();
-		ImageSingleBand input = GeneralizedImageOps.createSingleBand(paramTypes[0], width, height);
-		ImageSingleBand output = GeneralizedImageOps.createSingleBand(paramTypes[0], width, height);
-		GImageMiscOps.fillUniform(input, rand, -20,20);
-
-		m.invoke(null,input,output);
-
-		GImageSingleBand a = FactoryGImageSingleBand.wrap(input);
-		GImageSingleBand b = FactoryGImageSingleBand.wrap(output);
-		for( int i = 0; i < height; i++ ) {
-			for( int j = 0; j < width; j++ ) {
-				assertEquals(Math.abs(a.get(j,i).doubleValue()),b.get(j,i).doubleValue(),1e-4);
-			}
-		}
 	}
 
 	private void testMaxAbs( Method m ) throws InvocationTargetException, IllegalAccessException {
@@ -202,28 +183,111 @@ public class TestImageStatistics {
 		Class paramTypes[] = m.getParameterTypes();
 		ImageSingleBand inputA = GeneralizedImageOps.createSingleBand(paramTypes[0], width, height);
 
-		fail("Implement");
+		if( inputA.getTypeInfo().isSigned() ) {
+			GImageMiscOps.fillUniform(inputA, rand, -20,20);
+		} else {
+			GImageMiscOps.fillUniform(inputA, rand, 0,20);
+		}
+
+		Object result = m.invoke(null, inputA);
+
+		double total = 0;
+		for( int i = 0; i < height; i++ ) {
+			for( int j = 0; j < width; j++ ) {
+				total += GeneralizedImageOps.get(inputA,j,i);
+			}
+		}
+
+		double mean = total/(width*height);
+
+		assertEquals(mean,((Number)result).doubleValue(),1e-4);
 	}
 
 	private void testVariance( Method m ) throws InvocationTargetException, IllegalAccessException {
 		Class paramTypes[] = m.getParameterTypes();
 		ImageSingleBand inputA = GeneralizedImageOps.createSingleBand(paramTypes[0], width, height);
 
-		fail("Implement");
+		if( inputA.getTypeInfo().isSigned() ) {
+			GImageMiscOps.fillUniform(inputA, rand, -20,20);
+		} else {
+			GImageMiscOps.fillUniform(inputA, rand, 0,20);
+		}
+
+		double mean = 2.5;
+
+		Object result = m.invoke(null,inputA,mean);
+
+		double total = 0;
+		for( int i = 0; i < height; i++ ) {
+			for( int j = 0; j < width; j++ ) {
+				double d = GeneralizedImageOps.get(inputA,j,i) - mean;
+				total += d*d;
+			}
+		}
+
+		double var = total/(width*height);
+
+		assertEquals(var, ((Number) result).doubleValue(), 1e-4);
 	}
 
 	private void testMeanDiffSq(Method m) throws InvocationTargetException, IllegalAccessException {
 		Class paramTypes[] = m.getParameterTypes();
 		ImageSingleBand inputA = GeneralizedImageOps.createSingleBand(paramTypes[0], width, height);
+		ImageSingleBand inputB = GeneralizedImageOps.createSingleBand(paramTypes[1], width, height);
 
-		fail("Implement");
+		if( inputA.getTypeInfo().isSigned() ) {
+			GImageMiscOps.fillUniform(inputA, rand, -20,20);
+			GImageMiscOps.fillUniform(inputB, rand, -20,20);
+		} else {
+			GImageMiscOps.fillUniform(inputA, rand, 0,20);
+			GImageMiscOps.fillUniform(inputB, rand, 0,20);
+		}
+
+
+		Object result = m.invoke(null,inputA,inputB);
+
+		double total = 0;
+		for( int i = 0; i < height; i++ ) {
+			for( int j = 0; j < width; j++ ) {
+				double a = GeneralizedImageOps.get(inputA,j,i);
+				double b = GeneralizedImageOps.get(inputB,j,i);
+				total += (a-b)*(a-b);
+			}
+		}
+
+		double expected = total/(width*height);
+
+		assertEquals(expected, ((Number) result).doubleValue(), 1e-4);
 	}
 
 	private void testMeanDiffAbs(Method m) throws InvocationTargetException, IllegalAccessException {
 		Class paramTypes[] = m.getParameterTypes();
 		ImageSingleBand inputA = GeneralizedImageOps.createSingleBand(paramTypes[0], width, height);
+		ImageSingleBand inputB = GeneralizedImageOps.createSingleBand(paramTypes[1], width, height);
 
-		fail("Implement");
+		if( inputA.getTypeInfo().isSigned() ) {
+			GImageMiscOps.fillUniform(inputA, rand, -20,20);
+			GImageMiscOps.fillUniform(inputB, rand, -20,20);
+		} else {
+			GImageMiscOps.fillUniform(inputA, rand, 0,20);
+			GImageMiscOps.fillUniform(inputB, rand, 0,20);
+		}
+
+
+		Object result = m.invoke(null,inputA,inputB);
+
+		double total = 0;
+		for( int i = 0; i < height; i++ ) {
+			for( int j = 0; j < width; j++ ) {
+				double a = GeneralizedImageOps.get(inputA,j,i);
+				double b = GeneralizedImageOps.get(inputB,j,i);
+				total += Math.abs(a-b);
+			}
+		}
+
+		double expected = total/(width*height);
+
+		assertEquals(expected, ((Number) result).doubleValue(), 1e-4);
 	}
 
 }

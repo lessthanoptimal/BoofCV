@@ -21,7 +21,7 @@ package boofcv.alg.misc;
 import boofcv.struct.image.*;
 
 /**
- * Image type agnostic wrapper for {@link PixelMath}.
+ * Generalized version of {@link PixelMath}.  Type checking is performed at runtime instead of at compile type.
  *
  * @author Peter Abeles
  */
@@ -338,12 +338,44 @@ public class GPixelMath {
 	}
 
 	/**
+	 * <p>
+	 * Computes the absolute value of the difference between each pixel in the two images.<br>
+	 * d(x,y) = |img1(x,y) - img2(x,y)|
+	 * </p>
+	 * @param inputA Input image. Not modified.
+	 * @param inputB Input image. Not modified.
+	 * @param output Absolute value of difference image. Modified.
+	 */
+	public static <T extends ImageSingleBand> void diffAbs( T inputA , T inputB , T output) {
+
+		if( ImageUInt8.class == inputA.getClass() ) {
+			PixelMath.diffAbs((ImageUInt8) inputA, (ImageUInt8) inputB, (ImageUInt8) output);
+		} else if( ImageSInt8.class == inputA.getClass() ) {
+			PixelMath.diffAbs((ImageSInt8) inputA, (ImageSInt8) inputB, (ImageSInt8) output);
+		} else if( ImageUInt16.class == inputA.getClass() ) {
+			PixelMath.diffAbs((ImageUInt16) inputA, (ImageUInt16) inputB, (ImageUInt16) output);
+		} else if( ImageSInt16.class == inputA.getClass() ) {
+			PixelMath.diffAbs((ImageSInt16) inputA, (ImageSInt16) inputB, (ImageSInt16) output);
+		} else if( ImageSInt32.class == inputA.getClass() ) {
+			PixelMath.diffAbs((ImageSInt32) inputA, (ImageSInt32) inputB, (ImageSInt32) output);
+		} else if( ImageSInt64.class == inputA.getClass() ) {
+			PixelMath.diffAbs((ImageSInt64) inputA, (ImageSInt64) inputB, (ImageSInt64) output);
+		} else if( ImageFloat32.class == inputA.getClass() ) {
+			PixelMath.diffAbs((ImageFloat32) inputA, (ImageFloat32) inputB, (ImageFloat32) output);
+		} else if( ImageFloat64.class == inputA.getClass() ) {
+			PixelMath.diffAbs((ImageFloat64) inputA, (ImageFloat64) inputB, (ImageFloat64) output);
+		} else {
+			throw new IllegalArgumentException("Unknown image Type: "+inputA.getClass().getSimpleName());
+		}
+	}
+
+	/**
 	 * Computes the average for each pixel across all bands in the {@link MultiSpectral} image.
 	 *
 	 * @param input MultiSpectral image
 	 * @param output Gray scale image containing average pixel values
 	 */
-	public static <T extends ImageSingleBand> void bandAve( MultiSpectral<T> input , T output) {
+	public static <T extends ImageSingleBand> void averageBand(MultiSpectral<T> input, T output) {
 
 		if( ImageUInt8.class == input.getType() ) {
 			PixelMath.averageBand((MultiSpectral<ImageUInt8>) input, (ImageUInt8) output);
@@ -355,6 +387,8 @@ public class GPixelMath {
 			PixelMath.averageBand((MultiSpectral<ImageSInt16>) input, (ImageSInt16) output);
 		} else if( ImageSInt32.class == input.getType() ) {
 			PixelMath.averageBand((MultiSpectral<ImageSInt32>) input, (ImageSInt32) output);
+		} else if( ImageSInt64.class == input.getType() ) {
+			PixelMath.averageBand((MultiSpectral<ImageSInt64>) input, (ImageSInt64) output);
 		} else if( ImageFloat32.class == input.getType() ) {
 			PixelMath.averageBand((MultiSpectral<ImageFloat32>) input, (ImageFloat32) output);
 		} else if( ImageFloat64.class == input.getType() ) {

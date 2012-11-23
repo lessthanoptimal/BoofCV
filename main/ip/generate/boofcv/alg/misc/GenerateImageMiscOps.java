@@ -96,19 +96,15 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 		out.print("\t/**\n" +
 				"\t * Fills the whole image with the specified value\n" +
 				"\t *\n" +
-				"\t * @param img   An image.\n" +
+				"\t * @param input An image.\n" +
 				"\t * @param value The value that the image is being filled with.\n" +
 				"\t */\n" +
-				"\tpublic static void fill("+imageName+" img, "+imageType.getSumType()+" value) {\n" +
-				"\t\tfinal int h = img.getHeight();\n" +
-				"\t\tfinal int w = img.getWidth();\n" +
+				"\tpublic static void fill("+imageName+" input, "+imageType.getSumType()+" value) {\n" +
 				"\n" +
-				"\t\t"+dataType+"[] data = img.data;\n" +
-				"\n" +
-				"\t\tfor (int y = 0; y < h; y++) {\n" +
-				"\t\t\tint index = img.getStartIndex() + y * img.getStride();\n" +
-				"\t\t\tfor (int x = 0; x < w; x++) {\n" +
-				"\t\t\t\tdata[index++] = "+typeCast+"value;\n" +
+				"\t\tfor (int y = 0; y < input.height; y++) {\n" +
+				"\t\t\tint index = input.getStartIndex() + y * input.getStride();\n" +
+				"\t\t\tfor (int x = 0; x < input.width; x++) {\n" +
+				"\t\t\t\tinput.data[index++] = "+typeCast+"value;\n" +
 				"\t\t\t}\n" +
 				"\t\t}\n" +
 				"\t}\n\n");
@@ -117,7 +113,14 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 	public void printFillRectangle()
 	{
 		out.print("\t/**\n" +
-				"\t * Sets a rectangle inside the image with the specified value.\n" +
+				"\t * Draws a filled rectangle that is aligned along the image axis inside the image.\n" +
+				"\t *\n" +
+				"\t * @param img Image the rectangle is drawn in.  Modified\n" +
+				"\t * @param value Value of the rectangle\n" +
+				"\t * @param x0 Top left x-coordinate\n" +
+				"\t * @param y0 Top left y-coordinate\n" +
+				"\t * @param width Rectangle width\n" +
+				"\t * @param height Rectangle height\n" +
 				"\t */\n" +
 				"\tpublic static void fillRectangle("+imageName+" img, "+imageType.getSumType()+" value, int x0, int y0, int width, int height) {\n" +
 				"\t\tint x1 = x0 + width;\n" +
@@ -139,6 +142,11 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 
 		out.print("\t/**\n" +
 				"\t * Sets each value in the image to a value drawn from an uniform distribution that has a range of min <= X < max.\n" +
+				"\t *\n" +
+				"\t * @param img Image which is to be filled.  Modified,\n" +
+				"\t * @param rand Random number generator\n" +
+				"\t * @param min Minimum value of the distribution\n" +
+				"\t * @param max Maximum value of the distribution\n" +
 				"\t */\n" +
 				"\tpublic static void fillUniform("+imageName+" img, Random rand , "+sumType+" min , "+sumType+" max) {\n" +
 				"\t\t"+sumType+" range = max-min;\n" +
@@ -168,18 +176,27 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 		String typeCast = imageType.getTypeCastFromSum();
 
 		out.print("\t/**\n" +
-				"\t * Sets each value in the image to a value drawn from a Gaussian distribution\n" +
+				"\t * Sets each value in the image to a value drawn from a Gaussian distribution.  A user\n" +
+				"\t * specified lower and upper bound is provided to ensure that the values are within a legal\n" +
+				"\t * range.  A drawn value outside the allowed range will be set to the closest bound.\n" +
+				"\t * \n" +
+				"\t * @param input Input image.  Modified.\n" +
+				"\t * @param rand Random number generator\n" +
+				"\t * @param mean Distribution's mean.\n" +
+				"\t * @param sigma Distribution's standard deviation.\n" +
+				"\t * @param lowerBound Lower bound of value clip\n" +
+				"\t * @param upperBound Upper bound of value clip\n" +
 				"\t */\n" +
-				"\tpublic static void fillGaussian("+imageName+" img, Random rand , double mean , double sigma , "
-				+sumType+" lower , "+sumType+" upper ) {\n" +
-				"\t\t"+dataType+"[] data = img.data;\n" +
+				"\tpublic static void fillGaussian("+imageName+" input, Random rand , double mean , double sigma , "
+				+sumType+" lowerBound , "+sumType+" upperBound ) {\n" +
+				"\t\t"+dataType+"[] data = input.data;\n" +
 				"\n" +
-				"\t\tfor (int y = 0; y < img.height; y++) {\n" +
-				"\t\t\tint index = img.getStartIndex() + y * img.getStride();\n" +
-				"\t\t\tfor (int x = 0; x < img.width; x++) {\n" +
+				"\t\tfor (int y = 0; y < input.height; y++) {\n" +
+				"\t\t\tint index = input.getStartIndex() + y * input.getStride();\n" +
+				"\t\t\tfor (int x = 0; x < input.width; x++) {\n" +
 				"\t\t\t\t"+sumType+" value = "+castToSum+"(rand.nextGaussian()*sigma+mean);\n" +
-				"\t\t\t\tif( value < lower ) value = lower;\n" +
-				"\t\t\t\tif( value > upper ) value = upper;\n" +
+				"\t\t\t\tif( value < lowerBound ) value = lowerBound;\n" +
+				"\t\t\t\tif( value > upperBound ) value = upperBound;\n" +
 				"\t\t\t\tdata[index++] = "+typeCast+"value;\n" +
 				"\t\t\t}\n" +
 				"\t\t}\n" +
@@ -196,17 +213,14 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 		out.print("\t/**\n" +
 				"\t * Adds uniform i.i.d noise to each pixel in the image.  Noise range is min <= X < max.\n" +
 				"\t */\n" +
-				"\tpublic static void addUniform("+imageName+" img, Random rand , "+sumType+" min , "+sumType+" max) {\n" +
-				"\t\tfinal int h = img.getHeight();\n" +
-				"\t\tfinal int w = img.getWidth();\n" +
-				"\n" +
+				"\tpublic static void addUniform("+imageName+" input, Random rand , "+sumType+" min , "+sumType+" max) {\n" +
 				"\t\t"+sumType+" range = max-min;\n" +
 				"\n" +
-				"\t\t"+dataType+"[] data = img.data;\n" +
+				"\t\t"+dataType+"[] data = input.data;\n" +
 				"\n" +
-				"\t\tfor (int y = 0; y < h; y++) {\n" +
-				"\t\t\tint index = img.getStartIndex() + y * img.getStride();\n" +
-				"\t\t\tfor (int x = 0; x < w; x++) {\n");
+				"\t\tfor (int y = 0; y < input.height; y++) {\n" +
+				"\t\t\tint index = input.getStartIndex() + y * input.getStride();\n" +
+				"\t\t\tfor (int x = 0; x < input.width; x++) {\n");
 		if( imageType.isInteger() && imageType.getNumBits() != 64) {
 			out.print("\t\t\t\t"+sumType+" value = (data[index] "+bitWise+") + rand.nextInt(range)+min;\n");
 			if( imageType.getNumBits() < 32 ) {
@@ -232,28 +246,24 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 		String sumCast = sumType.equals("double") ? "" : "("+sumType+")";
 
 		out.print("\t/**\n" +
-				"\t * Adds Gaussian/normal i.i.d noise to each pixel in the image.\n" +
-				"\t * @param img Input image.  Modified.\n" +
+				"\t * Adds Gaussian/normal i.i.d noise to each pixel in the image.  If a value exceeds the specified\n"+
+				"\t * it will be set to the closest bound.\n" +
+				"\t * @param input Input image.  Modified.\n" +
 				"\t * @param rand Random number generator.\n" +
 				"\t * @param sigma Distributions standard deviation.\n" +
-				"\t * @param min Allowed lower bound\n" +
-				"\t * @param max Allowed upper bound\n" +
+				"\t * @param lowerBound Allowed lower bound\n" +
+				"\t * @param upperBound Allowed upper bound\n" +
 				"\t */\n" +
-				"\tpublic static void addGaussian("+imageName+" img, Random rand , double sigma , "
+				"\tpublic static void addGaussian("+imageName+" input, Random rand , double sigma , "
 				+sumType+" lowerBound , "+sumType+" upperBound ) {\n" +
-				"\t\tfinal int h = img.getHeight();\n" +
-				"\t\tfinal int w = img.getWidth();\n" +
 				"\n" +
-				"\t\t"+dataType+"[] data = img.data;\n" +
-				"\n" +
-				"\t\tfor (int y = 0; y < h; y++) {\n" +
-				"\t\t\tint index = img.getStartIndex() + y * img.getStride();\n" +
-				"\t\t\tfor (int x = 0; x < w; x++) {\n");
-		out.print("\t\t\t\t"+sumType+" value = (data[index] "+bitWise+") + "+sumCast+"(rand.nextGaussian()*sigma);\n");
-		out.print("\t\t\t\tif( value < lowerBound ) value = min;\n" +
-				"\t\t\t\tif( value > upperBound ) value = max;\n" +
-				"\n");
-		out.print("\t\t\t\tdata[index++] = "+typeCast+" value;\n" +
+				"\t\tfor (int y = 0; y < input.height; y++) {\n" +
+				"\t\t\tint index = input.getStartIndex() + y * input.getStride();\n" +
+				"\t\t\tfor (int x = 0; x < input.width; x++) {\n" +
+				"\t\t\t\t"+sumType+" value = (input.data[index] "+bitWise+") + "+sumCast+"(rand.nextGaussian()*sigma);\n" +
+				"\t\t\t\tif( value < lowerBound ) value = lowerBound;\n" +
+				"\t\t\t\tif( value > upperBound ) value = upperBound;\n" +
+				"\t\t\t\tinput.data[index++] = "+typeCast+" value;\n" +
 				"\t\t\t}\n" +
 				"\t\t}\n" +
 				"\t}\n\n");
@@ -265,19 +275,19 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 		out.print("\t/**\n" +
 				"\t * Flips the image from top to bottom\n" +
 				"\t */\n" +
-				"\tpublic static void flipVertical( "+imageName+" img ) {\n" +
-				"\t\tint h2 = img.height/2;\n" +
+				"\tpublic static void flipVertical( "+imageName+" input ) {\n" +
+				"\t\tint h2 = input.height/2;\n" +
 				"\n" +
 				"\t\tfor( int y = 0; y < h2; y++ ) {\n" +
-				"\t\t\tint index1 = img.getStartIndex() + y * img.getStride();\n" +
-				"\t\t\tint index2 = img.getStartIndex() + (img.height - y - 1) * img.getStride();\n" +
+				"\t\t\tint index1 = input.getStartIndex() + y * input.getStride();\n" +
+				"\t\t\tint index2 = input.getStartIndex() + (input.height - y - 1) * input.getStride();\n" +
 				"\n" +
-				"\t\t\tint end = index1 + img.width;\n" +
+				"\t\t\tint end = index1 + input.width;\n" +
 				"\n" +
 				"\t\t\twhile( index1 < end ) {\n" +
-				"\t\t\t\t"+sumType+" tmp = img.data[index1];\n" +
-				"\t\t\t\timg.data[index1++] = img.data[index2];\n" +
-				"\t\t\t\timg.data[index2++] = ("+dataType+")tmp;\n" +
+				"\t\t\t\t"+sumType+" tmp = input.data[index1];\n" +
+				"\t\t\t\tinput.data[index1++] = input.data[index2];\n" +
+				"\t\t\t\tinput.data[index2++] = ("+dataType+")tmp;\n" +
 				"\t\t\t}\n" +
 				"\t\t}\n" +
 				"\t}\n\n");

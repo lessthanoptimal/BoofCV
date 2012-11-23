@@ -166,6 +166,27 @@ public class MultiSpectral<T extends ImageSingleBand> extends ImageBase<MultiSpe
 	}
 
 	/**
+	 * Sets the values of each pixel equal to the pixels in the specified matrix.  Both image's shape
+	 * must be the same.
+	 *
+	 * @param orig The original image whose value is to be copied into this one
+	 */
+	@Override
+	public void setTo( MultiSpectral<T> orig) {
+		if (orig.width != width || orig.height != height)
+			throw new IllegalArgumentException("The width and/or height of 'orig' is not the same as this class");
+		if( orig.getNumBands() != getNumBands() )
+			throw new IllegalArgumentException("The number of bands must be the same");
+		if( orig.getType() != getType() )
+			throw new IllegalArgumentException("The band type must be the same");
+
+		int N = orig.getNumBands();
+		for( int i = 0; i < N; i++ ) {
+			bands[i].setTo(orig.getBand(i));
+		}
+	}
+
+	/**
 	 * Changes the image's width and height without declaring new memory.  If the internal array
 	 * is not large enough to store the new image an IllegalArgumentException is thrown.
 	 *

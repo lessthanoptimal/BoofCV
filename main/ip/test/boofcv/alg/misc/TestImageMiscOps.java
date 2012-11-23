@@ -43,7 +43,7 @@ public class TestImageMiscOps {
 
 	@Test
 	public void checkAll() {
-		int numExpected = 46;
+		int numExpected = 6*5 + 8*2;
 		Method methods[] = ImageMiscOps.class.getMethods();
 
 		// sanity check to make sure the functions are being found
@@ -52,18 +52,19 @@ public class TestImageMiscOps {
 			if( !isTestMethod(m))
 				continue;
 			try {
+//				System.out.println(m.getName());
 				if( m.getName().compareTo("fill") == 0 ) {
 					testFill(m);
 				} else if( m.getName().compareTo("fillRectangle") == 0 ) {
 					testFillRectangle(m);
-				} else if( m.getName().compareTo("randomize") == 0 ) {
-					testRandomize(m);
+				} else if( m.getName().compareTo("fillUniform") == 0 ) {
+					testFillUniform(m);
+				} else if( m.getName().compareTo("fillGaussian") == 0 ) {
+					testFillGaussian(m);
 				} else if( m.getName().compareTo("addUniform") == 0 ) {
 				    testAddUniform(m);
 				} else if( m.getName().compareTo("addGaussian") == 0 ) {
 					testAddGaussian(m);
-				} else if( m.getName().compareTo("computeMeanSquaredError") == 0 ) {
-					testComputeMSE(m);
 				} else if( m.getName().compareTo("flipVertical") == 0 ) {
 					testFlipVertical(m);
 				} else {
@@ -138,7 +139,7 @@ public class TestImageMiscOps {
 		}
 	}
 
-	private void testRandomize( Method m ) throws InvocationTargetException, IllegalAccessException {
+	private void testFillUniform(Method m) throws InvocationTargetException, IllegalAccessException {
 		Class paramTypes[] = m.getParameterTypes();
 		ImageSingleBand orig = GeneralizedImageOps.createSingleBand(paramTypes[0], width, height);
 
@@ -159,6 +160,37 @@ public class TestImageMiscOps {
 			for( int j = 0; j < width; j++ ) {
 				double value = a.get(j,i).doubleValue();
 				assertTrue(value>=-10 && value <= 10);
+				if( value == 0 )
+					numZero++;
+			}
+		}
+
+		assertTrue( numZero < width*height );
+	}
+
+	private void testFillGaussian(Method m) throws InvocationTargetException, IllegalAccessException {
+		Class paramTypes[] = m.getParameterTypes();
+		ImageSingleBand orig = GeneralizedImageOps.createSingleBand(paramTypes[0], width, height);
+
+		if( orig.getTypeInfo().isSigned() )
+			m.invoke(null,orig,rand,0,5,-2,2);
+		else {
+			m.invoke(null,orig,rand,5,7,0,12);
+		}
+
+		int numZero = 0;
+
+		GImageSingleBand a = FactoryGImageSingleBand.wrap(orig);
+		for( int i = 0; i < height; i++ ) {
+			for( int j = 0; j < width; j++ ) {
+				double value = a.get(j,i).doubleValue();
+
+				if( orig.getTypeInfo().isSigned() ) {
+					assertTrue("value = "+value,value>=-2 && value <= 2);
+				} else {
+					assertTrue("value = "+value,value>=0 && value <= 12);
+				}
+
 				if( value == 0 )
 					numZero++;
 			}
@@ -219,23 +251,6 @@ public class TestImageMiscOps {
 
 		// see if the gaussian with the larger variance creates a noisier image
 		assertTrue(stdev2<stdev10);
-	}
-
-	private void testComputeMSE( Method m ) throws InvocationTargetException, IllegalAccessException {
-
-		Class paramTypes[] = m.getParameterTypes();
-		ImageSingleBand imgA = GeneralizedImageOps.createSingleBand(paramTypes[0], width, height);
-
-		GImageMiscOps.fill(imgA,10);
-		ImageSingleBand imgB = imgA.clone();
-
-		GImageSingleBand b = FactoryGImageSingleBand.wrap(imgB);
-		b.set(5,5,20);
-
-		Number error = (Number)m.invoke(null,imgA,imgB);
-		double expected = (10.0*10.0)/(width*height);
-
-		assertEquals(expected,error.doubleValue(),1e-8);
 	}
 
 	private void testFlipVertical(Method m) throws InvocationTargetException, IllegalAccessException {

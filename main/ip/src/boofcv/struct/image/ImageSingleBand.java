@@ -144,6 +144,7 @@ public abstract class ImageSingleBand<T extends ImageSingleBand> extends ImageBa
 	 * @param orig The original image whose value is to be copied into this one
 	 */
 	@SuppressWarnings({"SuspiciousSystemArraycopy"})
+	@Override
 	public void setTo(T orig) {
 		if (orig.width != width || orig.height != height)
 			throw new IllegalArgumentException("The width and/or height of 'orig' is not the same as this class");

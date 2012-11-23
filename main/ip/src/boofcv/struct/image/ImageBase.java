@@ -51,6 +51,14 @@ public abstract class ImageBase<T extends ImageBase> implements Serializable, Cl
 	public abstract void reshape(int width, int height);
 
 	/**
+	 * Sets the value of 'this' image to be identical to the passed in image.  All structural
+	 * attributes of the images must be the same.
+	 *
+	 * @param orig Image for which 'this' is to be a copy of.
+	 */
+	public abstract void setTo( T orig );
+
+	/**
 	 * If this matrix is a sub-image or not.
 	 *
 	 * @return true if it is a subimage, otherwise false.
