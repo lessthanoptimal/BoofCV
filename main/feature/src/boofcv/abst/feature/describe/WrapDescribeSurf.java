@@ -53,11 +53,6 @@ public class WrapDescribeSurf<T extends ImageSingleBand, II extends ImageSingleB
 	}
 
 	@Override
-	public int getCanonicalRadius() {
-		return surf.getRadius();
-	}
-
-	@Override
 	public void setImage(T image) {
 		if( ii != null ) {
 			ii.reshape(image.width,image.height);

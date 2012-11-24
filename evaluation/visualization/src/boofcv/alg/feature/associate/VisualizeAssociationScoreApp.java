@@ -32,6 +32,7 @@ import boofcv.gui.SelectAlgorithmAndInputPanel;
 import boofcv.gui.feature.AssociationScorePanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.PathLabel;
+import boofcv.struct.BoofDefaults;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
@@ -210,7 +211,7 @@ public class VisualizeAssociationScoreApp<T extends ImageSingleBand, D extends I
 				Point2D_F64 pt = detector.getLocation(i);
 				double scale = detector.getScale(i);
 				if (describe.requiresOrientation()) {
-					orientation.setRadius((int) (describe.getCanonicalRadius() * scale));
+					orientation.setRadius((int) (BoofDefaults.SCALE_SPACE_CANONICAL_RADIUS * scale));
 					yaw = orientation.compute(pt.x, pt.y);
 				}
 
@@ -222,7 +223,7 @@ public class VisualizeAssociationScoreApp<T extends ImageSingleBand, D extends I
 			}
 		} else {
 			// just set the scale to one in this case
-			orientation.setRadius(describe.getCanonicalRadius());
+			orientation.setRadius(3);
 			for (int i = 0; i < detector.getNumberOfFeatures(); i++) {
 				double yaw = 0;
 

@@ -39,6 +39,10 @@ Version : Alpha 0.12
   * Changed PixelMath
   * Changed GeneralizedImageOps
 - Added setTo() in ImageBase
+- FastHessianFeatureDetector now recycles ScalePoints that it detects
+- Removed canoncialRadius() from feature detector and descriptor
+  * It was poorly implemented
+  * Was not consistent with scale-space theory
 
 ---------------------------------------------
 Date    : 2012/11/6

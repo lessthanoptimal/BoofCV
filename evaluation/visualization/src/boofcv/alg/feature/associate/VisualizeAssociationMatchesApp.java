@@ -36,6 +36,7 @@ import boofcv.gui.SelectAlgorithmAndInputPanel;
 import boofcv.gui.feature.AssociationPanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.PathLabel;
+import boofcv.struct.BoofDefaults;
 import boofcv.struct.FastQueue;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.feature.TupleDescQueue;
@@ -228,7 +229,7 @@ public class VisualizeAssociationMatchesApp<T extends ImageSingleBand, D extends
 				Point2D_F64 pt = detector.getLocation(i);
 				double scale = detector.getScale(i);
 				if (describe.requiresOrientation()) {
-					orientation.setRadius((int) (describe.getCanonicalRadius() * scale));
+					orientation.setRadius((int) (BoofDefaults.SCALE_SPACE_CANONICAL_RADIUS * scale));
 					yaw = orientation.compute(pt.x, pt.y);
 				}
 
@@ -238,7 +239,7 @@ public class VisualizeAssociationMatchesApp<T extends ImageSingleBand, D extends
 				}
 			}
 		} else {
-			orientation.setRadius(describe.getCanonicalRadius());
+			orientation.setRadius(3);
 			for (int i = 0; i < detector.getNumberOfFeatures(); i++) {
 				double yaw = 0;
 

@@ -23,13 +23,13 @@ import boofcv.alg.feature.detect.extract.SelectNBestFeatures;
 import boofcv.alg.feature.detect.intensity.GIntegralImageFeatureIntensity;
 import boofcv.core.image.border.FactoryImageBorderAlgs;
 import boofcv.core.image.border.ImageBorder_F32;
+import boofcv.struct.FastQueue;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.feature.ScalePoint;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.point.Point2D_I16;
 
-import java.util.ArrayList;
 import java.util.List;
 
 
@@ -95,7 +95,7 @@ public class FastHessianFeatureDetector<T extends ImageSingleBand> {
 	private QueueCorner foundFeatures = new QueueCorner(100);
 
 	// List of found feature points
-	private List<ScalePoint> foundPoints = new ArrayList<ScalePoint>();
+	private FastQueue<ScalePoint> foundPoints = new FastQueue<ScalePoint>(10,ScalePoint.class,true);
 
 	// size of detected feature at the smallest scale
 	private int initialSize;
@@ -154,7 +154,7 @@ public class FastHessianFeatureDetector<T extends ImageSingleBand> {
 				intensity[i] = new ImageFloat32(integral.width,integral.height);
 			}
 		}
-		foundPoints.clear();
+		foundPoints.reset();
 
 		// computes feature intensity every 'skip' pixels
 		int skip = initialSampleRate;
@@ -270,7 +270,7 @@ public class FastHessianFeatureDetector<T extends ImageSingleBand> {
 				float interpS = levelSize+peakS*sizeStep;
 
 				double scale =  1.2*interpS/9.0;
-				foundPoints.add( new ScalePoint(interpX,interpY,scale));
+				foundPoints.grow().set(interpX,interpY,scale);
 			}
 		}
 	}
@@ -311,7 +311,7 @@ public class FastHessianFeatureDetector<T extends ImageSingleBand> {
 	 * @param upper Value at x=1
 	 * @return x-coordinate of the peak
 	 */
-	private float polyPeak( float lower , float middle , float upper )
+	public static float polyPeak( float lower , float middle , float upper )
 	{
 		// only need two coefficients to compute the peak's location
 		float a = 0.5f*lower - middle + 0.5f*upper;
@@ -326,7 +326,7 @@ public class FastHessianFeatureDetector<T extends ImageSingleBand> {
 	 * @return Found interest points.
 	 */
 	public List<ScalePoint> getFoundPoints() {
-		return foundPoints;
+		return foundPoints.toList();
 	}
 
 	/**

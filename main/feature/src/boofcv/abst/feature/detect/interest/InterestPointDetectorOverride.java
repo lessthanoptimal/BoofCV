@@ -78,11 +78,6 @@ public class InterestPointDetectorOverride< T extends ImageSingleBand>
 	}
 
 	@Override
-	public double getCanonicalRadius() {
-		return detector.getCanonicalRadius();
-	}
-
-	@Override
 	public boolean hasScale() {
 		return detector.hasScale();
 	}

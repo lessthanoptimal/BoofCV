@@ -53,11 +53,6 @@ public class WrapDescribePixelRegionNCC<T extends ImageSingleBand>
 	}
 
 	@Override
-	public int getCanonicalRadius() {
-		return alg.getDescriptorRadius();
-	}
-
-	@Override
 	public boolean isInBounds(double x, double y, double orientation, double scale) {
 		return alg.isInBounds((int)x,(int)y);
 	}

@@ -133,11 +133,6 @@ public class WrapCornerToInterestPoint<T extends ImageSingleBand, D extends Imag
 	}
 
 	@Override
-	public double getCanonicalRadius() {
-		return 2;// TODO should set something better here
-	}
-
-	@Override
 	public boolean hasScale() {
 		return false;
 	}

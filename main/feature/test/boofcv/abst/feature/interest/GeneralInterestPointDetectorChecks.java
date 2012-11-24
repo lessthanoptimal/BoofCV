@@ -80,7 +80,6 @@ public abstract class GeneralInterestPointDetectorChecks<T extends ImageSingleBa
 	public void checkExpectedCharacteristics() {
 		assertTrue(hasOrientation == detector.hasOrientation());
 		assertTrue(hasScale == detector.hasScale());
-		assertTrue(detector.getCanonicalRadius() > 0 );
 	}
 
 	/**

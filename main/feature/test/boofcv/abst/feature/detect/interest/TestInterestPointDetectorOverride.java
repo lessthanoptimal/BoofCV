@@ -116,9 +116,6 @@ public class TestInterestPointDetectorOverride {
 		public double getOrientation(int featureIndex) {return 2;}
 
 		@Override
-		public double getCanonicalRadius() {return 2;}
-
-		@Override
 		public boolean hasScale() {return scale;}
 
 		@Override

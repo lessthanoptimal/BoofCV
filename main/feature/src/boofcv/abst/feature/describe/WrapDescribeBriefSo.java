@@ -41,11 +41,6 @@ public class WrapDescribeBriefSo<T extends ImageSingleBand> implements DescribeR
 	}
 
 	@Override
-	public int getCanonicalRadius() {
-		return alg.getDefinition().radius;
-	}
-
-	@Override
 	public void setImage(T image) {
 		alg.setImage(image);
 	}
