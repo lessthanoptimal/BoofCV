@@ -43,11 +43,6 @@ public class WrapDescribeGaussian12<T extends ImageSingleBand, D extends ImageSi
 	}
 
 	@Override
-	public int getCanonicalRadius() {
-		return steer.getRadius();
-	}
-
-	@Override
 	public int getDescriptionLength() {
 		return steer.getDescriptionLength();
 	}

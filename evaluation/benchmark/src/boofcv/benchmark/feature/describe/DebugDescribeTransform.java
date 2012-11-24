@@ -42,7 +42,7 @@ public class DebugDescribeTransform {
 	public static <T extends ImageSingleBand> void doStuff( Class<T> imageType ) {
 		DescribeRegionPoint<T,SurfFeature> alg =  FactoryDescribeRegionPoint.surf(false, imageType);
 
-		int r = alg.getCanonicalRadius()+8;
+		int r = 8;
 		int w = r*2+1;
 
 		T orig = GeneralizedImageOps.createSingleBand(imageType, w, w);

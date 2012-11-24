@@ -93,11 +93,6 @@ public class WrapFHtoInterestPoint<T extends ImageSingleBand, II extends ImageSi
 	}
 
 	@Override
-	public double getCanonicalRadius() {
-		return detector.getSmallestWidth()/2;
-	}
-
-	@Override
 	public boolean hasScale() {
 		return true;
 	}

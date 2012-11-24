@@ -57,11 +57,14 @@ public interface InterestPointDetector< T extends ImageSingleBand > {
 	Point2D_F64 getLocation( int featureIndex );
 
 	/**
-	 * The scale of the feature relative to the canonical size. To get the size in pixels
-	 * multiply the scale by the canonical radius.  If scale is not supported by the detector
-	 * then 1 is always returned.
+	 * Scale of the detected feature in scale space.  This is the standard deviation of the Gaussian blur
+	 * applied to the image when the feature was detected.  While the object's size is not exactly defined,
+	 * multiplying this number by 2.5 is typically considered the object's radius.
 	 *
-	 * @see #getCanonicalRadius()
+	 * <p>
+	 * NOTE: In the future this might be changed to getRadius() to remove any ambiguity over the detected
+	 * object's size.
+	 * </p>
 	 *
 	 * @param featureIndex Feature whose scale is being requested.
 	 * @return Size of the interest point relative to canonical size.
@@ -77,16 +80,6 @@ public interface InterestPointDetector< T extends ImageSingleBand > {
 	 */
 	double getOrientation( int featureIndex );
 
-	/**
-	 * The radius of a feature at a scale of one in pixels.
-	 *
-	 * TODO See comment in feature_todo.txt  This function might need to be redfined.
-	 *
-	 * Possible redefintion: radius of the detected blob's contour.  Get rid of scale?
-	 *
-	 * @return Size of a feature at scale one in pixels.
-	 */
-	double getCanonicalRadius();
 
 	/**
 	 * Does the interest point detector have scale information

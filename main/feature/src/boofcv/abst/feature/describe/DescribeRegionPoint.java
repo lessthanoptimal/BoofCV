@@ -24,9 +24,8 @@ import boofcv.struct.image.ImageSingleBand;
 
 /**
  * Describes the region around a point in the image.  The number of features used to compute the descriptor
- * is algorithm and scale dependent. To find out how many pixels the descriptor uses at a scale of one
- * call {@link #getCanonicalRadius()}.  The size at other scales is simply that number multiplied by the scale,
- * rounded up.
+ * is algorithm and scale dependent. The object's scale is defined as the scale according to scale-space theory.
+ * Thus, scale is the magnitude of Gaussian blur when the feature was detected.
  *
  * @author Peter Abeles
  */
@@ -50,11 +49,6 @@ public interface DescribeRegionPoint<T extends ImageSingleBand, D extends TupleD
 	 * Returns the descriptor length
 	 */
 	public int getDescriptionLength();
-
-	/**
-	 * Returns the description's radius at a scale of 1
-	 */
-	public int getCanonicalRadius();
 
 	/**
 	 * Checks to see if a description can be extracted at the specified location.  Some descriptors

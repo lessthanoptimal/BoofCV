@@ -58,11 +58,6 @@ public class WrapDescribePixelRegion<T extends ImageSingleBand, D extends TupleD
 	}
 
 	@Override
-	public int getCanonicalRadius() {
-		return alg.getDescriptorRadius();
-	}
-
-	@Override
 	public boolean isInBounds(double x, double y, double orientation, double scale) {
 		return true;
 	}

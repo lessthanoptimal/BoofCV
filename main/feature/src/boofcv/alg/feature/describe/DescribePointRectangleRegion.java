@@ -64,10 +64,6 @@ public abstract class DescribePointRectangleRegion<T extends ImageSingleBand>
 		return offset.length;
 	}
 
-	public int getDescriptorRadius() {
-		return Math.max(radiusHeight,radiusWidth);
-	}
-
 	public int getRegionWidth() {
 		return regionWidth;
 	}

@@ -24,6 +24,7 @@ import boofcv.factory.feature.detect.interest.FactoryInterestPoint;
 import boofcv.gui.feature.FancyInterestPointRender;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.image.UtilImageIO;
+import boofcv.struct.BoofDefaults;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.point.Point2D_F64;
@@ -63,9 +64,6 @@ public class ExampleInterestPoint {
 		Graphics2D g2 = image.createGraphics();
 		FancyInterestPointRender render = new FancyInterestPointRender();
 
-		// detector radius tends to be bigger than what's visually pleasing because it includes the contour
-		// region which is being sampled
-		double detectorRadius = detector.getCanonicalRadius()*0.6;
 
 		for( int i = 0; i < detector.getNumberOfFeatures(); i++ ) {
 			Point2D_F64 pt = detector.getLocation(i);
@@ -73,7 +71,8 @@ public class ExampleInterestPoint {
 			// note how it checks the capabilities of the detector
 			if( detector.hasScale() ) {
 				double scale = detector.getScale(i);
-				render.addCircle((int)pt.x,(int)pt.y,(int)(scale*detectorRadius));
+				int radius = (int)(scale* BoofDefaults.SCALE_SPACE_CANONICAL_RADIUS);
+				render.addCircle((int)pt.x,(int)pt.y,radius);
 			} else {
 				render.addPoint((int) pt.x, (int) pt.y);
 			}

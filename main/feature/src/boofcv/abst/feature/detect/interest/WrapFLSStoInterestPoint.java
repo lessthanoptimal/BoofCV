@@ -19,7 +19,6 @@
 package boofcv.abst.feature.detect.interest;
 
 import boofcv.alg.feature.detect.interest.FeatureLaplaceScaleSpace;
-import boofcv.struct.BoofDefaults;
 import boofcv.struct.feature.ScalePoint;
 import boofcv.struct.gss.GaussianScaleSpace;
 import boofcv.struct.image.ImageSingleBand;
@@ -72,12 +71,6 @@ public class WrapFLSStoInterestPoint<T extends ImageSingleBand, D extends ImageS
 	@Override
 	public double getOrientation(int featureIndex) {
 		return 0;
-	}
-
-	@Override
-	public double getCanonicalRadius() {
-		// TODO this is probably dependent upon the feature detector radius
-		return BoofDefaults.SCALE_SPACE_CANONICAL_RADIUS;
 	}
 
 	@Override

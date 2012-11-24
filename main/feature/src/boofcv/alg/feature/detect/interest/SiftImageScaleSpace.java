@@ -19,6 +19,7 @@
 package boofcv.alg.feature.detect.interest;
 
 import boofcv.alg.filter.convolve.ConvolveNormalized;
+import boofcv.alg.misc.PixelMath;
 import boofcv.factory.filter.kernel.FactoryKernelGaussian;
 import boofcv.struct.convolve.Kernel1D_F32;
 import boofcv.struct.image.ImageFloat32;
@@ -28,21 +29,30 @@ import boofcv.struct.image.ImageFloat32;
  */
 public class SiftImageScaleSpace {
 
+	// Storage for Difference of Gaussian (DOG) features
 	ImageFloat32 dog[];
+	// Images across scale-space in this octave
 	ImageFloat32 scale[];
+	// Amount of blur which is applied
 	float sigma;
+
+	// ratio of pixels in these images to the original image
+	double pixelScale;
+
+	// effective amount of blur that has already been applied before any additional blur was applied
+	double blurScale;
 
 	Kernel1D_F32 kernel;
 
 	ImageFloat32 storage;
 	int octave;
 
-	public SiftImageScaleSpace( int numScales , float sigma , int radius )
+	public SiftImageScaleSpace( int numScales , float blurSigma , int blurRadius )
 	{
 		if( numScales < 3 )
 			throw new IllegalArgumentException("A minimum of 3 scales are required");
 
-		this.sigma = sigma;
+		this.sigma = blurSigma;
 
 		scale = new ImageFloat32[numScales];
 		dog = new ImageFloat32[numScales-1];
@@ -54,7 +64,7 @@ public class SiftImageScaleSpace {
 		}
 		storage = new ImageFloat32(1,1);
 
-		kernel = FactoryKernelGaussian.gaussian(Kernel1D_F32.class, sigma, radius);
+		kernel = FactoryKernelGaussian.gaussian(Kernel1D_F32.class, blurSigma, blurRadius);
 	}
 
 	public void process( ImageFloat32 input ) {
@@ -77,9 +87,16 @@ public class SiftImageScaleSpace {
 		}
 	}
 
+	/**
+	 * Compute difference of Gaussian feature intensity across scale space
+	 */
 	public void computeFeatureIntensity() {
 		for( int i = 1; i < scale.length; i++ ) {
-//			PixelMath.plus();
+			PixelMath.subtract(scale[i],scale[i-1],dog[i-1]);
+			// compute adjustment to make it better approximate of the Laplacian of Gaussian detector
+			double k = (i+1)/(double)i;
+			double adjustment = (k-1)*sigma*sigma;
+			PixelMath.divide(dog[i - 1], (float) adjustment, dog[i - 1]);
 		}
 	}
 

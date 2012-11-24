@@ -27,6 +27,7 @@ import boofcv.gui.feature.SelectRegionDescriptionPanel;
 import boofcv.gui.feature.TupleDescPanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.PathLabel;
+import boofcv.struct.BoofDefaults;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
@@ -149,7 +150,7 @@ public class VisualizeRegionDescriptionApp <T extends ImageSingleBand, D extends
 	 */
 	private void updateTargetDescription() {
 		if( targetPt != null ) {
-			double scale = targetRadius/describe.getCanonicalRadius();
+			double scale = targetRadius/ BoofDefaults.SCALE_SPACE_CANONICAL_RADIUS;
 
 			TupleDesc feature = describe.createDescription();
 			describe.process(targetPt.x,targetPt.y,targetOrientation,scale,feature);

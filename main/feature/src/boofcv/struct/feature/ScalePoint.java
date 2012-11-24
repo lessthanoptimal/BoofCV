@@ -37,6 +37,11 @@ public class ScalePoint extends Point2D_F64 {
 	public ScalePoint() {
 	}
 
+	public void set(double x, double y, double scale) {
+		set(x, y);
+		this.scale = scale;
+	}
+
 	public double getScale() {
 		return scale;
 	}

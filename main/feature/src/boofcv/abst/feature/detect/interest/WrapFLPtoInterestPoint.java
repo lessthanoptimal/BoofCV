@@ -20,7 +20,6 @@ package boofcv.abst.feature.detect.interest;
 
 import boofcv.alg.feature.detect.interest.FeatureLaplacePyramid;
 import boofcv.alg.transform.gss.ScaleSpacePyramid;
-import boofcv.struct.BoofDefaults;
 import boofcv.struct.feature.ScalePoint;
 import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.point.Point2D_F64;
@@ -72,12 +71,6 @@ public class WrapFLPtoInterestPoint<T extends ImageSingleBand, D extends ImageSi
 	@Override
 	public double getOrientation(int featureIndex) {
 		return 0;
-	}
-
-	@Override
-	public double getCanonicalRadius() {
-		// TODO this is probably dependent upon the feature detector radius
-		return BoofDefaults.SCALE_SPACE_CANONICAL_RADIUS;
 	}
 
 	@Override

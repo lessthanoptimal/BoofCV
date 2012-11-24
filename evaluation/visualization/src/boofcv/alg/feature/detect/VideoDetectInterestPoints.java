@@ -28,6 +28,7 @@ import boofcv.gui.image.ProcessImageSequence;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.video.BoofVideoManager;
+import boofcv.struct.BoofDefaults;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.point.Point2D_F64;
@@ -71,14 +72,12 @@ public class VideoDetectInterestPoints<T extends ImageSingleBand>
 		if( orientation != null )
 			orientation.setImage(origImage);
 
-		double detectorRadius = detector.getCanonicalRadius();
-
 		render.reset();
 		for( int i = 0; i < detector.getNumberOfFeatures(); i++ ) {
 			Point2D_F64 pt = detector.getLocation(i);
 			double scale = detector.getScale(i);
 
-			int radius = (int)Math.round(detectorRadius*scale);
+			int radius = (int)Math.round(BoofDefaults.SCALE_SPACE_CANONICAL_RADIUS*scale);
 
 			if( orientation != null ) {
 				orientation.setScale(scale);
