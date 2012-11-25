@@ -81,7 +81,7 @@ public class VisualizeImageData {
 	 *
 	 * @param src       Input single band image.
 	 * @param dst       Where the image is rendered into.  If null a new BufferedImage will be created and return.
-	 * @param normalize Used to normalize the input image.
+	 * @param normalize Used to normalize the input image. If <= 0 then the max value will be used
 	 * @return Rendered image.
 	 */
 	public static BufferedImage colorizeSign(ImageSingleBand src, BufferedImage dst, double normalize) {

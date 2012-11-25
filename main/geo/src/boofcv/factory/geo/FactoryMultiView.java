@@ -45,6 +45,7 @@ import georegression.struct.se.Se3_F64;
 import org.ddogleg.optimization.FactoryOptimization;
 import org.ddogleg.optimization.UnconstrainedLeastSquares;
 import org.ddogleg.solver.PolynomialOps;
+import org.ddogleg.solver.RootFinderType;
 
 /**
  * Factory for creating abstracted algorithms related to multi-view geometry
@@ -270,11 +271,11 @@ public class FactoryMultiView {
 
 		switch( which ) {
 			case P3P_GRUNERT:
-				P3PGrunert grunert = new P3PGrunert(PolynomialOps.createRootFinder(5,0));
+				P3PGrunert grunert = new P3PGrunert(PolynomialOps.createRootFinder(5, RootFinderType.STURM));
 				return new WrapP3PLineDistance(grunert,motionFit);
 
 			case P3P_FINSTERWALDER:
-				P3PFinsterwalder finster = new P3PFinsterwalder(PolynomialOps.createRootFinder(4,0));
+				P3PFinsterwalder finster = new P3PFinsterwalder(PolynomialOps.createRootFinder(4,RootFinderType.STURM));
 				return new WrapP3PLineDistance(finster,motionFit);
 
 			case EPNP:

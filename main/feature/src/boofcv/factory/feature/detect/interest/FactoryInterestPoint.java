@@ -30,6 +30,7 @@ import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
 import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.factory.transform.gss.FactoryGaussianScaleSpace;
 import boofcv.struct.gss.GaussianScaleSpace;
+import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 
 /**
@@ -172,6 +173,32 @@ public class FactoryInterestPoint {
 				initialSampleSize, initialSize, numberScalesPerOctave, numberOfOctaves);
 
 		return new WrapFHtoInterestPoint(feature);
+	}
+
+	/**
+	 * TODO Comment
+	 *
+	 * @param scaleSigma
+	 * @param numScales
+	 * @param numOctaves
+	 * @param doubleInput
+	 * @param extractRadius
+	 * @param detectThreshold
+	 * @param maxFeaturesPerScale
+	 * @return
+	 */
+	public static InterestPointDetector<ImageFloat32> siftDetector( double scaleSigma ,
+																	int numScales ,
+																	int numOctaves ,
+																	boolean doubleInput ,
+																	int extractRadius,
+																	float detectThreshold,
+																	int maxFeaturesPerScale)
+	{
+		SiftDetector alg = FactoryInterestPointAlgs.siftDetector(scaleSigma,numScales,numOctaves,doubleInput,
+				extractRadius,detectThreshold,maxFeaturesPerScale);
+
+		return new WrapSiftDetector(alg);
 	}
 
 }

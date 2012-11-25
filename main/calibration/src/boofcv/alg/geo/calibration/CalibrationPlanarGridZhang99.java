@@ -23,7 +23,7 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.se.Se3_F64;
 import org.ddogleg.optimization.FactoryOptimization;
 import org.ddogleg.optimization.UnconstrainedLeastSquares;
-import org.ddogleg.optimization.impl.UtilOptimize;
+import org.ddogleg.optimization.UtilOptimize;
 import org.ejml.data.DenseMatrix64F;
 
 import java.util.ArrayList;

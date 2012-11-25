@@ -27,10 +27,7 @@ import boofcv.abst.filter.ImageFunctionSparse;
 import boofcv.abst.filter.derivative.AnyImageDerivative;
 import boofcv.alg.feature.detect.intensity.GradientCornerIntensity;
 import boofcv.alg.feature.detect.intensity.HessianBlobIntensity;
-import boofcv.alg.feature.detect.interest.FeatureLaplacePyramid;
-import boofcv.alg.feature.detect.interest.FeatureLaplaceScaleSpace;
-import boofcv.alg.feature.detect.interest.FeaturePyramid;
-import boofcv.alg.feature.detect.interest.FeatureScaleSpace;
+import boofcv.alg.feature.detect.interest.*;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.core.image.inst.FactoryImageGenerator;
 import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
@@ -254,6 +251,30 @@ public class FactoryInterestPointAlgs {
 		detector.setMaxFeatures(maxFeatures);
 
 		return new FeatureScaleSpace<T, D>(detector, 2);
+	}
+
+	/**
+	 * TODO COmment
+	 *
+	 * @param scaleSigma
+	 * @param numScales
+	 * @param numOctaves
+	 * @param doubleInput
+	 * @param extractRadius
+	 * @param detectThreshold
+	 * @param maxFeaturesPerScale
+	 * @return
+	 */
+	public static SiftDetector siftDetector( double scaleSigma ,
+											 int numScales ,
+											 int numOctaves ,
+											 boolean doubleInput ,
+											 int extractRadius,
+											 float detectThreshold,
+											 int maxFeaturesPerScale )
+	{
+		FeatureExtractor extractor = FactoryFeatureExtractor.nonmax(extractRadius, detectThreshold, 0, true);
+		return new SiftDetector(extractor,doubleInput,numOctaves,numScales,scaleSigma,maxFeaturesPerScale);
 	}
 
 }

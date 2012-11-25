@@ -69,22 +69,27 @@ public class SiftImageScaleSpace {
 
 	public void process( ImageFloat32 input ) {
 		octave = 1;
+		pixelScale = 1;
 
-		for( int i = 0; i < scale.length; i++ ) {
-			scale[i].reshape(input.width,input.height);
-		}
-		for( int i = 0; i < scale.length; i++ ) {
-			dog[i].reshape(input.width, input.height);
-		}
-		storage.reshape(input.width,input.height);
+		reshapeImages(input.width,input.height);
 
 		ConvolveNormalized.horizontal(kernel, input, storage);
-		ConvolveNormalized.vertical(kernel,storage,scale[1]);
+		ConvolveNormalized.vertical(kernel,storage,scale[0]);
 
 		for( int i = 1; i < scale.length; i++ ) {
 			ConvolveNormalized.horizontal(kernel, scale[i-1], storage);
 			ConvolveNormalized.vertical(kernel,storage,scale[i]);
 		}
+	}
+
+	private void reshapeImages(int width , int height ) {
+		for( int i = 0; i < scale.length; i++ ) {
+			scale[i].reshape(width,height);
+		}
+		for( int i = 0; i < dog.length; i++ ) {
+			dog[i].reshape(width, height);
+		}
+		storage.reshape(width,height);
 	}
 
 	/**
@@ -103,7 +108,30 @@ public class SiftImageScaleSpace {
 	public void computeNextOctave() {
 		octave++;
 
+		pixelScale *= 2;
+		blurScale = blurScale*2;
 
+		int w = scale[0].width/2;
+		int h = scale[0].height/2;
+
+		scale[0].reshape(w, h);
+		downSample(scale[1],scale[0]);
+
+		reshapeImages(w,h);
+
+		for( int i = 1; i < scale.length; i++ ) {
+			ConvolveNormalized.horizontal(kernel, scale[i-1], storage);
+			ConvolveNormalized.vertical(kernel,storage,scale[i]);
+		}
+	}
+
+	private void downSample( ImageFloat32 from , ImageFloat32 to ) {
+
+		for( int y = 0; y < to.height; y++ ) {
+			for( int x = 0; x < to.width; x++ ) {
+				to.set(x,y,from.get(x*2+1,y*2+1));
+			}
+		}
 	}
 
 }
