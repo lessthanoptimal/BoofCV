@@ -20,6 +20,7 @@ package boofcv.alg.geo.pose;
 
 import georegression.struct.point.Point2D_F64;
 import org.ddogleg.solver.PolynomialOps;
+import org.ddogleg.solver.RootFinderType;
 
 import java.util.List;
 
@@ -30,7 +31,7 @@ import static org.junit.Assert.assertTrue;
  */
 public class TestP3PFinsterwalder extends CommonP3PSideChecks {
 
-	P3PFinsterwalder alg = new P3PFinsterwalder(PolynomialOps.createRootFinder(4, 0));
+	P3PFinsterwalder alg = new P3PFinsterwalder(PolynomialOps.createRootFinder(4, RootFinderType.STURM));
 
 	@Override
 	public List<PointDistance3> computeSolutions(Point2D_F64 p1, Point2D_F64 p2, Point2D_F64 p3,

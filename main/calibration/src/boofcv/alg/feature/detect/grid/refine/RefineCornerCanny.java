@@ -30,7 +30,7 @@ import georegression.struct.point.Point2D_I32;
 import org.ddogleg.optimization.FactoryOptimization;
 import org.ddogleg.optimization.UnconstrainedMinimization;
 import org.ddogleg.optimization.functions.FunctionNtoS;
-import org.ddogleg.optimization.impl.UtilOptimize;
+import org.ddogleg.optimization.UtilOptimize;
 
 import java.util.ArrayList;
 import java.util.List;

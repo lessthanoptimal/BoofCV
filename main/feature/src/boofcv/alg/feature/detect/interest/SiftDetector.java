@@ -97,7 +97,7 @@ public class SiftDetector {
 		foundFeatures.reset();
 
 		// the current scale factor being considered
-		currentScale = ss.blurScale  + (scale+1)*ss.sigma;
+		currentScale = ss.pixelScale*scale*ss.sigma; // todo is this off by one?
 
 		ImageFloat32 scale0 = ss.dog[scale-1];
 		ImageFloat32 scale1 = ss.dog[scale];
@@ -114,7 +114,7 @@ public class SiftDetector {
 			// detect minimums
 			signAdj = -1;
 			PixelMath.multiply(scale1,-1,ss.storage);
-			extractor.process(ss.storage,null, maxFeatures,foundFeatures);
+//			extractor.process(ss.storage,null, maxFeatures,foundFeatures);
 		}
 
 		// if configured to do so, only select the features with the highest intensity
@@ -140,6 +140,9 @@ public class SiftDetector {
 	private void addPoint(ImageFloat32 scale0 , ImageFloat32 scale1, ImageFloat32 scale2,
 						  short x, short y, float value, float signAdj) {
 
+		// TODO remove low contract?
+		// TODO eliminate edge response
+
 		float x0 =  scale1.unsafe_get(x - 1, y)*signAdj;
 		float x2 =  scale1.unsafe_get(x + 1, y)*signAdj;
 		float y0 =  scale1.unsafe_get(x , y - 1)*signAdj;
@@ -150,10 +153,10 @@ public class SiftDetector {
 
 		ScalePoint p = foundPoints.grow();
 
-		p.x = ss.pixelScale*(x + polyPeak(x0, value, x2));
+		p.x = ss.pixelScale*(x+ polyPeak(x0, value, x2));
 		p.y = ss.pixelScale*(y + polyPeak(y0, value, y2));
 
-		p.scale = currentScale + ss.sigma*polyPeak(s0, value, s2);
+		p.scale = currentScale + ss.pixelScale*ss.sigma*polyPeak(s0, value, s2);
 	}
 
 	/**
@@ -174,14 +177,18 @@ public class SiftDetector {
 		for( int y = -1; y <= 1; y++ ) {
 			for( int x = -1; x <= 1; x++ ) {
 			    v = scale0.unsafe_get(c_x+x,c_y+y);
-				if( v*signAdj >= v )
+				if( v*signAdj >= value )
 					return false;
 				v = scale2.unsafe_get(c_x+x,c_y+y);
-				if( v*signAdj >= v )
+				if( v*signAdj >= value )
 					return false;
 			}
 		}
 
 		return true;
+	}
+
+	public FastQueue<ScalePoint> getFoundPoints() {
+		return foundPoints;
 	}
 }

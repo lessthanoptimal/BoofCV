@@ -80,7 +80,6 @@ public interface InterestPointDetector< T extends ImageSingleBand > {
 	 */
 	double getOrientation( int featureIndex );
 
-
 	/**
 	 * Does the interest point detector have scale information
 	 *
