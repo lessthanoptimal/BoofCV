@@ -27,8 +27,7 @@ import org.junit.Test;
 
 import java.util.Random;
 
-import static junit.framework.Assert.assertEquals;
-
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Peter Abeles
@@ -143,6 +142,28 @@ public class TestKernelMath {
 			for( int j = 0; j < 5; j++ ) {
 				assertEquals(k1.data[i]*k2.data[j],c.get(j,i),1e-4);
 			}
+		}
+	}
+
+	@Test
+	public void convolve2D_F32() {
+		Kernel2D_F32 k1 = new Kernel2D_F32(3,1,2,3,4,5,6,7,8,9);
+		Kernel2D_F32 k2 = new Kernel2D_F32(3,2,3,4,5,6,7,8,9,10);
+
+		Kernel2D_F32 c = KernelMath.convolve2D(k1,k2);
+
+		assertEquals(5,c.width);
+
+		// solution computed using octave
+		float[] expected = new float[]{
+				2,7,16,17,12,
+				13,38,77,70,45,
+				42,111,210,177,108,
+				67,158,275,214,123,
+				56,127,214,161, 90};
+
+		for( int i = 0; i < 25; i++ ) {
+			assertEquals(expected[i],c.data[i],1e-4);
 		}
 	}
 

@@ -25,32 +25,45 @@ import boofcv.struct.convolve.Kernel1D_F32;
 import boofcv.struct.image.ImageFloat32;
 
 /**
+ * Constructs the scale-space in which SIFT detects features.  An octave contains a set of scales.
+ * Each octave is half the width/height of the previous octave.  Scales are computed inside an octave
+ * by applying Gaussian blur.   See SIFT paper for the details.
+ *
+ * Only one octave is computed at a time.  Higher octaves are computed by calling {@link #computeNextOctave()}
+ * and overwrite the previous scales.
  *
  * @author Peter Abeles
  */
 public class SiftImageScaleSpace {
 
 	// Storage for Difference of Gaussian (DOG) features
-	ImageFloat32 dog[];
+	protected ImageFloat32 dog[];
 	// Images across scale-space in this octave
-	ImageFloat32 scale[];
+	protected ImageFloat32 scale[];
 	// Amount of blur which is applied
-	float sigma;
+	protected float sigma;
 
-	// assumed initial image blur
-	double initialSigma;
+	// ratio of pixels in current octave to the original image
+	// x = x'*pixelScale, where x is original coordinate, and x' is current image.
+	protected double pixelScale;
 
-	// ratio of pixels in these images to the original image
-	double pixelScale;
-
-	boolean doubleInputImage;
+	// should the input image be doubled
+	private boolean doubleInputImage;
 
 	// The blur sigma applied to the first scale BEFORE any additional blur has been applied
 	// Note that the octave's are recursively computed, so this is the blur magnitude from before
-	double priorSigmaFirstScale;
+	private double priorSigmaFirstScale;
 
-	ImageFloat32 storage;
+	// storage for applying blur
+	protected ImageFloat32 storage;
 
+	/**
+	 * Configures the scale-space
+	 *
+	 * @param numScales Number of scales per octave
+	 * @param blurSigma Amount of Gaussian blur applied to each scale
+	 * @param doubleInputImage Is the input image doubled or not
+	 */
 	public SiftImageScaleSpace( int numScales , float blurSigma , boolean doubleInputImage)
 	{
 		if( numScales < 3 )
@@ -84,14 +97,12 @@ public class SiftImageScaleSpace {
 			reshapeImages(input.width*2,input.height*2);
 			upSample(input,scale[1]);
 
-			double amount = Math.sqrt(sigma*sigma - initialSigma*initialSigma);
-			blurImage(scale[1],scale[0],amount);
+			blurImage(scale[1],scale[0],sigma);
 		} else {
 			pixelScale = 1;
 
 			reshapeImages(input.width,input.height);
-			double amount = Math.sqrt(sigma*sigma - initialSigma*initialSigma);
-			blurImage(input,scale[0],amount);
+			blurImage(input,scale[0],sigma);
 		}
 
 		constructRestOfPyramid();
@@ -206,7 +217,7 @@ public class SiftImageScaleSpace {
 	}
 
 	/**
-	 * Resizes all images
+	 * Reshapes all images to the specified size
 	 */
 	private void reshapeImages(int width , int height ) {
 		for( int i = 0; i < scale.length; i++ ) {

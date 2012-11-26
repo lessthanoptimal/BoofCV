@@ -74,7 +74,7 @@ public class DetectFeaturePointApp<T extends ImageSingleBand, D extends ImageSin
 		GeneralFeatureDetector<T, D> alg;
 
 		if( imageType == ImageFloat32.class )
-			addAlgorithm(0, "SIFT", FactoryInterestPoint.siftDetector(1.6,5,2,false,2,0,maxScaleFeatures));
+			addAlgorithm(0, "SIFT", FactoryInterestPoint.siftDetector(1.6,5,2,false,2,0,maxScaleFeatures,1));
 
 		alg = FactoryDetectPoint.createHarris(radius, false, thresh, maxFeatures, derivType);
 		addAlgorithm(0, "Harris", FactoryInterestPoint.wrapPoint(alg, imageType, derivType));

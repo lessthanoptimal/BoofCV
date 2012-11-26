@@ -148,7 +148,7 @@ public class DetectSquareCalibrationPoints {
 
 //		System.out.println("------------------------------------"+squares.size()+"  N "+N);
 //		System.out.println("Total Shuffles: "+combinations.numShuffles());
-		if( combinations.numShuffles() > maxCombinations) {
+		if( combinations.computeTotalCombinations() > maxCombinations) {
 			return fail("Not enough blobs detected");
 		}
 
@@ -158,7 +158,7 @@ public class DetectSquareCalibrationPoints {
 		boolean success = false;
 		while( true ) {
 //			System.out.println("Next combination "+num++);
-			combinations.getList(list);
+			combinations.getBucket(list);
 
 			// assumes that all the items in the list are part of a target
 			// see if it fails internal sanity checks
@@ -177,12 +177,7 @@ public class DetectSquareCalibrationPoints {
 			} catch (InvalidCalibrationTarget invalidTarget) {
 				System.out.println(invalidTarget.getMessage());
 			}
-
-			try {
-				combinations.shuffle();
-			} catch (Combinations.ExhaustedException e) {
-				break;
-			}
+			combinations.next();
 		}
 		
 		if( !success )

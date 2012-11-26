@@ -176,27 +176,30 @@ public class FactoryInterestPoint {
 	}
 
 	/**
-	 * TODO Comment
+	 * Creates a SIFT feature detector.
 	 *
-	 * @param scaleSigma
-	 * @param numScales
-	 * @param numOctaves
-	 * @param doubleInput
-	 * @param extractRadius
-	 * @param detectThreshold
-	 * @param maxFeaturesPerScale
-	 * @return
+	 * @see SiftDetector
+	 *
+	 * @param scaleSigma Amount of blur applied to each scale inside an octaves.  Try 1.6
+	 * @param numOfScales Number of scales per octaves.  Try 5.  Must be >= 3
+	 * @param numOfOctaves Number of octaves to detect.  Try 4
+	 * @param doubleInputImage Should the input image be doubled? Try false.
+	 * @param extractRadius   Size of the feature used to detect the corners. Try 2
+	 * @param detectThreshold Minimum corner intensity required.  Try 1
+	 * @param maxFeaturesPerScale Max detected features per scale.  Image size dependent.  Try 500
+	 * @param edgeThreshold Threshold for edge filtering.  Disable with a value <= 0.  Try 5
 	 */
 	public static InterestPointDetector<ImageFloat32> siftDetector( double scaleSigma ,
-																	int numScales ,
-																	int numOctaves ,
-																	boolean doubleInput ,
+																	int numOfScales ,
+																	int numOfOctaves ,
+																	boolean doubleInputImage ,
 																	int extractRadius,
 																	float detectThreshold,
-																	int maxFeaturesPerScale)
+																	int maxFeaturesPerScale,
+																	double edgeThreshold )
 	{
-		SiftDetector alg = FactoryInterestPointAlgs.siftDetector(scaleSigma,numScales,numOctaves,doubleInput,
-				extractRadius,detectThreshold,maxFeaturesPerScale);
+		SiftDetector alg = FactoryInterestPointAlgs.siftDetector(scaleSigma,numOfScales,numOfOctaves,doubleInputImage,
+				extractRadius,detectThreshold,maxFeaturesPerScale,edgeThreshold);
 
 		return new WrapSiftDetector(alg);
 	}
