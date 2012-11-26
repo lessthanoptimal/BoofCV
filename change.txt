@@ -43,6 +43,7 @@ Version : Alpha 0.12
 - Removed canoncialRadius() from feature detector and descriptor
   * It was poorly implemented
   * Was not consistent with scale-space theory
+- Added 2D convolution in KernelMath
 
 ---------------------------------------------
 Date    : 2012/11/6

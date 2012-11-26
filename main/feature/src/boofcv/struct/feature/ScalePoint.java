@@ -28,10 +28,17 @@ import georegression.struct.point.Point2D_F64;
 public class ScalePoint extends Point2D_F64 {
 	// the scale the feature was detected at
 	public double scale;
+	// does the blob correspond to a black or white region
+	public boolean white;
 
 	public ScalePoint(double x, double y, double scale) {
 		super(x, y);
 		this.scale = scale;
+	}
+
+	public ScalePoint(double x, double y,
+					  double scale, boolean white ) {
+		set(x, y, scale, white);
 	}
 
 	public ScalePoint() {
@@ -42,6 +49,16 @@ public class ScalePoint extends Point2D_F64 {
 		this.scale = scale;
 	}
 
+	public void set(double x, double y, double scale, boolean white ) {
+		set(x, y);
+		this.scale = scale;
+		this.white = white;
+	}
+
+	public boolean isWhite() {
+		return white;
+	}
+
 	public double getScale() {
 		return scale;
 	}
@@ -50,13 +67,18 @@ public class ScalePoint extends Point2D_F64 {
 		this.scale = scale;
 	}
 
+	public void setWhite(boolean white) {
+		this.white = white;
+	}
+
 	public ScalePoint copy() {
-		return new ScalePoint(x,y,scale);
+		return new ScalePoint(x,y,scale,white);
 	}
 
 	public void set(ScalePoint p) {
 		this.scale = p.scale;
 		this.x = p.x;
 		this.y = p.y;
+		this.white = p.white;
 	}
 }

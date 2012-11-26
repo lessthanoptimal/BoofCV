@@ -91,6 +91,48 @@ public class KernelMath {
 		return ret;
 	}
 
+	public static Kernel2D_F32 convolve2D( Kernel2D_F32 a , Kernel2D_F32 b ) {
+		int w = a.width+b.width-1;
+		int r = w/2;
+
+		Kernel2D_F32 ret = new Kernel2D_F32(w);
+
+		int aR = a.width/2;
+		int bR = b.width/2;
+
+		for( int y = -r; y <= r; y++ ) {
+			for( int x = -r; x <= r; x++ ) {
+
+				float sum = 0;
+
+				// go through kernel A
+				for( int y0 = -aR; y0 <= aR; y0++ ) {
+					// convert to kernel coordinates
+					int ay = -y0 + aR;
+					int by = y + y0 + bR;
+
+					if( by < 0 || by >= b.width )
+						continue;
+
+					for( int x0 = -aR; x0 <= aR; x0++ ) {
+
+						// convert to kernel coordinates
+						int ax = -x0 + aR;
+						int bx = x + x0 + bR;
+
+						if( bx < 0 || bx >= b.width )
+							continue;
+
+						sum += a.get(ax,ay) * b.get(bx,by);
+					}
+				}
+				ret.set(x+r,y+r,sum);
+			}
+		}
+
+		return ret;
+	}
+
 	// TODO rename convolve2D
 	// todo these might not be swapping the direction of one of the kernels during the convolution
 	public static Kernel2D_F32 convolve( Kernel1D_F32 a , Kernel1D_F32 b ) {
