@@ -30,10 +30,30 @@ import georegression.struct.point.Point2D_I16;
 import static boofcv.alg.feature.detect.interest.FastHessianFeatureDetector.polyPeak;
 
 /**
- * Feature detector as described in the Scale Invariant Feature Transform (SIFT) paper [1].
+ *
+ *
+ *
+ * <p>
+ * Feature detector as described in the Scale Invariant Feature Transform (SIFT) paper [1].  Location and scale of
+ * blob like features are detected using a Difference of Gaussian (DOG) feature detector across scale space.  Note that
+ * there are  several algorithmic changes that are intended to improve stability and runtime speed.  See notes below.
+ * </p>
+ *
+ * <p>
+ * ALGORITHM CHANGE: Location and scale interpolation is done using a second order polynomial.  This avoids taking
+ * the second order derivative numerically, which is very sensitive to noise.  Plus I disagree with his statement
+ * that peaks outside the local region are valid and require iteration.
+ * </p>
+ *
+ * <p>
+ * [1] Lowe, D. "Distinctive image features from scale-invariant keypoints".
+ * International Journal of Computer Vision, 60, 2 (2004), pp.91--110.
+ * </p>
  *
  * @author Peter Abeles
  */
+// TODO Add dark/white blob label
+// TODO Remove edge responses
 public class SiftDetector {
 
 	SiftImageScaleSpace ss;
@@ -69,14 +89,17 @@ public class SiftDetector {
 			selectBest = new SelectNBestFeatures(maxFeatures);
 		}
 
-		// TODO doubleInputImage
-		ss = new SiftImageScaleSpace(numOfScales,(float)scaleSigma,-1);
+		ss = new SiftImageScaleSpace(numOfScales,(float)scaleSigma,doubleInputImage );
 
 		// ignore features along the border since a 3x3 region is assumed in parts of the code
 		extractor.setIgnoreBorder(1);
 	}
 
 	public void process( ImageFloat32 input ) {
+		// set up data structures
+		foundPoints.reset();
+
+		// compute initial octave's scale-space
 		// todo sanity check input image size to make sure it is large enough
 		ss.process(input);
 
@@ -97,7 +120,7 @@ public class SiftDetector {
 		foundFeatures.reset();
 
 		// the current scale factor being considered
-		currentScale = ss.pixelScale*scale*ss.sigma; // todo is this off by one?
+		currentScale = ss.computeScaleSigma(scale);
 
 		ImageFloat32 scale0 = ss.dog[scale-1];
 		ImageFloat32 scale1 = ss.dog[scale];
@@ -114,7 +137,7 @@ public class SiftDetector {
 			// detect minimums
 			signAdj = -1;
 			PixelMath.multiply(scale1,-1,ss.storage);
-//			extractor.process(ss.storage,null, maxFeatures,foundFeatures);
+			extractor.process(ss.storage,null, maxFeatures,foundFeatures);
 		}
 
 		// if configured to do so, only select the features with the highest intensity

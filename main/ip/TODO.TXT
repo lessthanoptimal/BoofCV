@@ -65,6 +65,10 @@
 - ConvertBufferedImage
   * Add unit tests for converting to and from INDEXED BufferedImage
 
+- Specialized algorithm for scaling an image up and down by a factor of 2
+  * Done in SIFT detector
+  * Create common code more algorithms need this
+
 - Have a morphological filter section?
  * Add gray scale morphological operators
  * Handle image edges for binary and gray scale
