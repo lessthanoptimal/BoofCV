@@ -18,17 +18,68 @@
 
 package boofcv.alg.feature.detect.interest;
 
+import boofcv.factory.feature.detect.interest.FactoryInterestPointAlgs;
+import boofcv.struct.feature.ScalePoint;
+import boofcv.struct.image.ImageFloat32;
 import org.junit.Test;
 
-import static org.junit.Assert.fail;
+import java.util.List;
+
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Peter Abeles
  */
-public class TestSiftDetector {
+public class TestSiftDetector extends GenericFeatureDetector {
 
+	public TestSiftDetector() {
+		this.scaleTolerance = 0.3;
+	}
+
+	@Override
+	protected Object createDetector(int maxFeatures) {
+		return FactoryInterestPointAlgs.siftDetector(1.6,5,4,false,2,1,maxFeatures,5);
+	}
+
+	@Override
+	protected int detectFeature(ImageFloat32 input, Object detector) {
+		SiftDetector alg = (SiftDetector)detector;
+
+		alg.process(input);
+
+
+		return alg.getFoundPoints().size;
+	}
+
+	/**
+	 * Makes sure the blob color flag is being set.  Doesn't check to see if it is being set correctly
+	 * since that is more difficult to implement
+	 */
 	@Test
-	public void stuff() {
-		fail("implement");
+	public void checkWhiteBlack() {
+		ImageFloat32 input = new ImageFloat32(width,height);
+
+		// render a checkered pattern
+		renderCheckered(input);
+
+		SiftDetector alg = FactoryInterestPointAlgs.siftDetector(1.6,5,4,false,2,1,-1,5);
+
+		alg.process(input);
+
+		List<ScalePoint> l = alg.getFoundPoints().toList();
+
+		assertTrue(l.size()>1);
+
+		int countWhite = 0;
+		int countBlack = 0;
+		for( ScalePoint s : l ) {
+			if( s.isWhite() )
+				countWhite++;
+			else
+				countBlack++;
+		}
+
+		assertTrue(countWhite>0);
+		assertTrue(countBlack>0);
 	}
 }

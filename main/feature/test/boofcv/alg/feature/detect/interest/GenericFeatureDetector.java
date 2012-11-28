@@ -21,10 +21,8 @@ package boofcv.alg.feature.detect.interest;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.struct.image.ImageFloat32;
 import georegression.geometry.UtilPoint2D_I32;
-import georegression.struct.point.Point2D_I32;
 import org.junit.Test;
 
-import java.util.List;
 import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
@@ -32,15 +30,15 @@ import static org.junit.Assert.assertTrue;
 
 
 /**
- * Provides basic tests for feature detectors
+ * Provides VERY basic tests for feature detectors
  *
  * @author Peter Abeles
  */
 public abstract class GenericFeatureDetector {
 	Random rand = new Random(234);
 
-	int width = 50;
-	int height = 60;
+	int width = 80;
+	int height = 90;
 
 	int r = 2;
 
@@ -52,7 +50,6 @@ public abstract class GenericFeatureDetector {
 	 */
 	@Test
 	public void checkNegativeMaxFeatures() {
-		double scales[]=new double[]{1,2,4,8};
 		ImageFloat32 input = new ImageFloat32(width,height);
 
 		// give it a bunch of features that any of the detectors should be able to see
@@ -63,11 +60,11 @@ public abstract class GenericFeatureDetector {
 
 		// limit it to "one" feature
 		Object alg = createDetector(1);
-		int firstFound = detectFeature(input, scales,alg).size();
+		int firstFound = detectFeature(input, alg);
 
 		// tell it to return everything it can find
 		 alg = createDetector(0);
-		int secondFound = detectFeature(input, scales,alg).size();
+		int secondFound = detectFeature(input, alg);
 
 		assertTrue(secondFound>firstFound);
 	}
@@ -77,26 +74,67 @@ public abstract class GenericFeatureDetector {
 	 */
 	@Test
 	public void checkFlushFeatures() {
-		double scales[]=new double[]{1,2,4,8};
 		ImageFloat32 input = new ImageFloat32(width,height);
 
 		// provide a rectangle and circular feature
 		GImageMiscOps.fillRectangle(input,20,5,5,25,25);
-		drawCircle(input,10,10,r*2);
+		drawCircle(input, 10, 10, r * 2);
 
 		Object alg = createDetector(50);
-		int firstFound = detectFeature(input, scales,alg).size();
-		int secondFound = detectFeature(input, scales,alg).size();
+		int firstFound = detectFeature(input, alg);
+		int secondFound = detectFeature(input, alg);
 
 		// make sure at least one feature was found
 		assertTrue(firstFound>0);
 		// if features are not flushed then the secondFound should be twice as large
-		assertEquals(firstFound,secondFound);
+		assertEquals(firstFound, secondFound);
 	}
 
+	/**
+	 * Give it a blank image and one with random noise.  The blank image should have very very few features
+	 */
+	@Test
+	public void compareBlankImage() {
+		ImageFloat32 input = new ImageFloat32(width,height);
+
+		Object alg = createDetector(-1);
+		int firstFound = detectFeature(input, alg);
+
+		renderCheckered(input);
+
+		int secondFound = detectFeature(input, alg);
+
+		assertTrue(firstFound < secondFound);
+	}
+
+	/**
+	 * Multiple calls to the same input should return the same results
+	 */
+	@Test
+	public void checkMultipleCalls() {
+		ImageFloat32 input = new ImageFloat32(width,height);
+		renderCheckered(input);
+
+		Object alg = createDetector(50);
+
+		int firstFound = detectFeature(input, alg);
+		int secondFound = detectFeature(input, alg);
+
+		assertEquals(firstFound, secondFound);
+	}
+
+	/**
+	 * Creates a new feature detector.  Max feature detector isn't a hard max.
+	 *
+	 * @param maxFeatures Used to adjust the number of detected features.  -1 indicates all.
+	 * @return New feature detector
+	 */
 	protected abstract Object createDetector( int maxFeatures );
 
-	protected abstract List<Point2D_I32> detectFeature(ImageFloat32 input, double[] scales, Object detector);
+	/**
+	 * Returns the number of detected features in the image.
+	 */
+	protected abstract int detectFeature(ImageFloat32 input, Object detector);
 
 	private void drawCircle( ImageFloat32 img , int c_x , int c_y , double r ) {
 
@@ -108,5 +146,23 @@ public abstract class GenericFeatureDetector {
 				}
 			}
 		}
+	}
+
+	protected void renderCheckered(ImageFloat32 input) {
+		boolean moo = true;
+		for( int y = 0; y < input.height; y += 10 ) {
+			int h = Math.min(10,input.height-y);
+			boolean boo = moo;
+			for( int x = 0; x < input.width; x += 10 ) {
+				int w = Math.min(10,input.width-x);
+
+				if( boo )
+					GImageMiscOps.fillRectangle(input, 50, x, y, w, h);
+				boo = !boo;
+			}
+			moo = !moo;
+		}
+
+		GImageMiscOps.addUniform(input,rand,-5,5);
 	}
 }

@@ -31,7 +31,7 @@ public abstract class GenericFeatureScaleDetector extends GenericFeatureDetector
 	int r = 2;
 
 	private GeneralFeatureDetector<ImageFloat32, ImageFloat32> createBlobDetector(int maxFeatures) {
-		return FactoryDetectPoint.createHessian(HessianBlobIntensity.Type.DETERMINANT,
+		return FactoryDetectPoint.createHessian(HessianBlobIntensity.Type.TRACE,
 				r, 1, maxFeatures, ImageFloat32.class);
 	}
 

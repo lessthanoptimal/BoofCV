@@ -374,7 +374,7 @@ public abstract class ImageMotionBaseApp<I extends ImageSingleBand,
 
 	@Override
 	public boolean getHasProcessedImage() {
-		return distortAlg != null && distortAlg.getTotalProcessed() > 0;
+		return distortAlg != null && distortAlg.getTotalFramesProcessed() > 0;
 	}
 
 	@Override

@@ -158,9 +158,6 @@ public class SiftDetector {
 	}
 
 	public void process( ImageFloat32 input ) {
-		if( Math.min(input.width,input.height) < 4*Math.pow(2,numOctaves) )
-			throw new IllegalArgumentException("Image is too small to be processed");
-
 		// set up data structures
 		foundPoints.reset();
 
@@ -169,7 +166,9 @@ public class SiftDetector {
 
 		for( int octave = 0; octave < numOctaves; octave++ ) {
 			if( octave > 0 )
-				ss.computeNextOctave();
+				if( !ss.computeNextOctave() )
+					break;
+
 			ss.computeFeatureIntensity();
 
 			for( int scale = 1; scale < ss.dog.length-1; scale++ ) {

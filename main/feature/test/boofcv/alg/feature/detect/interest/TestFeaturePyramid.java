@@ -24,9 +24,6 @@ import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.alg.transform.gss.ScaleSpacePyramid;
 import boofcv.core.image.inst.FactoryImageGenerator;
 import boofcv.struct.image.ImageFloat32;
-import georegression.struct.point.Point2D_I32;
-
-import java.util.List;
 
 
 /**
@@ -42,15 +39,15 @@ public class TestFeaturePyramid extends GenericFeatureScaleDetector {
 	}
 
 	@Override
-	protected List<Point2D_I32> detectFeature(ImageFloat32 input, double[] scales, Object detector) {
-		ScaleSpacePyramid<ImageFloat32> ss = new ScaleSpacePyramid<ImageFloat32>(ImageFloat32.class, scales);
+	protected int detectFeature(ImageFloat32 input, Object detector) {
+		ScaleSpacePyramid<ImageFloat32> ss = new ScaleSpacePyramid<ImageFloat32>(ImageFloat32.class, new double[]{1,2,4,8,16});
 		ss.setImage(input);
 
 		FeaturePyramid<ImageFloat32, ImageFloat32> alg =
 				(FeaturePyramid<ImageFloat32, ImageFloat32>) detector;
 		alg.detect(ss);
 
-		return (List) alg.getInterestPoints();
+		return alg.getInterestPoints().size();
 	}
 
 }
