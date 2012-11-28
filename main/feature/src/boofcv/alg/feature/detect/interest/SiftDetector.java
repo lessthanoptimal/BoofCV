@@ -70,9 +70,6 @@ public class SiftDetector {
 	// selects the features with the largest intensity
 	private SelectNBestFeatures selectBest;
 
-	// total number of octaves that it hsould process
-	private int numOctaves;
-
 	// target number of features for the extractor
 	private int maxFeatures;
 	// storage for found features
@@ -81,8 +78,10 @@ public class SiftDetector {
 	// List of found feature points
 	private FastQueue<ScalePoint> foundPoints = new FastQueue<ScalePoint>(10,ScalePoint.class,true);
 
-	// Scale of the image being processed
-	private double currentScale;
+	// Amount of blur applied to the current image being considered
+	private double currentSigma;
+	// Pixel scale factor for the current image being considered
+	private double currentPixelScale;
 
 	// Computes image derivatives. used in edge rejection
 	private ImageConvolveSparse<ImageFloat32,?> derivXX;
@@ -111,14 +110,13 @@ public class SiftDetector {
 						int maxFeaturesPerScale,
 						double edgeThreshold ) {
 		this.extractor = extractor;
-		this.numOctaves = numOfOctaves;
 		if( maxFeaturesPerScale > 0 ) {
 			// Each scale has detection run twice on it
 			this.maxFeatures = maxFeaturesPerScale/2;
 			selectBest = new SelectNBestFeatures(maxFeatures);
 		}
 
-		ss = new SiftImageScaleSpace(numOfScales,(float)scaleSigma,doubleInputImage );
+		ss = new SiftImageScaleSpace(numOfOctaves,numOfScales,(float)scaleSigma,doubleInputImage );
 
 		// ignore features along the border since a 3x3 region is assumed in parts of the code
 		extractor.setIgnoreBorder(1);
@@ -162,18 +160,30 @@ public class SiftDetector {
 		foundPoints.reset();
 
 		// compute initial octave's scale-space
-		ss.process(input);
+		ss.constructPyramid(input);
+		ss.computeFeatureIntensity();
 
-		for( int octave = 0; octave < numOctaves; octave++ ) {
-			if( octave > 0 )
-				if( !ss.computeNextOctave() )
-					break;
+		for( int octave = 0; octave < ss.numOctaves; octave++ ) {
+			// start processing at the second DOG since it needs the scales above and below
+			int indexDOG = octave*(ss.numScales-1)+1;
+			int indexScale = octave*ss.numScales+1;
 
-			ss.computeFeatureIntensity();
+			currentPixelScale = ss.pixelScale[octave];
 
-			for( int scale = 1; scale < ss.dog.length-1; scale++ ) {
-				detectFeatures(scale,true);
-				detectFeatures(scale,false);
+			ss.storage.reshape( ss.scale[indexScale].width , ss.scale[indexScale].height );
+
+			for( int scale = 1; scale < ss.numScales-2; scale++ , indexScale++,indexDOG++ ) {
+
+				// use the scale-space image as input for derivatives
+				derivXX.setImage(ss.scale[indexScale]);
+				derivXY.setImage(ss.scale[indexScale]);
+				derivYY.setImage(ss.scale[indexScale]);
+
+				// the current scale factor being considered
+				currentSigma = ss.computeScaleSigma(octave,scale);
+
+				detectFeatures(indexDOG,true);
+				detectFeatures(indexDOG,false);
 			}
 		}
 	}
@@ -181,25 +191,16 @@ public class SiftDetector {
 	/**
 	 * Detect features inside the specified scale.
 	 *
-	 * @param scale Which scale is to be processed.
 	 * @param positive Detect features with a positive or negative response
 	 */
-	private void detectFeatures(int scale , boolean positive ) {
+	private void detectFeatures( int indexDOG , boolean positive ) {
 		// set up data structures
 		foundFeatures.reset();
 
-		// the current scale factor being considered
-		currentScale = ss.computeScaleSigma(scale);
-
 		// Local scale-space neighborhood
-		ImageFloat32 scale0 = ss.dog[scale-1];
-		ImageFloat32 scale1 = ss.dog[scale];
-		ImageFloat32 scale2 = ss.dog[scale+1];
-
-		// use the scale-space image as input for derivatives
-		derivXX.setImage(ss.scale[scale]);
-		derivXY.setImage(ss.scale[scale]);
-		derivYY.setImage(ss.scale[scale]);
+		ImageFloat32 scale0 = ss.dog[indexDOG-1];
+		ImageFloat32 scale1 = ss.dog[indexDOG];
+		ImageFloat32 scale2 = ss.dog[indexDOG+1];
 
 		// adjusts sign so that just the peak can be compared
 		float signAdj;
@@ -251,10 +252,10 @@ public class SiftDetector {
 
 		ScalePoint p = foundPoints.grow();
 
-		p.x = ss.pixelScale*(x+ polyPeak(x0, value, x2));
-		p.y = ss.pixelScale*(y + polyPeak(y0, value, y2));
+		p.x = currentPixelScale*(x + polyPeak(x0, value, x2));
+		p.y = currentPixelScale*(y + polyPeak(y0, value, y2));
 
-		p.scale = currentScale + ss.pixelScale*ss.sigma*polyPeak(s0, value, s2);
+		p.scale = currentSigma + currentPixelScale*ss.sigma*polyPeak(s0, value, s2);
 		p.white = white;
 	}
 

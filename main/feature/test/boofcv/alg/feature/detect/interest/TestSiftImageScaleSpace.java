@@ -37,15 +37,11 @@ public class TestSiftImageScaleSpace {
 	@Test
 	public void computeScaleSigma() {
 
-		SiftImageScaleSpace alg = new SiftImageScaleSpace(5,1.6f,false);
+		SiftImageScaleSpace alg = new SiftImageScaleSpace(2,5,1.6f,false);
 
-		alg.process(new ImageFloat32(100,120));
-
-		assertEquals( 1.6 , alg.computeScaleSigma(0) , 1e-4);
-		assertEquals( 3.2 , alg.computeScaleSigma(1) , 1e-4 );
-		assertEquals( 4.8 , alg.computeScaleSigma(2) , 1e-4 );
-
-		alg.computeNextOctave();
+		assertEquals( 1.6 , alg.computeScaleSigma(0,0) , 1e-4);
+		assertEquals( 3.2 , alg.computeScaleSigma(0,1) , 1e-4 );
+		assertEquals(4.8, alg.computeScaleSigma(0, 2), 1e-4);
 
 		// compute total gaussian blur from previous set taken at level 2
 		double prev = 2*1.6;
@@ -53,8 +49,8 @@ public class TestSiftImageScaleSpace {
 		double next1 = Math.sqrt( prev*prev + 4*1.6*1.6 );
 		double next2 = Math.sqrt( prev*prev + 4*3.2*3.2 );
 
-		assertEquals( next1 , alg.computeScaleSigma(0) , 1e-4);
-		assertEquals( next2 , alg.computeScaleSigma(1) , 1e-4 );
+		assertEquals( next1 , alg.computeScaleSigma(1,0) , 1e-4);
+		assertEquals( next2 , alg.computeScaleSigma(1,1) , 1e-4 );
 	}
 
 	@Test

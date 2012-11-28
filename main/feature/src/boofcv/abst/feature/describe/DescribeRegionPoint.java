@@ -48,6 +48,8 @@ public interface DescribeRegionPoint<T extends ImageSingleBand, D extends TupleD
 	/**
 	 * Returns the descriptor length
 	 */
+	// TODO Can this be removed?
+	@Deprecated
 	public int getDescriptionLength();
 
 	/**
