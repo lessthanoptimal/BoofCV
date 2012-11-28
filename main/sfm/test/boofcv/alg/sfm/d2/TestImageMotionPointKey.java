@@ -138,10 +138,36 @@ public class TestImageMotionPointKey {
 		assertEquals(computed.getX(), worldToKey.getX(), 1e-8);
 	}
 
-
+	/**
+	 * See if tracks are pruned after not being in inlier set for X time
+	 */
 	@Test
 	public void testPrune() {
-		fail("Implement");
+		Se2_F32 computed = new Se2_F32(4,5,6);
+		Se2_F32 model = new Se2_F32();
+		DummyTracker tracker = new DummyTracker();
+		DummyModelMatcher<Se2_F32> matcher = new DummyModelMatcher<Se2_F32>(computed,5);
+
+		ImageUInt8 input = new ImageUInt8(20,30);
+
+		ImageMotionPointKey<ImageUInt8,Se2_F32> alg = new ImageMotionPointKey<ImageUInt8,Se2_F32>(tracker,matcher,null,model,5);
+
+		// create tracks such that only some of them will be dropped
+		alg.totalFramesProcessed = 9;
+		for( int i = 0; i < 10; i++ ) {
+			PointTrack t = new PointTrack();
+			AssociatedPairTrack a = new AssociatedPairTrack();
+			a.lastUsed = i;
+			t.cookie = a;
+
+			tracker.list.add(t);
+		}
+
+		// update
+		alg.process(input);
+
+		// check to see how many were dropped
+		assertEquals(6,tracker.numDropped);
 	}
 
 	public static class DummyTracker implements ImagePointTracker<ImageUInt8>
@@ -189,7 +215,7 @@ public class TestImageMotionPointKey {
 
 		@Override
 		public List<PointTrack> getInactiveTracks(List<PointTrack> list) {
-			return null;  //To change body of implemented methods use File | Settings | File Templates.
+			return null;
 		}
 
 		@Override
@@ -229,7 +255,7 @@ public class TestImageMotionPointKey {
 		public List<AssociatedPair> getMatchSet() {
 			List<AssociatedPair> ret = new ArrayList<AssociatedPair>();
 			for( int i = 0; i < matchSetSize; i++ ) {
-				ret.add( new AssociatedPair());
+				ret.add( new AssociatedPairTrack());
 			}
 			return ret;
 		}

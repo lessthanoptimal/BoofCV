@@ -61,7 +61,7 @@ public class TestImplMedianSortEdgeNaive extends CompareEquivalentFunctions {
 		Class<?> c[] = candidate.getParameterTypes();
 		Class<?> v[] = validation.getParameterTypes();
 
-		return c[0] == v[1];
+		return c.length == v.length && c[0] == v[1];
 	}
 
 	@Override

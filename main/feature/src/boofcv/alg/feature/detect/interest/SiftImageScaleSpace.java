@@ -147,8 +147,10 @@ public class SiftImageScaleSpace {
 	/**
 	 * Construct scale-space pyramid in the next octave by sub-sampling the second scale in
 	 * the previous octave  and applying additional blur.
+	 *
+	 * @return true if the image is large enough to process or false if it should not be processed
 	 */
-	public void computeNextOctave() {
+	public boolean computeNextOctave() {
 		// the second level is selected to seed the next octave
 		priorSigmaFirstScale = computeScaleSigma(1);
 
@@ -157,12 +159,19 @@ public class SiftImageScaleSpace {
 		int w = scale[0].width/2;
 		int h = scale[0].height/2;
 
+		// no points in processing images that are smaller
+		if( w < 3 || h < 3 )
+			return false;
+
+
 		scale[0].reshape(w, h);
 		downSample(scale[1],scale[0]);
 
 		reshapeImages(w,h);
 
 		constructRestOfPyramid();
+
+		return true;
 	}
 
 	/**
@@ -186,7 +195,7 @@ public class SiftImageScaleSpace {
 	/**
 	 * Down samples an image by copying every other pixel, starting with pixel 1.
 	 */
-	private void downSample( ImageFloat32 from , ImageFloat32 to ) {
+	protected static void downSample( ImageFloat32 from , ImageFloat32 to ) {
 
 		for( int y = 0; y < to.height; y++ ) {
 			for( int x = 0; x < to.width; x++ ) {
@@ -198,7 +207,7 @@ public class SiftImageScaleSpace {
 	/**
 	 * Up-samples the input image.  Doubling its size.
 	 */
-	private void upSample( ImageFloat32 from , ImageFloat32 to ) {
+	protected static void upSample( ImageFloat32 from , ImageFloat32 to ) {
 
 		for( int y = 0; y < from.height; y++ ) {
 			int yy = y*2;

@@ -44,7 +44,7 @@ public class ImageMotionPointKey<I extends ImageSingleBand, T extends Invertible
 	private int totalSpawned;
 
 	// total number of frames processed
-	protected int totalProcessed = 0;
+	protected int totalFramesProcessed = 0;
 	// feature tracker
 	protected ImagePointTracker<I> tracker;
 	// Fits a model to the tracked features
@@ -63,7 +63,7 @@ public class ImageMotionPointKey<I extends ImageSingleBand, T extends Invertible
 	protected T worldToCurr;
 
 	// tracks which are not in the inlier set for this many frames in a row are pruned
-	int pruneThreshold;
+	protected int pruneThreshold;
 
 	/**
 	 * Specify algorithms to use internally.  Each of these classes must work with
@@ -111,7 +111,7 @@ public class ImageMotionPointKey<I extends ImageSingleBand, T extends Invertible
 		worldToKey.set(worldToInit);
 		keyToCurr.set(worldToInit);
 		worldToCurr.set(worldToInit);
-		totalProcessed = 0;
+		totalFramesProcessed = 0;
 
 		changeKeyFrame();
 	}
@@ -139,7 +139,7 @@ public class ImageMotionPointKey<I extends ImageSingleBand, T extends Invertible
 	public boolean process( I frame ) {
 		// update the feature tracker
 		tracker.process(frame);
-		totalProcessed++;
+		totalFramesProcessed++;
 
 		List<PointTrack> tracks = tracker.getActiveTracks(null);
 
@@ -158,7 +158,7 @@ public class ImageMotionPointKey<I extends ImageSingleBand, T extends Invertible
 
 		// mark that the track is in the inlier set
 		for( AssociatedPair p : modelMatcher.getMatchSet() ) {
-			((AssociatedPairTrack)p).lastUsed = totalProcessed;
+			((AssociatedPairTrack)p).lastUsed = totalFramesProcessed;
 		}
 
 		// refine the motion estimate
@@ -176,8 +176,7 @@ public class ImageMotionPointKey<I extends ImageSingleBand, T extends Invertible
 		for( PointTrack t : all ) {
 			AssociatedPairTrack p = t.getCookie();
 
-			if( totalProcessed - p.lastUsed >= pruneThreshold ) {
-				System.out.println("Delta "+(totalProcessed-p.lastUsed));
+			if( totalFramesProcessed - p.lastUsed >= pruneThreshold ) {
 				tracker.dropTrack(t);
 			}
 		}
@@ -204,7 +203,7 @@ public class ImageMotionPointKey<I extends ImageSingleBand, T extends Invertible
 				l.cookie = p;
 			}
 			p.p1.set(l);
-			p.lastUsed = totalProcessed;
+			p.lastUsed = totalFramesProcessed;
 		}
 
 		totalSpawned = spawned.size();
@@ -231,8 +230,8 @@ public class ImageMotionPointKey<I extends ImageSingleBand, T extends Invertible
 		return modelMatcher;
 	}
 
-	public int getTotalProcessed() {
-		return totalProcessed;
+	public int getTotalFramesProcessed() {
+		return totalFramesProcessed;
 	}
 
 	public int getTotalSpawned() {

@@ -23,13 +23,7 @@ import boofcv.abst.filter.derivative.AnyImageDerivative;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.core.image.inst.FactoryImageGenerator;
 import boofcv.factory.feature.detect.interest.FactoryDetectPoint;
-import boofcv.struct.QueueCorner;
 import boofcv.struct.image.ImageFloat32;
-import georegression.struct.point.Point2D_I16;
-import georegression.struct.point.Point2D_I32;
-
-import java.util.ArrayList;
-import java.util.List;
 
 
 /**
@@ -47,7 +41,7 @@ public class TestGeneralFeatureDetector extends GenericFeatureDetector {
 	}
 
 	@Override
-	protected List<Point2D_I32> detectFeature(ImageFloat32 input, double[] scales, Object detector) {
+	protected int detectFeature(ImageFloat32 input, Object detector) {
 		GeneralFeatureDetector<ImageFloat32, ImageFloat32> d =
 				(GeneralFeatureDetector<ImageFloat32, ImageFloat32>) detector;
 
@@ -61,12 +55,6 @@ public class TestGeneralFeatureDetector extends GenericFeatureDetector {
 
 		d.process(input, derivX, derivY, derivXX, derivYY, derivXY);
 
-		QueueCorner found = d.getFeatures();
-		List<Point2D_I32> ret = new ArrayList<Point2D_I32>();
-		for (int i = 0; i < found.size; i++) {
-			Point2D_I16 p = found.get(i);
-			ret.add(new Point2D_I32(p.x, p.y));
-		}
-		return ret;
+		return d.getFeatures().size;
 	}
 }

@@ -22,9 +22,6 @@ import boofcv.abst.feature.detect.extract.FeatureExtractor;
 import boofcv.alg.transform.ii.IntegralImageOps;
 import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
 import boofcv.struct.image.ImageFloat32;
-import georegression.struct.point.Point2D_I32;
-
-import java.util.List;
 
 
 /**
@@ -38,17 +35,17 @@ public class TestFastHessianFeatureDetector extends GenericFeatureDetector {
 
 	@Override
 	protected Object createDetector( int maxFeatures ) {
-		FeatureExtractor extractor = FactoryFeatureExtractor.nonmax(2, 1, 5, true);
+		FeatureExtractor extractor = FactoryFeatureExtractor.nonmax(1, 1, 5, true);
 		return new FastHessianFeatureDetector(extractor,maxFeatures, 1, 9,4,4);
 	}
 
 	@SuppressWarnings({"unchecked"})
 	@Override
-	protected List<Point2D_I32> detectFeature(ImageFloat32 input, double[] scales, Object detector) {
+	protected int detectFeature(ImageFloat32 input, Object detector) {
 		FastHessianFeatureDetector<ImageFloat32> alg = (FastHessianFeatureDetector<ImageFloat32>)detector;
 		ImageFloat32 integral = IntegralImageOps.transform(input,null);
 		alg.detect(integral);
 
-		return (List)alg.getFoundPoints();
+		return alg.getFoundPoints().size();
 	}
 }
