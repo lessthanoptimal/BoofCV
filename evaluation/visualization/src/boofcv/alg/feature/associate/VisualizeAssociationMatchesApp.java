@@ -85,10 +85,15 @@ public class VisualizeAssociationMatchesApp<T extends ImageSingleBand, D extends
 		this.imageType = imageType;
 
 		GeneralFeatureDetector<T, D> alg;
+
+		if( imageType == ImageFloat32.class )
+			addAlgorithm(0, "SIFT", FactoryInterestPoint.siftDetector(1.6,5,4,false,2,1,500,10));
 		addAlgorithm(0, "Fast Hessian", FactoryInterestPoint.fastHessian(1, 2, 200, 1, 9, 4, 4));
 		alg = FactoryDetectPoint.createShiTomasi(2, false, 1, 500, derivType);
-		addAlgorithm(0, "KLT", FactoryInterestPoint.wrapPoint(alg, imageType, derivType));
+		addAlgorithm(0, "Shi-Tomasi", FactoryInterestPoint.wrapPoint(alg, imageType, derivType));
 
+		if( imageType == ImageFloat32.class )
+			addAlgorithm(1, "SIFT", FactoryDescribeRegionPoint.sift(1.6, 5, 4, false, true));
 		addAlgorithm(1, "SURF", FactoryDescribeRegionPoint.surfm(true, imageType));
 		addAlgorithm(1, "BRIEF", FactoryDescribeRegionPoint.brief(16, 512, -1, 4, true, imageType));
 		addAlgorithm(1, "BRIEFO", FactoryDescribeRegionPoint.brief(16, 512, -1, 4, false, imageType));
@@ -277,6 +282,8 @@ public class VisualizeAssociationMatchesApp<T extends ImageSingleBand, D extends
 		VisualizeAssociationMatchesApp app = new VisualizeAssociationMatchesApp(imageType, derivType);
 
 		List<PathLabel> inputs = new ArrayList<PathLabel>();
+
+		inputs.add(new PathLabel("Boat", "../../SURFPerformance/data/boat/img1.png", "../../SURFPerformance/data/boat/img6.png"));
 
 		inputs.add(new PathLabel("Cave", "../data/evaluation/stitch/cave_01.jpg", "../data/evaluation/stitch/cave_02.jpg"));
 		inputs.add(new PathLabel("Kayak", "../data/evaluation/stitch/kayak_02.jpg", "../data/evaluation/stitch/kayak_03.jpg"));

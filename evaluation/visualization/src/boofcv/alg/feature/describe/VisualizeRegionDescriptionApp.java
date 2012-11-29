@@ -69,6 +69,8 @@ public class VisualizeRegionDescriptionApp <T extends ImageSingleBand, D extends
 		this.imageType = imageType;
 
 		addAlgorithm(0,"SURF", FactoryDescribeRegionPoint.surfm(false, imageType));
+		if( imageType == ImageFloat32.class )
+			addAlgorithm(0,"SIFT", FactoryDescribeRegionPoint.sift(1.6,5,4,false,true));
 		addAlgorithm(0,"BRIEF", FactoryDescribeRegionPoint.brief(16, 512, -1, 4, true, imageType));
 		addAlgorithm(0,"BRIEFO", FactoryDescribeRegionPoint.brief(16, 512, -1, 4, false, imageType));
 		addAlgorithm(0,"Gaussian 12", FactoryDescribeRegionPoint.gaussian12(20, imageType, derivType));

@@ -41,9 +41,12 @@ public class DebugSiftDetectorApp {
 
 		ImageFloat32 gray = ConvertBufferedImage.convertFromSingle(input, null, ImageFloat32.class);
 
-		SiftDetector alg = FactoryInterestPointAlgs.siftDetector(1.6,5,4,false,2,5,-1,5);
+		SiftDetector alg = FactoryInterestPointAlgs.siftDetector(2,5,-1,5);
+		SiftImageScaleSpace imageSS = new SiftImageScaleSpace(1.6f, 5, 4, false);
 
-		alg.process(gray);
+		imageSS.constructPyramid(gray);
+
+		alg.process(imageSS);
 
 		System.out.println("total features found: "+alg.getFoundPoints().size());
 
@@ -53,14 +56,20 @@ public class DebugSiftDetectorApp {
 
 		ListDisplayPanel dog = new ListDisplayPanel();
 		for( int i = 0; i < alg.ss.dog.length; i++ ) {
+			int scale = i % (alg.ss.numScales-1);
+			int octave = i / (alg.ss.numScales-1);
+
 			BufferedImage img = VisualizeImageData.colorizeSign(alg.ss.dog[i],null,-1);
-			dog.addImage(img,"Scale "+(i+1));
+			dog.addImage(img,octave+"  "+scale);
 		}
 
 		ListDisplayPanel ss = new ListDisplayPanel();
 		for( int i = 0; i < alg.ss.scale.length; i++ ) {
+			int scale = i % alg.ss.numScales;
+			int octave = i / alg.ss.numScales;
+
 			BufferedImage img = VisualizeImageData.grayMagnitude(alg.ss.scale[i],null,255);
-			ss.addImage(img,"Scale "+(i+1));
+			ss.addImage(img,octave+"  "+scale);
 		}
 		ShowImages.showWindow(dog, "Octave DOG");
 		ShowImages.showWindow(ss, "Octave Scales");
