@@ -28,6 +28,7 @@ import boofcv.factory.filter.kernel.FactoryKernel;
 import boofcv.factory.filter.kernel.FactoryKernelGaussian;
 import boofcv.factory.filter.kernel.FactorySteerable;
 import boofcv.factory.interpolate.FactoryInterpolation;
+import boofcv.struct.BoofDefaults;
 import boofcv.struct.convolve.Kernel2D;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.image.ImageFloat32;
@@ -74,6 +75,11 @@ public class FactoryDescribePointAlgs {
 		InterpolatePixel<T> interp = FactoryInterpolation.bilinearPixel(imageType);
 
 		return new DescribePointBriefSO<T>(definition,filterBlur,interp);
+	}
+
+	public static DescribePointSift sift( int gridWidth , int numSamples , int numHistBins ) {
+		return new DescribePointSift(gridWidth,numSamples,numHistBins
+				,0.5, BoofDefaults.SCALE_SPACE_CANONICAL_RADIUS);
 	}
 
 	/**

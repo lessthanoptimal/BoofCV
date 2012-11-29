@@ -16,26 +16,19 @@
  * limitations under the License.
  */
 
-package boofcv.abst.filter.derivative;
+package boofcv.abst.feature.detdesc;
 
-import boofcv.struct.image.ImageSingleBand;
+import org.junit.Test;
 
+import static org.junit.Assert.fail;
 
 /**
- * A generic interface for computing first order image derivative along the x and y axes.
- *
  * @author Peter Abeles
  */
-public interface ImageGradient<Input extends ImageSingleBand, Output extends ImageSingleBand> extends ImageDerivative<Input,Output> {
+public class TestDetectDescribeFusion {
 
-	/**
-	 * Computes the image gradient from the input image and stores the results into
-	 * 'derivX' and 'derivY'
-	 *
-	 * @param inputImage Original input image. Not modified.
-	 * @param derivX First order image derivative along the x-axis. Modified.
-	 * @param derivY First order image derivative along the y-axis. Modified.
-	 */
-	public void process( Input inputImage , Output derivX, Output derivY );
-
+	@Test
+	public void stuff() {
+		fail("implement");
+	}
 }

@@ -37,9 +37,9 @@ public class TestSiftImageScaleSpace {
 	@Test
 	public void computeScaleSigma() {
 
-		SiftImageScaleSpace alg = new SiftImageScaleSpace(2,5,1.6f,false);
+		SiftImageScaleSpace alg = new SiftImageScaleSpace(1.6f, 5, 2, false);
 
-		assertEquals( 1.6 , alg.computeScaleSigma(0,0) , 1e-4);
+		assertEquals(1.6, alg.computeScaleSigma(0, 0), 1e-4);
 		assertEquals( 3.2 , alg.computeScaleSigma(0,1) , 1e-4 );
 		assertEquals(4.8, alg.computeScaleSigma(0, 2), 1e-4);
 
@@ -93,5 +93,40 @@ public class TestSiftImageScaleSpace {
 				assertTrue(input.get(j/2, i/2) == output.get(j, i));
 			}
 		}
+	}
+
+	@Test
+	public void scaleToImageIndex() {
+		SiftImageScaleSpace alg = new SiftImageScaleSpace(1.6f, 5, 2, false);
+
+		// try easy cases exactly on the nominal sigma
+		assertEquals(0,alg.scaleToImageIndex(alg.computeScaleSigma(0, 0)));
+		assertEquals(1,alg.scaleToImageIndex(alg.computeScaleSigma(0, 1)));
+		assertEquals(2,alg.scaleToImageIndex(alg.computeScaleSigma(0, 2)));
+		assertEquals(5,alg.scaleToImageIndex(alg.computeScaleSigma(1, 0)));
+		assertEquals(6,alg.scaleToImageIndex(alg.computeScaleSigma(1, 1)));
+		assertEquals(9,alg.scaleToImageIndex(alg.computeScaleSigma(1, 4)));
+
+		// try cases slightly off from nominal
+		assertEquals(0, alg.scaleToImageIndex(alg.computeScaleSigma(0, 0) - 0.01));
+		assertEquals(0,alg.scaleToImageIndex(alg.computeScaleSigma(0, 0)+0.01));
+		assertEquals(9,alg.scaleToImageIndex(alg.computeScaleSigma(1, 4)-0.01));
+		assertEquals(9,alg.scaleToImageIndex(alg.computeScaleSigma(1, 4)+0.01));
+
+		// try the extreme ends, which should round in the wrong direction
+		assertEquals(0, alg.scaleToImageIndex(0));
+		assertEquals(9,alg.scaleToImageIndex(alg.computeScaleSigma(1, 4)+1.6*2));
+	}
+
+	@Test
+	public void imageIndexToPixelScale() {
+		SiftImageScaleSpace alg = new SiftImageScaleSpace(1.6f, 5, 2, false);
+
+		assertEquals(1.0,alg.imageIndexToPixelScale(0),1e-8);
+		assertEquals(1.0,alg.imageIndexToPixelScale(1),1e-8);
+		assertEquals(1.0,alg.imageIndexToPixelScale(4),1e-8);
+		assertEquals(2.0,alg.imageIndexToPixelScale(5),1e-8);
+		assertEquals(2.0,alg.imageIndexToPixelScale(6),1e-8);
+		assertEquals(2.0,alg.imageIndexToPixelScale(9),1e-8);
 	}
 }

@@ -22,16 +22,21 @@ import boofcv.abst.feature.describe.*;
 import boofcv.abst.filter.blur.BlurFilter;
 import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.alg.feature.describe.DescribePointGaussian12;
+import boofcv.alg.feature.describe.DescribePointSift;
 import boofcv.alg.feature.describe.DescribePointSteerable2D;
 import boofcv.alg.feature.describe.DescribePointSurf;
 import boofcv.alg.feature.describe.brief.BriefDefinition_I32;
 import boofcv.alg.feature.describe.brief.FactoryBriefDefinition;
+import boofcv.alg.feature.detect.interest.SiftImageScaleSpace;
+import boofcv.alg.feature.orientation.OrientationHistogramSift;
 import boofcv.alg.feature.orientation.OrientationIntegral;
 import boofcv.alg.transform.ii.GIntegralImageOps;
 import boofcv.factory.feature.orientation.FactoryOrientationAlgs;
 import boofcv.factory.filter.blur.FactoryBlurFilter;
 import boofcv.factory.filter.derivative.FactoryDerivative;
+import boofcv.struct.BoofDefaults;
 import boofcv.struct.feature.*;
+import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 
 import java.util.Random;
@@ -93,10 +98,43 @@ public class FactoryDescribeRegionPoint {
 
 		if( isOriented )
 //			orientation = FactoryOrientationAlgs.average_ii(6, true, integralType);
-			orientation = FactoryOrientationAlgs.sliding_ii(0.65, Math.PI/3.0,8,-1, 6, integralType);
+			orientation = FactoryOrientationAlgs.sliding_ii(0.65, Math.PI / 3.0, 8, -1, 6, integralType);
 
 		DescribePointSurf<II> alg = FactoryDescribePointAlgs.<II>msurf(integralType);
 		return new WrapDescribeSurf<T,II>( alg ,orientation);
+	}
+
+	/**
+	 *
+	 * <p>
+	 * NOTE: Only a single orientation hypothesis is considered when using this interface.  Consider
+	 * using {@link boofcv.factory.feature.detdesc.FactoryDetectDescribe#sift(int, boolean, int)} instead
+	 * </p>
+	 *
+	 * @param scaleSigma
+	 * @param numOfScales
+	 * @param numOfOctaves
+	 * @param doubleInputImage
+	 * @param isOriented
+	 * @return
+	 */
+	public static DescribeRegionPoint<ImageFloat32,SurfFeature> sift( double scaleSigma ,
+																	  int numOfScales ,
+																	  int numOfOctaves ,
+																	  boolean doubleInputImage ,
+																	  boolean isOriented ) {
+		SiftImageScaleSpace ss = new SiftImageScaleSpace((float)scaleSigma, numOfScales, numOfOctaves,
+				doubleInputImage);
+
+		OrientationHistogramSift orientationAlg = null;
+
+		if( isOriented ) {
+			orientationAlg = new OrientationHistogramSift(36, BoofDefaults.SCALE_SPACE_CANONICAL_RADIUS,1.5);
+		}
+
+		DescribePointSift alg = FactoryDescribePointAlgs.sift(4, 8, 8);
+
+		return new WrapDescribeSift(alg,orientationAlg,ss);
 	}
 
 	/**

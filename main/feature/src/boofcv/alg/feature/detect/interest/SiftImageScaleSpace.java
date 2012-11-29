@@ -18,8 +18,10 @@
 
 package boofcv.alg.feature.detect.interest;
 
+import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.alg.filter.convolve.ConvolveNormalized;
 import boofcv.alg.misc.PixelMath;
+import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.factory.filter.kernel.FactoryKernelGaussian;
 import boofcv.struct.convolve.Kernel1D_F32;
 import boofcv.struct.image.ImageFloat32;
@@ -42,16 +44,22 @@ public class SiftImageScaleSpace {
 	// number of scales per octave
 	protected int numScales;
 
-	// Storage for Difference of Gaussian (DOG) features
+	// Difference of Gaussian (DOG) features
 	protected ImageFloat32 dog[];
 	// Images across scale-space in this octave
 	protected ImageFloat32 scale[];
+	// Image Derivatives
+	protected ImageFloat32 derivX[];
+	protected ImageFloat32 derivY[];
 	// Amount of blur which is applied
 	protected float sigma;
 
 	// ratio of pixels in each octave to the original image
 	// x = x'*pixelScale, where x is original coordinate, and x' is current image.
 	protected double pixelScale[];
+
+	// the sigma for each layer in the pyramid.  Saved as an array for speed reasons
+	protected double layerSigma[];
 
 	// should the input image be doubled
 	private boolean doubleInputImage;
@@ -60,18 +68,21 @@ public class SiftImageScaleSpace {
 	// Note that the octave's are recursively computed, so this is the blur magnitude from before
 	private double priorSigmaFirstScale[];
 
+	// Computes the image derivative
+	private ImageGradient<ImageFloat32,ImageFloat32> gradient = FactoryDerivative.three_F32();
+
 	// storage for applying blur
 	protected ImageFloat32 storage;
 
 	/**
-	 * Configures the scale-space
+	 * Configures the scale-space.
 	 *
-	 * @param numOctaves Number of octaves
-	 * @param numScales Number of scales per octave
-	 * @param blurSigma Amount of Gaussian blur applied to each scale
-	 * @param doubleInputImage Is the input image doubled or not
+	 * @param blurSigma Amount of blur applied to each scale inside an octaves.  Try 1.6
+	 * @param numScales Number of scales per octaves.  Try 5.  Must be >= 3
+	 * @param numOctaves Number of octaves to detect.  Try 4
+	 * @param doubleInputImage Should the input image be doubled? Try false.
 	 */
-	public SiftImageScaleSpace( int numOctaves , int numScales , float blurSigma , boolean doubleInputImage)
+	public SiftImageScaleSpace(float blurSigma, int numScales, int numOctaves, boolean doubleInputImage)
 	{
 		if( numScales < 3 )
 			throw new IllegalArgumentException("A minimum of 3 scales are required");
@@ -97,14 +108,26 @@ public class SiftImageScaleSpace {
 		int totalImages = numScales*numOctaves;
 
 		scale = new ImageFloat32[totalImages];
+		derivX = new ImageFloat32[totalImages];
+		derivY = new ImageFloat32[totalImages];
 		dog = new ImageFloat32[totalImages-numOctaves];
 		for( int i = 0; i < scale.length; i++ ) {
 			scale[i] = new ImageFloat32(1,1);
+			derivX[i] = new ImageFloat32(1,1);
+			derivY[i] = new ImageFloat32(1,1);
 		}
 		for( int i = 0; i < dog.length; i++ ) {
 			dog[i] = new ImageFloat32(1,1);
 		}
 		storage = new ImageFloat32(1,1);
+
+		layerSigma = new double[totalImages];
+		for( int o = 0; o < numOctaves; o++ ) {
+			for( int s = 0; s < numScales; s++ ) {
+				int index = o*numScales + s;
+				layerSigma[index] = computeScaleSigma(o,s);
+			}
+		}
 	}
 
 	/**
@@ -123,7 +146,7 @@ public class SiftImageScaleSpace {
 			reshapeToInput(input.width, input.height);
 			blurImage(input,scale[0],sigma);
 		}
-		constructRestOfOctave(1, numScales);
+		constructRestOfOctave(0);
 
 		// compute rest of the octaves
 		for( int o = 1; o < numOctaves; o++ ) {
@@ -133,7 +156,23 @@ public class SiftImageScaleSpace {
 
 			downSample(scale[indexSeed],scale[indexStart]);
 
-			constructRestOfOctave(indexStart + 1, indexStart + numScales);
+			constructRestOfOctave(o);
+		}
+	}
+
+	/**
+	 * Computes the image derivative for each layer in the pyramid.
+	 */
+	public void computeDerivatives() {
+		for( int i = 0; i < scale.length; i++ ) {
+			ImageFloat32 input = scale[i];
+			ImageFloat32 dx = derivX[i];
+			ImageFloat32 dy = derivY[i];
+
+			dx.reshape(input.width,input.height);
+			dy.reshape(input.width,input.height);
+
+			gradient.process(input,dx,dy);
 		}
 	}
 
@@ -189,8 +228,10 @@ public class SiftImageScaleSpace {
 	 * The amount of blur for each scale is a multiple of sigma.  To improve runtime performance
 	 * the previous scale is convolved and the amount of blur is adjusted accordingly.
 	 */
-	private void constructRestOfOctave(int start, int stop) {
-		for( int i = start; i < stop; i++ ) {
+	private void constructRestOfOctave( int octave ) {
+
+		int indexScales = octave*numScales+1;
+		for( int i = 1; i < numScales; i++ , indexScales++ ) {
 			// sigmaA is the amount of blur already applied
 			double sigmaA = sigma*i;
 			// sigmaB is the desired amount of blur at this scale
@@ -200,7 +241,7 @@ public class SiftImageScaleSpace {
 			double amount = Math.sqrt(sigmaB*sigmaB - sigmaA*sigmaA);
 
 			// apply the blur
-			blurImage(scale[i-1],scale[i],amount);
+			blurImage(scale[indexScales-1],scale[indexScales],amount);
 		}
 	}
 
@@ -256,4 +297,52 @@ public class SiftImageScaleSpace {
 		}
 	}
 
+	public int getNumOctaves() {
+		return numOctaves;
+	}
+
+	public int getNumScales() {
+		return numScales;
+	}
+
+	public ImageFloat32 getPyramidLayer(int index) {
+		return scale[index];
+	}
+
+	public ImageFloat32 getDerivativeX(int index) {
+		return derivX[index];
+	}
+
+	public ImageFloat32 getDerivativeY(int index) {
+		return derivY[index];
+	}
+
+	/**
+	 * Given the scale, return the index of the layer in the scale-space that is the closest
+	 * match.
+	 */
+	public int scaleToImageIndex(double sigma) {
+		// figure out which octave it is in
+		int index = -1;
+		double bestScore = Double.MAX_VALUE;
+
+		// find the closest match
+		for( int i = 0; i < layerSigma.length; i++ ) {
+			double error = Math.abs(sigma - layerSigma[i]);
+
+			if( error < bestScore ) {
+				bestScore = error;
+				index = i;
+			}
+		}
+
+		return index;
+	}
+
+	/**
+	 * Image pixel scale factor for the specific image in the pyramid.
+	 */
+	public double imageIndexToPixelScale(int imageIndex) {
+		return pixelScale[ imageIndex/numScales ];
+	}
 }

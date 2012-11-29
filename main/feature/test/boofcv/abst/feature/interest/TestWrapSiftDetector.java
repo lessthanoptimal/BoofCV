@@ -20,6 +20,7 @@ package boofcv.abst.feature.interest;
 
 import boofcv.abst.feature.detect.interest.WrapSiftDetector;
 import boofcv.alg.feature.detect.interest.SiftDetector;
+import boofcv.alg.feature.detect.interest.SiftImageScaleSpace;
 import boofcv.factory.feature.detect.interest.FactoryInterestPointAlgs;
 import boofcv.struct.image.ImageFloat32;
 import org.junit.Test;
@@ -29,19 +30,21 @@ import org.junit.Test;
  */
 public class TestWrapSiftDetector {
 
-
 	@Test
 	public void standard() {
-		SiftDetector alg = FactoryInterestPointAlgs.siftDetector(1.6,5,4,false,2,1,500,5);
-		WrapSiftDetector wrapper = new WrapSiftDetector(alg);
+		SiftDetector alg = FactoryInterestPointAlgs.siftDetector(2,1,500,5);
+		SiftImageScaleSpace ss = new SiftImageScaleSpace(1.6f, 5, 4, false);
+
+		WrapSiftDetector wrapper = new WrapSiftDetector(alg,ss);
 
 		new GeneralInterestPointDetectorChecks<ImageFloat32>(wrapper,false,true,ImageFloat32.class){}.performAllTests();
 	}
 
 	@Test
 	public void doubleInput() {
-		SiftDetector alg = FactoryInterestPointAlgs.siftDetector(1.6,5,4,true,2,1,500,5);
-		WrapSiftDetector wrapper = new WrapSiftDetector(alg);
+		SiftDetector alg = FactoryInterestPointAlgs.siftDetector(2,1,500,5);
+		SiftImageScaleSpace ss = new SiftImageScaleSpace(1.6f, 5, 4, true);
+		WrapSiftDetector wrapper = new WrapSiftDetector(alg,ss);
 
 		new GeneralInterestPointDetectorChecks<ImageFloat32>(wrapper,false,true,ImageFloat32.class){}.performAllTests();
 	}
