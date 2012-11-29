@@ -32,21 +32,25 @@ import static org.junit.Assert.assertTrue;
  */
 public class TestSiftDetector extends GenericFeatureDetector {
 
+	SiftImageScaleSpace ss = new SiftImageScaleSpace(1.6f, 5, 4, false);
+
 	public TestSiftDetector() {
 		this.scaleTolerance = 0.3;
 	}
 
 	@Override
 	protected Object createDetector(int maxFeatures) {
-		return FactoryInterestPointAlgs.siftDetector(1.6,5,4,false,2,1,maxFeatures,5);
+		return FactoryInterestPointAlgs.siftDetector(2,1,maxFeatures,5);
 	}
 
 	@Override
 	protected int detectFeature(ImageFloat32 input, Object detector) {
 		SiftDetector alg = (SiftDetector)detector;
 
-		alg.process(input);
+		ss.constructPyramid(input);
+		ss.computeFeatureIntensity();
 
+		alg.process(ss);
 
 		return alg.getFoundPoints().size;
 	}
@@ -62,9 +66,12 @@ public class TestSiftDetector extends GenericFeatureDetector {
 		// render a checkered pattern
 		renderCheckered(input);
 
-		SiftDetector alg = FactoryInterestPointAlgs.siftDetector(1.6,5,4,false,2,1,-1,5);
+		SiftDetector alg = FactoryInterestPointAlgs.siftDetector(2,1,-1,5);
 
-		alg.process(input);
+		ss.constructPyramid(input);
+		ss.computeFeatureIntensity();
+
+		alg.process(ss);
 
 		List<ScalePoint> l = alg.getFoundPoints().toList();
 

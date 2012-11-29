@@ -179,6 +179,7 @@ public class FactoryInterestPoint {
 	 * Creates a SIFT feature detector.
 	 *
 	 * @see SiftDetector
+	 * @see SiftImageScaleSpace
 	 *
 	 * @param scaleSigma Amount of blur applied to each scale inside an octaves.  Try 1.6
 	 * @param numOfScales Number of scales per octaves.  Try 5.  Must be >= 3
@@ -198,10 +199,13 @@ public class FactoryInterestPoint {
 																	int maxFeaturesPerScale,
 																	double edgeThreshold )
 	{
-		SiftDetector alg = FactoryInterestPointAlgs.siftDetector(scaleSigma,numOfScales,numOfOctaves,doubleInputImage,
-				extractRadius,detectThreshold,maxFeaturesPerScale,edgeThreshold);
+		SiftDetector alg = FactoryInterestPointAlgs.siftDetector(extractRadius,detectThreshold,
+				maxFeaturesPerScale,edgeThreshold);
 
-		return new WrapSiftDetector(alg);
+		SiftImageScaleSpace ss = new SiftImageScaleSpace((float)scaleSigma, numOfScales, numOfOctaves,
+				doubleInputImage);
+
+		return new WrapSiftDetector(alg,ss);
 	}
 
 }

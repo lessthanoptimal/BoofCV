@@ -16,57 +16,64 @@
  * limitations under the License.
  */
 
-package boofcv.abst.feature.detect.interest;
+package boofcv.abst.feature.detdesc;
 
-import boofcv.alg.feature.detect.interest.SiftDetector;
-import boofcv.alg.feature.detect.interest.SiftImageScaleSpace;
+import boofcv.alg.feature.detdesc.DetectDescribeSift;
+import boofcv.struct.feature.SurfFeature;
 import boofcv.struct.image.ImageFloat32;
 import georegression.struct.point.Point2D_F64;
 
 /**
- * Wrapper around {@link SiftDetector} for {@link InterestPointDetector}.
+ * Wrapper around {@link DetectDescribeSift} for {@link DetectDescribePoint}.
  *
  * @author Peter Abeles
  */
-public class WrapSiftDetector implements InterestPointDetector<ImageFloat32> {
+public class WrapDetectDescribeSift implements DetectDescribePoint<ImageFloat32,SurfFeature> {
 
-	SiftImageScaleSpace ss;
-	SiftDetector detector;
+	DetectDescribeSift alg;
 
-	public WrapSiftDetector( SiftDetector detector ,
-							 SiftImageScaleSpace ss ) {
-		this.detector = detector;
-		this.ss = ss;
+	public WrapDetectDescribeSift(DetectDescribeSift alg) {
+		this.alg = alg;
+	}
+
+	@Override
+	public SurfFeature createDescription() {
+		return new SurfFeature(alg.getDescriptorLength());
+	}
+
+	@Override
+	public SurfFeature getDescriptor(int index) {
+		return alg.getFeatures().data[index];
+	}
+
+	@Override
+	public Class<SurfFeature> getDescriptorType() {
+		return SurfFeature.class;
 	}
 
 	@Override
 	public void detect(ImageFloat32 input) {
-
-		// compute initial octave's scale-space
-		ss.constructPyramid(input);
-		ss.computeFeatureIntensity();
-
-		detector.process(ss);
+		alg.process(input);
 	}
 
 	@Override
 	public int getNumberOfFeatures() {
-		return detector.getFoundPoints().size();
+		return alg.getFeatures().size;
 	}
 
 	@Override
 	public Point2D_F64 getLocation(int featureIndex) {
-		return detector.getFoundPoints().get(featureIndex);
+		return alg.getLocation().get(featureIndex);
 	}
 
 	@Override
 	public double getScale(int featureIndex) {
-		return detector.getFoundPoints().get(featureIndex).scale;
+		return alg.getFeatureScales().get(featureIndex);
 	}
 
 	@Override
 	public double getOrientation(int featureIndex) {
-		return 0;
+		return alg.getFeatureAngles().get(featureIndex);
 	}
 
 	@Override
@@ -76,6 +83,6 @@ public class WrapSiftDetector implements InterestPointDetector<ImageFloat32> {
 
 	@Override
 	public boolean hasOrientation() {
-		return false;
+		return true;
 	}
 }

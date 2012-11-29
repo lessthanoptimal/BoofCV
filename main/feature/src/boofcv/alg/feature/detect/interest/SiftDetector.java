@@ -62,7 +62,7 @@ import static boofcv.alg.feature.detect.interest.FastHessianFeatureDetector.poly
  */
 public class SiftDetector {
 
-	// Computes the scale space
+	// Contains the image's  scale space representation
 	protected SiftImageScaleSpace ss;
 
 	// finds features from 2D intensity image
@@ -95,18 +95,10 @@ public class SiftDetector {
 	 * Configures SIFT
 	 *
 	 * @param extractor Extracts local maximums from each scale.
-	 * @param doubleInputImage Should the input image be doubled? Try false.
-	 * @param numOfOctaves Number of octaves to detect.  Try 4
-	 * @param numOfScales Number of scales per octaves.  Try 5.  Must be >= 3
-	 * @param scaleSigma Amount of blur applied to each scale inside an octaves.  Try 1.6
 	 * @param maxFeaturesPerScale Max detected features per scale.  Image size dependent.  Try 500
 	 * @param edgeThreshold Threshold for edge filtering.  Disable with a value <= 0.  Try 5
 	 */
 	public SiftDetector(FeatureExtractor extractor,
-						boolean doubleInputImage ,
-						int numOfOctaves ,
-						int numOfScales ,
-						double scaleSigma ,
 						int maxFeaturesPerScale,
 						double edgeThreshold ) {
 		this.extractor = extractor;
@@ -115,8 +107,6 @@ public class SiftDetector {
 			this.maxFeatures = maxFeaturesPerScale/2;
 			selectBest = new SelectNBestFeatures(maxFeatures);
 		}
-
-		ss = new SiftImageScaleSpace(numOfOctaves,numOfScales,(float)scaleSigma,doubleInputImage );
 
 		// ignore features along the border since a 3x3 region is assumed in parts of the code
 		extractor.setIgnoreBorder(1);
@@ -155,14 +145,12 @@ public class SiftDetector {
 		derivYY.setImageBorder(border);
 	}
 
-	public void process( ImageFloat32 input ) {
+	public void process( SiftImageScaleSpace ss ) {
 		// set up data structures
 		foundPoints.reset();
+		this.ss = ss;
 
-		// compute initial octave's scale-space
-		ss.constructPyramid(input);
-		ss.computeFeatureIntensity();
-
+		// extract features in each octave
 		for( int octave = 0; octave < ss.numOctaves; octave++ ) {
 			// start processing at the second DOG since it needs the scales above and below
 			int indexDOG = octave*(ss.numScales-1)+1;
