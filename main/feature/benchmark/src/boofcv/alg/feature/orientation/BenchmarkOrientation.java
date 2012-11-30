@@ -19,11 +19,15 @@
 package boofcv.alg.feature.orientation;
 
 import boofcv.abst.feature.orientation.OrientationGradient;
+import boofcv.abst.feature.orientation.OrientationImage;
 import boofcv.abst.feature.orientation.OrientationIntegral;
+import boofcv.abst.feature.orientation.OrientationSiftToImage;
 import boofcv.abst.filter.derivative.ImageGradient;
+import boofcv.alg.feature.detect.interest.SiftImageScaleSpace;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.alg.transform.ii.GIntegralImageOps;
 import boofcv.core.image.GeneralizedImageOps;
+import boofcv.factory.feature.orientation.FactoryOrientationAlgs;
 import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.misc.Performer;
 import boofcv.misc.ProfileOperation;
@@ -56,6 +60,7 @@ public class BenchmarkOrientation<I extends ImageSingleBand, D extends ImageSing
 	ImageSingleBand ii;
 
 	Point2D_I32 pts[];
+	double scales[];
 
 	Class<I> imageType;
 	Class<D> derivType;
@@ -79,11 +84,13 @@ public class BenchmarkOrientation<I extends ImageSingleBand, D extends ImageSing
 		gradient.process(image,derivX,derivY);
 
 		pts = new Point2D_I32[NUM_POINTS];
+		scales = new double[NUM_POINTS];
 		int border = 6;
 		for( int i = 0; i < NUM_POINTS; i++ ) {
 			int x = rand.nextInt(width-border*2)+border;
 			int y = rand.nextInt(height-border*2)+border;
 			pts[i] = new Point2D_I32(x,y);
+			scales[i] = rand.nextDouble()*10+0.8;
 		}
 
 	}
@@ -101,7 +108,9 @@ public class BenchmarkOrientation<I extends ImageSingleBand, D extends ImageSing
 		@Override
 		public void process() {
 			alg.setImage(derivX,derivY);
-			for( Point2D_I32 p : pts ) {
+			for( int i = 0; i < pts.length; i++ ) {
+				Point2D_I32 p = pts[i];
+				alg.setScale(scales[i]);
 				alg.compute(p.x,p.y);
 			}
 		}
@@ -112,20 +121,22 @@ public class BenchmarkOrientation<I extends ImageSingleBand, D extends ImageSing
 		}
 	}
 
-	public class NoGradient implements Performer {
+	public class Image implements Performer {
 
-		OrientationImageAverage alg;
+		OrientationImage alg;
 		String name;
 
-		public NoGradient(String name, OrientationImageAverage alg) {
+		public Image(String name, OrientationImage alg) {
 			this.alg = alg;
 			this.name = name;
 		}
 
 		@Override
 		public void process() {
-			alg.setImage((ImageFloat32)image);
-			for( Point2D_I32 p : pts ) {
+			alg.setImage(image);
+			for( int i = 0; i < pts.length; i++ ) {
+				Point2D_I32 p = pts[i];
+				alg.setScale(scales[i]);
 				alg.compute(p.x,p.y);
 			}
 		}
@@ -149,7 +160,9 @@ public class BenchmarkOrientation<I extends ImageSingleBand, D extends ImageSing
 		@Override
 		public void process() {
 			alg.setImage(ii);
-			for( Point2D_I32 p : pts ) {
+			for( int i = 0; i < pts.length; i++ ) {
+				Point2D_I32 p = pts[i];
+				alg.setScale(scales[i]);
 				alg.compute(p.x,p.y);
 			}
 		}
@@ -164,7 +177,13 @@ public class BenchmarkOrientation<I extends ImageSingleBand, D extends ImageSing
 		System.out.println("=========  Profile Image Size " + width + " x " + height + " ========== "+imageType.getSimpleName());
 		System.out.println();
 
-		ProfileOperation.printOpsPerSec(new NoGradient("No Gradient", nogradient(RADIUS,imageType)), TEST_TIME);
+		OrientationHistogramSift sift = FactoryOrientationAlgs.sift(32,2.5,1.5);
+		SiftImageScaleSpace ss = new SiftImageScaleSpace(1.6f,5,4,false);
+		OrientationSiftToImage siftWrapped = new OrientationSiftToImage(sift,ss);
+
+
+		ProfileOperation.printOpsPerSec(new Image("SIFT", siftWrapped), TEST_TIME);
+		ProfileOperation.printOpsPerSec(new Image("No Gradient", nogradient(RADIUS,imageType)), TEST_TIME);
 		ProfileOperation.printOpsPerSec(new Gradient("Average", average(RADIUS,false,derivType)), TEST_TIME);
 		ProfileOperation.printOpsPerSec(new Gradient("Average W", average(RADIUS, true, derivType)), TEST_TIME);
 		ProfileOperation.printOpsPerSec(new Gradient("Histogram", histogram(15, RADIUS, false, derivType)), TEST_TIME);

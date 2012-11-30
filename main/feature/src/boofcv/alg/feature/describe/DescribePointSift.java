@@ -194,15 +194,21 @@ public class DescribePointSift {
 			for( int offX = startX; offX <= endX; offX++ ) {
 				int binIndex = (gridY+gridRadius+offY)*gridWidth + gridX+gridRadius+offX;
 
-				// compute distance from center of grid element
-				double distX = locX-(gridX+offX+0.5);
-				double distY = locY-(gridY+offY+0.5);
+				// Use an alternative weighting scheme.  You can view this as a very crude approximation
+				// of a Gaussian.  exp() function is very expensive
 
-				// Use a gaussian weighting here instead of
-				double d = distX*distX + distY*distY;
+				if( offX == 0 && offY == 0 ) {
+					histograms[binIndex][angleBin] += gradMag;
+				} else {
+					// compute distance from center of grid element
+					double distX = Math.abs(locX-(gridX+offX+0.5));
+					double distY = Math.abs(locY-(gridY+offY+0.5));
 
-				double w = Math.exp(-0.5*d*d/(0.5*0.5));
-				histograms[binIndex][angleBin] += w * gradMag;
+					if( distX < 1 && distY < 1 ) {
+						double w = (1-distX)*(1-distY);
+						histograms[binIndex][angleBin] += w * gradMag;
+					}
+				}
 			}
 		}
 	}

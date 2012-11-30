@@ -87,6 +87,8 @@ public class DetectDescribeSift {
 		ss.computeDerivatives();
 
 		detector.process(ss);
+		orientation.setScaleSpace(ss);
+		describe.setScaleSpace(ss);
 
 		FastQueue<ScalePoint> found = detector.getFoundPoints();
 

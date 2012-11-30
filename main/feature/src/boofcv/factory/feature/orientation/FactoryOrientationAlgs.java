@@ -19,10 +19,7 @@
 package boofcv.factory.feature.orientation;
 
 import boofcv.abst.feature.orientation.OrientationIntegral;
-import boofcv.alg.feature.orientation.OrientationAverage;
-import boofcv.alg.feature.orientation.OrientationHistogram;
-import boofcv.alg.feature.orientation.OrientationImageAverage;
-import boofcv.alg.feature.orientation.OrientationSlidingWindow;
+import boofcv.alg.feature.orientation.*;
 import boofcv.alg.feature.orientation.impl.*;
 import boofcv.struct.image.*;
 
@@ -173,5 +170,11 @@ public class FactoryOrientationAlgs {
 		return (OrientationIntegral<II>)
 				new ImplOrientationSlidingWindowIntegral(samplePeriod,
 						windowSize,radius,weightSigma, sampleWidth,integralType);
+	}
+
+	public static OrientationHistogramSift sift( int histogramSize ,
+												 double sigmaToRadius,
+												 double sigmaEnlarge ) {
+		return new OrientationHistogramSift(histogramSize,sigmaToRadius,sigmaEnlarge);
 	}
 }
