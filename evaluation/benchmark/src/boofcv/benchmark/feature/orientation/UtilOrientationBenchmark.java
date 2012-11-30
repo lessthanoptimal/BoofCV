@@ -19,8 +19,8 @@
 package boofcv.benchmark.feature.orientation;
 
 import boofcv.abst.feature.detect.interest.InterestPointDetector;
-import boofcv.alg.feature.orientation.OrientationImage;
-import boofcv.alg.feature.orientation.OrientationIntegral;
+import boofcv.abst.feature.orientation.OrientationImage;
+import boofcv.abst.feature.orientation.OrientationIntegral;
 import boofcv.alg.transform.ii.GIntegralImageOps;
 import boofcv.benchmark.feature.BenchmarkAlgorithm;
 import boofcv.core.image.GeneralizedImageOps;

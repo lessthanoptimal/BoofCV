@@ -18,7 +18,11 @@
 
 package boofcv.factory.feature.orientation;
 
-import boofcv.alg.feature.orientation.*;
+import boofcv.abst.feature.orientation.OrientationIntegral;
+import boofcv.alg.feature.orientation.OrientationAverage;
+import boofcv.alg.feature.orientation.OrientationHistogram;
+import boofcv.alg.feature.orientation.OrientationImageAverage;
+import boofcv.alg.feature.orientation.OrientationSlidingWindow;
 import boofcv.alg.feature.orientation.impl.*;
 import boofcv.struct.image.*;
 
@@ -109,13 +113,22 @@ public class FactoryOrientationAlgs {
 		return ret;
 	}
 
-	public static <T extends ImageSingleBand>
-	OrientationIntegral<T> average_ii( int radius , double samplePeriod , int sampleWidth,
-									   double weightSigma , Class<T> imageType)
+	/**
+	 *
+	 * @param radius Radius of the region being considered in terms of samples. Typically 6.
+	 * @param samplePeriod How often the image is sampled.  This number is scaled.  Typically 1.
+	 * @param sampleWidth How wide of a kernel should be used to sample. Try 6
+	 * @param weightSigma Sigma for weighting.  zero for unweighted. Try 0.
+	 * @param integralType Type of image being processed.
+	 * @return OrientationIntegral
+	 */
+	public static <II extends ImageSingleBand>
+	OrientationIntegral<II> average_ii( int radius , double samplePeriod , int sampleWidth,
+									   double weightSigma , Class<II> integralType)
 	{
-		return (OrientationIntegral<T>)
+		return (OrientationIntegral<II>)
 				new ImplOrientationAverageGradientIntegral(radius,samplePeriod,sampleWidth,weightSigma
-						,imageType);
+						,integralType);
 	}
 
 	/**
@@ -127,16 +140,16 @@ public class FactoryOrientationAlgs {
 	 * @param samplePeriod How often the image is sampled.  This number is scaled.  Typically 1.
 	 * @param sampleWidth How wide of a kernel should be used to sample. Try 4
 	 * @param weightSigma Sigma for weighting.  zero for unweighted.
-	 * @param imageType Type of image being processed.
+	 * @param integralImage Type of image being processed.
 	 * @return OrientationIntegral
 	 */
-	public static <T extends ImageSingleBand>
-	OrientationIntegral<T> image_ii( int radius , double samplePeriod , int sampleWidth,
-									 double weightSigma , Class<T> imageType)
+	public static <II extends ImageSingleBand>
+	OrientationIntegral<II> image_ii( int radius , double samplePeriod , int sampleWidth,
+									 double weightSigma , Class<II> integralImage)
 	{
-		return (OrientationIntegral<T>)
+		return (OrientationIntegral<II>)
 				new ImplOrientationImageAverageIntegral(radius,samplePeriod,sampleWidth,weightSigma
-						,imageType);
+						,integralImage);
 	}
 
 	/**
@@ -145,20 +158,20 @@ public class FactoryOrientationAlgs {
 	 *
 	 * @see OrientationSlidingWindow
 	 *
-	 * @param samplePeriod How often the image is sampled.  This number is scaled.  Typically 1.
-	 * @param windowSize Angular window that is slide across
-	 * @param radius Radius of the region being considered in terms of samples. Typically 6.
-	 * @param weightSigma Sigma for weighting distribution.  Zero for unweighted.
-	 * @param sampleWidth Size of kernel doing the sampling.  Typically 4.
-	 * @param imageType Type of image being processed.
+	 * @param samplePeriod How often the image is sampled.  This number is scaled.  Typically 0.65.
+	 * @param windowSize Angular window that is slide across.  Try PI/3
+	 * @param radius Radius of the region being considered in terms of samples. Typically 8.
+	 * @param weightSigma Sigma for weighting distribution.  Zero for unweighted. Try 0
+	 * @param sampleWidth Size of kernel doing the sampling.  Typically 6.
+	 * @param integralType Type of integral image being processed.
 	 * @return OrientationIntegral
 	 */
-	public static <T extends ImageSingleBand>
-	OrientationIntegral<T> sliding_ii(double samplePeriod, double windowSize, int radius,
-									  double weightSigma, int sampleWidth, Class<T> imageType)
+	public static <II extends ImageSingleBand>
+	OrientationIntegral<II> sliding_ii(double samplePeriod, double windowSize, int radius,
+									  double weightSigma, int sampleWidth, Class<II> integralType)
 	{
-		return (OrientationIntegral<T>)
+		return (OrientationIntegral<II>)
 				new ImplOrientationSlidingWindowIntegral(samplePeriod,
-						windowSize,radius,weightSigma, sampleWidth,imageType);
+						windowSize,radius,weightSigma, sampleWidth,integralType);
 	}
 }

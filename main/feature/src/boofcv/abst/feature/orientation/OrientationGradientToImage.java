@@ -16,46 +16,53 @@
  * limitations under the License.
  */
 
-package boofcv.alg.feature.orientation;
+package boofcv.abst.feature.orientation;
 
-import boofcv.abst.feature.orientation.OrientationImage;
-import boofcv.abst.feature.orientation.OrientationIntegral;
-import boofcv.alg.transform.ii.GIntegralImageOps;
+import boofcv.abst.filter.derivative.ImageGradient;
+import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.ImageSingleBand;
 
 /**
- * Converts an {@link boofcv.abst.feature.orientation.OrientationIntegral} into {@link boofcv.abst.feature.orientation.OrientationImage}.
+ * Converts an implementation of {@link OrientationGradient} into {@link OrientationImage}.
  *
  * @author Peter Abeles
  */
-public class OrientationIntegralToImage<T extends ImageSingleBand, II extends ImageSingleBand>
+public class OrientationGradientToImage<T extends ImageSingleBand, D extends ImageSingleBand>
 	implements OrientationImage<T>
 {
-	private Class<T> imageType;
-	private OrientationIntegral<II> alg;
+	ImageGradient<T,D> gradient;
+	OrientationGradient<D> alg;
 
-	// converted integral image of input image
-	private II ii;
+	// storage for image gradient
+	D derivX;
+	D derivY;
 
-	public OrientationIntegralToImage(OrientationIntegral<II> alg, Class<T> imageType) {
+	// Input image type
+	Class<T> inputType;
+
+	public OrientationGradientToImage(OrientationGradient<D> alg,
+									  ImageGradient<T, D> gradient,
+									  Class<T> inputType ,
+									  Class<D> gradientType ) {
 		this.alg = alg;
-		this.imageType = imageType;
+		this.gradient = gradient;
+		this.inputType = inputType;
+
+		derivX = GeneralizedImageOps.createSingleBand(gradientType,1,1);
+		derivY = GeneralizedImageOps.createSingleBand(gradientType,1,1);
 	}
 
 	@Override
 	public void setImage(T image) {
-		if( ii != null ) {
-			ii.reshape(image.width,image.height);
-		}
+		derivX.reshape(image.width,image.height);
+		derivY.reshape(image.width,image.height);
 
-		// compute integral image
-		ii = GIntegralImageOps.transform(image, ii);
-		alg.setImage(ii);
+		gradient.process(image,derivX,derivY);
 	}
 
 	@Override
 	public Class<T> getImageType() {
-		return imageType;
+		return inputType;
 	}
 
 	@Override

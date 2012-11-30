@@ -18,26 +18,22 @@
 
 package boofcv.examples;
 
-import boofcv.abst.feature.describe.DescribeRegionPoint;
+import boofcv.abst.feature.detdesc.DetectDescribePoint;
 import boofcv.abst.feature.detect.extract.FeatureExtractor;
-import boofcv.abst.feature.detect.interest.InterestPointDetector;
+import boofcv.abst.feature.orientation.OrientationIntegral;
 import boofcv.alg.feature.describe.DescribePointSurf;
 import boofcv.alg.feature.detect.interest.FastHessianFeatureDetector;
-import boofcv.alg.feature.orientation.OrientationIntegral;
 import boofcv.alg.transform.ii.GIntegralImageOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.feature.describe.FactoryDescribePointAlgs;
-import boofcv.factory.feature.describe.FactoryDescribeRegionPoint;
+import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
 import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
-import boofcv.factory.feature.detect.interest.FactoryInterestPoint;
 import boofcv.factory.feature.orientation.FactoryOrientationAlgs;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.feature.ScalePoint;
 import boofcv.struct.feature.SurfFeature;
-import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
-import georegression.struct.point.Point2D_F64;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -57,40 +53,14 @@ public class ExampleFeatureSurf {
 	 */
 	public static void easy( ImageFloat32 image ) {
 		// create the detector and descriptors
-		InterestPointDetector<ImageFloat32> detector = FactoryInterestPoint.fastHessian(0, 2, 200, 2, 9, 4, 4);
-		// BoofCV has two SURF implementations.
-		// surfm() = slower, but more accurate.  surf() = faster and less accurate
-		DescribeRegionPoint<ImageFloat32,SurfFeature> descriptor =
-				FactoryDescribeRegionPoint.surfm(true,ImageFloat32.class);
-		
-		// just pointing out that orientation does not need to be passed into the descriptor
-		if( descriptor.requiresOrientation() )
-			throw new RuntimeException("SURF should compute orientation itself!");
-		
-		// detect interest points
-		detector.detect(image);
-		 // specify the image to process
-		descriptor.setImage(image);
-		
-		List<Point2D_F64> locations = new ArrayList<Point2D_F64>();
-		List<TupleDesc_F64> descriptions = new ArrayList<TupleDesc_F64>();
-		
-		for( int i = 0; i < detector.getNumberOfFeatures(); i++ ) {
-			// information about hte detected interest point
-			Point2D_F64 p = detector.getLocation(i);
-			double scale = detector.getScale(i);
-			
-			// extract the SURF description for this region
-			SurfFeature desc = descriptor.createDescription();
-			descriptor.process(p.x,p.y,0,scale,desc);
-			
-			// save everything for processing later on
-			descriptions.add(desc);
-			locations.add(p);
-		}
+		DetectDescribePoint<ImageFloat32,SurfFeature>
+				surf = FactoryDetectDescribe.surf(0, 2, 200, 2, 9, 4, 4, true, ImageFloat32.class);
 
-		System.out.println("Found Features: "+locations.size());
-		System.out.println("First descriptor's first value: "+descriptions.get(0).value[0]);
+		 // specify the image to process
+		surf.detect(image);
+
+		System.out.println("Found Features: "+surf.getNumberOfFeatures());
+		System.out.println("First descriptor's first value: "+surf.getDescriptor(0).value[0]);
 	}
 
 	/**

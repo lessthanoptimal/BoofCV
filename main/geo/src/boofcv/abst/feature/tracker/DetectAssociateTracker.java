@@ -19,12 +19,10 @@
 package boofcv.abst.feature.tracker;
 
 import boofcv.abst.feature.associate.GeneralAssociation;
-import boofcv.abst.feature.describe.DescribeRegionPoint;
-import boofcv.abst.feature.detect.interest.InterestPointDetector;
+import boofcv.abst.feature.detdesc.DetectDescribePoint;
 import boofcv.struct.FastQueue;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.TupleDesc;
-import boofcv.struct.feature.TupleDescQueue;
 import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.point.Point2D_F64;
 
@@ -44,10 +42,8 @@ import java.util.List;
 public class DetectAssociateTracker<I extends ImageSingleBand, D extends TupleDesc>
 		implements ImagePointTracker<I> {
 
-	// detects features inside the image
-	InterestPointDetector<I> detector;
-	// describes features using local information
-	DescribeRegionPoint<I,D> describe;
+	// Feature detector and describer
+	DetectDescribePoint<I,D> detDesc;
 	// associates features between two images together
 	GeneralAssociation<D> associate;
 
@@ -86,23 +82,20 @@ public class DetectAssociateTracker<I extends ImageSingleBand, D extends TupleDe
 	/**
 	 * Configures tracker
 	 *
-	 * @param detector Feature detector
-	 * @param describe Feature descriptor
+	 * @param detDesc Feature detector and descriptor
 	 * @param associate Association
 	 * @param updateDescription If true then the feature description will be updated after each image.
 	 *                          Typically this should be false.
 	 */
-	public DetectAssociateTracker(InterestPointDetector<I> detector,
-								  DescribeRegionPoint<I, D> describe,
-								  GeneralAssociation<D> associate ,
-								  boolean updateDescription ) {
-		this.detector = detector;
-		this.describe = describe;
+	public DetectAssociateTracker( final DetectDescribePoint<I,D> detDesc ,
+								   final GeneralAssociation<D> associate ,
+								   final boolean updateDescription ) {
+		this.detDesc = detDesc;
 		this.associate = associate;
 		this.updateDescription = updateDescription;
 
-		featSrc = new TupleDescQueue<D>(describe,false);
-		featDst = new TupleDescQueue<D>(describe,true);
+		featSrc = new FastQueue<D>(10,detDesc.getDescriptorType(),false);
+		featDst = new FastQueue<D>(10,detDesc.getDescriptorType(),false);
 	}
 
 	public boolean isUpdateDescription() {
@@ -128,8 +121,7 @@ public class DetectAssociateTracker<I extends ImageSingleBand, D extends TupleDe
 	@Override
 	public void process( I input ) {
 
-		detector.detect(input);
-		describe.setImage(input);
+		detDesc.detect(input);
 
 		tracksActive.clear();
 		tracksDropped.clear();
@@ -142,20 +134,12 @@ public class DetectAssociateTracker<I extends ImageSingleBand, D extends TupleDe
 			srcAssociated = new boolean[ tracksAll.size() ];
 		}
 
-		int N = detector.getNumberOfFeatures();
+		int N = detDesc.getNumberOfFeatures();
 		for( int i = 0; i < N; i++ ) {
 			Point2D_F64 p = locDst.grow();
-			p.set(detector.getLocation(i));
+			p.set(detDesc.getLocation(i));
 
-			double yaw = detector.getOrientation(i);
-			double scale = detector.getScale(i);
-
-			if( describe.isInBounds(p.x,p.y,yaw,scale)) {
-				D desc = featDst.grow();
-				describe.process(p.x,p.y,yaw,scale,desc);
-			} else {
-				locDst.removeTail();
-			}
+			featDst.add( detDesc.getDescriptor(i));
 		}
 
 		// skip if there are no features to match with the current image
@@ -250,7 +234,7 @@ public class DetectAssociateTracker<I extends ImageSingleBand, D extends TupleDe
 			p = unused.remove( unused.size()-1 );
 		} else {
 			p = new PointTrack();
-			p.setDescription(describe.createDescription());
+			p.setDescription(detDesc.createDescription());
 		}
 		return p;
 	}

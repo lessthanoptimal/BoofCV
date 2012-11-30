@@ -18,6 +18,7 @@
 
 package boofcv.alg.feature.orientation;
 
+import boofcv.abst.feature.orientation.OrientationImage;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.ImageRectangle;
 import boofcv.struct.convolve.Kernel2D_F32;

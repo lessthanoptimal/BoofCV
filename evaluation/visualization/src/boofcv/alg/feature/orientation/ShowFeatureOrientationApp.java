@@ -19,6 +19,9 @@
 package boofcv.alg.feature.orientation;
 
 import boofcv.abst.feature.detect.interest.GeneralFeatureDetector;
+import boofcv.abst.feature.orientation.OrientationGradient;
+import boofcv.abst.feature.orientation.OrientationIntegral;
+import boofcv.abst.feature.orientation.RegionOrientation;
 import boofcv.abst.filter.derivative.AnyImageDerivative;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.alg.transform.ii.GIntegralImageOps;

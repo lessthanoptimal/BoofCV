@@ -40,7 +40,7 @@ public class TestOrientationHistogramSift {
 			new SiftImageScaleSpace(1.6f,5,4,false);
 
 	// accuracy tolerance
-	double tol =  2*Math.PI/36.0;
+	double tol =  1e-5;//2*Math.PI/36.0;
 
 	public TestOrientationHistogramSift() {
 		ss.constructPyramid( new ImageFloat32(width,height));
@@ -54,6 +54,7 @@ public class TestOrientationHistogramSift {
 
 		for( int i = 0; i < 100; i++ ) {
 			double theta = 2*Math.PI*i/100.0;
+			theta = UtilAngle.bound(theta);
 
 			double dx = Math.cos(theta);
 			double dy = Math.sin(theta);
@@ -68,7 +69,7 @@ public class TestOrientationHistogramSift {
 			assertEquals(1,found.size);
 
 			double error = Math.abs(UtilAngle.distHalf(theta, found.get(0)));
-			assertTrue(error <= tol);
+			assertTrue("i = "+i+" theta = "+theta+" found "+found.get(0),error <= tol);
 		}
 	}
 

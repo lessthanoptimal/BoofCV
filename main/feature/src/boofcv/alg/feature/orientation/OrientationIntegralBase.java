@@ -18,6 +18,7 @@
 
 package boofcv.alg.feature.orientation;
 
+import boofcv.abst.feature.orientation.OrientationIntegral;
 import boofcv.alg.feature.describe.SurfDescribeOps;
 import boofcv.factory.filter.kernel.FactoryKernelGaussian;
 import boofcv.struct.convolve.Kernel2D_F64;
@@ -33,11 +34,11 @@ import boofcv.struct.sparse.SparseScaleGradient;
  *
  * @author Peter Abeles
  */
-public abstract class OrientationIntegralBase<T extends ImageSingleBand,G extends GradientValue>
-		implements OrientationIntegral<T>
+public abstract class OrientationIntegralBase<II extends ImageSingleBand,G extends GradientValue>
+		implements OrientationIntegral<II>
 {
 	// integral image transform of input image
-	protected T ii;
+	protected II ii;
 
 	// the scale at which the feature was detected
 	protected double scale=1;
@@ -56,9 +57,9 @@ public abstract class OrientationIntegralBase<T extends ImageSingleBand,G extend
 	protected double period;
 
 	// used to sample the image when it's on the image's border
-	protected SparseScaleGradient<T,G> g;
+	protected SparseScaleGradient<II,G> g;
 
-	Class<T> imageType;
+	Class<II> integralType;
 	/**
 	 * Configure orientation estimation.
 	 *
@@ -69,16 +70,16 @@ public abstract class OrientationIntegralBase<T extends ImageSingleBand,G extend
 	 */
 	public OrientationIntegralBase(int radius, double period, 
 								   int sampleWidth , double weightSigma ,
-								   Class<T> imageType ) {
+								   Class<II> integralType) {
 		this.radius = radius;
 		this.period = period;
 		this.sampleWidth = sampleWidth;
 		this.width = radius*2+1;
-		this.imageType = imageType;
+		this.integralType = integralType;
 		if( weightSigma != 0 )
 			this.weights = FactoryKernelGaussian.gaussian(2,true, 64, weightSigma,radius);
 
-		g = (SparseScaleGradient<T,G>)SurfDescribeOps.createGradient(false, sampleWidth, imageType);
+		g = (SparseScaleGradient<II,G>)SurfDescribeOps.createGradient(false, sampleWidth, integralType);
 	}
 	
 	@Override
@@ -88,13 +89,13 @@ public abstract class OrientationIntegralBase<T extends ImageSingleBand,G extend
 	}
 
 	@Override
-	public void setImage(T integralImage) {
+	public void setImage(II integralImage) {
 		this.ii = integralImage;
 		g.setImage(ii);
 	}
 
 	@Override
-	public Class<T> getImageType() {
-		return imageType;
+	public Class<II> getImageType() {
+		return integralType;
 	}
 }

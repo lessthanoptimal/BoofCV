@@ -18,6 +18,7 @@
 
 package boofcv.alg.feature.orientation;
 
+import boofcv.abst.feature.orientation.OrientationImage;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.ImageSingleBand;
 import georegression.metric.UtilAngle;
@@ -26,7 +27,7 @@ import static org.junit.Assert.assertTrue;
 
 
 /**
- * Generic tests for implementers of {@link boofcv.alg.feature.orientation.OrientationGradient}.
+ * Generic tests for implementers of {@link boofcv.abst.feature.orientation.OrientationGradient}.
  *
  * @author Peter Abeles
  */

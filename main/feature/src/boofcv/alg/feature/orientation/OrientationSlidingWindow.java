@@ -18,6 +18,7 @@
 
 package boofcv.alg.feature.orientation;
 
+import boofcv.abst.feature.orientation.OrientationGradient;
 import boofcv.alg.InputSanityCheck;
 import boofcv.factory.filter.kernel.FactoryKernelGaussian;
 import boofcv.misc.BoofMiscOps;

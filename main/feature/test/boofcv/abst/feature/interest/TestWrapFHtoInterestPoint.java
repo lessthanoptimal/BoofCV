@@ -21,10 +21,7 @@ package boofcv.abst.feature.interest;
 import boofcv.abst.feature.detect.extract.FeatureExtractor;
 import boofcv.abst.feature.detect.interest.WrapFHtoInterestPoint;
 import boofcv.alg.feature.detect.interest.FastHessianFeatureDetector;
-import boofcv.alg.feature.orientation.OrientationIntegral;
 import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
-import boofcv.factory.feature.orientation.FactoryOrientationAlgs;
-import boofcv.struct.image.ImageSInt32;
 import boofcv.struct.image.ImageUInt8;
 import org.junit.Test;
 
@@ -39,19 +36,11 @@ public class TestWrapFHtoInterestPoint {
 	FastHessianFeatureDetector detector = new FastHessianFeatureDetector(extractor,150,
 			1,9, 4,4);
 
-	OrientationIntegral orientation = FactoryOrientationAlgs.image_ii(5,1,4,0, ImageSInt32.class);
-
 	@Test
-	public void NO_Orientation() {
+	public void standard() {
 		WrapFHtoInterestPoint alg = new WrapFHtoInterestPoint(detector);
 
 		new GeneralInterestPointDetectorChecks(alg,false,true,ImageUInt8.class){}.performAllTests();
 	}
 
-	@Test
-	public void With_Orientation() {
-		WrapFHtoInterestPoint alg = new WrapFHtoInterestPoint(detector,orientation);
-
-		new GeneralInterestPointDetectorChecks(alg,true,true,ImageUInt8.class){}.performAllTests();
-	}
 }

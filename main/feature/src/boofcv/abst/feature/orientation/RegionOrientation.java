@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.feature.orientation;
+package boofcv.abst.feature.orientation;
 
 
 /**

@@ -21,18 +21,19 @@ package boofcv.alg.feature.associate;
 import boofcv.abst.feature.describe.DescribeRegionPoint;
 import boofcv.abst.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.abst.feature.detect.interest.InterestPointDetector;
-import boofcv.alg.feature.orientation.OrientationImageAverage;
+import boofcv.abst.feature.orientation.OrientationImage;
+import boofcv.abst.feature.orientation.OrientationIntegral;
+import boofcv.alg.transform.ii.GIntegralImageOps;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.feature.describe.FactoryDescribeRegionPoint;
 import boofcv.factory.feature.detect.interest.FactoryDetectPoint;
 import boofcv.factory.feature.detect.interest.FactoryInterestPoint;
-import boofcv.factory.feature.orientation.FactoryOrientationAlgs;
+import boofcv.factory.feature.orientation.FactoryOrientation;
 import boofcv.gui.SelectAlgorithmAndInputPanel;
 import boofcv.gui.feature.AssociationScorePanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.PathLabel;
-import boofcv.struct.BoofDefaults;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
@@ -58,7 +59,7 @@ public class VisualizeAssociationScoreApp<T extends ImageSingleBand, D extends I
 	// These classes process the input images and compute association score
 	InterestPointDetector<T> detector;
 	DescribeRegionPoint<T, TupleDesc> describe;
-	OrientationImageAverage<T> orientation;
+	OrientationImage<T> orientation;
 
 	// gray scale versions of input image
 	T imageLeft;
@@ -82,11 +83,12 @@ public class VisualizeAssociationScoreApp<T extends ImageSingleBand, D extends I
 
 		GeneralFeatureDetector<T, D> alg;
 
+		// TODO add orientation
 		addAlgorithm(0, "Fast Hessian", FactoryInterestPoint.fastHessian(1, 2, 200, 1, 9, 4, 4));
 		alg = FactoryDetectPoint.createShiTomasi(2, false, 1, 500, derivType);
-		addAlgorithm(0, "KLT", FactoryInterestPoint.wrapPoint(alg, imageType, derivType));
+		addAlgorithm(0, "Shi-Tomasi", FactoryInterestPoint.wrapPoint(alg, imageType, derivType));
 
-		addAlgorithm(1, "SURF", FactoryDescribeRegionPoint.surfm(true, imageType));
+		addAlgorithm(1, "SURF", FactoryDescribeRegionPoint.surf(true, imageType));
 		addAlgorithm(1, "BRIEF", FactoryDescribeRegionPoint.brief(16, 512, -1, 4, true, imageType));
 		addAlgorithm(1, "BRIEFO", FactoryDescribeRegionPoint.brief(16, 512, -1, 4, false, imageType));
 		addAlgorithm(1, "Gaussian 12", FactoryDescribeRegionPoint.gaussian12(20, imageType, derivType));
@@ -94,7 +96,10 @@ public class VisualizeAssociationScoreApp<T extends ImageSingleBand, D extends I
 		addAlgorithm(1, "Pixel 11x11", FactoryDescribeRegionPoint.pixel(11, 11, imageType));
 		addAlgorithm(1, "NCC 11x11", FactoryDescribeRegionPoint.pixelNCC(11, 11, imageType));
 
-		orientation = FactoryOrientationAlgs.nogradient(5, imageType);
+		// estimate orientation using this once since it is fast
+		Class integralType = GIntegralImageOps.getIntegralType(imageType);
+		OrientationIntegral orientationII = FactoryOrientation.surfDefault(true, integralType);
+		orientation = FactoryOrientation.convertImage(orientationII, imageType);
 
 		controlPanel = new VisualizeScorePanel(this);
 		scorePanel = new AssociationScorePanel<TupleDesc>(3);
@@ -211,7 +216,7 @@ public class VisualizeAssociationScoreApp<T extends ImageSingleBand, D extends I
 				Point2D_F64 pt = detector.getLocation(i);
 				double scale = detector.getScale(i);
 				if (describe.requiresOrientation()) {
-					orientation.setRadius((int) (BoofDefaults.SCALE_SPACE_CANONICAL_RADIUS * scale));
+					orientation.setScale(scale);
 					yaw = orientation.compute(pt.x, pt.y);
 				}
 
@@ -223,7 +228,7 @@ public class VisualizeAssociationScoreApp<T extends ImageSingleBand, D extends I
 			}
 		} else {
 			// just set the scale to one in this case
-			orientation.setRadius(3);
+			orientation.setScale(1);
 			for (int i = 0; i < detector.getNumberOfFeatures(); i++) {
 				double yaw = 0;
 

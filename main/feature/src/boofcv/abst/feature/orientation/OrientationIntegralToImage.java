@@ -16,46 +16,47 @@
  * limitations under the License.
  */
 
-package boofcv.alg.feature.orientation;
+package boofcv.abst.feature.orientation;
 
-import boofcv.abst.feature.orientation.OrientationImage;
-import boofcv.abst.feature.orientation.OrientationIntegral;
 import boofcv.alg.transform.ii.GIntegralImageOps;
+import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.ImageSingleBand;
 
 /**
- * Converts an {@link boofcv.abst.feature.orientation.OrientationIntegral} into {@link boofcv.abst.feature.orientation.OrientationImage}.
+ * Converts an implementation of {@link OrientationIntegral} into {@link OrientationImage}.
  *
  * @author Peter Abeles
  */
 public class OrientationIntegralToImage<T extends ImageSingleBand, II extends ImageSingleBand>
 	implements OrientationImage<T>
 {
-	private Class<T> imageType;
-	private OrientationIntegral<II> alg;
+	// algorithm which is being wrapped around
+	OrientationIntegral<II> alg;
 
-	// converted integral image of input image
-	private II ii;
+	// input image converted into an integral image
+	II integralImage;
 
-	public OrientationIntegralToImage(OrientationIntegral<II> alg, Class<T> imageType) {
+	// type of input image
+	Class<T> inputType;
+
+	public OrientationIntegralToImage(OrientationIntegral<II> alg,
+									  Class<T> inputType ,
+									  Class<II> integralType ) {
 		this.alg = alg;
-		this.imageType = imageType;
+		this.inputType = inputType;
+		integralImage = GeneralizedImageOps.createSingleBand(integralType, 1, 1);
 	}
 
 	@Override
 	public void setImage(T image) {
-		if( ii != null ) {
-			ii.reshape(image.width,image.height);
-		}
-
-		// compute integral image
-		ii = GIntegralImageOps.transform(image, ii);
-		alg.setImage(ii);
+		integralImage.reshape(image.width,image.height);
+		GIntegralImageOps.transform(image, integralImage);
+		alg.setImage(integralImage);
 	}
 
 	@Override
 	public Class<T> getImageType() {
-		return imageType;
+		return inputType;
 	}
 
 	@Override

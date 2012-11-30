@@ -20,7 +20,7 @@ package boofcv.abst.feature.detdesc;
 
 import boofcv.abst.feature.describe.DescribeRegionPoint;
 import boofcv.abst.feature.detect.interest.InterestPointDetector;
-import boofcv.alg.feature.orientation.OrientationImage;
+import boofcv.abst.feature.orientation.OrientationImage;
 import boofcv.struct.FastQueue;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.image.ImageSingleBand;

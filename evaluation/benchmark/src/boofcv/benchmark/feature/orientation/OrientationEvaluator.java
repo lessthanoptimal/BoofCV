@@ -19,10 +19,10 @@
 package boofcv.benchmark.feature.orientation;
 
 import boofcv.abst.feature.detect.interest.InterestPointDetector;
+import boofcv.abst.feature.orientation.OrientationGradient;
+import boofcv.abst.feature.orientation.OrientationImage;
+import boofcv.abst.feature.orientation.RegionOrientation;
 import boofcv.abst.filter.derivative.ImageGradient;
-import boofcv.alg.feature.orientation.OrientationGradient;
-import boofcv.alg.feature.orientation.OrientationImage;
-import boofcv.alg.feature.orientation.RegionOrientation;
 import boofcv.benchmark.feature.BenchmarkAlgorithm;
 import boofcv.benchmark.feature.distort.StabilityEvaluatorPoint;
 import boofcv.core.image.GeneralizedImageOps;

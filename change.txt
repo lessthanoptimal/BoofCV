@@ -25,6 +25,15 @@ Version : Alpha 0.12
   * SurfFeature
   * TupleDesc_B
   * NccFeature
+- Feature Descriptors
+  * No longer have hidden orienation estimation algorithms inside
+- Feature Orienation
+  * Interfaces moved to abst package
+  * Created wrappers to convert different types into image input
+  * Added a new factory
+- Created DetectDescribePoint interface
+  * Combines detection and describing into a single interface
+  * Useful for algorithms which have coupled data structures are are more efficient this way.
 - FactoryPointSequentialTracker has been tweaked a bit
 - GeneralAssociation provides two functions for specifying the source and destination lists
   * Allows better optimization since preprocessing might only need to be done once
@@ -44,6 +53,8 @@ Version : Alpha 0.12
   * It was poorly implemented
   * Was not consistent with scale-space theory
 - Added 2D convolution in KernelMath
+- Maven build has been added.
+  * BoofCV is on the central repository
 
 ---------------------------------------------
 Date    : 2012/11/6

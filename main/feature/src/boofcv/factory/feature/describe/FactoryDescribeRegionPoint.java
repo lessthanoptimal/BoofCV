@@ -28,13 +28,9 @@ import boofcv.alg.feature.describe.DescribePointSurf;
 import boofcv.alg.feature.describe.brief.BriefDefinition_I32;
 import boofcv.alg.feature.describe.brief.FactoryBriefDefinition;
 import boofcv.alg.feature.detect.interest.SiftImageScaleSpace;
-import boofcv.alg.feature.orientation.OrientationHistogramSift;
-import boofcv.alg.feature.orientation.OrientationIntegral;
 import boofcv.alg.transform.ii.GIntegralImageOps;
-import boofcv.factory.feature.orientation.FactoryOrientationAlgs;
 import boofcv.factory.filter.blur.FactoryBlurFilter;
 import boofcv.factory.filter.derivative.FactoryDerivative;
-import boofcv.struct.BoofDefaults;
 import boofcv.struct.feature.*;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
@@ -51,57 +47,36 @@ public class FactoryDescribeRegionPoint {
 
 	/**
 	 * <p>
-	 * Standard SURF descriptor configured to balance speed and descriptor stability. Invariant
-	 * to illumination, orientation, and scale.  Stability is a bit less than the reference
-	 * implementation provided by the original author.
+	 * Creates a SURF descriptor.  SURF descriptors are invariant to illumination, orientation, and scale.
+	 * BoofCV provides two variants. BoofCV provides two variants, described below.
 	 * </p>
 	 *
-	 * @see DescribePointSurf
-	 *
-	 * @param isOriented True for orientation invariant.
-	 * @param imageType Type of input image.
-	 * @return SURF description extractor
-	 */
-	public static <T extends ImageSingleBand, II extends ImageSingleBand>
-	DescribeRegionPoint<T,SurfFeature> surf( boolean isOriented , Class<T> imageType) {
-		OrientationIntegral<II> orientation = null;
-
-		Class<II> integralType = GIntegralImageOps.getIntegralType(imageType);
-
-		if( isOriented )
-//			orientation = FactoryOrientationAlgs.image_ii(6, 1 , 6, -1, integralType);
-			orientation = FactoryOrientationAlgs.average_ii(6, 1 , 6, -1, integralType);
-//			orientation = FactoryOrientationAlgs.sliding_ii(42,Math.PI/3.0,6,true,integralType);
-
-		DescribePointSurf<II> alg = FactoryDescribePointAlgs.<II>surf(integralType);
-		return new WrapDescribeSurf<T,II>( alg ,orientation);
-	}
-
-	/**
 	 * <p>
-	 * Modified SURF descriptor configured for optimal descriptor stability.  Runs slower
-	 * than {@link #surf(boolean, Class)}, but produces more stable results.  Stability is very
-	 * similar to reference implementation provided by the original author.
-	 * </p>
+	 * The modified variant provides comparable stability to binary provided by the original author.  The
+	 * other variant is much faster, but a bit less stable, Both implementations contain several algorithmic
+	 * changes from what was described in the original SURF paper.  See tech report [1] for details.
+	 * <p>
 	 *
 	 * @see DescribePointSurf
 	 *
-	 * @param isOriented True for orientation invariant.
+	 * @param modified True for more stable but slower and false for a faster but less stable.
 	 * @param imageType Type of input image.
 	 * @return SURF description extractor
 	 */
 	public static <T extends ImageSingleBand, II extends ImageSingleBand>
-	DescribeRegionPoint<T,SurfFeature> surfm(boolean isOriented, Class<T> imageType) {
-		OrientationIntegral<II> orientation = null;
+	DescribeRegionPoint<T,SurfFeature> surf( boolean modified , Class<T> imageType) {
 
 		Class<II> integralType = GIntegralImageOps.getIntegralType(imageType);
 
-		if( isOriented )
-//			orientation = FactoryOrientationAlgs.average_ii(6, true, integralType);
-			orientation = FactoryOrientationAlgs.sliding_ii(0.65, Math.PI / 3.0, 8, -1, 6, integralType);
+		DescribePointSurf<II> alg;
 
-		DescribePointSurf<II> alg = FactoryDescribePointAlgs.<II>msurf(integralType);
-		return new WrapDescribeSurf<T,II>( alg ,orientation);
+		if( modified ) {
+			alg = FactoryDescribePointAlgs.<II>msurf(integralType);
+		} else {
+			alg = FactoryDescribePointAlgs.<II>surf(integralType);
+		}
+
+		return new WrapDescribeSurf<T,II>( alg );
 	}
 
 	/**
@@ -115,26 +90,19 @@ public class FactoryDescribeRegionPoint {
 	 * @param numOfScales
 	 * @param numOfOctaves
 	 * @param doubleInputImage
-	 * @param isOriented
 	 * @return
 	 */
 	public static DescribeRegionPoint<ImageFloat32,SurfFeature> sift( double scaleSigma ,
 																	  int numOfScales ,
 																	  int numOfOctaves ,
-																	  boolean doubleInputImage ,
-																	  boolean isOriented ) {
+																	  boolean doubleInputImage ) {
 		SiftImageScaleSpace ss = new SiftImageScaleSpace((float)scaleSigma, numOfScales, numOfOctaves,
 				doubleInputImage);
 
-		OrientationHistogramSift orientationAlg = null;
-
-		if( isOriented ) {
-			orientationAlg = new OrientationHistogramSift(36, BoofDefaults.SCALE_SPACE_CANONICAL_RADIUS,1.5);
-		}
 
 		DescribePointSift alg = FactoryDescribePointAlgs.sift(4, 8, 8);
 
-		return new WrapDescribeSift(alg,orientationAlg,ss);
+		return new WrapDescribeSift(alg,ss);
 	}
 
 	/**

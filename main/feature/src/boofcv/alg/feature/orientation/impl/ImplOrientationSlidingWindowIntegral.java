@@ -61,12 +61,12 @@ public class ImplOrientationSlidingWindowIntegral
 	 * @param radius Radius of the region being considered in terms of samples. Typically 6.
 	 * @param weightSigma Sigma for weighting distribution.  Zero for unweighted.
 	 * @param sampleKernelWidth Size of kernel doing the sampling.  Typically 4.
-	 * @param imageType Type of image being processed.
+	 * @param integralType Type of integral image being processed.
 	 */
 	public ImplOrientationSlidingWindowIntegral(double samplePeriod, double windowSize,
 												int radius, double weightSigma, int sampleKernelWidth,
-												Class<T> imageType) {
-		super(radius,samplePeriod,sampleKernelWidth,weightSigma,imageType);
+												Class<T> integralType) {
+		super(radius,samplePeriod,sampleKernelWidth,weightSigma,integralType);
 		this.windowSize = windowSize;
 
 		derivX = new double[width*width];

@@ -34,8 +34,8 @@ public class UtilStabilityBenchmark {
 	List<BenchmarkAlgorithm> createAlgorithms(int radius, Class<T> imageType , Class<D> derivType ) {
 		List<BenchmarkAlgorithm> ret = new ArrayList<BenchmarkAlgorithm>();
 
-		ret.add( new BenchmarkAlgorithm("SURF", FactoryDescribeRegionPoint.surf(true, imageType)));
-		ret.add( new BenchmarkAlgorithm("SURF-M", FactoryDescribeRegionPoint.surfm(true, imageType)));
+		ret.add( new BenchmarkAlgorithm("SURF", FactoryDescribeRegionPoint.surf(false, imageType)));
+		ret.add( new BenchmarkAlgorithm("SURF-M", FactoryDescribeRegionPoint.surf(true, imageType)));
 		ret.add( new BenchmarkAlgorithm("BRIEF", FactoryDescribeRegionPoint.brief(16, 512, -1, 4, true, imageType)));
 		ret.add( new BenchmarkAlgorithm("BRIEF-SO", FactoryDescribeRegionPoint.brief(16, 512, -1, 4, false, imageType)));
 		ret.add( new BenchmarkAlgorithm("Gaussian 12", FactoryDescribeRegionPoint.gaussian12(20, imageType, derivType)));

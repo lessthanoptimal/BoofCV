@@ -63,7 +63,7 @@ public class TestWrapCombinedTracker extends StandardImagePointTracker<ImageFloa
 				FactoryAssociation.greedy(score, 400, 300, true);
 
 		pointTracker = FactoryPointSequentialTracker.combined(
-				detector,
+				detector, null,
 				new WrapDescribeBrief<ImageFloat32>(brief),
 				association,2,new int[]{1,2,4},20,ImageFloat32.class);
 
