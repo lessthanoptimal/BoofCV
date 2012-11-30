@@ -73,7 +73,7 @@ public class WrapDescribeSurf<T extends ImageSingleBand, II extends ImageSingleB
 		if( ret == null )
 			ret = createDescription();
 
-		surf.describe(x,y,scale,orientation,ret);
+		surf.describe(x,y, orientation, scale, ret);
 
 		return ret;
 	}

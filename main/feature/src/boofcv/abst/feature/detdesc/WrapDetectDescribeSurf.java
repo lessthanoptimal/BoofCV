@@ -109,7 +109,7 @@ public class WrapDetectDescribeSurf
 
 			orientation.setScale(p.scale);
 			double angle = orientation.compute(p.x,p.y);
-			describe.describe(p.x,p.y,p.scale,angle,features.grow());
+			describe.describe(p.x,p.y, angle, p.scale, features.grow());
 			featureAngles.push(angle);
 		}
 	}
