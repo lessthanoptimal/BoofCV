@@ -23,20 +23,21 @@ import boofcv.abst.feature.associate.ScoreAssociation;
 import boofcv.abst.feature.describe.DescribeRegionPoint;
 import boofcv.abst.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.abst.feature.detect.interest.InterestPointDetector;
-import boofcv.alg.feature.orientation.OrientationImageAverage;
+import boofcv.abst.feature.orientation.OrientationImage;
+import boofcv.abst.feature.orientation.OrientationIntegral;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
+import boofcv.alg.transform.ii.GIntegralImageOps;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.feature.describe.FactoryDescribeRegionPoint;
 import boofcv.factory.feature.detect.interest.FactoryDetectPoint;
 import boofcv.factory.feature.detect.interest.FactoryInterestPoint;
-import boofcv.factory.feature.orientation.FactoryOrientationAlgs;
+import boofcv.factory.feature.orientation.FactoryOrientation;
 import boofcv.gui.SelectAlgorithmAndInputPanel;
 import boofcv.gui.feature.AssociationPanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.PathLabel;
-import boofcv.struct.BoofDefaults;
 import boofcv.struct.FastQueue;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.feature.TupleDescQueue;
@@ -65,7 +66,7 @@ public class VisualizeAssociationMatchesApp<T extends ImageSingleBand, D extends
 	InterestPointDetector<T> detector;
 	DescribeRegionPoint<T, TupleDesc> describe;
 	GeneralAssociation<TupleDesc> matcher;
-	OrientationImageAverage<T> orientation;
+	OrientationImage<T> orientation;
 
 	T imageLeft;
 	T imageRight;
@@ -86,15 +87,15 @@ public class VisualizeAssociationMatchesApp<T extends ImageSingleBand, D extends
 
 		GeneralFeatureDetector<T, D> alg;
 
+		addAlgorithm(0, "Fast Hessian", FactoryInterestPoint.fastHessian(1, 2, 200, 1, 9, 4, 4));
 		if( imageType == ImageFloat32.class )
 			addAlgorithm(0, "SIFT", FactoryInterestPoint.siftDetector(1.6,5,4,false,2,1,500,10));
-		addAlgorithm(0, "Fast Hessian", FactoryInterestPoint.fastHessian(1, 2, 200, 1, 9, 4, 4));
 		alg = FactoryDetectPoint.createShiTomasi(2, false, 1, 500, derivType);
 		addAlgorithm(0, "Shi-Tomasi", FactoryInterestPoint.wrapPoint(alg, imageType, derivType));
 
+		addAlgorithm(1, "SURF", FactoryDescribeRegionPoint.surf(true, imageType));
 		if( imageType == ImageFloat32.class )
-			addAlgorithm(1, "SIFT", FactoryDescribeRegionPoint.sift(1.6, 5, 4, false, true));
-		addAlgorithm(1, "SURF", FactoryDescribeRegionPoint.surfm(true, imageType));
+			addAlgorithm(1, "SIFT", FactoryDescribeRegionPoint.sift(1.6, 5, 4, false));
 		addAlgorithm(1, "BRIEF", FactoryDescribeRegionPoint.brief(16, 512, -1, 4, true, imageType));
 		addAlgorithm(1, "BRIEFO", FactoryDescribeRegionPoint.brief(16, 512, -1, 4, false, imageType));
 		addAlgorithm(1, "Gaussian 12", FactoryDescribeRegionPoint.gaussian12(20, imageType, derivType));
@@ -105,7 +106,10 @@ public class VisualizeAssociationMatchesApp<T extends ImageSingleBand, D extends
 		addAlgorithm(2, "Greedy", false);
 		addAlgorithm(2, "Backwards", true);
 
-		orientation = FactoryOrientationAlgs.nogradient(5, imageType);
+		// estimate orientation using this once since it is fast and accurate
+		Class integralType = GIntegralImageOps.getIntegralType(imageType);
+		OrientationIntegral orientationII = FactoryOrientation.surfDefault(true, integralType);
+		orientation = FactoryOrientation.convertImage(orientationII,imageType);
 
 		imageLeft = GeneralizedImageOps.createSingleBand(imageType, 1, 1);
 		imageRight = GeneralizedImageOps.createSingleBand(imageType, 1, 1);
@@ -234,7 +238,7 @@ public class VisualizeAssociationMatchesApp<T extends ImageSingleBand, D extends
 				Point2D_F64 pt = detector.getLocation(i);
 				double scale = detector.getScale(i);
 				if (describe.requiresOrientation()) {
-					orientation.setRadius((int) (BoofDefaults.SCALE_SPACE_CANONICAL_RADIUS * scale));
+					orientation.setScale(scale);
 					yaw = orientation.compute(pt.x, pt.y);
 				}
 
@@ -244,7 +248,7 @@ public class VisualizeAssociationMatchesApp<T extends ImageSingleBand, D extends
 				}
 			}
 		} else {
-			orientation.setRadius(3);
+			orientation.setScale(1);
 			for (int i = 0; i < detector.getNumberOfFeatures(); i++) {
 				double yaw = 0;
 
@@ -252,8 +256,6 @@ public class VisualizeAssociationMatchesApp<T extends ImageSingleBand, D extends
 				if (describe.requiresOrientation()) {
 					yaw = orientation.compute(pt.x, pt.y);
 				}
-
-				TupleDesc d = describe.createDescription();
 
 				if (describe.isInBounds(pt.x, pt.y, yaw, 1)) {
 					describe.process(pt.x, pt.y, yaw, 1, descs.grow());

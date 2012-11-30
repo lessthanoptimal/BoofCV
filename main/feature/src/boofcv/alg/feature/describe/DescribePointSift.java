@@ -23,6 +23,13 @@ import boofcv.struct.feature.SurfFeature;
 import boofcv.struct.image.ImageFloat32;
 
 /**
+ *
+ * <p>
+ * DESCRIPTOR INTERPOLATION: Instead of using trilinear interpolation a Gaussian weight is used instead.
+ * Both methods were tried and Gaussian weight produced slightly better results.  Same results had been
+ * found by others with regard to SURF descriptors.
+ * </p>
+ *
  * @author Peter Abeles
  */
 public class DescribePointSift {
@@ -187,15 +194,15 @@ public class DescribePointSift {
 			for( int offX = startX; offX <= endX; offX++ ) {
 				int binIndex = (gridY+gridRadius+offY)*gridWidth + gridX+gridRadius+offX;
 
-				double distX = locX-(gridX+offX);
-				double distY = locY-(gridY+offY);
+				// compute distance from center of grid element
+				double distX = locX-(gridX+offX+0.5);
+				double distY = locY-(gridY+offY+0.5);
 
-				// use trilinear interpolation for distributing the edge weights
-				double w = 1 - Math.sqrt(distX*distX + distY*distY);
+				// Use a gaussian weighting here instead of
+				double d = distX*distX + distY*distY;
 
-				if( w > 0 ) {
-					histograms[binIndex][angleBin] += w * gradMag;
-				}
+				double w = Math.exp(-0.5*d*d/(0.5*0.5));
+				histograms[binIndex][angleBin] += w * gradMag;
 			}
 		}
 	}

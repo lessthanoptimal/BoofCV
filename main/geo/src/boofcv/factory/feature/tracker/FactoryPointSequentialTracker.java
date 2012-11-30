@@ -22,8 +22,12 @@ import boofcv.abst.feature.associate.*;
 import boofcv.abst.feature.describe.DescribeRegionPoint;
 import boofcv.abst.feature.describe.WrapDescribeBrief;
 import boofcv.abst.feature.describe.WrapDescribePixelRegionNCC;
+import boofcv.abst.feature.detdesc.DetectDescribeFusion;
+import boofcv.abst.feature.detdesc.DetectDescribePoint;
 import boofcv.abst.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.abst.feature.detect.interest.InterestPointDetector;
+import boofcv.abst.feature.orientation.OrientationImage;
+import boofcv.abst.feature.orientation.OrientationIntegral;
 import boofcv.abst.feature.tracker.*;
 import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.alg.feature.associate.AssociateSurfBasic;
@@ -36,11 +40,14 @@ import boofcv.alg.interpolate.InterpolateRectangle;
 import boofcv.alg.tracker.combined.CombinedTrackerScalePoint;
 import boofcv.alg.tracker.combined.PyramidKltForCombined;
 import boofcv.alg.tracker.klt.KltConfig;
+import boofcv.alg.transform.ii.GIntegralImageOps;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.feature.describe.FactoryDescribePointAlgs;
 import boofcv.factory.feature.describe.FactoryDescribeRegionPoint;
+import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
 import boofcv.factory.feature.detect.interest.FactoryDetectPoint;
 import boofcv.factory.feature.detect.interest.FactoryInterestPoint;
+import boofcv.factory.feature.orientation.FactoryOrientation;
 import boofcv.factory.filter.blur.FactoryBlurFilter;
 import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.factory.interpolate.FactoryInterpolation;
@@ -131,22 +138,16 @@ public class FactoryPointSequentialTracker {
 									 boolean modifiedSURF ,
 									 Class<I> imageType)
 	{
-		InterestPointDetector<I> id = FactoryInterestPoint.fastHessian(1,detectRadius,detectPerScale, sampleRateFH, 9, 4, 4);
-
 		ScoreAssociation<TupleDesc_F64> score = FactoryAssociation.scoreEuclidean(TupleDesc_F64.class, true);
 		AssociateSurfBasic assoc = new AssociateSurfBasic(FactoryAssociation.greedy(score, 100000, maxTracks, true));
 
-		DescribeRegionPoint<I,SurfFeature> regionDesc;
-
-		if( modifiedSURF ) {
-			regionDesc = FactoryDescribeRegionPoint.surfm(true, imageType);
-		} else {
-			regionDesc = FactoryDescribeRegionPoint.surf(true,imageType);
-		}
-
 		GeneralAssociation<SurfFeature> generalAssoc = new WrapAssociateSurfBasic(assoc);
 
-		return new DetectAssociateTracker<I,SurfFeature>(id, regionDesc, generalAssoc,false);
+		DetectDescribePoint<I,SurfFeature> fused =
+				FactoryDetectDescribe.surf(1,detectRadius,detectPerScale, sampleRateFH, 9, 4, 4,
+						modifiedSURF,imageType);
+
+		return new DetectAssociateTracker<I,SurfFeature>(fused, generalAssoc,false);
 	}
 
 	/**
@@ -183,8 +184,11 @@ public class FactoryPointSequentialTracker {
 		GeneralAssociation<TupleDesc_B> association =
 				FactoryAssociation.greedy(score, maxAssociationError, maxFeatures, true);
 
+		DetectDescribeFusion<I,TupleDesc_B> fused =
+				new DetectDescribeFusion<I,TupleDesc_B>(detector,null,new WrapDescribeBrief<I>(brief));
+
 		return new DetectAssociateTracker<I,TupleDesc_B>
-				(detector, new WrapDescribeBrief<I>(brief), association,false);
+				(fused, association,false);
 	}
 
 	/**
@@ -219,8 +223,11 @@ public class FactoryPointSequentialTracker {
 		GeneralAssociation<TupleDesc_B> association =
 				FactoryAssociation.greedy(score, maxAssociationError, maxFeatures, true);
 
+		DetectDescribeFusion<I,TupleDesc_B> fused =
+				new DetectDescribeFusion<I,TupleDesc_B>(detector,null,new WrapDescribeBrief<I>(brief));
+
 		return new DetectAssociateTracker<I,TupleDesc_B>
-				(detector, new WrapDescribeBrief<I>(brief), association,false);
+				(fused, association,false);
 	}
 
 	/**
@@ -256,31 +263,36 @@ public class FactoryPointSequentialTracker {
 		GeneralAssociation<NccFeature> association =
 				FactoryAssociation.greedy(score, Double.MAX_VALUE, maxFeatures, true);
 
+		DetectDescribeFusion<I,NccFeature> fused =
+				new DetectDescribeFusion<I,NccFeature>(detector,null,new WrapDescribePixelRegionNCC<I>(alg));
+
 		return new DetectAssociateTracker<I,NccFeature>
-				(detector, new WrapDescribePixelRegionNCC<I>(alg), association,false);
+				(fused, association,false);
 	}
 
 	/**
 	 * Creates a tracker which uses the detect, describe, associate architecture.
 	 *
 	 * @param detector Interest point detector.
+	 * @param orientation Optional orientation estimation algorithm. Can be null.
 	 * @param describe Region description.
 	 * @param associate Description association.
 	 * @param updateDescription After a track has been associated should the description be changed?  Try false.
-	 * @param imageType     Input image type.
 	 * @param <I> Type of input image.
 	 * @param <Desc> Type of region description
 	 * @return tracker
 	 */
 	public static <I extends ImageSingleBand, Desc extends TupleDesc>
 	DetectAssociateTracker<I,Desc> detectDescribeAssociate(InterestPointDetector<I> detector,
+														   OrientationImage<I> orientation ,
 														   DescribeRegionPoint<I, Desc> describe,
 														   GeneralAssociation<Desc> associate ,
-														   boolean updateDescription ,
-														   Class<I> imageType ) {
+														   boolean updateDescription ) {
 
-		DetectAssociateTracker<I,Desc> dat = new DetectAssociateTracker<I,Desc>(detector, describe, associate,false);
-		dat.setUpdateDescription(updateDescription);
+		DetectDescribeFusion<I,Desc> fused =
+				new DetectDescribeFusion<I,Desc>(detector,orientation,describe);
+
+		DetectAssociateTracker<I,Desc> dat = new DetectAssociateTracker<I,Desc>(fused, associate,updateDescription);
 
 		return dat;
 	}
@@ -320,15 +332,14 @@ public class FactoryPointSequentialTracker {
 		InterestPointDetector<I> id = FactoryInterestPoint.fastHessian(1,detectRadius,detectPerScale, sampleRateFH, 9, 4, 4);
 		GeneralAssociation<SurfFeature> generalAssoc = new WrapAssociateSurfBasic(assoc);
 
-		DescribeRegionPoint<I,SurfFeature> regionDesc;
-		if( modifiedSURF ) {
-			regionDesc = FactoryDescribeRegionPoint.surfm(true,imageType);
-		} else {
-			regionDesc = FactoryDescribeRegionPoint.surf(true,imageType);
-		}
+		DescribeRegionPoint<I,SurfFeature> regionDesc
+				= FactoryDescribeRegionPoint.surf(modifiedSURF, imageType);
 
+		DetectDescribePoint<I,SurfFeature> fused =
+				FactoryDetectDescribe.surf(1,detectRadius,detectPerScale, sampleRateFH, 9, 4, 4,
+						modifiedSURF,imageType);
 
-		return combined(id,regionDesc,generalAssoc,trackRadius,pyramidScalingKlt,reactivateThreshold,
+		return combined(fused,generalAssoc,trackRadius,pyramidScalingKlt,reactivateThreshold,
 				imageType);
 	}
 
@@ -370,20 +381,19 @@ public class FactoryPointSequentialTracker {
 
 		InterestPointDetector<I> detector = FactoryInterestPoint.wrapPoint(corner, imageType, derivType);
 
-		DescribeRegionPoint<I,SurfFeature> regionDesc;
-
-		if( modifiedSURF ) {
-			regionDesc = FactoryDescribeRegionPoint.surfm(true, imageType);
-		} else {
-			regionDesc = FactoryDescribeRegionPoint.surf(true,imageType);
-		}
+		DescribeRegionPoint<I,SurfFeature> regionDesc
+				= FactoryDescribeRegionPoint.surf(modifiedSURF, imageType);
 
 		ScoreAssociation<TupleDesc_F64> score = FactoryAssociation.scoreEuclidean(TupleDesc_F64.class, true);
 		AssociateSurfBasic assoc = new AssociateSurfBasic(FactoryAssociation.greedy(score, 100000, maxMatches, true));
 
 		GeneralAssociation<SurfFeature> generalAssoc = new WrapAssociateSurfBasic(assoc);
 
-		return combined(detector,regionDesc,generalAssoc,trackRadius,pyramidScalingKlt,reactivateThreshold,
+		Class integralType = GIntegralImageOps.getIntegralType(imageType);
+		OrientationIntegral orientationII = FactoryOrientation.surfDefault(modifiedSURF,integralType);
+		OrientationImage<I> orientation = FactoryOrientation.convertImage(orientationII,imageType);
+
+		return combined(detector,orientation,regionDesc,generalAssoc,trackRadius,pyramidScalingKlt,reactivateThreshold,
 				imageType);
 	}
 
@@ -393,7 +403,39 @@ public class FactoryPointSequentialTracker {
 	 * @see CombinedTrackerScalePoint
 	 *
 	 * @param detector Feature detector.
+	 * @param orientation Optional feature orientation.  Can be null.
 	 * @param describe Feature description
+	 * @param associate Association algorithm.
+	 * @param featureRadiusKlt KLT feature radius
+	 * @param pyramidScalingKlt KLT pyramid configuration
+	 * @param reactivateThreshold Tracks are reactivated after this many have been dropped.  Try 10% of maxMatches
+	 * @param imageType Input image type.
+	 * @param <I> Input image type.
+	 * @param <Desc> Feature description type.
+	 * @return Feature tracker
+	 */
+	public static <I extends ImageSingleBand, Desc extends TupleDesc>
+	ImagePointTracker<I> combined( InterestPointDetector<I> detector,
+								   OrientationImage<I> orientation ,
+								   DescribeRegionPoint<I, Desc> describe,
+								   GeneralAssociation<Desc> associate ,
+								   int featureRadiusKlt,
+								   int[] pyramidScalingKlt ,
+								   int reactivateThreshold,
+								   Class<I> imageType )
+	{
+		DetectDescribeFusion<I,Desc> fused =
+				new DetectDescribeFusion<I,Desc>(detector,orientation,describe);
+
+		return combined(fused,associate,featureRadiusKlt,pyramidScalingKlt,reactivateThreshold,imageType);
+	}
+
+	/**
+	 * Creates a tracker that is a hybrid between KLT and Detect-Describe-Associate (DDA) trackers.
+	 *
+	 * @see CombinedTrackerScalePoint
+	 *
+	 * @param detector Feature detector and describer.
 	 * @param associate Association algorithm.
 	 * @param featureRadiusKlt KLT feature radius
 	 * @param pyramidScalingKlt KLT pyramid configuration
@@ -405,8 +447,7 @@ public class FactoryPointSequentialTracker {
 	 * @return Feature tracker
 	 */
 	public static <I extends ImageSingleBand, D extends ImageSingleBand, Desc extends TupleDesc>
-	ImagePointTracker<I> combined( InterestPointDetector<I> detector,
-								   DescribeRegionPoint<I, Desc> describe,
+	ImagePointTracker<I> combined( DetectDescribePoint<I,Desc> detector ,
 								   GeneralAssociation<Desc> associate ,
 								   int featureRadiusKlt,
 								   int[] pyramidScalingKlt ,
@@ -420,8 +461,9 @@ public class FactoryPointSequentialTracker {
 		PyramidKltForCombined<I,D> klt = new PyramidKltForCombined<I, D>(configKlt,
 				featureRadiusKlt,pyramidScalingKlt,imageType,derivType);
 
+
 		CombinedTrackerScalePoint<I, D,Desc> tracker =
-				new CombinedTrackerScalePoint<I, D, Desc>(klt,detector,describe,associate);
+				new CombinedTrackerScalePoint<I, D, Desc>(klt,detector,associate);
 
 		return new WrapCombinedTracker<I,D,Desc>(tracker,reactivateThreshold,imageType,derivType);
 	}

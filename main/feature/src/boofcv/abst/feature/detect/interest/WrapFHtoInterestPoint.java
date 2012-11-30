@@ -19,7 +19,6 @@
 package boofcv.abst.feature.detect.interest;
 
 import boofcv.alg.feature.detect.interest.FastHessianFeatureDetector;
-import boofcv.alg.feature.orientation.OrientationIntegral;
 import boofcv.alg.transform.ii.GIntegralImageOps;
 import boofcv.struct.feature.ScalePoint;
 import boofcv.struct.image.ImageSingleBand;
@@ -35,8 +34,7 @@ import java.util.List;
  */
 public class WrapFHtoInterestPoint<T extends ImageSingleBand, II extends ImageSingleBand> implements InterestPointDetector<T> {
 
-	// optionally will compute the feature's orientation
-	OrientationIntegral<II> orientation;
+
 	// detects the feature's location and scale
 	FastHessianFeatureDetector<II> detector;
 	List<ScalePoint> location;
@@ -44,12 +42,6 @@ public class WrapFHtoInterestPoint<T extends ImageSingleBand, II extends ImageSi
 
 	public WrapFHtoInterestPoint(FastHessianFeatureDetector<II> detector) {
 		this.detector = detector;
-	}
-
-	public WrapFHtoInterestPoint(FastHessianFeatureDetector<II> detector,
-								 OrientationIntegral<II> orientation ) {
-		this.detector = detector;
-		this.orientation = orientation;
 	}
 
 	@Override
@@ -61,8 +53,6 @@ public class WrapFHtoInterestPoint<T extends ImageSingleBand, II extends ImageSi
 		integral = GIntegralImageOps.transform(input,integral);
 
 		detector.detect(integral);
-		if( orientation != null )
-			orientation.setImage(integral);
 
 		location = detector.getFoundPoints();
 	}
@@ -84,11 +74,6 @@ public class WrapFHtoInterestPoint<T extends ImageSingleBand, II extends ImageSi
 
 	@Override
 	public double getOrientation(int featureIndex) {
-		if( orientation != null ) {
-			Point2D_F64 p = location.get(featureIndex);
-			orientation.setScale(location.get(featureIndex).scale);
-			return orientation.compute(p.x,p.y);
-		}
 		return 0;
 	}
 
@@ -99,6 +84,6 @@ public class WrapFHtoInterestPoint<T extends ImageSingleBand, II extends ImageSi
 
 	@Override
 	public boolean hasOrientation() {
-		return orientation != null;
+		return false;
 	}
 }

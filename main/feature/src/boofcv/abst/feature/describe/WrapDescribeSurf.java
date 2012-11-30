@@ -19,7 +19,6 @@
 package boofcv.abst.feature.describe;
 
 import boofcv.alg.feature.describe.DescribePointSurf;
-import boofcv.alg.feature.orientation.OrientationIntegral;
 import boofcv.alg.transform.ii.GIntegralImageOps;
 import boofcv.struct.feature.SurfFeature;
 import boofcv.struct.image.ImageSingleBand;
@@ -33,18 +32,13 @@ public class WrapDescribeSurf<T extends ImageSingleBand, II extends ImageSingleB
 
 	// computes SURF feature descriptor
 	DescribePointSurf<II> surf;
-	// estimates feature's orientation
-	// would not be included normally, but this way the integral image will only need to be computed once
-	OrientationIntegral<II> orientationAlg;
 	// integral image
 	II ii;
 
 
-	public WrapDescribeSurf(DescribePointSurf<II> surf,
-							OrientationIntegral<II> orientation)
+	public WrapDescribeSurf(DescribePointSurf<II> surf )
 	{
 		this.surf = surf;
-		this.orientationAlg = orientation;
 	}
 
 	@Override
@@ -60,8 +54,6 @@ public class WrapDescribeSurf<T extends ImageSingleBand, II extends ImageSingleB
 
 		// compute integral image
 		ii = GIntegralImageOps.transform(image,ii);
-		if( orientationAlg != null )
-			orientationAlg.setImage(ii);
 		surf.setImage(ii);
 	}
 
@@ -81,14 +73,7 @@ public class WrapDescribeSurf<T extends ImageSingleBand, II extends ImageSingleB
 		if( ret == null )
 			ret = createDescription();
 
-		double angle = orientation;
-
-		if( orientationAlg != null ) {
-			orientationAlg.setScale(scale);
-			angle = orientationAlg.compute(x,y);
-		}
-
-		surf.describe(x,y,scale,angle,ret);
+		surf.describe(x,y,scale,orientation,ret);
 
 		return ret;
 	}
@@ -100,7 +85,7 @@ public class WrapDescribeSurf<T extends ImageSingleBand, II extends ImageSingleB
 
 	@Override
 	public boolean requiresOrientation() {
-		return orientationAlg == null;
+		return true;
 	}
 
 	@Override

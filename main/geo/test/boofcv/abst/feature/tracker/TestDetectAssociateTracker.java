@@ -21,6 +21,7 @@ package boofcv.abst.feature.tracker;
 import boofcv.abst.feature.associate.GeneralAssociation;
 import boofcv.abst.feature.associate.ScoreAssociateHamming_B;
 import boofcv.abst.feature.describe.WrapDescribeBrief;
+import boofcv.abst.feature.detdesc.DetectDescribeFusion;
 import boofcv.abst.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.abst.feature.detect.interest.InterestPointDetector;
 import boofcv.alg.feature.describe.DescribePointBrief;
@@ -87,7 +88,8 @@ public class TestDetectAssociateTracker extends StandardImagePointTracker<ImageF
 
 	@Override
 	public ImagePointTracker<ImageFloat32> createTracker() {
-		DescribePointBrief<ImageFloat32> brief = FactoryDescribePointAlgs.brief(FactoryBriefDefinition.gaussian2(new Random(123), 16, 512),
+		DescribePointBrief<ImageFloat32> brief =
+				FactoryDescribePointAlgs.brief(FactoryBriefDefinition.gaussian2(new Random(123), 16, 512),
 				FactoryBlurFilter.gaussian(ImageFloat32.class, 0, 4));
 
 		GeneralFeatureDetector<ImageFloat32,ImageFloat32> corner =
@@ -100,8 +102,11 @@ public class TestDetectAssociateTracker extends StandardImagePointTracker<ImageF
 		GeneralAssociation<TupleDesc_B> association =
 				FactoryAssociation.greedy(score, 400, 300, true);
 
-		dat = new DetectAssociateTracker<ImageFloat32,TupleDesc_B>(detector,
-				new WrapDescribeBrief<ImageFloat32>(brief), association,false);
+		DetectDescribeFusion<ImageFloat32,TupleDesc_B> fused =
+				new DetectDescribeFusion<ImageFloat32,TupleDesc_B>(
+						detector,null,new WrapDescribeBrief<ImageFloat32>(brief));
+
+		dat = new DetectAssociateTracker<ImageFloat32,TupleDesc_B>(fused, association,false);
 
 
 		return dat;

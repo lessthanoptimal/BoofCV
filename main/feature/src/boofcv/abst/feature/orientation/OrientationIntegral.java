@@ -16,30 +16,28 @@
  * limitations under the License.
  */
 
-package boofcv.alg.feature.orientation;
+package boofcv.abst.feature.orientation;
 
 import boofcv.struct.image.ImageSingleBand;
 
 
 /**
- * Estimates the orientation of a region from the image gradient.
+ * Estimate the orientation of an image from an {@link boofcv.alg.transform.ii.IntegralImageOps integral image}.
  *
  * @author Peter Abeles
  */
-public interface OrientationGradient<D extends ImageSingleBand> extends RegionOrientation {
-
+public interface OrientationIntegral<II extends ImageSingleBand> extends RegionOrientation {
 	/**
 	 * Specifies input image data for estimating orientation.
 	 *
-	 * @param derivX Image derivative along x-axis.
-	 * @param derivY Image derivative along y-axis.
+	 * @param integralImage Input image transformed into an integral image.
 	 */
-	public void setImage( D derivX , D derivY );
+	public void setImage( II integralImage );
 
 	/**
 	 * Returns the type of image it can process.
 	 *
 	 * @return Type of image which can be processed
 	 */
-	public Class<D> getImageType();
+	public Class<II> getImageType();
 }

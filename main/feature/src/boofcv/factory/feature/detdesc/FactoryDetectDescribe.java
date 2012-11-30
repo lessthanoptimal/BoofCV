@@ -22,14 +22,23 @@ import boofcv.abst.feature.describe.DescribeRegionPoint;
 import boofcv.abst.feature.detdesc.DetectDescribeFusion;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
 import boofcv.abst.feature.detdesc.WrapDetectDescribeSift;
+import boofcv.abst.feature.detdesc.WrapDetectDescribeSurf;
+import boofcv.abst.feature.detect.extract.FeatureExtractor;
 import boofcv.abst.feature.detect.interest.InterestPointDetector;
+import boofcv.abst.feature.orientation.OrientationImage;
+import boofcv.abst.feature.orientation.OrientationIntegral;
 import boofcv.alg.feature.describe.DescribePointSift;
+import boofcv.alg.feature.describe.DescribePointSurf;
 import boofcv.alg.feature.detdesc.DetectDescribeSift;
+import boofcv.alg.feature.detect.interest.FastHessianFeatureDetector;
 import boofcv.alg.feature.detect.interest.SiftDetector;
 import boofcv.alg.feature.detect.interest.SiftImageScaleSpace;
 import boofcv.alg.feature.orientation.OrientationHistogramSift;
-import boofcv.alg.feature.orientation.OrientationImage;
+import boofcv.alg.transform.ii.GIntegralImageOps;
+import boofcv.factory.feature.describe.FactoryDescribePointAlgs;
+import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
 import boofcv.factory.feature.detect.interest.FactoryInterestPointAlgs;
+import boofcv.factory.feature.orientation.FactoryOrientation;
 import boofcv.struct.BoofDefaults;
 import boofcv.struct.feature.SurfFeature;
 import boofcv.struct.feature.TupleDesc;
@@ -73,6 +82,67 @@ public class FactoryDetectDescribe {
 		DetectDescribeSift combined = new DetectDescribeSift(ss,detector,orientation,describe);
 
 		return new WrapDetectDescribeSift(combined);
+	}
+
+	/**
+	 * <p>
+	 * Creates a SURF descriptor.  SURF descriptors are invariant to illumination, orientation, and scale.
+	 * BoofCV provides two variants. BoofCV provides two variants, described below.
+	 * </p>
+	 *
+	 * <p>
+	 * The modified variant provides comparable stability to binary provided by the original author.  The
+	 * other variant is much faster, but a bit less stable, Both implementations contain several algorithmic
+	 * changes from what was described in the original SURF paper.  See tech report [1] for details.
+	 * <p>
+	 *
+	 * <p>
+	 * Both variants use the FastHessian feature detector described in the SURF paper.
+	 * </p>
+	 *
+	 * <p>
+	 * [1] Add tech report when its finished.  See SURF performance web page for now.
+	 * </p>
+	 *
+	 * @see FastHessianFeatureDetector
+	 * @see DescribePointSurf
+	 * @see DescribePointSurf
+	 *
+	 * @param detectThreshold       Minimum feature intensity. Image dependent.  Start tuning at 1.
+	 * @param extractRadius         Radius used for non-max-suppression.  Typically 1 or 2.
+	 * @param maxFeaturesPerScale   Number of features it will find or if <= 0 it will return all features it finds.
+	 * @param initialSampleSize     How often pixels are sampled in the first octave.  Typically 1 or 2.
+	 * @param initialSize           Typically 9.
+	 * @param numberScalesPerOctave Typically 4.
+	 * @param numberOfOctaves       Typically 4.
+	 * @param modified              True for more stable but slower and false for a faster but less stable.
+	 * @return The interest point detector.
+	 * @see FastHessianFeatureDetector
+	 */
+	public static <T extends ImageSingleBand, II extends ImageSingleBand>
+	DetectDescribePoint<T,SurfFeature> surf( float detectThreshold,
+											 int extractRadius, int maxFeaturesPerScale,
+											 int initialSampleSize, int initialSize,
+											 int numberScalesPerOctave,
+											 int numberOfOctaves ,
+											 boolean modified ,
+											 Class<T> imageType) {
+
+		Class<II> integralType = GIntegralImageOps.getIntegralType(imageType);
+		OrientationIntegral<II> orientation = FactoryOrientation.surfDefault(modified, integralType);
+		DescribePointSurf<II> describe;
+
+		if( modified ) {
+			describe = FactoryDescribePointAlgs.<II>msurf(integralType);
+		} else {
+			describe = FactoryDescribePointAlgs.<II>surf(integralType);
+		}
+
+		FeatureExtractor extractor = FactoryFeatureExtractor.nonmax(extractRadius, detectThreshold, 5, true);
+		FastHessianFeatureDetector<II> detector = new FastHessianFeatureDetector<II>(extractor, maxFeaturesPerScale,
+				initialSampleSize, initialSize, numberScalesPerOctave, numberOfOctaves);
+
+		return new WrapDetectDescribeSurf<T,II>( detector, orientation, describe );
 	}
 
 	public static <T extends ImageSingleBand, D extends TupleDesc>

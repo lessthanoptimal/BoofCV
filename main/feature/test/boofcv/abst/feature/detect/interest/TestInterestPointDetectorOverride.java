@@ -18,7 +18,7 @@
 
 package boofcv.abst.feature.detect.interest;
 
-import boofcv.alg.feature.orientation.OrientationImage;
+import boofcv.abst.feature.orientation.OrientationImage;
 import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.point.Point2D_F64;
 import org.junit.Test;

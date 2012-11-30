@@ -20,7 +20,6 @@ package boofcv.abst.feature.describe;
 
 import boofcv.alg.feature.describe.DescribePointSift;
 import boofcv.alg.feature.detect.interest.SiftImageScaleSpace;
-import boofcv.alg.feature.orientation.OrientationHistogramSift;
 import boofcv.struct.feature.SurfFeature;
 import boofcv.struct.image.ImageFloat32;
 
@@ -35,14 +34,11 @@ public class WrapDescribeSift
 {
 	DescribePointSift alg;
 	SiftImageScaleSpace ss;
-	OrientationHistogramSift orientationAlg;
 
 	public WrapDescribeSift(DescribePointSift alg,
-							OrientationHistogramSift orientationAlg,
 							SiftImageScaleSpace ss) {
 		this.alg = alg;
 		this.ss = ss;
-		this.orientationAlg = orientationAlg;
 	}
 
 	@Override
@@ -50,8 +46,6 @@ public class WrapDescribeSift
 		ss.constructPyramid(image);
 		ss.computeDerivatives();
 		alg.setScaleSpace(ss);
-		if( orientationAlg != null )
-			orientationAlg.setScaleSpace(ss);
 	}
 
 	@Override
@@ -74,11 +68,6 @@ public class WrapDescribeSift
 		if( ret == null )
 			ret = createDescription();
 
-		if( orientationAlg != null ) {
-			orientationAlg.process(x,y,scale);
-			orientation = orientationAlg.getPeakOrientation();
-		}
-
 		alg.process(x,y,scale,orientation,ret);
 
 		return ret;
@@ -91,7 +80,7 @@ public class WrapDescribeSift
 
 	@Override
 	public boolean requiresOrientation() {
-		return orientationAlg==null;
+		return true;
 	}
 
 	@Override

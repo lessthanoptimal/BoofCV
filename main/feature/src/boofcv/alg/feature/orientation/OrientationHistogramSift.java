@@ -25,8 +25,6 @@ import boofcv.struct.GrowQueue_I32;
 import boofcv.struct.ImageRectangle;
 import boofcv.struct.image.ImageFloat32;
 
-import static boofcv.alg.feature.detect.interest.FastHessianFeatureDetector.polyPeak;
-
 /**
  * <p>
  * Computes the orientation of a region around a point in scale-space as specified in the SIFT [1] paper.  A
@@ -35,6 +33,8 @@ import static boofcv.alg.feature.detect.interest.FastHessianFeatureDetector.poly
  * what's described in the paper.
  * </p>
  *
+ * TODO Note changes to reflect changes from paper
+ *
  * <p>
  * [1] Lowe, D. "Distinctive image features from scale-invariant keypoints".
  * International Journal of Computer Vision, 60, 2 (2004), pp.91--110.
@@ -42,9 +42,7 @@ import static boofcv.alg.feature.detect.interest.FastHessianFeatureDetector.poly
  *
  * @author Peter Abeles
  */
-// TODO sum up DX DY in each bin then compute angle from that
-// TODO interpolate weighting
-// TODO weighting simply equation
+// TODO approximate weight equation using interpolation
 public class OrientationHistogramSift {
 
 	// Converts a distribution's sigma into a region radius to sample
@@ -54,6 +52,9 @@ public class OrientationHistogramSift {
 	private double sigmaEnlarge;
 	// Storage for orientation histogram. Each bin is for angles from i*histAngleBin to (i+1)*histAngleBin
 	private double histogram[];
+	// histograms containing the sum of each derivative
+	private double histogramX[];
+	private double histogramY[];
 	// Number of radians each bin corresponds to.  histAngleBin = 2*PI/histogram.length
 	private double histAngleBin;
 
@@ -92,6 +93,9 @@ public class OrientationHistogramSift {
 									 double sigmaToRadius,
 									 double sigmaEnlarge) {
 		this.histogram = new double[ histogramSize ];
+		this.histogramX = new double[ histogramSize ];
+		this.histogramY = new double[ histogramSize ];
+
 		this.sigmaToRadius = sigmaToRadius;
 		this.sigmaEnlarge = sigmaEnlarge;
 
@@ -157,8 +161,11 @@ public class OrientationHistogramSift {
 		BoofMiscOps.boundRectangleInside(image,bound);
 
 		// clear the histogram
-		for( int i = 0; i < histogram.length; i++ )
+		for( int i = 0; i < histogram.length; i++ ) {
 			histogram[i] = 0;
+			histogramX[i] = 0;
+			histogramY[i] = 0;
+		}
 
 		// construct the histogram
 		for( int y = bound.y0; y < bound.y1; y++ ) {
@@ -185,6 +192,8 @@ public class OrientationHistogramSift {
 
 				// update the histogram
 				histogram[h] += m*w;
+				histogramX[h] += dx;
+				histogramY[h] += dy;
 			}
 		}
 	}
@@ -222,11 +231,8 @@ public class OrientationHistogramSift {
 			int index = peaks.data[i];
 			current = histogram[index];
 			if( largest*0.8 <= current ) {
-				// value before and after for interpolating
-				before = index == 0 ? histogram[histogram.length-1 ] : histogram[index-1];
-				double after = histogram[ (i + 1) % histogram.length ];
 
-				double angle = (index + polyPeak(before,current,after) + 0.5)*histAngleBin;
+				double angle = Math.atan2(histogramY[index],histogramX[index]);
 
 				angles.push( angle );
 

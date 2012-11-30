@@ -19,12 +19,10 @@
 package boofcv.alg.tracker.combined;
 
 import boofcv.abst.feature.associate.GeneralAssociation;
-import boofcv.abst.feature.describe.DescribeRegionPoint;
-import boofcv.abst.feature.detect.interest.InterestPointDetector;
+import boofcv.abst.feature.detdesc.DetectDescribePoint;
 import boofcv.struct.FastQueue;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.TupleDesc;
-import boofcv.struct.feature.TupleDescQueue;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.pyramid.PyramidDiscrete;
 import georegression.struct.point.Point2D_F64;
@@ -53,10 +51,8 @@ public class CombinedTrackerScalePoint
 	// The KLT tracker used to perform the nominal track update
 	private PyramidKltForCombined<I,D> trackerKlt;
 
-	// feature detector
-	private InterestPointDetector<I> detector;
-	// describes features for DDA update
-	private DescribeRegionPoint<I,TD> describe;
+	// feature detector and describer
+	private DetectDescribePoint<I,TD> detector;
 	// Used to associate features using their DDA description
 	private GeneralAssociation<TD> associate;
 
@@ -71,9 +67,6 @@ public class CombinedTrackerScalePoint
 	// track points whose data is to be reused
 	private Stack<CombinedTrack<TD>> tracksUnused = new Stack<CombinedTrack<TD>>();
 
-	// list of descriptions that are available for reuse
-	private Stack<TD> descUnused = new Stack<TD>();
-
 	// local storage used by association
 	private FastQueue<TD> detectedDesc;
 	private FastQueue<TD> knownDesc;
@@ -85,15 +78,13 @@ public class CombinedTrackerScalePoint
 	private boolean associated[] = new boolean[1];
 
 	public CombinedTrackerScalePoint(PyramidKltForCombined<I, D> trackerKlt,
-									 InterestPointDetector<I> detector,
-									 DescribeRegionPoint<I, TD> describe,
+									 DetectDescribePoint<I,TD> detector,
 									 GeneralAssociation<TD> associate ) {
 		this.trackerKlt = trackerKlt;
 		this.detector = detector;
-		this.describe = describe;
 
-		detectedDesc = new TupleDescQueue<TD>(describe,false);
-		knownDesc = new TupleDescQueue<TD>(describe,false);
+		detectedDesc = new FastQueue<TD>(10,detector.getDescriptorType(),false);
+		knownDesc = new FastQueue<TD>(10,detector.getDescriptorType(),false);
 
 		this.associate = associate;
 	}
@@ -190,7 +181,7 @@ public class CombinedTrackerScalePoint
 				track = tracksUnused.pop();
 			} else {
 				track = new CombinedTrack<TD>();
-				track.desc = describe.createDescription();
+				track.desc = detector.createDescription();
 				track.track = trackerKlt.createNewTrack();
 			}
 
@@ -215,21 +206,13 @@ public class CombinedTrackerScalePoint
 	 */
 	private void associateToDetected( List<CombinedTrack<TD>> known ) {
 		// initialize data structures
-		describe.setImage(input);
-
 		detectedDesc.reset();
 		knownDesc.reset();
 
 		// create a list of detected feature descriptions
-		for( int i = 0; i < detector.getNumberOfFeatures(); i++ ) {
-			Point2D_F64 p = detector.getLocation(i);
-			double scale = detector.getScale(i);
-			double yaw = detector.getOrientation(i);
-
-			TD d = descUnused.isEmpty() ? describe.createDescription() : descUnused.pop();
-			describe.process(p.x,p.y,yaw,scale,d);
-
-			detectedDesc.add(d);
+		int N = detector.getNumberOfFeatures();
+		for( int i = 0; i < N; i++ ) {
+			detectedDesc.add(detector.getDescriptor(i));
 		}
 
 		// create a list of previously created track descriptions
@@ -242,10 +225,7 @@ public class CombinedTrackerScalePoint
 		associate.setDestination(detectedDesc);
 		associate.associate();
 
-		// clean up
-		descUnused.addAll(detectedDesc.toList());
-
-		int N = Math.max(known.size(),detector.getNumberOfFeatures());
+		N = Math.max(known.size(),detector.getNumberOfFeatures());
 		if( associated.length < N )
 			associated = new boolean[N];
 	}
