@@ -63,13 +63,13 @@ public abstract class BaseTestDescribeSurf<I extends ImageSingleBand,II extends 
 		GImageMiscOps.fillUniform(ii, rand, 0, 100);
 		alg.setImage(ii);
 		SurfFeature expected = alg.createDescription();
-		alg.describe(c_x,c_y,1,0,expected);
+		alg.describe(c_x,c_y, 0, 1, expected);
 
 		II sub = BoofTesting.createSubImageOf(ii);
 
 		alg.setImage(sub);
 		SurfFeature found = alg.createDescription();
-		alg.describe(c_x,c_y,1,0,found);
+		alg.describe(c_x,c_y, 0, 1, found);
 
 		assertTrue(isSimilar(expected,found));
 	}
@@ -83,8 +83,8 @@ public abstract class BaseTestDescribeSurf<I extends ImageSingleBand,II extends 
 		alg.setImage(ii);
 		SurfFeature a = alg.createDescription();
 		SurfFeature b = alg.createDescription();
-		alg.describe(c_x,c_y,1,0,a);
-		alg.describe(c_x,c_y,1.5,0,b);
+		alg.describe(c_x,c_y, 0, 1, a);
+		alg.describe(c_x,c_y, 0, 1.5, b);
 
 		assertFalse(isSimilar(a,b));
 	}
@@ -98,8 +98,8 @@ public abstract class BaseTestDescribeSurf<I extends ImageSingleBand,II extends 
 		alg.setImage(ii);
 		SurfFeature a = alg.createDescription();
 		SurfFeature b = alg.createDescription();
-		alg.describe(c_x,c_y,1,0,a);
-		alg.describe(c_x,c_y,1,1,b);
+		alg.describe(c_x,c_y, 0, 1, a);
+		alg.describe(c_x,c_y, 1, 1, b);
 
 		assertFalse(isSimilar(a,b));
 	}
@@ -127,8 +127,8 @@ public abstract class BaseTestDescribeSurf<I extends ImageSingleBand,II extends 
 	
 		for( int i = 0; i < 10; i++ ) {
 			double angle = (2.0*Math.PI*i)/10;
-			alg.describe(0,0,1,angle,null);
-			alg.describe(ii.width-1,ii.height-1,1,angle,null);
+			alg.describe(0,0, angle, 1, null);
+			alg.describe(ii.width-1,ii.height-1, angle, 1, null);
 		}
 	}
 
@@ -144,7 +144,7 @@ public abstract class BaseTestDescribeSurf<I extends ImageSingleBand,II extends 
 		alg.setImage(ii);
 		
 		SurfFeature feat = alg.createDescription();
-		alg.describe(20,20,1,0.75,feat);
+		alg.describe(20,20, 0.75, 1, feat);
 
 		for( double f : feat.value )
 			assertEquals(0,f,1e-4);
@@ -165,7 +165,7 @@ public abstract class BaseTestDescribeSurf<I extends ImageSingleBand,II extends 
 		// orient the feature along the x-axis
 		alg.setImage(ii);
 		SurfFeature feat = alg.createDescription();
-		alg.describe(15,15,1,0,feat);
+		alg.describe(15,15, 0, 1, feat);
 
 		for( int i = 0; i < 64; i+= 4) {
 			assertEquals(feat.value[i],feat.value[i+1],1e-4);
@@ -175,7 +175,7 @@ public abstract class BaseTestDescribeSurf<I extends ImageSingleBand,II extends 
 		}
 
 		// now orient the feature along the y-axis
-		alg.describe(15,15,1, Math.PI / 2.0,feat);
+		alg.describe(15,15, Math.PI / 2.0, 1, feat);
 
 		for( int i = 0; i < 64; i+= 4) {
 			assertEquals(-feat.value[i+2],feat.value[i+3],1e-4);
@@ -198,7 +198,7 @@ public abstract class BaseTestDescribeSurf<I extends ImageSingleBand,II extends 
 		// orient the feature along the x-axis
 		alg.setImage(ii);
 		SurfFeature feat = alg.createDescription();
-		alg.describe(25,25,1.5,0,feat);
+		alg.describe(25,25, 0, 1.5, feat);
 
 		for( int i = 0; i < 64; i+= 4) {
 			assertEquals(feat.value[i],feat.value[i+1],1e-4);

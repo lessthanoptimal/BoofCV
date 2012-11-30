@@ -140,11 +140,11 @@ public class DescribePointSurf<II extends ImageSingleBand> {
 	 *
 	 * @param x Location of interest point.
 	 * @param y Location of interest point.
-	 * @param scale Scale of the interest point. Null is returned if the feature goes outside the image border.
 	 * @param angle The angle the feature is pointing at in radians.
+	 * @param scale Scale of the interest point. Null is returned if the feature goes outside the image border.
 	 * @param ret storage for the feature. Must have 64 values.
 	 */
-	public void describe( double x , double y , double scale , double angle , SurfFeature ret )
+	public void describe(double x, double y, double angle, double scale, SurfFeature ret)
 	{
 		double c = Math.cos(angle),s=Math.sin(angle);
 		
