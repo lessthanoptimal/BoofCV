@@ -46,10 +46,21 @@ import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 
 /**
+ * Creates instances of {@link DetectDescribePoint} for different feature detectors/describers.
+ *
  * @author Peter Abeles
  */
 public class FactoryDetectDescribe {
 
+	/**
+	 * Creates a new SIFT feature and describer.  Only provides access to a few critical parameters and uses
+	 * default settings for the rest.
+	 *
+	 * @param numOfOctaves Number of octaves to detect.  Try 4
+	 * @param doubleInputImage Should the input image be doubled? Try false.
+	 * @param maxFeaturesPerScale Max detected features per scale.  Disable with < 0.  Try 500
+	 * @return SIFT
+	 */
 	public static DetectDescribePoint<ImageFloat32,SurfFeature>
 	sift( int numOfOctaves ,
 		  boolean doubleInputImage ,
@@ -57,6 +68,20 @@ public class FactoryDetectDescribe {
 		return sift(1.6,5,numOfOctaves,doubleInputImage,3,0,maxFeaturesPerScale,10,36);
 	}
 
+	/**
+	 * Creates a new SIFT feature detector and describer.  Provides access to most parameters.
+	 *
+	 * @param scaleSigma Amount of blur applied to each scale inside an octaves.  Try 1.6
+	 * @param numOfScales Number of scales per octaves.  Try 5.  Must be >= 3
+	 * @param numOfOctaves Number of octaves to detect.  Try 4
+	 * @param doubleInputImage Should the input image be doubled? Try false.
+	 * @param extractRadius   Size of the feature used to detect the corners. Try 2
+	 * @param detectThreshold Minimum corner intensity required.  Try 1
+	 * @param maxFeaturesPerScale Max detected features per scale.  Disable with < 0.  Try 500
+	 * @param edgeThreshold Threshold for edge filtering.  Disable with a value <= 0.  Try 5
+	 * @param oriHistogramSize Orientation histogram size.  Standard is 36
+	 * @return SIFT
+	 */
 	public static DetectDescribePoint<ImageFloat32,SurfFeature>
 	sift( double scaleSigma ,
 		  int numOfScales ,
@@ -145,6 +170,15 @@ public class FactoryDetectDescribe {
 		return new WrapDetectDescribeSurf<T,II>( detector, orientation, describe );
 	}
 
+	/**
+	 * Given independent algorithms for feature detection, orientation, and describing, create a new
+	 * {@link DetectDescribePoint}.
+	 *
+	 * @param detector Feature detector
+	 * @param orientation Orientation estimation.  Optiona, can be null.
+	 * @param describe Feature descriptor
+	 * @return {@link DetectDescribePoint}.
+	 */
 	public static <T extends ImageSingleBand, D extends TupleDesc>
 	DetectDescribePoint<T,D> fuseTogether( InterestPointDetector<T> detector,
 										   OrientationImage<T> orientation,

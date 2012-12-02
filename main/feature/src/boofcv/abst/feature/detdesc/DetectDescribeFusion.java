@@ -22,6 +22,7 @@ import boofcv.abst.feature.describe.DescribeRegionPoint;
 import boofcv.abst.feature.detect.interest.InterestPointDetector;
 import boofcv.abst.feature.orientation.OrientationImage;
 import boofcv.struct.FastQueue;
+import boofcv.struct.GrowQueue_F64;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.point.Point2D_F64;
@@ -49,6 +50,11 @@ public class DetectDescribeFusion<T extends ImageSingleBand, D extends TupleDesc
 
 	// list of extracted feature descriptors
 	private FastQueue<D> descs;
+
+	// storage for found orientations
+	private GrowQueue_F64 featureScales = new GrowQueue_F64(10);
+	private GrowQueue_F64 featureAngles = new GrowQueue_F64(10);
+	private FastQueue<Point2D_F64> location = new FastQueue<Point2D_F64>(10,Point2D_F64.class,false);
 
 	/**
 	 * Configures the algorithm.
@@ -92,6 +98,9 @@ public class DetectDescribeFusion<T extends ImageSingleBand, D extends TupleDesc
 	@Override
 	public void detect(T input) {
 		descs.reset();
+		featureScales.reset();
+		featureAngles.reset();
+		location.reset();
 
 		if( orientation != null ) {
 			orientation.setImage(input);
@@ -113,30 +122,32 @@ public class DetectDescribeFusion<T extends ImageSingleBand, D extends TupleDesc
 			}
 
 			if( describe.isInBounds(p.x,p.y,yaw,scale) ) {
-				D d = descs.grow();
-				describe.process(p.x,p.y,yaw,scale,d);
+				describe.process(p.x,p.y,yaw,scale,descs.grow());
+				featureScales.push(scale);
+				featureAngles.push(yaw);
+				location.add(p);
 			}
 		}
 	}
 
 	@Override
 	public int getNumberOfFeatures() {
-		return detector.getNumberOfFeatures();
+		return location.size();
 	}
 
 	@Override
 	public Point2D_F64 getLocation(int featureIndex) {
-		return detector.getLocation(featureIndex);
+		return location.get(featureIndex);
 	}
 
 	@Override
 	public double getScale(int featureIndex) {
-		return detector.getScale(featureIndex);
+		return featureScales.get(featureIndex);
 	}
 
 	@Override
 	public double getOrientation(int featureIndex) {
-		return detector.getOrientation(featureIndex);
+		return featureAngles.get(featureIndex);
 	}
 
 	@Override

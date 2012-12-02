@@ -16,24 +16,34 @@
  * limitations under the License.
  */
 
-package boofcv.abst.feature.detdesc;
-
-import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
-import boofcv.struct.feature.SurfFeature;
-import boofcv.struct.image.ImageFloat32;
+package boofcv.numerics;
 
 /**
+ * Do linear interpolation between points in an array.  Sample points must be positive and less than one minus
+ * the array's index.
+ *
  * @author Peter Abeles
  */
-public class TestWrapDetectDescribeSurf extends GenericTestsDetectDescribePoint<ImageFloat32,SurfFeature>
-{
+public class InterpolateArray {
+	public double data[];
+	public double value;
+	private int end;
 
-	public TestWrapDetectDescribeSurf() {
-		super(true, true, ImageFloat32.class, SurfFeature.class);
+	public InterpolateArray(double[] data) {
+		this.data = data;
+		end = data.length-1;
 	}
 
-	@Override
-	public DetectDescribePoint<ImageFloat32, SurfFeature> createDetDesc() {
-		return FactoryDetectDescribe.surf(0, 1, -1, 1, 9, 4, 4, true, ImageFloat32.class);
+	public boolean interpolate( double where ) {
+		if( where < 0 )
+			return false;
+		int index = (int)where;
+		if( index >= end )
+			return false;
+
+		double w = where-index;
+
+		value = data[index]*(1.0-w) + data[index+1]*w;
+		return true;
 	}
 }

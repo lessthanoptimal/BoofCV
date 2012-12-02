@@ -231,10 +231,20 @@ public class DescribePointSift {
 		double norm = Math.sqrt(sumSq);
 		for( int i = 0; i < desc.size() ; i++ )  {
 			desc.value[i] /= norm;
-//			System.out.println(i+"  "+desc.value[i]);
 		}
 
-		// TODO cap max values at BLAH
+		// cap values at 0.2 and re-normalize
+		sumSq = 0;
+		for( int i = 0; i < desc.size(); i++ ) {
+			double v = desc.value[i];
+			if( v > 0.2 )
+				v = desc.value[i] = 0.2;
+			sumSq += v*v;
+		}
+		norm = Math.sqrt(sumSq);
+		for( int i = 0; i < desc.size() ; i++ )  {
+			desc.value[i] /= norm;
+		}
 	}
 
 	public int getDescriptorLength() {

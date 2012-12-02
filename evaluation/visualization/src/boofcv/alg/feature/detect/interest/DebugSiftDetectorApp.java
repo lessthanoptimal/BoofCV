@@ -36,8 +36,8 @@ import java.awt.image.BufferedImage;
 public class DebugSiftDetectorApp {
 
 	public static void main( String args[] ) {
-//		BufferedImage input = UtilImageIO.loadImage("../data/evaluation/sunflowers.png");
-		BufferedImage input = UtilImageIO.loadImage("../data/evaluation/shapes01.png");
+		BufferedImage input = UtilImageIO.loadImage("../data/evaluation/sunflowers.png");
+//		BufferedImage input = UtilImageIO.loadImage("../data/evaluation/shapes01.png");
 
 		ImageFloat32 gray = ConvertBufferedImage.convertFromSingle(input, null, ImageFloat32.class);
 
@@ -45,6 +45,7 @@ public class DebugSiftDetectorApp {
 		SiftImageScaleSpace imageSS = new SiftImageScaleSpace(1.6f, 5, 4, false);
 
 		imageSS.constructPyramid(gray);
+		imageSS.computeFeatureIntensity();
 
 		alg.process(imageSS);
 

@@ -73,9 +73,6 @@ public class DetectFeaturePointApp<T extends ImageSingleBand, D extends ImageSin
 
 		GeneralFeatureDetector<T, D> alg;
 
-		if( imageType == ImageFloat32.class )
-			addAlgorithm(0, "SIFT", FactoryInterestPoint.siftDetector(1.6,5,4,false,2,0,maxScaleFeatures,5));
-
 		alg = FactoryDetectPoint.createHarris(radius, false, thresh, maxFeatures, derivType);
 		addAlgorithm(0, "Harris", FactoryInterestPoint.wrapPoint(alg, imageType, derivType));
 		alg = FactoryDetectPoint.createHarris(radius, true, thresh, maxFeatures, derivType);
@@ -99,7 +96,9 @@ public class DetectFeaturePointApp<T extends ImageSingleBand, D extends ImageSin
 		addAlgorithm(0, "Hess Lap SS", FactoryInterestPoint.wrapDetector(flss, scales, imageType));
 		FeatureLaplacePyramid<T, D> flp = FactoryInterestPointAlgs.hessianLaplacePyramid(radius, thresh, maxScaleFeatures, imageType, derivType);
 		addAlgorithm(0, "Hess Lap P", FactoryInterestPoint.wrapDetector(flp, scales, imageType));
-		addAlgorithm(0, "FastHessian", FactoryInterestPoint.<T>fastHessian(thresh, 5, maxScaleFeatures, 2, 9, 4, 4));
+		addAlgorithm(0, "FastHessian", FactoryInterestPoint.<T>fastHessian(thresh, 2, maxScaleFeatures, 2, 9, 4, 4));
+		if( imageType == ImageFloat32.class )
+			addAlgorithm(0, "SIFT", FactoryInterestPoint.siftDetector(1.6,5,4,false,2,0,maxScaleFeatures,5));
 
 		JPanel viewArea = new JPanel(new BorderLayout());
 		corruptPanel = new ImageCorruptPanel();
