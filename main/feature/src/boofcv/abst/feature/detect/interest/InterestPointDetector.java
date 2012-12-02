@@ -57,9 +57,11 @@ public interface InterestPointDetector< T extends ImageSingleBand > {
 	Point2D_F64 getLocation( int featureIndex );
 
 	/**
+	 * <p>
 	 * Scale of the detected feature in scale space.  This is the standard deviation of the Gaussian blur
 	 * applied to the image when the feature was detected.  While the object's size is not exactly defined,
-	 * multiplying this number by 2.5 is typically considered the object's radius.
+	 * multiplying this number by 2.5 or 3 is typically considered the object's radius.
+	 * </p>
 	 *
 	 * <p>
 	 * NOTE: In the future this might be changed to getRadius() to remove any ambiguity over the detected

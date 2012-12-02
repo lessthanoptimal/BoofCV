@@ -285,8 +285,6 @@ public class VisualizeAssociationMatchesApp<T extends ImageSingleBand, D extends
 
 		List<PathLabel> inputs = new ArrayList<PathLabel>();
 
-		inputs.add(new PathLabel("Boat", "../../SURFPerformance/data/boat/img1.png", "../../SURFPerformance/data/boat/img6.png"));
-
 		inputs.add(new PathLabel("Cave", "../data/evaluation/stitch/cave_01.jpg", "../data/evaluation/stitch/cave_02.jpg"));
 		inputs.add(new PathLabel("Kayak", "../data/evaluation/stitch/kayak_02.jpg", "../data/evaluation/stitch/kayak_03.jpg"));
 		inputs.add(new PathLabel("Forest", "../data/evaluation/scale/rainforest_01.jpg", "../data/evaluation/scale/rainforest_02.jpg"));

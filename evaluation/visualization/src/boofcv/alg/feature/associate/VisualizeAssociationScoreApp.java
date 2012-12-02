@@ -83,12 +83,15 @@ public class VisualizeAssociationScoreApp<T extends ImageSingleBand, D extends I
 
 		GeneralFeatureDetector<T, D> alg;
 
-		// TODO add orientation
 		addAlgorithm(0, "Fast Hessian", FactoryInterestPoint.fastHessian(1, 2, 200, 1, 9, 4, 4));
+		if( imageType == ImageFloat32.class )
+			addAlgorithm(0, "SIFT", FactoryInterestPoint.siftDetector(1.6,5,4,false,2,1,500,10));
 		alg = FactoryDetectPoint.createShiTomasi(2, false, 1, 500, derivType);
 		addAlgorithm(0, "Shi-Tomasi", FactoryInterestPoint.wrapPoint(alg, imageType, derivType));
 
 		addAlgorithm(1, "SURF", FactoryDescribeRegionPoint.surf(true, imageType));
+		if( imageType == ImageFloat32.class )
+			addAlgorithm(1, "SIFT", FactoryDescribeRegionPoint.sift(1.6, 5, 4, false));
 		addAlgorithm(1, "BRIEF", FactoryDescribeRegionPoint.brief(16, 512, -1, 4, true, imageType));
 		addAlgorithm(1, "BRIEFO", FactoryDescribeRegionPoint.brief(16, 512, -1, 4, false, imageType));
 		addAlgorithm(1, "Gaussian 12", FactoryDescribeRegionPoint.gaussian12(20, imageType, derivType));

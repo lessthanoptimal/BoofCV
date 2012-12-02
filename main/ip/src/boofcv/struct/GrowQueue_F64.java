@@ -40,7 +40,15 @@ public class GrowQueue_F64 {
 
 	public void push( double val ) {
 		if( size == data.length ) {
-			double temp[] = new double[ size * 2];
+			double temp[];
+			try {
+				temp = new double[ size * 2];
+			} catch( OutOfMemoryError e ) {
+				System.gc();
+//				System.out.println("Memory on size "+size+" or "+(size*8/1024/1024)+" MB");
+//				System.out.println("Trying smaller increment");
+				temp = new double[ 3*size/2];
+			}
 			System.arraycopy(data,0,temp,0,size);
 			data = temp;
 		}

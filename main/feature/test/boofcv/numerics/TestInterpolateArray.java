@@ -16,24 +16,40 @@
  * limitations under the License.
  */
 
-package boofcv.abst.feature.detdesc;
+package boofcv.numerics;
 
-import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
-import boofcv.struct.feature.SurfFeature;
-import boofcv.struct.image.ImageFloat32;
+import org.junit.Test;
+
+import static org.junit.Assert.*;
 
 /**
  * @author Peter Abeles
  */
-public class TestWrapDetectDescribeSurf extends GenericTestsDetectDescribePoint<ImageFloat32,SurfFeature>
-{
+public class TestInterpolateArray {
 
-	public TestWrapDetectDescribeSurf() {
-		super(true, true, ImageFloat32.class, SurfFeature.class);
+	@Test
+	public void linearCase() {
+		double d[] = new double[]{1,3,5,7};
+
+		InterpolateArray alg = new InterpolateArray(d);
+
+		assertTrue(alg.interpolate(0.5));
+		assertEquals(2, alg.value, 1e-8);
+
+		assertTrue(alg.interpolate(1.1));
+		assertEquals(3.2,alg.value,1e-8);
 	}
 
-	@Override
-	public DetectDescribePoint<ImageFloat32, SurfFeature> createDetDesc() {
-		return FactoryDetectDescribe.surf(0, 1, -1, 1, 9, 4, 4, true, ImageFloat32.class);
+	@Test
+	public void checkBounds() {
+		double d[] = new double[]{1,3,5,7};
+
+		InterpolateArray alg = new InterpolateArray(d);
+
+		assertTrue(alg.interpolate(0));
+		assertTrue(alg.interpolate(2.9));
+		assertFalse(alg.interpolate(3));
+		assertFalse(alg.interpolate(-0.1));
 	}
+
 }

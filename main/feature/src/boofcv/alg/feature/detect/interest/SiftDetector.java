@@ -95,7 +95,7 @@ public class SiftDetector {
 	 * Configures SIFT
 	 *
 	 * @param extractor Extracts local maximums from each scale.
-	 * @param maxFeaturesPerScale Max detected features per scale.  Image size dependent.  Try 500
+	 * @param maxFeaturesPerScale Max detected features per scale.  Disable with < 0.  Try 500
 	 * @param edgeThreshold Threshold for edge filtering.  Disable with a value <= 0.  Try 5
 	 */
 	public SiftDetector(FeatureExtractor extractor,
@@ -104,7 +104,7 @@ public class SiftDetector {
 		this.extractor = extractor;
 		if( maxFeaturesPerScale > 0 ) {
 			// Each scale has detection run twice on it
-			this.maxFeatures = maxFeaturesPerScale/2;
+			this.maxFeatures = maxFeaturesPerScale;
 			selectBest = new SelectNBestFeatures(maxFeatures);
 		}
 

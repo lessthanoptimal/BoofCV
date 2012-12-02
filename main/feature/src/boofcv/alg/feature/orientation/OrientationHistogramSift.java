@@ -20,6 +20,7 @@ package boofcv.alg.feature.orientation;
 
 import boofcv.alg.feature.detect.interest.SiftImageScaleSpace;
 import boofcv.misc.BoofMiscOps;
+import boofcv.numerics.InterpolateArray;
 import boofcv.struct.GrowQueue_F64;
 import boofcv.struct.GrowQueue_I32;
 import boofcv.struct.ImageRectangle;
@@ -82,6 +83,9 @@ public class OrientationHistogramSift {
 	private ImageFloat32 derivX;
 	private ImageFloat32 derivY;
 
+	InterpolateArray approximateGauss;
+	double approximateStep = 0.1;
+
 	/**
 	 * Configures orientation estimation
 	 *
@@ -100,6 +104,14 @@ public class OrientationHistogramSift {
 		this.sigmaEnlarge = sigmaEnlarge;
 
 		this.histAngleBin = 2.0*Math.PI/histogramSize;
+
+		// compute an approximation of a Gaussian distribution as a function of the distance squared
+		double samples[] = new double[ (int)(4*4/approximateStep) ];
+		for( int i = 0; i < samples.length; i++ ) {
+			double dx2 = i*approximateStep;
+			samples[i] = Math.exp(-0.5*dx2 );
+		}
+		approximateGauss = new InterpolateArray(samples);
 	}
 
 	/**
@@ -243,11 +255,20 @@ public class OrientationHistogramSift {
 	}
 
 	/**
-	 * Computes (approximate) Gaussian weighting for each sample point
+	 * Computes the weigthing using a Gaussian shaped function.  Interpolation is used to speed up the process
 	 */
 	private double computeWeight( double deltaX , double deltaY , double sigma ) {
-		return Math.exp(-0.5 * ((deltaX * deltaX + deltaY * deltaY) / (sigma * sigma)));
+		// the exact equation
+//		return Math.exp(-0.5 * ((deltaX * deltaX + deltaY * deltaY) / (sigma * sigma)));
+
+		// approximation below
+		double d =  ((deltaX * deltaX + deltaY * deltaY) / (sigma * sigma))/approximateStep;
+		if( approximateGauss.interpolate(d) ) {
+			return approximateGauss.value;
+		} else
+			return 0;
 	}
+
 
 	/**
 	 * Which image in the scale space is being used.

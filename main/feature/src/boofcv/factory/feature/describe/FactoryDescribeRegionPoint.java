@@ -80,16 +80,19 @@ public class FactoryDescribeRegionPoint {
 	}
 
 	/**
-	 *
 	 * <p>
-	 * NOTE: Only a single orientation hypothesis is considered when using this interface.  Consider
-	 * using {@link boofcv.factory.feature.detdesc.FactoryDetectDescribe#sift(int, boolean, int)} instead
+	 * Creates a standard SIFT region descriptor.
 	 * </p>
 	 *
-	 * @param scaleSigma
-	 * @param numOfScales
-	 * @param numOfOctaves
-	 * @param doubleInputImage
+	 * <p>
+	 * NOTE: If detecting and describing SIFT features then it is more efficient to use
+	 * {@link boofcv.factory.feature.detdesc.FactoryDetectDescribe#sift(int, boolean, int)} instead
+	 * </p>
+	 *
+	 * @param scaleSigma Amount of blur applied to each scale inside an octaves.  Try 1.6
+	 * @param numOfScales Number of scales per octaves.  Try 5.  Must be >= 3
+	 * @param numOfOctaves Number of octaves to detect.  Try 4
+	 * @param doubleInputImage Should the input image be doubled? Try false.
 	 * @return
 	 */
 	public static DescribeRegionPoint<ImageFloat32,SurfFeature> sift( double scaleSigma ,

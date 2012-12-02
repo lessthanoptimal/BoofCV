@@ -68,7 +68,6 @@ public class VisualizeRegionDescriptionApp <T extends ImageSingleBand, D extends
 
 		this.imageType = imageType;
 
-		// TODO add orientation algorithm
 		addAlgorithm(0,"SURF", FactoryDescribeRegionPoint.surf(true, imageType));
 		if( imageType == ImageFloat32.class )
 			addAlgorithm(0,"SIFT", FactoryDescribeRegionPoint.sift(1.6,5,4,false));

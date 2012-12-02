@@ -18,17 +18,21 @@
 
 package boofcv.abst.feature.detdesc;
 
-import org.junit.Test;
-
-import static org.junit.Assert.fail;
+import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
+import boofcv.struct.feature.SurfFeature;
+import boofcv.struct.image.ImageFloat32;
 
 /**
  * @author Peter Abeles
  */
-public class TestWrapDetectDescribeSift {
+public class TestWrapDetectDescribeSift extends GenericTestsDetectDescribePoint<ImageFloat32,SurfFeature>{
 
-	@Test
-	public void stuff() {
-		fail("implement");
+	public TestWrapDetectDescribeSift() {
+		super(true, true, ImageFloat32.class, SurfFeature.class);
+	}
+
+	@Override
+	public DetectDescribePoint<ImageFloat32, SurfFeature> createDetDesc() {
+		return FactoryDetectDescribe.sift(4,false,500);
 	}
 }

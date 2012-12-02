@@ -261,7 +261,7 @@ public class FactoryInterestPointAlgs {
 	 *
 	 * @param extractRadius   Size of the feature used to detect the corners. Try 2
 	 * @param detectThreshold Minimum corner intensity required.  Try 1
-	 * @param maxFeaturesPerScale Max detected features per scale.  Image size dependent.  Try 500
+	 * @param maxFeaturesPerScale Max detected features per scale.  Disable with < 0.  Try 500
 	 * @param edgeThreshold Threshold for edge filtering.  Disable with a value <= 0.  Try 5
 	 */
 	public static SiftDetector siftDetector( int extractRadius,
