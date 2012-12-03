@@ -44,18 +44,18 @@ import georegression.struct.point.Point2D_F64;
 public class DetectDescribeSift {
 
 	// computes the image's scale-space
-	private SiftImageScaleSpace ss;
+	protected SiftImageScaleSpace ss;
 
 	// core SIFT algorithms
-	private SiftDetector detector;
-	private OrientationHistogramSift orientation;
-	private DescribePointSift describe;
+	protected SiftDetector detector;
+	protected OrientationHistogramSift orientation;
+	protected DescribePointSift describe;
 
 	// storage for features and their attributes
-	private SurfFeatureQueue features;
-	private GrowQueue_F64 featureScales;
-	private GrowQueue_F64 featureAngles;
-	private FastQueue<Point2D_F64> location;
+	protected SurfFeatureQueue features;
+	protected GrowQueue_F64 featureScales;
+	protected GrowQueue_F64 featureAngles;
+	protected FastQueue<Point2D_F64> location;
 
 	public DetectDescribeSift(SiftImageScaleSpace ss,
 							  SiftDetector detector,

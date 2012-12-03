@@ -18,17 +18,31 @@
 
 package boofcv.abst.feature.orientation;
 
+import boofcv.alg.feature.orientation.GenericOrientationImageTests;
+import boofcv.factory.feature.orientation.FactoryOrientationAlgs;
+import boofcv.struct.image.ImageFloat32;
 import org.junit.Test;
-
-import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
  */
 public class TestOrientationIntegralToImage {
+	double angleTol = 0.01;
+	int r = 3;
 
+	/**
+	 * Tests using generic tests for image orientation
+	 */
 	@Test
-	public void stuff() {
-		fail("implement");
+	public void generic() {
+		OrientationIntegral<ImageFloat32> orig = FactoryOrientationAlgs.average_ii(r, 1, 6, 0, ImageFloat32.class);
+
+		OrientationIntegralToImage<ImageFloat32,ImageFloat32>
+				alg = new OrientationIntegralToImage<ImageFloat32, ImageFloat32>(orig,
+				ImageFloat32.class,ImageFloat32.class);
+
+		GenericOrientationImageTests tests = new GenericOrientationImageTests();
+		tests.setup(angleTol, r * 2 + 1, alg, ImageFloat32.class);
+		tests.performAll();
 	}
 }

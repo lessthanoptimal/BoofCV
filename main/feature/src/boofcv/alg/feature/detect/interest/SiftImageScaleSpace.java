@@ -43,6 +43,8 @@ public class SiftImageScaleSpace {
 	protected int numOctaves;
 	// number of scales per octave
 	protected int numScales;
+	// largest octave when image size is taken in account.  no octave if image has a width less than 5
+	protected int actualOctaves;
 
 	// Difference of Gaussian (DOG) features
 	protected ImageFloat32 dog[];
@@ -149,10 +151,17 @@ public class SiftImageScaleSpace {
 		constructRestOfOctave(0);
 
 		// compute rest of the octaves
+		actualOctaves = numOctaves;
 		for( int o = 1; o < numOctaves; o++ ) {
 			// use the second scale in the previous octave to seed this one
 			int indexSeed = (o-1)*numScales+1;
 			int indexStart = o*numScales;
+
+			// stop computing octaves if the image is too small
+			if( Math.max(scale[indexStart].width,scale[indexStart].height) < 5 ) {
+				actualOctaves = o;
+				break;
+			}
 
 			downSample(scale[indexSeed],scale[indexStart]);
 
@@ -164,7 +173,8 @@ public class SiftImageScaleSpace {
 	 * Computes the image derivative for each layer in the pyramid.
 	 */
 	public void computeDerivatives() {
-		for( int i = 0; i < scale.length; i++ ) {
+		int maxScales = actualOctaves*numScales;
+		for( int i = 0; i < maxScales; i++ ) {
 			ImageFloat32 input = scale[i];
 			ImageFloat32 dx = derivX[i];
 			ImageFloat32 dy = derivY[i];
@@ -209,7 +219,7 @@ public class SiftImageScaleSpace {
 	 */
 	public void computeFeatureIntensity() {
 		int indexDog = 0;
-		for( int o = 0; o < numOctaves; o++ ) {
+		for( int o = 0; o < actualOctaves; o++ ) {
 			for( int i = 1; i < numScales; i++ , indexDog++ ) {
 				int indexScale = o*numScales + i;
 

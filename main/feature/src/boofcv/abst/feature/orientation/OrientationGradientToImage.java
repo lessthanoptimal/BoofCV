@@ -58,6 +58,7 @@ public class OrientationGradientToImage<T extends ImageSingleBand, D extends Ima
 		derivY.reshape(image.width,image.height);
 
 		gradient.process(image,derivX,derivY);
+		alg.setImage(derivX,derivY);
 	}
 
 	@Override
