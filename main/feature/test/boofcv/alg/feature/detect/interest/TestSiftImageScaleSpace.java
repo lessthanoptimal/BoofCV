@@ -19,7 +19,9 @@
 package boofcv.alg.feature.detect.interest;
 
 import boofcv.alg.misc.GImageMiscOps;
+import boofcv.alg.misc.ImageStatistics;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.testing.BoofTesting;
 import org.junit.Test;
 
 import java.util.Random;
@@ -128,5 +130,66 @@ public class TestSiftImageScaleSpace {
 		assertEquals(2.0,alg.imageIndexToPixelScale(5),1e-8);
 		assertEquals(2.0,alg.imageIndexToPixelScale(6),1e-8);
 		assertEquals(2.0,alg.imageIndexToPixelScale(9),1e-8);
+	}
+
+	/**
+	 * The number of octaves is too large for input image and should stop processing before it gets too small
+	 */
+	@Test
+	public void smallImages() {
+		SiftImageScaleSpace ss = new SiftImageScaleSpace(1.6f, 5, 4, false);
+
+		ImageFloat32 input = new ImageFloat32(10,15);
+		GImageMiscOps.fillUniform(input, rand, 0, 100);
+
+		ss.constructPyramid(input);
+		ss.computeFeatureIntensity();
+		ss.computeDerivatives();
+
+		assertEquals(2, ss.actualOctaves);
+
+		// images in rest of the octaves should be zero
+		int index = 3*5;
+		for( ; index < ss.scale.length; index++ ) {
+			ImageFloat32 s = ss.scale[index];
+			ImageFloat32 gx = ss.derivX[index];
+			ImageFloat32 gy = ss.derivY[index];
+			assertTrue(ImageStatistics.sum(s)==0);
+			assertTrue(ImageStatistics.sum(gx)==0);
+			assertTrue(ImageStatistics.sum(gy)==0);
+		}
+
+		index = 3*4;
+		for( ; index < ss.dog.length; index++ ) {
+			ImageFloat32 dog = ss.dog[index];
+			assertTrue(ImageStatistics.sum(dog)==0);
+		}
+	}
+
+	/**
+	 * Process two images, one is a sub-image of the first.  See if it produces the same results
+	 */
+	@Test
+	public void checkSubImage() {
+		SiftImageScaleSpace ss1 = new SiftImageScaleSpace(1.6f, 5, 4, false);
+		SiftImageScaleSpace ss2 = new SiftImageScaleSpace(1.6f, 5, 4, false);
+
+		ImageFloat32 input = new ImageFloat32(60,70);
+		GImageMiscOps.fillUniform(input, rand, 0, 100);
+		ImageFloat32 sub = BoofTesting.createSubImageOf(input);
+
+		ss1.constructPyramid(input);
+		ss2.constructPyramid(sub);
+
+		for( int index = 0; index < ss1.scale.length; index++ ) {
+			ImageFloat32 s1 = ss1.scale[index];
+			ImageFloat32 s2 = ss2.scale[index];
+
+			float sum1 = ImageStatistics.sum(s1);
+			float sum2 = ImageStatistics.sum(s2);
+
+			assertTrue(sum1 != 0);
+			assertEquals(sum1,sum2,1e-6);
+		}
 	}
 }

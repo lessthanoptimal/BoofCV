@@ -18,17 +18,56 @@
 
 package boofcv.alg.feature.detdesc;
 
+import boofcv.alg.feature.describe.DescribePointSift;
+import boofcv.alg.feature.detect.interest.SiftDetector;
+import boofcv.alg.feature.detect.interest.SiftImageScaleSpace;
+import boofcv.alg.feature.orientation.OrientationHistogramSift;
+import boofcv.factory.feature.detect.interest.FactoryInterestPointAlgs;
 import org.junit.Test;
 
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertTrue;
 
 /**
+ * High level functionality is tested by {@link boofcv.abst.feature.detdesc.TestWrapDetectDescribeSift}.
+ * Only very basic accessor tests are here.
+ *
  * @author Peter Abeles
  */
 public class TestDetectDescribeSift {
 
+	DetectDescribeSift alg;
+
+	public TestDetectDescribeSift() {
+		SiftImageScaleSpace ss = new SiftImageScaleSpace(1.6f, 5,4,false);
+		SiftDetector detector = FactoryInterestPointAlgs.siftDetector(2, 1, -1, 5);
+		OrientationHistogramSift orientation = new OrientationHistogramSift(32,2.5,1.5);
+		DescribePointSift describe = new DescribePointSift(4,8,8,0.5, 2.5);
+
+		alg = new DetectDescribeSift(ss,detector,orientation,describe);
+	}
+
 	@Test
-	public void stuff() {
-		fail("implement");
+	public void getDescriptorLength() {
+		assertTrue(alg.describe.getDescriptorLength() == alg.getDescriptorLength());
+	}
+
+	@Test
+	public void getFeatures() {
+		assertTrue(alg.features == alg.getFeatures());
+	}
+
+	@Test
+	public void getFeatureScales() {
+		assertTrue(alg.featureScales == alg.getFeatureScales());
+	}
+
+	@Test
+	public void getFeatureAngles() {
+		assertTrue(alg.featureAngles == alg.getFeatureAngles());
+	}
+
+	@Test
+	public void getLocation() {
+		assertTrue(alg.location == alg.getLocation());
 	}
 }

@@ -55,6 +55,7 @@ Version : Alpha 0.12
 - Added 2D convolution in KernelMath
 - Maven build has been added.
   * BoofCV is on the central repository
+- Added SIFT feature descriptor and detector
 
 ---------------------------------------------
 Date    : 2012/11/6
@@ -201,6 +202,7 @@ Version : Alpha 0.9
   * About the same for 3x3 regions, much faster for larger regions
   * Tweaked related API and improved unit tests
 - Fixed bug in WrapDescrivePixelRegion where the descriptor is not properly configured for integer images
+- Added SIFT feature descriptor and detector
 
 ---------------------------------------------
 Date    : 2012/05/13

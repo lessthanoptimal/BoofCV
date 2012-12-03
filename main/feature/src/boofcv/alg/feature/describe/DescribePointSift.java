@@ -23,6 +23,11 @@ import boofcv.struct.feature.SurfFeature;
 import boofcv.struct.image.ImageFloat32;
 
 /**
+ * <p>
+ * Detects SIFT features inside the provided SIFT scale-space.  SIFT features work by sampling the image in a grid.
+ * For each grid element, a histogram of the gradient's orientation is computed.  From this histogram the descriptor
+ * is computed.  See [1] for the details and below for algorithmic changes.
+ * </p>
  *
  * <p>
  * DESCRIPTOR INTERPOLATION: Instead of using trilinear interpolation a Gaussian weight is used instead.
@@ -30,31 +35,49 @@ import boofcv.struct.image.ImageFloat32;
  * found by others with regard to SURF descriptors.
  * </p>
  *
+ * <p>
+ * [1] Lowe, D. "Distinctive image features from scale-invariant keypoints".
+ * International Journal of Computer Vision, 60, 2 (2004), pp.91--110.
+ * </p>
+ *
  * @author Peter Abeles
  */
 public class DescribePointSift {
 
 	// Image scale space
-	SiftImageScaleSpace ss;
+	private SiftImageScaleSpace ss;
 
 	// Converts a distribution's sigma into a region radius to sample
 	private double sigmaToRadius;
 
-	int gridWidth;
-	// number of samples along a grid's side
-	// each grid is samples the square of this number
-	int numSamples;
+	// number of elements along the side of the descriptor grid
+	private int gridWidth;
+	// number of samples along a grid element's side
+	// each grid is samples the square of this number and the histogram computed
+	// from these samples
+	private int numSamples;
 
-	int numHistBins;
-	double angleStep;
+	private int numHistBins;
+	private double angleStep;
 
-	ImageFloat32 image;
-	ImageFloat32 derivX;
-	ImageFloat32 derivY;
+	// image and gradient of octave being processed
+	private ImageFloat32 image;
+	private ImageFloat32 derivX;
+	private ImageFloat32 derivY;
 
-	double[][] histograms;
-	double[] gridWeights;
+	// storage for histogram
+	private double[][] histograms;
+	private double[] gridWeights;
 
+	/**
+	 * Configures detector
+	 *
+	 * @param gridWidth Number of grid elements along a side.  Typically 4
+	 * @param numSamples Number of samples along a grid. Typically 8
+	 * @param numHistBins Number of bins in the orientation histogram.  Typically 8
+	 * @param weightSigma Adjusts descriptor element's weighting from center.  Typically 0.5
+	 * @param sigmaToRadius Conversation from scale space to pixels.  Typically 2.5
+	 */
 	public DescribePointSift( int gridWidth , int numSamples , int numHistBins ,
 							  double weightSigma , double sigmaToRadius ) {
 		this.gridWidth = gridWidth;

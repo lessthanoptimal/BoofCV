@@ -30,11 +30,13 @@ import boofcv.struct.image.ImageFloat32;
  * <p>
  * Computes the orientation of a region around a point in scale-space as specified in the SIFT [1] paper.  A
  * histogram of gradients is computed and the largest peaks are returned as the region's direction.  The
- * gradient is weighted using a Gaussian distribution.  This is intended to be a faithful implementation of
- * what's described in the paper.
+ * gradient is weighted using a Gaussian distribution.
  * </p>
  *
- * TODO Note changes to reflect changes from paper
+ * <p>
+ * INTERPOLATION: Instead of fitting a curve to adjacent bins, the solution is computed by summing
+ * up dx and dy independently in each bin.  Then when a bin is selected the angle is set to the atan() of dx,dy sums.
+ * </p>
  *
  * <p>
  * [1] Lowe, D. "Distinctive image features from scale-invariant keypoints".
@@ -43,7 +45,6 @@ import boofcv.struct.image.ImageFloat32;
  *
  * @author Peter Abeles
  */
-// TODO approximate weight equation using interpolation
 public class OrientationHistogramSift {
 
 	// Converts a distribution's sigma into a region radius to sample
@@ -261,7 +262,8 @@ public class OrientationHistogramSift {
 		// the exact equation
 //		return Math.exp(-0.5 * ((deltaX * deltaX + deltaY * deltaY) / (sigma * sigma)));
 
-		// approximation below
+		// approximation below.  when validating this approach it produced results that were within
+		// floating point tolerance of the exact solution, but much faster
 		double d =  ((deltaX * deltaX + deltaY * deltaY) / (sigma * sigma))/approximateStep;
 		if( approximateGauss.interpolate(d) ) {
 			return approximateGauss.value;

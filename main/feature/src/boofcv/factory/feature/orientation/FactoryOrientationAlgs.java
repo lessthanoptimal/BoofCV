@@ -172,6 +172,14 @@ public class FactoryOrientationAlgs {
 						windowSize,radius,weightSigma, sampleWidth,integralType);
 	}
 
+	/**
+	 * Estimates multiple orientations as specified in SIFT paper.
+	 *
+	 * @param histogramSize Number of elements in the histogram.  Standard is 36
+	 * @param sigmaToRadius Convert a sigma to region radius.  Try 2.5
+	 * @param sigmaEnlarge How much the scale is enlarged by.  Standard is 1.5
+	 * @return OrientationHistogramSift
+	 */
 	public static OrientationHistogramSift sift( int histogramSize ,
 												 double sigmaToRadius,
 												 double sigmaEnlarge ) {

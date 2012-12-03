@@ -151,7 +151,7 @@ public class SiftDetector {
 		this.ss = ss;
 
 		// extract features in each octave
-		for( int octave = 0; octave < ss.numOctaves; octave++ ) {
+		for( int octave = 0; octave < ss.actualOctaves; octave++ ) {
 			// start processing at the second DOG since it needs the scales above and below
 			int indexDOG = octave*(ss.numScales-1)+1;
 			int indexScale = octave*ss.numScales+1;

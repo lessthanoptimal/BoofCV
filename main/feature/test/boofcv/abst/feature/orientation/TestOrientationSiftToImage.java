@@ -18,17 +18,31 @@
 
 package boofcv.abst.feature.orientation;
 
+import boofcv.alg.feature.detect.interest.SiftImageScaleSpace;
+import boofcv.alg.feature.orientation.GenericOrientationImageTests;
+import boofcv.alg.feature.orientation.OrientationHistogramSift;
+import boofcv.factory.feature.orientation.FactoryOrientationAlgs;
+import boofcv.struct.image.ImageFloat32;
 import org.junit.Test;
-
-import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
  */
 public class TestOrientationSiftToImage {
+	double angleTol = 0.1;
 
+	/**
+	 * Tests using generic tests for image orientation
+	 */
 	@Test
-	public void stuff() {
-		fail("implement");
+	public void generic() {
+		SiftImageScaleSpace ss = new SiftImageScaleSpace(1.6f,5,4,false);
+		OrientationHistogramSift orig = FactoryOrientationAlgs.sift(32,2.5,1.5);
+
+		OrientationSiftToImage alg = new OrientationSiftToImage(orig,ss);
+
+		GenericOrientationImageTests tests = new GenericOrientationImageTests();
+		tests.setup(angleTol, (int)(2*2.5*1.5), alg, ImageFloat32.class);
+		tests.performAll();
 	}
 }
