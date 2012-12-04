@@ -20,18 +20,17 @@ package boofcv.factory.feature.describe;
 
 import boofcv.abst.feature.describe.*;
 import boofcv.abst.filter.blur.BlurFilter;
-import boofcv.abst.filter.derivative.ImageGradient;
-import boofcv.alg.feature.describe.DescribePointGaussian12;
 import boofcv.alg.feature.describe.DescribePointSift;
-import boofcv.alg.feature.describe.DescribePointSteerable2D;
 import boofcv.alg.feature.describe.DescribePointSurf;
 import boofcv.alg.feature.describe.brief.BriefDefinition_I32;
 import boofcv.alg.feature.describe.brief.FactoryBriefDefinition;
 import boofcv.alg.feature.detect.interest.SiftImageScaleSpace;
 import boofcv.alg.transform.ii.GIntegralImageOps;
 import boofcv.factory.filter.blur.FactoryBlurFilter;
-import boofcv.factory.filter.derivative.FactoryDerivative;
-import boofcv.struct.feature.*;
+import boofcv.struct.feature.NccFeature;
+import boofcv.struct.feature.SurfFeature;
+import boofcv.struct.feature.TupleDesc;
+import boofcv.struct.feature.TupleDesc_B;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 
@@ -86,7 +85,7 @@ public class FactoryDescribeRegionPoint {
 	 *
 	 * <p>
 	 * NOTE: If detecting and describing SIFT features then it is more efficient to use
-	 * {@link boofcv.factory.feature.detdesc.FactoryDetectDescribe#sift(int, boolean, int)} instead
+	 * {@link boofcv.factory.feature.detdesc.FactoryDetectDescribe#sift(int, float, boolean, int)} instead
 	 * </p>
 	 *
 	 * @param scaleSigma Amount of blur applied to each scale inside an octaves.  Try 1.6
@@ -106,37 +105,6 @@ public class FactoryDescribeRegionPoint {
 		DescribePointSift alg = FactoryDescribePointAlgs.sift(4, 8, 8);
 
 		return new WrapDescribeSift(alg,ss);
-	}
-
-	/**
-	 * Steerable Gaussian descriptor normalized by 1st order gradient.
-	 *
-	 * @see DescribePointGaussian12
-	 *
-	 * @param radius How large the kernel should be. Try 20.
-	 * @param imageType Type of input image.
-	 * @param derivType Type of image the gradient is.
-	 * @param <T> Input image type
-	 * @param <D> Derivative type
-	 * @return Steerable gaussian descriptor.
-	 */
-	public static <T extends ImageSingleBand, D extends ImageSingleBand>
-	DescribeRegionPoint<T,TupleDesc_F64> gaussian12( int radius ,Class<T> imageType , Class<D> derivType ) {
-
-		ImageGradient<T,D> gradient = FactoryDerivative.sobel(imageType,derivType);
-		DescribePointGaussian12<T, ?> steer = FactoryDescribePointAlgs.steerableGaussian12(radius, imageType);
-
-		return new WrapDescribeGaussian12<T,D>(steer,gradient,imageType,derivType);
-	}
-
-	public static <T extends ImageSingleBand, D extends ImageSingleBand>
-	DescribeRegionPoint<T,TupleDesc_F64> steerableGaussian( int radius , boolean normalized ,
-													Class<T> imageType , Class<D> derivType ) {
-
-		ImageGradient<T,D> gradient = FactoryDerivative.sobel(imageType,derivType);
-		DescribePointSteerable2D<T, ?> steer = FactoryDescribePointAlgs.steerableGaussian(normalized, -1, radius, imageType);
-
-		return new WrapDescribeSteerable<T,D>(steer,gradient,imageType,derivType);
 	}
 
 	/**

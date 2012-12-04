@@ -107,7 +107,7 @@ public class ExampleFeatureSurf {
 			
 			// extract the SURF description for this region
 			SurfFeature desc = descriptor.createDescription();
-			descriptor.describe(p.x,p.y,p.scale,angle,desc);
+			descriptor.describe(p.x,p.y,angle,p.scale,desc);
 
 			// save everything for processing later on
 			descriptions.add(desc);

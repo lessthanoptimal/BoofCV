@@ -33,11 +33,14 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 
 /**
- * Demonstrates how to detect interest points using the easy to use {@link InterestPointDetector} interface.
+ * Demonstrates how to detect interest points using the to use {@link InterestPointDetector} interface.
  * InterestPointDetector makes it easy to switch between algorithms, but due to its abstraction it also cause
  * calculations to be done multiple times.  For example, if a detector requires the gradient and so does the description
  * algorithm then that calculation will have to be done twice when using this interface.  If the algorithms had
  * been used directly then extra calculations could be avoided.
+ *
+ * If descriptors are also being computed, consider using the DetectDescribePoint interface instead.  See
+ * {@link ExampleDetectDescribe}.
  *
  * @author Peter Abeles
  */

@@ -38,9 +38,6 @@ public class UtilStabilityBenchmark {
 		ret.add( new BenchmarkAlgorithm("SURF-M", FactoryDescribeRegionPoint.surf(true, imageType)));
 		ret.add( new BenchmarkAlgorithm("BRIEF", FactoryDescribeRegionPoint.brief(16, 512, -1, 4, true, imageType)));
 		ret.add( new BenchmarkAlgorithm("BRIEF-SO", FactoryDescribeRegionPoint.brief(16, 512, -1, 4, false, imageType)));
-		ret.add( new BenchmarkAlgorithm("Gaussian 12", FactoryDescribeRegionPoint.gaussian12(20, imageType, derivType)));
-		ret.add( new BenchmarkAlgorithm("Steer", FactoryDescribeRegionPoint.steerableGaussian(20, false, imageType, derivType)));
-		ret.add( new BenchmarkAlgorithm("Steer Norm", FactoryDescribeRegionPoint.steerableGaussian(20, true, imageType, derivType)));
 
 		return ret;
 	}

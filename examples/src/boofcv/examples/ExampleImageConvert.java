@@ -70,7 +70,7 @@ public class ExampleImageConvert {
 		// will be within a valid range.
 		ImageSInt16 scaledAbs = new ImageSInt16(derivX.width,derivX.height);
 		GPixelMath.abs(derivX,scaledAbs);
-		GPixelMath.multiply(scaledAbs, 255/ ImageStatistics.max(scaledAbs), scaledAbs);
+		GPixelMath.multiply(scaledAbs, 255.0 / ImageStatistics.max(scaledAbs), scaledAbs);
 
 		// If you just want to see the values of a 16-bit image there are built in utility functions
 		// for visualizing their values too

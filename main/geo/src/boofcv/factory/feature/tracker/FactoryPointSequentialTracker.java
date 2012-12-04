@@ -38,8 +38,6 @@ import boofcv.alg.feature.describe.brief.FactoryBriefDefinition;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.alg.interpolate.InterpolateRectangle;
 import boofcv.alg.tracker.combined.CombinedTrackerScalePoint;
-import boofcv.alg.tracker.combined.PyramidKltForCombined;
-import boofcv.alg.tracker.klt.KltConfig;
 import boofcv.alg.transform.ii.GIntegralImageOps;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.feature.describe.FactoryDescribePointAlgs;
@@ -51,6 +49,7 @@ import boofcv.factory.feature.orientation.FactoryOrientation;
 import boofcv.factory.filter.blur.FactoryBlurFilter;
 import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.factory.interpolate.FactoryInterpolation;
+import boofcv.factory.tracker.FactoryTrackerAlg;
 import boofcv.factory.transform.pyramid.FactoryPyramid;
 import boofcv.struct.feature.*;
 import boofcv.struct.image.ImageSingleBand;
@@ -377,7 +376,8 @@ public class FactoryPointSequentialTracker {
 		if( derivType == null )
 			derivType = GImageDerivativeOps.getDerivativeType(imageType);
 
-		GeneralFeatureDetector corner = FactoryDetectPoint.createShiTomasi(detectRadius, false, detectThreshold, maxMatches, derivType);
+		GeneralFeatureDetector corner = FactoryDetectPoint.createShiTomasi(
+				detectRadius, false, detectThreshold, maxMatches, derivType);
 
 		InterestPointDetector<I> detector = FactoryInterestPoint.wrapPoint(corner, imageType, derivType);
 
@@ -456,14 +456,9 @@ public class FactoryPointSequentialTracker {
 	{
 		Class<D> derivType = GImageDerivativeOps.getDerivativeType(imageType);
 
-		KltConfig configKlt =  KltConfig.createDefault();
-
-		PyramidKltForCombined<I,D> klt = new PyramidKltForCombined<I, D>(configKlt,
-				featureRadiusKlt,pyramidScalingKlt,imageType,derivType);
-
-
 		CombinedTrackerScalePoint<I, D,Desc> tracker =
-				new CombinedTrackerScalePoint<I, D, Desc>(klt,detector,associate);
+				FactoryTrackerAlg.combined(detector,associate,featureRadiusKlt,pyramidScalingKlt,
+						imageType,derivType);
 
 		return new WrapCombinedTracker<I,D,Desc>(tracker,reactivateThreshold,imageType,derivType);
 	}

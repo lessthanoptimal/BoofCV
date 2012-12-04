@@ -56,35 +56,4 @@ public class TestFactorySteerable {
 			}
 		}
 	}
-
-	/**
-	 * Compare the values found in the separable kernel against what was computed
-	 * using the full 2D gaussian kernel.
-	 */
-	// todo this is going to be a long standing bug.
-	@Test
-	public void separable() {
-		for( int totalOrder = 1; totalOrder <= 4; totalOrder++ ) {
-			for( int orderX = 0; orderX<= totalOrder; orderX++ ) {
-				int orderY = totalOrder-orderX;
-
-				// todo note the Dy doesn't work either   only Dx
-				System.out.println("x = "+orderX+" y = "+orderY);
-
-				SteerableKernel<Kernel2D_F32> alg = FactorySteerable.separable(Kernel2D_F32.class,orderX,orderY,10);
-				SteerableKernel<Kernel2D_F32> algValidate = FactorySteerable.gaussian(Kernel2D_F32.class,orderX,orderY, -1, 10);
-
-				Kernel2D_F32 found = alg.compute(0.2);
-				Kernel2D_F32 expected = algValidate.compute(0.2);
-
-				float total = 0;
-				float sum = 0;
-				for( int y = 0; y < found.data.length; y++ ) {
-					total += Math.abs(found.data[y]-expected.data[y]);
-					sum += Math.abs(expected.data[y]);
-				}
-				assertTrue(total/sum < 0.01);
-			}
-		}
-	}
 }

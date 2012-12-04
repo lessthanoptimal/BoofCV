@@ -70,10 +70,10 @@ public class ExampleBinaryImage {
 		ImageSInt32 blobs = new ImageSInt32(input.width,input.height);
 
 		// the mean pixel value is often a reasonable threshold when creating a binary image
-		float mean = (float)ImageStatistics.sum(input);
+		double mean = ImageStatistics.mean(input);
 
 		// create a binary image
-		ThresholdImageOps.threshold(input,binary,mean,true);
+		ThresholdImageOps.threshold(input,binary,(float)mean,true);
 
 		// remove small blobs through erosion and dilation
 		// The null in the input indicates that it should internally declare the work image it needs

@@ -18,22 +18,114 @@
 
 package boofcv.alg.tracker.combined;
 
+import boofcv.abst.filter.derivative.ImageGradient;
+import boofcv.alg.misc.ImageMiscOps;
+import boofcv.alg.misc.ImageStatistics;
+import boofcv.alg.tracker.klt.KltConfig;
+import boofcv.alg.tracker.klt.PyramidKltFeature;
+import boofcv.alg.transform.pyramid.PyramidOps;
+import boofcv.factory.filter.derivative.FactoryDerivative;
+import boofcv.factory.transform.pyramid.FactoryPyramid;
+import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.pyramid.PyramidDiscrete;
+import boofcv.struct.pyramid.PyramidUpdaterDiscrete;
+import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.fail;
+import java.util.Random;
+
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Peter Abeles
  */
 public class TestPyramidKltForCombined {
 
+	Random rand = new Random(243);
+
+	int width = 80;
+	int height = 100;
+
+	int scales[] = new int[]{1,2,4};
+
+	PyramidDiscrete<ImageFloat32> pyramid;
+	PyramidDiscrete<ImageFloat32> derivX;
+	PyramidDiscrete<ImageFloat32> derivY;
+
+
+	public PyramidKltForCombined<ImageFloat32,ImageFloat32> createAlg()
+	{
+		KltConfig config = KltConfig.createDefault();
+
+		return new PyramidKltForCombined<ImageFloat32,ImageFloat32>(config,5,scales,
+				ImageFloat32.class,ImageFloat32.class);
+	}
+
+	@Before
+	public void init() {
+
+		pyramid = new PyramidDiscrete(ImageFloat32.class,false,scales);
+		derivX = new PyramidDiscrete(ImageFloat32.class,false,scales);
+		derivY = new PyramidDiscrete(ImageFloat32.class,false,scales);
+
+		pyramid.initialize(width,height);
+		derivX.initialize(width,height);
+		derivY.initialize(width,height);
+
+		ImageFloat32 input = new ImageFloat32(width,height);
+		ImageMiscOps.fillUniform(input,rand,0,100);
+
+		// do a real update so that it can track a feature
+		PyramidUpdaterDiscrete<ImageFloat32> updaterP = FactoryPyramid.discreteGaussian(ImageFloat32.class, -1, 2);
+		ImageGradient<ImageFloat32,ImageFloat32> gradient =
+				FactoryDerivative.sobel(ImageFloat32.class, ImageFloat32.class);
+
+		updaterP.update(input,pyramid);
+		PyramidOps.gradient(pyramid, gradient, derivX, derivY);
+	}
+
 	@Test
 	public void setDescription() {
-		fail("implement");
+		PyramidKltForCombined<ImageFloat32,ImageFloat32> alg = createAlg();
+
+		alg.setInputs(pyramid,derivX,derivY);
+
+		PyramidKltFeature t = alg.createNewTrack();
+
+		alg.setDescription(30.1f,25,t);
+
+		assertTrue(30.1f == t.x);
+		assertTrue(25f == t.y);
+
+		for( int i = 0; i < t.desc.length; i++ ) {
+			double v = ImageStatistics.sum(t.desc[i].desc);
+			double dx = ImageStatistics.sum(t.desc[i].derivX);
+			double dy = ImageStatistics.sum(t.desc[i].derivY);
+
+			assertTrue(v!=0);
+			assertTrue(dx!=0);
+			assertTrue(dy!=0);
+		}
 	}
 
 	@Test
 	public void performTracking() {
-		fail("implement");
+		PyramidKltForCombined<ImageFloat32,ImageFloat32> alg = createAlg();
+
+		alg.setInputs(pyramid,derivX,derivY);
+
+		PyramidKltFeature t = alg.createNewTrack();
+
+		alg.setDescription(30.1f, 25, t);
+
+		// offset it from the original pose
+		t.x = 33.5f;
+		t.y = 18f;
+
+		// see if it moves it back close to the original pose
+		assertTrue(alg.performTracking(t));
+
+		assertTrue(Math.abs(t.x-30.1)<0.1);
+		assertTrue(Math.abs(t.y-25)<0.1);
 	}
 }
