@@ -13,7 +13,7 @@
     <dependency>
       <groupId>com.googlecode.efficient-java-matrix-library</groupId>
       <artifactId>ejml</artifactId>
-      <version>0.21-SNAPSHOT</version>
+      <version>0.21</version>
     </dependency>
     
     <dependency>

@@ -49,34 +49,41 @@ public class CombinedTrackerScalePoint
 	private I input;
 
 	// The KLT tracker used to perform the nominal track update
-	private PyramidKltForCombined<I,D> trackerKlt;
+	protected PyramidKltForCombined<I,D> trackerKlt;
 
 	// feature detector and describer
-	private DetectDescribePoint<I,TD> detector;
+	protected DetectDescribePoint<I,TD> detector;
 	// Used to associate features using their DDA description
-	private GeneralAssociation<TD> associate;
+	protected GeneralAssociation<TD> associate;
 
 	// all active tracks that have been tracked purely by KLT
-	private List<CombinedTrack<TD>> tracksPureKlt = new ArrayList<CombinedTrack<TD>>();
+	protected List<CombinedTrack<TD>> tracksPureKlt = new ArrayList<CombinedTrack<TD>>();
 	// tracks that had been dropped by KLT but have been reactivated
-	private List<CombinedTrack<TD>> tracksReactivated = new ArrayList<CombinedTrack<TD>>();
+	protected List<CombinedTrack<TD>> tracksReactivated = new ArrayList<CombinedTrack<TD>>();
 	// tracks that are not actively being tracked
-	private List<CombinedTrack<TD>> tracksDormant = new ArrayList<CombinedTrack<TD>>();
+	protected List<CombinedTrack<TD>> tracksDormant = new ArrayList<CombinedTrack<TD>>();
 	// recently spawned tracks
-	private List<CombinedTrack<TD>> tracksSpawned = new ArrayList<CombinedTrack<TD>>();
+	protected List<CombinedTrack<TD>> tracksSpawned = new ArrayList<CombinedTrack<TD>>();
 	// track points whose data is to be reused
-	private Stack<CombinedTrack<TD>> tracksUnused = new Stack<CombinedTrack<TD>>();
+	protected Stack<CombinedTrack<TD>> tracksUnused = new Stack<CombinedTrack<TD>>();
 
 	// local storage used by association
-	private FastQueue<TD> detectedDesc;
-	private FastQueue<TD> knownDesc;
+	protected FastQueue<TD> detectedDesc;
+	protected FastQueue<TD> knownDesc;
 
 	// number of tracks it has created
-	private long totalTracks = 0;
+	protected long totalTracks = 0;
 
-	// Marks a known track has being associated
+	// Marks a known track as being associated
 	private boolean associated[] = new boolean[1];
 
+	/**
+	 * Configures tracker
+	 *
+	 * @param trackerKlt KLT tracker used nominally
+	 * @param detector Feature detector
+	 * @param associate Association algorithm
+	 */
 	public CombinedTrackerScalePoint(PyramidKltForCombined<I, D> trackerKlt,
 									 DetectDescribePoint<I,TD> detector,
 									 GeneralAssociation<TD> associate ) {
@@ -90,18 +97,17 @@ public class CombinedTrackerScalePoint
 	}
 
 	/**
+	 * Used for unit tests
+	 */
+	protected CombinedTrackerScalePoint() {
+	}
+
+	/**
 	 * Sets the tracker into its initial state.  Previously declared track data structures are saved
 	 * for re-use.
 	 */
 	public void reset() {
-		tracksUnused.addAll(tracksSpawned);
-		tracksUnused.addAll(tracksPureKlt);
-		tracksUnused.addAll(tracksReactivated);
-
-		tracksPureKlt.clear();
-		tracksReactivated.clear();
-		tracksDormant.clear();
-		tracksSpawned.clear();
+		dropAllTracks();
 		totalTracks = 0;
 	}
 
@@ -231,7 +237,9 @@ public class CombinedTrackerScalePoint
 	}
 
 	/**
-	 * Associate all tracks in any state to the latest observations
+	 * Associate all tracks in any state to the latest observations.  If a dormant track is associated it
+	 * will be reactivated.  If a reactivated track is associated it's state will be updated.  PureKLT
+	 * tracks are left unmodified.
 	 */
 	public void associateAllToDetected() {
 		// initialize data structures
@@ -306,8 +314,11 @@ public class CombinedTrackerScalePoint
 		return trackerKlt;
 	}
 
+	/**
+	 * Drops all tracks and recycles the data
+	 */
 	public void dropAllTracks() {
-		tracksUnused.addAll(tracksSpawned);
+		tracksUnused.addAll(tracksDormant);
 		tracksUnused.addAll(tracksPureKlt);
 		tracksUnused.addAll(tracksReactivated);
 
@@ -315,5 +326,6 @@ public class CombinedTrackerScalePoint
 		tracksPureKlt.clear();
 		tracksReactivated.clear();
 		tracksSpawned.clear();
+		tracksDormant.clear();
 	}
 }

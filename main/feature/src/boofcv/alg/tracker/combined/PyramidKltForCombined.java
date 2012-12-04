@@ -57,6 +57,8 @@ public class PyramidKltForCombined<I extends ImageSingleBand, D extends ImageSin
 		tracker = new PyramidKltTracker<I,D>(klt);
 	}
 
+	protected PyramidKltForCombined() {
+	}
 
 	public void setDescription( float x , float y , PyramidKltFeature ret ) {
 		ret.setPosition(x,y);

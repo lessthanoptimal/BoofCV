@@ -150,16 +150,12 @@ public class BenchmarkDescribe<I extends ImageSingleBand, D extends ImageSingleB
 		System.out.println("=========  Profile Image Size " + width + " x " + height + " ========== "+imageType.getSimpleName());
 		System.out.println();
 
-//		ProfileOperation.printOpsPerSec(new Describe("SURF", FactoryDescribeRegionPoint.<I,II>surf(false, imageType)),TEST_TIME);
-//		ProfileOperation.printOpsPerSec(new Describe("MSURF", FactoryDescribeRegionPoint.<I,II>surf(true, imageType)),TEST_TIME);
+		ProfileOperation.printOpsPerSec(new Describe("SURF", FactoryDescribeRegionPoint.<I,II>surf(false, imageType)),TEST_TIME);
+		ProfileOperation.printOpsPerSec(new Describe("MSURF", FactoryDescribeRegionPoint.<I,II>surf(true, imageType)),TEST_TIME);
 		if( imageType == ImageFloat32.class )
 			ProfileOperation.printOpsPerSec(new Describe("SIFT", FactoryDescribeRegionPoint.sift(1.6,5,4,false)),TEST_TIME);
 		ProfileOperation.printOpsPerSec(new Brief512(),TEST_TIME);
 		ProfileOperation.printOpsPerSec(new BriefSO512(),TEST_TIME);
-		ProfileOperation.printOpsPerSec(new Describe("Steer r=12", FactoryDescribeRegionPoint.steerableGaussian(12, false, imageType, derivType)),TEST_TIME);
-		ProfileOperation.printOpsPerSec(new Describe("Steer Norm r=12", FactoryDescribeRegionPoint.steerableGaussian(12, true, imageType, derivType)),TEST_TIME);
-		ProfileOperation.printOpsPerSec(new Describe("Gaussian 12 r=12", FactoryDescribeRegionPoint.gaussian12(12, imageType, derivType)),TEST_TIME);
-		ProfileOperation.printOpsPerSec(new Describe("Gaussian 12 r=20", FactoryDescribeRegionPoint.gaussian12(20, imageType, derivType)),TEST_TIME);
 	}
 
 	public static void main( String arg[ ] ) {

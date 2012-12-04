@@ -57,15 +57,17 @@ public class FactoryDetectDescribe {
 	 * default settings for the rest.
 	 *
 	 * @param numOfOctaves Number of octaves to detect.  Try 4
+	 * @param detectThreshold Minimum corner intensity required.  Try 1
 	 * @param doubleInputImage Should the input image be doubled? Try false.
 	 * @param maxFeaturesPerScale Max detected features per scale.  Disable with < 0.  Try 500
 	 * @return SIFT
 	 */
 	public static DetectDescribePoint<ImageFloat32,SurfFeature>
 	sift( int numOfOctaves ,
+		  float detectThreshold ,
 		  boolean doubleInputImage ,
 		  int maxFeaturesPerScale ) {
-		return sift(1.6,5,numOfOctaves,doubleInputImage,3,0,maxFeaturesPerScale,10,36);
+		return sift(1.6,5,numOfOctaves,doubleInputImage,3,detectThreshold,maxFeaturesPerScale,10,36);
 	}
 
 	/**
@@ -175,7 +177,7 @@ public class FactoryDetectDescribe {
 	 * {@link DetectDescribePoint}.
 	 *
 	 * @param detector Feature detector
-	 * @param orientation Orientation estimation.  Optiona, can be null.
+	 * @param orientation Orientation estimation.  Optionally, can be null.
 	 * @param describe Feature descriptor
 	 * @return {@link DetectDescribePoint}.
 	 */

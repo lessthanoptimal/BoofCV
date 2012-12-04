@@ -3,7 +3,7 @@ Change Log
 Date Format: year/month/day
 
 ---------------------------------------------
-Date    : 
+Date    : 2012/12/04
 Version : Alpha 0.12
 
 - Fixed inverse wavelet transform so that it bounds the pixel values
@@ -56,6 +56,11 @@ Version : Alpha 0.12
 - Maven build has been added.
   * BoofCV is on the central repository
 - Added SIFT feature descriptor and detector
+- Removed seperable kernel 
+  * Wasn't being used and there is no need for it with more modern techniques
+  * Plus it was causing a unit test to fail
+- Removed Gaussian12 and Steerable feature descriptors
+  * They sucked and were not properly implemented limited their historical value
 
 ---------------------------------------------
 Date    : 2012/11/6

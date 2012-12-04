@@ -98,8 +98,6 @@ public class VisualizeAssociationMatchesApp<T extends ImageSingleBand, D extends
 			addAlgorithm(1, "SIFT", FactoryDescribeRegionPoint.sift(1.6, 5, 4, false));
 		addAlgorithm(1, "BRIEF", FactoryDescribeRegionPoint.brief(16, 512, -1, 4, true, imageType));
 		addAlgorithm(1, "BRIEFO", FactoryDescribeRegionPoint.brief(16, 512, -1, 4, false, imageType));
-		addAlgorithm(1, "Gaussian 12", FactoryDescribeRegionPoint.gaussian12(20, imageType, derivType));
-		addAlgorithm(1, "Gaussian 14", FactoryDescribeRegionPoint.steerableGaussian(20, false, imageType, derivType));
 		addAlgorithm(1, "Pixel 11x11", FactoryDescribeRegionPoint.pixel(11, 11, imageType));
 		addAlgorithm(1, "NCC 11x11", FactoryDescribeRegionPoint.pixelNCC(11, 11, imageType));
 

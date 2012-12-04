@@ -20,15 +20,13 @@ package boofcv.examples;
 
 import boofcv.abst.feature.associate.GeneralAssociation;
 import boofcv.abst.feature.associate.ScoreAssociation;
-import boofcv.abst.feature.describe.DescribeRegionPoint;
-import boofcv.abst.feature.detect.interest.InterestPointDetector;
+import boofcv.abst.feature.detdesc.DetectDescribePoint;
 import boofcv.abst.geo.Estimate1ofEpipolar;
 import boofcv.abst.geo.fitting.DistanceFromModelResidual;
 import boofcv.abst.geo.fitting.GenerateEpipolarMatrix;
 import boofcv.alg.geo.f.FundamentalResidualSampson;
 import boofcv.factory.feature.associate.FactoryAssociation;
-import boofcv.factory.feature.describe.FactoryDescribeRegionPoint;
-import boofcv.factory.feature.detect.interest.FactoryInterestPoint;
+import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
 import boofcv.factory.geo.EnumEpipolar;
 import boofcv.factory.geo.EpipolarError;
 import boofcv.factory.geo.FactoryMultiView;
@@ -132,16 +130,16 @@ public class ExampleFundamentalMatrix {
 	 * fundamental matrix.
 	 */
 	public static List<AssociatedPair> computeMatches( BufferedImage left , BufferedImage right ) {
-		InterestPointDetector<ImageFloat32> detector = FactoryInterestPoint.fastHessian(1, 2, 200, 1, 9, 4, 4);
-		DescribeRegionPoint<ImageFloat32,SurfFeature> describe =
-				FactoryDescribeRegionPoint.surf(true, ImageFloat32.class);
+		DetectDescribePoint detDesc = FactoryDetectDescribe.surf(1, 2, 200, 1, 9, 4, 4,true,ImageFloat32.class);
+//		DetectDescribePoint detDesc = FactoryDetectDescribe.sift(4,2,false,-1);
+
 		ScoreAssociation<SurfFeature> scorer = FactoryAssociation.scoreEuclidean(SurfFeature.class,true);
 		GeneralAssociation<SurfFeature> associate =
-				FactoryAssociation.greedy(scorer, 2, -1, true);
+				FactoryAssociation.greedy(scorer, 1, -1, true);
 
 		ExampleAssociatePoints<ImageFloat32,SurfFeature> findMatches =
 				new ExampleAssociatePoints<ImageFloat32,SurfFeature>
-						(detector, describe, associate, ImageFloat32.class);
+						(detDesc, associate, ImageFloat32.class);
 
 		findMatches.associate(left,right);
 

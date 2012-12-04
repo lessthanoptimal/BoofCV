@@ -21,14 +21,13 @@ package boofcv.examples;
 
 import boofcv.abst.feature.associate.GeneralAssociation;
 import boofcv.abst.feature.associate.ScoreAssociation;
-import boofcv.abst.feature.describe.DescribeRegionPoint;
-import boofcv.abst.feature.detect.interest.InterestPointDetector;
+import boofcv.abst.feature.detdesc.DetectDescribePoint;
+import boofcv.alg.feature.UtilFeature;
 import boofcv.alg.sfm.robust.DistanceHomographySq;
 import boofcv.alg.sfm.robust.GenerateHomographyLinear;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.factory.feature.associate.FactoryAssociation;
-import boofcv.factory.feature.describe.FactoryDescribeRegionPoint;
-import boofcv.factory.feature.detect.interest.FactoryInterestPoint;
+import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
 import boofcv.gui.image.HomographyStitchPanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.image.UtilImageIO;
@@ -36,7 +35,6 @@ import boofcv.struct.FastQueue;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.SurfFeature;
 import boofcv.struct.feature.TupleDesc;
-import boofcv.struct.feature.TupleDescQueue;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
@@ -73,26 +71,19 @@ public class ExampleImageStitching {
 	 */
 	public static<T extends ImageSingleBand, FD extends TupleDesc> Homography2D_F64
 	computeTransform( T imageA , T imageB ,
-					  InterestPointDetector<T> detector ,
-					  DescribeRegionPoint<T, FD> describe ,
+					  DetectDescribePoint<T,FD> detDesc ,
 					  GeneralAssociation<FD> associate ,
 					  ModelMatcher<Homography2D_F64,AssociatedPair> modelMatcher )
 	{
-		// see if the detector has everything that the describer needs
-		if( describe.requiresOrientation() && !detector.hasOrientation() )
-			throw new IllegalArgumentException("Requires orientation be provided.");
-		if( describe.requiresScale() && !detector.hasScale() )
-			throw new IllegalArgumentException("Requires scale be provided.");
-
 		// get the length of the description
 		List<Point2D_F64> pointsA = new ArrayList<Point2D_F64>();
-		FastQueue<FD> descA = new TupleDescQueue<FD>(describe,true);
+		FastQueue<FD> descA = UtilFeature.createQueue(detDesc,100);
 		List<Point2D_F64> pointsB = new ArrayList<Point2D_F64>();
-		FastQueue<FD> descB = new TupleDescQueue<FD>(describe,true);
+		FastQueue<FD> descB = UtilFeature.createQueue(detDesc,100);
 
 		// extract feature locations and descriptions from each image
-		describeImage(imageA, detector, describe, pointsA, descA);
-		describeImage(imageB, detector, describe, pointsB, descB);
+		describeImage(imageA, detDesc, pointsA, descA);
+		describeImage(imageB, detDesc, pointsB, descB);
 
 		// Associate features between the two images
 		associate.setSource(descA);
@@ -125,25 +116,15 @@ public class ExampleImageStitching {
 	 */
 	private static <T extends ImageSingleBand, FD extends TupleDesc>
 	void describeImage(T image,
-					   InterestPointDetector<T> detector,
-					   DescribeRegionPoint<T,FD> describe,
+					   DetectDescribePoint<T,FD> detDesc,
 					   List<Point2D_F64> points,
 					   FastQueue<FD> listDescs) {
-		detector.detect(image);
-		describe.setImage(image);
+		detDesc.detect(image);
 
 		listDescs.reset();
-		for( int i = 0; i < detector.getNumberOfFeatures(); i++ ) {
-			// get the feature location info
-			Point2D_F64 p = detector.getLocation(i);
-			double yaw = detector.getOrientation(i);
-			double scale = detector.getScale(i);
-
-			// extract the description and save the results into the provided description
-			if( describe.isInBounds(p.x,p.y,yaw,scale) ) {
-				describe.process(p.x, p.y, yaw, scale, listDescs.grow());
-				points.add(p.copy());
-			}
+		for( int i = 0; i < detDesc.getNumberOfFeatures(); i++ ) {
+			points.add( detDesc.getLocation(i).copy() );
+			listDescs.grow().setTo(detDesc.getDescriptor(i));
 		}
 	}
 
@@ -157,8 +138,7 @@ public class ExampleImageStitching {
 		T inputB = ConvertBufferedImage.convertFromSingle(imageB, null, imageType);
 
 		// Detect using the standard SURF feature descriptor and describer
-		InterestPointDetector<T> detector = FactoryInterestPoint.fastHessian(1, 2, 400, 1, 9, 4, 4);
-		DescribeRegionPoint<T,SurfFeature> describe = FactoryDescribeRegionPoint.surf(true,imageType);
+		DetectDescribePoint detDesc = FactoryDetectDescribe.surf(1, 2, 200, 1, 9, 4, 4, true, imageType);
 		ScoreAssociation<SurfFeature> scorer = FactoryAssociation.scoreEuclidean(SurfFeature.class,true);
 		GeneralAssociation<SurfFeature> associate = FactoryAssociation.greedy(scorer,2,-1,true);
 
@@ -169,7 +149,7 @@ public class ExampleImageStitching {
 		ModelMatcher<Homography2D_F64,AssociatedPair> modelMatcher =
 				new Ransac<Homography2D_F64,AssociatedPair>(123,modelFitter,distance,60,9);
 
-		Homography2D_F64 H = computeTransform(inputA, inputB, detector, describe, associate, modelMatcher);
+		Homography2D_F64 H = computeTransform(inputA, inputB, detDesc, associate, modelMatcher);
 
 		// draw the results
 		HomographyStitchPanel panel = new HomographyStitchPanel(0.5,inputA.width,inputA.height);
