@@ -3,7 +3,7 @@ Change Log
 Date Format: year/month/day
 
 ---------------------------------------------
-Date    : 2012/12/04
+Date    : 2012/12/05
 Version : Alpha 0.12
 
 - Fixed inverse wavelet transform so that it bounds the pixel values
