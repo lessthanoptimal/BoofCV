@@ -24,7 +24,6 @@ import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.misc.Performer;
 import boofcv.misc.ProfileOperation;
 import boofcv.struct.FastQueue;
-import boofcv.struct.feature.TupleDescQueue;
 import boofcv.struct.feature.TupleDesc_F64;
 
 import java.util.Random;
@@ -67,7 +66,12 @@ public class BenchmarkAssociationAlgs {
 	}
 
 	private static FastQueue<TupleDesc_F64> createSet() {
-		FastQueue<TupleDesc_F64> ret = new TupleDescQueue<TupleDesc_F64>(TupleDesc_F64.class,DOF, true);
+		FastQueue<TupleDesc_F64> ret = new FastQueue<TupleDesc_F64>(10,TupleDesc_F64.class, true) {
+				@Override
+				protected TupleDesc_F64 createInstance() {
+					return new TupleDesc_F64(DOF);
+				}
+		};
 
 		for( int i = 0; i < NUM_FEATURES; i++ ) {
 			TupleDesc_F64 t = ret.grow();

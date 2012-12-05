@@ -22,6 +22,7 @@ import boofcv.abst.feature.associate.GeneralAssociation;
 import boofcv.abst.feature.associate.ScoreAssociation;
 import boofcv.abst.feature.describe.DescribeRegionPoint;
 import boofcv.abst.feature.detect.interest.InterestPointDetector;
+import boofcv.alg.feature.UtilFeature;
 import boofcv.alg.feature.orientation.OrientationImageAverage;
 import boofcv.benchmark.feature.BenchmarkAlgorithm;
 import boofcv.benchmark.feature.distort.StabilityEvaluatorPoint;
@@ -30,7 +31,6 @@ import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.struct.FastQueue;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.TupleDesc;
-import boofcv.struct.feature.TupleDescQueue;
 import boofcv.struct.image.ImageSingleBand;
 import georegression.metric.UtilAngle;
 import georegression.struct.point.Point2D_F64;
@@ -49,9 +49,9 @@ public class DescribeEvaluator<T extends ImageSingleBand, D extends TupleDesc>
 	extends StabilityEvaluatorPoint<T>
 {
 	// list of descriptions from the initial image
-	TupleDescQueue<D> initial;
+	FastQueue<D> initial;
 	// list of descriptions from the current image being considered
-	TupleDescQueue<D> current;
+	FastQueue<D> current;
 	// list of features which maintain the original indexes
 	List<D> initList = new ArrayList<D>();
 	List<D> currentList = new ArrayList<D>();
@@ -91,17 +91,15 @@ public class DescribeEvaluator<T extends ImageSingleBand, D extends TupleDesc>
 		if( theta == null || theta.length < points.size() )
 			theta = new double[ points.size() ];
 
-		DescribeRegionPoint<T,D> extract = alg.getAlgorithm();
-		ScoreAssociation<D> scorer = FactoryAssociation.defaultScore(extract.getDescriptorType());
+		DescribeRegionPoint<T,D> describe = alg.getAlgorithm();
+		ScoreAssociation<D> scorer = FactoryAssociation.defaultScore(describe.getDescriptorType());
 
 		matcher = FactoryAssociation.greedy(scorer, Double.MAX_VALUE, -1, true);
 
-		int descLength = extract.getDescriptionLength();
+		initial = UtilFeature.createQueue(describe,10);
+		current = UtilFeature.createQueue(describe,10);
 
-		initial = new TupleDescQueue<D>(extract.getDescriptorType(),descLength, true);
-		current = new TupleDescQueue<D>(extract.getDescriptorType(),descLength, true);
-
-		initialDescriptions(image, points, extract);
+		initialDescriptions(image, points, describe);
 	}
 
 	@Override

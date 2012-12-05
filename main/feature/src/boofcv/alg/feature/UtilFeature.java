@@ -18,6 +18,7 @@
 
 package boofcv.alg.feature;
 
+import boofcv.abst.feature.describe.DescribeRegionPoint;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
 import boofcv.struct.FastQueue;
 import boofcv.struct.feature.TupleDesc;
@@ -34,11 +35,26 @@ public class UtilFeature {
 	 * {@link DetectDescribePoint}.  The queue will have declareInstance set to true, otherwise
 	 * why would you be using this function?
 	 */
-	public static <T extends TupleDesc>
-	FastQueue<T> createQueue( final DetectDescribePoint<?,T> detDesc , int initialMax ) {
-		return new FastQueue<T>(initialMax,detDesc.getDescriptorType(),true) {
+	public static <TD extends TupleDesc>
+	FastQueue<TD> createQueue( final DescribeRegionPoint<?, TD> detDesc , int initialMax ) {
+		return new FastQueue<TD>(initialMax,detDesc.getDescriptorType(),true) {
 			@Override
-			protected T createInstance() {
+			protected TD createInstance() {
+				return detDesc.createDescription();
+			}
+		};
+	}
+
+	/**
+	 * Creates a FastQueue and declares new instances of the descriptor using the provided
+	 * {@link DetectDescribePoint}.  The queue will have declareInstance set to true, otherwise
+	 * why would you be using this function?
+	 */
+	public static <TD extends TupleDesc>
+	FastQueue<TD> createQueue( final DetectDescribePoint<?, TD> detDesc , int initialMax ) {
+		return new FastQueue<TD>(initialMax,detDesc.getDescriptorType(),true) {
+			@Override
+			protected TD createInstance() {
 				return detDesc.createDescription();
 			}
 		};
