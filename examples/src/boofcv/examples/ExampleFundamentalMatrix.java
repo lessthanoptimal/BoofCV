@@ -57,9 +57,8 @@ import java.util.List;
  * matches, The simple version just assumes that all the matches are correct.  Similar techniques can be used
  * to fit various other types of motion or structural models to observations.
  *
- * The input image and associated features are displayed in a window.  In another window only features included
- * in the inlier set of the robust algorithm are shown.  Note how there are clearly incorrect inliers even after
- * the epipolar constraint has been applied?
+ * The input image and associated features are displayed in a window.  In another window, inlier features
+ * from robust model fitting are shown.
  *
  * @author Peter Abeles
  */
