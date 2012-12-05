@@ -25,6 +25,7 @@ import boofcv.abst.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.abst.feature.detect.interest.InterestPointDetector;
 import boofcv.abst.feature.orientation.OrientationImage;
 import boofcv.abst.feature.orientation.OrientationIntegral;
+import boofcv.alg.feature.UtilFeature;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.alg.transform.ii.GIntegralImageOps;
 import boofcv.core.image.ConvertBufferedImage;
@@ -40,7 +41,6 @@ import boofcv.gui.image.ShowImages;
 import boofcv.io.PathLabel;
 import boofcv.struct.FastQueue;
 import boofcv.struct.feature.TupleDesc;
-import boofcv.struct.feature.TupleDescQueue;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.point.Point2D_F64;
@@ -178,8 +178,8 @@ public class VisualizeAssociationMatchesApp<T extends ImageSingleBand, D extends
 	private void processImage() {
 		final List<Point2D_F64> leftPts = new ArrayList<Point2D_F64>();
 		final List<Point2D_F64> rightPts = new ArrayList<Point2D_F64>();
-		TupleDescQueue<TupleDesc> leftDesc = new TupleDescQueue(describe.getDescriptorType(), describe.getDescriptionLength(), true);
-		TupleDescQueue<TupleDesc> rightDesc = new TupleDescQueue(describe.getDescriptorType(), describe.getDescriptionLength(), true);
+		FastQueue<TupleDesc> leftDesc = UtilFeature.createQueue(describe, 10);
+		FastQueue<TupleDesc> rightDesc = UtilFeature.createQueue(describe,10);
 
 		final ProgressMonitor progressMonitor = new ProgressMonitor(this,
 				"Associating Features",

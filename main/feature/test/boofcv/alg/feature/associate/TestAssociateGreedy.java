@@ -21,7 +21,6 @@ package boofcv.alg.feature.associate;
 import boofcv.abst.feature.associate.ScoreAssociateEuclidean_F64;
 import boofcv.abst.feature.associate.ScoreAssociation;
 import boofcv.struct.FastQueue;
-import boofcv.struct.feature.TupleDescQueue;
 import boofcv.struct.feature.TupleDesc_F64;
 import org.junit.Test;
 
@@ -100,7 +99,12 @@ public class TestAssociateGreedy {
 
 	private FastQueue<TupleDesc_F64> createData( double ...values )
 	{
-		FastQueue<TupleDesc_F64> ret = new TupleDescQueue<TupleDesc_F64>(TupleDesc_F64.class,1, true);
+		FastQueue<TupleDesc_F64> ret = new FastQueue<TupleDesc_F64>(10,TupleDesc_F64.class, true) {
+			@Override
+			protected TupleDesc_F64 createInstance() {
+				return new TupleDesc_F64(1);
+			}
+		};
 
 		for( int i = 0; i < values.length; i++ ) {
 			ret.grow().set(values[i]);
