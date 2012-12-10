@@ -59,7 +59,8 @@ import java.util.Random;
 
 
 /**
- * Factory for creating trackers which implement {@link ImagePointTracker}.
+ * Factory for creating trackers which implement {@link ImagePointTracker}.  These trackers are intended for use
+ * in SFM applications.
  *
  * @author Peter Abeles
  */
@@ -120,7 +121,6 @@ public class FactoryPointSequentialTracker {
 	/**
 	 * Creates a tracker which detects Fast-Hessian features and describes them with SURF.
 	 *
-	 * @see boofcv.alg.feature.detect.intensity.ShiTomasiCornerIntensity
 	 * @see DescribePointSurf
 	 * @see DetectAssociateTracker
 	 *
@@ -175,6 +175,7 @@ public class FactoryPointSequentialTracker {
 		DescribePointBrief<I> brief = FactoryDescribePointAlgs.brief(FactoryBriefDefinition.gaussian2(new Random(123), 16, 512),
 				FactoryBlurFilter.gaussian(imageType, 0, 4));
 
+		// weighted produces more accurate results
 		GeneralFeatureDetector<I,D> corner = FactoryDetectPoint.createShiTomasi(detectionRadius,true,detectThreshold, maxFeatures, derivType);
 
 		InterestPointDetector<I> detector = FactoryInterestPoint.wrapPoint(corner, imageType, derivType);
@@ -254,7 +255,8 @@ public class FactoryPointSequentialTracker {
 
 		DescribePointPixelRegionNCC<I> alg = FactoryDescribePointAlgs.pixelRegionNCC(w, w, imageType);
 
-		GeneralFeatureDetector corner = FactoryDetectPoint.createShiTomasi(detectRadius, false, cornerThreshold, maxFeatures, derivType);
+		// weighted produces more accurate results
+		GeneralFeatureDetector corner = FactoryDetectPoint.createShiTomasi(detectRadius, true, cornerThreshold, maxFeatures, derivType);
 
 		InterestPointDetector<I> detector = FactoryInterestPoint.wrapPoint(corner, imageType, derivType);
 		ScoreAssociateNccFeature score = new ScoreAssociateNccFeature();
@@ -297,9 +299,8 @@ public class FactoryPointSequentialTracker {
 	}
 
 	/**
-	 * Creates a tracker which detects Shi-Tomasi corner features and describes them with SURF.
+	 * Creates a tracker which detects Fast-Hessian features, describes them with SURF, nominally tracks them using KLT.
 	 *
-	 * @see boofcv.alg.feature.detect.intensity.ShiTomasiCornerIntensity
 	 * @see DescribePointSurf
 	 * @see DetectAssociateTracker
 	 *
@@ -328,11 +329,7 @@ public class FactoryPointSequentialTracker {
 		ScoreAssociation<TupleDesc_F64> score = FactoryAssociation.scoreEuclidean(TupleDesc_F64.class, true);
 		AssociateSurfBasic assoc = new AssociateSurfBasic(FactoryAssociation.greedy(score, 100000, maxMatches, true));
 
-		InterestPointDetector<I> id = FactoryInterestPoint.fastHessian(1,detectRadius,detectPerScale, sampleRateFH, 9, 4, 4);
 		GeneralAssociation<SurfFeature> generalAssoc = new WrapAssociateSurfBasic(assoc);
-
-		DescribeRegionPoint<I,SurfFeature> regionDesc
-				= FactoryDescribeRegionPoint.surf(modifiedSURF, imageType);
 
 		DetectDescribePoint<I,SurfFeature> fused =
 				FactoryDetectDescribe.surf(1,detectRadius,detectPerScale, sampleRateFH, 9, 4, 4,
@@ -343,7 +340,8 @@ public class FactoryPointSequentialTracker {
 	}
 
 	/**
-	 * Creates a tracker which detects Fast-Hessian features and describes them with SURF.
+	 * Creates a tracker which detects Shi-Tomasi corner features, describes them with SURF, and
+	 * nominally tracks them using KLT.
 	 *
 	 * @see boofcv.alg.feature.detect.intensity.ShiTomasiCornerIntensity
 	 * @see DescribePointSurf
@@ -377,7 +375,7 @@ public class FactoryPointSequentialTracker {
 			derivType = GImageDerivativeOps.getDerivativeType(imageType);
 
 		GeneralFeatureDetector corner = FactoryDetectPoint.createShiTomasi(
-				detectRadius, false, detectThreshold, maxMatches, derivType);
+				detectRadius, true, detectThreshold, maxMatches, derivType);
 
 		InterestPointDetector<I> detector = FactoryInterestPoint.wrapPoint(corner, imageType, derivType);
 
