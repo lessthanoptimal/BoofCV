@@ -61,12 +61,12 @@ public class ImplSelectSparseStandardWta_F32 extends SelectSparseStandardWta<flo
 			return false;
 		} else if( textureThreshold > 0 ) {
 			// find the second best disparity value and exclude its neighbors
-			float secondBest = scores[0];
-			for( int i = 1; i < disparity-1; i++ ) {
+			float secondBest = Float.MAX_VALUE;
+			for( int i = 0; i < disparity-1; i++ ) {
 				if( scores[i] < secondBest )
 					secondBest = scores[i];
 			}
-			for( int i =  disparity+2; i < maxDisparity; i++ ) {
+			for( int i = disparity+2; i < maxDisparity; i++ ) {
 				if( scores[i] < secondBest )
 					secondBest = scores[i];
 			}
