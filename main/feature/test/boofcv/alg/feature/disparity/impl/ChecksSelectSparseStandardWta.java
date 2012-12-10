@@ -99,4 +99,24 @@ public abstract class ChecksSelectSparseStandardWta<ArrayData> {
 
 		assertFalse(alg.select(copyToCorrectType(scores,arrayType), maxDisparity));
 	}
+
+	/**
+	 * See if multiple peak detection works correctly when the first peak is at zero.  There was a bug related to
+	 * this at one point.
+	 */
+	@Test
+	public void multiplePeakFirstAtIndexZero() {
+
+		int maxDisparity=10;
+
+		SelectSparseStandardWta<ArrayData> alg = createAlg(-1,3);
+
+		int scores[] = new int[maxDisparity+10];
+
+		for( int d = 0; d < 10; d++ ) {
+			scores[d] = d*2+1;
+		}
+
+		assertTrue(alg.select(copyToCorrectType(scores,arrayType), maxDisparity));
+	}
 }
