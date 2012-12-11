@@ -127,7 +127,7 @@ public class ExamplePointFeatureTracker< T extends ImageSingleBand, D extends Im
 		config.featureRadius = 3;
 		config.pyramidScaling = new int[]{1,2,4,8};
 
-		tracker = FactoryPointSequentialTracker.klt(config,1,1);
+		tracker = FactoryPointSequentialTracker.klt(config,1,3,1,1);
 	}
 
 	/**

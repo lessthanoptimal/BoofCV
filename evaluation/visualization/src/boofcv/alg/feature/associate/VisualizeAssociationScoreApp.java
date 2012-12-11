@@ -87,7 +87,7 @@ public class VisualizeAssociationScoreApp<T extends ImageSingleBand, D extends I
 		if( imageType == ImageFloat32.class )
 			addAlgorithm(0, "SIFT", FactoryInterestPoint.siftDetector(1.6,5,4,false,2,1,500,10));
 		alg = FactoryDetectPoint.createShiTomasi(2, false, 1, 500, derivType);
-		addAlgorithm(0, "Shi-Tomasi", FactoryInterestPoint.wrapPoint(alg, imageType, derivType));
+		addAlgorithm(0, "Shi-Tomasi", FactoryInterestPoint.wrapPoint(alg, 1, imageType, derivType));
 
 		addAlgorithm(1, "SURF", FactoryDescribeRegionPoint.surf(true, imageType));
 		if( imageType == ImageFloat32.class )

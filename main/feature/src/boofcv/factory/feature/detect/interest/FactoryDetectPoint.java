@@ -50,7 +50,7 @@ public class FactoryDetectPoint {
 	/**
 	 * Detects Harris corners.
 	 *
-	 * @param extractRadius   Radius of non-maximum suppression region. Try 1 or 2.
+	 * @param extractRadius   Radius of non-maximum suppression region and corner radius. Try 1 or 2.
 	 * @param weighted        Is a Gaussian weight applied to the sample region?  False is much faster.
 	 * @param detectThreshold Minimum feature intensity.  Image dependent.  Start tuning at 0 or 1.
 	 * @param maxFeatures     The maximum number of detected features it will return.  Try 300
@@ -67,7 +67,7 @@ public class FactoryDetectPoint {
 	/**
 	 * Detects Shi-Tomasi corners.
 	 *
-	 * @param extractRadius   Radius of non-maximum suppression region. Try 1 or 2.
+	 * @param extractRadius   Radius of non-maximum suppression region and corner radius. Try 1 or 2.
 	 * @param weighted        Is a Gaussian weight applied to the sample region?  False is much faster.
 	 * @param detectThreshold Minimum feature intensity.  Image dependent.  Start tuning at 0 or 1.
 	 * @param maxFeatures     The maximum number of detected features it will return.  Try 300
@@ -149,14 +149,14 @@ public class FactoryDetectPoint {
 		return createGeneral(intensity, extractRadius, detectThreshold, maxFeatures);
 	}
 
-	protected static <T extends ImageSingleBand, D extends ImageSingleBand>
+	public static <T extends ImageSingleBand, D extends ImageSingleBand>
 	GeneralFeatureDetector<T, D> createGeneral(GradientCornerIntensity<D> cornerIntensity,
 											   int extractRadius, float detectThreshold, int maxFeatures) {
 		GeneralFeatureIntensity<T, D> intensity = new WrapperGradientCornerIntensity<T, D>(cornerIntensity);
 		return createGeneral(intensity, extractRadius, detectThreshold, maxFeatures);
 	}
 
-	protected static <T extends ImageSingleBand, D extends ImageSingleBand>
+	public static <T extends ImageSingleBand, D extends ImageSingleBand>
 	GeneralFeatureDetector<T, D> createGeneral(GeneralFeatureIntensity<T, D> intensity,
 											   int extractRadius, float detectThreshold, int maxFeatures) {
 		int border = intensity.getIgnoreBorder() + extractRadius;

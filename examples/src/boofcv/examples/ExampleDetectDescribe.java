@@ -74,7 +74,7 @@ public class ExampleDetectDescribe {
 		// create a corner detector
 		Class derivType = GImageDerivativeOps.getDerivativeType(imageType);
 		GeneralFeatureDetector corner = FactoryDetectPoint.createShiTomasi(2, false, 1, 300, derivType);
-		InterestPointDetector detector = FactoryInterestPoint.wrapPoint(corner, imageType, derivType);
+		InterestPointDetector detector = FactoryInterestPoint.wrapPoint(corner, 1, imageType, derivType);
 
 		// describe points using BRIEF
 		DescribeRegionPoint describe = FactoryDescribeRegionPoint.brief(16, 512, -1, 4, true, imageType);
