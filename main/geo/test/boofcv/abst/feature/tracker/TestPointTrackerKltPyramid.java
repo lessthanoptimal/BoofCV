@@ -42,7 +42,7 @@ public class TestPointTrackerKltPyramid extends StandardImagePointTracker<ImageF
 	@Override
 	public ImagePointTracker<ImageFloat32> createTracker() {
 		config = PkltConfig.createDefault(ImageFloat32.class, ImageFloat32.class);
-		return FactoryPointSequentialTracker.klt(config,1,1);
+		return FactoryPointSequentialTracker.klt(config,1000,3,1,1);
 	}
 
 	/**

@@ -96,7 +96,7 @@ public class TestDetectAssociateTracker extends StandardImagePointTracker<ImageF
 				FactoryDetectPoint.createShiTomasi(2, false, 0, 100, ImageFloat32.class);
 
 		InterestPointDetector<ImageFloat32> detector =
-				FactoryInterestPoint.wrapPoint(corner, ImageFloat32.class, ImageFloat32.class);
+				FactoryInterestPoint.wrapPoint(corner, 1,ImageFloat32.class, ImageFloat32.class);
 		ScoreAssociateHamming_B score = new ScoreAssociateHamming_B();
 
 		GeneralAssociation<TupleDesc_B> association =

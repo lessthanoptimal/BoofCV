@@ -53,12 +53,13 @@ public class FactoryInterestPoint {
 	 * Wraps {@link GeneralFeatureDetector} inside an {@link InterestPointDetector}.
 	 *
 	 * @param feature   Feature detector.
+	 * @param scale Scale of detected features
 	 * @param inputType Image type of input image.
 	 * @param inputType Image type for gradient.
 	 * @return The interest point detector.
 	 */
 	public static <T extends ImageSingleBand, D extends ImageSingleBand>
-	InterestPointDetector<T> wrapPoint(GeneralFeatureDetector<T, D> feature, Class<T> inputType, Class<D> derivType) {
+	InterestPointDetector<T> wrapPoint(GeneralFeatureDetector<T, D> feature, double scale , Class<T> inputType, Class<D> derivType) {
 
 		ImageGradient<T, D> gradient = null;
 		ImageHessian<D> hessian = null;
@@ -71,7 +72,7 @@ public class FactoryInterestPoint {
 		if (gradient != null || hessian != null)
 			derivativeGenerator = FactoryImageGenerator.create(derivType);
 
-		return new WrapCornerToInterestPoint<T, D>(feature, gradient, hessian, derivativeGenerator);
+		return new WrapCornerToInterestPoint<T, D>(feature, gradient, hessian, derivativeGenerator,scale);
 	}
 
 	/**
