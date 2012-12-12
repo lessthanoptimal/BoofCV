@@ -18,7 +18,7 @@
 
 package boofcv.alg.feature.associate;
 
-import boofcv.abst.feature.associate.GeneralAssociation;
+import boofcv.abst.feature.associate.AssociateDescription;
 import boofcv.abst.feature.associate.ScoreAssociation;
 import boofcv.abst.feature.describe.DescribeRegionPoint;
 import boofcv.abst.feature.detect.interest.GeneralFeatureDetector;
@@ -65,7 +65,7 @@ public class VisualizeAssociationMatchesApp<T extends ImageSingleBand, D extends
 
 	InterestPointDetector<T> detector;
 	DescribeRegionPoint<T, TupleDesc> describe;
-	GeneralAssociation<TupleDesc> matcher;
+	AssociateDescription<TupleDesc> matcher;
 	OrientationImage<T> orientation;
 
 	T imageLeft;
@@ -145,7 +145,7 @@ public class VisualizeAssociationMatchesApp<T extends ImageSingleBand, D extends
 		processImage();
 	}
 
-	private GeneralAssociation createMatcher() {
+	private AssociateDescription createMatcher() {
 		ScoreAssociation scorer = FactoryAssociation.defaultScore(describe.getDescriptorType());
 		return FactoryAssociation.greedy(scorer, Double.MAX_VALUE, maxMatches, associateBackwards);
 	}

@@ -24,7 +24,7 @@ import boofcv.struct.feature.AssociatedIndex;
 
 /**
  * <p>
- * Generalized interface for associating features.   Exhaustively finds matches for each feature in the source
+ * Generalized interface for associating features.   Finds matches for each feature in the source
  * list to one in the destination list.  There is only one match found for each member of source, but multiple
  * matches can be found for destination.  If the best match has an error which is too high then a member of
  * source might not be matched.
@@ -36,9 +36,11 @@ import boofcv.struct.feature.AssociatedIndex;
  * one would think descriptor comparisons would dominate.
  * </p>
  *
+ * @param <D> Feature description type.
+ *
  * @author Peter Abeles
  */
-public interface GeneralAssociation<T> {
+public interface AssociateDescription<D> {
 
 	/**
 	 * Sets the list of source features.
@@ -47,7 +49,7 @@ public interface GeneralAssociation<T> {
 	 *
 	 * @param listSrc List of features
 	 */
-	public void setSource(  FastQueue<T> listSrc );
+	public void setSource( FastQueue<D> listSrc );
 
 	/**
 	 * Sets the list of destination features
@@ -56,7 +58,7 @@ public interface GeneralAssociation<T> {
 	 *
 	 * @param listDst List of features
 	 */
-	public void setDestination(  FastQueue<T> listDst );
+	public void setDestination( FastQueue<D> listDst );
 
 
 	/**

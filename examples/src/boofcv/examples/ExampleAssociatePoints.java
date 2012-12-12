@@ -18,7 +18,7 @@
 
 package boofcv.examples;
 
-import boofcv.abst.feature.associate.GeneralAssociation;
+import boofcv.abst.feature.associate.AssociateDescription;
 import boofcv.abst.feature.associate.ScoreAssociation;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
 import boofcv.alg.feature.UtilFeature;
@@ -52,7 +52,7 @@ public class ExampleAssociatePoints<T extends ImageSingleBand, FD extends TupleD
 	// algorithm used to detect and describe interest points
 	DetectDescribePoint<T,FD> detDesc;
 	// Associated descriptions together by minimizing an error metric
-	GeneralAssociation<FD> associate;
+	AssociateDescription<FD> associate;
 
 	// location of interest points
 	List<Point2D_F64> pointsA;
@@ -61,7 +61,7 @@ public class ExampleAssociatePoints<T extends ImageSingleBand, FD extends TupleD
 	Class<T> imageType;
 
 	public ExampleAssociatePoints(DetectDescribePoint<T,FD> detDesc,
-								  GeneralAssociation<FD> associate,
+								  AssociateDescription<FD> associate,
 								  Class<T> imageType) {
 		this.detDesc = detDesc;
 		this.associate = associate;
@@ -122,7 +122,7 @@ public class ExampleAssociatePoints<T extends ImageSingleBand, FD extends TupleD
 		DetectDescribePoint detDesc = FactoryDetectDescribe.surf(1, 2, 200, 1, 9, 4, 4,true,imageType);
 
 		ScoreAssociation scorer = FactoryAssociation.defaultScore(detDesc.getDescriptorType());
-		GeneralAssociation associate = FactoryAssociation.greedy(scorer, Double.MAX_VALUE, -1, true);
+		AssociateDescription associate = FactoryAssociation.greedy(scorer, Double.MAX_VALUE, -1, true);
 
 		// load and match images
 		ExampleAssociatePoints app = new ExampleAssociatePoints(detDesc,associate,imageType);

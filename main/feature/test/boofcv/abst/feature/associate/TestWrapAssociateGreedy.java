@@ -32,7 +32,7 @@ import static org.junit.Assert.assertTrue;
 public class TestWrapAssociateGreedy {
 
 	/**
-	 * Perform basic tests to make sure GeneralAssociation is correctly
+	 * Perform basic tests to make sure AssociateDescription is correctly
 	 * being implemented.
 	 */
 	@Test

@@ -18,25 +18,18 @@
 
 package boofcv.abst.feature.associate;
 
-import boofcv.alg.feature.associate.DescriptorDistance;
-import boofcv.struct.feature.TupleDesc_F64;
+import org.junit.Test;
 
+import static org.junit.Assert.fail;
 
 /**
- * Scores based on Euclidean distance squared
- *
- * @see {@link DescriptorDistance#euclideanSq(TupleDesc_F64, TupleDesc_F64)}
- *
  * @author Peter Abeles
  */
-public class ScoreAssociateEuclideanSq_F64 implements ScoreAssociation<TupleDesc_F64> {
-	@Override
-	public double score(TupleDesc_F64 a, TupleDesc_F64 b) {
-		return DescriptorDistance.euclideanSq(a, b);
+public class TestAssociateDescTo2D {
+
+	@Test
+	public void stuff() {
+		fail("Implement");
 	}
 
-	@Override
-	public boolean isZeroMinimum() {
-		return true;
-	}
 }

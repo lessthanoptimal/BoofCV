@@ -18,7 +18,8 @@
 
 package boofcv.abst.feature.tracker;
 
-import boofcv.abst.feature.associate.GeneralAssociation;
+import boofcv.abst.feature.associate.AssociateDescTo2D;
+import boofcv.abst.feature.associate.AssociateDescription2D;
 import boofcv.abst.feature.associate.ScoreAssociateHamming_B;
 import boofcv.abst.feature.describe.WrapDescribeBrief;
 import boofcv.abst.feature.detdesc.DetectDescribeFusion;
@@ -99,8 +100,8 @@ public class TestDetectAssociateTracker extends StandardImagePointTracker<ImageF
 				FactoryInterestPoint.wrapPoint(corner, 1,ImageFloat32.class, ImageFloat32.class);
 		ScoreAssociateHamming_B score = new ScoreAssociateHamming_B();
 
-		GeneralAssociation<TupleDesc_B> association =
-				FactoryAssociation.greedy(score, 400, 300, true);
+		AssociateDescription2D<TupleDesc_B> association =
+				new AssociateDescTo2D<TupleDesc_B>(FactoryAssociation.greedy(score, 400, 300, true));
 
 		DetectDescribeFusion<ImageFloat32,TupleDesc_B> fused =
 				new DetectDescribeFusion<ImageFloat32,TupleDesc_B>(

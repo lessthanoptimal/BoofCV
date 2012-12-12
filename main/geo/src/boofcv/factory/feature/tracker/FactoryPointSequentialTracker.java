@@ -148,7 +148,8 @@ public class FactoryPointSequentialTracker {
 		ScoreAssociation<TupleDesc_F64> score = FactoryAssociation.scoreEuclidean(TupleDesc_F64.class, true);
 		AssociateSurfBasic assoc = new AssociateSurfBasic(FactoryAssociation.greedy(score, 100000, maxTracks, true));
 
-		GeneralAssociation<SurfFeature> generalAssoc = new WrapAssociateSurfBasic(assoc);
+		AssociateDescription2D<SurfFeature> generalAssoc =
+				new AssociateDescTo2D<SurfFeature>(new WrapAssociateSurfBasic(assoc));
 
 		DetectDescribePoint<I,SurfFeature> fused =
 				FactoryDetectDescribe.surf(1,extractRadius,detectPerScale, sampleRateFH, 9, 4, 4,
@@ -188,8 +189,9 @@ public class FactoryPointSequentialTracker {
 		InterestPointDetector<I> detector = FactoryInterestPoint.wrapPoint(corner,1, imageType, derivType);
 		ScoreAssociateHamming_B score = new ScoreAssociateHamming_B();
 
-		GeneralAssociation<TupleDesc_B> association =
-				FactoryAssociation.greedy(score, maxAssociationError, maxFeatures, true);
+		AssociateDescription2D<TupleDesc_B> association =
+				new AssociateDescTo2D<TupleDesc_B>(
+						FactoryAssociation.greedy(score, maxAssociationError, maxFeatures, true));
 
 		DetectDescribeFusion<I,TupleDesc_B> fused =
 				new DetectDescribeFusion<I,TupleDesc_B>(detector,null,new WrapDescribeBrief<I>(brief));
@@ -227,8 +229,9 @@ public class FactoryPointSequentialTracker {
 		InterestPointDetector<I> detector = FactoryInterestPoint.wrapPoint(corner,1, imageType, null);
 		ScoreAssociateHamming_B score = new ScoreAssociateHamming_B();
 
-		GeneralAssociation<TupleDesc_B> association =
-				FactoryAssociation.greedy(score, maxAssociationError, maxFeatures, true);
+		AssociateDescription2D<TupleDesc_B> association =
+				new AssociateDescTo2D<TupleDesc_B>(
+						FactoryAssociation.greedy(score, maxAssociationError, maxFeatures, true));
 
 		DetectDescribeFusion<I,TupleDesc_B> fused =
 				new DetectDescribeFusion<I,TupleDesc_B>(detector,null,new WrapDescribeBrief<I>(brief));
@@ -267,8 +270,9 @@ public class FactoryPointSequentialTracker {
 		InterestPointDetector<I> detector = FactoryInterestPoint.wrapPoint(corner,1, imageType, derivType);
 		ScoreAssociateNccFeature score = new ScoreAssociateNccFeature();
 
-		GeneralAssociation<NccFeature> association =
-				FactoryAssociation.greedy(score, Double.MAX_VALUE, maxFeatures, true);
+		AssociateDescription2D<NccFeature> association =
+				new AssociateDescTo2D<NccFeature>(
+						FactoryAssociation.greedy(score, Double.MAX_VALUE, maxFeatures, true));
 
 		DetectDescribeFusion<I,NccFeature> fused =
 				new DetectDescribeFusion<I,NccFeature>(detector,null,new WrapDescribePixelRegionNCC<I>(alg));
@@ -293,13 +297,14 @@ public class FactoryPointSequentialTracker {
 	DetectAssociateTracker<I,Desc> detectDescribeAssociate(InterestPointDetector<I> detector,
 														   OrientationImage<I> orientation ,
 														   DescribeRegionPoint<I, Desc> describe,
-														   GeneralAssociation<Desc> associate ,
+														   AssociateDescription2D<Desc> associate ,
 														   boolean updateDescription ) {
 
 		DetectDescribeFusion<I,Desc> fused =
 				new DetectDescribeFusion<I,Desc>(detector,orientation,describe);
 
-		DetectAssociateTracker<I,Desc> dat = new DetectAssociateTracker<I,Desc>(fused, associate,updateDescription);
+		DetectAssociateTracker<I,Desc> dat =
+				new DetectAssociateTracker<I,Desc>(fused, associate,updateDescription);
 
 		return dat;
 	}
@@ -335,7 +340,7 @@ public class FactoryPointSequentialTracker {
 		ScoreAssociation<TupleDesc_F64> score = FactoryAssociation.scoreEuclidean(TupleDesc_F64.class, true);
 		AssociateSurfBasic assoc = new AssociateSurfBasic(FactoryAssociation.greedy(score, 100000, maxMatches, true));
 
-		GeneralAssociation<SurfFeature> generalAssoc = new WrapAssociateSurfBasic(assoc);
+		AssociateDescription<SurfFeature> generalAssoc = new WrapAssociateSurfBasic(assoc);
 
 		DetectDescribePoint<I,SurfFeature> fused =
 				FactoryDetectDescribe.surf(1,extractRadius,detectPerScale, sampleRateFH, 9, 4, 4,
@@ -389,7 +394,7 @@ public class FactoryPointSequentialTracker {
 		ScoreAssociation<TupleDesc_F64> score = FactoryAssociation.scoreEuclidean(TupleDesc_F64.class, true);
 		AssociateSurfBasic assoc = new AssociateSurfBasic(FactoryAssociation.greedy(score, 100000, maxMatches, true));
 
-		GeneralAssociation<SurfFeature> generalAssoc = new WrapAssociateSurfBasic(assoc);
+		AssociateDescription<SurfFeature> generalAssoc = new WrapAssociateSurfBasic(assoc);
 
 		Class integralType = GIntegralImageOps.getIntegralType(imageType);
 		OrientationIntegral orientationII = FactoryOrientation.surfDefault(modifiedSURF,integralType);
@@ -420,7 +425,7 @@ public class FactoryPointSequentialTracker {
 	ImagePointTracker<I> combined( InterestPointDetector<I> detector,
 								   OrientationImage<I> orientation ,
 								   DescribeRegionPoint<I, Desc> describe,
-								   GeneralAssociation<Desc> associate ,
+								   AssociateDescription<Desc> associate ,
 								   int featureRadiusKlt,
 								   int[] pyramidScalingKlt ,
 								   int reactivateThreshold,
@@ -449,7 +454,7 @@ public class FactoryPointSequentialTracker {
 	 */
 	public static <I extends ImageSingleBand, D extends ImageSingleBand, Desc extends TupleDesc>
 	ImagePointTracker<I> combined( DetectDescribePoint<I,Desc> detector ,
-								   GeneralAssociation<Desc> associate ,
+								   AssociateDescription<Desc> associate ,
 								   int featureRadiusKlt,
 								   int[] pyramidScalingKlt ,
 								   int reactivateThreshold,

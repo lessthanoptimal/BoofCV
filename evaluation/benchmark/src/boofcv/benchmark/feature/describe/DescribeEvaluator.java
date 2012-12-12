@@ -18,7 +18,7 @@
 
 package boofcv.benchmark.feature.describe;
 
-import boofcv.abst.feature.associate.GeneralAssociation;
+import boofcv.abst.feature.associate.AssociateDescription;
 import boofcv.abst.feature.associate.ScoreAssociation;
 import boofcv.abst.feature.describe.DescribeRegionPoint;
 import boofcv.abst.feature.detect.interest.InterestPointDetector;
@@ -68,7 +68,7 @@ public class DescribeEvaluator<T extends ImageSingleBand, D extends TupleDesc>
 	double theta[];
 	
 	// associates features together
-	GeneralAssociation<D> matcher;
+	AssociateDescription<D> matcher;
 
 	// computes error statistics
 	ErrorStatistics errors = new ErrorStatistics(500);

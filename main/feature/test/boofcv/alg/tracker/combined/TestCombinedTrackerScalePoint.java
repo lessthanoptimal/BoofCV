@@ -18,7 +18,7 @@
 
 package boofcv.alg.tracker.combined;
 
-import boofcv.abst.feature.associate.GeneralAssociation;
+import boofcv.abst.feature.associate.AssociateDescription;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
 import boofcv.alg.tracker.klt.PyramidKltFeature;
 import boofcv.struct.FastQueue;
@@ -159,7 +159,7 @@ public class TestCombinedTrackerScalePoint {
 		public void setDescription( float x , float y , PyramidKltFeature ret ) {}
 	}
 
-	private static class DummyAssoc implements GeneralAssociation {
+	private static class DummyAssoc implements AssociateDescription {
 
 		int N;
 
