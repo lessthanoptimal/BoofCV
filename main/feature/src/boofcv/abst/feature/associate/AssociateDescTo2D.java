@@ -18,32 +18,32 @@
 
 package boofcv.abst.feature.associate;
 
-import boofcv.alg.feature.associate.AssociateSurfBasic;
 import boofcv.struct.FastQueue;
+import boofcv.struct.GrowingArrayInt;
 import boofcv.struct.feature.AssociatedIndex;
-import boofcv.struct.feature.SurfFeature;
+import georegression.struct.point.Point2D_F64;
 
 /**
- * Wrapper around {@Link AssociateSurfBasic} for {@link AssociateDescription}.
+ * Wrapper around {@link AssociateDescription} that allows it to be used inside of {@link AssociateDescription2D}
  *
  * @author Peter Abeles
  */
-public class WrapAssociateSurfBasic implements AssociateDescription<SurfFeature> {
+public class AssociateDescTo2D<D> implements AssociateDescription2D<D> {
 
-	AssociateSurfBasic alg;
+	AssociateDescription<D> alg;
 
-	public WrapAssociateSurfBasic(AssociateSurfBasic alg) {
+	public AssociateDescTo2D(AssociateDescription<D> alg) {
 		this.alg = alg;
 	}
 
 	@Override
-	public void setSource(FastQueue<SurfFeature> listSrc) {
-		alg.setSrc(listSrc);
+	public void setSource(FastQueue<Point2D_F64> location, FastQueue<D> descriptions) {
+		alg.setSource(descriptions);
 	}
 
 	@Override
-	public void setDestination(FastQueue<SurfFeature> listDst) {
-		alg.setDst(listDst);
+	public void setDestination(FastQueue<Point2D_F64> location, FastQueue<D> descriptions) {
+		alg.setDestination(descriptions);
 	}
 
 	@Override
@@ -54,5 +54,10 @@ public class WrapAssociateSurfBasic implements AssociateDescription<SurfFeature>
 	@Override
 	public FastQueue<AssociatedIndex> getMatches() {
 		return alg.getMatches();
+	}
+
+	@Override
+	public GrowingArrayInt getUnassociatedSource() {
+		return null;
 	}
 }

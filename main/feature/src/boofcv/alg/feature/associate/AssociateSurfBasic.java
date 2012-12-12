@@ -18,7 +18,7 @@
 
 package boofcv.alg.feature.associate;
 
-import boofcv.abst.feature.associate.GeneralAssociation;
+import boofcv.abst.feature.associate.AssociateDescription;
 import boofcv.struct.FastQueue;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.SurfFeature;
@@ -35,7 +35,7 @@ import boofcv.struct.feature.TupleDesc_F64;
 public class AssociateSurfBasic {
 
 	// association algorithm
-	GeneralAssociation<TupleDesc_F64> assoc;
+	AssociateDescription<TupleDesc_F64> assoc;
 
 	// features segmented by laplace sign
 	FastQueue<Helper> srcPositive = new FastQueue<Helper>(10,Helper.class,true);
@@ -47,7 +47,7 @@ public class AssociateSurfBasic {
 	// stores output matches
 	FastQueue<AssociatedIndex> matches = new FastQueue<AssociatedIndex>(10,AssociatedIndex.class,true);
 
-	public AssociateSurfBasic(GeneralAssociation<TupleDesc_F64> assoc) {
+	public AssociateSurfBasic(AssociateDescription<TupleDesc_F64> assoc) {
 		this.assoc = assoc;
 	}
 

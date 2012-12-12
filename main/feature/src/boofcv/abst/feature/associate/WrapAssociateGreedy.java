@@ -29,7 +29,7 @@ import org.ddogleg.sorting.QuickSelectArray;
  *
  * @author Peter Abeles
  */
-public class WrapAssociateGreedy<T> implements GeneralAssociation<T> {
+public class WrapAssociateGreedy<T> implements AssociateDescription<T> {
 
 	AssociateGreedy<T> alg;
 

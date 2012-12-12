@@ -18,7 +18,7 @@
 
 package boofcv.examples;
 
-import boofcv.abst.feature.associate.GeneralAssociation;
+import boofcv.abst.feature.associate.AssociateDescription;
 import boofcv.abst.feature.associate.ScoreAssociation;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
 import boofcv.abst.geo.Estimate1ofEpipolar;
@@ -133,7 +133,7 @@ public class ExampleFundamentalMatrix {
 //		DetectDescribePoint detDesc = FactoryDetectDescribe.sift(4,2,false,-1);
 
 		ScoreAssociation<SurfFeature> scorer = FactoryAssociation.scoreEuclidean(SurfFeature.class,true);
-		GeneralAssociation<SurfFeature> associate =
+		AssociateDescription<SurfFeature> associate =
 				FactoryAssociation.greedy(scorer, 1, -1, true);
 
 		ExampleAssociatePoints<ImageFloat32,SurfFeature> findMatches =

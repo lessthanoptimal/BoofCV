@@ -44,7 +44,7 @@ public class FactoryAssociation {
 	 * @param <D> Data structure being associated
 	 * @return 
 	 */
-	public static <D> GeneralAssociation<D>
+	public static <D> AssociateDescription<D>
 	greedy( ScoreAssociation<D> score ,
 			double maxError ,
 			int maxMatches ,
