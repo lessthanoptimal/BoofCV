@@ -56,7 +56,7 @@ public class ExampleStereoVisualOdometry {
 
 		// specify how the image features are going to be tracked
 		ImagePointTracker<ImageUInt8> tracker =
-				FactoryPointSequentialTracker.klt(600,new int[]{1,2,4,8},3,3,2,ImageUInt8.class, ImageSInt16.class);
+				FactoryPointSequentialTracker.klt(600,1,new int[]{1,2,4,8},3,3,3,2,ImageUInt8.class, ImageSInt16.class);
 
 		// computes the depth of each point
 		StereoDisparitySparse<ImageUInt8> disparity =
@@ -64,7 +64,7 @@ public class ExampleStereoVisualOdometry {
 
 		// declares the algorithm
 		StereoVisualOdometry<ImageUInt8> visualOdometry = FactoryVisualOdometry.stereoDepth(120, 2,
-				1.5, tracker, disparity, 0, ImageUInt8.class);
+				1.5, tracker, disparity, 400,0, ImageUInt8.class);
 
 		// Pass in intrinsic/extrinsic calibration.  This can be changed in the future.
 		visualOdometry.setCalibration(config);

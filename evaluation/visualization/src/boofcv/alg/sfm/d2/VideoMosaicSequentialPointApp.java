@@ -66,7 +66,7 @@ public class VideoMosaicSequentialPointApp<I extends ImageSingleBand, D extends 
 		config.featureRadius = 3;
 		config.pyramidScaling = new int[]{1,2,4,8};
 
-		addAlgorithm(0, "KLT", FactoryPointSequentialTracker.klt(config,1,1));
+		addAlgorithm(0, "KLT", FactoryPointSequentialTracker.klt(config,1,3,1,1));
 		addAlgorithm(0, "ST-BRIEF", FactoryPointSequentialTracker.dda_ST_BRIEF(400, 150, 1, 10, imageType, null));
 		// size of the description region has been increased to improve quality.
 		addAlgorithm(0, "ST-NCC", FactoryPointSequentialTracker.
@@ -160,8 +160,8 @@ public class VideoMosaicSequentialPointApp<I extends ImageSingleBand, D extends 
 	protected void startEverything() {
 		// make sure there is nothing left over from before
 		tracker.dropAllTracks();
-		createModelMatcher(maxIterations,4);
-		distortAlg = new MotionMosaicPointKey<I,T>(tracker,modelMatcher,modelRefiner,fitModel,40,0.3,pruneThreshold,0.8);
+		createAssistedTracker(maxIterations,4);
+		distortAlg = new MotionMosaicPointKey<I,T>(trackerModel,fitModel,40,0.3,pruneThreshold,0.8);
 		T initTran = ConvertTransform_F64.convert(createInitialTransform(), fitModel.createInstance());
 		distortAlg.setInitialTransform(initTran);
 		totalKeyFrames = 0;

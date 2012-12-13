@@ -18,13 +18,11 @@
 
 package boofcv.alg.sfm.d2;
 
-import boofcv.abst.feature.tracker.ImagePointTracker;
+import boofcv.abst.feature.tracker.ModelAssistedTracker;
 import boofcv.abst.feature.tracker.PointTrack;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.InvertibleTransform;
-import org.ddogleg.fitting.modelset.ModelFitter;
-import org.ddogleg.fitting.modelset.ModelMatcher;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,30 +48,25 @@ public class MotionMosaicPointKey<I extends ImageSingleBand, T extends Invertibl
 	// coverage right after spawning new features
 	double maxCoverage;
 
-	// if the internal key frame has changed
-	boolean keyFrame;
-	
 	// stores list of tracks to prune
 	List<PointTrack> prune = new ArrayList<PointTrack>();
+
+	private boolean previousWasKeyFrame;
 
 	/**
 	 * Specify algorithms to use internally.  Each of these classes must work with
 	 * compatible data structures.
 	 *
-	 * @param tracker feature tracker
-	 * @param modelMatcher Fits model to track data
-	 * @param modelRefiner (Optional) Refines the found model using the entire inlier set. Can be null.
+	 * @param tracker Feature tracker and motion estimator
 	 * @param model Motion model data structure
 	 */
-	public MotionMosaicPointKey(ImagePointTracker<I> tracker,
-								ModelMatcher<T, AssociatedPair> modelMatcher,
-								ModelFitter<T,AssociatedPair> modelRefiner,
+	public MotionMosaicPointKey(ModelAssistedTracker<I,T,AssociatedPair> tracker,
 								T model,
 								int absoluteMinimumTracks, double respawnTrackFraction,
 								int pruneThreshold ,
 								double respawnCoverageFraction)
 	{
-		super(tracker, modelMatcher, modelRefiner, model,pruneThreshold);
+		super(tracker, model,pruneThreshold);
 		
 		this.absoluteMinimumTracks = absoluteMinimumTracks;
 		this.respawnTrackFraction = respawnTrackFraction;
@@ -82,30 +75,19 @@ public class MotionMosaicPointKey<I extends ImageSingleBand, T extends Invertibl
 	
 	@Override
 	public boolean process( I frame ) {
-		if( !super.process(frame) )
+		if( !super.process(frame) && totalFramesProcessed == 0 )
 			return false;
 
 		// todo add a check to see if it is a keyframe or not- two spawns on first frame
-		keyFrame = false;
+		boolean setKeyFrame = false;
 
-		int matchSetSize = modelMatcher.getMatchSet().size();
-		if( matchSetSize < getTotalSpawned()* respawnTrackFraction  || matchSetSize < absoluteMinimumTracks ) {
-			keyFrame = true;
-		}
+		List<AssociatedPair> pairs = tracker.getMatchSet();
 
-		List<AssociatedPair> pairs = modelMatcher.getMatchSet();
-		
-		double fractionCovered = imageCoverageFraction(frame.width,frame.height,pairs);
-		if( fractionCovered < respawnCoverageFraction *maxCoverage ) {
-			keyFrame = true;
-		}
-		
-		if(keyFrame) {
-			changeKeyFrame();
+		if( previousWasKeyFrame ) {
+			previousWasKeyFrame = false;
 
 			int width = frame.width;
 			int height = frame.height;
-
 			maxCoverage = imageCoverageFraction(width, height,pairs);
 
 			// for some trackers, like KLT, they keep old features and these features can get squeezed together
@@ -123,6 +105,22 @@ public class MotionMosaicPointKey<I extends ImageSingleBand, T extends Invertibl
 
 				maxCoverage = imageCoverageFraction(width, height,pairs);
 			}
+		} else {
+			// look at the track distribution to see if new ones should be spawned
+			int matchSetSize = pairs.size();
+			if( matchSetSize < getTotalSpawned()* respawnTrackFraction  || matchSetSize < absoluteMinimumTracks ) {
+				setKeyFrame = true;
+			}
+
+			double fractionCovered = imageCoverageFraction(frame.width,frame.height,pairs);
+			if( fractionCovered < respawnCoverageFraction *maxCoverage ) {
+				setKeyFrame = true;
+			}
+		}
+		
+		if(setKeyFrame) {
+			changeKeyFrame();
+			previousWasKeyFrame = true;
 		}
 
 		return true;
@@ -154,9 +152,5 @@ public class MotionMosaicPointKey<I extends ImageSingleBand, T extends Invertibl
 				y1 = p.p2.y;
 		}
 		return ((x1-x0)*(y1-y0))/(width*height);
-	}
-
-	public boolean isKeyFrame() {
-		return keyFrame;
 	}
 }

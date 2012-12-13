@@ -19,7 +19,7 @@
 package boofcv.examples;
 
 
-import boofcv.abst.feature.associate.GeneralAssociation;
+import boofcv.abst.feature.associate.AssociateDescription;
 import boofcv.abst.feature.associate.ScoreAssociation;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
 import boofcv.alg.feature.UtilFeature;
@@ -72,7 +72,7 @@ public class ExampleImageStitching {
 	public static<T extends ImageSingleBand, FD extends TupleDesc> Homography2D_F64
 	computeTransform( T imageA , T imageB ,
 					  DetectDescribePoint<T,FD> detDesc ,
-					  GeneralAssociation<FD> associate ,
+					  AssociateDescription<FD> associate ,
 					  ModelMatcher<Homography2D_F64,AssociatedPair> modelMatcher )
 	{
 		// get the length of the description
@@ -140,7 +140,7 @@ public class ExampleImageStitching {
 		// Detect using the standard SURF feature descriptor and describer
 		DetectDescribePoint detDesc = FactoryDetectDescribe.surf(1, 2, 200, 1, 9, 4, 4, true, imageType);
 		ScoreAssociation<SurfFeature> scorer = FactoryAssociation.scoreEuclidean(SurfFeature.class,true);
-		GeneralAssociation<SurfFeature> associate = FactoryAssociation.greedy(scorer,2,-1,true);
+		AssociateDescription<SurfFeature> associate = FactoryAssociation.greedy(scorer,2,-1,true);
 
 		// fit the images using a homography.  This works well for rotations and distant objects.
 		GenerateHomographyLinear modelFitter = new GenerateHomographyLinear(true);

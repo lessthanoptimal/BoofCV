@@ -23,8 +23,7 @@ import boofcv.struct.FastQueue;
 import boofcv.struct.feature.AssociatedIndex;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * @author Peter Abeles
@@ -32,7 +31,7 @@ import static org.junit.Assert.assertTrue;
 public class TestWrapAssociateGreedy {
 
 	/**
-	 * Perform basic tests to make sure GeneralAssociation is correctly
+	 * Perform basic tests to make sure AssociateDescription is correctly
 	 * being implemented.
 	 */
 	@Test
@@ -71,6 +70,11 @@ public class TestWrapAssociateGreedy {
 			assertTrue(a.src==i);
 			assertTrue(a.fitScore != 0 );
 		}
+	}
+
+	@Test
+	public void checkUnassociated() {
+		fail("Implement");
 	}
 
 	private class DoubleScore implements ScoreAssociation<Double> {

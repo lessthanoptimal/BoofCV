@@ -18,7 +18,7 @@
 
 package boofcv.alg.feature.associate;
 
-import boofcv.abst.feature.associate.GeneralAssociation;
+import boofcv.abst.feature.associate.AssociateDescription;
 import boofcv.abst.feature.associate.ScoreAssociation;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.misc.Performer;
@@ -44,10 +44,10 @@ public class BenchmarkAssociationAlgs {
 
 	public static class General implements Performer {
 
-		GeneralAssociation<TupleDesc_F64> alg;
+		AssociateDescription<TupleDesc_F64> alg;
 		String name;
 
-		public General(String name, GeneralAssociation<TupleDesc_F64> alg) {
+		public General(String name, AssociateDescription<TupleDesc_F64> alg) {
 			this.alg = alg;
 			this.name = name;
 		}

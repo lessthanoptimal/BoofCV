@@ -19,7 +19,9 @@
 package boofcv.alg.sfm.d2;
 
 import boofcv.abst.feature.tracker.ImagePointTracker;
+import boofcv.abst.feature.tracker.ModelAssistedTracker;
 import boofcv.abst.feature.tracker.PointTrack;
+import boofcv.alg.feature.tracker.PointToAssistedTracker;
 import boofcv.alg.sfm.robust.DistanceAffine2DSq;
 import boofcv.alg.sfm.robust.DistanceHomographySq;
 import boofcv.alg.sfm.robust.GenerateAffine2D;
@@ -66,10 +68,8 @@ public abstract class ImageMotionBaseApp<I extends ImageSingleBand,
 
 	// tracks feature in the video stream
 	protected ImagePointTracker<I> tracker;
-	// finds the best fit model parameters to describe feature motion
-	protected ModelMatcher<T,AssociatedPair> modelMatcher;
-	// batch refinement algorithm
-	protected ModelFitter<T,AssociatedPair> modelRefiner;
+	// tracks and estimates the motion
+	protected ModelAssistedTracker<I,T,AssociatedPair> trackerModel;
 
 	// computes motion across multiple frames intelligently
 	// MUST be declared by child class
@@ -218,7 +218,7 @@ public abstract class ImageMotionBaseApp<I extends ImageSingleBand,
 		
 		// toggle on and off showing the active tracks
 		if( infoPanel.getShowInliers())
-			gui.setInliers(modelMatcher.getMatchSet());
+			gui.setInliers(trackerModel.getMatchSet());
 		else
 			gui.setInliers(null);
 		if( infoPanel.getShowAll())
@@ -230,7 +230,7 @@ public abstract class ImageMotionBaseApp<I extends ImageSingleBand,
 		gui.setCurrToWorld(H);
 		gui.setImages(imageGUI,distortedImage);
 
-		final int numAssociated = modelMatcher.getMatchSet().size();
+		final int numAssociated = trackerModel.getMatchSet().size();
 		final int numFeatures = tracker.getActiveTracks(null).size();
 
 		// update GUI
@@ -389,7 +389,7 @@ public abstract class ImageMotionBaseApp<I extends ImageSingleBand,
 
 	@Override
 	public void setActiveAlgorithm(int indexFamily, String name, Object cookie) {
-		if( sequence == null || modelMatcher == null )
+		if( sequence == null || trackerModel == null )
 			return;
 
 		stopWorker();
@@ -535,11 +535,11 @@ public abstract class ImageMotionBaseApp<I extends ImageSingleBand,
 	 * @param maxIterations Maximum number of iterations in RANSAC
 	 * @param thresholdFit Inlier fit threshold
 	 */
-	protected void createModelMatcher( int maxIterations , double thresholdFit ) {
-
+	protected void createAssistedTracker( int maxIterations , double thresholdFit ) {
 		ModelGenerator fitter;
 		DistanceFromModel distance;
-		
+		ModelFitter<T,AssociatedPair> modelRefiner;
+
 		if( fitModel instanceof Homography2D_F64 ) {
 			GenerateHomographyLinear mf = new GenerateHomographyLinear(true);
 			fitter = mf;
@@ -554,8 +554,10 @@ public abstract class ImageMotionBaseApp<I extends ImageSingleBand,
 			throw new RuntimeException("Unknown model type");
 		}
 
-		modelMatcher = new Ransac(123123,fitter,distance,maxIterations,thresholdFit);
+		ModelMatcher<T,AssociatedPair> modelMatcher = new Ransac(123123,fitter,distance,maxIterations,thresholdFit);
 
+		tracker.reset();
+		trackerModel = new PointToAssistedTracker<I, T, AssociatedPair>(tracker,modelMatcher,modelRefiner);
 	}
 
 	protected abstract void startEverything();

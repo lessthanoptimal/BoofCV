@@ -23,12 +23,14 @@ import boofcv.struct.feature.TupleDesc_F64;
 
 
 /**
+ * Scores two possible associations using {@link DescriptorDistance#correlation(boofcv.struct.feature.TupleDesc_F64, boofcv.struct.feature.TupleDesc_F64)}.
+ *
  * @author Peter Abeles
  */
 public class ScoreAssociateCorrelation implements ScoreAssociation<TupleDesc_F64> {
 	@Override
 	public double score(TupleDesc_F64 a, TupleDesc_F64 b) {
-		return -Math.abs(DescriptorDistance.correlation(a, b));
+		return -DescriptorDistance.correlation(a, b);
 	}
 
 	@Override

@@ -9,7 +9,7 @@ import boofcv.abst.sfm.WrapVisOdomPixelDepthPnP;
 import boofcv.alg.geo.DistanceModelMonoPixels;
 import boofcv.alg.geo.pose.PnPDistanceReprojectionSq;
 import boofcv.alg.sfm.StereoSparse3D;
-import boofcv.alg.sfm.VisOdomPixelDepthPnP;
+import boofcv.alg.sfm.d3.VisOdomPixelDepthPnP;
 import boofcv.alg.sfm.robust.EstimatorToGenerator;
 import boofcv.factory.geo.EnumPNP;
 import boofcv.factory.geo.FactoryMultiView;
@@ -37,6 +37,7 @@ public class FactoryVisualOdometry {
 	 * @param inlierPixelTol Tolerance for what defines a fit to the motin model.  Try a value between 1 and 2
 	 * @param tracker Feature tracker
 	 * @param sparseDisparity Estimates the 3D location of features
+	 * @param ransacIterations Number of iterations RANSAC will perform
 	 * @param refineIterations Number of iterations used to refine the estimate.  Try 100 or 0 to turn off refinement.
 	 * @param imageType Type of image being processed.
 	 * @return StereoVisualOdometry
@@ -47,6 +48,7 @@ public class FactoryVisualOdometry {
 										double inlierPixelTol,
 										ImagePointTracker<T> tracker,
 										StereoDisparitySparse<T> sparseDisparity,
+										int ransacIterations ,
 										int refineIterations ,
 										Class<T> imageType) {
 
@@ -66,8 +68,7 @@ public class FactoryVisualOdometry {
 		double ransacTOL = inlierPixelTol * inlierPixelTol;
 
 		ModelMatcher<Se3_F64, Point2D3D> motion =
-				new Ransac<Se3_F64, Point2D3D>(2323, generator, distance,
-						200, ransacTOL);
+				new Ransac<Se3_F64, Point2D3D>(2323, generator, distance, ransacIterations, ransacTOL);
 
 		// Range from sparse disparity
 		StereoSparse3D<T> pixelTo3D = new StereoSparse3D<T>(sparseDisparity,imageType);

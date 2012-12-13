@@ -62,7 +62,7 @@ public class UtilDisparityScore {
 			int indexRight = right.startIndex + right.stride*row;
 
 			// Fill elementScore with scores for individual elements for this row at disparity d
-			computeScoreRow(left, right, colMax, indexLeft, indexRight,elementScore );
+			computeScoreRowSad(left, right, colMax, indexLeft, indexRight, elementScore);
 
 			// score at the first column
 			int score = 0;
@@ -86,9 +86,9 @@ public class UtilDisparityScore {
 	 * is in its own function so that it can be overridden and have different cost functions
 	 * inserted easily.
 	 */
-	public static void computeScoreRow(ImageUInt8 left, ImageUInt8 right,
-									   int elementMax, int indexLeft, int indexRight,
-									   int elementScore[] )
+	public static void computeScoreRowSad(ImageUInt8 left, ImageUInt8 right,
+										  int elementMax, int indexLeft, int indexRight,
+										  int elementScore[])
 	{
 		for( int rCol = 0; rCol < elementMax; rCol++ ) {
 			int diff = (left.data[ indexLeft++ ]& 0xFF) - (right.data[ indexRight++ ]& 0xFF);
@@ -131,7 +131,7 @@ public class UtilDisparityScore {
 			int indexRight = right.startIndex + right.stride*row;
 
 			// Fill elementScore with scores for individual elements for this row at disparity d
-			computeScoreRow(left, right, colMax, indexLeft, indexRight, elementScore);
+			computeScoreRowSad(left, right, colMax, indexLeft, indexRight, elementScore);
 
 			// score at the first column
 			float score = 0;
@@ -155,9 +155,9 @@ public class UtilDisparityScore {
 	 * is in its own function so that it can be overridden and have different cost functions
 	 * inserted easily.
 	 */
-	public static void computeScoreRow(ImageFloat32 left, ImageFloat32 right,
-									   int elementMax, int indexLeft, int indexRight,
-									   float elementScore[] )
+	public static void computeScoreRowSad(ImageFloat32 left, ImageFloat32 right,
+										  int elementMax, int indexLeft, int indexRight,
+										  float elementScore[])
 	{
 		for( int rCol = 0; rCol < elementMax; rCol++ ) {
 			float diff = (left.data[ indexLeft++ ]) - (right.data[ indexRight++ ]);

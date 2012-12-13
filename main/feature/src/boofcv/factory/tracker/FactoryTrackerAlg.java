@@ -18,7 +18,7 @@
 
 package boofcv.factory.tracker;
 
-import boofcv.abst.feature.associate.GeneralAssociation;
+import boofcv.abst.feature.associate.AssociateDescription;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
 import boofcv.alg.interpolate.InterpolateRectangle;
 import boofcv.alg.tracker.combined.CombinedTrackerScalePoint;
@@ -78,7 +78,7 @@ public class FactoryTrackerAlg {
 	 */
 	public static <I extends ImageSingleBand, D extends ImageSingleBand, Desc extends TupleDesc>
 	CombinedTrackerScalePoint<I,D,Desc> combined( DetectDescribePoint<I,Desc> detector ,
-												  GeneralAssociation<Desc> associate ,
+												  AssociateDescription<Desc> associate ,
 												  int featureRadiusKlt,
 												  int[] pyramidScalingKlt ,
 												  Class<I> imageType ,

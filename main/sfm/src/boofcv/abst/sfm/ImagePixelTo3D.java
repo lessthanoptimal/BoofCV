@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.sfm;
+package boofcv.abst.sfm;
 
 /**
  * <p>

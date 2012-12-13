@@ -18,7 +18,7 @@
 
 package boofcv.alg.tracker.combined;
 
-import boofcv.abst.feature.associate.GeneralAssociation;
+import boofcv.abst.feature.associate.AssociateDescription;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
 import boofcv.struct.FastQueue;
 import boofcv.struct.feature.AssociatedIndex;
@@ -54,7 +54,7 @@ public class CombinedTrackerScalePoint
 	// feature detector and describer
 	protected DetectDescribePoint<I,TD> detector;
 	// Used to associate features using their DDA description
-	protected GeneralAssociation<TD> associate;
+	protected AssociateDescription<TD> associate;
 
 	// all active tracks that have been tracked purely by KLT
 	protected List<CombinedTrack<TD>> tracksPureKlt = new ArrayList<CombinedTrack<TD>>();
@@ -86,7 +86,7 @@ public class CombinedTrackerScalePoint
 	 */
 	public CombinedTrackerScalePoint(PyramidKltForCombined<I, D> trackerKlt,
 									 DetectDescribePoint<I,TD> detector,
-									 GeneralAssociation<TD> associate ) {
+									 AssociateDescription<TD> associate ) {
 		this.trackerKlt = trackerKlt;
 		this.detector = detector;
 

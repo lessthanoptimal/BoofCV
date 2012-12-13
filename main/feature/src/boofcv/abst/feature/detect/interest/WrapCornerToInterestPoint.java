@@ -43,6 +43,7 @@ public class WrapCornerToInterestPoint<T extends ImageSingleBand, D extends Imag
 	GeneralFeatureDetector<T, D> detector;
 	ImageGradient<T, D> gradient;
 	ImageHessian<D> hessian;
+	double scale = 1;
 
 	// true if the data 
 	boolean declaredDerivatives = false;
@@ -62,6 +63,19 @@ public class WrapCornerToInterestPoint<T extends ImageSingleBand, D extends Imag
 		this.gradient = gradient;
 		this.hessian = hessian;
 		this.derivativeGenerator = derivativeGenerator;
+	}
+
+	public WrapCornerToInterestPoint(GeneralFeatureDetector<T, D> detector,
+									 ImageGradient<T, D> gradient,
+									 ImageHessian<D> hessian,
+									 ImageGenerator<D> derivativeGenerator,
+									 double scale) {
+		this(detector,gradient,hessian,derivativeGenerator);
+		this.scale = scale;
+	}
+
+	public double getScale() {
+		return scale;
 	}
 
 	@Override
@@ -124,7 +138,7 @@ public class WrapCornerToInterestPoint<T extends ImageSingleBand, D extends Imag
 
 	@Override
 	public double getScale(int featureIndex) {
-		return 1;
+		return scale;
 	}
 
 	@Override

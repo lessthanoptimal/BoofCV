@@ -18,8 +18,9 @@
 
 package boofcv.alg.feature.associate;
 
-import boofcv.abst.feature.associate.GeneralAssociation;
+import boofcv.abst.feature.associate.AssociateDescription;
 import boofcv.struct.FastQueue;
+import boofcv.struct.GrowingArrayInt;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.SurfFeature;
 import boofcv.struct.feature.TupleDesc_F64;
@@ -35,7 +36,7 @@ import boofcv.struct.feature.TupleDesc_F64;
 public class AssociateSurfBasic {
 
 	// association algorithm
-	GeneralAssociation<TupleDesc_F64> assoc;
+	AssociateDescription<TupleDesc_F64> assoc;
 
 	// features segmented by laplace sign
 	FastQueue<Helper> srcPositive = new FastQueue<Helper>(10,Helper.class,true);
@@ -47,7 +48,10 @@ public class AssociateSurfBasic {
 	// stores output matches
 	FastQueue<AssociatedIndex> matches = new FastQueue<AssociatedIndex>(10,AssociatedIndex.class,true);
 
-	public AssociateSurfBasic(GeneralAssociation<TupleDesc_F64> assoc) {
+	// indexes of unassociated features
+	GrowingArrayInt unassociated = new GrowingArrayInt();
+
+	public AssociateSurfBasic(AssociateDescription<TupleDesc_F64> assoc) {
 		this.assoc = assoc;
 	}
 
@@ -78,8 +82,11 @@ public class AssociateSurfBasic {
 	 */
 	public void associate()
 	{
-		// find and add the matches
+		// initialize data structures
 		matches.reset();
+		unassociated.reset();
+
+		// find and add the matches
 		assoc.setSource((FastQueue)srcPositive);
 		assoc.setDestination((FastQueue) dstPositive);
 		assoc.associate();
@@ -90,6 +97,10 @@ public class AssociateSurfBasic {
 			int globalDstIndex = dstPositive.data[a.dst].index;
 			matches.grow().setAssociation(globalSrcIndex,globalDstIndex,a.fitScore);
 		}
+		GrowingArrayInt un = assoc.getUnassociatedSource();
+		for( int i = 0; i < un.size; i++ ) {
+			unassociated.add( srcPositive.data[un.get(i)].index );
+		}
 		assoc.setSource((FastQueue)srcNegative);
 		assoc.setDestination((FastQueue) dstNegative);
 		assoc.associate();
@@ -99,6 +110,10 @@ public class AssociateSurfBasic {
 			int globalSrcIndex = srcNegative.data[a.src].index;
 			int globalDstIndex = dstNegative.data[a.dst].index;
 			matches.grow().setAssociation(globalSrcIndex,globalDstIndex,a.fitScore);
+		}
+		un = assoc.getUnassociatedSource();
+		for( int i = 0; i < un.size; i++ ) {
+			unassociated.add( srcNegative.data[un.get(i)].index );
 		}
 	}
 
@@ -129,6 +144,10 @@ public class AssociateSurfBasic {
 		}
 	}
 
+	public GrowingArrayInt getUnassociated() {
+		return unassociated;
+	}
+
 	public static class Helper extends TupleDesc_F64
 	{
 		public int index;
@@ -136,6 +155,5 @@ public class AssociateSurfBasic {
 			this.index = index;
 			value = a.value;
 		}
-
 	}
 }

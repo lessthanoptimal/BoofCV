@@ -20,17 +20,20 @@ package boofcv.abst.feature.associate;
 
 import boofcv.alg.feature.associate.AssociateSurfBasic;
 import boofcv.struct.FastQueue;
+import boofcv.struct.GrowingArrayInt;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.SurfFeature;
 
 /**
- * Wrapper around {@Link AssociateSurfBasic} for {@link GeneralAssociation}.
+ * Wrapper around {@Link AssociateSurfBasic} for {@link AssociateDescription}.
  *
  * @author Peter Abeles
  */
-public class WrapAssociateSurfBasic implements GeneralAssociation<SurfFeature> {
+public class WrapAssociateSurfBasic implements AssociateDescription<SurfFeature> {
 
 	AssociateSurfBasic alg;
+
+	FastQueue<SurfFeature> listSrc;
 
 	public WrapAssociateSurfBasic(AssociateSurfBasic alg) {
 		this.alg = alg;
@@ -39,6 +42,7 @@ public class WrapAssociateSurfBasic implements GeneralAssociation<SurfFeature> {
 	@Override
 	public void setSource(FastQueue<SurfFeature> listSrc) {
 		alg.setSrc(listSrc);
+		this.listSrc = listSrc;
 	}
 
 	@Override
@@ -54,5 +58,10 @@ public class WrapAssociateSurfBasic implements GeneralAssociation<SurfFeature> {
 	@Override
 	public FastQueue<AssociatedIndex> getMatches() {
 		return alg.getMatches();
+	}
+
+	@Override
+	public GrowingArrayInt getUnassociatedSource() {
+		return alg.getUnassociated();
 	}
 }
