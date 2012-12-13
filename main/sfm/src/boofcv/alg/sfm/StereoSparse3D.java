@@ -1,6 +1,7 @@
 package boofcv.alg.sfm;
 
 import boofcv.abst.feature.disparity.StereoDisparitySparse;
+import boofcv.abst.sfm.ImagePixelTo3D;
 import boofcv.alg.geo.RectifyImageOps;
 import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.distort.PointTransform_F64;

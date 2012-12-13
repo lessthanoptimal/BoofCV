@@ -19,8 +19,6 @@
 package boofcv.abst.feature.associate;
 
 import boofcv.struct.FastQueue;
-import boofcv.struct.GrowingArrayInt;
-import boofcv.struct.feature.AssociatedIndex;
 import georegression.struct.point.Point2D_F64;
 
 /**
@@ -32,7 +30,7 @@ import georegression.struct.point.Point2D_F64;
  *
  * @author Peter Abeles
  */
-public interface AssociateDescription2D<D> {
+public interface AssociateDescription2D<D> extends Associate {
 
 	/**
 	 * Provide the location and descriptions for source features.
@@ -49,24 +47,4 @@ public interface AssociateDescription2D<D> {
 	 * @param descriptions Feature descriptions.
 	 */
 	public void setDestination( FastQueue<Point2D_F64> location , FastQueue<D> descriptions );
-
-	/**
-	 * Finds the best match for each item in the source list with an item in the destination list.
-	 */
-	public void associate();
-
-	/**
-	 * List of associated features.  Indexes refer to the index inside the input lists.
-	 *
-	 * @return List of associated features.
-	 */
-	public FastQueue<AssociatedIndex> getMatches();
-
-	/**
-	 * Indexes of features in the source set which are not associated to features to the destination set.
-	 *
-	 * @return List of unassociated source features by index.
-	 */
-	public GrowingArrayInt getUnassociatedSource();
-
 }

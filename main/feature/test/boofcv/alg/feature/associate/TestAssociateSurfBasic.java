@@ -28,8 +28,7 @@ import boofcv.struct.feature.SurfFeature;
 import boofcv.struct.feature.TupleDesc_F64;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 
 /**
@@ -107,5 +106,10 @@ public class TestAssociateSurfBasic {
 		ret.value[0] = value;
 
 		return ret;
+	}
+
+	@Test
+	public void checkUnassociated() {
+		fail("Implement");
 	}
 }

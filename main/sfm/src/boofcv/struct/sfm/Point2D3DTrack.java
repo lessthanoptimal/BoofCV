@@ -1,4 +1,4 @@
-package boofcv.alg.sfm;
+package boofcv.struct.sfm;
 
 import boofcv.struct.geo.Point2D3D;
 
@@ -10,6 +10,6 @@ import boofcv.struct.geo.Point2D3D;
 public class Point2D3DTrack extends Point2D3D {
 
 	// the tick in which it was last an inlier
-	long lastInlier;
+	public long lastInlier;
 
 }

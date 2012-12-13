@@ -1,4 +1,4 @@
-package boofcv.alg.sfm;
+package boofcv.alg.sfm.d3;
 
 import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Point2D_F64;
