@@ -1,11 +1,13 @@
-package boofcv.alg.sfm;
+package boofcv.alg.sfm.d3;
 
 import boofcv.abst.feature.tracker.ImagePointTracker;
 import boofcv.abst.feature.tracker.PointTrack;
 import boofcv.abst.geo.RefinePnP;
+import boofcv.abst.sfm.ImagePixelTo3D;
 import boofcv.struct.distort.PointTransform_F64;
 import boofcv.struct.geo.Point2D3D;
 import boofcv.struct.image.ImageBase;
+import boofcv.struct.sfm.Point2D3DTrack;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;

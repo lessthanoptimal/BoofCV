@@ -18,13 +18,13 @@
 
 package boofcv.alg.sfm.d2;
 
-import boofcv.abst.feature.tracker.ImagePointTracker;
+import boofcv.abst.feature.tracker.ModelAssistedTracker;
 import boofcv.abst.feature.tracker.PointTrack;
+import boofcv.abst.feature.tracker.TrackGeometryManager;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.image.ImageUInt8;
 import georegression.struct.InvertibleTransform;
 import georegression.struct.se.Se2_F32;
-import org.ddogleg.fitting.modelset.ModelMatcher;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -47,13 +47,12 @@ public class TestImageMotionPointKey {
 		Se2_F32 initial = new Se2_F32(1,2,3);
 		Se2_F32 computed = new Se2_F32(4,5,6);
 		Se2_F32 model = new Se2_F32();
-		DummyTracker tracker = new DummyTracker();
-		DummyModelMatcher<Se2_F32> matcher = new DummyModelMatcher<Se2_F32>(computed,5);
+		DummyTracker tracker = new DummyTracker(computed,5);
 
 		ImageUInt8 input = new ImageUInt8(20,30);
 
 		ImageMotionPointKey<ImageUInt8,Se2_F32> alg =
-				new ImageMotionPointKey<ImageUInt8,Se2_F32>(tracker,matcher,null,model,1000);
+				new ImageMotionPointKey<ImageUInt8,Se2_F32>(tracker,model,1000);
 
 		// specify an initial transform
 		alg.setInitialTransform(initial);
@@ -89,7 +88,7 @@ public class TestImageMotionPointKey {
 		Se2_F32 model = new Se2_F32();
 
 		// the world frame will initially be the identify matrix
-		ImageMotionPointKey<ImageUInt8,Se2_F32> alg = new ImageMotionPointKey<ImageUInt8,Se2_F32>(null,null,null,model,1000);
+		ImageMotionPointKey<ImageUInt8,Se2_F32> alg = new ImageMotionPointKey<ImageUInt8,Se2_F32>(null,model,1000);
 
 		// change it to this frame
 		alg.changeWorld(oldToNew);
@@ -110,12 +109,11 @@ public class TestImageMotionPointKey {
 	public void changeKeyFrame() {
 		Se2_F32 computed = new Se2_F32(4,5,6);
 		Se2_F32 model = new Se2_F32();
-		DummyTracker tracker = new DummyTracker();
-		DummyModelMatcher<Se2_F32> matcher = new DummyModelMatcher<Se2_F32>(computed,5);
+		DummyTracker tracker = new DummyTracker(computed,5);
 
 		ImageUInt8 input = new ImageUInt8(20,30);
 
-		ImageMotionPointKey<ImageUInt8,Se2_F32> alg = new ImageMotionPointKey<ImageUInt8,Se2_F32>(tracker,matcher,null,model,100);
+		ImageMotionPointKey<ImageUInt8,Se2_F32> alg = new ImageMotionPointKey<ImageUInt8,Se2_F32>(tracker,model,100);
 
 		// process twice to change the transforms
 		alg.process(input);
@@ -145,12 +143,11 @@ public class TestImageMotionPointKey {
 	public void testPrune() {
 		Se2_F32 computed = new Se2_F32(4,5,6);
 		Se2_F32 model = new Se2_F32();
-		DummyTracker tracker = new DummyTracker();
-		DummyModelMatcher<Se2_F32> matcher = new DummyModelMatcher<Se2_F32>(computed,5);
+		DummyTracker tracker = new DummyTracker(computed,5);
 
 		ImageUInt8 input = new ImageUInt8(20,30);
 
-		ImageMotionPointKey<ImageUInt8,Se2_F32> alg = new ImageMotionPointKey<ImageUInt8,Se2_F32>(tracker,matcher,null,model,5);
+		ImageMotionPointKey<ImageUInt8,Se2_F32> alg = new ImageMotionPointKey<ImageUInt8,Se2_F32>(tracker,model,5);
 
 		// create tracks such that only some of them will be dropped
 		alg.totalFramesProcessed = 9;
@@ -170,13 +167,21 @@ public class TestImageMotionPointKey {
 		assertEquals(6,tracker.numDropped);
 	}
 
-	public static class DummyTracker implements ImagePointTracker<ImageUInt8>
+	public static class DummyTracker<T extends InvertibleTransform>
+			implements ModelAssistedTracker<ImageUInt8,T,AssociatedPair>
 	{
+		T found;
+		int matchSetSize;
 		public int numSpawn = 0;
 		public int numDropped = 0;
 
 		List<PointTrack> list = new ArrayList<PointTrack>();
 		List<PointTrack> listSpawned = new ArrayList<PointTrack>();
+
+		public DummyTracker(T found, int matchSetSize) {
+			this.found = found;
+			this.matchSetSize = matchSetSize;
+		}
 
 		@Override
 		public void reset() {}
@@ -229,20 +234,14 @@ public class TestImageMotionPointKey {
 			list.addAll(this.listSpawned);
 			return list;
 		}
-	}
 
-	public static class DummyModelMatcher<T extends InvertibleTransform> implements ModelMatcher<T,AssociatedPair> {
+		@Override
+		public void setTrackGeometry(TrackGeometryManager<AssociatedPair> manager) {
 
-		T found;
-		int matchSetSize;
-
-		public DummyModelMatcher(T found, int matchSetSize) {
-			this.found = found;
-			this.matchSetSize = matchSetSize;
 		}
 
 		@Override
-		public boolean process(List<AssociatedPair> dataSet) {
+		public boolean foundModel() {
 			return true;
 		}
 
@@ -261,18 +260,8 @@ public class TestImageMotionPointKey {
 		}
 
 		@Override
-		public int getInputIndex(int matchIndex) {
+		public int convertMatchToTrackIndex(int matchIndex) {
 			return matchIndex;
-		}
-
-		@Override
-		public double getError() {
-			return 0;
-		}
-
-		@Override
-		public int getMinimumSize() {
-			return matchSetSize;
 		}
 
 		public void setMotion(T se) {

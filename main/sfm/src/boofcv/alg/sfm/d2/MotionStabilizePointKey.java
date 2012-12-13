@@ -18,13 +18,11 @@
 
 package boofcv.alg.sfm.d2;
 
-import boofcv.abst.feature.tracker.ImagePointTracker;
+import boofcv.abst.feature.tracker.ModelAssistedTracker;
 import boofcv.struct.distort.PixelTransform_F32;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.InvertibleTransform;
-import org.ddogleg.fitting.modelset.ModelFitter;
-import org.ddogleg.fitting.modelset.ModelMatcher;
 
 /**
  * Extension of {@link ImageMotionPointKey} specifically designed to stabilize image motion.  The algorithm
@@ -53,23 +51,19 @@ public class MotionStabilizePointKey<I extends ImageSingleBand, T extends Invert
 	 * Specify algorithms to use internally.  Each of these classes must work with
 	 * compatible data structures.
 	 *
-	 * @param tracker feature tracker
-	 * @param modelMatcher Fits model to track data
-	 * @param modelRefiner (Optional) Refines the found model using the entire inlier set. Can be null.
+	 * @param tracker Feature tracker and motion estimator
 	 * @param model Motion model data structure
 	 * @param thresholdKeyFrame  If the number of inlier is less than this number the keyframe will change.
 	 * @param thresholdReset If the number of inlier is less than this number a reset will occur.
 	 * @param largeMotionThreshold  If the transform from the key frame to the current frame is more than this a reset will occur.
 	 */
-	public MotionStabilizePointKey(ImagePointTracker<I> tracker, 
-								   ModelMatcher<T, AssociatedPair> modelMatcher,
-								   ModelFitter<T,AssociatedPair> modelRefiner,
+	public MotionStabilizePointKey(ModelAssistedTracker<I,T,AssociatedPair> tracker ,
 								   T model ,
 								   int thresholdKeyFrame , int thresholdReset ,
 								   int pruneThreshold ,
 								   int largeMotionThreshold )
 	{
-		super(tracker, modelMatcher, modelRefiner, model,pruneThreshold);
+		super(tracker, model,pruneThreshold);
 
 		if( thresholdKeyFrame < thresholdReset ) {
 			throw new IllegalArgumentException("Threshold for key frame should be more than reset");
@@ -96,7 +90,7 @@ public class MotionStabilizePointKey<I extends ImageSingleBand, T extends Invert
 		isReset = false;
 		isKeyFrame = false;
 
-		int inliers = modelMatcher.getMatchSet().size();
+		int inliers = tracker.getMatchSet().size();
 
 		// too few features to have a reliable motion estimate?
 		if( inliers < thresholdReset ) {

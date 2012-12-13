@@ -1,13 +1,15 @@
 package boofcv.alg.sfm;
 
 import boofcv.alg.misc.ImageStatistics;
+import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.image.ImageUInt8;
+import georegression.geometry.RotationMatrixGenerator;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
+import georegression.struct.se.Se3_F64;
 import org.junit.Test;
 
-import static boofcv.alg.sfm.TestAssociateStereoPoint.createStereoParam;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -81,5 +83,18 @@ public class TestStereoProcessingBase {
 		meanY /= totalPixel;
 
 		return new Point2D_F64(meanX,meanY);
+	}
+
+	public static StereoParameters createStereoParam( int width , int height , boolean flipY ) {
+		StereoParameters ret = new StereoParameters();
+
+		ret.setRightToLeft(new Se3_F64());
+		ret.getRightToLeft().getT().set(-0.2,0.001,-0.012);
+		RotationMatrixGenerator.eulerXYZ(0.001, -0.01, 0.0023, ret.getRightToLeft().getR());
+
+		ret.left = new IntrinsicParameters(300,320,0,width/2,height/2,width,height, flipY, new double[]{0.1,1e-4});
+		ret.right = new IntrinsicParameters(290,310,0,width/2+2,height/2-6,width,height, flipY, new double[]{0.05,-2e-4});
+
+		return ret;
 	}
 }

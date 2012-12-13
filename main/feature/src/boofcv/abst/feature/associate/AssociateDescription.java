@@ -19,7 +19,6 @@
 package boofcv.abst.feature.associate;
 
 import boofcv.struct.FastQueue;
-import boofcv.struct.feature.AssociatedIndex;
 
 
 /**
@@ -40,7 +39,7 @@ import boofcv.struct.feature.AssociatedIndex;
  *
  * @author Peter Abeles
  */
-public interface AssociateDescription<D> {
+public interface AssociateDescription<D> extends Associate {
 
 	/**
 	 * Sets the list of source features.
@@ -59,17 +58,4 @@ public interface AssociateDescription<D> {
 	 * @param listDst List of features
 	 */
 	public void setDestination( FastQueue<D> listDst );
-
-
-	/**
-	 * Finds the best match for each item in the source list with an item in the destination list.
-	 */
-	public void associate();
-
-	/**
-	 * List of associated features.  Indexes refer to the index inside the input lists.
-	 *
-	 * @return List of associated features.
-	 */
-	public FastQueue<AssociatedIndex> getMatches();
 }
