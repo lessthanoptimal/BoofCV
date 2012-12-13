@@ -62,7 +62,7 @@ public class VideoStabilizeSequentialPointApp<I extends ImageSingleBand, D exten
 		config.featureRadius = 3;
 		config.pyramidScaling = new int[]{1,2,4,8};
 
-		addAlgorithm(0, "KLT", FactoryPointSequentialTracker.klt(config,1,1));
+		addAlgorithm(0, "KLT", FactoryPointSequentialTracker.klt(config,1,3,1,1));
 		addAlgorithm(0, "ST-BRIEF", FactoryPointSequentialTracker.
 				dda_ST_BRIEF(400, 100, 1, 10, imageType, derivType));
 		// size of the description region has been increased to improve quality.
@@ -111,9 +111,8 @@ public class VideoStabilizeSequentialPointApp<I extends ImageSingleBand, D exten
 	@Override
 	protected void startEverything() {
 		// make sure there is nothing left over from before
-		tracker.dropAllTracks();
-		createModelMatcher(maxIterations,4);
-		distortAlg = new MotionStabilizePointKey<I,T>(tracker,modelMatcher,modelRefiner,fitModel,
+		createAssistedTracker(maxIterations,4);
+		distortAlg = new MotionStabilizePointKey<I,T>(trackerModel,fitModel,
 				thresholdKeyFrame,thresholdReset,pruneThreshold,largeMotionThreshold);
 //		distortAlg.setInitialTransform(createInitialTransform());
 

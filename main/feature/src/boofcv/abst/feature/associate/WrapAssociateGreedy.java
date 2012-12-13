@@ -20,6 +20,7 @@ package boofcv.abst.feature.associate;
 
 import boofcv.alg.feature.associate.AssociateGreedy;
 import boofcv.struct.FastQueue;
+import boofcv.struct.GrowingArrayInt;
 import boofcv.struct.feature.AssociatedIndex;
 import org.ddogleg.sorting.QuickSelectArray;
 
@@ -29,7 +30,7 @@ import org.ddogleg.sorting.QuickSelectArray;
  *
  * @author Peter Abeles
  */
-public class WrapAssociateGreedy<T> implements GeneralAssociation<T> {
+public class WrapAssociateGreedy<T> implements AssociateDescription<T> {
 
 	AssociateGreedy<T> alg;
 
@@ -40,6 +41,9 @@ public class WrapAssociateGreedy<T> implements GeneralAssociation<T> {
 	// reference to input list
 	FastQueue<T> listSrc;
 	FastQueue<T> listDst;
+
+	// indexes of unassociated features
+	GrowingArrayInt unassoc = new GrowingArrayInt();
 
 	/**
 	 *
@@ -68,6 +72,7 @@ public class WrapAssociateGreedy<T> implements GeneralAssociation<T> {
 
 	@Override
 	public void associate() {
+		unassoc.reset();
 		alg.associate(listSrc,listDst);
 
 		int pairs[] = alg.getPairs();
@@ -91,6 +96,8 @@ public class WrapAssociateGreedy<T> implements GeneralAssociation<T> {
 				int dst = pairs[i];
 				if( dst >= 0 )
 					matches.grow().setAssociation(i,dst,score[i]);
+				else
+					unassoc.add(i);
 			}
 			
 		} else {
@@ -103,6 +110,14 @@ public class WrapAssociateGreedy<T> implements GeneralAssociation<T> {
 				}
 				matches.grow().setAssociation(src,dst,score[src]);
 			}
+			for( int i = maxAssociations; i < listSrc.size; i++ ) {
+				unassoc.add(indexes[i]);
+			}
 		}
+	}
+
+	@Override
+	public GrowingArrayInt getUnassociatedSource() {
+		return unassoc;
 	}
 }

@@ -25,6 +25,9 @@ import georegression.struct.point.Point3D_F64;
 import java.util.List;
 
 /**
+ * TODO COmment
+ * TODO is this being used elsewhere, like in applets?
+ *
  * @author Peter Abeles
  */
 public class DisparityPointCloud {

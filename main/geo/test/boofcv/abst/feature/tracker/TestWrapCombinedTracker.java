@@ -18,7 +18,7 @@
 
 package boofcv.abst.feature.tracker;
 
-import boofcv.abst.feature.associate.GeneralAssociation;
+import boofcv.abst.feature.associate.AssociateDescription;
 import boofcv.abst.feature.associate.ScoreAssociateHamming_B;
 import boofcv.abst.feature.describe.WrapDescribeBrief;
 import boofcv.abst.feature.detect.interest.GeneralFeatureDetector;
@@ -56,10 +56,10 @@ public class TestWrapCombinedTracker extends StandardImagePointTracker<ImageFloa
 				FactoryDetectPoint.createShiTomasi(2, false, 0, 100, ImageFloat32.class);
 
 		InterestPointDetector<ImageFloat32> detector =
-				FactoryInterestPoint.wrapPoint(corner, ImageFloat32.class, ImageFloat32.class);
+				FactoryInterestPoint.wrapPoint(corner, 1,ImageFloat32.class, ImageFloat32.class);
 		ScoreAssociateHamming_B score = new ScoreAssociateHamming_B();
 
-		GeneralAssociation<TupleDesc_B> association =
+		AssociateDescription<TupleDesc_B> association =
 				FactoryAssociation.greedy(score, 400, 300, true);
 
 		pointTracker = FactoryPointSequentialTracker.combined(

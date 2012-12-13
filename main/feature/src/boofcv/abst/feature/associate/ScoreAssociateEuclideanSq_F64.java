@@ -25,6 +25,8 @@ import boofcv.struct.feature.TupleDesc_F64;
 /**
  * Scores based on Euclidean distance squared
  *
+ * @see {@link DescriptorDistance#euclideanSq(TupleDesc_F64, TupleDesc_F64)}
+ *
  * @author Peter Abeles
  */
 public class ScoreAssociateEuclideanSq_F64 implements ScoreAssociation<TupleDesc_F64> {

@@ -18,7 +18,7 @@
 
 package boofcv.abst.feature.tracker;
 
-import boofcv.abst.feature.associate.GeneralAssociation;
+import boofcv.abst.feature.associate.AssociateDescription2D;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
 import boofcv.struct.FastQueue;
 import boofcv.struct.feature.AssociatedIndex;
@@ -43,12 +43,13 @@ public class DetectAssociateTracker<I extends ImageSingleBand, D extends TupleDe
 		implements ImagePointTracker<I> {
 
 	// Feature detector and describer
-	DetectDescribePoint<I,D> detDesc;
+	protected DetectDescribePoint<I,D> detDesc;
 	// associates features between two images together
-	GeneralAssociation<D> associate;
+	protected AssociateDescription2D<D> associate;
 
 	// location of interest points
-	private FastQueue<Point2D_F64> locDst = new FastQueue<Point2D_F64>(10,Point2D_F64.class,true);
+	private FastQueue<Point2D_F64> locDst = new FastQueue<Point2D_F64>(10,Point2D_F64.class,false);
+	private FastQueue<Point2D_F64> locSrc = new FastQueue<Point2D_F64>(10,Point2D_F64.class,false);
 	// description of interest points
 	private FastQueue<D> featSrc;
 	private FastQueue<D> featDst;
@@ -77,7 +78,7 @@ public class DetectAssociateTracker<I extends ImageSingleBand, D extends TupleDe
 	boolean updateDescription;
 
 	// indicates if a feature was associated or not
-	boolean srcAssociated[] = new boolean[1];
+	boolean isAssociated[] = new boolean[1];
 
 	/**
 	 * Configures tracker
@@ -88,7 +89,7 @@ public class DetectAssociateTracker<I extends ImageSingleBand, D extends TupleDe
 	 *                          Typically this should be false.
 	 */
 	public DetectAssociateTracker( final DetectDescribePoint<I,D> detDesc ,
-								   final GeneralAssociation<D> associate ,
+								   final AssociateDescription2D<D> associate ,
 								   final boolean updateDescription ) {
 		this.detDesc = detDesc;
 		this.associate = associate;
@@ -130,15 +131,13 @@ public class DetectAssociateTracker<I extends ImageSingleBand, D extends TupleDe
 		featDst.reset();
 		locDst.reset();
 
-		if( srcAssociated.length < tracksAll.size() ) {
-			srcAssociated = new boolean[ tracksAll.size() ];
+		if( isAssociated.length < tracksAll.size() ) {
+			isAssociated = new boolean[ tracksAll.size() ];
 		}
 
 		int N = detDesc.getNumberOfFeatures();
 		for( int i = 0; i < N; i++ ) {
-			Point2D_F64 p = locDst.grow();
-			p.set(detDesc.getLocation(i));
-
+			locDst.add(detDesc.getLocation(i));
 			featDst.add( detDesc.getDescriptor(i));
 		}
 
@@ -149,18 +148,17 @@ public class DetectAssociateTracker<I extends ImageSingleBand, D extends TupleDe
 				throw new RuntimeException("BUG");
 
 			for( int i = 0; i < tracksAll.size(); i++ ) {
-				D desc = tracksAll.get(i).getDescription();
+				PointTrack t = tracksAll.get(i);
+				D desc = t.getDescription();
 				featSrc.add(desc);
-				srcAssociated[i] = false;
+				locSrc.add(t);
+				isAssociated[i] = false;
 			}
 
 			// pair of old and newly detected features
-			associate.setSource(featSrc);
-			associate.setDestination(featDst);
-			associate.associate();
+			matches = associateFeatures();
 
 			// update tracks
-			matches = associate.getMatches();
 			for( int i = 0; i < matches.size; i++ ) {
 				AssociatedIndex indexes = matches.data[i];
 				PointTrack track = tracksAll.get(indexes.src);
@@ -173,19 +171,29 @@ public class DetectAssociateTracker<I extends ImageSingleBand, D extends TupleDe
 					((D)track.getDescription()).setTo(featDst.get(indexes.dst));
 				}
 
-				srcAssociated[indexes.src] = true;
-//				System.out.println("i = "+i+"  x = "+loc.x+" y = "+loc.y);
+				isAssociated[indexes.src] = true;
 			}
 
 			// add unassociated to the list
 			for( int i = 0; i < tracksAll.size(); i++ ) {
-				if( !srcAssociated[i] )
+				if( !isAssociated[i] )
 					tracksInactive.add(tracksAll.get(i));
 			}
 
 			// clean up
 			featSrc.reset();
+			locSrc.reset();
 		}
+	}
+
+	/**
+	 * Associates features between the two images
+	 */
+	protected FastQueue<AssociatedIndex> associateFeatures() {
+		associate.setSource(locSrc, featSrc);
+		associate.setDestination(locDst, featDst);
+		associate.associate();
+		return associate.getMatches();
 	}
 
 	/**
@@ -193,25 +201,26 @@ public class DetectAssociateTracker<I extends ImageSingleBand, D extends TupleDe
 	 */
 	@Override
 	public void spawnTracks() {
-		// create new tracks from latest detected features
+		// setup data structures
+		if( isAssociated.length < featDst.size ) {
+			isAssociated = new boolean[ featDst.size ];
+		}
+
+		// see which features are associated in the dst list
 		for( int i = 0; i < featDst.size; i++ ) {
+			isAssociated[i] = false;
+		}
 
-			if( matches != null ) {
-				// only spawn tracks at points which have not been associated
-				boolean found = false;
-
-				// *** NOTE *** could speed up using by creating a lookup table first
-				for( int j = 0; j < matches.size; j++ ) {
-					AssociatedIndex indexes = matches.data[j];
-					if( indexes.dst == i ) {
-						found = true;
-						break;
-					}
-				}
-
-				if( found )
-					continue;
+		if( matches != null ) {
+			for( int i = 0; i < matches.size; i++ ) {
+				isAssociated[matches.data[i].dst] = true;
 			}
+		}
+
+		// create new tracks from latest unassociated detected features
+		for( int i = 0; i < featDst.size; i++ ) {
+			if( isAssociated[i] )
+				continue;
 
 			PointTrack p = getUnused();
 			Point2D_F64 loc = locDst.get(i);

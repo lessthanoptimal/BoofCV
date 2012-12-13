@@ -18,7 +18,7 @@
 
 package boofcv.alg.feature.associate;
 
-import boofcv.abst.feature.associate.GeneralAssociation;
+import boofcv.abst.feature.associate.AssociateDescription;
 import boofcv.abst.feature.associate.ScoreAssociateEuclidean_F64;
 import boofcv.abst.feature.associate.ScoreAssociation;
 import boofcv.factory.feature.associate.FactoryAssociation;
@@ -28,8 +28,7 @@ import boofcv.struct.feature.SurfFeature;
 import boofcv.struct.feature.TupleDesc_F64;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 
 /**
@@ -95,7 +94,7 @@ public class TestAssociateSurfBasic {
 	private AssociateSurfBasic createAlg() {
 
 		ScoreAssociation<TupleDesc_F64> score = new ScoreAssociateEuclidean_F64();
-		GeneralAssociation<TupleDesc_F64> assoc = FactoryAssociation.greedy(score, 20, -1, true);
+		AssociateDescription<TupleDesc_F64> assoc = FactoryAssociation.greedy(score, 20, -1, true);
 
 		return new AssociateSurfBasic(assoc);
 	}
@@ -107,5 +106,10 @@ public class TestAssociateSurfBasic {
 		ret.value[0] = value;
 
 		return ret;
+	}
+
+	@Test
+	public void checkUnassociated() {
+		fail("Implement");
 	}
 }

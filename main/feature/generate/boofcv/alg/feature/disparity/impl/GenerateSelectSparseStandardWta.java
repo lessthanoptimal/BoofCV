@@ -29,6 +29,7 @@ public class GenerateSelectSparseStandardWta extends CodeGeneratorBase {
 
 	String dataAbr;
 	String sumType;
+	String MAX_VALUE;
 	boolean isFloat;
 
 	@Override
@@ -41,9 +42,11 @@ public class GenerateSelectSparseStandardWta extends CodeGeneratorBase {
 		this.isFloat = isFloat;
 		if( isFloat ) {
 			sumType = "float";
+			MAX_VALUE = "Float.MAX_VALUE";
 			dataAbr = "F32";
 		} else {
 			sumType = "int";
+			MAX_VALUE = "Integer.MAX_VALUE";
 			dataAbr = "S32";
 		}
 
@@ -117,12 +120,12 @@ public class GenerateSelectSparseStandardWta extends CodeGeneratorBase {
 				"\t\t\treturn false;\n" +
 				"\t\t} else if( textureThreshold > 0 ) {\n" +
 				"\t\t\t// find the second best disparity value and exclude its neighbors\n" +
-				"\t\t\t"+sumType+" secondBest = scores[0];\n" +
-				"\t\t\tfor( int i = 1; i < disparity-1; i++ ) {\n" +
+				"\t\t\t"+sumType+" secondBest = "+MAX_VALUE+";\n" +
+				"\t\t\tfor( int i = 0; i < disparity-1; i++ ) {\n" +
 				"\t\t\t\tif( scores[i] < secondBest )\n" +
 				"\t\t\t\t\tsecondBest = scores[i];\n" +
 				"\t\t\t}\n" +
-				"\t\t\tfor( int i =  disparity+2; i < maxDisparity; i++ ) {\n" +
+				"\t\t\tfor( int i = disparity+2; i < maxDisparity; i++ ) {\n" +
 				"\t\t\t\tif( scores[i] < secondBest )\n" +
 				"\t\t\t\t\tsecondBest = scores[i];\n" +
 				"\t\t\t}\n" +

@@ -257,7 +257,7 @@ public class VisualizeStereoVisualOdometryApp <I extends ImageSingleBand>
 		if( whichAlg == 0 ) {
 			thresholdAdd = 120;
 			thresholdRetire = 2;
-			tracker = FactoryPointSequentialTracker.klt(600,new int[]{1,2,4,8},3,3,2,imageType,derivType);
+			tracker = FactoryPointSequentialTracker.klt(600,1,new int[]{1,2,4,8},3,3,3,2,imageType,derivType);
 		} else if( whichAlg == 1 ) {
 			thresholdAdd = 80;
 			thresholdRetire = 3;
@@ -273,10 +273,10 @@ public class VisualizeStereoVisualOdometryApp <I extends ImageSingleBand>
 		}
 
 		StereoDisparitySparse<I> disparity =
-				FactoryStereoDisparity.regionSparseWta(0,150,3,3,30,-1,true,imageType);
+				FactoryStereoDisparity.regionSparseWta(2,150,3,3,30,-1,true,imageType);
 
 		return FactoryVisualOdometry.stereoDepth(thresholdAdd, thresholdRetire,
-				1.5, tracker, disparity, 0, imageType);
+				1.5, tracker, disparity, 400,0, imageType);
 	}
 
 	@Override

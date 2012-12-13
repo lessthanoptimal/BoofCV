@@ -106,19 +106,24 @@ public class PointTrackerKltPyramid<I extends ImageSingleBand,D extends ImageSin
 		// pre-declare image features
 		int numLayers = config.pyramidScaling.length;
 		for (int i = 0; i < config.maxFeatures; i++) {
-			PyramidKltFeature t = new PyramidKltFeature(numLayers, config.featureRadius);
-
-			PointTrack p = new PointTrack();
-			p.setDescription(t);
-			t.cookie = p;
-
-			unused.add(t);
+			addTrackToUnused();
 		}
 
 		// declare the image pyramid
 		basePyramid = new PyramidDiscrete<I>(config.typeInput,true,config.pyramidScaling);
 		derivX = new PyramidDiscrete<D>(config.typeDeriv,false,config.pyramidScaling);
 		derivY = new PyramidDiscrete<D>(config.typeDeriv,false,config.pyramidScaling);
+	}
+
+	private void addTrackToUnused() {
+		int numLayers = config.pyramidScaling.length;
+		PyramidKltFeature t = new PyramidKltFeature(numLayers, config.featureRadius);
+
+		PointTrack p = new PointTrack();
+		p.setDescription(t);
+		t.cookie = p;
+
+		unused.add(t);
 	}
 
 	@Override
@@ -142,6 +147,10 @@ public class PointTrackerKltPyramid<I extends ImageSingleBand,D extends ImageSin
 
 		// extract the features
 		QueueCorner found = detector.getFeatures();
+
+		// grow the number of tracks if needed
+		while( unused.size() < found.size() )
+			addTrackToUnused();
 
 		for (int i = 0; i < found.size() && !unused.isEmpty(); i++) {
 			Point2D_I16 pt = found.get(i);

@@ -18,7 +18,7 @@
 
 package boofcv.examples;
 
-import boofcv.abst.feature.associate.GeneralAssociation;
+import boofcv.abst.feature.associate.AssociateDescription;
 import boofcv.abst.feature.associate.ScoreAssociation;
 import boofcv.abst.feature.describe.DescribeRegionPoint;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
@@ -74,7 +74,7 @@ public class ExampleDetectDescribe {
 		// create a corner detector
 		Class derivType = GImageDerivativeOps.getDerivativeType(imageType);
 		GeneralFeatureDetector corner = FactoryDetectPoint.createShiTomasi(2, false, 1, 300, derivType);
-		InterestPointDetector detector = FactoryInterestPoint.wrapPoint(corner, imageType, derivType);
+		InterestPointDetector detector = FactoryInterestPoint.wrapPoint(corner, 1, imageType, derivType);
 
 		// describe points using BRIEF
 		DescribeRegionPoint describe = FactoryDescribeRegionPoint.brief(16, 512, -1, 4, true, imageType);
@@ -93,7 +93,7 @@ public class ExampleDetectDescribe {
 
 		// Might as well have this example do something useful, like associate two images
 		ScoreAssociation scorer = FactoryAssociation.defaultScore(detDesc.getDescriptorType());
-		GeneralAssociation associate = FactoryAssociation.greedy(scorer, Double.MAX_VALUE, -1, true);
+		AssociateDescription associate = FactoryAssociation.greedy(scorer, Double.MAX_VALUE, -1, true);
 
 		// load and match images
 		ExampleAssociatePoints app = new ExampleAssociatePoints(detDesc,associate,imageType);
