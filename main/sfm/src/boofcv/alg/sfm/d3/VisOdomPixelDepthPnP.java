@@ -1,17 +1,17 @@
 package boofcv.alg.sfm.d3;
 
-import boofcv.abst.feature.tracker.ImagePointTracker;
+import boofcv.abst.feature.tracker.ModelAssistedTracker;
 import boofcv.abst.feature.tracker.PointTrack;
-import boofcv.abst.geo.RefinePnP;
+import boofcv.abst.feature.tracker.TrackGeometryManager;
 import boofcv.abst.sfm.ImagePixelTo3D;
 import boofcv.struct.distort.PointTransform_F64;
 import boofcv.struct.geo.Point2D3D;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.sfm.Point2D3DTrack;
+import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
-import org.ddogleg.fitting.modelset.ModelMatcher;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,7 +33,9 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class VisOdomPixelDepthPnP<T extends ImageBase> {
+public class VisOdomPixelDepthPnP<T extends ImageBase>
+		implements TrackGeometryManager<Se3_F64,Point2D3D>
+{
 
 	// when the inlier set is less than this number new features are detected
 	private int thresholdAdd;
@@ -41,18 +43,14 @@ public class VisOdomPixelDepthPnP<T extends ImageBase> {
 	// discard tracks after they have not been in the inlier set for this many updates in a row
 	private int thresholdRetire;
 
-	// tracks features in the image
-	private ImagePointTracker<T> tracker;
+	// tracks features and estimates camera motion
+	private ModelAssistedTracker<T, Se3_F64,Point2D3D> tracker;
 	// used to estimate a feature's 3D position from image range data
 	private ImagePixelTo3D pixelTo3D;
 	// converts from pixel to normalized image coordinates
 	private PointTransform_F64 pixelToNorm;
-
-	// non-linear refinement of pose estimate
-	private RefinePnP refine;
-
-	// estimate the camera motion up to a scale factor from two sets of point correspondences
-	private ModelMatcher<Se3_F64, Point2D3D> motionEstimator;
+	// convert from normalized image coordinates to pixel
+	private PointTransform_F64 normToPixel;
 
 	// location of tracks in the image that are included in the inlier set
 	private List<Point2D3DTrack> inlierTracks = new ArrayList<Point2D3DTrack>();
@@ -75,27 +73,26 @@ public class VisOdomPixelDepthPnP<T extends ImageBase> {
 	 * @param thresholdAdd Add new tracks when less than this number are in the inlier set.  Tracker dependent. Set to
 	 *                     a value <= 0 to add features every frame.
 	 * @param thresholdRetire Discard a track if it is not in the inlier set after this many updates.  Try 2
-	 * @param motionEstimator PnP motion estimator.  P3P algorithm is recommended/
+	 * @param tracker Tracks point features and estimates the camera's ego motion.
 	 * @param pixelTo3D Computes the 3D location of pixels.
-	 * @param refine Optional algorithm for refining the pose estimate.  Can be null.
-	 * @param tracker Point feature tracker.
 	 * @param pixelToNorm Converts from raw image pixels into normalized image coordinates.
+	 * @param normToPixel Converts from normalized image coordinates into raw pixels
 	 */
 	public VisOdomPixelDepthPnP(int thresholdAdd,
 								int thresholdRetire ,
-								ModelMatcher<Se3_F64, Point2D3D> motionEstimator,
+								ModelAssistedTracker<T, Se3_F64,Point2D3D> tracker,
 								ImagePixelTo3D pixelTo3D,
-								RefinePnP refine ,
-								ImagePointTracker<T> tracker ,
-								PointTransform_F64 pixelToNorm )
+								PointTransform_F64 pixelToNorm ,
+								PointTransform_F64 normToPixel )
 	{
 		this.thresholdAdd = thresholdAdd;
 		this.thresholdRetire = thresholdRetire;
-		this.motionEstimator = motionEstimator;
 		this.pixelTo3D = pixelTo3D;
-		this.refine = refine;
 		this.tracker = tracker;
 		this.pixelToNorm = pixelToNorm;
+		this.normToPixel = normToPixel;
+
+		tracker.setTrackGeometry(this);
 	}
 
 	/**
@@ -130,7 +127,7 @@ public class VisOdomPixelDepthPnP<T extends ImageBase> {
 			}
 
 			dropUnusedTracks();
-			int N = motionEstimator.getMatchSet().size();
+			int N = tracker.getMatchSet().size();
 
 			if( thresholdAdd <= 0 || N < thresholdAdd ) {
 				changePoseToReference();
@@ -187,36 +184,8 @@ public class VisOdomPixelDepthPnP<T extends ImageBase> {
 	 * Detects new features and computes their 3D coordinates
 	 */
 	private void addNewTracks() {
-//		System.out.println("----------- Adding new tracks ---------------");
-
 		pixelTo3D.initialize();
 		tracker.spawnTracks();
-		List<PointTrack> spawned = tracker.getNewTracks(null);
-
-		// estimate 3D coordinate using stereo vision
-		for( PointTrack t : spawned ) {
-			Point2D3DTrack p = t.getCookie();
-			if( p == null) {
-				t.cookie = p = new Point2D3DTrack();
-			}
-
-			// discard point if it can't localized
-			if( !pixelTo3D.process(t.x,t.y) || pixelTo3D.getW() == 0 ) {
-				tracker.dropTrack(t);
-			} else {
-				Point3D_F64 X = p.getLocation();
-
-				double w = pixelTo3D.getW();
-				X.set(pixelTo3D.getX() / w, pixelTo3D.getY() / w, pixelTo3D.getZ() / w);
-
-				// translate the point into the key frame
-				// SePointOps_F64.transform(currToKey,X,X);
-				// not needed since the current frame was just set to be the key frame
-
-				p.lastInlier = tick;
-				pixelToNorm.compute(t.x, t.y, p.observation);
-			}
-		}
 	}
 
 	/**
@@ -225,35 +194,17 @@ public class VisOdomPixelDepthPnP<T extends ImageBase> {
 	 * @return true if successful.
 	 */
 	private boolean estimateMotion() {
-
-		List<PointTrack> active = tracker.getActiveTracks(null);
-		List<Point2D3D> obs = new ArrayList<Point2D3D>();
-
-		for( PointTrack t : active ) {
-			Point2D3D p = t.getCookie();
-			pixelToNorm.compute( t.x , t.y , p.observation );
-			obs.add( p );
-		}
-
-		// estimate the motion up to a scale factor in translation
-		if( !motionEstimator.process( obs ) )
+		if( !tracker.foundModel() )
 			return false;
 
-		Se3_F64 keyToCurr;
-
-		if( refine != null ) {
-			keyToCurr = new Se3_F64();
-			refine.process(motionEstimator.getModel(),motionEstimator.getMatchSet(),keyToCurr);
-		} else {
-			keyToCurr = motionEstimator.getModel();
-		}
-
+		Se3_F64 keyToCurr = tracker.getModel();
 		keyToCurr.invert(currToKey);
 
 		// mark tracks as being inliers and add to inlier list
-		int N = motionEstimator.getMatchSet().size();
+		List<PointTrack> active = tracker.getActiveTracks(null);
+		int N = tracker.getMatchSet().size();
 		for( int i = 0; i < N; i++ ) {
-			int index = motionEstimator.getInputIndex(i);
+			int index = tracker.convertMatchToActiveIndex(i);
 			Point2D3DTrack t = active.get(index).getCookie();
 			t.lastInlier = tick;
 			inlierTracks.add( t );
@@ -274,12 +225,8 @@ public class VisOdomPixelDepthPnP<T extends ImageBase> {
 		return currToWorld;
 	}
 
-	public ImagePointTracker<T> getTracker() {
+	public ModelAssistedTracker<T, Se3_F64,Point2D3D> getTracker() {
 		return tracker;
-	}
-
-	public ModelMatcher<Se3_F64, Point2D3D> getMotionEstimator() {
-		return motionEstimator;
 	}
 
 	public List<Point2D3DTrack> getInlierTracks() {
@@ -288,5 +235,58 @@ public class VisOdomPixelDepthPnP<T extends ImageBase> {
 
 	public void setPixelToNorm(PointTransform_F64 pixelToNorm) {
 		this.pixelToNorm = pixelToNorm;
+	}
+
+	public void setNormToPixel(PointTransform_F64 normToPixel) {
+		this.normToPixel = normToPixel;
+	}
+
+	@Override
+	public boolean handleSpawnedTrack(PointTrack track) {
+		Point2D3DTrack p = track.getCookie();
+		if( p == null) {
+			track.cookie = p = new Point2D3DTrack();
+		}
+
+		// discard point if it can't localized
+		if( !pixelTo3D.process(track.x,track.y) || pixelTo3D.getW() == 0 ) {
+			return false;
+		} else {
+			Point3D_F64 X = p.getLocation();
+
+			double w = pixelTo3D.getW();
+			X.set(pixelTo3D.getX() / w, pixelTo3D.getY() / w, pixelTo3D.getZ() / w);
+
+			// translate the point into the key frame
+			// SePointOps_F64.transform(currToKey,X,X);
+			// not needed since the current frame was just set to be the key frame
+
+			p.lastInlier = tick;
+			pixelToNorm.compute(track.x, track.y, p.observation);
+			return true;
+		}
+	}
+
+	@Override
+	public Point2D3D extractGeometry(PointTrack track) {
+		Point2D3D p = track.getCookie();
+
+		pixelToNorm.compute( track.x , track.y , p.observation );
+
+		return p;
+	}
+
+	@Override
+	public Point2D_F64 predict(Se3_F64 worldToCurr, PointTrack track) {
+		Point2D3D info = track.getCookie();
+
+		Point3D_F64 curr = new Point3D_F64();
+		SePointOps_F64.transform(worldToCurr,info.location,curr);
+
+		Point2D_F64 result = new Point2D_F64();
+
+		normToPixel.compute( curr.x/curr.z , curr.y/curr.z ,result );
+
+		return result; // TODO optimize
 	}
 }

@@ -474,7 +474,7 @@ public class FactoryPointSequentialTracker {
 	 * Variable detectRadius to control the number of features.  When larger features are used weighting should
 	 * be set to true, but because this is so small, it is set to false
 	 */
-	private static <I extends ImageSingleBand, D extends ImageSingleBand>
+	public static <I extends ImageSingleBand, D extends ImageSingleBand>
 	GeneralFeatureDetector<I, D> createShiTomasi(int maxMatches, int extractRadius, float detectThreshold,
 												 Class<D> derivType)
 	{

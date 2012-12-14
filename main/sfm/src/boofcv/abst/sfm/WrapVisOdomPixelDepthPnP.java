@@ -78,7 +78,10 @@ public class WrapVisOdomPixelDepthPnP<T extends ImageSingleBand>
 		stereo.setCalibration(parameters);
 
 		PointTransform_F64 leftPixelToNorm = LensDistortionOps.transformRadialToNorm_F64(parameters.left);
+		PointTransform_F64 leftNormToPixel = LensDistortionOps.transformNormToRadial_F64(parameters.left);
+
 		alg.setPixelToNorm(leftPixelToNorm);
+		alg.setNormToPixel(leftNormToPixel);
 
 		fitError.setIntrinsic(parameters.left.fx, parameters.left.fy, parameters.left.skew);
 	}

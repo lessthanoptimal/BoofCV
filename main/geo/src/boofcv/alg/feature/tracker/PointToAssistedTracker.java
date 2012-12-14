@@ -64,7 +64,7 @@ public class PointToAssistedTracker<T extends ImageBase,Model,Info>
 	// storage for spawned tracks
 	protected List<PointTrack> spawnedTracks = new ArrayList<PointTrack>();
 
-	protected TrackGeometryManager<Info> manager;
+	protected TrackGeometryManager<Model,Info> manager;
 
 	/**
 	 *
@@ -85,7 +85,7 @@ public class PointToAssistedTracker<T extends ImageBase,Model,Info>
 	}
 
 	@Override
-	public void setTrackGeometry(TrackGeometryManager<Info> manager) {
+	public void setTrackGeometry(TrackGeometryManager<Model,Info> manager) {
 		this.manager = manager;
 	}
 
@@ -108,7 +108,7 @@ public class PointToAssistedTracker<T extends ImageBase,Model,Info>
 	}
 
 	@Override
-	public int convertMatchToTrackIndex(int matchIndex) {
+	public int convertMatchToActiveIndex(int matchIndex) {
 		return modelMatcher.getInputIndex(matchIndex);
 	}
 
@@ -157,7 +157,8 @@ public class PointToAssistedTracker<T extends ImageBase,Model,Info>
 
 		tracker.getNewTracks(spawnedTracks);
 		for( PointTrack t : spawnedTracks ) {
-			manager.handleSpawnedTrack(t);
+			if( !manager.handleSpawnedTrack(t) )
+				tracker.dropTrack(t);
 		}
 		spawnedTracks.clear();
 	}

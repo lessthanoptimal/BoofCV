@@ -24,6 +24,9 @@ import boofcv.abst.feature.tracker.TrackGeometryManager;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.InvertibleTransform;
+import georegression.struct.affine.Affine2D_F64;
+import georegression.struct.point.Point2D_F64;
+import georegression.transform.affine.AffinePointOps;
 
 import java.util.List;
 
@@ -33,26 +36,26 @@ import java.util.List;
  *
  * @author Peter Abeles
  * @param <I> Input image type
- * @param <T> Motion model data type
+ * @param <IT> Motion model data type
  */
 @SuppressWarnings("unchecked")
-public class ImageMotionPointKey<I extends ImageSingleBand, T extends InvertibleTransform>
-		implements TrackGeometryManager<AssociatedPair>
+public class ImageMotionPointKey<I extends ImageSingleBand, IT extends InvertibleTransform>
+		implements TrackGeometryManager<IT,AssociatedPair>
 {
 	// total number of frames processed
 	protected int totalFramesProcessed = 0;
 	// Tracker and motion estimator
-	protected ModelAssistedTracker<I,T,AssociatedPair> tracker;
+	protected ModelAssistedTracker<I, IT,AssociatedPair> tracker;
 
 	// assumed initial transform from the first image to the world
-	protected T worldToInit;
+	protected IT worldToInit;
 
 	// transform from the world frame to the key frame
-	protected T worldToKey;
+	protected IT worldToKey;
 	// transform from key frame to current frame
-	protected T keyToCurr;
+	protected IT keyToCurr;
 	// transform from world to current frame
-	protected T worldToCurr;
+	protected IT worldToCurr;
 
 	// tracks which are not in the inlier set for this many frames in a row are pruned
 	protected int pruneThreshold;
@@ -73,19 +76,18 @@ public class ImageMotionPointKey<I extends ImageSingleBand, T extends Invertible
 	 * @param model Motion model data structure
 	 * @param pruneThreshold Tracks not in the inlier set for this many frames in a row are pruned
 	 */
-	public ImageMotionPointKey(ModelAssistedTracker<I,T,AssociatedPair> tracker,
-							   T model ,
-							   int pruneThreshold )
+	public ImageMotionPointKey(ModelAssistedTracker<I, IT,AssociatedPair> tracker,
+							   IT model , int pruneThreshold )
 	{
 		this.tracker = tracker;
 		this.pruneThreshold = pruneThreshold;
 
 		tracker.setTrackGeometry(this);
 
-		worldToInit = (T)model.createInstance();
-		worldToKey = (T)model.createInstance();
-		keyToCurr = (T)model.createInstance();
-		worldToCurr = (T)model.createInstance();
+		worldToInit = (IT)model.createInstance();
+		worldToKey = (IT)model.createInstance();
+		keyToCurr = (IT)model.createInstance();
+		worldToCurr = (IT)model.createInstance();
 	}
 
 	/**
@@ -94,7 +96,7 @@ public class ImageMotionPointKey<I extends ImageSingleBand, T extends Invertible
 	 *
 	 * @param worldToInit The transform.
 	 */
-	public void setInitialTransform( T worldToInit) {
+	public void setInitialTransform( IT worldToInit) {
 		this.worldToInit.set(worldToInit);
 		this.keyToCurr.set(worldToInit);
 		this.worldToCurr.set(worldToInit);
@@ -116,9 +118,9 @@ public class ImageMotionPointKey<I extends ImageSingleBand, T extends Invertible
 	 *
 	 * @param oldWorldToNewWorld Transform from the old world frame to the new world frame
 	 */
-	public void changeWorld(T oldWorldToNewWorld) {
+	public void changeWorld(IT oldWorldToNewWorld) {
 
-		T worldToKey = (T) this.worldToKey.invert(null);
+		IT worldToKey = (IT) this.worldToKey.invert(null);
 		worldToInit.concat(worldToKey, oldWorldToNewWorld);
 
 		this.worldToKey.set(worldToInit);
@@ -167,7 +169,7 @@ public class ImageMotionPointKey<I extends ImageSingleBand, T extends Invertible
 	}
 
 	@Override
-	public void handleSpawnedTrack(PointTrack track) {
+	public boolean handleSpawnedTrack(PointTrack track) {
 		AssociatedPairTrack p = track.getCookie();
 		if( p == null ) {
 			track.cookie = p = new AssociatedPairTrack();
@@ -177,11 +179,25 @@ public class ImageMotionPointKey<I extends ImageSingleBand, T extends Invertible
 		}
 		p.p1.set(track);
 		p.lastUsed = totalFramesProcessed;
+
+		return true;
 	}
 
 	@Override
 	public AssociatedPair extractGeometry(PointTrack track) {
 		return (AssociatedPair)track.cookie;
+	}
+
+	@Override
+	public Point2D_F64 predict(IT it, PointTrack track) {
+		// TODO total hack.  need to handle model in a generic way
+		Point2D_F64 ret = new Point2D_F64();
+
+		AssociatedPair p = track.getCookie();
+
+		AffinePointOps.transform((Affine2D_F64)it, p.p1, ret);
+
+		return ret;
 	}
 
 	/**
@@ -192,25 +208,27 @@ public class ImageMotionPointKey<I extends ImageSingleBand, T extends Invertible
 		tracker.spawnTracks();
 
 		spawned = tracker.getNewTracks(null);
+		for( PointTrack t : spawned )
+			handleSpawnedTrack(t);
 
 		totalSpawned = spawned.size();
 		worldToKey.set(worldToCurr);
 		keyFrame = true;
 	}
 
-	public T getWorldToCurr() {
+	public IT getWorldToCurr() {
 		return worldToCurr;
 	}
 
-	public T getWorldToKey() {
+	public IT getWorldToKey() {
 		return worldToKey;
 	}
 
-	public T getKeyToCurr() {
+	public IT getKeyToCurr() {
 		return keyToCurr;
 	}
 
-	public ModelAssistedTracker<I,T,AssociatedPair> getTracker() {
+	public ModelAssistedTracker<I, IT,AssociatedPair> getTracker() {
 		return tracker;
 	}
 

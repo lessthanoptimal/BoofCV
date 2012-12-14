@@ -48,11 +48,11 @@ public class DetectAssociateTracker<I extends ImageSingleBand, D extends TupleDe
 	protected AssociateDescription2D<D> associate;
 
 	// location of interest points
-	private FastQueue<Point2D_F64> locDst = new FastQueue<Point2D_F64>(10,Point2D_F64.class,false);
-	private FastQueue<Point2D_F64> locSrc = new FastQueue<Point2D_F64>(10,Point2D_F64.class,false);
+	protected FastQueue<Point2D_F64> locDst = new FastQueue<Point2D_F64>(10,Point2D_F64.class,false);
+	protected FastQueue<Point2D_F64> locSrc = new FastQueue<Point2D_F64>(10,Point2D_F64.class,false);
 	// description of interest points
-	private FastQueue<D> featSrc;
-	private FastQueue<D> featDst;
+	protected FastQueue<D> featSrc;
+	protected FastQueue<D> featDst;
 
 	// all tracks
 	protected List<PointTrack> tracksAll = new ArrayList<PointTrack>();
@@ -69,16 +69,16 @@ public class DetectAssociateTracker<I extends ImageSingleBand, D extends TupleDe
 	protected List<PointTrack> unused = new ArrayList<PointTrack>();
 
 	// Data returned by associate
-	private FastQueue<AssociatedIndex> matches;
+	protected FastQueue<AssociatedIndex> matches;
 
 	// number of features created.  Used to assign unique IDs
-	long featureID = 0;
+	protected long featureID = 0;
 
 	// should it update the feature description after each association?
 	boolean updateDescription;
 
 	// indicates if a feature was associated or not
-	boolean isAssociated[] = new boolean[1];
+	protected boolean isAssociated[] = new boolean[1];
 
 	/**
 	 * Configures tracker
@@ -137,8 +137,8 @@ public class DetectAssociateTracker<I extends ImageSingleBand, D extends TupleDe
 
 		int N = detDesc.getNumberOfFeatures();
 		for( int i = 0; i < N; i++ ) {
-			locDst.add(detDesc.getLocation(i));
-			featDst.add( detDesc.getDescriptor(i));
+			locDst.add( detDesc.getLocation(i) );
+			featDst.add( detDesc.getDescriptor(i) );
 		}
 
 		// skip if there are no features to match with the current image
@@ -147,32 +147,7 @@ public class DetectAssociateTracker<I extends ImageSingleBand, D extends TupleDe
 			if( featSrc.size != 0 )
 				throw new RuntimeException("BUG");
 
-			for( int i = 0; i < tracksAll.size(); i++ ) {
-				PointTrack t = tracksAll.get(i);
-				D desc = t.getDescription();
-				featSrc.add(desc);
-				locSrc.add(t);
-				isAssociated[i] = false;
-			}
-
-			// pair of old and newly detected features
-			matches = associateFeatures();
-
-			// update tracks
-			for( int i = 0; i < matches.size; i++ ) {
-				AssociatedIndex indexes = matches.data[i];
-				PointTrack track = tracksAll.get(indexes.src);
-				Point2D_F64 loc = locDst.data[indexes.dst];
-				track.set(loc.x, loc.y);
-				tracksActive.add(track);
-
-				// update the description
-				if(updateDescription) {
-					((D)track.getDescription()).setTo(featDst.get(indexes.dst));
-				}
-
-				isAssociated[indexes.src] = true;
-			}
+			performTracking();
 
 			// add unassociated to the list
 			for( int i = 0; i < tracksAll.size(); i++ ) {
@@ -186,15 +161,51 @@ public class DetectAssociateTracker<I extends ImageSingleBand, D extends TupleDe
 		}
 	}
 
+	protected void performTracking() {
+		// Match features
+		associateFeatures();
+		matches = associate.getMatches(); // todo needed?
+
+		// Update the track state using association information
+		updateTrackState(matches);
+	}
+
 	/**
-	 * Associates features between the two images
+	 * Associate features and update the track information
 	 */
-	protected FastQueue<AssociatedIndex> associateFeatures() {
+	protected void associateFeatures() {
+		// put each track's location and description into the source list
+		for( int i = 0; i < tracksAll.size(); i++ ) {
+			PointTrack t = tracksAll.get(i);
+			D desc = t.getDescription();
+			featSrc.add(desc);
+			locSrc.add(t);
+			isAssociated[i] = false;
+		}
+
 		associate.setSource(locSrc, featSrc);
 		associate.setDestination(locDst, featDst);
 		associate.associate();
-		return associate.getMatches();
 	}
+
+	protected void updateTrackState( FastQueue<AssociatedIndex> matches ) {
+		// update tracks
+		for( int i = 0; i < matches.size; i++ ) {
+			AssociatedIndex indexes = matches.data[i];
+			PointTrack track = tracksAll.get(indexes.src);
+			Point2D_F64 loc = locDst.data[indexes.dst];
+			track.set(loc.x, loc.y);
+			tracksActive.add(track);
+
+			// update the description
+			if(updateDescription) {
+				((D)track.getDescription()).setTo(featDst.get(indexes.dst));
+			}
+
+			isAssociated[indexes.src] = true;
+		}
+	}
+
 
 	/**
 	 * Takes the current crop of detected features and makes them the keyframe

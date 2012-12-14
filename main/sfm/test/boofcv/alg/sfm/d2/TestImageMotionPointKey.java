@@ -236,7 +236,7 @@ public class TestImageMotionPointKey {
 		}
 
 		@Override
-		public void setTrackGeometry(TrackGeometryManager<AssociatedPair> manager) {
+		public void setTrackGeometry(TrackGeometryManager<T,AssociatedPair> manager) {
 
 		}
 
@@ -260,7 +260,7 @@ public class TestImageMotionPointKey {
 		}
 
 		@Override
-		public int convertMatchToTrackIndex(int matchIndex) {
+		public int convertMatchToActiveIndex(int matchIndex) {
 			return matchIndex;
 		}
 

@@ -16,25 +16,19 @@
  * limitations under the License.
  */
 
-package boofcv.abst.feature.tracker;
+package boofcv.alg.feature.associate;
 
-import georegression.struct.point.Point2D_F64;
+import org.junit.Test;
+
+import static org.junit.Assert.fail;
 
 /**
- * TODO Fill out comments
- *
  * @author Peter Abeles
  */
-public interface TrackGeometryManager<Model,Info> {
+public class TestBaseAssociateLocation2DFilter {
 
-	/**
-	 *
-	 * @param track
-	 * @return true to keep track and false to drop track
-	 */
-	public boolean handleSpawnedTrack(PointTrack track);
-
-	public Info extractGeometry( PointTrack track );
-
-	public Point2D_F64 predict( Model model , PointTrack track );
+	@Test
+	public void stuff() {
+		fail("implement");
+	}
 }

@@ -6,6 +6,8 @@ Date Format: year/month/day
 Date    : 
 Version : Alpha 0.13
 
+- Removed TupleDescQueue 
+  * Use UtilFeature.createFeature() instead or extend FastQueue
 - Fixed bug in ImplSelectSparseStandardWta_* where peak checks for 0 disparity were incorrectly handled
 - FactoryPointSequentialTracker tweaked tracker configurations for better SFM performance
 - PointTrackerKltPyramid can now create new data to store tracks after init
