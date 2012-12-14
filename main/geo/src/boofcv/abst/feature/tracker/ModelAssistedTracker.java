@@ -38,7 +38,7 @@ public interface ModelAssistedTracker<T extends ImageBase,Model,Info> extends Im
 	 *
 	 * @param manager
 	 */
-	public void setTrackGeometry( TrackGeometryManager<Info> manager );
+	public void setTrackGeometry( TrackGeometryManager<Model,Info> manager );
 
 	/**
 	 * If true then a valid model was found and tracking was successful.
@@ -69,5 +69,5 @@ public interface ModelAssistedTracker<T extends ImageBase,Model,Info> extends Im
 	 * @param matchIndex Match set index.
 	 * @return Index of the same element in the active track list.
 	 */
-	public int convertMatchToTrackIndex( int matchIndex );
+	public int convertMatchToActiveIndex(int matchIndex);
 }

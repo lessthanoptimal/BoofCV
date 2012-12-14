@@ -25,7 +25,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public interface GeoModelRefine<Model,Sample>  {
+public interface GeoModelRefine<Model,Sample> {
 
 	/**
 	 * Processes and refines the position estimate to reduce the error between the model and the observations.

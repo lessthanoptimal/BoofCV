@@ -16,25 +16,18 @@
  * limitations under the License.
  */
 
-package boofcv.abst.feature.tracker;
+package boofcv.alg.feature.associate;
 
-import georegression.struct.point.Point2D_F64;
+import boofcv.abst.feature.associate.AssociateDescription2D;
 
 /**
- * TODO Fill out comments
+ * Two features can only be associated if their distance in image space is less than the specified number.
  *
  * @author Peter Abeles
  */
-public interface TrackGeometryManager<Model,Info> {
+public interface AssociateMaxDistance<D> extends AssociateDescription2D<D> {
 
-	/**
-	 *
-	 * @param track
-	 * @return true to keep track and false to drop track
-	 */
-	public boolean handleSpawnedTrack(PointTrack track);
+	public double getMaxDistance();
 
-	public Info extractGeometry( PointTrack track );
-
-	public Point2D_F64 predict( Model model , PointTrack track );
+	public void setMaxDistance(double maxDistance);
 }

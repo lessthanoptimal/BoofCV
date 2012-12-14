@@ -18,14 +18,24 @@
 
 package boofcv.alg.sfm.d3;
 
+import boofcv.abst.feature.describe.WrapDescribeBrief;
+import boofcv.abst.feature.detdesc.DetectDescribePoint;
+import boofcv.abst.feature.detect.interest.GeneralFeatureDetector;
+import boofcv.abst.feature.detect.interest.InterestPointDetector;
 import boofcv.abst.feature.disparity.StereoDisparitySparse;
 import boofcv.abst.feature.tracker.ImagePointTracker;
 import boofcv.abst.sfm.AccessPointTracks3D;
 import boofcv.abst.sfm.StereoVisualOdometry;
+import boofcv.alg.feature.describe.DescribePointBrief;
+import boofcv.alg.feature.describe.brief.FactoryBriefDefinition;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.alg.geo.PerspectiveOps;
+import boofcv.factory.feature.describe.FactoryDescribePointAlgs;
+import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
+import boofcv.factory.feature.detect.interest.FactoryInterestPoint;
 import boofcv.factory.feature.disparity.FactoryStereoDisparity;
 import boofcv.factory.feature.tracker.FactoryPointSequentialTracker;
+import boofcv.factory.filter.blur.FactoryBlurFilter;
 import boofcv.factory.sfm.FactoryVisualOdometry;
 import boofcv.gui.StereoVideoAppBase;
 import boofcv.gui.VisualizeApp;
@@ -51,6 +61,7 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 
 /**
  * @author Peter Abeles
@@ -229,6 +240,8 @@ public class VisualizeStereoVisualOdometryApp <I extends ImageSingleBand>
 	public void refreshAll(Object[] cookies) {
 
 		numFaults = 0;
+		if( cookies != null )
+			whichAlg = (Integer)cookies[0];
 		alg = createStereoDepth(whichAlg);
 		alg.setCalibration(config);
 
@@ -247,12 +260,14 @@ public class VisualizeStereoVisualOdometryApp <I extends ImageSingleBand>
 	}
 
 	private StereoVisualOdometry<I> createStereoDepth( int whichAlg ) {
-		ImagePointTracker<I> tracker;
+		ImagePointTracker<I> tracker = null;
+		DetectDescribePoint detDesc = null;
 
 		Class derivType = GImageDerivativeOps.getDerivativeType(imageType);
 
 		int thresholdAdd;
 		int thresholdRetire;
+		double associationMaxError = -1;
 
 		if( whichAlg == 0 ) {
 			thresholdAdd = 120;
@@ -261,8 +276,19 @@ public class VisualizeStereoVisualOdometryApp <I extends ImageSingleBand>
 		} else if( whichAlg == 1 ) {
 			thresholdAdd = 80;
 			thresholdRetire = 3;
+			associationMaxError = 150;
+
+			DescribePointBrief<I> brief = FactoryDescribePointAlgs.brief(FactoryBriefDefinition.gaussian2(new Random(123), 16, 512),
+					FactoryBlurFilter.gaussian(imageType, 0, 4));
+
+			GeneralFeatureDetector corner = FactoryPointSequentialTracker.createShiTomasi(
+					600, 2, 0, derivType);
+
+			InterestPointDetector detector = FactoryInterestPoint.wrapPoint(corner, 1, imageType, derivType);
+
+			detDesc = FactoryDetectDescribe.fuseTogether(detector,null,new WrapDescribeBrief<I>(brief));
 //			tracker = FactoryPointSequentialTracker.dda_FH_SURF(600, 200, 1, 2,imageType);
-			tracker = FactoryPointSequentialTracker.dda_ST_BRIEF(600, 200, 2, 0, imageType, null);
+//			tracker = FactoryPointSequentialTracker.dda_ST_BRIEF(600, 200, 2, 0, imageType, null);
 //			tracker = FactoryPointSequentialTracker.dda_ST_NCC(600, 3, 7, 0, imageType, null);
 		} else {
 			thresholdAdd = 80;
@@ -275,8 +301,13 @@ public class VisualizeStereoVisualOdometryApp <I extends ImageSingleBand>
 		StereoDisparitySparse<I> disparity =
 				FactoryStereoDisparity.regionSparseWta(2,150,3,3,30,-1,true,imageType);
 
-		return FactoryVisualOdometry.stereoDepth(thresholdAdd, thresholdRetire,
-				1.5, tracker, disparity, 400,0, imageType);
+		if( tracker != null ) {
+			return FactoryVisualOdometry.stereoDepth(thresholdAdd, thresholdRetire,
+					1.5, tracker, disparity, 400,0, imageType);
+		} else {
+			return FactoryVisualOdometry.stereoDepth(thresholdAdd, thresholdRetire,
+					1.5, detDesc, disparity, 400,0,associationMaxError,3.0, imageType);
+		}
 	}
 
 	@Override

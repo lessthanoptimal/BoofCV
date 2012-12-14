@@ -18,14 +18,17 @@
 
 package boofcv.alg.feature.tracker;
 
-import georegression.struct.point.Point2D_F64;
+import org.junit.Test;
+
+import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
  */
-public interface PredictFeatureLocation<Info,Model> {
+public class TestAssistedTrackerTwoPass {
 
-	public void setModel( Model model );
-
-	public void predict( Info featureInfo , Point2D_F64 prediction );
+	@Test
+	public void stuff() {
+		fail("implement");
+	}
 }
