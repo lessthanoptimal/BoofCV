@@ -41,7 +41,7 @@ public class DebugSiftDetectorApp {
 
 		ImageFloat32 gray = ConvertBufferedImage.convertFromSingle(input, null, ImageFloat32.class);
 
-		SiftDetector alg = FactoryInterestPointAlgs.siftDetector(2,5,-1,5);
+		SiftDetector alg = FactoryInterestPointAlgs.siftDetector(3,10,150,5);
 		SiftImageScaleSpace imageSS = new SiftImageScaleSpace(1.6f, 5, 4, false);
 
 		imageSS.constructPyramid(gray);

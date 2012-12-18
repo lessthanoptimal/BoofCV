@@ -320,15 +320,6 @@ public class FastHessianFeatureDetector<T extends ImageSingleBand> {
 		return -b/(2.0f*a);
 	}
 
-	public static double polyPeak( double lower , double middle , double upper )
-	{
-		// only need two coefficients to compute the peak's location
-		double a = 0.5*lower - middle + 0.5*upper;
-		double b = 0.5*upper - 0.5*lower;
-
-		return -b/(2.0*a);
-	}
-
 	/**
 	 * Returns all the found interest points.
 	 *

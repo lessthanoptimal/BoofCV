@@ -12,6 +12,10 @@ Version : Alpha 0.13
 - FactoryPointSequentialTracker tweaked tracker configurations for better SFM performance
 - PointTrackerKltPyramid can now create new data to store tracks after init
 - Made scale configurable in corner based interest points
+- SIFT
+  * Accounts for offset during sub-sampling
+  * Documents deviations from paper in pyramid construction
+  * Tweaked pyramid construction
 
 ---------------------------------------------
 Date    : 2012/12/05
