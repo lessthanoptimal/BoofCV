@@ -19,6 +19,9 @@ Version : Alpha 0.13
   * Accounts for offset during sub-sampling
   * Documents deviations from paper in pyramid construction
   * Tweaked pyramid construction
+- Improved handling of Max Features in SURF + SIFT
+  * All features are considered in order of intensity
+  * Features are no longer added once the max has been reached
 
 ---------------------------------------------
 Date    : 2012/12/05
