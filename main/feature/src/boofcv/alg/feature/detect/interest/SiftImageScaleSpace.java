@@ -31,8 +31,16 @@ import boofcv.struct.image.ImageFloat32;
  * Each octave is half the width/height of the previous octave.  Scales are computed inside an octave
  * by applying Gaussian blur.   See SIFT paper for the details.
  *
+ * <p>
+ * OCTAVE SCALES: The scales sampled are different from the SIFT paper.  In each octave the scales are sampled
+ * across a linear function. s(i) = sigma*i.  In the paper scales are sampled using an exponential function
+ * s(i) = sigma*s(i-1)
+ * </p>
+ *
+ * <p>
  * When computing the next octave in the sequence it is seeded with the image from the second scale in the previous
  * octave.  The first octave is seeded with the input image or the input image scaled.
+ * </p>
  *
  * @author Peter Abeles
  */
@@ -146,7 +154,7 @@ public class SiftImageScaleSpace {
 			blurImage(scale[1],scale[0],sigma);
 		} else {
 			reshapeToInput(input.width, input.height);
-			blurImage(input,scale[0],sigma);
+			blurImage(input, scale[0], sigma);
 		}
 		constructRestOfOctave(0);
 
@@ -163,7 +171,8 @@ public class SiftImageScaleSpace {
 				break;
 			}
 
-			downSample(scale[indexSeed],scale[indexStart]);
+			downSample(scale[indexSeed],scale[indexStart+1]);
+			blurImage(scale[indexStart+1],scale[indexStart],sigma);
 
 			constructRestOfOctave(o);
 		}
@@ -225,9 +234,12 @@ public class SiftImageScaleSpace {
 
 				PixelMath.subtract(scale[indexScale],scale[indexScale-1],dog[indexDog]);
 
+				// NOTE: In SIFT paper it states you don't need to do this adjustment.  However, since the difference
+				// between scales is not a constant factor in this implementation you do need to do it.
+
 				// compute adjustment to make it better approximate of the Laplacian of Gaussian detector
 				double k = (i+1)/(double)i;
-				double adjustment = (k-1)*sigma*sigma;
+				double adjustment = k-1;
 				PixelMath.divide(dog[indexDog], (float) adjustment, dog[indexDog]);
 			}
 		}

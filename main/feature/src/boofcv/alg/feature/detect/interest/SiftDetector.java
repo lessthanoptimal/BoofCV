@@ -78,6 +78,8 @@ public class SiftDetector {
 	// List of found feature points
 	private FastQueue<ScalePoint> foundPoints = new FastQueue<ScalePoint>(10,ScalePoint.class,true);
 
+	// correcting for how images are subsampled
+	private double octavePixelOffset;
 	// Amount of blur applied to the current image being considered
 	private double currentSigma;
 	// Pixel scale factor for the current image being considered
@@ -149,6 +151,7 @@ public class SiftDetector {
 		// set up data structures
 		foundPoints.reset();
 		this.ss = ss;
+		octavePixelOffset = 0;
 
 		// extract features in each octave
 		for( int octave = 0; octave < ss.actualOctaves; octave++ ) {
@@ -173,6 +176,9 @@ public class SiftDetector {
 				detectFeatures(indexDOG,true);
 				detectFeatures(indexDOG,false);
 			}
+
+			// when the images are sub-sampled between octaves the sampling starts at pixel 1 in (x,y)
+			octavePixelOffset += currentPixelScale;
 		}
 	}
 
@@ -240,8 +246,9 @@ public class SiftDetector {
 
 		ScalePoint p = foundPoints.grow();
 
-		p.x = currentPixelScale*(x + polyPeak(x0, value, x2));
-		p.y = currentPixelScale*(y + polyPeak(y0, value, y2));
+		// when the image is down sampled it is sampled at pixel + 1
+		p.x = currentPixelScale*(x + polyPeak(x0, value, x2)) + octavePixelOffset;
+		p.y = currentPixelScale*(y + polyPeak(y0, value, y2)) + octavePixelOffset;
 
 		p.scale = currentSigma + currentPixelScale*ss.sigma*polyPeak(s0, value, s2);
 		p.white = white;
