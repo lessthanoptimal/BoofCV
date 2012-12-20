@@ -19,7 +19,7 @@
 package boofcv.alg.feature.detect.interest;
 
 import boofcv.abst.feature.detect.extract.FeatureExtractor;
-import boofcv.alg.feature.detect.extract.SelectNBestFeatures;
+import boofcv.alg.feature.detect.extract.SortBestFeatures;
 import boofcv.alg.feature.detect.intensity.GIntegralImageFeatureIntensity;
 import boofcv.core.image.border.FactoryImageBorderAlgs;
 import boofcv.core.image.border.ImageBorder_F32;
@@ -86,8 +86,10 @@ public class FastHessianFeatureDetector<T extends ImageSingleBand> {
 
 	// finds features from 2D intensity image
 	private FeatureExtractor extractor;
-		// selects the features with the largest intensity
-	private SelectNBestFeatures selectBest;
+	// sorts feature by their intensity
+	private SortBestFeatures sortBest;
+	// the maximum number of returned feature per scale
+	private int maxFeaturesPerScale;
 
 	// local sub-space
 	private ImageFloat32 intensity[];
@@ -133,7 +135,8 @@ public class FastHessianFeatureDetector<T extends ImageSingleBand> {
 									  int numberOfOctaves) {
 		this.extractor = extractor;
 		if( maxFeaturesPerScale > 0 ) {
-			selectBest = new SelectNBestFeatures(maxFeaturesPerScale);
+			this.maxFeaturesPerScale = maxFeaturesPerScale;
+			sortBest = new SortBestFeatures(maxFeaturesPerScale);
 		}
 		this.initialSampleRate = initialSampleRate;
 		this.initialSize = initialSize;
@@ -237,20 +240,25 @@ public class FastHessianFeatureDetector<T extends ImageSingleBand> {
 		extractor.setIgnoreBorder(size[level] / (2 * skip)+extractor.getSearchRadius());
 		extractor.process(intensity[index1],null,-1,foundFeatures);
 
+		// number of features which can be added
+		int numberRemaining;
+
 		// if configured to do so, only select the features with the highest intensity
 		QueueCorner features;
-		if( selectBest != null ) {
-			selectBest.process(intensity[index1],foundFeatures);
-			features = selectBest.getBestCorners();
+		if( sortBest != null ) {
+			sortBest.process(intensity[index1],foundFeatures);
+			features = sortBest.getBestCorners();
+			numberRemaining = maxFeaturesPerScale;
 		} else {
 			features = foundFeatures;
+			numberRemaining = Integer.MAX_VALUE;
 		}
 
 		int levelSize = size[level];
 		int sizeStep = levelSize-size[level-1];
 
 		// see if these local maximums are also a maximum in scale-space
-		for( int i = 0; i < features.size; i++ ) {
+		for( int i = 0; i < features.size && numberRemaining > 0; i++ ) {
 			Point2D_I16 f = features.get(i);
 
 			float val = inten1.get(f.x,f.y);
@@ -271,6 +279,7 @@ public class FastHessianFeatureDetector<T extends ImageSingleBand> {
 
 				double scale =  1.2*interpS/9.0;
 				foundPoints.grow().set(interpX,interpY,scale);
+				numberRemaining--;
 			}
 		}
 	}
