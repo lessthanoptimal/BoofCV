@@ -155,6 +155,7 @@ public class DescribePointSift {
 		double sampleUnit = (2.0*scale*sigmaToRadius)/numSamples;
 		// how wide a grid cell is in pixels
 		double gridCellLength = numSamples*sampleUnit;
+		int gridCellLengthI = (int)(gridCellLength+0.5); // round to int
 
 //		System.out.println("-----------------------------------------");
 //		System.out.println("  cell length "+gridCellLength);
@@ -167,6 +168,7 @@ public class DescribePointSift {
 				// top left coordinate of grid in pixels
 				double gridX = (gx-gridRadius)*gridCellLength;
 
+				// TODO Sample all pixels here
 				for( int sy = 0; sy < numSamples; sy++ ) {
 					double y = sy*sampleUnit + gridY;
 					for( int sx = 0; sx < numSamples; sx++ , allSampleIndex++ ) {

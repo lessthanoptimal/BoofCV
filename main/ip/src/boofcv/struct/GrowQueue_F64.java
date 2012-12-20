@@ -66,6 +66,12 @@ public class GrowQueue_F64 {
 		this.size = size;
 	}
 
+	public void setMaxSize( int size ) {
+		if( data.length < size ) {
+			data = new double[size];
+		}
+	}
+
 	public int getSize() {
 		return size;
 	}

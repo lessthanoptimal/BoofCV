@@ -87,6 +87,8 @@ public class AssociateGreedy<D> {
 		workBuffer.reset();
 
 //		System.out.println("Associate: "+src.size+"*"+dst.size+" = "+(src.size*dst.size)+" or "+(src.size*dst.size*8/1024/1024)+"MB");
+		fitQuality.setMaxSize(src.size);
+		workBuffer.setMaxSize(src.size*dst.size);
 		for( int i = 0; i < src.size; i++ ) {
 			D a = src.data[i];
 			double bestScore = maxFitError;
