@@ -89,7 +89,7 @@ public class VisualizeAssociationMatchesApp<T extends ImageSingleBand, D extends
 
 		addAlgorithm(0, "Fast Hessian", FactoryInterestPoint.fastHessian(1, 2, 200, 1, 9, 4, 4));
 		if( imageType == ImageFloat32.class )
-			addAlgorithm(0, "SIFT", FactoryInterestPoint.siftDetector(1.6,5,4,false,2,1,500,10));
+			addAlgorithm(0, "SIFT", FactoryInterestPoint.siftDetector(1.6,5,4,false,2,1,500,5));
 		alg = FactoryDetectPoint.createShiTomasi(2, false, 1, 500, derivType);
 		addAlgorithm(0, "Shi-Tomasi", FactoryInterestPoint.wrapPoint(alg, 1, imageType, derivType));
 

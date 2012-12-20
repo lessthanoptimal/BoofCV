@@ -15,6 +15,11 @@ Version : Alpha 0.13
 - Renamed GeneralAssociation to AssociateDescription
 - Added AssociateDescription2D for association with location info
 - ScoreAssociateCorrelation no longer takes the abs()
+- SIFT
+  * Accounts for offset during sub-sampling
+  * Documents deviations from paper in pyramid construction
+  * Tweaked pyramid construction
+
 ---------------------------------------------
 Date    : 2012/12/05
 Version : Alpha 0.12

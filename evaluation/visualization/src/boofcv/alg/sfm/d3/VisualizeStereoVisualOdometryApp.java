@@ -303,7 +303,7 @@ public class VisualizeStereoVisualOdometryApp <I extends ImageSingleBand>
 
 		if( tracker != null ) {
 			return FactoryVisualOdometry.stereoDepth(thresholdAdd, thresholdRetire,
-					1.5, tracker, disparity, 400,0, imageType);
+					1.5, tracker, disparity, 200,0, imageType);
 		} else {
 			return FactoryVisualOdometry.stereoDepth(thresholdAdd, thresholdRetire,
 					1.5, detDesc, disparity, 400,0,associationMaxError,3.0, imageType);
