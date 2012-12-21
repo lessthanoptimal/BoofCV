@@ -45,8 +45,8 @@ public class AssistedTrackerTwoPass<I extends ImageSingleBand,D extends TupleDes
 
 	TrackGeometryManager<Model,Info> manager;
 
-	ModelMatcher<Model, Info> fitterInitial;
-	ModelMatcher<Model, Info> fitterFinal;
+	ModelMatcher<Model, Info> matcherInitial;
+	ModelMatcher<Model, Info> matcherFinal;
 
 	ModelFitter<Model, Info> modelRefiner;
 
@@ -62,15 +62,15 @@ public class AssistedTrackerTwoPass<I extends ImageSingleBand,D extends TupleDes
 								  AssociateDescription2D<D> associateInitial,
 								  AssociateDescription2D<D> associateFinal,
 								  final boolean updateDescription ,
-								  ModelMatcher<Model, Info> fitterInitial,
-								  ModelMatcher<Model, Info> fitterFinal,
+								  ModelMatcher<Model, Info> matcherInitial,
+								  ModelMatcher<Model, Info> matcherFinal,
 								  ModelFitter<Model, Info> modelRefiner )
 	{
 		super(detDesc, associateInitial, updateDescription);
 
 		this.associateFinal = associateFinal;
-		this.fitterInitial = fitterInitial;
-		this.fitterFinal = fitterFinal;
+		this.matcherInitial = matcherInitial;
+		this.matcherFinal = matcherFinal;
 		this.modelRefiner = modelRefiner;
 
 		if( modelRefiner != null ){
@@ -87,10 +87,10 @@ public class AssistedTrackerTwoPass<I extends ImageSingleBand,D extends TupleDes
 
 		System.out.println("Tracks "+tracksAll.size());
 		System.out.println("First pass. matches "+matches.size());
-		System.out.println("            inliers "+fitterInitial.getMatchSet().size());
+		System.out.println("            inliers " + matcherInitial.getMatchSet().size());
 		secondPass();
 		System.out.println("Second pass. matches "+matches.size());
-		System.out.println("             inliers "+fitterFinal.getMatchSet().size());
+		System.out.println("             inliers " + matcherFinal.getMatchSet().size());
 	}
 
 	private boolean firstPass() {
@@ -110,7 +110,7 @@ public class AssistedTrackerTwoPass<I extends ImageSingleBand,D extends TupleDes
 		}
 
 		// fit the motion model to the feature tracks
-		if( !fitterInitial.process(locationInfo) ) {
+		if( !matcherInitial.process(locationInfo) ) {
 			foundModel = false;
 			return true;
 		}
@@ -122,7 +122,7 @@ public class AssistedTrackerTwoPass<I extends ImageSingleBand,D extends TupleDes
 		locSrc.reset();
 		for( int i = 0; i < tracksAll.size(); i++ ) {
 			PointTrack t = tracksAll.get(i);
-			locSrc.add(manager.predict(fitterInitial.getModel(), t));
+			manager.predict(matcherInitial.getModel(), t,locSrc.grow());
 		}
 
 		// associate again
@@ -143,57 +143,21 @@ public class AssistedTrackerTwoPass<I extends ImageSingleBand,D extends TupleDes
 		}
 
 		// recompute the model using improved matches
-		if( !fitterFinal.process(locationInfo) ) {
+		if( !matcherFinal.process(locationInfo) ) {
 			foundModel = false;
 			return;
 		}
 
 		// refine the motion estimate
 		if( modelRefiner != null )
-			modelRefiner.fitModel(fitterFinal.getMatchSet(), fitterFinal.getModel(),refinedModel);
+			modelRefiner.fitModel(matcherFinal.getMatchSet(), matcherFinal.getModel(),refinedModel);
 
 		foundModel = true;
 	}
 
 	@Override
-	public void spawnTracks() {
-		// TODO maximize reuse here
-		// setup data structures
-		if( isAssociated.length < featDst.size ) {
-			isAssociated = new boolean[ featDst.size ];
-		}
-
-		// see which features are associated in the dst list
-		for( int i = 0; i < featDst.size; i++ ) {
-			isAssociated[i] = false;
-		}
-
-		if( matches != null ) {
-			for( int i = 0; i < matches.size; i++ ) {
-				isAssociated[matches.data[i].dst] = true;
-			}
-		}
-
-		// create new tracks from latest unassociated detected features
-		for( int i = 0; i < featDst.size; i++ ) {
-			if( isAssociated[i]  )
-				continue;
-
-			PointTrack p = getUnused();
-			Point2D_F64 loc = locDst.get(i);
-			p.set(loc.x,loc.y);
-			((D)p.getDescription()).setTo(featDst.get(i));
-
-			if( manager.handleSpawnedTrack(p) ) {
-				p.featureId = featureID++;
-
-				tracksNew.add(p);
-				tracksActive.add(p);
-				tracksAll.add(p);
-			} else {
-				unused.add(p);
-			}
-		}
+	protected boolean checkValidSpawn( PointTrack p ) {
+		return manager.handleSpawnedTrack(p);
 	}
 
 	@Override
@@ -209,18 +173,18 @@ public class AssistedTrackerTwoPass<I extends ImageSingleBand,D extends TupleDes
 	@Override
 	public Model getModel() {
 		if( modelRefiner == null )
-			return fitterFinal.getModel();
+			return matcherFinal.getModel();
 		else
 			return refinedModel;
 	}
 
 	@Override
 	public List<Info> getMatchSet() {
-		return fitterFinal.getMatchSet();
+		return matcherFinal.getMatchSet();
 	}
 
 	@Override
 	public int convertMatchToActiveIndex(int matchIndex) {
-		return fitterFinal.getInputIndex(matchIndex);
+		return matcherFinal.getInputIndex(matchIndex);
 	}
 }

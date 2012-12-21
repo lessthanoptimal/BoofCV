@@ -169,6 +169,7 @@ public class VideoTrackFeaturesApp<I extends ImageSingleBand, D extends ImageSin
 		VideoTrackFeaturesApp app = new VideoTrackFeaturesApp(imageType, derivType);
 
 		java.util.List<PathLabel> inputs = new ArrayList<PathLabel>();
+		inputs.add(new PathLabel("Rovio", "/home/pja/projects/rovio/images/rovio2.mjpeg"));
 		inputs.add(new PathLabel("Shake", "../data/applet/shake.mjpeg"));
 		inputs.add(new PathLabel("Zoom", "../data/applet/zoom.mjpeg"));
 		inputs.add(new PathLabel("Rotate", "../data/applet/rotate.mjpeg"));
