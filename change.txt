@@ -22,6 +22,10 @@ Version : Alpha 0.13
 - Improved handling of Max Features in SURF + SIFT
   * All features are considered in order of intensity
   * Features are no longer added once the max has been reached
+- Added Model Assisted Trackers
+  * Can use estimated motion to improve tracking results
+  * Useful in SFM applications
+  * Updated SFM algorithms so that they can use these types of trackers
 
 ---------------------------------------------
 Date    : 2012/12/05

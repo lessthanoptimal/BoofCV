@@ -146,7 +146,7 @@ public class FactoryPointSequentialTracker {
 									 Class<I> imageType)
 	{
 		ScoreAssociation<TupleDesc_F64> score = FactoryAssociation.scoreEuclidean(TupleDesc_F64.class, true);
-		AssociateSurfBasic assoc = new AssociateSurfBasic(FactoryAssociation.greedy(score, 100000, maxTracks, true));
+		AssociateSurfBasic assoc = new AssociateSurfBasic(FactoryAssociation.greedy(score, 5, maxTracks, true));
 
 		AssociateDescription2D<SurfFeature> generalAssoc =
 				new AssociateDescTo2D<SurfFeature>(new WrapAssociateSurfBasic(assoc));

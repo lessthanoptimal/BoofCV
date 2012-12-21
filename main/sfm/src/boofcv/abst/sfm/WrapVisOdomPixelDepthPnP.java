@@ -1,9 +1,7 @@
 package boofcv.abst.sfm;
 
-import boofcv.abst.feature.tracker.ImagePointTracker;
 import boofcv.abst.feature.tracker.PointTrack;
 import boofcv.alg.distort.LensDistortionOps;
-import boofcv.alg.geo.DistanceModelMonoPixels;
 import boofcv.alg.sfm.StereoSparse3D;
 import boofcv.alg.sfm.d3.VisOdomPixelDepthPnP;
 import boofcv.struct.calib.StereoParameters;
@@ -20,27 +18,24 @@ import java.util.List;
 /**
  * @author Peter Abeles
  */
-public class WrapVisOdomPixelDepthPnP<T extends ImageSingleBand>
+public class WrapVisOdomPixelDepthPnP<T extends ImageSingleBand,Model,Info>
 		implements StereoVisualOdometry<T>, AccessPointTracks3D {
 
 	// low level algorithm
 	VisOdomPixelDepthPnP<T> alg;
 	StereoSparse3D<T> stereo;
-	ImagePointTracker<T> tracker;
-	DistanceModelMonoPixels<Se3_F64,Point2D3D> fitError;
+	ModelAssistedTrackerCalibrated<T,Model,Info> tracker;
 	Class<T> imageType;
 	boolean failed;
 
 
 	public WrapVisOdomPixelDepthPnP(VisOdomPixelDepthPnP<T> alg,
 									StereoSparse3D<T> stereo,
-									ImagePointTracker<T> tracker,
-									DistanceModelMonoPixels<Se3_F64, Point2D3D> fitError,
+									ModelAssistedTrackerCalibrated<T,Model,Info> tracker,
 									Class<T> imageType) {
 		this.alg = alg;
 		this.stereo = stereo;
 		this.tracker = tracker;
-		this.fitError = fitError;
 		this.imageType = imageType;
 	}
 
@@ -83,7 +78,7 @@ public class WrapVisOdomPixelDepthPnP<T extends ImageSingleBand>
 		alg.setPixelToNorm(leftPixelToNorm);
 		alg.setNormToPixel(leftNormToPixel);
 
-		fitError.setIntrinsic(parameters.left.fx, parameters.left.fy, parameters.left.skew);
+		tracker.setCalibration(parameters.left);
 	}
 
 	@Override

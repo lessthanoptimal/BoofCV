@@ -24,7 +24,9 @@ import boofcv.abst.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.abst.feature.detect.interest.InterestPointDetector;
 import boofcv.abst.feature.disparity.StereoDisparitySparse;
 import boofcv.abst.feature.tracker.ImagePointTracker;
+import boofcv.abst.feature.tracker.PkltConfig;
 import boofcv.abst.sfm.AccessPointTracks3D;
+import boofcv.abst.sfm.ModelAssistedTrackerCalibrated;
 import boofcv.abst.sfm.StereoVisualOdometry;
 import boofcv.alg.feature.describe.DescribePointBrief;
 import boofcv.alg.feature.describe.brief.FactoryBriefDefinition;
@@ -46,6 +48,7 @@ import boofcv.gui.image.ShowImages;
 import boofcv.io.PathLabel;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.struct.calib.IntrinsicParameters;
+import boofcv.struct.geo.Point2D3D;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.point.Point2D_F64;
@@ -260,7 +263,7 @@ public class VisualizeStereoVisualOdometryApp <I extends ImageSingleBand>
 	}
 
 	private StereoVisualOdometry<I> createStereoDepth( int whichAlg ) {
-		ImagePointTracker<I> tracker = null;
+		ModelAssistedTrackerCalibrated<I, Se3_F64,Point2D3D> assistedTracker;
 		DetectDescribePoint detDesc = null;
 
 		Class derivType = GImageDerivativeOps.getDerivativeType(imageType);
@@ -272,13 +275,28 @@ public class VisualizeStereoVisualOdometryApp <I extends ImageSingleBand>
 		if( whichAlg == 0 ) {
 			thresholdAdd = 120;
 			thresholdRetire = 2;
-			tracker = FactoryPointSequentialTracker.klt(600,1,new int[]{1,2,4,8},3,3,3,2,imageType,derivType);
+//			ImagePointTracker<I> tracker = FactoryPointSequentialTracker.klt(600,1,new int[]{1,2,4,8},3,3,3,2,imageType,derivType);
+//			assistedTracker = FactoryVisualOdometry.trackerP3P(tracker,1.5,200,50);
+
+			PkltConfig config =
+					PkltConfig.createDefault(imageType, derivType);
+			config.pyramidScaling = new int[]{1,2,4,8};
+			config.maxFeatures = 600;
+			config.featureRadius = 3;
+			config.typeInput = imageType;
+			config.typeDeriv = derivType;
+
+			GeneralFeatureDetector detector =
+					FactoryPointSequentialTracker.createShiTomasi(config.maxFeatures, 3, 1, config.typeDeriv);
+
+			assistedTracker = FactoryVisualOdometry.trackerAssistedKltP3P(detector,config,1.5,200,50);
 		} else if( whichAlg == 1 ) {
 			thresholdAdd = 80;
 			thresholdRetire = 3;
 			associationMaxError = 150;
 
-			DescribePointBrief<I> brief = FactoryDescribePointAlgs.brief(FactoryBriefDefinition.gaussian2(new Random(123), 16, 512),
+			DescribePointBrief<I> brief = FactoryDescribePointAlgs.brief(
+					FactoryBriefDefinition.gaussian2(new Random(123), 16, 512),
 					FactoryBlurFilter.gaussian(imageType, 0, 4));
 
 			GeneralFeatureDetector corner = FactoryPointSequentialTracker.createShiTomasi(
@@ -290,24 +308,21 @@ public class VisualizeStereoVisualOdometryApp <I extends ImageSingleBand>
 //			tracker = FactoryPointSequentialTracker.dda_FH_SURF(600, 200, 1, 2,imageType);
 //			tracker = FactoryPointSequentialTracker.dda_ST_BRIEF(600, 200, 2, 0, imageType, null);
 //			tracker = FactoryPointSequentialTracker.dda_ST_NCC(600, 3, 7, 0, imageType, null);
+
+			assistedTracker = FactoryVisualOdometry.trackerAssistedDdaP3P(detDesc,1.5,200,0,associationMaxError,10.0);
 		} else {
 			thresholdAdd = 80;
 			thresholdRetire = 3;
 //			tracker = FactoryPointSequentialTracker.dda_FH_SURF(600, 200, 1, 2,imageType);
-			tracker = FactoryPointSequentialTracker.combined_ST_SURF_KLT(600, 3,0,3,
+			ImagePointTracker<I> tracker = FactoryPointSequentialTracker.combined_ST_SURF_KLT(600, 3,0,3,
 					new int[]{1,2,4,8},50, true,imageType, derivType);
+			assistedTracker = FactoryVisualOdometry.trackerP3P(tracker,1.5,200,0);
 		}
 
 		StereoDisparitySparse<I> disparity =
 				FactoryStereoDisparity.regionSparseWta(2,150,3,3,30,-1,true,imageType);
 
-		if( tracker != null ) {
-			return FactoryVisualOdometry.stereoDepth(thresholdAdd, thresholdRetire,
-					1.5, tracker, disparity, 200,0, imageType);
-		} else {
-			return FactoryVisualOdometry.stereoDepth(thresholdAdd, thresholdRetire,
-					1.5, detDesc, disparity, 400,0,associationMaxError,3.0, imageType);
-		}
+		return FactoryVisualOdometry.stereoDepth(thresholdAdd, thresholdRetire,disparity, assistedTracker, imageType);
 	}
 
 	@Override

@@ -189,15 +189,10 @@ public class ImageMotionPointKey<I extends ImageSingleBand, IT extends Invertibl
 	}
 
 	@Override
-	public Point2D_F64 predict(IT it, PointTrack track) {
-		// TODO total hack.  need to handle model in a generic way
-		Point2D_F64 ret = new Point2D_F64();
-
+	public void predict(IT it, PointTrack track, Point2D_F64 prediction ) {
 		AssociatedPair p = track.getCookie();
 
-		AffinePointOps.transform((Affine2D_F64)it, p.p1, ret);
-
-		return ret;
+		AffinePointOps.transform((Affine2D_F64)it, p.p1, prediction);
 	}
 
 	/**

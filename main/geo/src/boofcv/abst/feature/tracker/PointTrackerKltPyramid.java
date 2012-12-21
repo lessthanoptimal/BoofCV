@@ -47,14 +47,14 @@ public class PointTrackerKltPyramid<I extends ImageSingleBand,D extends ImageSin
 		implements ImagePointTracker<I>
 {
 	// update the image pyramid
-	private PyramidUpdaterDiscrete<I> inputPyramidUpdater;
+	protected PyramidUpdaterDiscrete<I> inputPyramidUpdater;
 	// Updates the image pyramid's gradient.
-	private ImageGradient<I,D> gradient;
+	protected ImageGradient<I,D> gradient;
 
 	// storage for image pyramid
-	private PyramidDiscrete<I> basePyramid;
-	private ImagePyramid<D> derivX;
-	private ImagePyramid<D> derivY;
+	protected PyramidDiscrete<I> basePyramid;
+	protected ImagePyramid<D> derivX;
+	protected ImagePyramid<D> derivY;
 
 	// configuration for the track manager
 	protected PkltConfig<I, D> config;
@@ -164,13 +164,25 @@ public class PointTrackerKltPyramid<I extends ImageSingleBand,D extends ImageSin
 
 			// set up point description
 			PointTrack p = t.getCookie();
-			p.featureId = totalFeatures++;
 			p.set(t.x,t.y);
 
-			// add to appropriate lists
-			active.add(t);
-			spawned.add(t);
+			if( checkValidSpawn(p) ) {
+				p.featureId = totalFeatures++;
+
+				// add to appropriate lists
+				active.add(t);
+				spawned.add(t);
+			} else {
+				unused.add(t);
+			}
 		}
+	}
+
+	/**
+	 * Returns true if a new track can be spawned here.  Intended to be overloaded
+	 */
+	protected boolean checkValidSpawn( PointTrack p ) {
+		return true;
 	}
 
 	@Override

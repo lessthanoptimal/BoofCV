@@ -49,7 +49,7 @@ public class DetectAssociateTracker<I extends ImageSingleBand, D extends TupleDe
 
 	// location of interest points
 	protected FastQueue<Point2D_F64> locDst = new FastQueue<Point2D_F64>(10,Point2D_F64.class,false);
-	protected FastQueue<Point2D_F64> locSrc = new FastQueue<Point2D_F64>(10,Point2D_F64.class,false);
+	protected FastQueue<Point2D_F64> locSrc = new FastQueue<Point2D_F64>(10,Point2D_F64.class,true);
 	// description of interest points
 	protected FastQueue<D> featSrc;
 	protected FastQueue<D> featDst;
@@ -125,15 +125,13 @@ public class DetectAssociateTracker<I extends ImageSingleBand, D extends TupleDe
 		detDesc.detect(input);
 
 		tracksActive.clear();
+		tracksInactive.clear();
 		tracksDropped.clear();
 		tracksNew.clear();
 
 		featDst.reset();
 		locDst.reset();
 
-		if( isAssociated.length < tracksAll.size() ) {
-			isAssociated = new boolean[ tracksAll.size() ];
-		}
 
 		int N = detDesc.getNumberOfFeatures();
 		for( int i = 0; i < N; i++ ) {
@@ -164,7 +162,8 @@ public class DetectAssociateTracker<I extends ImageSingleBand, D extends TupleDe
 	protected void performTracking() {
 		// Match features
 		associateFeatures();
-		matches = associate.getMatches(); // todo needed?
+		// used in spawn tracks.  if null then no tracking data is assumed
+		matches = associate.getMatches();
 
 		// Update the track state using association information
 		updateTrackState(matches);
@@ -174,6 +173,10 @@ public class DetectAssociateTracker<I extends ImageSingleBand, D extends TupleDe
 	 * Associate features and update the track information
 	 */
 	protected void associateFeatures() {
+		if( isAssociated.length < tracksAll.size() ) {
+			isAssociated = new boolean[ tracksAll.size() ];
+		}
+
 		// put each track's location and description into the source list
 		for( int i = 0; i < tracksAll.size(); i++ ) {
 			PointTrack t = tracksAll.get(i);
@@ -235,14 +238,25 @@ public class DetectAssociateTracker<I extends ImageSingleBand, D extends TupleDe
 
 			PointTrack p = getUnused();
 			Point2D_F64 loc = locDst.get(i);
-			p.set(loc.x,loc.y);
+			p.set(loc.x, loc.y);
 			((D)p.getDescription()).setTo(featDst.get(i));
-			p.featureId = featureID++;
+			if( checkValidSpawn(p) ) {
+				p.featureId = featureID++;
 
-			tracksNew.add(p);
-			tracksActive.add(p);
-			tracksAll.add(p);
+				tracksNew.add(p);
+				tracksActive.add(p);
+				tracksAll.add(p);
+			} else {
+				unused.add(p);
+			}
 		}
+	}
+
+	/**
+	 * Returns true if a new track can be spawned here.  Intended to be overloaded
+	 */
+	protected boolean checkValidSpawn( PointTrack p ) {
+		return true;
 	}
 
 	/**
@@ -263,6 +277,7 @@ public class DetectAssociateTracker<I extends ImageSingleBand, D extends TupleDe
 	public void dropAllTracks() {
 		unused.addAll(tracksAll);
 		tracksActive.clear();
+		tracksInactive.clear();
 		tracksAll.clear();
 		tracksNew.clear();
 	}
@@ -276,6 +291,7 @@ public class DetectAssociateTracker<I extends ImageSingleBand, D extends TupleDe
 	public void dropTrack(PointTrack track) {
 		// the track may or may not be in the active list
 		tracksActive.remove(track);
+		tracksInactive.remove(track);
 		// it must be in the all list
 		if( !tracksAll.remove(track) )
 			throw new IllegalArgumentException("Track not found in all list");

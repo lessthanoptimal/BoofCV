@@ -21,6 +21,7 @@ package boofcv.examples;
 import boofcv.abst.feature.disparity.StereoDisparitySparse;
 import boofcv.abst.feature.tracker.ImagePointTracker;
 import boofcv.abst.sfm.AccessPointTracks3D;
+import boofcv.abst.sfm.ModelAssistedTrackerCalibrated;
 import boofcv.abst.sfm.StereoVisualOdometry;
 import boofcv.factory.feature.disparity.FactoryStereoDisparity;
 import boofcv.factory.feature.tracker.FactoryPointSequentialTracker;
@@ -30,6 +31,7 @@ import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.wrapper.DefaultMediaManager;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.StereoParameters;
+import boofcv.struct.geo.Point2D3D;
 import boofcv.struct.image.ImageSInt16;
 import boofcv.struct.image.ImageUInt8;
 import georegression.struct.point.Vector3D_F64;
@@ -63,8 +65,10 @@ public class ExampleStereoVisualOdometry {
 				FactoryStereoDisparity.regionSparseWta(0, 150, 3, 3, 30, -1, true, ImageUInt8.class);
 
 		// declares the algorithm
+		ModelAssistedTrackerCalibrated<ImageUInt8, Se3_F64,Point2D3D> assistedTracker =
+				FactoryVisualOdometry.trackerP3P(tracker,1.5,400,0);
 		StereoVisualOdometry<ImageUInt8> visualOdometry = FactoryVisualOdometry.stereoDepth(120, 2,
-				1.5, tracker, disparity, 400,0, ImageUInt8.class);
+				disparity, assistedTracker, ImageUInt8.class);
 
 		// Pass in intrinsic/extrinsic calibration.  This can be changed in the future.
 		visualOdometry.setCalibration(config);

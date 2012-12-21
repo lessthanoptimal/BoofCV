@@ -33,6 +33,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
+// TODO remove PnP from name and comments above
 public class VisOdomPixelDepthPnP<T extends ImageBase>
 		implements TrackGeometryManager<Se3_F64,Point2D3D>
 {
@@ -277,16 +278,12 @@ public class VisOdomPixelDepthPnP<T extends ImageBase>
 	}
 
 	@Override
-	public Point2D_F64 predict(Se3_F64 worldToCurr, PointTrack track) {
+	public void predict(Se3_F64 worldToCurr, PointTrack track, Point2D_F64 prediction ) {
 		Point2D3D info = track.getCookie();
 
 		Point3D_F64 curr = new Point3D_F64();
 		SePointOps_F64.transform(worldToCurr,info.location,curr);
 
-		Point2D_F64 result = new Point2D_F64();
-
-		normToPixel.compute( curr.x/curr.z , curr.y/curr.z ,result );
-
-		return result; // TODO optimize
+		normToPixel.compute( curr.x/curr.z , curr.y/curr.z ,prediction );
 	}
 }
