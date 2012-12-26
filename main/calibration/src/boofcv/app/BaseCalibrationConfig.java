@@ -73,7 +73,7 @@ public class BaseCalibrationConfig {
 			detector = FactoryPlanarCalibrationTarget.detectorSquareGrid(numCols, numRows);
 			target = FactoryPlanarCalibrationTarget.gridSquare(numCols, numRows, width, space);
 		} else if( type.compareToIgnoreCase("chess") == 0 ) {
-			detector = FactoryPlanarCalibrationTarget.detectorChessboard(numCols, numRows, 6);
+			detector = FactoryPlanarCalibrationTarget.detectorChessboard(numCols, numRows, 1.0, 6);
 			target = FactoryPlanarCalibrationTarget.gridChess(numCols,numRows,width);
 		} else {
 			throw new RuntimeException("Unknown type: "+type);

@@ -309,14 +309,14 @@ public class VisualizeStereoVisualOdometryApp <I extends ImageSingleBand>
 //			tracker = FactoryPointSequentialTracker.dda_ST_BRIEF(600, 200, 2, 0, imageType, null);
 //			tracker = FactoryPointSequentialTracker.dda_ST_NCC(600, 3, 7, 0, imageType, null);
 
-			assistedTracker = FactoryVisualOdometry.trackerAssistedDdaP3P(detDesc,1.5,200,0,associationMaxError,10.0);
+			assistedTracker = FactoryVisualOdometry.trackerAssistedDdaP3P(detDesc,1.5,200,50,associationMaxError,10.0);
 		} else {
 			thresholdAdd = 80;
 			thresholdRetire = 3;
 //			tracker = FactoryPointSequentialTracker.dda_FH_SURF(600, 200, 1, 2,imageType);
 			ImagePointTracker<I> tracker = FactoryPointSequentialTracker.combined_ST_SURF_KLT(600, 3,0,3,
 					new int[]{1,2,4,8},50, true,imageType, derivType);
-			assistedTracker = FactoryVisualOdometry.trackerP3P(tracker,1.5,200,0);
+			assistedTracker = FactoryVisualOdometry.trackerP3P(tracker,1.5,200,50);
 		}
 
 		StereoDisparitySparse<I> disparity =

@@ -33,9 +33,10 @@ public class WrapPlanarChessTarget implements PlanarCalibrationDetector {
 
 	DetectChessCalibrationPoints<ImageFloat32,ImageFloat32> alg;
 
-	public WrapPlanarChessTarget( int numColSquares , int numRowSquares , int featureRadius ) {
+	public WrapPlanarChessTarget( int numColSquares , int numRowSquares , int featureRadius ,
+								  double relativeSizeThreshold ) {
 		alg = new DetectChessCalibrationPoints<ImageFloat32, ImageFloat32>(numColSquares,numRowSquares,
-				featureRadius,20,255,ImageFloat32.class);
+				featureRadius,20,255,relativeSizeThreshold,ImageFloat32.class);
 	}
 
 	@Override

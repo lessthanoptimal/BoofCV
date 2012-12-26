@@ -49,13 +49,16 @@ public class FactoryPlanarCalibrationTarget {
 	 * Creates a calibration target detector for chessboard targets.  Adjust the feature radius
 	 * for best performance.
 	 *
+	 *
 	 * @param numSquareColumns Number of columns in square block grid.  Target dependent.
 	 * @param numSquareRows Number of rows in square block grid.  Target dependent.
-	 * @param radius Side of interest point detection region.  TUNE THIS!  Typically 5
+	 * @param relativeSizeThreshold Increases or decreases the minimum allowed blob size. Try 1.0
+	 * @param detectionRadius Size of interest point detection region.  TUNE THIS!  Typically 5
 	 * @return Square grid target detector.
 	 */
-	public static PlanarCalibrationDetector detectorChessboard( int numSquareColumns, int numSquareRows , int radius ) {
-		return new WrapPlanarChessTarget(numSquareColumns, numSquareRows,radius);
+	public static PlanarCalibrationDetector detectorChessboard(int numSquareColumns, int numSquareRows,
+															   double relativeSizeThreshold, int detectionRadius) {
+		return new WrapPlanarChessTarget(numSquareColumns, numSquareRows,detectionRadius,relativeSizeThreshold);
 	}
 
 	/**

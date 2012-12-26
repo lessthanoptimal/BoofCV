@@ -55,7 +55,7 @@ public class ExampleDetectCalibrationPoints {
 
 		// For chessboard targets, tune RADIUS parameter for your images
 //		detector = FactoryPlanarCalibrationTarget.detectorSquareGrid( 3, 4);
-		detector = FactoryPlanarCalibrationTarget.detectorChessboard( 3, 4, 6);
+		detector = FactoryPlanarCalibrationTarget.detectorChessboard( 3, 4, 1, 6);
 
 		// process the image and check for failure condition
 		if( !detector.process(input) )

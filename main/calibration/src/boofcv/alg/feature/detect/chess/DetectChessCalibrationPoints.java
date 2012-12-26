@@ -90,6 +90,8 @@ public class DetectChessCalibrationPoints<T extends ImageSingleBand, D extends I
 	private List<Double> thresholdAttempts = new ArrayList<Double>();
 	// maximum pixel intensity value
 	private double maxPixelValue;
+	// relative blob size threshold.  Adjusted relative to image size.  Small objects are pruned
+	private double relativeSizeThreshold;
 
 	// point detection algorithms
 	private GeneralFeatureIntensity<T, D> intensityAlg;
@@ -107,7 +109,6 @@ public class DetectChessCalibrationPoints<T extends ImageSingleBand, D extends I
 	// puts points into the correct order
 	private OrderPointsIntoGrid orderAlg = new OrderPointsIntoGrid();
 
-//	FitQuadratic2D quad = new FitQuadratic2D();
 
 	/**
 	 * Configures detection parameters
@@ -117,14 +118,17 @@ public class DetectChessCalibrationPoints<T extends ImageSingleBand, D extends I
 	 * @param radius        Side of interest point detection region.  Typically 5
 	 * @param maxAttempts   Maximum number of different threshold it will try to detect the image
 	 * @param maxPixelValue Maximum pixel intensity value.  Almost always 255
+	 * @param relativeSizeThreshold Increases or decreases the minimum allowed blob size. Try 1.0
 	 * @param imageType     Type of image being processed
 	 */
 	public DetectChessCalibrationPoints(int numCols, int numRows, int radius,
 										int maxAttempts, double maxPixelValue,
+										double relativeSizeThreshold ,
 										Class<T> imageType) {
 		Class<D> derivType = GImageDerivativeOps.getDerivativeType(imageType);
 
 		this.radius = radius;
+		this.relativeSizeThreshold = relativeSizeThreshold;
 
 		this.numColsPoints = 2 * (numCols - 1);
 		this.numRowsPoints = 2 * (numRows - 1);
@@ -143,12 +147,15 @@ public class DetectChessCalibrationPoints<T extends ImageSingleBand, D extends I
 		FeatureExtractor extractor = FactoryFeatureExtractor.nonmax(radius + 2, 20, radius + 2, true);
 		detectorAlg = new GeneralFeatureDetector<T, D>(intensityAlg, extractor);
 
-		findBound = new DetectChessSquaresBinary(numCols, numRows, 20 * 4);
+		// minContourSize is specified later after the image's size is known
+		findBound = new DetectChessSquaresBinary(numCols, numRows, 0);
 	}
 
 	public boolean process(T gray) {
 		binary.reshape(gray.width, gray.height);
 		eroded.reshape(gray.width, gray.height);
+
+		adjustForImageSize(gray.width,gray.height);
 
 		// detect the chess board
 		if (!detectChessBoard(gray))
@@ -199,6 +206,15 @@ public class DetectChessCalibrationPoints<T extends ImageSingleBand, D extends I
 				numRowsPoints, numColsPoints);
 
 		return subpixel != null;
+	}
+
+	/**
+	 * Adjust image processing parameters for the input image size
+	 */
+	private void adjustForImageSize( int imgWidth , int imgHeight ) {
+		int size = (int)(relativeSizeThreshold*80.0/640.0*imgWidth);
+
+		findBound.setMinimumContourSize(size);
 	}
 
 	/**

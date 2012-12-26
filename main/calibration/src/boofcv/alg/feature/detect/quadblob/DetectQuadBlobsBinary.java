@@ -129,7 +129,7 @@ public class DetectQuadBlobsBinary {
 		filterNotPolygon(squares);
 		if( squares.size() < minimumBlobCount)
 			return fail("Too few valid squares");
-		
+
 		return true;
 	}
 
