@@ -193,24 +193,24 @@ public class CalibrateMonoPlanarGuiApp extends JPanel
 	}
 
 	public static void main( String args[] ) {
-//		PlanarCalibrationDetector detector = FactoryPlanarCalibrationTarget.detectorSquareGrid(8,8);
+		PlanarCalibrationDetector detector = FactoryPlanarCalibrationTarget.detectorSquareGrid(8,8);
 //		PlanarCalibrationDetector detector = FactoryPlanarCalibrationTarget.detectorSquareGrid(3,4);
-		PlanarCalibrationDetector detector = FactoryPlanarCalibrationTarget.detectorChessboard(3,4, 1, 6);
+//		PlanarCalibrationDetector detector = FactoryPlanarCalibrationTarget.detectorChessboard(3,4,1,6);
 
-//		PlanarCalibrationTarget target = FactoryPlanarCalibrationTarget.gridSquare(8, 8, 0.5, 7.0 / 18.0);
+		PlanarCalibrationTarget target = FactoryPlanarCalibrationTarget.gridSquare(8, 8, 0.5, 7.0 / 18.0);
 //		PlanarCalibrationTarget target = FactoryPlanarCalibrationTarget.gridSquare(3,4,30,30);
-		PlanarCalibrationTarget target = FactoryPlanarCalibrationTarget.gridChess(3, 4, 30);
+//		PlanarCalibrationTarget target = FactoryPlanarCalibrationTarget.gridChess(3, 4, 30);
 
 //		String directory = "../data/evaluation/calibration/mono/Sony_DSC-HX5V_Square";
 //		String directory = "../data/evaluation/calibration/mono/Sony_DSC-HX5V_Chess";
-		String directory = "/home/pja/projects/rovio/calib";
+		String directory = "../data/evaluation/calibration/mono/PULNiX_CCD_6mm_Zhang";
 //		String directory = "../data/evaluation/calibration/stereo/Bumblebee2_Chess";
 //		String directory = "../data/evaluation/calibration/stereo/Bumblebee2_Square";
 
 		CalibrateMonoPlanarGuiApp app = new CalibrateMonoPlanarGuiApp();
 //		app.configure(detector,target,BoofMiscOps.directoryList(directory, "frame" ),false);
 //		app.configure(detector,target,BoofMiscOps.directoryList(directory, "left" ),false);
-		app.configure(detector,target,BoofMiscOps.directoryList(directory, "image" ),false);
+		app.configure(detector,target,BoofMiscOps.directoryList(directory, "CalibIm" ),false);
 
 		JFrame frame = new JFrame("Planar Calibration");
 		frame.add(app, BorderLayout.CENTER);
