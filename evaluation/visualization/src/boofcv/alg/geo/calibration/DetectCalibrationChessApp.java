@@ -33,6 +33,7 @@ import boofcv.gui.image.ShowImages;
 import boofcv.gui.image.VisualizeImageData;
 import boofcv.io.PathLabel;
 import boofcv.io.SimpleStringNumberReader;
+import boofcv.misc.BoofMiscOps;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.point.Point2D_F64;
@@ -91,7 +92,7 @@ public class DetectCalibrationChessApp<T extends ImageSingleBand, D extends Imag
 	}
 
 	public void configure( int numCols , int numRows ) {
-		alg = new DetectChessCalibrationPoints<T,D>(numCols,numRows,4,20,255,imageType);
+		alg = new DetectChessCalibrationPoints<T,D>(numCols,numRows,4,20,255,1,imageType);
 	}
 
 	@Override
@@ -279,16 +280,24 @@ public class DetectCalibrationChessApp<T extends ImageSingleBand, D extends Imag
 
 		List<PathLabel> inputs = new ArrayList<PathLabel>();
 
-		inputs.add(new PathLabel("View 01",prefix+"frame01.jpg"));
-		inputs.add(new PathLabel("View 02",prefix+"frame02.jpg"));
-		inputs.add(new PathLabel("View 03",prefix+"frame03.jpg"));
-		inputs.add(new PathLabel("View 04",prefix+"frame04.jpg"));
-		inputs.add(new PathLabel("View 05",prefix+"frame05.jpg"));
-		inputs.add(new PathLabel("View 06",prefix+"frame06.jpg"));
-		inputs.add(new PathLabel("View 07",prefix+"frame07.jpg"));
-		inputs.add(new PathLabel("View 08",prefix+"frame08.jpg"));
-		inputs.add(new PathLabel("View 11",prefix+"frame11.jpg"));
-		inputs.add(new PathLabel("View 12",prefix+"frame12.jpg"));
+		String dir = "/home/pja/projects/rovio/calib";
+
+		List<String> names = BoofMiscOps.directoryList(dir, "image");
+//		for( String s : names ) {
+		String s = names.get(0);
+			int n = s.length();
+			inputs.add(new PathLabel(s.substring(n-12,n),s));
+//		}
+//		inputs.add(new PathLabel("View 01",prefix+"frame01.jpg"));
+//		inputs.add(new PathLabel("View 02",prefix+"frame02.jpg"));
+//		inputs.add(new PathLabel("View 03",prefix+"frame03.jpg"));
+//		inputs.add(new PathLabel("View 04",prefix+"frame04.jpg"));
+//		inputs.add(new PathLabel("View 05",prefix+"frame05.jpg"));
+//		inputs.add(new PathLabel("View 06",prefix+"frame06.jpg"));
+//		inputs.add(new PathLabel("View 07",prefix+"frame07.jpg"));
+//		inputs.add(new PathLabel("View 08",prefix+"frame08.jpg"));
+//		inputs.add(new PathLabel("View 11",prefix+"frame11.jpg"));
+//		inputs.add(new PathLabel("View 12",prefix+"frame12.jpg"));
 
 		app.setInputList(inputs);
 

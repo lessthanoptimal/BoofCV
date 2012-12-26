@@ -81,7 +81,7 @@ public class ExampleCalibrateMonocularPoints {
 		String directory = "../data/evaluation/calibration/stereo/Bumblebee2_Chess";
 		List<String> imageNames = BoofMiscOps.directoryList(directory,"left");
 
-		PlanarCalibrationDetector detector = FactoryPlanarCalibrationTarget.detectorChessboard(3, 4, 6);
+		PlanarCalibrationDetector detector = FactoryPlanarCalibrationTarget.detectorChessboard(3, 4, 1, 6);
 
 		List<List<Point2D_F64>> ret = new ArrayList<List<Point2D_F64>>();
 

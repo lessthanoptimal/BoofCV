@@ -72,8 +72,7 @@ public class DetectChessSquaresBinary {
 
 		expectedBlobs = numRows*numCols + (numCols-1)*(numRows-1);
 
-		this.connectThreshold = minContourSize/5;
-		detectBlobs = new DetectQuadBlobsBinary(minContourSize,0.25,expectedBlobs);
+		setMinimumContourSize(minContourSize);
 	}
 
 	/**
@@ -159,7 +158,7 @@ public class DetectChessSquaresBinary {
 		for( QuadBlob b : blobs ) {
 			if( b.conn.size() == 1 )
 				corners.add(b);
-			
+
 			conn[b.conn.size()]++;
 		}
 
@@ -202,6 +201,16 @@ public class DetectChessSquaresBinary {
 		UtilCalibrationGrid.sortByAngleCCW(center, points);
 
 		return points;
+	}
+
+	/**
+	 * Adjusts the minimum contour for a square blob
+	 *
+	 * @param minContourSize The minimum contour size
+	 */
+	public void setMinimumContourSize( int minContourSize ) {
+		this.connectThreshold = minContourSize/5;
+		detectBlobs = new DetectQuadBlobsBinary(minContourSize,0.25,expectedBlobs);
 	}
 
 	public List<Point2D_F64> getBoundingQuad() {

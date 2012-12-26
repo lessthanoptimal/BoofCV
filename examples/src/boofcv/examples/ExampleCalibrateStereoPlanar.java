@@ -89,7 +89,7 @@ public class ExampleCalibrateStereoPlanar {
 	public void setupBumblebeeChess() {
 		// Use the wrapper below for chessboard targets.  The last parameter adjusts the size of the corner detection
 		// region.  TUNE THIS PARAMETER FOR OPTIMAL ACCURACY!
-		detector = FactoryPlanarCalibrationTarget.detectorChessboard(3, 4, 6);
+		detector = FactoryPlanarCalibrationTarget.detectorChessboard(3, 4, 1, 6);
 		// Target physical description
 		target = FactoryPlanarCalibrationTarget.gridChess(3, 4, 30);
 
