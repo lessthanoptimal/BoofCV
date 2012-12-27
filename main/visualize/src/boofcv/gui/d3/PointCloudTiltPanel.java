@@ -18,6 +18,7 @@
 
 package boofcv.gui.d3;
 
+import boofcv.struct.distort.PointTransform_F64;
 import boofcv.struct.image.ImageSingleBand;
 import org.ejml.data.DenseMatrix64F;
 
@@ -105,8 +106,9 @@ public class PointCloudTiltPanel extends JPanel
 	 */
 	public void configure(double baseline,
 						  DenseMatrix64F K,
+						  PointTransform_F64 rectifiedToColor,
 						  int minDisparity, int maxDisparity) {
-		view.configure(baseline, K, minDisparity, maxDisparity);
+		view.configure(baseline, K, rectifiedToColor, minDisparity, maxDisparity);
 	}
 
 	/**

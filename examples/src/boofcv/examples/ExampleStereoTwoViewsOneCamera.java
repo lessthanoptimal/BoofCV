@@ -42,6 +42,7 @@ import boofcv.gui.stereo.RectifiedPairPanel;
 import boofcv.io.image.UtilImageIO;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.IntrinsicParameters;
+import boofcv.struct.distort.DoNothingTransform_F64;
 import boofcv.struct.distort.PointTransform_F64;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.image.ImageFloat32;
@@ -70,8 +71,8 @@ import java.util.List;
 public class ExampleStereoTwoViewsOneCamera {
 
 	// Disparity calculation parameters
-	private static int minDisparity = 30;
-	private static int maxDisparity = 160;
+	private static final int minDisparity = 30;
+	private static final int maxDisparity = 160;
 
 	public static void main(String args[]) {
 		// specify location of images and calibration
@@ -266,13 +267,13 @@ public class ExampleStereoTwoViewsOneCamera {
 	 * Show results as a point cloud
 	 */
 	public static void showPointCloud(ImageSingleBand disparity, BufferedImage left,
-									  Se3_F64 motion, DenseMatrix64F rectR ,
+									  Se3_F64 motion, DenseMatrix64F rectifiedK ,
 									  int minDisparity, int maxDisparity) {
 		PointCloudTiltPanel gui = new PointCloudTiltPanel();
 
 		double baseline = motion.getT().norm();
 
-		gui.configure(baseline, rectR, minDisparity, maxDisparity);
+		gui.configure(baseline, rectifiedK, new DoNothingTransform_F64(), minDisparity, maxDisparity);
 		gui.process(disparity, left);
 		gui.setPreferredSize(new Dimension(left.getWidth(), left.getHeight()));
 
