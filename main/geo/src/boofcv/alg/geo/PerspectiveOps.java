@@ -52,6 +52,8 @@ public class PerspectiveOps {
 	 * @param scale Scale factor that input image is being scaled by.
 	 */
 	public static void scaleIntrinsic( IntrinsicParameters param , double scale ) {
+		param.width = (int)(param.width*scale);
+		param.height = (int)(param.height*scale);
 		param.cx *= scale;
 		param.cy *= scale;
 		param.fx *= scale;
@@ -62,9 +64,9 @@ public class PerspectiveOps {
 	/**
 	 * <p>
 	 * Creates a new {@link PointTransform_F32} which is the same as applying a homography transform
-	 * and another arbitrary transform.  A typical application is removing lens distortion from
-	 * camera.s  The order that each transform is applied depends on if the arbitrary transform is forward or
-	 * reverse transform.  A new set of camera parameters is computed to account for the adjustment.
+	 * and another arbitrary transform.  A typical application is removing lens distortion.  The order that each
+	 * transform is applied depends on if the arbitrary transform is forward or reverse transform.  A new set of
+	 * camera parameters is computed to account for the adjustment.
 	 * </p>
 	 *
 	 * <p>

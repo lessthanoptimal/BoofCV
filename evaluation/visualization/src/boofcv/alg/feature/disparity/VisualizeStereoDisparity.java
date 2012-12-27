@@ -19,7 +19,6 @@
 package boofcv.alg.feature.disparity;
 
 import boofcv.abst.feature.disparity.StereoDisparity;
-import boofcv.alg.distort.DistortImageOps;
 import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.RectifyImageOps;
@@ -38,9 +37,9 @@ import boofcv.io.ProgressMonitorThread;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.calib.StereoParameters;
+import boofcv.struct.distort.PointTransform_F64;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
-import boofcv.struct.image.MultiSpectral;
 import georegression.struct.se.Se3_F64;
 import org.ejml.data.DenseMatrix64F;
 
@@ -50,6 +49,8 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
+
+import static boofcv.alg.geo.RectifyImageOps.transformRectToPixel_F64;
 
 /**
  * Computes and displays disparity from still disparity images.  The disparity can be viewed
@@ -109,6 +110,8 @@ public class VisualizeStereoDisparity <T extends ImageSingleBand, D extends Imag
 	private boolean processedImage = false;
 	private boolean rectifiedImages = false;
 
+	// coordinate transform from left rectified image to its original pixels
+	PointTransform_F64 leftRectToPixel;
 
 	public VisualizeStereoDisparity() {
 		super(1);
@@ -180,7 +183,8 @@ public class VisualizeStereoDisparity <T extends ImageSingleBand, D extends Imag
 			if( !computedCloud ) {
 				computedCloud = true;
 				double baseline = calib.getRightToLeft().getT().norm();
-				cloudGui.configure(baseline,rectK,control.minDisparity,control.maxDisparity);
+
+				cloudGui.configure(baseline,rectK,leftRectToPixel,control.minDisparity,control.maxDisparity);
 				cloudGui.process(activeAlg.getDisparity(),colorLeft);
 			}
 			comp = cloudGui;
@@ -249,25 +253,16 @@ public class VisualizeStereoDisparity <T extends ImageSingleBand, D extends Imag
 
 		// adjust view to maximize viewing area while not including black regions
 		RectifyImageOps.allInsideLeft(calib.left, rect1, rect2, rectK);
+
+		// compute transforms to apply rectify the images
+		leftRectToPixel = transformRectToPixel_F64(calib.left, rect1);
+
 		ImageDistort<T> distortRect1 = RectifyImageOps.rectifyImage(calib.left, rect1, activeAlg.getInputType());
 		ImageDistort<T> distortRect2 = RectifyImageOps.rectifyImage(calib.right, rect2, activeAlg.getInputType());
 
-		// rectify input images too
-		MultiSpectral<T> ms1 = ConvertBufferedImage.convertFromMulti(colorLeft,null,activeAlg.getInputType());
-		MultiSpectral<T> ms2 = ConvertBufferedImage.convertFromMulti(colorRight, null, activeAlg.getInputType());
-		MultiSpectral<T> rectMs1 =
-				new MultiSpectral<T>(activeAlg.getInputType(),ms1.width,ms1.height,ms1.getNumBands());
-		MultiSpectral<T> rectMs2 =
-				new MultiSpectral<T>(activeAlg.getInputType(),ms2.width,ms2.height,ms2.getNumBands());
-
 		// rectify and undo distortion
-		distortRect1.apply(inputLeft,rectLeft);
+		distortRect1.apply(inputLeft, rectLeft);
 		distortRect2.apply(inputRight,rectRight);
-		DistortImageOps.distortMS(ms1,rectMs1,distortRect1);
-		DistortImageOps.distortMS(ms2,rectMs2,distortRect2);
-
-		ConvertBufferedImage.convertTo(rectMs1,colorLeft);
-		ConvertBufferedImage.convertTo(rectMs2,colorRight);
 
 		rectifiedImages = true;
 	}

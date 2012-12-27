@@ -18,7 +18,10 @@
 
 package boofcv.gui.d3;
 
+import boofcv.misc.BoofMiscOps;
 import boofcv.struct.FastQueue;
+import boofcv.struct.distort.PointTransform_F64;
+import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
@@ -80,17 +83,25 @@ public class PointCloudViewer extends JPanel {
 	public int tiltAngle = 0;
 	public double radius = 5;
 
+	// converts from rectified pixels into color image pixels
+	PointTransform_F64 rectifiedToColor;
+	// storage for color image coordinate
+	Point2D_F64 colorPt = new Point2D_F64();
+
 	/**
 	 * Stereo and intrinsic camera parameters
 	 * @param baseline Stereo baseline (world units)
 	 * @param K Intrinsic camera calibration matrix of rectified camera
+	 * @param rectifiedToColor Transform from rectified pixels to the color image pixels.
 	 * @param minDisparity Minimum disparity that's computed (pixels)
 	 * @param maxDisparity Maximum disparity that's computed (pixels)
 	 */
 	public void configure(double baseline,
 						  DenseMatrix64F K,
+						  PointTransform_F64 rectifiedToColor,
 						  int minDisparity, int maxDisparity) {
 		this.K = K;
+		this.rectifiedToColor = rectifiedToColor;
 		this.baseline = baseline;
 		this.focalLengthX = K.get(0,0);
 		this.focalLengthY = K.get(1,1);
@@ -99,6 +110,8 @@ public class PointCloudViewer extends JPanel {
 		this.minDisparity = minDisparity;
 
 		this.rangeDisparity = maxDisparity-minDisparity;
+
+
 	}
 
 	/**
@@ -140,7 +153,8 @@ public class PointCloudViewer extends JPanel {
 				p.z = baseline*focalLengthX/value;
 				p.x = p.z*(x - centerX)/focalLengthX;
 				p.y = p.z*(y - centerY)/focalLengthY;
-				p.rgb = color.getRGB(x,y);
+
+				getColor(disparity, color, x, y, p);
 			}
 		}
 	}
@@ -168,8 +182,18 @@ public class PointCloudViewer extends JPanel {
 				p.z = baseline*focalLengthX/value;
 				p.x = p.z*(x - centerX)/focalLengthX;
 				p.y = p.z*(y - centerY)/focalLengthY;
-				p.rgb = color.getRGB(x,y);
+
+				getColor(disparity, color, x, y, p);
 			}
+		}
+	}
+
+	private void getColor(ImageBase disparity, BufferedImage color, int x, int y, ColorPoint3D p) {
+		rectifiedToColor.compute(x,y,colorPt);
+		if( BoofMiscOps.checkInside(disparity, colorPt.x, colorPt.y, 0) ) {
+			p.rgb = color.getRGB((int)colorPt.x,(int)colorPt.y);
+		} else {
+			p.rgb = 0x000000;
 		}
 	}
 
