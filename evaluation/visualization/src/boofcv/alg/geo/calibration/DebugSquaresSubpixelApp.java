@@ -74,7 +74,7 @@ public class DebugSquaresSubpixelApp
 		this.targetColumns = numSquaresCol;
 		this.targetRows = numSquaresRow;
 
-		detectAlg = new DetectSquareCalibrationPoints(500,targetColumns,targetRows);
+		detectAlg = new DetectSquareCalibrationPoints(500,1.0,targetColumns,targetRows);
 
 //		refineAlg = new WrapCornerIntensity<T,ImageSingleBand>(1,imageType);
 //		refineAlg = new WrapRefineCornerSegmentFit();

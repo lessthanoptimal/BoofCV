@@ -240,8 +240,8 @@ public class CalibrateStereoPlanarGuiApp extends JPanel
 	}
 
 	public static void main( String args[] ) {
-		PlanarCalibrationDetector detector = FactoryPlanarCalibrationTarget.detectorSquareGrid(3,4);
-//		PlanarCalibrationDetector detector = FactoryPlanarCalibrationTarget.detectorChessboard(3,4,6);
+		PlanarCalibrationDetector detector = FactoryPlanarCalibrationTarget.detectorSquareGrid(3,4,1.0);
+//		PlanarCalibrationDetector detector = FactoryPlanarCalibrationTarget.detectorChessboard(3,4,1.0,6);
 
 		PlanarCalibrationTarget target = FactoryPlanarCalibrationTarget.gridSquare(3,4,30,30);
 //		PlanarCalibrationTarget target = FactoryPlanarCalibrationTarget.gridChess(3, 4, 30);

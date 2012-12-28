@@ -67,6 +67,21 @@ public class TestBoofMiscOps {
 	}
 
 	@Test
+	public void checkInside_radius_int() {
+		fail("Implement");
+	}
+
+	@Test
+	public void checkInside_radius_F32() {
+		fail("Implement");
+	}
+
+	@Test
+	public void checkInside_radius_F64() {
+		fail("Implement");
+	}
+
+	@Test
 	public void checkInside_ImageRectangle() {
 		ImageUInt8 image = new ImageUInt8(20,25);
 

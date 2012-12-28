@@ -39,10 +39,12 @@ public class FactoryPlanarCalibrationTarget {
 	 *
 	 * @param numSquareColumns Number of columns in square block grid.  Target dependent.
 	 * @param numSquareRows Number of rows in square block grid.  Target dependent.
+	 * @param relativeSizeThreshold Increases or decreases the minimum allowed blob size. Try 1.0
 	 * @return Square grid target detector.
 	 */
-	public static PlanarCalibrationDetector detectorSquareGrid( int numSquareColumns, int numSquareRows ) {
-		return new WrapPlanarSquareGridTarget(numSquareColumns, numSquareRows);
+	public static PlanarCalibrationDetector detectorSquareGrid( int numSquareColumns, int numSquareRows ,
+																double relativeSizeThreshold ) {
+		return new WrapPlanarSquareGridTarget(numSquareColumns, numSquareRows,relativeSizeThreshold);
 	}
 
 	/**
@@ -58,7 +60,7 @@ public class FactoryPlanarCalibrationTarget {
 	 */
 	public static PlanarCalibrationDetector detectorChessboard(int numSquareColumns, int numSquareRows,
 															   double relativeSizeThreshold, int detectionRadius) {
-		return new WrapPlanarChessTarget(numSquareColumns, numSquareRows,detectionRadius,relativeSizeThreshold);
+		return new WrapPlanarChessTarget(numSquareColumns, numSquareRows, relativeSizeThreshold, detectionRadius);
 	}
 
 	/**

@@ -67,7 +67,10 @@ public class DetectSquareCalibrationPoints {
 
 	// maximum number of possible targets it will consider
 	private int maxCombinations;
-	
+
+	// relative blob size threshold.  Adjusted relative to image size.  Small objects are pruned
+	private double relativeSizeThreshold;
+
 	// Explaining why it failed
 	private String errorMessage;
 
@@ -82,10 +85,12 @@ public class DetectSquareCalibrationPoints {
 	/**
 	 *
 	 * @param maxCombinations Maximum number of combinations of squares it will try when looking for a target. Try 500.
+	 * @param relativeSizeThreshold Increases or decreases the minimum allowed blob size. Try 1.0
 	 * @param gridCols Number of squares wide the grid is. Target dependent.
 	 * @param gridRows Number of squares tall the grid is. Target dependent.
 	 */
 	public DetectSquareCalibrationPoints(int maxCombinations,
+										 double relativeSizeThreshold,
 										 int gridCols, int gridRows) {
 		if( gridCols <= 0 || gridRows <= 0 )
 			throw new IllegalArgumentException("Columns and rows must be more than zero");
@@ -93,8 +98,10 @@ public class DetectSquareCalibrationPoints {
 		this.gridCols = gridCols;
 		this.gridRows = gridRows;
 		this.maxCombinations = maxCombinations;
+		this.relativeSizeThreshold = relativeSizeThreshold;
 
-		detectBlobs = new DetectQuadBlobsBinary(20*4,0.25,gridCols*gridRows);
+		// minContourSize is specified later after the image's size is known
+		detectBlobs = new DetectQuadBlobsBinary(0,0.25,gridCols*gridRows);
 	}
 
 	/**
@@ -109,6 +116,10 @@ public class DetectSquareCalibrationPoints {
 		// discard old results
 		interestPoints = new ArrayList<Point2D_F64>();
 		interestSquares = new ArrayList<QuadBlob>();
+
+		// adjust threshold for image size
+		int contourSize = (int)(relativeSizeThreshold*80.0/640.0*thresholded.width);
+		detectBlobs.setMinContourSize(contourSize);
 
 		// initialize data structures
 		binaryA.reshape(thresholded.width,thresholded.height);

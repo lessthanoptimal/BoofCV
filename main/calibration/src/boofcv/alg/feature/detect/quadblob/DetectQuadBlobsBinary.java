@@ -47,7 +47,7 @@ public class DetectQuadBlobsBinary {
 	// given a blob it finds the 4 corners in the blob
 	FindQuadCorners cornerFinder = new FindQuadCorners();
 	
-	// smallest allowed size of a blob;s contour
+	// smallest allowed size of a blob's contour
 	private int minContourSize;
 
 	// maximum different between smallest and largest side in a candidate square
@@ -82,6 +82,15 @@ public class DetectQuadBlobsBinary {
 		this.minContourSize = minContourSize;
 		this.polySideRatio = polySideRatio;
 		this.minimumBlobCount = minimumBlobCount;
+	}
+
+	/**
+	 * Specify the minimum size of a blob's contour
+	 *
+	 * @param minContourSize Contour size in pixels
+	 */
+	public void setMinContourSize(int minContourSize) {
+		this.minContourSize = minContourSize;
 	}
 
 	/**
