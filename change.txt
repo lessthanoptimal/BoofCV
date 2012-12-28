@@ -26,10 +26,11 @@ Version : Alpha 0.13
   * Can use estimated motion to improve tracking results
   * Useful in SFM applications
   * Updated SFM algorithms so that they can use these types of trackers
-- Chessboard calibration grid detector
+- Chessboard and Square grid calibration target detectors
   * Made minimum blob automatically adjust to image size
   * Made it user configurable
   * These changes allow calibration of 320x240 images
+- PerspectiveOps.scaleIntrinsic() changes image width/height
 
 ---------------------------------------------
 Date    : 2012/12/05

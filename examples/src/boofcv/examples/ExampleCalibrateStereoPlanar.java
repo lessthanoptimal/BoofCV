@@ -71,7 +71,7 @@ public class ExampleCalibrateStereoPlanar {
 	 */
 	public void setupBumblebeeSquare() {
 		// Use the wrapper below for square grid targets.
-		detector = FactoryPlanarCalibrationTarget.detectorSquareGrid(3,4);
+		detector = FactoryPlanarCalibrationTarget.detectorSquareGrid(3,4,1.0);
 		// Target physical description
 		target = FactoryPlanarCalibrationTarget.gridSquare(3, 4, 30,30);
 

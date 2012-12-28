@@ -99,7 +99,7 @@ public class DetectCalibrationSquaresApp
 		this.targetColumns = numCols;
 		this.targetRows = numRows;
 
-		alg = new DetectSquareCalibrationPoints(500,targetColumns,targetRows);
+		alg = new DetectSquareCalibrationPoints(500,1.0,targetColumns,targetRows);
 	}
 
 

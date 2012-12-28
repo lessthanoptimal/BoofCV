@@ -70,7 +70,7 @@ public class ExampleCalibrateMonocularPlanar {
 	 */
 	private void setupZhang99() {
 		// Use the wrapper below for square grid targets.
-		detector = FactoryPlanarCalibrationTarget.detectorSquareGrid(8,8);
+		detector = FactoryPlanarCalibrationTarget.detectorSquareGrid(8,8,1.0);
 
 		// physical description
 		target = FactoryPlanarCalibrationTarget.gridSquare(8, 8, 0.5, 7.0 / 18.0);
