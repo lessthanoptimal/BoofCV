@@ -31,6 +31,13 @@ Version : Alpha 0.13
   * Made it user configurable
   * These changes allow calibration of 320x240 images
 - PerspectiveOps.scaleIntrinsic() changes image width/height
+- Improved unit tests for MultiSpectral images
+- ImageConvert
+  * Added support for ImageSInt64
+  * Added support for MultiSpectral to SingleBand using average
+  * Added GImageConvert
+- Code to convert between different types of TupleDesc
+- Fixed bug in TupleDesc_F64 SAD scorer
 
 ---------------------------------------------
 Date    : 2012/12/05

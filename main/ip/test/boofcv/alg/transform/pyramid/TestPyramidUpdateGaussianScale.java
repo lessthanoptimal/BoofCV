@@ -71,7 +71,7 @@ public class TestPyramidUpdateGaussianScale extends GenericPyramidUpdateTests<Im
 		DistortImageOps.scale(blurrImg, expected, TypeInterpolate.BILINEAR);
 		ImageFloat32 found = pyramid.getLayer(0);
 
-		BoofTesting.assertEquals(expected,found);
+		BoofTesting.assertEquals(expected,found,1e-4);
 
 		// test the second layer
 		blur = FactoryBlurFilter.gaussian(ImageFloat32.class,sigmas[0],-1);
@@ -81,7 +81,7 @@ public class TestPyramidUpdateGaussianScale extends GenericPyramidUpdateTests<Im
 		DistortImageOps.scale(blurrImg, expected, TypeInterpolate.BILINEAR);
 		found = pyramid.getLayer(1);
 
-		BoofTesting.assertEquals(expected,found,0,1e-4);
+		BoofTesting.assertEquals(expected,found, 1e-4);
 	}
 
 	@Override

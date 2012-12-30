@@ -16,35 +16,24 @@
  * limitations under the License.
  */
 
-package boofcv.struct.distort;
+package boofcv.abst.feature.associate;
 
-import georegression.struct.point.Point2D_F64;
-import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
+import boofcv.alg.feature.associate.DescriptorDistance;
+import boofcv.struct.feature.TupleDesc_S8;
 
 /**
+ * Computes sum of absolute difference (SAD) score for {@link boofcv.struct.feature.TupleDesc_U8}.
+ *
  * @author Peter Abeles
  */
-public class TestSequencePointTransform_F64 {
+public class ScoreAssociateSad_S8 implements ScoreAssociation<TupleDesc_S8>{
+	@Override
+	public double score(TupleDesc_S8 a, TupleDesc_S8 b) {
+		return DescriptorDistance.sad(a, b);
+	}
 
-	@Test
-	public void simpleTest() {
-
-		PointTransform_F64 a = new PointTransform_F64() {
-			@Override
-			public void compute(double x, double y, Point2D_F64 out) {
-				out.x = x+1;
-				out.y = y+2;
-			}
-		};
-
-		SequencePointTransform_F64 alg = new SequencePointTransform_F64(a,a);
-
-		Point2D_F64 p = new Point2D_F64();
-		alg.compute(3,4,p);
-
-		assertEquals(5,p.x,1e-8);
-		assertEquals(8,p.y,1e-8);
+	@Override
+	public boolean isZeroMinimum() {
+		return true;
 	}
 }

@@ -179,14 +179,14 @@ public class BoofTesting {
 									 boolean checkEquals,
 									 Object... inputParam) {
 		try {
-			ImageSingleBand[] larger = new ImageSingleBand[inputParam.length];
-			ImageSingleBand[] subImg = new ImageSingleBand[inputParam.length];
+			ImageBase[] larger = new ImageBase[inputParam.length];
+			ImageBase[] subImg = new ImageBase[inputParam.length];
 			Class<?> paramDesc[] = new Class<?>[inputParam.length];
 			Object[] inputModified = new Object[inputParam.length];
 
 			for (int i = 0; i < inputParam.length; i++) {
-				if (ImageSingleBand.class.isAssignableFrom(inputParam[i].getClass())) {
-					ImageSingleBand<?> img = (ImageSingleBand<?>) inputParam[i];
+				if (ImageBase.class.isAssignableFrom(inputParam[i].getClass())) {
+					ImageBase<?> img = (ImageBase<?>) inputParam[i];
 
 					// copy the original image inside of a larger image
 					larger[i] = img._createNew(img.getWidth() + 10, img.getHeight() + 12);
@@ -219,16 +219,7 @@ public class BoofTesting {
 				for (int i = 0; i < inputParam.length; i++) {
 					if (subImg[i] == null)
 						continue;
-					if (ImageInteger.class.isAssignableFrom(inputParam[i].getClass()))
-						assertEquals((ImageInteger) inputModified[i], (ImageInteger) subImg[i], 0);
-					else if (inputParam[i] instanceof ImageInterleavedInt8)
-						assertEquals((ImageInterleavedInt8) inputParam[i], (ImageInterleavedInt8) subImg[i]);
-					else if (inputParam[i] instanceof ImageFloat32)
-						assertEquals((ImageFloat32) inputParam[i], (ImageFloat32) subImg[i]);
-					else if (inputParam[i] instanceof ImageFloat64)
-						assertEquals((ImageFloat64) inputParam[i], (ImageFloat64) subImg[i]);
-					else
-						throw new RuntimeException("Unknown type " + inputParam[i].getClass().getSimpleName() + ".  Add it here");
+					assertEquals((ImageBase)inputModified[i], subImg[i], 0);
 				}
 			}
 
@@ -376,202 +367,131 @@ public class BoofTesting {
 		}
 	}
 
-	/**
-	 * Checks to see if thw two images are equivalent.  Note that this is not the same
-	 * as identical since they can be sub-images.
-	 *
-	 * @param imgA An image.
-	 * @param imgB An image.
-	 */
-	public static void assertEqualsGeneric(ImageSingleBand imgA, ImageSingleBand imgB, int tolInt, double tolFloat) {
+	public static void assertEquals(ImageBase imgA, ImageBase imgB, double tol ) {
 
-		if (imgA.getTypeInfo().isInteger() && imgB.getTypeInfo().isInteger()) {
-			if( imgA.getTypeInfo().getNumBits() != 64 )
-				assertEquals((ImageInteger) imgA, (ImageInteger) imgB, tolInt);
-			else
-				assertEquals((ImageSInt64) imgA, (ImageSInt64) imgB, tolInt);
-		} else if (imgA.getTypeInfo().isInteger() || imgB.getTypeInfo().isInteger()) {
-			ImageInteger imgInt = (ImageInteger) (imgA.getTypeInfo().isInteger() ? imgA : imgB);
-			ImageFloat imgFloat = (ImageFloat) (imgA.getTypeInfo().isInteger() ? imgB : imgA);
+		// if no specialized check exists, use a slower generalized approach
+		if( imgA instanceof ImageSingleBand ) {
+			GImageSingleBand a = FactoryGImageSingleBand.wrap((ImageSingleBand)imgA);
+			GImageSingleBand b = FactoryGImageSingleBand.wrap((ImageSingleBand)imgB);
 
-			assertEquals(imgInt, imgFloat, tolInt);
+			for( int y = 0; y < imgA.height; y++ ) {
+				for( int x = 0; x < imgA.width; x++ ) {
+					double valA = a.get(x,y).doubleValue();
+					double valB = b.get(x,y).doubleValue();
+
+					double difference = valA - valB;
+					if( Math.abs(difference) > tol )
+						throw new RuntimeException("Values not equal at ("+x+","+y+") "+valA+"  "+valB);
+				}
+			}
+		} else if( imgA instanceof MultiSpectral ){
+			MultiSpectral a = (MultiSpectral)imgA;
+			MultiSpectral b = (MultiSpectral)imgB;
+
+			if( a.getNumBands() != b.getNumBands() )
+				throw new RuntimeException("Number of bands not equal");
+
+			for( int band = 0; band < a.getNumBands(); band++ ) {
+				assertEquals(a.getBand(band),b.getBand(band),tol );
+			}
+		} else if( imgA instanceof ImageInterleaved ) {
+			ImageInterleavedInt8 a = (ImageInterleavedInt8)imgA;
+			ImageInterleavedInt8 b = (ImageInterleavedInt8)imgB;
+
+			if( a.getNumBands() != b.getNumBands() )
+				throw new RuntimeException("Number of bands not equal");
+
+			int numBands = a.getNumBands();
+
+			for( int y = 0; y < imgA.height; y++ ) {
+				for( int x = 0; x < imgA.width; x++ ) {
+					for( int band = 0; band < numBands; band++ ) {
+						int valA = a.getBand(x, y, band);
+						int valB = b.getBand(x, y, band);
+
+						double difference = valA - valB;
+						if( Math.abs(difference) > tol )
+							throw new RuntimeException("Values not equal at ("+x+","+y+") "+valA+"  "+valB);
+					}
+				}
+			}
+
 		} else {
-			assertEquals((ImageFloat) imgA, (ImageFloat) imgB, 0, (float) tolFloat);
+			throw new RuntimeException("Unknown image type");
 		}
 	}
 
-	public static void assertEqualsGeneric(ImageSingleBand imgA, ImageSingleBand imgB, int tolInt, double tolFloat,
-										   int ignoreBorder) {
+	public static void assertEqualsInner(ImageBase imgA, ImageBase imgB, double tol , int borderX , int borderY ,
+										 boolean relative ) {
 
-		if (ImageInteger.class.isAssignableFrom(imgA.getClass())) {
-			if (ImageInteger.class.isAssignableFrom(imgB.getClass())) {
-				assertEquals((ImageInteger) imgA, (ImageInteger) imgB, ignoreBorder);
-			} else {
-				assertEquals((ImageInteger) imgA, (ImageFloat32) imgB, ignoreBorder);
+		// if no specialized check exists, use a slower generalized approach
+		if( imgA instanceof ImageSingleBand ) {
+			GImageSingleBand a = FactoryGImageSingleBand.wrap((ImageSingleBand)imgA);
+			GImageSingleBand b = FactoryGImageSingleBand.wrap((ImageSingleBand)imgB);
+
+			for( int y = borderY; y < imgA.height-borderY; y++ ) {
+				for( int x = borderX; x < imgA.width-borderX; x++ ) {
+					double valA = a.get(x,y).doubleValue();
+					double valB = b.get(x,y).doubleValue();
+
+					double error = Math.abs(valA - valB);
+					if( relative ) {
+						double denominator = Math.abs(valA) + Math.abs(valB);
+						if( denominator == 0 )
+							denominator = 1;
+						error /= denominator;
+					}
+					if( error > tol )
+						throw new RuntimeException("Values not equal at ("+x+","+y+") "+valA+"  "+valB);
+				}
 			}
-		} else if (ImageInteger.class.isAssignableFrom(imgB.getClass())) {
-			assertEquals((ImageInteger) imgB, (ImageFloat32) imgA, ignoreBorder);
+		} else if( imgA instanceof MultiSpectral ){
+			MultiSpectral a = (MultiSpectral)imgA;
+			MultiSpectral b = (MultiSpectral)imgB;
+
+			if( a.getNumBands() != b.getNumBands() )
+				throw new RuntimeException("Number of bands not equal");
+
+			for( int band = 0; band < a.getNumBands(); band++ ) {
+				assertEqualsInner(a.getBand(band),b.getBand(band),tol,borderX,borderY,relative );
+			}
 		} else {
-			assertEquals((ImageFloat32) imgA, (ImageFloat32) imgB, ignoreBorder, (float) tolFloat);
+			throw new RuntimeException("Unknown image type");
 		}
 	}
 
-	/**
-	 * Checks to see if two images are equivalent.  Note that this is not the same
-	 * as identical since they can be sub-images.
-	 *
-	 * @param imgA         An image.
-	 * @param imgB         An image.
-	 * @param ignoreBorder
-	 */
-	public static void assertEquals(ImageInteger imgA, ImageInteger imgB, int ignoreBorder) {
-		if (imgA.getWidth() != imgB.getWidth())
-			throw new RuntimeException("Widths are not equals");
+	public static void assertEqualsRelative(ImageBase imgA, ImageBase imgB, double tolFrac ) {
 
-		if (imgA.getHeight() != imgB.getHeight())
-			throw new RuntimeException("Heights are not equals");
+		// if no specialized check exists, use a slower generalized approach
+		if( imgA instanceof ImageSingleBand ) {
+			GImageSingleBand a = FactoryGImageSingleBand.wrap((ImageSingleBand)imgA);
+			GImageSingleBand b = FactoryGImageSingleBand.wrap((ImageSingleBand)imgB);
 
-		for (int y = ignoreBorder; y < imgA.getHeight() - ignoreBorder; y++) {
-			for (int x = ignoreBorder; x < imgA.getWidth() - ignoreBorder; x++) {
-				if (imgA.get(x, y) != imgB.get(x, y))
-					throw new RuntimeException("values not equal at (" + x + " " + y + ") vals " + imgA.get(x, y) + " " + imgB.get(x, y) + " Subimages = " + imgA.isSubimage() + " " + imgB.isSubimage());
+			for( int y = 0; y < imgA.height; y++ ) {
+				for( int x = 0; x < imgA.width; x++ ) {
+					double valA = a.get(x,y).doubleValue();
+					double valB = b.get(x,y).doubleValue();
+
+					double difference = valA - valB;
+					double max = Math.max( Math.abs(valA), Math.abs(valB));
+					if( max == 0 )
+						max = 1;
+					if( Math.abs(difference)/max > tolFrac )
+						throw new RuntimeException("Values not equal at ("+x+","+y+") "+valA+"  "+valB);
+				}
 			}
-		}
-	}
+		} else if( imgA instanceof MultiSpectral ){
+			MultiSpectral a = (MultiSpectral)imgA;
+			MultiSpectral b = (MultiSpectral)imgB;
 
-	public static void assertEquals(ImageInteger imgA, ImageFloat32 imgB, int ignoreBorder) {
-		if (imgA.getWidth() != imgB.getWidth())
-			throw new RuntimeException("Widths are not equals");
+			if( a.getNumBands() != b.getNumBands() )
+				throw new RuntimeException("Number of bands not equal");
 
-		if (imgA.getHeight() != imgB.getHeight())
-			throw new RuntimeException("Heights are not equals");
-
-		for (int y = ignoreBorder; y < imgA.getHeight() - ignoreBorder; y++) {
-			for (int x = ignoreBorder; x < imgA.getWidth() - ignoreBorder; x++) {
-				if (imgA.get(x, y) != (int) imgB.get(x, y))
-					throw new RuntimeException("values not equal at (" + x + " " + y + ") vals " + imgA.get(x, y) + " " + (int) imgB.get(x, y));
+			for( int band = 0; band < a.getNumBands(); band++ ) {
+				assertEqualsRelative(a.getBand(band),b.getBand(band),tolFrac );
 			}
-		}
-	}
-
-	public static void assertEquals(ImageInteger imgA, ImageFloat64 imgB, int ignoreBorder) {
-		if (imgA.getWidth() != imgB.getWidth())
-			throw new RuntimeException("Widths are not equals");
-
-		if (imgA.getHeight() != imgB.getHeight())
-			throw new RuntimeException("Heights are not equals");
-
-		for (int y = ignoreBorder; y < imgA.getHeight() - ignoreBorder; y++) {
-			for (int x = ignoreBorder; x < imgA.getWidth() - ignoreBorder; x++) {
-				if (imgA.get(x, y) != (int) imgB.get(x, y))
-					throw new RuntimeException("values not equal at (" + x + " " + y + ") vals " + imgA.get(x, y) + " " + (int) imgB.get(x, y));
-			}
-		}
-	}
-
-	public static void assertEquals(ImageSInt64 imgA, ImageSInt64 imgB, int ignoreBorder) {
-		if (imgA.getWidth() != imgB.getWidth())
-			throw new RuntimeException("Widths are not equals");
-
-		if (imgA.getHeight() != imgB.getHeight())
-			throw new RuntimeException("Heights are not equals");
-
-		for (int y = ignoreBorder; y < imgA.getHeight() - ignoreBorder; y++) {
-			for (int x = ignoreBorder; x < imgA.getWidth() - ignoreBorder; x++) {
-				if (imgA.get(x, y) != imgB.get(x, y))
-					throw new RuntimeException("values not equal at (" + x + " " + y + ") vals " + imgA.get(x, y) + " " + imgB.get(x, y) + " Subimages = " + imgA.isSubimage() + " " + imgB.isSubimage());
-			}
-		}
-	}
-
-	/**
-	 * Checks to see if thw two images are equivalent.  Note that this is not the same
-	 * as identical since they can be sub-images.
-	 *
-	 * @param imgA An image.
-	 * @param imgB An image.
-	 */
-	public static void assertEquals(ImageFloat32 imgA, ImageFloat32 imgB) {
-		if (imgA.getWidth() != imgB.getWidth())
-			throw new RuntimeException("Widths are not equals");
-
-		if (imgA.getHeight() != imgB.getHeight())
-			throw new RuntimeException("Heights are not equals");
-
-		for (int y = 0; y < imgA.getHeight(); y++) {
-			for (int x = 0; x < imgA.getWidth(); x++) {
-				if (imgA.get(x, y) != imgB.get(x, y))
-					throw new RuntimeException("values not equal at (" + x + " " + y + ") " + imgA.get(x, y) + "  " + imgB.get(x, y));
-			}
-		}
-	}
-
-	public static void assertEquals(ImageFloat64 imgA, ImageFloat64 imgB) {
-		if (imgA.getWidth() != imgB.getWidth())
-			throw new RuntimeException("Widths are not equals");
-
-		if (imgA.getHeight() != imgB.getHeight())
-			throw new RuntimeException("Heights are not equals");
-
-		for (int y = 0; y < imgA.getHeight(); y++) {
-			for (int x = 0; x < imgA.getWidth(); x++) {
-				if (imgA.get(x, y) != imgB.get(x, y))
-					throw new RuntimeException("values not equal at (" + x + " " + y + ") " + imgA.get(x, y) + "  " + imgB.get(x, y));
-			}
-		}
-	}
-
-	public static void assertEquals(ImageInteger imgA, ImageFloat imgB, int tol) {
-		if (imgA.getWidth() != imgB.getWidth())
-			throw new RuntimeException("Widths are not equals");
-
-		if (imgA.getHeight() != imgB.getHeight())
-			throw new RuntimeException("Heights are not equals");
-
-		GImageSingleBand a = FactoryGImageSingleBand.wrap(imgA);
-		GImageSingleBand b = FactoryGImageSingleBand.wrap(imgB);
-
-		for (int y = 0; y < imgA.getHeight(); y++) {
-			for (int x = 0; x < imgA.getWidth(); x++) {
-				if (Math.abs(a.get(x, y).intValue() - b.get(x, y).intValue()) > tol)
-					throw new RuntimeException("values not equal at (" + x + " " + y + ") " + a.get(x, y) + "  " + b.get(x, y));
-			}
-		}
-	}
-
-	public static void assertEquals(ImageFloat imgA, ImageFloat imgB, int ignoreBorder, double tol) {
-		if (imgA.getWidth() != imgB.getWidth())
-			throw new RuntimeException("Widths are not equals");
-
-		if (imgA.getHeight() != imgB.getHeight())
-			throw new RuntimeException("Heights are not equals");
-
-		GImageSingleBand a = FactoryGImageSingleBand.wrap(imgA);
-		GImageSingleBand b = FactoryGImageSingleBand.wrap(imgB);
-
-		for (int y = ignoreBorder; y < imgA.getHeight() - ignoreBorder; y++) {
-			for (int x = ignoreBorder; x < imgA.getWidth() - ignoreBorder; x++) {
-				compareValues(tol, a, b, x, y);
-			}
-		}
-	}
-
-	public static void assertEquals(ImageInterleavedInt8 imgA, ImageInterleavedInt8 imgB) {
-		if (imgA.getWidth() != imgB.getWidth())
-			throw new RuntimeException("Widths are not equals");
-
-		if (imgA.getHeight() != imgB.getHeight())
-			throw new RuntimeException("Heights are not equals");
-
-		if (imgA.numBands != imgB.numBands)
-			throw new RuntimeException("Number of bands are not equal");
-
-		for (int y = 0; y < imgA.getHeight(); y++) {
-			for (int x = 0; x < imgA.getWidth(); x++) {
-				for (int k = 0; k < imgA.numBands; k++)
-					if (imgA.getBand(x, y, k) != imgB.getBand(x, y, k))
-						throw new RuntimeException("value not equal");
-			}
+		} else {
+			throw new RuntimeException("Unknown image type");
 		}
 	}
 
@@ -734,8 +654,8 @@ public class BoofTesting {
 				// handle a special case where the RGB conversion is screwed
 				for (int i = 0; i < imgA.getHeight(); i++) {
 					for (int j = 0; j < imgA.getWidth(); j++) {
-						byte valB = imgB.getBand(j, i, 0);
-						byte valA = raster.getDataStorage()[i * imgA.getWidth() + j];
+						int valB = imgB.getBand(j, i, 0);
+						int valA = raster.getDataStorage()[i * imgA.getWidth() + j];
 
 						if (valA != valB)
 							throw new RuntimeException("Images are not equal");

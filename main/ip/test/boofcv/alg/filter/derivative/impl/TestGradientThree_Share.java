@@ -47,6 +47,6 @@ public class TestGradientThree_Share {
 		GradientThree_Standard.process(img, derivX2,new ImageFloat32(width,height));
 		GradientThree_Share.derivX_F32(img, derivX);
 
-		BoofTesting.assertEquals(derivX2, derivX, 1, 1e-4f);
+		BoofTesting.assertEqualsInner(derivX2, derivX, 1e-4f, 1, 1, true);
 	}
 }

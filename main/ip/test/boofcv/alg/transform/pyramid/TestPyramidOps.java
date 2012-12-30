@@ -73,7 +73,7 @@ public class TestPyramidOps {
 			ImageFloat32 expected = new ImageFloat32(input.width,input.height);
 
 			filter.process(input,expected);
-			BoofTesting.assertEquals(expected,out.getLayer(i),0,1e-4);
+			BoofTesting.assertEquals(expected,out.getLayer(i),1e-4);
 		}
 	}
 
@@ -96,8 +96,8 @@ public class TestPyramidOps {
 			ImageFloat32 y = new ImageFloat32(input.width,input.height);
 
 			gradient.process(input,x,y);
-			BoofTesting.assertEquals(x,outX.getLayer(i),0,1e-4);
-			BoofTesting.assertEquals(y,outY.getLayer(i),0,1e-4);
+			BoofTesting.assertEquals(x,outX.getLayer(i),1e-4);
+			BoofTesting.assertEquals(y,outY.getLayer(i),1e-4);
 		}
 	}
 }

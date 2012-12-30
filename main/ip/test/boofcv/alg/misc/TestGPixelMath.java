@@ -145,6 +145,6 @@ public class TestGPixelMath extends BaseGClassChecksInMisc {
 		// if it is full of zeros something went wrong
 		assertTrue(GImageStatistics.maxAbs(t) != 0);
 
-		BoofTesting.assertEqualsGeneric(t,v,0,0);
+		BoofTesting.assertEquals(t, v, 0);
 	}
 }

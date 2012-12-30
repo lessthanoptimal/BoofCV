@@ -92,7 +92,7 @@ public class TestPyramidUpdateIntegerDown extends GenericPyramidUpdateTests<Imag
 		alg.update(input,pyramid);
 
 		// top layer should be the same as the input layer
-		BoofTesting.assertEquals(input, pyramid.getLayer(0), 1, 1e-4f);
+		BoofTesting.assertEquals(input, pyramid.getLayer(0), 1e-4f);
 
 		// second layer should have the same values as the convolved image
 		for (int i = 0; i < height; i += 2) {

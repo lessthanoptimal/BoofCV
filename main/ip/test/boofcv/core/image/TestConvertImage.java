@@ -19,8 +19,10 @@
 package boofcv.core.image;
 
 import boofcv.alg.misc.GImageMiscOps;
+import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageInteger;
 import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.MultiSpectral;
 import boofcv.testing.BoofTesting;
 import org.junit.Test;
 
@@ -28,8 +30,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Random;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * @author Peter Abeles
@@ -46,22 +47,28 @@ public class TestConvertImage {
 		Method methods[] = ConvertImage.class.getMethods();
 
 		for (Method m : methods) {
-			if( !m.getName().contains("convert"))
+
+			Class[] inputTypes = m.getParameterTypes();
+			if( inputTypes.length != 2 || !ImageBase.class.isAssignableFrom(inputTypes[1]))
 				continue;
 
-			Class<?> inputType = m.getParameterTypes()[0];
-			Class<?> outputType = m.getParameterTypes()[1];
+			Class<?> inputType = inputTypes[0];
+			Class<?> outputType = inputTypes[1];
 
 //			System.out.println(m.getName()+" "+inputType.getSimpleName()+" "+outputType.getSimpleName()+" "+m.getReturnType());
 			
 			// make sure the return type equals the output type
-			assertTrue( outputType == m.getReturnType() );
+			assertTrue(outputType == m.getReturnType());
 
-			checkConvert(m,inputType,outputType);
+			if( m.getName().contains("convert") ) {
+				checkConvert(m,inputType,outputType);
+			} else {
+				checkAverage(m,inputType,outputType);
+			}
 			count++;
 		}
 
-		assertEquals(42,count);
+		assertEquals(8*7+8,count);
 	}
 
 	private void checkConvert( Method m , Class inputType , Class outputType ) {
@@ -72,9 +79,9 @@ public class TestConvertImage {
 		boolean outputSigned = true;
 
 		if( ImageInteger.class.isAssignableFrom(inputType) )
-			inputSigned = ((ImageInteger)input).getTypeInfo().isSigned();
+			inputSigned = input.getTypeInfo().isSigned();
 		if( ImageInteger.class.isAssignableFrom(outputType) )
-			outputSigned = ((ImageInteger)output).getTypeInfo().isSigned();
+			outputSigned = output.getTypeInfo().isSigned();
 
 	   // only provide signed numbers of both data types can handle them
 		if( inputSigned && outputSigned ) {
@@ -88,18 +95,87 @@ public class TestConvertImage {
 
 	public void checkConvert( Method m , ImageSingleBand<?> input , ImageSingleBand<?> output ) {
 		try {
+			double tol = selectTolerance(input,output);
+
 			// check it with a non-null output
 			ImageSingleBand<?> ret = (ImageSingleBand<?>)m.invoke(null,input,output);
-			BoofTesting.assertEqualsGeneric(input,ret,0,1e-4);
+			assertTrue(ret == output);
+			BoofTesting.assertEquals(input, ret, tol);
 
 			// check it with a null output
 			ret = (ImageSingleBand<?>)m.invoke(null,input,null);
-			BoofTesting.assertEqualsGeneric(input,ret,0,1e-4);
+			BoofTesting.assertEquals(input, ret, tol);
 
 		} catch (IllegalAccessException e) {
 			throw new RuntimeException(e);
 		} catch (InvocationTargetException e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	private void checkAverage( Method m , Class inputType , Class outputType ) {
+		if( inputType != MultiSpectral.class )
+			fail("Expected MultiSpectral image");
+
+		ImageSingleBand output = GeneralizedImageOps.createSingleBand(outputType, imgWidth, imgHeight);
+
+		boolean signed = true;
+
+		if( ImageInteger.class.isAssignableFrom(outputType) )
+			signed = output.getTypeInfo().isSigned();
+
+		for( int numBands = 1; numBands <= 3; numBands++ ) {
+			MultiSpectral input = new MultiSpectral(outputType,imgWidth,imgHeight,numBands);
+
+			// only provide signed numbers of both data types can handle them
+			if( signed ) {
+				GImageMiscOps.fillUniform(input, rand, -10, 10);
+			} else {
+				GImageMiscOps.fillUniform(input, rand, 0, 20);
+			}
+
+			BoofTesting.checkSubImage(this,"checkAverage",true,m,input,output);
+		}
+	}
+
+	public void checkAverage( Method m , MultiSpectral<?> input , ImageSingleBand<?> output ) {
+		try {
+			// check it with a non-null output
+			ImageSingleBand<?> ret = (ImageSingleBand<?>)m.invoke(null,input,output);
+			assertTrue(ret == output);
+			checkAverage(input, ret);
+
+			// check it with a null output
+			ret = (ImageSingleBand<?>)m.invoke(null,input,null);
+			checkAverage(input, ret);
+
+		} catch (IllegalAccessException e) {
+			throw new RuntimeException(e);
+		} catch (InvocationTargetException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	private void checkAverage(  MultiSpectral<?> input , ImageSingleBand<?> found ) {
+		int numBands = input.getNumBands();
+		for( int y = 0; y < imgHeight; y++ ){
+			for( int x = 0; x < imgWidth; x++ ) {
+				double sum = 0;
+				for( int b = 0; b < numBands; b++ ) {
+					sum += GeneralizedImageOps.get(input.getBand(b),x,y);
+				}
+				assertEquals(sum/numBands,GeneralizedImageOps.get(found, x, y),1);
+			}
+		}
+	}
+
+	/**
+	 * If the two images are both int or float then set a low tolerance, otherwise set the tolerance to one pixel
+	 */
+	private double selectTolerance( ImageSingleBand a , ImageSingleBand b ) {
+		if( a.getTypeInfo().isInteger() == b.getTypeInfo().isInteger() )
+			return 1e-4;
+		else
+			return 1;
 	}
 }

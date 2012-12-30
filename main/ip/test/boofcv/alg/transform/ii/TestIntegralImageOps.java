@@ -130,7 +130,7 @@ public class TestIntegralImageOps {
 
 		m.invoke(null,integral,kernel,found);
 
-		BoofTesting.assertEqualsGeneric(expected,found,0,1e-4f);
+		BoofTesting.assertEqualsRelative(expected, found, 1e-4f);
 	}
 
 

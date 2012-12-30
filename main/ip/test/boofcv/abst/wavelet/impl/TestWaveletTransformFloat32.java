@@ -62,15 +62,15 @@ public class TestWaveletTransformFloat32 {
 		alg.transform(orig,found);
 
 		// make sure the original input was not modified like it is in WaveletTransformOps
-		BoofTesting.assertEquals(origCopy,orig, 0, 1e-4);
+		BoofTesting.assertEquals(origCopy,orig, 1e-4);
 		// see if the two techniques produced the same results
-		BoofTesting.assertEquals(expected,found, 0, 1e-4);
+		BoofTesting.assertEquals(expected,found, 1e-4);
 
 		// test inverse transform
 		ImageFloat32 reconstructed = new ImageFloat32(width,height);
 		alg.invert(found,reconstructed);
-		BoofTesting.assertEquals(orig,reconstructed, 0, 1e-4);
+		BoofTesting.assertEquals(orig,reconstructed, 1e-4);
 		// make sure the input has not been modified
-		BoofTesting.assertEquals(expected,found, 0, 1e-4);
+		BoofTesting.assertEquals(expected,found, 1e-4);
 	}
 }

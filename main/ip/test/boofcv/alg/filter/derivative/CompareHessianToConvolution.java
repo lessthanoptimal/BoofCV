@@ -145,7 +145,7 @@ public class CompareHessianToConvolution {
 		// compare the results
 		for( int i = 0; i < expectedOutput.length; i++ ) {
 			int border = processBorder ? 0 : borderSize;
-			BoofTesting.assertEqualsGeneric(expectedOutput[i],images[i+2],0,1e-4f,border);
+			BoofTesting.assertEqualsInner(expectedOutput[i], images[i + 2], 1e-4f, border, border, true);
 
 			if( !processBorder )
 				BoofTesting.checkBorderZero(images[i+2],border);

@@ -45,7 +45,7 @@ public abstract class StandardImageInterleavedTests {
 	/**
 	 * Sets each element in the image to a random value.
 	 */
-	public void setRandom(ImageSingleBand img) {
+	public void setRandom(ImageInterleaved img) {
 		Object data = img._getData();
 
 		int N = Array.getLength(data);
@@ -138,7 +138,7 @@ public abstract class StandardImageInterleavedTests {
 		checkException(img, method, type, typeData, 0, 0, img.getNumBands());
 	}
 
-	private void checkException(ImageSingleBand img, String method,
+	private void checkException(ImageInterleaved img, String method,
 								int type, Object typeData, int... where) {
 		boolean found = false;
 		try {
@@ -150,7 +150,7 @@ public abstract class StandardImageInterleavedTests {
 		assertTrue("No exception was thrown", found);
 	}
 
-	private Object call(ImageSingleBand img, String method,
+	private Object call(ImageInterleaved img, String method,
 						int type, Object typeData, int... where) {
 		try {
 			Class<?>[] paramTypes = type == 0 ?
@@ -164,10 +164,10 @@ public abstract class StandardImageInterleavedTests {
 				args[index] = where[index];
 			}
 			if (type == 1) {
-				paramTypes[index] = img.getTypeInfo().getDataType();
+				paramTypes[index] = img.getDataType();
 				args[index] = typeData;
 			} else if (type == 2) {
-				String name = "[" + img.getTypeInfo().getDataType().getName().toUpperCase().charAt(0);
+				String name = "[" + img.getDataType().getName().toUpperCase().charAt(0);
 				paramTypes[index] = Class.forName(name);
 				args[index] = typeData;
 			}
@@ -190,7 +190,7 @@ public abstract class StandardImageInterleavedTests {
 	private Object createPixelArray(ImageInterleaved img) {
 		int numBands = img.getNumBands();
 
-		Object ret = Array.newInstance(img.getTypeInfo().getDataType(), numBands);
+		Object ret = Array.newInstance(img.getDataType(), numBands);
 
 		for (int i = 0; i < numBands; i++)
 			Array.set(ret, i, randomNumber());

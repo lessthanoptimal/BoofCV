@@ -43,11 +43,6 @@ public class ImageInterleavedInt8 extends ImageInterleaved<ImageInterleavedInt8>
 	public ImageInterleavedInt8() {
 	}
 
-	@Override
-	public ImageTypeInfo<ImageInterleavedInt8> getTypeInfo() {
-		return ImageTypeInfo.INTER_U8;
-	}
-
 	/**
 	 * Returns the pixel's value for all the bands as an array.
 	 *
@@ -97,7 +92,7 @@ public class ImageInterleavedInt8 extends ImageInterleaved<ImageInterleavedInt8>
 	 * @param band which color band in the pixel
 	 * @return an intensity value.
 	 */
-	public byte getBand(int x, int y, int band) {
+	public int getBand(int x, int y, int band) {
 		if (!isInBounds(x, y))
 			throw new ImageAccessException("Requested pixel is out of bounds.");
 		if (band < 0 || band >= numBands)
@@ -136,6 +131,11 @@ public class ImageInterleavedInt8 extends ImageInterleaved<ImageInterleavedInt8>
 	@Override
 	protected Object _getData() {
 		return data;
+	}
+
+	@Override
+	protected Class getDataType() {
+		return byte.class;
 	}
 
 	@Override

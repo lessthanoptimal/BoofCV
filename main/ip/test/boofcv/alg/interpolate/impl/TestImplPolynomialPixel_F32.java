@@ -72,7 +72,7 @@ public class TestImplPolynomialPixel_F32 extends GeneralInterpolationPixelChecks
 		distorter.setModel(new PixelTransformAffine_F32(tran));
         distorter.apply(img, expected);
 
-		BoofTesting.assertEquals(expected, found, 0, 1e-4f);
+		BoofTesting.assertEquals(expected, found, 1e-4f);
     }
 
 	@Override

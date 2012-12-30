@@ -87,7 +87,7 @@ public abstract class CompareIdenticalFunctions extends CompareEquivalentFunctio
 			ImageSingleBand t = (ImageSingleBand)targetParam[i];
 			ImageSingleBand v = (ImageSingleBand)validationParam[i];
 
-			BoofTesting.assertEqualsGeneric(v,t,1,1e-4);// todo is this tolerance too big?  some operations with a slightly different ordering seem to require it
+			BoofTesting.assertEqualsRelative(v, t, 1e-4);// todo is this tolerance too big?  some operations with a slightly different ordering seem to require it
 		}
 	}
 }

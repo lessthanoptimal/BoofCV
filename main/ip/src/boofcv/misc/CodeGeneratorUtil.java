@@ -24,7 +24,7 @@ package boofcv.misc;
 public class CodeGeneratorUtil {
 
 	public static String copyright = "/*\n" +
-			" * Copyright (c) 2011-2012, Peter Abeles. All Rights Reserved.\n" +
+			" * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.\n" +
 			" *\n" +
 			" * This file is part of BoofCV (http://boofcv.org).\n" +
 			" *\n" +

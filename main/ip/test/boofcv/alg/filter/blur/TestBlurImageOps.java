@@ -87,7 +87,7 @@ public class TestBlurImageOps {
 
 			BlurImageOps.mean(input,found, radius, null);
 
-			BoofTesting.assertEquals(expected,found,0,1e-4);
+			BoofTesting.assertEquals(expected,found,1e-4);
 		}
 	}
 
@@ -120,7 +120,7 @@ public class TestBlurImageOps {
 			ImplMedianSortNaive.process(input,expected,radius,null);
 			BlurImageOps.median(input,found,radius);
 
-			BoofTesting.assertEquals(expected,found,0,1e-4);
+			BoofTesting.assertEquals(expected,found,1e-4);
 		}
 	}
 
@@ -172,7 +172,7 @@ public class TestBlurImageOps {
 
 			BlurImageOps.gaussian(input,found,sigma,radius,null);
 
-			BoofTesting.assertEquals(expected,found,0,1e-4);
+			BoofTesting.assertEquals(expected,found,1e-4);
 		}
 	}
 }

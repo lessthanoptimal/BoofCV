@@ -104,6 +104,6 @@ public class StandardGradientChecks {
 		}
 
 //		BoofTesting.printDiff(derivXY,derivYX);
-		BoofTesting.assertEqualsGeneric(derivXY,derivYX,0,1e-3f);
+		BoofTesting.assertEquals(derivXY, derivYX, 1e-3f);
 	}
 }

@@ -63,14 +63,14 @@ public class TestPyramidUpdateSubsampleScale extends GenericPyramidUpdateTests<I
 		DistortImageOps.scale(input, expected, TypeInterpolate.BILINEAR);
 		ImageFloat32 found = pyramid.getLayer(0);
 
-		BoofTesting.assertEquals(expected,found);
+		BoofTesting.assertEquals(expected,found,1e-4);
 
 		// test the second layer
 		ImageFloat32 next = new ImageFloat32((int)Math.ceil(width/5.0),(int)Math.ceil(height/5.0));
 		DistortImageOps.scale(expected, next, TypeInterpolate.BILINEAR);
 		found = pyramid.getLayer(1);
 
-		BoofTesting.assertEquals(next,found,0,1e-4);
+		BoofTesting.assertEquals(next,found,1e-4);
 	}
 
 	@Override

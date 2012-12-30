@@ -73,6 +73,6 @@ public class TestFilterSequence {
 		ConvolveImageNoBorder.horizontal(ker2,tmp1,tmp2,false);
 		ConvolveImageNoBorder.horizontal(ker3,tmp2,expected,false);
 
-		BoofTesting.assertEquals(expected,found,0,1e-4f);
+		BoofTesting.assertEquals(expected,found,1e-4f);
 	}
 }

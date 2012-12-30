@@ -64,7 +64,7 @@ public class TestNoCacheScaleSpace {
 		alg.setActiveScale(0);
 		ImageFloat32 found = alg.getScaledImage();
 
-		BoofTesting.assertEquals(expected,found,0,1e-4);
+		BoofTesting.assertEquals(expected,found, 1e-4);
 	}
 
 	@Test
@@ -96,12 +96,12 @@ public class TestNoCacheScaleSpace {
 
 
 		// do one out of order which will force it to meet all the dependencies
-		BoofTesting.assertEquals(derivYYY,alg.getDerivative(false,false,false),0,1e-4);
-		BoofTesting.assertEquals(derivX,alg.getDerivative(true),0,1e-4);
-		BoofTesting.assertEquals(derivY,alg.getDerivative(false),0,1e-4);
-		BoofTesting.assertEquals(derivXX,alg.getDerivative(true,true),0,1e-4);
-		BoofTesting.assertEquals(derivXY,alg.getDerivative(true,false),0,1e-4);
-		BoofTesting.assertEquals(derivYY,alg.getDerivative(false,false),0,1e-4);
-		BoofTesting.assertEquals(derivYYX,alg.getDerivative(false,false,true),0,1e-4);
+		BoofTesting.assertEquals(derivYYY,alg.getDerivative(false,false,false), 1e-4);
+		BoofTesting.assertEquals(derivX,alg.getDerivative(true), 1e-4);
+		BoofTesting.assertEquals(derivY,alg.getDerivative(false), 1e-4);
+		BoofTesting.assertEquals(derivXX,alg.getDerivative(true,true), 1e-4);
+		BoofTesting.assertEquals(derivXY,alg.getDerivative(true,false), 1e-4);
+		BoofTesting.assertEquals(derivYY,alg.getDerivative(false,false), 1e-4);
+		BoofTesting.assertEquals(derivYYX,alg.getDerivative(false,false,true), 1e-4);
 	}
 }

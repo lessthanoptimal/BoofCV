@@ -65,7 +65,7 @@ public class TestFactoryConvolveDown {
 		conv = FactoryConvolveDown.convolve( kernel,ImageFloat32.class,ImageFloat32.class,BorderType.SKIP,true,skip);
 		conv.process(input,found);
 		ConvolveDownNoBorder.horizontal(kernel,input,expected,skip);
-		BoofTesting.assertEquals(expected,found,0,1e-4f);
+		BoofTesting.assertEquals(expected,found,1e-4f);
 
 		// CHECK EXTENDED
 //		conv = FactoryConvolveDown.convolve( kernel,ImageFloat32.class,ImageFloat32.class,BorderType.EXTENDED,true);
@@ -77,7 +77,7 @@ public class TestFactoryConvolveDown {
 		conv = FactoryConvolveDown.convolve( kernel,ImageFloat32.class,ImageFloat32.class,BorderType.NORMALIZED,true,skip);
 		conv.process(input,found);
 		ConvolveDownNormalized.horizontal(kernel,input,expected,skip);
-		BoofTesting.assertEquals(expected,found,0,1e-4f);
+		BoofTesting.assertEquals(expected,found,1e-4f);
 	}
 
 	@Test
@@ -130,7 +130,7 @@ public class TestFactoryConvolveDown {
 		conv = FactoryConvolveDown.convolve( kernel,ImageFloat32.class,ImageFloat32.class,BorderType.SKIP,skip);
 		conv.process(input,found);
 		ConvolveDownNoBorder.convolve(kernel,input,expected,skip);
-		BoofTesting.assertEquals(expected,found,0,1e-4f);
+		BoofTesting.assertEquals(expected,found,1e-4f);
 
 		// CHECK EXTENDED
 //		conv = FactoryConvolveDown.convolve( kernel,ImageFloat32.class,ImageFloat32.class,BorderType.EXTENDED);
@@ -142,7 +142,7 @@ public class TestFactoryConvolveDown {
 		conv = FactoryConvolveDown.convolve( kernel,ImageFloat32.class,ImageFloat32.class, BorderType.NORMALIZED,skip);
 		conv.process(input,found);
 		ConvolveDownNormalized.convolve(kernel,input,expected,skip);
-		BoofTesting.assertEquals(expected,found,0,1e-4f);
+		BoofTesting.assertEquals(expected,found,1e-4f);
 	}
 
 	@Test

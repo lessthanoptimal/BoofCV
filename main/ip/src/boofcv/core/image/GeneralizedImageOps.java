@@ -128,8 +128,6 @@ public class GeneralizedImageOps {
 			return (T)new ImageFloat32(width, height);
 		} else if (type == ImageFloat64.class) {
 			return (T)new ImageFloat64(width, height);
-		} else if (type == ImageInterleavedInt8.class) {
-			return (T)new ImageInterleavedInt8(width, height, 1);
 		} else if( type == ImageInteger.class ) {
 			// ImageInteger is a generic type, so just create something
 			return (T)new ImageSInt32(width,height);

@@ -62,7 +62,7 @@ public class TestDerivativeIntegralImage {
 			ConvolveWithBorder.convolve(kernel,orig,expected,border);
 			IntegralImageOps.convolve(integral,kernelI,found);
 
-			BoofTesting.assertEquals(expected,found,0,1e-2);
+			BoofTesting.assertEquals(expected,found,1e-2);
 		}
 	}
 
@@ -88,7 +88,7 @@ public class TestDerivativeIntegralImage {
 			ConvolveWithBorder.convolve(kernel,orig,expected,border);
 			IntegralImageOps.convolve(integral,kernelI,found);
 
-			BoofTesting.assertEquals(expected,found,0,1e-2);
+			BoofTesting.assertEquals(expected,found,1e-2);
 		}
 	}
 
@@ -113,7 +113,7 @@ public class TestDerivativeIntegralImage {
 			ConvolveWithBorder.convolve(kernel,orig,expected,border);
 			IntegralImageOps.convolve(integral,kernelI,found);
 
-			BoofTesting.assertEquals(expected,found,0,1e-2);
+			BoofTesting.assertEquals(expected,found,1e-2);
 		}
 	}
 
@@ -140,7 +140,7 @@ public class TestDerivativeIntegralImage {
 			ConvolveWithBorder.convolve(kernel,orig,expected,border);
 			IntegralImageOps.convolve(integral,kernelI,found);
 
-			BoofTesting.assertEquals(expected,found,0,1e-2);
+			BoofTesting.assertEquals(expected,found,1e-2);
 		}
 	}
 
@@ -166,7 +166,7 @@ public class TestDerivativeIntegralImage {
 			ConvolveWithBorder.convolve(kernel,orig,expected,border);
 			IntegralImageOps.convolve(integral,kernelI,found);
 
-			BoofTesting.assertEquals(expected,found,0,1e-2);
+			BoofTesting.assertEquals(expected,found,1e-2);
 		}
 	}
 
@@ -192,7 +192,7 @@ public class TestDerivativeIntegralImage {
 			ImageFloat32 a = expected.subimage(r+1,r+1,expected.width-r,expected.height-r);
 			ImageFloat32 b = found.subimage(r+1,r+1,found.width-r,found.height-r);
 
-			BoofTesting.assertEquals(a,b,0,1e-2);
+			BoofTesting.assertEquals(a,b,1e-2);
 		}
 	}
 
@@ -219,7 +219,7 @@ public class TestDerivativeIntegralImage {
 			ConvolveWithBorder.convolve(kernel,orig,expected,border);
 			IntegralImageOps.convolve(integral,kernelI,found);
 
-			BoofTesting.assertEquals(expected,found,0,1e-2);
+			BoofTesting.assertEquals(expected,found,1e-2);
 		}
 	}
 
@@ -247,7 +247,7 @@ public class TestDerivativeIntegralImage {
 			ImageFloat32 a = expected.subimage(r+1,r+1,expected.width-r,expected.height-r);
 			ImageFloat32 b = found.subimage(r+1,r+1,found.width-r,found.height-r);
 
-			BoofTesting.assertEquals(a,b,0,1e-2);
+			BoofTesting.assertEquals(a,b,1e-2);
 		}
 	}
 
@@ -273,7 +273,7 @@ public class TestDerivativeIntegralImage {
 			ConvolveWithBorder.convolve(kernel,orig,expected,border);
 			IntegralImageOps.convolve(integral,kernelI,found);
 
-			BoofTesting.assertEquals(expected,found,0,1e-2);
+			BoofTesting.assertEquals(expected,found,1e-2);
 		}
 	}
 
@@ -300,7 +300,7 @@ public class TestDerivativeIntegralImage {
 			ImageFloat32 a = expected.subimage(r+1,r+1,expected.width-r,expected.height-r);
 			ImageFloat32 b = found.subimage(r+1,r+1,found.width-r,found.height-r);
 
-			BoofTesting.assertEquals(a,b,0,1e-2);
+			BoofTesting.assertEquals(a,b,1e-2);
 		}
 	}
 

@@ -64,7 +64,7 @@ public class TestImplWaveletTransformBorder extends CompareToNaiveWavelet {
 			@Override
 			public void compareResults(WaveletDescription<?> desc, ImageSingleBand input,
 									   ImageSingleBand expected, ImageSingleBand found ) {
-				BoofTesting.assertEqualsGeneric(expected,found,0,1e-4f);
+				BoofTesting.assertEquals(expected, found, 1e-4f);
 			}
 		};
 
@@ -76,7 +76,7 @@ public class TestImplWaveletTransformBorder extends CompareToNaiveWavelet {
 			@Override
 			public void compareResults(WaveletDescription<?> desc, ImageSingleBand input,
 									   ImageSingleBand expected, ImageSingleBand found ) {
-				BoofTesting.assertEqualsGeneric(expected,found,0,1e-4f);
+				BoofTesting.assertEquals(expected, found, 1e-4f);
 			}
 		};
 
@@ -90,7 +90,7 @@ public class TestImplWaveletTransformBorder extends CompareToNaiveWavelet {
 									   ImageSingleBand expected, ImageSingleBand found ) {
 //				System.out.println();
 //				BoofTesting.printDiff(expected,found);
-				BoofTesting.assertEqualsGeneric(expected,found,0,1e-4f);
+				BoofTesting.assertEquals(expected, found, 1e-4f);
 			}
 		};
 
@@ -102,7 +102,7 @@ public class TestImplWaveletTransformBorder extends CompareToNaiveWavelet {
 			@Override
 			public void compareResults(WaveletDescription<?> desc, ImageSingleBand input,
 									   ImageSingleBand expected, ImageSingleBand found ) {
-				BoofTesting.assertEqualsGeneric(expected,found,0,1e-4f);
+				BoofTesting.assertEquals(expected, found, 1e-4f);
 			}
 		};
 

@@ -69,12 +69,12 @@ public class CommonFactoryWavelet {
 			ImplWaveletTransformNaive.horizontal(border,waveletDesc.forward,orig,tran);
 			ImplWaveletTransformNaive.horizontalInverse(border,waveletDesc.inverse,tran,rev);
 
-			BoofTesting.assertEquals(orig,rev,0,1e-4f);
+			BoofTesting.assertEquals(orig,rev,1e-4f);
 
 			ImplWaveletTransformNaive.vertical(border,waveletDesc.forward,orig,tran);
 			ImplWaveletTransformNaive.verticalInverse(border,waveletDesc.inverse,tran,rev);
 
-			BoofTesting.assertEquals(orig,rev,0,1e-4f);
+			BoofTesting.assertEquals(orig,rev,1e-4f);
 
 			// quick sanity check to make sure that WaveletTransformOps
 			// also correctly does a transform with these wavelets
@@ -83,7 +83,7 @@ public class CommonFactoryWavelet {
 			WaveletTransformOps.inverse1(waveletDesc,tran,rev,null,0,255);
 
 //			BoofTesting.printDiff(orig,rev);
-			BoofTesting.assertEquals(orig,rev,0,1e-4f);
+			BoofTesting.assertEquals(orig,rev,1e-4f);
 		}
 	}
 

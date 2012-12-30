@@ -20,11 +20,8 @@ package boofcv.core.image.impl;
 
 import boofcv.misc.AutoTypeImage;
 import boofcv.misc.CodeGeneratorBase;
-import boofcv.misc.CodeGeneratorUtil;
 
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.PrintStream;
 
 
 /**
@@ -34,10 +31,8 @@ public class GenerateImplConvertImage extends CodeGeneratorBase {
 
 	String className = "ImplConvertImage";
 
-	PrintStream out;
-
 	public GenerateImplConvertImage() throws FileNotFoundException {
-		out = new PrintStream(new FileOutputStream(className + ".java"));
+		setOutputFile(className);
 	}
 
 	@Override
@@ -53,16 +48,11 @@ public class GenerateImplConvertImage extends CodeGeneratorBase {
 			}
 		}
 
-		out.print("\n" +
-				"}\n");
+		out.print("}\n");
 	}
 
 	private void printPreamble() {
-		out.print(CodeGeneratorUtil.copyright);
-		out.print("package boofcv.core.image.impl;\n" +
-				"\n" +
-				"import boofcv.alg.InputSanityCheck;\n" +
-				"import boofcv.struct.image.*;\n" +
+		out.print("import boofcv.struct.image.*;\n" +
 				"\n" +
 				"/**\n" +
 				" * <p>\n" +
@@ -86,14 +76,14 @@ public class GenerateImplConvertImage extends CodeGeneratorBase {
 
 		boolean sameTypes = imageIn.getDataType().compareTo(imageOut.getDataType()) == 0;
 
-		if( imageIn.isInteger() && imageOut.isInteger() && imageOut.getNumBits() == 32 )
+		if( imageIn.isInteger() && imageOut.isInteger() &&
+				((imageOut.getNumBits() == 32 && imageIn.getNumBits() != 64) ||
+				(imageOut.getNumBits() == 64)) )
 			typeCast = "";
 		else if( sameTypes && imageIn.isSigned() )
 			typeCast = "";
 
 		out.print("\tpublic static void convert( "+imageIn.getImageName()+" from, "+imageOut.getImageName()+" to ) {\n" +
-				"\n" +
-				"\t\tInputSanityCheck.checkSameShape(from, to);\n" +
 				"\n" +
 				"\t\tif (from.isSubimage() || to.isSubimage()) {\n" +
 				"\n" +
