@@ -53,7 +53,7 @@ public class WrapDescribePixelRegion<T extends ImageSingleBand, D extends TupleD
 	}
 
 	@Override
-	public int getLength() {
+	public int getDescriptorLength() {
 		return alg.getDescriptorLength();
 	}
 

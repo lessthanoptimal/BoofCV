@@ -57,8 +57,8 @@ public class DescribeRegionPointConvert<T extends ImageSingleBand,In extends Tup
 	}
 
 	@Override
-	public int getLength() {
-		return original.getLength();
+	public int getDescriptorLength() {
+		return original.getDescriptorLength();
 	}
 
 	@Override

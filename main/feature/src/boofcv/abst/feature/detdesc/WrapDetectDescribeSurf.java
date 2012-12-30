@@ -86,6 +86,11 @@ public class WrapDetectDescribeSurf
 	}
 
 	@Override
+	public int getDescriptorLength() {
+		return describe.getDescriptionLength();
+	}
+
+	@Override
 	public void detect(T input) {
 		if( ii != null ) {
 			ii.reshape(input.width,input.height);
