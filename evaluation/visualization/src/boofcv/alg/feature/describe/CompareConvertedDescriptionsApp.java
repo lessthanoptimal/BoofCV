@@ -119,7 +119,7 @@ public class CompareConvertedDescriptionsApp {
 				(DescribeRegionPoint)FactoryDescribeRegionPoint.surf(true,ImageFloat32.class);
 
 		ConvertTupleDesc<TupleDesc_F64,TupleDesc_S8> converter =
-				FactoryConvertTupleDesc.real_F64_S8(describeA.getLength());
+				FactoryConvertTupleDesc.real_F64_S8(describeA.getDescriptorLength());
 
 		DescribeRegionPoint<ImageFloat32,TupleDesc_S8> describeB =
 				new DescribeRegionPointConvert<ImageFloat32,TupleDesc_F64,TupleDesc_S8>(describeA,converter);

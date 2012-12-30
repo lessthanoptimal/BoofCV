@@ -58,7 +58,7 @@ public class WrapDescribeSurf<T extends ImageSingleBand, II extends ImageSingleB
 	}
 
 	@Override
-	public int getLength() {
+	public int getDescriptorLength() {
 		return surf.getDescriptionLength();
 	}
 

@@ -216,6 +216,11 @@ public class TestCombinedTrackerScalePoint {
 		public Class getDescriptorType() {return null;}
 
 		@Override
+		public int getDescriptorLength() {
+			return 0;
+		}
+
+		@Override
 		public void detect(ImageSingleBand input) {}
 
 		@Override

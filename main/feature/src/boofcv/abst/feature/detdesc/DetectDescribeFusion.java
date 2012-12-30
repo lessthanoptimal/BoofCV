@@ -96,6 +96,11 @@ public class DetectDescribeFusion<T extends ImageSingleBand, D extends TupleDesc
 	}
 
 	@Override
+	public int getDescriptorLength() {
+		return describe.getDescriptorLength();
+	}
+
+	@Override
 	public void detect(T input) {
 		descs.reset();
 		featureScales.reset();

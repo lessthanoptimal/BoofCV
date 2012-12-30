@@ -50,7 +50,7 @@ public interface DescribeRegionPoint<T extends ImageSingleBand, D extends TupleD
 	 *
 	 * @return Number of elements in the description
 	 */
-	public int getLength();
+	public int getDescriptorLength();
 
 	/**
 	 * Checks to see if a description can be extracted at the specified location.  Some descriptors

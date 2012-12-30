@@ -52,4 +52,11 @@ public interface DetectDescribePoint<T extends ImageSingleBand, D extends TupleD
 	 * @return Returns the descriptor type.
 	 */
 	public Class<D> getDescriptorType();
+
+	/**
+	 * Number of elements in the descriptor tuple.
+	 *
+	 * @return Length of descriptor.
+	 */
+	public int getDescriptorLength();
 }
