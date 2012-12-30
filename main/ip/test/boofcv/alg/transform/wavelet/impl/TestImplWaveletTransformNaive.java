@@ -90,12 +90,12 @@ public class TestImplWaveletTransformNaive {
 		// Test horizontal transformation
 		ImplWaveletTransformNaive.horizontal(desc_F32.getBorder(),desc_F32.getForward(),orig,transformed);
 		ImplWaveletTransformNaive.horizontalInverse(desc_F32.getBorder(),desc_F32.getInverse(),transformed,reconstructed);
-		BoofTesting.assertEquals(orig,reconstructed,0,1e-2);
+		BoofTesting.assertEquals(orig,reconstructed,1e-4);
 
 		// Test vertical transformation
 		ImplWaveletTransformNaive.vertical(desc_F32.getBorder(),desc_F32.getForward(),orig,transformed);
 		ImplWaveletTransformNaive.verticalInverse(desc_F32.getBorder(),desc_F32.getInverse(),transformed,reconstructed);
-		BoofTesting.assertEquals(orig,reconstructed,0,1e-2);
+		BoofTesting.assertEquals(orig,reconstructed,1e-4);
 	}
 
 	private void testEncodeDecode_I32( int widthOrig , int heightOrig ,

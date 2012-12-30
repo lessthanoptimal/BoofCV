@@ -16,35 +16,19 @@
  * limitations under the License.
  */
 
-package boofcv.struct.distort;
+package boofcv.abst.feature.associate;
 
-import georegression.struct.point.Point2D_F64;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
  */
-public class TestSequencePointTransform_F64 {
+public class TestScoreAssociateSad_S8 {
 
 	@Test
-	public void simpleTest() {
-
-		PointTransform_F64 a = new PointTransform_F64() {
-			@Override
-			public void compute(double x, double y, Point2D_F64 out) {
-				out.x = x+1;
-				out.y = y+2;
-			}
-		};
-
-		SequencePointTransform_F64 alg = new SequencePointTransform_F64(a,a);
-
-		Point2D_F64 p = new Point2D_F64();
-		alg.compute(3,4,p);
-
-		assertEquals(5,p.x,1e-8);
-		assertEquals(8,p.y,1e-8);
+	public void stuff() {
+		fail("implement");
 	}
 }

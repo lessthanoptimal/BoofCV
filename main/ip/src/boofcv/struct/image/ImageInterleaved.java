@@ -34,7 +34,7 @@ import java.lang.reflect.Array;
  *
  * @author Peter Abeles
  */
-public abstract class ImageInterleaved<T extends ImageInterleaved> extends ImageSingleBand<T> {
+public abstract class ImageInterleaved<T extends ImageInterleaved> extends ImageBase<T> {
 	/**
 	 * How many color bands are contained in each pixel
 	 */
@@ -49,7 +49,7 @@ public abstract class ImageInterleaved<T extends ImageInterleaved> extends Image
 	 * @param numBands Number of bands/colors.
 	 */
 	protected ImageInterleaved(int width, int height, int numBands) {
-		_setData(Array.newInstance(getTypeInfo().getDataType(), width * height * numBands));
+		_setData(Array.newInstance(getDataType(), width * height * numBands));
 		this.startIndex = 0;
 		this.stride = width * numBands;
 		this.numBands = numBands;
@@ -144,4 +144,20 @@ public abstract class ImageInterleaved<T extends ImageInterleaved> extends Image
 	public final void setNumBands(int numBands) {
 		this.numBands = numBands;
 	}
+
+	/**
+	 * Returns the data array the image is stored in.
+	 *
+	 * @return data array;
+	 */
+	protected abstract Object _getData();
+
+	protected abstract Class getDataType();
+
+	/**
+	 * Sets the image's internal data array.
+	 *
+	 * @param data data array
+	 */
+	protected abstract void _setData(Object data);
 }

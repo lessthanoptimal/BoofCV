@@ -104,7 +104,7 @@ public class TestImplWaveletTransformInner extends CompareToNaiveWavelet {
 				// only compare the relevant portion of the images
 				expected = expected.subimage(lowerBorder,0,w+w%2-upperBorder,h);
 				found = found.subimage(lowerBorder,0,w+w%2-upperBorder,h);
-				BoofTesting.assertEqualsGeneric(expected,found,0,1e-4f);
+				BoofTesting.assertEquals(expected, found, 1e-4f);
 			}
 		};
 
@@ -126,7 +126,7 @@ public class TestImplWaveletTransformInner extends CompareToNaiveWavelet {
 				expected = expected.subimage(0,lowerBorder,w,h+h%2-upperBorder);
 				found = found.subimage(0,lowerBorder,w,h+h%2-upperBorder);
 
-				BoofTesting.assertEqualsGeneric(expected,found,0,1e-4f);
+				BoofTesting.assertEquals(expected, found, 1e-4f);
 			}
 		};
 

@@ -18,7 +18,6 @@
 
 package boofcv.core.image.impl;
 
-import boofcv.alg.InputSanityCheck;
 import boofcv.struct.image.*;
 
 /**
@@ -36,8 +35,6 @@ import boofcv.struct.image.*;
 public class ImplConvertImage {
 
 	public static void convert( ImageUInt8 from, ImageInt8 to ) {
-
-		InputSanityCheck.checkSameShape(from, to);
 
 		if (from.isSubimage() || to.isSubimage()) {
 
@@ -58,8 +55,6 @@ public class ImplConvertImage {
 	}
 
 	public static void convert( ImageUInt8 from, ImageInt16 to ) {
-
-		InputSanityCheck.checkSameShape(from, to);
 
 		if (from.isSubimage() || to.isSubimage()) {
 
@@ -83,7 +78,27 @@ public class ImplConvertImage {
 
 	public static void convert( ImageUInt8 from, ImageSInt32 to ) {
 
-		InputSanityCheck.checkSameShape(from, to);
+		if (from.isSubimage() || to.isSubimage()) {
+
+			for (int y = 0; y < from.height; y++) {
+				int indexFrom = from.getIndex(0, y);
+				int indexTo = to.getIndex(0, y);
+
+				for (int x = 0; x < from.width; x++) {
+					to.data[indexTo++] = ( from.data[indexFrom++] & 0xFF);
+				}
+			}
+
+		} else {
+			final int N = from.width * from.height;
+
+			for (int i = 0; i < N; i++) {
+				to.data[i] = ( from.data[i] & 0xFF);
+			}
+		}
+	}
+
+	public static void convert( ImageUInt8 from, ImageSInt64 to ) {
 
 		if (from.isSubimage() || to.isSubimage()) {
 
@@ -107,8 +122,6 @@ public class ImplConvertImage {
 
 	public static void convert( ImageUInt8 from, ImageFloat32 to ) {
 
-		InputSanityCheck.checkSameShape(from, to);
-
 		if (from.isSubimage() || to.isSubimage()) {
 
 			for (int y = 0; y < from.height; y++) {
@@ -130,8 +143,6 @@ public class ImplConvertImage {
 	}
 
 	public static void convert( ImageUInt8 from, ImageFloat64 to ) {
-
-		InputSanityCheck.checkSameShape(from, to);
 
 		if (from.isSubimage() || to.isSubimage()) {
 
@@ -155,8 +166,6 @@ public class ImplConvertImage {
 
 	public static void convert( ImageSInt8 from, ImageInt8 to ) {
 
-		InputSanityCheck.checkSameShape(from, to);
-
 		if (from.isSubimage() || to.isSubimage()) {
 
 			for (int y = 0; y < from.height; y++) {
@@ -176,8 +185,6 @@ public class ImplConvertImage {
 	}
 
 	public static void convert( ImageSInt8 from, ImageInt16 to ) {
-
-		InputSanityCheck.checkSameShape(from, to);
 
 		if (from.isSubimage() || to.isSubimage()) {
 
@@ -201,7 +208,27 @@ public class ImplConvertImage {
 
 	public static void convert( ImageSInt8 from, ImageSInt32 to ) {
 
-		InputSanityCheck.checkSameShape(from, to);
+		if (from.isSubimage() || to.isSubimage()) {
+
+			for (int y = 0; y < from.height; y++) {
+				int indexFrom = from.getIndex(0, y);
+				int indexTo = to.getIndex(0, y);
+
+				for (int x = 0; x < from.width; x++) {
+					to.data[indexTo++] = ( from.data[indexFrom++] );
+				}
+			}
+
+		} else {
+			final int N = from.width * from.height;
+
+			for (int i = 0; i < N; i++) {
+				to.data[i] = ( from.data[i] );
+			}
+		}
+	}
+
+	public static void convert( ImageSInt8 from, ImageSInt64 to ) {
 
 		if (from.isSubimage() || to.isSubimage()) {
 
@@ -225,8 +252,6 @@ public class ImplConvertImage {
 
 	public static void convert( ImageSInt8 from, ImageFloat32 to ) {
 
-		InputSanityCheck.checkSameShape(from, to);
-
 		if (from.isSubimage() || to.isSubimage()) {
 
 			for (int y = 0; y < from.height; y++) {
@@ -248,8 +273,6 @@ public class ImplConvertImage {
 	}
 
 	public static void convert( ImageSInt8 from, ImageFloat64 to ) {
-
-		InputSanityCheck.checkSameShape(from, to);
 
 		if (from.isSubimage() || to.isSubimage()) {
 
@@ -273,8 +296,6 @@ public class ImplConvertImage {
 
 	public static void convert( ImageUInt16 from, ImageInt8 to ) {
 
-		InputSanityCheck.checkSameShape(from, to);
-
 		if (from.isSubimage() || to.isSubimage()) {
 
 			for (int y = 0; y < from.height; y++) {
@@ -297,8 +318,6 @@ public class ImplConvertImage {
 
 	public static void convert( ImageUInt16 from, ImageInt16 to ) {
 
-		InputSanityCheck.checkSameShape(from, to);
-
 		if (from.isSubimage() || to.isSubimage()) {
 
 			for (int y = 0; y < from.height; y++) {
@@ -319,7 +338,27 @@ public class ImplConvertImage {
 
 	public static void convert( ImageUInt16 from, ImageSInt32 to ) {
 
-		InputSanityCheck.checkSameShape(from, to);
+		if (from.isSubimage() || to.isSubimage()) {
+
+			for (int y = 0; y < from.height; y++) {
+				int indexFrom = from.getIndex(0, y);
+				int indexTo = to.getIndex(0, y);
+
+				for (int x = 0; x < from.width; x++) {
+					to.data[indexTo++] = ( from.data[indexFrom++] & 0xFFFF);
+				}
+			}
+
+		} else {
+			final int N = from.width * from.height;
+
+			for (int i = 0; i < N; i++) {
+				to.data[i] = ( from.data[i] & 0xFFFF);
+			}
+		}
+	}
+
+	public static void convert( ImageUInt16 from, ImageSInt64 to ) {
 
 		if (from.isSubimage() || to.isSubimage()) {
 
@@ -343,8 +382,6 @@ public class ImplConvertImage {
 
 	public static void convert( ImageUInt16 from, ImageFloat32 to ) {
 
-		InputSanityCheck.checkSameShape(from, to);
-
 		if (from.isSubimage() || to.isSubimage()) {
 
 			for (int y = 0; y < from.height; y++) {
@@ -366,8 +403,6 @@ public class ImplConvertImage {
 	}
 
 	public static void convert( ImageUInt16 from, ImageFloat64 to ) {
-
-		InputSanityCheck.checkSameShape(from, to);
 
 		if (from.isSubimage() || to.isSubimage()) {
 
@@ -391,8 +426,6 @@ public class ImplConvertImage {
 
 	public static void convert( ImageSInt16 from, ImageInt8 to ) {
 
-		InputSanityCheck.checkSameShape(from, to);
-
 		if (from.isSubimage() || to.isSubimage()) {
 
 			for (int y = 0; y < from.height; y++) {
@@ -415,8 +448,6 @@ public class ImplConvertImage {
 
 	public static void convert( ImageSInt16 from, ImageInt16 to ) {
 
-		InputSanityCheck.checkSameShape(from, to);
-
 		if (from.isSubimage() || to.isSubimage()) {
 
 			for (int y = 0; y < from.height; y++) {
@@ -437,7 +468,27 @@ public class ImplConvertImage {
 
 	public static void convert( ImageSInt16 from, ImageSInt32 to ) {
 
-		InputSanityCheck.checkSameShape(from, to);
+		if (from.isSubimage() || to.isSubimage()) {
+
+			for (int y = 0; y < from.height; y++) {
+				int indexFrom = from.getIndex(0, y);
+				int indexTo = to.getIndex(0, y);
+
+				for (int x = 0; x < from.width; x++) {
+					to.data[indexTo++] = ( from.data[indexFrom++] );
+				}
+			}
+
+		} else {
+			final int N = from.width * from.height;
+
+			for (int i = 0; i < N; i++) {
+				to.data[i] = ( from.data[i] );
+			}
+		}
+	}
+
+	public static void convert( ImageSInt16 from, ImageSInt64 to ) {
 
 		if (from.isSubimage() || to.isSubimage()) {
 
@@ -461,8 +512,6 @@ public class ImplConvertImage {
 
 	public static void convert( ImageSInt16 from, ImageFloat32 to ) {
 
-		InputSanityCheck.checkSameShape(from, to);
-
 		if (from.isSubimage() || to.isSubimage()) {
 
 			for (int y = 0; y < from.height; y++) {
@@ -484,8 +533,6 @@ public class ImplConvertImage {
 	}
 
 	public static void convert( ImageSInt16 from, ImageFloat64 to ) {
-
-		InputSanityCheck.checkSameShape(from, to);
 
 		if (from.isSubimage() || to.isSubimage()) {
 
@@ -509,8 +556,6 @@ public class ImplConvertImage {
 
 	public static void convert( ImageSInt32 from, ImageInt8 to ) {
 
-		InputSanityCheck.checkSameShape(from, to);
-
 		if (from.isSubimage() || to.isSubimage()) {
 
 			for (int y = 0; y < from.height; y++) {
@@ -533,8 +578,6 @@ public class ImplConvertImage {
 
 	public static void convert( ImageSInt32 from, ImageInt16 to ) {
 
-		InputSanityCheck.checkSameShape(from, to);
-
 		if (from.isSubimage() || to.isSubimage()) {
 
 			for (int y = 0; y < from.height; y++) {
@@ -555,9 +598,29 @@ public class ImplConvertImage {
 		}
 	}
 
-	public static void convert( ImageSInt32 from, ImageFloat32 to ) {
+	public static void convert( ImageSInt32 from, ImageSInt64 to ) {
 
-		InputSanityCheck.checkSameShape(from, to);
+		if (from.isSubimage() || to.isSubimage()) {
+
+			for (int y = 0; y < from.height; y++) {
+				int indexFrom = from.getIndex(0, y);
+				int indexTo = to.getIndex(0, y);
+
+				for (int x = 0; x < from.width; x++) {
+					to.data[indexTo++] = ( from.data[indexFrom++] );
+				}
+			}
+
+		} else {
+			final int N = from.width * from.height;
+
+			for (int i = 0; i < N; i++) {
+				to.data[i] = ( from.data[i] );
+			}
+		}
+	}
+
+	public static void convert( ImageSInt32 from, ImageFloat32 to ) {
 
 		if (from.isSubimage() || to.isSubimage()) {
 
@@ -581,7 +644,115 @@ public class ImplConvertImage {
 
 	public static void convert( ImageSInt32 from, ImageFloat64 to ) {
 
-		InputSanityCheck.checkSameShape(from, to);
+		if (from.isSubimage() || to.isSubimage()) {
+
+			for (int y = 0; y < from.height; y++) {
+				int indexFrom = from.getIndex(0, y);
+				int indexTo = to.getIndex(0, y);
+
+				for (int x = 0; x < from.width; x++) {
+					to.data[indexTo++] = ( double )( from.data[indexFrom++] );
+				}
+			}
+
+		} else {
+			final int N = from.width * from.height;
+
+			for (int i = 0; i < N; i++) {
+				to.data[i] = ( double )( from.data[i] );
+			}
+		}
+	}
+
+	public static void convert( ImageSInt64 from, ImageInt8 to ) {
+
+		if (from.isSubimage() || to.isSubimage()) {
+
+			for (int y = 0; y < from.height; y++) {
+				int indexFrom = from.getIndex(0, y);
+				int indexTo = to.getIndex(0, y);
+
+				for (int x = 0; x < from.width; x++) {
+					to.data[indexTo++] = ( byte )( from.data[indexFrom++] );
+				}
+			}
+
+		} else {
+			final int N = from.width * from.height;
+
+			for (int i = 0; i < N; i++) {
+				to.data[i] = ( byte )( from.data[i] );
+			}
+		}
+	}
+
+	public static void convert( ImageSInt64 from, ImageInt16 to ) {
+
+		if (from.isSubimage() || to.isSubimage()) {
+
+			for (int y = 0; y < from.height; y++) {
+				int indexFrom = from.getIndex(0, y);
+				int indexTo = to.getIndex(0, y);
+
+				for (int x = 0; x < from.width; x++) {
+					to.data[indexTo++] = ( short )( from.data[indexFrom++] );
+				}
+			}
+
+		} else {
+			final int N = from.width * from.height;
+
+			for (int i = 0; i < N; i++) {
+				to.data[i] = ( short )( from.data[i] );
+			}
+		}
+	}
+
+	public static void convert( ImageSInt64 from, ImageSInt32 to ) {
+
+		if (from.isSubimage() || to.isSubimage()) {
+
+			for (int y = 0; y < from.height; y++) {
+				int indexFrom = from.getIndex(0, y);
+				int indexTo = to.getIndex(0, y);
+
+				for (int x = 0; x < from.width; x++) {
+					to.data[indexTo++] = ( int )( from.data[indexFrom++] );
+				}
+			}
+
+		} else {
+			final int N = from.width * from.height;
+
+			for (int i = 0; i < N; i++) {
+				to.data[i] = ( int )( from.data[i] );
+			}
+		}
+	}
+
+	public static void convert( ImageSInt64 from, ImageFloat32 to ) {
+
+		if (from.isSubimage() || to.isSubimage()) {
+
+			for (int y = 0; y < from.height; y++) {
+				int indexFrom = from.getIndex(0, y);
+				int indexTo = to.getIndex(0, y);
+
+				for (int x = 0; x < from.width; x++) {
+					to.data[indexTo++] = ( float )( from.data[indexFrom++] );
+				}
+			}
+
+		} else {
+			final int N = from.width * from.height;
+
+			for (int i = 0; i < N; i++) {
+				to.data[i] = ( float )( from.data[i] );
+			}
+		}
+	}
+
+	public static void convert( ImageSInt64 from, ImageFloat64 to ) {
 
 		if (from.isSubimage() || to.isSubimage()) {
 
@@ -605,8 +776,6 @@ public class ImplConvertImage {
 
 	public static void convert( ImageFloat32 from, ImageInt8 to ) {
 
-		InputSanityCheck.checkSameShape(from, to);
-
 		if (from.isSubimage() || to.isSubimage()) {
 
 			for (int y = 0; y < from.height; y++) {
@@ -628,8 +797,6 @@ public class ImplConvertImage {
 	}
 
 	public static void convert( ImageFloat32 from, ImageInt16 to ) {
-
-		InputSanityCheck.checkSameShape(from, to);
 
 		if (from.isSubimage() || to.isSubimage()) {
 
@@ -653,8 +820,6 @@ public class ImplConvertImage {
 
 	public static void convert( ImageFloat32 from, ImageSInt32 to ) {
 
-		InputSanityCheck.checkSameShape(from, to);
-
 		if (from.isSubimage() || to.isSubimage()) {
 
 			for (int y = 0; y < from.height; y++) {
@@ -675,9 +840,29 @@ public class ImplConvertImage {
 		}
 	}
 
-	public static void convert( ImageFloat32 from, ImageFloat64 to ) {
+	public static void convert( ImageFloat32 from, ImageSInt64 to ) {
 
-		InputSanityCheck.checkSameShape(from, to);
+		if (from.isSubimage() || to.isSubimage()) {
+
+			for (int y = 0; y < from.height; y++) {
+				int indexFrom = from.getIndex(0, y);
+				int indexTo = to.getIndex(0, y);
+
+				for (int x = 0; x < from.width; x++) {
+					to.data[indexTo++] = ( long )( from.data[indexFrom++] );
+				}
+			}
+
+		} else {
+			final int N = from.width * from.height;
+
+			for (int i = 0; i < N; i++) {
+				to.data[i] = ( long )( from.data[i] );
+			}
+		}
+	}
+
+	public static void convert( ImageFloat32 from, ImageFloat64 to ) {
 
 		if (from.isSubimage() || to.isSubimage()) {
 
@@ -701,8 +886,6 @@ public class ImplConvertImage {
 
 	public static void convert( ImageFloat64 from, ImageInt8 to ) {
 
-		InputSanityCheck.checkSameShape(from, to);
-
 		if (from.isSubimage() || to.isSubimage()) {
 
 			for (int y = 0; y < from.height; y++) {
@@ -724,8 +907,6 @@ public class ImplConvertImage {
 	}
 
 	public static void convert( ImageFloat64 from, ImageInt16 to ) {
-
-		InputSanityCheck.checkSameShape(from, to);
 
 		if (from.isSubimage() || to.isSubimage()) {
 
@@ -749,8 +930,6 @@ public class ImplConvertImage {
 
 	public static void convert( ImageFloat64 from, ImageSInt32 to ) {
 
-		InputSanityCheck.checkSameShape(from, to);
-
 		if (from.isSubimage() || to.isSubimage()) {
 
 			for (int y = 0; y < from.height; y++) {
@@ -771,9 +950,29 @@ public class ImplConvertImage {
 		}
 	}
 
-	public static void convert( ImageFloat64 from, ImageFloat32 to ) {
+	public static void convert( ImageFloat64 from, ImageSInt64 to ) {
 
-		InputSanityCheck.checkSameShape(from, to);
+		if (from.isSubimage() || to.isSubimage()) {
+
+			for (int y = 0; y < from.height; y++) {
+				int indexFrom = from.getIndex(0, y);
+				int indexTo = to.getIndex(0, y);
+
+				for (int x = 0; x < from.width; x++) {
+					to.data[indexTo++] = ( long )( from.data[indexFrom++] );
+				}
+			}
+
+		} else {
+			final int N = from.width * from.height;
+
+			for (int i = 0; i < N; i++) {
+				to.data[i] = ( long )( from.data[i] );
+			}
+		}
+	}
+
+	public static void convert( ImageFloat64 from, ImageFloat32 to ) {
 
 		if (from.isSubimage() || to.isSubimage()) {
 
@@ -794,4 +993,5 @@ public class ImplConvertImage {
 			}
 		}
 	}
+
 }

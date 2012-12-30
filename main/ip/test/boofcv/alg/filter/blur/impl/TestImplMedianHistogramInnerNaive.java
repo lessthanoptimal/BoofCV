@@ -47,7 +47,7 @@ public class TestImplMedianHistogramInnerNaive {
 			ImplMedianHistogramInnerNaive.process(image,found,radius,null,null);
 			ImplMedianSortNaive.process(image,expected,radius,null);
 
-			BoofTesting.assertEquals(expected,found,radius);
+			BoofTesting.assertEqualsInner(expected, found, 0, radius, radius, false);
 		}
 	}
 }

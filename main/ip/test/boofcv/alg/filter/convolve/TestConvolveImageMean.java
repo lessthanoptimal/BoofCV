@@ -107,7 +107,7 @@ public class TestConvolveImageMean extends CompareEquivalentFunctions {
 		ImageSingleBand expected = (ImageSingleBand)validationParam[2];
 		ImageSingleBand found = (ImageSingleBand)targetParam[1];
 
-		BoofTesting.assertEqualsGeneric(expected,found,0,1e-4);
+		BoofTesting.assertEquals(expected, found, 1e-4);
 	}
 
 	public static Object createTableKernel(Class<?> kernelType, int kernelRadius, Random rand) {

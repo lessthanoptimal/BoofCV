@@ -132,9 +132,10 @@ public class TestImageInterleaved {
 		}
 
 		@Override
-		public ImageTypeInfo<DummyImage> getTypeInfo() {
-			return (ImageTypeInfo)ImageTypeInfo.S32;
+		protected Class getDataType() {
+			return int.class;
 		}
+
 
 		@Override
 		protected void _setData(Object data) {

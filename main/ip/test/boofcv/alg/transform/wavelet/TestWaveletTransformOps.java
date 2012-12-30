@@ -101,7 +101,7 @@ public class TestWaveletTransformOps {
 
 			invokeTransform(desc, input, output, found,0,255);
 
-			BoofTesting.assertEqualsGeneric(input, found, 0, 1e-4f);
+			BoofTesting.assertEquals(input, found, 1e-4f);
 		}
 	}
 
@@ -146,7 +146,7 @@ public class TestWaveletTransformOps {
 
 				invokeTransformN(desc, input.clone(), output, found, level, 0, 255);
 
-				BoofTesting.assertEqualsGeneric(input,found,0,1e-4f);
+				BoofTesting.assertEquals(input, found, 1e-4f);
 			}
 		}
 	}

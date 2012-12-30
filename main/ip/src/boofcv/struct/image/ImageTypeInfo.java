@@ -49,7 +49,6 @@ public final class ImageTypeInfo <T extends ImageSingleBand> {
 	public static ImageTypeInfo<ImageInteger> I = new ImageTypeInfo<ImageInteger>(true,ImageInteger.class);
 	/** Single Band floating point image */
 	public static ImageTypeInfo<ImageFloat> F = new ImageTypeInfo<ImageFloat>(true,ImageFloat.class);
-	public static ImageTypeInfo<ImageInterleavedInt8> INTER_U8 = new ImageTypeInfo<ImageInterleavedInt8>(false,byte.class,ImageInterleavedInt8.class);
 
 	private int numBits;
 	private boolean isAbstract;

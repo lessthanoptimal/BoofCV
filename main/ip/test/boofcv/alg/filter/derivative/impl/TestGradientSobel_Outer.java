@@ -111,8 +111,8 @@ public class TestGradientSobel_Outer {
 				GradientSobel_Naive.process(img, derivX2, derivY2);
 				GradientSobel_Outer.process_F32(img, derivX, derivY);
 
-				BoofTesting.assertEquals(derivX2, derivX, 0, 1e-4f);
-				BoofTesting.assertEquals(derivY2, derivY, 0, 1e-4f);
+				BoofTesting.assertEquals(derivX2, derivX, 1e-4f);
+				BoofTesting.assertEquals(derivY2, derivY, 1e-4f);
 			}
 		}
 	}

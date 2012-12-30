@@ -136,7 +136,7 @@ public class CompareDerivativeToConvolution {
 		// compare the results
 		for( int i = 0; i < expectedOutput.length; i++ ) {
 			int border = processBorder ? 0 : borderSize;
-			BoofTesting.assertEqualsGeneric(expectedOutput[i],outputImages[i],0,1e-4f,border);
+			BoofTesting.assertEqualsInner(expectedOutput[i], outputImages[i], 1e-4f, border, border, false);
 
 			if( !processBorder )
 				BoofTesting.checkBorderZero(outputImages[i],border);

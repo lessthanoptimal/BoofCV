@@ -67,19 +67,19 @@ public class TestFactoryConvolve {
 		conv = FactoryConvolve.convolve( kernel,ImageFloat32.class,ImageFloat32.class,BorderType.SKIP,true);
 		conv.process(input,found);
 		ConvolveImageNoBorder.horizontal(kernel,input,expected,false);
-		BoofTesting.assertEquals(expected,found,0,1e-4f);
+		BoofTesting.assertEquals(expected,found,1e-4f);
 
 		// CHECK EXTENDED
 		conv = FactoryConvolve.convolve( kernel,ImageFloat32.class,ImageFloat32.class,BorderType.EXTENDED,true);
 		conv.process(input,found);
 		ConvolveWithBorder.horizontal(kernel,input,expected,new ImageBorder1D_F32(BorderIndex1D_Extend.class));
-		BoofTesting.assertEquals(expected,found,0,1e-4f);
+		BoofTesting.assertEquals(expected,found,1e-4f);
 
 		// CHECK NORMALIZED
 		conv = FactoryConvolve.convolve( kernel,ImageFloat32.class,ImageFloat32.class,BorderType.NORMALIZED,true);
 		conv.process(input,found);
 		ConvolveNormalized.horizontal(kernel,input,expected);
-		BoofTesting.assertEquals(expected,found,0,1e-4f);
+		BoofTesting.assertEquals(expected,found,1e-4f);
 	}
 
 	@Test
@@ -132,19 +132,19 @@ public class TestFactoryConvolve {
 		conv = FactoryConvolve.convolve( kernel,ImageFloat32.class,ImageFloat32.class,BorderType.SKIP);
 		conv.process(input,found);
 		ConvolveImageNoBorder.convolve(kernel,input,expected);
-		BoofTesting.assertEquals(expected,found,0,1e-4f);
+		BoofTesting.assertEquals(expected,found,1e-4f);
 
 		// CHECK EXTENDED
 		conv = FactoryConvolve.convolve( kernel,ImageFloat32.class,ImageFloat32.class,BorderType.EXTENDED);
 		conv.process(input,found);
 		ConvolveWithBorder.convolve(kernel,input,expected,new ImageBorder1D_F32(BorderIndex1D_Extend.class));
-		BoofTesting.assertEquals(expected,found,0,1e-4f);
+		BoofTesting.assertEquals(expected,found,1e-4f);
 
 		// CHECK NORMALIZED
 		conv = FactoryConvolve.convolve( kernel,ImageFloat32.class,ImageFloat32.class,BorderType.NORMALIZED);
 		conv.process(input,found);
 		ConvolveNormalized.convolve(kernel,input,expected);
-		BoofTesting.assertEquals(expected,found,0,1e-4f);
+		BoofTesting.assertEquals(expected,found,1e-4f);
 	}
 
 	@Test
