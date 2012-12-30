@@ -113,6 +113,6 @@ public class TestImplDisparityScoreSadRectFive_F32 {
 		alg.process(leftF32, rightF32, found);
 		naive.process(left, right, expected);
 
-		BoofTesting.assertEqualsGeneric(found, expected, 1, 1);
+		BoofTesting.assertEquals(found, expected, 1);
 	}
 }

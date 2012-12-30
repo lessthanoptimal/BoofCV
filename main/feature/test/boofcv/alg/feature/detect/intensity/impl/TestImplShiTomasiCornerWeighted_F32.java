@@ -87,6 +87,6 @@ public class TestImplShiTomasiCornerWeighted_F32 {
 		ImplShiTomasiCornerWeighted_F32 ssd_F = new ImplShiTomasiCornerWeighted_F32( 3);
 		ssd_F.process(derivX_F, derivY_F,found);
 
-		BoofTesting.assertEquals(expected, found, 3, 1f);
+		BoofTesting.assertEqualsInner(expected, found, 1f, 3, 3, true);
 	}
 }

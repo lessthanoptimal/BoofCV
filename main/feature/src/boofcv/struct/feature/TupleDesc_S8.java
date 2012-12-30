@@ -20,24 +20,24 @@ package boofcv.struct.feature;
 
 
 /**
- * Feature description storage in an array of unsigned bytes.
+ * Feature description storage in an array of signed bytes.
  *
  * @author Peter Abeles
  */
-public class TupleDesc_U8 extends TupleDesc_I8<TupleDesc_U8> {
+public class TupleDesc_S8 extends TupleDesc_I8<TupleDesc_S8> {
 
-	public TupleDesc_U8(int numFeatures) {
+	public TupleDesc_S8(int numFeatures) {
 		super(numFeatures);
 	}
 
-	public TupleDesc_U8 copy() {
-		TupleDesc_U8 ret = new TupleDesc_U8( value.length );
+	public TupleDesc_S8 copy() {
+		TupleDesc_S8 ret = new TupleDesc_S8( value.length );
 		System.arraycopy(value,0,ret.value,0,value.length);
 		return ret;
 	}
 
 	@Override
 	public double getDouble(int index) {
-		return value[index] & 0xFF;
+		return value[index];
 	}
 }

@@ -144,7 +144,7 @@ public class TestImplEdgeNonMaxSuppression {
 
 		// just test the inside border
 		BoofTesting.assertEquals(expected.subimage(1,1,width-1,height-1),
-				found.subimage(1,1,width-1,height-1),0,1e-4);
+				found.subimage(1,1,width-1,height-1), 1e-4);
 	}
 
 	@Test
@@ -166,7 +166,7 @@ public class TestImplEdgeNonMaxSuppression {
 
 		// just test the inside border
 		BoofTesting.assertEquals(expected.subimage(1,1,width-1,height-1),
-				found.subimage(1,1,width-1,height-1),0,1e-4);
+				found.subimage(1,1,width-1,height-1), 1e-4);
 	}
 
 	@Test

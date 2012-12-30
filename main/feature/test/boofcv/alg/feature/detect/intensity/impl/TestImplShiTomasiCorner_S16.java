@@ -80,6 +80,6 @@ public class TestImplShiTomasiCorner_S16 {
 		ImplShiTomasiCorner_S16 fast = new ImplShiTomasiCorner_S16(3);
 		fast.process(derivX, derivY,found);
 
-		BoofTesting.assertEquals(expected, found);
+		BoofTesting.assertEquals(expected, found,1e-4);
 	}
 }

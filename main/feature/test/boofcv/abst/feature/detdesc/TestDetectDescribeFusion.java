@@ -141,7 +141,7 @@ public class TestDetectDescribeFusion {
 		}
 
 		@Override
-		public int getDescriptionLength() {return 0;}
+		public int getLength() {return 0;}
 
 		@Override
 		public boolean isInBounds(double x, double y, double orientation, double scale) {

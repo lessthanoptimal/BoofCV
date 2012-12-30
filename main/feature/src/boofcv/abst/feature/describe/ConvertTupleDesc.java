@@ -16,28 +16,36 @@
  * limitations under the License.
  */
 
-package boofcv.struct.feature;
+package boofcv.abst.feature.describe;
 
+import boofcv.struct.feature.TupleDesc;
 
 /**
- * Feature description storage in an array of unsigned bytes.
+ * Convert between different types of {@link TupleDesc}.
  *
  * @author Peter Abeles
  */
-public class TupleDesc_U8 extends TupleDesc_I8<TupleDesc_U8> {
+public interface ConvertTupleDesc<A extends TupleDesc, B extends TupleDesc> {
 
-	public TupleDesc_U8(int numFeatures) {
-		super(numFeatures);
-	}
+	/**
+	 * Creates a new instance of the output type.
+	 *
+	 * @return New instance of output data type
+	 */
+	public B createOutput();
 
-	public TupleDesc_U8 copy() {
-		TupleDesc_U8 ret = new TupleDesc_U8( value.length );
-		System.arraycopy(value,0,ret.value,0,value.length);
-		return ret;
-	}
+	/**
+	 * Converts the input descriptor into the output descriptor type.
+	 *
+	 * @param input Original input descriptor. Not modified.
+	 * @param output Converted output descriptor. Modified.
+	 */
+	public void convert( A input , B output );
 
-	@Override
-	public double getDouble(int index) {
-		return value[index] & 0xFF;
-	}
+	/**
+	 * Returns the class type of the output descriptor
+	 *
+	 * @return Output type
+	 */
+	public Class<B> getOutputType();
 }

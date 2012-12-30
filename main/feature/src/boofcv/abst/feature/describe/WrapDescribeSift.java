@@ -54,7 +54,7 @@ public class WrapDescribeSift
 	}
 
 	@Override
-	public int getDescriptionLength() {
+	public int getLength() {
 		return alg.getDescriptorLength();
 	}
 

@@ -24,6 +24,7 @@ import org.junit.Test;
 import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
@@ -103,14 +104,27 @@ public class TestDescriptorDistance {
 	}
 
 	@Test
+	public void sad_S8() {
+		TupleDesc_S8 a = new TupleDesc_S8(5);
+		TupleDesc_S8 b = new TupleDesc_S8(5);
+
+		a.value=new byte[]{1,2,3,4,5};
+		b.value=new byte[]{-2,2,-3,3,6};
+
+		assertEquals(11, DescriptorDistance.sad(a, b), 1e-2);
+	}
+
+	@Test
 	public void sad_F32() {
 		TupleDesc_F32 a = new TupleDesc_F32(5);
 		TupleDesc_F32 b = new TupleDesc_F32(5);
 
+		// TODO update with values less than one
 		a.value=new float[]{1,2,3,4,5};
 		b.value=new float[]{-1,2,6,3,6};
 
 		assertEquals(7, DescriptorDistance.sad(a, b), 1e-2);
+		fail("Implement");
 	}
 
 	@Test
