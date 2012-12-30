@@ -46,11 +46,11 @@ public interface DescribeRegionPoint<T extends ImageSingleBand, D extends TupleD
 	public D createDescription();
 
 	/**
-	 * Returns the descriptor length
+	 * Returns the description's length
+	 *
+	 * @return Number of elements in the description
 	 */
-	// TODO Can this be removed?
-	@Deprecated
-	public int getDescriptionLength();
+	public int getLength();
 
 	/**
 	 * Checks to see if a description can be extracted at the specified location.  Some descriptors

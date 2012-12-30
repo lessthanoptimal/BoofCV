@@ -16,28 +16,19 @@
  * limitations under the License.
  */
 
-package boofcv.struct.feature;
+package boofcv.abst.feature.describe;
 
+import org.junit.Test;
+
+import static org.junit.Assert.fail;
 
 /**
- * Feature description storage in an array of unsigned bytes.
- *
  * @author Peter Abeles
  */
-public class TupleDesc_U8 extends TupleDesc_I8<TupleDesc_U8> {
+public class TestConvertReal_F64_U8 {
 
-	public TupleDesc_U8(int numFeatures) {
-		super(numFeatures);
-	}
-
-	public TupleDesc_U8 copy() {
-		TupleDesc_U8 ret = new TupleDesc_U8( value.length );
-		System.arraycopy(value,0,ret.value,0,value.length);
-		return ret;
-	}
-
-	@Override
-	public double getDouble(int index) {
-		return value[index] & 0xFF;
+	@Test
+	public void stuff() {
+		fail("implement");
 	}
 }

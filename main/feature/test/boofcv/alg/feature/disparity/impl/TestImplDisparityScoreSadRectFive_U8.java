@@ -107,6 +107,6 @@ public class TestImplDisparityScoreSadRectFive_U8 {
 		alg.process(left, right, found);
 		naive.process(left, right, expected);
 
-		BoofTesting.assertEqualsGeneric(found, expected, 1, 1);
+		BoofTesting.assertEquals(found, expected, 1);
 	}
 }

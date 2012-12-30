@@ -145,7 +145,7 @@ public class DescriptorDistance {
 	 * @param b Second descriptor
 	 * @return SAD score
 	 */
-	public static double sad(TupleDesc_F32 a, TupleDesc_F32 b) {
+	public static double sad(TupleDesc_S8 a, TupleDesc_S8 b) {
 
 		int total = 0;
 		for( int i = 0; i < a.value.length; i++ ) {
@@ -161,9 +161,25 @@ public class DescriptorDistance {
 	 * @param b Second descriptor
 	 * @return SAD score
 	 */
+	public static double sad(TupleDesc_F32 a, TupleDesc_F32 b) {
+
+		float total = 0;
+		for( int i = 0; i < a.value.length; i++ ) {
+			total += Math.abs( a.value[i] - b.value[i]);
+		}
+		return total;
+	}
+
+	/**
+	 * Sum of absolute difference (SAD) score
+	 *
+	 * @param a First descriptor
+	 * @param b Second descriptor
+	 * @return SAD score
+	 */
 	public static double sad(TupleDesc_F64 a, TupleDesc_F64 b) {
 
-		int total = 0;
+		double total = 0;
 		for( int i = 0; i < a.value.length; i++ ) {
 			total += Math.abs( a.value[i] - b.value[i]);
 		}

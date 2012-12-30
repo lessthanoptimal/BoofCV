@@ -92,6 +92,8 @@ public class FactoryAssociation {
 			return (ScoreAssociation)new ScoreAssociateSad_F32();
 		} else if( tupleType == TupleDesc_U8.class ) {
 			return (ScoreAssociation)new ScoreAssociateSad_U8();
+		} else if( tupleType == TupleDesc_S8.class ) {
+			return (ScoreAssociation)new ScoreAssociateSad_S8();
 		} else {
 			throw new IllegalArgumentException("SAD score not supported for type "+tupleType.getSimpleName());
 		}

@@ -59,7 +59,7 @@ public class TestIntegralImageFeatureIntensity {
 			ImplIntegralImageFeatureIntensity.hessianNaive(integral,skip,size,expected);
 			IntegralImageFeatureIntensity.hessian(integral,skip,size,found);
 
-			BoofTesting.assertEquals(expected,found,0,1e-4f);
+			BoofTesting.assertEquals(expected,found, 1e-4f);
 		}
 	}
 
@@ -84,7 +84,7 @@ public class TestIntegralImageFeatureIntensity {
 			ImplIntegralImageFeatureIntensity.hessianNaive(integral,skip,size,expected);
 			IntegralImageFeatureIntensity.hessian(integral,skip,size,found);
 
-			BoofTesting.assertEquals(expected,found,0,1e-4f);
+			BoofTesting.assertEquals(expected,found, 1e-4f);
 		}
 	}
 }

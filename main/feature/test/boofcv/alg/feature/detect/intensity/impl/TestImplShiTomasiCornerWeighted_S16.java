@@ -82,6 +82,6 @@ public class TestImplShiTomasiCornerWeighted_S16 {
 
 		// how the weighted is applied is different between these two verisons, which is why the error
 		// tolerance is so high
-		BoofTesting.assertEquals(expected, found,3,0.5);
+		BoofTesting.assertEqualsInner(expected, found, 0.5, 3, 3, true);
 	}
 }

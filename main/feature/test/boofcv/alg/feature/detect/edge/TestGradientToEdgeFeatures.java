@@ -209,6 +209,6 @@ public class TestGradientToEdgeFeatures {
 		ImplEdgeNonMaxSuppression.naive4(intensity,direction,expected);
 		GradientToEdgeFeatures.nonMaxSuppression4(intensity,direction,found);
 
-		BoofTesting.assertEquals(expected,found,0,1e-4);
+		BoofTesting.assertEquals(expected,found, 1e-4);
 	}
 }
