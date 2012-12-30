@@ -27,7 +27,7 @@ import boofcv.struct.feature.TupleDesc_U8;
  *
  * @author Peter Abeles
  */
-public class ssConvertTupleDescOps {
+public class ConvertTupleDescOps {
 	/**
 	 * Converts the floating point input description into the 8-bit integer output descriptor by dividing each
 	 * element in input by the maximum value.  All elements in input are assumed to be positive
