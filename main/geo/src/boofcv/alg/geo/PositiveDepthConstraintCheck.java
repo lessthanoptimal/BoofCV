@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2012, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,9 +20,6 @@ package boofcv.alg.geo;
 
 import boofcv.abst.geo.TriangulateTwoViewsCalibrated;
 import boofcv.factory.geo.FactoryTriangulate;
-import georegression.geometry.GeometryMath_F64;
-import georegression.metric.ClosestPoint3D_F64;
-import georegression.struct.line.LineParametric3D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;

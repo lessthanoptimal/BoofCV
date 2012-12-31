@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2012, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,8 +23,8 @@ import boofcv.struct.geo.AssociatedTriple;
 import boofcv.struct.geo.TrifocalTensor;
 import georegression.struct.point.Point3D_F64;
 import org.ddogleg.optimization.UnconstrainedLeastSquares;
-import org.ddogleg.optimization.functions.FunctionNtoM;
 import org.ddogleg.optimization.UtilOptimize;
+import org.ddogleg.optimization.functions.FunctionNtoM;
 import org.ejml.data.DenseMatrix64F;
 
 import java.util.List;
