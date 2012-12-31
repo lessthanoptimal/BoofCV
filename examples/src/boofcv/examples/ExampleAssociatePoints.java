@@ -21,6 +21,7 @@ package boofcv.examples;
 import boofcv.abst.feature.associate.AssociateDescription;
 import boofcv.abst.feature.associate.ScoreAssociation;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
+import boofcv.abst.feature.detect.interest.ConfigFastHessian;
 import boofcv.alg.feature.UtilFeature;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.factory.feature.associate.FactoryAssociation;
@@ -119,7 +120,8 @@ public class ExampleAssociatePoints<T extends ImageSingleBand, FD extends TupleD
 		Class imageType = ImageFloat32.class;
 
 		// select which algorithms to use
-		DetectDescribePoint detDesc = FactoryDetectDescribe.surf(1, 2, 200, 1, 9, 4, 4,true,imageType);
+		DetectDescribePoint detDesc = FactoryDetectDescribe.surfStable(
+				new ConfigFastHessian(1, 2, 200, 1, 9, 4, 4), null,null, imageType);
 
 		ScoreAssociation scorer = FactoryAssociation.defaultScore(detDesc.getDescriptorType());
 		AssociateDescription associate = FactoryAssociation.greedy(scorer, Double.MAX_VALUE, -1, true);

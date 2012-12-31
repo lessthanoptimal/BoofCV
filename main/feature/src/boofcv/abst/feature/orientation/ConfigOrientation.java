@@ -16,24 +16,28 @@
  * limitations under the License.
  */
 
-package boofcv.abst.feature.detdesc;
+package boofcv.abst.feature.orientation;
 
-import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
-import boofcv.struct.feature.SurfFeature;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.Configuration;
 
 /**
+ * Base configuration for orientation estimation.
+ *
  * @author Peter Abeles
  */
-public class TestWrapDetectDescribeSurf extends GenericTestsDetectDescribePoint<ImageFloat32,SurfFeature>
-{
+public interface ConfigOrientation extends Configuration {
 
-	public TestWrapDetectDescribeSurf() {
-		super(true, true, ImageFloat32.class, SurfFeature.class);
+	/**
+	 * Orientation estimation which takes in an integral image
+	 */
+	public static interface Integral extends ConfigOrientation {
+
 	}
 
-	@Override
-	public DetectDescribePoint<ImageFloat32, SurfFeature> createDetDesc() {
-		return FactoryDetectDescribe.surfStable(null,null,null, ImageFloat32.class);
+	/**
+	 * Orientation estimation which takes in the image gradient
+	 */
+	public static interface Gradient extends ConfigOrientation {
+
 	}
 }

@@ -18,7 +18,9 @@
 
 package boofcv.benchmark.feature.orientation;
 
+import boofcv.abst.feature.detect.interest.ConfigFastHessian;
 import boofcv.abst.feature.detect.interest.InterestPointDetector;
+import boofcv.abst.feature.orientation.ConfigAverageIntegral;
 import boofcv.abst.feature.orientation.OrientationImage;
 import boofcv.abst.feature.orientation.OrientationIntegral;
 import boofcv.alg.transform.ii.GIntegralImageOps;
@@ -39,7 +41,7 @@ public class UtilOrientationBenchmark {
 
 	public static <T extends ImageSingleBand, D extends ImageSingleBand>
 	InterestPointDetector<T> defaultDetector( Class<T> imageType , Class<D> derivType ) {
-		return FactoryInterestPoint.<T>fastHessian(1, 2, 200, 1, 9, 4, 4);
+		return FactoryInterestPoint.<T>fastHessian(new ConfigFastHessian(1, 2, 200, 1, 9, 4, 4));
 //		GeneralFeatureDetector<T, D> detector = FactoryDetectPoint.createKlt(2,0.1f,150,derivType);
 //		FeatureScaleSpace<T,D> ff = new FeatureScaleSpace<T,D>(detector,2);
 //		double scales[] = new double[]{1,1.2,1.5,3,4,5,6,7};
@@ -65,8 +67,10 @@ public class UtilOrientationBenchmark {
 		ret.add(new BenchmarkAlgorithm("No Gradient", FactoryOrientationAlgs.nogradient(radius,imageType)));
 
 		Class typeII = GIntegralImageOps.getIntegralType(imageType);
-		ret.add(new BenchmarkAlgorithm("II Ave", new WrapII(FactoryOrientationAlgs.average_ii(radius, 1,4,0, typeII),imageType)));
-		ret.add(new BenchmarkAlgorithm("II Ave Weighted", new WrapII(FactoryOrientationAlgs.average_ii(radius, 1,4,-1, typeII),imageType)));
+		ret.add(new BenchmarkAlgorithm("II Ave",
+				new WrapII(FactoryOrientationAlgs.average_ii(new ConfigAverageIntegral(radius,1,4,0), typeII),imageType)));
+		ret.add(new BenchmarkAlgorithm("II Ave Weighted",
+				new WrapII(FactoryOrientationAlgs.average_ii(new ConfigAverageIntegral(radius, 1,4,-1), typeII),imageType)));
 
 		return ret;
 	}

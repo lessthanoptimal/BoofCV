@@ -21,6 +21,7 @@ package boofcv.examples;
 import boofcv.abst.feature.associate.AssociateDescription;
 import boofcv.abst.feature.associate.ScoreAssociation;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
+import boofcv.abst.feature.detect.interest.ConfigFastHessian;
 import boofcv.abst.geo.Estimate1ofEpipolar;
 import boofcv.abst.geo.fitting.DistanceFromModelResidual;
 import boofcv.abst.geo.fitting.GenerateEpipolarMatrix;
@@ -129,7 +130,8 @@ public class ExampleFundamentalMatrix {
 	 * fundamental matrix.
 	 */
 	public static List<AssociatedPair> computeMatches( BufferedImage left , BufferedImage right ) {
-		DetectDescribePoint detDesc = FactoryDetectDescribe.surf(1, 2, 200, 1, 9, 4, 4,true,ImageFloat32.class);
+		DetectDescribePoint detDesc = FactoryDetectDescribe.surfStable(
+				new ConfigFastHessian(1, 2, 200, 1, 9, 4, 4), null,null, ImageFloat32.class);
 //		DetectDescribePoint detDesc = FactoryDetectDescribe.sift(4,2,false,-1);
 
 		ScoreAssociation<SurfFeature> scorer = FactoryAssociation.scoreEuclidean(SurfFeature.class,true);

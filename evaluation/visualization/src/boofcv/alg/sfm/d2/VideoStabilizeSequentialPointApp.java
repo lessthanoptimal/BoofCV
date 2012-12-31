@@ -18,6 +18,7 @@
 
 package boofcv.alg.sfm.d2;
 
+import boofcv.abst.feature.detect.interest.ConfigFastHessian;
 import boofcv.abst.feature.tracker.PkltConfig;
 import boofcv.factory.feature.tracker.FactoryPointSequentialTracker;
 import boofcv.gui.image.ShowImages;
@@ -62,17 +63,21 @@ public class VideoStabilizeSequentialPointApp<I extends ImageSingleBand, D exten
 		config.featureRadius = 3;
 		config.pyramidScaling = new int[]{1,2,4,8};
 
+		ConfigFastHessian configFH = new ConfigFastHessian();
+		configFH.maxFeaturesPerScale = 200;
+		configFH.initialSampleSize = 2;
+
 		addAlgorithm(0, "KLT", FactoryPointSequentialTracker.klt(config,1,3,1,1));
 		addAlgorithm(0, "ST-BRIEF", FactoryPointSequentialTracker.
 				dda_ST_BRIEF(400, 100, 1, 10, imageType, derivType));
 		// size of the description region has been increased to improve quality.
 		addAlgorithm(0, "ST-NCC", FactoryPointSequentialTracker.
 				dda_ST_NCC(500, 3, 5, 10, imageType, derivType));
-		addAlgorithm(0, "FH-SURF", FactoryPointSequentialTracker.dda_FH_SURF(400, 2, 200, 2, false, imageType));
+		addAlgorithm(0, "FH-SURF", FactoryPointSequentialTracker.dda_FH_SURF_Fast(400,configFH,null,null , imageType));
 		addAlgorithm(0, "ST-SURF-KLT", FactoryPointSequentialTracker.combined_ST_SURF_KLT(400, 3, 1, 3,
-				config.pyramidScaling, 50, false, imageType, derivType));
-		addAlgorithm(0, "FH-SURF-KLT", FactoryPointSequentialTracker.combined_FH_SURF_KLT(400, 200, 3,2,3,
-				config.pyramidScaling,50,false,imageType));
+				config.pyramidScaling, 50, null,null, imageType, derivType));
+		addAlgorithm(0, "FH-SURF-KLT", FactoryPointSequentialTracker.combined_FH_SURF_KLT(400, 3,
+				config.pyramidScaling,50,configFH,null,null,imageType));
 
 		addAlgorithm(1,"Affine", new Affine2D_F64());
 		addAlgorithm(1,"Homography", new Homography2D_F64());

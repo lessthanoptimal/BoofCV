@@ -82,7 +82,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class FastHessianFeatureDetector<T extends ImageSingleBand> {
+public class FastHessianFeatureDetector<II extends ImageSingleBand> {
 
 	// finds features from 2D intensity image
 	private FeatureExtractor extractor;
@@ -150,7 +150,7 @@ public class FastHessianFeatureDetector<T extends ImageSingleBand> {
 	 *
 	 * @param integral Image transformed into an integral image.
 	 */
-	public void detect( T integral ) {
+	public void detect( II integral ) {
 		if( intensity == null ) {
 			intensity = new ImageFloat32[3];
 			for( int i = 0; i < intensity.length; i++ ) {
@@ -192,7 +192,7 @@ public class FastHessianFeatureDetector<T extends ImageSingleBand> {
 	 * @param skip Pixel skip factor
 	 * @param featureSize which feature sizes should be detected.
 	 */
-	protected void detectOctave( T integral , int skip , int ...featureSize ) {
+	protected void detectOctave( II integral , int skip , int ...featureSize ) {
 
 		int w = integral.width/skip;
 		int h = integral.height/skip;

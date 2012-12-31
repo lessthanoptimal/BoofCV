@@ -58,6 +58,12 @@ public class GrowQueue_I32 {
 		this.size = size;
 	}
 
+	public void setMaxSize( int size ) {
+		if( data.length < size ) {
+			data = new int[size];
+		}
+	}
+
 	public int getSize() {
 		return size;
 	}

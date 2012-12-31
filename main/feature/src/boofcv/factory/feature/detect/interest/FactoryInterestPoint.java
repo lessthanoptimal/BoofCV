@@ -18,7 +18,6 @@
 
 package boofcv.factory.feature.detect.interest;
 
-import boofcv.abst.feature.detect.extract.FeatureExtractor;
 import boofcv.abst.feature.detect.interest.*;
 import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.abst.filter.derivative.ImageHessian;
@@ -153,27 +152,14 @@ public class FactoryInterestPoint {
 	 * Creates a {@link FastHessianFeatureDetector} detector which is wrapped inside
 	 * an {@link InterestPointDetector}
 	 *
-	 * @param detectThreshold       Minimum feature intensity. Image dependent.  Start tuning at 1.
-	 * @param extractRadius         Radius used for non-max-suppression.  Typically 1 or 2.
-	 * @param maxFeaturesPerScale   Number of features it will find or if <= 0 it will return all features it finds.
-	 * @param initialSampleSize     How often pixels are sampled in the first octave.  Typically 1 or 2.
-	 * @param initialSize           Typically 9.
-	 * @param numberScalesPerOctave Typically 4.
-	 * @param numberOfOctaves       Typically 4.
+	 * @param config Configuration for detector.
 	 * @return The interest point detector.
 	 * @see FastHessianFeatureDetector
 	 */
 	public static <T extends ImageSingleBand>
-	InterestPointDetector<T> fastHessian(float detectThreshold,
-										 int extractRadius, int maxFeaturesPerScale,
-										 int initialSampleSize, int initialSize,
-										 int numberScalesPerOctave,
-										 int numberOfOctaves) {
-		FeatureExtractor extractor = FactoryFeatureExtractor.nonmax(extractRadius, detectThreshold, 5, true);
-		FastHessianFeatureDetector feature = new FastHessianFeatureDetector<T>(extractor, maxFeaturesPerScale,
-				initialSampleSize, initialSize, numberScalesPerOctave, numberOfOctaves);
+	InterestPointDetector<T> fastHessian( ConfigFastHessian config ) {
 
-		return new WrapFHtoInterestPoint(feature);
+		return new WrapFHtoInterestPoint(FactoryInterestPointAlgs.fastHessian(config));
 	}
 
 	/**

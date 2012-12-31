@@ -20,6 +20,7 @@ package boofcv.benchmark.opencv;
 
 import boofcv.abst.feature.describe.DescribeRegionPoint;
 import boofcv.abst.feature.detect.edge.DetectEdgeContour;
+import boofcv.abst.feature.detect.interest.ConfigFastHessian;
 import boofcv.abst.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.abst.feature.detect.interest.InterestPointDetector;
 import boofcv.abst.feature.detect.line.DetectLineHoughPolar;
@@ -143,8 +144,8 @@ public class BenchmarkForOpenCV<T extends ImageSingleBand, D extends ImageSingle
 		DescribeRegionPoint<T, SurfFeature> describer;
 
 		public SURF() {
-			detector = FactoryInterestPoint.fastHessian(20, 2, -1, 1, 9, 4, 4);
-			describer = FactoryDescribeRegionPoint.surf(true, imageType);
+			detector = FactoryInterestPoint.fastHessian(new ConfigFastHessian(20, 2, -1, 1, 9, 4, 4));
+			describer = FactoryDescribeRegionPoint.surfStable(null, imageType);
 		}
 
 		@Override

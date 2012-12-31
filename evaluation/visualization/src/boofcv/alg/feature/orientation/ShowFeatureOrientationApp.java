@@ -19,9 +19,7 @@
 package boofcv.alg.feature.orientation;
 
 import boofcv.abst.feature.detect.interest.GeneralFeatureDetector;
-import boofcv.abst.feature.orientation.OrientationGradient;
-import boofcv.abst.feature.orientation.OrientationIntegral;
-import boofcv.abst.feature.orientation.RegionOrientation;
+import boofcv.abst.feature.orientation.*;
 import boofcv.abst.filter.derivative.AnyImageDerivative;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.alg.transform.ii.GIntegralImageOps;
@@ -75,10 +73,12 @@ public class ShowFeatureOrientationApp<T extends ImageSingleBand, D extends Imag
 		addAlgorithm(0, "Gradient Histogram 10 Weighted", FactoryOrientationAlgs.histogram(10, radius, true, derivType));
 		addAlgorithm(0, "Gradient Sliding", FactoryOrientationAlgs.sliding(20, Math.PI / 3.0, radius, false, derivType));
 		addAlgorithm(0, "Gradient Sliding Weighted", FactoryOrientationAlgs.sliding(20, Math.PI / 3.0, radius, true, derivType));
-		addAlgorithm(0, "Integral Average", FactoryOrientationAlgs.average_ii(radius, 1, 4, 0, imageType));
-		addAlgorithm(0, "Integral Average Weighted", FactoryOrientationAlgs.average_ii(radius, 1, 4, -1, imageType));
-		addAlgorithm(0, "Integral Sliding", FactoryOrientationAlgs.sliding_ii(1, 1, 4, 0, 4, imageType));
-		addAlgorithm(0, "Integral Sliding Weighted", FactoryOrientationAlgs.sliding_ii(1, 1, 4, -1, 4, imageType));
+		addAlgorithm(0, "Integral Average", FactoryOrientationAlgs.average_ii(new ConfigAverageIntegral(radius, 1, 4, 0), imageType));
+		addAlgorithm(0, "Integral Average Weighted", FactoryOrientationAlgs.average_ii(new ConfigAverageIntegral(radius, 1, 4, -1), imageType));
+		addAlgorithm(0, "Integral Sliding", FactoryOrientationAlgs.sliding_ii(
+				new ConfigSlidingIntegral(1, 1, 4, 0, 4), imageType));
+		addAlgorithm(0, "Integral Sliding Weighted", FactoryOrientationAlgs.sliding_ii(
+				new ConfigSlidingIntegral(1, 1, 4, -1, 4), imageType));
 
 		panel = new ImagePanel();
 		setMainGUI(panel);

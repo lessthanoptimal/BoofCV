@@ -315,7 +315,7 @@ public class VisualizeStereoVisualOdometryApp <I extends ImageSingleBand>
 			thresholdRetire = 3;
 //			tracker = FactoryPointSequentialTracker.dda_FH_SURF(600, 200, 1, 2,imageType);
 			ImagePointTracker<I> tracker = FactoryPointSequentialTracker.combined_ST_SURF_KLT(600, 3,0,3,
-					new int[]{1,2,4,8},50, true,imageType, derivType);
+					new int[]{1,2,4,8},50, null,null,imageType, derivType);
 			assistedTracker = FactoryVisualOdometry.trackerP3P(tracker,1.5,200,50);
 		}
 

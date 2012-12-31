@@ -23,6 +23,7 @@ import boofcv.abst.feature.associate.ScoreAssociation;
 import boofcv.abst.feature.describe.ConvertTupleDesc;
 import boofcv.abst.feature.describe.DescribeRegionPoint;
 import boofcv.abst.feature.describe.DescribeRegionPointConvert;
+import boofcv.abst.feature.detect.interest.ConfigFastHessian;
 import boofcv.abst.feature.detect.interest.InterestPointDetector;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.factory.feature.associate.FactoryAssociation;
@@ -113,10 +114,10 @@ public class CompareConvertedDescriptionsApp {
 		String file2 = "../data/evaluation/stitch/kayak_02.jpg";
 
 		InterestPointDetector<ImageFloat32> detector =
-				FactoryInterestPoint.fastHessian(1,10,-1,2,9,4,4);
+				FactoryInterestPoint.fastHessian(new ConfigFastHessian(1,10,-1,2,9,4,4));
 
 		DescribeRegionPoint<ImageFloat32,TupleDesc_F64> describeA =
-				(DescribeRegionPoint)FactoryDescribeRegionPoint.surf(true,ImageFloat32.class);
+				(DescribeRegionPoint)FactoryDescribeRegionPoint.surfStable(null, ImageFloat32.class);
 
 		ConvertTupleDesc<TupleDesc_F64,TupleDesc_S8> converter =
 				FactoryConvertTupleDesc.real_F64_S8(describeA.getDescriptorLength());

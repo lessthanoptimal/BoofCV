@@ -18,6 +18,7 @@
 
 package boofcv.alg.feature.detect.interest;
 
+import boofcv.abst.feature.detect.interest.ConfigFastHessian;
 import boofcv.abst.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.abst.feature.detect.interest.InterestPointDetector;
 import boofcv.alg.feature.detect.ImageCorruptPanel;
@@ -71,6 +72,7 @@ public class DetectFeaturePointApp<T extends ImageSingleBand, D extends ImageSin
 		super(1);
 		this.imageType = imageType;
 
+
 		GeneralFeatureDetector<T, D> alg;
 
 		alg = FactoryDetectPoint.createHarris(radius, false, thresh, maxFeatures, derivType);
@@ -96,7 +98,8 @@ public class DetectFeaturePointApp<T extends ImageSingleBand, D extends ImageSin
 		addAlgorithm(0, "Hess Lap SS", FactoryInterestPoint.wrapDetector(flss, scales, imageType));
 		FeatureLaplacePyramid<T, D> flp = FactoryInterestPointAlgs.hessianLaplacePyramid(radius, thresh, maxScaleFeatures, imageType, derivType);
 		addAlgorithm(0, "Hess Lap P", FactoryInterestPoint.wrapDetector(flp, scales, imageType));
-		addAlgorithm(0, "FastHessian", FactoryInterestPoint.<T>fastHessian(thresh, 2, maxScaleFeatures, 2, 9, 4, 4));
+		addAlgorithm(0, "FastHessian", FactoryInterestPoint.<T>fastHessian(
+				new ConfigFastHessian(thresh, 2, maxScaleFeatures, 2, 9, 4, 4)));
 		if( imageType == ImageFloat32.class )
 			addAlgorithm(0, "SIFT", FactoryInterestPoint.siftDetector(1.6,5,4,false,2,1,maxScaleFeatures,5));
 

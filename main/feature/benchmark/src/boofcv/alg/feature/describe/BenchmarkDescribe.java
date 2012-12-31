@@ -18,6 +18,7 @@
 
 package boofcv.alg.feature.describe;
 
+import boofcv.abst.feature.describe.ConfigSurfDescribe;
 import boofcv.abst.feature.describe.DescribeRegionPoint;
 import boofcv.alg.feature.describe.brief.FactoryBriefDefinition;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
@@ -150,8 +151,11 @@ public class BenchmarkDescribe<I extends ImageSingleBand, D extends ImageSingleB
 		System.out.println("=========  Profile Image Size " + width + " x " + height + " ========== "+imageType.getSimpleName());
 		System.out.println();
 
-		ProfileOperation.printOpsPerSec(new Describe("SURF", FactoryDescribeRegionPoint.<I,II>surf(false, imageType)),TEST_TIME);
-		ProfileOperation.printOpsPerSec(new Describe("MSURF", FactoryDescribeRegionPoint.<I,II>surf(true, imageType)),TEST_TIME);
+		ConfigSurfDescribe.Speed surfSpeed = new ConfigSurfDescribe.Speed();
+		ConfigSurfDescribe.Stablility surfStable = new ConfigSurfDescribe.Stablility();
+
+		ProfileOperation.printOpsPerSec(new Describe("SURF", FactoryDescribeRegionPoint.<I,II>surfFast(surfSpeed, imageType)),TEST_TIME);
+		ProfileOperation.printOpsPerSec(new Describe("MSURF", FactoryDescribeRegionPoint.<I,II>surfStable(surfStable, imageType)),TEST_TIME);
 		if( imageType == ImageFloat32.class )
 			ProfileOperation.printOpsPerSec(new Describe("SIFT", FactoryDescribeRegionPoint.sift(1.6,5,4,false)),TEST_TIME);
 		ProfileOperation.printOpsPerSec(new Brief512(),TEST_TIME);

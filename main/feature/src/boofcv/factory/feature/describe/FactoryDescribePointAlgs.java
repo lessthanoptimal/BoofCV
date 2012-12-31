@@ -18,6 +18,7 @@
 
 package boofcv.factory.feature.describe;
 
+import boofcv.abst.feature.describe.ConfigSurfDescribe;
 import boofcv.abst.filter.blur.BlurFilter;
 import boofcv.alg.feature.describe.*;
 import boofcv.alg.feature.describe.brief.BriefDefinition_I32;
@@ -40,13 +41,24 @@ import boofcv.struct.image.ImageUInt8;
 public class FactoryDescribePointAlgs {
 
 	public static <T extends ImageSingleBand>
-	DescribePointSurf<T> surf(Class<T> imageType) {
-		return new DescribePointSurf<T>(imageType);
+	DescribePointSurf<T> surfSpeed(ConfigSurfDescribe.Speed config, Class<T> imageType) {
+		if( config == null )
+			config = new ConfigSurfDescribe.Speed();
+		config.checkValidity();
+
+
+		return new DescribePointSurf<T>(config.widthLargeGrid,config.widthSubRegion,config.widthSample,
+				config.weightSigma,config.useHaar,imageType);
 	}
 
 	public static <T extends ImageSingleBand>
-	DescribePointSurf<T> msurf(Class<T> imageType) {
-		return new DescribePointSurfMod<T>(imageType);
+	DescribePointSurf<T> surfStability(ConfigSurfDescribe.Stablility config, Class<T> imageType) {
+		if( config == null )
+			config = new ConfigSurfDescribe.Stablility();
+		config.checkValidity();
+
+		return new DescribePointSurfMod<T>(config.widthLargeGrid,config.widthSubRegion,config.widthSample,
+				config.overLap,config.sigmaLargeGrid,config.sigmaSubRegion,config.useHaar,imageType);
 	}
 
 	public static <T extends ImageSingleBand>

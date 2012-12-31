@@ -18,6 +18,7 @@
 
 package boofcv.examples;
 
+import boofcv.abst.feature.detect.interest.ConfigFastHessian;
 import boofcv.abst.feature.detect.interest.InterestPointDetector;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.factory.feature.detect.interest.FactoryInterestPoint;
@@ -52,7 +53,8 @@ public class ExampleInterestPoint {
 
 		// Create a Fast Hessian detector from the SURF paper.
 		// Other detectors can be used in this example too.
-		InterestPointDetector<T> detector = FactoryInterestPoint.fastHessian(10, 2, 100, 2, 9, 3, 4);
+		InterestPointDetector<T> detector = FactoryInterestPoint.fastHessian(
+				new ConfigFastHessian(10, 2, 100, 2, 9, 3, 4));
 
 		// find interest points in the image
 		detector.detect(input);

@@ -32,12 +32,12 @@ import java.util.Random;
 /**
  * @author Peter Abeles
  */
-public class BenchmarkAssociationAlgs {
+public class BenchmarkAssociationSpeedRandom {
 
 	static final long TEST_TIME = 1000;
 	static final Random rand = new Random(234234);
-	static final int DOF = 10;
-	static final int NUM_FEATURES = 2000;
+	static final int DOF = 50;
+	static final int NUM_FEATURES = 1000;
 
 	static final FastQueue<TupleDesc_F64> listA = createSet();
 	static final FastQueue<TupleDesc_F64> listB = createSet();
@@ -91,6 +91,7 @@ public class BenchmarkAssociationAlgs {
 
 		ProfileOperation.printOpsPerSec(new General("Greedy", FactoryAssociation.greedy(score, Double.MAX_VALUE, maxMatches, false)),TEST_TIME);
 		ProfileOperation.printOpsPerSec(new General("Greedy Backwards", FactoryAssociation.greedy(score, Double.MAX_VALUE, maxMatches, true)),TEST_TIME);
+		ProfileOperation.printOpsPerSec(new General("Random Forest", FactoryAssociation.kdRandomForest(DOF,500,15,5,1233445565)),TEST_TIME);
 		
 	}
 }
