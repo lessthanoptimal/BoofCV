@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2012, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,6 @@ package boofcv.io.video;
 
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageSingleBand;
 
 
 /**

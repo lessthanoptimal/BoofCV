@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2012, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,6 @@
 package boofcv.io;
 
 import java.io.InputStream;
-import java.io.Reader;
 
 /**
  * Implementers of this interface can be configured using data from an {@link InputStream}

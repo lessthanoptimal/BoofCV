@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2012, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,8 +37,8 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I32;
 import org.ddogleg.optimization.FactoryOptimization;
 import org.ddogleg.optimization.UnconstrainedMinimization;
-import org.ddogleg.optimization.functions.FunctionNtoS;
 import org.ddogleg.optimization.UtilOptimize;
+import org.ddogleg.optimization.functions.FunctionNtoS;
 
 import java.util.ArrayList;
 import java.util.List;
