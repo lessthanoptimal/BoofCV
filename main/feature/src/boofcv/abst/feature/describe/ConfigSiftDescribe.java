@@ -18,8 +18,51 @@
 
 package boofcv.abst.feature.describe;
 
+import boofcv.struct.Configuration;
+
 /**
+ * Configures the SIFT feature descriptor.
+ *
+ * @see boofcv.alg.feature.describe.DescribePointSift
+ *
  * @author Peter Abeles
  */
-public class ConfigSiftDescribe {
+public class ConfigSiftDescribe implements Configuration {
+
+	/**
+	 * Number of grid elements along a side.  Typically 4
+	 */
+	public int gridWidth = 4;
+	/**
+	 * Number of samples along a grid. Typically 8
+	 */
+	public int numSamples = 8;
+	/**
+	 * Number of bins in the orientation histogram.  Typically 8
+	 */
+	public int numHistBins = 8;
+	/**
+	 * Adjusts descriptor element's weighting from center.  Typically 0.5
+	 */
+	public double weightSigma = 0.5;
+	/**
+	 * Conversation from scale space to pixels.  Typically 2.5
+	 */
+	public double sigmaToRadius = 2.5;
+
+	public ConfigSiftDescribe(int gridWidth, int numSamples,
+							  int numHistBins, double weightSigma, double sigmaToRadius) {
+		this.gridWidth = gridWidth;
+		this.numSamples = numSamples;
+		this.numHistBins = numHistBins;
+		this.weightSigma = weightSigma;
+		this.sigmaToRadius = sigmaToRadius;
+	}
+
+	public ConfigSiftDescribe() {
+	}
+
+	@Override
+	public void checkValidity() {
+	}
 }

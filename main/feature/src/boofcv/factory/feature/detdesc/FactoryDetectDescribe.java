@@ -18,6 +18,8 @@
 
 package boofcv.factory.feature.detdesc;
 
+import boofcv.abst.feature.describe.ConfigSiftDescribe;
+import boofcv.abst.feature.describe.ConfigSiftScaleSpace;
 import boofcv.abst.feature.describe.ConfigSurfDescribe;
 import boofcv.abst.feature.describe.DescribeRegionPoint;
 import boofcv.abst.feature.detdesc.DetectDescribeFusion;
@@ -25,11 +27,9 @@ import boofcv.abst.feature.detdesc.DetectDescribePoint;
 import boofcv.abst.feature.detdesc.WrapDetectDescribeSift;
 import boofcv.abst.feature.detdesc.WrapDetectDescribeSurf;
 import boofcv.abst.feature.detect.interest.ConfigFastHessian;
+import boofcv.abst.feature.detect.interest.ConfigSiftDetector;
 import boofcv.abst.feature.detect.interest.InterestPointDetector;
-import boofcv.abst.feature.orientation.ConfigAverageIntegral;
-import boofcv.abst.feature.orientation.ConfigSlidingIntegral;
-import boofcv.abst.feature.orientation.OrientationImage;
-import boofcv.abst.feature.orientation.OrientationIntegral;
+import boofcv.abst.feature.orientation.*;
 import boofcv.alg.feature.describe.DescribePointSift;
 import boofcv.alg.feature.describe.DescribePointSurf;
 import boofcv.alg.feature.detdesc.DetectDescribeSift;
@@ -41,7 +41,6 @@ import boofcv.alg.transform.ii.GIntegralImageOps;
 import boofcv.factory.feature.describe.FactoryDescribePointAlgs;
 import boofcv.factory.feature.detect.interest.FactoryInterestPointAlgs;
 import boofcv.factory.feature.orientation.FactoryOrientationAlgs;
-import boofcv.struct.BoofDefaults;
 import boofcv.struct.feature.SurfFeature;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.image.ImageFloat32;
@@ -55,58 +54,31 @@ import boofcv.struct.image.ImageSingleBand;
 public class FactoryDetectDescribe {
 
 	/**
-	 * Creates a new SIFT feature and describer.  Only provides access to a few critical parameters and uses
-	 * default settings for the rest.
+	 * Creates a new SIFT feature detector and describer.
 	 *
-	 * @param numOfOctaves Number of octaves to detect.  Try 4
-	 * @param detectThreshold Minimum corner intensity required.  Try 1
-	 * @param doubleInputImage Should the input image be doubled? Try false.
-	 * @param maxFeaturesPerScale Max detected features per scale.  Disable with < 0.  Try 500
+	 * @param configSS Configuration for scale-space.  Pass in null for default options.
+	 * @param configDetector Configuration for detector.  Pass in null for default options.
+	 * @param configOri Configuration for region orientation.  Pass in null for default options.
+	 * @param configDesc Configuration for descriptor. Pass in null for default options.
 	 * @return SIFT
 	 */
 	public static DetectDescribePoint<ImageFloat32,SurfFeature>
-	sift( int numOfOctaves ,
-		  float detectThreshold ,
-		  boolean doubleInputImage ,
-		  int maxFeaturesPerScale ) {
-		return sift(1.6,5,numOfOctaves,doubleInputImage,3,detectThreshold,maxFeaturesPerScale,10,36);
-	}
+	sift( ConfigSiftScaleSpace configSS,
+		  ConfigSiftDetector configDetector ,
+		  ConfigSiftOrientation configOri ,
+		  ConfigSiftDescribe configDesc) {
 
-	/**
-	 * Creates a new SIFT feature detector and describer.  Provides access to most parameters.
-	 *
-	 * @param scaleSigma Amount of blur applied to each scale inside an octaves.  Try 1.6
-	 * @param numOfScales Number of scales per octaves.  Try 5.  Must be >= 3
-	 * @param numOfOctaves Number of octaves to detect.  Try 4
-	 * @param doubleInputImage Should the input image be doubled? Try false.
-	 * @param extractRadius   Size of the feature used to detect the corners. Try 2
-	 * @param detectThreshold Minimum corner intensity required.  Try 1
-	 * @param maxFeaturesPerScale Max detected features per scale.  Disable with < 0.  Try 500
-	 * @param edgeThreshold Threshold for edge filtering.  Disable with a value <= 0.  Try 5
-	 * @param oriHistogramSize Orientation histogram size.  Standard is 36
-	 * @return SIFT
-	 */
-	public static DetectDescribePoint<ImageFloat32,SurfFeature>
-	sift( double scaleSigma ,
-		  int numOfScales ,
-		  int numOfOctaves ,
-		  boolean doubleInputImage ,
-		  int extractRadius,
-		  float detectThreshold,
-		  int maxFeaturesPerScale,
-		  double edgeThreshold ,
-		  int oriHistogramSize ) {
+		if( configSS == null )
+			configSS = new ConfigSiftScaleSpace();
+		configSS.checkValidity();
 
-		double sigmaToRadius = BoofDefaults.SCALE_SPACE_CANONICAL_RADIUS;
+		SiftImageScaleSpace ss = new SiftImageScaleSpace(configSS.blurSigma, configSS.numScales, configSS.numOctaves,
+				configSS.doubleInputImage);
 
-		SiftImageScaleSpace ss = new SiftImageScaleSpace((float)scaleSigma, numOfScales, numOfOctaves,
-				doubleInputImage);
+		SiftDetector detector = FactoryInterestPointAlgs.siftDetector(configDetector);
 
-		SiftDetector detector = FactoryInterestPointAlgs.siftDetector(extractRadius, detectThreshold,
-				maxFeaturesPerScale, edgeThreshold);
-
-		OrientationHistogramSift orientation = new OrientationHistogramSift(oriHistogramSize,sigmaToRadius,1.5);
-		DescribePointSift describe = new DescribePointSift(4,8,8,0.5, sigmaToRadius);
+		OrientationHistogramSift orientation = FactoryOrientationAlgs.sift(configOri);
+		DescribePointSift describe = FactoryDescribePointAlgs.sift(configDesc);
 
 		DetectDescribeSift combined = new DetectDescribeSift(ss,detector,orientation,describe);
 

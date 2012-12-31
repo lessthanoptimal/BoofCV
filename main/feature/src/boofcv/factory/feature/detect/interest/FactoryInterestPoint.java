@@ -18,6 +18,7 @@
 
 package boofcv.factory.feature.detect.interest;
 
+import boofcv.abst.feature.describe.ConfigSiftScaleSpace;
 import boofcv.abst.feature.detect.interest.*;
 import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.abst.filter.derivative.ImageHessian;
@@ -152,7 +153,7 @@ public class FactoryInterestPoint {
 	 * Creates a {@link FastHessianFeatureDetector} detector which is wrapped inside
 	 * an {@link InterestPointDetector}
 	 *
-	 * @param config Configuration for detector.
+	 * @param config Configuration for detector.  Pass in null for default options.
 	 * @return The interest point detector.
 	 * @see FastHessianFeatureDetector
 	 */
@@ -168,29 +169,20 @@ public class FactoryInterestPoint {
 	 * @see SiftDetector
 	 * @see SiftImageScaleSpace
 	 *
-	 * @param scaleSigma Amount of blur applied to each scale inside an octaves.  Try 1.6
-	 * @param numOfScales Number of scales per octaves.  Try 5.  Must be >= 3
-	 * @param numOfOctaves Number of octaves to detect.  Try 4
-	 * @param doubleInputImage Should the input image be doubled? Try false.
-	 * @param extractRadius   Size of the feature used to detect the corners. Try 2
-	 * @param detectThreshold Minimum corner intensity required.  Try 1
-	 * @param maxFeaturesPerScale Max detected features per scale.  Image size dependent.  Try 500
-	 * @param edgeThreshold Threshold for edge filtering.  Disable with a value <= 0.  Try 5
+	 * @param configSS Configuration for scale-space.  Pass in null for default options.
+	 * @param configDetector Configuration for detector.  Pass in null for default options.
 	 */
-	public static InterestPointDetector<ImageFloat32> siftDetector( double scaleSigma ,
-																	int numOfScales ,
-																	int numOfOctaves ,
-																	boolean doubleInputImage ,
-																	int extractRadius,
-																	float detectThreshold,
-																	int maxFeaturesPerScale,
-																	double edgeThreshold )
+	public static InterestPointDetector<ImageFloat32> siftDetector( ConfigSiftScaleSpace configSS,
+																	ConfigSiftDetector configDetector )
 	{
-		SiftDetector alg = FactoryInterestPointAlgs.siftDetector(extractRadius,detectThreshold,
-				maxFeaturesPerScale,edgeThreshold);
+		if( configSS == null )
+			configSS = new ConfigSiftScaleSpace();
+		configSS.checkValidity();
 
-		SiftImageScaleSpace ss = new SiftImageScaleSpace((float)scaleSigma, numOfScales, numOfOctaves,
-				doubleInputImage);
+		SiftDetector alg = FactoryInterestPointAlgs.siftDetector(configDetector);
+
+		SiftImageScaleSpace ss = new SiftImageScaleSpace(configSS.blurSigma, configSS.numScales, configSS.numOctaves,
+				configSS.doubleInputImage);
 
 		return new WrapSiftDetector(alg,ss);
 	}

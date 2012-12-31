@@ -70,7 +70,7 @@ public class VisualizeRegionDescriptionApp <T extends ImageSingleBand, D extends
 
 		addAlgorithm(0,"SURF", FactoryDescribeRegionPoint.surfStable(null, imageType));
 		if( imageType == ImageFloat32.class )
-			addAlgorithm(0,"SIFT", FactoryDescribeRegionPoint.sift(1.6,5,4,false));
+			addAlgorithm(0,"SIFT", FactoryDescribeRegionPoint.sift(null,null));
 		addAlgorithm(0,"BRIEF", FactoryDescribeRegionPoint.brief(16, 512, -1, 4, true, imageType));
 		addAlgorithm(0,"BRIEFO", FactoryDescribeRegionPoint.brief(16, 512, -1, 4, false, imageType));
 		addAlgorithm(0,"Pixel 5x5", FactoryDescribeRegionPoint.pixel(5, 5, imageType));

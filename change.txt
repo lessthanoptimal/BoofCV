@@ -43,7 +43,7 @@ Version : Alpha 0.13
   * k-d random forest
 - Changing the way complex algorithm are configured
   * Instead of passing in parameters to a factory a config class is passed in.
-  * Affected: SURF
+  * Affected: SIFT, SURF
 
 ---------------------------------------------
 Date    : 2012/12/05

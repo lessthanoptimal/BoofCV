@@ -23,6 +23,7 @@ import boofcv.abst.feature.detect.intensity.GeneralFeatureIntensity;
 import boofcv.abst.feature.detect.intensity.WrapperGradientCornerIntensity;
 import boofcv.abst.feature.detect.intensity.WrapperHessianBlobIntensity;
 import boofcv.abst.feature.detect.interest.ConfigFastHessian;
+import boofcv.abst.feature.detect.interest.ConfigSiftDetector;
 import boofcv.abst.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.abst.filter.ImageFunctionSparse;
 import boofcv.abst.filter.derivative.AnyImageDerivative;
@@ -257,7 +258,7 @@ public class FactoryInterestPointAlgs {
 	/**
 	 * Creates a Fast Hessian blob detector used by SURF.
 	 *
-	 * @param config Configuration for detector
+	 * @param config Configuration for detector. Pass in null for default options.
 	 * @param <II> Integral Image
 	 * @return The feature detector
 	 */
@@ -266,6 +267,7 @@ public class FactoryInterestPointAlgs {
 
 		if( config == null )
 			config = new ConfigFastHessian();
+		config.checkValidity();
 
 		FeatureExtractor extractor = FactoryFeatureExtractor.nonmax(config.extractRadius, config.detectThreshold, 5, true);
 		return new FastHessianFeatureDetector<II>(extractor, config.maxFeaturesPerScale,
@@ -278,18 +280,16 @@ public class FactoryInterestPointAlgs {
 	 * @see SiftDetector
 	 * @see SiftImageScaleSpace
 	 *
-	 * @param extractRadius   Size of the feature used to detect the corners. Try 2
-	 * @param detectThreshold Minimum corner intensity required.  Try 1
-	 * @param maxFeaturesPerScale Max detected features per scale.  Disable with < 0.  Try 500
-	 * @param edgeThreshold Threshold for edge filtering.  Disable with a value <= 0.  Try 5
+	 * @param config Configuration for detector. Pass in null for default options.
 	 */
-	public static SiftDetector siftDetector( int extractRadius,
-											 float detectThreshold,
-											 int maxFeaturesPerScale,
-											 double edgeThreshold )
+	public static SiftDetector siftDetector( ConfigSiftDetector config )
 	{
-		FeatureExtractor extractor = FactoryFeatureExtractor.nonmax(extractRadius, detectThreshold, 0, true);
-		return new SiftDetector(extractor,maxFeaturesPerScale,edgeThreshold);
+		if( config == null )
+			config = new ConfigSiftDetector();
+		config.checkValidity();
+
+		FeatureExtractor extractor = FactoryFeatureExtractor.nonmax(config.extractRadius, config.detectThreshold, 0, true);
+		return new SiftDetector(extractor,config.maxFeaturesPerScale,config.edgeThreshold);
 	}
 
 }

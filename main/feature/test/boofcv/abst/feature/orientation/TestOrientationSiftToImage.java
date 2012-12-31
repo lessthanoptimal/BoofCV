@@ -37,7 +37,7 @@ public class TestOrientationSiftToImage {
 	@Test
 	public void generic() {
 		SiftImageScaleSpace ss = new SiftImageScaleSpace(1.6f,5,4,false);
-		OrientationHistogramSift orig = FactoryOrientationAlgs.sift(32,2.5,1.5);
+		OrientationHistogramSift orig = FactoryOrientationAlgs.sift(null);
 
 		OrientationSiftToImage alg = new OrientationSiftToImage(orig,ss);
 
