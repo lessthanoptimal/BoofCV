@@ -39,7 +39,7 @@ public class TestDetectDescribeSift {
 
 	public TestDetectDescribeSift() {
 		SiftImageScaleSpace ss = new SiftImageScaleSpace(1.6f, 5,4,false);
-		SiftDetector detector = FactoryInterestPointAlgs.siftDetector(2, 1, -1, 5);
+		SiftDetector detector = FactoryInterestPointAlgs.siftDetector(null);
 		OrientationHistogramSift orientation = new OrientationHistogramSift(32,2.5,1.5);
 		DescribePointSift describe = new DescribePointSift(4,8,8,0.5, 2.5);
 

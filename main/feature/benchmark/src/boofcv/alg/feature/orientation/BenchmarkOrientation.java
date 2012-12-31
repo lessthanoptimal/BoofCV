@@ -174,7 +174,7 @@ public class BenchmarkOrientation<I extends ImageSingleBand, D extends ImageSing
 		System.out.println("=========  Profile Image Size " + width + " x " + height + " ========== "+imageType.getSimpleName());
 		System.out.println();
 
-		OrientationHistogramSift sift = FactoryOrientationAlgs.sift(32,2.5,1.5);
+		OrientationHistogramSift sift = FactoryOrientationAlgs.sift(null);
 		SiftImageScaleSpace ss = new SiftImageScaleSpace(1.6f,5,4,false);
 		OrientationSiftToImage siftWrapped = new OrientationSiftToImage(sift,ss);
 

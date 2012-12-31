@@ -32,7 +32,7 @@ public class TestWrapSiftDetector {
 
 	@Test
 	public void standard() {
-		SiftDetector alg = FactoryInterestPointAlgs.siftDetector(2,1,500,5);
+		SiftDetector alg = FactoryInterestPointAlgs.siftDetector(null);
 		SiftImageScaleSpace ss = new SiftImageScaleSpace(1.6f, 5, 4, false);
 
 		WrapSiftDetector wrapper = new WrapSiftDetector(alg,ss);
@@ -42,7 +42,7 @@ public class TestWrapSiftDetector {
 
 	@Test
 	public void doubleInput() {
-		SiftDetector alg = FactoryInterestPointAlgs.siftDetector(2,1,500,5);
+		SiftDetector alg = FactoryInterestPointAlgs.siftDetector(null);
 		SiftImageScaleSpace ss = new SiftImageScaleSpace(1.6f, 5, 4, true);
 		WrapSiftDetector wrapper = new WrapSiftDetector(alg,ss);
 

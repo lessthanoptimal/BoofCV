@@ -18,6 +18,7 @@
 
 package boofcv.alg.feature.detect.interest;
 
+import boofcv.abst.feature.detect.interest.ConfigSiftDetector;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.factory.feature.detect.interest.FactoryInterestPointAlgs;
 import boofcv.gui.ListDisplayPanel;
@@ -41,7 +42,7 @@ public class DebugSiftDetectorApp {
 
 		ImageFloat32 gray = ConvertBufferedImage.convertFromSingle(input, null, ImageFloat32.class);
 
-		SiftDetector alg = FactoryInterestPointAlgs.siftDetector(3,10,150,5);
+		SiftDetector alg = FactoryInterestPointAlgs.siftDetector(new ConfigSiftDetector(3,10,150,5));
 		SiftImageScaleSpace imageSS = new SiftImageScaleSpace(1.6f, 5, 4, false);
 
 		imageSS.constructPyramid(gray);

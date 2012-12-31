@@ -52,7 +52,7 @@ public class FactoryDescribeRegionPoint {
 	 *
 	 * @see DescribePointSurf
 	 *
-	 * @param config SURF configuration.
+	 * @param config SURF configuration. Pass in null for default options.
 	 * @param imageType Type of input image.
 	 * @return SURF description extractor
 	 */
@@ -74,7 +74,7 @@ public class FactoryDescribeRegionPoint {
 	 *
 	 * @see DescribePointSurf
 	 *
-	 * @param config SURF configuration.
+	 * @param config SURF configuration. Pass in null for default options.
 	 * @param imageType Type of input image.
 	 * @return SURF description extractor
 	 */
@@ -95,24 +95,23 @@ public class FactoryDescribeRegionPoint {
 	 *
 	 * <p>
 	 * NOTE: If detecting and describing SIFT features then it is more efficient to use
-	 * {@link boofcv.factory.feature.detdesc.FactoryDetectDescribe#sift(int, float, boolean, int)} instead
+	 * {@link boofcv.factory.feature.detdesc.FactoryDetectDescribe#sift} instead
 	 * </p>
 	 *
-	 * @param scaleSigma Amount of blur applied to each scale inside an octaves.  Try 1.6
-	 * @param numOfScales Number of scales per octaves.  Try 5.  Must be >= 3
-	 * @param numOfOctaves Number of octaves to detect.  Try 4
-	 * @param doubleInputImage Should the input image be doubled? Try false.
-	 * @return
+	 * @param configSS SIFT scale-space configuration. Pass in null for default options.
+	 * @param configDescribe SIFT descriptor configuration.  Pass in null for default options.
+	 * @return SIFT descriptor
 	 */
-	public static DescribeRegionPoint<ImageFloat32,SurfFeature> sift( double scaleSigma ,
-																	  int numOfScales ,
-																	  int numOfOctaves ,
-																	  boolean doubleInputImage ) {
-		SiftImageScaleSpace ss = new SiftImageScaleSpace((float)scaleSigma, numOfScales, numOfOctaves,
-				doubleInputImage);
+	public static DescribeRegionPoint<ImageFloat32,SurfFeature> sift( ConfigSiftScaleSpace configSS,
+																	  ConfigSiftDescribe configDescribe) {
+		if( configSS == null )
+			configSS = new ConfigSiftScaleSpace();
+		configSS.checkValidity();
 
+		SiftImageScaleSpace ss = new SiftImageScaleSpace(configSS.blurSigma, configSS.numScales, configSS.numOctaves,
+				configSS.doubleInputImage);
 
-		DescribePointSift alg = FactoryDescribePointAlgs.sift(4, 8, 8);
+		DescribePointSift alg = FactoryDescribePointAlgs.sift(configDescribe);
 
 		return new WrapDescribeSift(alg,ss);
 	}

@@ -40,7 +40,7 @@ public class TestSiftDetector extends GenericFeatureDetector {
 
 	@Override
 	protected Object createDetector(int maxFeatures) {
-		return FactoryInterestPointAlgs.siftDetector(2,1,maxFeatures,5);
+		return FactoryInterestPointAlgs.siftDetector(null);
 	}
 
 	@Override
@@ -66,7 +66,7 @@ public class TestSiftDetector extends GenericFeatureDetector {
 		// render a checkered pattern
 		renderCheckered(input);
 
-		SiftDetector alg = FactoryInterestPointAlgs.siftDetector(2,1,-1,5);
+		SiftDetector alg = FactoryInterestPointAlgs.siftDetector(null);
 
 		ss.constructPyramid(input);
 		ss.computeFeatureIntensity();

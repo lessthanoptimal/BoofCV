@@ -18,6 +18,7 @@
 
 package boofcv.factory.feature.describe;
 
+import boofcv.abst.feature.describe.ConfigSiftDescribe;
 import boofcv.abst.feature.describe.ConfigSurfDescribe;
 import boofcv.abst.filter.blur.BlurFilter;
 import boofcv.alg.feature.describe.*;
@@ -25,7 +26,6 @@ import boofcv.alg.feature.describe.brief.BriefDefinition_I32;
 import boofcv.alg.feature.describe.impl.*;
 import boofcv.alg.interpolate.InterpolatePixel;
 import boofcv.factory.interpolate.FactoryInterpolation;
-import boofcv.struct.BoofDefaults;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
@@ -84,9 +84,14 @@ public class FactoryDescribePointAlgs {
 		return new DescribePointBriefSO<T>(definition,filterBlur,interp);
 	}
 
-	public static DescribePointSift sift( int gridWidth , int numSamples , int numHistBins ) {
-		return new DescribePointSift(gridWidth,numSamples,numHistBins
-				,0.5, BoofDefaults.SCALE_SPACE_CANONICAL_RADIUS);
+	public static DescribePointSift sift( ConfigSiftDescribe config )
+	{
+	    if( config == null )
+			config = new ConfigSiftDescribe();
+		config.checkValidity();
+
+		return new DescribePointSift(config.gridWidth,config.numSamples,config.numHistBins
+				,config.weightSigma, config.sigmaToRadius);
 	}
 
 	public static <T extends ImageSingleBand, D extends TupleDesc>
