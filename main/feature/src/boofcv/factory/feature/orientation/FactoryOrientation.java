@@ -53,13 +53,4 @@ public class FactoryOrientation {
 			throw new IllegalArgumentException("Unknown orientation algorithm type");
 		}
 	}
-
-	public static <II extends ImageSingleBand>
-	OrientationIntegral<II> surfDefault( boolean modified , Class<II> integralType ) {
-		if( modified ) {
-			return FactoryOrientationAlgs.sliding_ii(0.65, Math.PI / 3.0, 8, -1, 6, integralType);
-		} else {
-			return FactoryOrientationAlgs.average_ii(6, 1 , 6, -1, integralType);
-		}
-	}
 }

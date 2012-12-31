@@ -18,13 +18,16 @@
 
 package boofcv.factory.feature.detdesc;
 
+import boofcv.abst.feature.describe.ConfigSurfDescribe;
 import boofcv.abst.feature.describe.DescribeRegionPoint;
 import boofcv.abst.feature.detdesc.DetectDescribeFusion;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
 import boofcv.abst.feature.detdesc.WrapDetectDescribeSift;
 import boofcv.abst.feature.detdesc.WrapDetectDescribeSurf;
-import boofcv.abst.feature.detect.extract.FeatureExtractor;
+import boofcv.abst.feature.detect.interest.ConfigFastHessian;
 import boofcv.abst.feature.detect.interest.InterestPointDetector;
+import boofcv.abst.feature.orientation.ConfigAverageIntegral;
+import boofcv.abst.feature.orientation.ConfigSlidingIntegral;
 import boofcv.abst.feature.orientation.OrientationImage;
 import boofcv.abst.feature.orientation.OrientationIntegral;
 import boofcv.alg.feature.describe.DescribePointSift;
@@ -36,9 +39,8 @@ import boofcv.alg.feature.detect.interest.SiftImageScaleSpace;
 import boofcv.alg.feature.orientation.OrientationHistogramSift;
 import boofcv.alg.transform.ii.GIntegralImageOps;
 import boofcv.factory.feature.describe.FactoryDescribePointAlgs;
-import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
 import boofcv.factory.feature.detect.interest.FactoryInterestPointAlgs;
-import boofcv.factory.feature.orientation.FactoryOrientation;
+import boofcv.factory.feature.orientation.FactoryOrientationAlgs;
 import boofcv.struct.BoofDefaults;
 import boofcv.struct.feature.SurfFeature;
 import boofcv.struct.feature.TupleDesc;
@@ -114,17 +116,7 @@ public class FactoryDetectDescribe {
 	/**
 	 * <p>
 	 * Creates a SURF descriptor.  SURF descriptors are invariant to illumination, orientation, and scale.
-	 * BoofCV provides two variants. BoofCV provides two variants, described below.
-	 * </p>
-	 *
-	 * <p>
-	 * The modified variant provides comparable stability to binary provided by the original author.  The
-	 * other variant is much faster, but a bit less stable, Both implementations contain several algorithmic
-	 * changes from what was described in the original SURF paper.  See tech report [1] for details.
-	 * <p>
-	 *
-	 * <p>
-	 * Both variants use the FastHessian feature detector described in the SURF paper.
+	 * BoofCV provides two variants. Creates a variant which is designed for speed at the cost of some stability.
 	 * </p>
 	 *
 	 * <p>
@@ -133,41 +125,54 @@ public class FactoryDetectDescribe {
 	 *
 	 * @see FastHessianFeatureDetector
 	 * @see DescribePointSurf
-	 * @see DescribePointSurf
 	 *
-	 * @param detectThreshold       Minimum feature intensity. Image dependent.  Start tuning at 1.
-	 * @param extractRadius         Radius used for non-max-suppression.  Typically 1 or 2.
-	 * @param maxFeaturesPerScale   Number of features it will find or if <= 0 it will return all features it finds.
-	 * @param initialSampleSize     How often pixels are sampled in the first octave.  Typically 1 or 2.
-	 * @param initialSize           Typically 9.
-	 * @param numberScalesPerOctave Typically 4.
-	 * @param numberOfOctaves       Typically 4.
-	 * @param modified              True for more stable but slower and false for a faster but less stable.
-	 * @return The interest point detector.
-	 * @see FastHessianFeatureDetector
+	 * @param configDetector		Configuration for SURF detector
+	 * @param configDesc			Configuration for SURF descriptor
+	 * @param configOrientation		Configuration for orientation
+	 * @return SURF detector and descriptor
 	 */
 	public static <T extends ImageSingleBand, II extends ImageSingleBand>
-	DetectDescribePoint<T,SurfFeature> surf( float detectThreshold,
-											 int extractRadius, int maxFeaturesPerScale,
-											 int initialSampleSize, int initialSize,
-											 int numberScalesPerOctave,
-											 int numberOfOctaves ,
-											 boolean modified ,
-											 Class<T> imageType) {
+	DetectDescribePoint<T,SurfFeature> surfFast( ConfigFastHessian configDetector ,
+												 ConfigSurfDescribe.Speed configDesc,
+												 ConfigAverageIntegral configOrientation,
+												 Class<T> imageType) {
 
 		Class<II> integralType = GIntegralImageOps.getIntegralType(imageType);
-		OrientationIntegral<II> orientation = FactoryOrientation.surfDefault(modified, integralType);
-		DescribePointSurf<II> describe;
+		OrientationIntegral<II> orientation = FactoryOrientationAlgs.average_ii(configOrientation, integralType);
+		DescribePointSurf<II> describe = FactoryDescribePointAlgs.surfSpeed(configDesc, integralType);
+		FastHessianFeatureDetector<II> detector = FactoryInterestPointAlgs.fastHessian(configDetector);
 
-		if( modified ) {
-			describe = FactoryDescribePointAlgs.<II>msurf(integralType);
-		} else {
-			describe = FactoryDescribePointAlgs.<II>surf(integralType);
-		}
+		return new WrapDetectDescribeSurf<T,II>( detector, orientation, describe );
+	}
 
-		FeatureExtractor extractor = FactoryFeatureExtractor.nonmax(extractRadius, detectThreshold, 5, true);
-		FastHessianFeatureDetector<II> detector = new FastHessianFeatureDetector<II>(extractor, maxFeaturesPerScale,
-				initialSampleSize, initialSize, numberScalesPerOctave, numberOfOctaves);
+	/**
+	 * <p>
+	 * Creates a SURF descriptor.  SURF descriptors are invariant to illumination, orientation, and scale.
+	 * BoofCV provides two variants. Creates a variant which is designed for stability..
+	 * </p>
+	 *
+	 * <p>
+	 * [1] Add tech report when its finished.  See SURF performance web page for now.
+	 * </p>
+	 *
+	 * @see FastHessianFeatureDetector
+	 * @see DescribePointSurf
+	 *
+	 * @param configDetector Configuration for SURF detector.  Null for default.
+	 * @param configDescribe Configuration for SURF descriptor.  Null for default.
+	 * @param configOrientation Configuration for region orientation.  Null for default.
+	 * @return SURF detector and descriptor
+	 */
+	public static <T extends ImageSingleBand, II extends ImageSingleBand>
+	DetectDescribePoint<T,SurfFeature> surfStable( ConfigFastHessian configDetector,
+												   ConfigSurfDescribe.Stablility configDescribe,
+												   ConfigSlidingIntegral configOrientation,
+												   Class<T> imageType) {
+
+		Class<II> integralType = GIntegralImageOps.getIntegralType(imageType);
+		FastHessianFeatureDetector<II> detector = FactoryInterestPointAlgs.fastHessian(configDetector);
+		DescribePointSurf<II> describe = FactoryDescribePointAlgs.surfStability(configDescribe, integralType);
+		OrientationIntegral<II> orientation = FactoryOrientationAlgs.sliding_ii(configOrientation, integralType);
 
 		return new WrapDetectDescribeSurf<T,II>( detector, orientation, describe );
 	}

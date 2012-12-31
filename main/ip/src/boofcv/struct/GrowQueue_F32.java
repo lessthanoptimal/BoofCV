@@ -51,6 +51,19 @@ public class GrowQueue_F32 {
 		return data[index];
 	}
 
+	public void resize( int size ) {
+		if( data.length < size ) {
+			data = new float[size];
+		}
+		this.size = size;
+	}
+
+	public void setMaxSize( int size ) {
+		if( data.length < size ) {
+			data = new float[size];
+		}
+	}
+
 	public int getSize() {
 		return size;
 	}

@@ -21,6 +21,8 @@ package boofcv.factory.feature.associate;
 import boofcv.abst.feature.associate.*;
 import boofcv.alg.feature.associate.AssociateGreedy;
 import boofcv.struct.feature.*;
+import org.ddogleg.nn.FactoryNearestNeighbor;
+import org.ddogleg.nn.NearestNeighbor;
 
 
 /**
@@ -53,6 +55,50 @@ public class FactoryAssociation {
 		AssociateGreedy<D> alg = new AssociateGreedy<D>(score,maxError,backwardsValidation);
 		WrapAssociateGreedy<D> ret = new WrapAssociateGreedy<D>(alg,maxMatches);
 		return ret;
+	}
+
+
+	/**
+	 * Approximate association using a K-D tree degree of moderate size (10-15) that uses a best-bin-first search
+	 * order.
+	 *
+	 * @see AssociateNearestNeighbor
+	 * @see org.ddogleg.nn.alg.KdTreeSearchBbf
+	 *
+	 * @param dimension Number of elements in the feature vector
+	 * @param maxNodesSearched  Maximum number of nodes it will search.  Controls speed and accuracy.
+	 * @return Association using approximate nearest neighbor
+	 */
+	public static AssociateDescription<TupleDesc_F64> kdtree( int dimension, int maxNodesSearched ) {
+		NearestNeighbor nn = FactoryNearestNeighbor.kdtree(maxNodesSearched);
+
+		return new AssociateNearestNeighbor<TupleDesc_F64>(nn,dimension);
+	}
+
+	/**
+	 * Approximate association using multiple random K-D trees (random forest) for descriptors with a high degree of
+	 * freedom, e.g. > 20
+	 *
+	 * @see AssociateNearestNeighbor
+	 * @see org.ddogleg.nn.wrap.KdForestBbfSearch
+	 *
+	 * @param dimension Number of elements in the feature vector
+	 * @param maxNodesSearched  Maximum number of nodes it will search.  Controls speed and accuracy.
+	 * @param numTrees Number of trees that are considered.  Try 10 and tune.
+	 * @param numConsiderSplit Number of nodes that are considered when generating a tree.  Must be less than the
+	 *                         point's dimension.  Try 5
+	 * @param randomSeed Seed used by random number generator
+	 * @return Association using approximate nearest neighbor
+	 */
+	public static AssociateDescription<TupleDesc_F64> kdRandomForest( int dimension,
+																	  int maxNodesSearched ,
+																	  int numTrees ,
+																	  int numConsiderSplit ,
+																	  long randomSeed) {
+		NearestNeighbor nn = FactoryNearestNeighbor.kdRandomForest(
+				maxNodesSearched,numTrees,numConsiderSplit,randomSeed);
+
+		return new AssociateNearestNeighbor<TupleDesc_F64>(nn,dimension);
 	}
 
 	/**

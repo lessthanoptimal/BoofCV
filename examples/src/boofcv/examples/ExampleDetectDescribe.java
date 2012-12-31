@@ -22,6 +22,7 @@ import boofcv.abst.feature.associate.AssociateDescription;
 import boofcv.abst.feature.associate.ScoreAssociation;
 import boofcv.abst.feature.describe.DescribeRegionPoint;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
+import boofcv.abst.feature.detect.interest.ConfigFastHessian;
 import boofcv.abst.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.abst.feature.detect.interest.InterestPointDetector;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
@@ -56,7 +57,8 @@ public class ExampleDetectDescribe {
 	 */
 	public static <T extends ImageSingleBand, D extends TupleDesc>
 	DetectDescribePoint<T,D> createFromPremade( Class<T> imageType ) {
-		return (DetectDescribePoint)FactoryDetectDescribe.surf(1, 2, 200, 1, 9, 4, 4,true,ImageFloat32.class);
+		return (DetectDescribePoint)FactoryDetectDescribe.surfStable(
+				new ConfigFastHessian(1, 2, 200, 1, 9, 4, 4), null,null, ImageFloat32.class);
 		// note that SIFT only supports ImageFloat32
 //		if( imageType == ImageFloat32.class )
 //			return (DetectDescribePoint)FactoryDetectDescribe.sift(4,2,false,-1);

@@ -16,24 +16,21 @@
  * limitations under the License.
  */
 
-package boofcv.abst.feature.detdesc;
+package boofcv.struct;
 
-import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
-import boofcv.struct.feature.SurfFeature;
-import boofcv.struct.image.ImageFloat32;
+import java.io.Serializable;
 
 /**
+ * Complex algorithms with several parameters can specify their parameters using a separate class.  This interface
+ * is intended to provide a common interface for all such configuration classes.
+ *
  * @author Peter Abeles
  */
-public class TestWrapDetectDescribeSurf extends GenericTestsDetectDescribePoint<ImageFloat32,SurfFeature>
-{
+public interface Configuration extends Serializable {
 
-	public TestWrapDetectDescribeSurf() {
-		super(true, true, ImageFloat32.class, SurfFeature.class);
-	}
-
-	@Override
-	public DetectDescribePoint<ImageFloat32, SurfFeature> createDetDesc() {
-		return FactoryDetectDescribe.surfStable(null,null,null, ImageFloat32.class);
-	}
+	/**
+	 * Checks to see if the configuration is valid. If it is invalid, throw an exception explaining what is
+	 * incorrect.
+	 */
+	public void checkValidity();
 }

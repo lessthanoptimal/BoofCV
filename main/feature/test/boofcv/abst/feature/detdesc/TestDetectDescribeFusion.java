@@ -65,9 +65,9 @@ public class TestDetectDescribeFusion {
 
 	@Test
 	public void checkWithOrientation() {
-		final InterestPointDetector<ImageFloat32> detector = FactoryInterestPoint.fastHessian(1, 1, -1, 1, 9, 4, 4);
+		final InterestPointDetector<ImageFloat32> detector = FactoryInterestPoint.fastHessian(null);
 		final OrientationImage ori = FactoryOrientationAlgs.nogradient(5,ImageFloat32.class);
-		final DescribeRegionPoint<ImageFloat32,SurfFeature> desc = FactoryDescribeRegionPoint.surf(true, ImageFloat32.class);
+		final DescribeRegionPoint<ImageFloat32,SurfFeature> desc = FactoryDescribeRegionPoint.surfStable(null, ImageFloat32.class);
 
 		new GenericTestsDetectDescribePoint(true,true, ImageFloat32.class,SurfFeature.class) {
 
@@ -80,8 +80,8 @@ public class TestDetectDescribeFusion {
 
 	@Test
 	public void checkWithoutOrientation() {
-		final InterestPointDetector<ImageFloat32> detector = FactoryInterestPoint.fastHessian(1, 1, -1, 1, 9, 4, 4);
-		final DescribeRegionPoint<ImageFloat32,SurfFeature> desc = FactoryDescribeRegionPoint.surf(true, ImageFloat32.class);
+		final InterestPointDetector<ImageFloat32> detector = FactoryInterestPoint.fastHessian(null);
+		final DescribeRegionPoint<ImageFloat32,SurfFeature> desc = FactoryDescribeRegionPoint.surfStable(null, ImageFloat32.class);
 
 		new GenericTestsDetectDescribePoint(true,false, ImageFloat32.class,SurfFeature.class) {
 

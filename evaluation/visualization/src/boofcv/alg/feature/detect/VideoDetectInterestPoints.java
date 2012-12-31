@@ -18,6 +18,7 @@
 
 package boofcv.alg.feature.detect;
 
+import boofcv.abst.feature.detect.interest.ConfigFastHessian;
 import boofcv.abst.feature.detect.interest.InterestPointDetector;
 import boofcv.alg.feature.orientation.OrientationImageAverage;
 import boofcv.factory.feature.detect.interest.FactoryInterestPoint;
@@ -112,7 +113,7 @@ public class VideoDetectInterestPoints<T extends ImageSingleBand>
 
 		InterestPointDetector<T> detector;
 
-		detector = FactoryInterestPoint.fastHessian(1, 2, 100, 2, 9, 4, 4);
+		detector = FactoryInterestPoint.fastHessian(new ConfigFastHessian(1, 2, 100, 2, 9, 4, 4));
 //		FeatureScaleSpace<T,D> feature = FactoryInterestPointAlgs.hessianScaleSpace(radius,1,maxCorners,imageType,derivType);
 //		detector = FactoryInterestPoint.wrapDetector(feature,new double[]{1,2,4,6,8,12},imageType);
 

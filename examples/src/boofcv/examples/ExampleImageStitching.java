@@ -22,6 +22,7 @@ package boofcv.examples;
 import boofcv.abst.feature.associate.AssociateDescription;
 import boofcv.abst.feature.associate.ScoreAssociation;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
+import boofcv.abst.feature.detect.interest.ConfigFastHessian;
 import boofcv.alg.feature.UtilFeature;
 import boofcv.alg.sfm.robust.DistanceHomographySq;
 import boofcv.alg.sfm.robust.GenerateHomographyLinear;
@@ -138,7 +139,8 @@ public class ExampleImageStitching {
 		T inputB = ConvertBufferedImage.convertFromSingle(imageB, null, imageType);
 
 		// Detect using the standard SURF feature descriptor and describer
-		DetectDescribePoint detDesc = FactoryDetectDescribe.surf(1, 2, 200, 1, 9, 4, 4, true, imageType);
+		DetectDescribePoint detDesc = FactoryDetectDescribe.surfStable(
+				new ConfigFastHessian(1, 2, 200, 1, 9, 4, 4), null,null, imageType);
 		ScoreAssociation<SurfFeature> scorer = FactoryAssociation.scoreEuclidean(SurfFeature.class,true);
 		AssociateDescription<SurfFeature> associate = FactoryAssociation.greedy(scorer,2,-1,true);
 

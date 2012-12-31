@@ -47,33 +47,43 @@ public class FactoryDescribeRegionPoint {
 	/**
 	 * <p>
 	 * Creates a SURF descriptor.  SURF descriptors are invariant to illumination, orientation, and scale.
-	 * BoofCV provides two variants. BoofCV provides two variants, described below.
+	 * BoofCV provides two variants. The SURF variant created here is designed for speed and sacrifices some stability.
 	 * </p>
-	 *
-	 * <p>
-	 * The modified variant provides comparable stability to binary provided by the original author.  The
-	 * other variant is much faster, but a bit less stable, Both implementations contain several algorithmic
-	 * changes from what was described in the original SURF paper.  See tech report [1] for details.
-	 * <p>
 	 *
 	 * @see DescribePointSurf
 	 *
-	 * @param modified True for more stable but slower and false for a faster but less stable.
+	 * @param config SURF configuration.
 	 * @param imageType Type of input image.
 	 * @return SURF description extractor
 	 */
 	public static <T extends ImageSingleBand, II extends ImageSingleBand>
-	DescribeRegionPoint<T,SurfFeature> surf( boolean modified , Class<T> imageType) {
+	DescribeRegionPoint<T,SurfFeature> surfFast( ConfigSurfDescribe.Speed config , Class<T> imageType) {
 
 		Class<II> integralType = GIntegralImageOps.getIntegralType(imageType);
 
-		DescribePointSurf<II> alg;
+		DescribePointSurf<II> alg = FactoryDescribePointAlgs.surfSpeed( config, integralType);
 
-		if( modified ) {
-			alg = FactoryDescribePointAlgs.<II>msurf(integralType);
-		} else {
-			alg = FactoryDescribePointAlgs.<II>surf(integralType);
-		}
+		return new WrapDescribeSurf<T,II>( alg );
+	}
+
+	/**
+	 * <p>
+	 * Creates a SURF descriptor.  SURF descriptors are invariant to illumination, orientation, and scale.
+	 * BoofCV provides two variants. The SURF variant created here is designed for stability.
+	 * </p>
+	 *
+	 * @see DescribePointSurf
+	 *
+	 * @param config SURF configuration.
+	 * @param imageType Type of input image.
+	 * @return SURF description extractor
+	 */
+	public static <T extends ImageSingleBand, II extends ImageSingleBand>
+	DescribeRegionPoint<T,SurfFeature> surfStable(ConfigSurfDescribe.Stablility config, Class<T> imageType) {
+
+		Class<II> integralType = GIntegralImageOps.getIntegralType(imageType);
+
+		DescribePointSurf<II> alg = FactoryDescribePointAlgs.surfStability( config, integralType);
 
 		return new WrapDescribeSurf<T,II>( alg );
 	}

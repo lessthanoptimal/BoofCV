@@ -20,6 +20,7 @@ package boofcv.examples;
 
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
 import boofcv.abst.feature.detect.extract.FeatureExtractor;
+import boofcv.abst.feature.detect.interest.ConfigFastHessian;
 import boofcv.abst.feature.orientation.OrientationIntegral;
 import boofcv.alg.feature.describe.DescribePointSurf;
 import boofcv.alg.feature.detect.interest.FastHessianFeatureDetector;
@@ -54,7 +55,7 @@ public class ExampleFeatureSurf {
 	public static void easy( ImageFloat32 image ) {
 		// create the detector and descriptors
 		DetectDescribePoint<ImageFloat32,SurfFeature>
-				surf = FactoryDetectDescribe.surf(0, 2, 200, 2, 9, 4, 4, true, ImageFloat32.class);
+				surf = FactoryDetectDescribe.surfStable(new ConfigFastHessian(0, 2, 200, 2, 9, 4, 4), null,null, ImageFloat32.class);
 
 		 // specify the image to process
 		surf.detect(image);
@@ -82,9 +83,9 @@ public class ExampleFeatureSurf {
 
 		// estimate orientation
 		OrientationIntegral<II> orientation = 
-				FactoryOrientationAlgs.sliding_ii(0.65, Math.PI / 3.0, 8, -1, 6, integralType);
+				FactoryOrientationAlgs.sliding_ii(null, integralType);
 
-		DescribePointSurf<II> descriptor = FactoryDescribePointAlgs.<II>msurf(integralType);
+		DescribePointSurf<II> descriptor = FactoryDescribePointAlgs.<II>surfStability(null,integralType);
 		
 		// compute the integral image of 'image'
 		II integral = GeneralizedImageOps.createSingleBand(integralType,image.width,image.height);

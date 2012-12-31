@@ -35,7 +35,9 @@ public class TestOrientationIntegralToImage {
 	 */
 	@Test
 	public void generic() {
-		OrientationIntegral<ImageFloat32> orig = FactoryOrientationAlgs.average_ii(r, 1, 6, 0, ImageFloat32.class);
+		ConfigAverageIntegral config = new ConfigAverageIntegral();
+		config.radius = r;
+		OrientationIntegral<ImageFloat32> orig = FactoryOrientationAlgs.average_ii(config, ImageFloat32.class);
 
 		OrientationIntegralToImage<ImageFloat32,ImageFloat32>
 				alg = new OrientationIntegralToImage<ImageFloat32, ImageFloat32>(orig,

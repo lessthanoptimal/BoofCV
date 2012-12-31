@@ -18,6 +18,8 @@
 
 package boofcv.factory.feature.orientation;
 
+import boofcv.abst.feature.orientation.ConfigAverageIntegral;
+import boofcv.abst.feature.orientation.ConfigSlidingIntegral;
 import boofcv.abst.feature.orientation.OrientationIntegral;
 import boofcv.alg.feature.orientation.*;
 import boofcv.alg.feature.orientation.impl.*;
@@ -112,20 +114,21 @@ public class FactoryOrientationAlgs {
 
 	/**
 	 *
-	 * @param radius Radius of the region being considered in terms of samples. Typically 6.
-	 * @param samplePeriod How often the image is sampled.  This number is scaled.  Typically 1.
-	 * @param sampleWidth How wide of a kernel should be used to sample. Try 6
-	 * @param weightSigma Sigma for weighting.  zero for unweighted. Try 0.
+	 * @see ImplOrientationAverageGradientIntegral
+	 *
+	 * @param config Configuration for algorithm.
 	 * @param integralType Type of image being processed.
 	 * @return OrientationIntegral
 	 */
 	public static <II extends ImageSingleBand>
-	OrientationIntegral<II> average_ii( int radius , double samplePeriod , int sampleWidth,
-									   double weightSigma , Class<II> integralType)
+	OrientationIntegral<II> average_ii( ConfigAverageIntegral config , Class<II> integralType)
 	{
+		if( config == null )
+			config = new ConfigAverageIntegral();
+
 		return (OrientationIntegral<II>)
-				new ImplOrientationAverageGradientIntegral(radius,samplePeriod,sampleWidth,weightSigma
-						,integralType);
+				new ImplOrientationAverageGradientIntegral(config.radius,config.samplePeriod,config.sampleWidth,
+						config.weightSigma ,integralType);
 	}
 
 	/**
@@ -155,21 +158,20 @@ public class FactoryOrientationAlgs {
 	 *
 	 * @see OrientationSlidingWindow
 	 *
-	 * @param samplePeriod How often the image is sampled.  This number is scaled.  Typically 0.65.
-	 * @param windowSize Angular window that is slide across.  Try PI/3
-	 * @param radius Radius of the region being considered in terms of samples. Typically 8.
-	 * @param weightSigma Sigma for weighting distribution.  Zero for unweighted. Try 0
-	 * @param sampleWidth Size of kernel doing the sampling.  Typically 6.
+	 * @param config Configuration for algorithm.  If null defaults will be used.
 	 * @param integralType Type of integral image being processed.
 	 * @return OrientationIntegral
 	 */
 	public static <II extends ImageSingleBand>
-	OrientationIntegral<II> sliding_ii(double samplePeriod, double windowSize, int radius,
-									  double weightSigma, int sampleWidth, Class<II> integralType)
+	OrientationIntegral<II> sliding_ii( ConfigSlidingIntegral config , Class<II> integralType)
 	{
+		if( config == null )
+			config = new ConfigSlidingIntegral();
+		config.checkValidity();
+
 		return (OrientationIntegral<II>)
-				new ImplOrientationSlidingWindowIntegral(samplePeriod,
-						windowSize,radius,weightSigma, sampleWidth,integralType);
+				new ImplOrientationSlidingWindowIntegral(config.samplePeriod,
+						config.windowSize,config.radius,config.weightSigma, config.sampleWidth,integralType);
 	}
 
 	/**

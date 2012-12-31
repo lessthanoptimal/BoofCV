@@ -16,24 +16,10 @@
  * limitations under the License.
  */
 
-package boofcv.abst.feature.detdesc;
-
-import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
-import boofcv.struct.feature.SurfFeature;
-import boofcv.struct.image.ImageFloat32;
+package boofcv.abst.feature.describe;
 
 /**
  * @author Peter Abeles
  */
-public class TestWrapDetectDescribeSurf extends GenericTestsDetectDescribePoint<ImageFloat32,SurfFeature>
-{
-
-	public TestWrapDetectDescribeSurf() {
-		super(true, true, ImageFloat32.class, SurfFeature.class);
-	}
-
-	@Override
-	public DetectDescribePoint<ImageFloat32, SurfFeature> createDetDesc() {
-		return FactoryDetectDescribe.surfStable(null,null,null, ImageFloat32.class);
-	}
+public class ConfigSiftDescribe {
 }

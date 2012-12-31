@@ -40,7 +40,7 @@ import java.util.Random;
 public class DebugDescribeTransform {
 
 	public static <T extends ImageSingleBand> void doStuff( Class<T> imageType ) {
-		DescribeRegionPoint<T,SurfFeature> alg =  FactoryDescribeRegionPoint.surf(false, imageType);
+		DescribeRegionPoint<T,SurfFeature> alg =  FactoryDescribeRegionPoint.surfFast(null, imageType);
 
 		int r = 8;
 		int w = r*2+1;

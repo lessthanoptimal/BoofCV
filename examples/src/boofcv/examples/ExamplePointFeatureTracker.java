@@ -18,6 +18,7 @@
 
 package boofcv.examples;
 
+import boofcv.abst.feature.detect.interest.ConfigFastHessian;
 import boofcv.abst.feature.tracker.ImagePointTracker;
 import boofcv.abst.feature.tracker.PkltConfig;
 import boofcv.abst.feature.tracker.PointTrack;
@@ -134,7 +135,11 @@ public class ExamplePointFeatureTracker< T extends ImageSingleBand, D extends Im
 	 * Creates a SURF feature tracker.
 	 */
 	public void createSURF() {
-		tracker = FactoryPointSequentialTracker.dda_FH_SURF(200, 3, 200, 2 ,false, imageType);
+		ConfigFastHessian configDetector = new ConfigFastHessian();
+		configDetector.maxFeaturesPerScale = 200;
+		configDetector.extractRadius = 3;
+		configDetector.initialSampleSize = 2;
+		tracker = FactoryPointSequentialTracker.dda_FH_SURF_Fast(200,configDetector,null,null, imageType);
 	}
 
 	public static void main( String args[] ) throws FileNotFoundException {

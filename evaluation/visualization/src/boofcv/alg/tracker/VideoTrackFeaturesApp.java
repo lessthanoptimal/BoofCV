@@ -18,6 +18,7 @@
 
 package boofcv.alg.tracker;
 
+import boofcv.abst.feature.detect.interest.ConfigFastHessian;
 import boofcv.abst.feature.tracker.ImagePointTracker;
 import boofcv.abst.feature.tracker.PkltConfig;
 import boofcv.abst.feature.tracker.PointTrack;
@@ -65,14 +66,18 @@ public class VideoTrackFeaturesApp<I extends ImageSingleBand, D extends ImageSin
 		config.featureRadius = 3;
 		config.pyramidScaling = new int[]{1,2,4,8};
 
+		ConfigFastHessian configFH = new ConfigFastHessian();
+		configFH.maxFeaturesPerScale = 200;
+		configFH.extractRadius = 3;
+
 		addAlgorithm(0,"KLT", FactoryPointSequentialTracker.klt(config,1,3,1,1));
 		addAlgorithm(0,"ST-BRIEF", FactoryPointSequentialTracker.dda_ST_BRIEF(maxFeatures, 200, 3, 1, imageType, derivType));
 		addAlgorithm(0,"ST-NCC", FactoryPointSequentialTracker.dda_ST_NCC(maxFeatures, 3, 5, 2, imageType, derivType));
-		addAlgorithm(0,"FH-SURF", FactoryPointSequentialTracker.dda_FH_SURF(maxFeatures, 3, 200, 1 , false,imageType));
+		addAlgorithm(0,"FH-SURF", FactoryPointSequentialTracker.dda_FH_SURF_Fast(maxFeatures, configFH,null,null, imageType));
 		addAlgorithm(0,"ST-SURF-KLT", FactoryPointSequentialTracker.combined_ST_SURF_KLT(maxFeatures, 3, 1, 3,
-				config.pyramidScaling, 50, false, imageType, derivType));
-		addAlgorithm(0,"FH-SURF-KLT", FactoryPointSequentialTracker.combined_FH_SURF_KLT(maxFeatures, 200, 3,2,3,
-				config.pyramidScaling, 50,false,imageType));
+				config.pyramidScaling, 50, null,null, imageType, derivType));
+		addAlgorithm(0,"FH-SURF-KLT", FactoryPointSequentialTracker.combined_FH_SURF_KLT(maxFeatures, 3,
+				config.pyramidScaling, 50,configFH,null,null,imageType));
 
 		gui.addMouseListener(this);
 		gui.requestFocus();
@@ -169,7 +174,6 @@ public class VideoTrackFeaturesApp<I extends ImageSingleBand, D extends ImageSin
 		VideoTrackFeaturesApp app = new VideoTrackFeaturesApp(imageType, derivType);
 
 		java.util.List<PathLabel> inputs = new ArrayList<PathLabel>();
-		inputs.add(new PathLabel("Rovio", "/home/pja/projects/rovio/images/rovio2.mjpeg"));
 		inputs.add(new PathLabel("Shake", "../data/applet/shake.mjpeg"));
 		inputs.add(new PathLabel("Zoom", "../data/applet/zoom.mjpeg"));
 		inputs.add(new PathLabel("Rotate", "../data/applet/rotate.mjpeg"));

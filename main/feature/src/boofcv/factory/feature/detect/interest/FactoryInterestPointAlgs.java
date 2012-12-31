@@ -22,6 +22,7 @@ import boofcv.abst.feature.detect.extract.FeatureExtractor;
 import boofcv.abst.feature.detect.intensity.GeneralFeatureIntensity;
 import boofcv.abst.feature.detect.intensity.WrapperGradientCornerIntensity;
 import boofcv.abst.feature.detect.intensity.WrapperHessianBlobIntensity;
+import boofcv.abst.feature.detect.interest.ConfigFastHessian;
 import boofcv.abst.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.abst.filter.ImageFunctionSparse;
 import boofcv.abst.filter.derivative.AnyImageDerivative;
@@ -251,6 +252,24 @@ public class FactoryInterestPointAlgs {
 		detector.setMaxFeatures(maxFeatures);
 
 		return new FeatureScaleSpace<T, D>(detector, 2);
+	}
+
+	/**
+	 * Creates a Fast Hessian blob detector used by SURF.
+	 *
+	 * @param config Configuration for detector
+	 * @param <II> Integral Image
+	 * @return The feature detector
+	 */
+	public static <II extends ImageSingleBand>
+	FastHessianFeatureDetector<II> fastHessian( ConfigFastHessian config ) {
+
+		if( config == null )
+			config = new ConfigFastHessian();
+
+		FeatureExtractor extractor = FactoryFeatureExtractor.nonmax(config.extractRadius, config.detectThreshold, 5, true);
+		return new FastHessianFeatureDetector<II>(extractor, config.maxFeaturesPerScale,
+				config.initialSampleSize, config.initialSize, config.numberScalesPerOctave, config.numberOfOctaves);
 	}
 
 	/**

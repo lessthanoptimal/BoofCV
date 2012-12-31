@@ -18,6 +18,7 @@
 
 package boofcv.benchmark.feature.detect;
 
+import boofcv.abst.feature.detect.interest.ConfigFastHessian;
 import boofcv.abst.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.alg.feature.detect.intensity.HessianBlobIntensity;
 import boofcv.alg.feature.detect.interest.FeatureLaplacePyramid;
@@ -77,7 +78,8 @@ public class BenchmarkDetectHelper {
 		ret.add(new BenchmarkAlgorithm("Hessian SS", FactoryInterestPoint.wrapDetector(fss, scales, imageType)));
 		FeaturePyramid<T, D> fp = FactoryInterestPointAlgs.hessianPyramid(radius, thresh, maxScaleFeatures, imageType, derivType);
 		ret.add(new BenchmarkAlgorithm("Hessian P", FactoryInterestPoint.wrapDetector(fp, scales, imageType)));
-		ret.add(new BenchmarkAlgorithm("FastHessian", FactoryInterestPoint.<T>fastHessian(1, 2, maxScaleFeatures, 1, 9, 4, 4)));
+		ret.add(new BenchmarkAlgorithm("FastHessian", FactoryInterestPoint.<T>fastHessian(
+				new ConfigFastHessian(1, 2, maxScaleFeatures, 1, 9, 4, 4))));
 
 		return ret;
 	}

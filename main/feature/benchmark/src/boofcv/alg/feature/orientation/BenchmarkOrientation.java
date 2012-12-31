@@ -18,10 +18,7 @@
 
 package boofcv.alg.feature.orientation;
 
-import boofcv.abst.feature.orientation.OrientationGradient;
-import boofcv.abst.feature.orientation.OrientationImage;
-import boofcv.abst.feature.orientation.OrientationIntegral;
-import boofcv.abst.feature.orientation.OrientationSiftToImage;
+import boofcv.abst.feature.orientation.*;
 import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.alg.feature.detect.interest.SiftImageScaleSpace;
 import boofcv.alg.misc.GImageMiscOps;
@@ -182,6 +179,12 @@ public class BenchmarkOrientation<I extends ImageSingleBand, D extends ImageSing
 		OrientationSiftToImage siftWrapped = new OrientationSiftToImage(sift,ss);
 
 
+		ConfigAverageIntegral confAverageIIW = new ConfigAverageIntegral();
+		confAverageIIW.weightSigma = -1;
+		ConfigSlidingIntegral confSlidingIIW = new ConfigSlidingIntegral();
+		confSlidingIIW.weightSigma = -1;
+
+
 		ProfileOperation.printOpsPerSec(new Image("SIFT", siftWrapped), TEST_TIME);
 		ProfileOperation.printOpsPerSec(new Image("No Gradient", nogradient(RADIUS,imageType)), TEST_TIME);
 		ProfileOperation.printOpsPerSec(new Gradient("Average", average(RADIUS,false,derivType)), TEST_TIME);
@@ -192,10 +195,10 @@ public class BenchmarkOrientation<I extends ImageSingleBand, D extends ImageSing
 		ProfileOperation.printOpsPerSec(new Gradient("Sliding W", sliding(15, Math.PI / 3.0, RADIUS, true, derivType)), TEST_TIME);
 		ProfileOperation.printOpsPerSec(new Integral("Image II", image_ii(RADIUS, 1, 4, 0, imageType)), TEST_TIME);
 		ProfileOperation.printOpsPerSec(new Integral("Image II W", image_ii(RADIUS, 1, 4, -1, imageType)), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new Integral("Average II", average_ii(RADIUS, 1,4,0, imageType)), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new Integral("Average II W", average_ii(RADIUS, 1,4,-1, imageType)), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new Integral("Sliding II", sliding_ii(1, Math.PI / 3.0, RADIUS, 0, 4, imageType)), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new Integral("Sliding II W", sliding_ii(1, Math.PI / 3.0, RADIUS, -1, 4, imageType)), TEST_TIME);
+		ProfileOperation.printOpsPerSec(new Integral("Average II", average_ii(null, imageType)), TEST_TIME);
+		ProfileOperation.printOpsPerSec(new Integral("Average II W", average_ii(confAverageIIW, imageType)), TEST_TIME);
+		ProfileOperation.printOpsPerSec(new Integral("Sliding II", sliding_ii(null, imageType)), TEST_TIME);
+		ProfileOperation.printOpsPerSec(new Integral("Sliding II W", sliding_ii(confSlidingIIW, imageType)), TEST_TIME);
 	}
 
 	public static void main( String argsp[ ] ) {

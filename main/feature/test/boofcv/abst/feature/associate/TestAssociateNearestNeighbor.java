@@ -16,24 +16,20 @@
  * limitations under the License.
  */
 
-package boofcv.abst.feature.detdesc;
+package boofcv.abst.feature.associate;
 
-import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
-import boofcv.struct.feature.SurfFeature;
-import boofcv.struct.image.ImageFloat32;
+import org.junit.Test;
+
+import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
  */
-public class TestWrapDetectDescribeSurf extends GenericTestsDetectDescribePoint<ImageFloat32,SurfFeature>
-{
+public class TestAssociateNearestNeighbor {
 
-	public TestWrapDetectDescribeSurf() {
-		super(true, true, ImageFloat32.class, SurfFeature.class);
+	@Test
+	public void stuff() {
+		fail("Implement");
 	}
 
-	@Override
-	public DetectDescribePoint<ImageFloat32, SurfFeature> createDetDesc() {
-		return FactoryDetectDescribe.surfStable(null,null,null, ImageFloat32.class);
-	}
 }

@@ -19,13 +19,17 @@
 package boofcv.factory.feature.tracker;
 
 import boofcv.abst.feature.associate.*;
+import boofcv.abst.feature.describe.ConfigSurfDescribe;
 import boofcv.abst.feature.describe.DescribeRegionPoint;
 import boofcv.abst.feature.describe.WrapDescribeBrief;
 import boofcv.abst.feature.describe.WrapDescribePixelRegionNCC;
 import boofcv.abst.feature.detdesc.DetectDescribeFusion;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
+import boofcv.abst.feature.detect.interest.ConfigFastHessian;
 import boofcv.abst.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.abst.feature.detect.interest.InterestPointDetector;
+import boofcv.abst.feature.orientation.ConfigAverageIntegral;
+import boofcv.abst.feature.orientation.ConfigSlidingIntegral;
 import boofcv.abst.feature.orientation.OrientationImage;
 import boofcv.abst.feature.orientation.OrientationIntegral;
 import boofcv.abst.feature.tracker.*;
@@ -48,6 +52,7 @@ import boofcv.factory.feature.detect.intensity.FactoryIntensityPointAlg;
 import boofcv.factory.feature.detect.interest.FactoryDetectPoint;
 import boofcv.factory.feature.detect.interest.FactoryInterestPoint;
 import boofcv.factory.feature.orientation.FactoryOrientation;
+import boofcv.factory.feature.orientation.FactoryOrientationAlgs;
 import boofcv.factory.filter.blur.FactoryBlurFilter;
 import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.factory.interpolate.FactoryInterpolation;
@@ -127,23 +132,26 @@ public class FactoryPointSequentialTracker {
 	}
 
 	/**
-	 * Creates a tracker which detects Fast-Hessian features and describes them with SURF.
+	 * Creates a tracker which detects Fast-Hessian features and describes them with SURF using the faster variant
+	 * of SURF.
 	 *
 	 * @see DescribePointSurf
 	 * @see DetectAssociateTracker
 	 *
 	 * @param maxTracks The maximum number of tracks it will return. A value <= 0 will return all.
-	 * @param extractRadius  How close together detected features can be.  Recommended value = 2.
-	 * @param detectPerScale Number of features it will detect per scale.
-	 * @param sampleRateFH   Sample rate used by Fast-Hessian detector.  Typically 1 or 2
-	 * @param modifiedSURF   true for more robust but slower descriptor and false for faster but less robust
+	 * @param configDetector Configuration for SURF detector
+	 * @param configDescribe Configuration for SURF descriptor
+	 * @param configOrientation Configuration for orientation
 	 * @param imageType      Type of image the input is.
 	 * @return SURF based tracker.
 	 */
+	// TODO remove maxTracks?  Use number of detected instead
 	public static <I extends ImageSingleBand>
-	ImagePointTracker<I> dda_FH_SURF(int maxTracks, int extractRadius, int detectPerScale, int sampleRateFH,
-									 boolean modifiedSURF ,
-									 Class<I> imageType)
+	ImagePointTracker<I> dda_FH_SURF_Fast(int maxTracks,
+										  ConfigFastHessian configDetector ,
+										  ConfigSurfDescribe.Speed configDescribe ,
+										  ConfigAverageIntegral configOrientation ,
+										  Class<I> imageType)
 	{
 		ScoreAssociation<TupleDesc_F64> score = FactoryAssociation.scoreEuclidean(TupleDesc_F64.class, true);
 		AssociateSurfBasic assoc = new AssociateSurfBasic(FactoryAssociation.greedy(score, 5, maxTracks, true));
@@ -152,8 +160,41 @@ public class FactoryPointSequentialTracker {
 				new AssociateDescTo2D<SurfFeature>(new WrapAssociateSurfBasic(assoc));
 
 		DetectDescribePoint<I,SurfFeature> fused =
-				FactoryDetectDescribe.surf(1,extractRadius,detectPerScale, sampleRateFH, 9, 4, 4,
-						modifiedSURF,imageType);
+				FactoryDetectDescribe.surfFast(configDetector, configDescribe, configOrientation, imageType);
+
+		return new DetectAssociateTracker<I,SurfFeature>(fused, generalAssoc,false);
+	}
+
+	/**
+	 * Creates a tracker which detects Fast-Hessian features and describes them with SURF using the faster variant
+	 * of SURF.
+	 *
+	 * @see DescribePointSurf
+	 * @see DetectAssociateTracker
+	 *
+	 * @param maxTracks The maximum number of tracks it will return. A value <= 0 will return all.
+	 * @param configDetector Configuration for SURF detector
+	 * @param configDescribe Configuration for SURF descriptor
+	 * @param configOrientation Configuration for orientation
+	 * @param imageType      Type of image the input is.
+	 * @return SURF based tracker.
+	 */
+	// TODO remove maxTracks?  Use number of detected instead
+	public static <I extends ImageSingleBand>
+	ImagePointTracker<I> dda_FH_SURF_Stable(int maxTracks,
+											ConfigFastHessian configDetector ,
+											ConfigSurfDescribe.Stablility configDescribe ,
+											ConfigSlidingIntegral configOrientation ,
+											Class<I> imageType)
+	{
+		ScoreAssociation<TupleDesc_F64> score = FactoryAssociation.scoreEuclidean(TupleDesc_F64.class, true);
+		AssociateSurfBasic assoc = new AssociateSurfBasic(FactoryAssociation.greedy(score, 5, maxTracks, true));
+
+		AssociateDescription2D<SurfFeature> generalAssoc =
+				new AssociateDescTo2D<SurfFeature>(new WrapAssociateSurfBasic(assoc));
+
+		DetectDescribePoint<I,SurfFeature> fused =
+				FactoryDetectDescribe.surfStable(configDetector,configDescribe,configOrientation,imageType);
 
 		return new DetectAssociateTracker<I,SurfFeature>(fused, generalAssoc,false);
 	}
@@ -317,24 +358,24 @@ public class FactoryPointSequentialTracker {
 	 *
 	 * @param maxMatches     The maximum number of matched features that will be considered.
 	 *                       Set to a value <= 0 to not bound the number of matches.
-	 * @param detectPerScale Controls how many features can be detected.  Try a value of 200 initially.
-	 * @param sampleRateFH   Sample rate used by Fast-Hessian detector.  Typically 1 or 2
-	 * @param extractRadius How close together two features can be.  Try 2
 	 * @param trackRadius Size of feature being tracked by KLT
 	 * @param pyramidScalingKlt Image pyramid used for KLT
 	 * @param reactivateThreshold Tracks are reactivated after this many have been dropped.  Try 10% of maxMatches
+	 * @param configDetector Configuration for SURF detector
+	 * @param configDescribe Configuration for SURF descriptor
+	 * @param configOrientation Configuration for region orientation
 	 * @param imageType      Type of image the input is.
 	 * @param <I>            Input image type.
 	 * @return SURF based tracker.
 	 */
 	public static <I extends ImageSingleBand>
-	ImagePointTracker<I> combined_FH_SURF_KLT(int maxMatches, int detectPerScale,
-											  int extractRadius,
-											  int sampleRateFH,
+	ImagePointTracker<I> combined_FH_SURF_KLT(int maxMatches,
 											  int trackRadius,
 											  int[] pyramidScalingKlt ,
 											  int reactivateThreshold ,
-											  boolean modifiedSURF ,
+											  ConfigFastHessian configDetector ,
+											  ConfigSurfDescribe.Stablility configDescribe ,
+											  ConfigSlidingIntegral configOrientation ,
 											  Class<I> imageType) {
 
 		ScoreAssociation<TupleDesc_F64> score = FactoryAssociation.scoreEuclidean(TupleDesc_F64.class, true);
@@ -343,8 +384,7 @@ public class FactoryPointSequentialTracker {
 		AssociateDescription<SurfFeature> generalAssoc = new WrapAssociateSurfBasic(assoc);
 
 		DetectDescribePoint<I,SurfFeature> fused =
-				FactoryDetectDescribe.surf(1,extractRadius,detectPerScale, sampleRateFH, 9, 4, 4,
-						modifiedSURF,imageType);
+				FactoryDetectDescribe.surfStable(configDetector, configDescribe, configOrientation, imageType);
 
 		return combined(fused,generalAssoc,trackRadius,pyramidScalingKlt,reactivateThreshold,
 				imageType);
@@ -365,7 +405,8 @@ public class FactoryPointSequentialTracker {
 	 * @param trackRadius Size of feature being tracked by KLT
 	 * @param pyramidScalingKlt Image pyramid used for KLT
 	 * @param reactivateThreshold Tracks are reactivated after this many have been dropped.  Try 10% of maxMatches
-	 * @param modifiedSURF   true for more robust but slower descriptor and false for faster but less robust
+	 * @param configDescribe Configuration for SURF descriptor
+	 * @param configOrientation Configuration for region orientation
 	 * @param imageType      Type of image the input is.
 	 * @param derivType      Image derivative type.
 	 * @param <I>            Input image type.
@@ -378,7 +419,8 @@ public class FactoryPointSequentialTracker {
 											  int trackRadius,
 											  int[] pyramidScalingKlt ,
 											  int reactivateThreshold ,
-											  boolean modifiedSURF ,
+											  ConfigSurfDescribe.Stablility configDescribe,
+											  ConfigSlidingIntegral configOrientation ,
 											  Class<I> imageType,
 											  Class<D> derivType ) {
 
@@ -389,7 +431,7 @@ public class FactoryPointSequentialTracker {
 		InterestPointDetector<I> detector = FactoryInterestPoint.wrapPoint(corner, 1, imageType, derivType);
 
 		DescribeRegionPoint<I,SurfFeature> regionDesc
-				= FactoryDescribeRegionPoint.surf(modifiedSURF, imageType);
+				= FactoryDescribeRegionPoint.surfStable(configDescribe, imageType);
 
 		ScoreAssociation<TupleDesc_F64> score = FactoryAssociation.scoreEuclidean(TupleDesc_F64.class, true);
 		AssociateSurfBasic assoc = new AssociateSurfBasic(FactoryAssociation.greedy(score, 100000, maxMatches, true));
@@ -397,7 +439,7 @@ public class FactoryPointSequentialTracker {
 		AssociateDescription<SurfFeature> generalAssoc = new WrapAssociateSurfBasic(assoc);
 
 		Class integralType = GIntegralImageOps.getIntegralType(imageType);
-		OrientationIntegral orientationII = FactoryOrientation.surfDefault(modifiedSURF,integralType);
+		OrientationIntegral orientationII = FactoryOrientationAlgs.sliding_ii(configOrientation, integralType);
 		OrientationImage<I> orientation = FactoryOrientation.convertImage(orientationII,imageType);
 
 		return combined(detector,orientation,regionDesc,generalAssoc,trackRadius,pyramidScalingKlt,reactivateThreshold,
