@@ -459,8 +459,8 @@ public class TestPixelMath {
 			GImageMiscOps.fillUniform(inputA, rand, -20,20);
 			GImageMiscOps.fillUniform(inputB, rand, -20,20);
 		} else {
-			GImageMiscOps.fillUniform(inputA, rand, 20,40);
-			GImageMiscOps.fillUniform(inputB, rand, 5,15);
+			GImageMiscOps.fillUniform(inputA, rand, 0,40);
+			GImageMiscOps.fillUniform(inputB, rand, 0,40);
 		}
 
 		m.invoke(null,inputA,inputB,inputC);

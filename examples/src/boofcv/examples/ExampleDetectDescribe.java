@@ -61,7 +61,7 @@ public class ExampleDetectDescribe {
 				new ConfigFastHessian(1, 2, 200, 1, 9, 4, 4), null,null, ImageFloat32.class);
 		// note that SIFT only supports ImageFloat32
 //		if( imageType == ImageFloat32.class )
-//			return (DetectDescribePoint)FactoryDetectDescribe.sift(4,2,false,-1);
+//			return (DetectDescribePoint)FactoryDetectDescribe.sift(null,new ConfigSiftDetector(2,0,200,5),null,null);
 //		else
 //			throw new RuntimeException("Unsupported image type");
 	}

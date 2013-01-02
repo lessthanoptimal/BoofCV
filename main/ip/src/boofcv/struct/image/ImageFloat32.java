@@ -20,7 +20,7 @@ package boofcv.struct.image;
 
 /**
  * <p>
- * An image where the primitive type is a 32-bit floating point number.
+ * Image with a pixel type of 32-bit float.
  * </p>
  *
  * @author Peter Abeles

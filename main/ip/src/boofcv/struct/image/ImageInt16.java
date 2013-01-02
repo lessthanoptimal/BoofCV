@@ -20,7 +20,7 @@ package boofcv.struct.image;
 
 /**
  * <p>
- * Base class for 16-bit images
+ * Base class for images with 16-bit pixels.
  * </p>
  *
  * @author Peter Abeles

@@ -20,7 +20,7 @@ package boofcv.struct.image;
 
 /**
  * <p>
- * Base class for floating point images
+ * Base class for images with float pixels.
  * </p>
  *
  * @author Peter Abeles

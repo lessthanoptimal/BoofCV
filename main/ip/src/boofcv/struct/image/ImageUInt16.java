@@ -20,8 +20,7 @@ package boofcv.struct.image;
 
 /**
  * <p>
- * An image where the primitive type is an unsigned 8-bit byte.  By default all operations treat elements
- * in this image as an unsigned bytes.
+ * Image with a pixel type of unsigned 16-bit integer.
  * </p>
  *
  * @author Peter Abeles

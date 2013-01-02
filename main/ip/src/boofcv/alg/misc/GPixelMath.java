@@ -287,7 +287,7 @@ public class GPixelMath {
 	public static <T extends ImageSingleBand, O extends ImageSingleBand>
 	void subtract(T inputA, T inputB, O output) {
 		if( ImageUInt8.class == inputA.getClass() ) {
-			PixelMath.subtract((ImageUInt8) inputA, (ImageUInt8)inputB, (ImageUInt16) output);
+			PixelMath.subtract((ImageUInt8) inputA, (ImageUInt8)inputB, (ImageInt16) output);
 		} else if( ImageSInt8.class == inputA.getClass() ) {
 			PixelMath.subtract((ImageSInt8) inputA, (ImageSInt8)inputB, (ImageSInt16) output);
 		} else if( ImageUInt16.class == inputA.getClass() ) {

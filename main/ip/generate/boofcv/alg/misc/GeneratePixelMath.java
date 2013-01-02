@@ -77,11 +77,12 @@ public class GeneratePixelMath extends CodeGeneratorBase {
 			printAverageBand();
 		}
 
-		AutoTypeImage outputs[] = new AutoTypeImage[]{U16,S16,S32,S32,S32,S64,F32,F64};
+		AutoTypeImage outputsAdd[] = new AutoTypeImage[]{U16,S16,S32,S32,S32,S64,F32,F64};
+		AutoTypeImage outputsSub[] = new AutoTypeImage[]{I16,S16,S32,S32,S32,S64,F32,F64};
 
 		for( int i = 0; i < types.length; i++ ) {
-			printAddTwoImages(types[i],outputs[i]);
-			printSubtractTwoImages(types[i],outputs[i]);
+			printAddTwoImages(types[i],outputsAdd[i]);
+			printSubtractTwoImages(types[i],outputsSub[i]);
 		}
 	}
 
@@ -408,7 +409,7 @@ public class GeneratePixelMath extends CodeGeneratorBase {
 
 		out.print("\t/**\n" +
 				"\t * <p>\n" +
-				"\t * Performs pixel-wise subtraction, but ensures the result is between two bounds.<br>\n" +
+				"\t * Performs pixel-wise subtraction.<br>\n" +
 				"\t * d(x,y) = imgA(x,y) - imgB(x,y)\n" +
 				"\t * </p>\n" +
 				"\t * @param imgA Input image. Not modified.\n" +

@@ -18,9 +18,13 @@
 
 package boofcv.abst.feature.associate;
 
+import boofcv.struct.FastQueue;
+import boofcv.struct.GrowingArrayInt;
+import boofcv.struct.feature.AssociatedIndex;
+import boofcv.struct.feature.TupleDesc_F64;
 import org.junit.Test;
 
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Peter Abeles
@@ -28,8 +32,57 @@ import static org.junit.Assert.fail;
 public class TestAssociateDescTo2D {
 
 	@Test
-	public void stuff() {
-		fail("Implement");
+	public void basic() {
+		Dummy dummy = new Dummy();
+
+		AssociateDescTo2D<TupleDesc_F64> alg = new AssociateDescTo2D<TupleDesc_F64>(dummy);
+
+		FastQueue<TupleDesc_F64> listSrc = new FastQueue<TupleDesc_F64>(10,TupleDesc_F64.class,false);
+		FastQueue<TupleDesc_F64> listDst = new FastQueue<TupleDesc_F64>(10,TupleDesc_F64.class,false);
+
+		alg.setSource(null,listSrc);
+		alg.setDestination(null,listDst);
+		alg.associate();
+
+		assertTrue(listSrc == dummy.listSrc);
+		assertTrue(listDst == dummy.listDst);
+		assertTrue(dummy.calledAssociate);
+		assertTrue(dummy.matches == alg.getMatches());
+		assertTrue(dummy.unassociated == alg.getUnassociatedSource());
+	}
+
+	private static class Dummy implements AssociateDescription<TupleDesc_F64> {
+
+		public FastQueue<TupleDesc_F64> listSrc;
+		public FastQueue<TupleDesc_F64> listDst;
+		public boolean calledAssociate = false;
+		public FastQueue<AssociatedIndex> matches = new FastQueue<AssociatedIndex>(10,AssociatedIndex.class,false);
+		public GrowingArrayInt unassociated = new GrowingArrayInt(10);
+
+		@Override
+		public void setSource(FastQueue<TupleDesc_F64> listSrc) {
+			this.listSrc = listSrc;
+		}
+
+		@Override
+		public void setDestination(FastQueue<TupleDesc_F64> listDst) {
+			this.listDst = listDst;
+		}
+
+		@Override
+		public void associate() {
+			calledAssociate = true;
+		}
+
+		@Override
+		public FastQueue<AssociatedIndex> getMatches() {
+			return matches;
+		}
+
+		@Override
+		public GrowingArrayInt getUnassociatedSource() {
+			return unassociated;
+		}
 	}
 
 }

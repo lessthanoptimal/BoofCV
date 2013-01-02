@@ -132,7 +132,7 @@ public class ExampleFundamentalMatrix {
 	public static List<AssociatedPair> computeMatches( BufferedImage left , BufferedImage right ) {
 		DetectDescribePoint detDesc = FactoryDetectDescribe.surfStable(
 				new ConfigFastHessian(1, 2, 200, 1, 9, 4, 4), null,null, ImageFloat32.class);
-//		DetectDescribePoint detDesc = FactoryDetectDescribe.sift(4,2,false,-1);
+//		DetectDescribePoint detDesc = FactoryDetectDescribe.sift(null,new ConfigSiftDetector(2,0,200,5),null,null);
 
 		ScoreAssociation<SurfFeature> scorer = FactoryAssociation.scoreEuclidean(SurfFeature.class,true);
 		AssociateDescription<SurfFeature> associate =
