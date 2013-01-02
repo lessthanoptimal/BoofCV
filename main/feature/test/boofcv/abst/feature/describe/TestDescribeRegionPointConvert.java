@@ -18,9 +18,12 @@
 
 package boofcv.abst.feature.describe;
 
+import boofcv.struct.feature.TupleDesc_F64;
+import boofcv.struct.feature.TupleDesc_S8;
+import boofcv.struct.image.ImageFloat32;
 import org.junit.Test;
 
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 /**
  * @author Peter Abeles
@@ -28,7 +31,100 @@ import static org.junit.Assert.fail;
 public class TestDescribeRegionPointConvert {
 
 	@Test
-	public void stuff() {
-		fail("implement");
+	public void basic() {
+		DummyConvert convert = new DummyConvert();
+		DummyDescribe original = new DummyDescribe();
+
+		DescribeRegionPointConvert<ImageFloat32,TupleDesc_F64,TupleDesc_S8> alg =
+				new DescribeRegionPointConvert<ImageFloat32,TupleDesc_F64,TupleDesc_S8>(original,convert);
+
+		assertEquals(5,alg.getDescriptorLength());
+
+		TupleDesc_S8 found = alg.createDescription();
+		assertTrue(found.value.length==5);
+
+		assertFalse(original.calledImageSet);
+		alg.setImage(null);
+		assertTrue(original.calledImageSet);
+
+
+		alg.process(1,2,2,2,found);
+		assertEquals(5,found.value[0]);
+
+		assertTrue(alg.requiresOrientation()==original.requiresOrientation());
+		assertTrue(alg.requiresScale()==original.requiresScale());
+		assertTrue(alg.getDescriptorType()==TupleDesc_S8.class);
+
+		assertFalse(original.calledIsInBounds);
+		alg.isInBounds(2,3,4,3);
+		assertTrue(original.calledIsInBounds);
+
+	}
+
+	private static class DummyConvert implements ConvertTupleDesc<TupleDesc_F64,TupleDesc_S8> {
+
+		@Override
+		public TupleDesc_S8 createOutput() {
+			return new TupleDesc_S8(5);
+		}
+
+		@Override
+		public void convert(TupleDesc_F64 input, TupleDesc_S8 output) {
+			assertTrue(input.value[0] == 1);
+			output.value[0] = 5;
+		}
+
+		@Override
+		public Class<TupleDesc_S8> getOutputType() {
+			return TupleDesc_S8.class;
+		}
+	}
+
+	private static class DummyDescribe implements DescribeRegionPoint<ImageFloat32,TupleDesc_F64> {
+
+		public boolean calledImageSet = false;
+		public boolean calledIsInBounds = false;
+
+		@Override
+		public void setImage(ImageFloat32 image) {
+			calledImageSet = true;
+		}
+
+		@Override
+		public TupleDesc_F64 createDescription() {
+			return new TupleDesc_F64(5);
+		}
+
+		@Override
+		public int getDescriptorLength() {
+			return 5;
+		}
+
+		@Override
+		public boolean isInBounds(double x, double y, double orientation, double scale) {
+			calledIsInBounds = true;
+			return true;
+		}
+
+		@Override
+		public TupleDesc_F64 process(double x, double y, double orientation, double scale, TupleDesc_F64 ret) {
+			ret.value[0] = 1;
+			return ret;
+		}
+
+		@Override
+		public boolean requiresScale() {
+			return false;
+		}
+
+		@Override
+		public boolean requiresOrientation() {
+			return true;
+		}
+
+		@Override
+		public Class<TupleDesc_F64> getDescriptorType() {
+			return TupleDesc_F64.class;
+		}
 	}
 }

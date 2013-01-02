@@ -36,10 +36,10 @@ public class TestScoreAssociateSad_U8 {
 		TupleDesc_U8 a = new TupleDesc_U8(5);
 		TupleDesc_U8 b = new TupleDesc_U8(5);
 
-		a.value=new byte[]{1,2,3,4,5};
-		b.value=new byte[]{6,2,6,3,6};
+		a.value=new byte[]{1,2,3,4,(byte)200};
+		b.value=new byte[]{(byte)245,2,6,3,6};
 
-		assertEquals(10,scorer.score(a,b),1e-2);
+		assertEquals(442,scorer.score(a,b),1e-2);
 	}
 
 	@Test

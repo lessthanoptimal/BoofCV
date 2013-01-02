@@ -129,7 +129,7 @@ public class DescriptorDistance {
 	 * @param b Second descriptor
 	 * @return SAD score
 	 */
-	public static double sad(TupleDesc_U8 a, TupleDesc_U8 b) {
+	public static int sad(TupleDesc_U8 a, TupleDesc_U8 b) {
 
 		int total = 0;
 		for( int i = 0; i < a.value.length; i++ ) {
@@ -145,7 +145,7 @@ public class DescriptorDistance {
 	 * @param b Second descriptor
 	 * @return SAD score
 	 */
-	public static double sad(TupleDesc_S8 a, TupleDesc_S8 b) {
+	public static int sad(TupleDesc_S8 a, TupleDesc_S8 b) {
 
 		int total = 0;
 		for( int i = 0; i < a.value.length; i++ ) {
@@ -161,7 +161,7 @@ public class DescriptorDistance {
 	 * @param b Second descriptor
 	 * @return SAD score
 	 */
-	public static double sad(TupleDesc_F32 a, TupleDesc_F32 b) {
+	public static float sad(TupleDesc_F32 a, TupleDesc_F32 b) {
 
 		float total = 0;
 		for( int i = 0; i < a.value.length; i++ ) {

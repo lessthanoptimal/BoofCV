@@ -36,10 +36,10 @@ public class TestScoreAssociateSad_F32 {
 		TupleDesc_F32 a = new TupleDesc_F32(5);
 		TupleDesc_F32 b = new TupleDesc_F32(5);
 
-		a.value=new float[]{1,2,3,4,5};
-		b.value=new float[]{-1,2,6,3,6};
+		a.value=new float[]{1.1f,2,3,4.5f,5};
+		b.value=new float[]{-1,2,6.1f,3,6};
 
-		assertEquals(7,scorer.score(a,b),1e-2);
+		assertEquals(7.7,scorer.score(a,b),1e-2);
 	}
 
 	@Test

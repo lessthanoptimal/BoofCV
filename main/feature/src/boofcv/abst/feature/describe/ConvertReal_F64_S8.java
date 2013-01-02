@@ -20,35 +20,35 @@ package boofcv.abst.feature.describe;
 
 import boofcv.alg.feature.describe.ConvertTupleDescOps;
 import boofcv.struct.feature.TupleDesc_F64;
-import boofcv.struct.feature.TupleDesc_U8;
+import boofcv.struct.feature.TupleDesc_S8;
 
 /**
  * Converts two types of region descriptors.
  *
- * @see boofcv.alg.feature.describe.ConvertTupleDescOps#positive(boofcv.struct.feature.TupleDesc_F64, boofcv.struct.feature.TupleDesc_U8)
+ * @see boofcv.alg.feature.describe.ConvertTupleDescOps#real(boofcv.struct.feature.TupleDesc_F64, boofcv.struct.feature.TupleDesc_S8)
  *
  * @author Peter Abeles
  */
-public class ConvertPositive_F64_S8 implements ConvertTupleDesc<TupleDesc_F64, TupleDesc_U8> {
+public class ConvertReal_F64_S8 implements ConvertTupleDesc<TupleDesc_F64, TupleDesc_S8> {
 
 	int numElements;
 
-	public ConvertPositive_F64_S8(int numElements) {
+	public ConvertReal_F64_S8(int numElements) {
 		this.numElements = numElements;
 	}
 
 	@Override
-	public TupleDesc_U8 createOutput() {
-		return new TupleDesc_U8(numElements);
+	public TupleDesc_S8 createOutput() {
+		return new TupleDesc_S8(numElements);
 	}
 
 	@Override
-	public void convert(TupleDesc_F64 input, TupleDesc_U8 output) {
-		ConvertTupleDescOps.positive(input, output);
+	public void convert(TupleDesc_F64 input, TupleDesc_S8 output) {
+		ConvertTupleDescOps.real(input, output);
 	}
 
 	@Override
-	public Class<TupleDesc_U8> getOutputType() {
-		return TupleDesc_U8.class;
+	public Class<TupleDesc_S8> getOutputType() {
+		return TupleDesc_S8.class;
 	}
 }

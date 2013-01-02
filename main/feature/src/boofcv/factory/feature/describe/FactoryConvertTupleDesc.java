@@ -18,8 +18,8 @@
 
 package boofcv.factory.feature.describe;
 
-import boofcv.abst.feature.describe.ConvertPositive_F64_S8;
-import boofcv.abst.feature.describe.ConvertReal_F64_U8;
+import boofcv.abst.feature.describe.ConvertPositive_F64_U8;
+import boofcv.abst.feature.describe.ConvertReal_F64_S8;
 import boofcv.abst.feature.describe.ConvertTupleDesc;
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.feature.TupleDesc_S8;
@@ -41,7 +41,7 @@ public class FactoryConvertTupleDesc {
 	 * @return The converter.
 	 */
 	public static ConvertTupleDesc<TupleDesc_F64,TupleDesc_U8> positive_F64_U8( final int numElements ) {
-		return new ConvertPositive_F64_S8(numElements);
+		return new ConvertPositive_F64_U8(numElements);
 	}
 
 	/**
@@ -52,7 +52,7 @@ public class FactoryConvertTupleDesc {
 	 * @return The converter.
 	 */
 	public static ConvertTupleDesc<TupleDesc_F64,TupleDesc_S8> real_F64_S8( final int numElements ) {
-		return new ConvertReal_F64_U8(numElements);
+		return new ConvertReal_F64_S8(numElements);
 	}
 
 }

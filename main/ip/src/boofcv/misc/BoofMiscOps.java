@@ -28,6 +28,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * Miscellaneous functions which have no better place to go.
+ *
  * @author Peter Abeles
  */
 public class BoofMiscOps {
@@ -150,6 +152,15 @@ public class BoofMiscOps {
 		return true;
 	}
 
+	/**
+	 * Returns true if the point is contained inside the image and 'radius' away from the image border.
+	 *
+	 * @param b Image
+	 * @param x x-coordinate of point
+	 * @param y y-coordinate of point
+	 * @param radius How many pixels away from the border it needs to be to be considered inside
+	 * @return true if the point is inside and false if it is outside
+	 */
 	public static boolean checkInside(ImageBase b, int x , int y , int radius ) {
 		if( x-radius < 0 )
 			return false;
@@ -163,28 +174,46 @@ public class BoofMiscOps {
 		return true;
 	}
 
+	/**
+	 * Returns true if the point is contained inside the image and 'radius' away from the image border.
+	 *
+	 * @param b Image
+	 * @param x x-coordinate of point
+	 * @param y y-coordinate of point
+	 * @param radius How many pixels away from the border it needs to be to be considered inside
+	 * @return true if the point is inside and false if it is outside
+	 */
 	public static boolean checkInside(ImageBase b, float x , float y , float radius ) {
 		if( x-radius < 0 )
 			return false;
-		if( x+radius >= b.width )
+		if( x+radius > b.width-1 )
 			return false;
 
 		if( y-radius < 0 )
 			return false;
-		if( y+radius >= b.height )
+		if( y+radius > b.height-1 )
 			return false;
 		return true;
 	}
 
+	/**
+	 * Returns true if the point is contained inside the image and 'radius' away from the image border.
+	 *
+	 * @param b Image
+	 * @param x x-coordinate of point
+	 * @param y y-coordinate of point
+	 * @param radius How many pixels away from the border it needs to be to be considered inside
+	 * @return true if the point is inside and false if it is outside
+	 */
 	public static boolean checkInside(ImageBase b, double x , double y , double radius ) {
 		if( x-radius < 0 )
 			return false;
-		if( x+radius >= b.width )
+		if( x+radius > b.width-1 )
 			return false;
 
 		if( y-radius < 0 )
 			return false;
-		if( y+radius >= b.height )
+		if( y+radius > b.height-1 )
 			return false;
 		return true;
 	}

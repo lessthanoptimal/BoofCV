@@ -29,8 +29,8 @@ import boofcv.struct.feature.TupleDesc_U8;
  */
 public class ConvertTupleDescOps {
 	/**
-	 * Converts the floating point input description into the 8-bit integer output descriptor by dividing each
-	 * element in input by the maximum value.  All elements in input are assumed to be positive
+	 * Converts a floating point description with all positive values into the 8-bit integer descriptor by
+	 * dividing each element in the input by the element maximum value and multiplying by 255.
 	 *
 	 * @param input Description with elements that are all positive
 	 * @param output Unsigned 8-bit output
@@ -43,14 +43,17 @@ public class ConvertTupleDescOps {
 				max = v;
 		}
 
+		if( max == 0 )
+			max = 1.0;
+
 		for( int i = 0; i < input.size(); i++ ) {
 			output.value[i] = (byte)(255.0*input.value[i]/max);
 		}
 	}
 
 	/**
-	 * Converts the floating point input description into the 8-bit integer output descriptor by dividing each
-	 * element in input by the maximum absolute value.
+	 * Converts a floating point description with real values into the 8-bit integer descriptor by
+	 * dividing each element in the input by the element maximum absolute value and multiplying by 127.
 	 *
 	 * @param input Description with elements that are all positive
 	 * @param output Unsigned 8-bit output

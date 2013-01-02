@@ -18,9 +18,11 @@
 
 package boofcv.abst.feature.associate;
 
+import boofcv.struct.feature.TupleDesc_S8;
 import org.junit.Test;
 
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Peter Abeles
@@ -28,7 +30,21 @@ import static org.junit.Assert.fail;
 public class TestScoreAssociateSad_S8 {
 
 	@Test
-	public void stuff() {
-		fail("implement");
+	public void basic() {
+		ScoreAssociateSad_S8 scorer = new ScoreAssociateSad_S8();
+
+		TupleDesc_S8 a = new TupleDesc_S8(3);
+		TupleDesc_S8 b = new TupleDesc_S8(3);
+
+		a.value=new byte[]{-5,2,120};
+		b.value=new byte[]{56,2,-30};
+
+		assertEquals(211,scorer.score(a,b),1e-2);
+	}
+
+	@Test
+	public void checkZeroMinimum() {
+		ScoreAssociateSad_S8 scorer = new ScoreAssociateSad_S8();
+		assertTrue(scorer.isZeroMinimum());
 	}
 }
