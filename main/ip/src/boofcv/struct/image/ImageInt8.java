@@ -20,7 +20,7 @@ package boofcv.struct.image;
 
 /**
  * <p>
- * Base class for 8-bit images.
+ * Base class for images with 8-bit pixels.
  * </p>
  *
  * @author Peter Abeles

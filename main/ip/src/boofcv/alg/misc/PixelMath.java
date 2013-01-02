@@ -2048,14 +2048,14 @@ public class PixelMath {
 
 	/**
 	 * <p>
-	 * Performs pixel-wise subtraction, but ensures the result is between two bounds.<br>
+	 * Performs pixel-wise subtraction.<br>
 	 * d(x,y) = imgA(x,y) - imgB(x,y)
 	 * </p>
 	 * @param imgA Input image. Not modified.
 	 * @param imgB Input image. Not modified.
 	 * @param output Output image. Modified.
 	 */
-	public static void subtract( ImageUInt8 imgA , ImageUInt8 imgB , ImageUInt16 output ) {
+	public static void subtract( ImageUInt8 imgA , ImageUInt8 imgB , ImageInt16 output ) {
 		InputSanityCheck.checkSameShape(imgA,imgB,output);
 		
 		final int h = imgA.getHeight();
@@ -2104,7 +2104,7 @@ public class PixelMath {
 
 	/**
 	 * <p>
-	 * Performs pixel-wise subtraction, but ensures the result is between two bounds.<br>
+	 * Performs pixel-wise subtraction.<br>
 	 * d(x,y) = imgA(x,y) - imgB(x,y)
 	 * </p>
 	 * @param imgA Input image. Not modified.
@@ -2160,7 +2160,7 @@ public class PixelMath {
 
 	/**
 	 * <p>
-	 * Performs pixel-wise subtraction, but ensures the result is between two bounds.<br>
+	 * Performs pixel-wise subtraction.<br>
 	 * d(x,y) = imgA(x,y) - imgB(x,y)
 	 * </p>
 	 * @param imgA Input image. Not modified.
@@ -2216,7 +2216,7 @@ public class PixelMath {
 
 	/**
 	 * <p>
-	 * Performs pixel-wise subtraction, but ensures the result is between two bounds.<br>
+	 * Performs pixel-wise subtraction.<br>
 	 * d(x,y) = imgA(x,y) - imgB(x,y)
 	 * </p>
 	 * @param imgA Input image. Not modified.
@@ -2272,7 +2272,7 @@ public class PixelMath {
 
 	/**
 	 * <p>
-	 * Performs pixel-wise subtraction, but ensures the result is between two bounds.<br>
+	 * Performs pixel-wise subtraction.<br>
 	 * d(x,y) = imgA(x,y) - imgB(x,y)
 	 * </p>
 	 * @param imgA Input image. Not modified.
@@ -2328,7 +2328,7 @@ public class PixelMath {
 
 	/**
 	 * <p>
-	 * Performs pixel-wise subtraction, but ensures the result is between two bounds.<br>
+	 * Performs pixel-wise subtraction.<br>
 	 * d(x,y) = imgA(x,y) - imgB(x,y)
 	 * </p>
 	 * @param imgA Input image. Not modified.
@@ -2384,7 +2384,7 @@ public class PixelMath {
 
 	/**
 	 * <p>
-	 * Performs pixel-wise subtraction, but ensures the result is between two bounds.<br>
+	 * Performs pixel-wise subtraction.<br>
 	 * d(x,y) = imgA(x,y) - imgB(x,y)
 	 * </p>
 	 * @param imgA Input image. Not modified.
@@ -2440,7 +2440,7 @@ public class PixelMath {
 
 	/**
 	 * <p>
-	 * Performs pixel-wise subtraction, but ensures the result is between two bounds.<br>
+	 * Performs pixel-wise subtraction.<br>
 	 * d(x,y) = imgA(x,y) - imgB(x,y)
 	 * </p>
 	 * @param imgA Input image. Not modified.

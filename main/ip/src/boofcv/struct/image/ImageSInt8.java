@@ -20,7 +20,7 @@ package boofcv.struct.image;
 
 /**
  * <p>
- * An image where the primitive type is an signed 8-bit byte.
+ * Image with a pixel type of signed 8-bit integer.
  * </p>
  *
  * @author Peter Abeles

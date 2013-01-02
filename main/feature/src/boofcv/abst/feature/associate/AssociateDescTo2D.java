@@ -58,6 +58,6 @@ public class AssociateDescTo2D<D> implements AssociateDescription2D<D> {
 
 	@Override
 	public GrowingArrayInt getUnassociatedSource() {
-		return null;
+		return alg.getUnassociatedSource();
 	}
 }

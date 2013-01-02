@@ -48,6 +48,5 @@ public interface Associate {
 	 *
 	 * @return List of unassociated source features by index.
 	 */
-	// TODO Is this being used anyplace?  If not delete it and remove related code
 	public GrowingArrayInt getUnassociatedSource();
 }

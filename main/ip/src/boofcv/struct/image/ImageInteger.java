@@ -30,7 +30,7 @@ package boofcv.struct.image;
  * </p>
  *
  * <p>
- * DESIGN NOTE: Java does not support unsigned data.  IF an image is unsigned this is only directly enforced by the get()
+ * DESIGN NOTE: Java does not support unsigned data.  If an image is unsigned this is only directly enforced by the get()
  * function.  When directly accessing the data array the data's unsigned nature must be enforced manually using the
  * bitwise and operator.
  * </p>

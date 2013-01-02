@@ -20,8 +20,7 @@ package boofcv.struct.image;
 
 /**
  * <p>
- * An image where the primitive type is a signed 16-bit short.  By default all operations treat elements
- * in this image as an unsigned bytes.
+ * Image with a pixel type of signed 16-bit integer.
  * </p>
  *
  * @author Peter Abeles
