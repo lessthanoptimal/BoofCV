@@ -21,34 +21,46 @@ package boofcv.abst.feature.describe;
 import boofcv.alg.feature.describe.ConvertTupleDescOps;
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.feature.TupleDesc_S8;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
- * Converts two types of region descriptors.
- *
- * @see boofcv.alg.feature.describe.ConvertTupleDescOps#real(boofcv.struct.feature.TupleDesc_F64, boofcv.struct.feature.TupleDesc_S8)
- *
  * @author Peter Abeles
  */
-public class ConvertReal_F64_U8 implements ConvertTupleDesc<TupleDesc_F64, TupleDesc_S8> {
+public class TestTestConvertReal_F64_S8 {
 
-	int numElements;
+	@Test
+	public void createOutput() {
+		ConvertReal_F64_S8 alg = new ConvertReal_F64_S8(5);
 
-	public ConvertReal_F64_U8(int numElements) {
-		this.numElements = numElements;
+		TupleDesc_S8 found = alg.createOutput();
+
+		assertTrue(5 == found.value.length);
 	}
 
-	@Override
-	public TupleDesc_S8 createOutput() {
-		return new TupleDesc_S8(numElements);
+	@Test
+	public void convert() {
+		ConvertReal_F64_S8 alg = new ConvertReal_F64_S8(5);
+
+		TupleDesc_F64 input = new TupleDesc_F64(5);
+		input.value = new double[]{-2.5,3,20,-243.45};
+
+		TupleDesc_S8 found = alg.createOutput();
+		alg.convert(input,found);
+
+		TupleDesc_S8 expected = alg.createOutput();
+		ConvertTupleDescOps.real(input,expected);
+
+		for( int i = 0; i < 5; i++ ) {
+			assertEquals(expected.value[i],found.value[i]);
+		}
 	}
 
-	@Override
-	public void convert(TupleDesc_F64 input, TupleDesc_S8 output) {
-		ConvertTupleDescOps.real(input, output);
-	}
-
-	@Override
-	public Class<TupleDesc_S8> getOutputType() {
-		return TupleDesc_S8.class;
+	@Test
+	public void getOutputType() {
+		ConvertReal_F64_S8 alg = new ConvertReal_F64_S8(5);
+		assertTrue(TupleDesc_S8.class == alg.getOutputType());
 	}
 }

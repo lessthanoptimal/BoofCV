@@ -24,7 +24,6 @@ import org.junit.Test;
 import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
@@ -97,10 +96,10 @@ public class TestDescriptorDistance {
 		TupleDesc_U8 a = new TupleDesc_U8(5);
 		TupleDesc_U8 b = new TupleDesc_U8(5);
 
-		a.value=new byte[]{1,2,3,4,5};
-		b.value=new byte[]{6,2,6,3,6};
+		a.value=new byte[]{1,2,3,4,(byte)200};
+		b.value=new byte[]{(byte)245,2,6,3,6};
 
-		assertEquals(10, DescriptorDistance.sad(a, b), 1e-2);
+		assertEquals(442, DescriptorDistance.sad(a, b), 1e-2);
 	}
 
 	@Test
@@ -119,12 +118,10 @@ public class TestDescriptorDistance {
 		TupleDesc_F32 a = new TupleDesc_F32(5);
 		TupleDesc_F32 b = new TupleDesc_F32(5);
 
-		// TODO update with values less than one
-		a.value=new float[]{1,2,3,4,5};
-		b.value=new float[]{-1,2,6,3,6};
+		a.value=new float[]{ 0.1f ,2     ,3 ,-4.9f ,5};
+		b.value=new float[]{-1    ,45.5f ,6 ,3     ,6.01f};
 
-		assertEquals(7, DescriptorDistance.sad(a, b), 1e-2);
-		fail("Implement");
+		assertEquals(56.51,DescriptorDistance.sad(a, b),1e-2);
 	}
 
 	@Test
@@ -132,10 +129,10 @@ public class TestDescriptorDistance {
 		TupleDesc_F64 a = new TupleDesc_F64(5);
 		TupleDesc_F64 b = new TupleDesc_F64(5);
 
-		a.value=new double[]{1,2,3,4,5};
-		b.value=new double[]{-1,2,6,3,6};
+		a.value=new double[]{ 0.1 ,2    ,3 ,-4.9 ,5};
+		b.value=new double[]{-1   ,45.5 ,6 ,3   ,6.01};
 
-		assertEquals(7,DescriptorDistance.sad(a, b),1e-2);
+		assertEquals(56.51,DescriptorDistance.sad(a, b),1e-2);
 	}
 
 	@Test

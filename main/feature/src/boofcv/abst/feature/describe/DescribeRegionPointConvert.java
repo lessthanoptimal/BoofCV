@@ -84,7 +84,7 @@ public class DescribeRegionPointConvert<T extends ImageSingleBand,In extends Tup
 
 	@Override
 	public boolean requiresOrientation() {
-		return original.requiresScale();
+		return original.requiresOrientation();
 	}
 
 	@Override
