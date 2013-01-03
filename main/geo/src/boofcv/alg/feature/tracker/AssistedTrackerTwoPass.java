@@ -18,12 +18,14 @@
 
 package boofcv.alg.feature.tracker;
 
+import boofcv.abst.feature.associate.Associate;
 import boofcv.abst.feature.associate.AssociateDescription2D;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
 import boofcv.abst.feature.tracker.DetectAssociateTracker;
 import boofcv.abst.feature.tracker.ModelAssistedTracker;
 import boofcv.abst.feature.tracker.PointTrack;
 import boofcv.abst.feature.tracker.TrackGeometryManager;
+import boofcv.struct.FastQueue;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.image.ImageSingleBand;
@@ -85,12 +87,47 @@ public class AssistedTrackerTwoPass<I extends ImageSingleBand,D extends TupleDes
 		if (firstPass())
 			return;
 
+		printAssociationErrors(associate,matcherInitial);
+
 		System.out.println("Tracks "+tracksAll.size());
 		System.out.println("First pass. matches "+matches.size());
 		System.out.println("            inliers " + matcherInitial.getMatchSet().size());
 		secondPass();
+		printAssociationErrors(associateFinal,matcherFinal);
 		System.out.println("Second pass. matches "+matches.size());
 		System.out.println("             inliers " + matcherFinal.getMatchSet().size());
+		System.out.println("------------------------------------------------------");
+	}
+
+	private void printAssociationErrors( Associate assoc , ModelMatcher<Model, Info> matcher ) {
+
+		double assocMin = Double.MAX_VALUE;
+		double assocMax = 0;
+
+		FastQueue<AssociatedIndex> matches = assoc.getMatches();
+
+		for( AssociatedIndex i : matches.toList() ) {
+			if( i.fitScore < assocMin )
+				assocMin = i.fitScore;
+			if( i.fitScore > assocMax )
+				assocMax = i.fitScore;
+		}
+
+		int N = matcher.getMatchSet().size();
+
+		double matchMin = Double.MAX_VALUE;
+		double matchMax = 0;
+
+		for( int i = 0; i < N; i++ ) {
+			AssociatedIndex a = matches.get( matcher.getInputIndex(i) );
+			if( a.fitScore < matchMin )
+				matchMin = a.fitScore;
+			if( a.fitScore > matchMax )
+				matchMax = a.fitScore;
+		}
+
+		System.out.println("Assoc: "+assocMin+" "+assocMax+"  match "+matchMin+" "+matchMax);
+
 	}
 
 	private boolean firstPass() {
