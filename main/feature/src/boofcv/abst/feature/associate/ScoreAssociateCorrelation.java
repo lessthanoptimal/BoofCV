@@ -24,7 +24,10 @@ import boofcv.struct.feature.TupleDesc_F64;
 
 
 /**
- * Scores two possible associations using {@link DescriptorDistance#correlation(boofcv.struct.feature.TupleDesc_F64, boofcv.struct.feature.TupleDesc_F64)}.
+ * Scores two possible associations using {@link DescriptorDistance#correlation}.
+ *
+ * NOTE: The score's sign is flipped in order to comply with {@link ScoreAssociation}'s requirements that lower
+ * values be preferred.
  *
  * @author Peter Abeles
  */
