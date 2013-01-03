@@ -19,6 +19,7 @@
 package boofcv.abst.feature.associate;
 
 import boofcv.alg.feature.associate.HammingTable16;
+import boofcv.struct.feature.MatchScoreType;
 import boofcv.struct.feature.TupleDesc_B;
 
 /**
@@ -48,7 +49,7 @@ public class ScoreAssociateHamming_B implements ScoreAssociation<TupleDesc_B>{
 	}
 
 	@Override
-	public boolean isZeroMinimum() {
-		return true;
+	public MatchScoreType getScoreType() {
+		return MatchScoreType.NORM_ERROR;
 	}
 }

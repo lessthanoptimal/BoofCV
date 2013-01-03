@@ -71,6 +71,9 @@ public class AssociateGreedy<D> {
 		this.score = score;
 		this.maxFitError = maxFitError;
 		this.backwardsValidation = backwardsValidation;
+
+		// TODO if lower is not better flip sign
+		// TODO update unit test to make sure this is handled
 	}
 
 	/**
@@ -147,5 +150,13 @@ public class AssociateGreedy<D> {
 	 */
 	public double[] getFitQuality() {
 		return fitQuality.data;
+	}
+
+	public void setMaxFitError(double maxFitError) {
+		this.maxFitError = maxFitError;
+	}
+
+	public ScoreAssociation<D> getScore() {
+		return score;
 	}
 }

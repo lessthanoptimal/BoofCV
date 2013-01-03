@@ -144,7 +144,7 @@ public class AssociationScorePanel<D>
 		g2.setStroke(new BasicStroke(3));
 
 		double normalizer;
-		if( scorer.isZeroMinimum() )
+		if( scorer.getScoreType().isZeroBest() )
 			normalizer = best*containmentFraction;
 		else
 			normalizer = Math.abs(best)*(Math.exp(-1.0/containmentFraction));

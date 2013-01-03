@@ -109,7 +109,7 @@ public class ExampleImageStitching {
 			throw new RuntimeException("Model Matcher failed!");
 
 		// return the found image transform
-		return modelMatcher.getModel();
+		return modelMatcher.getModel().copy();
 	}
 
 	/**

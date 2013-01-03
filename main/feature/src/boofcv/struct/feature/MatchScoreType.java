@@ -16,26 +16,37 @@
  * limitations under the License.
  */
 
-package boofcv.abst.feature.associate;
-
-import boofcv.alg.feature.associate.DescriptorDistance;
-import boofcv.struct.feature.MatchScoreType;
-import boofcv.struct.feature.TupleDesc_F64;
+package boofcv.struct.feature;
 
 /**
- * Computes sum of absolute difference (SAD) score for {@link boofcv.struct.feature.TupleDesc_F64}.
+ * Specifies the meaning of a match score.
  *
  * @author Peter Abeles
  */
-public class ScoreAssociateSad_F64 implements ScoreAssociation<TupleDesc_F64>{
-	@Override
-	public double score(TupleDesc_F64 a, TupleDesc_F64 b) {
+public enum MatchScoreType {
+	/**
+	 * Correlation scores can be both positive and negative values.  Scores with a larger positive value are considered
+	 * to be better.
+	 */
+	CORRELATION(false),
+	/**
+	 * These error metrics have values greater than or equal to zero.  Closer the error is to zero the better
+	 * the match is considered.
+	 */
+	NORM_ERROR(true);
 
-		return DescriptorDistance.sad(a, b);
+	boolean zeroBest;
+
+	private MatchScoreType(boolean zeroBest) {
+		this.zeroBest = zeroBest;
 	}
 
-	@Override
-	public MatchScoreType getScoreType() {
-		return MatchScoreType.NORM_ERROR;
+	/**
+	 * True if the best possible score has a value of zero
+	 *
+	 * @return True if the best possible score has a value of zero
+	 */
+	public boolean isZeroBest() {
+		return zeroBest;
 	}
 }

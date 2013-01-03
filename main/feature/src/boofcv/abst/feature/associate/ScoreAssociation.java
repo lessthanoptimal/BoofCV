@@ -18,10 +18,15 @@
 
 package boofcv.abst.feature.associate;
 
+import boofcv.struct.feature.MatchScoreType;
+
 /**
- * Scores the quality of fit between two feature descriptions.
- * Designed to handle fit metrics with different statics.  In general it is assumed that
- * scores with lower values are better.  They can be limited to zero or go negative.
+ * Scores the fit quality between two feature descriptions.  A lower score always indicate a better match a larger one.
+ * Thus scoreA < scoreB will return true if scoreA is a better score than scoreB.
+ * The range of possible scores is not specified by this interface.  For example, correlation based scores can
+ * take on both positive and negative values while Euclidean will always be positive or zero.
+ *
+ * NOTES: To ensure that lower is better, correlation scores undergo a sign flip.
  *
  * @param <T> Feature description type.
  *
@@ -39,9 +44,9 @@ public interface ScoreAssociation<T> {
 	public double score( T a , T b );
 
 	/**
-	 * Is the best/minimum score zero?
+	 * Specifies the type of score which is returned.
 	 *
-	 * @return true if the best zero is zero.
+	 * @return Type of association score.
 	 */
-	public boolean isZeroMinimum();
+	public MatchScoreType getScoreType();
 }

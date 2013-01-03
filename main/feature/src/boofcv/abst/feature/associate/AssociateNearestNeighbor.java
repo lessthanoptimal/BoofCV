@@ -21,6 +21,7 @@ package boofcv.abst.feature.associate;
 import boofcv.struct.FastQueue;
 import boofcv.struct.GrowingArrayInt;
 import boofcv.struct.feature.AssociatedIndex;
+import boofcv.struct.feature.MatchScoreType;
 import boofcv.struct.feature.TupleDesc_F64;
 import org.ddogleg.nn.NearestNeighbor;
 import org.ddogleg.nn.NnData;
@@ -142,5 +143,15 @@ public class AssociateNearestNeighbor<D extends TupleDesc_F64>
 	@Override
 	public GrowingArrayInt getUnassociatedSource() {
 		return unassociatedSrc;
+	}
+
+	@Override
+	public void setThreshold(double score) {
+		throw new RuntimeException("Not supported yet");
+	}
+
+	@Override
+	public MatchScoreType getScoreType() {
+		return MatchScoreType.NORM_ERROR;
 	}
 }

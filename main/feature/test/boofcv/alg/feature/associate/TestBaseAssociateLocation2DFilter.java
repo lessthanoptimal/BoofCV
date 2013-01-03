@@ -28,7 +28,12 @@ import static org.junit.Assert.fail;
 public class TestBaseAssociateLocation2DFilter {
 
 	@Test
-	public void stuff() {
+	public void checkDistanceFilter() {
+		fail("implement");
+	}
+
+	@Test
+	public void checkBackwards() {
 		fail("implement");
 	}
 }

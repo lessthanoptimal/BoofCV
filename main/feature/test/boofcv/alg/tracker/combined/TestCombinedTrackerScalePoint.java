@@ -24,6 +24,7 @@ import boofcv.alg.tracker.klt.PyramidKltFeature;
 import boofcv.struct.FastQueue;
 import boofcv.struct.GrowingArrayInt;
 import boofcv.struct.feature.AssociatedIndex;
+import boofcv.struct.feature.MatchScoreType;
 import boofcv.struct.feature.SurfFeature;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.image.ImageSingleBand;
@@ -195,6 +196,15 @@ public class TestCombinedTrackerScalePoint {
 		@Override
 		public GrowingArrayInt getUnassociatedSource() {
 			return null;
+		}
+
+		@Override
+		public void setThreshold(double score) {
+		}
+
+		@Override
+		public MatchScoreType getScoreType() {
+			return MatchScoreType.NORM_ERROR;
 		}
 	}
 

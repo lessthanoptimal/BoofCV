@@ -23,6 +23,7 @@ import boofcv.abst.feature.associate.ScoreAssociateEuclidean_F64;
 import boofcv.abst.feature.associate.ScoreAssociation;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.struct.FastQueue;
+import boofcv.struct.GrowingArrayInt;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.SurfFeature;
 import boofcv.struct.feature.TupleDesc_F64;
@@ -65,9 +66,12 @@ public class TestAssociateSurfBasic {
 		FastQueue<SurfFeature> src = new FastQueue<SurfFeature>(10,SurfFeature.class,false);
 		FastQueue<SurfFeature> dst = new FastQueue<SurfFeature>(10,SurfFeature.class,false);
 
+		// create a list where some should be matched and others not
 		src.add( createDesc(true,10));
 		src.add( createDesc(true,12));
 		src.add( createDesc(false,5));
+		src.add( createDesc(false,2344));
+		src.add( createDesc(false,1000));
 		dst.add( createDesc(true,0));
 		dst.add( createDesc(true,10.1));
 		dst.add( createDesc(true,13));
@@ -89,6 +93,19 @@ public class TestAssociateSurfBasic {
 		assertTrue(matches.get(2).fitScore != 0);
 		assertEquals(2,matches.get(2).src);
 		assertEquals(4,matches.get(2).dst);
+
+		// see if the expected number of features are in the unassociated list
+		GrowingArrayInt unassoc = alg.unassociated;
+		assertEquals(2,unassoc.size);
+
+		// make sure none of the unassociated are contained in the associated list
+		for( int i = 0; i < unassoc.size; i++ ) {
+			int index = unassoc.data[i];
+			for( int j = 0; j < matches.size(); j++ ) {
+				if( matches.get(j).src == index )
+					fail("match found");
+			}
+		}
 	}
 
 	private AssociateSurfBasic createAlg() {
@@ -110,6 +127,25 @@ public class TestAssociateSurfBasic {
 
 	@Test
 	public void checkUnassociated() {
-		fail("Implement");
+		FastQueue<SurfFeature> src = new FastQueue<SurfFeature>(10,SurfFeature.class,false);
+		FastQueue<SurfFeature> dst = new FastQueue<SurfFeature>(10,SurfFeature.class,false);
+
+		src.add( createDesc(true,10));
+		src.add( createDesc(true,12));
+		src.add( createDesc(false,5));
+		dst.add( createDesc(true,0));
+		dst.add( createDesc(true,10.1));
+		dst.add( createDesc(true,13));
+		dst.add( createDesc(false,0.1));
+		dst.add( createDesc(false,7));
+
+		ScoreAssociation<TupleDesc_F64> score = new ScoreAssociateEuclidean_F64();
+		AssociateDescription<TupleDesc_F64> assoc = FactoryAssociation.greedy(score, 20, -1, true);
+		AssociateSurfBasic alg = new AssociateSurfBasic(assoc);
+
+		alg.setSrc(src);
+		alg.setDst(dst);
+		alg.associate();
+		FastQueue<AssociatedIndex> matches = alg.getMatches();
 	}
 }

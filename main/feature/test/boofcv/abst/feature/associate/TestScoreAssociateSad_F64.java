@@ -18,16 +18,34 @@
 
 package boofcv.abst.feature.associate;
 
+import boofcv.struct.feature.MatchScoreType;
 import boofcv.struct.feature.TupleDesc_F64;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 /**
  * @author Peter Abeles
  */
-public class TestScoreAssociateSad_F64 {
+public class TestScoreAssociateSad_F64 extends StandardScoreAssociationChecks<TupleDesc_F64> {
+
+	public TestScoreAssociateSad_F64() {
+		super(MatchScoreType.NORM_ERROR);
+	}
+
+	@Override
+	public ScoreAssociation<TupleDesc_F64> createScore() {
+		return new ScoreAssociateSad_F64();
+	}
+
+	@Override
+	public TupleDesc_F64 createDescription() {
+		TupleDesc_F64 a = new TupleDesc_F64(5);
+		for( int i = 0; i < a.size(); i++ )
+			a.value[i] = rand.nextDouble()*2;
+
+		return a;
+	}
 
 	@Test
 	public void compareToExpected() {
@@ -40,11 +58,5 @@ public class TestScoreAssociateSad_F64 {
 		b.value=new double[]{-1,2,6.1,3,6};
 
 		assertEquals(7.7,scorer.score(a,b),1e-2);
-	}
-
-	@Test
-	public void checkZeroMinimum() {
-		ScoreAssociateSad_F64 scorer = new ScoreAssociateSad_F64();
-		assertTrue(scorer.isZeroMinimum());
 	}
 }
