@@ -23,11 +23,12 @@ import boofcv.abst.feature.associate.ScoreAssociation;
 import boofcv.struct.FastQueue;
 import boofcv.struct.GrowingArrayInt;
 import boofcv.struct.feature.AssociatedIndex;
+import boofcv.struct.feature.MatchScoreType;
 import georegression.struct.point.Point2D_F64;
 
 /**
- * Base class for algorithms which consider all possible associations but perform a which calculation
- * of a distance measure before doing more expensive calculations
+ * Base class for algorithms which consider all possible associations but perform a quick distance calculation
+ * to remove unlikely matches before computing the more expensive fit score between two descriptions.
  *
  * @author Peter Abeles
  */
@@ -179,5 +180,15 @@ public abstract class BaseAssociateLocation2DFilter<D> implements AssociateDescr
 	@Override
 	public GrowingArrayInt getUnassociatedSource() {
 		return unassociated;
+	}
+
+	@Override
+	public void setThreshold(double score) {
+		maxError = score;
+	}
+
+	@Override
+	public MatchScoreType getScoreType() {
+		return scoreAssociation.getScoreType();
 	}
 }

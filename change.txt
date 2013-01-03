@@ -44,6 +44,8 @@ Version : Alpha 0.13
 - Changing the way complex algorithm are configured
   * Instead of passing in parameters to a factory a config class is passed in.
   * Affected: SIFT, SURF
+- Fixed bug in PixelMath.subtract for ImageUInt8
+  * Thanks Paul Dumais for reporting the problem
 
 ---------------------------------------------
 Date    : 2012/12/05

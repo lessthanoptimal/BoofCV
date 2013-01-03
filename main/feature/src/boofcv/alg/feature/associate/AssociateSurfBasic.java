@@ -148,6 +148,10 @@ public class AssociateSurfBasic {
 		return unassociated;
 	}
 
+	public AssociateDescription<TupleDesc_F64> getAssoc() {
+		return assoc;
+	}
+
 	public static class Helper extends TupleDesc_F64
 	{
 		public int index;

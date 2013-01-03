@@ -19,19 +19,20 @@
 package boofcv.abst.feature.associate;
 
 import boofcv.alg.feature.associate.DescriptorDistance;
+import boofcv.struct.feature.MatchScoreType;
 import boofcv.struct.feature.TupleDesc_B;
 import org.junit.Test;
-
-import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
 
 /**
  * @author Peter Abeles
  */
-public class TestScoreAssociateHamming_B {
+public class TestScoreAssociateHamming_B extends StandardScoreAssociationChecks<TupleDesc_B>{
 
-	Random rand = new Random(123);
+	public TestScoreAssociateHamming_B() {
+		super(MatchScoreType.NORM_ERROR);
+	}
 
 	/**
 	 * Generate random descriptions and see two hamming distance calculations return the same result.
@@ -53,5 +54,19 @@ public class TestScoreAssociateHamming_B {
 
 			assertEquals(expected,scorer.score(a,b),1e-4);
 		}
+	}
+
+	@Override
+	public ScoreAssociation<TupleDesc_B> createScore() {
+		return new ScoreAssociateHamming_B();
+	}
+
+	@Override
+	public TupleDesc_B createDescription() {
+		TupleDesc_B a = new TupleDesc_B(5);
+		for( int i = 0; i < a.data.length; i++ )
+			a.data[i] = rand.nextInt();
+
+		return a;
 	}
 }

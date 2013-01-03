@@ -22,6 +22,7 @@ import boofcv.alg.feature.associate.AssociateSurfBasic;
 import boofcv.struct.FastQueue;
 import boofcv.struct.GrowingArrayInt;
 import boofcv.struct.feature.AssociatedIndex;
+import boofcv.struct.feature.MatchScoreType;
 import boofcv.struct.feature.SurfFeature;
 
 /**
@@ -63,5 +64,15 @@ public class WrapAssociateSurfBasic implements AssociateDescription<SurfFeature>
 	@Override
 	public GrowingArrayInt getUnassociatedSource() {
 		return alg.getUnassociated();
+	}
+
+	@Override
+	public void setThreshold(double score) {
+		alg.getAssoc().setThreshold(score);
+	}
+
+	@Override
+	public MatchScoreType getScoreType() {
+		return alg.getAssoc().getScoreType();
 	}
 }

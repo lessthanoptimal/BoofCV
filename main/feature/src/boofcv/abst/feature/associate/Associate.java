@@ -21,6 +21,7 @@ package boofcv.abst.feature.associate;
 import boofcv.struct.FastQueue;
 import boofcv.struct.GrowingArrayInt;
 import boofcv.struct.feature.AssociatedIndex;
+import boofcv.struct.feature.MatchScoreType;
 
 /**
  * Common functions for associating features between two images with a single match. Features are associated from the
@@ -49,4 +50,19 @@ public interface Associate {
 	 * @return List of unassociated source features by index.
 	 */
 	public GrowingArrayInt getUnassociatedSource();
+
+	/**
+	 * Associations are only considered if their score is less than the specified threshold.  To remove
+	 * any threshold test set this value to Double.MAX_VALUE
+	 *
+	 * @param score The threshold.
+	 */
+	public void setThreshold( double score );
+
+	/**
+	 * Specifies the type of score which is returned.
+	 *
+	 * @return Type of association score.
+	 */
+	public MatchScoreType getScoreType();
 }

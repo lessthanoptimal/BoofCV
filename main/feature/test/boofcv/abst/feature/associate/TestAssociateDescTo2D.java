@@ -21,6 +21,7 @@ package boofcv.abst.feature.associate;
 import boofcv.struct.FastQueue;
 import boofcv.struct.GrowingArrayInt;
 import boofcv.struct.feature.AssociatedIndex;
+import boofcv.struct.feature.MatchScoreType;
 import boofcv.struct.feature.TupleDesc_F64;
 import org.junit.Test;
 
@@ -43,12 +44,15 @@ public class TestAssociateDescTo2D {
 		alg.setSource(null,listSrc);
 		alg.setDestination(null,listDst);
 		alg.associate();
+		alg.setThreshold(10.5);
 
 		assertTrue(listSrc == dummy.listSrc);
 		assertTrue(listDst == dummy.listDst);
 		assertTrue(dummy.calledAssociate);
 		assertTrue(dummy.matches == alg.getMatches());
 		assertTrue(dummy.unassociated == alg.getUnassociatedSource());
+		assertTrue(10.5 == dummy.threshold);
+		assertTrue(MatchScoreType.CORRELATION==alg.getScoreType());
 	}
 
 	private static class Dummy implements AssociateDescription<TupleDesc_F64> {
@@ -58,6 +62,7 @@ public class TestAssociateDescTo2D {
 		public boolean calledAssociate = false;
 		public FastQueue<AssociatedIndex> matches = new FastQueue<AssociatedIndex>(10,AssociatedIndex.class,false);
 		public GrowingArrayInt unassociated = new GrowingArrayInt(10);
+		public double threshold;
 
 		@Override
 		public void setSource(FastQueue<TupleDesc_F64> listSrc) {
@@ -82,6 +87,16 @@ public class TestAssociateDescTo2D {
 		@Override
 		public GrowingArrayInt getUnassociatedSource() {
 			return unassociated;
+		}
+
+		@Override
+		public void setThreshold(double score) {
+			threshold = score;
+		}
+
+		@Override
+		public MatchScoreType getScoreType() {
+			return MatchScoreType.CORRELATION;
 		}
 	}
 

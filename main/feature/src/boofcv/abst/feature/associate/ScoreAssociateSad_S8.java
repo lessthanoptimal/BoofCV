@@ -19,6 +19,7 @@
 package boofcv.abst.feature.associate;
 
 import boofcv.alg.feature.associate.DescriptorDistance;
+import boofcv.struct.feature.MatchScoreType;
 import boofcv.struct.feature.TupleDesc_S8;
 
 /**
@@ -33,7 +34,7 @@ public class ScoreAssociateSad_S8 implements ScoreAssociation<TupleDesc_S8>{
 	}
 
 	@Override
-	public boolean isZeroMinimum() {
-		return true;
+	public MatchScoreType getScoreType() {
+		return MatchScoreType.NORM_ERROR;
 	}
 }

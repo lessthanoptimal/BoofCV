@@ -22,6 +22,7 @@ import boofcv.alg.feature.associate.AssociateGreedy;
 import boofcv.struct.FastQueue;
 import boofcv.struct.GrowingArrayInt;
 import boofcv.struct.feature.AssociatedIndex;
+import boofcv.struct.feature.MatchScoreType;
 import org.ddogleg.sorting.QuickSelectArray;
 
 
@@ -119,5 +120,15 @@ public class WrapAssociateGreedy<T> implements AssociateDescription<T> {
 	@Override
 	public GrowingArrayInt getUnassociatedSource() {
 		return unassoc;
+	}
+
+	@Override
+	public void setThreshold(double score) {
+		alg.setMaxFitError(score);
+	}
+
+	@Override
+	public MatchScoreType getScoreType() {
+		return alg.getScore().getScoreType();
 	}
 }

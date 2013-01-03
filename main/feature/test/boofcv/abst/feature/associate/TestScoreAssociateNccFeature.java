@@ -18,16 +18,36 @@
 
 package boofcv.abst.feature.associate;
 
+import boofcv.struct.feature.MatchScoreType;
 import boofcv.struct.feature.NccFeature;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 
 /**
  * @author Peter Abeles
  */
-public class TestScoreAssociateNccFeature {
+public class TestScoreAssociateNccFeature extends StandardScoreAssociationChecks<NccFeature> {
+
+	public TestScoreAssociateNccFeature() {
+		super(MatchScoreType.CORRELATION);
+	}
+
+	@Override
+	public ScoreAssociation<NccFeature> createScore() {
+		return new ScoreAssociateNccFeature();
+	}
+
+	@Override
+	public NccFeature createDescription() {
+		NccFeature a = new NccFeature(5);
+		a.mean = 10;
+		a.sigma = 5;
+		for( int i = 0; i < a.size(); i++ )
+			a.value[i] = rand.nextGaussian()*2;
+
+		return a;
+	}
 
 	@Test
 	public void compareToExpected() {
@@ -42,11 +62,5 @@ public class TestScoreAssociateNccFeature {
 		b.value=new double[]{2,-1,7,-8,10};
 
 		assertEquals(-0.46429,scorer.score(a,b),1e-2);
-	}
-
-	@Test
-	public void checkZeroMinimum() {
-		ScoreAssociateNccFeature scorer = new ScoreAssociateNccFeature();
-		assertFalse(scorer.isZeroMinimum());
 	}
 }
