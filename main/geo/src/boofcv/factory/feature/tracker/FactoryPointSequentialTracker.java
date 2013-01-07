@@ -95,10 +95,9 @@ public class FactoryPointSequentialTracker {
 		PkltConfig<I, D> config =
 				PkltConfig.createDefault(imageType, derivType);
 		config.pyramidScaling = scaling;
-		config.maxFeatures = maxFeatures;
 		config.featureRadius = featureRadius;
 
-		return klt(config,detectThreshold,extractRadius,spawnSubW,spawnSubH);
+		return klt(config,maxFeatures,detectThreshold,extractRadius,spawnSubW,spawnSubH);
 	}
 
 	/**
@@ -107,17 +106,18 @@ public class FactoryPointSequentialTracker {
 	 * @see boofcv.struct.pyramid.PyramidUpdaterDiscrete
 	 *
 	 * @param config Config for the tracker. Try PkltConfig.createDefault().
+	 * @param maxFeatures Maximum number of features that will be detected.  -1 for no limit.
 	 * @param detectThreshold Minimum allowed feature detection intensity.  Tune. Start at 1.
 	 * @param extractRadius How close together two features can be.  Try 2
 	 * @param spawnSubW Forces a more even distribution of features.  Width.  Try 2
 	 * @param spawnSubH Forces a more even distribution of features.  Height.  Try 3
 	 * @return KLT based tracker.
 	 */
-	public static <I extends ImageSingleBand, D extends ImageSingleBand, Tracker extends PointTracker<I>>
-	Tracker klt(PkltConfig<I, D> config, double detectThreshold , int extractRadius , int spawnSubW, int spawnSubH) {
+	public static <I extends ImageSingleBand, D extends ImageSingleBand>
+	PointTrackerSpawn<I> klt(PkltConfig<I, D> config, int maxFeatures , double detectThreshold , int extractRadius , int spawnSubW, int spawnSubH) {
 
-		GeneralFeatureDetector<I, D> detector = createShiTomasi(config.maxFeatures, extractRadius,
-				(float)detectThreshold, config.typeDeriv);
+		GeneralFeatureDetector<I, D> detector = createShiTomasi(maxFeatures, extractRadius,
+				(float) detectThreshold, config.typeDeriv);
 		detector.setRegions(spawnSubW, spawnSubH);
 
 		InterpolateRectangle<I> interpInput = FactoryInterpolation.<I>bilinearRectangle(config.typeInput);
@@ -127,7 +127,28 @@ public class FactoryPointSequentialTracker {
 
 		PyramidUpdaterDiscrete<I> pyramidUpdater = FactoryPyramid.discreteGaussian(config.typeInput, -1, 2);
 
-		return (Tracker)new PointTrackerKltPyramid<I, D>(config,pyramidUpdater,detector,
+		return new PointTrackerKltPyramid<I, D>(config,pyramidUpdater,detector,
+				gradient,interpInput,interpDeriv);
+	}
+
+	/**
+	 * Creates a KLT tracker where the user specifies the spawn points.
+	 *
+	 * @param config Config for the tracker. Try PkltConfig.createDefault().
+	 * @return KLT based tracker.
+	 */
+	public static <I extends ImageSingleBand, D extends ImageSingleBand>
+	PointTrackerUser<I> klt(PkltConfig<I, D> config ) {
+
+
+		InterpolateRectangle<I> interpInput = FactoryInterpolation.<I>bilinearRectangle(config.typeInput);
+		InterpolateRectangle<D> interpDeriv = FactoryInterpolation.<D>bilinearRectangle(config.typeDeriv);
+
+		ImageGradient<I,D> gradient = FactoryDerivative.sobel(config.typeInput, config.typeDeriv);
+
+		PyramidUpdaterDiscrete<I> pyramidUpdater = FactoryPyramid.discreteGaussian(config.typeInput, -1, 2);
+
+		return new PointTrackerKltPyramid<I, D>(config,pyramidUpdater,null,
 				gradient,interpInput,interpDeriv);
 	}
 

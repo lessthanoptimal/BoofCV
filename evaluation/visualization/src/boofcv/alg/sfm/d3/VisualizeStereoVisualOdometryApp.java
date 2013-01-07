@@ -286,13 +286,12 @@ public class VisualizeStereoVisualOdometryApp <I extends ImageSingleBand>
 			PkltConfig config =
 					PkltConfig.createDefault(imageType, derivType);
 			config.pyramidScaling = new int[]{1,2,4,8};
-			config.maxFeatures = 600;
 			config.featureRadius = 3;
 			config.typeInput = imageType;
 			config.typeDeriv = derivType;
 
 			GeneralFeatureDetector detector =
-					FactoryPointSequentialTracker.createShiTomasi(config.maxFeatures, 3, 1, config.typeDeriv);
+					FactoryPointSequentialTracker.createShiTomasi(600, 3, 1, config.typeDeriv);
 
 			assistedTracker = FactoryVisualOdometry.trackerAssistedKltP3P(detector,config,1.5,200,50);
 		} else if( whichAlg == 1 ) {
@@ -329,16 +328,15 @@ public class VisualizeStereoVisualOdometryApp <I extends ImageSingleBand>
 			PkltConfig config =
 					PkltConfig.createDefault(imageType, derivType);
 			config.pyramidScaling = new int[]{1,2,4,8};
-			config.maxFeatures = 600;
 			config.featureRadius = 3;
 			config.typeInput = imageType;
 			config.typeDeriv = derivType;
 
 			GeneralFeatureDetector detector =
-					FactoryPointSequentialTracker.createShiTomasi(config.maxFeatures, 3, 1, config.typeDeriv);
+					FactoryPointSequentialTracker.createShiTomasi(600, 3, 1, config.typeDeriv);
 
-			PointTrackerUser<I> trackerLeft = (PointTrackerUser<I>)FactoryPointSequentialTracker.klt(config,1,2,1,1);
-			PointTrackerUser<I> trackerRight = (PointTrackerUser<I>)FactoryPointSequentialTracker.klt(config,1,2,1,1);
+			PointTrackerUser<I> trackerLeft = FactoryPointSequentialTracker.klt(config);
+			PointTrackerUser<I> trackerRight = FactoryPointSequentialTracker.klt(config);
 
 			return FactoryVisualOdometry.stereoFullPnP(thresholdAdd, thresholdRetire,1.5,200,disparity,
 					detector,trackerLeft,trackerRight, imageType);

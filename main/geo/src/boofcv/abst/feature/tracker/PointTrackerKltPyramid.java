@@ -103,12 +103,6 @@ public class PointTrackerKltPyramid<I extends ImageSingleBand,D extends ImageSin
 		KltTracker<I, D> klt = new KltTracker<I, D>(interpInput, interpDeriv, config.config);
 		tracker = new PyramidKltTracker<I, D>(klt);
 
-		// pre-declare image features
-		int numLayers = config.pyramidScaling.length;
-		for (int i = 0; i < config.maxFeatures; i++) {
-			addTrackToUnused();
-		}
-
 		// declare the image pyramid
 		basePyramid = new PyramidDiscrete<I>(config.typeInput,true,config.pyramidScaling);
 		derivX = new PyramidDiscrete<D>(config.typeDeriv,false,config.pyramidScaling);
