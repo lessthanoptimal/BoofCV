@@ -38,13 +38,13 @@ import java.util.List;
 
 
 /**
- * Wrapper around {@link boofcv.alg.tracker.klt.PyramidKltTracker} for {@link ImagePointTracker}.  Every track
+ * Wrapper around {@link boofcv.alg.tracker.klt.PyramidKltTracker} for {@link PointTrackerSpawn}.  Every track
  * will have the same size and shaped descriptor.  If any fault is encountered the track will be dropped.
  *
  * @author Peter Abeles
  */
 public class PointTrackerKltPyramid<I extends ImageSingleBand,D extends ImageSingleBand>
-		implements ImagePointTracker<I>
+		implements PointTrackerSpawn<I>, PointTrackerUser<I>
 {
 	// update the image pyramid
 	protected PyramidUpdaterDiscrete<I> inputPyramidUpdater;
@@ -124,6 +124,26 @@ public class PointTrackerKltPyramid<I extends ImageSingleBand,D extends ImageSin
 		t.cookie = p;
 
 		unused.add(t);
+	}
+
+	@Override
+	public PointTrack addTrack( double x , double y ) {
+		// grow the number of tracks if needed
+		if( unused.isEmpty() )
+			addTrackToUnused();
+
+		PyramidKltFeature t = unused.remove(unused.size() - 1);
+		t.setPosition((float)x,(float)y);
+		tracker.setDescription(t);
+
+		PointTrack p = (PointTrack)t.cookie;
+
+		if( checkValidSpawn(p) ) {
+			active.add(t);
+			return p;
+		}
+
+		return null;
 	}
 
 	@Override
@@ -222,9 +242,10 @@ public class PointTrackerKltPyramid<I extends ImageSingleBand,D extends ImageSin
 
 	@Override
 	public void dropTrack(PointTrack track) {
-		unused.add((PyramidKltFeature)track.getDescription());
-		if( !active.remove((PyramidKltFeature)track.getDescription()) ) {
-			throw new RuntimeException("Not in active list!");
+		if( active.remove((PyramidKltFeature)track.getDescription()) ) {
+			// only recycle the description if it is in the active list.  This avoids the problem of adding the
+			// same description multiple times
+			unused.add((PyramidKltFeature)track.getDescription());
 		}
 	}
 

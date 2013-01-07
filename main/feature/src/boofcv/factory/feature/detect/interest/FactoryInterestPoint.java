@@ -24,8 +24,6 @@ import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.abst.filter.derivative.ImageHessian;
 import boofcv.alg.feature.detect.interest.*;
 import boofcv.alg.transform.gss.ScaleSpacePyramid;
-import boofcv.core.image.ImageGenerator;
-import boofcv.core.image.inst.FactoryImageGenerator;
 import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
 import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.factory.transform.gss.FactoryGaussianScaleSpace;
@@ -63,16 +61,13 @@ public class FactoryInterestPoint {
 
 		ImageGradient<T, D> gradient = null;
 		ImageHessian<D> hessian = null;
-		ImageGenerator<D> derivativeGenerator = null;
 
 		if (feature.getRequiresGradient() || feature.getRequiresHessian())
 			gradient = FactoryDerivative.sobel(inputType, derivType);
 		if (feature.getRequiresHessian())
 			hessian = FactoryDerivative.hessianSobel(derivType);
-		if (gradient != null || hessian != null)
-			derivativeGenerator = FactoryImageGenerator.create(derivType);
 
-		return new WrapCornerToInterestPoint<T, D>(feature, gradient, hessian, derivativeGenerator,scale);
+		return new WrapCornerToInterestPoint<T, D>(feature, gradient, hessian, scale,derivType);
 	}
 
 	/**

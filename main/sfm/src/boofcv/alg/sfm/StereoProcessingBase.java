@@ -26,6 +26,8 @@ import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.image.ImageSingleBand;
+import georegression.geometry.GeometryMath_F64;
+import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import org.ejml.data.DenseMatrix64F;
 
@@ -58,6 +60,16 @@ public class StereoProcessingBase<T extends ImageSingleBand> {
 
 	// rotation matrix for both rectified cameras
 	protected DenseMatrix64F rectR;
+
+	// storage for 3D coordinate of point in rectified reference frame
+	protected Point3D_F64 pointRect = new Point3D_F64();
+
+	// --------- Camera Calibration parameters
+	// stereo baseline
+	protected double baseline;
+	// intrinsic parameters for rectified camera
+	// skew is always set to zero in rectified camera
+	protected double cx,cy,fx,fy;
 
 	/**
 	 * Declares internal data structures
@@ -104,6 +116,32 @@ public class StereoProcessingBase<T extends ImageSingleBand> {
 		Class<T> imageType = imageLeftRect.getTypeInfo().getImageClass();
 		distortLeftRect = RectifyImageOps.rectifyImage(stereoParam.left, rect1, imageType);
 		distortRightRect = RectifyImageOps.rectifyImage(stereoParam.right, rect2, imageType);
+
+		// Compute parameters that are needed when converting to 3D
+		baseline = stereoParam.getBaseline();
+		fx = rectK.get(0,0);
+		fy = rectK.get(1,1);
+		cx = rectK.get(0,2);
+		cy = rectK.get(1,2);
+	}
+
+	/**
+	 * Given a coordinate of a point in the left rectified frame, compute the point's 3D
+	 * coordinate in the camera's reference frame in homogeneous coordinates. To convert the coordinate
+	 * into normal 3D, divide each element by the disparity.
+	 *
+	 * @param x x-coordinate of pixel in rectified left image
+	 * @param y y-coordinate of pixel in rectified left image
+	 * @param pointLeft Storage for 3D coordinate of point in homogeneous coordinates.  w = disparity
+	 */
+	public void compute3D( double x , double y , Point3D_F64 pointLeft ) {
+		// Coordinate in rectified camera frame
+		pointRect.z = baseline*fx;
+		pointRect.x = pointRect.z*(x - cx)/fx;
+		pointRect.y = pointRect.z*(y - cy)/fy;
+
+		// rotate into the original left camera frame
+		GeometryMath_F64.multTran(rectR,pointRect,pointLeft);
 	}
 
 	/**
@@ -147,5 +185,13 @@ public class StereoProcessingBase<T extends ImageSingleBand> {
 	 */
 	public DenseMatrix64F getRectK() {
 		return rectK;
+	}
+
+	public DenseMatrix64F getRect1() {
+		return rect1;
+	}
+
+	public DenseMatrix64F getRect2() {
+		return rect2;
 	}
 }

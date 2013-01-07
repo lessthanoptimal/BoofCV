@@ -66,7 +66,7 @@ import java.util.Random;
 
 
 /**
- * Factory for creating trackers which implement {@link ImagePointTracker}.  These trackers are intended for use
+ * Factory for creating trackers which implement {@link boofcv.abst.feature.tracker.PointTrackerSpawn}.  These trackers are intended for use
  * in SFM applications.
  *
  * @author Peter Abeles
@@ -90,7 +90,7 @@ public class FactoryPointSequentialTracker {
 	 * @return KLT based tracker.
 	 */
 	public static <I extends ImageSingleBand, D extends ImageSingleBand>
-	ImagePointTracker<I> klt(int maxFeatures, double detectThreshold, int scaling[], int featureRadius, int extractRadius ,
+	PointTrackerSpawn<I> klt(int maxFeatures, double detectThreshold, int scaling[], int featureRadius, int extractRadius ,
 							 int spawnSubW, int spawnSubH, Class<I> imageType, Class<D> derivType) {
 		PkltConfig<I, D> config =
 				PkltConfig.createDefault(imageType, derivType);
@@ -113,8 +113,8 @@ public class FactoryPointSequentialTracker {
 	 * @param spawnSubH Forces a more even distribution of features.  Height.  Try 3
 	 * @return KLT based tracker.
 	 */
-	public static <I extends ImageSingleBand, D extends ImageSingleBand>
-	ImagePointTracker<I> klt(PkltConfig<I, D> config, double detectThreshold , int extractRadius , int spawnSubW, int spawnSubH) {
+	public static <I extends ImageSingleBand, D extends ImageSingleBand, Tracker extends PointTracker<I>>
+	Tracker klt(PkltConfig<I, D> config, double detectThreshold , int extractRadius , int spawnSubW, int spawnSubH) {
 
 		GeneralFeatureDetector<I, D> detector = createShiTomasi(config.maxFeatures, extractRadius,
 				(float)detectThreshold, config.typeDeriv);
@@ -127,7 +127,7 @@ public class FactoryPointSequentialTracker {
 
 		PyramidUpdaterDiscrete<I> pyramidUpdater = FactoryPyramid.discreteGaussian(config.typeInput, -1, 2);
 
-		return new PointTrackerKltPyramid<I, D>(config,pyramidUpdater,detector,
+		return (Tracker)new PointTrackerKltPyramid<I, D>(config,pyramidUpdater,detector,
 				gradient,interpInput,interpDeriv);
 	}
 
@@ -147,7 +147,7 @@ public class FactoryPointSequentialTracker {
 	 */
 	// TODO remove maxTracks?  Use number of detected instead
 	public static <I extends ImageSingleBand>
-	ImagePointTracker<I> dda_FH_SURF_Fast(int maxTracks,
+	PointTrackerSpawn<I> dda_FH_SURF_Fast(int maxTracks,
 										  ConfigFastHessian configDetector ,
 										  ConfigSurfDescribe.Speed configDescribe ,
 										  ConfigAverageIntegral configOrientation ,
@@ -181,7 +181,7 @@ public class FactoryPointSequentialTracker {
 	 */
 	// TODO remove maxTracks?  Use number of detected instead
 	public static <I extends ImageSingleBand>
-	ImagePointTracker<I> dda_FH_SURF_Stable(int maxTracks,
+	PointTrackerSpawn<I> dda_FH_SURF_Stable(int maxTracks,
 											ConfigFastHessian configDetector ,
 											ConfigSurfDescribe.Stablility configDescribe ,
 											ConfigSlidingIntegral configOrientation ,
@@ -214,7 +214,7 @@ public class FactoryPointSequentialTracker {
 	 * @param derivType Type of image used to store the image derivative. null == use default
 	 */
 	public static <I extends ImageSingleBand, D extends ImageSingleBand>
-	ImagePointTracker<I> dda_ST_BRIEF(int maxFeatures, int maxAssociationError,
+	PointTrackerSpawn<I> dda_ST_BRIEF(int maxFeatures, int maxAssociationError,
 									  int extractRadius,
 									  float detectThreshold,
 									  Class<I> imageType, Class<D> derivType)
@@ -256,7 +256,7 @@ public class FactoryPointSequentialTracker {
 	 * @param imageType           Type of image being processed.
 	 */
 	public static <I extends ImageSingleBand, D extends ImageSingleBand>
-	ImagePointTracker<I> dda_FAST_BRIEF(int maxFeatures, int maxAssociationError,
+	PointTrackerSpawn<I> dda_FAST_BRIEF(int maxFeatures, int maxAssociationError,
 										int extractRadius,
 										int minContinuous,
 										int detectThreshold,
@@ -295,7 +295,7 @@ public class FactoryPointSequentialTracker {
 	 * @param imageType      Type of image being processed.
 	 * @param derivType      Type of image used to store the image derivative. null == use default     */
 	public static <I extends ImageSingleBand, D extends ImageSingleBand>
-	ImagePointTracker<I> dda_ST_NCC(int maxFeatures, int extractRadius, int describeRadius,
+	PointTrackerSpawn<I> dda_ST_NCC(int maxFeatures, int extractRadius, int describeRadius,
 									float detectThreshold,
 									Class<I> imageType, Class<D> derivType) {
 
@@ -369,7 +369,7 @@ public class FactoryPointSequentialTracker {
 	 * @return SURF based tracker.
 	 */
 	public static <I extends ImageSingleBand>
-	ImagePointTracker<I> combined_FH_SURF_KLT(int maxMatches,
+	PointTrackerSpawn<I> combined_FH_SURF_KLT(int maxMatches,
 											  int trackRadius,
 											  int[] pyramidScalingKlt ,
 											  int reactivateThreshold ,
@@ -413,7 +413,7 @@ public class FactoryPointSequentialTracker {
 	 * @return SURF based tracker.
 	 */
 	public static <I extends ImageSingleBand, D extends ImageSingleBand>
-	ImagePointTracker<I> combined_ST_SURF_KLT(int maxMatches,
+	PointTrackerSpawn<I> combined_ST_SURF_KLT(int maxMatches,
 											  int extractRadius,
 											  float detectThreshold,
 											  int trackRadius,
@@ -464,7 +464,7 @@ public class FactoryPointSequentialTracker {
 	 * @return Feature tracker
 	 */
 	public static <I extends ImageSingleBand, Desc extends TupleDesc>
-	ImagePointTracker<I> combined( InterestPointDetector<I> detector,
+	PointTrackerSpawn<I> combined( InterestPointDetector<I> detector,
 								   OrientationImage<I> orientation ,
 								   DescribeRegionPoint<I, Desc> describe,
 								   AssociateDescription<Desc> associate ,
@@ -495,7 +495,7 @@ public class FactoryPointSequentialTracker {
 	 * @return Feature tracker
 	 */
 	public static <I extends ImageSingleBand, D extends ImageSingleBand, Desc extends TupleDesc>
-	ImagePointTracker<I> combined( DetectDescribePoint<I,Desc> detector ,
+	PointTrackerSpawn<I> combined( DetectDescribePoint<I,Desc> detector ,
 								   AssociateDescription<Desc> associate ,
 								   int featureRadiusKlt,
 								   int[] pyramidScalingKlt ,

@@ -20,7 +20,6 @@ package boofcv.abst.feature.detect.interest;
 
 import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.abst.filter.derivative.ImageHessian;
-import boofcv.core.image.ImageGenerator;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.point.Point2D_F64;
@@ -37,40 +36,34 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class WrapCornerToInterestPoint<T extends ImageSingleBand, D extends ImageSingleBand> implements InterestPointDetector<T> {
+// TODO rename
+public class WrapCornerToInterestPoint<T extends ImageSingleBand, D extends ImageSingleBand>
+		extends EasyGeneralFeatureDetector<T,D>
+		implements InterestPointDetector<T>
+{
 
-	ImageGenerator<D> derivativeGenerator;
-	GeneralFeatureDetector<T, D> detector;
-	ImageGradient<T, D> gradient;
-	ImageHessian<D> hessian;
 	double scale = 1;
 
-	// true if the data 
-	boolean declaredDerivatives = false;
-	D derivX;
-	D derivY;
-	D derivXX;
-	D derivYY;
-	D derivXY;
-
-	List<Point2D_F64> foundPoints;
+	// list of points it found
+	protected List<Point2D_F64> foundPoints;
 
 	public WrapCornerToInterestPoint(GeneralFeatureDetector<T, D> detector,
-									 ImageGradient<T, D> gradient,
-									 ImageHessian<D> hessian,
-									 ImageGenerator<D> derivativeGenerator) {
-		this.detector = detector;
-		this.gradient = gradient;
-		this.hessian = hessian;
-		this.derivativeGenerator = derivativeGenerator;
+									 double scale ,
+									 Class<T> imageType, Class<D> derivType ) {
+		super(detector,imageType,derivType);
+		this.scale = scale;
 	}
 
 	public WrapCornerToInterestPoint(GeneralFeatureDetector<T, D> detector,
 									 ImageGradient<T, D> gradient,
 									 ImageHessian<D> hessian,
-									 ImageGenerator<D> derivativeGenerator,
-									 double scale) {
-		this(detector,gradient,hessian,derivativeGenerator);
+									 double scale,
+									 Class<D> derivType) {
+		super(detector, gradient, hessian, derivType);
+		this.scale = scale;
+	}
+
+	public void setScale(double scale) {
 		this.scale = scale;
 	}
 
@@ -80,15 +73,7 @@ public class WrapCornerToInterestPoint<T extends ImageSingleBand, D extends Imag
 
 	@Override
 	public void detect(T input) {
-
-		initializeDerivatives(input);
-
-		if (detector.getRequiresGradient() || detector.getRequiresHessian())
-			gradient.process(input, derivX, derivY);
-		if (detector.getRequiresHessian())
-			hessian.process(derivX, derivY, derivXX, derivYY, derivXY);
-
-		detector.process(input, derivX, derivY, derivXX, derivYY, derivXY);
+		super.detect(input,null);
 
 		QueueCorner corners = detector.getFeatures();
 
@@ -96,33 +81,6 @@ public class WrapCornerToInterestPoint<T extends ImageSingleBand, D extends Imag
 		for (int i = 0; i < corners.size; i++) {
 			Point2D_I16 p = corners.get(i);
 			foundPoints.add(new Point2D_F64(p.x, p.y));
-		}
-	}
-
-	private void initializeDerivatives(T input) {
-		if (derivativeGenerator == null)
-			return;
-
-		if (!declaredDerivatives) {
-			declaredDerivatives = true;
-			if (detector.getRequiresGradient() || detector.getRequiresHessian()) {
-				derivX = derivativeGenerator.createInstance(input.width, input.height);
-				derivY = derivativeGenerator.createInstance(input.width, input.height);
-			}
-			if (detector.getRequiresHessian()) {
-				derivXX = derivativeGenerator.createInstance(input.width, input.height);
-				derivYY = derivativeGenerator.createInstance(input.width, input.height);
-				derivXY = derivativeGenerator.createInstance(input.width, input.height);
-			}
-		} else if (derivX != null && (input.width != derivX.width || input.height != input.height)) {
-			// reshape derivatives if the input image has changed size
-			derivX.reshape(input.width, input.height);
-			derivY.reshape(input.width, input.height);
-			if (detector.getRequiresHessian()) {
-				derivXX.reshape(input.width, input.height);
-				derivYY.reshape(input.width, input.height);
-				derivXY.reshape(input.width, input.height);
-			}
 		}
 	}
 

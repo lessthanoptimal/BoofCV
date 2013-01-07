@@ -18,9 +18,9 @@
 
 package boofcv.alg.sfm.d2;
 
-import boofcv.abst.feature.tracker.ImagePointTracker;
 import boofcv.abst.feature.tracker.ModelAssistedTracker;
 import boofcv.abst.feature.tracker.PointTrack;
+import boofcv.abst.feature.tracker.PointTrackerSpawn;
 import boofcv.alg.feature.tracker.PointToAssistedTracker;
 import boofcv.alg.sfm.robust.DistanceAffine2DSq;
 import boofcv.alg.sfm.robust.DistanceHomographySq;
@@ -67,7 +67,7 @@ public abstract class ImageMotionBaseApp<I extends ImageSingleBand,
 	private final static int outputBorder = 10;
 
 	// tracks feature in the video stream
-	protected ImagePointTracker<I> tracker;
+	protected PointTrackerSpawn<I> tracker;
 	// tracks and estimates the motion
 	protected ModelAssistedTracker<I,T,AssociatedPair> trackerModel;
 
@@ -381,7 +381,7 @@ public abstract class ImageMotionBaseApp<I extends ImageSingleBand,
 	public void refreshAll(Object[] cookies) {
 		stopWorker();
 
-		tracker = (ImagePointTracker<I>)cookies[0];
+		tracker = (PointTrackerSpawn<I>)cookies[0];
 		fitModel = (T)cookies[1];
 
 		startEverything();
@@ -396,7 +396,7 @@ public abstract class ImageMotionBaseApp<I extends ImageSingleBand,
 
 		switch( indexFamily ) {
 			case 0:
-				tracker = (ImagePointTracker<I>)cookie;
+				tracker = (PointTrackerSpawn<I>)cookie;
 				break;
 			
 			case 1:

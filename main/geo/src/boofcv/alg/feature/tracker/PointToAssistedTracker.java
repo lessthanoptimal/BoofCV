@@ -18,9 +18,9 @@
 
 package boofcv.alg.feature.tracker;
 
-import boofcv.abst.feature.tracker.ImagePointTracker;
 import boofcv.abst.feature.tracker.ModelAssistedTracker;
 import boofcv.abst.feature.tracker.PointTrack;
+import boofcv.abst.feature.tracker.PointTrackerSpawn;
 import boofcv.abst.feature.tracker.TrackGeometryManager;
 import boofcv.struct.image.ImageBase;
 import org.ddogleg.fitting.modelset.ModelFitter;
@@ -43,7 +43,7 @@ public class PointToAssistedTracker<T extends ImageBase,Model,Info>
 		implements ModelAssistedTracker<T,Model,Info>
 {
 	// feature tracker
-	protected ImagePointTracker<T> tracker;
+	protected PointTrackerSpawn<T> tracker;
 	// Fits a model to the tracked features
 	protected ModelMatcher<Model,Info> modelMatcher;
 	// Refines the model using the complete inlier set
@@ -72,7 +72,7 @@ public class PointToAssistedTracker<T extends ImageBase,Model,Info>
 	 * @param modelMatcher
 	 * @param modelRefiner Optional model refinement.  Can be null.
 	 */
-	public PointToAssistedTracker(ImagePointTracker<T> tracker,
+	public PointToAssistedTracker(PointTrackerSpawn<T> tracker,
 								  ModelMatcher<Model, Info> modelMatcher,
 								  ModelFitter<Model, Info> modelRefiner )
 	{

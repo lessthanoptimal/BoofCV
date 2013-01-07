@@ -23,8 +23,9 @@ import boofcv.abst.feature.detdesc.DetectDescribePoint;
 import boofcv.abst.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.abst.feature.detect.interest.InterestPointDetector;
 import boofcv.abst.feature.disparity.StereoDisparitySparse;
-import boofcv.abst.feature.tracker.ImagePointTracker;
 import boofcv.abst.feature.tracker.PkltConfig;
+import boofcv.abst.feature.tracker.PointTrackerSpawn;
+import boofcv.abst.feature.tracker.PointTrackerUser;
 import boofcv.abst.sfm.AccessPointTracks3D;
 import boofcv.abst.sfm.ModelAssistedTrackerCalibrated;
 import boofcv.abst.sfm.StereoVisualOdometry;
@@ -95,6 +96,7 @@ public class VisualizeStereoVisualOdometryApp <I extends ImageSingleBand>
 	public VisualizeStereoVisualOdometryApp( Class<I> imageType ) {
 		super(1, imageType);
 
+		addAlgorithm(0, "Stereo P3P - KLT", 3);
 		addAlgorithm(0, "Depth P3P - KLT", 0);
 		addAlgorithm(0, "Depth P3P - ST-BRIEF", 1);
 		addAlgorithm(0, "Depth P3P - ST-SURF-KLT", 2);
@@ -272,6 +274,9 @@ public class VisualizeStereoVisualOdometryApp <I extends ImageSingleBand>
 		int thresholdRetire;
 		double associationMaxError = -1;
 
+		StereoDisparitySparse<I> disparity =
+				FactoryStereoDisparity.regionSparseWta(2,150,3,3,30,-1,true,imageType);
+
 		if( whichAlg == 0 ) {
 			thresholdAdd = 120;
 			thresholdRetire = 2;
@@ -310,17 +315,36 @@ public class VisualizeStereoVisualOdometryApp <I extends ImageSingleBand>
 //			tracker = FactoryPointSequentialTracker.dda_ST_NCC(600, 3, 7, 0, imageType, null);
 
 			assistedTracker = FactoryVisualOdometry.trackerAssistedDdaP3P(detDesc,1.5,200,50,associationMaxError,10.0);
-		} else {
+		} else if( whichAlg == 2 ) {
 			thresholdAdd = 80;
 			thresholdRetire = 3;
 //			tracker = FactoryPointSequentialTracker.dda_FH_SURF(600, 200, 1, 2,imageType);
-			ImagePointTracker<I> tracker = FactoryPointSequentialTracker.combined_ST_SURF_KLT(600, 3,0,3,
+			PointTrackerSpawn<I> tracker = FactoryPointSequentialTracker.combined_ST_SURF_KLT(600, 3,0,3,
 					new int[]{1,2,4,8},50, null,null,imageType, derivType);
 			assistedTracker = FactoryVisualOdometry.trackerP3P(tracker,1.5,200,50);
-		}
+		} else if( whichAlg == 3 ) {
+			thresholdAdd = 120;
+			thresholdRetire = 2;
 
-		StereoDisparitySparse<I> disparity =
-				FactoryStereoDisparity.regionSparseWta(2,150,3,3,30,-1,true,imageType);
+			PkltConfig config =
+					PkltConfig.createDefault(imageType, derivType);
+			config.pyramidScaling = new int[]{1,2,4,8};
+			config.maxFeatures = 600;
+			config.featureRadius = 3;
+			config.typeInput = imageType;
+			config.typeDeriv = derivType;
+
+			GeneralFeatureDetector detector =
+					FactoryPointSequentialTracker.createShiTomasi(config.maxFeatures, 3, 1, config.typeDeriv);
+
+			PointTrackerUser<I> trackerLeft = (PointTrackerUser<I>)FactoryPointSequentialTracker.klt(config,1,2,1,1);
+			PointTrackerUser<I> trackerRight = (PointTrackerUser<I>)FactoryPointSequentialTracker.klt(config,1,2,1,1);
+
+			return FactoryVisualOdometry.stereoFullPnP(thresholdAdd, thresholdRetire,1.5,200,disparity,
+					detector,trackerLeft,trackerRight, imageType);
+		} else {
+			throw new RuntimeException("Unknown selection");
+		}
 
 		return FactoryVisualOdometry.stereoDepth(thresholdAdd, thresholdRetire,disparity, assistedTracker, imageType);
 	}

@@ -24,8 +24,7 @@ import boofcv.factory.feature.tracker.FactoryPointSequentialTracker;
 import boofcv.struct.image.ImageFloat32;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 
 /**
@@ -40,7 +39,7 @@ public class TestPointTrackerKltPyramid extends StandardImagePointTracker<ImageF
 	}
 
 	@Override
-	public ImagePointTracker<ImageFloat32> createTracker() {
+	public PointTrackerSpawn<ImageFloat32> createTracker() {
 		config = PkltConfig.createDefault(ImageFloat32.class, ImageFloat32.class);
 		return FactoryPointSequentialTracker.klt(config,1000,3,1,1);
 	}
@@ -106,5 +105,10 @@ public class TestPointTrackerKltPyramid extends StandardImagePointTracker<ImageF
 
 		assertEquals( before-1, alg.active.size());
 		assertEquals(alg.config.maxFeatures-alg.active.size(),alg.unused.size());
+	}
+
+	@Test
+	public void addTrack() {
+		fail("Implement");
 	}
 }

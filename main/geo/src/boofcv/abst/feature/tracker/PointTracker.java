@@ -24,11 +24,10 @@ import java.util.List;
 
 /**
  * <p>
- * Interface for tracking point features in image sequences and is intended for use in
- * Structure From Motion (SFM) application.  Features are automatically
- * detected and tracked between consecutive frames in a video sequence. Access is provided
- * to the pixel location of each track.  Implementation specific track information is hidden
- * from the user.
+ * Base interface for tracking point features in image sequences and is intended for use in
+ * Structure From Motion (SFM) application.  This interface does not specify how new tracks are created.  Once a track
+ * has been created it is tracked from frame to frame.  Access is provided to the pixel location of each track.
+ * Implementation specific track information is hidden from the user.
  * </p>
  *
  * <p>
@@ -59,7 +58,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public interface ImagePointTracker <T extends ImageBase> {
+public interface PointTracker<T extends ImageBase> {
 
 	/**
 	 * Discard memory of all current and past tracks.  Growing buffered might not be reset to
@@ -72,16 +71,7 @@ public interface ImagePointTracker <T extends ImageBase> {
 	 *
 	 * @param image Next image in the sequence
 	 */
-	void process( T image );
-
-	/**
-	 * Automatically selects new features in the image to track. Returned tracks must
-	 * be unique and not duplicates of any existing tracks.  This includes both active
-	 * and inactive tracks.
-	 *
-	 * NOTE: This function may or may not also modify the active and inactive lists.
-	 */
-	public void spawnTracks();
+	void process(T image);
 
 	/**
 	 * Drops all feature to be dropped and will no longer be tracked.  Tracks dropped using
@@ -91,12 +81,12 @@ public interface ImagePointTracker <T extends ImageBase> {
 
 	/**
 	 * Manually forces a track to be dropped.  Tracks dropped using this function will not
-	 * appear in the dropped list.
+	 * appear in the dropped list.  If request is made to drop a track that is not being tracked, then the request
+	 * is ignored.  Data should not be added to the recycle list in this case since it might be a double request.
 	 *
 	 * @param track The track which is to be dropped
 	 */
 	public void dropTrack(PointTrack track);
-
 
 	/**
 	 * Returns a list of all features that are currently being tracked
@@ -105,7 +95,7 @@ public interface ImagePointTracker <T extends ImageBase> {
 	 *             If null a new list will be declared internally.
 	 * @return List of tracks.
 	 */
-	public List<PointTrack> getAllTracks( List<PointTrack> list );
+	public List<PointTrack> getAllTracks(List<PointTrack> list);
 
 	/**
 	 * Returns a list of active tracks. An active track is defined as a track
@@ -115,7 +105,7 @@ public interface ImagePointTracker <T extends ImageBase> {
 	 *             If null a new list will be declared internally.
 	 * @return List of tracks.
 	 */
-	public List<PointTrack> getActiveTracks( List<PointTrack> list );
+	public List<PointTrack> getActiveTracks(List<PointTrack> list);
 
 	/**
 	 * Returns a list of inactive tracks.  A track is inactive if it is not
@@ -125,7 +115,7 @@ public interface ImagePointTracker <T extends ImageBase> {
 	 *             If null a new list will be declared internally.
 	 * @return List of tracks.
 	 */
-	public List<PointTrack> getInactiveTracks( List<PointTrack> list );
+	public List<PointTrack> getInactiveTracks(List<PointTrack> list);
 
 	/**
 	 * Returns a list of tracks dropped by the tracker during the most recent update.
@@ -135,7 +125,7 @@ public interface ImagePointTracker <T extends ImageBase> {
 	 *             If null a new list will be declared internally.
 	 * @return List of tracks.
 	 */
-	public List<PointTrack> getDroppedTracks( List<PointTrack> list );
+	public List<PointTrack> getDroppedTracks(List<PointTrack> list);
 
 	/**
 	 * Returns a list of tracks that have been added since process was called.
@@ -144,7 +134,7 @@ public interface ImagePointTracker <T extends ImageBase> {
 	 *             If null a new list will be declared internally.
 	 * @return List of tracks.
 	 */
-	public List<PointTrack> getNewTracks( List<PointTrack> list );
+	public List<PointTrack> getNewTracks(List<PointTrack> list);
 
 
 }

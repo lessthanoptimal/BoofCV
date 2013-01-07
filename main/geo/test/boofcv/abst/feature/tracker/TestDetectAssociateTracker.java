@@ -88,7 +88,7 @@ public class TestDetectAssociateTracker extends StandardImagePointTracker<ImageF
 	}
 
 	@Override
-	public ImagePointTracker<ImageFloat32> createTracker() {
+	public PointTrackerSpawn<ImageFloat32> createTracker() {
 		DescribePointBrief<ImageFloat32> brief =
 				FactoryDescribePointAlgs.brief(FactoryBriefDefinition.gaussian2(new Random(123), 16, 512),
 				FactoryBlurFilter.gaussian(ImageFloat32.class, 0, 4));

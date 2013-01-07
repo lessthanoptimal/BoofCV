@@ -34,13 +34,13 @@ import static org.junit.Assert.assertTrue;
 
 
 /**
- * Standard tests for implementations of {@link boofcv.abst.feature.tracker.ImagePointTracker}.
+ * Standard tests for implementations of {@link PointTrackerSpawn}.
  *
  * @author Peter Abeles
  */
 public abstract class StandardImagePointTracker <T extends ImageSingleBand> {
 
-	public ImagePointTracker<T> tracker;
+	public PointTrackerSpawn<T> tracker;
 	Random rand = new Random(234);
 	int width = 100;
 	int height = 80;
@@ -61,7 +61,7 @@ public abstract class StandardImagePointTracker <T extends ImageSingleBand> {
 	/**
 	 * Creates a new tracker with the specified number of tracks initially.
 	 */
-	public abstract ImagePointTracker<T> createTracker();
+	public abstract PointTrackerSpawn<T> createTracker();
 
 	/**
 	 * The cookie for tracks should not be set
