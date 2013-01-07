@@ -62,10 +62,9 @@ public class FactoryModelAssistedTracker {
 		PkltConfig<I, D> config =
 				PkltConfig.createDefault(imageType, derivType);
 		config.pyramidScaling = scaling;
-		config.maxFeatures = maxFeatures;
 		config.featureRadius = featureRadius;
 
-		GeneralFeatureDetector<I, D> detector = FactoryPointSequentialTracker.createShiTomasi(config.maxFeatures, extractRadius,
+		GeneralFeatureDetector<I, D> detector = FactoryPointSequentialTracker.createShiTomasi(maxFeatures, extractRadius,
 				(float) detectThreshold, config.typeDeriv);
 		detector.setRegions(spawnSubW, spawnSubH);
 

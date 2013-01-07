@@ -30,9 +30,7 @@ import boofcv.struct.image.ImageSingleBand;
 public class PkltConfig<I extends ImageSingleBand, D extends ImageSingleBand> {
 	/** configuration for low level KLT tracker */
 	public KltConfig config;
-	/** Maximum number of features it can track.  Determines how many features are spawned */
-	public int maxFeatures;
-	/** The radius of each feature. 3 is a reasonable number. */
+	/** The radius of a feature descriptor in layer. 3 is a reasonable number. */
 	public int featureRadius;
 
 	/** Scale factor for each layer in the pyramid */
@@ -57,7 +55,6 @@ public class PkltConfig<I extends ImageSingleBand, D extends ImageSingleBand> {
 		ret.typeDeriv = typeDeriv;
 
 		ret.config = KltConfig.createDefault();
-		ret.maxFeatures = 200;
 		ret.featureRadius = 2;
 		ret.pyramidScaling = new int[]{1,2,4};
 

@@ -59,7 +59,6 @@ public class VideoStabilizeSequentialPointApp<I extends ImageSingleBand, D exten
 
 		PkltConfig<I, D> config =
 				PkltConfig.createDefault(imageType, derivType);
-		config.maxFeatures = maxFeatures;
 		config.featureRadius = 3;
 		config.pyramidScaling = new int[]{1,2,4,8};
 
@@ -67,7 +66,7 @@ public class VideoStabilizeSequentialPointApp<I extends ImageSingleBand, D exten
 		configFH.maxFeaturesPerScale = 200;
 		configFH.initialSampleSize = 2;
 
-		addAlgorithm(0, "KLT", FactoryPointSequentialTracker.klt(config,1,3,1,1));
+		addAlgorithm(0, "KLT", FactoryPointSequentialTracker.klt(config,maxFeatures,1,3,1,1));
 		addAlgorithm(0, "ST-BRIEF", FactoryPointSequentialTracker.
 				dda_ST_BRIEF(400, 100, 1, 10, imageType, derivType));
 		// size of the description region has been increased to improve quality.

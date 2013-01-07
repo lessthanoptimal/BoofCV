@@ -41,7 +41,7 @@ public class TestPointTrackerKltPyramid extends StandardImagePointTracker<ImageF
 	@Override
 	public PointTrackerSpawn<ImageFloat32> createTracker() {
 		config = PkltConfig.createDefault(ImageFloat32.class, ImageFloat32.class);
-		return FactoryPointSequentialTracker.klt(config,1000,3,1,1);
+		return FactoryPointSequentialTracker.klt(config,200,1000,3,1,1);
 	}
 
 	/**
@@ -55,12 +55,10 @@ public class TestPointTrackerKltPyramid extends StandardImagePointTracker<ImageF
 		alg.process(image);
 		alg.spawnTracks();
 
-		int max = alg.config.maxFeatures;
 		int total = alg.active.size();
 
-		assertTrue( total > 0 );
+		assertTrue(total > 0);
 		assertEquals(0,alg.dropped.size());
-		assertEquals(max-total,alg.unused.size());
 
 		// drastically change the image causing tracks to be dropped
 		GImageMiscOps.fill(image, 0);
@@ -68,7 +66,7 @@ public class TestPointTrackerKltPyramid extends StandardImagePointTracker<ImageF
 
 		int difference = total - alg.active.size();
 		assertEquals(difference,alg.dropped.size());
-		assertEquals(max-alg.active.size(),alg.unused.size());
+		assertEquals(0,alg.unused.size());
 	}
 
 	@Test
@@ -79,13 +77,14 @@ public class TestPointTrackerKltPyramid extends StandardImagePointTracker<ImageF
 		alg.process(image);
 		alg.spawnTracks();
 
-		assertTrue( alg.active.size() > 0 );
+		int numSpawned = alg.active.size();
+		assertTrue( numSpawned > 0 );
 
 		alg.dropAllTracks();
 
 		assertEquals( 0, alg.active.size());
 		assertEquals( 0, alg.dropped.size());
-		assertEquals(alg.config.maxFeatures, alg.unused.size());
+		assertEquals( numSpawned, alg.unused.size());
 	}
 
 	@Test
@@ -104,7 +103,7 @@ public class TestPointTrackerKltPyramid extends StandardImagePointTracker<ImageF
 		alg.dropTrack((PointTrack)f.cookie);
 
 		assertEquals( before-1, alg.active.size());
-		assertEquals(alg.config.maxFeatures-alg.active.size(),alg.unused.size());
+		assertEquals(0,alg.unused.size());
 	}
 
 	@Test
