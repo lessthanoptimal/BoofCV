@@ -41,7 +41,9 @@ import java.util.Arrays;
  *
  * @author Peter Abeles
  */
-public class GeneralFeatureDetector<I extends ImageSingleBand, D extends ImageSingleBand> {
+// TODO move to alg?
+public class GeneralFeatureDetector<I extends ImageSingleBand, D extends ImageSingleBand>
+{
 
 	// selects the features with the largest intensity
 	private SelectNBestFeatures selectBest = new SelectNBestFeatures(10);

@@ -24,16 +24,15 @@ import boofcv.abst.feature.associate.ScoreAssociation;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
 import boofcv.abst.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.abst.feature.disparity.StereoDisparitySparse;
-import boofcv.abst.feature.tracker.ImagePointTracker;
 import boofcv.abst.feature.tracker.ModelAssistedTracker;
 import boofcv.abst.feature.tracker.PkltConfig;
+import boofcv.abst.feature.tracker.PointTrackerSpawn;
+import boofcv.abst.feature.tracker.PointTrackerUser;
 import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.abst.geo.Estimate1ofPnP;
+import boofcv.abst.geo.EstimateNofPnP;
 import boofcv.abst.geo.RefinePnP;
-import boofcv.abst.sfm.ModelAssistedToCalibrated;
-import boofcv.abst.sfm.ModelAssistedTrackerCalibrated;
-import boofcv.abst.sfm.StereoVisualOdometry;
-import boofcv.abst.sfm.WrapVisOdomPixelDepthPnP;
+import boofcv.abst.sfm.*;
 import boofcv.alg.feature.associate.AssociateMaxDistanceNaive;
 import boofcv.alg.feature.tracker.AssistedPyramidKltTracker;
 import boofcv.alg.feature.tracker.AssistedTrackerTwoPass;
@@ -42,9 +41,13 @@ import boofcv.alg.geo.DistanceModelMonoPixels;
 import boofcv.alg.geo.pose.PnPDistanceReprojectionSq;
 import boofcv.alg.interpolate.InterpolateRectangle;
 import boofcv.alg.sfm.StereoSparse3D;
+import boofcv.alg.sfm.d3.Stereo2D3D;
 import boofcv.alg.sfm.d3.VisOdomPixelDepthPnP;
+import boofcv.alg.sfm.d3.VisOdomStereoPnP;
 import boofcv.alg.sfm.robust.EstimatorToGenerator;
 import boofcv.alg.sfm.robust.GeoModelRefineToModelFitter;
+import boofcv.alg.sfm.robust.PnPDistanceStereoReprojectionSq;
+import boofcv.alg.sfm.robust.PnPStereoEstimator;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.factory.geo.EnumPNP;
@@ -106,11 +109,10 @@ public class FactoryVisualOdometry {
 	 * @return
 	 */
 	public static <T extends ImageSingleBand>
-	ModelAssistedTrackerCalibrated<T, Se3_F64,Point2D3D> trackerP3P( ImagePointTracker<T> tracker,
+	ModelAssistedTrackerCalibrated<T, Se3_F64,Point2D3D> trackerP3P( PointTrackerSpawn<T> tracker,
 																	 double inlierPixelTol,
 																	 int ransacIterations ,
 																	 int refineIterations ) {
-		// motion estimation using essential matrix
 		Estimate1ofPnP estimator = FactoryMultiView.computePnP_1(EnumPNP.P3P_FINSTERWALDER,-1,2);
 		final DistanceModelMonoPixels<Se3_F64,Point2D3D> distance = new PnPDistanceReprojectionSq();
 
@@ -159,7 +161,6 @@ public class FactoryVisualOdometry {
 																				int refineIterations ,
 																				double maxAssociationError ,
 																				double associationSecondTol ) {
-		// motion estimation using essential matrix
 		Estimate1ofPnP estimator = FactoryMultiView.computePnP_1(EnumPNP.P3P_FINSTERWALDER,-1,2);
 		final DistanceModelMonoPixels<Se3_F64,Point2D3D> distance = new PnPDistanceReprojectionSq();
 
@@ -217,7 +218,6 @@ public class FactoryVisualOdometry {
 																				double inlierPixelTol,
 																				int ransacIterations ,
 																				int refineIterations ) {
-		// motion estimation using essential matrix
 		Estimate1ofPnP estimator = FactoryMultiView.computePnP_1(EnumPNP.P3P_FINSTERWALDER,-1,2);
 		final DistanceModelMonoPixels<Se3_F64,Point2D3D> distance = new PnPDistanceReprojectionSq();
 
@@ -265,5 +265,38 @@ public class FactoryVisualOdometry {
 				distance.setIntrinsic(param.fx,param.fy,param.skew);
 			}
 		};
+	}
+
+	public static <T extends ImageSingleBand, D extends ImageSingleBand>
+	StereoVisualOdometry<T> stereoFullPnP( int thresholdAdd, int thresholdRetire, double inlierPixelTol,
+										   int ransacIterations ,
+										   StereoDisparitySparse<T> disparity,
+										   GeneralFeatureDetector<T, D> detector,
+										   PointTrackerUser<T> trackerLeft, PointTrackerUser<T> trackerRight,
+										   Class<T> imageType )
+	{
+		EstimateNofPnP pnp = FactoryMultiView.computePnP_N(EnumPNP.P3P_FINSTERWALDER, -1);
+		DistanceModelMonoPixels<Se3_F64,Point2D3D> distanceMono = new PnPDistanceReprojectionSq();
+		PnPDistanceStereoReprojectionSq distanceStereo = new PnPDistanceStereoReprojectionSq();
+		PnPStereoEstimator pnpStereo = new PnPStereoEstimator(pnp,distanceMono,0);
+
+		EstimatorToGenerator<Se3_F64,Stereo2D3D> generator =
+				new EstimatorToGenerator<Se3_F64,Stereo2D3D>(pnpStereo) {
+					@Override
+					public Se3_F64 createModelInstance() {
+						return new Se3_F64();
+					}
+				};
+
+		// Pixel tolerance for RANSAC inliers - euclidean error squared from left + right images
+		double ransacTOL = 2*inlierPixelTol * inlierPixelTol;
+
+		ModelMatcher<Se3_F64, Stereo2D3D> motion =
+				new Ransac<Se3_F64, Stereo2D3D>(2323, generator, distanceStereo, ransacIterations, ransacTOL);
+
+		VisOdomStereoPnP<T,D> alg =  new VisOdomStereoPnP<T,D>(thresholdAdd,thresholdRetire,inlierPixelTol,
+				detector,trackerLeft,trackerRight,motion,disparity,imageType);
+
+		return new WrapVisOdomStereoPnP<T>(pnpStereo,distanceMono,distanceStereo,alg,imageType);
 	}
 }

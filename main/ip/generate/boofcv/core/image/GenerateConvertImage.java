@@ -61,8 +61,8 @@ public class GenerateConvertImage extends CodeGeneratorBase {
 				"\n" +
 				"/**\n" +
 				" * <p>\n" +
-				" * Functions for converting between different image types. Numerical values do not change or are closely approximated\n" +
-				" * in these functions. If an output image is not specified then a new instance is declared and returned.\n" +
+				" * Functions for converting between different image types. Pixel values are converted by typecasting.\n" +
+				" * When converting between signed and unsigned types, care should be taken to avoid numerical overflow.\n" +
 				" * </p>\n" +
 				" *\n" +
 				" * <p>\n" +

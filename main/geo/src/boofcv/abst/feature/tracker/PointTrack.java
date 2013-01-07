@@ -21,7 +21,7 @@ package boofcv.abst.feature.tracker;
 import georegression.struct.point.Point2D_F64;
 
 /**
- * Current location of feature in a {@link ImagePointTracker}.
+ * Current location of feature in a {@link PointTrackerSpawn}.
  * 
  * @author Peter Abeles
  */

@@ -40,7 +40,7 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class DetectAssociateTracker<I extends ImageSingleBand, D extends TupleDesc>
-		implements ImagePointTracker<I> {
+		implements PointTrackerSpawn<I> {
 
 	// Feature detector and describer
 	protected DetectDescribePoint<I,D> detDesc;

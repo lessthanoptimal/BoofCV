@@ -25,8 +25,8 @@ import boofcv.struct.image.*;
 
 /**
  * <p>
- * Functions for converting between different image types. Numerical values do not change or are closely approximated
- * in these functions. If an output image is not specified then a new instance is declared and returned.
+ * Functions for converting between different image types. Pixel values are converted by typecasting.
+ * When converting between signed and unsigned types, care should be taken to avoid numerical overflow.
  * </p>
  *
  * <p>

@@ -1,0 +1,150 @@
+/*
+ * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ *
+ * This file is part of BoofCV (http://boofcv.org).
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package boofcv.abst.sfm;
+
+import boofcv.abst.feature.tracker.PointTrack;
+import boofcv.alg.geo.DistanceModelMonoPixels;
+import boofcv.alg.sfm.d3.Stereo2D3D;
+import boofcv.alg.sfm.d3.VisOdomStereoPnP;
+import boofcv.alg.sfm.robust.PnPDistanceStereoReprojectionSq;
+import boofcv.alg.sfm.robust.PnPStereoEstimator;
+import boofcv.struct.calib.IntrinsicParameters;
+import boofcv.struct.calib.StereoParameters;
+import boofcv.struct.geo.Point2D3D;
+import boofcv.struct.image.ImageSingleBand;
+import georegression.struct.point.Point2D_F64;
+import georegression.struct.point.Point3D_F64;
+import georegression.struct.se.Se3_F64;
+import org.ddogleg.fitting.modelset.ModelMatcher;
+
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * TODO comment
+ *
+ * @author Peter Abeles
+ */
+public class WrapVisOdomStereoPnP<T extends ImageSingleBand>
+		implements StereoVisualOdometry<T>, AccessPointTracks3D
+{
+	PnPStereoEstimator pnp;
+	DistanceModelMonoPixels<Se3_F64,Point2D3D> distanceMono;
+	PnPDistanceStereoReprojectionSq distanceStereo;
+
+	VisOdomStereoPnP<T,?> alg;
+
+	Class<T> imageType;
+
+	boolean error;
+
+	public WrapVisOdomStereoPnP(PnPStereoEstimator pnp,
+								DistanceModelMonoPixels<Se3_F64, Point2D3D> distanceMono,
+								PnPDistanceStereoReprojectionSq distanceStereo,
+								VisOdomStereoPnP<T,?> alg ,
+								Class<T> imageType ) {
+		this.pnp = pnp;
+		this.distanceMono = distanceMono;
+		this.distanceStereo = distanceStereo;
+		this.alg = alg;
+		this.imageType = imageType;
+	}
+
+	@Override
+	public Point3D_F64 getTrackLocation(int index) {
+		VisOdomStereoPnP.LeftTrackInfo info = alg.getCandidates().get(index).getCookie();
+		return info.location.location;
+	}
+
+	@Override
+	public long getTrackId(int index) {
+		return alg.getCandidates().get(index).featureId;
+	}
+
+	@Override
+	public List<Point2D_F64> getAllTracks() {
+		List<Point2D_F64> ret = new ArrayList<Point2D_F64>();
+
+		for( PointTrack c : alg.getCandidates() ) {
+			ret.add(c);
+		}
+
+		return ret;
+	}
+
+	@Override
+	public boolean isInlier(int index) {
+		ModelMatcher<Se3_F64, Stereo2D3D> matcher = alg.getMatcher();
+
+		int N = matcher.getMatchSet().size();
+
+		for( int i = 0; i < N; i++ ) {
+			if( matcher.getInputIndex(i) == index ) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	@Override
+	public boolean isNew(int index) {
+		return false;
+	}
+
+	@Override
+	public void setCalibration(StereoParameters parameters) {
+		pnp.setLeftToRight(parameters.getRightToLeft().invert(null));
+		alg.setCalibration(parameters);
+
+		IntrinsicParameters left = parameters.left;
+		distanceMono.setIntrinsic(left.fx,left.fy,left.skew);
+		distanceStereo.setStereoParameters(parameters);
+	}
+
+	@Override
+	public void reset() {
+		alg.reset();
+	}
+
+	@Override
+	public boolean isFatal() {
+		return error;
+	}
+
+	@Override
+	public Se3_F64 getLeftToWorld() {
+		return alg.getCurrToWorld();
+	}
+
+	@Override
+	public boolean process(T leftImage, T rightImage) {
+		return error = alg.process(leftImage,rightImage);
+	}
+
+	@Override
+	public boolean isFault() {
+		return error;
+	}
+
+	@Override
+	public Class<T> getImageType() {
+		return imageType;
+	}
+}

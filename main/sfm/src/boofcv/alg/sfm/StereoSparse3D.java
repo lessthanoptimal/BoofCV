@@ -24,7 +24,6 @@ import boofcv.alg.geo.RectifyImageOps;
 import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.distort.PointTransform_F64;
 import boofcv.struct.image.ImageSingleBand;
-import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 
@@ -45,21 +44,10 @@ public class StereoSparse3D<T extends ImageSingleBand>
 	// storage for rectified pixel coordinate
 	private Point2D_F64 pixelRect = new Point2D_F64();
 
-	// output 3D coordinate
-	private double x,y,z,w;
-
-	// --------- Camera Calibration parameters
-	// stereo baseline
-	private double baseline;
-	// intrinsic parameters for rectified camera
-	// skew is always set to zero in rectified camera
-	private double cx,cy,fx,fy;
-
-	// 3D coordinate in rectified left camera
-	private Point3D_F64 pointRect = new Point3D_F64();
-
-	// 3D coordinate in the left camera
+	// 3D coordinate in the left camera: in homogeneous coordinates.  w = disparity
 	private Point3D_F64 pointLeft = new Point3D_F64();
+	// Found disparity or the 4th-axis in homogeneous coordinates
+	private double w;
 
 	/**
 	 * Configures and declares internal data
@@ -76,12 +64,6 @@ public class StereoSparse3D<T extends ImageSingleBand>
 		super.setCalibration(stereoParam);
 
 		leftPixelToRect = RectifyImageOps.transformPixelToRect_F64(stereoParam.left,rect1);
-
-		baseline = stereoParam.getBaseline();
-		fx = rectK.get(0,0);
-		fy = rectK.get(1,1);
-		cx = rectK.get(0,2);
-		cy = rectK.get(1,2);
 	}
 
 	@Override
@@ -106,35 +88,26 @@ public class StereoSparse3D<T extends ImageSingleBand>
 		if( !disparity.process((int)(pixelRect.x+0.5),(int)(pixelRect.y+0.5)) )
 			return false;
 
-		// Coordinate in rectified camera frame
+		// Compute coordinate in camera frame
 		this.w = disparity.getDisparity();
-		pointRect.z = baseline*fx;
-		pointRect.x = pointRect.z*(pixelRect.x - cx)/fx;
-		pointRect.y = pointRect.z*(pixelRect.y - cy)/fy;
-
-		// rotate into the original left camera frame
-		GeometryMath_F64.multTran(rectR,pointRect,pointLeft);
-
-		this.x = pointLeft.x;
-		this.y = pointLeft.y;
-		this.z = pointLeft.z;
+		compute3D(pixelRect.x,pixelRect.y,pointLeft);
 
 		return true;
 	}
 
 	@Override
 	public double getX() {
-		return x;
+		return pointLeft.x;
 	}
 
 	@Override
 	public double getY() {
-		return y;
+		return pointLeft.y;
 	}
 
 	@Override
 	public double getZ() {
-		return z;
+		return pointLeft.z;
 	}
 
 	@Override

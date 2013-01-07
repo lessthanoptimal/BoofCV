@@ -28,8 +28,7 @@ import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import org.junit.Test;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * @author Peter Abeles
@@ -82,6 +81,11 @@ public class TestStereoProcessingBase {
 		assertTrue(foundRight.x < foundLeft.x);
 	}
 
+	@Test
+	public void compute3D() {
+		fail("Implement");
+	}
+
 	/**
 	 * Finds the mean point in the image weighted by pixel intensity
 	 */
@@ -115,4 +119,5 @@ public class TestStereoProcessingBase {
 
 		return ret;
 	}
+
 }

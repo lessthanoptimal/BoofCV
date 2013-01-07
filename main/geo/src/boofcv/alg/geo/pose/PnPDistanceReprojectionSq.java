@@ -91,8 +91,8 @@ public class PnPDistanceReprojectionSq implements DistanceModelMonoPixels<Se3_F6
 	}
 
 	@Override
-	public void computeDistance(List<Point2D3D> obserations, double[] distance) {
-		for( int i = 0; i < obserations.size(); i++ )
-			distance[i] = computeDistance(obserations.get(i));
+	public void computeDistance(List<Point2D3D> observations, double[] distance) {
+		for( int i = 0; i < observations.size(); i++ )
+			distance[i] = computeDistance(observations.get(i));
 	}
 }

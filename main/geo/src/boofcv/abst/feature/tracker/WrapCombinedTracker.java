@@ -38,7 +38,7 @@ import java.util.List;
 // TODO drop after no associate after X detections
 // TODO Speed up combination of respawn and spawn
 public class WrapCombinedTracker<I extends ImageSingleBand, D extends ImageSingleBand, TD extends TupleDesc>
-		implements ImagePointTracker<I> {
+		implements PointTrackerSpawn<I> {
 
 	CombinedTrackerScalePoint<I,D,TD> tracker;
 

@@ -30,7 +30,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public interface ModelAssistedTracker<T extends ImageBase,Model,Info> extends ImagePointTracker<T>
+public interface ModelAssistedTracker<T extends ImageBase,Model,Info> extends PointTrackerSpawn<T>
 {
 
 	/**

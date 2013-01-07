@@ -16,11 +16,10 @@
  * limitations under the License.
  */
 
-package boofcv.abst.feature.detect.point;
+package boofcv.abst.feature.detect.interest;
 
 import boofcv.abst.feature.detect.extract.FeatureExtractor;
 import boofcv.abst.feature.detect.intensity.GeneralFeatureIntensity;
-import boofcv.abst.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.image.ImageFloat32;
