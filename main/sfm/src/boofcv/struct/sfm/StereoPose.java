@@ -16,30 +16,24 @@
  * limitations under the License.
  */
 
-package boofcv.alg.sfm.d3;
+package boofcv.struct.sfm;
 
-import georegression.struct.point.Point2D_F64;
-import georegression.struct.point.Point3D_F64;
+import georegression.struct.se.Se3_F64;
 
 /**
+ * Specifies the pose of a stereo camera system as a kinematic chain relative to camera 0.
+ *
  * @author Peter Abeles
  */
-public class Stereo2D3D {
+public class StereoPose {
+	public Se3_F64 worldToCam0;
+	public Se3_F64 cam0ToCam1;
 
-	// observation of point in left and right camera
-	// normalized image coordinates
-	public Point2D_F64 leftObs = new Point2D_F64();
-	public Point2D_F64 rightObs = new Point2D_F64();
-
-	// 3D coordinate of the point
-	public Point3D_F64 location = new Point3D_F64();
-
-	public Stereo2D3D(Point2D_F64 leftObs, Point2D_F64 rightObs, Point3D_F64 location) {
-		this.leftObs = leftObs;
-		this.rightObs = rightObs;
-		this.location = location;
+	public StereoPose(Se3_F64 worldToCam0, Se3_F64 cam0ToCam1) {
+		this.worldToCam0 = worldToCam0;
+		this.cam0ToCam1 = cam0ToCam1;
 	}
 
-	public Stereo2D3D() {
+	public StereoPose() {
 	}
 }

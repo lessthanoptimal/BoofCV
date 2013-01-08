@@ -19,42 +19,43 @@
 package boofcv.abst.geo.optimization;
 
 import boofcv.alg.geo.ModelObservationResidualN;
-import boofcv.struct.geo.Point2D3D;
-import georegression.struct.se.Se3_F64;
 import org.ddogleg.fitting.modelset.ModelCodec;
 import org.ddogleg.optimization.functions.FunctionNtoM;
 
 import java.util.List;
 
 /**
- * Computes residual errors for a set of observations from a Se3 motion.
+ * Computes residual errors for a set of observations from a model.
  *
  * @author Peter Abeles
  */
-public class ResidualsPoseMatrix implements FunctionNtoM {
+public class ResidualsCodecToMatrix<Model,Observation> implements FunctionNtoM {
 	// converts parameters to and from the motion
-	protected ModelCodec<Se3_F64> param;
+	protected ModelCodec<Model> param;
 	// list of observations
-	protected List<Point2D3D> obs;
+	protected List<Observation> obs;
 	// error function
-	protected ModelObservationResidualN<Se3_F64,Point2D3D> residual;
+	protected ModelObservationResidualN<Model,Observation> residual;
 
 	// pre-declare temporary storage
-	protected Se3_F64 pose = new Se3_F64();
+	protected Model pose;
 
 	/**
 	 * Configures algorithm
 	 *
 	 * @param param Converts parameters into epipolar matrix
 	 * @param residual Function for computing the residuals
+	 * @param storage Storage for converted model.
 	 */
-	public ResidualsPoseMatrix(ModelCodec<Se3_F64> param,
-							   ModelObservationResidualN<Se3_F64,Point2D3D> residual) {
+	public ResidualsCodecToMatrix(ModelCodec<Model> param,
+								  ModelObservationResidualN<Model, Observation> residual,
+								  Model storage) {
 		this.param = param;
 		this.residual = residual;
+		this.pose = storage;
 	}
 
-	public void setObservations( List<Point2D3D> obs ) {
+	public void setObservations( List<Observation> obs ) {
 		this.obs = obs;
 	}
 

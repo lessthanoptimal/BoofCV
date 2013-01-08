@@ -16,14 +16,11 @@
  * limitations under the License.
  */
 
-package boofcv.abst.geo.pose;
+package boofcv.alg.geo.pose;
 
-import boofcv.abst.geo.RefinePnP;
 import boofcv.abst.geo.optimization.ResidualsCodecToMatrix;
-import boofcv.alg.geo.pose.PnPJacobianRodrigues;
-import boofcv.alg.geo.pose.PnPResidualReprojection;
-import boofcv.alg.geo.pose.PnPRodriguesCodec;
-import boofcv.struct.geo.Point2D3D;
+import boofcv.struct.sfm.Stereo2D3D;
+import boofcv.struct.sfm.StereoPose;
 import georegression.struct.se.Se3_F64;
 import org.ddogleg.fitting.modelset.ModelCodec;
 import org.ddogleg.optimization.FactoryOptimization;
@@ -37,32 +34,40 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class PnPRefineRodrigues implements RefinePnP {
+public class PnPStereoRefineRodrigues implements RefinePnPStereo {
 
-	ModelCodec<Se3_F64> paramModel = new PnPRodriguesCodec();
-	ResidualsCodecToMatrix<Se3_F64,Point2D3D> func;
-	PnPJacobianRodrigues jacobian = new PnPJacobianRodrigues();
+	ModelCodec<StereoPose> paramModel = new Se3ToStereoPoseCodec(new PnPRodriguesCodec());
+	ResidualsCodecToMatrix<StereoPose,Stereo2D3D> func;
+	PnPStereoJacobianRodrigues jacobian = new PnPStereoJacobianRodrigues();
+
+	StereoPose stereoPose = new StereoPose();
 
 	double param[];
 	UnconstrainedLeastSquares minimizer;
 	int maxIterations;
 	double convergenceTol;
 
-	public PnPRefineRodrigues(double convergenceTol, int maxIterations )
+	public PnPStereoRefineRodrigues(double convergenceTol, int maxIterations)
 	{
 		this.maxIterations = maxIterations;
 		this.convergenceTol = convergenceTol;
 		this.minimizer = FactoryOptimization.leastSquareLevenberg(1e-3);
 
-		func = new ResidualsCodecToMatrix<Se3_F64,Point2D3D>(paramModel,new PnPResidualReprojection(), new Se3_F64());
+		func = new ResidualsCodecToMatrix<StereoPose,Stereo2D3D>(paramModel,new PnPStereoResidualReprojection(),stereoPose);
 
 		param = new double[paramModel.getParamLength()];
 	}
 
-	@Override
-	public boolean process(Se3_F64 worldToCamera, List<Point2D3D> obs, Se3_F64 refinedWorldToCamera ) {
+	public void setLeftToRight( Se3_F64 leftToRight ) {
+		stereoPose.cam0ToCam1 = leftToRight;
+		jacobian.setLeftToRight(leftToRight);
+	}
 
-		paramModel.encode(worldToCamera, param);
+	@Override
+	public boolean process(Se3_F64 worldToLeft, List<Stereo2D3D> obs, Se3_F64 refinedWorldToLeft ) {
+
+		stereoPose.worldToCam0 = worldToLeft;
+		paramModel.encode(stereoPose, param);
 
 		func.setObservations(obs);
 		jacobian.setObservations(obs);
@@ -71,14 +76,15 @@ public class PnPRefineRodrigues implements RefinePnP {
 
 		minimizer.initialize(param,0,convergenceTol*obs.size());
 
-//		System.out.println("  error before "+minimizer.getFunctionValue());
+		System.out.println("  error before "+minimizer.getFunctionValue());
 		for( int i = 0; i < maxIterations; i++ ) {
 			if( minimizer.iterate() )
 				break;
 		}
-//		System.out.println("  error after  "+minimizer.getFunctionValue());
+		System.out.println("  error after  "+minimizer.getFunctionValue());
 
-		paramModel.decode(minimizer.getParameters(), refinedWorldToCamera);
+		stereoPose.worldToCam0 = refinedWorldToLeft;
+		paramModel.decode(minimizer.getParameters(), stereoPose);
 
 		return true;
 	}

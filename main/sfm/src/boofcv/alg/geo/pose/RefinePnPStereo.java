@@ -16,20 +16,18 @@
  * limitations under the License.
  */
 
-package abst.sfm;
+package boofcv.alg.geo.pose;
 
-import org.junit.Test;
-
-import static org.junit.Assert.fail;
+import boofcv.struct.geo.GeoModelRefine;
+import boofcv.struct.sfm.Stereo2D3D;
+import georegression.struct.se.Se3_F64;
 
 /**
+ * Refines a pose estimate given a set of stereo observations and associated 3D point in world coordinates.
+ *
  * @author Peter Abeles
  */
-public class TestModelAssistedToCalibrated {
+public interface RefinePnPStereo extends GeoModelRefine<Se3_F64,Stereo2D3D> {
 
-	@Test
-	public void stuff() {
-		fail("Implement");
-	}
-
+	public void setLeftToRight( Se3_F64 leftToRight );
 }

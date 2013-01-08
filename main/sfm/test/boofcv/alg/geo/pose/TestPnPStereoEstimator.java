@@ -16,11 +16,10 @@
  * limitations under the License.
  */
 
-package boofcv.alg.sfm.robust;
+package boofcv.alg.geo.pose;
 
 import boofcv.abst.geo.EstimateNofPnP;
 import boofcv.alg.geo.DistanceModelMonoPixels;
-import boofcv.alg.geo.pose.PnPDistanceReprojectionSq;
 import boofcv.factory.geo.EnumPNP;
 import boofcv.factory.geo.FactoryMultiView;
 import boofcv.struct.geo.Point2D3D;

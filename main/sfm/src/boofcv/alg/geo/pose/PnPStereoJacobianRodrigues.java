@@ -19,7 +19,7 @@
 package boofcv.alg.geo.pose;
 
 import boofcv.alg.geo.RodriguesRotationJacobian;
-import boofcv.struct.geo.Point2D3D;
+import boofcv.struct.sfm.Stereo2D3D;
 import georegression.geometry.RotationMatrixGenerator;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
@@ -27,21 +27,26 @@ import georegression.struct.so.Rodrigues;
 import georegression.transform.se.SePointOps_F64;
 import org.ddogleg.optimization.functions.FunctionNtoMxN;
 import org.ejml.data.DenseMatrix64F;
+import org.ejml.ops.CommonOps;
 
 import java.util.List;
 
 /**
- * Computes the Jacobian of the error function in {@link PnPResidualReprojection}.  For a calibrated
+ * Computes the Jacobian of the error function in {@link boofcv.alg.geo.pose.PnPResidualReprojection}.  For a calibrated
  * camera given observations in normalized image coordinates.  The rotation matrix is assumed to be
  * parameterized using {@link georegression.struct.so.Rodrigues} coordinates.
  *
  * @author Peter Abeles
  */
-public class PnPJacobianRodrigues implements FunctionNtoMxN {
+// TODO Make PnPJacobianRodrigues and this class share a common parent for common functions?
+public class PnPStereoJacobianRodrigues implements FunctionNtoMxN {
 
-	// transformation from world to camera frame
-	private Se3_F64 worldToCamera = new Se3_F64();
-	private List<Point2D3D> observations;
+	// transformation from world to left camera frame
+	private Se3_F64 worldToLeft = new Se3_F64();
+	// known transform from left to right camera frame
+	private Se3_F64 leftToRight;
+
+	private List<Stereo2D3D> observations;
 
 	// used to compute the Jacobian from Rodrigues coordinates
 	private RodriguesRotationJacobian rodJacobian = new RodriguesRotationJacobian();
@@ -58,8 +63,15 @@ public class PnPJacobianRodrigues implements FunctionNtoMxN {
 	private int indexX;
 	private int indexY;
 
-	public void setObservations(List<Point2D3D> observations) {
+	// storage for intermediate results
+	private DenseMatrix64F rotR = new DenseMatrix64F(3,3);
+
+	public void setObservations(List<Stereo2D3D> observations) {
 		this.observations = observations;
+	}
+
+	public void setLeftToRight(Se3_F64 leftToRight) {
+		this.leftToRight = leftToRight;
 	}
 
 	@Override
@@ -69,7 +81,7 @@ public class PnPJacobianRodrigues implements FunctionNtoMxN {
 
 	@Override
 	public int getM() {
-		return observations.size()*2;
+		return observations.size()*4;
 	}
 
 	@Override
@@ -81,19 +93,21 @@ public class PnPJacobianRodrigues implements FunctionNtoMxN {
 		rodrigues.setParamVector(input[0],input[1],input[2]);
 		rodJacobian.process(input[0], input[1], input[2]);
 
-		worldToCamera.T.x = input[3];
-		worldToCamera.T.y = input[4];
-		worldToCamera.T.z = input[5];
+		worldToLeft.T.x = input[3];
+		worldToLeft.T.y = input[4];
+		worldToLeft.T.z = input[5];
 
-		RotationMatrixGenerator.rodriguesToMatrix(rodrigues, worldToCamera.getR());
+		RotationMatrixGenerator.rodriguesToMatrix(rodrigues, worldToLeft.getR());
 
 		// compute the gradient for each observation
 		for( int i = 0; i < observations.size(); i++ ) {
-			Point2D3D o = observations.get(i);
+			Stereo2D3D o = observations.get(i);
 
-			SePointOps_F64.transform(worldToCamera,o.location, cameraPt);
 
-			indexX = 2*6*i;
+			// --------- Left camera observations
+			SePointOps_F64.transform(worldToLeft,o.location, cameraPt);
+
+			indexX = 4*6*i;
 			indexY = indexX + 6;
 
 			// add gradient from rotation
@@ -103,6 +117,21 @@ public class PnPJacobianRodrigues implements FunctionNtoMxN {
 
 			// add gradient from translation
 			addTranslationJacobian(cameraPt);
+
+			// --------- Right camera observations
+			SePointOps_F64.transform(leftToRight,cameraPt, cameraPt);
+
+			indexX = indexY;
+			indexY = indexY + 6;
+
+			CommonOps.mult(leftToRight.getR(), rodJacobian.Rx, rotR);
+			addRodriguesJacobian(rotR,o.location,cameraPt);
+			CommonOps.mult(leftToRight.getR(), rodJacobian.Ry, rotR);
+			addRodriguesJacobian(rotR,o.location,cameraPt);
+			CommonOps.mult(leftToRight.getR(), rodJacobian.Rz, rotR);
+			addRodriguesJacobian(rotR,o.location,cameraPt);
+
+			addTranslationJacobian(leftToRight.getR(),cameraPt);
 		}
 	}
 
@@ -152,5 +181,30 @@ public class PnPJacobianRodrigues implements FunctionNtoMxN {
 		// partial T.z
 		output[indexX++] = -cameraPt.x*divZ2;
 		output[indexY++] = -cameraPt.y*divZ2;
+	}
+
+	/**
+	 * The translation vector is now multiplied by 3x3 matrix R.  The components of T are no longer decoupled.
+	 *
+	 * deriv [x,y] = R*dot(T)/z - (dot(z)/(z^2))(R*T)
+	 *
+	 * @param R
+	 * @param cameraPt
+	 */
+	private void addTranslationJacobian( DenseMatrix64F R ,
+										 Point3D_F64 cameraPt )
+	{
+		double z = cameraPt.z;
+		double z2 = z*z;
+
+		// partial T.x
+		output[indexX++] = R.get(0,0)/cameraPt.z - R.get(2,0)/z2*cameraPt.x;
+		output[indexY++] = R.get(1,0)/cameraPt.z - R.get(2,0)/z2*cameraPt.y;
+		// partial T.y
+		output[indexX++] = R.get(0,1)/cameraPt.z - R.get(2,1)/z2*cameraPt.x;
+		output[indexY++] = R.get(1,1)/cameraPt.z - R.get(2,1)/z2*cameraPt.y;
+		// partial T.z
+		output[indexX++] = R.get(0,2)/cameraPt.z - R.get(2,2)/z2*cameraPt.x;
+		output[indexY++] = R.get(1,2)/cameraPt.z - R.get(2,2)/z2*cameraPt.y;
 	}
 }

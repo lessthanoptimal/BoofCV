@@ -16,10 +16,20 @@
  * limitations under the License.
  */
 
-package boofcv.alg.sfm.robust;
+package boofcv.abst.sfm;
+
+import org.junit.Test;
+
+import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
  */
-public class TestPnPDistanceStereoReprojectionSq {
+public class TestModelAssistedToCalibrated {
+
+	@Test
+	public void stuff() {
+		fail("Implement");
+	}
+
 }

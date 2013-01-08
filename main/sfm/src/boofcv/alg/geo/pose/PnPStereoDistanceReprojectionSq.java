@@ -16,12 +16,12 @@
  * limitations under the License.
  */
 
-package boofcv.alg.sfm.robust;
+package boofcv.alg.geo.pose;
 
 import boofcv.alg.geo.NormalizedToPixelError;
-import boofcv.alg.sfm.d3.Stereo2D3D;
 import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.calib.StereoParameters;
+import boofcv.struct.sfm.Stereo2D3D;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
@@ -31,17 +31,23 @@ import org.ddogleg.fitting.modelset.DistanceFromModel;
 import java.util.List;
 
 /**
- * TODO comment up
+ * <p>
+ * Computes sum of reprojection error squared in pixels for a pair of stereo observations.  If the point
+ * is behind either the left or right camera and can't be viewed then Double.MAX_VALUE is returned.<br>
+ * <br>
+ * error = dx0^2 + dy0^2 + dx1^2 + dy1^2<br>
+ * <br>
+ * where dx0 = residual along x-axis in image 0
+ * </p>
  *
  * @author Peter Abeles
  */
-public class PnPDistanceStereoReprojectionSq implements DistanceFromModel<Se3_F64,Stereo2D3D> {
+public class PnPStereoDistanceReprojectionSq implements DistanceFromModel<Se3_F64,Stereo2D3D> {
 
 	// transform from world to left camera
 	private Se3_F64 worldToLeft;
 	// transform from left to right camera
 	private Se3_F64 leftToRight;
-
 
 	// storage for point in camera frame
 	private Point3D_F64 X = new Point3D_F64();

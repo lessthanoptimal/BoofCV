@@ -148,8 +148,7 @@ public class FactoryPointSequentialTracker {
 
 		PyramidUpdaterDiscrete<I> pyramidUpdater = FactoryPyramid.discreteGaussian(config.typeInput, -1, 2);
 
-		return new PointTrackerKltPyramid<I, D>(config,pyramidUpdater,null,
-				gradient,interpInput,interpDeriv);
+		return new PointTrackerKltPyramid<I, D>(config,pyramidUpdater,gradient,interpInput,interpDeriv);
 	}
 
 	/**
