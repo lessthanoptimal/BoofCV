@@ -25,8 +25,8 @@ import boofcv.abst.feature.detdesc.DetectDescribePoint;
 import boofcv.abst.feature.disparity.StereoDisparitySparse;
 import boofcv.abst.feature.tracker.ModelAssistedTracker;
 import boofcv.abst.feature.tracker.PkltConfig;
-import boofcv.abst.feature.tracker.PointTrackerSpawn;
-import boofcv.abst.feature.tracker.PointTrackerUser;
+import boofcv.abst.feature.tracker.PointTracker;
+import boofcv.abst.feature.tracker.PointTrackerAux;
 import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.abst.geo.Estimate1ofPnP;
 import boofcv.abst.geo.EstimateNofPnP;
@@ -107,7 +107,7 @@ public class FactoryVisualOdometry {
 	 * @return
 	 */
 	public static <T extends ImageSingleBand>
-	ModelAssistedTrackerCalibrated<T, Se3_F64,Point2D3D> trackerP3P( PointTrackerSpawn<T> tracker,
+	ModelAssistedTrackerCalibrated<T, Se3_F64,Point2D3D> trackerP3P( PointTracker<T> tracker,
 																	 double inlierPixelTol,
 																	 int ransacIterations ,
 																	 int refineIterations ) {
@@ -265,13 +265,12 @@ public class FactoryVisualOdometry {
 		};
 	}
 
-	public static <T extends ImageSingleBand, D extends ImageSingleBand>
+	public static <T extends ImageSingleBand, D extends ImageSingleBand, Aux>
 	StereoVisualOdometry<T> stereoFullPnP( int thresholdAdd, int thresholdRetire, double inlierPixelTol,
 										   int ransacIterations ,
 										   int refineIterations ,
 										   StereoDisparitySparse<T> disparity,
-										   GeneralFeatureDetector<T, D> detector,
-										   PointTrackerUser<T> trackerLeft, PointTrackerUser<T> trackerRight,
+										   PointTrackerAux<T,Aux> trackerLeft, PointTrackerAux<T,Aux> trackerRight,
 										   Class<T> imageType )
 	{
 		EstimateNofPnP pnp = FactoryMultiView.computePnP_N(EnumPNP.P3P_FINSTERWALDER, -1);
@@ -308,7 +307,7 @@ public class FactoryVisualOdometry {
 		}
 
 		VisOdomStereoPnP<T,D> alg =  new VisOdomStereoPnP<T,D>(thresholdAdd,thresholdRetire,inlierPixelTol,
-				detector,trackerLeft,trackerRight,motion,refine,disparity,imageType);
+				trackerLeft,trackerRight,motion,refine,disparity,imageType);
 
 		return new WrapVisOdomStereoPnP<T>(pnpStereo,distanceMono,distanceStereo,alg,refinePnP,imageType);
 	}

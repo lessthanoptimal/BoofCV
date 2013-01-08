@@ -20,10 +20,8 @@ package boofcv.alg.sfm.d3;
 
 import boofcv.abst.feature.disparity.StereoDisparitySparse;
 import boofcv.abst.feature.tracker.PointTrack;
-import boofcv.abst.feature.tracker.PointTrackerUser;
+import boofcv.abst.feature.tracker.PointTrackerAux;
 import boofcv.alg.distort.LensDistortionOps;
-import boofcv.alg.feature.detect.interest.EasyGeneralFeatureDetector;
-import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.alg.geo.RectifyImageOps;
 import boofcv.alg.sfm.StereoProcessingBase;
 import boofcv.struct.QueueCorner;
@@ -32,7 +30,6 @@ import boofcv.struct.distort.PointTransform_F64;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.sfm.Stereo2D3D;
 import georegression.struct.point.Point2D_F64;
-import georegression.struct.point.Point2D_I16;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
@@ -60,7 +57,6 @@ public class VisOdomStereoPnP<T extends ImageSingleBand,D extends ImageSingleBan
 	// tolerance for deviations in epipolar check
 	private double epilolarTol;
 
-	private EasyGeneralFeatureDetector<T,D> detector;
 	private QueueCorner excludeList = new QueueCorner(10);
 
 	// computes disparity from two rectified images
@@ -78,8 +74,8 @@ public class VisOdomStereoPnP<T extends ImageSingleBand,D extends ImageSingleBan
 	private ModelFitter<Se3_F64, Stereo2D3D> modelRefiner;
 
 	// trackers for left and right cameras
-	private PointTrackerUser<T> trackerLeft;
-	private PointTrackerUser<T> trackerRight;
+	private PointTrackerAux<T,?> trackerLeft;
+	private PointTrackerAux<T,?> trackerRight;
 
 	// convert for original image pixels into normalized image coordinates
 	private PointTransform_F64 leftImageToNorm;
@@ -107,8 +103,7 @@ public class VisOdomStereoPnP<T extends ImageSingleBand,D extends ImageSingleBan
 	private boolean first = true;
 
 	public VisOdomStereoPnP(int thresholdAdd, int thresholdRetire, double epilolarTol,
-							GeneralFeatureDetector<T, D> detector,
-							PointTrackerUser<T> trackerLeft, PointTrackerUser<T> trackerRight,
+							PointTrackerAux<T,?> trackerLeft, PointTrackerAux<T,?> trackerRight,
 							ModelMatcher<Se3_F64, Stereo2D3D> matcher ,
 							ModelFitter<Se3_F64, Stereo2D3D> modelRefiner ,
 							StereoDisparitySparse<T> disparity,
@@ -117,7 +112,6 @@ public class VisOdomStereoPnP<T extends ImageSingleBand,D extends ImageSingleBan
 		this.thresholdAdd = thresholdAdd;
 		this.thresholdRetire = thresholdRetire;
 		this.epilolarTol = epilolarTol;
-		this.detector = new EasyGeneralFeatureDetector<T,D>(detector,imageType,null);
 		this.trackerLeft = trackerLeft;
 		this.trackerRight = trackerRight;
 		this.matcher = matcher;
@@ -344,14 +338,15 @@ public class VisOdomStereoPnP<T extends ImageSingleBand,D extends ImageSingleBan
 		}
 
 		// detect new features
-		detector.detect(left,excludeList);
-		QueueCorner found = detector.getFeatures();
+		trackerLeft.spawnTracks();
+		List<PointTrack> spawned = trackerLeft.getNewTracks(null);
 
-		for( int i = 0; i < found.size; i++ ) {
+		for( int i = 0; i < spawned.size(); i++ ) {
 			// point in original image coordinates
-			Point2D_I16 p = found.get(i);
+			PointTrack trackLeft = spawned.get(i);
+
 			// convert point into rectified coordinates
-			leftImageToRect.compute(p.x,p.y, rectLeftPixel);
+			leftImageToRect.compute(trackLeft.x,trackLeft.y, rectLeftPixel);
 
 			// find the disparity between the two images
 			double d = computeDisparity(rectLeftPixel.x, rectLeftPixel.y);
@@ -362,11 +357,8 @@ public class VisOdomStereoPnP<T extends ImageSingleBand,D extends ImageSingleBan
 				// and convert back into original pixel coordinates
 				rightRectToImage.compute(rectLeftPixel.x-d, rectLeftPixel.y, imageRightPixel);
 
-				// create tracks in both images.  Handle case where it fails to create a track
-				PointTrack trackLeft = trackerLeft.addTrack(p.x,p.y);
-				if( trackLeft == null )
-					continue;
-				PointTrack trackRight = trackerRight.addTrack(imageRightPixel.x, imageRightPixel.y);
+				// Create track in right image and drop it in both if it fails
+				PointTrack trackRight = trackerRight.addTrack(imageRightPixel.x, imageRightPixel.y,null);
 
 				if( trackRight == null ) {
 					trackerLeft.dropTrack(trackLeft);
@@ -385,6 +377,8 @@ public class VisOdomStereoPnP<T extends ImageSingleBand,D extends ImageSingleBan
 				// Save reference to both tracks in each other
 				leftInfo.right = trackRight;
 				trackRight.cookie = trackLeft;
+			} else {
+				trackerLeft.dropTrack(trackLeft);
 			}
 		}
 	}
