@@ -18,6 +18,7 @@
 
 package boofcv.alg.feature.detect.template;
 
+import boofcv.abst.feature.detect.extract.ConfigExtract;
 import boofcv.abst.feature.detect.extract.FeatureExtractor;
 import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
 import boofcv.struct.FastQueue;
@@ -63,7 +64,7 @@ public class TemplateMatching<T extends ImageBase> {
 	public TemplateMatching(TemplateMatchingIntensity<T> match) {
 		this.match = match;
 
-		extractor = FactoryFeatureExtractor.nonmax(2, -Float.MAX_VALUE, 0, true);
+		extractor = FactoryFeatureExtractor.nonmax(new ConfigExtract(2, -Float.MAX_VALUE, 0, true));
 	}
 
 	/**

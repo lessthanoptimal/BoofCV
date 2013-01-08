@@ -19,6 +19,7 @@
 package boofcv.abst.feature.detect.line;
 
 
+import boofcv.abst.feature.detect.extract.ConfigExtract;
 import boofcv.abst.feature.detect.extract.FeatureExtractor;
 import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.alg.feature.detect.edge.GGradientToEdgeFeatures;
@@ -124,7 +125,7 @@ public class DetectLineHoughPolar<I extends ImageSingleBand, D extends ImageSing
 		this.resolutionRange = resolutionRange;
 		this.resolutionAngle = resolutionAngle;
 		this.maxLines = maxLines <= 0 ? Integer.MAX_VALUE : maxLines;
-		extractor = FactoryFeatureExtractor.nonmax(localMaxRadius, minCounts, 0, true);
+		extractor = FactoryFeatureExtractor.nonmax(new ConfigExtract(localMaxRadius, minCounts, 0, true));
 		derivX = GeneralizedImageOps.createSingleBand(gradient.getDerivType(), 1, 1);
 		derivY = GeneralizedImageOps.createSingleBand(gradient.getDerivType(), 1, 1);
 	}

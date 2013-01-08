@@ -19,6 +19,7 @@
 package boofcv.abst.feature.detect.line;
 
 
+import boofcv.abst.feature.detect.extract.ConfigExtract;
 import boofcv.abst.feature.detect.extract.FeatureExtractor;
 import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.alg.feature.detect.edge.GGradientToEdgeFeatures;
@@ -113,7 +114,8 @@ public class DetectLineHoughFootSubimage<I extends ImageSingleBand, D extends Im
 		this.totalHorizontalDivisions = totalHorizontalDivisions;
 		this.totalVerticalDivisions = totalVerticalDivisions;
 		this.maxLines = maxLines;
-		FeatureExtractor extractor = FactoryFeatureExtractor.nonmaxCandidate(localMaxRadius, minCounts, 0, false);
+		FeatureExtractor extractor = FactoryFeatureExtractor.nonmaxCandidate(
+				new ConfigExtract(localMaxRadius, minCounts, 0, false));
 		alg = new HoughTransformLineFootOfNorm(extractor,minDistanceFromOrigin);
 		derivX = GeneralizedImageOps.createSingleBand(gradient.getDerivType(), 1, 1);
 		derivY = GeneralizedImageOps.createSingleBand(gradient.getDerivType(), 1, 1);

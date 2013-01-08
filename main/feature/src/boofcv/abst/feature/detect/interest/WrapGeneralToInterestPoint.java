@@ -20,6 +20,8 @@ package boofcv.abst.feature.detect.interest;
 
 import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.abst.filter.derivative.ImageHessian;
+import boofcv.alg.feature.detect.interest.EasyGeneralFeatureDetector;
+import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.point.Point2D_F64;
@@ -29,15 +31,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Wrapper around {@link GeneralFeatureDetector} to make it compatible with {@link InterestPointDetector}.
+ * Wrapper around {@link boofcv.alg.feature.detect.interest.GeneralFeatureDetector} to make it compatible with {@link InterestPointDetector}.
  *
  * @param <T> Input image type.
  * @param <D> Image derivative type.
  *
  * @author Peter Abeles
  */
-// TODO rename
-public class WrapCornerToInterestPoint<T extends ImageSingleBand, D extends ImageSingleBand>
+public class WrapGeneralToInterestPoint<T extends ImageSingleBand, D extends ImageSingleBand>
 		extends EasyGeneralFeatureDetector<T,D>
 		implements InterestPointDetector<T>
 {
@@ -47,18 +48,18 @@ public class WrapCornerToInterestPoint<T extends ImageSingleBand, D extends Imag
 	// list of points it found
 	protected List<Point2D_F64> foundPoints;
 
-	public WrapCornerToInterestPoint(GeneralFeatureDetector<T, D> detector,
-									 double scale ,
-									 Class<T> imageType, Class<D> derivType ) {
+	public WrapGeneralToInterestPoint(GeneralFeatureDetector<T, D> detector,
+									  double scale,
+									  Class<T> imageType, Class<D> derivType) {
 		super(detector,imageType,derivType);
 		this.scale = scale;
 	}
 
-	public WrapCornerToInterestPoint(GeneralFeatureDetector<T, D> detector,
-									 ImageGradient<T, D> gradient,
-									 ImageHessian<D> hessian,
-									 double scale,
-									 Class<D> derivType) {
+	public WrapGeneralToInterestPoint(GeneralFeatureDetector<T, D> detector,
+									  ImageGradient<T, D> gradient,
+									  ImageHessian<D> hessian,
+									  double scale,
+									  Class<D> derivType) {
 		super(detector, gradient, hessian, derivType);
 		this.scale = scale;
 	}

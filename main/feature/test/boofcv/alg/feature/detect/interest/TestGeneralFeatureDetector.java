@@ -16,8 +16,9 @@
  * limitations under the License.
  */
 
-package boofcv.abst.feature.detect.interest;
+package boofcv.alg.feature.detect.interest;
 
+import boofcv.abst.feature.detect.extract.ConfigExtract;
 import boofcv.abst.feature.detect.extract.FeatureExtractor;
 import boofcv.abst.feature.detect.intensity.GeneralFeatureIntensity;
 import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
@@ -58,7 +59,7 @@ public class TestGeneralFeatureDetector {
 		intensity.img.set(8, 9, 10);
 
 		// use a real extractor to see if it is passing in the correct sub-images
-		FeatureExtractor extractor = FactoryFeatureExtractor.nonmax(1, 0.001f, 1, true);
+		FeatureExtractor extractor = FactoryFeatureExtractor.nonmax(new ConfigExtract(1, 0.001f, 1, true));
 
 		GeneralFeatureDetector<ImageFloat32, ImageFloat32> detector =
 				new GeneralFeatureDetector<ImageFloat32, ImageFloat32>(intensity, extractor);

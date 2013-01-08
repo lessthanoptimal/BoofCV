@@ -18,6 +18,7 @@
 
 package boofcv.alg.feature.detect.interest;
 
+import boofcv.abst.feature.detect.extract.ConfigExtract;
 import boofcv.abst.feature.detect.extract.FeatureExtractor;
 import boofcv.alg.transform.ii.GIntegralImageOps;
 import boofcv.core.image.ConvertBufferedImage;
@@ -53,7 +54,7 @@ public class DetectFastHessianApp {
 	private static <T extends ImageSingleBand> void doStuff( Class<T> imageType , BufferedImage input ) {
 		T workImage = ConvertBufferedImage.convertFromSingle(input, null, imageType);
 
-		FeatureExtractor extractor = FactoryFeatureExtractor.nonmax( 5 , 1 , 5, true);
+		FeatureExtractor extractor = FactoryFeatureExtractor.nonmax(new ConfigExtract( 5 , 1 , 5, true) );
 		FastHessianFeatureDetector<T> det = new FastHessianFeatureDetector<T>(extractor,NUM_FEATURES, 2, 9,4,4);
 
 		T integral = GIntegralImageOps.transform(workImage,null);

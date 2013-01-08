@@ -18,13 +18,10 @@
 
 package boofcv.benchmark.feature.detect;
 
+import boofcv.abst.feature.detect.extract.ConfigExtract;
 import boofcv.abst.feature.detect.interest.ConfigFastHessian;
-import boofcv.abst.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.alg.feature.detect.intensity.HessianBlobIntensity;
-import boofcv.alg.feature.detect.interest.FeatureLaplacePyramid;
-import boofcv.alg.feature.detect.interest.FeatureLaplaceScaleSpace;
-import boofcv.alg.feature.detect.interest.FeaturePyramid;
-import boofcv.alg.feature.detect.interest.FeatureScaleSpace;
+import boofcv.alg.feature.detect.interest.*;
 import boofcv.benchmark.feature.BenchmarkAlgorithm;
 import boofcv.factory.feature.detect.interest.FactoryDetectPoint;
 import boofcv.factory.feature.detect.interest.FactoryInterestPoint;
@@ -55,19 +52,21 @@ public class BenchmarkDetectHelper {
 		GeneralFeatureDetector<T, D> alg;
 		int thresh = 1;
 
+		ConfigExtract configExtract = new ConfigExtract(radius,thresh);
+
 		alg = FactoryDetectPoint.createFast(radius, 9,20, maxFeatures, imageType);
 		ret.add(new BenchmarkAlgorithm("Fast", FactoryInterestPoint.wrapPoint(alg, 1, imageType, derivType)));
-		alg = FactoryDetectPoint.createHarris(radius, false, thresh, maxFeatures, derivType);
+		alg = FactoryDetectPoint.createHarris(configExtract, false, maxFeatures, derivType);
 		ret.add(new BenchmarkAlgorithm("Harris", FactoryInterestPoint.wrapPoint(alg, 1, imageType, derivType)));
-		alg = FactoryDetectPoint.createShiTomasi(radius, false, thresh, maxFeatures, derivType);
+		alg = FactoryDetectPoint.createShiTomasi(configExtract, false, maxFeatures, derivType);
 		ret.add(new BenchmarkAlgorithm("KLT", FactoryInterestPoint.wrapPoint(alg, 1, imageType, derivType)));
-		alg = FactoryDetectPoint.createKitRos(radius, thresh, maxFeatures, derivType);
+		alg = FactoryDetectPoint.createKitRos(configExtract, maxFeatures, derivType);
 		ret.add(new BenchmarkAlgorithm("KitRos", FactoryInterestPoint.wrapPoint(alg, 1, imageType, derivType)));
-		alg = FactoryDetectPoint.createMedian(radius, thresh, maxFeatures, imageType);
+		alg = FactoryDetectPoint.createMedian(configExtract, maxFeatures, imageType);
 		ret.add(new BenchmarkAlgorithm("Median", FactoryInterestPoint.wrapPoint(alg, 1, imageType, derivType)));
-		alg = FactoryDetectPoint.createHessian(HessianBlobIntensity.Type.DETERMINANT, radius, thresh, maxFeatures, derivType);
+		alg = FactoryDetectPoint.createHessian(HessianBlobIntensity.Type.DETERMINANT, configExtract, maxFeatures, derivType);
 		ret.add(new BenchmarkAlgorithm("Hessian", FactoryInterestPoint.wrapPoint(alg, 1, imageType, derivType)));
-		alg = FactoryDetectPoint.createHessian(HessianBlobIntensity.Type.TRACE, radius, thresh, maxFeatures, derivType);
+		alg = FactoryDetectPoint.createHessian(HessianBlobIntensity.Type.TRACE, configExtract, maxFeatures, derivType);
 		ret.add(new BenchmarkAlgorithm("Laplace", FactoryInterestPoint.wrapPoint(alg, 1, imageType, derivType)));
 
 		FeatureLaplaceScaleSpace<T, D> flss = FactoryInterestPointAlgs.hessianLaplace(radius, thresh, maxScaleFeatures, imageType, derivType);

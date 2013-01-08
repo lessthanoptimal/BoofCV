@@ -18,7 +18,6 @@
 
 package boofcv.alg.feature.detect.interest;
 
-import boofcv.abst.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.factory.transform.gss.FactoryGaussianScaleSpace;
 import boofcv.struct.gss.GaussianScaleSpace;
 import boofcv.struct.image.ImageFloat32;

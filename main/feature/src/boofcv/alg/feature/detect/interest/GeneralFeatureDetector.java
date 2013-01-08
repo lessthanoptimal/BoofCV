@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.abst.feature.detect.interest;
+package boofcv.alg.feature.detect.interest;
 
 import boofcv.abst.feature.detect.extract.FeatureExtractor;
 import boofcv.abst.feature.detect.intensity.GeneralFeatureIntensity;
@@ -41,7 +41,6 @@ import java.util.Arrays;
  *
  * @author Peter Abeles
  */
-// TODO move to alg?
 public class GeneralFeatureDetector<I extends ImageSingleBand, D extends ImageSingleBand>
 {
 
@@ -60,7 +59,7 @@ public class GeneralFeatureDetector<I extends ImageSingleBand, D extends ImageSi
 	protected QueueCorner foundCorners = new QueueCorner(10);
 
 	// Corners which should be excluded
-	protected QueueCorner excludedCorners;
+	protected QueueCorner exclude;
 
 	// optional: number of corners it should try to find
 	protected int requestedFeatureNumber;
@@ -88,13 +87,16 @@ public class GeneralFeatureDetector<I extends ImageSingleBand, D extends ImageSi
 		this.extractor = extractor;
 	}
 
+	protected GeneralFeatureDetector() {
+	}
+
 	/**
-	 * Specifies which corners should be excluded and not detected a second time
+	 * Specifies which points should be excluded and not detected a second time
 	 *
-	 * @param excludedCorners List of corners being excluded
+	 * @param exclude List of points being excluded
 	 */
-	public void setExcludedCorners(QueueCorner excludedCorners) {
-		this.excludedCorners = excludedCorners;
+	public void setExclude(QueueCorner exclude) {
+		this.exclude = exclude;
 	}
 
 	/**
@@ -131,10 +133,10 @@ public class GeneralFeatureDetector<I extends ImageSingleBand, D extends ImageSi
 			throw new RuntimeException("Candidates with subregions is not yet supported");
 
 		// mark features which are in the excluded list so that they are not returned again
-		if (excludedCorners != null) {
+		if (exclude != null) {
 			Arrays.fill(regionCount, 0);
-			for (int i = 0; i < excludedCorners.size; i++) {
-				Point2D_I16 pt = excludedCorners.get(i);
+			for (int i = 0; i < exclude.size; i++) {
+				Point2D_I16 pt = exclude.get(i);
 				intensityImage.set(pt.x, pt.y, Float.MAX_VALUE);
 
 				int c = pt.x / regionWidth, r = pt.y / regionHeight;

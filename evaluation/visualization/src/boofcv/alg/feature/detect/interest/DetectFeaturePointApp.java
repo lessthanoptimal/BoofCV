@@ -18,9 +18,9 @@
 
 package boofcv.alg.feature.detect.interest;
 
+import boofcv.abst.feature.detect.extract.ConfigExtract;
 import boofcv.abst.feature.detect.interest.ConfigFastHessian;
 import boofcv.abst.feature.detect.interest.ConfigSiftDetector;
-import boofcv.abst.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.abst.feature.detect.interest.InterestPointDetector;
 import boofcv.alg.feature.detect.ImageCorruptPanel;
 import boofcv.alg.feature.detect.intensity.HessianBlobIntensity;
@@ -75,24 +75,25 @@ public class DetectFeaturePointApp<T extends ImageSingleBand, D extends ImageSin
 
 
 		GeneralFeatureDetector<T, D> alg;
+		ConfigExtract configExtract = new ConfigExtract(radius,thresh);
 
-		alg = FactoryDetectPoint.createHarris(radius, false, thresh, maxFeatures, derivType);
+		alg = FactoryDetectPoint.createHarris(configExtract, false, maxFeatures, derivType);
 		addAlgorithm(0, "Harris", FactoryInterestPoint.wrapPoint(alg, 1, imageType, derivType));
-		alg = FactoryDetectPoint.createHarris(radius, true, thresh, maxFeatures, derivType);
+		alg = FactoryDetectPoint.createHarris(configExtract, true, maxFeatures, derivType);
 		addAlgorithm(0, "Harris Weighted", FactoryInterestPoint.wrapPoint(alg, 1, imageType, derivType));
-		alg = FactoryDetectPoint.createShiTomasi(radius, false, thresh, maxFeatures, derivType);
+		alg = FactoryDetectPoint.createShiTomasi(configExtract, false, maxFeatures, derivType);
 		addAlgorithm(0, "KLT", FactoryInterestPoint.wrapPoint(alg, 1, imageType, derivType));
-		alg = FactoryDetectPoint.createShiTomasi(radius, true, thresh, maxFeatures, derivType);
+		alg = FactoryDetectPoint.createShiTomasi(configExtract, true, maxFeatures, derivType);
 		addAlgorithm(0, "KLT Weighted", FactoryInterestPoint.wrapPoint(alg, 1, imageType, derivType));
 		alg = FactoryDetectPoint.createFast(radius, 9,10, maxFeatures, imageType);
 		addAlgorithm(0, "Fast", FactoryInterestPoint.wrapPoint(alg, 1, imageType, derivType));
-		alg = FactoryDetectPoint.createKitRos(radius, thresh, maxFeatures, derivType);
+		alg = FactoryDetectPoint.createKitRos(configExtract, maxFeatures, derivType);
 		addAlgorithm(0, "KitRos", FactoryInterestPoint.wrapPoint(alg, 1, imageType, derivType));
-		alg = FactoryDetectPoint.createMedian(radius, thresh, maxFeatures, imageType);
+		alg = FactoryDetectPoint.createMedian(configExtract, maxFeatures, imageType);
 		addAlgorithm(0, "Median", FactoryInterestPoint.wrapPoint(alg, 1, imageType, derivType));
-		alg = FactoryDetectPoint.createHessian(HessianBlobIntensity.Type.DETERMINANT, radius, thresh, maxFeatures, derivType);
+		alg = FactoryDetectPoint.createHessian(HessianBlobIntensity.Type.DETERMINANT, configExtract, maxFeatures, derivType);
 		addAlgorithm(0, "Hessian", FactoryInterestPoint.wrapPoint(alg, 1, imageType, derivType));
-		alg = FactoryDetectPoint.createHessian(HessianBlobIntensity.Type.TRACE, radius, thresh, maxFeatures, derivType);
+		alg = FactoryDetectPoint.createHessian(HessianBlobIntensity.Type.TRACE, configExtract, maxFeatures, derivType);
 		addAlgorithm(0, "Laplace", FactoryInterestPoint.wrapPoint(alg, 1, imageType, derivType));
 
 		FeatureLaplaceScaleSpace<T, D> flss = FactoryInterestPointAlgs.hessianLaplace(radius, thresh, maxScaleFeatures, imageType, derivType);

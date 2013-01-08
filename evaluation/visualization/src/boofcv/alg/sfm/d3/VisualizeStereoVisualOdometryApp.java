@@ -20,7 +20,7 @@ package boofcv.alg.sfm.d3;
 
 import boofcv.abst.feature.describe.WrapDescribeBrief;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
-import boofcv.abst.feature.detect.interest.GeneralFeatureDetector;
+import boofcv.abst.feature.detect.extract.ConfigExtract;
 import boofcv.abst.feature.detect.interest.InterestPointDetector;
 import boofcv.abst.feature.disparity.StereoDisparitySparse;
 import boofcv.abst.feature.tracker.PkltConfig;
@@ -31,6 +31,7 @@ import boofcv.abst.sfm.ModelAssistedTrackerCalibrated;
 import boofcv.abst.sfm.StereoVisualOdometry;
 import boofcv.alg.feature.describe.DescribePointBrief;
 import boofcv.alg.feature.describe.brief.FactoryBriefDefinition;
+import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.factory.feature.describe.FactoryDescribePointAlgs;
@@ -291,7 +292,7 @@ public class VisualizeStereoVisualOdometryApp <I extends ImageSingleBand>
 			config.typeDeriv = derivType;
 
 			GeneralFeatureDetector detector =
-					FactoryPointSequentialTracker.createShiTomasi(600, 3, 1, config.typeDeriv);
+					FactoryPointSequentialTracker.createShiTomasi(new ConfigExtract(3, 1),600, config.typeDeriv);
 
 			assistedTracker = FactoryVisualOdometry.trackerAssistedKltP3P(detector,config,1.5,200,50);
 		} else if( whichAlg == 1 ) {
@@ -304,7 +305,7 @@ public class VisualizeStereoVisualOdometryApp <I extends ImageSingleBand>
 					FactoryBlurFilter.gaussian(imageType, 0, 4));
 
 			GeneralFeatureDetector corner = FactoryPointSequentialTracker.createShiTomasi(
-					600, 2, 0, derivType);
+					new ConfigExtract(2,0),600, derivType);
 
 			InterestPointDetector detector = FactoryInterestPoint.wrapPoint(corner, 1, imageType, derivType);
 
@@ -318,8 +319,9 @@ public class VisualizeStereoVisualOdometryApp <I extends ImageSingleBand>
 			thresholdAdd = 80;
 			thresholdRetire = 3;
 //			tracker = FactoryPointSequentialTracker.dda_FH_SURF(600, 200, 1, 2,imageType);
-			PointTrackerSpawn<I> tracker = FactoryPointSequentialTracker.combined_ST_SURF_KLT(600, 3,0,3,
-					new int[]{1,2,4,8},50, null,null,imageType, derivType);
+			PointTrackerSpawn<I> tracker = FactoryPointSequentialTracker.
+					combined_ST_SURF_KLT(600, new ConfigExtract(3, 0), 3,
+							new int[]{1, 2, 4, 8}, 50, null, null, imageType, derivType);
 			assistedTracker = FactoryVisualOdometry.trackerP3P(tracker,1.5,200,50);
 		} else if( whichAlg == 3 ) {
 			thresholdAdd = 120;
@@ -333,7 +335,7 @@ public class VisualizeStereoVisualOdometryApp <I extends ImageSingleBand>
 			config.typeDeriv = derivType;
 
 			GeneralFeatureDetector detector =
-					FactoryPointSequentialTracker.createShiTomasi(600, 3, 1, config.typeDeriv);
+					FactoryPointSequentialTracker.createShiTomasi(new ConfigExtract(3, 1),600, config.typeDeriv);
 
 			PointTrackerUser<I> trackerLeft = FactoryPointSequentialTracker.klt(config);
 			PointTrackerUser<I> trackerRight = FactoryPointSequentialTracker.klt(config);

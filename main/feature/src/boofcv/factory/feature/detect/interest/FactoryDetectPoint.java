@@ -18,13 +18,14 @@
 
 package boofcv.factory.feature.detect.interest;
 
+import boofcv.abst.feature.detect.extract.ConfigExtract;
 import boofcv.abst.feature.detect.extract.FeatureExtractor;
 import boofcv.abst.feature.detect.intensity.*;
-import boofcv.abst.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.abst.filter.blur.MedianImageFilter;
 import boofcv.alg.feature.detect.intensity.FastCornerIntensity;
 import boofcv.alg.feature.detect.intensity.GradientCornerIntensity;
 import boofcv.alg.feature.detect.intensity.HessianBlobIntensity;
+import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
 import boofcv.factory.feature.detect.intensity.FactoryIntensityPoint;
 import boofcv.factory.feature.detect.intensity.FactoryIntensityPointAlg;
@@ -50,51 +51,49 @@ public class FactoryDetectPoint {
 	/**
 	 * Detects Harris corners.
 	 *
-	 * @param extractRadius   Radius of non-maximum suppression region and corner radius. Try 1 or 2.
+	 * @param configExtract Configuration for extracting features
 	 * @param weighted        Is a Gaussian weight applied to the sample region?  False is much faster.
-	 * @param detectThreshold Minimum feature intensity.  Image dependent.  Start tuning at 0 or 1.
 	 * @param maxFeatures     The maximum number of detected features it will return.  Try 300
 	 * @param derivType       Type of derivative image.
 	 * @see boofcv.alg.feature.detect.intensity.HarrisCornerIntensity
 	 */
 	public static <T extends ImageSingleBand, D extends ImageSingleBand>
-	GeneralFeatureDetector<T, D> createHarris(int extractRadius, boolean weighted,
-											  float detectThreshold, int maxFeatures, Class<D> derivType) {
-		GradientCornerIntensity<D> cornerIntensity = FactoryIntensityPointAlg.harris(extractRadius, 0.04f, weighted, derivType);
-		return createGeneral(cornerIntensity, extractRadius, detectThreshold, maxFeatures);
+	GeneralFeatureDetector<T, D> createHarris(ConfigExtract configExtract, boolean weighted,
+											  int maxFeatures, Class<D> derivType) {
+		GradientCornerIntensity<D> cornerIntensity =
+				FactoryIntensityPointAlg.harris(configExtract.radius, 0.04f, weighted, derivType);
+		return createGeneral(cornerIntensity, configExtract, maxFeatures);
 	}
 
 	/**
 	 * Detects Shi-Tomasi corners.
 	 *
-	 * @param extractRadius   Radius of non-maximum suppression region and corner radius. Try 1 or 2.
+	 * @param configExtract Configuration for extracting features
 	 * @param weighted        Is a Gaussian weight applied to the sample region?  False is much faster.
-	 * @param detectThreshold Minimum feature intensity.  Image dependent.  Start tuning at 0 or 1.
 	 * @param maxFeatures     The maximum number of detected features it will return.  Try 300
 	 * @param derivType       Type of derivative image.
 	 * @see boofcv.alg.feature.detect.intensity.ShiTomasiCornerIntensity
 	 */
 	public static <T extends ImageSingleBand, D extends ImageSingleBand>
-	GeneralFeatureDetector<T, D> createShiTomasi(int extractRadius, boolean weighted,
-												 float detectThreshold, int maxFeatures, Class<D> derivType) {
-		GradientCornerIntensity<D> cornerIntensity = FactoryIntensityPointAlg.shiTomasi(extractRadius, weighted, derivType);
-		return createGeneral(cornerIntensity, extractRadius, detectThreshold, maxFeatures);
+	GeneralFeatureDetector<T, D> createShiTomasi(ConfigExtract configExtract, boolean weighted,
+												 int maxFeatures, Class<D> derivType) {
+		GradientCornerIntensity<D> cornerIntensity =
+				FactoryIntensityPointAlg.shiTomasi(configExtract.radius, weighted, derivType);
+		return createGeneral(cornerIntensity, configExtract, maxFeatures);
 	}
 
 	/**
 	 * Detects Kitchen and Rosenfeld corners.
 	 *
-	 * @param extractRadius   Radius of non-maximum suppression region. Try 1 or 2.
-	 * @param detectThreshold Minimum feature intensity.  Image dependent.  Start tuning at 0 or 1.
+	 * @param configExtract Configuration for extracting features
 	 * @param maxFeatures     The maximum number of detected features it will return.  Try 300
 	 * @param derivType       Type of derivative image.
 	 * @see boofcv.alg.feature.detect.intensity.KitRosCornerIntensity
 	 */
 	public static <T extends ImageSingleBand, D extends ImageSingleBand>
-	GeneralFeatureDetector<T, D> createKitRos(int extractRadius,
-											  float detectThreshold, int maxFeatures, Class<D> derivType) {
+	GeneralFeatureDetector<T, D> createKitRos(ConfigExtract configExtract, int maxFeatures, Class<D> derivType) {
 		GeneralFeatureIntensity<T, D> intensity = new WrapperKitRosCornerIntensity<T, D>(derivType);
-		return createGeneral(intensity, extractRadius, detectThreshold, maxFeatures);
+		return createGeneral(intensity, configExtract, maxFeatures);
 	}
 
 	/**
@@ -113,55 +112,53 @@ public class FactoryDetectPoint {
 											int detectThreshold, int maxFeatures, Class<T> imageType) {
 		FastCornerIntensity<T> alg = FactoryIntensityPointAlg.fast(detectThreshold, minContinuous, imageType);
 		GeneralFeatureIntensity<T, D> intensity = new WrapperFastCornerIntensity<T, D>(alg);
-		return createGeneral(intensity, extractRadius, detectThreshold, maxFeatures);
+		ConfigExtract configExtract = new ConfigExtract(extractRadius,detectThreshold,0,true);
+		return createGeneral(intensity, configExtract, maxFeatures);
 	}
 
 	/**
 	 * Creates a median filter corner detector.
 	 *
-	 * @param extractRadius   Radius of non-maximum suppression region. Try 1 or 2.
-	 * @param detectThreshold Minimum feature intensity.  Image dependent.  Start tuning at 0 or 1.
+	 * @param configExtract Configuration for extracting features
 	 * @param maxFeatures     The maximum number of detected features it will return.  Try 300
 	 * @param imageType       Type of input image.
 	 * @see boofcv.alg.feature.detect.intensity.MedianCornerIntensity
 	 */
 	public static <T extends ImageSingleBand, D extends ImageSingleBand>
-	GeneralFeatureDetector<T, D> createMedian(int extractRadius, float detectThreshold, int maxFeatures, Class<T> imageType) {
-		MedianImageFilter<T> medianFilter = FactoryBlurFilter.median(imageType, extractRadius);
+	GeneralFeatureDetector<T, D> createMedian(ConfigExtract configExtract, int maxFeatures, Class<T> imageType) {
+		MedianImageFilter<T> medianFilter = FactoryBlurFilter.median(imageType, configExtract.radius);
 		GeneralFeatureIntensity<T, D> intensity = new WrapperMedianCornerIntensity<T, D>(medianFilter, imageType);
-		return createGeneral(intensity, extractRadius, detectThreshold, maxFeatures);
+		return createGeneral(intensity, configExtract, maxFeatures);
 	}
 
 	/**
 	 * Creates a Hessian based blob detector.
 	 *
 	 * @param type            The type of Hessian based blob detector to use. DETERMINANT often works well.
-	 * @param extractRadius   Radius of non-maximum suppression region. Try 1 or 2.
-	 * @param detectThreshold Minimum feature intensity.  Image dependent.  Start tuning at 0 or 1.
+	 * @param configExtract Configuration for extracting features
 	 * @param maxFeatures     The maximum number of detected features it will return.  Try 300
 	 * @param derivType       Type of derivative image.
 	 * @see HessianBlobIntensity
 	 */
 	public static <T extends ImageSingleBand, D extends ImageSingleBand>
 	GeneralFeatureDetector<T, D> createHessian(HessianBlobIntensity.Type type,
-											   int extractRadius, float detectThreshold, int maxFeatures, Class<D> derivType) {
+											   ConfigExtract configExtract, int maxFeatures, Class<D> derivType) {
 		GeneralFeatureIntensity<T, D> intensity = FactoryIntensityPoint.hessian(type, derivType);
-		return createGeneral(intensity, extractRadius, detectThreshold, maxFeatures);
+		return createGeneral(intensity, configExtract, maxFeatures);
 	}
 
 	public static <T extends ImageSingleBand, D extends ImageSingleBand>
 	GeneralFeatureDetector<T, D> createGeneral(GradientCornerIntensity<D> cornerIntensity,
-											   int extractRadius, float detectThreshold, int maxFeatures) {
+											   ConfigExtract config, int maxFeatures) {
 		GeneralFeatureIntensity<T, D> intensity = new WrapperGradientCornerIntensity<T, D>(cornerIntensity);
-		return createGeneral(intensity, extractRadius, detectThreshold, maxFeatures);
+		return createGeneral(intensity, config,maxFeatures);
 	}
 
 	public static <T extends ImageSingleBand, D extends ImageSingleBand>
 	GeneralFeatureDetector<T, D> createGeneral(GeneralFeatureIntensity<T, D> intensity,
-											   int extractRadius, float detectThreshold, int maxFeatures) {
-		int border = intensity.getIgnoreBorder() + extractRadius;
-		FeatureExtractor extractor = FactoryFeatureExtractor.
-				nonmax(extractRadius, detectThreshold, border, true);
+											   ConfigExtract config , int maxFeatures ) {
+		config.ignoreBorder += config.radius;
+		FeatureExtractor extractor = FactoryFeatureExtractor.nonmax(config);
 		GeneralFeatureDetector<T, D> det = new GeneralFeatureDetector<T, D>(intensity, extractor);
 		det.setMaxFeatures(maxFeatures);
 
