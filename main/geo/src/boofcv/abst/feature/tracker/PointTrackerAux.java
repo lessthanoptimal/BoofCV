@@ -21,18 +21,30 @@ package boofcv.abst.feature.tracker;
 import boofcv.struct.image.ImageBase;
 
 /**
- * Point feature tracker in which the user creates new tracks by specifying the tracks initial location.
+ * Tracker that provides access to auxiliary feature location information.  The auxiliary information can specify
+ * the features orientation, scale, or affine structure.  The user can also manually spawn points by providing a
+ * feature's location and the auxiliary information.
  *
  * @author Peter Abeles
  */
-public interface PointTrackerUser<T extends ImageBase> extends PointTracker<T> {
+public interface PointTrackerAux<T extends ImageBase, Aux>
+		extends PointTracker<T>
+{
+	/**
+	 * Returns auxiliary location information about the track, e.g scale, orientation, or affine.
+	 *
+	 * @param track Requested track.
+	 * @return auxiliary location
+	 */
+	public Aux getAuxiliary( PointTrack track );
 
 	/**
 	 * Creates a new track at the specified pixel coordinate. Newly created tracks here are not added to the spawn list.
 	 *
 	 * @param x x-coordinate of new track
 	 * @param y y-coordinate of new track
+	 * @param auxiliary Auxiliary coordinate information.
 	 * @return The newly created track.  null if a track could not be created there
 	 */
-	PointTrack addTrack( double x , double y );
+	PointTrack addTrack( double x , double y , Aux auxiliary );
 }

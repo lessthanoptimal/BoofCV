@@ -49,8 +49,9 @@ import java.util.List;
  * @param <D> Image derivative type
  */
 // TODO change scale in info panel
-public class VideoMosaicSequentialPointApp<I extends ImageSingleBand, D extends ImageSingleBand, T extends InvertibleTransform<T>>
-		extends ImageMotionBaseApp<I,T>
+public class VideoMosaicSequentialPointApp<I extends ImageSingleBand, D extends ImageSingleBand,
+		T extends InvertibleTransform<T>,Aux>
+		extends ImageMotionBaseApp<I,T,Aux>
 {
 	private final static int maxFeatures = 250;
 	private final static int maxIterations = 100;

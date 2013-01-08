@@ -38,13 +38,13 @@ import java.util.List;
 
 
 /**
- * Wrapper around {@link boofcv.alg.tracker.klt.PyramidKltTracker} for {@link PointTrackerSpawn}.  Every track
+ * Wrapper around {@link boofcv.alg.tracker.klt.PyramidKltTracker} for {@link PointTracker}.  Every track
  * will have the same size and shaped descriptor.  If any fault is encountered the track will be dropped.
  *
  * @author Peter Abeles
  */
 public class PointTrackerKltPyramid<I extends ImageSingleBand,D extends ImageSingleBand>
-		implements PointTrackerSpawn<I>, PointTrackerUser<I>
+		implements PointTrackerAux<I,Object>
 {
 	// update the image pyramid
 	protected PyramidUpdaterDiscrete<I> inputPyramidUpdater;
@@ -131,7 +131,7 @@ public class PointTrackerKltPyramid<I extends ImageSingleBand,D extends ImageSin
 	}
 
 	@Override
-	public PointTrack addTrack( double x , double y ) {
+	public PointTrack addTrack( double x , double y , Object aux ) {
 		// grow the number of tracks if needed
 		if( unused.isEmpty() )
 			addTrackToUnused();
@@ -200,6 +200,11 @@ public class PointTrackerKltPyramid<I extends ImageSingleBand,D extends ImageSin
 				unused.add(t);
 			}
 		}
+	}
+
+	@Override
+	public Object getAuxiliary(PointTrack track) {
+		return null;
 	}
 
 	/**

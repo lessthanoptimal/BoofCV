@@ -20,7 +20,7 @@ package boofcv.alg.sfm.d2;
 
 import boofcv.abst.feature.tracker.ModelAssistedTracker;
 import boofcv.abst.feature.tracker.PointTrack;
-import boofcv.abst.feature.tracker.PointTrackerSpawn;
+import boofcv.abst.feature.tracker.PointTracker;
 import boofcv.alg.feature.tracker.PointToAssistedTracker;
 import boofcv.alg.sfm.robust.DistanceAffine2DSq;
 import boofcv.alg.sfm.robust.DistanceHomographySq;
@@ -60,14 +60,14 @@ import java.awt.image.BufferedImage;
  * @author Peter Abeles
  */
 public abstract class ImageMotionBaseApp<I extends ImageSingleBand,
-		T extends InvertibleTransform>
+		T extends InvertibleTransform,Aux>
 		extends VideoProcessAppBase<I> implements VisualizeApp
 {
 	// If the input and output images are being shown, this is the width of a border between them.
 	private final static int outputBorder = 10;
 
 	// tracks feature in the video stream
-	protected PointTrackerSpawn<I> tracker;
+	protected PointTracker<I> tracker;
 	// tracks and estimates the motion
 	protected ModelAssistedTracker<I,T,AssociatedPair> trackerModel;
 
@@ -381,7 +381,7 @@ public abstract class ImageMotionBaseApp<I extends ImageSingleBand,
 	public void refreshAll(Object[] cookies) {
 		stopWorker();
 
-		tracker = (PointTrackerSpawn<I>)cookies[0];
+		tracker = (PointTracker<I>)cookies[0];
 		fitModel = (T)cookies[1];
 
 		startEverything();
@@ -396,7 +396,7 @@ public abstract class ImageMotionBaseApp<I extends ImageSingleBand,
 
 		switch( indexFamily ) {
 			case 0:
-				tracker = (PointTrackerSpawn<I>)cookie;
+				tracker = (PointTracker<I>)cookie;
 				break;
 			
 			case 1:

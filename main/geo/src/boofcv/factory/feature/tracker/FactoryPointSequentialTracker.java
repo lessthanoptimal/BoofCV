@@ -40,6 +40,7 @@ import boofcv.alg.feature.describe.DescribePointPixelRegionNCC;
 import boofcv.alg.feature.describe.DescribePointSurf;
 import boofcv.alg.feature.describe.brief.FactoryBriefDefinition;
 import boofcv.alg.feature.detect.intensity.GradientCornerIntensity;
+import boofcv.alg.feature.detect.interest.EasyGeneralFeatureDetector;
 import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.alg.interpolate.InterpolateRectangle;
@@ -67,7 +68,7 @@ import java.util.Random;
 
 
 /**
- * Factory for creating trackers which implement {@link boofcv.abst.feature.tracker.PointTrackerSpawn}.  These trackers are intended for use
+ * Factory for creating trackers which implement {@link boofcv.abst.feature.tracker.PointTracker}.  These trackers are intended for use
  * in SFM applications.
  *
  * @author Peter Abeles
@@ -90,7 +91,7 @@ public class FactoryPointSequentialTracker {
 	 * @return KLT based tracker.
 	 */
 	public static <I extends ImageSingleBand, D extends ImageSingleBand>
-	PointTrackerSpawn<I> klt(int maxFeatures, int scaling[], ConfigExtract configExtract, int featureRadius,
+	PointTracker<I> klt(int maxFeatures, int scaling[], ConfigExtract configExtract, int featureRadius,
 							 int spawnSubW, int spawnSubH, Class<I> imageType, Class<D> derivType) {
 		PkltConfig<I, D> config =
 				PkltConfig.createDefault(imageType, derivType);
@@ -113,7 +114,7 @@ public class FactoryPointSequentialTracker {
 	 * @return KLT based tracker.
 	 */
 	public static <I extends ImageSingleBand, D extends ImageSingleBand>
-	PointTrackerSpawn<I> klt(PkltConfig<I, D> config, int maxFeatures , ConfigExtract configExtract , int spawnSubW, int spawnSubH) {
+	PointTrackerAux<I,?> klt(PkltConfig<I, D> config, int maxFeatures , ConfigExtract configExtract , int spawnSubW, int spawnSubH) {
 
 		GeneralFeatureDetector<I, D> detector = createShiTomasi(configExtract,maxFeatures, config.typeDeriv);
 		detector.setRegions(spawnSubW, spawnSubH);
@@ -130,26 +131,6 @@ public class FactoryPointSequentialTracker {
 	}
 
 	/**
-	 * Creates a KLT tracker where the user specifies the spawn points.
-	 *
-	 * @param config Config for the tracker. Try PkltConfig.createDefault().
-	 * @return KLT based tracker.
-	 */
-	public static <I extends ImageSingleBand, D extends ImageSingleBand>
-	PointTrackerUser<I> klt(PkltConfig<I, D> config ) {
-
-
-		InterpolateRectangle<I> interpInput = FactoryInterpolation.<I>bilinearRectangle(config.typeInput);
-		InterpolateRectangle<D> interpDeriv = FactoryInterpolation.<D>bilinearRectangle(config.typeDeriv);
-
-		ImageGradient<I,D> gradient = FactoryDerivative.sobel(config.typeInput, config.typeDeriv);
-
-		PyramidUpdaterDiscrete<I> pyramidUpdater = FactoryPyramid.discreteGaussian(config.typeInput, -1, 2);
-
-		return new PointTrackerKltPyramid<I, D>(config,pyramidUpdater,gradient,interpInput,interpDeriv);
-	}
-
-	/**
 	 * Creates a tracker which detects Fast-Hessian features and describes them with SURF using the faster variant
 	 * of SURF.
 	 *
@@ -165,7 +146,7 @@ public class FactoryPointSequentialTracker {
 	 */
 	// TODO remove maxTracks?  Use number of detected instead
 	public static <I extends ImageSingleBand>
-	PointTrackerSpawn<I> dda_FH_SURF_Fast(int maxTracks,
+	PointTrackerAux<I,?> dda_FH_SURF_Fast(int maxTracks,
 										  ConfigFastHessian configDetector ,
 										  ConfigSurfDescribe.Speed configDescribe ,
 										  ConfigAverageIntegral configOrientation ,
@@ -180,7 +161,7 @@ public class FactoryPointSequentialTracker {
 		DetectDescribePoint<I,SurfFeature> fused =
 				FactoryDetectDescribe.surfFast(configDetector, configDescribe, configOrientation, imageType);
 
-		return new DetectAssociateTracker<I,SurfFeature>(fused, generalAssoc,false);
+		return new DetectAssociateTracker<I,SurfFeature,Object>(fused, generalAssoc,false);
 	}
 
 	/**
@@ -199,7 +180,7 @@ public class FactoryPointSequentialTracker {
 	 */
 	// TODO remove maxTracks?  Use number of detected instead
 	public static <I extends ImageSingleBand>
-	PointTrackerSpawn<I> dda_FH_SURF_Stable(int maxTracks,
+	PointTrackerAux<I,?> dda_FH_SURF_Stable(int maxTracks,
 											ConfigFastHessian configDetector ,
 											ConfigSurfDescribe.Stablility configDescribe ,
 											ConfigSlidingIntegral configOrientation ,
@@ -214,7 +195,7 @@ public class FactoryPointSequentialTracker {
 		DetectDescribePoint<I,SurfFeature> fused =
 				FactoryDetectDescribe.surfStable(configDetector,configDescribe,configOrientation,imageType);
 
-		return new DetectAssociateTracker<I,SurfFeature>(fused, generalAssoc,false);
+		return new DetectAssociateTracker<I,SurfFeature,Object>(fused, generalAssoc,false);
 	}
 
 	/**
@@ -231,7 +212,7 @@ public class FactoryPointSequentialTracker {
 	 * @param derivType Type of image used to store the image derivative. null == use default
 	 */
 	public static <I extends ImageSingleBand, D extends ImageSingleBand>
-	PointTrackerSpawn<I> dda_ST_BRIEF(int maxFeatures, int maxAssociationError,
+	PointTrackerAux<I,?> dda_ST_BRIEF(int maxFeatures, int maxAssociationError,
 									  ConfigExtract configExtract,
 									  Class<I> imageType, Class<D> derivType)
 	{
@@ -253,7 +234,7 @@ public class FactoryPointSequentialTracker {
 		DetectDescribeFusion<I,TupleDesc_B> fused =
 				new DetectDescribeFusion<I,TupleDesc_B>(detector,null,new WrapDescribeBrief<I>(brief));
 
-		return new DetectAssociateTracker<I,TupleDesc_B>
+		return new DetectAssociateTracker<I,TupleDesc_B,Object>
 				(fused, association,false);
 	}
 
@@ -272,7 +253,7 @@ public class FactoryPointSequentialTracker {
 	 * @param imageType           Type of image being processed.
 	 */
 	public static <I extends ImageSingleBand, D extends ImageSingleBand>
-	PointTrackerSpawn<I> dda_FAST_BRIEF(int maxFeatures, int maxAssociationError,
+	PointTrackerAux<I,?> dda_FAST_BRIEF(int maxFeatures, int maxAssociationError,
 										int extractRadius,
 										int minContinuous,
 										int detectThreshold,
@@ -293,7 +274,7 @@ public class FactoryPointSequentialTracker {
 		DetectDescribeFusion<I,TupleDesc_B> fused =
 				new DetectDescribeFusion<I,TupleDesc_B>(detector,null,new WrapDescribeBrief<I>(brief));
 
-		return new DetectAssociateTracker<I,TupleDesc_B>
+		return new DetectAssociateTracker<I,TupleDesc_B,Object>
 				(fused, association,false);
 	}
 
@@ -310,7 +291,7 @@ public class FactoryPointSequentialTracker {
 	 * @param imageType      Type of image being processed.
 	 * @param derivType      Type of image used to store the image derivative. null == use default     */
 	public static <I extends ImageSingleBand, D extends ImageSingleBand>
-	PointTrackerSpawn<I> dda_ST_NCC(int maxFeatures, ConfigExtract configExtract, int describeRadius,
+	PointTrackerAux<I,?> dda_ST_NCC(int maxFeatures, ConfigExtract configExtract, int describeRadius,
 									Class<I> imageType, Class<D> derivType) {
 
 		if( derivType == null )
@@ -332,7 +313,7 @@ public class FactoryPointSequentialTracker {
 		DetectDescribeFusion<I,NccFeature> fused =
 				new DetectDescribeFusion<I,NccFeature>(detector,null,new WrapDescribePixelRegionNCC<I>(alg));
 
-		return new DetectAssociateTracker<I,NccFeature>
+		return new DetectAssociateTracker<I,NccFeature,Object>
 				(fused, association,false);
 	}
 
@@ -349,17 +330,17 @@ public class FactoryPointSequentialTracker {
 	 * @return tracker
 	 */
 	public static <I extends ImageSingleBand, Desc extends TupleDesc>
-	DetectAssociateTracker<I,Desc> detectDescribeAssociate(InterestPointDetector<I> detector,
-														   OrientationImage<I> orientation ,
-														   DescribeRegionPoint<I, Desc> describe,
-														   AssociateDescription2D<Desc> associate ,
-														   boolean updateDescription ) {
+	DetectAssociateTracker<I,Desc,?> detectDescribeAssociate(InterestPointDetector<I> detector,
+															 OrientationImage<I> orientation ,
+															 DescribeRegionPoint<I, Desc> describe,
+															 AssociateDescription2D<Desc> associate ,
+															 boolean updateDescription ) {
 
 		DetectDescribeFusion<I,Desc> fused =
 				new DetectDescribeFusion<I,Desc>(detector,orientation,describe);
 
-		DetectAssociateTracker<I,Desc> dat =
-				new DetectAssociateTracker<I,Desc>(fused, associate,updateDescription);
+		DetectAssociateTracker<I,Desc,?> dat =
+				new DetectAssociateTracker<I,Desc,Object>(fused, associate,updateDescription);
 
 		return dat;
 	}
@@ -383,7 +364,7 @@ public class FactoryPointSequentialTracker {
 	 * @return SURF based tracker.
 	 */
 	public static <I extends ImageSingleBand>
-	PointTrackerSpawn<I> combined_FH_SURF_KLT(int maxMatches,
+	PointTrackerAux<I,?> combined_FH_SURF_KLT(int maxMatches,
 											  int trackRadius,
 											  int[] pyramidScalingKlt ,
 											  int reactivateThreshold ,
@@ -426,7 +407,7 @@ public class FactoryPointSequentialTracker {
 	 * @return SURF based tracker.
 	 */
 	public static <I extends ImageSingleBand, D extends ImageSingleBand>
-	PointTrackerSpawn<I> combined_ST_SURF_KLT(int maxMatches,
+	PointTrackerAux<I,?> combined_ST_SURF_KLT(int maxMatches,
 											  ConfigExtract configExtract,
 											  int trackRadius,
 											  int[] pyramidScalingKlt ,
@@ -476,7 +457,7 @@ public class FactoryPointSequentialTracker {
 	 * @return Feature tracker
 	 */
 	public static <I extends ImageSingleBand, Desc extends TupleDesc>
-	PointTrackerSpawn<I> combined( InterestPointDetector<I> detector,
+	PointTrackerAux<I,?> combined( InterestPointDetector<I> detector,
 								   OrientationImage<I> orientation ,
 								   DescribeRegionPoint<I, Desc> describe,
 								   AssociateDescription<Desc> associate ,
@@ -507,7 +488,7 @@ public class FactoryPointSequentialTracker {
 	 * @return Feature tracker
 	 */
 	public static <I extends ImageSingleBand, D extends ImageSingleBand, Desc extends TupleDesc>
-	PointTrackerSpawn<I> combined( DetectDescribePoint<I,Desc> detector ,
+	PointTrackerAux<I,?> combined( DetectDescribePoint<I,Desc> detector ,
 								   AssociateDescription<Desc> associate ,
 								   int featureRadiusKlt,
 								   int[] pyramidScalingKlt ,
@@ -521,6 +502,19 @@ public class FactoryPointSequentialTracker {
 						imageType,derivType);
 
 		return new WrapCombinedTracker<I,D,Desc>(tracker,reactivateThreshold,imageType,derivType);
+	}
+
+
+	public static <I extends ImageSingleBand, D extends ImageSingleBand, Desc extends TupleDesc>
+	PointTrackerAux<I,?> ddaUser( GeneralFeatureDetector<I, D> detector,
+								  DescribeRegionPoint<I,Desc> describe ,
+								  AssociateDescription2D<Desc> associate ,
+								  double scale ,
+								  Class<I> imageType ) {
+
+		EasyGeneralFeatureDetector<I,D> easy = new EasyGeneralFeatureDetector<I, D>(detector,imageType,null);
+
+		return new DdaTrackerGeneralPoint<I,D,Desc>(associate,true,easy,describe,scale);
 	}
 
 	/**
