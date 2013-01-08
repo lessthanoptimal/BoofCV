@@ -18,7 +18,8 @@
 
 package boofcv.benchmark.feature.corner;
 
-import boofcv.abst.feature.detect.interest.GeneralFeatureDetector;
+import boofcv.abst.feature.detect.extract.ConfigExtract;
+import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.alg.filter.derivative.GradientSobel;
 import boofcv.alg.filter.derivative.GradientThree;
 import boofcv.alg.filter.derivative.HessianFromGradient;
@@ -93,10 +94,14 @@ public class BenchmarkCornerAccuracy {
 		int maxFeatures = corners.size() * 2;
 
 		detectCorners("FAST", FactoryDetectPoint.<ImageUInt8, ImageSInt16>createFast(10,9, 11, maxFeatures, ImageUInt8.class));
-		detectCorners("Harris", FactoryDetectPoint.<ImageUInt8, ImageSInt16>createHarris(radius, false, 0.04f, maxFeatures, ImageSInt16.class));
-		detectCorners("KitRos", FactoryDetectPoint.<ImageUInt8, ImageSInt16>createKitRos(radius, 1f, maxFeatures, ImageSInt16.class));
-		detectCorners("KLT", FactoryDetectPoint.<ImageUInt8, ImageSInt16>createShiTomasi(radius, false, 1f, maxFeatures, ImageSInt16.class));
-		detectCorners("Median", FactoryDetectPoint.<ImageUInt8, ImageSInt16>createMedian(radius, 1, maxFeatures, ImageUInt8.class));
+		detectCorners("Harris", FactoryDetectPoint.<ImageUInt8, ImageSInt16>
+				createHarris(new ConfigExtract(radius, 0.04f), false, maxFeatures, ImageSInt16.class));
+		detectCorners("KitRos", FactoryDetectPoint.<ImageUInt8, ImageSInt16>
+				createKitRos(new ConfigExtract(radius, 1f), maxFeatures, ImageSInt16.class));
+		detectCorners("KLT", FactoryDetectPoint.<ImageUInt8, ImageSInt16>
+				createShiTomasi(new ConfigExtract(radius,1f), false, maxFeatures, ImageSInt16.class));
+		detectCorners("Median", FactoryDetectPoint.<ImageUInt8, ImageSInt16>
+				createMedian(new ConfigExtract(radius, 1), maxFeatures, ImageUInt8.class));
 	}
 
 	private void createTestImage() {

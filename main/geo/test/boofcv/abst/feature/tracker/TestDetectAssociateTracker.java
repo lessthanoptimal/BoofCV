@@ -23,10 +23,11 @@ import boofcv.abst.feature.associate.AssociateDescription2D;
 import boofcv.abst.feature.associate.ScoreAssociateHamming_B;
 import boofcv.abst.feature.describe.WrapDescribeBrief;
 import boofcv.abst.feature.detdesc.DetectDescribeFusion;
-import boofcv.abst.feature.detect.interest.GeneralFeatureDetector;
+import boofcv.abst.feature.detect.extract.ConfigExtract;
 import boofcv.abst.feature.detect.interest.InterestPointDetector;
 import boofcv.alg.feature.describe.DescribePointBrief;
 import boofcv.alg.feature.describe.brief.FactoryBriefDefinition;
+import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.feature.describe.FactoryDescribePointAlgs;
 import boofcv.factory.feature.detect.interest.FactoryDetectPoint;
@@ -43,7 +44,7 @@ import static org.junit.Assert.assertEquals;
 /**
  * @author Peter Abeles
  */
-public class TestDetectAssociateTracker extends StandardImagePointTracker<ImageFloat32> {
+public class TestDetectAssociateTracker extends StandardPointTrackerSpawn<ImageFloat32> {
 
 	DetectAssociateTracker<ImageFloat32,TupleDesc_B> dat;
 
@@ -94,7 +95,7 @@ public class TestDetectAssociateTracker extends StandardImagePointTracker<ImageF
 				FactoryBlurFilter.gaussian(ImageFloat32.class, 0, 4));
 
 		GeneralFeatureDetector<ImageFloat32,ImageFloat32> corner =
-				FactoryDetectPoint.createShiTomasi(2, false, 0, 100, ImageFloat32.class);
+				FactoryDetectPoint.createShiTomasi(new ConfigExtract(2,0), false, 100, ImageFloat32.class);
 
 		InterestPointDetector<ImageFloat32> detector =
 				FactoryInterestPoint.wrapPoint(corner, 1,ImageFloat32.class, ImageFloat32.class);

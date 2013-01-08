@@ -18,6 +18,7 @@
 
 package boofcv.alg.feature.detect.template;
 
+import boofcv.abst.feature.detect.extract.ConfigExtract;
 import boofcv.abst.feature.detect.extract.FeatureExtractor;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
@@ -163,7 +164,7 @@ public abstract class GeneralTemplateMatchTests<T extends ImageSingleBand> {
 		ImageFloat32 adjusted = alg.getIntensity().subimage(x0, y0, x1, y1);
 
 		// solutions should be local maximums
-		FeatureExtractor extractor = FactoryFeatureExtractor.nonmax(2, -Float.MAX_VALUE, 0, true);
+		FeatureExtractor extractor = FactoryFeatureExtractor.nonmax(new ConfigExtract(2, -Float.MAX_VALUE, 0, true));
 
 		QueueCorner found = new QueueCorner(10);
 

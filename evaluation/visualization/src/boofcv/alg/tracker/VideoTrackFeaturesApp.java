@@ -18,6 +18,7 @@
 
 package boofcv.alg.tracker;
 
+import boofcv.abst.feature.detect.extract.ConfigExtract;
 import boofcv.abst.feature.detect.interest.ConfigFastHessian;
 import boofcv.abst.feature.tracker.PkltConfig;
 import boofcv.abst.feature.tracker.PointTrack;
@@ -67,13 +68,16 @@ public class VideoTrackFeaturesApp<I extends ImageSingleBand, D extends ImageSin
 
 		ConfigFastHessian configFH = new ConfigFastHessian();
 		configFH.maxFeaturesPerScale = 200;
-		configFH.extractRadius = 3;
+		configFH.extractRadius = 4;
+		configFH.detectThreshold = 15f;
 
-		addAlgorithm(0,"KLT", FactoryPointSequentialTracker.klt(config,maxFeatures,1,3,1,1));
-		addAlgorithm(0,"ST-BRIEF", FactoryPointSequentialTracker.dda_ST_BRIEF(maxFeatures, 200, 3, 1, imageType, derivType));
-		addAlgorithm(0,"ST-NCC", FactoryPointSequentialTracker.dda_ST_NCC(maxFeatures, 3, 5, 2, imageType, derivType));
+		addAlgorithm(0,"KLT", FactoryPointSequentialTracker.klt(config,maxFeatures,new ConfigExtract(1,3),1,1));
+		addAlgorithm(0,"ST-BRIEF", FactoryPointSequentialTracker.
+				dda_ST_BRIEF(maxFeatures, 200, new ConfigExtract(3, 1), imageType, derivType));
+		addAlgorithm(0,"ST-NCC", FactoryPointSequentialTracker.dda_ST_NCC(maxFeatures, new ConfigExtract(3,2), 5, imageType, derivType));
 		addAlgorithm(0,"FH-SURF", FactoryPointSequentialTracker.dda_FH_SURF_Fast(maxFeatures, configFH,null,null, imageType));
-		addAlgorithm(0,"ST-SURF-KLT", FactoryPointSequentialTracker.combined_ST_SURF_KLT(maxFeatures, 3, 1, 3,
+		addAlgorithm(0,"ST-SURF-KLT", FactoryPointSequentialTracker.
+				combined_ST_SURF_KLT(maxFeatures, new ConfigExtract(3, 1), 3,
 				config.pyramidScaling, 50, null,null, imageType, derivType));
 		addAlgorithm(0,"FH-SURF-KLT", FactoryPointSequentialTracker.combined_FH_SURF_KLT(maxFeatures, 3,
 				config.pyramidScaling, 50,configFH,null,null,imageType));

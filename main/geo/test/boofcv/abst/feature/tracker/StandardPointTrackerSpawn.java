@@ -38,7 +38,7 @@ import static org.junit.Assert.assertTrue;
  *
  * @author Peter Abeles
  */
-public abstract class StandardImagePointTracker <T extends ImageSingleBand> {
+public abstract class StandardPointTrackerSpawn<T extends ImageSingleBand> {
 
 	public PointTrackerSpawn<T> tracker;
 	Random rand = new Random(234);
@@ -48,7 +48,7 @@ public abstract class StandardImagePointTracker <T extends ImageSingleBand> {
 	boolean shouldDropTracks;
 	boolean shouldCreateInactive;
 
-	protected StandardImagePointTracker(boolean shouldCreateInactive, boolean shouldDropTracks) {
+	protected StandardPointTrackerSpawn(boolean shouldCreateInactive, boolean shouldDropTracks) {
 		this.shouldCreateInactive = shouldCreateInactive;
 		this.shouldDropTracks = shouldDropTracks;
 	}
@@ -133,7 +133,7 @@ public abstract class StandardImagePointTracker <T extends ImageSingleBand> {
 				tracker.getNewTracks(null).size() );
 
 		// Tweak the input image and make sure that everything has the expected size
-		ImageMiscOps.addGaussian(image,rand,1,0,255);
+		ImageMiscOps.addGaussian(image,rand,2,0,255);
 		tracker.process((T)image);
 
 		int beforeAll = tracker.getAllTracks(null).size();

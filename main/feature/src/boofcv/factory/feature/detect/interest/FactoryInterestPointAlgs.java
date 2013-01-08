@@ -18,13 +18,13 @@
 
 package boofcv.factory.feature.detect.interest;
 
+import boofcv.abst.feature.detect.extract.ConfigExtract;
 import boofcv.abst.feature.detect.extract.FeatureExtractor;
 import boofcv.abst.feature.detect.intensity.GeneralFeatureIntensity;
 import boofcv.abst.feature.detect.intensity.WrapperGradientCornerIntensity;
 import boofcv.abst.feature.detect.intensity.WrapperHessianBlobIntensity;
 import boofcv.abst.feature.detect.interest.ConfigFastHessian;
 import boofcv.abst.feature.detect.interest.ConfigSiftDetector;
-import boofcv.abst.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.abst.filter.ImageFunctionSparse;
 import boofcv.abst.filter.derivative.AnyImageDerivative;
 import boofcv.alg.feature.detect.intensity.GradientCornerIntensity;
@@ -62,7 +62,8 @@ public class FactoryInterestPointAlgs {
 												 Class<D> derivType) {
 		GradientCornerIntensity<D> harris = FactoryIntensityPointAlg.harris(extractRadius, 0.04f, false, derivType);
 		GeneralFeatureIntensity<T, D> intensity = new WrapperGradientCornerIntensity<T, D>(harris);
-		FeatureExtractor extractor = FactoryFeatureExtractor.nonmax(extractRadius, detectThreshold, extractRadius, true);
+		FeatureExtractor extractor =
+				FactoryFeatureExtractor.nonmax(new ConfigExtract(extractRadius, detectThreshold, extractRadius, true));
 		GeneralFeatureDetector<T, D> detector = new GeneralFeatureDetector<T, D>(intensity, extractor);
 		detector.setMaxFeatures(maxFeatures);
 
@@ -88,7 +89,8 @@ public class FactoryInterestPointAlgs {
 												  Class<T> imageType,
 												  Class<D> derivType) {
 		GeneralFeatureIntensity<T, D> intensity = new WrapperHessianBlobIntensity<T, D>(HessianBlobIntensity.Type.DETERMINANT, derivType);
-		FeatureExtractor extractor = FactoryFeatureExtractor.nonmax(extractRadius, detectThreshold, extractRadius, true);
+		FeatureExtractor extractor = FactoryFeatureExtractor.nonmax(
+				new ConfigExtract(extractRadius, detectThreshold, extractRadius, true));
 		GeneralFeatureDetector<T, D> detector = new GeneralFeatureDetector<T, D>(intensity, extractor);
 		detector.setMaxFeatures(maxFeatures);
 
@@ -114,7 +116,8 @@ public class FactoryInterestPointAlgs {
 										Class<T> imageType,
 										Class<D> derivType) {
 		GeneralFeatureIntensity<T, D> intensity = new WrapperHessianBlobIntensity<T, D>(HessianBlobIntensity.Type.DETERMINANT, derivType);
-		FeatureExtractor extractor = FactoryFeatureExtractor.nonmax(extractRadius, detectThreshold, extractRadius, true);
+		FeatureExtractor extractor = FactoryFeatureExtractor.nonmax(
+				new ConfigExtract(extractRadius, detectThreshold, extractRadius, true));
 		GeneralFeatureDetector<T, D> detector = new GeneralFeatureDetector<T, D>(intensity, extractor);
 		detector.setMaxFeatures(maxFeatures);
 
@@ -141,7 +144,8 @@ public class FactoryInterestPointAlgs {
 									   Class<D> derivType) {
 		GradientCornerIntensity<D> harris = FactoryIntensityPointAlg.harris(extractRadius, 0.04f, false, derivType);
 		GeneralFeatureIntensity<T, D> intensity = new WrapperGradientCornerIntensity<T, D>(harris);
-		FeatureExtractor extractor = FactoryFeatureExtractor.nonmax(extractRadius, detectThreshold, extractRadius, true);
+		FeatureExtractor extractor = FactoryFeatureExtractor.nonmax(
+				new ConfigExtract(extractRadius, detectThreshold, extractRadius, true));
 		GeneralFeatureDetector<T, D> detector = new GeneralFeatureDetector<T, D>(intensity, extractor);
 		detector.setMaxFeatures(maxFeatures);
 
@@ -167,7 +171,8 @@ public class FactoryInterestPointAlgs {
 													  Class<T> imageType,
 													  Class<D> derivType) {
 		GeneralFeatureIntensity<T, D> intensity = new WrapperHessianBlobIntensity<T, D>(HessianBlobIntensity.Type.DETERMINANT, derivType);
-		FeatureExtractor extractor = FactoryFeatureExtractor.nonmax(extractRadius, detectThreshold, extractRadius, true);
+		FeatureExtractor extractor = FactoryFeatureExtractor.nonmax(
+				new ConfigExtract(extractRadius, detectThreshold, extractRadius, true));
 		GeneralFeatureDetector<T, D> detector = new GeneralFeatureDetector<T, D>(intensity, extractor);
 		detector.setMaxFeatures(maxFeatures);
 
@@ -196,7 +201,8 @@ public class FactoryInterestPointAlgs {
 													 Class<D> derivType) {
 		GradientCornerIntensity<D> harris = FactoryIntensityPointAlg.harris(extractRadius, 0.04f, false, derivType);
 		GeneralFeatureIntensity<T, D> intensity = new WrapperGradientCornerIntensity<T, D>(harris);
-		FeatureExtractor extractor = FactoryFeatureExtractor.nonmax(extractRadius, detectThreshold, extractRadius, true);
+		FeatureExtractor extractor = FactoryFeatureExtractor.nonmax(
+				new ConfigExtract(extractRadius, detectThreshold, extractRadius, true));
 		GeneralFeatureDetector<T, D> detector = new GeneralFeatureDetector<T, D>(intensity, extractor);
 		detector.setMaxFeatures(maxFeatures);
 
@@ -224,7 +230,8 @@ public class FactoryInterestPointAlgs {
 											 Class<D> derivType) {
 		GradientCornerIntensity<D> harris = FactoryIntensityPointAlg.harris(extractRadius, 0.04f, false, derivType);
 		GeneralFeatureIntensity<T, D> intensity = new WrapperGradientCornerIntensity<T, D>(harris);
-		FeatureExtractor extractor = FactoryFeatureExtractor.nonmax(extractRadius, detectThreshold, extractRadius, true);
+		FeatureExtractor extractor = FactoryFeatureExtractor.nonmax(
+				new ConfigExtract(extractRadius, detectThreshold, extractRadius, true));
 		GeneralFeatureDetector<T, D> detector = new GeneralFeatureDetector<T, D>(intensity, extractor);
 		detector.setMaxFeatures(maxFeatures);
 
@@ -248,7 +255,8 @@ public class FactoryInterestPointAlgs {
 											  Class<T> imageType,
 											  Class<D> derivType) {
 		GeneralFeatureIntensity<T, D> intensity = new WrapperHessianBlobIntensity<T, D>(HessianBlobIntensity.Type.DETERMINANT, derivType);
-		FeatureExtractor extractor = FactoryFeatureExtractor.nonmax(extractRadius, detectThreshold, extractRadius, true);
+		FeatureExtractor extractor = FactoryFeatureExtractor.nonmax(
+				new ConfigExtract(extractRadius, detectThreshold, extractRadius, true));
 		GeneralFeatureDetector<T, D> detector = new GeneralFeatureDetector<T, D>(intensity, extractor);
 		detector.setMaxFeatures(maxFeatures);
 
@@ -269,7 +277,8 @@ public class FactoryInterestPointAlgs {
 			config = new ConfigFastHessian();
 		config.checkValidity();
 
-		FeatureExtractor extractor = FactoryFeatureExtractor.nonmax(config.extractRadius, config.detectThreshold, 5, true);
+		FeatureExtractor extractor = FactoryFeatureExtractor.nonmax(
+				new ConfigExtract(config.extractRadius, config.detectThreshold, 5, true));
 		return new FastHessianFeatureDetector<II>(extractor, config.maxFeaturesPerScale,
 				config.initialSampleSize, config.initialSize, config.numberScalesPerOctave, config.numberOfOctaves);
 	}
@@ -288,7 +297,8 @@ public class FactoryInterestPointAlgs {
 			config = new ConfigSiftDetector();
 		config.checkValidity();
 
-		FeatureExtractor extractor = FactoryFeatureExtractor.nonmax(config.extractRadius, config.detectThreshold, 0, true);
+		FeatureExtractor extractor = FactoryFeatureExtractor.nonmax(
+				new ConfigExtract(config.extractRadius, config.detectThreshold, 0, true));
 		return new SiftDetector(extractor,config.maxFeaturesPerScale,config.edgeThreshold);
 	}
 

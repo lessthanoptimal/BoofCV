@@ -18,11 +18,12 @@
 
 package boofcv.alg.feature.detect.extract;
 
+import boofcv.abst.feature.detect.extract.ConfigExtract;
 import boofcv.abst.feature.detect.extract.FeatureExtractor;
 import boofcv.abst.feature.detect.intensity.GeneralFeatureIntensity;
-import boofcv.abst.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.abst.filter.derivative.AnyImageDerivative;
 import boofcv.alg.feature.detect.intensity.HessianBlobIntensity;
+import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.alg.misc.ImageStatistics;
 import boofcv.core.image.ConvertBufferedImage;
@@ -153,12 +154,14 @@ public class CompareFeatureExtractorApp<T extends ImageSingleBand, D extends Ima
 
 		intensityAlg.process(grayImage, derivX, derivY, derivXX, derivYY, derivXY);
 		ImageFloat32 intensity = intensityAlg.getIntensity();
-		intensityImage = VisualizeImageData.colorizeSign(intensityAlg.getIntensity(), null, ImageStatistics.maxAbs(intensity));
+		intensityImage = VisualizeImageData.colorizeSign(
+				intensityAlg.getIntensity(), null, ImageStatistics.maxAbs(intensity));
 
 		float max = ImageStatistics.maxAbs(intensity);
 		float threshold = max * thresholdFraction;
 
-		FeatureExtractor extractor = FactoryFeatureExtractor.nonmax(minSeparation, threshold, radius, true);
+		FeatureExtractor extractor =
+				FactoryFeatureExtractor.nonmax(new ConfigExtract(minSeparation, threshold, radius, true));
 		GeneralFeatureDetector<T, D> detector = new GeneralFeatureDetector<T, D>(intensityAlg, extractor);
 		detector.setMaxFeatures(numFeatures);
 		detector.process(grayImage, derivX, derivY, derivXX, derivYY, derivXY);

@@ -67,7 +67,7 @@ public class FactoryInterestPoint {
 		if (feature.getRequiresHessian())
 			hessian = FactoryDerivative.hessianSobel(derivType);
 
-		return new WrapCornerToInterestPoint<T, D>(feature, gradient, hessian, scale,derivType);
+		return new WrapGeneralToInterestPoint<T, D>(feature, gradient, hessian, scale,derivType);
 	}
 
 	/**

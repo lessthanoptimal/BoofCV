@@ -20,10 +20,11 @@ package boofcv.benchmark.opencv;
 
 import boofcv.abst.feature.describe.DescribeRegionPoint;
 import boofcv.abst.feature.detect.edge.DetectEdgeContour;
+import boofcv.abst.feature.detect.extract.ConfigExtract;
 import boofcv.abst.feature.detect.interest.ConfigFastHessian;
-import boofcv.abst.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.abst.feature.detect.interest.InterestPointDetector;
 import boofcv.abst.feature.detect.line.DetectLineHoughPolar;
+import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.alg.filter.blur.GBlurImageOps;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.core.image.GeneralizedImageOps;
@@ -98,7 +99,7 @@ public class BenchmarkForOpenCV<T extends ImageSingleBand, D extends ImageSingle
 
 		public Harris() {
 			GImageDerivativeOps.sobel(input, derivX, derivY, BorderType.EXTENDED);
-			detector = FactoryDetectPoint.createHarris(radius, false, 1, -1, derivType);
+			detector = FactoryDetectPoint.createHarris(new ConfigExtract(radius,1), false, -1, derivType);
 		}
 
 		@Override

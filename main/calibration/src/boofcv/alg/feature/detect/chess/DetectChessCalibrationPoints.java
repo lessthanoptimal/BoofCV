@@ -18,11 +18,12 @@
 
 package boofcv.alg.feature.detect.chess;
 
+import boofcv.abst.feature.detect.extract.ConfigExtract;
 import boofcv.abst.feature.detect.extract.FeatureExtractor;
 import boofcv.abst.feature.detect.intensity.GeneralFeatureIntensity;
-import boofcv.abst.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.alg.feature.detect.InvalidCalibrationTarget;
 import boofcv.alg.feature.detect.grid.UtilCalibrationGrid;
+import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.alg.feature.detect.quadblob.OrderPointsIntoGrid;
 import boofcv.alg.filter.binary.BinaryImageOps;
 import boofcv.alg.filter.binary.GThresholdImageOps;
@@ -144,7 +145,8 @@ public class DetectChessCalibrationPoints<T extends ImageSingleBand, D extends I
 		intensityAlg = FactoryIntensityPoint.shiTomasi(radius, true, derivType);
 //		intensityAlg = FactoryIntensityPoint.harris(radius,0.04f,true,derivType);
 
-		FeatureExtractor extractor = FactoryFeatureExtractor.nonmax(radius + 2, 20, radius + 2, true);
+		FeatureExtractor extractor =
+				FactoryFeatureExtractor.nonmax(new ConfigExtract(radius + 2, 20, radius + 2, true));
 		detectorAlg = new GeneralFeatureDetector<T, D>(intensityAlg, extractor);
 
 		// minContourSize is specified later after the image's size is known

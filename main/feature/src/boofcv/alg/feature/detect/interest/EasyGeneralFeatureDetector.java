@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.abst.feature.detect.interest;
+package boofcv.alg.feature.detect.interest;
 
 import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.abst.filter.derivative.ImageHessian;
@@ -31,25 +31,24 @@ import boofcv.struct.image.ImageSingleBand;
  *
  * @author Peter Abeles
  */
-// TODO move to alg? with general feature detector
 public class EasyGeneralFeatureDetector<T extends ImageSingleBand, D extends ImageSingleBand> {
 
 	// Feature detector
-	GeneralFeatureDetector<T, D> detector;
+	protected GeneralFeatureDetector<T, D> detector;
 	// Computes iamge gradient
-	ImageGradient<T, D> gradient;
+	protected ImageGradient<T, D> gradient;
 	// computes hessian
-	ImageHessian<D> hessian;
+	protected ImageHessian<D> hessian;
 
 	// storage for image derivatives
-	D derivX; // first derivative x-axis
-	D derivY; // first derivative y-axis
-	D derivXX; // second derivative x-x
-	D derivYY; // second derivative y-y
-	D derivXY; // second derivative x-y
+	protected D derivX; // first derivative x-axis
+	protected D derivY; // first derivative y-axis
+	protected D derivXX; // second derivative x-x
+	protected D derivYY; // second derivative y-y
+	protected D derivXY; // second derivative x-y
 
 	/**
-	 * Uses default image derivatives.
+	 * Configures detector and uses default image derivatives.
 	 *
 	 * @param detector Feature detector.
 	 * @param imageType Type of input image
@@ -63,7 +62,7 @@ public class EasyGeneralFeatureDetector<T extends ImageSingleBand, D extends Ima
 			derivType = GImageDerivativeOps.getDerivativeType(imageType);
 		}
 
-		if( detector.getRequiresGradient() ) {
+		if( detector.getRequiresGradient() || detector.getRequiresHessian()  ) {
 			gradient = FactoryDerivative.sobel(imageType, derivType);
 		}
 		if( detector.getRequiresHessian() ) {
@@ -72,6 +71,9 @@ public class EasyGeneralFeatureDetector<T extends ImageSingleBand, D extends Ima
 		declareDerivativeImages(gradient, hessian, derivType);
 	}
 
+	/**
+	 * Constructor which allows the user to specify how derivatives are computed
+	 */
 	public EasyGeneralFeatureDetector(GeneralFeatureDetector<T, D> detector,
 									  ImageGradient<T, D> gradient,
 									  ImageHessian<D> hessian,
@@ -83,8 +85,11 @@ public class EasyGeneralFeatureDetector<T extends ImageSingleBand, D extends Ima
 		declareDerivativeImages(gradient, hessian, derivType);
 	}
 
+	/**
+	 * Declare storage for image derivatives as needed
+	 */
 	private void declareDerivativeImages(ImageGradient<T, D> gradient, ImageHessian<D> hessian, Class<D> derivType) {
-		if( gradient != null ) {
+		if( gradient != null || hessian != null ) {
 			derivX = GeneralizedImageOps.createSingleBand(derivType, 1, 1);
 			derivY = GeneralizedImageOps.createSingleBand(derivType,1,1);
 		}
@@ -95,8 +100,13 @@ public class EasyGeneralFeatureDetector<T extends ImageSingleBand, D extends Ima
 		}
 	}
 
-
-	public void detect(T input, QueueCorner excludedCorners ) {
+	/**
+	 * Detect features inside the image.  Excluding points in the exclude list.
+	 *
+	 * @param input Image being processed.
+	 * @param exclude List of points that should not be returned.
+	 */
+	public void detect(T input, QueueCorner exclude ) {
 
 		initializeDerivatives(input);
 
@@ -105,19 +115,28 @@ public class EasyGeneralFeatureDetector<T extends ImageSingleBand, D extends Ima
 		if (detector.getRequiresHessian())
 			hessian.process(derivX, derivY, derivXX, derivYY, derivXY);
 
-		detector.setExcludedCorners(excludedCorners);
+		detector.setExclude(exclude);
 		detector.process(input, derivX, derivY, derivXX, derivYY, derivXY);
 	}
 
+	/**
+	 * Reshape derivative images to match the input image
+	 */
 	private void initializeDerivatives(T input) {
 		// reshape derivatives if the input image has changed size
-		derivX.reshape(input.width, input.height);
-		derivY.reshape(input.width, input.height);
+		if (detector.getRequiresGradient() || detector.getRequiresHessian()) {
+			derivX.reshape(input.width, input.height);
+			derivY.reshape(input.width, input.height);
+		}
 		if (detector.getRequiresHessian()) {
 			derivXX.reshape(input.width, input.height);
 			derivYY.reshape(input.width, input.height);
 			derivXY.reshape(input.width, input.height);
 		}
+	}
+
+	public GeneralFeatureDetector<T, D> getDetector() {
+		return detector;
 	}
 
 	public QueueCorner getFeatures() {

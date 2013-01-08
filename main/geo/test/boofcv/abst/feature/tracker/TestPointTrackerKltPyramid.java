@@ -18,19 +18,22 @@
 
 package boofcv.abst.feature.tracker;
 
+import boofcv.abst.feature.detect.extract.ConfigExtract;
 import boofcv.alg.misc.GImageMiscOps;
+import boofcv.alg.tracker.klt.KltFeature;
 import boofcv.alg.tracker.klt.PyramidKltFeature;
 import boofcv.factory.feature.tracker.FactoryPointSequentialTracker;
 import boofcv.struct.image.ImageFloat32;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 
 /**
  * @author Peter Abeles
  */
-public class TestPointTrackerKltPyramid extends StandardImagePointTracker<ImageFloat32> {
+public class TestPointTrackerKltPyramid extends StandardPointTrackerSpawn<ImageFloat32> {
 
 	PkltConfig<ImageFloat32,ImageFloat32> config;
 
@@ -41,7 +44,7 @@ public class TestPointTrackerKltPyramid extends StandardImagePointTracker<ImageF
 	@Override
 	public PointTrackerSpawn<ImageFloat32> createTracker() {
 		config = PkltConfig.createDefault(ImageFloat32.class, ImageFloat32.class);
-		return FactoryPointSequentialTracker.klt(config,200,1000,3,1,1);
+		return FactoryPointSequentialTracker.klt(config,200,new ConfigExtract(3,1000),1,1);
 	}
 
 	/**
@@ -66,7 +69,7 @@ public class TestPointTrackerKltPyramid extends StandardImagePointTracker<ImageF
 
 		int difference = total - alg.active.size();
 		assertEquals(difference,alg.dropped.size());
-		assertEquals(0,alg.unused.size());
+		assertEquals(difference,alg.unused.size());
 	}
 
 	@Test
@@ -92,6 +95,8 @@ public class TestPointTrackerKltPyramid extends StandardImagePointTracker<ImageF
 		PointTrackerKltPyramid<ImageFloat32,ImageFloat32> alg =
 				(PointTrackerKltPyramid<ImageFloat32,ImageFloat32>)createTracker();
 
+		assertEquals(0,alg.unused.size());
+
 		alg.process(image);
 		alg.spawnTracks();
 
@@ -103,11 +108,26 @@ public class TestPointTrackerKltPyramid extends StandardImagePointTracker<ImageF
 		alg.dropTrack((PointTrack)f.cookie);
 
 		assertEquals( before-1, alg.active.size());
-		assertEquals(0,alg.unused.size());
+		assertEquals(1,alg.unused.size());
 	}
 
 	@Test
 	public void addTrack() {
-		fail("Implement");
+		PointTrackerKltPyramid<ImageFloat32,ImageFloat32> alg =
+				(PointTrackerKltPyramid<ImageFloat32,ImageFloat32>)createTracker();
+
+		alg.process(image);
+		PointTrack track = alg.addTrack(10,20.5);
+		assertTrue(track != null );
+		assertEquals(10,track.x,1e-5);
+		assertEquals(20.5,track.y,1e-5);
+
+		PyramidKltFeature desc = track.getDescription();
+		assertEquals(10,desc.x,1e-5);
+		assertEquals(20.5,desc.y,1e-5);
+
+		for(KltFeature f : desc.desc ) {
+			assertTrue(f.Gxx != 0 );
+		}
 	}
 }

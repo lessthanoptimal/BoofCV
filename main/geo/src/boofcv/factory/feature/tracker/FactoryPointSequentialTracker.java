@@ -25,8 +25,8 @@ import boofcv.abst.feature.describe.WrapDescribeBrief;
 import boofcv.abst.feature.describe.WrapDescribePixelRegionNCC;
 import boofcv.abst.feature.detdesc.DetectDescribeFusion;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
+import boofcv.abst.feature.detect.extract.ConfigExtract;
 import boofcv.abst.feature.detect.interest.ConfigFastHessian;
-import boofcv.abst.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.abst.feature.detect.interest.InterestPointDetector;
 import boofcv.abst.feature.orientation.ConfigAverageIntegral;
 import boofcv.abst.feature.orientation.ConfigSlidingIntegral;
@@ -40,6 +40,7 @@ import boofcv.alg.feature.describe.DescribePointPixelRegionNCC;
 import boofcv.alg.feature.describe.DescribePointSurf;
 import boofcv.alg.feature.describe.brief.FactoryBriefDefinition;
 import boofcv.alg.feature.detect.intensity.GradientCornerIntensity;
+import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.alg.interpolate.InterpolateRectangle;
 import boofcv.alg.tracker.combined.CombinedTrackerScalePoint;
@@ -80,9 +81,8 @@ public class FactoryPointSequentialTracker {
 	 *
 	 * @param maxFeatures   Maximum number of features it can detect/track. Try 200 initially.
 	 * @param scaling       Scales in the image pyramid. Recommend [1,2,4] or [2,4]
-	 * @param detectThreshold Minimum allowed feature detection intensity.  Tune. Start at 1.
+	 * @param configExtract Configuration for extracting features
 	 * @param featureRadius Size of the tracked feature.  Try 3 or 5
-	 * @param extractRadius How close together features are detected.  Try 2
 	 * @param spawnSubW     Forces a more even distribution of features.  Width.  Try 2
 	 * @param spawnSubH     Forces a more even distribution of features.  Height.  Try 3
 	 * @param imageType     Input image type.
@@ -90,14 +90,14 @@ public class FactoryPointSequentialTracker {
 	 * @return KLT based tracker.
 	 */
 	public static <I extends ImageSingleBand, D extends ImageSingleBand>
-	PointTrackerSpawn<I> klt(int maxFeatures, double detectThreshold, int scaling[], int featureRadius, int extractRadius ,
+	PointTrackerSpawn<I> klt(int maxFeatures, int scaling[], ConfigExtract configExtract, int featureRadius,
 							 int spawnSubW, int spawnSubH, Class<I> imageType, Class<D> derivType) {
 		PkltConfig<I, D> config =
 				PkltConfig.createDefault(imageType, derivType);
 		config.pyramidScaling = scaling;
 		config.featureRadius = featureRadius;
 
-		return klt(config,maxFeatures,detectThreshold,extractRadius,spawnSubW,spawnSubH);
+		return klt(config,maxFeatures,configExtract,spawnSubW,spawnSubH);
 	}
 
 	/**
@@ -107,17 +107,15 @@ public class FactoryPointSequentialTracker {
 	 *
 	 * @param config Config for the tracker. Try PkltConfig.createDefault().
 	 * @param maxFeatures Maximum number of features that will be detected.  -1 for no limit.
-	 * @param detectThreshold Minimum allowed feature detection intensity.  Tune. Start at 1.
-	 * @param extractRadius How close together two features can be.  Try 2
+	 * @param configExtract Configuration for extracting features
 	 * @param spawnSubW Forces a more even distribution of features.  Width.  Try 2
 	 * @param spawnSubH Forces a more even distribution of features.  Height.  Try 3
 	 * @return KLT based tracker.
 	 */
 	public static <I extends ImageSingleBand, D extends ImageSingleBand>
-	PointTrackerSpawn<I> klt(PkltConfig<I, D> config, int maxFeatures , double detectThreshold , int extractRadius , int spawnSubW, int spawnSubH) {
+	PointTrackerSpawn<I> klt(PkltConfig<I, D> config, int maxFeatures , ConfigExtract configExtract , int spawnSubW, int spawnSubH) {
 
-		GeneralFeatureDetector<I, D> detector = createShiTomasi(maxFeatures, extractRadius,
-				(float) detectThreshold, config.typeDeriv);
+		GeneralFeatureDetector<I, D> detector = createShiTomasi(configExtract,maxFeatures, config.typeDeriv);
 		detector.setRegions(spawnSubW, spawnSubH);
 
 		InterpolateRectangle<I> interpInput = FactoryInterpolation.<I>bilinearRectangle(config.typeInput);
@@ -228,15 +226,13 @@ public class FactoryPointSequentialTracker {
 	 *
 	 * @param maxFeatures         Maximum number of features it will track.
 	 * @param maxAssociationError Maximum allowed association error.  Try 200.
-	 * @param extractRadius How close together two features can be.  Try 2
-	 * @param detectThreshold     Tolerance for detecting corner features.  Tune. Start at 1.
+	 * @param configExtract Configuration for extracting features
 	 * @param imageType           Type of image being processed.
 	 * @param derivType Type of image used to store the image derivative. null == use default
 	 */
 	public static <I extends ImageSingleBand, D extends ImageSingleBand>
 	PointTrackerSpawn<I> dda_ST_BRIEF(int maxFeatures, int maxAssociationError,
-									  int extractRadius,
-									  float detectThreshold,
+									  ConfigExtract configExtract,
 									  Class<I> imageType, Class<D> derivType)
 	{
 		if( derivType == null )
@@ -245,7 +241,7 @@ public class FactoryPointSequentialTracker {
 		DescribePointBrief<I> brief = FactoryDescribePointAlgs.brief(FactoryBriefDefinition.gaussian2(new Random(123), 16, 512),
 				FactoryBlurFilter.gaussian(imageType, 0, 4));
 
-		GeneralFeatureDetector<I, D> corner = createShiTomasi(maxFeatures, extractRadius, detectThreshold, derivType);
+		GeneralFeatureDetector<I, D> corner = createShiTomasi(configExtract, maxFeatures, derivType);
 
 		InterestPointDetector<I> detector = FactoryInterestPoint.wrapPoint(corner,1, imageType, derivType);
 		ScoreAssociateHamming_B score = new ScoreAssociateHamming_B();
@@ -309,14 +305,12 @@ public class FactoryPointSequentialTracker {
 	 * @see DetectAssociateTracker
 	 *
 	 * @param maxFeatures    Maximum number of features it will track.
-	 * @param extractRadius How close together two features can be.  Try 2
+	 * @param configExtract Configuration for extracting features
 	 * @param describeRadius Radius of the region being described.  Try 2.
-	 * @param detectThreshold  Tolerance for detecting corner features.  Tune. Start at 1.
 	 * @param imageType      Type of image being processed.
 	 * @param derivType      Type of image used to store the image derivative. null == use default     */
 	public static <I extends ImageSingleBand, D extends ImageSingleBand>
-	PointTrackerSpawn<I> dda_ST_NCC(int maxFeatures, int extractRadius, int describeRadius,
-									float detectThreshold,
+	PointTrackerSpawn<I> dda_ST_NCC(int maxFeatures, ConfigExtract configExtract, int describeRadius,
 									Class<I> imageType, Class<D> derivType) {
 
 		if( derivType == null )
@@ -326,7 +320,7 @@ public class FactoryPointSequentialTracker {
 
 		DescribePointPixelRegionNCC<I> alg = FactoryDescribePointAlgs.pixelRegionNCC(w, w, imageType);
 
-		GeneralFeatureDetector<I, D> corner = createShiTomasi(maxFeatures, extractRadius, detectThreshold, derivType);
+		GeneralFeatureDetector<I, D> corner = createShiTomasi(configExtract, maxFeatures, derivType);
 
 		InterestPointDetector<I> detector = FactoryInterestPoint.wrapPoint(corner,1, imageType, derivType);
 		ScoreAssociateNccFeature score = new ScoreAssociateNccFeature();
@@ -420,8 +414,7 @@ public class FactoryPointSequentialTracker {
 	 *
 	 * @param maxMatches     The maximum number of matched features that will be considered.
 	 *                       Set to a value <= 0 to not bound the number of matches.
-	 * @param extractRadius How close together two features can be.  Try 2
-	 * @param detectThreshold Tolerance for detecting corner features.  Tune. Start at 1.
+	 * @param configExtract Configuration for extracting features
 	 * @param trackRadius Size of feature being tracked by KLT
 	 * @param pyramidScalingKlt Image pyramid used for KLT
 	 * @param reactivateThreshold Tracks are reactivated after this many have been dropped.  Try 10% of maxMatches
@@ -434,8 +427,7 @@ public class FactoryPointSequentialTracker {
 	 */
 	public static <I extends ImageSingleBand, D extends ImageSingleBand>
 	PointTrackerSpawn<I> combined_ST_SURF_KLT(int maxMatches,
-											  int extractRadius,
-											  float detectThreshold,
+											  ConfigExtract configExtract,
 											  int trackRadius,
 											  int[] pyramidScalingKlt ,
 											  int reactivateThreshold ,
@@ -447,7 +439,7 @@ public class FactoryPointSequentialTracker {
 		if( derivType == null )
 			derivType = GImageDerivativeOps.getDerivativeType(imageType);
 
-		GeneralFeatureDetector<I, D> corner = createShiTomasi(maxMatches, extractRadius, detectThreshold, derivType);
+		GeneralFeatureDetector<I, D> corner = createShiTomasi(configExtract, maxMatches, derivType);
 		InterestPointDetector<I> detector = FactoryInterestPoint.wrapPoint(corner, 1, imageType, derivType);
 
 		DescribeRegionPoint<I,SurfFeature> regionDesc
@@ -537,12 +529,12 @@ public class FactoryPointSequentialTracker {
 	 * be set to true, but because this is so small, it is set to false
 	 */
 	public static <I extends ImageSingleBand, D extends ImageSingleBand>
-	GeneralFeatureDetector<I, D> createShiTomasi(int maxMatches, int extractRadius, float detectThreshold,
+	GeneralFeatureDetector<I, D> createShiTomasi(ConfigExtract config ,
+												 int maxFeatures,
 												 Class<D> derivType)
 	{
 		GradientCornerIntensity<D> cornerIntensity = FactoryIntensityPointAlg.shiTomasi(1, false, derivType);
 
-		return FactoryDetectPoint.createGeneral(cornerIntensity, extractRadius,
-				detectThreshold, maxMatches);
+		return FactoryDetectPoint.createGeneral(cornerIntensity, config, maxFeatures );
 	}
 }

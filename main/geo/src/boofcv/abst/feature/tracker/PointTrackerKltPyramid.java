@@ -18,8 +18,8 @@
 
 package boofcv.abst.feature.tracker;
 
-import boofcv.abst.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.abst.filter.derivative.ImageGradient;
+import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.alg.interpolate.InterpolateRectangle;
 import boofcv.alg.tracker.klt.KltTrackFault;
 import boofcv.alg.tracker.klt.KltTracker;
@@ -141,6 +141,7 @@ public class PointTrackerKltPyramid<I extends ImageSingleBand,D extends ImageSin
 		tracker.setDescription(t);
 
 		PointTrack p = (PointTrack)t.cookie;
+		p.set(x,y);
 
 		if( checkValidSpawn(p) ) {
 			active.add(t);
@@ -165,8 +166,7 @@ public class PointTrackerKltPyramid<I extends ImageSingleBand,D extends ImageSin
 		}
 
 		// find new tracks, but no more than the max
-		detector.setExcludedCorners(excludeList);
-		detector.setMaxFeatures(excludeList.size() + unused.size());
+		detector.setExclude(excludeList);
 		detector.process(basePyramid.getLayer(0), derivX.getLayer(0), derivY.getLayer(0), null, null, null);
 
 		// extract the features

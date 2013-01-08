@@ -18,6 +18,7 @@
 
 package boofcv.abst.feature.interest;
 
+import boofcv.abst.feature.detect.extract.ConfigExtract;
 import boofcv.abst.feature.detect.extract.FeatureExtractor;
 import boofcv.abst.feature.detect.interest.WrapFHtoInterestPoint;
 import boofcv.alg.feature.detect.interest.FastHessianFeatureDetector;
@@ -32,7 +33,7 @@ import org.junit.Test;
 public class TestWrapFHtoInterestPoint {
 
 	// some reasonable input algorithms
-	FeatureExtractor extractor = FactoryFeatureExtractor.nonmax(2, 1, 5, true);
+	FeatureExtractor extractor = FactoryFeatureExtractor.nonmax(new ConfigExtract(2, 1, 5, true));
 	FastHessianFeatureDetector detector = new FastHessianFeatureDetector(extractor,150,
 			1,9, 4,4);
 

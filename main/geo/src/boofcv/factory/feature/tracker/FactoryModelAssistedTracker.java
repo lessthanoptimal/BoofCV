@@ -18,10 +18,11 @@
 
 package boofcv.factory.feature.tracker;
 
-import boofcv.abst.feature.detect.interest.GeneralFeatureDetector;
+import boofcv.abst.feature.detect.extract.ConfigExtract;
 import boofcv.abst.feature.tracker.ModelAssistedTracker;
 import boofcv.abst.feature.tracker.PkltConfig;
 import boofcv.abst.filter.derivative.ImageGradient;
+import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.alg.feature.tracker.AssistedPyramidKltTracker;
 import boofcv.alg.interpolate.InterpolateRectangle;
 import boofcv.factory.filter.derivative.FactoryDerivative;
@@ -43,9 +44,8 @@ public class FactoryModelAssistedTracker {
 	 *
 	 * @param maxFeatures   Maximum number of features it can detect/track. Try 200 initially.
 	 * @param scaling       Scales in the image pyramid. Recommend [1,2,4] or [2,4]
-	 * @param detectThreshold Minimum allowed feature detection intensity.  Tune. Start at 1.
 	 * @param featureRadius Size of the tracked feature.  Try 3 or 5
-	 * @param extractRadius How close together features are detected.  Try 2
+	 * @param configExtract Configuration for extracting features
 	 * @param spawnSubW     Forces a more even distribution of features.  Width.  Try 2
 	 * @param spawnSubH     Forces a more even distribution of features.  Height.  Try 3
 	 * @param imageType     Input image type.
@@ -53,8 +53,9 @@ public class FactoryModelAssistedTracker {
 	 * @return KLT based tracker.
 	 */
 	public static <I extends ImageSingleBand, D extends ImageSingleBand,Model,Info>
-	ModelAssistedTracker<I,Model,Info> klt(int maxFeatures, double detectThreshold, int scaling[], int featureRadius,
-										   int extractRadius , int spawnSubW, int spawnSubH,
+	ModelAssistedTracker<I,Model,Info> klt(int maxFeatures, int scaling[],
+										   int featureRadius,
+										   ConfigExtract configExtract , int spawnSubW, int spawnSubH,
 										   ModelMatcher<Model, Info> matcherInitial,
 										   ModelMatcher<Model, Info> matcherFinal,
 										   ModelFitter<Model, Info> modelRefiner,
@@ -64,8 +65,8 @@ public class FactoryModelAssistedTracker {
 		config.pyramidScaling = scaling;
 		config.featureRadius = featureRadius;
 
-		GeneralFeatureDetector<I, D> detector = FactoryPointSequentialTracker.createShiTomasi(maxFeatures, extractRadius,
-				(float) detectThreshold, config.typeDeriv);
+		GeneralFeatureDetector<I, D> detector =
+				FactoryPointSequentialTracker.createShiTomasi(configExtract,maxFeatures, config.typeDeriv);
 		detector.setRegions(spawnSubW, spawnSubH);
 
 		InterpolateRectangle<I> interpInput = FactoryInterpolation.<I>bilinearRectangle(config.typeInput);

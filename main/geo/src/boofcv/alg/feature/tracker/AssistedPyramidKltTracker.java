@@ -18,9 +18,9 @@
 
 package boofcv.alg.feature.tracker;
 
-import boofcv.abst.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.abst.feature.tracker.*;
 import boofcv.abst.filter.derivative.ImageGradient;
+import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.alg.interpolate.InterpolateRectangle;
 import boofcv.alg.tracker.klt.KltTrackFault;
 import boofcv.alg.tracker.klt.PyramidKltFeature;

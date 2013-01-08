@@ -19,6 +19,7 @@
 package boofcv.examples;
 
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
+import boofcv.abst.feature.detect.extract.ConfigExtract;
 import boofcv.abst.feature.detect.extract.FeatureExtractor;
 import boofcv.abst.feature.detect.interest.ConfigFastHessian;
 import boofcv.abst.feature.orientation.OrientationIntegral;
@@ -77,7 +78,8 @@ public class ExampleFeatureSurf {
 		Class<II> integralType = GIntegralImageOps.getIntegralType(ImageFloat32.class);
 		
 		// define the feature detection algorithm
-		FeatureExtractor extractor = FactoryFeatureExtractor.nonmax(2, 0, 5, true);
+		FeatureExtractor extractor =
+				FactoryFeatureExtractor.nonmax(new ConfigExtract(2, 0, 5, true));
 		FastHessianFeatureDetector<II> detector = 
 				new FastHessianFeatureDetector<II>(extractor,200,2, 9,4,4);
 

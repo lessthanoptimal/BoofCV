@@ -18,12 +18,13 @@
 
 package boofcv.factory.feature.detect.extract;
 
+import boofcv.abst.feature.detect.extract.ConfigExtract;
 import boofcv.abst.feature.detect.extract.FeatureExtractor;
 import boofcv.abst.feature.detect.extract.WrapperNonMaxCandidate;
 import boofcv.abst.feature.detect.extract.WrapperNonMaximumBlock;
 import boofcv.abst.feature.detect.intensity.GeneralFeatureIntensity;
-import boofcv.abst.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.alg.feature.detect.extract.*;
+import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.struct.image.ImageSingleBand;
 
 /**
@@ -57,27 +58,25 @@ public class FactoryFeatureExtractor {
 	/**
 	 * Standard non-max feature extractor.
 	 *
-	 * @param searchRadius  Radius of the non-maximum region.
-	 * @param threshold     Minimum feature intensity it will consider
-	 * @param ignoreBorder  Size of border around the image in which pixels are not considered.
-	 * @param useStrictRule Is a strict test used to test for local maximums.
+	 * @param config Configuration for extractor
 	 * @return A feature extractor.
 	 */
-	public static FeatureExtractor nonmax(int searchRadius,
-										  float threshold,
-										  int ignoreBorder,
-										  boolean useStrictRule) {
+	public static FeatureExtractor nonmax( ConfigExtract config ) {
+
+		if( config == null )
+			config = new ConfigExtract();
+		config.checkValidity();
 
 		NonMaxBlock ret;
-		if (useStrictRule) {
+		if (config.useStrictRule) {
 			ret = new NonMaxBlockStrict();
 		} else {
 			ret = new NonMaxBlockRelaxed();
 		}
 
-		ret.setSearchRadius(searchRadius);
-		ret.setThreshold(threshold);
-		ret.setBorder(ignoreBorder);
+		ret.setSearchRadius(config.radius);
+		ret.setThreshold(config.threshold);
+		ret.setBorder(config.ignoreBorder);
 
 		return new WrapperNonMaximumBlock(ret);
 	}
@@ -85,20 +84,23 @@ public class FactoryFeatureExtractor {
 	/**
 	 * Non-max feature extractor which saves a candidate list of all the found local maximums..
 	 *
-	 * @param searchRadius  Minimum separation between found features.
-	 * @param threshold     Minimum feature intensity it will consider
-	 * @param ignoreBorder  Size of border around the image in which pixels are not considered.
-	 * @param useStrictRule Is a strict test used to test for local maximums.
+	 * @param config Configuration for extractor
 	 * @return A feature extractor.
 	 */
-	public static FeatureExtractor nonmaxCandidate(int searchRadius, float threshold,
-												   int ignoreBorder, boolean useStrictRule) {
+	public static FeatureExtractor nonmaxCandidate(ConfigExtract config ) {
+
+		if( config == null )
+			config = new ConfigExtract();
+		config.checkValidity();
+
 		WrapperNonMaxCandidate ret;
 
-		if (useStrictRule)
-			ret = new WrapperNonMaxCandidate(new NonMaxCandidateStrict(searchRadius, threshold, ignoreBorder));
+		if (config.useStrictRule)
+			ret = new WrapperNonMaxCandidate(
+					new NonMaxCandidateStrict(config.radius, config.threshold, config.ignoreBorder));
 		else
-			ret = new WrapperNonMaxCandidate(new NonMaxCandidateRelaxed(searchRadius, threshold, ignoreBorder));
+			ret = new WrapperNonMaxCandidate(
+					new NonMaxCandidateRelaxed(config.radius, config.threshold, config.ignoreBorder));
 
 		return ret;
 	}

@@ -18,6 +18,7 @@
 
 package boofcv.alg.feature.line;
 
+import boofcv.abst.feature.detect.extract.ConfigExtract;
 import boofcv.abst.feature.detect.extract.FeatureExtractor;
 import boofcv.alg.feature.detect.line.HoughTransformLineFootOfNorm;
 import boofcv.core.image.GeneralizedImageOps;
@@ -57,7 +58,7 @@ public class TestHoughTransformLineFootOfNorm {
 			GeneralizedImageOps.set(derivX,5,i,20);
 		}
 
-		FeatureExtractor extractor = FactoryFeatureExtractor.nonmax(4, 2, 0, true);
+		FeatureExtractor extractor = FactoryFeatureExtractor.nonmax(new ConfigExtract(4, 2, 0, true));
 		HoughTransformLineFootOfNorm alg = new HoughTransformLineFootOfNorm(extractor,2);
 
 		alg.transform(derivX,derivY,binary);

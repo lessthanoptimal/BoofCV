@@ -18,12 +18,12 @@
 
 package boofcv.alg.sfm.d3;
 
-import boofcv.abst.feature.detect.interest.EasyGeneralFeatureDetector;
-import boofcv.abst.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.abst.feature.disparity.StereoDisparitySparse;
 import boofcv.abst.feature.tracker.PointTrack;
 import boofcv.abst.feature.tracker.PointTrackerUser;
 import boofcv.alg.distort.LensDistortionOps;
+import boofcv.alg.feature.detect.interest.EasyGeneralFeatureDetector;
+import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.alg.geo.RectifyImageOps;
 import boofcv.alg.sfm.StereoProcessingBase;
 import boofcv.struct.QueueCorner;
