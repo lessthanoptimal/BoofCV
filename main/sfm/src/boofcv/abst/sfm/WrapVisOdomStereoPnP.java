@@ -20,14 +20,15 @@ package boofcv.abst.sfm;
 
 import boofcv.abst.feature.tracker.PointTrack;
 import boofcv.alg.geo.DistanceModelMonoPixels;
-import boofcv.alg.sfm.d3.Stereo2D3D;
+import boofcv.alg.geo.pose.PnPStereoDistanceReprojectionSq;
+import boofcv.alg.geo.pose.PnPStereoEstimator;
+import boofcv.alg.geo.pose.RefinePnPStereo;
 import boofcv.alg.sfm.d3.VisOdomStereoPnP;
-import boofcv.alg.sfm.robust.PnPDistanceStereoReprojectionSq;
-import boofcv.alg.sfm.robust.PnPStereoEstimator;
 import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.geo.Point2D3D;
 import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.sfm.Stereo2D3D;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
@@ -44,9 +45,10 @@ import java.util.List;
 public class WrapVisOdomStereoPnP<T extends ImageSingleBand>
 		implements StereoVisualOdometry<T>, AccessPointTracks3D
 {
+	RefinePnPStereo refine;
 	PnPStereoEstimator pnp;
 	DistanceModelMonoPixels<Se3_F64,Point2D3D> distanceMono;
-	PnPDistanceStereoReprojectionSq distanceStereo;
+	PnPStereoDistanceReprojectionSq distanceStereo;
 
 	VisOdomStereoPnP<T,?> alg;
 
@@ -56,13 +58,15 @@ public class WrapVisOdomStereoPnP<T extends ImageSingleBand>
 
 	public WrapVisOdomStereoPnP(PnPStereoEstimator pnp,
 								DistanceModelMonoPixels<Se3_F64, Point2D3D> distanceMono,
-								PnPDistanceStereoReprojectionSq distanceStereo,
+								PnPStereoDistanceReprojectionSq distanceStereo,
 								VisOdomStereoPnP<T,?> alg ,
+								RefinePnPStereo refine ,
 								Class<T> imageType ) {
 		this.pnp = pnp;
 		this.distanceMono = distanceMono;
 		this.distanceStereo = distanceStereo;
 		this.alg = alg;
+		this.refine = refine;
 		this.imageType = imageType;
 	}
 
@@ -110,7 +114,12 @@ public class WrapVisOdomStereoPnP<T extends ImageSingleBand>
 
 	@Override
 	public void setCalibration(StereoParameters parameters) {
-		pnp.setLeftToRight(parameters.getRightToLeft().invert(null));
+
+		Se3_F64 leftToRight = parameters.getRightToLeft().invert(null);
+
+		pnp.setLeftToRight(leftToRight);
+		if( refine != null )
+			refine.setLeftToRight(leftToRight);
 		alg.setCalibration(parameters);
 
 		IntrinsicParameters left = parameters.left;

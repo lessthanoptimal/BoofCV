@@ -338,7 +338,7 @@ public class VisualizeStereoVisualOdometryApp <I extends ImageSingleBand>
 			PointTrackerUser<I> trackerLeft = FactoryPointSequentialTracker.klt(config);
 			PointTrackerUser<I> trackerRight = FactoryPointSequentialTracker.klt(config);
 
-			return FactoryVisualOdometry.stereoFullPnP(thresholdAdd, thresholdRetire,1.5,200,disparity,
+			return FactoryVisualOdometry.stereoFullPnP(thresholdAdd, thresholdRetire,1.5,200,50,disparity,
 					detector,trackerLeft,trackerRight, imageType);
 		} else {
 			throw new RuntimeException("Unknown selection");

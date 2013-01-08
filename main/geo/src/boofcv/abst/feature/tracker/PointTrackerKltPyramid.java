@@ -92,12 +92,22 @@ public class PointTrackerKltPyramid<I extends ImageSingleBand,D extends ImageSin
 								  ImageGradient<I, D> gradient,
 								  InterpolateRectangle<I> interpInput,
 								  InterpolateRectangle<D> interpDeriv) {
+		this(config,inputPyramidUpdater,gradient,interpInput,interpDeriv);
+
 		if( detector.getRequiresHessian() )
 			throw new IllegalArgumentException("Hessian based feature detectors not yet supported");
 
+		this.detector = detector;
+	}
+
+	public PointTrackerKltPyramid(PkltConfig<I, D> config,
+								  PyramidUpdaterDiscrete<I> inputPyramidUpdater,
+								  ImageGradient<I, D> gradient,
+								  InterpolateRectangle<I> interpInput,
+								  InterpolateRectangle<D> interpDeriv) {
+
 		this.config = config;
 		this.gradient = gradient;
-		this.detector = detector;
 		this.inputPyramidUpdater = inputPyramidUpdater;
 
 		KltTracker<I, D> klt = new KltTracker<I, D>(interpInput, interpDeriv, config.config);

@@ -19,30 +19,23 @@
 package boofcv.alg.geo.pose;
 
 import boofcv.abst.geo.optimization.ResidualsCodecToMatrix;
-import boofcv.alg.geo.PerspectiveOps;
-import boofcv.struct.geo.Point2D3D;
+import boofcv.struct.sfm.Stereo2D3D;
+import boofcv.struct.sfm.StereoPose;
 import georegression.geometry.RotationMatrixGenerator;
 import georegression.struct.se.Se3_F64;
 import org.ddogleg.optimization.JacobianChecker;
 import org.junit.Test;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
 
 import static org.junit.Assert.assertTrue;
 
 /**
  * @author Peter Abeles
  */
-public class TestPnPJacobianRodrigues {
+public class TestPnPStereoJacobianRodrigues extends CommonStereoMotionNPoint {
 
-	Random rand = new Random(48854);
 	int numPoints = 3;
 
-	PnPRodriguesCodec codec = new PnPRodriguesCodec();
-	ResidualsCodecToMatrix<Se3_F64,Point2D3D> func =
-			new ResidualsCodecToMatrix<Se3_F64,Point2D3D>(codec,new PnPResidualReprojection(), new Se3_F64());
+	Se3ToStereoPoseCodec codec = new Se3ToStereoPoseCodec(new PnPRodriguesCodec());
 
 	/**
 	 * Compare to numerical differentiation
@@ -55,35 +48,31 @@ public class TestPnPJacobianRodrigues {
 
 	private void compareToNumerical(double noise) {
 
-		Se3_F64 worldToCamera = new Se3_F64();
-		RotationMatrixGenerator.eulerXYZ(0.1, 1, -0.2, worldToCamera.getR());
-		worldToCamera.getT().set(-0.3,0.4,1);
+		Se3_F64 worldToLeft = new Se3_F64();
+		RotationMatrixGenerator.eulerXYZ(0.1, 1, -0.2, worldToLeft.getR());
+		worldToLeft.getT().set(-0.3,0.4,1);
 
-		List<Point2D3D> observations = new ArrayList<Point2D3D>();
+		generateScene(numPoints,worldToLeft,false);
+		addNoise(noise);
 
-		for( int i = 0; i < numPoints; i++ ) {
-			Point2D3D p = new Point2D3D();
 
-			p.location.set( rand.nextGaussian()*0.1,
-					rand.nextGaussian()*0.2 , 3 + rand.nextGaussian() );
+		PnPStereoJacobianRodrigues alg = new PnPStereoJacobianRodrigues();
+		alg.setLeftToRight(leftToRight);
+		alg.setObservations(pointPose);
 
-			p.observation = PerspectiveOps.renderPixel(worldToCamera, null, p.location);
+		StereoPose storage = new StereoPose(new Se3_F64(),leftToRight);
+		ResidualsCodecToMatrix<StereoPose,Stereo2D3D> func =
+				new ResidualsCodecToMatrix<StereoPose,Stereo2D3D>
+						(codec,new PnPStereoResidualReprojection(),storage);
 
-			p.observation.x += rand.nextGaussian()*noise;
-			p.observation.y += rand.nextGaussian()*noise;
+		func.setObservations(pointPose);
 
-			observations.add(p);
-		}
-
-		PnPJacobianRodrigues alg = new PnPJacobianRodrigues();
-		alg.setObservations(observations);
-		func.setObservations(observations);
-
+		StereoPose pose = new StereoPose(worldToLeft,leftToRight);
 		double []param = new double[ codec.getParamLength() ];
 
-		codec.encode(worldToCamera,param);
+		codec.encode(pose,param);
 
-//		JacobianChecker.jacobianPrint(func, alg, param, 1e-6);
+//		JacobianChecker.jacobianPrint(func,alg,param,1e-6);
 		assertTrue(JacobianChecker.jacobian(func, alg, param, 1e-6));
 	}
 }

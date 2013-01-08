@@ -16,11 +16,14 @@
  * limitations under the License.
  */
 
-package boofcv.alg.sfm.robust;
+package boofcv.alg.geo.pose;
 
 import boofcv.alg.geo.GeoTestingOps;
 import boofcv.alg.geo.h.CommonHomographyChecks;
-import boofcv.alg.sfm.d3.Stereo2D3D;
+import boofcv.struct.calib.IntrinsicParameters;
+import boofcv.struct.calib.StereoParameters;
+import boofcv.struct.sfm.Stereo2D3D;
+import georegression.geometry.RotationMatrixGenerator;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
@@ -39,6 +42,8 @@ public class CommonStereoMotionNPoint {
 	// the true motion
 	protected Se3_F64 worldToLeft;
 	protected Se3_F64 leftToRight;
+	protected Se3_F64 worldToRight;
+
 
 	// list of points in world reference frame
 	protected List<Point3D_F64> worldPts;
@@ -48,10 +53,34 @@ public class CommonStereoMotionNPoint {
 	// list of point pairs
 	protected List<Stereo2D3D> pointPose;
 
-	protected void generateScene(int N, Se3_F64 worldToLeft, boolean planar) {
-		this.worldToLeft = worldToLeft;
+	protected StereoParameters param;
+
+	public CommonStereoMotionNPoint() {
 		leftToRight = new Se3_F64();
-		leftToRight.getT().set(-0.1,0,0);
+		RotationMatrixGenerator.eulerXYZ(0.01,-0.001,0.005,leftToRight.getR());
+		leftToRight.getT().set(-0.1,0.02,-0.03);
+
+		param = new StereoParameters();
+		param.rightToLeft = leftToRight.invert(null);
+
+		param.left = new IntrinsicParameters(400,500,0.1,160,120,320,240,false,new double[]{0,0});
+		param.right = new IntrinsicParameters(380,505,0.05,165,115,320,240,false,new double[]{0,0});
+
+		worldToLeft = new Se3_F64();
+		RotationMatrixGenerator.eulerXYZ(0.01, 0.04, -0.05, worldToLeft.getR());
+		worldToLeft.getT().set(0.1,-0.1,0.2);
+
+		worldToRight = worldToLeft.concat(leftToRight,null);
+	}
+
+	protected void generateScene(int N, Se3_F64 worldToLeft, boolean planar) {
+		if( worldToLeft == null ) {
+			this.worldToLeft = worldToLeft = new Se3_F64();
+			RotationMatrixGenerator.eulerXYZ(0.1, 1, -0.2, worldToLeft.getR());
+			worldToLeft.getT().set(-0.3,0.4,1);
+		} else {
+			this.worldToLeft = worldToLeft;
+		}
 
 		// randomly generate points in space
 		if( planar ) {
@@ -76,6 +105,15 @@ public class CommonStereoMotionNPoint {
 
 			cameraLeftPts.add(leftPt);
 			cameraRightPts.add(rightPt);
+		}
+	}
+
+	public void addNoise( double sigma ) {
+		for( Stereo2D3D o : pointPose ) {
+			o.leftObs.x += rand.nextGaussian()*sigma;
+			o.leftObs.y += rand.nextGaussian()*sigma;
+			o.rightObs.x += rand.nextGaussian()*sigma;
+			o.rightObs.y += rand.nextGaussian()*sigma;
 		}
 	}
 }

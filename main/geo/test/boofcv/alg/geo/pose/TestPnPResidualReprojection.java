@@ -67,9 +67,4 @@ public class TestPnPResidualReprojection {
 		assertTrue(Math.abs(error[0]) > 1e-8);
 		assertTrue(Math.abs(error[1]) > 1e-8);
 	}
-
-	@Test
-	public void error() {
-
-	}
 }

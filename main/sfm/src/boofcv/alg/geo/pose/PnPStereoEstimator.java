@@ -16,13 +16,13 @@
  * limitations under the License.
  */
 
-package boofcv.alg.sfm.robust;
+package boofcv.alg.geo.pose;
 
-import boofcv.alg.sfm.d3.Stereo2D3D;
 import boofcv.struct.FastQueue;
 import boofcv.struct.geo.GeoModelEstimator1;
 import boofcv.struct.geo.GeoModelEstimatorN;
 import boofcv.struct.geo.Point2D3D;
+import boofcv.struct.sfm.Stereo2D3D;
 import georegression.struct.se.Se3_F64;
 import org.ddogleg.fitting.modelset.DistanceFromModel;
 

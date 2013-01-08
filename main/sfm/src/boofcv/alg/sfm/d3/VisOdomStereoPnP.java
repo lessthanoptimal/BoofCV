@@ -30,11 +30,13 @@ import boofcv.struct.QueueCorner;
 import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.distort.PointTransform_F64;
 import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.sfm.Stereo2D3D;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I16;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
+import org.ddogleg.fitting.modelset.ModelFitter;
 import org.ddogleg.fitting.modelset.ModelMatcher;
 import org.ejml.data.DenseMatrix64F;
 
@@ -46,7 +48,6 @@ import java.util.List;
  */
 // TODO add a second pass option
 // TODO add bundle adjustment
-// TODO add pose refinement
 // TODO Show right camera tracks in debugger
 public class VisOdomStereoPnP<T extends ImageSingleBand,D extends ImageSingleBand> {
 
@@ -74,7 +75,7 @@ public class VisOdomStereoPnP<T extends ImageSingleBand,D extends ImageSingleBan
 
 	// computes camera motion
 	private ModelMatcher<Se3_F64, Stereo2D3D> matcher;
-//	ModelFitter<Se3_F64, Stereo2D3D> modelRefiner; TODO add this later
+	private ModelFitter<Se3_F64, Stereo2D3D> modelRefiner;
 
 	// trackers for left and right cameras
 	private PointTrackerUser<T> trackerLeft;
@@ -109,6 +110,7 @@ public class VisOdomStereoPnP<T extends ImageSingleBand,D extends ImageSingleBan
 							GeneralFeatureDetector<T, D> detector,
 							PointTrackerUser<T> trackerLeft, PointTrackerUser<T> trackerRight,
 							ModelMatcher<Se3_F64, Stereo2D3D> matcher ,
+							ModelFitter<Se3_F64, Stereo2D3D> modelRefiner ,
 							StereoDisparitySparse<T> disparity,
 							Class<T> imageType )
 	{
@@ -119,6 +121,7 @@ public class VisOdomStereoPnP<T extends ImageSingleBand,D extends ImageSingleBan
 		this.trackerLeft = trackerLeft;
 		this.trackerRight = trackerRight;
 		this.matcher = matcher;
+		this.modelRefiner = modelRefiner;
 		this.disparity = disparity;
 
 		stereoIP = new StereoProcessingBase<T>(imageType);
@@ -166,6 +169,9 @@ public class VisOdomStereoPnP<T extends ImageSingleBand,D extends ImageSingleBan
 			dropUnusedTracks();
 			int N = matcher.getMatchSet().size();
 
+			if( modelRefiner != null )
+				refineMotionEstimate();
+
 			if( thresholdAdd <= 0 || N < thresholdAdd ) {
 				System.out.println("----------- Spawn Tracks --------------");
 				changePoseToReference();
@@ -175,6 +181,35 @@ public class VisOdomStereoPnP<T extends ImageSingleBand,D extends ImageSingleBan
 
 		tick++;
 		return true;
+	}
+
+	private void refineMotionEstimate() {
+
+		// use observations from the inlier set
+		List<Stereo2D3D> data = new ArrayList<Stereo2D3D>();
+
+		int N = matcher.getMatchSet().size();
+		for( int i = 0; i < N; i++ ) {
+			int index = matcher.getInputIndex(i);
+
+			PointTrack l = candidates.get(index);
+			LeftTrackInfo info = l.getCookie();
+			PointTrack r = info.right;
+
+			Stereo2D3D stereo = info.location;
+			// compute normalized image coordinate for track in left and right image
+			leftImageToNorm.compute(l.x,l.y,info.location.leftObs);
+			rightImageToNorm.compute(r.x,r.y,info.location.rightObs);
+
+			data.add(stereo);
+		}
+
+		// refine the motion estimate using non-linear optimization
+		Se3_F64 keyToCurr = currToKey.invert(null);
+		Se3_F64 found = new Se3_F64();
+		if( modelRefiner.fitModel(data,keyToCurr,found) ) {
+			found.invert(currToKey);
+		}
 	}
 
 	private void applyGeometryConstraints() {
