@@ -24,9 +24,8 @@ import java.util.List;
 
 /**
  * <p>
- * Base interface for tracking point features in image sequences and is intended for use in
- * Structure From Motion (SFM) application.  This interface does not specify how new tracks are created.  Once a track
- * has been created it is tracked from frame to frame.  Access is provided to the pixel location of each track.
+ * Interface for tracking point features in image sequences with automatic feature selection for use in
+ * Structure From Motion (SFM) application.  Access is provided to the pixel location of each track.
  * Implementation specific track information is hidden from the user.
  * </p>
  *
@@ -136,6 +135,15 @@ public interface PointTracker<T extends ImageBase> {
 	 */
 	public List<PointTrack> getNewTracks(List<PointTrack> list);
 
+
+	/**
+	 * Automatically selects new features in the image to track. Returned tracks must
+	 * be unique and not duplicates of any existing tracks.  This includes both active
+	 * and inactive tracks.
+	 *
+	 * NOTE: This function may or may not also modify the active and inactive lists.
+	 */
+	public void spawnTracks();
 
 }
 

@@ -44,8 +44,9 @@ import java.util.List;
  * @param <I> Input image type
  * @param <D> Image derivative type
  */
-public class VideoStabilizeSequentialPointApp<I extends ImageSingleBand, D extends ImageSingleBand, T extends InvertibleTransform<T>>
-		extends ImageMotionBaseApp<I,T>
+public class VideoStabilizeSequentialPointApp<I extends ImageSingleBand, D extends ImageSingleBand,
+		T extends InvertibleTransform<T>,Aux>
+		extends ImageMotionBaseApp<I,T,Aux>
 {
 	private int maxFeatures = 250;
 	private static int thresholdKeyFrame = 80;

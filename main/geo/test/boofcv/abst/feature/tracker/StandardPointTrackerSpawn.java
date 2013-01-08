@@ -34,13 +34,13 @@ import static org.junit.Assert.assertTrue;
 
 
 /**
- * Standard tests for implementations of {@link PointTrackerSpawn}.
+ * Standard tests for implementations of {@link PointTracker}.
  *
  * @author Peter Abeles
  */
 public abstract class StandardPointTrackerSpawn<T extends ImageSingleBand> {
 
-	public PointTrackerSpawn<T> tracker;
+	public PointTracker<T> tracker;
 	Random rand = new Random(234);
 	int width = 100;
 	int height = 80;
@@ -61,7 +61,7 @@ public abstract class StandardPointTrackerSpawn<T extends ImageSingleBand> {
 	/**
 	 * Creates a new tracker with the specified number of tracks initially.
 	 */
-	public abstract PointTrackerSpawn<T> createTracker();
+	public abstract PointTracker<T> createTracker();
 
 	/**
 	 * The cookie for tracks should not be set
@@ -141,7 +141,7 @@ public abstract class StandardPointTrackerSpawn<T extends ImageSingleBand> {
 
 		assertTrue(beforeAll > 0);
 		assertTrue(beforeActive>0);
-		assertTrue(tracker.getNewTracks(null).size() == 0 );
+		assertEquals(0, tracker.getNewTracks(null).size());
 
 		// Call spawn again.  There should be more tracks now
 		tracker.spawnTracks();

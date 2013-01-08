@@ -22,7 +22,7 @@ import boofcv.abst.feature.detect.extract.ConfigExtract;
 import boofcv.abst.feature.detect.interest.ConfigFastHessian;
 import boofcv.abst.feature.tracker.PkltConfig;
 import boofcv.abst.feature.tracker.PointTrack;
-import boofcv.abst.feature.tracker.PointTrackerSpawn;
+import boofcv.abst.feature.tracker.PointTracker;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.factory.feature.tracker.FactoryPointSequentialTracker;
 import boofcv.gui.feature.VisualizeFeatures;
@@ -43,7 +43,7 @@ import java.util.List;
 
 /**
  * <p>
- * Example of how to use the {@link boofcv.abst.feature.tracker.PointTrackerSpawn} to track different types of point features.
+ * Example of how to use the {@link boofcv.abst.feature.tracker.PointTracker} to track different types of point features.
  * ImagePointTracker hides much of the complexity involved in tracking point features and masks
  * the very different underlying structures used by these different trackers.  The default trackers
  * provided in BoofCV are general purpose trackers, that might not be the best tracker or utility
@@ -59,7 +59,7 @@ public class ExamplePointFeatureTracker< T extends ImageSingleBand, D extends Im
 	Class<D> derivType;
 
 	// tracks point features inside the image
-	PointTrackerSpawn<T> tracker;
+	PointTracker<T> tracker;
 
 	// displays the video sequence and tracked features
 	ImagePanel gui = new ImagePanel();

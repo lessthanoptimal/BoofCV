@@ -42,7 +42,7 @@ public class TestPointTrackerKltPyramid extends StandardPointTrackerSpawn<ImageF
 	}
 
 	@Override
-	public PointTrackerSpawn<ImageFloat32> createTracker() {
+	public PointTrackerAux<ImageFloat32,?> createTracker() {
 		config = PkltConfig.createDefault(ImageFloat32.class, ImageFloat32.class);
 		return FactoryPointSequentialTracker.klt(config,200,new ConfigExtract(3,1000),1,1);
 	}
@@ -117,7 +117,7 @@ public class TestPointTrackerKltPyramid extends StandardPointTrackerSpawn<ImageF
 				(PointTrackerKltPyramid<ImageFloat32,ImageFloat32>)createTracker();
 
 		alg.process(image);
-		PointTrack track = alg.addTrack(10,20.5);
+		PointTrack track = alg.addTrack(10,20.5,null);
 		assertTrue(track != null );
 		assertEquals(10,track.x,1e-5);
 		assertEquals(20.5,track.y,1e-5);

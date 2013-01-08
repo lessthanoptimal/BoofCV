@@ -42,7 +42,7 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class AssistedTrackerTwoPass<I extends ImageSingleBand,D extends TupleDesc,Model,Info>
-		extends DetectAssociateTracker<I,D>
+		extends DetectAssociateTracker<I,D,Object>
 		implements ModelAssistedTracker<I,Model,Info> {
 
 	TrackGeometryManager<Model,Info> manager;

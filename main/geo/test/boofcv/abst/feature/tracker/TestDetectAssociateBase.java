@@ -18,25 +18,17 @@
 
 package boofcv.abst.feature.tracker;
 
-import boofcv.struct.image.ImageBase;
+import org.junit.Test;
+
+import static org.junit.Assert.fail;
 
 /**
- * <p>
- * Point feature tracker that automatically selects and creates tracks upon request.
- * </p>
- *
  * @author Peter Abeles
  */
-public interface PointTrackerSpawn<T extends ImageBase> extends PointTracker<T> {
+public class TestDetectAssociateBase {
 
-	/**
-	 * Automatically selects new features in the image to track. Returned tracks must
-	 * be unique and not duplicates of any existing tracks.  This includes both active
-	 * and inactive tracks.
-	 *
-	 * NOTE: This function may or may not also modify the active and inactive lists.
-	 */
-	public void spawnTracks();
-
+	@Test
+	public void stuff() {
+		fail("implement");
+	}
 }
-

@@ -18,14 +18,17 @@
 
 package boofcv.alg.sfm.d3;
 
+import boofcv.abst.feature.associate.AssociateDescTo2D;
+import boofcv.abst.feature.associate.AssociateDescription2D;
+import boofcv.abst.feature.associate.ScoreAssociateHamming_B;
 import boofcv.abst.feature.describe.WrapDescribeBrief;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
 import boofcv.abst.feature.detect.extract.ConfigExtract;
 import boofcv.abst.feature.detect.interest.InterestPointDetector;
 import boofcv.abst.feature.disparity.StereoDisparitySparse;
 import boofcv.abst.feature.tracker.PkltConfig;
-import boofcv.abst.feature.tracker.PointTrackerSpawn;
-import boofcv.abst.feature.tracker.PointTrackerUser;
+import boofcv.abst.feature.tracker.PointTracker;
+import boofcv.abst.feature.tracker.PointTrackerAux;
 import boofcv.abst.sfm.AccessPointTracks3D;
 import boofcv.abst.sfm.ModelAssistedTrackerCalibrated;
 import boofcv.abst.sfm.StereoVisualOdometry;
@@ -34,6 +37,7 @@ import boofcv.alg.feature.describe.brief.FactoryBriefDefinition;
 import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.alg.geo.PerspectiveOps;
+import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.feature.describe.FactoryDescribePointAlgs;
 import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
 import boofcv.factory.feature.detect.interest.FactoryInterestPoint;
@@ -50,6 +54,7 @@ import boofcv.gui.image.ShowImages;
 import boofcv.io.PathLabel;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.struct.calib.IntrinsicParameters;
+import boofcv.struct.feature.TupleDesc_B;
 import boofcv.struct.geo.Point2D3D;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
@@ -98,6 +103,7 @@ public class VisualizeStereoVisualOdometryApp <I extends ImageSingleBand>
 		super(1, imageType);
 
 		addAlgorithm(0, "Stereo P3P - KLT", 3);
+		addAlgorithm(0, "Stereo P3P - ST-BRIEF", 4);
 		addAlgorithm(0, "Depth P3P - KLT", 0);
 		addAlgorithm(0, "Depth P3P - ST-BRIEF", 1);
 		addAlgorithm(0, "Depth P3P - ST-SURF-KLT", 2);
@@ -319,7 +325,7 @@ public class VisualizeStereoVisualOdometryApp <I extends ImageSingleBand>
 			thresholdAdd = 80;
 			thresholdRetire = 3;
 //			tracker = FactoryPointSequentialTracker.dda_FH_SURF(600, 200, 1, 2,imageType);
-			PointTrackerSpawn<I> tracker = FactoryPointSequentialTracker.
+			PointTracker<I> tracker = FactoryPointSequentialTracker.
 					combined_ST_SURF_KLT(600, new ConfigExtract(3, 0), 3,
 							new int[]{1, 2, 4, 8}, 50, null, null, imageType, derivType);
 			assistedTracker = FactoryVisualOdometry.trackerP3P(tracker,1.5,200,50);
@@ -334,14 +340,41 @@ public class VisualizeStereoVisualOdometryApp <I extends ImageSingleBand>
 			config.typeInput = imageType;
 			config.typeDeriv = derivType;
 
-			GeneralFeatureDetector detector =
-					FactoryPointSequentialTracker.createShiTomasi(new ConfigExtract(3, 1),600, config.typeDeriv);
-
-			PointTrackerUser<I> trackerLeft = FactoryPointSequentialTracker.klt(config);
-			PointTrackerUser<I> trackerRight = FactoryPointSequentialTracker.klt(config);
+			PointTrackerAux trackerLeft = FactoryPointSequentialTracker.klt(config, 600, new ConfigExtract(3, 1), 1, 1);
+			PointTrackerAux trackerRight = FactoryPointSequentialTracker.klt(config,600, new ConfigExtract(3, 1),1,1);
 
 			return FactoryVisualOdometry.stereoFullPnP(thresholdAdd, thresholdRetire,1.5,200,50,disparity,
-					detector,trackerLeft,trackerRight, imageType);
+					trackerLeft,trackerRight, imageType);
+		} else if( whichAlg == 4 ) {
+			thresholdAdd = 80;
+			thresholdRetire = 3;
+			associationMaxError = 150;
+
+			DescribePointBrief<I> briefLeft = FactoryDescribePointAlgs.brief(
+					FactoryBriefDefinition.gaussian2(new Random(123), 16, 512),
+					FactoryBlurFilter.gaussian(imageType, 0, 4));
+			DescribePointBrief<I> briefRight = FactoryDescribePointAlgs.brief(
+					FactoryBriefDefinition.gaussian2(new Random(123), 16, 512),
+					FactoryBlurFilter.gaussian(imageType, 0, 4));
+
+			GeneralFeatureDetector cornerLeft = FactoryPointSequentialTracker.createShiTomasi(
+					new ConfigExtract(2,1),600, derivType);
+			GeneralFeatureDetector cornerRight = FactoryPointSequentialTracker.createShiTomasi(
+					new ConfigExtract(2,1),600, derivType);
+
+			ScoreAssociateHamming_B score = new ScoreAssociateHamming_B();
+			AssociateDescription2D<TupleDesc_B> associateLeft =
+					new AssociateDescTo2D<TupleDesc_B>(FactoryAssociation.greedy(score, associationMaxError, -1, true));
+			AssociateDescription2D<TupleDesc_B> associateRight =
+					new AssociateDescTo2D<TupleDesc_B>(FactoryAssociation.greedy(score, associationMaxError, -1, true));
+
+			PointTrackerAux trackerLeft = FactoryPointSequentialTracker.
+					ddaUser(cornerLeft, new WrapDescribeBrief<I>(briefLeft), associateLeft, 1, imageType);
+			PointTrackerAux trackerRight = FactoryPointSequentialTracker.
+					ddaUser(cornerRight,new WrapDescribeBrief<I>(briefRight), associateRight, 1, imageType);
+
+			return FactoryVisualOdometry.stereoFullPnP(thresholdAdd, thresholdRetire,1.5,200,50,disparity,
+					trackerLeft,trackerRight, imageType);
 		} else {
 			throw new RuntimeException("Unknown selection");
 		}

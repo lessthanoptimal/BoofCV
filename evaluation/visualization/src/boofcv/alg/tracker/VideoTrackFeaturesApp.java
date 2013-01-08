@@ -22,7 +22,7 @@ import boofcv.abst.feature.detect.extract.ConfigExtract;
 import boofcv.abst.feature.detect.interest.ConfigFastHessian;
 import boofcv.abst.feature.tracker.PkltConfig;
 import boofcv.abst.feature.tracker.PointTrack;
-import boofcv.abst.feature.tracker.PointTrackerSpawn;
+import boofcv.abst.feature.tracker.PointTracker;
 import boofcv.factory.feature.tracker.FactoryPointSequentialTracker;
 import boofcv.gui.VideoProcessAppBase;
 import boofcv.gui.feature.VisualizeFeatures;
@@ -52,7 +52,7 @@ public class VideoTrackFeaturesApp<I extends ImageSingleBand, D extends ImageSin
 	int maxFeatures = 400;
 	int minFeatures = 150;
 
-	PointTrackerSpawn<I> tracker;
+	PointTracker<I> tracker;
 
 	ImagePanel gui = new ImagePanel();
 
@@ -115,7 +115,7 @@ public class VideoTrackFeaturesApp<I extends ImageSingleBand, D extends ImageSin
 		
 		stopWorker();
 
-		tracker = (PointTrackerSpawn<I>)cookie;
+		tracker = (PointTracker<I>)cookie;
 		sequence.reset();
 
 		SwingUtilities.invokeLater(new Runnable() {

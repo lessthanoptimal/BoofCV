@@ -38,7 +38,7 @@ import java.util.List;
 // TODO drop after no associate after X detections
 // TODO Speed up combination of respawn and spawn
 public class WrapCombinedTracker<I extends ImageSingleBand, D extends ImageSingleBand, TD extends TupleDesc>
-		implements PointTrackerSpawn<I> {
+		implements PointTrackerAux<I,Object> {
 
 	CombinedTrackerScalePoint<I,D,TD> tracker;
 
@@ -133,6 +133,16 @@ public class WrapCombinedTracker<I extends ImageSingleBand, D extends ImageSingl
 		}
 
 		previousSpawn = tracker.getPureKlt().size() + tracker.getReactivated().size();
+	}
+
+	@Override
+	public Object getAuxiliary(PointTrack track) {
+		return null;
+	}
+
+	@Override
+	public PointTrack addTrack(double x, double y, Object auxiliary) {
+		throw new RuntimeException("NOt implemented yet");
 	}
 
 	@Override

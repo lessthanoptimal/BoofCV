@@ -46,7 +46,7 @@ import static org.junit.Assert.assertEquals;
  */
 public class TestDetectAssociateTracker extends StandardPointTrackerSpawn<ImageFloat32> {
 
-	DetectAssociateTracker<ImageFloat32,TupleDesc_B> dat;
+	DetectAssociateTracker<ImageFloat32,TupleDesc_B,?> dat;
 
 	public TestDetectAssociateTracker() {
 		super(true, false);
@@ -89,7 +89,7 @@ public class TestDetectAssociateTracker extends StandardPointTrackerSpawn<ImageF
 	}
 
 	@Override
-	public PointTrackerSpawn<ImageFloat32> createTracker() {
+	public PointTracker<ImageFloat32> createTracker() {
 		DescribePointBrief<ImageFloat32> brief =
 				FactoryDescribePointAlgs.brief(FactoryBriefDefinition.gaussian2(new Random(123), 16, 512),
 				FactoryBlurFilter.gaussian(ImageFloat32.class, 0, 4));
@@ -108,7 +108,7 @@ public class TestDetectAssociateTracker extends StandardPointTrackerSpawn<ImageF
 				new DetectDescribeFusion<ImageFloat32,TupleDesc_B>(
 						detector,null,new WrapDescribeBrief<ImageFloat32>(brief));
 
-		dat = new DetectAssociateTracker<ImageFloat32,TupleDesc_B>(fused, association,false);
+		dat = new DetectAssociateTracker<ImageFloat32,TupleDesc_B,Object>(fused, association,false);
 
 
 		return dat;
