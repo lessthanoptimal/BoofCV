@@ -91,7 +91,7 @@ public class FactoryPointSequentialTracker {
 	 * @return KLT based tracker.
 	 */
 	public static <I extends ImageSingleBand, D extends ImageSingleBand>
-	PointTracker<I> klt(int maxFeatures, int scaling[], ConfigExtract configExtract, int featureRadius,
+	PointTrackerAux<I,?> klt(int maxFeatures, int scaling[], ConfigExtract configExtract, int featureRadius,
 							 int spawnSubW, int spawnSubH, Class<I> imageType, Class<D> derivType) {
 		PkltConfig<I, D> config =
 				PkltConfig.createDefault(imageType, derivType);

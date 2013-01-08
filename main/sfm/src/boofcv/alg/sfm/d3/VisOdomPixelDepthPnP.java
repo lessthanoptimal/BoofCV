@@ -244,7 +244,7 @@ public class VisOdomPixelDepthPnP<T extends ImageBase>
 		return currToWorld;
 	}
 
-	public ModelAssistedTracker<T, Se3_F64,Point2D3D> getTracker() {
+	public ModelAssistedTracker<T,Se3_F64,Point2D3D> getTracker() {
 		return tracker;
 	}
 
