@@ -166,11 +166,11 @@ public class PointTrackerKltPyramid<I extends ImageSingleBand,D extends ImageSin
 		}
 
 		// find new tracks, but no more than the max
-		detector.setExclude(excludeList);
+		detector.setExcludeMaximum(excludeList);
 		detector.process(basePyramid.getLayer(0), derivX.getLayer(0), derivY.getLayer(0), null, null, null);
 
 		// extract the features
-		QueueCorner found = detector.getFeatures();
+		QueueCorner found = detector.getMaximums();
 
 		// grow the number of tracks if needed
 		while( unused.size() < found.size() )

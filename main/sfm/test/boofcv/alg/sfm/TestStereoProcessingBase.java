@@ -18,14 +18,18 @@
 
 package boofcv.alg.sfm;
 
+import boofcv.alg.geo.PerspectiveOps;
+import boofcv.alg.geo.RectifyImageOps;
 import boofcv.alg.misc.ImageStatistics;
 import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.calib.StereoParameters;
+import boofcv.struct.distort.PointTransform_F64;
 import boofcv.struct.image.ImageUInt8;
 import georegression.geometry.RotationMatrixGenerator;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
+import org.ejml.data.DenseMatrix64F;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -83,7 +87,46 @@ public class TestStereoProcessingBase {
 
 	@Test
 	public void compute3D() {
-		fail("Implement");
+		// point being viewed
+		Point3D_F64 X = new Point3D_F64(-0.01,0.1,3);
+
+		StereoParameters param = createStereoParam(width,height,false);
+
+		DenseMatrix64F K = PerspectiveOps.calibrationMatrix(param.left,null);
+
+		// compute the view in pixels of the point in the left and right cameras
+		Point2D_F64 lensLeft = new Point2D_F64();
+		Point2D_F64 lensRight = new Point2D_F64();
+		SfmTestHelper.renderPointPixel(param,X,lensLeft,lensRight);
+
+		StereoProcessingBase<ImageUInt8> alg = new StereoProcessingBase<ImageUInt8>(ImageUInt8.class);
+		alg.setCalibration(param);
+
+		// Rectify the points
+		PointTransform_F64 rectLeft = RectifyImageOps.transformPixelToRect_F64(param.left,alg.getRect1());
+		PointTransform_F64 rectRight = RectifyImageOps.transformPixelToRect_F64(param.right,alg.getRect2());
+
+		Point2D_F64 l = new Point2D_F64();
+		Point2D_F64 r = new Point2D_F64();
+
+		rectLeft.compute(lensLeft.x,lensLeft.y,l);
+		rectRight.compute(lensRight.x,lensRight.y,r);
+
+		// make sure I rectified it correctly
+		assertEquals(l.y,r.y,1);
+
+		// find point in homogeneous coordinates
+		Point3D_F64 found = new Point3D_F64();
+		alg.computeHomo3D(l.x, l.y, found);
+
+		// disparity between the two images
+		double disparity = l.x - r.x;
+
+		found.x /= disparity;
+		found.y /= disparity;
+		found.z /= disparity;
+
+		assertTrue(found.isIdentical(X,0.01));
 	}
 
 	/**

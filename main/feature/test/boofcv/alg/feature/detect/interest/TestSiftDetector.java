@@ -18,6 +18,7 @@
 
 package boofcv.alg.feature.detect.interest;
 
+import boofcv.abst.feature.detect.interest.ConfigSiftDetector;
 import boofcv.factory.feature.detect.interest.FactoryInterestPointAlgs;
 import boofcv.struct.feature.ScalePoint;
 import boofcv.struct.image.ImageFloat32;
@@ -40,7 +41,9 @@ public class TestSiftDetector extends GenericFeatureDetector {
 
 	@Override
 	protected Object createDetector(int maxFeatures) {
-		return FactoryInterestPointAlgs.siftDetector(null);
+		ConfigSiftDetector config = new ConfigSiftDetector();
+		config.maxFeaturesPerScale = maxFeatures;
+		return FactoryInterestPointAlgs.siftDetector(config);
 	}
 
 	@Override

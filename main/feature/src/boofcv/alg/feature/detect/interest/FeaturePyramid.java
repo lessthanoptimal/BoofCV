@@ -158,7 +158,7 @@ public class FeaturePyramid<T extends ImageSingleBand, D extends ImageSingleBand
 
 		List<Point2D_I16> m = maximums[spaceIndex];
 		m.clear();
-		QueueCorner q = detector.getFeatures();
+		QueueCorner q = detector.getMaximums();
 		for (int i = 0; i < q.size; i++) {
 			m.add(q.get(i).copy());
 		}

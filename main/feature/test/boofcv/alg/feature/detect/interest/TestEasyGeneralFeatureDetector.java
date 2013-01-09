@@ -97,7 +97,7 @@ public class TestEasyGeneralFeatureDetector {
 		}
 
 		@Override
-		public void setExclude(QueueCorner exclude) {
+		public void setExcludeMaximum(QueueCorner exclude) {
 			excludeIsNull = exclude==null;
 		}
 
@@ -115,8 +115,8 @@ public class TestEasyGeneralFeatureDetector {
 		}
 
 		@Override
-		public QueueCorner getFeatures() {
-			return foundCorners;
+		public QueueCorner getMaximums() {
+			return foundMaximum;
 		}
 
 		@Override

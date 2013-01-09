@@ -90,7 +90,7 @@ public class StereoSparse3D<T extends ImageSingleBand>
 
 		// Compute coordinate in camera frame
 		this.w = disparity.getDisparity();
-		compute3D(pixelRect.x,pixelRect.y,pointLeft);
+		computeHomo3D(pixelRect.x, pixelRect.y, pointLeft);
 
 		return true;
 	}

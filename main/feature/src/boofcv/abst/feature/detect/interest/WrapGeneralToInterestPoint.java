@@ -76,7 +76,7 @@ public class WrapGeneralToInterestPoint<T extends ImageSingleBand, D extends Ima
 	public void detect(T input) {
 		super.detect(input,null);
 
-		QueueCorner corners = detector.getFeatures();
+		QueueCorner corners = detector.getMaximums();
 
 		foundPoints = new ArrayList<Point2D_F64>();
 		for (int i = 0; i < corners.size; i++) {

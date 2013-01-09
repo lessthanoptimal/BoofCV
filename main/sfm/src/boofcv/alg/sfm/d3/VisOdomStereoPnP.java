@@ -392,7 +392,7 @@ public class VisOdomStereoPnP<T extends ImageSingleBand,D extends ImageSingleBan
 	}
 
 	private void disparityTo3D( double x , double y, double disparity , Point3D_F64 location ) {
-		stereoIP.compute3D(x, y, location);
+		stereoIP.computeHomo3D(x, y, location);
 
 		// convert from homogeneous coordinates into 3D
 		location.x /= disparity;

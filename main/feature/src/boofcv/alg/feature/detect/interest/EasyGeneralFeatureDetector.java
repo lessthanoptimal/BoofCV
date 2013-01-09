@@ -115,7 +115,7 @@ public class EasyGeneralFeatureDetector<T extends ImageSingleBand, D extends Ima
 		if (detector.getRequiresHessian())
 			hessian.process(derivX, derivY, derivXX, derivYY, derivXY);
 
-		detector.setExclude(exclude);
+		detector.setExcludeMaximum(exclude);
 		detector.process(input, derivX, derivY, derivXX, derivYY, derivXY);
 	}
 
@@ -139,7 +139,11 @@ public class EasyGeneralFeatureDetector<T extends ImageSingleBand, D extends Ima
 		return detector;
 	}
 
-	public QueueCorner getFeatures() {
-		return detector.getFeatures();
+	public QueueCorner getMaximums() {
+		return detector.getMaximums();
+	}
+
+	public QueueCorner getMinimums() {
+		return detector.getMinimums();
 	}
 }

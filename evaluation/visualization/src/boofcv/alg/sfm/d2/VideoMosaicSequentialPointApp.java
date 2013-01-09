@@ -71,7 +71,7 @@ public class VideoMosaicSequentialPointApp<I extends ImageSingleBand, D extends 
 		ConfigFastHessian configFH = new ConfigFastHessian();
 		configFH.maxFeaturesPerScale = 200;
 
-		addAlgorithm(0, "KLT", FactoryPointSequentialTracker.klt(config,maxFeatures,new ConfigExtract(3,1),1,1));
+		addAlgorithm(0, "KLT", FactoryPointSequentialTracker.klt(config,maxFeatures,new ConfigExtract(3,1)));
 		addAlgorithm(0, "ST-BRIEF", FactoryPointSequentialTracker.
 				dda_ST_BRIEF(400, 150, new ConfigExtract(1, 10), imageType, null));
 		// size of the description region has been increased to improve quality.

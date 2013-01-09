@@ -73,7 +73,7 @@ public class DdaTrackerGeneralPoint<I extends ImageSingleBand, D extends ImageSi
 		detector.detect(input,null);
 		describe.setImage(input);
 
-		QueueCorner found = detector.getFeatures();
+		QueueCorner found = detector.getMaximums();
 
 		// compute descriptors and populate results list
 		descriptors.reset();

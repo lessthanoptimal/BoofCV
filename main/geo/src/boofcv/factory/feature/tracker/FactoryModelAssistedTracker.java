@@ -46,8 +46,6 @@ public class FactoryModelAssistedTracker {
 	 * @param scaling       Scales in the image pyramid. Recommend [1,2,4] or [2,4]
 	 * @param featureRadius Size of the tracked feature.  Try 3 or 5
 	 * @param configExtract Configuration for extracting features
-	 * @param spawnSubW     Forces a more even distribution of features.  Width.  Try 2
-	 * @param spawnSubH     Forces a more even distribution of features.  Height.  Try 3
 	 * @param imageType     Input image type.
 	 * @param derivType     Image derivative  type.
 	 * @return KLT based tracker.
@@ -55,7 +53,7 @@ public class FactoryModelAssistedTracker {
 	public static <I extends ImageSingleBand, D extends ImageSingleBand,Model,Info>
 	ModelAssistedTracker<I,Model,Info> klt(int maxFeatures, int scaling[],
 										   int featureRadius,
-										   ConfigExtract configExtract , int spawnSubW, int spawnSubH,
+										   ConfigExtract configExtract ,
 										   ModelMatcher<Model, Info> matcherInitial,
 										   ModelMatcher<Model, Info> matcherFinal,
 										   ModelFitter<Model, Info> modelRefiner,
@@ -67,7 +65,6 @@ public class FactoryModelAssistedTracker {
 
 		GeneralFeatureDetector<I, D> detector =
 				FactoryPointSequentialTracker.createShiTomasi(configExtract,maxFeatures, config.typeDeriv);
-		detector.setRegions(spawnSubW, spawnSubH);
 
 		InterpolateRectangle<I> interpInput = FactoryInterpolation.<I>bilinearRectangle(config.typeInput);
 		InterpolateRectangle<D> interpDeriv = FactoryInterpolation.<D>bilinearRectangle(config.typeDeriv);

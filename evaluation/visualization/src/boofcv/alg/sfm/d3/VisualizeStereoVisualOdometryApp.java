@@ -340,8 +340,8 @@ public class VisualizeStereoVisualOdometryApp <I extends ImageSingleBand>
 			config.typeInput = imageType;
 			config.typeDeriv = derivType;
 
-			PointTrackerAux trackerLeft = FactoryPointSequentialTracker.klt(config, 600, new ConfigExtract(3, 1), 1, 1);
-			PointTrackerAux trackerRight = FactoryPointSequentialTracker.klt(config,600, new ConfigExtract(3, 1),1,1);
+			PointTrackerAux trackerLeft = FactoryPointSequentialTracker.klt(config, 600, new ConfigExtract(3, 1));
+			PointTrackerAux trackerRight = FactoryPointSequentialTracker.klt(config,600, new ConfigExtract(3, 1));
 
 			return FactoryVisualOdometry.stereoFullPnP(thresholdAdd, thresholdRetire,1.5,200,50,disparity,
 					trackerLeft,trackerRight, imageType);
