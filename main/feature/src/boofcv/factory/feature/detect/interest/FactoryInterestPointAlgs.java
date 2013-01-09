@@ -64,7 +64,7 @@ public class FactoryInterestPointAlgs {
 		GeneralFeatureIntensity<T, D> intensity = new WrapperGradientCornerIntensity<T, D>(harris);
 		FeatureExtractor extractor =
 				FactoryFeatureExtractor.nonmax(new ConfigExtract(extractRadius, detectThreshold, extractRadius, true));
-		GeneralFeatureDetector<T, D> detector = new GeneralFeatureDetector<T, D>(intensity, extractor);
+		GeneralFeatureDetector<T, D> detector = new GeneralFeatureDetector<T, D>(intensity, extractor,false);
 		detector.setMaxFeatures(maxFeatures);
 
 		ImageFunctionSparse<T> sparseLaplace = FactoryDerivativeSparse.createLaplacian(imageType, null);
@@ -91,7 +91,7 @@ public class FactoryInterestPointAlgs {
 		GeneralFeatureIntensity<T, D> intensity = new WrapperHessianBlobIntensity<T, D>(HessianBlobIntensity.Type.DETERMINANT, derivType);
 		FeatureExtractor extractor = FactoryFeatureExtractor.nonmax(
 				new ConfigExtract(extractRadius, detectThreshold, extractRadius, true));
-		GeneralFeatureDetector<T, D> detector = new GeneralFeatureDetector<T, D>(intensity, extractor);
+		GeneralFeatureDetector<T, D> detector = new GeneralFeatureDetector<T, D>(intensity, extractor, false);
 		detector.setMaxFeatures(maxFeatures);
 
 		ImageFunctionSparse<T> sparseLaplace = FactoryDerivativeSparse.createLaplacian(imageType, null);
@@ -118,7 +118,7 @@ public class FactoryInterestPointAlgs {
 		GeneralFeatureIntensity<T, D> intensity = new WrapperHessianBlobIntensity<T, D>(HessianBlobIntensity.Type.DETERMINANT, derivType);
 		FeatureExtractor extractor = FactoryFeatureExtractor.nonmax(
 				new ConfigExtract(extractRadius, detectThreshold, extractRadius, true));
-		GeneralFeatureDetector<T, D> detector = new GeneralFeatureDetector<T, D>(intensity, extractor);
+		GeneralFeatureDetector<T, D> detector = new GeneralFeatureDetector<T, D>(intensity, extractor, false);
 		detector.setMaxFeatures(maxFeatures);
 
 		AnyImageDerivative<T, D> deriv = GImageDerivativeOps.createDerivatives(imageType, FactoryImageGenerator.create(derivType));
@@ -146,7 +146,7 @@ public class FactoryInterestPointAlgs {
 		GeneralFeatureIntensity<T, D> intensity = new WrapperGradientCornerIntensity<T, D>(harris);
 		FeatureExtractor extractor = FactoryFeatureExtractor.nonmax(
 				new ConfigExtract(extractRadius, detectThreshold, extractRadius, true));
-		GeneralFeatureDetector<T, D> detector = new GeneralFeatureDetector<T, D>(intensity, extractor);
+		GeneralFeatureDetector<T, D> detector = new GeneralFeatureDetector<T, D>(intensity, extractor, false);
 		detector.setMaxFeatures(maxFeatures);
 
 		AnyImageDerivative<T, D> deriv = GImageDerivativeOps.createDerivatives(imageType, FactoryImageGenerator.create(derivType));
@@ -173,7 +173,7 @@ public class FactoryInterestPointAlgs {
 		GeneralFeatureIntensity<T, D> intensity = new WrapperHessianBlobIntensity<T, D>(HessianBlobIntensity.Type.DETERMINANT, derivType);
 		FeatureExtractor extractor = FactoryFeatureExtractor.nonmax(
 				new ConfigExtract(extractRadius, detectThreshold, extractRadius, true));
-		GeneralFeatureDetector<T, D> detector = new GeneralFeatureDetector<T, D>(intensity, extractor);
+		GeneralFeatureDetector<T, D> detector = new GeneralFeatureDetector<T, D>(intensity, extractor, false);
 		detector.setMaxFeatures(maxFeatures);
 
 		AnyImageDerivative<T, D> deriv = GImageDerivativeOps.createDerivatives(imageType, FactoryImageGenerator.create(derivType));
@@ -203,7 +203,7 @@ public class FactoryInterestPointAlgs {
 		GeneralFeatureIntensity<T, D> intensity = new WrapperGradientCornerIntensity<T, D>(harris);
 		FeatureExtractor extractor = FactoryFeatureExtractor.nonmax(
 				new ConfigExtract(extractRadius, detectThreshold, extractRadius, true));
-		GeneralFeatureDetector<T, D> detector = new GeneralFeatureDetector<T, D>(intensity, extractor);
+		GeneralFeatureDetector<T, D> detector = new GeneralFeatureDetector<T, D>(intensity, extractor, false);
 		detector.setMaxFeatures(maxFeatures);
 
 		AnyImageDerivative<T, D> deriv = GImageDerivativeOps.createDerivatives(imageType, FactoryImageGenerator.create(derivType));
@@ -232,7 +232,7 @@ public class FactoryInterestPointAlgs {
 		GeneralFeatureIntensity<T, D> intensity = new WrapperGradientCornerIntensity<T, D>(harris);
 		FeatureExtractor extractor = FactoryFeatureExtractor.nonmax(
 				new ConfigExtract(extractRadius, detectThreshold, extractRadius, true));
-		GeneralFeatureDetector<T, D> detector = new GeneralFeatureDetector<T, D>(intensity, extractor);
+		GeneralFeatureDetector<T, D> detector = new GeneralFeatureDetector<T, D>(intensity, extractor, false);
 		detector.setMaxFeatures(maxFeatures);
 
 		return new FeatureScaleSpace<T, D>(detector, 2);
@@ -257,7 +257,7 @@ public class FactoryInterestPointAlgs {
 		GeneralFeatureIntensity<T, D> intensity = new WrapperHessianBlobIntensity<T, D>(HessianBlobIntensity.Type.DETERMINANT, derivType);
 		FeatureExtractor extractor = FactoryFeatureExtractor.nonmax(
 				new ConfigExtract(extractRadius, detectThreshold, extractRadius, true));
-		GeneralFeatureDetector<T, D> detector = new GeneralFeatureDetector<T, D>(intensity, extractor);
+		GeneralFeatureDetector<T, D> detector = new GeneralFeatureDetector<T, D>(intensity, extractor, false);
 		detector.setMaxFeatures(maxFeatures);
 
 		return new FeatureScaleSpace<T, D>(detector, 2);

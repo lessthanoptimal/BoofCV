@@ -68,7 +68,7 @@ public class VideoStabilizeSequentialPointApp<I extends ImageSingleBand, D exten
 		configFH.maxFeaturesPerScale = 200;
 		configFH.initialSampleSize = 2;
 
-		addAlgorithm(0, "KLT", FactoryPointSequentialTracker.klt(config,maxFeatures,new ConfigExtract(1,3),1,1));
+		addAlgorithm(0, "KLT", FactoryPointSequentialTracker.klt(config,maxFeatures,new ConfigExtract(1,3)));
 		addAlgorithm(0, "ST-BRIEF", FactoryPointSequentialTracker.
 				dda_ST_BRIEF(400, 100, new ConfigExtract(1, 10), imageType, derivType));
 		// size of the description region has been increased to improve quality.

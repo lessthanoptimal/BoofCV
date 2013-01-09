@@ -136,7 +136,7 @@ public class ShowFeatureOrientationApp<T extends ImageSingleBand, D extends Imag
 		}
 		detector.process(workImage, derivX, derivY, derivXX, derivYY, derivXY);
 
-		QueueCorner points = detector.getFeatures();
+		QueueCorner points = detector.getMaximums();
 
 		FancyInterestPointRender render = new FancyInterestPointRender();
 

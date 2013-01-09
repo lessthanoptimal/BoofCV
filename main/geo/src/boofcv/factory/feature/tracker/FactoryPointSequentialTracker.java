@@ -84,21 +84,19 @@ public class FactoryPointSequentialTracker {
 	 * @param scaling       Scales in the image pyramid. Recommend [1,2,4] or [2,4]
 	 * @param configExtract Configuration for extracting features
 	 * @param featureRadius Size of the tracked feature.  Try 3 or 5
-	 * @param spawnSubW     Forces a more even distribution of features.  Width.  Try 2
-	 * @param spawnSubH     Forces a more even distribution of features.  Height.  Try 3
 	 * @param imageType     Input image type.
 	 * @param derivType     Image derivative  type.
 	 * @return KLT based tracker.
 	 */
 	public static <I extends ImageSingleBand, D extends ImageSingleBand>
 	PointTrackerAux<I,?> klt(int maxFeatures, int scaling[], ConfigExtract configExtract, int featureRadius,
-							 int spawnSubW, int spawnSubH, Class<I> imageType, Class<D> derivType) {
+							 Class<I> imageType, Class<D> derivType) {
 		PkltConfig<I, D> config =
 				PkltConfig.createDefault(imageType, derivType);
 		config.pyramidScaling = scaling;
 		config.featureRadius = featureRadius;
 
-		return klt(config,maxFeatures,configExtract,spawnSubW,spawnSubH);
+		return klt(config,maxFeatures,configExtract);
 	}
 
 	/**
@@ -109,15 +107,12 @@ public class FactoryPointSequentialTracker {
 	 * @param config Config for the tracker. Try PkltConfig.createDefault().
 	 * @param maxFeatures Maximum number of features that will be detected.  -1 for no limit.
 	 * @param configExtract Configuration for extracting features
-	 * @param spawnSubW Forces a more even distribution of features.  Width.  Try 2
-	 * @param spawnSubH Forces a more even distribution of features.  Height.  Try 3
 	 * @return KLT based tracker.
 	 */
 	public static <I extends ImageSingleBand, D extends ImageSingleBand>
-	PointTrackerAux<I,?> klt(PkltConfig<I, D> config, int maxFeatures , ConfigExtract configExtract , int spawnSubW, int spawnSubH) {
+	PointTrackerAux<I,?> klt(PkltConfig<I, D> config, int maxFeatures , ConfigExtract configExtract ) {
 
 		GeneralFeatureDetector<I, D> detector = createShiTomasi(configExtract,maxFeatures, config.typeDeriv);
-		detector.setRegions(spawnSubW, spawnSubH);
 
 		InterpolateRectangle<I> interpInput = FactoryInterpolation.<I>bilinearRectangle(config.typeInput);
 		InterpolateRectangle<D> interpDeriv = FactoryInterpolation.<D>bilinearRectangle(config.typeDeriv);

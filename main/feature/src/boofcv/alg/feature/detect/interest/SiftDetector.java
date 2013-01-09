@@ -206,7 +206,7 @@ public class SiftDetector {
 		} else {
 			// detect minimums
 			signAdj = -1;
-			PixelMath.multiply(scale1,-1,ss.storage);
+			PixelMath.invert(scale1, ss.storage);
 			extractor.process(ss.storage,null, -1,foundFeatures);
 		}
 

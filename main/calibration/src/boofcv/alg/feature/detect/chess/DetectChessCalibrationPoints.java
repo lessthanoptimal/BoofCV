@@ -147,7 +147,7 @@ public class DetectChessCalibrationPoints<T extends ImageSingleBand, D extends I
 
 		FeatureExtractor extractor =
 				FactoryFeatureExtractor.nonmax(new ConfigExtract(radius + 2, 20, radius + 2, true));
-		detectorAlg = new GeneralFeatureDetector<T, D>(intensityAlg, extractor);
+		detectorAlg = new GeneralFeatureDetector<T, D>(intensityAlg, extractor, false);
 
 		// minContourSize is specified later after the image's size is known
 		findBound = new DetectChessSquaresBinary(numCols, numRows, 0);
@@ -178,7 +178,7 @@ public class DetectChessCalibrationPoints<T extends ImageSingleBand, D extends I
 		// detect interest points
 		detectorAlg.process(subGray, derivX, derivY, null, null, null);
 
-		QueueCorner corners = detectorAlg.getFeatures();
+		QueueCorner corners = detectorAlg.getMaximums();
 
 		// put points into original image coordinates
 		List<Point2D_F64> points = convert(corners, targetRect.x0, targetRect.y0);

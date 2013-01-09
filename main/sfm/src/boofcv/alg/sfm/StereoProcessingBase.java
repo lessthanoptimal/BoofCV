@@ -134,7 +134,7 @@ public class StereoProcessingBase<T extends ImageSingleBand> {
 	 * @param y y-coordinate of pixel in rectified left image
 	 * @param pointLeft Storage for 3D coordinate of point in homogeneous coordinates.  w = disparity
 	 */
-	public void compute3D( double x , double y , Point3D_F64 pointLeft ) {
+	public void computeHomo3D(double x, double y, Point3D_F64 pointLeft) {
 		// Coordinate in rectified camera frame
 		pointRect.z = baseline*fx;
 		pointRect.x = pointRect.z*(x - cx)/fx;
