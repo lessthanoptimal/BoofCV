@@ -92,6 +92,7 @@ public class GeneratePixelMath extends CodeGeneratorBase {
 		for( AutoTypeImage t : types ) {
 			input = t;
 			printAbs();
+			printInvert();
 		}
 	}
 
@@ -115,6 +116,29 @@ public class GeneratePixelMath extends CodeGeneratorBase {
 				"\n" +
 				"\t\t\tfor( ; indexSrc < end; indexSrc++ , indexDst++) {\n" +
 				"\t\t\t\toutput.data[indexDst] = "+input.getTypeCastFromSum()+"Math.abs(input.data[indexSrc]);\n" +
+				"\t\t\t}\n" +
+				"\t\t}\n" +
+				"\t}\n\n");
+	}
+
+	public void printInvert() {
+		out.print("\t/**\n" +
+				"\t * Changes the sign of every pixel in the image: output[x,y] = -input[x,y]\n" +
+				"\t *\n" +
+				"\t * @param input The input image. Not modified.\n" +
+				"\t * @param output Where the inverted image is written to. Modified.\n" +
+				"\t */\n" +
+				"\tpublic static void invert( "+input.getImageName()+" input , "+input.getImageName()+" output ) {\n" +
+				"\n" +
+				"\t\tInputSanityCheck.checkSameShape(input,output);\n" +
+				"\n" +
+				"\t\tfor( int y = 0; y < input.height; y++ ) {\n" +
+				"\t\t\tint indexSrc = input.startIndex + y* input.stride;\n" +
+				"\t\t\tint indexDst = output.startIndex + y* output.stride;\n" +
+				"\t\t\tint end = indexSrc + input.width;\n" +
+				"\n" +
+				"\t\t\tfor( ; indexSrc < end; indexSrc++ , indexDst++) {\n" +
+				"\t\t\t\toutput.data[indexDst] = "+input.getTypeCastFromSum()+"-input.data[indexSrc];\n" +
 				"\t\t\t}\n" +
 				"\t\t}\n" +
 				"\t}\n\n");

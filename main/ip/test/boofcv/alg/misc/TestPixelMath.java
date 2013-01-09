@@ -43,7 +43,7 @@ public class TestPixelMath {
 
 	@Test
 	public void checkAll() {
-		int numExpected = 6+11*8;
+		int numExpected = 2*6+11*8;
 		Method methods[] = PixelMath.class.getMethods();
 
 		// sanity check to make sure the functions are being found
@@ -70,6 +70,8 @@ public class TestPixelMath {
 						testPlusBounded(m);
 				} else if( m.getName().compareTo("add") == 0 ) {
 					testAdd(m);
+				} else if( m.getName().compareTo("invert") == 0 ) {
+					testInvert(m);
 				} else if( m.getName().compareTo("subtract") == 0 ) {
 					testSubtract(m);
 				} else if( m.getName().compareTo("boundImage") == 0 ) {
@@ -390,6 +392,29 @@ public class TestPixelMath {
 				double b = GeneralizedImageOps.get(inputB,j,i);
 
 				assertEquals(Math.abs(a),b,1e-4);
+			}
+		}
+	}
+
+	private void testInvert(Method m) throws InvocationTargetException, IllegalAccessException {
+		Class paramTypes[] = m.getParameterTypes();
+		ImageSingleBand inputA = GeneralizedImageOps.createSingleBand(paramTypes[0], width, height);
+		ImageSingleBand inputB = GeneralizedImageOps.createSingleBand(paramTypes[1], width, height);
+
+		if( inputA.getTypeInfo().isSigned() ) {
+			GImageMiscOps.fillUniform(inputA, rand, -20,20);
+		} else {
+			throw new RuntimeException("Shouldn't be used on unsigned images");
+		}
+
+		m.invoke(null,inputA,inputB);
+
+		for( int i = 0; i < height; i++ ) {
+			for( int j = 0; j < width; j++ ) {
+				double a = GeneralizedImageOps.get(inputA,j,i);
+				double b = GeneralizedImageOps.get(inputB,j,i);
+
+				assertEquals(a,-b,1e-4);
 			}
 		}
 	}

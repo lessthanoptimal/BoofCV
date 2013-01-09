@@ -39,7 +39,7 @@ public class TestGPixelMath extends BaseGClassChecksInMisc {
 
 	@Test
 	public void compareToPixelMath() {
-		performTests(12);
+		performTests(13);
 	}
 
 	@Override
@@ -53,6 +53,10 @@ public class TestGPixelMath extends BaseGClassChecksInMisc {
 		Object[][] ret = new Object[1][param.length];
 
 		if( name.equals("abs")) {
+			output = createImage(param[1],null);
+			ret[0][0] = inputA;
+			ret[0][1] = output;
+		} else if( name.equals("invert")) {
 			output = createImage(param[1],null);
 			ret[0][0] = inputA;
 			ret[0][1] = output;

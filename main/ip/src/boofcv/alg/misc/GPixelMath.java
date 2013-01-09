@@ -53,6 +53,32 @@ public class GPixelMath {
 	}
 
 	/**
+	 * Changes the sign of every pixel in the image: output[x,y] = -input[x,y]
+	 * Can only be used on signed images.
+	 *
+	 * @param input The input image. Not modified.
+	 * @param output Where the inverted image is written to. Modified.
+	 */
+	public static <T extends ImageSingleBand> void invert( T input , T output )
+	{
+		if( ImageSInt8.class == input.getClass() ) {
+			PixelMath.invert((ImageSInt8) input, (ImageSInt8) output);
+		} else if( ImageSInt16.class == input.getClass() ) {
+			PixelMath.invert((ImageSInt16) input, (ImageSInt16) output);
+		} else if( ImageSInt32.class == input.getClass() ) {
+			PixelMath.invert((ImageSInt32) input, (ImageSInt32) output);
+		} else if( ImageSInt64.class == input.getClass() ) {
+			PixelMath.invert((ImageSInt64) input, (ImageSInt64) output);
+		} else if( ImageFloat32.class == input.getClass() ) {
+			PixelMath.invert((ImageFloat32) input, (ImageFloat32) output);
+		} else if( ImageFloat64.class == input.getClass() ) {
+			PixelMath.invert((ImageFloat64) input, (ImageFloat64) output);
+		} else {
+			throw new IllegalArgumentException("Unsupported image type.  Input image must be signed");
+		}
+	}
+
+	/**
 	 * Divide each element by a scalar value. Both input and output images can be the same instance.
 	 *
 	 * @param input The input image. Not modified.
