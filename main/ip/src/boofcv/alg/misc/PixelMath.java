@@ -53,6 +53,27 @@ public class PixelMath {
 	}
 
 	/**
+	 * Changes the sign of every pixel in the image: output[x,y] = -input[x,y]
+	 *
+	 * @param input The input image. Not modified.
+	 * @param output Where the inverted image is written to. Modified.
+	 */
+	public static void invert( ImageSInt8 input , ImageSInt8 output ) {
+
+		InputSanityCheck.checkSameShape(input,output);
+
+		for( int y = 0; y < input.height; y++ ) {
+			int indexSrc = input.startIndex + y* input.stride;
+			int indexDst = output.startIndex + y* output.stride;
+			int end = indexSrc + input.width;
+
+			for( ; indexSrc < end; indexSrc++ , indexDst++) {
+				output.data[indexDst] = (byte)-input.data[indexSrc];
+			}
+		}
+	}
+
+	/**
 	 * Sets each pixel in the output image to be the absolute value of the input image.
 	 * Both the input and output image can be the same instance.
 	 * 
@@ -70,6 +91,27 @@ public class PixelMath {
 
 			for( ; indexSrc < end; indexSrc++ , indexDst++) {
 				output.data[indexDst] = (short)Math.abs(input.data[indexSrc]);
+			}
+		}
+	}
+
+	/**
+	 * Changes the sign of every pixel in the image: output[x,y] = -input[x,y]
+	 *
+	 * @param input The input image. Not modified.
+	 * @param output Where the inverted image is written to. Modified.
+	 */
+	public static void invert( ImageSInt16 input , ImageSInt16 output ) {
+
+		InputSanityCheck.checkSameShape(input,output);
+
+		for( int y = 0; y < input.height; y++ ) {
+			int indexSrc = input.startIndex + y* input.stride;
+			int indexDst = output.startIndex + y* output.stride;
+			int end = indexSrc + input.width;
+
+			for( ; indexSrc < end; indexSrc++ , indexDst++) {
+				output.data[indexDst] = (short)-input.data[indexSrc];
 			}
 		}
 	}
@@ -97,6 +139,27 @@ public class PixelMath {
 	}
 
 	/**
+	 * Changes the sign of every pixel in the image: output[x,y] = -input[x,y]
+	 *
+	 * @param input The input image. Not modified.
+	 * @param output Where the inverted image is written to. Modified.
+	 */
+	public static void invert( ImageSInt32 input , ImageSInt32 output ) {
+
+		InputSanityCheck.checkSameShape(input,output);
+
+		for( int y = 0; y < input.height; y++ ) {
+			int indexSrc = input.startIndex + y* input.stride;
+			int indexDst = output.startIndex + y* output.stride;
+			int end = indexSrc + input.width;
+
+			for( ; indexSrc < end; indexSrc++ , indexDst++) {
+				output.data[indexDst] = -input.data[indexSrc];
+			}
+		}
+	}
+
+	/**
 	 * Sets each pixel in the output image to be the absolute value of the input image.
 	 * Both the input and output image can be the same instance.
 	 * 
@@ -114,6 +177,27 @@ public class PixelMath {
 
 			for( ; indexSrc < end; indexSrc++ , indexDst++) {
 				output.data[indexDst] = Math.abs(input.data[indexSrc]);
+			}
+		}
+	}
+
+	/**
+	 * Changes the sign of every pixel in the image: output[x,y] = -input[x,y]
+	 *
+	 * @param input The input image. Not modified.
+	 * @param output Where the inverted image is written to. Modified.
+	 */
+	public static void invert( ImageSInt64 input , ImageSInt64 output ) {
+
+		InputSanityCheck.checkSameShape(input,output);
+
+		for( int y = 0; y < input.height; y++ ) {
+			int indexSrc = input.startIndex + y* input.stride;
+			int indexDst = output.startIndex + y* output.stride;
+			int end = indexSrc + input.width;
+
+			for( ; indexSrc < end; indexSrc++ , indexDst++) {
+				output.data[indexDst] = -input.data[indexSrc];
 			}
 		}
 	}
@@ -141,6 +225,27 @@ public class PixelMath {
 	}
 
 	/**
+	 * Changes the sign of every pixel in the image: output[x,y] = -input[x,y]
+	 *
+	 * @param input The input image. Not modified.
+	 * @param output Where the inverted image is written to. Modified.
+	 */
+	public static void invert( ImageFloat32 input , ImageFloat32 output ) {
+
+		InputSanityCheck.checkSameShape(input,output);
+
+		for( int y = 0; y < input.height; y++ ) {
+			int indexSrc = input.startIndex + y* input.stride;
+			int indexDst = output.startIndex + y* output.stride;
+			int end = indexSrc + input.width;
+
+			for( ; indexSrc < end; indexSrc++ , indexDst++) {
+				output.data[indexDst] = -input.data[indexSrc];
+			}
+		}
+	}
+
+	/**
 	 * Sets each pixel in the output image to be the absolute value of the input image.
 	 * Both the input and output image can be the same instance.
 	 * 
@@ -158,6 +263,27 @@ public class PixelMath {
 
 			for( ; indexSrc < end; indexSrc++ , indexDst++) {
 				output.data[indexDst] = Math.abs(input.data[indexSrc]);
+			}
+		}
+	}
+
+	/**
+	 * Changes the sign of every pixel in the image: output[x,y] = -input[x,y]
+	 *
+	 * @param input The input image. Not modified.
+	 * @param output Where the inverted image is written to. Modified.
+	 */
+	public static void invert( ImageFloat64 input , ImageFloat64 output ) {
+
+		InputSanityCheck.checkSameShape(input,output);
+
+		for( int y = 0; y < input.height; y++ ) {
+			int indexSrc = input.startIndex + y* input.stride;
+			int indexDst = output.startIndex + y* output.stride;
+			int end = indexSrc + input.width;
+
+			for( ; indexSrc < end; indexSrc++ , indexDst++) {
+				output.data[indexDst] = -input.data[indexSrc];
 			}
 		}
 	}
