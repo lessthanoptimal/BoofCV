@@ -53,7 +53,7 @@ public class FactoryModelAssistedTracker {
 	public static <I extends ImageSingleBand, D extends ImageSingleBand,Model,Info>
 	ModelAssistedTracker<I,Model,Info> klt(int maxFeatures, int scaling[],
 										   int featureRadius,
-										   ConfigExtract configExtract ,
+										   ConfigExtract configExtract,
 										   ModelMatcher<Model, Info> matcherInitial,
 										   ModelMatcher<Model, Info> matcherFinal,
 										   ModelFitter<Model, Info> modelRefiner,

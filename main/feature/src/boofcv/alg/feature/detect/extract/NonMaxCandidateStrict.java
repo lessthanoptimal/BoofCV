@@ -82,8 +82,10 @@ public class NonMaxCandidateStrict {
 	public void process(ImageFloat32 intensityImage, QueueCorner candidates, QueueCorner corners) {
 
 		this.input = intensityImage;
-		final int w = intensityImage.width-radius;
-		final int h = intensityImage.height-radius;
+
+		// pixels indexes larger than these should not be examined
+		int endX = intensityImage.width-ignoreBorder;
+		int endY = intensityImage.height-ignoreBorder;
 
 		final int stride = intensityImage.stride;
 
@@ -92,8 +94,7 @@ public class NonMaxCandidateStrict {
 		for (int iter = 0; iter < candidates.size; iter++) {
 			Point2D_I16 pt = candidates.data[iter];
 
-			if( pt.x < ignoreBorder || pt.y < ignoreBorder ||
-					pt.x >= intensityImage.width-ignoreBorder || pt.y >= intensityImage.height-ignoreBorder )
+			if( pt.x < ignoreBorder || pt.y < ignoreBorder || pt.x >= endX || pt.y >= endY )
 				continue;
 
 			int center = intensityImage.startIndex + pt.y * stride + pt.x;
@@ -101,51 +102,29 @@ public class NonMaxCandidateStrict {
 			float val = inten[center];
 			if (val < thresh || val == Float.MAX_VALUE ) continue;
 
-			// see if its too close to the image edge
-			if( pt.x < radius || pt.y < radius || pt.x >= w || pt.y >= h ) {
-				if( checkBorder(center, val, pt.x, pt.y))
-					corners.add(pt.x,pt.y);
-			} else if( checkInner(center, val) )
-				corners.add(pt.x, pt.y);
-		}
-	}
+			int x0 = Math.max(ignoreBorder,pt.x - radius);
+			int y0 = Math.max(ignoreBorder,pt.y - radius);
+			int x1 = Math.min(endX, pt.x + radius + 1);
+			int y1 = Math.min(endY, pt.y + radius + 1);
 
-	protected boolean checkBorder(int center, float val, int c_x , int c_y )
-	{
-		int x0 = Math.max(0,c_x-radius);
-		int y0 = Math.max(0,c_y-radius);
-		int x1 = Math.min(input.width, c_x + radius + 1);
-		int y1 = Math.min(input.height,c_y+radius+1);
+			boolean success = true;
+			failed:
+			for( int i = y0; i < y1; i++ ) {
+				int index = input.startIndex + i * input.stride + x0;
+				for( int j = x0; j < x1; j++ , index++ ) {
+					// don't compare the center point against itself
+					if ( center == index )
+						continue;
 
-		for( int i = y0; i < y1; i++ ) {
-			int index = input.startIndex + i * input.stride + x0;
-			for( int j = x0; j < x1; j++ , index++ ) {
-				// don't compare the center point against itself
-				if ( center == index )
-					continue;
-
-				if (val <= input.data[index]) {
-					return false;
+					if (val <= input.data[index]) {
+						success = false;
+						break failed;
+					}
 				}
 			}
+			if( success )
+				corners.add(pt.x,pt.y);
 		}
-		return true;
-	}
-
-	protected boolean checkInner( int center, float val ) {
-		for (int i = -radius; i <= radius; i++) {
-			int index = center + i * input.stride - radius;
-			for (int j = -radius; j <= radius; j++, index++) {
-				// don't compare the center point against itself
-				if ( index == center )
-					continue;
-
-				if (val <= input.data[index]) {
-					return false;
-				}
-			}
-		}
-		return true;
 	}
 
 	public int getSearchRadius() {

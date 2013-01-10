@@ -94,6 +94,9 @@ public abstract class DetectAssociateBase<I extends ImageSingleBand, Desc extend
 		featDst = new FastQueue<Desc>(10,descriptorType,false);
 	}
 
+	protected DetectAssociateBase() {
+	}
+
 	public boolean isUpdateDescription() {
 		return updateDescription;
 	}

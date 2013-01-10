@@ -130,7 +130,7 @@ public class HoughTransformLinePolar {
 		foundLines.reset();
 		foundIntensity.reset();
 
-		extractor.process(transform, null, -1, foundLines);
+		extractor.process(transform, null, foundLines);
 
 		int w2 = transform.width/2;
 

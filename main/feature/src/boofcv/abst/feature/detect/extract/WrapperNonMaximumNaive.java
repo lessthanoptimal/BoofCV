@@ -36,8 +36,7 @@ public class WrapperNonMaximumNaive implements FeatureExtractor {
 	}
 
 	@Override
-	public void process(ImageFloat32 intensity, QueueCorner candidate, int requestedNumber,
-						QueueCorner foundFeature) {
+	public void process(ImageFloat32 intensity, QueueCorner candidate, QueueCorner foundFeature) {
 		alg.process(intensity, foundFeature);
 	}
 
@@ -63,11 +62,6 @@ public class WrapperNonMaximumNaive implements FeatureExtractor {
 
 	@Override
 	public boolean getUsesCandidates() {
-		return false;
-	}
-
-	@Override
-	public boolean getAcceptRequest() {
 		return false;
 	}
 

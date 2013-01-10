@@ -164,18 +164,21 @@ public abstract class StandardPointTrackerSpawn<T extends ImageSingleBand> {
 		tracker.spawnTracks();
 		assertTrue(tracker.getActiveTracks(null).size()>0);
 
+		int activeBefore = tracker.getActiveTracks(null).size();
+
 		// drop a track
 		PointTrack dropped = tracker.getActiveTracks(null).get(0);
 		tracker.dropTrack(dropped);
 		double x = dropped.x;
 		double y = dropped.y;
 
-		// no change to the image
-		// I think in just about every tracker nothing should change. Might need to change test for some
+		// process the exact same image
+		// I think in just about every tracker nothing should change. Might need to change this test for some
 		tracker.process((T)image);
 
 		// should just spawn one track
 		tracker.spawnTracks();
+		assertEquals(activeBefore,tracker.getActiveTracks(null).size());
 		assertEquals(1,tracker.getNewTracks(null).size());
 
 		PointTrack found = tracker.getNewTracks(null).get(0);

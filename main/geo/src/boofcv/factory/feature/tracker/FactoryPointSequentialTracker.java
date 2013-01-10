@@ -96,7 +96,7 @@ public class FactoryPointSequentialTracker {
 		config.pyramidScaling = scaling;
 		config.featureRadius = featureRadius;
 
-		return klt(config,maxFeatures,configExtract);
+		return klt(config,maxFeatures, configExtract);
 	}
 
 	/**
@@ -110,7 +110,7 @@ public class FactoryPointSequentialTracker {
 	 * @return KLT based tracker.
 	 */
 	public static <I extends ImageSingleBand, D extends ImageSingleBand>
-	PointTrackerAux<I,?> klt(PkltConfig<I, D> config, int maxFeatures , ConfigExtract configExtract ) {
+	PointTrackerAux<I,?> klt(PkltConfig<I, D> config, int maxFeatures , ConfigExtract configExtract) {
 
 		GeneralFeatureDetector<I, D> detector = createShiTomasi(configExtract,maxFeatures, config.typeDeriv);
 

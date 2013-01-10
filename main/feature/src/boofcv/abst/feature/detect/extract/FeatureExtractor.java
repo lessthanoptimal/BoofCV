@@ -25,25 +25,22 @@ import boofcv.struct.image.ImageFloat32;
 /**
  * <p>
  * Detects features in an intensity image as local maximums.  The extractor can be configured to ignore pixels
- * along the image's border.  Some implementations can be significantly speed up by using candidate features previously
- * computed.  If a pixel's value is less than the minimum pixel intensity it cannot be a feature even if it is a local
- * <p/>
+ * along the image's border by a user specified distance.  Some implementations require candidate locations for the
+ * features.  This allows for a sparse algorithm to be used, resulting in a significant speed boost.  Local maximums
+ * with intensity values less than the user specified threshold are ignored and values equal to Float.MAX_VALUE.  A
+ * good way to ignore previously detected features is to set their pixel values to Float.MAX_VALUE.
  * </p>
- * <p/>
+ *
  * <p>
- * Almost all feature extraction algorithms use a threshold to determine what can be a feature or not.  Pixels
- * whose intensity is less than the threshold cannot be a feature.  This interface allows the threshold to be changed,
- * which is useful in scale-space analysis where the threshold will vary for each level.  In addition, if
- * a pixel has an intensity of Float.MAX_VALUE then it is ignored and not returned.  This technique is often used to
- * ignore features which have already been detected.
+ * An extractor which uses candidate features must always be provided them.  However, an algorithm which does not
+ * use candidate features will simply ignore that input and operate as usual.
  * </p>
- * <p/>
- * <p/>
- * Depending in the implementation the following may or may not be supported:
- * <ul>
- * <li> Ignore existing corners.  Corners which are passed in will be ignored. </li>
- * <li> Return the specified number of features, always. </li>
- * </ul>
+ *
+ * <p>
+ * The processing border is defined as the image minus the ignore border.  Some algorithms cannot detect features
+ * which are within the search radius of this border.  If that is the case it would be possible to have a feature
+ * at the image border.  To determine if this is the case call {@link #canDetectBorder()}.
+ * <p>
  *
  * @author Peter Abeles
  */
@@ -55,26 +52,16 @@ public interface FeatureExtractor {
 	 *
 	 * @param intensity       Feature intensity image.  Can be modified.
 	 * @param candidate       Optional list of candidate features computed with the intensity image.
-	 * @param requestedNumber Number of features it should find.  Not always supported.
-	 * @param foundFeature    Features which were found.
+	 * @param foundFeature    Storage for found features
 	 */
-	public void process(ImageFloat32 intensity, QueueCorner candidate,
-						int requestedNumber,
-						QueueCorner foundFeature);
+	public void process(ImageFloat32 intensity, QueueCorner candidate, QueueCorner foundFeature);
 
 	/**
-	 * Returns true if the algorithm requires a candidate list of corners
+	 * Returns true if the algorithm requires a candidate list of corners.
 	 *
 	 * @return true if candidates are required.
 	 */
 	public boolean getUsesCandidates();
-
-	/**
-	 * If it accepts requests to find a specific number of features or not.
-	 *
-	 * @return If requests are accepted for number of features.
-	 */
-	public boolean getAcceptRequest();
 
 	/**
 	 * Features must have the specified threshold.
