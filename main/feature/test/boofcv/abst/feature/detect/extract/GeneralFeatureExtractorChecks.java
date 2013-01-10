@@ -74,7 +74,7 @@ public abstract class GeneralFeatureExtractorChecks {
 
 		// with the candidate list only (2,4) should be found
 		QueueCorner found = new QueueCorner(10);
-		alg.process(image,candidates,found);
+		alg.process(image,null,candidates,null,found);
 		assertEquals(1, found.size);
 		assertEquals(2,found.get(0).x);
 		assertEquals(4,found.get(0).y);
@@ -82,7 +82,7 @@ public abstract class GeneralFeatureExtractorChecks {
 		// remove (2,4) from the list, none should be found
 		candidates.removeTail();
 		found.reset();
-		alg.process(image, candidates, found);
+		alg.process(image,null,candidates,null, found);
 		assertEquals(0, found.size);
 
 		// since it got two different answers that were dependent on the candidate list it passes the test
@@ -100,13 +100,13 @@ public abstract class GeneralFeatureExtractorChecks {
 
 		// should find both of them
 		QueueCorner found = new QueueCorner(10);
-		alg.process(image,candidates,found);
+		alg.process(image,null,candidates,null,found);
 		assertEquals(2, found.size);
 
 		// now it shouldn't find them
 		found.reset();
 		alg.setIgnoreBorder(1);
-		alg.process(image, candidates, found);
+		alg.process(image,null,candidates,null, found);
 		assertEquals(0, found.size);
 	}
 
@@ -128,7 +128,7 @@ public abstract class GeneralFeatureExtractorChecks {
 		// If it doesn't find both of those features then its actually looking outside the ignore border
 		QueueCorner found = new QueueCorner(10);
 		alg.setIgnoreBorder(1);
-		alg.process(image,candidates,found);
+		alg.process(image,null,candidates,null,found);
 		assertEquals(2, found.size);
 
 	}
@@ -139,13 +139,13 @@ public abstract class GeneralFeatureExtractorChecks {
 
 		setPixel(5,6,10);
 		QueueCorner found = new QueueCorner(10);
-		alg.process(image,candidates,found);
+		alg.process(image,null,candidates,null,found);
 		assertEquals(1, found.size);
 
 		// shouldn't find it after the threshold is set above its values
 		alg.setThreshold(20);
 		found.reset();
-		alg.process(image,candidates,found);
+		alg.process(image,null,candidates,null,found);
 		assertEquals(0, found.size);
 	}
 
@@ -159,13 +159,13 @@ public abstract class GeneralFeatureExtractorChecks {
 		// should find them both on the first pass
 		QueueCorner found = new QueueCorner(10);
 		alg.setSearchRadius(1);
-		alg.process(image,candidates,found);
+		alg.process(image,null,candidates,null,found);
 		assertEquals(2, found.size);
 
 		// only one of the aftear the search radius is expanded
 		alg.setSearchRadius(2);
 		found.reset();
-		alg.process(image,candidates,found);
+		alg.process(image,null,candidates,null,found);
 		assertEquals(1, found.size);
 	}
 
@@ -177,7 +177,7 @@ public abstract class GeneralFeatureExtractorChecks {
 
 		// the solution should depend on its capabilities
 		QueueCorner found = new QueueCorner(10);
-		alg.process(image,candidates,found);
+		alg.process(image,null,candidates,null,found);
 		if( found.size == 2 )
 			assertTrue(alg.canDetectBorder());
 		else if( found.size == 0 )

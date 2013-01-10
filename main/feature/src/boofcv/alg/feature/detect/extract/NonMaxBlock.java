@@ -53,8 +53,10 @@ public abstract class NonMaxBlock {
 	// the defines the region that can be processed
 	int endX,endY;
 
-	// found peaks
-	protected QueueCorner peaks;
+	// found minimums
+	protected QueueCorner localMin;
+	// found maximums
+	protected QueueCorner localMax;
 
 	protected NonMaxBlock() {
 	}
@@ -65,9 +67,17 @@ public abstract class NonMaxBlock {
 		this.border = border;
 	}
 
-	public void process(ImageFloat32 intensityImage, QueueCorner peaks) {
+	/**
+	 * Detects local minimums and/or maximums in the provided intensity image.
+	 *
+	 * @param intensityImage (Input) Feature intensity image.
+	 * @param localMin (Output) storage for found local minimums.
+	 * @param localMax (Output) storage for found local maximums.
+	 */
+	public void process(ImageFloat32 intensityImage, QueueCorner localMin, QueueCorner localMax) {
 
-		this.peaks = peaks;
+		this.localMin = localMin;
+		this.localMax = localMax;
 
 		endX = intensityImage.width-border;
 		endY = intensityImage.height-border;

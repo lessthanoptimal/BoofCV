@@ -117,7 +117,7 @@ public class TemplateMatching<T extends ImageBase> {
 
 		// find local peaks in intensity image
 		candidates.reset();
-		extractor.process(intensity, null, candidates);
+		extractor.process(intensity, null,null,null, candidates);
 
 		// select the best matches
 		if (scores.length < candidates.size) {

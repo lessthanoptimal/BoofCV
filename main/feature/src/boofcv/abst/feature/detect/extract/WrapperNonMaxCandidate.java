@@ -18,7 +18,7 @@
 
 package boofcv.abst.feature.detect.extract;
 
-import boofcv.alg.feature.detect.extract.NonMaxCandidateStrict;
+import boofcv.alg.feature.detect.extract.NonMaxCandidate;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.image.ImageFloat32;
 
@@ -28,16 +28,10 @@ import boofcv.struct.image.ImageFloat32;
  * @author Peter Abeles
  */
 public class WrapperNonMaxCandidate implements FeatureExtractor {
-	NonMaxCandidateStrict extractor;
+	NonMaxCandidate extractor;
 
-	public WrapperNonMaxCandidate(NonMaxCandidateStrict extractor) {
+	public WrapperNonMaxCandidate(NonMaxCandidate extractor) {
 		this.extractor = extractor;
-	}
-
-	@Override
-	public void process(ImageFloat32 intensity, QueueCorner candidate,
-						QueueCorner foundFeature) {
-		extractor.process(intensity, candidate, foundFeature);
 	}
 
 	@Override
@@ -61,6 +55,13 @@ public class WrapperNonMaxCandidate implements FeatureExtractor {
 	}
 
 	@Override
+	public void process(ImageFloat32 intensity,
+						QueueCorner candidateMin, QueueCorner candidateMax,
+						QueueCorner foundMin, QueueCorner foundMax) {
+		extractor.process(intensity, candidateMin, candidateMax, foundMin,foundMax);
+	}
+
+	@Override
 	public boolean getUsesCandidates() {
 		return true;
 	}
@@ -78,5 +79,15 @@ public class WrapperNonMaxCandidate implements FeatureExtractor {
 	@Override
 	public int getSearchRadius() {
 		return extractor.getSearchRadius();
+	}
+
+	@Override
+	public boolean canDetectMaximums() {
+		return true;
+	}
+
+	@Override
+	public boolean canDetectMinimums() {
+		return true;
 	}
 }

@@ -146,9 +146,9 @@ public class GeneralFeatureDetector<I extends ImageSingleBand, D extends ImageSi
 
 		detected.reset();
 		if (intensity.hasCandidates()) {
-			extractor.process(intensityImage, intensity.getCandidates(), detected);
+			extractor.process(intensityImage, null, intensity.getCandidates(),null, detected);
 		} else {
-			extractor.process(intensityImage, null, detected);
+			extractor.process(intensityImage, null, null,null,detected);
 		}
 
 		// optionally select the most intense features only

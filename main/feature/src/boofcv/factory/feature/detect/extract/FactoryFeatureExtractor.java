@@ -78,7 +78,7 @@ public class FactoryFeatureExtractor {
 		ret.setThreshold(config.threshold);
 		ret.setBorder(config.ignoreBorder);
 
-		return new WrapperNonMaximumBlock(ret);
+		return new WrapperNonMaximumBlock(ret,false,true);
 	}
 
 	/**
@@ -97,10 +97,15 @@ public class FactoryFeatureExtractor {
 
 		if (config.useStrictRule)
 			ret = new WrapperNonMaxCandidate(
-					new NonMaxCandidateStrict(config.radius, config.threshold, config.ignoreBorder));
+					new NonMaxCandidateStrict());
 		else
 			ret = new WrapperNonMaxCandidate(
-					new NonMaxCandidateRelaxed(config.radius, config.threshold, config.ignoreBorder));
+					new NonMaxCandidateRelaxed());
+
+		ret.setSearchRadius(config.radius);
+		ret.setIgnoreBorder(config.ignoreBorder);
+		ret.setThreshold(config.threshold);
+
 
 		return ret;
 	}

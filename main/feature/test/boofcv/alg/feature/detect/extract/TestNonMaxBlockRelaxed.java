@@ -42,6 +42,6 @@ public class TestNonMaxBlockRelaxed extends GenericNonMaxTests {
 		alg.setThreshold(threshold);
 		alg.setBorder(border);
 		alg.setSearchRadius(radius);
-		alg.process(intensity,found);
+		alg.process(intensity,null,found);
 	}
 }

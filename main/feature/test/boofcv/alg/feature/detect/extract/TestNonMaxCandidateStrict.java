@@ -32,7 +32,10 @@ public class TestNonMaxCandidateStrict {
 		GenericNonMaxTests tests = new GenericNonMaxTests(true) {
 			@Override
 			public void findMaximums(ImageFloat32 intensity, float threshold, int radius, int border, QueueCorner found) {
-				NonMaxCandidateStrict alg = new NonMaxCandidateStrict(radius, threshold, border);
+				NonMaxCandidateStrict alg = new NonMaxCandidateStrict();
+				alg.radius = radius;
+				alg.ignoreBorder = border;
+				alg.thresh = threshold;
 
 				QueueCorner candidates = new QueueCorner(100);
 				for( int i = 0; i < intensity.height; i++ ) {
@@ -42,7 +45,7 @@ public class TestNonMaxCandidateStrict {
 					}
 				}
 
-				alg.process(intensity,candidates,found);
+				alg.process(intensity,null,candidates,null,found);
 			}
 		};
 		tests.allStandard();

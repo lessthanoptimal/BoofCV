@@ -32,7 +32,10 @@ public class TestNonMaxCandidateRelaxed {
 		GenericNonMaxTests tests = new GenericNonMaxTests(false) {
 			@Override
 			public void findMaximums(ImageFloat32 intensity, float threshold, int radius, int border, QueueCorner found) {
-				NonMaxCandidateRelaxed alg = new NonMaxCandidateRelaxed(radius, threshold, border);
+				NonMaxCandidateRelaxed alg = new NonMaxCandidateRelaxed();
+				alg.radius = radius;
+				alg.ignoreBorder = border;
+				alg.thresh = threshold;
 
 				QueueCorner candidates = new QueueCorner(100);
 				for( int i = 0; i < intensity.height; i++ ) {
@@ -42,7 +45,7 @@ public class TestNonMaxCandidateRelaxed {
 					}
 				}
 
-				alg.process(intensity,candidates,found);
+				alg.process(intensity,null,candidates,null,found);
 			}
 		};
 		tests.allStandard();

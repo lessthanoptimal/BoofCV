@@ -33,7 +33,7 @@ public class TestWrapperNonMaximumBlock {
 
 			@Override
 			public FeatureExtractor createAlg() {
-				return new WrapperNonMaximumBlock(new NonMaxBlockStrict());
+				return new WrapperNonMaximumBlock(new NonMaxBlockStrict(),false,true);
 			}
 		};
 		checks.testAll();
@@ -45,7 +45,7 @@ public class TestWrapperNonMaximumBlock {
 
 			@Override
 			public FeatureExtractor createAlg() {
-				return new WrapperNonMaximumBlock(new NonMaxBlockRelaxed());
+				return new WrapperNonMaximumBlock(new NonMaxBlockRelaxed(),false,true);
 			}
 		};
 		checks.testAll();

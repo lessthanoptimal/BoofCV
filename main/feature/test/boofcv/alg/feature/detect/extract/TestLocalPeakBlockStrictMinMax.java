@@ -18,39 +18,17 @@
 
 package boofcv.alg.feature.detect.extract;
 
+import org.junit.Test;
+
+import static org.junit.Assert.fail;
 
 /**
- * <p/>
- * Applies a relaxed peak rule to candidates
- * <p/>
- *
  * @author Peter Abeles
  */
-public class NonMaxCandidateRelaxed extends NonMaxCandidate {
+public class TestLocalPeakBlockStrictMinMax {
 
-	@Override
-	protected boolean searchMin(int center, float val) {
-		for( int i = y0; i < y1; i++ ) {
-			int index = input.startIndex + i * input.stride + x0;
-			for( int j = x0; j < x1; j++ , index++ ) {
-				if (val > input.data[index]) {
-					return false;
-				}
-			}
-		}
-		return true;
-	}
-
-	@Override
-	protected boolean searchMax(int center, float val) {
-		for( int i = y0; i < y1; i++ ) {
-			int index = input.startIndex + i * input.stride + x0;
-			for( int j = x0; j < x1; j++ , index++ ) {
-				if (val < input.data[index]) {
-					return false;
-				}
-			}
-		}
-		return true;
+	@Test
+	public void stuff() {
+		fail("implement");
 	}
 }

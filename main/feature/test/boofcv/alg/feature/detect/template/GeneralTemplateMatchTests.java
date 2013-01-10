@@ -168,7 +168,7 @@ public abstract class GeneralTemplateMatchTests<T extends ImageSingleBand> {
 
 		QueueCorner found = new QueueCorner(10);
 
-		extractor.process(adjusted, null, found);
+		extractor.process(adjusted, null,null,null, found);
 
 		assertTrue(found.size >= points.length);
 

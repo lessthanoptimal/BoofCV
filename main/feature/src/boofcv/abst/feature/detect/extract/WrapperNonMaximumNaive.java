@@ -36,11 +36,6 @@ public class WrapperNonMaximumNaive implements FeatureExtractor {
 	}
 
 	@Override
-	public void process(ImageFloat32 intensity, QueueCorner candidate, QueueCorner foundFeature) {
-		alg.process(intensity, foundFeature);
-	}
-
-	@Override
 	public float getThreshold() {
 		return alg.getThreshold();
 	}
@@ -61,6 +56,13 @@ public class WrapperNonMaximumNaive implements FeatureExtractor {
 	}
 
 	@Override
+	public void process(ImageFloat32 intensity,
+						QueueCorner candidateMin, QueueCorner candidateMax,
+						QueueCorner foundMin, QueueCorner foundMax) {
+		alg.process(intensity, foundMax);
+	}
+
+	@Override
 	public boolean getUsesCandidates() {
 		return false;
 	}
@@ -78,5 +80,15 @@ public class WrapperNonMaximumNaive implements FeatureExtractor {
 	@Override
 	public int getSearchRadius() {
 		return alg.getSearchRadius();
+	}
+
+	@Override
+	public boolean canDetectMaximums() {
+		return true;
+	}
+
+	@Override
+	public boolean canDetectMinimums() {
+		return false;
 	}
 }

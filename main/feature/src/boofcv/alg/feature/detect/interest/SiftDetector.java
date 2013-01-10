@@ -202,12 +202,12 @@ public class SiftDetector {
 		if( positive ) {
 			// detect maximums
 			signAdj = 1;
-			extractor.process(scale1,null, foundFeatures);
+			extractor.process(scale1,null,null,null, foundFeatures);
 		} else {
 			// detect minimums
 			signAdj = -1;
 			PixelMath.invert(scale1, ss.storage);
-			extractor.process(ss.storage,null, foundFeatures);
+			extractor.process(ss.storage,null,null,null, foundFeatures);
 		}
 
 		// number of features which can be added
