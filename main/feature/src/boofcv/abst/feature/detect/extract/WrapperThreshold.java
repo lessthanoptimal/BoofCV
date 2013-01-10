@@ -34,13 +34,6 @@ public class WrapperThreshold implements FeatureExtractor {
 	public WrapperThreshold(ThresholdCornerExtractor extractor) {
 		this.extractor = extractor;
 	}
-
-	@Override
-	public void process(ImageFloat32 intensity, QueueCorner candidate,
-						QueueCorner foundFeature) {
-		extractor.process(intensity, foundFeature);
-	}
-
 	@Override
 	public float getThreshold() {
 		return extractor.getThreshold();
@@ -62,6 +55,13 @@ public class WrapperThreshold implements FeatureExtractor {
 	}
 
 	@Override
+	public void process(ImageFloat32 intensity,
+						QueueCorner candidateMin, QueueCorner candidateMax,
+						QueueCorner foundMin, QueueCorner foundMax) {
+		extractor.process(intensity, foundMax);
+	}
+
+	@Override
 	public boolean getUsesCandidates() {
 		return false;
 	}
@@ -79,5 +79,15 @@ public class WrapperThreshold implements FeatureExtractor {
 	@Override
 	public int getSearchRadius() {
 		return 0;
+	}
+
+	@Override
+	public boolean canDetectMaximums() {
+		return true;
+	}
+
+	@Override
+	public boolean canDetectMinimums() {
+		return false;
 	}
 }

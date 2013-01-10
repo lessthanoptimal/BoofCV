@@ -29,16 +29,23 @@ import boofcv.struct.image.ImageFloat32;
  */
 public class WrapperNonMaximumBlock implements FeatureExtractor {
 
+	// specific implementation
 	NonMaxBlock alg;
+	// indicates if the algorithm can detect minimums or maximums
+	boolean detectMin,detectMax;
 
-	public WrapperNonMaximumBlock(NonMaxBlock alg) {
+
+	public WrapperNonMaximumBlock(NonMaxBlock alg, boolean detectMin, boolean detectMax) {
 		this.alg = alg;
+		this.detectMin = detectMin;
+		this.detectMax = detectMax;
 	}
 
 	@Override
-	public void process(ImageFloat32 intensity, QueueCorner candidate,
-						QueueCorner foundFeature) {
-		alg.process(intensity, foundFeature);
+	public void process(ImageFloat32 intensity,
+						QueueCorner candidateMin, QueueCorner candidateMax,
+						QueueCorner foundMin, QueueCorner foundMax) {
+		alg.process(intensity, foundMin, foundMax );
 	}
 
 	@Override
@@ -79,5 +86,15 @@ public class WrapperNonMaximumBlock implements FeatureExtractor {
 	@Override
 	public int getSearchRadius() {
 		return alg.getSearchRadius();
+	}
+
+	@Override
+	public boolean canDetectMaximums() {
+		return detectMin;
+	}
+
+	@Override
+	public boolean canDetectMinimums() {
+		return detectMax;
 	}
 }

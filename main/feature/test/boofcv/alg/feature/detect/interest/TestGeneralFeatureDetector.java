@@ -233,11 +233,13 @@ public class TestGeneralFeatureDetector {
 		}
 
 		@Override
-		public void process(ImageFloat32 intensity, QueueCorner candidate, QueueCorner foundFeature) {
+		public void process(ImageFloat32 intensity,
+							QueueCorner candidateMin, QueueCorner candidateMax,
+							QueueCorner foundMin, QueueCorner foundMax) {
 			numTimesProcessed++;
 
-			foundFeature.add(1, 1);
-			foundFeature.add(2, 2);
+			foundMax.add(1, 1);
+			foundMax.add(2, 2);
 		}
 
 		@Override
@@ -275,6 +277,16 @@ public class TestGeneralFeatureDetector {
 		@Override
 		public int getSearchRadius() {
 			return 0;
+		}
+
+		@Override
+		public boolean canDetectMaximums() {
+			return true;
+		}
+
+		@Override
+		public boolean canDetectMinimums() {
+			return false;
 		}
 	}
 

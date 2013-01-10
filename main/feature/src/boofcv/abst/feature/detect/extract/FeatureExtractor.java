@@ -24,16 +24,22 @@ import boofcv.struct.image.ImageFloat32;
 
 /**
  * <p>
- * Detects features in an intensity image as local maximums.  The extractor can be configured to ignore pixels
- * along the image's border by a user specified distance.  Some implementations require candidate locations for the
- * features.  This allows for a sparse algorithm to be used, resulting in a significant speed boost.  Local maximums
- * with intensity values less than the user specified threshold are ignored and values equal to Float.MAX_VALUE.  A
- * good way to ignore previously detected features is to set their pixel values to Float.MAX_VALUE.
+ * Detects features in an intensity image as local minimums and/or maximums.  The extractor can be configured to ignore
+ * pixels along the image border by a user specified distance.  Some implementations require candidate locations
+ * for the features.  This allows for a sparse algorithm to be used, resulting in a significant speed boost.  Pixel
+ * values with -Float.MAX_VALUE or Float.MAX_VALUE will not be considered for local minimum/maximum, respectively.
+ * A good way to ignore previously detected features is to set their pixel values to Float.MAX_VALUE.
+ * </p>
+ *
+ * <p>
+ * Not all implementations will search for both minimums or maximums.  Be sure you are using the correct one.  If
+ * you don't intend on detecting a minimum or maximum pass in null for the candidate list and the output found list.
  * </p>
  *
  * <p>
  * An extractor which uses candidate features must always be provided them.  However, an algorithm which does not
- * use candidate features will simply ignore that input and operate as usual.
+ * use candidate features will simply ignore that input and operate as usual.  Can check capabilities at runtime
+ * using the {@link #canDetectMinimums()} and {@link #canDetectMaximums()} functions.
  * </p>
  *
  * <p>
@@ -48,13 +54,19 @@ public interface FeatureExtractor {
 
 	/**
 	 * Process a feature intensity image to extract the point features.  If a pixel has an intensity
-	 * value == Float.MAX_VALUE it is be ignored.
+	 * value == -Float.MAX_VALUE  or Float.MAX_VALUE it will not be considered for a local min or max, respectively.
+	 * If an algorithm only detect local minimums or maximums and null can be passed in for unused lists.  This is
+	 * the recommended procedure since it will force an exception to be thrown if a mistake was made.
 	 *
-	 * @param intensity       Feature intensity image.  Can be modified.
-	 * @param candidate       Optional list of candidate features computed with the intensity image.
-	 * @param foundFeature    Storage for found features
+	 * @param intensity (Input) Feature intensity image.  Not modified.
+	 * @param candidateMin  (Input) (Optional) List of candidate local minimum features. Can be null if not used.
+	 * @param candidateMax  (Input) (Optional) List of candidate local maximum features  Can be null if not used.
+	 * @param foundMin (Output) Storage for found minimums. Can be null if not used.
+	 * @param foundMax (Output) Storage for found maximums. Can be null if not used.
 	 */
-	public void process(ImageFloat32 intensity, QueueCorner candidate, QueueCorner foundFeature);
+	public void process(ImageFloat32 intensity,
+						QueueCorner candidateMin, QueueCorner candidateMax,
+						QueueCorner foundMin, QueueCorner foundMax );
 
 	/**
 	 * Returns true if the algorithm requires a candidate list of corners.
@@ -114,4 +126,14 @@ public interface FeatureExtractor {
 	 * @return Search radius
 	 */
 	public int getSearchRadius();
+
+	/**
+	 *
+	 * @return
+	 */
+	public boolean canDetectMaximums();
+
+
+	public boolean canDetectMinimums();
+
 }

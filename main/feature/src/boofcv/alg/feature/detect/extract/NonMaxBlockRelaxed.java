@@ -86,7 +86,7 @@ public class NonMaxBlockRelaxed extends NonMaxBlock {
 		}
 
 		// save location of local max
-		peaks.add(x_c,y_c);
+		localMax.add(x_c,y_c);
 	}
 
 	@Override

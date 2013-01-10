@@ -22,43 +22,54 @@ import boofcv.struct.image.ImageFloat32;
 
 /**
  * <p>
- * Implementation of {@link NonMaxBlock} which implements a strict maximum rule.
+ * Implementation of {@link boofcv.alg.feature.detect.extract.NonMaxBlock} which implements a strict maximum rule.
  * </p>
  *
  * @author Peter Abeles
  */
-public class NonMaxBlockStrict extends NonMaxBlock {
+public class LocalPeakBlockStrictMinMax extends NonMaxBlock {
 
-	public NonMaxBlockStrict() {
+	public LocalPeakBlockStrictMinMax() {
 	}
 
-	public NonMaxBlockStrict(int radius, float threshold, int border) {
+	public LocalPeakBlockStrictMinMax(int radius, float threshold, int border) {
 		super(radius, threshold, border);
 	}
 
 	@Override
 	protected void searchBlock(int x0, int y0, int x1, int y1, ImageFloat32 img) {
 
-		int peakX = 0;
-		int peakY = 0;
+		int maxX = 0;
+		int maxY = 0;
+		int minX = 0;
+		int minY = 0;
 
-		float peakVal = -Float.MAX_VALUE;
+		float maxVal = -Float.MAX_VALUE;
+		float minVal = Float.MAX_VALUE;
 
 		for (int y = y0; y < y1; y++) {
 			int index = img.startIndex + y * img.stride + x0;
 			for (int x = x0; x < x1; x++) {
 				float v = img.data[index++];
 
-				if (v > peakVal) {
-					peakVal = v;
-					peakX = x;
-					peakY = y;
+				if (v > maxVal) {
+					maxVal = v;
+					maxX = x;
+					maxY = y;
+				}
+				if (v < minVal) {
+					minVal = v;
+					minX = x;
+					minY = y;
 				}
 			}
 		}
 
-		if (peakVal >= threshold && peakVal != Float.MAX_VALUE) {
-			checkLocalMax(peakX, peakY, peakVal, img);
+		if (maxVal >= threshold && maxVal != Float.MAX_VALUE) {
+			checkLocalMax(maxX, maxY, maxVal, img);
+		}
+		if (minVal <= -threshold && minVal != -Float.MAX_VALUE) {
+			checkLocalMin(minX, minY, minVal, img);
 		}
 	}
 
@@ -79,6 +90,33 @@ public class NonMaxBlockStrict extends NonMaxBlock {
 				float v = img.data[index++];
 
 				if (v >= peakVal && !(x == x_c && y == y_c)) {
+					// not a local max
+					return;
+				}
+			}
+		}
+
+		// save location of local max
+		localMax.add(x_c, y_c);
+	}
+
+	protected void checkLocalMin(int x_c, int y_c, float peakVal, ImageFloat32 img) {
+		int x0 = x_c - radius;
+		int x1 = x_c + radius;
+		int y0 = y_c - radius;
+		int y1 = y_c + radius;
+
+		if (x0 < border) x0 = border;
+		if (y0 < border) y0 = border;
+		if (x1 >= endX) x1 = endX - 1;
+		if (y1 >= endY) y1 = endY - 1;
+
+		for (int y = y0; y <= y1; y++) {
+			int index = img.startIndex + y * img.stride + x0;
+			for (int x = x0; x <= x1; x++) {
+				float v = img.data[index++];
+
+				if (v <= peakVal && !(x == x_c && y == y_c)) {
 					// not a local max
 					return;
 				}
