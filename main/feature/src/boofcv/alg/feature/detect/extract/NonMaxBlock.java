@@ -50,6 +50,9 @@ public abstract class NonMaxBlock {
 	// should it ignore border pixels?
 	protected int border;
 
+	// the defines the region that can be processed
+	int endX,endY;
+
 	// found peaks
 	protected QueueCorner peaks;
 
@@ -66,8 +69,8 @@ public abstract class NonMaxBlock {
 
 		this.peaks = peaks;
 
-		int endY = intensityImage.height-border;
-		int endX = intensityImage.width-border;
+		endX = intensityImage.width-border;
+		endY = intensityImage.height-border;
 
 		int step = radius+1;
 

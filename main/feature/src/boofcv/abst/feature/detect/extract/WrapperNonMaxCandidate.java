@@ -35,7 +35,7 @@ public class WrapperNonMaxCandidate implements FeatureExtractor {
 	}
 
 	@Override
-	public void process(ImageFloat32 intensity, QueueCorner candidate, int requestedNumber,
+	public void process(ImageFloat32 intensity, QueueCorner candidate,
 						QueueCorner foundFeature) {
 		extractor.process(intensity, candidate, foundFeature);
 	}
@@ -63,11 +63,6 @@ public class WrapperNonMaxCandidate implements FeatureExtractor {
 	@Override
 	public boolean getUsesCandidates() {
 		return true;
-	}
-
-	@Override
-	public boolean getAcceptRequest() {
-		return false;
 	}
 
 	@Override

@@ -18,17 +18,102 @@
 
 package boofcv.abst.feature.tracker;
 
+import boofcv.struct.FastQueue;
+import boofcv.struct.feature.TupleDesc_F64;
+import boofcv.struct.image.ImageFloat32;
+import georegression.struct.point.Point2D_F64;
 import org.junit.Test;
 
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Peter Abeles
  */
 public class TestDetectAssociateBase {
 
+	/**
+	 * Make sure drop track is correctly recycling the data
+	 */
 	@Test
-	public void stuff() {
-		fail("implement");
+	public void dropTrack_Recycle() {
+		Helper dat = new Helper();
+
+		dat.tracksAll.add(dat.getUnused());
+		dat.tracksAll.add(dat.getUnused());
+		dat.tracksAll.add(dat.getUnused());
+
+		PointTrack a = dat.tracksAll.get(1);
+
+		assertEquals(0,dat.unused.size());
+		dat.dropTrack(a);
+		assertEquals(1,dat.unused.size());
+
+		assertEquals(2,dat.tracksAll.size());
+	}
+
+	/**
+	 * Make sure drop all tracks is correctly recycling the data
+	 */
+	@Test
+	public void dropAllTracks_Recycle() {
+		Helper dat = new Helper();
+
+		dat.tracksAll.add(dat.getUnused());
+		dat.tracksAll.add(dat.getUnused());
+		dat.tracksAll.add(dat.getUnused());
+
+		dat.dropAllTracks();
+		assertEquals(3,dat.unused.size());
+		assertEquals(0, dat.tracksAll.size());
+	}
+
+	@Test
+	public void addNewTrack() {
+		Helper dat = new Helper();
+
+		TupleDesc_F64 desc = dat.createDescription();
+		desc.value[0] = 5;
+
+		PointTrack found0 = dat.addNewTrack(5,10,desc);
+		PointTrack found1 = dat.addNewTrack(8,23,desc);
+
+		// unique featureId should be assigned
+		assertTrue(found0.featureId != found1.featureId);
+		// make sure a copy is made
+		assertTrue(found0.getDescription() != desc);
+		assertTrue(((TupleDesc_F64)found0.getDescription()).value[0] == 5);
+		// should check to see if the feature is valid
+		assertTrue(dat.validCalled);
+	}
+
+	private static class Helper extends DetectAssociateBase<ImageFloat32,TupleDesc_F64,Object> {
+
+		boolean validCalled = false;
+
+		@Override
+		protected void detectFeatures(ImageFloat32 input, FastQueue<Point2D_F64> locDst, FastQueue<TupleDesc_F64> featDst) {
+
+		}
+
+		protected boolean checkValidSpawn( PointTrack p ) {
+			validCalled = true;
+			return true;
+		}
+
+		@Override
+		protected TupleDesc_F64 createDescription() {
+			return new TupleDesc_F64(10);
+		}
+
+		@Override
+		public Object getAuxiliary(PointTrack track) {
+			return null;
+		}
+
+		@Override
+		public PointTrack addTrack(double x, double y, Object auxiliary) {
+			return null;
+		}
 	}
 }

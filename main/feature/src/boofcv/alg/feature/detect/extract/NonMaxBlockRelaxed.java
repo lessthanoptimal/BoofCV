@@ -68,10 +68,10 @@ public class NonMaxBlockRelaxed extends NonMaxBlock {
 		int y0 = y_c-radius;
 		int y1 = y_c+radius;
 
-		if( x0 < 0 ) x0 = 0;
-		if( y0 < 0 ) y0 = 0;
-		if( x1 >= img.width ) x1 = img.width-1;
-		if( y1 >= img.height ) y1 = img.height-1;
+		if (x0 < border) x0 = border;
+		if (y0 < border) y0 = border;
+		if (x1 >= endX) x1 = endX - 1;
+		if (y1 >= endY) y1 = endY - 1;
 
 		for( int y = y0; y <= y1; y++ ) {
 			int index = img.startIndex + y*img.stride+x0;

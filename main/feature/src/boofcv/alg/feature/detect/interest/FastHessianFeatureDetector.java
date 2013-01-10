@@ -238,7 +238,7 @@ public class FastHessianFeatureDetector<II extends ImageSingleBand> {
 		// treated as being zero.
 		foundFeatures.reset();
 		extractor.setIgnoreBorder(size[level] / (2 * skip)+extractor.getSearchRadius());
-		extractor.process(intensity[index1],null,-1,foundFeatures);
+		extractor.process(intensity[index1],null,foundFeatures);
 
 		// number of features which can be added
 		int numberRemaining;

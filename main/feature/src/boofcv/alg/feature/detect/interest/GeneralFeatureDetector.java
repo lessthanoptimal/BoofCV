@@ -65,9 +65,6 @@ public class GeneralFeatureDetector<I extends ImageSingleBand, D extends ImageSi
 	// Maximums in the feature intensity
 	protected QueueCorner detected = new QueueCorner(10);
 
-	// optional: number of maximums it should try to find
-	protected int requestedFeatureNumber;
-
 	// computes the feature intensity image
 	protected GeneralFeatureIntensity<I, D> intensity;
 
@@ -87,7 +84,11 @@ public class GeneralFeatureDetector<I extends ImageSingleBand, D extends ImageSi
 		this.intensity = intensity;
 		this.extractor = extractor;
 		this.detectMinimums = detectMinimums;
-		extractor.setIgnoreBorder(intensity.getIgnoreBorder());
+
+		// sanity check ignore borders and increase the size of the extractor's ignore border
+		// if its ignore border is too small then false positive are highly likely
+		if( intensity.getIgnoreBorder() > extractor.getIgnoreBorder() )
+			extractor.setIgnoreBorder(intensity.getIgnoreBorder());
 	}
 
 	protected GeneralFeatureDetector() {
@@ -145,9 +146,9 @@ public class GeneralFeatureDetector<I extends ImageSingleBand, D extends ImageSi
 
 		detected.reset();
 		if (intensity.hasCandidates()) {
-			extractor.process(intensityImage, intensity.getCandidates(), requestedFeatureNumber, detected);
+			extractor.process(intensityImage, intensity.getCandidates(), detected);
 		} else {
-			extractor.process(intensityImage, null, requestedFeatureNumber, detected);
+			extractor.process(intensityImage, null, detected);
 		}
 
 		// optionally select the most intense features only
@@ -176,24 +177,6 @@ public class GeneralFeatureDetector<I extends ImageSingleBand, D extends ImageSi
 	 */
 	public void setMaxFeatures(int numFeatures) {
 		this.maxFeatures = numFeatures;
-	}
-
-	/**
-	 * <p>
-	 * Specifies how many corners should be returned.
-	 * </p>
-	 * <p/>
-	 * <p>
-	 * If the provided corner extractor does not support this feature then an exception is thrown.
-	 * </p>
-	 *
-	 * @param requestedFeatureNumber The number of corners it should return.
-	 */
-	public void setRequestedFeatureNumber(int requestedFeatureNumber) {
-		if (!extractor.getAcceptRequest())
-			throw new IllegalArgumentException("The provided corner extractor does not accept requests for the number of detected features.");
-
-		this.requestedFeatureNumber = requestedFeatureNumber;
 	}
 
 	/**

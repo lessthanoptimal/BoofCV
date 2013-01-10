@@ -233,7 +233,7 @@ public class TestGeneralFeatureDetector {
 		}
 
 		@Override
-		public void process(ImageFloat32 intensity, QueueCorner candidate, int requestedNumber, QueueCorner foundFeature) {
+		public void process(ImageFloat32 intensity, QueueCorner candidate, QueueCorner foundFeature) {
 			numTimesProcessed++;
 
 			foundFeature.add(1, 1);
@@ -243,12 +243,6 @@ public class TestGeneralFeatureDetector {
 		@Override
 		public boolean getUsesCandidates() {
 			return usesCandidates;
-		}
-
-
-		@Override
-		public boolean getAcceptRequest() {
-			return acceptsRequests;
 		}
 
 		@Override

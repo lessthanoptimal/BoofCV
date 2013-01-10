@@ -60,7 +60,7 @@ public class BenchmarkExtractors {
 		@Override
 		public void process() {
 			corners.reset();
-			alg.process(intensity, null,-1,corners);
+			alg.process(intensity, null, corners);
 		}
 
 		@Override

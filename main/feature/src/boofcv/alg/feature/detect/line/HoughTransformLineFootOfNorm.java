@@ -123,7 +123,7 @@ public class HoughTransformLineFootOfNorm {
 		foundLines.reset();
 		foundIntensity.reset();
 
-		extractor.process(transform, candidates, -1, foundLines);
+		extractor.process(transform, candidates, foundLines);
 
 		for( int i = 0; i < foundLines.size(); i++ ) {
 			Point2D_I16 p = foundLines.get(i);

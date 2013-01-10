@@ -165,18 +165,22 @@ public abstract class GenericNonMaxTests {
 		intensity.set(0, 0, 100);
 		intensity.set(radius, radius, 50);
 
-		// it should consider the 0,0 pixel
+		// it should not consider the 0,0 pixel and just find the second point
 		findLocalMaximums(intensity, 2, radius, radius);
-		assertEquals(0, found.size);
+		assertEquals(1, found.size);
+		assertEquals(radius,found.get(0).x);
+		assertEquals(radius,found.get(0).y);
 
-		// no ignore border
+		// no ignore border, the first one is the maximum
 		findLocalMaximums(intensity, 2, radius, 0);
 		assertEquals(1, found.size);
+		assertEquals(0, found.get(0).x);
+		assertEquals(0,found.get(0).y);
 
 		// sanity check
-		intensity.set(0, 0, 0);
+		intensity.set(radius, radius, 0);
 		findLocalMaximums(intensity, 2, radius, radius);
-		assertEquals(1, found.size);
+		assertEquals(0, found.size);
 	}
 
 	/**

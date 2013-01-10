@@ -35,11 +35,8 @@ import boofcv.factory.feature.detect.interest.FactoryInterestPoint;
 import boofcv.factory.filter.blur.FactoryBlurFilter;
 import boofcv.struct.feature.TupleDesc_B;
 import boofcv.struct.image.ImageFloat32;
-import org.junit.Test;
 
 import java.util.Random;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * @author Peter Abeles
@@ -50,42 +47,6 @@ public class TestDetectAssociateTracker extends StandardPointTrackerSpawn<ImageF
 
 	public TestDetectAssociateTracker() {
 		super(true, false);
-	}
-
-	/**
-	 * Make sure drop track is correctly recycling the data
-	 */
-	@Test
-	public void dropTrack_Recycle() {
-		createTracker();
-
-		dat.tracksAll.add(dat.getUnused());
-		dat.tracksAll.add(dat.getUnused());
-		dat.tracksAll.add(dat.getUnused());
-
-		PointTrack a = dat.tracksAll.get(1);
-
-		assertEquals(0,dat.unused.size());
-		dat.dropTrack(a);
-		assertEquals(1,dat.unused.size());
-
-		assertEquals(2,dat.tracksAll.size());
-	}
-
-	/**
-	 * Make sure drop all tracks is correctly recycling the data
-	 */
-	@Test
-	public void dropAllTracks_Recycle() {
-		createTracker();
-
-		dat.tracksAll.add(dat.getUnused());
-		dat.tracksAll.add(dat.getUnused());
-		dat.tracksAll.add(dat.getUnused());
-
-		dat.dropAllTracks();
-		assertEquals(3,dat.unused.size());
-		assertEquals(0, dat.tracksAll.size());
 	}
 
 	@Override
