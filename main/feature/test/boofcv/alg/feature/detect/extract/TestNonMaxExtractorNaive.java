@@ -34,15 +34,16 @@ public class TestNonMaxExtractorNaive {
 	}
 
 	private void standardTests( boolean strict ) {
-		new GenericNonMaxTests(strict) {
+		new GenericNonMaxTests(strict,false,true) {
 
 			@Override
-			public void findMaximums(ImageFloat32 intensity, float threshold, int radius, int border, QueueCorner found) {
+			public void findMaximums(ImageFloat32 intensity, float threshold, int radius, int border,
+									 QueueCorner foundMinimum, QueueCorner foundMaximum) {
 				NonMaxExtractorNaive alg = new NonMaxExtractorNaive(strict);
 				alg.setSearchRadius(radius);
 				alg.setThreshold(threshold);
 				alg.setBorder(border);
-				alg.process(intensity,found);
+				alg.process(intensity,foundMaximum);
 			}
 		}.allStandard();
 	}

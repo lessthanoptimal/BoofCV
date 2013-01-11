@@ -21,7 +21,7 @@ package boofcv.abst.feature.detect.extract;
 import boofcv.struct.Configuration;
 
 /**
- * General configuration for {@link FeatureExtractor}.
+ * General configuration for {@link NonMaxSuppression}.
  *
  * @author Peter Abeles
  */
@@ -43,6 +43,27 @@ public class ConfigExtract implements Configuration {
 	 * all its neighbors, otherwise it just needs to be greater than or equal to its neighbors. Default is true.
 	 */
 	public boolean useStrictRule = true;
+
+	/**
+	 * If true then local maximums will be found
+	 */
+	public boolean detectMaximums = true;
+
+	/**
+	 * If false then local maximums will be found
+	 */
+	public boolean detectMinimums = false;
+
+	public ConfigExtract(int radius, float threshold, int ignoreBorder, boolean useStrictRule,
+						 boolean detectMaximums, boolean detectMinimums)
+	{
+		this.radius = radius;
+		this.threshold = threshold;
+		this.ignoreBorder = ignoreBorder;
+		this.useStrictRule = useStrictRule;
+		this.detectMaximums = detectMaximums;
+		this.detectMinimums = detectMinimums;
+	}
 
 	public ConfigExtract(int radius, float threshold, int ignoreBorder, boolean useStrictRule) {
 		this.radius = radius;

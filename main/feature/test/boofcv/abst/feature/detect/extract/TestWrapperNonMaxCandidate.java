@@ -29,10 +29,10 @@ public class TestWrapperNonMaxCandidate {
 
 	@Test
 	public void checkStrict() {
-		GeneralFeatureExtractorChecks checks = new GeneralFeatureExtractorChecks() {
+		GeneralNonMaxSuppressionChecks checks = new GeneralNonMaxSuppressionChecks() {
 
 			@Override
-			public FeatureExtractor createAlg() {
+			public NonMaxSuppression createAlg() {
 				return new WrapperNonMaxCandidate(new NonMaxCandidateStrict());
 			}
 		};
@@ -41,10 +41,10 @@ public class TestWrapperNonMaxCandidate {
 
 	@Test
 	public void checkRelaxed() {
-		GeneralFeatureExtractorChecks checks = new GeneralFeatureExtractorChecks() {
+		GeneralNonMaxSuppressionChecks checks = new GeneralNonMaxSuppressionChecks() {
 
 			@Override
-			public FeatureExtractor createAlg() {
+			public NonMaxSuppression createAlg() {
 				return new WrapperNonMaxCandidate(new NonMaxCandidateRelaxed());
 			}
 		};

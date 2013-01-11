@@ -19,7 +19,7 @@
 package boofcv.alg.feature.detect.line;
 
 
-import boofcv.abst.feature.detect.extract.FeatureExtractor;
+import boofcv.abst.feature.detect.extract.NonMaxSuppression;
 import boofcv.alg.InputSanityCheck;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.struct.FastQueue;
@@ -51,7 +51,7 @@ import georegression.struct.point.Point2D_I16;
 public class HoughTransformLineFootOfNorm {
 
 	// extracts line from the transform
-	FeatureExtractor extractor;
+	NonMaxSuppression extractor;
 	// stores returned lines
 	FastQueue<LineParametric2D_F32> lines = new FastQueue<LineParametric2D_F32>(10,LineParametric2D_F32.class,true);
 	// lines are ignored if they are less than this distance from the origin
@@ -76,7 +76,7 @@ public class HoughTransformLineFootOfNorm {
 	 * @param extractor Extracts local maxima from transform space.  A set of candidates is provided, but can be ignored.
 	 * @param minDistanceFromOrigin Distance from the origin in which lines will not be estimated.  In transform space.  Try 5.
 	 */
-	public HoughTransformLineFootOfNorm(FeatureExtractor extractor,
+	public HoughTransformLineFootOfNorm(NonMaxSuppression extractor,
 										int minDistanceFromOrigin) {
 		if( !extractor.canDetectBorder() ) {
 			throw new IllegalArgumentException("The extractor must also process the image border");

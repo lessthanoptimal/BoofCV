@@ -18,7 +18,7 @@
 
 package boofcv.alg.feature.detect.interest;
 
-import boofcv.abst.feature.detect.extract.FeatureExtractor;
+import boofcv.abst.feature.detect.extract.NonMaxSuppression;
 import boofcv.alg.feature.detect.extract.SortBestFeatures;
 import boofcv.alg.feature.detect.intensity.GIntegralImageFeatureIntensity;
 import boofcv.core.image.border.FactoryImageBorderAlgs;
@@ -85,7 +85,7 @@ import java.util.List;
 public class FastHessianFeatureDetector<II extends ImageSingleBand> {
 
 	// finds features from 2D intensity image
-	private FeatureExtractor extractor;
+	private NonMaxSuppression extractor;
 	// sorts feature by their intensity
 	private SortBestFeatures sortBest;
 	// the maximum number of returned feature per scale
@@ -129,7 +129,7 @@ public class FastHessianFeatureDetector<II extends ImageSingleBand> {
 	 * @param numberScalesPerOctave How many different feature sizes are considered in a single octave
 	 * @param numberOfOctaves How many different octaves are considered.
 	 */
-	public FastHessianFeatureDetector(FeatureExtractor extractor, int maxFeaturesPerScale,
+	public FastHessianFeatureDetector(NonMaxSuppression extractor, int maxFeaturesPerScale,
 									  int initialSampleRate, int initialSize,
 									  int numberScalesPerOctave,
 									  int numberOfOctaves) {
@@ -246,7 +246,7 @@ public class FastHessianFeatureDetector<II extends ImageSingleBand> {
 		// if configured to do so, only select the features with the highest intensity
 		QueueCorner features;
 		if( sortBest != null ) {
-			sortBest.process(intensity[index1],foundFeatures);
+			sortBest.process(intensity[index1],foundFeatures,true);
 			features = sortBest.getBestCorners();
 			numberRemaining = maxFeaturesPerScale;
 		} else {

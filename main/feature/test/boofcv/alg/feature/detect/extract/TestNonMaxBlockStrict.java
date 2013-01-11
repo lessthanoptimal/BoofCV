@@ -25,23 +25,63 @@ import org.junit.Test;
 /**
  * @author Peter Abeles
  */
-public class TestNonMaxBlockStrict extends GenericNonMaxTests {
+public class TestNonMaxBlockStrict {
 
-	public TestNonMaxBlockStrict() {
-		super(true);
+	@Test
+	public void checkMax() {
+		GenericNonMaxTests checks = new GenericNonMaxTests(true,false,true) {
+
+			@Override
+			public void findMaximums(ImageFloat32 intensity, float threshold, int radius, int border,
+									 QueueCorner foundMinimum, QueueCorner foundMaximum)
+			{
+				NonMaxBlockStrict alg = new NonMaxBlockStrict.Max();
+				alg.setThresholdMax(threshold);
+				alg.setBorder(border);
+				alg.setSearchRadius(radius);
+				alg.process(intensity,foundMinimum,foundMaximum);
+			}
+		};
+
+		checks.allStandard();
 	}
 
 	@Test
-	public void standardTests() {
-		super.allStandard();
+	public void checkMin() {
+		GenericNonMaxTests checks = new GenericNonMaxTests(true,true,false) {
+
+			@Override
+			public void findMaximums(ImageFloat32 intensity, float threshold, int radius, int border,
+									 QueueCorner foundMinimum, QueueCorner foundMaximum)
+			{
+				NonMaxBlockStrict alg = new NonMaxBlockStrict.Min();
+				alg.setThresholdMin(-threshold);
+				alg.setBorder(border);
+				alg.setSearchRadius(radius);
+				alg.process(intensity,foundMinimum,foundMaximum);
+			}
+		};
+
+		checks.allStandard();
 	}
 
-	@Override
-	public void findMaximums(ImageFloat32 intensity, float threshold, int radius, int border, QueueCorner found) {
-		NonMaxBlockStrict alg = new NonMaxBlockStrict();
-		alg.setThreshold(threshold);
-		alg.setBorder(border);
-		alg.setSearchRadius(radius);
-		alg.process(intensity,null,found);
+	@Test
+	public void checkMinMax() {
+		GenericNonMaxTests checks = new GenericNonMaxTests(true,true,true) {
+
+			@Override
+			public void findMaximums(ImageFloat32 intensity, float threshold, int radius, int border,
+									 QueueCorner foundMinimum, QueueCorner foundMaximum)
+			{
+				NonMaxBlockStrict alg = new NonMaxBlockStrict.MinMax();
+				alg.setThresholdMin(-threshold);
+				alg.setThresholdMax(threshold);
+				alg.setBorder(border);
+				alg.setSearchRadius(radius);
+				alg.process(intensity,foundMinimum,foundMaximum);
+			}
+		};
+
+		checks.allStandard();
 	}
 }

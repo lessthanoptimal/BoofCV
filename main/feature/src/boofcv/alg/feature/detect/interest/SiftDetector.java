@@ -18,11 +18,10 @@
 
 package boofcv.alg.feature.detect.interest;
 
-import boofcv.abst.feature.detect.extract.FeatureExtractor;
+import boofcv.abst.feature.detect.extract.NonMaxSuppression;
 import boofcv.abst.filter.convolve.ImageConvolveSparse;
 import boofcv.alg.feature.detect.extract.SortBestFeatures;
 import boofcv.alg.filter.kernel.KernelMath;
-import boofcv.alg.misc.PixelMath;
 import boofcv.core.image.border.FactoryImageBorder;
 import boofcv.core.image.border.ImageBorder;
 import boofcv.factory.filter.convolve.FactoryConvolveSparse;
@@ -66,14 +65,15 @@ public class SiftDetector {
 	protected SiftImageScaleSpace ss;
 
 	// finds features from 2D intensity image
-	private FeatureExtractor extractor;
+	private NonMaxSuppression extractor;
 	// helps select features with the largest intensity
 	private SortBestFeatures sortBest;
 
 	// target number of features for the extractor
 	private int maxFeatures;
 	// storage for found features
-	private QueueCorner foundFeatures = new QueueCorner(10);
+	private QueueCorner foundPositive = new QueueCorner(10);
+	private QueueCorner foundNegative = new QueueCorner(10);
 
 	// List of found feature points
 	private FastQueue<ScalePoint> foundPoints = new FastQueue<ScalePoint>(10,ScalePoint.class,true);
@@ -100,9 +100,12 @@ public class SiftDetector {
 	 * @param maxFeaturesPerScale Max detected features per scale.  Disable with < 0.  Try 500
 	 * @param edgeThreshold Threshold for edge filtering.  Disable with a value <= 0.  Try 5
 	 */
-	public SiftDetector(FeatureExtractor extractor,
+	public SiftDetector(NonMaxSuppression extractor,
 						int maxFeaturesPerScale,
 						double edgeThreshold ) {
+		if( !extractor.canDetectMaximums() || !extractor.canDetectMinimums() )
+			throw new IllegalArgumentException("The extractor must be able to detect maximums and minimums");
+
 		this.extractor = extractor;
 		if( maxFeaturesPerScale > 0 ) {
 			// Each scale has detection run twice on it
@@ -173,8 +176,7 @@ public class SiftDetector {
 				// the current scale factor being considered
 				currentSigma = ss.computeScaleSigma(octave,scale);
 
-				detectFeatures(indexDOG,true);
-				detectFeatures(indexDOG,false);
+				detectFeatures(indexDOG);
 			}
 
 			// when the images are sub-sampled between octaves the sampling starts at pixel 1 in (x,y)
@@ -184,54 +186,45 @@ public class SiftDetector {
 
 	/**
 	 * Detect features inside the specified scale.
-	 *
-	 * @param positive Detect features with a positive or negative response
 	 */
-	private void detectFeatures( int indexDOG , boolean positive ) {
+	private void detectFeatures( int indexDOG ) {
 		// set up data structures
-		foundFeatures.reset();
+		foundNegative.reset();
+		foundPositive.reset();
 
 		// Local scale-space neighborhood
 		ImageFloat32 scale0 = ss.dog[indexDOG-1];
 		ImageFloat32 scale1 = ss.dog[indexDOG];
 		ImageFloat32 scale2 = ss.dog[indexDOG+1];
 
-		// adjusts sign so that just the peak can be compared
-		float signAdj;
+		extractor.process(scale1,null,null,foundNegative,foundPositive);
 
-		if( positive ) {
-			// detect maximums
-			signAdj = 1;
-			extractor.process(scale1,null,null,null, foundFeatures);
-		} else {
-			// detect minimums
-			signAdj = -1;
-			PixelMath.invert(scale1, ss.storage);
-			extractor.process(ss.storage,null,null,null, foundFeatures);
-		}
+		addFoundFeatures(scale0,scale1,scale2,foundNegative,false);
+		addFoundFeatures(scale0,scale1,scale2,foundPositive,true);
+	}
 
-		// number of features which can be added
-		int numberRemaining;
+	private void addFoundFeatures( ImageFloat32 scale0, ImageFloat32 scale1, ImageFloat32 scale2,
+								   QueueCorner found , boolean positive ) {
+
 
 		// if configured to do so, only select the features with the highest intensity
 		QueueCorner features;
 		if( sortBest != null ) {
-			sortBest.process(scale1,foundFeatures);
+			sortBest.process(scale1,found,positive);
 			features = sortBest.getBestCorners();
-			numberRemaining = maxFeatures;
 		} else {
-			features = foundFeatures;
-			numberRemaining = Integer.MAX_VALUE;
+			features = found;
 		}
 
+		float signAdj = positive ? 1 : -1;
+
 		// see if they are a local max in scale space
-		for( int i = 0; i < features.size && numberRemaining > 0 ; i++ ) {
+		for( int i = 0; i < features.size; i++ ) {
 			Point2D_I16 p = features.data[i];
 			float value = scale1.unsafe_get(p.x, p.y);
 			if( isScaleSpaceMax(scale0,scale2,p.x,p.y,value,signAdj)
 					&& !isEdge(p.x,p.y) ) {
 				addPoint(scale0,scale1,scale2,p.x,p.y,value,signAdj,positive);
-				numberRemaining--;
 			}
 		}
 	}

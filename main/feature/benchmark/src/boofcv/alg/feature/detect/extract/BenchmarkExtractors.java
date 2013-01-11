@@ -18,7 +18,7 @@
 
 package boofcv.alg.feature.detect.extract;
 
-import boofcv.abst.feature.detect.extract.FeatureExtractor;
+import boofcv.abst.feature.detect.extract.NonMaxSuppression;
 import boofcv.abst.feature.detect.extract.WrapperNonMaximumBlock;
 import boofcv.abst.feature.detect.extract.WrapperNonMaximumNaive;
 import boofcv.alg.misc.ImageMiscOps;
@@ -48,13 +48,13 @@ public class BenchmarkExtractors {
 
 
 	public static class NM implements Performer {
-		FeatureExtractor alg;
+		NonMaxSuppression alg;
 		String name;
 
-		public NM(String name , FeatureExtractor alg) {
+		public NM(String name , NonMaxSuppression alg) {
 			this.alg = alg;
 			this.name = name;
-			alg.setThreshold(threshold);
+			alg.setThresholdMaximum(threshold);
 			alg.setSearchRadius(windowRadius);
 		}
 
@@ -81,10 +81,10 @@ public class BenchmarkExtractors {
 		System.out.println();
 
 		ThresholdCornerExtractor algThresh = new ThresholdCornerExtractor();
-		NonMaxBlockStrict algBlockStrict = new NonMaxBlockStrict();
-		LocalPeakBlockStrictMinMax algBlobMinMax = new LocalPeakBlockStrictMinMax();
+		NonMaxBlockStrict algBlockStrict = new NonMaxBlockStrict.Max();
+		NonMaxBlockStrict algBlockStrictMinMax = new NonMaxBlockStrict.MinMax();
 		NonMaxExtractorNaive algNaiveStrict = new NonMaxExtractorNaive(true);
-		NonMaxBlockRelaxed algBlockRelaxed = new NonMaxBlockRelaxed();
+		NonMaxBlockRelaxed algBlockRelaxed = new NonMaxBlockRelaxed.Max();
 		NonMaxExtractorNaive algNaiveRelaxed = new NonMaxExtractorNaive(true);
 
 
@@ -93,10 +93,10 @@ public class BenchmarkExtractors {
 			System.out.println();
 			windowRadius = radius;
 
-			NM alg2 = new NM("Block Strict",new WrapperNonMaximumBlock(algBlockStrict,false,true));
-			NM alg3 = new NM("Block Strict MinMax",new WrapperNonMaximumBlock(algBlobMinMax,true,true));
+			NM alg2 = new NM("Block Strict",new WrapperNonMaximumBlock(algBlockStrict));
+			NM alg3 = new NM("Block Strict MinMax",new WrapperNonMaximumBlock(algBlockStrictMinMax));
 			NM alg4 = new NM("Naive Strict",new WrapperNonMaximumNaive(algNaiveStrict));
-			NM alg5 = new NM("Block Relaxed",new WrapperNonMaximumBlock(algBlockRelaxed,false,true));
+			NM alg5 = new NM("Block Relaxed",new WrapperNonMaximumBlock(algBlockRelaxed));
 			NM alg6 = new NM("Naive Relaxed",new WrapperNonMaximumNaive(algNaiveRelaxed));
 
 			ProfileOperation.printOpsPerSec(alg2, TEST_TIME);

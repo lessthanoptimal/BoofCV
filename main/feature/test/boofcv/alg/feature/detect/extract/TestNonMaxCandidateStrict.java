@@ -20,35 +20,27 @@ package boofcv.alg.feature.detect.extract;
 
 import boofcv.struct.QueueCorner;
 import boofcv.struct.image.ImageFloat32;
-import org.junit.Test;
 
 /**
  * @author Peter Abeles
  */
-public class TestNonMaxCandidateStrict {
+public class TestNonMaxCandidateStrict extends GenericNonMaxCandidateTests {
 
-	@Test
-	public void standardTests() {
-		GenericNonMaxTests tests = new GenericNonMaxTests(true) {
-			@Override
-			public void findMaximums(ImageFloat32 intensity, float threshold, int radius, int border, QueueCorner found) {
-				NonMaxCandidateStrict alg = new NonMaxCandidateStrict();
-				alg.radius = radius;
-				alg.ignoreBorder = border;
-				alg.thresh = threshold;
-
-				QueueCorner candidates = new QueueCorner(100);
-				for( int i = 0; i < intensity.height; i++ ) {
-					for( int j = 0; j < intensity.width; j++ ) {
-						if( intensity.get(j,i) >= threshold )
-							candidates.add(j,i);
-					}
-				}
-
-				alg.process(intensity,null,candidates,null,found);
-			}
-		};
-		tests.allStandard();
+	public TestNonMaxCandidateStrict() {
+		super(true, true, true);
 	}
 
+	@Override
+	public void findMaximums(ImageFloat32 intensity, float threshold, int radius, int border,
+							 QueueCorner candidatesMin, QueueCorner candidatesMax,
+							 QueueCorner foundMinimum, QueueCorner foundMaximum)
+	{
+		NonMaxCandidateStrict alg = new NonMaxCandidateStrict();
+		alg.radius = radius;
+		alg.ignoreBorder = border;
+		alg.thresholdMin = -threshold;
+		alg.thresholdMax = threshold;
+
+		alg.process(intensity,candidatesMin,candidatesMax,foundMinimum,foundMaximum);
+	}
 }

@@ -24,11 +24,12 @@ import boofcv.struct.image.ImageFloat32;
 
 /**
  * <p>
- * Detects features in an intensity image as local minimums and/or maximums.  The extractor can be configured to ignore
- * pixels along the image border by a user specified distance.  Some implementations require candidate locations
- * for the features.  This allows for a sparse algorithm to be used, resulting in a significant speed boost.  Pixel
- * values with -Float.MAX_VALUE or Float.MAX_VALUE will not be considered for local minimum/maximum, respectively.
- * A good way to ignore previously detected features is to set their pixel values to Float.MAX_VALUE.
+ * Detects local minimums and/or maximums in an intensity image inside square regions.  This is known as non-maximum
+ * suppression.  The detector can be configured to ignore pixels along the image border by a user specified distance.
+ * Some implementations require candidate locations for the features.  This allows for a sparse algorithm to be used,
+ * resulting in a significant speed boost.  Pixel values with a value of -Float.MAX_VALUE or Float.MAX_VALUE will
+ * not be considered for local minimum/maximum, respectively.  This is a good way to ignore previously detected
+ * features.
  * </p>
  *
  * <p>
@@ -50,7 +51,7 @@ import boofcv.struct.image.ImageFloat32;
  *
  * @author Peter Abeles
  */
-public interface FeatureExtractor {
+public interface NonMaxSuppression {
 
 	/**
 	 * Process a feature intensity image to extract the point features.  If a pixel has an intensity
@@ -76,18 +77,32 @@ public interface FeatureExtractor {
 	public boolean getUsesCandidates();
 
 	/**
-	 * Features must have the specified threshold.
+	 * Maximum value for detected minimums
 	 *
 	 * @return threshold for feature selection
 	 */
-	public float getThreshold();
+	public float getThresholdMinimum();
 
 	/**
-	 * Change the feature selection threshold.
+	 * Minimum value for detected maximums
+	 *
+	 * @return threshold for feature selection
+	 */
+	public float getThresholdMaximum();
+
+	/**
+	 * Change the feature selection threshold for finding local minimums.
 	 *
 	 * @param threshold The new selection threshold.
 	 */
-	public void setThreshold(float threshold);
+	public void setThresholdMinimum(float threshold);
+
+	/**
+	 * Change the feature selection threshold for finding local maximums.
+	 *
+	 * @param threshold The new selection threshold.
+	 */
+	public void setThresholdMaximum(float threshold);
 
 	/**
 	 * Pixels which are within 'border' of the image border will not be considered.
@@ -128,12 +143,13 @@ public interface FeatureExtractor {
 	public int getSearchRadius();
 
 	/**
-	 *
-	 * @return
+	 * True if it can detect local maximums.
 	 */
 	public boolean canDetectMaximums();
 
-
+	/**
+	 * True if it can detect local minimums.
+	 */
 	public boolean canDetectMinimums();
 
 }

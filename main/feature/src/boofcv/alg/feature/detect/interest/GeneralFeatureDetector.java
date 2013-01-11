@@ -18,7 +18,7 @@
 
 package boofcv.alg.feature.detect.interest;
 
-import boofcv.abst.feature.detect.extract.FeatureExtractor;
+import boofcv.abst.feature.detect.extract.NonMaxSuppression;
 import boofcv.abst.feature.detect.intensity.GeneralFeatureIntensity;
 import boofcv.alg.feature.detect.extract.SelectNBestFeatures;
 import boofcv.alg.misc.PixelMath;
@@ -60,7 +60,7 @@ public class GeneralFeatureDetector<I extends ImageSingleBand, D extends ImageSi
 	protected int maxFeatures;
 
 	// extracts corners from the intensity image
-	protected FeatureExtractor extractor;
+	protected NonMaxSuppression extractor;
 
 	// Maximums in the feature intensity
 	protected QueueCorner detected = new QueueCorner(10);
@@ -76,7 +76,7 @@ public class GeneralFeatureDetector<I extends ImageSingleBand, D extends ImageSi
 	 * @param detectMinimums If true it will detect minimums in the intensity image also.
 	 */
 	public GeneralFeatureDetector(GeneralFeatureIntensity<I, D> intensity,
-								  FeatureExtractor extractor ,
+								  NonMaxSuppression extractor ,
 								  boolean detectMinimums ) {
 		if (extractor.getUsesCandidates() && !intensity.hasCandidates())
 			throw new IllegalArgumentException("The extractor requires candidate features, which the intensity does not provide.");
@@ -207,7 +207,7 @@ public class GeneralFeatureDetector<I extends ImageSingleBand, D extends ImageSi
 	 * @param threshold The new feature extraction threshold.
 	 */
 	public void setThreshold(float threshold) {
-		extractor.setThreshold(threshold);
+		extractor.setThresholdMaximum(threshold);
 	}
 
 	/**
@@ -216,7 +216,7 @@ public class GeneralFeatureDetector<I extends ImageSingleBand, D extends ImageSi
 	 * @return feature extraction threshold.
 	 */
 	public float getThreshold() {
-		return extractor.getThreshold();
+		return extractor.getThresholdMaximum();
 	}
 
 	/**

@@ -21,6 +21,7 @@ package boofcv.alg.feature.detect.extract;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.image.ImageFloat32;
 import georegression.struct.point.Point2D_I16;
+import org.ddogleg.sorting.QuickSelectArray;
 import org.ddogleg.sorting.QuickSort_F32;
 
 
@@ -37,6 +38,8 @@ public class SortBestFeatures {
 	float inten[] = new float[1];
 
 	QuickSort_F32 sorter = new QuickSort_F32();
+	// number of features it should return
+	int target;
 
 	public SortBestFeatures(int maxCorners) {
 		bestCorners = new QueueCorner(maxCorners);
@@ -44,46 +47,47 @@ public class SortBestFeatures {
 	}
 
 	public void setN( int N ) {
-		if( N > indexes.length ) {
-			indexes = new int[N];
-			inten = new float[N];
-		}
+		target = N;
 	}
 
-	public void process(ImageFloat32 intensityImage, QueueCorner origCorners) {
-		final int numFoundFeatures = origCorners.size;
+	public void process(ImageFloat32 intensityImage, QueueCorner origCorners, boolean positive ) {
 		bestCorners.reset();
 
-		if (numFoundFeatures <= origCorners.size) {
+		if (origCorners.size <= target) {
 			// make a copy of the results with no pruning since it already
 			// has the desired number, or less
-			for (int i = 0; i < numFoundFeatures; i++) {
+			for (int i = 0; i < origCorners.size; i++) {
 				Point2D_I16 pt = origCorners.data[i];
 				bestCorners.add(pt.x, pt.y);
 			}
 		} else {
-			int N = origCorners.size;
 
 			// grow internal data structures
-			if( N > indexes.length ) {
-				indexes = new int[N];
-				inten = new float[N];
+			if( origCorners.size > indexes.length ) {
+				indexes = new int[origCorners.size];
+				inten = new float[origCorners.size];
 			}
 
 			// extract the intensities for each corner
 			Point2D_I16[] points = origCorners.data;
 
-			for (int i = 0; i < N; i++) {
-				Point2D_I16 pt = points[i];
-				// quick select selects the k smallest
-				// I want the k-biggest so the negative is used
-				inten[i] = -intensityImage.get(pt.getX(), pt.getY());
-
+			if( positive ) {
+				for (int i = 0; i < origCorners.size; i++) {
+					Point2D_I16 pt = points[i];
+					// quick select selects the k smallest
+					// I want the k-biggest so the negative is used
+					inten[i] = -intensityImage.get(pt.getX(), pt.getY());
+				}
+			} else {
+				for (int i = 0; i < origCorners.size; i++) {
+					Point2D_I16 pt = points[i];
+					inten[i] = intensityImage.get(pt.getX(), pt.getY());
+				}
 			}
 
-			sorter.sort(inten,N,indexes);
+			QuickSelectArray.selectIndex(inten,target,origCorners.size,indexes);
 
-			for (int i = 0; i < N; i++) {
+			for (int i = 0; i < target; i++) {
 				Point2D_I16 pt = origCorners.data[indexes[i]];
 				bestCorners.add(pt.x, pt.y);
 			}
