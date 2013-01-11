@@ -18,7 +18,7 @@
 
 package boofcv.alg.feature.detect;
 
-import boofcv.abst.feature.detect.extract.FeatureExtractor;
+import boofcv.abst.feature.detect.extract.NonMaxSuppression;
 import boofcv.abst.feature.detect.extract.WrapperNonMaximumBlock;
 import boofcv.abst.feature.detect.intensity.GeneralFeatureIntensity;
 import boofcv.abst.feature.detect.intensity.WrapperGradientCornerIntensity;
@@ -133,11 +133,11 @@ public class VideoDetectCorners<T extends ImageSingleBand, D extends ImageSingle
 //		GeneralFeatureIntensity<T, D> intensity =
 //				new WrapperFastCornerIntensity<T, D>(FactoryIntensityPointAlg.createFast12(imageType, 8 , 12));
 
-		FeatureExtractor extractor = new WrapperNonMaximumBlock(new NonMaxBlockStrict(),false,true);
+		NonMaxSuppression extractor = new WrapperNonMaximumBlock(new NonMaxBlockStrict.Max());
 //		FeatureExtractor extractor = new WrapperNonMaximumBlock( new NonMaxExtractorNaive(radius+10,10f));
 //		FeatureExtractor extractor = new WrapperNonMaxCandidate(new NonMaxCandidateStrict(radius+10, 10f));
 		extractor.setIgnoreBorder(radius + 10);
-		extractor.setThreshold(10f);
+		extractor.setThresholdMaximum(10f);
 
 		GeneralFeatureDetector<T, D> detector = new GeneralFeatureDetector<T, D>(intensity, extractor, false);
 		detector.setMaxFeatures(maxCorners);

@@ -19,7 +19,7 @@
 package boofcv.alg.feature.detect.extract;
 
 import boofcv.abst.feature.detect.extract.ConfigExtract;
-import boofcv.abst.feature.detect.extract.FeatureExtractor;
+import boofcv.abst.feature.detect.extract.NonMaxSuppression;
 import boofcv.abst.feature.detect.intensity.GeneralFeatureIntensity;
 import boofcv.abst.filter.derivative.AnyImageDerivative;
 import boofcv.alg.feature.detect.intensity.HessianBlobIntensity;
@@ -160,7 +160,7 @@ public class CompareFeatureExtractorApp<T extends ImageSingleBand, D extends Ima
 		float max = ImageStatistics.maxAbs(intensity);
 		float threshold = max * thresholdFraction;
 
-		FeatureExtractor extractor =
+		NonMaxSuppression extractor =
 				FactoryFeatureExtractor.nonmax(new ConfigExtract(minSeparation, threshold, radius, true));
 		GeneralFeatureDetector<T, D> detector = new GeneralFeatureDetector<T, D>(intensityAlg, extractor, false);
 		detector.setMaxFeatures(numFeatures);
