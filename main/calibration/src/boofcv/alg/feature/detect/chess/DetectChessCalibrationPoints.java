@@ -19,7 +19,7 @@
 package boofcv.alg.feature.detect.chess;
 
 import boofcv.abst.feature.detect.extract.ConfigExtract;
-import boofcv.abst.feature.detect.extract.FeatureExtractor;
+import boofcv.abst.feature.detect.extract.NonMaxSuppression;
 import boofcv.abst.feature.detect.intensity.GeneralFeatureIntensity;
 import boofcv.alg.feature.detect.InvalidCalibrationTarget;
 import boofcv.alg.feature.detect.grid.UtilCalibrationGrid;
@@ -145,7 +145,7 @@ public class DetectChessCalibrationPoints<T extends ImageSingleBand, D extends I
 		intensityAlg = FactoryIntensityPoint.shiTomasi(radius, true, derivType);
 //		intensityAlg = FactoryIntensityPoint.harris(radius,0.04f,true,derivType);
 
-		FeatureExtractor extractor =
+		NonMaxSuppression extractor =
 				FactoryFeatureExtractor.nonmax(new ConfigExtract(radius + 2, 20, radius + 2, true));
 		detectorAlg = new GeneralFeatureDetector<T, D>(intensityAlg, extractor, false);
 
