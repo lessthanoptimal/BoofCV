@@ -36,7 +36,7 @@ public class FactoryTemplateMatching {
 
 	/**
 	 * Creates {@link TemplateMatchingIntensity} of the specified type.  Likely
-	 * matches can be extracted using {@link boofcv.abst.feature.detect.extract.FeatureExtractor}.
+	 * matches can be extracted using {@link boofcv.abst.feature.detect.extract.NonMaxSuppression}.
 	 *
 	 * @param type      Type of error function
 	 * @param imageType Image type being processed

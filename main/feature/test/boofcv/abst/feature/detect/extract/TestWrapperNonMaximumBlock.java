@@ -28,24 +28,72 @@ import org.junit.Test;
 public class TestWrapperNonMaximumBlock {
 
 	@Test
-	public void checkStrict() {
-		GeneralFeatureExtractorChecks checks = new GeneralFeatureExtractorChecks() {
+	public void checkStrict_Max() {
+		GeneralNonMaxSuppressionChecks checks = new GeneralNonMaxSuppressionChecks() {
 
 			@Override
-			public FeatureExtractor createAlg() {
-				return new WrapperNonMaximumBlock(new NonMaxBlockStrict(),false,true);
+			public NonMaxSuppression createAlg() {
+				return new WrapperNonMaximumBlock(new NonMaxBlockStrict.Max());
 			}
 		};
 		checks.testAll();
 	}
 
 	@Test
-	public void checkRelaxed() {
-		GeneralFeatureExtractorChecks checks = new GeneralFeatureExtractorChecks() {
+	public void checkStrict_Min() {
+		GeneralNonMaxSuppressionChecks checks = new GeneralNonMaxSuppressionChecks() {
 
 			@Override
-			public FeatureExtractor createAlg() {
-				return new WrapperNonMaximumBlock(new NonMaxBlockRelaxed(),false,true);
+			public NonMaxSuppression createAlg() {
+				return new WrapperNonMaximumBlock(new NonMaxBlockStrict.Min());
+			}
+		};
+		checks.testAll();
+	}
+
+	@Test
+	public void checkStrict_MinMax() {
+		GeneralNonMaxSuppressionChecks checks = new GeneralNonMaxSuppressionChecks() {
+
+			@Override
+			public NonMaxSuppression createAlg() {
+				return new WrapperNonMaximumBlock(new NonMaxBlockStrict.MinMax());
+			}
+		};
+		checks.testAll();
+	}
+
+	@Test
+	public void checkRelaxed_Max() {
+		GeneralNonMaxSuppressionChecks checks = new GeneralNonMaxSuppressionChecks() {
+
+			@Override
+			public NonMaxSuppression createAlg() {
+				return new WrapperNonMaximumBlock(new NonMaxBlockRelaxed.Max());
+			}
+		};
+		checks.testAll();
+	}
+
+	@Test
+	public void checkRelaxed_Min() {
+		GeneralNonMaxSuppressionChecks checks = new GeneralNonMaxSuppressionChecks() {
+
+			@Override
+			public NonMaxSuppression createAlg() {
+				return new WrapperNonMaximumBlock(new NonMaxBlockRelaxed.Min());
+			}
+		};
+		checks.testAll();
+	}
+
+	@Test
+	public void checkRelaxed_MinMax() {
+		GeneralNonMaxSuppressionChecks checks = new GeneralNonMaxSuppressionChecks() {
+
+			@Override
+			public NonMaxSuppression createAlg() {
+				return new WrapperNonMaximumBlock(new NonMaxBlockRelaxed.MinMax());
 			}
 		};
 		checks.testAll();

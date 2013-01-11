@@ -20,7 +20,7 @@ package boofcv.abst.feature.detect.line;
 
 
 import boofcv.abst.feature.detect.extract.ConfigExtract;
-import boofcv.abst.feature.detect.extract.FeatureExtractor;
+import boofcv.abst.feature.detect.extract.NonMaxSuppression;
 import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.alg.feature.detect.edge.GGradientToEdgeFeatures;
 import boofcv.alg.feature.detect.line.HoughTransformLinePolar;
@@ -58,7 +58,7 @@ public class DetectLineHoughPolar<I extends ImageSingleBand, D extends ImageSing
 	HoughTransformLinePolar alg;
 
 	// extractor used by hough transform
-	FeatureExtractor extractor;
+	NonMaxSuppression extractor;
 
 	// computes image gradient
 	ImageGradient<I,D> gradient;

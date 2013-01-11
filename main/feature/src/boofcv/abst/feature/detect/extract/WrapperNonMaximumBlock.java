@@ -27,18 +27,14 @@ import boofcv.struct.image.ImageFloat32;
  *
  * @author Peter Abeles
  */
-public class WrapperNonMaximumBlock implements FeatureExtractor {
+public class WrapperNonMaximumBlock implements NonMaxSuppression {
 
 	// specific implementation
 	NonMaxBlock alg;
-	// indicates if the algorithm can detect minimums or maximums
-	boolean detectMin,detectMax;
 
 
-	public WrapperNonMaximumBlock(NonMaxBlock alg, boolean detectMin, boolean detectMax) {
+	public WrapperNonMaximumBlock(NonMaxBlock alg ) {
 		this.alg = alg;
-		this.detectMin = detectMin;
-		this.detectMax = detectMax;
 	}
 
 	@Override
@@ -49,8 +45,23 @@ public class WrapperNonMaximumBlock implements FeatureExtractor {
 	}
 
 	@Override
-	public float getThreshold() {
-		return alg.getThreshold();
+	public float getThresholdMinimum() {
+		return alg.getThresholdMin();
+	}
+
+	@Override
+	public float getThresholdMaximum() {
+		return alg.getThresholdMax();
+	}
+
+	@Override
+	public void setThresholdMinimum(float threshold) {
+		alg.setThresholdMin(threshold);
+	}
+
+	@Override
+	public void setThresholdMaximum(float threshold) {
+		alg.setThresholdMax(threshold);
 	}
 
 	@Override
@@ -61,11 +72,6 @@ public class WrapperNonMaximumBlock implements FeatureExtractor {
 	@Override
 	public void setIgnoreBorder(int border) {
 		alg.setBorder(border);
-	}
-
-	@Override
-	public void setThreshold(float threshold) {
-		alg.setThreshold(threshold);
 	}
 
 	@Override
@@ -90,11 +96,11 @@ public class WrapperNonMaximumBlock implements FeatureExtractor {
 
 	@Override
 	public boolean canDetectMaximums() {
-		return detectMin;
+		return alg.detectsMaximum;
 	}
 
 	@Override
 	public boolean canDetectMinimums() {
-		return detectMax;
+		return alg.detectsMinimum;
 	}
 }

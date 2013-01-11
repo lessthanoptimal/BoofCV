@@ -19,7 +19,7 @@
 package boofcv.alg.feature.detect.line;
 
 
-import boofcv.abst.feature.detect.extract.FeatureExtractor;
+import boofcv.abst.feature.detect.extract.NonMaxSuppression;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.struct.FastQueue;
 import boofcv.struct.GrowQueue_F32;
@@ -50,7 +50,7 @@ import georegression.struct.point.Point2D_I16;
  */
 public class HoughTransformLinePolar {
 	// extracts line from the transform
-	FeatureExtractor extractor;
+	NonMaxSuppression extractor;
 	// stores returned lines
 	FastQueue<LineParametric2D_F32> lines = new FastQueue<LineParametric2D_F32>(10,LineParametric2D_F32.class,true);
 	// origin of the transform coordinate system
@@ -77,7 +77,7 @@ public class HoughTransformLinePolar {
 	 * @param numBinsRange How many bins are be used for line range.
 	 * @param numBinsAngle How many bins are used for angle.
 	 */
-	public HoughTransformLinePolar(FeatureExtractor extractor , int numBinsRange , int numBinsAngle) {
+	public HoughTransformLinePolar(NonMaxSuppression extractor , int numBinsRange , int numBinsAngle) {
 		if( !extractor.canDetectBorder() ) {
 			throw new IllegalArgumentException("The extractor must also process the image border");
 		}

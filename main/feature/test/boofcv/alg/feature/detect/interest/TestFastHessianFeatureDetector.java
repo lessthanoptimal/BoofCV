@@ -19,7 +19,7 @@
 package boofcv.alg.feature.detect.interest;
 
 import boofcv.abst.feature.detect.extract.ConfigExtract;
-import boofcv.abst.feature.detect.extract.FeatureExtractor;
+import boofcv.abst.feature.detect.extract.NonMaxSuppression;
 import boofcv.alg.transform.ii.IntegralImageOps;
 import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
 import boofcv.struct.image.ImageFloat32;
@@ -36,7 +36,7 @@ public class TestFastHessianFeatureDetector extends GenericFeatureDetector {
 
 	@Override
 	protected Object createDetector( int maxFeatures ) {
-		FeatureExtractor extractor = FactoryFeatureExtractor.nonmax(new ConfigExtract(1, 1, 5, true));
+		NonMaxSuppression extractor = FactoryFeatureExtractor.nonmax(new ConfigExtract(1, 1, 5, true));
 		return new FastHessianFeatureDetector(extractor,maxFeatures, 1, 9,4,4);
 	}
 

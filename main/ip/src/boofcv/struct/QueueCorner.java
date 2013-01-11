@@ -33,6 +33,10 @@ public class QueueCorner extends FastQueue<Point2D_I16>{
 		super(max,Point2D_I16.class,true);
 	}
 
+	public QueueCorner() {
+		super(10,Point2D_I16.class,true);
+	}
+
 	public final void add(int x, int y) {
 		grow().set((short)x,(short)y);
 	}

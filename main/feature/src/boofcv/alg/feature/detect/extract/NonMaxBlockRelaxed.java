@@ -28,36 +28,128 @@ import georegression.struct.point.Point2D_I32;
  *
  * @author Peter Abeles
  */
-public class NonMaxBlockRelaxed extends NonMaxBlock {
+public abstract class NonMaxBlockRelaxed extends NonMaxBlock {
 
 	// storage for local maximums
-	Point2D_I32 local[];
+	Point2D_I32 foundMax[];
+	Point2D_I32 foundMin[];
 
-	@Override
-	protected void searchBlock( int x0 , int y0 , int x1 , int y1 , ImageFloat32 img ) {
+	protected NonMaxBlockRelaxed(boolean detectsMinimum, boolean detectsMaximum) {
+		super(detectsMinimum, detectsMaximum);
+	}
 
-		int numPeaks = 0;
-		float peakVal = threshold;
+	public static class Max extends NonMaxBlockRelaxed {
+		public Max() { super(false, true); }
 
-		for( int y = y0; y < y1; y++ ) {
-			int index = img.startIndex + y*img.stride+x0;
-			for( int x = x0; x < x1; x++ ) {
-				float v = img.data[index++];
+		@Override
+		protected void searchBlock( int x0 , int y0 , int x1 , int y1 , ImageFloat32 img ) {
 
-				if( v > peakVal ) {
-					peakVal = v;
-					local[0].set(x,y);
-					numPeaks = 1;
-				} else if( v == peakVal ) {
-					local[numPeaks++].set(x,y);
+			int numPeaks = 0;
+			float peakVal = thresholdMax;
+
+			for( int y = y0; y < y1; y++ ) {
+				int index = img.startIndex + y*img.stride+x0;
+				for( int x = x0; x < x1; x++ ) {
+					float v = img.data[index++];
+
+					if( v > peakVal ) {
+						peakVal = v;
+						foundMax[0].set(x, y);
+						numPeaks = 1;
+					} else if( v == peakVal ) {
+						foundMax[numPeaks++].set(x, y);
+					}
+				}
+			}
+
+			if( numPeaks > 0 && peakVal != Float.MAX_VALUE ) {
+				for( int i = 0; i < numPeaks; i++ ) {
+					Point2D_I32 p = foundMax[i];
+					checkLocalMax(p.x,p.y,peakVal,img);
 				}
 			}
 		}
+	}
 
-		if( numPeaks > 0 && peakVal != Float.MAX_VALUE ) {
-			for( int i = 0; i < numPeaks; i++ ) {
-				Point2D_I32 p = local[i];
-				checkLocalMax(p.x,p.y,peakVal,img);
+	public static class Min extends NonMaxBlockRelaxed {
+		public Min() { super(true, false); }
+
+		@Override
+		protected void searchBlock( int x0 , int y0 , int x1 , int y1 , ImageFloat32 img ) {
+
+			int numPeaks = 0;
+			float peakVal = thresholdMin;
+
+			for( int y = y0; y < y1; y++ ) {
+				int index = img.startIndex + y*img.stride+x0;
+				for( int x = x0; x < x1; x++ ) {
+					float v = img.data[index++];
+
+					if( v < peakVal ) {
+						peakVal = v;
+						foundMin[0].set(x, y);
+						numPeaks = 1;
+					} else if( v == peakVal ) {
+						foundMin[numPeaks++].set(x, y);
+					}
+				}
+			}
+
+			if( numPeaks > 0 && peakVal != -Float.MAX_VALUE ) {
+				for( int i = 0; i < numPeaks; i++ ) {
+					Point2D_I32 p = foundMin[i];
+					checkLocalMin(p.x, p.y, peakVal, img);
+				}
+			}
+		}
+	}
+
+	public static class MinMax extends NonMaxBlockRelaxed {
+		public MinMax() { super(true, true); }
+
+		@Override
+		protected void searchBlock( int x0 , int y0 , int x1 , int y1 , ImageFloat32 img ) {
+
+			int numMinPeaks = 0;
+			float peakMinVal = thresholdMin;
+			int numMaxPeaks = 0;
+			float peakMaxVal = thresholdMax;
+
+			for( int y = y0; y < y1; y++ ) {
+				int index = img.startIndex + y*img.stride+x0;
+				for( int x = x0; x < x1; x++ ) {
+					float v = img.data[index++];
+
+					if( v < peakMinVal ) {
+						peakMinVal = v;
+						foundMin[0].set(x, y);
+						numMinPeaks = 1;
+					} else if( v == peakMinVal ) {
+						foundMin[numMinPeaks++].set(x, y);
+					}
+
+					if( v > peakMaxVal ) {
+						peakMaxVal = v;
+						foundMax[0].set(x, y);
+						numMaxPeaks = 1;
+					} else if( v == peakMaxVal ) {
+						foundMax[numMaxPeaks++].set(x, y);
+					}
+				}
+			}
+
+			if( numMinPeaks > 0 && peakMinVal != -Float.MAX_VALUE ) {
+				for( int i = 0; i < numMinPeaks; i++ ) {
+					Point2D_I32 p = foundMin[i];
+					checkLocalMin(p.x,p.y,peakMinVal,img);
+				}
+			}
+
+			if( numMaxPeaks > 0 && peakMaxVal != Float.MAX_VALUE ) {
+				for( int i = 0; i < numMaxPeaks; i++ ) {
+					Point2D_I32 p = foundMax[i];
+					checkLocalMax(p.x,p.y,peakMaxVal,img);
+				}
 			}
 		}
 	}
@@ -79,14 +171,39 @@ public class NonMaxBlockRelaxed extends NonMaxBlock {
 				float v = img.data[index++];
 
 				if( v > peakVal ) {
-					// not a local max
+					// not a local maximum
 					return;
 				}
 			}
 		}
 
-		// save location of local max
 		localMax.add(x_c,y_c);
+	}
+
+	protected void checkLocalMin( int x_c , int y_c , float peakVal , ImageFloat32 img ) {
+		int x0 = x_c-radius;
+		int x1 = x_c+radius;
+		int y0 = y_c-radius;
+		int y1 = y_c+radius;
+
+		if (x0 < border) x0 = border;
+		if (y0 < border) y0 = border;
+		if (x1 >= endX) x1 = endX - 1;
+		if (y1 >= endY) y1 = endY - 1;
+
+		for( int y = y0; y <= y1; y++ ) {
+			int index = img.startIndex + y*img.stride+x0;
+			for( int x = x0; x <= x1; x++ ) {
+				float v = img.data[index++];
+
+				if( v < peakVal ) {
+					// not a local minimum
+					return;
+				}
+			}
+		}
+
+		localMin.add(x_c,y_c);
 	}
 
 	@Override
@@ -95,9 +212,12 @@ public class NonMaxBlockRelaxed extends NonMaxBlock {
 
 		int w = 2* radius +1;
 
-		local = new Point2D_I32[w*w];
-		for( int i = 0; i < local.length; i++ )
-			local[i] = new Point2D_I32();
+		foundMax = new Point2D_I32[w*w];
+		for( int i = 0; i < foundMax.length; i++ )
+			foundMax[i] = new Point2D_I32();
+		foundMin = new Point2D_I32[w*w];
+		for( int i = 0; i < foundMin.length; i++ )
+			foundMin[i] = new Point2D_I32();
 	}
 
 }

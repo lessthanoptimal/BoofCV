@@ -28,10 +28,10 @@ public class TestWrapperNonMaximumNaive {
 
 	@Test
 	public void checkStrict() {
-		GeneralFeatureExtractorChecks checks = new GeneralFeatureExtractorChecks() {
+		GeneralNonMaxSuppressionChecks checks = new GeneralNonMaxSuppressionChecks() {
 
 			@Override
-			public FeatureExtractor createAlg() {
+			public NonMaxSuppression createAlg() {
 				return new WrapperNonMaximumNaive(new NonMaxExtractorNaive(true));
 			}
 		};
@@ -40,10 +40,10 @@ public class TestWrapperNonMaximumNaive {
 
 	@Test
 	public void checkRelaxed() {
-		GeneralFeatureExtractorChecks checks = new GeneralFeatureExtractorChecks() {
+		GeneralNonMaxSuppressionChecks checks = new GeneralNonMaxSuppressionChecks() {
 
 			@Override
-			public FeatureExtractor createAlg() {
+			public NonMaxSuppression createAlg() {
 				return new WrapperNonMaximumNaive(new NonMaxExtractorNaive(false));
 			}
 		};

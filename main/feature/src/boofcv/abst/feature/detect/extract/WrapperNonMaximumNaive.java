@@ -27,17 +27,12 @@ import boofcv.struct.image.ImageFloat32;
  *
  * @author Peter Abeles
  */
-public class WrapperNonMaximumNaive implements FeatureExtractor {
+public class WrapperNonMaximumNaive implements NonMaxSuppression {
 
 	NonMaxExtractorNaive alg;
 
 	public WrapperNonMaximumNaive(NonMaxExtractorNaive alg) {
 		this.alg = alg;
-	}
-
-	@Override
-	public float getThreshold() {
-		return alg.getThreshold();
 	}
 
 	@Override
@@ -51,11 +46,6 @@ public class WrapperNonMaximumNaive implements FeatureExtractor {
 	}
 
 	@Override
-	public void setThreshold(float threshold) {
-		alg.setThreshold(threshold);
-	}
-
-	@Override
 	public void process(ImageFloat32 intensity,
 						QueueCorner candidateMin, QueueCorner candidateMax,
 						QueueCorner foundMin, QueueCorner foundMax) {
@@ -65,6 +55,25 @@ public class WrapperNonMaximumNaive implements FeatureExtractor {
 	@Override
 	public boolean getUsesCandidates() {
 		return false;
+	}
+
+	@Override
+	public float getThresholdMinimum() {
+		return Float.NaN;
+	}
+
+	@Override
+	public float getThresholdMaximum() {
+		return alg.getThreshold();
+	}
+
+	@Override
+	public void setThresholdMinimum(float threshold) {
+	}
+
+	@Override
+	public void setThresholdMaximum(float threshold) {
+		alg.setThreshold(threshold);
 	}
 
 	@Override

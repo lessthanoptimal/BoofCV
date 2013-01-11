@@ -32,8 +32,9 @@ import georegression.struct.point.Point2D_I16;
 public abstract class NonMaxCandidate {
 	// size of the search area
 	int radius;
-	// the threshold which points must be above to be a feature
-	float thresh;
+	// threshold for intensity values when detecting minimums and maximums
+	protected float thresholdMin;
+	protected float thresholdMax;
 	// does not process pixels this close to the image border
 	int ignoreBorder;
 
@@ -43,12 +44,6 @@ public abstract class NonMaxCandidate {
 	int endX,endY;
 	// local area that's examined and cropped for the image border
 	int x0,y0,x1,y1;
-
-	public NonMaxCandidate(int searchRadius, float thresh , int ignoreBorder ) {
-		setSearchRadius(searchRadius);
-		this.thresh = thresh;
-		this.ignoreBorder = ignoreBorder;
-	}
 
 	public NonMaxCandidate() {
 	}
@@ -87,7 +82,7 @@ public abstract class NonMaxCandidate {
 			int center = intensityImage.startIndex + pt.y * stride + pt.x;
 
 			float val = inten[center];
-			if (val > -thresh || val == -Float.MAX_VALUE ) continue;
+			if (val > thresholdMin || val == -Float.MAX_VALUE ) continue;
 
 			x0 = Math.max(ignoreBorder,pt.x - radius);
 			y0 = Math.max(ignoreBorder,pt.y - radius);
@@ -112,7 +107,7 @@ public abstract class NonMaxCandidate {
 			int center = intensityImage.startIndex + pt.y * stride + pt.x;
 
 			float val = inten[center];
-			if (val < thresh || val == Float.MAX_VALUE ) continue;
+			if (val < thresholdMax || val == Float.MAX_VALUE ) continue;
 
 			x0 = Math.max(ignoreBorder,pt.x - radius);
 			y0 = Math.max(ignoreBorder,pt.y - radius);
@@ -135,12 +130,20 @@ public abstract class NonMaxCandidate {
 		return radius;
 	}
 
-	public float getThresh() {
-		return thresh;
+	public float getThresholdMin() {
+		return thresholdMin;
 	}
 
-	public void setThresh(float thresh) {
-		this.thresh = thresh;
+	public void setThresholdMin(float thresholdMin) {
+		this.thresholdMin = thresholdMin;
+	}
+
+	public float getThresholdMax() {
+		return thresholdMax;
+	}
+
+	public void setThresholdMax(float thresholdMax) {
+		this.thresholdMax = thresholdMax;
 	}
 
 	public void setBorder( int border ) {

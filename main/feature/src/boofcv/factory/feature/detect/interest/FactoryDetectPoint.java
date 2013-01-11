@@ -19,7 +19,7 @@
 package boofcv.factory.feature.detect.interest;
 
 import boofcv.abst.feature.detect.extract.ConfigExtract;
-import boofcv.abst.feature.detect.extract.FeatureExtractor;
+import boofcv.abst.feature.detect.extract.NonMaxSuppression;
 import boofcv.abst.feature.detect.intensity.*;
 import boofcv.abst.filter.blur.MedianImageFilter;
 import boofcv.alg.feature.detect.intensity.FastCornerIntensity;
@@ -158,7 +158,7 @@ public class FactoryDetectPoint {
 	GeneralFeatureDetector<T, D> createGeneral(GeneralFeatureIntensity<T, D> intensity,
 											   ConfigExtract config , int maxFeatures ) {
 		config.ignoreBorder += config.radius;
-		FeatureExtractor extractor = FactoryFeatureExtractor.nonmax(config);
+		NonMaxSuppression extractor = FactoryFeatureExtractor.nonmax(config);
 		GeneralFeatureDetector<T, D> det = new GeneralFeatureDetector<T, D>(intensity, extractor,false);
 		det.setMaxFeatures(maxFeatures);
 

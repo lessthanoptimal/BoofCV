@@ -19,7 +19,7 @@
 package boofcv.alg.feature.line;
 
 import boofcv.abst.feature.detect.extract.ConfigExtract;
-import boofcv.abst.feature.detect.extract.FeatureExtractor;
+import boofcv.abst.feature.detect.extract.NonMaxSuppression;
 import boofcv.alg.feature.detect.line.HoughTransformLinePolar;
 import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
 import boofcv.struct.FastQueue;
@@ -50,7 +50,7 @@ public class TestHoughTransformLinePolar {
 			image.set(5,i,1);
 		}
 
-		FeatureExtractor extractor = FactoryFeatureExtractor.nonmax(new ConfigExtract(4,5,0, true));
+		NonMaxSuppression extractor = FactoryFeatureExtractor.nonmax(new ConfigExtract(4,5,0, true));
 		HoughTransformLinePolar alg = new HoughTransformLinePolar(extractor,40,180);
 
 		alg.transform(image);

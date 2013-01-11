@@ -19,7 +19,7 @@
 package boofcv.alg.feature.detect.interest;
 
 import boofcv.abst.feature.detect.extract.ConfigExtract;
-import boofcv.abst.feature.detect.extract.FeatureExtractor;
+import boofcv.abst.feature.detect.extract.NonMaxSuppression;
 import boofcv.abst.feature.detect.intensity.GeneralFeatureIntensity;
 import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
 import boofcv.struct.QueueCorner;
@@ -57,7 +57,7 @@ public class TestGeneralFeatureDetector {
 		intensity.img.set(6, 5, -10);
 
 		// use a real extractor
-		FeatureExtractor extractor = FactoryFeatureExtractor.nonmax(new ConfigExtract(1, 0.001f, 1, true));
+		NonMaxSuppression extractor = FactoryFeatureExtractor.nonmax(new ConfigExtract(1, 0.001f, 1, true));
 
 		// configure it to only detect positive features
 		GeneralFeatureDetector<ImageFloat32, ImageFloat32> detector =
@@ -102,7 +102,7 @@ public class TestGeneralFeatureDetector {
 		intensity.img.set(9,4 , -10);
 
 		// use a real extractor
-		FeatureExtractor extractor = FactoryFeatureExtractor.nonmax(new ConfigExtract(1, 0.001f, 1, true));
+		NonMaxSuppression extractor = FactoryFeatureExtractor.nonmax(new ConfigExtract(1, 0.001f, 1, true));
 
 		GeneralFeatureDetector<ImageFloat32, ImageFloat32> detector =
 				new GeneralFeatureDetector<ImageFloat32, ImageFloat32>(intensity, extractor,true);
@@ -220,7 +220,7 @@ public class TestGeneralFeatureDetector {
 	}
 
 
-	public class HelperExtractor implements FeatureExtractor {
+	public class HelperExtractor implements NonMaxSuppression {
 
 		boolean usesCandidates;
 		boolean acceptsRequests;
@@ -248,12 +248,21 @@ public class TestGeneralFeatureDetector {
 		}
 
 		@Override
-		public float getThreshold() {
+		public float getThresholdMinimum() {
 			return 0;
 		}
 
 		@Override
-		public void setThreshold(float threshold) {
+		public float getThresholdMaximum() {
+			return 0;
+		}
+
+		@Override
+		public void setThresholdMinimum(float threshold) {
+		}
+
+		@Override
+		public void setThresholdMaximum(float threshold) {
 		}
 
 		@Override

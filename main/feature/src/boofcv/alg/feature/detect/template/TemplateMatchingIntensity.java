@@ -55,7 +55,7 @@ public interface TemplateMatchingIntensity<T extends ImageBase> {
 
 	/**
 	 * Contains results of template matching.  Higher intensity values correspond to a better match.
-	 * Local matches can be found using {@link boofcv.abst.feature.detect.extract.FeatureExtractor}.
+	 * Local matches can be found using {@link boofcv.abst.feature.detect.extract.NonMaxSuppression}.
 	 * See comment about processing the image border.
 	 *
 	 * @return Feature intensity

@@ -45,8 +45,9 @@ public abstract class NonMaxBlock {
 
 	// search region
 	protected int radius;
-	// minimum intensity value
-	protected float threshold;
+	// threshold for intensity values when detecting minimums and maximums
+	protected float thresholdMin;
+	protected float thresholdMax;
 	// should it ignore border pixels?
 	protected int border;
 
@@ -58,13 +59,14 @@ public abstract class NonMaxBlock {
 	// found maximums
 	protected QueueCorner localMax;
 
-	protected NonMaxBlock() {
-	}
+	// indicates the algorithm's behavior
+	public boolean detectsMinimum;
+	public boolean detectsMaximum;
 
-	protected NonMaxBlock(int radius, float threshold, int border) {
-		this.radius = radius;
-		this.threshold = threshold;
-		this.border = border;
+
+	protected NonMaxBlock(boolean detectsMinimum, boolean detectsMaximum) {
+		this.detectsMinimum = detectsMinimum;
+		this.detectsMaximum = detectsMaximum;
 	}
 
 	/**
@@ -98,12 +100,10 @@ public abstract class NonMaxBlock {
 
 	protected abstract void searchBlock( int x0 , int y0 , int x1 , int y1 , ImageFloat32 img );
 
+
+
 	public void setSearchRadius(int radius) {
 		this.radius = radius;
-	}
-
-	public void setThreshold(float thresh) {
-		this.threshold = thresh;
 	}
 
 	public int getBorder() {
@@ -114,11 +114,23 @@ public abstract class NonMaxBlock {
 		this.border = border;
 	}
 
-	public float getThreshold() {
-		return threshold;
-	}
-
 	public int getSearchRadius() {
 		return radius;
+	}
+
+	public float getThresholdMin() {
+		return thresholdMin;
+	}
+
+	public void setThresholdMin(float thresholdMin) {
+		this.thresholdMin = thresholdMin;
+	}
+
+	public float getThresholdMax() {
+		return thresholdMax;
+	}
+
+	public void setThresholdMax(float thresholdMax) {
+		this.thresholdMax = thresholdMax;
 	}
 }

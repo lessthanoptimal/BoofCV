@@ -19,7 +19,7 @@
 package boofcv.alg.feature.detect.template;
 
 import boofcv.abst.feature.detect.extract.ConfigExtract;
-import boofcv.abst.feature.detect.extract.FeatureExtractor;
+import boofcv.abst.feature.detect.extract.NonMaxSuppression;
 import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
 import boofcv.struct.FastQueue;
 import boofcv.struct.QueueCorner;
@@ -40,7 +40,7 @@ public class TemplateMatching<T extends ImageBase> {
 	// computes an intensity image identifying matches
 	private TemplateMatchingIntensity<T> match;
 	// searches for local matches in intensity image
-	private FeatureExtractor extractor;
+	private NonMaxSuppression extractor;
 
 	// Reference to the template being searched for
 	private T template;

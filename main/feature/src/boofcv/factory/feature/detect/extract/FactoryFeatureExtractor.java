@@ -19,7 +19,7 @@
 package boofcv.factory.feature.detect.extract;
 
 import boofcv.abst.feature.detect.extract.ConfigExtract;
-import boofcv.abst.feature.detect.extract.FeatureExtractor;
+import boofcv.abst.feature.detect.extract.NonMaxSuppression;
 import boofcv.abst.feature.detect.extract.WrapperNonMaxCandidate;
 import boofcv.abst.feature.detect.extract.WrapperNonMaximumBlock;
 import boofcv.abst.feature.detect.intensity.GeneralFeatureIntensity;
@@ -28,14 +28,14 @@ import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.struct.image.ImageSingleBand;
 
 /**
- * Creates {@link FeatureExtractor} for finding local maximums in feature intensity images.
+ * Creates {@link boofcv.abst.feature.detect.extract.NonMaxSuppression} for finding local maximums in feature intensity images.
  *
  * @author Peter Abeles
  * @see boofcv.factory.feature.detect.intensity.FactoryIntensityPoint
  */
 public class FactoryFeatureExtractor {
 	/**
-	 * Creates a generalized feature detector/extractor that adds n-best capability to {@link FeatureExtractor}
+	 * Creates a generalized feature detector/extractor that adds n-best capability to {@link boofcv.abst.feature.detect.extract.NonMaxSuppression}
 	 * and performs other house keeping tasks. Handles calling {@link GeneralFeatureIntensity} itself.
 	 *
 	 *
@@ -47,7 +47,7 @@ public class FactoryFeatureExtractor {
 	 */
 	public static <I extends ImageSingleBand, D extends ImageSingleBand>
 	GeneralFeatureDetector<I, D> general(GeneralFeatureIntensity<I, D> intensity,
-										 FeatureExtractor extractor,
+										 NonMaxSuppression extractor,
 										 int maxFeatures, boolean detectMinimum) {
 		GeneralFeatureDetector<I, D> det = new GeneralFeatureDetector<I, D>(intensity, extractor,detectMinimum);
 		det.setMaxFeatures(maxFeatures);
@@ -61,7 +61,7 @@ public class FactoryFeatureExtractor {
 	 * @param config Configuration for extractor
 	 * @return A feature extractor.
 	 */
-	public static FeatureExtractor nonmax( ConfigExtract config ) {
+	public static NonMaxSuppression nonmax( ConfigExtract config ) {
 
 		if( config == null )
 			config = new ConfigExtract();
@@ -69,16 +69,28 @@ public class FactoryFeatureExtractor {
 
 		NonMaxBlock ret;
 		if (config.useStrictRule) {
-			ret = new NonMaxBlockStrict();
+			if( config.detectMaximums)
+				if( config.detectMinimums )
+					ret = new NonMaxBlockStrict.MinMax();
+				else
+					ret = new NonMaxBlockStrict.Max();
+			else
+				ret = new NonMaxBlockStrict.Min();
 		} else {
-			ret = new NonMaxBlockRelaxed();
+			if( config.detectMaximums)
+				if( config.detectMinimums )
+					ret = new NonMaxBlockRelaxed.MinMax();
+				else
+					ret = new NonMaxBlockRelaxed.Max();
+			else
+				ret = new NonMaxBlockRelaxed.Min();
 		}
 
 		ret.setSearchRadius(config.radius);
-		ret.setThreshold(config.threshold);
+		ret.setThresholdMax(config.threshold);
 		ret.setBorder(config.ignoreBorder);
 
-		return new WrapperNonMaximumBlock(ret,false,true);
+		return new WrapperNonMaximumBlock(ret);
 	}
 
 	/**
@@ -87,25 +99,26 @@ public class FactoryFeatureExtractor {
 	 * @param config Configuration for extractor
 	 * @return A feature extractor.
 	 */
-	public static FeatureExtractor nonmaxCandidate(ConfigExtract config ) {
+	public static NonMaxSuppression nonmaxCandidate(ConfigExtract config ) {
 
 		if( config == null )
 			config = new ConfigExtract();
 		config.checkValidity();
 
-		WrapperNonMaxCandidate ret;
+		NonMaxCandidate alg;
 
-		if (config.useStrictRule)
-			ret = new WrapperNonMaxCandidate(
-					new NonMaxCandidateStrict());
-		else
-			ret = new WrapperNonMaxCandidate(
-					new NonMaxCandidateRelaxed());
+		// no need to check the detection max/min since these algorithms can handle both
+		if (config.useStrictRule) {
+			alg = new NonMaxCandidateStrict();
+		} else {
+			alg = new NonMaxCandidateRelaxed();
+		}
+
+		WrapperNonMaxCandidate ret = new WrapperNonMaxCandidate(alg);
 
 		ret.setSearchRadius(config.radius);
 		ret.setIgnoreBorder(config.ignoreBorder);
-		ret.setThreshold(config.threshold);
-
+		ret.setThresholdMaximum(config.threshold);
 
 		return ret;
 	}

@@ -19,6 +19,7 @@ Version : Alpha 0.13
   * Accounts for offset during sub-sampling
   * Documents deviations from paper in pyramid construction
   * Tweaked pyramid construction
+  * Tweaked non-maximum suppression
 - Improved handling of Max Features in SURF + SIFT
   * All features are considered in order of intensity
   * Features are no longer added once the max has been reached
@@ -58,11 +59,12 @@ Version : Alpha 0.13
   * moved to alg package
   * can now detect local minimums
   * Removed ability to segment image.  Turned out to not be all that useful, just increase the size of the non-maximum region.
-- FeatureExtractor
-  * Removed the parameter for requesting the number of returned features
-  * Nothing implements it any more and it is handled otherways now
-- NonMaximum supression
+- Non-Maximum supression
+  * Renamed FeatureExtractor to NonMaxSuppression
+    - Removed the parameter for requesting the number of returned features
   * All algorithms contained a bug where the ignore border was being incorrectly enforced
+  * Added support for detecting maximums and minimums
+- Fixed bugs in SortBestFeatures and added sort for negative peaks
 
 
 ---------------------------------------------
