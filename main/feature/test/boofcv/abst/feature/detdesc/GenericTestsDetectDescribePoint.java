@@ -66,6 +66,7 @@ public abstract class GenericTestsDetectDescribePoint<T extends ImageSingleBand,
 		checkSubImage();
 		hasScale();
 		hasOrientation();
+		checkMultipleCalls();
 	}
 
 	public abstract DetectDescribePoint<T,D> createDetDesc();
@@ -90,7 +91,7 @@ public abstract class GenericTestsDetectDescribePoint<T extends ImageSingleBand,
 			Point2D_F64 p = alg.getLocation(i);
 			double scale = alg.getScale(i);
 			double angle = alg.getOrientation(i);
-			D desc = alg.getDescriptor(i);
+			D desc = alg.getDescription(i);
 
 			assertTrue(desc!=null);
 			assertTrue(p.x != 0 && p.y != 0);
@@ -165,7 +166,7 @@ public abstract class GenericTestsDetectDescribePoint<T extends ImageSingleBand,
 	public void getDescriptorType() {
 		DetectDescribePoint<T,D> alg = createDetDesc();
 
-		assertTrue(descType==alg.getDescriptorType());
+		assertTrue(descType==alg.getDescriptionType());
 	}
 
 	private void checkIdenticalResponse(DetectDescribePoint<T, D> alg1, DetectDescribePoint<T, D> alg2) {
@@ -181,8 +182,8 @@ public abstract class GenericTestsDetectDescribePoint<T extends ImageSingleBand,
 			assertTrue(alg1.getScale(i) == alg2.getScale(i));
 			assertTrue(alg1.getOrientation(i) == alg2.getOrientation(i));
 
-			D desc1 = alg1.getDescriptor(i);
-			D desc2 = alg2.getDescriptor(i);
+			D desc1 = alg1.getDescription(i);
+			D desc2 = alg2.getDescription(i);
 
 			for( int j = 0; j < desc1.size(); j++ ) {
 				assertTrue(desc1.getDouble(j) == desc2.getDouble(j));

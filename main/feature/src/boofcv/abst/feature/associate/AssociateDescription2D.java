@@ -26,11 +26,11 @@ import georegression.struct.point.Point2D_F64;
  * source feature is paired up with a single feature in the destination.  If a match is not found then it
  * is added to the unassociated list.
  *
- * @param <D> Feature description type.
+ * @param <Desc> Feature description type.
  *
  * @author Peter Abeles
  */
-public interface AssociateDescription2D<D> extends Associate {
+public interface AssociateDescription2D<Desc> extends Associate {
 
 	/**
 	 * Provide the location and descriptions for source features.
@@ -38,7 +38,7 @@ public interface AssociateDescription2D<D> extends Associate {
 	 * @param location Feature locations.
 	 * @param descriptions Feature descriptions.
 	 */
-	public void setSource( FastQueue<Point2D_F64> location , FastQueue<D> descriptions );
+	public void setSource( FastQueue<Point2D_F64> location , FastQueue<Desc> descriptions );
 
 	/**
 	 * Provide the location and descriptions for destination features.
@@ -46,5 +46,5 @@ public interface AssociateDescription2D<D> extends Associate {
 	 * @param location Feature locations.
 	 * @param descriptions Feature descriptions.
 	 */
-	public void setDestination( FastQueue<Point2D_F64> location , FastQueue<D> descriptions );
+	public void setDestination( FastQueue<Point2D_F64> location , FastQueue<Desc> descriptions );
 }

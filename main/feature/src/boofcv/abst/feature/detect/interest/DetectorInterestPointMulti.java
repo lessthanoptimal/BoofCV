@@ -51,8 +51,7 @@ public interface DetectorInterestPointMulti<T extends ImageBase> {
 	 * {@link #detect(boofcv.struct.image.ImageBase)} is called the results are modified.
 	 *
 	 * @param set Which set of detected features.
-	 * @param
 	 * @return Results for a set.
 	 */
-	public FoundPointSO getSet( int set );
+	public FoundPointSO getFeatureSet(int set);
 }

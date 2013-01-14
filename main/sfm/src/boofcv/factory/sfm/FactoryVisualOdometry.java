@@ -189,7 +189,7 @@ public class FactoryVisualOdometry {
 			};
 		}
 
-		ScoreAssociation<D> score = FactoryAssociation.defaultScore(detDesc.getDescriptorType());
+		ScoreAssociation<D> score = FactoryAssociation.defaultScore(detDesc.getDescriptionType());
 
 		AssociateDescription2D<D> association =
 				new AssociateDescTo2D<D>(

@@ -38,18 +38,18 @@ import georegression.struct.point.Point2D_F64;
  *
  * @author Peter Abeles
  */
-public class DetectDescribeFusion<T extends ImageSingleBand, D extends TupleDesc>
-	implements DetectDescribePoint<T,D>
+public class DetectDescribeFusion<T extends ImageSingleBand, TD extends TupleDesc>
+	implements DetectDescribePoint<T, TD>
 {
 	// detects interest points
 	private InterestPointDetector<T> detector;
 	// optional override for orientation
 	private OrientationImage<T> orientation;
 	// describes each feature found
-	private DescribeRegionPoint<T,D> describe;
+	private DescribeRegionPoint<T, TD> describe;
 
 	// list of extracted feature descriptors
-	private FastQueue<D> descs;
+	private FastQueue<TD> descs;
 
 	// storage for found orientations
 	private GrowQueue_F64 featureScales = new GrowQueue_F64(10);
@@ -65,38 +65,38 @@ public class DetectDescribeFusion<T extends ImageSingleBand, D extends TupleDesc
 	 */
 	public DetectDescribeFusion(InterestPointDetector<T> detector,
 								OrientationImage<T> orientation,
-								DescribeRegionPoint<T, D> describe)
+								DescribeRegionPoint<T, TD> describe)
 	{
 		this.describe = describe;
 		this.orientation = orientation;
 		this.detector = detector;
 
-		final DescribeRegionPoint<T,D> locaDescribe = describe;
+		final DescribeRegionPoint<T, TD> locaDescribe = describe;
 
-		descs = new FastQueue<D>(100,describe.getDescriptorType(),true) {
-			protected D createInstance() {
+		descs = new FastQueue<TD>(100,describe.getDescriptorType(),true) {
+			protected TD createInstance() {
 				return locaDescribe.createDescription();
 			}
 		};
 	}
 
 	@Override
-	public D createDescription() {
+	public TD createDescription() {
 		return describe.createDescription();
 	}
 
 	@Override
-	public D getDescriptor(int index) {
+	public TD getDescription(int index) {
 		return descs.get(index);
 	}
 
 	@Override
-	public Class<D> getDescriptorType() {
+	public Class<TD> getDescriptionType() {
 		return describe.getDescriptorType();
 	}
 
 	@Override
-	public int getDescriptorLength() {
+	public int getDescriptionLength() {
 		return describe.getDescriptorLength();
 	}
 

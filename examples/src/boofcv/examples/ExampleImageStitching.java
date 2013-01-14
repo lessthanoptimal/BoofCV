@@ -125,7 +125,7 @@ public class ExampleImageStitching {
 		listDescs.reset();
 		for( int i = 0; i < detDesc.getNumberOfFeatures(); i++ ) {
 			points.add( detDesc.getLocation(i).copy() );
-			listDescs.grow().setTo(detDesc.getDescriptor(i));
+			listDescs.grow().setTo(detDesc.getDescription(i));
 		}
 	}
 

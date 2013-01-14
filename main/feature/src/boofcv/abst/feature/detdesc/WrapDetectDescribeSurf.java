@@ -76,17 +76,17 @@ public class WrapDetectDescribeSurf
 	}
 
 	@Override
-	public SurfFeature getDescriptor(int index) {
+	public SurfFeature getDescription(int index) {
 		return features.get(index);
 	}
 
 	@Override
-	public Class<SurfFeature> getDescriptorType() {
+	public Class<SurfFeature> getDescriptionType() {
 		return SurfFeature.class;
 	}
 
 	@Override
-	public int getDescriptorLength() {
+	public int getDescriptionLength() {
 		return describe.getDescriptionLength();
 	}
 

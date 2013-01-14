@@ -111,7 +111,7 @@ public class ExampleAssociatePoints<T extends ImageSingleBand, FD extends TupleD
 
 		for( int i = 0; i < detDesc.getNumberOfFeatures(); i++ ) {
 			points.add( detDesc.getLocation(i).copy() );
-			descs.grow().setTo(detDesc.getDescriptor(i));
+			descs.grow().setTo(detDesc.getDescription(i));
 		}
 	}
 
@@ -123,7 +123,7 @@ public class ExampleAssociatePoints<T extends ImageSingleBand, FD extends TupleD
 		DetectDescribePoint detDesc = FactoryDetectDescribe.surfStable(
 				new ConfigFastHessian(1, 2, 200, 1, 9, 4, 4), null,null, imageType);
 
-		ScoreAssociation scorer = FactoryAssociation.defaultScore(detDesc.getDescriptorType());
+		ScoreAssociation scorer = FactoryAssociation.defaultScore(detDesc.getDescriptionType());
 		AssociateDescription associate = FactoryAssociation.greedy(scorer, Double.MAX_VALUE, -1, true);
 
 		// load and match images
