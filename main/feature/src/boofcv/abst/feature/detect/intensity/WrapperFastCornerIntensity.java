@@ -66,4 +66,14 @@ public class WrapperFastCornerIntensity<I extends ImageSingleBand, D extends Ima
 	public int getIgnoreBorder() {
 		return alg.getIgnoreBorder();
 	}
+
+	@Override
+	public boolean localMinimums() {
+		return false;
+	}
+
+	@Override
+	public boolean localMaximums() {
+		return true;
+	}
 }

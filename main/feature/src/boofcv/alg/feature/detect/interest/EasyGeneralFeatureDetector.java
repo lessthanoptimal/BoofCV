@@ -35,7 +35,7 @@ public class EasyGeneralFeatureDetector<T extends ImageSingleBand, D extends Ima
 
 	// Feature detector
 	protected GeneralFeatureDetector<T, D> detector;
-	// Computes iamge gradient
+	// Computes image gradient
 	protected ImageGradient<T, D> gradient;
 	// computes hessian
 	protected ImageHessian<D> hessian;

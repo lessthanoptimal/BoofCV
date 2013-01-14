@@ -159,7 +159,7 @@ public class FactoryDetectPoint {
 											   ConfigExtract config , int maxFeatures ) {
 		config.ignoreBorder += config.radius;
 		NonMaxSuppression extractor = FactoryFeatureExtractor.nonmax(config);
-		GeneralFeatureDetector<T, D> det = new GeneralFeatureDetector<T, D>(intensity, extractor,false);
+		GeneralFeatureDetector<T, D> det = new GeneralFeatureDetector<T, D>(intensity, extractor);
 		det.setMaxFeatures(maxFeatures);
 
 		return det;

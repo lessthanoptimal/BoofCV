@@ -29,9 +29,10 @@ import georegression.struct.point.Point2D_I16;
 
 /**
  * <p>
- * Detects features which are local maximums and (optionally) local minimums in the feature intensity image.
+ * Detects features which are local maximums and/or local minimums in the feature intensity image.
  * A list of pixels to exclude as candidates can be provided.  Image derivatives need to be computed
- * externally and provided as needed.
+ * externally and provided as needed. The passed in {@link GeneralFeatureIntensity} is used to determine if local
+ * maximums or minimums should be detected.
  * </p>
  *
  * @param <I> Input image type.
@@ -41,8 +42,6 @@ import georegression.struct.point.Point2D_I16;
  */
 public class GeneralFeatureDetector<I extends ImageSingleBand, D extends ImageSingleBand>
 {
-	// toggle for detecting local minimums
-	protected boolean detectMinimums;
 	// storage for inverted image that minimums are detected inside of
 	protected ImageFloat32 inverted = new ImageFloat32(1,1);
 
@@ -73,17 +72,14 @@ public class GeneralFeatureDetector<I extends ImageSingleBand, D extends ImageSi
 	 *
 	 * @param intensity Computes how much like the feature the region around each pixel is.
 	 * @param extractor Extracts the corners from intensity image
-	 * @param detectMinimums If true it will detect minimums in the intensity image also.
 	 */
 	public GeneralFeatureDetector(GeneralFeatureIntensity<I, D> intensity,
-								  NonMaxSuppression extractor ,
-								  boolean detectMinimums ) {
+								  NonMaxSuppression extractor ) {
 		if (extractor.getUsesCandidates() && !intensity.hasCandidates())
 			throw new IllegalArgumentException("The extractor requires candidate features, which the intensity does not provide.");
 
 		this.intensity = intensity;
 		this.extractor = extractor;
-		this.detectMinimums = detectMinimums;
 
 		// sanity check ignore borders and increase the size of the extractor's ignore border
 		// if its ignore border is too small then false positive are highly likely
@@ -110,15 +106,17 @@ public class GeneralFeatureDetector<I extends ImageSingleBand, D extends ImageSi
 		ImageFloat32 intensityImage = intensity.getIntensity();
 
 		// detection minimums by inverting the original image and running non-maximum suppression
-		if( detectMinimums ) {
+		if( intensity.localMinimums() ) {
 			inverted.reshape(intensityImage.width,intensityImage.height);
 			PixelMath.invert(intensityImage, inverted);
 			foundMinimum.reset();
 			extract(inverted, excludeMinimum, foundMinimum);
 		}
 
-		foundMaximum.reset();
-		extract(intensityImage, excludeMaximum, foundMaximum);
+		if( intensity.localMaximums() ) {
+			foundMaximum.reset();
+			extract(intensityImage, excludeMaximum, foundMaximum);
+		}
 	}
 
 	/**
@@ -251,5 +249,19 @@ public class GeneralFeatureDetector<I extends ImageSingleBand, D extends ImageSi
 	 */
 	public QueueCorner getMinimums() {
 		return foundMinimum;
+	}
+
+	/**
+	 * true if it will detector local minimums
+	 */
+	public boolean isDetectMinimums() {
+		return intensity.localMinimums();
+	}
+
+	/**
+	 * true if it will detector local maximums
+	 */
+	public boolean isDetectMaximums() {
+		return intensity.localMaximums();
 	}
 }

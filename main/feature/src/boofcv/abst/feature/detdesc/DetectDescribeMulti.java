@@ -24,7 +24,7 @@ import boofcv.struct.image.ImageSingleBand;
 /**
  * Detects and describes different types of features inside an image.  All detected features are described using the
  * same type of descriptor.  Each type of detected feature is a member of a set and the found features
- * for a set are returned inside of a {@link DetectionSet}.  The order and number of sets remains constant.
+ * for a set are returned inside of a {@link PointDescSet}.  The order and number of sets remains constant.
  *
  * <TD> Type of feature descriptor
  * @author Peter Abeles
@@ -53,7 +53,7 @@ public interface DetectDescribeMulti<T extends ImageSingleBand, TD extends Tuple
 	 * @param
 	 * @return Results for a set.
 	 */
-	public DetectionSet<TD> getDetectedSet( int set );
+	public PointDescSet<TD> getSet(int set);
 
 	/**
 	 * Creates new description instance

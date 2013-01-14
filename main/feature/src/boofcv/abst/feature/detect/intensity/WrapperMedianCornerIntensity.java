@@ -94,4 +94,14 @@ public class WrapperMedianCornerIntensity<I extends ImageSingleBand, D extends I
 	public int getIgnoreBorder() {
 		return 0;
 	}
+
+	@Override
+	public boolean localMinimums() {
+		return false;
+	}
+
+	@Override
+	public boolean localMaximums() {
+		return true;
+	}
 }

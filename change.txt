@@ -65,6 +65,7 @@ Version : Alpha 0.13
   * All algorithms contained a bug where the ignore border was being incorrectly enforced
   * Added support for detecting maximums and minimums
 - Fixed bugs in SortBestFeatures and added sort for negative peaks
+- GeneralFeatureIntensity: Added flags to indicate if features are maximum or minimums
 
 
 ---------------------------------------------

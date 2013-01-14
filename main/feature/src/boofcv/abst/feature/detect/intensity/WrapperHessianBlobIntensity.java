@@ -37,16 +37,19 @@ public class WrapperHessianBlobIntensity<I extends ImageSingleBand, D extends Im
 
 	HessianBlobIntensity.Type type;
 	Method m;
+	boolean minimum;
 
 	public WrapperHessianBlobIntensity(HessianBlobIntensity.Type type, Class<D> derivType) {
 		this.type = type;
 		try {
 			switch( type ) {
 				case DETERMINANT:
+					minimum = false;
 					m = HessianBlobIntensity.class.getMethod("determinant",ImageFloat32.class,derivType,derivType,derivType);
 					break;
 
 				case TRACE:
+					minimum = true;
 					m = HessianBlobIntensity.class.getMethod("trace",ImageFloat32.class,derivType,derivType);
 					break;
 
@@ -105,5 +108,15 @@ public class WrapperHessianBlobIntensity<I extends ImageSingleBand, D extends Im
 	@Override
 	public int getIgnoreBorder() {
 		return 0;
+	}
+
+	@Override
+	public boolean localMinimums() {
+		return minimum;
+	}
+
+	@Override
+	public boolean localMaximums() {
+		return true;
 	}
 }

@@ -54,7 +54,7 @@ public class ImplHessianBlobIntensity {
 				float dyy = hessianYY.data[indexYY++];
 				float dxy = hessianXY.data[indexXY++];
 
-				featureIntensity.data[indexInten++] = Math.abs(dxx*dyy - dxy*dxy);
+				featureIntensity.data[indexInten++] = dxx*dyy - dxy*dxy;
 			}
 		}
 	}
@@ -77,7 +77,7 @@ public class ImplHessianBlobIntensity {
 				float dxx = hessianXX.data[indexXX++];
 				float dyy = hessianYY.data[indexYY++];
 
-				featureIntensity.data[indexInten++] = Math.abs(dxx + dyy);
+				featureIntensity.data[indexInten++] = dxx + dyy;
 			}
 		}
 	}
@@ -102,7 +102,7 @@ public class ImplHessianBlobIntensity {
 				int dyy = hessianYY.data[indexYY++];
 				int dxy = hessianXY.data[indexXY++];
 
-				featureIntensity.data[indexInten++] = Math.abs(dxx*dyy - dxy*dxy);
+				featureIntensity.data[indexInten++] = dxx*dyy - dxy*dxy;
 			}
 		}
 	}
@@ -125,7 +125,7 @@ public class ImplHessianBlobIntensity {
 				int dxx = hessianXX.data[indexXX++];
 				int dyy = hessianYY.data[indexYY++];
 
-				featureIntensity.data[indexInten++] = Math.abs(dxx + dyy);
+				featureIntensity.data[indexInten++] = dxx + dyy;
 			}
 		}
 	}

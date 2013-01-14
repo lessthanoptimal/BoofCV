@@ -22,13 +22,11 @@ import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.abst.filter.derivative.ImageHessian;
 import boofcv.alg.feature.detect.interest.EasyGeneralFeatureDetector;
 import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
+import boofcv.struct.FastQueue;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I16;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Wrapper around {@link boofcv.alg.feature.detect.interest.GeneralFeatureDetector} to make it compatible with {@link InterestPointDetector}.
@@ -38,7 +36,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class WrapGeneralToInterestPoint<T extends ImageSingleBand, D extends ImageSingleBand>
+public class GeneralToInterestPoint<T extends ImageSingleBand, D extends ImageSingleBand>
 		extends EasyGeneralFeatureDetector<T,D>
 		implements InterestPointDetector<T>
 {
@@ -46,20 +44,20 @@ public class WrapGeneralToInterestPoint<T extends ImageSingleBand, D extends Ima
 	double scale = 1;
 
 	// list of points it found
-	protected List<Point2D_F64> foundPoints;
+	protected FastQueue<Point2D_F64> foundPoints = new FastQueue<Point2D_F64>(10,Point2D_F64.class,true);
 
-	public WrapGeneralToInterestPoint(GeneralFeatureDetector<T, D> detector,
-									  double scale,
-									  Class<T> imageType, Class<D> derivType) {
+	public GeneralToInterestPoint(GeneralFeatureDetector<T, D> detector,
+								  double scale,
+								  Class<T> imageType, Class<D> derivType) {
 		super(detector,imageType,derivType);
 		this.scale = scale;
 	}
 
-	public WrapGeneralToInterestPoint(GeneralFeatureDetector<T, D> detector,
-									  ImageGradient<T, D> gradient,
-									  ImageHessian<D> hessian,
-									  double scale,
-									  Class<D> derivType) {
+	public GeneralToInterestPoint(GeneralFeatureDetector<T, D> detector,
+								  ImageGradient<T, D> gradient,
+								  ImageHessian<D> hessian,
+								  double scale,
+								  Class<D> derivType) {
 		super(detector, gradient, hessian, derivType);
 		this.scale = scale;
 	}
@@ -76,13 +74,25 @@ public class WrapGeneralToInterestPoint<T extends ImageSingleBand, D extends Ima
 	public void detect(T input) {
 		super.detect(input,null);
 
-		QueueCorner corners = detector.getMaximums();
+		foundPoints.reset();
+		if( getDetector().isDetectMaximums() ) {
+			QueueCorner corners = detector.getMaximums();
 
-		foundPoints = new ArrayList<Point2D_F64>();
-		for (int i = 0; i < corners.size; i++) {
-			Point2D_I16 p = corners.get(i);
-			foundPoints.add(new Point2D_F64(p.x, p.y));
+			for (int i = 0; i < corners.size; i++) {
+				Point2D_I16 p = corners.get(i);
+				foundPoints.grow().set(p.x,p.y);
+			}
 		}
+
+		if( getDetector().isDetectMinimums() ) {
+			QueueCorner corners = detector.getMinimums();
+
+			for (int i = 0; i < corners.size; i++) {
+				Point2D_I16 p = corners.get(i);
+				foundPoints.grow().set(p.x,p.y);
+			}
+		}
+
 	}
 
 	@Override

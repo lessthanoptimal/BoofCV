@@ -22,11 +22,11 @@ import boofcv.struct.feature.TupleDesc;
 import georegression.struct.point.Point2D_F64;
 
 /**
- * A set of image features which are detected and described using the same techniques.
+ * A set of point image features which were detected and described using the same techniques.
  *
  * @author Peter Abeles
  */
-public interface DetectionSet<TD extends TupleDesc> {
+public interface PointDescSet<TD extends TupleDesc> {
 
 	/**
 	 * Returns the number of detected features

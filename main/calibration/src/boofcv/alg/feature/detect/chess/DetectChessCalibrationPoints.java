@@ -147,7 +147,7 @@ public class DetectChessCalibrationPoints<T extends ImageSingleBand, D extends I
 
 		NonMaxSuppression extractor =
 				FactoryFeatureExtractor.nonmax(new ConfigExtract(radius + 2, 20, radius + 2, true));
-		detectorAlg = new GeneralFeatureDetector<T, D>(intensityAlg, extractor, false);
+		detectorAlg = new GeneralFeatureDetector<T, D>(intensityAlg, extractor);
 
 		// minContourSize is specified later after the image's size is known
 		findBound = new DetectChessSquaresBinary(numCols, numRows, 0);

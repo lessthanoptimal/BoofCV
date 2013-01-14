@@ -162,7 +162,7 @@ public class CompareFeatureExtractorApp<T extends ImageSingleBand, D extends Ima
 
 		NonMaxSuppression extractor =
 				FactoryFeatureExtractor.nonmax(new ConfigExtract(minSeparation, threshold, radius, true));
-		GeneralFeatureDetector<T, D> detector = new GeneralFeatureDetector<T, D>(intensityAlg, extractor, false);
+		GeneralFeatureDetector<T, D> detector = new GeneralFeatureDetector<T, D>(intensityAlg, extractor);
 		detector.setMaxFeatures(numFeatures);
 		detector.process(grayImage, derivX, derivY, derivXX, derivYY, derivXY);
 		QueueCorner foundCorners = detector.getMaximums();
