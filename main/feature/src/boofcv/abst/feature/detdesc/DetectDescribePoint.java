@@ -28,7 +28,7 @@ import boofcv.struct.image.ImageSingleBand;
  *
  * @author Peter Abeles
  */
-public interface DetectDescribePoint<T extends ImageSingleBand, D extends TupleDesc>
+public interface DetectDescribePoint<T extends ImageSingleBand, TD extends TupleDesc>
 		extends InterestPointDetector<T>
 {
 	/**
@@ -36,7 +36,7 @@ public interface DetectDescribePoint<T extends ImageSingleBand, D extends TupleD
 	 *
 	 * @return New descriptor
 	 */
-	public D createDescription();
+	public TD createDescription();
 
 	/**
 	 * Returns the feature descriptor at the specified index.
@@ -44,19 +44,19 @@ public interface DetectDescribePoint<T extends ImageSingleBand, D extends TupleD
 	 * @param index Which feature
 	 * @return Feature descriptor
 	 */
-	public D getDescriptor( int index );
+	public TD getDescription(int index);
 
 	/**
 	 * The type of region descriptor generated
 	 *
 	 * @return Returns the descriptor type.
 	 */
-	public Class<D> getDescriptorType();
+	public Class<TD> getDescriptionType();
 
 	/**
 	 * Number of elements in the descriptor tuple.
 	 *
 	 * @return Length of descriptor.
 	 */
-	public int getDescriptorLength();
+	public int getDescriptionLength();
 }

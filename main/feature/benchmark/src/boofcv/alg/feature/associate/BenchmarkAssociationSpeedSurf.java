@@ -65,7 +65,7 @@ public class BenchmarkAssociationSpeedSurf {
 	}
 
 	public int getFeatureLength() {
-		return detector.getDescriptorLength();
+		return detector.getDescriptionLength();
 	}
 
 	public class General implements Performer {
@@ -102,7 +102,7 @@ public class BenchmarkAssociationSpeedSurf {
 			detector.detect(gray);
 			
 			for( int i = 0; i < detector.getNumberOfFeatures(); i++ ) {
-				ret.add( detector.getDescriptor(i).copy() );
+				ret.add( detector.getDescription(i).copy() );
 			}
 			
 			return ret;

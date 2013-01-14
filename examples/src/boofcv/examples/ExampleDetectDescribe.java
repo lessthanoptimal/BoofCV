@@ -95,7 +95,7 @@ public class ExampleDetectDescribe {
 //		DetectDescribePoint detDesc = createFromComponents(imageType);
 
 		// Might as well have this example do something useful, like associate two images
-		ScoreAssociation scorer = FactoryAssociation.defaultScore(detDesc.getDescriptorType());
+		ScoreAssociation scorer = FactoryAssociation.defaultScore(detDesc.getDescriptionType());
 		AssociateDescription associate = FactoryAssociation.greedy(scorer, Double.MAX_VALUE, -1, true);
 
 		// load and match images

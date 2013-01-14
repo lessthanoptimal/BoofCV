@@ -53,7 +53,7 @@ public interface DetectDescribeMulti<T extends ImageSingleBand, TD extends Tuple
 	 * @param
 	 * @return Results for a set.
 	 */
-	public PointDescSet<TD> getSet(int set);
+	public PointDescSet<TD> getFeatureSet(int set);
 
 	/**
 	 * Creates new description instance

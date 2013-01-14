@@ -220,13 +220,13 @@ public class TestCombinedTrackerScalePoint {
 		public TupleDesc createDescription() {return null;}
 
 		@Override
-		public TupleDesc getDescriptor(int index) {return null;}
+		public TupleDesc getDescription(int index) {return null;}
 
 		@Override
-		public Class getDescriptorType() {return null;}
+		public Class getDescriptionType() {return null;}
 
 		@Override
-		public int getDescriptorLength() {
+		public int getDescriptionLength() {
 			return 0;
 		}
 

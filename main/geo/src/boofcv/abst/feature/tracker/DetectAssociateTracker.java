@@ -52,7 +52,7 @@ public class DetectAssociateTracker<I extends ImageSingleBand, TD extends TupleD
 	public DetectAssociateTracker( final DetectDescribePoint<I, TD> detDesc ,
 								   final AssociateDescription2D<TD> associate ,
 								   final boolean updateDescription ) {
-		super(associate,updateDescription,detDesc.getDescriptorType());
+		super(associate,updateDescription,detDesc.getDescriptionType());
 		this.detDesc = detDesc;
 	}
 
@@ -63,7 +63,7 @@ public class DetectAssociateTracker<I extends ImageSingleBand, TD extends TupleD
 		int N = detDesc.getNumberOfFeatures();
 		for( int i = 0; i < N; i++ ) {
 			locDst.add( detDesc.getLocation(i) );
-			featDst.add( detDesc.getDescriptor(i) );
+			featDst.add( detDesc.getDescription(i) );
 		}
 	}
 

@@ -88,7 +88,7 @@ public class GeneralToInterestMulti<T extends ImageSingleBand, D extends ImageSi
 	}
 
 	@Override
-	public FoundPointSO getSet(int set) {
+	public FoundPointSO getFeatureSet(int set) {
 		return sets[set];
 	}
 

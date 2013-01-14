@@ -43,7 +43,7 @@ public class TestGeneralToInterestMulti {
 		alg.detect(input);
 
 		assertEquals(1,alg.getNumberOfSets());
-		FoundPointSO set = alg.getSet(0);
+		FoundPointSO set = alg.getFeatureSet(0);
 		assertEquals(6,set.getNumberOfFeatures());
 		for( int i = 0; i < set.getNumberOfFeatures(); i++ ) {
 			assertEquals(2.5, set.getScale(i),1e-8);
@@ -67,21 +67,21 @@ public class TestGeneralToInterestMulti {
 		alg = new GeneralToInterestMulti<ImageFloat32,ImageFloat32>(detector,2.5, ImageFloat32.class,ImageFloat32.class);
 		assertEquals(1,alg.getNumberOfSets());
 		alg.detect(input);
-		assertEquals(5,alg.getSet(0).getNumberOfFeatures());
+		assertEquals(5,alg.getFeatureSet(0).getNumberOfFeatures());
 
 		// both minimums and maximums
 		detector.maximum = true;
 		alg = new GeneralToInterestMulti<ImageFloat32,ImageFloat32>(detector,2.5, ImageFloat32.class,ImageFloat32.class);
 		assertEquals(2,alg.getNumberOfSets());
 		alg.detect(input);
-		assertEquals(5,alg.getSet(0).getNumberOfFeatures());
-		assertEquals(6,alg.getSet(1).getNumberOfFeatures());
+		assertEquals(5,alg.getFeatureSet(0).getNumberOfFeatures());
+		assertEquals(6,alg.getFeatureSet(1).getNumberOfFeatures());
 
 		// just maximums
 		detector.minimum = false;
 		alg = new GeneralToInterestMulti<ImageFloat32,ImageFloat32>(detector,2.5, ImageFloat32.class,ImageFloat32.class);
 		assertEquals(1, alg.getNumberOfSets());
 		alg.detect(input);
-		assertEquals(6,alg.getSet(0).getNumberOfFeatures());
+		assertEquals(6,alg.getFeatureSet(0).getNumberOfFeatures());
 	}
 }

@@ -90,8 +90,8 @@ public class CombinedTrackerScalePoint
 		this.trackerKlt = trackerKlt;
 		this.detector = detector;
 
-		detectedDesc = new FastQueue<TD>(10,detector.getDescriptorType(),false);
-		knownDesc = new FastQueue<TD>(10,detector.getDescriptorType(),false);
+		detectedDesc = new FastQueue<TD>(10,detector.getDescriptionType(),false);
+		knownDesc = new FastQueue<TD>(10,detector.getDescriptionType(),false);
 
 		this.associate = associate;
 	}
@@ -218,7 +218,7 @@ public class CombinedTrackerScalePoint
 		// create a list of detected feature descriptions
 		int N = detector.getNumberOfFeatures();
 		for( int i = 0; i < N; i++ ) {
-			detectedDesc.add(detector.getDescriptor(i));
+			detectedDesc.add(detector.getDescription(i));
 		}
 
 		// create a list of previously created track descriptions

@@ -42,17 +42,17 @@ public class WrapDetectDescribeSift implements DetectDescribePoint<ImageFloat32,
 	}
 
 	@Override
-	public SurfFeature getDescriptor(int index) {
+	public SurfFeature getDescription(int index) {
 		return alg.getFeatures().data[index];
 	}
 
 	@Override
-	public Class<SurfFeature> getDescriptorType() {
+	public Class<SurfFeature> getDescriptionType() {
 		return SurfFeature.class;
 	}
 
 	@Override
-	public int getDescriptorLength() {
+	public int getDescriptionLength() {
 		return alg.getDescriptorLength();
 	}
 

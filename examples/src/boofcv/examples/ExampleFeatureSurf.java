@@ -62,7 +62,7 @@ public class ExampleFeatureSurf {
 		surf.detect(image);
 
 		System.out.println("Found Features: "+surf.getNumberOfFeatures());
-		System.out.println("First descriptor's first value: "+surf.getDescriptor(0).value[0]);
+		System.out.println("First descriptor's first value: "+surf.getDescription(0).value[0]);
 	}
 
 	/**

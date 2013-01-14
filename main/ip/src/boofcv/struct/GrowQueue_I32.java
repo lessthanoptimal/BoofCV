@@ -26,19 +26,19 @@ package boofcv.struct;
  */
 public class GrowQueue_I32 {
 
-    public int data[];
-    public int size;
+	public int data[];
+	public int size;
 
-    public GrowQueue_I32( int maxSize ) {
-        data = new int[ maxSize ];
-        this.size = 0;
-    }
+	public GrowQueue_I32( int maxSize ) {
+		data = new int[ maxSize ];
+		this.size = 0;
+	}
 
 	public void reset() {
 		size = 0;
 	}
 
-    public void push( int val ) {
+	public void push( int val ) {
         if( size == data.length ) {
 			int temp[] = new int[ size * 2];
 			System.arraycopy(data,0,temp,0,size);

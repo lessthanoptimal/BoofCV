@@ -58,7 +58,7 @@ public class TestDetectDescribeFusion {
 		for( int i = 0; i < 9; i++ ) {
 			assertEquals(2,alg.getScale(i),1e-8);
 			assertEquals(1,alg.getOrientation(i),1e-8);
-			assertTrue(alg.getDescriptor(i) != null);
+			assertTrue(alg.getDescription(i) != null);
 			assertTrue(alg.getLocation(i) != null);
 		}
 	}
@@ -92,7 +92,7 @@ public class TestDetectDescribeFusion {
 		}.allTests();
 	}
 
-	private static class DummyDetector implements InterestPointDetector {
+	public static class DummyDetector implements InterestPointDetector {
 
 		@Override
 		public void detect(ImageSingleBand input) {}
@@ -128,7 +128,7 @@ public class TestDetectDescribeFusion {
 		}
 	}
 
-	private static class DummyRegionPoint implements DescribeRegionPoint {
+	public static class DummyRegionPoint implements DescribeRegionPoint {
 
 		int calls = 0;
 

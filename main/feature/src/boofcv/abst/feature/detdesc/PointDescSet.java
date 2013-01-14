@@ -33,7 +33,7 @@ public interface PointDescSet<TD extends TupleDesc> {
 	 *
 	 * @return Number of interest points.
 	 */
-	public int getTotalDetected();
+	public int getNumberOfFeatures();
 
 	/**
 	 * <p>
