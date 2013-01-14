@@ -55,7 +55,7 @@ public interface GeneralFeatureIntensity<I extends ImageSingleBand,D extends Ima
 	 * Returns an image containing an intensity mapping showing how corner like each pixel is.
 	 * Unprocessed image borders will have a value of zero.
 	 *
-	 * @return Corner intenisty image.
+	 * @return Corner intensity image.
 	 */
 	public ImageFloat32 getIntensity();
 
@@ -91,4 +91,18 @@ public interface GeneralFeatureIntensity<I extends ImageSingleBand,D extends Ima
 	 * @return Size of unprocessed border around the image.
 	 */
 	public int getIgnoreBorder();
+
+	/**
+	 * Indicates if local minimums are features or not.
+	 *
+	 * @return true for local minimum features.
+	 */
+	public boolean localMinimums();
+
+	/**
+	 * Indicates if local maximums are features or not.
+	 *
+	 * @return true for local maximum features.
+	 */
+	public boolean localMaximums();
 }

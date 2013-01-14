@@ -66,4 +66,14 @@ public class WrapperGradientCornerIntensity<I extends ImageSingleBand,D extends 
 	public int getIgnoreBorder() {
 		return alg.getIgnoreBorder();
 	}
+
+	@Override
+	public boolean localMaximums() {
+		return true;
+	}
+
+	@Override
+	public boolean localMinimums() {
+		return false;
+	}
 }

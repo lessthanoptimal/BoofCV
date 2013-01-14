@@ -60,14 +60,16 @@ public class TestGeneralFeatureDetector {
 		NonMaxSuppression extractor = FactoryFeatureExtractor.nonmax(new ConfigExtract(1, 0.001f, 1, true));
 
 		// configure it to only detect positive features
+		intensity.minimums = false;
 		GeneralFeatureDetector<ImageFloat32, ImageFloat32> detector =
-				new GeneralFeatureDetector<ImageFloat32, ImageFloat32>(intensity, extractor,false);
+				new GeneralFeatureDetector<ImageFloat32, ImageFloat32>(intensity, extractor);
 		detector.process(new ImageFloat32(width, height), null, null, null, null, null);
 		assertEquals(6, detector.getMaximums().size());
 		assertEquals(0, detector.getMinimums().size());
 
 		// try detecting the negative features too
-		detector = new GeneralFeatureDetector<ImageFloat32, ImageFloat32>(intensity, extractor,true);
+		intensity.minimums = true;
+		detector = new GeneralFeatureDetector<ImageFloat32, ImageFloat32>(intensity, extractor);
 		detector.process(new ImageFloat32(width, height), null, null, null, null, null);
 		assertEquals(6, detector.getMaximums().size());
 		assertEquals(2, detector.getMinimums().size());
@@ -85,6 +87,7 @@ public class TestGeneralFeatureDetector {
 	public void ignoreBorder() {
 		HelperIntensity intensity = new HelperIntensity(false, false, false);
 		intensity.ignoreBorder = 2;
+		intensity.minimums = true;
 
 		// add several features inside the image
 		intensity.img.set(3, 3, 10);
@@ -105,7 +108,7 @@ public class TestGeneralFeatureDetector {
 		NonMaxSuppression extractor = FactoryFeatureExtractor.nonmax(new ConfigExtract(1, 0.001f, 1, true));
 
 		GeneralFeatureDetector<ImageFloat32, ImageFloat32> detector =
-				new GeneralFeatureDetector<ImageFloat32, ImageFloat32>(intensity, extractor,true);
+				new GeneralFeatureDetector<ImageFloat32, ImageFloat32>(intensity, extractor);
 		detector.process(new ImageFloat32(width, height), null, null, null, null, null);
 
 		// only features inside the image should be found
@@ -119,7 +122,7 @@ public class TestGeneralFeatureDetector {
 		HelperIntensity intensity = new HelperIntensity(false, false, false);
 
 		GeneralFeatureDetector<ImageFloat32, ImageFloat32> detector =
-				new GeneralFeatureDetector<ImageFloat32, ImageFloat32>(intensity, extractor,false);
+				new GeneralFeatureDetector<ImageFloat32, ImageFloat32>(intensity, extractor);
 
 		detector.process(new ImageFloat32(width, height), null, null, null, null, null);
 
@@ -134,7 +137,7 @@ public class TestGeneralFeatureDetector {
 		HelperExtractor extractor = new HelperExtractor(true, true);
 
 		GeneralFeatureDetector<ImageFloat32, ImageFloat32> detector =
-				new GeneralFeatureDetector<ImageFloat32, ImageFloat32>(intensity, extractor,false);
+				new GeneralFeatureDetector<ImageFloat32, ImageFloat32>(intensity, extractor);
 
 		detector.process(new ImageFloat32(width, height), null, null, null, null, null);
 
@@ -152,7 +155,7 @@ public class TestGeneralFeatureDetector {
 		HelperExtractor extractor = new HelperExtractor(true, true);
 
 		GeneralFeatureDetector<ImageFloat32, ImageFloat32> detector =
-				new GeneralFeatureDetector<ImageFloat32, ImageFloat32>(intensity, extractor,false);
+				new GeneralFeatureDetector<ImageFloat32, ImageFloat32>(intensity, extractor);
 
 		detector.process(new ImageFloat32(width, height), null, null, null, null, null);
 
@@ -168,7 +171,7 @@ public class TestGeneralFeatureDetector {
 		HelperExtractor extractor = new HelperExtractor(true, true);
 
 		GeneralFeatureDetector<ImageFloat32, ImageFloat32> detector =
-				new GeneralFeatureDetector<ImageFloat32, ImageFloat32>(intensity, extractor,false);
+				new GeneralFeatureDetector<ImageFloat32, ImageFloat32>(intensity, extractor);
 
 		detector.process(new ImageFloat32(width, height), null, null, null, null, null);
 
@@ -185,7 +188,7 @@ public class TestGeneralFeatureDetector {
 		HelperExtractor extractor = new HelperExtractor(true, true);
 
 		GeneralFeatureDetector<ImageFloat32, ImageFloat32> detector =
-				new GeneralFeatureDetector<ImageFloat32, ImageFloat32>(intensity, extractor,false);
+				new GeneralFeatureDetector<ImageFloat32, ImageFloat32>(intensity, extractor);
 		detector.setMaxFeatures(1);
 
 		detector.process(new ImageFloat32(width, height), null, null, null, null, null);
@@ -203,7 +206,7 @@ public class TestGeneralFeatureDetector {
 		HelperExtractor extractor = new HelperExtractor(true, true);
 
 		GeneralFeatureDetector<ImageFloat32, ImageFloat32> detector =
-				new GeneralFeatureDetector<ImageFloat32, ImageFloat32>(intensity, extractor,false);
+				new GeneralFeatureDetector<ImageFloat32, ImageFloat32>(intensity, extractor);
 
 		detector.process(new ImageFloat32(width, height), null, null, null, null, null);
 
@@ -219,6 +222,39 @@ public class TestGeneralFeatureDetector {
 		assertEquals(2, detector.getMaximums().size());
 	}
 
+	/**
+	 * Makes sure flags that indicate the presence of local minimums and maximums are handled correctly
+	 */
+	@Test
+	public void handleLocalMinMaxFlags() {
+		HelperIntensity intensity = new HelperIntensity(false, false, true);
+		HelperExtractor extractor = new HelperExtractor(true, true);
+
+		intensity.minimums = false;
+		intensity.maximums = false;
+
+		GeneralFeatureDetector<ImageFloat32, ImageFloat32> detector =
+				new GeneralFeatureDetector<ImageFloat32, ImageFloat32>(intensity, extractor);
+
+		assertFalse(detector.isDetectMinimums());
+		assertFalse(detector.isDetectMaximums());
+
+		intensity.minimums = true;
+		intensity.maximums = false;
+
+		detector = new GeneralFeatureDetector<ImageFloat32, ImageFloat32>(intensity, extractor);
+
+		assertTrue(detector.isDetectMinimums());
+		assertFalse(detector.isDetectMaximums());
+
+		intensity.minimums = false;
+		intensity.maximums = true;
+
+		detector = new GeneralFeatureDetector<ImageFloat32, ImageFloat32>(intensity, extractor);
+
+		assertFalse(detector.isDetectMinimums());
+		assertTrue(detector.isDetectMaximums());
+	}
 
 	public class HelperExtractor implements NonMaxSuppression {
 
@@ -308,6 +344,8 @@ public class TestGeneralFeatureDetector {
 		public int processCalled = 0;
 		public int candidatesCalled = 0;
 		public int ignoreBorder = 0;
+		public boolean minimums = false;
+		public boolean maximums = true;
 
 		public ImageFloat32 img = new ImageFloat32(width, height);
 
@@ -351,6 +389,16 @@ public class TestGeneralFeatureDetector {
 		@Override
 		public int getIgnoreBorder() {
 			return ignoreBorder;
+		}
+
+		@Override
+		public boolean localMaximums() {
+			return maximums;
+		}
+
+		@Override
+		public boolean localMinimums() {
+			return minimums;
 		}
 	}
 }

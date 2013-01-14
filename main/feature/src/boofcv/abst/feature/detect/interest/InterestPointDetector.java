@@ -19,7 +19,6 @@
 package boofcv.abst.feature.detect.interest;
 
 import boofcv.struct.image.ImageSingleBand;
-import georegression.struct.point.Point2D_F64;
 
 /**
  * Interface for automatic interest point detection in an image.  Optional support is
@@ -27,7 +26,8 @@ import georegression.struct.point.Point2D_F64;
  *
  * @author Peter Abeles
  */
-public interface InterestPointDetector< T extends ImageSingleBand > {
+// TODO Rename to DetectorInterestPoint? or DetectorPointSO
+public interface InterestPointDetector< T extends ImageSingleBand > extends FoundPointSO {
 
 	/**
 	 * Detects interest points inside the provided image.
@@ -37,54 +37,9 @@ public interface InterestPointDetector< T extends ImageSingleBand > {
 	void detect( T input );
 
 	/**
-	 * Returns the number of interest points found.
-	 *
-	 * @return Number of interest points.
-	 */
-	int getNumberOfFeatures();
-
-	/**
-	 * <p>
-	 * The center location of the feature inside the image.
-	 * </p>
-	 * <p>
-	 * WARNING: Do not save the returned reference since it might get overwritten.
-	 * </p>
-	 *
-	 * @param featureIndex The feature's index.
-	 * @return Location of the feature in image pixels.
-	 */
-	Point2D_F64 getLocation( int featureIndex );
-
-	/**
-	 * <p>
-	 * Scale of the detected feature in scale space.  This is the standard deviation of the Gaussian blur
-	 * applied to the image when the feature was detected.  While the object's size is not exactly defined,
-	 * multiplying this number by 2.5 or 3 is typically considered the object's radius.
-	 * </p>
-	 *
-	 * <p>
-	 * NOTE: In the future this might be changed to getRadius() to remove any ambiguity over the detected
-	 * object's size.
-	 * </p>
-	 *
-	 * @param featureIndex Feature whose scale is being requested.
-	 * @return Size of the interest point relative to canonical size.
-	 */
-	double getScale( int featureIndex );
-
-	/**
-	 * Returns the features found orientation.   If orientation is not supported by the detector then
-	 * 0 is always returned.
-	 *
-	 * @param featureIndex Feature whose
-	 * @return Orientation in radians.
-	 */
-	double getOrientation( int featureIndex );
-
-	/**
 	 * Does the interest point detector have scale information
 	 *
+	 * @deprecated Likely to be removed since this flag has no use in actual algorithms to date.
 	 * @return true if it has scale information and false otherwise
 	 */
 	public boolean hasScale();
@@ -92,6 +47,7 @@ public interface InterestPointDetector< T extends ImageSingleBand > {
 	/**
 	 * If the interest point detector estimates the feature's orientation
 	 *
+	 * @deprecated Likely to be removed since this flag has no use in actual algorithms to date.
 	 * @return true if it estimates the orientation
 	 */
 	public boolean hasOrientation();

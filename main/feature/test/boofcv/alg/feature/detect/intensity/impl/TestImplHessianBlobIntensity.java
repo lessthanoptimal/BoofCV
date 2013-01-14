@@ -81,7 +81,7 @@ public class TestImplHessianBlobIntensity {
 		GImageSingleBand yy = FactoryGImageSingleBand.wrap(derivYY);
 		GImageSingleBand xy = FactoryGImageSingleBand.wrap(derivXY);
 
-		float expected = Math.abs(xx.get(5,6).floatValue()*yy.get(5,6).floatValue() - xy.get(5,6).floatValue()*xy.get(5,6).floatValue());
+		float expected =xx.get(5,6).floatValue()*yy.get(5,6).floatValue() - xy.get(5,6).floatValue()*xy.get(5,6).floatValue();
 		assertEquals(expected,intensity.get(5,6),1e-4);
 	}
 
@@ -121,7 +121,7 @@ public class TestImplHessianBlobIntensity {
 		GImageSingleBand yy = FactoryGImageSingleBand.wrap(derivYY);
 
 
-		float expected = Math.abs(xx.get(5,6).floatValue() + yy.get(5,6).floatValue());
+		float expected = xx.get(5,6).floatValue() + yy.get(5,6).floatValue();
 		assertEquals(expected,intensity.get(5,6),1e-4);
 	}
 }

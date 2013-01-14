@@ -94,7 +94,7 @@ public class GenerateImplHessianBlobIntensity extends CodeGeneratorBase {
 				"\t\t\t\t"+sumType+" dyy = hessianYY.data[indexYY++]"+bitWise+";\n" +
 				"\t\t\t\t"+sumType+" dxy = hessianXY.data[indexXY++]"+bitWise+";\n" +
 				"\n" +
-				"\t\t\t\tfeatureIntensity.data[indexInten++] = Math.abs(dxx*dyy - dxy*dxy);\n" +
+				"\t\t\t\tfeatureIntensity.data[indexInten++] = dxx*dyy - dxy*dxy;\n" +
 				"\t\t\t}\n" +
 				"\t\t}\n" +
 				"\t}\n\n");
@@ -123,7 +123,7 @@ public class GenerateImplHessianBlobIntensity extends CodeGeneratorBase {
 				"\t\t\t\t"+sumType+" dxx = hessianXX.data[indexXX++]"+bitWise+";\n" +
 				"\t\t\t\t"+sumType+" dyy = hessianYY.data[indexYY++]"+bitWise+";\n" +
 				"\n" +
-				"\t\t\t\tfeatureIntensity.data[indexInten++] = Math.abs(dxx + dyy);\n" +
+				"\t\t\t\tfeatureIntensity.data[indexInten++] = dxx + dyy;\n" +
 				"\t\t\t}\n" +
 				"\t\t}\n" +
 				"\t}\n\n");

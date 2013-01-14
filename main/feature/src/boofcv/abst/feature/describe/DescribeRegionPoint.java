@@ -75,13 +75,19 @@ public interface DescribeRegionPoint<T extends ImageSingleBand, D extends TupleD
 	public D process( double x , double y , double orientation , double scale , D ret );
 
 	/**
+	 * If scale information is used when computing the descriptor.
 	 *
 	 * @return if scale needs to be provided or not
+	 * @deprecated Likely to be removed in the near future.  if this flag is true or not won't change the input it
+	 * gets when paired with {@link boofcv.abst.feature.detect.interest.InterestPointDetector}
 	 */
 	public boolean requiresScale();
 
 	/**
+	 * True if the descriptor uses orientation information.
 	 *
+	 * @deprecated Likely to be removed in the near future.  if this flag is true or not won't change the input it
+	 * gets when paired with {@link boofcv.abst.feature.detect.interest.InterestPointDetector}
 	 * @return if orientation needs to be provided or not
 	 */
 	public boolean requiresOrientation();

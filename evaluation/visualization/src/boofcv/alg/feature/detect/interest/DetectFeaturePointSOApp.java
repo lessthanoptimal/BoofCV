@@ -18,21 +18,22 @@
 
 package boofcv.alg.feature.detect.interest;
 
-import boofcv.abst.feature.detect.extract.ConfigExtract;
+import boofcv.abst.feature.detect.interest.ConfigFastHessian;
+import boofcv.abst.feature.detect.interest.ConfigSiftDetector;
+import boofcv.abst.feature.detect.interest.InterestPointDetector;
 import boofcv.alg.feature.detect.ImageCorruptPanel;
-import boofcv.alg.feature.detect.intensity.HessianBlobIntensity;
 import boofcv.core.image.ConvertBufferedImage;
-import boofcv.factory.feature.detect.interest.FactoryDetectPoint;
+import boofcv.factory.feature.detect.interest.FactoryInterestPoint;
+import boofcv.factory.feature.detect.interest.FactoryInterestPointAlgs;
 import boofcv.gui.SelectAlgorithmAndInputPanel;
 import boofcv.gui.feature.FancyInterestPointRender;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.PathLabel;
 import boofcv.struct.BoofDefaults;
-import boofcv.struct.QueueCorner;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
-import georegression.struct.point.Point2D_I16;
+import georegression.struct.point.Point2D_F64;
 
 import javax.swing.*;
 import java.awt.*;
@@ -41,12 +42,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Displays a window showing the selected point features.  Local maximums and minimums are shown using different
- * colors.
+ * Displays a window point features with scale and orientation information
  *
  * @author Peter Abeles
  */
-public class DetectFeaturePointApp<T extends ImageSingleBand, D extends ImageSingleBand>
+public class DetectFeaturePointSOApp<T extends ImageSingleBand, D extends ImageSingleBand>
 		extends SelectAlgorithmAndInputPanel implements ImageCorruptPanel.Listener {
 
 	static int maxFeatures = 400;
@@ -66,33 +66,18 @@ public class DetectFeaturePointApp<T extends ImageSingleBand, D extends ImageSin
 	ImagePanel panel;
 	ImageCorruptPanel corruptPanel;
 
-	public DetectFeaturePointApp(Class<T> imageType, Class<D> derivType) {
+	public DetectFeaturePointSOApp(Class<T> imageType, Class<D> derivType) {
 		super(1);
 		this.imageType = imageType;
 
-
-		GeneralFeatureDetector<T, D> alg;
-		ConfigExtract configExtract = new ConfigExtract(radius,thresh);
-
-		alg = FactoryDetectPoint.createHarris(configExtract, false, maxFeatures, derivType);
-
-		addAlgorithm(0, "Harris", new EasyGeneralFeatureDetector<T,D>(alg,imageType,derivType));
-		alg = FactoryDetectPoint.createHarris(configExtract, true, maxFeatures, derivType);
-		addAlgorithm(0, "Harris Weighted", new EasyGeneralFeatureDetector<T,D>(alg,imageType,derivType));
-		alg = FactoryDetectPoint.createShiTomasi(configExtract, false, maxFeatures, derivType);
-		addAlgorithm(0, "KLT", new EasyGeneralFeatureDetector<T,D>(alg,imageType,derivType));
-		alg = FactoryDetectPoint.createShiTomasi(configExtract, true, maxFeatures, derivType);
-		addAlgorithm(0, "KLT Weighted", new EasyGeneralFeatureDetector<T,D>(alg,imageType,derivType));
-		alg = FactoryDetectPoint.createFast(radius, 9,10, maxFeatures, imageType);
-		addAlgorithm(0, "Fast", new EasyGeneralFeatureDetector<T,D>(alg,imageType,derivType));
-		alg = FactoryDetectPoint.createKitRos(configExtract, maxFeatures, derivType);
-		addAlgorithm(0, "KitRos", new EasyGeneralFeatureDetector<T,D>(alg,imageType,derivType));
-		alg = FactoryDetectPoint.createMedian(configExtract, maxFeatures, imageType);
-		addAlgorithm(0, "Median", new EasyGeneralFeatureDetector<T,D>(alg,imageType,derivType));
-		alg = FactoryDetectPoint.createHessian(HessianBlobIntensity.Type.DETERMINANT, configExtract, maxFeatures, derivType);
-		addAlgorithm(0, "Hessian", new EasyGeneralFeatureDetector<T,D>(alg,imageType,derivType));
-		alg = FactoryDetectPoint.createHessian(HessianBlobIntensity.Type.TRACE, configExtract, maxFeatures, derivType);
-		addAlgorithm(0, "Laplace", new EasyGeneralFeatureDetector<T,D>(alg,imageType,derivType));
+		FeatureLaplaceScaleSpace<T, D> flss = FactoryInterestPointAlgs.hessianLaplace(radius, thresh, maxScaleFeatures, imageType, derivType);
+		addAlgorithm(0, "Hess Lap SS", FactoryInterestPoint.wrapDetector(flss, scales, imageType));
+		FeatureLaplacePyramid<T, D> flp = FactoryInterestPointAlgs.hessianLaplacePyramid(radius, thresh, maxScaleFeatures, imageType, derivType);
+		addAlgorithm(0, "Hess Lap P", FactoryInterestPoint.wrapDetector(flp, scales, imageType));
+		addAlgorithm(0, "FastHessian", FactoryInterestPoint.<T>fastHessian(
+				new ConfigFastHessian(thresh, 2, maxScaleFeatures, 2, 9, 4, 4)));
+		if( imageType == ImageFloat32.class )
+			addAlgorithm(0, "SIFT", FactoryInterestPoint.siftDetector(null,new ConfigSiftDetector(2,10,maxScaleFeatures,5)));
 
 		JPanel viewArea = new JPanel(new BorderLayout());
 		corruptPanel = new ImageCorruptPanel();
@@ -139,25 +124,16 @@ public class DetectFeaturePointApp<T extends ImageSingleBand, D extends ImageSin
 		// corrupt the input image
 		corruptPanel.corruptImage(grayImage, corruptImage);
 
-		final EasyGeneralFeatureDetector<T,D> det = (EasyGeneralFeatureDetector<T,D>) cookie;
-		det.detect(corruptImage,null);
+		final InterestPointDetector<T> det = (InterestPointDetector<T>) cookie;
+		det.detect(corruptImage);
 
 		double detectorRadius = BoofDefaults.SCALE_SPACE_CANONICAL_RADIUS;
 
 		render.reset();
-		if( det.getDetector().isDetectMinimums() ) {
-			QueueCorner l = det.getMinimums();
-			for( int i = 0; i < l.size; i++ ) {
-				Point2D_I16 p = l.get(i);
-				render.addPoint(p.x, p.y, 3, Color.BLUE);
-			}
-		}
-		if( det.getDetector().isDetectMaximums() ) {
-			QueueCorner l = det.getMaximums();
-			for( int i = 0; i < l.size; i++ ) {
-				Point2D_I16 p = l.get(i);
-				render.addPoint(p.x, p.y, 3, Color.RED);
-			}
+		for (int i = 0; i < det.getNumberOfFeatures(); i++) {
+			Point2D_F64 p = det.getLocation(i);
+			int radius = (int) Math.ceil(det.getScale(i) * detectorRadius);
+			render.addCircle((int) p.x, (int) p.y, radius);
 		}
 
 		SwingUtilities.invokeLater(new Runnable() {
@@ -191,7 +167,7 @@ public class DetectFeaturePointApp<T extends ImageSingleBand, D extends ImageSin
 	}
 
 	public static void main(String args[]) {
-		DetectFeaturePointApp app = new DetectFeaturePointApp(ImageFloat32.class, ImageFloat32.class);
+		DetectFeaturePointSOApp app = new DetectFeaturePointSOApp(ImageFloat32.class, ImageFloat32.class);
 //		DetectFeaturePointApp app = new DetectFeaturePointApp(ImageUInt8.class,ImageSInt16.class);
 
 		List<PathLabel> inputs = new ArrayList<PathLabel>();

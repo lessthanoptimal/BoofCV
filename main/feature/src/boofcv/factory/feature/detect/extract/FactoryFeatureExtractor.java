@@ -42,14 +42,13 @@ public class FactoryFeatureExtractor {
 	 * @param intensity   Feature intensity algorithm
 	 * @param extractor   Feature extraction algorithm.
 	 * @param maxFeatures Maximum number of features it should return. -1 to return them all.
-	 * @param detectMinimum if true it will detect local minimums as well as maximums.
 	 * @return General feature detector
 	 */
 	public static <I extends ImageSingleBand, D extends ImageSingleBand>
 	GeneralFeatureDetector<I, D> general(GeneralFeatureIntensity<I, D> intensity,
 										 NonMaxSuppression extractor,
-										 int maxFeatures, boolean detectMinimum) {
-		GeneralFeatureDetector<I, D> det = new GeneralFeatureDetector<I, D>(intensity, extractor,detectMinimum);
+										 int maxFeatures ) {
+		GeneralFeatureDetector<I, D> det = new GeneralFeatureDetector<I, D>(intensity, extractor);
 		det.setMaxFeatures(maxFeatures);
 
 		return det;
