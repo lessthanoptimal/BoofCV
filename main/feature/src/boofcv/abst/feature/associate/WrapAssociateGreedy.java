@@ -20,7 +20,7 @@ package boofcv.abst.feature.associate;
 
 import boofcv.alg.feature.associate.AssociateGreedy;
 import boofcv.struct.FastQueue;
-import boofcv.struct.GrowingArrayInt;
+import boofcv.struct.GrowQueue_I32;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.MatchScoreType;
 import org.ddogleg.sorting.QuickSelectArray;
@@ -44,7 +44,7 @@ public class WrapAssociateGreedy<T> implements AssociateDescription<T> {
 	FastQueue<T> listDst;
 
 	// indexes of unassociated features
-	GrowingArrayInt unassoc = new GrowingArrayInt();
+	GrowQueue_I32 unassoc = new GrowQueue_I32();
 
 	/**
 	 *
@@ -118,7 +118,7 @@ public class WrapAssociateGreedy<T> implements AssociateDescription<T> {
 	}
 
 	@Override
-	public GrowingArrayInt getUnassociatedSource() {
+	public GrowQueue_I32 getUnassociatedSource() {
 		return unassoc;
 	}
 

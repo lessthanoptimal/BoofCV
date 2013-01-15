@@ -21,7 +21,7 @@ package boofcv.alg.feature.associate;
 import boofcv.abst.feature.associate.AssociateDescription2D;
 import boofcv.abst.feature.associate.ScoreAssociation;
 import boofcv.struct.FastQueue;
-import boofcv.struct.GrowingArrayInt;
+import boofcv.struct.GrowQueue_I32;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.MatchScoreType;
 import georegression.struct.point.Point2D_F64;
@@ -50,7 +50,7 @@ public abstract class BaseAssociateLocation2DFilter<D> implements AssociateDescr
 
 
 	// list of source features not associated
-	private GrowingArrayInt unassociated = new GrowingArrayInt();
+	private GrowQueue_I32 unassociated = new GrowQueue_I32();
 
 	// list of features that have been matched with each other
 	private FastQueue<AssociatedIndex> matched = new FastQueue<AssociatedIndex>(10,AssociatedIndex.class,true);
@@ -178,7 +178,7 @@ public abstract class BaseAssociateLocation2DFilter<D> implements AssociateDescr
 	}
 
 	@Override
-	public GrowingArrayInt getUnassociatedSource() {
+	public GrowQueue_I32 getUnassociatedSource() {
 		return unassociated;
 	}
 

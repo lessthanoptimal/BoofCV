@@ -21,9 +21,16 @@ package boofcv.alg.sfm.d3;
 import boofcv.abst.feature.associate.AssociateDescTo2D;
 import boofcv.abst.feature.associate.AssociateDescription2D;
 import boofcv.abst.feature.associate.ScoreAssociateHamming_B;
+import boofcv.abst.feature.describe.DescribeRegionPoint;
 import boofcv.abst.feature.describe.WrapDescribeBrief;
+import boofcv.abst.feature.detdesc.DetectDescribeMulti;
+import boofcv.abst.feature.detdesc.DetectDescribeMultiFusion;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
 import boofcv.abst.feature.detect.extract.ConfigExtract;
+import boofcv.abst.feature.detect.extract.NonMaxSuppression;
+import boofcv.abst.feature.detect.intensity.GeneralFeatureIntensity;
+import boofcv.abst.feature.detect.interest.DetectorInterestPointMulti;
+import boofcv.abst.feature.detect.interest.GeneralToInterestMulti;
 import boofcv.abst.feature.detect.interest.InterestPointDetector;
 import boofcv.abst.feature.disparity.StereoDisparitySparse;
 import boofcv.abst.feature.tracker.PkltConfig;
@@ -34,12 +41,16 @@ import boofcv.abst.sfm.ModelAssistedTrackerCalibrated;
 import boofcv.abst.sfm.StereoVisualOdometry;
 import boofcv.alg.feature.describe.DescribePointBrief;
 import boofcv.alg.feature.describe.brief.FactoryBriefDefinition;
+import boofcv.alg.feature.detect.intensity.HessianBlobIntensity;
 import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.feature.describe.FactoryDescribePointAlgs;
+import boofcv.factory.feature.describe.FactoryDescribeRegionPoint;
 import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
+import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
+import boofcv.factory.feature.detect.intensity.FactoryIntensityPoint;
 import boofcv.factory.feature.detect.interest.FactoryInterestPoint;
 import boofcv.factory.feature.disparity.FactoryStereoDisparity;
 import boofcv.factory.feature.tracker.FactoryPointSequentialTracker;
@@ -102,6 +113,7 @@ public class VisualizeStereoVisualOdometryApp <I extends ImageSingleBand>
 	public VisualizeStereoVisualOdometryApp( Class<I> imageType ) {
 		super(1, imageType);
 
+		addAlgorithm(0, "Quad P3P - ST-BRIEF", 5);
 		addAlgorithm(0, "Stereo P3P - KLT", 3);
 		addAlgorithm(0, "Stereo P3P - ST-BRIEF", 4);
 		addAlgorithm(0, "Depth P3P - KLT", 0);
@@ -375,11 +387,25 @@ public class VisualizeStereoVisualOdometryApp <I extends ImageSingleBand>
 
 			return FactoryVisualOdometry.stereoFullPnP(thresholdAdd, thresholdRetire,1.5,200,50,disparity,
 					trackerLeft,trackerRight, imageType);
+		} else if( whichAlg == 5 ) {
+			GeneralFeatureIntensity intensity =
+					FactoryIntensityPoint.hessian(HessianBlobIntensity.Type.TRACE,imageType);
+//			GeneralFeatureIntensity intensity =
+//					FactoryIntensityPoint.shiTomasi(1,false,imageType);
+			NonMaxSuppression nonmax = FactoryFeatureExtractor.nonmax(new ConfigExtract(3,1,0,true,true,false));
+			GeneralFeatureDetector general = new GeneralFeatureDetector(intensity,nonmax);
+			DetectorInterestPointMulti detector = new GeneralToInterestMulti(general,1,imageType,derivType);
+//			DescribeRegionPoint describe = FactoryDescribeRegionPoint.brief(16,512,-1,4,true,imageType);
+//			DescribeRegionPoint describe = FactoryDescribeRegionPoint.pixelNCC(5,5,imageType);
+			DescribeRegionPoint describe = FactoryDescribeRegionPoint.surfFast(null,imageType);
+			DetectDescribeMulti detDescMulti =  new DetectDescribeMultiFusion(detector,null,describe);
+
+			return FactoryVisualOdometry.stereoQuadPnP(1.5, Double.MAX_VALUE, 300, 50, detDescMulti, imageType);
 		} else {
 			throw new RuntimeException("Unknown selection");
 		}
 
-		return FactoryVisualOdometry.stereoDepth(thresholdAdd, thresholdRetire,disparity, assistedTracker, imageType);
+		return FactoryVisualOdometry.stereoDepth(thresholdAdd, thresholdRetire, disparity, assistedTracker, imageType);
 	}
 
 	@Override

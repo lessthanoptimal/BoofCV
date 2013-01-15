@@ -22,7 +22,7 @@ import boofcv.abst.feature.associate.AssociateDescription;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
 import boofcv.alg.tracker.klt.PyramidKltFeature;
 import boofcv.struct.FastQueue;
-import boofcv.struct.GrowingArrayInt;
+import boofcv.struct.GrowQueue_I32;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.MatchScoreType;
 import boofcv.struct.feature.SurfFeature;
@@ -194,7 +194,7 @@ public class TestCombinedTrackerScalePoint {
 		}
 
 		@Override
-		public GrowingArrayInt getUnassociatedSource() {
+		public GrowQueue_I32 getUnassociatedSource() {
 			return null;
 		}
 

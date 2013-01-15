@@ -35,11 +35,11 @@ import boofcv.struct.FastQueue;
  * one would think descriptor comparisons would dominate.
  * </p>
  *
- * @param <D> Feature description type.
+ * @param <Desc> Feature description type.
  *
  * @author Peter Abeles
  */
-public interface AssociateDescription<D> extends Associate {
+public interface AssociateDescription<Desc> extends Associate {
 
 	/**
 	 * Sets the list of source features.
@@ -48,7 +48,7 @@ public interface AssociateDescription<D> extends Associate {
 	 *
 	 * @param listSrc List of features
 	 */
-	public void setSource( FastQueue<D> listSrc );
+	public void setSource( FastQueue<Desc> listSrc );
 
 	/**
 	 * Sets the list of destination features
@@ -57,5 +57,5 @@ public interface AssociateDescription<D> extends Associate {
 	 *
 	 * @param listDst List of features
 	 */
-	public void setDestination( FastQueue<D> listDst );
+	public void setDestination( FastQueue<Desc> listDst );
 }

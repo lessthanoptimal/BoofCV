@@ -20,7 +20,7 @@ package boofcv.alg.feature.associate;
 
 import boofcv.abst.feature.associate.AssociateDescription;
 import boofcv.struct.FastQueue;
-import boofcv.struct.GrowingArrayInt;
+import boofcv.struct.GrowQueue_I32;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.SurfFeature;
 import boofcv.struct.feature.TupleDesc_F64;
@@ -49,7 +49,7 @@ public class AssociateSurfBasic {
 	FastQueue<AssociatedIndex> matches = new FastQueue<AssociatedIndex>(10,AssociatedIndex.class,true);
 
 	// indexes of unassociated features
-	GrowingArrayInt unassociated = new GrowingArrayInt();
+	GrowQueue_I32 unassociated = new GrowQueue_I32();
 
 	public AssociateSurfBasic(AssociateDescription<TupleDesc_F64> assoc) {
 		this.assoc = assoc;
@@ -97,7 +97,7 @@ public class AssociateSurfBasic {
 			int globalDstIndex = dstPositive.data[a.dst].index;
 			matches.grow().setAssociation(globalSrcIndex,globalDstIndex,a.fitScore);
 		}
-		GrowingArrayInt un = assoc.getUnassociatedSource();
+		GrowQueue_I32 un = assoc.getUnassociatedSource();
 		for( int i = 0; i < un.size; i++ ) {
 			unassociated.add( srcPositive.data[un.get(i)].index );
 		}
@@ -144,7 +144,7 @@ public class AssociateSurfBasic {
 		}
 	}
 
-	public GrowingArrayInt getUnassociated() {
+	public GrowQueue_I32 getUnassociated() {
 		return unassociated;
 	}
 

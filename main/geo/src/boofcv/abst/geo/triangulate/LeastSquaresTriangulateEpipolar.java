@@ -53,7 +53,7 @@ public class LeastSquaresTriangulateEpipolar implements RefineTriangulationEpipo
 	@Override
 	public boolean process(List<Point2D_F64> observations,
 						   List<DenseMatrix64F> fundamentalWorldToCam,
-						Point3D_F64 worldPt, Point3D_F64 refinedPt)
+						   Point3D_F64 worldPt, Point3D_F64 refinedPt)
 	{
 		func.setObservations(observations, fundamentalWorldToCam);
 		minimizer.setFunction(func,null);
