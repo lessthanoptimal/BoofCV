@@ -18,7 +18,7 @@
 
 package boofcv.alg.filter.binary.impl;
 
-import boofcv.struct.GrowingArrayInt;
+import boofcv.struct.GrowQueue_I32;
 
 
 /**
@@ -30,7 +30,7 @@ public class LabelNode {
 
 	public int index;
 	public int maxIndex;
-	public GrowingArrayInt connections = new GrowingArrayInt(5);
+	public GrowQueue_I32 connections = new GrowQueue_I32(5);
 
 	public LabelNode(int index) {
 		this.index = index;

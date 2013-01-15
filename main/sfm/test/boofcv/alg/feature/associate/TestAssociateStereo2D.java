@@ -16,42 +16,19 @@
  * limitations under the License.
  */
 
-package boofcv.struct;
+package boofcv.alg.feature.associate;
+
+import org.junit.Test;
+
+import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
  */
-public class GrowingArrayInt {
-	public int data[];
-	public int size;
+public class TestAssociateStereo2D {
 
-	public GrowingArrayInt( int initialMaxSize ) {
-		this.size = 0;
-		data = new int[initialMaxSize];
-	}
-
-	public GrowingArrayInt() {
-		this(20);
-	}
-
-	public void reset() {
-		this.size = 0;
-	}
-
-	public void add( int value ) {
-		if( size >= data.length ) {
-			int temp[] = new int[ data.length*2 ];
-			System.arraycopy(data,0,temp,0,size);
-			data = temp;
-		}
-		data[size++] = value;
-	}
-
-	public int get( int index ) {
-		return data[index];
-	}
-
-	public int size() {
-		return size;
+	@Test
+	public void stuff() {
+		fail("implement");
 	}
 }

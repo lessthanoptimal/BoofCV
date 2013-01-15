@@ -19,7 +19,7 @@
 package boofcv.abst.feature.associate;
 
 import boofcv.struct.FastQueue;
-import boofcv.struct.GrowingArrayInt;
+import boofcv.struct.GrowQueue_I32;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.MatchScoreType;
 import boofcv.struct.feature.TupleDesc_F64;
@@ -59,7 +59,7 @@ public class AssociateNearestNeighbor<D extends TupleDesc_F64>
 	FastQueue<AssociatedIndex> matches = new FastQueue<AssociatedIndex>(100,AssociatedIndex.class,true);
 
 	// list of indexes in source which are unassociated
-	GrowingArrayInt unassociatedSrc = new GrowingArrayInt();
+	GrowQueue_I32 unassociatedSrc = new GrowQueue_I32();
 
 	public AssociateNearestNeighbor(NearestNeighbor<Integer> alg , int featureDimension ) {
 		this.alg = alg;
@@ -141,7 +141,7 @@ public class AssociateNearestNeighbor<D extends TupleDesc_F64>
 	}
 
 	@Override
-	public GrowingArrayInt getUnassociatedSource() {
+	public GrowQueue_I32 getUnassociatedSource() {
 		return unassociatedSrc;
 	}
 

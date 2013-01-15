@@ -19,7 +19,7 @@
 package boofcv.abst.feature.associate;
 
 import boofcv.struct.FastQueue;
-import boofcv.struct.GrowingArrayInt;
+import boofcv.struct.GrowQueue_I32;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.MatchScoreType;
 import boofcv.struct.feature.TupleDesc_F64;
@@ -61,7 +61,7 @@ public class TestAssociateDescTo2D {
 		public FastQueue<TupleDesc_F64> listDst;
 		public boolean calledAssociate = false;
 		public FastQueue<AssociatedIndex> matches = new FastQueue<AssociatedIndex>(10,AssociatedIndex.class,false);
-		public GrowingArrayInt unassociated = new GrowingArrayInt(10);
+		public GrowQueue_I32 unassociated = new GrowQueue_I32(10);
 		public double threshold;
 
 		@Override
@@ -85,7 +85,7 @@ public class TestAssociateDescTo2D {
 		}
 
 		@Override
-		public GrowingArrayInt getUnassociatedSource() {
+		public GrowQueue_I32 getUnassociatedSource() {
 			return unassociated;
 		}
 

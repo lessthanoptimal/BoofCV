@@ -54,8 +54,8 @@ public class FastQueue<T> {
 		}
 	}
 
-	protected FastQueue(Class<T> type, boolean declareInstances ) {
-		this(0,type,declareInstances);
+	public FastQueue(Class<T> type, boolean declareInstances ) {
+		this(10,type,declareInstances);
 	}
 
 	/**

@@ -23,7 +23,7 @@ import boofcv.abst.feature.associate.ScoreAssociateEuclidean_F64;
 import boofcv.abst.feature.associate.ScoreAssociation;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.struct.FastQueue;
-import boofcv.struct.GrowingArrayInt;
+import boofcv.struct.GrowQueue_I32;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.SurfFeature;
 import boofcv.struct.feature.TupleDesc_F64;
@@ -95,7 +95,7 @@ public class TestAssociateSurfBasic {
 		assertEquals(4,matches.get(2).dst);
 
 		// see if the expected number of features are in the unassociated list
-		GrowingArrayInt unassoc = alg.unassociated;
+		GrowQueue_I32 unassoc = alg.unassociated;
 		assertEquals(2,unassoc.size);
 
 		// make sure none of the unassociated are contained in the associated list

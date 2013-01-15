@@ -19,7 +19,7 @@
 package boofcv.abst.feature.associate;
 
 import boofcv.struct.FastQueue;
-import boofcv.struct.GrowingArrayInt;
+import boofcv.struct.GrowQueue_I32;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.TupleDesc_F64;
 import org.ddogleg.nn.NearestNeighbor;
@@ -74,7 +74,7 @@ public class TestAssociateNearestNeighbor {
 		assertEquals(4,matches.get(1).src);
 		assertEquals(4,matches.get(1).dst);
 
-		GrowingArrayInt unassoc = alg.getUnassociatedSource();
+		GrowQueue_I32 unassoc = alg.getUnassociatedSource();
 		assertEquals(3, unassoc.size);
 		assertEquals(1,unassoc.get(0));
 		assertEquals(2,unassoc.get(1));

@@ -47,7 +47,7 @@ public class PnPStereoEstimator implements GeoModelEstimator1<Se3_F64,Stereo2D3D
 	private FastQueue<Point2D3D> monoPoints = new FastQueue<Point2D3D>(10,Point2D3D.class,true);
 
 	// known transform from left camera view into the right camera view
-	private Se3_F64 leftToRight;
+	private Se3_F64 leftToRight = new Se3_F64();
 
 	// computed transform from worldToRight
 	private Se3_F64 worldToRight = new Se3_F64();

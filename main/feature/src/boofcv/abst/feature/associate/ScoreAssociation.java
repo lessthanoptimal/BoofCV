@@ -28,11 +28,11 @@ import boofcv.struct.feature.MatchScoreType;
  *
  * NOTES: To ensure that lower is better, correlation scores undergo a sign flip.
  *
- * @param <T> Feature description type.
+ * @param <Desc> Feature description type.
  *
  * @author Peter Abeles
  */
-public interface ScoreAssociation<T> {
+public interface ScoreAssociation<Desc> {
 
 	/**
 	 * Compute the fit score between the two features.  A better fit score will have a lower value.
@@ -41,7 +41,7 @@ public interface ScoreAssociation<T> {
 	 * @param b second feature
 	 * @return Quality of fit score.  Lower is better.
 	 */
-	public double score( T a , T b );
+	public double score( Desc a , Desc b );
 
 	/**
 	 * Specifies the type of score which is returned.

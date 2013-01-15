@@ -19,7 +19,7 @@
 package boofcv.abst.feature.associate;
 
 import boofcv.struct.FastQueue;
-import boofcv.struct.GrowingArrayInt;
+import boofcv.struct.GrowQueue_I32;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.MatchScoreType;
 import georegression.struct.point.Point2D_F64;
@@ -58,7 +58,7 @@ public class AssociateDescTo2D<D> implements AssociateDescription2D<D> {
 	}
 
 	@Override
-	public GrowingArrayInt getUnassociatedSource() {
+	public GrowQueue_I32 getUnassociatedSource() {
 		return alg.getUnassociatedSource();
 	}
 

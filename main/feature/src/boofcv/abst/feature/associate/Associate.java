@@ -19,7 +19,7 @@
 package boofcv.abst.feature.associate;
 
 import boofcv.struct.FastQueue;
-import boofcv.struct.GrowingArrayInt;
+import boofcv.struct.GrowQueue_I32;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.MatchScoreType;
 
@@ -49,7 +49,7 @@ public interface Associate {
 	 *
 	 * @return List of unassociated source features by index.
 	 */
-	public GrowingArrayInt getUnassociatedSource();
+	public GrowQueue_I32 getUnassociatedSource();
 
 	/**
 	 * Associations are only considered if their score is less than the specified threshold.  To remove

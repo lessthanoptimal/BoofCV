@@ -34,18 +34,26 @@ public class GrowQueue_I32 {
 		this.size = 0;
 	}
 
+	public GrowQueue_I32() {
+		this(10);
+	}
+
 	public void reset() {
 		size = 0;
 	}
 
+	public void add(int value) {
+		push(value);
+	}
+
 	public void push( int val ) {
-        if( size == data.length ) {
+		if( size == data.length ) {
 			int temp[] = new int[ size * 2];
 			System.arraycopy(data,0,temp,0,size);
 			data = temp;
 		}
 		data[size++] = val;
-    }
+	}
 
 	public int get( int index ) {
 		return data[index];
@@ -68,7 +76,7 @@ public class GrowQueue_I32 {
 		return size;
 	}
 
-    public int pop() {
-        return data[--size];
-    }
+	public int pop() {
+		return data[--size];
+	}
 }

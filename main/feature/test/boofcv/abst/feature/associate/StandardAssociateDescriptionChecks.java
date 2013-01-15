@@ -19,7 +19,7 @@
 package boofcv.abst.feature.associate;
 
 import boofcv.struct.FastQueue;
-import boofcv.struct.GrowingArrayInt;
+import boofcv.struct.GrowQueue_I32;
 import boofcv.struct.feature.AssociatedIndex;
 import org.junit.Test;
 
@@ -94,7 +94,7 @@ public abstract class StandardAssociateDescriptionChecks<D> {
 		}
 
 		// see if the expected number of features are in the unassociated list
-		GrowingArrayInt unassoc = alg.getUnassociatedSource();
+		GrowQueue_I32 unassoc = alg.getUnassociatedSource();
 		assertEquals(Math.max(numFeatures-maxAssoc,0),unassoc.size);
 
 		// make sure none of the unassociated are contained in the associated list
