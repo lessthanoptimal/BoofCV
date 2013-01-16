@@ -36,8 +36,8 @@ public class Se3ToStereoPoseCodec implements ModelCodec<StereoPose> {
 	}
 
 	@Override
-	public void decode(double[] param, StereoPose outputModel) {
-		codec.decode(param,outputModel.worldToCam0);
+	public void decode(double[] input, StereoPose outputModel) {
+		codec.decode(input,outputModel.worldToCam0);
 	}
 
 	@Override

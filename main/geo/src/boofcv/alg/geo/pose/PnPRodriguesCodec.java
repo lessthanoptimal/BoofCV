@@ -45,23 +45,23 @@ public class PnPRodriguesCodec implements ModelCodec<Se3_F64> {
 	Rodrigues rotation = new Rodrigues();
 
 	@Override
-	public void decode(double[] param, Se3_F64 outputModel) {
-		rotation.setParamVector(param[0],param[1],param[2]);
+	public void decode(double[] input, Se3_F64 outputModel) {
+		rotation.setParamVector(input[0],input[1],input[2]);
 
 		RotationMatrixGenerator.rodriguesToMatrix(rotation, outputModel.getR());
 
 		Vector3D_F64 T = outputModel.getT();
-		T.x = param[3];
-		T.y = param[4];
-		T.z = param[5];
+		T.x = input[3];
+		T.y = input[4];
+		T.z = input[5];
 	}
 
 	@Override
-	public void encode(Se3_F64 se, double[] param) {
+	public void encode(Se3_F64 input, double[] output) {
 
 		// force the "rotation matrix" to be an exact rotation matrix
 		// otherwise Rodrigues will have issues with the noise
-		if( !svd.decompose(se.getR()) )
+		if( !svd.decompose(input.getR()) )
 			throw new RuntimeException("SVD failed");
 
 		DenseMatrix64F U = svd.getU(null,false);
@@ -72,15 +72,15 @@ public class PnPRodriguesCodec implements ModelCodec<Se3_F64> {
 		// extract Rodrigues coordinates
 		RotationMatrixGenerator.matrixToRodrigues(R,rotation);
 
-		param[0] = rotation.unitAxisRotation.x*rotation.theta;
-		param[1] = rotation.unitAxisRotation.y*rotation.theta;
-		param[2] = rotation.unitAxisRotation.z*rotation.theta;
+		output[0] = rotation.unitAxisRotation.x*rotation.theta;
+		output[1] = rotation.unitAxisRotation.y*rotation.theta;
+		output[2] = rotation.unitAxisRotation.z*rotation.theta;
 
-		Vector3D_F64 T = se.getT();
+		Vector3D_F64 T = input.getT();
 
-		param[3] = T.x;
-		param[4] = T.y;
-		param[5] = T.z;
+		output[3] = T.x;
+		output[4] = T.y;
+		output[5] = T.z;
 	}
 
 	@Override

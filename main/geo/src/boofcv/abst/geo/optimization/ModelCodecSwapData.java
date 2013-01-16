@@ -36,8 +36,8 @@ public class ModelCodecSwapData implements ModelCodec<DenseMatrix64F> {
 	}
 
 	@Override
-	public void decode(double[] param, DenseMatrix64F outputModel) {
-		outputModel.data = param;
+	public void decode(double[] input, DenseMatrix64F outputModel) {
+		outputModel.data = input;
 	}
 
 	@Override

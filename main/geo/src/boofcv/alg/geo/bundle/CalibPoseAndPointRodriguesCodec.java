@@ -69,7 +69,7 @@ public class CalibPoseAndPointRodriguesCodec
 	}
 
 	@Override
-	public void decode(double[] param, CalibratedPoseAndPoint outputModel) {
+	public void decode(double[] input, CalibratedPoseAndPoint outputModel) {
 
 		int paramIndex = 0;
 
@@ -81,22 +81,22 @@ public class CalibPoseAndPointRodriguesCodec
 
 			Se3_F64 se = outputModel.getWorldToCamera(i);
 
-			rotation.setParamVector(param[paramIndex++],param[paramIndex++],param[paramIndex++]);
+			rotation.setParamVector(input[paramIndex++], input[paramIndex++], input[paramIndex++]);
 
 			RotationMatrixGenerator.rodriguesToMatrix(rotation,se.getR());
 
 			Vector3D_F64 T = se.getT();
-			T.x = param[paramIndex++];
-			T.y = param[paramIndex++];
-			T.z = param[paramIndex++];
+			T.x = input[paramIndex++];
+			T.y = input[paramIndex++];
+			T.z = input[paramIndex++];
 		}
 		
 		// now decode the points
 		for( int i = 0; i < numPoints; i++ ) {
 			Point3D_F64 p = outputModel.getPoint(i);
-			p.x = param[paramIndex++];
-			p.y = param[paramIndex++];
-			p.z = param[paramIndex++];
+			p.x = input[paramIndex++];
+			p.y = input[paramIndex++];
+			p.z = input[paramIndex++];
 		}
 	}
 

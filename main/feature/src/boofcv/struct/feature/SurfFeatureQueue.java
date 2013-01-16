@@ -31,9 +31,8 @@ public class SurfFeatureQueue extends FastQueue<SurfFeature> {
 	int numFeatures;
 
 	public SurfFeatureQueue( int descriptionLength ) {
-		super(SurfFeature.class,true);
 		this.numFeatures = descriptionLength;
-		growArray(10);
+		init(10,SurfFeature.class,true);
 	}
 
 	@Override
