@@ -32,6 +32,7 @@ import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.sfm.Stereo2D3D;
+import georegression.geometry.RotationMatrixGenerator;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
@@ -39,13 +40,14 @@ import org.ddogleg.fitting.modelset.ModelFitter;
 import org.ddogleg.fitting.modelset.ModelMatcher;
 
 /**
-* @author Peter Abeles
-*/
+ * @author Peter Abeles
+ */
 // TODO add a second pass option
 // TODO add bundle adjustment
 // TODO Show right camera tracks in debugger
 public class VisOdomQuadPnP<T extends ImageSingleBand,TD extends TupleDesc> {
 
+	// TODO change to key-frame so that its performance isn't coupled to vehicle speed strongly
 	TriangulateTwoViewsCalibrated triangulate;
 
 	// computes camera motion
@@ -65,6 +67,7 @@ public class VisOdomQuadPnP<T extends ImageSingleBand,TD extends TupleDesc> {
 
 	ImageInfo<TD> featsLeft0,featsLeft1;
 	ImageInfo<TD> featsRight0,featsRight1;
+	ImageInfo<TD> featsTmp0, featsTmp1;
 	SetMatches setMatches[];
 
 	// stereo baseline going from left to right
@@ -82,6 +85,11 @@ public class VisOdomQuadPnP<T extends ImageSingleBand,TD extends TupleDesc> {
 	// number of frames that have been processed
 	// is this the first frame
 	private boolean first = true;
+
+	boolean usedLeft[] = new boolean[ 1 ];
+	boolean usedRight[] = new boolean[ 1];
+	int oldToNewLeft[] = new int[ 1 ];
+	int oldToNewRight[] = new int[ 1 ];
 
 	public VisOdomQuadPnP(DetectDescribeMulti<T,TD> detector,
 						  AssociateDescription2D<TD> assocSame , AssociateDescription2D<TD> assocL2R ,
@@ -174,8 +182,65 @@ public class VisOdomQuadPnP<T extends ImageSingleBand,TD extends TupleDesc> {
 
 			FastQueue<AssociatedIndex> found = assocL2R.getMatches();
 
+//			removeUnassociated(leftLoc,featsLeft1.description[i],rightLoc,featsRight1.description[i],found);
 			setMatches(matches.match2to3, found, leftLoc.size);
 		}
+	}
+
+	private void removeUnassociated( FastQueue<Point2D_F64> leftLoc , FastQueue<TD> leftDesc ,
+									 FastQueue<Point2D_F64> rightLoc , FastQueue<TD> rightDesc ,
+									 FastQueue<AssociatedIndex> matches ) {
+
+		int N = Math.max(leftLoc.size,rightLoc.size);
+		if( usedLeft.length < N ) {
+			usedLeft = new boolean[ N ];
+			usedRight = new boolean[ N ];
+			oldToNewLeft = new int[ N ];
+			oldToNewRight = new int[ N ];
+		} else {
+			for( int i = 0; i < N; i++ ) {
+				usedLeft[i] = false;
+				usedRight[i] = false;
+			}
+		}
+
+		for( int i = 0; i < matches.size; i++ ) {
+			AssociatedIndex a = matches.get(i);
+			usedLeft[a.src] = true;
+			usedRight[a.dst] = true;
+		}
+
+		removeUnused(leftLoc, leftDesc, usedLeft, oldToNewLeft);
+		removeUnused(rightLoc, rightDesc, usedRight, oldToNewRight);
+
+		// update association list
+		for( int i = 0; i < matches.size; i++ ) {
+			AssociatedIndex a = matches.get(i);
+			a.src = oldToNewLeft[a.src];
+			a.dst = oldToNewRight[a.dst];
+		}
+	}
+
+	private void removeUnused(FastQueue<Point2D_F64> loc, FastQueue<TD> desc, boolean[] used, int[] oldToNew) {
+		int count = 0;
+		for( int i = 0; i < loc.size; i++ ) {
+			if( used[i] ) {
+				oldToNew[i] = count;
+				if( count != i ) {
+					Point2D_F64 a = loc.data[count];
+					loc.data[count] = loc.data[i];
+					loc.data[i] = a;
+
+					TD d = desc.data[count];
+					desc.data[count] = desc.data[i];
+					desc.data[i] = d;
+				}
+				count++;
+			} else {
+				oldToNew[i] = -1;
+			}
+		}
+		loc.size = desc.size = count;
 	}
 
 	private void associateF2F()
@@ -302,11 +367,17 @@ public class VisOdomQuadPnP<T extends ImageSingleBand,TD extends TupleDesc> {
 
 		Se3_F64 oldToNew = matcher.getModel();
 
+//		System.out.println("matcher rot = "+toString(oldToNew));
 		// optionally refine the results
 		if( modelRefiner != null ) {
 			Se3_F64 found = new Se3_F64();
-			modelRefiner.fitModel(matcher.getMatchSet(), oldToNew, found);
-			found.invert(newToOld);
+			if( modelRefiner.fitModel(matcher.getMatchSet(), oldToNew, found) ) {
+//				System.out.println("matcher rot = "+toString(found));
+				found.invert(newToOld);
+			} else {
+				oldToNew.invert(newToOld);
+//				System.out.println("Fit failed!");
+			}
 		} else {
 			oldToNew.invert(newToOld);
 		}
@@ -317,6 +388,11 @@ public class VisOdomQuadPnP<T extends ImageSingleBand,TD extends TupleDesc> {
 		leftCamToWorld.set(temp);
 
 		return true;
+	}
+
+	private String toString( Se3_F64 motion ) {
+		double euler[] = RotationMatrixGenerator.matrixToEulerXYZ(motion.getR());
+		return String.format("%5e %5e %5e",euler[0],euler[1],euler[2]);
 	}
 
 	public ModelMatcher<Se3_F64, Stereo2D3D> getMatcher() {

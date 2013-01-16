@@ -42,20 +42,30 @@ public class FastQueue<T> {
 	private FastQueueList<T> list = new FastQueueList<T>(this);
 
 	public FastQueue(int initialMaxSize, Class<T> type, boolean declareInstances) {
+		init(initialMaxSize, type, declareInstances);
+	}
+
+	public FastQueue(Class<T> type, boolean declareInstances ) {
+		this(10,type,declareInstances);
+	}
+
+	protected FastQueue() {
+	}
+
+	/**
+	 * Data structure initialization is done here so that child classes can declay initialization until they are ready
+	 */
+	protected void init(int initialMaxSize, Class<T> type, boolean declareInstances) {
 		this.size = 0;
 		this.type = type;
 		this.declareInstances = declareInstances;
 
-		data = (T[])Array.newInstance(type,initialMaxSize);
+		data = (T[]) Array.newInstance(type, initialMaxSize);
 		if( declareInstances ) {
 			for( int i = 0; i < initialMaxSize; i++ ) {
 				data[i] = createInstance();
 			}
 		}
-	}
-
-	public FastQueue(Class<T> type, boolean declareInstances ) {
-		this(10,type,declareInstances);
 	}
 
 	/**
@@ -140,8 +150,9 @@ public class FastQueue<T> {
 	}
 
 	public void growArray( int length) {
+		// now need to grow since it is already larger
 		if( this.data.length >= length)
-			throw new IllegalArgumentException("The new size must be larger than the old size.");
+			return;
 
 		T []data = (T[])Array.newInstance(type, length);
 		System.arraycopy(this.data,0,data,0,this.data.length);

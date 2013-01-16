@@ -108,7 +108,7 @@ public class TestGeneralFeatureDetector {
 		intensity.img.set(9,4 , -10);
 
 		// use a real extractor
-		NonMaxSuppression extractor = FactoryFeatureExtractor.nonmax(new ConfigExtract(1, 0.001f, 1, true));
+		NonMaxSuppression extractor = FactoryFeatureExtractor.nonmax(new ConfigExtract(1, 0.001f, 1, true,true,true));
 
 		GeneralFeatureDetector<ImageFloat32, ImageFloat32> detector =
 				new GeneralFeatureDetector<ImageFloat32, ImageFloat32>(intensity, extractor);
@@ -129,26 +129,39 @@ public class TestGeneralFeatureDetector {
 
 		detector.process(new ImageFloat32(width, height), null, null, null, null, null);
 
-		assertTrue(intensity.candidatesCalled == 0);
+		assertTrue(intensity.candidatesMinCalled == 0);
+		assertTrue(intensity.candidatesMaxCalled == 0);
 		assertTrue(intensity.processCalled == 1);
 		assertTrue(extractor.numTimesProcessed == 1);
 	}
 
 	@Test
 	public void testPositiveCandidates() {
+		testPositiveCandidates(true,false);
+		testPositiveCandidates(false,true);
+		testPositiveCandidates(true,true);
+	}
+
+	public void testPositiveCandidates( boolean min , boolean max ) {
 		HelperIntensity intensity = new HelperIntensity(false, false, true);
+		intensity.minimums = min;
+		intensity.maximums = max;
 		HelperExtractor extractor = new HelperExtractor(true, true);
+		extractor.minimums = min;
+		extractor.maximums = max;
 
 		GeneralFeatureDetector<ImageFloat32, ImageFloat32> detector =
 				new GeneralFeatureDetector<ImageFloat32, ImageFloat32>(intensity, extractor);
 
 		detector.process(new ImageFloat32(width, height), null, null, null, null, null);
 
-		assertTrue(intensity.candidatesCalled == 1);
+		//  since candidates returns null if not supported it is still ok for it to be invoked
+		if( min )
+			assertTrue(intensity.candidatesMinCalled == 1);
+		if( max )
+			assertTrue(intensity.candidatesMaxCalled == 1);
 		assertTrue(intensity.processCalled == 1);
 		assertTrue(extractor.numTimesProcessed == 1);
-
-		fail("Check min/max candidates");
 	}
 
 	/**
@@ -235,8 +248,8 @@ public class TestGeneralFeatureDetector {
 		HelperIntensity intensity = new HelperIntensity(false, false, true);
 		HelperExtractor extractor = new HelperExtractor(true, true);
 
-		intensity.minimums = false;
-		intensity.maximums = false;
+		intensity.minimums = false; intensity.minimums = false;
+		intensity.maximums = false; extractor.maximums = false;
 
 		GeneralFeatureDetector<ImageFloat32, ImageFloat32> detector =
 				new GeneralFeatureDetector<ImageFloat32, ImageFloat32>(intensity, extractor);
@@ -244,23 +257,21 @@ public class TestGeneralFeatureDetector {
 		assertFalse(detector.isDetectMinimums());
 		assertFalse(detector.isDetectMaximums());
 
-		intensity.minimums = true;
-		intensity.maximums = false;
+		intensity.minimums = true;  intensity.minimums = true;
+		intensity.maximums = false; extractor.maximums = false;
 
 		detector = new GeneralFeatureDetector<ImageFloat32, ImageFloat32>(intensity, extractor);
 
 		assertTrue(detector.isDetectMinimums());
 		assertFalse(detector.isDetectMaximums());
 
-		intensity.minimums = false;
-		intensity.maximums = true;
+		intensity.minimums = false; intensity.minimums = false;
+		intensity.maximums = true;  extractor.maximums = true;
 
 		detector = new GeneralFeatureDetector<ImageFloat32, ImageFloat32>(intensity, extractor);
 
 		assertFalse(detector.isDetectMinimums());
 		assertTrue(detector.isDetectMaximums());
-
-		fail("Check to see if it detects minimums and maximums");
 	}
 
 	public class HelperExtractor implements NonMaxSuppression {
@@ -269,6 +280,9 @@ public class TestGeneralFeatureDetector {
 		boolean acceptsRequests;
 
 		public int numTimesProcessed;
+
+		public boolean minimums = false;
+		public boolean maximums = true;
 
 		public HelperExtractor(boolean usesCandidates, boolean acceptsRequests) {
 			this.usesCandidates = usesCandidates;
@@ -332,13 +346,13 @@ public class TestGeneralFeatureDetector {
 		}
 
 		@Override
-		public boolean canDetectMaximums() {
-			return true;
+		public boolean canDetectMinimums() {
+			return minimums;
 		}
 
 		@Override
-		public boolean canDetectMinimums() {
-			return false;
+		public boolean canDetectMaximums() {
+			return maximums;
 		}
 	}
 
@@ -349,7 +363,8 @@ public class TestGeneralFeatureDetector {
 
 		public QueueCorner candidates = new QueueCorner(10);
 		public int processCalled = 0;
-		public int candidatesCalled = 0;
+		public int candidatesMinCalled = 0;
+		public int candidatesMaxCalled = 0;
 		public int ignoreBorder = 0;
 		public boolean minimums = false;
 		public boolean maximums = true;
@@ -374,13 +389,13 @@ public class TestGeneralFeatureDetector {
 
 		@Override
 		public QueueCorner getCandidatesMin() {
-			candidatesCalled++;
+			candidatesMinCalled++;
 			return candidates;
 		}
 
 		@Override
 		public QueueCorner getCandidatesMax() {
-			candidatesCalled++;
+			candidatesMaxCalled++;
 			return candidates;
 		}
 

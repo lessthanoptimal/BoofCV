@@ -45,7 +45,7 @@ public class ResidualsCodecToMatrix<Model,Observation> implements FunctionNtoM {
 	 *
 	 * @param param Converts parameters into epipolar matrix
 	 * @param residual Function for computing the residuals
-	 * @param storage Storage for converted model.
+	 * @param storage Storage for converted model.  Will be modified.
 	 */
 	public ResidualsCodecToMatrix(ModelCodec<Model> param,
 								  ModelObservationResidualN<Model, Observation> residual,

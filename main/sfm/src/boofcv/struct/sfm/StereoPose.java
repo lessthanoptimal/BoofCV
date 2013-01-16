@@ -35,5 +35,7 @@ public class StereoPose {
 	}
 
 	public StereoPose() {
+		worldToCam0 = new Se3_F64();
+		cam0ToCam1 = new Se3_F64();
 	}
 }

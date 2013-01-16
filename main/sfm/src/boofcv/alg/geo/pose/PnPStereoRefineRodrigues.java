@@ -29,23 +29,29 @@ import org.ddogleg.optimization.UnconstrainedLeastSquares;
 import java.util.List;
 
 /**
- * Minimizes the projection residual error in a calibrated camera for a pose estimate.
- * Rotation is encoded using rodrigues coordinates.
+ * Minimizes the reprojection residual error for a pose estimate (left camera) in a calibrated stereo camera.
+ * Rotation is encoded using rodrigues coordinates.  Transform between left and right camera
+ * is assumed to be known and must be specified by the user.  Observations are in normalized image coordinates.
  *
  * @author Peter Abeles
  */
 public class PnPStereoRefineRodrigues implements RefinePnPStereo {
 
-	ModelCodec<StereoPose> paramModel = new Se3ToStereoPoseCodec(new PnPRodriguesCodec());
-	ResidualsCodecToMatrix<StereoPose,Stereo2D3D> func;
-	PnPStereoJacobianRodrigues jacobian = new PnPStereoJacobianRodrigues();
+	// converts to and from rodrigues coordinates
+	private ModelCodec<Se3_F64> motionCodec = new PnPRodriguesCodec();
+	// computes residual and Jacobian for optimization
+	private ResidualsCodecToMatrix<StereoPose,Stereo2D3D> func;
+	private PnPStereoJacobianRodrigues jacobian = new PnPStereoJacobianRodrigues();
 
-	StereoPose stereoPose = new StereoPose();
+	// parameters that specify the stereo camera and location of left camera
+	private StereoPose stereoPose = new StereoPose();
 
-	double param[];
-	UnconstrainedLeastSquares minimizer;
-	int maxIterations;
-	double convergenceTol;
+	// encoded model that is optimized
+	private double param[];
+	// optimizer and settings
+	protected UnconstrainedLeastSquares minimizer;
+	private int maxIterations;
+	private double convergenceTol;
 
 	public PnPStereoRefineRodrigues(double convergenceTol, int maxIterations)
 	{
@@ -53,12 +59,19 @@ public class PnPStereoRefineRodrigues implements RefinePnPStereo {
 		this.convergenceTol = convergenceTol;
 		this.minimizer = FactoryOptimization.leastSquareLevenberg(1e-3);
 
-		func = new ResidualsCodecToMatrix<StereoPose,Stereo2D3D>(paramModel,new PnPStereoResidualReprojection(),stereoPose);
+		// decodes StereoPose
+		ModelCodec<StereoPose> paramModel = new Se3ToStereoPoseCodec(motionCodec);
+
+		// since a reference is saved, stereoPose.worldToCam0 will be modified by the optimization
+		// algorithm internally
+		func = new ResidualsCodecToMatrix<StereoPose,Stereo2D3D>(
+				paramModel,new PnPStereoResidualReprojection(),stereoPose);
 
 		param = new double[paramModel.getParamLength()];
 	}
 
 	public void setLeftToRight( Se3_F64 leftToRight ) {
+		// cam0toCam1 is not modified during optimization since it is assumed to be known/constant
 		stereoPose.cam0ToCam1 = leftToRight;
 		jacobian.setLeftToRight(leftToRight);
 	}
@@ -66,16 +79,17 @@ public class PnPStereoRefineRodrigues implements RefinePnPStereo {
 	@Override
 	public boolean process(Se3_F64 worldToLeft, List<Stereo2D3D> obs, Se3_F64 refinedWorldToLeft ) {
 
-		stereoPose.worldToCam0 = worldToLeft;
-		paramModel.encode(stereoPose, param);
+		// put into a parameterized format
+		motionCodec.encode(worldToLeft, param);
 
+		// setup the optimization
 		func.setObservations(obs);
 		jacobian.setObservations(obs);
 
 		minimizer.setFunction(func,jacobian);
-
 		minimizer.initialize(param,0,convergenceTol*obs.size());
 
+		// iterate until it converges
 //		System.out.println("  error before "+minimizer.getFunctionValue());
 		for( int i = 0; i < maxIterations; i++ ) {
 			if( minimizer.iterate() )
@@ -83,8 +97,8 @@ public class PnPStereoRefineRodrigues implements RefinePnPStereo {
 		}
 //		System.out.println("  error after  "+minimizer.getFunctionValue());
 
-		stereoPose.worldToCam0 = refinedWorldToLeft;
-		paramModel.decode(minimizer.getParameters(), stereoPose);
+		// decode the solution
+		motionCodec.decode(minimizer.getParameters(),refinedWorldToLeft);
 
 		return true;
 	}

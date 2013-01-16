@@ -46,7 +46,6 @@ public class TestQueueMatrix {
 		QueueMatrix alg = new QueueMatrix(3,4);
 
 		assertEquals(0,alg.size);
-		assertEquals(0,alg.data.length);
 
 		DenseMatrix64F M = alg.grow();
 

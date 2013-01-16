@@ -139,16 +139,16 @@ public class ParamFundamentalEpipolar implements ModelCodec<DenseMatrix64F> {
 	}
 
 	@Override
-	public void decode(double[] param, DenseMatrix64F F) {
-		F.data[indexes[0]] = param[0];
-		F.data[indexes[1]] = param[1];
-		F.data[indexes[2]] = param[2];
-		F.data[indexes[3]] = param[3];
-		F.data[indexes[4]] = param[4];
+	public void decode(double[] input, DenseMatrix64F F) {
+		F.data[indexes[0]] = input[0];
+		F.data[indexes[1]] = input[1];
+		F.data[indexes[2]] = input[2];
+		F.data[indexes[3]] = input[3];
+		F.data[indexes[4]] = input[4];
 		F.data[indexes[5]] = 1;
 		
-		double alpha = param[5];
-		double beta = param[6];
+		double alpha = input[5];
+		double beta = input[6];
 
 		F.data[col2] = alpha*F.data[col0] + beta*F.data[col1];
 		F.data[col2+3] = alpha*F.data[col0+3] + beta*F.data[col1+3];

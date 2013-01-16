@@ -36,8 +36,8 @@ public class Affine2DCodec implements ModelCodec<Affine2D_F64> {
 	}
 
 	@Override
-	public void decode(double[] param, Affine2D_F64 model) {
-		decodeStatic(param, model);
+	public void decode(double[] input, Affine2D_F64 model) {
+		decodeStatic(input, model);
 	}
 
 	public static void decodeStatic(double[] param, Affine2D_F64 model) {

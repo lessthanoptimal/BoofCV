@@ -400,7 +400,7 @@ public class VisualizeStereoVisualOdometryApp <I extends ImageSingleBand>
 			DescribeRegionPoint describe = FactoryDescribeRegionPoint.surfFast(null,imageType);
 			DetectDescribeMulti detDescMulti =  new DetectDescribeMultiFusion(detector,null,describe);
 
-			return FactoryVisualOdometry.stereoQuadPnP(1.5, Double.MAX_VALUE, 300, 50, detDescMulti, imageType);
+			return FactoryVisualOdometry.stereoQuadPnP(1.5, 0.5 , Double.MAX_VALUE, 300, 50, detDescMulti, imageType);
 		} else {
 			throw new RuntimeException("Unknown selection");
 		}

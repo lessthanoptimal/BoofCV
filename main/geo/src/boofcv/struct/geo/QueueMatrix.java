@@ -39,12 +39,10 @@ public class QueueMatrix extends FastQueue<DenseMatrix64F> {
 	 * @param initialMaxSize Initial number of matrices in storage.
 	 */
 	public QueueMatrix(int numRows, int numCols, int initialMaxSize) {
-		super(DenseMatrix64F.class,true);
-
 		this.numRows = numRows;
 		this.numCols = numCols;
 
-		growArray(initialMaxSize);
+		init(initialMaxSize,DenseMatrix64F.class,true);
 	}
 
 	/**
@@ -54,10 +52,10 @@ public class QueueMatrix extends FastQueue<DenseMatrix64F> {
 	 * @param numCols Number of columns in each matrix.
 	 */
 	public QueueMatrix( int numRows , int numCols ) {
-		super(DenseMatrix64F.class,true);
-
 		this.numRows = numRows;
 		this.numCols = numCols;
+
+		init(10,DenseMatrix64F.class,true);
 	}
 
 	@Override

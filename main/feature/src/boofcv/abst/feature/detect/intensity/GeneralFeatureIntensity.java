@@ -62,14 +62,14 @@ public interface GeneralFeatureIntensity<I extends ImageSingleBand,D extends Ima
 	/**
 	 * (Optional) Returns a list of candidate for local minimums.
 	 *
-	 * @return List of potential features
+	 * @return List of potential features.  If not supported then null is returned.
 	 */
 	public QueueCorner getCandidatesMin();
 
 	/**
 	 *  (Optional) Returns a list of candidate for local maximums.
 	 *
-	 * @return List of potential features
+	 * @return List of potential features.  If not supported then null is returned.
 	 */
 	public QueueCorner getCandidatesMax();
 
@@ -88,7 +88,7 @@ public interface GeneralFeatureIntensity<I extends ImageSingleBand,D extends Ima
 	public boolean getRequiresHessian();
 
 	/**
-	 * If true a list of candidate corners is returned.
+	 * If true there is a list of candidate corners for minimums and/or maximums.
 	 */
 	public boolean hasCandidates();
 
