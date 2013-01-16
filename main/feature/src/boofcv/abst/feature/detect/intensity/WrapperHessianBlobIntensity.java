@@ -83,7 +83,12 @@ public class WrapperHessianBlobIntensity<I extends ImageSingleBand, D extends Im
 	}
 
 	@Override
-	public QueueCorner getCandidates() {
+	public QueueCorner getCandidatesMin() {
+		return null;
+	}
+
+	@Override
+	public QueueCorner getCandidatesMax() {
 		return null;
 	}
 

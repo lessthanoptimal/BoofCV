@@ -20,95 +20,79 @@ package boofcv.alg.feature.detect.extract;
 
 import boofcv.struct.QueueCorner;
 import boofcv.struct.image.ImageFloat32;
-import georegression.struct.point.Point2D_I16;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 /**
  * @author Peter Abeles
  */
 public class TestSelectNBestFeatures {
 
-	int width = 20;
-	int height = 20;
-
-	int N = 50;
-
+	/**
+	 * The value of N is less than the number of features
+	 */
 	@Test
-	public void setN() {
-		ImageFloat32 intensity = new ImageFloat32(width,height);
-		SelectNBestFeatures alg = new SelectNBestFeatures(1);
+	public void testExtra() {
 
-		// make sure N can grow with no problems
-		alg.setN(N);
+		ImageFloat32 intensity = new ImageFloat32(10,20);
+		intensity.set(5,10,-3);
+		intensity.set(4,10,-3.5f);
+		intensity.set(5,11,0);
+		intensity.set(8,8,10);
 
-		QueueCorner origCorners = new QueueCorner(N+20);
-		for( int i = 0; i < origCorners.getMaxSize(); i++ ) {
-			origCorners.add(0,0);
-		}
+		QueueCorner corners = new QueueCorner();
+		corners.add(5,10);
+		corners.add(4,10);
+		corners.add(5,11);
+		corners.add(8,8);
 
-		alg.process(intensity,origCorners);
+		SelectNBestFeatures alg = new SelectNBestFeatures(20);
+		alg.setN(3);
+		alg.process(intensity,corners,true);
 
-		// shrinking should be no problem too
-		alg.setN(N-10);
-		alg.process(intensity,origCorners);
+		QueueCorner found = alg.getBestCorners();
+
+		assertEquals(3,found.size);
+		assertEquals(8,found.get(0).x);
+		assertEquals(8,found.get(0).y);
+
+		// same test, but with negative features
+		alg.process(intensity,corners,false);
+
+		found = alg.getBestCorners();
+
+		assertEquals(3,found.size);
+		assertEquals(4,found.get(0).x);
+		assertEquals(10,found.get(0).y);
 	}
 
+	/**
+	 * The size of N is less than the number of points
+	 */
 	@Test
-	public void testLessThanN() {
-		ImageFloat32 intensity = new ImageFloat32(width,height);
-		for( int y = 0; y < height; y++ ) {
-			for( int x = 0; x < width; x++ ) {
-				intensity.set(x,y,y*width+x);
-			}
-		}
+	public void testTooLittle() {
 
-		QueueCorner origCorners = new QueueCorner(N);
-		for( int y = 0; y < height; y++ ) {
-			for( int x = 0; x < width && origCorners.size() < N-10; x++ ) {
-				origCorners.add(x,y);
-			}
-		}
+		ImageFloat32 intensity = new ImageFloat32(10,20);
+		intensity.set(5,10,-3);
+		intensity.set(4,10,-3.5f);
+		intensity.set(5,11,0);
+		intensity.set(8,8,10);
 
-		// make sure the input features were returned
-		SelectNBestFeatures alg = new SelectNBestFeatures(N);
-		alg.process(intensity,origCorners);
+		QueueCorner corners = new QueueCorner();
+		corners.add(5,10);
+		corners.add(4,10);
+		corners.add(5,11);
+		corners.add(8,8);
 
-		assertEquals(alg.bestCorners.size(),origCorners.size());
+		SelectNBestFeatures alg = new SelectNBestFeatures(20);
+		alg.setN(20);
+		alg.process(intensity,corners,true);
+
+		QueueCorner found = alg.getBestCorners();
+
+		assertEquals(4,found.size);
 	}
 
-	@Test
-	public void testMoreThanN() {
-		ImageFloat32 intensity = new ImageFloat32(width,height);
-		for( int y = 0; y < height; y++ ) {
-			for( int x = 0; x < width; x++ ) {
-				intensity.set(x,y,y*width+x);
-			}
-		}
 
-		QueueCorner origCorners = new QueueCorner(N+30);
-		for( int y = 0; y < height; y++ ) {
-			for( int x = 0; x < width && origCorners.size() < N+30; x++ ) {
-				origCorners.add(x,y);
-			}
-		}
-
-		// make sure only N features were found
-		SelectNBestFeatures alg = new SelectNBestFeatures(N);
-		alg.process(intensity,origCorners);
-
-		assertEquals(alg.bestCorners.size(),N);
-
-		// make sure only the best features were selectec
-		float diff = origCorners.size()-N;
-		for( int i = 0; i < alg.bestCorners.size(); i++ ) {
-			Point2D_I16 pt = alg.bestCorners.get(i);
-
-			float val = intensity.get(pt.x,pt.y);
-
-			assertTrue( val >= diff);
-		}
-	}
 }

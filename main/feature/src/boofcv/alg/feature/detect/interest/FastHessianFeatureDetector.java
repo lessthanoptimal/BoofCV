@@ -19,7 +19,7 @@
 package boofcv.alg.feature.detect.interest;
 
 import boofcv.abst.feature.detect.extract.NonMaxSuppression;
-import boofcv.alg.feature.detect.extract.SortBestFeatures;
+import boofcv.alg.feature.detect.extract.SelectNBestFeatures;
 import boofcv.alg.feature.detect.intensity.GIntegralImageFeatureIntensity;
 import boofcv.core.image.border.FactoryImageBorderAlgs;
 import boofcv.core.image.border.ImageBorder_F32;
@@ -87,7 +87,7 @@ public class FastHessianFeatureDetector<II extends ImageSingleBand> {
 	// finds features from 2D intensity image
 	private NonMaxSuppression extractor;
 	// sorts feature by their intensity
-	private SortBestFeatures sortBest;
+	private SelectNBestFeatures sortBest;
 	// the maximum number of returned feature per scale
 	private int maxFeaturesPerScale;
 
@@ -136,7 +136,7 @@ public class FastHessianFeatureDetector<II extends ImageSingleBand> {
 		this.extractor = extractor;
 		if( maxFeaturesPerScale > 0 ) {
 			this.maxFeaturesPerScale = maxFeaturesPerScale;
-			sortBest = new SortBestFeatures(maxFeaturesPerScale);
+			sortBest = new SelectNBestFeatures(maxFeaturesPerScale);
 		}
 		this.initialSampleRate = initialSampleRate;
 		this.initialSize = initialSize;

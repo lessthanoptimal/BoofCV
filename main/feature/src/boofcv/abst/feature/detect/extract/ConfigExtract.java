@@ -31,7 +31,8 @@ public class ConfigExtract implements Configuration {
 	 */
 	public int radius = 1;
 	/**
-	 * Minimum feature intensity it will consider.  Defaults to 0.
+	 * Minimum feature intensity it will consider when detecting a maximum. For local minimums
+	 * it will use a value of -threshold. Defaults to 0.
 	 */
 	public float threshold = 0;
 	/**
@@ -45,24 +46,24 @@ public class ConfigExtract implements Configuration {
 	public boolean useStrictRule = true;
 
 	/**
-	 * If true then local maximums will be found
-	 */
-	public boolean detectMaximums = true;
-
-	/**
 	 * If false then local maximums will be found
 	 */
 	public boolean detectMinimums = false;
 
+	/**
+	 * If true then local maximums will be found
+	 */
+	public boolean detectMaximums = true;
+
 	public ConfigExtract(int radius, float threshold, int ignoreBorder, boolean useStrictRule,
-						 boolean detectMaximums, boolean detectMinimums)
+						 boolean detectMinimums, boolean detectMaximums)
 	{
 		this.radius = radius;
 		this.threshold = threshold;
 		this.ignoreBorder = ignoreBorder;
 		this.useStrictRule = useStrictRule;
-		this.detectMaximums = detectMaximums;
 		this.detectMinimums = detectMinimums;
+		this.detectMaximums = detectMaximums;
 	}
 
 	public ConfigExtract(int radius, float threshold, int ignoreBorder, boolean useStrictRule) {

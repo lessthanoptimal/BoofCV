@@ -117,7 +117,8 @@ public class ExampleCalibrateMonocularPlanar {
 			BufferedImage input = UtilImageIO.loadImage(n);
 			if( n != null ) {
 				ImageFloat32 image = ConvertBufferedImage.convertFrom(input,(ImageFloat32)null);
-				calibrationAlg.addImage(image);
+				if( !calibrationAlg.addImage(image) )
+					System.err.println("Failed to detect target in "+n);
 			}
 		}
 		// process and compute intrinsic parameters
