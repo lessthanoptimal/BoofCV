@@ -21,7 +21,6 @@ package boofcv.alg.feature.detect.interest;
 import boofcv.abst.feature.detect.extract.NonMaxSuppression;
 import boofcv.abst.feature.detect.intensity.GeneralFeatureIntensity;
 import boofcv.alg.feature.detect.extract.SelectNBestFeatures;
-import boofcv.alg.misc.PixelMath;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
@@ -42,9 +41,6 @@ import georegression.struct.point.Point2D_I16;
  */
 public class GeneralFeatureDetector<I extends ImageSingleBand, D extends ImageSingleBand>
 {
-	// storage for inverted image that minimums are detected inside of
-	protected ImageFloat32 inverted = new ImageFloat32(1,1);
-
 	// list of feature locations found by the extractor
 	protected QueueCorner foundMaximum = new QueueCorner(10);
 	protected QueueCorner foundMinimum = new QueueCorner(10);
@@ -61,9 +57,6 @@ public class GeneralFeatureDetector<I extends ImageSingleBand, D extends ImageSi
 	// extracts corners from the intensity image
 	protected NonMaxSuppression extractor;
 
-	// Maximums in the feature intensity
-	protected QueueCorner detected = new QueueCorner(10);
-
 	// computes the feature intensity image
 	protected GeneralFeatureIntensity<I, D> intensity;
 
@@ -75,6 +68,11 @@ public class GeneralFeatureDetector<I extends ImageSingleBand, D extends ImageSi
 	 */
 	public GeneralFeatureDetector(GeneralFeatureIntensity<I, D> intensity,
 								  NonMaxSuppression extractor ) {
+		if( extractor.canDetectMinimums() && !intensity.localMinimums() )
+			throw new IllegalArgumentException("Extracting local minimums, but intensity has minimums set to false");
+		if( extractor.canDetectMaximums() && !intensity.localMaximums() )
+			throw new IllegalArgumentException("Extracting local maximums, but intensity has maximums set to false");
+
 		if (extractor.getUsesCandidates() && !intensity.hasCandidates())
 			throw new IllegalArgumentException("The extractor requires candidate features, which the intensity does not provide.");
 
@@ -105,64 +103,55 @@ public class GeneralFeatureDetector<I extends ImageSingleBand, D extends ImageSi
 		intensity.process(image, derivX, derivY, derivXX, derivYY, derivXY);
 		ImageFloat32 intensityImage = intensity.getIntensity();
 
-		// detection minimums by inverting the original image and running non-maximum suppression
-		if( intensity.localMinimums() ) {
-			inverted.reshape(intensityImage.width,intensityImage.height);
-			PixelMath.invert(intensityImage, inverted);
-			foundMinimum.reset();
-			extract(inverted, excludeMinimum, foundMinimum);
-		}
-
-		if( intensity.localMaximums() ) {
-			foundMaximum.reset();
-			extract(intensityImage, excludeMaximum, foundMaximum);
-		}
-	}
-
-	/**
-	 * Performs non-maximum detection on the provided intensity image.  If a maximum feature limit has been
-	 * specified then the features are sorted by intensity values and only the most intense features are returned.
-	 */
-	protected void extract( ImageFloat32 intensityImage , QueueCorner exclude , QueueCorner found ) {
-
-		int numSelect = -1;
+		int numSelectMin = -1;
+		int numSelectMax = -1;
 		if( maxFeatures > 0 ) {
-			numSelect = exclude == null ? maxFeatures : maxFeatures - exclude.size;
+			if( intensity.localMinimums() )
+				numSelectMin = excludeMinimum == null ? maxFeatures : maxFeatures - excludeMinimum.size;
+			if( intensity.localMaximums() )
+				numSelectMax = excludeMaximum == null ? maxFeatures : maxFeatures - excludeMaximum.size;
 
 			// return without processing if there is no room to detect any more features
-			if( numSelect <= 0 )
+			if( numSelectMin <= 0 && numSelectMax <= 0 )
 				return;
 		}
 
-		if( exclude != null ) {
-			// mark pixels that should be excluded
-			for( int i = 0; i < exclude.size; i++ ) {
-				Point2D_I16 p = exclude.get(i);
+		// mark pixels that should be excluded
+		if( excludeMinimum != null ) {
+			for( int i = 0; i < excludeMinimum.size; i++ ) {
+				Point2D_I16 p = excludeMinimum.get(i);
+				intensityImage.set(p.x,p.y,-Float.MAX_VALUE);
+			}
+		}
+		if( excludeMaximum != null ) {
+			for( int i = 0; i < excludeMaximum.size; i++ ) {
+				Point2D_I16 p = excludeMaximum.get(i);
 				intensityImage.set(p.x,p.y,Float.MAX_VALUE);
 			}
 		}
 
-		detected.reset();
+		foundMinimum.reset();
+		foundMaximum.reset();
 		if (intensity.hasCandidates()) {
-			extractor.process(intensityImage, null, intensity.getCandidates(),null, detected);
+			extractor.process(intensityImage, intensity.getCandidatesMin(), intensity.getCandidatesMax(),foundMinimum, foundMaximum);
 		} else {
-			extractor.process(intensityImage, null, null,null,detected);
+			extractor.process(intensityImage, null, null,foundMinimum, foundMaximum);
 		}
 
 		// optionally select the most intense features only
-		QueueCorner q;
+		selectBest(intensityImage, foundMinimum, numSelectMin, false);
+		selectBest(intensityImage, foundMaximum, numSelectMax, true);
+	}
+
+	private void selectBest(ImageFloat32 intensityImage, QueueCorner found , int numSelect, boolean positive) {
 		if (numSelect > 0) {
 			selectBest.setN(numSelect);
-			selectBest.process(intensityImage, this.detected);
-			q = selectBest.getBestCorners();
-		} else {
-			q = detected;
-		}
-
-		// save the found features
-		for (int k = 0; k < q.size; k++) {
-			Point2D_I16 p = q.get(k);
-			found.grow().set(p.x , p.y );
+			selectBest.process(intensityImage, found,positive);
+			QueueCorner best = selectBest.getBestCorners();
+			found.reset();
+			for( int i = 0; i < best.size; i++ ) {
+				found.grow().set(best.get(i));
+			}
 		}
 	}
 

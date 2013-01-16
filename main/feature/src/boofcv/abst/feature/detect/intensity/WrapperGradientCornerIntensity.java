@@ -43,7 +43,12 @@ public class WrapperGradientCornerIntensity<I extends ImageSingleBand,D extends 
 	}
 
 	@Override
-	public QueueCorner getCandidates() {
+	public QueueCorner getCandidatesMin() {
+		return null;
+	}
+
+	@Override
+	public QueueCorner getCandidatesMax() {
 		return null;
 	}
 

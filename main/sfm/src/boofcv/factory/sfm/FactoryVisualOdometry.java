@@ -319,6 +319,7 @@ public class FactoryVisualOdometry {
 
 	public static <T extends ImageSingleBand,Desc extends TupleDesc>
 	StereoVisualOdometry<T> stereoQuadPnP( double inlierPixelTol ,
+										   double epipolarPixelTol ,
 										   double maxAssociationError,
 										   int ransacIterations ,
 										   int refineIterations ,
@@ -361,9 +362,13 @@ public class FactoryVisualOdometry {
 
 		ScoreAssociation<Desc> scorer = FactoryAssociation.defaultScore(descType);
 
-		AssociateDescription2D<Desc> assocSame = new AssociateDescTo2D<Desc>(
-				FactoryAssociation.greedy(scorer, maxAssociationError, -1, true));
-		AssociateStereo2D<Desc> associateStereo = new AssociateStereo2D<Desc>(scorer,inlierPixelTol,descType);
+//		AssociateDescription2D<Desc> assocSame = new AssociateDescTo2D<Desc>(
+//				FactoryAssociation.greedy(scorer, maxAssociationError, -1, true));
+		AssociateDescription2D<Desc> assocSame =
+				new AssociateMaxDistanceNaive<Desc>(scorer,true,maxAssociationError,100);
+
+
+		AssociateStereo2D<Desc> associateStereo = new AssociateStereo2D<Desc>(scorer,epipolarPixelTol,descType);
 		TriangulateTwoViewsCalibrated triangulate = FactoryTriangulate.twoGeometric();
 
 		associateStereo.setThreshold(maxAssociationError);

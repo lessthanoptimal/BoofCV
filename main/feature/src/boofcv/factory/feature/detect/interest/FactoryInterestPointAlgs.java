@@ -298,7 +298,7 @@ public class FactoryInterestPointAlgs {
 		config.checkValidity();
 
 		NonMaxSuppression extractor = FactoryFeatureExtractor.nonmax(
-				new ConfigExtract(config.extractRadius, config.detectThreshold, 0, true,true,true));
+				new ConfigExtract(config.extractRadius, config.detectThreshold, 0, true, true, true));
 		return new SiftDetector(extractor,config.maxFeaturesPerScale,config.edgeThreshold);
 	}
 

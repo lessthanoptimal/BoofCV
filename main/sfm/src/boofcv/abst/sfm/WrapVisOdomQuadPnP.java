@@ -29,9 +29,11 @@ import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.geo.Point2D3D;
 import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.sfm.Stereo2D3D;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
+import org.ddogleg.fitting.modelset.ModelMatcher;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -82,19 +84,25 @@ public class WrapVisOdomQuadPnP<T extends ImageSingleBand,TD extends TupleDesc>
 
 		List<Point2D_F64> ret = new ArrayList<Point2D_F64>();
 		for( VisOdomQuadPnP.QuadView v : features.toList() )
-			ret.add(v.v0);
+			ret.add(v.v2); // new left camera
 
 		return ret;
 	}
 
 	@Override
 	public boolean isInlier(int index) {
-		return false;  //To change body of implemented methods use File | Settings | File Templates.
+		ModelMatcher<Se3_F64, Stereo2D3D> matcher = alg.getMatcher();
+		int N = matcher.getMatchSet().size();
+		for( int i = 0; i < N; i++ ) {
+			if( matcher.getInputIndex(i) == index )
+				return true;
+		}
+		return false;
 	}
 
 	@Override
 	public boolean isNew(int index) {
-		return false;  //To change body of implemented methods use File | Settings | File Templates.
+		return false;// its always new
 	}
 
 	@Override

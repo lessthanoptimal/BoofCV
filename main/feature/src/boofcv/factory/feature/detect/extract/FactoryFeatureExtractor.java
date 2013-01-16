@@ -87,6 +87,7 @@ public class FactoryFeatureExtractor {
 
 		ret.setSearchRadius(config.radius);
 		ret.setThresholdMax(config.threshold);
+		ret.setThresholdMin(-config.threshold);
 		ret.setBorder(config.ignoreBorder);
 
 		return new WrapperNonMaximumBlock(ret);

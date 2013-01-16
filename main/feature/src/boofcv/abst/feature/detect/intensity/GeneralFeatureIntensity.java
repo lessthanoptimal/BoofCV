@@ -60,11 +60,18 @@ public interface GeneralFeatureIntensity<I extends ImageSingleBand,D extends Ima
 	public ImageFloat32 getIntensity();
 
 	/**
-	 * Optional: Returns a list of candidate locations for corners.  All other pixels are assumed to not be corners.
+	 * (Optional) Returns a list of candidate for local minimums.
 	 *
-	 * @return List of potential corners.
+	 * @return List of potential features
 	 */
-	public QueueCorner getCandidates();
+	public QueueCorner getCandidatesMin();
+
+	/**
+	 *  (Optional) Returns a list of candidate for local maximums.
+	 *
+	 * @return List of potential features
+	 */
+	public QueueCorner getCandidatesMax();
 
 	/**
 	 * If the image gradient is required for calculations.

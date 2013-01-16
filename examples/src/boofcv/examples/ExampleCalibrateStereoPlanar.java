@@ -120,7 +120,8 @@ public class ExampleCalibrateStereoPlanar {
 			ImageFloat32 imageLeft = ConvertBufferedImage.convertFrom(l,(ImageFloat32)null);
 			ImageFloat32 imageRight = ConvertBufferedImage.convertFrom(r,(ImageFloat32)null);
 
-			calibratorAlg.addPair(imageLeft, imageRight);
+			if( !calibratorAlg.addPair(imageLeft, imageRight) )
+				System.out.println("Failed to detect target in "+left.get(i)+" and/or "+right.get(i));
 		}
 
 		// Process and compute calibration parameters

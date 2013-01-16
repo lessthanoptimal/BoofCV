@@ -43,7 +43,12 @@ public class WrapperFastCornerIntensity<I extends ImageSingleBand, D extends Ima
 	}
 
 	@Override
-	public QueueCorner getCandidates() {
+	public QueueCorner getCandidatesMin() {
+		return null;
+	}
+
+	@Override
+	public QueueCorner getCandidatesMax() {
 		return alg.getCandidates();
 	}
 

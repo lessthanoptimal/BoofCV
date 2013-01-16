@@ -42,6 +42,9 @@ public class TestGeneralFeatureDetector {
 	 */
 	@Test
 	public void testDetection() {
+		// use a real extractor
+		NonMaxSuppression extractor;
+
 		HelperIntensity intensity = new HelperIntensity(false, false, false);
 
 		// add several features while avoiding the image border
@@ -56,11 +59,10 @@ public class TestGeneralFeatureDetector {
 		intensity.img.set(2, 5, -10);
 		intensity.img.set(6, 5, -10);
 
-		// use a real extractor
-		NonMaxSuppression extractor = FactoryFeatureExtractor.nonmax(new ConfigExtract(1, 0.001f, 1, true));
 
 		// configure it to only detect positive features
 		intensity.minimums = false;
+		extractor = FactoryFeatureExtractor.nonmax(new ConfigExtract(1, 0.001f, 1, true, false, true));
 		GeneralFeatureDetector<ImageFloat32, ImageFloat32> detector =
 				new GeneralFeatureDetector<ImageFloat32, ImageFloat32>(intensity, extractor);
 		detector.process(new ImageFloat32(width, height), null, null, null, null, null);
@@ -69,6 +71,7 @@ public class TestGeneralFeatureDetector {
 
 		// try detecting the negative features too
 		intensity.minimums = true;
+		extractor = FactoryFeatureExtractor.nonmax(new ConfigExtract(1, 0.001f, 1, true, true, true));
 		detector = new GeneralFeatureDetector<ImageFloat32, ImageFloat32>(intensity, extractor);
 		detector.process(new ImageFloat32(width, height), null, null, null, null, null);
 		assertEquals(6, detector.getMaximums().size());
@@ -144,6 +147,8 @@ public class TestGeneralFeatureDetector {
 		assertTrue(intensity.candidatesCalled == 1);
 		assertTrue(intensity.processCalled == 1);
 		assertTrue(extractor.numTimesProcessed == 1);
+
+		fail("Check min/max candidates");
 	}
 
 	/**
@@ -254,6 +259,8 @@ public class TestGeneralFeatureDetector {
 
 		assertFalse(detector.isDetectMinimums());
 		assertTrue(detector.isDetectMaximums());
+
+		fail("Check to see if it detects minimums and maximums");
 	}
 
 	public class HelperExtractor implements NonMaxSuppression {
@@ -366,7 +373,13 @@ public class TestGeneralFeatureDetector {
 		}
 
 		@Override
-		public QueueCorner getCandidates() {
+		public QueueCorner getCandidatesMin() {
+			candidatesCalled++;
+			return candidates;
+		}
+
+		@Override
+		public QueueCorner getCandidatesMax() {
 			candidatesCalled++;
 			return candidates;
 		}

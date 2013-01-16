@@ -20,7 +20,7 @@ package boofcv.alg.feature.detect.interest;
 
 import boofcv.abst.feature.detect.extract.NonMaxSuppression;
 import boofcv.abst.filter.convolve.ImageConvolveSparse;
-import boofcv.alg.feature.detect.extract.SortBestFeatures;
+import boofcv.alg.feature.detect.extract.SelectNBestFeatures;
 import boofcv.alg.filter.kernel.KernelMath;
 import boofcv.core.image.border.FactoryImageBorder;
 import boofcv.core.image.border.ImageBorder;
@@ -67,7 +67,7 @@ public class SiftDetector {
 	// finds features from 2D intensity image
 	private NonMaxSuppression extractor;
 	// helps select features with the largest intensity
-	private SortBestFeatures sortBest;
+	private SelectNBestFeatures sortBest;
 
 	// target number of features for the extractor
 	private int maxFeatures;
@@ -110,7 +110,7 @@ public class SiftDetector {
 		if( maxFeaturesPerScale > 0 ) {
 			// Each scale has detection run twice on it
 			this.maxFeatures = maxFeaturesPerScale;
-			sortBest = new SortBestFeatures(maxFeatures);
+			sortBest = new SelectNBestFeatures(maxFeatures);
 		}
 
 		// ignore features along the border since a 3x3 region is assumed in parts of the code
