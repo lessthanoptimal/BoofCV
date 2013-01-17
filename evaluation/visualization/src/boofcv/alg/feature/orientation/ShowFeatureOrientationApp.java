@@ -18,7 +18,7 @@
 
 package boofcv.alg.feature.orientation;
 
-import boofcv.abst.feature.detect.extract.ConfigExtract;
+import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
 import boofcv.abst.feature.orientation.*;
 import boofcv.abst.filter.derivative.AnyImageDerivative;
 import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
@@ -122,7 +122,7 @@ public class ShowFeatureOrientationApp<T extends ImageSingleBand, D extends Imag
 
 		int r = 2;
 		GeneralFeatureDetector<T, D> detector = FactoryDetectPoint.
-				createHarris(new ConfigExtract(r, 1), false, NUM_FEATURES, derivType);
+				createHarris(new ConfigGeneralDetector(NUM_FEATURES,r, 1), false, derivType);
 
 		D derivX = null, derivY = null, derivXX = null, derivYY = null, derivXY = null;
 

@@ -18,7 +18,7 @@
 
 package boofcv.factory.feature.tracker;
 
-import boofcv.abst.feature.detect.extract.ConfigExtract;
+import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
 import boofcv.abst.feature.tracker.ModelAssistedTracker;
 import boofcv.abst.feature.tracker.PkltConfig;
 import boofcv.abst.filter.derivative.ImageGradient;
@@ -42,7 +42,6 @@ public class FactoryModelAssistedTracker {
 	 *
 	 * @see boofcv.struct.pyramid.PyramidUpdaterDiscrete
 	 *
-	 * @param maxFeatures   Maximum number of features it can detect/track. Try 200 initially.
 	 * @param scaling       Scales in the image pyramid. Recommend [1,2,4] or [2,4]
 	 * @param featureRadius Size of the tracked feature.  Try 3 or 5
 	 * @param configExtract Configuration for extracting features
@@ -51,9 +50,9 @@ public class FactoryModelAssistedTracker {
 	 * @return KLT based tracker.
 	 */
 	public static <I extends ImageSingleBand, D extends ImageSingleBand,Model,Info>
-	ModelAssistedTracker<I,Model,Info> klt(int maxFeatures, int scaling[],
+	ModelAssistedTracker<I,Model,Info> klt(int scaling[],
 										   int featureRadius,
-										   ConfigExtract configExtract,
+										   ConfigGeneralDetector configExtract,
 										   ModelMatcher<Model, Info> matcherInitial,
 										   ModelMatcher<Model, Info> matcherFinal,
 										   ModelFitter<Model, Info> modelRefiner,
@@ -64,7 +63,7 @@ public class FactoryModelAssistedTracker {
 		config.featureRadius = featureRadius;
 
 		GeneralFeatureDetector<I, D> detector =
-				FactoryPointSequentialTracker.createShiTomasi(configExtract,maxFeatures, config.typeDeriv);
+				FactoryPointSequentialTracker.createShiTomasi(configExtract, config.typeDeriv);
 
 		InterpolateRectangle<I> interpInput = FactoryInterpolation.<I>bilinearRectangle(config.typeInput);
 		InterpolateRectangle<D> interpDeriv = FactoryInterpolation.<D>bilinearRectangle(config.typeDeriv);

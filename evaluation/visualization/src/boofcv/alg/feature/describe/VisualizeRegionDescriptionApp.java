@@ -18,6 +18,7 @@
 
 package boofcv.alg.feature.describe;
 
+import boofcv.abst.feature.describe.ConfigBrief;
 import boofcv.abst.feature.describe.DescribeRegionPoint;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.core.image.ConvertBufferedImage;
@@ -71,8 +72,8 @@ public class VisualizeRegionDescriptionApp <T extends ImageSingleBand, D extends
 		addAlgorithm(0,"SURF", FactoryDescribeRegionPoint.surfStable(null, imageType));
 		if( imageType == ImageFloat32.class )
 			addAlgorithm(0,"SIFT", FactoryDescribeRegionPoint.sift(null,null));
-		addAlgorithm(0,"BRIEF", FactoryDescribeRegionPoint.brief(16, 512, -1, 4, true, imageType));
-		addAlgorithm(0,"BRIEFO", FactoryDescribeRegionPoint.brief(16, 512, -1, 4, false, imageType));
+		addAlgorithm(0,"BRIEF", FactoryDescribeRegionPoint.brief(new ConfigBrief(true), imageType));
+		addAlgorithm(0,"BRIEFO", FactoryDescribeRegionPoint.brief(new ConfigBrief(false), imageType));
 		addAlgorithm(0,"Pixel 5x5", FactoryDescribeRegionPoint.pixel(5, 5, imageType));
 		addAlgorithm(0,"NCC 5x5", FactoryDescribeRegionPoint.pixelNCC(5, 5, imageType));
 

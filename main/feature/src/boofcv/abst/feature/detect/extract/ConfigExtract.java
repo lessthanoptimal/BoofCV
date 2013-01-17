@@ -83,6 +83,15 @@ public class ConfigExtract implements Configuration {
 	public ConfigExtract() {
 	}
 
+	public void setTo( ConfigExtract orig ) {
+		this.radius = orig.radius;
+		this.threshold = orig.threshold;
+		this.ignoreBorder = orig.ignoreBorder;
+		this.useStrictRule = orig.useStrictRule;
+		this.detectMinimums = orig.detectMinimums;
+		this.detectMaximums = orig.detectMaximums;
+	}
+
 	@Override
 	public void checkValidity() {
 		if( radius <= 0 )

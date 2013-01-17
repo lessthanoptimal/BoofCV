@@ -18,7 +18,7 @@
 
 package boofcv.abst.feature.tracker;
 
-import boofcv.abst.feature.detect.extract.ConfigExtract;
+import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.alg.tracker.klt.KltFeature;
 import boofcv.alg.tracker.klt.PyramidKltFeature;
@@ -44,7 +44,7 @@ public class TestPointTrackerKltPyramid extends StandardPointTrackerSpawn<ImageF
 	@Override
 	public PointTrackerAux<ImageFloat32,?> createTracker() {
 		config = PkltConfig.createDefault(ImageFloat32.class, ImageFloat32.class);
-		return FactoryPointSequentialTracker.klt(config,200,new ConfigExtract(3,1000));
+		return FactoryPointSequentialTracker.klt(config,new ConfigGeneralDetector(200,3,1000,0,true));
 	}
 
 	/**

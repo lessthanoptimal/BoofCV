@@ -23,7 +23,7 @@ import boofcv.abst.feature.associate.AssociateDescription2D;
 import boofcv.abst.feature.associate.ScoreAssociateHamming_B;
 import boofcv.abst.feature.describe.WrapDescribeBrief;
 import boofcv.abst.feature.detdesc.DetectDescribeFusion;
-import boofcv.abst.feature.detect.extract.ConfigExtract;
+import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
 import boofcv.abst.feature.detect.interest.InterestPointDetector;
 import boofcv.alg.feature.describe.DescribePointBrief;
 import boofcv.alg.feature.describe.brief.FactoryBriefDefinition;
@@ -56,7 +56,7 @@ public class TestDetectAssociateTracker extends StandardPointTrackerSpawn<ImageF
 				FactoryBlurFilter.gaussian(ImageFloat32.class, 0, 4));
 
 		GeneralFeatureDetector<ImageFloat32,ImageFloat32> corner =
-				FactoryDetectPoint.createShiTomasi(new ConfigExtract(2,0), false, 100, ImageFloat32.class);
+				FactoryDetectPoint.createShiTomasi(new ConfigGeneralDetector(100,2,0,0,true), false, ImageFloat32.class);
 
 		InterestPointDetector<ImageFloat32> detector =
 				FactoryInterestPoint.wrapPoint(corner, 1,ImageFloat32.class, ImageFloat32.class);

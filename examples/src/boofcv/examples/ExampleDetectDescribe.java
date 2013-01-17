@@ -20,10 +20,11 @@ package boofcv.examples;
 
 import boofcv.abst.feature.associate.AssociateDescription;
 import boofcv.abst.feature.associate.ScoreAssociation;
+import boofcv.abst.feature.describe.ConfigBrief;
 import boofcv.abst.feature.describe.DescribeRegionPoint;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
-import boofcv.abst.feature.detect.extract.ConfigExtract;
 import boofcv.abst.feature.detect.interest.ConfigFastHessian;
+import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
 import boofcv.abst.feature.detect.interest.InterestPointDetector;
 import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
@@ -76,11 +77,11 @@ public class ExampleDetectDescribe {
 	DetectDescribePoint<T,D> createFromComponents( Class<T> imageType ) {
 		// create a corner detector
 		Class derivType = GImageDerivativeOps.getDerivativeType(imageType);
-		GeneralFeatureDetector corner = FactoryDetectPoint.createShiTomasi(new ConfigExtract(5,1), false, 1000, derivType);
+		GeneralFeatureDetector corner = FactoryDetectPoint.createShiTomasi(new ConfigGeneralDetector(1000,5,1), false, derivType);
 		InterestPointDetector detector = FactoryInterestPoint.wrapPoint(corner, 1, imageType, derivType);
 
 		// describe points using BRIEF
-		DescribeRegionPoint describe = FactoryDescribeRegionPoint.brief(16, 512, -1, 4, true, imageType);
+		DescribeRegionPoint describe = FactoryDescribeRegionPoint.brief(new ConfigBrief(true), imageType);
 
 		// Combine together.
 		// NOTE: orientation will not be estimated

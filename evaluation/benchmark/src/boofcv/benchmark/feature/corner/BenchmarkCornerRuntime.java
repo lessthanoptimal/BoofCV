@@ -18,7 +18,7 @@
 
 package boofcv.benchmark.feature.corner;
 
-import boofcv.abst.feature.detect.extract.ConfigExtract;
+import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
 import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.abst.filter.derivative.ImageHessian;
 import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
@@ -105,7 +105,7 @@ public class BenchmarkCornerRuntime {
 	}
 
 	public static GeneralFeatureDetector<?, ?> createMedian() {
-		return FactoryDetectPoint.createMedian(new ConfigExtract(windowRadius, 1), maxFeatures, imageType);
+		return FactoryDetectPoint.createMedian(new ConfigGeneralDetector(maxFeatures,windowRadius, 1), imageType);
 	}
 
 	public static GeneralFeatureDetector<?, ?> createFast12() {
@@ -113,15 +113,15 @@ public class BenchmarkCornerRuntime {
 	}
 
 	public static GeneralFeatureDetector<?, ?> createHarris() {
-		return FactoryDetectPoint.createHarris(new ConfigExtract(windowRadius,1), false, maxFeatures, derivType);
+		return FactoryDetectPoint.createHarris(new ConfigGeneralDetector(maxFeatures,windowRadius,1), false, derivType);
 	}
 
 	public static GeneralFeatureDetector<?, ?> createKitRos() {
-		return FactoryDetectPoint.createKitRos(new ConfigExtract(windowRadius, 1), maxFeatures, derivType);
+		return FactoryDetectPoint.createKitRos(new ConfigGeneralDetector(maxFeatures,windowRadius, 1), derivType);
 	}
 
 	public static GeneralFeatureDetector<?, ?> createShiTomasi() {
-		return FactoryDetectPoint.createShiTomasi(new ConfigExtract(windowRadius,1), false, maxFeatures, derivType);
+		return FactoryDetectPoint.createShiTomasi(new ConfigGeneralDetector(maxFeatures,windowRadius,1), false,  derivType);
 	}
 
 	public static void main(String args[]) {

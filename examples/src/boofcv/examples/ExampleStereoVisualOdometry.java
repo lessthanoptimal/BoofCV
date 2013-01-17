@@ -18,7 +18,7 @@
 
 package boofcv.examples;
 
-import boofcv.abst.feature.detect.extract.ConfigExtract;
+import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
 import boofcv.abst.feature.disparity.StereoDisparitySparse;
 import boofcv.abst.feature.tracker.PointTracker;
 import boofcv.abst.sfm.AccessPointTracks3D;
@@ -60,7 +60,7 @@ public class ExampleStereoVisualOdometry {
 		// specify how the image features are going to be tracked
 		PointTracker<ImageUInt8> tracker =
 				FactoryPointSequentialTracker.klt(
-						600,new int[]{1,2,4,8},new ConfigExtract(3,1),3,ImageUInt8.class, ImageSInt16.class);
+						new int[]{1,2,4,8},new ConfigGeneralDetector(600,3,1),3,ImageUInt8.class, ImageSInt16.class);
 
 		// computes the depth of each point
 		StereoDisparitySparse<ImageUInt8> disparity =

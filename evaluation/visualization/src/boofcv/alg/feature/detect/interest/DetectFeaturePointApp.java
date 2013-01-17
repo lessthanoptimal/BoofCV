@@ -18,7 +18,7 @@
 
 package boofcv.alg.feature.detect.interest;
 
-import boofcv.abst.feature.detect.extract.ConfigExtract;
+import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
 import boofcv.alg.feature.detect.ImageCorruptPanel;
 import boofcv.alg.feature.detect.intensity.HessianBlobIntensity;
 import boofcv.core.image.ConvertBufferedImage;
@@ -72,26 +72,26 @@ public class DetectFeaturePointApp<T extends ImageSingleBand, D extends ImageSin
 
 
 		GeneralFeatureDetector<T, D> alg;
-		ConfigExtract configExtract = new ConfigExtract(radius,thresh);
+		ConfigGeneralDetector configExtract = new ConfigGeneralDetector(maxFeatures,radius,thresh);
 
-		alg = FactoryDetectPoint.createHarris(configExtract, false, maxFeatures, derivType);
+		alg = FactoryDetectPoint.createHarris(configExtract, false, derivType);
 
 		addAlgorithm(0, "Harris", new EasyGeneralFeatureDetector<T,D>(alg,imageType,derivType));
-		alg = FactoryDetectPoint.createHarris(configExtract, true, maxFeatures, derivType);
+		alg = FactoryDetectPoint.createHarris(configExtract, true, derivType);
 		addAlgorithm(0, "Harris Weighted", new EasyGeneralFeatureDetector<T,D>(alg,imageType,derivType));
-		alg = FactoryDetectPoint.createShiTomasi(configExtract, false, maxFeatures, derivType);
+		alg = FactoryDetectPoint.createShiTomasi(configExtract, false, derivType);
 		addAlgorithm(0, "KLT", new EasyGeneralFeatureDetector<T,D>(alg,imageType,derivType));
-		alg = FactoryDetectPoint.createShiTomasi(configExtract, true, maxFeatures, derivType);
+		alg = FactoryDetectPoint.createShiTomasi(configExtract, true, derivType);
 		addAlgorithm(0, "KLT Weighted", new EasyGeneralFeatureDetector<T,D>(alg,imageType,derivType));
-		alg = FactoryDetectPoint.createFast(radius, 9,10, maxFeatures, imageType);
+		alg = FactoryDetectPoint.createFast(radius, 9,10,maxFeatures, imageType);
 		addAlgorithm(0, "Fast", new EasyGeneralFeatureDetector<T,D>(alg,imageType,derivType));
-		alg = FactoryDetectPoint.createKitRos(configExtract, maxFeatures, derivType);
+		alg = FactoryDetectPoint.createKitRos(configExtract, derivType);
 		addAlgorithm(0, "KitRos", new EasyGeneralFeatureDetector<T,D>(alg,imageType,derivType));
-		alg = FactoryDetectPoint.createMedian(configExtract, maxFeatures, imageType);
+		alg = FactoryDetectPoint.createMedian(configExtract, imageType);
 		addAlgorithm(0, "Median", new EasyGeneralFeatureDetector<T,D>(alg,imageType,derivType));
-		alg = FactoryDetectPoint.createHessian(HessianBlobIntensity.Type.DETERMINANT, configExtract, maxFeatures, derivType);
+		alg = FactoryDetectPoint.createHessian(HessianBlobIntensity.Type.DETERMINANT, configExtract, derivType);
 		addAlgorithm(0, "Hessian", new EasyGeneralFeatureDetector<T,D>(alg,imageType,derivType));
-		alg = FactoryDetectPoint.createHessian(HessianBlobIntensity.Type.TRACE, configExtract, maxFeatures, derivType);
+		alg = FactoryDetectPoint.createHessian(HessianBlobIntensity.Type.TRACE, configExtract, derivType);
 		addAlgorithm(0, "Laplace", new EasyGeneralFeatureDetector<T,D>(alg,imageType,derivType));
 
 		JPanel viewArea = new JPanel(new BorderLayout());
