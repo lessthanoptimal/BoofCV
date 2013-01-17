@@ -118,31 +118,28 @@ public class FactoryDescribeRegionPoint {
 
 	/**
 	 * <p>
-	 * The BRIEF descriptor is HORRIBLY inefficient when used through this interface.  This functionality is only
-	 * provided for testing and validation purposes.
+	 * Creates a BRIEF descriptor.
 	 * </p>
 	 *
 	 * @see boofcv.alg.feature.describe.DescribePointBrief
 	 * @see boofcv.alg.feature.describe.DescribePointBriefSO
 	 *
-	 * @param radius Region's radius.  Typical value is 16.
-	 * @param numPoints Number of feature/points.  Typical value is 512.
-	 * @param blurSigma Typical value is -1.
-	 * @param blurRadius Typical value is 4.
-	 * @param isFixed Is the orientation and scale fixed? true for original algorithm described in BRIEF paper.
+	 * @param config Configuration for BRIEF descriptor.  If null then default is used.
 	 * @param imageType Type of gray scale image it processes.
 	 * @return BRIEF descriptor
 	 */
 	public static <T extends ImageSingleBand>
-	DescribeRegionPoint<T,TupleDesc_B> brief(int radius, int numPoints,
-									   double blurSigma, int blurRadius,
-									   boolean isFixed,
-									   Class<T> imageType)
+	DescribeRegionPoint<T,TupleDesc_B> brief( ConfigBrief config , Class<T> imageType)
 	{
-		BlurFilter<T> filter = FactoryBlurFilter.gaussian(imageType,blurSigma,blurRadius);
-		BriefDefinition_I32 definition = FactoryBriefDefinition.gaussian2(new Random(123), radius, numPoints);
+		if( config == null )
+			config = new ConfigBrief();
+		config.checkValidity();
 
-		if( isFixed) {
+		BlurFilter<T> filter = FactoryBlurFilter.gaussian(imageType,config.blurSigma,config.blurRadius);
+		BriefDefinition_I32 definition =
+				FactoryBriefDefinition.gaussian2(new Random(123), config.radius, config.numPoints);
+
+		if( config.fixed) {
 			return new WrapDescribeBrief<T>(FactoryDescribePointAlgs.brief(definition,filter));
 		} else {
 			return new WrapDescribeBriefSo<T>(FactoryDescribePointAlgs.briefso(definition, filter));

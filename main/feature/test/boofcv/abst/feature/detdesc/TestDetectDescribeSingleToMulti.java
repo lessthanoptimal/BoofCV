@@ -18,9 +18,12 @@
 
 package boofcv.abst.feature.detdesc;
 
+import boofcv.struct.feature.TupleDesc_F64;
+import boofcv.struct.image.ImageFloat32;
+import georegression.struct.point.Point2D_F64;
 import org.junit.Test;
 
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 /**
  * @author Peter Abeles
@@ -28,7 +31,83 @@ import static org.junit.Assert.fail;
 public class TestDetectDescribeSingleToMulti {
 
 	@Test
-	public void stuff() {
-		fail("implement");
+	public void basic() {
+		Helper helper = new Helper();
+
+		DetectDescribeSingleToMulti<ImageFloat32,TupleDesc_F64> alg =
+				new DetectDescribeSingleToMulti<ImageFloat32,TupleDesc_F64>(helper);
+
+		assertFalse(helper.calledDetect);
+		alg.process(null);
+		assertTrue(helper.calledDetect);
+
+		assertTrue(TupleDesc_F64.class == alg.getDescriptionType());
+		assertEquals(10,alg.getDescriptionLength());
+		assertTrue(null != alg.createDescription());
+
+		assertEquals(1,alg.getNumberOfSets());
+		assertEquals(16,alg.getFeatureSet(0).getNumberOfFeatures());
+		assertTrue(null != alg.getFeatureSet(0).getLocation(0));
+		assertTrue(null != alg.getFeatureSet(0).getDescription(0));
+	}
+
+	protected static class Helper implements DetectDescribePoint<ImageFloat32,TupleDesc_F64> {
+
+		boolean calledDetect = false;
+
+		@Override
+		public TupleDesc_F64 createDescription() {
+			return new TupleDesc_F64(10);
+		}
+
+		@Override
+		public TupleDesc_F64 getDescription(int index) {
+			return new TupleDesc_F64(10);
+		}
+
+		@Override
+		public Class<TupleDesc_F64> getDescriptionType() {
+			return TupleDesc_F64.class;
+		}
+
+		@Override
+		public int getDescriptionLength() {
+			return 10;
+		}
+
+		@Override
+		public void detect(ImageFloat32 input) {
+			calledDetect = true;
+		}
+
+		@Override
+		public boolean hasScale() {
+			return true;
+		}
+
+		@Override
+		public boolean hasOrientation() {
+			return true;
+		}
+
+		@Override
+		public int getNumberOfFeatures() {
+			return 16;
+		}
+
+		@Override
+		public Point2D_F64 getLocation(int featureIndex) {
+			return new Point2D_F64(1,1);
+		}
+
+		@Override
+		public double getScale(int featureIndex) {
+			return 1.5;
+		}
+
+		@Override
+		public double getOrientation(int featureIndex) {
+			return -0.5;
+		}
 	}
 }

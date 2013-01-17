@@ -25,8 +25,8 @@ import boofcv.abst.feature.describe.WrapDescribeBrief;
 import boofcv.abst.feature.describe.WrapDescribePixelRegionNCC;
 import boofcv.abst.feature.detdesc.DetectDescribeFusion;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
-import boofcv.abst.feature.detect.extract.ConfigExtract;
 import boofcv.abst.feature.detect.interest.ConfigFastHessian;
+import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
 import boofcv.abst.feature.detect.interest.InterestPointDetector;
 import boofcv.abst.feature.orientation.ConfigAverageIntegral;
 import boofcv.abst.feature.orientation.ConfigSlidingIntegral;
@@ -80,7 +80,6 @@ public class FactoryPointSequentialTracker {
 	 *
 	 * @see boofcv.struct.pyramid.PyramidUpdaterDiscrete
 	 *
-	 * @param maxFeatures   Maximum number of features it can detect/track. Try 200 initially.
 	 * @param scaling       Scales in the image pyramid. Recommend [1,2,4] or [2,4]
 	 * @param configExtract Configuration for extracting features
 	 * @param featureRadius Size of the tracked feature.  Try 3 or 5
@@ -89,14 +88,14 @@ public class FactoryPointSequentialTracker {
 	 * @return KLT based tracker.
 	 */
 	public static <I extends ImageSingleBand, D extends ImageSingleBand>
-	PointTrackerAux<I,?> klt(int maxFeatures, int scaling[], ConfigExtract configExtract, int featureRadius,
+	PointTrackerAux<I,?> klt(int scaling[], ConfigGeneralDetector configExtract, int featureRadius,
 							 Class<I> imageType, Class<D> derivType) {
 		PkltConfig<I, D> config =
 				PkltConfig.createDefault(imageType, derivType);
 		config.pyramidScaling = scaling;
 		config.featureRadius = featureRadius;
 
-		return klt(config,maxFeatures, configExtract);
+		return klt(config, configExtract);
 	}
 
 	/**
@@ -105,14 +104,13 @@ public class FactoryPointSequentialTracker {
 	 * @see boofcv.struct.pyramid.PyramidUpdaterDiscrete
 	 *
 	 * @param config Config for the tracker. Try PkltConfig.createDefault().
-	 * @param maxFeatures Maximum number of features that will be detected.  -1 for no limit.
 	 * @param configExtract Configuration for extracting features
 	 * @return KLT based tracker.
 	 */
 	public static <I extends ImageSingleBand, D extends ImageSingleBand>
-	PointTrackerAux<I,?> klt(PkltConfig<I, D> config, int maxFeatures , ConfigExtract configExtract) {
+	PointTrackerAux<I,?> klt(PkltConfig<I, D> config, ConfigGeneralDetector configExtract) {
 
-		GeneralFeatureDetector<I, D> detector = createShiTomasi(configExtract,maxFeatures, config.typeDeriv);
+		GeneralFeatureDetector<I, D> detector = createShiTomasi(configExtract, config.typeDeriv);
 
 		InterpolateRectangle<I> interpInput = FactoryInterpolation.<I>bilinearRectangle(config.typeInput);
 		InterpolateRectangle<D> interpDeriv = FactoryInterpolation.<D>bilinearRectangle(config.typeDeriv);
@@ -200,15 +198,14 @@ public class FactoryPointSequentialTracker {
 	 * @see DescribePointBrief
 	 * @see DetectAssociateTracker
 	 *
-	 * @param maxFeatures         Maximum number of features it will track.
 	 * @param maxAssociationError Maximum allowed association error.  Try 200.
 	 * @param configExtract Configuration for extracting features
 	 * @param imageType           Type of image being processed.
 	 * @param derivType Type of image used to store the image derivative. null == use default
 	 */
 	public static <I extends ImageSingleBand, D extends ImageSingleBand>
-	PointTrackerAux<I,?> dda_ST_BRIEF(int maxFeatures, int maxAssociationError,
-									  ConfigExtract configExtract,
+	PointTrackerAux<I,?> dda_ST_BRIEF(int maxAssociationError,
+									  ConfigGeneralDetector configExtract,
 									  Class<I> imageType, Class<D> derivType)
 	{
 		if( derivType == null )
@@ -217,14 +214,14 @@ public class FactoryPointSequentialTracker {
 		DescribePointBrief<I> brief = FactoryDescribePointAlgs.brief(FactoryBriefDefinition.gaussian2(new Random(123), 16, 512),
 				FactoryBlurFilter.gaussian(imageType, 0, 4));
 
-		GeneralFeatureDetector<I, D> corner = createShiTomasi(configExtract, maxFeatures, derivType);
+		GeneralFeatureDetector<I, D> corner = createShiTomasi(configExtract, derivType);
 
 		InterestPointDetector<I> detector = FactoryInterestPoint.wrapPoint(corner,1, imageType, derivType);
 		ScoreAssociateHamming_B score = new ScoreAssociateHamming_B();
 
 		AssociateDescription2D<TupleDesc_B> association =
 				new AssociateDescTo2D<TupleDesc_B>(
-						FactoryAssociation.greedy(score, maxAssociationError, maxFeatures, true));
+						FactoryAssociation.greedy(score, maxAssociationError, configExtract.maxFeatures, true));
 
 		DetectDescribeFusion<I,TupleDesc_B> fused =
 				new DetectDescribeFusion<I,TupleDesc_B>(detector,null,new WrapDescribeBrief<I>(brief));
@@ -280,13 +277,12 @@ public class FactoryPointSequentialTracker {
 	 * @see DescribePointPixelRegionNCC
 	 * @see DetectAssociateTracker
 	 *
-	 * @param maxFeatures    Maximum number of features it will track.
 	 * @param configExtract Configuration for extracting features
 	 * @param describeRadius Radius of the region being described.  Try 2.
 	 * @param imageType      Type of image being processed.
 	 * @param derivType      Type of image used to store the image derivative. null == use default     */
 	public static <I extends ImageSingleBand, D extends ImageSingleBand>
-	PointTrackerAux<I,?> dda_ST_NCC(int maxFeatures, ConfigExtract configExtract, int describeRadius,
+	PointTrackerAux<I,?> dda_ST_NCC(ConfigGeneralDetector configExtract, int describeRadius,
 									Class<I> imageType, Class<D> derivType) {
 
 		if( derivType == null )
@@ -296,14 +292,14 @@ public class FactoryPointSequentialTracker {
 
 		DescribePointPixelRegionNCC<I> alg = FactoryDescribePointAlgs.pixelRegionNCC(w, w, imageType);
 
-		GeneralFeatureDetector<I, D> corner = createShiTomasi(configExtract, maxFeatures, derivType);
+		GeneralFeatureDetector<I, D> corner = createShiTomasi(configExtract, derivType);
 
 		InterestPointDetector<I> detector = FactoryInterestPoint.wrapPoint(corner,1, imageType, derivType);
 		ScoreAssociateNccFeature score = new ScoreAssociateNccFeature();
 
 		AssociateDescription2D<NccFeature> association =
 				new AssociateDescTo2D<NccFeature>(
-						FactoryAssociation.greedy(score, Double.MAX_VALUE, maxFeatures, true));
+						FactoryAssociation.greedy(score, Double.MAX_VALUE, configExtract.maxFeatures, true));
 
 		DetectDescribeFusion<I,NccFeature> fused =
 				new DetectDescribeFusion<I,NccFeature>(detector,null,new WrapDescribePixelRegionNCC<I>(alg));
@@ -388,8 +384,6 @@ public class FactoryPointSequentialTracker {
 	 * @see DescribePointSurf
 	 * @see DetectAssociateTracker
 	 *
-	 * @param maxMatches     The maximum number of matched features that will be considered.
-	 *                       Set to a value <= 0 to not bound the number of matches.
 	 * @param configExtract Configuration for extracting features
 	 * @param trackRadius Size of feature being tracked by KLT
 	 * @param pyramidScalingKlt Image pyramid used for KLT
@@ -402,8 +396,7 @@ public class FactoryPointSequentialTracker {
 	 * @return SURF based tracker.
 	 */
 	public static <I extends ImageSingleBand, D extends ImageSingleBand>
-	PointTrackerAux<I,?> combined_ST_SURF_KLT(int maxMatches,
-											  ConfigExtract configExtract,
+	PointTrackerAux<I,?> combined_ST_SURF_KLT(ConfigGeneralDetector configExtract,
 											  int trackRadius,
 											  int[] pyramidScalingKlt ,
 											  int reactivateThreshold ,
@@ -415,14 +408,15 @@ public class FactoryPointSequentialTracker {
 		if( derivType == null )
 			derivType = GImageDerivativeOps.getDerivativeType(imageType);
 
-		GeneralFeatureDetector<I, D> corner = createShiTomasi(configExtract, maxMatches, derivType);
+		GeneralFeatureDetector<I, D> corner = createShiTomasi(configExtract, derivType);
 		InterestPointDetector<I> detector = FactoryInterestPoint.wrapPoint(corner, 1, imageType, derivType);
 
 		DescribeRegionPoint<I,SurfFeature> regionDesc
 				= FactoryDescribeRegionPoint.surfStable(configDescribe, imageType);
 
 		ScoreAssociation<TupleDesc_F64> score = FactoryAssociation.scoreEuclidean(TupleDesc_F64.class, true);
-		AssociateSurfBasic assoc = new AssociateSurfBasic(FactoryAssociation.greedy(score, 100000, maxMatches, true));
+		AssociateSurfBasic assoc = new AssociateSurfBasic(FactoryAssociation.greedy(score, 100000,
+				configExtract.maxFeatures, true));
 
 		AssociateDescription<SurfFeature> generalAssoc = new WrapAssociateSurfBasic(assoc);
 
@@ -518,12 +512,11 @@ public class FactoryPointSequentialTracker {
 	 * be set to true, but because this is so small, it is set to false
 	 */
 	public static <I extends ImageSingleBand, D extends ImageSingleBand>
-	GeneralFeatureDetector<I, D> createShiTomasi(ConfigExtract config ,
-												 int maxFeatures,
+	GeneralFeatureDetector<I, D> createShiTomasi(ConfigGeneralDetector config ,
 												 Class<D> derivType)
 	{
 		GradientCornerIntensity<D> cornerIntensity = FactoryIntensityPointAlg.shiTomasi(1, false, derivType);
 
-		return FactoryDetectPoint.createGeneral(cornerIntensity, config, maxFeatures );
+		return FactoryDetectPoint.createGeneral(cornerIntensity, config );
 	}
 }

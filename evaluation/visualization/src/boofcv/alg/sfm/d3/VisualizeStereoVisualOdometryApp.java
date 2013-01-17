@@ -29,6 +29,7 @@ import boofcv.abst.feature.detdesc.DetectDescribePoint;
 import boofcv.abst.feature.detect.extract.ConfigExtract;
 import boofcv.abst.feature.detect.extract.NonMaxSuppression;
 import boofcv.abst.feature.detect.intensity.GeneralFeatureIntensity;
+import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
 import boofcv.abst.feature.detect.interest.DetectorInterestPointMulti;
 import boofcv.abst.feature.detect.interest.GeneralToInterestMulti;
 import boofcv.abst.feature.detect.interest.InterestPointDetector;
@@ -41,7 +42,6 @@ import boofcv.abst.sfm.ModelAssistedTrackerCalibrated;
 import boofcv.abst.sfm.StereoVisualOdometry;
 import boofcv.alg.feature.describe.DescribePointBrief;
 import boofcv.alg.feature.describe.brief.FactoryBriefDefinition;
-import boofcv.alg.feature.detect.intensity.HessianBlobIntensity;
 import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.alg.geo.PerspectiveOps;
@@ -310,7 +310,7 @@ public class VisualizeStereoVisualOdometryApp <I extends ImageSingleBand>
 			config.typeDeriv = derivType;
 
 			GeneralFeatureDetector detector =
-					FactoryPointSequentialTracker.createShiTomasi(new ConfigExtract(3, 1),600, config.typeDeriv);
+					FactoryPointSequentialTracker.createShiTomasi(new ConfigGeneralDetector(600,3, 1), config.typeDeriv);
 
 			assistedTracker = FactoryVisualOdometry.trackerAssistedKltP3P(detector,config,1.5,200,50);
 		} else if( whichAlg == 1 ) {
@@ -323,7 +323,7 @@ public class VisualizeStereoVisualOdometryApp <I extends ImageSingleBand>
 					FactoryBlurFilter.gaussian(imageType, 0, 4));
 
 			GeneralFeatureDetector corner = FactoryPointSequentialTracker.createShiTomasi(
-					new ConfigExtract(2,0),600, derivType);
+					new ConfigGeneralDetector(600,2,0), derivType);
 
 			InterestPointDetector detector = FactoryInterestPoint.wrapPoint(corner, 1, imageType, derivType);
 
@@ -338,7 +338,7 @@ public class VisualizeStereoVisualOdometryApp <I extends ImageSingleBand>
 			thresholdRetire = 3;
 //			tracker = FactoryPointSequentialTracker.dda_FH_SURF(600, 200, 1, 2,imageType);
 			PointTracker<I> tracker = FactoryPointSequentialTracker.
-					combined_ST_SURF_KLT(600, new ConfigExtract(3, 0), 3,
+					combined_ST_SURF_KLT(new ConfigGeneralDetector(600,3, 0), 3,
 							new int[]{1, 2, 4, 8}, 50, null, null, imageType, derivType);
 			assistedTracker = FactoryVisualOdometry.trackerP3P(tracker,1.5,200,50);
 		} else if( whichAlg == 3 ) {
@@ -352,8 +352,8 @@ public class VisualizeStereoVisualOdometryApp <I extends ImageSingleBand>
 			config.typeInput = imageType;
 			config.typeDeriv = derivType;
 
-			PointTrackerAux trackerLeft = FactoryPointSequentialTracker.klt(config, 600, new ConfigExtract(3, 1));
-			PointTrackerAux trackerRight = FactoryPointSequentialTracker.klt(config,600, new ConfigExtract(3, 1));
+			PointTrackerAux trackerLeft = FactoryPointSequentialTracker.klt(config, new ConfigGeneralDetector(600,3, 1));
+			PointTrackerAux trackerRight = FactoryPointSequentialTracker.klt(config,new ConfigGeneralDetector(600,3, 1));
 
 			return FactoryVisualOdometry.stereoFullPnP(thresholdAdd, thresholdRetire,1.5,200,50,disparity,
 					trackerLeft,trackerRight, imageType);
@@ -370,9 +370,9 @@ public class VisualizeStereoVisualOdometryApp <I extends ImageSingleBand>
 					FactoryBlurFilter.gaussian(imageType, 0, 4));
 
 			GeneralFeatureDetector cornerLeft = FactoryPointSequentialTracker.createShiTomasi(
-					new ConfigExtract(2,1),600, derivType);
+					new ConfigGeneralDetector(600,2,1), derivType);
 			GeneralFeatureDetector cornerRight = FactoryPointSequentialTracker.createShiTomasi(
-					new ConfigExtract(2,1),600, derivType);
+					new ConfigGeneralDetector(600,2,1), derivType);
 
 			ScoreAssociateHamming_B score = new ScoreAssociateHamming_B();
 			AssociateDescription2D<TupleDesc_B> associateLeft =
@@ -388,11 +388,11 @@ public class VisualizeStereoVisualOdometryApp <I extends ImageSingleBand>
 			return FactoryVisualOdometry.stereoFullPnP(thresholdAdd, thresholdRetire,1.5,200,50,disparity,
 					trackerLeft,trackerRight, imageType);
 		} else if( whichAlg == 5 ) {
-			GeneralFeatureIntensity intensity =
-					FactoryIntensityPoint.hessian(HessianBlobIntensity.Type.TRACE,imageType);
 //			GeneralFeatureIntensity intensity =
-//					FactoryIntensityPoint.shiTomasi(1,false,imageType);
-			NonMaxSuppression nonmax = FactoryFeatureExtractor.nonmax(new ConfigExtract(3,1,0,true,true,false));
+//					FactoryIntensityPoint.hessian(HessianBlobIntensity.Type.TRACE,imageType);
+			GeneralFeatureIntensity intensity =
+					FactoryIntensityPoint.shiTomasi(1,false,imageType);
+			NonMaxSuppression nonmax = FactoryFeatureExtractor.nonmax(new ConfigExtract(2,50,0,true,false,true));
 			GeneralFeatureDetector general = new GeneralFeatureDetector(intensity,nonmax);
 			DetectorInterestPointMulti detector = new GeneralToInterestMulti(general,1,imageType,derivType);
 //			DescribeRegionPoint describe = FactoryDescribeRegionPoint.brief(16,512,-1,4,true,imageType);

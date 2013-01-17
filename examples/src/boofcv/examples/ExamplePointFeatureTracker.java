@@ -18,8 +18,8 @@
 
 package boofcv.examples;
 
-import boofcv.abst.feature.detect.extract.ConfigExtract;
 import boofcv.abst.feature.detect.interest.ConfigFastHessian;
+import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
 import boofcv.abst.feature.tracker.PkltConfig;
 import boofcv.abst.feature.tracker.PointTrack;
 import boofcv.abst.feature.tracker.PointTracker;
@@ -128,7 +128,7 @@ public class ExamplePointFeatureTracker< T extends ImageSingleBand, D extends Im
 		config.featureRadius = 3;
 		config.pyramidScaling = new int[]{1,2,4,8};
 
-		tracker = FactoryPointSequentialTracker.klt(config,200,new ConfigExtract(3,1));
+		tracker = FactoryPointSequentialTracker.klt(config,new ConfigGeneralDetector(200,3,1));
 	}
 
 	/**

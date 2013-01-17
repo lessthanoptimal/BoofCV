@@ -34,6 +34,11 @@ import georegression.struct.point.Point2D_I16;
  * maximums or minimums should be detected.
  * </p>
  *
+ * <p>
+ * If a maximum number of features is specified then the N most intense features are returned.  By default all
+ * found features are returned.  Set to a value <= 0 to detect all features.
+ * </p>
+ *
  * @param <I> Input image type.
  * @param <D> Image derivative type.
  *

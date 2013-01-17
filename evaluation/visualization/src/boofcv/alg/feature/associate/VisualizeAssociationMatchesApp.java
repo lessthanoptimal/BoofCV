@@ -20,9 +20,10 @@ package boofcv.alg.feature.associate;
 
 import boofcv.abst.feature.associate.AssociateDescription;
 import boofcv.abst.feature.associate.ScoreAssociation;
+import boofcv.abst.feature.describe.ConfigBrief;
 import boofcv.abst.feature.describe.DescribeRegionPoint;
-import boofcv.abst.feature.detect.extract.ConfigExtract;
 import boofcv.abst.feature.detect.interest.ConfigFastHessian;
+import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
 import boofcv.abst.feature.detect.interest.InterestPointDetector;
 import boofcv.abst.feature.orientation.OrientationImage;
 import boofcv.abst.feature.orientation.OrientationIntegral;
@@ -93,14 +94,14 @@ public class VisualizeAssociationMatchesApp<T extends ImageSingleBand, D extends
 		addAlgorithm(0, "Fast Hessian",FactoryInterestPoint.fastHessian(new ConfigFastHessian( 1, 2, 200, 1, 9, 4, 4)));
 		if( imageType == ImageFloat32.class )
 			addAlgorithm(0, "SIFT", FactoryInterestPoint.siftDetector(null,null));
-		alg = FactoryDetectPoint.createShiTomasi(new ConfigExtract(2,1), false, 500, derivType);
+		alg = FactoryDetectPoint.createShiTomasi(new ConfigGeneralDetector(500,2,1), false, derivType);
 		addAlgorithm(0, "Shi-Tomasi", FactoryInterestPoint.wrapPoint(alg, 1, imageType, derivType));
 
 		addAlgorithm(1, "SURF", FactoryDescribeRegionPoint.surfStable(null, imageType));
 		if( imageType == ImageFloat32.class )
 			addAlgorithm(1, "SIFT", FactoryDescribeRegionPoint.sift(null,null));
-		addAlgorithm(1, "BRIEF", FactoryDescribeRegionPoint.brief(16, 512, -1, 4, true, imageType));
-		addAlgorithm(1, "BRIEFO", FactoryDescribeRegionPoint.brief(16, 512, -1, 4, false, imageType));
+		addAlgorithm(1, "BRIEF", FactoryDescribeRegionPoint.brief(new ConfigBrief(true), imageType));
+		addAlgorithm(1, "BRIEFSO", FactoryDescribeRegionPoint.brief(new ConfigBrief(false), imageType));
 		addAlgorithm(1, "Pixel 11x11", FactoryDescribeRegionPoint.pixel(11, 11, imageType));
 		addAlgorithm(1, "NCC 11x11", FactoryDescribeRegionPoint.pixelNCC(11, 11, imageType));
 

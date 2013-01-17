@@ -23,7 +23,7 @@ import boofcv.abst.feature.associate.AssociateDescription2D;
 import boofcv.abst.feature.associate.ScoreAssociateHamming_B;
 import boofcv.abst.feature.describe.DescribeRegionPoint;
 import boofcv.abst.feature.describe.WrapDescribeBrief;
-import boofcv.abst.feature.detect.extract.ConfigExtract;
+import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
 import boofcv.alg.feature.describe.DescribePointBrief;
 import boofcv.alg.feature.describe.brief.FactoryBriefDefinition;
 import boofcv.alg.feature.detect.interest.EasyGeneralFeatureDetector;
@@ -55,7 +55,7 @@ public class TestDdaTrackerGeneralPoint extends StandardPointTrackerSpawn<ImageF
 						FactoryBlurFilter.gaussian(ImageFloat32.class, 0, 4));
 
 		GeneralFeatureDetector<ImageFloat32,ImageFloat32> corner =
-				FactoryDetectPoint.createShiTomasi(new ConfigExtract(2, 0), false, -1, ImageFloat32.class);
+				FactoryDetectPoint.createShiTomasi(new ConfigGeneralDetector(-1,2, 0), false, ImageFloat32.class);
 
 		ScoreAssociateHamming_B score = new ScoreAssociateHamming_B();
 

@@ -18,6 +18,7 @@
 
 package boofcv.benchmark.feature.describe;
 
+import boofcv.abst.feature.describe.ConfigBrief;
 import boofcv.benchmark.feature.BenchmarkAlgorithm;
 import boofcv.factory.feature.describe.FactoryDescribeRegionPoint;
 import boofcv.struct.image.ImageSingleBand;
@@ -36,8 +37,8 @@ public class UtilStabilityBenchmark {
 
 		ret.add( new BenchmarkAlgorithm("SURF", FactoryDescribeRegionPoint.surfFast(null, imageType)));
 		ret.add( new BenchmarkAlgorithm("SURF-M", FactoryDescribeRegionPoint.surfStable(null, imageType)));
-		ret.add( new BenchmarkAlgorithm("BRIEF", FactoryDescribeRegionPoint.brief(16, 512, -1, 4, true, imageType)));
-		ret.add( new BenchmarkAlgorithm("BRIEF-SO", FactoryDescribeRegionPoint.brief(16, 512, -1, 4, false, imageType)));
+		ret.add( new BenchmarkAlgorithm("BRIEF", FactoryDescribeRegionPoint.brief(new ConfigBrief(true), imageType)));
+		ret.add( new BenchmarkAlgorithm("BRIEF-SO", FactoryDescribeRegionPoint.brief(new ConfigBrief(false), imageType)));
 
 		return ret;
 	}
