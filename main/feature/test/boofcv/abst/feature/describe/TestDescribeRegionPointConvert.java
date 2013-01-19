@@ -38,7 +38,7 @@ public class TestDescribeRegionPointConvert {
 		DescribeRegionPointConvert<ImageFloat32,TupleDesc_F64,TupleDesc_S8> alg =
 				new DescribeRegionPointConvert<ImageFloat32,TupleDesc_F64,TupleDesc_S8>(original,convert);
 
-		assertEquals(5,alg.getDescriptorLength());
+		assertEquals(5,alg.getDescriptionLength());
 
 		TupleDesc_S8 found = alg.createDescription();
 		assertTrue(found.value.length==5);
@@ -53,7 +53,7 @@ public class TestDescribeRegionPointConvert {
 
 		assertTrue(alg.requiresOrientation()==original.requiresOrientation());
 		assertTrue(alg.requiresScale()==original.requiresScale());
-		assertTrue(alg.getDescriptorType()==TupleDesc_S8.class);
+		assertTrue(alg.getDescriptionType()==TupleDesc_S8.class);
 
 		assertFalse(original.calledIsInBounds);
 		alg.isInBounds(2,3,4,3);
@@ -96,7 +96,7 @@ public class TestDescribeRegionPointConvert {
 		}
 
 		@Override
-		public int getDescriptorLength() {
+		public int getDescriptionLength() {
 			return 5;
 		}
 
@@ -123,7 +123,7 @@ public class TestDescribeRegionPointConvert {
 		}
 
 		@Override
-		public Class<TupleDesc_F64> getDescriptorType() {
+		public Class<TupleDesc_F64> getDescriptionType() {
 			return TupleDesc_F64.class;
 		}
 	}

@@ -57,7 +57,7 @@ public class DdaTrackerGeneralPoint<I extends ImageSingleBand, D extends ImageSi
 								   EasyGeneralFeatureDetector<I,D> detector ,
 								   DescribeRegionPoint<I,TD> describe ,
 								   double scale ) {
-		super(associate, updateDescription, describe.getDescriptorType());
+		super(associate, updateDescription, describe.getDescriptionType());
 		this.detector = detector;
 		this.describe = describe;
 		this.scale = scale;

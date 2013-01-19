@@ -66,7 +66,7 @@ public abstract class GenericFeatureDetector {
 		 alg = createDetector(0);
 		int secondFound = detectFeature(input, alg);
 
-		assertTrue(secondFound>firstFound);
+		assertTrue(firstFound+" "+secondFound,secondFound>firstFound);
 	}
 
 	/**

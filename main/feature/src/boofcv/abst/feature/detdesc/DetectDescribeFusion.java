@@ -73,7 +73,7 @@ public class DetectDescribeFusion<T extends ImageSingleBand, TD extends TupleDes
 
 		final DescribeRegionPoint<T, TD> locaDescribe = describe;
 
-		descs = new FastQueue<TD>(100,describe.getDescriptorType(),true) {
+		descs = new FastQueue<TD>(100,describe.getDescriptionType(),true) {
 			protected TD createInstance() {
 				return locaDescribe.createDescription();
 			}
@@ -92,12 +92,12 @@ public class DetectDescribeFusion<T extends ImageSingleBand, TD extends TupleDes
 
 	@Override
 	public Class<TD> getDescriptionType() {
-		return describe.getDescriptorType();
+		return describe.getDescriptionType();
 	}
 
 	@Override
 	public int getDescriptionLength() {
-		return describe.getDescriptorLength();
+		return describe.getDescriptionLength();
 	}
 
 	@Override

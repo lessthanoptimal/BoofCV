@@ -18,17 +18,51 @@
 
 package boofcv.alg.geo.pose;
 
+import boofcv.struct.sfm.StereoPose;
+import georegression.struct.se.Se3_F64;
+import org.ddogleg.fitting.modelset.ModelCodec;
 import org.junit.Test;
 
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Peter Abeles
  */
 public class TestSe3ToStereoPoseCodec {
 
+	StereoPose model = new StereoPose();
+
 	@Test
-	public void stuff() {
-		fail("implement");
+	public void basic() {
+		Helper helper = new Helper();
+		Se3ToStereoPoseCodec alg = new Se3ToStereoPoseCodec(helper);
+
+		alg.decode(null,model);
+		assertTrue(helper.calledDecode);
+		alg.encode(model,null);
+		assertTrue(helper.calledEncode);
+	}
+
+	protected class Helper implements ModelCodec<Se3_F64> {
+
+		boolean calledDecode = false;
+		boolean calledEncode = false;
+
+		@Override
+		public void decode(double[] input, Se3_F64 outputModel) {
+			calledDecode = true;
+			assertTrue(model.worldToCam0 == outputModel);
+		}
+
+		@Override
+		public void encode(Se3_F64 inputModel, double[] output) {
+			calledEncode = true;
+			assertTrue(model.worldToCam0 == inputModel);
+		}
+
+		@Override
+		public int getParamLength() {
+			return 6;
+		}
 	}
 }

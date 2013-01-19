@@ -40,8 +40,10 @@ public class TestFeatureLaplacePyramid extends GenericFeatureScaleDetector {
 	@Override
 	protected Object createDetector(GeneralFeatureDetector<ImageFloat32, ImageFloat32> detector) {
 
-		ImageFunctionSparse<ImageFloat32> sparseLaplace = FactoryDerivativeSparse.createLaplacian(ImageFloat32.class, null);
-		AnyImageDerivative<ImageFloat32, ImageFloat32> deriv = GImageDerivativeOps.createDerivatives(ImageFloat32.class, FactoryImageGenerator.create(ImageFloat32.class));
+		ImageFunctionSparse<ImageFloat32> sparseLaplace =
+				FactoryDerivativeSparse.createLaplacian(ImageFloat32.class, null);
+		AnyImageDerivative<ImageFloat32, ImageFloat32> deriv =  GImageDerivativeOps.
+				createDerivatives(ImageFloat32.class, FactoryImageGenerator.create(ImageFloat32.class));
 
 		return new FeatureLaplacePyramid<ImageFloat32, ImageFloat32>(detector, sparseLaplace, deriv, 1);
 	}

@@ -54,7 +54,7 @@ public class WrapDescribeSift
 	}
 
 	@Override
-	public int getDescriptorLength() {
+	public int getDescriptionLength() {
 		return alg.getDescriptorLength();
 	}
 
@@ -84,7 +84,7 @@ public class WrapDescribeSift
 	}
 
 	@Override
-	public Class<SurfFeature> getDescriptorType() {
+	public Class<SurfFeature> getDescriptionType() {
 		return SurfFeature.class;
 	}
 }

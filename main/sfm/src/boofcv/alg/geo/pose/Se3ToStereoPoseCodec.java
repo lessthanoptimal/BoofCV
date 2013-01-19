@@ -23,13 +23,15 @@ import georegression.struct.se.Se3_F64;
 import org.ddogleg.fitting.modelset.ModelCodec;
 
 /**
- * Allows a {@link ModelCodec} for {@link Se3_F64} to be used by {@link StereoPose}.
+ * Allows a {@link ModelCodec} for {@link Se3_F64} to be used by {@link StereoPose}. Only the worldToCam0
+ * transform is modified.
  *
  * @author Peter Abeles
  */
 public class Se3ToStereoPoseCodec implements ModelCodec<StereoPose> {
 
-	ModelCodec<Se3_F64> codec;
+	// converts to and from parameterization
+	private ModelCodec<Se3_F64> codec;
 
 	public Se3ToStereoPoseCodec(ModelCodec<Se3_F64> codec) {
 		this.codec = codec;

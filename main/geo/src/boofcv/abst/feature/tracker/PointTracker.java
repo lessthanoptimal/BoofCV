@@ -80,8 +80,11 @@ public interface PointTracker<T extends ImageBase> {
 
 	/**
 	 * Manually forces a track to be dropped.  Tracks dropped using this function will not
-	 * appear in the dropped list.  If request is made to drop a track that is not being tracked, then the request
-	 * is ignored.  Data should not be added to the recycle list in this case since it might be a double request.
+	 * appear in the dropped list and their data is subject to being immediately recycled.  New requests to
+	 * all and active lists will not include the track after it has been dropped using this function.
+	 *
+	 * If request is made to drop a track that is not being tracked (in the internal all list), then the request
+	 * is ignored.
 	 *
 	 * @param track The track which is to be dropped
 	 */

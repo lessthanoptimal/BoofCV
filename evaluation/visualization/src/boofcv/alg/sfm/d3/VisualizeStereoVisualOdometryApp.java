@@ -395,12 +395,12 @@ public class VisualizeStereoVisualOdometryApp <I extends ImageSingleBand>
 			NonMaxSuppression nonmax = FactoryFeatureExtractor.nonmax(new ConfigExtract(2,50,0,true,false,true));
 			GeneralFeatureDetector general = new GeneralFeatureDetector(intensity,nonmax);
 			DetectorInterestPointMulti detector = new GeneralToInterestMulti(general,1,imageType,derivType);
-//			DescribeRegionPoint describe = FactoryDescribeRegionPoint.brief(16,512,-1,4,true,imageType);
+//			DescribeRegionPoint describe = FactoryDescribeRegionPoint.brief(new ConfigBrief(true),imageType);
 //			DescribeRegionPoint describe = FactoryDescribeRegionPoint.pixelNCC(5,5,imageType);
 			DescribeRegionPoint describe = FactoryDescribeRegionPoint.surfFast(null,imageType);
 			DetectDescribeMulti detDescMulti =  new DetectDescribeMultiFusion(detector,null,describe);
 
-			return FactoryVisualOdometry.stereoQuadPnP(1.5, 0.5 , Double.MAX_VALUE, 300, 50, detDescMulti, imageType);
+			return FactoryVisualOdometry.stereoQuadPnP(1.5, 0.5 ,-1, Double.MAX_VALUE, 300, 50, detDescMulti, imageType);
 		} else {
 			throw new RuntimeException("Unknown selection");
 		}

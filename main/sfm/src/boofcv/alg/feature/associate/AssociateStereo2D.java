@@ -20,20 +20,12 @@ package boofcv.alg.feature.associate;
 
 import boofcv.abst.feature.associate.AssociateDescription2D;
 import boofcv.abst.feature.associate.ScoreAssociation;
-import boofcv.alg.geo.PerspectiveOps;
-import boofcv.alg.geo.RectifyImageOps;
-import boofcv.alg.geo.rectify.RectifyCalibrated;
 import boofcv.struct.FastQueue;
 import boofcv.struct.GrowQueue_I32;
-import boofcv.struct.calib.IntrinsicParameters;
-import boofcv.struct.calib.StereoParameters;
-import boofcv.struct.distort.PointTransform_F64;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.MatchScoreType;
 import boofcv.struct.feature.TupleDesc;
 import georegression.struct.point.Point2D_F64;
-import georegression.struct.se.Se3_F64;
-import org.ejml.data.DenseMatrix64F;
 
 /**
  * Association for a stereo pair where the source is the left camera and the destination is the right camera. Pixel
@@ -42,7 +34,9 @@ import org.ejml.data.DenseMatrix64F;
  *
  * @author Peter Abeles
  */
-public class AssociateStereo2D<Desc extends TupleDesc> implements AssociateDescription2D<Desc>
+public class AssociateStereo2D<Desc extends TupleDesc>
+		extends StereoConsistencyCheck
+		implements AssociateDescription2D<Desc>
 {
 	// computes match score between two descriptions
 	private ScoreAssociation<Desc> scorer;
@@ -51,15 +45,9 @@ public class AssociateStereo2D<Desc extends TupleDesc> implements AssociateDescr
 	// stores indexes of unassociated source features
 	private GrowQueue_I32 unassociated = new GrowQueue_I32();
 
-	// tolerance used for epipolar checks
-	private double tolerance;
-
 	// maximum allowed score when matching descriptors
 	private double scoreThreshold = Double.MAX_VALUE;
 
-	// transformations used to rectify image coordinates
-	private PointTransform_F64 leftImageToRect;
-	private PointTransform_F64 rightImageToRect;
 
 	// stores rectified coordinates of observations in left and right images
 	private FastQueue<Point2D_F64> locationLeft = new FastQueue<Point2D_F64>(Point2D_F64.class,true);
@@ -68,35 +56,12 @@ public class AssociateStereo2D<Desc extends TupleDesc> implements AssociateDescr
 	private FastQueue<Desc> descriptionsLeft;
 	private FastQueue<Desc> descriptionsRight;
 
-	public AssociateStereo2D( ScoreAssociation<Desc> scorer , double locationTolerance , Class<Desc> descType ) {
+	public AssociateStereo2D( ScoreAssociation<Desc> scorer , double locationTolerance , Class<Desc> descType )
+	{
+		super(locationTolerance,locationTolerance);
 		this.scorer = scorer;
-		this.tolerance = locationTolerance;
 		descriptionsLeft = new FastQueue<Desc>(descType,false);
 		descriptionsRight = new FastQueue<Desc>(descType,false);
-	}
-
-
-	public void setCalibration(StereoParameters param) {
-		IntrinsicParameters left = param.getLeft();
-		IntrinsicParameters right = param.getRight();
-
-
-		// compute rectification
-		RectifyCalibrated rectifyAlg = RectifyImageOps.createCalibrated();
-		Se3_F64 leftToRight = param.getRightToLeft().invert(null);
-
-		// original camera calibration matrices
-		DenseMatrix64F K1 = PerspectiveOps.calibrationMatrix(left, null);
-		DenseMatrix64F K2 = PerspectiveOps.calibrationMatrix(right, null);
-
-		rectifyAlg.process(K1,new Se3_F64(),K2,leftToRight);
-
-		// rectification matrix for each image
-		DenseMatrix64F rect1 = rectifyAlg.getRect1();
-		DenseMatrix64F rect2 = rectifyAlg.getRect2();
-
-		leftImageToRect = RectifyImageOps.transformPixelToRect_F64(param.left, rect1);
-		rightImageToRect = RectifyImageOps.transformPixelToRect_F64(param.right, rect2);
 	}
 
 	/**
@@ -144,7 +109,7 @@ public class AssociateStereo2D<Desc extends TupleDesc> implements AssociateDescr
 			for( int j = 0; j < locationRight.size; j++ ) {
 				Point2D_F64 right = locationRight.get(j);
 
-				if( Math.abs(left.y-right.y) < tolerance && left.x-tolerance > right.x ) {
+				if( checkRectified(left,right) ) {
 					double dist = scorer.score(descLeft, descriptionsRight.get(j));
 					if( dist < bestScore ) {
 						bestScore = dist;

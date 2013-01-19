@@ -150,7 +150,7 @@ public class VisualizeAssociationMatchesApp<T extends ImageSingleBand, D extends
 	}
 
 	private AssociateDescription createMatcher() {
-		ScoreAssociation scorer = FactoryAssociation.defaultScore(describe.getDescriptorType());
+		ScoreAssociation scorer = FactoryAssociation.defaultScore(describe.getDescriptionType());
 		return FactoryAssociation.greedy(scorer, Double.MAX_VALUE, maxMatches, associateBackwards);
 	}
 
