@@ -141,7 +141,7 @@ public class TestDetectDescribeFusion {
 		}
 
 		@Override
-		public int getDescriptorLength() {return 0;}
+		public int getDescriptionLength() {return 0;}
 
 		@Override
 		public boolean isInBounds(double x, double y, double orientation, double scale) {
@@ -164,7 +164,7 @@ public class TestDetectDescribeFusion {
 		}
 
 		@Override
-		public Class getDescriptorType() {
+		public Class getDescriptionType() {
 			return SurfFeature.class;
 		}
 	}

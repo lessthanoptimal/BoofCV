@@ -46,7 +46,6 @@ import boofcv.alg.interpolate.InterpolateRectangle;
 import boofcv.alg.sfm.StereoSparse3D;
 import boofcv.alg.sfm.d3.VisOdomPixelDepthPnP;
 import boofcv.alg.sfm.d3.VisOdomQuadPnP;
-import boofcv.alg.sfm.d3.VisOdomStereoPnP;
 import boofcv.alg.sfm.robust.EstimatorToGenerator;
 import boofcv.alg.sfm.robust.GeoModelRefineToModelFitter;
 import boofcv.factory.feature.associate.FactoryAssociation;
@@ -278,48 +277,50 @@ public class FactoryVisualOdometry {
 										   PointTrackerAux<T,Aux> trackerLeft, PointTrackerAux<T,Aux> trackerRight,
 										   Class<T> imageType )
 	{
-		EstimateNofPnP pnp = FactoryMultiView.computePnP_N(EnumPNP.P3P_FINSTERWALDER, -1);
-		DistanceModelMonoPixels<Se3_F64,Point2D3D> distanceMono = new PnPDistanceReprojectionSq();
-		PnPStereoDistanceReprojectionSq distanceStereo = new PnPStereoDistanceReprojectionSq();
-		PnPStereoEstimator pnpStereo = new PnPStereoEstimator(pnp,distanceMono,0);
-
-		EstimatorToGenerator<Se3_F64,Stereo2D3D> generator =
-				new EstimatorToGenerator<Se3_F64,Stereo2D3D>(pnpStereo) {
-					@Override
-					public Se3_F64 createModelInstance() {
-						return new Se3_F64();
-					}
-				};
-
-		// Pixel tolerance for RANSAC inliers - euclidean error squared from left + right images
-		double ransacTOL = 2*inlierPixelTol * inlierPixelTol;
-
-		ModelMatcher<Se3_F64, Stereo2D3D> motion =
-				new Ransac<Se3_F64, Stereo2D3D>(2323, generator, distanceStereo, ransacIterations, ransacTOL);
-
-		RefinePnPStereo refinePnP = null;
-		ModelFitter<Se3_F64,Stereo2D3D> refine = null;
-
-		if( refineIterations > 0 ) {
-			refinePnP = new PnPStereoRefineRodrigues(1e-12,refineIterations);
-			refine = new GeoModelRefineToModelFitter<Se3_F64,Stereo2D3D>(refinePnP) {
-
-				@Override
-				public Se3_F64 createModelInstance() {
-					return new Se3_F64();
-				}
-			};
-		}
-
-		VisOdomStereoPnP<T,D> alg =  new VisOdomStereoPnP<T,D>(thresholdAdd,thresholdRetire,inlierPixelTol,
-				trackerLeft,trackerRight,motion,refine,disparity,imageType);
-
-		return new WrapVisOdomStereoPnP<T>(pnpStereo,distanceMono,distanceStereo,alg,refinePnP,imageType);
+//		EstimateNofPnP pnp = FactoryMultiView.computePnP_N(EnumPNP.P3P_FINSTERWALDER, -1);
+//		DistanceModelMonoPixels<Se3_F64,Point2D3D> distanceMono = new PnPDistanceReprojectionSq();
+//		PnPStereoDistanceReprojectionSq distanceStereo = new PnPStereoDistanceReprojectionSq();
+//		PnPStereoEstimator pnpStereo = new PnPStereoEstimator(pnp,distanceMono,0);
+//
+//		EstimatorToGenerator<Se3_F64,Stereo2D3D> generator =
+//				new EstimatorToGenerator<Se3_F64,Stereo2D3D>(pnpStereo) {
+//					@Override
+//					public Se3_F64 createModelInstance() {
+//						return new Se3_F64();
+//					}
+//				};
+//
+//		// Pixel tolerance for RANSAC inliers - euclidean error squared from left + right images
+//		double ransacTOL = 2*inlierPixelTol * inlierPixelTol;
+//
+//		ModelMatcher<Se3_F64, Stereo2D3D> motion =
+//				new Ransac<Se3_F64, Stereo2D3D>(2323, generator, distanceStereo, ransacIterations, ransacTOL);
+//
+//		RefinePnPStereo refinePnP = null;
+//		ModelFitter<Se3_F64,Stereo2D3D> refine = null;
+//
+//		if( refineIterations > 0 ) {
+//			refinePnP = new PnPStereoRefineRodrigues(1e-12,refineIterations);
+//			refine = new GeoModelRefineToModelFitter<Se3_F64,Stereo2D3D>(refinePnP) {
+//
+//				@Override
+//				public Se3_F64 createModelInstance() {
+//					return new Se3_F64();
+//				}
+//			};
+//		}
+//
+//		VisOdomStereoPnP<T,D> alg =  new VisOdomStereoPnP<T,D>(thresholdAdd,thresholdRetire,inlierPixelTol,
+//				trackerLeft,trackerRight,motion,refine,disparity,imageType);
+//
+//		return new WrapVisOdomStereoPnP<T>(pnpStereo,distanceMono,distanceStereo,alg,refinePnP,imageType);
+		return null;
 	}
 
 	public static <T extends ImageSingleBand,Desc extends TupleDesc>
 	StereoVisualOdometry<T> stereoQuadPnP( double inlierPixelTol ,
 										   double epipolarPixelTol ,
+										   double maxDistanceF2F,
 										   double maxAssociationError,
 										   int ransacIterations ,
 										   int refineIterations ,
@@ -362,11 +363,11 @@ public class FactoryVisualOdometry {
 
 		ScoreAssociation<Desc> scorer = FactoryAssociation.defaultScore(descType);
 
-//		AssociateDescription2D<Desc> assocSame = new AssociateDescTo2D<Desc>(
-//				FactoryAssociation.greedy(scorer, maxAssociationError, -1, true));
-		AssociateDescription2D<Desc> assocSame =
-				new AssociateMaxDistanceNaive<Desc>(scorer,true,maxAssociationError,100);
-
+		AssociateDescription2D<Desc> assocSame;
+		if( maxDistanceF2F > 0 )
+			assocSame = new AssociateMaxDistanceNaive<Desc>(scorer,true,maxAssociationError,maxDistanceF2F);
+		else
+			assocSame = new AssociateDescTo2D<Desc>(FactoryAssociation.greedy(scorer, maxAssociationError, -1, true));
 
 		AssociateStereo2D<Desc> associateStereo = new AssociateStereo2D<Desc>(scorer,epipolarPixelTol,descType);
 		TriangulateTwoViewsCalibrated triangulate = FactoryTriangulate.twoGeometric();

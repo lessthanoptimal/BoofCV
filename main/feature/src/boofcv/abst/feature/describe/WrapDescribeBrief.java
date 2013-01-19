@@ -37,7 +37,7 @@ public class WrapDescribeBrief<T extends ImageSingleBand> implements DescribeReg
 
 	@Override
 	public TupleDesc_B createDescription() {
-		return new TupleDesc_B(getDescriptorLength());
+		return new TupleDesc_B(getDescriptionLength());
 	}
 
 	@Override
@@ -46,7 +46,7 @@ public class WrapDescribeBrief<T extends ImageSingleBand> implements DescribeReg
 	}
 
 	@Override
-	public int getDescriptorLength() {
+	public int getDescriptionLength() {
 		return length;
 	}
 
@@ -76,7 +76,7 @@ public class WrapDescribeBrief<T extends ImageSingleBand> implements DescribeReg
 	}
 
 	@Override
-	public Class<TupleDesc_B> getDescriptorType() {
+	public Class<TupleDesc_B> getDescriptionType() {
 		return TupleDesc_B.class;
 	}
 }

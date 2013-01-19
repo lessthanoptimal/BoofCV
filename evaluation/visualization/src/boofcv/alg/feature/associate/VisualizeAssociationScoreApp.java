@@ -144,7 +144,7 @@ public class VisualizeAssociationScoreApp<T extends ImageSingleBand, D extends I
 	public void refreshAll(Object[] cookies) {
 		detector = (InterestPointDetector<T>) cookies[0];
 		describe = (DescribeRegionPoint<T, TupleDesc>) cookies[1];
-		controlPanel.setFeatureType(describe.getDescriptorType());
+		controlPanel.setFeatureType(describe.getDescriptionType());
 
 		processImage();
 	}
@@ -161,7 +161,7 @@ public class VisualizeAssociationScoreApp<T extends ImageSingleBand, D extends I
 				break;
 		}
 
-		controlPanel.setFeatureType(describe.getDescriptorType());
+		controlPanel.setFeatureType(describe.getDescriptionType());
 
 		processImage();
 	}

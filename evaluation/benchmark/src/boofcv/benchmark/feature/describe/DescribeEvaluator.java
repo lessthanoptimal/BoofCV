@@ -92,7 +92,7 @@ public class DescribeEvaluator<T extends ImageSingleBand, D extends TupleDesc>
 			theta = new double[ points.size() ];
 
 		DescribeRegionPoint<T,D> describe = alg.getAlgorithm();
-		ScoreAssociation<D> scorer = FactoryAssociation.defaultScore(describe.getDescriptorType());
+		ScoreAssociation<D> scorer = FactoryAssociation.defaultScore(describe.getDescriptionType());
 
 		matcher = FactoryAssociation.greedy(scorer, Double.MAX_VALUE, -1, true);
 

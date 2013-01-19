@@ -262,7 +262,9 @@ public abstract class StandardPointTrackerSpawn<T extends ImageSingleBand> {
 		int before = tracks.size();
 		assertTrue(before > 0);
 		tracker.dropTrack(tracks.get(0));
-		
+
+		// the track should be removed from the all and active lists
+		assertEquals(before-1,tracker.getAllTracks(null).size());
 		assertEquals(before-1,tracker.getActiveTracks(null).size());
 
 		// tracks which have been dropped by request should not be included in this list

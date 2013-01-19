@@ -90,7 +90,7 @@ public class CompareConvertedDescriptionsApp {
 								  DescribeRegionPoint<ImageFloat32,TD> describe ,
 								  List<Point2D_F64> location )
 	{
-		FastQueue<TD> list = new FastQueue<TD>(100,describe.getDescriptorType(),false);
+		FastQueue<TD> list = new FastQueue<TD>(100,describe.getDescriptionType(),false);
 
 		System.out.println("Detecting");
 		detector.detect(input);
@@ -120,7 +120,7 @@ public class CompareConvertedDescriptionsApp {
 				(DescribeRegionPoint)FactoryDescribeRegionPoint.surfStable(null, ImageFloat32.class);
 
 		ConvertTupleDesc<TupleDesc_F64,TupleDesc_S8> converter =
-				FactoryConvertTupleDesc.real_F64_S8(describeA.getDescriptorLength());
+				FactoryConvertTupleDesc.real_F64_S8(describeA.getDescriptionLength());
 
 		DescribeRegionPoint<ImageFloat32,TupleDesc_S8> describeB =
 				new DescribeRegionPointConvert<ImageFloat32,TupleDesc_F64,TupleDesc_S8>(describeA,converter);

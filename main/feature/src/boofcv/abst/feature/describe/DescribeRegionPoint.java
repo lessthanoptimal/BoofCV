@@ -29,7 +29,9 @@ import boofcv.struct.image.ImageSingleBand;
  *
  * @author Peter Abeles
  */
-public interface DescribeRegionPoint<T extends ImageSingleBand, D extends TupleDesc> {
+public interface DescribeRegionPoint<T extends ImageSingleBand, Desc extends TupleDesc>
+	extends DescriptorInfo<Desc>
+{
 
 	/**
 	 * Specified the image which is to be processed.
@@ -37,20 +39,6 @@ public interface DescribeRegionPoint<T extends ImageSingleBand, D extends TupleD
 	 * @param image The image which contains the features.
 	 */
 	public void setImage( T image );
-
-	/**
-	 * Creates new description instance which can be processed by this class
-	 *
-	 * @return New descriptor
-	 */
-	public D createDescription();
-
-	/**
-	 * Returns the description's length
-	 *
-	 * @return Number of elements in the description
-	 */
-	public int getDescriptorLength();
 
 	/**
 	 * Checks to see if a description can be extracted at the specified location.  Some descriptors
@@ -72,7 +60,7 @@ public interface DescribeRegionPoint<T extends ImageSingleBand, D extends TupleD
 	 * @param ret Storage for extracted feature.  If null a new descriptor will be declared and returned..
 	 * @return The descriptor.
 	 */
-	public D process( double x , double y , double orientation , double scale , D ret );
+	public Desc process( double x , double y , double orientation , double scale , Desc ret );
 
 	/**
 	 * If scale information is used when computing the descriptor.
@@ -91,11 +79,4 @@ public interface DescribeRegionPoint<T extends ImageSingleBand, D extends TupleD
 	 * @return if orientation needs to be provided or not
 	 */
 	public boolean requiresOrientation();
-
-	/**
-	 * The type of region descriptor generated
-	 *
-	 * @return Returns the descriptor type.
-	 */
-	public Class<D> getDescriptorType();
 }

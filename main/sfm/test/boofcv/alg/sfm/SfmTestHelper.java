@@ -54,7 +54,7 @@ public class SfmTestHelper {
 		Point2D_F64 normRight = new Point2D_F64(rightX.x/rightX.z,rightX.y/rightX.z);
 
 		// convert into pixel coordinates
-		Point2D_F64 pixelLeft =  PerspectiveOps.convertNormToPixel(param.left, normLeft.x, normRight.y, null);
+		Point2D_F64 pixelLeft =  PerspectiveOps.convertNormToPixel(param.left, normLeft.x, normLeft.y, null);
 		Point2D_F64 pixelRight =  PerspectiveOps.convertNormToPixel(param.right, normRight.x, normRight.y, null);
 
 		// take in account lens distortion

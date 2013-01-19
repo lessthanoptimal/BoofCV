@@ -63,7 +63,7 @@ public abstract class WrapScaleToCharacteristic <T extends ImageSingleBand, D ex
 
 	@Override
 	public TupleDesc_F64 createDescription() {
-		return new TupleDesc_F64(getDescriptorLength());
+		return new TupleDesc_F64(getDescriptionLength());
 	}
 
 	@Override
@@ -119,7 +119,7 @@ public abstract class WrapScaleToCharacteristic <T extends ImageSingleBand, D ex
 	}
 
 	@Override
-	public Class<TupleDesc_F64> getDescriptorType() {
+	public Class<TupleDesc_F64> getDescriptionType() {
 		return TupleDesc_F64.class;
 	}
 }

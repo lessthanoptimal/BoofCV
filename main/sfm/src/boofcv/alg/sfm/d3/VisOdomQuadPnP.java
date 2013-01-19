@@ -47,7 +47,6 @@ import org.ddogleg.fitting.modelset.ModelMatcher;
 // TODO Show right camera tracks in debugger
 public class VisOdomQuadPnP<T extends ImageSingleBand,TD extends TupleDesc> {
 
-	// TODO change to key-frame so that its performance isn't coupled to vehicle speed strongly
 	TriangulateTwoViewsCalibrated triangulate;
 
 	// computes camera motion
@@ -143,12 +142,19 @@ public class VisOdomQuadPnP<T extends ImageSingleBand,TD extends TupleDesc> {
 			associateL2R(left, right);
 			first = false;
 		} else {
+			long time0 = System.currentTimeMillis();
 			associateL2R(left, right);
+			long time1 = System.currentTimeMillis();
 			associateF2F();
+			long time2 = System.currentTimeMillis();
 			cyclicConsistency();
-
+			long time3 = System.currentTimeMillis();
 			if( !estimateMotion() )
 				return false;
+			long time4 = System.currentTimeMillis();
+
+			System.out.println("timing: "+(time1-time0)+" "+(time2-time1)+" "+(time3-time2)+" "+(time4-time3));
+
 		}
 
 		return true;
@@ -165,8 +171,10 @@ public class VisOdomQuadPnP<T extends ImageSingleBand,TD extends TupleDesc> {
 		featsLeft1.reset();
 		featsRight1.reset();
 
+		long time0 = System.currentTimeMillis();
 		describeImage(left,featsLeft1);
 		describeImage(right,featsRight1);
+		long time1 = System.currentTimeMillis();
 
 		for( int i = 0; i < detector.getNumberOfSets(); i++ ) {
 			SetMatches matches = setMatches[i];
@@ -185,6 +193,8 @@ public class VisOdomQuadPnP<T extends ImageSingleBand,TD extends TupleDesc> {
 //			removeUnassociated(leftLoc,featsLeft1.description[i],rightLoc,featsRight1.description[i],found);
 			setMatches(matches.match2to3, found, leftLoc.size);
 		}
+		long time2 = System.currentTimeMillis();
+		System.out.println("  desc "+(time1-time0)+" assoc "+(time2-time1));
 	}
 
 	private void removeUnassociated( FastQueue<Point2D_F64> leftLoc , FastQueue<TD> leftDesc ,

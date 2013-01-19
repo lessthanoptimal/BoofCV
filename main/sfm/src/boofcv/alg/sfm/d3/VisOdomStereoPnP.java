@@ -18,15 +18,18 @@
 
 package boofcv.alg.sfm.d3;
 
-import boofcv.abst.feature.disparity.StereoDisparitySparse;
+import boofcv.abst.feature.associate.AssociateDescription2D;
 import boofcv.abst.feature.tracker.PointTrack;
-import boofcv.abst.feature.tracker.PointTrackerAux;
+import boofcv.abst.feature.tracker.PointTrackerD;
+import boofcv.abst.geo.TriangulateTwoViewsCalibrated;
 import boofcv.alg.distort.LensDistortionOps;
-import boofcv.alg.geo.RectifyImageOps;
-import boofcv.alg.sfm.StereoProcessingBase;
-import boofcv.struct.QueueCorner;
+import boofcv.alg.feature.associate.StereoConsistencyCheck;
+import boofcv.struct.FastQueue;
+import boofcv.struct.GrowQueue_I32;
 import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.distort.PointTransform_F64;
+import boofcv.struct.feature.AssociatedIndex;
+import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.sfm.Stereo2D3D;
 import georegression.struct.point.Point2D_F64;
@@ -35,7 +38,6 @@ import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
 import org.ddogleg.fitting.modelset.ModelFitter;
 import org.ddogleg.fitting.modelset.ModelMatcher;
-import org.ejml.data.DenseMatrix64F;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,7 +48,7 @@ import java.util.List;
 // TODO add a second pass option
 // TODO add bundle adjustment
 // TODO Show right camera tracks in debugger
-public class VisOdomStereoPnP<T extends ImageSingleBand,D extends ImageSingleBand> {
+public class VisOdomStereoPnP<T extends ImageSingleBand,Desc extends TupleDesc> {
 
 	// when the inlier set is less than this number new features are detected
 	private int thresholdAdd;
@@ -54,39 +56,31 @@ public class VisOdomStereoPnP<T extends ImageSingleBand,D extends ImageSingleBan
 	// discard tracks after they have not been in the inlier set for this many updates in a row
 	private int thresholdRetire;
 
-	// tolerance for deviations in epipolar check
-	private double epilolarTol;
-
-	private QueueCorner excludeList = new QueueCorner(10);
-
-	// computes disparity from two rectified images
-	private StereoDisparitySparse<T> disparity;
-	// Provides standard stereo image processing
-	private StereoProcessingBase<T> stereoIP;
-
-	// storage for rectified left pixel
-	private Point2D_F64 rectLeftPixel = new Point2D_F64();
-	// storage for right pixel
-	private Point2D_F64 imageRightPixel = new Point2D_F64();
-
 	// computes camera motion
 	private ModelMatcher<Se3_F64, Stereo2D3D> matcher;
 	private ModelFitter<Se3_F64, Stereo2D3D> modelRefiner;
 
 	// trackers for left and right cameras
-	private PointTrackerAux<T,?> trackerLeft;
-	private PointTrackerAux<T,?> trackerRight;
+	private PointTrackerD<T,Desc> trackerLeft;
+	private PointTrackerD<T,Desc> trackerRight;
+
+	FastQueue<Point2D_F64> pointsLeft = new FastQueue<Point2D_F64>(Point2D_F64.class,false);
+	FastQueue<Point2D_F64> pointsRight = new FastQueue<Point2D_F64>(Point2D_F64.class,false);
+	FastQueue<Desc> descLeft,descRight;
+
+	AssociateDescription2D<Desc> assocL2R;
+	TriangulateTwoViewsCalibrated triangulate;
 
 	// convert for original image pixels into normalized image coordinates
 	private PointTransform_F64 leftImageToNorm;
 	private PointTransform_F64 rightImageToNorm;
-	// convert from original image pixels into rectified image pixels
-	private PointTransform_F64 leftImageToRect;
-	private PointTransform_F64 rightImageToRect;
-	// convert from rectified pixels into original pixels
-	private PointTransform_F64 rightRectToImage;
 
+	StereoConsistencyCheck stereoCheck;
 
+	// known stereo baseline
+	private Se3_F64 leftToRight = new Se3_F64();
+
+	GrowQueue_I32 assignedRight = new GrowQueue_I32();
 	// List of tracks from left image that remain after geometric filters have been applied
 	private List<PointTrack> candidates = new ArrayList<PointTrack>();
 
@@ -103,36 +97,33 @@ public class VisOdomStereoPnP<T extends ImageSingleBand,D extends ImageSingleBan
 	private boolean first = true;
 
 	public VisOdomStereoPnP(int thresholdAdd, int thresholdRetire, double epilolarTol,
-							PointTrackerAux<T,?> trackerLeft, PointTrackerAux<T,?> trackerRight,
+							PointTrackerD<T,Desc> trackerLeft, PointTrackerD<T,Desc> trackerRight,
+							AssociateDescription2D<Desc> assocL2R ,
+							TriangulateTwoViewsCalibrated triangulate ,
 							ModelMatcher<Se3_F64, Stereo2D3D> matcher ,
 							ModelFitter<Se3_F64, Stereo2D3D> modelRefiner ,
-							StereoDisparitySparse<T> disparity,
 							Class<T> imageType )
 	{
 		this.thresholdAdd = thresholdAdd;
 		this.thresholdRetire = thresholdRetire;
-		this.epilolarTol = epilolarTol;
 		this.trackerLeft = trackerLeft;
 		this.trackerRight = trackerRight;
+		this.assocL2R = assocL2R;
+		this.triangulate = triangulate;
 		this.matcher = matcher;
 		this.modelRefiner = modelRefiner;
-		this.disparity = disparity;
 
-		stereoIP = new StereoProcessingBase<T>(imageType);
+		descLeft = new FastQueue<Desc>(trackerLeft.getDescriptionType(),false);
+		descRight = new FastQueue<Desc>(trackerLeft.getDescriptionType(),false);
+
+		stereoCheck = new StereoConsistencyCheck(epilolarTol,epilolarTol);
 	}
 
 	public void setCalibration(StereoParameters param) {
-		stereoIP.setCalibration(param);
 
-		// rectification matrices
-		DenseMatrix64F rect1 = stereoIP.getRect1();
-		DenseMatrix64F rect2 = stereoIP.getRect2();
-
+		param.rightToLeft.invert(leftToRight);
 		leftImageToNorm = LensDistortionOps.transformRadialToNorm_F64(param.left );
 		rightImageToNorm = LensDistortionOps.transformRadialToNorm_F64(param.right);
-		leftImageToRect = RectifyImageOps.transformPixelToRect_F64(param.left, rect1);
-		rightImageToRect = RectifyImageOps.transformPixelToRect_F64(param.right, rect2);
-		rightRectToImage = RectifyImageOps.transformRectToPixel_F64(param.right, rect2);
 	}
 
 	/**
@@ -153,10 +144,11 @@ public class VisOdomStereoPnP<T extends ImageSingleBand,D extends ImageSingleBan
 		trackerRight.process(right);
 
 		if( first ) {
-			addNewTracks(left,right);
+			addNewTracks();
 			first = false;
 		} else {
-			applyGeometryConstraints();
+			mutualTrackDrop();
+			selectCandidateTracks();
 			if( !estimateMotion() )
 				return false;
 
@@ -169,7 +161,7 @@ public class VisOdomStereoPnP<T extends ImageSingleBand,D extends ImageSingleBan
 			if( thresholdAdd <= 0 || N < thresholdAdd ) {
 				System.out.println("----------- Spawn Tracks --------------");
 				changePoseToReference();
-				addNewTracks(left,right);
+				addNewTracks();
 			}
 		}
 
@@ -206,32 +198,10 @@ public class VisOdomStereoPnP<T extends ImageSingleBand,D extends ImageSingleBan
 		}
 	}
 
-	private void applyGeometryConstraints() {
-
-		System.out.println("Before check mutual drop "+trackerLeft.getActiveTracks(null).size());
-		// if a track was dropped in one image drop it in the other
-		for( PointTrack t : trackerLeft.getDroppedTracks(null) ) {
-			LeftTrackInfo info = t.getCookie();
-			trackerRight.dropTrack(info.right);
-		}
-		for( PointTrack t : trackerRight.getDroppedTracks(null) ) {
-			trackerLeft.dropTrack((PointTrack)t.cookie);
-		}
-
-		System.out.println("Before epipolar check "+trackerLeft.getActiveTracks(null).size());
-		// Make a list of tracks which pass an epipolar stereo geometric test
-		candidates.clear();
-		for( PointTrack left : trackerLeft.getActiveTracks(null) ) {
-			LeftTrackInfo info = left.getCookie();
-			PointTrack right = info.right;
-
-			if( checkEpipolar(left,right) ) {
-				candidates.add(left);
-			}
-		}
-		System.out.println("Number of candidates "+candidates.size());
-	}
-
+	/**
+	 * Given the set of active tracks, estimate the cameras motion robustly
+	 * @return
+	 */
 	private boolean estimateMotion() {
 		// organize the data
 		List<Stereo2D3D> data = new ArrayList<Stereo2D3D>();
@@ -260,13 +230,58 @@ public class VisOdomStereoPnP<T extends ImageSingleBand,D extends ImageSingleBan
 		for( int i = 0; i < N; i++ ) {
 			int index = matcher.getInputIndex(i);
 			LeftTrackInfo info = candidates.get(index).getCookie();
-			info.lastInlier = tick;
+			info.lastConsistent = tick;
 		}
 
 		System.out.println("Inlier set size: "+N);
 
 		return true;
 	}
+
+	/**
+	 * If a track was dropped in one image make sure it was dropped in the other image
+	 */
+	private void mutualTrackDrop() {
+		for( PointTrack t : trackerLeft.getDroppedTracks(null) ) {
+			LeftTrackInfo info = t.getCookie();
+			trackerRight.dropTrack(info.right);
+		}
+		for( PointTrack t : trackerRight.getDroppedTracks(null) ) {
+			RightTrackInfo info = t.getCookie();
+			// a track could be dropped twice here, such requests are ignored by the tracker
+			trackerLeft.dropTrack(info.left);
+		}
+	}
+
+
+	/**
+	 * Searches for tracks which are active and meet the epipolar constraints
+	 */
+	private void selectCandidateTracks() {
+		// mark tracks in right frame that are active
+		for( PointTrack t : trackerRight.getActiveTracks(null) ) {
+			RightTrackInfo info = t.getCookie();
+			info.lastActiveList = tick;
+		}
+
+		candidates.clear();
+		for( PointTrack left : trackerLeft.getActiveTracks(null) ) {
+			LeftTrackInfo info = left.getCookie();
+
+			// for each active left track, see if its right track has been marked as active
+			RightTrackInfo infoRight = info.right.getCookie();
+			if( infoRight.lastActiveList != tick ) {
+				continue;
+			}
+
+			// check epipolar constraint and see if it is still valid
+			if( stereoCheck.checkPixel(left, info.right) ) {
+				candidates.add(left);
+			}
+		}
+
+	}
+
 
 	/**
 	 * Removes tracks which have not been included in the inlier set recently
@@ -280,7 +295,7 @@ public class VisOdomStereoPnP<T extends ImageSingleBand,D extends ImageSingleBan
 
 		for( PointTrack t : all ) {
 			LeftTrackInfo info = t.getCookie();
-			if( tick - info.lastInlier >= thresholdRetire ) {
+			if( tick - info.lastConsistent >= thresholdRetire ) {
 				trackerLeft.dropTrack(t);
 				trackerRight.dropTrack(info.right);
 				num++;
@@ -289,23 +304,6 @@ public class VisOdomStereoPnP<T extends ImageSingleBand,D extends ImageSingleBan
 
 		return num;
 	}
-
-	private boolean checkEpipolar( PointTrack left , PointTrack right ) {
-
-		Point2D_F64 rectLeft = new Point2D_F64();
-		Point2D_F64 rectRight = new Point2D_F64();
-
-		leftImageToRect.compute(left.x,left.y,rectLeft);
-		rightImageToRect.compute(right.x, right.y, rectRight);
-
-		// rectifications should make them appear along the same y-coordinate/epipolar line
-		if( Math.abs(rectLeft.y - rectRight.y) > epilolarTol )
-			return false;
-
-		// features in the right camera should appear left of features in the image image
-		return rectLeft.x - epilolarTol > rectRight.x;
-	}
-
 
 	/**
 	 * Updates the relative position of all points so that the current frame is the reference frame.  Mathematically
@@ -324,81 +322,100 @@ public class VisOdomStereoPnP<T extends ImageSingleBand,D extends ImageSingleBan
 		concatMotion();
 	}
 
-	private void addNewTracks( T left , T right ) {
-		stereoIP.setImages(left,right);
-		stereoIP.initialize();
-		disparity.setImages(stereoIP.getImageLeftRect(), stereoIP.getImageRightRect());
-
-		List<PointTrack> tracks = trackerLeft.getActiveTracks(null);
-
-		// don't detect existing tracks twice
-		excludeList.reset();
-		for( PointTrack t : tracks ) {
-			excludeList.add( (int)t.x , (int)t.y );
-		}
-
-		// detect new features
+	private void addNewTracks() {
 		trackerLeft.spawnTracks();
-		List<PointTrack> spawned = trackerLeft.getNewTracks(null);
+		trackerRight.spawnTracks();
 
-		for( int i = 0; i < spawned.size(); i++ ) {
-			// point in original image coordinates
-			PointTrack trackLeft = spawned.get(i);
+		List<PointTrack> newLeft = trackerLeft.getNewTracks(null);
+		List<PointTrack> newRight = trackerRight.getNewTracks(null);
 
-			// convert point into rectified coordinates
-			leftImageToRect.compute(trackLeft.x,trackLeft.y, rectLeftPixel);
+		// get a list of new tracks and their descriptions
+		addNewToList(trackerLeft,newLeft,pointsLeft,descLeft);
+		addNewToList(trackerRight,newRight,pointsRight,descRight);
 
-			// find the disparity between the two images
-			double d = computeDisparity(rectLeftPixel.x, rectLeftPixel.y);
+		// set up data structures
+		assignedRight.resize(pointsRight.size);
+		for( int i = 0; i < assignedRight.size; i++ )
+			assignedRight.data[i] = -1;
 
-			// exclude points at infinity
-			if( d > 0 ) {
-				// start a track in the right image at the found location
-				// and convert back into original pixel coordinates
-				rightRectToImage.compute(rectLeftPixel.x-d, rectLeftPixel.y, imageRightPixel);
+		// associate using L2R
+		assocL2R.setSource(pointsLeft,descLeft);
+		assocL2R.setDestination(pointsRight, descRight);
 
-				// Create track in right image and drop it in both if it fails
-				PointTrack trackRight = trackerRight.addTrack(imageRightPixel.x, imageRightPixel.y,null);
+		FastQueue<AssociatedIndex> matches = assocL2R.getMatches();
 
-				if( trackRight == null ) {
-					trackerLeft.dropTrack(trackLeft);
-					continue;
-				}
+		// storage for the triangulated location in the camera frame
+		Point3D_F64 cameraP3 = new Point3D_F64();
 
-				if( trackLeft.cookie == null ) {
-					trackLeft.cookie = new LeftTrackInfo();
-				}
-				// compute the point's 3D coordinate in the camera's reference frame
-				LeftTrackInfo leftInfo = trackLeft.getCookie();
-				disparityTo3D(rectLeftPixel.x, rectLeftPixel.y,d,leftInfo.location.location);
-				// Mark the tick so it isn't immediately dropped
-				leftInfo.lastInlier = tick;
+		for( int i = 0; i < matches.size; i++ ) {
+			AssociatedIndex m = matches.get(i);
 
-				// Save reference to both tracks in each other
-				leftInfo.right = trackRight;
-				trackRight.cookie = trackLeft;
+			if( assignedRight.data[m.dst] != -1 ) {
+				throw new RuntimeException("The association must ensure only unique associations for src and dst");
+			}
+			assignedRight.data[m.dst] = 1;
+
+			PointTrack trackL = newLeft.get(m.src);
+			PointTrack trackR = newRight.get(m.dst);
+
+			// declare additional track information stored in each track.  Tracks can be recycled so it
+			// might not always need to be declared
+			LeftTrackInfo infoLeft = trackL.getCookie();
+			if( infoLeft == null )
+				trackL.cookie = infoLeft = new LeftTrackInfo();
+
+			RightTrackInfo infoRight = trackR.getCookie();
+			if( infoRight == null )
+				trackR.cookie = infoRight = new RightTrackInfo();
+
+			Stereo2D3D p2d3d = infoLeft.location;
+
+			// convert pixel observations into normalized image coordinates
+			leftImageToNorm.compute(trackL.x,trackL.y,p2d3d.leftObs);
+			leftImageToNorm.compute(trackR.x,trackR.y,p2d3d.rightObs);
+
+			// triangulate 3D coordinate in the current camera frame
+			if( triangulate.triangulate(p2d3d.leftObs,p2d3d.rightObs,leftToRight,cameraP3) )
+			{
+				// put the track into the current keyframe coordinate system
+				SePointOps_F64.transform(currToKey,cameraP3,p2d3d.location);
+				// save a reference to the matching track in the right camera frame
+				infoLeft.right = trackR;
+				infoLeft.lastConsistent = infoLeft.lastInlier = tick;
+				infoRight.left = trackL;
 			} else {
-				trackerLeft.dropTrack(trackLeft);
+				// triangulation failed, drop track
+				assignedRight.data[m.dst] = -1;
+				trackerLeft.dropTrack(trackL);
 			}
 		}
-	}
 
-	private double computeDisparity( double x , double y ) {
-		if( disparity.process((int)(x+0.5),(int)(y+0.5)) ) {
-			return disparity.getDisparity();
-		} else {
-			return 0;
+		// drop tracks that were not associated
+		for( int i = 0; i < assignedRight.size; i++ ) {
+			if( assignedRight.data[i] != -1 )
+				continue;
+			trackerRight.dropTrack(newRight.get(i));
+		}
+		GrowQueue_I32 unassignedLeft = assocL2R.getUnassociatedSource();
+		for( int i = 0; i < unassignedLeft.size; i++ ) {
+			int index = unassignedLeft.get(i);
+			trackerLeft.dropTrack(newLeft.get(index));
 		}
 	}
 
-	private void disparityTo3D( double x , double y, double disparity , Point3D_F64 location ) {
-		stereoIP.computeHomo3D(x, y, location);
+	private void addNewToList( PointTrackerD<T,Desc> tracker , List<PointTrack> tracks ,
+							   FastQueue<Point2D_F64> points , FastQueue<Desc> descs )
+	{
+		points.reset(); descs.reset();
 
-		// convert from homogeneous coordinates into 3D
-		location.x /= disparity;
-		location.y /= disparity;
-		location.z /= disparity;
+		for( int i = 0; i < tracks.size(); i++ ) {
+			PointTrack t = tracks.get(i);
+
+			points.add( t );
+			descs.add( tracker.extractDescription(t));
+		}
 	}
+
 
 	private void concatMotion() {
 		Se3_F64 temp = new Se3_F64();
@@ -426,7 +443,19 @@ public class VisOdomStereoPnP<T extends ImageSingleBand,D extends ImageSingleBan
 	public static class LeftTrackInfo
 	{
 		public Stereo2D3D location = new Stereo2D3D();
+		// last time the track was declared as being geometrically consistent
+		public int lastConsistent;
+		// last time it was in the inlier list
 		public int lastInlier;
+		// right camera track it is associated with
 		public PointTrack right;
+	}
+
+	public static class RightTrackInfo
+	{
+		// used to see if the right track is currently in the active list
+		public int lastActiveList;
+		// left camera track it is associated with
+		public PointTrack left;
 	}
 }

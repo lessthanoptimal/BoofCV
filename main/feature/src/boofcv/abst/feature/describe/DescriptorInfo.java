@@ -16,28 +16,35 @@
  * limitations under the License.
  */
 
-package boofcv.abst.feature.detdesc;
+package boofcv.abst.feature.describe;
 
-import boofcv.abst.feature.describe.DescriptorInfo;
-import boofcv.abst.feature.detect.interest.InterestPointDetector;
 import boofcv.struct.feature.TupleDesc;
-import boofcv.struct.image.ImageSingleBand;
 
 /**
- * Interface for detecting and describing point features. By detecting and describing at the same time some algorithms
- * can be significantly speed up by avoiding recomputing preprocessing steps twice.
+ * Provides information about the feature's descriptor.
  *
  * @author Peter Abeles
  */
-public interface DetectDescribePoint<T extends ImageSingleBand, Desc extends TupleDesc>
-		extends InterestPointDetector<T>, DescriptorInfo<Desc>
-{
-	/**
-	 * Returns the feature descriptor at the specified index.
-	 *
-	 * @param index Which feature
-	 * @return Feature descriptor
-	 */
-	public Desc getDescription(int index);
-}
+public interface DescriptorInfo<Desc extends TupleDesc> {
 
+	/**
+	 * Creates new description instance which can be processed by this class
+	 *
+	 * @return New descriptor
+	 */
+	public Desc createDescription();
+
+	/**
+	 * Returns the number of elements in the descriptor
+	 *
+	 * @return Number of elements in the description
+	 */
+	public int getDescriptionLength();
+
+	/**
+	 * The type of region descriptor generated
+	 *
+	 * @return Returns the descriptor type.
+	 */
+	public Class<Desc> getDescriptionType();
+}

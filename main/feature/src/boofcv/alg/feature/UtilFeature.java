@@ -38,7 +38,7 @@ public class UtilFeature {
 	 */
 	public static <TD extends TupleDesc>
 	FastQueue<TD> createQueue( final DescribeRegionPoint<?, TD> detDesc , int initialMax ) {
-		return new FastQueue<TD>(initialMax,detDesc.getDescriptorType(),true) {
+		return new FastQueue<TD>(initialMax,detDesc.getDescriptionType(),true) {
 			@Override
 			protected TD createInstance() {
 				return detDesc.createDescription();

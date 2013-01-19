@@ -18,6 +18,7 @@
 
 package boofcv.abst.feature.detdesc;
 
+import boofcv.abst.feature.describe.DescriptorInfo;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.image.ImageSingleBand;
 
@@ -29,7 +30,9 @@ import boofcv.struct.image.ImageSingleBand;
  * <TD> Type of feature descriptor
  * @author Peter Abeles
  */
-public interface DetectDescribeMulti<T extends ImageSingleBand, TD extends TupleDesc> {
+public interface DetectDescribeMulti<T extends ImageSingleBand, Desc extends TupleDesc>
+	extends DescriptorInfo<Desc>
+{
 
 	/**
 	 * Detects features inside the image.
@@ -39,9 +42,9 @@ public interface DetectDescribeMulti<T extends ImageSingleBand, TD extends Tuple
 	public void process( T image );
 
 	/**
-	 * The number of families.
+	 * The number of feature sets.
 	 *
-	 * @return number of families
+	 * @return number of feature sets
 	 */
 	public int getNumberOfSets();
 
@@ -53,26 +56,5 @@ public interface DetectDescribeMulti<T extends ImageSingleBand, TD extends Tuple
 	 * @param
 	 * @return Results for a set.
 	 */
-	public PointDescSet<TD> getFeatureSet(int set);
-
-	/**
-	 * Creates new description instance
-	 *
-	 * @return New descriptor
-	 */
-	public TD createDescription();
-
-	/**
-	 * The type of region descriptor generated
-	 *
-	 * @return Returns the descriptor type.
-	 */
-	public Class<TD> getDescriptionType();
-
-	/**
-	 * Number of elements in the descriptor tuple.
-	 *
-	 * @return Length of descriptor.
-	 */
-	public int getDescriptionLength();
+	public PointDescSet<Desc> getFeatureSet(int set);
 }
