@@ -19,6 +19,7 @@
 package boofcv.abst.feature.associate;
 
 import boofcv.alg.feature.associate.AssociateSurfBasic;
+import boofcv.alg.feature.associate.FindUnassociated;
 import boofcv.struct.FastQueue;
 import boofcv.struct.GrowQueue_I32;
 import boofcv.struct.feature.AssociatedIndex;
@@ -34,7 +35,8 @@ public class WrapAssociateSurfBasic implements AssociateDescription<SurfFeature>
 
 	AssociateSurfBasic alg;
 
-	FastQueue<SurfFeature> listSrc;
+	// creates a list of unassociated features from the list of matches
+	FindUnassociated unassociated = new FindUnassociated();
 
 	public WrapAssociateSurfBasic(AssociateSurfBasic alg) {
 		this.alg = alg;
@@ -43,7 +45,6 @@ public class WrapAssociateSurfBasic implements AssociateDescription<SurfFeature>
 	@Override
 	public void setSource(FastQueue<SurfFeature> listSrc) {
 		alg.setSrc(listSrc);
-		this.listSrc = listSrc;
 	}
 
 	@Override
@@ -63,7 +64,12 @@ public class WrapAssociateSurfBasic implements AssociateDescription<SurfFeature>
 
 	@Override
 	public GrowQueue_I32 getUnassociatedSource() {
-		return alg.getUnassociated();
+		return alg.getUnassociatedSrc();
+	}
+
+	@Override
+	public GrowQueue_I32 getUnassociatedDestination() {
+		return unassociated.checkDestination(alg.getMatches(),alg.totalDestination());
 	}
 
 	@Override
@@ -74,5 +80,15 @@ public class WrapAssociateSurfBasic implements AssociateDescription<SurfFeature>
 	@Override
 	public MatchScoreType getScoreType() {
 		return alg.getAssoc().getScoreType();
+	}
+
+	@Override
+	public boolean uniqueSource() {
+		return alg.getAssoc().uniqueSource();
+	}
+
+	@Override
+	public boolean uniqueDestination() {
+		return alg.getAssoc().uniqueDestination();
 	}
 }

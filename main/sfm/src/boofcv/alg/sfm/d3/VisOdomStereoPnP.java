@@ -101,9 +101,11 @@ public class VisOdomStereoPnP<T extends ImageSingleBand,Desc extends TupleDesc> 
 							AssociateDescription2D<Desc> assocL2R ,
 							TriangulateTwoViewsCalibrated triangulate ,
 							ModelMatcher<Se3_F64, Stereo2D3D> matcher ,
-							ModelFitter<Se3_F64, Stereo2D3D> modelRefiner ,
-							Class<T> imageType )
+							ModelFitter<Se3_F64, Stereo2D3D> modelRefiner )
 	{
+		if( !assocL2R.uniqueSource() || !assocL2R.uniqueDestination() )
+			throw new IllegalArgumentException("Both unique source and destination must be ensure by association");
+
 		this.thresholdAdd = thresholdAdd;
 		this.thresholdRetire = thresholdRetire;
 		this.trackerLeft = trackerLeft;
@@ -243,11 +245,13 @@ public class VisOdomStereoPnP<T extends ImageSingleBand,Desc extends TupleDesc> 
 	 */
 	private void mutualTrackDrop() {
 		for( PointTrack t : trackerLeft.getDroppedTracks(null) ) {
+			System.out.println("dropped left "+t.x+" "+t.y);
 			LeftTrackInfo info = t.getCookie();
 			trackerRight.dropTrack(info.right);
 		}
 		for( PointTrack t : trackerRight.getDroppedTracks(null) ) {
 			RightTrackInfo info = t.getCookie();
+			System.out.println("dropping left "+info.left.x+" "+info.left.y);
 			// a track could be dropped twice here, such requests are ignored by the tracker
 			trackerLeft.dropTrack(info.left);
 		}
@@ -341,7 +345,7 @@ public class VisOdomStereoPnP<T extends ImageSingleBand,Desc extends TupleDesc> 
 		// associate using L2R
 		assocL2R.setSource(pointsLeft,descLeft);
 		assocL2R.setDestination(pointsRight, descRight);
-
+		assocL2R.associate();
 		FastQueue<AssociatedIndex> matches = assocL2R.getMatches();
 
 		// storage for the triangulated location in the camera frame
@@ -386,6 +390,7 @@ public class VisOdomStereoPnP<T extends ImageSingleBand,Desc extends TupleDesc> 
 			} else {
 				// triangulation failed, drop track
 				assignedRight.data[m.dst] = -1;
+				System.out.println(" no triangulate "+trackL.x+" "+trackL.y);
 				trackerLeft.dropTrack(trackL);
 			}
 		}
@@ -399,6 +404,7 @@ public class VisOdomStereoPnP<T extends ImageSingleBand,Desc extends TupleDesc> 
 		GrowQueue_I32 unassignedLeft = assocL2R.getUnassociatedSource();
 		for( int i = 0; i < unassignedLeft.size; i++ ) {
 			int index = unassignedLeft.get(i);
+			System.out.println(" unassigned "+newLeft.get(index).x+" "+newLeft.get(index).y);
 			trackerLeft.dropTrack(newLeft.get(index));
 		}
 	}

@@ -51,6 +51,8 @@ Version : Alpha 0.13
   * Added PixelMath.invert()
 - Associate and ScoreAssociation
   * Added ability to set a threshold via Associate interface
+  * Can get a list of unassociate destination features
+  * Can determine if the algorithm selects a unique match for source and destination
   * Created MatchScoreType to provide more information on the score's behavior 
 - Created EasyGeneralFeatureDetector
   * Automatically handles image derivatives
@@ -66,7 +68,8 @@ Version : Alpha 0.13
   * Added support for detecting maximums and minimums
 - Fixed bugs in SortBestFeatures and added sort for negative peaks
 - GeneralFeatureIntensity: Added flags to indicate if features are maximum or minimums
-
+- Calibration package was missing from Maven build
+- Removed maxMatches from greedy assocaition since its not part of Association interface and can be easily added
 
 ---------------------------------------------
 Date    : 2012/12/05

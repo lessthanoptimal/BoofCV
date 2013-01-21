@@ -39,7 +39,8 @@ public class TestAssociateGreedy {
 		FastQueue<TupleDesc_F64> a = createData(1,2,3,4);
 		FastQueue<TupleDesc_F64> b = createData(3,4,1,40);
 
-		AssociateGreedy<TupleDesc_F64> alg = new AssociateGreedy<TupleDesc_F64>(score,0.5,false);
+		AssociateGreedy<TupleDesc_F64> alg = new AssociateGreedy<TupleDesc_F64>(score,false);
+		alg.setMaxFitError(0.5);
 
 		alg.associate(a,b);
 
@@ -63,13 +64,15 @@ public class TestAssociateGreedy {
 		FastQueue<TupleDesc_F64> b = createData(3,4,1.1,40);
 
 		// large margin for error
-		AssociateGreedy<TupleDesc_F64> alg = new AssociateGreedy<TupleDesc_F64>(score,10,false);
+		AssociateGreedy<TupleDesc_F64> alg = new AssociateGreedy<TupleDesc_F64>(score,false);
+		alg.setMaxFitError(10);
 
 		alg.associate(a,b);
 		assertEquals(2,alg.getPairs()[1]);
 
 		// small margin for error, no association
-		alg = new AssociateGreedy<TupleDesc_F64>(score,0.1,false);
+		alg = new AssociateGreedy<TupleDesc_F64>(score,false);
+		alg.setMaxFitError(0.1);
 		alg.associate(a,b);
 		assertEquals(-1,alg.getPairs()[1]);
 	}
@@ -79,7 +82,8 @@ public class TestAssociateGreedy {
 		FastQueue<TupleDesc_F64> a = createData(1,2,3,8);
 		FastQueue<TupleDesc_F64> b = createData(3,4,1,10);
 
-		AssociateGreedy<TupleDesc_F64> alg = new AssociateGreedy<TupleDesc_F64>(score,10,true);
+		AssociateGreedy<TupleDesc_F64> alg = new AssociateGreedy<TupleDesc_F64>(score,true);
+		alg.setMaxFitError(10);
 
 		alg.associate(a,b);
 

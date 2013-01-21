@@ -94,7 +94,7 @@ public class DescribeEvaluator<T extends ImageSingleBand, D extends TupleDesc>
 		DescribeRegionPoint<T,D> describe = alg.getAlgorithm();
 		ScoreAssociation<D> scorer = FactoryAssociation.defaultScore(describe.getDescriptionType());
 
-		matcher = FactoryAssociation.greedy(scorer, Double.MAX_VALUE, -1, true);
+		matcher = FactoryAssociation.greedy(scorer, Double.MAX_VALUE, true);
 
 		initial = UtilFeature.createQueue(describe,10);
 		current = UtilFeature.createQueue(describe,10);

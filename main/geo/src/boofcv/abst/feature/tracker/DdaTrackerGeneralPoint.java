@@ -36,26 +36,24 @@ import georegression.struct.point.Point2D_I16;
  *
  * @author Peter Abeles
  */
-public class DdaTrackerGeneralPoint<I extends ImageSingleBand, D extends ImageSingleBand, TD extends TupleDesc>
-		extends DetectAssociateBase<I,TD,Object> {
+public class DdaTrackerGeneralPoint<I extends ImageSingleBand, D extends ImageSingleBand, Desc extends TupleDesc>
+		extends DetectAssociateBase<I, Desc> {
 
 	// feature detector
 	private EasyGeneralFeatureDetector<I,D> detector;
 	// feature descriptor
-	private DescribeRegionPoint<I,TD> describe;
+	private DescribeRegionPoint<I, Desc> describe;
 	// scale that features should be created at
 	private double scale;
 
 	// storage for descriptors
-	private FastQueue<TD> descriptors;
+	private FastQueue<Desc> descriptors;
 	private FastQueue<Point2D_F64> locations = new FastQueue<Point2D_F64>(100,Point2D_F64.class,true);
-	// storage for addTrack()
-	private TD desc;
 
-	public DdaTrackerGeneralPoint( final AssociateDescription2D<TD> associate ,
+	public DdaTrackerGeneralPoint( final AssociateDescription2D<Desc> associate ,
 								   final boolean updateDescription,
 								   EasyGeneralFeatureDetector<I,D> detector ,
-								   DescribeRegionPoint<I,TD> describe ,
+								   DescribeRegionPoint<I, Desc> describe ,
 								   double scale ) {
 		super(associate, updateDescription, describe.getDescriptionType());
 		this.detector = detector;
@@ -63,11 +61,10 @@ public class DdaTrackerGeneralPoint<I extends ImageSingleBand, D extends ImageSi
 		this.scale = scale;
 
 		descriptors = UtilFeature.createQueue(describe,100);
-		desc = describe.createDescription();
 	}
 
 	@Override
-	protected void detectFeatures(I input, FastQueue<Point2D_F64> locDst, FastQueue<TD> featDst) {
+	protected void detectFeatures(I input, FastQueue<Point2D_F64> locDst, FastQueue<Desc> featDst) {
 
 		// detect features in the image
 		detector.detect(input,null);
@@ -82,7 +79,7 @@ public class DdaTrackerGeneralPoint<I extends ImageSingleBand, D extends ImageSi
 			Point2D_I16 p = found.get(i);
 			if( describe.isInBounds(p.x,p.y,0,scale) ) {
 				Point2D_F64 loc = locations.grow();
-				TD desc = descriptors.grow();
+				Desc desc = descriptors.grow();
 				loc.set(p.x,p.y);
 				describe.process(loc.x,loc.y,0,scale,desc);
 				featDst.add(desc);
@@ -92,18 +89,17 @@ public class DdaTrackerGeneralPoint<I extends ImageSingleBand, D extends ImageSi
 	}
 
 	@Override
-	protected TD createDescription() {
+	public Desc createDescription() {
 		return describe.createDescription();
 	}
 
 	@Override
-	public Object getAuxiliary(PointTrack track) {
-		return null;
+	public int getDescriptionLength() {
+		return describe.getDescriptionLength();
 	}
 
 	@Override
-	public PointTrack addTrack(double x, double y, Object auxiliary) {
-		describe.process(x,y,0,scale,desc);
-		return addNewTrack(x,y,desc);
+	public Class<Desc> getDescriptionType() {
+		return describe.getDescriptionType();
 	}
 }

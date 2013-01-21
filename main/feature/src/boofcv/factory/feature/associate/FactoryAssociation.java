@@ -39,8 +39,6 @@ public class FactoryAssociation {
 	 * 
 	 * @param score Computes the fit score between two features.
 	 * @param maxError Maximum allowed error/fit score between two features.  To disable set to Double.MAX_VALUE
-	 * @param maxMatches  Maximum number of matches returned.  If more than this are found then only the ones with the 
-	 *                  best fit score are returned.  To disable set to a value <= 0.
 	 * @param backwardsValidation If true associations are validated by associating in the reverse direction.  If the 
 	 *                  forward and reverse matches fit an association is excepted.
 	 * @param <D> Data structure being associated
@@ -49,11 +47,11 @@ public class FactoryAssociation {
 	public static <D> AssociateDescription<D>
 	greedy( ScoreAssociation<D> score ,
 			double maxError ,
-			int maxMatches ,
 			boolean backwardsValidation )
 	{
-		AssociateGreedy<D> alg = new AssociateGreedy<D>(score,maxError,backwardsValidation);
-		WrapAssociateGreedy<D> ret = new WrapAssociateGreedy<D>(alg,maxMatches);
+		AssociateGreedy<D> alg = new AssociateGreedy<D>(score,backwardsValidation);
+		alg.setMaxFitError(maxError);
+		WrapAssociateGreedy<D> ret = new WrapAssociateGreedy<D>(alg);
 		return ret;
 	}
 

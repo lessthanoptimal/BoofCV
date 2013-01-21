@@ -19,11 +19,11 @@
 package boofcv.abst.feature.associate;
 
 import boofcv.alg.feature.associate.AssociateGreedy;
+import boofcv.alg.feature.associate.FindUnassociated;
 import boofcv.struct.FastQueue;
 import boofcv.struct.GrowQueue_I32;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.MatchScoreType;
-import org.ddogleg.sorting.QuickSelectArray;
 
 
 /**
@@ -36,24 +36,22 @@ public class WrapAssociateGreedy<T> implements AssociateDescription<T> {
 	AssociateGreedy<T> alg;
 
 	FastQueue<AssociatedIndex> matches = new FastQueue<AssociatedIndex>(10,AssociatedIndex.class,true);
-	int indexes[] = new int[1];
-	int maxAssociations;
 
 	// reference to input list
 	FastQueue<T> listSrc;
 	FastQueue<T> listDst;
 
 	// indexes of unassociated features
-	GrowQueue_I32 unassoc = new GrowQueue_I32();
+	GrowQueue_I32 unassocSrc = new GrowQueue_I32();
+	// creates a list of unassociated features from the list of matches
+	FindUnassociated unassociated = new FindUnassociated();
 
 	/**
 	 *
 	 * @param alg
-	 * @param maxAssociations Maximum number of allowed associations.  If -1 then all are returned.
 	 */
-	public WrapAssociateGreedy( AssociateGreedy<T> alg , int maxAssociations ) {
+	public WrapAssociateGreedy( AssociateGreedy<T> alg ) {
 		this.alg = alg;
-		this.maxAssociations = maxAssociations;
 	}
 
 	@Override
@@ -73,53 +71,30 @@ public class WrapAssociateGreedy<T> implements AssociateDescription<T> {
 
 	@Override
 	public void associate() {
-		unassoc.reset();
+		unassocSrc.reset();
 		alg.associate(listSrc,listDst);
 
 		int pairs[] = alg.getPairs();
 		double score[] = alg.getFitQuality();
 
-		if( indexes.length < listSrc.size )
-			indexes = new int[ listSrc.size ];
-
-		// set up the index for sorting and see how many matches where found
-		int numMatches = 0;
-		for( int i = 0; i < listSrc.size; i++ ) {
-			indexes[i] = i;
-			if( pairs[i] >= 0 )
-				numMatches++;
-		}
-
 		matches.reset();
-		if( maxAssociations <= 0 || numMatches <= maxAssociations ) {
-			// copy copy all the matches
-			for( int i = 0; i < listSrc.size; i++ ) {
-				int dst = pairs[i];
-				if( dst >= 0 )
-					matches.grow().setAssociation(i,dst,score[i]);
-				else
-					unassoc.add(i);
-			}
-			
-		} else {
-			QuickSelectArray.selectIndex(score, maxAssociations, listSrc.size, indexes);
-			for( int i = 0; i < maxAssociations; i++ ) {
-				int src = indexes[i];
-				int dst = pairs[src];
-				if( dst == -1 ) {
-					break;
-				}
-				matches.grow().setAssociation(src,dst,score[src]);
-			}
-			for( int i = maxAssociations; i < listSrc.size; i++ ) {
-				unassoc.add(indexes[i]);
-			}
+		for( int i = 0; i < listSrc.size; i++ ) {
+			int dst = pairs[i];
+			if( dst >= 0 )
+				matches.grow().setAssociation(i,dst,score[i]);
+			else
+				unassocSrc.add(i);
 		}
 	}
 
 	@Override
 	public GrowQueue_I32 getUnassociatedSource() {
-		return unassoc;
+		return unassocSrc;
+	}
+
+	@Override
+	public GrowQueue_I32 getUnassociatedDestination() {
+		return unassociated.checkDestination(matches,listDst.size);
 	}
 
 	@Override
@@ -130,5 +105,15 @@ public class WrapAssociateGreedy<T> implements AssociateDescription<T> {
 	@Override
 	public MatchScoreType getScoreType() {
 		return alg.getScore().getScoreType();
+	}
+
+	@Override
+	public boolean uniqueSource() {
+		return true;
+	}
+
+	@Override
+	public boolean uniqueDestination() {
+		return alg.isBackwardsValidation();
 	}
 }

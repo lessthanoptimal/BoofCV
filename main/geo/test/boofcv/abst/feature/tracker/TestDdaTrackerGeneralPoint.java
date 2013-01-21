@@ -49,7 +49,7 @@ public class TestDdaTrackerGeneralPoint extends StandardPointTrackerSpawn<ImageF
 	}
 
 	@Override
-	public PointTrackerAux<ImageFloat32,?> createTracker() {
+	public PointTrackerD<ImageFloat32,TupleDesc_B> createTracker() {
 		DescribePointBrief<ImageFloat32> brief =
 				FactoryDescribePointAlgs.brief(FactoryBriefDefinition.gaussian2(new Random(123), 16, 512),
 						FactoryBlurFilter.gaussian(ImageFloat32.class, 0, 4));
@@ -60,7 +60,7 @@ public class TestDdaTrackerGeneralPoint extends StandardPointTrackerSpawn<ImageF
 		ScoreAssociateHamming_B score = new ScoreAssociateHamming_B();
 
 		AssociateDescription2D<TupleDesc_B> association =
-				new AssociateDescTo2D<TupleDesc_B>(FactoryAssociation.greedy(score,400, 300, true));
+				new AssociateDescTo2D<TupleDesc_B>(FactoryAssociation.greedy(score,400, true));
 
 		DescribeRegionPoint<ImageFloat32,TupleDesc_B> describe = new WrapDescribeBrief<ImageFloat32>(brief);
 

@@ -97,7 +97,7 @@ public class ExampleDetectDescribe {
 
 		// Might as well have this example do something useful, like associate two images
 		ScoreAssociation scorer = FactoryAssociation.defaultScore(detDesc.getDescriptionType());
-		AssociateDescription associate = FactoryAssociation.greedy(scorer, Double.MAX_VALUE, -1, true);
+		AssociateDescription associate = FactoryAssociation.greedy(scorer, Double.MAX_VALUE, true);
 
 		// load and match images
 		ExampleAssociatePoints app = new ExampleAssociatePoints(detDesc,associate,imageType);

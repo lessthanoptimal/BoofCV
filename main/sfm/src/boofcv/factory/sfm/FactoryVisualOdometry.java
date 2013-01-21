@@ -27,7 +27,7 @@ import boofcv.abst.feature.disparity.StereoDisparitySparse;
 import boofcv.abst.feature.tracker.ModelAssistedTracker;
 import boofcv.abst.feature.tracker.PkltConfig;
 import boofcv.abst.feature.tracker.PointTracker;
-import boofcv.abst.feature.tracker.PointTrackerAux;
+import boofcv.abst.feature.tracker.PointTrackerD;
 import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.abst.geo.Estimate1ofPnP;
 import boofcv.abst.geo.EstimateNofPnP;
@@ -46,6 +46,7 @@ import boofcv.alg.interpolate.InterpolateRectangle;
 import boofcv.alg.sfm.StereoSparse3D;
 import boofcv.alg.sfm.d3.VisOdomPixelDepthPnP;
 import boofcv.alg.sfm.d3.VisOdomQuadPnP;
+import boofcv.alg.sfm.d3.VisOdomStereoPnP;
 import boofcv.alg.sfm.robust.EstimatorToGenerator;
 import boofcv.alg.sfm.robust.GeoModelRefineToModelFitter;
 import boofcv.factory.feature.associate.FactoryAssociation;
@@ -197,7 +198,7 @@ public class FactoryVisualOdometry {
 
 		AssociateDescription2D<D> association =
 				new AssociateDescTo2D<D>(
-						FactoryAssociation.greedy(score, maxAssociationError, -1, true));
+						FactoryAssociation.greedy(score, maxAssociationError, true));
 
 		AssociateDescription2D<D> association2 =
 				new AssociateMaxDistanceNaive<D>(score,true,maxAssociationError,associationSecondTol);
@@ -269,52 +270,58 @@ public class FactoryVisualOdometry {
 		};
 	}
 
-	public static <T extends ImageSingleBand, D extends ImageSingleBand, Aux>
-	StereoVisualOdometry<T> stereoFullPnP( int thresholdAdd, int thresholdRetire, double inlierPixelTol,
+	public static <T extends ImageSingleBand, Desc extends TupleDesc>
+	StereoVisualOdometry<T> stereoFullPnP( int thresholdAdd, int thresholdRetire,
+										   double inlierPixelTol ,
+										   double epipolarPixelTol,
 										   int ransacIterations ,
 										   int refineIterations ,
-										   StereoDisparitySparse<T> disparity,
-										   PointTrackerAux<T,Aux> trackerLeft, PointTrackerAux<T,Aux> trackerRight,
+										   PointTrackerD<T,Desc> trackerLeft, PointTrackerD<T,Desc> trackerRight,
 										   Class<T> imageType )
 	{
-//		EstimateNofPnP pnp = FactoryMultiView.computePnP_N(EnumPNP.P3P_FINSTERWALDER, -1);
-//		DistanceModelMonoPixels<Se3_F64,Point2D3D> distanceMono = new PnPDistanceReprojectionSq();
-//		PnPStereoDistanceReprojectionSq distanceStereo = new PnPStereoDistanceReprojectionSq();
-//		PnPStereoEstimator pnpStereo = new PnPStereoEstimator(pnp,distanceMono,0);
-//
-//		EstimatorToGenerator<Se3_F64,Stereo2D3D> generator =
-//				new EstimatorToGenerator<Se3_F64,Stereo2D3D>(pnpStereo) {
-//					@Override
-//					public Se3_F64 createModelInstance() {
-//						return new Se3_F64();
-//					}
-//				};
-//
-//		// Pixel tolerance for RANSAC inliers - euclidean error squared from left + right images
-//		double ransacTOL = 2*inlierPixelTol * inlierPixelTol;
-//
-//		ModelMatcher<Se3_F64, Stereo2D3D> motion =
-//				new Ransac<Se3_F64, Stereo2D3D>(2323, generator, distanceStereo, ransacIterations, ransacTOL);
-//
-//		RefinePnPStereo refinePnP = null;
-//		ModelFitter<Se3_F64,Stereo2D3D> refine = null;
-//
-//		if( refineIterations > 0 ) {
-//			refinePnP = new PnPStereoRefineRodrigues(1e-12,refineIterations);
-//			refine = new GeoModelRefineToModelFitter<Se3_F64,Stereo2D3D>(refinePnP) {
-//
-//				@Override
-//				public Se3_F64 createModelInstance() {
-//					return new Se3_F64();
-//				}
-//			};
-//		}
-//
-//		VisOdomStereoPnP<T,D> alg =  new VisOdomStereoPnP<T,D>(thresholdAdd,thresholdRetire,inlierPixelTol,
-//				trackerLeft,trackerRight,motion,refine,disparity,imageType);
-//
-//		return new WrapVisOdomStereoPnP<T>(pnpStereo,distanceMono,distanceStereo,alg,refinePnP,imageType);
-		return null;
+		EstimateNofPnP pnp = FactoryMultiView.computePnP_N(EnumPNP.P3P_FINSTERWALDER, -1);
+		DistanceModelMonoPixels<Se3_F64,Point2D3D> distanceMono = new PnPDistanceReprojectionSq();
+		PnPStereoDistanceReprojectionSq distanceStereo = new PnPStereoDistanceReprojectionSq();
+		PnPStereoEstimator pnpStereo = new PnPStereoEstimator(pnp,distanceMono,0);
+
+		EstimatorToGenerator<Se3_F64,Stereo2D3D> generator =
+				new EstimatorToGenerator<Se3_F64,Stereo2D3D>(pnpStereo) {
+					@Override
+					public Se3_F64 createModelInstance() {
+						return new Se3_F64();
+					}
+				};
+
+		// Pixel tolerance for RANSAC inliers - euclidean error squared from left + right images
+		double ransacTOL = 2*inlierPixelTol * inlierPixelTol;
+
+		ModelMatcher<Se3_F64, Stereo2D3D> motion =
+				new Ransac<Se3_F64, Stereo2D3D>(2323, generator, distanceStereo, ransacIterations, ransacTOL);
+
+		RefinePnPStereo refinePnP = null;
+		ModelFitter<Se3_F64,Stereo2D3D> refine = null;
+
+		Class<Desc> descType = trackerLeft.getDescriptionType();
+		ScoreAssociation<Desc> scorer = FactoryAssociation.defaultScore(descType);
+		AssociateStereo2D<Desc> associateStereo = new AssociateStereo2D<Desc>(scorer,epipolarPixelTol,descType);
+
+		if( refineIterations > 0 ) {
+			refinePnP = new PnPStereoRefineRodrigues(1e-12,refineIterations);
+			refine = new GeoModelRefineToModelFitter<Se3_F64,Stereo2D3D>(refinePnP) {
+
+				@Override
+				public Se3_F64 createModelInstance() {
+					return new Se3_F64();
+				}
+			};
+		}
+
+		TriangulateTwoViewsCalibrated triangulate = FactoryTriangulate.twoGeometric();
+
+		VisOdomStereoPnP<T,Desc> alg =  new VisOdomStereoPnP<T,Desc>(thresholdAdd,thresholdRetire,epipolarPixelTol,
+				trackerLeft,trackerRight,associateStereo,triangulate,motion,refine);
+
+		return new WrapVisOdomStereoPnP<T>(pnpStereo,distanceMono,distanceStereo,associateStereo,alg,refinePnP,imageType);
 	}
 
 	public static <T extends ImageSingleBand,Desc extends TupleDesc>
@@ -367,7 +374,7 @@ public class FactoryVisualOdometry {
 		if( maxDistanceF2F > 0 )
 			assocSame = new AssociateMaxDistanceNaive<Desc>(scorer,true,maxAssociationError,maxDistanceF2F);
 		else
-			assocSame = new AssociateDescTo2D<Desc>(FactoryAssociation.greedy(scorer, maxAssociationError, -1, true));
+			assocSame = new AssociateDescTo2D<Desc>(FactoryAssociation.greedy(scorer, maxAssociationError, true));
 
 		AssociateStereo2D<Desc> associateStereo = new AssociateStereo2D<Desc>(scorer,epipolarPixelTol,descType);
 		TriangulateTwoViewsCalibrated triangulate = FactoryTriangulate.twoGeometric();

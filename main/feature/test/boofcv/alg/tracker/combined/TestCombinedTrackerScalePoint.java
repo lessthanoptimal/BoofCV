@@ -199,12 +199,27 @@ public class TestCombinedTrackerScalePoint {
 		}
 
 		@Override
+		public GrowQueue_I32 getUnassociatedDestination() {
+			return null;
+		}
+
+		@Override
 		public void setThreshold(double score) {
 		}
 
 		@Override
 		public MatchScoreType getScoreType() {
 			return MatchScoreType.NORM_ERROR;
+		}
+
+		@Override
+		public boolean uniqueSource() {
+			return false;
+		}
+
+		@Override
+		public boolean uniqueDestination() {
+			return false;
 		}
 	}
 

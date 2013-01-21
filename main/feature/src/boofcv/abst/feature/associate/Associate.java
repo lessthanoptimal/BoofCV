@@ -24,9 +24,22 @@ import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.MatchScoreType;
 
 /**
- * Common functions for associating features between two images with a single match. Features are associated from the
- * source image to the destination image.  Each source feature is paired up with a single feature in the destination.
- * If a match is not found then it is added to the unassociated list.
+ * <p>
+ * Common interface for associating features between two images.  Found associations are returned in a list of
+ * {@link AssociatedIndex} which specifies the index and score of the matching pair.  Implementing classes can
+ * optionally ensure that a unique pairing is found from source to destination and/or the reverse.  See
+ * functions {@link #uniqueSource()} and {@link #uniqueDestination()}.  Indexes refer to the index in the input
+ * list for source and destination lists.  Inputs are not specified in this interface but are specified in a child
+ * interface.
+ * </p>
+ *
+ * <p>
+ * DESIGN NOTES:<br>
+ * <b>Indexes</b> of matching features are used instead of the descriptions because descriptions are often separated
+ * from another more complex data structure and the index can be easily matched to that data.<br>
+ * <b>Unassociated feature</b> lists can be easily computed using the returned set of associations.  This functionality
+ * is provided since in some cases it can be computed at virtually no cost during association.<br>
+ * </p>
  *
  * @author Peter Abeles
  */
@@ -45,11 +58,24 @@ public interface Associate {
 	public FastQueue<AssociatedIndex> getMatches();
 
 	/**
-	 * Indexes of features in the source set which are not associated to features to the destination set.
+	 * Indexes of features in the source set which are not associated.
+	 *
+	 * WARNING: In some implementations the unassociated list is recomputed each time this function is invoked.  In
+	 * other implementations it was found virtually for free while the matches are found.
 	 *
 	 * @return List of unassociated source features by index.
 	 */
 	public GrowQueue_I32 getUnassociatedSource();
+
+	/**
+	 * Indexes of features in the destination set which are not associated.
+	 *
+	 * WARNING: In some implementations the unassociated list is recomputed each time this function is invoked.  In
+	 * other implementations it was found virtually for free while the matches are found.
+	 *
+	 * @return List of unassociated destination features by index.
+	 */
+	public GrowQueue_I32 getUnassociatedDestination();
 
 	/**
 	 * Associations are only considered if their score is less than the specified threshold.  To remove
@@ -65,4 +91,18 @@ public interface Associate {
 	 * @return Type of association score.
 	 */
 	public MatchScoreType getScoreType();
+
+	/**
+	 * If at most one match is returned for each source feature.
+	 *
+	 * @return true for unique source association
+	 */
+	public boolean uniqueSource();
+
+	/**
+	 * If at most one match is returned for each destination feature.
+	 *
+	 * @return true for unique destination association
+	 */
+	public boolean uniqueDestination();
 }

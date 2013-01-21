@@ -43,7 +43,7 @@ import java.util.Random;
  */
 public class TestDetectAssociateTracker extends StandardPointTrackerSpawn<ImageFloat32> {
 
-	DetectAssociateTracker<ImageFloat32,TupleDesc_B,?> dat;
+	DetectAssociateTracker<ImageFloat32,TupleDesc_B> dat;
 
 	public TestDetectAssociateTracker() {
 		super(true, false);
@@ -63,13 +63,13 @@ public class TestDetectAssociateTracker extends StandardPointTrackerSpawn<ImageF
 		ScoreAssociateHamming_B score = new ScoreAssociateHamming_B();
 
 		AssociateDescription2D<TupleDesc_B> association =
-				new AssociateDescTo2D<TupleDesc_B>(FactoryAssociation.greedy(score, 400, 300, true));
+				new AssociateDescTo2D<TupleDesc_B>(FactoryAssociation.greedy(score, 400, true));
 
 		DetectDescribeFusion<ImageFloat32,TupleDesc_B> fused =
 				new DetectDescribeFusion<ImageFloat32,TupleDesc_B>(
 						detector,null,new WrapDescribeBrief<ImageFloat32>(brief));
 
-		dat = new DetectAssociateTracker<ImageFloat32,TupleDesc_B,Object>(fused, association,false);
+		dat = new DetectAssociateTracker<ImageFloat32,TupleDesc_B>(fused, association,false);
 
 
 		return dat;

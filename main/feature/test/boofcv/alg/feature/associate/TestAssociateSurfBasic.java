@@ -95,7 +95,7 @@ public class TestAssociateSurfBasic {
 		assertEquals(4,matches.get(2).dst);
 
 		// see if the expected number of features are in the unassociated list
-		GrowQueue_I32 unassoc = alg.unassociated;
+		GrowQueue_I32 unassoc = alg.unassociatedSrc;
 		assertEquals(2,unassoc.size);
 
 		// make sure none of the unassociated are contained in the associated list
@@ -111,7 +111,7 @@ public class TestAssociateSurfBasic {
 	private AssociateSurfBasic createAlg() {
 
 		ScoreAssociation<TupleDesc_F64> score = new ScoreAssociateEuclidean_F64();
-		AssociateDescription<TupleDesc_F64> assoc = FactoryAssociation.greedy(score, 20, -1, true);
+		AssociateDescription<TupleDesc_F64> assoc = FactoryAssociation.greedy(score, 20, true);
 
 		return new AssociateSurfBasic(assoc);
 	}
@@ -140,7 +140,7 @@ public class TestAssociateSurfBasic {
 		dst.add( createDesc(false,7));
 
 		ScoreAssociation<TupleDesc_F64> score = new ScoreAssociateEuclidean_F64();
-		AssociateDescription<TupleDesc_F64> assoc = FactoryAssociation.greedy(score, 20, -1, true);
+		AssociateDescription<TupleDesc_F64> assoc = FactoryAssociation.greedy(score, 20, true);
 		AssociateSurfBasic alg = new AssociateSurfBasic(assoc);
 
 		alg.setSrc(src);

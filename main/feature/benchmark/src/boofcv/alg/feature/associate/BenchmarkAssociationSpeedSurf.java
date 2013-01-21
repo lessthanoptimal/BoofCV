@@ -116,13 +116,15 @@ public class BenchmarkAssociationSpeedSurf {
 		BenchmarkAssociationSpeedSurf app = new BenchmarkAssociationSpeedSurf();
 
 		ScoreAssociation<TupleDesc_F64> score = FactoryAssociation.scoreEuclidean(TupleDesc_F64.class,true);
-		int maxMatches = 200;
 		
 		int DOF = app.getFeatureLength();
 
-		ProfileOperation.printOpsPerSec(app.createProfile("Greedy", FactoryAssociation.greedy(score, Double.MAX_VALUE, maxMatches, false)),TEST_TIME);
-		ProfileOperation.printOpsPerSec(app.createProfile("Greedy Backwards", FactoryAssociation.greedy(score, Double.MAX_VALUE, maxMatches, true)),TEST_TIME);
-		ProfileOperation.printOpsPerSec(app.createProfile("Random Forest", FactoryAssociation.kdRandomForest(DOF, 500, 15, 5, 1233445565)),TEST_TIME);
+		ProfileOperation.printOpsPerSec(app.createProfile("Greedy",
+				FactoryAssociation.greedy(score, Double.MAX_VALUE,  false)),TEST_TIME);
+		ProfileOperation.printOpsPerSec(app.createProfile("Greedy Backwards",
+				FactoryAssociation.greedy(score, Double.MAX_VALUE,  true)),TEST_TIME);
+		ProfileOperation.printOpsPerSec(app.createProfile("Random Forest",
+				FactoryAssociation.kdRandomForest(DOF, 500, 15, 5, 1233445565)),TEST_TIME);
 		
 	}
 }

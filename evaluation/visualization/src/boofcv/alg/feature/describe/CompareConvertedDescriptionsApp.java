@@ -60,7 +60,7 @@ public class CompareConvertedDescriptionsApp {
 					DescribeRegionPoint<ImageFloat32,TD> describe ,
 					ScoreAssociation<TD> scorer ) {
 
-		AssociateDescription<TD> assoc = FactoryAssociation.greedy(scorer,Double.MAX_VALUE,10000,false);
+		AssociateDescription<TD> assoc = FactoryAssociation.greedy(scorer,Double.MAX_VALUE,false);
 
 		List<Point2D_F64> locationSrc = new ArrayList<Point2D_F64>();
 		List<Point2D_F64> locationDst = new ArrayList<Point2D_F64>();

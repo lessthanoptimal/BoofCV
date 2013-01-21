@@ -61,7 +61,7 @@ public class TestWrapCombinedTracker extends StandardPointTrackerSpawn<ImageFloa
 		ScoreAssociateHamming_B score = new ScoreAssociateHamming_B();
 
 		AssociateDescription<TupleDesc_B> association =
-				FactoryAssociation.greedy(score, 400, 300, true);
+				FactoryAssociation.greedy(score, 400, true);
 
 		pointTracker = FactoryPointSequentialTracker.combined(
 				detector, null,

@@ -22,6 +22,7 @@ import boofcv.struct.FastQueue;
 import boofcv.struct.GrowQueue_I32;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.TupleDesc_F64;
+import org.ddogleg.nn.FactoryNearestNeighbor;
 import org.ddogleg.nn.NearestNeighbor;
 import org.ddogleg.nn.NnData;
 import org.junit.Test;
@@ -34,7 +35,26 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestAssociateNearestNeighbor {
+public class TestAssociateNearestNeighbor extends StandardAssociateDescriptionChecks<TupleDesc_F64> {
+
+	public TestAssociateNearestNeighbor() {
+		super(TupleDesc_F64.class);
+	}
+
+	@Override
+	public AssociateDescription<TupleDesc_F64> createAlg() {
+		// exhaustive algorithm will produce perfect results
+		NearestNeighbor<Integer> exhaustive = FactoryNearestNeighbor.exhaustive();
+		AssociateNearestNeighbor<TupleDesc_F64> alg = new AssociateNearestNeighbor<TupleDesc_F64>(exhaustive,1);
+		return alg;
+	}
+
+	@Override
+	protected TupleDesc_F64 c(double value) {
+		TupleDesc_F64 s = new TupleDesc_F64(1);
+		s.value[0] = value;
+		return s;
+	}
 
 	/**
 	 * Several tests combined into one
@@ -43,8 +63,7 @@ public class TestAssociateNearestNeighbor {
 	public void various() {
 
 		Dummy<Integer> nn = new Dummy<Integer>();
-		// multiple matches for 1 and 2
-		// no match for 3
+		// src = assoc[i] where src is the index of the source feature and i is the index of the dst feature
 		nn.assoc = new int[]{2,0,1,-1,4,-1,-1,2,2,1};
 
 		AssociateNearestNeighbor<TupleDesc_F64> alg = new AssociateNearestNeighbor<TupleDesc_F64>(nn,10);
@@ -68,17 +87,24 @@ public class TestAssociateNearestNeighbor {
 		FastQueue<AssociatedIndex> matches = alg.getMatches();
 		assertTrue(nn.pointDimension == 10);
 
-		assertEquals(2,matches.size);
-		assertEquals(0,matches.get(0).src);
-		assertEquals(1,matches.get(0).dst);
-		assertEquals(4,matches.get(1).src);
-		assertEquals(4,matches.get(1).dst);
+		assertEquals(7,matches.size);
+		for( int i = 0, count = 0; i < nn.assoc.length; i++ ) {
+			if( nn.assoc[i] != -1 ) {
+				int source = nn.assoc[i];
+				assertEquals(source,matches.get(count).src);
+				assertEquals(i,matches.get(count).dst);
+				count++;
+			}
+		}
 
 		GrowQueue_I32 unassoc = alg.getUnassociatedSource();
+		assertEquals(1, unassoc.size);
+		assertEquals(3,unassoc.get(0));
+		unassoc = alg.getUnassociatedDestination();
 		assertEquals(3, unassoc.size);
-		assertEquals(1,unassoc.get(0));
-		assertEquals(2,unassoc.get(1));
-		assertEquals(3,unassoc.get(2));
+		assertEquals(3,unassoc.get(0));
+		assertEquals(5,unassoc.get(1));
+		assertEquals(6,unassoc.get(2));
 	}
 
 	public static class Dummy<D> implements NearestNeighbor<D> {

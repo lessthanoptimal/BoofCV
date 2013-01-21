@@ -81,8 +81,8 @@ public class VisualizeAssociationAlgorithmsApp<T extends ImageSingleBand>
 
 		ScoreAssociation<TupleDesc_F64> score = FactoryAssociation.scoreEuclidean(TupleDesc_F64.class,true);
 
-		addAlgorithm(0, "Greedy", FactoryAssociation.greedy(score, Double.MAX_VALUE, -1, false));
-		addAlgorithm(0, "Greedy Backwards", FactoryAssociation.greedy(score, Double.MAX_VALUE, -1, true));
+		addAlgorithm(0, "Greedy", FactoryAssociation.greedy(score, Double.MAX_VALUE, false));
+		addAlgorithm(0, "Greedy Backwards", FactoryAssociation.greedy(score, Double.MAX_VALUE, true));
 		addAlgorithm(0, "K-D Tree BBF", FactoryAssociation.kdtree(DOF, 75));
 		addAlgorithm(0, "Random Forest", FactoryAssociation.kdRandomForest(DOF, 75, 10, 5, 1233445565));
 

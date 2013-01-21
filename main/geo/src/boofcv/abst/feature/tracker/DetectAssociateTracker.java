@@ -35,11 +35,11 @@ import georegression.struct.point.Point2D_F64;
  *
  * @author Peter Abeles
  */
-public class DetectAssociateTracker<I extends ImageSingleBand, TD extends TupleDesc,Aux>
-		extends DetectAssociateBase<I, TD,Aux> {
+public class DetectAssociateTracker<I extends ImageSingleBand, Desc extends TupleDesc>
+		extends DetectAssociateBase<I, Desc> {
 
 	// Feature detector and describer
-	protected DetectDescribePoint<I, TD> detDesc;
+	protected DetectDescribePoint<I, Desc> detDesc;
 
 	/**
 	 * Configures tracker
@@ -49,15 +49,15 @@ public class DetectAssociateTracker<I extends ImageSingleBand, TD extends TupleD
 	 * @param updateDescription If true then the feature description will be updated after each image.
 	 *                          Typically this should be false.
 	 */
-	public DetectAssociateTracker( final DetectDescribePoint<I, TD> detDesc ,
-								   final AssociateDescription2D<TD> associate ,
+	public DetectAssociateTracker( final DetectDescribePoint<I, Desc> detDesc ,
+								   final AssociateDescription2D<Desc> associate ,
 								   final boolean updateDescription ) {
 		super(associate,updateDescription,detDesc.getDescriptionType());
 		this.detDesc = detDesc;
 	}
 
 	@Override
-	protected void detectFeatures(I input, FastQueue<Point2D_F64> locDst, FastQueue<TD> featDst) {
+	protected void detectFeatures(I input, FastQueue<Point2D_F64> locDst, FastQueue<Desc> featDst) {
 		detDesc.detect(input);
 
 		int N = detDesc.getNumberOfFeatures();
@@ -68,17 +68,18 @@ public class DetectAssociateTracker<I extends ImageSingleBand, TD extends TupleD
 	}
 
 	@Override
-	protected TD createDescription() {
+	public Desc createDescription() {
 		return detDesc.createDescription();
 	}
 
 	@Override
-	public Aux getAuxiliary(PointTrack track) {
-		return null;
+	public int getDescriptionLength() {
+		return detDesc.getDescriptionLength();
 	}
 
 	@Override
-	public PointTrack addTrack(double x, double y, Object auxiliary) {
-		return null;
+	public Class<Desc> getDescriptionType() {
+		return detDesc.getDescriptionType();
 	}
+
 }

@@ -50,10 +50,13 @@ public abstract class BaseAssociateLocation2DFilter<D> implements AssociateDescr
 
 
 	// list of source features not associated
-	private GrowQueue_I32 unassociated = new GrowQueue_I32();
+	private GrowQueue_I32 unassociatedSrc = new GrowQueue_I32();
 
 	// list of features that have been matched with each other
 	private FastQueue<AssociatedIndex> matched = new FastQueue<AssociatedIndex>(10,AssociatedIndex.class,true);
+
+	// creates a list of unassociated features from the list of matches
+	FindUnassociated unassociated = new FindUnassociated();
 
 	boolean backwardsValidation = true;
 
@@ -104,7 +107,7 @@ public abstract class BaseAssociateLocation2DFilter<D> implements AssociateDescr
 	@Override
 	public void associate() {
 
-		unassociated.reset();
+		unassociatedSrc.reset();
 		matched.reset();
 
 		for( int i = 0; i < locationSrc.size(); i++ ) {
@@ -131,7 +134,7 @@ public abstract class BaseAssociateLocation2DFilter<D> implements AssociateDescr
 			}
 
 			if( bestIndex == -1 ) {
-				unassociated.add(i);
+				unassociatedSrc.add(i);
 				continue;
 			}
 
@@ -160,7 +163,7 @@ public abstract class BaseAssociateLocation2DFilter<D> implements AssociateDescr
 				}
 
 				if( bestIndexV != i ) {
-					unassociated.add(i);
+					unassociatedSrc.add(i);
 					continue;
 				}
 			}
@@ -179,7 +182,12 @@ public abstract class BaseAssociateLocation2DFilter<D> implements AssociateDescr
 
 	@Override
 	public GrowQueue_I32 getUnassociatedSource() {
-		return unassociated;
+		return unassociatedSrc;
+	}
+
+	@Override
+	public GrowQueue_I32 getUnassociatedDestination() {
+		return unassociated.checkDestination(matched,locationDst.size());
 	}
 
 	@Override
@@ -190,5 +198,15 @@ public abstract class BaseAssociateLocation2DFilter<D> implements AssociateDescr
 	@Override
 	public MatchScoreType getScoreType() {
 		return scoreAssociation.getScoreType();
+	}
+
+	@Override
+	public boolean uniqueSource() {
+		return true;
+	}
+
+	@Override
+	public boolean uniqueDestination() {
+		return false;
 	}
 }

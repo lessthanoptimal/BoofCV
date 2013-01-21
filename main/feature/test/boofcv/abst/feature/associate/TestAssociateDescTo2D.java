@@ -50,7 +50,7 @@ public class TestAssociateDescTo2D {
 		assertTrue(listDst == dummy.listDst);
 		assertTrue(dummy.calledAssociate);
 		assertTrue(dummy.matches == alg.getMatches());
-		assertTrue(dummy.unassociated == alg.getUnassociatedSource());
+		assertTrue(dummy.unassociatedSrc == alg.getUnassociatedSource());
 		assertTrue(10.5 == dummy.threshold);
 		assertTrue(MatchScoreType.CORRELATION==alg.getScoreType());
 	}
@@ -61,7 +61,8 @@ public class TestAssociateDescTo2D {
 		public FastQueue<TupleDesc_F64> listDst;
 		public boolean calledAssociate = false;
 		public FastQueue<AssociatedIndex> matches = new FastQueue<AssociatedIndex>(10,AssociatedIndex.class,false);
-		public GrowQueue_I32 unassociated = new GrowQueue_I32(10);
+		public GrowQueue_I32 unassociatedSrc = new GrowQueue_I32(10);
+		public GrowQueue_I32 unassociatedDst = new GrowQueue_I32(10);
 		public double threshold;
 
 		@Override
@@ -86,7 +87,12 @@ public class TestAssociateDescTo2D {
 
 		@Override
 		public GrowQueue_I32 getUnassociatedSource() {
-			return unassociated;
+			return unassociatedSrc;
+		}
+
+		@Override
+		public GrowQueue_I32 getUnassociatedDestination() {
+			return unassociatedDst;
 		}
 
 		@Override
@@ -97,6 +103,16 @@ public class TestAssociateDescTo2D {
 		@Override
 		public MatchScoreType getScoreType() {
 			return MatchScoreType.CORRELATION;
+		}
+
+		@Override
+		public boolean uniqueSource() {
+			return false;
+		}
+
+		@Override
+		public boolean uniqueDestination() {
+			return false;
 		}
 	}
 

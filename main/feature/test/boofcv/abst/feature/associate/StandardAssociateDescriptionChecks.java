@@ -19,54 +19,73 @@
 package boofcv.abst.feature.associate;
 
 import boofcv.struct.FastQueue;
-import boofcv.struct.GrowQueue_I32;
 import boofcv.struct.feature.AssociatedIndex;
+import boofcv.struct.feature.MatchScoreType;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Standard tests for implementations of AssociateDescription
  *
  * @author Peter Abeles
  */
-public abstract class StandardAssociateDescriptionChecks<D> {
+public abstract class StandardAssociateDescriptionChecks<Desc> {
+
+	FastQueue<Desc> listSrc;
+	FastQueue<Desc> listDst;
+
+	protected StandardAssociateDescriptionChecks( Class<Desc> descType ) {
+		listSrc = new FastQueue<Desc>(descType,false);
+		listDst = new FastQueue<Desc>(descType,false);
+	}
+
+	public void allTests() {
+		checkScoreType();
+		basicTests();
+		checkDefaultThreshold();
+		checkSetThreshold();
+		uniqueSource();
+		uniqueDestination();
+	}
 
 	/**
 	 * Match error must be less than the specified euclidean error
 	 */
-	public abstract AssociateDescription<D> createAlg();
+	public abstract AssociateDescription<Desc> createAlg();
+
+	protected void init() {
+		listSrc.reset();
+		listDst.reset();
+	}
+
+	@Test
+	public void checkScoreType() {
+		AssociateDescription<Desc> alg = createAlg();
+
+		assertTrue("Test are designed for norm error",MatchScoreType.NORM_ERROR == alg.getScoreType());
+	}
 
 	/**
-	 * Adds a feature pair to the list with the specified amount of error between the pair
-	 */
-	public abstract void addFeature( FastQueue<D> listSrc , FastQueue<D> listDst , double error );
-
-	public abstract Class<D> getDescType();
-
-	/**
-	 * Perform basic tests to make sure AssociateDescription is correctly
-	 * being implemented.
+	 * Basic tests where there should be unique association in both direction
 	 */
 	@Test
 	public void basicTests() {
 		// test the cases where the number of matches is more than and less than the maximum
-		performBasicTest(20, 30);
-		performBasicTest(40, 30);
+		performBasicTest(20);
+		performBasicTest(40);
 	}
 
-	private void performBasicTest(int numFeatures, int maxAssoc) {
+	private void performBasicTest(int numFeatures ) {
+		init();
 
-		double maxError = 0.001*(maxAssoc+0.5);
-
-		AssociateDescription<D> alg = createAlg();
-		alg.setThreshold(maxError);
-
-		FastQueue<D> listSrc = new FastQueue<D>(numFeatures,getDescType(),false);
-		FastQueue<D> listDst = new FastQueue<D>(numFeatures,getDescType(),false);
+		AssociateDescription<Desc> alg = createAlg();
+		alg.setThreshold(0.01);
 
 		for( int i = 0; i < numFeatures; i++ ) {
-			addFeature(listSrc, listDst, (i + 1) * 0.001);
+			listSrc.add(c(i+1) );
+			listDst.add(c(i + 1 + 0.001));
 		}
 
 		alg.setSource(listSrc);
@@ -75,8 +94,8 @@ public abstract class StandardAssociateDescriptionChecks<D> {
 
 		FastQueue<AssociatedIndex> matches = alg.getMatches();
 
-		// check to see that max assoc is being obeyed.
-		assertEquals(Math.min(maxAssoc,numFeatures),matches.size());
+		// Every features should be associated
+		assertEquals(numFeatures,matches.size());
 
 		// see if everything is assigned as expected
 		for( int i = 0; i < matches.size(); i++ ) {
@@ -93,18 +112,26 @@ public abstract class StandardAssociateDescriptionChecks<D> {
 			assertEquals(1,numMatches);
 		}
 
-		// see if the expected number of features are in the unassociated list
-		GrowQueue_I32 unassoc = alg.getUnassociatedSource();
-		assertEquals(Math.max(numFeatures-maxAssoc,0),unassoc.size);
+		// in this example there should be perfect unambiguous associations
+		assertEquals(0,alg.getUnassociatedSource().size);
+		assertEquals(0,alg.getUnassociatedDestination().size);
+	}
 
-		// make sure none of the unassociated are contained in the associated list
-		for( int i = 0; i < unassoc.size; i++ ) {
-			int index = unassoc.data[i];
-			for( int j = 0; j < matches.size(); j++ ) {
-				if( matches.get(j).src == index )
-					fail("match found");
-			}
-		}
+	/**
+	 * The default threshold should allow for all matches to work
+	 */
+	@Test
+	public void checkDefaultThreshold() {
+		init();
+
+		listSrc.add( c(1) );
+		listDst.add( c(100) );
+
+		AssociateDescription<Desc> alg = createAlg();
+		alg.setSource(listSrc);
+		alg.setDestination(listDst);
+		alg.associate();
+		assertEquals(1,alg.getMatches().size);
 	}
 
 	/**
@@ -112,15 +139,12 @@ public abstract class StandardAssociateDescriptionChecks<D> {
 	 */
 	@Test
 	public void checkSetThreshold() {
-		int numFeatures = 10;
+		init();
 
-		AssociateDescription<D> alg = createAlg();
+		listSrc.add( c(1) );
+		listDst.add( c(1+0.1) );
 
-		FastQueue<D> listSrc = new FastQueue<D>(numFeatures,getDescType(),false);
-		FastQueue<D> listDst = new FastQueue<D>(numFeatures,getDescType(),false);
-
-		addFeature(listSrc,listDst,0.1);
-
+		AssociateDescription<Desc> alg = createAlg();
 		alg.setSource(listSrc);
 		alg.setDestination(listDst);
 
@@ -144,4 +168,94 @@ public abstract class StandardAssociateDescriptionChecks<D> {
 		alg.associate();
 		assertEquals(1,alg.getMatches().size);
 	}
+
+	@Test
+	public void checkUnassociatedLists() {
+		init();
+
+		AssociateDescription<Desc> alg = createAlg();
+
+		listSrc.add( c(1) );
+		listSrc.add( c(2) );
+		listSrc.add( c(3) );
+		listDst.add( c(1+0.1) );
+		listDst.add( c(2+0.05) );
+		listDst.add( c(3+0.05) );
+		listDst.add( c(20) );  // can't be paired with anything
+
+		// set threshold so that on pair won't be considered
+		alg.setThreshold(0.07);
+		alg.setSource(listSrc);
+		alg.setDestination(listDst);
+		alg.associate();
+
+		assertEquals(2,alg.getMatches().size);
+		assertEquals(1,alg.getUnassociatedSource().size);
+		assertEquals(2,alg.getUnassociatedDestination().size);
+	}
+
+	@Test
+	public void uniqueSource() {
+		init();
+
+		listSrc.add(c(1));
+		listDst.add( c(1) );
+		listDst.add( c(1.001) );
+
+		AssociateDescription<Desc> alg = createAlg();
+		alg.setSource(listSrc);
+		alg.setDestination(listDst);
+		alg.associate();
+
+		if( alg.uniqueSource() ) {
+			assertEquals(1,numMatchesSrc(0,alg.getMatches()));
+		} else {
+			// both dst will match up the first src
+			assertEquals(2,numMatchesSrc(0,alg.getMatches()));
+		}
+	}
+
+	@Test
+	public void uniqueDestination() {
+		init();
+
+		listSrc.add( c(1) );
+		listSrc.add( c(1.001) );
+		listDst.add( c(1) );
+
+		AssociateDescription<Desc> alg = createAlg();
+		alg.setSource(listSrc);
+		alg.setDestination(listDst);
+		alg.associate();
+
+		if( alg.uniqueDestination() ) {
+			assertEquals(1,numMatchesDst(0, alg.getMatches()));
+		} else {
+			// both src will match up the first dst
+			assertEquals(2,numMatchesDst(0, alg.getMatches()));
+		}
+	}
+
+	private int numMatchesSrc( int index , FastQueue<AssociatedIndex> list ) {
+		int ret = 0;
+		for( AssociatedIndex l : list.toList() ) {
+			if( l.src == index )
+				ret++;
+		}
+		return ret;
+	}
+
+	private int numMatchesDst( int index , FastQueue<AssociatedIndex> list ) {
+		int ret = 0;
+		for( AssociatedIndex l : list.toList() ) {
+			if( l.dst == index )
+				ret++;
+		}
+		return ret;
+	}
+
+	/**
+	 * Creates a description with the specified value
+	 */
+	protected abstract Desc c( double value );
 }

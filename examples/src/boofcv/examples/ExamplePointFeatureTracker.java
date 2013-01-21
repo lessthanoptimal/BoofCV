@@ -139,7 +139,7 @@ public class ExamplePointFeatureTracker< T extends ImageSingleBand, D extends Im
 		configDetector.maxFeaturesPerScale = 200;
 		configDetector.extractRadius = 3;
 		configDetector.initialSampleSize = 2;
-		tracker = FactoryPointSequentialTracker.dda_FH_SURF_Fast(200,configDetector,null,null, imageType);
+		tracker = FactoryPointSequentialTracker.dda_FH_SURF_Fast(configDetector,null,null, imageType);
 	}
 
 	public static void main( String args[] ) throws FileNotFoundException {

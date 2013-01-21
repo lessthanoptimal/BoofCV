@@ -49,7 +49,7 @@ public class AssociateSurfBasic {
 	FastQueue<AssociatedIndex> matches = new FastQueue<AssociatedIndex>(10,AssociatedIndex.class,true);
 
 	// indexes of unassociated features
-	GrowQueue_I32 unassociated = new GrowQueue_I32();
+	GrowQueue_I32 unassociatedSrc = new GrowQueue_I32();
 
 	public AssociateSurfBasic(AssociateDescription<TupleDesc_F64> assoc) {
 		this.assoc = assoc;
@@ -84,7 +84,7 @@ public class AssociateSurfBasic {
 	{
 		// initialize data structures
 		matches.reset();
-		unassociated.reset();
+		unassociatedSrc.reset();
 
 		// find and add the matches
 		assoc.setSource((FastQueue)srcPositive);
@@ -99,7 +99,7 @@ public class AssociateSurfBasic {
 		}
 		GrowQueue_I32 un = assoc.getUnassociatedSource();
 		for( int i = 0; i < un.size; i++ ) {
-			unassociated.add( srcPositive.data[un.get(i)].index );
+			unassociatedSrc.add(srcPositive.data[un.get(i)].index);
 		}
 		assoc.setSource((FastQueue)srcNegative);
 		assoc.setDestination((FastQueue) dstNegative);
@@ -113,7 +113,7 @@ public class AssociateSurfBasic {
 		}
 		un = assoc.getUnassociatedSource();
 		for( int i = 0; i < un.size; i++ ) {
-			unassociated.add( srcNegative.data[un.get(i)].index );
+			unassociatedSrc.add(srcNegative.data[un.get(i)].index);
 		}
 	}
 
@@ -144,8 +144,12 @@ public class AssociateSurfBasic {
 		}
 	}
 
-	public GrowQueue_I32 getUnassociated() {
-		return unassociated;
+	public int totalDestination() {
+		return dstNegative.size + dstPositive.size;
+	}
+
+	public GrowQueue_I32 getUnassociatedSrc() {
+		return unassociatedSrc;
 	}
 
 	public AssociateDescription<TupleDesc_F64> getAssoc() {

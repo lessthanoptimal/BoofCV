@@ -48,7 +48,7 @@ public class AssociateGreedy<D> {
 	// computes association score
 	private ScoreAssociation<D> score;
 	// worst allowed fit score to associate
-	private double maxFitError;
+	private double maxFitError = Double.MAX_VALUE;
 	// stores the quality of fit score
 	private GrowQueue_F64 fitQuality = new GrowQueue_F64(100);
 	// stores indexes of associated
@@ -62,18 +62,12 @@ public class AssociateGreedy<D> {
 	 * Configure association
 	 *
 	 * @param score Computes the association score.
-	 * @param maxFitError Maximum allowed fit error.  To disable set to Double.MAX_VALUE
 	 * @param backwardsValidation If true then backwards validation is performed.
 	 */
 	public AssociateGreedy(ScoreAssociation<D> score,
-						   double maxFitError,
 						   boolean backwardsValidation) {
 		this.score = score;
-		this.maxFitError = maxFitError;
 		this.backwardsValidation = backwardsValidation;
-
-		// TODO if lower is not better flip sign
-		// TODO update unit test to make sure this is handled
 	}
 
 	/**
@@ -121,7 +115,7 @@ public class AssociateGreedy<D> {
 				double scoreToBeat = workBuffer.data[i*dst.size+match];
 
 				for( int j = 0; j < src.size; j++ , match += dst.size ) {
-					if( workBuffer.data[match] < scoreToBeat ) {
+					if( workBuffer.data[match] <= scoreToBeat && j != i) {
 						pairs.data[i] = -1;
 						fitQuality.data[i] = Double.MAX_VALUE;
 						break;
@@ -158,5 +152,9 @@ public class AssociateGreedy<D> {
 
 	public ScoreAssociation<D> getScore() {
 		return score;
+	}
+
+	public boolean isBackwardsValidation() {
+		return backwardsValidation;
 	}
 }

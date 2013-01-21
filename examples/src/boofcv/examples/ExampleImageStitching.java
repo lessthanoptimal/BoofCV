@@ -142,7 +142,7 @@ public class ExampleImageStitching {
 		DetectDescribePoint detDesc = FactoryDetectDescribe.surfStable(
 				new ConfigFastHessian(1, 2, 200, 1, 9, 4, 4), null,null, imageType);
 		ScoreAssociation<SurfFeature> scorer = FactoryAssociation.scoreEuclidean(SurfFeature.class,true);
-		AssociateDescription<SurfFeature> associate = FactoryAssociation.greedy(scorer,2,-1,true);
+		AssociateDescription<SurfFeature> associate = FactoryAssociation.greedy(scorer,2,true);
 
 		// fit the images using a homography.  This works well for rotations and distant objects.
 		GenerateHomographyLinear modelFitter = new GenerateHomographyLinear(true);
