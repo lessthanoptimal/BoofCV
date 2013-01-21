@@ -19,6 +19,7 @@
 package boofcv.abst.sfm;
 
 import boofcv.abst.feature.tracker.PointTrack;
+import boofcv.alg.feature.associate.AssociateStereo2D;
 import boofcv.alg.geo.DistanceModelMonoPixels;
 import boofcv.alg.geo.pose.PnPStereoDistanceReprojectionSq;
 import boofcv.alg.geo.pose.PnPStereoEstimator;
@@ -49,6 +50,7 @@ public class WrapVisOdomStereoPnP<T extends ImageSingleBand>
 	PnPStereoEstimator pnp;
 	DistanceModelMonoPixels<Se3_F64,Point2D3D> distanceMono;
 	PnPStereoDistanceReprojectionSq distanceStereo;
+	AssociateStereo2D<?> assoc;
 
 	VisOdomStereoPnP<T,?> alg;
 
@@ -59,12 +61,14 @@ public class WrapVisOdomStereoPnP<T extends ImageSingleBand>
 	public WrapVisOdomStereoPnP(PnPStereoEstimator pnp,
 								DistanceModelMonoPixels<Se3_F64, Point2D3D> distanceMono,
 								PnPStereoDistanceReprojectionSq distanceStereo,
+								AssociateStereo2D<?> assoc,
 								VisOdomStereoPnP<T,?> alg ,
 								RefinePnPStereo refine ,
 								Class<T> imageType ) {
 		this.pnp = pnp;
 		this.distanceMono = distanceMono;
 		this.distanceStereo = distanceStereo;
+		this.assoc = assoc;
 		this.alg = alg;
 		this.refine = refine;
 		this.imageType = imageType;
@@ -125,6 +129,7 @@ public class WrapVisOdomStereoPnP<T extends ImageSingleBand>
 		IntrinsicParameters left = parameters.left;
 		distanceMono.setIntrinsic(left.fx,left.fy,left.skew);
 		distanceStereo.setStereoParameters(parameters);
+		assoc.setCalibration(parameters);
 	}
 
 	@Override

@@ -124,7 +124,7 @@ public class ExampleAssociatePoints<T extends ImageSingleBand, FD extends TupleD
 				new ConfigFastHessian(1, 2, 200, 1, 9, 4, 4), null,null, imageType);
 
 		ScoreAssociation scorer = FactoryAssociation.defaultScore(detDesc.getDescriptionType());
-		AssociateDescription associate = FactoryAssociation.greedy(scorer, Double.MAX_VALUE, -1, true);
+		AssociateDescription associate = FactoryAssociation.greedy(scorer, Double.MAX_VALUE, true);
 
 		// load and match images
 		ExampleAssociatePoints app = new ExampleAssociatePoints(detDesc,associate,imageType);

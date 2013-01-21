@@ -65,7 +65,6 @@ import java.util.List;
 // todo show partial results
 public class VisualizeAssociationMatchesApp<T extends ImageSingleBand, D extends ImageSingleBand>
 		extends SelectAlgorithmAndInputPanel {
-	int maxMatches = 200;
 
 	InterestPointDetector<T> detector;
 	DescribeRegionPoint<T, TupleDesc> describe;
@@ -151,7 +150,7 @@ public class VisualizeAssociationMatchesApp<T extends ImageSingleBand, D extends
 
 	private AssociateDescription createMatcher() {
 		ScoreAssociation scorer = FactoryAssociation.defaultScore(describe.getDescriptionType());
-		return FactoryAssociation.greedy(scorer, Double.MAX_VALUE, maxMatches, associateBackwards);
+		return FactoryAssociation.greedy(scorer, Double.MAX_VALUE, associateBackwards);
 	}
 
 	@Override

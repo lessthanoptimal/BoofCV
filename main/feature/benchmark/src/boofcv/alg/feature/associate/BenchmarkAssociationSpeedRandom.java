@@ -87,10 +87,9 @@ public class BenchmarkAssociationSpeedRandom {
 		System.out.println();
 
 		ScoreAssociation<TupleDesc_F64> score = FactoryAssociation.scoreEuclidean(TupleDesc_F64.class,true);
-		int maxMatches = 200;
 
-		ProfileOperation.printOpsPerSec(new General("Greedy", FactoryAssociation.greedy(score, Double.MAX_VALUE, maxMatches, false)),TEST_TIME);
-		ProfileOperation.printOpsPerSec(new General("Greedy Backwards", FactoryAssociation.greedy(score, Double.MAX_VALUE, maxMatches, true)),TEST_TIME);
+		ProfileOperation.printOpsPerSec(new General("Greedy", FactoryAssociation.greedy(score, Double.MAX_VALUE, false)),TEST_TIME);
+		ProfileOperation.printOpsPerSec(new General("Greedy Backwards", FactoryAssociation.greedy(score, Double.MAX_VALUE, true)),TEST_TIME);
 		ProfileOperation.printOpsPerSec(new General("Random Forest", FactoryAssociation.kdRandomForest(DOF,500,15,5,1233445565)),TEST_TIME);
 		
 	}

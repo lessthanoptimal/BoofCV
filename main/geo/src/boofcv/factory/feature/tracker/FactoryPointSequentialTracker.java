@@ -130,7 +130,6 @@ public class FactoryPointSequentialTracker {
 	 * @see DescribePointSurf
 	 * @see DetectAssociateTracker
 	 *
-	 * @param maxTracks The maximum number of tracks it will return. A value <= 0 will return all.
 	 * @param configDetector Configuration for SURF detector
 	 * @param configDescribe Configuration for SURF descriptor
 	 * @param configOrientation Configuration for orientation
@@ -139,14 +138,14 @@ public class FactoryPointSequentialTracker {
 	 */
 	// TODO remove maxTracks?  Use number of detected instead
 	public static <I extends ImageSingleBand>
-	PointTrackerAux<I,?> dda_FH_SURF_Fast(int maxTracks,
+	PointTrackerD<I,SurfFeature> dda_FH_SURF_Fast(
 										  ConfigFastHessian configDetector ,
 										  ConfigSurfDescribe.Speed configDescribe ,
 										  ConfigAverageIntegral configOrientation ,
 										  Class<I> imageType)
 	{
 		ScoreAssociation<TupleDesc_F64> score = FactoryAssociation.scoreEuclidean(TupleDesc_F64.class, true);
-		AssociateSurfBasic assoc = new AssociateSurfBasic(FactoryAssociation.greedy(score, 5, maxTracks, true));
+		AssociateSurfBasic assoc = new AssociateSurfBasic(FactoryAssociation.greedy(score, 5, true));
 
 		AssociateDescription2D<SurfFeature> generalAssoc =
 				new AssociateDescTo2D<SurfFeature>(new WrapAssociateSurfBasic(assoc));
@@ -154,7 +153,7 @@ public class FactoryPointSequentialTracker {
 		DetectDescribePoint<I,SurfFeature> fused =
 				FactoryDetectDescribe.surfFast(configDetector, configDescribe, configOrientation, imageType);
 
-		return new DetectAssociateTracker<I,SurfFeature,Object>(fused, generalAssoc,false);
+		return new DetectAssociateTracker<I,SurfFeature>(fused, generalAssoc,false);
 	}
 
 	/**
@@ -164,7 +163,6 @@ public class FactoryPointSequentialTracker {
 	 * @see DescribePointSurf
 	 * @see DetectAssociateTracker
 	 *
-	 * @param maxTracks The maximum number of tracks it will return. A value <= 0 will return all.
 	 * @param configDetector Configuration for SURF detector
 	 * @param configDescribe Configuration for SURF descriptor
 	 * @param configOrientation Configuration for orientation
@@ -173,14 +171,14 @@ public class FactoryPointSequentialTracker {
 	 */
 	// TODO remove maxTracks?  Use number of detected instead
 	public static <I extends ImageSingleBand>
-	PointTrackerAux<I,?> dda_FH_SURF_Stable(int maxTracks,
+	PointTrackerD<I,SurfFeature> dda_FH_SURF_Stable(
 											ConfigFastHessian configDetector ,
 											ConfigSurfDescribe.Stablility configDescribe ,
 											ConfigSlidingIntegral configOrientation ,
 											Class<I> imageType)
 	{
 		ScoreAssociation<TupleDesc_F64> score = FactoryAssociation.scoreEuclidean(TupleDesc_F64.class, true);
-		AssociateSurfBasic assoc = new AssociateSurfBasic(FactoryAssociation.greedy(score, 5, maxTracks, true));
+		AssociateSurfBasic assoc = new AssociateSurfBasic(FactoryAssociation.greedy(score, 5, true));
 
 		AssociateDescription2D<SurfFeature> generalAssoc =
 				new AssociateDescTo2D<SurfFeature>(new WrapAssociateSurfBasic(assoc));
@@ -188,7 +186,7 @@ public class FactoryPointSequentialTracker {
 		DetectDescribePoint<I,SurfFeature> fused =
 				FactoryDetectDescribe.surfStable(configDetector,configDescribe,configOrientation,imageType);
 
-		return new DetectAssociateTracker<I,SurfFeature,Object>(fused, generalAssoc,false);
+		return new DetectAssociateTracker<I,SurfFeature>(fused, generalAssoc,false);
 	}
 
 	/**
@@ -204,7 +202,7 @@ public class FactoryPointSequentialTracker {
 	 * @param derivType Type of image used to store the image derivative. null == use default
 	 */
 	public static <I extends ImageSingleBand, D extends ImageSingleBand>
-	PointTrackerAux<I,?> dda_ST_BRIEF(int maxAssociationError,
+	PointTrackerD<I,TupleDesc_B> dda_ST_BRIEF(int maxAssociationError,
 									  ConfigGeneralDetector configExtract,
 									  Class<I> imageType, Class<D> derivType)
 	{
@@ -221,13 +219,12 @@ public class FactoryPointSequentialTracker {
 
 		AssociateDescription2D<TupleDesc_B> association =
 				new AssociateDescTo2D<TupleDesc_B>(
-						FactoryAssociation.greedy(score, maxAssociationError, configExtract.maxFeatures, true));
+						FactoryAssociation.greedy(score, maxAssociationError, true));
 
 		DetectDescribeFusion<I,TupleDesc_B> fused =
 				new DetectDescribeFusion<I,TupleDesc_B>(detector,null,new WrapDescribeBrief<I>(brief));
 
-		return new DetectAssociateTracker<I,TupleDesc_B,Object>
-				(fused, association,false);
+		return new DetectAssociateTracker<I,TupleDesc_B>(fused, association,false);
 	}
 
 	/**
@@ -245,7 +242,7 @@ public class FactoryPointSequentialTracker {
 	 * @param imageType           Type of image being processed.
 	 */
 	public static <I extends ImageSingleBand, D extends ImageSingleBand>
-	PointTrackerAux<I,?> dda_FAST_BRIEF(int maxFeatures, int maxAssociationError,
+	PointTrackerD<I,TupleDesc_B> dda_FAST_BRIEF(int maxFeatures, int maxAssociationError,
 										int extractRadius,
 										int minContinuous,
 										int detectThreshold,
@@ -261,13 +258,12 @@ public class FactoryPointSequentialTracker {
 
 		AssociateDescription2D<TupleDesc_B> association =
 				new AssociateDescTo2D<TupleDesc_B>(
-						FactoryAssociation.greedy(score, maxAssociationError, maxFeatures, true));
+						FactoryAssociation.greedy(score, maxAssociationError, true));
 
 		DetectDescribeFusion<I,TupleDesc_B> fused =
 				new DetectDescribeFusion<I,TupleDesc_B>(detector,null,new WrapDescribeBrief<I>(brief));
 
-		return new DetectAssociateTracker<I,TupleDesc_B,Object>
-				(fused, association,false);
+		return new DetectAssociateTracker<I,TupleDesc_B>(fused, association,false);
 	}
 
 	/**
@@ -282,7 +278,7 @@ public class FactoryPointSequentialTracker {
 	 * @param imageType      Type of image being processed.
 	 * @param derivType      Type of image used to store the image derivative. null == use default     */
 	public static <I extends ImageSingleBand, D extends ImageSingleBand>
-	PointTrackerAux<I,?> dda_ST_NCC(ConfigGeneralDetector configExtract, int describeRadius,
+	PointTrackerD<I,NccFeature> dda_ST_NCC(ConfigGeneralDetector configExtract, int describeRadius,
 									Class<I> imageType, Class<D> derivType) {
 
 		if( derivType == null )
@@ -299,13 +295,12 @@ public class FactoryPointSequentialTracker {
 
 		AssociateDescription2D<NccFeature> association =
 				new AssociateDescTo2D<NccFeature>(
-						FactoryAssociation.greedy(score, Double.MAX_VALUE, configExtract.maxFeatures, true));
+						FactoryAssociation.greedy(score, Double.MAX_VALUE, true));
 
 		DetectDescribeFusion<I,NccFeature> fused =
 				new DetectDescribeFusion<I,NccFeature>(detector,null,new WrapDescribePixelRegionNCC<I>(alg));
 
-		return new DetectAssociateTracker<I,NccFeature,Object>
-				(fused, association,false);
+		return new DetectAssociateTracker<I,NccFeature>(fused, association,false);
 	}
 
 	/**
@@ -321,7 +316,7 @@ public class FactoryPointSequentialTracker {
 	 * @return tracker
 	 */
 	public static <I extends ImageSingleBand, Desc extends TupleDesc>
-	DetectAssociateTracker<I,Desc,?> detectDescribeAssociate(InterestPointDetector<I> detector,
+	DetectAssociateTracker<I,Desc> detectDescribeAssociate(InterestPointDetector<I> detector,
 															 OrientationImage<I> orientation ,
 															 DescribeRegionPoint<I, Desc> describe,
 															 AssociateDescription2D<Desc> associate ,
@@ -330,8 +325,8 @@ public class FactoryPointSequentialTracker {
 		DetectDescribeFusion<I,Desc> fused =
 				new DetectDescribeFusion<I,Desc>(detector,orientation,describe);
 
-		DetectAssociateTracker<I,Desc,?> dat =
-				new DetectAssociateTracker<I,Desc,Object>(fused, associate,updateDescription);
+		DetectAssociateTracker<I,Desc> dat =
+				new DetectAssociateTracker<I,Desc>(fused, associate,updateDescription);
 
 		return dat;
 	}
@@ -342,8 +337,6 @@ public class FactoryPointSequentialTracker {
 	 * @see DescribePointSurf
 	 * @see DetectAssociateTracker
 	 *
-	 * @param maxMatches     The maximum number of matched features that will be considered.
-	 *                       Set to a value <= 0 to not bound the number of matches.
 	 * @param trackRadius Size of feature being tracked by KLT
 	 * @param pyramidScalingKlt Image pyramid used for KLT
 	 * @param reactivateThreshold Tracks are reactivated after this many have been dropped.  Try 10% of maxMatches
@@ -355,8 +348,7 @@ public class FactoryPointSequentialTracker {
 	 * @return SURF based tracker.
 	 */
 	public static <I extends ImageSingleBand>
-	PointTrackerAux<I,?> combined_FH_SURF_KLT(int maxMatches,
-											  int trackRadius,
+	PointTrackerAux<I,?> combined_FH_SURF_KLT(int trackRadius,
 											  int[] pyramidScalingKlt ,
 											  int reactivateThreshold ,
 											  ConfigFastHessian configDetector ,
@@ -365,7 +357,7 @@ public class FactoryPointSequentialTracker {
 											  Class<I> imageType) {
 
 		ScoreAssociation<TupleDesc_F64> score = FactoryAssociation.scoreEuclidean(TupleDesc_F64.class, true);
-		AssociateSurfBasic assoc = new AssociateSurfBasic(FactoryAssociation.greedy(score, 100000, maxMatches, true));
+		AssociateSurfBasic assoc = new AssociateSurfBasic(FactoryAssociation.greedy(score, 100000, true));
 
 		AssociateDescription<SurfFeature> generalAssoc = new WrapAssociateSurfBasic(assoc);
 
@@ -415,8 +407,7 @@ public class FactoryPointSequentialTracker {
 				= FactoryDescribeRegionPoint.surfStable(configDescribe, imageType);
 
 		ScoreAssociation<TupleDesc_F64> score = FactoryAssociation.scoreEuclidean(TupleDesc_F64.class, true);
-		AssociateSurfBasic assoc = new AssociateSurfBasic(FactoryAssociation.greedy(score, 100000,
-				configExtract.maxFeatures, true));
+		AssociateSurfBasic assoc = new AssociateSurfBasic(FactoryAssociation.greedy(score, 100000, true));
 
 		AssociateDescription<SurfFeature> generalAssoc = new WrapAssociateSurfBasic(assoc);
 
@@ -495,7 +486,7 @@ public class FactoryPointSequentialTracker {
 
 
 	public static <I extends ImageSingleBand, D extends ImageSingleBand, Desc extends TupleDesc>
-	PointTrackerAux<I,?> ddaUser( GeneralFeatureDetector<I, D> detector,
+	PointTrackerD<I,Desc> ddaUser( GeneralFeatureDetector<I, D> detector,
 								  DescribeRegionPoint<I,Desc> describe ,
 								  AssociateDescription2D<Desc> associate ,
 								  double scale ,

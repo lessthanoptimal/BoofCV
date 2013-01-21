@@ -63,6 +63,11 @@ public class AssociateDescTo2D<D> implements AssociateDescription2D<D> {
 	}
 
 	@Override
+	public GrowQueue_I32 getUnassociatedDestination() {
+		return alg.getUnassociatedDestination();
+	}
+
+	@Override
 	public void setThreshold(double score) {
 		alg.setThreshold(score);
 	}
@@ -70,5 +75,15 @@ public class AssociateDescTo2D<D> implements AssociateDescription2D<D> {
 	@Override
 	public MatchScoreType getScoreType() {
 		return alg.getScoreType();
+	}
+
+	@Override
+	public boolean uniqueSource() {
+		return alg.uniqueSource();
+	}
+
+	@Override
+	public boolean uniqueDestination() {
+		return alg.uniqueDestination();
 	}
 }

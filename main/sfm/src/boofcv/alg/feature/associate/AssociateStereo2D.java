@@ -43,7 +43,9 @@ public class AssociateStereo2D<Desc extends TupleDesc>
 	// storage for associated features
 	private FastQueue<AssociatedIndex> matches = new FastQueue<AssociatedIndex>(AssociatedIndex.class,true);
 	// stores indexes of unassociated source features
-	private GrowQueue_I32 unassociated = new GrowQueue_I32();
+	private GrowQueue_I32 unassociatedSrc = new GrowQueue_I32();
+	// creates a list of unassociated features from the list of matches
+	private FindUnassociated unassociated = new FindUnassociated();
 
 	// maximum allowed score when matching descriptors
 	private double scoreThreshold = Double.MAX_VALUE;
@@ -97,7 +99,7 @@ public class AssociateStereo2D<Desc extends TupleDesc>
 	public void associate() {
 
 		matches.reset();
-		unassociated.reset();
+		unassociatedSrc.reset();
 
 		for( int i = 0; i < locationLeft.size; i++ ) {
 			Point2D_F64 left = locationLeft.get(i);
@@ -121,7 +123,7 @@ public class AssociateStereo2D<Desc extends TupleDesc>
 			if( bestIndex >= 0 ) {
 				matches.grow().setAssociation(i,bestIndex,bestScore);
 			} else {
-				unassociated.push(i);
+				unassociatedSrc.push(i);
 			}
 		}
 	}
@@ -133,7 +135,12 @@ public class AssociateStereo2D<Desc extends TupleDesc>
 
 	@Override
 	public GrowQueue_I32 getUnassociatedSource() {
-		return unassociated;
+		return unassociatedSrc;
+	}
+
+	@Override
+	public GrowQueue_I32 getUnassociatedDestination() {
+		return unassociated.checkDestination(matches,locationRight.size);
 	}
 
 	@Override
@@ -144,5 +151,15 @@ public class AssociateStereo2D<Desc extends TupleDesc>
 	@Override
 	public MatchScoreType getScoreType() {
 		return scorer.getScoreType();
+	}
+
+	@Override
+	public boolean uniqueSource() {
+		return true;
+	}
+
+	@Override
+	public boolean uniqueDestination() {
+		return false;
 	}
 }

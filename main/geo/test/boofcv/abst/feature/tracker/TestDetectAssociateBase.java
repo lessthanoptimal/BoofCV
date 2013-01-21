@@ -87,7 +87,7 @@ public class TestDetectAssociateBase {
 		assertTrue(dat.validCalled);
 	}
 
-	private static class Helper extends DetectAssociateBase<ImageFloat32,TupleDesc_F64,Object> {
+	private static class Helper extends DetectAssociateBase<ImageFloat32,TupleDesc_F64> {
 
 		boolean validCalled = false;
 
@@ -102,18 +102,20 @@ public class TestDetectAssociateBase {
 		}
 
 		@Override
-		protected TupleDesc_F64 createDescription() {
+		public TupleDesc_F64 createDescription() {
 			return new TupleDesc_F64(10);
 		}
 
 		@Override
-		public Object getAuxiliary(PointTrack track) {
-			return null;
+		public int getDescriptionLength() {
+			return 0;
 		}
 
 		@Override
-		public PointTrack addTrack(double x, double y, Object auxiliary) {
+		public Class<TupleDesc_F64> getDescriptionType() {
 			return null;
 		}
+
+
 	}
 }

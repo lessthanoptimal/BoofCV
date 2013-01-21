@@ -136,7 +136,7 @@ public class ExampleFundamentalMatrix {
 
 		ScoreAssociation<SurfFeature> scorer = FactoryAssociation.scoreEuclidean(SurfFeature.class,true);
 		AssociateDescription<SurfFeature> associate =
-				FactoryAssociation.greedy(scorer, 1, -1, true);
+				FactoryAssociation.greedy(scorer, 1, true);
 
 		ExampleAssociatePoints<ImageFloat32,SurfFeature> findMatches =
 				new ExampleAssociatePoints<ImageFloat32,SurfFeature>

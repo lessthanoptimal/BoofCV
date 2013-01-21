@@ -36,7 +36,7 @@ import boofcv.abst.feature.detect.interest.InterestPointDetector;
 import boofcv.abst.feature.disparity.StereoDisparitySparse;
 import boofcv.abst.feature.tracker.PkltConfig;
 import boofcv.abst.feature.tracker.PointTracker;
-import boofcv.abst.feature.tracker.PointTrackerAux;
+import boofcv.abst.feature.tracker.PointTrackerD;
 import boofcv.abst.sfm.AccessPointTracks3D;
 import boofcv.abst.sfm.ModelAssistedTrackerCalibrated;
 import boofcv.abst.sfm.StereoVisualOdometry;
@@ -113,9 +113,9 @@ public class VisualizeStereoVisualOdometryApp <I extends ImageSingleBand>
 	public VisualizeStereoVisualOdometryApp( Class<I> imageType ) {
 		super(1, imageType);
 
+		addAlgorithm(0, "Stereo P3P - ST-BRIEF", 4);
 		addAlgorithm(0, "Quad P3P - ST-BRIEF", 5);
 		addAlgorithm(0, "Stereo P3P - KLT", 3);
-		addAlgorithm(0, "Stereo P3P - ST-BRIEF", 4);
 		addAlgorithm(0, "Depth P3P - KLT", 0);
 		addAlgorithm(0, "Depth P3P - ST-BRIEF", 1);
 		addAlgorithm(0, "Depth P3P - ST-SURF-KLT", 2);
@@ -341,22 +341,22 @@ public class VisualizeStereoVisualOdometryApp <I extends ImageSingleBand>
 					combined_ST_SURF_KLT(new ConfigGeneralDetector(600,3, 0), 3,
 							new int[]{1, 2, 4, 8}, 50, null, null, imageType, derivType);
 			assistedTracker = FactoryVisualOdometry.trackerP3P(tracker,1.5,200,50);
-		} else if( whichAlg == 3 ) {
-			thresholdAdd = 120;
-			thresholdRetire = 2;
-
-			PkltConfig config =
-					PkltConfig.createDefault(imageType, derivType);
-			config.pyramidScaling = new int[]{1,2,4,8};
-			config.featureRadius = 3;
-			config.typeInput = imageType;
-			config.typeDeriv = derivType;
-
-			PointTrackerAux trackerLeft = FactoryPointSequentialTracker.klt(config, new ConfigGeneralDetector(600,3, 1));
-			PointTrackerAux trackerRight = FactoryPointSequentialTracker.klt(config,new ConfigGeneralDetector(600,3, 1));
-
-			return FactoryVisualOdometry.stereoFullPnP(thresholdAdd, thresholdRetire,1.5,200,50,disparity,
-					trackerLeft,trackerRight, imageType);
+//		} else if( whichAlg == 3 ) {
+//			thresholdAdd = 120;
+//			thresholdRetire = 2;
+//
+//			PkltConfig config =
+//					PkltConfig.createDefault(imageType, derivType);
+//			config.pyramidScaling = new int[]{1,2,4,8};
+//			config.featureRadius = 3;
+//			config.typeInput = imageType;
+//			config.typeDeriv = derivType;
+//
+//			PointTrackerD trackerLeft = FactoryPointSequentialTracker.klt(config, new ConfigGeneralDetector(600,3, 1));
+//			PointTrackerAux trackerRight = FactoryPointSequentialTracker.klt(config,new ConfigGeneralDetector(600,3, 1));
+//
+//			return FactoryVisualOdometry.stereoFullPnP(thresholdAdd, thresholdRetire,1.5,200,50,disparity,
+//					trackerLeft,trackerRight, imageType);
 		} else if( whichAlg == 4 ) {
 			thresholdAdd = 80;
 			thresholdRetire = 3;
@@ -376,16 +376,16 @@ public class VisualizeStereoVisualOdometryApp <I extends ImageSingleBand>
 
 			ScoreAssociateHamming_B score = new ScoreAssociateHamming_B();
 			AssociateDescription2D<TupleDesc_B> associateLeft =
-					new AssociateDescTo2D<TupleDesc_B>(FactoryAssociation.greedy(score, associationMaxError, -1, true));
+					new AssociateDescTo2D<TupleDesc_B>(FactoryAssociation.greedy(score, associationMaxError, true));
 			AssociateDescription2D<TupleDesc_B> associateRight =
-					new AssociateDescTo2D<TupleDesc_B>(FactoryAssociation.greedy(score, associationMaxError, -1, true));
+					new AssociateDescTo2D<TupleDesc_B>(FactoryAssociation.greedy(score, associationMaxError, true));
 
-			PointTrackerAux trackerLeft = FactoryPointSequentialTracker.
+			PointTrackerD trackerLeft = FactoryPointSequentialTracker.
 					ddaUser(cornerLeft, new WrapDescribeBrief<I>(briefLeft), associateLeft, 1, imageType);
-			PointTrackerAux trackerRight = FactoryPointSequentialTracker.
+			PointTrackerD trackerRight = FactoryPointSequentialTracker.
 					ddaUser(cornerRight,new WrapDescribeBrief<I>(briefRight), associateRight, 1, imageType);
 
-			return FactoryVisualOdometry.stereoFullPnP(thresholdAdd, thresholdRetire,1.5,200,50,disparity,
+			return FactoryVisualOdometry.stereoFullPnP(thresholdAdd, thresholdRetire,1.5,0.5,200,50,
 					trackerLeft,trackerRight, imageType);
 		} else if( whichAlg == 5 ) {
 //			GeneralFeatureIntensity intensity =

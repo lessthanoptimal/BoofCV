@@ -18,6 +18,7 @@
 
 package boofcv.abst.feature.associate;
 
+import boofcv.alg.feature.associate.FindUnassociated;
 import boofcv.struct.FastQueue;
 import boofcv.struct.GrowQueue_I32;
 import boofcv.struct.feature.AssociatedIndex;
@@ -30,9 +31,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Matches features using a {@link NearestNeighbor} search with the source being the data base that is searched inside
- * of.  This is useful when the source is set once, but the destination changes.  Unique source association is enforced
- * by discarding any matches which have the same source.
+ * Matches features using a {@link NearestNeighbor} search from DDogleg.  The source features are processed
+ * as a lump using {@link NearestNeighbor#setPoints(java.util.List, java.util.List)} while destination features
+ * are matched one at time using {@link NearestNeighbor#findNearest(double[], double, org.ddogleg.nn.NnData)}.
+ * Typically the processing of source features is more expensive and should be minimized while looking up
+ * destination features is fast.  Multiple matches for source features are possible while there will only
+ * be a unique match for each destination feature.
  *
  * @author Peter Abeles
  */
@@ -48,9 +52,6 @@ public class AssociateNearestNeighbor<D extends TupleDesc_F64>
 
 	// List of indexes.  Passed in as data associated with source points
 	FastQueue<Integer> indexes = new FastQueue<Integer>(0,Integer.class,false);
-	// arrays that store results and scores for matches with source list
-	int matchIndexes[] = new int[0];
-	double matchScores[] = new double[0];
 
 	// storage for source points
 	List<double[]> src = new ArrayList<double[]>();
@@ -58,8 +59,8 @@ public class AssociateNearestNeighbor<D extends TupleDesc_F64>
 	// List of final associated points
 	FastQueue<AssociatedIndex> matches = new FastQueue<AssociatedIndex>(100,AssociatedIndex.class,true);
 
-	// list of indexes in source which are unassociated
-	GrowQueue_I32 unassociatedSrc = new GrowQueue_I32();
+	// creates a list of unassociated features from the list of matches
+	FindUnassociated unassociated = new FindUnassociated();
 
 	public AssociateNearestNeighbor(NearestNeighbor<Integer> alg , int featureDimension ) {
 		this.alg = alg;
@@ -98,41 +99,15 @@ public class AssociateNearestNeighbor<D extends TupleDesc_F64>
 	@Override
 	public void associate() {
 
-		// grow and initialize data structures
-		if( matchIndexes.length < src.size() ) {
-			matchIndexes = new int[ src.size() ];
-			matchScores = new double[ src.size() ];
-		}
-		for( int i = 0; i < src.size(); i++ ) {
-			matchIndexes[i] = -1;
-		}
-
+		matches.reset();
 		for( int i = 0; i < listDst.size; i++ ) {
 			if( !alg.findNearest(listDst.data[i].value,-1,result) )
 				continue;
 			// get the index of the source feature
 			int indexSrc = result.data;
-			int prev = matchIndexes[indexSrc];
-			// if nothing else is associated there save this index
-			// if another match was already found, mark it as having multiple matches
-			if( prev == -1 ) {
-				matchIndexes[indexSrc] = i; // single match
-				matchScores[indexSrc] = result.distance;
-			} else
-				matchIndexes[indexSrc] = -2; // multiple matches
+			matches.grow().setAssociation(indexSrc,i,result.distance);
 		}
 
-		// return a list of unique source associations
-		unassociatedSrc.reset();
-		matches.reset();
-		for( int i = 0; i < src.size(); i++ ) {
-			int indexDst = matchIndexes[i];
-			if( indexDst >= 0 ) {
-				matches.grow().setAssociation(i,indexDst,matchScores[i]);
-			} else {
-				unassociatedSrc.add(i);
-			}
-		}
 	}
 
 	@Override
@@ -142,7 +117,12 @@ public class AssociateNearestNeighbor<D extends TupleDesc_F64>
 
 	@Override
 	public GrowQueue_I32 getUnassociatedSource() {
-		return unassociatedSrc;
+		return unassociated.checkSource(matches,src.size());
+	}
+
+	@Override
+	public GrowQueue_I32 getUnassociatedDestination() {
+		return unassociated.checkDestination(matches,listDst.size());
 	}
 
 	@Override
@@ -153,5 +133,15 @@ public class AssociateNearestNeighbor<D extends TupleDesc_F64>
 	@Override
 	public MatchScoreType getScoreType() {
 		return MatchScoreType.NORM_ERROR;
+	}
+
+	@Override
+	public boolean uniqueSource() {
+		return false;
+	}
+
+	@Override
+	public boolean uniqueDestination() {
+		return true;
 	}
 }

@@ -20,7 +20,6 @@ package boofcv.abst.feature.associate;
 
 import boofcv.alg.feature.associate.AssociateSurfBasic;
 import boofcv.factory.feature.associate.FactoryAssociation;
-import boofcv.struct.FastQueue;
 import boofcv.struct.feature.SurfFeature;
 import boofcv.struct.feature.TupleDesc_F64;
 
@@ -35,10 +34,14 @@ public class TestWrapAssociateSurfBasic extends StandardAssociateDescriptionChec
 
 	Random rand = new Random(234);
 
+	public TestWrapAssociateSurfBasic() {
+		super(SurfFeature.class);
+	}
+
 	@Override
 	public AssociateDescription<SurfFeature> createAlg() {
 		ScoreAssociation<TupleDesc_F64> score = new ScoreAssociateEuclidean_F64();
-		AssociateDescription<TupleDesc_F64> assoc = FactoryAssociation.greedy(score, -1, -1, false);
+		AssociateDescription<TupleDesc_F64> assoc = FactoryAssociation.greedy(score, Double.MAX_VALUE, false);
 
 		AssociateSurfBasic basic = new AssociateSurfBasic(assoc);
 
@@ -46,23 +49,9 @@ public class TestWrapAssociateSurfBasic extends StandardAssociateDescriptionChec
 	}
 
 	@Override
-	public void addFeature(FastQueue<SurfFeature> listSrc, FastQueue<SurfFeature> listDst, double error) {
-		double i = listSrc.size();
-
+	protected SurfFeature c(double value) {
 		SurfFeature s = new SurfFeature(1);
-		s.laplacianPositive = rand.nextBoolean();
-		s.value[0] = i;
-
-		SurfFeature d = new SurfFeature(1);
-		d.laplacianPositive = s.laplacianPositive;
-		d.value[0] = i + error;
-
-		listSrc.add(s);
-		listDst.add(d);
-	}
-
-	@Override
-	public Class<SurfFeature> getDescType() {
-		return SurfFeature.class;
+		s.value[0] = value;
+		return s;
 	}
 }

@@ -19,44 +19,54 @@
 package boofcv.abst.feature.associate;
 
 import boofcv.alg.feature.associate.AssociateGreedy;
-import boofcv.struct.FastQueue;
-import boofcv.struct.feature.MatchScoreType;
+import boofcv.struct.feature.TupleDesc_F64;
+import org.junit.Test;
 
 /**
  * @author Peter Abeles
  */
-public class TestWrapAssociateGreedy extends StandardAssociateDescriptionChecks<Double> {
+public class TestWrapAssociateGreedy {
 
-	@Override
-	public AssociateDescription<Double> createAlg() {
-		AssociateGreedy<Double> greedy = new AssociateGreedy<Double>(new DoubleScore(),-1,false);
-		return new WrapAssociateGreedy<Double>(greedy,-1);
+	@Test
+	public void normal() {
+		new StandardTests() {
+			@Override
+			public AssociateDescription<TupleDesc_F64> createAlg() {
+				ScoreAssociateEuclidean_F64 score = new ScoreAssociateEuclidean_F64();
+				AssociateGreedy<TupleDesc_F64> greedy = new AssociateGreedy<TupleDesc_F64>(score,false);
+				return new WrapAssociateGreedy<TupleDesc_F64>(greedy);
+			}
+		}.allTests();
 	}
 
-	@Override
-	public void addFeature(FastQueue<Double> listSrc, FastQueue<Double> listDst, double error) {
-
-		int i = listSrc.size;
-
-		listSrc.add((double)i);
-		listDst.add(i+error);
+	@Test
+	public void backwards() {
+		new StandardTests() {
+			@Override
+			public AssociateDescription<TupleDesc_F64> createAlg() {
+				ScoreAssociateEuclidean_F64 score = new ScoreAssociateEuclidean_F64();
+				AssociateGreedy<TupleDesc_F64> greedy = new AssociateGreedy<TupleDesc_F64>(score,true);
+				return new WrapAssociateGreedy<TupleDesc_F64>(greedy);
+			}
+		}.allTests();
 	}
 
-	@Override
-	public Class<Double> getDescType() {
-		return Double.class;
-	}
-
-	private class DoubleScore implements ScoreAssociation<Double> {
-
-		@Override
-		public double score(Double a, Double b) {
-			return Math.abs(a-b);
+	private static abstract class StandardTests extends StandardAssociateDescriptionChecks<TupleDesc_F64>
+	{
+		public StandardTests() {
+			super(TupleDesc_F64.class);
 		}
 
 		@Override
-		public MatchScoreType getScoreType() {
-			return MatchScoreType.NORM_ERROR;
+		protected TupleDesc_F64 c(double value) {
+			return createFeature(value);
 		}
 	}
+
+	private static TupleDesc_F64 createFeature(double value) {
+		TupleDesc_F64 s = new TupleDesc_F64(1);
+		s.value[0] = value;
+		return s;
+	}
+
 }
