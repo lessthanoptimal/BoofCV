@@ -40,7 +40,7 @@ import java.util.Random;
 /**
  * @author Peter Abeles
  */
-public class TestDdaTrackerGeneralPoint extends StandardPointTrackerSpawn<ImageFloat32> {
+public class TestDdaTrackerGeneralPoint extends StandardPointTracker<ImageFloat32> {
 
 	DdaTrackerGeneralPoint<ImageFloat32,ImageFloat32,TupleDesc_B> dat;
 

@@ -73,7 +73,7 @@ import java.util.Random;
  *
  * @author Peter Abeles
  */
-public class FactoryPointSequentialTracker {
+public class FactoryPointTracker {
 
 	/**
 	 * Pyramid KLT feature tracker.
@@ -88,7 +88,7 @@ public class FactoryPointSequentialTracker {
 	 * @return KLT based tracker.
 	 */
 	public static <I extends ImageSingleBand, D extends ImageSingleBand>
-	PointTrackerAux<I,?> klt(int scaling[], ConfigGeneralDetector configExtract, int featureRadius,
+	PointTracker<I> klt(int scaling[], ConfigGeneralDetector configExtract, int featureRadius,
 							 Class<I> imageType, Class<D> derivType) {
 		PkltConfig<I, D> config =
 				PkltConfig.createDefault(imageType, derivType);
@@ -108,7 +108,7 @@ public class FactoryPointSequentialTracker {
 	 * @return KLT based tracker.
 	 */
 	public static <I extends ImageSingleBand, D extends ImageSingleBand>
-	PointTrackerAux<I,?> klt(PkltConfig<I, D> config, ConfigGeneralDetector configExtract) {
+	PointTracker<I> klt(PkltConfig<I, D> config, ConfigGeneralDetector configExtract) {
 
 		GeneralFeatureDetector<I, D> detector = createShiTomasi(configExtract, config.typeDeriv);
 
@@ -348,15 +348,15 @@ public class FactoryPointSequentialTracker {
 	 * @return SURF based tracker.
 	 */
 	public static <I extends ImageSingleBand>
-	PointTrackerAux<I,?> combined_FH_SURF_KLT(int trackRadius,
-											  int[] pyramidScalingKlt ,
-											  int reactivateThreshold ,
-											  ConfigFastHessian configDetector ,
-											  ConfigSurfDescribe.Stablility configDescribe ,
-											  ConfigSlidingIntegral configOrientation ,
-											  Class<I> imageType) {
+	PointTrackerD<I,SurfFeature> combined_FH_SURF_KLT(int trackRadius,
+													  int[] pyramidScalingKlt ,
+													  int reactivateThreshold ,
+													  ConfigFastHessian configDetector ,
+													  ConfigSurfDescribe.Stablility configDescribe ,
+													  ConfigSlidingIntegral configOrientation ,
+													  Class<I> imageType) {
 
-		ScoreAssociation<TupleDesc_F64> score = FactoryAssociation.scoreEuclidean(TupleDesc_F64.class, true);
+		ScoreAssociation<TupleDesc_F64> score = FactoryAssociation.defaultScore(TupleDesc_F64.class);
 		AssociateSurfBasic assoc = new AssociateSurfBasic(FactoryAssociation.greedy(score, 100000, true));
 
 		AssociateDescription<SurfFeature> generalAssoc = new WrapAssociateSurfBasic(assoc);
@@ -381,21 +381,21 @@ public class FactoryPointSequentialTracker {
 	 * @param pyramidScalingKlt Image pyramid used for KLT
 	 * @param reactivateThreshold Tracks are reactivated after this many have been dropped.  Try 10% of maxMatches
 	 * @param configDescribe Configuration for SURF descriptor
-	 * @param configOrientation Configuration for region orientation
+	 * @param configOrientation Configuration for region orientation.  If null then orientation isn't estimated
 	 * @param imageType      Type of image the input is.
 	 * @param derivType      Image derivative type.
 	 * @param <I>            Input image type.
 	 * @return SURF based tracker.
 	 */
 	public static <I extends ImageSingleBand, D extends ImageSingleBand>
-	PointTrackerAux<I,?> combined_ST_SURF_KLT(ConfigGeneralDetector configExtract,
-											  int trackRadius,
-											  int[] pyramidScalingKlt ,
-											  int reactivateThreshold ,
-											  ConfigSurfDescribe.Stablility configDescribe,
-											  ConfigSlidingIntegral configOrientation ,
-											  Class<I> imageType,
-											  Class<D> derivType ) {
+	PointTrackerD<I,SurfFeature> combined_ST_SURF_KLT(ConfigGeneralDetector configExtract,
+													  int trackRadius,
+													  int[] pyramidScalingKlt ,
+													  int reactivateThreshold ,
+													  ConfigSurfDescribe.Stablility configDescribe,
+													  ConfigSlidingIntegral configOrientation ,
+													  Class<I> imageType,
+													  Class<D> derivType ) {
 
 		if( derivType == null )
 			derivType = GImageDerivativeOps.getDerivativeType(imageType);
@@ -411,9 +411,13 @@ public class FactoryPointSequentialTracker {
 
 		AssociateDescription<SurfFeature> generalAssoc = new WrapAssociateSurfBasic(assoc);
 
-		Class integralType = GIntegralImageOps.getIntegralType(imageType);
-		OrientationIntegral orientationII = FactoryOrientationAlgs.sliding_ii(configOrientation, integralType);
-		OrientationImage<I> orientation = FactoryOrientation.convertImage(orientationII,imageType);
+		OrientationImage<I> orientation = null;
+
+		if( configOrientation != null ) {
+			Class integralType = GIntegralImageOps.getIntegralType(imageType);
+			OrientationIntegral orientationII = FactoryOrientationAlgs.sliding_ii(configOrientation, integralType);
+			orientation = FactoryOrientation.convertImage(orientationII,imageType);
+		}
 
 		return combined(detector,orientation,regionDesc,generalAssoc,trackRadius,pyramidScalingKlt,reactivateThreshold,
 				imageType);
@@ -437,7 +441,7 @@ public class FactoryPointSequentialTracker {
 	 * @return Feature tracker
 	 */
 	public static <I extends ImageSingleBand, Desc extends TupleDesc>
-	PointTrackerAux<I,?> combined( InterestPointDetector<I> detector,
+	PointTrackerD<I,Desc> combined( InterestPointDetector<I> detector,
 								   OrientationImage<I> orientation ,
 								   DescribeRegionPoint<I, Desc> describe,
 								   AssociateDescription<Desc> associate ,
@@ -468,7 +472,7 @@ public class FactoryPointSequentialTracker {
 	 * @return Feature tracker
 	 */
 	public static <I extends ImageSingleBand, D extends ImageSingleBand, Desc extends TupleDesc>
-	PointTrackerAux<I,?> combined( DetectDescribePoint<I,Desc> detector ,
+	PointTrackerD<I,Desc> combined( DetectDescribePoint<I,Desc> detector ,
 								   AssociateDescription<Desc> associate ,
 								   int featureRadiusKlt,
 								   int[] pyramidScalingKlt ,
@@ -486,11 +490,11 @@ public class FactoryPointSequentialTracker {
 
 
 	public static <I extends ImageSingleBand, D extends ImageSingleBand, Desc extends TupleDesc>
-	PointTrackerD<I,Desc> ddaUser( GeneralFeatureDetector<I, D> detector,
-								  DescribeRegionPoint<I,Desc> describe ,
-								  AssociateDescription2D<Desc> associate ,
-								  double scale ,
-								  Class<I> imageType ) {
+	PointTrackerD<I,Desc> dda(GeneralFeatureDetector<I, D> detector,
+							  DescribeRegionPoint<I, Desc> describe,
+							  AssociateDescription2D<Desc> associate,
+							  double scale,
+							  Class<I> imageType) {
 
 		EasyGeneralFeatureDetector<I,D> easy = new EasyGeneralFeatureDetector<I, D>(detector,imageType,null);
 

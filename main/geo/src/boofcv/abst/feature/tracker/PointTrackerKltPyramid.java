@@ -44,7 +44,7 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class PointTrackerKltPyramid<I extends ImageSingleBand,D extends ImageSingleBand>
-		implements PointTrackerAux<I,Object>
+		implements PointTracker<I>
 {
 	// update the image pyramid
 	protected PyramidUpdaterDiscrete<I> inputPyramidUpdater;
@@ -130,8 +130,7 @@ public class PointTrackerKltPyramid<I extends ImageSingleBand,D extends ImageSin
 		unused.add(t);
 	}
 
-	@Override
-	public PointTrack addTrack( double x , double y , Object aux ) {
+	public PointTrack addTrack( double x , double y ) {
 		// grow the number of tracks if needed
 		if( unused.isEmpty() )
 			addTrackToUnused();
@@ -200,11 +199,6 @@ public class PointTrackerKltPyramid<I extends ImageSingleBand,D extends ImageSin
 				unused.add(t);
 			}
 		}
-	}
-
-	@Override
-	public Object getAuxiliary(PointTrack track) {
-		return null;
 	}
 
 	/**

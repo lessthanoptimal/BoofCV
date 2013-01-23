@@ -63,7 +63,7 @@ public class FactoryModelAssistedTracker {
 		config.featureRadius = featureRadius;
 
 		GeneralFeatureDetector<I, D> detector =
-				FactoryPointSequentialTracker.createShiTomasi(configExtract, config.typeDeriv);
+				FactoryPointTracker.createShiTomasi(configExtract, config.typeDeriv);
 
 		InterpolateRectangle<I> interpInput = FactoryInterpolation.<I>bilinearRectangle(config.typeInput);
 		InterpolateRectangle<D> interpDeriv = FactoryInterpolation.<D>bilinearRectangle(config.typeDeriv);

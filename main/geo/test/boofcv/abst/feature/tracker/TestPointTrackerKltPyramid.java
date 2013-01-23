@@ -22,7 +22,7 @@ import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.alg.tracker.klt.KltFeature;
 import boofcv.alg.tracker.klt.PyramidKltFeature;
-import boofcv.factory.feature.tracker.FactoryPointSequentialTracker;
+import boofcv.factory.feature.tracker.FactoryPointTracker;
 import boofcv.struct.image.ImageFloat32;
 import org.junit.Test;
 
@@ -33,7 +33,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestPointTrackerKltPyramid extends StandardPointTrackerSpawn<ImageFloat32> {
+public class TestPointTrackerKltPyramid extends StandardPointTracker<ImageFloat32> {
 
 	PkltConfig<ImageFloat32,ImageFloat32> config;
 
@@ -42,9 +42,9 @@ public class TestPointTrackerKltPyramid extends StandardPointTrackerSpawn<ImageF
 	}
 
 	@Override
-	public PointTrackerAux<ImageFloat32,?> createTracker() {
+	public PointTracker<ImageFloat32> createTracker() {
 		config = PkltConfig.createDefault(ImageFloat32.class, ImageFloat32.class);
-		return FactoryPointSequentialTracker.klt(config,new ConfigGeneralDetector(200,3,1000,0,true));
+		return FactoryPointTracker.klt(config, new ConfigGeneralDetector(200, 3, 1000, 0, true));
 	}
 
 	/**
@@ -117,7 +117,7 @@ public class TestPointTrackerKltPyramid extends StandardPointTrackerSpawn<ImageF
 				(PointTrackerKltPyramid<ImageFloat32,ImageFloat32>)createTracker();
 
 		alg.process(image);
-		PointTrack track = alg.addTrack(10,20.5,null);
+		PointTrack track = alg.addTrack(10,20.5);
 		assertTrue(track != null );
 		assertEquals(10,track.x,1e-5);
 		assertEquals(20.5,track.y,1e-5);

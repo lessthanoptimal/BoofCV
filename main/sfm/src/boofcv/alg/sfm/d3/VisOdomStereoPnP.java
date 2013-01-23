@@ -295,7 +295,7 @@ public class VisOdomStereoPnP<T extends ImageSingleBand,Desc extends TupleDesc> 
 
 		System.out.println("Active Tracks: Left "+trackerLeft.getActiveTracks(null).size()+" right "+
 				trackerRight.getActiveTracks(null).size());
-		System.out.println("Candidates: "+candidates.size()+" mutual "+mutualActive);
+		System.out.println("Candidates = "+candidates.size()+" mutual active = "+mutualActive);
 	}
 
 

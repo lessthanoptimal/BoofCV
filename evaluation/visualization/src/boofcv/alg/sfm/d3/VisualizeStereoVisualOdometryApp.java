@@ -53,7 +53,7 @@ import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
 import boofcv.factory.feature.detect.intensity.FactoryIntensityPoint;
 import boofcv.factory.feature.detect.interest.FactoryInterestPoint;
 import boofcv.factory.feature.disparity.FactoryStereoDisparity;
-import boofcv.factory.feature.tracker.FactoryPointSequentialTracker;
+import boofcv.factory.feature.tracker.FactoryPointTracker;
 import boofcv.factory.filter.blur.FactoryBlurFilter;
 import boofcv.factory.sfm.FactoryVisualOdometry;
 import boofcv.gui.StereoVideoAppBase;
@@ -65,7 +65,7 @@ import boofcv.gui.image.ShowImages;
 import boofcv.io.PathLabel;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.struct.calib.IntrinsicParameters;
-import boofcv.struct.feature.TupleDesc_B;
+import boofcv.struct.feature.SurfFeature;
 import boofcv.struct.geo.Point2D3D;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
@@ -310,7 +310,7 @@ public class VisualizeStereoVisualOdometryApp <I extends ImageSingleBand>
 			config.typeDeriv = derivType;
 
 			GeneralFeatureDetector detector =
-					FactoryPointSequentialTracker.createShiTomasi(new ConfigGeneralDetector(600,3, 1), config.typeDeriv);
+					FactoryPointTracker.createShiTomasi(new ConfigGeneralDetector(600, 3, 1), config.typeDeriv);
 
 			assistedTracker = FactoryVisualOdometry.trackerAssistedKltP3P(detector,config,1.5,200,50);
 		} else if( whichAlg == 1 ) {
@@ -322,8 +322,8 @@ public class VisualizeStereoVisualOdometryApp <I extends ImageSingleBand>
 					FactoryBriefDefinition.gaussian2(new Random(123), 16, 512),
 					FactoryBlurFilter.gaussian(imageType, 0, 4));
 
-			GeneralFeatureDetector corner = FactoryPointSequentialTracker.createShiTomasi(
-					new ConfigGeneralDetector(600,2,0), derivType);
+			GeneralFeatureDetector corner = FactoryPointTracker.createShiTomasi(
+					new ConfigGeneralDetector(600, 2, 0), derivType);
 
 			InterestPointDetector detector = FactoryInterestPoint.wrapPoint(corner, 1, imageType, derivType);
 
@@ -337,8 +337,8 @@ public class VisualizeStereoVisualOdometryApp <I extends ImageSingleBand>
 			thresholdAdd = 80;
 			thresholdRetire = 3;
 //			tracker = FactoryPointSequentialTracker.dda_FH_SURF(600, 200, 1, 2,imageType);
-			PointTracker<I> tracker = FactoryPointSequentialTracker.
-					combined_ST_SURF_KLT(new ConfigGeneralDetector(600,3, 0), 3,
+			PointTracker<I> tracker = FactoryPointTracker.
+					combined_ST_SURF_KLT(new ConfigGeneralDetector(600, 3, 0), 3,
 							new int[]{1, 2, 4, 8}, 50, null, null, imageType, derivType);
 			assistedTracker = FactoryVisualOdometry.trackerP3P(tracker,1.5,200,50);
 //		} else if( whichAlg == 3 ) {
@@ -363,15 +363,13 @@ public class VisualizeStereoVisualOdometryApp <I extends ImageSingleBand>
 			associationMaxError = Double.MAX_VALUE;
 
 //			DescribeRegionPoint<I,NccFeature> describe = FactoryDescribeRegionPoint.pixelNCC(21,21, imageType);
-			DescribeRegionPoint<I,TupleDesc_B> describe = FactoryDescribeRegionPoint.brief(null, imageType);
-//			DescribeRegionPoint<I,SurfFeature> describe = FactoryDescribeRegionPoint.surfFast(null, imageType);
-			// TODO Why is SURF producing much worse results than BRIEF?!?!
+//			DescribeRegionPoint<I,TupleDesc_B> describe = FactoryDescribeRegionPoint.brief(null, imageType);
+			DescribeRegionPoint<I,SurfFeature> describe = FactoryDescribeRegionPoint.surfFast(null, imageType);
 
-
-			GeneralFeatureDetector cornerLeft = FactoryPointSequentialTracker.createShiTomasi(
-					new ConfigGeneralDetector(600,2,1), derivType);
-			GeneralFeatureDetector cornerRight = FactoryPointSequentialTracker.createShiTomasi(
-					new ConfigGeneralDetector(600,2,1), derivType);
+			GeneralFeatureDetector cornerLeft = FactoryPointTracker.createShiTomasi(
+					new ConfigGeneralDetector(600, 2, 1), derivType);
+			GeneralFeatureDetector cornerRight = FactoryPointTracker.createShiTomasi(
+					new ConfigGeneralDetector(600, 2, 1), derivType);
 
 			ScoreAssociation score = FactoryAssociation.defaultScore(describe.getDescriptionType());
 //			AssociateDescription2D associateLeft =
@@ -384,10 +382,10 @@ public class VisualizeStereoVisualOdometryApp <I extends ImageSingleBand>
 			AssociateDescription2D associateRight =
 					new AssociateMaxDistanceNaive(score,true,associationMaxError,50);
 
-			PointTrackerD trackerLeft = FactoryPointSequentialTracker.
-					ddaUser(cornerLeft, describe, associateLeft, 1, imageType);
-			PointTrackerD trackerRight = FactoryPointSequentialTracker.
-					ddaUser(cornerRight,describe, associateRight, 1, imageType);
+			PointTrackerD trackerLeft = FactoryPointTracker.
+					dda(cornerLeft, describe, associateLeft, 2, imageType);
+			PointTrackerD trackerRight = FactoryPointTracker.
+					dda(cornerRight, describe, associateRight, 2, imageType);
 
 			return FactoryVisualOdometry.stereoFullPnP(thresholdAdd, thresholdRetire,1.5,0.5,200,50,
 					trackerLeft,trackerRight, imageType);

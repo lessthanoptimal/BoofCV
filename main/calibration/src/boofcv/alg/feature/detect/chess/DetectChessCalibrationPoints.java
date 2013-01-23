@@ -151,6 +151,15 @@ public class DetectChessCalibrationPoints<T extends ImageSingleBand, D extends I
 
 		// minContourSize is specified later after the image's size is known
 		findBound = new DetectChessSquaresBinary(numCols, numRows, 0);
+
+		reset();
+	}
+
+	/**
+	 * Forgets any past history and resets the detector
+	 */
+	public void reset() {
+		selectedThreshold = -1;
 	}
 
 	public boolean process(T gray) {
@@ -225,9 +234,13 @@ public class DetectChessCalibrationPoints<T extends ImageSingleBand, D extends I
 	private boolean detectChessBoard(T gray) {
 		thresholdAttempts.clear();
 
-		for (int i = 0; i < maxAttempts; i++) {
+		// if it previously found a target use that threshold
+		if( selectedThreshold == -1 )
 			selectedThreshold = selectNext(thresholdAttempts, maxPixelValue);
+		else
+			thresholdAttempts.add(selectedThreshold);
 
+		for (int i = 0; i < maxAttempts; i++) {
 			GThresholdImageOps.threshold(gray, binary, selectedThreshold, true);
 
 			// erode to make the squares separated
@@ -235,7 +248,11 @@ public class DetectChessCalibrationPoints<T extends ImageSingleBand, D extends I
 
 			if (findBound.process(eroded))
 				return true;
+
+			selectedThreshold = selectNext(thresholdAttempts, maxPixelValue);
 		}
+
+		selectedThreshold = -1;
 		return false;
 	}
 

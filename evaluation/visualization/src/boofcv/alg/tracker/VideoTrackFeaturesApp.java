@@ -23,7 +23,7 @@ import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
 import boofcv.abst.feature.tracker.PkltConfig;
 import boofcv.abst.feature.tracker.PointTrack;
 import boofcv.abst.feature.tracker.PointTracker;
-import boofcv.factory.feature.tracker.FactoryPointSequentialTracker;
+import boofcv.factory.feature.tracker.FactoryPointTracker;
 import boofcv.gui.VideoProcessAppBase;
 import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.gui.image.ImagePanel;
@@ -71,18 +71,18 @@ public class VideoTrackFeaturesApp<I extends ImageSingleBand, D extends ImageSin
 		configFH.extractRadius = 4;
 		configFH.detectThreshold = 15f;
 
-		addAlgorithm(0,"KLT", FactoryPointSequentialTracker.klt(config,new ConfigGeneralDetector(maxFeatures,1,3)));
-		addAlgorithm(0,"ST-BRIEF", FactoryPointSequentialTracker.
-				dda_ST_BRIEF(200, new ConfigGeneralDetector(maxFeatures,3, 1), imageType, derivType));
-		addAlgorithm(0,"ST-NCC", FactoryPointSequentialTracker.
+		addAlgorithm(0,"KLT", FactoryPointTracker.klt(config, new ConfigGeneralDetector(maxFeatures, 1, 3)));
+		addAlgorithm(0,"ST-BRIEF", FactoryPointTracker.
+				dda_ST_BRIEF(200, new ConfigGeneralDetector(maxFeatures, 3, 1), imageType, derivType));
+		addAlgorithm(0,"ST-NCC", FactoryPointTracker.
 				dda_ST_NCC(new ConfigGeneralDetector(maxFeatures, 3, 2), 5, imageType, derivType));
-		addAlgorithm(0,"FH-SURF", FactoryPointSequentialTracker.
-				dda_FH_SURF_Fast( configFH, null, null, imageType));
-		addAlgorithm(0,"ST-SURF-KLT", FactoryPointSequentialTracker.
-				combined_ST_SURF_KLT(new ConfigGeneralDetector(maxFeatures,3, 1), 3,
-				config.pyramidScaling, 50, null,null, imageType, derivType));
-		addAlgorithm(0,"FH-SURF-KLT", FactoryPointSequentialTracker.combined_FH_SURF_KLT( 3,
-				config.pyramidScaling, 50,configFH,null,null,imageType));
+		addAlgorithm(0,"FH-SURF", FactoryPointTracker.
+				dda_FH_SURF_Fast(configFH, null, null, imageType));
+		addAlgorithm(0,"ST-SURF-KLT", FactoryPointTracker.
+				combined_ST_SURF_KLT(new ConfigGeneralDetector(maxFeatures, 3, 1), 3,
+						config.pyramidScaling, 50, null, null, imageType, derivType));
+		addAlgorithm(0,"FH-SURF-KLT", FactoryPointTracker.combined_FH_SURF_KLT(3,
+				config.pyramidScaling, 50, configFH, null, null, imageType));
 
 		gui.addMouseListener(this);
 		gui.requestFocus();

@@ -41,7 +41,7 @@ import java.util.Random;
 /**
  * @author Peter Abeles
  */
-public class TestDetectAssociateTracker extends StandardPointTrackerSpawn<ImageFloat32> {
+public class TestDetectAssociateTracker extends StandardPointTracker<ImageFloat32> {
 
 	DetectAssociateTracker<ImageFloat32,TupleDesc_B> dat;
 

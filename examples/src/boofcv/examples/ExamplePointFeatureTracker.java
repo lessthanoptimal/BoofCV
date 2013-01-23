@@ -24,7 +24,7 @@ import boofcv.abst.feature.tracker.PkltConfig;
 import boofcv.abst.feature.tracker.PointTrack;
 import boofcv.abst.feature.tracker.PointTracker;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
-import boofcv.factory.feature.tracker.FactoryPointSequentialTracker;
+import boofcv.factory.feature.tracker.FactoryPointTracker;
 import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ShowImages;
@@ -128,7 +128,7 @@ public class ExamplePointFeatureTracker< T extends ImageSingleBand, D extends Im
 		config.featureRadius = 3;
 		config.pyramidScaling = new int[]{1,2,4,8};
 
-		tracker = FactoryPointSequentialTracker.klt(config,new ConfigGeneralDetector(200,3,1));
+		tracker = FactoryPointTracker.klt(config, new ConfigGeneralDetector(200, 3, 1));
 	}
 
 	/**
@@ -139,7 +139,7 @@ public class ExamplePointFeatureTracker< T extends ImageSingleBand, D extends Im
 		configDetector.maxFeaturesPerScale = 200;
 		configDetector.extractRadius = 3;
 		configDetector.initialSampleSize = 2;
-		tracker = FactoryPointSequentialTracker.dda_FH_SURF_Fast(configDetector,null,null, imageType);
+		tracker = FactoryPointTracker.dda_FH_SURF_Fast(configDetector, null, null, imageType);
 	}
 
 	public static void main( String args[] ) throws FileNotFoundException {
