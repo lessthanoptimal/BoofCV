@@ -303,15 +303,16 @@ public abstract class DetectAssociateBase<I extends ImageSingleBand, Desc extend
 	 * @param track The track which is to be dropped
 	 */
 	@Override
-	public void dropTrack(PointTrack track) {
+	public boolean dropTrack(PointTrack track) {
+		if( !tracksAll.remove(track) )
+			return false;
 		// the track may or may not be in the active list
 		tracksActive.remove(track);
 		tracksInactive.remove(track);
 		// it must be in the all list
-		if( !tracksAll.remove(track) )
-			throw new IllegalArgumentException("Track not found in all list");
 		// recycle the data
 		unused.add(track);
+		return true;
 	}
 
 	@Override
