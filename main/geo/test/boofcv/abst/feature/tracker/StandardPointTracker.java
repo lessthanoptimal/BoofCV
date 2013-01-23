@@ -37,7 +37,7 @@ import static org.junit.Assert.*;
  *
  * @author Peter Abeles
  */
-public abstract class StandardPointTrackerSpawn<T extends ImageSingleBand> {
+public abstract class StandardPointTracker<T extends ImageSingleBand> {
 
 	public PointTracker<T> tracker;
 	Random rand = new Random(234);
@@ -47,7 +47,7 @@ public abstract class StandardPointTrackerSpawn<T extends ImageSingleBand> {
 	boolean shouldDropTracks;
 	boolean shouldCreateInactive;
 
-	protected StandardPointTrackerSpawn(boolean shouldCreateInactive, boolean shouldDropTracks) {
+	protected StandardPointTracker(boolean shouldCreateInactive, boolean shouldDropTracks) {
 		this.shouldCreateInactive = shouldCreateInactive;
 		this.shouldDropTracks = shouldDropTracks;
 	}

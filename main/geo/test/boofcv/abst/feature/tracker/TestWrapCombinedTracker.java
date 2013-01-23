@@ -30,7 +30,7 @@ import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.feature.describe.FactoryDescribePointAlgs;
 import boofcv.factory.feature.detect.interest.FactoryDetectPoint;
 import boofcv.factory.feature.detect.interest.FactoryInterestPoint;
-import boofcv.factory.feature.tracker.FactoryPointSequentialTracker;
+import boofcv.factory.feature.tracker.FactoryPointTracker;
 import boofcv.factory.filter.blur.FactoryBlurFilter;
 import boofcv.struct.feature.TupleDesc_B;
 import boofcv.struct.image.ImageFloat32;
@@ -40,7 +40,7 @@ import java.util.Random;
 /**
  * @author Peter Abeles
  */
-public class TestWrapCombinedTracker extends StandardPointTrackerSpawn<ImageFloat32> {
+public class TestWrapCombinedTracker extends StandardPointTracker<ImageFloat32> {
 
 	PointTracker<ImageFloat32> pointTracker;
 
@@ -63,10 +63,10 @@ public class TestWrapCombinedTracker extends StandardPointTrackerSpawn<ImageFloa
 		AssociateDescription<TupleDesc_B> association =
 				FactoryAssociation.greedy(score, 400, true);
 
-		pointTracker = FactoryPointSequentialTracker.combined(
+		pointTracker = FactoryPointTracker.combined(
 				detector, null,
 				new WrapDescribeBrief<ImageFloat32>(brief),
-				association,2,new int[]{1,2,4},20,ImageFloat32.class);
+				association, 2, new int[]{1, 2, 4}, 20, ImageFloat32.class);
 
 		return pointTracker;
 	}

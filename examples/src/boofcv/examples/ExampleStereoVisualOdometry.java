@@ -25,7 +25,7 @@ import boofcv.abst.sfm.AccessPointTracks3D;
 import boofcv.abst.sfm.ModelAssistedTrackerCalibrated;
 import boofcv.abst.sfm.StereoVisualOdometry;
 import boofcv.factory.feature.disparity.FactoryStereoDisparity;
-import boofcv.factory.feature.tracker.FactoryPointSequentialTracker;
+import boofcv.factory.feature.tracker.FactoryPointTracker;
 import boofcv.factory.sfm.FactoryVisualOdometry;
 import boofcv.io.MediaManager;
 import boofcv.io.image.SimpleImageSequence;
@@ -59,8 +59,8 @@ public class ExampleStereoVisualOdometry {
 
 		// specify how the image features are going to be tracked
 		PointTracker<ImageUInt8> tracker =
-				FactoryPointSequentialTracker.klt(
-						new int[]{1,2,4,8},new ConfigGeneralDetector(600,3,1),3,ImageUInt8.class, ImageSInt16.class);
+				FactoryPointTracker.klt(
+						new int[]{1, 2, 4, 8}, new ConfigGeneralDetector(600, 3, 1), 3, ImageUInt8.class, ImageSInt16.class);
 
 		// computes the depth of each point
 		StereoDisparitySparse<ImageUInt8> disparity =

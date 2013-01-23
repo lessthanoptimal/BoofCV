@@ -314,6 +314,10 @@ public class CombinedTrackerScalePoint
 		return trackerKlt;
 	}
 
+	public DetectDescribePoint<I, TD> getDetector() {
+		return detector;
+	}
+
 	/**
 	 * Drops all tracks and recycles the data
 	 */
