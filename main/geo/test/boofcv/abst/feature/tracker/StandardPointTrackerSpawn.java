@@ -29,8 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 
 /**
@@ -261,7 +260,9 @@ public abstract class StandardPointTrackerSpawn<T extends ImageSingleBand> {
 
 		int before = tracks.size();
 		assertTrue(before > 0);
-		tracker.dropTrack(tracks.get(0));
+		assertTrue(tracker.dropTrack(tracks.get(0)));
+		// a second request to drop the track should do nothing
+		assertFalse(tracker.dropTrack(tracks.get(0)));
 
 		// the track should be removed from the all and active lists
 		assertEquals(before-1,tracker.getAllTracks(null).size());
@@ -269,6 +270,7 @@ public abstract class StandardPointTrackerSpawn<T extends ImageSingleBand> {
 
 		// tracks which have been dropped by request should not be included in this list
 		assertEquals(0,tracker.getDroppedTracks(null).size());
+
 	}
 
 	@Test

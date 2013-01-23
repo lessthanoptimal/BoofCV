@@ -87,8 +87,10 @@ public interface PointTracker<T extends ImageBase> {
 	 * is ignored.
 	 *
 	 * @param track The track which is to be dropped
+	 * @return true if the request to drop the track was done or if it was ignored because the track wasn't being
+	 * tracked
 	 */
-	public void dropTrack(PointTrack track);
+	public boolean dropTrack(PointTrack track);
 
 	/**
 	 * Returns a list of all features that are currently being tracked

@@ -43,6 +43,7 @@
             <goals><goal>add-source</goal></goals>
             <configuration>
               <sources>
+		<source>calibration/src</source>
 		<source>numerics/src</source>
 		<source>ip/src</source>
 		<source>io/src</source>

@@ -169,8 +169,8 @@ public class PointToAssistedTracker<T extends ImageBase,Model,Info>
 	}
 
 	@Override
-	public void dropTrack(PointTrack track) {
-		tracker.dropTrack(track);
+	public boolean dropTrack(PointTrack track) {
+		return tracker.dropTrack(track);
 	}
 
 	@Override

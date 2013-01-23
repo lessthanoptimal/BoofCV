@@ -18,9 +18,8 @@
 
 package boofcv.alg.sfm.d3;
 
-import boofcv.abst.feature.associate.AssociateDescTo2D;
 import boofcv.abst.feature.associate.AssociateDescription2D;
-import boofcv.abst.feature.associate.ScoreAssociateHamming_B;
+import boofcv.abst.feature.associate.ScoreAssociation;
 import boofcv.abst.feature.describe.DescribeRegionPoint;
 import boofcv.abst.feature.describe.WrapDescribeBrief;
 import boofcv.abst.feature.detdesc.DetectDescribeMulti;
@@ -40,6 +39,7 @@ import boofcv.abst.feature.tracker.PointTrackerD;
 import boofcv.abst.sfm.AccessPointTracks3D;
 import boofcv.abst.sfm.ModelAssistedTrackerCalibrated;
 import boofcv.abst.sfm.StereoVisualOdometry;
+import boofcv.alg.feature.associate.AssociateMaxDistanceNaive;
 import boofcv.alg.feature.describe.DescribePointBrief;
 import boofcv.alg.feature.describe.brief.FactoryBriefDefinition;
 import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
@@ -358,32 +358,36 @@ public class VisualizeStereoVisualOdometryApp <I extends ImageSingleBand>
 //			return FactoryVisualOdometry.stereoFullPnP(thresholdAdd, thresholdRetire,1.5,200,50,disparity,
 //					trackerLeft,trackerRight, imageType);
 		} else if( whichAlg == 4 ) {
-			thresholdAdd = 80;
-			thresholdRetire = 3;
-			associationMaxError = 150;
+			thresholdAdd = 100;
+			thresholdRetire = 4;
+			associationMaxError = Double.MAX_VALUE;
 
-			DescribePointBrief<I> briefLeft = FactoryDescribePointAlgs.brief(
-					FactoryBriefDefinition.gaussian2(new Random(123), 16, 512),
-					FactoryBlurFilter.gaussian(imageType, 0, 4));
-			DescribePointBrief<I> briefRight = FactoryDescribePointAlgs.brief(
-					FactoryBriefDefinition.gaussian2(new Random(123), 16, 512),
-					FactoryBlurFilter.gaussian(imageType, 0, 4));
+//			DescribeRegionPoint<I,NccFeature> describe = FactoryDescribeRegionPoint.pixelNCC(21,21, imageType);
+			DescribeRegionPoint<I,TupleDesc_B> describe = FactoryDescribeRegionPoint.brief(null, imageType);
+//			DescribeRegionPoint<I,SurfFeature> describe = FactoryDescribeRegionPoint.surfFast(null, imageType);
+			// TODO Why is SURF producing much worse results than BRIEF?!?!
+
 
 			GeneralFeatureDetector cornerLeft = FactoryPointSequentialTracker.createShiTomasi(
 					new ConfigGeneralDetector(600,2,1), derivType);
 			GeneralFeatureDetector cornerRight = FactoryPointSequentialTracker.createShiTomasi(
 					new ConfigGeneralDetector(600,2,1), derivType);
 
-			ScoreAssociateHamming_B score = new ScoreAssociateHamming_B();
-			AssociateDescription2D<TupleDesc_B> associateLeft =
-					new AssociateDescTo2D<TupleDesc_B>(FactoryAssociation.greedy(score, associationMaxError, true));
-			AssociateDescription2D<TupleDesc_B> associateRight =
-					new AssociateDescTo2D<TupleDesc_B>(FactoryAssociation.greedy(score, associationMaxError, true));
+			ScoreAssociation score = FactoryAssociation.defaultScore(describe.getDescriptionType());
+//			AssociateDescription2D associateLeft =
+//					new AssociateDescTo2D(FactoryAssociation.greedy(score, associationMaxError, true));
+//			AssociateDescription2D associateRight =
+//					new AssociateDescTo2D(FactoryAssociation.greedy(score, associationMaxError, true));
+
+			AssociateDescription2D associateLeft =
+					new AssociateMaxDistanceNaive(score,true,associationMaxError,50);
+			AssociateDescription2D associateRight =
+					new AssociateMaxDistanceNaive(score,true,associationMaxError,50);
 
 			PointTrackerD trackerLeft = FactoryPointSequentialTracker.
-					ddaUser(cornerLeft, new WrapDescribeBrief<I>(briefLeft), associateLeft, 1, imageType);
+					ddaUser(cornerLeft, describe, associateLeft, 1, imageType);
 			PointTrackerD trackerRight = FactoryPointSequentialTracker.
-					ddaUser(cornerRight,new WrapDescribeBrief<I>(briefRight), associateRight, 1, imageType);
+					ddaUser(cornerRight,describe, associateRight, 1, imageType);
 
 			return FactoryVisualOdometry.stereoFullPnP(thresholdAdd, thresholdRetire,1.5,0.5,200,50,
 					trackerLeft,trackerRight, imageType);
@@ -394,13 +398,14 @@ public class VisualizeStereoVisualOdometryApp <I extends ImageSingleBand>
 					FactoryIntensityPoint.shiTomasi(1,false,imageType);
 			NonMaxSuppression nonmax = FactoryFeatureExtractor.nonmax(new ConfigExtract(2,50,0,true,false,true));
 			GeneralFeatureDetector general = new GeneralFeatureDetector(intensity,nonmax);
+//			general.setMaxFeatures(600);
 			DetectorInterestPointMulti detector = new GeneralToInterestMulti(general,1,imageType,derivType);
 //			DescribeRegionPoint describe = FactoryDescribeRegionPoint.brief(new ConfigBrief(true),imageType);
 //			DescribeRegionPoint describe = FactoryDescribeRegionPoint.pixelNCC(5,5,imageType);
 			DescribeRegionPoint describe = FactoryDescribeRegionPoint.surfFast(null,imageType);
 			DetectDescribeMulti detDescMulti =  new DetectDescribeMultiFusion(detector,null,describe);
 
-			return FactoryVisualOdometry.stereoQuadPnP(1.5, 0.5 ,-1, Double.MAX_VALUE, 300, 50, detDescMulti, imageType);
+			return FactoryVisualOdometry.stereoQuadPnP(1.5, 0.5 ,100, Double.MAX_VALUE, 300, 50, detDescMulti, imageType);
 		} else {
 			throw new RuntimeException("Unknown selection");
 		}

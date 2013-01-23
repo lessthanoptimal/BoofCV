@@ -20,6 +20,7 @@ package boofcv.factory.sfm;
 
 import boofcv.abst.feature.associate.AssociateDescTo2D;
 import boofcv.abst.feature.associate.AssociateDescription2D;
+import boofcv.abst.feature.associate.EnforceUniqueByScore;
 import boofcv.abst.feature.associate.ScoreAssociation;
 import boofcv.abst.feature.detdesc.DetectDescribeMulti;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
@@ -305,6 +306,12 @@ public class FactoryVisualOdometry {
 		ScoreAssociation<Desc> scorer = FactoryAssociation.defaultScore(descType);
 		AssociateStereo2D<Desc> associateStereo = new AssociateStereo2D<Desc>(scorer,epipolarPixelTol,descType);
 
+		// need to make sure associations are unique
+		AssociateDescription2D<Desc> associateUnique = associateStereo;
+		if( !associateStereo.uniqueDestination() || !associateStereo.uniqueSource() ) {
+			associateUnique = new EnforceUniqueByScore.Describe2D<Desc>(associateStereo,true,true);
+		}
+
 		if( refineIterations > 0 ) {
 			refinePnP = new PnPStereoRefineRodrigues(1e-12,refineIterations);
 			refine = new GeoModelRefineToModelFitter<Se3_F64,Stereo2D3D>(refinePnP) {
@@ -319,7 +326,7 @@ public class FactoryVisualOdometry {
 		TriangulateTwoViewsCalibrated triangulate = FactoryTriangulate.twoGeometric();
 
 		VisOdomStereoPnP<T,Desc> alg =  new VisOdomStereoPnP<T,Desc>(thresholdAdd,thresholdRetire,epipolarPixelTol,
-				trackerLeft,trackerRight,associateStereo,triangulate,motion,refine);
+				trackerLeft,trackerRight,associateUnique,triangulate,motion,refine);
 
 		return new WrapVisOdomStereoPnP<T>(pnpStereo,distanceMono,distanceStereo,associateStereo,alg,refinePnP,imageType);
 	}

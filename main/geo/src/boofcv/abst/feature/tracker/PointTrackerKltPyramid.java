@@ -250,12 +250,14 @@ public class PointTrackerKltPyramid<I extends ImageSingleBand,D extends ImageSin
 	}
 
 	@Override
-	public void dropTrack(PointTrack track) {
+	public boolean dropTrack(PointTrack track) {
 		if( active.remove((PyramidKltFeature)track.getDescription()) ) {
 			// only recycle the description if it is in the active list.  This avoids the problem of adding the
 			// same description multiple times
 			unused.add((PyramidKltFeature)track.getDescription());
+			return true;
 		}
+		return false;
 	}
 
 	@Override

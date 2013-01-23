@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.feature.associate;
+package boofcv.struct;
 
 import org.junit.Test;
 
@@ -25,7 +25,7 @@ import static org.junit.Assert.fail;
 /**
  * @author Peter Abeles
  */
-public class TestAssociateUniqueByScore {
+public class TestGrowQueue_B {
 
 	@Test
 	public void stuff() {

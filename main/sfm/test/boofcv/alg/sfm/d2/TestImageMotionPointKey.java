@@ -204,7 +204,7 @@ public class TestImageMotionPointKey {
 		public void dropAllTracks() {}
 
 		@Override
-		public void dropTrack(PointTrack track) {numDropped++;}
+		public boolean dropTrack(PointTrack track) {numDropped++;return true;}
 
 		@Override
 		public List<PointTrack> getAllTracks( List<PointTrack> list ) {

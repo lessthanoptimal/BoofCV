@@ -50,6 +50,9 @@ import java.util.List;
 // TODO Show right camera tracks in debugger
 public class VisOdomStereoPnP<T extends ImageSingleBand,Desc extends TupleDesc> {
 
+	// TODO Listener for stereo parameter change
+	// TODO debugging code.  Check for unique features src/dst
+
 	// when the inlier set is less than this number new features are detected
 	private int thresholdAdd;
 
@@ -80,7 +83,6 @@ public class VisOdomStereoPnP<T extends ImageSingleBand,Desc extends TupleDesc> 
 	// known stereo baseline
 	private Se3_F64 leftToRight = new Se3_F64();
 
-	GrowQueue_I32 assignedRight = new GrowQueue_I32();
 	// List of tracks from left image that remain after geometric filters have been applied
 	private List<PointTrack> candidates = new ArrayList<PointTrack>();
 
@@ -126,6 +128,7 @@ public class VisOdomStereoPnP<T extends ImageSingleBand,Desc extends TupleDesc> 
 		param.rightToLeft.invert(leftToRight);
 		leftImageToNorm = LensDistortionOps.transformRadialToNorm_F64(param.left );
 		rightImageToNorm = LensDistortionOps.transformRadialToNorm_F64(param.right);
+		stereoCheck.setCalibration(param);
 	}
 
 	/**
@@ -141,6 +144,7 @@ public class VisOdomStereoPnP<T extends ImageSingleBand,Desc extends TupleDesc> 
 	}
 
 	public boolean process( T left , T right ) {
+		System.out.println("----------- Process --------------");
 
 		trackerLeft.process(left);
 		trackerRight.process(right);
@@ -161,7 +165,6 @@ public class VisOdomStereoPnP<T extends ImageSingleBand,Desc extends TupleDesc> 
 				refineMotionEstimate();
 
 			if( thresholdAdd <= 0 || N < thresholdAdd ) {
-				System.out.println("----------- Spawn Tracks --------------");
 				changePoseToReference();
 				addNewTracks();
 			}
@@ -245,13 +248,11 @@ public class VisOdomStereoPnP<T extends ImageSingleBand,Desc extends TupleDesc> 
 	 */
 	private void mutualTrackDrop() {
 		for( PointTrack t : trackerLeft.getDroppedTracks(null) ) {
-			System.out.println("dropped left "+t.x+" "+t.y);
 			LeftTrackInfo info = t.getCookie();
 			trackerRight.dropTrack(info.right);
 		}
 		for( PointTrack t : trackerRight.getDroppedTracks(null) ) {
 			RightTrackInfo info = t.getCookie();
-			System.out.println("dropping left "+info.left.x+" "+info.left.y);
 			// a track could be dropped twice here, such requests are ignored by the tracker
 			trackerLeft.dropTrack(info.left);
 		}
@@ -263,14 +264,21 @@ public class VisOdomStereoPnP<T extends ImageSingleBand,Desc extends TupleDesc> 
 	 */
 	private void selectCandidateTracks() {
 		// mark tracks in right frame that are active
-		for( PointTrack t : trackerRight.getActiveTracks(null) ) {
+		List<PointTrack> activeRight = trackerRight.getActiveTracks(null);
+		for( PointTrack t : activeRight ) {
 			RightTrackInfo info = t.getCookie();
 			info.lastActiveList = tick;
 		}
 
+		int mutualActive = 0;
+		List<PointTrack> activeLeft = trackerLeft.getActiveTracks(null);
 		candidates.clear();
-		for( PointTrack left : trackerLeft.getActiveTracks(null) ) {
+		for( PointTrack left : activeLeft ) {
 			LeftTrackInfo info = left.getCookie();
+
+			if( info == null || info.right == null ) {
+				System.out.println("Oh Crap");
+			}
 
 			// for each active left track, see if its right track has been marked as active
 			RightTrackInfo infoRight = info.right.getCookie();
@@ -282,8 +290,12 @@ public class VisOdomStereoPnP<T extends ImageSingleBand,Desc extends TupleDesc> 
 			if( stereoCheck.checkPixel(left, info.right) ) {
 				candidates.add(left);
 			}
+			mutualActive++;
 		}
 
+		System.out.println("Active Tracks: Left "+trackerLeft.getActiveTracks(null).size()+" right "+
+				trackerRight.getActiveTracks(null).size());
+		System.out.println("Candidates: "+candidates.size()+" mutual "+mutualActive);
 	}
 
 
@@ -300,11 +312,14 @@ public class VisOdomStereoPnP<T extends ImageSingleBand,Desc extends TupleDesc> 
 		for( PointTrack t : all ) {
 			LeftTrackInfo info = t.getCookie();
 			if( tick - info.lastConsistent >= thresholdRetire ) {
-				trackerLeft.dropTrack(t);
-				trackerRight.dropTrack(info.right);
+				if( !trackerLeft.dropTrack(t) )
+					throw new IllegalArgumentException("failed to drop unused left track");
+				if( !trackerRight.dropTrack(info.right) )
+					throw new IllegalArgumentException("failed to drop unused right track");
 				num++;
 			}
 		}
+		System.out.println("  total unused dropped "+num);
 
 		return num;
 	}
@@ -337,11 +352,6 @@ public class VisOdomStereoPnP<T extends ImageSingleBand,Desc extends TupleDesc> 
 		addNewToList(trackerLeft,newLeft,pointsLeft,descLeft);
 		addNewToList(trackerRight,newRight,pointsRight,descRight);
 
-		// set up data structures
-		assignedRight.resize(pointsRight.size);
-		for( int i = 0; i < assignedRight.size; i++ )
-			assignedRight.data[i] = -1;
-
 		// associate using L2R
 		assocL2R.setSource(pointsLeft,descLeft);
 		assocL2R.setDestination(pointsRight, descRight);
@@ -353,11 +363,6 @@ public class VisOdomStereoPnP<T extends ImageSingleBand,Desc extends TupleDesc> 
 
 		for( int i = 0; i < matches.size; i++ ) {
 			AssociatedIndex m = matches.get(i);
-
-			if( assignedRight.data[m.dst] != -1 ) {
-				throw new RuntimeException("The association must ensure only unique associations for src and dst");
-			}
-			assignedRight.data[m.dst] = 1;
 
 			PointTrack trackL = newLeft.get(m.src);
 			PointTrack trackR = newRight.get(m.dst);
@@ -376,7 +381,7 @@ public class VisOdomStereoPnP<T extends ImageSingleBand,Desc extends TupleDesc> 
 
 			// convert pixel observations into normalized image coordinates
 			leftImageToNorm.compute(trackL.x,trackL.y,p2d3d.leftObs);
-			leftImageToNorm.compute(trackR.x,trackR.y,p2d3d.rightObs);
+			rightImageToNorm.compute(trackR.x,trackR.y,p2d3d.rightObs);
 
 			// triangulate 3D coordinate in the current camera frame
 			if( triangulate.triangulate(p2d3d.leftObs,p2d3d.rightObs,leftToRight,cameraP3) )
@@ -389,24 +394,38 @@ public class VisOdomStereoPnP<T extends ImageSingleBand,Desc extends TupleDesc> 
 				infoRight.left = trackL;
 			} else {
 				// triangulation failed, drop track
-				assignedRight.data[m.dst] = -1;
-				System.out.println(" no triangulate "+trackL.x+" "+trackL.y);
 				trackerLeft.dropTrack(trackL);
+				// TODO need way to mark right tracks which are unassociated after this loop
 			}
 		}
 
 		// drop tracks that were not associated
-		for( int i = 0; i < assignedRight.size; i++ ) {
-			if( assignedRight.data[i] != -1 )
-				continue;
-			trackerRight.dropTrack(newRight.get(i));
+		GrowQueue_I32 unassignedRight = assocL2R.getUnassociatedDestination();
+		for( int i = 0; i < unassignedRight.size; i++ ) {
+			int index = unassignedRight.get(i);
+//			System.out.println(" unassigned right "+newRight.get(index).x+" "+newRight.get(index).y);
+			trackerRight.dropTrack(newRight.get(index));
 		}
 		GrowQueue_I32 unassignedLeft = assocL2R.getUnassociatedSource();
 		for( int i = 0; i < unassignedLeft.size; i++ ) {
 			int index = unassignedLeft.get(i);
-			System.out.println(" unassigned "+newLeft.get(index).x+" "+newLeft.get(index).y);
 			trackerLeft.dropTrack(newLeft.get(index));
 		}
+
+		System.out.println("Associated: "+matches.size+" new left "+newLeft.size()+" new right "+newRight.size());
+		System.out.println("New Tracks: Total: Left "+trackerLeft.getAllTracks(null).size()+" right "+
+				trackerRight.getAllTracks(null).size());
+
+//		List<PointTrack> temp = trackerLeft.getActiveTracks(null);
+//		for( PointTrack t : temp ) {
+//			if( t.cookie == null )
+//				System.out.println("BUG!");
+//		}
+//		temp = trackerRight.getActiveTracks(null);
+//		for( PointTrack t : temp ) {
+//			if( t.cookie == null )
+//				System.out.println("BUG!");
+//		}
 	}
 
 	private void addNewToList( PointTrackerD<T,Desc> tracker , List<PointTrack> tracks ,

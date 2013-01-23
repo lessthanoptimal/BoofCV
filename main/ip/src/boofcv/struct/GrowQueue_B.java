@@ -20,21 +20,21 @@ package boofcv.struct;
 
 
 /**
- * This is a queue that is composed of integers.  Elements are added and removed from the tail
+ * This is a queue that is composed of booleans.  Elements are added and removed from the tail
  *
  * @author Peter Abeles
  */
-public class GrowQueue_F64 {
+public class GrowQueue_B {
 
-	public double data[];
+	public boolean data[];
 	public int size;
 
-	public GrowQueue_F64( int maxSize ) {
-		data = new double[ maxSize ];
+	public GrowQueue_B(int maxSize) {
+		data = new boolean[ maxSize ];
 		this.size = 0;
 	}
 
-	public GrowQueue_F64() {
+	public GrowQueue_B() {
 		this(10);
 	}
 
@@ -42,37 +42,33 @@ public class GrowQueue_F64 {
 		size = 0;
 	}
 
-	public void push( double val ) {
+	public void add(boolean value) {
+		push(value);
+	}
+
+	public void push( boolean val ) {
 		if( size == data.length ) {
-			double temp[];
-			try {
-				temp = new double[ size * 2];
-			} catch( OutOfMemoryError e ) {
-				System.gc();
-//				System.out.println("Memory on size "+size+" or "+(size*8/1024/1024)+" MB");
-//				System.out.println("Trying smaller increment");
-				temp = new double[ 3*size/2];
-			}
+			boolean temp[] = new boolean[ size * 2];
 			System.arraycopy(data,0,temp,0,size);
 			data = temp;
 		}
 		data[size++] = val;
-    }
+	}
 
-	public double get( int index ) {
+	public boolean get( int index ) {
 		return data[index];
 	}
 
 	public void resize( int size ) {
 		if( data.length < size ) {
-			data = new double[size];
+			data = new boolean[size];
 		}
 		this.size = size;
 	}
 
 	public void setMaxSize( int size ) {
 		if( data.length < size ) {
-			data = new double[size];
+			data = new boolean[size];
 		}
 	}
 
@@ -80,7 +76,7 @@ public class GrowQueue_F64 {
 		return size;
 	}
 
-    public double pop() {
-        return data[--size];
-    }
+	public boolean pop() {
+		return data[--size];
+	}
 }
