@@ -21,7 +21,7 @@ package boofcv.alg.feature.tracker;
 import boofcv.abst.feature.associate.Associate;
 import boofcv.abst.feature.associate.AssociateDescription2D;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
-import boofcv.abst.feature.tracker.DetectAssociateTracker;
+import boofcv.abst.feature.tracker.DdaTrackerDetectDescribePoint;
 import boofcv.abst.feature.tracker.ModelAssistedTracker;
 import boofcv.abst.feature.tracker.PointTrack;
 import boofcv.abst.feature.tracker.TrackGeometryManager;
@@ -42,7 +42,7 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class AssistedTrackerTwoPass<I extends ImageSingleBand,D extends TupleDesc,Model,Info>
-		extends DetectAssociateTracker<I,D>
+		extends DdaTrackerDetectDescribePoint<I,D>
 		implements ModelAssistedTracker<I,Model,Info> {
 
 	TrackGeometryManager<Model,Info> manager;

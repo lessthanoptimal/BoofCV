@@ -20,8 +20,10 @@ package boofcv.abst.sfm;
 
 import boofcv.abst.feature.tracker.PointTrack;
 import boofcv.alg.distort.LensDistortionOps;
+import boofcv.alg.geo.DistanceModelMonoPixels;
 import boofcv.alg.sfm.StereoSparse3D;
 import boofcv.alg.sfm.d3.VisOdomPixelDepthPnP;
+import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.distort.PointTransform_F64;
 import boofcv.struct.geo.Point2D3D;
@@ -42,18 +44,18 @@ public class WrapVisOdomPixelDepthPnP<T extends ImageSingleBand,Model,Info>
 	// low level algorithm
 	VisOdomPixelDepthPnP<T> alg;
 	StereoSparse3D<T> stereo;
-	ModelAssistedTrackerCalibrated<T,Model,Info> tracker;
+	DistanceModelMonoPixels<Se3_F64,Point2D3D> distance;
 	Class<T> imageType;
 	boolean failed;
 
 
 	public WrapVisOdomPixelDepthPnP(VisOdomPixelDepthPnP<T> alg,
 									StereoSparse3D<T> stereo,
-									ModelAssistedTrackerCalibrated<T,Model,Info> tracker,
+									DistanceModelMonoPixels<Se3_F64,Point2D3D> distance,
 									Class<T> imageType) {
 		this.alg = alg;
 		this.stereo = stereo;
-		this.tracker = tracker;
+		this.distance = distance;
 		this.imageType = imageType;
 	}
 
@@ -90,13 +92,14 @@ public class WrapVisOdomPixelDepthPnP<T extends ImageSingleBand,Model,Info>
 	public void setCalibration( StereoParameters parameters ) {
 		stereo.setCalibration(parameters);
 
+		IntrinsicParameters l = parameters.left;
+
 		PointTransform_F64 leftPixelToNorm = LensDistortionOps.transformRadialToNorm_F64(parameters.left);
 		PointTransform_F64 leftNormToPixel = LensDistortionOps.transformNormToRadial_F64(parameters.left);
 
 		alg.setPixelToNorm(leftPixelToNorm);
 		alg.setNormToPixel(leftNormToPixel);
-
-		tracker.setCalibration(parameters.left);
+		distance.setIntrinsic(l.fx,l.fy,l.skew);
 	}
 
 	@Override

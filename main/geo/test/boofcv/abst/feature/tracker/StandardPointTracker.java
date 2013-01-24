@@ -354,7 +354,7 @@ public abstract class StandardPointTracker<T extends ImageSingleBand> {
 		tracker.spawnTracks();
 
 		List<PointTrack> input = new ArrayList<PointTrack>();
-		assertTrue( input == tracker.getActiveTracks(input));
+		assertTrue(input == tracker.getActiveTracks(input));
 
 		List<PointTrack> ret = tracker.getActiveTracks(null);
 
@@ -415,6 +415,50 @@ public abstract class StandardPointTracker<T extends ImageSingleBand> {
 		assertTrue(ret.size() > 0 );
 
 		checkIdentical(input, ret);
+	}
+
+	@Test
+	public void extractDescription() {
+		tracker = createTracker();
+		if( !(tracker instanceof ExtractTrackDescription) )
+			return;
+
+		ExtractTrackDescription extract = (ExtractTrackDescription)tracker;
+
+		fail("Implement");
+	}
+
+	@Test
+	public void createDescription() {
+		tracker = createTracker();
+		if( !(tracker instanceof ExtractTrackDescription) )
+			return;
+
+		ExtractTrackDescription extract = (ExtractTrackDescription)tracker;
+
+		fail("Implement");
+	}
+
+	@Test
+	public void getDescriptionLength() {
+		tracker = createTracker();
+		if( !(tracker instanceof ExtractTrackDescription) )
+			return;
+
+		ExtractTrackDescription extract = (ExtractTrackDescription)tracker;
+
+		fail("Implement");
+	}
+
+	@Test
+	public void getDescriptionType() {
+		tracker = createTracker();
+		if( !(tracker instanceof ExtractTrackDescription) )
+			return;
+
+		ExtractTrackDescription extract = (ExtractTrackDescription)tracker;
+
+		fail("Implement");
 	}
 
 	private void checkIdentical( List<PointTrack> a , List<PointTrack> b ){

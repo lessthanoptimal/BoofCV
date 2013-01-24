@@ -31,10 +31,10 @@ public class PointTrack extends Point2D_F64 {
 	 */
 	public long featureId;
 	
-	// user specified data
+	/** User specified data */
 	public Object cookie;
 
-	// description of this feature
+	/* Description of this feature that is used internally.  Don't mess with this */
 	private Object description;
 
 	public PointTrack(double x, double y, long featureId) {

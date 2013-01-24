@@ -28,14 +28,13 @@ import georegression.struct.point.Point2D_F64;
 
 /**
  * <p>
- * Tracker for image features which are first detected and then associated using the extracted
- * feature description.  For this tracker to work well the feature descriptor must be very strong
- * and result in the correct association without any model of the model being fit.
+ * Extension of {@link DetectAssociateBase} which uses the {@link DetectDescribePoint} interface for extracting
+ * features from an image.
  * </p>
  *
  * @author Peter Abeles
  */
-public class DetectAssociateTracker<I extends ImageSingleBand, Desc extends TupleDesc>
+public class DdaTrackerDetectDescribePoint<I extends ImageSingleBand, Desc extends TupleDesc>
 		extends DetectAssociateBase<I, Desc> {
 
 	// Feature detector and describer
@@ -49,9 +48,9 @@ public class DetectAssociateTracker<I extends ImageSingleBand, Desc extends Tupl
 	 * @param updateDescription If true then the feature description will be updated after each image.
 	 *                          Typically this should be false.
 	 */
-	public DetectAssociateTracker( final DetectDescribePoint<I, Desc> detDesc ,
-								   final AssociateDescription2D<Desc> associate ,
-								   final boolean updateDescription ) {
+	public DdaTrackerDetectDescribePoint(final DetectDescribePoint<I, Desc> detDesc,
+										 final AssociateDescription2D<Desc> associate,
+										 final boolean updateDescription) {
 		super(associate,updateDescription,detDesc.getDescriptionType());
 		this.detDesc = detDesc;
 	}
