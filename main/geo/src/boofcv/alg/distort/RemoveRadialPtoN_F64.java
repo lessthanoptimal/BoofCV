@@ -116,6 +116,8 @@ public class RemoveRadialPtoN_F64 implements PointTransform_F64 {
 
 			if( Math.abs(prevSum-sum) <= tol ) {
 				break;
+			} else {
+				prevSum = sum;
 			}
 		}
 	}

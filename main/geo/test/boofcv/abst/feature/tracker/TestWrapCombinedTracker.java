@@ -42,8 +42,6 @@ import java.util.Random;
  */
 public class TestWrapCombinedTracker extends StandardPointTracker<ImageFloat32> {
 
-	PointTracker<ImageFloat32> pointTracker;
-
 	public TestWrapCombinedTracker() {
 		super(true, false);
 	}
@@ -63,7 +61,7 @@ public class TestWrapCombinedTracker extends StandardPointTracker<ImageFloat32> 
 		AssociateDescription<TupleDesc_B> association =
 				FactoryAssociation.greedy(score, 400, true);
 
-		pointTracker = FactoryPointTracker.combined(
+		PointTracker<ImageFloat32> pointTracker = FactoryPointTracker.combined(
 				detector, null,
 				new WrapDescribeBrief<ImageFloat32>(brief),
 				association, 2, new int[]{1, 2, 4}, 20, ImageFloat32.class);

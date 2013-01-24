@@ -49,7 +49,7 @@ public class TestDdaTrackerGeneralPoint extends StandardPointTracker<ImageFloat3
 	}
 
 	@Override
-	public PointTrackerD<ImageFloat32,TupleDesc_B> createTracker() {
+	public PointTracker<ImageFloat32> createTracker() {
 		DescribePointBrief<ImageFloat32> brief =
 				FactoryDescribePointAlgs.brief(FactoryBriefDefinition.gaussian2(new Random(123), 16, 512),
 						FactoryBlurFilter.gaussian(ImageFloat32.class, 0, 4));

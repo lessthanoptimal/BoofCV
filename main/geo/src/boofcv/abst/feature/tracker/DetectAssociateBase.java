@@ -38,7 +38,7 @@ import java.util.List;
  * @author Peter Abeles
  */
 public abstract class DetectAssociateBase<I extends ImageSingleBand, Desc extends TupleDesc>
-		implements PointTrackerD<I,Desc> {
+		implements PointTracker<I>, ExtractTrackDescription<Desc> {
 
 	// associates features between two images together
 	protected AssociateDescription2D<Desc> associate;
@@ -284,11 +284,6 @@ public abstract class DetectAssociateBase<I extends ImageSingleBand, Desc extend
 	}
 
 	@Override
-	public Desc extractDescription(PointTrack track) {
-		return track.getDescription();
-	}
-
-	@Override
 	public void dropAllTracks() {
 		unused.addAll(tracksAll);
 		tracksActive.clear();
@@ -313,6 +308,11 @@ public abstract class DetectAssociateBase<I extends ImageSingleBand, Desc extend
 		// recycle the data
 		unused.add(track);
 		return true;
+	}
+
+	@Override
+	public Desc extractDescription(PointTrack track) {
+		return track.getDescription();
 	}
 
 	@Override
