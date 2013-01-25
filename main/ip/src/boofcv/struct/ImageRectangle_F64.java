@@ -16,19 +16,33 @@
  * limitations under the License.
  */
 
-package boofcv.alg.sfm.d2;
+package boofcv.struct;
 
-import org.junit.Test;
-
-import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
  */
-public class TestMotionMosaicPointKey {
+public class ImageRectangle_F64 {
+	public double x0,y0,x1,y1;
 
-	@Test
-	public void stuff() {
-		fail("something should go here");
+	public ImageRectangle_F64(double x0, double y0, double x1, double y1) {
+		this.x0 = x0;
+		this.y0 = y0;
+		this.x1 = x1;
+		this.y1 = y1;
+	}
+
+	public ImageRectangle_F64(ImageRectangle_F64 orig) {
+		this.x0 = orig.x0;
+		this.y0 = orig.y0;
+		this.x1 = orig.x1;
+		this.y1 = orig.y1;
+	}
+
+	public ImageRectangle_F64() {
+	}
+
+	public double area() {
+		return (y1-y0)*(x1-x0);
 	}
 }

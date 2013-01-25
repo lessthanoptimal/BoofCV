@@ -41,11 +41,11 @@ import java.util.Random;
 /**
  * @author Peter Abeles
  */
-public class TestDetectAssociateTracker extends StandardPointTracker<ImageFloat32> {
+public class TestDdaManagerDetectDescribePoint extends StandardPointTracker<ImageFloat32> {
 
-	DdaTrackerDetectDescribePoint<ImageFloat32,TupleDesc_B> dat;
 
-	public TestDetectAssociateTracker() {
+
+	public TestDdaManagerDetectDescribePoint() {
 		super(true, false);
 	}
 
@@ -69,9 +69,10 @@ public class TestDetectAssociateTracker extends StandardPointTracker<ImageFloat3
 				new DetectDescribeFusion<ImageFloat32,TupleDesc_B>(
 						detector,null,new WrapDescribeBrief<ImageFloat32>(brief));
 
-		dat = new DdaTrackerDetectDescribePoint<ImageFloat32,TupleDesc_B>(fused, association,false);
-
-
-		return dat;
+		DdaManagerDetectDescribePoint<ImageFloat32,TupleDesc_B> manager;
+		manager = new DdaManagerDetectDescribePoint<ImageFloat32,TupleDesc_B>(fused);
+		DetectDescribeAssociate<ImageFloat32,TupleDesc_B> tracker =
+				new DetectDescribeAssociate<ImageFloat32, TupleDesc_B>(manager,association,false);
+		return tracker;
 	}
 }

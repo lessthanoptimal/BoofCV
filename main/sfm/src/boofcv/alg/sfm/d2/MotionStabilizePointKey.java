@@ -18,11 +18,13 @@
 
 package boofcv.alg.sfm.d2;
 
-import boofcv.abst.feature.tracker.ModelAssistedTracker;
+import boofcv.abst.feature.tracker.PointTracker;
 import boofcv.struct.distort.PixelTransform_F32;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.InvertibleTransform;
+import org.ddogleg.fitting.modelset.ModelFitter;
+import org.ddogleg.fitting.modelset.ModelMatcher;
 
 /**
  * Extension of {@link ImageMotionPointKey} specifically designed to stabilize image motion.  The algorithm
@@ -32,8 +34,8 @@ import georegression.struct.InvertibleTransform;
  * 
  * @author Peter Abeles
  */
-public class MotionStabilizePointKey<I extends ImageSingleBand, T extends InvertibleTransform>
-	extends ImageMotionPointKey<I,T>
+public class MotionStabilizePointKey<I extends ImageSingleBand, IT extends InvertibleTransform>
+		extends ImageMotionPointKey<I, IT>
 {
 	// a new keyframe is selected when there are fewer than this number of inliers
 	private int thresholdKeyFrame;
@@ -46,34 +48,38 @@ public class MotionStabilizePointKey<I extends ImageSingleBand, T extends Invert
 	boolean isReset;
 	// if the internal keyframe has changed
 	boolean isKeyFrame;
-	
+
 	/**
 	 * Specify algorithms to use internally.  Each of these classes must work with
 	 * compatible data structures.
 	 *
-	 * @param tracker Feature tracker and motion estimator
+	 * @param tracker feature tracker
+	 * @param modelMatcher Fits model to track data
+	 * @param modelRefiner (Optional) Refines the found model using the entire inlier set. Can be null.
 	 * @param model Motion model data structure
 	 * @param thresholdKeyFrame  If the number of inlier is less than this number the keyframe will change.
 	 * @param thresholdReset If the number of inlier is less than this number a reset will occur.
 	 * @param largeMotionThreshold  If the transform from the key frame to the current frame is more than this a reset will occur.
 	 */
-	public MotionStabilizePointKey(ModelAssistedTracker<I,T,AssociatedPair> tracker ,
-								   T model ,
+	public MotionStabilizePointKey(PointTracker<I> tracker,
+								   ModelMatcher<IT, AssociatedPair> modelMatcher,
+								   ModelFitter<IT,AssociatedPair> modelRefiner,
+								   IT model ,
 								   int thresholdKeyFrame , int thresholdReset ,
 								   int pruneThreshold ,
 								   int largeMotionThreshold )
 	{
-		super(tracker, model,pruneThreshold);
+		super(tracker, modelMatcher, modelRefiner, model,pruneThreshold);
 
 		if( thresholdKeyFrame < thresholdReset ) {
 			throw new IllegalArgumentException("Threshold for key frame should be more than reset");
 		}
-		
+
 		this.thresholdKeyFrame = thresholdKeyFrame;
 		this.thresholdReset = thresholdReset;
 		this.largeMotionThreshold = largeMotionThreshold;
 	}
-	
+
 	@Override
 	public boolean process( I frame ) {
 		if( !super.process(frame) ) {
@@ -90,7 +96,7 @@ public class MotionStabilizePointKey<I extends ImageSingleBand, T extends Invert
 		isReset = false;
 		isKeyFrame = false;
 
-		int inliers = tracker.getMatchSet().size();
+		int inliers = modelMatcher.getMatchSet().size();
 
 		// too few features to have a reliable motion estimate?
 		if( inliers < thresholdReset ) {
@@ -100,7 +106,12 @@ public class MotionStabilizePointKey<I extends ImageSingleBand, T extends Invert
 			// too few features in common with the current key frame?
 			isKeyFrame = true;
 			changeKeyFrame();
+		} else if( contFraction < 0.3 ) {
+			// if a good percentage of the screen isn't covered then the estimate is likely to be bad
+			isKeyFrame = true;
+			changeKeyFrame();
 		}
+		System.out.println("contFraction "+contFraction);
 
 		PixelTransform_F32 local = UtilImageMotion.createPixelTransform(keyToCurr);
 

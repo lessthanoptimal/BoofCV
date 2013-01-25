@@ -114,7 +114,7 @@ public class FactoryVisualOdometry {
 		}
 
 		VisOdomPixelDepthPnP<T> alg =
-				new VisOdomPixelDepthPnP<T>(thresholdAdd,thresholdRetire ,motion,pixelTo3D,refine,tracker,null,null);
+				new VisOdomPixelDepthPnP<T>(thresholdAdd,thresholdRetire ,motion,pixelTo3D,refine,null,null,null);
 
 		return new WrapVisOdomPixelDepthPnP<T,Se3_F64,Point2D3D>(alg,pixelTo3D,distance,imageType);
 	}

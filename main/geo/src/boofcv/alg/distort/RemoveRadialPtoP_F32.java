@@ -39,7 +39,6 @@ public class RemoveRadialPtoP_F32 extends RemoveRadialPtoN_F32 {
 		//  distorted pixel to undistorted normalized
 		super.compute(x,y,out);
 
-
 		out.x = (x+x_c*sum)/(1+sum);
 		out.y = (y+y_c*sum)/(1+sum);
 	}
