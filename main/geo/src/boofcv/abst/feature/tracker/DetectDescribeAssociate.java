@@ -37,11 +37,14 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public abstract class DetectAssociateBase<I extends ImageSingleBand, Desc extends TupleDesc>
+public class DetectDescribeAssociate<I extends ImageSingleBand, Desc extends TupleDesc>
 		implements PointTracker<I>, ExtractTrackDescription<Desc> {
 
 	// associates features between two images together
 	protected AssociateDescription2D<Desc> associate;
+
+	// Detects features and manages descriptions
+	protected DdaFeatureManager<I,Desc> manager;
 
 	// location of interest points
 	protected FastQueue<Point2D_F64> locDst = new FastQueue<Point2D_F64>(10,Point2D_F64.class,false);
@@ -82,19 +85,19 @@ public abstract class DetectAssociateBase<I extends ImageSingleBand, Desc extend
 	 * @param associate Association
 	 * @param updateDescription If true then the feature description will be updated after each image.
 	 *                          Typically this should be false.
-	 * @param descriptorType
 	 */
-	public DetectAssociateBase(final AssociateDescription2D<Desc> associate,
-							   final boolean updateDescription,
-							   Class<Desc> descriptorType ) {
+	public DetectDescribeAssociate(DdaFeatureManager<I, Desc> manager,
+								   final AssociateDescription2D<Desc> associate,
+								   final boolean updateDescription ) {
+		this.manager = manager;
 		this.associate = associate;
 		this.updateDescription = updateDescription;
 
-		featSrc = new FastQueue<Desc>(10,descriptorType,false);
-		featDst = new FastQueue<Desc>(10,descriptorType,false);
+		featSrc = new FastQueue<Desc>(10,manager.getDescriptionType(),false);
+		featDst = new FastQueue<Desc>(10,manager.getDescriptionType(),false);
 	}
 
-	protected DetectAssociateBase() {
+	protected DetectDescribeAssociate() {
 	}
 
 	public boolean isUpdateDescription() {
@@ -128,13 +131,10 @@ public abstract class DetectAssociateBase<I extends ImageSingleBand, Desc extend
 		featDst.reset();
 		locDst.reset();
 
-		detectFeatures(input,locDst,featDst);
+		manager.detectFeatures(input, locDst, featDst);
 
-		// skip if there are no features to match with the current image
+		// skip if there are no features
 		if( !tracksAll.isEmpty() ) {
-			// create a list of previously detected features
-			if( featSrc.size != 0 )
-				throw new RuntimeException("BUG");
 
 			performTracking();
 
@@ -150,19 +150,15 @@ public abstract class DetectAssociateBase<I extends ImageSingleBand, Desc extend
 		}
 	}
 
-
-	/**
-	 * Detect features in the input image and pass the results into the two lists.
-	 *
-	 * @param input Input image.
-	 * @param locDst Location of detected feature.  Add references to list.
-	 * @param featDst Description of each detected feature.  Add references to list.
-	 */
-	protected abstract void detectFeatures( I input , FastQueue<Point2D_F64> locDst , FastQueue<Desc> featDst );
-
 	protected void performTracking() {
-		// Match features
-		associateFeatures();
+		// create source list
+		putIntoSrcList();
+
+		// associate features together
+		associate.setSource(locSrc, featSrc);
+		associate.setDestination(locDst, featDst);
+		associate.associate();
+
 		// used in spawn tracks.  if null then no tracking data is assumed
 		matches = associate.getMatches();
 
@@ -171,14 +167,17 @@ public abstract class DetectAssociateBase<I extends ImageSingleBand, Desc extend
 	}
 
 	/**
-	 * Associate features and update the track information
+	 * Put existing tracks into source list for association
 	 */
-	protected void associateFeatures() {
+	protected void putIntoSrcList() {
+		// make sure isAssociated is large enough
 		if( isAssociated.length < tracksAll.size() ) {
 			isAssociated = new boolean[ tracksAll.size() ];
 		}
 
-		// put each track's location and description into the source list
+		featSrc.reset();
+		locSrc.reset();
+
 		for( int i = 0; i < tracksAll.size(); i++ ) {
 			PointTrack t = tracksAll.get(i);
 			Desc desc = t.getDescription();
@@ -186,12 +185,11 @@ public abstract class DetectAssociateBase<I extends ImageSingleBand, Desc extend
 			locSrc.add(t);
 			isAssociated[i] = false;
 		}
-
-		associate.setSource(locSrc, featSrc);
-		associate.setDestination(locDst, featDst);
-		associate.associate();
 	}
 
+	/**
+	 * Update each track's location and description (if configured to do so) mark tracks as being associated.
+	 */
 	protected void updateTrackState( FastQueue<AssociatedIndex> matches ) {
 		// update tracks
 		for( int i = 0; i < matches.size; i++ ) {
@@ -209,7 +207,6 @@ public abstract class DetectAssociateBase<I extends ImageSingleBand, Desc extend
 			isAssociated[indexes.src] = true;
 		}
 	}
-
 
 	/**
 	 * Takes the current crop of detected features and makes them the keyframe
@@ -358,5 +355,20 @@ public abstract class DetectAssociateBase<I extends ImageSingleBand, Desc extend
 
 		list.addAll(tracksInactive);
 		return list;
+	}
+
+	@Override
+	public Desc createDescription() {
+		return manager.createDescription();
+	}
+
+	@Override
+	public int getDescriptionLength() {
+		return manager.getDescriptionLength();
+	}
+
+	@Override
+	public Class<Desc> getDescriptionType() {
+		return manager.getDescriptionType();
 	}
 }

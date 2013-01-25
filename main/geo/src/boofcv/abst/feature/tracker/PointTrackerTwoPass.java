@@ -28,7 +28,18 @@ import boofcv.struct.image.ImageBase;
  * </p>
  *
  * <p>
+ * The behavior of {@link #process(boofcv.struct.image.ImageBase)}} has been changed.  It will only update each track's
+ * location and the active list. {@link #performSecondPass()} will also only update the track's location and
+ * active list.  {@link #finishTracking()} will update the dropped list and change the track's description.
+ * </p>
+ *
+ * <p>
  * NOTE: A track hint can be set before {@link #process(boofcv.struct.image.ImageBase)} is called.
+ * </p>
+ *
+ * <p>
+ * NOTE: Calling {@link #process(boofcv.struct.image.ImageBase)} and {@link #finishTracking()} is equivalent
+ * to just calling process() in the standard {@link PointTracker} interface.
  * </p>
  *
  * @author Peter Abeles
@@ -36,13 +47,23 @@ import boofcv.struct.image.ImageBase;
 public interface PointTrackerTwoPass<T extends ImageBase> extends PointTracker<T> {
 
 	/**
-	 * Updates spacial information for each track.  Does not change the track description.  Can be called multiple
-	 * times.
+	 * Changes behavior of {@link PointTracker#process(boofcv.struct.image.ImageBase)} in that it will only
+	 * update each track's location, but not its description, and the active list.  Call {@link #finishTracking()}
+	 * to update the track's description, the inactive list, and the dropped list.  An exception is thrown if
+	 * multiple calls to this function are made without calling {@link #finishTracking()}.
+	 *
+	 * @param image Next image in the sequence
+	 */
+	public void process(T image);
+
+	/**
+	 * Updates spacial information for each track and active list.  Does not change the track description or any other
+	 * lists.  Can be called multiple times.
 	 */
 	public void performSecondPass();
 
 	/**
-	 *
+	 * Finishes tracking and updates the track's description, updates inactive and drop track lists.
 	 */
 	public void finishTracking();
 

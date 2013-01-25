@@ -40,11 +40,9 @@ import java.util.Random;
 /**
  * @author Peter Abeles
  */
-public class TestDdaTrackerGeneralPoint extends StandardPointTracker<ImageFloat32> {
+public class TestDdaManagerGeneralPoint extends StandardPointTracker<ImageFloat32> {
 
-	DdaTrackerGeneralPoint<ImageFloat32,ImageFloat32,TupleDesc_B> dat;
-
-	public TestDdaTrackerGeneralPoint() {
+	public TestDdaManagerGeneralPoint() {
 		super(true, false);
 	}
 
@@ -67,8 +65,11 @@ public class TestDdaTrackerGeneralPoint extends StandardPointTracker<ImageFloat3
 		EasyGeneralFeatureDetector<ImageFloat32,ImageFloat32> easy = new
 				EasyGeneralFeatureDetector<ImageFloat32,ImageFloat32>(corner,ImageFloat32.class,ImageFloat32.class);
 
-		dat = new DdaTrackerGeneralPoint<ImageFloat32,ImageFloat32,TupleDesc_B>(association,false,easy,describe,2);
+		DdaManagerGeneralPoint<ImageFloat32,ImageFloat32,TupleDesc_B> manager;
+		manager = new DdaManagerGeneralPoint<ImageFloat32,ImageFloat32,TupleDesc_B>(easy,describe,2);
 
-		return dat;
+		DetectDescribeAssociate<ImageFloat32,TupleDesc_B> tracker =
+				new DetectDescribeAssociate<ImageFloat32, TupleDesc_B>(manager,association,false);
+		return tracker;
 	}
 }

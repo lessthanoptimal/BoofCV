@@ -20,12 +20,14 @@ package boofcv.alg.sfm.d3;
 
 import boofcv.abst.feature.tracker.PointTrack;
 import boofcv.abst.feature.tracker.PointTracker;
+import boofcv.abst.feature.tracker.PointTrackerTwoPass;
 import boofcv.abst.geo.RefinePnP;
 import boofcv.abst.sfm.ImagePixelTo3D;
 import boofcv.struct.distort.PointTransform_F64;
 import boofcv.struct.geo.Point2D3D;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.sfm.Point2D3DTrack;
+import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
@@ -59,8 +61,11 @@ public class VisOdomPixelDepthPnP<T extends ImageBase> {
 	// discard tracks after they have not been in the inlier set for this many updates in a row
 	private int thresholdRetire;
 
+	// run the tracker once or twice?
+	boolean doublePass = true;
+
 	// tracks features in the image
-	private PointTracker<T> tracker;
+	private PointTrackerTwoPass<T> tracker;
 	// used to estimate a feature's 3D position from image range data
 	private ImagePixelTo3D pixelTo3D;
 	// converts from pixel to normalized image coordinates
@@ -107,7 +112,7 @@ public class VisOdomPixelDepthPnP<T extends ImageBase> {
 								ModelMatcher<Se3_F64, Point2D3D> motionEstimator,
 								ImagePixelTo3D pixelTo3D,
 								RefinePnP refine ,
-								PointTracker<T> tracker ,
+								PointTrackerTwoPass<T> tracker ,
 								PointTransform_F64 pixelToNorm ,
 								PointTransform_F64 normToPixel )
 	{
@@ -248,7 +253,6 @@ public class VisOdomPixelDepthPnP<T extends ImageBase> {
 	 * @return true if successful.
 	 */
 	private boolean estimateMotion() {
-
 		List<PointTrack> active = tracker.getActiveTracks(null);
 		List<Point2D3D> obs = new ArrayList<Point2D3D>();
 
@@ -261,6 +265,12 @@ public class VisOdomPixelDepthPnP<T extends ImageBase> {
 		// estimate the motion up to a scale factor in translation
 		if( !motionEstimator.process( obs ) )
 			return false;
+
+		if( doublePass ) {
+			if (!performSecondPass(active, obs))
+				return false;
+		}
+		tracker.finishTracking();
 
 		Se3_F64 keyToCurr;
 
@@ -283,6 +293,38 @@ public class VisOdomPixelDepthPnP<T extends ImageBase> {
 		}
 
 		return true;
+	}
+
+	private boolean performSecondPass(List<PointTrack> active, List<Point2D3D> obs) {
+		Se3_F64 keyToCurr = motionEstimator.getModel();
+
+		Point3D_F64 cameraPt = new Point3D_F64();
+		Point2D_F64 predicted = new Point2D_F64();
+
+		// predict where each track should be given the just estimated motion
+		List<PointTrack> all = tracker.getAllTracks(null);
+		for( PointTrack t : all ) {
+			Point2D3D p = t.getCookie();
+
+			SePointOps_F64.transform(keyToCurr, p.location, cameraPt);
+			normToPixel.compute(cameraPt.x / cameraPt.z, cameraPt.y / cameraPt.z, predicted);
+			tracker.setHint(predicted.x,predicted.y,t);
+		}
+
+		// redo tracking with the additional information
+		tracker.performSecondPass();
+
+		active.clear();
+		obs.clear();
+		tracker.getActiveTracks(active);
+
+		for( PointTrack t : active ) {
+			Point2D3D p = t.getCookie();
+			pixelToNorm.compute( t.x , t.y , p.observation );
+			obs.add( p );
+		}
+
+		return motionEstimator.process(obs);
 	}
 
 	private void concatMotion() {

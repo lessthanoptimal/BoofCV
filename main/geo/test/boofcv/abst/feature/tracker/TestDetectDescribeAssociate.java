@@ -18,10 +18,8 @@
 
 package boofcv.abst.feature.tracker;
 
-import boofcv.struct.FastQueue;
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.ImageFloat32;
-import georegression.struct.point.Point2D_F64;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -30,7 +28,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestDetectAssociateBase {
+public class TestDetectDescribeAssociate {
 
 	/**
 	 * Make sure drop track is correctly recycling the data
@@ -87,35 +85,12 @@ public class TestDetectAssociateBase {
 		assertTrue(dat.validCalled);
 	}
 
-	private static class Helper extends DetectAssociateBase<ImageFloat32,TupleDesc_F64> {
-
+	private static class Helper extends DetectDescribeAssociate<ImageFloat32,TupleDesc_F64> {
 		boolean validCalled = false;
-
-		@Override
-		protected void detectFeatures(ImageFloat32 input, FastQueue<Point2D_F64> locDst, FastQueue<TupleDesc_F64> featDst) {
-
-		}
 
 		protected boolean checkValidSpawn( PointTrack p ) {
 			validCalled = true;
 			return true;
 		}
-
-		@Override
-		public TupleDesc_F64 createDescription() {
-			return new TupleDesc_F64(10);
-		}
-
-		@Override
-		public int getDescriptionLength() {
-			return 0;
-		}
-
-		@Override
-		public Class<TupleDesc_F64> getDescriptionType() {
-			return null;
-		}
-
-
 	}
 }

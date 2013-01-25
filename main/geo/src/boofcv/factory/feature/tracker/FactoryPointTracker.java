@@ -128,7 +128,7 @@ public class FactoryPointTracker {
 	 * of SURF.
 	 *
 	 * @see DescribePointSurf
-	 * @see boofcv.abst.feature.tracker.DdaTrackerDetectDescribePoint
+	 * @see boofcv.abst.feature.tracker.DdaManagerDetectDescribePoint
 	 *
 	 * @param configDetector Configuration for SURF detector
 	 * @param configDescribe Configuration for SURF descriptor
@@ -153,7 +153,9 @@ public class FactoryPointTracker {
 		DetectDescribePoint<I,SurfFeature> fused =
 				FactoryDetectDescribe.surfFast(configDetector, configDescribe, configOrientation, imageType);
 
-		return new DdaTrackerDetectDescribePoint<I,SurfFeature>(fused, generalAssoc,false);
+		DdaManagerDetectDescribePoint<I,SurfFeature> manager = new DdaManagerDetectDescribePoint<I,SurfFeature>(fused);
+
+		return new DetectDescribeAssociate<I,SurfFeature>(manager, generalAssoc,false);
 	}
 
 	/**
@@ -161,7 +163,7 @@ public class FactoryPointTracker {
 	 * of SURF.
 	 *
 	 * @see DescribePointSurf
-	 * @see boofcv.abst.feature.tracker.DdaTrackerDetectDescribePoint
+	 * @see boofcv.abst.feature.tracker.DdaManagerDetectDescribePoint
 	 *
 	 * @param configDetector Configuration for SURF detector
 	 * @param configDescribe Configuration for SURF descriptor
@@ -186,7 +188,9 @@ public class FactoryPointTracker {
 		DetectDescribePoint<I,SurfFeature> fused =
 				FactoryDetectDescribe.surfStable(configDetector,configDescribe,configOrientation,imageType);
 
-		return new DdaTrackerDetectDescribePoint<I,SurfFeature>(fused, generalAssoc,false);
+		DdaManagerDetectDescribePoint<I,SurfFeature> manager = new DdaManagerDetectDescribePoint<I,SurfFeature>(fused);
+
+		return new DetectDescribeAssociate<I,SurfFeature>(manager, generalAssoc,false);
 	}
 
 	/**
@@ -194,7 +198,7 @@ public class FactoryPointTracker {
 	 *
 	 * @see boofcv.alg.feature.detect.intensity.ShiTomasiCornerIntensity
 	 * @see DescribePointBrief
-	 * @see boofcv.abst.feature.tracker.DdaTrackerDetectDescribePoint
+	 * @see boofcv.abst.feature.tracker.DdaManagerDetectDescribePoint
 	 *
 	 * @param maxAssociationError Maximum allowed association error.  Try 200.
 	 * @param configExtract Configuration for extracting features
@@ -212,19 +216,19 @@ public class FactoryPointTracker {
 		DescribePointBrief<I> brief = FactoryDescribePointAlgs.brief(FactoryBriefDefinition.gaussian2(new Random(123), 16, 512),
 				FactoryBlurFilter.gaussian(imageType, 0, 4));
 
-		GeneralFeatureDetector<I, D> corner = createShiTomasi(configExtract, derivType);
+		GeneralFeatureDetector<I, D> detectPoint = createShiTomasi(configExtract, derivType);
+		EasyGeneralFeatureDetector<I,D> easy = new EasyGeneralFeatureDetector<I, D>(detectPoint,imageType,derivType);
 
-		InterestPointDetector<I> detector = FactoryInterestPoint.wrapPoint(corner,1, imageType, derivType);
 		ScoreAssociateHamming_B score = new ScoreAssociateHamming_B();
 
 		AssociateDescription2D<TupleDesc_B> association =
 				new AssociateDescTo2D<TupleDesc_B>(
 						FactoryAssociation.greedy(score, maxAssociationError, true));
 
-		DetectDescribeFusion<I,TupleDesc_B> fused =
-				new DetectDescribeFusion<I,TupleDesc_B>(detector,null,new WrapDescribeBrief<I>(brief));
+		DdaManagerGeneralPoint<I,D,TupleDesc_B> manager =
+				new DdaManagerGeneralPoint<I,D,TupleDesc_B>(easy,new WrapDescribeBrief<I>(brief),1.0);
 
-		return new DdaTrackerDetectDescribePoint<I,TupleDesc_B>(fused, association,false);
+		return new DetectDescribeAssociate<I,TupleDesc_B>(manager, association,false);
 	}
 
 	/**
@@ -232,7 +236,7 @@ public class FactoryPointTracker {
 	 *
 	 * @see boofcv.alg.feature.detect.intensity.FastCornerIntensity
 	 * @see DescribePointBrief
-	 * @see boofcv.abst.feature.tracker.DdaTrackerDetectDescribePoint
+	 * @see boofcv.abst.feature.tracker.DdaManagerDetectDescribePoint
 	 *
 	 * @param maxFeatures         Maximum number of features it will track.
 	 * @param maxAssociationError Maximum allowed association error.  Try 200.
@@ -252,18 +256,18 @@ public class FactoryPointTracker {
 				FactoryBlurFilter.gaussian(imageType, 0, 4));
 
 		GeneralFeatureDetector<I,D> corner = FactoryDetectPoint.createFast(extractRadius, minContinuous, detectThreshold, maxFeatures, imageType);
+		EasyGeneralFeatureDetector<I,D> easy = new EasyGeneralFeatureDetector<I, D>(corner,imageType,null);
 
-		InterestPointDetector<I> detector = FactoryInterestPoint.wrapPoint(corner,1, imageType, null);
 		ScoreAssociateHamming_B score = new ScoreAssociateHamming_B();
 
 		AssociateDescription2D<TupleDesc_B> association =
 				new AssociateDescTo2D<TupleDesc_B>(
 						FactoryAssociation.greedy(score, maxAssociationError, true));
 
-		DetectDescribeFusion<I,TupleDesc_B> fused =
-				new DetectDescribeFusion<I,TupleDesc_B>(detector,null,new WrapDescribeBrief<I>(brief));
+		DdaManagerGeneralPoint<I,D,TupleDesc_B> manager =
+				new DdaManagerGeneralPoint<I,D,TupleDesc_B>(easy,new WrapDescribeBrief<I>(brief),1.0);
 
-		return new DdaTrackerDetectDescribePoint<I,TupleDesc_B>(fused, association,false);
+		return new DetectDescribeAssociate<I,TupleDesc_B>(manager, association,false);
 	}
 
 	/**
@@ -271,7 +275,7 @@ public class FactoryPointTracker {
 	 *
 	 * @see boofcv.alg.feature.detect.intensity.ShiTomasiCornerIntensity
 	 * @see DescribePointPixelRegionNCC
-	 * @see boofcv.abst.feature.tracker.DdaTrackerDetectDescribePoint
+	 * @see boofcv.abst.feature.tracker.DdaManagerDetectDescribePoint
 	 *
 	 * @param configExtract Configuration for extracting features
 	 * @param describeRadius Radius of the region being described.  Try 2.
@@ -289,18 +293,18 @@ public class FactoryPointTracker {
 		DescribePointPixelRegionNCC<I> alg = FactoryDescribePointAlgs.pixelRegionNCC(w, w, imageType);
 
 		GeneralFeatureDetector<I, D> corner = createShiTomasi(configExtract, derivType);
+		EasyGeneralFeatureDetector<I,D> easy = new EasyGeneralFeatureDetector<I, D>(corner,imageType,derivType);
 
-		InterestPointDetector<I> detector = FactoryInterestPoint.wrapPoint(corner,1, imageType, derivType);
 		ScoreAssociateNccFeature score = new ScoreAssociateNccFeature();
 
 		AssociateDescription2D<NccFeature> association =
 				new AssociateDescTo2D<NccFeature>(
 						FactoryAssociation.greedy(score, Double.MAX_VALUE, true));
 
-		DetectDescribeFusion<I,NccFeature> fused =
-				new DetectDescribeFusion<I,NccFeature>(detector,null,new WrapDescribePixelRegionNCC<I>(alg));
+		DdaManagerGeneralPoint<I,D,NccFeature> manager =
+				new DdaManagerGeneralPoint<I,D,NccFeature>(easy,new WrapDescribePixelRegionNCC<I>(alg),1.0);
 
-		return new DdaTrackerDetectDescribePoint<I,NccFeature>(fused, association,false);
+		return new DetectDescribeAssociate<I,NccFeature>(manager, association,false);
 	}
 
 	/**
@@ -316,17 +320,20 @@ public class FactoryPointTracker {
 	 * @return tracker
 	 */
 	public static <I extends ImageSingleBand, Desc extends TupleDesc>
-	DdaTrackerDetectDescribePoint<I,Desc> detectDescribeAssociate(InterestPointDetector<I> detector,
-															 OrientationImage<I> orientation ,
-															 DescribeRegionPoint<I, Desc> describe,
-															 AssociateDescription2D<Desc> associate ,
-															 boolean updateDescription ) {
+	DetectDescribeAssociate<I,Desc> dda(InterestPointDetector<I> detector,
+										OrientationImage<I> orientation ,
+										DescribeRegionPoint<I, Desc> describe,
+										AssociateDescription2D<Desc> associate ,
+										boolean updateDescription ) {
 
 		DetectDescribeFusion<I,Desc> fused =
 				new DetectDescribeFusion<I,Desc>(detector,orientation,describe);
 
-		DdaTrackerDetectDescribePoint<I,Desc> dat =
-				new DdaTrackerDetectDescribePoint<I,Desc>(fused, associate,updateDescription);
+		DdaManagerDetectDescribePoint<I,Desc> manager =
+				new DdaManagerDetectDescribePoint<I,Desc>(fused);
+
+		DetectDescribeAssociate<I,Desc> dat =
+				new DetectDescribeAssociate<I,Desc>(manager, associate,updateDescription);
 
 		return dat;
 	}
@@ -335,7 +342,7 @@ public class FactoryPointTracker {
 	 * Creates a tracker which detects Fast-Hessian features, describes them with SURF, nominally tracks them using KLT.
 	 *
 	 * @see DescribePointSurf
-	 * @see boofcv.abst.feature.tracker.DdaTrackerDetectDescribePoint
+	 * @see boofcv.abst.feature.tracker.DdaManagerDetectDescribePoint
 	 *
 	 * @param trackRadius Size of feature being tracked by KLT
 	 * @param pyramidScalingKlt Image pyramid used for KLT
@@ -374,7 +381,7 @@ public class FactoryPointTracker {
 	 *
 	 * @see boofcv.alg.feature.detect.intensity.ShiTomasiCornerIntensity
 	 * @see DescribePointSurf
-	 * @see boofcv.abst.feature.tracker.DdaTrackerDetectDescribePoint
+	 * @see boofcv.abst.feature.tracker.DdaManagerDetectDescribePoint
 	 *
 	 * @param configExtract Configuration for extracting features
 	 * @param trackRadius Size of feature being tracked by KLT
@@ -491,14 +498,17 @@ public class FactoryPointTracker {
 
 	public static <I extends ImageSingleBand, D extends ImageSingleBand, Desc extends TupleDesc>
 	PointTracker<I> dda(GeneralFeatureDetector<I, D> detector,
-							  DescribeRegionPoint<I, Desc> describe,
-							  AssociateDescription2D<Desc> associate,
-							  double scale,
-							  Class<I> imageType) {
+						DescribeRegionPoint<I, Desc> describe,
+						AssociateDescription2D<Desc> associate,
+						double scale,
+						Class<I> imageType) {
 
 		EasyGeneralFeatureDetector<I,D> easy = new EasyGeneralFeatureDetector<I, D>(detector,imageType,null);
 
-		return new DdaTrackerGeneralPoint<I,D,Desc>(associate,true,easy,describe,scale);
+		DdaManagerGeneralPoint<I,D,Desc> manager =
+				new DdaManagerGeneralPoint<I,D,Desc>(easy,describe,scale);
+
+		return new DetectDescribeAssociate<I,Desc>(manager,associate,false);
 	}
 
 	/**
