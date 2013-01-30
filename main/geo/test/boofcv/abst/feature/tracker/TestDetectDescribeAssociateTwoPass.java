@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.sfm.d2;
+package boofcv.abst.feature.tracker;
 
 import org.junit.Test;
 
@@ -25,10 +25,10 @@ import static org.junit.Assert.fail;
 /**
  * @author Peter Abeles
  */
-public class TestMotionMosaicPointKey {
+public class TestDetectDescribeAssociateTwoPass {
 
 	@Test
 	public void stuff() {
-		fail("something should go here");
+		fail("implement");
 	}
 }

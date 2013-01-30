@@ -23,45 +23,34 @@ import boofcv.abst.feature.associate.AssociateDescription2D;
 import boofcv.abst.feature.associate.EnforceUniqueByScore;
 import boofcv.abst.feature.associate.ScoreAssociation;
 import boofcv.abst.feature.detdesc.DetectDescribeMulti;
-import boofcv.abst.feature.detdesc.DetectDescribePoint;
 import boofcv.abst.feature.disparity.StereoDisparitySparse;
-import boofcv.abst.feature.tracker.ModelAssistedTracker;
-import boofcv.abst.feature.tracker.PkltConfig;
+import boofcv.abst.feature.tracker.ExtractTrackDescription;
 import boofcv.abst.feature.tracker.PointTracker;
-import boofcv.abst.feature.tracker.PointTrackerD;
-import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.abst.geo.Estimate1ofPnP;
 import boofcv.abst.geo.EstimateNofPnP;
 import boofcv.abst.geo.RefinePnP;
 import boofcv.abst.geo.TriangulateTwoViewsCalibrated;
-import boofcv.abst.sfm.*;
+import boofcv.abst.sfm.StereoVisualOdometry;
+import boofcv.abst.sfm.WrapVisOdomPixelDepthPnP;
+import boofcv.abst.sfm.WrapVisOdomQuadPnP;
+import boofcv.abst.sfm.WrapVisOdomStereoPnP;
 import boofcv.alg.feature.associate.AssociateMaxDistanceNaive;
 import boofcv.alg.feature.associate.AssociateStereo2D;
-import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
-import boofcv.alg.feature.tracker.AssistedPyramidKltTracker;
-import boofcv.alg.feature.tracker.AssistedTrackerTwoPass;
-import boofcv.alg.feature.tracker.PointToAssistedTracker;
 import boofcv.alg.geo.DistanceModelMonoPixels;
 import boofcv.alg.geo.pose.*;
-import boofcv.alg.interpolate.InterpolateRectangle;
 import boofcv.alg.sfm.StereoSparse3D;
+import boofcv.alg.sfm.d3.VisOdomDualTrackPnP;
 import boofcv.alg.sfm.d3.VisOdomPixelDepthPnP;
 import boofcv.alg.sfm.d3.VisOdomQuadPnP;
-import boofcv.alg.sfm.d3.VisOdomStereoPnP;
 import boofcv.alg.sfm.robust.EstimatorToGenerator;
 import boofcv.alg.sfm.robust.GeoModelRefineToModelFitter;
 import boofcv.factory.feature.associate.FactoryAssociation;
-import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.factory.geo.EnumPNP;
 import boofcv.factory.geo.FactoryMultiView;
 import boofcv.factory.geo.FactoryTriangulate;
-import boofcv.factory.interpolate.FactoryInterpolation;
-import boofcv.factory.transform.pyramid.FactoryPyramid;
-import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.geo.Point2D3D;
 import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.pyramid.PyramidUpdaterDiscrete;
 import boofcv.struct.sfm.Stereo2D3D;
 import georegression.struct.se.Se3_F64;
 import org.ddogleg.fitting.modelset.ModelFitter;
@@ -89,186 +78,45 @@ public class FactoryVisualOdometry {
 	 * @return StereoVisualOdometry
 	 */
 	public static <T extends ImageSingleBand>
-	StereoVisualOdometry<T> stereoDepth(int thresholdAdd,
+	StereoVisualOdometry<T> stereoDepth(double inlierPixelTol,
+										int thresholdAdd,
 										int thresholdRetire ,
+										int ransacIterations ,
+										int refineIterations ,
 										StereoDisparitySparse<T> sparseDisparity,
-										ModelAssistedTrackerCalibrated<T, Se3_F64,Point2D3D> assistedTracker ,
+										PointTracker<T> tracker ,
 										Class<T> imageType) {
 
 		// Range from sparse disparity
 		StereoSparse3D<T> pixelTo3D = new StereoSparse3D<T>(sparseDisparity,imageType);
 
+		Estimate1ofPnP estimator = FactoryMultiView.computePnP_1(EnumPNP.P3P_FINSTERWALDER,-1,2);
+		final DistanceModelMonoPixels<Se3_F64,Point2D3D> distance = new PnPDistanceReprojectionSq();
+
+		EstimatorToGenerator<Se3_F64,Point2D3D> generator =
+				new EstimatorToGenerator<Se3_F64,Point2D3D>(estimator) {
+					@Override
+					public Se3_F64 createModelInstance() {
+						return new Se3_F64();
+					}
+				};
+
+		// 1/2 a pixel tolerance for RANSAC inliers
+		double ransacTOL = inlierPixelTol * inlierPixelTol;
+
+		ModelMatcher<Se3_F64, Point2D3D> motion =
+				new Ransac<Se3_F64, Point2D3D>(2323, generator, distance, ransacIterations, ransacTOL);
+
+		RefinePnP refine = null;
+
+		if( refineIterations > 0 ) {
+			refine = FactoryMultiView.refinePnP(1e-12,refineIterations);
+		}
+
 		VisOdomPixelDepthPnP<T> alg =
-				new VisOdomPixelDepthPnP<T>(thresholdAdd,thresholdRetire ,assistedTracker,pixelTo3D,null,null);
+				new VisOdomPixelDepthPnP<T>(thresholdAdd,thresholdRetire ,motion,pixelTo3D,refine,null,null,null);
 
-		return new WrapVisOdomPixelDepthPnP<T,Se3_F64,Point2D3D>(alg,pixelTo3D,assistedTracker,imageType);
-	}
-
-	/**
-	 *
-	 * @param tracker Feature tracker
-	 * @param inlierPixelTol Tolerance for what defines a fit to the motin model.  Try a value between 1 and 2
-	 * @param ransacIterations Number of iterations RANSAC will perform
-	 * @param refineIterations Number of iterations used to refine the estimate.  Try 100 or 0 to turn off refinement.
-	 * @return
-	 */
-	public static <T extends ImageSingleBand>
-	ModelAssistedTrackerCalibrated<T, Se3_F64,Point2D3D> trackerP3P( PointTracker<T> tracker,
-																	 double inlierPixelTol,
-																	 int ransacIterations ,
-																	 int refineIterations ) {
-		Estimate1ofPnP estimator = FactoryMultiView.computePnP_1(EnumPNP.P3P_FINSTERWALDER,-1,2);
-		final DistanceModelMonoPixels<Se3_F64,Point2D3D> distance = new PnPDistanceReprojectionSq();
-
-		EstimatorToGenerator<Se3_F64,Point2D3D> generator =
-				new EstimatorToGenerator<Se3_F64,Point2D3D>(estimator) {
-					@Override
-					public Se3_F64 createModelInstance() {
-						return new Se3_F64();
-					}
-				};
-
-		// 1/2 a pixel tolerance for RANSAC inliers
-		double ransacTOL = inlierPixelTol * inlierPixelTol;
-
-		ModelMatcher<Se3_F64, Point2D3D> motion =
-				new Ransac<Se3_F64, Point2D3D>(2323, generator, distance, ransacIterations, ransacTOL);
-
-		ModelFitter<Se3_F64,Point2D3D> refine = null;
-
-		if( refineIterations > 0 ) {
-			RefinePnP refinePnP = FactoryMultiView.refinePnP(1e-12,refineIterations);
-			refine = new GeoModelRefineToModelFitter<Se3_F64,Point2D3D>(refinePnP) {
-
-				@Override
-				public Se3_F64 createModelInstance() {
-					return new Se3_F64();
-				}
-			};
-		}
-
-		ModelAssistedTracker<T, Se3_F64,Point2D3D> assisted =
-				new PointToAssistedTracker<T, Se3_F64,Point2D3D>(tracker,motion,refine);
-
-		return new ModelAssistedToCalibrated<T,Se3_F64,Point2D3D>(assisted) {
-			@Override
-			public void setCalibration(IntrinsicParameters param) {
-				distance.setIntrinsic(param.fx,param.fy,param.skew);
-			}
-		};
-	}
-
-	public static <T extends ImageSingleBand,D extends TupleDesc>
-	ModelAssistedTrackerCalibrated<T, Se3_F64,Point2D3D> trackerAssistedDdaP3P( DetectDescribePoint<T, D> detDesc,
-																				double inlierPixelTol,
-																				int ransacIterations ,
-																				int refineIterations ,
-																				double maxAssociationError ,
-																				double associationSecondTol ) {
-		Estimate1ofPnP estimator = FactoryMultiView.computePnP_1(EnumPNP.P3P_FINSTERWALDER,-1,2);
-		final DistanceModelMonoPixels<Se3_F64,Point2D3D> distance = new PnPDistanceReprojectionSq();
-
-		EstimatorToGenerator<Se3_F64,Point2D3D> generator =
-				new EstimatorToGenerator<Se3_F64,Point2D3D>(estimator) {
-					@Override
-					public Se3_F64 createModelInstance() {
-						return new Se3_F64();
-					}
-				};
-
-		// 1/2 a pixel tolerance for RANSAC inliers
-		double ransacTOL = inlierPixelTol * inlierPixelTol;
-
-		ModelMatcher<Se3_F64, Point2D3D> motion =
-				new Ransac<Se3_F64, Point2D3D>(2323, generator, distance, ransacIterations, ransacTOL);
-
-		ModelFitter<Se3_F64,Point2D3D> refine = null;
-
-		if( refineIterations > 0 ) {
-			RefinePnP refinePnP = FactoryMultiView.refinePnP(1e-12,refineIterations);
-			refine = new GeoModelRefineToModelFitter<Se3_F64,Point2D3D>(refinePnP) {
-
-				@Override
-				public Se3_F64 createModelInstance() {
-					return new Se3_F64();
-				}
-			};
-		}
-
-		ScoreAssociation<D> score = FactoryAssociation.defaultScore(detDesc.getDescriptionType());
-
-		AssociateDescription2D<D> association =
-				new AssociateDescTo2D<D>(
-						FactoryAssociation.greedy(score, maxAssociationError, true));
-
-		AssociateDescription2D<D> association2 =
-				new AssociateMaxDistanceNaive<D>(score,true,maxAssociationError,associationSecondTol);
-
-		ModelAssistedTracker<T, Se3_F64,Point2D3D> assisted =
-				new AssistedTrackerTwoPass<T, D,Se3_F64,Point2D3D>(detDesc,association,association2,
-						false,motion,motion,refine);
-
-		return new ModelAssistedToCalibrated<T,Se3_F64,Point2D3D>(assisted) {
-			@Override
-			public void setCalibration(IntrinsicParameters param) {
-				distance.setIntrinsic(param.fx,param.fy,param.skew);
-			}
-		};
-	}
-
-	public static <T extends ImageSingleBand, D extends ImageSingleBand>
-	ModelAssistedTrackerCalibrated<T, Se3_F64,Point2D3D> trackerAssistedKltP3P( GeneralFeatureDetector<T, D> detector,
-																				PkltConfig<T, D> trackerConfig,
-																				double inlierPixelTol,
-																				int ransacIterations ,
-																				int refineIterations ) {
-		Estimate1ofPnP estimator = FactoryMultiView.computePnP_1(EnumPNP.P3P_FINSTERWALDER,-1,2);
-		final DistanceModelMonoPixels<Se3_F64,Point2D3D> distance = new PnPDistanceReprojectionSq();
-
-		EstimatorToGenerator<Se3_F64,Point2D3D> generator =
-				new EstimatorToGenerator<Se3_F64,Point2D3D>(estimator) {
-					@Override
-					public Se3_F64 createModelInstance() {
-						return new Se3_F64();
-					}
-				};
-
-		// 1/2 a pixel tolerance for RANSAC inliers
-		double ransacTOL = inlierPixelTol * inlierPixelTol;
-
-		ModelMatcher<Se3_F64, Point2D3D> motion =
-				new Ransac<Se3_F64, Point2D3D>(2323, generator, distance, ransacIterations, ransacTOL);
-
-		ModelFitter<Se3_F64,Point2D3D> refine = null;
-
-		if( refineIterations > 0 ) {
-			RefinePnP refinePnP = FactoryMultiView.refinePnP(1e-12,refineIterations);
-			refine = new GeoModelRefineToModelFitter<Se3_F64,Point2D3D>(refinePnP) {
-
-				@Override
-				public Se3_F64 createModelInstance() {
-					return new Se3_F64();
-				}
-			};
-		}
-
-		InterpolateRectangle<T> interpInput = FactoryInterpolation.<T>bilinearRectangle(trackerConfig.typeInput);
-		InterpolateRectangle<D> interpDeriv = FactoryInterpolation.<D>bilinearRectangle(trackerConfig.typeDeriv);
-
-		ImageGradient<T,D> gradient = FactoryDerivative.sobel(trackerConfig.typeInput, trackerConfig.typeDeriv);
-
-		PyramidUpdaterDiscrete<T> pyramidUpdater = FactoryPyramid.discreteGaussian(trackerConfig.typeInput, -1, 2);
-
-		ModelAssistedTracker<T, Se3_F64,Point2D3D> assisted =
-				new AssistedPyramidKltTracker<T,D,Se3_F64,Point2D3D>(trackerConfig,pyramidUpdater,detector,
-						gradient,interpInput,interpDeriv,motion,motion,refine);
-
-		return new ModelAssistedToCalibrated<T,Se3_F64,Point2D3D>(assisted) {
-			@Override
-			public void setCalibration(IntrinsicParameters param) {
-				distance.setIntrinsic(param.fx,param.fy,param.skew);
-			}
-		};
+		return new WrapVisOdomPixelDepthPnP<T,Se3_F64,Point2D3D>(alg,pixelTo3D,distance,imageType);
 	}
 
 	public static <T extends ImageSingleBand, Desc extends TupleDesc>
@@ -277,9 +125,13 @@ public class FactoryVisualOdometry {
 										   double epipolarPixelTol,
 										   int ransacIterations ,
 										   int refineIterations ,
-										   PointTrackerD<T,Desc> trackerLeft, PointTrackerD<T,Desc> trackerRight,
+										   PointTracker<T> trackerLeft, PointTracker<T> trackerRight,
 										   Class<T> imageType )
 	{
+		if( !(trackerLeft instanceof ExtractTrackDescription) || !(trackerRight instanceof ExtractTrackDescription) ) {
+			throw new IllegalArgumentException("Both trackers must implement TrackDescription");
+		}
+
 		EstimateNofPnP pnp = FactoryMultiView.computePnP_N(EnumPNP.P3P_FINSTERWALDER, -1);
 		DistanceModelMonoPixels<Se3_F64,Point2D3D> distanceMono = new PnPDistanceReprojectionSq();
 		PnPStereoDistanceReprojectionSq distanceStereo = new PnPStereoDistanceReprojectionSq();
@@ -302,7 +154,8 @@ public class FactoryVisualOdometry {
 		RefinePnPStereo refinePnP = null;
 		ModelFitter<Se3_F64,Stereo2D3D> refine = null;
 
-		Class<Desc> descType = trackerLeft.getDescriptionType();
+		ExtractTrackDescription<Desc> extractor = (ExtractTrackDescription)trackerLeft;
+		Class<Desc> descType = extractor.getDescriptionType();
 		ScoreAssociation<Desc> scorer = FactoryAssociation.defaultScore(descType);
 		AssociateStereo2D<Desc> associateStereo = new AssociateStereo2D<Desc>(scorer,epipolarPixelTol,descType);
 
@@ -325,7 +178,7 @@ public class FactoryVisualOdometry {
 
 		TriangulateTwoViewsCalibrated triangulate = FactoryTriangulate.twoGeometric();
 
-		VisOdomStereoPnP<T,Desc> alg =  new VisOdomStereoPnP<T,Desc>(thresholdAdd,thresholdRetire,epipolarPixelTol,
+		VisOdomDualTrackPnP<T,Desc> alg =  new VisOdomDualTrackPnP<T,Desc>(thresholdAdd,thresholdRetire,epipolarPixelTol,
 				trackerLeft,trackerRight,associateUnique,triangulate,motion,refine);
 
 		return new WrapVisOdomStereoPnP<T>(pnpStereo,distanceMono,distanceStereo,associateStereo,alg,refinePnP,imageType);

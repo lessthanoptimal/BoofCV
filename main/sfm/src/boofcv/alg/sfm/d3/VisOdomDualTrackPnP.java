@@ -19,8 +19,9 @@
 package boofcv.alg.sfm.d3;
 
 import boofcv.abst.feature.associate.AssociateDescription2D;
+import boofcv.abst.feature.tracker.ExtractTrackDescription;
 import boofcv.abst.feature.tracker.PointTrack;
-import boofcv.abst.feature.tracker.PointTrackerD;
+import boofcv.abst.feature.tracker.PointTracker;
 import boofcv.abst.geo.TriangulateTwoViewsCalibrated;
 import boofcv.alg.distort.LensDistortionOps;
 import boofcv.alg.feature.associate.StereoConsistencyCheck;
@@ -48,7 +49,7 @@ import java.util.List;
 // TODO add a second pass option
 // TODO add bundle adjustment
 // TODO Show right camera tracks in debugger
-public class VisOdomStereoPnP<T extends ImageSingleBand,Desc extends TupleDesc> {
+public class VisOdomDualTrackPnP<T extends ImageSingleBand,Desc extends TupleDesc> {
 
 	// TODO Listener for stereo parameter change
 	// TODO debugging code.  Check for unique features src/dst
@@ -64,8 +65,10 @@ public class VisOdomStereoPnP<T extends ImageSingleBand,Desc extends TupleDesc> 
 	private ModelFitter<Se3_F64, Stereo2D3D> modelRefiner;
 
 	// trackers for left and right cameras
-	private PointTrackerD<T,Desc> trackerLeft;
-	private PointTrackerD<T,Desc> trackerRight;
+	private PointTracker<T> trackerLeft;
+	private PointTracker<T> trackerRight;
+	private ExtractTrackDescription<Desc> extractLeft;
+	private ExtractTrackDescription<Desc> extractRight;
 
 	FastQueue<Point2D_F64> pointsLeft = new FastQueue<Point2D_F64>(Point2D_F64.class,false);
 	FastQueue<Point2D_F64> pointsRight = new FastQueue<Point2D_F64>(Point2D_F64.class,false);
@@ -98,15 +101,22 @@ public class VisOdomStereoPnP<T extends ImageSingleBand,Desc extends TupleDesc> 
 	// is this the first frame
 	private boolean first = true;
 
-	public VisOdomStereoPnP(int thresholdAdd, int thresholdRetire, double epilolarTol,
-							PointTrackerD<T,Desc> trackerLeft, PointTrackerD<T,Desc> trackerRight,
-							AssociateDescription2D<Desc> assocL2R ,
-							TriangulateTwoViewsCalibrated triangulate ,
-							ModelMatcher<Se3_F64, Stereo2D3D> matcher ,
-							ModelFitter<Se3_F64, Stereo2D3D> modelRefiner )
+	public VisOdomDualTrackPnP(int thresholdAdd, int thresholdRetire, double epilolarTol,
+							   PointTracker<T> trackerLeft, PointTracker<T> trackerRight,
+							   AssociateDescription2D<Desc> assocL2R,
+							   TriangulateTwoViewsCalibrated triangulate,
+							   ModelMatcher<Se3_F64, Stereo2D3D> matcher,
+							   ModelFitter<Se3_F64, Stereo2D3D> modelRefiner)
 	{
 		if( !assocL2R.uniqueSource() || !assocL2R.uniqueDestination() )
 			throw new IllegalArgumentException("Both unique source and destination must be ensure by association");
+
+		try {
+			extractLeft = (ExtractTrackDescription)trackerLeft;
+			extractRight = (ExtractTrackDescription)trackerRight;
+		} catch( ClassCastException e ) {
+			throw new RuntimeException("Both trackers must implement TrackDescription");
+		}
 
 		this.thresholdAdd = thresholdAdd;
 		this.thresholdRetire = thresholdRetire;
@@ -117,8 +127,8 @@ public class VisOdomStereoPnP<T extends ImageSingleBand,Desc extends TupleDesc> 
 		this.matcher = matcher;
 		this.modelRefiner = modelRefiner;
 
-		descLeft = new FastQueue<Desc>(trackerLeft.getDescriptionType(),false);
-		descRight = new FastQueue<Desc>(trackerLeft.getDescriptionType(),false);
+		descLeft = new FastQueue<Desc>(extractLeft.getDescriptionType(),false);
+		descRight = new FastQueue<Desc>(extractRight.getDescriptionType(),false);
 
 		stereoCheck = new StereoConsistencyCheck(epilolarTol,epilolarTol);
 	}
@@ -349,8 +359,8 @@ public class VisOdomStereoPnP<T extends ImageSingleBand,Desc extends TupleDesc> 
 		List<PointTrack> newRight = trackerRight.getNewTracks(null);
 
 		// get a list of new tracks and their descriptions
-		addNewToList(trackerLeft,newLeft,pointsLeft,descLeft);
-		addNewToList(trackerRight,newRight,pointsRight,descRight);
+		addNewToList(trackerLeft,extractLeft,newLeft,pointsLeft,descLeft);
+		addNewToList(trackerRight,extractRight,newRight,pointsRight,descRight);
 
 		// associate using L2R
 		assocL2R.setSource(pointsLeft,descLeft);
@@ -428,16 +438,18 @@ public class VisOdomStereoPnP<T extends ImageSingleBand,Desc extends TupleDesc> 
 //		}
 	}
 
-	private void addNewToList( PointTrackerD<T,Desc> tracker , List<PointTrack> tracks ,
+	private void addNewToList( PointTracker<T> tracker , ExtractTrackDescription<Desc> extract ,
+							   List<PointTrack> tracks ,
 							   FastQueue<Point2D_F64> points , FastQueue<Desc> descs )
 	{
 		points.reset(); descs.reset();
 
 		for( int i = 0; i < tracks.size(); i++ ) {
 			PointTrack t = tracks.get(i);
+			Desc desc = extract.extractDescription(t);
 
 			points.add( t );
-			descs.add( tracker.extractDescription(t));
+			descs.add( desc );
 		}
 	}
 

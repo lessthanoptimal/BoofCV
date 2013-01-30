@@ -60,17 +60,17 @@ import java.util.List;
 public interface PointTracker<T extends ImageBase> {
 
 	/**
-	 * Discard memory of all current and past tracks.  Growing buffered might not be reset to
-	 * their initial size by this method.
-	 */
-	void reset();
-
-	/**
 	 * Process input image and perform tracking.
 	 *
 	 * @param image Next image in the sequence
 	 */
 	void process(T image);
+
+	/**
+	 * Discard memory of all current and past tracks.  Growing buffered might not be reset to
+	 * their initial size by this method.
+	 */
+	void reset();
 
 	/**
 	 * Drops all feature to be dropped and will no longer be tracked.  Tracks dropped using
@@ -140,7 +140,6 @@ public interface PointTracker<T extends ImageBase> {
 	 */
 	public List<PointTrack> getNewTracks(List<PointTrack> list);
 
-
 	/**
 	 * Automatically selects new features in the image to track. Returned tracks must
 	 * be unique and not duplicates of any existing tracks.  This includes both active
@@ -149,6 +148,5 @@ public interface PointTracker<T extends ImageBase> {
 	 * NOTE: This function may or may not also modify the active and inactive lists.
 	 */
 	public void spawnTracks();
-
 }
 

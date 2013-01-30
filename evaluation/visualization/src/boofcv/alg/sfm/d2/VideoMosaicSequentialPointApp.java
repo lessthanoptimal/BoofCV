@@ -50,8 +50,8 @@ import java.util.List;
  */
 // TODO change scale in info panel
 public class VideoMosaicSequentialPointApp<I extends ImageSingleBand, D extends ImageSingleBand,
-		T extends InvertibleTransform<T>,Aux>
-		extends ImageMotionBaseApp<I,T,Aux>
+		T extends InvertibleTransform<T>>
+		extends ImageMotionBaseApp<I,T>
 {
 	private final static int maxFeatures = 250;
 	private final static int maxIterations = 100;
@@ -69,6 +69,7 @@ public class VideoMosaicSequentialPointApp<I extends ImageSingleBand, D extends 
 		config.pyramidScaling = new int[]{1,2,4,8};
 
 		ConfigFastHessian configFH = new ConfigFastHessian();
+		configFH.initialSampleSize = 2;
 		configFH.maxFeaturesPerScale = 200;
 
 		addAlgorithm(0, "KLT", FactoryPointTracker.klt(config, new ConfigGeneralDetector(maxFeatures, 3, 1)));
@@ -80,9 +81,9 @@ public class VideoMosaicSequentialPointApp<I extends ImageSingleBand, D extends 
 		addAlgorithm(0, "FH-SURF", FactoryPointTracker.dda_FH_SURF_Fast(configFH, null, null, imageType));
 		addAlgorithm(0, "ST-SURF-KLT", FactoryPointTracker.
 				combined_ST_SURF_KLT(new ConfigGeneralDetector(400, 3, 1), 3,
-						config.pyramidScaling, 50, null, null, imageType, derivType));
+						config.pyramidScaling, 75, null, null, imageType, derivType));
 		addAlgorithm(0, "FH-SURF-KLT", FactoryPointTracker.combined_FH_SURF_KLT(3,
-				config.pyramidScaling, 50, configFH, null, null, imageType));
+				config.pyramidScaling, 75, configFH, null, null, imageType));
 
 		addAlgorithm(1,"Affine", new Affine2D_F64());
 		addAlgorithm(1,"Homography", new Homography2D_F64());
@@ -167,8 +168,8 @@ public class VideoMosaicSequentialPointApp<I extends ImageSingleBand, D extends 
 	protected void startEverything() {
 		// make sure there is nothing left over from before
 		tracker.dropAllTracks();
-		createAssistedTracker(maxIterations,4);
-		distortAlg = new MotionMosaicPointKey<I,T>(trackerModel,fitModel,40,0.3,pruneThreshold,0.8);
+		createModelMatcher(maxIterations, 4);
+		distortAlg = new MotionMosaicPointKey<I,T>(tracker,modelMatcher,modelRefiner,fitModel,40,0.3,pruneThreshold,0.8);
 		T initTran = ConvertTransform_F64.convert(createInitialTransform(), fitModel.createInstance());
 		distortAlg.setInitialTransform(initTran);
 		totalKeyFrames = 0;

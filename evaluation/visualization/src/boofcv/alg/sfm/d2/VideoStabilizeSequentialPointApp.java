@@ -46,7 +46,7 @@ import java.util.List;
  */
 public class VideoStabilizeSequentialPointApp<I extends ImageSingleBand, D extends ImageSingleBand,
 		T extends InvertibleTransform<T>,Aux>
-		extends ImageMotionBaseApp<I,T,Aux>
+		extends ImageMotionBaseApp<I,T>
 {
 	private int maxFeatures = 250;
 	private static int thresholdKeyFrame = 80;
@@ -118,8 +118,9 @@ public class VideoStabilizeSequentialPointApp<I extends ImageSingleBand, D exten
 	@Override
 	protected void startEverything() {
 		// make sure there is nothing left over from before
-		createAssistedTracker(maxIterations,4);
-		distortAlg = new MotionStabilizePointKey<I,T>(trackerModel,fitModel,
+		tracker.dropAllTracks();
+		createModelMatcher(maxIterations, 4);
+		distortAlg = new MotionStabilizePointKey<I,T>(tracker,modelMatcher,modelRefiner,fitModel,
 				thresholdKeyFrame,thresholdReset,pruneThreshold,largeMotionThreshold);
 //		distortAlg.setInitialTransform(createInitialTransform());
 

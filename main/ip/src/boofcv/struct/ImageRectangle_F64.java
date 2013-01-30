@@ -16,21 +16,33 @@
  * limitations under the License.
  */
 
-package boofcv.abst.sfm;
+package boofcv.struct;
 
-import boofcv.abst.feature.tracker.ModelAssistedTracker;
-import boofcv.struct.calib.IntrinsicParameters;
-import boofcv.struct.image.ImageBase;
 
 /**
- * Extension to {@Link ModelAssistedTracker} which allows camera calibration information to be passed to the tracker.
- * Useful for applications where the camera's calibration can change.
- *
  * @author Peter Abeles
  */
-public interface ModelAssistedTrackerCalibrated<T extends ImageBase,Model,Info>
-		extends ModelAssistedTracker<T,Model,Info>
-{
+public class ImageRectangle_F64 {
+	public double x0,y0,x1,y1;
 
-	public void setCalibration( IntrinsicParameters param );
+	public ImageRectangle_F64(double x0, double y0, double x1, double y1) {
+		this.x0 = x0;
+		this.y0 = y0;
+		this.x1 = x1;
+		this.y1 = y1;
+	}
+
+	public ImageRectangle_F64(ImageRectangle_F64 orig) {
+		this.x0 = orig.x0;
+		this.y0 = orig.y0;
+		this.x1 = orig.x1;
+		this.y1 = orig.y1;
+	}
+
+	public ImageRectangle_F64() {
+	}
+
+	public double area() {
+		return (y1-y0)*(x1-x0);
+	}
 }

@@ -21,17 +21,16 @@ package boofcv.abst.feature.tracker;
 import boofcv.abst.feature.associate.AssociateDescTo2D;
 import boofcv.abst.feature.associate.AssociateDescription2D;
 import boofcv.abst.feature.associate.ScoreAssociateHamming_B;
+import boofcv.abst.feature.describe.DescribeRegionPoint;
 import boofcv.abst.feature.describe.WrapDescribeBrief;
-import boofcv.abst.feature.detdesc.DetectDescribeFusion;
 import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
-import boofcv.abst.feature.detect.interest.InterestPointDetector;
 import boofcv.alg.feature.describe.DescribePointBrief;
 import boofcv.alg.feature.describe.brief.FactoryBriefDefinition;
+import boofcv.alg.feature.detect.interest.EasyGeneralFeatureDetector;
 import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.feature.describe.FactoryDescribePointAlgs;
 import boofcv.factory.feature.detect.interest.FactoryDetectPoint;
-import boofcv.factory.feature.detect.interest.FactoryInterestPoint;
 import boofcv.factory.filter.blur.FactoryBlurFilter;
 import boofcv.struct.feature.TupleDesc_B;
 import boofcv.struct.image.ImageFloat32;
@@ -41,11 +40,9 @@ import java.util.Random;
 /**
  * @author Peter Abeles
  */
-public class TestDetectAssociateTracker extends StandardPointTracker<ImageFloat32> {
+public class TestDdaManagerGeneralPoint extends StandardPointTracker<ImageFloat32> {
 
-	DetectAssociateTracker<ImageFloat32,TupleDesc_B> dat;
-
-	public TestDetectAssociateTracker() {
+	public TestDdaManagerGeneralPoint() {
 		super(true, false);
 	}
 
@@ -53,25 +50,26 @@ public class TestDetectAssociateTracker extends StandardPointTracker<ImageFloat3
 	public PointTracker<ImageFloat32> createTracker() {
 		DescribePointBrief<ImageFloat32> brief =
 				FactoryDescribePointAlgs.brief(FactoryBriefDefinition.gaussian2(new Random(123), 16, 512),
-				FactoryBlurFilter.gaussian(ImageFloat32.class, 0, 4));
+						FactoryBlurFilter.gaussian(ImageFloat32.class, 0, 4));
 
 		GeneralFeatureDetector<ImageFloat32,ImageFloat32> corner =
-				FactoryDetectPoint.createShiTomasi(new ConfigGeneralDetector(100,2,0,0,true), false, ImageFloat32.class);
+				FactoryDetectPoint.createShiTomasi(new ConfigGeneralDetector(-1,2, 0), false, ImageFloat32.class);
 
-		InterestPointDetector<ImageFloat32> detector =
-				FactoryInterestPoint.wrapPoint(corner, 1,ImageFloat32.class, ImageFloat32.class);
 		ScoreAssociateHamming_B score = new ScoreAssociateHamming_B();
 
 		AssociateDescription2D<TupleDesc_B> association =
-				new AssociateDescTo2D<TupleDesc_B>(FactoryAssociation.greedy(score, 400, true));
+				new AssociateDescTo2D<TupleDesc_B>(FactoryAssociation.greedy(score,400, true));
 
-		DetectDescribeFusion<ImageFloat32,TupleDesc_B> fused =
-				new DetectDescribeFusion<ImageFloat32,TupleDesc_B>(
-						detector,null,new WrapDescribeBrief<ImageFloat32>(brief));
+		DescribeRegionPoint<ImageFloat32,TupleDesc_B> describe = new WrapDescribeBrief<ImageFloat32>(brief);
 
-		dat = new DetectAssociateTracker<ImageFloat32,TupleDesc_B>(fused, association,false);
+		EasyGeneralFeatureDetector<ImageFloat32,ImageFloat32> easy = new
+				EasyGeneralFeatureDetector<ImageFloat32,ImageFloat32>(corner,ImageFloat32.class,ImageFloat32.class);
 
+		DdaManagerGeneralPoint<ImageFloat32,ImageFloat32,TupleDesc_B> manager;
+		manager = new DdaManagerGeneralPoint<ImageFloat32,ImageFloat32,TupleDesc_B>(easy,describe,2);
 
-		return dat;
+		DetectDescribeAssociate<ImageFloat32,TupleDesc_B> tracker =
+				new DetectDescribeAssociate<ImageFloat32, TupleDesc_B>(manager,association,false);
+		return tracker;
 	}
 }

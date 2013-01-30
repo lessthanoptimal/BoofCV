@@ -24,7 +24,7 @@ import boofcv.alg.geo.DistanceModelMonoPixels;
 import boofcv.alg.geo.pose.PnPStereoDistanceReprojectionSq;
 import boofcv.alg.geo.pose.PnPStereoEstimator;
 import boofcv.alg.geo.pose.RefinePnPStereo;
-import boofcv.alg.sfm.d3.VisOdomStereoPnP;
+import boofcv.alg.sfm.d3.VisOdomDualTrackPnP;
 import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.geo.Point2D3D;
@@ -52,7 +52,7 @@ public class WrapVisOdomStereoPnP<T extends ImageSingleBand>
 	PnPStereoDistanceReprojectionSq distanceStereo;
 	AssociateStereo2D<?> assoc;
 
-	VisOdomStereoPnP<T,?> alg;
+	VisOdomDualTrackPnP<T,?> alg;
 
 	Class<T> imageType;
 
@@ -62,7 +62,7 @@ public class WrapVisOdomStereoPnP<T extends ImageSingleBand>
 								DistanceModelMonoPixels<Se3_F64, Point2D3D> distanceMono,
 								PnPStereoDistanceReprojectionSq distanceStereo,
 								AssociateStereo2D<?> assoc,
-								VisOdomStereoPnP<T,?> alg ,
+								VisOdomDualTrackPnP<T,?> alg ,
 								RefinePnPStereo refine ,
 								Class<T> imageType ) {
 		this.pnp = pnp;
@@ -76,7 +76,7 @@ public class WrapVisOdomStereoPnP<T extends ImageSingleBand>
 
 	@Override
 	public Point3D_F64 getTrackLocation(int index) {
-		VisOdomStereoPnP.LeftTrackInfo info = alg.getCandidates().get(index).getCookie();
+		VisOdomDualTrackPnP.LeftTrackInfo info = alg.getCandidates().get(index).getCookie();
 		return info.location.location;
 	}
 

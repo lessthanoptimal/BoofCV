@@ -16,19 +16,12 @@
  * limitations under the License.
  */
 
-package boofcv.alg.sfm.d2;
-
-import org.junit.Test;
-
-import static org.junit.Assert.fail;
+package boofcv.abst.feature.tracker;
 
 /**
+ * Standard tests for {@link PointTrackerTwoPass}
+ *
  * @author Peter Abeles
  */
-public class TestMotionMosaicPointKey {
-
-	@Test
-	public void stuff() {
-		fail("something should go here");
-	}
+public abstract class StandardPointTrackerTwoPass {
 }

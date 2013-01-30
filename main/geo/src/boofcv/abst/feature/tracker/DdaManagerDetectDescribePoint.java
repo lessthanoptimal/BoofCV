@@ -18,7 +18,6 @@
 
 package boofcv.abst.feature.tracker;
 
-import boofcv.abst.feature.associate.AssociateDescription2D;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
 import boofcv.struct.FastQueue;
 import boofcv.struct.feature.TupleDesc;
@@ -28,15 +27,14 @@ import georegression.struct.point.Point2D_F64;
 
 /**
  * <p>
- * Tracker for image features which are first detected and then associated using the extracted
- * feature description.  For this tracker to work well the feature descriptor must be very strong
- * and result in the correct association without any model of the model being fit.
+ * Implementation of {@link DdaFeatureManager} which uses the {@link DetectDescribePoint} interface for extracting
+ * features from an image.
  * </p>
  *
  * @author Peter Abeles
  */
-public class DetectAssociateTracker<I extends ImageSingleBand, Desc extends TupleDesc>
-		extends DetectAssociateBase<I, Desc> {
+public class DdaManagerDetectDescribePoint<I extends ImageSingleBand, Desc extends TupleDesc>
+		implements DdaFeatureManager<I, Desc> {
 
 	// Feature detector and describer
 	protected DetectDescribePoint<I, Desc> detDesc;
@@ -45,19 +43,13 @@ public class DetectAssociateTracker<I extends ImageSingleBand, Desc extends Tupl
 	 * Configures tracker
 	 *
 	 * @param detDesc Feature detector and descriptor
-	 * @param associate Association
-	 * @param updateDescription If true then the feature description will be updated after each image.
-	 *                          Typically this should be false.
 	 */
-	public DetectAssociateTracker( final DetectDescribePoint<I, Desc> detDesc ,
-								   final AssociateDescription2D<Desc> associate ,
-								   final boolean updateDescription ) {
-		super(associate,updateDescription,detDesc.getDescriptionType());
+	public DdaManagerDetectDescribePoint(final DetectDescribePoint<I, Desc> detDesc) {
 		this.detDesc = detDesc;
 	}
 
 	@Override
-	protected void detectFeatures(I input, FastQueue<Point2D_F64> locDst, FastQueue<Desc> featDst) {
+	public void detectFeatures(I input, FastQueue<Point2D_F64> locDst, FastQueue<Desc> featDst) {
 		detDesc.detect(input);
 
 		int N = detDesc.getNumberOfFeatures();

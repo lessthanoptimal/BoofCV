@@ -18,7 +18,6 @@
 
 package boofcv.abst.feature.tracker;
 
-import boofcv.abst.feature.associate.AssociateDescription2D;
 import boofcv.abst.feature.describe.DescribeRegionPoint;
 import boofcv.alg.feature.UtilFeature;
 import boofcv.alg.feature.detect.interest.EasyGeneralFeatureDetector;
@@ -36,8 +35,8 @@ import georegression.struct.point.Point2D_I16;
  *
  * @author Peter Abeles
  */
-public class DdaTrackerGeneralPoint<I extends ImageSingleBand, D extends ImageSingleBand, Desc extends TupleDesc>
-		extends DetectAssociateBase<I, Desc> {
+public class DdaManagerGeneralPoint<I extends ImageSingleBand, D extends ImageSingleBand, Desc extends TupleDesc>
+		implements DdaFeatureManager<I, Desc> {
 
 	// feature detector
 	private EasyGeneralFeatureDetector<I,D> detector;
@@ -50,12 +49,9 @@ public class DdaTrackerGeneralPoint<I extends ImageSingleBand, D extends ImageSi
 	private FastQueue<Desc> descriptors;
 	private FastQueue<Point2D_F64> locations = new FastQueue<Point2D_F64>(100,Point2D_F64.class,true);
 
-	public DdaTrackerGeneralPoint( final AssociateDescription2D<Desc> associate ,
-								   final boolean updateDescription,
-								   EasyGeneralFeatureDetector<I,D> detector ,
-								   DescribeRegionPoint<I, Desc> describe ,
-								   double scale ) {
-		super(associate, updateDescription, describe.getDescriptionType());
+	public DdaManagerGeneralPoint(EasyGeneralFeatureDetector<I, D> detector,
+								  DescribeRegionPoint<I, Desc> describe,
+								  double scale) {
 		this.detector = detector;
 		this.describe = describe;
 		this.scale = scale;
@@ -64,7 +60,7 @@ public class DdaTrackerGeneralPoint<I extends ImageSingleBand, D extends ImageSi
 	}
 
 	@Override
-	protected void detectFeatures(I input, FastQueue<Point2D_F64> locDst, FastQueue<Desc> featDst) {
+	public void detectFeatures(I input, FastQueue<Point2D_F64> locDst, FastQueue<Desc> featDst) {
 
 		// detect features in the image
 		detector.detect(input,null);
