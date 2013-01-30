@@ -37,10 +37,10 @@ import java.util.List;
  */
 // TODO drop after no associate after X detections
 // TODO Speed up combination of respawn and spawn
-public class WrapCombinedTracker<I extends ImageSingleBand, D extends ImageSingleBand, TD extends TupleDesc>
-		implements PointTrackerD<I,TD> {
+public class WrapCombinedTracker<I extends ImageSingleBand, D extends ImageSingleBand, Desc extends TupleDesc>
+		implements PointTracker<I> , ExtractTrackDescription<Desc> {
 
-	CombinedTrackerScalePoint<I,D,TD> tracker;
+	CombinedTrackerScalePoint<I,D, Desc> tracker;
 
 	PyramidUpdaterDiscrete<I> updaterP;
 
@@ -55,7 +55,7 @@ public class WrapCombinedTracker<I extends ImageSingleBand, D extends ImageSingl
 
 	boolean detected;
 
-	public WrapCombinedTracker(CombinedTrackerScalePoint<I, D,TD> tracker ,
+	public WrapCombinedTracker(CombinedTrackerScalePoint<I, D, Desc> tracker ,
 							   int reactivateThreshold ,
 							   Class<I> imageType , Class<D> derivType ) {
 		this.tracker = tracker;
@@ -103,10 +103,10 @@ public class WrapCombinedTracker<I extends ImageSingleBand, D extends ImageSingl
 			previousSpawn = tracker.getPureKlt().size() + tracker.getReactivated().size();
 		}
 
-		for( CombinedTrack<TD> t : tracker.getPureKlt() ) {
+		for( CombinedTrack<Desc> t : tracker.getPureKlt() ) {
 			((PointTrack)t.getCookie()).set(t);
 		}
-		for( CombinedTrack<TD> t : tracker.getReactivated() ) {
+		for( CombinedTrack<Desc> t : tracker.getReactivated() ) {
 			((PointTrack)t.getCookie()).set(t);
 		}
 	}
@@ -118,9 +118,9 @@ public class WrapCombinedTracker<I extends ImageSingleBand, D extends ImageSingl
 		}
 		tracker.spawnTracksFromDetected();
 
-		List<CombinedTrack<TD>> spawned = tracker.getSpawned();
+		List<CombinedTrack<Desc>> spawned = tracker.getSpawned();
 
-		for( CombinedTrack<TD> t : spawned ) {
+		for( CombinedTrack<Desc> t : spawned ) {
 			PointTrack p = t.getCookie();
 			if( p == null ) {
 				p = new PointTrack();
@@ -142,7 +142,7 @@ public class WrapCombinedTracker<I extends ImageSingleBand, D extends ImageSingl
 
 	@Override
 	public boolean dropTrack(PointTrack track) {
-		tracker.dropTrack((CombinedTrack<TD>) track.getDescription());
+		tracker.dropTrack((CombinedTrack<Desc>) track.getDescription());
 		// make sure if the user drops a lot of tracks that doesn't force a constant respawn
 		previousSpawn--;
 		return true;
@@ -205,20 +205,20 @@ public class WrapCombinedTracker<I extends ImageSingleBand, D extends ImageSingl
 		return list;
 	}
 
-	private void addToList( List<CombinedTrack<TD>> in , List<PointTrack> out ) {
+	private void addToList( List<CombinedTrack<Desc>> in , List<PointTrack> out ) {
 		for( int i = 0; i < in.size(); i++ ) {
 			out.add( (PointTrack)in.get(i).getCookie() );
 		}
 	}
 
 	@Override
-	public TD extractDescription(PointTrack track) {
-		CombinedTrack<TD> c = track.getDescription();
+	public Desc extractDescription(PointTrack track) {
+		CombinedTrack<Desc> c = track.getDescription();
 		return c.desc;
 	}
 
 	@Override
-	public TD createDescription() {
+	public Desc createDescription() {
 		return tracker.getDetector().createDescription();
 	}
 
@@ -228,7 +228,7 @@ public class WrapCombinedTracker<I extends ImageSingleBand, D extends ImageSingl
 	}
 
 	@Override
-	public Class<TD> getDescriptionType() {
+	public Class<Desc> getDescriptionType() {
 		return tracker.getDetector().getDescriptionType();
 	}
 }

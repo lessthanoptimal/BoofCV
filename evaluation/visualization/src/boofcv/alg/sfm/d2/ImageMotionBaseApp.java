@@ -18,10 +18,8 @@
 
 package boofcv.alg.sfm.d2;
 
-import boofcv.abst.feature.tracker.ModelAssistedTracker;
 import boofcv.abst.feature.tracker.PointTrack;
 import boofcv.abst.feature.tracker.PointTracker;
-import boofcv.alg.feature.tracker.PointToAssistedTracker;
 import boofcv.alg.sfm.robust.DistanceAffine2DSq;
 import boofcv.alg.sfm.robust.DistanceHomographySq;
 import boofcv.alg.sfm.robust.GenerateAffine2D;
@@ -59,8 +57,7 @@ import java.awt.image.BufferedImage;
  *
  * @author Peter Abeles
  */
-public abstract class ImageMotionBaseApp<I extends ImageSingleBand,
-		T extends InvertibleTransform,Aux>
+public abstract class ImageMotionBaseApp<I extends ImageSingleBand, IT extends InvertibleTransform>
 		extends VideoProcessAppBase<I> implements VisualizeApp
 {
 	// If the input and output images are being shown, this is the width of a border between them.
@@ -68,12 +65,14 @@ public abstract class ImageMotionBaseApp<I extends ImageSingleBand,
 
 	// tracks feature in the video stream
 	protected PointTracker<I> tracker;
-	// tracks and estimates the motion
-	protected ModelAssistedTracker<I,T,AssociatedPair> trackerModel;
+	// finds the best fit model parameters to describe feature motion
+	protected ModelMatcher<IT,AssociatedPair> modelMatcher;
+	// batch refinement algorithm
+	protected ModelFitter<IT,AssociatedPair> modelRefiner;
 
 	// computes motion across multiple frames intelligently
 	// MUST be declared by child class
-	protected ImageMotionPointKey<I,T> distortAlg;
+	protected ImageMotionPointKey<I, IT> distortAlg;
 
 	// render the found motion on the output image
 	protected RenderImageMotion<I,?> motionRender;
@@ -92,7 +91,7 @@ public abstract class ImageMotionBaseApp<I extends ImageSingleBand,
 	protected int inputHeight;
 
 	// data type which is being fit
-	T fitModel;
+	IT fitModel;
 	// type of gray scale
 	Class<I> imageType;
 	boolean colorOutput = true;
@@ -145,7 +144,7 @@ public abstract class ImageMotionBaseApp<I extends ImageSingleBand,
 
 	/**
 	 * Start processing the image sequence
-	 * 
+	 *
 	 * @param sequence Image sequence being processed
 	 */
 	@Override
@@ -157,7 +156,7 @@ public abstract class ImageMotionBaseApp<I extends ImageSingleBand,
 
 		this.sequence = sequence;
 		sequence.setLoop(true);
-		
+
 		// save the input image dimension
 		I input = sequence.next();
 		inputWidth = input.width;
@@ -190,7 +189,7 @@ public abstract class ImageMotionBaseApp<I extends ImageSingleBand,
 	 * Adds the current frame onto the distorted image
 	 */
 	protected void renderCurrentTransform(I frame, BufferedImage buffImage) {
-		T worldToCurr = distortAlg.getWorldToCurr();
+		IT worldToCurr = distortAlg.getWorldToCurr();
 		PixelTransform_F32 pixelTran = UtilImageMotion.createPixelTransform(worldToCurr);
 		PixelTransform_F32 pixelTranInv = UtilImageMotion.createPixelTransform(worldToCurr.invert(null));
 
@@ -208,17 +207,17 @@ public abstract class ImageMotionBaseApp<I extends ImageSingleBand,
 			}
 		}
 
-		T worldToCurr = distortAlg.getWorldToCurr();
-		final T currToWorld = (T)worldToCurr.invert(null);
+		IT worldToCurr = distortAlg.getWorldToCurr();
+		final IT currToWorld = (IT)worldToCurr.invert(null);
 
 		ConvertBufferedImage.convertTo(motionRender.getMosaic(), distortedImage);
 
 		// toggle on and off the view window
 		showImageView = infoPanel.getShowView();
-		
+
 		// toggle on and off showing the active tracks
 		if( infoPanel.getShowInliers())
-			gui.setInliers(trackerModel.getMatchSet());
+			gui.setInliers(modelMatcher.getMatchSet());
 		else
 			gui.setInliers(null);
 		if( infoPanel.getShowAll())
@@ -230,7 +229,7 @@ public abstract class ImageMotionBaseApp<I extends ImageSingleBand,
 		gui.setCurrToWorld(H);
 		gui.setImages(imageGUI,distortedImage);
 
-		final int numAssociated = trackerModel.getMatchSet().size();
+		final int numAssociated = modelMatcher.getMatchSet().size();
 		final int numFeatures = tracker.getActiveTracks(null).size();
 
 		// update GUI
@@ -252,10 +251,10 @@ public abstract class ImageMotionBaseApp<I extends ImageSingleBand,
 	 * @param m 64F motion model
 	 * @return Homography2D_F32
 	 */
-	protected Homography2D_F32 convertToHomography(T m) {
+	protected Homography2D_F32 convertToHomography(IT m) {
 
 		Homography2D_F32 H = new Homography2D_F32();
-		
+
 		if( m instanceof Affine2D_F64) {
 			Affine2D_F64 affine = (Affine2D_F64)m;
 
@@ -276,13 +275,13 @@ public abstract class ImageMotionBaseApp<I extends ImageSingleBand,
 		} else {
 			throw new RuntimeException("Unexpected type: "+m.getClass().getSimpleName());
 		}
-		
+
 		return H;
 	}
 
 	/**
 	 * Draws the location of the current image onto the distorted image as a red quadrilateral.
-	 * 
+	 *
 	 * @param scale The scale from distorted image to its display output
 	 * @param offsetX  Offset in the display output
 	 * @param offsetY  Offset in the display output
@@ -382,14 +381,14 @@ public abstract class ImageMotionBaseApp<I extends ImageSingleBand,
 		stopWorker();
 
 		tracker = (PointTracker<I>)cookies[0];
-		fitModel = (T)cookies[1];
+		fitModel = (IT)cookies[1];
 
 		startEverything();
 	}
 
 	@Override
 	public void setActiveAlgorithm(int indexFamily, String name, Object cookie) {
-		if( sequence == null || trackerModel == null )
+		if( sequence == null || modelMatcher == null )
 			return;
 
 		stopWorker();
@@ -398,9 +397,9 @@ public abstract class ImageMotionBaseApp<I extends ImageSingleBand,
 			case 0:
 				tracker = (PointTracker<I>)cookie;
 				break;
-			
+
 			case 1:
-				fitModel = (T)cookie;
+				fitModel = (IT)cookie;
 				break;
 		}
 
@@ -468,7 +467,7 @@ public abstract class ImageMotionBaseApp<I extends ImageSingleBand,
 				drawJustDistorted( g2 );
 			}
 		}
-		
+
 		private void drawJustDistorted( Graphics2D g2 ) {
 			int w = getWidth();
 			int h = getHeight();
@@ -490,9 +489,9 @@ public abstract class ImageMotionBaseApp<I extends ImageSingleBand,
 			if(showImageView)
 				drawImageBounds((float)scale,0,0,orig.getWidth(),orig.getHeight(), currToWorld,g2);
 		}
-		
+
 		private void drawBoth( Graphics2D g2 ) {
-			
+
 			int desiredWidth = orig.getWidth()+ distorted.getWidth();
 			int desiredHeight = Math.max(orig.getHeight(), distorted.getHeight());
 
@@ -535,10 +534,10 @@ public abstract class ImageMotionBaseApp<I extends ImageSingleBand,
 	 * @param maxIterations Maximum number of iterations in RANSAC
 	 * @param thresholdFit Inlier fit threshold
 	 */
-	protected void createAssistedTracker( int maxIterations , double thresholdFit ) {
+	protected void createModelMatcher( int maxIterations , double thresholdFit ) {
+
 		ModelGenerator fitter;
 		DistanceFromModel distance;
-		ModelFitter<T,AssociatedPair> modelRefiner;
 
 		if( fitModel instanceof Homography2D_F64 ) {
 			GenerateHomographyLinear mf = new GenerateHomographyLinear(true);
@@ -554,13 +553,11 @@ public abstract class ImageMotionBaseApp<I extends ImageSingleBand,
 			throw new RuntimeException("Unknown model type");
 		}
 
-		ModelMatcher<T,AssociatedPair> modelMatcher = new Ransac(123123,fitter,distance,maxIterations,thresholdFit);
+		modelMatcher = new Ransac(123123,fitter,distance,maxIterations,thresholdFit);
 
-		tracker.reset();
-		trackerModel = new PointToAssistedTracker<I, T, AssociatedPair>(tracker,modelMatcher,modelRefiner);
 	}
 
 	protected abstract void startEverything();
-	
+
 	protected abstract void handleFatalError();
 }

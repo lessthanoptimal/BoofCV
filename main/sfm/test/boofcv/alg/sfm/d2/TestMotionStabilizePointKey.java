@@ -22,6 +22,7 @@ import boofcv.struct.image.ImageUInt8;
 import georegression.struct.affine.Affine2D_F32;
 import org.junit.Test;
 
+import static boofcv.alg.sfm.d2.TestImageMotionPointKey.DummyModelMatcher;
 import static boofcv.alg.sfm.d2.TestImageMotionPointKey.DummyTracker;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -35,12 +36,13 @@ public class TestMotionStabilizePointKey {
 	public void checkLargeDistortion() {
 		Affine2D_F32 model = new Affine2D_F32();
 		Affine2D_F32 computed = new Affine2D_F32(1,0,0,1,2,3);
-		DummyTracker tracker = new DummyTracker(computed,20);
+		DummyTracker tracker = new DummyTracker();
+		DummyModelMatcher<Affine2D_F32> matcher = new DummyModelMatcher<Affine2D_F32>(computed,20);
 
 		ImageUInt8 input = new ImageUInt8(20,30);
 
 		MotionStabilizePointKey<ImageUInt8,Affine2D_F32> alg =
-				new MotionStabilizePointKey<ImageUInt8,Affine2D_F32>(tracker,model,5,3,10,10);
+				new MotionStabilizePointKey<ImageUInt8,Affine2D_F32>(tracker,matcher,null,model,5,3,10,10);
 
 		// sanity check here
 		assertTrue(alg.process(input));
@@ -49,7 +51,7 @@ public class TestMotionStabilizePointKey {
 		assertFalse(alg.isReset());
 
 		// make sure there is a huge motion that should trigger a reset
-		tracker.setMotion(new Affine2D_F32(100,0,0,200,2,3));
+		matcher.setMotion(new Affine2D_F32(100,0,0,200,2,3));
 		assertTrue(alg.process(input));
 		assertTrue(alg.isReset());
 

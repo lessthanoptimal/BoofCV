@@ -18,43 +18,28 @@
 
 package boofcv.alg.sfm.d3;
 
-import boofcv.abst.feature.associate.AssociateDescription2D;
-import boofcv.abst.feature.associate.ScoreAssociation;
 import boofcv.abst.feature.describe.DescribeRegionPoint;
-import boofcv.abst.feature.describe.WrapDescribeBrief;
 import boofcv.abst.feature.detdesc.DetectDescribeMulti;
 import boofcv.abst.feature.detdesc.DetectDescribeMultiFusion;
-import boofcv.abst.feature.detdesc.DetectDescribePoint;
 import boofcv.abst.feature.detect.extract.ConfigExtract;
 import boofcv.abst.feature.detect.extract.NonMaxSuppression;
 import boofcv.abst.feature.detect.intensity.GeneralFeatureIntensity;
 import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
 import boofcv.abst.feature.detect.interest.DetectorInterestPointMulti;
 import boofcv.abst.feature.detect.interest.GeneralToInterestMulti;
-import boofcv.abst.feature.detect.interest.InterestPointDetector;
 import boofcv.abst.feature.disparity.StereoDisparitySparse;
 import boofcv.abst.feature.tracker.PkltConfig;
 import boofcv.abst.feature.tracker.PointTracker;
-import boofcv.abst.feature.tracker.PointTrackerD;
 import boofcv.abst.sfm.AccessPointTracks3D;
-import boofcv.abst.sfm.ModelAssistedTrackerCalibrated;
 import boofcv.abst.sfm.StereoVisualOdometry;
-import boofcv.alg.feature.associate.AssociateMaxDistanceNaive;
-import boofcv.alg.feature.describe.DescribePointBrief;
-import boofcv.alg.feature.describe.brief.FactoryBriefDefinition;
 import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.alg.geo.PerspectiveOps;
-import boofcv.factory.feature.associate.FactoryAssociation;
-import boofcv.factory.feature.describe.FactoryDescribePointAlgs;
 import boofcv.factory.feature.describe.FactoryDescribeRegionPoint;
-import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
 import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
 import boofcv.factory.feature.detect.intensity.FactoryIntensityPoint;
-import boofcv.factory.feature.detect.interest.FactoryInterestPoint;
 import boofcv.factory.feature.disparity.FactoryStereoDisparity;
 import boofcv.factory.feature.tracker.FactoryPointTracker;
-import boofcv.factory.filter.blur.FactoryBlurFilter;
 import boofcv.factory.sfm.FactoryVisualOdometry;
 import boofcv.gui.StereoVideoAppBase;
 import boofcv.gui.VisualizeApp;
@@ -65,8 +50,6 @@ import boofcv.gui.image.ShowImages;
 import boofcv.io.PathLabel;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.struct.calib.IntrinsicParameters;
-import boofcv.struct.feature.SurfFeature;
-import boofcv.struct.geo.Point2D3D;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.point.Point2D_F64;
@@ -82,7 +65,6 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Random;
 
 /**
  * @author Peter Abeles
@@ -113,12 +95,11 @@ public class VisualizeStereoVisualOdometryApp <I extends ImageSingleBand>
 	public VisualizeStereoVisualOdometryApp( Class<I> imageType ) {
 		super(1, imageType);
 
-		addAlgorithm(0, "Stereo P3P - ST-BRIEF", 4);
-		addAlgorithm(0, "Quad P3P - ST-BRIEF", 5);
-		addAlgorithm(0, "Stereo P3P - KLT", 3);
-		addAlgorithm(0, "Depth P3P - KLT", 0);
-		addAlgorithm(0, "Depth P3P - ST-BRIEF", 1);
-		addAlgorithm(0, "Depth P3P - ST-SURF-KLT", 2);
+		addAlgorithm(0, "Single Depth : KLT", 0);
+		addAlgorithm(0, "Single Depth : ST-BRIEF", 1);
+		addAlgorithm(0, "Single Depth : ST-SURF-KLT", 2);
+		addAlgorithm(0, "Dual Track : ST-SURF-KLT", 3);
+		addAlgorithm(0, "Quad Match : ST-BRIEF", 4);
 
 		guiInfo = new VisualOdometryPanel();
 		guiLeft = new ImagePanel();
@@ -284,131 +265,65 @@ public class VisualizeStereoVisualOdometryApp <I extends ImageSingleBand>
 	}
 
 	private StereoVisualOdometry<I> createStereoDepth( int whichAlg ) {
-		ModelAssistedTrackerCalibrated<I, Se3_F64,Point2D3D> assistedTracker;
-		DetectDescribePoint detDesc = null;
 
 		Class derivType = GImageDerivativeOps.getDerivativeType(imageType);
-
-		int thresholdAdd;
-		int thresholdRetire;
-		double associationMaxError = -1;
 
 		StereoDisparitySparse<I> disparity =
 				FactoryStereoDisparity.regionSparseWta(2,150,3,3,30,-1,true,imageType);
 
 		if( whichAlg == 0 ) {
-			thresholdAdd = 120;
-			thresholdRetire = 2;
-//			ImagePointTracker<I> tracker = FactoryPointSequentialTracker.klt(600,1,new int[]{1,2,4,8},3,3,3,2,imageType,derivType);
-//			assistedTracker = FactoryVisualOdometry.trackerP3P(tracker,1.5,200,50);
-
 			PkltConfig config =
 					PkltConfig.createDefault(imageType, derivType);
 			config.pyramidScaling = new int[]{1,2,4,8};
 			config.featureRadius = 3;
 			config.typeInput = imageType;
 			config.typeDeriv = derivType;
+			ConfigGeneralDetector configDetector = new ConfigGeneralDetector(600,3,1);
 
-			GeneralFeatureDetector detector =
-					FactoryPointTracker.createShiTomasi(new ConfigGeneralDetector(600, 3, 1), config.typeDeriv);
+			PointTracker<I> tracker = FactoryPointTracker.klt(config, configDetector);
 
-			assistedTracker = FactoryVisualOdometry.trackerAssistedKltP3P(detector,config,1.5,200,50);
+			return FactoryVisualOdometry.stereoDepth(1.5,120,2,200,50, disparity, tracker, imageType);
 		} else if( whichAlg == 1 ) {
-			thresholdAdd = 80;
-			thresholdRetire = 3;
-			associationMaxError = 150;
 
-			DescribePointBrief<I> brief = FactoryDescribePointAlgs.brief(
-					FactoryBriefDefinition.gaussian2(new Random(123), 16, 512),
-					FactoryBlurFilter.gaussian(imageType, 0, 4));
+			ConfigGeneralDetector configExtract = new ConfigGeneralDetector(600,3,1);
 
-			GeneralFeatureDetector corner = FactoryPointTracker.createShiTomasi(
-					new ConfigGeneralDetector(600, 2, 0), derivType);
+			PointTracker tracker = FactoryPointTracker.dda_ST_BRIEF(150,configExtract,imageType, null);
 
-			InterestPointDetector detector = FactoryInterestPoint.wrapPoint(corner, 1, imageType, derivType);
-
-			detDesc = FactoryDetectDescribe.fuseTogether(detector,null,new WrapDescribeBrief<I>(brief));
-//			tracker = FactoryPointSequentialTracker.dda_FH_SURF(600, 200, 1, 2,imageType);
-//			tracker = FactoryPointSequentialTracker.dda_ST_BRIEF(600, 200, 2, 0, imageType, null);
-//			tracker = FactoryPointSequentialTracker.dda_ST_NCC(600, 3, 7, 0, imageType, null);
-
-			assistedTracker = FactoryVisualOdometry.trackerAssistedDdaP3P(detDesc,1.5,200,50,associationMaxError,10.0);
+			return FactoryVisualOdometry.stereoDepth(1.5,80,3,200,50, disparity, tracker, imageType);
 		} else if( whichAlg == 2 ) {
-			thresholdAdd = 80;
-			thresholdRetire = 3;
 //			tracker = FactoryPointSequentialTracker.dda_FH_SURF(600, 200, 1, 2,imageType);
 			PointTracker<I> tracker = FactoryPointTracker.
 					combined_ST_SURF_KLT(new ConfigGeneralDetector(600, 3, 0), 3,
 							new int[]{1, 2, 4, 8}, 50, null, null, imageType, derivType);
-			assistedTracker = FactoryVisualOdometry.trackerP3P(tracker,1.5,200,50);
-//		} else if( whichAlg == 3 ) {
-//			thresholdAdd = 120;
-//			thresholdRetire = 2;
-//
-//			PkltConfig config =
-//					PkltConfig.createDefault(imageType, derivType);
-//			config.pyramidScaling = new int[]{1,2,4,8};
-//			config.featureRadius = 3;
-//			config.typeInput = imageType;
-//			config.typeDeriv = derivType;
-//
-//			PointTrackerD trackerLeft = FactoryPointSequentialTracker.klt(config, new ConfigGeneralDetector(600,3, 1));
-//			PointTrackerAux trackerRight = FactoryPointSequentialTracker.klt(config,new ConfigGeneralDetector(600,3, 1));
-//
-//			return FactoryVisualOdometry.stereoFullPnP(thresholdAdd, thresholdRetire,1.5,200,50,disparity,
-//					trackerLeft,trackerRight, imageType);
-		} else if( whichAlg == 4 ) {
-			thresholdAdd = 100;
-			thresholdRetire = 4;
-			associationMaxError = Double.MAX_VALUE;
 
-//			DescribeRegionPoint<I,NccFeature> describe = FactoryDescribeRegionPoint.pixelNCC(21,21, imageType);
-//			DescribeRegionPoint<I,TupleDesc_B> describe = FactoryDescribeRegionPoint.brief(null, imageType);
-			DescribeRegionPoint<I,SurfFeature> describe = FactoryDescribeRegionPoint.surfFast(null, imageType);
+			return FactoryVisualOdometry.stereoDepth(1.5,80,3,200,50, disparity, tracker, imageType);
+		} else if( whichAlg == 3 ) {
+			ConfigGeneralDetector configDetector = new ConfigGeneralDetector(600,2,1);
+			PointTracker trackerLeft = FactoryPointTracker.
+					combined_ST_SURF_KLT(configDetector,3,new int[]{1, 2, 4, 8},100000,null,null,imageType,derivType);
+			PointTracker trackerRight = FactoryPointTracker.
+					combined_ST_SURF_KLT(configDetector, 3, new int[]{1, 2, 4, 8}, 100000, null, null, imageType, derivType);
 
-			GeneralFeatureDetector cornerLeft = FactoryPointTracker.createShiTomasi(
-					new ConfigGeneralDetector(600, 2, 1), derivType);
-			GeneralFeatureDetector cornerRight = FactoryPointTracker.createShiTomasi(
-					new ConfigGeneralDetector(600, 2, 1), derivType);
-
-			ScoreAssociation score = FactoryAssociation.defaultScore(describe.getDescriptionType());
-//			AssociateDescription2D associateLeft =
-//					new AssociateDescTo2D(FactoryAssociation.greedy(score, associationMaxError, true));
-//			AssociateDescription2D associateRight =
-//					new AssociateDescTo2D(FactoryAssociation.greedy(score, associationMaxError, true));
-
-			AssociateDescription2D associateLeft =
-					new AssociateMaxDistanceNaive(score,true,associationMaxError,50);
-			AssociateDescription2D associateRight =
-					new AssociateMaxDistanceNaive(score,true,associationMaxError,50);
-
-			PointTrackerD trackerLeft = FactoryPointTracker.
-					dda(cornerLeft, describe, associateLeft, 2, imageType);
-			PointTrackerD trackerRight = FactoryPointTracker.
-					dda(cornerRight, describe, associateRight, 2, imageType);
-
-			return FactoryVisualOdometry.stereoFullPnP(thresholdAdd, thresholdRetire,1.5,0.5,200,50,
+			return FactoryVisualOdometry.stereoFullPnP(90,2,1.5,1.5,200,50,
 					trackerLeft,trackerRight, imageType);
-		} else if( whichAlg == 5 ) {
+		} else if( whichAlg == 4 ) {
 //			GeneralFeatureIntensity intensity =
 //					FactoryIntensityPoint.hessian(HessianBlobIntensity.Type.TRACE,imageType);
 			GeneralFeatureIntensity intensity =
 					FactoryIntensityPoint.shiTomasi(1,false,imageType);
 			NonMaxSuppression nonmax = FactoryFeatureExtractor.nonmax(new ConfigExtract(2,50,0,true,false,true));
 			GeneralFeatureDetector general = new GeneralFeatureDetector(intensity,nonmax);
-//			general.setMaxFeatures(600);
-			DetectorInterestPointMulti detector = new GeneralToInterestMulti(general,1,imageType,derivType);
+			general.setMaxFeatures(600);
+			DetectorInterestPointMulti detector = new GeneralToInterestMulti(general,2,imageType,derivType);
 //			DescribeRegionPoint describe = FactoryDescribeRegionPoint.brief(new ConfigBrief(true),imageType);
 //			DescribeRegionPoint describe = FactoryDescribeRegionPoint.pixelNCC(5,5,imageType);
 			DescribeRegionPoint describe = FactoryDescribeRegionPoint.surfFast(null,imageType);
 			DetectDescribeMulti detDescMulti =  new DetectDescribeMultiFusion(detector,null,describe);
 
-			return FactoryVisualOdometry.stereoQuadPnP(1.5, 0.5 ,100, Double.MAX_VALUE, 300, 50, detDescMulti, imageType);
+			return FactoryVisualOdometry.stereoQuadPnP(1.5, 0.5 ,75, Double.MAX_VALUE, 300, 50, detDescMulti, imageType);
 		} else {
 			throw new RuntimeException("Unknown selection");
 		}
-
-		return FactoryVisualOdometry.stereoDepth(thresholdAdd, thresholdRetire, disparity, assistedTracker, imageType);
 	}
 
 	@Override

@@ -23,10 +23,10 @@ Version : Alpha 0.13
 - Improved handling of Max Features in SURF + SIFT
   * All features are considered in order of intensity
   * Features are no longer added once the max has been reached
-- Added Model Assisted Trackers
-  * Can use estimated motion to improve tracking results
-  * Useful in SFM applications
-  * Updated SFM algorithms so that they can use these types of trackers
+- Point Trackers
+  * Renamed and changed function
+  * Created interface for extracting feature descriptions
+  * Added variant designed for two pass tracking
 - Chessboard and Square grid calibration target detectors
   * Made minimum blob automatically adjust to image size
   * Made it user configurable
@@ -73,6 +73,9 @@ Version : Alpha 0.13
 - Android
   * ConvertNV21 - Convert camera preview images into BoofCV image types
   * VisualizeImageData - Render different types of image information into a visible format
+- Fixed bug in RemoveRadialPto*_* where it couldn't detect convergence
+- 2D stabilization checks image fraction contained by points before spawning more points
+- Added ImageGradient.getMaxValueMultiplier() so that it is possible to know the maximum possible gradient
 
 ---------------------------------------------
 Date    : 2012/12/05

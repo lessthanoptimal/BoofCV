@@ -18,16 +18,17 @@
 
 package boofcv.alg.sfm.d2;
 
-import boofcv.abst.feature.tracker.ModelAssistedTracker;
 import boofcv.abst.feature.tracker.PointTrack;
-import boofcv.abst.feature.tracker.TrackGeometryManager;
+import boofcv.abst.feature.tracker.PointTracker;
+import boofcv.struct.ImageRectangle_F64;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.InvertibleTransform;
-import georegression.struct.affine.Affine2D_F64;
 import georegression.struct.point.Point2D_F64;
-import georegression.transform.affine.AffinePointOps;
+import org.ddogleg.fitting.modelset.ModelFitter;
+import org.ddogleg.fitting.modelset.ModelMatcher;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -40,12 +41,15 @@ import java.util.List;
  */
 @SuppressWarnings("unchecked")
 public class ImageMotionPointKey<I extends ImageSingleBand, IT extends InvertibleTransform>
-		implements TrackGeometryManager<IT,AssociatedPair>
 {
 	// total number of frames processed
 	protected int totalFramesProcessed = 0;
-	// Tracker and motion estimator
-	protected ModelAssistedTracker<I, IT,AssociatedPair> tracker;
+	// feature tracker
+	protected PointTracker<I> tracker;
+	// Fits a model to the tracked features
+	protected ModelMatcher<IT,AssociatedPair> modelMatcher;
+	// Refines the model using the complete inlier set
+	protected ModelFitter<IT,AssociatedPair> modelRefiner;
 
 	// assumed initial transform from the first image to the world
 	protected IT worldToInit;
@@ -63,26 +67,34 @@ public class ImageMotionPointKey<I extends ImageSingleBand, IT extends Invertibl
 	// if the current frame is a keyframe or not
 	protected boolean keyFrame;
 
-	// list of tracks just spawned
-	List<PointTrack> spawned;
 	// number of detected features
 	private int totalSpawned;
+
+
+	// computes the fraction of the screen which contains inlier points
+	private ImageRectangle_F64 contRect = new ImageRectangle_F64();
+	protected double contFraction;
 
 	/**
 	 * Specify algorithms to use internally.  Each of these classes must work with
 	 * compatible data structures.
 	 *
-	 * @param tracker Feature tracker and motion estimator
+	 * @param tracker feature tracker
+	 * @param modelMatcher Fits model to track data
+	 * @param modelRefiner (Optional) Refines the found model using the entire inlier set. Can be null.
 	 * @param model Motion model data structure
 	 * @param pruneThreshold Tracks not in the inlier set for this many frames in a row are pruned
 	 */
-	public ImageMotionPointKey(ModelAssistedTracker<I, IT,AssociatedPair> tracker,
-							   IT model , int pruneThreshold )
+	public ImageMotionPointKey(PointTracker<I> tracker,
+							   ModelMatcher<IT, AssociatedPair> modelMatcher,
+							   ModelFitter<IT,AssociatedPair> modelRefiner,
+							   IT model ,
+							   int pruneThreshold )
 	{
 		this.tracker = tracker;
+		this.modelMatcher = modelMatcher;
+		this.modelRefiner = modelRefiner;
 		this.pruneThreshold = pruneThreshold;
-
-		tracker.setTrackGeometry(this);
 
 		worldToInit = (IT)model.createInstance();
 		worldToKey = (IT)model.createInstance();
@@ -141,16 +153,40 @@ public class ImageMotionPointKey<I extends ImageSingleBand, IT extends Invertibl
 
 		totalFramesProcessed++;
 
-		if( !tracker.foundModel() ) {
+		List<PointTrack> tracks = tracker.getActiveTracks(null);
+
+		if( tracks.size() == 0 )
+			return false;
+
+		List<AssociatedPair> pairs = new ArrayList<AssociatedPair>();
+		for( PointTrack t : tracks ) {
+			pairs.add((AssociatedPair)t.getCookie());
+		}
+
+		// fit the motion model to the feature tracks
+		if( !modelMatcher.process((List)pairs) ) {
 			return false;
 		}
 
-		keyToCurr.set(tracker.getModel());
+		keyToCurr.set(modelMatcher.getModel());
 
-		// mark that the track is in the inlier set
-		for( AssociatedPair p : tracker.getMatchSet() ) {
+		// mark that the track is in the inlier set and compute the containment rectangle
+		contRect.x0 = contRect.y0 = Double.MAX_VALUE;
+		contRect.x1 = contRect.y1 = -Double.MAX_VALUE;
+		for( AssociatedPair p : modelMatcher.getMatchSet() ) {
 			((AssociatedPairTrack)p).lastUsed = totalFramesProcessed;
+
+			Point2D_F64 t = p.p2;
+			if( t.x > contRect.x1 )
+				contRect.x1 = t.x;
+			if( t.y > contRect.y1 )
+				contRect.y1 = t.y;
+			if( t.x < contRect.x0 )
+				contRect.x0 = t.x;
+			if( t.y < contRect.y0 )
+				contRect.y0 = t.y;
 		}
+		contFraction = contRect.area()/(frame.width*frame.height);
 
 		// Update the motion
 		worldToKey.concat(keyToCurr, worldToCurr);
@@ -168,33 +204,6 @@ public class ImageMotionPointKey<I extends ImageSingleBand, IT extends Invertibl
 		return true;
 	}
 
-	@Override
-	public boolean handleSpawnedTrack(PointTrack track) {
-		AssociatedPairTrack p = track.getCookie();
-		if( p == null ) {
-			track.cookie = p = new AssociatedPairTrack();
-			// little bit of trickery here.  Save the reference so that the point
-			// in the current frame is updated for free as PointTrack is
-			p.p2 = track;
-		}
-		p.p1.set(track);
-		p.lastUsed = totalFramesProcessed;
-
-		return true;
-	}
-
-	@Override
-	public AssociatedPair extractGeometry(PointTrack track) {
-		return (AssociatedPair)track.cookie;
-	}
-
-	@Override
-	public void predict(IT it, PointTrack track, Point2D_F64 prediction ) {
-		AssociatedPair p = track.getCookie();
-
-		AffinePointOps.transform((Affine2D_F64)it, p.p1, prediction);
-	}
-
 	/**
 	 * Make the current frame the first frame in the sequence
 	 */
@@ -202,9 +211,19 @@ public class ImageMotionPointKey<I extends ImageSingleBand, IT extends Invertibl
 		tracker.dropAllTracks();
 		tracker.spawnTracks();
 
-		spawned = tracker.getNewTracks(null);
-		for( PointTrack t : spawned )
-			handleSpawnedTrack(t);
+		List<PointTrack> spawned = tracker.getNewTracks(null);
+
+		for( PointTrack l : spawned ) {
+			AssociatedPairTrack p = l.getCookie();
+			if( p == null ) {
+				l.cookie = p = new AssociatedPairTrack();
+				// little bit of trickery here.  Save the reference so that the point
+				// in the current frame is updated for free as PointTrack is
+				p.p2 = l;
+			}
+			p.p1.set(l);
+			p.lastUsed = totalFramesProcessed;
+		}
 
 		totalSpawned = spawned.size();
 		worldToKey.set(worldToCurr);
@@ -223,8 +242,12 @@ public class ImageMotionPointKey<I extends ImageSingleBand, IT extends Invertibl
 		return keyToCurr;
 	}
 
-	public ModelAssistedTracker<I, IT,AssociatedPair> getTracker() {
+	public PointTracker<I> getTracker() {
 		return tracker;
+	}
+
+	public ModelMatcher<IT, AssociatedPair> getModelMatcher() {
+		return modelMatcher;
 	}
 
 	public int getTotalFramesProcessed() {
