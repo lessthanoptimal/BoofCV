@@ -70,6 +70,9 @@ Version : Alpha 0.13
 - GeneralFeatureIntensity: Added flags to indicate if features are maximum or minimums
 - Calibration package was missing from Maven build
 - Removed maxMatches from greedy assocaition since its not part of Association interface and can be easily added
+- Android
+  * ConvertNV21 - Convert camera preview images into BoofCV image types
+  * VisualizeImageData - Render different types of image information into a visible format
 
 ---------------------------------------------
 Date    : 2012/12/05

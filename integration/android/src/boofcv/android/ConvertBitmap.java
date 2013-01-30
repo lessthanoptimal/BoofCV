@@ -38,6 +38,8 @@ public class ConvertBitmap {
 	
 	/**
 	 * Converts Bitmap image into a single band image of arbitrary type.
+	 *
+	 * @see #declareStorage(android.graphics.Bitmap, byte[])
 	 * 
 	 * @param input Input Bitmap image.
 	 * @param output Output single band image.  If null a new one will be declared.
@@ -82,6 +84,8 @@ public class ConvertBitmap {
 	
 	/**
 	 * Converts Bitmap image into ImageFloat32.
+	 *
+	 * @see #declareStorage(android.graphics.Bitmap, byte[])
 	 * 
 	 * @param input Input Bitmap image.
 	 * @param output Output image.  If null a new one will be declared.
@@ -106,6 +110,8 @@ public class ConvertBitmap {
 	
 	/**
 	 * Converts Bitmap image into MultiSpectral image of the appropriate type.
+	 *
+	 * @see #declareStorage(android.graphics.Bitmap, byte[])
 	 * 
 	 * @param input Input Bitmap image.
 	 * @param output Output image.  If null a new one will be declared.
@@ -137,6 +143,8 @@ public class ConvertBitmap {
 	
 	/**
 	 * Converts ImageSingleBand into Bitmap.
+	 *
+	 * @see #declareStorage(android.graphics.Bitmap, byte[])
 	 * 
 	 * @param input Input gray scale image.
 	 * @param output Output Bitmap image.
@@ -153,6 +161,8 @@ public class ConvertBitmap {
 	
 	/**
 	 * Converts ImageSingleBand into Bitmap.
+	 *
+	 * @see #declareStorage(android.graphics.Bitmap, byte[])
 	 * 
 	 * @param input Input gray scale image.
 	 * @param output Output Bitmap image.
@@ -172,6 +182,8 @@ public class ConvertBitmap {
 	
 	/**
 	 * Converts ImageSingleBand into Bitmap.
+	 *
+	 * @see #declareStorage(android.graphics.Bitmap, byte[])
 	 * 
 	 * @param input Input gray scale image.
 	 * @param output Output Bitmap image.
@@ -191,7 +203,9 @@ public class ConvertBitmap {
 	
 	/**
 	 * Converts MultiSpectral image into Bitmap.
-	 * 
+	 *
+	 * @see #declareStorage(android.graphics.Bitmap, byte[])
+	 *
 	 * @param input Input MultiSpectral image.
 	 * @param output Output Bitmap image.
 	 * @param storage Byte array used for internal storage. If null it will be declared internally.

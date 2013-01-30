@@ -43,8 +43,12 @@ public class ImageGradient_Reflection<Input extends ImageSingleBand, Output exte
 	// the image derivative function
 	private Method m;
 
-	public ImageGradient_Reflection( Method m ) {
+	// maximum possible gradient / max pixel value
+	double maxValue;
+
+	public ImageGradient_Reflection( Method m , double maxValue ) {
 		this.m = m;
+		this.maxValue = maxValue;
 		setBorderType(borderType);
 	}
 
@@ -57,6 +61,11 @@ public class ImageGradient_Reflection<Input extends ImageSingleBand, Output exte
 		} catch (InvocationTargetException e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	@Override
+	public double getMaxValueMultiplier() {
+		return maxValue;
 	}
 
 	@Override
