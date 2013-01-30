@@ -51,6 +51,8 @@ public class ImageGradient_Gaussian<I extends ImageSingleBand, D extends ImageSi
 	Kernel1D kernelBlur;
 	Kernel1D kernelDeriv;
 
+	double maxValue;
+
 	public ImageGradient_Gaussian(int radius , Class<I> inputType , Class<D> derivType) {
 		this(sigmaForRadius(radius,0),radius,inputType,derivType);
 	}
@@ -84,6 +86,12 @@ public class ImageGradient_Gaussian<I extends ImageSingleBand, D extends ImageSi
 		GConvolveImageOps.horizontal(kernelDeriv,storage,derivX,border );
 		GConvolveImageOps.horizontalNormalized(kernelBlur,inputImage,storage);
 		GConvolveImageOps.vertical(kernelDeriv,storage,derivY,border );
+	}
+
+	@Override
+	public double getMaxValueMultiplier() {
+		throw new RuntimeException("Implement");
+//		return maxValue;
 	}
 
 	@Override

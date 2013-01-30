@@ -38,4 +38,13 @@ public interface ImageGradient<Input extends ImageSingleBand, Output extends Ima
 	 */
 	public void process( Input inputImage , Output derivX, Output derivY );
 
+
+	/**
+	 * Returns the maximum possible absolute value of the gradient relative to the maximum pixel value.  If the
+	 * image is unsigned 8-bits then you would need to multiply this by 255.
+	 *
+	 * @return Max value of the gradient.
+	 */
+	public double getMaxValueMultiplier();
+
 }

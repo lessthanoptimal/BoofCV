@@ -59,21 +59,21 @@ public class FactoryDerivative {
 	ImageGradient<I,D> prewitt( Class<I> inputType , Class<D> derivType)
 	{
 		Method m = findDerivative(GradientPrewitt.class,inputType,derivType);
-		return new ImageGradient_Reflection<I,D>(m);
+		return new ImageGradient_Reflection<I,D>(m,6);
 	}
 
 	public static <I extends ImageSingleBand, D extends ImageSingleBand>
 	ImageGradient<I,D> sobel( Class<I> inputType , Class<D> derivType)
 	{
 		Method m = findDerivative(GradientSobel.class,inputType,derivType);
-		return new ImageGradient_Reflection<I,D>(m);
+		return new ImageGradient_Reflection<I,D>(m,8);
 	}
 
 	public static <I extends ImageSingleBand, D extends ImageSingleBand>
 	ImageGradient<I,D> three( Class<I> inputType , Class<D> derivType)
 	{
 		Method m = findDerivative(GradientThree.class,inputType,derivType);
-		return new ImageGradient_Reflection<I,D>(m);
+		return new ImageGradient_Reflection<I,D>(m,2);
 	}
 
 	public static <I extends ImageSingleBand, D extends ImageSingleBand>
