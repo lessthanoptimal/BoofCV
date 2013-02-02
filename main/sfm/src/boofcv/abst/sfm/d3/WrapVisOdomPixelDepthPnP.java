@@ -16,9 +16,10 @@
  * limitations under the License.
  */
 
-package boofcv.abst.sfm;
+package boofcv.abst.sfm.d3;
 
 import boofcv.abst.feature.tracker.PointTrack;
+import boofcv.abst.sfm.AccessPointTracks3D;
 import boofcv.alg.distort.LensDistortionOps;
 import boofcv.alg.geo.DistanceModelMonoPixels;
 import boofcv.alg.sfm.StereoSparse3D;

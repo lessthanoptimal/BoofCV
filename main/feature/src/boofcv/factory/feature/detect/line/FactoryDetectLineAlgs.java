@@ -26,10 +26,10 @@ import boofcv.abst.feature.detect.line.DetectLineSegmentsGridRansac;
 import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.alg.feature.detect.line.ConnectLinesGrid;
 import boofcv.alg.feature.detect.line.GridRansacLineDetector;
-import boofcv.alg.feature.detect.line.gridline.Edgel;
-import boofcv.alg.feature.detect.line.gridline.GridLineModelDistance;
-import boofcv.alg.feature.detect.line.gridline.GridLineModelFitter;
+import boofcv.alg.feature.detect.line.gridline.*;
 import boofcv.factory.filter.derivative.FactoryDerivative;
+import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageSInt16;
 import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.line.LinePolar2D_F32;
 import org.ddogleg.fitting.modelset.ModelMatcher;
@@ -71,7 +71,15 @@ public class FactoryDetectLineAlgs {
 		ModelMatcher<LinePolar2D_F32, Edgel> matcher =
 				new Ransac<LinePolar2D_F32,Edgel>(123123,fitter,distance,25,1);
 
-		GridRansacLineDetector alg = new GridRansacLineDetector(regionSize,10,matcher);
+		GridRansacLineDetector<D> alg;
+		if( derivType == ImageFloat32.class )  {
+			alg = (GridRansacLineDetector)new ImplGridRansacLineDetector_F32(regionSize,10,matcher);
+		} else if( derivType == ImageSInt16.class ) {
+			alg = (GridRansacLineDetector)new ImplGridRansacLineDetector_S16(regionSize,10,matcher);
+		} else {
+			throw new IllegalArgumentException("Unsupported derivative type");
+		}
+
 
 		ConnectLinesGrid connect = null;
 		if( connectLines )

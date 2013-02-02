@@ -41,7 +41,7 @@ import java.util.List;
 public class DetectLineSegmentsGridRansac<T extends ImageSingleBand, D extends ImageSingleBand>
 		implements DetectLineSegment<T>
 {
-	GridRansacLineDetector detectorGrid;
+	GridRansacLineDetector<D> detectorGrid;
 	ConnectLinesGrid connect;
 
 	D derivX;
@@ -53,7 +53,7 @@ public class DetectLineSegmentsGridRansac<T extends ImageSingleBand, D extends I
 
 	double edgeThreshold;
 
-	public DetectLineSegmentsGridRansac(GridRansacLineDetector detectorGrid,
+	public DetectLineSegmentsGridRansac(GridRansacLineDetector<D> detectorGrid,
 										ConnectLinesGrid connect,
 										ImageGradient<T,D> gradient,
 										double edgeThreshold ,
@@ -81,7 +81,7 @@ public class DetectLineSegmentsGridRansac<T extends ImageSingleBand, D extends I
 		GGradientToEdgeFeatures.intensityAbs(derivX, derivY, edgeIntensity);
 		GThresholdImageOps.threshold(edgeIntensity, detected, edgeThreshold, false);
 
-		detectorGrid.process((ImageFloat32)derivX,(ImageFloat32)derivY,detected);
+		detectorGrid.process(derivX,derivY,detected);
 
 		MatrixOfList<LineSegment2D_F32> grid = detectorGrid.getFoundLines();
 		if( connect != null ) {

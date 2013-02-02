@@ -22,7 +22,7 @@ import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
 import boofcv.abst.feature.disparity.StereoDisparitySparse;
 import boofcv.abst.feature.tracker.PointTracker;
 import boofcv.abst.sfm.AccessPointTracks3D;
-import boofcv.abst.sfm.StereoVisualOdometry;
+import boofcv.abst.sfm.d3.StereoVisualOdometry;
 import boofcv.factory.feature.disparity.FactoryStereoDisparity;
 import boofcv.factory.feature.tracker.FactoryPointTracker;
 import boofcv.factory.sfm.FactoryVisualOdometry;

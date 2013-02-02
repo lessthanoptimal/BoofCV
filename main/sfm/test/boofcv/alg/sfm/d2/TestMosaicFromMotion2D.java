@@ -16,33 +16,20 @@
  * limitations under the License.
  */
 
-package boofcv.abst.sfm;
+package boofcv.alg.sfm.d2;
 
-import georegression.struct.se.Se3_F64;
+import org.junit.Test;
+
+import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
  */
-public interface VisualOdometry {
+public class TestMosaicFromMotion2D {
 
-	/**
-	 * Forget past history and tracking results, returning it to its initial state.
-	 */
-	public void reset();
+	@Test
+	public void stuff() {
+		fail("Implement");
+	}
 
-	/**
-	 * If a fatal error occurred while updating its state then this function will return true.
-	 * Before more images can be processed {@link #reset()} must be called.
-	 *
-	 * @return true if a fatal error has occurred.
-	 */
-	public boolean isFatal();
-
-	/**
-	 * Returns the estimated motion relative to the first frame in which a fatal error
-	 * does not happen.
-	 *
-	 * @return Found pose.
-	 */
-	public Se3_F64 getLeftToWorld();
 }

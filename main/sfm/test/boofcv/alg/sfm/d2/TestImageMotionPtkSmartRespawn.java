@@ -25,10 +25,11 @@ import static org.junit.Assert.fail;
 /**
  * @author Peter Abeles
  */
-public class TestMotionMosaicPointKey {
+public class TestImageMotionPtkSmartRespawn {
 
 	@Test
 	public void stuff() {
-		fail("something should go here");
+		fail("Implement");
 	}
+
 }

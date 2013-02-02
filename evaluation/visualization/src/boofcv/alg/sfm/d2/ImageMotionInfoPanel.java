@@ -37,7 +37,6 @@ public class ImageMotionInfoPanel extends StandardAlgConfigPanel implements Item
 
 	JButton resetButton;
 	JCheckBox showView;
-	JCheckBox showColor;
 	JCheckBox showInliers;
 	JCheckBox showAll;
 	JTextArea displayFPS;
@@ -46,7 +45,6 @@ public class ImageMotionInfoPanel extends StandardAlgConfigPanel implements Item
 	JTextArea displayNumInliers;
 
 	boolean setShowView = true;
-	boolean setColor = true;
 	boolean setShowInliers = false;
 	boolean setShowAll = false;
 	boolean shouldReset = false;
@@ -61,9 +59,6 @@ public class ImageMotionInfoPanel extends StandardAlgConfigPanel implements Item
 		showView = new JCheckBox("View");
 		showView.addItemListener(this);
 		showView.setSelected(setShowView);
-		showColor = new JCheckBox("Color");
-		showColor.addItemListener(this);
-		showColor.setSelected(setColor);
 		showAll = new JCheckBox("Show All");
 		showAll.addItemListener(this);
 		showAll.setSelected(setShowAll);
@@ -78,12 +73,11 @@ public class ImageMotionInfoPanel extends StandardAlgConfigPanel implements Item
 
 		addAlignLeft(resetButton, this);
 		addAlignLeft(showView, this);
-		addAlignLeft(showColor, this);
 		addAlignLeft(showAll, this);
 		addAlignLeft(showInliers, this);
 		addSeparator(200);
 		addLabeled(displayFPS,"Algorithm FPS:",this);
-		addLabeled(displayNumKeyFrames,"Key Frames:",this);
+		addLabeled(displayNumKeyFrames,"Resets:",this);
 		addLabeled(displayNumTracks,"Tracks:",this);
 		addLabeled(displayNumInliers,"Inliers:",this);
 
@@ -110,8 +104,6 @@ public class ImageMotionInfoPanel extends StandardAlgConfigPanel implements Item
 			setShowInliers = e.getStateChange() != ItemEvent.DESELECTED;
 		} else if( e.getItem() == showAll) {
 			setShowAll = e.getStateChange() != ItemEvent.DESELECTED;
-		} else if( e.getItem() == showColor ) {
-			setColor = e.getStateChange() != ItemEvent.DESELECTED;
 		} else if( e.getItem() == showView ) {
 			setShowView = e.getStateChange() != ItemEvent.DESELECTED;
 		}
@@ -139,10 +131,6 @@ public class ImageMotionInfoPanel extends StandardAlgConfigPanel implements Item
 
 	public boolean getShowAll() {
 		return setShowAll;
-	}
-
-	public boolean getColor() {
-		return setColor;
 	}
 
 	public boolean getShowView() {

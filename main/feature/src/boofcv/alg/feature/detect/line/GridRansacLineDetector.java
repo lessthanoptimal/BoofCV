@@ -23,11 +23,10 @@ import boofcv.alg.InputSanityCheck;
 import boofcv.alg.feature.detect.line.gridline.Edgel;
 import boofcv.struct.FastQueue;
 import boofcv.struct.feature.MatrixOfList;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
 import georegression.geometry.UtilLine2D_F32;
 import georegression.metric.ClosestPoint2D_F32;
-import georegression.metric.UtilAngle;
 import georegression.struct.line.LineParametric2D_F32;
 import georegression.struct.line.LinePolar2D_F32;
 import georegression.struct.line.LineSegment2D_F32;
@@ -60,17 +59,17 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class GridRansacLineDetector {
+public abstract class GridRansacLineDetector<D extends ImageSingleBand> {
 
 	// size of a region's width/height in pixels
-	private int regionSize;
+	protected int regionSize;
 	// the minimum number of points which must be fit to be accepted
-	private int minInlierSize;
+	protected int minInlierSize;
 
 	// list of detected edge pixels in a region
-	private FastQueue<Edgel> edgels = new FastQueue<Edgel>(30,Edgel.class,true);
+	protected FastQueue<Edgel> edgels = new FastQueue<Edgel>(30,Edgel.class,true);
 	// The maximum number of lines which can be detected in a region
-	private int maxDetectLines;
+	protected int maxDetectLines;
 
 	// extracts lines
 	private ModelMatcher<LinePolar2D_F32,Edgel> robustMatcher;
@@ -102,7 +101,7 @@ public class GridRansacLineDetector {
 	 * @param derivY Image derivative along x-axis. Not modified.
 	 * @param binaryEdges True values indicate that a pixel is an edge pixel. Not modified.
 	 */
-	public void process( ImageFloat32 derivX , ImageFloat32 derivY , ImageUInt8 binaryEdges )
+	public void process( D derivX , D derivY , ImageUInt8 binaryEdges )
 	{
 		InputSanityCheck.checkSameShape(derivX,derivY,binaryEdges);
 
@@ -138,30 +137,16 @@ public class GridRansacLineDetector {
 		return foundLines;
 	}
 
-	private void detectEdgels( int index0 , int x0 , int y0 ,
-							   ImageFloat32 derivX , ImageFloat32 derivY ,
-							   ImageUInt8 binaryEdges) {
-
-		edgels.reset();
-		for( int y = 0; y < regionSize; y++ ) {
-			int index = index0 + y*binaryEdges.stride;
-
-			for( int x = 0; x < regionSize; x++ ) {
-				if( binaryEdges.data[index++] != 0 ) {
-					Edgel e = edgels.grow();
-					int xx = x0+x;
-					int yy = y0+y;
-
-					e.set(xx,yy);
-
-					float dx = derivX.get(xx,yy);
-					float dy = derivY.get(xx,yy);
-
-					e.theta = UtilAngle.atanSafe(dy,dx);
-				}
-			}
-		}
-	}
+	/**
+	 * Computes edgel information for pixels which have been flagged inside a region
+	 * @param index0
+	 * @param x0 offset of region top left corner
+	 * @param y0 offset of region top left corner
+	 * @param derivX contains image derivative x-axis
+	 * @param derivY contains image derivative y-axis
+	 * @param binaryEdges Mark indicting which pixels are edges along a line
+	 */
+	protected abstract void detectEdgels( int index0 , int x0 , int y0 , D derivX , D derivY , ImageUInt8 binaryEdges);
 
 	/**
 	 * Searches for lines inside inside the region..

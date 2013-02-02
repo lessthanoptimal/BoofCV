@@ -24,18 +24,13 @@ import boofcv.abst.feature.tracker.PkltConfig;
 import boofcv.factory.feature.tracker.FactoryPointTracker;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.PathLabel;
-import boofcv.struct.distort.PixelTransform_F32;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.InvertibleTransform;
 import georegression.struct.affine.Affine2D_F64;
-import georegression.struct.homo.Homography2D_F32;
 import georegression.struct.homo.Homography2D_F64;
-import georegression.struct.point.Point2D_F32;
-import georegression.transform.ConvertTransform_F64;
-import georegression.transform.homo.HomographyPointOps_F32;
+import georegression.struct.point.Point2D_F64;
 
-import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -48,20 +43,16 @@ import java.util.List;
  * @param <I> Input image type
  * @param <D> Image derivative type
  */
-// TODO change scale in info panel
+// TODO add support for color again
+// TODO comment and clean up code
 public class VideoMosaicSequentialPointApp<I extends ImageSingleBand, D extends ImageSingleBand,
-		T extends InvertibleTransform<T>>
-		extends ImageMotionBaseApp<I,T>
+		IT extends InvertibleTransform>
+		extends VideoStitchBaseApp<I,IT>
 {
-	private final static int maxFeatures = 250;
-	private final static int maxIterations = 100;
-	private final static int pruneThreshold = 10;
-	
-	public VideoMosaicSequentialPointApp(Class<I> imageType, Class<D> derivType) {
-		super(false,imageType,2);
+	private static int maxFeatures = 250;
 
-		// size of the mosaic image
-		setOutputSize(1000,600);
+	public VideoMosaicSequentialPointApp(Class<I> imageType, Class<D> derivType) {
+		super(2,imageType,new Mosaic2DPanel());
 
 		PkltConfig<I, D> config =
 				PkltConfig.createDefault(imageType, derivType);
@@ -87,95 +78,46 @@ public class VideoMosaicSequentialPointApp<I extends ImageSingleBand, D extends 
 
 		addAlgorithm(1,"Affine", new Affine2D_F64());
 		addAlgorithm(1,"Homography", new Homography2D_F64());
-	}
 
-	@Override
-	public void loadConfigurationFile(String fileName) {}
+		absoluteMinimumTracks = 40;
+		respawnTrackFraction = 0.3;
+		respawnCoverageFraction = 0.8;
+		maxJumpFraction = 0.7;
+
+		initialTransform = createInitialTransform();
+	}
 
 	private Affine2D_F64 createInitialTransform() {
 		float scale = 0.8f;
 
-		Affine2D_F64 H = new Affine2D_F64(scale,0,0,scale,outputWidth/4, outputHeight/4);
+		Affine2D_F64 H = new Affine2D_F64(scale,0,0,scale, stitchWidth /4, stitchHeight /4);
 		return H.invert(null);
 	}
 
-	/**
-	 * Checks to see if one of the four corners is near the mosaic's border.
-	 *
-	 * @param frameWidth width of input image
-	 * @param frameHeight height of input image
-	 * @param tol how close to the border it needs to be to return true
-	 * @return If it is near the image border
-	 */
-	private boolean closeToImageBounds( int frameWidth , int frameHeight, int tol )  {
-		T worldToCurr = distortAlg.getWorldToCurr();
+	@Override
+	protected void init(int inputWidth, int inputHeight) {
+		setStitchImageSize(1000, 600);
+		((Mosaic2DPanel)gui).setMosaicSize(stitchWidth, stitchHeight);
+	}
 
-		Homography2D_F32 currToWorld = convertToHomography(worldToCurr.invert(null));
-
-		if( closeToBorder(0,0,tol,currToWorld) )
+	@Override
+	protected boolean checkLocation(StitchingFromMotion2D.Corners corners) {
+		if( closeToBorder(corners.p0) )
 			return true;
-		if( closeToBorder(frameWidth,0,tol,currToWorld) )
+		if( closeToBorder(corners.p1) )
 			return true;
-		if( closeToBorder(frameWidth,frameHeight,tol,currToWorld) )
+		if( closeToBorder(corners.p2) )
 			return true;
-		if( closeToBorder(0,frameHeight,tol,currToWorld) )
+		if( closeToBorder(corners.p3) )
 			return true;
 
 		return false;
 	}
 
-	/**
-	 * Transforms the point and sees if it is near the border
-	 */
-	private boolean closeToBorder( int x , int y , int tolerance , Homography2D_F32 currToWorld) {
-
-		Point2D_F32 pt = new Point2D_F32(x,y);
-		HomographyPointOps_F32.transform(currToWorld, pt, pt);
-
-		
-		if( pt.x < tolerance || pt.y < tolerance )
+	private boolean closeToBorder( Point2D_F64 pt ) {
+		if( pt.x < borderTolerance || pt.y < borderTolerance)
 			return true;
-		return( pt.x >= outputWidth-tolerance || pt.y >= outputHeight-tolerance );
-	}
-
-	@Override
-	protected void handleFatalError() {
-		motionRender.clear();
-		distortAlg.reset();
-	}
-
-	@Override
-	protected void updateAlgGUI(I frame, BufferedImage imageGUI, final double fps) {
-
-		// reset the world coordinate system to the current key frame
-		if( infoPanel.resetRequested() || closeToImageBounds(frame.width,frame.height,30)) {
-			T oldToNew = fitModel.createInstance();
-			distortAlg.changeWorld(oldToNew);
-			PixelTransform_F32 pixelTran = UtilImageMotion.createPixelTransform(oldToNew);
-			motionRender.distortMosaic(pixelTran);
-		}
-
-		MotionMosaicPointKey alg = (MotionMosaicPointKey)distortAlg;
-
-		if( alg.isKeyFrame() ) {
-			totalKeyFrames++;
-		}
-
-		super.updateAlgGUI(frame,imageGUI,fps);
-	}
-
-	@Override
-	protected void startEverything() {
-		// make sure there is nothing left over from before
-		tracker.dropAllTracks();
-		createModelMatcher(maxIterations, 4);
-		distortAlg = new MotionMosaicPointKey<I,T>(tracker,modelMatcher,modelRefiner,fitModel,40,0.3,pruneThreshold,0.8);
-		T initTran = ConvertTransform_F64.convert(createInitialTransform(), fitModel.createInstance());
-		distortAlg.setInitialTransform(initTran);
-		totalKeyFrames = 0;
-		motionRender.clear();
-
-		startWorkerThread();
+		return( pt.x >= stitchWidth - borderTolerance || pt.y >= stitchHeight - borderTolerance);
 	}
 
 	public static void main( String args[] ) {
@@ -184,7 +126,7 @@ public class VideoMosaicSequentialPointApp<I extends ImageSingleBand, D extends 
 
 //		Class type = ImageUInt8.class;
 //		Class derivType = ImageSInt16.class;
-		
+
 		VideoMosaicSequentialPointApp app = new VideoMosaicSequentialPointApp(type,derivType);
 
 		List<PathLabel> inputs = new ArrayList<PathLabel>();

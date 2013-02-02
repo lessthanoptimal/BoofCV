@@ -46,7 +46,7 @@ public class TestImageGradient_Reflection {
 
 		Method m = GradientSobel.class.getMethod("process",ImageFloat32.class,ImageFloat32.class,ImageFloat32.class, ImageBorder_F32.class);
 
-		ImageGradient_Reflection<ImageFloat32,ImageFloat32> alg = new ImageGradient_Reflection<ImageFloat32,ImageFloat32>(m,2);
+		ImageGradient_Reflection<ImageFloat32,ImageFloat32> alg = new ImageGradient_Reflection<ImageFloat32,ImageFloat32>(m);
 
 		alg.process(input,derivX,derivY);
 	}
