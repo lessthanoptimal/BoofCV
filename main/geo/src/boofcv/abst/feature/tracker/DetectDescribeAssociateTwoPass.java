@@ -26,20 +26,41 @@ import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.point.Point2D_F64;
 
 /**
+ * Changes behavior of {@link DetectDescribeAssociate} so that it conforms to the {@link PointTrackerTwoPass} interface.
+ * It can now take hints for where tracks might appear in the image.   If possible
+ * {@link AssociateDescription2D#setSource(boofcv.struct.FastQueue, boofcv.struct.FastQueue)} will only be called once
+ * on the second pass.
+ *
  * @author Peter Abeles
  */
 public class DetectDescribeAssociateTwoPass<I extends ImageSingleBand, Desc extends TupleDesc>
 	extends DetectDescribeAssociate<I,Desc> implements PointTrackerTwoPass<I>
 {
+	// associate used in the second pass
+	AssociateDescription2D<Desc> associate2;
+	// has source been set in associate for the second pass
+	boolean sourceSet2;
+
+	/**
+	 * Configure the tracker.  The parameters associate and associate2 can be the same instance.
+	 *
+	 * @param manager Feature manager
+	 * @param associate Association algorithm for the first pass
+	 * @param associate2 Association algorithm for the second pass
+	 * @param updateDescription Should descriptions be updated? Typically false
+	 */
 	public DetectDescribeAssociateTwoPass(DdaFeatureManager<I, Desc> manager,
 										  AssociateDescription2D<Desc> associate,
+										  AssociateDescription2D<Desc> associate2,
 										  boolean updateDescription)
 	{
 		super(manager, associate, updateDescription);
+		this.associate2 = associate2;
 	}
 
 	@Override
 	public void process( I input ) {
+		sourceSet2 = false;
 		tracksActive.clear();
 		tracksInactive.clear();
 		tracksDropped.clear();
@@ -67,11 +88,16 @@ public class DetectDescribeAssociateTwoPass<I extends ImageSingleBand, Desc exte
 		if( tracksAll.isEmpty() )
 			return;
 
-		associate.setSource(locSrc, featSrc);
-		associate.setDestination(locDst, featDst);
-		associate.associate();
+		// minimize the number of times set source is called.  In some implementations of associate this is an
+		// expensive operation
+		if( associate2 != associate && !sourceSet2 ) {
+			sourceSet2 = true;
+			associate.setSource(locSrc, featSrc);
+		}
+		associate2.setDestination(locDst, featDst);
+		associate2.associate();
 
-		updateTrackLocation(associate.getMatches());
+		updateTrackLocation(associate2.getMatches());
 	}
 
 	@Override
@@ -80,6 +106,7 @@ public class DetectDescribeAssociateTwoPass<I extends ImageSingleBand, Desc exte
 			return;
 
 		// Update the track state using association information
+		tracksActive.clear();
 		updateTrackState(matches);
 
 		// add unassociated to the list
@@ -101,6 +128,7 @@ public class DetectDescribeAssociateTwoPass<I extends ImageSingleBand, Desc exte
 			track.set(loc.x, loc.y);
 			tracksActive.add(track);
 		}
+		this.matches = matches;
 	}
 
 	@Override

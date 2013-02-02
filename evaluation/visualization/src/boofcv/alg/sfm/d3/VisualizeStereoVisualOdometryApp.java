@@ -18,6 +18,9 @@
 
 package boofcv.alg.sfm.d3;
 
+import boofcv.abst.feature.associate.AssociateDescTo2D;
+import boofcv.abst.feature.associate.AssociateDescription2D;
+import boofcv.abst.feature.associate.ScoreAssociateHamming_B;
 import boofcv.abst.feature.describe.DescribeRegionPoint;
 import boofcv.abst.feature.detdesc.DetectDescribeMulti;
 import boofcv.abst.feature.detdesc.DetectDescribeMultiFusion;
@@ -30,16 +33,20 @@ import boofcv.abst.feature.detect.interest.GeneralToInterestMulti;
 import boofcv.abst.feature.disparity.StereoDisparitySparse;
 import boofcv.abst.feature.tracker.PkltConfig;
 import boofcv.abst.feature.tracker.PointTracker;
+import boofcv.abst.feature.tracker.PointTrackerToTwoPass;
+import boofcv.abst.feature.tracker.PointTrackerTwoPass;
 import boofcv.abst.sfm.AccessPointTracks3D;
 import boofcv.abst.sfm.StereoVisualOdometry;
 import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.alg.geo.PerspectiveOps;
+import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.feature.describe.FactoryDescribeRegionPoint;
 import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
 import boofcv.factory.feature.detect.intensity.FactoryIntensityPoint;
 import boofcv.factory.feature.disparity.FactoryStereoDisparity;
 import boofcv.factory.feature.tracker.FactoryPointTracker;
+import boofcv.factory.feature.tracker.FactoryPointTrackerTwoPass;
 import boofcv.factory.sfm.FactoryVisualOdometry;
 import boofcv.gui.StereoVideoAppBase;
 import boofcv.gui.VisualizeApp;
@@ -50,6 +57,7 @@ import boofcv.gui.image.ShowImages;
 import boofcv.io.PathLabel;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.struct.calib.IntrinsicParameters;
+import boofcv.struct.feature.TupleDesc_B;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.point.Point2D_F64;
@@ -280,23 +288,32 @@ public class VisualizeStereoVisualOdometryApp <I extends ImageSingleBand>
 			config.typeDeriv = derivType;
 			ConfigGeneralDetector configDetector = new ConfigGeneralDetector(600,3,1);
 
-			PointTracker<I> tracker = FactoryPointTracker.klt(config, configDetector);
+			PointTrackerTwoPass<I> tracker = FactoryPointTrackerTwoPass.klt(config, configDetector);
 
-			return FactoryVisualOdometry.stereoDepth(1.5,120,2,200,50, disparity, tracker, imageType);
+			return FactoryVisualOdometry.stereoDepth(1.5,120,2,200,50, true, disparity, tracker, imageType);
 		} else if( whichAlg == 1 ) {
 
 			ConfigGeneralDetector configExtract = new ConfigGeneralDetector(600,3,1);
 
-			PointTracker tracker = FactoryPointTracker.dda_ST_BRIEF(150,configExtract,imageType, null);
+			GeneralFeatureDetector detector = FactoryPointTracker.createShiTomasi(configExtract, derivType);
+			DescribeRegionPoint describe = FactoryDescribeRegionPoint.brief(null,imageType);
 
-			return FactoryVisualOdometry.stereoDepth(1.5,80,3,200,50, disparity, tracker, imageType);
+			ScoreAssociateHamming_B score = new ScoreAssociateHamming_B();
+
+			AssociateDescription2D<TupleDesc_B> associate =
+					new AssociateDescTo2D<TupleDesc_B>(FactoryAssociation.greedy(score, 150, true));
+
+			PointTrackerTwoPass tracker = FactoryPointTrackerTwoPass.dda(detector, describe, associate, null, 1, imageType);
+
+			return FactoryVisualOdometry.stereoDepth(1.5,80,3,200,50, false, disparity, tracker, imageType);
 		} else if( whichAlg == 2 ) {
-//			tracker = FactoryPointSequentialTracker.dda_FH_SURF(600, 200, 1, 2,imageType);
 			PointTracker<I> tracker = FactoryPointTracker.
 					combined_ST_SURF_KLT(new ConfigGeneralDetector(600, 3, 0), 3,
 							new int[]{1, 2, 4, 8}, 50, null, null, imageType, derivType);
 
-			return FactoryVisualOdometry.stereoDepth(1.5,80,3,200,50, disparity, tracker, imageType);
+			PointTrackerTwoPass<I> twopass = new PointTrackerToTwoPass<I>(tracker);
+
+			return FactoryVisualOdometry.stereoDepth(1.5,80,3,200,50, false, disparity, twopass, imageType);
 		} else if( whichAlg == 3 ) {
 			ConfigGeneralDetector configDetector = new ConfigGeneralDetector(600,2,1);
 			PointTracker trackerLeft = FactoryPointTracker.

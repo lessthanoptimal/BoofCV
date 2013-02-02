@@ -20,6 +20,7 @@ package boofcv.abst.feature.tracker;
 
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.alg.misc.ImageMiscOps;
+import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 import org.junit.Before;
@@ -68,7 +69,7 @@ public abstract class StandardPointTracker<T extends ImageSingleBand> {
 	@Test
 	public void checkCookieNull() {
 		tracker = createTracker();
-		tracker.process((T)image);
+		processImage((T)image);
 		tracker.spawnTracks();
 
 		assertTrue(tracker.getAllTracks(null).size() > 0);
@@ -89,7 +90,7 @@ public abstract class StandardPointTracker<T extends ImageSingleBand> {
 	public void checkCookieSaved() {
 		// create tracks
 		tracker = createTracker();
-		tracker.process((T)image);
+		processImage((T)image);
 		tracker.spawnTracks();
 
 		assertTrue(tracker.getAllTracks(null).size() > 0);
@@ -100,7 +101,7 @@ public abstract class StandardPointTracker<T extends ImageSingleBand> {
 		tracker.dropAllTracks();
 
 		// respawn and look for a cookie that's not null
-		tracker.process((T)image);
+		processImage((T)image);
 		tracker.spawnTracks();
 
 		int numFound = 0;
@@ -118,7 +119,7 @@ public abstract class StandardPointTracker<T extends ImageSingleBand> {
 	public void spawnTracks() {
 		// Process an image and make sure no new tracks have been spawned until requested
 		tracker = createTracker();
-		tracker.process((T)image);
+		processImage((T)image);
 		assertEquals(0,tracker.getAllTracks(null).size());
 		assertEquals(0,tracker.getActiveTracks(null).size());
 		assertTrue(tracker.getNewTracks(null).size() == 0 );
@@ -133,7 +134,7 @@ public abstract class StandardPointTracker<T extends ImageSingleBand> {
 
 		// Tweak the input image and make sure that everything has the expected size
 		ImageMiscOps.addGaussian(image,rand,2,0,255);
-		tracker.process((T)image);
+		processImage((T)image);
 
 		int beforeAll = tracker.getAllTracks(null).size();
 		int beforeActive = tracker.getActiveTracks(null).size();
@@ -159,7 +160,7 @@ public abstract class StandardPointTracker<T extends ImageSingleBand> {
 	@Test
 	public void spawnTracks_NoDuplicates() {
 		tracker = createTracker();
-		tracker.process((T)image);
+		processImage((T)image);
 		tracker.spawnTracks();
 		assertTrue(tracker.getActiveTracks(null).size()>0);
 
@@ -173,7 +174,7 @@ public abstract class StandardPointTracker<T extends ImageSingleBand> {
 
 		// process the exact same image
 		// I think in just about every tracker nothing should change. Might need to change this test for some
-		tracker.process((T)image);
+		processImage((T)image);
 
 		// should just spawn one track
 		tracker.spawnTracks();
@@ -189,7 +190,7 @@ public abstract class StandardPointTracker<T extends ImageSingleBand> {
 	@Test
 	public void dropAllTracks() {
 		tracker = createTracker();
-		tracker.process((T)image);
+		processImage((T)image);
 		tracker.spawnTracks();
 		assertTrue(tracker.getAllTracks(null).size() > 0);
 		assertTrue(tracker.getActiveTracks(null).size() > 0);
@@ -208,7 +209,7 @@ public abstract class StandardPointTracker<T extends ImageSingleBand> {
 	@Test
 	public void testUpdateTrackDrop() {
 		tracker = createTracker();
-		tracker.process((T)image);
+		processImage((T)image);
 		tracker.spawnTracks();
 		int beforeAll = tracker.getAllTracks(null).size();
 		int beforeActive = tracker.getActiveTracks(null).size();
@@ -218,7 +219,7 @@ public abstract class StandardPointTracker<T extends ImageSingleBand> {
 
 		// make the image a poor match, causing tracks to be dropped
 		GImageMiscOps.fill(image, 0);
-		tracker.process((T) image);
+		processImage((T)image);
 
 		int afterAll = tracker.getAllTracks(null).size();
 		int afterActive = tracker.getActiveTracks(null).size();
@@ -254,7 +255,7 @@ public abstract class StandardPointTracker<T extends ImageSingleBand> {
 	@Test
 	public void testRequestDrop() {
 		tracker = createTracker();
-		tracker.process((T)image);
+		processImage((T)image);
 		tracker.spawnTracks();
 		List<PointTrack> tracks = tracker.getActiveTracks(null);
 
@@ -276,7 +277,7 @@ public abstract class StandardPointTracker<T extends ImageSingleBand> {
 	@Test
 	public void testTrackUpdate() {
 		tracker = createTracker();
-		tracker.process((T)image);
+		processImage((T)image);
 		tracker.spawnTracks();
 		int before = tracker.getAllTracks(null).size();
 		assertTrue(before > 0);
@@ -284,7 +285,7 @@ public abstract class StandardPointTracker<T extends ImageSingleBand> {
 
 		// by adding a little bit of noise the features should move slightly
 		ImageMiscOps.addUniform(image,rand,0,5);
-		tracker.process((T)image);
+		processImage((T)image);
 		checkUniqueFeatureID();
 
 		int after = tracker.getAllTracks(null).size();
@@ -295,7 +296,7 @@ public abstract class StandardPointTracker<T extends ImageSingleBand> {
 	@Test
 	public void reset() {
 		tracker = createTracker();
-		tracker.process((T)image);
+		processImage((T)image);
 		tracker.spawnTracks();
 		assertTrue(tracker.getAllTracks(null).size() > 0);
 		assertEquals(0, tracker.getAllTracks(null).get(0).featureId);
@@ -304,7 +305,7 @@ public abstract class StandardPointTracker<T extends ImageSingleBand> {
 
 		// add several tracks
 		ImageMiscOps.addUniform(image,rand,0,5);
-		tracker.process((T)image);
+		processImage((T)image);
 		tracker.spawnTracks();
 
 		// old tracks should be discarded
@@ -333,7 +334,7 @@ public abstract class StandardPointTracker<T extends ImageSingleBand> {
 	@Test
 	public void getAllTracks() {
 		tracker = createTracker();
-		tracker.process((T)image);
+		processImage((T)image);
 		tracker.spawnTracks();
 
 		List<PointTrack> input = new ArrayList<PointTrack>();
@@ -350,7 +351,7 @@ public abstract class StandardPointTracker<T extends ImageSingleBand> {
 	@Test
 	public void getActiveTracks() {
 		tracker = createTracker();
-		tracker.process((T)image);
+		processImage((T)image);
 		tracker.spawnTracks();
 
 		List<PointTrack> input = new ArrayList<PointTrack>();
@@ -367,12 +368,12 @@ public abstract class StandardPointTracker<T extends ImageSingleBand> {
 	@Test
 	public void getInactiveTracks() {
 		tracker = createTracker();
-		tracker.process((T)image);
+		processImage((T)image);
 		tracker.spawnTracks();
 
 		// create a situation where tracks might become inactive
 		GImageMiscOps.fill(image, 0);
-		tracker.process((T) image);
+		processImage((T)image);
 
 		List<PointTrack> input = new ArrayList<PointTrack>();
 		assertTrue( input == tracker.getInactiveTracks(input));
@@ -385,15 +386,17 @@ public abstract class StandardPointTracker<T extends ImageSingleBand> {
 	@Test
 	public void getDroppedTracks() {
 		tracker = createTracker();
-		tracker.process((T)image);
+		processImage((T)image);
 		tracker.spawnTracks();
 
 		// create a situation where tracks might be dropped
 		GImageMiscOps.fill(image, 0);
-		tracker.process((T) image);
+		processImage((T)image);
 
 		List<PointTrack> input = new ArrayList<PointTrack>();
 		assertTrue( input == tracker.getDroppedTracks(input));
+		if( shouldDropTracks )
+			assertTrue( input.size() > 0 );
 
 		List<PointTrack> ret = tracker.getDroppedTracks(null);
 
@@ -403,7 +406,7 @@ public abstract class StandardPointTracker<T extends ImageSingleBand> {
 	@Test
 	public void getNewTracks() {
 		tracker = createTracker();
-		tracker.process((T)image);
+		processImage((T)image);
 		tracker.spawnTracks();
 
 		List<PointTrack> input = new ArrayList<PointTrack>();
@@ -417,48 +420,64 @@ public abstract class StandardPointTracker<T extends ImageSingleBand> {
 		checkIdentical(input, ret);
 	}
 
+	/**
+	 * Just checks to see if the extracted description is not zero from new tracks
+	 */
 	@Test
 	public void extractDescription() {
+		// is this interface supported?
 		tracker = createTracker();
 		if( !(tracker instanceof ExtractTrackDescription) )
 			return;
 
+		processImage((T)image);
+		tracker.spawnTracks();
 		ExtractTrackDescription extract = (ExtractTrackDescription)tracker;
 
-		fail("Implement");
+		List<PointTrack> tracks = tracker.getNewTracks(null);
+		assertTrue( tracks.size() > 0 );
+		for( PointTrack t : tracks ) {
+			TupleDesc des = extract.extractDescription(t);
+			assertTrue(des != null);
+		}
 	}
 
 	@Test
 	public void createDescription() {
+		// is this interface supported?
 		tracker = createTracker();
 		if( !(tracker instanceof ExtractTrackDescription) )
 			return;
 
 		ExtractTrackDescription extract = (ExtractTrackDescription)tracker;
 
-		fail("Implement");
+		TupleDesc desc = extract.createDescription();
+		assertTrue( desc != null );
+		assertTrue( desc.size() == extract.getDescriptionLength() );
 	}
 
 	@Test
 	public void getDescriptionLength() {
+		// is this interface supported?
 		tracker = createTracker();
 		if( !(tracker instanceof ExtractTrackDescription) )
 			return;
 
 		ExtractTrackDescription extract = (ExtractTrackDescription)tracker;
 
-		fail("Implement");
+		assertTrue(extract.getDescriptionLength()>0);
 	}
 
 	@Test
 	public void getDescriptionType() {
+		// is this interface supported?
 		tracker = createTracker();
 		if( !(tracker instanceof ExtractTrackDescription) )
 			return;
 
 		ExtractTrackDescription extract = (ExtractTrackDescription)tracker;
 
-		fail("Implement");
+		assertTrue(extract.getDescriptionType() != null);
 	}
 
 	private void checkIdentical( List<PointTrack> a , List<PointTrack> b ){
@@ -467,5 +486,16 @@ public abstract class StandardPointTracker<T extends ImageSingleBand> {
 		for( int i = 0; i < a.size(); i++ ) {
 			assertTrue(a.get(i) == b.get(i));
 		}
+	}
+
+	/**
+	 * Performs all the standard tracking steps.  Associates and updates tracks descriptions.  This function
+	 * is here for {@link DetectDescribeAssociateTwoPass} tests.  If overriden it should be
+	 * equivalent to just calling tracker.process()
+	 *
+	 * @param image
+	 */
+	protected void processImage( T image ) {
+		tracker.process(image);
 	}
 }

@@ -62,7 +62,7 @@ public class VisOdomPixelDepthPnP<T extends ImageBase> {
 	private int thresholdRetire;
 
 	// run the tracker once or twice?
-	boolean doublePass = true;
+	boolean doublePass;
 
 	// tracks features in the image
 	private PointTrackerTwoPass<T> tracker;
@@ -100,6 +100,8 @@ public class VisOdomPixelDepthPnP<T extends ImageBase> {
 	 * @param thresholdAdd Add new tracks when less than this number are in the inlier set.  Tracker dependent. Set to
 	 *                     a value <= 0 to add features every frame.
 	 * @param thresholdRetire Discard a track if it is not in the inlier set after this many updates.  Try 2
+	 * @param doublePass Associate image features a second time using the estimated model from the first
+	 *                   try to improve results
 	 * @param motionEstimator PnP motion estimator.  P3P algorithm is recommended/
 	 * @param pixelTo3D Computes the 3D location of pixels.
 	 * @param refine Optional algorithm for refining the pose estimate.  Can be null.
@@ -109,6 +111,7 @@ public class VisOdomPixelDepthPnP<T extends ImageBase> {
 	 */
 	public VisOdomPixelDepthPnP(int thresholdAdd,
 								int thresholdRetire ,
+								boolean doublePass ,
 								ModelMatcher<Se3_F64, Point2D3D> motionEstimator,
 								ImagePixelTo3D pixelTo3D,
 								RefinePnP refine ,
@@ -118,6 +121,7 @@ public class VisOdomPixelDepthPnP<T extends ImageBase> {
 	{
 		this.thresholdAdd = thresholdAdd;
 		this.thresholdRetire = thresholdRetire;
+		this.doublePass = doublePass;
 		this.motionEstimator = motionEstimator;
 		this.pixelTo3D = pixelTo3D;
 		this.refine = refine;

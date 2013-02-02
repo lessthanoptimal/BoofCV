@@ -48,7 +48,6 @@ public abstract class BaseAssociateLocation2DFilter<D> implements AssociateDescr
 	private FastQueue<Point2D_F64> locationDst;
 	private FastQueue<D> descDst;
 
-
 	// list of source features not associated
 	private GrowQueue_I32 unassociatedSrc = new GrowQueue_I32();
 

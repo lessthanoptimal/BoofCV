@@ -20,11 +20,12 @@ package boofcv.examples;
 
 import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
 import boofcv.abst.feature.disparity.StereoDisparitySparse;
-import boofcv.abst.feature.tracker.PointTracker;
+import boofcv.abst.feature.tracker.PkltConfig;
+import boofcv.abst.feature.tracker.PointTrackerTwoPass;
 import boofcv.abst.sfm.AccessPointTracks3D;
 import boofcv.abst.sfm.StereoVisualOdometry;
 import boofcv.factory.feature.disparity.FactoryStereoDisparity;
-import boofcv.factory.feature.tracker.FactoryPointTracker;
+import boofcv.factory.feature.tracker.FactoryPointTrackerTwoPass;
 import boofcv.factory.sfm.FactoryVisualOdometry;
 import boofcv.io.MediaManager;
 import boofcv.io.image.SimpleImageSequence;
@@ -51,25 +52,28 @@ public class ExampleStereoVisualOdometry {
 		String directory = "../data/applet/vo/backyard/";
 
 		// load camera description and the video sequence
-		StereoParameters config = BoofMiscOps.loadXML(media.openFile(directory+"stereo.xml"));
+		StereoParameters stereoParam = BoofMiscOps.loadXML(media.openFile(directory+"stereo.xml"));
 		SimpleImageSequence<ImageUInt8> video1 = media.openVideo(directory+"left.mjpeg",ImageUInt8.class);
 		SimpleImageSequence<ImageUInt8> video2 = media.openVideo(directory+"right.mjpeg",ImageUInt8.class);
 
 		// specify how the image features are going to be tracked
-		PointTracker<ImageUInt8> tracker =
-				FactoryPointTracker.klt(
-						new int[]{1, 2, 4, 8}, new ConfigGeneralDetector(600, 3, 1), 3, ImageUInt8.class, ImageSInt16.class);
+		PkltConfig<ImageUInt8, ImageSInt16> configKlt = PkltConfig.createDefault(ImageUInt8.class, ImageSInt16.class);
+		configKlt.pyramidScaling = new int[]{1, 2, 4, 8};
+		configKlt.featureRadius = 3;
+
+		PointTrackerTwoPass<ImageUInt8> tracker =
+				FactoryPointTrackerTwoPass.klt(configKlt, new ConfigGeneralDetector(600, 3, 1));
 
 		// computes the depth of each point
 		StereoDisparitySparse<ImageUInt8> disparity =
 				FactoryStereoDisparity.regionSparseWta(0, 150, 3, 3, 30, -1, true, ImageUInt8.class);
 
 		// declares the algorithm
-		StereoVisualOdometry<ImageUInt8> visualOdometry = FactoryVisualOdometry.stereoDepth(1.5,120, 2,200,50,
+		StereoVisualOdometry<ImageUInt8> visualOdometry = FactoryVisualOdometry.stereoDepth(1.5,120, 2,200,50,true,
 				disparity, tracker, ImageUInt8.class);
 
 		// Pass in intrinsic/extrinsic calibration.  This can be changed in the future.
-		visualOdometry.setCalibration(config);
+		visualOdometry.setCalibration(stereoParam);
 
 		// Process the video sequence and output the location plus number of inliers
 		while( video1.hasNext() ) {

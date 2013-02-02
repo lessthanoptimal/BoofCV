@@ -1,0 +1,145 @@
+/*
+ * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ *
+ * This file is part of BoofCV (http://boofcv.org).
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package boofcv.abst.feature.tracker;
+
+import boofcv.abst.filter.derivative.ImageGradient;
+import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
+import boofcv.alg.interpolate.InterpolateRectangle;
+import boofcv.alg.tracker.klt.KltTrackFault;
+import boofcv.alg.tracker.klt.PyramidKltFeature;
+import boofcv.alg.transform.pyramid.PyramidOps;
+import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.pyramid.PyramidUpdaterDiscrete;
+
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Changes behavior of {@link PointTrackerKltPyramid} so that it conforms to the {@link PointTrackerTwoPass} interface.
+ *
+ * @author Peter Abeles
+ */
+public class PointTrackerTwoPassKltPyramid<I extends ImageSingleBand,D extends ImageSingleBand>
+	extends PointTrackerKltPyramid<I,D> implements PointTrackerTwoPass<I>
+{
+	// list of active tracks before the current image is processed
+	List<PyramidKltFeature> originalActive = new ArrayList<PyramidKltFeature>();
+
+	// list of tracks that were dropped, but won't really be dropped until tracking finishes
+	List<PyramidKltFeature> candidateDrop = new ArrayList<PyramidKltFeature>();
+
+	// has finished tracking been called
+	boolean finishedTracking;
+
+	public PointTrackerTwoPassKltPyramid(PkltConfig<I, D> config, PyramidUpdaterDiscrete<I> inputPyramidUpdater,
+										 GeneralFeatureDetector<I, D> detector,
+										 ImageGradient<I, D> gradient,
+										 InterpolateRectangle<I> interpInput,
+										 InterpolateRectangle<D> interpDeriv)
+	{
+		super(config, inputPyramidUpdater, detector, gradient, interpInput, interpDeriv);
+	}
+
+	@Override
+	public void process(I image) {
+		finishedTracking = false;
+		spawned.clear();
+		dropped.clear();
+
+		// update image pyramids
+		inputPyramidUpdater.update(image,basePyramid);
+		PyramidOps.gradient(basePyramid, gradient, derivX, derivY);
+
+		// setup active list
+		originalActive.clear();
+		originalActive.addAll( active );
+
+		// track features
+		candidateDrop.clear();
+		active.clear();
+
+		tracker.setImage(basePyramid,derivX,derivY);
+		for( int i = 0; i < originalActive.size(); i++ ) {
+			PyramidKltFeature t = originalActive.get(i);
+			KltTrackFault ret = tracker.track(t);
+
+			if( ret == KltTrackFault.SUCCESS ) {
+				active.add(t);
+				PointTrack p = t.getCookie();
+				p.set(t.x,t.y);
+			} else {
+				candidateDrop.add(t);
+			}
+		}
+	}
+
+	@Override
+	public void performSecondPass() {
+		candidateDrop.clear();
+		active.clear();
+
+		for( int i = 0; i < originalActive.size(); i++ ) {
+			PyramidKltFeature t = originalActive.get(i);
+			KltTrackFault ret = tracker.track(t);
+
+			if( ret == KltTrackFault.SUCCESS ) {
+				active.add(t);
+				PointTrack p = t.getCookie();
+				p.set(t.x,t.y);
+			} else {
+				candidateDrop.add(t);
+			}
+		}
+	}
+
+	@Override
+	public void finishTracking() {
+		for( int i = 0; i < active.size(); i++ ) {
+			PyramidKltFeature t = active.get(i);
+			tracker.setDescription(t);
+		}
+
+		for( int i = 0; i < candidateDrop.size(); i++ ) {
+			PyramidKltFeature t = candidateDrop.get(i);
+			dropped.add( t );
+			unused.add( t );
+		}
+
+		finishedTracking = true;
+	}
+
+	@Override
+	public void setHint(double pixelX, double pixelY, PointTrack track) {
+		PyramidKltFeature kltTrack = track.getDescription();
+		kltTrack.setPosition((float)pixelX,(float)pixelY);
+	}
+
+	@Override
+	public List<PointTrack> getAllTracks( List<PointTrack> list ) {
+		if( list == null )
+			list = new ArrayList<PointTrack>();
+
+		if( finishedTracking )
+			addToList(active,list);
+		else
+			addToList(originalActive,list);
+
+		return list;
+	}
+}
