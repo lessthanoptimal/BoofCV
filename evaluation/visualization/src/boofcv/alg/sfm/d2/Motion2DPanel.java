@@ -18,10 +18,8 @@
 
 package boofcv.alg.sfm.d2;
 
-import boofcv.abst.feature.tracker.PointTrack;
 import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.struct.FastQueue;
-import boofcv.struct.geo.AssociatedPair;
 import georegression.struct.homo.Homography2D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.transform.homo.HomographyPointOps_F64;
@@ -64,21 +62,21 @@ public abstract class Motion2DPanel extends JPanel
 		this.corners = corners;
 	}
 
-	public synchronized void setInliers(java.util.List<AssociatedPair> list) {
+	public synchronized void setInliers(java.util.List<Point2D_F64> list) {
 		inliers.reset();
 
 		if( list != null ) {
-			for( AssociatedPair p : list ) {
-				inliers.grow().set(p.p2);
+			for( Point2D_F64 p : list ) {
+				inliers.grow().set(p);
 			}
 		}
 	}
 
-	public synchronized void setAllTracks(java.util.List<PointTrack> list) {
+	public synchronized void setAllTracks(java.util.List<Point2D_F64> list) {
 		allTracks.reset();
 
 		if( list != null ) {
-			for( PointTrack p : list ) {
+			for( Point2D_F64 p : list ) {
 				allTracks.grow().set(p);
 			}
 		}

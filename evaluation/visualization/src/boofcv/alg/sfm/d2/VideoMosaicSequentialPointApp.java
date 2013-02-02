@@ -82,9 +82,7 @@ public class VideoMosaicSequentialPointApp<I extends ImageSingleBand, D extends 
 		absoluteMinimumTracks = 40;
 		respawnTrackFraction = 0.3;
 		respawnCoverageFraction = 0.8;
-		maxJumpFraction = 0.7;
-
-		initialTransform = createInitialTransform();
+		maxJumpFraction = 0.3;
 	}
 
 	private Affine2D_F64 createInitialTransform() {
@@ -98,6 +96,7 @@ public class VideoMosaicSequentialPointApp<I extends ImageSingleBand, D extends 
 	protected void init(int inputWidth, int inputHeight) {
 		setStitchImageSize(1000, 600);
 		((Mosaic2DPanel)gui).setMosaicSize(stitchWidth, stitchHeight);
+		alg.configure(stitchWidth, stitchHeight,createInitialTransform());
 	}
 
 	@Override
