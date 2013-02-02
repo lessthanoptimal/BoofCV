@@ -44,7 +44,7 @@ import java.util.List;
  * @param <D> Image derivative type
  */
 public class VideoStabilizeSequentialPointApp<I extends ImageSingleBand, D extends ImageSingleBand,
-		T extends InvertibleTransform<T>,Aux>
+		T extends InvertibleTransform<T>>
 		extends VideoStitchBaseApp<I,T>
 {
 	private int maxFeatures = 250;
@@ -86,13 +86,14 @@ public class VideoStabilizeSequentialPointApp<I extends ImageSingleBand, D exten
 		absoluteMinimumTracks = 40;
 		respawnTrackFraction = 0.3;
 		respawnCoverageFraction = 0.5;
-		maxJumpFraction = 0.7;
+		maxJumpFraction = 0.3;
 	}
 
 	@Override
 	protected void init(int inputWidth, int inputHeight) {
 		setStitchImageSize(inputWidth,inputHeight);
 		((Stabilize2DPanel)gui).setInputSize(inputWidth,inputHeight);
+		alg.configure(inputWidth,inputHeight,fitModel.createInstance());
 	}
 
 	@Override

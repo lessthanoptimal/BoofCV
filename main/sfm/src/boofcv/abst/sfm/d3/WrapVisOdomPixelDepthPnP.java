@@ -39,6 +39,8 @@ import java.util.List;
 /**
  * @author Peter Abeles
  */
+// TODO WARNING! active list has been modified by dropping and adding tracks
+// this is probably true of other SFM algorithms
 public class WrapVisOdomPixelDepthPnP<T extends ImageSingleBand,Model,Info>
 		implements StereoVisualOdometry<T>, AccessPointTracks3D {
 
@@ -62,6 +64,7 @@ public class WrapVisOdomPixelDepthPnP<T extends ImageSingleBand,Model,Info>
 
 	@Override
 	public Point3D_F64 getTrackLocation(int index) {
+		// TODO see comment above
 		PointTrack t = alg.getTracker().getActiveTracks(null).get(index);
 		return ((Point2D3D)t.getCookie()).getLocation();
 	}

@@ -58,7 +58,7 @@ public class ImageMotionPointTrackerKey<I extends ImageBase, IT extends Invertib
 	protected IT worldToCurr;
 
 	// tracks which are not in the inlier set for this many frames in a row are pruned
-	protected int inlierPruneThreshold;
+	protected int outlierPrune;
 
 	// if the current frame is a keyframe or not
 	protected boolean keyFrame;
@@ -74,18 +74,18 @@ public class ImageMotionPointTrackerKey<I extends ImageBase, IT extends Invertib
 	 * @param modelMatcher Fits model to track data
 	 * @param modelRefiner (Optional) Refines the found model using the entire inlier set. Can be null.
 	 * @param model Motion model data structure
-	 * @param inlierPruneThreshold Tracks not in the inlier set for this many frames in a row are pruned
+	 * @param outlierPrune If a track is an outlier for this many frames in a row they are pruned
 	 */
 	public ImageMotionPointTrackerKey(PointTracker<I> tracker,
 									  ModelMatcher<IT, AssociatedPair> modelMatcher,
 									  ModelFitter<IT, AssociatedPair> modelRefiner,
 									  IT model,
-									  int inlierPruneThreshold)
+									  int outlierPrune)
 	{
 		this.tracker = tracker;
 		this.modelMatcher = modelMatcher;
 		this.modelRefiner = modelRefiner;
-		this.inlierPruneThreshold = inlierPruneThreshold;
+		this.outlierPrune = outlierPrune;
 
 		worldToKey = (IT)model.createInstance();
 		keyToCurr = (IT)model.createInstance();
@@ -111,6 +111,9 @@ public class ImageMotionPointTrackerKey<I extends ImageBase, IT extends Invertib
 	public boolean process( I frame ) {
 		keyFrame = false;
 
+		// prune tracks which aren't being used
+		pruneUnusedTracks();
+
 		// update the feature tracker
 		tracker.process(frame);
 
@@ -131,7 +134,12 @@ public class ImageMotionPointTrackerKey<I extends ImageBase, IT extends Invertib
 			return false;
 		}
 
-		keyToCurr.set(modelMatcher.getModel());
+//		if( modelRefiner != null ) {
+//			if( !modelRefiner.fitModel(modelMatcher.getMatchSet(),modelMatcher.getModel(),keyToCurr) )
+//				return false;
+//		} else {
+			keyToCurr.set(modelMatcher.getModel());
+//		}
 
 		// mark that the track is in the inlier set
 		for( AssociatedPair p : modelMatcher.getMatchSet() ) {
@@ -141,17 +149,18 @@ public class ImageMotionPointTrackerKey<I extends ImageBase, IT extends Invertib
 		// Update the motion
 		worldToKey.concat(keyToCurr, worldToCurr);
 
-		// prune tracks which aren't being used
+		return true;
+	}
+
+	private void pruneUnusedTracks() {
 		List<PointTrack> all = tracker.getAllTracks(null);
 		for( PointTrack t : all ) {
 			AssociatedPairTrack p = t.getCookie();
 
-			if( totalFramesProcessed - p.lastUsed >= inlierPruneThreshold) {
+			if( totalFramesProcessed - p.lastUsed >= outlierPrune) {
 				tracker.dropTrack(t);
 			}
 		}
-
-		return true;
 	}
 
 	/**
