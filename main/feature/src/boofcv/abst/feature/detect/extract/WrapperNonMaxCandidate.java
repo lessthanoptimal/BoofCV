@@ -29,9 +29,12 @@ import boofcv.struct.image.ImageFloat32;
  */
 public class WrapperNonMaxCandidate implements NonMaxSuppression {
 	NonMaxCandidate extractor;
+	boolean minimums,maximums;
 
-	public WrapperNonMaxCandidate(NonMaxCandidate extractor) {
+	public WrapperNonMaxCandidate(NonMaxCandidate extractor, boolean minimums, boolean maximums ) {
 		this.extractor = extractor;
+		this.minimums = minimums;
+		this.maximums = maximums;
 	}
 
 	@Override
@@ -92,12 +95,12 @@ public class WrapperNonMaxCandidate implements NonMaxSuppression {
 	}
 
 	@Override
-	public boolean canDetectMaximums() {
-		return true;
+	public boolean canDetectMinimums() {
+		return minimums;
 	}
 
 	@Override
-	public boolean canDetectMinimums() {
-		return true;
+	public boolean canDetectMaximums() {
+		return maximums;
 	}
 }

@@ -21,20 +21,22 @@ package boofcv.abst.feature.detect.intensity;
 import boofcv.factory.feature.detect.intensity.FactoryIntensityPoint;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSInt16;
+import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
 
 /**
  * @author Peter Abeles
  */
-@SuppressWarnings("unchecked")
-public class TestWrapperGradientCornerIntensity extends ChecksGeneralFeatureIntensity {
-	public TestWrapperGradientCornerIntensity() {
+public class TestWrapperLaplacianBlobIntensity<I extends ImageSingleBand, D extends ImageSingleBand>
+		extends ChecksGeneralFeatureIntensity<I,D>
+{
+	public TestWrapperLaplacianBlobIntensity() {
 		addTypes(ImageFloat32.class,ImageFloat32.class);
 		addTypes(ImageUInt8.class, ImageSInt16.class);
 	}
 
 	@Override
-	public GeneralFeatureIntensity<ImageFloat32, ImageFloat32> createAlg(Class imageType, Class derivType) {
-		return FactoryIntensityPoint.shiTomasi(2, false, derivType);
+	public GeneralFeatureIntensity<I,D> createAlg(Class<I> imageType, Class<D> derivType) {
+		return (GeneralFeatureIntensity)FactoryIntensityPoint.laplacian();
 	}
 }

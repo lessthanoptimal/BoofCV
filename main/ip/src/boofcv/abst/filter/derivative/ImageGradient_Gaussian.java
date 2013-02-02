@@ -89,12 +89,6 @@ public class ImageGradient_Gaussian<I extends ImageSingleBand, D extends ImageSi
 	}
 
 	@Override
-	public double getMaxValueMultiplier() {
-		throw new RuntimeException("Implement");
-//		return maxValue;
-	}
-
-	@Override
 	public void setBorderType(BorderType type) {
 		this.borderType = type;
 		border = FactoryImageBorder.general(derivType,borderType);

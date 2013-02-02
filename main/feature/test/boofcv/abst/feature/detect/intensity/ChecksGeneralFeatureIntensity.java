@@ -48,7 +48,7 @@ public abstract class ChecksGeneralFeatureIntensity<I extends ImageSingleBand , 
 	I input;
 	D derivX,derivY,derivXX,derivYY,derivXY;
 
-	public <T extends ImageSingleBand> void addTypes( Class<T> inputType , Class<T> derivType ) {
+	public void addTypes( Class inputType , Class derivType ) {
 		listInputTypes.add( inputType );
 		listDerivTypes.add( derivType );
 	}

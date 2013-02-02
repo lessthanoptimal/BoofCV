@@ -46,7 +46,7 @@ public abstract class VideoProcessAppBase<I extends ImageSingleBand>
 
 	JSpinner periodSpinner;
 	
-	Class<I> imageType;
+	protected Class<I> imageType;
 
 	public VideoProcessAppBase(int numAlgFamilies, Class<I> imageType) {
 		super(numAlgFamilies);

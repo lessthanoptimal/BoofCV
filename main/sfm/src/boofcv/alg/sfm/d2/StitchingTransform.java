@@ -18,11 +18,18 @@
 
 package boofcv.alg.sfm.d2;
 
-import boofcv.struct.geo.AssociatedPair;
+import boofcv.struct.distort.PixelTransform_F32;
+import georegression.struct.InvertibleTransform;
+import georegression.struct.homo.Homography2D_F64;
 
 /**
+ * TODO Comment
+ *
  * @author Peter Abeles
  */
-public class AssociatedPairTrack extends AssociatedPair {
-	public long lastUsed;
+public interface StitchingTransform<IT extends InvertibleTransform> {
+
+	PixelTransform_F32 convertPixel( IT input , PixelTransform_F32 output );
+
+	Homography2D_F64 convertH( IT input , Homography2D_F64 output );
 }

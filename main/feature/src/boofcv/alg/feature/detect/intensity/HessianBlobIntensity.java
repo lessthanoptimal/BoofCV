@@ -48,9 +48,14 @@ public class HessianBlobIntensity {
 	 */
 	public static enum Type
 	{
+		/**
+		 * Compute the determinant.  Maximum are features.
+		 */
 		DETERMINANT,
-		TRACE,
-//		QUICK // todo add this in the future.  Compute using 3x3 convolution kernel from raw input image
+		/**
+		 * Compute the trace (aka Laplacian).  Maximum and Minimums are features.
+		 */
+		TRACE
 	}
 
 	/**

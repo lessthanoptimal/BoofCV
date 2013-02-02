@@ -115,7 +115,7 @@ public class FactoryIntensityPoint {
 	}
 
 	/**
-	 * Blob detector which uses the image's second order derivatives.
+	 * Blob detector which uses the image's second order derivatives directly.
 	 *
 	 * @see HessianBlobIntensity
 	 *
@@ -127,5 +127,14 @@ public class FactoryIntensityPoint {
 	public static <I extends ImageSingleBand, D extends ImageSingleBand>
 	GeneralFeatureIntensity<I,D> hessian(HessianBlobIntensity.Type type, Class<D> derivType) {
 		return new WrapperHessianBlobIntensity<I, D>(type,derivType);
+	}
+
+	/**
+	 * Blob detector which uses a 3x3 kernel to approximate the second order derivatives and compute a Laplacian
+	 * blob.
+	 */
+	public static <I extends ImageSingleBand>
+	GeneralFeatureIntensity<I,?> laplacian() {
+		return new WrapperLaplacianBlobIntensity<I>();
 	}
 }
