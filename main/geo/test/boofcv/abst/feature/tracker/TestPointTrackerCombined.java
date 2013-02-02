@@ -40,9 +40,9 @@ import java.util.Random;
 /**
  * @author Peter Abeles
  */
-public class TestWrapCombinedTracker extends StandardPointTracker<ImageFloat32> {
+public class TestPointTrackerCombined extends StandardPointTracker<ImageFloat32> {
 
-	public TestWrapCombinedTracker() {
+	public TestPointTrackerCombined() {
 		super(true, false);
 	}
 

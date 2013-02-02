@@ -42,12 +42,16 @@ public class RemoveRadialPtoN_F64 implements PointTransform_F64 {
 	// inverse of camera calibration matrix
 	protected DenseMatrix64F K_inv = new DenseMatrix64F(3,3);
 
-	private double tol=1e-5f;
+	private double tol=1e-10;
 
 	public RemoveRadialPtoN_F64() {
 	}
 
-	public void setTolerance(float tol) {
+	public RemoveRadialPtoN_F64( double tol ) {
+		this.tol = tol;
+	}
+
+	public void setTolerance(double tol) {
 		this.tol = tol;
 	}
 

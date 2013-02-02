@@ -18,8 +18,10 @@
 
 package boofcv.abst.feature.tracker;
 
+import boofcv.struct.FastQueue;
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.ImageFloat32;
+import georegression.struct.point.Point2D_F64;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -88,9 +90,38 @@ public class TestDetectDescribeAssociate {
 	private static class Helper extends DetectDescribeAssociate<ImageFloat32,TupleDesc_F64> {
 		boolean validCalled = false;
 
+		private Helper() {
+			manager = new HelpManager();
+		}
+
 		protected boolean checkValidSpawn( PointTrack p ) {
 			validCalled = true;
 			return true;
+		}
+	}
+
+	private static class HelpManager implements DdaFeatureManager<ImageFloat32,TupleDesc_F64> {
+
+		@Override
+		public void detectFeatures(ImageFloat32 input,
+								   FastQueue<Point2D_F64> locDst,
+								   FastQueue<TupleDesc_F64> featDst) {
+
+		}
+
+		@Override
+		public TupleDesc_F64 createDescription() {
+			return new TupleDesc_F64(10);
+		}
+
+		@Override
+		public int getDescriptionLength() {
+			return 10;
+		}
+
+		@Override
+		public Class<TupleDesc_F64> getDescriptionType() {
+			return TupleDesc_F64.class;
 		}
 	}
 }

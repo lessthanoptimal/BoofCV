@@ -43,8 +43,6 @@ import java.util.Random;
  */
 public class TestDdaManagerDetectDescribePoint extends StandardPointTracker<ImageFloat32> {
 
-
-
 	public TestDdaManagerDetectDescribePoint() {
 		super(true, false);
 	}

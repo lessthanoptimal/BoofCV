@@ -222,8 +222,7 @@ public class FactoryPointTracker {
 		ScoreAssociateHamming_B score = new ScoreAssociateHamming_B();
 
 		AssociateDescription2D<TupleDesc_B> association =
-				new AssociateDescTo2D<TupleDesc_B>(
-						FactoryAssociation.greedy(score, maxAssociationError, true));
+				new AssociateDescTo2D<TupleDesc_B>(FactoryAssociation.greedy(score, maxAssociationError, true));
 
 		DdaManagerGeneralPoint<I,D,TupleDesc_B> manager =
 				new DdaManagerGeneralPoint<I,D,TupleDesc_B>(easy,new WrapDescribeBrief<I>(brief),1.0);
@@ -492,7 +491,7 @@ public class FactoryPointTracker {
 				FactoryTrackerAlg.combined(detector,associate,featureRadiusKlt,pyramidScalingKlt,
 						imageType,derivType);
 
-		return new WrapCombinedTracker<I,D,Desc>(tracker,reactivateThreshold,imageType,derivType);
+		return new PointTrackerCombined<I,D,Desc>(tracker,reactivateThreshold,imageType,derivType);
 	}
 
 

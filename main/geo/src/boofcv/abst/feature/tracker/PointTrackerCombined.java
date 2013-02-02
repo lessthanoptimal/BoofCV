@@ -33,11 +33,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * Wrapper around {@link CombinedTrackerScalePoint} for {@link PointTracker}. Features are respawned when the
+ * number of active tracks drops below a threshold automatically.  This threshold is realtive to the number
+ * of tracks spawned previously and is adjusted when the user requests that tracks are dropped.
+ *
  * @author Peter Abeles
  */
 // TODO drop after no associate after X detections
 // TODO Speed up combination of respawn and spawn
-public class WrapCombinedTracker<I extends ImageSingleBand, D extends ImageSingleBand, Desc extends TupleDesc>
+public class PointTrackerCombined<I extends ImageSingleBand, D extends ImageSingleBand, Desc extends TupleDesc>
 		implements PointTracker<I> , ExtractTrackDescription<Desc> {
 
 	CombinedTrackerScalePoint<I,D, Desc> tracker;
@@ -55,9 +59,9 @@ public class WrapCombinedTracker<I extends ImageSingleBand, D extends ImageSingl
 
 	boolean detected;
 
-	public WrapCombinedTracker(CombinedTrackerScalePoint<I, D, Desc> tracker ,
-							   int reactivateThreshold ,
-							   Class<I> imageType , Class<D> derivType ) {
+	public PointTrackerCombined(CombinedTrackerScalePoint<I, D, Desc> tracker,
+								int reactivateThreshold,
+								Class<I> imageType, Class<D> derivType) {
 		this.tracker = tracker;
 		this.reactivateThreshold = reactivateThreshold;
 
@@ -142,10 +146,13 @@ public class WrapCombinedTracker<I extends ImageSingleBand, D extends ImageSingl
 
 	@Override
 	public boolean dropTrack(PointTrack track) {
-		tracker.dropTrack((CombinedTrack<Desc>) track.getDescription());
-		// make sure if the user drops a lot of tracks that doesn't force a constant respawn
-		previousSpawn--;
-		return true;
+		if( tracker.dropTrack((CombinedTrack<Desc>) track.getDescription()) ) {
+			// make sure if the user drops a lot of tracks that doesn't force a constant respawn
+			previousSpawn--;
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 	@Override

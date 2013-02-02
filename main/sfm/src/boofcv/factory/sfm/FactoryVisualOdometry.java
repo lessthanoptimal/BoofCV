@@ -26,6 +26,7 @@ import boofcv.abst.feature.detdesc.DetectDescribeMulti;
 import boofcv.abst.feature.disparity.StereoDisparitySparse;
 import boofcv.abst.feature.tracker.ExtractTrackDescription;
 import boofcv.abst.feature.tracker.PointTracker;
+import boofcv.abst.feature.tracker.PointTrackerTwoPass;
 import boofcv.abst.geo.Estimate1ofPnP;
 import boofcv.abst.geo.EstimateNofPnP;
 import boofcv.abst.geo.RefinePnP;
@@ -83,8 +84,9 @@ public class FactoryVisualOdometry {
 										int thresholdRetire ,
 										int ransacIterations ,
 										int refineIterations ,
+										boolean doublePass ,
 										StereoDisparitySparse<T> sparseDisparity,
-										PointTracker<T> tracker ,
+										PointTrackerTwoPass<T> tracker ,
 										Class<T> imageType) {
 
 		// Range from sparse disparity
@@ -114,7 +116,7 @@ public class FactoryVisualOdometry {
 		}
 
 		VisOdomPixelDepthPnP<T> alg =
-				new VisOdomPixelDepthPnP<T>(thresholdAdd,thresholdRetire ,motion,pixelTo3D,refine,null,null,null);
+				new VisOdomPixelDepthPnP<T>(thresholdAdd,thresholdRetire ,doublePass,motion,pixelTo3D,refine,tracker,null,null);
 
 		return new WrapVisOdomPixelDepthPnP<T,Se3_F64,Point2D3D>(alg,pixelTo3D,distance,imageType);
 	}

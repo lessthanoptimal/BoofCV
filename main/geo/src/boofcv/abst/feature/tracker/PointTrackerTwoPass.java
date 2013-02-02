@@ -34,12 +34,17 @@ import boofcv.struct.image.ImageBase;
  * </p>
  *
  * <p>
- * NOTE: A track hint can be set before {@link #process(boofcv.struct.image.ImageBase)} is called.
+ * Dropping tracks: Tracks should not be dropped until after finishTracking() has been called.  If a track is
+ * dropped between process() and finishTracking() are called, then the behavior is not defined.
  * </p>
  *
  * <p>
- * NOTE: Calling {@link #process(boofcv.struct.image.ImageBase)} and {@link #finishTracking()} is equivalent
- * to just calling process() in the standard {@link PointTracker} interface.
+ * NOTES:
+ * <ol>
+ * <li> A track hint can be set before {@link #process(boofcv.struct.image.ImageBase)} is called. </li>
+ * <li> Calling {@link #process(boofcv.struct.image.ImageBase)} and {@link #finishTracking()} is equivalent
+ * to just calling process() in the standard {@link PointTracker} interface.</li>
+ * <ol>
  * </p>
  *
  * @author Peter Abeles

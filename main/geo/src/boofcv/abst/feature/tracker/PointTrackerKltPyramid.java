@@ -300,7 +300,7 @@ public class PointTrackerKltPyramid<I extends ImageSingleBand,D extends ImageSin
 		return getActiveTracks(list);
 	}
 
-	private void addToList( List<PyramidKltFeature> in , List<PointTrack> out ) {
+	protected void addToList( List<PyramidKltFeature> in , List<PointTrack> out ) {
 		for( PyramidKltFeature t : in ) {
 			out.add( (PointTrack)t.cookie );
 		}

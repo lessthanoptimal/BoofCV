@@ -16,20 +16,26 @@
  * limitations under the License.
  */
 
-package boofcv.alg.feature.tracker;
+package boofcv.abst.feature.tracker;
 
-import org.junit.Test;
-
-import static org.junit.Assert.fail;
+import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
+import boofcv.factory.feature.tracker.FactoryPointTrackerTwoPass;
+import boofcv.struct.image.ImageFloat32;
 
 /**
  * @author Peter Abeles
  */
-public class TestPointToAssistedTracker {
+public class TestPointTrackerTwoPassKltPyramid extends StandardPointTrackerTwoPass<ImageFloat32> {
 
-	@Test
-	public void stuff() {
-		fail("Implement");
+	PkltConfig<ImageFloat32,ImageFloat32> config;
+
+	public TestPointTrackerTwoPassKltPyramid() {
+		super(false, true);
 	}
 
+	@Override
+	public PointTrackerTwoPass<ImageFloat32> createTracker() {
+		config = PkltConfig.createDefault(ImageFloat32.class, ImageFloat32.class);
+		return FactoryPointTrackerTwoPass.klt(config, new ConfigGeneralDetector(200, 3, 1000, 0, true));
+	}
 }

@@ -285,13 +285,20 @@ public class CombinedTrackerScalePoint
 		}
 	}
 
-	public void dropTrack( CombinedTrack<TD> track ) {
+	/**
+	 * Stops tracking the specified track and recycles its data.
+	 *
+	 * @param track The track being dropped
+	 * @return true if the track was being tracked and data was recycled false if not.
+	 */
+	public boolean dropTrack( CombinedTrack<TD> track ) {
 		if( !tracksPureKlt.remove(track) )
 			if( !tracksReactivated.remove(track) )
 				if( !tracksDormant.remove(track) )
-					throw new RuntimeException("Track not being tracked!");
+					return false;
 
 		tracksUnused.add(track);
+		return true;
 	}
 
 	public List<CombinedTrack<TD>> getSpawned() {
