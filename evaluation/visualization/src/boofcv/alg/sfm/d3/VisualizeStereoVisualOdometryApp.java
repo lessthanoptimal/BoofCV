@@ -31,7 +31,7 @@ import boofcv.abst.feature.disparity.StereoDisparitySparse;
 import boofcv.abst.feature.tracker.PkltConfig;
 import boofcv.abst.feature.tracker.PointTracker;
 import boofcv.abst.sfm.AccessPointTracks3D;
-import boofcv.abst.sfm.StereoVisualOdometry;
+import boofcv.abst.sfm.d3.StereoVisualOdometry;
 import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.alg.geo.PerspectiveOps;

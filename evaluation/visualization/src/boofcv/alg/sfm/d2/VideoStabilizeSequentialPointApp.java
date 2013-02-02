@@ -30,7 +30,6 @@ import georegression.struct.InvertibleTransform;
 import georegression.struct.affine.Affine2D_F64;
 import georegression.struct.homo.Homography2D_F64;
 
-import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,7 +45,7 @@ import java.util.List;
  */
 public class VideoStabilizeSequentialPointApp<I extends ImageSingleBand, D extends ImageSingleBand,
 		T extends InvertibleTransform<T>,Aux>
-		extends ImageMotionBaseApp<I,T>
+		extends VideoStitchBaseApp<I,T>
 {
 	private int maxFeatures = 250;
 	private static int thresholdKeyFrame = 80;
@@ -57,7 +56,7 @@ public class VideoStabilizeSequentialPointApp<I extends ImageSingleBand, D exten
 	int largeMotionThreshold = 5000;
 
 	public VideoStabilizeSequentialPointApp(Class<I> imageType, Class<D> derivType) {
-		super(true,imageType,2);
+		super(2,imageType,new Stabilize2DPanel());
 
 		PkltConfig<I, D> config =
 				PkltConfig.createDefault(imageType, derivType);
@@ -83,54 +82,22 @@ public class VideoStabilizeSequentialPointApp<I extends ImageSingleBand, D exten
 
 		addAlgorithm(1,"Affine", new Affine2D_F64());
 		addAlgorithm(1,"Homography", new Homography2D_F64());
-	}
 
-	/**
-	 * Updates the GUI and response to user requests.
-	 */
-	@Override
-	protected void updateAlgGUI(I frame, BufferedImage imageGUI, final double fps) {
-
-		// put it into its initial state
-		if( infoPanel.resetRequested() ) {
-			doRefreshAll();
-		}
-
-		MotionStabilizePointKey alg = (MotionStabilizePointKey)distortAlg;
-
-		if( alg.isReset() ) {
-			totalKeyFrames++;
-		}
-
-		// perform standard update
-		super.updateAlgGUI(frame,imageGUI,fps);
+		absoluteMinimumTracks = 40;
+		respawnTrackFraction = 0.3;
+		respawnCoverageFraction = 0.5;
+		maxJumpFraction = 0.7;
 	}
 
 	@Override
-	public void loadConfigurationFile(String fileName) {}
-
-	@Override
-	protected void handleFatalError() {
-		motionRender.clear();
-		distortAlg.reset();
+	protected void init(int inputWidth, int inputHeight) {
+		setStitchImageSize(inputWidth,inputHeight);
+		((Stabilize2DPanel)gui).setInputSize(inputWidth,inputHeight);
 	}
 
 	@Override
-	protected void startEverything() {
-		// make sure there is nothing left over from before
-		tracker.dropAllTracks();
-		createModelMatcher(maxIterations, 4);
-		distortAlg = new MotionStabilizePointKey<I,T>(tracker,modelMatcher,modelRefiner,fitModel,
-				thresholdKeyFrame,thresholdReset,pruneThreshold,largeMotionThreshold);
-//		distortAlg.setInitialTransform(createInitialTransform());
-
-		totalKeyFrames = 0;
-
-		I image = sequence.next();
-		setOutputSize(image.width,image.height);
-		motionRender.clear();
-
-		startWorkerThread();
+	protected boolean checkLocation(StitchingFromMotion2D.Corners corners) {
+		return false;
 	}
 
 	public static void main( String args[] ) {

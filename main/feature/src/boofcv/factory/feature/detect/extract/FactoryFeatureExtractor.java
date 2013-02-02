@@ -114,7 +114,7 @@ public class FactoryFeatureExtractor {
 			alg = new NonMaxCandidateRelaxed();
 		}
 
-		WrapperNonMaxCandidate ret = new WrapperNonMaxCandidate(alg);
+		WrapperNonMaxCandidate ret = new WrapperNonMaxCandidate(alg,false,true);
 
 		ret.setSearchRadius(config.radius);
 		ret.setIgnoreBorder(config.ignoreBorder);

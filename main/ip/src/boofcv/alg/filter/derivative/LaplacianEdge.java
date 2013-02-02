@@ -61,7 +61,7 @@ public class LaplacianEdge {
 	public static Kernel2D_F32 kernel_F32 = new Kernel2D_F32(3, new float[]{0,1,0,1,-4,1,0,1,0});
 
 	/**
-	 * Computes the Laplacian of 'orig'.
+	 * Computes the Laplacian of input image.
 	 *
 	 * @param orig  Input image.  Not modified.
 	 * @param deriv Where the Laplacian is written to. Modified.
@@ -94,8 +94,36 @@ public class LaplacianEdge {
 		}
 	}
 
+	public static void process(ImageUInt8 orig, ImageFloat32 deriv) {
+		InputSanityCheck.checkSameShape(orig, deriv);
+
+		final byte[] data = orig.data;
+		final float[] out = deriv.data;
+
+		final int width = orig.getWidth();
+		final int height = orig.getHeight() - 1;
+		final int stride = orig.stride;
+
+		for (int y = 1; y < height; y++) {
+			int index = orig.startIndex + stride * y + 1;
+			int indexOut = deriv.startIndex + deriv.stride * y + 1;
+			int endX = index + width - 2;
+
+			for (; index < endX; index++) {
+
+				int v = data[index - stride] & 0xFF;
+				v += data[index - 1] & 0xFF;
+				v += -4 * (data[index] & 0xFF);
+				v += data[index + 1] & 0xFF;
+				v += data[index + stride] & 0xFF;
+
+				out[indexOut++] = v;
+			}
+		}
+	}
+
 	/**
-	 * Computes the Laplacean of 'orig'.
+	 * Computes the Laplacian of 'orig'.
 	 *
 	 * @param orig  Input image.  Not modified.
 	 * @param deriv Where the Laplacian is written to. Modified.

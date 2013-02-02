@@ -75,7 +75,9 @@ Version : Alpha 0.13
   * VisualizeImageData - Render different types of image information into a visible format
 - Fixed bug in RemoveRadialPto*_* where it couldn't detect convergence
 - 2D stabilization checks image fraction contained by points before spawning more points
-- Added ImageGradient.getMaxValueMultiplier() so that it is possible to know the maximum possible gradient
+- LaplacianEdge added suport for U8 in and F32 out
+- Added kernel based (using LaplacianEdge) blob detector
+- GridRansacLineDetector has support for S16 an F32
 
 ---------------------------------------------
 Date    : 2012/12/05

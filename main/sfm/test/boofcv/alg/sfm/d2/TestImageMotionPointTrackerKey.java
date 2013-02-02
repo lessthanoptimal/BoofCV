@@ -35,7 +35,7 @@ import static org.junit.Assert.*;
 /**
  * @author Peter Abeles
  */
-public class TestImageMotionPointKey {
+public class TestImageMotionPointTrackerKey {
 
 	/**
 	 * Give it a very simple example and see if it computes the correct motion and has the expected behavior
@@ -52,8 +52,8 @@ public class TestImageMotionPointKey {
 
 		ImageUInt8 input = new ImageUInt8(20,30);
 
-		ImageMotionPointKey<ImageUInt8,Se2_F32> alg =
-				new ImageMotionPointKey<ImageUInt8,Se2_F32>(tracker,matcher,null,model,1000);
+		ImageMotionPointTrackerKey<ImageUInt8,Se2_F32> alg =
+				new ImageMotionPointTrackerKey<ImageUInt8,Se2_F32>(tracker,matcher,null,model,1000);
 
 		// specify an initial transform
 		alg.setInitialTransform(initial);
@@ -89,7 +89,7 @@ public class TestImageMotionPointKey {
 		Se2_F32 model = new Se2_F32();
 
 		// the world frame will initially be the identify matrix
-		ImageMotionPointKey<ImageUInt8,Se2_F32> alg = new ImageMotionPointKey<ImageUInt8,Se2_F32>(null,null,null,model,1000);
+		ImageMotionPointTrackerKey<ImageUInt8,Se2_F32> alg = new ImageMotionPointTrackerKey<ImageUInt8,Se2_F32>(null,null,null,model,1000);
 
 		// change it to this frame
 		alg.changeWorld(oldToNew);
@@ -115,7 +115,7 @@ public class TestImageMotionPointKey {
 
 		ImageUInt8 input = new ImageUInt8(20,30);
 
-		ImageMotionPointKey<ImageUInt8,Se2_F32> alg = new ImageMotionPointKey<ImageUInt8,Se2_F32>(tracker,matcher,null,model,100);
+		ImageMotionPointTrackerKey<ImageUInt8,Se2_F32> alg = new ImageMotionPointTrackerKey<ImageUInt8,Se2_F32>(tracker,matcher,null,model,100);
 
 		// process twice to change the transforms
 		alg.process(input);
@@ -150,7 +150,7 @@ public class TestImageMotionPointKey {
 
 		ImageUInt8 input = new ImageUInt8(20,30);
 
-		ImageMotionPointKey<ImageUInt8,Se2_F32> alg = new ImageMotionPointKey<ImageUInt8,Se2_F32>(tracker,matcher,null,model,5);
+		ImageMotionPointTrackerKey<ImageUInt8,Se2_F32> alg = new ImageMotionPointTrackerKey<ImageUInt8,Se2_F32>(tracker,matcher,null,model,5);
 
 		// create tracks such that only some of them will be dropped
 		alg.totalFramesProcessed = 9;
