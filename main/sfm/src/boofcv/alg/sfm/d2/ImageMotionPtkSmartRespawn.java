@@ -20,85 +20,79 @@ package boofcv.alg.sfm.d2;
 
 import boofcv.abst.feature.tracker.PointTrack;
 import boofcv.abst.feature.tracker.PointTracker;
+import boofcv.struct.ImageRectangle_F64;
 import boofcv.struct.geo.AssociatedPair;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageBase;
 import georegression.struct.InvertibleTransform;
-import org.ddogleg.fitting.modelset.ModelFitter;
-import org.ddogleg.fitting.modelset.ModelMatcher;
+import georegression.struct.point.Point2D_F64;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Extension of {@link ImageMotionPointKey} specifically designed
- * for creating image mosaics.  Each new image is laid on top of the previous images based on its estimated
- * motion to the original.
+ * TODO Comment
  *
  * @author Peter Abeles
  */
-public class MotionMosaicPointKey<I extends ImageSingleBand, T extends InvertibleTransform>
-		extends ImageMotionPointKey<I,T>
-{
-	int absoluteMinimumTracks = 40;
-	double respawnTrackFraction = 0.7;
-	// if less than this fraction of the window is convered by features switch views
-	double respawnCoverageFraction = 0.8;
+public class ImageMotionPtkSmartRespawn<I extends ImageBase, IT extends InvertibleTransform> {
+	ImageMotionPointTrackerKey<I,IT> motion;
 
 	// used to prune feature tracks which are too close together
 	protected PruneCloseTracks pruneClose = new PruneCloseTracks(3,1,1);
 
-	// coverage right after spawning new features
-	double maxCoverage;
-
 	// stores list of tracks to prune
 	List<PointTrack> prune = new ArrayList<PointTrack>();
 
-	private boolean previousWasKeyFrame;
+	int absoluteMinimumTracks;
+	double respawnTrackFraction;
+	double respawnCoverageFraction;
 
-	/**
-	 * Specify algorithms to use internally.  Each of these classes must work with
-	 * compatible data structures.
-	 *
-	 * @param tracker feature tracker
-	 * @param modelMatcher Fits model to track data
-	 * @param modelRefiner (Optional) Refines the found model using the entire inlier set. Can be null.
-	 * @param model Motion model data structure
-	 */
-	public MotionMosaicPointKey(PointTracker<I> tracker,
-								ModelMatcher<T, AssociatedPair> modelMatcher,
-								ModelFitter<T,AssociatedPair> modelRefiner,
-								T model,
-								int absoluteMinimumTracks, double respawnTrackFraction,
-								int pruneThreshold ,
-								double respawnCoverageFraction)
-	{
-		super(tracker, modelMatcher, modelRefiner, model,pruneThreshold);
+	boolean previousWasKeyFrame = false;
+
+	// computes the fraction of the screen which contains inlier points
+	private ImageRectangle_F64 contRect = new ImageRectangle_F64();
+	// fraction of area covered by containment rectangle
+	protected double contFraction;
+	// maximum fraction of area covered by containment rectangle
+	private double maxCoverage;
+
+	IT firstToKey;
+
+	public ImageMotionPtkSmartRespawn(ImageMotionPointTrackerKey<I, IT> motion,
+									  int absoluteMinimumTracks, double respawnTrackFraction,
+									  double respawnCoverageFraction) {
+		this.motion = motion;
+
+		firstToKey = (IT) motion.getKeyToCurr().createInstance();
 
 		this.absoluteMinimumTracks = absoluteMinimumTracks;
 		this.respawnTrackFraction = respawnTrackFraction;
 		this.respawnCoverageFraction = respawnCoverageFraction;
 	}
 
-	@Override
-	public boolean process( I frame ) {
-		if( !super.process(frame) && totalFramesProcessed == 0 )
+	public boolean process(I input) {
+		if( !motion.process(input) )
 			return false;
 
 		// todo add a check to see if it is a keyframe or not- two spawns on first frame
 		boolean setKeyFrame = false;
 
-		List<AssociatedPair> pairs = modelMatcher.getMatchSet();
+		PointTracker<I> tracker = motion.getTracker();
+		List<AssociatedPair> pairs = motion.getModelMatcher().getMatchSet();
+
+		computeContainment(input.width*input.height);
 
 		if( previousWasKeyFrame ) {
 			previousWasKeyFrame = false;
 
-			int width = frame.width;
-			int height = frame.height;
+			int width = input.width;
+			int height = input.height;
 			maxCoverage = contFraction;
 
 			// for some trackers, like KLT, they keep old features and these features can get squeezed together
 			// this will remove some of the really close features
 			if( maxCoverage < respawnCoverageFraction) {
+
 				pruneClose.resize(width,height);
 				// prune some of the ones which are too close
 				prune.clear();
@@ -107,12 +101,12 @@ public class MotionMosaicPointKey<I extends ImageSingleBand, T extends Invertibl
 					tracker.dropTrack(t);
 				}
 				// see if it can find some more in diverse locations
-				changeKeyFrame();
+				motion.changeKeyFrame(false);
 			}
 		} else {
 			// look at the track distribution to see if new ones should be spawned
 			int matchSetSize = pairs.size();
-			if( matchSetSize < getTotalSpawned()* respawnTrackFraction  || matchSetSize < absoluteMinimumTracks ) {
+			if( matchSetSize < motion.getTotalSpawned()* respawnTrackFraction  || matchSetSize < absoluteMinimumTracks ) {
 				setKeyFrame = true;
 			}
 
@@ -122,11 +116,42 @@ public class MotionMosaicPointKey<I extends ImageSingleBand, T extends Invertibl
 		}
 
 		if(setKeyFrame) {
-			changeKeyFrame();
+			motion.changeKeyFrame(false);
+			previousWasKeyFrame = true;
+		}
+
+		if( motion.isKeyFrame() ) {
 			previousWasKeyFrame = true;
 		}
 
 		return true;
 	}
 
+	/**
+	 * Computes an axis-aligned rectangle that contains all the inliers.  It then computes the area contained in
+	 * that rectangle to the total area of the image
+	 *
+	 * @param imageArea width*height
+	 */
+	private void computeContainment( int imageArea ) {
+		// mark that the track is in the inlier set and compute the containment rectangle
+		contRect.x0 = contRect.y0 = Double.MAX_VALUE;
+		contRect.x1 = contRect.y1 = -Double.MAX_VALUE;
+		for( AssociatedPair p : motion.getModelMatcher().getMatchSet() ) {
+			Point2D_F64 t = p.p2;
+			if( t.x > contRect.x1 )
+				contRect.x1 = t.x;
+			if( t.y > contRect.y1 )
+				contRect.y1 = t.y;
+			if( t.x < contRect.x0 )
+				contRect.x0 = t.x;
+			if( t.y < contRect.y0 )
+				contRect.y0 = t.y;
+		}
+		contFraction = contRect.area()/imageArea;
+	}
+
+	public ImageMotionPointTrackerKey<I, IT> getMotion() {
+		return motion;
+	}
 }

@@ -80,9 +80,9 @@ public class DetectFeaturePointApp<T extends ImageSingleBand, D extends ImageSin
 		alg = FactoryDetectPoint.createHarris(configExtract, true, derivType);
 		addAlgorithm(0, "Harris Weighted", new EasyGeneralFeatureDetector<T,D>(alg,imageType,derivType));
 		alg = FactoryDetectPoint.createShiTomasi(configExtract, false, derivType);
-		addAlgorithm(0, "KLT", new EasyGeneralFeatureDetector<T,D>(alg,imageType,derivType));
+		addAlgorithm(0, "Shi-Tomasi", new EasyGeneralFeatureDetector<T,D>(alg,imageType,derivType));
 		alg = FactoryDetectPoint.createShiTomasi(configExtract, true, derivType);
-		addAlgorithm(0, "KLT Weighted", new EasyGeneralFeatureDetector<T,D>(alg,imageType,derivType));
+		addAlgorithm(0, "Shi-Tomasi Weighted", new EasyGeneralFeatureDetector<T,D>(alg,imageType,derivType));
 		alg = FactoryDetectPoint.createFast(radius, 9,10,maxFeatures, imageType);
 		addAlgorithm(0, "Fast", new EasyGeneralFeatureDetector<T,D>(alg,imageType,derivType));
 		alg = FactoryDetectPoint.createKitRos(configExtract, derivType);

@@ -24,6 +24,7 @@ import boofcv.alg.feature.detect.edge.GGradientToEdgeFeatures;
 import boofcv.alg.feature.detect.line.gridline.Edgel;
 import boofcv.alg.feature.detect.line.gridline.GridLineModelDistance;
 import boofcv.alg.feature.detect.line.gridline.GridLineModelFitter;
+import boofcv.alg.feature.detect.line.gridline.ImplGridRansacLineDetector_F32;
 import boofcv.alg.filter.binary.GThresholdImageOps;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.core.image.GeneralizedImageOps;
@@ -94,7 +95,7 @@ public class VisualizeLineRansac<I extends ImageSingleBand, D extends ImageSingl
 
 		GThresholdImageOps.threshold(edgeIntensity,detected,30,false);
 
-		GridRansacLineDetector alg = new GridRansacLineDetector(40,10,matcher);
+		GridRansacLineDetector<ImageFloat32> alg = new ImplGridRansacLineDetector_F32(40,10,matcher);
 
 		alg.process((ImageFloat32) derivX, (ImageFloat32) derivY, detected);
 

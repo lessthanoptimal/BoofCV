@@ -41,25 +41,43 @@ public class TestLaplacianEdge {
 
 	@Test
 	public void checkInputShape() {
-		BoofTesting.checkImageDimensionValidation(new LaplacianEdge(), 2);
+		BoofTesting.checkImageDimensionValidation(new LaplacianEdge(), 3);
 	}
 
 	@Test
-	public void process_I8() {
+	public void process_U8_S16() {
 		ImageUInt8 img = new ImageUInt8(width, height);
 		ImageMiscOps.fillUniform(img, rand, 0, 100);
 
 		ImageSInt16 deriv = new ImageSInt16(width, height);
-		BoofTesting.checkSubImage(this, "process_I8", true, img, deriv);
+		BoofTesting.checkSubImage(this, "process_U8_S16", true, img, deriv);
 	}
 
-	public void process_I8(ImageUInt8 img, ImageSInt16 deriv) {
+	public void process_U8_S16(ImageUInt8 img, ImageSInt16 deriv) {
 		LaplacianEdge.process(img, deriv);
 
 		int expected = -4 * img.get(1, 1) + img.get(0, 1) + img.get(1, 0)
 				+ img.get(2, 1) + img.get(1, 2);
 
 		assertEquals(expected, deriv.get(1, 1));
+	}
+
+	@Test
+	public void process_I8_F32() {
+		ImageUInt8 img = new ImageUInt8(width, height);
+		ImageMiscOps.fillUniform(img, rand, 0, 100);
+
+		ImageFloat32 deriv = new ImageFloat32(width, height);
+		BoofTesting.checkSubImage(this, "process_U8_F32", true, img, deriv);
+	}
+
+	public void process_U8_F32(ImageUInt8 img, ImageFloat32 deriv) {
+		LaplacianEdge.process(img, deriv);
+
+		int expected = -4 * img.get(1, 1) + img.get(0, 1) + img.get(1, 0)
+				+ img.get(2, 1) + img.get(1, 2);
+
+		assertEquals(expected, deriv.get(1, 1), 1e-5);
 	}
 
 	@Test

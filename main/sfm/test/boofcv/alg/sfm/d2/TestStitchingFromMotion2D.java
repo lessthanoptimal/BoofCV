@@ -18,11 +18,17 @@
 
 package boofcv.alg.sfm.d2;
 
-import boofcv.struct.geo.AssociatedPair;
+import org.junit.Test;
+
+import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
  */
-public class AssociatedPairTrack extends AssociatedPair {
-	public long lastUsed;
+public class TestStitchingFromMotion2D {
+
+	@Test
+	public void stuff() {
+		fail("something should go here");
+	}
 }
