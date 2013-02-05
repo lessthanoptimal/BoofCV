@@ -337,6 +337,20 @@ public class FactoryPointTracker {
 		return dat;
 	}
 
+	public static <I extends ImageSingleBand, Desc extends TupleDesc>
+	DetectDescribeAssociate<I,Desc> dda( DetectDescribePoint<I, Desc> detDesc,
+										AssociateDescription2D<Desc> associate ,
+										boolean updateDescription ) {
+
+		DdaManagerDetectDescribePoint<I,Desc> manager =
+				new DdaManagerDetectDescribePoint<I,Desc>(detDesc);
+
+		DetectDescribeAssociate<I,Desc> dat =
+				new DetectDescribeAssociate<I,Desc>(manager, associate,updateDescription);
+
+		return dat;
+	}
+
 	/**
 	 * Creates a tracker which detects Fast-Hessian features, describes them with SURF, nominally tracks them using KLT.
 	 *
