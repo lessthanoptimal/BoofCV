@@ -117,7 +117,6 @@
   <component name="CompilerConfiguration">
     <option name="DEFAULT_COMPILER" value="Javac" />
     <excludeFromCompile>
-      <file url="file://$PROJECT_DIR$/../main/sfm/src/boofcv/alg/sfm/d2/MotionStabilizePointKey.java" />
       <file url="file://$PROJECT_DIR$/../main/sfm/test/boofcv/alg/sfm/d2/TestImageMotionPointTrackerKey.java" />
     </excludeFromCompile>
     <resourceExtensions>

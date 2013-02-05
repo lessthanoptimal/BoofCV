@@ -78,6 +78,9 @@ Version : Alpha 0.13
 - LaplacianEdge added suport for U8 in and F32 out
 - Added kernel based (using LaplacianEdge) blob detector
 - GridRansacLineDetector has support for S16 an F32
+- Redesigned image stabilization and mosaic code
+  * Much easier to work with now and can be plugged in a high level
+  * Added a factory for creating related algorithms
 
 ---------------------------------------------
 Date    : 2012/12/05
@@ -196,7 +199,6 @@ Version : Alpha 0.11
   * Removed addTrack() since only KLT supported that functionality, hence not generic.
 - ConvertBufferedImage
   * Fixed bug where INDEXED images where not being converted correctly
- 
 
 ---------------------------------------------
 Date    : 2012/09/18

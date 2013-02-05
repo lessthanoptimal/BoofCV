@@ -19,36 +19,23 @@
 package boofcv.alg.sfm.d2;
 
 import boofcv.abst.feature.tracker.PointTracker;
+import boofcv.abst.sfm.AccessPointTracks;
 import boofcv.abst.sfm.d2.ImageMotion2D;
-import boofcv.abst.sfm.d2.WrapImageMotionPtkSmartRespawn;
-import boofcv.alg.distort.ImageDistort;
-import boofcv.alg.interpolate.InterpolatePixel;
-import boofcv.alg.interpolate.TypeInterpolate;
-import boofcv.alg.sfm.robust.DistanceAffine2DSq;
-import boofcv.alg.sfm.robust.DistanceHomographySq;
-import boofcv.alg.sfm.robust.GenerateAffine2D;
-import boofcv.alg.sfm.robust.GenerateHomographyLinear;
 import boofcv.core.image.ConvertBufferedImage;
-import boofcv.factory.distort.FactoryDistort;
-import boofcv.factory.interpolate.FactoryInterpolation;
+import boofcv.factory.sfm.FactoryMotion2D;
 import boofcv.gui.VideoProcessAppBase;
 import boofcv.gui.VisualizeApp;
 import boofcv.io.image.SimpleImageSequence;
-import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.InvertibleTransform;
-import georegression.struct.affine.Affine2D_F64;
 import georegression.struct.homo.Homography2D_F64;
-import georegression.transform.ConvertTransform_F64;
-import org.ddogleg.fitting.modelset.DistanceFromModel;
-import org.ddogleg.fitting.modelset.ModelFitter;
-import org.ddogleg.fitting.modelset.ModelGenerator;
-import org.ddogleg.fitting.modelset.ModelMatcher;
-import org.ddogleg.fitting.modelset.ransac.Ransac;
+import georegression.struct.point.Point2D_F64;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Parent class for applications which estimate image motion based upon fit parameters to a model on extracted
@@ -59,11 +46,14 @@ import java.awt.image.BufferedImage;
 public abstract class VideoStitchBaseApp<I extends ImageSingleBand, IT extends InvertibleTransform>
 		extends VideoProcessAppBase<I> implements VisualizeApp
 {
+	// size of input image
 	int inputWidth,inputHeight;
 
-	int stitchWidth = 1000;
-	int stitchHeight = 600;
+	// size of the image being stitched into
+	int stitchWidth;
+	int stitchHeight;
 
+	// show a rectangle around the view be shown
 	boolean showImageView;
 
 	int borderTolerance = 30;
@@ -73,18 +63,12 @@ public abstract class VideoStitchBaseApp<I extends ImageSingleBand, IT extends I
 
 	// tracks feature in the video stream
 	protected PointTracker<I> tracker;
-	// finds the best fit model parameters to describe feature motion
-	protected ModelMatcher<IT,AssociatedPair> modelMatcher;
-	// batch refinement algorithm
-	protected ModelFitter<IT,AssociatedPair> modelRefiner;
 
 	BufferedImage stitchOut;
 
 	StitchingFromMotion2D alg;
 
 	StitchingFromMotion2D.Corners corners;
-
-	protected Affine2D_F64 initialTransform;
 
 	// number of times stitching has failed and it was reset
 	int totalResets;
@@ -125,38 +109,10 @@ public abstract class VideoStitchBaseApp<I extends ImageSingleBand, IT extends I
 
 	protected StitchingFromMotion2D createAlgorithm( PointTracker<I> tracker ) {
 
-		createModelMatcher(maxIterations, 4);
-		InterpolatePixel<I> interp = FactoryInterpolation.createPixel(0, 255, TypeInterpolate.BILINEAR, imageType);
+		ImageMotion2D<I,IT> motion = FactoryMotion2D.createMotion2D(maxIterations,4,2,absoluteMinimumTracks,
+				respawnTrackFraction,respawnCoverageFraction,tracker,fitModel);
 
-		IT worldToInit;
-		if( initialTransform == null )
-			worldToInit = (IT)fitModel.createInstance();
-		else
-			worldToInit = (IT) ConvertTransform_F64.convert(initialTransform, fitModel.createInstance());
-
-		ImageMotionPointTrackerKey<I,IT> motionAlg =
-				new ImageMotionPointTrackerKey<I, IT>(tracker,modelMatcher,modelRefiner,
-						(IT)fitModel.createInstance(),pruneThreshold);
-
-		ImageMotionPtkSmartRespawn<I,IT> motionAlg2 =
-				new ImageMotionPtkSmartRespawn<I, IT>(motionAlg,
-						absoluteMinimumTracks,respawnTrackFraction,respawnCoverageFraction );
-
-
-		ImageMotion2D<I,IT> motion = new WrapImageMotionPtkSmartRespawn<I,IT>(motionAlg2);
-
-		ImageDistort<I> distorter = FactoryDistort.distort(interp, null, imageType);
-
-		StitchingTransform transform;
-
-		if( worldToInit instanceof Affine2D_F64 ) {
-			transform = FactoryStitchingTransform.createAffine_F64();
-		} else {
-			transform = FactoryStitchingTransform.createHomography_F64();
-		}
-
-		return new StitchingFromMotion2D<I, IT>(
-				motion,distorter,transform,maxJumpFraction,worldToInit, stitchWidth, stitchHeight);
+		return FactoryMotion2D.createVideoStitch(maxJumpFraction,motion,imageType);
 	}
 
 	@Override
@@ -165,35 +121,6 @@ public abstract class VideoStitchBaseApp<I extends ImageSingleBand, IT extends I
 	@Override
 	public boolean getHasProcessedImage() {
 		return alg != null;
-	}
-
-	/**
-	 * Create a {@link org.ddogleg.fitting.modelset.ModelMatcher} for the type of model it is fitting to
-	 *
-	 * @param maxIterations Maximum number of iterations in RANSAC
-	 * @param thresholdFit Inlier fit threshold
-	 */
-	protected void createModelMatcher( int maxIterations , double thresholdFit ) {
-
-		ModelGenerator fitter;
-		DistanceFromModel distance;
-
-		if( fitModel instanceof Homography2D_F64 ) {
-			GenerateHomographyLinear mf = new GenerateHomographyLinear(true);
-			fitter = mf;
-			modelRefiner = (ModelFitter)mf;
-			distance = new DistanceHomographySq();
-		} else if( fitModel instanceof Affine2D_F64 ) {
-			GenerateAffine2D mf = new GenerateAffine2D();
-			fitter = mf;
-			distance = new DistanceAffine2DSq();
-			modelRefiner = (ModelFitter)mf;
-		} else {
-			throw new RuntimeException("Unknown model type");
-		}
-
-		modelMatcher = new Ransac(123123,fitter,distance,maxIterations,thresholdFit);
-
 	}
 
 	@Override
@@ -210,8 +137,6 @@ public abstract class VideoStitchBaseApp<I extends ImageSingleBand, IT extends I
 		I input = sequence.next();
 		inputWidth = input.width;
 		inputHeight = input.height;
-
-		init(inputWidth,inputHeight);
 
 		// start everything up and resume processing
 		doRefreshAll();
@@ -243,8 +168,18 @@ public abstract class VideoStitchBaseApp<I extends ImageSingleBand, IT extends I
 			alg.setOriginToCurrent();
 		}
 
-		final int numAssociated = modelMatcher.getMatchSet().size();
-		final int numFeatures = tracker.getActiveTracks(null).size();
+		AccessPointTracks access = (AccessPointTracks)alg.getMotion();
+
+		List<Point2D_F64> tracks = access.getAllTracks();
+		List<Point2D_F64> inliers = new ArrayList<Point2D_F64>();
+
+		for( int i = 0; i < tracks.size(); i++ ) {
+			if( access.isInlier(i) )
+				inliers.add( tracks.get(i) );
+		}
+
+		final int numInliers = inliers.size();
+		final int numFeatures = tracks.size();
 
 		showImageView = infoPanel.getShowView();
 
@@ -254,11 +189,11 @@ public abstract class VideoStitchBaseApp<I extends ImageSingleBand, IT extends I
 
 		// toggle on and off showing the active tracks
 		if( infoPanel.getShowInliers())
-			gui.setInliers(modelMatcher.getMatchSet());
+			gui.setInliers(inliers);
 		else
 			gui.setInliers(null);
 		if( infoPanel.getShowAll())
-			gui.setAllTracks(tracker.getActiveTracks(null));
+			gui.setAllTracks(tracks);
 		else
 			gui.setAllTracks(null);
 
@@ -270,7 +205,7 @@ public abstract class VideoStitchBaseApp<I extends ImageSingleBand, IT extends I
 			public void run() {
 				// update GUI
 				infoPanel.setFPS(fps);
-				infoPanel.setNumInliers(numAssociated);
+				infoPanel.setNumInliers(numInliers);
 				infoPanel.setNumTracks(numFeatures);
 				infoPanel.setKeyFrames(totalResets);
 				infoPanel.repaint();
@@ -292,7 +227,7 @@ public abstract class VideoStitchBaseApp<I extends ImageSingleBand, IT extends I
 
 	@Override
 	public void setActiveAlgorithm(int indexFamily, String name, Object cookie) {
-		if( sequence == null || modelMatcher == null )
+		if( sequence == null )
 			return;
 
 		stopWorker();
@@ -317,6 +252,7 @@ public abstract class VideoStitchBaseApp<I extends ImageSingleBand, IT extends I
 		// make sure there is nothing left over from before
 		tracker.dropAllTracks();
 		alg = createAlgorithm(tracker);
+		init(inputWidth,inputHeight);
 		totalResets = 0;
 
 		startWorkerThread();

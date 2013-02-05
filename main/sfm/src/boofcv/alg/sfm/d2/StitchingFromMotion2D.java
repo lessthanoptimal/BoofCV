@@ -24,6 +24,7 @@ import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.struct.distort.PixelTransform_F32;
 import boofcv.struct.image.ImageBase;
+import georegression.metric.Area2D_F64;
 import georegression.struct.InvertibleTransform;
 import georegression.struct.homo.Homography2D_F64;
 import georegression.struct.point.Point2D_F64;
@@ -34,9 +35,9 @@ import georegression.struct.shapes.Rectangle2D_I32;
  * and creating image mosaics.  Internally any motion model in the Homogeneous family can be used.  For convenience,
  * those models are converted into a {@link Homography2D_F64} on output.
  *
- * Sudden large motions between frames is often a sign that a bad solution was generated.  There for a maxJumpFraction
- * specifies how large of a jump is allowed relative to the image width/height.  If a large jump is detected
- * then {@link #process(boofcv.struct.image.ImageBase)} will return false.
+ * A sudden change or jump in the shape of the view area can be an indication of a bad motion estimate.  If a large
+ * jump larger than the user specified threshold is detected then {@link #process(boofcv.struct.image.ImageBase)}
+ * will return false.
  *
  * <p>
  * Developer Note:  The reason homogeneous transforms aren't used internally is that using that those transform can
@@ -45,6 +46,7 @@ import georegression.struct.shapes.Rectangle2D_I32;
  *
  * @author Peter Abeles
  */
+// TODO Change max jump into max area change and update comments
 public class StitchingFromMotion2D<I extends ImageBase, IT extends InvertibleTransform>
 {
 	// estimates image motion
@@ -59,12 +61,11 @@ public class StitchingFromMotion2D<I extends ImageBase, IT extends InvertibleTra
 	// size of the stitch image
 	private int widthStitch, heightStitch;
 
-	// very large motions are often signs that the estimated motion is wrong
-	// this number defines the maximum allowed motion relative to image size
+	// Largest allowed fractional change in area
 	private double maxJumpFraction;
 	// image corners are used to detect large motions
-	private Corners previousCorners = new Corners();
-	private Corners currentCorners = new Corners();
+	private Corners corners = new Corners();
+	private double previousArea;
 
 	// storage for the transform from current frame to the initial frame
 	private IT worldToCurr;
@@ -86,27 +87,35 @@ public class StitchingFromMotion2D<I extends ImageBase, IT extends InvertibleTra
 	 * @param distorter
 	 * @param converter
 	 * @param maxJumpFraction
-	 * @param worldToInit
-	 * @param widthStitch
-	 * @param heightStitch
 	 */
 	public StitchingFromMotion2D(ImageMotion2D<I, IT> motion,
 								 ImageDistort<I> distorter,
 								 StitchingTransform<IT> converter ,
-								 double maxJumpFraction ,
-								 IT worldToInit,
-								 int widthStitch, int heightStitch)
+								 double maxJumpFraction )
 	{
 		this.motion = motion;
 		this.distorter = distorter;
 		this.converter = converter;
 		this.maxJumpFraction = maxJumpFraction;
-		this.worldToInit = (IT)worldToInit.createInstance();
-		this.worldToInit.set(worldToInit);
+
+		worldToCurr = (IT)motion.getFirstToCurrent().createInstance();
+
+
+	}
+
+	/**
+	 * Must call this function before processing the first image.
+	 *
+	 * @param widthStitch Width of the image being stitched into
+	 * @param heightStitch Height of the image being stitched into
+	 * @param worldToInit (Option) Used to change the location of the initial frame.  null means no transform.
+	 */
+	public void configure( int widthStitch, int heightStitch , IT worldToInit ) {
+		this.worldToInit = (IT)worldToCurr.createInstance();
+		if( worldToInit != null )
+			this.worldToInit.set(worldToInit);
 		this.widthStitch = widthStitch;
 		this.heightStitch = heightStitch;
-
-		worldToCurr = (IT)worldToInit.createInstance();
 	}
 
 	/**
@@ -151,33 +160,28 @@ public class StitchingFromMotion2D<I extends ImageBase, IT extends InvertibleTra
 	 */
 	private boolean checkLargeMotion( int width , int height ) {
 		if( first ) {
-			getImageCorners(width,height,previousCorners);
+			getImageCorners(width,height,corners);
+			previousArea = computeArea(corners);
 			first = false;
 		} else {
-			getImageCorners(width,height,currentCorners);
+			getImageCorners(width,height,corners);
 
-			// compute the maximum distance squared
-			double threshold =  Math.max(width,height) * maxJumpFraction;
-			threshold *= threshold;
+			double area = computeArea(corners);
 
-			// see if any of the corners exceeded the threshold
-			if( previousCorners.p0.distance2(currentCorners.p0) > threshold )
+			double change = Math.max(area/previousArea,previousArea/area)-1;
+			if( change > maxJumpFraction ) {
 				return true;
-			if( previousCorners.p1.distance2(currentCorners.p1) > threshold )
-				return true;
-			if( previousCorners.p2.distance2(currentCorners.p2) > threshold )
-				return true;
-			if( previousCorners.p3.distance2(currentCorners.p3) > threshold )
-				return true;
-
-			// make current into previous
-			Corners tmp = currentCorners;
-			currentCorners = previousCorners;
-			previousCorners = tmp;
+			}
+			previousArea = area;
 		}
 
 		return false;
 
+	}
+
+	private double computeArea( Corners c ) {
+		return Area2D_F64.triangle(c.p0,c.p1,c.p2) +
+				Area2D_F64.triangle(c.p0,c.p2,c.p3);
 	}
 
 	/**
@@ -276,11 +280,15 @@ public class StitchingFromMotion2D<I extends ImageBase, IT extends InvertibleTra
 		return stitchedImage;
 	}
 
+	public ImageMotion2D<I, IT> getMotion() {
+		return motion;
+	}
+
 	public static class Corners {
-		Point2D_F64 p0 = new Point2D_F64();
-		Point2D_F64 p1 = new Point2D_F64();
-		Point2D_F64 p2 = new Point2D_F64();
-		Point2D_F64 p3 = new Point2D_F64();
+		public Point2D_F64 p0 = new Point2D_F64();
+		public Point2D_F64 p1 = new Point2D_F64();
+		public Point2D_F64 p2 = new Point2D_F64();
+		public Point2D_F64 p3 = new Point2D_F64();
 	}
 
 }
