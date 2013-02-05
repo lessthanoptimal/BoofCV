@@ -4,6 +4,7 @@ import android.graphics.Bitmap;
 import boofcv.alg.misc.ImageStatistics;
 import boofcv.alg.misc.PixelMath;
 import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSInt16;
 import boofcv.struct.image.ImageUInt8;
 
@@ -12,10 +13,20 @@ import java.nio.ByteBuffer;
 import static boofcv.android.ConvertBitmap.declareStorage;
 
 /**
+ * Visualizes different types of image data into a color image which can be understood by humans.
+ *
  * @author Peter Abeles
  */
 public class VisualizeImageData {
 
+	/**
+	 * Renders a binary image as a B&W bitmap.  Create storage with
+	 * {@link ConvertBitmap#declareStorage(android.graphics.Bitmap, byte[])};
+	 *
+	 * @param binary (Input) Binary image.
+	 * @param output (Output) Bitmap ARGB_8888 image.
+	 * @param storage Optional working buffer for Bitmap image.
+	 */
 	public static void binaryToBitmap( ImageUInt8 binary , Bitmap output , byte[] storage ) {
 		shapeShape(binary, output);
 
@@ -40,11 +51,12 @@ public class VisualizeImageData {
 	}
 
 	/**
+	 * Renders positive and negative values as two different colors.
 	 *
-	 * @param input
-	 * @param maxAbsValue
-	 * @param output
-	 * @param storage
+	 * @param input (Input) Image with positive and negative values.
+	 * @param maxAbsValue  The largest absolute value of any pixel in the image.  Set to < 0 if not known.
+	 * @param output (Output) Bitmap ARGB_8888 image.
+	 * @param storage Optional working buffer for Bitmap image.
 	 */
 	public static void colorizeSign( ImageSInt16 input , int maxAbsValue , Bitmap output , byte[] storage ) {
 		shapeShape(input, output);
@@ -77,6 +89,54 @@ public class VisualizeImageData {
 		output.copyPixelsFromBuffer(ByteBuffer.wrap(storage));
 	}
 
+	/**
+	 * Renders positive and negative values as two different colors.
+	 *
+	 * @param input (Input) Image with positive and negative values.
+	 * @param maxAbsValue  The largest absolute value of any pixel in the image.  Set to < 0 if not known.
+	 * @param output (Output) Bitmap ARGB_8888 image.
+	 * @param storage Optional working buffer for Bitmap image.
+	 */
+	public static void colorizeSign( ImageFloat32 input , float maxAbsValue , Bitmap output , byte[] storage ) {
+		shapeShape(input, output);
+
+		if( storage == null )
+			storage = declareStorage(output,null);
+
+		if( maxAbsValue < 0 )
+			maxAbsValue = ImageStatistics.maxAbs(input);
+
+		int indexDst = 0;
+
+		for( int y = 0; y < input.height; y++ ) {
+			int indexSrc = input.startIndex + y*input.stride;
+			for( int x = 0; x < input.width; x++ ) {
+				float value = input.data[ indexSrc++ ];
+				if( value > 0 ) {
+					storage[indexDst++] = (byte) (255f*value/maxAbsValue);
+					storage[indexDst++] = 0;
+					storage[indexDst++] = 0;
+				} else {
+					storage[indexDst++] = 0;
+					storage[indexDst++] = (byte) (-255f*value/maxAbsValue);
+					storage[indexDst++] = 0;
+				}
+				storage[indexDst++] = (byte) 0xFF;
+			}
+		}
+
+		output.copyPixelsFromBuffer(ByteBuffer.wrap(storage));
+	}
+
+	/**
+	 * Renders two gradients on the same image using two sets of colors, on for each input image.
+	 *
+	 * @param derivX (Input) Image with positive and negative values.
+	 * @param derivY (Input) Image with positive and negative values.
+	 * @param maxAbsValue  The largest absolute value of any pixel in the image.  Set to < 0 if not known.
+	 * @param output (Output) Bitmap ARGB_8888 image.
+	 * @param storage Optional working buffer for Bitmap image.
+	 */
 	public static void colorizeGradient( ImageSInt16 derivX , ImageSInt16 derivY ,
 										 int maxAbsValue , Bitmap output , byte[] storage ) {
 		shapeShape(derivX, derivY, output);
@@ -88,6 +148,8 @@ public class VisualizeImageData {
 			maxAbsValue = ImageStatistics.maxAbs(derivX);
 			maxAbsValue = Math.max(maxAbsValue, ImageStatistics.maxAbs(derivY));
 		}
+		if( maxAbsValue == 0 )
+			return;
 
 		int indexDst = 0;
 
@@ -110,6 +172,65 @@ public class VisualizeImageData {
 					b = 255*valueY/maxAbsValue;
 				} else {
 					int v = -255*valueY/maxAbsValue;
+					r += v;
+					g += v;
+					if( r > 255 ) r = 255;
+					if( g > 255 ) g = 255;
+				}
+				storage[indexDst++] = (byte) r;
+				storage[indexDst++] = (byte) g;
+				storage[indexDst++] = (byte) b;
+				storage[indexDst++] = (byte) 0xFF;
+			}
+		}
+
+		output.copyPixelsFromBuffer(ByteBuffer.wrap(storage));
+	}
+
+	/**
+	 * Renders two gradients on the same image using two sets of colors, on for each input image.
+	 *
+	 * @param derivX (Input) Image with positive and negative values.
+	 * @param derivY (Input) Image with positive and negative values.
+	 * @param maxAbsValue  The largest absolute value of any pixel in the image.  Set to < 0 if not known.
+	 * @param output (Output) Bitmap ARGB_8888 image.
+	 * @param storage Optional working buffer for Bitmap image.
+	 */
+	public static void colorizeGradient( ImageFloat32 derivX , ImageFloat32 derivY ,
+										 float maxAbsValue , Bitmap output , byte[] storage ) {
+		shapeShape(derivX, derivY, output);
+
+		if( storage == null )
+			storage = declareStorage(output,null);
+
+		if( maxAbsValue < 0 ) {
+			maxAbsValue = ImageStatistics.maxAbs(derivX);
+			maxAbsValue = Math.max(maxAbsValue, ImageStatistics.maxAbs(derivY));
+		}
+		if( maxAbsValue == 0 )
+			return;
+
+		int indexDst = 0;
+
+		for( int y = 0; y < derivX.height; y++ ) {
+			int indexX = derivX.startIndex + y*derivX.stride;
+			int indexY = derivY.startIndex + y*derivY.stride;
+
+			for( int x = 0; x < derivX.width; x++ ) {
+				float valueX = derivX.data[ indexX++ ];
+				float valueY = derivY.data[ indexY++ ];
+
+				int r=0,g=0,b=0;
+
+				if( valueX > 0 ) {
+					r = (int)(255f*valueX/maxAbsValue);
+				} else {
+					g = (int)(-255f*valueX/maxAbsValue);
+				}
+				if( valueY > 0 ) {
+					b = (int)(255f*valueY/maxAbsValue);
+				} else {
+					int v = (int)(-255f*valueY/maxAbsValue);
 					r += v;
 					g += v;
 					if( r > 255 ) r = 255;
