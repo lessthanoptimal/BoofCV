@@ -87,6 +87,7 @@ public class VideoStabilizeSequentialPointApp<I extends ImageSingleBand, D exten
 		respawnTrackFraction = 0.3;
 		respawnCoverageFraction = 0.5;
 		maxJumpFraction = 0.3;
+		inlierThreshold = 4;
 	}
 
 	@Override

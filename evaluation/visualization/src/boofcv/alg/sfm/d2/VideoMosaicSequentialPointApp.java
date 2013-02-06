@@ -24,7 +24,6 @@ import boofcv.abst.feature.tracker.PkltConfig;
 import boofcv.factory.feature.tracker.FactoryPointTracker;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.PathLabel;
-import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSInt16;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
@@ -85,6 +84,7 @@ public class VideoMosaicSequentialPointApp<I extends ImageSingleBand, D extends 
 		respawnTrackFraction = 0.3;
 		respawnCoverageFraction = 0.8;
 		maxJumpFraction = 0.3;
+		inlierThreshold = 4;
 	}
 
 	private Affine2D_F64 createInitialTransform() {

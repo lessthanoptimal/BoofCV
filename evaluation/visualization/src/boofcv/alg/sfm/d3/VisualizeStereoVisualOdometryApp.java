@@ -290,7 +290,7 @@ public class VisualizeStereoVisualOdometryApp <I extends ImageSingleBand>
 
 			PointTrackerTwoPass<I> tracker = FactoryPointTrackerTwoPass.klt(config, configDetector);
 
-			return FactoryVisualOdometry.stereoDepth(1.5,120,2,200,50, true, disparity, tracker, imageType);
+			return FactoryVisualOdometry.stereoDepth(1.5,120,2,200,50, false, disparity, tracker, imageType);
 		} else if( whichAlg == 1 ) {
 
 			ConfigGeneralDetector configExtract = new ConfigGeneralDetector(600,3,1);
