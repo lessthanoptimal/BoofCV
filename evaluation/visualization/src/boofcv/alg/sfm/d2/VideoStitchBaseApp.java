@@ -86,6 +86,7 @@ public abstract class VideoStitchBaseApp<I extends ImageSingleBand, IT extends I
 	protected double respawnTrackFraction;
 	protected double respawnCoverageFraction;
 	protected double maxJumpFraction;
+	protected double inlierThreshold;
 
 	public VideoStitchBaseApp(int numAlgFamilies,
 							  Class<I> imageType,
@@ -109,8 +110,8 @@ public abstract class VideoStitchBaseApp<I extends ImageSingleBand, IT extends I
 
 	protected StitchingFromMotion2D createAlgorithm( PointTracker<I> tracker ) {
 
-		ImageMotion2D<I,IT> motion = FactoryMotion2D.createMotion2D(maxIterations,4,2,absoluteMinimumTracks,
-				respawnTrackFraction,respawnCoverageFraction,tracker,fitModel);
+		ImageMotion2D<I,IT> motion = FactoryMotion2D.createMotion2D(maxIterations,inlierThreshold,2,absoluteMinimumTracks,
+				respawnTrackFraction,respawnCoverageFraction,false,tracker,fitModel);
 
 		return FactoryMotion2D.createVideoStitch(maxJumpFraction,motion,imageType);
 	}
