@@ -24,5 +24,8 @@ import boofcv.struct.geo.AssociatedPair;
  * @author Peter Abeles
  */
 public class AssociatedPairTrack extends AssociatedPair {
+	/**
+	 * The tick at which the track was last inside the inlier list
+	 */
 	public long lastUsed;
 }

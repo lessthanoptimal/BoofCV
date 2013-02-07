@@ -20,13 +20,12 @@ package boofcv.abst.sfm.d2;
 
 import boofcv.abst.feature.tracker.PointTrack;
 import boofcv.abst.sfm.AccessPointTracks;
+import boofcv.alg.sfm.d2.AssociatedPairTrack;
 import boofcv.alg.sfm.d2.ImageMotionPtkSmartRespawn;
 import boofcv.struct.GrowQueue_B;
-import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.image.ImageBase;
 import georegression.struct.InvertibleTransform;
 import georegression.struct.point.Point2D_F64;
-import org.ddogleg.fitting.modelset.ModelMatcher;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -57,7 +56,8 @@ public class WrapImageMotionPtkSmartRespawn<T extends ImageBase, IT extends Inve
 
 		boolean ret = alg.process(input);
 		if( first ) {
-			alg.getMotion().changeKeyFrame(true);
+			alg.getMotion().changeKeyFrame();
+			alg.getMotion().resetTransforms();
 			first = false;
 			return true;
 		}
@@ -72,8 +72,8 @@ public class WrapImageMotionPtkSmartRespawn<T extends ImageBase, IT extends Inve
 
 	@Override
 	public void setToFirst() {
-		// TODO this will force new features to be detected.  instead just adjust the initial transform
-		alg.getMotion().changeKeyFrame(true);
+		alg.getMotion().changeKeyFrame();
+		alg.getMotion().resetTransforms();
 	}
 
 	@Override
@@ -99,19 +99,15 @@ public class WrapImageMotionPtkSmartRespawn<T extends ImageBase, IT extends Inve
 
 			allTracks.clear();
 
-			for( int i = 0; i < active.size(); i++ ) {
-				allTracks.add(active.get(i));
-			}
+			long tick = alg.getMotion().getTotalFramesProcessed();
 			inliers.resize(active.size());
-			for( int i = 0; i < inliers.size; i++ )
-				inliers.data[i] = false;
 
-			ModelMatcher<IT, AssociatedPair> mm = alg.getMotion().getModelMatcher();
-
-			int N = mm.getMatchSet().size();
-
-			for( int i = 0; i < N; i++ ) {
-				inliers.data[ mm.getInputIndex(i) ] = true;
+			for( int i = 0; i < active.size(); i++ ) {
+				PointTrack t = active.get(i);
+				AssociatedPairTrack info = t.getCookie();
+				allTracks.add(t);
+				// if it was used in the previous update then it is in the inlier set
+				inliers.data[i] = info.lastUsed == tick;
 			}
 		}
 	}

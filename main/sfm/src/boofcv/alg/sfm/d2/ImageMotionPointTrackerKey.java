@@ -63,9 +63,6 @@ public class ImageMotionPointTrackerKey<I extends ImageBase, IT extends Invertib
 	// if the current frame is a keyframe or not
 	protected boolean keyFrame;
 
-	// number of detected features
-	private int totalSpawned;
-
 	/**
 	 * Specify algorithms to use internally.  Each of these classes must work with
 	 * compatible data structures.
@@ -92,14 +89,16 @@ public class ImageMotionPointTrackerKey<I extends ImageBase, IT extends Invertib
 		worldToCurr = (IT)model.createInstance();
 	}
 
-
+	protected ImageMotionPointTrackerKey() {
+	}
 
 	/**
 	 * Makes the current frame the first frame and discards its past history
 	 */
 	public void reset() {
 		totalFramesProcessed = 0;
-		changeKeyFrame(true);
+		tracker.dropAllTracks();
+		resetTransforms();
 	}
 
 	/**
@@ -110,9 +109,6 @@ public class ImageMotionPointTrackerKey<I extends ImageBase, IT extends Invertib
 	 */
 	public boolean process( I frame ) {
 		keyFrame = false;
-
-		// prune tracks which aren't being used
-		pruneUnusedTracks();
 
 		// update the feature tracker
 		tracker.process(frame);
@@ -134,17 +130,20 @@ public class ImageMotionPointTrackerKey<I extends ImageBase, IT extends Invertib
 			return false;
 		}
 
-//		if( modelRefiner != null ) {
-//			if( !modelRefiner.fitModel(modelMatcher.getMatchSet(),modelMatcher.getModel(),keyToCurr) )
-//				return false;
-//		} else {
+		if( modelRefiner != null ) {
+			if( !modelRefiner.fitModel(modelMatcher.getMatchSet(),modelMatcher.getModel(),keyToCurr) )
+				return false;
+		} else {
 			keyToCurr.set(modelMatcher.getModel());
-//		}
+		}
 
 		// mark that the track is in the inlier set
 		for( AssociatedPair p : modelMatcher.getMatchSet() ) {
 			((AssociatedPairTrack)p).lastUsed = totalFramesProcessed;
 		}
+
+		// prune tracks which aren't being used
+		pruneUnusedTracks();
 
 		// Update the motion
 		worldToKey.concat(keyToCurr, worldToCurr);
@@ -158,20 +157,33 @@ public class ImageMotionPointTrackerKey<I extends ImageBase, IT extends Invertib
 			AssociatedPairTrack p = t.getCookie();
 
 			if( totalFramesProcessed - p.lastUsed >= outlierPrune) {
-				tracker.dropTrack(t);
+				if( !tracker.dropTrack(t) )
+					throw new RuntimeException("Drop track failed. Must be a bug in the tracker");
 			}
 		}
 	}
 
 	/**
-	 * Make the current frame the first frame in the sequence
+	 * Change the current frame into the keyframe. p1 location of existing tracks is set to
+	 * their current location and new tracks are spawned.  Reference frame transformations are also updated
 	 */
-	public void changeKeyFrame( boolean resetMotion ) {
-		tracker.dropAllTracks();
+	public void changeKeyFrame() {
+		// drop all inactive tracks since their location is unknown in the current frame
+		List<PointTrack> inactive = tracker.getInactiveTracks(null);
+		for( PointTrack l : inactive ) {
+			tracker.dropTrack(l);
+		}
+
+		// set the keyframe for active tracks as their current location
+		List<PointTrack> active = tracker.getActiveTracks(null);
+		for( PointTrack l : active ) {
+			AssociatedPairTrack p = l.getCookie();
+			p.p1.set(l);
+			p.lastUsed = totalFramesProcessed;
+		}
+
 		tracker.spawnTracks();
-
 		List<PointTrack> spawned = tracker.getNewTracks(null);
-
 		for( PointTrack l : spawned ) {
 			AssociatedPairTrack p = l.getCookie();
 			if( p == null ) {
@@ -184,17 +196,16 @@ public class ImageMotionPointTrackerKey<I extends ImageBase, IT extends Invertib
 			p.lastUsed = totalFramesProcessed;
 		}
 
-		totalSpawned = spawned.size();
-
-		if( resetMotion ) {
-			worldToKey.reset();
-			worldToCurr.reset();
-		} else {
-			worldToKey.set(worldToCurr);
-		}
+		worldToKey.set(worldToCurr);
 		keyToCurr.reset();
 
 		keyFrame = true;
+	}
+
+	public void resetTransforms() {
+		worldToCurr.reset();
+		worldToKey.reset();
+		keyToCurr.reset();
 	}
 
 	public IT getWorldToCurr() {
@@ -219,10 +230,6 @@ public class ImageMotionPointTrackerKey<I extends ImageBase, IT extends Invertib
 
 	public int getTotalFramesProcessed() {
 		return totalFramesProcessed;
-	}
-
-	public int getTotalSpawned() {
-		return totalSpawned;
 	}
 
 	public boolean isKeyFrame() {

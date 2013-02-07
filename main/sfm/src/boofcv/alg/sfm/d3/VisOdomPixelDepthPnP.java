@@ -151,6 +151,7 @@ public class VisOdomPixelDepthPnP<T extends ImageBase> {
 	public boolean process( T image ) {
 		tracker.process(image);
 
+		tick++;
 		inlierTracks.clear();
 
 		if( first ) {
@@ -171,7 +172,6 @@ public class VisOdomPixelDepthPnP<T extends ImageBase> {
 
 //			System.out.println("  num inliers = "+N+"  num dropped "+numDropped+" total active "+tracker.getActivePairs().size());
 		}
-		tick++;
 
 		return true;
 	}
@@ -206,7 +206,7 @@ public class VisOdomPixelDepthPnP<T extends ImageBase> {
 
 		for( PointTrack t : all ) {
 			Point2D3DTrack p = t.getCookie();
-			if( tick - p.lastInlier >= thresholdRetire ) {
+			if( tick - p.lastInlier > thresholdRetire ) {
 				tracker.dropTrack(t);
 				num++;
 			}
@@ -361,5 +361,9 @@ public class VisOdomPixelDepthPnP<T extends ImageBase> {
 
 	public void setNormToPixel(PointTransform_F64 normToPixel) {
 		this.normToPixel = normToPixel;
+	}
+
+	public long getTick() {
+		return tick;
 	}
 }

@@ -24,9 +24,8 @@ import boofcv.abst.feature.tracker.PkltConfig;
 import boofcv.factory.feature.tracker.FactoryPointTracker;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.PathLabel;
-import boofcv.struct.image.ImageSInt16;
+import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.image.ImageUInt8;
 import georegression.struct.InvertibleTransform;
 import georegression.struct.affine.Affine2D_F64;
 import georegression.struct.homo.Homography2D_F64;
@@ -122,11 +121,11 @@ public class VideoMosaicSequentialPointApp<I extends ImageSingleBand, D extends 
 	}
 
 	public static void main( String args[] ) {
-//		Class type = ImageFloat32.class;
-//		Class derivType = type;
+		Class type = ImageFloat32.class;
+		Class derivType = type;
 
-		Class type = ImageUInt8.class;
-		Class derivType = ImageSInt16.class;
+//		Class type = ImageUInt8.class;
+//		Class derivType = ImageSInt16.class;
 
 		VideoMosaicSequentialPointApp app = new VideoMosaicSequentialPointApp(type,derivType);
 

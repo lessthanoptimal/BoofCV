@@ -34,6 +34,7 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -51,6 +52,7 @@ public class WrapVisOdomPixelDepthPnP<T extends ImageSingleBand,Model,Info>
 	Class<T> imageType;
 	boolean failed;
 
+	List<PointTrack> active = new ArrayList<PointTrack>();
 
 	public WrapVisOdomPixelDepthPnP(VisOdomPixelDepthPnP<T> alg,
 									StereoSparse3D<T> stereo,
@@ -71,19 +73,18 @@ public class WrapVisOdomPixelDepthPnP<T extends ImageSingleBand,Model,Info>
 
 	@Override
 	public long getTrackId(int index) {
-		PointTrack t = alg.getTracker().getActiveTracks(null).get(index);
-		return t.featureId;
+		return active.get(index).featureId;
 	}
 
 	@Override
 	public List<Point2D_F64> getAllTracks() {
-		return (List)alg.getTracker().getActiveTracks(null);
+		return (List)active;
 	}
 
 	@Override
 	public boolean isInlier(int index) {
-		Point2D3DTrack t = alg.getTracker().getActiveTracks(null).get(index).getCookie();
-		return alg.getInlierTracks().contains(t);
+		Point2D3DTrack t = active.get(index).getCookie();
+		return t.lastInlier == alg.getTick();
 	}
 
 	@Override
@@ -110,6 +111,10 @@ public class WrapVisOdomPixelDepthPnP<T extends ImageSingleBand,Model,Info>
 	public boolean process(T leftImage, T rightImage) {
 		stereo.setImages(leftImage,rightImage);
 		failed = alg.process(leftImage);
+
+		active.clear();
+		alg.getTracker().getActiveTracks(active);
+
 		return failed;
 	}
 

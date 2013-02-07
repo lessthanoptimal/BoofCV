@@ -52,21 +52,24 @@ public class FactoryMotion2D {
 	ImageMotion2D<I,IT> createMotion2D( int ransacIterations , double inlierThreshold,int outlierPrune,
 										int absoluteMinimumTracks, double respawnTrackFraction,
 										double respawnCoverageFraction,
+										boolean refineEstimate ,
 										PointTracker<I> tracker , IT motionModel ) {
 
 		ModelGenerator<IT,AssociatedPair> fitter;
 		DistanceFromModel<IT,AssociatedPair> distance;
-		ModelFitter<IT,AssociatedPair> modelRefiner;
+		ModelFitter<IT,AssociatedPair> modelRefiner = null;
 
 		if( motionModel instanceof Homography2D_F64) {
 			GenerateHomographyLinear mf = new GenerateHomographyLinear(true);
 			fitter = (ModelGenerator)mf;
-			modelRefiner = (ModelFitter)mf;
+			if( refineEstimate )
+				modelRefiner = (ModelFitter)mf;
 			distance = (DistanceFromModel)new DistanceHomographySq();
 		} else if( motionModel instanceof Affine2D_F64) {
 			GenerateAffine2D mf = new GenerateAffine2D();
 			fitter = (ModelGenerator)mf;
-			modelRefiner = (ModelFitter)mf;
+			if( refineEstimate )
+				modelRefiner = (ModelFitter)mf;
 			distance =  (DistanceFromModel)new DistanceAffine2DSq();
 		} else {
 			throw new RuntimeException("Unknown model type: "+motionModel.getClass().getSimpleName());
