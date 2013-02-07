@@ -44,8 +44,9 @@ public class PruneCloseTracks {
 		this.imgWidth = imgWidth;
 		this.imgHeight = imgHeight;
 
-		int w = imgWidth/scale;
-		int h = imgHeight/scale;
+		// +1 to avoid out of bounds error along image border
+		int w = imgWidth/scale+1;
+		int h = imgHeight/scale+1;
 		
 		if( pairImage == null || pairImage.length < w*h ) {
 			pairImage = new PointTrack[ w*h ];

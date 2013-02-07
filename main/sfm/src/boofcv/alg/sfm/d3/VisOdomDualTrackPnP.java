@@ -156,6 +156,7 @@ public class VisOdomDualTrackPnP<T extends ImageSingleBand,Desc extends TupleDes
 	public boolean process( T left , T right ) {
 		System.out.println("----------- Process --------------");
 
+		tick++;
 		trackerLeft.process(left);
 		trackerRight.process(right);
 
@@ -179,8 +180,6 @@ public class VisOdomDualTrackPnP<T extends ImageSingleBand,Desc extends TupleDes
 				addNewTracks();
 			}
 		}
-
-		tick++;
 		return true;
 	}
 
@@ -245,7 +244,7 @@ public class VisOdomDualTrackPnP<T extends ImageSingleBand,Desc extends TupleDes
 		for( int i = 0; i < N; i++ ) {
 			int index = matcher.getInputIndex(i);
 			LeftTrackInfo info = candidates.get(index).getCookie();
-			info.lastConsistent = tick;
+			info.lastInlier = tick;
 		}
 
 		System.out.println("Inlier set size: "+N);
@@ -298,6 +297,7 @@ public class VisOdomDualTrackPnP<T extends ImageSingleBand,Desc extends TupleDes
 
 			// check epipolar constraint and see if it is still valid
 			if( stereoCheck.checkPixel(left, info.right) ) {
+				info.lastConsistent = tick;
 				candidates.add(left);
 			}
 			mutualActive++;
@@ -321,7 +321,7 @@ public class VisOdomDualTrackPnP<T extends ImageSingleBand,Desc extends TupleDes
 
 		for( PointTrack t : all ) {
 			LeftTrackInfo info = t.getCookie();
-			if( tick - info.lastConsistent >= thresholdRetire ) {
+			if( tick - info.lastInlier > thresholdRetire ) {
 				if( !trackerLeft.dropTrack(t) )
 					throw new IllegalArgumentException("failed to drop unused left track");
 				if( !trackerRight.dropTrack(info.right) )
@@ -464,6 +464,10 @@ public class VisOdomDualTrackPnP<T extends ImageSingleBand,Desc extends TupleDes
 	public Se3_F64 getCurrToWorld() {
 		currToKey.concat(keyToWorld, currToWorld);
 		return currToWorld;
+	}
+
+	public int getTick() {
+		return tick;
 	}
 
 	/**

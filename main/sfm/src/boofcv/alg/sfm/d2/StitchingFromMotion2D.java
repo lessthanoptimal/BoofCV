@@ -32,21 +32,20 @@ import georegression.struct.shapes.Rectangle2D_I32;
 
 /**
  * Stitches together sequences of images using {@link ImageMotion2D}, typically used for image stabilization
- * and creating image mosaics.  Internally any motion model in the Homogeneous family can be used.  For convenience,
+ * and creating mosaics.  Internally any motion model in the Homogeneous family can be used.  For convenience,
  * those models are converted into a {@link Homography2D_F64} on output.
+ *
+ * The size of the stitch region is specified using {@link #configure(int, int, georegression.struct.InvertibleTransform)}
+ * which must be called before any images are processed.  One of the parameters include an initial transform.  The
+ * initial transform can be used to scale/translate/other the input image.
  *
  * A sudden change or jump in the shape of the view area can be an indication of a bad motion estimate.  If a large
  * jump larger than the user specified threshold is detected then {@link #process(boofcv.struct.image.ImageBase)}
  * will return false.
  *
- * <p>
- * Developer Note:  The reason homogeneous transforms aren't used internally is that using that those transform can
- * be significantly slower when rendering an image than other simpler models.
- * </p>
- *
  * @author Peter Abeles
  */
-// TODO Change max jump into max area change and update comments
+
 public class StitchingFromMotion2D<I extends ImageBase, IT extends InvertibleTransform>
 {
 	// estimates image motion
@@ -65,6 +64,7 @@ public class StitchingFromMotion2D<I extends ImageBase, IT extends InvertibleTra
 	private double maxJumpFraction;
 	// image corners are used to detect large motions
 	private Corners corners = new Corners();
+	// size of view area in previous update
 	private double previousArea;
 
 	// storage for the transform from current frame to the initial frame
@@ -81,12 +81,12 @@ public class StitchingFromMotion2D<I extends ImageBase, IT extends InvertibleTra
 	private boolean first = true;
 
 	/**
-	 * TODO WRITE
+	 * Provides internal algorithms and tuning parameters.
 	 *
-	 * @param motion
-	 * @param distorter
-	 * @param converter
-	 * @param maxJumpFraction
+	 * @param motion Estimates image motion
+	 * @param distorter Applies found transformation to stitch images
+	 * @param converter Converts internal model into a homogenous transformation
+	 * @param maxJumpFraction If the view area changes by more than this fraction a fault is declared
 	 */
 	public StitchingFromMotion2D(ImageMotion2D<I, IT> motion,
 								 ImageDistort<I> distorter,
@@ -99,12 +99,10 @@ public class StitchingFromMotion2D<I extends ImageBase, IT extends InvertibleTra
 		this.maxJumpFraction = maxJumpFraction;
 
 		worldToCurr = (IT)motion.getFirstToCurrent().createInstance();
-
-
 	}
 
 	/**
-	 * Must call this function before processing the first image.
+	 * Specifies size of stitch image and the location of the initial coordinate system.
 	 *
 	 * @param widthStitch Width of the image being stitched into
 	 * @param heightStitch Height of the image being stitched into
@@ -239,13 +237,14 @@ public class StitchingFromMotion2D<I extends ImageBase, IT extends InvertibleTra
 
 		// have motion estimates be relative to this frame
 		motion.setToFirst();
+		worldToCurr.reset();
 		first = true;
 	}
 
 	/**
-	 * Returns the location of the current image's corners in the mosaic
+	 * Returns the location of the input image's corners inside the stitch image.
 	 *
-	 * @return
+	 * @return image corners
 	 */
 	public Corners getImageCorners( int width , int height , Corners corners ) {
 

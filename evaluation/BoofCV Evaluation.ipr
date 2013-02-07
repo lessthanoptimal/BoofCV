@@ -405,6 +405,7 @@
         <w>epipole</w>
         <w>epipoles</w>
         <w>hough</w>
+        <w>inliers</w>
         <w>jacobian</w>
         <w>matlab</w>
         <w>maxima</w>
