@@ -51,17 +51,17 @@ public class WrapPlanarSquareGridTarget implements PlanarCalibrationDetector {
 
 	OrderPointsIntoGrid orderAlg = new OrderPointsIntoGrid();
 
-	public WrapPlanarSquareGridTarget(int numSquareColumns, int numSquareRows , double relativeSizeThreshold ) {
+	public WrapPlanarSquareGridTarget( ConfigSquareGrid config ) {
 		refine = new WrapRefineCornerSegmentFit();
 //		refine = new WrapRefineCornerCanny();
 
-		this.squareColumns = numSquareColumns;
+		this.squareColumns = config.numCols;
 
 		pointColumns = squareColumns*2;
-		pointRows = numSquareRows*2;
+		pointRows = config.numRows*2;
 
-		detect = new DetectSquareCalibrationPoints(500,relativeSizeThreshold,squareColumns,numSquareRows);
-		autoThreshold = new AutoThresholdCalibrationGrid(255,30);
+		detect = new DetectSquareCalibrationPoints(500,config.relativeSizeThreshold,squareColumns,config.numRows);
+		autoThreshold = new AutoThresholdCalibrationGrid(config.binaryThreshold);
 	}
 
 	@Override

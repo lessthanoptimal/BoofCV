@@ -18,6 +18,8 @@
 
 package boofcv.examples;
 
+import boofcv.abst.calib.ConfigChessboard;
+import boofcv.abst.calib.ConfigSquareGrid;
 import boofcv.abst.calib.PlanarCalibrationDetector;
 import boofcv.alg.geo.calibration.PlanarCalibrationTarget;
 import boofcv.app.CalibrateStereoPlanar;
@@ -71,7 +73,7 @@ public class ExampleCalibrateStereoPlanar {
 	 */
 	public void setupBumblebeeSquare() {
 		// Use the wrapper below for square grid targets.
-		detector = FactoryPlanarCalibrationTarget.detectorSquareGrid(3,4,1.0);
+		detector = FactoryPlanarCalibrationTarget.detectorSquareGrid(new ConfigSquareGrid(3,4));
 		// Target physical description
 		target = FactoryPlanarCalibrationTarget.gridSquare(3, 4, 30,30);
 
@@ -89,7 +91,7 @@ public class ExampleCalibrateStereoPlanar {
 	public void setupBumblebeeChess() {
 		// Use the wrapper below for chessboard targets.  The last parameter adjusts the size of the corner detection
 		// region.  TUNE THIS PARAMETER FOR OPTIMAL ACCURACY!
-		detector = FactoryPlanarCalibrationTarget.detectorChessboard(3, 4, 1, 6);
+		detector = FactoryPlanarCalibrationTarget.detectorChessboard(new ConfigChessboard(3,4));
 		// Target physical description
 		target = FactoryPlanarCalibrationTarget.gridChess(3, 4, 30);
 
@@ -126,6 +128,9 @@ public class ExampleCalibrateStereoPlanar {
 
 		// Process and compute calibration parameters
 		StereoParameters stereoCalib = calibratorAlg.process();
+
+		// print out information on its accuracy and errors
+		calibratorAlg.printStatistics();
 
 		// save results to a file and print out
 		BoofMiscOps.saveXML(stereoCalib, "stereo.xml");

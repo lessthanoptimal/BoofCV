@@ -245,10 +245,10 @@ public class DetectQuadBlobsBinary {
 			Point2D_I32 p3 = corners.get(2);
 			Point2D_I32 p4 = corners.get(3);
 
-			d[0] = Math.sqrt(p1.distance2(p2));
-			d[1] = Math.sqrt(p2.distance2(p3));
-			d[2] = Math.sqrt(p3.distance2(p4));
-			d[3] = Math.sqrt(p4.distance2(p1));
+			d[0] = p1.distance(p2);
+			d[1] = p2.distance(p3);
+			d[2] = p3.distance(p4);
+			d[3] = p4.distance(p1);
 
 			double max = -1;
 			double min = Double.MAX_VALUE;

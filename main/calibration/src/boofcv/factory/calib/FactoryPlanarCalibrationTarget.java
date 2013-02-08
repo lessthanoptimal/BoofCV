@@ -18,9 +18,7 @@
 
 package boofcv.factory.calib;
 
-import boofcv.abst.calib.PlanarCalibrationDetector;
-import boofcv.abst.calib.WrapPlanarChessTarget;
-import boofcv.abst.calib.WrapPlanarSquareGridTarget;
+import boofcv.abst.calib.*;
 import boofcv.alg.geo.calibration.PlanarCalibrationTarget;
 import georegression.struct.point.Point2D_F64;
 
@@ -37,14 +35,13 @@ public class FactoryPlanarCalibrationTarget {
 	/**
 	 * Creates a calibration target detector for square grid targets.
 	 *
-	 * @param numSquareColumns Number of columns in square block grid.  Target dependent.
-	 * @param numSquareRows Number of rows in square block grid.  Target dependent.
-	 * @param relativeSizeThreshold Increases or decreases the minimum allowed blob size. Try 1.0
+	 * @param config Configuration for chessboard detector
 	 * @return Square grid target detector.
 	 */
-	public static PlanarCalibrationDetector detectorSquareGrid( int numSquareColumns, int numSquareRows ,
-																double relativeSizeThreshold ) {
-		return new WrapPlanarSquareGridTarget(numSquareColumns, numSquareRows,relativeSizeThreshold);
+	public static PlanarCalibrationDetector detectorSquareGrid( ConfigSquareGrid config) {
+		config.checkValidity();
+
+		return new WrapPlanarSquareGridTarget(config);
 	}
 
 	/**
@@ -52,15 +49,13 @@ public class FactoryPlanarCalibrationTarget {
 	 * for best performance.
 	 *
 	 *
-	 * @param numSquareColumns Number of columns in square block grid.  Target dependent.
-	 * @param numSquareRows Number of rows in square block grid.  Target dependent.
-	 * @param relativeSizeThreshold Increases or decreases the minimum allowed blob size. Try 1.0
-	 * @param detectionRadius Size of interest point detection region.  TUNE THIS!  Typically 5
+	 * @param config Configuration for chessboard detector
 	 * @return Square grid target detector.
 	 */
-	public static PlanarCalibrationDetector detectorChessboard(int numSquareColumns, int numSquareRows,
-															   double relativeSizeThreshold, int detectionRadius) {
-		return new WrapPlanarChessTarget(numSquareColumns, numSquareRows, relativeSizeThreshold, detectionRadius);
+	public static PlanarCalibrationDetector detectorChessboard( ConfigChessboard config ) {
+		config.checkValidity();
+
+		return new WrapPlanarChessTarget(config);
 	}
 
 	/**

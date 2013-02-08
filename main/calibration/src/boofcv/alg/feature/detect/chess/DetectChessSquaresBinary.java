@@ -56,7 +56,7 @@ public class DetectChessSquaresBinary {
 	private List<QuadBlob> cornerBlobs;
 
 	// how close two corners need to be for them to be connected
-	private int connectThreshold;
+	private double connectThreshold = 10;
 
 	/**
 	 * Configures chess board detector.
@@ -94,14 +94,18 @@ public class DetectChessSquaresBinary {
 		connect(graphBlobs, connectThreshold);
 
 		// Remove all but the largest islands in the graph to reduce the number of combinations
-		ConnectGridSquares.pruneSmallIslands(graphBlobs);
-		if( graphBlobs.size() != expectedBlobs )
+		graphBlobs = ConnectGridSquares.pruneSmallIslands(graphBlobs);
+		if( graphBlobs.size() != expectedBlobs ) {
+//			System.out.println("Unexpected graph size: found = "+graphBlobs.size()+" expected "+expectedBlobs);
 			return false;
+		}
 
 		// Examine connections
 		cornerBlobs = new ArrayList<QuadBlob>();
-		if( !checkGraphStructure(graphBlobs,cornerBlobs))
+		if( !checkGraphStructure(graphBlobs,cornerBlobs)) {
+//			System.out.println("Bad graph structure");
 			return false;
+		}
 
 		// find bounds
 		boundingQuad = findBoundingQuad(cornerBlobs);
@@ -118,19 +122,27 @@ public class DetectChessSquaresBinary {
 	{
 		for( int i = 0; i < blobs.size(); i++ ) {
 			QuadBlob a = blobs.get(i);
-			
+
+			if( a.corners.size() != 4 )
+				throw new RuntimeException("WTF is this doing here?");
+
 			for( int indexA = 0; indexA < 4; indexA++ ) {
 				Point2D_I32 ac = a.corners.get(indexA);
 
 				int count = 0;
 				QuadBlob match = null;
-				
-				for( int j = i+1; j < blobs.size(); j++ ) {
+
+				for( int j = 0; j < blobs.size(); j++ ) {
+					if( j == i )
+						continue;
+
 					QuadBlob b = blobs.get(j);
 					for( int indexB = 0; indexB < 4; indexB++ ) {
 						Point2D_I32 bc = b.corners.get(indexB);
-						
-						if( UtilPoint2D_I32.distance(ac,bc) < tol ) {
+
+						double d = UtilPoint2D_I32.distance(ac,bc);
+						if( d < tol ) {
+//							System.out.println("  Match distance = "+d+" count = "+count);
 							match = b;
 							count++;
 						}
@@ -138,8 +150,23 @@ public class DetectChessSquaresBinary {
 				}
 				
 				if( count == 1 ) {
+//					if( a.conn.contains(match) )
+//						throw new RuntimeException("MUltiple matches");
 					a.conn.add(match);
-					match.conn.add(a);
+				}
+			}
+		}
+
+		// remove connections that are not mutual
+		for( int i = 0; i < blobs.size(); i++ ) {
+			QuadBlob a = blobs.get(i);
+
+			for( int j = 0; j < a.conn.size(); ) {
+				QuadBlob b = a.conn.get(j);
+				if( !b.conn.contains(a) ) {
+					a.conn.remove(j);
+				} else {
+					j++;
 				}
 			}
 		}
@@ -209,7 +236,6 @@ public class DetectChessSquaresBinary {
 	 * @param minContourSize The minimum contour size
 	 */
 	public void setMinimumContourSize( int minContourSize ) {
-		this.connectThreshold = minContourSize/5;
 		detectBlobs = new DetectQuadBlobsBinary(minContourSize,0.25,expectedBlobs);
 	}
 

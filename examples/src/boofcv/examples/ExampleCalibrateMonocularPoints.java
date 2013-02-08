@@ -18,6 +18,7 @@
 
 package boofcv.examples;
 
+import boofcv.abst.calib.ConfigChessboard;
 import boofcv.abst.calib.PlanarCalibrationDetector;
 import boofcv.alg.geo.calibration.CalibrationPlanarGridZhang99;
 import boofcv.alg.geo.calibration.PlanarCalibrationTarget;
@@ -81,7 +82,8 @@ public class ExampleCalibrateMonocularPoints {
 		String directory = "../data/evaluation/calibration/stereo/Bumblebee2_Chess";
 		List<String> imageNames = BoofMiscOps.directoryList(directory,"left");
 
-		PlanarCalibrationDetector detector = FactoryPlanarCalibrationTarget.detectorChessboard(3, 4, 1, 6);
+		PlanarCalibrationDetector detector = FactoryPlanarCalibrationTarget.
+				detectorChessboard(new ConfigChessboard(3, 4));
 
 		List<List<Point2D_F64>> ret = new ArrayList<List<Point2D_F64>>();
 

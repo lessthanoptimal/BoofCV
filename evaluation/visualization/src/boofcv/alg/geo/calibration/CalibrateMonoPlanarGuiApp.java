@@ -18,6 +18,7 @@
 
 package boofcv.alg.geo.calibration;
 
+import boofcv.abst.calib.ConfigSquareGrid;
 import boofcv.abst.calib.PlanarCalibrationDetector;
 import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.distort.LensDistortionOps;
@@ -193,9 +194,10 @@ public class CalibrateMonoPlanarGuiApp extends JPanel
 	}
 
 	public static void main( String args[] ) {
-		PlanarCalibrationDetector detector = FactoryPlanarCalibrationTarget.detectorSquareGrid(8,8,1.0);
-//		PlanarCalibrationDetector detector = FactoryPlanarCalibrationTarget.detectorSquareGrid(3,4,1.0);
-//		PlanarCalibrationDetector detector = FactoryPlanarCalibrationTarget.detectorChessboard(3,4,1.0,6);
+		PlanarCalibrationDetector detector = FactoryPlanarCalibrationTarget.detectorSquareGrid(new ConfigSquareGrid(8,8));
+//		PlanarCalibrationDetector detector = FactoryPlanarCalibrationTarget.detectorSquareGrid(new ConfigSquareGrid(3,4));
+//		PlanarCalibrationDetector detector = FactoryPlanarCalibrationTarget.
+//				detectorChessboard(new ConfigCalibrationChess(3,4));
 
 		PlanarCalibrationTarget target = FactoryPlanarCalibrationTarget.gridSquare(8, 8, 0.5, 7.0 / 18.0);
 //		PlanarCalibrationTarget target = FactoryPlanarCalibrationTarget.gridSquare(3,4,30,30);

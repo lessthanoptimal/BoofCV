@@ -20,6 +20,7 @@ package boofcv.alg.geo.calibration;
 
 import boofcv.alg.feature.detect.chess.DetectChessCalibrationPoints;
 import boofcv.alg.feature.detect.quadblob.DetectQuadBlobsBinary;
+import boofcv.alg.feature.detect.quadblob.QuadBlob;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.alg.misc.ImageStatistics;
 import boofcv.core.image.ConvertBufferedImage;
@@ -91,7 +92,7 @@ public class DetectCalibrationChessApp<T extends ImageSingleBand, D extends Imag
 	}
 
 	public void configure( int numCols , int numRows ) {
-		alg = new DetectChessCalibrationPoints<T,D>(numCols,numRows,4,20,255,1,imageType);
+		alg = new DetectChessCalibrationPoints<T,D>(numCols,numRows,4,-1,1,imageType);
 	}
 
 	@Override
@@ -161,10 +162,7 @@ public class DetectCalibrationChessApp<T extends ImageSingleBand, D extends Imag
 				break;
 
 			case 2:
-				DetectQuadBlobsBinary detectBlobs = alg.getFindBound().getDetectBlobs();
-
-				int numLabels = detectBlobs.getNumLabels();
-				VisualizeBinaryData.renderLabeled(detectBlobs.getLabeledImage(),numLabels,workImage);
+				renderClusters();
 				break;
 
 			case 3:
@@ -205,6 +203,22 @@ public class DetectCalibrationChessApp<T extends ImageSingleBand, D extends Imag
 		gui.repaint();
 
 		processed = true;
+	}
+
+	private void renderClusters() {
+		DetectQuadBlobsBinary detectBlobs = alg.getFindBound().getDetectBlobs();
+
+		int numLabels = detectBlobs.getNumLabels();
+		VisualizeBinaryData.renderLabeled(detectBlobs.getLabeledImage(), numLabels, workImage);
+
+		// put a mark in the center of blobs that were declared as being valid
+		Graphics2D g2 = workImage.createGraphics();
+		for( QuadBlob b : detectBlobs.getDetected() ) {
+			g2.setColor(Color.BLACK);
+			g2.fillOval(b.center.x - 2, b.center.y - 2, 5, 5);
+			g2.setColor(Color.CYAN);
+			g2.fillOval(b.center.x-1,b.center.y-1,3,3);
+		}
 	}
 
 	public static void drawNumbers( Graphics2D g2 , java.util.List<Point2D_F64> foundTarget , double scale ) {

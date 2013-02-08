@@ -31,6 +31,7 @@ Version : Alpha 0.13
   * Made minimum blob automatically adjust to image size
   * Made it user configurable
   * These changes allow calibration of 320x240 images
+  * Fixed multiple bugs/issues so that it detects targets more reliably
 - PerspectiveOps.scaleIntrinsic() changes image width/height
 - Improved unit tests for MultiSpectral images
 - ImageConvert

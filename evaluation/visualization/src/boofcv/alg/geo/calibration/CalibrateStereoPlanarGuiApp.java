@@ -18,6 +18,7 @@
 
 package boofcv.alg.geo.calibration;
 
+import boofcv.abst.calib.ConfigChessboard;
 import boofcv.abst.calib.PlanarCalibrationDetector;
 import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.geo.PerspectiveOps;
@@ -94,6 +95,9 @@ public class CalibrateStereoPlanarGuiApp extends JPanel
 							gui.repaint();
 							monitor.setMessage(0, "Image "+number);
 						}});
+				} else {
+					System.out.println("Feature detection failed in:");
+					System.out.println(leftImages.get(i)+" and/or "+rightImages.get(i));
 				}
 			}
 		}
@@ -124,6 +128,7 @@ public class CalibrateStereoPlanarGuiApp extends JPanel
 
 		monitor.stopThread();
 
+		calibrator.printStatistics();
 		param.print();
 		if( outputFileName != null )
 			BoofMiscOps.saveXML(param,outputFileName);
@@ -240,14 +245,15 @@ public class CalibrateStereoPlanarGuiApp extends JPanel
 	}
 
 	public static void main( String args[] ) {
-		PlanarCalibrationDetector detector = FactoryPlanarCalibrationTarget.detectorSquareGrid(3,4,1.0);
-//		PlanarCalibrationDetector detector = FactoryPlanarCalibrationTarget.detectorChessboard(3,4,1.0,6);
+//		PlanarCalibrationDetector detector = FactoryPlanarCalibrationTarget.detectorSquareGrid(3,4,1.0,-1);
+		PlanarCalibrationDetector detector = FactoryPlanarCalibrationTarget.
+				detectorChessboard(new ConfigChessboard(3, 4));
 
-		PlanarCalibrationTarget target = FactoryPlanarCalibrationTarget.gridSquare(3,4,30,30);
-//		PlanarCalibrationTarget target = FactoryPlanarCalibrationTarget.gridChess(3, 4, 30);
+//		PlanarCalibrationTarget target = FactoryPlanarCalibrationTarget.gridSquare(3,4,30,30);
+		PlanarCalibrationTarget target = FactoryPlanarCalibrationTarget.gridChess(3, 4, 30);
 
-//		String directory = "../data/evaluation/calibration/stereo/Bumblebee2_Chess";
-		String directory = "../data/evaluation/calibration/stereo/Bumblebee2_Square";
+		String directory = "../data/evaluation/calibration/stereo/Bumblebee2_Chess";
+//		String directory = "../data/evaluation/calibration/stereo/Bumblebee2_Square";
 
 		List<String> leftImages = BoofMiscOps.directoryList(directory, "left");
 		List<String> rightImages = BoofMiscOps.directoryList(directory, "right");

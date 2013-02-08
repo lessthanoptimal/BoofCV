@@ -20,14 +20,13 @@ package boofcv.alg.feature.detect.grid;
 
 import boofcv.alg.feature.detect.quadblob.QuadBlob;
 import boofcv.alg.filter.binary.GThresholdImageOps;
+import boofcv.alg.misc.GImageStatistics;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.ImageRectangle;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageUInt8;
 import georegression.struct.point.Point2D_I32;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -40,19 +39,11 @@ import java.util.List;
  */
 public class AutoThresholdCalibrationGrid {
 
-	// maximum allowed pixel value
-	private double maxValue;
-	// maximum number of thresholds it will test
-	private int maxAttempts;
-
 	// the final threshold it selected
 	private double selectedThreshold;
 
 	// binary image computed from the threshold
 	private ImageUInt8 binary = new ImageUInt8(1,1);
-
-	// history of attempted thresholds
-	private List<Double> attempts = new ArrayList<Double>();
 
 	// pixel values around corners
 	private IntensityHistogram histHighRes = new IntensityHistogram(256,256);
@@ -67,14 +58,11 @@ public class AutoThresholdCalibrationGrid {
 	/**
 	 * Configures auto threshold.
 	 *
-	 * @param maxValue Maximum allowed pixel value. Typically 255
-	 * @param maxAttempts Maximum number of different thresholds it will attempt. Try 20
+	 * @param selectedThreshold Threshold used for computing binary image. If < 0 then mean intensity is used.
 	 */
-	public AutoThresholdCalibrationGrid(double maxValue,
-										int maxAttempts)
+	public AutoThresholdCalibrationGrid(double selectedThreshold )
 	{
-		this.maxValue = maxValue;
-		this.maxAttempts = maxAttempts;
+		this.selectedThreshold = selectedThreshold;
 	}
 
 	/**
@@ -86,26 +74,23 @@ public class AutoThresholdCalibrationGrid {
 	 * @return true if a threshold was successfully found and target detected.
 	 */
 	public boolean process( DetectSquareCalibrationPoints detector , ImageFloat32 gray ) {
-		attempts.clear();
 
 		binary.reshape(gray.width,gray.height);
 
-		// first find a threshold which detects the target
-		for( int i = 0; i < maxAttempts; i++ ) {
-			selectedThreshold = selectNext(attempts,maxValue);
-//			System.out.println("trying a threshold of "+selectedThreshold);
-			
-			GThresholdImageOps.threshold(gray,binary,selectedThreshold,true);
+		double threshold = selectedThreshold;
+		if( threshold < 0 )
+			threshold = GImageStatistics.mean(gray);
 
-			// see if the target was detected
-			if( detector.process(binary) ) {
-				selectedThreshold = refineThreshold(detector.getInterestSquares(),gray);
-				GThresholdImageOps.threshold(gray,binary,selectedThreshold,true);
-				if( !detector.process(binary) ) {
-					throw new RuntimeException("Crap new threshold doesn't work!");
-				}
-				return true;
+		GThresholdImageOps.threshold(gray,binary,threshold,true);
+
+		// see if the target was detected
+		if( detector.process(binary) ) {
+			threshold = refineThreshold(detector.getInterestSquares(),gray);
+			GThresholdImageOps.threshold(gray,binary,threshold,true);
+			if( !detector.process(binary) ) {
+				throw new RuntimeException("Crap new threshold doesn't work!");
 			}
+			return true;
 		}
 
 		return false;
@@ -118,38 +103,6 @@ public class AutoThresholdCalibrationGrid {
 	 */
 	public double getThreshold() {
 		return selectedThreshold;
-	}
-
-	/**
-	 * Select thresholds by doing a binary search.
-	 */
-	public static double selectNext( List<Double> attempts , double maxValue ) {
-		if( attempts.size() == 0 ) {
-			attempts.add(maxValue/2.0);
-			return maxValue/2.0;
-		}
-
-		Collections.sort(attempts);
-		
-		double largestGap = 0;
-		double largestStart = 0;
-		double prev = 0;
-
-		for (Double v : attempts) {
-			if (v - prev > largestGap) {
-				largestGap = v - prev;
-				largestStart = prev;
-			}
-			prev = v;
-		}
-		if( maxValue-prev>largestGap) {
-			largestGap=maxValue-prev;
-			largestStart=prev;
-		}
-
-		double ret = largestStart + largestGap/2.0;
-		attempts.add(ret);
-		return ret;
 	}
 
 	/**
