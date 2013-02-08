@@ -76,7 +76,7 @@ public class DetectCalibrationSquaresApp
 	BufferedImage input;
 
 	// used to automatically select the threshold
-	AutoThresholdCalibrationGrid auto = new AutoThresholdCalibrationGrid(255,20);
+	AutoThresholdCalibrationGrid auto = new AutoThresholdCalibrationGrid(-1);
 
 	// if a target was found or not
 	boolean foundTarget;

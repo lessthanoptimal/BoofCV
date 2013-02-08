@@ -63,7 +63,7 @@ public class TestAutoThresholdCalibrationGrid {
 		ImageMiscOps.addGaussian(gray,rand,0.5,0,255);
 
 
-		AutoThresholdCalibrationGrid alg = new AutoThresholdCalibrationGrid(255,20);
+		AutoThresholdCalibrationGrid alg = new AutoThresholdCalibrationGrid(-1);
 		DetectSquareCalibrationPoints detector = new DetectSquareCalibrationPoints(100,1.0,3,4);
 		assertTrue(alg.process(detector, gray));
 

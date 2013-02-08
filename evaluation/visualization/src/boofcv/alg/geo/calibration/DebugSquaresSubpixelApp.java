@@ -54,7 +54,7 @@ public class DebugSquaresSubpixelApp
 
 	// detects the calibration target
 	DetectSquareCalibrationPoints detectAlg;
-	AutoThresholdCalibrationGrid auto = new AutoThresholdCalibrationGrid(255,20);
+	AutoThresholdCalibrationGrid auto = new AutoThresholdCalibrationGrid(-1);
 
 	// refines the initial corner estimate
 	RefineCalibrationGridCorner refineAlg;

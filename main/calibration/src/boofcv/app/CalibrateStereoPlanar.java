@@ -197,4 +197,11 @@ public class CalibrateStereoPlanar {
 	public boolean isConvertToRightHanded() {
 		return calibLeft.isFlipY();
 	}
+
+	public void printStatistics() {
+		System.out.println("********** LEFT ************");
+		calibLeft.printStatistics();
+		System.out.println("********** RIGHT ************");
+		calibRight.printStatistics();
+	}
 }

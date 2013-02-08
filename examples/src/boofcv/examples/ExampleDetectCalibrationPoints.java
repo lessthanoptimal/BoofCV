@@ -18,6 +18,7 @@
 
 package boofcv.examples;
 
+import boofcv.abst.calib.ConfigChessboard;
 import boofcv.abst.calib.PlanarCalibrationDetector;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.factory.calib.FactoryPlanarCalibrationTarget;
@@ -55,7 +56,7 @@ public class ExampleDetectCalibrationPoints {
 
 		// For chessboard targets, tune RADIUS parameter for your images
 //		detector = FactoryPlanarCalibrationTarget.detectorSquareGrid( 3, 4);
-		detector = FactoryPlanarCalibrationTarget.detectorChessboard( 3, 4, 1, 6);
+		detector = FactoryPlanarCalibrationTarget.detectorChessboard( new ConfigChessboard(3,4));
 
 		// process the image and check for failure condition
 		if( !detector.process(input) )

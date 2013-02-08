@@ -33,9 +33,10 @@ public class WrapPlanarChessTarget implements PlanarCalibrationDetector {
 
 	DetectChessCalibrationPoints<ImageFloat32,ImageFloat32> alg;
 
-	public WrapPlanarChessTarget(int numColSquares, int numRowSquares, double relativeSizeThreshold, int featureRadius) {
-		alg = new DetectChessCalibrationPoints<ImageFloat32, ImageFloat32>(numColSquares,numRowSquares,
-				featureRadius,20,255,relativeSizeThreshold,ImageFloat32.class);
+	public WrapPlanarChessTarget(ConfigChessboard config ) {
+		alg = new DetectChessCalibrationPoints<ImageFloat32, ImageFloat32>(
+				config.numCols,config.numRows,config.nonmaxRadius,config.binaryThreshold,
+				config.relativeSizeThreshold,ImageFloat32.class);
 	}
 
 	@Override
@@ -47,5 +48,9 @@ public class WrapPlanarChessTarget implements PlanarCalibrationDetector {
 	public List<Point2D_F64> getPoints() {
 		// points should be at sub-pixel accuracy and in the correct orientation
 		return alg.getPoints();
+	}
+
+	public DetectChessCalibrationPoints<ImageFloat32, ImageFloat32> getAlg() {
+		return alg;
 	}
 }

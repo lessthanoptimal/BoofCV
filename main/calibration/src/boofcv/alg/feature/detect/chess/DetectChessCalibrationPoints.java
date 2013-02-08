@@ -28,6 +28,8 @@ import boofcv.alg.feature.detect.quadblob.OrderPointsIntoGrid;
 import boofcv.alg.filter.binary.BinaryImageOps;
 import boofcv.alg.filter.binary.GThresholdImageOps;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
+import boofcv.alg.misc.GImageStatistics;
+import boofcv.alg.misc.ImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.core.image.border.BorderType;
 import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
@@ -49,8 +51,6 @@ import org.ddogleg.sorting.QuickSort_F64;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-
-import static boofcv.alg.feature.detect.grid.AutoThresholdCalibrationGrid.selectNext;
 
 /**
  * <p>
@@ -86,11 +86,7 @@ public class DetectChessCalibrationPoints<T extends ImageSingleBand, D extends I
 	private ImageUInt8 binary = new ImageUInt8(1, 1);
 	private ImageUInt8 eroded = new ImageUInt8(1, 1);
 	// number of attempts it will make to find the chessboard
-	private int maxAttempts;
 	private double selectedThreshold;
-	private List<Double> thresholdAttempts = new ArrayList<Double>();
-	// maximum pixel intensity value
-	private double maxPixelValue;
 	// relative blob size threshold.  Adjusted relative to image size.  Small objects are pruned
 	private double relativeSizeThreshold;
 
@@ -110,6 +106,11 @@ public class DetectChessCalibrationPoints<T extends ImageSingleBand, D extends I
 	// puts points into the correct order
 	private OrderPointsIntoGrid orderAlg = new OrderPointsIntoGrid();
 
+	// true if it found the rectangular bound
+	private boolean foundBound;
+
+	// Found candidate calibration points
+	List<Point2D_F64> points;
 
 	/**
 	 * Configures detection parameters
@@ -117,13 +118,12 @@ public class DetectChessCalibrationPoints<T extends ImageSingleBand, D extends I
 	 * @param numCols       Number of columns in square block grid.  Target dependent.
 	 * @param numRows       Number of rows in square block grid.  Target dependent.
 	 * @param radius        Side of interest point detection region.  Typically 5
-	 * @param maxAttempts   Maximum number of different threshold it will try to detect the image
-	 * @param maxPixelValue Maximum pixel intensity value.  Almost always 255
+	 * @param threshold		Threshold for computing binary image.  If < 0 then the mean intensity will be used.
 	 * @param relativeSizeThreshold Increases or decreases the minimum allowed blob size. Try 1.0
 	 * @param imageType     Type of image being processed
 	 */
 	public DetectChessCalibrationPoints(int numCols, int numRows, int radius,
-										int maxAttempts, double maxPixelValue,
+										double threshold,
 										double relativeSizeThreshold ,
 										Class<T> imageType) {
 		Class<D> derivType = GImageDerivativeOps.getDerivativeType(imageType);
@@ -134,8 +134,7 @@ public class DetectChessCalibrationPoints<T extends ImageSingleBand, D extends I
 		this.numColsPoints = 2 * (numCols - 1);
 		this.numRowsPoints = 2 * (numRows - 1);
 
-		this.maxAttempts = maxAttempts;
-		this.maxPixelValue = maxPixelValue;
+		this.selectedThreshold = threshold;
 
 		expectedPoints = numColsPoints * numRowsPoints;
 
@@ -169,7 +168,7 @@ public class DetectChessCalibrationPoints<T extends ImageSingleBand, D extends I
 		adjustForImageSize(gray.width,gray.height);
 
 		// detect the chess board
-		if (!detectChessBoard(gray))
+		if (!(foundBound = detectChessBoard(gray)))
 			return false;
 
 		List<Point2D_F64> boundary = findBound.getBoundingQuad();
@@ -207,10 +206,16 @@ public class DetectChessCalibrationPoints<T extends ImageSingleBand, D extends I
 		for (Point2D_F64 p : points)
 			subpixel.add(refineSubpixel(p, targetRect.x0, targetRect.y0, intensityAlg.getIntensity()));
 
-		orderAlg.process(subpixel);
+		try {
+			orderAlg.process(subpixel);
+		} catch( InvalidCalibrationTarget e ) {
+			System.err.println(e.getMessage());
+			return false;
+		}
 
 		if (numColsPoints * numRowsPoints != orderAlg.getNumCols() * orderAlg.getNumRows())
-			throw new InvalidCalibrationTarget("Unexpected grid size");
+			return false;
+//			throw new InvalidCalibrationTarget("Unexpected grid size");
 
 		subpixel = UtilCalibrationGrid.rotatePoints(orderAlg.getOrdered(),
 				orderAlg.getNumRows(), orderAlg.getNumCols(),
@@ -223,36 +228,28 @@ public class DetectChessCalibrationPoints<T extends ImageSingleBand, D extends I
 	 * Adjust image processing parameters for the input image size
 	 */
 	private void adjustForImageSize( int imgWidth , int imgHeight ) {
-		int size = (int)(relativeSizeThreshold*80.0/640.0*imgWidth);
+		int size = (int)(relativeSizeThreshold*60.0/640.0*imgWidth);
 
 		findBound.setMinimumContourSize(size);
 	}
 
 	/**
-	 * Tests several different thresholds while attempting to detect a calibration grid in the image
+	 * Threshold the image and find squares
 	 */
 	private boolean detectChessBoard(T gray) {
-		thresholdAttempts.clear();
 
-		// if it previously found a target use that threshold
-		if( selectedThreshold == -1 )
-			selectedThreshold = selectNext(thresholdAttempts, maxPixelValue);
-		else
-			thresholdAttempts.add(selectedThreshold);
+		double threshold = selectedThreshold;
+		if( threshold < 0 )
+			threshold = GImageStatistics.mean(gray);
 
-		for (int i = 0; i < maxAttempts; i++) {
-			GThresholdImageOps.threshold(gray, binary, selectedThreshold, true);
+		GThresholdImageOps.threshold(gray, binary, threshold, true);
 
-			// erode to make the squares separated
-			BinaryImageOps.erode8(binary, eroded);
+		// erode to make the squares separated
+		BinaryImageOps.erode8(binary, eroded);
 
-			if (findBound.process(eroded))
-				return true;
+		if (findBound.process(eroded))
+			return true;
 
-			selectedThreshold = selectNext(thresholdAttempts, maxPixelValue);
-		}
-
-		selectedThreshold = -1;
 		return false;
 	}
 
@@ -420,10 +417,13 @@ public class DetectChessCalibrationPoints<T extends ImageSingleBand, D extends I
 	 * @param wholeImage Image being written to
 	 */
 	public void renderIntensity(ImageFloat32 wholeImage) {
-		ImageFloat32 found = intensityAlg.getIntensity();
-		ImageFloat32 out = wholeImage.subimage(targetRect.x0, targetRect.y0, targetRect.x1, targetRect.y1);
-
-		out.setTo(found);
+		if( targetRect == null ) {
+			ImageMiscOps.fill(wholeImage,0);
+		} else {
+			ImageFloat32 found = intensityAlg.getIntensity();
+			ImageFloat32 out = wholeImage.subimage(targetRect.x0, targetRect.y0, targetRect.x1, targetRect.y1);
+			out.setTo(found);
+		}
 	}
 
 	public DetectChessSquaresBinary getFindBound() {
@@ -440,5 +440,24 @@ public class DetectChessCalibrationPoints<T extends ImageSingleBand, D extends I
 
 	public double getSelectedThreshold() {
 		return selectedThreshold;
+	}
+
+	public boolean isFoundBound() {
+		return foundBound;
+	}
+
+	public List<Point2D_F64> detectedPointFeatures() {
+
+		List<Point2D_F64> ret = new ArrayList<Point2D_F64>();
+
+		int offX = targetRect.x0, offY = targetRect.y0;
+		QueueCorner found = detectorAlg.getMaximums();
+
+		for( int i = 0; i < found.size; i++ ) {
+			Point2D_I16 c = found.get(i);
+			ret.add(new Point2D_F64(offX + c.x , offY + c.y) );
+		}
+
+		return ret;
 	}
 }
