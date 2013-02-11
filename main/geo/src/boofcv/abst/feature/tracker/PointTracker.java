@@ -37,14 +37,14 @@ import java.util.List;
  * <p>
  *
  * <p>
- * TRACK MAINTENANCE: Implementors of this interface should not automatically drop tracks or perform other forms of
+ * TRACK MAINTENANCE: Implementations of this interface should not automatically drop tracks or perform other forms of
  * track maintenance unless the feature is hopelessly lost and can no longer be tracked.  It is the responsibility
  * of the user to drop tracks which are inactive for an excessive amount of time.  New tracks should never be spawned
  * unless specifically requested by the user.
  * </p>
  *
  * <p>
- * TRACK MEMORY: Implementators of this interface must recycle tracks.  After a track has been dropped, either by
+ * TRACK MEMORY: Implementations of this interface must recycle tracks.  After a track has been dropped, either by
  * the user or automatically, the reference should be saved and the user provided cookie
  * left unmodified.  When a new track is added the track information should be updated and the
  * cookie left unmodified again.  The intended purpose of this requirement is to reduce the

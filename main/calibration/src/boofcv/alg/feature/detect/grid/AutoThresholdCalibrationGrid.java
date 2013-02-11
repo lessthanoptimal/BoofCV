@@ -39,8 +39,10 @@ import java.util.List;
  */
 public class AutoThresholdCalibrationGrid {
 
-	// the final threshold it selected
-	private double selectedThreshold;
+	// Initial threshold specified by the user
+	private double initialThreshold;
+	// The refined threshold
+	private double refinedThreshold;
 
 	// binary image computed from the threshold
 	private ImageUInt8 binary = new ImageUInt8(1,1);
@@ -58,11 +60,11 @@ public class AutoThresholdCalibrationGrid {
 	/**
 	 * Configures auto threshold.
 	 *
-	 * @param selectedThreshold Threshold used for computing binary image. If < 0 then mean intensity is used.
+	 * @param initialThreshold Threshold used for computing binary image. If < 0 then mean intensity is used.
 	 */
-	public AutoThresholdCalibrationGrid(double selectedThreshold )
+	public AutoThresholdCalibrationGrid(double initialThreshold)
 	{
-		this.selectedThreshold = selectedThreshold;
+		this.initialThreshold = initialThreshold;
 	}
 
 	/**
@@ -77,7 +79,7 @@ public class AutoThresholdCalibrationGrid {
 
 		binary.reshape(gray.width,gray.height);
 
-		double threshold = selectedThreshold;
+		double threshold = initialThreshold;
 		if( threshold < 0 )
 			threshold = GImageStatistics.mean(gray);
 
@@ -85,7 +87,7 @@ public class AutoThresholdCalibrationGrid {
 
 		// see if the target was detected
 		if( detector.process(binary) ) {
-			threshold = refineThreshold(detector.getInterestSquares(),gray);
+			refinedThreshold = refineThreshold(detector.getInterestSquares(),gray);
 			GThresholdImageOps.threshold(gray,binary,threshold,true);
 			if( !detector.process(binary) ) {
 				throw new RuntimeException("Crap new threshold doesn't work!");
@@ -102,7 +104,7 @@ public class AutoThresholdCalibrationGrid {
 	 * @return threshold
 	 */
 	public double getThreshold() {
-		return selectedThreshold;
+		return refinedThreshold;
 	}
 
 	/**

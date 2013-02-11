@@ -40,14 +40,28 @@ import org.ddogleg.fitting.modelset.ModelFitter;
 import org.ddogleg.fitting.modelset.ModelMatcher;
 
 /**
+ * Stereo visual odometry algorithm which associates image features across two stereo pairs for a total of four images.
+ * Image features are first matched between left and right images while applying epipolar constraints.  Then the two
+ * more recent sets of stereo  images are associated with each other in a left to left and right to right fashion.
+ * Features which are consistently matched across all four images are saved in a list.  RANSAC is then used to
+ * remove false positives and estimate camera motion using a
+ * {@link boofcv.abst.geo.Estimate1ofPnP PnP} type algorithm.
+ *
+ * Motion is estimated using PNP algorithms.  These require that each image feature as its 3D coordinate estimated.
+ * After a feature is associated between a stereo pair its 3D location is also estimated using triangulation.  Iterative
+ * refinement can then be applied after motion has been estimated.
+ *
+ * Inside the code each camera is some times referred to by number. 0 = left camera previous frame. 1 = right
+ * camera previous frame. 2 = left camera current frame. 3 = right camera current frame.
+ *
+ * Estimated motion is relative to left camera.
+ *
  * @author Peter Abeles
  */
-// TODO add a second pass option
-// TODO add bundle adjustment
-// TODO Show right camera tracks in debugger
 public class VisOdomQuadPnP<T extends ImageSingleBand,TD extends TupleDesc> {
 
-	TriangulateTwoViewsCalibrated triangulate;
+	// used to estimate each feature's 3D location using a stereo pair
+	private TriangulateTwoViewsCalibrated triangulate;
 
 	// computes camera motion
 	private ModelMatcher<Se3_F64, Stereo2D3D> matcher;
@@ -56,21 +70,23 @@ public class VisOdomQuadPnP<T extends ImageSingleBand,TD extends TupleDesc> {
 	private FastQueue<Stereo2D3D> modelFitData = new FastQueue<Stereo2D3D>(10,Stereo2D3D.class,true);
 
 	// Detects feature inside the image
-	DetectDescribeMulti<T,TD> detector;
+	private DetectDescribeMulti<T,TD> detector;
 	// Associates feature between the same camera
-	AssociateDescription2D<TD> assocSame;
+	private AssociateDescription2D<TD> assocSame;
 	// Associates features from left to right camera
-	AssociateDescription2D<TD> assocL2R;
+	private AssociateDescription2D<TD> assocL2R;
 
-	FastQueue<QuadView> quadViews = new FastQueue<QuadView>(10,QuadView.class,true);
+	// Set of associated features across all views
+	private FastQueue<QuadView> quadViews = new FastQueue<QuadView>(10,QuadView.class,true);
 
-	ImageInfo<TD> featsLeft0,featsLeft1;
-	ImageInfo<TD> featsRight0,featsRight1;
-	ImageInfo<TD> featsTmp0, featsTmp1;
-	SetMatches setMatches[];
+	// features info extracted from the stereo pairs. 0 = previous 1 = current
+	private ImageInfo<TD> featsLeft0,featsLeft1;
+	private ImageInfo<TD> featsRight0,featsRight1;
+	// Matched features between all four images.  One set of matches for each type of detected feature
+	private SetMatches setMatches[];
 
 	// stereo baseline going from left to right
-	Se3_F64 leftToRight = new Se3_F64();
+	private Se3_F64 leftToRight = new Se3_F64();
 
 	// convert for original image pixels into normalized image coordinates
 	private PointTransform_F64 leftImageToNorm;
@@ -85,11 +101,22 @@ public class VisOdomQuadPnP<T extends ImageSingleBand,TD extends TupleDesc> {
 	// is this the first frame
 	private boolean first = true;
 
-	boolean usedLeft[] = new boolean[ 1 ];
-	boolean usedRight[] = new boolean[ 1];
-	int oldToNewLeft[] = new int[ 1 ];
-	int oldToNewRight[] = new int[ 1 ];
+	// used to indicate which image features are being used
+	private boolean usedLeft[] = new boolean[ 1 ];
+	private boolean usedRight[] = new boolean[ 1];
+	private int oldToNewLeft[] = new int[ 1 ];
+	private int oldToNewRight[] = new int[ 1 ];
 
+	/**
+	 * Specifies internal algorithms
+	 *
+	 * @param detector Estimates image features
+	 * @param assocSame Association algorithm used for left to left and right to right
+	 * @param assocL2R Assocation algorithm used for left to right
+	 * @param triangulate Used to estimate 3D location of a feature using stereo correspondence
+	 * @param matcher Robust model estimation.  Often RANSAC
+	 * @param modelRefiner Non-linear refinement of motion estimation
+	 */
 	public VisOdomQuadPnP(DetectDescribeMulti<T,TD> detector,
 						  AssociateDescription2D<TD> assocSame , AssociateDescription2D<TD> assocL2R ,
 						  TriangulateTwoViewsCalibrated triangulate,
@@ -136,6 +163,12 @@ public class VisOdomQuadPnP<T extends ImageSingleBand,TD extends TupleDesc> {
 		first = true;
 	}
 
+	/**
+	 * Estimates camera egomotion from the stereo pair
+	 * @param left Image from left camera
+	 * @param right Image from right camera
+	 * @return true if motion was estimated and false if not
+	 */
 	public boolean process( T left , T right ) {
 
 		if( first ) {
@@ -160,6 +193,12 @@ public class VisOdomQuadPnP<T extends ImageSingleBand,TD extends TupleDesc> {
 		return true;
 	}
 
+	/**
+	 * Associates image features from the left and right camera together while applying epipolar constraints.
+	 *
+	 * @param left Image from left camera
+	 * @param right Image from right camera
+	 */
 	private void associateL2R( T left , T right ) {
 		// make the previous new observations into the new old ones
 		ImageInfo<TD> tmp = featsLeft1;
@@ -176,6 +215,7 @@ public class VisOdomQuadPnP<T extends ImageSingleBand,TD extends TupleDesc> {
 		describeImage(right,featsRight1);
 //		long time1 = System.currentTimeMillis();
 
+		// detect and associate features in the current stereo pair
 		for( int i = 0; i < detector.getNumberOfSets(); i++ ) {
 			SetMatches matches = setMatches[i];
 			matches.swap();
@@ -253,6 +293,9 @@ public class VisOdomQuadPnP<T extends ImageSingleBand,TD extends TupleDesc> {
 		loc.size = desc.size = count;
 	}
 
+	/**
+	 * Associates images between left and left and right and right images
+	 */
 	private void associateF2F()
 	{
 		quadViews.reset();
@@ -330,7 +373,9 @@ public class VisOdomQuadPnP<T extends ImageSingleBand,TD extends TupleDesc> {
 		}
 	}
 
-
+	/**
+	 * Computes image features and stores the results in info
+	 */
 	private void describeImage(T left , ImageInfo<TD> info ) {
 		detector.process(left);
 		for( int i = 0; i < detector.getNumberOfSets(); i++ ) {
@@ -345,6 +390,10 @@ public class VisOdomQuadPnP<T extends ImageSingleBand,TD extends TupleDesc> {
 		}
 	}
 
+	/**
+	 * Estimates camera egomotion between the two most recent image frames
+	 * @return
+	 */
 	private boolean estimateMotion() {
 		modelFitData.reset();
 
@@ -417,6 +466,9 @@ public class VisOdomQuadPnP<T extends ImageSingleBand,TD extends TupleDesc> {
 		return leftCamToWorld;
 	}
 
+	/**
+	 * Storage for detected features inside an image
+	 */
 	public static class ImageInfo<TD extends TupleDesc>
 	{
 		FastQueue<Point2D_F64> location[];
@@ -440,10 +492,17 @@ public class VisOdomQuadPnP<T extends ImageSingleBand,TD extends TupleDesc> {
 		}
 	}
 
+	/**
+	 * Correspondences between images
+	 */
 	public static class SetMatches {
+		// previous left to previous right
 		GrowQueue_I32 match0to1 = new GrowQueue_I32(10);
+		// previous left to current left
 		GrowQueue_I32 match0to2 = new GrowQueue_I32(10);
+		// current left to current right
 		GrowQueue_I32 match2to3 = new GrowQueue_I32(10);
+		// previous right to current right
 		GrowQueue_I32 match1to3 = new GrowQueue_I32(10);
 
 		public void swap() {
@@ -462,6 +521,9 @@ public class VisOdomQuadPnP<T extends ImageSingleBand,TD extends TupleDesc> {
 		}
 	}
 
+	/**
+	 * 3D coordinate of the feature and its observed location in each image
+	 */
 	public static class QuadView
 	{
 		// 3D coordinate in old camera view

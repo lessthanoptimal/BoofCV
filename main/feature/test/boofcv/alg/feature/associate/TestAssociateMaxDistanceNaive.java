@@ -29,7 +29,7 @@ import static org.junit.Assert.assertEquals;
  * @author Peter Abeles
  */
 @SuppressWarnings("unchecked")
-public class TestAssociateMaxDistance {
+public class TestAssociateMaxDistanceNaive {
 
 	Random rand = new Random(234);
 

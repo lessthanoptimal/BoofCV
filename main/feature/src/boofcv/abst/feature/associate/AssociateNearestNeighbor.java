@@ -44,23 +44,26 @@ public class AssociateNearestNeighbor<D extends TupleDesc_F64>
 		implements AssociateDescription<D>
 {
 	// Nearest Neighbor algorithm and storage for the results
-	NearestNeighbor<Integer> alg;
-	NnData<Integer> result = new NnData<Integer>();
+	private NearestNeighbor<Integer> alg;
+	private NnData<Integer> result = new NnData<Integer>();
 
 	// list of features in destination set that are to be searched for in the source list
-	FastQueue<D> listDst;
+	private FastQueue<D> listDst;
 
 	// List of indexes.  Passed in as data associated with source points
-	FastQueue<Integer> indexes = new FastQueue<Integer>(0,Integer.class,false);
+	private FastQueue<Integer> indexes = new FastQueue<Integer>(0,Integer.class,false);
 
 	// storage for source points
-	List<double[]> src = new ArrayList<double[]>();
+	private List<double[]> src = new ArrayList<double[]>();
 
 	// List of final associated points
-	FastQueue<AssociatedIndex> matches = new FastQueue<AssociatedIndex>(100,AssociatedIndex.class,true);
+	private FastQueue<AssociatedIndex> matches = new FastQueue<AssociatedIndex>(100,AssociatedIndex.class,true);
 
 	// creates a list of unassociated features from the list of matches
-	FindUnassociated unassociated = new FindUnassociated();
+	private FindUnassociated unassociated = new FindUnassociated();
+
+	// maximum distance away two points can be
+	private double maxDistance = -1;
 
 	public AssociateNearestNeighbor(NearestNeighbor<Integer> alg , int featureDimension ) {
 		this.alg = alg;
@@ -101,7 +104,7 @@ public class AssociateNearestNeighbor<D extends TupleDesc_F64>
 
 		matches.reset();
 		for( int i = 0; i < listDst.size; i++ ) {
-			if( !alg.findNearest(listDst.data[i].value,-1,result) )
+			if( !alg.findNearest(listDst.data[i].value,maxDistance,result) )
 				continue;
 			// get the index of the source feature
 			int indexSrc = result.data;
@@ -127,7 +130,7 @@ public class AssociateNearestNeighbor<D extends TupleDesc_F64>
 
 	@Override
 	public void setThreshold(double score) {
-		throw new RuntimeException("Not supported yet");
+		this.maxDistance = score;
 	}
 
 	@Override

@@ -44,15 +44,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * Stereo visual odometry algorithm which relies on tracking features independently in the left and right images
+ * and then matching those tracks together.  The idea behind this tracker is that the expensive task of association
+ * features between left and right cameras only needs to be done once eat time a track is spawned.  Triangulation
+ * is used to estimate each feature's 3D location.  Motion is estimated robustly using a RANSAC type algorithm
+ * provided by the user which internally uses {@link boofcv.abst.geo.Estimate1ofPnP PnP} type algorithm.
+ *
+ * Estimated motion is relative to left camera.
+ *
  * @author Peter Abeles
  */
-// TODO add a second pass option
-// TODO add bundle adjustment
-// TODO Show right camera tracks in debugger
 public class VisOdomDualTrackPnP<T extends ImageSingleBand,Desc extends TupleDesc> {
-
-	// TODO Listener for stereo parameter change
-	// TODO debugging code.  Check for unique features src/dst
 
 	// when the inlier set is less than this number new features are detected
 	private int thresholdAdd;
@@ -70,18 +72,22 @@ public class VisOdomDualTrackPnP<T extends ImageSingleBand,Desc extends TupleDes
 	private ExtractTrackDescription<Desc> extractLeft;
 	private ExtractTrackDescription<Desc> extractRight;
 
-	FastQueue<Point2D_F64> pointsLeft = new FastQueue<Point2D_F64>(Point2D_F64.class,false);
-	FastQueue<Point2D_F64> pointsRight = new FastQueue<Point2D_F64>(Point2D_F64.class,false);
-	FastQueue<Desc> descLeft,descRight;
+	// Data structures used when associating left and right cameras
+	private FastQueue<Point2D_F64> pointsLeft = new FastQueue<Point2D_F64>(Point2D_F64.class,false);
+	private FastQueue<Point2D_F64> pointsRight = new FastQueue<Point2D_F64>(Point2D_F64.class,false);
+	private FastQueue<Desc> descLeft,descRight;
 
-	AssociateDescription2D<Desc> assocL2R;
-	TriangulateTwoViewsCalibrated triangulate;
+	// matches features between left and right images
+	private AssociateDescription2D<Desc> assocL2R;
+	// Estimates the 3D coordinate of a feature
+	private TriangulateTwoViewsCalibrated triangulate;
 
 	// convert for original image pixels into normalized image coordinates
 	private PointTransform_F64 leftImageToNorm;
 	private PointTransform_F64 rightImageToNorm;
 
-	StereoConsistencyCheck stereoCheck;
+	// Ensures that the epipolar constraint still applies to the tracks
+	private StereoConsistencyCheck stereoCheck;
 
 	// known stereo baseline
 	private Se3_F64 leftToRight = new Se3_F64();
@@ -101,6 +107,19 @@ public class VisOdomDualTrackPnP<T extends ImageSingleBand,Desc extends TupleDes
 	// is this the first frame
 	private boolean first = true;
 
+	/**
+	 * Specifies internal algorithms and parameters
+	 *
+	 * @param thresholdAdd When the number of inliers is below this number new features are detected
+	 * @param thresholdRetire When a feature has not been in the inlier list for this many ticks it is dropped
+	 * @param epilolarTol Tolerance in pixels for enforcing the epipolar constraint
+	 * @param trackerLeft Tracker used for left camera
+	 * @param trackerRight Tracker used for right camera
+	 * @param assocL2R Assocation for left to right
+	 * @param triangulate Triangulation for estimating 3D location from stereo pair
+	 * @param matcher Robust motion model estimation with outlier rejection
+	 * @param modelRefiner Non-linear refinement of motion model
+	 */
 	public VisOdomDualTrackPnP(int thresholdAdd, int thresholdRetire, double epilolarTol,
 							   PointTracker<T> trackerLeft, PointTracker<T> trackerRight,
 							   AssociateDescription2D<Desc> assocL2R,
@@ -153,8 +172,15 @@ public class VisOdomDualTrackPnP<T extends ImageSingleBand,Desc extends TupleDes
 		tick = 0;
 	}
 
+	/**
+	 * Updates motion estimate using the stereo pair.
+	 *
+	 * @param left Image from left camera
+	 * @param right Image from right camera
+	 * @return true if motion estimate was updated and false if not
+	 */
 	public boolean process( T left , T right ) {
-		System.out.println("----------- Process --------------");
+//		System.out.println("----------- Process --------------");
 
 		tick++;
 		trackerLeft.process(left);
@@ -183,6 +209,9 @@ public class VisOdomDualTrackPnP<T extends ImageSingleBand,Desc extends TupleDes
 		return true;
 	}
 
+	/**
+	 * Non-linear refinement of motion estimate
+	 */
 	private void refineMotionEstimate() {
 
 		// use observations from the inlier set
@@ -247,7 +276,7 @@ public class VisOdomDualTrackPnP<T extends ImageSingleBand,Desc extends TupleDes
 			info.lastInlier = tick;
 		}
 
-		System.out.println("Inlier set size: "+N);
+//		System.out.println("Inlier set size: "+N);
 
 		return true;
 	}
@@ -285,9 +314,9 @@ public class VisOdomDualTrackPnP<T extends ImageSingleBand,Desc extends TupleDes
 		for( PointTrack left : activeLeft ) {
 			LeftTrackInfo info = left.getCookie();
 
-			if( info == null || info.right == null ) {
-				System.out.println("Oh Crap");
-			}
+//			if( info == null || info.right == null ) {
+//				System.out.println("Oh Crap");
+//			}
 
 			// for each active left track, see if its right track has been marked as active
 			RightTrackInfo infoRight = info.right.getCookie();
@@ -303,9 +332,9 @@ public class VisOdomDualTrackPnP<T extends ImageSingleBand,Desc extends TupleDes
 			mutualActive++;
 		}
 
-		System.out.println("Active Tracks: Left "+trackerLeft.getActiveTracks(null).size()+" right "+
-				trackerRight.getActiveTracks(null).size());
-		System.out.println("Candidates = "+candidates.size()+" mutual active = "+mutualActive);
+//		System.out.println("Active Tracks: Left "+trackerLeft.getActiveTracks(null).size()+" right "+
+//				trackerRight.getActiveTracks(null).size());
+//		System.out.println("Candidates = "+candidates.size()+" mutual active = "+mutualActive);
 	}
 
 
@@ -329,7 +358,7 @@ public class VisOdomDualTrackPnP<T extends ImageSingleBand,Desc extends TupleDes
 				num++;
 			}
 		}
-		System.out.println("  total unused dropped "+num);
+//		System.out.println("  total unused dropped "+num);
 
 		return num;
 	}
@@ -351,6 +380,9 @@ public class VisOdomDualTrackPnP<T extends ImageSingleBand,Desc extends TupleDes
 		concatMotion();
 	}
 
+	/**
+	 * Spawns tracks in each image and associates features together.
+	 */
 	private void addNewTracks() {
 		trackerLeft.spawnTracks();
 		trackerRight.spawnTracks();
@@ -406,6 +438,7 @@ public class VisOdomDualTrackPnP<T extends ImageSingleBand,Desc extends TupleDes
 				// triangulation failed, drop track
 				trackerLeft.dropTrack(trackL);
 				// TODO need way to mark right tracks which are unassociated after this loop
+				throw new RuntimeException("This special case needs to be handled!");
 			}
 		}
 
@@ -422,9 +455,9 @@ public class VisOdomDualTrackPnP<T extends ImageSingleBand,Desc extends TupleDes
 			trackerLeft.dropTrack(newLeft.get(index));
 		}
 
-		System.out.println("Associated: "+matches.size+" new left "+newLeft.size()+" new right "+newRight.size());
-		System.out.println("New Tracks: Total: Left "+trackerLeft.getAllTracks(null).size()+" right "+
-				trackerRight.getAllTracks(null).size());
+//		System.out.println("Associated: "+matches.size+" new left "+newLeft.size()+" new right "+newRight.size());
+//		System.out.println("New Tracks: Total: Left "+trackerLeft.getAllTracks(null).size()+" right "+
+//				trackerRight.getAllTracks(null).size());
 
 //		List<PointTrack> temp = trackerLeft.getActiveTracks(null);
 //		for( PointTrack t : temp ) {

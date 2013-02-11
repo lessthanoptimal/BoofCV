@@ -32,9 +32,9 @@ import boofcv.abst.geo.EstimateNofPnP;
 import boofcv.abst.geo.RefinePnP;
 import boofcv.abst.geo.TriangulateTwoViewsCalibrated;
 import boofcv.abst.sfm.d3.StereoVisualOdometry;
+import boofcv.abst.sfm.d3.WrapVisOdomDualTrackPnP;
 import boofcv.abst.sfm.d3.WrapVisOdomPixelDepthPnP;
 import boofcv.abst.sfm.d3.WrapVisOdomQuadPnP;
-import boofcv.abst.sfm.d3.WrapVisOdomStereoPnP;
 import boofcv.alg.feature.associate.AssociateMaxDistanceNaive;
 import boofcv.alg.feature.associate.AssociateStereo2D;
 import boofcv.alg.geo.DistanceModelMonoPixels;
@@ -63,13 +63,14 @@ import org.ddogleg.fitting.modelset.ransac.Ransac;
  *
  * @author Peter Abeles
  */
-// TODO reduce duplicate code in tracker functions
 public class FactoryVisualOdometry {
 
 	/**
 	 * Stereo visual odometry algorithm which only uses the right camera to estimate a points 3D location.  The camera's
 	 * pose is updated relative to the left camera using PnP algorithms.  See {@link VisOdomPixelDepthPnP} for more
 	 * details.
+	 *
+	 * @see VisOdomPixelDepthPnP
 	 *
 	 * @param thresholdAdd Add new tracks when less than this number are in the inlier set.  Tracker dependent. Set to
 	 *                     a value <= 0 to add features every frame.
@@ -121,14 +122,30 @@ public class FactoryVisualOdometry {
 		return new WrapVisOdomPixelDepthPnP<T,Se3_F64,Point2D3D>(alg,pixelTo3D,distance,imageType);
 	}
 
+	/**
+	 * Creates a stereo visual odometry algorithm that independently tracks features in left and right camera.
+	 *
+	 * @see VisOdomDualTrackPnP
+	 *
+	 * @param thresholdAdd When the number of inliers is below this number new features are detected
+	 * @param thresholdRetire When a feature has not been in the inlier list for this many ticks it is dropped
+	 * @param inlierPixelTol Tolerance in pixels for defining an inlier during robust model matching.  Typically 1.5
+	 * @param epipolarPixelTol Tolerance in pixels for enforcing the epipolar constraint
+	 * @param ransacIterations Number of iterations performed by RANSAC.  Try 300 or more.
+	 * @param refineIterations Number of iterations done during non-linear optimization.  Try 50 or more.
+	 * @param trackerLeft Tracker used for left camera
+	 * @param trackerRight Tracker used for right camera
+	 * @param imageType Type of image being processed
+	 * @return Stereo visual odometry algorithm.
+	 */
 	public static <T extends ImageSingleBand, Desc extends TupleDesc>
-	StereoVisualOdometry<T> stereoFullPnP( int thresholdAdd, int thresholdRetire,
-										   double inlierPixelTol ,
-										   double epipolarPixelTol,
-										   int ransacIterations ,
-										   int refineIterations ,
-										   PointTracker<T> trackerLeft, PointTracker<T> trackerRight,
-										   Class<T> imageType )
+	StereoVisualOdometry<T> stereoDualTrackerPnP(int thresholdAdd, int thresholdRetire,
+												 double inlierPixelTol,
+												 double epipolarPixelTol,
+												 int ransacIterations,
+												 int refineIterations,
+												 PointTracker<T> trackerLeft, PointTracker<T> trackerRight,
+												 Class<T> imageType)
 	{
 		if( !(trackerLeft instanceof ExtractTrackDescription) || !(trackerRight instanceof ExtractTrackDescription) ) {
 			throw new IllegalArgumentException("Both trackers must implement TrackDescription");
@@ -183,9 +200,15 @@ public class FactoryVisualOdometry {
 		VisOdomDualTrackPnP<T,Desc> alg =  new VisOdomDualTrackPnP<T,Desc>(thresholdAdd,thresholdRetire,epipolarPixelTol,
 				trackerLeft,trackerRight,associateUnique,triangulate,motion,refine);
 
-		return new WrapVisOdomStereoPnP<T>(pnpStereo,distanceMono,distanceStereo,associateStereo,alg,refinePnP,imageType);
+		return new WrapVisOdomDualTrackPnP<T>(pnpStereo,distanceMono,distanceStereo,associateStereo,alg,refinePnP,imageType);
 	}
 
+	/**
+	 * Stereo visual odometry which uses the two most recent stereo observations (total of four views) to estimate
+	 * motion.
+	 *
+	 * @see VisOdomQuadPnP
+	 */
 	public static <T extends ImageSingleBand,Desc extends TupleDesc>
 	StereoVisualOdometry<T> stereoQuadPnP( double inlierPixelTol ,
 										   double epipolarPixelTol ,

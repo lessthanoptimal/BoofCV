@@ -20,16 +20,14 @@ package boofcv.alg.sfm.d3;
 
 import org.junit.Test;
 
-import static org.junit.Assert.fail;
-
 /**
  * @author Peter Abeles
  */
-public class TestVisOdomPixelDepthPnP {
+public class TestVisOdomPixelDepthPnP  {
 
 	@Test
 	public void stuff() {
-		fail("Implement");
+		// This is intentionally left blank.  Tests are performed inside the abstract package
 	}
 
 }

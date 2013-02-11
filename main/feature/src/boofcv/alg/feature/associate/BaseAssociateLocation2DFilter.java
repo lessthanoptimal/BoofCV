@@ -28,7 +28,11 @@ import georegression.struct.point.Point2D_F64;
 
 /**
  * Base class for algorithms which consider all possible associations but perform a quick distance calculation
- * to remove unlikely matches before computing the more expensive fit score between two descriptions.
+ * to remove unlikely matches before computing the more expensive fit score between two descriptions.  The
+ * maxDistance is the upper limit and features with a distance greater than maxDistance are rejected.  Maximum
+ * error is exclusive and a match must have an error which is less than the max error.
+ *
+ * By default the max-distance and max error are set to Double.MAX_VALUE.
  *
  * @author Peter Abeles
  */
@@ -37,10 +41,10 @@ public abstract class BaseAssociateLocation2DFilter<D> implements AssociateDescr
 	private ScoreAssociation<D> scoreAssociation;
 
 	// maximum allowed distance from the epipolar line
-	protected double maxDistance;
+	protected double maxDistance = Double.MAX_VALUE;
 
 	// the largest allowed error
-	protected double maxError;
+	protected double maxError = Double.MAX_VALUE;
 
 	// input lists
 	private FastQueue<Point2D_F64> locationSrc;
@@ -55,14 +59,17 @@ public abstract class BaseAssociateLocation2DFilter<D> implements AssociateDescr
 	private FastQueue<AssociatedIndex> matched = new FastQueue<AssociatedIndex>(10,AssociatedIndex.class,true);
 
 	// creates a list of unassociated features from the list of matches
-	FindUnassociated unassociated = new FindUnassociated();
+	private FindUnassociated unassociated = new FindUnassociated();
 
-	boolean backwardsValidation = true;
+	// is backwards validation performed during association?
+	private boolean backwardsValidation = true;
 
 	/**
 	 * Specifies score mechanism
 	 *
 	 * @param scoreAssociation How features are scored.
+	 * @param backwardsValidation Require that matches are mutual in forward/backwards directions
+	 * @param maxError Maximum allowed association error
 	 */
 	protected BaseAssociateLocation2DFilter( ScoreAssociation<D> scoreAssociation ,
 											 boolean backwardsValidation ,
@@ -117,6 +124,7 @@ public abstract class BaseAssociateLocation2DFilter<D> implements AssociateDescr
 			double bestScore = maxError;
 			int bestIndex = -1;
 
+			// find the best match in destination list
 			for( int j = 0; j < locationDst.size(); j++ ) {
 				D d_d = descDst.get(j);
 
@@ -137,34 +145,9 @@ public abstract class BaseAssociateLocation2DFilter<D> implements AssociateDescr
 				continue;
 			}
 
-			if( backwardsValidation ) {
-
-				double bestScoreV = maxError;
-				int bestIndexV = -1;
-
-				D d_forward = descDst.get(bestIndex);
-				setActiveSource(locationDst.get(bestIndex));
-
-				for( int j = 0; j < locationSrc.size(); j++ ) {
-
-					// compute distance between the two features
-					double distance = computeDistanceToSource(locationSrc.get(j));
-					if( distance > maxDistance )
-						continue;
-
-					D d_v = descSrc.get(j);
-
-					double score = scoreAssociation.score(d_forward,d_v);
-					if( score < bestScoreV ) {
-						bestScoreV = score;
-						bestIndexV = j;
-					}
-				}
-
-				if( bestIndexV != i ) {
-					unassociatedSrc.add(i);
-					continue;
-				}
+			if( backwardsValidation &&  !backwardsValidation(i, bestIndex)) {
+				unassociatedSrc.add(i);
+				continue;
 			}
 
 			AssociatedIndex m = matched.grow();
@@ -172,6 +155,39 @@ public abstract class BaseAssociateLocation2DFilter<D> implements AssociateDescr
 			m.dst = bestIndex;
 			m.fitScore = bestScore;
 		}
+	}
+
+	/**
+	 * Finds the best match for an index in destination and sees if it matches the source index
+	 *
+	 * @param indexSrc The index in source being examined
+	 * @param bestIndex Index in dst with the best fit to source
+	 * @return
+	 */
+	private boolean backwardsValidation(int indexSrc, int bestIndex) {
+		double bestScoreV = maxError;
+		int bestIndexV = -1;
+
+		D d_forward = descDst.get(bestIndex);
+		setActiveSource(locationDst.get(bestIndex));
+
+		for( int j = 0; j < locationSrc.size(); j++ ) {
+
+			// compute distance between the two features
+			double distance = computeDistanceToSource(locationSrc.get(j));
+			if( distance > maxDistance )
+				continue;
+
+			D d_v = descSrc.get(j);
+
+			double score = scoreAssociation.score(d_forward,d_v);
+			if( score < bestScoreV ) {
+				bestScoreV = score;
+				bestIndexV = j;
+			}
+		}
+
+		return bestIndexV == indexSrc;
 	}
 
 	@Override

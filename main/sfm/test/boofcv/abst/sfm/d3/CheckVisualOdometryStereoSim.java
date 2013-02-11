@@ -1,0 +1,115 @@
+/*
+ * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ *
+ * This file is part of BoofCV (http://boofcv.org).
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package boofcv.abst.sfm.d3;
+
+import boofcv.core.image.GeneralizedImageOps;
+import boofcv.struct.calib.IntrinsicParameters;
+import boofcv.struct.calib.StereoParameters;
+import boofcv.struct.image.ImageSingleBand;
+import georegression.geometry.RotationMatrixGenerator;
+import georegression.struct.se.Se3_F64;
+import org.ejml.ops.MatrixFeatures;
+import org.junit.Test;
+
+import static org.junit.Assert.assertTrue;
+
+/**
+ * Performs empirical validation of stereo visual odometry algorithms using synthetic images.  Only a crude test
+ *
+ * @author Peter Abeles
+ */
+public abstract class CheckVisualOdometryStereoSim<I extends ImageSingleBand>
+	extends VideoSequenceSimulator<I>
+{
+	StereoParameters param = createStereoParam();
+	StereoVisualOdometry<I> algorithm;
+
+	I left;
+	I right;
+
+	protected int numSquares = 100;
+
+	double tolerance = 0.02;
+
+	public CheckVisualOdometryStereoSim(Class<I> inputType) {
+		super(320, 240, inputType);
+
+		left = GeneralizedImageOps.createSingleBand(inputType,width,height);
+		right = GeneralizedImageOps.createSingleBand(inputType,width,height);
+
+		createSquares(numSquares,1,2);
+	}
+
+	public CheckVisualOdometryStereoSim(Class<I> inputType , double tolerance ) {
+		this(inputType);
+		this.tolerance = tolerance;
+	}
+
+	public void setAlgorithm(StereoVisualOdometry<I> algorithm) {
+		this.algorithm = algorithm;
+	}
+
+	@Test
+	public void moveForward() {
+		algorithm.reset();
+		algorithm.setCalibration(param);
+
+		Se3_F64 worldToLeft = new Se3_F64();
+		Se3_F64 worldToRight = new Se3_F64();
+		Se3_F64 leftToRight = param.getRightToLeft().invert(null);
+
+		for( int i = 0; i < 10; i++ ) {
+			worldToLeft.getT().z = i*0.05;
+
+			worldToLeft.concat(leftToRight,worldToRight);
+
+			// render the images
+			setIntrinsic(param.getLeft());
+			left.setTo(render(worldToLeft));
+			setIntrinsic(param.getRight());
+			right.setTo(render(worldToRight));
+
+			// process the images
+			assertTrue(algorithm.process(left,right));
+
+			// Compare to truth.  Only go for a crude approximation
+			Se3_F64 foundWorldToLeft = algorithm.getLeftToWorld().invert(null);
+
+//			worldToLeft.getT().print();
+//			foundWorldToLeft.getT().print();
+
+			assertTrue(MatrixFeatures.isIdentical(foundWorldToLeft.getR(),worldToLeft.getR(),0.1));
+			assertTrue(foundWorldToLeft.getT().distance(worldToLeft.getT()) < tolerance );
+		}
+	}
+
+
+	public StereoParameters createStereoParam() {
+		StereoParameters ret = new StereoParameters();
+
+		ret.setRightToLeft(new Se3_F64());
+		ret.getRightToLeft().getT().set(-0.2,0.001,-0.012);
+		RotationMatrixGenerator.eulerXYZ(0.001, -0.01, 0.0023, ret.getRightToLeft().getR());
+
+		ret.left = new IntrinsicParameters(200,201,0,width/2,height/2,width,height, false, new double[]{0,0});
+		ret.right = new IntrinsicParameters(199,200,0,width/2+2,height/2-6,width,height, false, new double[]{0,0});
+
+		return ret;
+	}
+}
