@@ -42,7 +42,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class WrapVisOdomStereoPnP<T extends ImageSingleBand>
+public class WrapVisOdomDualTrackPnP<T extends ImageSingleBand>
 		implements StereoVisualOdometry<T>, AccessPointTracks3D
 {
 	RefinePnPStereo refine;
@@ -57,13 +57,13 @@ public class WrapVisOdomStereoPnP<T extends ImageSingleBand>
 
 	boolean error;
 
-	public WrapVisOdomStereoPnP(PnPStereoEstimator pnp,
-								DistanceModelMonoPixels<Se3_F64, Point2D3D> distanceMono,
-								PnPStereoDistanceReprojectionSq distanceStereo,
-								AssociateStereo2D<?> assoc,
-								VisOdomDualTrackPnP<T,?> alg ,
-								RefinePnPStereo refine ,
-								Class<T> imageType ) {
+	public WrapVisOdomDualTrackPnP(PnPStereoEstimator pnp,
+								   DistanceModelMonoPixels<Se3_F64, Point2D3D> distanceMono,
+								   PnPStereoDistanceReprojectionSq distanceStereo,
+								   AssociateStereo2D<?> assoc,
+								   VisOdomDualTrackPnP<T, ?> alg,
+								   RefinePnPStereo refine,
+								   Class<T> imageType) {
 		this.pnp = pnp;
 		this.distanceMono = distanceMono;
 		this.distanceStereo = distanceStereo;

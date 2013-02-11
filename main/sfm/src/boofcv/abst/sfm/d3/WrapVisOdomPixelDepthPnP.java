@@ -50,7 +50,7 @@ public class WrapVisOdomPixelDepthPnP<T extends ImageSingleBand,Model,Info>
 	StereoSparse3D<T> stereo;
 	DistanceModelMonoPixels<Se3_F64,Point2D3D> distance;
 	Class<T> imageType;
-	boolean failed;
+	boolean success;
 
 	List<PointTrack> active = new ArrayList<PointTrack>();
 
@@ -110,17 +110,17 @@ public class WrapVisOdomPixelDepthPnP<T extends ImageSingleBand,Model,Info>
 	@Override
 	public boolean process(T leftImage, T rightImage) {
 		stereo.setImages(leftImage,rightImage);
-		failed = alg.process(leftImage);
+		success = alg.process(leftImage);
 
 		active.clear();
 		alg.getTracker().getActiveTracks(active);
 
-		return failed;
+		return success;
 	}
 
 	@Override
 	public boolean isFault() {
-		return false;
+		return !success;
 	}
 
 	@Override

@@ -321,8 +321,8 @@ public class VisualizeStereoVisualOdometryApp <I extends ImageSingleBand>
 			PointTracker trackerRight = FactoryPointTracker.
 					combined_ST_SURF_KLT(configDetector, 3, new int[]{1, 2, 4, 8}, 100000, null, null, imageType, derivType);
 
-			return FactoryVisualOdometry.stereoFullPnP(90,2,1.5,1.5,200,50,
-					trackerLeft,trackerRight, imageType);
+			return FactoryVisualOdometry.stereoDualTrackerPnP(90, 2, 1.5, 1.5, 200, 50,
+					trackerLeft, trackerRight, imageType);
 		} else if( whichAlg == 4 ) {
 //			GeneralFeatureIntensity intensity =
 //					FactoryIntensityPoint.hessian(HessianBlobIntensity.Type.TRACE,imageType);

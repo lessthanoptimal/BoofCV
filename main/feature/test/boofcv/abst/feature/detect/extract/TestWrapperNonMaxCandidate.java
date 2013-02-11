@@ -33,7 +33,7 @@ public class TestWrapperNonMaxCandidate {
 
 			@Override
 			public NonMaxSuppression createAlg() {
-				return new WrapperNonMaxCandidate(new NonMaxCandidateStrict(),false,true);
+				return new WrapperNonMaxCandidate(new NonMaxCandidateStrict(),true,true);
 			}
 		};
 		checks.testAll();
@@ -45,7 +45,7 @@ public class TestWrapperNonMaxCandidate {
 
 			@Override
 			public NonMaxSuppression createAlg() {
-				return new WrapperNonMaxCandidate(new NonMaxCandidateRelaxed(),false,true);
+				return new WrapperNonMaxCandidate(new NonMaxCandidateRelaxed(),true,true);
 			}
 		};
 		checks.testAll();

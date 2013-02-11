@@ -22,14 +22,36 @@ import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.image.ImageBase;
 
 /**
- * TODO write
- * 
+ * <p>
+ * Stereo visual odometry algorithms that estimate the camera's ego-motion in Euclidean space using a pair of
+ * stereo images.  Camera motion is estimated relative to the first frame in the left camera's point of view.
+ * </p>
+ * <p>
+ * The following is a set of assumptions and behaviors that all implementations of this interface must follow:
+ * <ul>
+ * <li>Stereo images must be captured simultaneously</li>
+ * <li>Cameras must have a global shutter</li>
+ * <li>Calibration parameters can be changed at any time, but must be set at least once before processing an image.</li>
+ * <li>If process returns false then the motion could not be estimated and isFault() should be checked</li>
+ * <li>If isFault() is true then the reset() should be called since it can't estimate motion any more</li>
+ * <li>reset() puts back into its initial state</li>
+ * </ul>
+ * </p>
+ *
+ * <p>
+ * Optional interfaces are provided for accessing internal features.
+ * <ul>
+ *     <li>{@link boofcv.abst.sfm.AccessPointTracks3D}</li>
+ * </ul>
+ * </p>
+ *
  * @author Peter Abeles
  */
-public interface StereoVisualOdometry<T extends ImageBase> extends VisualOdometry{
+public interface StereoVisualOdometry<T extends ImageBase> extends VisualOdometry {
 
 	/**
-	 * Specifies intrinsic and extrinsic parameters for the stereo camera system.
+	 * Specifies intrinsic and extrinsic parameters for the stereo camera system. Can be called
+	 * at any time, but must be called at least once before {@link #process) can be called.
 	 *
 	 * @param parameters stereo calibration
 	 */
@@ -41,12 +63,11 @@ public interface StereoVisualOdometry<T extends ImageBase> extends VisualOdometr
 	public void reset();
 
 	/**
-	 * TODO Update
 	 * Process the new image and update the motion estimate.  The return value must be checked
 	 * to see if the estimate was actually updated.  If false is returned then {@link #isFatal}
 	 * also needs to be checked to see if the pose estimate has been reset.
 	 *
-	 * @return If the motion estimate has been updated or not
+	 * @return true if the motion estimate has been updated and false if not
 	 */
 	public boolean process(T leftImage , T rightImage );
 

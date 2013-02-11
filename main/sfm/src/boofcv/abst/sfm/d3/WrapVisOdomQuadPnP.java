@@ -40,6 +40,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * Wrapper around {@link VisOdomQuadPnP} for {@link StereoVisualOdometry}.
+ *
  * @author Peter Abeles
  */
 public class WrapVisOdomQuadPnP<T extends ImageSingleBand,TD extends TupleDesc>

@@ -18,22 +18,134 @@
 
 package boofcv.alg.feature.associate;
 
+import boofcv.abst.feature.associate.ScoreAssociation;
+import boofcv.struct.FastQueue;
+import boofcv.struct.feature.MatchScoreType;
+import georegression.struct.point.Point2D_F64;
+import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Peter Abeles
  */
 public class TestBaseAssociateLocation2DFilter {
 
+	FastQueue<Point2D_F64> locationSrc = new FastQueue<Point2D_F64>(Point2D_F64.class,false);
+	FastQueue<Integer> descSrc = new FastQueue<Integer>(Integer.class,false);
+	FastQueue<Point2D_F64> locationDst = new FastQueue<Point2D_F64>(Point2D_F64.class,false);
+	FastQueue<Integer> descDst = new FastQueue<Integer>(Integer.class,false);
+
+	@Before
+	public void init() {
+		locationSrc.reset();
+		descSrc.reset();
+		locationDst.reset();
+		descDst.reset();
+	}
+
 	@Test
 	public void checkDistanceFilter() {
-		fail("implement");
+		locationSrc.add( new Point2D_F64(10,10));
+		descSrc.add(20);
+		locationDst.add( new Point2D_F64(10,100));
+		descDst.add(20);
+
+		// first test a positive case where the two are (barely) within tolerance
+		BaseAssociateLocation2DFilter<Integer> alg = new Helper(false,1000);
+		alg.setMaxDistance(90);
+		alg.setSource(locationSrc,descSrc);
+		alg.setDestination(locationDst, descDst);
+
+		alg.associate();
+		assertEquals(1,alg.getMatches().size);
+
+		// now make it outside of the max distance
+		alg.setMaxDistance(80);
+		alg.associate();
+		assertEquals(0,alg.getMatches().size);
+	}
+
+	@Test
+	public void checkMaxError() {
+		locationSrc.add( new Point2D_F64(10,10));
+		descSrc.add(20);
+		locationDst.add( new Point2D_F64(10,10));
+		descDst.add(50);
+
+		// first test a positive case where the two are (barely) within tolerance
+		BaseAssociateLocation2DFilter<Integer> alg = new Helper(false,31);
+		alg.setSource(locationSrc,descSrc);
+		alg.setDestination(locationDst, descDst);
+
+		alg.associate();
+		assertEquals(1,alg.getMatches().size);
+
+		// now make it outside of the max error
+		alg = new Helper(false,20);
+		alg.setSource(locationSrc,descSrc);
+		alg.setDestination(locationDst, descDst);
+		alg.associate();
+		assertEquals(0,alg.getMatches().size);
 	}
 
 	@Test
 	public void checkBackwards() {
-		fail("implement");
+		locationSrc.add( new Point2D_F64(10,10));
+		descSrc.add(20);
+		locationSrc.add( new Point2D_F64(10,20));
+		descSrc.add(60);
+		locationDst.add( new Point2D_F64(10,10));
+		descDst.add(50);
+		locationDst.add( new Point2D_F64(15,10));
+		descDst.add(60);
+
+		// with no backwards validation it should accept the match
+		BaseAssociateLocation2DFilter<Integer> alg = new Helper(false,1000);
+		alg.setSource(locationSrc,descSrc);
+		alg.setDestination(locationDst, descDst);
+
+		alg.associate();
+		assertEquals(2,alg.getMatches().size);
+
+		// with backwards validation it should be rejected
+		alg = new Helper(true,1000);
+		alg.setSource(locationSrc,descSrc);
+		alg.setDestination(locationDst, descDst);
+		alg.associate();
+		assertEquals(1,alg.getMatches().size);
+	}
+
+	private class Helper extends BaseAssociateLocation2DFilter<Integer> {
+
+		Point2D_F64 src;
+
+		protected Helper(boolean backwardsValidation, double maxError) {
+			super(new Score(), backwardsValidation, maxError);
+		}
+
+		@Override
+		protected void setActiveSource(Point2D_F64 p) {
+			this.src = p;
+		}
+
+		@Override
+		protected double computeDistanceToSource(Point2D_F64 p) {
+			return src.distance(p);
+		}
+	}
+
+	private static class Score implements ScoreAssociation<Integer> {
+
+		@Override
+		public double score(Integer a, Integer b) {
+			return Math.abs(a-b);
+		}
+
+		@Override
+		public MatchScoreType getScoreType() {
+			return MatchScoreType.NORM_ERROR;
+		}
 	}
 }
