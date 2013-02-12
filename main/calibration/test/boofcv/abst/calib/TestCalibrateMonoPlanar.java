@@ -16,9 +16,8 @@
  * limitations under the License.
  */
 
-package boofcv.app;
+package boofcv.abst.calib;
 
-import boofcv.abst.calib.PlanarCalibrationDetector;
 import boofcv.alg.geo.calibration.PlanarCalibrationTarget;
 import boofcv.factory.calib.FactoryPlanarCalibrationTarget;
 import boofcv.struct.calib.IntrinsicParameters;

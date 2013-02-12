@@ -12,7 +12,6 @@
     <orderEntry type="module" module-name="BoofCV Feature" />
     <orderEntry type="module" module-name="BoofCV Geometric Vision" />
     <orderEntry type="module" module-name="BoofCV Image Processing" />
-    <orderEntry type="module" module-name="BoofCV IO" />
     <orderEntry type="module" module-name="ejml" />
     <orderEntry type="library" scope="TEST" name="testing" level="project" />
     <orderEntry type="module" module-name="GeoRegression" />
