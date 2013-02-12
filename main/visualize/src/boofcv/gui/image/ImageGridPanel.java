@@ -102,6 +102,10 @@ public class ImageGridPanel extends JPanel {
 		this.images[row*numCols+col] = image;
 	}
 
+	public BufferedImage getImage( int row , int col ) {
+		return images[row*numCols+col];
+	}
+
 	public void setImages( BufferedImage ...images ) {
 		for( int i = 0; i < images.length; i++ ) {
 			this.images[i] = images[i];
