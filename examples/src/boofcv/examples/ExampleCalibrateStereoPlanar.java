@@ -18,11 +18,11 @@
 
 package boofcv.examples;
 
+import boofcv.abst.calib.CalibrateStereoPlanar;
 import boofcv.abst.calib.ConfigChessboard;
 import boofcv.abst.calib.ConfigSquareGrid;
 import boofcv.abst.calib.PlanarCalibrationDetector;
 import boofcv.alg.geo.calibration.PlanarCalibrationTarget;
-import boofcv.app.CalibrateStereoPlanar;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.factory.calib.FactoryPlanarCalibrationTarget;
 import boofcv.io.image.UtilImageIO;

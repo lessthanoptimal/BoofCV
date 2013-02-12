@@ -166,7 +166,6 @@ public class DetectLineHoughPolar<I extends ImageSingleBand, D extends ImageSing
 		alg.transform(binary);
 		FastQueue<LineParametric2D_F32> lines = alg.extractLines();
 
-
 		List<LineParametric2D_F32> ret = new ArrayList<LineParametric2D_F32>();
 		for( int i = 0; i < lines.size; i++ )
 			ret.add(lines.get(i));

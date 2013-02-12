@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.app;
+package boofcv.abst.calib;
 
 /**
  * @author Peter Abeles

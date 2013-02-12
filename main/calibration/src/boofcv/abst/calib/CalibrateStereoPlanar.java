@@ -16,9 +16,8 @@
  * limitations under the License.
  */
 
-package boofcv.app;
+package boofcv.abst.calib;
 
-import boofcv.abst.calib.PlanarCalibrationDetector;
 import boofcv.alg.geo.calibration.PlanarCalibrationTarget;
 import boofcv.alg.geo.calibration.Zhang99Parameters;
 import boofcv.struct.calib.IntrinsicParameters;
@@ -49,7 +48,7 @@ import java.util.List;
  * </p>
  *
  * <p>
- * See comments in {@link boofcv.app.CalibrateMonoPlanar} about when the y-axis should be inverted.
+ * See comments in {@link CalibrateMonoPlanar} about when the y-axis should be inverted.
  * </p>
  *
  * @author Peter Abeles
