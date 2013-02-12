@@ -18,8 +18,8 @@
 
 package boofcv.alg.geo.calibration;
 
+import boofcv.abst.calib.ImageResults;
 import boofcv.alg.distort.ImageDistort;
-import boofcv.app.ImageResults;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.struct.image.ImageFloat32;

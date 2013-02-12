@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.app;
+package boofcv.alg.geo.calibration;
 
 import boofcv.io.MediaManager;
 
@@ -28,7 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Parses a configuration file for {@link CalibrateMonoPlanar}.
+ * Parses a configuration file for {@link boofcv.abst.calib.CalibrateMonoPlanar}.
  * 
  * @author Peter Abeles
  */

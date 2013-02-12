@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.app;
+package boofcv.alg.geo.calibration;
 
 import boofcv.io.MediaManager;
 import boofcv.io.image.SimpleImageSequence;
