@@ -280,8 +280,7 @@ public class VisualizeStereoVisualOdometryApp <I extends ImageSingleBand>
 				FactoryStereoDisparity.regionSparseWta(2,150,3,3,30,-1,true,imageType);
 
 		if( whichAlg == 0 ) {
-			PkltConfig config =
-					PkltConfig.createDefault(imageType, derivType);
+			PkltConfig config = PkltConfig.createDefault(imageType, derivType);
 			config.pyramidScaling = new int[]{1,2,4,8};
 			config.featureRadius = 3;
 			config.typeInput = imageType;
