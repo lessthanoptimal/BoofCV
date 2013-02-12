@@ -23,7 +23,6 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.se.Se3_F64;
 import org.ddogleg.optimization.FactoryOptimization;
 import org.ddogleg.optimization.UnconstrainedLeastSquares;
-import org.ddogleg.optimization.UtilOptimize;
 import org.ejml.data.DenseMatrix64F;
 
 import java.util.ArrayList;
@@ -39,6 +38,11 @@ import java.util.List;
  * When processing the results be sure to take in account the coordinate system being left or right handed.  Calibration
  * works just fine with either coordinate system, but most 3D geometric algorithms assume a right handed coordinate
  * system while most images are left handed.
+ * </p>
+ *
+ * <p>
+ * A listener can be provide that will give status updates and allows requests for early termination.  If a request
+ * for early termination is made then a RuntimeException will be thrown.
  * </p>
  *
  * <p>
@@ -68,6 +72,9 @@ public class CalibrationPlanarGridZhang99 {
 	// optimization algorithm
 	private UnconstrainedLeastSquares optimizer;
 
+	// provides information on calibration status
+	private Listener listener;
+
 	/**
 	 * Configures calibration process.
 	 *
@@ -88,6 +95,15 @@ public class CalibrationPlanarGridZhang99 {
 	}
 
 	/**
+	 * Used to listen in on progress and request that processing be stopped
+	 *
+	 * @param listener The listener
+	 */
+	public void setListener(Listener listener) {
+		this.listener = listener;
+	}
+
+	/**
 	 * Processes observed calibration point coordinates and computes camera intrinsic and extrinsic
 	 * parameters.
 	 *
@@ -103,6 +119,7 @@ public class CalibrationPlanarGridZhang99 {
 		if( initial == null )
 			return false;
 
+		status("Non-linear refinement");
 		// perform non-linear optimization to improve results
 		if( !optimizedParam(observations,target.points,initial,optimized,optimizer))
 			return false;
@@ -115,6 +132,7 @@ public class CalibrationPlanarGridZhang99 {
 	 */
 	protected Zhang99Parameters initialParam( List<List<Point2D_F64>> observations )
 	{
+		status("Estimating Homographies");
 		List<DenseMatrix64F> homographies = new ArrayList<DenseMatrix64F>();
 		List<Se3_F64> motions = new ArrayList<Se3_F64>();
 
@@ -127,6 +145,7 @@ public class CalibrationPlanarGridZhang99 {
 			homographies.add(H);
 		}
 
+		status("Estimating Calibration Matrix");
 		computeK.process(homographies);
 
 		DenseMatrix64F K = computeK.getCalibrationMatrix();
@@ -136,11 +155,19 @@ public class CalibrationPlanarGridZhang99 {
 			motions.add(decomposeH.decompose(H));
 		}
 
+		status("Estimating Radial Distortion");
 		computeRadial.process(K,homographies,observations);
 
 		double distort[] = computeRadial.getParameters();
 
 		return convertIntoZhangParam(motions, K,assumeZeroSkew, distort);
+	}
+
+	private void status( String message ) {
+		if( listener != null ) {
+			if( !listener.zhangUpdate(message) )
+				throw new RuntimeException("User requested termination of calibration");
+		}
 	}
 
 	/**
@@ -152,11 +179,11 @@ public class CalibrationPlanarGridZhang99 {
 	 * @param found The refined calibration parameters.
 	 * @param optimizer Algorithm used to optimize parameters
 	 */
-	public static boolean optimizedParam( List<List<Point2D_F64>> observations ,
-										  List<Point2D_F64> grid ,
-										  Zhang99Parameters initial ,
-										  Zhang99Parameters found ,
-										  UnconstrainedLeastSquares optimizer )
+	public boolean optimizedParam( List<List<Point2D_F64>> observations ,
+								   List<Point2D_F64> grid ,
+								   Zhang99Parameters initial ,
+								   Zhang99Parameters found ,
+								   UnconstrainedLeastSquares optimizer )
 	{
 		if( optimizer == null ) {
 //			optimizer = FactoryOptimization.leastSquaresTrustRegion(1,
@@ -179,8 +206,13 @@ public class CalibrationPlanarGridZhang99 {
 		optimizer.setFunction(func,null);
 		optimizer.initialize(model,1e-10,1e-25*observations.size());
 
-		if( !UtilOptimize.process(optimizer,500) ) {
-			return false;
+		for( int i = 0; i < 500; i++ ) {
+			if( optimizer.iterate() ) {
+				break;
+			} else {
+				if( i % 25 == 0 )
+					status("Progress "+(100*i/500.0)+"%");
+			}
 		}
 
 		double param[] = optimizer.getParameters();
@@ -251,5 +283,16 @@ public class CalibrationPlanarGridZhang99 {
 
 	public Zhang99Parameters getOptimized() {
 		return optimized;
+	}
+
+	public static interface Listener
+	{
+		/**
+		 * Updated to update the status and request that processing be stopped
+		 *
+		 * @param taskName Name of the task being performed
+		 * @return true to continue and false to request a stop
+		 */
+		public boolean zhangUpdate( String taskName );
 	}
 }
