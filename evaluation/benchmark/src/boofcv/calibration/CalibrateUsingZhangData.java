@@ -108,7 +108,7 @@ public class CalibrateUsingZhangData {
 	}
 
 	public void optimizeUsingZhang() {
-		ComputeZhangErrors.nonlinearUsingZhang(observations,target.points);
+		ComputeZhangErrors.nonlinearUsingZhang(observations,target);
 	}
 
 	public void setOptimizer(UnconstrainedLeastSquares optimizer) {
