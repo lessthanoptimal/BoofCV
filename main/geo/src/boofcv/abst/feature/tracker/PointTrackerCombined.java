@@ -95,10 +95,6 @@ public class PointTrackerCombined<I extends ImageSingleBand, D extends ImageSing
 		// pass in filtered inputs
 		tracker.updateTracks(image, pyramid, derivX, derivY);
 
-		// if no features have been spawned don't try to reactive anything
-		if( previousSpawn < 0 )
-			return;
-
 		int numActive = tracker.getPureKlt().size() + tracker.getReactivated().size();
 
 		if( previousSpawn-numActive > reactivateThreshold) {
@@ -107,9 +103,11 @@ public class PointTrackerCombined<I extends ImageSingleBand, D extends ImageSing
 			previousSpawn = tracker.getPureKlt().size() + tracker.getReactivated().size();
 		}
 
+		// Update the PointTrack state for KLT tracks
 		for( CombinedTrack<Desc> t : tracker.getPureKlt() ) {
 			((PointTrack)t.getCookie()).set(t);
 		}
+
 		for( CombinedTrack<Desc> t : tracker.getReactivated() ) {
 			((PointTrack)t.getCookie()).set(t);
 		}
