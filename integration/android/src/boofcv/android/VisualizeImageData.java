@@ -2,11 +2,7 @@ package boofcv.android;
 
 import android.graphics.Bitmap;
 import boofcv.alg.misc.ImageStatistics;
-import boofcv.alg.misc.PixelMath;
-import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSInt16;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.*;
 
 import java.nio.ByteBuffer;
 
@@ -244,6 +240,110 @@ public class VisualizeImageData {
 		}
 
 		output.copyPixelsFromBuffer(ByteBuffer.wrap(storage));
+	}
+
+	/**
+	 * Colorizes a disparity image.
+	 *
+	 * @param disparity (Input) disparity image.
+	 * @param minValue Minimum possible disparity
+	 * @param maxValue Maximum possible disparity
+	 * @param invalidColor RGB value of an invalid pixel
+	 * @param output (Output) Bitmap ARGB_8888 image.  Can be null.
+	 * @param storage Optional working buffer for Bitmap image.
+	 * @return Colorized disparity image
+	 */
+	public static Bitmap disparity( ImageInteger disparity, int minValue, int maxValue,
+									int invalidColor, Bitmap output , byte[] storage ) {
+		shapeShape(disparity, output);
+
+		if( storage == null )
+			storage = declareStorage(output,null);
+
+		int range = maxValue - minValue;
+
+		int indexDst = 0;
+
+		for (int y = 0; y < disparity.height; y++) {
+			for (int x = 0; x < disparity.width; x++) {
+				int v = disparity.unsafe_get(x, y);
+				int r,g,b;
+
+				if (v > range) {
+					r = (invalidColor >> 16) & 0xFF;
+					g = (invalidColor >> 8) & 0xFF;
+					b = (invalidColor) & 0xFF;
+				} else {
+					g = 0;
+					if (v == 0) {
+						r = b = 0;
+					} else {
+						r = 255 * v / maxValue;
+						b = 255 * (maxValue - v) / maxValue;
+					}
+				}
+
+				storage[indexDst++] = (byte) r;
+				storage[indexDst++] = (byte) g;
+				storage[indexDst++] = (byte) b;
+				storage[indexDst++] = (byte) 0xFF;
+			}
+		}
+
+		output.copyPixelsFromBuffer(ByteBuffer.wrap(storage));
+		return output;
+	}
+
+	/**
+	 * Colorizes a disparity image.
+	 *
+	 * @param disparity (Input) disparity image.
+	 * @param minValue Minimum possible disparity
+	 * @param maxValue Maximum possible disparity
+	 * @param invalidColor RGB value of an invalid pixel
+	 * @param output (Output) Bitmap ARGB_8888 image.  Can be null.
+	 * @param storage Optional working buffer for Bitmap image.
+	 * @return Colorized disparity image
+	 */
+	public static Bitmap disparity( ImageFloat32 disparity, int minValue, int maxValue,
+									int invalidColor, Bitmap output , byte[] storage ) {
+		shapeShape(disparity, output);
+
+		if( storage == null )
+			storage = declareStorage(output,null);
+
+		int range = maxValue - minValue;
+
+		int indexDst = 0;
+
+		for (int y = 0; y < disparity.height; y++) {
+			for (int x = 0; x < disparity.width; x++) {
+				float v = disparity.unsafe_get(x, y);
+				int r,g,b;
+
+				if (v > range) {
+					r = (invalidColor >> 16) & 0xFF;
+					g = (invalidColor >> 8) & 0xFF;
+					b = (invalidColor) & 0xFF;
+				} else {
+					g = 0;
+					if (v == 0) {
+						r = b = 0;
+					} else {
+						r = (int)(255 * v / maxValue);
+						b = (int)(255 * (maxValue - v) / maxValue);
+					}
+				}
+
+				storage[indexDst++] = (byte) r;
+				storage[indexDst++] = (byte) g;
+				storage[indexDst++] = (byte) b;
+				storage[indexDst++] = (byte) 0xFF;
+			}
+		}
+
+		output.copyPixelsFromBuffer(ByteBuffer.wrap(storage));
+		return output;
 	}
 
 	private static void shapeShape(ImageBase input, Bitmap output) {
