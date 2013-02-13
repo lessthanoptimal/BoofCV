@@ -63,7 +63,7 @@ public class FactoryMotion2D {
 	 * @param respawnCoverageFraction If the area covered drops by this fraction then spawn more features.  Try 0.8
 	 * @param refineEstimate Should it refine the model estimate using all inliers.
 	 * @param tracker Point feature tracker.
-	 * @param motionModel Instance of the model model used
+	 * @param motionModel Instance of the model model used. Affine2D_F64 or Homography2D_F64
 	 * @param <I> Image input type.
 	 * @param <IT> Model model
 	 * @return  ImageMotion2D
@@ -109,7 +109,7 @@ public class FactoryMotion2D {
 	}
 
 	/**
-	 * Estimates the image motion then combines images together.  Can be used for mosaic and stabilization
+	 * Estimates the image motion then combines images together.  Typically used for mosaics and stabilization.
 	 *
 	 * @param maxJumpFraction If the area changes by this much between two consecuative frames then the transform
 	 *                        is reset.
