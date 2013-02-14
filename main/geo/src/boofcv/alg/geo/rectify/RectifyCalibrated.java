@@ -92,7 +92,7 @@ public class RectifyCalibrated {
 		SimpleMatrix KR1 = sK1.mult(R1);
 		SimpleMatrix KR2 = sK2.mult(R2);
 
-		// compute optical centers
+		// compute optical centers in world reference frame
 		// c = -R'*T
 		SimpleMatrix c1 = R1.transpose().mult(T1.scale(-1));
 		SimpleMatrix c2 = R2.transpose().mult(T2.scale(-1));
