@@ -27,6 +27,7 @@ import boofcv.alg.feature.disparity.DisparitySelect;
 import boofcv.alg.feature.disparity.DisparitySparseScoreSadRect;
 import boofcv.alg.feature.disparity.DisparitySparseSelect;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageSInt16;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
 
@@ -102,6 +103,9 @@ public class FactoryStereoDisparity {
 				if( imageType == ImageUInt8.class ) {
 					alg = FactoryStereoDisparityAlgs.scoreDisparitySadRect_U8(minDisparity,
 							maxDisparity,regionRadiusX,regionRadiusY,select);
+				} else if( imageType == ImageSInt16.class ) {
+					alg = FactoryStereoDisparityAlgs.scoreDisparitySadRect_S16(minDisparity,
+							maxDisparity, regionRadiusX, regionRadiusY, select);
 				} else if( imageType == ImageFloat32.class ) {
 					alg = FactoryStereoDisparityAlgs.scoreDisparitySadRect_F32(minDisparity,
 							maxDisparity, regionRadiusX, regionRadiusY, select);
@@ -112,6 +116,9 @@ public class FactoryStereoDisparity {
 				if( imageType == ImageUInt8.class ) {
 					alg = FactoryStereoDisparityAlgs.scoreDisparitySadRectFive_U8(minDisparity,
 							maxDisparity,regionRadiusX,regionRadiusY,select);
+				} else if( imageType == ImageSInt16.class ) {
+					alg = FactoryStereoDisparityAlgs.scoreDisparitySadRectFive_S16(minDisparity,
+							maxDisparity, regionRadiusX, regionRadiusY, select);
 				} else if( imageType == ImageFloat32.class ) {
 					alg = FactoryStereoDisparityAlgs.scoreDisparitySadRectFive_F32(minDisparity,
 							maxDisparity, regionRadiusX, regionRadiusY, select);
@@ -164,7 +171,7 @@ public class FactoryStereoDisparity {
 			maxError *= 3;
 
 		DisparitySelect select;
-		if( imageType == ImageUInt8.class ) {
+		if( imageType == ImageUInt8.class || imageType == ImageSInt16.class ) {
 			select = selectDisparitySubpixel_S32((int) maxError, validateRtoL, texture);
 		} else if( imageType == ImageFloat32.class ) {
 			select = selectDisparitySubpixel_F32((int) maxError, validateRtoL, texture);
@@ -179,6 +186,9 @@ public class FactoryStereoDisparity {
 				if( imageType == ImageUInt8.class ) {
 					alg = FactoryStereoDisparityAlgs.scoreDisparitySadRect_U8(minDisparity,
 							maxDisparity,regionRadiusX,regionRadiusY,select);
+				} else if( imageType == ImageSInt16.class ) {
+					alg = FactoryStereoDisparityAlgs.scoreDisparitySadRect_S16(minDisparity,
+							maxDisparity, regionRadiusX, regionRadiusY, select);
 				} else if( imageType == ImageFloat32.class ) {
 					alg = FactoryStereoDisparityAlgs.scoreDisparitySadRect_F32(minDisparity,
 							maxDisparity, regionRadiusX, regionRadiusY, select);
@@ -189,6 +199,9 @@ public class FactoryStereoDisparity {
 				if( imageType == ImageUInt8.class ) {
 					alg = FactoryStereoDisparityAlgs.scoreDisparitySadRectFive_U8(minDisparity,
 							maxDisparity,regionRadiusX,regionRadiusY,select);
+				} else if( imageType == ImageSInt16.class ) {
+					alg = FactoryStereoDisparityAlgs.scoreDisparitySadRectFive_S16(minDisparity,
+							maxDisparity, regionRadiusX, regionRadiusY, select);
 				} else if( imageType == ImageFloat32.class ) {
 					alg = FactoryStereoDisparityAlgs.scoreDisparitySadRectFive_F32(minDisparity,
 							maxDisparity, regionRadiusX, regionRadiusY, select);

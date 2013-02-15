@@ -82,6 +82,7 @@ Version : Alpha 0.13
 - Redesigned image stabilization and mosaic code
   * Much easier to work with now and can be plugged in a high level
   * Added a factory for creating related algorithms
+- Stereo Disparity: support for ImageSInt16
 
 ---------------------------------------------
 Date    : 2012/12/05

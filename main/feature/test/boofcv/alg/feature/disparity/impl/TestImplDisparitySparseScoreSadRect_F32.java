@@ -18,67 +18,30 @@
 
 package boofcv.alg.feature.disparity.impl;
 
-import boofcv.alg.misc.GImageMiscOps;
+import boofcv.alg.feature.disparity.DisparityScoreSadRect;
+import boofcv.alg.feature.disparity.DisparitySparseScoreSadRect;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageUInt8;
-import org.junit.Test;
-
-import java.util.Random;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * @author Peter Abeles
  */
-public class TestImplDisparitySparseScoreSadRect_F32 {
+public class TestImplDisparitySparseScoreSadRect_F32 extends ChecksImplDisparitySparseScoreSadRect<ImageFloat32,float[]>{
 
-	Random rand = new Random(234);
-
-	ImplSelectSparseBasicWta_F32 selectAlg = new ImplSelectSparseBasicWta_F32();
-
-	/**
-	 * Compute disparity using the equivalent dense algorithm and see if the sparse one produces the
-	 * same results.
-	 */
-	@Test
-	public void compareToDense() {
-		int w = 20, h = 25;
-		ImageFloat32 left = new ImageFloat32(w,h);
-		ImageFloat32 right = new ImageFloat32(w,h);
-
-		GImageMiscOps.fillUniform(left, rand, 0, 20);
-		GImageMiscOps.fillUniform(right, rand, 0, 20);
-
-		compareToDense(left, right, 0);
-		compareToDense(left, right, 2);
+	public TestImplDisparitySparseScoreSadRect_F32() {
+		super(ImageFloat32.class);
 	}
 
-	private void compareToDense(ImageFloat32 left, ImageFloat32 right, int minDisparity) {
-		int w = left.width; int h = left.height;
-		int maxDisparity = 10;
-		int radiusX = 3;
-		int radiusY = 2;
+	@Override
+	public DisparityScoreSadRect<ImageFloat32, ImageUInt8> createDense(int minDisparity, int maxDisparity,
+																	   int radiusX, int radiusY) {
+		return new ImplDisparityScoreSadRect_F32<ImageUInt8>(minDisparity,maxDisparity,radiusX,radiusY,
+				new ImplSelectRectBasicWta_F32_U8());
+	}
 
-		ImplDisparityScoreSadRect_F32<ImageUInt8> denseAlg =
-				new ImplDisparityScoreSadRect_F32<ImageUInt8>(minDisparity,maxDisparity,radiusX,radiusY,new ImplSelectRectBasicWta_F32_U8());
-		ImplDisparitySparseScoreSadRect_F32 alg = new ImplDisparitySparseScoreSadRect_F32(minDisparity,maxDisparity,radiusX,radiusY);
-
-		ImageUInt8 expected = new ImageUInt8(w,h);
-		denseAlg.process(left, right, expected);
-		alg.setImages(left,right);
-
-		for( int y = 0; y < h; y++ ) {
-			for( int x = 0; x < w; x++ ) {
-				alg.process(x,y);
-				if( !alg.process(x,y) )  {
-					assertEquals(x+" "+y,expected.get(x,y),0);
-				} else {
-					selectAlg.select(alg.scores,alg.getLocalMaxDisparity());
-					int found = (int)(alg.getMinDisparity()+selectAlg.getDisparity());
-
-					assertEquals(x+" "+y,minDisparity+expected.get(x,y),found);
-				}
-			}
-		}
+	@Override
+	public DisparitySparseScoreSadRect<float[], ImageFloat32> createSparse(int minDisparity, int maxDisparity,
+																		   int radiusX, int radiusY) {
+		return new ImplDisparitySparseScoreSadRect_F32(minDisparity,maxDisparity,radiusX,radiusY);
 	}
 }
