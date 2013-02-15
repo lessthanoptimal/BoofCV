@@ -155,18 +155,19 @@ public class DetectSquareCalibrationPoints {
 	private boolean shuffleToFindTarget( List<QuadBlob> squares ) {
 		
 		int N = gridCols * gridRows;
+		if( squares.size() < N )
+			return fail("Not enough blobs detected");
+
 		Combinations<QuadBlob> combinations = new Combinations<QuadBlob>(squares,N);
 
 //		System.out.println("------------------------------------"+squares.size()+"  N "+N);
 //		System.out.println("Total Shuffles: "+combinations.numShuffles());
 		if( combinations.computeTotalCombinations() > maxCombinations) {
-			return fail("Not enough blobs detected");
+			return fail("Too many possible combinations");
 		}
 
 		List<QuadBlob> list = new ArrayList<QuadBlob>();
 
-		int num = 0;
-		boolean success = false;
 		while( true ) {
 //			System.out.println("Next combination "+num++);
 			combinations.getBucket(list);
@@ -183,17 +184,13 @@ public class DetectSquareCalibrationPoints {
 				interestSquares = list;
 				orderAlg.process(interestPoints);
 				interestPoints = orderAlg.getOrdered();
-				success = true;
-				break;
+				return true;
 			} catch (InvalidCalibrationTarget invalidTarget) {
-				System.out.println(invalidTarget.getMessage());
+//				System.out.println(invalidTarget.getMessage());
 			}
-			combinations.next();
+			if( !combinations.next() )
+				return fail("No target found after shuffling");
 		}
-		
-		if( !success )
-			return fail("No target found after shuffling");
-		return true;
 	}
 
 	/**
@@ -235,5 +232,9 @@ public class DetectSquareCalibrationPoints {
 
 	public int getNumberOfLabels() {
 		return detectBlobs.getNumLabels();
+	}
+
+	public DetectQuadBlobsBinary getDetectBlobs() {
+		return detectBlobs;
 	}
 }
