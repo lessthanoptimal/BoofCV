@@ -25,7 +25,6 @@ import boofcv.alg.feature.detect.grid.IntensityHistogram;
 import boofcv.alg.feature.detect.grid.UtilCalibrationGrid;
 import boofcv.alg.filter.binary.BinaryImageOps;
 import boofcv.alg.filter.binary.GThresholdImageOps;
-import boofcv.misc.BoofMiscOps;
 import boofcv.struct.FastQueue;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSInt32;
@@ -233,15 +232,15 @@ public class RefineCornerSegmentFit {
 
 		// sanity check
 		if( highThresh <= lowThresh ) {
-			BoofMiscOps.print(image);
-			for( int i = 0; i < histHighRes.histogram.length; i++ ) {
-				int c = histHighRes.histogram[i];
-				if( c != 0 ) {
-					System.out.println("["+i+"] = "+c);
-				}
-			}
+//			BoofMiscOps.print(image);
+//			for( int i = 0; i < histHighRes.histogram.length; i++ ) {
+//				int c = histHighRes.histogram[i];
+//				if( c != 0 ) {
+//					System.out.println("["+i+"] = "+c);
+//				}
+//			}
 //			return;
-			throw new RuntimeException("Bad statistics");
+			throw new InvalidCalibrationTarget("Bad statistics");
 		}
 
 		// do a threshold in the middle first
@@ -356,6 +355,10 @@ public class RefineCornerSegmentFit {
 				onEdge.add(i);
 			}
 		}
+
+		// At least two points should hit the image edge
+		if( onEdge.size() < 2 )
+			throw new InvalidCalibrationTarget("Less than two edge points");
 
 		// find the two points which are farthest part
 		int bestDistance = -1;

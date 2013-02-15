@@ -70,37 +70,42 @@ public class WrapPlanarSquareGridTarget implements PlanarCalibrationDetector {
 		// detect the target at pixel level accuracy
 		if( !autoThreshold.process(detect,input) )
 			return false;
-
-		List<QuadBlob> squares = detect.getInterestSquares();
-		
-		// refine the corner accuracy estimate to sub-pixel
 		try {
+			List<QuadBlob> squares = detect.getInterestSquares();
+		
+			// refine the corner accuracy estimate to sub-pixel
 			refine.refine(squares,input);
+
+			List<Point2D_F64> unordered = new ArrayList<Point2D_F64>();
+			for( QuadBlob b : squares ) {
+				for( Point2D_F64 p : b.subpixel )
+					unordered.add(p);
+			}
+
+			orderAlg.process(unordered);
+
+			ret = UtilCalibrationGrid.rotatePoints(orderAlg.getOrdered(),
+					orderAlg.getNumRows(),orderAlg.getNumCols(),
+					pointRows,pointColumns);
 		} catch( InvalidCalibrationTarget e ) {
-			e.printStackTrace();
+//			e.printStackTrace();
 			return false;
 		}
 
-		List<Point2D_F64> unordered = new ArrayList<Point2D_F64>();
-		for( QuadBlob b : squares ) {
-			for( Point2D_F64 p : b.subpixel )
-				unordered.add(p);
-		}
+		return ret != null;
 
-		orderAlg.process(unordered);
-
-		ret = UtilCalibrationGrid.rotatePoints(orderAlg.getOrdered(),
-				orderAlg.getNumRows(),orderAlg.getNumCols(),
-				pointRows,pointColumns);
-
-		if( ret == null )
-			throw new RuntimeException("rotatePoints failed!");
-
-		return true;
 	}
 
 	@Override
 	public List<Point2D_F64> getPoints() {
 		return ret;
+	}
+
+	public RefineCalibrationGridCorner getRefine() {
+		return refine;
+	}
+
+	public DetectSquareCalibrationPoints getDetect() {
+		return detect;
 	}
 }
