@@ -20,20 +20,21 @@ package boofcv.alg.feature.disparity.impl;
 
 import boofcv.alg.feature.disparity.DisparityScoreWindowFive;
 import boofcv.alg.feature.disparity.DisparitySelect;
+import boofcv.struct.image.ImageSInt16;
 import boofcv.struct.image.ImageUInt8;
 
 /**
  * @author Peter Abeles
  */
-public class TestImplDisparityScoreSadRectFive_U8 extends ChecksImplDisparityScoreSadRectFive<ImageUInt8,ImageUInt8> {
+public class TestImplDisparityScoreSadRectFive_S16 extends ChecksImplDisparityScoreSadRectFive<ImageSInt16,ImageUInt8> {
 
-	public TestImplDisparityScoreSadRectFive_U8() {
-		super(ImageUInt8.class, ImageUInt8.class);
+	public TestImplDisparityScoreSadRectFive_S16() {
+		super(ImageSInt16.class, ImageUInt8.class);
 	}
 
 	@Override
-	protected DisparityScoreWindowFive<ImageUInt8, ImageUInt8>
+	protected DisparityScoreWindowFive<ImageSInt16, ImageUInt8>
 	createAlg(int minDisparity, int maxDisparity, int radiusX, int radiusY, DisparitySelect compDisp) {
-		return new ImplDisparityScoreSadRectFive_U8<ImageUInt8>(minDisparity,maxDisparity,radiusX,radiusY,compDisp);
+		return new ImplDisparityScoreSadRectFive_S16<ImageUInt8>(minDisparity,maxDisparity,radiusX,radiusY,compDisp);
 	}
 }

@@ -23,6 +23,7 @@ import boofcv.abst.geo.Estimate1ofEpipolar;
 import boofcv.abst.geo.TriangulateTwoViewsCalibrated;
 import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.distort.LensDistortionOps;
+import boofcv.alg.filter.derivative.LaplacianEdge;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.RectifyImageOps;
 import boofcv.alg.geo.rectify.RectifyCalibrated;
@@ -46,6 +47,7 @@ import boofcv.struct.distort.DoNothingTransform_F64;
 import boofcv.struct.distort.PointTransform_F64;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageSInt16;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
 import georegression.struct.se.Se3_F64;
@@ -111,12 +113,18 @@ public class ExampleStereoTwoViewsOneCamera {
 		rectifyImages(distortedLeft, distortedRight, leftToRight, intrinsic, rectifiedLeft, rectifiedRight, rectifiedK);
 
 		// compute disparity
-		StereoDisparity<ImageUInt8, ImageFloat32> disparityAlg =
+		StereoDisparity<ImageSInt16, ImageFloat32> disparityAlg =
 				FactoryStereoDisparity.regionSubpixelWta(DisparityAlgorithms.RECT_FIVE,
-						minDisparity, maxDisparity, 5, 5, 20, 1, 0.1, ImageUInt8.class);
+						minDisparity, maxDisparity, 5, 5, 20, 1, 0.1, ImageSInt16.class);
+
+		// Apply the Laplacian across the image to add extra resistance to changes in lighting or camera gain
+		ImageSInt16 derivLeft = new ImageSInt16(rectifiedLeft.width,rectifiedLeft.height);
+		ImageSInt16 derivRight = new ImageSInt16(rectifiedLeft.width,rectifiedLeft.height);
+		LaplacianEdge.process(rectifiedLeft, derivLeft);
+		LaplacianEdge.process(rectifiedRight,derivRight);
 
 		// process and return the results
-		disparityAlg.process(rectifiedLeft, rectifiedRight);
+		disparityAlg.process(derivLeft, derivRight);
 		ImageFloat32 disparity = disparityAlg.getDisparity();
 
 		// show results

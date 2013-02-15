@@ -21,6 +21,7 @@ package boofcv.factory.feature.disparity;
 import boofcv.alg.feature.disparity.*;
 import boofcv.alg.feature.disparity.impl.*;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageSInt16;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
 
@@ -90,6 +91,15 @@ public class FactoryStereoDisparityAlgs {
 				maxDisparity,regionRadiusX,regionRadiusY,computeDisparity);
 	}
 
+	public static <T extends ImageSingleBand> DisparityScoreSadRect<ImageSInt16,T>
+	scoreDisparitySadRect_S16( int minDisparity , int maxDisparity,
+							  int regionRadiusX, int regionRadiusY,
+							  DisparitySelect<int[],T> computeDisparity)
+	{
+		return new ImplDisparityScoreSadRect_S16<T>(minDisparity,
+				maxDisparity,regionRadiusX,regionRadiusY,computeDisparity);
+	}
+
 	public static <T extends ImageSingleBand> DisparityScoreSadRect<ImageFloat32,T>
 	scoreDisparitySadRect_F32( int minDisparity , int maxDisparity,
 							  int regionRadiusX, int regionRadiusY,
@@ -105,6 +115,15 @@ public class FactoryStereoDisparityAlgs {
 								  DisparitySelect<int[],T> computeDisparity)
 	{
 		return new ImplDisparityScoreSadRectFive_U8<T>(minDisparity,
+				maxDisparity,regionRadiusX,regionRadiusY,computeDisparity);
+	}
+
+	public static <T extends ImageSingleBand> DisparityScoreWindowFive<ImageSInt16,T>
+	scoreDisparitySadRectFive_S16( int minDisparity , int maxDisparity,
+								  int regionRadiusX, int regionRadiusY,
+								  DisparitySelect<int[],T> computeDisparity)
+	{
+		return new ImplDisparityScoreSadRectFive_S16<T>(minDisparity,
 				maxDisparity,regionRadiusX,regionRadiusY,computeDisparity);
 	}
 

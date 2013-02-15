@@ -36,6 +36,7 @@ public class GenerateDisparityScoreSadRect extends CodeGeneratorBase {
 	@Override
 	public void generate() throws FileNotFoundException {
 		createFile(AutoTypeImage.U8);
+		createFile(AutoTypeImage.S16);
 		createFile(AutoTypeImage.F32);
 	}
 
