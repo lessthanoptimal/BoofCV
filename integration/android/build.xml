@@ -6,7 +6,7 @@
   <import file="../build_common.xml"/>
   
   <!--  Specify where your android SDK is here-->
-  <property name="android.dir" value="/opt/android-sdk/platforms/android-15"/>
+  <property name="android.dir" value="/opt/android-sdk-linux/platforms/android-17"/>
 
   <path id="project.classpath">
     <fileset dir="${lib.dir}" includes="**/*.jar"/>
