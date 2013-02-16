@@ -10,7 +10,7 @@ Repository:      https://github.com/lessthanoptimal/BoofCV
 
 ========== New to Java? =====================
 
-If you are new to Java running and using BoofCV can be a challenge.  With a little bit of knowledge it is possible to build and run examples using the instructions below.  Integrating BoofCV into your own project is another issue.  If you don't know what a jar file is or how to import classes I highly recommend you learn the basics first before attempting to use BoofCV.
+If you are new to Java, then using BoofCV will be a challenge.  With just a little bit of knowledge it is possible to build and run examples using the instructions below.  Integrating BoofCV into your own project is another issue.  If you don't know what a jar file is or how to import classes, it is highly recommend that you learn the basics first before attempting to use BoofCV.
 
 ========== Directories ======================
 
@@ -24,33 +24,40 @@ main/          Contains the source code for BoofCV
 
 ========== Building =========================
 
-BoofCV is a java library and can be compiled on any platform with java installed.  Out of convinience ant scripts have been provided.  These ant scripts can be used to build and run example code.
+BoofCV is a java library and can be compiled on any platform with Java installed.  OutFor your convinience Ant and Maven build scripts have been provided.  These ant scripts can be used to build and run example code.
 
 BEFORE trying to compile BoofCV make sure you have the following installed and that the paths are setup correctly:
 
 - Java Developers Kit (JDK) version 1.6 or later
       http://www.oracle.com/technetwork/java/index.html
-- Ant  (If you wish to use the Ant build scripts)
+- Ant  (Optional)
       http://ant.apache.org/
+- Maven (Optional)
+      http://maven.apache.org/
 
-In Linux BoofCV can be compiled using the following command line squence:
+In Linux, BoofCV can be compiled using Ant with the following command line squence:
 
 ---- BEGIN TEXT-----
 cd main
 ant
 ----- END TEXT -----
 
-Yes, with two commands you can compile BoofCV.  Inside the lib/ directory there should now be BoofCV.jar.  It is also possible to create JavaDoc by typeing "ant javadoc".  Next if you wish to compile and run the example code, move into the example/ directory and following the readme.txt instructions you find there.
+After the last command has finished you can find BoofCV.jar in the lib/ directory.  It is also possible to create JavaDoc by typing "ant javadoc".  Next if you wish to compile and run the example code, move into the example/ directory and following the readme.txt instructions you find there.  Code inside integration directory can be easily compiled using the same command.
 
 BoofCV is in general very easy to build on just about any system.  Because it is Java you don't have any of the annoying system dependent or compilor issues that are the source of endless headaches.
 
 ========= Dependencies =======================
 
-BoofCV depends on a few other packages and if you are getting lot of errors when compiling your source code you probably forgot to include them.  All libraries that BoofCV depends on are included with BoofCV and are contained in the boofcv/lib directory.
+BoofCV depends on a few other packages and if you are getting lot of errors when compiling your source code you probably forgot to include them.  All libraries that BoofCV depends can be found in the lib/ directory.
 
 EJML.jar             http://code.google.com/p/efficient-java-matrix-library
 GeoRegression.jar    http://georegression.org
 DDogleg.jar          http://ddogleg.org
+
+The following are required for running unit tests and micro-benchmarks:
+
+JUnit                http://junit.sourceforge.net/
+Caliper              http://code.google.com/p/caliper/
 
 ========= Developing With BoofCV =============
 
