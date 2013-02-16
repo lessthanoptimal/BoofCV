@@ -88,7 +88,7 @@ public class FactoryStereoDisparity {
 			maxError *= 3;
 
 		DisparitySelect select;
-		if( imageType == ImageUInt8.class ) {
+		if( imageType == ImageUInt8.class || imageType == ImageSInt16.class ) {
 			select = selectDisparity_S32((int) maxError, validateRtoL, texture);
 		} else if( imageType == ImageFloat32.class ) {
 			select = selectDisparity_F32((int) maxError, validateRtoL, texture);

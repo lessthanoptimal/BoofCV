@@ -32,7 +32,11 @@ public class BoofVideoManager {
 	 * @return Video interface
 	 */
 	public static VideoInterface loadManagerDefault() {
-		return loadManager("boofcv.io.wrapper.xuggler.XugglerVideoInterface");
+		try {
+			return loadManager("boofcv.io.wrapper.xuggler.XugglerVideoInterface");
+		} catch( RuntimeException e ) {
+			return new BoofMjpegVideo();
+		}
 	}
 
 	/**

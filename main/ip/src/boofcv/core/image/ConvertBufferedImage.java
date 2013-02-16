@@ -313,7 +313,7 @@ public class ConvertBufferedImage {
 			if( dst == null)
 				dst = new MultiSpectral<T>(type,src.getWidth(),src.getHeight(),numBands);
 			else if( dst.getNumBands() != numBands )
-				throw new IllegalArgumentException("Expected "+numBands+" in dst");
+				throw new IllegalArgumentException("Expected "+numBands+" bands in dst not "+dst.getNumBands());
 
 			if( type == ImageUInt8.class ) {
 				if (src.getRaster() instanceof ByteInterleavedRaster &&

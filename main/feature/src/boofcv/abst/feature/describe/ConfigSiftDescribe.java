@@ -46,9 +46,9 @@ public class ConfigSiftDescribe implements Configuration {
 	 */
 	public double weightSigma = 0.5;
 	/**
-	 * Conversation from scale space to pixels.  Typically 2.5
+	 * Conversation from scale space to pixels.  Typically 3
 	 */
-	public double sigmaToRadius = 2.5;
+	public double sigmaToRadius = 3;
 
 	public ConfigSiftDescribe(int gridWidth, int numSamples,
 							  int numHistBins, double weightSigma, double sigmaToRadius) {
