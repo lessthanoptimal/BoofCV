@@ -105,7 +105,7 @@ public abstract class Motion2DPanel extends JPanel
 		drawFeatures((float)scale,g2);
 //
 		if(showImageView)
-			drawImageBounds(g2,distortOffX,0);
+			drawImageBounds(g2,distortOffX,0,scale);
 	}
 
 	protected abstract void drawImages( double scale , Graphics2D g2 );
@@ -141,17 +141,23 @@ public abstract class Motion2DPanel extends JPanel
 		}
 	}
 
-	private void drawImageBounds( Graphics2D g2 , int tx , int ty ) {
+	private void drawImageBounds( Graphics2D g2 , int tx , int ty , double scale ) {
 		StitchingFromMotion2D.Corners c = corners;
 		if( c == null )
 			return;
 
 		g2.setColor(Color.BLUE);
-		g2.drawLine((int)c.p0.x+tx,(int)c.p0.y+ty,(int)c.p1.x+tx,(int)c.p1.y+ty);
-		g2.drawLine((int)c.p1.x+tx,(int)c.p1.y+ty,(int)c.p2.x+tx,(int)c.p2.y+ty);
-		g2.drawLine((int)c.p2.x+tx,(int)c.p2.y+ty,(int)c.p3.x+tx,(int)c.p3.y+ty);
-		g2.drawLine((int)c.p3.x+tx,(int)c.p3.y+ty,(int)c.p0.x+tx,(int)c.p0.y+ty);
+		drawLine(g2,tx,ty,scale,c.p0,c.p1);
+		drawLine(g2,tx,ty,scale,c.p1,c.p2);
+		drawLine(g2,tx,ty,scale,c.p2,c.p3);
+		drawLine(g2,tx,ty,scale,c.p3,c.p0);
 	}
+
+	private void drawLine( Graphics2D g2 , int tx , int ty , double scale , Point2D_F64 p0 , Point2D_F64 p1 )
+	{
+		g2.drawLine((int)(p0.x*scale)+tx,(int)(p0.y*scale)+ty,(int)(p1.x*scale)+tx,(int)(p1.y*scale)+ty);
+	}
+
 
 	public void setCurrToWorld(Homography2D_F64 currToWorld) {
 		this.currToWorld.set(currToWorld);
