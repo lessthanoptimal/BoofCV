@@ -57,8 +57,8 @@ public class ExampleDetectDescribe {
 	 * For some features, there are pre-made implementations of DetectDescribePoint.  This has only been done
 	 * in situations where there was a performance advantage or that it was a very common combination.
 	 */
-	public static <T extends ImageSingleBand, D extends TupleDesc>
-	DetectDescribePoint<T,D> createFromPremade( Class<T> imageType ) {
+	public static <T extends ImageSingleBand, TD extends TupleDesc>
+	DetectDescribePoint<T, TD> createFromPremade( Class<T> imageType ) {
 		return (DetectDescribePoint)FactoryDetectDescribe.surfStable(
 				new ConfigFastHessian(1, 2, 200, 1, 9, 4, 4), null,null, ImageFloat32.class);
 		// note that SIFT only supports ImageFloat32
@@ -73,8 +73,8 @@ public class ExampleDetectDescribe {
 	 * can be combined into DetectDescribePoint.  The syntax is more complex, but the end result is more flexible.
 	 * This should only be done if there isn't a pre-made DetectDescribePoint.
 	 */
-	public static <T extends ImageSingleBand, D extends TupleDesc>
-	DetectDescribePoint<T,D> createFromComponents( Class<T> imageType ) {
+	public static <T extends ImageSingleBand, TD extends TupleDesc>
+	DetectDescribePoint<T, TD> createFromComponents( Class<T> imageType ) {
 		// create a corner detector
 		Class derivType = GImageDerivativeOps.getDerivativeType(imageType);
 		GeneralFeatureDetector corner = FactoryDetectPoint.createShiTomasi(new ConfigGeneralDetector(1000,5,1), false, derivType);

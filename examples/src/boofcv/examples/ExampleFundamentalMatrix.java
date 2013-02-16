@@ -77,7 +77,7 @@ public class ExampleFundamentalMatrix {
 													List<AssociatedPair> inliers ) {
 
 		// Select which linear algorithm is to be used.  Try playing with the number of remove ambiguity points
-		Estimate1ofEpipolar estimateF = FactoryMultiView.computeFundamental_1(EnumEpipolar.FUNDAMENTAL_7_LINEAR, 20);
+		Estimate1ofEpipolar estimateF = FactoryMultiView.computeFundamental_1(EnumEpipolar.FUNDAMENTAL_7_LINEAR, 2);
 		// Wrapper so that this estimator can be used by the robust estimator
 		GenerateEpipolarMatrix generateF = new GenerateEpipolarMatrix(estimateF);
 
@@ -87,7 +87,7 @@ public class ExampleFundamentalMatrix {
 
 		// Use RANSAC to estimate the Fundamental matrix
 		ModelMatcher<DenseMatrix64F,AssociatedPair> robustF =
-				new Ransac<DenseMatrix64F, AssociatedPair>(123123,generateF,errorMetric,3000,0.2);
+				new Ransac<DenseMatrix64F, AssociatedPair>(123123,generateF,errorMetric,6000,0.1);
 
 		// Estimate the fundamental matrix while removing outliers
 		if( !robustF.process(matches) )

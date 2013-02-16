@@ -48,12 +48,12 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class ExampleAssociatePoints<T extends ImageSingleBand, FD extends TupleDesc> {
+public class ExampleAssociatePoints<T extends ImageSingleBand, TD extends TupleDesc> {
 
 	// algorithm used to detect and describe interest points
-	DetectDescribePoint<T,FD> detDesc;
+	DetectDescribePoint<T, TD> detDesc;
 	// Associated descriptions together by minimizing an error metric
-	AssociateDescription<FD> associate;
+	AssociateDescription<TD> associate;
 
 	// location of interest points
 	List<Point2D_F64> pointsA;
@@ -61,8 +61,8 @@ public class ExampleAssociatePoints<T extends ImageSingleBand, FD extends TupleD
 
 	Class<T> imageType;
 
-	public ExampleAssociatePoints(DetectDescribePoint<T,FD> detDesc,
-								  AssociateDescription<FD> associate,
+	public ExampleAssociatePoints(DetectDescribePoint<T, TD> detDesc,
+								  AssociateDescription<TD> associate,
 								  Class<T> imageType) {
 		this.detDesc = detDesc;
 		this.associate = associate;
@@ -82,8 +82,8 @@ public class ExampleAssociatePoints<T extends ImageSingleBand, FD extends TupleD
 		pointsB = new ArrayList<Point2D_F64>();
 
 		// stores the description of detected interest points
-		FastQueue<FD> descA = UtilFeature.createQueue(detDesc,100);
-		FastQueue<FD> descB = UtilFeature.createQueue(detDesc,100);
+		FastQueue<TD> descA = UtilFeature.createQueue(detDesc,100);
+		FastQueue<TD> descB = UtilFeature.createQueue(detDesc,100);
 
 		// describe each image using interest points
 		describeImage(inputA,pointsA,descA);
@@ -105,7 +105,7 @@ public class ExampleAssociatePoints<T extends ImageSingleBand, FD extends TupleD
 	/**
 	 * Detects features inside the two images and computes descriptions at those points.
 	 */
-	private void describeImage(T input, List<Point2D_F64> points, FastQueue<FD> descs )
+	private void describeImage(T input, List<Point2D_F64> points, FastQueue<TD> descs )
 	{
 		detDesc.detect(input);
 
