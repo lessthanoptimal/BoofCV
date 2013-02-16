@@ -6,13 +6,9 @@
 
       <h1>Applet below</h1>
       <hr>
-      <applet code="boofcv.applet.MediaApplet.class" width="1200" height="450">
-	<param name="panelPath" value="boofcv.alg.sfm.d3.VisualizeStereoVisualOdometryApp">
-
-	<param name="dataset" value="data/vo/data.txt">
-    <param name="config" value="info.txt">
-alt="Your browser understands the &lt;APPLET&gt; tag but is not running the applet, for some reason."
-	Your browser is completely ignoring the &lt;APPLET&gt; tag!
+      <applet code="boofcv.applet.MediaApplet.class" width="1100" height="550" archive="BoofCV_Applet.jar">
+          <param name="panelPath" value="boofcv.alg.sfm.d2.VideoMosaicSequentialPointApp">
+          <param name="dataset" value="data/mosaic_video.txt">
       </applet>
 
       <hr>

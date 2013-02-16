@@ -10,15 +10,6 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../lib/libpja.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library>
-        <CLASSES>
           <root url="jar://$MODULE_DIR$/../lib/GeoRegression.jar!/" />
         </CLASSES>
         <JAVADOC />
@@ -38,6 +29,15 @@
       <library>
         <CLASSES>
           <root url="jar://$MODULE_DIR$/../lib/BoofCV.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../lib/DDogleg.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />

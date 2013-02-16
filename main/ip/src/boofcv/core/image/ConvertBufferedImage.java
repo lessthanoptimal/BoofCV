@@ -349,7 +349,9 @@ public class ConvertBufferedImage {
 
 		} catch( java.security.AccessControlException e) {
 			// Applets don't allow access to the raster()
-			dst = new MultiSpectral<T>(type,src.getWidth(),src.getHeight(),3);
+			if( dst == null )
+				dst = new MultiSpectral<T>(type,src.getWidth(),src.getHeight(),3);
+
 			if( type == ImageUInt8.class ) {
 				ConvertRaster.bufferedToMulti_U8(src, (MultiSpectral<ImageUInt8>)dst);
 			} else if( type == ImageFloat32.class ) {
