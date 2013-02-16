@@ -22,8 +22,6 @@ import boofcv.alg.distort.DistortImageOps;
 import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.geo.RectifyImageOps;
 import boofcv.alg.geo.rectify.RectifyFundamental;
-import boofcv.alg.sfm.robust.DistanceAffine2D;
-import boofcv.alg.sfm.robust.GenerateAffine2D;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.gui.feature.AssociationPanel;
 import boofcv.gui.image.ShowImages;
@@ -32,9 +30,6 @@ import boofcv.io.image.UtilImageIO;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.MultiSpectral;
-import georegression.struct.affine.Affine2D_F64;
-import org.ddogleg.fitting.modelset.ModelMatcher;
-import org.ddogleg.fitting.modelset.ransac.Ransac;
 import org.ejml.data.DenseMatrix64F;
 
 import java.awt.image.BufferedImage;
@@ -43,29 +38,15 @@ import java.util.List;
 
 /**
  * <p>
- * Given two uncalibrated stereo images (stereo baseline is unknown) rectify the images by aligning the images along
- * the y-axis.  The uncalibrated case is difficult to apply in practice because it requires an accurate fundamental
- * matrix estimate.  Any outliers or other errors will throw the estimate off by a significant amount. Note
- * how rectification is off by several pixels even in this example.
+ * In this example, two images are rectified using a Fundamental matrix.  This is known as uncalibrated stereo
+ * rectification since the camera's intrinsic parameters and stereo baseline are not known.  The fundamental
+ * matrix is computed by matching image features, followed by robust estimation using RANSAC to remove outliers.
  * </p>
  *
  * <p>
- * In the example below a hack is used to remove the last few outliers, applying crude affine constraint.
- * The affine constraint works moderately well in this example because the observed location of points after
- * the true rigid body motion has applied is within several pixels of the affine model.
- * </p>
- *
- * <p>
- * Check list for correctly applying uncalibrated rectification:
- * <ul>
- * <li>Must remove all incorrect associated pairs</li>
- * <ul>
- *   <li>Do not rely on the epipolar constraint alone to remove noise</li>
- *   <li>Use a robust estimation algorithm to compute F (e.g. RANSAC).</li>
- *   <li>Remove lens distortion to improve accuracy</li>
- * </ul>
- * <li>Curse CV books for not mentioning these important problems and making it sound trivial</li>
- * <ul>
+ * Lens distortion has been removed to increase its accuracy.  It is worth mentioning that if you
+ * can remove lens distortion then you also know the intrinsic camera parameters.  To see how this added information
+ * can be used take a look at {@link ExampleStereoTwoViewsOneCamera}.
  * </p>
  *
  * @author Peter Abeles
@@ -124,48 +105,19 @@ public class ExampleRectifyUncalibratedStereo {
 		ShowImages.showWindow(new RectifiedPairPanel(true, outLeft,outRight),"Rectified");
 	}
 
-	/**
-	 * After the epipolar constraint is used to remove outliers, many still remain.  Here it
-	 * is assumed that there is only a small change between feature locations and any that
-	 * are far away will be pruned.
-	 */
-	public static List<AssociatedPair> pruneWithAffine( List<AssociatedPair> pairs ) {
-
-		// use a fairly crude threshold since its not really an affine scene
-		double threshold = 5;
-
-		GenerateAffine2D modelFitter = new GenerateAffine2D();
-		DistanceAffine2D distance = new DistanceAffine2D();
-		int minSamples = modelFitter.getMinimumPoints();
-		ModelMatcher<Affine2D_F64,AssociatedPair> modelMatcher =
-				new Ransac<Affine2D_F64,AssociatedPair>(
-						123,modelFitter,distance,200,threshold);
-
-		if( !modelMatcher.process(pairs) )
-			throw new RuntimeException("Prune affine failed");
-
-		return modelMatcher.getMatchSet();
-	}
-
 	public static void main( String args[] ) {
 
 		// load images with lens distortion removed
-		String dir = "../data/evaluation/structure/";
-		BufferedImage imageA = UtilImageIO.loadImage(dir + "undist_cyto_01.jpg");
-		BufferedImage imageB = UtilImageIO.loadImage(dir + "undist_cyto_02.jpg");
+		String dir = "../data/applet/stereo/";
+		BufferedImage imageA = UtilImageIO.loadImage(dir + "mono_wall_01.jpg");
+		BufferedImage imageB = UtilImageIO.loadImage(dir + "mono_wall_03.jpg");
 
 		// Find a set of point feature matches
 		List<AssociatedPair> matches = ExampleFundamentalMatrix.computeMatches(imageA,imageB);
 
 		// Prune matches using the epipolar constraint
 		List<AssociatedPair> inliers = new ArrayList<AssociatedPair>();
-		ExampleFundamentalMatrix.robustFundamental(matches, inliers);
-
-		// Remove additional outliers by assuming a small change between the images
-		inliers = pruneWithAffine(inliers);
-
-		// recompute F using the remaining features pairs
-		DenseMatrix64F F = ExampleFundamentalMatrix.simpleFundamental(inliers);
+		DenseMatrix64F F = ExampleFundamentalMatrix.robustFundamental(matches, inliers);
 
 		// display the inlier matches found using the robust estimator
 		AssociationPanel panel = new AssociationPanel(20);
