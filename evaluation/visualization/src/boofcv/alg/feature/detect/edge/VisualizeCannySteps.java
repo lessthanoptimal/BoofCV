@@ -48,7 +48,7 @@ public class VisualizeCannySteps {
 //	static String fileName = "data/evaluation/particles01.jpg";
 //	static String fileName = "data/evaluation/scale/beach02.jpg";
 //	static String fileName = "data/evaluation/indoors01.jpg";
-	static String fileName = "data/shapes01.png";
+	static String fileName = "../data/applet/shapes01.png";
 
 	public static void main( String args[] ){
 

@@ -89,18 +89,14 @@ public class CalibratedImageGridPanel extends JPanel {
 		this.selectedImage = selected;
 		this.isUndistorted = false;
 
-		BufferedImage image = images.get(selected);
-		int numBands = image.getRaster().getNumBands();
+		if( origMS == null ) {
+			BufferedImage image = images.get(selected);
 
-		if( origMS == null || origMS.getNumBands() != numBands ) {
-			origMS = new MultiSpectral<ImageFloat32>(ImageFloat32.class,1,1,numBands);
-			correctedMS = new MultiSpectral<ImageFloat32>(ImageFloat32.class,1,1,numBands);
-		}
-		if( image.getWidth() != origMS.getWidth() || image.getHeight() != origMS.getHeight() ) {
-			int type = numBands == 1 ? BufferedImage.TYPE_INT_BGR : image.getType();
-			undistorted = new BufferedImage(image.getWidth(),image.getHeight(),type);
-			origMS.reshape(image.getWidth(),image.getHeight());
-			correctedMS.reshape(image.getWidth(),image.getHeight());
+			// the number of bands can be difficult to ascertain without digging deep into the data structure
+			// so just declare a new one using convert
+			origMS = ConvertBufferedImage.convertFromMulti(image,null,ImageFloat32.class);
+			correctedMS = ConvertBufferedImage.convertFromMulti(image,null,ImageFloat32.class);
+			undistorted = new BufferedImage(image.getWidth(),image.getHeight(),image.getType());
 		}
 	}
 

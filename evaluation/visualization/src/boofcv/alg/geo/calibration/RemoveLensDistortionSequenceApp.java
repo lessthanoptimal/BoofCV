@@ -43,7 +43,7 @@ public class RemoveLensDistortionSequenceApp {
 
 	public static void main( String args[] ) {
 		MediaManager media = DefaultMediaManager.INSTANCE;
-		String calibDir = "../data/evaluation/calibration/mono/Sony_DSC-HX5V_Chess/";
+		String calibDir = "../data/applet/calibration/mono/Sony_DSC-HX5V_Chess/";
 		String fileName = "/home/pja/a/lines.mjpeg";
 		String outputDir = "/home/pja/a/images/";
 
