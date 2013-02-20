@@ -3,6 +3,13 @@ Change Log
 Date Format: year/month/day
 
 ---------------------------------------------
+Date    : 2013
+Version : Alpha 0.14
+
+- Added histogram to ImageStatistics
+- Calibration target's binary threshold is selected using image histogram to make it more tolerant to shadows
+
+---------------------------------------------
 Date    : 2013/02/16
 Version : Alpha 0.13
 
