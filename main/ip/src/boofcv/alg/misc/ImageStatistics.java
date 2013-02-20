@@ -205,6 +205,26 @@ public class ImageStatistics {
 	}
 
 	/**
+	 * Computes the histogram of intensity values for the image.
+	 * 
+	 * @param input (input) Image.
+	 * @param histogram (output) Storage for histogram. Number of elements must be equal to max value.
+	 */
+	public static void histogram( ImageUInt8 input , int histogram[] ) {
+		for( int i = 0; i < histogram.length; i++ )
+			histogram[i] = 0;
+		
+		for( int y = 0; y < input.height; y++ ) {
+			int index = input.startIndex + y*input.stride;
+			int end = index + input.width;
+
+			for( ; index < end; index++ ) {
+				histogram[input.data[index]& 0xFF]++;
+			}
+		}
+	}
+
+	/**
 	 * Returns the minimum element value.
 	 * 
 	 * @param input Input image. Not modified.
@@ -377,6 +397,29 @@ public class ImageStatistics {
 		}
 
 		return total / (double)(imgA.width*imgA.height);
+	}
+
+	/**
+	 * Computes the histogram of intensity values for the image.
+	 * 
+	 * @param input (input) Image.
+	 * @param minValue (input) Minimum possible intensity value   
+	 * @param histogram (output) Storage for histogram. Number of elements must be equal to max value.
+	 */
+	public static void histogram( ImageSInt8 input , int minValue , int histogram[] ) {
+		minValue = -minValue;
+		for( int i = 0; i < histogram.length; i++ )
+			histogram[i] = 0;
+		
+		for( int y = 0; y < input.height; y++ ) {
+			int index = input.startIndex + y*input.stride;
+			int end = index + input.width;
+
+			for( ; index < end; index++ ) {
+				// floor value. just convert to int rounds towards zero
+				histogram[minValue + input.data[index]]++;
+			}
+		}
 	}
 
 	/**
@@ -555,6 +598,26 @@ public class ImageStatistics {
 	}
 
 	/**
+	 * Computes the histogram of intensity values for the image.
+	 * 
+	 * @param input (input) Image.
+	 * @param histogram (output) Storage for histogram. Number of elements must be equal to max value.
+	 */
+	public static void histogram( ImageUInt16 input , int histogram[] ) {
+		for( int i = 0; i < histogram.length; i++ )
+			histogram[i] = 0;
+		
+		for( int y = 0; y < input.height; y++ ) {
+			int index = input.startIndex + y*input.stride;
+			int end = index + input.width;
+
+			for( ; index < end; index++ ) {
+				histogram[input.data[index]& 0xFFFF]++;
+			}
+		}
+	}
+
+	/**
 	 * Returns the minimum element value.
 	 * 
 	 * @param input Input image. Not modified.
@@ -727,6 +790,29 @@ public class ImageStatistics {
 		}
 
 		return total / (double)(imgA.width*imgA.height);
+	}
+
+	/**
+	 * Computes the histogram of intensity values for the image.
+	 * 
+	 * @param input (input) Image.
+	 * @param minValue (input) Minimum possible intensity value   
+	 * @param histogram (output) Storage for histogram. Number of elements must be equal to max value.
+	 */
+	public static void histogram( ImageSInt16 input , int minValue , int histogram[] ) {
+		minValue = -minValue;
+		for( int i = 0; i < histogram.length; i++ )
+			histogram[i] = 0;
+		
+		for( int y = 0; y < input.height; y++ ) {
+			int index = input.startIndex + y*input.stride;
+			int end = index + input.width;
+
+			for( ; index < end; index++ ) {
+				// floor value. just convert to int rounds towards zero
+				histogram[minValue + input.data[index]]++;
+			}
+		}
 	}
 
 	/**
@@ -905,6 +991,29 @@ public class ImageStatistics {
 	}
 
 	/**
+	 * Computes the histogram of intensity values for the image.
+	 * 
+	 * @param input (input) Image.
+	 * @param minValue (input) Minimum possible intensity value   
+	 * @param histogram (output) Storage for histogram. Number of elements must be equal to max value.
+	 */
+	public static void histogram( ImageSInt32 input , int minValue , int histogram[] ) {
+		minValue = -minValue;
+		for( int i = 0; i < histogram.length; i++ )
+			histogram[i] = 0;
+		
+		for( int y = 0; y < input.height; y++ ) {
+			int index = input.startIndex + y*input.stride;
+			int end = index + input.width;
+
+			for( ; index < end; index++ ) {
+				// floor value. just convert to int rounds towards zero
+				histogram[minValue + input.data[index]]++;
+			}
+		}
+	}
+
+	/**
 	 * Returns the minimum element value.
 	 * 
 	 * @param input Input image. Not modified.
@@ -1077,6 +1186,29 @@ public class ImageStatistics {
 		}
 
 		return total / (double)(imgA.width*imgA.height);
+	}
+
+	/**
+	 * Computes the histogram of intensity values for the image.
+	 * 
+	 * @param input (input) Image.
+	 * @param minValue (input) Minimum possible intensity value   
+	 * @param histogram (output) Storage for histogram. Number of elements must be equal to max value.
+	 */
+	public static void histogram( ImageSInt64 input , int minValue , int histogram[] ) {
+		minValue = -minValue;
+		for( int i = 0; i < histogram.length; i++ )
+			histogram[i] = 0;
+		
+		for( int y = 0; y < input.height; y++ ) {
+			int index = input.startIndex + y*input.stride;
+			int end = index + input.width;
+
+			for( ; index < end; index++ ) {
+				// floor value. just convert to int rounds towards zero
+				histogram[minValue + (int)input.data[index]]++;
+			}
+		}
 	}
 
 	/**
@@ -1255,6 +1387,29 @@ public class ImageStatistics {
 	}
 
 	/**
+	 * Computes the histogram of intensity values for the image.
+	 * 
+	 * @param input (input) Image.
+	 * @param minValue (input) Minimum possible intensity value   
+	 * @param histogram (output) Storage for histogram. Number of elements must be equal to max value.
+	 */
+	public static void histogram( ImageFloat32 input , int minValue , int histogram[] ) {
+		minValue = -minValue;
+		for( int i = 0; i < histogram.length; i++ )
+			histogram[i] = 0;
+		
+		for( int y = 0; y < input.height; y++ ) {
+			int index = input.startIndex + y*input.stride;
+			int end = index + input.width;
+
+			for( ; index < end; index++ ) {
+				// floor value. just convert to int rounds towards zero
+				histogram[minValue + (int)input.data[index]]++;
+			}
+		}
+	}
+
+	/**
 	 * Returns the minimum element value.
 	 * 
 	 * @param input Input image. Not modified.
@@ -1427,6 +1582,29 @@ public class ImageStatistics {
 		}
 
 		return total / (double)(imgA.width*imgA.height);
+	}
+
+	/**
+	 * Computes the histogram of intensity values for the image.
+	 * 
+	 * @param input (input) Image.
+	 * @param minValue (input) Minimum possible intensity value   
+	 * @param histogram (output) Storage for histogram. Number of elements must be equal to max value.
+	 */
+	public static void histogram( ImageFloat64 input , int minValue , int histogram[] ) {
+		minValue = -minValue;
+		for( int i = 0; i < histogram.length; i++ )
+			histogram[i] = 0;
+		
+		for( int y = 0; y < input.height; y++ ) {
+			int index = input.startIndex + y*input.stride;
+			int end = index + input.width;
+
+			for( ; index < end; index++ ) {
+				// floor value. just convert to int rounds towards zero
+				histogram[minValue + (int)input.data[index]]++;
+			}
+		}
 	}
 
 }

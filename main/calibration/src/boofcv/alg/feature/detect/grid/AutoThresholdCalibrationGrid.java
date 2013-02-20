@@ -20,7 +20,6 @@ package boofcv.alg.feature.detect.grid;
 
 import boofcv.alg.feature.detect.quadblob.QuadBlob;
 import boofcv.alg.filter.binary.GThresholdImageOps;
-import boofcv.alg.misc.GImageStatistics;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.ImageRectangle;
 import boofcv.struct.image.ImageFloat32;
@@ -57,6 +56,9 @@ public class AutoThresholdCalibrationGrid {
 	private FitGaussianPrune low = new FitGaussianPrune(20,3,5);
 	private FitGaussianPrune high = new FitGaussianPrune(20,3,5);
 
+	// storage for image histogram
+	private int histogram[] = new int[256];
+
 	/**
 	 * Configures auto threshold.
 	 *
@@ -81,7 +83,7 @@ public class AutoThresholdCalibrationGrid {
 
 		double threshold = initialThreshold;
 		if( threshold < 0 )
-			threshold = GImageStatistics.mean(gray);
+			threshold = UtilCalibrationGrid.selectThreshold(gray,histogram);
 
 		GThresholdImageOps.threshold(gray,binary,threshold,true);
 

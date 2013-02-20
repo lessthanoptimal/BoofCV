@@ -68,9 +68,63 @@ public class GenerateImageStatistics extends CodeGeneratorBase {
 			printVariance();
 			printMeanDiffSq();
 			printMeanDiffAbs();
+			printHistogram();
 		}
 	}
 
+	public void printHistogram() {
+		if( input.isSigned() ) {
+
+			out.print("\t/**\n" +
+					"\t * Computes the histogram of intensity values for the image.\n" +
+					"\t * \n" +
+					"\t * @param input (input) Image.\n" +
+					"\t * @param minValue (input) Minimum possible intensity value   \n" +
+					"\t * @param histogram (output) Storage for histogram. Number of elements must be equal to max value.\n" +
+					"\t */\n" +
+					"\tpublic static void histogram( "+input.getImageName()+" input , int minValue , int histogram[] ) {\n" +
+					"\t\tminValue = -minValue;\n" +
+					"\t\tfor( int i = 0; i < histogram.length; i++ )\n" +
+					"\t\t\thistogram[i] = 0;\n" +
+					"\t\t\n" +
+					"\t\tfor( int y = 0; y < input.height; y++ ) {\n" +
+					"\t\t\tint index = input.startIndex + y*input.stride;\n" +
+					"\t\t\tint end = index + input.width;\n" +
+					"\n" +
+					"\t\t\tfor( ; index < end; index++ ) {\n" +
+					"\t\t\t\t// floor value. just convert to int rounds towards zero\n");
+			if( input.isInteger()) {
+				if( input.getNumBits() == 64 )
+					out.print("\t\t\t\thistogram[minValue + (int)input.data[index]]++;\n");
+				else
+					out.print("\t\t\t\thistogram[minValue + input.data[index]]++;\n");
+			} else
+				out.print("\t\t\t\thistogram[minValue + (int)input.data[index]]++;\n");
+			out.print("\t\t\t}\n" +
+					"\t\t}\n" +
+					"\t}\n\n");
+		} else {
+			out.print("\t/**\n" +
+					"\t * Computes the histogram of intensity values for the image.\n" +
+					"\t * \n" +
+					"\t * @param input (input) Image.\n" +
+					"\t * @param histogram (output) Storage for histogram. Number of elements must be equal to max value.\n" +
+					"\t */\n" +
+					"\tpublic static void histogram( "+input.getImageName()+" input , int histogram[] ) {\n" +
+					"\t\tfor( int i = 0; i < histogram.length; i++ )\n" +
+					"\t\t\thistogram[i] = 0;\n" +
+					"\t\t\n" +
+					"\t\tfor( int y = 0; y < input.height; y++ ) {\n" +
+					"\t\t\tint index = input.startIndex + y*input.stride;\n" +
+					"\t\t\tint end = index + input.width;\n" +
+					"\n" +
+					"\t\t\tfor( ; index < end; index++ ) {\n" +
+					"\t\t\t\thistogram[input.data[index]"+input.getBitWise()+"]++;\n" +
+					"\t\t\t}\n" +
+					"\t\t}\n" +
+					"\t}\n\n");
+		}
+	}
 
 	public void printMaxAbs() {
 		out.print("\t/**\n" +

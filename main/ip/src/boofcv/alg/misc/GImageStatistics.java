@@ -259,4 +259,34 @@ public class GImageStatistics {
 			throw new IllegalArgumentException("Unknown image Type");
 		}
 	}
+
+	/**
+	 * Computes the histogram of intensity values for the image.  For floating point images it is rounded
+	 * to the nearest integer using "(int)value".
+	 *
+	 * @param input (input) Image.
+	 * @param minValue (input) Minimum possible intensity value   Ignored for unsigned images.
+	 * @param histogram (output) Storage for histogram. Number of elements must be equal to max value.
+	 */
+	public static void histogram( ImageSingleBand input , int minValue , int histogram[] ) {
+		if( ImageUInt8.class == input.getClass() ) {
+			ImageStatistics.histogram((ImageUInt8)input,histogram);
+		} else if( ImageSInt8.class == input.getClass() ) {
+			ImageStatistics.histogram((ImageSInt8)input,minValue,histogram);
+		} else if( ImageUInt16.class == input.getClass() ) {
+			ImageStatistics.histogram((ImageUInt16)input,histogram);
+		} else if( ImageSInt16.class == input.getClass() ) {
+			ImageStatistics.histogram((ImageSInt16)input,minValue,histogram);
+		} else if( ImageSInt32.class == input.getClass() ) {
+			ImageStatistics.histogram((ImageSInt32)input,minValue,histogram);
+		} else if( ImageSInt64.class == input.getClass() ) {
+			ImageStatistics.histogram((ImageSInt64)input,minValue,histogram);
+		} else if( ImageFloat32.class == input.getClass() ) {
+			ImageStatistics.histogram((ImageFloat32)input,minValue,histogram);
+		} else if( ImageFloat64.class == input.getClass() ) {
+			ImageStatistics.histogram((ImageFloat64)input,minValue,histogram);
+		} else {
+			throw new IllegalArgumentException("Unknown image Type");
+		}
+	}
 }
