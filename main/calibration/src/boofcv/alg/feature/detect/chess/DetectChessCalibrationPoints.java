@@ -28,7 +28,6 @@ import boofcv.alg.feature.detect.quadblob.OrderPointsIntoGrid;
 import boofcv.alg.filter.binary.BinaryImageOps;
 import boofcv.alg.filter.binary.GThresholdImageOps;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
-import boofcv.alg.misc.GImageStatistics;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.core.image.border.BorderType;
@@ -109,8 +108,8 @@ public class DetectChessCalibrationPoints<T extends ImageSingleBand, D extends I
 	// true if it found the rectangular bound
 	private boolean foundBound;
 
-	// Found candidate calibration points
-	List<Point2D_F64> points;
+	// storage for image histogram
+	private int histogram[] = new int[256];
 
 	/**
 	 * Configures detection parameters
@@ -213,9 +212,10 @@ public class DetectChessCalibrationPoints<T extends ImageSingleBand, D extends I
 			return false;
 		}
 
-		if (numColsPoints * numRowsPoints != orderAlg.getNumCols() * orderAlg.getNumRows())
+		if (numColsPoints * numRowsPoints != orderAlg.getNumCols() * orderAlg.getNumRows()) {
+			System.err.println("Unexpected grid size");
 			return false;
-//			throw new InvalidCalibrationTarget("Unexpected grid size");
+		}
 
 		subpixel = UtilCalibrationGrid.rotatePoints(orderAlg.getOrdered(),
 				orderAlg.getNumRows(), orderAlg.getNumCols(),
@@ -240,7 +240,7 @@ public class DetectChessCalibrationPoints<T extends ImageSingleBand, D extends I
 
 		double threshold = selectedThreshold;
 		if( threshold < 0 )
-			threshold = GImageStatistics.mean(gray);
+			threshold = UtilCalibrationGrid.selectThreshold(gray,histogram);
 
 		GThresholdImageOps.threshold(gray, binary, threshold, true);
 

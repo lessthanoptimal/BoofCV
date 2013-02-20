@@ -108,4 +108,8 @@ public class WrapPlanarSquareGridTarget implements PlanarCalibrationDetector {
 	public DetectSquareCalibrationPoints getDetect() {
 		return detect;
 	}
+
+	public AutoThresholdCalibrationGrid getAutoThreshold() {
+		return autoThreshold;
+	}
 }
