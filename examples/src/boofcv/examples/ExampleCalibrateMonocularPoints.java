@@ -83,7 +83,7 @@ public class ExampleCalibrateMonocularPoints {
 		List<String> imageNames = BoofMiscOps.directoryList(directory,"left");
 
 		PlanarCalibrationDetector detector = FactoryPlanarCalibrationTarget.
-				detectorChessboard(new ConfigChessboard(3, 4));
+				detectorChessboard(new ConfigChessboard(5, 7));
 
 		List<List<Point2D_F64>> ret = new ArrayList<List<Point2D_F64>>();
 
@@ -102,7 +102,7 @@ public class ExampleCalibrateMonocularPoints {
 
 	public static void main( String args[] ) {
 		// target description and list of observations
-		PlanarCalibrationTarget desc = FactoryPlanarCalibrationTarget.gridChess(3, 4, 30);
+		PlanarCalibrationTarget desc = FactoryPlanarCalibrationTarget.gridChess(5, 7, 30);
 		List<List<Point2D_F64>> calibPts = loadObservations();
 
 		// Calibrate the camera

@@ -115,8 +115,8 @@ public class DetectChessCalibrationPoints<T extends ImageSingleBand, D extends I
 	/**
 	 * Configures detection parameters
 	 *
-	 * @param numCols       Number of columns in square block grid.  Target dependent.
-	 * @param numRows       Number of rows in square block grid.  Target dependent.
+	 * @param numCols       Number of columns in the grid.  Target dependent.
+	 * @param numRows       Number of rows in the grid.  Target dependent.
 	 * @param radius        Side of interest point detection region.  Typically 5
 	 * @param threshold		Threshold for computing binary image.  If < 0 then the mean intensity will be used.
 	 * @param relativeSizeThreshold Increases or decreases the minimum allowed blob size. Try 1.0
@@ -131,8 +131,8 @@ public class DetectChessCalibrationPoints<T extends ImageSingleBand, D extends I
 		this.radius = radius;
 		this.relativeSizeThreshold = relativeSizeThreshold;
 
-		this.numColsPoints = 2 * (numCols - 1);
-		this.numRowsPoints = 2 * (numRows - 1);
+		this.numColsPoints = numCols-1;
+		this.numRowsPoints = numRows-1;
 
 		this.selectedThreshold = threshold;
 

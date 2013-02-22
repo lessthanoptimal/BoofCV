@@ -57,8 +57,8 @@ public class WrapPlanarSquareGridTarget implements PlanarCalibrationDetector {
 
 		this.squareColumns = config.numCols;
 
-		pointColumns = squareColumns*2;
-		pointRows = config.numRows*2;
+		pointColumns = (squareColumns/2+1)*2;
+		pointRows = (config.numRows/2+1)*2;
 
 		detect = new DetectSquareCalibrationPoints(500,config.relativeSizeThreshold,squareColumns,config.numRows);
 		autoThreshold = new AutoThresholdCalibrationGrid(config.binaryThreshold);
@@ -99,6 +99,10 @@ public class WrapPlanarSquareGridTarget implements PlanarCalibrationDetector {
 	@Override
 	public List<Point2D_F64> getPoints() {
 		return ret;
+	}
+
+	public AutoThresholdCalibrationGrid getAutoThreshold() {
+		return autoThreshold;
 	}
 
 	public RefineCalibrationGridCorner getRefine() {

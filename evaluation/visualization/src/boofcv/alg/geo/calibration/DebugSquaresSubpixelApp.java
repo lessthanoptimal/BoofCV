@@ -196,7 +196,7 @@ public class DebugSquaresSubpixelApp
 
 	public static void main(String args[]) {
 
-		DebugSquaresSubpixelApp app = new DebugSquaresSubpixelApp(3,4);
+		DebugSquaresSubpixelApp app = new DebugSquaresSubpixelApp(5,7);
 
 		String prefix = "../data/evaluation/calibration/mono/Sony_DSC-HX5V_Square/";
 //		String prefix = "../data/evaluation/calibration/mono/PULNiX_CCD_6mm_Zhang/";

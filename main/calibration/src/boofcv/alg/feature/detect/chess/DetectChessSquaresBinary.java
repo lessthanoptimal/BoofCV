@@ -70,7 +70,11 @@ public class DetectChessSquaresBinary {
 		this.numRows = numRows;
 		this.numCols = numCols;
 
-		expectedBlobs = numRows*numCols + (numCols-1)*(numRows-1);
+		// number of black squares in rows/columns
+		int blackCols = numCols/2 + numCols%2;
+		int blackRows = numRows/2 + numRows%2;
+
+		expectedBlobs = blackCols*blackRows + (blackCols-1)*(blackRows-1);
 
 		setMinimumContourSize(minContourSize);
 	}
@@ -192,10 +196,10 @@ public class DetectChessSquaresBinary {
 		if( conn[0] != 0 )
 			return false;
 
-		if( conn[1] != 4 )
+		if( conn[1] != 1 + (numCols%2) + (numRows%2) + ((numCols+numRows+1)%2) )
 			return false;
 
-		if( conn[2] != 2*(numCols+numRows-4) )
+		if( conn[2] != 2*(numCols/2-1) + 2*(numRows/2-1) )
 			return false;
 
 		if( conn[3] != 0 )
