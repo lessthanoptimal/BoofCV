@@ -18,6 +18,8 @@
 
 package boofcv.alg.feature.detect.grid;
 
+import boofcv.alg.misc.GImageStatistics;
+import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I32;
 import org.ddogleg.sorting.QuickSort_F64;
@@ -31,6 +33,43 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class UtilCalibrationGrid {
+
+	/**
+	 * Selects a threshold using the image histogram.
+	 */
+	public static int selectThreshold( ImageSingleBand image , int histogram[] ) {
+		GImageStatistics.histogram(image,0,histogram);
+
+		int mean = 0;
+		for( int i = 1; i < histogram.length; i++ ) {
+			mean += i*histogram[i];
+		}
+		mean /= (image.width*image.height);
+
+		// find peaks below and above the mean
+		int lowerPeak = -1;
+		int lowerValue = 0;
+
+		int upperPeak = -1;
+		int upperValue = 0;
+
+		for( int i = 0; i < histogram.length; i++ ) {
+			if( i < mean ) {
+				if( histogram[i] > lowerValue ) {
+					lowerValue = histogram[i];
+					lowerPeak = i;
+				}
+			} else {
+				if( histogram[i] > upperValue ) {
+					upperValue = histogram[i];
+					upperPeak = i;
+				}
+			}
+		}
+
+		// pick the point which maximizes the separation between the two peaks
+		return (lowerPeak + upperPeak)/2;
+	}
 
 	/**
 	 * Automatically checks and adjusts the points.  if the number of rows/columns are swapped the
