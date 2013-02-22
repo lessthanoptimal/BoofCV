@@ -76,6 +76,7 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
             <bottom><![CDATA[<b>Copyright &copy; 2011-2012 Peter Abeles</b>]]></bottom>
  
         </javadoc>
+	<jar compress="true" destfile="docs/javadoc.jar" basedir="docs/api" />
     </target>
 
     <target name="test">

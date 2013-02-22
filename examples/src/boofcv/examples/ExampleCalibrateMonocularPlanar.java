@@ -72,10 +72,10 @@ public class ExampleCalibrateMonocularPlanar {
 	 */
 	private void setupZhang99() {
 		// Use the wrapper below for square grid targets.
-		detector = FactoryPlanarCalibrationTarget.detectorSquareGrid(new ConfigSquareGrid(8, 8));
+		detector = FactoryPlanarCalibrationTarget.detectorSquareGrid(new ConfigSquareGrid(15, 15));
 
 		// physical description
-		target = FactoryPlanarCalibrationTarget.gridSquare(8, 8, 0.5, 7.0 / 18.0);
+		target = FactoryPlanarCalibrationTarget.gridSquare(15, 15, 0.5, 7.0 / 18.0);
 
 		// load image list
 		String directory = "../data/evaluation/calibration/mono/PULNiX_CCD_6mm_Zhang";
@@ -91,10 +91,10 @@ public class ExampleCalibrateMonocularPlanar {
 	private void setupBumbleBee() {
 		// Use the wrapper below for chessboard targets.  The last parameter adjusts the size of the corner detection
 		// region.  TUNE THIS PARAMETER FOR OPTIMAL ACCURACY!
-		detector = FactoryPlanarCalibrationTarget.detectorChessboard(new ConfigChessboard(3,4));
+		detector = FactoryPlanarCalibrationTarget.detectorChessboard(new ConfigChessboard(5,7));
 
 		// physical description
-		target = FactoryPlanarCalibrationTarget.gridChess(3, 4, 30);
+		target = FactoryPlanarCalibrationTarget.gridChess(5, 7, 30);
 
 		// load image list
 		String directory = "../data/evaluation/calibration/stereo/Bumblebee2_Chess";

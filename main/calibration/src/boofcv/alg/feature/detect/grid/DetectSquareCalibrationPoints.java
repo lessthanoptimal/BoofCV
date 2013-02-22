@@ -62,8 +62,7 @@ public class DetectSquareCalibrationPoints {
 	private List<QuadBlob> squares;
 
 	// number of black squares in calibration grid
-	private int gridCols;
-	private int gridRows;
+	private int numSquares;
 
 	// maximum number of possible targets it will consider
 	private int maxCombinations;
@@ -94,14 +93,16 @@ public class DetectSquareCalibrationPoints {
 										 int gridCols, int gridRows) {
 		if( gridCols <= 0 || gridRows <= 0 )
 			throw new IllegalArgumentException("Columns and rows must be more than zero");
+		if( gridCols%2 == 0 || gridRows%2 == 0)
+			throw new IllegalArgumentException("Number of columns and rows must be odd");
 
-		this.gridCols = gridCols;
-		this.gridRows = gridRows;
+		// black squares are every other element in the grid
+		this.numSquares = (gridCols/2+1)*(gridRows/2+1);
 		this.maxCombinations = maxCombinations;
 		this.relativeSizeThreshold = relativeSizeThreshold;
 
 		// minContourSize is specified later after the image's size is known
-		detectBlobs = new DetectQuadBlobsBinary(0,0.25,gridCols*gridRows);
+		detectBlobs = new DetectQuadBlobsBinary(0,0.25,numSquares);
 	}
 
 	/**
@@ -153,12 +154,11 @@ public class DetectSquareCalibrationPoints {
 	 * @return true of it worked
 	 */
 	private boolean shuffleToFindTarget( List<QuadBlob> squares ) {
-		
-		int N = gridCols * gridRows;
-		if( squares.size() < N )
+
+		if( squares.size() < numSquares )
 			return fail("Not enough blobs detected");
 
-		Combinations<QuadBlob> combinations = new Combinations<QuadBlob>(squares,N);
+		Combinations<QuadBlob> combinations = new Combinations<QuadBlob>(squares,numSquares);
 
 //		System.out.println("------------------------------------"+squares.size()+"  N "+N);
 //		System.out.println("Total Shuffles: "+combinations.numShuffles());

@@ -19,6 +19,7 @@
 package boofcv.alg.geo.calibration;
 
 import boofcv.abst.calib.CalibrateMonoPlanar;
+import boofcv.abst.calib.ConfigChessboard;
 import boofcv.abst.calib.ConfigSquareGrid;
 import boofcv.abst.calib.PlanarCalibrationDetector;
 import boofcv.alg.distort.ImageDistort;
@@ -193,14 +194,13 @@ public class CalibrateMonoPlanarGuiApp extends JPanel
 	}
 
 	public static void main( String args[] ) {
-		PlanarCalibrationDetector detector = FactoryPlanarCalibrationTarget.detectorSquareGrid(new ConfigSquareGrid(8,8));
-//		PlanarCalibrationDetector detector = FactoryPlanarCalibrationTarget.detectorSquareGrid(new ConfigSquareGrid(3,4));
-//		PlanarCalibrationDetector detector = FactoryPlanarCalibrationTarget.
-//				detectorChessboard(new ConfigCalibrationChess(3,4));
+		PlanarCalibrationDetector detector = FactoryPlanarCalibrationTarget.detectorSquareGrid(new ConfigSquareGrid(15,15));
+//		PlanarCalibrationDetector detector = FactoryPlanarCalibrationTarget.detectorSquareGrid(new ConfigSquareGrid(5,7));
+//		PlanarCalibrationDetector detector = FactoryPlanarCalibrationTarget.detectorChessboard(new ConfigChessboard(5,7));
 
-		PlanarCalibrationTarget target = FactoryPlanarCalibrationTarget.gridSquare(8, 8, 0.5, 7.0 / 18.0);
-//		PlanarCalibrationTarget target = FactoryPlanarCalibrationTarget.gridSquare(3,4,30,30);
-//		PlanarCalibrationTarget target = FactoryPlanarCalibrationTarget.gridChess(3, 4, 30);
+		PlanarCalibrationTarget target = FactoryPlanarCalibrationTarget.gridSquare(15, 15, 0.5, 7.0 / 18.0);
+//		PlanarCalibrationTarget target = FactoryPlanarCalibrationTarget.gridSquare(5, 7,30,30);
+//		PlanarCalibrationTarget target = FactoryPlanarCalibrationTarget.gridChess(5, 7, 30);
 
 //		String directory = "../data/evaluation/calibration/mono/Sony_DSC-HX5V_Square";
 //		String directory = "../data/evaluation/calibration/mono/Sony_DSC-HX5V_Chess";

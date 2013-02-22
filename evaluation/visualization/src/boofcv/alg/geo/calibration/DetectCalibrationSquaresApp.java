@@ -324,7 +324,7 @@ public class DetectCalibrationSquaresApp
 
 		DetectCalibrationSquaresApp app = new DetectCalibrationSquaresApp();
 
-//		String prefix = "../data/evaluation/calibration/mono/Sony_DSC-HX5V_Square/";
+//		String prefix = "../data/applet/calibration/mono/Sony_DSC-HX5V_Square/";
 //		String prefix = "../data/evaluation/calibration/stereo/Bumblebee2_Square/";
 		String prefix = "../data/evaluation/calibration/mono/PULNiX_CCD_6mm_Zhang/";
 

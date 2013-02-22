@@ -73,9 +73,9 @@ public class ExampleCalibrateStereoPlanar {
 	 */
 	public void setupBumblebeeSquare() {
 		// Use the wrapper below for square grid targets.
-		detector = FactoryPlanarCalibrationTarget.detectorSquareGrid(new ConfigSquareGrid(3,4));
+		detector = FactoryPlanarCalibrationTarget.detectorSquareGrid(new ConfigSquareGrid(5,7));
 		// Target physical description
-		target = FactoryPlanarCalibrationTarget.gridSquare(3, 4, 30,30);
+		target = FactoryPlanarCalibrationTarget.gridSquare(5, 7, 30,30);
 
 		String directory = "../data/evaluation/calibration/stereo/Bumblebee2_Square";
 
@@ -91,9 +91,9 @@ public class ExampleCalibrateStereoPlanar {
 	public void setupBumblebeeChess() {
 		// Use the wrapper below for chessboard targets.  The last parameter adjusts the size of the corner detection
 		// region.  TUNE THIS PARAMETER FOR OPTIMAL ACCURACY!
-		detector = FactoryPlanarCalibrationTarget.detectorChessboard(new ConfigChessboard(3,4));
+		detector = FactoryPlanarCalibrationTarget.detectorChessboard(new ConfigChessboard(5,7));
 		// Target physical description
-		target = FactoryPlanarCalibrationTarget.gridChess(3, 4, 30);
+		target = FactoryPlanarCalibrationTarget.gridChess(5, 7, 30);
 
 		String directory = "../data/evaluation/calibration/stereo/Bumblebee2_Chess";
 
