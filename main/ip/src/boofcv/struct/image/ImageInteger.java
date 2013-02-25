@@ -55,7 +55,7 @@ public abstract class ImageInteger<T extends ImageInteger> extends ImageSingleBa
 	 */
 	public int get(int x, int y) {
 		if (!isInBounds(x, y))
-			throw new ImageAccessException("Requested pixel is out of bounds");
+			throw new ImageAccessException("Requested pixel is out of bounds: "+x+" "+y);
 
 		return unsafe_get(x,y);
 	}
