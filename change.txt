@@ -8,6 +8,10 @@ Version : Alpha 0.14
 
 - Added histogram to ImageStatistics
 - Calibration target's binary threshold is selected using image histogram to make it more tolerant to shadows
+- Calibration grid size does not refer to number of black squares any more.  Instead to number of square total.
+- Added image enhancement operations
+  * Global histogram
+  * Local histogram
 
 ---------------------------------------------
 Date    : 2013/02/16

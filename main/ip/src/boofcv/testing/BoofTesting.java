@@ -771,7 +771,7 @@ public class BoofTesting {
 				if (x >= border && x < img.getWidth() - border)
 					continue;
 				if (img.get(x, y).intValue() != 0)
-					throw new RuntimeException("The border is not zero");
+					throw new RuntimeException("The border is not zero: "+x+" "+y);
 			}
 		}
 	}

@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.filter.blur.impl;
+package boofcv.alg.filter.blur;
 
 import boofcv.misc.AutoTypeImage;
 import boofcv.misc.CodeGeneratorBase;
