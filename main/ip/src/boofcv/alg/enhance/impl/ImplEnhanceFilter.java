@@ -21,6 +21,7 @@ package boofcv.alg.enhance.impl;
 import boofcv.struct.convolve.Kernel2D_F32;
 import boofcv.struct.convolve.Kernel2D_I32;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageInteger;
 import boofcv.struct.image.ImageUInt8;
 
 /**
@@ -62,6 +63,62 @@ public class ImplEnhanceFilter {
 		}
 	}
 
+	public static void sharpenBorder4( ImageUInt8 input , ImageUInt8 output , int minValue , int maxValue ) {
+		int value;
+
+		int b = input.height-1;
+
+		int indexTop = input.startIndex;
+		int indexBottom = input.startIndex + b*input.stride;
+		
+		for( int x = 0; x < input.width; x++ ) {
+			value = 4*safeGet(input,x,0) - (safeGet(input,x-1,0) + safeGet(input,x+1,0) + safeGet(input,x,1));
+
+			if( value > maxValue )
+				value = maxValue;
+			else if( value < minValue )
+				value = minValue;
+
+			output.data[indexTop++] = (byte)value;
+
+			value = 4*safeGet(input,x,b) - (safeGet(input,x-1,b) + safeGet(input,x+1,b) + safeGet(input,x,b-1));
+
+			if( value > maxValue )
+				value = maxValue;
+			else if( value < minValue )
+				value = minValue;
+
+			output.data[indexBottom++] = (byte)value;
+		}
+
+		b = input.width-1;
+		int indexLeft = input.startIndex + input.stride;
+		int indexRight = input.startIndex + input.stride + b;
+
+		for( int y = 1; y < input.height-1; y++ ) {
+			value = 4*safeGet(input,0,y) - (safeGet(input,1,y) + safeGet(input,0,y-1) + safeGet(input,0,y+1));
+
+			if( value > maxValue )
+				value = maxValue;
+			else if( value < minValue )
+				value = minValue;
+
+			output.data[indexLeft] = (byte)value;
+
+			value = 4*safeGet(input,b,y) - (safeGet(input,b-1,y) + safeGet(input,b,y-1) + safeGet(input,b,y+1));
+
+			if( value > maxValue )
+				value = maxValue;
+			else if( value < minValue )
+				value = minValue;
+
+			output.data[indexRight] = (byte)value;
+			
+			indexLeft += input.stride;
+			indexRight += input.stride;
+		}
+	}
+
 	public static void sharpenInner4( ImageFloat32 input , ImageFloat32 output , float minValue , float maxValue ) {
 		for( int y = 1; y < input.height-1; y++ ) {
 			int indexIn = input.startIndex + y*input.stride + 1;
@@ -83,8 +140,64 @@ public class ImplEnhanceFilter {
 		}
 	}
 
+	public static void sharpenBorder4( ImageFloat32 input , ImageFloat32 output , float minValue , float maxValue ) {
+		float value;
+
+		int b = input.height-1;
+
+		int indexTop = input.startIndex;
+		int indexBottom = input.startIndex + b*input.stride;
+		
+		for( int x = 0; x < input.width; x++ ) {
+			value = 4*safeGet(input,x,0) - (safeGet(input,x-1,0) + safeGet(input,x+1,0) + safeGet(input,x,1));
+
+			if( value > maxValue )
+				value = maxValue;
+			else if( value < minValue )
+				value = minValue;
+
+			output.data[indexTop++] = value;
+
+			value = 4*safeGet(input,x,b) - (safeGet(input,x-1,b) + safeGet(input,x+1,b) + safeGet(input,x,b-1));
+
+			if( value > maxValue )
+				value = maxValue;
+			else if( value < minValue )
+				value = minValue;
+
+			output.data[indexBottom++] = value;
+		}
+
+		b = input.width-1;
+		int indexLeft = input.startIndex + input.stride;
+		int indexRight = input.startIndex + input.stride + b;
+
+		for( int y = 1; y < input.height-1; y++ ) {
+			value = 4*safeGet(input,0,y) - (safeGet(input,1,y) + safeGet(input,0,y-1) + safeGet(input,0,y+1));
+
+			if( value > maxValue )
+				value = maxValue;
+			else if( value < minValue )
+				value = minValue;
+
+			output.data[indexLeft] = value;
+
+			value = 4*safeGet(input,b,y) - (safeGet(input,b-1,y) + safeGet(input,b,y-1) + safeGet(input,b,y+1));
+
+			if( value > maxValue )
+				value = maxValue;
+			else if( value < minValue )
+				value = minValue;
+
+			output.data[indexRight] = value;
+			
+			indexLeft += input.stride;
+			indexRight += input.stride;
+		}
+	}
+
 	public static void sharpenInner8( ImageUInt8 input , ImageUInt8 output , int minValue , int maxValue ) {
-for( int y = 1; y < input.height-1; y++ ) {
+		for( int y = 1; y < input.height-1; y++ ) {
 			int indexIn = input.startIndex + y*input.stride + 1;
 			int indexOut = output.startIndex + y*output.stride + 1;
 
@@ -112,8 +225,106 @@ for( int y = 1; y < input.height-1; y++ ) {
 		}
 	}
 
+	public static void sharpenBorder8( ImageUInt8 input , ImageUInt8 output , int minValue , int maxValue ) {
+		int value;
+
+		int b = input.height-1;
+		int a11,a12,a13,a21,a22,a23,a31,a32,a33;
+
+		int indexTop = input.startIndex;
+		int indexBottom = input.startIndex + b*input.stride;
+
+		for( int x = 0; x < input.width; x++ ) {
+
+			a11 = safeGet(input,x-1,-1);
+			a12 = safeGet(input,x  ,-1);
+			a13 = safeGet(input,x+1,-1);
+			a21 = safeGet(input,x-1, 0);
+			a22 = safeGet(input,x  , 0);
+			a23 = safeGet(input,x+1, 0);
+			a31 = safeGet(input,x-1, 1);
+			a32 = safeGet(input,x  , 1);
+			a33 = safeGet(input,x+1, 1);
+
+			value = 9*a22 - (a11+a12+a13+a21+a23+a31+a32+a33);
+
+			if( value > maxValue )
+				value = maxValue;
+			else if( value < minValue )
+				value = minValue;
+
+			output.data[indexTop++] = (byte)value;
+
+			a11 = safeGet(input,x-1,b-1);
+			a12 = safeGet(input,x  ,b-1);
+			a13 = safeGet(input,x+1,b-1);
+			a21 = safeGet(input,x-1, b);
+			a22 = safeGet(input,x  , b);
+			a23 = safeGet(input,x+1, b);
+			a31 = safeGet(input,x-1,b+1);
+			a32 = safeGet(input,x  ,b+1);
+			a33 = safeGet(input,x+1,b+1);
+
+			value = 9*a22 - (a11+a12+a13+a21+a23+a31+a32+a33);
+
+			if( value > maxValue )
+				value = maxValue;
+			else if( value < minValue )
+				value = minValue;
+
+			output.data[indexBottom++] = (byte)value;
+		}
+
+		b = input.width-1;
+		int indexLeft = input.startIndex + input.stride;
+		int indexRight = input.startIndex + input.stride + b;
+
+		for( int y = 1; y < input.height-1; y++ ) {
+			a11 = safeGet(input,-1,y-1);
+			a12 = safeGet(input, 0,y-1);
+			a13 = safeGet(input,+1,y-1);
+			a21 = safeGet(input,-1, y );
+			a22 = safeGet(input, 0, y );
+			a23 = safeGet(input,+1, y );
+			a31 = safeGet(input,-1,y+1);
+			a32 = safeGet(input, 0,y+1);
+			a33 = safeGet(input,+1,y+1);
+
+			value = 9*a22 - (a11+a12+a13+a21+a23+a31+a32+a33);
+
+			if( value > maxValue )
+				value = maxValue;
+			else if( value < minValue )
+				value = minValue;
+
+			output.data[indexLeft] = (byte)value;
+
+			a11 = safeGet(input,b-1,y-1);
+			a12 = safeGet(input, b ,y-1);
+			a13 = safeGet(input,b+1,y-1);
+			a21 = safeGet(input,b-1, y );
+			a22 = safeGet(input, b , y );
+			a23 = safeGet(input,b+1, y );
+			a31 = safeGet(input,b-1,y+1);
+			a32 = safeGet(input, b ,y+1);
+			a33 = safeGet(input,b+1,y+1);
+
+			value = 9*a22 - (a11+a12+a13+a21+a23+a31+a32+a33);
+
+			if( value > maxValue )
+				value = maxValue;
+			else if( value < minValue )
+				value = minValue;
+
+			output.data[indexRight] = (byte)value;
+
+			indexLeft += input.stride;
+			indexRight += input.stride;
+		}
+	}
+
 	public static void sharpenInner8( ImageFloat32 input , ImageFloat32 output , float minValue , float maxValue ) {
-for( int y = 1; y < input.height-1; y++ ) {
+		for( int y = 1; y < input.height-1; y++ ) {
 			int indexIn = input.startIndex + y*input.stride + 1;
 			int indexOut = output.startIndex + y*output.stride + 1;
 
@@ -139,6 +350,136 @@ for( int y = 1; y < input.height-1; y++ ) {
 				output.data[indexOut] = result;
 			}
 		}
+	}
+
+	public static void sharpenBorder8( ImageFloat32 input , ImageFloat32 output , float minValue , float maxValue ) {
+		float value;
+
+		int b = input.height-1;
+		float a11,a12,a13,a21,a22,a23,a31,a32,a33;
+
+		int indexTop = input.startIndex;
+		int indexBottom = input.startIndex + b*input.stride;
+
+		for( int x = 0; x < input.width; x++ ) {
+
+			a11 = safeGet(input,x-1,-1);
+			a12 = safeGet(input,x  ,-1);
+			a13 = safeGet(input,x+1,-1);
+			a21 = safeGet(input,x-1, 0);
+			a22 = safeGet(input,x  , 0);
+			a23 = safeGet(input,x+1, 0);
+			a31 = safeGet(input,x-1, 1);
+			a32 = safeGet(input,x  , 1);
+			a33 = safeGet(input,x+1, 1);
+
+			value = 9*a22 - (a11+a12+a13+a21+a23+a31+a32+a33);
+
+			if( value > maxValue )
+				value = maxValue;
+			else if( value < minValue )
+				value = minValue;
+
+			output.data[indexTop++] = value;
+
+			a11 = safeGet(input,x-1,b-1);
+			a12 = safeGet(input,x  ,b-1);
+			a13 = safeGet(input,x+1,b-1);
+			a21 = safeGet(input,x-1, b);
+			a22 = safeGet(input,x  , b);
+			a23 = safeGet(input,x+1, b);
+			a31 = safeGet(input,x-1,b+1);
+			a32 = safeGet(input,x  ,b+1);
+			a33 = safeGet(input,x+1,b+1);
+
+			value = 9*a22 - (a11+a12+a13+a21+a23+a31+a32+a33);
+
+			if( value > maxValue )
+				value = maxValue;
+			else if( value < minValue )
+				value = minValue;
+
+			output.data[indexBottom++] = value;
+		}
+
+		b = input.width-1;
+		int indexLeft = input.startIndex + input.stride;
+		int indexRight = input.startIndex + input.stride + b;
+
+		for( int y = 1; y < input.height-1; y++ ) {
+			a11 = safeGet(input,-1,y-1);
+			a12 = safeGet(input, 0,y-1);
+			a13 = safeGet(input,+1,y-1);
+			a21 = safeGet(input,-1, y );
+			a22 = safeGet(input, 0, y );
+			a23 = safeGet(input,+1, y );
+			a31 = safeGet(input,-1,y+1);
+			a32 = safeGet(input, 0,y+1);
+			a33 = safeGet(input,+1,y+1);
+
+			value = 9*a22 - (a11+a12+a13+a21+a23+a31+a32+a33);
+
+			if( value > maxValue )
+				value = maxValue;
+			else if( value < minValue )
+				value = minValue;
+
+			output.data[indexLeft] = value;
+
+			a11 = safeGet(input,b-1,y-1);
+			a12 = safeGet(input, b ,y-1);
+			a13 = safeGet(input,b+1,y-1);
+			a21 = safeGet(input,b-1, y );
+			a22 = safeGet(input, b , y );
+			a23 = safeGet(input,b+1, y );
+			a31 = safeGet(input,b-1,y+1);
+			a32 = safeGet(input, b ,y+1);
+			a33 = safeGet(input,b+1,y+1);
+
+			value = 9*a22 - (a11+a12+a13+a21+a23+a31+a32+a33);
+
+			if( value > maxValue )
+				value = maxValue;
+			else if( value < minValue )
+				value = minValue;
+
+			output.data[indexRight] = value;
+
+			indexLeft += input.stride;
+			indexRight += input.stride;
+		}
+	}
+
+	/**
+	 * Handle outside image pixels by extending the image.
+	 */
+	public static int safeGet( ImageInteger input , int x , int y ) {
+		if( x < 0 )
+			x = 0;
+		else if( x >= input.width )
+			x = input.width-1;
+		if( y < 0 )
+			y = 0;
+		else if( y >= input.height )
+			y = input.height-1;
+
+		return input.unsafe_get(x,y);
+	}
+
+	/**
+	 * Handle outside image pixels by extending the image.
+	 */
+	public static float safeGet( ImageFloat32 input , int x , int y ) {
+		if( x < 0 )
+			x = 0;
+		else if( x >= input.width )
+			x = input.width-1;
+		if( y < 0 )
+			y = 0;
+		else if( y >= input.height )
+			y = input.height-1;
+
+		return input.unsafe_get(x,y);
 	}
 
 
