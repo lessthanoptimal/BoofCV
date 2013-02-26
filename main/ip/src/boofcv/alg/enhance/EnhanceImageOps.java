@@ -21,12 +21,7 @@ package boofcv.alg.enhance;
 import boofcv.alg.InputSanityCheck;
 import boofcv.alg.enhance.impl.ImplEnhanceFilter;
 import boofcv.alg.enhance.impl.ImplEnhanceHistogram;
-import boofcv.alg.filter.convolve.border.ConvolveJustBorder_General;
 import boofcv.alg.misc.ImageStatistics;
-import boofcv.core.image.border.ImageBorder;
-import boofcv.core.image.border.ImageBorder_F32;
-import boofcv.core.image.border.ImageBorder_I32;
-import boofcv.struct.BoofDefaults;
 import boofcv.struct.image.*;
 
 /**
@@ -226,11 +221,7 @@ public class EnhanceImageOps {
 		InputSanityCheck.checkSameShape(input, output);
 
 		ImplEnhanceFilter.sharpenInner4(input,output,0,255);
-
-		ImageBorder_I32 border = BoofDefaults.borderDerivative_I32();
-		border.setImage(input);
-
-		ConvolveJustBorder_General.convolve(ImplEnhanceFilter.kernelEnhance4_I32, border, output, 1,0,255);
+		ImplEnhanceFilter.sharpenBorder4(input,output,0,255);
 	}
 
 	/**
@@ -243,11 +234,7 @@ public class EnhanceImageOps {
 		InputSanityCheck.checkSameShape(input, output);
 
 		ImplEnhanceFilter.sharpenInner4(input,output,0,255);
-
-		ImageBorder_F32 border = BoofDefaults.borderDerivative_F32();
-		border.setImage(input);
-
-		ConvolveJustBorder_General.convolve(ImplEnhanceFilter.kernelEnhance4_F32, border, output, 1,0,255);
+		ImplEnhanceFilter.sharpenBorder4(input, output, 0, 255);
 	}
 
 	/**
@@ -260,11 +247,7 @@ public class EnhanceImageOps {
 		InputSanityCheck.checkSameShape(input, output);
 
 		ImplEnhanceFilter.sharpenInner8(input,output,0,255);
-
-		ImageBorder_I32 border = BoofDefaults.borderDerivative_I32();
-		border.setImage(input);
-
-		ConvolveJustBorder_General.convolve(ImplEnhanceFilter.kernelEnhance8_I32, border, output, 1,0,255);
+		ImplEnhanceFilter.sharpenBorder8(input, output, 0, 255);
 	}
 
 	/**
@@ -277,10 +260,6 @@ public class EnhanceImageOps {
 		InputSanityCheck.checkSameShape(input, output);
 
 		ImplEnhanceFilter.sharpenInner8(input,output,0,255);
-
-		ImageBorder_F32 border = BoofDefaults.borderDerivative_F32();
-		border.setImage(input);
-
-		ConvolveJustBorder_General.convolve(ImplEnhanceFilter.kernelEnhance8_F32, border, output, 1,0,255);
+		ImplEnhanceFilter.sharpenBorder8(input, output, 0, 255);
 	}
 }

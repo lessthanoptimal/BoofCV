@@ -20,10 +20,8 @@ package boofcv.alg.enhance;
 
 import boofcv.alg.enhance.impl.ImplEnhanceHistogram;
 import boofcv.alg.misc.GImageMiscOps;
-import boofcv.alg.misc.ImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.ImageInteger;
-import boofcv.struct.image.ImageUInt8;
 import boofcv.testing.BoofTesting;
 import org.junit.Test;
 
@@ -90,7 +88,6 @@ public class TestEnhanceImageOps {
 		for( int radius = 1; radius < 11; radius++ ) {
 			BoofTesting.callStaticMethod(ImplEnhanceHistogram.class, "equalizeLocalNaive", input, radius, expected, histogram);
 			BoofTesting.callStaticMethod(EnhanceImageOps.class, "equalizeLocal", input, radius, found, histogram,transform);
-
 
 			BoofTesting.assertEquals(expected, found, 1e-10);
 		}

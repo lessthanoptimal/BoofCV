@@ -38,9 +38,15 @@ public class GenerateImplEnhanceFilter extends CodeGeneratorBase {
 		printPreamble();
 
 		sharpen4(AutoTypeImage.U8);
+		sharpenBorder4(AutoTypeImage.U8);
 		sharpen4(AutoTypeImage.F32);
+		sharpenBorder4(AutoTypeImage.F32);
 		sharpen8(AutoTypeImage.U8);
+		sharpenBorder8(AutoTypeImage.U8);
 		sharpen8(AutoTypeImage.F32);
+		sharpenBorder8(AutoTypeImage.F32);
+
+		printVarious();
 
 		out.print("\n" +
 				"}\n");
@@ -98,6 +104,69 @@ public class GenerateImplEnhanceFilter extends CodeGeneratorBase {
 				"\t}\n\n");
 	}
 
+	private void sharpenBorder4( AutoTypeImage image ) {
+
+		String name = image.getImageName();
+		String cast = image.getTypeCastFromSum();
+		String sumtype = image.getSumType();
+
+		out.print("\tpublic static void sharpenBorder4( "+name+" input , "+name+" output , "+sumtype+" minValue , "+sumtype+" maxValue ) {\n" +
+				"\t\t"+sumtype+" value;\n" +
+				"\n" +
+				"\t\tint b = input.height-1;\n" +
+				"\n" +
+				"\t\tint indexTop = input.startIndex;\n" +
+				"\t\tint indexBottom = input.startIndex + b*input.stride;\n" +
+				"\t\t\n" +
+				"\t\tfor( int x = 0; x < input.width; x++ ) {\n" +
+				"\t\t\tvalue = 4*safeGet(input,x,0) - (safeGet(input,x-1,0) + safeGet(input,x+1,0) + safeGet(input,x,1));\n" +
+				"\n" +
+				"\t\t\tif( value > maxValue )\n" +
+				"\t\t\t\tvalue = maxValue;\n" +
+				"\t\t\telse if( value < minValue )\n" +
+				"\t\t\t\tvalue = minValue;\n" +
+				"\n" +
+				"\t\t\toutput.data[indexTop++] = "+cast+"value;\n" +
+				"\n" +
+				"\t\t\tvalue = 4*safeGet(input,x,b) - (safeGet(input,x-1,b) + safeGet(input,x+1,b) + safeGet(input,x,b-1));\n" +
+				"\n" +
+				"\t\t\tif( value > maxValue )\n" +
+				"\t\t\t\tvalue = maxValue;\n" +
+				"\t\t\telse if( value < minValue )\n" +
+				"\t\t\t\tvalue = minValue;\n" +
+				"\n" +
+				"\t\t\toutput.data[indexBottom++] = "+cast+"value;\n" +
+				"\t\t}\n" +
+				"\n" +
+				"\t\tb = input.width-1;\n" +
+				"\t\tint indexLeft = input.startIndex + input.stride;\n" +
+				"\t\tint indexRight = input.startIndex + input.stride + b;\n" +
+				"\n" +
+				"\t\tfor( int y = 1; y < input.height-1; y++ ) {\n" +
+				"\t\t\tvalue = 4*safeGet(input,0,y) - (safeGet(input,1,y) + safeGet(input,0,y-1) + safeGet(input,0,y+1));\n" +
+				"\n" +
+				"\t\t\tif( value > maxValue )\n" +
+				"\t\t\t\tvalue = maxValue;\n" +
+				"\t\t\telse if( value < minValue )\n" +
+				"\t\t\t\tvalue = minValue;\n" +
+				"\n" +
+				"\t\t\toutput.data[indexLeft] = "+cast+"value;\n" +
+				"\n" +
+				"\t\t\tvalue = 4*safeGet(input,b,y) - (safeGet(input,b-1,y) + safeGet(input,b,y-1) + safeGet(input,b,y+1));\n" +
+				"\n" +
+				"\t\t\tif( value > maxValue )\n" +
+				"\t\t\t\tvalue = maxValue;\n" +
+				"\t\t\telse if( value < minValue )\n" +
+				"\t\t\t\tvalue = minValue;\n" +
+				"\n" +
+				"\t\t\toutput.data[indexRight] = "+cast+"value;\n" +
+				"\t\t\t\n" +
+				"\t\t\tindexLeft += input.stride;\n" +
+				"\t\t\tindexRight += input.stride;\n" +
+				"\t\t}\n" +
+				"\t}\n\n");
+	}
+
 	private void sharpen8(AutoTypeImage image) {
 		String name = image.getImageName();
 		String bitwise = image.getBitWise();
@@ -105,7 +174,7 @@ public class GenerateImplEnhanceFilter extends CodeGeneratorBase {
 		String sumtype = image.getSumType();
 
 		out.print("\tpublic static void sharpenInner8( "+name+" input , "+name+" output , "+sumtype+" minValue , "+sumtype+" maxValue ) {\n" +
-				"for( int y = 1; y < input.height-1; y++ ) {\n" +
+				"\t\tfor( int y = 1; y < input.height-1; y++ ) {\n" +
 				"\t\t\tint indexIn = input.startIndex + y*input.stride + 1;\n" +
 				"\t\t\tint indexOut = output.startIndex + y*output.stride + 1;\n" +
 				"\n" +
@@ -131,6 +200,144 @@ public class GenerateImplEnhanceFilter extends CodeGeneratorBase {
 				"\t\t\t\toutput.data[indexOut] = "+cast+"result;\n" +
 				"\t\t\t}\n" +
 				"\t\t}\n" +
+				"\t}\n\n");
+	}
+
+	private void sharpenBorder8(AutoTypeImage image) {
+		String name = image.getImageName();
+		String cast = image.getTypeCastFromSum();
+		String sumtype = image.getSumType();
+
+		out.print("\tpublic static void sharpenBorder8( "+name+" input , "+name+" output , "+sumtype+" minValue , "+sumtype+" maxValue ) {\n" +
+				"\t\t"+sumtype+" value;\n" +
+				"\n" +
+				"\t\tint b = input.height-1;\n" +
+				"\t\t"+sumtype+" a11,a12,a13,a21,a22,a23,a31,a32,a33;\n" +
+				"\n" +
+				"\t\tint indexTop = input.startIndex;\n" +
+				"\t\tint indexBottom = input.startIndex + b*input.stride;\n" +
+				"\n" +
+				"\t\tfor( int x = 0; x < input.width; x++ ) {\n" +
+				"\n" +
+				"\t\t\ta11 = safeGet(input,x-1,-1);\n" +
+				"\t\t\ta12 = safeGet(input,x  ,-1);\n" +
+				"\t\t\ta13 = safeGet(input,x+1,-1);\n" +
+				"\t\t\ta21 = safeGet(input,x-1, 0);\n" +
+				"\t\t\ta22 = safeGet(input,x  , 0);\n" +
+				"\t\t\ta23 = safeGet(input,x+1, 0);\n" +
+				"\t\t\ta31 = safeGet(input,x-1, 1);\n" +
+				"\t\t\ta32 = safeGet(input,x  , 1);\n" +
+				"\t\t\ta33 = safeGet(input,x+1, 1);\n" +
+				"\n" +
+				"\t\t\tvalue = 9*a22 - (a11+a12+a13+a21+a23+a31+a32+a33);\n" +
+				"\n" +
+				"\t\t\tif( value > maxValue )\n" +
+				"\t\t\t\tvalue = maxValue;\n" +
+				"\t\t\telse if( value < minValue )\n" +
+				"\t\t\t\tvalue = minValue;\n" +
+				"\n" +
+				"\t\t\toutput.data[indexTop++] = "+cast+"value;\n" +
+				"\n" +
+				"\t\t\ta11 = safeGet(input,x-1,b-1);\n" +
+				"\t\t\ta12 = safeGet(input,x  ,b-1);\n" +
+				"\t\t\ta13 = safeGet(input,x+1,b-1);\n" +
+				"\t\t\ta21 = safeGet(input,x-1, b);\n" +
+				"\t\t\ta22 = safeGet(input,x  , b);\n" +
+				"\t\t\ta23 = safeGet(input,x+1, b);\n" +
+				"\t\t\ta31 = safeGet(input,x-1,b+1);\n" +
+				"\t\t\ta32 = safeGet(input,x  ,b+1);\n" +
+				"\t\t\ta33 = safeGet(input,x+1,b+1);\n" +
+				"\n" +
+				"\t\t\tvalue = 9*a22 - (a11+a12+a13+a21+a23+a31+a32+a33);\n" +
+				"\n" +
+				"\t\t\tif( value > maxValue )\n" +
+				"\t\t\t\tvalue = maxValue;\n" +
+				"\t\t\telse if( value < minValue )\n" +
+				"\t\t\t\tvalue = minValue;\n" +
+				"\n" +
+				"\t\t\toutput.data[indexBottom++] = "+cast+"value;\n" +
+				"\t\t}\n" +
+				"\n" +
+				"\t\tb = input.width-1;\n" +
+				"\t\tint indexLeft = input.startIndex + input.stride;\n" +
+				"\t\tint indexRight = input.startIndex + input.stride + b;\n" +
+				"\n" +
+				"\t\tfor( int y = 1; y < input.height-1; y++ ) {\n" +
+				"\t\t\ta11 = safeGet(input,-1,y-1);\n" +
+				"\t\t\ta12 = safeGet(input, 0,y-1);\n" +
+				"\t\t\ta13 = safeGet(input,+1,y-1);\n" +
+				"\t\t\ta21 = safeGet(input,-1, y );\n" +
+				"\t\t\ta22 = safeGet(input, 0, y );\n" +
+				"\t\t\ta23 = safeGet(input,+1, y );\n" +
+				"\t\t\ta31 = safeGet(input,-1,y+1);\n" +
+				"\t\t\ta32 = safeGet(input, 0,y+1);\n" +
+				"\t\t\ta33 = safeGet(input,+1,y+1);\n" +
+				"\n" +
+				"\t\t\tvalue = 9*a22 - (a11+a12+a13+a21+a23+a31+a32+a33);\n" +
+				"\n" +
+				"\t\t\tif( value > maxValue )\n" +
+				"\t\t\t\tvalue = maxValue;\n" +
+				"\t\t\telse if( value < minValue )\n" +
+				"\t\t\t\tvalue = minValue;\n" +
+				"\n" +
+				"\t\t\toutput.data[indexLeft] = "+cast+"value;\n" +
+				"\n" +
+				"\t\t\ta11 = safeGet(input,b-1,y-1);\n" +
+				"\t\t\ta12 = safeGet(input, b ,y-1);\n" +
+				"\t\t\ta13 = safeGet(input,b+1,y-1);\n" +
+				"\t\t\ta21 = safeGet(input,b-1, y );\n" +
+				"\t\t\ta22 = safeGet(input, b , y );\n" +
+				"\t\t\ta23 = safeGet(input,b+1, y );\n" +
+				"\t\t\ta31 = safeGet(input,b-1,y+1);\n" +
+				"\t\t\ta32 = safeGet(input, b ,y+1);\n" +
+				"\t\t\ta33 = safeGet(input,b+1,y+1);\n" +
+				"\n" +
+				"\t\t\tvalue = 9*a22 - (a11+a12+a13+a21+a23+a31+a32+a33);\n" +
+				"\n" +
+				"\t\t\tif( value > maxValue )\n" +
+				"\t\t\t\tvalue = maxValue;\n" +
+				"\t\t\telse if( value < minValue )\n" +
+				"\t\t\t\tvalue = minValue;\n" +
+				"\n" +
+				"\t\t\toutput.data[indexRight] = "+cast+"value;\n" +
+				"\n" +
+				"\t\t\tindexLeft += input.stride;\n" +
+				"\t\t\tindexRight += input.stride;\n" +
+				"\t\t}\n" +
+				"\t}\n\n");
+	}
+
+	private void printVarious() {
+		out.print("\t/**\n" +
+				"\t * Handle outside image pixels by extending the image.\n" +
+				"\t */\n" +
+				"\tpublic static int safeGet( ImageInteger input , int x , int y ) {\n" +
+				"\t\tif( x < 0 )\n" +
+				"\t\t\tx = 0;\n" +
+				"\t\telse if( x >= input.width )\n" +
+				"\t\t\tx = input.width-1;\n" +
+				"\t\tif( y < 0 )\n" +
+				"\t\t\ty = 0;\n" +
+				"\t\telse if( y >= input.height )\n" +
+				"\t\t\ty = input.height-1;\n" +
+				"\n" +
+				"\t\treturn input.unsafe_get(x,y);\n" +
+				"\t}\n" +
+				"\n" +
+				"\t/**\n" +
+				"\t * Handle outside image pixels by extending the image.\n" +
+				"\t */\n" +
+				"\tpublic static float safeGet( ImageFloat32 input , int x , int y ) {\n" +
+				"\t\tif( x < 0 )\n" +
+				"\t\t\tx = 0;\n" +
+				"\t\telse if( x >= input.width )\n" +
+				"\t\t\tx = input.width-1;\n" +
+				"\t\tif( y < 0 )\n" +
+				"\t\t\ty = 0;\n" +
+				"\t\telse if( y >= input.height )\n" +
+				"\t\t\ty = input.height-1;\n" +
+				"\n" +
+				"\t\treturn input.unsafe_get(x,y);\n" +
 				"\t}\n\n");
 	}
 
