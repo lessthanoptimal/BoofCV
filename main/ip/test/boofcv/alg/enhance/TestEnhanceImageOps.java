@@ -19,11 +19,15 @@
 package boofcv.alg.enhance;
 
 import boofcv.alg.enhance.impl.ImplEnhanceHistogram;
+import boofcv.alg.misc.GImageMiscOps;
 import boofcv.alg.misc.ImageMiscOps;
+import boofcv.core.image.GeneralizedImageOps;
+import boofcv.struct.image.ImageInteger;
 import boofcv.struct.image.ImageUInt8;
 import boofcv.testing.BoofTesting;
 import org.junit.Test;
 
+import java.lang.reflect.Method;
 import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
@@ -31,6 +35,7 @@ import static org.junit.Assert.assertEquals;
 /**
  * @author Peter Abeles
  */
+@SuppressWarnings("unchecked")
 public class TestEnhanceImageOps {
 
 	int width = 15;
@@ -53,26 +58,41 @@ public class TestEnhanceImageOps {
 	@Test
 	public void equalizeLocal() {
 
-		ImageUInt8 input = new ImageUInt8(width,height);
-		ImageUInt8 output = new ImageUInt8(width,height);
+		int numFound = 0;
 
-		ImageMiscOps.fillUniform(input, rand, 0, 10);
+		Method methods[] = EnhanceImageOps.class.getMethods();
+		for( int i = 0; i < methods.length; i++ ) {
+			if( methods[i].getName().compareTo("equalizeLocal") != 0 )
+				continue;
 
-		equalizeLocal(input,output);
+			numFound++;
+
+			Class imageType = methods[i].getParameterTypes()[0];
+			ImageInteger input = (ImageInteger)GeneralizedImageOps.createSingleBand(imageType, width, height);
+			ImageInteger output = (ImageInteger)GeneralizedImageOps.createSingleBand(imageType,width,height);
+
+			equalizeLocal(input, output);
+
+			BoofTesting.checkSubImage(this,"equalizeLocal",true,input,output);
+		}
+
+		assertEquals(2, numFound);
 	}
 
-	public void equalizeLocal( ImageUInt8 input , ImageUInt8 output ) {
+	public void equalizeLocal( ImageInteger input , ImageInteger found ) {
+
+		ImageInteger expected = GeneralizedImageOps.createSingleBand(input.getClass(),input.width, input.height);
+		GImageMiscOps.fillUniform(input, rand, 0, 10);
 
 		int transform[] = new int[10];
 		int histogram[] = new int[10];
 
-		ImageUInt8 expected = new ImageUInt8(width,height);
-
 		for( int radius = 1; radius < 11; radius++ ) {
-			ImplEnhanceHistogram.equalizeLocalNaive(input, radius, expected, histogram);
-			EnhanceImageOps.equalizeLocal(input, radius, output, histogram, transform);
+			BoofTesting.callStaticMethod(ImplEnhanceHistogram.class, "equalizeLocalNaive", input, radius, expected, histogram);
+			BoofTesting.callStaticMethod(EnhanceImageOps.class, "equalizeLocal", input, radius, found, histogram,transform);
 
-			BoofTesting.assertEquals(expected, output, 1e-10);
+
+			BoofTesting.assertEquals(expected, found, 1e-10);
 		}
 	}
 }

@@ -25,6 +25,8 @@ import boofcv.alg.filter.derivative.GradientThree;
 import boofcv.alg.filter.derivative.HessianFromGradient;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.core.image.ConvertBufferedImage;
+import boofcv.core.image.border.FactoryImageBorder;
+import boofcv.core.image.border.ImageBorder_I32;
 import boofcv.factory.feature.detect.interest.FactoryDetectPoint;
 import boofcv.gui.image.ShowImages;
 import boofcv.struct.BoofDefaults;
@@ -69,10 +71,10 @@ public class BenchmarkCornerAccuracy {
 
 	public void detectCorners(String name, GeneralFeatureDetector<ImageUInt8, ImageSInt16> detector) {
 		if (detector.getRequiresGradient()) {
-			GradientThree.process(image, derivX, derivY, BoofDefaults.DERIV_BORDER_I32);
+			GradientThree.process(image, derivX, derivY, BoofDefaults.borderDerivative_I32());
 		}
 		if (detector.getRequiresHessian()) {
-			HessianFromGradient.hessianThree(derivX, derivY, derivXX, derivYY, derivXY, BoofDefaults.DERIV_BORDER_I32);
+			HessianFromGradient.hessianThree(derivX, derivY, derivXX, derivYY, derivXY, BoofDefaults.borderDerivative_I32());
 		}
 
 		detector.process(image, derivX, derivY, derivXX, derivYY, derivXY);
@@ -121,7 +123,8 @@ public class BenchmarkCornerAccuracy {
 
 		ConvertBufferedImage.convertFrom(workImg, image);
 		ImageMiscOps.addUniform(image, rand, -2, 2);
-		GradientSobel.process(image, derivX, derivY, BoofDefaults.DERIV_BORDER_I32);
+		ImageBorder_I32<ImageUInt8> border = (ImageBorder_I32)FactoryImageBorder.general(image,BoofDefaults.DERIV_BORDER_TYPE);
+		GradientSobel.process(image, derivX, derivY, border);
 	}
 
 	private void addRectangle(Graphics2D g2, AffineTransform tran, int x0, int y0, int w, int h) {

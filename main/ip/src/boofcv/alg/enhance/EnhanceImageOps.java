@@ -19,9 +19,15 @@
 package boofcv.alg.enhance;
 
 import boofcv.alg.InputSanityCheck;
+import boofcv.alg.enhance.impl.ImplEnhanceFilter;
 import boofcv.alg.enhance.impl.ImplEnhanceHistogram;
+import boofcv.alg.filter.convolve.border.ConvolveJustBorder_General;
 import boofcv.alg.misc.ImageStatistics;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.core.image.border.ImageBorder;
+import boofcv.core.image.border.ImageBorder_F32;
+import boofcv.core.image.border.ImageBorder_I32;
+import boofcv.struct.BoofDefaults;
+import boofcv.struct.image.*;
 
 /**
  * <p>
@@ -38,7 +44,6 @@ import boofcv.struct.image.ImageUInt8;
  *
  * @author Peter Abeles
  */
-// TODO add applyTransform() with linear interpolation for floating point images?
 // TODO Add laplacian enhancement?
 public class EnhanceImageOps {
 
@@ -77,6 +82,61 @@ public class EnhanceImageOps {
 	}
 
 	/**
+	 * Applies the transformation table to the provided input image.
+	 *
+	 * @param input Input image.
+	 * @param transform Input transformation table.
+	 * @param output Output image.
+	 */
+	public static void applyTransform( ImageUInt16 input , int transform[] , ImageUInt16 output ) {
+		InputSanityCheck.checkSameShape(input, output);
+
+		ImplEnhanceHistogram.applyTransform(input,transform,output);
+	}
+
+	/**
+	 * Applies the transformation table to the provided input image.
+	 *
+	 * @param input Input image.
+	 * @param minValue Minimum possible pixel value.
+	 * @param transform Input transformation table.
+	 * @param output Output image.
+	 */
+	public static void applyTransform( ImageSInt8 input , int transform[] , int minValue, ImageSInt8 output ) {
+		InputSanityCheck.checkSameShape(input, output);
+
+		ImplEnhanceHistogram.applyTransform(input,transform,minValue,output);
+	}
+
+	/**
+	 * Applies the transformation table to the provided input image.
+	 *
+	 * @param input Input image.
+	 * @param minValue Minimum possible pixel value.
+	 * @param transform Input transformation table.
+	 * @param output Output image.
+	 */
+	public static void applyTransform( ImageSInt16 input , int transform[] , int minValue, ImageSInt16 output ) {
+		InputSanityCheck.checkSameShape(input, output);
+
+		ImplEnhanceHistogram.applyTransform(input,transform,minValue,output);
+	}
+
+	/**
+	 * Applies the transformation table to the provided input image.
+	 *
+	 * @param input Input image.
+	 * @param minValue Minimum possible pixel value.
+	 * @param transform Input transformation table.
+	 * @param output Output image.
+	 */
+	public static void applyTransform( ImageSInt32 input , int transform[] , int minValue, ImageSInt32 output ) {
+		InputSanityCheck.checkSameShape(input, output);
+
+		ImplEnhanceHistogram.applyTransform(input,transform,minValue,output);
+	}
+
+	/**
 	 * Equalizes the local image histogram on a per pixel basis.
 	 *
 	 * @param input Input image.
@@ -87,6 +147,8 @@ public class EnhanceImageOps {
 	 */
 	public static void equalizeLocal( ImageUInt8 input , int radius , ImageUInt8 output ,
 									  int histogram[] , int transform[] ) {
+
+		InputSanityCheck.checkSameShape(input, output);
 
 		int width = radius*2+1;
 
@@ -112,5 +174,113 @@ public class EnhanceImageOps {
 		} else {
 			ImplEnhanceHistogram.equalizeLocalNaive(input,radius,output,transform);
 		}
+	}
+
+	/**
+	 * Equalizes the local image histogram on a per pixel basis.
+	 *
+	 * @param input Input image.
+	 * @param radius Radius of square local histogram.
+	 * @param output Output image.
+	 * @param histogram Storage for image histogram.  Must be large enough to contain all possible values.
+	 * @param transform Storage for transformation table.  Must be large enough to contain all possible values.
+	 */
+	public static void equalizeLocal( ImageUInt16 input , int radius , ImageUInt16 output ,
+									  int histogram[] , int transform[] ) {
+
+		InputSanityCheck.checkSameShape(input, output);
+
+		int width = radius*2+1;
+
+		// use more efficient algorithms if possible
+		if( input.width >= width && input.height >= width ) {
+			ImplEnhanceHistogram.equalizeLocalInner(input,radius,output,histogram);
+
+			// top border
+			ImplEnhanceHistogram.equalizeLocalRow(input,radius,0,output,histogram,transform);
+			// bottom border
+			ImplEnhanceHistogram.equalizeLocalRow(input,radius,input.height-radius,output,histogram,transform);
+
+			// left border
+			ImplEnhanceHistogram.equalizeLocalCol(input,radius,0,output,histogram,transform);
+			// right border
+			ImplEnhanceHistogram.equalizeLocalCol(input,radius,input.width-radius,output,histogram,transform);
+
+		} else if( input.width < width && input.height < width ) {
+			// the local region is larger than the image.  just use the full image algorithm
+			ImageStatistics.histogram(input,histogram);
+			equalize(histogram,transform);
+			applyTransform(input,transform,output);
+		} else {
+			ImplEnhanceHistogram.equalizeLocalNaive(input,radius,output,transform);
+		}
+	}
+
+	/**
+	 * Applies a Laplacian-4 based sharpen filter to the image.
+	 *
+	 * @param input Input image.
+	 * @param output Output image.
+	 */
+	public static void sharpen4( ImageUInt8 input , ImageUInt8 output ) {
+		InputSanityCheck.checkSameShape(input, output);
+
+		ImplEnhanceFilter.sharpenInner4(input,output,0,255);
+
+		ImageBorder_I32 border = BoofDefaults.borderDerivative_I32();
+		border.setImage(input);
+
+		ConvolveJustBorder_General.convolve(ImplEnhanceFilter.kernelEnhance4_I32, border, output, 1,0,255);
+	}
+
+	/**
+	 * Applies a Laplacian-4 based sharpen filter to the image.
+	 *
+	 * @param input Input image.
+	 * @param output Output image.
+	 */
+	public static void sharpen4( ImageFloat32 input , ImageFloat32 output ) {
+		InputSanityCheck.checkSameShape(input, output);
+
+		ImplEnhanceFilter.sharpenInner4(input,output,0,255);
+
+		ImageBorder_F32 border = BoofDefaults.borderDerivative_F32();
+		border.setImage(input);
+
+		ConvolveJustBorder_General.convolve(ImplEnhanceFilter.kernelEnhance4_F32, border, output, 1,0,255);
+	}
+
+	/**
+	 * Applies a Laplacian-8 based sharpen filter to the image.
+	 *
+	 * @param input Input image.
+	 * @param output Output image.
+	 */
+	public static void sharpen8( ImageUInt8 input , ImageUInt8 output ) {
+		InputSanityCheck.checkSameShape(input, output);
+
+		ImplEnhanceFilter.sharpenInner8(input,output,0,255);
+
+		ImageBorder_I32 border = BoofDefaults.borderDerivative_I32();
+		border.setImage(input);
+
+		ConvolveJustBorder_General.convolve(ImplEnhanceFilter.kernelEnhance8_I32, border, output, 1,0,255);
+	}
+
+	/**
+	 * Applies a Laplacian-8 based sharpen filter to the image.
+	 *
+	 * @param input Input image.
+	 * @param output Output image.
+	 */
+	public static void sharpen8( ImageFloat32 input , ImageFloat32 output ) {
+		InputSanityCheck.checkSameShape(input, output);
+
+		ImplEnhanceFilter.sharpenInner8(input,output,0,255);
+
+		ImageBorder_F32 border = BoofDefaults.borderDerivative_F32();
+		border.setImage(input);
+
+		ConvolveJustBorder_General.convolve(ImplEnhanceFilter.kernelEnhance8_F32, border, output, 1,0,255);
 	}
 }

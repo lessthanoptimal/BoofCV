@@ -59,7 +59,7 @@ public class TestImplSsdCorner_S16 {
 	public void compareToManual() {
 		GImageMiscOps.fillUniform(input, rand, 0, 100);
 
-		GradientSobel.process(input,derivX,derivY, BoofDefaults.DERIV_BORDER_I32);
+		GradientSobel.process(input,derivX,derivY, BoofDefaults.borderDerivative_I32());
 
 		for( int i = 0; i < height; i++ ) {
 			for( int j = 0; j < width; j++ ) {

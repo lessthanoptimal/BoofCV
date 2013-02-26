@@ -21,50 +21,77 @@ package boofcv.examples;
 import boofcv.alg.enhance.EnhanceImageOps;
 import boofcv.alg.misc.ImageStatistics;
 import boofcv.core.image.ConvertBufferedImage;
+import boofcv.gui.ListDisplayPanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.image.ImageUInt8;
 
+import java.awt.*;
 import java.awt.image.BufferedImage;
 
 /**
+ * Demonstration of various ways an image can be "enhanced".  Image enhancement typically refers to making it easier
+ * for people to view the image and pick out its details.
+ *
  * @author Peter Abeles
  */
 public class ExampleImageEnhancement {
 
-	public static void histogramGlobal() {
-		BufferedImage buffered = UtilImageIO.loadImage("/home/pja/Image.jpg");
+	/**
+	 * Histogram adjustment algorithms aim to spread out pixel intensity values uniformly across the allowed range.
+	 * This if an image is dark, it will have greater contrast and be brighter.
+	 */
+	public static void histogram() {
+		BufferedImage buffered = UtilImageIO.loadImage("../data/applet/enhance/dark.jpg");
 		ImageUInt8 gray = ConvertBufferedImage.convertFrom(buffered,(ImageUInt8)null);
 		ImageUInt8 adjusted = new ImageUInt8(gray.width, gray.height);
 
 		int histogram[] = new int[256];
 		int transform[] = new int[256];
+
+		ListDisplayPanel panel = new ListDisplayPanel();
 
 		ImageStatistics.histogram(gray,histogram);
 		EnhanceImageOps.equalize(histogram, transform);
 		EnhanceImageOps.applyTransform(gray, transform, adjusted);
+		panel.addImage(ConvertBufferedImage.convertTo(adjusted,null),"Global");
 
-//		ShowImages.showWindow(gray,"Original");
-		ShowImages.showWindow(adjusted,"Global Histogram");
+		EnhanceImageOps.equalizeLocal(gray, 50, adjusted, histogram, transform);
+		panel.addImage(ConvertBufferedImage.convertTo(adjusted,null),"Local");
+
+		panel.addImage(ConvertBufferedImage.convertTo(gray,null),"Original");
+
+		panel.setPreferredSize(new Dimension(gray.width,gray.height));
+		ShowImages.showWindow(panel,"Histogram");
 	}
 
-	public static void histogramLocal() {
-		BufferedImage buffered = UtilImageIO.loadImage("/home/pja/Image.jpg");
+	/**
+	 * When an image is sharpened the intensity of edges are made more extreme while flat regions remain unchanged.
+	 */
+	public static void sharpen() {
+		BufferedImage buffered = UtilImageIO.loadImage("../data/applet/enhance/dull.jpg");
 		ImageUInt8 gray = ConvertBufferedImage.convertFrom(buffered,(ImageUInt8)null);
 		ImageUInt8 adjusted = new ImageUInt8(gray.width, gray.height);
 
-		int histogram[] = new int[256];
-		int transform[] = new int[256];
 
-		EnhanceImageOps.equalizeLocal(gray, 50, adjusted, histogram, transform);
+		ListDisplayPanel panel = new ListDisplayPanel();
 
-		ShowImages.showWindow(gray,"Original");
-		ShowImages.showWindow(adjusted,"Local Histogram");
+		EnhanceImageOps.sharpen4(gray, adjusted);
+		panel.addImage(ConvertBufferedImage.convertTo(adjusted,null),"Sharpen-4");
+
+		EnhanceImageOps.sharpen8(gray, adjusted);
+		panel.addImage(ConvertBufferedImage.convertTo(adjusted,null),"Sharpen-8");
+
+		panel.addImage(ConvertBufferedImage.convertTo(gray,null),"Original");
+
+		panel.setPreferredSize(new Dimension(gray.width,gray.height));
+		ShowImages.showWindow(panel,"Sharpen");
 	}
 
-	public static void main( String args[] ) {
-		histogramGlobal();
-		histogramLocal();
+	public static void main( String args[] )
+	{
+		histogram();
+		sharpen();
 	}
 
 }
