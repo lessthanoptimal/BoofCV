@@ -19,6 +19,7 @@
 package boofcv.alg.geo.calibration;
 
 import boofcv.io.MediaManager;
+import boofcv.io.VideoCallBack;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.struct.image.ImageBase;
 import org.junit.Test;
@@ -87,6 +88,11 @@ public class TestParseMonoCalibrationConfig {
 		@Override
 		public <T extends ImageBase> SimpleImageSequence<T> openVideo(String fileName, Class<T> imageType) {
 			return null;
+		}
+
+		@Override
+		public <T extends ImageBase> boolean openCamera(String device, int width, int height, VideoCallBack<T> callback) {
+			return false;
 		}
 	}
 }

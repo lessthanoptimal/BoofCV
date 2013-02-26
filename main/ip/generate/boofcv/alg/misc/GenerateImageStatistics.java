@@ -83,7 +83,6 @@ public class GenerateImageStatistics extends CodeGeneratorBase {
 					"\t * @param histogram (output) Storage for histogram. Number of elements must be equal to max value.\n" +
 					"\t */\n" +
 					"\tpublic static void histogram( "+input.getImageName()+" input , int minValue , int histogram[] ) {\n" +
-					"\t\tminValue = -minValue;\n" +
 					"\t\tfor( int i = 0; i < histogram.length; i++ )\n" +
 					"\t\t\thistogram[i] = 0;\n" +
 					"\t\t\n" +
@@ -95,11 +94,11 @@ public class GenerateImageStatistics extends CodeGeneratorBase {
 					"\t\t\t\t// floor value. just convert to int rounds towards zero\n");
 			if( input.isInteger()) {
 				if( input.getNumBits() == 64 )
-					out.print("\t\t\t\thistogram[minValue + (int)input.data[index]]++;\n");
+					out.print("\t\t\t\thistogram[(int)input.data[index] - minValue]++;\n");
 				else
-					out.print("\t\t\t\thistogram[minValue + input.data[index]]++;\n");
+					out.print("\t\t\t\thistogram[input.data[index] - minValue ]++;\n");
 			} else
-				out.print("\t\t\t\thistogram[minValue + (int)input.data[index]]++;\n");
+				out.print("\t\t\t\thistogram[(int)input.data[index] - minValue ]++;\n");
 			out.print("\t\t\t}\n" +
 					"\t\t}\n" +
 					"\t}\n\n");

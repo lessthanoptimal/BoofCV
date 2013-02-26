@@ -407,7 +407,6 @@ public class ImageStatistics {
 	 * @param histogram (output) Storage for histogram. Number of elements must be equal to max value.
 	 */
 	public static void histogram( ImageSInt8 input , int minValue , int histogram[] ) {
-		minValue = -minValue;
 		for( int i = 0; i < histogram.length; i++ )
 			histogram[i] = 0;
 		
@@ -417,7 +416,7 @@ public class ImageStatistics {
 
 			for( ; index < end; index++ ) {
 				// floor value. just convert to int rounds towards zero
-				histogram[minValue + input.data[index]]++;
+				histogram[input.data[index] - minValue ]++;
 			}
 		}
 	}
@@ -800,7 +799,6 @@ public class ImageStatistics {
 	 * @param histogram (output) Storage for histogram. Number of elements must be equal to max value.
 	 */
 	public static void histogram( ImageSInt16 input , int minValue , int histogram[] ) {
-		minValue = -minValue;
 		for( int i = 0; i < histogram.length; i++ )
 			histogram[i] = 0;
 		
@@ -810,7 +808,7 @@ public class ImageStatistics {
 
 			for( ; index < end; index++ ) {
 				// floor value. just convert to int rounds towards zero
-				histogram[minValue + input.data[index]]++;
+				histogram[input.data[index] - minValue ]++;
 			}
 		}
 	}
@@ -998,7 +996,6 @@ public class ImageStatistics {
 	 * @param histogram (output) Storage for histogram. Number of elements must be equal to max value.
 	 */
 	public static void histogram( ImageSInt32 input , int minValue , int histogram[] ) {
-		minValue = -minValue;
 		for( int i = 0; i < histogram.length; i++ )
 			histogram[i] = 0;
 		
@@ -1008,7 +1005,7 @@ public class ImageStatistics {
 
 			for( ; index < end; index++ ) {
 				// floor value. just convert to int rounds towards zero
-				histogram[minValue + input.data[index]]++;
+				histogram[input.data[index] - minValue ]++;
 			}
 		}
 	}
@@ -1196,7 +1193,6 @@ public class ImageStatistics {
 	 * @param histogram (output) Storage for histogram. Number of elements must be equal to max value.
 	 */
 	public static void histogram( ImageSInt64 input , int minValue , int histogram[] ) {
-		minValue = -minValue;
 		for( int i = 0; i < histogram.length; i++ )
 			histogram[i] = 0;
 		
@@ -1206,7 +1202,7 @@ public class ImageStatistics {
 
 			for( ; index < end; index++ ) {
 				// floor value. just convert to int rounds towards zero
-				histogram[minValue + (int)input.data[index]]++;
+				histogram[(int)input.data[index] - minValue]++;
 			}
 		}
 	}
@@ -1394,7 +1390,6 @@ public class ImageStatistics {
 	 * @param histogram (output) Storage for histogram. Number of elements must be equal to max value.
 	 */
 	public static void histogram( ImageFloat32 input , int minValue , int histogram[] ) {
-		minValue = -minValue;
 		for( int i = 0; i < histogram.length; i++ )
 			histogram[i] = 0;
 		
@@ -1404,7 +1399,7 @@ public class ImageStatistics {
 
 			for( ; index < end; index++ ) {
 				// floor value. just convert to int rounds towards zero
-				histogram[minValue + (int)input.data[index]]++;
+				histogram[(int)input.data[index] - minValue ]++;
 			}
 		}
 	}
@@ -1592,7 +1587,6 @@ public class ImageStatistics {
 	 * @param histogram (output) Storage for histogram. Number of elements must be equal to max value.
 	 */
 	public static void histogram( ImageFloat64 input , int minValue , int histogram[] ) {
-		minValue = -minValue;
 		for( int i = 0; i < histogram.length; i++ )
 			histogram[i] = 0;
 		
@@ -1602,7 +1596,7 @@ public class ImageStatistics {
 
 			for( ; index < end; index++ ) {
 				// floor value. just convert to int rounds towards zero
-				histogram[minValue + (int)input.data[index]]++;
+				histogram[(int)input.data[index] - minValue ]++;
 			}
 		}
 	}

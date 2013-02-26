@@ -14,7 +14,8 @@ Version : Alpha 0.14
   * Local histogram
   * Sharpen 4 and 8
   * Demonstration to example directory
-- Convolve border with lower and upper bounds
+- Convolve with lower and upper bounds on output for U8 and F32
+- Interface for V4L4J to provide webcam support
 
 ---------------------------------------------
 Date    : 2013/02/16

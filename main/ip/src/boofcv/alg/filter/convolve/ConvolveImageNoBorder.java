@@ -400,4 +400,36 @@ public class ConvolveImageNoBorder {
 		if( !ConvolveImageUnrolled_S16_I16_Div.convolve(kernel,input,output,divisor))
 			ConvolveImageStandard.convolve(kernel, input,  output, divisor);
 	}
+
+	/**
+	 * Performs a 2D convolution across the image but bounds output values.  The image's borders are not processed.
+	 *
+	 * @param kernel A square kernel that will be convolved across the source image
+	 * @param input  The source image that is to be convolved
+	 * @param output   The results of the convolution
+	 * @param minValue Minimum allowed pixel value on output.
+	 * @param maxValue Maximum allowed pixel value on output.
+	 */
+	public static void convolve(Kernel2D_I32 kernel, ImageUInt8 input, ImageInt8 output , int minValue , int maxValue) {
+		InputSanityCheck.checkSameShape(input, output);
+
+		// todo add unrolled
+		ConvolveImageStandard.convolve(kernel, input,  output,minValue,maxValue);
+	}
+
+	/**
+	 * Performs a 2D convolution across the image but bounds output values.  The image's borders are not processed.
+	 *
+	 * @param kernel A square kernel that will be convolved across the source image
+	 * @param input  The source image that is to be convolved
+	 * @param output   The results of the convolution
+	 * @param minValue Minimum allowed pixel value on output.
+	 * @param maxValue Maximum allowed pixel value on output.
+	 */
+	public static void convolve(Kernel2D_F32 kernel, ImageFloat32 input, ImageFloat32 output , float minValue , float maxValue) {
+		InputSanityCheck.checkSameShape(input, output);
+
+		// todo add unrolled
+		ConvolveImageStandard.convolve(kernel, input,  output,minValue,maxValue);
+	}
 }

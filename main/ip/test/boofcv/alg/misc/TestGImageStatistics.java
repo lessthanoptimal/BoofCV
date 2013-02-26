@@ -37,7 +37,7 @@ public class TestGImageStatistics extends BaseGClassChecksInMisc {
 
 	@Test
 	public void compareToPixelMath() {
-		performTests(8);
+		performTests(9);
 	}
 
 	@Override
@@ -71,6 +71,13 @@ public class TestGImageStatistics extends BaseGClassChecksInMisc {
 			inputB = GeneralizedImageOps.createSingleBand((Class)param[1], width, height);
 			ret[0][0] = inputA;
 			ret[0][1] = inputB;
+		} else if( name.equals("histogram")) {
+			int histogramSize = 10;
+			if( inputA.getTypeInfo().isSigned() )
+				histogramSize += 11;
+			ret[0][0] = inputA;
+			ret[0][1] = -10;
+			ret[0][2] = new int[histogramSize];
 		}
 
 		fillRandom(inputA);
