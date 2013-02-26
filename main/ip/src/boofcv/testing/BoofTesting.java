@@ -298,6 +298,42 @@ public class BoofTesting {
 	}
 
 	/**
+	 * Looks up the static method then passes in the specified inputs.
+	 */
+	public static void callStaticMethod(Class<?> classType, String name, Object... inputs) {
+		Class<?> params[] = new Class[inputs.length];
+
+		for( int i = 0; i < inputs.length; i++ ) {
+			params[i] = inputs[i].getClass();
+		}
+
+		Method m = findMethod(classType,name,params);
+
+		if( m == null ) {
+			for( int i = 0; i < inputs.length; i++ ) {
+				if( params[i] == Integer.class ) {
+					params[i] = int.class;
+				} else if( params[i] == Float.class ) {
+					params[i] = float.class;
+				} else if( params[i] == Double.class ) {
+					params[i] = double.class;
+				}
+			}
+			m = findMethod(classType,name,params);
+		}
+		if( m == null )
+			throw new IllegalArgumentException("Method not found");
+
+		try {
+			m.invoke(null,inputs);
+		} catch (IllegalAccessException e) {
+			throw new RuntimeException(e);
+		} catch (InvocationTargetException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	/**
 	 * Searches for all functions with the specified name in the target class.  Once it finds
 	 * that function it invokes the specified function in the owner class. That function must
 	 * take in a Method as its one and only parameter.  The method will be one of the matching

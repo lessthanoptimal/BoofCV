@@ -12,6 +12,9 @@ Version : Alpha 0.14
 - Added image enhancement operations
   * Global histogram
   * Local histogram
+  * Sharpen 4 and 8
+  * Demonstration to example directory
+- Convolve border with lower and upper bounds
 
 ---------------------------------------------
 Date    : 2013/02/16

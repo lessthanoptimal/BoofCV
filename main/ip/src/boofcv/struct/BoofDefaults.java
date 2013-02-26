@@ -19,6 +19,7 @@
 package boofcv.struct;
 
 import boofcv.core.image.border.*;
+import boofcv.struct.image.ImageInteger;
 
 
 /**
@@ -29,13 +30,25 @@ public class BoofDefaults {
 	/**
 	 * String specifying BoofCV's version.
 	 */
-	public static String version = "0.13";
+	public static String version = "0.14";
 
 	// Use extended borders when computing image derivatives 
 	public static BorderType DERIV_BORDER_TYPE = BorderType.EXTENDED;
-	public static ImageBorder_I32 DERIV_BORDER_I32 = new ImageBorder1D_I32((Class)BorderIndex1D_Extend.class);
-	public static ImageBorder_F32 DERIV_BORDER_F32 = new ImageBorder1D_F32((Class)BorderIndex1D_Extend.class);
 
 	// multiplication factor to go from scale to pixel radius
 	public static final double SCALE_SPACE_CANONICAL_RADIUS = 2.5;
+
+	/**
+	 * Creates a new instance of the default border for derivatives of integer images
+	 */
+	public static ImageBorder_I32 borderDerivative_I32() {
+		return new ImageBorder1D_I32((Class)BorderIndex1D_Extend.class);
+	}
+
+	/**
+	 * Creates a new instance of the default border for derivatives of ImageFloat32
+	 */
+	public static ImageBorder_F32 borderDerivative_F32() {
+		return new ImageBorder1D_F32((Class)BorderIndex1D_Extend.class);
+	}
 }

@@ -18,6 +18,7 @@
 
 package boofcv.alg.filter.convolve.border;
 
+import boofcv.misc.AutoTypeImage;
 import boofcv.misc.CodeGeneratorUtil;
 
 import java.io.FileNotFoundException;
@@ -35,11 +36,10 @@ public class GenerateConvolveJustBorder_General {
 
 	PrintStream out;
 
+	AutoTypeImage imageOut;
 	String typeKernel;
 	String typeInput;
-	String typeOutput;
 	String dataKernel;
-	String dataOutput;
 	String sumType;
 
 	public void createAll() throws FileNotFoundException {
@@ -47,60 +47,67 @@ public class GenerateConvolveJustBorder_General {
 
 		printPreamble();
 
-		addF32_F32();
-		addI_I16();
-		addI_I32();
+		createMethod(AutoTypeImage.F32);
+		createMethod(AutoTypeImage.I16);
+		createMethod(AutoTypeImage.S32);
+
+		createBound(AutoTypeImage.F32);
+		createBound(AutoTypeImage.I8);
 
 		out.println("}");
 	}
 
-	public void addF32_F32() throws FileNotFoundException {
-		typeKernel = "F32";
-		typeInput = "ImageBorder_F32";
-		typeOutput = "ImageFloat32";
-		dataKernel = "float";
-		dataOutput = "float";
-		sumType = "float";
+	public void createMethod( AutoTypeImage imageOut ) {
+		this.imageOut = imageOut;
 
-		addMethods();
+		if( imageOut.isInteger() ) {
+			typeKernel = "I32";
+			dataKernel = "int";
+			typeInput = "ImageBorder_I32";
+		} else {
+			typeKernel = "F32";
+			dataKernel = "float";
+			typeInput = "ImageBorder_F32";
+		}
+
+		sumType = imageOut.getSumType();
+		String typeCast = imageOut.getTypeCastFromSum();
+
+		addHorizontal(typeCast);
+		addVertical(typeCast);
+		addConvolution(typeCast);
 	}
 
-	public void addI_I16() throws FileNotFoundException {
-		typeKernel = "I32";
-		typeInput = "ImageBorder_I";
-		typeOutput = "ImageInt16";
-		dataKernel = "int";
-		dataOutput = "short";
-		sumType = "int";
+	public void createBound( AutoTypeImage imageOut ) {
+		this.imageOut = imageOut;
 
-		addMethods();
+		if( imageOut.isInteger() ) {
+			typeKernel = "I32";
+			dataKernel = "int";
+			typeInput = "ImageBorder_I32";
+		} else {
+			typeKernel = "F32";
+			dataKernel = "float";
+			typeInput = "ImageBorder_F32";
+		}
+
+		sumType = imageOut.getSumType();
+		String typeCast = imageOut.getTypeCastFromSum();
+
+		addConvolutionBound(typeCast);
 	}
-
-	public void addI_I32() throws FileNotFoundException {
-		typeKernel = "I32";
-		typeInput = "ImageBorder_I";
-		typeOutput = "ImageSInt32";
-		dataKernel = "int";
-		dataOutput = "int";
-		sumType = "int";
-
-		addMethods();
-	}
-
 
 	public void printPreamble() {
 		out.print(CodeGeneratorUtil.copyright);
 		out.print("package boofcv.alg.filter.convolve.border;\n" +
 				"\n" +
 				"import boofcv.core.image.border.ImageBorder_F32;\n" +
-				"import boofcv.core.image.border.ImageBorder_I;\n" +
+				"import boofcv.core.image.border.ImageBorder_I32;\n" +
 				"import boofcv.struct.convolve.Kernel1D_F32;\n" +
 				"import boofcv.struct.convolve.Kernel1D_I32;\n" +
 				"import boofcv.struct.convolve.Kernel2D_F32;\n" +
 				"import boofcv.struct.convolve.Kernel2D_I32;\n" +
-				"import boofcv.struct.image.ImageFloat32;\n" +
-				"import boofcv.struct.image.ImageInt16;\n" +
-				"import boofcv.struct.image.ImageSInt32;\n" +
+				"import boofcv.struct.image.*;\n" +
 				"\n" +
 				"/**\n" +
 				" * <p>\n" +
@@ -117,15 +124,9 @@ public class GenerateConvolveJustBorder_General {
 				"public class ConvolveJustBorder_General {\n\n");
 	}
 
-	public void addMethods() {
-		String typeCast = sumType.compareTo(dataOutput) != 0 ? "("+dataOutput+")" : "";
-
-		addHorizontal(typeCast);
-		addVertical(typeCast);
-		addConvolution(typeCast);
-	}
-
 	public void addHorizontal( String typeCast ) {
+		String typeOutput = imageOut.getImageName();
+		String dataOutput = imageOut.getDataType();
 
 		out.print("\tpublic static void horizontal(Kernel1D_"+typeKernel+" kernel, "+typeInput+" input, "+typeOutput+" output , int border ) {\n" +
 				"\t\tfinal "+dataOutput+"[] dataDst = output.data;\n" +
@@ -159,6 +160,9 @@ public class GenerateConvolveJustBorder_General {
 	}
 
 	public void addVertical( String typeCast ) {
+		String typeOutput = imageOut.getImageName();
+		String dataOutput = imageOut.getDataType();
+
 		out.print("\tpublic static void vertical(Kernel1D_"+typeKernel+" kernel, "+typeInput+" input, "+typeOutput+" output , int border ) {\n" +
 				"\t\tfinal "+dataOutput+"[] dataDst = output.data;\n" +
 				"\t\tfinal "+dataKernel+"[] dataKer = kernel.data;\n" +
@@ -191,6 +195,9 @@ public class GenerateConvolveJustBorder_General {
 	}
 
 	public void addConvolution( String typeCast ) {
+		String typeOutput = imageOut.getImageName();
+		String dataOutput = imageOut.getDataType();
+
 		out.print("\tpublic static void convolve(Kernel2D_"+typeKernel+" kernel, "+typeInput+" input, "+typeOutput+" output , int border ) {\n" +
 				"\t\tfinal "+dataOutput+"[] dataDst = output.data;\n" +
 				"\t\tfinal "+dataKernel+"[] dataKer = kernel.data;\n" +
@@ -251,6 +258,101 @@ public class GenerateConvolveJustBorder_General {
 				"\t\t\t\t\t\ttotal += input.get(x+j,y+i) * dataKer[indexKer++];\n" +
 				"\t\t\t\t\t}\n" +
 				"\t\t\t\t}\n" +
+				"\t\t\t\tdataDst[indexDest] = "+typeCast+"total;\n" +
+				"\t\t\t}\n" +
+				"\t\t}\n" +
+				"\t}\n\n");
+	}
+
+	public void addConvolutionBound( String typeCast ) {
+		String typeOutput = imageOut.getImageName();
+		String dataOutput = imageOut.getDataType();
+
+		out.print("\tpublic static void convolve(Kernel2D_"+typeKernel+" kernel, "+typeInput+" input, "+typeOutput+" output , int border ,\n" +
+				"\t\t\t\t\t\t\t\t"+sumType+" minValue , "+sumType+" maxValue ) {\n" +
+				"\t\tfinal "+dataOutput+"[] dataDst = output.data;\n" +
+				"\t\tfinal "+dataKernel+"[] dataKer = kernel.data;\n" +
+				"\n" +
+				"\t\tfinal int radius = kernel.getRadius();\n"+
+				"\t\tfinal int width = output.getWidth();\n" +
+				"\t\tfinal int height = output.getHeight();\n" +
+				"\n" +
+				"\t\t// convolve along the left and right borders\n" +
+				"\t\tfor (int y = 0; y < height; y++) {\n" +
+				"\t\t\tint indexDest = output.startIndex + y * output.stride;\n" +
+				"\n" +
+				"\t\t\tfor ( int x = 0; x < border; x++ ) {\n" +
+				"\t\t\t\t"+sumType+" total = 0;\n" +
+				"\t\t\t\tint indexKer = 0;\n" +
+				"\t\t\t\tfor( int i = -radius; i <= radius; i++ ) {\n" +
+				"\t\t\t\t\tfor (int j = -radius; j <= radius; j++) {\n" +
+				"\t\t\t\t\t\ttotal += input.get(x+j,y+i) * dataKer[indexKer++];\n" +
+				"\t\t\t\t\t}\n" +
+				"\t\t\t\t}\n" +
+				"\n" +
+				"\t\t\t\tif( total < minValue )\n" +
+				"\t\t\t\t\ttotal = minValue;\n" +
+				"\t\t\t\telse if( total > maxValue )\n" +
+				"\t\t\t\t\ttotal = maxValue;\n" +
+				"\n"+
+				"\t\t\t\tdataDst[indexDest++] = "+typeCast+"total;\n" +
+				"\t\t\t}\n" +
+				"\n" +
+				"\t\t\tindexDest = output.startIndex + y * output.stride + width-border;\n" +
+				"\t\t\tfor ( int x = width-border; x < width; x++ ) {\n" +
+				"\t\t\t\t"+sumType+" total = 0;\n" +
+				"\t\t\t\tint indexKer = 0;\n" +
+				"\t\t\t\tfor( int i = -radius; i <= radius; i++ ) {\n" +
+				"\t\t\t\t\tfor (int j = -radius; j <= radius; j++) {\n" +
+				"\t\t\t\t\t\ttotal += input.get(x+j,y+i) * dataKer[indexKer++];\n" +
+				"\t\t\t\t\t}\n" +
+				"\t\t\t\t}\n" +
+				"\n" +
+				"\t\t\t\tif( total < minValue )\n" +
+				"\t\t\t\t\ttotal = minValue;\n" +
+				"\t\t\t\telse if( total > maxValue )\n" +
+				"\t\t\t\t\ttotal = maxValue;\n" +
+				"\n"+
+				"\t\t\t\tdataDst[indexDest++] = "+typeCast+"total;\n" +
+				"\t\t\t}\n" +
+				"\t\t}\n" +
+				"\n" +
+				"\t\t// convolve along the top and bottom borders\n" +
+				"\t\tfor ( int x = border; x < width-border; x++ ) {\n" +
+				"\t\t\tint indexDest = output.startIndex + x;\n" +
+				"\n" +
+				"\t\t\tfor (int y = 0; y < border; y++, indexDest += output.stride) {\n" +
+				"\t\t\t\t"+sumType+" total = 0;\n" +
+				"\t\t\t\tint indexKer = 0;\n" +
+				"\t\t\t\tfor( int i = -radius; i <= radius; i++ ) {\n" +
+				"\t\t\t\t\tfor (int j = -radius; j <= radius; j++) {\n" +
+				"\t\t\t\t\t\ttotal += input.get(x+j,y+i) * dataKer[indexKer++];\n" +
+				"\t\t\t\t\t}\n" +
+				"\t\t\t\t}\n" +
+				"\n" +
+				"\t\t\t\tif( total < minValue )\n" +
+				"\t\t\t\t\ttotal = minValue;\n" +
+				"\t\t\t\telse if( total > maxValue )\n" +
+				"\t\t\t\t\ttotal = maxValue;\n" +
+				"\n"+
+				"\t\t\t\tdataDst[indexDest] = "+typeCast+"total;\n" +
+				"\t\t\t}\n" +
+				"\n" +
+				"\t\t\tindexDest = output.startIndex + (height-border) * output.stride + x;\n" +
+				"\t\t\tfor (int y = height-border; y < height; y++, indexDest += output.stride) {\n" +
+				"\t\t\t\t"+sumType+" total = 0;\n" +
+				"\t\t\t\tint indexKer = 0;\n" +
+				"\t\t\t\tfor( int i = -radius; i <= radius; i++ ) {\n" +
+				"\t\t\t\t\tfor (int j = -radius; j <= radius; j++) {\n" +
+				"\t\t\t\t\t\ttotal += input.get(x+j,y+i) * dataKer[indexKer++];\n" +
+				"\t\t\t\t\t}\n" +
+				"\t\t\t\t}\n" +
+				"\n" +
+				"\t\t\t\tif( total < minValue )\n" +
+				"\t\t\t\t\ttotal = minValue;\n" +
+				"\t\t\t\telse if( total > maxValue )\n" +
+				"\t\t\t\t\ttotal = maxValue;\n" +
+				"\n"+
 				"\t\t\t\tdataDst[indexDest] = "+typeCast+"total;\n" +
 				"\t\t\t}\n" +
 				"\t\t}\n" +
