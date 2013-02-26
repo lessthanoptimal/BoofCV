@@ -15,11 +15,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package boofcv.alg.enhance.impl;
 
 import boofcv.struct.convolve.Kernel2D_F32;
 import boofcv.struct.convolve.Kernel2D_I32;
-import boofcv.struct.image.*;
+import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageUInt8;
 
 /**
  * <p>
@@ -48,7 +50,7 @@ public class ImplEnhanceFilter {
 
 				int a = 5*(input.data[indexIn] & 0xFF) - (
 						(input.data[indexIn-1] & 0xFF)+(input.data[indexIn+1] & 0xFF) +
-								(input.data[indexIn+input.stride] & 0xFF) + (input.data[indexIn+input.stride] & 0xFF));
+								(input.data[indexIn-input.stride] & 0xFF) + (input.data[indexIn+input.stride] & 0xFF));
 
 				if( a > maxValue )
 					a = maxValue;
@@ -69,7 +71,7 @@ public class ImplEnhanceFilter {
 
 				float a = 5*(input.data[indexIn] ) - (
 						(input.data[indexIn-1] )+(input.data[indexIn+1] ) +
-								(input.data[indexIn+input.stride] ) + (input.data[indexIn+input.stride] ));
+								(input.data[indexIn-input.stride] ) + (input.data[indexIn+input.stride] ));
 
 				if( a > maxValue )
 					a = maxValue;

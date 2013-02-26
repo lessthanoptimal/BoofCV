@@ -85,7 +85,7 @@ public class GenerateImplEnhanceFilter extends CodeGeneratorBase {
 				"\n" +
 				"\t\t\t\t"+sumtype+" a = 5*(input.data[indexIn] "+bitwise+") - (\n" +
 				"\t\t\t\t\t\t(input.data[indexIn-1] "+bitwise+")+(input.data[indexIn+1] "+bitwise+") +\n" +
-				"\t\t\t\t\t\t\t\t(input.data[indexIn+input.stride] "+bitwise+") + (input.data[indexIn+input.stride] "+bitwise+"));\n" +
+				"\t\t\t\t\t\t\t\t(input.data[indexIn-input.stride] "+bitwise+") + (input.data[indexIn+input.stride] "+bitwise+"));\n" +
 				"\n" +
 				"\t\t\t\tif( a > maxValue )\n" +
 				"\t\t\t\t\ta = maxValue;\n" +

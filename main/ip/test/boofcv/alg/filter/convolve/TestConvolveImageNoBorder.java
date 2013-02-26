@@ -28,6 +28,6 @@ public class TestConvolveImageNoBorder {
 	@Test
 	public void compareToStandard() {
 		CompareToStandardConvolution a = new CompareToStandardConvolution(ConvolveImageNoBorder.class);
-		a.performTests(20);
+		a.performTests(22);
 	}
 }

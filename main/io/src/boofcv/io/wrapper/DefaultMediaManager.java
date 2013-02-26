@@ -19,6 +19,7 @@
 package boofcv.io.wrapper;
 
 import boofcv.io.MediaManager;
+import boofcv.io.VideoCallBack;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.image.UtilImageIO;
 import boofcv.io.video.VideoMjpegCodec;
@@ -89,5 +90,10 @@ public class DefaultMediaManager implements MediaManager {
 		} else {
 			throw new RuntimeException("Unknown movie type.  Must be an mjpeg");
 		}
+	}
+
+	@Override
+	public <T extends ImageBase> boolean openCamera(String device, int width, int height, VideoCallBack<T> callback) {
+		throw new RuntimeException("Not supported");
 	}
 }

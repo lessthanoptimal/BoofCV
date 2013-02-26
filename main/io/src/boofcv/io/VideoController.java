@@ -18,27 +18,14 @@
 
 package boofcv.io;
 
-import boofcv.io.image.SimpleImageSequence;
 import boofcv.struct.image.ImageBase;
 
-import java.awt.image.BufferedImage;
-import java.io.Reader;
-
 /**
- * Abstract interface for accessing files, images, and videos.  Intended to help
- * handle regular applications and applets
- * 
+ * Starts processing a video sequence.  As new frames arrive the callback function is called.
+ *
  * @author Peter Abeles
  */
-public interface MediaManager {
-	
-	public Reader openFile( String fileName );
-	
-	public BufferedImage openImage( String fileName );
-	
-	public <T extends ImageBase>
-	SimpleImageSequence<T> openVideo( String fileName , Class<T> imageType );
+public interface VideoController<T extends ImageBase> {
 
-	public <T extends ImageBase>
-	boolean openCamera( String device , int width , int height , VideoCallBack<T> callback );
+	public boolean start( String device , int width , int height , VideoCallBack<T> callback );
 }
