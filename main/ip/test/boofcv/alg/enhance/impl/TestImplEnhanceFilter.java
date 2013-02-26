@@ -88,7 +88,7 @@ public class TestImplEnhanceFilter {
 			BoofTesting.callStaticMethod(ImplEnhanceFilter.class,"sharpenInner4",input,output,0f,255f);
 
 			expected = new ImageFloat32(input.width,input.height);
-			ConvolveImageStandard.convolve(ImplEnhanceFilter.kernelEnhance4_F32,(ImageFloat32)input,(ImageFloat32)expected,0,255);
+			ConvolveImageStandard.convolve(ImplEnhanceFilter.kernelEnhance4_F32,(ImageFloat32)input,(ImageFloat32)expected);
 			GPixelMath.boundImage(expected, 0, 255);
 		}
 
@@ -166,7 +166,7 @@ public class TestImplEnhanceFilter {
 			ImageSingleBand input = GeneralizedImageOps.createSingleBand(imageType, width, height);
 			ImageSingleBand output = GeneralizedImageOps.createSingleBand(imageType,width,height);
 
-			sharpenInner4(input, output);
+			sharpenInner8(input, output);
 
 			BoofTesting.checkSubImage(this, "sharpenInner8", true, input, output);
 		}
@@ -182,11 +182,15 @@ public class TestImplEnhanceFilter {
 		if( input.getTypeInfo().isInteger()) {
 			BoofTesting.callStaticMethod(ImplEnhanceFilter.class,"sharpenInner8",input,output,0,255);
 
-			ConvolveImageStandard.convolve(ImplEnhanceFilter.kernelEnhance8_I32,(ImageUInt8)input,(ImageUInt8)expected,0,255);
+			expected = new ImageSInt16(input.width,input.height);
+			ConvolveImageStandard.convolve(ImplEnhanceFilter.kernelEnhance8_I32,(ImageUInt8)input,(ImageSInt16)expected);
+			GPixelMath.boundImage(expected, 0, 255);
 		} else {
 			BoofTesting.callStaticMethod(ImplEnhanceFilter.class,"sharpenInner8",input,output,0f,255f);
 
-			ConvolveImageStandard.convolve(ImplEnhanceFilter.kernelEnhance8_F32,(ImageFloat32)input,(ImageFloat32)expected,0,255);
+			expected = new ImageFloat32(input.width,input.height);
+			ConvolveImageStandard.convolve(ImplEnhanceFilter.kernelEnhance8_F32,(ImageFloat32)input,(ImageFloat32)expected);
+			GPixelMath.boundImage(expected, 0, 255);
 		}
 
 		BoofTesting.assertEqualsInner(expected,output,1e-5,1,1,false);

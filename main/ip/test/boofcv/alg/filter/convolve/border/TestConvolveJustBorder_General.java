@@ -51,7 +51,7 @@ public class TestConvolveJustBorder_General extends CompareImageBorder {
 	 */
 	@Test
 	public void compareToNoBorder() {
-		performTests(11);
+		performTests(9);
 	}
 
 	protected void fillTestImage(ImageSingleBand smaller, ImageSingleBand larger) {
@@ -95,10 +95,7 @@ public class TestConvolveJustBorder_General extends CompareImageBorder {
 	protected Object[] reformatForValidation(Method m, Object[] targetParam) {
 		Object[] ret;
 		if( m.getName().contains("convolve")) {
-			if( m.getParameterTypes().length == 5 )
-				ret =  new Object[]{targetParam[0],targetParam[1],targetParam[2],targetParam[4],targetParam[5]};
-			else
-				ret =  new Object[]{targetParam[0],targetParam[1],targetParam[2]};
+			ret =  new Object[]{targetParam[0],targetParam[1],targetParam[2]};
 		} else {
 			ret = new Object[]{targetParam[0],targetParam[1],targetParam[2],false};
 		}
@@ -129,10 +126,6 @@ public class TestConvolveJustBorder_General extends CompareImageBorder {
 				ImageBorderValue.wrap((ImageFloat32)src,fillValue) : ImageBorderValue.wrap((ImageInteger)src,fillValue);
 		ret[0][2] = dst;
 		ret[0][3] = kernelRadius;
-		if( paramTypes.length == 6 ) {
-			ret[0][4] = 0;
-			ret[0][5] = 255;
-		}
 
 		return ret;
 	}

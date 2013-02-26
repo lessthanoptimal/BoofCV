@@ -97,9 +97,6 @@ public class CompareToStandardConvolution extends CompareIdenticalFunctions
 
 			if( paramTypes.length == 4 ) {
 				ret[0][3] = 11;
-			} else if( paramTypes.length == 5 ) {
-				ret[0][3] = 0;
-				ret[0][4] = 255;
 			}
 
 			return ret;

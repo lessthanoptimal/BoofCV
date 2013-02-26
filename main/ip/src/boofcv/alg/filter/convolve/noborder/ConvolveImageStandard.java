@@ -132,39 +132,6 @@ public class ConvolveImageStandard {
 		}
 	}
 
-	public static void convolve( Kernel2D_F32 kernel , ImageFloat32 src , ImageFloat32 dest , float minValue , float maxValue )
-	{
-		final float[] dataKernel = kernel.data;
-		final float[] dataSrc = src.data;
-		final float[] dataDst = dest.data;
-
-		final int width = src.getWidth();
-		final int height = src.getHeight();
-
-		int kernelRadius = kernel.width/2;
-
-		for( int y = kernelRadius; y < height-kernelRadius; y++ ) {
-			int indexDst = dest.startIndex + y*dest.stride+kernelRadius;
-			for( int x = kernelRadius; x < width-kernelRadius; x++ ) {
-				float total = 0;
-				int indexKer = 0;
-				for( int ki = -kernelRadius; ki <= kernelRadius; ki++ ) {
-					int indexSrc = src.startIndex+(y+ki)*src.stride+ x;
-					for( int kj = -kernelRadius; kj <= kernelRadius; kj++ ) {
-						total += (dataSrc[indexSrc+kj]  )* dataKernel[indexKer++];
-					}
-				}
-
-				if( total < minValue )
-					total = minValue;
-				else if( total > maxValue )
-					total = maxValue;
-
-				dataDst[indexDst++] = total;
-			}
-		}
-	}
-
 	public static void horizontal( Kernel1D_I32 kernel ,
 								  ImageUInt8 image, ImageInt16 dest,
 								  boolean includeBorder) {
@@ -533,39 +500,6 @@ public class ConvolveImageStandard {
 					}
 				}
 				dataDst[indexDst++] = (byte)(total/divisor);
-			}
-		}
-	}
-
-	public static void convolve( Kernel2D_I32 kernel , ImageUInt8 src , ImageInt8 dest , int minValue , int maxValue )
-	{
-		final int[] dataKernel = kernel.data;
-		final byte[] dataSrc = src.data;
-		final byte[] dataDst = dest.data;
-
-		final int width = src.getWidth();
-		final int height = src.getHeight();
-
-		int kernelRadius = kernel.width/2;
-
-		for( int y = kernelRadius; y < height-kernelRadius; y++ ) {
-			int indexDst = dest.startIndex + y*dest.stride+kernelRadius;
-			for( int x = kernelRadius; x < width-kernelRadius; x++ ) {
-				int total = 0;
-				int indexKer = 0;
-				for( int ki = -kernelRadius; ki <= kernelRadius; ki++ ) {
-					int indexSrc = src.startIndex+(y+ki)*src.stride+ x;
-					for( int kj = -kernelRadius; kj <= kernelRadius; kj++ ) {
-						total += (dataSrc[indexSrc+kj] & 0xFF )* dataKernel[indexKer++];
-					}
-				}
-
-				if( total < minValue )
-					total = minValue;
-				else if( total > maxValue )
-					total = maxValue;
-
-				dataDst[indexDst++] = (byte)total;
 			}
 		}
 	}

@@ -56,7 +56,7 @@ public class TestConvolveImageStandard {
 	 */
 	@Test
 	public void checkAll() {
-		int numExpected = 26;
+		int numExpected = 24;
 		Method methods[] = ConvolveImageStandard.class.getMethods();
 
 		// sanity check to make sure the functions are being found
@@ -111,10 +111,8 @@ public class TestConvolveImageStandard {
 		} else if( m.getName().contentEquals("convolve")) {
 			if( param.length == 3 ) {
 				BoofTesting.checkSubImage(this, "convolve", true, input, output);
-			} else if( param.length == 4 ) {
-				BoofTesting.checkSubImage(this, "convolveDiv", true, input, output);
 			} else {
-				BoofTesting.checkSubImage(this, "convolve_bound", true, input, output);
+				BoofTesting.checkSubImage(this, "convolveDiv", true, input, output);
 			}
 		} else {
 			fail("Unknown method name: "+m.getName());
@@ -248,54 +246,6 @@ public class TestConvolveImageStandard {
 	}
 
 	/**
-	 * Unit test for 2D convolution.
-	 */
-	public void convolve_bound(ImageSingleBand img, ImageSingleBand dest) {
-		Object ker;
-		if (!img.getTypeInfo().isInteger())
-			ker = FactoryKernel.random2D_F32(kernelRadius, 0f, 1f, new Random(234));
-		else
-			ker = FactoryKernel.random2D_I32(kernelRadius, 0, 10, new Random(234));
-
-		int min = 10;
-		int max = 50;
-
-		if( img.getTypeInfo().isInteger() )
-			invokeMethod("convolve",ker, img, dest,min,max);
-		else
-			invokeMethod("convolve",ker, img, dest,(float)min,(float)max);
-
-		for( int y = kernelRadius; y < img.height-kernelRadius; y++ ) {
-			for( int x = kernelRadius; x < img.width-kernelRadius; x++ ) {
-
-				// manually perform a convolution
-				double expected = 0;
-				for (int i = -kernelRadius; i <= kernelRadius; i++) {
-					for (int j = -kernelRadius; j <= kernelRadius; j++) {
-						expected += getKernel(ker, kernelRadius + i, kernelRadius + j) * get(img, x + i, y + j);
-					}
-				}
-
-				if( expected < min )
-					expected = min;
-				else if( expected > max )
-					expected = max;
-
-				// is the test point the same as the expected?
-				assertEquals(expected, get(dest, x, y), 1e-5);
-			}
-		}
-
-		// the border should be zero
-		for (int i = 0; i < height; i++) {
-			for (int j = 0; j < width; j++) {
-				if (i < kernelRadius || j < kernelRadius)
-					assertEquals(0f, get(dest, j, i), 1e-6);
-			}
-		}
-	}
-
-	/**
 	 * Unit test for 2D convolution with division.
 	 */
 	public void convolveDiv(ImageSingleBand img, ImageSingleBand dest) {
@@ -370,8 +320,6 @@ public class TestConvolveImageStandard {
 				inputTypes[i] = boolean.class;
 			} else if( inputs[i].getClass() == Integer.class ) {
 				inputTypes[i] = int.class;
-			} else if( inputs[i].getClass() == Float.class ) {
-				inputTypes[i] = float.class;
 			} else {
 				inputTypes[i] = inputs[i].getClass();
 			}

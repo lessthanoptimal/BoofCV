@@ -14,7 +14,9 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */package boofcv.alg.filter.convolve.border;
+ */
+
+package boofcv.alg.filter.convolve.border;
 
 import boofcv.core.image.border.ImageBorder_F32;
 import boofcv.core.image.border.ImageBorder_I32;
@@ -22,7 +24,9 @@ import boofcv.struct.convolve.Kernel1D_F32;
 import boofcv.struct.convolve.Kernel1D_I32;
 import boofcv.struct.convolve.Kernel2D_F32;
 import boofcv.struct.convolve.Kernel2D_I32;
-import boofcv.struct.image.*;
+import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageInt16;
+import boofcv.struct.image.ImageSInt32;
 
 /**
  * <p>
@@ -409,186 +413,6 @@ public class ConvolveJustBorder_General {
 					}
 				}
 				dataDst[indexDest] = total;
-			}
-		}
-	}
-
-	public static void convolve(Kernel2D_F32 kernel, ImageBorder_F32 input, ImageFloat32 output , int border ,
-								float minValue , float maxValue ) {
-		final float[] dataDst = output.data;
-		final float[] dataKer = kernel.data;
-
-		final int radius = kernel.getRadius();
-		final int width = output.getWidth();
-		final int height = output.getHeight();
-
-		// convolve along the left and right borders
-		for (int y = 0; y < height; y++) {
-			int indexDest = output.startIndex + y * output.stride;
-
-			for ( int x = 0; x < border; x++ ) {
-				float total = 0;
-				int indexKer = 0;
-				for( int i = -radius; i <= radius; i++ ) {
-					for (int j = -radius; j <= radius; j++) {
-						total += input.get(x+j,y+i) * dataKer[indexKer++];
-					}
-				}
-
-				if( total < minValue )
-					total = minValue;
-				else if( total > maxValue )
-					total = maxValue;
-
-				dataDst[indexDest++] = total;
-			}
-
-			indexDest = output.startIndex + y * output.stride + width-border;
-			for ( int x = width-border; x < width; x++ ) {
-				float total = 0;
-				int indexKer = 0;
-				for( int i = -radius; i <= radius; i++ ) {
-					for (int j = -radius; j <= radius; j++) {
-						total += input.get(x+j,y+i) * dataKer[indexKer++];
-					}
-				}
-
-				if( total < minValue )
-					total = minValue;
-				else if( total > maxValue )
-					total = maxValue;
-
-				dataDst[indexDest++] = total;
-			}
-		}
-
-		// convolve along the top and bottom borders
-		for ( int x = border; x < width-border; x++ ) {
-			int indexDest = output.startIndex + x;
-
-			for (int y = 0; y < border; y++, indexDest += output.stride) {
-				float total = 0;
-				int indexKer = 0;
-				for( int i = -radius; i <= radius; i++ ) {
-					for (int j = -radius; j <= radius; j++) {
-						total += input.get(x+j,y+i) * dataKer[indexKer++];
-					}
-				}
-
-				if( total < minValue )
-					total = minValue;
-				else if( total > maxValue )
-					total = maxValue;
-
-				dataDst[indexDest] = total;
-			}
-
-			indexDest = output.startIndex + (height-border) * output.stride + x;
-			for (int y = height-border; y < height; y++, indexDest += output.stride) {
-				float total = 0;
-				int indexKer = 0;
-				for( int i = -radius; i <= radius; i++ ) {
-					for (int j = -radius; j <= radius; j++) {
-						total += input.get(x+j,y+i) * dataKer[indexKer++];
-					}
-				}
-
-				if( total < minValue )
-					total = minValue;
-				else if( total > maxValue )
-					total = maxValue;
-
-				dataDst[indexDest] = total;
-			}
-		}
-	}
-
-	public static void convolve(Kernel2D_I32 kernel, ImageBorder_I32 input, ImageInt8 output , int border ,
-								int minValue , int maxValue ) {
-		final byte[] dataDst = output.data;
-		final int[] dataKer = kernel.data;
-
-		final int radius = kernel.getRadius();
-		final int width = output.getWidth();
-		final int height = output.getHeight();
-
-		// convolve along the left and right borders
-		for (int y = 0; y < height; y++) {
-			int indexDest = output.startIndex + y * output.stride;
-
-			for ( int x = 0; x < border; x++ ) {
-				int total = 0;
-				int indexKer = 0;
-				for( int i = -radius; i <= radius; i++ ) {
-					for (int j = -radius; j <= radius; j++) {
-						total += input.get(x+j,y+i) * dataKer[indexKer++];
-					}
-				}
-
-				if( total < minValue )
-					total = minValue;
-				else if( total > maxValue )
-					total = maxValue;
-
-				dataDst[indexDest++] = (byte)total;
-			}
-
-			indexDest = output.startIndex + y * output.stride + width-border;
-			for ( int x = width-border; x < width; x++ ) {
-				int total = 0;
-				int indexKer = 0;
-				for( int i = -radius; i <= radius; i++ ) {
-					for (int j = -radius; j <= radius; j++) {
-						total += input.get(x+j,y+i) * dataKer[indexKer++];
-					}
-				}
-
-				if( total < minValue )
-					total = minValue;
-				else if( total > maxValue )
-					total = maxValue;
-
-				dataDst[indexDest++] = (byte)total;
-			}
-		}
-
-		// convolve along the top and bottom borders
-		for ( int x = border; x < width-border; x++ ) {
-			int indexDest = output.startIndex + x;
-
-			for (int y = 0; y < border; y++, indexDest += output.stride) {
-				int total = 0;
-				int indexKer = 0;
-				for( int i = -radius; i <= radius; i++ ) {
-					for (int j = -radius; j <= radius; j++) {
-						total += input.get(x+j,y+i) * dataKer[indexKer++];
-					}
-				}
-
-				if( total < minValue )
-					total = minValue;
-				else if( total > maxValue )
-					total = maxValue;
-
-				dataDst[indexDest] = (byte)total;
-			}
-
-			indexDest = output.startIndex + (height-border) * output.stride + x;
-			for (int y = height-border; y < height; y++, indexDest += output.stride) {
-				int total = 0;
-				int indexKer = 0;
-				for( int i = -radius; i <= radius; i++ ) {
-					for (int j = -radius; j <= radius; j++) {
-						total += input.get(x+j,y+i) * dataKer[indexKer++];
-					}
-				}
-
-				if( total < minValue )
-					total = minValue;
-				else if( total > maxValue )
-					total = maxValue;
-
-				dataDst[indexDest] = (byte)total;
 			}
 		}
 	}
