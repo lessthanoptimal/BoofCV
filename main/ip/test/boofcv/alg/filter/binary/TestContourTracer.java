@@ -49,39 +49,10 @@ public class TestContourTracer {
 
 	@Test
 	public void single() {
-		ContourTracer alg = new ContourTracer();
-		ImageUInt8 input = new ImageUInt8(4,5);
-		ImageSInt32 label = new ImageSInt32(input.width,input.height);
+		ImageUInt8 pattern = new ImageUInt8(1,1);
+		ImageMiscOps.fill(pattern,1);
 
-		// exhaustively try all initial locations
-		for( int y = 0; y < input.height; y++ ) {
-			for( int x = 0; x < input.width; x++ ) {
-				ImageMiscOps.fill(input,0);
-				ImageMiscOps.fill(label,0);
-				queue.reset();
-				found.clear();
-
-				input.set(x,y,1);
-
-				// process the image
-				alg.setInputs(input,label,queue);
-				alg.trace(2,x,y,7,found);
-
-				// only one pixel in the contour
-				assertEquals(1,queue.size);
-				assertEquals(1,found.size());
-
-				// see if the image has been correctly labeled
-				for( int yy = 0; yy < input.height; yy++ ) {
-					for( int xx = 0; xx < input.width; xx++ ) {
-						if( y == yy && x == xx )
-							assertEquals(2,label.get(xx,yy));
-						else
-							assertEquals(0,label.get(xx,yy));
-					}
-				}
-			}
-		}
+		shiftContourCheck(pattern,1);
 	}
 
 	@Test
@@ -145,8 +116,8 @@ public class TestContourTracer {
 		ContourTracer alg = new ContourTracer();
 
 		// process the image
-		alg.setInputs(input,label,queue);
-		alg.trace(2,1,0,7,found);
+		alg.setInputs(addBorder(input),label,queue);
+		alg.trace(2,1+1,0+1,7,found);
 
 		assertEquals(7,queue.size);
 		assertEquals(7, found.size());
@@ -165,8 +136,8 @@ public class TestContourTracer {
 		ContourTracer alg = new ContourTracer();
 
 		// process the image
-		alg.setInputs(input,label,queue);
-		alg.trace(2,3,0,3,found);
+		alg.setInputs(addBorder(input),label,queue);
+		alg.trace(2,3+1,0+1,3,found);
 
 		assertEquals(4, queue.size);
 		assertEquals(4,found.size());
@@ -211,8 +182,8 @@ public class TestContourTracer {
 				found.clear();
 
 				// process the image
-				alg.setInputs(input,label,queue);
-				alg.trace(2,x,y,7,found);
+				alg.setInputs(addBorder(input),label,queue);
+				alg.trace(2,x+1,y+1,7,found);
 
 				// forward then back
 				assertEquals(expectedSize,queue.size);
@@ -233,6 +204,13 @@ public class TestContourTracer {
 				}
 			}
 		}
+	}
+
+	private ImageUInt8 addBorder( ImageUInt8 original ) {
+		ImageUInt8 border = new ImageUInt8(original.width+2,original.height+2);
+		border.subimage(1,1,border.width-1,border.height-1).setTo(original);
+		ImageMiscOps.fillBorder(border,0,1);
+		return border;
 	}
 
 	private ImageUInt8 stringToImage( String s ) {

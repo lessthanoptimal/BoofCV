@@ -39,7 +39,7 @@ public class TestGImageMiscOps extends BaseGClassChecksInMisc{
 
 	@Test
 	public void compareToPixelMath() {
-		performTests(7);
+		performTests(8);
 	}
 
 	@Override
@@ -54,6 +54,10 @@ public class TestGImageMiscOps extends BaseGClassChecksInMisc{
 		if( name.equals("fill")) {
 			ret[0][0] = inputA;
 			ret[0][1] = 3;
+		} else if( name.equals("fillBorder")) {
+			ret[0][0] = inputA;
+			ret[0][1] = 3;
+			ret[0][2] = 2;
 		} else if( name.equals("fillRectangle")) {
 			ret[0][0] = inputA;
 			ret[0][1] = 3;

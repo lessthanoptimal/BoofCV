@@ -42,11 +42,20 @@ public class ContourTracer {
 	List<Point2D_I32> contour;
 
 	int x,y,label,dir;
+	int indexPixel,s;
 
+	/**
+	 *
+	 * @param binary Binary image with a border of zeros added to the outside.
+	 * @param labeled Labeled image.  Size is the same as the original binary image without border.
+	 * @param storagePoints
+	 */
 	public void setInputs( ImageUInt8 binary , ImageSInt32 labeled , FastQueue<Point2D_I32> storagePoints ) {
 		this.binary = binary;
 		this.labeled = labeled;
 		this.storagePoints = storagePoints;
+
+		s = binary.stride;
 	}
 
 
@@ -58,6 +67,7 @@ public class ContourTracer {
 		this.x = initialX;
 		this.y = initialY;
 
+		indexPixel = binary.getIndex(x,y);
 		add(x,y);
 
 		// find the next black pixel.  handle case where its an isolated point
@@ -98,42 +108,42 @@ public class ContourTracer {
 		for( int i = 0; i < 8; i++ ) {
 			switch( dir ) {
 				case 0:
-					if( checkBlack(x+1,y) )
+					if( checkBlack(indexPixel+1) ) // x+1,y
 						return true;
 					break;
 
 				case 1:
-					if( checkBlack(x+1,y+1) )
+					if( checkBlack(indexPixel+1+s) ) // x+1,y+1
 						return true;
 					break;
 
 				case 2:
-					if( checkBlack(x,y+1) )
+					if( checkBlack(indexPixel+s) ) // x,y+1
 						return true;
 					break;
 
 				case 3:
-					if( checkBlack(x-1,y+1) )
+					if( checkBlack(indexPixel-1+s) )  // x-1,y+1
 						return true;
 					break;
 
 				case 4:
-					if( checkBlack(x-1,y) )
+					if( checkBlack(indexPixel-1) )  // x-1,y
 						return true;
 					break;
 
 				case 5:
-					if( checkBlack(x-1,y-1) )
+					if( checkBlack(indexPixel-1-s) ) // x-1,y-1
 						return true;
 					break;
 
 				case 6:
-					if( checkBlack(x,y-1) )
+					if( checkBlack(indexPixel-s ) ) // x,y-1
 						return true;
 					break;
 
 				case 7:
-					if( checkBlack(x+1,y-1) )
+					if( checkBlack(indexPixel+1-s) )  //x+1,y-1
 						return true;
 					break;
 			}
@@ -178,13 +188,23 @@ public class ContourTracer {
 		}
 	}
 
-	private boolean checkBlack( int x , int y ) {
-		// treat pixels outside the image as white
-		if( x < 0 || x >= binary.width || y < 0 || y >= binary.height )
-			return false;
+//	private boolean checkBlack( int x , int y ) {
+//		// treat pixels outside the image as white
+//		if( x < 0 || x >= binary.width || y < 0 || y >= binary.height )
+//			return false;
+//
+//		int index = binary.getIndex(x,y);
+//
+//		if( binary.data[index] == 1 ) {
+//			return true;
+//		} else {
+//			// mark white pixels as negative numbers to avoid retracing this contour in the future
+//			binary.data[index] = -1;
+//			return false;
+//		}
+//	}
 
-		int index = binary.getIndex(x,y);
-
+	private boolean checkBlack( int index ) {
 		if( binary.data[index] == 1 ) {
 			return true;
 		} else {
@@ -205,6 +225,7 @@ public class ContourTracer {
 			case 6:     y--; break;
 			case 7: x++;y--; break;
 		}
+		indexPixel = binary.startIndex + y*binary.stride + x;
 	}
 
 	/**
@@ -212,8 +233,9 @@ public class ContourTracer {
 	 */
 	private void add( int x , int y ) {
 		Point2D_I32 p = storagePoints.grow();
-		p.set(x, y);
+		// compensate for the border added to binary image
+		p.set(x-1, y-1);
 		contour.add(p);
-		labeled.unsafe_set(x,y,label);
+		labeled.unsafe_set(p.x,p.y,label);
 	}
 }

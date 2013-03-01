@@ -81,7 +81,7 @@ public class BenchmarkBinaryBlobLabeling {
 		public void process() {
 			int numFound = BinaryImageOps.labelBlobs8(input, output);
 			BinaryImageOps.labelToClusters(output,numFound,queuePts);
-			System.out.println("Full8 total = "+numFound);
+//			System.out.println("Full8 total = "+numFound);
 		}
 	}
 
@@ -98,9 +98,8 @@ public class BenchmarkBinaryBlobLabeling {
 
 		@Override
 		public void process() {
-			input.setTo(original);
+//			input.setTo(original);
 			alg.process(input,output);
-			System.out.println("Chang total = "+alg.getContours().size);
 		}
 	}
 
@@ -109,6 +108,14 @@ public class BenchmarkBinaryBlobLabeling {
 
 		Random rand = new Random(234);
 		ImageMiscOps.fillUniform(original, rand, 0, 1);
+
+		for( int y = 0; y < original.height; y++ ) {
+			for( int x = 0; x < original.width; x++ ) {
+				if( x == 0 || y == 0 || x == original.width-1 || y == original.height-1 )
+					original.unsafe_set(x,y,0);
+			}
+		}
+
 		input.setTo(original);
 
 //		ProfileOperation.printOpsPerSec(new Normal8(), TEST_TIME);

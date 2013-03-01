@@ -49,6 +49,41 @@ public class ImageMiscOps {
 	}
 
 	/**
+	 * Fills the outside border with the specified value
+	 *
+	 * @param input An image.
+	 * @param value The value that the image is being filled with.
+	 * @param radius Border width.   
+	 */
+	public static void fillBorder(ImageInt8 input, int value, int radius ) {
+
+		// top and bottom
+		for (int y = 0; y < radius; y++) {
+			int indexTop = input.startIndex + y * input.stride;
+			int indexBottom = input.startIndex + (input.height-y-1) * input.stride;
+			for (int x = 0; x < input.width; x++) {
+				input.data[indexTop++] = (byte)value;
+				input.data[indexBottom++] = (byte)value;
+			}
+		}
+
+		// left and right
+		int h = input.height-radius;
+		int indexStart = input.startIndex + radius*input.stride;
+		for (int x = 0; x < radius; x++) {
+			int indexLeft = indexStart + x;
+			int indexRight = indexStart + input.width-1-x;
+			for (int y = radius; y < h; y++) {
+				input.data[indexLeft] = (byte)value;
+				input.data[indexRight] = (byte)value;
+				
+				indexLeft += input.stride;
+				indexRight += input.stride;
+			}
+		}
+	}
+
+	/**
 	 * Draws a filled rectangle that is aligned along the image axis inside the image.
 	 *
 	 * @param img Image the rectangle is drawn in.  Modified
@@ -149,6 +184,41 @@ public class ImageMiscOps {
 			int index = input.getStartIndex() + y * input.getStride();
 			for (int x = 0; x < input.width; x++) {
 				input.data[index++] = (short)value;
+			}
+		}
+	}
+
+	/**
+	 * Fills the outside border with the specified value
+	 *
+	 * @param input An image.
+	 * @param value The value that the image is being filled with.
+	 * @param radius Border width.   
+	 */
+	public static void fillBorder(ImageInt16 input, int value, int radius ) {
+
+		// top and bottom
+		for (int y = 0; y < radius; y++) {
+			int indexTop = input.startIndex + y * input.stride;
+			int indexBottom = input.startIndex + (input.height-y-1) * input.stride;
+			for (int x = 0; x < input.width; x++) {
+				input.data[indexTop++] = (short)value;
+				input.data[indexBottom++] = (short)value;
+			}
+		}
+
+		// left and right
+		int h = input.height-radius;
+		int indexStart = input.startIndex + radius*input.stride;
+		for (int x = 0; x < radius; x++) {
+			int indexLeft = indexStart + x;
+			int indexRight = indexStart + input.width-1-x;
+			for (int y = radius; y < h; y++) {
+				input.data[indexLeft] = (short)value;
+				input.data[indexRight] = (short)value;
+				
+				indexLeft += input.stride;
+				indexRight += input.stride;
 			}
 		}
 	}
@@ -259,6 +329,41 @@ public class ImageMiscOps {
 	}
 
 	/**
+	 * Fills the outside border with the specified value
+	 *
+	 * @param input An image.
+	 * @param value The value that the image is being filled with.
+	 * @param radius Border width.   
+	 */
+	public static void fillBorder(ImageSInt32 input, int value, int radius ) {
+
+		// top and bottom
+		for (int y = 0; y < radius; y++) {
+			int indexTop = input.startIndex + y * input.stride;
+			int indexBottom = input.startIndex + (input.height-y-1) * input.stride;
+			for (int x = 0; x < input.width; x++) {
+				input.data[indexTop++] = value;
+				input.data[indexBottom++] = value;
+			}
+		}
+
+		// left and right
+		int h = input.height-radius;
+		int indexStart = input.startIndex + radius*input.stride;
+		for (int x = 0; x < radius; x++) {
+			int indexLeft = indexStart + x;
+			int indexRight = indexStart + input.width-1-x;
+			for (int y = radius; y < h; y++) {
+				input.data[indexLeft] = value;
+				input.data[indexRight] = value;
+				
+				indexLeft += input.stride;
+				indexRight += input.stride;
+			}
+		}
+	}
+
+	/**
 	 * Draws a filled rectangle that is aligned along the image axis inside the image.
 	 *
 	 * @param img Image the rectangle is drawn in.  Modified
@@ -359,6 +464,41 @@ public class ImageMiscOps {
 			int index = input.getStartIndex() + y * input.getStride();
 			for (int x = 0; x < input.width; x++) {
 				input.data[index++] = value;
+			}
+		}
+	}
+
+	/**
+	 * Fills the outside border with the specified value
+	 *
+	 * @param input An image.
+	 * @param value The value that the image is being filled with.
+	 * @param radius Border width.   
+	 */
+	public static void fillBorder(ImageSInt64 input, long value, int radius ) {
+
+		// top and bottom
+		for (int y = 0; y < radius; y++) {
+			int indexTop = input.startIndex + y * input.stride;
+			int indexBottom = input.startIndex + (input.height-y-1) * input.stride;
+			for (int x = 0; x < input.width; x++) {
+				input.data[indexTop++] = value;
+				input.data[indexBottom++] = value;
+			}
+		}
+
+		// left and right
+		int h = input.height-radius;
+		int indexStart = input.startIndex + radius*input.stride;
+		for (int x = 0; x < radius; x++) {
+			int indexLeft = indexStart + x;
+			int indexRight = indexStart + input.width-1-x;
+			for (int y = radius; y < h; y++) {
+				input.data[indexLeft] = value;
+				input.data[indexRight] = value;
+				
+				indexLeft += input.stride;
+				indexRight += input.stride;
 			}
 		}
 	}
@@ -469,6 +609,41 @@ public class ImageMiscOps {
 	}
 
 	/**
+	 * Fills the outside border with the specified value
+	 *
+	 * @param input An image.
+	 * @param value The value that the image is being filled with.
+	 * @param radius Border width.   
+	 */
+	public static void fillBorder(ImageFloat32 input, float value, int radius ) {
+
+		// top and bottom
+		for (int y = 0; y < radius; y++) {
+			int indexTop = input.startIndex + y * input.stride;
+			int indexBottom = input.startIndex + (input.height-y-1) * input.stride;
+			for (int x = 0; x < input.width; x++) {
+				input.data[indexTop++] = value;
+				input.data[indexBottom++] = value;
+			}
+		}
+
+		// left and right
+		int h = input.height-radius;
+		int indexStart = input.startIndex + radius*input.stride;
+		for (int x = 0; x < radius; x++) {
+			int indexLeft = indexStart + x;
+			int indexRight = indexStart + input.width-1-x;
+			for (int y = radius; y < h; y++) {
+				input.data[indexLeft] = value;
+				input.data[indexRight] = value;
+				
+				indexLeft += input.stride;
+				indexRight += input.stride;
+			}
+		}
+	}
+
+	/**
 	 * Draws a filled rectangle that is aligned along the image axis inside the image.
 	 *
 	 * @param img Image the rectangle is drawn in.  Modified
@@ -499,7 +674,7 @@ public class ImageMiscOps {
 	 * @param max Maximum value of the distribution, inclusive
 	 */
 	public static void fillUniform(ImageFloat32 img, Random rand , float min , float max) {
-		float range = max-min+1;
+		float range = max-min;
 
 		float[] data = img.data;
 
@@ -574,6 +749,41 @@ public class ImageMiscOps {
 	}
 
 	/**
+	 * Fills the outside border with the specified value
+	 *
+	 * @param input An image.
+	 * @param value The value that the image is being filled with.
+	 * @param radius Border width.   
+	 */
+	public static void fillBorder(ImageFloat64 input, double value, int radius ) {
+
+		// top and bottom
+		for (int y = 0; y < radius; y++) {
+			int indexTop = input.startIndex + y * input.stride;
+			int indexBottom = input.startIndex + (input.height-y-1) * input.stride;
+			for (int x = 0; x < input.width; x++) {
+				input.data[indexTop++] = value;
+				input.data[indexBottom++] = value;
+			}
+		}
+
+		// left and right
+		int h = input.height-radius;
+		int indexStart = input.startIndex + radius*input.stride;
+		for (int x = 0; x < radius; x++) {
+			int indexLeft = indexStart + x;
+			int indexRight = indexStart + input.width-1-x;
+			for (int y = radius; y < h; y++) {
+				input.data[indexLeft] = value;
+				input.data[indexRight] = value;
+				
+				indexLeft += input.stride;
+				indexRight += input.stride;
+			}
+		}
+	}
+
+	/**
 	 * Draws a filled rectangle that is aligned along the image axis inside the image.
 	 *
 	 * @param img Image the rectangle is drawn in.  Modified
@@ -604,7 +814,7 @@ public class ImageMiscOps {
 	 * @param max Maximum value of the distribution, inclusive
 	 */
 	public static void fillUniform(ImageFloat64 img, Random rand , double min , double max) {
-		double range = max-min+1;
+		double range = max-min;
 
 		double[] data = img.data;
 
