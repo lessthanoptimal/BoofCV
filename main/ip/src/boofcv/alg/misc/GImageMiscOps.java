@@ -62,6 +62,39 @@ public class GImageMiscOps {
 	}
 
 	/**
+	 * Fills the outside border with the specified value
+	 *
+	 * @param input An image.
+	 * @param value The value that the image is being filled with.
+	 * @param radius Border width.
+	 */
+	public static void fillBorder( ImageBase input , double value , int radius ) {
+		if( input instanceof ImageSingleBand ) {
+			if( ImageInt8.class.isAssignableFrom(input.getClass()) ) {
+				ImageMiscOps.fillBorder((ImageInt8) input, (int) value, radius);
+			} else if( ImageInt16.class.isAssignableFrom(input.getClass()) ) {
+				ImageMiscOps.fillBorder((ImageInt16) input, (int) value, radius);
+			} else if( ImageSInt32.class == input.getClass() ) {
+				ImageMiscOps.fillBorder((ImageSInt32) input, (int) value, radius);
+			} else if( ImageSInt64.class == input.getClass() ) {
+				ImageMiscOps.fillBorder((ImageSInt64) input, (long) value, radius);
+			} else if( ImageFloat32.class == input.getClass() ) {
+				ImageMiscOps.fillBorder((ImageFloat32) input, (float) value, radius);
+			} else if( ImageFloat64.class == input.getClass() ) {
+				ImageMiscOps.fillBorder((ImageFloat64) input, value, radius);
+			} else {
+				throw new IllegalArgumentException("Unknown image Type: "+input.getClass().getSimpleName());
+			}
+		} else if( input instanceof MultiSpectral ) {
+			MultiSpectral m = (MultiSpectral)input;
+			for( int i = 0; i < m.getNumBands(); i++ )
+				fillBorder(m.getBand(i), value, radius);
+		} else {
+			throw new IllegalArgumentException("Unknown image type: " + input.getClass().getSimpleName());
+		}
+	}
+
+	/**
 	 * Draws a filled rectangle that is aligned along the image axis inside the image.
 	 *
 	 * @param input Image the rectangle is drawn in.  Modified

@@ -18,6 +18,7 @@
 
 package boofcv.alg.filter.binary;
 
+import boofcv.alg.misc.ImageMiscOps;
 import boofcv.struct.FastQueue;
 import boofcv.struct.image.ImageSInt32;
 import boofcv.struct.image.ImageUInt8;
@@ -34,6 +35,9 @@ public class LinearContourLabelChang2004 {
 	// traces edge pixels
 	ContourTracer tracer = new ContourTracer();
 
+	// binary image with a border of zero.
+	ImageUInt8 border = new ImageUInt8(1,1);
+
 	// predeclared/recycled data structures
 	FastQueue<Point2D_I32> storagePoints = new FastQueue<Point2D_I32>(Point2D_I32.class,true);
 	FastQueue<List<Point2D_I32>> storageLists = new FastQueue<List<Point2D_I32>>((Class)ArrayList.class,true);
@@ -44,16 +48,32 @@ public class LinearContourLabelChang2004 {
 
 	public void process( ImageUInt8 binary , ImageSInt32 labeled ) {
 		// initialize data structures
+
+		// ensure that the image border pixels are filled with zero by enlarging the image
+		if( border.width != binary.width+2 || border.height != binary.height+2)  {
+			border.reshape(binary.width + 2, binary.height + 2);
+			ImageMiscOps.fillBorder(border, 0, 1);
+		}
+		border.subimage(1,1,border.width-1,border.height-1).setTo(binary);
+
+		// labeled image must initially be filled with zeros
+		ImageMiscOps.fill(labeled,0);
+
+		binary = border;
 		storagePoints.reset();
 		storageLists.reset();
 		contours.reset();
 		tracer.setInputs(binary,labeled,storagePoints);
 
-		for( y = 0; y < binary.height; y++ ) {
-			indexIn = binary.startIndex + y*binary.stride;
-			indexOut = labeled.startIndex + y*labeled.stride;
+		long totalTrace = 0;
+//		long startTime = System.currentTimeMillis();
 
-			for( x = 0; x < binary.width; x++ , indexIn++ , indexOut++) {
+		// Outside border is all zeros so it can be ignored
+		for( y = 1; y < binary.height-1; y++ ) {
+			indexIn = binary.startIndex + y*binary.stride+1;
+			indexOut = labeled.startIndex + (y-1)*labeled.stride;
+
+			for( x = 1; x < binary.width-1; x++ , indexIn++ , indexOut++) {
 				int bit = binary.data[indexIn];
 
 				// white pixels are ignored
@@ -62,11 +82,12 @@ public class LinearContourLabelChang2004 {
 
 				int label = labeled.data[indexOut];
 
-				if( label == 0 && (y <= 0 || binary.data[indexIn - binary.stride ] != 1) ) {
+//				long startTraceTime = System.currentTimeMillis();
+				if( label == 0 && binary.data[indexIn - binary.stride ] != 1 ) {
 //					System.out.println("--------- Step 1 at "+x+" "+y);
 
 					handleStep1();
-				} else if( (y >= binary.height-1) || binary.data[indexIn + binary.stride ] == 0 ) {
+				} else if( binary.data[indexIn + binary.stride ] == 0 ) {
 //					System.out.println("--------- Step 2 at "+x+" "+y);
 
 					handleStep2(labeled, label);
@@ -75,6 +96,7 @@ public class LinearContourLabelChang2004 {
 
 					handleStep3(labeled);
 				}
+//				totalTrace += System.currentTimeMillis()-startTraceTime;
 
 //				System.out.println("Binary");
 //				binary.print();
@@ -82,6 +104,10 @@ public class LinearContourLabelChang2004 {
 //				labeled.print();
 			}
 		}
+
+//		long total = System.currentTimeMillis()-startTime;
+
+//		System.out.println("Total elapsed "+total+"  trace = "+totalTrace);
 //		System.out.println("Exiting alg");
 	}
 
