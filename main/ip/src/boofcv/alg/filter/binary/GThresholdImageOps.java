@@ -93,9 +93,9 @@ public class GThresholdImageOps {
 	 * @return Number of blobs found.
 	 */
 	public static <T extends ImageSingleBand>
-			int hysteresisLabel4( T input , ImageSInt32 output ,
-								   double lowerThreshold , double upperThreshold , boolean down ,
-								   ImageUInt8 work )
+	int hysteresisLabel4( T input , ImageSInt32 output ,
+						  double lowerThreshold , double upperThreshold , boolean down ,
+						  ImageUInt8 work )
 	{
 		if( input instanceof ImageFloat32 ) {
 			return ThresholdImageOps.hysteresisLabel4((ImageFloat32)input,output,(float)lowerThreshold,(float)upperThreshold,down,work);
@@ -136,9 +136,9 @@ public class GThresholdImageOps {
 	 * @return Number of blobs found.
 	 */
 	public static <T extends ImageSingleBand>
-			int hysteresisLabel8( T input , ImageSInt32 output ,
-								   double lowerThreshold , double upperThreshold , boolean down ,
-								   ImageUInt8 work )
+	int hysteresisLabel8( T input , ImageSInt32 output ,
+						  double lowerThreshold , double upperThreshold , boolean down ,
+						  ImageUInt8 work )
 	{
 		if( input instanceof ImageFloat32 ) {
 			return ThresholdImageOps.hysteresisLabel8((ImageFloat32)input,output,(float)lowerThreshold,(float)upperThreshold,down,work);
