@@ -17,7 +17,9 @@ Version : Alpha 0.14
 - Interface for V4L4J to provide webcam support
 - ImageMiscOps
   * fillUniform(min,max) max is now inclusive
+  * added fillBorder()
 - Added new algorithm for binary contour and blob labeling
+- Fixed bug in FactoryImageBorder.value()
 
 ---------------------------------------------
 Date    : 2013/02/16

@@ -113,8 +113,7 @@ public class FactoryImageBorder {
 	 * @return An {@link ImageBorder}
 	 */
 	public static <T extends ImageSingleBand> ImageBorder<T> value( T image , double value ) {
-		Class borderType = lookupBorderClassType((Class)image.getClass());
-		ImageBorder border = value(borderType,value);
+		ImageBorder border = value(image.getClass(),value);
 		border.setImage(image);
 		return border;
 	}
@@ -136,7 +135,7 @@ public class FactoryImageBorder {
 		} else if( ImageInteger.class.isAssignableFrom(imageType) ) {
 			return (ImageBorder<T>)new ImageBorderValue.Value_I((int)value);
 		} else {
-			throw new IllegalArgumentException("Unknown image type");
+			throw new IllegalArgumentException("Unknown image type: "+imageType.getSimpleName());
 		}
 	}
 }

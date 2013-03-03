@@ -30,7 +30,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
@@ -148,15 +147,35 @@ public class TestContourTracer {
 	 */
 	@Test
 	public void checkMarkWhite() {
-		fail("Implement");
-	}
+		String b =
+				"000000\n"+
+				"001100\n"+
+				"000100\n"+
+				"000000\n";
+		String a =
+				"022220\n"+
+				"021120\n"+
+				"022120\n"+
+				"002220\n";
 
-	/**
-	 * See if the contour has the expected ordering properties
-	 */
-	@Test
-	public void checkContourOrdering() {
-		fail("Implement");
+		ImageUInt8 before = stringToImage(b);
+		ImageUInt8 after = stringToImage(a);
+		ImageSInt32 label = new ImageSInt32(before.width,before.height);
+
+		ContourTracer alg = new ContourTracer();
+
+		// process the image
+		alg.setInputs(before,label,queue);
+		alg.trace(2,2,1,7,found);
+
+		for( int i = 0; i < before.height; i++ ) {
+			for( int j = 0; j < before.width; j++ ) {
+				if( after.get(j,i) == 2 )
+					assertEquals(255,before.get(j,i));
+				else
+					assertEquals(after.get(j,i),before.get(j,i));
+			}
+		}
 	}
 
 	/**
