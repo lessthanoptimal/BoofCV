@@ -16,12 +16,26 @@
  * limitations under the License.
  */
 
-package boofcv.alg.feature.detect.edge;
+package boofcv.alg.filter.binary;
+
+import georegression.struct.point.Point2D_I32;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- * Detect edges and their directions using templates.
+ *
  *
  * @author Peter Abeles
  */
-public class TemplateEdgeDetector {
+public class Contour {
+	int id;
+	List<Point2D_I32> external = new ArrayList<Point2D_I32>();
+	List<List<Point2D_I32>> internal = new ArrayList<List<Point2D_I32>>();
+
+	public void reset() {
+		id = -1;
+		external.clear();
+		internal.clear();
+	}
 }

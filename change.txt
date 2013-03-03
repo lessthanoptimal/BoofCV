@@ -14,8 +14,12 @@ Version : Alpha 0.14
   * Local histogram
   * Sharpen 4 and 8
   * Demonstration to example directory
-- Convolve with lower and upper bounds on output for U8 and F32
 - Interface for V4L4J to provide webcam support
+- ImageMiscOps
+  * fillUniform(min,max) max is now inclusive
+  * added fillBorder()
+- Added new algorithm for binary contour and blob labeling
+- Fixed bug in FactoryImageBorder.value()
 
 ---------------------------------------------
 Date    : 2013/02/16

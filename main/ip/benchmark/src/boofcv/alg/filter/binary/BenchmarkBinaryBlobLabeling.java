@@ -20,10 +20,12 @@ package boofcv.alg.filter.binary;
 
 import boofcv.alg.filter.binary.impl.ImplBinaryBlobLabeling;
 import boofcv.alg.misc.ImageMiscOps;
+import boofcv.misc.PerformerBase;
+import boofcv.misc.ProfileOperation;
+import boofcv.struct.FastQueue;
 import boofcv.struct.image.ImageSInt32;
 import boofcv.struct.image.ImageUInt8;
-import com.google.caliper.Runner;
-import com.google.caliper.SimpleBenchmark;
+import georegression.struct.point.Point2D_I32;
 
 import java.util.Random;
 
@@ -32,57 +34,97 @@ import java.util.Random;
  *
  * @author Peter Abeles
  */
-public class BenchmarkBinaryBlobLabeling extends SimpleBenchmark {
+public class BenchmarkBinaryBlobLabeling {
+
+	static final long TEST_TIME = 1000;
+
 	static int imgWidth = 640;
 	static int imgHeight = 480;
 
+	static ImageUInt8 original = new ImageUInt8(imgWidth, imgHeight);
 	static ImageUInt8 input = new ImageUInt8(imgWidth, imgHeight);
 	static ImageSInt32 output = new ImageSInt32(imgWidth, imgHeight);
 
-	public BenchmarkBinaryBlobLabeling() {
-		Random rand = new Random(234);
-		ImageMiscOps.fillUniform(input, rand, 0, 1);
-	}
-
-	public int timeNormal8(int reps) {
-		for( int i = 0; i < reps; i++ )
+	public static class Normal8 extends PerformerBase {
+		@Override
+		public void process() {
 			ImplBinaryBlobLabeling.quickLabelBlobs8(input, output);
-		return 0;
+		}
 	}
 
-	public int timeNormal4(int reps) {
-		for( int i = 0; i < reps; i++ )
+	public static class Normal4 extends PerformerBase {
+		@Override
+		public void process() {
 			ImplBinaryBlobLabeling.quickLabelBlobs4(input, output);
-		return 0;
+		}
 	}
 
-	public int timeNaive8(int reps) {
-		for( int i = 0; i < reps; i++ )
+	public static class Naive8 extends PerformerBase {
+		@Override
+		public void process() {
 			ImplBinaryBlobLabeling.quickLabelBlobs8_Naive(input, output);
-		return 0;
+		}
 	}
 
-	public int timeNaive4(int reps) {
-		for( int i = 0; i < reps; i++ )
+	public static class Naive4 extends PerformerBase {
+		@Override
+		public void process() {
 			ImplBinaryBlobLabeling.quickLabelBlobs4_Naive(input, output);
-		return 0;
+		}
 	}
 
-	public int timeFull8(int reps) {
-		for( int i = 0; i < reps; i++ )
-			BinaryImageOps.labelBlobs8(input, output);
-		return 0;
+	public static class Full8 extends PerformerBase {
+
+		FastQueue<Point2D_I32> queuePts = new FastQueue<Point2D_I32>(Point2D_I32.class,true);
+
+		@Override
+		public void process() {
+			int numFound = BinaryImageOps.labelBlobs8(input, output);
+			BinaryImageOps.labelToClusters(output,numFound,queuePts);
+//			System.out.println("Full8 total = "+numFound);
+		}
 	}
 
-	public int timeFull4(int reps) {
-		for( int i = 0; i < reps; i++ )
+	public static class Full4 extends PerformerBase {
+		@Override
+		public void process() {
 			BinaryImageOps.labelBlobs4(input, output);
-		return 0;
+		}
+	}
+
+	public static class NewAlg extends PerformerBase {
+
+		LinearContourLabelChang2004 alg = new LinearContourLabelChang2004();
+
+		@Override
+		public void process() {
+//			input.setTo(original);
+			alg.process(input,output);
+		}
 	}
 
 	public static void main(String args[]) {
 		System.out.println("=========  Profile Image Size "+ imgWidth +" x "+ imgHeight  +" ==========");
 
-		Runner.main(BenchmarkBinaryBlobLabeling.class, args);
+		Random rand = new Random(234);
+		ImageMiscOps.fillUniform(original, rand, 0, 1);
+
+		for( int y = 0; y < original.height; y++ ) {
+			for( int x = 0; x < original.width; x++ ) {
+				if( x == 0 || y == 0 || x == original.width-1 || y == original.height-1 )
+					original.unsafe_set(x,y,0);
+			}
+		}
+
+		input.setTo(original);
+
+//		ProfileOperation.printOpsPerSec(new Normal8(), TEST_TIME);
+//		ProfileOperation.printOpsPerSec(new Normal4(), TEST_TIME);
+//		ProfileOperation.printOpsPerSec(new Naive8(), TEST_TIME);
+//		ProfileOperation.printOpsPerSec(new Naive4(), TEST_TIME);
+		ProfileOperation.printOpsPerSec(new Full8(), TEST_TIME);
+//		ProfileOperation.printOpsPerSec(new Full4(), TEST_TIME);
+		ProfileOperation.printOpsPerSec(new NewAlg(), TEST_TIME);
+
 	}
 }
