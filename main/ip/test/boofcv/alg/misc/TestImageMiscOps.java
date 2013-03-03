@@ -43,7 +43,7 @@ public class TestImageMiscOps {
 
 	@Test
 	public void checkAll() {
-		int numExpected = 6*5 + 8*2;
+		int numExpected = 6*6 + 8*2;
 		Method methods[] = ImageMiscOps.class.getMethods();
 
 		// sanity check to make sure the functions are being found
@@ -55,6 +55,8 @@ public class TestImageMiscOps {
 //				System.out.println(m.getName());
 				if( m.getName().compareTo("fill") == 0 ) {
 					testFill(m);
+				} else if( m.getName().compareTo("fillBorder") == 0 ) {
+					testFillBorder(m);
 				} else if( m.getName().compareTo("fillRectangle") == 0 ) {
 					testFillRectangle(m);
 				} else if( m.getName().compareTo("fillUniform") == 0 ) {
@@ -113,6 +115,29 @@ public class TestImageMiscOps {
 		}
 	}
 
+	private void testFillBorder( Method m ) throws InvocationTargetException, IllegalAccessException {
+		Class paramTypes[] = m.getParameterTypes();
+		ImageSingleBand orig = GeneralizedImageOps.createSingleBand(paramTypes[0], width, height);
+		GImageMiscOps.fill(orig, 4);
+
+		int r = 2;
+		if( orig.getTypeInfo().isInteger()) {
+			m.invoke(null,orig,5,r);
+		} else {
+			m.invoke(null,orig,5,r);
+		}
+
+		GImageSingleBand a = FactoryGImageSingleBand.wrap(orig);
+		for( int i = 0; i < height; i++ ) {
+			for( int j = 0; j < width; j++ ) {
+				if( j < r || i < r || j >= width-r || i >= height-r )
+					assertEquals(i+" "+j,5,a.get(j,i).doubleValue(),1e-4);
+				else
+					assertEquals(4,a.get(j,i).doubleValue(),1e-4);
+			}
+		}
+	}
+
 	private void testFillRectangle( Method m ) throws InvocationTargetException, IllegalAccessException {
 		Class paramTypes[] = m.getParameterTypes();
 		ImageSingleBand orig = GeneralizedImageOps.createSingleBand(paramTypes[0], width, height);
@@ -159,7 +184,7 @@ public class TestImageMiscOps {
 		for( int i = 0; i < height; i++ ) {
 			for( int j = 0; j < width; j++ ) {
 				double value = a.get(j,i).doubleValue();
-				assertTrue(value>=-10 && value <= 10);
+				assertTrue("value = "+value,value>=-10 && value <= 10);
 				if( value == 0 )
 					numZero++;
 			}

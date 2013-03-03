@@ -49,6 +49,41 @@ public class ImageMiscOps {
 	}
 
 	/**
+	 * Fills the outside border with the specified value
+	 *
+	 * @param input An image.
+	 * @param value The value that the image is being filled with.
+	 * @param radius Border width.   
+	 */
+	public static void fillBorder(ImageInt8 input, int value, int radius ) {
+
+		// top and bottom
+		for (int y = 0; y < radius; y++) {
+			int indexTop = input.startIndex + y * input.stride;
+			int indexBottom = input.startIndex + (input.height-y-1) * input.stride;
+			for (int x = 0; x < input.width; x++) {
+				input.data[indexTop++] = (byte)value;
+				input.data[indexBottom++] = (byte)value;
+			}
+		}
+
+		// left and right
+		int h = input.height-radius;
+		int indexStart = input.startIndex + radius*input.stride;
+		for (int x = 0; x < radius; x++) {
+			int indexLeft = indexStart + x;
+			int indexRight = indexStart + input.width-1-x;
+			for (int y = radius; y < h; y++) {
+				input.data[indexLeft] = (byte)value;
+				input.data[indexRight] = (byte)value;
+				
+				indexLeft += input.stride;
+				indexRight += input.stride;
+			}
+		}
+	}
+
+	/**
 	 * Draws a filled rectangle that is aligned along the image axis inside the image.
 	 *
 	 * @param img Image the rectangle is drawn in.  Modified
@@ -75,11 +110,11 @@ public class ImageMiscOps {
 	 *
 	 * @param img Image which is to be filled.  Modified,
 	 * @param rand Random number generator
-	 * @param min Minimum value of the distribution
-	 * @param max Maximum value of the distribution
+	 * @param min Minimum value of the distribution, inclusive
+	 * @param max Maximum value of the distribution, inclusive
 	 */
 	public static void fillUniform(ImageInt8 img, Random rand , int min , int max) {
-		int range = max-min;
+		int range = max-min+1;
 
 		byte[] data = img.data;
 
@@ -154,6 +189,41 @@ public class ImageMiscOps {
 	}
 
 	/**
+	 * Fills the outside border with the specified value
+	 *
+	 * @param input An image.
+	 * @param value The value that the image is being filled with.
+	 * @param radius Border width.   
+	 */
+	public static void fillBorder(ImageInt16 input, int value, int radius ) {
+
+		// top and bottom
+		for (int y = 0; y < radius; y++) {
+			int indexTop = input.startIndex + y * input.stride;
+			int indexBottom = input.startIndex + (input.height-y-1) * input.stride;
+			for (int x = 0; x < input.width; x++) {
+				input.data[indexTop++] = (short)value;
+				input.data[indexBottom++] = (short)value;
+			}
+		}
+
+		// left and right
+		int h = input.height-radius;
+		int indexStart = input.startIndex + radius*input.stride;
+		for (int x = 0; x < radius; x++) {
+			int indexLeft = indexStart + x;
+			int indexRight = indexStart + input.width-1-x;
+			for (int y = radius; y < h; y++) {
+				input.data[indexLeft] = (short)value;
+				input.data[indexRight] = (short)value;
+				
+				indexLeft += input.stride;
+				indexRight += input.stride;
+			}
+		}
+	}
+
+	/**
 	 * Draws a filled rectangle that is aligned along the image axis inside the image.
 	 *
 	 * @param img Image the rectangle is drawn in.  Modified
@@ -180,11 +250,11 @@ public class ImageMiscOps {
 	 *
 	 * @param img Image which is to be filled.  Modified,
 	 * @param rand Random number generator
-	 * @param min Minimum value of the distribution
-	 * @param max Maximum value of the distribution
+	 * @param min Minimum value of the distribution, inclusive
+	 * @param max Maximum value of the distribution, inclusive
 	 */
 	public static void fillUniform(ImageInt16 img, Random rand , int min , int max) {
-		int range = max-min;
+		int range = max-min+1;
 
 		short[] data = img.data;
 
@@ -259,6 +329,41 @@ public class ImageMiscOps {
 	}
 
 	/**
+	 * Fills the outside border with the specified value
+	 *
+	 * @param input An image.
+	 * @param value The value that the image is being filled with.
+	 * @param radius Border width.   
+	 */
+	public static void fillBorder(ImageSInt32 input, int value, int radius ) {
+
+		// top and bottom
+		for (int y = 0; y < radius; y++) {
+			int indexTop = input.startIndex + y * input.stride;
+			int indexBottom = input.startIndex + (input.height-y-1) * input.stride;
+			for (int x = 0; x < input.width; x++) {
+				input.data[indexTop++] = value;
+				input.data[indexBottom++] = value;
+			}
+		}
+
+		// left and right
+		int h = input.height-radius;
+		int indexStart = input.startIndex + radius*input.stride;
+		for (int x = 0; x < radius; x++) {
+			int indexLeft = indexStart + x;
+			int indexRight = indexStart + input.width-1-x;
+			for (int y = radius; y < h; y++) {
+				input.data[indexLeft] = value;
+				input.data[indexRight] = value;
+				
+				indexLeft += input.stride;
+				indexRight += input.stride;
+			}
+		}
+	}
+
+	/**
 	 * Draws a filled rectangle that is aligned along the image axis inside the image.
 	 *
 	 * @param img Image the rectangle is drawn in.  Modified
@@ -285,11 +390,11 @@ public class ImageMiscOps {
 	 *
 	 * @param img Image which is to be filled.  Modified,
 	 * @param rand Random number generator
-	 * @param min Minimum value of the distribution
-	 * @param max Maximum value of the distribution
+	 * @param min Minimum value of the distribution, inclusive
+	 * @param max Maximum value of the distribution, inclusive
 	 */
 	public static void fillUniform(ImageSInt32 img, Random rand , int min , int max) {
-		int range = max-min;
+		int range = max-min+1;
 
 		int[] data = img.data;
 
@@ -364,6 +469,41 @@ public class ImageMiscOps {
 	}
 
 	/**
+	 * Fills the outside border with the specified value
+	 *
+	 * @param input An image.
+	 * @param value The value that the image is being filled with.
+	 * @param radius Border width.   
+	 */
+	public static void fillBorder(ImageSInt64 input, long value, int radius ) {
+
+		// top and bottom
+		for (int y = 0; y < radius; y++) {
+			int indexTop = input.startIndex + y * input.stride;
+			int indexBottom = input.startIndex + (input.height-y-1) * input.stride;
+			for (int x = 0; x < input.width; x++) {
+				input.data[indexTop++] = value;
+				input.data[indexBottom++] = value;
+			}
+		}
+
+		// left and right
+		int h = input.height-radius;
+		int indexStart = input.startIndex + radius*input.stride;
+		for (int x = 0; x < radius; x++) {
+			int indexLeft = indexStart + x;
+			int indexRight = indexStart + input.width-1-x;
+			for (int y = radius; y < h; y++) {
+				input.data[indexLeft] = value;
+				input.data[indexRight] = value;
+				
+				indexLeft += input.stride;
+				indexRight += input.stride;
+			}
+		}
+	}
+
+	/**
 	 * Draws a filled rectangle that is aligned along the image axis inside the image.
 	 *
 	 * @param img Image the rectangle is drawn in.  Modified
@@ -390,11 +530,11 @@ public class ImageMiscOps {
 	 *
 	 * @param img Image which is to be filled.  Modified,
 	 * @param rand Random number generator
-	 * @param min Minimum value of the distribution
-	 * @param max Maximum value of the distribution
+	 * @param min Minimum value of the distribution, inclusive
+	 * @param max Maximum value of the distribution, inclusive
 	 */
 	public static void fillUniform(ImageSInt64 img, Random rand , long min , long max) {
-		long range = max-min;
+		long range = max-min+1;
 
 		long[] data = img.data;
 
@@ -469,6 +609,41 @@ public class ImageMiscOps {
 	}
 
 	/**
+	 * Fills the outside border with the specified value
+	 *
+	 * @param input An image.
+	 * @param value The value that the image is being filled with.
+	 * @param radius Border width.   
+	 */
+	public static void fillBorder(ImageFloat32 input, float value, int radius ) {
+
+		// top and bottom
+		for (int y = 0; y < radius; y++) {
+			int indexTop = input.startIndex + y * input.stride;
+			int indexBottom = input.startIndex + (input.height-y-1) * input.stride;
+			for (int x = 0; x < input.width; x++) {
+				input.data[indexTop++] = value;
+				input.data[indexBottom++] = value;
+			}
+		}
+
+		// left and right
+		int h = input.height-radius;
+		int indexStart = input.startIndex + radius*input.stride;
+		for (int x = 0; x < radius; x++) {
+			int indexLeft = indexStart + x;
+			int indexRight = indexStart + input.width-1-x;
+			for (int y = radius; y < h; y++) {
+				input.data[indexLeft] = value;
+				input.data[indexRight] = value;
+				
+				indexLeft += input.stride;
+				indexRight += input.stride;
+			}
+		}
+	}
+
+	/**
 	 * Draws a filled rectangle that is aligned along the image axis inside the image.
 	 *
 	 * @param img Image the rectangle is drawn in.  Modified
@@ -495,8 +670,8 @@ public class ImageMiscOps {
 	 *
 	 * @param img Image which is to be filled.  Modified,
 	 * @param rand Random number generator
-	 * @param min Minimum value of the distribution
-	 * @param max Maximum value of the distribution
+	 * @param min Minimum value of the distribution, inclusive
+	 * @param max Maximum value of the distribution, inclusive
 	 */
 	public static void fillUniform(ImageFloat32 img, Random rand , float min , float max) {
 		float range = max-min;
@@ -574,6 +749,41 @@ public class ImageMiscOps {
 	}
 
 	/**
+	 * Fills the outside border with the specified value
+	 *
+	 * @param input An image.
+	 * @param value The value that the image is being filled with.
+	 * @param radius Border width.   
+	 */
+	public static void fillBorder(ImageFloat64 input, double value, int radius ) {
+
+		// top and bottom
+		for (int y = 0; y < radius; y++) {
+			int indexTop = input.startIndex + y * input.stride;
+			int indexBottom = input.startIndex + (input.height-y-1) * input.stride;
+			for (int x = 0; x < input.width; x++) {
+				input.data[indexTop++] = value;
+				input.data[indexBottom++] = value;
+			}
+		}
+
+		// left and right
+		int h = input.height-radius;
+		int indexStart = input.startIndex + radius*input.stride;
+		for (int x = 0; x < radius; x++) {
+			int indexLeft = indexStart + x;
+			int indexRight = indexStart + input.width-1-x;
+			for (int y = radius; y < h; y++) {
+				input.data[indexLeft] = value;
+				input.data[indexRight] = value;
+				
+				indexLeft += input.stride;
+				indexRight += input.stride;
+			}
+		}
+	}
+
+	/**
 	 * Draws a filled rectangle that is aligned along the image axis inside the image.
 	 *
 	 * @param img Image the rectangle is drawn in.  Modified
@@ -600,8 +810,8 @@ public class ImageMiscOps {
 	 *
 	 * @param img Image which is to be filled.  Modified,
 	 * @param rand Random number generator
-	 * @param min Minimum value of the distribution
-	 * @param max Maximum value of the distribution
+	 * @param min Minimum value of the distribution, inclusive
+	 * @param max Maximum value of the distribution, inclusive
 	 */
 	public static void fillUniform(ImageFloat64 img, Random rand , double min , double max) {
 		double range = max-min;
