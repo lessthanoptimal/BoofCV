@@ -121,6 +121,7 @@ public class LinearContourLabelChang2004 {
 	 */
 	private void handleStep1() {
 		Contour c = contours.grow();
+		c.id = contours.size();
 		tracer.trace(contours.size(),x,y,7,c.external);
 	}
 
