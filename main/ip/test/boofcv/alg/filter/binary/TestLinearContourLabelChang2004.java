@@ -66,6 +66,15 @@ public class TestLinearContourLabelChang2004 {
 			 0,0,1,0,0,
 			 0,0,0,0,0};
 
+	public static byte[] TEST4 = new byte[]
+			{0,0,0,0,0,0,0,
+			 0,0,1,1,1,1,1,
+			 0,1,0,1,1,1,1,
+			 0,1,1,1,0,1,1,
+			 0,1,1,1,1,1,1,
+			 0,1,1,1,1,1,1,
+			 0,1,1,1,1,1,1,
+			 0,0,0,0,0,0,0};
 
 
 	List<Point2D_I32> local;
@@ -84,29 +93,81 @@ public class TestLinearContourLabelChang2004 {
 	}
 
 	@Test
-	public void test1() {
+	public void test1_4() {
 		ImageUInt8 input = new ImageUInt8(13,8);
 		input.data = TEST1;
 
 		ImageSInt32 labeled = new ImageSInt32(input.width,input.height);
-		LinearContourLabelChang2004 alg = new LinearContourLabelChang2004();
+		LinearContourLabelChang2004 alg = new LinearContourLabelChang2004(4);
 		alg.process(input, labeled);
 
-		assertEquals(1, alg.getContours().size);
-		checkContour(alg, labeled);
+		assertEquals(2, alg.getContours().size);
+		checkContour(alg, labeled,4);
 	}
 
 	@Test
-	public void test2() {
+	public void test1_8() {
+		ImageUInt8 input = new ImageUInt8(13,8);
+		input.data = TEST1;
+
+		ImageSInt32 labeled = new ImageSInt32(input.width,input.height);
+		LinearContourLabelChang2004 alg = new LinearContourLabelChang2004(8);
+		alg.process(input, labeled);
+
+		assertEquals(1, alg.getContours().size);
+		checkContour(alg, labeled,8);
+	}
+
+	@Test
+	public void test2_4() {
 		ImageUInt8 input = new ImageUInt8(13,8);
 		input.data = TEST2;
 
 		ImageSInt32 labeled = new ImageSInt32(input.width,input.height);
-		LinearContourLabelChang2004 alg = new LinearContourLabelChang2004();
+		LinearContourLabelChang2004 alg = new LinearContourLabelChang2004(4);
+		alg.process(input,labeled);
+
+		assertEquals(14,alg.getContours().size);
+		checkContour(alg, labeled,4);
+	}
+
+	@Test
+	public void test2_8() {
+		ImageUInt8 input = new ImageUInt8(13,8);
+		input.data = TEST2;
+
+		ImageSInt32 labeled = new ImageSInt32(input.width,input.height);
+		LinearContourLabelChang2004 alg = new LinearContourLabelChang2004(8);
 		alg.process(input,labeled);
 
 		assertEquals(4,alg.getContours().size);
-		checkContour(alg,labeled);
+		checkContour(alg, labeled,8);
+	}
+
+	@Test
+	public void test3_4() {
+		ImageUInt8 input = new ImageUInt8(7,8);
+		input.data = TEST4;
+
+		ImageSInt32 labeled = new ImageSInt32(input.width,input.height);
+		LinearContourLabelChang2004 alg = new LinearContourLabelChang2004(4);
+		alg.process(input,labeled);
+
+		assertEquals(1, alg.getContours().size);
+		checkContour(alg, labeled,4);
+	}
+
+	@Test
+	public void test3_8() {
+		ImageUInt8 input = new ImageUInt8(7,8);
+		input.data = TEST4;
+
+		ImageSInt32 labeled = new ImageSInt32(input.width,input.height);
+		LinearContourLabelChang2004 alg = new LinearContourLabelChang2004(8);
+		alg.process(input, labeled);
+
+		assertEquals(1,alg.getContours().size);
+		checkContour(alg, labeled,8);
 	}
 
 	/**
@@ -118,11 +179,11 @@ public class TestLinearContourLabelChang2004 {
 		input.data = TEST3;
 
 		ImageSInt32 labeled = new ImageSInt32(input.width,input.height);
-		LinearContourLabelChang2004 alg = new LinearContourLabelChang2004();
+		LinearContourLabelChang2004 alg = new LinearContourLabelChang2004(8);
 		alg.process(input,labeled);
 
 		assertEquals(1,alg.getContours().size);
-		checkContour(alg,labeled);
+		checkContour(alg, labeled,8);
 
 		Contour c = alg.getContours().get(0);
 		assertEquals(10,c.external.size());
@@ -133,8 +194,10 @@ public class TestLinearContourLabelChang2004 {
 	/**
 	 * Creates a list of every pixel with the specified label that is on the contour.  Removes duplicate points
 	 * in the found contour.  Sees if the two lists are equivalent.
+	 *
+	 * @param rule Which connectivity rule is being tested
 	 */
-	private void checkContour( LinearContourLabelChang2004 alg , ImageSInt32 labeled ) {
+	private void checkContour(LinearContourLabelChang2004 alg, ImageSInt32 labeled , int rule ) {
 
 		FastQueue<Contour> contours = alg.getContours();
 
@@ -153,7 +216,7 @@ public class TestLinearContourLabelChang2004 {
 			found = removeDuplicates(found);
 
 			// see if the two lists are equivalent
-			List<Point2D_I32> expected = findContour(labeled,c.id);
+			List<Point2D_I32> expected = rule == 8 ? findContour8(labeled, c.id) : findContour4(labeled, c.id);
 
 //			labeled.print();
 //			System.out.println("------------------");
@@ -178,7 +241,7 @@ public class TestLinearContourLabelChang2004 {
 	/**
 	 * Create an unordered list of all points in the internal and external contour
 	 */
-	private List<Point2D_I32> findContour( ImageSInt32 labeled , int target ) {
+	private List<Point2D_I32> findContour8(ImageSInt32 labeled, int target) {
 		List<Point2D_I32> list = new ArrayList<Point2D_I32>();
 
 		ImageBorder<ImageSInt32> border = FactoryImageBorder.value(labeled, 0);
@@ -206,6 +269,34 @@ public class TestLinearContourLabelChang2004 {
 						isContour = true;
 					if( !isContour && border.getGeneral(x,y-1) != target)
 						isContour = true;
+
+					if( isContour )
+						list.add( new Point2D_I32(x,y));
+				}
+			}
+		}
+		return list;
+	}
+
+	/**
+	 * Create an unordered list of all points in the internal and external contour
+	 */
+	private List<Point2D_I32> findContour4(ImageSInt32 labeled, int target) {
+		List<Point2D_I32> list = new ArrayList<Point2D_I32>();
+
+		ImageBorder<ImageSInt32> border = FactoryImageBorder.value(labeled, 0);
+
+		for( int y = 0; y < labeled.height; y++ ) {
+			for( int x = 0; x < labeled.width; x++ ) {
+				if( target == labeled.get(x,y) ) {
+
+					boolean isContour = false;
+					for( int i = 0; i < local.size(); i++ ) {
+						Point2D_I32 a = local.get(i);
+						if( border.getGeneral(x+a.x,y+a.y) != target ) {
+							isContour = true;
+						}
+					}
 
 					if( isContour )
 						list.add( new Point2D_I32(x,y));

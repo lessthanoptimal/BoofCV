@@ -33,7 +33,7 @@ import java.util.List;
 public class LinearContourLabelChang2004 {
 
 	// traces edge pixels
-	ContourTracer tracer = new ContourTracer();
+	ContourTracer tracer;
 
 	// binary image with a border of zero.
 	ImageUInt8 border = new ImageUInt8(1,1);
@@ -45,6 +45,15 @@ public class LinearContourLabelChang2004 {
 
 	// internal book keeping variables
 	int x,y,indexIn,indexOut;
+
+	/**
+	 * Configures the algorithm.
+	 *
+	 * @param rule Connectivity rule.  4 or 8
+	 */
+	public LinearContourLabelChang2004( int rule ) {
+		tracer = new ContourTracer(rule);
+	}
 
 	public void process( ImageUInt8 binary , ImageSInt32 labeled ) {
 		// initialize data structures
@@ -83,17 +92,21 @@ public class LinearContourLabelChang2004 {
 				int label = labeled.data[indexOut];
 
 //				long startTraceTime = System.currentTimeMillis();
+				boolean handled = false;
 				if( label == 0 && binary.data[indexIn - binary.stride ] != 1 ) {
 //					System.out.println("--------- Step 1 at "+x+" "+y);
-
-					handleStep1();
-				} else if( binary.data[indexIn + binary.stride ] == 0 ) {
+					handleStep1(labeled);
+					handled = true;
+					label = contours.size;
+				}
+				// could be an external and internal contour
+				if( binary.data[indexIn + binary.stride ] == 0 ) {
 //					System.out.println("--------- Step 2 at "+x+" "+y);
-
 					handleStep2(labeled, label);
-				} else {
+					handled = true;
+				}
+				if( !handled ) {
 //					System.out.println("--------- Step 3 at "+x+" "+y);
-
 					handleStep3(labeled);
 				}
 //				totalTrace += System.currentTimeMillis()-startTraceTime;
@@ -119,10 +132,11 @@ public class LinearContourLabelChang2004 {
 	 *  Step 1: If the pixel is unlabeled and the pixel above is white, then it
 	 *          must be an external contour of a newly encountered blob.
 	 */
-	private void handleStep1() {
+	private void handleStep1(ImageSInt32 labeled) {
 		Contour c = contours.grow();
+		c.reset();
 		c.id = contours.size();
-		tracer.trace(contours.size(),x,y,7,c.external);
+		tracer.trace(contours.size(),x,y,true,c.external);
 	}
 
 	/**
@@ -138,7 +152,7 @@ public class LinearContourLabelChang2004 {
 		List<Point2D_I32> inner = storageLists.grow();
 		inner.clear();
 		c.internal.add(inner);
-		tracer.trace(label,x,y,3,inner);
+		tracer.trace(label,x,y,false,inner);
 	}
 
 	/**

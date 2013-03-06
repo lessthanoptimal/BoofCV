@@ -19,8 +19,8 @@
 package boofcv.alg.binary;
 
 import boofcv.abst.filter.FilterImageInterface;
-import boofcv.abst.filter.binary.FilterLabelBlobs;
 import boofcv.alg.filter.binary.BinaryImageOps;
+import boofcv.alg.filter.binary.Contour;
 import boofcv.alg.filter.binary.GThresholdImageOps;
 import boofcv.alg.misc.GImageStatistics;
 import boofcv.core.image.ConvertBufferedImage;
@@ -62,7 +62,7 @@ public class DemoBinaryImageLabelOpsApp<T extends ImageSingleBand> extends Selec
 
 	FilterImageInterface<ImageUInt8, ImageUInt8> filter1;
 	FilterImageInterface<ImageUInt8, ImageUInt8> filter2;
-	FilterLabelBlobs filterLabel;
+	int connectRule;
 	BufferedImage work;
 	int colors[];
 
@@ -89,8 +89,8 @@ public class DemoBinaryImageLabelOpsApp<T extends ImageSingleBand> extends Selec
 		addAlgorithm(1,"Dilate-8", FactoryBinaryImageOps.dilate8());
 		addAlgorithm(1,"Remove Noise", FactoryBinaryImageOps.removePointNoise());
 
-		addAlgorithm(2, "Label-4", FactoryBinaryImageOps.labelBlobs4());
-		addAlgorithm(2, "Label-8", FactoryBinaryImageOps.labelBlobs8());
+		addAlgorithm(2, "Label-4", 4);
+		addAlgorithm(2, "Label-8", 8);
 
 		JPanel body = new JPanel();
 		body.setLayout(new BorderLayout());
@@ -165,7 +165,7 @@ public class DemoBinaryImageLabelOpsApp<T extends ImageSingleBand> extends Selec
 	public void refreshAll(Object[] cookies) {
 		filter1 = (FilterImageInterface<ImageUInt8, ImageUInt8>)cookies[0];
 		filter2 = (FilterImageInterface<ImageUInt8, ImageUInt8>)cookies[1];
-		filterLabel = (FilterLabelBlobs)cookies[2];
+		connectRule = (Integer)cookies[2];
 		performWork();
 	}
 
@@ -179,7 +179,7 @@ public class DemoBinaryImageLabelOpsApp<T extends ImageSingleBand> extends Selec
 				filter2 = (FilterImageInterface<ImageUInt8, ImageUInt8>)cookie;
 				break;
 			case 2:
-				filterLabel = (FilterLabelBlobs)cookie;
+				connectRule = (Integer)cookie;
 				break;
 		}
 
@@ -187,14 +187,14 @@ public class DemoBinaryImageLabelOpsApp<T extends ImageSingleBand> extends Selec
 	}
 
 	private synchronized void performWork() {
-		if( filter1 == null || filter2 == null || filterLabel == null )
+		if( filter1 == null || filter2 == null )
 			return;
 		GThresholdImageOps.threshold(imageInput, imageBinary, selectThresh.getThreshold(), selectThresh.isDown());
 		filter1.process(imageBinary,imageOutput1);
 		filter2.process(imageOutput1,imageOutput2);
-		filterLabel.process(imageOutput2,imageLabeled);
-		if( colors == null || colors.length <= filterLabel.getNumBlobs() )
-			colors = BinaryImageOps.selectRandomColors(filterLabel.getNumBlobs(),rand);
+		List<Contour> found = BinaryImageOps.labelContour(imageOutput2,connectRule,imageLabeled);
+		if( colors == null || colors.length <= found.size() )
+			colors = BinaryImageOps.selectRandomColors(found.size(),rand);
 
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {

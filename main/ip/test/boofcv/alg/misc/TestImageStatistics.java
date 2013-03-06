@@ -171,14 +171,15 @@ public class TestImageStatistics {
 
 		GImageSingleBand a = FactoryGImageSingleBand.wrap(inputA);
 
-		double total = 0;
+		double expected = 0;
 		for( int i = 0; i < height; i++ ) {
 			for( int j = 0; j < width; j++ ) {
-				total += a.get(j,i).doubleValue();
+				expected += a.get(j,i).doubleValue();
 			}
 		}
 
-		assertEquals(total,((Number)result).doubleValue(),1e-4);
+		double found = ((Number)result).doubleValue();
+		assertEquals(expected,found,1e-4);
 	}
 
 	private void testMean( Method m ) throws InvocationTargetException, IllegalAccessException {

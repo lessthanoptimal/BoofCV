@@ -24,6 +24,7 @@ import boofcv.alg.feature.detect.grid.HistogramTwoPeaks;
 import boofcv.alg.feature.detect.grid.IntensityHistogram;
 import boofcv.alg.feature.detect.grid.UtilCalibrationGrid;
 import boofcv.alg.filter.binary.BinaryImageOps;
+import boofcv.alg.filter.binary.Contour;
 import boofcv.alg.filter.binary.GThresholdImageOps;
 import boofcv.struct.FastQueue;
 import boofcv.struct.image.ImageFloat32;
@@ -292,27 +293,24 @@ public class RefineCornerSegmentFit {
 	 */
 	private void removeBinaryNoise(ImageUInt8 binary) {
 		// remove potential noise by only saving the largest cluster
-		int numBlobs = BinaryImageOps.labelBlobs4(binary, blobs);
+		List<Contour> contours = BinaryImageOps.labelContour(binary,4,blobs);
 
 		// find the largest blob
-		numBlobs++;
-		int count[] = new int[numBlobs];
-		for( int i = 0; i < width*height; i++ ) {
-			count[blobs.data[i]]++;
-		}
-		int largest = -1;
-		int largestIndex = -1;
-		for( int i = 1; i < numBlobs; i++ ) {
-			if( count[i] > largest ) {
-				largestIndex = i;
-				largest = count[i];
+		Contour largest = null;
+		for( Contour c : contours ) {
+			if( largest == null || largest.external.size() < c.external.size() ) {
+				largest = c;
 			}
 		}
 
-		for( int i = 0; i < numBlobs; i++ ) {
-			count[i] = i != largestIndex ? 0 : i;
-		}
-		BinaryImageOps.relabel(blobs,count);
+		if( largest == null )
+			return;
+
+		// recreate the binary image using only the largest blob
+		int labels[] = new int[ contours.size() + 1 ];
+		labels[ largest.id ] = 1;
+
+		BinaryImageOps.relabel(blobs,labels);
 		BinaryImageOps.labelToBinary(blobs,binary);
 	}
 

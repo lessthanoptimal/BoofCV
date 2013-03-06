@@ -30,6 +30,9 @@ import java.util.List;
  */
 public class ContourTracer {
 
+	// which connectivity rule is being used. 4 and 8 supported
+	int rule;
+
 	// storage for contour points.
 	FastQueue<Point2D_I32> storagePoints;
 
@@ -41,8 +44,43 @@ public class ContourTracer {
 	// storage for contour
 	List<Point2D_I32> contour;
 
-	int x,y,label,dir;
-	int indexPixel,s;
+	// coordinate of pixel being examined (x,y)
+	int x,y;
+	// label of the object being traced
+	int label;
+	// direction it moved in
+	int dir;
+	// index of the pixel in the image's internal array
+	int indexBinary;
+	int indexLabel;
+
+	// the pixel index offset to each neighbor
+	int offsetsBinary[];
+	int offsetsLabeled[];
+	// lookup table for which direction it should search next given the direction it traveled into the current pixel
+	int nextDirection[];
+
+
+	public ContourTracer( int rule ) {
+		if( rule != 4 && rule != 8 )
+			throw new IllegalArgumentException("Connectivity rule must be 4 or 8 not "+rule);
+		this.rule = rule;
+
+		offsetsBinary = new int[rule];
+		offsetsLabeled = new int[rule];
+
+		if( rule == 8 ) {
+			// start the next search +2 away from the square it came from
+			// the square it came from is the opposite from the previous 'dir'
+			nextDirection = new int[8];
+			for( int i = 0; i < 8; i++ )
+				nextDirection[i] = ((i+4)%8 + 2)%8;
+		} else {
+			nextDirection = new int[4];
+			for( int i = 0; i < 4; i++ )
+				nextDirection[i] = ((i+2)%4 + 1)%4;
+		}
+	}
 
 	/**
 	 *
@@ -55,19 +93,61 @@ public class ContourTracer {
 		this.labeled = labeled;
 		this.storagePoints = storagePoints;
 
-		s = binary.stride;
+		if( rule == 8 ) {
+			setOffsets8(offsetsBinary,binary.stride);
+			setOffsets8(offsetsLabeled,labeled.stride);
+		} else {
+			setOffsets4(offsetsBinary,binary.stride);
+			setOffsets4(offsetsLabeled,labeled.stride);
+		}
 	}
 
+	private void setOffsets8( int offsets[] , int stride ) {
+		int s = stride;
+		offsets[0] =  1;   // x =  1 y =  0
+		offsets[1] =  1+s; // x =  1 y =  1
+		offsets[2] =    s; // x =  0 y =  1
+		offsets[3] = -1+s; // x = -1 y =  1
+		offsets[4] = -1  ; // x = -1 y =  0
+		offsets[5] = -1-s; // x = -1 y = -1
+		offsets[6] =   -s; // x =  0 y = -1
+		offsets[7] =  1-s; // x =  1 y = -1
+	}
 
-	public void trace( int label , int initialX , int initialY , int initialDir , List<Point2D_I32> contour )
+	private void setOffsets4( int offsets[] , int stride ) {
+		int s = stride;
+		offsets[0] =  1;   // x =  1 y =  0
+		offsets[1] =    s; // x =  0 y =  1
+		offsets[2] = -1;   // x = -1 y =  0
+		offsets[3] =   -s; // x =  0 y = -1
+	}
+
+	/**
+	 *
+	 * @param label
+	 * @param initialX
+	 * @param initialY
+	 * @param external True for tracing an external contour or false for internal..
+	 * @param contour
+	 */
+	public void trace( int label , int initialX , int initialY , boolean external , List<Point2D_I32> contour )
 	{
+		int initialDir;
+		if( rule == 8 )
+			initialDir = external ? 7 : 3;
+		else
+			initialDir = external ? 0 : 2;
+
 		this.label = label;
 		this.contour = contour;
 		this.dir = initialDir;
-		this.x = initialX;
-		this.y = initialY;
+		x = initialX;
+		y = initialY;
 
-		indexPixel = binary.getIndex(x,y);
+		// index of pixels in the image array
+		// binary has a 1 pixel border which labeled lacks, hence the -1,-1 for labeled
+		indexBinary = binary.getIndex(x,y);
+		indexLabel = labeled.getIndex(x-1,y-1);
 		add(x,y);
 
 		// find the next black pixel.  handle case where its an isolated point
@@ -76,8 +156,7 @@ public class ContourTracer {
 		} else {
 			initialDir = dir;
 			moveToNext();
-			flipDirection();
-			dir = (dir + 2)%8;
+			dir = nextDirection[dir];
 		}
 
 		while( true ) {
@@ -90,10 +169,9 @@ public class ContourTracer {
 //				System.out.println("------------------ Done");
 				return;
 			}else {
-				add(x,y);
+				add(x, y);
 				moveToNext();
-				flipDirection();
-				dir = (dir + 2)%8;
+				dir = nextDirection[dir];
 			}
 		}
 	}
@@ -101,109 +179,19 @@ public class ContourTracer {
 	/**
 	 * Searches in a circle around the current point in a clock-wise direction for the first black pixel.
 	 */
-	// TODO faster if offsets are stored in an array?
-	// TODO split into two functions.  one which considers the possibility that its an issolated point and the other
-	//      where it does not
 	private boolean searchBlack() {
-		for( int i = 0; i < 8; i++ ) {
-			switch( dir ) {
-				case 0:
-					if( checkBlack(indexPixel+1) ) // x+1,y
-						return true;
-					break;
-
-				case 1:
-					if( checkBlack(indexPixel+1+s) ) // x+1,y+1
-						return true;
-					break;
-
-				case 2:
-					if( checkBlack(indexPixel+s) ) // x,y+1
-						return true;
-					break;
-
-				case 3:
-					if( checkBlack(indexPixel-1+s) )  // x-1,y+1
-						return true;
-					break;
-
-				case 4:
-					if( checkBlack(indexPixel-1) )  // x-1,y
-						return true;
-					break;
-
-				case 5:
-					if( checkBlack(indexPixel-1-s) ) // x-1,y-1
-						return true;
-					break;
-
-				case 6:
-					if( checkBlack(indexPixel-s ) ) // x,y-1
-						return true;
-					break;
-
-				case 7:
-					if( checkBlack(indexPixel+1-s) )  //x+1,y-1
-						return true;
-					break;
-			}
-			dir = (dir+1)%8;
+		for( int i = 0; i < offsetsBinary.length; i++ ) {
+			if( checkBlack(indexBinary + offsetsBinary[dir]))
+				return true;
+			dir = (dir+1)%rule;
 		}
 		return false;
 	}
 
-	private void flipDirection() {
-		switch( dir ) {
-			case 0:
-				dir = 4;
-				break;
-
-			case 1:
-				dir = 5;
-				break;
-
-			case 2:
-				dir = 6;
-				break;
-
-			case 3:
-				dir = 7;
-				break;
-
-			case 4:
-				dir = 0;
-				break;
-
-			case 5:
-				dir = 1;
-				break;
-
-			case 6:
-				dir = 2;
-				break;
-
-			case 7:
-				dir = 3;
-				break;
-		}
-	}
-
-//	private boolean checkBlack( int x , int y ) {
-//		// treat pixels outside the image as white
-//		if( x < 0 || x >= binary.width || y < 0 || y >= binary.height )
-//			return false;
-//
-//		int index = binary.getIndex(x,y);
-//
-//		if( binary.data[index] == 1 ) {
-//			return true;
-//		} else {
-//			// mark white pixels as negative numbers to avoid retracing this contour in the future
-//			binary.data[index] = -1;
-//			return false;
-//		}
-//	}
-
+	/**
+	 * Checks to see if the specified pixel is black (1).  If not the pixel is marked so that it
+	 * won't be searched again
+	 */
 	private boolean checkBlack( int index ) {
 		if( binary.data[index] == 1 ) {
 			return true;
@@ -215,17 +203,13 @@ public class ContourTracer {
 	}
 
 	private void moveToNext() {
-		switch( dir ) {
-			case 0: x++;     break;
-			case 1: x++;y++; break;
-			case 2:     y++; break;
-			case 3: x--;y++; break;
-			case 4: x--;     break;
-			case 5: x--;y--; break;
-			case 6:     y--; break;
-			case 7: x++;y--; break;
-		}
-		indexPixel = binary.startIndex + y*binary.stride + x;
+		// move to the next pixel using the precomputed pixel index offsets
+		indexBinary += offsetsBinary[dir];
+		indexLabel += offsetsLabeled[dir];
+		// compute the new pixel coordinate from the binary pixel index
+		int a = indexBinary - binary.startIndex;
+		x = a%binary.stride;
+		y = a/binary.stride;
 	}
 
 	/**
@@ -236,6 +220,6 @@ public class ContourTracer {
 		// compensate for the border added to binary image
 		p.set(x-1, y-1);
 		contour.add(p);
-		labeled.unsafe_set(p.x,p.y,label);
+		labeled.data[indexLabel] = label;
 	}
 }

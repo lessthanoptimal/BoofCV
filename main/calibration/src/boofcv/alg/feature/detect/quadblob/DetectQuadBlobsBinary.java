@@ -18,7 +18,8 @@
 
 package boofcv.alg.feature.detect.quadblob;
 
-import boofcv.alg.filter.binary.BinaryImageOps;
+import boofcv.alg.filter.binary.Contour;
+import boofcv.alg.filter.binary.LinearContourLabelChang2004;
 import boofcv.struct.image.ImageSInt32;
 import boofcv.struct.image.ImageUInt8;
 import georegression.struct.point.Point2D_I32;
@@ -56,9 +57,13 @@ public class DetectQuadBlobsBinary {
 	// minimum number of expected blobs
 	private int minimumBlobCount;
 
+	// computes the contour around binary images
+	LinearContourLabelChang2004 contourAlg = new LinearContourLabelChang2004(8);
+
 	// labeled blobs blobs found in the binary image
 	ImageSInt32 labeledBlobs = new ImageSInt32(1,1);
 	int numLabels;
+	List<Contour> contours = new ArrayList<Contour>();
 
 	// list of blobs where are declared to be valid quadrilaterals
 	List<QuadBlob> squares;
@@ -107,31 +112,27 @@ public class DetectQuadBlobsBinary {
 		labeledBlobs.reshape(binary.width, binary.height);
 		
 		// find blobs
-		numLabels = BinaryImageOps.labelBlobs8(binary, labeledBlobs);
+		contourAlg.process(binary,labeledBlobs);
+		contours.clear();
+		contours.addAll(contourAlg.getContours().toList());
+		numLabels = contours.size();
 
 		// See if there are enough blobs to continue processing
-		if( numLabels < minimumBlobCount)
+		if( contours.size() < minimumBlobCount)
 			return fail("Not enough blobs detected");
 
 		//remove blobs with holes
-		numLabels = removeBlobsHoles(binary, labeledBlobs,numLabels);
+		removeBlobsHolesAndTooSmall();
 
 		// remove blobs that touch the image border
-		numLabels = filterTouchEdge(labeledBlobs,numLabels);
-
-		// find their contours
-		List<List<Point2D_I32>> contours = BinaryImageOps.labelEdgeCluster4(labeledBlobs,numLabels,null);
+		filterTouchEdge();
 
 		// create  list of squares and find an initial estimate of their corners
 		squares = new ArrayList<QuadBlob>();
-		for( List<Point2D_I32> l : contours ) {
-			if( l.size() < minContourSize ) {
-				// this might be a bug or maybe an artifact of detecting with 8 versus 4-connect
-				continue;
-			}
-			List<Point2D_I32> corners = cornerFinder.process(l);
+		for( Contour c : contours ) {
+			List<Point2D_I32> corners = cornerFinder.process(c.external);
 			if( corners.size() == 4 )
-				squares.add(new QuadBlob(l, corners));
+				squares.add(new QuadBlob(c.external, corners));
 		}
 
 		// remove blobs which are not like a polygon at all
@@ -143,89 +144,47 @@ public class DetectQuadBlobsBinary {
 	}
 
 	/**
-	 * Remove blobs with holes and blobs with a contour that is too small.  Holes are detected by
-	 * finding contour pixels in each blob.  If more than one set of contours exist then there
-	 * must be a hole inside
+	 * Remove blobs with internal contours and whose external contour is too small
 	 */
-	private int removeBlobsHoles( ImageUInt8 binary , ImageSInt32 labeled , int numLabels )
+	private void removeBlobsHolesAndTooSmall()
 	{
-		ImageUInt8 contourImg = new ImageUInt8(labeled.width,labeled.height);
-		ImageSInt32 contourBlobs = new ImageSInt32(labeled.width,labeled.height);
-
-		BinaryImageOps.edge8(binary,contourImg);
-		int numContours = BinaryImageOps.labelBlobs8(contourImg,contourBlobs);
-		List<List<Point2D_I32>> contours = BinaryImageOps.labelToClusters(contourBlobs, numContours, null);
-
-		// see how many complete contours each blob has
-		int counter[] = new int[ numLabels + 1 ];
-		for( int i = 0; i < numContours; i++ ) {
-			List<Point2D_I32> l = contours.get(i);
-			Point2D_I32 p = l.get(0);
-			int which = labeled.get(p.x,p.y);
-			if( l.size() < minContourSize ) {
-				// set it to a size larger than one so that it will be zeroed
-				counter[which] = 20;
+		for( int i = 0; i < contours.size(); ) {
+			Contour c = contours.get(i);
+			if( c.internal.size() > 0 ) {
+				contours.remove(i);
+			} else if( c.external.size() < minContourSize ) {
+				contours.remove(i);
 			} else {
-				counter[which]++;
+				i++;
 			}
 		}
-
-		// find the blobs with holes
-		counter[0] = 0;
-		int counts = 1;
-		for( int i = 1; i < counter.length; i++ ) {
-
-			if( counter[i] > 1 )
-				counter[i] = 0;
-			else if( counter[i] != 0 )
-				counter[i] = counts++;
-			else
-				throw new RuntimeException("BUG!");
-		}
-
-		// relabel the image to remove blobs with holes inside
-		BinaryImageOps.relabel(labeled,counter);
-
-		return counts-1;
 	}
 
 	/**
 	 * Set the value of any blob which touches the image border to zero.  Then
 	 * relabel the binary image.
 	 */
-	private int filterTouchEdge(ImageSInt32 labeled , int numLabels ) {
-		int value[] = new int[ numLabels + 1 ];
-		for( int i = 0; i < value.length; i++ ) {
-			value[i] = i;
-		}
+	private void filterTouchEdge() {
 
-		for( int y = 0; y < labeled.height; y++ ) {
-			int row = labeled.startIndex + labeled.stride*y;
-			int rowEnd = row+labeled.width-1;
+		int w = labeledBlobs.width-1;
+		int h = labeledBlobs.height-1;
 
-			value[labeled.data[row]] = 0;
-			value[labeled.data[rowEnd]] = 0;
-		}
+		for( int i = 0; i < contours.size();  ) {
+			Contour c = contours.get(i);
 
-		for( int x = 0; x < labeled.width; x++ ) {
-			int top = labeled.startIndex + x;
-			int bottom = labeled.startIndex + labeled.stride*(labeled.height-1) + x;
-
-			value[labeled.data[top]] = 0;
-			value[labeled.data[bottom]] = 0;
-		}
-
-		int count = 1;
-		for( int i = 0; i < value.length; i++ ) {
-			if( value[i] != 0 ) {
-				value[i] = count++;
+			boolean touching = false;
+			for( Point2D_I32 p : c.external ) {
+				if( p.x == 0 || p.y == 0 || p.x == w || p.y == h ) {
+					touching = true;
+					break;
+				}
+			}
+			if( touching ) {
+				contours.remove(i);
+			} else {
+				i++;
 			}
 		}
-
-		// relabel the image to remove blobs with holes inside
-		BinaryImageOps.relabel(labeled,value);
-
-		return count-1;
 	}
 
 	/**

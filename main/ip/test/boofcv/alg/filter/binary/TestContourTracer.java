@@ -51,7 +51,8 @@ public class TestContourTracer {
 		ImageUInt8 pattern = new ImageUInt8(1,1);
 		ImageMiscOps.fill(pattern,1);
 
-		shiftContourCheck(pattern,1);
+		shiftContourCheck(pattern,1,4);
+		shiftContourCheck(pattern,1,8);
 	}
 
 	@Test
@@ -59,7 +60,8 @@ public class TestContourTracer {
 		ImageUInt8 pattern = new ImageUInt8(2,1);
 		ImageMiscOps.fill(pattern,1);
 
-		shiftContourCheck(pattern,2);
+		shiftContourCheck(pattern,2,4);
+		shiftContourCheck(pattern,2,8);
 	}
 
 	@Test
@@ -67,7 +69,8 @@ public class TestContourTracer {
 		ImageUInt8 pattern = new ImageUInt8(1,2);
 		ImageMiscOps.fill(pattern,1);
 
-		shiftContourCheck(pattern,2);
+		shiftContourCheck(pattern,2,4);
+		shiftContourCheck(pattern,2,8);
 	}
 
 	@Test
@@ -75,7 +78,8 @@ public class TestContourTracer {
 		ImageUInt8 pattern = new ImageUInt8(2,2);
 		ImageMiscOps.fill(pattern,1);
 
-		shiftContourCheck(pattern,4);
+		shiftContourCheck(pattern,4,4);
+		shiftContourCheck(pattern,4,8);
 	}
 
 	@Test
@@ -87,7 +91,7 @@ public class TestContourTracer {
 
 		ImageUInt8 pattern = stringToImage(s);
 
-		shiftContourCheck(pattern,4);
+		shiftContourCheck(pattern,4,8);
 	}
 
 	@Test
@@ -99,7 +103,7 @@ public class TestContourTracer {
 
 		ImageUInt8 pattern = stringToImage(s);
 
-		shiftContourCheck(pattern,8);
+		shiftContourCheck(pattern,8,8);
 	}
 
 	@Test
@@ -112,14 +116,26 @@ public class TestContourTracer {
 		ImageUInt8 input = stringToImage(s);
 		ImageSInt32 label = new ImageSInt32(input.width,input.height);
 
-		ContourTracer alg = new ContourTracer();
+		ContourTracer alg = new ContourTracer(8);
 
 		// process the image
 		alg.setInputs(addBorder(input),label,queue);
-		alg.trace(2,1+1,0+1,7,found);
+		alg.trace(2,1+1,0+1,true,found);
 
 		assertEquals(7,queue.size);
 		assertEquals(7, found.size());
+	}
+
+	@Test
+	public void funk4() {
+		String s =
+				"101\n"+
+				"111\n"+
+				"101\n";
+
+		ImageUInt8 pattern = stringToImage(s);
+
+		shiftContourCheck(pattern,12,4);
 	}
 
 	@Test
@@ -132,14 +148,34 @@ public class TestContourTracer {
 		ImageUInt8 input = stringToImage(s);
 		ImageSInt32 label = new ImageSInt32(input.width,input.height);
 
-		ContourTracer alg = new ContourTracer();
+		ContourTracer alg = new ContourTracer(8);
 
 		// process the image
 		alg.setInputs(addBorder(input),label,queue);
-		alg.trace(2,3+1,0+1,3,found);
+		alg.trace(2,3+1,0+1,false,found);
 
 		assertEquals(4, queue.size);
 		assertEquals(4,found.size());
+	}
+
+	@Test
+	public void interior2() {
+		String s =
+				"01111\n"+
+				"01101\n"+
+				"11111\n";
+
+		ImageUInt8 input = stringToImage(s);
+		ImageSInt32 label = new ImageSInt32(input.width,input.height);
+
+		ContourTracer alg = new ContourTracer(4);
+
+		// process the image
+		alg.setInputs(addBorder(input),label,queue);
+		alg.trace(2,3+1,0+1,false,found);
+
+		assertEquals(8, queue.size);
+		assertEquals(8,found.size());
 	}
 
 	/**
@@ -162,11 +198,11 @@ public class TestContourTracer {
 		ImageUInt8 after = stringToImage(a);
 		ImageSInt32 label = new ImageSInt32(before.width,before.height);
 
-		ContourTracer alg = new ContourTracer();
+		ContourTracer alg = new ContourTracer(8);
 
 		// process the image
 		alg.setInputs(before,label,queue);
-		alg.trace(2,2,1,7,found);
+		alg.trace(2,2,1,true,found);
 
 		for( int i = 0; i < before.height; i++ ) {
 			for( int j = 0; j < before.width; j++ ) {
@@ -182,8 +218,8 @@ public class TestContourTracer {
 	 * Given a pattern that is only a contour, it sees if it has the expected results when the pattern
 	 * is shifted to every possible location in the image
 	 */
-	public void shiftContourCheck( ImageUInt8 pattern , int expectedSize ) {
-		ContourTracer alg = new ContourTracer();
+	public void shiftContourCheck( ImageUInt8 pattern , int expectedSize , int rule ) {
+		ContourTracer alg = new ContourTracer(rule);
 		ImageUInt8 input = new ImageUInt8(4,5);
 		ImageSInt32 label = new ImageSInt32(input.width,input.height);
 
@@ -202,7 +238,7 @@ public class TestContourTracer {
 
 				// process the image
 				alg.setInputs(addBorder(input),label,queue);
-				alg.trace(2,x+1,y+1,7,found);
+				alg.trace(2,x+1,y+1,true,found);
 
 				// forward then back
 				assertEquals(expectedSize,queue.size);

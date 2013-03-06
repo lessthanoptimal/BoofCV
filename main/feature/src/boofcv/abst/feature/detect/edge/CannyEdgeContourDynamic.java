@@ -67,6 +67,6 @@ public class CannyEdgeContourDynamic<T extends ImageSingleBand, D extends ImageS
 
 		// set the threshold using that
 		threshLow = max*fractionLow;
-		threshLow = max*fractionHigh;
+		threshHigh = max*fractionHigh;
 	}
 }

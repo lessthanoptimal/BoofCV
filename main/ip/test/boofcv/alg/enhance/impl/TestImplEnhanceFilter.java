@@ -75,7 +75,7 @@ public class TestImplEnhanceFilter {
 
 	public void sharpenInner4( ImageSingleBand input , ImageSingleBand output ) {
 
-		ImageSingleBand expected = GeneralizedImageOps.createSingleBand(input.getClass(), input.width, input.height);
+		ImageSingleBand expected;
 		GImageMiscOps.fillUniform(input, rand, 0, 10);
 
 		if( input.getTypeInfo().isInteger()) {
@@ -176,7 +176,7 @@ public class TestImplEnhanceFilter {
 
 	public void sharpenInner8( ImageSingleBand input , ImageSingleBand output ) {
 
-		ImageSingleBand expected = GeneralizedImageOps.createSingleBand(input.getClass(), input.width, input.height);
+		ImageSingleBand expected;
 		GImageMiscOps.fillUniform(input, rand, 0, 10);
 
 		if( input.getTypeInfo().isInteger()) {

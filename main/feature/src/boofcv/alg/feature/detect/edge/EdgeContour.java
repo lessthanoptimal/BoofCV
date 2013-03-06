@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.filter.binary;
+package boofcv.alg.feature.detect.edge;
 
 import georegression.struct.point.Point2D_I32;
 
@@ -24,28 +24,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Internal and externals contours for a binary blob.  The set of points in each contour list are ordered in
- * CW or CCW directions.
- *
  * @author Peter Abeles
  */
-public class Contour {
-	/**
-	 * ID of blob in the image.  Pixels belonging to this blob in the labeled image will have this pixel value.
-	 */
-	public int id;
-	/**
-	 * External contour around the blob.
-	 */
-	public List<Point2D_I32> external = new ArrayList<Point2D_I32>();
-	/**
-	 * Internal contours that are inside the blob.
-	 */
-	public List<List<Point2D_I32>> internal = new ArrayList<List<Point2D_I32>>();
+public class EdgeContour {
+	public List<List<Point2D_I32>> edges = new ArrayList<List<Point2D_I32>>();
 
 	public void reset() {
-		id = -1;
-		external.clear();
-		internal.clear();
+		edges.clear();
 	}
 }

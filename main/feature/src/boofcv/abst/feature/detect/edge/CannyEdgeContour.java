@@ -20,15 +20,16 @@ package boofcv.abst.feature.detect.edge;
 
 import boofcv.abst.filter.blur.BlurFilter;
 import boofcv.abst.filter.derivative.ImageGradient;
+import boofcv.alg.feature.detect.edge.EdgeContour;
 import boofcv.alg.feature.detect.edge.GGradientToEdgeFeatures;
 import boofcv.alg.feature.detect.edge.GradientToEdgeFeatures;
-import boofcv.alg.filter.binary.BinaryImageOps;
-import boofcv.alg.filter.binary.ThresholdImageOps;
+import boofcv.alg.feature.detect.edge.HysteresisEdgeTrace4;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.FastQueue;
 import boofcv.struct.image.*;
 import georegression.struct.point.Point2D_I32;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -68,10 +69,10 @@ public class CannyEdgeContour<T extends ImageSingleBand, D extends ImageSingleBa
 	// work space
 	protected ImageSInt32 label = new ImageSInt32(1,1);
 	protected ImageUInt8 work = new ImageUInt8(1,1);
-	// reuse found points
-	protected FastQueue<Point2D_I32> queuePts = new FastQueue<Point2D_I32>(100,Point2D_I32.class,true);
 
-	List<List<Point2D_I32>> contours;
+	HysteresisEdgeTrace4 hysteresis = new HysteresisEdgeTrace4();
+
+	List<List<Point2D_I32>> contours = new ArrayList<List<Point2D_I32>>();
 
 	public CannyEdgeContour(BlurFilter<T> blur, ImageGradient<T, D> gradient, float threshLow, float threshHigh) {
 		this.blur = blur;
@@ -109,26 +110,18 @@ public class CannyEdgeContour<T extends ImageSingleBand, D extends ImageSingleBa
 		GradientToEdgeFeatures.discretizeDirection4(angle,direction);
 		GradientToEdgeFeatures.nonMaxSuppression4(intensity,direction, suppressed);
 
-//		float v[] = suppressed.data.clone();
-//		Arrays.sort(v);
-//
-//		int indexZero = 0;
-//		for( ; indexZero < v.length; indexZero++ ) {
-//			if( v[indexZero] > 0 )
-//				break;
-//		}
-//
-//		int size = v.length-indexZero;
-//		threshLow = v[indexZero +(int)(size*0.5)];
-//		threshHigh = v[indexZero +(int)(size*0.8)];
-
 		updateThresholds();
 
-		// TODO investigate improving performance by tracking contour
-		int numFound = ThresholdImageOps.hysteresisLabel8(suppressed, label, threshLow, threshHigh, false, work);
+		hysteresis.setImages(suppressed,direction);
+		hysteresis.process(threshLow,threshHigh);
+		FastQueue<EdgeContour> found = hysteresis.getQueueContour();
 
-		contours = BinaryImageOps.labelToClusters(label,numFound,queuePts);
+		contours.clear();
+		for( EdgeContour e : found.toList() ) {
+			contours.addAll( e.edges );
+		}
 	}
+
 
 	/**
 	 * This function exists so that the wrapper can be overridden to add an adaptive threshold

@@ -19,10 +19,6 @@
 package boofcv.alg.filter.binary;
 
 import boofcv.alg.filter.binary.impl.CompareToBinaryNaive;
-import boofcv.alg.filter.binary.impl.ImplBinaryBlobLabeling;
-import boofcv.alg.filter.binary.impl.TestImplBinaryBlobLabeling;
-import boofcv.alg.misc.GImageMiscOps;
-import boofcv.alg.misc.ImageStatistics;
 import boofcv.struct.FastQueue;
 import boofcv.struct.image.ImageSInt32;
 import boofcv.struct.image.ImageUInt8;
@@ -34,7 +30,7 @@ import java.util.List;
 import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
@@ -133,40 +129,8 @@ public class TestBinaryImageOps {
 	}
 
 	@Test
-	public void labelBlobs8() {
-		checkLabelBlobs(TEST,EXPECTED8,2,true);
-		checkLabelBlobs(TestImplBinaryBlobLabeling.TEST1,TestImplBinaryBlobLabeling.BLOBS8,1,true);
-		checkLabelBlobs(TEST2,null,1,true);
-	}
-
-	@Test
-	public void labelBlobs4() {
-
-		int EXPECTED4[] = EXPECTED8.clone();
-		EXPECTED4[4*13+5] = 3;
-		EXPECTED4[5*13+5] = 3;
-
-		checkLabelBlobs(TEST,EXPECTED4,3,false);
-		checkLabelBlobs(TestImplBinaryBlobLabeling.TEST1,TestImplBinaryBlobLabeling.BLOBS4,2,false);
-		checkLabelBlobs(TEST2,null,1,false);
-	}
-
-	private void checkLabelBlobs( byte[] inputData , int[] expectedData, int numExpected ,
-								  boolean rule8) {
-		ImageUInt8 input = new ImageUInt8(13,8);
-		input.data = inputData;
-		ImageSInt32 found = new ImageSInt32(13,8);
-		ImageSInt32 expected = new ImageSInt32(13,8);
-		expected.data = expectedData;
-
-		// randomize output data to simulate using the same output multiple times
-		GImageMiscOps.fillUniform(found, rand, 0, 20);
-
-		int numFount = rule8 ? BinaryImageOps.labelBlobs8(input,found) : BinaryImageOps.labelBlobs4(input,found);
-		assertEquals(numExpected,numFount);
-
-		if( expectedData != null )
-			BoofTesting.assertEquals(expected,found,0);
+	public void labelContour() {
+		fail("Implement");
 	}
 
 	@Test
@@ -179,10 +143,12 @@ public class TestBinaryImageOps {
 
 		int convert[]={0,2,3,4};
 
-		ImplBinaryBlobLabeling.relabelBlobs(input,convert);
 		BinaryImageOps.relabel(found,convert);
 
-		BoofTesting.assertEquals(input,found,0);
+		assertEquals(0,input.get(0,1));
+		assertEquals(2,input.get(0,0));
+		assertEquals(3,input.get(1,1));
+		assertEquals(4,input.get(2,1));
 	}
 
 	@Test
@@ -240,43 +206,5 @@ public class TestBinaryImageOps {
 		assertEquals(2,ret.get(2).size());
 		assertEquals(4,ret.get(3).size());
 		assertEquals(1,ret.get(4).size());
-	}
-
-	@Test
-	public void labelEdgeCluster4() {
-		int w = 30;
-		int w2 = w/2;
-
-		ImageUInt8 binary = new ImageUInt8(w,w);
-		ImageSInt32 labels = new ImageSInt32(w,w);
-		ImageUInt8 expected = new ImageUInt8(w,w);
-		
-		// create a random image and find clusters
-		GImageMiscOps.fillUniform(binary, rand, 0, 2);
-		// make sure there are some islands
-		for( int i = 0; i < w; i++ ) {
-			binary.set(w2,i,0);
-			binary.set(i,w2,0);
-		}
-		int numLabels = BinaryImageOps.labelBlobs4(binary,labels);
-		assertTrue( numLabels > 0 );
-		
-		// extract edges from binary
-		BinaryImageOps.edge4(binary,expected);
-		// find edge using labeled
-		List<List<Point2D_I32>> list = BinaryImageOps.labelEdgeCluster4(labels,numLabels,null);
-		
-		// makes sure its edges only
-		int total = 0;
-		for( List<Point2D_I32> l : list ) {
-			assertTrue(l.size() != 0 );
-			total += l.size();
-			for( Point2D_I32 p : l ) {
-				assertTrue(expected.get(p.x,p.y) == 1);
-			}
-		}
-
-		// should be the same number
-		assertEquals(ImageStatistics.sum(expected),total);
 	}
 }
