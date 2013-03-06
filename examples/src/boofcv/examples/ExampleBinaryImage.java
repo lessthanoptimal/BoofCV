@@ -81,12 +81,13 @@ public class ExampleBinaryImage {
 		binary = BinaryImageOps.erode8(binary,null);
 		binary = BinaryImageOps.dilate8(binary, null);
 
-		// Detect blobs inside the binary image and assign labels to them
-		int numBlobs = BinaryImageOps.labelBlobs4(binary,blobs);
-
-		// Render the binary image for output and display it in a window
-		BufferedImage visualized = VisualizeBinaryData.renderLabeled(blobs, numBlobs, null);
-		ShowImages.showWindow(visualized,"Labeled Image");
+//		// Detect blobs inside the binary image and assign labels to them
+//		int numBlobs = BinaryImageOps.labelBlobs4(binary,blobs);
+//
+//		// Render the binary image for output and display it in a window
+//		BufferedImage visualized = VisualizeBinaryData.renderLabeled(blobs, numBlobs, null);
+//		ShowImages.showWindow(visualized,"Labeled Image");
+		throw new RuntimeException("Redo this example");
 	}
 
 

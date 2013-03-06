@@ -184,7 +184,7 @@ public class TestImageMiscOps {
 		for( int i = 0; i < height; i++ ) {
 			for( int j = 0; j < width; j++ ) {
 				double value = a.get(j,i).doubleValue();
-				assertTrue("value = "+value,value>=-10 && value <= 10);
+				assertTrue("value = "+value,value>=-10 && value < 10);
 				if( value == 0 )
 					numZero++;
 			}

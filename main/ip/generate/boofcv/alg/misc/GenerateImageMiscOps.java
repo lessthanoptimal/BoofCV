@@ -180,7 +180,6 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 
 		String sumType = imageType.getSumType();
 		String typeCast = imageType.getTypeCastFromSum();
-		String addOneForInt = imageType.isInteger() ? "+1" : "";
 
 		out.print("\t/**\n" +
 				"\t * Sets each value in the image to a value drawn from an uniform distribution that has a range of min <= X < max.\n" +
@@ -188,10 +187,10 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 				"\t * @param img Image which is to be filled.  Modified,\n" +
 				"\t * @param rand Random number generator\n" +
 				"\t * @param min Minimum value of the distribution, inclusive\n" +
-				"\t * @param max Maximum value of the distribution, inclusive\n" +
+				"\t * @param max Maximum value of the distribution, exclusive\n" +
 				"\t */\n" +
 				"\tpublic static void fillUniform("+imageName+" img, Random rand , "+sumType+" min , "+sumType+" max) {\n" +
-				"\t\t"+sumType+" range = max-min"+addOneForInt+";\n" +
+				"\t\t"+sumType+" range = max-min;\n" +
 				"\n" +
 				"\t\t"+dataType+"[] data = img.data;\n" +
 				"\n" +

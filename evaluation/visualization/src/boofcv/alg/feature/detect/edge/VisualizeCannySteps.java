@@ -20,7 +20,6 @@ package boofcv.alg.feature.detect.edge;
 
 import boofcv.abst.filter.blur.BlurStorageFilter;
 import boofcv.abst.filter.derivative.ImageGradient;
-import boofcv.alg.filter.binary.ThresholdImageOps;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.factory.filter.blur.FactoryBlurFilter;
 import boofcv.factory.filter.derivative.FactoryDerivative;
@@ -28,13 +27,14 @@ import boofcv.gui.binary.VisualizeBinaryData;
 import boofcv.gui.edge.VisualizeEdgeFeatures;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.image.UtilImageIO;
+import boofcv.struct.FastQueue;
 import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSInt32;
 import boofcv.struct.image.ImageSInt8;
 import boofcv.struct.image.ImageUInt8;
+import georegression.struct.point.Point2D_I32;
 
 import java.awt.image.BufferedImage;
-import java.util.Random;
+import java.util.List;
 
 
 /**
@@ -46,15 +46,14 @@ public class VisualizeCannySteps {
 	//	static String fileName = "data/evaluation/outdoors01.jpg";
 //	static String fileName = "data/evaluation/sunflowers.png";
 //	static String fileName = "data/evaluation/particles01.jpg";
-//	static String fileName = "data/evaluation/scale/beach02.jpg";
+	static String fileName = "../data/evaluation/scale/beach02.jpg";
 //	static String fileName = "data/evaluation/indoors01.jpg";
-	static String fileName = "../data/applet/shapes01.png";
+//	static String fileName = "../data/applet/shapes01.png";
 
 	public static void main( String args[] ){
 
 		BufferedImage input = UtilImageIO.loadImage(fileName);
 		ImageFloat32 inputF32 = ConvertBufferedImage.convertFrom(input,(ImageFloat32)null);
-		ImageSInt32 labeled = new ImageSInt32(inputF32.width,inputF32.height);
 
 		ImageFloat32 blurred = new ImageFloat32(inputF32.width,inputF32.height);
 		ImageFloat32 derivX = new ImageFloat32(inputF32.width,inputF32.height);
@@ -63,7 +62,7 @@ public class VisualizeCannySteps {
 		ImageFloat32 orientation = new ImageFloat32(inputF32.width,inputF32.height);
 		ImageFloat32 suppressed = new ImageFloat32(inputF32.width,inputF32.height);
 		ImageSInt8 direction = new ImageSInt8(inputF32.width,inputF32.height);
-		ImageUInt8 work = new ImageUInt8(inputF32.width,inputF32.height);
+		ImageUInt8 output = new ImageUInt8(inputF32.width,inputF32.height);
 
 		BlurStorageFilter<ImageFloat32> blur = FactoryBlurFilter.gaussian(ImageFloat32.class,-1,2);
 		ImageGradient<ImageFloat32,ImageFloat32> gradient = FactoryDerivative.sobel_F32();
@@ -78,19 +77,26 @@ public class VisualizeCannySteps {
 		GradientToEdgeFeatures.direction(derivX,derivY,orientation);
 		GradientToEdgeFeatures.discretizeDirection4(orientation,direction);
 		GradientToEdgeFeatures.nonMaxSuppression4(intensity,direction,suppressed);
-		int numFound = ThresholdImageOps.hysteresisLabel8(suppressed, labeled, threshLow, threshHigh, false, work);
 
-		Random rand = new Random(234);
-		int colors[] = new int[ numFound+1 ];
-		for( int i = 1; i < colors.length; i++ ) {
-			colors[i] = rand.nextInt(0xFFFFFF);
+		ShowImages.showWindow(suppressed,"Suppressed Intensity",true);
+		BufferedImage renderedOrientation = VisualizeEdgeFeatures.renderOrientation4(direction,suppressed,threshLow,null);
+
+		HysteresisEdgeTrace4 hysteresis = new HysteresisEdgeTrace4();
+		hysteresis.setImages(suppressed,direction);
+		hysteresis.process(threshLow,threshHigh);
+		FastQueue<EdgeContour> contours = hysteresis.getQueueContour();
+
+		for( EdgeContour c : contours.toList() ) {
+			for( List<Point2D_I32> l : c.edges ) {
+				for( Point2D_I32 p : l ) {
+					output.set(p.x,p.y,1);
+				}
+			}
 		}
 
-		BufferedImage renderedOrientation = VisualizeEdgeFeatures.renderOrientation4(direction,suppressed,threshLow,null);
-		BufferedImage renderedLabel = VisualizeBinaryData.renderLabeled(labeled, colors, null);
+		BufferedImage renderedLabel = VisualizeBinaryData.renderBinary(output, null);
 
 		ShowImages.showWindow(intensity,"Raw Intensity",true);
-		ShowImages.showWindow(suppressed,"Suppressed Intensity",true);
 		ShowImages.showWindow(renderedOrientation,"Orientation");
 		ShowImages.showWindow(renderedLabel,"Labeled Contours");
 	}

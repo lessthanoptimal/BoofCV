@@ -20,7 +20,6 @@ package boofcv.factory.filter.binary;
 
 import boofcv.abst.filter.FilterImageInterface;
 import boofcv.abst.filter.FilterImageReflection;
-import boofcv.abst.filter.binary.FilterLabelBlobs;
 import boofcv.alg.filter.binary.BinaryImageOps;
 import boofcv.struct.image.ImageSInt32;
 import boofcv.struct.image.ImageUInt8;
@@ -79,20 +78,6 @@ public class FactoryBinaryImageOps {
 	 */
 	public static FilterImageInterface<ImageUInt8, ImageUInt8> removePointNoise() {
 		return new FilterImageReflection<ImageUInt8, ImageUInt8>(BinaryImageOps.class, "removePointNoise", 0, 0, ImageUInt8.class, ImageUInt8.class);
-	}
-
-	/**
-	 * Filter implementation of {@link BinaryImageOps#labelBlobs4(boofcv.struct.image.ImageUInt8, boofcv.struct.image.ImageSInt32)}
-	 */
-	public static FilterLabelBlobs labelBlobs4() {
-		return new FilterLabelBlobs(true);
-	}
-
-	/**
-	 * Filter implementation of {@link BinaryImageOps#labelBlobs8(boofcv.struct.image.ImageUInt8, boofcv.struct.image.ImageSInt32)}
-	 */
-	public static FilterLabelBlobs labelBlobs8() {
-		return new FilterLabelBlobs(false);
 	}
 
 	/**

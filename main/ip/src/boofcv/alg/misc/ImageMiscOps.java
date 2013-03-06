@@ -111,10 +111,10 @@ public class ImageMiscOps {
 	 * @param img Image which is to be filled.  Modified,
 	 * @param rand Random number generator
 	 * @param min Minimum value of the distribution, inclusive
-	 * @param max Maximum value of the distribution, inclusive
+	 * @param max Maximum value of the distribution, exclusive
 	 */
 	public static void fillUniform(ImageInt8 img, Random rand , int min , int max) {
-		int range = max-min+1;
+		int range = max-min;
 
 		byte[] data = img.data;
 
@@ -251,10 +251,10 @@ public class ImageMiscOps {
 	 * @param img Image which is to be filled.  Modified,
 	 * @param rand Random number generator
 	 * @param min Minimum value of the distribution, inclusive
-	 * @param max Maximum value of the distribution, inclusive
+	 * @param max Maximum value of the distribution, exclusive
 	 */
 	public static void fillUniform(ImageInt16 img, Random rand , int min , int max) {
-		int range = max-min+1;
+		int range = max-min;
 
 		short[] data = img.data;
 
@@ -391,10 +391,10 @@ public class ImageMiscOps {
 	 * @param img Image which is to be filled.  Modified,
 	 * @param rand Random number generator
 	 * @param min Minimum value of the distribution, inclusive
-	 * @param max Maximum value of the distribution, inclusive
+	 * @param max Maximum value of the distribution, exclusive
 	 */
 	public static void fillUniform(ImageSInt32 img, Random rand , int min , int max) {
-		int range = max-min+1;
+		int range = max-min;
 
 		int[] data = img.data;
 
@@ -531,10 +531,10 @@ public class ImageMiscOps {
 	 * @param img Image which is to be filled.  Modified,
 	 * @param rand Random number generator
 	 * @param min Minimum value of the distribution, inclusive
-	 * @param max Maximum value of the distribution, inclusive
+	 * @param max Maximum value of the distribution, exclusive
 	 */
 	public static void fillUniform(ImageSInt64 img, Random rand , long min , long max) {
-		long range = max-min+1;
+		long range = max-min;
 
 		long[] data = img.data;
 
@@ -671,7 +671,7 @@ public class ImageMiscOps {
 	 * @param img Image which is to be filled.  Modified,
 	 * @param rand Random number generator
 	 * @param min Minimum value of the distribution, inclusive
-	 * @param max Maximum value of the distribution, inclusive
+	 * @param max Maximum value of the distribution, exclusive
 	 */
 	public static void fillUniform(ImageFloat32 img, Random rand , float min , float max) {
 		float range = max-min;
@@ -811,7 +811,7 @@ public class ImageMiscOps {
 	 * @param img Image which is to be filled.  Modified,
 	 * @param rand Random number generator
 	 * @param min Minimum value of the distribution, inclusive
-	 * @param max Maximum value of the distribution, inclusive
+	 * @param max Maximum value of the distribution, exclusive
 	 */
 	public static void fillUniform(ImageFloat64 img, Random rand , double min , double max) {
 		double range = max-min;

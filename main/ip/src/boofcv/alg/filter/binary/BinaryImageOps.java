@@ -19,13 +19,9 @@
 package boofcv.alg.filter.binary;
 
 import boofcv.alg.InputSanityCheck;
-import boofcv.alg.filter.binary.impl.ImplBinaryBlobLabeling;
 import boofcv.alg.filter.binary.impl.ImplBinaryBorderOps;
 import boofcv.alg.filter.binary.impl.ImplBinaryInnerOps;
-import boofcv.alg.filter.binary.impl.LabelNode;
 import boofcv.alg.misc.ImageMiscOps;
-import boofcv.core.image.border.ImageBorderValue;
-import boofcv.core.image.border.ImageBorder_I32;
 import boofcv.struct.FastQueue;
 import boofcv.struct.image.ImageSInt32;
 import boofcv.struct.image.ImageUInt8;
@@ -282,75 +278,48 @@ public class BinaryImageOps {
 
 	/**
 	 * <p>
-	 * Connects pixels together using an 8-connect rule.  Each cluster of connected pixels (a blob)
-	 * is given a unique number >= 1.
+	 * Given a binary image, connect blobs/clusters of pixels together using the specified connectivity rule.
+	 * is given a unique number >= 1.  Both inner and outer contours around each blob is returned. Pixels
+	 * in the contours are in clockwise or counter-clockwise order, depending on the implementation.
 	 * </p>
 	 *
 	 * <p>
-	 * The coexist table is used internally to store intermediate results.  It is used supplied because
-	 * pre-allocating the array was shown to improve performance about 5 times.
+	 * The returned contours are traces of the object.  The trace of an object can be found by marking a point
+	 * with a pen and then marking every point on the contour without removing the pen.  It is possible to have
+	 * the same point multiple times in the contour.
 	 * </p>
 	 *
-	 * @param input Binary input image.
-	 * @param output The labeled blob image. Modified.
-	 * @return How many blobs were found.
+	 * @see LinearContourLabelChang2004
+	 *
+	 * @param input Input binary image.  Not modified.
+	 * @oaram rule Connectivity rule.  Can be 4 or 8.  8 is more commonly used.
+	 * @param output Output labeled image. Modified.
+	 * @return List of found contours for each blob.
 	 */
-	public static int labelBlobs8( ImageUInt8 input , ImageSInt32 output )
-	{
+	public static List<Contour> labelContour( ImageUInt8 input , int rule , ImageSInt32 output ) {
 		InputSanityCheck.checkSameShape(input,output);
 
-		List<LabelNode> labels = ImplBinaryBlobLabeling.quickLabelBlobs8(input,output);
-		ImplBinaryBlobLabeling.optimizeMaxConnect(labels);
-		int blobs[] = new int[ labels.size() ]; // todo clean this up
-		for( int i = 0; i < blobs.length; i++ ) {
-			blobs[i] = labels.get(i).maxIndex;
-		}
-		int newNumBlobs = ImplBinaryBlobLabeling.minimizeBlobID(blobs,blobs.length-1);
-		ImplBinaryBlobLabeling.relabelBlobs(output,blobs);
-
-		return newNumBlobs;
-	}
-
-
-	/**
-	 * <p>
-	 * Connects pixels together using an 4-connect rule.  Each cluster of connected pixels (a blob)
-	 * is given a unique number >= 1.
-	 * </p>
-	 *
-	 * <p>
-	 * The coexist table is used internally to store intermediate results.  It is used supplied because
-	 * pre-allocating the array was shown to improve performance about 5 times.
-	 * </p>
-	 *
-	 * @param input Binary input image. Not modified.
-	 * @param output The labeled blob image. Modified.
-	 * @return How many blobs were found.
-	 */
-	public static int labelBlobs4( ImageUInt8 input , ImageSInt32 output )
-	{
-		InputSanityCheck.checkSameShape(input,output);
-
-		List<LabelNode> labels = ImplBinaryBlobLabeling.quickLabelBlobs4(input,output);
-		ImplBinaryBlobLabeling.optimizeMaxConnect(labels);
-		int blobs[] = new int[ labels.size() ]; // todo clean this up
-		for( int i = 0; i < blobs.length; i++ ) {
-			blobs[i] = labels.get(i).maxIndex;
-		}
-		int newNumBlobs = ImplBinaryBlobLabeling.minimizeBlobID(blobs,blobs.length-1);
-		ImplBinaryBlobLabeling.relabelBlobs(output,blobs);
-
-		return newNumBlobs;
+		LinearContourLabelChang2004 alg = new LinearContourLabelChang2004(rule);
+		alg.process(input,output);
+		return alg.getContours().toList();
 	}
 
 	/**
 	 * Used to change the labels in a labeled binary image.
 	 *
-	 * @param image Labeled binary image.
+	 * @param input Labeled binary image.
 	 * @param labels Look up table where the indexes are the current label and the value are its new value.
 	 */
-	public static void relabel( ImageSInt32 image , int labels[] ) {
-		ImplBinaryBlobLabeling.relabelBlobs(image,labels);
+	public static void relabel( ImageSInt32 input , int labels[] ) {
+		for( int y = 0; y < input.height; y++ ) {
+			int index = input.startIndex + y*input.stride;
+			int end = index+input.width;
+
+			for( ; index < end; index++ ) {
+				int val = input.data[index];
+				input.data[index] = labels[val];
+			}
+		}
 	}
 
 	/**
@@ -451,51 +420,6 @@ public class BinaryImageOps {
 				if( v > 0 ) {
 					Point2D_I32 p = queue.grow();
 					p.set(index-start,y);
-					ret.get(v).add(p);
-				}
-			}
-		}
-		// first list is a place holder and should be empty
-		if( ret.get(0).size() != 0 )
-			throw new RuntimeException("BUG!");
-		ret.remove(0);
-		return ret;
-	}
-
-	/**
-	 * Extracts edges from a labeled blob image using a 4-connect rule
-	 *
-	 * @param labelImage labeled image
-	 * @param numLabels Number of labels in the image
-	 * @param queue Optional queue with predeclared points.  Can be null.
-	 * @return List of found contours around labeled image.
-	 */
-	public static List<List<Point2D_I32>> labelEdgeCluster4( ImageSInt32 labelImage ,
-															 int numLabels ,
-															 FastQueue<Point2D_I32> queue )
-	{
-		List<List<Point2D_I32>> ret = new ArrayList<List<Point2D_I32>>();
-		for( int i = 0; i < numLabels+1; i++ ) {
-			ret.add( new ArrayList<Point2D_I32>() );
-		}
-		if( queue == null ) {
-			queue = new FastQueue<Point2D_I32>(numLabels,Point2D_I32.class,true);
-		} else
-			queue.reset();
-
-		// todo this method is slow and should be speed up with an inner and outer version
-		ImageBorder_I32 in = ImageBorderValue.wrap(labelImage, 1);
-		
-		for( int y = 0; y < labelImage.height; y++ ) {
-
-			for( int x = 0; x < labelImage.width; x++ ) {
-				int v = in.get(x,y);
-				if( v == 0 )
-					continue;
-				// see if any part of it (4-connect) is touching a non-member pixel
-				if( in.get(x-1,y) == 0 || in.get(x+1,y) == 0 || in.get(x,y-1) == 0 || in.get(x,y+1) == 0 ) {
-					Point2D_I32 p = queue.grow();
-					p.set(x,y);
 					ret.get(v).add(p);
 				}
 			}

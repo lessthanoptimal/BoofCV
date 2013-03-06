@@ -18,14 +18,15 @@
 
 package boofcv.abst.feature.detect.edge;
 
-import boofcv.alg.filter.binary.BinaryImageOps;
+import boofcv.alg.filter.binary.Contour;
 import boofcv.alg.filter.binary.GThresholdImageOps;
-import boofcv.struct.FastQueue;
+import boofcv.alg.filter.binary.LinearContourLabelChang2004;
 import boofcv.struct.image.ImageSInt32;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
 import georegression.struct.point.Point2D_I32;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -38,21 +39,19 @@ import java.util.List;
  */
 public class WrapBinaryContour<T extends ImageSingleBand> implements DetectEdgeContour<T>{
 
+	// computes the contour around binary images
+	LinearContourLabelChang2004 contourAlg = new LinearContourLabelChang2004(8);
+
 	// threshold description
 	double threshold;
 	boolean down;
 
 	// thresholded image
 	ImageUInt8 thresh = new ImageUInt8(1,1);
-	// found edges
-	ImageUInt8 edge = new ImageUInt8(1,1);
 	// labeled edges
 	ImageSInt32 label = new ImageSInt32(1,1);
 
-	// reuse found points
-	private FastQueue<Point2D_I32> queuePts = new FastQueue<Point2D_I32>(100,Point2D_I32.class,true);
-
-	List<List<Point2D_I32>> contours;
+	List<List<Point2D_I32>> contours = new ArrayList<List<Point2D_I32>>();
 
 	public WrapBinaryContour(double threshold, boolean down) {
 		this.threshold = threshold;
@@ -63,19 +62,20 @@ public class WrapBinaryContour<T extends ImageSingleBand> implements DetectEdgeC
 	public void process(T input) {
 
 		thresh.reshape(input.width,input.height);
-		edge.reshape(input.width,input.height);
 		label.reshape(input.width,input.height);
 
 		// threshold image
 		GThresholdImageOps.threshold(input,thresh,threshold,down);
-		// extract the edges
-		BinaryImageOps.edge4(thresh,edge);
 
-		// label the edges
-		int numFound = BinaryImageOps.labelBlobs8(edge,label);
+		// find contours around each object
+		contourAlg.process(thresh,label);
 
 		// extract the contours
-		contours = BinaryImageOps.labelToClusters(label,numFound,queuePts);
+		contours.clear();
+		for( Contour c : contourAlg.getContours().toList() ) {
+			contours.add( c.external );
+			contours.addAll(c.internal);
+		}
 	}
 
 	@Override

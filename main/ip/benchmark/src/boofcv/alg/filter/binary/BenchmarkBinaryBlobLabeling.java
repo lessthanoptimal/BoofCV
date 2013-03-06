@@ -18,14 +18,11 @@
 
 package boofcv.alg.filter.binary;
 
-import boofcv.alg.filter.binary.impl.ImplBinaryBlobLabeling;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.misc.PerformerBase;
 import boofcv.misc.ProfileOperation;
-import boofcv.struct.FastQueue;
 import boofcv.struct.image.ImageSInt32;
 import boofcv.struct.image.ImageUInt8;
-import georegression.struct.point.Point2D_I32;
 
 import java.util.Random;
 
@@ -45,61 +42,24 @@ public class BenchmarkBinaryBlobLabeling {
 	static ImageUInt8 input = new ImageUInt8(imgWidth, imgHeight);
 	static ImageSInt32 output = new ImageSInt32(imgWidth, imgHeight);
 
-	public static class Normal8 extends PerformerBase {
-		@Override
-		public void process() {
-			ImplBinaryBlobLabeling.quickLabelBlobs8(input, output);
-		}
-	}
+	public static class NewAlg8 extends PerformerBase {
 
-	public static class Normal4 extends PerformerBase {
-		@Override
-		public void process() {
-			ImplBinaryBlobLabeling.quickLabelBlobs4(input, output);
-		}
-	}
-
-	public static class Naive8 extends PerformerBase {
-		@Override
-		public void process() {
-			ImplBinaryBlobLabeling.quickLabelBlobs8_Naive(input, output);
-		}
-	}
-
-	public static class Naive4 extends PerformerBase {
-		@Override
-		public void process() {
-			ImplBinaryBlobLabeling.quickLabelBlobs4_Naive(input, output);
-		}
-	}
-
-	public static class Full8 extends PerformerBase {
-
-		FastQueue<Point2D_I32> queuePts = new FastQueue<Point2D_I32>(Point2D_I32.class,true);
+		LinearContourLabelChang2004 alg = new LinearContourLabelChang2004(8);
 
 		@Override
 		public void process() {
-			int numFound = BinaryImageOps.labelBlobs8(input, output);
-			BinaryImageOps.labelToClusters(output,numFound,queuePts);
-//			System.out.println("Full8 total = "+numFound);
-		}
-	}
-
-	public static class Full4 extends PerformerBase {
-		@Override
-		public void process() {
-			BinaryImageOps.labelBlobs4(input, output);
-		}
-	}
-
-	public static class NewAlg extends PerformerBase {
-
-		LinearContourLabelChang2004 alg = new LinearContourLabelChang2004();
-
-		@Override
-		public void process() {
-//			input.setTo(original);
 			alg.process(input,output);
+		}
+	}
+
+	public static class NewAlg4 extends PerformerBase {
+
+		LinearContourLabelChang2004 alg = new LinearContourLabelChang2004(4);
+
+		@Override
+		public void process() {
+			alg.process(input,output);
+//			System.out.println("new 4 = "+alg.getContours().size);
 		}
 	}
 
@@ -107,7 +67,7 @@ public class BenchmarkBinaryBlobLabeling {
 		System.out.println("=========  Profile Image Size "+ imgWidth +" x "+ imgHeight  +" ==========");
 
 		Random rand = new Random(234);
-		ImageMiscOps.fillUniform(original, rand, 0, 1);
+		ImageMiscOps.fillUniform(original, rand, 0, 2);
 
 		for( int y = 0; y < original.height; y++ ) {
 			for( int x = 0; x < original.width; x++ ) {
@@ -118,13 +78,8 @@ public class BenchmarkBinaryBlobLabeling {
 
 		input.setTo(original);
 
-//		ProfileOperation.printOpsPerSec(new Normal8(), TEST_TIME);
-//		ProfileOperation.printOpsPerSec(new Normal4(), TEST_TIME);
-//		ProfileOperation.printOpsPerSec(new Naive8(), TEST_TIME);
-//		ProfileOperation.printOpsPerSec(new Naive4(), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new Full8(), TEST_TIME);
-//		ProfileOperation.printOpsPerSec(new Full4(), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new NewAlg(), TEST_TIME);
+		ProfileOperation.printOpsPerSec(new NewAlg8(), TEST_TIME);
+		ProfileOperation.printOpsPerSec(new NewAlg4(), TEST_TIME);
 
 	}
 }

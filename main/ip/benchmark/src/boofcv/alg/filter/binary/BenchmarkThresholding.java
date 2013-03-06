@@ -56,22 +56,6 @@ public class BenchmarkThresholding extends SimpleBenchmark {
 		return 0;
 	}
 
-	public int timeHysteresisLabel4(int reps) {
-		for( int i = 0; i < reps; i++ ) {
-			ThresholdImageOps.hysteresisLabel4(input, output_S32,threshLower,threshUpper,true,work);
-			BinaryImageOps.labelToBinary(output_S32,output_U8);
-		}
-		return 0;
-	}
-
-	public int timeHysteresisLabel8(int reps) {
-		for( int i = 0; i < reps; i++ ) {
-			ThresholdImageOps.hysteresisLabel8(input, output_S32,threshLower,threshUpper,true,work);
-			BinaryImageOps.labelToBinary(output_S32,output_U8);
-		}
-		return 0;
-	}
-
 	public static void main(String args[]) {
 
 		System.out.println("=========  Profile Image Size " + imgWidth + " x " + imgHeight + " ==========");
