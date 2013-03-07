@@ -18,18 +18,172 @@
 
 package boofcv.gui.binary;
 
+import boofcv.alg.feature.detect.edge.EdgeContour;
+import boofcv.alg.feature.detect.edge.EdgeSegment;
+import boofcv.alg.filter.binary.Contour;
 import boofcv.struct.image.ImageSInt32;
 import boofcv.struct.image.ImageUInt8;
+import georegression.struct.point.Point2D_I32;
 import sun.awt.image.ByteInterleavedRaster;
 import sun.awt.image.IntegerInterleavedRaster;
 
+import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.util.List;
 import java.util.Random;
 
 /**
  * @author Peter Abeles
  */
 public class VisualizeBinaryData {
+
+	public static BufferedImage renderContours( List<EdgeContour> edges , int colors[] ,
+												int width , int height , BufferedImage out) {
+
+		if( out == null ) {
+			out = new BufferedImage(width,height,BufferedImage.TYPE_INT_RGB);
+		} else {
+			Graphics2D g2 = out.createGraphics();
+			g2.setColor(Color.BLACK);
+			g2.fillRect(0,0,width,height);
+		}
+
+		colors = checkColors(colors,edges.size());
+
+		for( int i = 0; i < edges.size(); i++ ) {
+			EdgeContour e = edges.get(i);
+			int color = colors[i];
+
+			for( EdgeSegment s : e.segments ) {
+				for( Point2D_I32 p : s.points ) {
+					out.setRGB(p.x,p.y,color);
+				}
+			}
+		}
+
+		return out;
+	}
+
+	/**
+	 * Draws contours. Internal and external contours are different user specified colors.
+	 *
+	 * @param contours List of contours
+	 * @param colorExternal RGB color
+	 * @param colorInternal RGB color
+	 * @param width Image width
+	 * @param height Image height
+	 * @param out (Optional) storage for output image
+	 * @return Rendered contours
+	 */
+	public static BufferedImage renderContours( List<Contour> contours , int colorExternal, int colorInternal ,
+												int width , int height , BufferedImage out) {
+
+		if( out == null ) {
+			out = new BufferedImage(width,height,BufferedImage.TYPE_INT_RGB);
+		} else {
+			Graphics2D g2 = out.createGraphics();
+			g2.setColor(Color.BLACK);
+			g2.fillRect(0,0,width,height);
+		}
+
+		for( Contour c : contours ) {
+			for(Point2D_I32 p : c.external ) {
+				out.setRGB(p.x,p.y,colorExternal);
+			}
+			for( List<Point2D_I32> l : c.internal ) {
+				for( Point2D_I32 p : l ) {
+					out.setRGB(p.x,p.y,colorInternal);
+				}
+			}
+		}
+
+		return out;
+	}
+
+	/**
+	 * Draws contours. Internal and external contours are different user specified colors.
+	 *
+	 * @param contours List of contours
+	 * @param colorExternal (Optional) Array of RGB colors for each external contour
+	 * @param colorInternal RGB color
+	 * @param width Image width
+	 * @param height Image height
+	 * @param out (Optional) storage for output image
+	 * @return Rendered contours
+	 */
+	public static BufferedImage renderContours( List<Contour> contours , int colorExternal[], int colorInternal ,
+												int width , int height , BufferedImage out) {
+
+		if( out == null ) {
+			out = new BufferedImage(width,height,BufferedImage.TYPE_INT_RGB);
+		} else {
+			Graphics2D g2 = out.createGraphics();
+			g2.setColor(Color.BLACK);
+			g2.fillRect(0,0,width,height);
+		}
+
+		colorExternal = checkColors(colorExternal,contours.size());
+
+		int index = 0;
+		for( Contour c : contours ) {
+			int color = colorExternal[index++];
+			for(Point2D_I32 p : c.external ) {
+				out.setRGB(p.x,p.y,color);
+			}
+			for( List<Point2D_I32> l : c.internal ) {
+				for( Point2D_I32 p : l ) {
+					out.setRGB(p.x,p.y,colorInternal);
+				}
+			}
+		}
+
+		return out;
+	}
+
+	/**
+	 * Renders only the external contours.  Each contour is individually colored as specified by 'colors'
+	 *
+	 * @param contours List of contours
+	 * @param colors List of RGB colors for each element in contours.  If null then random colors will be used.
+	 * @param width Width of input image.
+	 * @param height Height of input image.
+	 * @param out (Optional) Storage for output
+	 * @return Rendered image for display.
+	 */
+	public static BufferedImage renderExternal( List<Contour> contours , int colors[] ,
+												int width , int height , BufferedImage out) {
+
+		if( out == null ) {
+			out = new BufferedImage(width,height,BufferedImage.TYPE_INT_RGB);
+		} else {
+			Graphics2D g2 = out.createGraphics();
+			g2.setColor(Color.BLACK);
+			g2.fillRect(0,0,width,height);
+		}
+
+		colors = checkColors(colors,contours.size());
+
+		for( Contour c : contours ) {
+			int color = colors[c.id-1];
+
+			for(Point2D_I32 p : c.external ) {
+				out.setRGB(p.x,p.y,color);
+			}
+		}
+
+		return out;
+	}
+
+	private static int[] checkColors(  int[] colors , int size ) {
+		if( colors == null ) {
+			colors = new int[ size ];
+			Random rand = new Random(123);
+			for( int i = 0; i < size; i++ ) {
+				colors[i] = rand.nextInt();
+			}
+		}
+		return colors;
+	}
 
 	public static BufferedImage renderLabeled(ImageSInt32 labelImage, int colors[], BufferedImage out) {
 

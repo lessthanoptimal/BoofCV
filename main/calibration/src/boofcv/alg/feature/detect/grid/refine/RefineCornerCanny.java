@@ -18,8 +18,10 @@
 
 package boofcv.alg.feature.detect.grid.refine;
 
-import boofcv.abst.feature.detect.edge.DetectEdgeContour;
-import boofcv.factory.feature.detect.edge.FactoryDetectEdgeContour;
+import boofcv.alg.feature.detect.edge.CannyEdge;
+import boofcv.alg.feature.detect.edge.EdgeContour;
+import boofcv.alg.feature.detect.edge.EdgeSegment;
+import boofcv.factory.feature.detect.edge.FactoryEdgeDetectors;
 import boofcv.struct.FastQueue;
 import boofcv.struct.image.ImageFloat32;
 import georegression.geometry.UtilPoint2D_F64;
@@ -47,7 +49,7 @@ public class RefineCornerCanny {
 	private CostFunction func = new CostFunction();
 	private UnconstrainedMinimization alg = FactoryOptimization.unconstrained();
 
-	DetectEdgeContour<ImageFloat32> detectEdge;
+	CannyEdge<ImageFloat32,ImageFloat32> detectEdge;
 
 	Point2D_F64 corner;
 
@@ -57,26 +59,25 @@ public class RefineCornerCanny {
 	InitialEstimate initial = new InitialEstimate();
 
 	public RefineCornerCanny() {
-		detectEdge = FactoryDetectEdgeContour.canny(0.1f, 0.3f, true, ImageFloat32.class, ImageFloat32.class);
+		detectEdge = FactoryEdgeDetectors.canny(2,true, true, ImageFloat32.class, ImageFloat32.class);
 	}
 
 	public void process( ImageFloat32 image ) {
-		detectEdge.process(image);
+		detectEdge.process(image,0.1f, 0.3f,null);
 
-		List<List<Point2D_I32>> edges = detectEdge.getContours();
+		List<EdgeContour> edges = detectEdge.getContours();
 
-//		ImageUInt8 binary = new ImageUInt8(1,1);
-//		GImageMiscOps.fill(binary,0);
-		
+
 		List<Point2D_I32> all = new ArrayList<Point2D_I32>();
 		
 		points.reset();
-		for( List<Point2D_I32> l : edges )
-			for( Point2D_I32 p : l ) {
+		for( EdgeContour e : edges )
+			for( EdgeSegment l : e.segments )
+				for( Point2D_I32 p : l.points ) {
 //				binary.set(p.x,p.y,1);
-				all.add(p);
-				points.grow().set(p.x,p.y);
-			}
+					all.add(p);
+					points.grow().set(p.x,p.y);
+				}
 
 //		UtilImageIO.print(image);
 //		binary.print();

@@ -25,7 +25,7 @@ import static org.junit.Assert.fail;
 /**
  * @author Peter Abeles
  */
-public class TestHysteresisEdgeTrace4 {
+public class TestCannyEdgeDynamic {
 
 	@Test
 	public void stuff() {

@@ -16,11 +16,13 @@
  * limitations under the License.
  */
 
-package boofcv.abst.feature.detect.edge;
+package boofcv.alg.feature.detect.edge;
 
 import boofcv.abst.filter.blur.BlurFilter;
 import boofcv.abst.filter.derivative.ImageGradient;
+import boofcv.alg.misc.ImageStatistics;
 import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageUInt8;
 
 
 /**
@@ -28,45 +30,28 @@ import boofcv.struct.image.ImageSingleBand;
  *
  * @author Peter Abeles
  */
-public class CannyEdgeContourDynamic<T extends ImageSingleBand, D extends ImageSingleBand> extends CannyEdgeContour<T,D>
+public class CannyEdgeDynamic<T extends ImageSingleBand, D extends ImageSingleBand> extends CannyEdge<T,D>
 {
-	// threshold is specified to be
-	float fractionLow, fractionHigh;
-
 	/**
 	 * Constructor and configures algorithm
 	 *
 	 * @param blur Used during the image blur pre-process step.
 	 * @param gradient Computes image gradient.
-	 * @param fractionLow Low threshold specified as fraction of maximum edge intensity
-	 * @param fractionHigh HIgh threshold specified as fraction of maximum edge intensity
 	 */
-	public CannyEdgeContourDynamic(BlurFilter<T> blur, ImageGradient<T, D> gradient ,
-								   float fractionLow , float fractionHigh  ) {
-		super(blur, gradient, 0, 0);
-		if( fractionLow >= fractionHigh )
-			throw new IllegalArgumentException("low must be lower than high");
-		this.fractionLow  = fractionLow;
-		this.fractionHigh  = fractionHigh;
+	public CannyEdgeDynamic(BlurFilter<T> blur, ImageGradient<T, D> gradient, boolean saveTrace) {
+		super(blur, gradient,saveTrace);
 	}
 
 	@Override
-	protected void updateThresholds() {
+	protected void performThresholding(float threshLow, float threshHigh, ImageUInt8 output) {
 		// find the largest intensity value
-		float max = 0;
-
-		for( int y = 0; y < suppressed.height; y++ ) {
-			for( int x = 0; x < suppressed.width; x++ ) {
-//				if( label.get(x,y) != 0 ) {
-					float v = suppressed.get(x,y);
-					if( v > max )
-						max = v;
-//				}
-			}
-		}
+		float max = ImageStatistics.max(suppressed);
 
 		// set the threshold using that
-		threshLow = max*fractionLow;
-		threshHigh = max*fractionHigh;
+		threshLow = max*threshLow;
+		threshHigh = max*threshHigh;
+
+		super.performThresholding(threshLow, threshHigh, output);
 	}
+
 }

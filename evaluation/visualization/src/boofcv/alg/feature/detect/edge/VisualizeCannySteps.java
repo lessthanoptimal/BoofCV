@@ -27,14 +27,11 @@ import boofcv.gui.binary.VisualizeBinaryData;
 import boofcv.gui.edge.VisualizeEdgeFeatures;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.image.UtilImageIO;
-import boofcv.struct.FastQueue;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSInt8;
 import boofcv.struct.image.ImageUInt8;
-import georegression.struct.point.Point2D_I32;
 
 import java.awt.image.BufferedImage;
-import java.util.List;
 
 
 /**
@@ -81,18 +78,8 @@ public class VisualizeCannySteps {
 		ShowImages.showWindow(suppressed,"Suppressed Intensity",true);
 		BufferedImage renderedOrientation = VisualizeEdgeFeatures.renderOrientation4(direction,suppressed,threshLow,null);
 
-		HysteresisEdgeTrace4 hysteresis = new HysteresisEdgeTrace4();
-		hysteresis.setImages(suppressed,direction);
-		hysteresis.process(threshLow,threshHigh);
-		FastQueue<EdgeContour> contours = hysteresis.getQueueContour();
-
-		for( EdgeContour c : contours.toList() ) {
-			for( List<Point2D_I32> l : c.edges ) {
-				for( Point2D_I32 p : l ) {
-					output.set(p.x,p.y,1);
-				}
-			}
-		}
+		HysteresisEdgeTraceMark hysteresis = new HysteresisEdgeTraceMark();
+		hysteresis.process(suppressed,direction,threshLow,threshHigh,output);
 
 		BufferedImage renderedLabel = VisualizeBinaryData.renderBinary(output, null);
 

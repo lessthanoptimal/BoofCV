@@ -18,19 +18,19 @@
 
 package boofcv.alg.feature.detect.edge;
 
-import boofcv.abst.feature.detect.edge.DetectEdgeContour;
 import boofcv.alg.misc.ImageMiscOps;
-import boofcv.factory.feature.detect.edge.FactoryDetectEdgeContour;
+import boofcv.factory.feature.detect.edge.FactoryEdgeDetectors;
 import boofcv.misc.PerformerBase;
 import boofcv.misc.ProfileOperation;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageUInt8;
 
 import java.util.Random;
 
 /**
  * @author Peter Abeles
  */
-public class BenchmarkCannyEdge {
+public class BenchmarkDetectEdge {
 	static final long TEST_TIME = 1000;
 
 	int width = 640;
@@ -41,17 +41,17 @@ public class BenchmarkCannyEdge {
 	ImageFloat32 input = new ImageFloat32(width,height);
 
 	public void createImage() {
-		for( int i = 0; i < 50; i++ ) {
-			int width = 50+rand.nextInt(50);
-			int height = 50+rand.nextInt(50);
+		for( int i = 0; i < 1000; i++ ) {
+			int width = 10+rand.nextInt(50);
+			int height = 10+rand.nextInt(50);
 
-			int x = rand.nextInt(width);
-			int y = rand.nextInt(height);
+			int x = rand.nextInt(input.width);
+			int y = rand.nextInt(input.height);
 
 			int x1 = x+width;
 			int y1 = y+height;
-			if( x1 > width ) x1 = width;
-			if( y1 > height ) y1 = height;
+			if( x1 > input.width ) x1 = input.width;
+			if( y1 > input.height ) y1 = input.height;
 
 			width = x1-x;
 			height = y1-y;
@@ -60,23 +60,25 @@ public class BenchmarkCannyEdge {
 		}
 	}
 
-	public class CannyEdge extends PerformerBase {
+	public class CannyMark extends PerformerBase {
 
-		DetectEdgeContour<ImageFloat32> alg = FactoryDetectEdgeContour.canny(5,20,false,ImageFloat32.class,ImageFloat32.class);
+		CannyEdge<ImageFloat32,ImageFloat32> alg = FactoryEdgeDetectors.canny(2,false, false, ImageFloat32.class, ImageFloat32.class);
+		ImageUInt8 output = new ImageUInt8(width,height);
 
 		@Override
 		public void process() {
-			alg.process(input);
+			alg.process(input,5,10,output);
 		}
 	}
 
-	public class ContourSimple extends PerformerBase {
+	public class CannyTrace extends PerformerBase {
 
-		DetectEdgeContour<ImageFloat32> alg = FactoryDetectEdgeContour.binarySimple(15,true);
+		CannyEdge<ImageFloat32,ImageFloat32> alg = FactoryEdgeDetectors.canny(2,true, false, ImageFloat32.class, ImageFloat32.class);
+		ImageUInt8 output = new ImageUInt8(width,height);
 
 		@Override
 		public void process() {
-			alg.process(input);
+			alg.process(input,5,10,output);
 		}
 	}
 
@@ -86,12 +88,12 @@ public class BenchmarkCannyEdge {
 		System.out.println("=========  Profile Image Size " + width + " x " + height + " ==========");
 		System.out.println();
 
-		ProfileOperation.printOpsPerSec(new CannyEdge(), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new ContourSimple(), TEST_TIME);
+		ProfileOperation.printOpsPerSec(new CannyMark(), TEST_TIME);
+		ProfileOperation.printOpsPerSec(new CannyTrace(), TEST_TIME);
 	}
 
 	public static void main( String args[] ) {
-		BenchmarkCannyEdge benchmark = new BenchmarkCannyEdge();
+		BenchmarkDetectEdge benchmark = new BenchmarkDetectEdge();
 		benchmark.performTests();
 	}
 

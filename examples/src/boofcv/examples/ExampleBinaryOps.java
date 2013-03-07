@@ -20,6 +20,7 @@ package boofcv.examples;
 
 
 import boofcv.alg.filter.binary.BinaryImageOps;
+import boofcv.alg.filter.binary.Contour;
 import boofcv.alg.filter.binary.ThresholdImageOps;
 import boofcv.alg.misc.ImageStatistics;
 import boofcv.core.image.ConvertBufferedImage;
@@ -31,72 +32,55 @@ import boofcv.struct.image.ImageSInt32;
 import boofcv.struct.image.ImageUInt8;
 
 import java.awt.image.BufferedImage;
+import java.util.List;
 
 /**
- * Demonstrates how to create and process binary images.
+ * Demonstrates how to create binary images by thresholding, applying binary morphological operations, and
+ * then extracting detected features by finding their contours.
  *
  * @author Peter Abeles
  */
-public class ExampleBinaryImage {
+public class ExampleBinaryOps {
 
-	/**
-	 * Thresholds and displays the image.
-	 */
-	public static void binaryExample( BufferedImage image )
-	{
+	public static void main( String args[] ) {
+		// load and convert the image into a usable format
+		BufferedImage image = UtilImageIO.loadImage("../data/applet/particles01.jpg");
+
 		// convert into a usable format
 		ImageFloat32 input = ConvertBufferedImage.convertFromSingle(image, null, ImageFloat32.class);
 		ImageUInt8 binary = new ImageUInt8(input.width,input.height);
-
-		// the mean pixel value is often a reasonable threshold when creating a binary image
-		float mean = (float)ImageStatistics.mean(input);
-
-		// create a binary image
-		ThresholdImageOps.threshold(input,binary,mean,true);
-
-		// Render the binary image for output and display it in a window
-		BufferedImage visualBinary = VisualizeBinaryData.renderBinary(binary,null);
-		ShowImages.showWindow(visualBinary,"Binary Image");
-	}
-
-	/**
-	 * Thresholds and extracts clusters of blobs from the image.
-	 */
-	public static void labeledExample( BufferedImage image )
-	{
-		// convert into a usable format
-		ImageFloat32 input = ConvertBufferedImage.convertFromSingle(image, null, ImageFloat32.class);
-		ImageUInt8 binary = new ImageUInt8(input.width,input.height);
-		ImageSInt32 blobs = new ImageSInt32(input.width,input.height);
+		ImageSInt32 label = new ImageSInt32(input.width,input.height);
 
 		// the mean pixel value is often a reasonable threshold when creating a binary image
 		double mean = ImageStatistics.mean(input);
 
-		// create a binary image
+		// create a binary image by thresholding
 		ThresholdImageOps.threshold(input,binary,(float)mean,true);
 
 		// remove small blobs through erosion and dilation
 		// The null in the input indicates that it should internally declare the work image it needs
 		// this is less efficient, but easier to code.
-		binary = BinaryImageOps.erode8(binary,null);
-		binary = BinaryImageOps.dilate8(binary, null);
+		ImageUInt8 filtered = BinaryImageOps.erode8(binary,null);
+		filtered = BinaryImageOps.dilate8(filtered, null);
 
-//		// Detect blobs inside the binary image and assign labels to them
-//		int numBlobs = BinaryImageOps.labelBlobs4(binary,blobs);
-//
-//		// Render the binary image for output and display it in a window
-//		BufferedImage visualized = VisualizeBinaryData.renderLabeled(blobs, numBlobs, null);
-//		ShowImages.showWindow(visualized,"Labeled Image");
-		throw new RuntimeException("Redo this example");
-	}
+		// Detect blobs inside the image using an 8-connect rule
+		List<Contour> contours = BinaryImageOps.contour(filtered, 8, label);
 
+		// colors of contours
+		int colorExternal = 0xFFFFFF;
+		int colorInternal = 0xFF2020;
 
-	public static void main( String args[] ) {
-		// load and convert the image into a unable format
-		BufferedImage image = UtilImageIO.loadImage("../data/applet/particles01.jpg");
+		// display the results
+		BufferedImage visualBinary = VisualizeBinaryData.renderBinary(binary, null);
+		BufferedImage visualFiltered = VisualizeBinaryData.renderBinary(filtered, null);
+		BufferedImage visualLabel = VisualizeBinaryData.renderLabeled(label, contours.size(), null);
+		BufferedImage visualContour = VisualizeBinaryData.renderContours(contours,colorExternal,colorInternal,
+				input.width,input.height,null);
 
-		binaryExample(image);
-		labeledExample(image);
+		ShowImages.showWindow(visualBinary,"Binary Original");
+		ShowImages.showWindow(visualFiltered,"Binary Filtered");
+		ShowImages.showWindow(visualLabel,"Labeled Blobs");
+		ShowImages.showWindow(visualContour,"Contours");
 	}
 
 }

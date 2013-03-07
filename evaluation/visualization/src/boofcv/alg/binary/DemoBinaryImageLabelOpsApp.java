@@ -192,7 +192,7 @@ public class DemoBinaryImageLabelOpsApp<T extends ImageSingleBand> extends Selec
 		GThresholdImageOps.threshold(imageInput, imageBinary, selectThresh.getThreshold(), selectThresh.isDown());
 		filter1.process(imageBinary,imageOutput1);
 		filter2.process(imageOutput1,imageOutput2);
-		List<Contour> found = BinaryImageOps.labelContour(imageOutput2,connectRule,imageLabeled);
+		List<Contour> found = BinaryImageOps.contour(imageOutput2, connectRule, imageLabeled);
 		if( colors == null || colors.length <= found.size() )
 			colors = BinaryImageOps.selectRandomColors(found.size(),rand);
 

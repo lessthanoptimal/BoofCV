@@ -18,19 +18,18 @@
 
 package boofcv.alg.feature.detect.edge;
 
-import java.util.ArrayList;
-import java.util.List;
+import org.junit.Test;
+
+import static org.junit.Assert.fail;
 
 /**
- * Data structure containing the contour along an edge.  Multiple paths along the edge are handled by creating
- * multiple segments at decision points.
- *
  * @author Peter Abeles
  */
-public class EdgeContour {
-	public List<EdgeSegment> segments = new ArrayList<EdgeSegment>();
+public class TestHysteresisEdgeTracePoints {
 
-	public void reset() {
-		segments.clear();
+	@Test
+	public void stuff() {
+		fail("Implement");
 	}
+
 }
