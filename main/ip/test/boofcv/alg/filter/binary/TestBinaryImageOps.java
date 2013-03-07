@@ -129,7 +129,7 @@ public class TestBinaryImageOps {
 	}
 
 	@Test
-	public void labelContour() {
+	public void contour() {
 		fail("Implement");
 	}
 

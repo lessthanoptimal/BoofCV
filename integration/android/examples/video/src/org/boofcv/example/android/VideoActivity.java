@@ -96,10 +96,6 @@ public class VideoActivity extends Activity implements Camera.PreviewCallback {
 	@Override
 	protected void onResume() {
 		super.onResume();
-
-		if( mCamera != null )
-			throw new RuntimeException("Bug, camera should not be initialized already");
-
 		setUpAndConfigureCamera();
 	}
 
@@ -148,7 +144,7 @@ public class VideoActivity extends Activity implements Camera.PreviewCallback {
 		thread = new ThreadProcess();
 		thread.start();
 
-		// Create an instance of Camera
+		// Start the video feed by passing it to mPreview
 		mPreview.setCamera(mCamera);
 	}
 

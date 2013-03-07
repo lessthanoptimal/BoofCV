@@ -63,7 +63,7 @@ Total time: 2 seconds
 
 The same ant script can be used to run any of example from the command line easily.  See below for examples of how to correctly invoke the script:
 
-ant -Dwhich=boofcv.examples.ExampleBinaryImage run
+ant -Dwhich=boofcv.examples.ExampleBinaryOps run
 ant -Dwhich=boofcv.examples.ExampleInterestPoint run
 ant -Dwhich=boofcv.examples.ExamplePointFeatureTracker run
 

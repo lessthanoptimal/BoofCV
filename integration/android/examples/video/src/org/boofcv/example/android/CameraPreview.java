@@ -43,7 +43,7 @@ public class CameraPreview extends ViewGroup implements SurfaceHolder.Callback {
 	Camera.PreviewCallback previewCallback;
 	boolean hidden;
 
-	CameraPreview(Context context, Camera.PreviewCallback previewCallback, boolean hidden ) {
+	public CameraPreview(Context context, Camera.PreviewCallback previewCallback, boolean hidden ) {
 		super(context);
 		this.previewCallback = previewCallback;
 		this.hidden = hidden;
@@ -55,6 +55,7 @@ public class CameraPreview extends ViewGroup implements SurfaceHolder.Callback {
 		// underlying surface is created and destroyed.
 		mHolder = mSurfaceView.getHolder();
 		mHolder.addCallback(this);
+		// deprecated setting, but required on Android versions prior to 3.0
 		mHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
 	}
 
@@ -67,17 +68,17 @@ public class CameraPreview extends ViewGroup implements SurfaceHolder.Callback {
 
 	@Override
 	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+		int width,height;
 		if( hidden ) {
-			this.setMeasuredDimension(2, 2);
+			// make the view small, effectively hiding it
+			width=height=2;
 		} else {
-			// We purposely disregard child measurements because act as a
-			// wrapper to a SurfaceView that centers the camera preview instead
-			// of stretching it.
-			final int width = resolveSize(getSuggestedMinimumWidth(), widthMeasureSpec);
-			final int height = resolveSize(getSuggestedMinimumHeight(), heightMeasureSpec);
-			setMeasuredDimension(width, height);
+			// We purposely disregard child measurements so that the SurfaceView will center the camera
+			// preview instead of stretching it.
+			width = resolveSize(getSuggestedMinimumWidth(), widthMeasureSpec);
+			height = resolveSize(getSuggestedMinimumHeight(), heightMeasureSpec);
 		}
-
+		setMeasuredDimension(width, height);
 	}
 
 	@Override
@@ -115,50 +116,11 @@ public class CameraPreview extends ViewGroup implements SurfaceHolder.Callback {
 
 	@Override
 	public void surfaceCreated(SurfaceHolder holder) {
-
-		// The Surface has been created, acquire the camera and tell it where
-		// to draw.
-		try {
-			if (mCamera != null) {
-				mCamera.setPreviewDisplay(holder);
-			}
-		} catch (IOException exception) {
-			Log.e(TAG, "IOException caused by setPreviewDisplay()", exception);
-		}
-	}
-
-	@Override
-	public void surfaceDestroyed(SurfaceHolder holder) {
-		// Surface will be destroyed when we return, so stop the preview.
-		if (mCamera != null) {
-			mCamera.stopPreview();
-		}
-	}
-
-	@Override
-	public void surfaceChanged(SurfaceHolder holder, int format, int w, int h) {
-		if( mCamera == null )
-			return;
-
-		// If your preview can change or rotate, take care of those events here.
-		// Make sure to stop the preview before resizing or reformatting it.
-
-		if (mHolder.getSurface() == null){
-			// preview surface does not exist
+		if (mCamera == null) {
+			Log.d(TAG, "Camera is null.  Bug else where in code. ");
 			return;
 		}
 
-		// stop preview before making changes
-		try {
-			mCamera.stopPreview();
-		} catch (Exception e){
-			// ignore: tried to stop a non-existent preview
-		}
-
-		// set preview size and make any resize, rotate or
-		// reformatting changes here
-
-		// start preview with new settings
 		try {
 			mCamera.setPreviewDisplay(mHolder);
 			mCamera.setPreviewCallback(previewCallback);
@@ -167,4 +129,10 @@ public class CameraPreview extends ViewGroup implements SurfaceHolder.Callback {
 			Log.d(TAG, "Error starting camera preview: " + e.getMessage());
 		}
 	}
+
+	@Override
+	public void surfaceDestroyed(SurfaceHolder holder) {}
+
+	@Override
+	public void surfaceChanged(SurfaceHolder holder, int format, int w, int h) {}
 }

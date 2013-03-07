@@ -26,41 +26,49 @@ import georegression.struct.point.Point2D_I32;
 import java.util.List;
 
 /**
+ * Used to trace the external and internal contours around objects for {@link LinearContourLabelChang2004}.  As it
+ * is tracing an object it will modify the binary image by labeling.  The input binary image is assumed to have
+ * a 1-pixel border that needs to be compensated for.
+ *
  * @author Peter Abeles
  */
 public class ContourTracer {
 
 	// which connectivity rule is being used. 4 and 8 supported
-	int rule;
+	private int rule;
 
 	// storage for contour points.
-	FastQueue<Point2D_I32> storagePoints;
+	private FastQueue<Point2D_I32> storagePoints;
 
 	// binary image being traced
-	ImageUInt8 binary;
+	private ImageUInt8 binary;
 	// label image being marked
-	ImageSInt32 labeled;
+	private ImageSInt32 labeled;
 
 	// storage for contour
-	List<Point2D_I32> contour;
+	private List<Point2D_I32> contour;
 
 	// coordinate of pixel being examined (x,y)
-	int x,y;
+	private int x,y;
 	// label of the object being traced
-	int label;
+	private int label;
 	// direction it moved in
-	int dir;
+	private int dir;
 	// index of the pixel in the image's internal array
-	int indexBinary;
-	int indexLabel;
+	private int indexBinary;
+	private int indexLabel;
 
 	// the pixel index offset to each neighbor
-	int offsetsBinary[];
-	int offsetsLabeled[];
+	private int offsetsBinary[];
+	private int offsetsLabeled[];
 	// lookup table for which direction it should search next given the direction it traveled into the current pixel
-	int nextDirection[];
+	private int nextDirection[];
 
-
+	/**
+	 * Specifies connectivity rule
+	 *
+	 * @param rule Specifies 4 or 8 as connectivity rule
+	 */
 	public ContourTracer( int rule ) {
 		if( rule != 4 && rule != 8 )
 			throw new IllegalArgumentException("Connectivity rule must be 4 or 8 not "+rule);
@@ -160,13 +168,10 @@ public class ContourTracer {
 		}
 
 		while( true ) {
-//			System.out.println("contour.size = "+contour.size());
 			// search in clockwise direction around the current pixel for next black pixel
 			searchBlack();
-//			System.out.println("current "+x+" "+y+" "+dir+" original "+initialX+" "+initialY+" "+initialDir);
 			if( x == initialX && y == initialY && dir == initialDir ) {
 				// returned to the initial state again. search is finished
-//				System.out.println("------------------ Done");
 				return;
 			}else {
 				add(x, y);

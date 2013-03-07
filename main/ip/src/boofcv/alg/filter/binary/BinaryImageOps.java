@@ -278,9 +278,10 @@ public class BinaryImageOps {
 
 	/**
 	 * <p>
-	 * Given a binary image, connect blobs/clusters of pixels together using the specified connectivity rule.
-	 * is given a unique number >= 1.  Both inner and outer contours around each blob is returned. Pixels
-	 * in the contours are in clockwise or counter-clockwise order, depending on the implementation.
+	 * Given a binary image, connect together pixels to form blobs/clusters using the specified connectivity rule.
+	 * The found blobs will be labeled in an output image and also described as a set of contours.  Pixels
+	 * in the contours are consecutive order in a clockwise or counter-clockwise direction, depending on the
+	 * implementation.
 	 * </p>
 	 *
 	 * <p>
@@ -293,11 +294,15 @@ public class BinaryImageOps {
 	 *
 	 * @param input Input binary image.  Not modified.
 	 * @oaram rule Connectivity rule.  Can be 4 or 8.  8 is more commonly used.
-	 * @param output Output labeled image. Modified.
+	 * @param output (Optional) Output labeled image. If null, an image will be declared internally.  Modified.
 	 * @return List of found contours for each blob.
 	 */
-	public static List<Contour> labelContour( ImageUInt8 input , int rule , ImageSInt32 output ) {
-		InputSanityCheck.checkSameShape(input,output);
+	public static List<Contour> contour(ImageUInt8 input, int rule, ImageSInt32 output) {
+		if( output == null ) {
+			output = new ImageSInt32(input.width,input.height);
+		} else {
+			InputSanityCheck.checkSameShape(input,output);
+		}
 
 		LinearContourLabelChang2004 alg = new LinearContourLabelChang2004(rule);
 		alg.process(input,output);
@@ -395,7 +400,7 @@ public class BinaryImageOps {
 	 *
 	 * @param labelImage The labeled image.
 	 * @param numLabels Number of labeled objects inside the image.
-	 * @param queue Predeclare returned points.  Improves runtime performance. Can be null.
+	 * @param queue (Optional) Storage for pixel coordinates.  Improves runtime performance. Can be null.
 	 * @return List of pixels in each cluster.
 	 */
 	public static List<List<Point2D_I32>> labelToClusters( ImageSInt32 labelImage ,

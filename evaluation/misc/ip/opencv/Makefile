@@ -13,6 +13,6 @@ OBJ = $(SRC:.cpp=.o)
 all: $(TARG)
 
 runtime: main.o
-	$(CC) $(LDFLAGS) -o runtime main.o $(CPPFLAGS)
+	$(CC) $(CPPFLAGS) -o runtime main.o $(LDFLAGS)
 
 clean: rm -f *~ *.o $(TARG) runtime

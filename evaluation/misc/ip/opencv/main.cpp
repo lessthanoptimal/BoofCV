@@ -1,6 +1,7 @@
 #include "opencv2/imgproc/imgproc.hpp"
 #include "opencv2/highgui/highgui.hpp"
-#include "opencv2/features2d/features2d.hpp"
+#include <opencv2/nonfree/features2d.hpp>
+#include <opencv2/nonfree/nonfree.hpp>
 #include <ctime>
 #include <iostream>
 #include <stdio.h>
@@ -12,8 +13,8 @@ using namespace cv;
 using namespace std;
 
 const int minTestTime = 1000;
-char imageLocation[] = "../../../data/standard/barbara.png";
-char imageLineLocation[] = "../../../data/simple_objects.jpg";
+char imageLocation[] = "../../../../data/evaluation/standard/barbara.png";
+char imageLineLocation[] = "../../../../data/evaluation/simple_objects.jpg";
 Mat inputImage;
 Mat lineImage;
 
@@ -106,10 +107,21 @@ public:
     virtual void process() {
         double low=5;
         double high=50;
-        vector<vector<Point> > contours;
 
         Canny( inputImage, canny_output, low,high, 3 );
-        findContours( canny_output, contours, CV_RETR_LIST, CV_CHAIN_APPROX_NONE, Point(0, 0) );
+    }
+};
+
+class PerformerContour : public Performer
+{
+public:
+
+    Mat binary;
+
+    virtual void process() {
+        threshold( inputImage, binary, 75, 255,0 );
+        vector<vector<Point> > contours;
+        findContours( binary, contours, CV_RETR_LIST, CV_CHAIN_APPROX_NONE, Point(0, 0) );
     }
 };
 
@@ -163,6 +175,7 @@ int main( int argc, char** argv )
     PerformerSobel sobel;
     PerformerHarris harris;
     PerformerCanny canny;
+    PerformerContour contour;
     PerformerHough hough;
     PerformerSURF surf;
 
@@ -170,6 +183,7 @@ int main( int argc, char** argv )
     printf("Sobel       = %6.3f\n",profile(&sobel));
     printf("Harris      = %6.3f\n",profile(&harris));
     printf("Canny       = %6.3f\n",profile(&canny));
+    printf("Contour     = %6.3f\n",profile(&contour));
     printf("Hough Lines = %6.3f\n",profile(&hough));
     printf("SURF        = %6.3f\n",profile(&surf));
 

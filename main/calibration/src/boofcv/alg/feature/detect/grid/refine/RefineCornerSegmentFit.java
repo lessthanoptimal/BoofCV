@@ -293,7 +293,7 @@ public class RefineCornerSegmentFit {
 	 */
 	private void removeBinaryNoise(ImageUInt8 binary) {
 		// remove potential noise by only saving the largest cluster
-		List<Contour> contours = BinaryImageOps.labelContour(binary,4,blobs);
+		List<Contour> contours = BinaryImageOps.contour(binary, 4, blobs);
 
 		// find the largest blob
 		Contour largest = null;

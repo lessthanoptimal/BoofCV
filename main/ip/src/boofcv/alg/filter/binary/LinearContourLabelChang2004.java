@@ -28,23 +28,41 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * <p>
+ * Finds objects in a binary image by tracing their contours.  The output is labeled binary image, set of external
+ * and internal contours for each object/blob.  Blobs can be defined using a 4 or 8 connect rule.  The algorithm
+ * works by processing the image in a single pass.  When a new object is encountered its contour is traced.  Then
+ * the inner pixels are labeled.  If an internal contour is found it will also be traced.  See [1] for all
+ * the details.  The original algorithm has been modified to use different connectivity rules.
+ * </p>
+ *
+ * <p>
+ * Internally, the input binary image is copied into another image which will have a 1 pixel border of all zeros
+ * around it.  This ensures that boundary checks will not need to be done, speeding up the algorithm significantly.
+ * </p>
+ *
+ * <p>
+ * [1] Fu Chang and Chun-jen Chen and Chi-jen Lu, "A linear-time component-labeling algorithm using contour
+ * tracing technique" Computer Vision and Image Understanding, 2004
+ * </p>
+ *
  * @author Peter Abeles
  */
 public class LinearContourLabelChang2004 {
 
 	// traces edge pixels
-	ContourTracer tracer;
+	private ContourTracer tracer;
 
 	// binary image with a border of zero.
-	ImageUInt8 border = new ImageUInt8(1,1);
+	private ImageUInt8 border = new ImageUInt8(1,1);
 
 	// predeclared/recycled data structures
-	FastQueue<Point2D_I32> storagePoints = new FastQueue<Point2D_I32>(Point2D_I32.class,true);
-	FastQueue<List<Point2D_I32>> storageLists = new FastQueue<List<Point2D_I32>>((Class)ArrayList.class,true);
-	FastQueue<Contour> contours = new FastQueue<Contour>(Contour.class,true);
+	private FastQueue<Point2D_I32> storagePoints = new FastQueue<Point2D_I32>(Point2D_I32.class,true);
+	private FastQueue<List<Point2D_I32>> storageLists = new FastQueue<List<Point2D_I32>>((Class)ArrayList.class,true);
+	private FastQueue<Contour> contours = new FastQueue<Contour>(Contour.class,true);
 
 	// internal book keeping variables
-	int x,y,indexIn,indexOut;
+	private int x,y,indexIn,indexOut;
 
 	/**
 	 * Configures the algorithm.
@@ -55,6 +73,12 @@ public class LinearContourLabelChang2004 {
 		tracer = new ContourTracer(rule);
 	}
 
+	/**
+	 * Processes the binary image to find the contour of and label blobs.
+	 *
+	 * @param binary Input binary image. Not modified.
+	 * @param labeled Output. Labeled image.  Modified.
+	 */
 	public void process( ImageUInt8 binary , ImageSInt32 labeled ) {
 		// initialize data structures
 
@@ -74,9 +98,6 @@ public class LinearContourLabelChang2004 {
 		contours.reset();
 		tracer.setInputs(binary,labeled,storagePoints);
 
-		long totalTrace = 0;
-//		long startTime = System.currentTimeMillis();
-
 		// Outside border is all zeros so it can be ignored
 		for( y = 1; y < binary.height-1; y++ ) {
 			indexIn = binary.startIndex + y*binary.stride+1;
@@ -94,34 +115,20 @@ public class LinearContourLabelChang2004 {
 //				long startTraceTime = System.currentTimeMillis();
 				boolean handled = false;
 				if( label == 0 && binary.data[indexIn - binary.stride ] != 1 ) {
-//					System.out.println("--------- Step 1 at "+x+" "+y);
-					handleStep1(labeled);
+					handleStep1();
 					handled = true;
 					label = contours.size;
 				}
 				// could be an external and internal contour
 				if( binary.data[indexIn + binary.stride ] == 0 ) {
-//					System.out.println("--------- Step 2 at "+x+" "+y);
 					handleStep2(labeled, label);
 					handled = true;
 				}
 				if( !handled ) {
-//					System.out.println("--------- Step 3 at "+x+" "+y);
 					handleStep3(labeled);
 				}
-//				totalTrace += System.currentTimeMillis()-startTraceTime;
-
-//				System.out.println("Binary");
-//				binary.print();
-//				System.out.println("Label");
-//				labeled.print();
 			}
 		}
-
-//		long total = System.currentTimeMillis()-startTime;
-
-//		System.out.println("Total elapsed "+total+"  trace = "+totalTrace);
-//		System.out.println("Exiting alg");
 	}
 
 	public FastQueue<Contour> getContours() {
@@ -132,7 +139,7 @@ public class LinearContourLabelChang2004 {
 	 *  Step 1: If the pixel is unlabeled and the pixel above is white, then it
 	 *          must be an external contour of a newly encountered blob.
 	 */
-	private void handleStep1(ImageSInt32 labeled) {
+	private void handleStep1() {
 		Contour c = contours.grow();
 		c.reset();
 		c.id = contours.size();

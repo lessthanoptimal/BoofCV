@@ -18,30 +18,27 @@
 
 package boofcv.alg.feature.detect.edge;
 
-import boofcv.abst.feature.detect.edge.CannyEdgeContourDynamic;
-import boofcv.abst.feature.detect.edge.DetectEdgeContour;
-import boofcv.abst.filter.blur.BlurFilter;
-import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.alg.binary.SelectHistogramThresholdPanel;
+import boofcv.alg.filter.binary.GThresholdImageOps;
+import boofcv.alg.filter.binary.LinearContourLabelChang2004;
 import boofcv.alg.misc.GImageStatistics;
 import boofcv.core.image.ConvertBufferedImage;
-import boofcv.factory.feature.detect.edge.FactoryDetectEdgeContour;
-import boofcv.factory.filter.blur.FactoryBlurFilter;
-import boofcv.factory.filter.derivative.FactoryDerivative;
+import boofcv.factory.feature.detect.edge.FactoryEdgeDetectors;
 import boofcv.gui.SelectAlgorithmAndInputPanel;
+import boofcv.gui.binary.VisualizeBinaryData;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.PathLabel;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageSInt32;
 import boofcv.struct.image.ImageSingleBand;
-import georegression.struct.point.Point2D_I32;
+import boofcv.struct.image.ImageUInt8;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 /**
  * Displays contours selected using different algorithms.
@@ -60,10 +57,17 @@ public class ShowEdgeContourApp<T extends ImageSingleBand, D extends ImageSingle
 	Class<D> derivType;
 	boolean processedImage = false;
 
+	ImageUInt8 binary = new ImageUInt8(1,1);
+	ImageSInt32 labeled = new ImageSInt32(1,1);
+
 	CannyControlBar barCanny;
 	SelectHistogramThresholdPanel barBinary;
 	JPanel bodyPanel = new JPanel();
 	int activeAlg;
+
+	int previousBlur;
+	CannyEdge<T,D> canny;
+	LinearContourLabelChang2004 contour = new LinearContourLabelChang2004(8);
 
 	public ShowEdgeContourApp(Class<T> imageType, Class<D> derivType) {
 		super(1);
@@ -71,7 +75,7 @@ public class ShowEdgeContourApp<T extends ImageSingleBand, D extends ImageSingle
 		this.derivType = derivType;
 
 		addAlgorithm(0, "Canny", 0);
-		addAlgorithm(0, "Binary Simple", 1);
+		addAlgorithm(0, "Threshold Contour", 1);
 
 		barCanny = new CannyControlBar(1,5);
 		barCanny.setListener(this);
@@ -84,6 +88,9 @@ public class ShowEdgeContourApp<T extends ImageSingleBand, D extends ImageSingle
 		bodyPanel.add(barCanny,BorderLayout.NORTH);
 
 		setMainGUI(bodyPanel);
+
+		previousBlur = barCanny.getBlurRadius();
+		canny =  FactoryEdgeDetectors.canny(previousBlur, true, true, imageType, derivType);
 	}
 
 	public void process( BufferedImage input ) {
@@ -94,6 +101,8 @@ public class ShowEdgeContourApp<T extends ImageSingleBand, D extends ImageSingle
 		// update the binary histogram threshold for this image
 		final double threshold = GImageStatistics.mean(workImage);
 
+		binary.reshape(workImage.width,workImage.height);
+		labeled.reshape(workImage.width,workImage.height);
 
 		final int width = input.getWidth();
 		final int height = input.getHeight();
@@ -142,19 +151,26 @@ public class ShowEdgeContourApp<T extends ImageSingleBand, D extends ImageSingle
 		if( input == null )
 			return;
 
-		DetectEdgeContour<T> contour = declareAlgorithm();
+		final BufferedImage temp;
 
-		contour.process(workImage);
-		List<List<Point2D_I32>> found = contour.getContours();
-
-		final BufferedImage temp = new BufferedImage(input.getWidth(),input.getHeight(),input.getType());
-
-		Random rand = new Random(234);
-		for( List<Point2D_I32> l : found ) {
-			int c = rand.nextInt(0xFFFFFF);
-			for( Point2D_I32 p : l ) {
-				temp.setRGB(p.x,p.y,c);
+		if( activeAlg == 0 ) {
+			if( previousBlur != barCanny.getBlurRadius() ) {
+				previousBlur = barCanny.getBlurRadius();
+				canny =  FactoryEdgeDetectors.canny(previousBlur,true, true, imageType, derivType);
 			}
+
+			double thresh = barCanny.getThreshold()/100.0;
+			canny.process(workImage,(float)thresh*0.1f,(float)thresh,null);
+			List<EdgeContour> contours = canny.getContours();
+
+			temp = VisualizeBinaryData.renderContours(contours,null,workImage.width,workImage.height,null);
+		} else {
+			// create a binary image by thresholding
+			GThresholdImageOps.threshold(workImage, binary, barBinary.getThreshold(), barBinary.isDown());
+
+			contour.process(binary,labeled);
+			temp = VisualizeBinaryData.renderContours(contour.getContours().toList(),null,0xFF1010,
+					workImage.width,workImage.height,null);
 		}
 
 		SwingUtilities.invokeLater(new Runnable() {
@@ -164,17 +180,6 @@ public class ShowEdgeContourApp<T extends ImageSingleBand, D extends ImageSingle
 			}});
 	}
 
-	private DetectEdgeContour<T> declareAlgorithm(){
-		switch( activeAlg ) {
-			case 0:
-				return createCanny();
-
-			case 1:
-				return FactoryDetectEdgeContour.binarySimple(barBinary.getThreshold(),barBinary.isDown());
-		}
-
-		throw new RuntimeException("Unknown algorithm");
-	}
 
 	@Override
 	public void changeInput(String name, int index) {
@@ -188,14 +193,6 @@ public class ShowEdgeContourApp<T extends ImageSingleBand, D extends ImageSingle
 	@Override
 	public boolean getHasProcessedImage() {
 		return processedImage;
-	}
-
-	private DetectEdgeContour<T> createCanny() {
-		double thresh = barCanny.getThreshold()/100.0;
-		BlurFilter<T> blur = FactoryBlurFilter.gaussian(imageType, -1, barCanny.getBlurRadius());
-		ImageGradient<T,D> gradient = FactoryDerivative.sobel(imageType, derivType);
-
-		return new CannyEdgeContourDynamic<T,D>(blur,gradient,(float)thresh*0.1f,(float)thresh);
 	}
 
 	@Override

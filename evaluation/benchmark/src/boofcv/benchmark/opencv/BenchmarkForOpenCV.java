@@ -18,30 +18,31 @@
 
 package boofcv.benchmark.opencv;
 
-import boofcv.abst.feature.describe.DescribeRegionPoint;
-import boofcv.abst.feature.detect.edge.DetectEdgeContour;
+import boofcv.abst.feature.detdesc.DetectDescribePoint;
 import boofcv.abst.feature.detect.interest.ConfigFastHessian;
 import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
-import boofcv.abst.feature.detect.interest.InterestPointDetector;
 import boofcv.abst.feature.detect.line.DetectLineHoughPolar;
+import boofcv.alg.feature.detect.edge.CannyEdge;
 import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
+import boofcv.alg.filter.binary.GThresholdImageOps;
+import boofcv.alg.filter.binary.LinearContourLabelChang2004;
 import boofcv.alg.filter.blur.GBlurImageOps;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.core.image.border.BorderType;
-import boofcv.factory.feature.describe.FactoryDescribeRegionPoint;
-import boofcv.factory.feature.detect.edge.FactoryDetectEdgeContour;
+import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
+import boofcv.factory.feature.detect.edge.FactoryEdgeDetectors;
 import boofcv.factory.feature.detect.interest.FactoryDetectPoint;
-import boofcv.factory.feature.detect.interest.FactoryInterestPoint;
 import boofcv.factory.feature.detect.line.FactoryDetectLineAlgs;
 import boofcv.io.image.UtilImageIO;
 import boofcv.misc.PerformerBase;
 import boofcv.misc.ProfileOperation;
 import boofcv.struct.feature.SurfFeature;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageSInt32;
 import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageUInt8;
 import georegression.struct.line.LineParametric2D_F32;
-import georegression.struct.point.Point2D_F64;
 
 import java.util.List;
 import java.util.Random;
@@ -128,39 +129,44 @@ public class BenchmarkForOpenCV<T extends ImageSingleBand, D extends ImageSingle
 
 	// Canny has known algorithm issues with its runtime performance.
 	public class Canny extends PerformerBase {
-		DetectEdgeContour<T> detector;
+		CannyEdge<T,D> detector;
+		ImageUInt8 output = new ImageUInt8(input.width,input.height);
 
 		public Canny() {
-			detector = FactoryDetectEdgeContour.canny(5, 50, false, imageType, derivType);
+			detector = FactoryEdgeDetectors.canny(2,false,false, imageType, derivType);
 		}
 
 		@Override
 		public void process() {
-			detector.process(input);
+			detector.process(input,5, 50,output);
+		}
+	}
+
+	public class Contour extends PerformerBase {
+
+		ImageUInt8 binary = new ImageUInt8(input.width,input.height);
+		ImageSInt32 labeled = new ImageSInt32(input.width,input.height);
+
+		LinearContourLabelChang2004 alg = new LinearContourLabelChang2004(8);
+
+		@Override
+		public synchronized void process() {
+			GThresholdImageOps.threshold(input, binary, 75, true);
+			alg.process(binary,labeled);
 		}
 	}
 
 	public class SURF extends PerformerBase {
-		InterestPointDetector<T> detector;
-		DescribeRegionPoint<T, SurfFeature> describer;
+		DetectDescribePoint<T,SurfFeature> detector;
 
 		public SURF() {
-			detector = FactoryInterestPoint.fastHessian(new ConfigFastHessian(20, 2, -1, 1, 9, 4, 4));
-			describer = FactoryDescribeRegionPoint.surfStable(null, imageType);
+			// the fast implementation is closer to OpenCV's SURF implementation for stability
+			detector = FactoryDetectDescribe.surfFast(new ConfigFastHessian(20, 2, -1, 1, 9, 4, 4), null, null, imageType);
 		}
 
 		@Override
 		public void process() {
 			detector.detect(input);
-			describer.setImage(input);
-
-			int N = detector.getNumberOfFeatures();
-			for (int i = 0; i < N; i++) {
-				Point2D_F64 pt = detector.getLocation(i);
-				double scale = detector.getScale(i);
-				describer.process(pt.x, pt.y, 0, scale, null);
-			}
-
 //			System.out.println("Found features: "+N);
 		}
 	}
@@ -173,8 +179,9 @@ public class BenchmarkForOpenCV<T extends ImageSingleBand, D extends ImageSingle
 //		ProfileOperation.printOpsPerSec(new Sobel(), TEST_TIME);
 //		ProfileOperation.printOpsPerSec(new Harris(), TEST_TIME);
 //		ProfileOperation.printOpsPerSec(new Canny(), TEST_TIME);
+		ProfileOperation.printOpsPerSec(new Contour(), TEST_TIME);
 //		ProfileOperation.printOpsPerSec(new HoughLine(), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new SURF(), TEST_TIME);
+//		ProfileOperation.printOpsPerSec(new SURF(), TEST_TIME);
 
 		System.out.println();
 	}
