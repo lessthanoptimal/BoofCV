@@ -62,7 +62,7 @@ public class TestDetectChessSquaresBinary {
 			}
 		}
 		
-		DetectChessSquaresBinary alg = new DetectChessSquaresBinary(4,3,50);
+		DetectChessSquaresBinary alg = new DetectChessSquaresBinary(7,5,50);
 		
 		assertTrue(alg.process(binary));
 		

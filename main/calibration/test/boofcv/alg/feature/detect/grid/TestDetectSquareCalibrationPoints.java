@@ -56,7 +56,7 @@ public class TestDetectSquareCalibrationPoints {
 		// add a bit of noise
 		ImageMiscOps.fillRectangle(binary,1,400,100,25,22);
 
-		DetectSquareCalibrationPoints alg = new DetectSquareCalibrationPoints(100,1.0,3,4);
+		DetectSquareCalibrationPoints alg = new DetectSquareCalibrationPoints(100,1.0,7,5);
 
 		assertTrue(alg.process(binary));
 

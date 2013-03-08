@@ -33,7 +33,7 @@ public class TestFactoryPlanarCalibrationTarget {
 
 	@Test
 	public void gridSquare() {
-		PlanarCalibrationTarget config = FactoryPlanarCalibrationTarget.gridSquare(2, 3, 0.1, 0.2);
+		PlanarCalibrationTarget config = FactoryPlanarCalibrationTarget.gridSquare(3, 5, 0.1, 0.2);
 		List<Point2D_F64> l = config.points;
 
 		assertEquals(4*6,l.size());

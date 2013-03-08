@@ -64,7 +64,7 @@ public class TestAutoThresholdCalibrationGrid {
 
 
 		AutoThresholdCalibrationGrid alg = new AutoThresholdCalibrationGrid(-1);
-		DetectSquareCalibrationPoints detector = new DetectSquareCalibrationPoints(100,1.0,3,4);
+		DetectSquareCalibrationPoints detector = new DetectSquareCalibrationPoints(100,1.0,7,5);
 		assertTrue(alg.process(detector, gray));
 
 		// sanity check threshold

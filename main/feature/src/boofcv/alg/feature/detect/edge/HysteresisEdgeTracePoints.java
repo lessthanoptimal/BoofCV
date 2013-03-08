@@ -87,7 +87,7 @@ public class HysteresisEdgeTracePoints {
 
 			for( int x = 0; x < intensity.width; x++ , indexInten++ ) {
 				// start a search if a pixel is found that's above the threshold
-				if( intensity.data[indexInten] > upper ) {
+				if( intensity.data[indexInten] >= upper ) {
 					trace( x,y,indexInten);
 				}
 			}

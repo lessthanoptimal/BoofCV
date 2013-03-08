@@ -157,7 +157,6 @@ public class DetectChessCalibrationPoints<T extends ImageSingleBand, D extends I
 	 * Forgets any past history and resets the detector
 	 */
 	public void reset() {
-		selectedThreshold = -1;
 	}
 
 	public boolean process(T gray) {
