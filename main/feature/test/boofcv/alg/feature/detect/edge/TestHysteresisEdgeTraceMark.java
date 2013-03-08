@@ -18,18 +18,63 @@
 
 package boofcv.alg.feature.detect.edge;
 
+import boofcv.alg.misc.ImageStatistics;
+import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageSInt8;
+import boofcv.struct.image.ImageUInt8;
+import boofcv.testing.BoofTesting;
 import org.junit.Test;
 
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Peter Abeles
  */
-public class TestHysteresisEdgeTraceMark {
+public class TestHysteresisEdgeTraceMark extends CommonHysteresisEdgeTrace {
 
 	@Test
-	public void stuff() {
-		fail("Implement");
+	public void test0() {
+		standardTest(0);
 	}
 
+	@Test
+	public void test1() {
+		standardTest(1);
+	}
+
+	@Test
+	public void test2() {
+		ImageSInt8 dir = direction(2);
+		ImageUInt8 out = new ImageUInt8(dir.width,dir.height);
+
+		HysteresisEdgeTraceMark alg = new HysteresisEdgeTraceMark();
+
+		alg.process(intensity(2),dir,3,5,out);
+		assertEquals(3, ImageStatistics.sum(out));
+
+		alg.process(intensity(2),dir,2,5,out);
+		assertEquals(4, ImageStatistics.sum(out));
+	}
+
+	@Test
+	public void test3() {
+		standardTest(3);
+	}
+
+	@Test
+	public void test4() {
+		standardTest(4);
+	}
+
+	private void standardTest( int which ) {
+		ImageFloat32 inten = intensity(which);
+		ImageSInt8 dir = direction(which);
+		ImageUInt8 out = new ImageUInt8(inten.width,inten.height);
+
+		HysteresisEdgeTraceMark alg = new HysteresisEdgeTraceMark();
+
+		alg.process(inten,dir,2,5,out);
+
+		BoofTesting.assertEquals(expected(which),out,0);
+	}
 }

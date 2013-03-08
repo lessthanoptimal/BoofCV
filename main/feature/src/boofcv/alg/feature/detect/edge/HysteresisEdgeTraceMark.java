@@ -77,7 +77,7 @@ public class HysteresisEdgeTraceMark {
 
 			for( int x = 0; x < intensity.width; x++ , indexInten++ ) {
 				// start a search if a pixel is found that's above the threshold
-				if( intensity.data[indexInten] > upper ) {
+				if( intensity.data[indexInten] >= upper ) {
 					trace( x,y,indexInten);
 				}
 			}
@@ -90,7 +90,6 @@ public class HysteresisEdgeTraceMark {
 	 */
 	protected void trace( int x , int y , int indexInten ) {
 
-
 		int dx,dy;
 
 		int indexOut = output.getIndex(x,y);
@@ -102,6 +101,8 @@ public class HysteresisEdgeTraceMark {
 			active.set(open.removeTail());
 			indexInten = intensity.getIndex(active.x,active.y);
 			int indexDir = direction.getIndex(active.x,active.y);
+
+			boolean first = true;
 
 			while( true ) {
 				//----- First check along the direction of the edge.  Only need to check 2 points this way
@@ -121,6 +122,7 @@ public class HysteresisEdgeTraceMark {
 				boolean match = false;
 
 				// pixel coordinate of forward and backward point
+				x = active.x; y = active.y;
 				int fx = active.x+dx, fy = active.y+dy;
 				int bx = active.x-dx, by = active.y-dy;
 
@@ -145,29 +147,41 @@ public class HysteresisEdgeTraceMark {
 					}
 				}
 
-				if( !match ) {
-					//--- No matches were found along the edge, so check for more matches using the 8-connect
-					x = active.x;y=active.y;
-					match |= check(x+1,y,false);
-					match |= check(x,y+1,match);
-					match |= check(x-1,y,match);
-					match |= check(x,y-1,match);
-
-					match |= check(x+1,y+1,match);
-					match |= check(x+1,y-1,match);
-					match |= check(x-1,y+1,match);
-					match |= check(x-1,y-1,match);
+				if( first || !match ) {
+					boolean priorMatch = match;
+					// Check local neighbors if its one of the end points, which would be the first point or
+					// any point for which no matches were found
+					match = checkAllNeighbors(x,y,match);
 
 					if( !match )
 						break;
 					else {
+						// if it was the first it's no longer the first
+						first = false;
+
 						// the point at the end was just added and is to be searched in the next iteration
-						indexInten = intensity.getIndex(active.x, active.y);
-						indexDir = direction.getIndex(active.x,active.y);
+						if( !priorMatch ) {
+							indexInten = intensity.getIndex(active.x, active.y);
+							indexDir = direction.getIndex(active.x,active.y);
+						}
 					}
 				}
 			}
 		}
+	}
+
+	private boolean checkAllNeighbors( int x , int y , boolean match ) {
+		match |= check(x+1,y,match);
+		match |= check(x,y+1,match);
+		match |= check(x-1,y,match);
+		match |= check(x,y-1,match);
+
+		match |= check(x+1,y+1,match);
+		match |= check(x+1,y-1,match);
+		match |= check(x-1,y+1,match);
+		match |= check(x-1,y-1,match);
+
+		return match;
 	}
 
 	/**
