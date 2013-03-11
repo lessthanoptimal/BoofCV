@@ -19,6 +19,7 @@
 package boofcv.alg.filter.binary;
 
 import boofcv.alg.filter.binary.impl.CompareToBinaryNaive;
+import boofcv.alg.misc.ImageMiscOps;
 import boofcv.struct.FastQueue;
 import boofcv.struct.image.ImageSInt32;
 import boofcv.struct.image.ImageUInt8;
@@ -30,7 +31,6 @@ import java.util.List;
 import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
@@ -128,9 +128,24 @@ public class TestBinaryImageOps {
 		tests.performTests(7);
 	}
 
+	/**
+	 * Very crude and not exhaustive check of contour
+	 */
 	@Test
 	public void contour() {
-		fail("Implement");
+		ImageUInt8 input = new ImageUInt8(10,12);
+		ImageMiscOps.fillRectangle(input,1,2,3,4,5);
+		input.set(9,11,1);
+
+		ImageSInt32 output = new ImageSInt32(10,12);
+		ImageSInt32 expected = new ImageSInt32(10,12);
+		ImageMiscOps.fillRectangle(expected,1,2,3,4,5);
+		expected.set(9,11,2);
+
+		List<Contour> found = BinaryImageOps.contour(input,4,output);
+
+		assertEquals(2,found.size());
+		BoofTesting.assertEquals(expected,output,0);
 	}
 
 	@Test
@@ -139,11 +154,10 @@ public class TestBinaryImageOps {
 		input.set(0,0,1);
 		input.set(1,1,2);
 		input.set(2,1,3);
-		ImageSInt32 found = input.clone();
 
 		int convert[]={0,2,3,4};
 
-		BinaryImageOps.relabel(found,convert);
+		BinaryImageOps.relabel(input,convert);
 
 		assertEquals(0,input.get(0,1));
 		assertEquals(2,input.get(0,0));
