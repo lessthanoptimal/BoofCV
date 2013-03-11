@@ -38,7 +38,7 @@ import java.util.List;
  *
  * <p>
  * Internally, the input binary image is copied into another image which will have a 1 pixel border of all zeros
- * around it.  This ensures that boundary checks will not need to be done, speeding up the algorithm significantly.
+ * around it.  This ensures that boundary checks will not need to be done, speeding up the algorithm by about 25%.
  * </p>
  *
  * <p>
