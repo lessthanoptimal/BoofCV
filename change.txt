@@ -20,8 +20,13 @@ Version : Alpha 0.14
 - BinaryImageOps
   * Changed API and algorithms used to label blobs and find their contour
   * New algorithm is about 3x faster in all situations.
-- Added new algorithm for binary contour and blob labeling
+- Canny edge has been improved
+  * Can be configured to create a binary image output or a set of contours
+  * Conour pixels are now ordered and returned as a graph
 - Fixed bug in FactoryImageBorder.value()
+- Color Models
+  * Added HSV, YUV
+  * Added new example demonstrating simple color based segmentation
 
 ---------------------------------------------
 Date    : 2013/02/16

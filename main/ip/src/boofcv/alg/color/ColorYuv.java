@@ -26,12 +26,9 @@ import boofcv.struct.image.MultiSpectral;
 /**
  * <p>
  * Color conversion between YUV and RGB.  YUV is color encoding which takes in account a human perception model and
- * is commonly used in various hardware platforms. Y component encodes luma (B&W gray scale) and UV encodes color.
- * Unfortunately there are a ton of different ways to encode YUV amd coefficients can vary depending on the source.
- * </p>
- *
- * <p></p>
- * NOTE: YUV and Y'CbCr are not the same format.
+ * is commonly used in cameras/video with analog signals. Y component encodes luma (B&W gray scale) and UV
+ * encodes color. Unfortunately there are a ton of different ways to encode YUV amd coefficients can vary depending
+ * on the source.  YCbCr is also commonly referred to as YUV, even though it is a different format.
  * </p>
  *
  * <p>
@@ -56,6 +53,15 @@ public class ColorYuv {
 	}
 
 	/**
+	 * Conversion from RGB to YUV using same equations as Intel IPP.
+	 */
+	public static void rgbToYuv( float r , float g , float b , float yuv[] ) {
+		float y = yuv[0] = 0.299f*r + 0.587f*g + 0.114f*b;
+		yuv[1] = 0.492f*(b-y);
+		yuv[2] = 0.877f*(r-y);
+	}
+
+	/**
 	 * Conversion from YUV to RGB using same equations as Intel IPP.
 	 */
 	public static void yuvToRgb( double y , double u , double v , double rgb[] ) {
@@ -64,6 +70,15 @@ public class ColorYuv {
 		rgb[2] = y + 2.032*u;
 	}
 
+
+	/**
+	 * Conversion from YUV to RGB using same equations as Intel IPP.
+	 */
+	public static void yuvToRgb( float y , float u , float v , float rgb[] ) {
+		rgb[0] = y + 1.13983f*v;
+		rgb[1] = y - 0.39465f*u - 0.58060f*v;
+		rgb[2] = y + 2.032f*u;
+	}
 	/**
 	 * Conversion from YUV to RGB using suggested integer approximation.  Y values have a range of 16 to 235.
 	 * U,V have a full range of 0 to 255.
@@ -81,8 +96,8 @@ public class ColorYuv {
 	/**
 	 * Convert a 3-channel {@link MultiSpectral} image from YUV into RGB.
 	 *
-	 * @param rgb RGB encoded image
-	 * @param yuv YUV encoded image
+	 * @param rgb (Input) RGB encoded image
+	 * @param yuv (Output) YUV encoded image
 	 */
 	public static void yuvToRgb_F32( MultiSpectral<ImageFloat32> yuv , MultiSpectral<ImageFloat32> rgb ) {
 
@@ -105,8 +120,8 @@ public class ColorYuv {
 				float u = U.data[indexYuv];
 				float v = V.data[indexYuv];
 
-				R.data[indexRgb] = y + 1.140f*v;
-				G.data[indexRgb] = y - 0.395f*u - 0.581f*v;
+				R.data[indexRgb] = y + 1.13983f*v;
+				G.data[indexRgb] = y - 0.39465f*u - 0.58060f*v;
 				B.data[indexRgb] = y + 2.032f*u;
 			}
 		}
@@ -114,8 +129,9 @@ public class ColorYuv {
 
 	/**
 	 * Convert a 3-channel {@link MultiSpectral} image from RGB into YUV.
-	 * @param rgb RGB encoded image
-	 * @param yuv YUV encoded image
+	 *
+	 * @param rgb (Input) RGB encoded image
+	 * @param yuv (Output) YUV encoded image
 	 */
 	public static void rgbToYuv_F32( MultiSpectral<ImageFloat32> rgb , MultiSpectral<ImageFloat32> yuv ) {
 
@@ -138,7 +154,7 @@ public class ColorYuv {
 				float g = G.data[indexRgb];
 				float b = B.data[indexRgb];
 
-				float y = 0.299f*r + 0.144f*g + 0.557f*b;
+				float y = 0.299f*r + 0.587f*g + 0.114f*b;
 
 				Y.data[indexRgb] = y;
 				U.data[indexRgb] = 0.492f*(b-y);

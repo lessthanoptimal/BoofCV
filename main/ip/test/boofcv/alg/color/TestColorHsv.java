@@ -34,11 +34,13 @@ public class TestColorHsv {
 	public static final double tol = 0.01;
 
 	Random rand = new Random(234);
-	double hsv[] = new double[3];
-	double rgb[] = new double[3];
+	double hsv_F64[] = new double[3];
+	double rgb_F64[] = new double[3];
+	float hsv_F32[] = new float[3];
+	float rgb_F32[] = new float[3];
 
 	@Test
-	public void backAndForth_F64() {
+	public void backAndForth_F64_and_F32() {
 
 		check(0.5, 0.3, 0.2);
 		check(0, 0, 0);
@@ -68,9 +70,16 @@ public class TestColorHsv {
 	}
 
 	private void check( double r , double g , double b ) {
-		ColorHsv.rgbToHsv(r, g, b, hsv);
-		ColorHsv.hsvToRgb(hsv[0], hsv[1], hsv[2], rgb);
-		check(rgb,r,g,b);
+		// Check F64
+		ColorHsv.rgbToHsv(r, g, b, hsv_F64);
+		ColorHsv.hsvToRgb(hsv_F64[0], hsv_F64[1], hsv_F64[2], rgb_F64);
+		check(rgb_F64,r,g,b);
+
+		// Check F32
+		float fr = (float)r, fg = (float)g, fb = (float)b;
+		ColorHsv.rgbToHsv(fr,fg,fb, hsv_F32);
+		ColorHsv.hsvToRgb(hsv_F32[0], hsv_F32[1], hsv_F32[2], rgb_F32);
+		check(rgb_F32,fr,fg,fb);
 	}
 
 
@@ -87,9 +96,9 @@ public class TestColorHsv {
 
 		for( int y = 0; y < rgb.height; y++ ) {
 			for( int x = 0; x < rgb.width; x++ ) {
-				double r = rgb.getBand(0).get(x,y);
-				double g = rgb.getBand(1).get(x,y);
-				double b = rgb.getBand(2).get(x,y);
+				float r = rgb.getBand(0).get(x,y);
+				float g = rgb.getBand(1).get(x,y);
+				float b = rgb.getBand(2).get(x,y);
 
 				assertEquals(r,found.getBand(0).get(x,y),tol);
 				assertEquals(g,found.getBand(1).get(x,y),tol);
@@ -99,6 +108,16 @@ public class TestColorHsv {
 	}
 
 	private static void check( double found[] , double a , double b , double c ) {
+		double tol = TestColorHsv.tol * Math.max(Math.max(a,b),c);
+
+		assertEquals(a,found[0],tol);
+		assertEquals(b,found[1],tol);
+		assertEquals(c,found[2],tol);
+	}
+
+	private static void check( float found[] , float a , float b , float c ) {
+		double tol = TestColorHsv.tol * Math.max(Math.max(a,b),c);
+
 		assertEquals(a,found[0],tol);
 		assertEquals(b,found[1],tol);
 		assertEquals(c,found[2],tol);
