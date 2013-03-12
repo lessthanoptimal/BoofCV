@@ -26,6 +26,7 @@ import org.junit.Test;
 import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
@@ -35,11 +36,14 @@ public class TestColorYuv {
 
 	Random rand = new Random(234);
 
-	double yuv[] = new double[3];
-	double rgb[] = new double[3];
+	double yuv_F64[] = new double[3];
+	double rgb_F64[] = new double[3];
+
+	float yuv_F32[] = new float[3];
+	float rgb_F32[] = new float[3];
 
 	@Test
-	public void backAndForth_F64() {
+	public void backAndForth_F64_and_F32() {
 
 		check(0.5, 0.3, 0.2);
 		check(0, 0, 0);
@@ -69,9 +73,21 @@ public class TestColorYuv {
 	}
 
 	private void check( double r , double g , double b ) {
-		ColorYuv.rgbToYuv(r,g,b, yuv);
-		ColorYuv.yuvToRgb(yuv[0], yuv[1], yuv[2],rgb);
-		check(rgb,r,g,b);
+		// check F64
+		ColorYuv.rgbToYuv(r,g,b, yuv_F64);
+		ColorYuv.yuvToRgb(yuv_F64[0], yuv_F64[1], yuv_F64[2], rgb_F64);
+		check(rgb_F64,r,g,b);
+
+		// Check F32
+		float fr = (float)r, fg = (float)g, fb = (float)b;
+		ColorYuv.rgbToYuv(fr,fg,fb, yuv_F32);
+		ColorYuv.yuvToRgb(yuv_F32[0], yuv_F32[1], yuv_F32[2], rgb_F32);
+		check(rgb_F32,fr,fg,fb);
+	}
+
+	@Test
+	public void backAndForth_U8() {
+		fail("Implement once format is understood");
 	}
 
 	@Test
@@ -82,14 +98,14 @@ public class TestColorYuv {
 
 		GImageMiscOps.fillUniform(rgb, rand, 0, 1);
 
-		ColorHsv.hsvToRgb_F32(rgb,hsv);
-		ColorHsv.rgbToHsv_F32(hsv,found);
+		ColorYuv.yuvToRgb_F32(rgb, hsv);
+		ColorYuv.rgbToYuv_F32(hsv, found);
 
 		for( int y = 0; y < rgb.height; y++ ) {
 			for( int x = 0; x < rgb.width; x++ ) {
-				double r = rgb.getBand(0).get(x,y);
-				double g = rgb.getBand(1).get(x,y);
-				double b = rgb.getBand(2).get(x,y);
+				float r = rgb.getBand(0).get(x,y);
+				float g = rgb.getBand(1).get(x,y);
+				float b = rgb.getBand(2).get(x,y);
 
 				assertEquals(r,found.getBand(0).get(x,y),tol);
 				assertEquals(g,found.getBand(1).get(x,y),tol);
@@ -99,6 +115,16 @@ public class TestColorYuv {
 	}
 
 	private static void check( double found[] , double a , double b , double c ) {
+		double tol = TestColorYuv.tol * Math.max(Math.max(a,b),c);
+
+		assertEquals(a,found[0],tol);
+		assertEquals(b,found[1],tol);
+		assertEquals(c, found[2], tol);
+	}
+
+	private static void check( float found[] , float a , float b , float c ) {
+		double tol = TestColorYuv.tol * Math.max(Math.max(a,b),c);
+
 		assertEquals(a,found[0],tol);
 		assertEquals(b,found[1],tol);
 		assertEquals(c, found[2], tol);

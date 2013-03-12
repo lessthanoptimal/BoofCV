@@ -35,12 +35,32 @@ import boofcv.struct.image.MultiSpectral;
  *
  * @author Peter Abeles
  */
+/*
+ Developer Notes:
+
+
+ The number of comparisons to find min/max can be reduced by one using the following code:
+
+ // Maximum and Minimum values
+ float min,max;
+ if( r > g ) {
+ 	if( r > b ) { max = r; } else { max = b; }
+ 	if( g < b ) { min = g; } else { min = b; }
+ } else {
+ 	if( g > b ) { max = g; } else { max = b; }
+ 	if( r < b ) { min = r; } else { min = b; }
+ }
+
+ This doesn't seem to improve the runtime noticeably and makes the code uglier.
+  */
+
 public class ColorHsv {
 
 	// 60 degrees in radians
 	public static final double d60_F64 = 60.0*Math.PI/180.0;
 	public static final float d60_F32 = (float)d60_F64;
 
+	// 360 degrees in radians
 	public static final double PI2_F64 = 2*Math.PI;
 	public static final float PI2_F32 = (float)PI2_F64;
 
@@ -65,6 +85,55 @@ public class ColorHsv {
 		double p = v * ( 1 - s );
 		double q = v * ( 1 - s * remainder );
 		double t = v * ( 1 - s * ( 1 - remainder ) );
+
+		if( h_int < 1 ) {
+			rgb[0] = v;
+			rgb[1] = t;
+			rgb[2] = p;
+		} else if( h_int < 2 ) {
+			rgb[0] = q;
+			rgb[1] = v;
+			rgb[2] = p;
+		} else if( h_int < 3 ) {
+			rgb[0] = p;
+			rgb[1] = v;
+			rgb[2] = t;
+		} else if( h_int < 4 ) {
+			rgb[0] = p;
+			rgb[1] = q;
+			rgb[2] = v;
+		} else if( h_int < 5 ) {
+			rgb[0] = t;
+			rgb[1] = p;
+			rgb[2] = v;
+		} else {
+			rgb[0] = v;
+			rgb[1] = p;
+			rgb[2] = q;
+		}
+	}
+
+	/**
+	 * Convert HSV color into RGB color
+	 *
+	 * @param h Hue [0,2*PI]
+	 * @param s Saturation [0,1]
+	 * @param v Value
+	 * @param rgb (Output) RGB value
+	 */
+	public static void hsvToRgb( float h , float s , float v , float []rgb ) {
+		if( s == 0 ) {
+			rgb[0] = v;
+			rgb[1] = v;
+			rgb[2] = v;
+			return;
+		}
+		h /= d60_F32;
+		int h_int = (int)h;
+		float remainder = h - h_int;
+		float p = v * ( 1 - s );
+		float q = v * ( 1 - s * remainder );
+		float t = v * ( 1 - s * ( 1 - remainder ) );
 
 		if( h_int < 1 ) {
 			rgb[0] = v;
@@ -129,6 +198,46 @@ public class ColorHsv {
 		h *= d60_F64;
 		if( h < 0 )
 			h += PI2_F64;
+
+		hsv[0] = h;
+	}
+
+	/**
+	 * Convert RGB color into HSV color
+	 *
+	 * @param r red
+	 * @param g green
+	 * @param b blue
+	 * @param hsv (Output) HSV value.
+	 */
+	public static void rgbToHsv( float r , float g , float b , float []hsv ) {
+		// Maximum value
+		float max = r > g ? ( r > b ? r : b) : ( g > b ? g : b );
+		// Minimum value
+		float min = r < g ? ( r < b ? r : b) : ( g < b ? g : b );
+		float delta = max - min;
+
+		hsv[2] = max;
+
+		if( max != 0 )
+			hsv[1] = delta / max;
+		else {
+			hsv[0] = Float.NaN;
+			hsv[1] = 0;
+			return;
+		}
+
+		float h;
+		if( r == max )
+			h = ( g - b ) / delta;
+		else if( g == max )
+			h = 2 + ( b - r ) / delta;
+		else
+			h = 4 + ( r - g ) / delta;
+
+		h *= d60_F32;
+		if( h < 0 )
+			h += PI2_F32;
 
 		hsv[0] = h;
 	}
