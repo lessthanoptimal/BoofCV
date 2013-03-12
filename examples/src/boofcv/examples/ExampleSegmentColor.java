@@ -40,17 +40,16 @@ import java.awt.image.BufferedImage;
  */
 public class ExampleSegmentColor {
 
-
 	/**
-	 * Shows a color window of the image and allows the user to select a pixel, convert it to HSV, print
-	 * the HSV, and call the function below to display similar pixels.
+	 * Shows a color image and allows the user to select a pixel, convert it to HSV, print
+	 * the HSV values, and calls the function below to display similar pixels.
 	 */
 	public static void printClickedColor( final BufferedImage image ) {
 		ImagePanel gui = new ImagePanel(image);
 		gui.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				double[] color = new double[3];
+				float[] color = new float[3];
 				int rgb = image.getRGB(e.getX(),e.getY());
 				ColorHsv.rgbToHsv((rgb >> 16) & 0xFF,(rgb >> 8) & 0xFF , rgb&0xFF,color);
 				System.out.println("h = " + color[0]);
@@ -65,9 +64,10 @@ public class ExampleSegmentColor {
 	}
 
 	/**
-	 * Shows an intensity image based on how close a color is to the specified hue and saturation.  The selected
-	 * color is specified in a way which is independent of intensity.  This can be done easily using HSV, but is
-	 * difficult using RGB color format.
+	 * Selectively displays only pixels which have a similar hue and saturation values to what is provided.
+	 * This is intended to be a simple example of color based segmentation.  Color based segmentation can be done
+	 * in RGB color, but is more problematic.  More robust techniques can use Gaussian
+	 * models.
 	 */
 	public static void showSelectedColor( String name , BufferedImage image , float hue , float saturation ) {
 		MultiSpectral<ImageFloat32> input = ConvertBufferedImage.convertFromMulti(image,null,ImageFloat32.class);

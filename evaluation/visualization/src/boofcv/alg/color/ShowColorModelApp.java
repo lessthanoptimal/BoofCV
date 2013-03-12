@@ -35,11 +35,11 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
 /**
- * Shows the result of different blur operations
+ * Shows individual bands in different color models
  *
  * @author Peter Abeles
  */
-public class ShowColorFormatApp
+public class ShowColorModelApp
 	extends SelectAlgorithmAndInputPanel
 {
 	int active = 0;
@@ -54,7 +54,7 @@ public class ShowColorFormatApp
 	// tells progress monitor the current progress
 	volatile int progress;
 
-	public ShowColorFormatApp() {
+	public ShowColorModelApp() {
 		super(1);
 
 		addAlgorithm(0,"RGB",0);
@@ -206,12 +206,12 @@ public class ShowColorFormatApp
 
 	public static void main(String args[]) {
 
-		ShowColorFormatApp app = new ShowColorFormatApp();
+		ShowColorModelApp app = new ShowColorModelApp();
 
 		java.util.List<PathLabel> inputs = new ArrayList<PathLabel>();
-		inputs.add(new PathLabel("shapes","../data/evaluation/shapes01.png"));
 		inputs.add(new PathLabel("sunflowers","../data/evaluation/sunflowers.png"));
 		inputs.add(new PathLabel("beach","../data/evaluation/scale/beach02.jpg"));
+		inputs.add(new PathLabel("shapes","../data/evaluation/shapes01.png"));
 
 		app.setInputList(inputs);
 
