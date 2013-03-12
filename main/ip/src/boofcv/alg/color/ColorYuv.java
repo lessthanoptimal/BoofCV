@@ -50,7 +50,7 @@ public class ColorYuv {
 	 * Conversion from RGB to YUV using same equations as Intel IPP.
 	 */
 	public static void rgbToYuv( double r , double g , double b , double yuv[] ) {
-		double y = yuv[0] = 0.299*r + 0.144*g + 0.557*b;
+		double y = yuv[0] = 0.299*r + 0.587*g + 0.114*b;
 		yuv[1] = 0.492*(b-y);
 		yuv[2] = 0.877*(r-y);
 	}
@@ -59,8 +59,8 @@ public class ColorYuv {
 	 * Conversion from YUV to RGB using same equations as Intel IPP.
 	 */
 	public static void yuvToRgb( double y , double u , double v , double rgb[] ) {
-		rgb[0] = y + 1.140*v;
-		rgb[1] = y - 0.395*u - 0.581*v;
+		rgb[0] = y + 1.13983*v;
+		rgb[1] = y - 0.39465*u - 0.58060*v;
 		rgb[2] = y + 2.032*u;
 	}
 

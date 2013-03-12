@@ -23,12 +23,15 @@ import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.MultiSpectral;
 
 /**
- * Color conversion between RGB and HSV.  HSV stands for Hue-Saturation-Value and is a color space which
- * "attempt to be more intuitive and perceptually relevant than the cartesian (cube) representation".Unfortunately
- * there are several similar formats whose names are often used interchangeably.
+ * <p>
+ * Color conversion between RGB and HSV color spaces.  HSV stands for Hue-Saturation-Value.  "Hue" has a range of [0,2*PI]
+ * and "Saturation" has a range of [0,1], the two together represent the color.  While "Value" has the same range as the
+ * input pixels and represents how light/dark the color is.
+ * </p>
  *
- * The hue is represented in radians instead of degrees, as is often done.  Input values are assumed to be from 0 to 1
- * when floating point values.
+ * <p>
+ * NOTE: The hue is represented in radians instead of degrees, as is often done.
+ * </p>
  *
  * @author Peter Abeles
  */
@@ -46,8 +49,8 @@ public class ColorHsv {
 	 *
 	 * @param h Hue [0,2*PI]
 	 * @param s Saturation [0,1]
-	 * @param v Value [0,1]
-	 * @param rgb Output RGB value
+	 * @param v Value
+	 * @param rgb (Output) RGB value
 	 */
 	public static void hsvToRgb( double h , double s , double v , double []rgb ) {
 		if( s == 0 ) {
@@ -93,10 +96,10 @@ public class ColorHsv {
 	/**
 	 * Convert RGB color into HSV color
 	 *
-	 * @param r red [0,1]
-	 * @param g green [0,1]
-	 * @param b blue [0,1]
-	 * @param hsv Output HSV.
+	 * @param r red
+	 * @param g green
+	 * @param b blue
+	 * @param hsv (Output) HSV value.
 	 */
 	public static void rgbToHsv( double r , double g , double b , double []hsv ) {
 		// Maximum value
@@ -130,6 +133,12 @@ public class ColorHsv {
 		hsv[0] = h;
 	}
 
+	/**
+	 * Converts an image from HSV into RGB.
+	 *
+	 * @param hsv (Input) Image in HSV format
+	 * @param rgb (Output) Image in RGB format
+	 */
 	public static void hsvToRgb_F32( MultiSpectral<ImageFloat32> hsv , MultiSpectral<ImageFloat32> rgb ) {
 
 		InputSanityCheck.checkSameShape(hsv, rgb);
@@ -187,23 +196,27 @@ public class ColorHsv {
 		}
 	}
 
+	/**
+	 * Converts an image from RGB into HSV.  Pixels must have a value within the range of [0,1].
+	 *
+	 * @param rgb (Input) Image in RGB format
+	 * @param hsv (Output) Image in HSV format
+	 */
 	public static void rgbToHsv_F32( MultiSpectral<ImageFloat32> rgb , MultiSpectral<ImageFloat32> hsv ) {
 
 		InputSanityCheck.checkSameShape(rgb, hsv);
-
-		InputSanityCheck.checkSameShape(hsv, rgb);
-
-		ImageFloat32 H = hsv.getBand(0);
-		ImageFloat32 S = hsv.getBand(1);
-		ImageFloat32 V = hsv.getBand(2);
 
 		ImageFloat32 R = rgb.getBand(0);
 		ImageFloat32 G = rgb.getBand(1);
 		ImageFloat32 B = rgb.getBand(2);
 
+		ImageFloat32 H = hsv.getBand(0);
+		ImageFloat32 S = hsv.getBand(1);
+		ImageFloat32 V = hsv.getBand(2);
+
 		for( int row = 0; row < hsv.height; row++ ) {
-			int indexHsv = hsv.startIndex + row*hsv.stride;
 			int indexRgb = rgb.startIndex + row*rgb.stride;
+			int indexHsv = hsv.startIndex + row*hsv.stride;
 
 			for( int col = 0; col < hsv.width; col++ , indexHsv++ , indexRgb++) {
 
@@ -223,7 +236,7 @@ public class ColorHsv {
 				else {
 					H.data[indexHsv] = Float.NaN;
 					S.data[indexHsv] = 0;
-					return;
+					continue;
 				}
 
 				float h;

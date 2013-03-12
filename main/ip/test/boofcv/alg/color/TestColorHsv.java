@@ -18,7 +18,12 @@
 
 package boofcv.alg.color;
 
+import boofcv.alg.misc.GImageMiscOps;
+import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.MultiSpectral;
 import org.junit.Test;
+
+import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
 
@@ -26,50 +31,74 @@ import static org.junit.Assert.assertEquals;
  * @author Peter Abeles
  */
 public class TestColorHsv {
-	double tol = 1e-5;
+	public static final double tol = 0.01;
 
+	Random rand = new Random(234);
+	double hsv[] = new double[3];
+	double rgb[] = new double[3];
 
 	@Test
 	public void backAndForth_F64() {
-		double hsv[] = new double[3];
-		double rgb[] = new double[3];
 
-		ColorHsv.rgbToHsv(0.5, 0.3, 0.2, hsv);
-		ColorHsv.hsvToRgb(hsv[0],hsv[1],hsv[2],rgb);
-		check(rgb,0.5, 0.3, 0.2);
+		check(0.5, 0.3, 0.2);
+		check(0, 0, 0);
+		check(1, 0, 0);
+		check(0, 1, 0);
+		check(0, 0, 1);
+		check(0.5, 0.5, 0.5);
+		check(0.25, 0.5, 0.75);
+		check(0.8, 0.1, 0.75);
 
-		ColorHsv.rgbToHsv(0, 0, 0, hsv);
-		ColorHsv.hsvToRgb(hsv[0],hsv[1],hsv[2],rgb);
-		check(rgb,0, 0, 0);
+		for( int i = 0; i < 50; i++ ) {
+			double r = rand.nextDouble();
+			double g = rand.nextDouble();
+			double b = rand.nextDouble();
 
-		ColorHsv.rgbToHsv(1, 0, 0, hsv);
-		ColorHsv.hsvToRgb(hsv[0],hsv[1],hsv[2],rgb);
-		check(rgb,1, 0, 0);
+			check(r,g,b);
+		}
 
-		ColorHsv.rgbToHsv(0, 1, 0, hsv);
-		ColorHsv.hsvToRgb(hsv[0],hsv[1],hsv[2],rgb);
-		check(rgb,0, 1, 0);
+		// check other ranges
+		for( int i = 0; i < 50; i++ ) {
+			double r = rand.nextDouble()*255;
+			double g = rand.nextDouble()*255;
+			double b = rand.nextDouble()*255;
 
-		ColorHsv.rgbToHsv(0, 0, 1, hsv);
-		ColorHsv.hsvToRgb(hsv[0],hsv[1],hsv[2],rgb);
-		check(rgb,0, 0, 1);
+			check(r,g,b);
+		}
+	}
 
-		ColorHsv.rgbToHsv(0.5, 0.5, 0.5, hsv);
-		ColorHsv.hsvToRgb(hsv[0],hsv[1],hsv[2],rgb);
-		check(rgb,0.5, 0.5, 0.5);
+	private void check( double r , double g , double b ) {
+		ColorHsv.rgbToHsv(r, g, b, hsv);
+		ColorHsv.hsvToRgb(hsv[0], hsv[1], hsv[2], rgb);
+		check(rgb,r,g,b);
+	}
 
-		ColorHsv.rgbToHsv(0.25, 0.5, 0.75, hsv);
-		ColorHsv.hsvToRgb(hsv[0],hsv[1],hsv[2],rgb);
-		check(rgb,0.25, 0.5, 0.75);
 
-		ColorHsv.rgbToHsv(0.8, 0.1, 0.75, hsv);
-		ColorHsv.hsvToRgb(hsv[0],hsv[1],hsv[2],rgb);
-		check(rgb,0.8, 0.1, 0.75);
+	@Test
+	public void multispectral_F32() {
+		MultiSpectral<ImageFloat32> rgb = new MultiSpectral<ImageFloat32>(ImageFloat32.class,10,15,3);
+		MultiSpectral<ImageFloat32> hsv = new MultiSpectral<ImageFloat32>(ImageFloat32.class,10,15,3);
+		MultiSpectral<ImageFloat32> found = new MultiSpectral<ImageFloat32>(ImageFloat32.class,10,15,3);
+
+		GImageMiscOps.fillUniform(rgb, rand, 0, 1);
+
+		ColorHsv.hsvToRgb_F32(rgb,hsv);
+		ColorHsv.rgbToHsv_F32(hsv, found);
+
+		for( int y = 0; y < rgb.height; y++ ) {
+			for( int x = 0; x < rgb.width; x++ ) {
+				double r = rgb.getBand(0).get(x,y);
+				double g = rgb.getBand(1).get(x,y);
+				double b = rgb.getBand(2).get(x,y);
+
+				assertEquals(r,found.getBand(0).get(x,y),tol);
+				assertEquals(g,found.getBand(1).get(x,y),tol);
+				assertEquals(b,found.getBand(2).get(x,y),tol);
+			}
+		}
 	}
 
 	private static void check( double found[] , double a , double b , double c ) {
-		double tol = 0.01;
-
 		assertEquals(a,found[0],tol);
 		assertEquals(b,found[1],tol);
 		assertEquals(c,found[2],tol);
