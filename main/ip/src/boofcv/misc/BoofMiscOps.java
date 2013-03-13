@@ -23,8 +23,6 @@ import boofcv.struct.image.*;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 
-import java.beans.XMLDecoder;
-import java.beans.XMLEncoder;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -48,7 +46,11 @@ public class BoofMiscOps {
 	
 	public static <T> T loadXML( String fileName ) {
 		XStream xstream = new XStream(new DomDriver());
-		return (T)xstream.fromXML(fileName);
+		try {
+			return (T)xstream.fromXML(new FileReader(fileName));
+		} catch (FileNotFoundException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	public static String toString( Reader r ) {
@@ -69,11 +71,8 @@ public class BoofMiscOps {
 	}
 
 	public static <T> T loadXML( Reader r ) {
-		XMLDecoder decoder = new XMLDecoder(new ByteArrayInputStream(toString(r).getBytes()));
-
-		T ret = (T)decoder.readObject();
-		decoder.close();
-		return ret;
+		XStream xstream = new XStream(new DomDriver());
+		return (T)xstream.fromXML(r);
 	}
 	
 	public static int countNotZero( int a[] , int size ) {
