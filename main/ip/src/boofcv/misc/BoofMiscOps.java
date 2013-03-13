@@ -20,6 +20,8 @@ package boofcv.misc;
 
 import boofcv.struct.ImageRectangle;
 import boofcv.struct.image.*;
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.io.xml.DomDriver;
 
 import java.beans.XMLDecoder;
 import java.beans.XMLEncoder;
@@ -34,29 +36,19 @@ import java.util.List;
  */
 public class BoofMiscOps {
 
-	public static void saveXML( Serializable o , String fileName ) {
-		XMLEncoder encoder = null;
+	public static void saveXML( Object o , String fileName ) {
+		XStream xstream = new XStream(new DomDriver());
+
 		try {
-			encoder = new XMLEncoder(
-					new FileOutputStream(fileName)
-			);
+			xstream.toXML(o,new FileOutputStream(fileName));
 		} catch (FileNotFoundException e) {
 			throw new RuntimeException(e);
 		}
-		encoder.writeObject(o);
-		encoder.close();
 	}
 	
 	public static <T> T loadXML( String fileName ) {
-		try {
-			XMLDecoder decoder = new XMLDecoder(new FileInputStream(fileName));
-		
-			T ret = (T)decoder.readObject();
-			decoder.close();
-			return ret;
-		} catch (FileNotFoundException e) {
-			throw new RuntimeException(e);
-		}
+		XStream xstream = new XStream(new DomDriver());
+		return (T)xstream.fromXML(fileName);
 	}
 
 	public static String toString( Reader r ) {

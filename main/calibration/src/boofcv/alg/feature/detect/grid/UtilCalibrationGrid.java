@@ -23,6 +23,7 @@ import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I32;
 import org.ddogleg.sorting.QuickSort_F64;
+import org.ddogleg.sorting.QuickSort_S32;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,29 +47,19 @@ public class UtilCalibrationGrid {
 		}
 		mean /= (image.width*image.height);
 
-		// find peaks below and above the mean
-		int lowerPeak = -1;
-		int lowerValue = 0;
+		QuickSort_S32 sort = new QuickSort_S32();
+		int indexes[] = new int[ histogram.length ];
 
-		int upperPeak = -1;
-		int upperValue = 0;
+		int lengthUpper = histogram.length-mean;
 
-		for( int i = 0; i < histogram.length; i++ ) {
-			if( i < mean ) {
-				if( histogram[i] > lowerValue ) {
-					lowerValue = histogram[i];
-					lowerPeak = i;
-				}
-			} else {
-				if( histogram[i] > upperValue ) {
-					upperValue = histogram[i];
-					upperPeak = i;
-				}
-			}
-		}
+		sort.sort(histogram,mean,indexes);
+		int lowerMedian = indexes[mean/2];
+		System.arraycopy(histogram,mean,histogram,0,lengthUpper);
+		sort.sort(histogram,lengthUpper,indexes);
+		int upperMedian = indexes[lengthUpper/2]+mean;
 
 		// pick the point which maximizes the separation between the two peaks
-		return (lowerPeak + upperPeak)/2;
+		return (lowerMedian + upperMedian)/2;
 	}
 
 	/**
