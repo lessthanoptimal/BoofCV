@@ -19,6 +19,7 @@
 package boofcv.applet;
 
 import boofcv.io.MediaManager;
+import boofcv.io.VideoCallBack;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.video.VideoMjpegCodec;
 import boofcv.io.wrapper.images.JpegByteImageSequence;
@@ -128,6 +129,11 @@ public class AppletMediaManager implements MediaManager {
 		}
 
 		return null;
+	}
+
+	@Override
+	public <T extends ImageBase> boolean openCamera(String device, int width, int height, VideoCallBack<T> callback) {
+		return false;
 	}
 
 	private ByteArrayInputStream readNetworkData(InputStream streamIn , int fileSize ) throws IOException {
