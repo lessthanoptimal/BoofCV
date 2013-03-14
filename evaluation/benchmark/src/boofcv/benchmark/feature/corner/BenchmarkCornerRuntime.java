@@ -18,6 +18,7 @@
 
 package boofcv.benchmark.feature.corner;
 
+import boofcv.abst.feature.detect.interest.ConfigFast;
 import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
 import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.abst.filter.derivative.ImageHessian;
@@ -109,7 +110,8 @@ public class BenchmarkCornerRuntime {
 	}
 
 	public static GeneralFeatureDetector<?, ?> createFast12() {
-		return FactoryDetectPoint.createFast(windowRadius,9, 30, maxFeatures, imageType);
+		return FactoryDetectPoint.createFast(
+				new ConfigFast(30,9),new ConfigGeneralDetector(maxFeatures,windowRadius,30), imageType);
 	}
 
 	public static GeneralFeatureDetector<?, ?> createHarris() {

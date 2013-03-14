@@ -27,7 +27,7 @@ import boofcv.struct.image.ImageSingleBand;
 /**
  * <p>
  * Generic interface for fast corner detection algorithms. The general idea is that at the points in a circle around
- * the center point should either be above or below the center pixel's intensity value value. With
+ * the center point (see below) should either be above or below the center pixel's intensity value value. With
  * this information candidates corners can be quickly eliminated, see [1].
  * <p/>
  *
@@ -41,6 +41,19 @@ import boofcv.struct.image.ImageSingleBand;
  * <p>
  * After a pixel is flagged as a corner then the the intensity the difference between the average
  * exterior pixel value which is part of the corner and the center pixel value.  See code for details.
+ * </p>
+ *
+ * <p>
+ * Circle of radius 2 pixels is searched around the center point 'x':
+ * <table border="1">
+ * <tr> <td></td> <td></td> <td>12</td><td>13</td><td>14</td> <td></td><td></td> </tr>
+ * <tr> <td></td> <td>11</td> <td></td><td></td><td></td> <td>15</td><td></td> </tr>
+ * <tr> <td>10</td> <td></td></td> <td></td><td></td><td></td> <td></td><td>16</td></tr>
+ * <tr> <td>09</td> <td></td></td> <td></td><td><center>x</center></td><td></td> <td></td><td>01</td></tr>
+ * <tr> <td>08</td> <td></td></td> <td></td><td></td><td></td> <td></td><td>02</td></tr>
+ * <tr> <td></td> <td>07</td> <td></td><td></td><td></td> <td>03</td><td></td> </tr>
+ * <tr> <td></td> <td></td> <td>06</td><td>05</td><td>04</td> <td></td><td></td> </tr>
+ * </table>
  * </p>
  *
  * @see FastHelper

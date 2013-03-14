@@ -18,6 +18,7 @@
 
 package boofcv.benchmark.feature.detect;
 
+import boofcv.abst.feature.detect.interest.ConfigFast;
 import boofcv.abst.feature.detect.interest.ConfigFastHessian;
 import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
 import boofcv.alg.feature.detect.intensity.HessianBlobIntensity;
@@ -54,7 +55,8 @@ public class BenchmarkDetectHelper {
 
 		ConfigGeneralDetector configExtract = new ConfigGeneralDetector(maxFeatures,radius,thresh);
 
-		alg = FactoryDetectPoint.createFast(radius, 9,20, maxFeatures, imageType);
+		alg = FactoryDetectPoint.createFast(
+				new ConfigFast(20,9),new ConfigGeneralDetector(maxFeatures,radius,20),imageType);
 		ret.add(new BenchmarkAlgorithm("Fast", FactoryInterestPoint.wrapPoint(alg, 1, imageType, derivType)));
 		alg = FactoryDetectPoint.createHarris(configExtract, false, derivType);
 		ret.add(new BenchmarkAlgorithm("Harris", FactoryInterestPoint.wrapPoint(alg, 1, imageType, derivType)));
