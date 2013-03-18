@@ -20,6 +20,7 @@ package boofcv.factory.feature.detect.interest;
 
 import boofcv.abst.feature.detect.extract.NonMaxSuppression;
 import boofcv.abst.feature.detect.intensity.*;
+import boofcv.abst.feature.detect.interest.ConfigFast;
 import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
 import boofcv.abst.filter.blur.MedianImageFilter;
 import boofcv.alg.feature.detect.intensity.FastCornerIntensity;
@@ -96,21 +97,26 @@ public class FactoryDetectPoint {
 	/**
 	 * Creates a Fast corner detector.
 	 *
-	 * @param extractRadius   Radius of non-maximum suppression region. Try 1 or 2.
-	 * @param minContinuous   Minimum number of pixels around the circle that are required to be a corner.  Can be 9 to 12
-	 * @param detectThreshold Minimum feature intensity.  Image dependent.  Start tuning at 0 or 1.
-	 * @param maxFeatures     The maximum number of detected features it will return.  Try 300
+	 * @param configFast Configuration for FAST feature detector
+	 * @param configDetector Configuration for feature extractor.
 	 * @param imageType       Type of input image.
 	 * @see FastCornerIntensity
 	 */
+	@SuppressWarnings("UnnecessaryLocalVariable")
 	public static <T extends ImageSingleBand, D extends ImageSingleBand>
-	GeneralFeatureDetector<T, D> createFast(int extractRadius,
-											int minContinuous,
-											int detectThreshold, int maxFeatures, Class<T> imageType) {
-		FastCornerIntensity<T> alg = FactoryIntensityPointAlg.fast(detectThreshold, minContinuous, imageType);
+	GeneralFeatureDetector<T, D> createFast( ConfigFast configFast ,
+											 ConfigGeneralDetector configDetector , Class<T> imageType) {
+
+		if( configFast == null )
+			configFast = new ConfigFast();
+		configFast.checkValidity();
+
+		ConfigGeneralDetector d = configDetector;
+
+		FastCornerIntensity<T> alg = FactoryIntensityPointAlg.fast(configFast.pixelTol, configFast.minContinuous, imageType);
 		GeneralFeatureIntensity<T, D> intensity = new WrapperFastCornerIntensity<T, D>(alg);
 		ConfigGeneralDetector configExtract =
-				new ConfigGeneralDetector(maxFeatures,extractRadius,detectThreshold,0,true,false,true);
+				new ConfigGeneralDetector(d.maxFeatures,d.radius,d.threshold,0,true,false,true);
 		return createGeneral(intensity, configExtract);
 	}
 

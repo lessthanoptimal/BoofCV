@@ -25,6 +25,7 @@ import boofcv.abst.feature.describe.WrapDescribeBrief;
 import boofcv.abst.feature.describe.WrapDescribePixelRegionNCC;
 import boofcv.abst.feature.detdesc.DetectDescribeFusion;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
+import boofcv.abst.feature.detect.interest.ConfigFast;
 import boofcv.abst.feature.detect.interest.ConfigFastHessian;
 import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
 import boofcv.abst.feature.detect.interest.InterestPointDetector;
@@ -237,24 +238,21 @@ public class FactoryPointTracker {
 	 * @see DescribePointBrief
 	 * @see boofcv.abst.feature.tracker.DdaManagerDetectDescribePoint
 	 *
-	 * @param maxFeatures         Maximum number of features it will track.
+	 * @param configFast Configuration for FAST detector
+	 * @param configExtract Configuration for extracting features
 	 * @param maxAssociationError Maximum allowed association error.  Try 200.
-	 * @param extractRadius How close together two features can be.  Try 2
-	 * @param minContinuous       Minimum number of pixels in a row for a circle to be declared a corner.  9 to 12
-	 * @param detectThreshold     Tolerance for detecting corner features.  Tune. Try 15.
 	 * @param imageType           Type of image being processed.
 	 */
 	public static <I extends ImageSingleBand, D extends ImageSingleBand>
-	PointTracker<I> dda_FAST_BRIEF(int maxFeatures, int maxAssociationError,
-										int extractRadius,
-										int minContinuous,
-										int detectThreshold,
-										Class<I> imageType )
+	PointTracker<I> dda_FAST_BRIEF(ConfigFast configFast,
+								   ConfigGeneralDetector configExtract,
+								   int maxAssociationError,
+								   Class<I> imageType )
 	{
 		DescribePointBrief<I> brief = FactoryDescribePointAlgs.brief(FactoryBriefDefinition.gaussian2(new Random(123), 16, 512),
 				FactoryBlurFilter.gaussian(imageType, 0, 4));
 
-		GeneralFeatureDetector<I,D> corner = FactoryDetectPoint.createFast(extractRadius, minContinuous, detectThreshold, maxFeatures, imageType);
+		GeneralFeatureDetector<I,D> corner = FactoryDetectPoint.createFast(configFast, configExtract, imageType);
 		EasyGeneralFeatureDetector<I,D> easy = new EasyGeneralFeatureDetector<I, D>(corner,imageType,null);
 
 		ScoreAssociateHamming_B score = new ScoreAssociateHamming_B();

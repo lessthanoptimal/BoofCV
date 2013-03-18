@@ -26,7 +26,7 @@ package boofcv.misc;
 public class DiscretizedCircle {
 
 	/**
-	 * Computes the offsets for a discretized circle of the specfied radius for an
+	 * Computes the offsets for a discretized circle of the specified radius for an
 	 * image with the specified width.
 	 *
 	 * @param radius   The radius of the circle in pixels.

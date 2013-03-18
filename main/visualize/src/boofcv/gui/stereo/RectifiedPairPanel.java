@@ -39,6 +39,7 @@ public class RectifiedPairPanel extends JPanel implements MouseListener {
 
 	// where the red line is drawn
 	int mouseY = -10;
+	int mouseX;
 
 	// if true it will scale the images to fit the display
 	boolean scaleToWindow;
@@ -70,13 +71,14 @@ public class RectifiedPairPanel extends JPanel implements MouseListener {
 		if( image1 == null || image2 == null )
 			return;
 
+		double scale = 1;
 		if( scaleToWindow ) {
 			int h = Math.max(image1.getHeight(),image2.getHeight());
 			int w = image1.getWidth() + image2.getWidth();
 
 			double scaleX = getWidth()/(double)w;
 			double scaleY = getHeight()/(double)h;
-			double scale = Math.min(scaleX,scaleY);
+			scale = Math.min(scaleX,scaleY);
 			if( scale > 1 ) scale = 1;
 
 			AffineTransform orig = g2.getTransform();
@@ -91,6 +93,17 @@ public class RectifiedPairPanel extends JPanel implements MouseListener {
 			g2.drawImage(image2,image1.getWidth(),0,null);
 		}
 
+		// draw a vertical line to make it easy to see how
+		if( mouseY >= 0 ) {
+			int x = mouseX >= image1.getWidth() ? mouseX-image1.getWidth() : mouseX;
+			x *= scale;
+			g2.setStroke(new BasicStroke(1));
+			g2.setColor(Color.RED);
+			g2.drawLine(x,0,x,getHeight());
+			x += image1.getWidth();
+			g2.drawLine(x,0,x,getHeight());
+		}
+
 		g2.setColor(Color.RED);
 		g2.setStroke(new BasicStroke(3));
 
@@ -100,6 +113,7 @@ public class RectifiedPairPanel extends JPanel implements MouseListener {
 	@Override
 	public void mouseClicked(MouseEvent e) {
 		mouseY = e.getY();
+		mouseX = e.getX();
 		repaint();
 	}
 

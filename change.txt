@@ -27,6 +27,9 @@ Version : Alpha 0.14
 - Color Models
   * Added HSV, YUV
   * Added new example demonstrating simple color based segmentation
+- XML Serialization
+  * Switched over to using XStream since XMLEncoder is broken in Java 1.7.
+  * XStream also produces easier to read XML
 
 ---------------------------------------------
 Date    : 2013/02/16
