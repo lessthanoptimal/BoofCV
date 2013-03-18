@@ -47,6 +47,11 @@ import static boofcv.factory.feature.disparity.FactoryStereoDisparityAlgs.*;
  * can better results, but is very computationally expensive.
  * </p>
  *
+ * <p>
+ * Dense vs Sparse.  Here dense refers to computing the disparity across the whole image at once.  Sparse refers
+ * to computing the disparity for a single pixel at a time as requested by the user,
+ * </p>
+ *
  * @author Peter Abeles
  */
 @SuppressWarnings("unchecked")
@@ -137,7 +142,7 @@ public class FactoryStereoDisparity {
 
 	/**
 	 * <p>
-	 * Crates algorithms for computing dense disparity images with sub-pixel accuracy.
+	 * Returns an algorithm for computing a dense disparity images with sub-pixel disparity accuracy.
 	 * </p>
 	 *
 	 * <p>
@@ -218,6 +223,21 @@ public class FactoryStereoDisparity {
 		return new WrapDisparitySadRect<T,ImageFloat32>(alg);
 	}
 
+	/**
+	 * WTA algorithms that computes disparity on a sparse per-pixel basis as requested..
+	 *
+	 * @param minDisparity Minimum disparity that it will check. Must be >= 0 and < maxDisparity
+	 * @param maxDisparity Maximum disparity that it will calculate. Must be > 0
+	 * @param regionRadiusX Radius of the rectangular region along x-axis.
+	 * @param regionRadiusY Radius of the rectangular region along y-axis.
+	 * @param maxPerPixelError Maximum allowed error in a region per pixel.  Set to < 0 to disable.
+	 * @param texture Tolerance for how similar optimal region is to other region.  Closer to zero is more tolerant.
+	 *                Try 0.1
+	 * @param subpixelInterpolation
+	 * @param imageType Type of input image.
+	 * @param <T> Image type
+	 * @return Sparse disparity algorithm
+	 */
 	public static <T extends ImageSingleBand> StereoDisparitySparse<T>
 	regionSparseWta( int minDisparity , int maxDisparity,
 					 int regionRadiusX, int regionRadiusY ,
