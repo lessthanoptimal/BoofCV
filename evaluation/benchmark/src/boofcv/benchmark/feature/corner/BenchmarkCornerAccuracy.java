@@ -18,6 +18,7 @@
 
 package boofcv.benchmark.feature.corner;
 
+import boofcv.abst.feature.detect.interest.ConfigFast;
 import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
 import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.alg.filter.derivative.GradientSobel;
@@ -95,7 +96,8 @@ public class BenchmarkCornerAccuracy {
 		// todo try different noise levels
 		int maxFeatures = corners.size() * 2;
 
-		detectCorners("FAST", FactoryDetectPoint.<ImageUInt8, ImageSInt16>createFast(10,9, 11, maxFeatures, ImageUInt8.class));
+		detectCorners("FAST", FactoryDetectPoint.<ImageUInt8, ImageSInt16>createFast(
+				new ConfigFast(11,9),new ConfigGeneralDetector(maxFeatures,10,11), ImageUInt8.class));
 		detectCorners("Harris", FactoryDetectPoint.<ImageUInt8, ImageSInt16>
 				createHarris(new ConfigGeneralDetector(maxFeatures,radius, 0.04f), false, ImageSInt16.class));
 		detectCorners("KitRos", FactoryDetectPoint.<ImageUInt8, ImageSInt16>

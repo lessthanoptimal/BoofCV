@@ -18,6 +18,7 @@
 
 package boofcv.alg.feature.detect.interest;
 
+import boofcv.abst.feature.detect.interest.ConfigFast;
 import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
 import boofcv.alg.feature.detect.ImageCorruptPanel;
 import boofcv.alg.feature.detect.intensity.HessianBlobIntensity;
@@ -76,6 +77,7 @@ public class DetectFeaturePointApp<T extends ImageSingleBand, D extends ImageSin
 
 		alg = FactoryDetectPoint.createHarris(configExtract, false, derivType);
 
+
 		addAlgorithm(0, "Harris", new EasyGeneralFeatureDetector<T,D>(alg,imageType,derivType));
 		alg = FactoryDetectPoint.createHarris(configExtract, true, derivType);
 		addAlgorithm(0, "Harris Weighted", new EasyGeneralFeatureDetector<T,D>(alg,imageType,derivType));
@@ -83,7 +85,8 @@ public class DetectFeaturePointApp<T extends ImageSingleBand, D extends ImageSin
 		addAlgorithm(0, "Shi-Tomasi", new EasyGeneralFeatureDetector<T,D>(alg,imageType,derivType));
 		alg = FactoryDetectPoint.createShiTomasi(configExtract, true, derivType);
 		addAlgorithm(0, "Shi-Tomasi Weighted", new EasyGeneralFeatureDetector<T,D>(alg,imageType,derivType));
-		alg = FactoryDetectPoint.createFast(radius, 9,10,maxFeatures, imageType);
+		alg = FactoryDetectPoint.createFast(
+				new ConfigFast(10,9),new ConfigGeneralDetector(maxFeatures,radius,10), imageType);
 		addAlgorithm(0, "Fast", new EasyGeneralFeatureDetector<T,D>(alg,imageType,derivType));
 		alg = FactoryDetectPoint.createKitRos(configExtract, derivType);
 		addAlgorithm(0, "KitRos", new EasyGeneralFeatureDetector<T,D>(alg,imageType,derivType));

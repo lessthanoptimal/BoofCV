@@ -201,7 +201,7 @@ public class HoughTransformLineFootOfNorm {
 			for( int index = start; index < end; index++ ) {
 				if( binary.data[index] != 0 ) {
 					int x = index-start;
-					parameterize(x,y,derivX.get(x,y),derivY.get(x,y));
+					parameterize(x,y,derivX.unsafe_get(x,y),derivY.unsafe_get(x,y));
 				}
 			}
 		}
@@ -217,7 +217,7 @@ public class HoughTransformLineFootOfNorm {
 			for( int index = start; index < end; index++ ) {
 				if( binary.data[index] != 0 ) {
 					int x = index-start;
-					parameterize(x,y,derivX.get(x,y),derivY.get(x,y));
+					parameterize(x,y,derivX.unsafe_get(x,y),derivY.unsafe_get(x,y));
 				}
 			}
 		}
@@ -233,7 +233,7 @@ public class HoughTransformLineFootOfNorm {
 			for( int index = start; index < end; index++ ) {
 				if( binary.data[index] != 0 ) {
 					int x = index-start;
-					parameterize(x,y,derivX.get(x,y),derivY.get(x,y));
+					parameterize(x,y,derivX.unsafe_get(x,y),derivY.unsafe_get(x,y));
 				}
 			}
 		}

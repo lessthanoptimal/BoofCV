@@ -87,7 +87,7 @@ public class ExampleStereoVisualOdometry {
 			Se3_F64 leftToWorld = visualOdometry.getLeftToWorld();
 			Vector3D_F64 T = leftToWorld.getT();
 
-			System.out.printf("Location %8.2f %8.2f %8.2f      inliers %s\n", T.x, T.y, T.z,countInliers(visualOdometry));
+			System.out.printf("Location %8.2f %8.2f %8.2f      inliers %s\n", T.x, T.y, T.z, inlierPercent(visualOdometry));
 		}
 	}
 
@@ -95,7 +95,7 @@ public class ExampleStereoVisualOdometry {
 	 * If the algorithm implements AccessPointTracks3D, then count the number of inlier features
 	 * and return a string.
 	 */
-	public static String countInliers( StereoVisualOdometry alg ) {
+	public static String inlierPercent(StereoVisualOdometry alg) {
 		if( !(alg instanceof AccessPointTracks3D))
 			return "";
 
@@ -108,6 +108,6 @@ public class ExampleStereoVisualOdometry {
 				count++;
 		}
 
-		return Integer.toString(count);
+		return String.format("%%%5.3f", 100.0 * count / N);
 	}
 }
