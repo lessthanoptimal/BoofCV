@@ -38,8 +38,19 @@ import boofcv.struct.image.ImageUInt8;
  */
 public class BlurImageOps {
 
-
+	/**
+	 * Applies a mean box filter.
+	 *
+	 * @param input Input image.  Not modified.
+	 * @param output (Optional) Storage for output image, Can be null.  Modified.
+	 * @param radius Radius of the box blur function.
+	 * @param storage (Optional) Storage for intermediate results.  Same size as input image.  Can be null.
+	 * @return Output blurred image.
+	 */
 	public static ImageUInt8 mean(ImageUInt8 input, ImageUInt8 output, int radius, ImageUInt8 storage) {
+
+		if( radius <= 0 )
+			throw new IllegalArgumentException("Radius must be > 0");
 
 		output = InputSanityCheck.checkDeclare(input,output);
 		storage = InputSanityCheck.checkDeclare(input,storage);
@@ -50,7 +61,18 @@ public class BlurImageOps {
 		return output;
 	}
 
+	/**
+	 * Applies a median filter.
+	 *
+	 * @param input Input image.  Not modified.
+	 * @param output (Optional) Storage for output image, Can be null.  Modified.
+	 * @param radius Radius of the median blur function.
+	 * @return Output blurred image.
+	 */
 	public static ImageUInt8 median(ImageUInt8 input, ImageUInt8 output, int radius) {
+		if( radius <= 0 )
+			throw new IllegalArgumentException("Radius must be > 0");
+
 		output = InputSanityCheck.checkDeclare(input,output);
 
 		int w = radius*2+1;
@@ -63,6 +85,16 @@ public class BlurImageOps {
 		return output;
 	}
 
+	/**
+	 * Applies Gaussian blur.
+	 *
+	 * @param input Input image.  Not modified.
+	 * @param output (Optional) Storage for output image, Can be null.  Modified.
+	 * @param sigma Gaussian distribution's sigma.  If <= 0 then will be selected based on radius.
+	 * @param radius Radius of the Gaussian blur function. If <= 0 then radius will be determined by sigma.
+	 * @param storage (Optional) Storage for intermediate results.  Same size as input image.  Can be null.
+	 * @return Output blurred image.
+	 */
 	public static ImageUInt8 gaussian(ImageUInt8 input, ImageUInt8 output, double sigma , int radius,
 									  ImageUInt8 storage ) {
 		output = InputSanityCheck.checkDeclare(input,output);
@@ -76,7 +108,19 @@ public class BlurImageOps {
 		return output;
 	}
 
+	/**
+	 * Applies a mean box filter.
+	 *
+	 * @param input Input image.  Not modified.
+	 * @param output (Optional) Storage for output image, Can be null.  Modified.
+	 * @param radius Radius of the box blur function.
+	 * @param storage (Optional) Storage for intermediate results.  Same size as input image.  Can be null.
+	 * @return Output blurred image.
+	 */
 	public static ImageFloat32 mean(ImageFloat32 input, ImageFloat32 output, int radius, ImageFloat32 storage) {
+
+		if( radius <= 0 )
+			throw new IllegalArgumentException("Radius must be > 0");
 
 		output = InputSanityCheck.checkDeclare(input,output);
 		storage = InputSanityCheck.checkDeclare(input,storage);
@@ -87,7 +131,19 @@ public class BlurImageOps {
 		return output;
 	}
 
+	/**
+	 * Applies a median filter.
+	 *
+	 * @param input Input image.  Not modified.
+	 * @param output (Optional) Storage for output image, Can be null.  Modified.
+	 * @param radius Radius of the median blur function.
+	 * @return Output blurred image.
+	 */
 	public static ImageFloat32 median(ImageFloat32 input, ImageFloat32 output, int radius) {
+
+		if( radius <= 0 )
+			throw new IllegalArgumentException("Radius must be > 0");
+
 		output = InputSanityCheck.checkDeclare(input,output);
 
 		ImplMedianSortNaive.process(input,output,radius,null);
@@ -95,6 +151,16 @@ public class BlurImageOps {
 		return output;
 	}
 
+	/**
+	 * Applies Gaussian blur.
+	 *
+	 * @param input Input image.  Not modified.
+	 * @param output (Optional) Storage for output image, Can be null.  Modified.
+	 * @param sigma Gaussian distribution's sigma.  If <= 0 then will be selected based on radius.
+	 * @param radius Radius of the Gaussian blur function. If <= 0 then radius will be determined by sigma.
+	 * @param storage (Optional) Storage for intermediate results.  Same size as input image.  Can be null.
+	 * @return Output blurred image.
+	 */
 	public static ImageFloat32 gaussian(ImageFloat32 input, ImageFloat32 output,
 										double sigma , int radius,
 										ImageFloat32 storage ) {

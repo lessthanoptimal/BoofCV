@@ -23,7 +23,8 @@ import boofcv.struct.image.ImageSingleBand;
 /**
  * <p>
  * Given two rectified images compute the corresponding dense disparity image.  Input images are assumed
- * to be rectified along the x-axis.  Disparity goes from left to right image, e.g. x_right = x_left + disparity.
+ * to be rectified along the x-axis.  Disparity goes from left to right image, thus the x coordinates of pixels
+ * in the left and right images have the following relationship x_right = x_left + disparity, and y_right = y_left..
  * To speed up calculations only a limited range of disparities are considered from minDisparity to maxDisparity.
  * Image borders are not processed and the border size is specified by functions below.
  * </p>
