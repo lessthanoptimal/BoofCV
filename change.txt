@@ -35,6 +35,8 @@ Version : Alpha 0.14
   * Added additional functions to ImagePyramid interface that provide information on how the image is sample and the amount of blur in it
   * There is no separate class for updating image pyramids any more.  The image pyramid takes in the input image
   * Scale-Space pyramids have been moved into the pyramid package instead of having its own
+  * Bug Fix: FeatureLaplacePyramid now looks for local maximum or minimum in searching across scales
+  * Removed GaussianScaleSpace class since it can now be represented using ImageFloatPyramid 
 
 ---------------------------------------------
 Date    : 2013/02/16

@@ -45,62 +45,7 @@ import boofcv.struct.image.ImageSingleBand;
 public class FactoryInterestPointAlgs {
 
 	/**
-	 * Creates a {@link boofcv.alg.feature.detect.interest.FeatureLaplaceScaleSpace} which is uses the Harris corner detector.
-	 *
-	 * @param extractRadius   Size of the feature used to detect the corners. Try 1 or 2.
-	 * @param detectThreshold Minimum corner intensity required.  Image dependent.  Start tuning at 1.
-	 * @param maxFeatures     Max number of features that can be found.
-	 * @param imageType       Type of input image.
-	 * @param derivType       Image derivative type.
-	 * @return CornerLaplaceScaleSpace
-	 */
-	public static <T extends ImageSingleBand, D extends ImageSingleBand>
-	FeatureLaplaceScaleSpace<T, D> harrisLaplace(int extractRadius,
-												 float detectThreshold,
-												 int maxFeatures,
-												 Class<T> imageType,
-												 Class<D> derivType) {
-		GradientCornerIntensity<D> harris = FactoryIntensityPointAlg.harris(extractRadius, 0.04f, false, derivType);
-		GeneralFeatureIntensity<T, D> intensity = new WrapperGradientCornerIntensity<T, D>(harris);
-		NonMaxSuppression extractor =
-				FactoryFeatureExtractor.nonmax(new ConfigExtract(extractRadius, detectThreshold, extractRadius, true));
-		GeneralFeatureDetector<T, D> detector = new GeneralFeatureDetector<T, D>(intensity, extractor);
-		detector.setMaxFeatures(maxFeatures);
-
-		ImageFunctionSparse<T> sparseLaplace = FactoryDerivativeSparse.createLaplacian(imageType, null);
-
-		return new FeatureLaplaceScaleSpace<T, D>(detector, sparseLaplace, 2);
-	}
-
-	/**
-	 * Creates a {@link FeatureLaplaceScaleSpace} which is uses a hessian blob detector.
-	 *
-	 * @param extractRadius   Size of the feature used to detect the corners.
-	 * @param detectThreshold Minimum corner intensity required
-	 * @param maxFeatures     Max number of features that can be found.
-	 * @param imageType       Type of input image.
-	 * @param derivType       Image derivative type.
-	 * @return CornerLaplaceScaleSpace
-	 */
-	public static <T extends ImageSingleBand, D extends ImageSingleBand>
-	FeatureLaplaceScaleSpace<T, D> hessianLaplace(int extractRadius,
-												  float detectThreshold,
-												  int maxFeatures,
-												  Class<T> imageType,
-												  Class<D> derivType) {
-		GeneralFeatureIntensity<T, D> intensity = new WrapperHessianBlobIntensity<T, D>(HessianBlobIntensity.Type.DETERMINANT, derivType);
-		NonMaxSuppression extractor = FactoryFeatureExtractor.nonmax(
-				new ConfigExtract(extractRadius, detectThreshold, extractRadius, true));
-		GeneralFeatureDetector<T, D> detector = new GeneralFeatureDetector<T, D>(intensity, extractor);
-		detector.setMaxFeatures(maxFeatures);
-
-		ImageFunctionSparse<T> sparseLaplace = FactoryDerivativeSparse.createLaplacian(imageType, null);
-
-		return new FeatureLaplaceScaleSpace<T, D>(detector, sparseLaplace, 2);
-	}
-
-	/**
-	 * Creates a {@link boofcv.alg.feature.detect.interest.FeaturePyramid} which is uses a hessian blob detector.
+	 * Creates a {@link FeaturePyramid} which is uses a hessian blob detector.
 	 *
 	 * @param extractRadius   Size of the feature used to detect the corners.
 	 * @param detectThreshold Minimum corner intensity required
@@ -123,11 +68,11 @@ public class FactoryInterestPointAlgs {
 
 		AnyImageDerivative<T, D> deriv = GImageDerivativeOps.createDerivatives(imageType, FactoryImageGenerator.create(derivType));
 
-		return new FeaturePyramid<T, D>(detector, deriv, 0);
+		return new FeaturePyramid<T, D>(detector, deriv, 2);
 	}
 
 	/**
-	 * Creates a {@link FeatureLaplaceScaleSpace} which is uses the Harris corner detector.
+	 * Creates a {@link FeaturePyramid} which is uses the Harris corner detector.
 	 *
 	 * @param extractRadius   Size of the feature used to detect the corners.
 	 * @param detectThreshold Minimum corner intensity required
@@ -151,7 +96,7 @@ public class FactoryInterestPointAlgs {
 
 		AnyImageDerivative<T, D> deriv = GImageDerivativeOps.createDerivatives(imageType, FactoryImageGenerator.create(derivType));
 
-		return new FeaturePyramid<T, D>(detector, deriv, 0);
+		return new FeaturePyramid<T, D>(detector, deriv, 2);
 	}
 
 	/**
@@ -165,11 +110,11 @@ public class FactoryInterestPointAlgs {
 	 * @return CornerLaplaceScaleSpace
 	 */
 	public static <T extends ImageSingleBand, D extends ImageSingleBand>
-	FeatureLaplacePyramid<T, D> hessianLaplacePyramid(int extractRadius,
-													  float detectThreshold,
-													  int maxFeatures,
-													  Class<T> imageType,
-													  Class<D> derivType) {
+	FeatureLaplacePyramid<T, D> hessianLaplace(int extractRadius,
+											   float detectThreshold,
+											   int maxFeatures,
+											   Class<T> imageType,
+											   Class<D> derivType) {
 		GeneralFeatureIntensity<T, D> intensity = new WrapperHessianBlobIntensity<T, D>(HessianBlobIntensity.Type.DETERMINANT, derivType);
 		NonMaxSuppression extractor = FactoryFeatureExtractor.nonmax(
 				new ConfigExtract(extractRadius, detectThreshold, extractRadius, true));
@@ -180,11 +125,11 @@ public class FactoryInterestPointAlgs {
 
 		ImageFunctionSparse<T> sparseLaplace = FactoryDerivativeSparse.createLaplacian(imageType, null);
 
-		return new FeatureLaplacePyramid<T, D>(detector, sparseLaplace, deriv, 1);
+		return new FeatureLaplacePyramid<T, D>(detector, sparseLaplace, deriv, 2);
 	}
 
 	/**
-	 * Creates a {@link FeatureLaplaceScaleSpace} which is uses the Harris corner detector.
+	 * Creates a {@link FeatureLaplacePyramid} which is uses the Harris corner detector.
 	 *
 	 * @param extractRadius   Size of the feature used to detect the corners.
 	 * @param detectThreshold Minimum corner intensity required
@@ -194,73 +139,22 @@ public class FactoryInterestPointAlgs {
 	 * @return CornerLaplaceScaleSpace
 	 */
 	public static <T extends ImageSingleBand, D extends ImageSingleBand>
-	FeatureLaplacePyramid<T, D> harrisLaplacePyramid(int extractRadius,
-													 float detectThreshold,
-													 int maxFeatures,
-													 Class<T> imageType,
-													 Class<D> derivType) {
-		GradientCornerIntensity<D> harris = FactoryIntensityPointAlg.harris(extractRadius, 0.04f, false, derivType);
-		GeneralFeatureIntensity<T, D> intensity = new WrapperGradientCornerIntensity<T, D>(harris);
-		NonMaxSuppression extractor = FactoryFeatureExtractor.nonmax(
-				new ConfigExtract(extractRadius, detectThreshold, extractRadius, true));
-		GeneralFeatureDetector<T, D> detector = new GeneralFeatureDetector<T, D>(intensity, extractor);
-		detector.setMaxFeatures(maxFeatures);
-
-		AnyImageDerivative<T, D> deriv = GImageDerivativeOps.createDerivatives(imageType, FactoryImageGenerator.create(derivType));
-		ImageFunctionSparse<T> sparseLaplace = FactoryDerivativeSparse.createLaplacian(imageType, null);
-
-		return new FeatureLaplacePyramid<T, D>(detector, sparseLaplace, deriv, 1);
-	}
-
-	/**
-	 * Creates a {@link FeatureLaplaceScaleSpace} which is uses the Harris corner detector.
-	 *
-	 * @param extractRadius   Size of the feature used to detect the corners.
-	 * @param detectThreshold Minimum corner intensity required
-	 * @param maxFeatures     Max number of features that can be found.
-	 * @param imageType       Type of input image.
-	 * @param derivType       Image derivative type.
-	 * @return CornerLaplaceScaleSpace
-	 */
-	public static <T extends ImageSingleBand, D extends ImageSingleBand>
-	FeatureScaleSpace<T, D> harrisScaleSpace(int extractRadius,
-											 float detectThreshold,
-											 int maxFeatures,
-											 Class<T> imageType,
-											 Class<D> derivType) {
-		GradientCornerIntensity<D> harris = FactoryIntensityPointAlg.harris(extractRadius, 0.04f, false, derivType);
-		GeneralFeatureIntensity<T, D> intensity = new WrapperGradientCornerIntensity<T, D>(harris);
-		NonMaxSuppression extractor = FactoryFeatureExtractor.nonmax(
-				new ConfigExtract(extractRadius, detectThreshold, extractRadius, true));
-		GeneralFeatureDetector<T, D> detector = new GeneralFeatureDetector<T, D>(intensity, extractor);
-		detector.setMaxFeatures(maxFeatures);
-
-		return new FeatureScaleSpace<T, D>(detector, 2);
-	}
-
-	/**
-	 * Creates a {@link FeatureLaplaceScaleSpace} which is uses a hessian blob detector.
-	 *
-	 * @param extractRadius   Size of the feature used to detect the corners.
-	 * @param detectThreshold Minimum corner intensity required
-	 * @param maxFeatures     Max number of features that can be found.
-	 * @param imageType       Type of input image.
-	 * @param derivType       Image derivative type.
-	 * @return CornerLaplaceScaleSpace
-	 */
-	public static <T extends ImageSingleBand, D extends ImageSingleBand>
-	FeatureScaleSpace<T, D> hessianScaleSpace(int extractRadius,
+	FeatureLaplacePyramid<T, D> harrisLaplace(int extractRadius,
 											  float detectThreshold,
 											  int maxFeatures,
 											  Class<T> imageType,
 											  Class<D> derivType) {
-		GeneralFeatureIntensity<T, D> intensity = new WrapperHessianBlobIntensity<T, D>(HessianBlobIntensity.Type.DETERMINANT, derivType);
+		GradientCornerIntensity<D> harris = FactoryIntensityPointAlg.harris(extractRadius, 0.04f, false, derivType);
+		GeneralFeatureIntensity<T, D> intensity = new WrapperGradientCornerIntensity<T, D>(harris);
 		NonMaxSuppression extractor = FactoryFeatureExtractor.nonmax(
 				new ConfigExtract(extractRadius, detectThreshold, extractRadius, true));
 		GeneralFeatureDetector<T, D> detector = new GeneralFeatureDetector<T, D>(intensity, extractor);
 		detector.setMaxFeatures(maxFeatures);
 
-		return new FeatureScaleSpace<T, D>(detector, 2);
+		AnyImageDerivative<T, D> deriv = GImageDerivativeOps.createDerivatives(imageType, FactoryImageGenerator.create(derivType));
+		ImageFunctionSparse<T> sparseLaplace = FactoryDerivativeSparse.createLaplacian(imageType, null);
+
+		return new FeatureLaplacePyramid<T, D>(detector, sparseLaplace, deriv, 2);
 	}
 
 	/**

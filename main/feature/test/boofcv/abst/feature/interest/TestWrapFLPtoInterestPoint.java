@@ -37,7 +37,7 @@ public class TestWrapFLPtoInterestPoint extends GeneralInterestPointDetectorChec
 
 	double scales[] = new double[]{1.0,2.0,3.0,4.0};
 
-	FeatureLaplacePyramid flp = FactoryInterestPointAlgs.hessianLaplacePyramid(3, 1, 200, imageType, derivType);
+	FeatureLaplacePyramid flp = FactoryInterestPointAlgs.hessianLaplace(3, 1, 200, imageType, derivType);
 	PyramidFloat ss = FactoryGaussianScaleSpace.scaleSpacePyramid(scales,imageType);
 
 	public TestWrapFLPtoInterestPoint() {

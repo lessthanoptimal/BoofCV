@@ -21,6 +21,7 @@ package boofcv.alg.feature.detect.interest;
 import boofcv.abst.feature.detect.extract.NonMaxSuppression;
 import boofcv.abst.feature.detect.intensity.GeneralFeatureIntensity;
 import boofcv.alg.feature.detect.extract.SelectNBestFeatures;
+import boofcv.alg.misc.ImageStatistics;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
@@ -143,6 +144,9 @@ public class GeneralFeatureDetector<I extends ImageSingleBand, D extends ImageSi
 			extractor.process(intensityImage, null, null,foundMinimum, foundMaximum);
 		}
 
+		System.out.println(" feature intensity image "+ ImageStatistics.max(intensityImage)+"  "+ImageStatistics.mean(intensityImage));
+		System.out.println("  total found "+foundMaximum.size);
+
 		// optionally select the most intense features only
 		selectBest(intensityImage, foundMinimum, numSelectMin, false);
 		selectBest(intensityImage, foundMaximum, numSelectMax, true);
@@ -155,6 +159,8 @@ public class GeneralFeatureDetector<I extends ImageSingleBand, D extends ImageSi
 			QueueCorner best = selectBest.getBestCorners();
 			found.reset();
 			for( int i = 0; i < best.size; i++ ) {
+				Point2D_I16 p = best.get(i);
+				System.out.println("   general "+p.x+" "+p.y+"  intensity = "+intensityImage.get(p.x,p.y));
 				found.grow().set(best.get(i));
 			}
 		}

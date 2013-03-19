@@ -49,17 +49,21 @@ public class DetectFeaturePyramidApp <T extends ImageSingleBand, D extends Image
 	ScaleSpacePyramidPointPanel panel;
 	boolean hasImage = false;
 
-	public DetectFeaturePyramidApp( Class<T> imageType , Class<D> derivType ) {
+	public DetectFeaturePyramidApp( Class<T> imageType , Class<D> derivType , boolean createPyramid) {
 		super(1);
 		this.imageType = imageType;
 
 		int r = 2;
-		addAlgorithm(0, "Hessian Laplace", FactoryInterestPointAlgs.hessianLaplacePyramid(r, 1f, NUM_FEATURES, imageType, derivType));
-		addAlgorithm(0, "Harris Laplace", FactoryInterestPointAlgs.harrisLaplacePyramid(r, 1f, NUM_FEATURES, imageType, derivType));
+		addAlgorithm(0, "Hessian Laplace", FactoryInterestPointAlgs.hessianLaplace(r, 1f, NUM_FEATURES, imageType, derivType));
+		addAlgorithm(0, "Harris Laplace", FactoryInterestPointAlgs.harrisLaplace(r, 0.5f, NUM_FEATURES, imageType, derivType));
 		addAlgorithm(0, "Hessian", FactoryInterestPointAlgs.hessianPyramid(r, 1, NUM_FEATURES, imageType, derivType));
-		addAlgorithm(0, "Harris", FactoryInterestPointAlgs.harrisPyramid(r, 1, NUM_FEATURES, imageType, derivType));
+		addAlgorithm(0, "Harris", FactoryInterestPointAlgs.harrisPyramid(r, 0.5f, NUM_FEATURES, imageType, derivType));
 
-		ss = FactoryGaussianScaleSpace.scaleSpacePyramid(new double[]{1,1.5,2,3,4,8,12,16,24},imageType);
+		double scales[] = new double[]{1,1.5,2,3,4,8,12,16,24};
+		if( createPyramid )
+			ss = FactoryGaussianScaleSpace.scaleSpacePyramid(scales,imageType);
+		else
+			ss = FactoryGaussianScaleSpace.scaleSpace(scales,imageType);
 
 		panel = new ScaleSpacePyramidPointPanel(ss, BoofDefaults.SCALE_SPACE_CANONICAL_RADIUS);
 
@@ -110,7 +114,9 @@ public class DetectFeaturePyramidApp <T extends ImageSingleBand, D extends Image
 	}
 
 	public static void main( String args[] ) {
-		DetectFeaturePyramidApp app = new DetectFeaturePyramidApp(ImageFloat32.class,ImageFloat32.class);
+		boolean createPyramid = false;
+
+		DetectFeaturePyramidApp app = new DetectFeaturePyramidApp(ImageFloat32.class,ImageFloat32.class,createPyramid);
 
 		java.util.List<PathLabel> inputs = new ArrayList<PathLabel>();
 

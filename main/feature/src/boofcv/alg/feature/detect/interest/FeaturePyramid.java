@@ -32,13 +32,7 @@ import georegression.struct.point.Point2D_I16;
 import java.util.ArrayList;
 import java.util.List;
 
-import static boofcv.alg.feature.detect.interest.FeatureScaleSpace.checkMax;
-
 /**
- * <p>
- * Pyramidal implementation of {@link FeatureScaleSpace}.
- * </p>
- * <p/>
  * <p>
  * Detects scale invariant interest/corner points by computing the feature intensities across a pyramid of different scales.
  * Features which are maximums with in a local 2D neighborhood and within the local scale neighbourhood are declared to
@@ -119,7 +113,7 @@ public class FeaturePyramid<T extends ImageSingleBand, D extends ImageSingleBand
 
 		// compute feature intensity in each level
 		for (int i = 0; i < ss.getNumLayers(); i++) {
-			detectCandidateFeatures(ss.getLayer(i), ss.scale[i]);
+			detectCandidateFeatures(ss.getLayer(i), ss.getSigma(i));
 
 			// find maximum in NxNx3 (local image and scale space) region
 			if (i >= 2) {
@@ -132,9 +126,9 @@ public class FeaturePyramid<T extends ImageSingleBand, D extends ImageSingleBand
 	/**
 	 * Use the feature detector to find candidate features in each level.  Only compute the needed image derivatives.
 	 */
-	private void detectCandidateFeatures(T image, double scale) {
+	private void detectCandidateFeatures(T image, double sigma) {
 		// adjust corner intensity threshold based upon the current scale factor
-		float scaleThreshold = (float) (baseThreshold / Math.pow(scale, scalePower));
+		float scaleThreshold = (float) (baseThreshold / Math.pow(sigma, scalePower));
 		detector.setThreshold(scaleThreshold);
 		computeDerivative.setInput(image);
 
@@ -185,9 +179,14 @@ public class FeaturePyramid<T extends ImageSingleBand, D extends ImageSingleBand
 		float scale1 = (float) ss.scale[layerID];
 		float scale2 = (float) ss.scale[layerID + 1];
 
-		float ss0 = (float) Math.pow(scale0, scalePower);
-		float ss1 = (float) Math.pow(scale1, scalePower);
-		float ss2 = (float) Math.pow(scale2, scalePower);
+		float sigma0 = (float) ss.getSigma(layerID - 1);
+		float sigma1 = (float) ss.getSigma(layerID);
+		float sigma2 = (float) ss.getSigma(layerID + 1);
+
+		// not sure if this is the correct way to handle the change in scale
+		float ss0 = (float) (Math.pow(sigma0, scalePower)/scale0);
+		float ss1 = (float) (Math.pow(sigma1, scalePower)/scale1);
+		float ss2 = (float) (Math.pow(sigma2, scalePower)/scale2);
 
 		for (Point2D_I16 c : candidates) {
 			float val = ss1 * inten1.get(c.x, c.y);
@@ -201,9 +200,24 @@ public class FeaturePyramid<T extends ImageSingleBand, D extends ImageSingleBand
 
 			if (checkMax(inten0, val / ss0, x0, y0) && checkMax(inten2, val / ss2, x2, y2)) {
 				// put features into the scale of the upper image
-				foundPoints.add(new ScalePoint(c.x * scale1, c.y * scale1, scale1));
+				foundPoints.add(new ScalePoint(c.x * scale1, c.y * scale1, sigma1));
 			}
 		}
+	}
+
+	protected static boolean checkMax(ImageBorder_F32 inten, float bestScore, int c_x, int c_y) {
+		boolean isMax = true;
+		beginLoop:
+		for (int i = c_y - 1; i <= c_y + 1; i++) {
+			for (int j = c_x - 1; j <= c_x + 1; j++) {
+
+				if (inten.get(j, i) >= bestScore) {
+					isMax = false;
+					break beginLoop;
+				}
+			}
+		}
+		return isMax;
 	}
 
 	@Override
