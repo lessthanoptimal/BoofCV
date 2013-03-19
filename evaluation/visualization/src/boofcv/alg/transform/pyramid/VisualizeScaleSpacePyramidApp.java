@@ -19,7 +19,7 @@
 package boofcv.alg.transform.pyramid;
 
 import boofcv.core.image.ConvertBufferedImage;
-import boofcv.factory.transform.pyramid.FactoryGaussianScaleSpace;
+import boofcv.factory.transform.pyramid.FactoryPyramid;
 import boofcv.gui.image.ImagePyramidPanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.image.UtilImageIO;
@@ -41,7 +41,7 @@ public class VisualizeScaleSpacePyramidApp {
 
 		BufferedImage buffered = UtilImageIO.loadImage("../data/evaluation/standard/boat.png");
 
-		PyramidFloat<ImageFloat32> pyramid = FactoryGaussianScaleSpace.scaleSpacePyramid(scales,ImageFloat32.class);
+		PyramidFloat<ImageFloat32> pyramid = FactoryPyramid.scaleSpacePyramid(scales, ImageFloat32.class);
 
 		ImageFloat32 input = ConvertBufferedImage.convertFrom(buffered,(ImageFloat32)null);
 

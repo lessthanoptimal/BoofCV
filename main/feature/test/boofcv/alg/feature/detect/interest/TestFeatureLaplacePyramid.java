@@ -23,7 +23,7 @@ import boofcv.abst.filter.derivative.AnyImageDerivative;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.core.image.inst.FactoryImageGenerator;
 import boofcv.factory.filter.derivative.FactoryDerivativeSparse;
-import boofcv.factory.transform.pyramid.FactoryGaussianScaleSpace;
+import boofcv.factory.transform.pyramid.FactoryPyramid;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.pyramid.PyramidFloat;
 
@@ -52,7 +52,7 @@ public class TestFeatureLaplacePyramid extends GenericFeatureScaleDetector {
 	@Override
 	protected int detectFeature(ImageFloat32 input, Object detector) {
 
-		PyramidFloat<ImageFloat32> ss = FactoryGaussianScaleSpace.scaleSpacePyramid(new double[]{1,2,4,8},ImageFloat32.class);
+		PyramidFloat<ImageFloat32> ss = FactoryPyramid.scaleSpacePyramid(new double[]{1, 2, 4, 8}, ImageFloat32.class);
 		ss.process(input);
 
 		FeatureLaplacePyramid<ImageFloat32, ImageFloat32> alg = (FeatureLaplacePyramid<ImageFloat32, ImageFloat32>) detector;

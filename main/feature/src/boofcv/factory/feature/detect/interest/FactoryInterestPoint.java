@@ -25,7 +25,7 @@ import boofcv.abst.filter.derivative.ImageHessian;
 import boofcv.alg.feature.detect.interest.*;
 import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
 import boofcv.factory.filter.derivative.FactoryDerivative;
-import boofcv.factory.transform.pyramid.FactoryGaussianScaleSpace;
+import boofcv.factory.transform.pyramid.FactoryPyramid;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.pyramid.PyramidFloat;
@@ -86,9 +86,9 @@ public class FactoryInterestPoint {
 		PyramidFloat<T> ss;
 
 		if( pyramid )
-			ss = FactoryGaussianScaleSpace.scaleSpacePyramid(scales,inputType);
+			ss = FactoryPyramid.scaleSpacePyramid(scales, inputType);
 		else
-			ss = FactoryGaussianScaleSpace.scaleSpace(scales, inputType);
+			ss = FactoryPyramid.scaleSpace(scales, inputType);
 
 		return new WrapFLPtoInterestPoint<T, D>(feature, ss);
 	}
@@ -110,9 +110,9 @@ public class FactoryInterestPoint {
 		PyramidFloat<T> ss;
 
 		if( pyramid )
-			ss = FactoryGaussianScaleSpace.scaleSpacePyramid(scales,inputType);
+			ss = FactoryPyramid.scaleSpacePyramid(scales, inputType);
 		else
-			ss = FactoryGaussianScaleSpace.scaleSpace(scales,inputType);
+			ss = FactoryPyramid.scaleSpace(scales, inputType);
 
 		return new WrapFPtoInterestPoint<T, D>(feature, ss);
 	}
