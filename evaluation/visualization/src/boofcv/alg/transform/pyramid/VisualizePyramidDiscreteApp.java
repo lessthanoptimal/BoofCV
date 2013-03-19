@@ -28,7 +28,6 @@ import boofcv.io.PathLabel;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.pyramid.PyramidDiscrete;
-import boofcv.struct.pyramid.PyramidUpdaterDiscrete;
 
 import javax.swing.*;
 import java.awt.image.BufferedImage;
@@ -47,7 +46,6 @@ public class VisualizePyramidDiscreteApp <T extends ImageSingleBand>
 
 	Class<T> imageType;
 	DiscretePyramidPanel gui = new DiscretePyramidPanel();
-	PyramidUpdaterDiscrete<T> updater;
 	PyramidDiscrete<T> pyramid;
 
 	boolean processedImage = false;
@@ -55,8 +53,7 @@ public class VisualizePyramidDiscreteApp <T extends ImageSingleBand>
 	public VisualizePyramidDiscreteApp(Class<T> imageType) {
 		this.imageType = imageType;
 
-		pyramid = new PyramidDiscrete<T>(imageType,true,scales);
-		updater = FactoryPyramid.discreteGaussian(imageType,-1,2);
+		pyramid = FactoryPyramid.discreteGaussian(scales,-1,2,true,imageType);
 		gui = new DiscretePyramidPanel();
 
 		setMainGUI(gui);
@@ -67,7 +64,7 @@ public class VisualizePyramidDiscreteApp <T extends ImageSingleBand>
 		final T gray = ConvertBufferedImage.convertFromSingle(input, null, imageType);
 
 		// update the pyramid
-		updater.update(gray,pyramid);
+		pyramid.process(gray);
 
 		// render the pyramid
 		SwingUtilities.invokeLater(new Runnable() {

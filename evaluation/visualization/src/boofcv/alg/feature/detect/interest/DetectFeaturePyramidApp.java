@@ -19,9 +19,9 @@
 package boofcv.alg.feature.detect.interest;
 
 import boofcv.abst.feature.detect.interest.InterestPointScaleSpacePyramid;
-import boofcv.alg.transform.gss.ScaleSpacePyramid;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.factory.feature.detect.interest.FactoryInterestPointAlgs;
+import boofcv.factory.transform.pyramid.FactoryGaussianScaleSpace;
 import boofcv.gui.SelectAlgorithmAndInputPanel;
 import boofcv.gui.feature.ScaleSpacePyramidPointPanel;
 import boofcv.gui.image.ShowImages;
@@ -29,6 +29,7 @@ import boofcv.io.PathLabel;
 import boofcv.struct.BoofDefaults;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.pyramid.PyramidFloat;
 
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
@@ -43,7 +44,7 @@ public class DetectFeaturePyramidApp <T extends ImageSingleBand, D extends Image
 {
 	static int NUM_FEATURES = 100;
 
-	ScaleSpacePyramid<T> ss;
+	PyramidFloat<T> ss;
 	Class<T> imageType;
 	ScaleSpacePyramidPointPanel panel;
 	boolean hasImage = false;
@@ -58,7 +59,7 @@ public class DetectFeaturePyramidApp <T extends ImageSingleBand, D extends Image
 		addAlgorithm(0, "Hessian", FactoryInterestPointAlgs.hessianPyramid(r, 1, NUM_FEATURES, imageType, derivType));
 		addAlgorithm(0, "Harris", FactoryInterestPointAlgs.harrisPyramid(r, 1, NUM_FEATURES, imageType, derivType));
 
-		ss = new ScaleSpacePyramid<T>(imageType,1,1.5,2,3,4,8,12,16,24);
+		ss = FactoryGaussianScaleSpace.scaleSpacePyramid(new double[]{1,1.5,2,3,4,8,12,16,24},imageType);
 
 		panel = new ScaleSpacePyramidPointPanel(ss, BoofDefaults.SCALE_SPACE_CANONICAL_RADIUS);
 
@@ -68,7 +69,7 @@ public class DetectFeaturePyramidApp <T extends ImageSingleBand, D extends Image
 	public synchronized void process( BufferedImage input ) {
 		setInputImage(input);
 		T workImage = ConvertBufferedImage.convertFromSingle(input, null, imageType);
-		ss.setImage(workImage);
+		ss.process(workImage);
 		panel.setBackground(input);
 		hasImage = true;
 		doRefreshAll();

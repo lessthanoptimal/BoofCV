@@ -24,11 +24,11 @@ import boofcv.alg.distort.DistortImageOps;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.alg.interpolate.TypeInterpolate;
 import boofcv.alg.misc.ImageStatistics;
-import boofcv.alg.transform.gss.ScaleSpacePyramid;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.core.image.inst.FactoryImageGenerator;
 import boofcv.factory.feature.detect.intensity.FactoryIntensityPointAlg;
 import boofcv.factory.filter.blur.FactoryBlurFilter;
+import boofcv.factory.transform.pyramid.FactoryGaussianScaleSpace;
 import boofcv.gui.ListDisplayPanel;
 import boofcv.gui.SelectAlgorithmAndInputPanel;
 import boofcv.gui.image.ShowImages;
@@ -36,6 +36,7 @@ import boofcv.gui.image.VisualizeImageData;
 import boofcv.io.PathLabel;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.pyramid.PyramidFloat;
 
 import javax.swing.*;
 import java.awt.*;
@@ -43,7 +44,7 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
 /**
- * Displays the intensity in each layer of a {@link ScaleSpacePyramid}.
+ * Displays the intensity in each layer of a {@link PyramidFloat}.
  *
  * @author Peter Abeles
  */
@@ -52,7 +53,7 @@ public class IntensityFeatureScaleSpacePyramidApp<T extends ImageSingleBand, D e
 {
 	ListDisplayPanel gui = new ListDisplayPanel();
 
-	ScaleSpacePyramid<T> pyramid;
+	PyramidFloat<T> pyramid;
 
 	BufferedImage input;
 	T workImage;
@@ -79,7 +80,7 @@ public class IntensityFeatureScaleSpacePyramidApp<T extends ImageSingleBand, D e
 		for( int i = 0; i < scales.length ; i++ ) {
 			scales[i] =  Math.exp(i*0.15);
 		}
-		pyramid = new ScaleSpacePyramid<T>(imageType,scales);
+		pyramid = FactoryGaussianScaleSpace.scaleSpacePyramid(scales,imageType);
 
 		anyDerivative = GImageDerivativeOps.createDerivatives(imageType, FactoryImageGenerator.create(derivType));
 	}
@@ -135,7 +136,7 @@ public class IntensityFeatureScaleSpacePyramidApp<T extends ImageSingleBand, D e
 		this.input = input;
 		workImage = ConvertBufferedImage.convertFromSingle(input, null, imageType);
 		scaledIntensity = new ImageFloat32(workImage.width,workImage.height);
-		pyramid.setImage(workImage);
+		pyramid.process(workImage);
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				setPreferredSize(new Dimension(input.getWidth(),input.getHeight()));

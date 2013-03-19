@@ -282,7 +282,7 @@ public class VisualizeStereoVisualOdometryApp <I extends ImageSingleBand>
 		if( whichAlg == 0 ) {
 			PkltConfig config = PkltConfig.createDefault(imageType, derivType);
 			config.pyramidScaling = new int[]{1,2,4,8};
-			config.featureRadius = 3;
+			config.templateRadius = 3;
 			config.typeInput = imageType;
 			config.typeDeriv = derivType;
 			ConfigGeneralDetector configDetector = new ConfigGeneralDetector(600,3,1);

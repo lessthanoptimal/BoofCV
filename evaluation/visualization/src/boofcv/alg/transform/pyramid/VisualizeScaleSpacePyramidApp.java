@@ -16,13 +16,15 @@
  * limitations under the License.
  */
 
-package boofcv.alg.transform.gss;
+package boofcv.alg.transform.pyramid;
 
 import boofcv.core.image.ConvertBufferedImage;
+import boofcv.factory.transform.pyramid.FactoryGaussianScaleSpace;
 import boofcv.gui.image.ImagePyramidPanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.pyramid.PyramidFloat;
 
 import java.awt.image.BufferedImage;
 
@@ -35,15 +37,15 @@ import java.awt.image.BufferedImage;
 public class VisualizeScaleSpacePyramidApp {
 
 	public static void main( String args[] ) {
-		double scales[] = new double[]{1,1.2,2.4,3.6,4.8,6.0};
+		double scales[] = new double[]{1,1.2,2.4,3.6,4.8,6.0,10,15,20};
 
-		BufferedImage input = UtilImageIO.loadImage("../data/evaluation/standard/boat.png");
+		BufferedImage buffered = UtilImageIO.loadImage("../data/evaluation/standard/boat.png");
 
-		ScaleSpacePyramid<ImageFloat32> pyramid = new ScaleSpacePyramid<ImageFloat32>(ImageFloat32.class,scales);
+		PyramidFloat<ImageFloat32> pyramid = FactoryGaussianScaleSpace.scaleSpacePyramid(scales,ImageFloat32.class);
 
-		ImageFloat32 inputF32 = ConvertBufferedImage.convertFrom(input,(ImageFloat32)null);
+		ImageFloat32 input = ConvertBufferedImage.convertFrom(buffered,(ImageFloat32)null);
 
-		pyramid.setImage(inputF32);
+		pyramid.process(input);
 
 		ImagePyramidPanel<ImageFloat32> gui = new ImagePyramidPanel<ImageFloat32>(pyramid,true);
 		gui.render();
