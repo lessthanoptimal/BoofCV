@@ -26,7 +26,6 @@ import boofcv.alg.feature.detect.interest.*;
 import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
 import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.factory.transform.pyramid.FactoryGaussianScaleSpace;
-import boofcv.struct.gss.GaussianScaleSpace;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.pyramid.PyramidFloat;
@@ -71,59 +70,27 @@ public class FactoryInterestPoint {
 	}
 
 	/**
-	 * Wraps {@link FeatureLaplaceScaleSpace} inside an {@link InterestPointDetector}.
+	 * Wraps {@link FeatureLaplacePyramid} inside an {@link InterestPointDetector}.
 	 *
 	 * @param feature   Feature detector.
 	 * @param scales    Scales at which features are detected at.
-	 * @param inputType Image type of input image.
-	 * @return The interest point detector.
-	 */
-	public static <T extends ImageSingleBand, D extends ImageSingleBand>
-	InterestPointDetector<T> wrapDetector(FeatureLaplaceScaleSpace<T, D> feature,
-										  double[] scales,
-										  Class<T> inputType) {
-
-		GaussianScaleSpace<T, D> ss = FactoryGaussianScaleSpace.nocache(inputType);
-		ss.setScales(scales);
-
-		return new WrapFLSStoInterestPoint<T, D>(feature, ss);
-	}
-
-	/**
-	 * Wraps {@link FeatureScaleSpace} inside an {@link InterestPointDetector}.
-	 *
-	 * @param feature   Feature detector.
-	 * @param scales    Scales at which features are detected at.
+	 * @param pyramid   Should it be constructed as a pyramid or scale-space
 	 * @param inputType Image type of input image.
 	 * @return The interest point detector.
 	 */
 	public static <T extends ImageSingleBand, D extends ImageSingleBand>
 	InterestPointDetector<T> wrapDetector(FeatureLaplacePyramid<T, D> feature,
-										  double[] scales,
+										  double[] scales, boolean pyramid,
 										  Class<T> inputType) {
 
-		PyramidFloat<T> ss = FactoryGaussianScaleSpace.scaleSpacePyramid(scales,inputType);
+		PyramidFloat<T> ss;
+
+		if( pyramid )
+			ss = FactoryGaussianScaleSpace.scaleSpacePyramid(scales,inputType);
+		else
+			ss = FactoryGaussianScaleSpace.scaleSpace(scales, inputType);
 
 		return new WrapFLPtoInterestPoint<T, D>(feature, ss);
-	}
-
-	/**
-	 * Wraps {@link FeatureScaleSpace} inside an {@link InterestPointDetector}.
-	 *
-	 * @param feature   Feature detector.
-	 * @param scales    Scales at which features are detected at.
-	 * @param inputType Image type of input image.
-	 * @return The interest point detector.
-	 */
-	public static <T extends ImageSingleBand, D extends ImageSingleBand>
-	InterestPointDetector<T> wrapDetector(FeatureScaleSpace<T, D> feature,
-										  double[] scales,
-										  Class<T> inputType) {
-
-		GaussianScaleSpace<T, D> ss = FactoryGaussianScaleSpace.nocache(inputType);
-		ss.setScales(scales);
-
-		return new WrapFSStoInterestPoint<T, D>(feature, ss);
 	}
 
 	/**
@@ -131,15 +98,21 @@ public class FactoryInterestPoint {
 	 *
 	 * @param feature   Feature detector.
 	 * @param scales    Scales at which features are detected at.
+	 * @param pyramid   Should it be constructed as a pyramid or scale-space
 	 * @param inputType Image type of input image.
 	 * @return The interest point detector.
 	 */
 	public static <T extends ImageSingleBand, D extends ImageSingleBand>
 	InterestPointDetector<T> wrapDetector(FeaturePyramid<T, D> feature,
-										  double[] scales,
+										  double[] scales, boolean pyramid,
 										  Class<T> inputType) {
 
-		PyramidFloat<T> ss = FactoryGaussianScaleSpace.scaleSpacePyramid(scales,inputType);
+		PyramidFloat<T> ss;
+
+		if( pyramid )
+			ss = FactoryGaussianScaleSpace.scaleSpacePyramid(scales,inputType);
+		else
+			ss = FactoryGaussianScaleSpace.scaleSpace(scales,inputType);
 
 		return new WrapFPtoInterestPoint<T, D>(feature, ss);
 	}

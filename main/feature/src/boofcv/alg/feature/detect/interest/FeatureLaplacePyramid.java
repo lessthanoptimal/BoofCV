@@ -21,6 +21,7 @@ package boofcv.alg.feature.detect.interest;
 import boofcv.abst.feature.detect.interest.InterestPointScaleSpacePyramid;
 import boofcv.abst.filter.ImageFunctionSparse;
 import boofcv.abst.filter.derivative.AnyImageDerivative;
+import boofcv.alg.misc.GImageStatistics;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.feature.ScalePoint;
 import boofcv.struct.image.ImageSingleBand;
@@ -112,7 +113,7 @@ public class FeatureLaplacePyramid<T extends ImageSingleBand, D extends ImageSin
 		for (int i = 0; i < ss.getNumLayers(); i++) {
 			// detect features in 2D space.  Don't need to compute features at the tail ends of scale-space
 			if (i > 0 && i < ss.getNumLayers() - 1)
-				detectCandidateFeatures(ss.getLayer(i), ss.scale[i]);
+				detectCandidateFeatures(ss.getLayer(i), ss.getSigma(i));
 
 			spaceIndex++;
 			if (spaceIndex >= 3)
@@ -129,10 +130,15 @@ public class FeatureLaplacePyramid<T extends ImageSingleBand, D extends ImageSin
 	/**
 	 * Use the feature detector to find candidate features in each level.  Only compute the needed image derivatives.
 	 */
-	private void detectCandidateFeatures(T image, double scale) {
+	private void detectCandidateFeatures(T image, double sigma ) {
+
+		System.out.println(" mean intensity = "+ GImageStatistics.mean(image)+"  sigma "+sigma+"  scalePower "+scalePower);
+
 		// adjust corner intensity threshold based upon the current scale factor
-		float scaleThreshold = (float) (baseThreshold / Math.pow(scale, scalePower));
+		float scaleThreshold = (float) (baseThreshold / Math.pow(sigma, scalePower));
 		detector.setThreshold(scaleThreshold);
+		System.out.println("    scaleThreshold "+scaleThreshold);
+
 		computeDerivative.setInput(image);
 
 		D derivX = null, derivY = null;
@@ -178,14 +184,21 @@ public class FeatureLaplacePyramid<T extends ImageSingleBand, D extends ImageSin
 		float scale1 = (float) ss.scale[layerID];
 		float scale2 = (float) ss.scale[layerID + 1];
 
-		// Because the image is blurred and scaled these are all one, I think.
-		float ss0 = 1;//(float)Math.pow(scale0,0);
-		float ss1 = 1;//(float)Math.pow(scale1,0);
-		float ss2 = 1;//(float)Math.pow(scale2,0);
+		float sigma0 = (float) ss.getSigma(layerID - 1);
+		float sigma1 = (float) ss.getSigma(layerID);
+		float sigma2 = (float) ss.getSigma(layerID + 1);
+
+		// For laplacian its t^(2*gamma) where gamma = 3/4
+		float ss0 = (float) (Math.pow(sigma0, 2.0 * 0.75)/scale0);// Is this divide by scale correct?
+		float ss1 = (float) (Math.pow(sigma1, 2.0 * 0.75)/scale1);
+		float ss2 = (float) (Math.pow(sigma2, 2.0 * 0.75)/scale2);
 
 		for (Point2D_I16 c : candidates) {
 			sparseLaplace.setImage(ss.getLayer(layerID));
-			float val = ss1 * (float) Math.abs(sparseLaplace.compute(c.x, c.y));
+			float val = ss1 * (float) sparseLaplace.compute(c.x, c.y);
+			// search for local maximum or local minimum
+			float adj = Math.signum(val);
+			val *= adj;
 
 			// find pixel location in each image's local coordinate
 			int x0 = (int) (c.x * scale1 / scale0);
@@ -194,9 +207,9 @@ public class FeatureLaplacePyramid<T extends ImageSingleBand, D extends ImageSin
 			int x2 = (int) (c.x * scale1 / scale2);
 			int y2 = (int) (c.y * scale1 / scale2);
 
-			if (checkMax(ss.getLayer(layerID - 1), val / ss0, x0, y0) && checkMax(ss.getLayer(layerID + 1), val / ss2, x2, y2)) {
+			if (checkMax(ss.getLayer(layerID - 1), adj*ss0,val, x0, y0) && checkMax(ss.getLayer(layerID + 1), adj*ss2,val, x2, y2)) {
 				// put features into the scale of the upper image
-				foundPoints.add(new ScalePoint(c.x * scale1, c.y * scale1, scale1));
+				foundPoints.add(new ScalePoint(c.x * scale1, c.y * scale1, sigma1));
 			}
 		}
 	}
@@ -204,14 +217,14 @@ public class FeatureLaplacePyramid<T extends ImageSingleBand, D extends ImageSin
 	/**
 	 * See if the best score is better than the local adjusted scores at this scale
 	 */
-	private boolean checkMax(T image, float bestScore, int c_x, int c_y) {
+	private boolean checkMax(T image, double adj, double bestScore, int c_x, int c_y) {
 		sparseLaplace.setImage(image);
 		boolean isMax = true;
 		beginLoop:
 		for (int i = c_y - 1; i <= c_y + 1; i++) {
 			for (int j = c_x - 1; j <= c_x + 1; j++) {
-
-				if (Math.abs(sparseLaplace.compute(j, i)) >= bestScore) {
+				double value = adj*sparseLaplace.compute(j, i);
+				if (value >= bestScore) {
 					isMax = false;
 					break beginLoop;
 				}

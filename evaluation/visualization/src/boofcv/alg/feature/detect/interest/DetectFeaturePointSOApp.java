@@ -70,10 +70,10 @@ public class DetectFeaturePointSOApp<T extends ImageSingleBand, D extends ImageS
 		super(1);
 		this.imageType = imageType;
 
-		FeatureLaplaceScaleSpace<T, D> flss = FactoryInterestPointAlgs.hessianLaplace(radius, thresh, maxScaleFeatures, imageType, derivType);
-		addAlgorithm(0, "Hess Lap SS", FactoryInterestPoint.wrapDetector(flss, scales, imageType));
-		FeatureLaplacePyramid<T, D> flp = FactoryInterestPointAlgs.hessianLaplacePyramid(radius, thresh, maxScaleFeatures, imageType, derivType);
-		addAlgorithm(0, "Hess Lap P", FactoryInterestPoint.wrapDetector(flp, scales, imageType));
+		FeatureLaplacePyramid<T, D> flss = FactoryInterestPointAlgs.hessianLaplace(radius, thresh, maxScaleFeatures, imageType, derivType);
+		addAlgorithm(0, "Hess Lap SS", FactoryInterestPoint.wrapDetector(flss, scales, false, imageType));
+		FeatureLaplacePyramid<T, D> flp = FactoryInterestPointAlgs.hessianLaplace(radius, thresh, maxScaleFeatures, imageType, derivType);
+		addAlgorithm(0, "Hess Lap P", FactoryInterestPoint.wrapDetector(flp, scales, true,imageType));
 		addAlgorithm(0, "FastHessian", FactoryInterestPoint.<T>fastHessian(
 				new ConfigFastHessian(thresh, 2, maxScaleFeatures, 2, 9, 4, 4)));
 		if( imageType == ImageFloat32.class )
