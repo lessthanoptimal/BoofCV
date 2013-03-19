@@ -72,7 +72,5 @@ public class DetectFastHessianApp {
 
 		doStuff(ImageFloat32.class,input);
 //		doStuff(ImageUInt8.class,input);
-
-		System.out.println("Done");
 	}
 }

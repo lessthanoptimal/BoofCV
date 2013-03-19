@@ -28,7 +28,7 @@ import boofcv.core.image.ConvertBufferedImage;
 import boofcv.core.image.inst.FactoryImageGenerator;
 import boofcv.factory.feature.detect.intensity.FactoryIntensityPointAlg;
 import boofcv.factory.filter.blur.FactoryBlurFilter;
-import boofcv.factory.transform.pyramid.FactoryGaussianScaleSpace;
+import boofcv.factory.transform.pyramid.FactoryPyramid;
 import boofcv.gui.ListDisplayPanel;
 import boofcv.gui.SelectAlgorithmAndInputPanel;
 import boofcv.gui.image.ShowImages;
@@ -83,9 +83,9 @@ public class IntensityFeaturePyramidApp<T extends ImageSingleBand, D extends Ima
 		}
 
 		if( createPyramid )
-			pyramid = FactoryGaussianScaleSpace.scaleSpacePyramid(scales,imageType);
+			pyramid = FactoryPyramid.scaleSpacePyramid(scales, imageType);
 		else
-			pyramid = FactoryGaussianScaleSpace.scaleSpace(scales, imageType);
+			pyramid = FactoryPyramid.scaleSpace(scales, imageType);
 
 		anyDerivative = GImageDerivativeOps.createDerivatives(imageType, FactoryImageGenerator.create(derivType));
 	}
@@ -185,6 +185,7 @@ public class IntensityFeaturePyramidApp<T extends ImageSingleBand, D extends Ima
 		java.util.List<PathLabel> inputs = new ArrayList<PathLabel>();
 
 		inputs.add(new PathLabel("shapes","../data/evaluation/shapes01.png"));
+		inputs.add(new PathLabel("amoeba","../data/evaluation/amoeba_shapes.jpg"));
 		inputs.add(new PathLabel("sunflowers","../data/evaluation/sunflowers.png"));
 		inputs.add(new PathLabel("beach","../data/evaluation/scale/beach02.jpg"));
 

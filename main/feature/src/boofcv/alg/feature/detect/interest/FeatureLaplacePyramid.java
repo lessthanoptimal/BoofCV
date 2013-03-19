@@ -21,7 +21,6 @@ package boofcv.alg.feature.detect.interest;
 import boofcv.abst.feature.detect.interest.InterestPointScaleSpacePyramid;
 import boofcv.abst.filter.ImageFunctionSparse;
 import boofcv.abst.filter.derivative.AnyImageDerivative;
-import boofcv.alg.misc.GImageStatistics;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.feature.ScalePoint;
 import boofcv.struct.image.ImageSingleBand;
@@ -33,16 +32,14 @@ import java.util.List;
 
 /**
  * <p>
- * A Pyramidal implementation of {@link FeatureLaplaceScaleSpace}
+ * Feature detector across image pyramids that uses the Laplacian to determine strength in scale-space.
  * </p>
- * <p/>
  * <p>
  * COMMENT ON SCALEPOWER: To normalize feature intensity across scales each feature intensity is multiplied by the scale to the power of 'scalePower'.
  * See [1,2] for how to compute 'scalePower'.  Inside of the image pyramid sub-sampling of the image causes the image
  * gradient to be a factor of 'scale' larger than it would be without sub-sampling.  In some situations this can negate
  * the need to adjust feature intensity further.
  * </p>
- * <p/>
  * <p>
  * [1] Krystian Mikolajczyk and Cordelia Schmid, "Indexing based on scale invariant interest points"  ICCV 2001. Proceedings.<br>
  * [2] Lindeberg, T., "Feature detection with automatic scale selection." IJCV 30(2) (1998) 79 – 116
@@ -132,13 +129,9 @@ public class FeatureLaplacePyramid<T extends ImageSingleBand, D extends ImageSin
 	 */
 	private void detectCandidateFeatures(T image, double sigma ) {
 
-		System.out.println(" mean intensity = "+ GImageStatistics.mean(image)+"  sigma "+sigma+"  scalePower "+scalePower);
-
 		// adjust corner intensity threshold based upon the current scale factor
 		float scaleThreshold = (float) (baseThreshold / Math.pow(sigma, scalePower));
 		detector.setThreshold(scaleThreshold);
-		System.out.println("    scaleThreshold "+scaleThreshold);
-
 		computeDerivative.setInput(image);
 
 		D derivX = null, derivY = null;

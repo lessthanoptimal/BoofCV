@@ -199,6 +199,7 @@ public class DetectFeaturePointApp<T extends ImageSingleBand, D extends ImageSin
 
 		List<PathLabel> inputs = new ArrayList<PathLabel>();
 		inputs.add(new PathLabel("shapes", "../data/evaluation/shapes01.png"));
+		inputs.add(new PathLabel("amoeba","../data/evaluation/amoeba_shapes.jpg"));
 		inputs.add(new PathLabel("sunflowers", "../data/evaluation/sunflowers.png"));
 		inputs.add(new PathLabel("beach", "../data/evaluation/scale/beach02.jpg"));
 
@@ -210,7 +211,5 @@ public class DetectFeaturePointApp<T extends ImageSingleBand, D extends ImageSin
 		}
 
 		ShowImages.showWindow(app, "Point Feature");
-
-		System.out.println("Done");
 	}
 }

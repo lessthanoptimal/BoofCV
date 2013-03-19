@@ -21,7 +21,7 @@ package boofcv.alg.feature.detect.interest;
 import boofcv.abst.filter.derivative.AnyImageDerivative;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.core.image.inst.FactoryImageGenerator;
-import boofcv.factory.transform.pyramid.FactoryGaussianScaleSpace;
+import boofcv.factory.transform.pyramid.FactoryPyramid;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.pyramid.PyramidFloat;
 
@@ -40,7 +40,7 @@ public class TestFeaturePyramid extends GenericFeatureScaleDetector {
 
 	@Override
 	protected int detectFeature(ImageFloat32 input, Object detector) {
-		PyramidFloat<ImageFloat32> ss = FactoryGaussianScaleSpace.scaleSpacePyramid(new double[]{1, 2, 4, 8, 16},ImageFloat32.class);
+		PyramidFloat<ImageFloat32> ss = FactoryPyramid.scaleSpacePyramid(new double[]{1, 2, 4, 8, 16}, ImageFloat32.class);
 		ss.process(input);
 
 		FeaturePyramid<ImageFloat32, ImageFloat32> alg =

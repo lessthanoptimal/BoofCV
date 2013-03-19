@@ -21,7 +21,7 @@ package boofcv.alg.feature.detect.interest;
 import boofcv.abst.feature.detect.interest.InterestPointScaleSpacePyramid;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.factory.feature.detect.interest.FactoryInterestPointAlgs;
-import boofcv.factory.transform.pyramid.FactoryGaussianScaleSpace;
+import boofcv.factory.transform.pyramid.FactoryPyramid;
 import boofcv.gui.SelectAlgorithmAndInputPanel;
 import boofcv.gui.feature.ScaleSpacePyramidPointPanel;
 import boofcv.gui.image.ShowImages;
@@ -61,9 +61,9 @@ public class DetectFeaturePyramidApp <T extends ImageSingleBand, D extends Image
 
 		double scales[] = new double[]{1,1.5,2,3,4,8,12,16,24};
 		if( createPyramid )
-			ss = FactoryGaussianScaleSpace.scaleSpacePyramid(scales,imageType);
+			ss = FactoryPyramid.scaleSpacePyramid(scales, imageType);
 		else
-			ss = FactoryGaussianScaleSpace.scaleSpace(scales,imageType);
+			ss = FactoryPyramid.scaleSpace(scales, imageType);
 
 		panel = new ScaleSpacePyramidPointPanel(ss, BoofDefaults.SCALE_SPACE_CANONICAL_RADIUS);
 
@@ -121,6 +121,7 @@ public class DetectFeaturePyramidApp <T extends ImageSingleBand, D extends Image
 		java.util.List<PathLabel> inputs = new ArrayList<PathLabel>();
 
 		inputs.add(new PathLabel("shapes","../data/evaluation/shapes01.png"));
+		inputs.add(new PathLabel("amoeba","../data/evaluation/amoeba_shapes.jpg"));
 		inputs.add(new PathLabel("sunflowers","../data/evaluation/sunflowers.png"));
 		inputs.add(new PathLabel("beach","../data/evaluation/scale/beach02.jpg"));
 
@@ -131,7 +132,6 @@ public class DetectFeaturePyramidApp <T extends ImageSingleBand, D extends Image
 			Thread.yield();
 		}
 
-		ShowImages.showWindow(app,"Feature Pyramid");
-		System.out.println("Done");
+		ShowImages.showWindow(app, "Feature Pyramid");
 	}
 }
