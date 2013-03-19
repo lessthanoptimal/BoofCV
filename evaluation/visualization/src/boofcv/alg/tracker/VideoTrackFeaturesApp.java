@@ -63,7 +63,7 @@ public class VideoTrackFeaturesApp<I extends ImageSingleBand, D extends ImageSin
 
 		PkltConfig<I, D> config =
 				PkltConfig.createDefault(imageType, derivType);
-		config.featureRadius = 3;
+		config.templateRadius = 3;
 		config.pyramidScaling = new int[]{1,2,4,8};
 
 		ConfigFastHessian configFH = new ConfigFastHessian();

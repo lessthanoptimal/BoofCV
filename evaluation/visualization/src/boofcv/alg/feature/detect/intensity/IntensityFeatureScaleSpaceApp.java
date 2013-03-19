@@ -23,7 +23,7 @@ import boofcv.alg.misc.ImageStatistics;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.factory.feature.detect.intensity.FactoryIntensityPointAlg;
 import boofcv.factory.filter.blur.FactoryBlurFilter;
-import boofcv.factory.transform.gss.FactoryGaussianScaleSpace;
+import boofcv.factory.transform.pyramid.FactoryGaussianScaleSpace;
 import boofcv.gui.ListDisplayPanel;
 import boofcv.gui.SelectAlgorithmAndInputPanel;
 import boofcv.gui.image.ShowImages;

@@ -60,10 +60,9 @@ public class VisualizePyramidFloatApp <T extends ImageSingleBand>
 		setInputImage(input);
 		final T gray = ConvertBufferedImage.convertFromSingle(input, null, imageType);
 
-		PyramidUpdateSubsampleScale<T> updater = new PyramidUpdateSubsampleScale<T>(interp);
-		PyramidFloat<T> pyramid = new PyramidFloat<T>(imageType,scales);
+		PyramidFloat<T> pyramid = new PyramidFloatScale<T>(interp,scales,imageType);
 
-		updater.update(gray,pyramid);
+		pyramid.process(gray);
 
 		gui.set(pyramid,true);
 		

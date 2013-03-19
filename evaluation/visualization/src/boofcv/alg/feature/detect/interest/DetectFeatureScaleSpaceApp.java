@@ -21,7 +21,7 @@ package boofcv.alg.feature.detect.interest;
 import boofcv.abst.feature.detect.interest.InterestPointScaleSpace;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.factory.feature.detect.interest.FactoryInterestPointAlgs;
-import boofcv.factory.transform.gss.FactoryGaussianScaleSpace;
+import boofcv.factory.transform.pyramid.FactoryGaussianScaleSpace;
 import boofcv.gui.SelectAlgorithmAndInputPanel;
 import boofcv.gui.feature.ScaleSpacePointPanel;
 import boofcv.gui.image.ShowImages;

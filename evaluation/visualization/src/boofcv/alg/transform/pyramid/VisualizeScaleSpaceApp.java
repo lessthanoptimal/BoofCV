@@ -16,10 +16,10 @@
  * limitations under the License.
  */
 
-package boofcv.alg.transform.gss;
+package boofcv.alg.transform.pyramid;
 
 import boofcv.core.image.ConvertBufferedImage;
-import boofcv.factory.transform.gss.FactoryGaussianScaleSpace;
+import boofcv.factory.transform.pyramid.FactoryGaussianScaleSpace;
 import boofcv.gui.ListDisplayPanel;
 import boofcv.gui.SelectInputPanel;
 import boofcv.gui.image.ShowImages;

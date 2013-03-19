@@ -60,7 +60,7 @@ public class VideoStabilizeSequentialPointApp<I extends ImageSingleBand, D exten
 
 		PkltConfig<I, D> config =
 				PkltConfig.createDefault(imageType, derivType);
-		config.featureRadius = 3;
+		config.templateRadius = 3;
 		config.pyramidScaling = new int[]{1,2,4,8};
 
 		ConfigFastHessian configFH = new ConfigFastHessian();
