@@ -122,8 +122,8 @@ public class CombinedTrackerScalePoint
 	 */
 	public void updateTracks( I input ,
 							  PyramidDiscrete<I> pyramid ,
-							  PyramidDiscrete<D> derivX,
-							  PyramidDiscrete<D> derivY ) {
+							  D[] derivX,
+							  D[] derivY ) {
 		// forget recently dropped or spawned tracks
 		tracksSpawned.clear();
 

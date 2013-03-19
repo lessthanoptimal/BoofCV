@@ -20,13 +20,13 @@ package boofcv.alg.feature.detect.interest;
 
 import boofcv.abst.feature.detect.interest.InterestPointScaleSpacePyramid;
 import boofcv.abst.filter.derivative.AnyImageDerivative;
-import boofcv.alg.transform.gss.ScaleSpacePyramid;
 import boofcv.core.image.border.FactoryImageBorderAlgs;
 import boofcv.core.image.border.ImageBorder_F32;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.feature.ScalePoint;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.pyramid.PyramidFloat;
 import georegression.struct.point.Point2D_I16;
 
 import java.util.ArrayList;
@@ -102,7 +102,7 @@ public class FeaturePyramid<T extends ImageSingleBand, D extends ImageSingleBand
 	 * @param ss Scale space of an image
 	 */
 	@Override
-	public void detect(ScaleSpacePyramid<T> ss) {
+	public void detect(PyramidFloat<T> ss) {
 		spaceIndex = 0;
 		if (intensities == null) {
 			intensities = new ImageFloat32[3];
@@ -171,7 +171,7 @@ public class FeaturePyramid<T extends ImageSingleBand, D extends ImageSingleBand
 	/**
 	 * Searches the pyramid layers up and down to see if the found 2D features are also scale space maximums.
 	 */
-	protected void findLocalScaleSpaceMax(ScaleSpacePyramid<T> ss, int layerID) {
+	protected void findLocalScaleSpaceMax(PyramidFloat<T> ss, int layerID) {
 		int index0 = spaceIndex;
 		int index1 = (spaceIndex + 1) % 3;
 		int index2 = (spaceIndex + 2) % 3;

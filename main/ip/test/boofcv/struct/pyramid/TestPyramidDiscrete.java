@@ -18,9 +18,11 @@
 
 package boofcv.struct.pyramid;
 
+import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 /**
@@ -28,19 +30,25 @@ import static org.junit.Assert.fail;
  */
 public class TestPyramidDiscrete {
 
-	int width = 80;
-	int height = 160;
-
 	/**
 	 * provide positive examples of working scales
 	 */
 	@Test
 	public void setScaling_positive() {
-		PyramidDiscrete<ImageUInt8> pyramid = new PyramidDiscrete<ImageUInt8>(ImageUInt8.class,true);
+		PyramidDiscrete<ImageUInt8> pyramid = new DummyDiscrete<ImageUInt8>(ImageUInt8.class,false);
 
 		pyramid.setScaleFactors(1,2,4);
+		pyramid.initialize(100,200);
+		assertEquals(100,pyramid.getWidth(0));
+
 		pyramid.setScaleFactors(2,4,8);
+		pyramid.initialize(100,200);
+		assertEquals(50,pyramid.getWidth(0));
+
 		pyramid.setScaleFactors(1,3,6);
+		pyramid.initialize(100,200);
+		assertEquals(100,pyramid.getWidth(0));
+		assertEquals(34,pyramid.getWidth(1));
 	}
 
 	/**
@@ -48,7 +56,7 @@ public class TestPyramidDiscrete {
 	 */
 	@Test
 	public void setScaling_negative() {
-		PyramidDiscrete<ImageUInt8> pyramid = new PyramidDiscrete<ImageUInt8>(ImageUInt8.class,true);
+		PyramidDiscrete<ImageUInt8> pyramid = new DummyDiscrete<ImageUInt8>(ImageUInt8.class,true);
 
 		try {
 			pyramid.setScaleFactors(1,2,5);
@@ -64,5 +72,19 @@ public class TestPyramidDiscrete {
 		} catch( RuntimeException e ){}
 	}
 
+	private static class DummyDiscrete<T extends ImageSingleBand> extends PyramidDiscrete<T> {
 
+		public DummyDiscrete(Class<T> imageType, boolean saveOriginalReference) {
+			super(imageType, saveOriginalReference);
+		}
+
+		@Override
+		public void process(T input) {}
+
+		@Override
+		public double getSampleOffset(int layer) {return 0;}
+
+		@Override
+		public double getSigma(int layer) {return 0;}
+	}
 }

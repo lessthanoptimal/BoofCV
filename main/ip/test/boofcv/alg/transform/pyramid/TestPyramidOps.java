@@ -20,17 +20,19 @@ package boofcv.alg.transform.pyramid;
 
 import boofcv.abst.filter.FilterImageInterface;
 import boofcv.abst.filter.derivative.ImageGradient;
-import boofcv.alg.misc.ImageStatistics;
+import boofcv.alg.misc.GImageMiscOps;
 import boofcv.factory.filter.blur.FactoryBlurFilter;
 import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.pyramid.ImagePyramid;
 import boofcv.struct.pyramid.PyramidDiscrete;
 import boofcv.testing.BoofTesting;
 import org.junit.Test;
 
 import java.util.Random;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
 
 
 /**
@@ -45,14 +47,16 @@ public class TestPyramidOps {
 	int scales[] = new int[]{1,2,4};
 
 	@Test
-	public void randomize() {
-		PyramidDiscrete<ImageFloat32> in = new PyramidDiscrete<ImageFloat32>(ImageFloat32.class,false,scales);
+	public void declareOutput() {
+		DummyDiscrete<ImageFloat32> in = new DummyDiscrete<ImageFloat32>(ImageFloat32.class,false,scales);
 		in.initialize(width,height);
-		PyramidOps.randomize(in,rand,0,100);
+		ImageFloat32[] out = PyramidOps.declareOutput(in,ImageFloat32.class);
 
-		for( int i = 0; i < scales.length; i++ ) {
-			ImageFloat32 input = in.getLayer(i);
-			assertTrue(ImageStatistics.sum(input)>0);
+		assertEquals(out.length,in.getNumLayers());
+		for( int i = 0; i < in.getNumLayers(); i++ ) {
+			ImageFloat32 o = out[i];
+			assertEquals(o.width,in.getWidth(i));
+			assertEquals(o.height,in.getHeight(i));
 		}
 	}
 
@@ -60,12 +64,12 @@ public class TestPyramidOps {
 	public void filter() {
 		FilterImageInterface<ImageFloat32,ImageFloat32> filter = FactoryBlurFilter.gaussian(ImageFloat32.class,-1,1);
 
-		PyramidDiscrete<ImageFloat32> in = new PyramidDiscrete<ImageFloat32>(ImageFloat32.class,false,scales);
-		PyramidDiscrete<ImageFloat32> out = new PyramidDiscrete<ImageFloat32>(ImageFloat32.class,false,scales);
+		DummyDiscrete<ImageFloat32> in = new DummyDiscrete<ImageFloat32>(ImageFloat32.class,false,scales);
 
 		in.initialize(width,height);
+		ImageFloat32[] out = PyramidOps.declareOutput(in,ImageFloat32.class);
 
-		PyramidOps.randomize(in,rand,0,100);
+		randomize(in, rand, 0, 100);
 		PyramidOps.filter(in, filter, out);
 
 		for( int i = 0; i < scales.length; i++ ) {
@@ -73,7 +77,7 @@ public class TestPyramidOps {
 			ImageFloat32 expected = new ImageFloat32(input.width,input.height);
 
 			filter.process(input,expected);
-			BoofTesting.assertEquals(expected,out.getLayer(i),1e-4);
+			BoofTesting.assertEquals(expected,out[i],1e-4);
 		}
 	}
 
@@ -81,13 +85,13 @@ public class TestPyramidOps {
 	public void gradient() {
 		ImageGradient<ImageFloat32,ImageFloat32> gradient = FactoryDerivative.sobel_F32();
 
-		PyramidDiscrete<ImageFloat32> in = new PyramidDiscrete<ImageFloat32>(ImageFloat32.class,false,scales);
-		PyramidDiscrete<ImageFloat32> outX = new PyramidDiscrete<ImageFloat32>(ImageFloat32.class,false,scales);
-		PyramidDiscrete<ImageFloat32> outY = new PyramidDiscrete<ImageFloat32>(ImageFloat32.class,false,scales);
+		DummyDiscrete<ImageFloat32> in = new DummyDiscrete<ImageFloat32>(ImageFloat32.class,false,scales);
+		in.initialize(width, height);
 
-		in.initialize(width,height);
+		ImageFloat32[] outX = PyramidOps.declareOutput(in,ImageFloat32.class);
+		ImageFloat32[] outY = PyramidOps.declareOutput(in,ImageFloat32.class);
 
-		PyramidOps.randomize(in,rand,0,100);
+		randomize(in, rand, 0, 100);
 		PyramidOps.gradient(in, gradient, outX,outY);
 
 		for( int i = 0; i < scales.length; i++ ) {
@@ -96,8 +100,38 @@ public class TestPyramidOps {
 			ImageFloat32 y = new ImageFloat32(input.width,input.height);
 
 			gradient.process(input,x,y);
-			BoofTesting.assertEquals(x,outX.getLayer(i),1e-4);
-			BoofTesting.assertEquals(y,outY.getLayer(i),1e-4);
+			BoofTesting.assertEquals(x,outX[i],1e-4);
+			BoofTesting.assertEquals(y,outY[i],1e-4);
 		}
+	}
+
+	public static <I extends ImageSingleBand>
+	void randomize( ImagePyramid<I> pyramid , Random rand , int min , int max ) {
+
+		for( int i = 0; i < pyramid.getNumLayers(); i++ ) {
+			I imageIn = pyramid.getLayer(i);
+			GImageMiscOps.fillUniform(imageIn, rand, min, max);
+		}
+	}
+
+	private static class DummyDiscrete<T extends ImageSingleBand> extends PyramidDiscrete<T> {
+
+		public DummyDiscrete(Class<T> imageType, boolean saveOriginalReference, int scales[] ) {
+			super(imageType, saveOriginalReference,scales);
+		}
+
+		@Override
+		public void initialize(int width, int height) {
+			super.initialize(width, height);
+		}
+
+		@Override
+		public void process(T input) {}
+
+		@Override
+		public double getSampleOffset(int layer) {return 0;}
+
+		@Override
+		public double getSigma(int layer) {return 0;}
 	}
 }

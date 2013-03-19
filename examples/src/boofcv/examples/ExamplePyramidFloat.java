@@ -27,7 +27,6 @@ import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.pyramid.PyramidDiscrete;
 import boofcv.struct.pyramid.PyramidFloat;
-import boofcv.struct.pyramid.PyramidUpdaterFloat;
 
 import java.awt.image.BufferedImage;
 
@@ -45,8 +44,6 @@ public class ExamplePyramidFloat<T extends ImageSingleBand> {
 	Class<T> imageType;
 	// The pyramid data structure
 	PyramidFloat<T> pyramid;
-	// update the pyramid given from
-	PyramidUpdaterFloat<T> updater;
 
 	public ExamplePyramidFloat(Class<T> imageType) {
 		this.imageType = imageType;
@@ -58,11 +55,10 @@ public class ExamplePyramidFloat<T extends ImageSingleBand> {
 	public void standard() {
 		// Scale factory for each layer can be any floating point value which is larger than
 		// the previous layer's scale.
-		pyramid = new PyramidFloat<T>(imageType,1,1.5,2,2.5,3,5,8,15);
-
-		// Specify the amount of blur to apply to each scale
-		// Using a custom updater other types of blur and interpolation can be applied
-		updater = FactoryPyramid.floatGaussian(imageType, 1,1,1,1,1,1,1,1);
+		double scales[] = new double[]{1,1.5,2,2.5,3,5,8,15};
+		// the amount of blur which is applied to each layer in the pyramid after the previous layer has been sampled
+		double sigmas[] = new double[]{1,1,1,1,1,1,1,1};
+		pyramid = FactoryPyramid.floatGaussian(scales,sigmas,imageType);
 	}
 
 	/**
@@ -70,7 +66,7 @@ public class ExamplePyramidFloat<T extends ImageSingleBand> {
 	 */
 	public void process( BufferedImage image ) {
 		T input = ConvertBufferedImage.convertFromSingle(image, null, imageType);
-		updater.update(input,pyramid);
+		pyramid.process(input);
 
 		ImagePyramidPanel<T> gui = new ImagePyramidPanel<T>();
 		gui.set(pyramid, true);

@@ -63,7 +63,7 @@ import boofcv.factory.tracker.FactoryTrackerAlg;
 import boofcv.factory.transform.pyramid.FactoryPyramid;
 import boofcv.struct.feature.*;
 import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.pyramid.PyramidUpdaterDiscrete;
+import boofcv.struct.pyramid.PyramidDiscrete;
 
 import java.util.Random;
 
@@ -79,8 +79,6 @@ public class FactoryPointTracker {
 	/**
 	 * Pyramid KLT feature tracker.
 	 *
-	 * @see boofcv.struct.pyramid.PyramidUpdaterDiscrete
-	 *
 	 * @param scaling       Scales in the image pyramid. Recommend [1,2,4] or [2,4]
 	 * @param configExtract Configuration for extracting features
 	 * @param featureRadius Size of the tracked feature.  Try 3 or 5
@@ -94,15 +92,13 @@ public class FactoryPointTracker {
 		PkltConfig<I, D> config =
 				PkltConfig.createDefault(imageType, derivType);
 		config.pyramidScaling = scaling;
-		config.featureRadius = featureRadius;
+		config.templateRadius = featureRadius;
 
 		return klt(config, configExtract);
 	}
 
 	/**
 	 * Pyramid KLT feature tracker.
-	 *
-	 * @see boofcv.struct.pyramid.PyramidUpdaterDiscrete
 	 *
 	 * @param config Config for the tracker. Try PkltConfig.createDefault().
 	 * @param configExtract Configuration for extracting features
@@ -118,10 +114,10 @@ public class FactoryPointTracker {
 
 		ImageGradient<I,D> gradient = FactoryDerivative.sobel(config.typeInput, config.typeDeriv);
 
-		PyramidUpdaterDiscrete<I> pyramidUpdater = FactoryPyramid.discreteGaussian(config.typeInput, -1, 2);
+		PyramidDiscrete<I> pyramid = FactoryPyramid.discreteGaussian(config.pyramidScaling,-1,2,true,config.typeInput);
 
-		return new PointTrackerKltPyramid<I, D>(config,pyramidUpdater,detector,
-				gradient,interpInput,interpDeriv);
+		return new PointTrackerKltPyramid<I, D>(config.config,config.templateRadius,pyramid,detector,
+				gradient,interpInput,interpDeriv,config.typeDeriv);
 	}
 
 	/**

@@ -26,14 +26,13 @@ import boofcv.struct.image.ImageSingleBand;
  * <p>
  * Base class for image pyramids.  Provides common functionality and data structures.  The scale
  * is defined in its children {@link PyramidDiscrete} and {@link PyramidFloat}.  This allows
- * it to be either integer or floating point and strongly typed.  Typically an image pyramid is
- * maintained using {@link PyramidUpdater} each time a new input image is processed.
+ * it to be either integer or floating point and strongly typed.
  * </p>
  *
  * <p>
  * When updating the pyramid, if the top most layer is at the same resolution as the original image then a reference
  * can optionally be saved, avoiding an unnecessary image copy.  This is done by setting the saveOriginalReference
- * to true.  If this functionality is not supported by an {@link PyramidUpdater}
+ * to true.
  * </p>
  *
  * @author Peter Abeles
@@ -58,15 +57,25 @@ public abstract class ImagePyramidBase<T extends ImageSingleBand>
 	/**
 	 * Specifies input image size and behavior of top most layer.
 	 *
-	 * @param saveOriginalReference If a reference to the full resolution image should be saved instead of  copied.
+	 * @param imageType Type of image which is processed
+	 * @param saveOriginalReference If a reference to the full resolution image should be saved instead of copied.
 	 */
 	public ImagePyramidBase( Class<T> imageType , boolean saveOriginalReference ) {
 		this.generator = FactoryImageGenerator.create(imageType);
 		this.saveOriginalReference = saveOriginalReference;
 	}
 
-	@Override
-	public void initialize(int width, int height) {
+	/**
+	 * Initializes internal data structures based on the input image's size.  Should be called each time a new image
+	 * is processed.
+	 * @param width Image width
+	 * @param height Image height
+	 */
+	protected void initialize(int width, int height) {
+		// see if it has already been initialized
+		if( bottomWidth == width && bottomHeight == height )
+			return;
+
 		this.bottomWidth = width;
 		this.bottomHeight = height;
 		layers = generator.createArray(getNumLayers());
@@ -86,11 +95,6 @@ public abstract class ImagePyramidBase<T extends ImageSingleBand>
 		}
 	}
 
-	@Override
-	public boolean isInitialized() {
-		return layers != null;
-	}
-
 	/**
 	 * Used to internally check that the provided scales are valid.
 	 */
@@ -102,8 +106,8 @@ public abstract class ImagePyramidBase<T extends ImageSingleBand>
 		double prevScale = 0;
 		for( int i = 0; i < getNumLayers(); i++ ) {
 			double s = getScale(i);
-			if( s <= prevScale )
-				throw new IllegalArgumentException("Higher layers must have larger scale factors than previous layers.");
+			if( s < prevScale )
+				throw new IllegalArgumentException("Higher layers must be the same size or larger than previous layers.");
 			prevScale = s;
 		}
 	}

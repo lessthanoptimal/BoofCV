@@ -18,6 +18,7 @@
 
 package boofcv.gui.image;
 
+import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.pyramid.ImagePyramid;
 import boofcv.struct.pyramid.PyramidDiscrete;
 
@@ -33,21 +34,21 @@ import java.awt.image.BufferedImage;
  *
  * @author Peter Abeles
  */
-public class DiscretePyramidPanel extends JPanel {
+public class DiscretePyramidPanel<T extends ImageSingleBand> extends JPanel {
 
 	BufferedImage img;
-	ImagePyramid<?> pyramid;
+	ImagePyramid<T> pyramid;
 
 	BufferedImage layers[];
 
 	public DiscretePyramidPanel() {
 	}
 
-	public DiscretePyramidPanel(PyramidDiscrete<?> pyramid) {
+	public DiscretePyramidPanel(PyramidDiscrete<T> pyramid) {
 		setPyramid(pyramid);
 	}
 
-	public void setPyramid( PyramidDiscrete<?> pyramid ) {
+	public void setPyramid( PyramidDiscrete<T> pyramid ) {
 		this.pyramid = pyramid;
 
 		// create temporary buffers for each layer in the pyramid

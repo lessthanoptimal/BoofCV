@@ -24,48 +24,57 @@ import boofcv.alg.distort.impl.DistortSupport;
 import boofcv.alg.interpolate.InterpolatePixel;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.pyramid.PyramidFloat;
-import boofcv.struct.pyramid.PyramidUpdaterFloat;
 
 
 /**
  * <p>
  * Updates each layer in a {@link boofcv.struct.pyramid.PyramidFloat} by rescaling the layer with interpolation.
- * Unlike {@link PyramidUpdateGaussianScale}, no additional blurring is done between layers.
+ * Unlike {@link PyramidFloatGaussianScale}, no additional blurring is done between layers.
  * </p>
  *
  * @author Peter Abeles
  */
 @SuppressWarnings({"unchecked"})
-public class PyramidUpdateSubsampleScale< T extends ImageSingleBand>
-		implements PyramidUpdaterFloat<T> {
+public class PyramidFloatScale< T extends ImageSingleBand>
+		extends PyramidFloat<T> {
 
 	// interpolation algorithm
 	protected InterpolatePixel<T> interpolate;
 
-	public PyramidUpdateSubsampleScale(InterpolatePixel<T> interpolate) {
+	public PyramidFloatScale(InterpolatePixel<T> interpolate, double scaleFactors[] , Class<T> imageType) {
+		super(imageType,scaleFactors);
 		this.interpolate = interpolate;
 	}
 
 	@Override
-	public void update(T input, PyramidFloat<T> pyramid) {
-		if( !pyramid.isInitialized() )
-			pyramid.initialize(input.width,input.height);
+	public void process(T input) {
+		super.initialize(input.width,input.height);
 		
-		if( pyramid.isSaveOriginalReference() )
+		if( isSaveOriginalReference() )
 			throw new IllegalArgumentException("The original reference cannot be saved");
 
-		for( int i = 0; i < pyramid.scale.length; i++ ) {
-			T prev = i == 0 ? input : pyramid.getLayer(i-1);
-			T layer = pyramid.getLayer(i);
-
-			float s;
-			if( i > 0 )
-				s = (float)(pyramid.scale[i]/pyramid.scale[i-1]);
-			else
-				s = (float)pyramid.scale[0];
+		for( int i = 0; i < scale.length; i++ ) {
+			T prev = i == 0 ? input : getLayer(i-1);
+			T layer = getLayer(i);
 
 			PixelTransformAffine_F32 model = DistortSupport.transformScale(layer,prev);
 			DistortImageOps.distortSingle(prev,layer,model,null,interpolate);
 		}
+	}
+
+	@Override
+	public double getSampleOffset(int layer) {
+		return 0;
+	}
+
+	/**
+	 * No blur is applied to the image
+	 *
+	 * @param layer Layer in the pyramid
+	 * @return scale
+	 */
+	@Override
+	public double getSigma(int layer) {
+		return 0;
 	}
 }

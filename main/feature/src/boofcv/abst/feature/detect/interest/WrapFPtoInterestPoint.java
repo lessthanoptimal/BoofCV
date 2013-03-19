@@ -19,9 +19,9 @@
 package boofcv.abst.feature.detect.interest;
 
 import boofcv.alg.feature.detect.interest.FeaturePyramid;
-import boofcv.alg.transform.gss.ScaleSpacePyramid;
 import boofcv.struct.feature.ScalePoint;
 import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.pyramid.PyramidFloat;
 import georegression.struct.point.Point2D_F64;
 
 import java.util.List;
@@ -36,17 +36,17 @@ public class WrapFPtoInterestPoint<T extends ImageSingleBand, D extends ImageSin
 
 	FeaturePyramid<T,D> detector;
 	List<ScalePoint> location;
-	ScaleSpacePyramid<T> ss;
+	PyramidFloat<T> ss;
 
 	public WrapFPtoInterestPoint(FeaturePyramid<T,D> detector,
-								 ScaleSpacePyramid<T> ss ) {
+								 PyramidFloat<T> ss ) {
 		this.detector = detector;
 		this.ss = ss;
 	}
 
 	@Override
 	public void detect(T input) {
-		ss.setImage(input);
+		ss.process(input);
 
 		detector.detect(ss);
 

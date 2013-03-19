@@ -32,7 +32,7 @@ import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.factory.transform.pyramid.FactoryPyramid;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.pyramid.PyramidUpdaterDiscrete;
+import boofcv.struct.pyramid.PyramidDiscrete;
 
 import static boofcv.factory.feature.tracker.FactoryPointTracker.createShiTomasi;
 
@@ -43,8 +43,6 @@ public class FactoryPointTrackerTwoPass {
 
 	/**
 	 * Pyramid KLT feature tracker.
-	 *
-	 * @see boofcv.struct.pyramid.PyramidUpdaterDiscrete
 	 *
 	 * @param config Config for the tracker. Try PkltConfig.createDefault().
 	 * @param configExtract Configuration for extracting features
@@ -60,9 +58,9 @@ public class FactoryPointTrackerTwoPass {
 
 		ImageGradient<I,D> gradient = FactoryDerivative.sobel(config.typeInput, config.typeDeriv);
 
-		PyramidUpdaterDiscrete<I> pyramidUpdater = FactoryPyramid.discreteGaussian(config.typeInput, -1, 2);
+		PyramidDiscrete<I> pyramid = FactoryPyramid.discreteGaussian(config.pyramidScaling,-1,2,true,config.typeInput);
 
-		return new PointTrackerTwoPassKltPyramid<I, D>(config,pyramidUpdater,detector,
+		return new PointTrackerTwoPassKltPyramid<I, D>(config.config,config.templateRadius,pyramid,detector,
 				gradient,interpInput,interpDeriv);
 	}
 

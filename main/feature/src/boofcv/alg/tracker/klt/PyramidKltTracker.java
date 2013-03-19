@@ -43,8 +43,8 @@ public class PyramidKltTracker<InputImage extends ImageSingleBand, DerivativeIma
 	// image pyramid for raw input image
 	ImagePyramid<InputImage> image;
 	// image pyramid for image gradient
-	ImagePyramid<DerivativeImage> derivX;
-	ImagePyramid<DerivativeImage> derivY;
+	DerivativeImage[] derivX;
+	DerivativeImage[] derivY;
 
 	public PyramidKltTracker(KltTracker<InputImage, DerivativeImage> tracker) {
 		this.tracker = tracker;
@@ -78,8 +78,8 @@ public class PyramidKltTracker<InputImage extends ImageSingleBand, DerivativeIma
 	 * @param derivY Derivative along y-axis.
 	 */
 	public void setImage(ImagePyramid<InputImage> image,
-						 ImagePyramid<DerivativeImage> derivX, ImagePyramid<DerivativeImage> derivY) {
-		if( image.getNumLayers() != derivX.getNumLayers() || image.getNumLayers() != derivY.getNumLayers() )
+						 DerivativeImage[] derivX, DerivativeImage[] derivY) {
+		if( image.getNumLayers() != derivX.length || image.getNumLayers() != derivY.length )
 			throw new IllegalArgumentException("Number of layers does not match.");
 
 		this.image = image;
@@ -153,7 +153,7 @@ public class PyramidKltTracker<InputImage extends ImageSingleBand, DerivativeIma
 
 	private void setupKltTracker(int layer) {
 		if (derivX != null)
-			tracker.setImage(image.getLayer(layer), derivX.getLayer(layer), derivY.getLayer(layer));
+			tracker.setImage(image.getLayer(layer), derivX[layer], derivY[layer]);
 		else
 			tracker.setImage(image.getLayer(layer), null, null);
 	}

@@ -28,7 +28,6 @@ import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.factory.transform.pyramid.FactoryPyramid;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.pyramid.PyramidDiscrete;
-import boofcv.struct.pyramid.PyramidUpdaterDiscrete;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -49,8 +48,8 @@ public class TestPyramidKltForCombined {
 	int scales[] = new int[]{1,2,4};
 
 	PyramidDiscrete<ImageFloat32> pyramid;
-	PyramidDiscrete<ImageFloat32> derivX;
-	PyramidDiscrete<ImageFloat32> derivY;
+	ImageFloat32[] derivX;
+	ImageFloat32[] derivY;
 
 
 	public PyramidKltForCombined<ImageFloat32,ImageFloat32> createAlg()
@@ -64,23 +63,18 @@ public class TestPyramidKltForCombined {
 	@Before
 	public void init() {
 
-		pyramid = new PyramidDiscrete(ImageFloat32.class,false,scales);
-		derivX = new PyramidDiscrete(ImageFloat32.class,false,scales);
-		derivY = new PyramidDiscrete(ImageFloat32.class,false,scales);
-
-		pyramid.initialize(width,height);
-		derivX.initialize(width,height);
-		derivY.initialize(width,height);
+		pyramid = FactoryPyramid.discreteGaussian(scales,-1,2,false,ImageFloat32.class);
 
 		ImageFloat32 input = new ImageFloat32(width,height);
 		ImageMiscOps.fillUniform(input,rand,0,100);
 
 		// do a real update so that it can track a feature
-		PyramidUpdaterDiscrete<ImageFloat32> updaterP = FactoryPyramid.discreteGaussian(ImageFloat32.class, -1, 2);
 		ImageGradient<ImageFloat32,ImageFloat32> gradient =
 				FactoryDerivative.sobel(ImageFloat32.class, ImageFloat32.class);
 
-		updaterP.update(input,pyramid);
+		pyramid.process(input);
+		derivX = PyramidOps.declareOutput(pyramid,ImageFloat32.class);
+		derivY = PyramidOps.declareOutput(pyramid,ImageFloat32.class);
 		PyramidOps.gradient(pyramid, gradient, derivX, derivY);
 	}
 

@@ -20,11 +20,11 @@ package boofcv.alg.transform.pyramid;
 
 import boofcv.abst.filter.FilterImageInterface;
 import boofcv.abst.filter.derivative.ImageGradient;
-import boofcv.alg.misc.GImageMiscOps;
+import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.pyramid.ImagePyramid;
 
-import java.util.Random;
+import java.lang.reflect.Array;
 
 
 /**
@@ -34,20 +34,28 @@ import java.util.Random;
  */
 public class PyramidOps {
 
-	/**
-	 * Randomizes the image in each layers using a uniform distribution.
-	 *
-	 * @param pyramid Image pyramid.
-	 * @param rand Random number generator.
-	 * @param min min value.
-	 * @param max maximum value.
-	 */
-	public static <I extends ImageSingleBand>
-	void randomize( ImagePyramid<I> pyramid , Random rand , int min , int max ) {
 
-		for( int i = 0; i < pyramid.getNumLayers(); i++ ) {
-			I imageIn = pyramid.getLayer(i);
-			GImageMiscOps.fillUniform(imageIn, rand, min, max);
+
+	public static <O extends ImageSingleBand>
+	O[] declareOutput( ImagePyramid<?> pyramid , Class<O> outputType ) {
+		O[] ret = (O[])Array.newInstance(outputType,pyramid.getNumLayers());
+
+		for( int i = 0; i < ret.length; i++ ) {
+			int w = pyramid.getWidth(i);
+			int h = pyramid.getHeight(i);
+			ret[i] = GeneralizedImageOps.createSingleBand(outputType,w,h);
+		}
+
+		return ret;
+	}
+
+	public static <O extends ImageSingleBand>
+	void reshapeOutput( ImagePyramid<?> pyramid , O[] output ) {
+
+		for( int i = 0; i < output.length; i++ ) {
+			int w = pyramid.getWidth(i);
+			int h = pyramid.getHeight(i);
+			output[i].reshape(w,h);
 		}
 	}
 
@@ -67,17 +75,12 @@ public class PyramidOps {
 	 * @param output Output pyramid where filter results are saved.
 	 */
 	public static <I extends ImageSingleBand, O extends ImageSingleBand>
-	void filter(ImagePyramid<I> input, FilterImageInterface<I, O> filter, ImagePyramid<O> output
+	void filter(ImagePyramid<I> input, FilterImageInterface<I, O> filter, O[] output
 	)
 	{
-		if( !output.isInitialized() )
-			output.initialize(input.getInputWidth(),input.getInputHeight());
-
-		for( int i = 0; i < output.getNumLayers(); i++ ) {
+		for( int i = 0; i < input.getNumLayers(); i++ ) {
 			I imageIn = input.getLayer(i);
-			O imageOut = output.getLayer(i);
-
-			filter.process(imageIn,imageOut);
+			filter.process(imageIn,output[i]);
 		}
 	}
 
@@ -98,30 +101,12 @@ public class PyramidOps {
 	 * @param derivY Pyramid where y-derivative is stored.
 	 */
 	public static <I extends ImageSingleBand, O extends ImageSingleBand>
-	void gradient(ImagePyramid<I> input,
-				  ImageGradient<I, O> gradient, ImagePyramid<O> derivX,
-				  ImagePyramid<O> derivY )
+	void gradient(ImagePyramid<I> input, ImageGradient<I, O> gradient,
+				  O[] derivX, O[] derivY )
 	{
-		if( !derivX.isInitialized() )
-			derivX.initialize(input.getInputWidth(),input.getInputHeight());
-		else if( derivX.getInputWidth() != input.getInputWidth() ||
-				derivX.getInputWidth() != input.getInputWidth() ) {
-			derivX.initialize(input.getInputWidth(),input.getInputHeight());
-		}
-
-		if( !derivY.isInitialized() )
-			derivY.initialize(input.getInputWidth(),input.getInputHeight());
-		else if( derivY.getInputWidth() != input.getInputWidth() ||
-				derivY.getInputWidth() != input.getInputWidth() ) {
-			derivY.initialize(input.getInputWidth(),input.getInputHeight());
-		}
-
 		for( int i = 0; i < input.getNumLayers(); i++ ) {
 			I imageIn = input.getLayer(i);
-			O x = derivX.getLayer(i);
-			O y = derivY.getLayer(i);
-
-			gradient.process(imageIn,x,y);
+			gradient.process(imageIn,derivX[i],derivY[i]);
 		}
 	}
 }

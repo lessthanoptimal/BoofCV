@@ -23,13 +23,13 @@ import boofcv.abst.feature.detect.interest.*;
 import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.abst.filter.derivative.ImageHessian;
 import boofcv.alg.feature.detect.interest.*;
-import boofcv.alg.transform.gss.ScaleSpacePyramid;
 import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
 import boofcv.factory.filter.derivative.FactoryDerivative;
-import boofcv.factory.transform.gss.FactoryGaussianScaleSpace;
+import boofcv.factory.transform.pyramid.FactoryGaussianScaleSpace;
 import boofcv.struct.gss.GaussianScaleSpace;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.pyramid.PyramidFloat;
 
 /**
  * Factory for creating interest point detectors which conform to the {@link InterestPointDetector}
@@ -102,7 +102,7 @@ public class FactoryInterestPoint {
 										  double[] scales,
 										  Class<T> inputType) {
 
-		ScaleSpacePyramid<T> ss = new ScaleSpacePyramid<T>(inputType, scales);
+		PyramidFloat<T> ss = FactoryGaussianScaleSpace.scaleSpacePyramid(scales,inputType);
 
 		return new WrapFLPtoInterestPoint<T, D>(feature, ss);
 	}
@@ -139,7 +139,7 @@ public class FactoryInterestPoint {
 										  double[] scales,
 										  Class<T> inputType) {
 
-		ScaleSpacePyramid<T> ss = new ScaleSpacePyramid<T>(inputType, scales);
+		PyramidFloat<T> ss = FactoryGaussianScaleSpace.scaleSpacePyramid(scales,inputType);
 
 		return new WrapFPtoInterestPoint<T, D>(feature, ss);
 	}

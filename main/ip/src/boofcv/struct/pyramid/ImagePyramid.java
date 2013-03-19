@@ -18,7 +18,7 @@
 
 package boofcv.struct.pyramid;
 
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageBase;
 
 /**
  * <p>
@@ -30,21 +30,21 @@ import boofcv.struct.image.ImageSingleBand;
  * </p>
  *
  * <p>
- * Usage: Before being used the scales in the pyramid must first be specified then the {@link @initialize}
- * function called.  How the scale is set is implementation dependent.  Once initialized images
- * at different layers can be accessed with {@link #getLayer}.
+ * The transform from a pixel coordinate in layer 'i' to the original image will vary depending on the pyramid is
+ * constructed.  In general it, can be described by the following equation: (x,y) = (offX_i,offY_i) + scale_i*(x_i,y_i),
+ * where (x_i,y_i) is the pixel coordinate in layer 'i'. The offsets (offX_i,offY_i) vary depending on how
+ * each layer in the pyramid samples the previous layers.  This offset can be found by calling {@link #getSampleOffset(int)}.
  * </p>
  * 
  * @author Peter Abeles
  */
 @SuppressWarnings({"unchecked"})
-public interface ImagePyramid<T extends ImageSingleBand> {
+public interface ImagePyramid<T extends ImageBase> {
 
 	/**
-	 * Creates the pyramids internal data structures.  The provided image must be of the same type
-	 * and dimension as all the input images.
+	 * Constructs the image pyramid given the input image.
 	 */
-	public void initialize( int width , int height );
+	public void process( T input );
 
 	/**
 	 * Returns the scale of the specified layer in the pyramid.  Larger the scale
@@ -94,17 +94,30 @@ public interface ImagePyramid<T extends ImageSingleBand> {
 	 */
 	public int getInputHeight();
 
-
-	/**
-	 * Checks to see if the image pyramid has been initialized or not yet.
-	 * @return True if initialized and false if not.
-	 */
-	public boolean isInitialized();
-
 	/**
 	 * The type of image.
 	 *
 	 * @return Image type.
 	 */
 	public Class<T> getImageType();
+
+	/**
+	 * Returns the sampling offset.  Both x and y axises are assumed to have the same offset.
+	 * See comment in constructor above.
+	 *
+	 * @param layer Layer in the pyramid
+	 * @return Sampling offset in pixels.
+	 */
+	public double getSampleOffset( int layer );
+
+	/**
+	 * Returns the scale-space scale for the specified layer.  This scale is equivalent amount of Gaussian blur
+	 * applied to the input image.
+	 *
+	 * If Gaussian blur is not applied to each layer then an approximation should be returned.
+	 *
+	 * @param layer Layer in the pyramid
+	 * @return Equivalent sigma for Gaussian blur.
+	 */
+	public double getSigma( int layer );
 }

@@ -18,7 +18,6 @@
 
 package boofcv.examples;
 
-import boofcv.alg.transform.pyramid.PyramidUpdateIntegerDown;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.filter.kernel.FactoryKernel;
@@ -30,7 +29,6 @@ import boofcv.struct.convolve.Kernel1D;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.pyramid.PyramidDiscrete;
-import boofcv.struct.pyramid.PyramidUpdaterDiscrete;
 
 import java.awt.image.BufferedImage;
 
@@ -47,8 +45,6 @@ public class ExamplePyramidDiscrete<T extends ImageSingleBand> {
 	Class<T> imageType;
 	// The pyramid data structure
 	PyramidDiscrete<T> pyramid;
-	// update the pyramid given from
-	PyramidUpdaterDiscrete<T> updater;
 
 	public ExamplePyramidDiscrete(Class<T> imageType) {
 		this.imageType = imageType;
@@ -59,10 +55,7 @@ public class ExamplePyramidDiscrete<T extends ImageSingleBand> {
 	 */
 	public void standard() {
 		// Each level in the pyramid must have a ratio with the previously layer that is an integer value
-		pyramid = new PyramidDiscrete<T>(imageType,true,1,2,4,8);
-
-		// In most cases sub-sampling with a Gaussian is preferred
-		updater = FactoryPyramid.discreteGaussian(imageType,-1,2);
+		pyramid = FactoryPyramid.discreteGaussian(new int[]{1,2,4,8},-1,2,true,imageType);
 	}
 
 	/**
@@ -70,7 +63,7 @@ public class ExamplePyramidDiscrete<T extends ImageSingleBand> {
 	 */
 	public void unusual() {
 		// Note that the first level does not have to be one
-		pyramid = new PyramidDiscrete<T>(imageType,true,2,6);
+		pyramid = FactoryPyramid.discreteGaussian(new int[]{2,6},-1,2,true,imageType);
 
 		// Other kernels can also be used besides Gaussian
 		Kernel1D kernel;
@@ -79,8 +72,6 @@ public class ExamplePyramidDiscrete<T extends ImageSingleBand> {
 		} else {
 			kernel = FactoryKernel.table1D_I32(2);
 		}
-
-		updater = new PyramidUpdateIntegerDown<T>(kernel,imageType);
 	}
 
 	/**
@@ -88,7 +79,7 @@ public class ExamplePyramidDiscrete<T extends ImageSingleBand> {
 	 */
 	public void process( BufferedImage image ) {
 		T input = ConvertBufferedImage.convertFromSingle(image, null, imageType);
-		updater.update(input,pyramid);
+		pyramid.process(input);
 
 		DiscretePyramidPanel gui = new DiscretePyramidPanel();
 		gui.setPyramid(pyramid);

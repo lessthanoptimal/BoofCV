@@ -16,17 +16,11 @@
  * limitations under the License.
  */
 
-package boofcv.struct.pyramid;
-
-import boofcv.struct.image.ImageSingleBand;
-
+package boofcv.factory.transform.pyramid;
 
 /**
- * <p>
- * Updater for pyramids of type {@link PyramidDiscrete}.
- * </p>
- *
  * @author Peter Abeles
  */
-public interface PyramidUpdaterDiscrete<T extends ImageSingleBand> extends PyramidUpdater<T, PyramidDiscrete<T>> {
+public class TestFactoryPyramid {
+
 }

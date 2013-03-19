@@ -18,6 +18,7 @@
 
 package boofcv.struct.pyramid;
 
+import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
 import org.junit.Test;
 
@@ -34,7 +35,7 @@ public class TestPyramidFloat {
 	@Test
 	public void setScaling() {
 		// see if all the layers are set correctly
-		PyramidFloat<ImageUInt8> pyramid = new PyramidFloat<ImageUInt8>(ImageUInt8.class);
+		PyramidFloat<ImageUInt8> pyramid = new DummyFloat<ImageUInt8>(ImageUInt8.class);
 
 		pyramid.setScaleFactors(1,2,5.5);
 		pyramid.initialize(width,height);
@@ -55,5 +56,21 @@ public class TestPyramidFloat {
 		assertEquals(height / 2, pyramid.getLayer(0).height);
 		assertEquals(width / 4, pyramid.getLayer(1).width);
 		assertEquals(height / 4, pyramid.getLayer(1).height);
+	}
+
+	private static class DummyFloat<T extends ImageSingleBand> extends PyramidFloat<T> {
+
+		public DummyFloat(Class<T> imageType) {
+			super(imageType);
+		}
+
+		@Override
+		public void process(T input) {}
+
+		@Override
+		public double getSampleOffset(int layer) {return 0;}
+
+		@Override
+		public double getSigma(int layer) {return 0;}
 	}
 }

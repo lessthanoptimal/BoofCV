@@ -16,48 +16,53 @@
  * limitations under the License.
  */
 
-package boofcv.struct.gss;
+package boofcv.alg.transform.pyramid;
 
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.alg.misc.GImageStatistics;
-import boofcv.alg.transform.gss.ScaleSpacePyramid;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.core.image.GeneralizedImageOps;
+import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.pyramid.ImagePyramid;
 import org.junit.Test;
 
 import java.util.Random;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+
 /**
+ * Basic high level tests common to all PyramidUpdater
+ *
  * @author Peter Abeles
  */
-public class TestScaleSpacePyramid {
+public abstract class GenericPyramidTests<T extends ImageSingleBand> {
 
 	Random rand = new Random(234);
-	int width = 50;
-	int height = 60;
+	int width = 80;
+	int height = 120;
+
+	Class<T> imageType;
+
+	protected GenericPyramidTests(Class<T> imageType) {
+		this.imageType = imageType;
+	}
 
 	/**
-	 * This is a hard class to test.  It can't be compared directly against {@link GaussianScaleSpace}
-	 * because they won't produce exactly the same results and visually it looks a bit different.  The
-	 * math has been inspected a couple of times.
-	 *
-	 * So all this test does is see if it will process an image without blowing up.
+	 * Checks to see if every layer in the pyramid has been modified on a call to update
 	 */
 	@Test
-	public void reallyStupidTest() {
-		ScaleSpacePyramid<ImageFloat32> ss = new ScaleSpacePyramid<ImageFloat32>(ImageFloat32.class,1,2,3,4);
-
-		ImageFloat32 input = new ImageFloat32(width,height);
+	public void checkModifiesLayersOnUpdate() {
+		T input = GeneralizedImageOps.createSingleBand(imageType, width, height);
+		ImagePyramid<T> pyramid = createPyramid(1,2,4);
 		GImageMiscOps.fillUniform(input, rand, 0, 100);
 
-		ss.setImage(input);
+		pyramid.process(input);
 
-		assertEquals(4,ss.getNumLayers());
-
-		for( int i = 0; i < 4; i++ ) {
-			assertTrue(GImageStatistics.sum(ss.getLayer(i))>0);
+		for( int i = 0; i < pyramid.getNumLayers(); i++ ) {
+			T image = pyramid.getLayer(i);
+			assertTrue( GImageStatistics.sum(image) > 0 );
 		}
 	}
+
+	protected abstract ImagePyramid<T> createPyramid( int... scales);
 }

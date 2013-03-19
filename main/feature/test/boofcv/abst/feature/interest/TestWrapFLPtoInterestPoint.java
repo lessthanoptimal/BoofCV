@@ -20,10 +20,11 @@ package boofcv.abst.feature.interest;
 
 import boofcv.abst.feature.detect.interest.WrapFLPtoInterestPoint;
 import boofcv.alg.feature.detect.interest.FeatureLaplacePyramid;
-import boofcv.alg.transform.gss.ScaleSpacePyramid;
 import boofcv.factory.feature.detect.interest.FactoryInterestPointAlgs;
+import boofcv.factory.transform.pyramid.FactoryGaussianScaleSpace;
 import boofcv.struct.image.ImageSInt16;
 import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.pyramid.PyramidFloat;
 
 /**
  * @author Peter Abeles
@@ -37,7 +38,7 @@ public class TestWrapFLPtoInterestPoint extends GeneralInterestPointDetectorChec
 	double scales[] = new double[]{1.0,2.0,3.0,4.0};
 
 	FeatureLaplacePyramid flp = FactoryInterestPointAlgs.hessianLaplacePyramid(3, 1, 200, imageType, derivType);
-	ScaleSpacePyramid ss = new ScaleSpacePyramid(imageType,scales);
+	PyramidFloat ss = FactoryGaussianScaleSpace.scaleSpacePyramid(scales,imageType);
 
 	public TestWrapFLPtoInterestPoint() {
 		configure(new WrapFLPtoInterestPoint(flp, ss), false, true, imageType);

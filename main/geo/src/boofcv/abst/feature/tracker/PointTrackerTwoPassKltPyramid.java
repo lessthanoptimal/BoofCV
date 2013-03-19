@@ -21,11 +21,12 @@ package boofcv.abst.feature.tracker;
 import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.alg.interpolate.InterpolateRectangle;
+import boofcv.alg.tracker.klt.KltConfig;
 import boofcv.alg.tracker.klt.KltTrackFault;
 import boofcv.alg.tracker.klt.PyramidKltFeature;
 import boofcv.alg.transform.pyramid.PyramidOps;
 import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.pyramid.PyramidUpdaterDiscrete;
+import boofcv.struct.pyramid.PyramidDiscrete;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,13 +48,15 @@ public class PointTrackerTwoPassKltPyramid<I extends ImageSingleBand,D extends I
 	// has finished tracking been called
 	boolean finishedTracking;
 
-	public PointTrackerTwoPassKltPyramid(PkltConfig<I, D> config, PyramidUpdaterDiscrete<I> inputPyramidUpdater,
+	public PointTrackerTwoPassKltPyramid(KltConfig config,
+										 int templateRadius ,
+										 PyramidDiscrete<I> pyramid,
 										 GeneralFeatureDetector<I, D> detector,
 										 ImageGradient<I, D> gradient,
 										 InterpolateRectangle<I> interpInput,
-										 InterpolateRectangle<D> interpDeriv)
+										 InterpolateRectangle<D> interpDeriv )
 	{
-		super(config, inputPyramidUpdater, detector, gradient, interpInput, interpDeriv);
+		super(config, templateRadius, pyramid , detector, gradient, interpInput, interpDeriv, gradient.getDerivType());
 	}
 
 	@Override
@@ -63,7 +66,12 @@ public class PointTrackerTwoPassKltPyramid<I extends ImageSingleBand,D extends I
 		dropped.clear();
 
 		// update image pyramids
-		inputPyramidUpdater.update(image,basePyramid);
+		basePyramid.process(image);
+		if( derivX == null ) {
+			// declare storage for image derivative since the image size is now known
+			derivX = PyramidOps.declareOutput(basePyramid,derivType);
+			derivY = PyramidOps.declareOutput(basePyramid,derivType);
+		}
 		PyramidOps.gradient(basePyramid, gradient, derivX, derivY);
 
 		// setup active list

@@ -21,16 +21,11 @@ package boofcv.abst.feature.tracker;
 import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.alg.interpolate.InterpolateRectangle;
-import boofcv.alg.tracker.klt.KltTrackFault;
-import boofcv.alg.tracker.klt.KltTracker;
-import boofcv.alg.tracker.klt.PyramidKltFeature;
-import boofcv.alg.tracker.klt.PyramidKltTracker;
+import boofcv.alg.tracker.klt.*;
 import boofcv.alg.transform.pyramid.PyramidOps;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.pyramid.ImagePyramid;
 import boofcv.struct.pyramid.PyramidDiscrete;
-import boofcv.struct.pyramid.PyramidUpdaterDiscrete;
 import georegression.struct.point.Point2D_I16;
 
 import java.util.ArrayList;
@@ -46,18 +41,19 @@ import java.util.List;
 public class PointTrackerKltPyramid<I extends ImageSingleBand,D extends ImageSingleBand>
 		implements PointTracker<I>
 {
-	// update the image pyramid
-	protected PyramidUpdaterDiscrete<I> inputPyramidUpdater;
 	// Updates the image pyramid's gradient.
 	protected ImageGradient<I,D> gradient;
 
 	// storage for image pyramid
 	protected PyramidDiscrete<I> basePyramid;
-	protected ImagePyramid<D> derivX;
-	protected ImagePyramid<D> derivY;
+	protected D[] derivX;
+	protected D[] derivY;
+	protected Class<D> derivType;
 
-	// configuration for the track manager
-	protected PkltConfig<I, D> config;
+	// configuration for the KLT tracker
+	protected KltConfig config;
+	// size of the template/feature description
+	protected int templateRadius;
 
 	// list of features which are actively being tracked
 	protected List<PyramidKltFeature> active = new ArrayList<PyramidKltFeature>();
@@ -83,45 +79,45 @@ public class PointTrackerKltPyramid<I extends ImageSingleBand,D extends ImageSin
 	 * Constructor which specified the KLT track manager and how the image pyramids are computed.
 	 *
 	 * @param config KLT tracker configuration
-	 * @param inputPyramidUpdater Computes the main image pyramid.
 	 * @param gradient Computes gradient image pyramid.
 	 */
-	public PointTrackerKltPyramid(PkltConfig<I, D> config,
-								  PyramidUpdaterDiscrete<I> inputPyramidUpdater,
+	public PointTrackerKltPyramid(KltConfig config,
+								  int templateRadius ,
+								  PyramidDiscrete<I> pyramid,
 								  GeneralFeatureDetector<I, D> detector,
 								  ImageGradient<I, D> gradient,
 								  InterpolateRectangle<I> interpInput,
-								  InterpolateRectangle<D> interpDeriv) {
-		this(config,inputPyramidUpdater,gradient,interpInput,interpDeriv);
+								  InterpolateRectangle<D> interpDeriv,
+								  Class<D> derivType ) {
+		this(config,templateRadius,pyramid,gradient,interpInput,interpDeriv,derivType);
 
 		if( detector.getRequiresHessian() )
 			throw new IllegalArgumentException("Hessian based feature detectors not yet supported");
 
 		this.detector = detector;
+		this.derivType = derivType;
 	}
 
-	public PointTrackerKltPyramid(PkltConfig<I, D> config,
-								  PyramidUpdaterDiscrete<I> inputPyramidUpdater,
+	public PointTrackerKltPyramid(KltConfig config,
+								  int templateRadius ,
+								  PyramidDiscrete<I> pyramid,
 								  ImageGradient<I, D> gradient,
 								  InterpolateRectangle<I> interpInput,
-								  InterpolateRectangle<D> interpDeriv) {
+								  InterpolateRectangle<D> interpDeriv,
+								  Class<D> derivType ) {
 
 		this.config = config;
+		this.templateRadius = templateRadius;
 		this.gradient = gradient;
-		this.inputPyramidUpdater = inputPyramidUpdater;
+		this.basePyramid = pyramid;
 
-		KltTracker<I, D> klt = new KltTracker<I, D>(interpInput, interpDeriv, config.config);
+		KltTracker<I, D> klt = new KltTracker<I, D>(interpInput, interpDeriv, config);
 		tracker = new PyramidKltTracker<I, D>(klt);
-
-		// declare the image pyramid
-		basePyramid = new PyramidDiscrete<I>(config.typeInput,true,config.pyramidScaling);
-		derivX = new PyramidDiscrete<D>(config.typeDeriv,false,config.pyramidScaling);
-		derivY = new PyramidDiscrete<D>(config.typeDeriv,false,config.pyramidScaling);
 	}
 
 	private void addTrackToUnused() {
-		int numLayers = config.pyramidScaling.length;
-		PyramidKltFeature t = new PyramidKltFeature(numLayers, config.featureRadius);
+		int numLayers = basePyramid.getNumLayers();
+		PyramidKltFeature t = new PyramidKltFeature(numLayers, templateRadius);
 
 		PointTrack p = new PointTrack();
 		p.setDescription(t);
@@ -166,7 +162,7 @@ public class PointTrackerKltPyramid<I extends ImageSingleBand,D extends ImageSin
 
 		// find new tracks, but no more than the max
 		detector.setExcludeMaximum(excludeList);
-		detector.process(basePyramid.getLayer(0), derivX.getLayer(0), derivY.getLayer(0), null, null, null);
+		detector.process(basePyramid.getLayer(0), derivX[0], derivY[0], null, null, null);
 
 		// extract the features
 		QueueCorner found = detector.getMaximums();
@@ -221,7 +217,12 @@ public class PointTrackerKltPyramid<I extends ImageSingleBand,D extends ImageSin
 		dropped.clear();
 		
 		// update image pyramids
-		inputPyramidUpdater.update(image,basePyramid);
+		basePyramid.process(image);
+		if( derivX == null ) {
+			// declare storage for image derivative since the image size is now known
+			derivX = PyramidOps.declareOutput(basePyramid,derivType);
+			derivY = PyramidOps.declareOutput(basePyramid,derivType);
+		}
 		PyramidOps.gradient(basePyramid, gradient, derivX,derivY);
 
 		// track features

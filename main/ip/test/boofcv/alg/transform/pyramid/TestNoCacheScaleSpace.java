@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.transform.gss;
+package boofcv.alg.transform.pyramid;
 
 import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.alg.filter.blur.BlurImageOps;
