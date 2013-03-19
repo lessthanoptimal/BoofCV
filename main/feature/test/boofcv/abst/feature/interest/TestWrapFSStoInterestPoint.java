@@ -21,7 +21,7 @@ package boofcv.abst.feature.interest;
 import boofcv.abst.feature.detect.interest.WrapFSStoInterestPoint;
 import boofcv.alg.feature.detect.interest.FeatureScaleSpace;
 import boofcv.factory.feature.detect.interest.FactoryInterestPointAlgs;
-import boofcv.factory.transform.gss.FactoryGaussianScaleSpace;
+import boofcv.factory.transform.pyramid.FactoryGaussianScaleSpace;
 import boofcv.struct.gss.GaussianScaleSpace;
 import boofcv.struct.image.ImageSInt16;
 import boofcv.struct.image.ImageUInt8;

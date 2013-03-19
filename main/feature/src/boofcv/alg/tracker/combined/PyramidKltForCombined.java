@@ -65,7 +65,7 @@ public class PyramidKltForCombined<I extends ImageSingleBand, D extends ImageSin
 		tracker.setDescription(ret);
 	}
 
-	public void setInputs( ImagePyramid<I> image , ImagePyramid<D> derivX , ImagePyramid<D> derivY ) {
+	public void setInputs( ImagePyramid<I> image , D[] derivX , D[] derivY ) {
 		tracker.setImage(image,derivX,derivY);
 	}
 

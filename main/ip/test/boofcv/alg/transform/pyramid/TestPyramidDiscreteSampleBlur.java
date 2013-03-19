@@ -23,47 +23,18 @@ import boofcv.factory.filter.kernel.FactoryKernelGaussian;
 import boofcv.struct.convolve.Kernel1D_F32;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.pyramid.ImagePyramid;
-import boofcv.struct.pyramid.PyramidDiscrete;
-import boofcv.struct.pyramid.PyramidUpdater;
 import boofcv.testing.BoofTesting;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 /**
  * @author Peter Abeles
  */
-public class TestPyramidUpdateIntegerDown extends GenericPyramidUpdateTests<ImageFloat32> {
+public class TestPyramidDiscreteSampleBlur extends GenericPyramidTests<ImageFloat32> {
 
-	public TestPyramidUpdateIntegerDown() {
+	public TestPyramidDiscreteSampleBlur() {
 		super(ImageFloat32.class);
-	}
-
-	/**
-	 * Make sure this flag is handled correctly on update
-	 */
-	@Test
-	public void saveOriginalReference() {
-		ImageFloat32 input= new ImageFloat32(width,height);
-
-		Kernel1D_F32 kernel = FactoryKernelGaussian.gaussian(Kernel1D_F32.class,-1,3);
-		PyramidUpdateIntegerDown<ImageFloat32> alg = new PyramidUpdateIntegerDown<ImageFloat32>(kernel,ImageFloat32.class);
-
-		PyramidDiscrete<ImageFloat32> pyramid = new PyramidDiscrete<ImageFloat32>(imageType,true,1,2,4);
-		alg.update(input,pyramid);
-
-		assertTrue(input == pyramid.getLayer(0));
-
-		pyramid = new PyramidDiscrete<ImageFloat32>(imageType,false,1,2,4);
-		alg.update(input,pyramid);
-
-		assertTrue(input != pyramid.getLayer(0));
-
-		pyramid = new PyramidDiscrete<ImageFloat32>(imageType,true,2,4);
-		alg.update(input,pyramid);
-
-		assertTrue(input != pyramid.getLayer(0));
 	}
 
 	/**
@@ -86,46 +57,60 @@ public class TestPyramidUpdateIntegerDown extends GenericPyramidUpdateTests<Imag
 		ConvolveNormalized.horizontal(kernel,input,storage);
 		ConvolveNormalized.vertical(kernel,storage,convImg);
 
-		PyramidUpdateIntegerDown<ImageFloat32> alg = new PyramidUpdateIntegerDown<ImageFloat32>(kernel,ImageFloat32.class);
+		PyramidDiscreteSampleBlur<ImageFloat32> alg =
+				new PyramidDiscreteSampleBlur<ImageFloat32>(kernel,3,ImageFloat32.class,true,new int[]{1,2,4});
 
-		PyramidDiscrete<ImageFloat32> pyramid = new PyramidDiscrete<ImageFloat32>(imageType,true,1,2,4);
-		alg.update(input,pyramid);
+		alg.process(input);
 
 		// top layer should be the same as the input layer
-		BoofTesting.assertEquals(input, pyramid.getLayer(0), 1e-4f);
+		BoofTesting.assertEquals(input, alg.getLayer(0), 1e-4f);
 
 		// second layer should have the same values as the convolved image
 		for (int i = 0; i < height; i += 2) {
 			for (int j = 0; j < width; j += 2) {
 				float a = convImg.get(j, i);
-				float b = pyramid.getLayer(1).get(j / 2, i / 2);
+				float b = alg.getLayer(1).get(j / 2, i / 2);
 
 				assertEquals(a, b, 1e-4);
 			}
 		}
 
 		storage.reshape(width/2,height/2);
-		ConvolveNormalized.horizontal(kernel,pyramid.getLayer(1),storage);
+		ConvolveNormalized.horizontal(kernel,alg.getLayer(1),storage);
 		ConvolveNormalized.vertical(kernel,storage,convImg2);
 		// second layer should have the same values as the second convolved image
 		for (int i = 0; i < height/2; i += 2) {
 			for (int j = 0; j < width/2; j += 2) {
 				float a = convImg2.get(j, i);
-				float b = pyramid.getLayer(2).get(j / 2, i / 2);
+				float b = alg.getLayer(2).get(j / 2, i / 2);
 
 				assertEquals(j+" "+j,a, b, 1e-4);
 			}
 		}
 	}
 
-	@Override
-	protected PyramidUpdater createUpdater() {
+	/**
+	 * Makes sure the amount of Gaussian blur in each level is correctly computed
+	 */
+	@Test
+	public void checkSigmas() {
 		Kernel1D_F32 kernel = FactoryKernelGaussian.gaussian(Kernel1D_F32.class,-1,3);
-		return new PyramidUpdateIntegerDown<ImageFloat32>(kernel,ImageFloat32.class);
+
+		PyramidDiscreteSampleBlur<ImageFloat32> alg =
+				new PyramidDiscreteSampleBlur<ImageFloat32>(kernel,3,ImageFloat32.class,true,new int[]{1,2,4});
+
+		assertEquals(0,alg.getSigma(0),1e-8);
+		assertEquals(3,alg.getSigma(1),1e-8);
+		assertEquals(6.7082,alg.getSigma(2),1e-3);
+
+		alg = new PyramidDiscreteSampleBlur<ImageFloat32>(kernel,3,ImageFloat32.class,true,new int[]{2,4,8});
+		assertEquals(0,alg.getSigma(0),1e-8);
+		assertEquals(6,alg.getSigma(1),1e-8);
 	}
 
 	@Override
 	protected ImagePyramid<ImageFloat32> createPyramid(int... scales) {
-		return new PyramidDiscrete<ImageFloat32>(imageType,true,scales);
+		Kernel1D_F32 kernel = FactoryKernelGaussian.gaussian(Kernel1D_F32.class,-1,3);
+		return new PyramidDiscreteSampleBlur<ImageFloat32>(kernel,3,ImageFloat32.class,true,new int[]{1,2,4});
 	}
 }

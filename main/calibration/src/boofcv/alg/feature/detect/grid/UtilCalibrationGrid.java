@@ -52,14 +52,26 @@ public class UtilCalibrationGrid {
 
 		int lengthUpper = histogram.length-mean;
 
+		// select the median value out of the non-zero values
 		sort.sort(histogram,mean,indexes);
-		int lowerMedian = indexes[mean/2];
+		int notZero = firstNotZero(histogram,indexes);
+		int lowerMedian = indexes[(mean-notZero)/2+notZero];
 		System.arraycopy(histogram,mean,histogram,0,lengthUpper);
 		sort.sort(histogram,lengthUpper,indexes);
-		int upperMedian = indexes[lengthUpper/2]+mean;
+		notZero = firstNotZero(histogram,indexes);
+		int upperMedian = indexes[(lengthUpper-notZero)/2+notZero]+mean;
 
 		// pick the point which maximizes the separation between the two peaks
 		return (lowerMedian + upperMedian)/2;
+	}
+
+
+	private static int firstNotZero( int counts[] , int indexes[] ) {
+		for( int i = 0; i < counts.length; i++ ) {
+			if( counts[indexes[i]] != 0 )
+				return i;
+		}
+		return counts.length;
 	}
 
 	/**

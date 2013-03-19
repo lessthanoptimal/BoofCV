@@ -24,9 +24,7 @@ import boofcv.alg.transform.pyramid.PyramidOps;
 import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.factory.transform.pyramid.FactoryPyramid;
 import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.pyramid.ImagePyramid;
 import boofcv.struct.pyramid.PyramidDiscrete;
-import boofcv.struct.pyramid.PyramidUpdaterDiscrete;
 
 import java.util.Random;
 
@@ -47,9 +45,8 @@ public class PyramidKltTestBase {
 
 	ImageFloat32 image = new ImageFloat32(width,height);
 	PyramidDiscrete<ImageFloat32> pyramid;
-	ImagePyramid<ImageFloat32> derivX;
-	ImagePyramid<ImageFloat32> derivY;
-	PyramidUpdaterDiscrete<ImageFloat32> updater;
+	ImageFloat32[] derivX;
+	ImageFloat32[] derivY;
 	PyramidKltTracker<ImageFloat32,ImageFloat32> tracker = createDefaultTracker();
 
 	int cornerX = 20;
@@ -60,14 +57,14 @@ public class PyramidKltTestBase {
 	}
 
 	public void setup( int ...scales ) {
-		updater = FactoryPyramid.discreteGaussian(ImageFloat32.class,-1,2);
 
-		pyramid = new PyramidDiscrete<ImageFloat32>(ImageFloat32.class,false,scales);
-		derivX = new PyramidDiscrete<ImageFloat32>(ImageFloat32.class,false,scales);
-		derivY = new PyramidDiscrete<ImageFloat32>(ImageFloat32.class,false,scales);
+		pyramid = FactoryPyramid.discreteGaussian(scales,-1,2,false,ImageFloat32.class);
 		ImageMiscOps.fillUniform(image,rand,0,1);
 		ImageMiscOps.fillRectangle(image,100,cornerX,cornerY,20,20);
-		updater.update(image,pyramid);
+		pyramid.process(image);
+
+		derivX = PyramidOps.declareOutput(pyramid,ImageFloat32.class);
+		derivY = PyramidOps.declareOutput(pyramid,ImageFloat32.class);
 
 		ImageGradient<ImageFloat32,ImageFloat32> gradient = FactoryDerivative.sobel(ImageFloat32.class,ImageFloat32.class);
 		PyramidOps.gradient(pyramid,gradient,derivX,derivY);

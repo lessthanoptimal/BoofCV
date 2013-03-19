@@ -155,7 +155,7 @@ public class TestCombinedTrackerScalePoint {
 		}
 
 		@Override
-		public void setInputs( ImagePyramid image , ImagePyramid derivX , ImagePyramid derivY ) {}
+		public void setInputs( ImagePyramid image , ImageSingleBand[] derivX , ImageSingleBand[] derivY ) {}
 
 		@Override
 		public void setDescription( float x , float y , PyramidKltFeature ret ) {}

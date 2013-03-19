@@ -125,7 +125,7 @@ public class ExamplePointFeatureTracker< T extends ImageSingleBand, D extends Im
 	 */
 	public void createKLT() {
 		PkltConfig<T, D> config = PkltConfig.createDefault(imageType, derivType);
-		config.featureRadius = 3;
+		config.templateRadius = 3;
 		config.pyramidScaling = new int[]{1,2,4,8};
 
 		tracker = FactoryPointTracker.klt(config, new ConfigGeneralDetector(200, 3, 1));

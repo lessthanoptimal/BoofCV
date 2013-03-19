@@ -20,11 +20,11 @@ package boofcv.gui.feature;
 
 import boofcv.alg.distort.DistortImageOps;
 import boofcv.alg.interpolate.TypeInterpolate;
-import boofcv.alg.transform.gss.ScaleSpacePyramid;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.feature.ScalePoint;
 import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.pyramid.PyramidFloat;
 
 import javax.swing.*;
 import java.awt.*;
@@ -40,7 +40,7 @@ import java.util.List;
  */
 public class ScaleSpacePyramidPointPanel extends JPanel implements MouseListener {
 
-	ScaleSpacePyramid ss;
+	PyramidFloat ss;
 	double radius;
 	BufferedImage background;
 	List<ScalePoint> points = new ArrayList<ScalePoint>();
@@ -50,7 +50,7 @@ public class ScaleSpacePyramidPointPanel extends JPanel implements MouseListener
 
 	int activeLevel = 0;
 
-	public ScaleSpacePyramidPointPanel( ScaleSpacePyramid ss , double radius) {
+	public ScaleSpacePyramidPointPanel( PyramidFloat ss , double radius) {
 		this.ss = ss;
 		this.radius = radius;
 		addMouseListener(this);

@@ -30,6 +30,11 @@ Version : Alpha 0.14
 - XML Serialization
   * Switched over to using XStream since XMLEncoder is broken in Java 1.7.
   * XStream also produces easier to read XML
+- Added ConfigFast. Configuration class for FAST feature detector
+- Image Pyramids and Scale-Space
+  * Added additional functions to ImagePyramid interface that provide information on how the image is sample and the amount of blur in it
+  * There is no separate class for updating image pyramids any more.  The image pyramid takes in the input image
+  * Scale-Space pyramids have been moved into the pyramid package instead of having its own
 
 ---------------------------------------------
 Date    : 2013/02/16

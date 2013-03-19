@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.transform.gss;
+package boofcv.alg.transform.pyramid;
 
 import boofcv.abst.filter.convolve.ConvolveInterface;
 import boofcv.abst.filter.derivative.AnyImageDerivative;

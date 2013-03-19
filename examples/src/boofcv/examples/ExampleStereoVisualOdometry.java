@@ -59,7 +59,7 @@ public class ExampleStereoVisualOdometry {
 		// specify how the image features are going to be tracked
 		PkltConfig<ImageUInt8, ImageSInt16> configKlt = PkltConfig.createDefault(ImageUInt8.class, ImageSInt16.class);
 		configKlt.pyramidScaling = new int[]{1, 2, 4, 8};
-		configKlt.featureRadius = 3;
+		configKlt.templateRadius = 3;
 
 		PointTrackerTwoPass<ImageUInt8> tracker =
 				FactoryPointTrackerTwoPass.klt(configKlt, new ConfigGeneralDetector(600, 3, 1));

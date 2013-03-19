@@ -21,10 +21,10 @@ package boofcv.alg.feature.detect.interest;
 import boofcv.abst.feature.detect.interest.InterestPointScaleSpacePyramid;
 import boofcv.abst.filter.ImageFunctionSparse;
 import boofcv.abst.filter.derivative.AnyImageDerivative;
-import boofcv.alg.transform.gss.ScaleSpacePyramid;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.feature.ScalePoint;
 import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.pyramid.PyramidFloat;
 import georegression.struct.point.Point2D_I16;
 
 import java.util.ArrayList;
@@ -98,7 +98,7 @@ public class FeatureLaplacePyramid<T extends ImageSingleBand, D extends ImageSin
 	 * @param ss Scale space of an image
 	 */
 	@Override
-	public void detect(ScaleSpacePyramid<T> ss) {
+	public void detect(PyramidFloat<T> ss) {
 		spaceIndex = 0;
 		if (maximums == null) {
 			maximums = new List[3];
@@ -169,7 +169,7 @@ public class FeatureLaplacePyramid<T extends ImageSingleBand, D extends ImageSin
 	/**
 	 * See if each feature is a maximum in its local scale-space.
 	 */
-	protected void findLocalScaleSpaceMax(ScaleSpacePyramid<T> ss, int layerID) {
+	protected void findLocalScaleSpaceMax(PyramidFloat<T> ss, int layerID) {
 		int index1 = (spaceIndex + 1) % 3;
 
 		List<Point2D_I16> candidates = maximums[index1];

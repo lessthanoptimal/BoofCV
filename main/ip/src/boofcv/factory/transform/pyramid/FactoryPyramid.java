@@ -19,15 +19,15 @@
 package boofcv.factory.transform.pyramid;
 
 import boofcv.alg.interpolate.InterpolatePixel;
-import boofcv.alg.transform.pyramid.PyramidUpdateGaussianScale;
-import boofcv.alg.transform.pyramid.PyramidUpdateIntegerDown;
+import boofcv.alg.transform.pyramid.PyramidDiscreteSampleBlur;
+import boofcv.alg.transform.pyramid.PyramidFloatGaussianScale;
 import boofcv.factory.filter.kernel.FactoryKernel;
 import boofcv.factory.filter.kernel.FactoryKernelGaussian;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.convolve.Kernel1D;
 import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.pyramid.PyramidUpdaterDiscrete;
-import boofcv.struct.pyramid.PyramidUpdaterFloat;
+import boofcv.struct.pyramid.PyramidDiscrete;
+import boofcv.struct.pyramid.PyramidFloat;
 
 
 /**
@@ -47,11 +47,14 @@ public class FactoryPyramid {
 	 * @return PyramidUpdaterDiscrete
 	 */
 	public static <T extends ImageSingleBand>
-	PyramidUpdaterDiscrete<T> discreteGaussian( Class<T> imageType , double sigma , int radius ) {
-
+	PyramidDiscrete<T> discreteGaussian( int[] scaleFactors , double sigma , int radius ,
+										 boolean saveOriginalReference, Class<T> imageType )
+	{
 		Class<Kernel1D> kernelType = FactoryKernel.getKernelType(imageType,1);
 
-		return new PyramidUpdateIntegerDown<T>(FactoryKernelGaussian.gaussian(kernelType,sigma,radius),imageType);
+		Kernel1D kernel = FactoryKernelGaussian.gaussian(kernelType,sigma,radius);
+
+		return new PyramidDiscreteSampleBlur<T>(kernel,sigma,imageType,saveOriginalReference,scaleFactors);
 	}
 
 	/**
@@ -63,10 +66,10 @@ public class FactoryPyramid {
 	 * @return PyramidUpdaterFloat
 	 */
 	public static <T extends ImageSingleBand>
-	PyramidUpdaterFloat<T> floatGaussian( Class<T> imageType , double ...sigmas ) {
+	PyramidFloat<T> floatGaussian( double scaleFactors[], double []sigmas , Class<T> imageType ) {
 
 		InterpolatePixel<T> interp = FactoryInterpolation.bilinearPixel(imageType);
 
-		return new PyramidUpdateGaussianScale<T>(interp,sigmas);
+		return new PyramidFloatGaussianScale<T>(interp,scaleFactors,sigmas,imageType);
 	}
 }

@@ -18,6 +18,7 @@
 
 package boofcv.struct.pyramid;
 
+import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageUInt8;
 import org.junit.Test;
 
@@ -27,6 +28,31 @@ import static org.junit.Assert.*;
  * @author Peter Abeles
  */
 public class TestImagePyramidBase {
+
+	/**
+	 * If told to use the original image then no image should be declared for layer 0
+	 */
+	@Test
+	public void saveOriginalReference() {
+		Dummy pyramid = new Dummy(ImageUInt8.class,false);
+		pyramid.setScaleFactors(1,2,4);
+		pyramid.initialize(100,120);
+
+		assertTrue(pyramid.getLayer(0) != null);
+
+		pyramid = new Dummy(ImageUInt8.class,true);
+		pyramid.setScaleFactors(1,2,4);
+		pyramid.initialize(100,120);
+
+		assertTrue(pyramid.getLayer(0) == null);
+
+		// first layer is not 1 so the flag should be ignored
+		pyramid = new Dummy(ImageUInt8.class,true);
+		pyramid.setScaleFactors(2,4);
+		pyramid.initialize(100,120);
+
+		assertTrue(pyramid.getLayer(0) != null);
+	}
 
 	@Test
 	public void initialize() {
@@ -45,6 +71,7 @@ public class TestImagePyramidBase {
 		assertTrue(pyramid.layers[0] == null);
 		
 		// if the first layer is not 1 then an image should be declared
+		pyramid = new Dummy(ImageUInt8.class,true);
 		pyramid.setScaleFactors(2,4);
 		pyramid.initialize(100,120);
 		assertTrue(pyramid.layers[0] != null);
@@ -65,27 +92,15 @@ public class TestImagePyramidBase {
 	}
 
 	@Test
-	public void isInitialized() {
-		Dummy pyramid = new Dummy(ImageUInt8.class,false);
-		assertFalse(pyramid.isInitialized());
-		pyramid.setScaleFactors(1,2,4);
-		pyramid.initialize(100,120);
-		assertTrue(pyramid.isInitialized());
-	}
-
-	@Test
 	public void checkScales() {
-		// rest a positive case
+		// Test positive cases
 		Dummy pyramid = new Dummy(ImageUInt8.class,false);
 		pyramid.setScaleFactors(1,2,4,8);
 		pyramid.checkScales();
 
-		// duplicate scale
-		try {
-			pyramid.setScaleFactors(1,2,2,4);
-			pyramid.checkScales();
-			fail("Exception should have been thrown");
-		} catch( IllegalArgumentException e ) {}
+		// multiple scales at the same resolution are allowed
+		pyramid.setScaleFactors(1,2,2,4);
+		pyramid.checkScales();
 
 		// out of order scale
 		try {
@@ -115,6 +130,9 @@ public class TestImagePyramidBase {
 		}
 
 		@Override
+		public void process(ImageBase input) {}
+
+		@Override
 		public double getScale(int layer) {
 			return scales[layer];
 		}
@@ -123,5 +141,11 @@ public class TestImagePyramidBase {
 		public int getNumLayers() {
 			return scales.length;
 		}
+
+		@Override
+		public double getSampleOffset(int layer) {return 0;}
+
+		@Override
+		public double getSigma(int layer) {return 0;}
 	}
 }

@@ -25,18 +25,18 @@ import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.pyramid.ImagePyramid;
-import boofcv.struct.pyramid.PyramidFloat;
-import boofcv.struct.pyramid.PyramidUpdater;
 import boofcv.testing.BoofTesting;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 
 /**
  * @author Peter Abeles
  */
-public class TestPyramidUpdateSubsampleScale extends GenericPyramidUpdateTests<ImageFloat32> {
+public class TestPyramidFloatScale extends GenericPyramidTests<ImageFloat32> {
 
-	public TestPyramidUpdateSubsampleScale() {
+	public TestPyramidFloatScale() {
 		super(ImageFloat32.class);
 	}
 
@@ -53,35 +53,43 @@ public class TestPyramidUpdateSubsampleScale extends GenericPyramidUpdateTests<I
 	public void _update(ImageFloat32 input) {
 
 		InterpolatePixel<ImageFloat32> interp = FactoryInterpolation.bilinearPixel(input);
-		PyramidUpdateSubsampleScale<ImageFloat32> alg = new PyramidUpdateSubsampleScale<ImageFloat32>(interp);
-
-		PyramidFloat<ImageFloat32> pyramid = new PyramidFloat<ImageFloat32>(imageType,3,5);
-		alg.update(input,pyramid);
+		PyramidFloatScale<ImageFloat32> alg = new PyramidFloatScale<ImageFloat32>(interp,new double[]{3,5},imageType);
+		alg.process(input);
 
 		// test the first layer
 		ImageFloat32 expected = new ImageFloat32((int)Math.ceil(width/3.0),(int)Math.ceil(height/3.0));
 		DistortImageOps.scale(input, expected, TypeInterpolate.BILINEAR);
-		ImageFloat32 found = pyramid.getLayer(0);
+		ImageFloat32 found = alg.getLayer(0);
 
 		BoofTesting.assertEquals(expected,found,1e-4);
 
 		// test the second layer
 		ImageFloat32 next = new ImageFloat32((int)Math.ceil(width/5.0),(int)Math.ceil(height/5.0));
 		DistortImageOps.scale(expected, next, TypeInterpolate.BILINEAR);
-		found = pyramid.getLayer(1);
+		found = alg.getLayer(1);
 
 		BoofTesting.assertEquals(next,found,1e-4);
 	}
 
-	@Override
-	protected PyramidUpdater createUpdater() {
-		InterpolatePixel<ImageFloat32> interp = FactoryInterpolation.bilinearPixel(imageType);
-		return new PyramidUpdateSubsampleScale(interp);
-	}
+
 
 	@Override
 	protected ImagePyramid<ImageFloat32> createPyramid(int... scales) {
+		InterpolatePixel<ImageFloat32> interp = FactoryInterpolation.bilinearPixel(ImageFloat32.class);
 		double a[] = BoofMiscOps.convertTo_F64(scales);
-		return new PyramidFloat<ImageFloat32>(imageType,a);
+		return new PyramidFloatScale<ImageFloat32>(interp,a,imageType);
+	}
+
+	/**
+	 * Well no blur is applied at any level so this should all be zero
+	 */
+	@Test
+	public void checkSigmas() {
+		InterpolatePixel<ImageFloat32> interp = FactoryInterpolation.bilinearPixel(ImageFloat32.class);
+		PyramidFloatScale<ImageFloat32> alg = new PyramidFloatScale<ImageFloat32>(interp,new double[]{3,5},imageType);
+
+		for( int i = 0; i < 2; i++ ) {
+			assertEquals(0,alg.getSigma(0),1e-8);
+		}
 	}
 }

@@ -31,7 +31,7 @@ public class PkltConfig<I extends ImageSingleBand, D extends ImageSingleBand> {
 	/** configuration for low level KLT tracker */
 	public KltConfig config;
 	/** The radius of a feature descriptor in layer. 3 is a reasonable number. */
-	public int featureRadius;
+	public int templateRadius;
 
 	/** Scale factor for each layer in the pyramid */
 	public int pyramidScaling[];
@@ -55,7 +55,7 @@ public class PkltConfig<I extends ImageSingleBand, D extends ImageSingleBand> {
 		ret.typeDeriv = typeDeriv;
 
 		ret.config = KltConfig.createDefault();
-		ret.featureRadius = 2;
+		ret.templateRadius = 2;
 		ret.pyramidScaling = new int[]{1,2,4};
 
 		return ret;

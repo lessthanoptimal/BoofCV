@@ -22,14 +22,13 @@ import boofcv.alg.interpolate.InterpolatePixel;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.factory.filter.kernel.FactoryKernelGaussian;
 import boofcv.factory.interpolate.FactoryInterpolation;
+import boofcv.factory.transform.pyramid.FactoryGaussianScaleSpace;
 import boofcv.misc.PerformerBase;
 import boofcv.misc.ProfileOperation;
 import boofcv.struct.convolve.Kernel1D_F32;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.pyramid.PyramidDiscrete;
 import boofcv.struct.pyramid.PyramidFloat;
-import boofcv.struct.pyramid.PyramidUpdaterDiscrete;
-import boofcv.struct.pyramid.PyramidUpdaterFloat;
 
 import java.util.Random;
 
@@ -49,39 +48,33 @@ public class BenchmarkImagePyramids {
 	static int scalesD[] = new int[]{1,2,4,8};
 	static double scalesF[] = new double[]{1,2,4,8};
 
-	static PyramidUpdaterDiscrete<ImageFloat32> updaterD;
-	static PyramidUpdaterFloat<ImageFloat32> updaterF;
+	static PyramidDiscrete<ImageFloat32> pyramidD;
+	static PyramidFloat<ImageFloat32> pyramidF;
 
 	static Class<ImageFloat32> imageType = ImageFloat32.class;
 
-	public static class ScaleSpace_F32 extends PerformerBase {
-
-		PyramidFloat<ImageFloat32> pyramid =
-				new PyramidFloat<ImageFloat32>(imageType,scalesF);
+	public static class Float_F32 extends PerformerBase {
 
 		@Override
 		public void process() {
-			updaterF.update(input,pyramid);
+			pyramidF.process(input);
 		}
 	}
 
 	public static class Discrete_F32 extends PerformerBase {
 
-		PyramidDiscrete<ImageFloat32> pyramid =
-				new PyramidDiscrete<ImageFloat32>(imageType,false,scalesD);
-
 		@Override
 		public void process() {
-			updaterD.update(input,pyramid);
+			pyramidD.process(input);
 		}
 	}
 
 	private static void createUpdate() {
 		Kernel1D_F32 kernel = FactoryKernelGaussian.gaussian(Kernel1D_F32.class,-1.0,2);
-		updaterD = new PyramidUpdateIntegerDown<ImageFloat32>(kernel,ImageFloat32.class);
+		pyramidD = new PyramidDiscreteSampleBlur<ImageFloat32>(kernel,2,ImageFloat32.class,true,scalesD);
 
 		InterpolatePixel<ImageFloat32> interp = FactoryInterpolation.bilinearPixel(ImageFloat32.class);
-		updaterF = new PyramidUpdateGaussianScale<ImageFloat32>(interp,scalesF);
+		pyramidF = FactoryGaussianScaleSpace.scaleSpacePyramid(scalesF,ImageFloat32.class);
 
 	}
 
@@ -94,7 +87,7 @@ public class BenchmarkImagePyramids {
 		System.out.println("=========  Profile Image Size " + width + " x " + height + " ==========");
 		System.out.println();
 
-		ProfileOperation.printOpsPerSec(new ScaleSpace_F32(), TEST_TIME);
+		ProfileOperation.printOpsPerSec(new Float_F32(), TEST_TIME);
 		ProfileOperation.printOpsPerSec(new Discrete_F32(), TEST_TIME);
 	}
 }

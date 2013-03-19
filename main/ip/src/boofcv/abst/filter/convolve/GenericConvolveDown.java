@@ -28,7 +28,8 @@ import java.lang.reflect.Method;
 
 /**
  * Generalized interface for filtering images with convolution kernels while skipping pixels.
- * Can invoke different techniques for handling image borders.
+ * Can invoke different techniques for handling image borders.  The first pixel sampled is always (0,0) and the
+ * sampled pixels are (x*skip,y*skip).
  *
  * @author Peter Abeles
  */

@@ -27,7 +27,6 @@ import boofcv.factory.transform.pyramid.FactoryPyramid;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.pyramid.PyramidDiscrete;
-import boofcv.struct.pyramid.PyramidUpdaterDiscrete;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,11 +45,10 @@ public class PointTrackerCombined<I extends ImageSingleBand, D extends ImageSing
 
 	CombinedTrackerScalePoint<I,D, Desc> tracker;
 
-	PyramidUpdaterDiscrete<I> updaterP;
-
 	PyramidDiscrete<I> pyramid;
-	PyramidDiscrete<D> derivX;
-	PyramidDiscrete<D> derivY;
+	D[] derivX;
+	D[] derivY;
+	Class<D> derivType;
 
 	ImageGradient<I,D> gradient;
 
@@ -64,15 +62,11 @@ public class PointTrackerCombined<I extends ImageSingleBand, D extends ImageSing
 								Class<I> imageType, Class<D> derivType) {
 		this.tracker = tracker;
 		this.reactivateThreshold = reactivateThreshold;
-
-		updaterP = FactoryPyramid.discreteGaussian(imageType, -1, 2);
-		gradient = FactoryDerivative.sobel(imageType, derivType);
+		this.derivType = derivType;
 
 		int pyramidScaling[] = tracker.getTrackerKlt().pyramidScaling;
-
-		pyramid = new PyramidDiscrete<I>(imageType,true,pyramidScaling);
-		derivX = new PyramidDiscrete<D>(derivType,false,pyramidScaling);
-		derivY = new PyramidDiscrete<D>(derivType,false,pyramidScaling);
+		pyramid = FactoryPyramid.discreteGaussian(pyramidScaling,-1,2,true,imageType);
+		gradient = FactoryDerivative.sobel(imageType, derivType);
 
 		reset();
 	}
@@ -89,7 +83,11 @@ public class PointTrackerCombined<I extends ImageSingleBand, D extends ImageSing
 		detected = false;
 
 		// update the image pyramid
-		updaterP.update(image,pyramid);
+		pyramid.process(image);
+		if( derivX == null ) {
+			derivX = PyramidOps.declareOutput(pyramid, derivType);
+			derivY = PyramidOps.declareOutput(pyramid, derivType);
+		}
 		PyramidOps.gradient(pyramid, gradient, derivX, derivY);
 
 		// pass in filtered inputs

@@ -35,7 +35,7 @@ import boofcv.struct.image.ImageSingleBand;
  * @author Peter Abeles
  */
 @SuppressWarnings({"unchecked"})
-public class PyramidFloat<T extends ImageSingleBand> extends ImagePyramidBase<T> {
+public abstract class PyramidFloat<T extends ImageSingleBand> extends ImagePyramidBase<T> {
 
 	// scale of each layer relative to the previous layer
 	public double scale[];
@@ -73,6 +73,8 @@ public class PyramidFloat<T extends ImageSingleBand> extends ImagePyramidBase<T>
 				return;
 
 		}
+		// set width/height to zero to force the image to be redeclared
+		bottomWidth = bottomHeight = 0;
 		this.scale = scaleFactors.clone();
 		checkScales();
 	}

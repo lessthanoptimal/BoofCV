@@ -45,7 +45,7 @@ public class TestWrapVisOdomPixelDepthPnP extends CheckVisualOdometryStereoSim<I
 		PkltConfig config =
 				PkltConfig.createDefault(ImageFloat32.class, ImageFloat32.class);
 		config.pyramidScaling = new int[]{1,2,4,8};
-		config.featureRadius = 3;
+		config.templateRadius = 3;
 		config.typeInput = ImageFloat32.class;
 		config.typeDeriv = ImageFloat32.class;
 		ConfigGeneralDetector configDetector = new ConfigGeneralDetector(600,3,1);
