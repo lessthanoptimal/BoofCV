@@ -46,7 +46,7 @@ import java.awt.image.BufferedImage;
  *
  * @author Peter Abeles
  */
-public class ExampleStereoDisparity2 {
+public class ExampleStereoDisparity3D {
 
 	// Specifies what size input images are scaled to
 	public static final double scale = 0.5;

@@ -37,6 +37,7 @@ Version : Alpha 0.14
   * Scale-Space pyramids have been moved into the pyramid package instead of having its own
   * Bug Fix: FeatureLaplacePyramid now looks for local maximum or minimum in searching across scales
   * Removed GaussianScaleSpace class since it can now be represented using ImageFloatPyramid 
+- Added ExampleStereoDisparity3D and tweaked the first one
 
 ---------------------------------------------
 Date    : 2013/02/16
