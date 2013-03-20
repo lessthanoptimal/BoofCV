@@ -18,7 +18,13 @@
 
 package boofcv.gui.d3;
 
+import boofcv.misc.BoofMiscOps;
 import boofcv.struct.FastQueue;
+import boofcv.struct.distort.PointTransform_F64;
+import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageUInt8;
 import georegression.geometry.GeometryMath_F64;
 import georegression.geometry.RotationMatrixGenerator;
 import georegression.struct.point.Point2D_F64;
@@ -30,9 +36,7 @@ import org.ejml.data.DenseMatrix64F;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
+import java.awt.image.BufferedImage;
 
 /**
  * <p>
@@ -46,8 +50,11 @@ import java.awt.event.MouseMotionListener;
  *
  * @author Peter Abeles
  */
-public class PointCloudViewer extends JPanel implements MouseMotionListener, MouseListener {
+public class DisparityPointCloudViewer extends JPanel {
 	FastQueue<ColorPoint3D> cloud = new FastQueue<ColorPoint3D>(200,ColorPoint3D.class,true);
+
+	// distance between the two camera centers
+	double baseline;
 
 	// intrinsic camera parameters
 	DenseMatrix64F K;
@@ -55,6 +62,14 @@ public class PointCloudViewer extends JPanel implements MouseMotionListener, Mou
 	double focalLengthY;
 	double centerX;
 	double centerY;
+
+	// minimum disparity
+	int minDisparity;
+	// maximum minus minimum disparity
+	int rangeDisparity;
+
+	// How far out it should zoom.
+	double range = 1;
 
 	// view offset
 	double offsetX;
@@ -68,41 +83,118 @@ public class PointCloudViewer extends JPanel implements MouseMotionListener, Mou
 	public int tiltAngle = 0;
 	public double radius = 5;
 
-	// previous mouse location
-	int prevX;
-	int prevY;
-
-	public PointCloudViewer() {
-		addMouseListener(this);
-		addMouseMotionListener(this);
-	}
-
-	public PointCloudViewer(DenseMatrix64F K) {
-		this();
-		configure(K);
-	}
+	// converts from rectified pixels into color image pixels
+	PointTransform_F64 rectifiedToColor;
+	// storage for color image coordinate
+	Point2D_F64 colorPt = new Point2D_F64();
 
 	/**
-	 * Specify camera parameters for rendering purposes
-	 *
+	 * Stereo and intrinsic camera parameters
+	 * @param baseline Stereo baseline (world units)
 	 * @param K Intrinsic camera calibration matrix of rectified camera
+	 * @param rectifiedToColor Transform from rectified pixels to the color image pixels.
+	 * @param minDisparity Minimum disparity that's computed (pixels)
+	 * @param maxDisparity Maximum disparity that's computed (pixels)
 	 */
-	public void configure(DenseMatrix64F K) {
+	public void configure(double baseline,
+						  DenseMatrix64F K,
+						  PointTransform_F64 rectifiedToColor,
+						  int minDisparity, int maxDisparity) {
 		this.K = K;
+		this.rectifiedToColor = rectifiedToColor;
+		this.baseline = baseline;
 		this.focalLengthX = K.get(0,0);
 		this.focalLengthY = K.get(1,1);
 		this.centerX = K.get(0,2);
 		this.centerY = K.get(1,2);
+		this.minDisparity = minDisparity;
+
+		this.rangeDisparity = maxDisparity-minDisparity;
+
+
 	}
 
-	public void reset() {
+	/**
+	 * Given the disparity image compute the 3D location of valid points and save pixel colors
+	 * at that point
+	 *
+	 * @param disparity Disparity image
+	 * @param color Color image of left camera
+	 */
+	public void process( ImageSingleBand disparity , BufferedImage color ) {
+		if( disparity instanceof ImageUInt8 )
+			process((ImageUInt8)disparity,color);
+		else
+			process((ImageFloat32)disparity,color);
+	}
+
+	private void process( ImageUInt8 disparity , BufferedImage color ) {
+
 		cloud.reset();
+
+		for( int y = 0; y < disparity.height; y++ ) {
+			int index = disparity.startIndex + disparity.stride*y;
+
+			for( int x = 0; x < disparity.width; x++ ) {
+				int value = disparity.data[index++] & 0xFF;
+
+				if( value >= rangeDisparity )
+					continue;
+
+				value += minDisparity;
+
+				if( value == 0 )
+					continue;
+
+				ColorPoint3D p = cloud.grow();
+
+				// Note that this will be in the rectified left camera's reference frame.
+				// An additional rotation is needed to put it into the original left camera frame.
+				p.z = baseline*focalLengthX/value;
+				p.x = p.z*(x - centerX)/focalLengthX;
+				p.y = p.z*(y - centerY)/focalLengthY;
+
+				getColor(disparity, color, x, y, p);
+			}
+		}
 	}
 
-	public void addPoint( double x , double y , double z , int rgb ) {
-		ColorPoint3D p = cloud.grow();
-		p.set(x,y,z);
-		p.rgb = rgb;
+	private void process( ImageFloat32 disparity , BufferedImage color ) {
+
+		cloud.reset();
+
+		for( int y = 0; y < disparity.height; y++ ) {
+			int index = disparity.startIndex + disparity.stride*y;
+
+			for( int x = 0; x < disparity.width; x++ ) {
+				float value = disparity.data[index++];
+
+				if( value >= rangeDisparity )
+					continue;
+
+				value += minDisparity;
+
+				if( value == 0 )
+					continue;
+
+				ColorPoint3D p = cloud.grow();
+
+				p.z = baseline*focalLengthX/value;
+				p.x = p.z*(x - centerX)/focalLengthX;
+				p.y = p.z*(y - centerY)/focalLengthY;
+
+				getColor(disparity, color, x, y, p);
+			}
+		}
+	}
+
+	private void getColor(ImageBase disparity, BufferedImage color, int x, int y, ColorPoint3D p) {
+		rectifiedToColor.compute(x,y,colorPt);
+		if( BoofMiscOps.checkInside(disparity, colorPt.x, colorPt.y, 0) ) {
+			p.rgb = color.getRGB((int)colorPt.x,(int)colorPt.y);
+		} else {
+			p.rgb = 0x000000;
+		}
 	}
 
 	@Override
@@ -175,8 +267,12 @@ public class PointCloudViewer extends JPanel implements MouseMotionListener, Mou
 	}
 
 	public Se3_F64 createWorldToCamera() {
+		// pick an appropriate amount of motion for the scene
+		double z = baseline*focalLengthX/(minDisparity+rangeDisparity);
 
-		Vector3D_F64 rotPt = new Vector3D_F64(offsetX,offsetY,0);
+		double adjust = baseline/20.0;
+
+		Vector3D_F64 rotPt = new Vector3D_F64(offsetX*adjust,offsetY*adjust,z* range);
 
 		double radians = tiltAngle*Math.PI/180.0;
 		DenseMatrix64F R = RotationMatrixGenerator.eulerXYZ(radians,0,0,null);
@@ -205,40 +301,4 @@ public class PointCloudViewer extends JPanel implements MouseMotionListener, Mou
 			rgb = -1;
 		}
 	}
-
-	@Override
-	public void mouseClicked(MouseEvent e) {
-	}
-
-	@Override
-	public void mousePressed(MouseEvent e) {
-		prevX = e.getX();
-		prevY = e.getY();
-	}
-
-	@Override
-	public void mouseReleased(MouseEvent e) {}
-
-	@Override
-	public void mouseEntered(MouseEvent e) {}
-
-	@Override
-	public void mouseExited(MouseEvent e) {}
-
-	@Override
-	public synchronized void mouseDragged(MouseEvent e) {
-		final int deltaX = e.getX()-prevX;
-		final int deltaY = e.getY()-prevY;
-
-		offsetX += deltaX;
-		offsetY += deltaY;
-
-		prevX = e.getX();
-		prevY = e.getY();
-
-		repaint();
-	}
-
-	@Override
-	public void mouseMoved(MouseEvent e) {}
 }

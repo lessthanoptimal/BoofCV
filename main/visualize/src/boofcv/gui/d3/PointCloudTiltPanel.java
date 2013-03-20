@@ -30,7 +30,7 @@ import java.awt.event.*;
 import java.awt.image.BufferedImage;
 
 /**
- * Provides a simplified set of controls for changing the view in a {@link PointCloudViewer}.
+ * Provides a simplified set of controls for changing the view in a {@link DisparityPointCloudViewer}.
  * Uses the mouse to move the camera in its local X,Y plane.  Widgets in the control bar
  * allow the user to change the camera's tilt and distance from the origin.
  *
@@ -40,7 +40,7 @@ public class PointCloudTiltPanel extends JPanel
 	implements ActionListener, ChangeListener, MouseListener, MouseMotionListener
 {
 	// Point cloud viewer
-	PointCloudViewer view;
+	DisparityPointCloudViewer view;
 
 	// when pressed sets the view to "home"
 	JButton homeButton;
@@ -63,7 +63,7 @@ public class PointCloudTiltPanel extends JPanel
 		addMouseListener(this);
 		addMouseMotionListener(this);
 
-		view = new PointCloudViewer();
+		view = new DisparityPointCloudViewer();
 		JToolBar toolBar = createToolBar();
 
 		add(toolBar, BorderLayout.PAGE_START);

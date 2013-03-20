@@ -31,6 +31,7 @@ import boofcv.gui.image.VisualizeImageData;
 import boofcv.io.image.UtilImageIO;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.StereoParameters;
+import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageUInt8;
 import georegression.struct.se.Se3_F64;
 import org.ejml.data.DenseMatrix64F;
@@ -59,18 +60,40 @@ public class ExampleStereoDisparity {
 	 *
 	 * @param rectLeft Rectified left camera image
 	 * @param rectRight Rectified right camera image
+	 * @param regionSize Radius of region being matched
 	 * @param minDisparity Minimum disparity that is considered
 	 * @param maxDisparity Maximum disparity that is considered
 	 * @return Disparity image
 	 */
 	public static ImageUInt8 denseDisparity( ImageUInt8 rectLeft , ImageUInt8 rectRight ,
+											 int regionSize,
 											 int minDisparity , int maxDisparity )
 	{
 		// A slower but more accuracy algorithm is selected
 		// All of these parameters should be turned
 		StereoDisparity<ImageUInt8,ImageUInt8> disparityAlg =
 				FactoryStereoDisparity.regionWta(DisparityAlgorithms.RECT_FIVE,
-						minDisparity, maxDisparity, 3, 3, 20, 1, 0.2, ImageUInt8.class);
+						minDisparity, maxDisparity, regionSize, regionSize, 25, 1, 0.2, ImageUInt8.class);
+
+		// process and return the results
+		disparityAlg.process(rectLeft,rectRight);
+
+		return disparityAlg.getDisparity();
+	}
+
+	/**
+	 * Same as above, but compute disparity to within sub-pixel accuracy. The difference between the
+	 * two is more apparent when a 3D point cloud is computed.
+	 */
+	public static ImageFloat32 denseDisparitySubpixel( ImageUInt8 rectLeft , ImageUInt8 rectRight ,
+													   int regionSize ,
+													   int minDisparity , int maxDisparity )
+	{
+		// A slower but more accuracy algorithm is selected
+		// All of these parameters should be turned
+		StereoDisparity<ImageUInt8,ImageFloat32> disparityAlg =
+				FactoryStereoDisparity.regionSubpixelWta(DisparityAlgorithms.RECT_FIVE,
+						minDisparity, maxDisparity, regionSize, regionSize, 25, 1, 0.2, ImageUInt8.class);
 
 		// process and return the results
 		disparityAlg.process(rectLeft,rectRight);
@@ -81,9 +104,9 @@ public class ExampleStereoDisparity {
 	/**
 	 * Rectified the input images using known calibration.
 	 */
-	public static void rectify( ImageUInt8 origLeft , ImageUInt8 origRight ,
-								StereoParameters param ,
-								ImageUInt8 rectLeft , ImageUInt8 rectRight )
+	public static RectifyCalibrated rectify( ImageUInt8 origLeft , ImageUInt8 origRight ,
+											 StereoParameters param ,
+											 ImageUInt8 rectLeft , ImageUInt8 rectRight )
 	{
 		// Compute rectification
 		RectifyCalibrated rectifyAlg = RectifyImageOps.createCalibrated();
@@ -102,7 +125,7 @@ public class ExampleStereoDisparity {
 		DenseMatrix64F rectK = rectifyAlg.getCalibrationMatrix();
 
 		// Adjust the rectification to make the view area more useful
-		RectifyImageOps.fullViewLeft(param.left, rect1, rect2, rectK);
+		RectifyImageOps.allInsideLeft(param.left, rect1, rect2, rectK);
 
 		// undistorted and rectify images
 		ImageDistort<ImageUInt8> imageDistortLeft =
@@ -112,6 +135,8 @@ public class ExampleStereoDisparity {
 
 		imageDistortLeft.apply(origLeft, rectLeft);
 		imageDistortRight.apply(origRight, rectRight);
+
+		return rectifyAlg;
 	}
 
 	public static void main( String args[] ) {
@@ -134,7 +159,8 @@ public class ExampleStereoDisparity {
 		rectify(distLeft,distRight,param,rectLeft,rectRight);
 
 		// compute disparity
-		ImageUInt8 disparity = denseDisparity(rectLeft,rectRight,10,60);
+		ImageUInt8 disparity = denseDisparity(rectLeft,rectRight,5,10,60);
+//		ImageFloat32 disparity = denseDisparitySubpixel(rectLeft,rectRight,5,10,60);
 
 		// show results
 		BufferedImage visualized = VisualizeImageData.disparity(disparity, null,10,60,0);
