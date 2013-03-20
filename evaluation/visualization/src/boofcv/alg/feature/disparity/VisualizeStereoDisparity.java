@@ -35,7 +35,6 @@ import boofcv.gui.image.VisualizeImageData;
 import boofcv.io.PathLabel;
 import boofcv.io.ProgressMonitorThread;
 import boofcv.misc.BoofMiscOps;
-import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.distort.PointTransform_F64;
 import boofcv.struct.image.ImageSingleBand;
@@ -223,18 +222,6 @@ public class VisualizeStereoDisparity <T extends ImageSingleBand, D extends Imag
 		changeInputScale();
 	}
 
-	private void adjustIntrinsicForScale( IntrinsicParameters param , double scale ) {
-		param.width *= scale;
-		param.height *= scale;
-		param.fx *= scale;
-		param.fy *= scale;
-		param.cx *= scale;
-		param.cy *= scale;
-		param.skew *= scale;
-
-		// no need to adjust radial distortion parameters since it is computed in normalized
-		// pixel coordinates, which are independent of pixel scaling
-	}
 
 	/**
 	 * Removes distortion and rectifies images.
@@ -382,8 +369,8 @@ public class VisualizeStereoDisparity <T extends ImageSingleBand, D extends Imag
 
 		double scale = control.inputScale;
 
-		adjustIntrinsicForScale(calib.left,scale);
-		adjustIntrinsicForScale(calib.right,scale);
+		PerspectiveOps.scaleIntrinsic(calib.left,scale);
+		PerspectiveOps.scaleIntrinsic(calib.right,scale);
 
 		int w = (int)(origLeft.getWidth()*scale);
 		int h = (int)(origLeft.getHeight()*scale);
