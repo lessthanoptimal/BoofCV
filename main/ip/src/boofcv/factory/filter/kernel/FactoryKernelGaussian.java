@@ -317,6 +317,9 @@ public class FactoryKernelGaussian {
 	 * @return
 	 */
 	public static double sigmaForRadius(double radius , int order ) {
+		if( radius <= 0 )
+			throw new IllegalArgumentException("Radius must be > 0");
+
 		return (radius* 2.0 + 1.0 ) / (5.0+0.8*order);
 	}
 
@@ -328,6 +331,9 @@ public class FactoryKernelGaussian {
 	 * @return
 	 */
 	public static int radiusForSigma(double sigma, int order ) {
+		if( sigma <= 0 )
+			throw new IllegalArgumentException("Sigma must be > 0");
+
 		return (int)Math.ceil((((5+0.8*order)*sigma)-1)/2);
 	}
 
