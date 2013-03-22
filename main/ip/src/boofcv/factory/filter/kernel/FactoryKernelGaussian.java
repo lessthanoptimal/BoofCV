@@ -72,7 +72,7 @@ public class FactoryKernelGaussian {
 	}
 
 	/**
-	 * Creates a 1D Gaussian kernel of the specified type.
+	 * Creates a 2D Gaussian kernel of the specified type.
 	 *
 	 * @param imageType The type of image which is to be convolved by this kernel.
 	 * @param sigma The distributions stdev.  If <= 0 then the sigma will be computed from the radius.

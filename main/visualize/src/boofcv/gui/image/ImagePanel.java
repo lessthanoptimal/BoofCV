@@ -78,13 +78,29 @@ public class ImagePanel extends JPanel {
 	}
 
 	/**
-	 * Change the image being displayed.
+	 * Change the image being displayed. If panel is active then don't call unless inside the GUI thread.  Repaint()
+    * is not automatically called.
 	 *
 	 * @param image The new image which will be displayed.
 	 */
 	public void setBufferedImage(BufferedImage image) {
 		this.img = image;
 	}
+
+   /**
+    * Change the image being displayed. Can be called at any time and automatically called repaint().
+    *
+    * @param image The new image which will be displayed.
+    */
+   public void setBufferedImageSafe(final BufferedImage image) {
+      SwingUtilities.invokeLater(new Runnable() {
+         @Override
+         public void run() {
+            img = image;
+            repaint();
+         }
+      });
+   }
 
 	public BufferedImage getImage() {
 		return img;
