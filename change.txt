@@ -38,6 +38,9 @@ Version : Alpha 0.14
   * Bug Fix: FeatureLaplacePyramid now looks for local maximum or minimum in searching across scales
   * Removed GaussianScaleSpace class since it can now be represented using ImageFloatPyramid 
 - Added ExampleStereoDisparity3D and tweaked the first one
+- Shape Fitting (Added)
+  * Fit polygon
+  * Usage examples
 
 ---------------------------------------------
 Date    : 2013/02/16
