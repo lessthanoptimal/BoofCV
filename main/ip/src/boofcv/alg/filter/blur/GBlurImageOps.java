@@ -35,9 +35,9 @@ public class GBlurImageOps {
 	 * Applies a mean box filter.
 	 *
 	 * @param input Input image.  Not modified.
-	 * @param output Optional storage for output image, can be null.  Modified.
+	 * @param output (Optional) Storage for output image, Can be null.  Modified.
 	 * @param radius Radius of the box blur function.
-	 * @param storage Optional storage for intermediate results.  Same size as input image.  Can be null.
+	 * @param storage (Optional) Storage for intermediate results.  Same size as input image.  Can be null.
 	 * @param <T> Input image type.
 	 * @return Output blurred image.
 	 */
@@ -56,7 +56,7 @@ public class GBlurImageOps {
 	 * Applies a median filter.
 	 *
 	 * @param input Input image.  Not modified.
-	 * @param output Optional storage for output image, can be null.  Modified.
+	 * @param output (Optional) Storage for output image, Can be null.  Modified.
 	 * @param radius Radius of the median blur function.
 	 * @param <T> Input image type.
 	 * @return Output blurred image.
@@ -76,10 +76,10 @@ public class GBlurImageOps {
 	 * Applies Gaussian blur.
 	 *
 	 * @param input Input image.  Not modified.
-	 * @param output Optional storage for output image, can be null.  Modified.
+	 * @param output (Optional) Storage for output image, Can be null.  Modified.
 	 * @param sigma Gaussian distribution's sigma.  If <= 0 then will be selected based on radius.
 	 * @param radius Radius of the Gaussian blur function. If <= 0 then radius will be determined by sigma.
-	 * @param storage Optional storage for intermediate results.  Same size as input image.  Can be null.
+	 * @param storage (Optional) Storage for intermediate results.  Same size as input image.  Can be null.
 	 * @param <T> Input image type.
 	 * @return Output blurred image.
 	 */
