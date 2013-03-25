@@ -16,37 +16,35 @@
  * limitations under the License.
  */
 
-package boofcv.struct;
+package boofcv.gui.feature;
 
 import georegression.struct.point.Point2D_I32;
 
+import java.awt.*;
+import java.util.List;
+
 /**
- * Combination of a point and an index in an array
- *
  * @author Peter Abeles
  */
-public class PointIndex_I32 extends Point2D_I32 {
+public class VisualizeShapes {
+
 	/**
-	 * Index of point in an array/list
+	 * Draws a polygon
+	 *
+	 * @param vertexes List of vertices in the polygon
+	 * @param loop true if the end points are connected, forming a loop
+	 * @param g2 Graphics object it's drawn to
 	 */
-	public int index;
-
-	public PointIndex_I32() {
-	}
-
-	public PointIndex_I32(int x, int y, int index) {
-		super(x, y);
-		this.index = index;
-	}
-
-	public int getIndex() {
-		return index;
-	}
-
-	public void setIndex(int index) {
-		this.index = index;
-	}
-	public PointIndex_I32 copy() {
-		return new PointIndex_I32(x,y,index);
+	public static<T extends Point2D_I32> void drawPolygon( List<T> vertexes , boolean loop, Graphics2D g2 ) {
+		for( int i = 0; i < vertexes.size()-1; i++ ) {
+			Point2D_I32 p0 = vertexes.get(i);
+			Point2D_I32 p1 = vertexes.get(i+1);
+			g2.drawLine(p0.x,p0.y,p1.x,p1.y);
+		}
+		if( loop ) {
+			Point2D_I32 p0 = vertexes.get(0);
+			Point2D_I32 p1 = vertexes.get(vertexes.size()-1);
+			g2.drawLine(p0.x,p0.y,p1.x,p1.y);
+		}
 	}
 }

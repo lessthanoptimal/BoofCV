@@ -28,6 +28,7 @@ import boofcv.alg.filter.binary.ThresholdImageOps;
 import boofcv.alg.misc.ImageStatistics;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.factory.feature.detect.edge.FactoryEdgeDetectors;
+import boofcv.gui.feature.VisualizeShapes;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.PointIndex_I32;
@@ -47,7 +48,7 @@ import java.util.Random;
  *
  * @author Peter Abeles
  */
-public class ExampleFitPolynomial {
+public class ExampleFitPolygon {
 
 	/**
 	 * Fits a polygons the found contours around binary blobs.  This demonstrates how it can be used to handle
@@ -75,12 +76,12 @@ public class ExampleFitPolynomial {
 			List<PointIndex_I32> vertexes = ShapeFittingOps.fitPolygon(c.external,true,1,Math.PI/10,100);
 
 			g2.setColor(Color.RED);
-			drawPolygon(vertexes,true,g2);
+			VisualizeShapes.drawPolygon(vertexes,true,g2);
 
 			g2.setColor(Color.BLUE);
 			for( List<Point2D_I32> internal : c.internal ) {
 				vertexes = ShapeFittingOps.fitPolygon(internal,true,1,Math.PI/10,100);
-				drawPolygon(vertexes,true,g2);
+				VisualizeShapes.drawPolygon(vertexes,true,g2);
 			}
 		}
 
@@ -115,7 +116,7 @@ public class ExampleFitPolynomial {
 				// fit line segments to the point sequence.  Note that loop is false
 				List<PointIndex_I32> vertexes = ShapeFittingOps.fitPolygon(s.points,false,1,Math.PI/10,100);
 
-				drawPolygon(vertexes,false,g2);
+				VisualizeShapes.drawPolygon(vertexes, false, g2);
 			}
 		}
 
@@ -132,21 +133,5 @@ public class ExampleFitPolynomial {
 
 		fitContours(input);
 		fitEdges(input);
-	}
-
-	/**
-	 * Draws a polygon
-	 */
-	private static void drawPolygon( List<PointIndex_I32> vertexes , boolean loop, Graphics2D g2 ) {
-		for( int i = 0; i < vertexes.size()-1; i++ ) {
-			Point2D_I32 p0 = vertexes.get(i);
-			Point2D_I32 p1 = vertexes.get(i+1);
-			g2.drawLine(p0.x,p0.y,p1.x,p1.y);
-		}
-		if( loop ) {
-			Point2D_I32 p0 = vertexes.get(0);
-			Point2D_I32 p1 = vertexes.get(vertexes.size()-1);
-			g2.drawLine(p0.x,p0.y,p1.x,p1.y);
-		}
 	}
 }
