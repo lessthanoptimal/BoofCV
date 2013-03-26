@@ -27,6 +27,8 @@ import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.struct.image.ImageSingleBand;
 
 /**
+ * Creates different types of edge detectors.
+ *
  * @author Peter Abeles
  */
 public class FactoryEdgeDetectors {
