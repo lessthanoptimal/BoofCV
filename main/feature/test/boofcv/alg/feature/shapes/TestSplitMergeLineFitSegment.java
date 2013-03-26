@@ -27,12 +27,27 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
  */
 public class TestSplitMergeLineFitSegment {
+
+	/**
+	 * Tests contours with zero and one points in them
+	 */
+	@Test
+	public void checkZeroOne() {
+		List<Point2D_I32> contour = new ArrayList<Point2D_I32>();
+		SplitMergeLineFitSegment alg = new SplitMergeLineFitSegment(0.1,0.3,100);
+		alg.process(contour);
+		assertEquals(0,alg.getSplits().size);
+
+		contour.add( new Point2D_I32(2,3));
+		alg.process(contour);
+		assertEquals(0,alg.getSplits().size);
+	}
+
 	/**
 	 * Simple case with a zig-zag pattern
 	 */

@@ -19,20 +19,25 @@
 package boofcv.alg.feature.shapes;
 
 import boofcv.struct.FastQueue;
+import boofcv.struct.GrowQueue_F64;
 import boofcv.struct.GrowQueue_I32;
 import boofcv.struct.PointIndex_I32;
 import boofcv.struct.image.ImageUInt8;
 import georegression.struct.point.Point2D_I32;
+import georegression.struct.trig.Circle2D_F64;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Functions for fitting shapes to sequences of points.
+ * Functions for fitting shapes to sequences of points. Points sequences are often found by computing a shape's
+ * contour or edge.
+ *
+ * @see boofcv.alg.feature.detect.edge.CannyEdge
+ * @see boofcv.alg.filter.binary.BinaryImageOps#contour(boofcv.struct.image.ImageUInt8, int, boofcv.struct.image.ImageSInt32)
  *
  * @author Peter Abeles
  */
-// todo add circle
 // todo add oval
 public class ShapeFittingOps {
 
@@ -73,8 +78,67 @@ public class ShapeFittingOps {
 		return new ArrayList<PointIndex_I32>(output.toList());
 	}
 
+	/**
+	 * Computes the best fit circle in the Euclidean sense.  The circle's center is the mean of the provided points
+	 * and the radius is the average distance of each point from the center.  The radius' variance is the returned
+	 * error.
+	 *
+	 * @param points (Input) Set of unordered points. Not modified.
+	 * @param optional (Optional) Used internally to store the distance of each point from the center.  Can be null.
+	 * @param outputStorage (Output/Optional) Storage for results.  If null then a new circle instance will be returned.
+	 * @return The found circle fit.
+	 */
+	public static FitData<Circle2D_F64> fitCircle( List<Point2D_I32> points ,GrowQueue_F64 optional ,
+												   FitData<Circle2D_F64> outputStorage ) {
+		if( outputStorage == null ) {
+			outputStorage = new FitData<Circle2D_F64>(new Circle2D_F64());
+		}
+		if( optional == null ) {
+			optional = new GrowQueue_F64();
+		}
+
+		Circle2D_F64 circle = outputStorage.shape;
+
+		int N = points.size();
+
+		// find center of the circle by computing the mean x and y
+		int sumX=0,sumY=0;
+		for( int i = 0; i < N; i++ ) {
+			Point2D_I32 p = points.get(i);
+			sumX += p.x;
+			sumY += p.y;
+		}
+
+		optional.reset();
+		double centerX = circle.center.x = sumX/(double)N;
+		double centerY = circle.center.y = sumY/(double)N;
+
+		double meanR = 0;
+		for( int i = 0; i < N; i++ ) {
+			Point2D_I32 p = points.get(i);
+			double dx = p.x-centerX;
+			double dy = p.y-centerY;
+
+			double r = Math.sqrt(dx*dx + dy*dy);
+		    optional.push(r);
+			meanR += r;
+		}
+		meanR /= N;
+		circle.radius = meanR;
+
+		// compute radius variance
+		double variance = 0;
+		for( int i = 0; i < N; i++ ) {
+			double diff = optional.get(i)-meanR;
+			variance += diff*diff;
+		}
+		outputStorage.error = variance/N;
+
+		return outputStorage;
+	}
+
 	public static void removeDuplicates( List<Point2D_I32> input , ImageUInt8 work ,
-								  List<Point2D_I32> output )
+										 List<Point2D_I32> output )
 	{
 
 	}

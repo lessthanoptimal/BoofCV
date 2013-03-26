@@ -53,6 +53,11 @@ public class SplitMergeLineFitLoop extends SplitMergeLineFit {
 		// ------------- find initial line segments
 		splits.reset();
 
+		// can't fit a line to a single point
+		if( N <= 1 ) {
+			return;
+		}
+
 		// Go around the contour looking for two points on opposite ends which are far apart
 		int startIndex = selectFarthest(contour);
 		int middleIndex = (startIndex+N/2)%N;
@@ -126,6 +131,9 @@ public class SplitMergeLineFitLoop extends SplitMergeLineFit {
 				bestDistance = dist;
 			}
 		}
+
+		if( bestIndex == -1 )
+			System.out.println();
 
 		return bestIndex;
 	}
