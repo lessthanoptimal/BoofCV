@@ -20,7 +20,10 @@ package boofcv.alg.feature.shapes;
 
 import boofcv.struct.GrowQueue_F64;
 import boofcv.struct.PointIndex_I32;
+import georegression.geometry.UtilEllipse_F64;
+import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I32;
+import georegression.struct.shapes.EllipseRotated_F64;
 import georegression.struct.trig.Circle2D_F64;
 import org.junit.Test;
 
@@ -68,15 +71,109 @@ public class TestShapeFittingOps {
 		check(1,0,27,result.get(4));
 	}
 
+	/**
+	 * Check the found solution
+	 */
 	@Test
-	public void fitCircle() {
+	public void fitEllipse_F64() {
+		EllipseRotated_F64 rotated = new EllipseRotated_F64(1,2,3,2,-0.05);
+
+		List<Point2D_F64> points = new ArrayList<Point2D_F64>();
+		for( int i = 0; i < 20; i++ ) {
+			double theta = 2.0*(double)Math.PI*i/20;
+			points.add(UtilEllipse_F64.computePoint(theta, rotated, null));
+		}
+
+		EllipseRotated_F64 found = ShapeFittingOps.fitEllipse_F64(points,0,false,null).shape;
+
+		assertEquals(rotated.center.x,found.center.x,1e-8);
+		assertEquals(rotated.center.y,found.center.y,1e-8);
+		assertEquals(rotated.a,found.a,1e-8);
+		assertEquals(rotated.b,found.b,1e-8);
+		assertEquals(rotated.phi,found.phi,1e-8);
+
+		// make sure refinement doesn't skew it up
+		found = ShapeFittingOps.fitEllipse_F64(points,20,false,null).shape;
+
+		assertEquals(rotated.center.x,found.center.x,1e-8);
+		assertEquals(rotated.center.y,found.center.y,1e-8);
+		assertEquals(rotated.a,found.a,1e-8);
+		assertEquals(rotated.b,found.b,1e-8);
+		assertEquals(rotated.phi,found.phi,1e-8);
+	}
+
+	/**
+	 * Request that error be computed
+	 */
+	@Test
+	public void fitEllipse_F64_error() {
+		EllipseRotated_F64 rotated = new EllipseRotated_F64(1,2,3,2,-0.05);
+
+		List<Point2D_F64> points = new ArrayList<Point2D_F64>();
+		for( int i = 0; i < 20; i++ ) {
+			double theta = 2.0*(double)Math.PI*i/20;
+			points.add(UtilEllipse_F64.computePoint(theta, rotated, null));
+		}
+		points.get(5).x += 2;
+
+		// Algebraic solution
+		FitData<EllipseRotated_F64> found = ShapeFittingOps.fitEllipse_F64(points,0,false,null);
+
+		assertTrue(found.error == 0);
+
+		// make sure refinement doesn't skew it up
+		found = ShapeFittingOps.fitEllipse_F64(points,0,true,null);
+
+		assertTrue(found.error > 0);
+
+		// Refined solution
+		found = ShapeFittingOps.fitEllipse_F64(points,10,false,null);
+
+		assertTrue(found.error == 0);
+
+		// make sure refinement doesn't skew it up
+		found = ShapeFittingOps.fitEllipse_F64(points,10,true,null);
+
+		assertTrue(found.error > 0);
+	}
+
+	/**
+	 * Checks to see if they produce the same solution
+	 */
+	@Test
+	public void fitEllipse_I32() {
+		EllipseRotated_F64 rotated = new EllipseRotated_F64(1,2,3,2,-0.05);
+
+		List<Point2D_F64> pointsF = new ArrayList<Point2D_F64>();
+		List<Point2D_I32> pointsI = new ArrayList<Point2D_I32>();
+		for( int i = 0; i < 20; i++ ) {
+			double theta = 2.0*(double)Math.PI*i/20;
+			Point2D_F64 p = UtilEllipse_F64.computePoint(theta, rotated, null);
+			Point2D_I32 pi = new Point2D_I32((int)p.x,(int)p.y) ;
+			p.set(pi.x,pi.y);
+			pointsF.add(p);
+			pointsI.add(pi);
+		}
+
+		EllipseRotated_F64 expected = ShapeFittingOps.fitEllipse_F64(pointsF,0,false,null).shape;
+		EllipseRotated_F64 found = ShapeFittingOps.fitEllipse_I32(pointsI, 0, false, null).shape;
+
+		assertEquals(expected.center.x,found.center.x,1e-8);
+		assertEquals(expected.center.y,found.center.y,1e-8);
+		assertEquals(expected.a,found.a,1e-8);
+		assertEquals(expected.b,found.b,1e-8);
+		assertEquals(expected.phi,found.phi,1e-8);
+	}
+
+	@Test
+	public void averageCircle_I32() {
 		List<Point2D_I32> points = new ArrayList<Point2D_I32>();
 		points.add( new Point2D_I32(0,0));
 		points.add( new Point2D_I32(10,0));
 		points.add( new Point2D_I32(5,5));
 		points.add( new Point2D_I32(5,-5));
 
-		FitData<Circle2D_F64> found = ShapeFittingOps.fitCircle(points,null,null);
+		FitData<Circle2D_F64> found = ShapeFittingOps.averageCircle_I32(points, null, null);
 		assertEquals(5,found.shape.center.x,1e-5);
 		assertEquals(0,found.shape.center.y,1e-5);
 		assertEquals(5,found.shape.radius,1e-5);
@@ -87,7 +184,7 @@ public class TestShapeFittingOps {
 		GrowQueue_F64 optional = new GrowQueue_F64();
 		optional.push(4);
 
-		ShapeFittingOps.fitCircle(points,optional,found);
+		ShapeFittingOps.averageCircle_I32(points, optional, found);
 		assertEquals(5,found.shape.center.x,1e-5);
 		assertEquals(0,found.shape.center.y,1e-5);
 		assertEquals(5,found.shape.radius,1e-5);
@@ -95,7 +192,7 @@ public class TestShapeFittingOps {
 
 		// now make it no longer a perfect fit
 		points.get(0).x = -1;
-		found = ShapeFittingOps.fitCircle(points,null,null);
+		found = ShapeFittingOps.averageCircle_I32(points, null, null);
 		assertTrue( found.error > 0 );
 	}
 
@@ -103,6 +200,37 @@ public class TestShapeFittingOps {
 		assertEquals(x,found.x);
 		assertEquals(y,found.y);
 		assertEquals(index,found.index);
+	}
+
+	@Test
+	public void averageCircle_F64() {
+		List<Point2D_F64> points = new ArrayList<Point2D_F64>();
+		points.add( new Point2D_F64(0,0));
+		points.add( new Point2D_F64(10,0));
+		points.add( new Point2D_F64(5,5));
+		points.add( new Point2D_F64(5,-5));
+
+		FitData<Circle2D_F64> found = ShapeFittingOps.averageCircle_F64(points, null, null);
+		assertEquals(5, found.shape.center.x, 1e-5);
+		assertEquals(0,found.shape.center.y,1e-5);
+		assertEquals(5,found.shape.radius,1e-5);
+		assertEquals(0, found.error, 1e-5);
+
+		// Pass in storage and see if it fails
+		found.error = 23; found.shape.center.x = 3;
+		GrowQueue_F64 optional = new GrowQueue_F64();
+		optional.push(4);
+
+		ShapeFittingOps.averageCircle_F64(points, optional, found);
+		assertEquals(5,found.shape.center.x,1e-5);
+		assertEquals(0,found.shape.center.y,1e-5);
+		assertEquals(5,found.shape.radius,1e-5);
+		assertEquals(0, found.error, 1e-5);
+
+		// now make it no longer a perfect fit
+		points.get(0).x = -1;
+		found = ShapeFittingOps.averageCircle_F64(points, null, null);
+		assertTrue(found.error > 0);
 	}
 
 	/**

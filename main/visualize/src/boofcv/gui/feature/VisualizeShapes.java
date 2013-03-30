@@ -19,8 +19,11 @@
 package boofcv.gui.feature;
 
 import georegression.struct.point.Point2D_I32;
+import georegression.struct.shapes.EllipseRotated_F64;
 
 import java.awt.*;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Ellipse2D;
 import java.util.List;
 
 /**
@@ -41,10 +44,30 @@ public class VisualizeShapes {
 			Point2D_I32 p1 = vertexes.get(i+1);
 			g2.drawLine(p0.x,p0.y,p1.x,p1.y);
 		}
-		if( loop ) {
+		if( loop && vertexes.size() > 0) {
 			Point2D_I32 p0 = vertexes.get(0);
 			Point2D_I32 p1 = vertexes.get(vertexes.size()-1);
 			g2.drawLine(p0.x,p0.y,p1.x,p1.y);
 		}
+	}
+
+	/**
+	 * Draws the rotated ellipse
+	 * @param ellipse Description of the ellipse
+	 * @param g2 Graphics object
+	 */
+	public static void drawEllipse( EllipseRotated_F64 ellipse , Graphics2D g2 ) {
+
+		AffineTransform rotate = new AffineTransform();
+		rotate.rotate(ellipse.phi);
+
+		double w = ellipse.a*2;
+		double h = ellipse.b*2;
+
+
+		Shape shape = rotate.createTransformedShape(new Ellipse2D.Double(-w/2,-h/2,w,h));
+		shape = AffineTransform.getTranslateInstance(ellipse.center.x,ellipse.center.y).createTransformedShape(shape);
+
+		g2.draw(shape);
 	}
 }

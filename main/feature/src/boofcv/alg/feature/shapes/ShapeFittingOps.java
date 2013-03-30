@@ -22,8 +22,13 @@ import boofcv.struct.FastQueue;
 import boofcv.struct.GrowQueue_F64;
 import boofcv.struct.GrowQueue_I32;
 import boofcv.struct.PointIndex_I32;
-import boofcv.struct.image.ImageUInt8;
+import georegression.fitting.ellipse.ClosestPointEllipseAngle_F64;
+import georegression.fitting.ellipse.FitEllipseAlgebraic;
+import georegression.fitting.ellipse.RefineEllipseEuclideanLeastSquares;
+import georegression.geometry.UtilEllipse_F64;
+import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I32;
+import georegression.struct.shapes.EllipseRotated_F64;
 import georegression.struct.trig.Circle2D_F64;
 
 import java.util.ArrayList;
@@ -38,7 +43,6 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-// todo add oval
 public class ShapeFittingOps {
 
 	/**
@@ -79,17 +83,108 @@ public class ShapeFittingOps {
 	}
 
 	/**
-	 * Computes the best fit circle in the Euclidean sense.  The circle's center is the mean of the provided points
-	 * and the radius is the average distance of each point from the center.  The radius' variance is the returned
-	 * error.
+	 * Computes the best fit ellipse based on minimizing Euclidean distance.  An estimate is initially provided
+	 * using algebraic algorithm which is then refined using non-linear optimization.  The amount of non-linear
+	 * optimization can be controlled using 'iterations' parameter.  Will work with partial and complete contours
+	 * of objects.
+	 *
+	 * NOTE: To improve speed, directly call classes from Georegression.  Look at the code for details.
+	 *
+	 * @param points (Input) Set of unordered points. Not modified.
+	 * @param iterations Number of iterations used to refine the fit. If set to zero then an algebraic solution
+	 *                   is returned.
+	 * @param computeError If true it will compute the average Euclidean distance error
+	 * @param outputStorage (Output/Optional) Storage for the ellipse.  Can be null.
+	 * @return Found ellipse.
+	 */
+	public static FitData<EllipseRotated_F64> fitEllipse_F64( List<Point2D_F64> points, int iterations ,
+															  boolean computeError ,
+															  FitData<EllipseRotated_F64> outputStorage ) {
+
+		if( outputStorage == null ) {
+			outputStorage = new FitData<EllipseRotated_F64>(new EllipseRotated_F64());
+		}
+
+		// Compute the optimal algebraic error
+		FitEllipseAlgebraic algebraic = new FitEllipseAlgebraic();
+
+		if( !algebraic.process(points)) {
+			// could be a line or some other weird case. Create a crude estimate instead
+			FitData<Circle2D_F64> circleData = averageCircle_F64(points,null,null);
+			Circle2D_F64 circle = circleData.shape;
+			outputStorage.shape.set(circle.center.x,circle.center.y,circle.radius,circle.radius,0);
+		}
+
+		UtilEllipse_F64.convert(algebraic.getEllipse(),outputStorage.shape);
+
+
+		// Improve the solution from algebraic into Euclidean
+		if( iterations > 0 ) {
+			RefineEllipseEuclideanLeastSquares leastSquares = new RefineEllipseEuclideanLeastSquares();
+			leastSquares.setMaxIterations(iterations);
+			leastSquares.refine(outputStorage.shape,points);
+			outputStorage.shape.set( leastSquares.getFound() );
+		}
+
+		// compute the average Euclidean error if the user requests it
+		if( computeError ) {
+			ClosestPointEllipseAngle_F64 closestPoint = new ClosestPointEllipseAngle_F64(1e-8,100);
+			closestPoint.setEllipse(outputStorage.shape);
+
+			int N = 0;
+			double total = 0;
+			for( Point2D_F64 p : points ) {
+				if( closestPoint.process(p) ) {
+					N++;
+					total += p.distance(closestPoint.getClosest());
+				}
+			}
+			if( N == 0 )
+				outputStorage.error = 0;
+			else
+				outputStorage.error = total/N;
+		} else {
+			outputStorage.error = 0;
+		}
+
+		return outputStorage;
+	}
+
+	/**
+	 * Convenience function.  Same as {@link #fitEllipse_F64(java.util.List, int, boolean,FitData)}, but converts the set of integer points
+	 * into floating point points.
+	 * @param points (Input) Set of unordered points. Not modified.
+	 * @param iterations Number of iterations used to refine the fit. If set to zero then an algebraic solution
+	 *                   is returned.
+	 * @param computeError If true it will compute the average Euclidean distance error
+	 * @param outputStorage (Output/Optional) Storage for the ellipse. Can be null
+	 * @return Found ellipse.
+	 */
+	public static FitData<EllipseRotated_F64> fitEllipse_I32( List<Point2D_I32> points, int iterations ,
+															  boolean computeError ,
+															  FitData<EllipseRotated_F64> outputStorage ) {
+
+		List<Point2D_F64> pointsF = new ArrayList<Point2D_F64>();
+		for( int i = 0; i < points.size(); i++ ) {
+			Point2D_I32 p = points.get(i);
+			pointsF.add( new Point2D_F64(p.x,p.y));
+		}
+
+		return fitEllipse_F64(pointsF,iterations,computeError,outputStorage);
+	}
+
+	/**
+	 * Computes a circle which has it's center at the mean position of the provided points and radius is equal to the
+	 * average distance of each point from the center.  While fast to compute the provided circle is not a best
+	 * first circle by any reasonable metric, except is very special cases.
 	 *
 	 * @param points (Input) Set of unordered points. Not modified.
 	 * @param optional (Optional) Used internally to store the distance of each point from the center.  Can be null.
 	 * @param outputStorage (Output/Optional) Storage for results.  If null then a new circle instance will be returned.
 	 * @return The found circle fit.
 	 */
-	public static FitData<Circle2D_F64> fitCircle( List<Point2D_I32> points ,GrowQueue_F64 optional ,
-												   FitData<Circle2D_F64> outputStorage ) {
+	public static FitData<Circle2D_F64> averageCircle_I32(List<Point2D_I32> points, GrowQueue_F64 optional,
+														  FitData<Circle2D_F64> outputStorage) {
 		if( outputStorage == null ) {
 			outputStorage = new FitData<Circle2D_F64>(new Circle2D_F64());
 		}
@@ -120,7 +215,7 @@ public class ShapeFittingOps {
 			double dy = p.y-centerY;
 
 			double r = Math.sqrt(dx*dx + dy*dy);
-		    optional.push(r);
+			optional.push(r);
 			meanR += r;
 		}
 		meanR /= N;
@@ -137,17 +232,65 @@ public class ShapeFittingOps {
 		return outputStorage;
 	}
 
-	public static void removeDuplicates( List<Point2D_I32> input , ImageUInt8 work ,
-										 List<Point2D_I32> output )
-	{
+	/**
+	 * Computes a circle which has it's center at the mean position of the provided points and radius is equal to the
+	 * average distance of each point from the center.  While fast to compute the provided circle is not a best
+	 * first circle by any reasonable metric, except is very special cases.
+	 *
+	 * @param points (Input) Set of unordered points. Not modified.
+	 * @param optional (Optional) Used internally to store the distance of each point from the center.  Can be null.
+	 * @param outputStorage (Output/Optional) Storage for results.  If null then a new circle instance will be returned.
+	 * @return The found circle fit.
+	 */
+	public static FitData<Circle2D_F64> averageCircle_F64(List<Point2D_F64> points, GrowQueue_F64 optional,
+														  FitData<Circle2D_F64> outputStorage) {
+		if( outputStorage == null ) {
+			outputStorage = new FitData<Circle2D_F64>(new Circle2D_F64());
+		}
+		if( optional == null ) {
+			optional = new GrowQueue_F64();
+		}
 
+		Circle2D_F64 circle = outputStorage.shape;
+
+		int N = points.size();
+
+		// find center of the circle by computing the mean x and y
+		double sumX=0,sumY=0;
+		for( int i = 0; i < N; i++ ) {
+			Point2D_F64 p = points.get(i);
+			sumX += p.x;
+			sumY += p.y;
+		}
+
+		optional.reset();
+		double centerX = circle.center.x = sumX/(double)N;
+		double centerY = circle.center.y = sumY/(double)N;
+
+		double meanR = 0;
+		for( int i = 0; i < N; i++ ) {
+			Point2D_F64 p = points.get(i);
+			double dx = p.x-centerX;
+			double dy = p.y-centerY;
+
+			double r = Math.sqrt(dx*dx + dy*dy);
+			optional.push(r);
+			meanR += r;
+		}
+		meanR /= N;
+		circle.radius = meanR;
+
+		// compute radius variance
+		double variance = 0;
+		for( int i = 0; i < N; i++ ) {
+			double diff = optional.get(i)-meanR;
+			variance += diff*diff;
+		}
+		outputStorage.error = variance/N;
+
+		return outputStorage;
 	}
 
-	public static void removeDuplicatesMulti( List<List<Point2D_I32>> input , ImageUInt8 work ,
-									   List<List<Point2D_I32>> output )
-	{
-
-	}
 
 	/**
 	 * Converts the list of indexes in a sequence into a list of {@link PointIndex_I32}.
