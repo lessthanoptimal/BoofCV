@@ -60,7 +60,7 @@ public abstract class SelectAlgorithmAndInputPanel extends JPanel
 	List<JComponent> addedComponents = new ArrayList<JComponent>();
 
 	// what the original image was before any processing
-	BufferedImage inputImage;
+	protected BufferedImage inputImage;
 	// panel used for displaying the original image
 	ImagePanel origPanel = new ImagePanel();
 	// the main GUI being displayed
@@ -151,6 +151,12 @@ public abstract class SelectAlgorithmAndInputPanel extends JPanel
 		toolbar.add(comp,1+algBoxes.length);
 		toolbar.revalidate();
 		addedComponents.add(comp);
+	}
+
+	public void removeFromToolbar( JComponent comp ) {
+		toolbar.remove(comp);
+		toolbar.revalidate();
+		addedComponents.remove(comp);
 	}
 
 	/**
@@ -334,7 +340,7 @@ public abstract class SelectAlgorithmAndInputPanel extends JPanel
 	public abstract void refreshAll( Object[] cookies );
 
 	/**
-	 * A request has been made to change the processing algorithm.
+	 * A request has been made to change the processing algorithm.  NOT called from a GUI thread.
 	 *
 	 * @param indexFamily
 	 * @param name Display name of the algorithm.

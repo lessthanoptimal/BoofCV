@@ -113,10 +113,12 @@ public class ShapeFittingOps {
 			FitData<Circle2D_F64> circleData = averageCircle_F64(points,null,null);
 			Circle2D_F64 circle = circleData.shape;
 			outputStorage.shape.set(circle.center.x,circle.center.y,circle.radius,circle.radius,0);
+		} else {
+			UtilEllipse_F64.convert(algebraic.getEllipse(),outputStorage.shape);
 		}
 
-		UtilEllipse_F64.convert(algebraic.getEllipse(),outputStorage.shape);
-
+		if( outputStorage.shape.a > 40 || outputStorage.shape.b > 40 )
+			System.out.println(points.size()+" a = "+outputStorage.shape.a);
 
 		// Improve the solution from algebraic into Euclidean
 		if( iterations > 0 ) {
