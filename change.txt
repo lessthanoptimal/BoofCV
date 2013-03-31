@@ -24,7 +24,7 @@ Version : Alpha 0.14
   * Can be configured to create a binary image output or a set of contours
   * Conour pixels are now ordered and returned as a graph
 - Fixed bug in FactoryImageBorder.value()
-- Color Models
+- Color Models (Added)
   * Added HSV, YUV
   * Added new example demonstrating simple color based segmentation
 - XML Serialization
@@ -40,6 +40,7 @@ Version : Alpha 0.14
 - Added ExampleStereoDisparity3D and tweaked the first one
 - Shape Fitting (Added)
   * Fit polygon
+  * Fit ellipse
   * Usage examples
 
 ---------------------------------------------
