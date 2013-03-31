@@ -39,6 +39,7 @@ import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
@@ -82,7 +83,7 @@ public class ShapeFitContourApp
 	public ShapeFitContourApp() {
 		super(1);
 
-		addAlgorithm(0, "Polygon Loop", 0);
+		addAlgorithm(0, "Polygon", 0);
 		addAlgorithm(0, "Ellipse", 1);
 
 
@@ -116,6 +117,20 @@ public class ShapeFitContourApp
 		if( contours == null )
 			return;
 
+		// display original image
+		if( originalCheck.isSelected() ) {
+			SwingUtilities.invokeLater(new Runnable() {
+				@Override
+				public void run() {
+					gui.setBufferedImage(inputImage);
+					gui.repaint();
+					gui.requestFocusInWindow();
+				}
+			});
+			return;
+		}
+
+		// display fit results
 		Graphics2D g2 = output.createGraphics();
 		g2.drawImage(inputImage,0,0,null);
 		g2.setStroke(new BasicStroke(3));
@@ -226,6 +241,16 @@ public class ShapeFitContourApp
 	@Override
 	public boolean getHasProcessedImage() {
 		return processImage;
+	}
+
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		// hijack the show original image event and handle it inside this class
+		if( e.getSource() != originalCheck  ) {
+			super.actionPerformed(e);
+		} else {
+			doRefreshAll();
+		}
 	}
 
 	public static void main( String args[] ) {

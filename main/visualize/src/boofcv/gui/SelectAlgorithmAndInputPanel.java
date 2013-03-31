@@ -50,7 +50,7 @@ public abstract class SelectAlgorithmAndInputPanel extends JPanel
 	// used to select the input image
 	JComboBox imageBox;
 	// when selected it shows the original image
-	JCheckBox originalCheck;
+	protected JCheckBox originalCheck;
 	List<Object> algCookies[];
 	// list of input names and where to get the inputs
 	protected List<PathLabel> inputRefs;

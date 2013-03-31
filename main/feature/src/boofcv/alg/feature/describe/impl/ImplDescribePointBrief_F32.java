@@ -54,13 +54,23 @@ public class ImplDescribePointBrief_F32 extends DescribePointBrief<ImageFloat32>
 
 		int index = blur.startIndex + blur.stride*c_y + c_x;
 
-		for( int i = 0; i < definition.compare.length; i++ ) {
+				for( int i = 0; i < definition.compare.length; i += 32 ) {
+			int end = Math.min(definition.compare.length,i+32);
 			float valA = blur.data[index + offsetsA[i]];
 			float valB = blur.data[index + offsetsB[i]];
 
-			if( valA < valB ) {
-				feature.data[ i/32 ] |= 1 << (i % 32);
+			int desc = valA < valB ? 1 : 0;
+			for( int j = i+1; j < end; j++ ) {
+				valA = blur.data[index + offsetsA[j]];
+				valB = blur.data[index + offsetsB[j]];
+
+				desc *= 2;
+				if( valA < valB ) {
+					desc += 1;
+				}
 			}
+
+			feature.data[ i/32 ] = desc;
 		}
 	}
 
@@ -73,20 +83,27 @@ public class ImplDescribePointBrief_F32 extends DescribePointBrief<ImageFloat32>
 
 		int index = blur.startIndex + blur.stride*c_y + c_x;
 
-		for( int i = 0; i < definition.compare.length; i++ ) {
-			Point2D_I32 c = definition.compare[i];
-			Point2D_I32 p_a = definition.samplePoints[c.x];
-			Point2D_I32 p_b = definition.samplePoints[c.y];
+				for( int i = 0; i < definition.compare.length; i += 32 ) {
+			int end = Math.min(definition.compare.length,i+32);
+			int desc = 0;
+			for( int j = i; j < end; j++ ) {
+				Point2D_I32 c = definition.compare[j];
+				Point2D_I32 p_a = definition.samplePoints[c.x];
+				Point2D_I32 p_b = definition.samplePoints[c.y];
 
-			if( blur.isInBounds(p_a.x + c_x , p_a.y + c_y) &&
-					blur.isInBounds(p_b.x + c_x , p_b.y + c_y) ){
-				float valA = blur.data[index + offsetsA[i]];
-				float valB = blur.data[index + offsetsB[i]];
+				if( blur.isInBounds(p_a.x + c_x , p_a.y + c_y) &&
+						blur.isInBounds(p_b.x + c_x , p_b.y + c_y) ){
+					float valA = blur.data[index + offsetsA[j]];
+					float valB = blur.data[index + offsetsB[j]];
 
-				if( valA < valB ) {
-					feature.data[ i/32 ] |= 1 << (i % 32);
+					desc *= 2;
+
+					if( valA < valB ) {
+						desc += 1;
+					}
 				}
 			}
+			feature.data[ i/32 ] = desc;
 		}
 	}
 

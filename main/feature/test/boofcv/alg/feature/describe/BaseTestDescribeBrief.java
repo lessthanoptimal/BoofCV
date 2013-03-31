@@ -168,7 +168,7 @@ public abstract class BaseTestDescribeBrief <T extends ImageSingleBand> {
 
 			boolean expected = a.get(c_x+p0.x,c_y+p0.y).doubleValue()
 					< a.get(c_x+p1.x,c_y+p1.y).doubleValue();
-			assertTrue(expected == desc.isBitTrue(i));
+			assertTrue(expected == desc.isBitTrue(def.compare.length-i-1));
 		}
 	}
 
