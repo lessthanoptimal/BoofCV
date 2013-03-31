@@ -26,7 +26,6 @@ import boofcv.alg.misc.GImageMiscOps;
 import boofcv.alg.transform.ii.GIntegralImageOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.feature.describe.FactoryDescribePointAlgs;
-import boofcv.factory.feature.describe.FactoryDescribeRegionPoint;
 import boofcv.factory.filter.blur.FactoryBlurFilter;
 import boofcv.misc.Performer;
 import boofcv.misc.PerformerBase;
@@ -154,10 +153,10 @@ public class BenchmarkDescribe<I extends ImageSingleBand, D extends ImageSingleB
 		ConfigSurfDescribe.Speed surfSpeed = new ConfigSurfDescribe.Speed();
 		ConfigSurfDescribe.Stablility surfStable = new ConfigSurfDescribe.Stablility();
 
-		ProfileOperation.printOpsPerSec(new Describe("SURF", FactoryDescribeRegionPoint.<I,II>surfFast(surfSpeed, imageType)),TEST_TIME);
-		ProfileOperation.printOpsPerSec(new Describe("MSURF", FactoryDescribeRegionPoint.<I,II>surfStable(surfStable, imageType)),TEST_TIME);
-		if( imageType == ImageFloat32.class )
-			ProfileOperation.printOpsPerSec(new Describe("SIFT", FactoryDescribeRegionPoint.sift(null,null)),TEST_TIME);
+//		ProfileOperation.printOpsPerSec(new Describe("SURF", FactoryDescribeRegionPoint.<I,II>surfFast(surfSpeed, imageType)),TEST_TIME);
+//		ProfileOperation.printOpsPerSec(new Describe("MSURF", FactoryDescribeRegionPoint.<I,II>surfStable(surfStable, imageType)),TEST_TIME);
+//		if( imageType == ImageFloat32.class )
+//			ProfileOperation.printOpsPerSec(new Describe("SIFT", FactoryDescribeRegionPoint.sift(null,null)),TEST_TIME);
 		ProfileOperation.printOpsPerSec(new Brief512(),TEST_TIME);
 		ProfileOperation.printOpsPerSec(new BriefSO512(),TEST_TIME);
 	}

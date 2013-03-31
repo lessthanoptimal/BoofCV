@@ -90,13 +90,23 @@ public class FactoryImplDescribePointBrief extends CodeGeneratorBase {
 				"\n" +
 				"\t\tint index = blur.startIndex + blur.stride*c_y + c_x;\n" +
 				"\n" +
-				"\t\tfor( int i = 0; i < definition.compare.length; i++ ) {\n" +
+				"\t\t\t\tfor( int i = 0; i < definition.compare.length; i += 32 ) {\n" +
+				"\t\t\tint end = Math.min(definition.compare.length,i+32);\n" +
 				"\t\t\t"+sumType+" valA = blur.data[index + offsetsA[i]]"+bitwise+";\n" +
 				"\t\t\t"+sumType+" valB = blur.data[index + offsetsB[i]]"+bitwise+";\n" +
 				"\n" +
-				"\t\t\tif( valA < valB ) {\n" +
-				"\t\t\t\tfeature.data[ i/32 ] |= 1 << (i % 32);\n" +
+				"\t\t\tint desc = valA < valB ? 1 : 0;\n" +
+				"\t\t\tfor( int j = i+1; j < end; j++ ) {\n" +
+				"\t\t\t\tvalA = blur.data[index + offsetsA[j]]"+bitwise+";\n" +
+				"\t\t\t\tvalB = blur.data[index + offsetsB[j]]"+bitwise+";\n" +
+				"\n" +
+				"\t\t\t\tdesc *= 2;\n" +
+				"\t\t\t\tif( valA < valB ) {\n" +
+				"\t\t\t\t\tdesc += 1;\n" +
+				"\t\t\t\t}\n" +
 				"\t\t\t}\n" +
+				"\n" +
+				"\t\t\tfeature.data[ i/32 ] = desc;\n" +
 				"\t\t}\n" +
 				"\t}\n\n");
 
@@ -109,20 +119,27 @@ public class FactoryImplDescribePointBrief extends CodeGeneratorBase {
 				"\n" +
 				"\t\tint index = blur.startIndex + blur.stride*c_y + c_x;\n" +
 				"\n" +
-				"\t\tfor( int i = 0; i < definition.compare.length; i++ ) {\n" +
-				"\t\t\tPoint2D_I32 c = definition.compare[i];\n" +
-				"\t\t\tPoint2D_I32 p_a = definition.samplePoints[c.x];\n" +
-				"\t\t\tPoint2D_I32 p_b = definition.samplePoints[c.y];\n" +
+				"\t\t\t\tfor( int i = 0; i < definition.compare.length; i += 32 ) {\n" +
+				"\t\t\tint end = Math.min(definition.compare.length,i+32);\n" +
+				"\t\t\tint desc = 0;\n" +
+				"\t\t\tfor( int j = i; j < end; j++ ) {\n" +
+				"\t\t\t\tPoint2D_I32 c = definition.compare[j];\n" +
+				"\t\t\t\tPoint2D_I32 p_a = definition.samplePoints[c.x];\n" +
+				"\t\t\t\tPoint2D_I32 p_b = definition.samplePoints[c.y];\n" +
 				"\n" +
-				"\t\t\tif( blur.isInBounds(p_a.x + c_x , p_a.y + c_y) &&\n" +
-				"\t\t\t\t\tblur.isInBounds(p_b.x + c_x , p_b.y + c_y) ){\n" +
-				"\t\t\t\t"+sumType+" valA = blur.data[index + offsetsA[i]]"+bitwise+";\n" +
-				"\t\t\t\t"+sumType+" valB = blur.data[index + offsetsB[i]]"+bitwise+";\n" +
+				"\t\t\t\tif( blur.isInBounds(p_a.x + c_x , p_a.y + c_y) &&\n" +
+				"\t\t\t\t\t\tblur.isInBounds(p_b.x + c_x , p_b.y + c_y) ){\n" +
+				"\t\t\t\t\t"+sumType+" valA = blur.data[index + offsetsA[j]]"+bitwise+";\n" +
+				"\t\t\t\t\t"+sumType+" valB = blur.data[index + offsetsB[j]]"+bitwise+";\n" +
 				"\n" +
-				"\t\t\t\tif( valA < valB ) {\n" +
-				"\t\t\t\t\tfeature.data[ i/32 ] |= 1 << (i % 32);\n" +
+				"\t\t\t\t\tdesc *= 2;\n" +
+				"\n" +
+				"\t\t\t\t\tif( valA < valB ) {\n" +
+				"\t\t\t\t\t\tdesc += 1;\n" +
+				"\t\t\t\t\t}\n" +
 				"\t\t\t\t}\n" +
 				"\t\t\t}\n" +
+				"\t\t\tfeature.data[ i/32 ] = desc;\n" +
 				"\t\t}\n" +
 				"\t}\n\n");
 	}
