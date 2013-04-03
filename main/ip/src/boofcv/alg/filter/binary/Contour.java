@@ -48,4 +48,24 @@ public class Contour {
 		external.clear();
 		internal.clear();
 	}
+
+   public Contour copy() {
+      Contour ret = new Contour();
+      ret.id = id;
+      for( Point2D_I32 p : external ) {
+         ret.external.add( p.copy() );
+      }
+
+      for( List<Point2D_I32> l : ret.internal ) {
+         List<Point2D_I32> a = new ArrayList<Point2D_I32>();
+
+         for( Point2D_I32 p : l ) {
+            a.add( p.copy() );
+         }
+
+         internal.add(a);
+      }
+
+      return ret;
+   }
 }

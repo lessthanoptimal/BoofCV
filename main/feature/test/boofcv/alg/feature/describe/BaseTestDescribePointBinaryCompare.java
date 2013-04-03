@@ -19,16 +19,13 @@
 package boofcv.alg.feature.describe;
 
 
-import boofcv.abst.filter.blur.BlurFilter;
-import boofcv.alg.feature.describe.brief.BriefDefinition_I32;
+import boofcv.alg.feature.describe.brief.BinaryCompareDefinition_I32;
 import boofcv.alg.feature.describe.brief.FactoryBriefDefinition;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.alg.misc.GPixelMath;
 import boofcv.core.image.FactoryGImageSingleBand;
 import boofcv.core.image.GImageSingleBand;
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.factory.feature.describe.FactoryDescribePointAlgs;
-import boofcv.factory.filter.blur.FactoryBlurFilter;
 import boofcv.struct.feature.TupleDesc_B;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.testing.BoofTesting;
@@ -43,19 +40,17 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author Peter Abeles
  */
-public abstract class BaseTestDescribeBrief <T extends ImageSingleBand> {
+public abstract class BaseTestDescribePointBinaryCompare<T extends ImageSingleBand> {
 
 	Random rand = new Random(234);
 	int width = 30;
 	int height = 40;
 	Class<T> imageType;
 
-	BriefDefinition_I32 def = FactoryBriefDefinition.gaussian2(rand, 5, 20);
-	BlurFilter<T> filterBlur;
+	BinaryCompareDefinition_I32 def = FactoryBriefDefinition.gaussian2(rand, 5, 20);
 
-	public BaseTestDescribeBrief(Class<T> imageType) {
+	public BaseTestDescribePointBinaryCompare(Class<T> imageType) {
 		this.imageType = imageType;
-		filterBlur = FactoryBlurFilter.gaussian(imageType, -1, 1);
 	}
 
 	protected  T createImage( int width , int height ) {
@@ -71,18 +66,18 @@ public abstract class BaseTestDescribeBrief <T extends ImageSingleBand> {
 	public void testSubImage() {
 		T input = createImage(width,height);
 
-		DescribePointBrief<T> alg = FactoryDescribePointAlgs.brief(def, filterBlur);
-		TupleDesc_B desc1 = alg.createFeature();
-		TupleDesc_B desc2 = alg.createFeature();
+		DescribePointBinaryCompare<T> alg = createAlg(def);
+		TupleDesc_B desc1 = createFeature();
+		TupleDesc_B desc2 = createFeature();
 
 		// resize the image and see if it computes the same output
 		alg.setImage(input);
-		process(alg, input.width / 2, input.height / 2, desc1);
+		alg.process( input.width / 2, input.height / 2, desc1);
 
 		T sub = (T)BoofTesting.createSubImageOf(input);
 
 		alg.setImage(sub);
-		process(alg, input.width / 2, input.height / 2, desc2);
+		alg.process( input.width / 2, input.height / 2, desc2);
 
 		for( int i = 0; i < desc1.data.length; i++ ) {
 			assertEquals(desc1.data[i],desc2.data[i]);
@@ -97,15 +92,15 @@ public abstract class BaseTestDescribeBrief <T extends ImageSingleBand> {
 		T inputA = createImage(width,height);
 		T inputB = createImage(width-5,height-5);
 
-		DescribePointBrief<T> alg = FactoryDescribePointAlgs.brief(def, filterBlur);
-		TupleDesc_B desc = alg.createFeature();
+		DescribePointBinaryCompare<T> alg = createAlg(def);
+		TupleDesc_B desc = createFeature();
 
 		alg.setImage(inputA);
-		process(alg, inputA.width / 2, inputA.height / 2, desc);
+		alg.process( inputA.width / 2, inputA.height / 2, desc);
 
 		// just see if it blows up or not
 		alg.setImage(inputB);
-		process(alg, inputA.width / 2, inputA.height / 2, desc);
+		alg.process( inputA.width / 2, inputA.height / 2, desc);
 	}
 
 	/**
@@ -118,17 +113,17 @@ public abstract class BaseTestDescribeBrief <T extends ImageSingleBand> {
 
 		GPixelMath.multiply(input, 2, mod);
 
-		DescribePointBrief<T> alg = FactoryDescribePointAlgs.brief(def, filterBlur);
+		DescribePointBinaryCompare<T> alg = createAlg(def);
 
-		TupleDesc_B desc1 = alg.createFeature();
-		TupleDesc_B desc2 = alg.createFeature();
+		TupleDesc_B desc1 = createFeature();
+		TupleDesc_B desc2 = createFeature();
 
 		// compute the image from the same image but different intensities
 		alg.setImage(input);
-		process(alg, input.width / 2, input.height / 2, desc1);
+		alg.process( input.width / 2, input.height / 2, desc1);
 
 		alg.setImage(mod);
-		process(alg, input.width / 2, input.height / 2, desc2);
+		alg.process( input.width / 2, input.height / 2, desc2);
 
 		// compare the descriptions
 		int count = 0;
@@ -140,26 +135,23 @@ public abstract class BaseTestDescribeBrief <T extends ImageSingleBand> {
 	}
 
 	/**
-	 * Compute the BRIEF descriptor manually and see if it gets the same answer
+	 * Compute the descriptor manually and see if it gets the same answer
 	 */
 	@Test
 	public void testManualCheck() {
 		T input = createImage(width,height);
-		T blurred = (T)input._createNew(width, height);
-		filterBlur.process(input,blurred);
 
+		GImageSingleBand a = FactoryGImageSingleBand.wrap(input);
 
-		GImageSingleBand a = FactoryGImageSingleBand.wrap(blurred);
-
-		DescribePointBrief<T> alg = FactoryDescribePointAlgs.brief(def, filterBlur);
+		DescribePointBinaryCompare<T> alg = createAlg(def);
 
 		alg.setImage(input);
 
 		int c_x = input.width/2;
 		int c_y = input.height/2;
 
-		TupleDesc_B desc = alg.createFeature();
-		process(alg, c_x, c_y, desc);
+		TupleDesc_B desc = createFeature();
+		alg.process(c_x, c_y, desc);
 
 		for( int i = 0; i < def.compare.length; i++ ) {
 			Point2D_I32 c = def.compare[i];
@@ -179,26 +171,28 @@ public abstract class BaseTestDescribeBrief <T extends ImageSingleBand> {
 	public void testImageBorder() {
 		T input = createImage(width,height);
 
-		DescribePointBrief<T> alg = FactoryDescribePointAlgs.brief(def, filterBlur);
+		DescribePointBinaryCompare<T> alg = createAlg(def);
 
 		alg.setImage(input);
 
-		TupleDesc_B desc = alg.createFeature();
+		TupleDesc_B desc = createFeature();
 
 		// just see if it blows up for now.  a more rigorous test would be better
-		process(alg, 0, 0, desc);
-		process(alg, width-1, height-1, desc);
+		alg.process( 0, 0, desc);
+		alg.process(width - 1, height - 1, desc);
 
 		// if given a point inside it should produce the same answer
 		alg.processBorder(width/2,height/2,desc);
-		TupleDesc_B descInside = alg.createFeature();
+		TupleDesc_B descInside = createFeature();
 		alg.processInside(width/2,height/2,descInside);
 
 		for( int i = 0; i < desc.numBits; i++ )
 			assertEquals(desc.getDouble(i),descInside.getDouble(i),1e-8);
 	}
 
-	private void process( DescribePointBrief<T> alg , double x , double y , TupleDesc_B desc ) {
-		alg.process(x,y,desc);
+	public TupleDesc_B createFeature() {
+		return new TupleDesc_B(def.getLength());
 	}
+
+	protected abstract DescribePointBinaryCompare<T> createAlg( BinaryCompareDefinition_I32 def );
 }

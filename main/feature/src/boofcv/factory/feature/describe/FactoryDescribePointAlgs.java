@@ -22,7 +22,7 @@ import boofcv.abst.feature.describe.ConfigSiftDescribe;
 import boofcv.abst.feature.describe.ConfigSurfDescribe;
 import boofcv.abst.filter.blur.BlurFilter;
 import boofcv.alg.feature.describe.*;
-import boofcv.alg.feature.describe.brief.BriefDefinition_I32;
+import boofcv.alg.feature.describe.brief.BinaryCompareDefinition_I32;
 import boofcv.alg.feature.describe.impl.*;
 import boofcv.alg.interpolate.InterpolatePixel;
 import boofcv.factory.interpolate.FactoryInterpolation;
@@ -62,21 +62,25 @@ public class FactoryDescribePointAlgs {
 	}
 
 	public static <T extends ImageSingleBand>
-	DescribePointBrief<T> brief(BriefDefinition_I32 definition, BlurFilter<T> filterBlur ) {
+	DescribePointBrief<T> brief(BinaryCompareDefinition_I32 definition, BlurFilter<T> filterBlur ) {
 		Class<T> imageType = filterBlur.getInputType();
 
+		DescribePointBinaryCompare<T> compare;
+
 		if( imageType == ImageFloat32.class ) {
-			return (DescribePointBrief<T> )new ImplDescribePointBrief_F32(definition,(BlurFilter<ImageFloat32>)filterBlur);
+			compare = (DescribePointBinaryCompare<T> )new ImplDescribeBinaryCompare_F32(definition);
 		} else if( imageType == ImageUInt8.class ) {
-			return (DescribePointBrief<T> )new ImplDescribePointBrief_U8(definition,(BlurFilter<ImageUInt8>)filterBlur);
+			compare = (DescribePointBinaryCompare<T> )new ImplDescribeBinaryCompare_U8(definition);
 		} else {
 			throw new IllegalArgumentException("Unknown image type: "+imageType.getSimpleName());
 		}
+
+		return new DescribePointBrief<T>(compare,filterBlur);
 	}
 
 	// todo remove filterBlur for all BRIEF change to radius,sigma,type
 	public static <T extends ImageSingleBand>
-	DescribePointBriefSO<T> briefso(BriefDefinition_I32 definition, BlurFilter<T> filterBlur) {
+	DescribePointBriefSO<T> briefso(BinaryCompareDefinition_I32 definition, BlurFilter<T> filterBlur) {
 		Class<T> imageType = filterBlur.getInputType();
 
 		InterpolatePixel<T> interp = FactoryInterpolation.bilinearPixel(imageType);

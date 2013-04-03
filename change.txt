@@ -42,6 +42,7 @@ Version : Alpha 0.14
   * Fit polygon
   * Fit ellipse
   * Usage examples
+- BRIEF description computation is 30% faster
 
 ---------------------------------------------
 Date    : 2013/02/16

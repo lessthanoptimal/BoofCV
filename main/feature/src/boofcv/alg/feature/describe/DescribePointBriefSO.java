@@ -19,7 +19,7 @@
 package boofcv.alg.feature.describe;
 
 import boofcv.abst.filter.blur.BlurFilter;
-import boofcv.alg.feature.describe.brief.BriefDefinition_I32;
+import boofcv.alg.feature.describe.brief.BinaryCompareDefinition_I32;
 import boofcv.alg.interpolate.InterpolatePixel;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.misc.BoofMiscOps;
@@ -44,7 +44,7 @@ import java.util.Arrays;
  */
 public class DescribePointBriefSO<T extends ImageSingleBand> {
 	// describes the BRIEF feature
-	protected BriefDefinition_I32 definition;
+	protected BinaryCompareDefinition_I32 definition;
 
 	// blurs the image prior to sampling
 	protected BlurFilter<T> filterBlur;
@@ -57,7 +57,7 @@ public class DescribePointBriefSO<T extends ImageSingleBand> {
 	// values at each sample point
 	float values[];
 
-	public DescribePointBriefSO(BriefDefinition_I32 definition,
+	public DescribePointBriefSO(BinaryCompareDefinition_I32 definition,
 								BlurFilter<T> filterBlur,
 								InterpolatePixel<T> interp) {
 		this.definition = definition;
@@ -123,7 +123,7 @@ public class DescribePointBriefSO<T extends ImageSingleBand> {
 		}
 	}
 
-	public BriefDefinition_I32 getDefinition() {
+	public BinaryCompareDefinition_I32 getDefinition() {
 		return definition;
 	}
 }

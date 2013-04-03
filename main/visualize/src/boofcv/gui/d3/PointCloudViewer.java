@@ -68,17 +68,21 @@ public class PointCloudViewer extends JPanel implements MouseMotionListener, Mou
 	public int tiltAngle = 0;
 	public double radius = 5;
 
+   // motion scale
+   public double pixelToDistance;
+
 	// previous mouse location
 	int prevX;
 	int prevY;
 
-	public PointCloudViewer() {
+	public PointCloudViewer( double pixelToDistance ) {
 		addMouseListener(this);
 		addMouseMotionListener(this);
+      this.pixelToDistance = pixelToDistance;
 	}
 
-	public PointCloudViewer(DenseMatrix64F K) {
-		this();
+   public PointCloudViewer(DenseMatrix64F K, double pixelToDistance ) {
+		this(pixelToDistance);
 		configure(K);
 	}
 
@@ -230,8 +234,8 @@ public class PointCloudViewer extends JPanel implements MouseMotionListener, Mou
 		final int deltaX = e.getX()-prevX;
 		final int deltaY = e.getY()-prevY;
 
-		offsetX += deltaX;
-		offsetY += deltaY;
+		offsetX += deltaX*pixelToDistance;
+		offsetY += deltaY*pixelToDistance;
 
 		prevX = e.getX();
 		prevY = e.getY();
