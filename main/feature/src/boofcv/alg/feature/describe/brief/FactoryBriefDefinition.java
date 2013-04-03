@@ -40,8 +40,8 @@ public class FactoryBriefDefinition {
 	 * @param numPairs Number of sample point pairs.
 	 * @return Definition of a BRIEF feature.
 	 */
-	public static BriefDefinition_I32 gaussian( Random rand, int radius , int numPairs ) {
-		BriefDefinition_I32 ret = new BriefDefinition_I32(radius,numPairs*2,numPairs);
+	public static BinaryCompareDefinition_I32 gaussian( Random rand, int radius , int numPairs ) {
+		BinaryCompareDefinition_I32 ret = new BinaryCompareDefinition_I32(radius,numPairs*2,numPairs);
 
 		double sigma = (2.0*radius+1.0)/5.0;
 		for( int i = 0; i < numPairs; i++ ) {
@@ -54,8 +54,8 @@ public class FactoryBriefDefinition {
 		return ret;
 	}
 
-	public static BriefDefinition_I32 gaussian2( Random rand, int radius , int numPairs ) {
-		BriefDefinition_I32 ret = new BriefDefinition_I32(radius,numPairs,numPairs);
+	public static BinaryCompareDefinition_I32 gaussian2( Random rand, int radius , int numPairs ) {
+		BinaryCompareDefinition_I32 ret = new BinaryCompareDefinition_I32(radius,numPairs,numPairs);
 
 		double sigma = (2.0*radius+1.0)/5.0;
 		for( int i = 0; i < numPairs; i++ ) {

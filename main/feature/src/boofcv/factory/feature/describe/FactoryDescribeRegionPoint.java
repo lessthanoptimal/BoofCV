@@ -22,7 +22,7 @@ import boofcv.abst.feature.describe.*;
 import boofcv.abst.filter.blur.BlurFilter;
 import boofcv.alg.feature.describe.DescribePointSift;
 import boofcv.alg.feature.describe.DescribePointSurf;
-import boofcv.alg.feature.describe.brief.BriefDefinition_I32;
+import boofcv.alg.feature.describe.brief.BinaryCompareDefinition_I32;
 import boofcv.alg.feature.describe.brief.FactoryBriefDefinition;
 import boofcv.alg.feature.detect.interest.SiftImageScaleSpace;
 import boofcv.alg.transform.ii.GIntegralImageOps;
@@ -136,7 +136,7 @@ public class FactoryDescribeRegionPoint {
 		config.checkValidity();
 
 		BlurFilter<T> filter = FactoryBlurFilter.gaussian(imageType,config.blurSigma,config.blurRadius);
-		BriefDefinition_I32 definition =
+		BinaryCompareDefinition_I32 definition =
 				FactoryBriefDefinition.gaussian2(new Random(123), config.radius, config.numPoints);
 
 		if( config.fixed) {

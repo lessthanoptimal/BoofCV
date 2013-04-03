@@ -19,14 +19,21 @@
 package boofcv.alg.feature.describe.impl;
 
 
-import boofcv.alg.feature.describe.BaseTestDescribeBrief;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.alg.feature.describe.BaseTestDescribePointBinaryCompare;
+import boofcv.alg.feature.describe.DescribePointBinaryCompare;
+import boofcv.alg.feature.describe.brief.BinaryCompareDefinition_I32;
+import boofcv.struct.image.ImageFloat32;
 
 /**
  * @author Peter Abeles
  */
-public class TestImplDescribePointBrief_U8 extends BaseTestDescribeBrief<ImageUInt8>{
-	public TestImplDescribePointBrief_U8() {
-		super(ImageUInt8.class);
+public class TestImplDescribeBinaryCompare_F32 extends BaseTestDescribePointBinaryCompare<ImageFloat32> {
+	public TestImplDescribeBinaryCompare_F32() {
+		super(ImageFloat32.class);
+	}
+
+	@Override
+	protected DescribePointBinaryCompare<ImageFloat32> createAlg(BinaryCompareDefinition_I32 def) {
+		return new ImplDescribeBinaryCompare_F32(def);
 	}
 }

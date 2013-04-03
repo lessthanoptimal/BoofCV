@@ -99,7 +99,7 @@ public class ExampleStereoDisparity3D {
 		DenseMatrix64F rectR = rectAlg.getRectifiedRotation();
 
 		// used to display the point cloud
-		PointCloudViewer viewer = new PointCloudViewer(rectK);
+		PointCloudViewer viewer = new PointCloudViewer(rectK,1);
 		viewer.setPreferredSize(new Dimension(rectLeft.width,rectLeft.height));
 
 		// extract intrinsic parameters from rectified camera
