@@ -34,6 +34,7 @@ import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.video.BoofVideoManager;
 import boofcv.struct.BoofDefaults;
 import boofcv.struct.QueueCorner;
+import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.point.Point2D_I16;
@@ -124,7 +125,7 @@ public class VideoDetectCorners<T extends ImageSingleBand, D extends ImageSingle
 
 	public static <T extends ImageSingleBand, D extends ImageSingleBand>
 	void perform(String fileName, Class<T> imageType, Class<D> derivType) {
-		SimpleImageSequence<T> sequence = BoofVideoManager.loadManagerDefault().load(fileName, imageType);
+		SimpleImageSequence<T> sequence = BoofVideoManager.loadManagerDefault().load(fileName, ImageDataType.single(imageType));
 
 		int maxCorners = 200;
 		int radius = 2;

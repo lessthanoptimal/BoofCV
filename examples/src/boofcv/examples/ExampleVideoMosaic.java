@@ -21,6 +21,7 @@ package boofcv.examples;
 import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
 import boofcv.abst.feature.tracker.PointTracker;
 import boofcv.abst.sfm.d2.ImageMotion2D;
+import boofcv.abst.sfm.d2.MsToGrayMotion2D;
 import boofcv.alg.sfm.d2.StitchingFromMotion2D;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.factory.feature.tracker.FactoryPointTracker;
@@ -31,7 +32,9 @@ import boofcv.io.MediaManager;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.wrapper.DefaultMediaManager;
 import boofcv.misc.BoofMiscOps;
+import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.MultiSpectral;
 import georegression.struct.homo.Homography2D_F64;
 import georegression.struct.point.Point2D_F64;
 
@@ -64,16 +67,20 @@ public class ExampleVideoMosaic {
 		ImageMotion2D<ImageFloat32,Homography2D_F64> motion2D =
 				FactoryMotion2D.createMotion2D(200,3,2,30,0.6,0.5,false,tracker,new Homography2D_F64());
 
+		// wrap it so it output color images while estimating motion from gray
+		ImageMotion2D<MultiSpectral<ImageFloat32>,Homography2D_F64> motion2DColor =
+				new MsToGrayMotion2D<ImageFloat32,Homography2D_F64>(motion2D,ImageFloat32.class);
+
 		// This fuses the images together
-		StitchingFromMotion2D<ImageFloat32,Homography2D_F64>
-				stitch = FactoryMotion2D.createVideoStitch(0.5, motion2D, ImageFloat32.class);
+		StitchingFromMotion2D<MultiSpectral<ImageFloat32>,Homography2D_F64>
+				stitch = FactoryMotion2D.createVideoStitchMS(0.5, motion2DColor, ImageFloat32.class);
 
 		// Load an image sequence
 		MediaManager media = DefaultMediaManager.INSTANCE;
 		String fileName = "../data/applet/mosaic/airplane01.mjpeg";
-		SimpleImageSequence<ImageFloat32> video = media.openVideo(fileName,ImageFloat32.class);
+		SimpleImageSequence<MultiSpectral<ImageFloat32>> video = media.openVideo(fileName, ImageDataType.ms(ImageFloat32.class));
 
-		ImageFloat32 frame = video.next();
+		MultiSpectral<ImageFloat32> frame = video.next();
 
 		// shrink the input image and center it
 		Homography2D_F64 shrink = new Homography2D_F64(0.5,0,frame.width/3,0,0.5,frame.height/2,0,0,1);

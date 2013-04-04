@@ -19,6 +19,7 @@
 package boofcv.io.wrapper.images;
 
 import boofcv.io.UtilIO;
+import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageFloat32;
 import org.junit.Test;
 
@@ -36,10 +37,12 @@ public class TestLoadFileImageSequence {
 	 */
 	@Test
 	public void basicLoadTest() {
-		LoadFileImageSequence<ImageFloat32> alg = new LoadFileImageSequence<ImageFloat32>(ImageFloat32.class,
+		LoadFileImageSequence<ImageFloat32> alg = new LoadFileImageSequence<ImageFloat32>(ImageDataType.single(ImageFloat32.class),
 				UtilIO.getPathToBase()+"main/io/data/test/","png");
 
-		assertTrue(ImageFloat32.class == alg.getImageType());
+
+		assertTrue(alg.getImageType().getFamily() == ImageDataType.Family.SINGLE_BAND);
+		assertTrue(ImageFloat32.class == alg.getImageType().getDataType().getImageClass());
 		assertTrue(!alg.isLoop());
 
 		int total = 0;
@@ -62,7 +65,7 @@ public class TestLoadFileImageSequence {
 	 */
 	@Test
 	public void checkLoop() {
-		LoadFileImageSequence<ImageFloat32> alg = new LoadFileImageSequence<ImageFloat32>(ImageFloat32.class,
+		LoadFileImageSequence<ImageFloat32> alg = new LoadFileImageSequence<ImageFloat32>(ImageDataType.single(ImageFloat32.class),
 				UtilIO.getPathToBase()+"main/io/data/test/","png");
 		alg.setLoop(true);
 

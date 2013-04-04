@@ -19,6 +19,7 @@
 package boofcv.io.wrapper.xuggler;
 
 import boofcv.gui.image.PlaybackImageSequence;
+import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageUInt8;
 
 /**
@@ -37,7 +38,7 @@ public class PlaybackXugglerVideo {
 			fileName = args[0];
 		}
 
-		XugglerSimplified<ImageUInt8> sequence = new XugglerSimplified<ImageUInt8>(fileName, ImageUInt8.class);
+		XugglerSimplified<ImageUInt8> sequence = new XugglerSimplified<ImageUInt8>(fileName, ImageDataType.single(ImageUInt8.class));
 
 		PlaybackImageSequence<ImageUInt8> player = new PlaybackImageSequence<ImageUInt8>(sequence);
 

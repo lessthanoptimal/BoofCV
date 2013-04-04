@@ -19,7 +19,10 @@
 package boofcv.gui;
 
 import boofcv.io.image.SimpleImageSequence;
+import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageTypeInfo;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -33,7 +36,7 @@ import java.awt.image.BufferedImage;
  *
  * @author Peter Abeles
  */
-public abstract class VideoProcessAppBase<I extends ImageSingleBand>
+public abstract class VideoProcessAppBase<I extends ImageBase>
 		extends SelectAlgorithmAndInputPanel implements VisualizeApp, MouseListener , ChangeListener
 {
 	protected SimpleImageSequence<I> sequence;
@@ -45,13 +48,20 @@ public abstract class VideoProcessAppBase<I extends ImageSingleBand>
 	long framePeriod = 100;
 
 	JSpinner periodSpinner;
-	
-	protected Class<I> imageType;
+
+	protected ImageDataType<I> imageInfo;
 
 	public VideoProcessAppBase(int numAlgFamilies, Class<I> imageType) {
 		super(numAlgFamilies);
 
-		this.imageType = imageType;
+		this.imageInfo = new ImageDataType<I>(ImageDataType.Family.SINGLE_BAND, ImageTypeInfo.classToType(imageType));
+		addToToolbar(createSelectDelay());
+	}
+
+	public VideoProcessAppBase(int numAlgFamilies, ImageDataType<I> imageInfo ) {
+		super(numAlgFamilies);
+
+		this.imageInfo = imageInfo;
 		addToToolbar(createSelectDelay());
 	}
 
@@ -82,7 +92,7 @@ public abstract class VideoProcessAppBase<I extends ImageSingleBand>
 	@Override
 	public void changeInput(String name, int index) {
 		stopWorker();
-		SimpleImageSequence<I> video = media.openVideo(inputRefs.get(index).getPath(),imageType);
+		SimpleImageSequence<I> video = media.openVideo(inputRefs.get(index).getPath(),imageInfo);
 		process(video);
 	}
 

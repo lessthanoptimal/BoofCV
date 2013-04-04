@@ -21,6 +21,7 @@ package boofcv.io.wrapper.xuggler;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.io.image.SimpleImageSequence;
+import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageSingleBand;
 import com.xuggle.xuggler.*;
 import com.xuggle.xuggler.video.ConverterFactory;
@@ -49,7 +50,7 @@ public class XugglerSimplified<T extends ImageSingleBand> implements SimpleImage
 	// the output image
 	T image;
 	// type of output image
-	Class<T> typeOutput;
+	ImageDataType<T> typeOutput;
 
 	// read in buffered images
 	BufferedImage bufferedImage;
@@ -63,12 +64,12 @@ public class XugglerSimplified<T extends ImageSingleBand> implements SimpleImage
 
 	String fileName;
 
-	public XugglerSimplified(String filename, Class<T> typeOutput) {
-		image = (T)GeneralizedImageOps.createSingleBand(typeOutput,1,1);
+	public XugglerSimplified(String filename, ImageDataType<T> typeOutput) {
+		image = typeOutput.createImage(1,1,3);
 		open(filename,typeOutput);
 	}
 
-	public void open(String filename, Class<T> typeOutput) {
+	public void open(String filename, ImageDataType<T> typeOutput) {
 		this.fileName = filename;
 
 		if (!IVideoResampler.isSupported(
@@ -242,7 +243,7 @@ public class XugglerSimplified<T extends ImageSingleBand> implements SimpleImage
 	}
 
 	@Override
-	public Class<T> getImageType() {
+	public ImageDataType<T> getImageType() {
 		return typeOutput;
 	}
 

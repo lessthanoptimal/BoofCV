@@ -22,6 +22,9 @@ import boofcv.io.MediaManager;
 import boofcv.io.VideoCallBack;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageDataType;
+import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.MultiSpectral;
 import org.junit.Test;
 
 import java.awt.image.BufferedImage;
@@ -89,7 +92,7 @@ public class TestParseStereoCalibrationConfig {
 		}
 
 		@Override
-		public <T extends ImageBase> SimpleImageSequence<T> openVideo(String fileName, Class<T> imageType) {
+		public <T extends ImageBase> SimpleImageSequence<T> openVideo(String fileName, ImageDataType<T> imageType) {
 			return null;
 		}
 

@@ -21,6 +21,8 @@ package boofcv.io.wrapper.images;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.image.UtilImageIO;
+import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageSingleBand;
 
 import java.awt.image.BufferedImage;
@@ -36,7 +38,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class BufferedFileImageSequence<T extends ImageSingleBand> implements SimpleImageSequence<T> {
+public class BufferedFileImageSequence<T extends ImageBase> implements SimpleImageSequence<T> {
 
 	BufferedImage orig[];
 	T[] images;
@@ -45,7 +47,7 @@ public class BufferedFileImageSequence<T extends ImageSingleBand> implements Sim
 	BufferedImage imageGUI;
 
 	// type of image it outputs
-	Class<T> type;
+	ImageDataType<T> type;
 
 	boolean loop = true;
 	boolean forwards = true;
@@ -56,7 +58,7 @@ public class BufferedFileImageSequence<T extends ImageSingleBand> implements Sim
 	 * @param directory The directory containing the images.
 	 * @param suffix	The suffix that the images have.
 	 */
-	public BufferedFileImageSequence(Class<T> type, File directory, String suffix) {
+	public BufferedFileImageSequence(ImageDataType<T> type, File directory, String suffix) {
 		this.type = type;
 
 		if (!directory.isDirectory()) throw new IllegalArgumentException("directory must specify a directory");
@@ -71,24 +73,27 @@ public class BufferedFileImageSequence<T extends ImageSingleBand> implements Sim
 		Collections.sort(listNames);
 
 		orig = new BufferedImage[ files.length ];
-		images = (T[])new ImageSingleBand[ files.length ];
+		images = type.createArray( files.length );
 		int index = 0;
 		for (String s : listNames) {
 			BufferedImage b = orig[index] = UtilImageIO.loadImage(directory.getPath()+"/"+s);
-			images[index++] = ConvertBufferedImage.convertFromSingle(b, (T) null, type);
+			T a = images[index++] = type.createImage(b.getWidth(),b.getHeight(),3);
+			ConvertBufferedImage.convertFrom(b, a);
 		}
 	}
 
 	/**
 	 *
 	 */
-	public BufferedFileImageSequence(Class<T> type, BufferedImage[] orig) {
+	public BufferedFileImageSequence(ImageDataType<T> type, BufferedImage[] orig) {
 		this.type = type;
 		this.orig = orig;
-		images = (T[])new ImageSingleBand[ orig.length ];
+		images = type.createArray( orig.length );
 
 		for( int i = 0; i < orig.length; i++ ) {
-			images[i] = ConvertBufferedImage.convertFromSingle(orig[i], (T) null, type);
+			BufferedImage b = orig[i];
+			images[i] = type.createImage(b.getWidth(),b.getHeight(),3);
+			ConvertBufferedImage.convertFrom(orig[i], images[i]);
 		}
 	}
 
@@ -143,7 +148,7 @@ public class BufferedFileImageSequence<T extends ImageSingleBand> implements Sim
 	}
 
 	@Override
-	public Class<T> getImageType() {
+	public ImageDataType<T> getImageType() {
 		return type;
 	}
 

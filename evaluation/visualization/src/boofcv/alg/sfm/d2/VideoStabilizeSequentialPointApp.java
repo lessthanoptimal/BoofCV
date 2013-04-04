@@ -56,7 +56,7 @@ public class VideoStabilizeSequentialPointApp<I extends ImageSingleBand, D exten
 	int largeMotionThreshold = 5000;
 
 	public VideoStabilizeSequentialPointApp(Class<I> imageType, Class<D> derivType) {
-		super(2,imageType,new Stabilize2DPanel());
+		super(2,imageType,true,new Stabilize2DPanel());
 
 		PkltConfig<I, D> config =
 				PkltConfig.createDefault(imageType, derivType);

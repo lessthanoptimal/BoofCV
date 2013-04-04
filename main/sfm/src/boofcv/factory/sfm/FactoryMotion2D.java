@@ -34,6 +34,7 @@ import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.MultiSpectral;
 import georegression.struct.InvertibleTransform;
 import georegression.struct.affine.Affine2D_F64;
 import georegression.struct.homo.Homography2D_F64;
@@ -134,5 +135,34 @@ public class FactoryMotion2D {
 		ImageDistort<I> distorter = FactoryDistort.distort(interp, null, imageType);
 
 		return new StitchingFromMotion2D<I, IT>(motion2D,distorter,transform,maxJumpFraction );
+	}
+
+	/**
+	 * Estimates the image motion from multi-spectral images and then combines images together.
+	 * Typically used for mosaics and stabilization.
+	 *
+	 * @param maxJumpFraction If the area changes by this much between two consecuative frames then the transform
+	 *                        is reset.
+	 * @param motion2D Estimates the image motion.
+	 * @param imageType Type of image processed
+	 * @param <I> Image input type.
+	 * @param <IT> Model model
+	 * @return StitchingFromMotion2D
+	 */
+	public static <I extends ImageSingleBand, IT extends InvertibleTransform>
+	StitchingFromMotion2D<MultiSpectral<I>, IT> createVideoStitchMS( double maxJumpFraction ,
+																	 ImageMotion2D<MultiSpectral<I>,IT> motion2D , Class<I> imageType ) {
+		StitchingTransform transform;
+
+		if( motion2D.getTransformType() == Affine2D_F64.class ) {
+			transform = FactoryStitchingTransform.createAffine_F64();
+		} else {
+			transform = FactoryStitchingTransform.createHomography_F64();
+		}
+
+		InterpolatePixel<I> interp = FactoryInterpolation.createPixel(0, 255, TypeInterpolate.BILINEAR, imageType);
+		ImageDistort<MultiSpectral<I>> distorter = FactoryDistort.distortMS(interp, null, imageType);
+
+		return new StitchingFromMotion2D<MultiSpectral<I>, IT>(motion2D,distorter,transform,maxJumpFraction );
 	}
 }

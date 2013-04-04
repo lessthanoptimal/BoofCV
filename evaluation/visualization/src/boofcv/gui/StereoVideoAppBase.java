@@ -21,6 +21,7 @@ package boofcv.gui;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.StereoParameters;
+import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageSingleBand;
 
 import javax.swing.*;
@@ -111,8 +112,8 @@ public abstract class StereoVideoAppBase <I extends ImageSingleBand>
 				line2 = path+"/"+line2;
 
 			config = BoofMiscOps.loadXML(media.openFile(lineConfig));
-			SimpleImageSequence<I> video1 = media.openVideo(line1,imageType);
-			SimpleImageSequence<I> video2 = media.openVideo(line2,imageType);
+			SimpleImageSequence<I> video1 = media.openVideo(line1, ImageDataType.single(imageType));
+			SimpleImageSequence<I> video2 = media.openVideo(line2,ImageDataType.single(imageType));
 
 			process(video1,video2);
 		} catch (IOException e) {

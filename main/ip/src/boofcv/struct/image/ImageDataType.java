@@ -20,6 +20,9 @@ package boofcv.struct.image;
 
 import boofcv.core.image.GeneralizedImageOps;
 
+import java.lang.reflect.Array;
+import java.util.Arrays;
+
 /**
  * Specifies the type of image data structure.
  *
@@ -33,6 +36,14 @@ public class ImageDataType<T extends ImageBase> {
 	public ImageDataType(Family family, ImageTypeInfo dataType) {
 		this.family = family;
 		this.dataType = dataType;
+	}
+
+	public static <I extends ImageSingleBand> ImageDataType<I> single( Class<I> imageType ) {
+		return new ImageDataType<I>(Family.SINGLE_BAND,ImageTypeInfo.classToType(imageType));
+	}
+
+	public static <I extends ImageSingleBand> ImageDataType<MultiSpectral<I>> ms( Class<I> imageType ) {
+		return new ImageDataType<MultiSpectral<I>>(Family.MULTI_SPECTRAL,ImageTypeInfo.classToType(imageType));
 	}
 
 	public ImageTypeInfo getDataType() {
@@ -54,6 +65,24 @@ public class ImageDataType<T extends ImageBase> {
 
 			case MULTI_SPECTRAL:
 				return (T)new MultiSpectral(dataType.getImageClass(),width,height,numBands);
+
+			default:
+				throw new IllegalArgumentException("Type not yet supported");
+		}
+	}
+
+	/**
+	 * Creates an array of the specified iamge type
+	 * @param length Number of elements in the array
+	 * @return array of image type
+	 */
+	public T[] createArray( int length ) {
+		switch( family ) {
+			case SINGLE_BAND:
+				return (T[])Array.newInstance(dataType.getImageClass(),length);
+
+			case MULTI_SPECTRAL:
+				return (T[])new MultiSpectral[ length ];
 
 			default:
 				throw new IllegalArgumentException("Type not yet supported");

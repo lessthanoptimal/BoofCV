@@ -21,12 +21,13 @@ package boofcv.alg.sfm.d2;
 import boofcv.abst.feature.tracker.PointTracker;
 import boofcv.abst.sfm.AccessPointTracks;
 import boofcv.abst.sfm.d2.ImageMotion2D;
+import boofcv.abst.sfm.d2.MsToGrayMotion2D;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.factory.sfm.FactoryMotion2D;
 import boofcv.gui.VideoProcessAppBase;
 import boofcv.gui.VisualizeApp;
 import boofcv.io.image.SimpleImageSequence;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.*;
 import georegression.struct.InvertibleTransform;
 import georegression.struct.homo.Homography2D_F64;
 import georegression.struct.point.Point2D_F64;
@@ -43,7 +44,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public abstract class VideoStitchBaseApp<I extends ImageSingleBand, IT extends InvertibleTransform>
+public abstract class VideoStitchBaseApp<I extends ImageBase, IT extends InvertibleTransform>
 		extends VideoProcessAppBase<I> implements VisualizeApp
 {
 	// size of input image
@@ -89,9 +90,10 @@ public abstract class VideoStitchBaseApp<I extends ImageSingleBand, IT extends I
 	protected double inlierThreshold;
 
 	public VideoStitchBaseApp(int numAlgFamilies,
-							  Class<I> imageType,
+							  Class imageType,
+							  boolean color ,
 							  Motion2DPanel gui) {
-		super(numAlgFamilies, imageType);
+		super(numAlgFamilies, color ? ImageDataType.ms(imageType) : ImageDataType.single(imageType));
 
 		this.gui = gui;
 		gui.addMouseListener(this);
@@ -110,10 +112,21 @@ public abstract class VideoStitchBaseApp<I extends ImageSingleBand, IT extends I
 
 	protected StitchingFromMotion2D createAlgorithm( PointTracker<I> tracker ) {
 
-		ImageMotion2D<I,IT> motion = FactoryMotion2D.createMotion2D(maxIterations,inlierThreshold,2,absoluteMinimumTracks,
-				respawnTrackFraction,respawnCoverageFraction,false,tracker,fitModel);
+		if( imageInfo.getFamily() == ImageDataType.Family.MULTI_SPECTRAL ) {
+			Class imageType = imageInfo.getDataType().getImageClass();
 
-		return FactoryMotion2D.createVideoStitch(maxJumpFraction,motion,imageType);
+			ImageMotion2D<I,IT> motion = FactoryMotion2D.createMotion2D(maxIterations,inlierThreshold,2,absoluteMinimumTracks,
+					respawnTrackFraction,respawnCoverageFraction,false,tracker,fitModel);
+
+			ImageMotion2D motion2DColor = new MsToGrayMotion2D(motion,imageType);
+
+			return FactoryMotion2D.createVideoStitchMS(maxJumpFraction,motion2DColor,imageType);
+		} else {
+			ImageMotion2D motion = FactoryMotion2D.createMotion2D(maxIterations,inlierThreshold,2,absoluteMinimumTracks,
+					respawnTrackFraction,respawnCoverageFraction,false,tracker,fitModel);
+
+			return FactoryMotion2D.createVideoStitch(maxJumpFraction,motion,imageInfo.getDataType().getImageClass());
+		}
 	}
 
 	@Override

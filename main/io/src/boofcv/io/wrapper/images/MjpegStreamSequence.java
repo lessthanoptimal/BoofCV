@@ -22,7 +22,10 @@ import boofcv.core.image.ConvertBufferedImage;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.video.VideoMjpegCodec;
+import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageTypeInfo;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -34,7 +37,7 @@ import java.io.*;
  *
  * @author Peter Abeles
  */
-public class MjpegStreamSequence<T extends ImageSingleBand>
+public class MjpegStreamSequence<T extends ImageBase>
 implements SimpleImageSequence<T>
 {
 	VideoMjpegCodec codec = new VideoMjpegCodec();
@@ -43,14 +46,16 @@ implements SimpleImageSequence<T>
 	BufferedImage next;
 	T image;
 	int frameNumber;
+	ImageDataType<T> imageType;
 
-	public MjpegStreamSequence( InputStream in , Class<T> imageType ) {
+	public MjpegStreamSequence( InputStream in , ImageDataType<T> imageType ) {
 		this.in = new DataInputStream(in);
-		image = GeneralizedImageOps.createSingleBand(imageType,1,1);
+		this.imageType = imageType;
+		image = imageType.createImage(1,1,3);
 		readNext();
 	}
 
-	public MjpegStreamSequence( String fileName , Class<T> imageType ) throws FileNotFoundException {
+	public MjpegStreamSequence( String fileName , ImageDataType<T> imageType ) throws FileNotFoundException {
 		this(new DataInputStream(new BufferedInputStream(new FileInputStream(fileName),1024*200)),imageType);
 	}
 
@@ -108,8 +113,8 @@ implements SimpleImageSequence<T>
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public Class<T> getImageType() {
-		return image.getTypeInfo().getImageClass();
+	public ImageDataType<T> getImageType() {
+		return imageType;
 	}
 
 	@Override

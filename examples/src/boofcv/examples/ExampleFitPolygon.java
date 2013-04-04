@@ -28,6 +28,7 @@ import boofcv.alg.filter.binary.ThresholdImageOps;
 import boofcv.alg.misc.ImageStatistics;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.factory.feature.detect.edge.FactoryEdgeDetectors;
+import boofcv.gui.binary.VisualizeBinaryData;
 import boofcv.gui.feature.VisualizeShapes;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.image.UtilImageIO;
@@ -126,7 +127,7 @@ public class ExampleFitPolygon {
 
 	public static void main( String args[] ) {
 		// load and convert the image into a usable format
-		BufferedImage image = UtilImageIO.loadImage("../data/evaluation/amoeba_shapes.jpg");
+		BufferedImage image = UtilImageIO.loadImage("../data/evaluation/particles01.jpg");
 		ImageFloat32 input = ConvertBufferedImage.convertFromSingle(image, null, ImageFloat32.class);
 
 		ShowImages.showWindow(image,"Original");
