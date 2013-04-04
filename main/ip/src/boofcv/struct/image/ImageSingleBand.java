@@ -83,15 +83,19 @@ public abstract class ImageSingleBand<T extends ImageSingleBand> extends ImageBa
 	}
 
 	/**
-	 * Creates a sub-image from 'this' image.  The subimage will share the same internal array
-	 * that stores each pixel's value, but will only pertain to an axis-aligned rectangular segment
-	 * of the original.
+	 * Creates a rectangular sub-image from 'this' image.  The subimage will share the same internal array
+	 * that stores each pixel's value.  Any changes to pixel values in the original image or the sub-image will
+	 * affect the other. A sub-image must be a sub-set of the original image and cannot specify a bounds larger
+	 * than the original.
 	 *
-	 * @param x0 x-coordinate of top-left corner of the sub-image.
-	 * @param y0 y-coordinate of top-left corner of the sub-image.
-	 * @param x1 x-coordinate of bottom-right corner of the sub-image.
-	 * @param y1 y-coordinate of bottom-right corner of the sub-image.
-	 * @return A sub-image of this image.
+	 * When specifying the sub-image, the top-left corner is inclusive and the bottom right corner exclusive.  Thus,
+	 * a sub-image will contain all the original pixels if the following is used: subimage(0,0,width,height).
+	 *
+	 * @param x0 x-coordinate of top-left corner of the sub-image, inclusive.
+	 * @param y0 y-coordinate of top-left corner of the sub-image, inclusive.
+	 * @param x1 x-coordinate of bottom-right corner of the sub-image, exclusive.
+	 * @param y1 y-coordinate of bottom-right corner of the sub-image, exclusive.
+	 * @return A sub-image of 'this' image.
 	 */
 	@Override
 	public T subimage(int x0, int y0, int x1, int y1) {
