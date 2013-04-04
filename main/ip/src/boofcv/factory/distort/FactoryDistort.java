@@ -54,6 +54,21 @@ public class FactoryDistort {
 	}
 
 	/**
+	 * Creates a {@link boofcv.alg.distort.ImageDistort} for the multi-spectral images, transformation
+	 * and interpolation instance.
+	 *
+	 * @param interp Which interpolation algorithm should be used.
+	 * @param border Specifies how requests to pixels outside the image should be handled.  If null then no change
+	 * @param imageType Type of image being processed.
+	 */
+	public static <T extends ImageSingleBand>
+	ImageDistort<MultiSpectral<T>> distortMS(InterpolatePixel<T> interp, ImageBorder border, Class<T> imageType)
+	{
+		ImageDistort<T> distortSingle = distort(interp,border,imageType);
+		return new ImplImageDistort_MS<T>(distortSingle);
+	}
+
+	/**
 	 * Avoid recomputing the distortion map for the entire image each time
 	 * by caching the distortion for each pixel.  This can improve speed significantly when the distortion
 	 * and output image size are both constant.

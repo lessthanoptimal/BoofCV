@@ -20,6 +20,9 @@ package boofcv.io;
 
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageDataType;
+import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.MultiSpectral;
 
 import java.awt.image.BufferedImage;
 import java.io.Reader;
@@ -37,7 +40,8 @@ public interface MediaManager {
 	public BufferedImage openImage( String fileName );
 	
 	public <T extends ImageBase>
-	SimpleImageSequence<T> openVideo( String fileName , Class<T> imageType );
+	SimpleImageSequence<T> openVideo( String fileName , ImageDataType<T> imageInfo );
+
 
 	public <T extends ImageBase>
 	boolean openCamera( String device , int width , int height , VideoCallBack<T> callback );

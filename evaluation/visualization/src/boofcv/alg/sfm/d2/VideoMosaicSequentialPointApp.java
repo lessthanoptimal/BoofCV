@@ -52,7 +52,7 @@ public class VideoMosaicSequentialPointApp<I extends ImageSingleBand, D extends 
 	private static int maxFeatures = 250;
 
 	public VideoMosaicSequentialPointApp(Class<I> imageType, Class<D> derivType) {
-		super(2,imageType,new Mosaic2DPanel());
+		super(2,imageType,true,new Mosaic2DPanel());
 
 		PkltConfig<I, D> config =
 				PkltConfig.createDefault(imageType, derivType);

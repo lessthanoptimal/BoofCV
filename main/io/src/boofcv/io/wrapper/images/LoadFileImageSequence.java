@@ -20,6 +20,7 @@ package boofcv.io.wrapper.images;
 
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.io.image.SimpleImageSequence;
+import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageSingleBand;
 
 import javax.imageio.ImageIO;
@@ -49,7 +50,7 @@ public class LoadFileImageSequence<T extends ImageSingleBand> implements SimpleI
 	java.util.List<String> fileNames = new ArrayList<String>();
 
 	// type of image it outputs
-	Class<T> type;
+	ImageDataType<T> type;
 	// the output image
 	T image;
 	int scalefactor;
@@ -66,7 +67,7 @@ public class LoadFileImageSequence<T extends ImageSingleBand> implements SimpleI
 	 * @param directory The directory containing the images.
 	 * @param suffix	The suffix that the images have.
 	 */
-	public LoadFileImageSequence(Class<T> type, String directory, String suffix) {
+	public LoadFileImageSequence(ImageDataType<T> type, String directory, String suffix) {
 		this(type, directory, suffix, 1);
 	}
 
@@ -77,7 +78,7 @@ public class LoadFileImageSequence<T extends ImageSingleBand> implements SimpleI
 	 * @param suffix	  The suffix that the images have.
 	 * @param scalefactor How much the images will be scaled down by.
 	 */
-	public LoadFileImageSequence(Class<T> type, String directory, String suffix, int scalefactor) {
+	public LoadFileImageSequence(ImageDataType<T> type, String directory, String suffix, int scalefactor) {
 		this.directoryName = directory;
 		this.suffix = suffix;
 		this.scalefactor = scalefactor;
@@ -145,7 +146,8 @@ public class LoadFileImageSequence<T extends ImageSingleBand> implements SimpleI
 			else
 				imageGUI = ImageIO.read(new File(fileNames.get(index--)));
 
-			image = ConvertBufferedImage.convertFromSingle(imageGUI, image, type);
+			image = type.createImage(imageGUI.getWidth(),imageGUI.getHeight(),3);
+			ConvertBufferedImage.convertFrom(imageGUI, image);
 
 			// no changes needed so return the original
 			if (scalefactor == 1)
@@ -179,7 +181,7 @@ public class LoadFileImageSequence<T extends ImageSingleBand> implements SimpleI
 	}
 
 	@Override
-	public Class<T> getImageType() {
+	public ImageDataType<T> getImageType() {
 		return type;
 	}
 

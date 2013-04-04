@@ -21,8 +21,7 @@ package boofcv.io.wrapper.images;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.io.image.SimpleImageSequence;
-import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.*;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -44,7 +43,7 @@ public class JpegByteImageSequence<T extends ImageBase> implements SimpleImageSe
 	List<byte[]> jpegData = new ArrayList<byte[]>();
 
 	// type of image it outputs
-	Class<T> imageType;
+	ImageDataType<T> imageType;
 
 	BufferedImage imageGUI;
 	T output;
@@ -54,12 +53,20 @@ public class JpegByteImageSequence<T extends ImageBase> implements SimpleImageSe
 	// is it traversing in the forwards or backwards direction
 	boolean forward = true;
 
-	public JpegByteImageSequence(Class<T> imageType, List<byte[]> jpegData, boolean loop) {
+	public JpegByteImageSequence(ImageDataType<T> imageType, List<byte[]> jpegData, boolean loop) {
 		this.imageType = imageType;
 		this.jpegData = jpegData;
 		this.loop = loop;
 
-		output = (T)GeneralizedImageOps.createSingleBand((Class)imageType, 1, 1);
+		output = imageType.createImage(1,1,3);
+	}
+
+	public JpegByteImageSequence(Class<T> imageType, List<byte[]> jpegData, boolean loop) {
+		this.imageType = new ImageDataType<T>(ImageDataType.Family.SINGLE_BAND, ImageTypeInfo.classToType(imageType));
+		this.jpegData = jpegData;
+		this.loop = loop;
+
+		output = this.imageType.createImage(1,1,3);
 	}
 
 	@Override
@@ -92,7 +99,19 @@ public class JpegByteImageSequence<T extends ImageBase> implements SimpleImageSe
 		}
 
 		output.reshape(imageGUI.getWidth(),imageGUI.getHeight());
-		ConvertBufferedImage.convertFromSingle(imageGUI, (ImageSingleBand)output, (Class)imageType);
+		switch( imageType.getFamily()) {
+			case SINGLE_BAND:
+				ConvertBufferedImage.convertFromSingle(imageGUI, (ImageSingleBand)output, imageType.getDataType().getImageClass());
+			break;
+
+			case MULTI_SPECTRAL:
+				ConvertBufferedImage.convertFromMulti(imageGUI, (MultiSpectral) output, imageType.getDataType().getImageClass());
+				ConvertBufferedImage.orderBandsIntoRGB((MultiSpectral) output,imageGUI);
+				break;
+
+			default:
+				throw new RuntimeException("Not supported yet: "+imageType.getFamily());
+		}
 
 		return output;
 	}
@@ -117,7 +136,7 @@ public class JpegByteImageSequence<T extends ImageBase> implements SimpleImageSe
 	}
 
 	@Override
-	public Class<T> getImageType() {
+	public ImageDataType<T> getImageType() {
 		return imageType;
 	}
 

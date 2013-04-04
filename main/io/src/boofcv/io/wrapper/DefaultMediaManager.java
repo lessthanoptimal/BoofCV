@@ -24,7 +24,7 @@ import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.image.UtilImageIO;
 import boofcv.io.video.VideoMjpegCodec;
 import boofcv.io.wrapper.images.JpegByteImageSequence;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.*;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -77,7 +77,7 @@ public class DefaultMediaManager implements MediaManager {
 
 	@Override
 	public <T extends ImageBase> SimpleImageSequence<T>
-	openVideo(String fileName, Class<T> type) {
+	openVideo(String fileName, ImageDataType<T> type) {
 
 		if( fileName.endsWith("mjpeg") || fileName.endsWith("MJPEG") ) {
 			try {
