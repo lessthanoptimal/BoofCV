@@ -47,6 +47,7 @@ Version : Alpha 0.14
 - Generalized several classes so that images other than single band can be used
   * VideoInterface
   * SimpleImageSequence
+- Added average down sampling and a related discrete image pyramid
 
 ---------------------------------------------
 Date    : 2013/02/16
