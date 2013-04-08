@@ -20,13 +20,14 @@ package boofcv.alg.color;
 
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageUInt8;
 import boofcv.struct.image.MultiSpectral;
 import org.junit.Test;
 
 import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Peter Abeles
@@ -87,32 +88,77 @@ public class TestColorYuv {
 
 	@Test
 	public void backAndForth_U8() {
-		fail("Implement once format is understood");
+		for( int i = 0; i < 1000; i++ ) {
+			byte yuv[] = new byte[3];
+			byte rgb[] = new byte[3];
+
+			int r = rand.nextInt(256);
+			int g = rand.nextInt(256);
+			int b = rand.nextInt(256);
+
+			ColorYuv.rgbToYCbCr(r,g,b,yuv);
+			ColorYuv.ycbcrToRgb(yuv[0] & 0xFF , yuv[1] & 0xFF , yuv[2] & 0xFF , rgb );
+
+			assertTrue(Math.abs(r - (rgb[0] & 0xFF)) < 5);
+			assertTrue( Math.abs( g - (rgb[1]&0xFF)) < 5 );
+			assertTrue( Math.abs( b - (rgb[2]&0xFF)) < 5 );
+		}
 	}
 
 	@Test
-	public void multispectral_F32() {
+	public void yuvToRgb_F32_MultiSpectral() {
+		MultiSpectral<ImageFloat32> yuv = new MultiSpectral<ImageFloat32>(ImageFloat32.class,10,15,3);
 		MultiSpectral<ImageFloat32> rgb = new MultiSpectral<ImageFloat32>(ImageFloat32.class,10,15,3);
-		MultiSpectral<ImageFloat32> hsv = new MultiSpectral<ImageFloat32>(ImageFloat32.class,10,15,3);
 		MultiSpectral<ImageFloat32> found = new MultiSpectral<ImageFloat32>(ImageFloat32.class,10,15,3);
 
-		GImageMiscOps.fillUniform(rgb, rand, 0, 1);
+		GImageMiscOps.fillUniform(yuv, rand, 0, 1);
 
-		ColorYuv.yuvToRgb_F32(rgb, hsv);
-		ColorYuv.rgbToYuv_F32(hsv, found);
+		ColorYuv.yuvToRgb_F32(yuv, rgb);
+		ColorYuv.rgbToYuv_F32(rgb, found);
 
-		for( int y = 0; y < rgb.height; y++ ) {
-			for( int x = 0; x < rgb.width; x++ ) {
-				float r = rgb.getBand(0).get(x,y);
-				float g = rgb.getBand(1).get(x,y);
-				float b = rgb.getBand(2).get(x,y);
+		for( int y = 0; y < yuv.height; y++ ) {
+			for( int x = 0; x < yuv.width; x++ ) {
+				float Y = yuv.getBand(0).get(x,y);
+				float U = yuv.getBand(1).get(x,y);
+				float V = yuv.getBand(2).get(x,y);
 
-				assertEquals(r,found.getBand(0).get(x,y),tol);
-				assertEquals(g,found.getBand(1).get(x,y),tol);
-				assertEquals(b,found.getBand(2).get(x,y),tol);
+				assertEquals(Y,found.getBand(0).get(x,y),tol);
+				assertEquals(U,found.getBand(1).get(x,y),tol);
+				assertEquals(V,found.getBand(2).get(x,y),tol);
 			}
 		}
 	}
+
+	@Test
+	public void ycbcrToRgb_U8_MultiSpectral() {
+		MultiSpectral<ImageUInt8> yuv = new MultiSpectral<ImageUInt8>(ImageUInt8.class,10,15,3);
+		MultiSpectral<ImageUInt8> rgb = new MultiSpectral<ImageUInt8>(ImageUInt8.class,10,15,3);
+
+		GImageMiscOps.fillUniform(yuv, rand, 0, 255);
+
+		ColorYuv.ycbcrToRgb_U8(yuv, rgb);
+
+		byte []expected = new byte[3];
+
+		for( int y = 0; y < yuv.height; y++ ) {
+			for( int x = 0; x < yuv.width; x++ ) {
+				int r = rgb.getBand(0).get(x,y);
+				int g = rgb.getBand(1).get(x,y);
+				int b = rgb.getBand(2).get(x,y);
+
+				int Y = yuv.getBand(0).get(x,y);
+				int U = yuv.getBand(1).get(x,y);
+				int V = yuv.getBand(2).get(x,y);
+
+				ColorYuv.ycbcrToRgb(Y,U,V,expected);
+
+				assertEquals(expected[0]&0xFF,r);
+				assertEquals(expected[1]&0xFF,g);
+				assertEquals(expected[2]&0xFF,b);
+			}
+		}
+	}
+
 
 	private static void check( double found[] , double a , double b , double c ) {
 		double tol = TestColorYuv.tol * Math.max(Math.max(a,b),c);

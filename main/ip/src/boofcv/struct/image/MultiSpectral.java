@@ -121,13 +121,14 @@ public class MultiSpectral<T extends ImageSingleBand> extends ImageBase<MultiSpe
 	}
 
 	/**
+	 * Returns a band in the multi-band image.
 	 * 
 	 * @param band Which band should be returned.
-	 * @return
+	 * @return Image band
 	 */
 	public T getBand(int band) {
 		if (band >= bands.length || band < 0)
-			throw new IllegalArgumentException("The specified band is out of bounds");
+			throw new IllegalArgumentException("The specified band is out of bounds: "+band);
 
 		return bands[band];
 	}

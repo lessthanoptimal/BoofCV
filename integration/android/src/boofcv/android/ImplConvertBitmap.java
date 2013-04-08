@@ -606,15 +606,27 @@ public class ImplConvertBitmap {
 		int indexDst = 0;
 
 		switch (config) {
-		case ARGB_8888:
-			ImageUInt8 A = input.getBand(3);
-			for (int y = 0; y < h; y++) {
-				int indexSrc = input.startIndex + y * input.stride;
-				for (int x = 0; x < w; x++,indexSrc++) {
-					output[indexDst++] = R.data[indexSrc];
-					output[indexDst++] = G.data[indexSrc];
-					output[indexDst++] = B.data[indexSrc];
-					output[indexDst++] = A.data[indexSrc];
+			case ARGB_8888:
+			if( input.getNumBands() == 4 ) {
+				ImageUInt8 A = input.getBand(3);
+				for (int y = 0; y < h; y++) {
+					int indexSrc = input.startIndex + y * input.stride;
+					for (int x = 0; x < w; x++,indexSrc++) {
+						output[indexDst++] = R.data[indexSrc];
+						output[indexDst++] = G.data[indexSrc];
+						output[indexDst++] = B.data[indexSrc];
+						output[indexDst++] = A.data[indexSrc];
+					}
+				}
+			} else {
+				for (int y = 0; y < h; y++) {
+					int indexSrc = input.startIndex + y * input.stride;
+					for (int x = 0; x < w; x++,indexSrc++) {
+						output[indexDst++] = R.data[indexSrc];
+						output[indexDst++] = G.data[indexSrc];
+						output[indexDst++] = B.data[indexSrc];
+						output[indexDst++] = (byte)0xFF;
+					}
 				}
 			}
 			break;

@@ -52,13 +52,15 @@ public class ImplConvertNV21 {
 
 		int startUV = yStride*output.height;
 
-		for( int y = 0; y < output.height; y++ ) {
-			int indexIn = startUV + y*uvStride;
-			int indexOut = output.startIndex + y*output.stride;
+		for( int row = 0; row < output.height; row++ ) {
+			int indexUV = startUV + (row/2)*(2*uvStride);
+			int indexOut = output.startIndex + row*output.stride;
 
-			for( int x = 0; x < output.width; x++ , indexOut++ ) {
-				U.data[indexOut] = dataNV[ indexIn++ ];
-				V.data[indexOut] = dataNV[ indexIn++ ];
+			for( int col = 0; col < output.width; col++ , indexOut++ ) {
+				U.data[indexOut] = dataNV[ indexUV     ];
+				V.data[indexOut] = dataNV[ indexUV + 1 ];
+
+				indexUV += 2*(col&0x1);
 			}
 		}
 	}
@@ -73,13 +75,89 @@ public class ImplConvertNV21 {
 
 		int startUV = yStride*output.height;
 
-		for( int y = 0; y < output.height; y++ ) {
-			int indexIn = startUV + y*uvStride;
-			int indexOut = output.startIndex + y*output.stride;
+		for( int row = 0; row < output.height; row++ ) {
+			int indexUV = startUV + (row/2)*(2*uvStride);
+			int indexOut = output.startIndex + row*output.stride;
 
-			for( int x = 0; x < output.width; x++ , indexOut++ ) {
-				U.data[indexOut] = dataNV[ indexIn++ ] & 0xFF;
-				V.data[indexOut] = dataNV[ indexIn++ ] & 0xFF;
+			for( int col = 0; col < output.width; col++ , indexOut++ ) {
+				U.data[indexOut] = (dataNV[ indexUV     ]&0xFF)-128;
+				V.data[indexOut] = (dataNV[ indexUV + 1 ]&0xFF)-128;
+
+				indexUV += 2*(col&0x1);
+			}
+		}
+	}
+
+	public static void nv21ToMultiRgb_U8(byte[] dataNV, int yStride, int uvStride, MultiSpectral<ImageUInt8> output) {
+
+		ImageUInt8 R = output.getBand(0);
+		ImageUInt8 G = output.getBand(1);
+		ImageUInt8 B = output.getBand(2);
+
+		int startUV = yStride*output.height;
+
+		for( int row = 0; row < output.height; row++ ) {
+			int indexY = row*yStride;
+			int indexUV = startUV + (row/2)*(2*uvStride);
+			int indexOut = output.startIndex + row*output.stride;
+
+			for( int col = 0; col < output.width; col++ , indexOut++ ) {
+				int y = 1191*(dataNV[indexY++] & 0xFF) - 16;
+				int cr = (dataNV[ indexUV ] & 0xFF) - 128;
+				int cb = (dataNV[ indexUV+1] & 0xFF) - 128;
+
+				if( y < 0 ) y = 0;
+
+				int r = (y + 1836*cr) >> 10;
+				int g = (y - 547*cr - 218*cb) >> 10;
+				int b = (y + 2165*cb) >> 10;
+
+				if( r < 0 ) r = 0; else if( r > 255 ) r = 255;
+				if( g < 0 ) g = 0; else if( g > 255 ) g = 255;
+				if( b < 0 ) b = 0; else if( b > 255 ) b = 255;
+
+				R.data[indexOut] = (byte)r;
+				G.data[indexOut] = (byte)g;
+				B.data[indexOut] = (byte)b;
+
+				indexUV += 2*(col&0x1);
+			}
+		}
+	}
+
+	public static void nv21ToMultiRgb_F32(byte[] dataNV, int yStride, int uvStride, MultiSpectral<ImageFloat32> output) {
+
+		ImageFloat32 R = output.getBand(0);
+		ImageFloat32 G = output.getBand(1);
+		ImageFloat32 B = output.getBand(2);
+
+		int startUV = yStride*output.height;
+
+		for( int row = 0; row < output.height; row++ ) {
+			int indexY = row*yStride;
+			int indexUV = startUV + (row/2)*(2*uvStride);
+			int indexOut = output.startIndex + row*output.stride;
+
+			for( int col = 0; col < output.width; col++ , indexOut++ ) {
+				int y = 1191*(dataNV[indexY++] & 0xFF) - 16;
+				int cr = (dataNV[ indexUV ] & 0xFF) - 128;
+				int cb = (dataNV[ indexUV+1] & 0xFF) - 128;
+
+				if( y < 0 ) y = 0;
+
+				int r = (y + 1836*cr) >> 10;
+				int g = (y - 547*cr - 218*cb) >> 10;
+				int b = (y + 2165*cb) >> 10;
+
+				if( r < 0 ) r = 0; else if( r > 255 ) r = 255;
+				if( g < 0 ) g = 0; else if( g > 255 ) g = 255;
+				if( b < 0 ) b = 0; else if( b > 255 ) b = 255;
+
+				R.data[indexOut] = r;
+				G.data[indexOut] = g;
+				B.data[indexOut] = b;
+
+				indexUV += 2*(col&0x1);
 			}
 		}
 	}
