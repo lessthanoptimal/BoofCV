@@ -48,6 +48,7 @@ Version : Alpha 0.14
   * VideoInterface
   * SimpleImageSequence
 - Added average down sampling and a related discrete image pyramid
+- Android: YUV to RGB now works
 
 ---------------------------------------------
 Date    : 2013/02/16

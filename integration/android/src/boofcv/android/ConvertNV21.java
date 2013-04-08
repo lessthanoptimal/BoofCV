@@ -132,6 +132,31 @@ public class ConvertNV21 {
 	}
 
 	/**
+	 * Converts an NV21 image into a {@link MultiSpectral} RGB image with U8 bands.
+	 *
+	 * @param data Input: NV21 image data
+	 * @param width Input: NV21 image width
+	 * @param height Input: NV21 image height
+	 * @param output Output: Optional storage for output image.  Can be null.
+	 */
+	public static MultiSpectral<ImageUInt8> nv21ToMsRgb_U8( byte[] data , int width , int height ,
+															MultiSpectral<ImageUInt8> output ) {
+		if( output == null ) {
+			output = new MultiSpectral<ImageUInt8>(ImageUInt8.class,width,height,3);
+		} else if( output.width != width || output.height != height )
+			throw new IllegalArgumentException("output width and height must be "+width+" "+height);
+		else if( output.getNumBands() != 3 )
+			throw new IllegalArgumentException("three bands expected");
+
+		int yStride   = (int) Math.ceil(width / 16.0) * 16;
+		int uvStride  = (int) Math.ceil( (yStride / 2) / 16.0) * 16;
+
+		ImplConvertNV21.nv21ToMultiRgb_U8(data,yStride,uvStride,output);
+
+		return output;
+	}
+
+	/**
 	 * Converts an NV21 image into a {@link MultiSpectral} YUV image with F32 bands.
 	 *
 	 * @param data Input: NV21 image data
@@ -152,6 +177,31 @@ public class ConvertNV21 {
 		int uvStride  = (int) Math.ceil( (yStride / 2) / 16.0) * 16;
 
 		ImplConvertNV21.nv21ToMultiYuv_F32(data,yStride,uvStride,output);
+
+		return output;
+	}
+
+	/**
+	 * Converts an NV21 image into a {@link MultiSpectral} RGB image with F32 bands.
+	 *
+	 * @param data Input: NV21 image data
+	 * @param width Input: NV21 image width
+	 * @param height Input: NV21 image height
+	 * @param output Output: Optional storage for output image.  Can be null.
+	 */
+	public static MultiSpectral<ImageFloat32> nv21ToMsRgb_F32( byte[] data , int width , int height ,
+															 MultiSpectral<ImageFloat32> output ) {
+		if( output == null ) {
+			output = new MultiSpectral<ImageFloat32>(ImageFloat32.class,width,height,3);
+		} else if( output.width != width || output.height != height )
+			throw new IllegalArgumentException("output width and height must be "+width+" "+height);
+		else if( output.getNumBands() != 3 )
+			throw new IllegalArgumentException("three bands expected");
+
+		int yStride   = (int) Math.ceil(width / 16.0) * 16;
+		int uvStride  = (int) Math.ceil( (yStride / 2) / 16.0) * 16;
+
+		ImplConvertNV21.nv21ToMultiRgb_F32(data,yStride,uvStride,output);
 
 		return output;
 	}
