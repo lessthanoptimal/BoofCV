@@ -49,6 +49,7 @@ Version : Alpha 0.14
   * SimpleImageSequence
 - Added average down sampling and a related discrete image pyramid
 - Android: YUV to RGB now works
+- ExampleImageStitching has rendering code pushed into it
 
 ---------------------------------------------
 Date    : 2013/02/16

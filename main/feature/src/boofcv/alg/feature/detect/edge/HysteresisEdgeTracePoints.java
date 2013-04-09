@@ -57,8 +57,6 @@ public class HysteresisEdgeTracePoints {
 
 	// the active contour which is being traced
 	private EdgeContour e;
-	// index of active segment
-	private int activeSegmentIndex;
 
 	// lower threshold
 	private float lower;
@@ -97,6 +95,10 @@ public class HysteresisEdgeTracePoints {
 	/**
 	 * Traces along object's contour starting at the specified seed.  As it does so it will set the intensity of
 	 * points which are below the lower threshold to zero and add points to contour.
+	 *
+	 * @param x x-coordinate of seed pixel above threshold
+	 * @param y y-coordinate of seed pixel above threshold
+	 * @param indexInten Pixel index in the image array of coordinate (x,y)
 	 */
 	protected void trace( int x , int y , int indexInten ) {
 
@@ -113,7 +115,6 @@ public class HysteresisEdgeTracePoints {
 			Point2D_I32 p = s.points.get(0);
 			indexInten = intensity.getIndex(p.x,p.y);
 			int indexDir = direction.getIndex(p.x,p.y);
-			activeSegmentIndex = s.index;
 
 			boolean first = true;
 
@@ -139,19 +140,22 @@ public class HysteresisEdgeTracePoints {
 				int fx = p.x+dx, fy = p.y+dy;
 				int bx = p.x-dx, by = p.y-dy;
 
+				// See if the forward point is in bounds and above the lower threshold
 				if( intensity.isInBounds(fx,fy) && intensity.data[ indexForward ] >= lower ) {
 					intensity.data[ indexForward ] = 0;
 					p = queuePoints.grow();
 					p.set(fx,fy);
 					s.points.add(p);
-					match = true;
+					match = true; // note that a match has already been found
 					indexInten = indexForward;
 					indexDir = prevIndexDir  + dy*intensity.stride + dx;
 				}
+				// See if the backwards point is in bounds and above the lower threshold
 				if( intensity.isInBounds(bx,by) && intensity.data[ indexBackward ] >= lower ) {
 					intensity.data[ indexBackward ] = 0;
 					if( match ) {
-						startNewSegment(bx, by);
+						// a match was found in the forwards direction, so start a new segment here
+						startNewSegment(bx, by,s);
 					} else {
 						p = queuePoints.grow();
 						p.set(bx,by);
@@ -162,11 +166,13 @@ public class HysteresisEdgeTracePoints {
 					}
 				}
 
+				// if it failed to find a match in the forwards/backwards direction or its the first pixel
+				// search the whole 8-neighborhood.
 				if( first || !match ) {
 					boolean priorMatch = match;
 					// Check local neighbors if its one of the end points, which would be the first point or
 					// any point for which no matches were found
-					match = checkAllNeighbors(x,y,s.points,match);
+					match = checkAllNeighbors(x,y,s,match);
 
 					if( !match )
 						break;
@@ -186,16 +192,16 @@ public class HysteresisEdgeTracePoints {
 		}
 	}
 
-	private boolean checkAllNeighbors( int x , int y ,List<Point2D_I32> edge , boolean match ) {
-		match |= check(x+1,y,edge,match);
-		match |= check(x,y+1,edge,match);
-		match |= check(x-1,y,edge,match);
-		match |= check(x,y-1,edge,match);
+	private boolean checkAllNeighbors( int x , int y ,EdgeSegment parent , boolean match ) {
+		match |= check(x+1,y,parent,match);
+		match |= check(x,y+1,parent,match);
+		match |= check(x-1,y,parent,match);
+		match |= check(x,y-1,parent,match);
 
-		match |= check(x+1,y+1,edge,match);
-		match |= check(x+1,y-1,edge,match);
-		match |= check(x-1,y+1,edge,match);
-		match |= check(x-1,y-1,edge,match);
+		match |= check(x+1,y+1,parent,match);
+		match |= check(x+1,y-1,parent,match);
+		match |= check(x-1,y+1,parent,match);
+		match |= check(x-1,y-1,parent,match);
 
 		return match;
 	}
@@ -204,11 +210,11 @@ public class HysteresisEdgeTracePoints {
 	 * Checks to see if the given coordinate is above the lower threshold.  If it is the point will be
 	 * added to the current segment or be the start of a new segment.
 	 *
-	 * @param edge List of edge points in the current segment
+	 * @param parent The edge segment which is being checked
 	 * @param match Has a match to the current segment already been found?
 	 * @return true if a match was found at this point
 	 */
-	private boolean check( int x , int y , List<Point2D_I32> edge , boolean match ) {
+	private boolean check( int x , int y , EdgeSegment parent , boolean match ) {
 
 		if( intensity.isInBounds(x,y)  ) {
 			int index = intensity.getIndex(x,y);
@@ -218,9 +224,10 @@ public class HysteresisEdgeTracePoints {
 				if( !match ) {
 					Point2D_I32 p = queuePoints.grow();
 					p.set(x,y);
-					edge.add(p);
+					parent.points.add(p);
 				} else {
-					startNewSegment(x,y);
+					// a match was found so it can't just be added to the current edge
+					startNewSegment(x,y,parent);
 				}
 				return true;
 			}
@@ -245,14 +252,14 @@ public class HysteresisEdgeTracePoints {
 	/**
 	 * Starts a new segment in the contour at the specified coordinate.
 	 */
-	private void startNewSegment( int x , int y ) {
+	private void startNewSegment( int x , int y , EdgeSegment parent ) {
 		// create the point which is the first
 		Point2D_I32 p = queuePoints.grow();
 		p.set(x,y);
 		EdgeSegment s = new EdgeSegment();
-		s.parent = activeSegmentIndex;
+		s.parent = parent.index;
 		// if a new segment is created that means an extra point has been added to the end already, hence -2 and not -1
-		s.parentPixel = s.points.size()-2;
+		s.parentPixel = parent.points.size()-2;
 		s.index = e.segments.size();
 		s.points.add(p);
 		e.segments.add(s);
