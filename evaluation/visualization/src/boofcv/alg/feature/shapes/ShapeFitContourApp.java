@@ -260,7 +260,7 @@ public class ShapeFitContourApp
 		java.util.List<PathLabel> inputs = new ArrayList<PathLabel>();
 
 		inputs.add(new PathLabel("Particles","../data/applet/particles01.jpg"));
-
+		inputs.add(new PathLabel("Shapes","../data/applet/shapes02.png"));
 		app.setInputList(inputs);
 
 		// wait for it to process one image so that the size isn't all screwed up

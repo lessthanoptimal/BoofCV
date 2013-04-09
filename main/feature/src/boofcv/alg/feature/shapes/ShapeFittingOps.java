@@ -117,9 +117,6 @@ public class ShapeFittingOps {
 			UtilEllipse_F64.convert(algebraic.getEllipse(),outputStorage.shape);
 		}
 
-		if( outputStorage.shape.a > 40 || outputStorage.shape.b > 40 )
-			System.out.println(points.size()+" a = "+outputStorage.shape.a);
-
 		// Improve the solution from algebraic into Euclidean
 		if( iterations > 0 ) {
 			RefineEllipseEuclideanLeastSquares leastSquares = new RefineEllipseEuclideanLeastSquares();

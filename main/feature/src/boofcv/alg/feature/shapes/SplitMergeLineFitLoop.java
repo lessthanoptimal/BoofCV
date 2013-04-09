@@ -178,6 +178,8 @@ public class SplitMergeLineFitLoop extends SplitMergeLineFit {
 		theta = computeAcute(a, b, c);
 		if( theta > toleranceMerge ) {
 			work.add(splits.data[splits.size-1]);
+		} else {
+			change = true;
 		}
 
 		// swap the two lists
@@ -197,36 +199,10 @@ public class SplitMergeLineFitLoop extends SplitMergeLineFit {
 
 		work.reset();
 		for( int i = 0; i < splits.size-1; i++ ) {
-			int start = splits.data[i];
-			int end = splits.data[i+1];
-			int length = circularDistance(start,end);
-
-			Point2D_I32 a = contour.get(start);
-			Point2D_I32 b = contour.get(end);
-
-			line.p.set(a.x,a.y);
-			line.slope.set(b.x-a.x,b.y-a.y);
-
-			int bestOffset = selectSplitOffset(start,length);
-			if( bestOffset >= 0 ) {
-				change = true;
-				work.add(start);
-				work.add((start+bestOffset)%N);
-			} else {
-				work.add(start);
-			}
+			change = checkSplit(change, i,i+1);
 		}
 
-		int start = splits.data[splits.size-1];
-		int length = circularDistance(start, splits.data[0]);
-
-		int bestOffset = selectSplitOffset(start, length);
-		if( bestOffset >= 0 ) {
-			work.add(start);
-			work.add((start+bestOffset)%N);
-		} else {
-			work.add(start);
-		}
+		change = checkSplit(change, splits.size-1,0);
 
 		// swap the two lists
 		GrowQueue_I32 tmp = work;
@@ -235,6 +211,29 @@ public class SplitMergeLineFitLoop extends SplitMergeLineFit {
 
 		return change;
 	}
+
+	private boolean checkSplit(boolean change, int i0 , int i1) {
+		int start = splits.data[i0];
+		int end = splits.data[i1];
+		int length = circularDistance(start,end);
+
+		Point2D_I32 a = contour.get(start);
+		Point2D_I32 b = contour.get(end);
+
+		line.p.set(a.x,a.y);
+		line.slope.set(b.x-a.x,b.y-a.y);
+
+		int bestOffset = selectSplitOffset(start,length);
+		if( bestOffset >= 0 ) {
+			change = true;
+			work.add(start);
+			work.add((start+bestOffset)%N);
+		} else {
+			work.add(start);
+		}
+		return change;
+	}
+
 
 	/**
 	 * Finds the point between indexStart and the end point which is the greater distance from the line
