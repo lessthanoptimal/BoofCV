@@ -50,10 +50,14 @@ public class ScaleSpacePyramidPointPanel extends JPanel implements MouseListener
 
 	int activeLevel = 0;
 
-	public ScaleSpacePyramidPointPanel( PyramidFloat ss , double radius) {
+	public ScaleSpacePyramidPointPanel(double radius) {
 		this.ss = ss;
 		this.radius = radius;
 		addMouseListener(this);
+	}
+
+	public void setSs(PyramidFloat ss) {
+		this.ss = ss;
 	}
 
 	public void setBackground( BufferedImage background ) {
@@ -79,7 +83,7 @@ public class ScaleSpacePyramidPointPanel extends JPanel implements MouseListener
 
 	private synchronized void setLevel( int level ) {
 //		System.out.println("level "+level);
-		if( level > 0 ) {
+		if( level > 0 && ss != null ) {
 
 			ImageSingleBand small = ss.getLayer(level-1);
 			ImageSingleBand enlarge = GeneralizedImageOps.createSingleBand(small.getClass(), ss.getInputWidth(), ss.getInputHeight());
@@ -152,22 +156,14 @@ public class ScaleSpacePyramidPointPanel extends JPanel implements MouseListener
 	}
 
 	@Override
-	public void mousePressed(MouseEvent e) {
-		//To change body of implemented methods use File | Settings | File Templates.
-	}
+	public void mousePressed(MouseEvent e) {}
 
 	@Override
-	public void mouseReleased(MouseEvent e) {
-		//To change body of implemented methods use File | Settings | File Templates.
-	}
+	public void mouseReleased(MouseEvent e) {}
 
 	@Override
-	public void mouseEntered(MouseEvent e) {
-		//To change body of implemented methods use File | Settings | File Templates.
-	}
+	public void mouseEntered(MouseEvent e) {}
 
 	@Override
-	public void mouseExited(MouseEvent e) {
-		//To change body of implemented methods use File | Settings | File Templates.
-	}
+	public void mouseExited(MouseEvent e) {}
 }

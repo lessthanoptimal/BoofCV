@@ -49,6 +49,9 @@ public class ImagePyramidPanel<T extends ImageSingleBand> extends ListDisplayPan
 	// if each layer should be scaled up to the original resolution or not
 	boolean scaleUp;
 
+	// show scales or blur factor
+	boolean showScales=true;
+
 	public ImagePyramidPanel(ImagePyramid<T> pyramid, boolean scaleUp) {
 		set(pyramid,scaleUp);
 		render();
@@ -56,6 +59,10 @@ public class ImagePyramidPanel<T extends ImageSingleBand> extends ListDisplayPan
 	}
 
 	public ImagePyramidPanel() {
+	}
+
+	public void setShowScales(boolean showScales) {
+		this.showScales = showScales;
 	}
 
 	public void set(ImagePyramid<T> pyramid, boolean scaleUp) {
@@ -102,7 +109,10 @@ public class ImagePyramidPanel<T extends ImageSingleBand> extends ListDisplayPan
 		for( int i = 0; i < N; i++ ) {
 			DistortImageOps.scale(pyramid.getLayer(i),upscale, TypeInterpolate.NEAREST_NEIGHBOR);
 			BufferedImage b = ConvertBufferedImage.convertTo(upscale,null);
-			addImage(b,String.format("%5.2f",pyramid.getScale(i)));
+			if( showScales )
+				addImage(b,String.format("%5.2f",pyramid.getScale(i)));
+			else
+				addImage(b,String.format("%5.2f",pyramid.getSigma(i)));
 		}
 	}
 }

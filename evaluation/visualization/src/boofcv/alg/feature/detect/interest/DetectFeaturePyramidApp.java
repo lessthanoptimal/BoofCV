@@ -20,6 +20,7 @@ package boofcv.alg.feature.detect.interest;
 
 import boofcv.abst.feature.detect.interest.InterestPointScaleSpacePyramid;
 import boofcv.core.image.ConvertBufferedImage;
+import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.feature.detect.interest.FactoryInterestPointAlgs;
 import boofcv.factory.transform.pyramid.FactoryPyramid;
 import boofcv.gui.SelectAlgorithmAndInputPanel;
@@ -49,31 +50,35 @@ public class DetectFeaturePyramidApp <T extends ImageSingleBand, D extends Image
 	ScaleSpacePyramidPointPanel panel;
 	boolean hasImage = false;
 
-	public DetectFeaturePyramidApp( Class<T> imageType , Class<D> derivType , boolean createPyramid) {
-		super(1);
+	T workImage;
+	InterestPointScaleSpacePyramid<T> det = null;
+
+	public DetectFeaturePyramidApp( Class<T> imageType , Class<D> derivType ) {
+		super(2);
 		this.imageType = imageType;
 
+		workImage = GeneralizedImageOps.createSingleBand(imageType,1,1);
+
 		int r = 2;
-		addAlgorithm(0, "Hessian Laplace", FactoryInterestPointAlgs.hessianLaplace(r, 1f, NUM_FEATURES, imageType, derivType));
-		addAlgorithm(0, "Harris Laplace", FactoryInterestPointAlgs.harrisLaplace(r, 0.5f, NUM_FEATURES, imageType, derivType));
-		addAlgorithm(0, "Hessian", FactoryInterestPointAlgs.hessianPyramid(r, 1, NUM_FEATURES, imageType, derivType));
-		addAlgorithm(0, "Harris", FactoryInterestPointAlgs.harrisPyramid(r, 0.5f, NUM_FEATURES, imageType, derivType));
+		addAlgorithm(0, "Hessian Laplace", FactoryInterestPointAlgs.hessianLaplace(r, 0, NUM_FEATURES, imageType, derivType));
+		addAlgorithm(0, "Harris Laplace", FactoryInterestPointAlgs.harrisLaplace(r, 0, NUM_FEATURES, imageType, derivType));
+		addAlgorithm(0, "Hessian", FactoryInterestPointAlgs.hessianPyramid(r, 0, NUM_FEATURES, imageType, derivType));
+		addAlgorithm(0, "Harris", FactoryInterestPointAlgs.harrisPyramid(r, 0, NUM_FEATURES, imageType, derivType));
 
-		double scales[] = new double[]{1,1.5,2,3,4,8,12,16,24};
-		if( createPyramid )
-			ss = FactoryPyramid.scaleSpacePyramid(scales, imageType);
-		else
-			ss = FactoryPyramid.scaleSpace(scales, imageType);
+		addAlgorithm(1 , "Pyramid", 0);
+		addAlgorithm(1 , "Scale-Space", 1);
 
-		panel = new ScaleSpacePyramidPointPanel(ss, BoofDefaults.SCALE_SPACE_CANONICAL_RADIUS);
+
+		panel = new ScaleSpacePyramidPointPanel(BoofDefaults.SCALE_SPACE_CANONICAL_RADIUS);
 
 		setMainGUI(panel);
 	}
 
 	public synchronized void process( BufferedImage input ) {
 		setInputImage(input);
-		T workImage = ConvertBufferedImage.convertFromSingle(input, null, imageType);
-		ss.process(workImage);
+		workImage.reshape(input.getWidth(),input.getHeight());
+		ConvertBufferedImage.convertFromSingle(input, workImage, imageType);
+
 		panel.setBackground(input);
 		hasImage = true;
 		doRefreshAll();
@@ -84,7 +89,11 @@ public class DetectFeaturePyramidApp <T extends ImageSingleBand, D extends Image
 
 	@Override
 	public void refreshAll(Object[] cookies) {
+		det = null;
+		ss = null;
+
 		setActiveAlgorithm(0,null,cookies[0]);
+		setActiveAlgorithm(1,null,cookies[1]);
 	}
 
 	@Override
@@ -92,7 +101,26 @@ public class DetectFeaturePyramidApp <T extends ImageSingleBand, D extends Image
 		if( !hasImage )
 			return;
 
-		final InterestPointScaleSpacePyramid<T> det = (InterestPointScaleSpacePyramid<T>)cookie;
+		if( indexFamily == 0 ) {
+			det = (InterestPointScaleSpacePyramid<T>)cookie;
+
+			if( ss == null )
+				return;
+		} else {
+			double scales[] = new double[]{1,1.5,2,3,4,8,12,16,24};
+			if( ((Number)cookie).intValue() == 0 )
+				ss = FactoryPyramid.scaleSpacePyramid(scales, imageType);
+			else
+				ss = FactoryPyramid.scaleSpace(scales, imageType);
+
+			if( workImage != null )
+				ss.process(workImage);
+
+			panel.setSs(ss);
+			if( det == null )
+				return;
+		}
+
 		det.detect(ss);
 		panel.setPoints(det.getInterestPoints());
 		panel.repaint();
@@ -114,9 +142,8 @@ public class DetectFeaturePyramidApp <T extends ImageSingleBand, D extends Image
 	}
 
 	public static void main( String args[] ) {
-		boolean createPyramid = false;
 
-		DetectFeaturePyramidApp app = new DetectFeaturePyramidApp(ImageFloat32.class,ImageFloat32.class,createPyramid);
+		DetectFeaturePyramidApp app = new DetectFeaturePyramidApp(ImageFloat32.class,ImageFloat32.class);
 
 		java.util.List<PathLabel> inputs = new ArrayList<PathLabel>();
 

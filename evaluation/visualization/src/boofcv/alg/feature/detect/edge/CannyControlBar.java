@@ -48,7 +48,7 @@ public class CannyControlBar extends JPanel implements ChangeListener {
 		controlBlur.setPreferredSize(new Dimension((int)controlBlur.getPreferredSize().getWidth(),(int)controlBlur.getPreferredSize().getHeight()+8));
 		controlBlur.setMaximumSize(controlBlur.getPreferredSize());
 
-		controlThreshold = new JSlider(JSlider.HORIZONTAL,threshold,100,20);
+		controlThreshold = new JSlider(JSlider.HORIZONTAL,5,100,threshold);
 		controlThreshold.setMajorTickSpacing(20);
 		controlThreshold.setPaintTicks(true);
 		controlThreshold.addChangeListener(this);

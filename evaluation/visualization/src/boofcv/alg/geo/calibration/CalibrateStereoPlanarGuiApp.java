@@ -20,7 +20,6 @@ package boofcv.alg.geo.calibration;
 
 import boofcv.abst.calib.CalibrateStereoPlanar;
 import boofcv.abst.calib.ConfigChessboard;
-import boofcv.abst.calib.ConfigSquareGrid;
 import boofcv.abst.calib.PlanarCalibrationDetector;
 import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.geo.PerspectiveOps;
@@ -245,14 +244,14 @@ public class CalibrateStereoPlanarGuiApp extends JPanel
 	}
 
 	public static void main( String args[] ) {
-		PlanarCalibrationDetector detector = FactoryPlanarCalibrationTarget.detectorSquareGrid(new ConfigSquareGrid(5,7));
-//		PlanarCalibrationDetector detector = FactoryPlanarCalibrationTarget.detectorChessboard(new ConfigChessboard(5,7));
+//		PlanarCalibrationDetector detector = FactoryPlanarCalibrationTarget.detectorSquareGrid(new ConfigSquareGrid(5,7));
+		PlanarCalibrationDetector detector = FactoryPlanarCalibrationTarget.detectorChessboard(new ConfigChessboard(5,7));
 
-		PlanarCalibrationTarget target = FactoryPlanarCalibrationTarget.gridSquare(5,7,30,30);
-//		PlanarCalibrationTarget target = FactoryPlanarCalibrationTarget.gridChess(5, 7, 30);
+//		PlanarCalibrationTarget target = FactoryPlanarCalibrationTarget.gridSquare(5,7,30,30);
+		PlanarCalibrationTarget target = FactoryPlanarCalibrationTarget.gridChess(5, 7, 30);
 
-//		String directory = "../data/evaluation/calibration/stereo/Bumblebee2_Chess";
-		String directory = "../data/evaluation/calibration/stereo/Bumblebee2_Square";
+		String directory = "../data/evaluation/calibration/stereo/Bumblebee2_Chess";
+//		String directory = "../data/evaluation/calibration/stereo/Bumblebee2_Square";
 
 		List<String> leftImages = BoofMiscOps.directoryList(directory, "left");
 		List<String> rightImages = BoofMiscOps.directoryList(directory, "right");
