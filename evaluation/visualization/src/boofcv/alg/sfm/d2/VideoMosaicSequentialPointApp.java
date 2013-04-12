@@ -86,11 +86,18 @@ public class VideoMosaicSequentialPointApp<I extends ImageSingleBand, D extends 
 		inlierThreshold = 4;
 	}
 
-	private Affine2D_F64 createInitialTransform() {
+	private IT createInitialTransform() {
 		float scale = 0.8f;
 
-		Affine2D_F64 H = new Affine2D_F64(scale,0,0,scale, stitchWidth /4, stitchHeight /4);
-		return H.invert(null);
+		if( fitModel instanceof Affine2D_F64 ) {
+			Affine2D_F64 H = new Affine2D_F64(scale,0,0,scale, stitchWidth /4, stitchHeight /4);
+			return (IT)H.invert(null);
+		} else if( fitModel instanceof Homography2D_F64 ) {
+			Homography2D_F64 H = new Homography2D_F64(scale,0,stitchWidth /4,0,scale,stitchHeight /4,0,0,1 );
+			return (IT)H.invert(null);
+		} else {
+			throw new RuntimeException("Need to support this model type: "+fitModel.getClass().getSimpleName());
+		}
 	}
 
 	@Override

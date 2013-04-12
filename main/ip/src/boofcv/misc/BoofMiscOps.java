@@ -39,7 +39,8 @@ import java.util.List;
 public class BoofMiscOps {
 
 	public static void saveXML( Object o , String fileName ) {
-		XStream xstream = new XStream(new DomDriver());
+		XStreamClassLoader loader = new BoofcvClassLoader();
+		XStream xstream = new XStream(new PureJavaReflectionProvider(),new DomDriver(),loader,null,new DefaultConverterLookup(), null);
 		xstream.registerConverter(new JavaBeanConverter(xstream.getMapper()));
 
 		try {
