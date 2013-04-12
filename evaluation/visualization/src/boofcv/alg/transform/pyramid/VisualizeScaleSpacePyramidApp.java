@@ -20,36 +20,93 @@ package boofcv.alg.transform.pyramid;
 
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.factory.transform.pyramid.FactoryPyramid;
+import boofcv.gui.SelectInputPanel;
 import boofcv.gui.image.ImagePyramidPanel;
 import boofcv.gui.image.ShowImages;
-import boofcv.io.image.UtilImageIO;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.io.PathLabel;
+import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageUInt8;
 import boofcv.struct.pyramid.PyramidFloat;
 
+import javax.swing.*;
+import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 
 /**
  * Displays an image pyramid.
  *
  * @author Peter Abeles
  */
-// TODO abstract and add integer
-public class VisualizeScaleSpacePyramidApp {
+public class VisualizeScaleSpacePyramidApp<T extends ImageSingleBand>
+	extends SelectInputPanel
+{
+	double scales[] = new double[]{1,1.2,2.4,3.6,4.8,6.0,12,20};
+
+	Class<T> imageType;
+	ImagePyramidPanel<T> gui = new ImagePyramidPanel<T>();
+	boolean processedImage = false;
+
+	public VisualizeScaleSpacePyramidApp(Class<T> imageType) {
+		this.imageType = imageType;
+
+		gui.setShowScales(false);
+		setMainGUI(gui);
+	}
+
+	public void process( final BufferedImage input ) {
+		setInputImage(input);
+		final T gray = ConvertBufferedImage.convertFromSingle(input, null, imageType);
+
+		PyramidFloat<T> pyramid = FactoryPyramid.scaleSpace(scales,imageType);
+
+		pyramid.process(gray);
+
+		gui.set(pyramid,true);
+		
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				gui.render();
+				gui.repaint();
+				setPreferredSize(new Dimension(gray.width+50,gray.height+20));
+				processedImage = true;
+			}});
+	}
+
+	@Override
+	public void loadConfigurationFile(String fileName) {}
+
+	@Override
+	public synchronized void changeInput(String name, int index) {
+		BufferedImage image = media.openImage(inputRefs.get(index).getPath());
+
+		if( image != null ) {
+			process(image);
+		}
+	}
+
+	@Override
+	public boolean getHasProcessedImage() {
+		return processedImage;
+	}
 
 	public static void main( String args[] ) {
-		double scales[] = new double[]{1,1.2,2.4,3.6,4.8,6.0,10,15,20};
 
-		BufferedImage buffered = UtilImageIO.loadImage("../data/evaluation/standard/boat.png");
+//		VisualizePyramidFloatApp<ImageFloat32> app = new VisualizePyramidFloatApp<ImageFloat32>(ImageFloat32.class);
+		VisualizeScaleSpacePyramidApp<ImageUInt8> app = new VisualizeScaleSpacePyramidApp<ImageUInt8>(ImageUInt8.class);
 
-		PyramidFloat<ImageFloat32> pyramid = FactoryPyramid.scaleSpacePyramid(scales, ImageFloat32.class);
+		java.util.List<PathLabel> inputs = new ArrayList<PathLabel>();
+		inputs.add(new PathLabel("boat","../data/evaluation/standard/boat.png"));
+		inputs.add(new PathLabel("shapes","../data/evaluation/shapes01.png"));
+		inputs.add(new PathLabel("sunflowers","../data/evaluation/sunflowers.png"));
 
-		ImageFloat32 input = ConvertBufferedImage.convertFrom(buffered,(ImageFloat32)null);
+		app.setInputList(inputs);
 
-		pyramid.process(input);
+		// wait for it to process one image so that the size isn't all screwed up
+		while( !app.getHasProcessedImage() ) {
+			Thread.yield();
+		}
 
-		ImagePyramidPanel<ImageFloat32> gui = new ImagePyramidPanel<ImageFloat32>(pyramid,true);
-		gui.render();
-
-		ShowImages.showWindow(gui,"Image Pyramid");
+		ShowImages.showWindow(app,"Image Float Pyramid");
 	}
 }

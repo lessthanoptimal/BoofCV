@@ -6,6 +6,7 @@
     <buildFile url="file://$PROJECT_DIR$/../georegression/build.xml" />
     <buildFile url="file://$PROJECT_DIR$/../ddogleg/build.xml" />
     <buildFile url="file://$PROJECT_DIR$/../ejml/trunk/build.xml" />
+    <buildFile url="file://$PROJECT_DIR$/applet/build.xml" />
   </component>
   <component name="CompilerConfiguration">
     <option name="DEFAULT_COMPILER" value="Javac" />
@@ -37,6 +38,9 @@
     <module2copyright>
       <element module="BoofCV" copyright="BoofCV" />
     </module2copyright>
+    <LanguageOptions name="__TEMPLATE__">
+      <option name="fileTypeOverride" value="1" />
+    </LanguageOptions>
   </component>
   <component name="DependencyValidationManager">
     <scope name="BoofCV" pattern="src[BoofCV]:*..*||src[BoofCV Calibration]:*..*||src[BoofCV Evaluation]:*..*||src[BoofCV Examples]:*..*||src[BoofCV Feature]:*..*||src[BoofCV Geometric Vision]:*..*||src[BoofCV Image Processing]:*..*||src[BoofCV IO]:*..*||src[BoofCV SFM]:*..*||src[BoofCV V4L4J]:*..*||src[BoofCV Visualize]:*..*||src[BoofCV Xuggler]:*..*||test[BoofCV Calibration]:*..*||test[BoofCV Evaluation]:*..*||test[BoofCV Feature]:*..*||test[BoofCV Geometric Vision]:*..*||test[BoofCV Image Processing]:*..*||test[BoofCV IO]:*..*||test[BoofCV SFM]:*..*" />
@@ -379,6 +383,12 @@
             </rules>
           </arrangement>
         </codeStyleSettings>
+        <codeStyleSettings language="XML">
+          <indentOptions>
+            <option name="INDENT_SIZE" value="2" />
+            <option name="TAB_SIZE" value="2" />
+          </indentOptions>
+        </codeStyleSettings>
       </value>
     </option>
     <option name="USE_PER_PROJECT_SETTINGS" value="true" />
@@ -386,6 +396,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/BoofCV.iml" filepath="$PROJECT_DIR$/BoofCV.iml" />
+      <module fileurl="file://$PROJECT_DIR$/applet/BoofCV Applet.iml" filepath="$PROJECT_DIR$/applet/BoofCV Applet.iml" />
       <module fileurl="file://$PROJECT_DIR$/main/calibration/BoofCV Calibration.iml" filepath="$PROJECT_DIR$/main/calibration/BoofCV Calibration.iml" />
       <module fileurl="file://$PROJECT_DIR$/evaluation/BoofCV Evaluation.iml" filepath="$PROJECT_DIR$/evaluation/BoofCV Evaluation.iml" />
       <module fileurl="file://$PROJECT_DIR$/examples/BoofCV Examples.iml" filepath="$PROJECT_DIR$/examples/BoofCV Examples.iml" />

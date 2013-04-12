@@ -7,50 +7,18 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="module-library">
-      <library>
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/../lib/GeoRegression.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library>
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/../lib/EJML.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library>
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/../lib/BoofCV.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES>
-          <root url="file://$MODULE_DIR$/../main/ip/src" />
-          <root url="file://$MODULE_DIR$/../main/io/src" />
-          <root url="file://$MODULE_DIR$/../main/feature/src" />
-          <root url="file://$MODULE_DIR$/../main/geo/src" />
-          <root url="file://$MODULE_DIR$/../main/calibration/src" />
-          <root url="file://$MODULE_DIR$/../main/visualize/src" />
-        </SOURCES>
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library>
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/../lib/DDogleg.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module" module-name="Visualization" />
+    <orderEntry type="module" module-name="BoofCV IO" />
+    <orderEntry type="module" module-name="BoofCV Image Processing" />
+    <orderEntry type="module" module-name="BoofCV Visualize" />
+    <orderEntry type="module" module-name="BoofCV Calibration" />
+    <orderEntry type="module" module-name="BoofCV Evaluation" />
+    <orderEntry type="module" module-name="BoofCV Examples" />
+    <orderEntry type="module" module-name="BoofCV Feature" />
+    <orderEntry type="module" module-name="BoofCV Geometric Vision" />
+    <orderEntry type="module" module-name="BoofCV SFM" />
+    <orderEntry type="module" module-name="DDogleg" />
+    <orderEntry type="module" module-name="ejml" />
+    <orderEntry type="module" module-name="GeoRegression" />
   </component>
 </module>
 

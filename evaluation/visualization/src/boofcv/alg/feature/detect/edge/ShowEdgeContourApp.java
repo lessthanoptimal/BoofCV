@@ -77,7 +77,7 @@ public class ShowEdgeContourApp<T extends ImageSingleBand, D extends ImageSingle
 		addAlgorithm(0, "Canny", 0);
 		addAlgorithm(0, "Threshold Contour", 1);
 
-		barCanny = new CannyControlBar(1,5);
+		barCanny = new CannyControlBar(1,15);
 		barCanny.setListener(this);
 
 		barBinary = new SelectHistogramThresholdPanel(50,true);

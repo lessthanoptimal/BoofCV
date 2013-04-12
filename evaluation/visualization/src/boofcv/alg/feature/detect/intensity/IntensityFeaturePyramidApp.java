@@ -63,8 +63,10 @@ public class IntensityFeaturePyramidApp<T extends ImageSingleBand, D extends Ima
 	AnyImageDerivative<T,D> anyDerivative;
 	boolean processedImage = false;
 
-	public IntensityFeaturePyramidApp(Class<T> imageType, Class<D> derivType, boolean createPyramid) {
-		super(1);
+	GeneralFeatureIntensity<T,D> intensity;
+
+	public IntensityFeaturePyramidApp(Class<T> imageType, Class<D> derivType ) {
+		super(2);
 		this.imageType = imageType;
 
 		addAlgorithm(0, "Hessian Det", new WrapperHessianBlobIntensity<T,D>(HessianBlobIntensity.Type.DETERMINANT,derivType));
@@ -75,17 +77,10 @@ public class IntensityFeaturePyramidApp<T extends ImageSingleBand, D extends Ima
 		addAlgorithm(0, "KitRos",new WrapperKitRosCornerIntensity<T,D>(derivType));
 		addAlgorithm(0, "Median",new WrapperMedianCornerIntensity<T,D>(FactoryBlurFilter.median(imageType,2),imageType));
 
+		addAlgorithm(1 , "Pyramid", 0);
+		addAlgorithm(1 , "Scale-Space", 1);
+
 		setMainGUI(gui);
-
-		double scales[] = new double[25];
-		for( int i = 0; i < scales.length ; i++ ) {
-			scales[i] =  Math.exp(i*0.15);
-		}
-
-		if( createPyramid )
-			pyramid = FactoryPyramid.scaleSpacePyramid(scales, imageType);
-		else
-			pyramid = FactoryPyramid.scaleSpace(scales, imageType);
 
 		anyDerivative = GImageDerivativeOps.createDerivatives(imageType, FactoryImageGenerator.create(derivType));
 	}
@@ -95,8 +90,31 @@ public class IntensityFeaturePyramidApp<T extends ImageSingleBand, D extends Ima
 		if( input == null ) {
 			return;
 		}
-		GeneralFeatureIntensity<T,D> intensity = (GeneralFeatureIntensity<T,D>)cookie;
 
+		if( indexFamily == 0 ) {
+			intensity = (GeneralFeatureIntensity<T,D>)cookie;
+			if( pyramid == null )
+				return;
+		} else if( indexFamily == 1 ) {
+			// setup the pyramid
+			double scales[] = new double[25];
+			for( int i = 0; i < scales.length ; i++ ) {
+				scales[i] =  Math.exp(i*0.15);
+			}
+
+			if( ((Number)cookie).intValue() == 0 ) {
+				pyramid = FactoryPyramid.scaleSpacePyramid(scales, imageType);
+			} else {
+				pyramid = FactoryPyramid.scaleSpace(scales, imageType);
+			}
+			if( workImage != null )
+				pyramid.process(workImage);
+
+			if( intensity == null )
+				return;
+		}
+
+		// setup the feature intensity
 		gui.reset();
 		BufferedImage b = VisualizeImageData.grayMagnitude(workImage,null, 255);
 		gui.addImage(b,"Gray Image");
@@ -141,7 +159,7 @@ public class IntensityFeaturePyramidApp<T extends ImageSingleBand, D extends Ima
 		this.input = input;
 		workImage = ConvertBufferedImage.convertFromSingle(input, null, imageType);
 		scaledIntensity = new ImageFloat32(workImage.width,workImage.height);
-		pyramid.process(workImage);
+
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				setPreferredSize(new Dimension(input.getWidth(),input.getHeight()));
@@ -155,7 +173,11 @@ public class IntensityFeaturePyramidApp<T extends ImageSingleBand, D extends Ima
 
 	@Override
 	public void refreshAll(Object[] cookies) {
+		intensity = null;
+		pyramid = null;
+
 		setActiveAlgorithm(0,null,cookies[0]);
+		setActiveAlgorithm(1,null,cookies[1]);
 	}
 
 	@Override
@@ -174,10 +196,9 @@ public class IntensityFeaturePyramidApp<T extends ImageSingleBand, D extends Ima
 
 	public static void main( String args[] ) {
 
-		boolean usePyramid = false;
 
 		IntensityFeaturePyramidApp<ImageFloat32,ImageFloat32> app =
-				new IntensityFeaturePyramidApp<ImageFloat32,ImageFloat32>(ImageFloat32.class,ImageFloat32.class,usePyramid);
+				new IntensityFeaturePyramidApp<ImageFloat32,ImageFloat32>(ImageFloat32.class,ImageFloat32.class);
 
 //		IntensityFeaturePyramidApp<ImageUInt8, ImageSInt16> app =
 //				new IntensityFeaturePyramidApp<ImageUInt8,ImageSInt16>(ImageUInt8.class,ImageSInt16.class,usePyramid);
