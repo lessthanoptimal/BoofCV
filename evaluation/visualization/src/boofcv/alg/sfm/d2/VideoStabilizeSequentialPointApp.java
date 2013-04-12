@@ -48,10 +48,6 @@ public class VideoStabilizeSequentialPointApp<I extends ImageSingleBand, D exten
 		extends VideoStitchBaseApp<I,T>
 {
 	private int maxFeatures = 250;
-	private static int thresholdKeyFrame = 80;
-	private static int thresholdReset = 20;
-	private static int maxIterations = 80;
-	private static int pruneThreshold = 10;
 	
 	int largeMotionThreshold = 5000;
 
