@@ -21,6 +21,10 @@ package boofcv.misc;
 import boofcv.struct.ImageRectangle;
 import boofcv.struct.image.*;
 import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.converters.javabean.JavaBeanConverter;
+import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider;
+import com.thoughtworks.xstream.core.DefaultConverterLookup;
+import com.thoughtworks.xstream.core.util.XStreamClassLoader;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 
 import java.io.*;
@@ -36,6 +40,7 @@ public class BoofMiscOps {
 
 	public static void saveXML( Object o , String fileName ) {
 		XStream xstream = new XStream(new DomDriver());
+		xstream.registerConverter(new JavaBeanConverter(xstream.getMapper()));
 
 		try {
 			xstream.toXML(o,new FileOutputStream(fileName));
@@ -45,7 +50,10 @@ public class BoofMiscOps {
 	}
 	
 	public static <T> T loadXML( String fileName ) {
-		XStream xstream = new XStream(new DomDriver());
+
+		XStreamClassLoader loader = new BoofcvClassLoader();
+		XStream xstream = new XStream(new PureJavaReflectionProvider(),new DomDriver(),loader,null,new DefaultConverterLookup(), null);
+		xstream.registerConverter(new JavaBeanConverter(xstream.getMapper()));
 		try {
 			return (T)xstream.fromXML(new FileReader(fileName));
 		} catch (FileNotFoundException e) {
@@ -71,7 +79,9 @@ public class BoofMiscOps {
 	}
 
 	public static <T> T loadXML( Reader r ) {
-		XStream xstream = new XStream(new DomDriver());
+		XStreamClassLoader loader = new BoofcvClassLoader();
+		XStream xstream = new XStream(new PureJavaReflectionProvider(),new DomDriver(),loader,null,new DefaultConverterLookup(), null);
+		xstream.registerConverter(new JavaBeanConverter(xstream.getMapper()));
 		return (T)xstream.fromXML(r);
 	}
 	
