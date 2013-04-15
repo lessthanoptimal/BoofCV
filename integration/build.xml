@@ -15,6 +15,7 @@
     <path id="source.classpath">
       <pathelement path="android/src"/>
       <pathelement path="xuggler/src"/>
+      <pathelement path="v4l4j/src"/>
     </path>
 
 
@@ -97,12 +98,14 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
 	<delete dir="${testreport.dir}"/>
 	<ant dir="android/" target="clean"/>
 	<ant dir="xuggler/" target="clean"/>
+	<ant dir="v4l4j/" target="clean"/>
     </target>
 
     <target name="jar">
         <mkdir dir="${jar.dir}"/>
 	<ant dir="android" inheritAll="false"/>
 	<ant dir="xuggler" inheritAll="false"/>
+	<ant dir="v4l4j" inheritAll="false"/>
 	<!--jar destfile="${lib.dir}/${ant.project.name}.jar">
 	  <zipgroupfileset dir="${jar.dir}" includes="*.jar"/> 
 	</jar-->
