@@ -57,8 +57,9 @@ public class ExampleCannyEdge {
 
 		// First get the contour created by canny
 		List<EdgeContour> edgeContours = canny.getContours();
-		// The edge image + binary image contour can also be used.  Note that you are only interested in external
-		// contours.
+		// The 'edgeContours' is a tree graph that can be difficult to process.  An alternative is to extract
+		// the contours from the binary image, which will produce a single loop for each connected cluster of pixels.
+		// Note that you are only interested in external contours.
 		List<Contour> contours = BinaryImageOps.contour(edgeImage, 8, null);
 
 		// display the results
