@@ -42,6 +42,7 @@ public class ExampleImageEnhancement {
 	 * This if an image is dark, it will have greater contrast and be brighter.
 	 */
 	public static void histogram() {
+//		BufferedImage buffered = UtilImageIO.loadImage("../data/applet/enhance/dull.jpg");
 		BufferedImage buffered = UtilImageIO.loadImage("../data/applet/enhance/dark.jpg");
 		ImageUInt8 gray = ConvertBufferedImage.convertFrom(buffered,(ImageUInt8)null);
 		ImageUInt8 adjusted = new ImageUInt8(gray.width, gray.height);
@@ -69,7 +70,8 @@ public class ExampleImageEnhancement {
 	 * When an image is sharpened the intensity of edges are made more extreme while flat regions remain unchanged.
 	 */
 	public static void sharpen() {
-		BufferedImage buffered = UtilImageIO.loadImage("../data/applet/enhance/dull.jpg");
+//		BufferedImage buffered = UtilImageIO.loadImage("../data/applet/enhance/dull.jpg");
+		BufferedImage buffered = UtilImageIO.loadImage("../data/applet/enhance/dark.jpg");
 		ImageUInt8 gray = ConvertBufferedImage.convertFrom(buffered,(ImageUInt8)null);
 		ImageUInt8 adjusted = new ImageUInt8(gray.width, gray.height);
 
