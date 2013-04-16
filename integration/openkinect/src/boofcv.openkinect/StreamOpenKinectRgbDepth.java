@@ -1,0 +1,180 @@
+package boofcv.openkinect;
+
+import boofcv.struct.image.ImageUInt16;
+import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.MultiSpectral;
+import org.openkinect.freenect.*;
+
+import java.nio.ByteBuffer;
+
+/**
+ * High-level interface for streaming RGB + depth images from a Kinect.  Images are "synchronized" by passing in the
+ * two most recent images.  The class has been designed such that the listener can spend as much time inside the listen
+ * function without interrupting the streaming process since it's run in a separate thread.
+ *
+ * @author Peter Abeles
+ */
+public class StreamOpenKinectRgbDepth {
+
+	// time out used in some places
+	private long timeout=10000;
+
+	// time stamps for raw data
+	private volatile long timeDepthData;
+	private volatile long timeRgbData;
+
+	// byte buffer for depth image.  stored in this format until
+	private byte[] dataDepth;
+	private byte[] dataRgb;
+
+	private Listener listener;
+
+	// image with depth information
+	private ImageUInt16 depth = new ImageUInt16(1,1);
+	// image with color information
+	private MultiSpectral<ImageUInt8> rgb = new MultiSpectral<ImageUInt8>(ImageUInt8.class,1,1,3);
+
+	// thread which synchronized video streams
+	private CombineThread thread;
+	// the Kinect device being used
+	private Device device;
+
+	/**
+	 * Adds listeners to the device and sets its resolutions.
+	 * @param device Kinect device
+	 * @param resolution Resolution that images are being processed at.  Must be medium for now
+	 * @param listener Listener for data
+	 */
+	public void start( Device device , Resolution resolution , Listener listener )
+	{
+		if( resolution != Resolution.MEDIUM ) {
+			throw new IllegalArgumentException("Depth image is always at medium resolution.  Possible bug in kinect driver");
+		}
+
+		this.device = device;
+		this.listener = listener;
+
+		// Configure the kinect
+		device.setDepthFormat(DepthFormat.REGISTERED,resolution);
+		device.setVideoFormat(VideoFormat.RGB, resolution);
+
+		// declare data structures
+		int w = UtilOpenKinect.getWidth(resolution);
+		int h = UtilOpenKinect.getHeight(resolution);
+
+		dataDepth = new byte[ w*h*2 ];
+		dataRgb = new byte[ w*h*3 ];
+		depth.reshape(w,h);
+		rgb.reshape(w,h);
+
+		thread = new CombineThread();
+		thread.start();
+		// make sure the thread is running before moving on
+		while(!thread.running)
+			Thread.yield();
+
+		// start the streaming
+		device.startDepth(new DepthHandler() {
+			@Override
+			public void onFrameReceived(FrameMode mode, ByteBuffer frame, int timestamp) {
+				processDepth(frame,timestamp);
+			}
+		});
+
+		device.startVideo(new VideoHandler() {
+			@Override
+			public void onFrameReceived(FrameMode mode, ByteBuffer frame, int timestamp) {
+				processRgb(frame,timestamp);
+			}
+		});
+	}
+
+	/**
+	 * Stops all the threads from running and closes the video channels and video device
+	 */
+	public void stop() {
+		thread.requestStop = true;
+		long start = System.currentTimeMillis()+timeout;
+		while( start > System.currentTimeMillis() && thread.running )
+			Thread.yield();
+
+		device.stopDepth();
+		device.stopVideo();
+		device.close();
+	}
+
+	protected void processDepth( ByteBuffer frame, int timestamp ) {
+		synchronized ( dataDepth ) {
+			for( int i = 0; i < dataDepth.length; i++ ) {
+				dataDepth[i] = frame.get(i);
+			}
+			timeDepthData = timestamp & 0xFFFFFFFFFFL;
+		}
+	}
+
+	protected void processRgb(ByteBuffer frame, int timestamp ) {
+
+		synchronized ( dataRgb ) {
+			for( int i = 0; i < dataRgb.length; i++ ) {
+				dataRgb[i] = frame.get(i);
+			}
+			timeRgbData = timestamp & 0xFFFFFFFFFFL;
+		}
+		thread.interrupt();
+	}
+
+	private class CombineThread extends Thread {
+
+		public volatile boolean running = false;
+		public volatile boolean requestStop = false;
+
+		@Override
+		public void run() {
+			running = true;
+			long previousTimeStamp = 0;
+
+			while( !requestStop ) {
+				synchronized ( this ) {
+					try {
+						wait(200);
+					} catch (InterruptedException ignore) {}
+				}
+				// don't process the same thread twice
+				if( previousTimeStamp == timeRgbData )
+					continue;
+
+				// Convert the two most recent images
+				long timeDepth,timeRgb;
+				synchronized ( dataDepth ) {
+					timeDepth = timeDepthData;
+					UtilOpenKinect.bufferDepthToU16(dataDepth,depth);
+				}
+				synchronized ( dataRgb ) {
+					previousTimeStamp = timeRgbData;
+					timeRgb = timeRgbData;
+					UtilOpenKinect.bufferRgbToMsU8(dataRgb,rgb);
+				}
+
+				listener.processKinect(rgb, depth, timeRgb, timeDepth);
+			}
+
+			running = false;
+		}
+	}
+
+	/**
+	 * Listener for kinect data
+	 */
+	public interface Listener {
+		/**
+		 * Function for processing synchronized kinect data. The two most recent depth and rgb images are passed along
+		 * with their time stamps.  The user can spend as much time inside this function without screwing up the
+		 * video feeds.  Just make sure you exit it before calling stop.
+		 * @param rgb Color image
+		 * @param depth Depth image
+		 * @param timeRgb Time-stamp for rgb image
+		 * @param timeDepth Time-stamp for depth image
+		 */
+		public void processKinect(MultiSpectral<ImageUInt8> rgb, ImageUInt16 depth, long timeRgb, long timeDepth);
+	}
+}

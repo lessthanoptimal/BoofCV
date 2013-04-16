@@ -6,11 +6,11 @@
   <import file="../build_common.xml"/>
 
   <!--  Specify where your V4L4J jar directory is here-->
-  <property name="xuggler.dir" value="./"/>
+  <property name="v4l4j.dir" value="./"/>
   
   <path id="project.classpath">
     <fileset dir="${lib.dir}" includes="**/*.jar"/>
-    <fileset dir="${xuggler.dir}" includes="**/*.jar"/>
+    <fileset dir="${v4l4j.dir}" includes="**/*.jar"/>
   </path>
 
 </project>

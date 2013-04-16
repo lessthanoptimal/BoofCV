@@ -1,0 +1,56 @@
+<project name="BoofCV_OpenKinect" basedir="." default="main">
+  <description>
+    Build script for V4L4J integration
+  </description>
+
+
+  <!--  Specify where your V4L4J jar directory is here-->
+  <property name="kinect.dir" value="libfreenect"/>
+  <property name="src.dir" value="${kinect.dir}/wrappers/java/src/main/java/:src/"/>
+  <property name="src_examples.dir" value="${kinect.dir}/wrappers/java/src/main/java/:src/:example/src"/>
+
+  <import file="../build_common.xml"/>
+
+  <path id="project.classpath">
+    <fileset dir="${lib.dir}" includes="**/*.jar"/>
+    <fileset dir="./lib" includes="**/*.jar"/>
+  </path>
+
+  <path id="example.classpath">
+    <fileset dir="${lib.dir}" includes="**/*.jar"/>
+    <fileset dir="./lib" includes="**/*.jar"/>
+    <file file="../jar/${ant.project.name}.jar" />
+  </path>
+
+  <path id="run.classpath">
+    <fileset dir="${lib.dir}" includes="**/*.jar"/>
+    <fileset dir="./lib" includes="**/*.jar"/>
+    <file file="../jar/${ant.project.name}.jar" />
+    <file file="kinect_examples.jar" />
+  </path>
+
+  <target name="compile">
+    <mkdir dir="${classes.dir}"/>
+    <javac srcdir="${src.dir}" destdir="${classes.dir}" includeantruntime="false">
+      <classpath refid="project.classpath"/>
+    </javac>
+  </target>
+
+  <target name="examples" depends="jar">
+    <delete dir="${build.dir}"/>
+    <mkdir dir="${classes.dir}"/>
+    <javac srcdir="${src_examples.dir}" destdir="${classes.dir}" includeantruntime="false">
+      <classpath refid="project.classpath"/>
+    </javac>
+
+    <mkdir dir="${jar.dir}"/>
+    <jar destfile="kinect_examples.jar" basedir="${classes.dir}"/>
+  </target>
+
+  <target name="run">
+    <java classname="${which}" fork="true">
+      <classpath refid="run.classpath"/>
+    </java>
+  </target>
+
+</project>
