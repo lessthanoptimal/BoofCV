@@ -18,6 +18,10 @@
 
 package boofcv.example;
 
+import boofcv.core.image.ConvertBufferedImage;
+import boofcv.gui.image.ImagePanel;
+import boofcv.gui.image.ShowImages;
+import boofcv.misc.BoofMiscOps;
 import boofcv.openkinect.StreamOpenKinectRgbDepth;
 import boofcv.openkinect.UtilOpenKinect;
 import boofcv.struct.image.ImageUInt16;
@@ -45,6 +49,8 @@ public class LogKinectDataApp implements StreamOpenKinectRgbDepth.Listener {
 			NativeLibrary.addSearchPath("freenect", UtilOpenKinect.PATH_TO_SHARED_LIBRARY);
 	}
 
+	int maxImages;
+	boolean showImage;
 	Resolution resolution = Resolution.MEDIUM;
 
 	BufferedImage buffRgb;
@@ -53,6 +59,13 @@ public class LogKinectDataApp implements StreamOpenKinectRgbDepth.Listener {
 	DataOutputStream logFile;
 
 	byte buffer[];
+
+	ImagePanel gui;
+
+	public LogKinectDataApp(int maxImages, boolean showImage) {
+		this.maxImages = maxImages;
+		this.showImage = showImage;
+	}
 
 	public void process() throws IOException {
 
@@ -66,6 +79,10 @@ public class LogKinectDataApp implements StreamOpenKinectRgbDepth.Listener {
 
 		buffer = new byte[w*h*3];
 
+		if( showImage ) {
+			gui = ShowImages.showWindow(buffRgb,"Kinect RGB");
+		}
+
 		StreamOpenKinectRgbDepth stream = new StreamOpenKinectRgbDepth();
 		Context kinect = Freenect.createContext();
 
@@ -75,6 +92,15 @@ public class LogKinectDataApp implements StreamOpenKinectRgbDepth.Listener {
 		Device device = kinect.openDevice(0);
 
 		stream.start(device,resolution,this);
+
+		if( maxImages > 0 ) {
+			while( frameNumber < maxImages ) {
+				BoofMiscOps.pause(100);
+			}
+			stream.stop();
+			System.out.println("Exceeded max images");
+			System.exit(0);
+		}
 	}
 
 	public void savePPM( MultiSpectral<ImageUInt8> rgb ) throws IOException {
@@ -132,13 +158,18 @@ public class LogKinectDataApp implements StreamOpenKinectRgbDepth.Listener {
 			savePPM(rgb);
 			saveDepth(depth);
 			frameNumber++;
+
+			if( showImage ) {
+				ConvertBufferedImage.convertTo_U8(rgb,buffRgb);
+				gui.repaint();
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 
 	public static void main( String args[] ) throws IOException {
-		LogKinectDataApp app = new LogKinectDataApp();
+		LogKinectDataApp app = new LogKinectDataApp(30,true);
 		app.process();
 	}
 }

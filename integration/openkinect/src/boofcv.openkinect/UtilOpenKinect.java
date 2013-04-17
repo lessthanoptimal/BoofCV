@@ -18,9 +18,6 @@
 
 package boofcv.openkinect;
 
-import boofcv.gui.d3.ColorPoint3D;
-import boofcv.struct.FastQueue;
-import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.image.ImageUInt16;
 import boofcv.struct.image.ImageUInt8;
 import boofcv.struct.image.MultiSpectral;
@@ -60,11 +57,11 @@ public class UtilOpenKinect {
 		throw new IllegalArgumentException("Unknown resolution "+resolution);
 	}
 
-	public static void depthTo3D( IntrinsicParameters param , ImageUInt16 depth , FastQueue<ColorPoint3D> cloud ) {
-		cloud.reset();
-
-
-	}
+//	public static void depthTo3D( IntrinsicParameters param , ImageUInt16 depth , FastQueue<ColorPoint3D> cloud ) {
+//		cloud.reset();
+//
+//
+//	}
 
 	/**
 	 * Converts data in a ByteBuffer into a 16bit depth image
@@ -110,9 +107,9 @@ public class UtilOpenKinect {
 		for( int y = 0; y < output.height; y++ ) {
 			int indexOut = output.startIndex + y*output.stride;
 			for( int x = 0; x < output.width; x++ , indexOut++ ) {
-				band2.data[indexOut] = input.get(indexIn++);
-				band1.data[indexOut] = input.get(indexIn++);
 				band0.data[indexOut] = input.get(indexIn++);
+				band1.data[indexOut] = input.get(indexIn++);
+				band2.data[indexOut] = input.get(indexIn++);
 			}
 		}
 	}
@@ -131,9 +128,9 @@ public class UtilOpenKinect {
 		for( int y = 0; y < output.height; y++ ) {
 			int indexOut = output.startIndex + y*output.stride;
 			for( int x = 0; x < output.width; x++ , indexOut++ ) {
-				band2.data[indexOut] = input[indexIn++];
-				band1.data[indexOut] = input[indexIn++];
 				band0.data[indexOut] = input[indexIn++];
+				band1.data[indexOut] = input[indexIn++];
+				band2.data[indexOut] = input[indexIn++];
 			}
 		}
 	}
