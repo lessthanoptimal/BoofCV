@@ -91,7 +91,7 @@ public class OpenKinectStreamingTest {
 
 		if( outDepth == null ) {
 			depth.reshape(mode.getWidth(),mode.getHeight());
-			outDepth = new BufferedImage(depth.width,depth.height,BufferedImage.TYPE_INT_BGR);
+			outDepth = new BufferedImage(depth.width,depth.height,BufferedImage.TYPE_INT_RGB);
 			guiDepth = ShowImages.showWindow(outDepth,"Depth Image");
 		}
 
@@ -110,7 +110,7 @@ public class OpenKinectStreamingTest {
 
 		if( outRgb == null ) {
 			rgb.reshape(mode.getWidth(),mode.getHeight());
-			outRgb = new BufferedImage(rgb.width,rgb.height,BufferedImage.TYPE_INT_BGR);
+			outRgb = new BufferedImage(rgb.width,rgb.height,BufferedImage.TYPE_INT_RGB);
 			guiRgb = ShowImages.showWindow(outRgb,"RGB Image");
 		}
 
