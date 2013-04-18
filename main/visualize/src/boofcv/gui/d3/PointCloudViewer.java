@@ -30,9 +30,7 @@ import org.ejml.data.DenseMatrix64F;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
+import java.awt.event.*;
 
 /**
  * <p>
@@ -46,7 +44,8 @@ import java.awt.event.MouseMotionListener;
  *
  * @author Peter Abeles
  */
-public class PointCloudViewer extends JPanel implements MouseMotionListener, MouseListener {
+public class PointCloudViewer extends JPanel
+		implements MouseMotionListener, MouseListener, MouseWheelListener, KeyListener {
 	FastQueue<ColorPoint3D> cloud = new FastQueue<ColorPoint3D>(200,ColorPoint3D.class,true);
 
 	// intrinsic camera parameters
@@ -59,6 +58,7 @@ public class PointCloudViewer extends JPanel implements MouseMotionListener, Mou
 	// view offset
 	double offsetX;
 	double offsetY;
+	double offsetZ;
 
 	// Data structure that contains the visible point at each pixel
 	// size = width*height, row major format
@@ -76,9 +76,14 @@ public class PointCloudViewer extends JPanel implements MouseMotionListener, Mou
 	int prevY;
 
 	public PointCloudViewer( double pixelToDistance ) {
+
 		addMouseListener(this);
 		addMouseMotionListener(this);
-      this.pixelToDistance = pixelToDistance;
+		addMouseWheelListener(this);
+		addKeyListener(this);
+		setFocusable(true);
+		requestFocus();
+		this.pixelToDistance = pixelToDistance;
 	}
 
    public PointCloudViewer(DenseMatrix64F K, double pixelToDistance ) {
@@ -180,7 +185,7 @@ public class PointCloudViewer extends JPanel implements MouseMotionListener, Mou
 
 	public Se3_F64 createWorldToCamera() {
 
-		Vector3D_F64 rotPt = new Vector3D_F64(offsetX,offsetY,0);
+		Vector3D_F64 rotPt = new Vector3D_F64(offsetX,offsetY,offsetZ);
 
 		double radians = tiltAngle*Math.PI/180.0;
 		DenseMatrix64F R = RotationMatrixGenerator.eulerXYZ(radians,0,0,null);
@@ -189,6 +194,22 @@ public class PointCloudViewer extends JPanel implements MouseMotionListener, Mou
 
 		return a;
 	}
+
+	@Override
+	public void keyTyped(KeyEvent e) {
+	}
+
+	@Override
+	public void keyPressed(KeyEvent e) {
+		if( e.getKeyCode() == KeyEvent.VK_H ) {
+			offsetX = offsetY = offsetZ = 0;
+			tiltAngle = 0;
+			repaint();
+		}
+	}
+
+	@Override
+	public void keyReleased(KeyEvent e) {}
 
 	/**
 	 * Contains information on visible pixels
@@ -211,8 +232,14 @@ public class PointCloudViewer extends JPanel implements MouseMotionListener, Mou
 	}
 
 	@Override
-	public void mouseClicked(MouseEvent e) {
+	public void mouseWheelMoved(MouseWheelEvent e) {
+		offsetZ -= e.getWheelRotation()*pixelToDistance;
+
+		repaint();
 	}
+
+	@Override
+	public void mouseClicked(MouseEvent e) {}
 
 	@Override
 	public void mousePressed(MouseEvent e) {
@@ -234,8 +261,14 @@ public class PointCloudViewer extends JPanel implements MouseMotionListener, Mou
 		final int deltaX = e.getX()-prevX;
 		final int deltaY = e.getY()-prevY;
 
-		offsetX += deltaX*pixelToDistance;
-		offsetY += deltaY*pixelToDistance;
+		if( SwingUtilities.isRightMouseButton(e) ) {
+			offsetZ -= deltaY*pixelToDistance;
+		} else if( e.isShiftDown() || SwingUtilities.isMiddleMouseButton(e)) {
+			tiltAngle += deltaY;
+		} else {
+			offsetX += deltaX*pixelToDistance;
+			offsetY += deltaY*pixelToDistance;
+		}
 
 		prevX = e.getX();
 		prevY = e.getY();

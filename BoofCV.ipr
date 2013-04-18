@@ -43,7 +43,7 @@
     </LanguageOptions>
   </component>
   <component name="DependencyValidationManager">
-    <scope name="BoofCV" pattern="src[BoofCV]:*..*||src[BoofCV Calibration]:*..*||src[BoofCV Evaluation]:*..*||src[BoofCV Examples]:*..*||src[BoofCV Feature]:*..*||src[BoofCV Geometric Vision]:*..*||src[BoofCV Image Processing]:*..*||src[BoofCV IO]:*..*||src[BoofCV SFM]:*..*||src[BoofCV V4L4J]:*..*||src[BoofCV Visualize]:*..*||src[BoofCV Xuggler]:*..*||test[BoofCV Calibration]:*..*||test[BoofCV Evaluation]:*..*||test[BoofCV Feature]:*..*||test[BoofCV Geometric Vision]:*..*||test[BoofCV Image Processing]:*..*||test[BoofCV IO]:*..*||test[BoofCV SFM]:*..*" />
+    <scope name="BoofCV" pattern="src[BoofCV]:*..*||src[BoofCV Calibration]:*..*||src[BoofCV Evaluation]:*..*||src[BoofCV Examples]:*..*||src[BoofCV Feature]:*..*||src[BoofCV Geometric Vision]:*..*||src[BoofCV Image Processing]:*..*||src[BoofCV IO]:*..*||src[BoofCV SFM]:*..*||src[BoofCV V4L4J]:*..*||src[BoofCV Visualize]:*..*||src[BoofCV Xuggler]:*..*||test[BoofCV Calibration]:*..*||test[BoofCV Evaluation]:*..*||test[BoofCV Feature]:*..*||test[BoofCV Geometric Vision]:*..*||test[BoofCV Image Processing]:*..*||test[BoofCV IO]:*..*||test[BoofCV SFM]:*..*||src[openkinect]:*..*||src[BoofCV Applet]:*..*" />
     <option name="SKIP_IMPORT_STATEMENTS" value="false" />
   </component>
   <component name="Encoding" useUTFGuessing="true" native2AsciiForPropertiesFiles="false" />
@@ -411,6 +411,7 @@
       <module fileurl="file://$PROJECT_DIR$/../ddogleg/DDogleg.iml" filepath="$PROJECT_DIR$/../ddogleg/DDogleg.iml" />
       <module fileurl="file://$PROJECT_DIR$/../georegression/GeoRegression.iml" filepath="$PROJECT_DIR$/../georegression/GeoRegression.iml" />
       <module fileurl="file://$PROJECT_DIR$/../ejml/trunk/ejml.iml" filepath="$PROJECT_DIR$/../ejml/trunk/ejml.iml" />
+      <module fileurl="file://$PROJECT_DIR$/integration/openkinect/openkinect.iml" filepath="$PROJECT_DIR$/integration/openkinect/openkinect.iml" />
     </modules>
   </component>
   <component name="ProjectRootManager" version="2" languageLevel="JDK_1_6" assert-keyword="true" jdk-15="true" project-jdk-name="1.6 (64bit)" project-jdk-type="JavaSDK">
@@ -423,6 +424,7 @@
     <mapping directory="" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/data" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/integration/openkinect/libfreenect" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/../ddogleg" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/../ejml/trunk" vcs="svn" />
     <mapping directory="$PROJECT_DIR$/../georegression" vcs="Git" />

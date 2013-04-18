@@ -217,18 +217,26 @@ public class LensDistortionOps {
 	}
 
 	/**
-	 * Creates an {@Link ImageDistort} which removes radial distortion.
+	 * Creates an {@Link ImageDistort} which removes radial distortion. How pixels outside the image are handled
+	 * is specified by the BorderType.  If BorderType.VALUE then pixels outside the image will be filled in with a
+	 * value of 0.  For viewing purposes it is recommended that BorderType.VALUE be used and BorderType.EXTENDED
+	 * in computer vision applications.  VALUE creates harsh edges which can cause false positives
+	 * when detecting features, which EXTENDED minimizes.
 	 *
 	 * @param param Intrinsic camera parameters
 	 * @param imageType Type of single band image being processed
+	 * @param borderType Specifies how the image border is handled.
 	 * @return Image distort that removes radial distortion
 	 */
 	public static <T extends ImageSingleBand> ImageDistort<T>
-	removeRadialImage(IntrinsicParameters param,
-					  Class<T> imageType)
+	removeRadialImage(IntrinsicParameters param, BorderType borderType, Class<T> imageType)
 	{
 		InterpolatePixel<T> interp = FactoryInterpolation.bilinearPixel(imageType);
-		ImageBorder<T> border = FactoryImageBorder.general(imageType, BorderType.EXTENDED);
+		ImageBorder<T> border;
+		if( borderType == BorderType.VALUE )
+			border = FactoryImageBorder.value(imageType, 0);
+		else
+			border = FactoryImageBorder.general(imageType,borderType);
 
 		// only compute the transform once
 		ImageDistort<T> ret = FactoryDistort.distortCached(interp, border, imageType);

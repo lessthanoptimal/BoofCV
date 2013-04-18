@@ -3,6 +3,16 @@ Change Log
 Date Format: year/month/day
 
 ---------------------------------------------
+Date    : 2013
+Version : Alpha 0.15
+
+- Improved automatic thresholding for calibration grids
+- Fixed bug in Zhang99 calibration where skew was not being copied
+- Added support for OpenKinect in integration
+- Can read/write PPM images
+
+
+---------------------------------------------
 Date    : 2013/04/15
 Version : Alpha 0.14
 
