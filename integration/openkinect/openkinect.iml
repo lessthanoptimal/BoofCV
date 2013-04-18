@@ -31,6 +31,9 @@
     <orderEntry type="module" module-name="BoofCV Image Processing" />
     <orderEntry type="module" module-name="BoofCV Visualize" />
     <orderEntry type="module" module-name="BoofCV Geometric Vision" />
+    <orderEntry type="module" module-name="GeoRegression" />
+    <orderEntry type="module" module-name="ejml" />
+    <orderEntry type="module" module-name="BoofCV IO" />
   </component>
 </module>
 

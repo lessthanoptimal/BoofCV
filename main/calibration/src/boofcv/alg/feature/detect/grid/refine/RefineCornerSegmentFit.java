@@ -72,6 +72,9 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
+
+// BUG:  If a corner is close to an edge of another object  then the assumption about it being entirely white and black
+//       will be broken.  This can happen when a foreground object is obstructing the view.
 public class RefineCornerSegmentFit {
 
 	// computes statistics of white and black sections
@@ -264,7 +267,7 @@ public class RefineCornerSegmentFit {
 		BinaryImageOps.edge4(binaryMiddle, binary);
 		BinaryImageOps.logicOr(binaryHigh,binary,binary);
 
-//		UtilImageIO.print(binary);
+//		binary.print();
 //		System.out.println("--------------------");
 
 		// extract the points from the binary image and compute weights

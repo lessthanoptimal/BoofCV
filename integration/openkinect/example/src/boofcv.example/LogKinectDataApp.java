@@ -35,7 +35,6 @@ import org.openkinect.freenect.Resolution;
 
 import java.awt.image.BufferedImage;
 import java.io.DataOutputStream;
-import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
@@ -103,60 +102,14 @@ public class LogKinectDataApp implements StreamOpenKinectRgbDepth.Listener {
 		}
 	}
 
-	public void savePPM( MultiSpectral<ImageUInt8> rgb ) throws IOException {
-		File out = new File(String.format("log/rgb%07d.ppm",frameNumber));
-		DataOutputStream os = new DataOutputStream(new FileOutputStream(out));
-
-		String header = String.format("P6\n%d %d\n255\n", rgb.width, rgb.height);
-		os.write(header.getBytes());
-
-		ImageUInt8 band0 = rgb.getBand(0);
-		ImageUInt8 band1 = rgb.getBand(1);
-		ImageUInt8 band2 = rgb.getBand(2);
-
-		int indexOut = 0;
-		for( int y = 0; y < rgb.height; y++ ) {
-			int index = rgb.startIndex + y*rgb.stride;
-			for( int x = 0; x < rgb.width; x++ , index++) {
-				buffer[indexOut++] = band0.data[index];
-				buffer[indexOut++] = band1.data[index];
-				buffer[indexOut++] = band2.data[index];
-			}
-		}
-
-		os.write(buffer,0,rgb.width*rgb.height*3);
-
-		os.close();
-	}
-
-	public void saveDepth( ImageUInt16 depth ) throws IOException {
-		File out = new File(String.format("log/depth%07d.depth",frameNumber));
-		DataOutputStream os = new DataOutputStream(new FileOutputStream(out));
-
-		String header = String.format("%d %d\n", depth.width, depth.height);
-		os.write(header.getBytes());
-
-		int indexOut = 0;
-		for( int y = 0; y < depth.height; y++ ) {
-			int index = depth.startIndex + y*depth.stride;
-			for( int x = 0; x < depth.width; x++ , index++) {
-				int pixel = depth.data[index];
-				buffer[indexOut++] = (byte)(pixel&0xFF);
-				buffer[indexOut++] = (byte)((pixel>>8) & 0xFF);
-			}
-		}
-		os.write(buffer,0,depth.width*depth.height*2);
-		os.close();
-	}
-
 	@Override
 	public void processKinect(MultiSpectral<ImageUInt8> rgb, ImageUInt16 depth, long timeRgb, long timeDepth) {
 		System.out.println(frameNumber+"  "+timeRgb);
 		try {
 			logFile.write(String.format("%10d %d %d\n",frameNumber,timeRgb,timeDepth).getBytes());
 			logFile.flush();
-			savePPM(rgb);
-			saveDepth(depth);
+			UtilOpenKinect.savePPM(rgb, String.format("log/rgb%07d.ppm", frameNumber), buffer);
+			UtilOpenKinect.saveDepth(depth, String.format("log/depth%07d.depth", frameNumber), buffer);
 			frameNumber++;
 
 			if( showImage ) {
@@ -169,7 +122,7 @@ public class LogKinectDataApp implements StreamOpenKinectRgbDepth.Listener {
 	}
 
 	public static void main( String args[] ) throws IOException {
-		LogKinectDataApp app = new LogKinectDataApp(30,true);
+		LogKinectDataApp app = new LogKinectDataApp(60,true);
 		app.process();
 	}
 }

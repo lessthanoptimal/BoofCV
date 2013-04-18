@@ -18,10 +18,14 @@
 
 package boofcv.io.image;
 
+import boofcv.alg.misc.GImageMiscOps;
+import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.MultiSpectral;
 import org.junit.Test;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
 import java.util.Random;
 
 import static junit.framework.Assert.assertEquals;
@@ -62,6 +66,27 @@ public class TestUtilImageIO {
 
 		// clean up
 		File f = new File("temp.png");
+		assertTrue(f.delete());
+	}
+
+	@Test
+	public void loadImage_saveImage_PPM() throws IOException {
+
+		MultiSpectral<ImageUInt8> orig = new MultiSpectral<ImageUInt8>(ImageUInt8.class,width,height,3);
+		GImageMiscOps.fillUniform(orig,rand,0,256);
+
+		UtilImageIO.savePPM(orig,"temp.ppm",null);
+		MultiSpectral<ImageUInt8> found = UtilImageIO.loadPPM_U8("temp.ppm",null,null);
+
+		for( int y = 0; y < height; y++ ) {
+			for( int x = 0; x < width; x++ ) {
+				for( int k = 0; k < 3; k++ )
+					assertEquals(orig.getBand(k).get(x,y),found.getBand(k).get(x,y));
+			}
+		}
+
+		// clean up
+		File f = new File("temp.ppm");
 		assertTrue(f.delete());
 	}
 

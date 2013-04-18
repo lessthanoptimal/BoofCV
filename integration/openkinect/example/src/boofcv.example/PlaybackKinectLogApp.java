@@ -22,15 +22,15 @@ import boofcv.core.image.ConvertBufferedImage;
 import boofcv.gui.image.ImageGridPanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.gui.image.VisualizeImageData;
+import boofcv.io.image.UtilImageIO;
 import boofcv.misc.BoofMiscOps;
 import boofcv.openkinect.UtilOpenKinect;
+import boofcv.struct.GrowQueue_I8;
 import boofcv.struct.image.ImageUInt16;
 import boofcv.struct.image.ImageUInt8;
 import boofcv.struct.image.MultiSpectral;
 
 import java.awt.image.BufferedImage;
-import java.io.DataInputStream;
-import java.io.FileInputStream;
 import java.io.IOException;
 
 /**
@@ -41,7 +41,7 @@ public class PlaybackKinectLogApp {
 
 	String directory;
 
-	byte[] data = new byte[0];
+	GrowQueue_I8 data = new GrowQueue_I8();
 
 	// image with depth information
 	private ImageUInt16 depth = new ImageUInt16(1,1);
@@ -75,57 +75,8 @@ public class PlaybackKinectLogApp {
 	}
 
 	private void parseFrame(int frameNumber ) throws IOException {
-		parsePPM(String.format("%s/rgb%07d.ppm",directory,frameNumber));
-		parseDepth(String.format("%s/depth%07d.depth", directory, frameNumber));
-	}
-
-
-	private void parsePPM( String fileName ) throws IOException {
-		DataInputStream in = new DataInputStream(new FileInputStream(fileName));
-
-		readLine(in);
-		String s[] = readLine(in).split(" ");
-		int w = Integer.parseInt(s[0]);
-		int h = Integer.parseInt(s[1]);
-		readLine(in);
-
-		int length = w*h*3;
-		if( data.length < length )
-			data = new byte[length];
-		in.read(data,0,length);
-
-
-		rgb.reshape(w,h);
-		UtilOpenKinect.bufferRgbToMsU8(data,rgb);
-	}
-
-	private void parseDepth( String fileName ) throws IOException {
-		DataInputStream in = new DataInputStream(new FileInputStream(fileName));
-
-		String s[] = readLine(in).split(" ");
-		int w = Integer.parseInt(s[0]);
-		int h = Integer.parseInt(s[1]);
-
-		int length = w*h*2;
-		if( data.length < length )
-			data = new byte[length];
-		in.read(data,0,length);
-
-
-		depth.reshape(w,h);
-		UtilOpenKinect.bufferDepthToU16(data, depth);
-	}
-
-	private String readLine( DataInputStream in ) throws IOException {
-		String s = "";
-		while( true ) {
-			int b = in.read();
-
-			if( b == '\n' )
-				return s;
-			else
-				s += (char)b;
-		}
+		UtilImageIO.loadPPM_U8(String.format("%s/rgb%07d.ppm", directory, frameNumber), rgb, data);
+		UtilOpenKinect.parseDepth(String.format("%s/depth%07d.depth", directory, frameNumber),depth,data);
 	}
 
 	public static void main( String args[] ) throws IOException {

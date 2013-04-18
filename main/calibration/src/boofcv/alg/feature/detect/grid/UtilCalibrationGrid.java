@@ -23,7 +23,6 @@ import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I32;
 import org.ddogleg.sorting.QuickSort_F64;
-import org.ddogleg.sorting.QuickSort_S32;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,22 +46,29 @@ public class UtilCalibrationGrid {
 		}
 		mean /= (image.width*image.height);
 
-		QuickSort_S32 sort = new QuickSort_S32();
-		int indexes[] = new int[ histogram.length ];
+		// select the center of mass for the two regions
+		int lower = selectMiddle(histogram,0,mean);
+		int upper = selectMiddle(histogram,mean,histogram.length);
 
-		int lengthUpper = histogram.length-mean;
+		// pick the point which maximizes the separation between the two regions
+		return (lower + upper)/2;
+	}
 
-		// select the median value out of the non-zero values
-		sort.sort(histogram,mean,indexes);
-		int notZero = firstNotZero(histogram,indexes);
-		int lowerMedian = indexes[(mean-notZero)/2+notZero];
-		System.arraycopy(histogram,mean,histogram,0,lengthUpper);
-		sort.sort(histogram,lengthUpper,indexes);
-		notZero = firstNotZero(histogram,indexes);
-		int upperMedian = indexes[(lengthUpper-notZero)/2+notZero]+mean;
+	private static int selectMiddle( int histogram[] , int begin , int end ) {
+		int target = 0;
+		for( int i = begin; i < end; i++ ) {
+			target += histogram[i];
+		}
 
-		// pick the point which maximizes the separation between the two peaks
-		return (lowerMedian + upperMedian)/2;
+		target /= 2;
+
+		int sum = 0;
+		for( int i = begin; i < end; i++ ) {
+			sum += histogram[i];
+			if( sum >= target )
+				return i;
+		}
+		return end-1;
 	}
 
 

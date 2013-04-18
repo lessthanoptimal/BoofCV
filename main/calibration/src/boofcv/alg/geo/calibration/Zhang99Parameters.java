@@ -166,6 +166,8 @@ public class Zhang99Parameters {
 		ret.fy = b;
 		if( assumeZeroSkew )
 			ret.skew = 0;
+		else
+			ret.skew = c;
 		ret.cx = x0;
 		ret.cy = y0;
 		ret.radial = new double[ distortion.length ];
