@@ -90,12 +90,11 @@ public class UtilOpenKinect {
 
 				// this could all be precomputed to speed it up
 				p2n.compute(x,y,n);
-				double l = Math.sqrt( n.x*n.x + n.y*n.y + 1);
 
 				Point3D_F64 p = cloud.grow();
-				p.x = (n.x/l)*mm;
-				p.y = (n.y/l)*mm;
-				p.z = (1/l)*mm;
+				p.z = mm;
+				p.x = n.x*p.z;
+				p.y = n.y*p.z;
 			}
 		}
 	}
@@ -134,12 +133,11 @@ public class UtilOpenKinect {
 
 				// this could all be precomputed to speed it up
 				p2n.compute(x,y,n);
-				double l = Math.sqrt( n.x*n.x + n.y*n.y + 1);
 
 				Point3D_F64 p = cloud.grow();
-				p.x = (n.x/l)*mm;
-				p.y = (n.y/l)*mm;
-				p.z = (1.0/l)*mm;
+				p.z = mm;
+				p.x = n.x*p.z;
+				p.y = n.y*p.z;
 
 				int color[] = cloudColor.grow();
 
