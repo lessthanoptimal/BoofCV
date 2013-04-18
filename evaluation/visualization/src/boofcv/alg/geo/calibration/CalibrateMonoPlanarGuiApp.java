@@ -25,6 +25,7 @@ import boofcv.abst.calib.PlanarCalibrationDetector;
 import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.distort.LensDistortionOps;
 import boofcv.core.image.ConvertBufferedImage;
+import boofcv.core.image.border.BorderType;
 import boofcv.factory.calib.FactoryPlanarCalibrationTarget;
 import boofcv.gui.VisualizeApp;
 import boofcv.io.MediaManager;
@@ -138,7 +139,7 @@ public class CalibrateMonoPlanarGuiApp extends JPanel
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 
-				ImageDistort<ImageFloat32> dist = LensDistortionOps.removeRadialImage(param,ImageFloat32.class);
+				ImageDistort<ImageFloat32> dist = LensDistortionOps.removeRadialImage(param,BorderType.VALUE,ImageFloat32.class);
 				gui.setCorrection(dist);
 
 				gui.repaint();
