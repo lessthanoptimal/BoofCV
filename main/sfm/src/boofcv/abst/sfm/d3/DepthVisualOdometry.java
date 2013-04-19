@@ -18,18 +18,25 @@
 
 package boofcv.abst.sfm.d3;
 
-import boofcv.struct.calib.StereoParameters;
+/**
+ * @author Peter Abeles
+ */
+
+import boofcv.struct.calib.IntrinsicParameters;
+import boofcv.struct.distort.PixelTransform_F32;
 import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 
 /**
  * <p>
- * Stereo visual odometry algorithms that estimate the camera's ego-motion in Euclidean space using a pair of
- * stereo images.  Camera motion is estimated relative to the first frame in the left camera's point of view.
+ * Visual odometry that estimate the camera's ego-motion in Euclidean space using a camera image and
+ * a depth image.  Camera motion is estimated relative to the first frame in the left camera's point of view.
  * </p>
+ *
  * <p>
  * The following is a set of assumptions and behaviors that all implementations of this interface must follow:
  * <ul>
- * <li>Stereo images must be captured simultaneously</li>
+ * <li>Visual and depth images must be captured simultaneously</li>
  * <li>Cameras must have a global shutter</li>
  * <li>Calibration parameters can be changed at any time, but must be set at least once before processing an image.</li>
  * <li>If process returns false then the motion could not be estimated and isFault() should be checked</li>
@@ -45,32 +52,46 @@ import boofcv.struct.image.ImageBase;
  * </ul>
  * </p>
  *
- * @author Peter Abeles
+ * @param <Vis> Visual camera sensor
+ * @param <Depth> Depth camera sensor
  */
-public interface StereoVisualOdometry<T extends ImageBase> extends VisualOdometry {
+
+// DEVELOPMENT NOTE: This right now assumes that the depth image contains depth.  A transform could be added which
+//                   would convert it from the internal value into depth. This would allow a sparse depth calculation
+//                   right now the depth of the whole image must be computed.
+public interface DepthVisualOdometry<Vis extends ImageBase, Depth extends ImageSingleBand> extends VisualOdometry {
 
 	/**
-	 * Specifies intrinsic and extrinsic parameters for the stereo camera system. Can be called
-	 * at any time, but must be called at least once before {@link #process) can be called.
+	 * Specifies the intrinsic parameters for the visual camera and the transform from visual to depth pixels.
 	 *
-	 * @param parameters stereo calibration
+	 * @param paramVisual Intrinsic parameters for visual camera
+	 * @param visToDepth Transform from visual camera pixels into depth camera pixels
 	 */
-	public void setCalibration( StereoParameters parameters );
+	public void setCalibration( IntrinsicParameters paramVisual , PixelTransform_F32 visToDepth );
 
 	/**
 	 * Process the new image and update the motion estimate.  The return value must be checked
 	 * to see if the estimate was actually updated.  If false is returned then {@link #isFatal}
 	 * also needs to be checked to see if the pose estimate has been reset.
 	 *
+	 * @param visual Image from visual camera
+	 * @param depth Image from depth sensor
 	 * @return true if the motion estimate has been updated and false if not
 	 */
-	public boolean process(T leftImage , T rightImage );
+	public boolean process(Vis visual , Depth depth );
 
 	/**
-	 * Type of input images it can process.
+	 * Type of visual images it can process.
 	 *
 	 * @return The image type
 	 */
-	public Class<T> getImageType();
+	public Class<Vis> getVisualType();
+
+	/**
+	 * Type of depth images it can process.
+	 *
+	 * @return The image type
+	 */
+	public Class<Depth> getDepthType();
 
 }

@@ -404,6 +404,7 @@
       <module fileurl="file://$PROJECT_DIR$/main/geo/BoofCV Geometric Vision.iml" filepath="$PROJECT_DIR$/main/geo/BoofCV Geometric Vision.iml" />
       <module fileurl="file://$PROJECT_DIR$/main/io/BoofCV IO.iml" filepath="$PROJECT_DIR$/main/io/BoofCV IO.iml" />
       <module fileurl="file://$PROJECT_DIR$/main/ip/BoofCV Image Processing.iml" filepath="$PROJECT_DIR$/main/ip/BoofCV Image Processing.iml" />
+      <module fileurl="file://$PROJECT_DIR$/integration/openkinect/BoofCV OpenKinect.iml" filepath="$PROJECT_DIR$/integration/openkinect/BoofCV OpenKinect.iml" />
       <module fileurl="file://$PROJECT_DIR$/main/sfm/BoofCV SFM.iml" filepath="$PROJECT_DIR$/main/sfm/BoofCV SFM.iml" />
       <module fileurl="file://$PROJECT_DIR$/integration/v4l4j/BoofCV V4L4J.iml" filepath="$PROJECT_DIR$/integration/v4l4j/BoofCV V4L4J.iml" />
       <module fileurl="file://$PROJECT_DIR$/main/visualize/BoofCV Visualize.iml" filepath="$PROJECT_DIR$/main/visualize/BoofCV Visualize.iml" />
@@ -411,7 +412,6 @@
       <module fileurl="file://$PROJECT_DIR$/../ddogleg/DDogleg.iml" filepath="$PROJECT_DIR$/../ddogleg/DDogleg.iml" />
       <module fileurl="file://$PROJECT_DIR$/../georegression/GeoRegression.iml" filepath="$PROJECT_DIR$/../georegression/GeoRegression.iml" />
       <module fileurl="file://$PROJECT_DIR$/../ejml/trunk/ejml.iml" filepath="$PROJECT_DIR$/../ejml/trunk/ejml.iml" />
-      <module fileurl="file://$PROJECT_DIR$/integration/openkinect/openkinect.iml" filepath="$PROJECT_DIR$/integration/openkinect/openkinect.iml" />
     </modules>
   </component>
   <component name="ProjectRootManager" version="2" languageLevel="JDK_1_6" assert-keyword="true" jdk-15="true" project-jdk-name="1.6 (64bit)" project-jdk-type="JavaSDK">

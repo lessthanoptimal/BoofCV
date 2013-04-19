@@ -67,9 +67,8 @@ public class StereoSparse3D<T extends ImageSingleBand>
 	}
 
 	@Override
-	public void initialize() {
-		super.initialize();
-
+	public void setImages( T leftImage , T rightImage ) {
+		super.setImages(leftImage,rightImage);
 		disparity.setImages(imageLeftRect,imageRightRect);
 	}
 

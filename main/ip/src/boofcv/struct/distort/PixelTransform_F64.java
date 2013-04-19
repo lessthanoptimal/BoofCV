@@ -24,11 +24,11 @@ package boofcv.struct.distort;
  *
  * @author Peter Abeles
  */
-public abstract class PixelTransform_F32 {
+public abstract class PixelTransform_F64 {
 
 	// distorted pixel coordinates
-	public float distX;
-	public float distY;
+	public double distX;
+	public double distY;
 
 	/**
 	 * applies a transform to a pixel coordinate
@@ -38,11 +38,11 @@ public abstract class PixelTransform_F32 {
 	 */
 	public abstract void compute( int x , int y );
 
-	public float getDistX() {
+	public double getDistX() {
 		return distX;
 	}
 
-	public float getDistY() {
+	public double getDistY() {
 		return distY;
 	}
 }

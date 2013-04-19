@@ -129,11 +129,6 @@ public class WrapVisOdomQuadPnP<T extends ImageSingleBand,TD extends TupleDesc>
 	}
 
 	@Override
-	public boolean isFatal() {
-		return false;
-	}
-
-	@Override
 	public Se3_F64 getLeftToWorld() {
 		return alg.getLeftToWorld();
 	}

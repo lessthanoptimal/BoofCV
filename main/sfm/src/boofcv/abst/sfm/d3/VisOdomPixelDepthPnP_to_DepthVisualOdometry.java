@@ -22,12 +22,13 @@ import boofcv.abst.feature.tracker.PointTrack;
 import boofcv.abst.sfm.AccessPointTracks3D;
 import boofcv.alg.distort.LensDistortionOps;
 import boofcv.alg.geo.DistanceModelMonoPixels;
-import boofcv.alg.sfm.StereoSparse3D;
+import boofcv.alg.sfm.DepthSparse3D;
 import boofcv.alg.sfm.d3.VisOdomPixelDepthPnP;
 import boofcv.struct.calib.IntrinsicParameters;
-import boofcv.struct.calib.StereoParameters;
+import boofcv.struct.distort.PixelTransform_F32;
 import boofcv.struct.distort.PointTransform_F64;
 import boofcv.struct.geo.Point2D3D;
+import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.sfm.Point2D3DTrack;
 import georegression.struct.point.Point2D_F64;
@@ -38,30 +39,33 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * Wrapper around {@link VisOdomPixelDepthPnP} for {@Link DepthVisualOdometry}.
+ *
  * @author Peter Abeles
  */
 // TODO WARNING! active list has been modified by dropping and adding tracks
 // this is probably true of other SFM algorithms
-public class WrapVisOdomPixelDepthPnP<T extends ImageSingleBand>
-		implements StereoVisualOdometry<T>, AccessPointTracks3D {
-
+public class VisOdomPixelDepthPnP_to_DepthVisualOdometry<Vis extends ImageBase, Depth extends ImageSingleBand>
+	implements DepthVisualOdometry<Vis,Depth> , AccessPointTracks3D
+{
 	// low level algorithm
-	VisOdomPixelDepthPnP<T> alg;
-	StereoSparse3D<T> stereo;
+	DepthSparse3D<Depth> sparse3D;
+	VisOdomPixelDepthPnP<Vis> alg;
 	DistanceModelMonoPixels<Se3_F64,Point2D3D> distance;
-	Class<T> imageType;
+	Class<Vis> visualType;
+	Class<Depth> depthType;
 	boolean success;
 
 	List<PointTrack> active = new ArrayList<PointTrack>();
 
-	public WrapVisOdomPixelDepthPnP(VisOdomPixelDepthPnP<T> alg,
-									StereoSparse3D<T> stereo,
-									DistanceModelMonoPixels<Se3_F64,Point2D3D> distance,
-									Class<T> imageType) {
+	public VisOdomPixelDepthPnP_to_DepthVisualOdometry(DepthSparse3D<Depth> sparse3D, VisOdomPixelDepthPnP<Vis> alg,
+													   DistanceModelMonoPixels<Se3_F64, Point2D3D> distance,
+													   Class<Vis> visualType, Class<Depth> depthType) {
+		this.sparse3D = sparse3D;
 		this.alg = alg;
-		this.stereo = stereo;
 		this.distance = distance;
-		this.imageType = imageType;
+		this.visualType = visualType;
+		this.depthType = depthType;
 	}
 
 	@Override
@@ -94,33 +98,27 @@ public class WrapVisOdomPixelDepthPnP<T extends ImageSingleBand>
 	}
 
 	@Override
-	public void setCalibration( StereoParameters parameters ) {
-		stereo.setCalibration(parameters);
+	public void setCalibration(IntrinsicParameters paramVisual, PixelTransform_F32 visToDepth) {
+		sparse3D.configure(paramVisual,visToDepth);
 
-		IntrinsicParameters l = parameters.left;
-
-		PointTransform_F64 leftPixelToNorm = LensDistortionOps.transformRadialToNorm_F64(l);
-		PointTransform_F64 leftNormToPixel = LensDistortionOps.transformNormToRadial_F64(l);
+		PointTransform_F64 leftPixelToNorm = LensDistortionOps.transformRadialToNorm_F64(paramVisual);
+		PointTransform_F64 leftNormToPixel = LensDistortionOps.transformNormToRadial_F64(paramVisual);
 
 		alg.setPixelToNorm(leftPixelToNorm);
 		alg.setNormToPixel(leftNormToPixel);
-		distance.setIntrinsic(l.fx,l.fy,l.skew);
+
+		distance.setIntrinsic(paramVisual.fx,paramVisual.fy,paramVisual.skew);
 	}
 
 	@Override
-	public boolean process(T leftImage, T rightImage) {
-		stereo.setImages(leftImage,rightImage);
-		success = alg.process(leftImage);
+	public boolean process(Vis visual, Depth depth) {
+		sparse3D.setDepthImage(depth);
+		success = alg.process(visual);
 
 		active.clear();
 		alg.getTracker().getActiveTracks(active);
 
 		return success;
-	}
-
-	@Override
-	public Class<T> getImageType() {
-		return imageType;
 	}
 
 	@Override
@@ -136,5 +134,15 @@ public class WrapVisOdomPixelDepthPnP<T extends ImageSingleBand>
 	@Override
 	public Se3_F64 getLeftToWorld() {
 		return alg.getCurrToWorld();
+	}
+
+	@Override
+	public Class<Vis> getVisualType() {
+		return visualType;
+	}
+
+	@Override
+	public Class<Depth> getDepthType() {
+		return depthType;
 	}
 }

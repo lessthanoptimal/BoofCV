@@ -153,15 +153,17 @@ public class StereoProcessingBase<T extends ImageSingleBand> {
 	public void setImages( T leftImage , T rightImage ) {
 		this.imageLeftInput = leftImage;
 		this.imageRightInput = rightImage;
+
+		// rectify input images
+		distortLeftRect.apply(imageLeftInput, imageLeftRect);
+		distortRightRect.apply(imageRightInput, imageRightRect);
 	}
 
 	/**
 	 * Initializes stereo processing.
 	 */
 	public void initialize() {
-		// rectify input images
-		distortLeftRect.apply(imageLeftInput, imageLeftRect);
-		distortRightRect.apply(imageRightInput, imageRightRect);
+
 	}
 
 	/**

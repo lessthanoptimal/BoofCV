@@ -31,14 +31,14 @@ import boofcv.abst.geo.Estimate1ofPnP;
 import boofcv.abst.geo.EstimateNofPnP;
 import boofcv.abst.geo.RefinePnP;
 import boofcv.abst.geo.TriangulateTwoViewsCalibrated;
-import boofcv.abst.sfm.d3.StereoVisualOdometry;
-import boofcv.abst.sfm.d3.WrapVisOdomDualTrackPnP;
-import boofcv.abst.sfm.d3.WrapVisOdomPixelDepthPnP;
-import boofcv.abst.sfm.d3.WrapVisOdomQuadPnP;
+import boofcv.abst.sfm.DepthSparse3D_to_PixelTo3D;
+import boofcv.abst.sfm.ImagePixelTo3D;
+import boofcv.abst.sfm.d3.*;
 import boofcv.alg.feature.associate.AssociateMaxDistanceNaive;
 import boofcv.alg.feature.associate.AssociateStereo2D;
 import boofcv.alg.geo.DistanceModelMonoPixels;
 import boofcv.alg.geo.pose.*;
+import boofcv.alg.sfm.DepthSparse3D;
 import boofcv.alg.sfm.StereoSparse3D;
 import boofcv.alg.sfm.d3.VisOdomDualTrackPnP;
 import boofcv.alg.sfm.d3.VisOdomPixelDepthPnP;
@@ -66,9 +66,8 @@ import org.ddogleg.fitting.modelset.ransac.Ransac;
 public class FactoryVisualOdometry {
 
 	/**
-	 * Stereo visual odometry algorithm which only uses the right camera to estimate a points 3D location.  The camera's
-	 * pose is updated relative to the left camera using PnP algorithms.  See {@link VisOdomPixelDepthPnP} for more
-	 * details.
+	 * Stereo vision based visual odometry algorithm which runs a sparse feature tracker in the left camera and
+	 * estimates the range of tracks once when first detected using disparity between left and right cameras.
 	 *
 	 * @see VisOdomPixelDepthPnP
 	 *
@@ -119,7 +118,65 @@ public class FactoryVisualOdometry {
 		VisOdomPixelDepthPnP<T> alg =
 				new VisOdomPixelDepthPnP<T>(thresholdAdd,thresholdRetire ,doublePass,motion,pixelTo3D,refine,tracker,null,null);
 
-		return new WrapVisOdomPixelDepthPnP<T,Se3_F64,Point2D3D>(alg,pixelTo3D,distance,imageType);
+		return new WrapVisOdomPixelDepthPnP<T>(alg,pixelTo3D,distance,imageType);
+	}
+
+	/**
+	 * Depth sensor based visual odometry algorithm which runs a sparse feature tracker in the visual camera and
+	 * estimates the range of tracks once when first detected using the depth sensor.
+	 *
+	 * @see VisOdomPixelDepthPnP
+	 *
+	 * @param thresholdAdd Add new tracks when less than this number are in the inlier set.  Tracker dependent. Set to
+	 *                     a value <= 0 to add features every frame.
+	 * @param thresholdRetire Discard a track if it is not in the inlier set after this many updates.  Try 2
+	 * @param sparseDepth Extracts depth of pixels from a depth sensor.
+	 * @param visualType Type of visual image being processed.
+	 * @param depthType Type of depth image being processed.
+	 * @return StereoVisualOdometry
+	 */
+	public static <Vis extends ImageSingleBand, Depth extends ImageSingleBand>
+	DepthVisualOdometry<Vis,Depth> depthDepthPnP(double inlierPixelTol,
+												 int thresholdAdd,
+												 int thresholdRetire ,
+												 int ransacIterations ,
+												 int refineIterations ,
+												 boolean doublePass ,
+												 DepthSparse3D<Depth> sparseDepth,
+												 PointTrackerTwoPass<Vis> tracker ,
+												 Class<Vis> visualType , Class<Depth> depthType ) {
+
+		// Range from sparse disparity
+		ImagePixelTo3D pixelTo3D = new DepthSparse3D_to_PixelTo3D<Depth>(sparseDepth);
+
+		Estimate1ofPnP estimator = FactoryMultiView.computePnP_1(EnumPNP.P3P_FINSTERWALDER,-1,2);
+		final DistanceModelMonoPixels<Se3_F64,Point2D3D> distance = new PnPDistanceReprojectionSq();
+
+		EstimatorToGenerator<Se3_F64,Point2D3D> generator =
+				new EstimatorToGenerator<Se3_F64,Point2D3D>(estimator) {
+					@Override
+					public Se3_F64 createModelInstance() {
+						return new Se3_F64();
+					}
+				};
+
+		// 1/2 a pixel tolerance for RANSAC inliers
+		double ransacTOL = inlierPixelTol * inlierPixelTol;
+
+		ModelMatcher<Se3_F64, Point2D3D> motion =
+				new Ransac<Se3_F64, Point2D3D>(2323, generator, distance, ransacIterations, ransacTOL);
+
+		RefinePnP refine = null;
+
+		if( refineIterations > 0 ) {
+			refine = FactoryMultiView.refinePnP(1e-12,refineIterations);
+		}
+
+		VisOdomPixelDepthPnP<Vis> alg = new VisOdomPixelDepthPnP<Vis>
+						(thresholdAdd,thresholdRetire ,doublePass,motion,pixelTo3D,refine,tracker,null,null);
+
+		return new VisOdomPixelDepthPnP_to_DepthVisualOdometry<Vis,Depth>
+				(sparseDepth,alg,distance,visualType,depthType);
 	}
 
 	/**
