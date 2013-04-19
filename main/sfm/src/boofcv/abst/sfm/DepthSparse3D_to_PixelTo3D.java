@@ -16,33 +16,47 @@
  * limitations under the License.
  */
 
-package boofcv.struct.distort;
+package boofcv.abst.sfm;
 
+import boofcv.alg.sfm.DepthSparse3D;
+import boofcv.struct.image.ImageSingleBand;
 
 /**
- * Computes the location of a pixel after an arbitrary distortion has been applied to the image.
+ * Wrapper around {@link DepthSparse3D} for {@link ImagePixelTo3D}.
  *
  * @author Peter Abeles
  */
-public abstract class PixelTransform_F32 {
+public class DepthSparse3D_to_PixelTo3D<T extends ImageSingleBand>
+	implements ImagePixelTo3D
+{
+	DepthSparse3D<T> alg;
 
-	// distorted pixel coordinates
-	public float distX;
-	public float distY;
-
-	/**
-	 * applies a transform to a pixel coordinate
-	 *
-	 * @param x Pixel x-coordinate
-	 * @param y Pixel y-coordinate
-	 */
-	public abstract void compute( int x , int y );
-
-	public float getDistX() {
-		return distX;
+	public DepthSparse3D_to_PixelTo3D(DepthSparse3D<T> alg) {
+		this.alg = alg;
 	}
 
-	public float getDistY() {
-		return distY;
+	@Override
+	public boolean process(double x, double y) {
+		return alg.process((int)x,(int)y);
+	}
+
+	@Override
+	public double getX() {
+		return alg.getWorldPt().x;
+	}
+
+	@Override
+	public double getY() {
+		return alg.getWorldPt().y;
+	}
+
+	@Override
+	public double getZ() {
+		return alg.getWorldPt().z;
+	}
+
+	@Override
+	public double getW() {
+		return 1;
 	}
 }

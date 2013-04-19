@@ -16,33 +16,18 @@
  * limitations under the License.
  */
 
-package boofcv.struct.distort;
+package boofcv.abst.sfm.d3;
 
+import org.junit.Test;
+
+import static org.junit.Assert.fail;
 
 /**
- * Computes the location of a pixel after an arbitrary distortion has been applied to the image.
- *
  * @author Peter Abeles
  */
-public abstract class PixelTransform_F32 {
-
-	// distorted pixel coordinates
-	public float distX;
-	public float distY;
-
-	/**
-	 * applies a transform to a pixel coordinate
-	 *
-	 * @param x Pixel x-coordinate
-	 * @param y Pixel y-coordinate
-	 */
-	public abstract void compute( int x , int y );
-
-	public float getDistX() {
-		return distX;
-	}
-
-	public float getDistY() {
-		return distY;
+public class TestVisOdomPixelDepthPnP_to_DepthVisualOdometry {
+	@Test
+	public void stuff() {
+		fail("implement");
 	}
 }

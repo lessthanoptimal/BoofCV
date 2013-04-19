@@ -35,11 +35,12 @@ public interface VisualOdometry {
 
 	/**
 	 * If a fatal error occurred while updating its state then this function will return true.
-	 * Before more images can be processed {@link #reset()} must be called.
+	 * Before more images can be processed {@link #reset()} must be called.  Only needs to be
+	 * called if process returns false.
 	 *
 	 * @return true if a fatal error has occurred.
 	 */
-	public boolean isFatal();
+	public boolean isFault();
 
 	/**
 	 * Returns the estimated motion relative to the first frame in which a fatal error

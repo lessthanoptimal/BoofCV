@@ -38,13 +38,6 @@ package boofcv.abst.sfm;
 public interface ImagePixelTo3D {
 
 	/**
-	 * Must be called before process and after each time its internal data has
-	 * been updated.  The intended purpose of this function is to provide the
-	 * opportunity to avoid costly calculations when not in use.
-	 */
-	public void initialize();
-
-	/**
 	 * Estimate the location of the pixel in 3D camera coordinates.
 	 *
 	 * @param x x-coordinate of the pixel

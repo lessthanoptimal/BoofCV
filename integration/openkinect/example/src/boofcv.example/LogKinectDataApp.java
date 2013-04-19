@@ -122,7 +122,7 @@ public class LogKinectDataApp implements StreamOpenKinectRgbDepth.Listener {
 	}
 
 	public static void main( String args[] ) throws IOException {
-		LogKinectDataApp app = new LogKinectDataApp(60,true);
+		LogKinectDataApp app = new LogKinectDataApp(600,true);
 		app.process();
 	}
 }

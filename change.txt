@@ -10,7 +10,9 @@ Version : Alpha 0.15
 - Fixed bug in Zhang99 calibration where skew was not being copied
 - Added support for OpenKinect in integration
 - Can read/write PPM images
-
+- Added DepthVisualOdometry for computing visual odometry from a Kinect
+  * Added several related classes and interfaces too
+- Cleaned up VisualOdometry and StereoVisualOdometry interfaces
 
 ---------------------------------------------
 Date    : 2013/04/15

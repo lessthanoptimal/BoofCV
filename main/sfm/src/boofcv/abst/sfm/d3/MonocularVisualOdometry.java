@@ -32,7 +32,7 @@ import boofcv.struct.image.ImageBase;
  * Each time a new image arrives the function {@link #process} should be invoked and its return value
  * checked.  If false is returned then {@link #isFatal()} needs to be called to see if a fatal error
  * occurred.  If a fatal error occurred then the motion estimate has been reset relative to the first
- * frame in which {@Link isFatal} returns false.
+ * frame in which {@link #isFault} returns false.
  * </p>
  * 
  * @author Peter Abeles

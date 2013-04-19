@@ -221,7 +221,6 @@ public class VisOdomPixelDepthPnP<T extends ImageBase> {
 	private void addNewTracks() {
 //		System.out.println("----------- Adding new tracks ---------------");
 
-		pixelTo3D.initialize();
 		tracker.spawnTracks();
 		List<PointTrack> spawned = tracker.getNewTracks(null);
 

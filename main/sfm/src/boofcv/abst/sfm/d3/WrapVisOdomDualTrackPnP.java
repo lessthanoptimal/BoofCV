@@ -128,11 +128,6 @@ public class WrapVisOdomDualTrackPnP<T extends ImageSingleBand>
 	}
 
 	@Override
-	public boolean isFatal() {
-		return error;
-	}
-
-	@Override
 	public Se3_F64 getLeftToWorld() {
 		return alg.getCurrToWorld();
 	}

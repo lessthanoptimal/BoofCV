@@ -18,7 +18,7 @@
 
 package boofcv.openkinect;
 
-import boofcv.alg.distort.PixelToNormalized_F64;
+import boofcv.alg.distort.RemoveRadialPtoN_F64;
 import boofcv.struct.FastQueue;
 import boofcv.struct.FastQueueArray_I32;
 import boofcv.struct.GrowQueue_I8;
@@ -74,8 +74,8 @@ public class UtilOpenKinect {
 	public static void depthTo3D( IntrinsicParameters param , ImageUInt16 depth , FastQueue<Point3D_F64> cloud ) {
 		cloud.reset();
 
-		PixelToNormalized_F64 p2n = new PixelToNormalized_F64();
-		p2n.set(param.fx,param.fy,param.skew,param.cx,param.cy);
+		RemoveRadialPtoN_F64 p2n = new RemoveRadialPtoN_F64();
+		p2n.set(param.fx,param.fy,param.skew,param.cx,param.cy,param.radial);
 
 		Point2D_F64 n = new Point2D_F64();
 
@@ -113,8 +113,8 @@ public class UtilOpenKinect {
 		cloud.reset();
 		cloudColor.reset();
 
-		PixelToNormalized_F64 p2n = new PixelToNormalized_F64();
-		p2n.set(param.fx,param.fy,param.skew,param.cx,param.cy);
+		RemoveRadialPtoN_F64 p2n = new RemoveRadialPtoN_F64();
+		p2n.set(param.fx,param.fy,param.skew,param.cx,param.cy,param.radial);
 
 		Point2D_F64 n = new Point2D_F64();
 
