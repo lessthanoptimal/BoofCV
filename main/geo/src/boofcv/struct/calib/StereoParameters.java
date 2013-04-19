@@ -25,7 +25,15 @@ import georegression.struct.se.Se3_F64;
 import java.io.Serializable;
 
 /**
- * Calibration parameters for a stereo camera pair.  Includes intrinsic and extrinsic.
+ * <p>
+ * Calibration parameters for a stereo camera pair.  Includes intrinsic and extrinsic. The baseline between
+ * the two cameras is specified as a rigid body {@link Se3_F64} transform from the right to left camera.
+ * </p>
+ *
+ * <p>
+ * NOTE: When generated during camera calibration, the distance units found in 'rightToLeft' will be in the units that
+ * the calibration target size was specified in.
+ * </p>
  *
  * @author Peter Abeles
  */
@@ -34,11 +42,11 @@ public class StereoParameters implements Serializable {
 	// serialization version
 	public static final long serialVersionUID = 1L;
 
-	// intrinsic camera parameters of left camera
+	/** intrinsic camera parameters of left camera */
 	public IntrinsicParameters left;
-	// intrinsic camera parameters of right camera
+	/** intrinsic camera parameters of right camera */
 	public IntrinsicParameters right;
-	// transform from left camera to right camera
+	/** transform from left camera to right camera */
 	public Se3_F64 rightToLeft;
 
 	public StereoParameters(StereoParameters param ) {
@@ -97,7 +105,7 @@ public class StereoParameters implements Serializable {
 		System.out.println("Right Camera");
 		right.print();
 		System.out.println("Right to Left");
-		System.out.printf("  Euler       [ %8.3f , %8.3f , %8.3f ]\n",euler[0],euler[1],euler[2]);
+		System.out.printf("  Euler XYZ   [ %8.3f , %8.3f , %8.3f ]\n",euler[0],euler[1],euler[2]);
 		System.out.printf("  Translation [ %8.3f , %8.3f , %8.3f ]\n",t.x,t.y,t.z);
 	}
 }
