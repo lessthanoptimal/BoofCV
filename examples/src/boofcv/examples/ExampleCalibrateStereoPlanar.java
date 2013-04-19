@@ -135,6 +135,9 @@ public class ExampleCalibrateStereoPlanar {
 		// save results to a file and print out
 		BoofMiscOps.saveXML(stereoCalib, "stereo.xml");
 		stereoCalib.print();
+
+		// Note that the stereo baseline translation will be specified in the same units as the calibration grid.
+		// Which is in millimeters (mm) in this example.
 	}
 
 	public static void main( String args[] ) {

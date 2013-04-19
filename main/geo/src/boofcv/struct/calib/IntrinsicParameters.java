@@ -55,20 +55,20 @@ public class IntrinsicParameters implements Serializable {
 	// serialization version
 	public static final long serialVersionUID = 1L;
 
-	// image shape
+	/** image shape (units: pixels) */
 	public int width,height;
 
-	// When calibrated was the y-axis flipped: y = (height - y - 1)
+	/** When calibrated was the y-axis flipped: y = (height - y - 1) */
 	public boolean flipY;
 
-	// focal length along x and y axis
+	/** focal length along x and y axis (units: pixels) */
 	public double fx,fy;
-	// skew parameter, typically 0
+	/** skew parameter, typically 0 (units: pixels)*/
 	public double skew;
-	// image center
+	/** image center (units: pixels) */
 	public double cx,cy;
 
-	// radial distortion parameters
+	/** radial distortion parameters */
 	public double radial[];
 
 	public IntrinsicParameters() {
