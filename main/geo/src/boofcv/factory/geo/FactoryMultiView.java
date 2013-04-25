@@ -69,6 +69,7 @@ public class FactoryMultiView {
 	 * Returns an algorithm for estimating a homography matrix given a set of
 	 * {@link AssociatedPair}.
 	 *
+    * @param normalize If input is in pixel coordinates set to true.  False if in normalized image coordinates.
 	 * @return Homography estimator.
 	 */
 	public static Estimate1ofEpipolar computeHomography( boolean normalize ) {

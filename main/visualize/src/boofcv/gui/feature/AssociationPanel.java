@@ -99,10 +99,29 @@ public class AssociationPanel extends CompareTwoImagePanel implements MouseListe
 		}
 	}
 
+	public synchronized void setAssociation( List<Point2D_F64> leftPts , List<Point2D_F64> rightPts ) {
+
+		setLocation(leftPts,rightPts);
+
+		assocLeft = new int[ leftPts.size() ];
+		assocRight = new int[ rightPts.size() ];
+
+		for( int i = 0; i < assocLeft.length; i++ ) {
+			assocLeft[i] = i;
+			assocRight[i] = i;
+		}
+
+		Random rand = new Random(234);
+		colors = new Color[ leftPts.size() ];
+		for( int i = 0; i < colors.length; i++ ) {
+			colors[i] = new Color(rand.nextInt() | 0xFF000000 );
+		}
+	}
+
 	@Override
 	protected void drawFeatures(Graphics2D g2 ,
-							 double scaleLeft, int leftX, int leftY,
-							 double scaleRight, int rightX, int rightY) {
+								double scaleLeft, int leftX, int leftY,
+								double scaleRight, int rightX, int rightY) {
 		if( selected.isEmpty() )
 			drawAllFeatures(g2, scaleLeft,scaleRight,rightX);
 		else {

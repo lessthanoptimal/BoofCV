@@ -41,7 +41,7 @@ import georegression.transform.se.SePointOps_F64;
  * @author Peter Abeles
  */
 public class PositiveDepthConstraintCheck {
-	// algorithm used to triangulate point locaiton
+	// algorithm used to triangulate point location
 	TriangulateTwoViewsCalibrated triangulate;
 
 	// location of triangulated point in 3D space

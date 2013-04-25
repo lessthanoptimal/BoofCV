@@ -18,6 +18,7 @@
 
 package boofcv.alg.sfm.robust;
 
+import boofcv.alg.geo.NormalizedToPixelError;
 import boofcv.struct.geo.AssociatedPair;
 import georegression.struct.homo.Homography2D_F64;
 import georegression.struct.point.Point2D_F64;
@@ -30,16 +31,28 @@ import java.util.List;
 /**
  * <p>
  * Computes the Euclidean error squared between 'p1' and 'p2' after projecting 'p1' into image 2.  Input
- * can be in pixels or normalized image coordinates, but the error for normalized image coordinates doesn't
- * have a physical meaning.
+ * points must be in normalized image coordinates, but the output error will be in pixel coordinates.
  * </p>
  * 
  * @author Peter Abeles
  */
-public class DistanceHomographySq implements DistanceFromModel<Homography2D_F64,AssociatedPair> {
+public class DistanceHomographyPixelSq implements DistanceFromModel<Homography2D_F64,AssociatedPair> {
 
 	Homography2D_F64 model;
 	Point2D_F64 expected = new Point2D_F64();
+
+	NormalizedToPixelError errorCam2 = new NormalizedToPixelError();
+
+	/**
+	 * Specifies intrinsic parameters for camera 2.
+	 *
+	 * @param cam2_fx intrinsic parameter: focal length x for camera 2
+	 * @param cam2_fy intrinsic parameter: focal length y for camera 2
+	 * @param cam2_skew intrinsic parameter: skew for camera 2 (usually zero)
+	 */
+	public void setIntrinsic(double cam2_fx, double cam2_fy , double cam2_skew) {
+		errorCam2.set(cam2_fx,cam2_fy, cam2_skew);
+	}
 
 	@Override
 	public void setModel(Homography2D_F64 model ) {
@@ -50,7 +63,7 @@ public class DistanceHomographySq implements DistanceFromModel<Homography2D_F64,
 	public double computeDistance(AssociatedPair pt) {
 		HomographyPointOps_F64.transform(model, pt.p1, expected);
 
-		return expected.distance2(pt.p2);
+		return errorCam2.errorSq(expected,pt.p2);
 	}
 
 	@Override
@@ -59,7 +72,7 @@ public class DistanceHomographySq implements DistanceFromModel<Homography2D_F64,
 			AssociatedPair p = points.get(i);
 			HomographyPointOps_F64.transform(model, p.p1, expected);
 
-			distance[i] = expected.distance2(p.p2);
+			distance[i] = errorCam2.errorSq(expected,p.p2);
 		}
 	}
 }

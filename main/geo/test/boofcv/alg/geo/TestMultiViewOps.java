@@ -18,6 +18,7 @@
 
 package boofcv.alg.geo;
 
+import boofcv.struct.Tuple2;
 import boofcv.struct.geo.TrifocalTensor;
 import georegression.geometry.GeometryMath_F64;
 import georegression.geometry.RotationMatrixGenerator;
@@ -33,6 +34,7 @@ import org.ejml.ops.NormOps;
 import org.ejml.simple.SimpleMatrix;
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -630,5 +632,31 @@ public class TestMultiViewOps {
 		}
 
 		assertEquals(1,numMatched);
+	}
+
+	@Test
+	public void decomposeHomography() {
+		DenseMatrix64F R = RotationMatrixGenerator.eulerXYZ(0.2, -0.06, -0.05, null);
+		Vector3D_F64 T = new Vector3D_F64(2,1,-3);
+
+		double d = 2.5;
+		Vector3D_F64 N = new Vector3D_F64(0.68,0.2,-0.06);
+		N.normalize();
+
+		DenseMatrix64F H = MultiViewOps.createHomography(R, T, d, N);
+
+		List<Tuple2<Se3_F64,Vector3D_F64>> found = MultiViewOps.decomposeHomography(H);
+
+		assertEquals(4, found.size());
+
+		List<Se3_F64> solutionsSE = new ArrayList<Se3_F64>();
+		List<Vector3D_F64> solutionsN = new ArrayList<Vector3D_F64>();
+
+		for( Tuple2<Se3_F64,Vector3D_F64> t : found ) {
+			solutionsSE.add( t.data0 );
+			solutionsN.add( t.data1 );
+		}
+
+		TestDecomposeHomography.checkHasOriginal(solutionsSE, solutionsN, R, T, d, N);
 	}
 }

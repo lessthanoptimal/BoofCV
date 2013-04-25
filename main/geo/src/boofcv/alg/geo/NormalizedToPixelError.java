@@ -37,6 +37,15 @@ public class NormalizedToPixelError {
 		this.skew = skew;
 	}
 
+	public NormalizedToPixelError()
+	{}
+
+	public void set(double fx, double fy, double skew) {
+		this.fx = fx;
+		this.fy = fy;
+		this.skew = skew;
+	}
+
 	public double errorSq( Point2D_F64 a , Point2D_F64 b ) {
 		double dy = (b.y - a.y);
 		double dx = (b.x - a.x)*fx + dy*skew;
