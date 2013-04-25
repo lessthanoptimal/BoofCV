@@ -44,6 +44,11 @@ import java.util.List;
  * </p>
  *
  * <p>
+ * The input homography is assumed to be from view 'a' to view 'b'.  Then the resulting transform (R,T) is the
+ * transform from view 'a' to view 'b'
+ * </p>
+ *
+ * <p>
  * "An Invitation to 3-D Vision" 1st edition page 137.
  * </p>
  *

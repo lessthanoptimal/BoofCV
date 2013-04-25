@@ -46,6 +46,14 @@ public class ImageRectangle {
 	public ImageRectangle() {
 	}
 
+   public int getWidth() {
+      return x1-x0;
+   }
+
+   public int getHeight() {
+      return y1-y0;
+   }
+
 	public int area() {
 		return (y1-y0)*(x1-x0);
 	}

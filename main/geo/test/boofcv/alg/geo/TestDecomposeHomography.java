@@ -84,8 +84,8 @@ public class TestDecomposeHomography {
 	/*
 	 * See if an equivalent to the input matrix exists
 	 */
-	private void checkHasOriginal( List<Se3_F64> solutionsSE , List<Vector3D_F64> solutionsN ,
-								   DenseMatrix64F R, Vector3D_F64 T, double d , Vector3D_F64 N ) {
+	public static void checkHasOriginal( List<Se3_F64> solutionsSE , List<Vector3D_F64> solutionsN ,
+										 DenseMatrix64F R, Vector3D_F64 T, double d , Vector3D_F64 N ) {
 
 		int numMatches = 0;
 		for( int i = 0; i < 4; i++ ) {

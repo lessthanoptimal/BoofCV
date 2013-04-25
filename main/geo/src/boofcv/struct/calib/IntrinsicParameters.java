@@ -91,7 +91,19 @@ public class IntrinsicParameters implements Serializable {
 	}
 
 	public IntrinsicParameters( IntrinsicParameters param ) {
-		this(param.fx,param.fy,param.skew,param.cx,param.cy,param.width,param.height,param.flipY,null);
+		set(param);
+	}
+
+	public void set( IntrinsicParameters param ) {
+		this.fx = param.fx;
+		this.fy = param.fy;
+		this.skew = param.skew;
+		this.cx = param.cx;
+		this.cy = param.cy;
+		this.width = param.width;
+		this.height = param.height;
+		this.flipY = param.flipY;
+		this.radial = param.radial;
 
 		if( param.radial != null )
 			radial = param.radial.clone();

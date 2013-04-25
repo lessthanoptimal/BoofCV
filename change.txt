@@ -13,6 +13,8 @@ Version : Alpha 0.15
 - Added DepthVisualOdometry for computing visual odometry from a Kinect
   * Added several related classes and interfaces too
 - Cleaned up VisualOdometry and StereoVisualOdometry interfaces
+- Added DistanceHomographyPixelSq so that the fit error for normalized homography can be computed in image pixels.
+- Added MultiViewOps.decomposeHomography().
 
 ---------------------------------------------
 Date    : 2013/04/15

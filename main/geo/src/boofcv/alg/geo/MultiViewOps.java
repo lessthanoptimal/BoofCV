@@ -19,6 +19,7 @@
 package boofcv.alg.geo;
 
 import boofcv.alg.geo.trifocal.TrifocalExtractEpipoles;
+import boofcv.struct.Tuple2;
 import boofcv.struct.geo.TrifocalTensor;
 import georegression.geometry.GeometryMath_F64;
 import georegression.struct.line.LineGeneral2D_F64;
@@ -33,6 +34,7 @@ import org.ejml.ops.CommonOps;
 import org.ejml.simple.SimpleMatrix;
 import org.ejml.simple.SimpleSVD;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -789,6 +791,8 @@ public class MultiViewOps {
 	 * be found using triangulation and the positive depth constraint, e.g. the objects must be in front of the camera
 	 * to be seen.  Also note that the scale of the translation is lost, even with perfect data.
 	 *
+	 * @see DecomposeEssential
+	 *
 	 * @param E An essential matrix.
 	 * @return Four possible motions
 	 */
@@ -798,5 +802,34 @@ public class MultiViewOps {
 		d.decompose(E);
 
 		return d.getSolutions();
+	}
+
+	/**
+	 * Decomposes a homography matrix that's in Euclidean space (computed from features in normalized image coordinates).
+	 * The homography is defined as H = (R + (1/d)*T*N<sup>T</sup>), where R is a 3x3 rotation matrix,
+	 * d is the distance of the plane, N is the plane's normal (unit vector), T is the translation vector.  If
+	 * the homography is from view 'a' to 'b' then transform (R,T) will be from reference 'a' to 'b'.  Note that the
+	 * returned 'T' is divided by 'd'.
+	 *
+	 * @see DecomposeHomography
+	 *
+	 * @param H Homography in Euclidean space
+	 * @return The set of four possible solutions. First param: motion (R,T).  Second param: plane normal vector.
+	 */
+	public static List<Tuple2<Se3_F64,Vector3D_F64>> decomposeHomography( DenseMatrix64F H ) {
+		DecomposeHomography d = new DecomposeHomography();
+
+		d.decompose(H);
+
+		List<Vector3D_F64> solutionsN = d.getSolutionsN();
+		List<Se3_F64> solutionsSe = d.getSolutionsSE();
+
+		List<Tuple2<Se3_F64,Vector3D_F64>> ret = new ArrayList<Tuple2<Se3_F64,Vector3D_F64>>();
+		for( int i = 0; i < 4; i++ ) {
+			ret.add( new Tuple2<Se3_F64, Vector3D_F64>(solutionsSe.get(i),solutionsN.get(i)));
+		}
+
+
+		return ret;
 	}
 }

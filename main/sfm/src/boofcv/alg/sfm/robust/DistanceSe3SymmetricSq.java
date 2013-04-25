@@ -66,8 +66,8 @@ public class DistanceSe3SymmetricSq implements DistanceModelStereoPixels<Se3_F64
 	private Point3D_F64 p = new Point3D_F64();
 
 	// Used to compute error in pixels
-	private NormalizedToPixelError errorKey;
-	private NormalizedToPixelError errorCurr;
+	private NormalizedToPixelError errorCam1 = new NormalizedToPixelError();
+	private NormalizedToPixelError errorCam2 = new NormalizedToPixelError();
 
 	/**
 	 * Configure distance calculation.
@@ -94,18 +94,18 @@ public class DistanceSe3SymmetricSq implements DistanceModelStereoPixels<Se3_F64
 	 * Specifies intrinsic parameters   See comment above about how to specify error units using
 	 * intrinsic parameters.
 	 *
-	 * @param key_fx intrinsic parameter: focal length x for key camera
-	 * @param key_fy intrinsic parameter: focal length y for key camera
-	 * @param key_skew intrinsic parameter: skew for key camera (usually zero)
-	 * @param curr_fx intrinsic parameter: focal length x for curr camera
-	 * @param curr_fy intrinsic parameter: focal length y for curr camera
-	 * @param cam2_skew intrinsic parameter: skew for curr camera (usually zero)
+	 * @param cam1_fx intrinsic parameter: focal length x for camera 1
+	 * @param cam1_fy intrinsic parameter: focal length y for camera 1
+	 * @param cam1_skew intrinsic parameter: skew for camera  1 (usually zero)
+	 * @param cam2_fx intrinsic parameter: focal length x for camera 2
+	 * @param cam2_fy intrinsic parameter: focal length y for camera 2
+	 * @param cam2_skew intrinsic parameter: skew for camera 2 (usually zero)
 	 */
 	@Override
-	public void setIntrinsic(double key_fx, double key_fy , double key_skew ,
-							 double curr_fx, double curr_fy , double cam2_skew) {
-		errorKey = new NormalizedToPixelError(key_fx,key_fy,key_skew);
-		errorCurr = new NormalizedToPixelError(curr_fx,curr_fy, cam2_skew);
+	public void setIntrinsic(double cam1_fx, double cam1_fy , double cam1_skew ,
+							 double cam2_fx, double cam2_fy , double cam2_skew) {
+		errorCam1.set(cam1_fx,cam1_fy,cam1_skew);
+		errorCam2.set(cam2_fx,cam2_fy, cam2_skew);
 	}
 
 	@Override
@@ -129,13 +129,13 @@ public class DistanceSe3SymmetricSq implements DistanceModelStereoPixels<Se3_F64
 			return Double.MAX_VALUE;
 
 		// compute observational error in each view
-		double error = errorKey.errorSq(obs.p1.x,obs.p1.y,p.x/p.z,p.y/p.z);
+		double error = errorCam1.errorSq(obs.p1.x,obs.p1.y,p.x/p.z,p.y/p.z);
 
 		SePointOps_F64.transform(keyToCurr,p,p);
 		if( p.z < 0 )
 			return Double.MAX_VALUE;
 
-		error += errorCurr.errorSq(obs.p2.x,obs.p2.y, p.x/p.z , p.y/p.z);
+		error += errorCam2.errorSq(obs.p2.x,obs.p2.y, p.x/p.z , p.y/p.z);
 
 		return error;
 	}
