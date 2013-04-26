@@ -100,4 +100,13 @@ public abstract class ImageInteger<T extends ImageInteger> extends ImageSingleBa
 			System.out.println();
 		}
 	}
+
+	public void printBinary() {
+		for (int y = 0; y < height; y++) {
+			for (int x = 0; x < width; x++) {
+				System.out.printf("%1d",get(x,y));
+			}
+			System.out.println();
+		}
+	}
 }

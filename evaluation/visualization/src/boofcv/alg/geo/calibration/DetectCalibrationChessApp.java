@@ -34,6 +34,7 @@ import boofcv.gui.image.ShowImages;
 import boofcv.gui.image.VisualizeImageData;
 import boofcv.io.PathLabel;
 import boofcv.io.SimpleStringNumberReader;
+import boofcv.struct.ImageRectangle;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.point.Point2D_F64;
@@ -185,8 +186,8 @@ public class DetectCalibrationChessApp<T extends ImageSingleBand, D extends Imag
 			}
 
 			if( calibGUI.isShowBound() ) {
-				List<Point2D_F64> boundary =  alg.getFindBound().getBoundingQuad();
-				DetectCalibrationSquaresApp.drawBounds(g2,boundary);
+				ImageRectangle boundary =  alg.getFindBound().getBoundRect();
+				drawBounds(g2, boundary);
 			}
 
 			if( calibGUI.doShowGraph ) {
@@ -203,6 +204,16 @@ public class DetectCalibrationChessApp<T extends ImageSingleBand, D extends Imag
 		gui.repaint();
 
 		processed = true;
+	}
+
+	public static void drawBounds( Graphics2D g2 , ImageRectangle rectangle ) {
+		g2.setColor(Color.BLUE);
+		g2.setStroke(new BasicStroke(2.0f));
+		g2.drawLine(rectangle.x0,rectangle.y0,rectangle.x1,rectangle.y0);
+		g2.drawLine(rectangle.x1,rectangle.y0,rectangle.x1,rectangle.y1);
+		g2.drawLine(rectangle.x1,rectangle.y1,rectangle.x0,rectangle.y1);
+		g2.drawLine(rectangle.x0,rectangle.y1,rectangle.x0,rectangle.y0);
+
 	}
 
 	private void renderClusters() {

@@ -19,15 +19,14 @@
 package boofcv.alg.feature.detect.chess;
 
 import boofcv.alg.feature.detect.grid.ConnectGridSquares;
-import boofcv.alg.feature.detect.grid.UtilCalibrationGrid;
 import boofcv.alg.feature.detect.quadblob.DetectQuadBlobsBinary;
 import boofcv.alg.feature.detect.quadblob.QuadBlob;
+import boofcv.struct.FastQueue;
+import boofcv.struct.ImageRectangle;
 import boofcv.struct.image.ImageUInt8;
 import georegression.geometry.UtilPoint2D_I32;
-import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I32;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -49,11 +48,13 @@ public class DetectChessSquaresBinary {
 	private int numRows;
 	private int numCols;
 
-	// quadrilateral bounding all the blobs
-	private List<Point2D_F64> boundingQuad;
+	// Find a rectangle which contains the whole target
+	private ImageRectangle boundRect = new ImageRectangle();
 	// graph of connected bobs
 	private List<QuadBlob> graphBlobs;
-	private List<QuadBlob> cornerBlobs;
+
+	// corners on detected squares
+	FastQueue<Point2D_I32> corners = new FastQueue<Point2D_I32>(Point2D_I32.class,true);
 
 	// how close two corners need to be for them to be connected
 	private double connectThreshold = 10;
@@ -74,7 +75,10 @@ public class DetectChessSquaresBinary {
 		int blackCols = numCols/2 + numCols%2;
 		int blackRows = numRows/2 + numRows%2;
 
-		expectedBlobs = blackCols*blackRows + (blackCols-1)*(blackRows-1);
+		int innerCols = numCols/2;
+		int innerRows = numRows/2;
+
+		expectedBlobs = blackCols*blackRows + innerCols*innerRows;
 
 		setMinimumContourSize(minContourSize);
 	}
@@ -105,15 +109,13 @@ public class DetectChessSquaresBinary {
 		}
 
 		// Examine connections
-		cornerBlobs = new ArrayList<QuadBlob>();
-		if( !checkGraphStructure(graphBlobs,cornerBlobs)) {
+		if( !checkGraphStructure(graphBlobs)) {
 //			System.out.println("Bad graph structure");
 			return false;
 		}
 
-		// find bounds
-		boundingQuad = findBoundingQuad(cornerBlobs);
-		
+		findBoundingRectangle(graphBlobs);
+
 		return true;
 	}
 
@@ -176,62 +178,95 @@ public class DetectChessSquaresBinary {
 		}
 	}
 
+	private void findBoundingRectangle( List<QuadBlob> blobs) {
+		boundRect.x0 = Integer.MAX_VALUE;
+		boundRect.x1 = -Integer.MAX_VALUE;
+		boundRect.y0 = Integer.MAX_VALUE;
+		boundRect.y1 = -Integer.MAX_VALUE;
+
+		for( QuadBlob b : blobs ) {
+			if( b.center.x < boundRect.x0 )
+				boundRect.x0 = b.center.x;
+			if( b.center.x > boundRect.x1 )
+				boundRect.x1 = b.center.x;
+			if( b.center.y < boundRect.y0 )
+				boundRect.y0 = b.center.y;
+			if( b.center.y > boundRect.y1 )
+				boundRect.y1 = b.center.y;
+		}
+	}
+
 	/**
 	 * Counts the number of connections each node has.  If it is a legit grid
 	 * then it should have a known number of nodes with a specific number
 	 * of connections.
 	 */
-	public boolean checkGraphStructure( List<QuadBlob> blobs , List<QuadBlob> corners )
+	public boolean checkGraphStructure( List<QuadBlob> blobs )
 	{
 		// make a histogram of connection counts
 		int conn[] = new int[5];
-		
-		for( QuadBlob b : blobs ) {
-			if( b.conn.size() == 1 )
-				corners.add(b);
 
+		for( QuadBlob b : blobs ) {
 			conn[b.conn.size()]++;
 		}
 
-		if( conn[0] != 0 )
-			return false;
-
-		if( conn[1] != 1 + (numCols%2) + (numRows%2) + ((numCols+numRows+1)%2) )
-			return false;
-
-		if( conn[2] != 2*(numCols/2-1) + 2*(numRows/2-1) )
-			return false;
 
 		if( conn[3] != 0 )
 			return false;
 
-		if( conn[4] != expectedBlobs-conn[1]-conn[2] )
+		if( numCols == 1 && numRows == 1 ) {
+			if( conn[0] != 1 )
+				return false;
+			if( conn[1] != 0 )
+				return false;
+			if( conn[2] != 0 )
+				return false;
+		} else {
+			if( conn[0] != 0 )
+				return false;
+
+			if( numCols%2 == 1 && numRows%2 == 1 ) {
+				if( conn[1] != 4 )
+					return false;
+
+				if( conn[2] != 2*(numCols/2-1) + 2*(numRows/2-1) )
+					return false;
+			} else if( numCols%2 == 1 || numRows%2 == 1 ) {
+				// can handle both cases here due to symmetry
+				if( numRows%2 == 0 ) {
+					int tmp = numRows;
+					numRows = numCols;
+					numCols = tmp;
+				}
+
+				if( conn[1] != 2 )
+					return false;
+
+				if( conn[2] != (numRows-2) + 2*(numCols/2-1) )
+					return false;
+			} else if( numRows%2 == 1 ) {
+				if( conn[1] != 1 + (numCols%2) + (numRows%2) + ((numCols+numRows+1)%2) )
+					return false;
+
+				if( conn[2] != 2*(numCols/2-1) + 2*(numRows/2-1) )
+					return false;
+			} else {
+				if( conn[1] != 2 )
+					return false;
+				if( numCols == 2 || numRows == 2 ) {
+					if( conn[2] != Math.max(numCols,numRows)-2 )
+						return false;
+				} else {
+					if( conn[2] != 2*(numCols/2-1) + 2*(numRows/2-1) )
+						return false;
+				}
+			}
+		}
+
+		if( conn[4] != expectedBlobs-conn[0]-conn[1]-conn[2] )
 			return false;
 
 		return true;
-	}
-
-	/**
-	 * Finds bounding quadrilateral using corner points
-	 */
-	public List<Point2D_F64> findBoundingQuad(  List<QuadBlob> corners ) {
-		List<Point2D_F64> points = new ArrayList<Point2D_F64>();
-
-		Point2D_F64 center = new Point2D_F64();
-		
-		// add the centers
-		for( QuadBlob b : corners ) {
-			points.add(new Point2D_F64(b.center.x,b.center.y));
-			center.x += b.center.x;
-			center.y += b.center.y;
-		}
-
-		center.x /= 4;
-		center.y /= 4;
-
-		UtilCalibrationGrid.sortByAngleCCW(center, points);
-
-		return points;
 	}
 
 	/**
@@ -243,10 +278,6 @@ public class DetectChessSquaresBinary {
 		detectBlobs = new DetectQuadBlobsBinary(minContourSize,0.25,expectedBlobs);
 	}
 
-	public List<Point2D_F64> getBoundingQuad() {
-		return boundingQuad;
-	}
-
 	public DetectQuadBlobsBinary getDetectBlobs() {
 		return detectBlobs;
 	}
@@ -255,10 +286,30 @@ public class DetectChessSquaresBinary {
 		return graphBlobs;
 	}
 
+	public ImageRectangle getBoundRect() {
+		return boundRect;
+	}
+
 	/**
-	 * Returns blobs at the chess board corner
+	 * Returns corners that are near a another square
 	 */
-	public List<QuadBlob> getCornerBlobs() {
-		return cornerBlobs;
+	public List<Point2D_I32> getCandidatePoints() {
+		corners.reset();
+		for( QuadBlob b : graphBlobs ) {
+			// find point closest to each connection
+			for( QuadBlob c : b.conn ) {
+				Point2D_I32 best = null;
+				double bestDistance = Double.MAX_VALUE;
+				for( Point2D_I32 p : b.corners ) {
+					int d = p.distance2(c.center);
+					if( d < bestDistance ) {
+						bestDistance = d;
+						best = p;
+					}
+				}
+				corners.grow().set(best);
+			}
+		}
+		return corners.toList();
 	}
 }

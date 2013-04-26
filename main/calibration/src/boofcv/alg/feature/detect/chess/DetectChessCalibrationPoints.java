@@ -40,11 +40,9 @@ import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
 import georegression.geometry.UtilPoint2D_I32;
-import georegression.metric.Intersection2D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I16;
 import georegression.struct.point.Point2D_I32;
-import georegression.struct.shapes.Polygon2D_F64;
 import org.ddogleg.sorting.QuickSort_F64;
 
 import java.util.ArrayList;
@@ -169,10 +167,8 @@ public class DetectChessCalibrationPoints<T extends ImageSingleBand, D extends I
 		if (!(foundBound = detectChessBoard(gray)))
 			return false;
 
-		List<Point2D_F64> boundary = findBound.getBoundingQuad();
-
-		// find image rectangle and detect features inside
-		targetRect = findImageRectangle(boundary);
+		// rectangle that contains the area of interest
+		targetRect = findBound.getBoundRect();
 
 		T subGray = (T) gray.subimage(targetRect.x0, targetRect.y0, targetRect.x1, targetRect.y1);
 		derivX.reshape(subGray.width, subGray.height);
@@ -189,8 +185,8 @@ public class DetectChessCalibrationPoints<T extends ImageSingleBand, D extends I
 		// put points into original image coordinates
 		List<Point2D_F64> points = convert(corners, targetRect.x0, targetRect.y0);
 
-		// prune features not inside the bounding quadrilateral
-		pruneOutside(points, boundary);
+		// prune features which are not near any candidate corners
+		pruneFarFromBlobCorners(points, findBound.getCandidatePoints());
 
 		// make sure enough points were detected
 		if (points.size() < expectedPoints)
@@ -321,49 +317,26 @@ public class DetectChessCalibrationPoints<T extends ImageSingleBand, D extends I
 	}
 
 	/**
-	 * Finds an axis aligned rectangle that contains the bounding quadrilateral
+	 * Prunes detected corners that are not near any of the corners
 	 */
-	private ImageRectangle findImageRectangle(List<Point2D_F64> quad) {
-		double x0, y0, x1, y1;
+	private void pruneFarFromBlobCorners(List<Point2D_F64> corners , List<Point2D_I32> initial ) {
 
-		Point2D_F64 p = quad.get(0);
-		x0 = x1 = p.x;
-		y0 = y1 = p.y;
-
-		for (int i = 1; i < 4; i++) {
-			p = quad.get(i);
-			if (p.x < x0)
-				x0 = p.x;
-			else if (p.x > x1)
-				x1 = p.x;
-
-			if (p.y < y0)
-				y0 = p.y;
-			else if (p.y > y1)
-				y1 = p.y;
-		}
-
-		return new ImageRectangle((int) x0, (int) y0, (int) x1, (int) y1);
-	}
-
-	/**
-	 * Prunes detected corners not inside the image
-	 */
-	private void pruneOutside(List<Point2D_F64> corners, List<Point2D_F64> quad) {
-		Polygon2D_F64 poly = new Polygon2D_F64(4);
-		for (int i = 0; i < 4; i++) {
-			Point2D_F64 p = quad.get(i);
-			poly.vertexes[i].set(p.x, p.y);
-		}
-
+		int tolerance = 10;
 		Iterator<Point2D_F64> iter = corners.iterator();
 
-		Point2D_F64 a = new Point2D_F64();
-		while (iter.hasNext()) {
-			Point2D_F64 p = iter.next();
-			a.set(p.x, p.y);
+		while( iter.hasNext() ) {
+			Point2D_F64 c = iter.next();
+			int x = (int)c.x;
+			int y = (int)c.y;
 
-			if (!Intersection2D_F64.containConvex(poly, a))
+			boolean matched = false;
+
+			for( Point2D_I32 i : initial )
+				if( UtilPoint2D_I32.distance(x,y,i.x,i.y) < tolerance )  {
+					matched = true;
+					break;
+				}
+			if( !matched )
 				iter.remove();
 		}
 	}
