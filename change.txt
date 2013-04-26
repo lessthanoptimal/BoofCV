@@ -15,6 +15,8 @@ Version : Alpha 0.15
 - Cleaned up VisualOdometry and StereoVisualOdometry interfaces
 - Added DistanceHomographyPixelSq so that the fit error for normalized homography can be computed in image pixels.
 - Added MultiViewOps.decomposeHomography().
+- Added support for chessboard calibration targets which are not symmetric
+  * Requested by Karim Hammoudi
 
 ---------------------------------------------
 Date    : 2013/04/15

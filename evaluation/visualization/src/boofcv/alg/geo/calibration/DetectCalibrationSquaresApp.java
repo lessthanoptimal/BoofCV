@@ -206,8 +206,8 @@ public class DetectCalibrationSquaresApp
 
 		g2.setColor(Color.BLUE);
 		g2.setStroke(new BasicStroke(2.0f));
-		g2.drawLine((int)c0.x,(int)c0.y,(int)c1.x,(int)c1.y);
-		g2.drawLine((int)c1.x,(int)c1.y,(int)c2.x,(int)c2.y);
+		g2.drawLine((int) c0.x, (int) c0.y, (int) c1.x, (int) c1.y);
+		g2.drawLine((int) c1.x, (int) c1.y, (int) c2.x, (int) c2.y);
 		g2.drawLine((int)c2.x,(int)c2.y,(int)c3.x,(int)c3.y);
 		g2.drawLine((int)c3.x,(int)c3.y,(int)c0.x,(int)c0.y);
 	}
