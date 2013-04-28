@@ -20,16 +20,15 @@ package boofcv.io.wrapper.images;
 
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.io.image.SimpleImageSequence;
+import boofcv.io.image.UtilImageIO;
 import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageSingleBand;
 
-import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FilenameFilter;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -127,52 +126,51 @@ public class LoadFileImageSequence<T extends ImageSingleBand> implements SimpleI
 	 * @return A BufferedImage containing the next image.
 	 */
 	public T next() {
-		try {
-			if( loop ) {
-				if( forwards ) {
-					if( index >= fileNames.size() ) {
-						index = fileNames.size()-1;
-						forwards = false;
-					}
-				} else {
-					if( index < 0 ) {
-						index = 0;
-						forwards = true;
-					}
+		if( loop ) {
+			if( forwards ) {
+				if( index >= fileNames.size() ) {
+					index = fileNames.size()-1;
+					forwards = false;
+				}
+			} else {
+				if( index < 0 ) {
+					index = 0;
+					forwards = true;
 				}
 			}
-			if( forwards )
-				imageGUI = ImageIO.read(new File(fileNames.get(index++)));
-			else
-				imageGUI = ImageIO.read(new File(fileNames.get(index--)));
+		}
 
-			image = type.createImage(imageGUI.getWidth(),imageGUI.getHeight(),3);
-			ConvertBufferedImage.convertFrom(imageGUI, image);
+		if( forwards )
+			imageGUI = UtilImageIO.loadImage(fileNames.get(index++));
+		else
+			imageGUI = UtilImageIO.loadImage(fileNames.get(index--));
 
-			// no changes needed so return the original
-			if (scalefactor == 1)
-				return image;
+		if( imageGUI == null )
+			return null;
 
-			// scale down the image
-			int width = image.getWidth() / scalefactor;
-			int height = image.getHeight() / scalefactor;
+		image = type.createImage(imageGUI.getWidth(),imageGUI.getHeight(),3);
+		ConvertBufferedImage.convertFrom(imageGUI, image);
 
-			if (scaled == null || scaled.getWidth() != width || scaled.getHeight() != height) {
-				scaled = new BufferedImage(width, height, imageGUI.getType());
-			}
-			Graphics2D g2 = scaled.createGraphics();
-
-			AffineTransform affine = new AffineTransform();
-			affine.setToScale(1.0 / scalefactor, 1.0 / scalefactor);
-
-			g2.drawImage(imageGUI, affine, null);
-			imageGUI = scaled;
-
+		// no changes needed so return the original
+		if (scalefactor == 1)
 			return image;
 
-		} catch (IOException e) {
-			throw new RuntimeException(e);
+		// scale down the image
+		int width = image.getWidth() / scalefactor;
+		int height = image.getHeight() / scalefactor;
+
+		if (scaled == null || scaled.getWidth() != width || scaled.getHeight() != height) {
+			scaled = new BufferedImage(width, height, imageGUI.getType());
 		}
+		Graphics2D g2 = scaled.createGraphics();
+
+		AffineTransform affine = new AffineTransform();
+		affine.setToScale(1.0 / scalefactor, 1.0 / scalefactor);
+
+		g2.drawImage(imageGUI, affine, null);
+		imageGUI = scaled;
+
+		return image;
 	}
 
 	@Override

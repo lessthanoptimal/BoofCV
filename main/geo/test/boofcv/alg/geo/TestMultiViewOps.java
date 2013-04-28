@@ -38,8 +38,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * @author Peter Abeles
@@ -302,6 +301,21 @@ public class TestMultiViewOps {
 
 		assertEquals(p2.x,found.x,1e-8);
 		assertEquals(p2.y,found.y,1e-8);
+	}
+
+	@Test
+	public void homographyStereo3Pts() {
+		fail("Implement");
+	}
+
+	@Test
+	public void homographyStereoLinePt() {
+		fail("Implement");
+	}
+
+	@Test
+	public void homographyStereo2Lines() {
+		fail("Implement");
 	}
 
 	/**
