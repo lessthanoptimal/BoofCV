@@ -17,6 +17,11 @@ Version : Alpha 0.15
 - Added MultiViewOps.decomposeHomography().
 - Added support for chessboard calibration targets which are not symmetric
   * Requested by Karim Hammoudi
+- Added PairLineNorm for sets of line correspondences between two lines
+- Added algorithms for computing induced homographies from planes
+  * Three points
+  * Line and a point
+  * Two lines
 
 ---------------------------------------------
 Date    : 2013/04/15

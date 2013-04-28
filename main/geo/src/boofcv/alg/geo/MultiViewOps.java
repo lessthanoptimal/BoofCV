@@ -18,8 +18,13 @@
 
 package boofcv.alg.geo;
 
+import boofcv.alg.geo.h.HomographyInducedStereo2Line;
+import boofcv.alg.geo.h.HomographyInducedStereo3Pts;
+import boofcv.alg.geo.h.HomographyInducedStereoLinePt;
 import boofcv.alg.geo.trifocal.TrifocalExtractEpipoles;
 import boofcv.struct.Tuple2;
+import boofcv.struct.geo.AssociatedPair;
+import boofcv.struct.geo.PairLineNorm;
 import boofcv.struct.geo.TrifocalTensor;
 import georegression.geometry.GeometryMath_F64;
 import georegression.struct.line.LineGeneral2D_F64;
@@ -417,6 +422,66 @@ public class MultiViewOps {
 //		}
 
 		return output;
+	}
+
+	/**
+	 * Computes the homography induced from a planar surface when viewed from two views using correspondences
+	 * of three points. Observations must be on the planar surface.
+	 *
+	 * @see boofcv.alg.geo.h.HomographyInducedStereo3Pts
+	 *
+	 * @param F Fundamental matrix
+	 * @param p1 Associated point observation
+	 * @param p2 Associated point observation
+	 * @param p3 Associated point observation
+	 * @return The homography from view 1 to view 2 or null if it fails
+	 */
+	public static DenseMatrix64F homographyStereo3Pts( DenseMatrix64F F , AssociatedPair p1, AssociatedPair p2, AssociatedPair p3) {
+		HomographyInducedStereo3Pts alg = new HomographyInducedStereo3Pts();
+
+		alg.setFundamental(F,null);
+		if( !alg.process(p1,p2,p3) )
+			return null;
+		return alg.getHomography();
+	}
+
+	/**
+	 * Computes the homography induced from a planar surface when viewed from two views using correspondences
+	 * of a line and a point. Observations must be on the planar surface.
+	 *
+	 * @see HomographyInducedStereoLinePt
+	 *
+	 * @param F Fundamental matrix
+	 * @param line Line on the plane
+	 * @param point Point on the plane
+	 * @return The homography from view 1 to view 2 or null if it fails
+	 */
+	public static DenseMatrix64F homographyStereoLinePt( DenseMatrix64F F , PairLineNorm line, AssociatedPair point) {
+		HomographyInducedStereoLinePt alg = new HomographyInducedStereoLinePt();
+
+		alg.setFundamental(F,null);
+		alg.process(line,point);
+		return alg.getHomography();
+	}
+
+	/**
+	 * Computes the homography induced from a planar surface when viewed from two views using correspondences
+	 * of two lines. Observations must be on the planar surface.
+	 *
+	 * @see HomographyInducedStereo2Line
+	 *
+	 * @param F Fundamental matrix
+	 * @param line0 Line on the plane
+	 * @param line1 Line on the plane
+	 * @return The homography from view 1 to view 2 or null if it fails
+	 */
+	public static DenseMatrix64F homographyStereo2Lines( DenseMatrix64F F , PairLineNorm line0, PairLineNorm line1) {
+		HomographyInducedStereo2Line alg = new HomographyInducedStereo2Line();
+
+		alg.setFundamental(F,null);
+		if( !alg.process(line0,line1) )
+			return null;
+		return alg.getHomography();
 	}
 
 	/**
