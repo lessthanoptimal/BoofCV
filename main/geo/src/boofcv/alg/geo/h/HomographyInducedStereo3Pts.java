@@ -23,6 +23,7 @@ import boofcv.struct.geo.AssociatedPair;
 import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
+import org.ejml.alg.dense.linsol.LinearSolverSafe;
 import org.ejml.data.DenseMatrix64F;
 import org.ejml.factory.LinearSolver;
 import org.ejml.factory.LinearSolverFactory;
@@ -65,9 +66,18 @@ public class HomographyInducedStereo3Pts {
 	private Point3D_F64 t0 = new Point3D_F64();
 	private Point3D_F64 t1 = new Point3D_F64();
 
-	private LinearSolver<DenseMatrix64F> solver = LinearSolverFactory.linear(3);
+	private LinearSolver<DenseMatrix64F> solver;
 
-	/**
+	// pick a reasonable scale and sign
+	private AdjustHomographyMatrix adjust = new AdjustHomographyMatrix();
+
+	public HomographyInducedStereo3Pts()
+	{
+		// ensure that the inputs are not modified
+		solver = new LinearSolverSafe<DenseMatrix64F>(LinearSolverFactory.linear(3));
+	}
+
+   /**
 	 * Specify the fundamental matrix and the camera 2 epipole.
 	 *
 	 * @param F Fundamental matrix.
@@ -110,6 +120,9 @@ public class HomographyInducedStereo3Pts {
 		GeometryMath_F64.toTuple3D(temp1, A_inv_b);
 
 		GeometryMath_F64.addOuterProd(A, -1, e2, A_inv_b, H);
+
+		// pick a good scale and sign for H
+		adjust.adjust(H, p1);
 
 		return true;
 	}
