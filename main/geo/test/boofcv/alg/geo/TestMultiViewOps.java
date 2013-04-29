@@ -18,7 +18,9 @@
 
 package boofcv.alg.geo;
 
+import boofcv.alg.geo.h.CommonHomographyInducedPlane;
 import boofcv.struct.Tuple2;
+import boofcv.struct.geo.PairLineNorm;
 import boofcv.struct.geo.TrifocalTensor;
 import georegression.geometry.GeometryMath_F64;
 import georegression.geometry.RotationMatrixGenerator;
@@ -38,7 +40,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Peter Abeles
@@ -305,17 +308,34 @@ public class TestMultiViewOps {
 
 	@Test
 	public void homographyStereo3Pts() {
-		fail("Implement");
+		CommonHomographyInducedPlane common = new CommonHomographyInducedPlane();
+
+		DenseMatrix64F H = MultiViewOps.homographyStereo3Pts(common.F, common.p1, common.p2, common.p3);
+
+		common.checkHomography(H);
 	}
 
 	@Test
 	public void homographyStereoLinePt() {
-		fail("Implement");
+		CommonHomographyInducedPlane common = new CommonHomographyInducedPlane();
+
+		PairLineNorm l1 = CommonHomographyInducedPlane.convert(common.p1,common.p2);
+
+		DenseMatrix64F H = MultiViewOps.homographyStereoLinePt(common.F, l1, common.p3);
+
+		common.checkHomography(H);
 	}
 
 	@Test
 	public void homographyStereo2Lines() {
-		fail("Implement");
+		CommonHomographyInducedPlane common = new CommonHomographyInducedPlane();
+
+		PairLineNorm l1 = CommonHomographyInducedPlane.convert(common.p1,common.p2);
+		PairLineNorm l2 = CommonHomographyInducedPlane.convert(common.p1,common.p3);
+
+		DenseMatrix64F H = MultiViewOps.homographyStereo2Lines(common.F,l1,l2);
+
+		common.checkHomography(H);
 	}
 
 	/**

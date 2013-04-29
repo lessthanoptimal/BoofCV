@@ -749,8 +749,8 @@ public class MultiViewOps {
 	 * </p>
 	 *
 	 * @param F Input: Fundamental or Essential 3x3 matrix.  Not modified.
-	 * @param e1 Output: Right epipole in homogeneous coordinates, Modified.
-	 * @param e2 Output: Left epipole in homogeneous coordinates, Modified.
+	 * @param e1 Output: Right epipole in homogeneous coordinates. Can be null. Modified.
+	 * @param e2 Output: Left epipole in homogeneous coordinates. Can be null. Modified.
 	 */
 	public static void extractEpipoles( DenseMatrix64F F , Point3D_F64 e1 , Point3D_F64 e2 ) {
 		SimpleMatrix f = SimpleMatrix.wrap(F);
@@ -759,8 +759,10 @@ public class MultiViewOps {
 		SimpleMatrix U = svd.getU();
 		SimpleMatrix V = svd.getV();
 
-		e2.set(U.get(0,2),U.get(1,2),U.get(2,2));
-		e1.set(V.get(0,2),V.get(1,2),V.get(2,2));
+		if( e2 != null )
+			e2.set(U.get(0,2),U.get(1,2),U.get(2,2));
+		if( e1 != null )
+			e1.set(V.get(0,2),V.get(1,2),V.get(2,2));
 	}
 
 	/**

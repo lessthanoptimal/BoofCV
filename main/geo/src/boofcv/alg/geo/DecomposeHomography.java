@@ -21,6 +21,7 @@ package boofcv.alg.geo;
 import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
+import org.ejml.alg.dense.decomposition.svd.SafeSvd;
 import org.ejml.data.DenseMatrix64F;
 import org.ejml.factory.DecompositionFactory;
 import org.ejml.factory.SingularValueDecomposition;
@@ -63,9 +64,6 @@ public class DecomposeHomography {
 	// normal of the plane
 	List<Vector3D_F64> solutionsN = new ArrayList<Vector3D_F64>();
 
-	// working copy of input matrix
-	DenseMatrix64F H_copy = new DenseMatrix64F(3,3);
-
 	// used for internal house keeping during decomposition
 	Vector3D_F64 u1 = new Vector3D_F64();
 	Vector3D_F64 u2 = new Vector3D_F64();
@@ -86,6 +84,9 @@ public class DecomposeHomography {
 			solutionsN.add( new Vector3D_F64() );
 			solutionsSE.add( new Se3_F64() );
 		}
+
+		// insure that the inputs are not modified
+		svd = new SafeSvd(DecompositionFactory.svd(3, 3, false, true, false));
 	}
 
 	/**
@@ -96,14 +97,8 @@ public class DecomposeHomography {
 	 * @param H Homography matrix.  Not modified.
 	 */
 	public void decompose( DenseMatrix64F H ) {
-		if( svd.inputModified() ) {
-			H_copy.set(H);
-			if( !svd.decompose(H_copy) )
-				throw new RuntimeException("SVD failed somehow");
-		} else {
-			if( !svd.decompose(H) )
-				throw new RuntimeException("SVD failed somehow");
-		}
+		if( !svd.decompose(H) )
+			throw new RuntimeException("SVD failed somehow");
 
 		DenseMatrix64F V = svd.getV(null,false);
 		DenseMatrix64F S = svd.getW(null);

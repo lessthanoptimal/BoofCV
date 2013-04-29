@@ -65,6 +65,9 @@ public class HomographyInducedStereo2Line {
 	// The found homography from view 1 to view 2
 	private DenseMatrix64F H = new DenseMatrix64F(3,3);
 
+	// pick a reasonable scale and sign
+	private AdjustHomographyMatrix adjust = new AdjustHomographyMatrix();
+
 	// storage for intermediate results
 	private Point3D_F64 Al0 = new Point3D_F64();
 	private Point3D_F64 Al1 = new Point3D_F64();
@@ -143,12 +146,14 @@ public class HomographyInducedStereo2Line {
 		// convert this plane description into general format
 		UtilPlane3D_F64.convert(pi,pi_gen);
 
-		// TODO Should be divided by -D.  Not sure why this works and the other doesn't
 		v.set(pi_gen.A/pi_gen.D,pi_gen.B/pi_gen.D,pi_gen.C/pi_gen.D);
 
 		// H = A - e2*v^T
 		GeometryMath_F64.outerProd(e2,v,av);
 		CommonOps.sub(A,av,H);
+
+		// pick a good scale and sign for H
+		adjust.adjust(H, line0);
 
 		return true;
 	}

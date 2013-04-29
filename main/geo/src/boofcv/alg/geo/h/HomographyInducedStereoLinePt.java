@@ -53,10 +53,13 @@ public class HomographyInducedStereoLinePt {
 	// Fundamental matrix
 	private DenseMatrix64F F;
 	// Epipole in camera 2
-	private Point3D_F64 e2;
+	private Point3D_F64 e2 = new Point3D_F64();
 
 	// The found homography from view 1 to view 2
 	private DenseMatrix64F H = new DenseMatrix64F(3,3);
+
+	// pick a reasonable scale and sign
+	private AdjustHomographyMatrix adjust = new AdjustHomographyMatrix();
 
 	// storage for intermediate results
 	private DenseMatrix64F el = new DenseMatrix64F(3,3);
@@ -76,9 +79,9 @@ public class HomographyInducedStereoLinePt {
 	public void setFundamental( DenseMatrix64F F , Point3D_F64 e2 ) {
 		this.F = F;
 		if( e2 != null )
-			this.e2 = e2;
+			this.e2.set(e2);
 		else {
-			MultiViewOps.extractEpipoles(F, new Point3D_F64(), e2);
+			MultiViewOps.extractEpipoles(F,new Point3D_F64(),this.e2);
 		}
 	}
 
@@ -106,6 +109,9 @@ public class HomographyInducedStereoLinePt {
 		GeometryMath_F64.multCrossA(line.l2, F, lf);
 
 		CommonOps.add(lf,top/bottom,el,H);
+
+		// pick a good scale and sign for H
+		adjust.adjust(H, point);
 	}
 
 	public DenseMatrix64F getHomography() {
