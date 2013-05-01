@@ -81,7 +81,8 @@ public class UtilImageIO {
 				type = "jpg";
 			}
 
-			ImageIO.write(img, type, new File(fileName));
+			if( !ImageIO.write(img, type, new File(fileName)) )
+				throw new IllegalArgumentException("No writter appropriate found");
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}

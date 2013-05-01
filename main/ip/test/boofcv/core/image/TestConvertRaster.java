@@ -24,6 +24,7 @@ import boofcv.testing.BoofTesting;
 import org.junit.Test;
 import sun.awt.image.ByteInterleavedRaster;
 import sun.awt.image.IntegerInterleavedRaster;
+import sun.awt.image.ShortInterleavedRaster;
 
 import java.awt.image.BufferedImage;
 import java.awt.image.Raster;
@@ -44,7 +45,7 @@ public class TestConvertRaster {
 	int imgWidth = 10;
 	int imgHeight = 20;
 
-	int numMethods = 27;
+	int numMethods = 30;
 
 	/**
 	 * Use reflections to test all the functions.
@@ -59,7 +60,7 @@ public class TestConvertRaster {
 			if (!isTestMethod(m))
 				continue;
 
-			System.out.println("Examining: " + m.getName());
+//			System.out.println("Examining: " + m.getName());
 			if (m.getName().contains("bufferedTo"))
 				testBufferedTo(m);
 			else if (m.getName().contains("ToBuffered"))
@@ -102,6 +103,21 @@ public class TestConvertRaster {
 		ImageFloat32 outF = new ImageFloat32(5, 5);
 		ConvertRaster.bufferedToGray(img, outF);
 		assertEquals(101, outF.get(0, 0), 1e-4);
+	}
+
+	/**
+	 * There isn't an RGB bug check here since RGB values make no sense with 16bit bands,  Just
+	 * checks to see if the unsigned short value is preserved
+	 */
+	@Test
+	public void checkGray_To_U16() {
+		BufferedImage img = new BufferedImage(5, 5, BufferedImage.TYPE_USHORT_GRAY);
+
+		img.getRaster().getDataBuffer().setElem(0, 2005);
+
+		ImageUInt16 out = new ImageUInt16(5, 5);
+		ConvertRaster.bufferedToGray(img, out);
+		assertEquals(2005, out.get(0, 0));
 	}
 
 	private boolean isTestMethod(Method m) {
@@ -171,6 +187,8 @@ public class TestConvertRaster {
 					createByteBuff(imgWidth, imgHeight, 1, rand)};
 		} else if (paramType == IntegerInterleavedRaster.class) {
 			input = new BufferedImage[]{createIntBuff(imgWidth, imgHeight, rand)};
+		} else if( paramType == ShortInterleavedRaster.class ) {
+			input = new BufferedImage[]{createShortBuff(imgWidth, imgHeight, rand)};
 		} else if (paramType == BufferedImage.class) {
 			// just pick an arbitrary image type here
 			input = new BufferedImage[]{createIntBuff(imgWidth, imgHeight, rand)};
@@ -253,6 +271,12 @@ public class TestConvertRaster {
 
 	public static BufferedImage createIntBuff(int width, int height, Random rand) {
 		BufferedImage ret = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+		randomize(ret, rand);
+		return ret;
+	}
+
+	public static BufferedImage createShortBuff(int width, int height, Random rand) {
+		BufferedImage ret = new BufferedImage(width, height, BufferedImage.TYPE_USHORT_GRAY);
 		randomize(ret, rand);
 		return ret;
 	}

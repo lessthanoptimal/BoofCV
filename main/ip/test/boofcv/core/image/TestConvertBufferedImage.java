@@ -170,7 +170,7 @@ public class TestConvertBufferedImage {
 	public void convertFromSingle() {
 		BufferedImage origImg;
 
-		for( int i = 0; i < 4; i++ ) {
+		for( int i = 0; i < 5; i++ ) {
 
 			if( i == 0 )
 				origImg = TestConvertRaster.createByteBuff(imgWidth, imgHeight, 1, rand);
@@ -198,6 +198,30 @@ public class TestConvertBufferedImage {
 				assertEquals(origImg.getHeight(), imgF32.height);
 				BoofTesting.checkEquals(origImg, imgF32, 1);
 			}
+		}
+	}
+
+	/**
+	 * Not all types support conversion into 16 bit images, so the special case of 16bit image are handled here
+	 */
+	@Test
+	public void convertFromSingle_I16() {
+		BufferedImage origImg = TestConvertRaster.createShortBuff(imgWidth, imgHeight, rand);
+
+		for( int j = 0; j < 2; j++ ) {
+			if( j == 1 ) {
+				origImg = origImg.getSubimage(1,2,imgWidth-1,imgHeight-2);
+			}
+
+			ImageUInt16 imgU16 = ConvertBufferedImage.convertFromSingle(origImg, null, ImageUInt16.class);
+			assertEquals(origImg.getWidth(), imgU16.width);
+			assertEquals(origImg.getHeight(), imgU16.height);
+			BoofTesting.checkEquals(origImg, imgU16, 1);
+
+			ImageSInt16 imgS16 = ConvertBufferedImage.convertFromSingle(origImg, null, ImageSInt16.class);
+			assertEquals(origImg.getWidth(), imgS16.width);
+			assertEquals(origImg.getHeight(), imgS16.height);
+			BoofTesting.checkEquals(origImg, imgS16, 1);
 		}
 	}
 
@@ -240,7 +264,7 @@ public class TestConvertBufferedImage {
 	 */
 	@Test
 	public void convertTo_single_ms() {
-		Class[] types = new Class[]{ImageUInt8.class, ImageFloat32.class};
+		Class[] types = new Class[]{ImageUInt8.class, ImageUInt16.class, ImageFloat32.class};
 
 		for (Class t : types) {
 			for (int i = 0; i < 2; i++) {
@@ -248,6 +272,8 @@ public class TestConvertBufferedImage {
 				if (i == 0) {
 					image = GeneralizedImageOps.createSingleBand(t, imgWidth, imgHeight);
 				} else {
+					if( t == ImageUInt16.class )
+						continue; // convert into 16bit gray scale buffered images isn't supported yet
 					image = new MultiSpectral(t, imgWidth, imgHeight, 3);
 				}
 				GImageMiscOps.fillUniform(image, rand, 0, 100);

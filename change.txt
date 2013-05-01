@@ -9,6 +9,7 @@ Version : Alpha 0.15
 - Improved automatic thresholding for calibration grids
 - Fixed bug in Zhang99 calibration where skew was not being copied
 - Added support for OpenKinect in integration
+  * Added related example code and applications demonstrating how to process its data
 - Can read/write PPM images
 - Added DepthVisualOdometry for computing visual odometry from a Kinect
   * Added several related classes and interfaces too
@@ -17,6 +18,8 @@ Version : Alpha 0.15
 - Added MultiViewOps.decomposeHomography().
 - Added support for chessboard calibration targets which are not symmetric
   * Requested by Karim Hammoudi
+- Added more support for convert to/from 16bit BufferedImages
+- Added DoNothingPixelTransform_F32 for those times when you don't want to do anything
 
 ---------------------------------------------
 Date    : 2013/04/15
