@@ -20,6 +20,11 @@ Version : Alpha 0.15
   * Requested by Karim Hammoudi
 - Added more support for convert to/from 16bit BufferedImages
 - Added DoNothingPixelTransform_F32 for those times when you don't want to do anything
+- Added PairLineNorm for sets of line correspondences between two lines
+- Added algorithms for computing induced homographies from planes
+  * Three points
+  * Line and a point
+  * Two lines
 
 ---------------------------------------------
 Date    : 2013/04/15
