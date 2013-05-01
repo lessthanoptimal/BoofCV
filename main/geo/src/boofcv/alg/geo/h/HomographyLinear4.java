@@ -21,17 +21,14 @@ package boofcv.alg.geo.h;
 
 import boofcv.alg.geo.LowLevelMultiViewOps;
 import boofcv.struct.geo.AssociatedPair;
-import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Point2D_F64;
 import org.ejml.data.DenseMatrix64F;
 import org.ejml.factory.DecompositionFactory;
 import org.ejml.factory.SingularValueDecomposition;
-import org.ejml.ops.CommonOps;
 import org.ejml.ops.SingularOps;
 import org.ejml.ops.SpecializedOps;
 import org.ejml.simple.SimpleMatrix;
 
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -63,6 +60,9 @@ public class HomographyLinear4 {
 	// matrix used to normalize results
 	protected DenseMatrix64F N1 = new DenseMatrix64F(3,3);
 	protected DenseMatrix64F N2 = new DenseMatrix64F(3,3);
+
+	// pick a reasonable scale and sign
+	private AdjustHomographyMatrix adjust = new AdjustHomographyMatrix();
 
 	// normalize image coordinates to avoid numerical errors?
 	boolean normalize;
@@ -107,12 +107,8 @@ public class HomographyLinear4 {
 		if( normalize )
 			undoNormalizationH(foundH,N1,N2);
 
-		// correctly scale the matrix
-		if( !findScaleH(foundH) )
-			return false;
-
-		// ensure that positive results are returned for points in front of the camera
-		adjustHomographSign(points.get(0),foundH);
+		// pick a good scale and sign for H
+		adjust.adjust(foundH,points.get(0));
 
 		return true;
 	}
@@ -148,34 +144,6 @@ public class HomographyLinear4 {
 		SimpleMatrix result = c.invert().mult(a).mult(b);
 
 		M.set(result.getMatrix());
-	}
-
-	/**
-	 * The scale of H is found by computing the second smallest singular value.
-	 */
-	protected boolean findScaleH( DenseMatrix64F H ) {
-		if( !svd.decompose(H) )
-			return false;
-
-		Arrays.sort(svd.getSingularValues(),0,3);
-
-		double scale = svd.getSingularValues()[1];
-		CommonOps.divide(scale,H);
-
-		return true;
-	}
-
-	/**
-	 * Since the sign of the homography is ambiguous a point is required to make sure the correct
-	 * one was selected.
-	 *
-	 * @param p test point, used to determine the sign of the matrix.
-	 */
-	protected void adjustHomographSign( AssociatedPair p , DenseMatrix64F H ) {
-		double val = GeometryMath_F64.innerProd(p.p2,H,p.p1);
-
-		if( val < 0 )
-			CommonOps.scale(-1, H);
 	}
 
 	/**
