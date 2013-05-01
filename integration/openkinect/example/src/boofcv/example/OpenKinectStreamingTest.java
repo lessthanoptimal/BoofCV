@@ -16,12 +16,13 @@
  * limitations under the License.
  */
 
-package boofcv.openkinect;
+package boofcv.example;
 
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.gui.image.VisualizeImageData;
+import boofcv.openkinect.UtilOpenKinect;
 import boofcv.struct.image.ImageUInt16;
 import boofcv.struct.image.ImageUInt8;
 import boofcv.struct.image.MultiSpectral;
@@ -95,7 +96,7 @@ public class OpenKinectStreamingTest {
 			guiDepth = ShowImages.showWindow(outDepth,"Depth Image");
 		}
 
-		UtilOpenKinect.bufferDepthToU16(frame,depth);
+		UtilOpenKinect.bufferDepthToU16(frame, depth);
 
 		VisualizeImageData.grayUnsigned(depth,outDepth,1000);
 		guiDepth.repaint();

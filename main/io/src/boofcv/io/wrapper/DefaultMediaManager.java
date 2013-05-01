@@ -24,7 +24,9 @@ import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.image.UtilImageIO;
 import boofcv.io.video.VideoMjpegCodec;
 import boofcv.io.wrapper.images.JpegByteImageSequence;
-import boofcv.struct.image.*;
+import boofcv.io.wrapper.images.MpngStreamSequence;
+import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageDataType;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -84,6 +86,12 @@ public class DefaultMediaManager implements MediaManager {
 				VideoMjpegCodec codec = new VideoMjpegCodec();
 				List<byte[]> data = codec.read(new FileInputStream(fileName));
 				return new JpegByteImageSequence<T>(type,data,false);
+			} catch (FileNotFoundException e) {
+				throw new RuntimeException(e);
+			}
+		} else if( fileName.endsWith("mpng") || fileName.endsWith("MPNG")) {
+			try {
+				return new MpngStreamSequence<T>(fileName,type);
 			} catch (FileNotFoundException e) {
 				throw new RuntimeException(e);
 			}

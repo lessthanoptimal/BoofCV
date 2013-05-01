@@ -19,11 +19,12 @@
 package boofcv.core.image;
 
 import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSInt16;
+import boofcv.struct.image.ImageInt16;
 import boofcv.struct.image.ImageUInt8;
 import boofcv.struct.image.MultiSpectral;
 import sun.awt.image.ByteInterleavedRaster;
 import sun.awt.image.IntegerInterleavedRaster;
+import sun.awt.image.ShortInterleavedRaster;
 
 import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
@@ -98,6 +99,36 @@ public class ConvertRaster {
 			}
 		} else {
 			throw new RuntimeException("Write more code here.");
+		}
+	}
+
+	/**
+	 * A faster convert that works directly with a specific raster
+	 */
+	public static void bufferedToGray(ShortInterleavedRaster src, ImageInt16 dst) {
+		short[] srcData = src.getDataStorage();
+
+		int numBands = src.getNumBands();
+
+		int size = dst.getWidth() * dst.getHeight();
+
+		int srcStride = src.getScanlineStride();
+		int srcOffset = src.getDataOffset(0)-src.getPixelStride()+1;
+		int srcStrideDiff = srcStride-src.getPixelStride()*dst.width;
+
+		if (numBands == 1) {
+			if (dst.startIndex == 0 && dst.width == dst.stride && srcStrideDiff == 0 && srcOffset == 0 )
+				System.arraycopy(srcData, 0, dst.data, 0, size);
+			else {
+				for (int y = 0; y < dst.height; y++) {
+					int indexDst = dst.startIndex + dst.stride * y;
+					int indexSrc = srcOffset + srcStride * y;
+
+					System.arraycopy(srcData, indexSrc, dst.data, indexDst, dst.width);
+				}
+			}
+		} else {
+			throw new RuntimeException("Only single band images are currently support for 16bit");
 		}
 	}
 
@@ -457,6 +488,53 @@ public class ConvertRaster {
 
 	/**
 	 * <p>
+	 * Converts a buffered image into an 16bit intensity image using the
+	 * BufferedImage's RGB interface.
+	 * </p>
+	 * <p>
+	 * This is much slower than working
+	 * directly with the BufferedImage's internal raster and should be
+	 * avoided if possible.
+	 * </p>
+	 *
+	 * @param src Input image.
+	 * @param dst Output image.
+	 */
+	public static void bufferedToGray(BufferedImage src, ImageInt16 dst) {
+		final int width = src.getWidth();
+		final int height = src.getHeight();
+
+		short[] data = dst.data;
+
+		if (src.getType() == BufferedImage.TYPE_BYTE_GRAY || src.getType() == BufferedImage.TYPE_USHORT_GRAY ) {
+			// If the buffered image is a gray scale image there is a bug where getRGB distorts
+			// the image.  See Bug ID: 5051418 , it has been around since 2004. Fuckers...
+			WritableRaster raster = src.getRaster();
+			int hack[] = new int[1];
+
+			for (int y = 0; y < height; y++) {
+				int index = dst.startIndex + y * dst.stride;
+				for (int x = 0; x < width; x++) {
+					raster.getPixel(x, y, hack);
+
+					data[index++] = (short) hack[0];
+				}
+			}
+		} else {
+			// this will be totally garbage.  just here so that some unit test will pass
+			for (int y = 0; y < height; y++) {
+				int index = dst.startIndex + y * dst.stride;
+				for (int x = 0; x < width; x++) {
+					int argb = src.getRGB(x, y);
+
+					data[index++] = (short) ((((argb >>> 16) & 0xFF) + ((argb >>> 8) & 0xFF) + (argb & 0xFF)) / 3);
+				}
+			}
+		}
+	}
+
+	/**
+	 * <p>
 	 * Converts a buffered image into an 8bit intensity image using the
 	 * BufferedImage's RGB interface.
 	 * </p>
@@ -642,7 +720,7 @@ public class ConvertRaster {
 		}
 	}
 
-	public static void grayToBuffered(ImageSInt16 src, ByteInterleavedRaster dst) {
+	public static void grayToBuffered(ImageInt16 src, ByteInterleavedRaster dst) {
 
 		final short[] srcData = src.data;
 		final byte[] dstData = dst.getDataStorage();
@@ -732,6 +810,57 @@ public class ConvertRaster {
 
 				for (; indexSrc < indexSrcEnd; indexSrc++) {
 					byte val = (byte) srcData[indexSrc];
+
+					indexDst++;
+					dstData[indexDst++] = val;
+					dstData[indexDst++] = val;
+					dstData[indexDst++] = val;
+				}
+			}
+		} else {
+			throw new RuntimeException("Code more here");
+		}
+	}
+
+	public static void grayToBuffered(ImageInt16 src, ShortInterleavedRaster dst) {
+
+		final short[] srcData = src.data;
+		final short[] dstData = dst.getDataStorage();
+
+		final int numBands = dst.getNumBands();
+
+		if (numBands == 3) {
+			int indexDst = 0;
+			for (int y = 0; y < src.height; y++) {
+				int indexSrc = src.startIndex + src.stride * y;
+				int indexSrcEnd = indexSrc + src.width;
+
+				for (; indexSrc < indexSrcEnd; indexSrc++) {
+					short val = srcData[indexSrc];
+
+					dstData[indexDst++] = val;
+					dstData[indexDst++] = val;
+					dstData[indexDst++] = val;
+				}
+			}
+		} else if (numBands == 1) {
+			int indexDst = 0;
+			for (int y = 0; y < src.height; y++) {
+				int indexSrc = src.startIndex + src.stride * y;
+				int indexSrcEnd = indexSrc + src.width;
+
+				for (; indexSrc < indexSrcEnd; indexSrc++) {
+					dstData[indexDst++] = srcData[indexSrc];
+				}
+			}
+		} else if (numBands == 4) {
+			int indexDst = 0;
+			for (int y = 0; y < src.height; y++) {
+				int indexSrc = src.startIndex + src.stride * y;
+				int indexSrcEnd = indexSrc + src.width;
+
+				for (; indexSrc < indexSrcEnd; indexSrc++) {
+					short val = srcData[indexSrc];
 
 					indexDst++;
 					dstData[indexDst++] = val;
@@ -855,7 +984,7 @@ public class ConvertRaster {
 		}
 	}
 
-	public static void grayToBuffered(ImageSInt16 src, IntegerInterleavedRaster dst) {
+	public static void grayToBuffered(ImageInt16 src, IntegerInterleavedRaster dst) {
 		final short[] srcData = src.data;
 		final int[] dstData = dst.getDataStorage();
 
@@ -992,7 +1121,7 @@ public class ConvertRaster {
 
 	}
 
-	public static void grayToBuffered(ImageSInt16 src, BufferedImage dst) {
+	public static void grayToBuffered(ImageInt16 src, BufferedImage dst) {
 
 		final int width = dst.getWidth();
 		final int height = dst.getHeight();

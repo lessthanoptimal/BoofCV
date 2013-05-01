@@ -21,9 +21,11 @@ package boofcv.example;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ShowImages;
+import boofcv.io.image.UtilImageIO;
 import boofcv.misc.BoofMiscOps;
 import boofcv.openkinect.StreamOpenKinectRgbDepth;
 import boofcv.openkinect.UtilOpenKinect;
+import boofcv.struct.GrowQueue_I8;
 import boofcv.struct.image.ImageUInt16;
 import boofcv.struct.image.ImageUInt8;
 import boofcv.struct.image.MultiSpectral;
@@ -60,7 +62,7 @@ public class CaptureCalibrationImagesApp implements KeyListener, StreamOpenKinec
 	BufferedImage buffRgb;
 	int frameNumber;
 
-	byte buffer[];
+	GrowQueue_I8 buffer = new GrowQueue_I8(1);
 
 	ImagePanel gui;
 
@@ -88,7 +90,6 @@ public class CaptureCalibrationImagesApp implements KeyListener, StreamOpenKinec
 		int h = UtilOpenKinect.getHeight(resolution);
 
 		buffRgb = new BufferedImage(w,h,BufferedImage.TYPE_INT_RGB);
-		buffer = new byte[w*h*3];
 
 		savedRgb = new MultiSpectral<ImageUInt8>(ImageUInt8.class,w,h,3);
 		savedDepth = new ImageUInt16(w,h);
@@ -119,7 +120,7 @@ public class CaptureCalibrationImagesApp implements KeyListener, StreamOpenKinec
 				while( true ) {
 					if( savedImages && userChoice != -1 ) {
 						if( userChoice == 1 ) {
-							UtilOpenKinect.savePPM(savedRgb, String.format(directory + "rgb%07d.ppm", frameNumber), buffer);
+							UtilImageIO.savePPM(savedRgb, String.format(directory + "rgb%07d.ppm", frameNumber), buffer);
 							UtilOpenKinect.saveDepth(savedDepth, String.format(directory + "depth%07d.depth", frameNumber), buffer);
 							frameNumber++;
 							text = "Image Saved!";

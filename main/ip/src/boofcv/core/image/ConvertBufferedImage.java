@@ -21,6 +21,7 @@ package boofcv.core.image;
 import boofcv.struct.image.*;
 import sun.awt.image.ByteInterleavedRaster;
 import sun.awt.image.IntegerInterleavedRaster;
+import sun.awt.image.ShortInterleavedRaster;
 
 import javax.swing.*;
 import java.awt.*;
@@ -208,6 +209,8 @@ public class ConvertBufferedImage {
 	public static <T extends ImageSingleBand> T convertFromSingle(BufferedImage src, T dst, Class<T> type) {
 		if (type == ImageUInt8.class) {
 			return (T) convertFrom(src, (ImageUInt8) dst);
+		} else if( ImageInt16.class.isAssignableFrom(type) ) {
+			return (T) convertFrom(src, (ImageInt16) dst,(Class)type);
 		} else if (type == ImageFloat32.class) {
 			return (T) convertFrom(src, (ImageFloat32) dst);
 		} else {
@@ -245,6 +248,36 @@ public class ConvertBufferedImage {
 			// Applets don't allow access to the raster()
 			ConvertRaster.bufferedToGray(src, dst);
 		}
+
+		return dst;
+	}
+
+	/**
+	 * Converts the buffered image into an {@link boofcv.struct.image.ImageInt16}.  If the buffered image
+	 * has multiple channels the intensities of each channel are averaged together.
+	 *
+	 * @param src Input image.
+	 * @param dst Where the converted image is written to.  If null a new unsigned image is created.
+	 * @return Converted image.
+	 */
+	public static <T extends ImageInt16>T convertFrom(BufferedImage src, T dst , Class<T> type ) {
+		if (dst != null) {
+			if (src.getWidth() != dst.getWidth() || src.getHeight() != dst.getHeight()) {
+				throw new IllegalArgumentException("image dimension are different");
+			}
+		} else {
+			dst = GeneralizedImageOps.createSingleBand(type,src.getWidth(), src.getHeight());
+		}
+
+		try {
+			if (src.getRaster() instanceof ShortInterleavedRaster ) {
+				ConvertRaster.bufferedToGray((ShortInterleavedRaster) src.getRaster(), dst);
+				return dst;
+			}
+		} catch( java.security.AccessControlException e) {}
+
+		// Applets don't allow access to the raster() or the image type wasn't supported
+		ConvertRaster.bufferedToGray(src, dst);
 
 		return dst;
 	}
@@ -373,8 +406,8 @@ public class ConvertBufferedImage {
 		if( src instanceof ImageSingleBand ) {
 			if( ImageUInt8.class == src.getClass() ) {
 				return convertTo((ImageUInt8)src,dst);
-			} else if( ImageSInt16.class == src.getClass() ) {
-				return convertTo((ImageSInt16)src,dst);
+			} else if( ImageInt16.class.isInstance(src) ) {
+				return convertTo((ImageInt16)src,dst);
 			} else if( ImageFloat32.class == src.getClass() ) {
 				return convertTo((ImageFloat32)src,dst);
 			} else {
@@ -424,14 +457,14 @@ public class ConvertBufferedImage {
 	}
 
 	/**
-	 * Converts a {@link boofcv.struct.image.ImageSInt16} into a BufferedImage.  If the buffered image
+	 * Converts a {@link boofcv.struct.image.ImageInt16} into a BufferedImage.  If the buffered image
 	 * has multiple channels the intensities of each channel are averaged together.
 	 *
 	 * @param src Input image.
 	 * @param dst Where the converted image is written to.  If null a new image is created.
 	 * @return Converted image.
 	 */
-	public static BufferedImage convertTo(ImageSInt16 src, BufferedImage dst) {
+	public static BufferedImage convertTo(ImageInt16 src, BufferedImage dst) {
 		dst = checkInputs(src, dst);
 
 		try {
@@ -440,6 +473,8 @@ public class ConvertBufferedImage {
 				ConvertRaster.grayToBuffered(src, (ByteInterleavedRaster) dst.getRaster());
 			} else if (dst.getRaster() instanceof IntegerInterleavedRaster) {
 				ConvertRaster.grayToBuffered(src, (IntegerInterleavedRaster) dst.getRaster());
+			} else if( dst.getType() == BufferedImage.TYPE_USHORT_GRAY ) {
+				ConvertRaster.grayToBuffered(src, (ShortInterleavedRaster) dst.getRaster());
 			} else {
 				ConvertRaster.grayToBuffered(src, dst);
 			}

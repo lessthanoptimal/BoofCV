@@ -76,7 +76,6 @@ public abstract class DepthSparse3D<T extends ImageSingleBand> {
 	 */
 	public void configure(IntrinsicParameters paramVisual , PixelTransform_F32 visualToDepth ) {
 		this.visualToDepth = visualToDepth;
-		this.depthScale = depthScale;
 		p2n.set(paramVisual.fx,paramVisual.fy,paramVisual.skew,paramVisual.cx,paramVisual.cy,
 				paramVisual.radial);
 	}

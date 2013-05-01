@@ -220,38 +220,15 @@ public class UtilOpenKinect {
 		}
 	}
 
-	public static void savePPM( MultiSpectral<ImageUInt8> rgb , String fileName , byte[] buffer ) throws IOException {
-		File out = new File(fileName);
-		DataOutputStream os = new DataOutputStream(new FileOutputStream(out));
-
-		String header = String.format("P6\n%d %d\n255\n", rgb.width, rgb.height);
-		os.write(header.getBytes());
-
-		ImageUInt8 band0 = rgb.getBand(0);
-		ImageUInt8 band1 = rgb.getBand(1);
-		ImageUInt8 band2 = rgb.getBand(2);
-
-		int indexOut = 0;
-		for( int y = 0; y < rgb.height; y++ ) {
-			int index = rgb.startIndex + y*rgb.stride;
-			for( int x = 0; x < rgb.width; x++ , index++) {
-				buffer[indexOut++] = band0.data[index];
-				buffer[indexOut++] = band1.data[index];
-				buffer[indexOut++] = band2.data[index];
-			}
-		}
-
-		os.write(buffer,0,rgb.width*rgb.height*3);
-
-		os.close();
-	}
-
-	public static void saveDepth( ImageUInt16 depth , String fileName , byte[] buffer ) throws IOException {
+	public static void saveDepth( ImageUInt16 depth , String fileName , GrowQueue_I8 data ) throws IOException {
 		File out = new File(fileName);
 		DataOutputStream os = new DataOutputStream(new FileOutputStream(out));
 
 		String header = String.format("%d %d\n", depth.width, depth.height);
 		os.write(header.getBytes());
+
+		data.resize(depth.width*depth.height*2);
+		byte[] buffer = data.data;
 
 		int indexOut = 0;
 		for( int y = 0; y < depth.height; y++ ) {

@@ -21,9 +21,11 @@ package boofcv.example;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ShowImages;
+import boofcv.io.image.UtilImageIO;
 import boofcv.misc.BoofMiscOps;
 import boofcv.openkinect.StreamOpenKinectRgbDepth;
 import boofcv.openkinect.UtilOpenKinect;
+import boofcv.struct.GrowQueue_I8;
 import boofcv.struct.image.ImageUInt16;
 import boofcv.struct.image.ImageUInt8;
 import boofcv.struct.image.MultiSpectral;
@@ -57,7 +59,7 @@ public class LogKinectDataApp implements StreamOpenKinectRgbDepth.Listener {
 
 	DataOutputStream logFile;
 
-	byte buffer[];
+	GrowQueue_I8 buffer = new GrowQueue_I8(1);
 
 	ImagePanel gui;
 
@@ -76,8 +78,6 @@ public class LogKinectDataApp implements StreamOpenKinectRgbDepth.Listener {
 
 		buffRgb = new BufferedImage(w,h,BufferedImage.TYPE_INT_RGB);
 
-		buffer = new byte[w*h*3];
-
 		if( showImage ) {
 			gui = ShowImages.showWindow(buffRgb,"Kinect RGB");
 		}
@@ -94,6 +94,7 @@ public class LogKinectDataApp implements StreamOpenKinectRgbDepth.Listener {
 
 		if( maxImages > 0 ) {
 			while( frameNumber < maxImages ) {
+				System.out.printf("Total saved %d\n",frameNumber);
 				BoofMiscOps.pause(100);
 			}
 			stream.stop();
@@ -108,7 +109,7 @@ public class LogKinectDataApp implements StreamOpenKinectRgbDepth.Listener {
 		try {
 			logFile.write(String.format("%10d %d %d\n",frameNumber,timeRgb,timeDepth).getBytes());
 			logFile.flush();
-			UtilOpenKinect.savePPM(rgb, String.format("log/rgb%07d.ppm", frameNumber), buffer);
+			UtilImageIO.savePPM(rgb, String.format("log/rgb%07d.ppm", frameNumber), buffer);
 			UtilOpenKinect.saveDepth(depth, String.format("log/depth%07d.depth", frameNumber), buffer);
 			frameNumber++;
 
@@ -122,7 +123,7 @@ public class LogKinectDataApp implements StreamOpenKinectRgbDepth.Listener {
 	}
 
 	public static void main( String args[] ) throws IOException {
-		LogKinectDataApp app = new LogKinectDataApp(600,true);
+		LogKinectDataApp app = new LogKinectDataApp(1000000,false);
 		app.process();
 	}
 }

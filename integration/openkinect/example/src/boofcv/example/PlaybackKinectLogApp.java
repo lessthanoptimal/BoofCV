@@ -42,6 +42,7 @@ public class PlaybackKinectLogApp {
 	String directory;
 
 	GrowQueue_I8 data = new GrowQueue_I8();
+	boolean depthIsPng = false;
 
 	// image with depth information
 	private ImageUInt16 depth = new ImageUInt16(1,1);
@@ -76,7 +77,13 @@ public class PlaybackKinectLogApp {
 
 	private void parseFrame(int frameNumber ) throws IOException {
 		UtilImageIO.loadPPM_U8(String.format("%s/rgb%07d.ppm", directory, frameNumber), rgb, data);
-		UtilOpenKinect.parseDepth(String.format("%s/depth%07d.depth", directory, frameNumber),depth,data);
+		if( depthIsPng ) {
+			BufferedImage image = UtilImageIO.loadImage(String.format("%s/depth%07d.png", directory, frameNumber));
+			ConvertBufferedImage.convertFrom(image,depth);
+		} else {
+			UtilOpenKinect.parseDepth(String.format("%s/depth%07d.depth", directory, frameNumber), depth, data);
+		}
+
 	}
 
 	public static void main( String args[] ) throws IOException {

@@ -71,8 +71,12 @@ public class VisOdomPixelDepthPnP_to_DepthVisualOdometry<Vis extends ImageBase, 
 	@Override
 	public Point3D_F64 getTrackLocation(int index) {
 		// TODO see comment above
-		PointTrack t = alg.getTracker().getActiveTracks(null).get(index);
-		return ((Point2D3D)t.getCookie()).getLocation();
+		try {
+			PointTrack t = alg.getTracker().getActiveTracks(null).get(index);
+			return ((Point2D3D)t.getCookie()).getLocation();
+		} catch( IndexOutOfBoundsException e ) {
+			return new Point3D_F64();
+		}
 	}
 
 	@Override
