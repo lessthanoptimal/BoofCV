@@ -68,14 +68,17 @@ public class VisualOdometryPanel
 
 	Listener listener;
 
-	public VisualOdometryPanel() {
+	public VisualOdometryPanel( boolean isStereo ) {
 		setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
 		setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
 
 		displayStatus = new JLabel();
 		displayStatus.setFont(new Font("Dialog",Font.BOLD,16));
 
-		selectView = new JComboBox(new String[]{"Right","3D"});
+		if( isStereo )
+			selectView = new JComboBox(new String[]{"Right","3D"});
+		else
+			selectView = new JComboBox(new String[]{"Depth","3D"});
 		selectView.addActionListener(this);
 		selectView.setMaximumSize(selectView.getPreferredSize());
 

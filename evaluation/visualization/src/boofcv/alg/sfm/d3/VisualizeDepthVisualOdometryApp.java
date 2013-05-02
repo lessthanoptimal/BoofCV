@@ -101,7 +101,7 @@ public class VisualizeDepthVisualOdometryApp<I extends ImageSingleBand>
 		addAlgorithm(0, "Single P3P : ST-BRIEF", 1);
 		addAlgorithm(0, "Single P3P : ST-SURF-KLT", 2);
 
-		guiInfo = new VisualOdometryPanel();
+		guiInfo = new VisualOdometryPanel(false);
 		guiLeft = new ImagePanel();
 		guiDepth = new ImagePanel();
 		guiCam3D = new Polygon3DSequenceViewer();

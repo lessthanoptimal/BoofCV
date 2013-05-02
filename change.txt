@@ -8,6 +8,11 @@ Version : Alpha 0.15
 
 - Improved automatic thresholding for calibration grids
 - Fixed bug in Zhang99 calibration where skew was not being copied
+- Fixed stereo calibration bug where if a target was not detected in right image it wouldn't be removed from the left
+- Chessboard calibration
+  * Support for targets which are not symmetric. Requested by Karim Hammoudi.
+  * Much more tolerant of grid which appear to be small in the image
+  * Handles cluttered backgrounds better now
 - Added support for OpenKinect in integration
   * Added related example code and applications demonstrating how to process its data
 - Can read/write PPM images
@@ -16,8 +21,6 @@ Version : Alpha 0.15
 - Cleaned up VisualOdometry and StereoVisualOdometry interfaces
 - Added DistanceHomographyPixelSq so that the fit error for normalized homography can be computed in image pixels.
 - Added MultiViewOps.decomposeHomography().
-- Added support for chessboard calibration targets which are not symmetric
-  * Requested by Karim Hammoudi
 - Added more support for convert to/from 16bit BufferedImages
 - Added DoNothingPixelTransform_F32 for those times when you don't want to do anything
 - Added PairLineNorm for sets of line correspondences between two lines

@@ -237,6 +237,14 @@ public class DetectCalibrationSquaresApp
 			Point2D_I32 c = p.center;
 			VisualizeFeatures.drawPoint(g2, c.x, c.y, Color.GREEN );
 		}
+
+		for( int i = 0; i < squares.size(); i++ ) {
+			QuadBlob p = squares.get(i);
+			for( int j = 0; j < p.corners.size(); j++ ) {
+				Point2D_I32 c = p.corners.get(j);
+				VisualizeFeatures.drawPoint(g2, c.x, c.y, 1, Color.BLUE );
+			}
+		}
 	}
 
 	/**

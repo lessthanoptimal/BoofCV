@@ -411,6 +411,7 @@
       <module fileurl="file://$PROJECT_DIR$/integration/xuggler/BoofCV Xuggler.iml" filepath="$PROJECT_DIR$/integration/xuggler/BoofCV Xuggler.iml" />
       <module fileurl="file://$PROJECT_DIR$/../ddogleg/DDogleg.iml" filepath="$PROJECT_DIR$/../ddogleg/DDogleg.iml" />
       <module fileurl="file://$PROJECT_DIR$/../georegression/GeoRegression.iml" filepath="$PROJECT_DIR$/../georegression/GeoRegression.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../VisionTools/VisionTools.iml" filepath="$PROJECT_DIR$/../VisionTools/VisionTools.iml" />
       <module fileurl="file://$PROJECT_DIR$/../ejml/trunk/ejml.iml" filepath="$PROJECT_DIR$/../ejml/trunk/ejml.iml" />
     </modules>
   </component>

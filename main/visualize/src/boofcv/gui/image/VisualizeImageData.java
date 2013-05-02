@@ -91,8 +91,11 @@ public class VisualizeImageData {
 			normalize = GImageStatistics.maxAbs(src);
 		}
 
-		if (normalize == 0)
+		if (normalize == 0) {
+			// sets the output to black
+			ConvertBufferedImage.convertTo(src,dst);
 			return dst;
+		}
 
 		if (src.getClass().isAssignableFrom(ImageFloat32.class)) {
 			return colorizeSign((ImageFloat32) src, dst, (float) normalize);

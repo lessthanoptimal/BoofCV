@@ -109,7 +109,14 @@ public class CalibrateStereoPlanar {
 	 */
 	public boolean addPair( ImageFloat32 left , ImageFloat32 right ) {
 
-		return( calibLeft.addImage(left) && calibRight.addImage(right ));
+		if( !calibLeft.addImage(left) )
+			return false;
+
+		if( !calibRight.addImage(right ) ) {
+			calibLeft.removeLatestImage();
+			return false;
+		}
+		return true;
 	}
 
 	/**
