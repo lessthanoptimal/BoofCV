@@ -19,19 +19,23 @@
 package boofcv.abst.sfm.d3;
 
 import boofcv.alg.geo.PerspectiveOps;
-import boofcv.core.image.ConvertBufferedImage;
+import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
+import boofcv.misc.BoofMiscOps;
+import boofcv.struct.ImageRectangle;
 import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.image.ImageSingleBand;
+import georegression.metric.Intersection2D_F64;
 import georegression.struct.point.Point2D_F64;
+import georegression.struct.point.Point2D_I32;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
+import georegression.struct.shapes.Polygon2D_F64;
+import georegression.struct.shapes.Polygon2D_I32;
 import org.ejml.data.DenseMatrix64F;
 
-import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.*;
-import java.util.List;
 
 /**
  *
@@ -100,10 +104,7 @@ public class VideoSequenceSimulator<I extends ImageSingleBand> {
 	}
 
 	public I render( Se3_F64 worldToCamera ) {
-		Graphics2D g2 = workImage.createGraphics();
-
-		g2.setColor(Color.WHITE);
-		g2.fillRect(0,0,workImage.getWidth(),workImage.getHeight());
+		GImageMiscOps.fill(outputImage, 0);
 
 		for( Square s : squares ) {
 			Point2D_F64 p1 = PerspectiveOps.renderPixel(worldToCamera,K,s.a);
@@ -111,22 +112,80 @@ public class VideoSequenceSimulator<I extends ImageSingleBand> {
 			Point2D_F64 p3 = PerspectiveOps.renderPixel(worldToCamera,K,s.c);
 			Point2D_F64 p4 = PerspectiveOps.renderPixel(worldToCamera,K,s.d);
 
-			Polygon p = new Polygon();
-			p.addPoint((int)p1.x,(int)p1.y);
-			p.addPoint((int)p2.x,(int)p2.y);
-			p.addPoint((int)p3.x,(int)p3.y);
-			p.addPoint((int)p4.x,(int)p4.y);
+			Polygon2D_I32 p = new Polygon2D_I32(4);
+			p.vertexes[0].set((int) p1.x, (int) p1.y);
+			p.vertexes[1].set((int) p2.x, (int) p2.y);
+			p.vertexes[2].set((int) p3.x, (int) p3.y);
+			p.vertexes[3].set((int) p4.x, (int) p4.y);
 
-			g2.setColor( new Color(s.gray,s.gray,s.gray) );
-			g2.fillPolygon(p);
+			convexFill(p, outputImage, s.gray);
 		}
 
-		// TODO apply lense distortion
-		ConvertBufferedImage.convertFrom(workImage,outputImage);
+		// TODO apply lens distortion
 		return outputImage;
 	}
 
+	public void renderDepth( Se3_F64 worldToCamera , ImageSingleBand depthImage , double units ) {
 
+		GImageMiscOps.fill(depthImage,0);
+		for( Square s : squares ) {
+			Point2D_F64 p1 = PerspectiveOps.renderPixel(worldToCamera,K,s.a);
+			Point2D_F64 p2 = PerspectiveOps.renderPixel(worldToCamera,K,s.b);
+			Point2D_F64 p3 = PerspectiveOps.renderPixel(worldToCamera,K,s.c);
+			Point2D_F64 p4 = PerspectiveOps.renderPixel(worldToCamera,K,s.d);
+
+			Polygon2D_I32 p = new Polygon2D_I32(4);
+			p.vertexes[0].set((int) p1.x, (int) p1.y);
+			p.vertexes[1].set((int) p2.x, (int) p2.y);
+			p.vertexes[2].set((int) p3.x, (int) p3.y);
+			p.vertexes[3].set((int) p4.x, (int) p4.y);
+
+			int depth = (int)(s.a.z/units);
+
+			convexFill(p,depthImage,depth);
+		}
+		// TODO apply lens distortion
+	}
+
+	private void convexFill( Polygon2D_I32 poly , ImageSingleBand image , double value ) {
+		int minX = Integer.MAX_VALUE; int maxX = Integer.MIN_VALUE;
+		int minY = Integer.MAX_VALUE; int maxY = Integer.MIN_VALUE;
+
+		for( int i = 0; i < poly.vertexes.length; i++ ) {
+			Point2D_I32 p = poly.vertexes[i];
+			if( p.y < minY ) {
+				minY = p.y;
+			} else if( p.y > maxY ) {
+				maxY = p.y;
+			}
+			if( p.x < minX ) {
+				minX = p.x;
+			} else if( p.x > maxX ) {
+				maxX = p.x;
+			}
+		}
+		ImageRectangle bounds = new ImageRectangle(minX,minY,maxX,maxY);
+		BoofMiscOps.boundRectangleInside(image,bounds);
+
+		Point2D_F64 p = new Point2D_F64();
+		Polygon2D_F64 poly64 = new Polygon2D_F64(4);
+		for( int i = 0; i < 4; i++ )
+			poly64.vertexes[i].set( poly.vertexes[i].x , poly.vertexes[i].y );
+
+		for( int y = bounds.y0; y < bounds.y1; y++ ) {
+			p.y = y;
+			for( int x = bounds.x0; x < bounds.x1; x++ ) {
+				p.x = x;
+
+				if( Intersection2D_F64.containConvex(poly64,p)) {
+					GeneralizedImageOps.set(image,x,y,value);
+				}
+			}
+		}
+
+
+
+	}
 
 	private static class Square
 	{

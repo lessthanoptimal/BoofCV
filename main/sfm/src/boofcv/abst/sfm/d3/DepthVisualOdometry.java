@@ -71,7 +71,7 @@ public interface DepthVisualOdometry<Vis extends ImageBase, Depth extends ImageS
 
 	/**
 	 * Process the new image and update the motion estimate.  The return value must be checked
-	 * to see if the estimate was actually updated.  If false is returned then {@link #isFatal}
+	 * to see if the estimate was actually updated.  If false is returned then {@link #isFault()}
 	 * also needs to be checked to see if the pose estimate has been reset.
 	 *
 	 * @param visual Image from visual camera
