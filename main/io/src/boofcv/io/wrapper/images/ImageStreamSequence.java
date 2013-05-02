@@ -32,14 +32,19 @@ import java.awt.image.BufferedImage;
 import java.io.*;
 
 /**
- * Instead of loading and decompressing the whole MJPEG at once, it loads the images
- * one at a time until it reaches the end of the file.
+ * Given a sequence of images encoded with {@link CombineFilesTogether}, it will read the files from
+ * the stream and decode them.  Only one image is read at a time and if it is initialized from a file
+ * the sequence can be restarted.
  *
  * @author Peter Abeles
  */
-public class MpngStreamSequence<T extends ImageBase>
+public class ImageStreamSequence<T extends ImageBase>
 implements SimpleImageSequence<T>
 {
+	// If the data set was read from a file it can then be restarted
+	String fileName;
+
+	// used to read in the stream
 	DataInputStream in;
 	BufferedImage original;
 	BufferedImage next;
@@ -48,15 +53,16 @@ implements SimpleImageSequence<T>
 	ImageDataType<T> imageType;
 	GrowQueue_I8 buffer = new GrowQueue_I8();
 
-	public MpngStreamSequence(InputStream in, ImageDataType<T> imageType) {
+	public ImageStreamSequence(InputStream in, ImageDataType<T> imageType) {
 		this.in = new DataInputStream(in);
 		this.imageType = imageType;
 		image = imageType.createImage(1,1,3);
 		readNext();
 	}
 
-	public MpngStreamSequence(String fileName, ImageDataType<T> imageType) throws FileNotFoundException {
+	public ImageStreamSequence(String fileName, ImageDataType<T> imageType) throws FileNotFoundException {
 		this(new DataInputStream(new BufferedInputStream(new FileInputStream(fileName),1024*200)),imageType);
+		this.fileName = fileName;
 	}
 
 	private void readNext() {
@@ -116,11 +122,21 @@ implements SimpleImageSequence<T>
 
 	@Override
 	public void reset() {
-		throw new RuntimeException("Reset not supported");
+		if( fileName != null ) {
+			try {
+				in = new DataInputStream(new BufferedInputStream(new FileInputStream(fileName),1024*200));
+				frameNumber = 0;
+				readNext();
+			} catch (FileNotFoundException e) {
+				throw new RuntimeException(e);
+			}
+		} else {
+			throw new RuntimeException("Reset not supported");
+		}
 	}
 
 	public static void main( String args[] ) throws FileNotFoundException {
-		MpngStreamSequence stream = new MpngStreamSequence("combined.mpng",ImageDataType.single(ImageUInt16.class));
+		ImageStreamSequence stream = new ImageStreamSequence("combined.mpng",ImageDataType.single(ImageUInt16.class));
 
 		while( stream.hasNext() ) {
 			System.out.println("Image");

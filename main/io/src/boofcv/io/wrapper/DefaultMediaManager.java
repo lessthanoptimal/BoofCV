@@ -23,8 +23,8 @@ import boofcv.io.VideoCallBack;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.image.UtilImageIO;
 import boofcv.io.video.VideoMjpegCodec;
+import boofcv.io.wrapper.images.ImageStreamSequence;
 import boofcv.io.wrapper.images.JpegByteImageSequence;
-import boofcv.io.wrapper.images.MpngStreamSequence;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageDataType;
 
@@ -91,7 +91,7 @@ public class DefaultMediaManager implements MediaManager {
 			}
 		} else if( fileName.endsWith("mpng") || fileName.endsWith("MPNG")) {
 			try {
-				return new MpngStreamSequence<T>(fileName,type);
+				return new ImageStreamSequence<T>(fileName,type);
 			} catch (FileNotFoundException e) {
 				throw new RuntimeException(e);
 			}

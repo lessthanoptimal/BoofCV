@@ -21,7 +21,6 @@ package boofcv.alg.geo.calibration;
 import boofcv.alg.feature.detect.chess.DetectChessCalibrationPoints;
 import boofcv.alg.feature.detect.quadblob.DetectQuadBlobsBinary;
 import boofcv.alg.feature.detect.quadblob.QuadBlob;
-import boofcv.alg.misc.GImageMiscOps;
 import boofcv.alg.misc.ImageStatistics;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.core.image.GeneralizedImageOps;
@@ -81,7 +80,7 @@ public class DetectCalibrationChessApp<T extends ImageSingleBand, D extends Imag
 		JPanel panel = new JPanel();
 		panel.setLayout( new BorderLayout());
 
-		calibGUI = new GridCalibPanel(false);
+		calibGUI = new GridCalibPanel(true);
 		calibGUI.addView("Feature");
 		calibGUI.setListener( this );
 		calibGUI.setMinimumSize(calibGUI.getPreferredSize());
@@ -93,7 +92,7 @@ public class DetectCalibrationChessApp<T extends ImageSingleBand, D extends Imag
 	}
 
 	public void configure( int numCols , int numRows ) {
-		alg = new DetectChessCalibrationPoints<T,D>(numCols,numRows,4,-1,1,imageType);
+		alg = new DetectChessCalibrationPoints<T,D>(numCols,numRows,5,1,imageType);
 	}
 
 	@Override
@@ -144,10 +143,15 @@ public class DetectCalibrationChessApp<T extends ImageSingleBand, D extends Imag
 	}
 
 	private synchronized void detectTarget() {
+		if( calibGUI.isManual())
+			alg.setUserBinaryThreshold(calibGUI.getThresholdLevel());
+		else
+			alg.setUserBinaryThreshold(-1);
+
 		foundTarget = alg.process(gray);
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
-				calibGUI.setThreshold((int) alg.getSelectedThreshold());
+				calibGUI.setThreshold((int) alg.getActualBinaryThreshold());
 			}
 		});
 	}
@@ -167,7 +171,6 @@ public class DetectCalibrationChessApp<T extends ImageSingleBand, D extends Imag
 				break;
 
 			case 3:
-				GImageMiscOps.fill(intensity, 0);
 				alg.renderIntensity(intensity);
 				float max = ImageStatistics.maxAbs(intensity);
 				VisualizeImageData.colorizeSign(intensity,workImage,max);
@@ -178,25 +181,28 @@ public class DetectCalibrationChessApp<T extends ImageSingleBand, D extends Imag
 		}
 		Graphics2D g2 = workImage.createGraphics();
 		if( foundTarget ) {
-			if( calibGUI.isShowPoints() ) {
-				List<Point2D_F64> candidates =  alg.getPoints();
-				for( Point2D_F64 c : candidates ) {
-					VisualizeFeatures.drawPoint(g2, (int)c.x, (int)c.y, 2, Color.RED);
-				}
-			}
-
 			if( calibGUI.isShowBound() ) {
 				ImageRectangle boundary =  alg.getFindBound().getBoundRect();
 				drawBounds(g2, boundary);
-			}
-
-			if( calibGUI.doShowGraph ) {
-				DetectCalibrationSquaresApp.drawGraph(g2,alg.getFindBound().getGraphBlobs());
 			}
 			
 			if( calibGUI.isShowNumbers() ) {
 				drawNumbers(g2, alg.getPoints(),1);
 			}
+		}
+
+		if( calibGUI.isShowPoints() ) {
+			List<Point2D_F64> candidates =  alg.getPoints();
+			for( Point2D_F64 c : candidates ) {
+				VisualizeFeatures.drawPoint(g2, (int)c.x, (int)c.y, 2, Color.RED);
+			}
+		}
+
+		if( calibGUI.doShowGraph ) {
+
+			List<QuadBlob> graph = alg.getFindBound().getGraphBlobs();
+			if( graph != null )
+				DetectCalibrationSquaresApp.drawGraph(g2,graph);
 		}
 
 		gui.setBufferedImage(workImage);
@@ -224,11 +230,13 @@ public class DetectCalibrationChessApp<T extends ImageSingleBand, D extends Imag
 
 		// put a mark in the center of blobs that were declared as being valid
 		Graphics2D g2 = workImage.createGraphics();
-		for( QuadBlob b : detectBlobs.getDetected() ) {
-			g2.setColor(Color.BLACK);
-			g2.fillOval(b.center.x - 2, b.center.y - 2, 5, 5);
-			g2.setColor(Color.CYAN);
-			g2.fillOval(b.center.x-1,b.center.y-1,3,3);
+		if( detectBlobs.getDetected() != null ) {
+			for( QuadBlob b : detectBlobs.getDetected() ) {
+				g2.setColor(Color.BLACK);
+				g2.fillOval(b.center.x - 2, b.center.y - 2, 5, 5);
+				g2.setColor(Color.CYAN);
+				g2.fillOval(b.center.x-1,b.center.y-1,3,3);
+			}
 		}
 	}
 

@@ -67,7 +67,7 @@ public class TestDetectChessCalibrationPoints {
 		}
 		ImageMiscOps.addGaussian(gray,rand,0.1,0,255);
 
-		DetectChessCalibrationPoints alg = new DetectChessCalibrationPoints(7,5,5,-1,1.0,ImageFloat32.class);
+		DetectChessCalibrationPoints alg = new DetectChessCalibrationPoints(7,5,5,1.0,ImageFloat32.class);
 
 		assertTrue(alg.process(gray));
 

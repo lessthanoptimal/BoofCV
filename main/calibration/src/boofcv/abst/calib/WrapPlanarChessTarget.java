@@ -35,8 +35,9 @@ public class WrapPlanarChessTarget implements PlanarCalibrationDetector {
 
 	public WrapPlanarChessTarget(ConfigChessboard config ) {
 		alg = new DetectChessCalibrationPoints<ImageFloat32, ImageFloat32>(
-				config.numCols,config.numRows,config.nonmaxRadius,config.binaryThreshold,
+				config.numCols,config.numRows,config.nonmaxRadius,
 				config.relativeSizeThreshold,ImageFloat32.class);
+		alg.setUserBinaryThreshold(config.binaryThreshold);
 	}
 
 	@Override

@@ -56,9 +56,6 @@ public class DetectChessSquaresBinary {
 	// corners on detected squares
 	FastQueue<Point2D_I32> corners = new FastQueue<Point2D_I32>(Point2D_I32.class,true);
 
-	// how close two corners need to be for them to be connected
-	private double connectThreshold = 10;
-
 	/**
 	 * Configures chess board detector.
 	 *
@@ -91,6 +88,7 @@ public class DetectChessSquaresBinary {
 	 * @return True if successful.
 	 */
 	public boolean process( ImageUInt8 binary ) {
+		graphBlobs = null;
 
 		// detect blobs
 		if( !detectBlobs.process(binary) )
@@ -99,7 +97,7 @@ public class DetectChessSquaresBinary {
 		// connect blobs
 		graphBlobs = detectBlobs.getDetected();
 
-		connect(graphBlobs, connectThreshold);
+		connect(graphBlobs);
 
 		// Remove all but the largest islands in the graph to reduce the number of combinations
 		graphBlobs = ConnectGridSquares.pruneSmallIslands(graphBlobs);
@@ -124,10 +122,16 @@ public class DetectChessSquaresBinary {
 	 * Connect blobs together based on corner distance. If two corners are uniquely close
 	 * together then.
 	 */
-	public static void connect( List<QuadBlob> blobs , double tol )
+	public static void connect( List<QuadBlob> blobs  )
 	{
 		for( int i = 0; i < blobs.size(); i++ ) {
 			QuadBlob a = blobs.get(i);
+
+			// A constant threshold for max distance was used before with a requirement that only one point
+			// match that criteria.  While a constant threshold is reasonable across
+			// images of different resolutions, blurred images caused problems.  They would silently fail
+			// confusing users.
+			double tol = Math.max( a.largestSide/2.0 , 10 );
 
 			if( a.corners.size() != 4 )
 				throw new RuntimeException("WTF is this doing here?");
@@ -135,27 +139,30 @@ public class DetectChessSquaresBinary {
 			for( int indexA = 0; indexA < 4; indexA++ ) {
 				Point2D_I32 ac = a.corners.get(indexA);
 
-				int count = 0;
+//				int count = 0;
 				QuadBlob match = null;
+				double bestScore = Double.MAX_VALUE;
 
+				// find the blobs which has a corner that is the closest match to corner 'indexA'
 				for( int j = 0; j < blobs.size(); j++ ) {
 					if( j == i )
 						continue;
 
 					QuadBlob b = blobs.get(j);
+
 					for( int indexB = 0; indexB < 4; indexB++ ) {
 						Point2D_I32 bc = b.corners.get(indexB);
 
 						double d = UtilPoint2D_I32.distance(ac,bc);
-						if( d < tol ) {
+						if( d < bestScore ) {
 //							System.out.println("  Match distance = "+d+" count = "+count);
 							match = b;
-							count++;
+							bestScore = d;
 						}
 					}
 				}
-				
-				if( count == 1 ) {
+
+				if( match != null && bestScore < tol) {
 //					if( a.conn.contains(match) )
 //						throw new RuntimeException("MUltiple matches");
 					a.conn.add(match);
@@ -178,6 +185,9 @@ public class DetectChessSquaresBinary {
 		}
 	}
 
+	/**
+	 * Finds bounds of target using corner points of each blob
+	 */
 	private void findBoundingRectangle( List<QuadBlob> blobs) {
 		boundRect.x0 = Integer.MAX_VALUE;
 		boundRect.x1 = -Integer.MAX_VALUE;
@@ -185,14 +195,16 @@ public class DetectChessSquaresBinary {
 		boundRect.y1 = -Integer.MAX_VALUE;
 
 		for( QuadBlob b : blobs ) {
-			if( b.center.x < boundRect.x0 )
-				boundRect.x0 = b.center.x;
-			if( b.center.x > boundRect.x1 )
-				boundRect.x1 = b.center.x;
-			if( b.center.y < boundRect.y0 )
-				boundRect.y0 = b.center.y;
-			if( b.center.y > boundRect.y1 )
-				boundRect.y1 = b.center.y;
+			for( Point2D_I32 c : b.corners ) {
+				if( c.x < boundRect.x0 )
+					boundRect.x0 = c.x;
+				if( c.x > boundRect.x1 )
+					boundRect.x1 = c.x;
+				if( c.y < boundRect.y0 )
+					boundRect.y0 = c.y;
+				if( c.y > boundRect.y1 )
+					boundRect.y1 = c.y;
+			}
 		}
 	}
 

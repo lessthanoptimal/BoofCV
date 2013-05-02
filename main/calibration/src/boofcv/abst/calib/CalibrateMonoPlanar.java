@@ -164,6 +164,14 @@ public class CalibrateMonoPlanar {
 	}
 
 	/**
+	 * Removes the most recently added image
+	 */
+	public void removeLatestImage() {
+		observations.remove( observations.size() - 1 );
+		observationsAdj.remove( observationsAdj.size() - 1 );
+	}
+
+	/**
 	 * After calibration points have been found this invokes the Zhang99 algorithm to
 	 * estimate calibration parameters.  Error statistics are also computed.
 	 */

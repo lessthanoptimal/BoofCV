@@ -152,7 +152,7 @@ public class DetectQuadBlobsBinary {
 			Contour c = contours.get(i);
 			if( c.internal.size() > 0 ) {
 				contours.remove(i);
-			} else if( c.external.size() < minContourSize ) {
+			} else if( c.external.size() < 10 ) {//minContourSize ) {
 				contours.remove(i);
 			} else {
 				i++;
