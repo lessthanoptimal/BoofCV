@@ -28,6 +28,7 @@ Version : Alpha 0.15
   * Three points
   * Line and a point
   * Two lines
+- Added NearestNeighborPixel_U16
 
 ---------------------------------------------
 Date    : 2013/04/15

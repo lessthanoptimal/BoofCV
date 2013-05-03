@@ -109,6 +109,21 @@ public class AverageDownSampleOps {
 	}
 
 	/**
+	 * Down samples a multi-spectral image.  Type checking is done at runtime.
+	 *
+	 * @param input Input image. Not modified.
+	 * @param sampleWidth Width of square region.
+	 * @param output Output image. Modified.
+	 */
+	public static <T extends ImageSingleBand> void down( MultiSpectral<T> input ,
+														 int sampleWidth , MultiSpectral<T> output ) {
+
+		for( int band = 0; band < input.getNumBands(); band++ ) {
+			down( input.getBand(band),sampleWidth,output.getBand(band));
+		}
+	}
+
+	/**
 	 * Down samples the image.
 	 *
 	 * @param input Input image. Not modified.

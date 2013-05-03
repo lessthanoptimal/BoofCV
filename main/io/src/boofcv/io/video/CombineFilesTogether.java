@@ -26,6 +26,10 @@ import java.util.Collections;
 import java.util.List;
 
 /**
+ * Combines a sequence of files together using a simple format.  At the beginning of each segment/file [0xff,0xff,0xff]
+ * is written, followed by the 4-byte integer in big endian order specifying the file size.  After that the file
+ * is written.  This is repeated until all the files are done.
+ *
  * @author Peter Abeles
  */
 public class CombineFilesTogether {
