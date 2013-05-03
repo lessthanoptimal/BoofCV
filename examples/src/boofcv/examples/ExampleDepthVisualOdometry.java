@@ -33,9 +33,8 @@ import boofcv.io.MediaManager;
 import boofcv.io.image.UtilImageIO;
 import boofcv.io.wrapper.DefaultMediaManager;
 import boofcv.misc.BoofMiscOps;
-import boofcv.openkinect.UtilOpenKinect;
 import boofcv.struct.GrowQueue_I8;
-import boofcv.struct.calib.IntrinsicParameters;
+import boofcv.struct.calib.VisualDepthParameters;
 import boofcv.struct.image.ImageSInt16;
 import boofcv.struct.image.ImageUInt16;
 import boofcv.struct.image.ImageUInt8;
@@ -60,7 +59,7 @@ public class ExampleDepthVisualOdometry {
 		String directory = "/home/pja/projects/boofcv/evaluation/log/";
 
 		// load camera description and the video sequence
-		IntrinsicParameters param = BoofMiscOps.loadXML(media.openFile(directory + "intrinsic.xml"));
+		VisualDepthParameters param = BoofMiscOps.loadXML(media.openFile(directory + "visualdepth.xml"));
 
 		// specify how the image features are going to be tracked
 		PkltConfig<ImageUInt8, ImageSInt16> configKlt = PkltConfig.createDefault(ImageUInt8.class, ImageSInt16.class);
@@ -78,8 +77,7 @@ public class ExampleDepthVisualOdometry {
 				sparseDepth, tracker, ImageUInt8.class, ImageUInt16.class);
 
 		// Pass in intrinsic/extrinsic calibration.  This can be changed in the future.
-		visualOdometry.setCalibration(param,new DoNothingPixelTransform_F32());
-
+		visualOdometry.setCalibration(param.visualParam,new DoNothingPixelTransform_F32());
 
 		// image with depth information
 		ImageUInt16 depth = new ImageUInt16(1,1);
@@ -92,7 +90,7 @@ public class ExampleDepthVisualOdometry {
 		// Process the video sequence and output the location plus number of inliers
 		for( int i = 0; i < 500; i++ ) {
 			UtilImageIO.loadPPM_U8(String.format("%s/rgb%07d.ppm", directory, i), rgb, data);
-			UtilOpenKinect.parseDepth(String.format("%s/depth%07d.depth", directory, i), depth, data);
+//			UtilOpenKinect.parseDepth(String.format("%s/depth%07d.depth", directory, i), depth, data);
 
 			gray.reshape(rgb.width,rgb.height);
 			ConvertImage.average(rgb,gray);

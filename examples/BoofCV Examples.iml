@@ -17,7 +17,6 @@
     <orderEntry type="module" module-name="BoofCV SFM" />
     <orderEntry type="module" module-name="BoofCV Calibration" />
     <orderEntry type="module" module-name="DDogleg" />
-    <orderEntry type="module" module-name="BoofCV OpenKinect" />
   </component>
 </module>
 

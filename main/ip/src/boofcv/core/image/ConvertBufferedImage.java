@@ -184,8 +184,7 @@ public class ConvertBufferedImage {
 	}
 
 	/**
-	 * Converts a buffered image into an image of the specified type.  In a 'dst' image is provided
-	 * it will be used for output.
+	 * Converts a buffered image into an image of the specified type.
 	 * 
 	 * @param src Input BufferedImage which is to be converted
 	 * @param dst The image which it is being converted into   
@@ -583,7 +582,10 @@ public class ConvertBufferedImage {
 				throw new IllegalArgumentException("image dimension are different");
 			}
 		} else {
-			dst = new BufferedImage(src.getWidth(), src.getHeight(), BufferedImage.TYPE_3BYTE_BGR);
+			if( ImageInt16.class.isInstance(src))
+				dst = new BufferedImage(src.getWidth(), src.getHeight(), BufferedImage.TYPE_USHORT_GRAY);
+			else
+				dst = new BufferedImage(src.getWidth(), src.getHeight(), BufferedImage.TYPE_INT_RGB);
 		}
 		return dst;
 	}
