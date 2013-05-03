@@ -16,18 +16,20 @@
  * limitations under the License.
  */
 
-package boofcv.example;
+package boofcv.examples;
 
 import boofcv.alg.depth.VisualDepthOps;
 import boofcv.alg.geo.PerspectiveOps;
+import boofcv.alg.misc.ImageStatistics;
+import boofcv.core.image.ConvertBufferedImage;
 import boofcv.gui.d3.PointCloudViewer;
 import boofcv.gui.image.ShowImages;
+import boofcv.gui.image.VisualizeImageData;
 import boofcv.io.image.UtilImageIO;
 import boofcv.misc.BoofMiscOps;
-import boofcv.openkinect.UtilOpenKinect;
 import boofcv.struct.FastQueue;
 import boofcv.struct.FastQueueArray_I32;
-import boofcv.struct.calib.IntrinsicParameters;
+import boofcv.struct.calib.VisualDepthParameters;
 import boofcv.struct.image.ImageUInt16;
 import boofcv.struct.image.ImageUInt8;
 import boofcv.struct.image.MultiSpectral;
@@ -35,38 +37,40 @@ import georegression.struct.point.Point3D_F64;
 import org.ejml.data.DenseMatrix64F;
 
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 
 /**
- * Loads kinect data from two files and displays the cloud in a 3D simple viewer.
+ * Example of how to create a point cloud from a RGB-D (Kinect) sensor.  Data is loaded from two files, one for the
+ * visual image and one for the depth image.
  *
  * @author Peter Abeles
  */
-public class DisplayKinectPointCloudApp {
+public class ExampleDepthPointCloud {
 
 	public static void main( String args[] ) throws IOException {
 		String baseDir = "../data/evaluation/kinect/";
 
-		String nameRgb = baseDir+"basket.ppm";
-		String nameDepth = baseDir+"basket.depth";
-		String nameCalib = baseDir+"intrinsic.xml";
+		String nameRgb = baseDir+"basket_rgb.png";
+		String nameDepth = baseDir+"basket_depth.png";
+		String nameCalib = baseDir+"visualdepth.xml";
 
-		IntrinsicParameters param = BoofMiscOps.loadXML(nameCalib);
+		VisualDepthParameters param = BoofMiscOps.loadXML(nameCalib);
 
-		ImageUInt16 depth = new ImageUInt16(1,1);
-		MultiSpectral<ImageUInt8> rgb = new MultiSpectral<ImageUInt8>(ImageUInt8.class,1,1,3);
-
-		UtilImageIO.loadPPM_U8(nameRgb, rgb, null);
-		UtilOpenKinect.parseDepth(nameDepth,depth,null);
+		BufferedImage buffered = UtilImageIO.loadImage(nameRgb);
+		MultiSpectral<ImageUInt8> rgb = ConvertBufferedImage.convertFromMulti(buffered,null,ImageUInt8.class);
+		ConvertBufferedImage.orderBandsIntoRGB(rgb,buffered);
+		ImageUInt16 depth =
+				ConvertBufferedImage.convertFrom(UtilImageIO.loadImage(nameDepth),null,ImageUInt16.class);
 
 		FastQueue<Point3D_F64> cloud = new FastQueue<Point3D_F64>(Point3D_F64.class,true);
 		FastQueueArray_I32 cloudColor = new FastQueueArray_I32(3);
 
-		VisualDepthOps.depthTo3D(param, rgb, depth, cloud, cloudColor);
+		VisualDepthOps.depthTo3D(param.visualParam, rgb, depth, cloud, cloudColor);
 
-		DenseMatrix64F K = PerspectiveOps.calibrationMatrix(param,null);
+		DenseMatrix64F K = PerspectiveOps.calibrationMatrix(param.visualParam,null);
 
-		PointCloudViewer viewer = new PointCloudViewer(K,20);
+		PointCloudViewer viewer = new PointCloudViewer(K,10);
 		viewer.setPreferredSize(new Dimension(rgb.width,rgb.height));
 
 		for( int i = 0; i < cloud.size; i++ ) {
@@ -76,10 +80,14 @@ public class DisplayKinectPointCloudApp {
 			viewer.addPoint(p.x,p.y,p.z,c);
 		}
 
+		// ---------- Display depth image
+		// use the actual max value in the image to maximize its appearance
+		int maxValue = ImageStatistics.max(depth);
+		BufferedImage depthOut = VisualizeImageData.disparity(depth, null, 0, maxValue, 0);
+		ShowImages.showWindow(depthOut,"Depth Image");
+
+		// ---------- Display colorized point cloud
 		ShowImages.showWindow(viewer,"Point Cloud");
 		System.out.println("Total points = "+cloud.size);
-
-//		BufferedImage depthOut = VisualizeImageData.disparity(depth, null, 0, UtilOpenKinect.FREENECT_DEPTH_MM_MAX_VALUE, 0);
-//		ShowImages.showWindow(depthOut,"Depth Image");
 	}
 }

@@ -77,6 +77,7 @@ public class ShowImages {
 		frame.add(panel, BorderLayout.CENTER);
 
 		frame.pack();
+		frame.setLocationByPlatform(true);
 		frame.setVisible(true);
 
 		return panel;

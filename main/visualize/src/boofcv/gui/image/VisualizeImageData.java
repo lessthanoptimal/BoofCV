@@ -249,7 +249,8 @@ public class VisualizeImageData {
 	 */
 	public static BufferedImage disparity(ImageSingleBand disparity, BufferedImage dst,
 										  int minDisparity, int maxDisparity, int invalidColor) {
-		dst = ConvertBufferedImage.checkInputs(disparity, dst);
+		if( dst == null )
+			dst = new BufferedImage(disparity.getWidth(),disparity.getHeight(),BufferedImage.TYPE_INT_RGB);
 
 		if (disparity.getTypeInfo().isInteger()) {
 			return disparity((ImageInteger) disparity, dst, minDisparity, maxDisparity, invalidColor);
@@ -266,7 +267,7 @@ public class VisualizeImageData {
 
 		for (int y = 0; y < src.height; y++) {
 			for (int x = 0; x < src.width; x++) {
-				int v = src.get(x, y);
+				int v = src.unsafe_get(x, y);
 
 				if (v > range) {
 					dst.setRGB(x, y, invalidColor);

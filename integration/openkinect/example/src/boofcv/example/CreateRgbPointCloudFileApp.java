@@ -18,6 +18,7 @@
 
 package boofcv.example;
 
+import boofcv.alg.depth.VisualDepthOps;
 import boofcv.io.image.UtilImageIO;
 import boofcv.misc.BoofMiscOps;
 import boofcv.openkinect.UtilOpenKinect;
@@ -57,7 +58,7 @@ public class CreateRgbPointCloudFileApp {
 		FastQueue<Point3D_F64> cloud = new FastQueue<Point3D_F64>(Point3D_F64.class,true);
 		FastQueueArray_I32 cloudColor = new FastQueueArray_I32(3);
 
-		UtilOpenKinect.depthTo3D(param,rgb,depth,cloud,cloudColor);
+		VisualDepthOps.depthTo3D(param, rgb, depth, cloud, cloudColor);
 
 		DataOutputStream file = new DataOutputStream(new FileOutputStream("kinect_pointcloud.txt"));
 
