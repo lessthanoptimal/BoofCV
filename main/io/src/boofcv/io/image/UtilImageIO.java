@@ -81,8 +81,13 @@ public class UtilImageIO {
 				type = "jpg";
 			}
 
-			if( !ImageIO.write(img, type, new File(fileName)) )
-				throw new IllegalArgumentException("No writter appropriate found");
+			if( !ImageIO.write(img, type, new File(fileName)) ) {
+				if( fileName.endsWith("ppm") || fileName.endsWith("PPM") ) {
+					MultiSpectral<ImageUInt8> color = ConvertBufferedImage.convertFromMulti(img,null,ImageUInt8.class);
+					savePPM(color, fileName, null);
+				}else
+					throw new IllegalArgumentException("No writter appropriate found");
+			}
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}

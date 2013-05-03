@@ -99,6 +99,8 @@ public class FactoryInterpolation {
 			return (InterpolatePixel<T>)new NearestNeighborPixel_U8();
 		else if( type == ImageSInt16.class )
 			return (InterpolatePixel<T>)new NearestNeighborPixel_S16();
+		else if( type == ImageUInt16.class )
+			return (InterpolatePixel<T>)new NearestNeighborPixel_U16();
 		else if( type == ImageSInt32.class )
 			return (InterpolatePixel<T>)new NearestNeighborPixel_S32();
 		else
