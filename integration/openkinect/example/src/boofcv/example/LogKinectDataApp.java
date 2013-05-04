@@ -71,7 +71,7 @@ public class LogKinectDataApp implements StreamOpenKinectRgbDepth.Listener {
 	public void process() throws IOException {
 
 		logFile = new DataOutputStream(new FileOutputStream("log/timestamps.txt"));
-		logFile.write("# Time stamps for rgb and depth cameras.".getBytes());
+		logFile.write("# Time stamps for rgb and depth cameras.\n".getBytes());
 
 		int w = UtilOpenKinect.getWidth(resolution);
 		int h = UtilOpenKinect.getHeight(resolution);

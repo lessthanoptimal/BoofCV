@@ -26,19 +26,15 @@ import boofcv.abst.sfm.d3.DepthVisualOdometry;
 import boofcv.abst.sfm.d3.VisualOdometry;
 import boofcv.alg.distort.DoNothingPixelTransform_F32;
 import boofcv.alg.sfm.DepthSparse3D;
-import boofcv.core.image.ConvertImage;
 import boofcv.factory.feature.tracker.FactoryPointTrackerTwoPass;
 import boofcv.factory.sfm.FactoryVisualOdometry;
 import boofcv.io.MediaManager;
-import boofcv.io.image.UtilImageIO;
+import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.wrapper.DefaultMediaManager;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.GrowQueue_I8;
 import boofcv.struct.calib.VisualDepthParameters;
-import boofcv.struct.image.ImageSInt16;
-import boofcv.struct.image.ImageUInt16;
-import boofcv.struct.image.ImageUInt8;
-import boofcv.struct.image.MultiSpectral;
+import boofcv.struct.image.*;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
 
@@ -56,7 +52,7 @@ public class ExampleDepthVisualOdometry {
 
 		MediaManager media = DefaultMediaManager.INSTANCE;
 
-		String directory = "/home/pja/projects/boofcv/evaluation/log/";
+		String directory = "../data/applet/kinect/straight/";
 
 		// load camera description and the video sequence
 		VisualDepthParameters param = BoofMiscOps.loadXML(media.openFile(directory + "visualdepth.xml"));
@@ -88,14 +84,14 @@ public class ExampleDepthVisualOdometry {
 		GrowQueue_I8 data = new GrowQueue_I8();
 
 		// Process the video sequence and output the location plus number of inliers
-		for( int i = 0; i < 500; i++ ) {
-			UtilImageIO.loadPPM_U8(String.format("%s/rgb%07d.ppm", directory, i), rgb, data);
-//			UtilOpenKinect.parseDepth(String.format("%s/depth%07d.depth", directory, i), depth, data);
+		SimpleImageSequence<ImageUInt8> videoVisual = media.openVideo(directory+"rgb.mjpeg",ImageDataType.single(ImageUInt8.class));
+		SimpleImageSequence<ImageUInt16> videoDepth = media.openVideo(directory + "depth.mpng", ImageDataType.single(ImageUInt16.class));
 
-			gray.reshape(rgb.width,rgb.height);
-			ConvertImage.average(rgb,gray);
+		while( videoVisual.hasNext() ) {
+			ImageUInt8 left = videoVisual.next();
+			ImageUInt16 right = videoDepth.next();
 
-			if( !visualOdometry.process(gray,depth) ) {
+			if( !visualOdometry.process(left,right) ) {
 				throw new RuntimeException("VO Failed!");
 			}
 
