@@ -20,7 +20,7 @@ package boofcv.gui;
 
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.misc.BoofMiscOps;
-import boofcv.struct.calib.IntrinsicParameters;
+import boofcv.struct.calib.VisualDepthParameters;
 import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageSingleBand;
 
@@ -43,7 +43,7 @@ import java.io.Reader;
 public abstract class DepthVideoAppBase<I extends ImageSingleBand, Depth extends ImageSingleBand>
 		extends SelectAlgorithmAndInputPanel implements VisualizeApp, MouseListener, ChangeListener
 {
-	protected IntrinsicParameters config;
+	protected VisualDepthParameters config;
 	protected SimpleImageSequence<I> sequence1;
 	protected SimpleImageSequence<Depth> sequence2;
 

@@ -197,6 +197,9 @@ public class VisualizeStereoVisualOdometryApp <I extends ImageSingleBand>
 
 	@Override
 	protected void updateAlg(I frame1, BufferedImage buffImage1, I frame2, BufferedImage buffImage2) {
+		if( config.left.width != frame1.width || config.left.height != frame1.height )
+			throw new IllegalArgumentException("Miss match between calibration and actual image size");
+
 		noFault = alg.process(frame1,frame2);
 	}
 

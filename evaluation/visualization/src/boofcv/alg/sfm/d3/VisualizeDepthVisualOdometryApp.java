@@ -189,6 +189,9 @@ public class VisualizeDepthVisualOdometryApp<I extends ImageSingleBand>
 
 	@Override
 	protected void updateAlg(I frame1, BufferedImage buffImage1, ImageUInt16 frame2, BufferedImage buffImage2) {
+		if( config.visualParam.width != frame1.width || config.visualParam.height != frame1.height )
+			throw new IllegalArgumentException("Miss match between calibration and actual image size");
+
 		noFault = alg.process(frame1,frame2);
 		if( !noFault ) {
 			alg.reset();
@@ -262,17 +265,17 @@ public class VisualizeDepthVisualOdometryApp<I extends ImageSingleBand>
 		if( cookies != null )
 			whichAlg = (Integer)cookies[0];
 		alg = createVisualOdometry(whichAlg);
-		alg.setCalibration(config,new DoNothingPixelTransform_F32());
+		alg.setCalibration(config.visualParam,new DoNothingPixelTransform_F32());
 
 		guiInfo.reset();
 
 		handleRunningStatus(2);
 
-		DenseMatrix64F K = PerspectiveOps.calibrationMatrix(config,null);
+		DenseMatrix64F K = PerspectiveOps.calibrationMatrix(config.visualParam,null);
 		guiCam3D.init();
 		guiCam3D.setK(K);
 		guiCam3D.setStepSize(0.05);
-		guiCam3D.setPreferredSize(new Dimension(config.width, config.height));
+		guiCam3D.setPreferredSize(new Dimension(config.visualParam.width, config.visualParam.height));
 		guiCam3D.setMaximumSize(guiCam3D.getPreferredSize());
 		startWorkerThread();
 	}
@@ -401,12 +404,9 @@ public class VisualizeDepthVisualOdometryApp<I extends ImageSingleBand>
 
 		VisualizeDepthVisualOdometryApp app = new VisualizeDepthVisualOdometryApp(type);
 
-//		app.setMediaManager(new XugglerMediaManager());
-
 		List<PathLabel> inputs = new ArrayList<PathLabel>();
-		inputs.add(new PathLabel("Test", "/home/pja/projects/boofcv/evaluation/log/config.txt"));
-//		inputs.add(new PathLabel("Outside", "../data/applet/vo/backyard/config.txt"));
-//		inputs.add(new PathLabel("Urban", "../data/applet/vo/rockville/config.txt"));
+		inputs.add(new PathLabel("Circle", "../data/applet/kinect/circle/config.txt"));
+		inputs.add(new PathLabel("Hallway", "../data/applet/kinect/straight/config.txt"));
 
 		app.setInputList(inputs);
 

@@ -49,7 +49,7 @@ import java.io.IOException;
 public class ExampleDepthPointCloud {
 
 	public static void main( String args[] ) throws IOException {
-		String baseDir = "../data/evaluation/kinect/";
+		String baseDir = "../data/applet/kinect/basket/";
 
 		String nameRgb = baseDir+"basket_rgb.png";
 		String nameDepth = baseDir+"basket_depth.png";

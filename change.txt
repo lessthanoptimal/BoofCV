@@ -11,8 +11,8 @@ Version : Alpha 0.15
 - Fixed stereo calibration bug where if a target was not detected in right image it wouldn't be removed from the left
 - Chessboard calibration
   * Support for targets which are not symmetric. Requested by Karim Hammoudi.
-  * Much more tolerant of grid which appear to be small in the image
-  * Handles cluttered backgrounds better now
+  * Much more tolerant of target which are visually small
+  * Handles cluttered backgrounds better
 - Added support for OpenKinect in integration
   * Added related example code and applications demonstrating how to process its data
 - Can read/write PPM images
@@ -29,6 +29,7 @@ Version : Alpha 0.15
   * Line and a point
   * Two lines
 - Added NearestNeighborPixel_U16
+- Added VisualDepthParameters to specify calibration for RGB-D cameras
 
 ---------------------------------------------
 Date    : 2013/04/15
