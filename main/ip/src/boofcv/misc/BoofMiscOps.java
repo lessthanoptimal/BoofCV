@@ -259,7 +259,7 @@ public class BoofMiscOps {
 		return b.isInBounds((int) x, (int) y);
 	}
 
-	public static void pause(int milli) {
+	public static void pause(long milli) {
 		Thread t = Thread.currentThread();
 		synchronized( t )  {
 			try {
