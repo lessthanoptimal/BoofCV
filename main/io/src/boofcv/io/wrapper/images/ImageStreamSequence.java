@@ -25,7 +25,6 @@ import boofcv.struct.GrowQueue_I8;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageUInt16;
-import com.sun.xml.internal.messaging.saaj.util.ByteInputStream;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -68,7 +67,7 @@ implements SimpleImageSequence<T>
 	private void readNext() {
 			try {
 				CombineFilesTogether.readNext(in,buffer);
-				next = ImageIO.read(new ByteInputStream(buffer.data,buffer.size));
+				next = ImageIO.read(new ByteArrayInputStream(buffer.data,0,buffer.size));
 				frameNumber++;
 			} catch (IOException e) {
 				throw new RuntimeException(e);
