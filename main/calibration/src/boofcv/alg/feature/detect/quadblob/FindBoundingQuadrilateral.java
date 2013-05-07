@@ -59,7 +59,7 @@ public class FindBoundingQuadrilateral {
 		ret.add(corner3);
 
 		// organize the corners
-		Point2D_F64 center = UtilPoint2D_F64.mean(ret);
+		Point2D_F64 center = UtilPoint2D_F64.mean(ret,null);
 		UtilCalibrationGrid.sortByAngleCCW(center, ret);
 
 		return ret;

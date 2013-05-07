@@ -155,10 +155,6 @@ public class VisualizeBinaryData {
 
 		if( out == null ) {
 			out = new BufferedImage(width,height,BufferedImage.TYPE_INT_RGB);
-		} else {
-			Graphics2D g2 = out.createGraphics();
-			g2.setColor(Color.BLACK);
-			g2.fillRect(0,0,width,height);
 		}
 
 		colors = checkColors(colors,contours.size());
@@ -174,7 +170,7 @@ public class VisualizeBinaryData {
 		return out;
 	}
 
-	private static int[] checkColors(  int[] colors , int size ) {
+	public static int[] checkColors(  int[] colors , int size ) {
 		if( colors == null ) {
 			colors = new int[ size ];
 			Random rand = new Random(123);

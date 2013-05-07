@@ -41,7 +41,7 @@ public class BoofMiscOps {
 	public static void saveXML( Object o , String fileName ) {
 		XStreamClassLoader loader = new BoofcvClassLoader();
 		XStream xstream = new XStream(new PureJavaReflectionProvider(),new DomDriver(),loader,null,new DefaultConverterLookup(), null);
-		xstream.registerConverter(new JavaBeanConverter(xstream.getMapper()));
+//		xstream.registerConverter(new JavaBeanConverter(xstream.getMapper()));
 
 		try {
 			xstream.toXML(o,new FileOutputStream(fileName));
@@ -54,7 +54,7 @@ public class BoofMiscOps {
 
 		XStreamClassLoader loader = new BoofcvClassLoader();
 		XStream xstream = new XStream(new PureJavaReflectionProvider(),new DomDriver(),loader,null,new DefaultConverterLookup(), null);
-		xstream.registerConverter(new JavaBeanConverter(xstream.getMapper()));
+//		xstream.registerConverter(new JavaBeanConverter(xstream.getMapper()));
 		try {
 			return (T)xstream.fromXML(new FileReader(fileName));
 		} catch (FileNotFoundException e) {
