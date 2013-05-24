@@ -38,6 +38,27 @@ import boofcv.struct.image.ImageSingleBand;
 public class FactoryTrackerAlg {
 
 	/**
+	 * Creates a {@link KltTracker}.
+	 *
+	 * NOTE: The pyramid's structure is determined by the input pyramid that is processed.
+	 *
+	 * @param config KLT configuration
+	 * @param imageType Type of input image
+	 * @param derivType Type of image derivative
+	 * @param <I> Input image type.
+	 * @param <D> Derivative image type.
+	 * @return Tracker
+	 */
+	public static <I extends ImageSingleBand, D extends ImageSingleBand>
+	KltTracker<I, D> klt( KltConfig config, Class<I> imageType , Class<D> derivType )
+	{
+		InterpolateRectangle<I> interpInput = FactoryInterpolation.<I>bilinearRectangle(imageType);
+		InterpolateRectangle<D> interpDeriv = FactoryInterpolation.<D>bilinearRectangle(derivType);
+
+		return new KltTracker<I, D>(interpInput, interpDeriv, config);
+	}
+
+	/**
 	 * Creates a {@link PyramidKltTracker}.
 	 *
 	 * NOTE: The pyramid's structure is determined by the input pyramid that is processed.

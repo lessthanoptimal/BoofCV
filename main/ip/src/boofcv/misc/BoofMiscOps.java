@@ -259,13 +259,21 @@ public class BoofMiscOps {
 		return b.isInBounds((int) x, (int) y);
 	}
 
+	/**
+	 * Invokes wait until the elapsed time has passed.  In the thread is interrupted, the interrupt is ignored.
+	 * @param milli Length of desired pause in milliseconds.
+	 */
 	public static void pause(long milli) {
-		Thread t = Thread.currentThread();
-		synchronized( t )  {
-			try {
-				t.wait(milli);
-			} catch (InterruptedException e) {
-				throw new RuntimeException(e);
+		final Thread t = Thread.currentThread();
+		long start = System.currentTimeMillis();
+		while( System.currentTimeMillis() - start < milli ) {
+			synchronized( t )  {
+				try {
+					long target = milli - (System.currentTimeMillis() - start);
+					if( target > 0 )
+						t.wait(target);
+				} catch (InterruptedException ignore) {
+				}
 			}
 		}
 	}
