@@ -27,7 +27,7 @@ import boofcv.struct.pyramid.ImagePyramid;
  * ({@link KltTracker}) implementation.  A feature is tracked at multiple resolutions, large motions can
  * be detected at low resolution and are refined at higher resolutions.
  * </p>
- * <p/>
+ *
  * <p>
  * Features are tracked at the lowest layer in the pyramid which can contain the feature.  If a feature is contained
  * or not is defined by the basic tracker provided to the pyramid tracker.  In other words, if this tracker can handle

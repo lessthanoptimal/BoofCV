@@ -69,8 +69,12 @@ import java.util.Random;
 
 
 /**
- * Factory for creating trackers which implement {@link boofcv.abst.feature.tracker.PointTracker}.  These trackers are intended for use
- * in SFM applications.
+ * Factory for creating trackers which implement {@link boofcv.abst.feature.tracker.PointTracker}.  These trackers
+ * are intended for use in SFM applications.  Some features which individual trackers can provide are lost when
+ * using the high level interface {@link PointTracker}.  To create low level tracking algorithms see
+ * {@link FactoryTrackerAlg}
+ *
+ * @see FactoryTrackerAlg
  *
  * @author Peter Abeles
  */
@@ -78,6 +82,8 @@ public class FactoryPointTracker {
 
 	/**
 	 * Pyramid KLT feature tracker.
+	 *
+	 * @see boofcv.alg.tracker.klt.PyramidKltTracker
 	 *
 	 * @param scaling       Scales in the image pyramid. Recommend [1,2,4] or [2,4]
 	 * @param configExtract Configuration for extracting features
@@ -99,6 +105,8 @@ public class FactoryPointTracker {
 
 	/**
 	 * Pyramid KLT feature tracker.
+	 *
+	 * @see boofcv.alg.tracker.klt.PyramidKltTracker
 	 *
 	 * @param config Config for the tracker. Try PkltConfig.createDefault().
 	 * @param configExtract Configuration for extracting features

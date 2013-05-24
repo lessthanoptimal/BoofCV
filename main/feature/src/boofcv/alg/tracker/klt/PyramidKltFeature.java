@@ -24,17 +24,22 @@ package boofcv.alg.tracker.klt;
  * @author Peter Abeles
  */
 public class PyramidKltFeature {
-	// KLT feature description for each layer in the pyramid
+	/** KLT feature description for each layer in the pyramid */
 	public KltFeature desc[];
-	// the feature's location in the original image
-	public float x;
-	public float y;
-	// the maximum layer in which this description is valid
+	/** the feature's location in the original image */
+	public float x,y;
+	/** the maximum layer in which this description is valid */
 	public int maxLayer=-1;
 
-	// user specified data, not used by the tracker
+	/** user specified data, not used by the tracker */
 	public Object cookie;
 
+	/**
+	 * Configures the feature's description
+	 *
+	 * @param numLayers Number of layers inside the image pyramid
+	 * @param radius Radius of the feature description in each layer
+	 */
 	public PyramidKltFeature(int numLayers, int radius) {
 		desc = new KltFeature[numLayers];
 

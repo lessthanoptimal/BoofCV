@@ -126,6 +126,15 @@ public class PointTrackerKltPyramid<I extends ImageSingleBand,D extends ImageSin
 		unused.add(t);
 	}
 
+	/**
+	 * Creates a new feature track at the specified location. Must only be called after
+	 * {@link #process(boofcv.struct.image.ImageSingleBand)} has been called.  It can fail if there
+	 * is insufficient texture
+	 *
+	 * @param x x-coordinate
+	 * @param y y-coordinate
+	 * @return the new track if successful or null if no new track could be created
+	 */
 	public PointTrack addTrack( double x , double y ) {
 		// grow the number of tracks if needed
 		if( unused.isEmpty() )
