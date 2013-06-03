@@ -62,7 +62,7 @@ public class VisOdomPixelDepthPnP<T extends ImageBase> {
 	private int thresholdRetire;
 
 	// run the tracker once or twice?
-	boolean doublePass;
+	private boolean doublePass;
 
 	// tracks features in the image
 	private PointTrackerTwoPass<T> tracker;
@@ -93,6 +93,9 @@ public class VisOdomPixelDepthPnP<T extends ImageBase> {
 	private boolean first = true;
 	// number of frames processed.
 	private long tick;
+
+	// used when concating motion
+	private Se3_F64 temp = new Se3_F64();
 
 	/**
 	 * Configures magic numbers and estimation algorithms.
@@ -331,7 +334,6 @@ public class VisOdomPixelDepthPnP<T extends ImageBase> {
 	}
 
 	private void concatMotion() {
-		Se3_F64 temp = new Se3_F64();
 		currToKey.concat(keyToWorld,temp);
 		keyToWorld.set(temp);
 		currToKey.reset();

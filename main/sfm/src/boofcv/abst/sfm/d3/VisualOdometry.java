@@ -18,15 +18,15 @@
 
 package boofcv.abst.sfm.d3;
 
-import georegression.struct.se.Se3_F64;
-
 /**
  * Interface for Visual Odometry (VO) algorithms.  VO estimates the camera's motion (egomotion) by tracking
- * the locations of image features and by applying geometric constraints.
+ * the locations of image features and by applying geometric constraints.   The motion estimate is relative
+ * to the camera's reference frame.  In a multi-camera system the specific implementation specifies which
+ * camera the motion is relative to.
  *
  * @author Peter Abeles
  */
-public interface VisualOdometry {
+public interface VisualOdometry<M> {
 
 	/**
 	 * Forget past history and tracking results, returning it to its initial state.
@@ -48,5 +48,5 @@ public interface VisualOdometry {
 	 *
 	 * @return Found pose.
 	 */
-	public Se3_F64 getLeftToWorld();
+	public M getCameraToWorld();
 }

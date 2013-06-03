@@ -21,7 +21,6 @@ package boofcv.struct.image;
 import boofcv.core.image.GeneralizedImageOps;
 
 import java.lang.reflect.Array;
-import java.util.Arrays;
 
 /**
  * Specifies the type of image data structure.
@@ -30,20 +29,31 @@ import java.util.Arrays;
  */
 public class ImageDataType<T extends ImageBase> {
 
+	/**
+	 * Specifies the image data structure
+	 */
 	Family family;
+	/**
+	 * Specifies the type of data used to store pixel information
+	 */
 	ImageTypeInfo dataType;
+	/**
+	 * Number of bands in the image.  Single band images ignore this field.
+	 */
+	int numBands;
 
-	public ImageDataType(Family family, ImageTypeInfo dataType) {
+	public ImageDataType(Family family, ImageTypeInfo dataType , int numBands ) {
 		this.family = family;
 		this.dataType = dataType;
+		this.numBands = numBands;
 	}
 
 	public static <I extends ImageSingleBand> ImageDataType<I> single( Class<I> imageType ) {
-		return new ImageDataType<I>(Family.SINGLE_BAND,ImageTypeInfo.classToType(imageType));
+		return new ImageDataType<I>(Family.SINGLE_BAND,ImageTypeInfo.classToType(imageType),1);
 	}
 
-	public static <I extends ImageSingleBand> ImageDataType<MultiSpectral<I>> ms( Class<I> imageType ) {
-		return new ImageDataType<MultiSpectral<I>>(Family.MULTI_SPECTRAL,ImageTypeInfo.classToType(imageType));
+	public static <I extends ImageSingleBand> ImageDataType<MultiSpectral<I>> ms( int numBands , Class<I> imageType ) {
+		return new ImageDataType<MultiSpectral<I>>(Family.MULTI_SPECTRAL,ImageTypeInfo.classToType(imageType),numBands);
 	}
 
 	public ImageTypeInfo getDataType() {
@@ -51,14 +61,13 @@ public class ImageDataType<T extends ImageBase> {
 	}
 
 	/**
-	 * Creates a new image.  If its a single band image then the numBands parameter is ignored.
+	 * Creates a new image.
 	 *
-	 * @param width Number of colums in the image.
+	 * @param width Number of columns in the image.
 	 * @param height Number of rows in the image.
-	 * @param numBands Number of bands.  Ignored for single band images.
 	 * @return New instance of the image.
 	 */
-	public T createImage( int width , int height , int numBands ) {
+	public T createImage( int width , int height ) {
 		switch( family ) {
 			case SINGLE_BAND:
 				return (T)GeneralizedImageOps.createSingleBand(dataType.getImageClass(),width,height);
@@ -87,6 +96,10 @@ public class ImageDataType<T extends ImageBase> {
 			default:
 				throw new IllegalArgumentException("Type not yet supported");
 		}
+	}
+
+	public int getNumBands() {
+		return numBands;
 	}
 
 	public Family getFamily() {

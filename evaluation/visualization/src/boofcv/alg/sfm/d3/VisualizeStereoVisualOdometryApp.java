@@ -213,7 +213,7 @@ public class VisualizeStereoVisualOdometryApp <I extends ImageSingleBand>
 		showInliers = guiInfo.isShowInliers();
 		drawFeatures((AccessPointTracks3D)alg,buffImage1);
 
-		final Se3_F64 leftToWorld = alg.getLeftToWorld().copy();
+		final Se3_F64 leftToWorld = alg.getCameraToWorld().copy();
 
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {

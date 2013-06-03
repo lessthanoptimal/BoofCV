@@ -55,7 +55,7 @@ implements SimpleImageSequence<T>
 	public ImageStreamSequence(InputStream in, ImageDataType<T> imageType) {
 		this.in = new DataInputStream(in);
 		this.imageType = imageType;
-		image = imageType.createImage(1,1,3);
+		image = imageType.createImage(1,1);
 		readNext();
 	}
 

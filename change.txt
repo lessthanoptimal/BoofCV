@@ -18,6 +18,8 @@ Version : Alpha 0.15
 - Can read/write PPM images
 - Added DepthVisualOdometry for computing visual odometry from a Kinect
   * Added several related classes and interfaces too
+- Added MonocularPlaneVisualOdometry for computing 2D motion from a camera when traveling over a plane
+- Generalized VisualOdometry interface to allow for arbitrary transforms
 - Cleaned up VisualOdometry and StereoVisualOdometry interfaces
 - Added DistanceHomographyPixelSq so that the fit error for normalized homography can be computed in image pixels.
 - Added MultiViewOps.decomposeHomography().
@@ -30,6 +32,10 @@ Version : Alpha 0.15
   * Two lines
 - Added NearestNeighborPixel_U16
 - Added VisualDepthParameters to specify calibration for RGB-D cameras
+- Added index setters and getters to GImageSingleBand
+- CreateSyntheticOverheadView for converting an image into an overhead view when the scene is planar
+- Added numBands to ImageDataType
+- Fixed type-o in triangulation JavaDoc.  Thanks tverbele
 
 ---------------------------------------------
 Date    : 2013/04/15

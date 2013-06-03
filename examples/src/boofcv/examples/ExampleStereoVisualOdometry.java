@@ -85,7 +85,7 @@ public class ExampleStereoVisualOdometry {
 				throw new RuntimeException("VO Failed!");
 			}
 
-			Se3_F64 leftToWorld = visualOdometry.getLeftToWorld();
+			Se3_F64 leftToWorld = visualOdometry.getCameraToWorld();
 			Vector3D_F64 T = leftToWorld.getT();
 
 			System.out.printf("Location %8.2f %8.2f %8.2f      inliers %s\n", T.x, T.y, T.z, inlierPercent(visualOdometry));

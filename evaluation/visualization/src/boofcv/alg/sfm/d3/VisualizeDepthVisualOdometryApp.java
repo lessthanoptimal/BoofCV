@@ -216,7 +216,7 @@ public class VisualizeDepthVisualOdometryApp<I extends ImageSingleBand>
 
 		drawFeatures((AccessPointTracks3D)alg,buffImage1);
 
-		final Se3_F64 leftToWorld = alg.getLeftToWorld().copy();
+		final Se3_F64 leftToWorld = alg.getCameraToWorld().copy();
 
 		// TODO magic value from kinect.  Add to config file?
 		VisualizeImageData.disparity(frame2, renderedDepth, 0, 10000, 0);

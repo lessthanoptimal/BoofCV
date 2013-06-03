@@ -19,13 +19,10 @@
 package boofcv.io.wrapper.images;
 
 import boofcv.core.image.ConvertBufferedImage;
-import boofcv.core.image.GeneralizedImageOps;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.video.VideoMjpegCodec;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageDataType;
-import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.image.ImageTypeInfo;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -51,7 +48,7 @@ implements SimpleImageSequence<T>
 	public MjpegStreamSequence( InputStream in , ImageDataType<T> imageType ) {
 		this.in = new DataInputStream(in);
 		this.imageType = imageType;
-		image = imageType.createImage(1,1,3);
+		image = imageType.createImage(1,1);
 		readNext();
 	}
 

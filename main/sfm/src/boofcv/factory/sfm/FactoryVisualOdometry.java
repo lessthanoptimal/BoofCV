@@ -33,6 +33,7 @@ import boofcv.abst.geo.RefinePnP;
 import boofcv.abst.geo.TriangulateTwoViewsCalibrated;
 import boofcv.abst.sfm.DepthSparse3D_to_PixelTo3D;
 import boofcv.abst.sfm.ImagePixelTo3D;
+import boofcv.abst.sfm.d2.ImageMotion2D;
 import boofcv.abst.sfm.d3.*;
 import boofcv.alg.feature.associate.AssociateMaxDistanceNaive;
 import boofcv.alg.feature.associate.AssociateStereo2D;
@@ -41,6 +42,7 @@ import boofcv.alg.geo.pose.*;
 import boofcv.alg.sfm.DepthSparse3D;
 import boofcv.alg.sfm.StereoSparse3D;
 import boofcv.alg.sfm.d3.VisOdomDualTrackPnP;
+import boofcv.alg.sfm.d3.VisOdomMonoOverheadMotion2D;
 import boofcv.alg.sfm.d3.VisOdomPixelDepthPnP;
 import boofcv.alg.sfm.d3.VisOdomQuadPnP;
 import boofcv.alg.sfm.robust.EstimatorToGenerator;
@@ -51,8 +53,10 @@ import boofcv.factory.geo.FactoryMultiView;
 import boofcv.factory.geo.FactoryTriangulate;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.geo.Point2D3D;
+import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.sfm.Stereo2D3D;
+import georegression.struct.se.Se2_F64;
 import georegression.struct.se.Se3_F64;
 import org.ddogleg.fitting.modelset.ModelFitter;
 import org.ddogleg.fitting.modelset.ModelMatcher;
@@ -64,6 +68,20 @@ import org.ddogleg.fitting.modelset.ransac.Ransac;
  * @author Peter Abeles
  */
 public class FactoryVisualOdometry {
+
+	public static <T extends ImageSingleBand>
+	MonocularPlaneVisualOdometry<T> monoPlaneOverhead(double cellSize,
+													  double maxCellsPerPixel,
+													  double mapHeightFraction ,
+													  ImageMotion2D<T,Se2_F64> motion2D ,
+													  ImageDataType<T> imageType ) {
+
+
+		VisOdomMonoOverheadMotion2D<T> alg =
+				new VisOdomMonoOverheadMotion2D<T>(cellSize,maxCellsPerPixel,mapHeightFraction,motion2D,imageType);
+
+		return new MonoOverhead_to_MonocularPlaneVisualOdometry<T>(alg);
+	}
 
 	/**
 	 * Stereo vision based visual odometry algorithm which runs a sparse feature tracker in the left camera and

@@ -71,9 +71,9 @@ public class ImageMotionPtkSmartRespawn<I extends ImageBase, IT extends Invertib
 	 * Specifies internal algorithms and reset parameters.
 	 *
 	 * @param motion Algorithm for estimating image motion
-	 * @param absoluteMinimumTracks New key-frame is number of inliers drops below this number
-	 * @param relativeInlierFraction New key-frame is ratio of inliers to the original count drops below this number
-	 * @param respawnCoverageFraction New key-frame is ratio point area coverage below this number
+	 * @param absoluteMinimumTracks Create new key-frame if number of inliers drops below this number
+	 * @param relativeInlierFraction Create new key-frame if ratio of inliers to the original count drops below this number
+	 * @param respawnCoverageFraction Create new key-frame if ratio point area coverage below this number
 	 */
 	public ImageMotionPtkSmartRespawn(ImageMotionPointTrackerKey<I, IT> motion,
 									  int absoluteMinimumTracks, double relativeInlierFraction,

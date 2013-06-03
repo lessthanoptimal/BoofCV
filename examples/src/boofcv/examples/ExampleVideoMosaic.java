@@ -78,7 +78,8 @@ public class ExampleVideoMosaic {
 		// Load an image sequence
 		MediaManager media = DefaultMediaManager.INSTANCE;
 		String fileName = "../data/applet/mosaic/airplane01.mjpeg";
-		SimpleImageSequence<MultiSpectral<ImageFloat32>> video = media.openVideo(fileName, ImageDataType.ms(ImageFloat32.class));
+		SimpleImageSequence<MultiSpectral<ImageFloat32>> video =
+				media.openVideo(fileName, ImageDataType.ms(3,ImageFloat32.class));
 
 		MultiSpectral<ImageFloat32> frame = video.next();
 

@@ -41,13 +41,13 @@ public class TriangulateGeometric {
 	/**
 	 * <p>
 	 * Given two observations of the same point from two views and a known motion between the
-	 * two views, triangulate the point's position in camera 'b' reference frame.
+	 * two views, triangulate the point's 3D position in camera 'a' reference frame.
 	 * </p>
 	 *
-	 * @param a Observation 'a' in normalized coordinates. Not modified.
-	 * @param b Observation 'b' in normalized coordinates. Not modified.
+	 * @param a Observation from camera view 'a' in normalized coordinates. Not modified.
+	 * @param b Observation from camera view 'b' in normalized coordinates. Not modified.
 	 * @param fromAtoB Transformation from camera view 'a' to 'b'  Not modified.
-	 * @param foundInA Output, the found 3D position of the point in 'a' reference frame.  Modified.
+	 * @param foundInA (Output) Found 3D position of the point in reference frame 'a'.  Modified.
 	 */
 	public void triangulate( Point2D_F64 a , Point2D_F64 b ,
 							 Se3_F64 fromAtoB ,

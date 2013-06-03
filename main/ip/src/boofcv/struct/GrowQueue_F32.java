@@ -38,8 +38,22 @@ public class GrowQueue_F32 {
 		size = 0;
 	}
 
-    public void push( float val ) {
-        if( size == data.length ) {
+	public void addAll( GrowQueue_F32 queue ) {
+		if( size+queue.size > data.length ) {
+			float temp[] = new float[ (size+queue.size) * 2];
+			System.arraycopy(data,0,temp,0,size);
+			data = temp;
+		}
+		System.arraycopy(queue.data,0,data,size,queue.size);
+		size += queue.size;
+	}
+
+	public void add( float val ) {
+		push(val);
+	}
+
+	public void push( float val ) {
+		if( size == data.length ) {
 			float temp[] = new float[ size * 2];
 			System.arraycopy(data,0,temp,0,size);
 			data = temp;
