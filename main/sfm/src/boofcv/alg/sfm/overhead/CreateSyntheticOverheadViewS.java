@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.sfm.misc;
+package boofcv.alg.sfm.overhead;
 
 import boofcv.alg.interpolate.InterpolatePixel;
 import boofcv.core.image.FactoryGImageSingleBand;

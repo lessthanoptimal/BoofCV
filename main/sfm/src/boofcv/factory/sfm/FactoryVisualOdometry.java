@@ -69,12 +69,44 @@ import org.ddogleg.fitting.modelset.ransac.Ransac;
  */
 public class FactoryVisualOdometry {
 
+	/**
+	 *
+	 * @param cellSize (Overhead) size of ground cells in overhead image in world units
+	 * @param maxCellsPerPixel (Overhead)
+	 * @param mapHeightFraction (Overhead)
+
+	 * @param inlierGroundTol (RANSAC) tolerance on ground plane in world units
+	 * @param ransacIterations (RANSAC)
+	 *
+	 * @param thresholdRetire (2D Motion)
+	 * @param absoluteMinimumTracks (2D Motion)
+	 * @param respawnTrackFraction (2D Motion)
+	 * @param respawnCoverageFraction (2D Motion)
+	 *
+	 * @param tracker
+	 * @param imageType
+	 * @param <T>
+	 * @return
+	 */
 	public static <T extends ImageSingleBand>
 	MonocularPlaneVisualOdometry<T> monoPlaneOverhead(double cellSize,
 													  double maxCellsPerPixel,
 													  double mapHeightFraction ,
-													  ImageMotion2D<T,Se2_F64> motion2D ,
+
+													  double inlierGroundTol,
+													  int ransacIterations ,
+
+													  int thresholdRetire ,
+													  int absoluteMinimumTracks,
+													  double respawnTrackFraction,
+													  double respawnCoverageFraction,
+
+													  PointTracker<T> tracker ,
 													  ImageDataType<T> imageType ) {
+
+		ImageMotion2D<T,Se2_F64> motion2D = FactoryMotion2D.createMotion2D(
+				ransacIterations,inlierGroundTol*inlierGroundTol,thresholdRetire,
+				absoluteMinimumTracks,respawnTrackFraction,respawnCoverageFraction,false,tracker,new Se2_F64());
 
 
 		VisOdomMonoOverheadMotion2D<T> alg =

@@ -20,8 +20,9 @@ package boofcv.alg.sfm.d3;
 
 import boofcv.abst.sfm.d2.ImageMotion2D;
 import boofcv.alg.misc.GImageMiscOps;
-import boofcv.alg.sfm.misc.CreateSyntheticOverheadView;
-import boofcv.alg.sfm.misc.SelectOverheadMap;
+import boofcv.alg.sfm.overhead.CreateSyntheticOverheadView;
+import boofcv.alg.sfm.overhead.OverheadView;
+import boofcv.alg.sfm.overhead.SelectOverheadParameters;
 import boofcv.factory.sfm.FactorySfmMisc;
 import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.image.ImageBase;
@@ -44,9 +45,6 @@ import org.ejml.data.DenseMatrix64F;
  * plane lies along the x-z axis and contains point (0,0,0).  See {@link CreateSyntheticOverheadView} for more
  * information about the ground plane coordinates and overhead image..
  *
- * NOTE: The overhead map needs to be selected carefully for this to work well.
- * {@link boofcv.alg.sfm.misc.SelectOverheadMap} provides an automated way for selecting the map.
- *
  * @author Peter Abeles
  */
 public class VisOdomMonoOverheadMotion2D<T extends ImageBase>
@@ -57,13 +55,10 @@ public class VisOdomMonoOverheadMotion2D<T extends ImageBase>
 	private ImageMotion2D<T,Se2_F64> motion2D;
 
 	// storage for overhead image
-	private T overhead;
-
+	private OverheadView<T> overhead;
 
 	// selects a reasonable overhead map
-	SelectOverheadMap selectOverhead;
-	// overhead image description
-	private double centerX, centerY, cellSize;
+	private SelectOverheadParameters selectOverhead;
 
 	// transform from the plane to the camera
 	private Se3_F64 planeToCamera;
@@ -88,12 +83,12 @@ public class VisOdomMonoOverheadMotion2D<T extends ImageBase>
 									   double mapHeightFraction ,
 									   ImageMotion2D<T, Se2_F64> motion2D , ImageDataType<T> imageType )
 	{
-		this.cellSize = cellSize;
-		selectOverhead = new SelectOverheadMap(cellSize,maxCellsPerPixel,mapHeightFraction);
+		selectOverhead = new SelectOverheadParameters(cellSize,maxCellsPerPixel,mapHeightFraction);
 		this.motion2D = motion2D;
 
 		createOverhead = FactorySfmMisc.createOverhead(imageType);
-		overhead = imageType.createImage(1,1);
+
+		overhead = new OverheadView<T>(imageType.createImage(1,1),0,0,cellSize);
 	}
 
 	/**
@@ -108,15 +103,15 @@ public class VisOdomMonoOverheadMotion2D<T extends ImageBase>
 		if( !selectOverhead.process(intrinsic,planeToCamera) )
 			throw new IllegalArgumentException("Can't find a reasonable overhead map.  Can the camera view the plane?");
 
-		centerX = selectOverhead.getCenterX();
-		centerY = selectOverhead.getCenterY();
+		overhead.centerX = selectOverhead.getCenterX();
+		overhead.centerY = selectOverhead.getCenterY();
 
-		createOverhead.configure(intrinsic,planeToCamera,centerX,centerY,cellSize,
+		createOverhead.configure(intrinsic,planeToCamera,overhead.centerX,overhead.centerY,overhead.cellSize,
 				selectOverhead.getOverheadWidth(),selectOverhead.getOverheadHeight());
 
 		// fill it so there aren't any artifacts in the left over
-		overhead.reshape(selectOverhead.getOverheadWidth(),selectOverhead.getOverheadHeight());
-		GImageMiscOps.fill(overhead,0);
+		overhead.image.reshape(selectOverhead.getOverheadWidth(), selectOverhead.getOverheadHeight());
+		GImageMiscOps.fill(overhead.image,0);
 	}
 
 	/**
@@ -133,9 +128,9 @@ public class VisOdomMonoOverheadMotion2D<T extends ImageBase>
 	 * @return true if motion was estimated or false if a fault occurred.  Should reset after a fault.
 	 */
 	public boolean process( T image ) {
-		createOverhead.process(image, overhead);
+		createOverhead.process(image, overhead.image);
 
-		if( !motion2D.process(overhead) ) {
+		if( !motion2D.process(overhead.image) ) {
 			return false;
 		}
 
@@ -161,8 +156,8 @@ public class VisOdomMonoOverheadMotion2D<T extends ImageBase>
 
 		// go from pixel to map coordinates
 		// This is the change in location, so no need to adjust for the origin
-		double mapX = m.tran.x*cellSize;
-		double mapY = m.tran.y*cellSize;
+		double mapX = m.tran.x*overhead.cellSize;
+		double mapY = m.tran.y*overhead.cellSize;
 
 		// 2D to 3D coordinates
 		worldToCurr3D.getT().set(-mapY,0,mapX);
@@ -184,7 +179,7 @@ public class VisOdomMonoOverheadMotion2D<T extends ImageBase>
 	/**
 	 * Overhead image view
 	 */
-	public T getOverhead() {
+	public OverheadView<T> getOverhead() {
 		return overhead;
 	}
 
@@ -193,17 +188,5 @@ public class VisOdomMonoOverheadMotion2D<T extends ImageBase>
 	 */
 	public ImageMotion2D<T, Se2_F64> getMotion2D() {
 		return motion2D;
-	}
-
-	public double getCenterX() {
-		return centerX;
-	}
-
-	public double getCenterY() {
-		return centerY;
-	}
-
-	public double getCellSize() {
-		return cellSize;
 	}
 }

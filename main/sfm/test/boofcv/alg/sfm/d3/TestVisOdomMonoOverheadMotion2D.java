@@ -20,30 +20,13 @@ package boofcv.alg.sfm.d3;
 
 import org.junit.Test;
 
-import static org.junit.Assert.fail;
-
 /**
 * @author Peter Abeles
 */
 public class TestVisOdomMonoOverheadMotion2D {
 
 	@Test
-	public void configureCamera() {
-		fail("Implement");
-	}
-
-	@Test
 	public void process() {
-		fail("Implement");
-	}
-
-	@Test
-	public void getWorldToCurr2D() {
-		fail("Implement");
-	}
-
-	@Test
-	public void getWorldToCurr3D() {
-		fail("Implement");
+		// intentionally left blank.  motion estimation tests are done in abst package implementation
 	}
 }

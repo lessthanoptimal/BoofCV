@@ -121,8 +121,6 @@ public abstract class CheckVisualOdometryMonoPlaneSim<I extends ImageSingleBand>
 		algorithm.setIntrinsic(param);
 
 		for( int i = 0; i < 10; i++ ) {
-			System.out.println("-----------------------------------------");
-
 			worldToCurr.getT().z = -i*0.10; // move forward
 
 			worldToCurr.concat(planeToCamera,worldToCamera);
@@ -138,8 +136,8 @@ public abstract class CheckVisualOdometryMonoPlaneSim<I extends ImageSingleBand>
 			Se3_F64 foundWorldToCamera = algorithm.getCameraToWorld().invert(null);
 			Se3_F64 foundWorldToCurr =  foundWorldToCamera.concat(cameraToPlane,null);
 
-//			worldToCurr.getT().print();
-//			foundWorldToCurr.getT().print();
+			worldToCurr.getT().print();
+			foundWorldToCurr.getT().print();
 
 //			worldToCurr.getR().print();
 //			foundWorldToCurr.getR().print();

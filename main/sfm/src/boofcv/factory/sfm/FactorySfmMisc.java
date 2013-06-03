@@ -20,9 +20,9 @@ package boofcv.factory.sfm;
 
 import boofcv.alg.interpolate.InterpolatePixel;
 import boofcv.alg.interpolate.TypeInterpolate;
-import boofcv.alg.sfm.misc.CreateSyntheticOverheadView;
-import boofcv.alg.sfm.misc.CreateSyntheticOverheadViewMS;
-import boofcv.alg.sfm.misc.CreateSyntheticOverheadViewS;
+import boofcv.alg.sfm.overhead.CreateSyntheticOverheadView;
+import boofcv.alg.sfm.overhead.CreateSyntheticOverheadViewMS;
+import boofcv.alg.sfm.overhead.CreateSyntheticOverheadViewS;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageDataType;
