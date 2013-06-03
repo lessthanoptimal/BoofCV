@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.sfm.misc;
+package boofcv.alg.sfm.overhead;
 
 import boofcv.struct.calib.IntrinsicParameters;
 import georegression.geometry.RotationMatrixGenerator;
@@ -29,7 +29,7 @@ import static org.junit.Assert.*;
 /**
  * @author Peter Abeles
  */
-public class TestSelectOverheadMap {
+public class TestSelectOverheadParameters {
 
 	protected int width=320,height=240;
 	IntrinsicParameters param = new IntrinsicParameters(150,150,0,width/2,height/2,width,height, false, new double[]{0,0});
@@ -42,7 +42,7 @@ public class TestSelectOverheadMap {
 	public void pointedStraightDown() {
 		createExtrinsic(-2,-Math.PI/2,0);
 
-		SelectOverheadMap alg = new SelectOverheadMap(cellSize,5,1);
+		SelectOverheadParameters alg = new SelectOverheadParameters(cellSize,5,1);
 
 		assertTrue(alg.process(param,planeToCamera));
 
@@ -59,13 +59,13 @@ public class TestSelectOverheadMap {
 		assertEquals(tanCameraY,tanWidth,0.05);
 
 		// won't be perfectly symmetric since the image doesn't project perfectly symmetric
-		assertEquals(alg.getCenterX(),-mapWidth/2.0,cellSize);
+		assertEquals(alg.getCenterX(),mapWidth/2.0,cellSize);
 		assertEquals(alg.getCenterY(),mapHeight/2.0,cellSize);
 	}
 
 	@Test
 	public void checkFailure() {
-		SelectOverheadMap alg = new SelectOverheadMap(cellSize,5,1);
+		SelectOverheadParameters alg = new SelectOverheadParameters(cellSize,5,1);
 
 		// look up away from the map, should fail
 		createExtrinsic(-2,Math.PI/2,0);
@@ -80,14 +80,14 @@ public class TestSelectOverheadMap {
 	public void pointedAngle() {
 		createExtrinsic(-2,UtilAngle.degreeToRadian(-45),0);
 
-		SelectOverheadMap alg = new SelectOverheadMap(cellSize,5,1);
+		SelectOverheadParameters alg = new SelectOverheadParameters(cellSize,5,1);
 
 		assertTrue(alg.process(param, planeToCamera));
 
 		double mapHeight = alg.getOverheadHeight()*cellSize;
 
 		// center X should be farther down the camera's pointing direction
-		assertTrue(alg.getCenterX() > 0);
+		assertTrue(alg.getCenterX() < 0);
 		// still symmetric
 		assertEquals(alg.getCenterY(),mapHeight/2,cellSize);
 	}

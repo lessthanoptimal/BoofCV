@@ -16,13 +16,13 @@
  * limitations under the License.
  */
 
-package boofcv.alg.sfm.misc;
+package boofcv.alg.sfm.overhead;
 
-import boofcv.alg.interpolate.InterpolatePixel;
+import boofcv.alg.interpolate.TypeInterpolate;
 import boofcv.alg.misc.ImageMiscOps;
-import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.MultiSpectral;
 import georegression.geometry.RotationMatrixGenerator;
 import georegression.metric.UtilAngle;
 import georegression.struct.se.Se3_F64;
@@ -33,7 +33,7 @@ import static org.junit.Assert.assertEquals;
 /**
  * @author Peter Abeles
  */
-public class TestCreateSyntheticOverheadViewS {
+public class TestCreateSyntheticOverheadViewMS {
 
 	int width = 800;
 	int height = 850;
@@ -54,25 +54,30 @@ public class TestCreateSyntheticOverheadViewS {
 
 		Se3_F64 planeToCamera = cameraToPlane.invert(null);
 
-		InterpolatePixel<ImageFloat32> interp = FactoryInterpolation.bilinearPixel(ImageFloat32.class);
-		CreateSyntheticOverheadViewS<ImageFloat32> alg = new CreateSyntheticOverheadViewS<ImageFloat32>(interp);
+		CreateSyntheticOverheadViewMS<ImageFloat32> alg =
+				new CreateSyntheticOverheadViewMS<ImageFloat32>(TypeInterpolate.BILINEAR,3,ImageFloat32.class);
 
 		alg.configure(param,planeToCamera,centerX,centerY,cellSize,overheadW,overheadH);
 
-		ImageFloat32 input = new ImageFloat32(width,height);
-		ImageMiscOps.fill(input,10);
+		MultiSpectral<ImageFloat32> input = new MultiSpectral<ImageFloat32>(ImageFloat32.class,width,height,3);
+		for( int i = 0; i < 3; i++ )
+			ImageMiscOps.fill(input.getBand(i), 10+i);
 
-		ImageFloat32 output = new ImageFloat32(overheadW,overheadH);
+		MultiSpectral<ImageFloat32> output = new MultiSpectral<ImageFloat32>(ImageFloat32.class,overheadW,overheadH,3);
 
 		alg.process(input,output);
 
-		// check parts that shouldn't be in view
-		assertEquals(0,output.get(0,300),1e-8);
-		assertEquals(0,output.get(5,0),1e-8);
-		assertEquals(0,output.get(5,599),1e-8);
+		for( int i = 0; i < 3; i++ ) {
+			ImageFloat32 o = output.getBand(i);
 
-		// check areas that should be in view
-		assertEquals(10,output.get(499,300),1e-8);
+			// check parts that shouldn't be in view
+			assertEquals(0,o.get(0,300),1e-8);
+			assertEquals(0,o.get(5,0),1e-8);
+			assertEquals(0,o.get(5,599),1e-8);
+
+			// check areas that should be in view
+			assertEquals(10+i,o.get(499,300),1e-8);
+		}
 	}
 
 }

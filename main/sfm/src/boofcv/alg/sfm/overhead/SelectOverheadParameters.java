@@ -16,21 +16,23 @@
  * limitations under the License.
  */
 
-package boofcv.alg.sfm.misc;
+package boofcv.alg.sfm.overhead;
 
 import boofcv.struct.calib.IntrinsicParameters;
+import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageDataType;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.se.Se3_F64;
 
 /**
- * Give a camera's intrinsic and extrinsic parameters, selects a reasonable overhead map to render the image onto.  It
- * attempts to maximize viewing area.  The user can crop the height of the overhead map to reduce the amount of
+ * Give a camera's intrinsic and extrinsic parameters, selects a reasonable overhead view to render the image onto.  It
+ * attempts to maximize viewing area.  The user can crop the height of the overhead view to reduce the amount of
  * unusable image space in the map.  This is particularly useful for cameras at an acute angle relative to the
  * ground plane.  Overhead cameras pointed downward should set it to 1.0
  *
  * @author Peter Abeles
  */
-public class SelectOverheadMap {
+public class SelectOverheadParameters {
 
 	// used to project pixels onto the plane
 	CameraPlaneProjection proj = new CameraPlaneProjection();
@@ -42,12 +44,12 @@ public class SelectOverheadMap {
 	double centerY;
 
 	// --- User specified parameters
-	// size of the map cells on the plane
+	// size of cells on the plane
 	double cellSize;
 	// determines the minimum resolution
 	double maxCellsPerPixel;
-	// used to crop the map's height.  Specifies the fraction of the "optimal" height which is actually used.
-	double mapHeightFraction;
+	// used to crop the views's height.  Specifies the fraction of the "optimal" height which is actually used.
+	double viewHeightFraction;
 
 	// local variables
 	Point2D_F64 plane0 = new Point2D_F64();
@@ -58,19 +60,19 @@ public class SelectOverheadMap {
 	 *
 	 * @param cellSize Size of cells in plane in world units
 	 * @param maxCellsPerPixel Specifies minimum resolution of a region in overhead image. A pixel in the camera
-	 *                         can't overlap more than this number of map cells.   Higher values allow lower
+	 *                         can't overlap more than this number of cells.   Higher values allow lower
 	 *                         resolution regions.  Try 4.
-	 * @param mapHeightFraction Reduce the map height by this fraction to avoid excessive unusable image space.  Set to
+	 * @param viewHeightFraction Reduce the view height by this fraction to avoid excessive unusable image space.  Set to
 	 *                          1.0 to maximize the viewing area and any value less than one to crop it.
 	 */
-	public SelectOverheadMap(double cellSize, double maxCellsPerPixel, double mapHeightFraction) {
+	public SelectOverheadParameters(double cellSize, double maxCellsPerPixel, double viewHeightFraction) {
 		this.cellSize = cellSize;
 		this.maxCellsPerPixel = maxCellsPerPixel;
-		this.mapHeightFraction = mapHeightFraction;
+		this.viewHeightFraction = viewHeightFraction;
 	}
 
 	/**
-	 * Computes the map size
+	 * Computes the view's characteristics
 	 *
 	 * @param intrinsic Intrinsic camera parameters
 	 * @param planeToCamera Extrinsic camera parameters which specify the plane
@@ -109,11 +111,24 @@ public class SelectOverheadMap {
 		double mapWidth = x1-x0;
 		double mapHeight = y1-y0;
 		overheadWidth = (int)Math.floor(mapWidth/cellSize);
-		overheadHeight = (int)Math.floor(mapHeight*mapHeightFraction/cellSize);
+		overheadHeight = (int)Math.floor(mapHeight* viewHeightFraction /cellSize);
 		centerX = -x0;
-		centerY = -(y0+mapHeight*(1-mapHeightFraction)/2.0);
+		centerY = -(y0+mapHeight*(1- viewHeightFraction)/2.0);
 
 		return true;
+	}
+
+	/**
+	 * Creates a new instance of the overhead view
+	 */
+	public <T extends ImageBase> OverheadView createOverhead( ImageDataType<T> imageType ) {
+		OverheadView ret = new OverheadView();
+		ret.image = imageType.createImage(overheadWidth,overheadHeight);
+		ret.cellSize = cellSize;
+		ret.centerX = centerX;
+		ret.centerY = centerY;
+		
+		return ret;
 	}
 
 	private boolean checkValidPixel( int x , int y ) {

@@ -21,14 +21,11 @@ package boofcv.abst.sfm.d3;
 import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
 import boofcv.abst.feature.tracker.PkltConfig;
 import boofcv.abst.feature.tracker.PointTracker;
-import boofcv.abst.sfm.d2.ImageMotion2D;
 import boofcv.factory.feature.tracker.FactoryPointTracker;
-import boofcv.factory.sfm.FactoryMotion2D;
 import boofcv.factory.sfm.FactoryVisualOdometry;
 import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageSInt16;
 import boofcv.struct.image.ImageUInt8;
-import georegression.struct.se.Se2_F64;
 
 /**
  * @author Peter Abeles
@@ -54,13 +51,10 @@ public class TestMonoOverhead_to_MonocularPlaneVisualOdometry extends CheckVisua
 		PointTracker<ImageUInt8> tracker = FactoryPointTracker.klt(config, configDetector);
 
 		double cellSize = 0.015;
-		double ransacTol = 5.5*cellSize;
-
-		ImageMotion2D<ImageUInt8,Se2_F64> motion2D = FactoryMotion2D.createMotion2D(
-				300,ransacTol*ransacTol,2,30,0.5,0.3,false,tracker,new Se2_F64());
+		double ransacTol = 0.2;
 
 		return FactoryVisualOdometry.monoPlaneOverhead(
-				cellSize, 25,0.5, motion2D, ImageDataType.single(ImageUInt8.class));
+				cellSize, 25,0.5, ransacTol,300,2,30,0.5,0.3, tracker,ImageDataType.single(ImageUInt8.class));
 
 	}
 

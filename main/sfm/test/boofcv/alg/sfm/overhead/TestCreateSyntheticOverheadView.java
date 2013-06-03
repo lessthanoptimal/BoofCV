@@ -16,37 +16,30 @@
  * limitations under the License.
  */
 
-package boofcv.alg.sfm.misc;
+package boofcv.alg.sfm.overhead;
 
-import boofcv.alg.interpolate.TypeInterpolate;
-import boofcv.alg.misc.ImageMiscOps;
 import boofcv.struct.calib.IntrinsicParameters;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.MultiSpectral;
+import boofcv.struct.image.ImageBase;
 import georegression.geometry.RotationMatrixGenerator;
 import georegression.metric.UtilAngle;
+import georegression.struct.point.Point2D_F64;
 import georegression.struct.se.Se3_F64;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Peter Abeles
  */
-public class TestCreateSyntheticOverheadViewMS {
+public class TestCreateSyntheticOverheadView {
 
 	int width = 800;
 	int height = 850;
 	IntrinsicParameters param = new IntrinsicParameters(200,201,0,width/2,height/2,width,height, false, new double[]{0.002,0});
 
-	int overheadW = 500;
-	int overheadH = 600;
-	double cellSize = 0.05;
-	double centerX = 1;
-	double centerY = overheadH*cellSize/2.0;
-
 	@Test
-	public void checkRender() {
+	public void checkPrecomputedTransform() {
 		// Easier to make up a plane in this direction
 		Se3_F64 cameraToPlane = new Se3_F64();
 		RotationMatrixGenerator.eulerXYZ(UtilAngle.degreeToRadian(0), 0, 0, cameraToPlane.getR());
@@ -54,30 +47,40 @@ public class TestCreateSyntheticOverheadViewMS {
 
 		Se3_F64 planeToCamera = cameraToPlane.invert(null);
 
-		CreateSyntheticOverheadViewMS<ImageFloat32> alg =
-				new CreateSyntheticOverheadViewMS<ImageFloat32>(TypeInterpolate.BILINEAR,3,ImageFloat32.class);
+		CreateSyntheticOverheadView alg = new CreateSyntheticOverheadView() {
+			@Override
+			public void process(ImageBase input, ImageBase output) {
+			}
+		};
+
+		int overheadW = 500;
+		int overheadH = 600;
+		double cellSize = 0.05;
+		double centerX = 1;
+		double centerY = overheadH*cellSize/2.0;
 
 		alg.configure(param,planeToCamera,centerX,centerY,cellSize,overheadW,overheadH);
 
-		MultiSpectral<ImageFloat32> input = new MultiSpectral<ImageFloat32>(ImageFloat32.class,width,height,3);
-		for( int i = 0; i < 3; i++ )
-			ImageMiscOps.fill(input.getBand(i), 10+i);
+		//  directly below camera, should not be in view
+		assertTrue(null == alg.getOverheadToPixel(0, 300));
 
-		MultiSpectral<ImageFloat32> output = new MultiSpectral<ImageFloat32>(ImageFloat32.class,overheadW,overheadH,3);
+		//  point at the end of the map should be in view
+		assertTrue(null!=alg.getOverheadToPixel(overheadW-1,300));
 
-		alg.process(input,output);
+		// check the value at one point by doing the reverse transform
+		Point2D_F64 found = alg.getOverheadToPixel(400,320);
 
-		for( int i = 0; i < 3; i++ ) {
-			ImageFloat32 o = output.getBand(i);
+		CameraPlaneProjection proj = new CameraPlaneProjection();
+		proj.setConfiguration(planeToCamera,param);
 
-			// check parts that shouldn't be in view
-			assertEquals(0,o.get(0,300),1e-8);
-			assertEquals(0,o.get(5,0),1e-8);
-			assertEquals(0,o.get(5,599),1e-8);
+		Point2D_F64 expected = new Point2D_F64();
+		proj.pixelToPlane(found.x, found.y, expected);
 
-			// check areas that should be in view
-			assertEquals(10+i,o.get(499,300),1e-8);
-		}
+		// put into overhead pixels
+		expected.x = (expected.x+centerX)/cellSize;
+		expected.y = (expected.y+centerY)/cellSize;
+
+		assertEquals(400,expected.x,1e-4);
+		assertEquals(320,expected.y,1e-4);
 	}
-
 }

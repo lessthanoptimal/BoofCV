@@ -19,9 +19,9 @@
 package boofcv.examples;
 
 import boofcv.alg.interpolate.TypeInterpolate;
-import boofcv.alg.sfm.misc.CreateSyntheticOverheadView;
-import boofcv.alg.sfm.misc.CreateSyntheticOverheadViewMS;
-import boofcv.alg.sfm.misc.SelectOverheadMap;
+import boofcv.alg.sfm.overhead.CreateSyntheticOverheadView;
+import boofcv.alg.sfm.overhead.CreateSyntheticOverheadViewMS;
+import boofcv.alg.sfm.overhead.SelectOverheadParameters;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.image.UtilImageIO;
@@ -57,7 +57,7 @@ public class ExampleOverheadView {
 		double cellSize = 0.05;
 
 		// You can use this to automatically select reasonable values for the overhead image
-		SelectOverheadMap selectMapSize = new SelectOverheadMap(cellSize,20,0.5);
+		SelectOverheadParameters selectMapSize = new SelectOverheadParameters(cellSize,20,0.5);
 		selectMapSize.process(stereoParam.left,groundToLeft);
 
 		int overheadWidth = selectMapSize.getOverheadWidth();

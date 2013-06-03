@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.sfm.misc;
+package boofcv.alg.sfm.overhead;
 
 import boofcv.alg.distort.LensDistortionOps;
 import boofcv.struct.FastQueue;
@@ -30,23 +30,12 @@ import georegression.transform.se.SePointOps_F64;
 
 /**
  * <p>
- * Converts an image into an overhead orthogonal view with known metric properties given a known transform from the
+ * Converts a camera image into an overhead orthogonal view with known metric properties given a known transform from the
  * plane to camera.  This will only produce a valid orthogonal view when the
- * surface being viewed is entirely planar, non-planar objects are heavily distorted.  Each pixel in the overhead view corresponds to a square of known size and location
- * in the world.  The each size of the square regions is specified by cellSize and the origin by (centerX,centerY).
+ * surface being viewed is entirely planar, non-planar objects are heavily distorted.  See {@link OverheadView}
+ * for more details.
  * </p>
- *
- * <p>
- * The overhead +x axis corresponds to the cameras +z axis and the image's +y axis corresponds to the camera's -x axis.
- * The user specify the origin by changing centerX and centerY parameters.  It is common to set centerX = 0 ,
- * centerY = output.height*cellSize/2.0.
- * </p>
- *
- * <p>
- * overhead pixels to world coordinates: (x,y) = (x_p,y_p)*cellSize - (centerX,centerY)<br>
- * world coordinates to overhead pixels: (x_p,y_p) = [(x,y) - (centerX,centerY)]/cellSize<br>
- * </p>
- *
+
  * <p>
  * Usage Notes:
  * <ul>
@@ -54,9 +43,6 @@ import georegression.transform.se.SePointOps_F64;
  *     plane to the camera.</li>
  *     <li>In the plane's reference frame the plane's normal vector is (0,1,0) or (0,-1,0) and
  *     contains the point (0,0,0).</li>
- *     <li>When rendering the overhead image objects to the left will appear on the right and the other way around.  This
- * is an artifact that in image's it's standard for +y to point down (clock-wise of +x), while on 2D maps the standard
- * is +y being counter-clock-wise of +x.</li>
  * </ul>
  * </p>
  *
@@ -71,14 +57,14 @@ import georegression.transform.se.SePointOps_F64;
 public abstract class CreateSyntheticOverheadView<T extends ImageBase>
 {
 	// size of overhead image;
-	int overheadWidth;
-	int overheadHeight;
+	protected int overheadWidth;
+	protected int overheadHeight;
 
 	// pixel coordinate for each pixel in the overhead image
 	// if an element is null that means there is no corresponding image pixel
-	Point2D_F64 mapPixels[];
+	protected Point2D_F64 mapPixels[];
 
-	FastQueue<Point2D_F64> points = new FastQueue<Point2D_F64>(Point2D_F64.class,true);
+	private FastQueue<Point2D_F64> points = new FastQueue<Point2D_F64>(Point2D_F64.class,true);
 
 	/**
 	 * Specifies camera configurations.
