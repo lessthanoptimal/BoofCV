@@ -148,7 +148,7 @@ public class LoadFileImageSequence<T extends ImageSingleBand> implements SimpleI
 		if( imageGUI == null )
 			return null;
 
-		image = type.createImage(imageGUI.getWidth(),imageGUI.getHeight(),3);
+		image = type.createImage(imageGUI.getWidth(),imageGUI.getHeight());
 		ConvertBufferedImage.convertFrom(imageGUI, image);
 
 		// no changes needed so return the original

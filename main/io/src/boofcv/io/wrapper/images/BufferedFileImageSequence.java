@@ -23,7 +23,6 @@ import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageDataType;
-import boofcv.struct.image.ImageSingleBand;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -77,7 +76,7 @@ public class BufferedFileImageSequence<T extends ImageBase> implements SimpleIma
 		int index = 0;
 		for (String s : listNames) {
 			BufferedImage b = orig[index] = UtilImageIO.loadImage(directory.getPath()+"/"+s);
-			T a = images[index++] = type.createImage(b.getWidth(),b.getHeight(),3);
+			T a = images[index++] = type.createImage(b.getWidth(),b.getHeight());
 			ConvertBufferedImage.convertFrom(b, a);
 		}
 	}
@@ -92,7 +91,7 @@ public class BufferedFileImageSequence<T extends ImageBase> implements SimpleIma
 
 		for( int i = 0; i < orig.length; i++ ) {
 			BufferedImage b = orig[i];
-			images[i] = type.createImage(b.getWidth(),b.getHeight(),3);
+			images[i] = type.createImage(b.getWidth(),b.getHeight());
 			ConvertBufferedImage.convertFrom(orig[i], images[i]);
 		}
 	}

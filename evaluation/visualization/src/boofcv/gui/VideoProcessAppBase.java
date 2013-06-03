@@ -21,7 +21,6 @@ package boofcv.gui;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageDataType;
-import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageTypeInfo;
 
 import javax.swing.*;
@@ -54,7 +53,7 @@ public abstract class VideoProcessAppBase<I extends ImageBase>
 	public VideoProcessAppBase(int numAlgFamilies, Class<I> imageType) {
 		super(numAlgFamilies);
 
-		this.imageInfo = new ImageDataType<I>(ImageDataType.Family.SINGLE_BAND, ImageTypeInfo.classToType(imageType));
+		this.imageInfo = new ImageDataType<I>(ImageDataType.Family.SINGLE_BAND, ImageTypeInfo.classToType(imageType),1);
 		addToToolbar(createSelectDelay());
 	}
 

@@ -25,19 +25,20 @@ import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.interpolate.InterpolatePixel;
 import boofcv.alg.interpolate.TypeInterpolate;
 import boofcv.alg.sfm.d2.*;
-import boofcv.alg.sfm.robust.DistanceAffine2DSq;
-import boofcv.alg.sfm.robust.DistanceHomographySq;
-import boofcv.alg.sfm.robust.GenerateAffine2D;
-import boofcv.alg.sfm.robust.GenerateHomographyLinear;
+import boofcv.alg.sfm.robust.*;
 import boofcv.factory.distort.FactoryDistort;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.MultiSpectral;
+import georegression.fitting.MotionTransformPoint;
+import georegression.fitting.se.MotionSe2PointSVD_F64;
 import georegression.struct.InvertibleTransform;
 import georegression.struct.affine.Affine2D_F64;
 import georegression.struct.homo.Homography2D_F64;
+import georegression.struct.point.Point2D_F64;
+import georegression.struct.se.Se2_F64;
 import org.ddogleg.fitting.modelset.DistanceFromModel;
 import org.ddogleg.fitting.modelset.ModelFitter;
 import org.ddogleg.fitting.modelset.ModelGenerator;
@@ -92,6 +93,12 @@ public class FactoryMotion2D {
 			if( refineEstimate )
 				modelRefiner = (ModelFitter)mf;
 			distance =  (DistanceFromModel)new DistanceAffine2DSq();
+		} else if( motionModel instanceof Se2_F64) {
+			MotionTransformPoint<Se2_F64, Point2D_F64> alg = new MotionSe2PointSVD_F64();
+			GenerateSe2Point mf = new GenerateSe2Point(alg);
+			fitter = (ModelGenerator)mf;
+			distance =  (DistanceFromModel)new DistanceSe2Sq();
+			// no refine, already optimal
 		} else {
 			throw new RuntimeException("Unknown model type: "+motionModel.getClass().getSimpleName());
 		}

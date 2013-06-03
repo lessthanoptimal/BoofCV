@@ -28,6 +28,34 @@ import static org.junit.Assert.assertTrue;
  * @author Peter Abeles
  */
 public class TestGrowQueue_I8 {
+
+	@Test
+	public void addAll() {
+		GrowQueue_I8 queue0 = new GrowQueue_I8(2);
+		GrowQueue_I8 queue1 = new GrowQueue_I8(3);
+
+		queue0.add(1);
+		queue0.add(2);
+
+		queue1.add(3);
+		queue1.add(4);
+		queue1.add(5);
+
+		assertEquals(2,queue0.size);
+		queue0.addAll(queue1);
+		assertEquals(5,queue0.size);
+		for( int i = 0; i < queue0.size; i++ ) {
+			assertEquals(queue0.get(i),i+1);
+		}
+
+		queue0.reset();
+		queue0.addAll(queue1);
+		assertEquals(3,queue0.size);
+		for( int i = 0; i < queue0.size; i++ ) {
+			assertEquals(queue0.get(i),i+3);
+		}
+	}
+
 	@Test
 	public void auto_grow() {
 		GrowQueue_I8 alg = new GrowQueue_I8(3);

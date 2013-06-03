@@ -128,7 +128,7 @@ public class WrapVisOdomDualTrackPnP<T extends ImageSingleBand>
 	}
 
 	@Override
-	public Se3_F64 getLeftToWorld() {
+	public Se3_F64 getCameraToWorld() {
 		return alg.getCurrToWorld();
 	}
 

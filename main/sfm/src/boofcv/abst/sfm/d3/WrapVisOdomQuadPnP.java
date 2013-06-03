@@ -129,7 +129,7 @@ public class WrapVisOdomQuadPnP<T extends ImageSingleBand,TD extends TupleDesc>
 	}
 
 	@Override
-	public Se3_F64 getLeftToWorld() {
+	public Se3_F64 getCameraToWorld() {
 		return alg.getLeftToWorld();
 	}
 

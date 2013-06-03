@@ -18,7 +18,9 @@
 
 package boofcv.abst.sfm.d3;
 
+import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.image.ImageBase;
+import georegression.struct.se.Se3_F64;
 
 /**
  * <P>
@@ -30,18 +32,25 @@ import boofcv.struct.image.ImageBase;
  * 
  * <p>
  * Each time a new image arrives the function {@link #process} should be invoked and its return value
- * checked.  If false is returned then {@link #isFatal()} needs to be called to see if a fatal error
+ * checked.  If false is returned then {@link #isFault()} needs to be called to see if a fatal error
  * occurred.  If a fatal error occurred then the motion estimate has been reset relative to the first
  * frame in which {@link #isFault} returns false.
  * </p>
  * 
  * @author Peter Abeles
  */
-public interface MonocularVisualOdometry<T extends ImageBase> extends VisualOdometry{
+public interface MonocularVisualOdometry<T extends ImageBase> extends VisualOdometry<Se3_F64> {
+
+	/**
+	 * Specifies the intrinsic parameters for the camera.
+	 *
+	 * @param param Intrinsic parameters for camera
+	 */
+	public void setIntrinsic( IntrinsicParameters param );
 
 	/**
 	 * Process the new image and update the motion estimate.  The return value must be checked
-	 * to see if the estimate was actually updated.  If false is returned then {@link #isFatal}
+	 * to see if the estimate was actually updated.  If false is returned then {@link #isFault}
 	 * also needs to be checked to see if the pose estimate has been reset.
 	 *
 	 * @param input Next image in the sequence.

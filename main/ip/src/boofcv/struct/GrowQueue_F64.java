@@ -42,6 +42,20 @@ public class GrowQueue_F64 {
 		size = 0;
 	}
 
+	public void addAll( GrowQueue_F64 queue ) {
+		if( size+queue.size > data.length ) {
+			double temp[] = new double[ (size+queue.size) * 2];
+			System.arraycopy(data,0,temp,0,size);
+			data = temp;
+		}
+		System.arraycopy(queue.data,0,data,size,queue.size);
+		size += queue.size;
+	}
+
+	public void add( double val ) {
+		push(val);
+	}
+
 	public void push( double val ) {
 		if( size == data.length ) {
 			double temp[];

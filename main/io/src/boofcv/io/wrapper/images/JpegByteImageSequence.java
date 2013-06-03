@@ -19,7 +19,6 @@
 package boofcv.io.wrapper.images;
 
 import boofcv.core.image.ConvertBufferedImage;
-import boofcv.core.image.GeneralizedImageOps;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.struct.image.*;
 
@@ -58,15 +57,15 @@ public class JpegByteImageSequence<T extends ImageBase> implements SimpleImageSe
 		this.jpegData = jpegData;
 		this.loop = loop;
 
-		output = imageType.createImage(1,1,3);
+		output = imageType.createImage(1,1);
 	}
 
 	public JpegByteImageSequence(Class<T> imageType, List<byte[]> jpegData, boolean loop) {
-		this.imageType = new ImageDataType<T>(ImageDataType.Family.SINGLE_BAND, ImageTypeInfo.classToType(imageType));
+		this.imageType = new ImageDataType<T>(ImageDataType.Family.SINGLE_BAND, ImageTypeInfo.classToType(imageType),1);
 		this.jpegData = jpegData;
 		this.loop = loop;
 
-		output = this.imageType.createImage(1,1,3);
+		output = this.imageType.createImage(1,1);
 	}
 
 	@Override

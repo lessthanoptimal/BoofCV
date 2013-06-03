@@ -19,7 +19,6 @@
 package boofcv.io.wrapper.xuggler;
 
 import boofcv.core.image.ConvertBufferedImage;
-import boofcv.core.image.GeneralizedImageOps;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageSingleBand;
@@ -65,7 +64,7 @@ public class XugglerSimplified<T extends ImageSingleBand> implements SimpleImage
 	String fileName;
 
 	public XugglerSimplified(String filename, ImageDataType<T> typeOutput) {
-		image = typeOutput.createImage(1,1,3);
+		image = typeOutput.createImage(1,1);
 		open(filename,typeOutput);
 	}
 

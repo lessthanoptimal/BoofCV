@@ -21,8 +21,9 @@ package boofcv.core.image;
 import boofcv.struct.image.ImageSingleBand;
 
 /**
- * Generalized interface for single banded images.  Due to the slow performance associated with working with this
- * interface its usage is not recommended except for testing purposes.
+ * Generalized interface for single banded images.  Setters and getters which use Number will be much slower than
+ * direct access, about 12x.  Setts and getters which use index have a negligible difference to about 25% performance
+ * hit depending if the data types need to be converted or not.
  *
  * @author Peter Abeles
  */
@@ -36,7 +37,20 @@ public interface GImageSingleBand {
 
 	Number get( int x , int y );
 
+	/**
+	 * Set's pixel value using number.  If native type of 'num' and image are the same then there is no loss in precision.
+	 * @param x pixel coordinate x-value
+	 * @param y pixel coordinate y-value
+	 * @param num Value of the pixel
+	 */
 	void set( int x , int y , Number num );
+
+	/**
+	 * Sets pixel based on pixel value in data array
+	 */
+	void set( int index , float value );
+
+	float getF( int index );
 
 	ImageSingleBand getImage();
 }

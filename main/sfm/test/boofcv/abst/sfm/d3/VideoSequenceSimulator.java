@@ -112,6 +112,9 @@ public class VideoSequenceSimulator<I extends ImageSingleBand> {
 			Point2D_F64 p3 = PerspectiveOps.renderPixel(worldToCamera,K,s.c);
 			Point2D_F64 p4 = PerspectiveOps.renderPixel(worldToCamera,K,s.d);
 
+			if( p1 == null || p2 == null || p3 == null || p4 == null )
+				continue;
+
 			Polygon2D_I32 p = new Polygon2D_I32(4);
 			p.vertexes[0].set((int) p1.x, (int) p1.y);
 			p.vertexes[1].set((int) p2.x, (int) p2.y);
@@ -133,6 +136,9 @@ public class VideoSequenceSimulator<I extends ImageSingleBand> {
 			Point2D_F64 p2 = PerspectiveOps.renderPixel(worldToCamera,K,s.b);
 			Point2D_F64 p3 = PerspectiveOps.renderPixel(worldToCamera,K,s.c);
 			Point2D_F64 p4 = PerspectiveOps.renderPixel(worldToCamera,K,s.d);
+
+			if( p1 == null || p2 == null || p3 == null || p4 == null )
+				continue;
 
 			Polygon2D_I32 p = new Polygon2D_I32(4);
 			p.vertexes[0].set((int) p1.x, (int) p1.y);
@@ -187,7 +193,7 @@ public class VideoSequenceSimulator<I extends ImageSingleBand> {
 
 	}
 
-	private static class Square
+	protected static class Square
 	{
 		int gray;
 		public Point3D_F64 a = new Point3D_F64();

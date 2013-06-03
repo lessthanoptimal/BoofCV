@@ -20,6 +20,7 @@ package boofcv.abst.sfm.d3;
 
 import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.image.ImageBase;
+import georegression.struct.se.Se3_F64;
 
 /**
  * <p>
@@ -47,8 +48,8 @@ import boofcv.struct.image.ImageBase;
  *
  * @author Peter Abeles
  */
-public interface StereoVisualOdometry<T extends ImageBase> extends VisualOdometry {
-
+public interface StereoVisualOdometry<T extends ImageBase> extends VisualOdometry<Se3_F64>
+{
 	/**
 	 * Specifies intrinsic and extrinsic parameters for the stereo camera system. Can be called
 	 * at any time, but must be called at least once before {@link #process) can be called.

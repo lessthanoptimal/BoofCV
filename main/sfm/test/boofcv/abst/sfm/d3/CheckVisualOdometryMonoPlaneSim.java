@@ -1,0 +1,151 @@
+/*
+ * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ *
+ * This file is part of BoofCV (http://boofcv.org).
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package boofcv.abst.sfm.d3;
+
+import boofcv.core.image.GeneralizedImageOps;
+import boofcv.struct.calib.IntrinsicParameters;
+import boofcv.struct.image.ImageSingleBand;
+import georegression.geometry.RotationMatrixGenerator;
+import georegression.metric.UtilAngle;
+import georegression.struct.se.Se3_F64;
+import org.ejml.ops.MatrixFeatures;
+import org.junit.Test;
+
+import java.util.Collections;
+import java.util.Comparator;
+
+import static org.junit.Assert.assertTrue;
+
+/**
+ * Performs empirical validation of depth visual odometry algorithms using synthetic images.  Only a crude test
+ *
+ * @author Peter Abeles
+ */
+public abstract class CheckVisualOdometryMonoPlaneSim<I extends ImageSingleBand>
+	extends VideoSequenceSimulator<I>
+{
+	IntrinsicParameters param = new IntrinsicParameters(150,155,0,width/2,height/2,width,height, false, new double[]{0,0});
+	MonocularPlaneVisualOdometry<I> algorithm;
+
+	I left;
+
+	// really not sure what's visible, so create a lot of objects
+	protected int numSquares = 5000;
+
+	double tolerance = 0.02;
+
+	public CheckVisualOdometryMonoPlaneSim(Class<I> inputType) {
+		super(320, 240, inputType);
+
+		left = GeneralizedImageOps.createSingleBand(inputType,width,height);
+
+		createSquares(numSquares,-10,10);
+	}
+
+	public CheckVisualOdometryMonoPlaneSim(Class<I> inputType, double tolerance) {
+		this(inputType);
+		this.tolerance = tolerance;
+	}
+
+	public void setAlgorithm(MonocularPlaneVisualOdometry<I>  algorithm) {
+		this.algorithm = algorithm;
+	}
+
+	@Override
+	protected void createSquares( int total , double minZ, double maxZ ) {
+		squares.clear();
+
+		double t = 0.1;
+
+		// creates squares which are entirely on the ground plane
+		for( int i = 0; i < total; i++ ) {
+			double z = rand.nextDouble()*(maxZ-minZ)+minZ;
+			double x = (rand.nextDouble()-0.5)*4;
+			double y = 0;
+
+			Square s = new Square();
+			s.a.set(x  ,y  ,z);
+			s.b.set(x + t, y, z);
+			s.c.set(x + t, y, z + t);
+			s.d.set(x, y , z + t);
+
+			s.gray = rand.nextInt(255);
+
+			squares.add(s);
+		}
+
+		// sort by depth so that objects farther way are rendered first and obstructed by objects closer in view
+		Collections.sort(squares, new Comparator<Square>() {
+			@Override
+			public int compare(Square o1, Square o2) {
+				if (o1.a.z < o2.a.z)
+					return -1;
+				if (o1.a.z > o2.a.z)
+					return 1;
+				else
+					return 0;
+			}
+		});
+	}
+
+	@Test
+	public void moveForward() {
+		// Easier to make up a plane in this direction
+		Se3_F64 cameraToPlane = new Se3_F64();
+		RotationMatrixGenerator.eulerXYZ(UtilAngle.degreeToRadian(-75), 0.1, 0.0, cameraToPlane.getR());
+		cameraToPlane.getT().set(0,-2,0);
+
+		Se3_F64 planeToCamera = cameraToPlane.invert(null);
+
+		Se3_F64 worldToCurr = new Se3_F64();
+		Se3_F64 worldToCamera = new Se3_F64();
+
+		algorithm.reset();
+		algorithm.setExtrinsic(planeToCamera);
+		algorithm.setIntrinsic(param);
+
+		for( int i = 0; i < 10; i++ ) {
+			System.out.println("-----------------------------------------");
+
+			worldToCurr.getT().z = -i*0.10; // move forward
+
+			worldToCurr.concat(planeToCamera,worldToCamera);
+
+			// render the images
+			setIntrinsic(param);
+			left.setTo(render(worldToCamera));
+
+			// process the images
+			assertTrue(algorithm.process(left));
+
+			// Compare to truth.  Only go for a crude approximation
+			Se3_F64 foundWorldToCamera = algorithm.getCameraToWorld().invert(null);
+			Se3_F64 foundWorldToCurr =  foundWorldToCamera.concat(cameraToPlane,null);
+
+//			worldToCurr.getT().print();
+//			foundWorldToCurr.getT().print();
+
+//			worldToCurr.getR().print();
+//			foundWorldToCurr.getR().print();
+
+			assertTrue(MatrixFeatures.isIdentical(foundWorldToCurr.getR(), worldToCurr.getR(), 0.1));
+			assertTrue(foundWorldToCurr.getT().distance(worldToCurr.getT()) < tolerance );
+		}
+	}
+}

@@ -109,4 +109,15 @@ public abstract class ImageInteger<T extends ImageInteger> extends ImageSingleBa
 			System.out.println();
 		}
 	}
+	public void printNotZero() {
+		for (int y = 0; y < height; y++) {
+			for (int x = 0; x < width; x++) {
+				if( unsafe_get(x, y) == 0 )
+					System.out.print("0");
+				else
+					System.out.print("1");
+			}
+			System.out.println();
+		}
+	}
 }

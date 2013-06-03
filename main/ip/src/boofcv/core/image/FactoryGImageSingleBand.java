@@ -32,8 +32,16 @@ import boofcv.struct.image.*;
 public class FactoryGImageSingleBand {
 
 	public static GImageSingleBand wrap( ImageSingleBand image ) {
-		if( ImageInteger.class.isAssignableFrom(image.getClass()) )
-			return new GSingle_I32( (ImageInteger)image );
+		if( image.getClass() == ImageUInt8.class )
+			return new GSingle_U8( (ImageUInt8)image );
+		else if( image.getClass() == ImageSInt8.class )
+			return new GSingle_S8( (ImageSInt8)image );
+		else if( image.getClass() == ImageUInt16.class )
+			return new GSingle_U16( (ImageUInt16)image );
+		else if( image.getClass() == ImageSInt16.class )
+			return new GSingle_S16( (ImageSInt16)image );
+		else if( image.getClass() == ImageSInt32.class )
+			return new GSingle_S32( (ImageSInt32)image );
 		else if( image.getClass() == ImageSInt64.class )
 			return new GSingle_I64( (ImageSInt64)image );
 		else if( image.getClass() == ImageFloat32.class )
@@ -42,6 +50,32 @@ public class FactoryGImageSingleBand {
 			return new GSingle_F64( (ImageFloat64)image );
 		else
 			throw new IllegalArgumentException("Unknown image type: "+image.getClass());
+	}
+
+	public static GImageSingleBand wrap( ImageSingleBand image , GImageSingleBand output ) {
+		if( output == null )
+			return wrap(image);
+
+		if( image.getClass() == ImageUInt8.class )
+			((GSingle_U8)output).image = (ImageUInt8)image;
+		else if( image.getClass() == ImageSInt8.class )
+			((GSingle_S8)output).image = (ImageSInt8)image;
+		else if( image.getClass() == ImageUInt16.class )
+			((GSingle_U16)output).image = (ImageUInt16)image;
+		else if( image.getClass() == ImageSInt16.class )
+			((GSingle_S16)output).image = (ImageSInt16)image;
+		else if( image.getClass() == ImageSInt32.class )
+			((GSingle_S32)output).image = (ImageSInt32)image;
+		else if( image.getClass() == ImageSInt64.class )
+			((GSingle_I64)output).image = (ImageSInt64)image;
+		else if( image.getClass() == ImageFloat32.class )
+			((GSingle_F32)output).image = (ImageFloat32)image;
+		else if( image.getClass() == ImageFloat64.class )
+			((GSingle_F64)output).image = (ImageFloat64)image;
+		else
+			throw new IllegalArgumentException("Unknown image type: "+image.getClass());
+
+		return output;
 	}
 
 	public static GImageSingleBand wrap( ImageBorder image ) {
@@ -75,6 +109,16 @@ public class FactoryGImageSingleBand {
 		public void set(int x, int y, Number num) {
 			image.set(x,y,num.intValue());
 		}
+
+		@Override
+		public void set(int index, float value) {
+			throw new RuntimeException("Operation not supported by inner data type");
+		}
+
+		@Override
+		public float getF(int index) {
+			throw new RuntimeException("Operation not supported by inner data type");
+		}
 	}
 
 	public static class Border_F32 extends GSingleBorder<ImageBorder_F32>
@@ -96,6 +140,16 @@ public class FactoryGImageSingleBand {
 		@Override
 		public void set(int x, int y, Number num) {
 			image.set(x,y,num.floatValue());
+		}
+
+		@Override
+		public void set(int index, float value) {
+			throw new RuntimeException("Operation not supported by inner data type");
+		}
+
+		@Override
+		public float getF(int index) {
+			throw new RuntimeException("Operation not supported by inner data type");
 		}
 	}
 
@@ -119,11 +173,21 @@ public class FactoryGImageSingleBand {
 		public void set(int x, int y, Number num) {
 			image.set(x,y,num.floatValue());
 		}
+
+		@Override
+		public void set(int index, float value) {
+			throw new RuntimeException("Operation not supported by inner data type");
+		}
+
+		@Override
+		public float getF(int index) {
+			throw new RuntimeException("Operation not supported by inner data type");
+		}
 	}
 
-	public static class GSingle_I32 extends GSingleBaseInt<ImageInteger>
+	public static class GSingle_U8 extends GSingleBaseInt<ImageUInt8>
 	{
-		public GSingle_I32(ImageInteger image) {
+		public GSingle_U8(ImageUInt8 image) {
 			super(image);
 		}
 
@@ -135,6 +199,124 @@ public class FactoryGImageSingleBand {
 		@Override
 		public void set(int x, int y, Number num) {
 			image.set(x,y,num.intValue());
+		}
+
+		@Override
+		public void set(int index, float value) {
+			image.data[index] = (byte)value;
+		}
+
+		@Override
+		public float getF(int index) {
+			return image.data[index] & 0xFF;
+		}
+	}
+
+	public static class GSingle_S8 extends GSingleBaseInt<ImageSInt8>
+	{
+		public GSingle_S8(ImageSInt8 image) {
+			super(image);
+		}
+
+		@Override
+		public Number get(int x, int y) {
+			return image.get(x,y);
+		}
+
+		@Override
+		public void set(int x, int y, Number num) {
+			image.set(x,y,num.intValue());
+		}
+
+		@Override
+		public void set(int index, float value) {
+			image.data[index] = (byte)value;
+		}
+
+		@Override
+		public float getF(int index) {
+			return image.data[index];
+		}
+	}
+
+	public static class GSingle_U16 extends GSingleBaseInt<ImageUInt16>
+	{
+		public GSingle_U16(ImageUInt16 image) {
+			super(image);
+		}
+
+		@Override
+		public Number get(int x, int y) {
+			return image.get(x,y);
+		}
+
+		@Override
+		public void set(int x, int y, Number num) {
+			image.set(x,y,num.intValue());
+		}
+
+		@Override
+		public void set(int index, float value) {
+			image.data[index] = (short)value;
+		}
+
+		@Override
+		public float getF(int index) {
+			return image.data[index] & 0xFFFF;
+		}
+	}
+
+	public static class GSingle_S16 extends GSingleBaseInt<ImageSInt16>
+	{
+		public GSingle_S16(ImageSInt16 image) {
+			super(image);
+		}
+
+		@Override
+		public Number get(int x, int y) {
+			return image.get(x,y);
+		}
+
+		@Override
+		public void set(int x, int y, Number num) {
+			image.set(x,y,num.intValue());
+		}
+
+		@Override
+		public void set(int index, float value) {
+			image.data[index] = (short)value;
+		}
+
+		@Override
+		public float getF(int index) {
+			return image.data[index];
+		}
+	}
+
+	public static class GSingle_S32 extends GSingleBaseInt<ImageSInt32>
+	{
+		public GSingle_S32(ImageSInt32 image) {
+			super(image);
+		}
+
+		@Override
+		public Number get(int x, int y) {
+			return image.get(x,y);
+		}
+
+		@Override
+		public void set(int x, int y, Number num) {
+			image.set(x,y,num.intValue());
+		}
+
+		@Override
+		public void set(int index, float value) {
+			image.data[index] = (short)value;
+		}
+
+		@Override
+		public float getF(int index) {
+			return image.data[index];
 		}
 	}
 
@@ -152,6 +334,16 @@ public class FactoryGImageSingleBand {
 		@Override
 		public void set(int x, int y, Number num) {
 			image.set(x,y,num.intValue());
+		}
+
+		@Override
+		public void set(int index, float value) {
+			image.data[index] = (long)value;
+		}
+
+		@Override
+		public float getF(int index) {
+			return image.data[index];
 		}
 	}
 
@@ -175,6 +367,16 @@ public class FactoryGImageSingleBand {
 		public void set(int x, int y, Number num) {
 			image.set(x,y,num.floatValue());
 		}
+
+		@Override
+		public void set(int index, float value) {
+			image.data[index] = value;
+		}
+
+		@Override
+		public float getF(int index) {
+			return image.data[index];
+		}
 	}
 
 	public static class GSingle_F64 extends GSingleBase<ImageFloat64>
@@ -196,6 +398,16 @@ public class FactoryGImageSingleBand {
 		@Override
 		public void set(int x, int y, Number num) {
 			image.set(x,y,num.doubleValue());
+		}
+
+		@Override
+		public void set(int index, float value) {
+			image.data[index] = value;
+		}
+
+		@Override
+		public float getF(int index) {
+			return (float)image.data[index];
 		}
 	}
 

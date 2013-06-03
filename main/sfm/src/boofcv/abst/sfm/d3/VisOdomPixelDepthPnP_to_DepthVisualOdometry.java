@@ -136,7 +136,7 @@ public class VisOdomPixelDepthPnP_to_DepthVisualOdometry<Vis extends ImageBase, 
 	}
 
 	@Override
-	public Se3_F64 getLeftToWorld() {
+	public Se3_F64 getCameraToWorld() {
 		return alg.getCurrToWorld();
 	}
 

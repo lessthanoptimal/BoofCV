@@ -36,7 +36,7 @@ public interface TriangulateTwoViewsCalibrated {
 	 * @param obsA View from position A in normalized image coordinates.
 	 * @param obsB View from position B in normalized image coordinates.
 	 * @param fromAtoB Transform from camera location A to location B
-	 * @param foundInA The found triangulated point in A's reference frame.
+	 * @param foundInA The found triangulated 3D point in A's reference frame.
 	 * @return true if successful, false otherwise.
 	 */
 	public boolean triangulate( Point2D_F64 obsA , Point2D_F64 obsB ,

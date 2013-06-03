@@ -42,6 +42,16 @@ public class GrowQueue_I8 {
 		size = 0;
 	}
 
+	public void addAll( GrowQueue_I8 queue ) {
+		if( size+queue.size > data.length ) {
+			byte temp[] = new byte[ (size+queue.size) * 2];
+			System.arraycopy(data,0,temp,0,size);
+			data = temp;
+		}
+		System.arraycopy(queue.data,0,data,size,queue.size);
+		size += queue.size;
+	}
+
 	public void add(int value) {
 		push(value);
 	}

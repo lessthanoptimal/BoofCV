@@ -325,12 +325,16 @@ public class PerspectiveOps {
 	 * @param worldToCamera Transform from world to camera frame
 	 * @param K Optional.  Intrinsic camera calibration matrix.  If null then normalized image coordinates are returned.
 	 * @param X 3D Point in world reference frame..
-	 * @return 2D Render point on image plane.
+	 * @return 2D Render point on image plane or null if it's behind the camera
 	 */
 	public static Point2D_F64 renderPixel( Se3_F64 worldToCamera , DenseMatrix64F K , Point3D_F64 X ) {
 		Point3D_F64 X_cam = new Point3D_F64();
 
 		SePointOps_F64.transform(worldToCamera, X, X_cam);
+
+		// see if it's behind the camera
+		if( X_cam.z <= 0 )
+			return null;
 
 		Point2D_F64 norm = new Point2D_F64(X_cam.x/X_cam.z,X_cam.y/X_cam.z);
 
