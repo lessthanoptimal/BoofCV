@@ -21,7 +21,6 @@ package boofcv.misc;
 import boofcv.struct.ImageRectangle;
 import boofcv.struct.image.*;
 import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.converters.javabean.JavaBeanConverter;
 import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider;
 import com.thoughtworks.xstream.core.DefaultConverterLookup;
 import com.thoughtworks.xstream.core.util.XStreamClassLoader;
@@ -62,6 +61,13 @@ public class BoofMiscOps {
 		}
 	}
 
+   public static <T> T loadXML( Reader r ) {
+      XStreamClassLoader loader = new BoofcvClassLoader();
+      XStream xstream = new XStream(new PureJavaReflectionProvider(),new DomDriver(),loader,null,new DefaultConverterLookup(), null);
+//		xstream.registerConverter(new JavaBeanConverter(xstream.getMapper()));
+      return (T)xstream.fromXML(r);
+   }
+
 	public static String toString( Reader r ) {
 		char buff[] = new char[1024];
 
@@ -77,13 +83,6 @@ public class BoofMiscOps {
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
-	}
-
-	public static <T> T loadXML( Reader r ) {
-		XStreamClassLoader loader = new BoofcvClassLoader();
-		XStream xstream = new XStream(new PureJavaReflectionProvider(),new DomDriver(),loader,null,new DefaultConverterLookup(), null);
-		xstream.registerConverter(new JavaBeanConverter(xstream.getMapper()));
-		return (T)xstream.fromXML(r);
 	}
 	
 	public static int countNotZero( int a[] , int size ) {

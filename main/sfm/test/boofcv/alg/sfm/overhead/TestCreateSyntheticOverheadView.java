@@ -22,6 +22,7 @@ import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.image.ImageBase;
 import georegression.geometry.RotationMatrixGenerator;
 import georegression.metric.UtilAngle;
+import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.se.Se3_F64;
 import org.junit.Test;
@@ -68,7 +69,7 @@ public class TestCreateSyntheticOverheadView {
 		assertTrue(null!=alg.getOverheadToPixel(overheadW-1,300));
 
 		// check the value at one point by doing the reverse transform
-		Point2D_F64 found = alg.getOverheadToPixel(400,320);
+		Point2D_F32 found = alg.getOverheadToPixel(400,320);
 
 		CameraPlaneProjection proj = new CameraPlaneProjection();
 		proj.setConfiguration(planeToCamera,param);

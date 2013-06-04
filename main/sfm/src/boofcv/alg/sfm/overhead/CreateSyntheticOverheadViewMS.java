@@ -25,7 +25,7 @@ import boofcv.core.image.GImageSingleBand;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.MultiSpectral;
-import georegression.struct.point.Point2D_F64;
+import georegression.struct.point.Point2D_F32;
 
 /**
  * Implementation of {@link CreateSyntheticOverheadView} for {@link MultiSpectral}.
@@ -85,10 +85,10 @@ public class CreateSyntheticOverheadViewMS<T extends ImageSingleBand>
 		for( int i = 0; i < output.height; i++ ) {
 			int indexOut = output.startIndex + i*output.stride;
 			for( int j = 0; j < output.width; j++ , indexOut++,indexMap++ ) {
-				Point2D_F64 p = mapPixels[indexMap];
+				Point2D_F32 p = mapPixels[indexMap];
 				if( p != null ) {
 					for( int k = 0; k < N; k++ ) {
-						this.output[k].set(indexOut, interp[k].get((float) p.x, (float) p.y));
+						this.output[k].set(indexOut, interp[k].get( p.x, p.y));
 					}
 				}
 			}

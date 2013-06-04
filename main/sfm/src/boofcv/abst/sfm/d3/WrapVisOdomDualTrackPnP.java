@@ -29,6 +29,7 @@ import boofcv.alg.sfm.d3.VisOdomDualTrackPnP;
 import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.geo.Point2D3D;
+import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
@@ -143,7 +144,7 @@ public class WrapVisOdomDualTrackPnP<T extends ImageSingleBand>
 	}
 
 	@Override
-	public Class<T> getImageType() {
-		return imageType;
+	public ImageDataType<T> getImageType() {
+		return ImageDataType.single(imageType);
 	}
 }

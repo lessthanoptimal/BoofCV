@@ -25,6 +25,7 @@ package boofcv.abst.sfm.d3;
 import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.distort.PixelTransform_F32;
 import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.se.Se3_F64;
 
@@ -87,7 +88,7 @@ public interface DepthVisualOdometry<Vis extends ImageBase, Depth extends ImageS
 	 *
 	 * @return The image type
 	 */
-	public Class<Vis> getVisualType();
+	public ImageDataType<Vis> getVisualType();
 
 	/**
 	 * Type of depth images it can process.
