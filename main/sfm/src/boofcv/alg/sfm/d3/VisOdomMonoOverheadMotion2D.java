@@ -156,8 +156,8 @@ public class VisOdomMonoOverheadMotion2D<T extends ImageBase>
 
 		// go from pixel to map coordinates
 		// This is the change in location, so no need to adjust for the origin
-		double mapX = m.tran.x*overhead.cellSize;
-		double mapY = m.tran.y*overhead.cellSize;
+		double mapX = m.T.x*overhead.cellSize;
+		double mapY = m.T.y*overhead.cellSize;
 
 		// 2D to 3D coordinates
 		worldToCurr3D.getT().set(-mapY,0,mapX);

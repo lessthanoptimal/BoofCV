@@ -29,6 +29,7 @@ import boofcv.struct.distort.PixelTransform_F32;
 import boofcv.struct.distort.PointTransform_F64;
 import boofcv.struct.geo.Point2D3D;
 import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.sfm.Point2D3DTrack;
 import georegression.struct.point.Point2D_F64;
@@ -52,7 +53,7 @@ public class VisOdomPixelDepthPnP_to_DepthVisualOdometry<Vis extends ImageBase, 
 	DepthSparse3D<Depth> sparse3D;
 	VisOdomPixelDepthPnP<Vis> alg;
 	DistanceModelMonoPixels<Se3_F64,Point2D3D> distance;
-	Class<Vis> visualType;
+	ImageDataType<Vis> visualType;
 	Class<Depth> depthType;
 	boolean success;
 
@@ -60,7 +61,7 @@ public class VisOdomPixelDepthPnP_to_DepthVisualOdometry<Vis extends ImageBase, 
 
 	public VisOdomPixelDepthPnP_to_DepthVisualOdometry(DepthSparse3D<Depth> sparse3D, VisOdomPixelDepthPnP<Vis> alg,
 													   DistanceModelMonoPixels<Se3_F64, Point2D3D> distance,
-													   Class<Vis> visualType, Class<Depth> depthType) {
+													   ImageDataType<Vis> visualType, Class<Depth> depthType) {
 		this.sparse3D = sparse3D;
 		this.alg = alg;
 		this.distance = distance;
@@ -141,7 +142,7 @@ public class VisOdomPixelDepthPnP_to_DepthVisualOdometry<Vis extends ImageBase, 
 	}
 
 	@Override
-	public Class<Vis> getVisualType() {
+	public ImageDataType<Vis> getVisualType() {
 		return visualType;
 	}
 

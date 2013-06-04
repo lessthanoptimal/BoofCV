@@ -20,6 +20,7 @@ package boofcv.abst.sfm.d3;
 
 import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageDataType;
 import georegression.struct.se.Se3_F64;
 
 /**
@@ -72,6 +73,6 @@ public interface StereoVisualOdometry<T extends ImageBase> extends VisualOdometr
 	 *
 	 * @return The image type
 	 */
-	public Class<T> getImageType();
+	public ImageDataType<T> getImageType();
 
 }

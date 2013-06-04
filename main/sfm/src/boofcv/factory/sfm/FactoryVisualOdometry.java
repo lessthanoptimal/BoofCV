@@ -53,6 +53,7 @@ import boofcv.factory.geo.FactoryMultiView;
 import boofcv.factory.geo.FactoryTriangulate;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.geo.Point2D3D;
+import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.sfm.Stereo2D3D;
@@ -226,7 +227,7 @@ public class FactoryVisualOdometry {
 						(thresholdAdd,thresholdRetire ,doublePass,motion,pixelTo3D,refine,tracker,null,null);
 
 		return new VisOdomPixelDepthPnP_to_DepthVisualOdometry<Vis,Depth>
-				(sparseDepth,alg,distance,visualType,depthType);
+				(sparseDepth,alg,distance,ImageDataType.single(visualType),depthType);
 	}
 
 	/**
@@ -377,5 +378,20 @@ public class FactoryVisualOdometry {
 				detector,assocSame,associateStereo,triangulate,motion,refine);
 
 		return new WrapVisOdomQuadPnP<T,Desc>(alg,refinePnP,associateStereo,distanceStereo,distanceMono,imageType);
+	}
+
+	/**
+	 * Wraps around a {@link StereoVisualOdometry} instance and will rescale the input images and adjust the cameras
+	 * intrinsic parameters automatically.  Rescaling input images is often an easy way to improve runtime performance
+	 * with a minimal hit on pose accuracy.
+	 *
+	 * @param vo Visual odometry algorithm which is being wrapped
+	 * @param scaleFactor Scale factor that the image should be reduced by,  Try 0.5 for half size.
+	 * @param <T> Image type
+	 * @return StereoVisualOdometry
+	 */
+	public static <T extends ImageBase> StereoVisualOdometry<T> scaleInput( StereoVisualOdometry<T> vo , double scaleFactor )
+	{
+		return new StereoVisualOdometryScaleInput<T>(vo,scaleFactor);
 	}
 }

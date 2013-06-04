@@ -23,6 +23,7 @@ import boofcv.struct.FastQueue;
 import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.distort.PointTransform_F64;
 import boofcv.struct.image.ImageBase;
+import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
@@ -62,9 +63,9 @@ public abstract class CreateSyntheticOverheadView<T extends ImageBase>
 
 	// pixel coordinate for each pixel in the overhead image
 	// if an element is null that means there is no corresponding image pixel
-	protected Point2D_F64 mapPixels[];
+	protected Point2D_F32 mapPixels[];
 
-	private FastQueue<Point2D_F64> points = new FastQueue<Point2D_F64>(Point2D_F64.class,true);
+	private FastQueue<Point2D_F32> points = new FastQueue<Point2D_F32>(Point2D_F32.class,true);
 
 	/**
 	 * Specifies camera configurations.
@@ -87,13 +88,13 @@ public abstract class CreateSyntheticOverheadView<T extends ImageBase>
 		PointTransform_F64 normToPixel = LensDistortionOps.transformNormToRadial_F64(intrinsic);
 
 		// precompute the transform
-		double w = intrinsic.width;
-		double h = intrinsic.height;
+		float w = intrinsic.width;
+		float h = intrinsic.height;
 
 		// Declare storage for precomputed pixel locations
 		int overheadPixels = overheadHeight*overheadWidth;
 		if( mapPixels == null || mapPixels.length < overheadPixels) {
-			mapPixels = new Point2D_F64[overheadPixels];
+			mapPixels = new Point2D_F32[overheadPixels];
 		}
 		points.reset();
 
@@ -118,10 +119,13 @@ public abstract class CreateSyntheticOverheadView<T extends ImageBase>
 					// compute normalized then convert to pixels
 					normToPixel.compute(pt_cam.x/pt_cam.z,pt_cam.y/pt_cam.z,pixel);
 
+					float x = (float)pixel.x;
+					float y = (float)pixel.y;
+
 					// make sure it's in the image
-					if( pixel.x >= 0 && pixel.y >= 0 && pixel.x < w && pixel.y < h ) {
-						Point2D_F64 p = points.grow();
-						p.set(pixel);
+					if( x >= 0 && y >= 0 && x < w && y < h ) {
+						Point2D_F32 p = points.grow();
+						p.set(x,y);
 						mapPixels[ indexOut ]= p;
 					} else {
 						mapPixels[ indexOut ]= null;
@@ -137,7 +141,7 @@ public abstract class CreateSyntheticOverheadView<T extends ImageBase>
 	 * @param y overhead pixel y-coordinate
 	 * @return Pixel in camera image
 	 */
-	public Point2D_F64 getOverheadToPixel( int x , int y ) {
+	public Point2D_F32 getOverheadToPixel( int x , int y ) {
 		return mapPixels[y*overheadWidth + x];
 	}
 

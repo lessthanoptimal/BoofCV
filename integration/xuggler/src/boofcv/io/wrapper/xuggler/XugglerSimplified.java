@@ -20,8 +20,8 @@ package boofcv.io.wrapper.xuggler;
 
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.io.image.SimpleImageSequence;
+import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageDataType;
-import boofcv.struct.image.ImageSingleBand;
 import com.xuggle.xuggler.*;
 import com.xuggle.xuggler.video.ConverterFactory;
 import com.xuggle.xuggler.video.IConverter;
@@ -36,7 +36,7 @@ import java.awt.image.BufferedImage;
  *
  * @author Peter Abeles
  */
-public class XugglerSimplified<T extends ImageSingleBand> implements SimpleImageSequence<T> {
+public class XugglerSimplified<T extends ImageBase> implements SimpleImageSequence<T> {
 
 	IContainer container;
 	IStreamCoder videoCoder;
