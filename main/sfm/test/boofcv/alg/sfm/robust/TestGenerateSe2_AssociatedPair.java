@@ -33,7 +33,7 @@ import java.util.Random;
 /**
  * @author Peter Abeles
  */
-public class TestGenerateSe2Point implements ModelTestingInterface<Se2_F64,AssociatedPair>
+public class TestGenerateSe2_AssociatedPair implements ModelTestingInterface<Se2_F64,AssociatedPair>
 {
 	Random rand = new Random(234);
 
@@ -44,7 +44,7 @@ public class TestGenerateSe2Point implements ModelTestingInterface<Se2_F64,Assoc
 					@Override
 					public ModelGenerator<Se2_F64,AssociatedPair> createAlg() {
 						MotionTransformPoint<Se2_F64, Point2D_F64> alg = new MotionSe2PointSVD_F64();
-						return new GenerateSe2Point(alg);
+						return new GenerateSe2_AssociatedPair(alg);
 					}
 				};
 

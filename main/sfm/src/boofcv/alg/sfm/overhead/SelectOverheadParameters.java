@@ -80,7 +80,8 @@ public class SelectOverheadParameters {
 	 */
 	public boolean process(IntrinsicParameters intrinsic , Se3_F64 planeToCamera )
 	{
-		proj.setConfiguration(planeToCamera,intrinsic);
+		proj.setPlaneToCamera(planeToCamera,true);
+		proj.setIntrinsic(intrinsic);
 
 		// find a bounding rectangle on the ground which is visible to the camera and at a high enough resolution
 		double x0 = Double.MAX_VALUE;

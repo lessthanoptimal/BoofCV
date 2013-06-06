@@ -41,11 +41,10 @@ import boofcv.alg.geo.DistanceModelMonoPixels;
 import boofcv.alg.geo.pose.*;
 import boofcv.alg.sfm.DepthSparse3D;
 import boofcv.alg.sfm.StereoSparse3D;
-import boofcv.alg.sfm.d3.VisOdomDualTrackPnP;
-import boofcv.alg.sfm.d3.VisOdomMonoOverheadMotion2D;
-import boofcv.alg.sfm.d3.VisOdomPixelDepthPnP;
-import boofcv.alg.sfm.d3.VisOdomQuadPnP;
+import boofcv.alg.sfm.d3.*;
+import boofcv.alg.sfm.robust.DistancePlane2DToPixelSq;
 import boofcv.alg.sfm.robust.EstimatorToGenerator;
+import boofcv.alg.sfm.robust.GenerateSe2_PlanePtPixel;
 import boofcv.alg.sfm.robust.GeoModelRefineToModelFitter;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.geo.EnumPNP;
@@ -56,6 +55,7 @@ import boofcv.struct.geo.Point2D3D;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.sfm.PlanePtPixel;
 import boofcv.struct.sfm.Stereo2D3D;
 import georegression.struct.se.Se2_F64;
 import georegression.struct.se.Se3_F64;
@@ -69,6 +69,31 @@ import org.ddogleg.fitting.modelset.ransac.Ransac;
  * @author Peter Abeles
  */
 public class FactoryVisualOdometry {
+
+
+	public static <T extends ImageSingleBand>
+	MonocularPlaneVisualOdometry<T> monoPlaneRotTran(int thresholdAdd,
+													 int thresholdRetire,
+
+													 double inlierPixelTol,
+													 int ransacIterations ,
+
+													 PointTracker<T> tracker ) {
+
+		//squared pixel error
+		double ransacTOL = inlierPixelTol * inlierPixelTol;
+
+		DistancePlane2DToPixelSq distance = new DistancePlane2DToPixelSq();
+		GenerateSe2_PlanePtPixel generator = new GenerateSe2_PlanePtPixel();
+
+		ModelMatcher<Se2_F64, PlanePtPixel> motion =
+				new Ransac<Se2_F64, PlanePtPixel>(2323, generator, distance, ransacIterations, ransacTOL);
+
+		VisOdomMonoPlaneRotTran<T> alg =
+				new VisOdomMonoPlaneRotTran<T>(thresholdAdd,thresholdRetire,inlierPixelTol,motion,tracker);
+
+		return new MonoMotion2D_to_MonocularPlaneVisualOdometry<T>(alg,distance,generator);
+	}
 
 	/**
 	 *

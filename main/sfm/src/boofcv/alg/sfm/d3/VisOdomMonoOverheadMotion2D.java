@@ -64,8 +64,14 @@ public class VisOdomMonoOverheadMotion2D<T extends ImageBase>
 	private Se3_F64 planeToCamera;
 
 	// storage for intermediate results
+	private Se2_F64 worldToCurr2D;
 	private Se3_F64 worldToCurrCam3D = new Se3_F64();
 	private Se3_F64 worldToCurr3D = new Se3_F64();
+	private Se2_F64 temp = new Se2_F64();
+
+	// adjust for offset
+	private Se2_F64 origToMap = new Se2_F64();
+	private Se2_F64 mapToOrigin = new Se2_F64();
 
 	/**
 	 * Configures motion estimation algorithm.
@@ -109,6 +115,10 @@ public class VisOdomMonoOverheadMotion2D<T extends ImageBase>
 		createOverhead.configure(intrinsic,planeToCamera,overhead.centerX,overhead.centerY,overhead.cellSize,
 				selectOverhead.getOverheadWidth(),selectOverhead.getOverheadHeight());
 
+		// used to counter act offset in overhead image
+		origToMap.set(overhead.centerX,overhead.centerY,0);
+		mapToOrigin.set(-overhead.centerX,-overhead.centerY,0);
+
 		// fill it so there aren't any artifacts in the left over
 		overhead.image.reshape(selectOverhead.getOverheadWidth(), selectOverhead.getOverheadHeight());
 		GImageMiscOps.fill(overhead.image,0);
@@ -134,6 +144,14 @@ public class VisOdomMonoOverheadMotion2D<T extends ImageBase>
 			return false;
 		}
 
+		worldToCurr2D = motion2D.getFirstToCurrent();
+		worldToCurr2D.T.x *= overhead.cellSize;
+		worldToCurr2D.T.y *= overhead.cellSize;
+
+		// the true origin is offset from the overhead image which the transform is computed inside of
+		origToMap.concat(worldToCurr2D,temp);
+		temp.concat(mapToOrigin,worldToCurr2D);
+
 		return true;
 	}
 
@@ -143,7 +161,7 @@ public class VisOdomMonoOverheadMotion2D<T extends ImageBase>
 	 * @return from world to current frame.
 	 */
 	public Se2_F64 getWorldToCurr2D() {
-		return motion2D.getFirstToCurrent();
+		return worldToCurr2D;
 	}
 
 	/**
@@ -152,24 +170,17 @@ public class VisOdomMonoOverheadMotion2D<T extends ImageBase>
 	 * @return from world to current frame.
 	 */
 	public Se3_F64 getWorldToCurr3D() {
-		Se2_F64 m = motion2D.getFirstToCurrent();
-
-		// go from pixel to map coordinates
-		// This is the change in location, so no need to adjust for the origin
-		double mapX = m.T.x*overhead.cellSize;
-		double mapY = m.T.y*overhead.cellSize;
-
 		// 2D to 3D coordinates
-		worldToCurr3D.getT().set(-mapY,0,mapX);
+		worldToCurr3D.getT().set(-worldToCurr2D.T.y,0,worldToCurr2D.T.x);
 		DenseMatrix64F R = worldToCurr3D.getR();
 
 		// set rotation around Y axis.
 		// Transpose the 2D transform since the rotation are pointing in opposite directions
-		R.unsafe_set(0, 0, m.c);
-		R.unsafe_set(0, 2, -m.s);
+		R.unsafe_set(0, 0, worldToCurr2D.c);
+		R.unsafe_set(0, 2, -worldToCurr2D.s);
 		R.unsafe_set(1, 1, 1);
-		R.unsafe_set(2, 0, m.s);
-		R.unsafe_set(2, 2, m.c);
+		R.unsafe_set(2, 0, worldToCurr2D.s);
+		R.unsafe_set(2, 2, worldToCurr2D.c);
 
 		worldToCurr3D.concat(planeToCamera,worldToCurrCam3D);
 

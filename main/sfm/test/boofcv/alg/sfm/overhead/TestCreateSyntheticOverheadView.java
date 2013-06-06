@@ -72,7 +72,9 @@ public class TestCreateSyntheticOverheadView {
 		Point2D_F32 found = alg.getOverheadToPixel(400,320);
 
 		CameraPlaneProjection proj = new CameraPlaneProjection();
-		proj.setConfiguration(planeToCamera,param);
+		proj.setPlaneToCamera(planeToCamera,true);
+		proj.setIntrinsic(param);
+
 
 		Point2D_F64 expected = new Point2D_F64();
 		proj.pixelToPlane(found.x, found.y, expected);
