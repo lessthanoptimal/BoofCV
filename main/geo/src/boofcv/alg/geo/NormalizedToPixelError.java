@@ -40,6 +40,13 @@ public class NormalizedToPixelError {
 	public NormalizedToPixelError()
 	{}
 
+	/**
+	 * Specify camera intrinsic parameters
+	 *
+	 * @param fx focal length x
+	 * @param fy focal length y
+	 * @param skew camera skew
+	 */
 	public void set(double fx, double fy, double skew) {
 		this.fx = fx;
 		this.fy = fy;

@@ -95,7 +95,7 @@ public class FactoryMotion2D {
 			distance =  (DistanceFromModel)new DistanceAffine2DSq();
 		} else if( motionModel instanceof Se2_F64) {
 			MotionTransformPoint<Se2_F64, Point2D_F64> alg = new MotionSe2PointSVD_F64();
-			GenerateSe2Point mf = new GenerateSe2Point(alg);
+			GenerateSe2_AssociatedPair mf = new GenerateSe2_AssociatedPair(alg);
 			fitter = (ModelGenerator)mf;
 			distance =  (DistanceFromModel)new DistanceSe2Sq();
 			// no refine, already optimal

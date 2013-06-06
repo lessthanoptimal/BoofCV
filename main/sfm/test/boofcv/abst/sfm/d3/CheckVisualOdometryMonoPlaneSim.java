@@ -47,8 +47,10 @@ public abstract class CheckVisualOdometryMonoPlaneSim<I extends ImageSingleBand>
 
 	// really not sure what's visible, so create a lot of objects
 	protected int numSquares = 5000;
+//	protected int numSquares = 50;
 
 	double tolerance = 0.02;
+	double cameraAngle = -0.75;
 
 	public CheckVisualOdometryMonoPlaneSim(Class<I> inputType) {
 		super(320, 240, inputType);
@@ -58,9 +60,10 @@ public abstract class CheckVisualOdometryMonoPlaneSim<I extends ImageSingleBand>
 		createSquares(numSquares,-10,10);
 	}
 
-	public CheckVisualOdometryMonoPlaneSim(Class<I> inputType, double tolerance) {
+	public CheckVisualOdometryMonoPlaneSim(Class<I> inputType, double cameraAngle , double tolerance) {
 		this(inputType);
 		this.tolerance = tolerance;
+		this.cameraAngle = cameraAngle;
 	}
 
 	public void setAlgorithm(MonocularPlaneVisualOdometry<I>  algorithm) {
@@ -75,8 +78,12 @@ public abstract class CheckVisualOdometryMonoPlaneSim<I extends ImageSingleBand>
 
 		// creates squares which are entirely on the ground plane
 		for( int i = 0; i < total; i++ ) {
-			double z = rand.nextDouble()*(maxZ-minZ)+minZ;
-			double x = (rand.nextDouble()-0.5)*4;
+
+			double theta = rand.nextDouble()*Math.PI*2.0;
+			double r = rand.nextDouble()*(maxZ-minZ)+minZ;
+
+			double z = r*Math.cos(theta);
+			double x = r*Math.sin(theta);
 			double y = 0;
 
 			Square s = new Square();
@@ -84,6 +91,28 @@ public abstract class CheckVisualOdometryMonoPlaneSim<I extends ImageSingleBand>
 			s.b.set(x + t, y, z);
 			s.c.set(x + t, y, z + t);
 			s.d.set(x, y , z + t);
+
+			s.gray = rand.nextInt(255);
+
+			squares.add(s);
+		}
+
+		// create points far away
+		t = 5.0;
+		for( int i = 0; i < total; i++ ) {
+			double theta = rand.nextDouble()*Math.PI*2.0;
+
+			double r = 50;
+
+			double z = r*Math.cos(theta);
+			double x = r*Math.sin(theta);
+			double y = -rand.nextDouble()*2-5; // stick them a bit up in the
+
+			Square s = new Square();
+			s.a.set(x , y  ,z);
+			s.b.set(x + t, y, z);
+			s.c.set(x + t, y + t, z);
+			s.d.set(x , y + t, z);
 
 			s.gray = rand.nextInt(255);
 
@@ -106,9 +135,19 @@ public abstract class CheckVisualOdometryMonoPlaneSim<I extends ImageSingleBand>
 
 	@Test
 	public void moveForward() {
+		motionCheck(0,0.1);
+	}
+
+	@Test
+	public void moveTurning() {
+		motionCheck(0.02,0.1);
+	}
+
+	public void motionCheck( double angleRate , double forwardRate ) {
+
 		// Easier to make up a plane in this direction
 		Se3_F64 cameraToPlane = new Se3_F64();
-		RotationMatrixGenerator.eulerXYZ(UtilAngle.degreeToRadian(-75), 0.1, 0.0, cameraToPlane.getR());
+		RotationMatrixGenerator.eulerXYZ(UtilAngle.degreeToRadian(cameraAngle), 0.1, 0.0, cameraToPlane.getR());
 		cameraToPlane.getT().set(0,-2,0);
 
 		Se3_F64 planeToCamera = cameraToPlane.invert(null);
@@ -121,7 +160,9 @@ public abstract class CheckVisualOdometryMonoPlaneSim<I extends ImageSingleBand>
 		algorithm.setIntrinsic(param);
 
 		for( int i = 0; i < 10; i++ ) {
-			worldToCurr.getT().z = -i*0.10; // move forward
+//			System.out.println("-------- Real rotY = "+angleRate*i);
+			worldToCurr.getT().z = -i*forwardRate; // move forward
+			RotationMatrixGenerator.rotY(angleRate*i,worldToCurr.getR());
 
 			worldToCurr.concat(planeToCamera,worldToCamera);
 
@@ -136,8 +177,8 @@ public abstract class CheckVisualOdometryMonoPlaneSim<I extends ImageSingleBand>
 			Se3_F64 foundWorldToCamera = algorithm.getCameraToWorld().invert(null);
 			Se3_F64 foundWorldToCurr =  foundWorldToCamera.concat(cameraToPlane,null);
 
-			worldToCurr.getT().print();
-			foundWorldToCurr.getT().print();
+//			worldToCurr.getT().print();
+//			foundWorldToCurr.getT().print();
 
 //			worldToCurr.getR().print();
 //			foundWorldToCurr.getR().print();

@@ -32,7 +32,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class GenerateSe2Point implements
+public class GenerateSe2_AssociatedPair implements
 		ModelGenerator<Se2_F64,AssociatedPair>
 {
 	MotionTransformPoint<Se2_F64, Point2D_F64> estimate;
@@ -40,7 +40,7 @@ public class GenerateSe2Point implements
 	List<Point2D_F64> from = new ArrayList<Point2D_F64>();
 	List<Point2D_F64> to = new ArrayList<Point2D_F64>();
 
-	public GenerateSe2Point(MotionTransformPoint<Se2_F64, Point2D_F64> estimate) {
+	public GenerateSe2_AssociatedPair(MotionTransformPoint<Se2_F64, Point2D_F64> estimate) {
 		this.estimate = estimate;
 	}
 

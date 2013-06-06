@@ -46,6 +46,7 @@ public class TestCameraPlaneProjection {
 
 	Point3D_F64 worldPt = new Point3D_F64(0.3,0,3);
 	Point3D_F64 cameraPt;
+	Point2D_F64 normalizedPt = new Point2D_F64();
 	Point2D_F64 pixelPt = new Point2D_F64();
 
 
@@ -58,7 +59,8 @@ public class TestCameraPlaneProjection {
 		planeToCamera = cameraToPlane.invert(null);
 
 		cameraPt = SePointOps_F64.transform(planeToCamera,worldPt,null);
-		normToPixel.compute(cameraPt.x/cameraPt.z,cameraPt.y/cameraPt.z,pixelPt);
+		normalizedPt.set(cameraPt.x/cameraPt.z,cameraPt.y/cameraPt.z);
+		normToPixel.compute(normalizedPt.x,normalizedPt.y,pixelPt);
 	}
 
 	@Test
@@ -79,6 +81,23 @@ public class TestCameraPlaneProjection {
 	}
 
 	@Test
+	public void planeToNormalized() {
+
+		CameraPlaneProjection alg = new CameraPlaneProjection();
+		alg.setConfiguration(planeToCamera,param);
+
+		Point2D_F64 found = new Point2D_F64();
+
+		assertTrue(alg.planeToNormalized(worldPt.z, -worldPt.x, found));
+
+		assertEquals(found.x,normalizedPt.x,1e-8);
+		assertEquals(found.y,normalizedPt.y,1e-8);
+
+		// try giving it a point behind the camera
+		assertFalse(alg.planeToNormalized(-50,-worldPt.x,found));
+	}
+
+	@Test
 	public void pixelToPlane() {
 		CameraPlaneProjection alg = new CameraPlaneProjection();
 		alg.setConfiguration(planeToCamera,param);
@@ -86,6 +105,22 @@ public class TestCameraPlaneProjection {
 		Point2D_F64 found = new Point2D_F64();
 
 		assertTrue(alg.pixelToPlane(pixelPt.x,pixelPt.y, found));
+
+		assertEquals(found.x,worldPt.z,1e-6);
+		assertEquals(found.y, -worldPt.x, 1e-6);
+
+		// give it a point which won't intersect the plane
+		assertFalse(alg.pixelToPlane(-10000, 0, found));
+	}
+
+	@Test
+	public void normalToPlane() {
+		CameraPlaneProjection alg = new CameraPlaneProjection();
+		alg.setConfiguration(planeToCamera,param);
+
+		Point2D_F64 found = new Point2D_F64();
+
+		assertTrue(alg.normalToPlane(normalizedPt.x,normalizedPt.y, found));
 
 		assertEquals(found.x,worldPt.z,1e-6);
 		assertEquals(found.y, -worldPt.x, 1e-6);

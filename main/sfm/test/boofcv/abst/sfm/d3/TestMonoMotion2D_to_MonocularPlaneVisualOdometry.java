@@ -23,17 +23,16 @@ import boofcv.abst.feature.tracker.PkltConfig;
 import boofcv.abst.feature.tracker.PointTracker;
 import boofcv.factory.feature.tracker.FactoryPointTracker;
 import boofcv.factory.sfm.FactoryVisualOdometry;
-import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageSInt16;
 import boofcv.struct.image.ImageUInt8;
 
 /**
  * @author Peter Abeles
  */
-public class TestMonoOverhead_to_MonocularPlaneVisualOdometry extends CheckVisualOdometryMonoPlaneSim<ImageUInt8> {
+public class TestMonoMotion2D_to_MonocularPlaneVisualOdometry extends CheckVisualOdometryMonoPlaneSim<ImageUInt8> {
 
-	public TestMonoOverhead_to_MonocularPlaneVisualOdometry() {
-		super(ImageUInt8.class,-20,0.04);
+	public TestMonoMotion2D_to_MonocularPlaneVisualOdometry() {
+		super(ImageUInt8.class,-20,0.04);   // angle selected to include ground points and points far away
 
 		setAlgorithm(createAlgorithm());
 	}
@@ -50,11 +49,7 @@ public class TestMonoOverhead_to_MonocularPlaneVisualOdometry extends CheckVisua
 
 		PointTracker<ImageUInt8> tracker = FactoryPointTracker.klt(config, configDetector);
 
-		double cellSize = 0.015;
-		double ransacTol = 0.2;
-
-		return FactoryVisualOdometry.monoPlaneOverhead(
-				cellSize, 25,0.5, ransacTol,300,2,30,0.5,0.3, tracker,ImageDataType.single(ImageUInt8.class));
+		return FactoryVisualOdometry.monoPlaneRotTran(50, 2, 1.5, 300, tracker);
 
 	}
 
