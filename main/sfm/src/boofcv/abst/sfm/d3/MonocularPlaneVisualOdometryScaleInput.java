@@ -1,0 +1,94 @@
+/*
+ * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ *
+ * This file is part of BoofCV (http://boofcv.org).
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package boofcv.abst.sfm.d3;
+
+import boofcv.alg.distort.DistortImageOps;
+import boofcv.alg.geo.PerspectiveOps;
+import boofcv.alg.interpolate.TypeInterpolate;
+import boofcv.struct.calib.IntrinsicParameters;
+import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageDataType;
+import georegression.struct.se.Se3_F64;
+
+/**
+ *  * Wrapper around {@link MonocularPlaneVisualOdometry} which scales the input images.
+ *
+ * @author Peter Abeles
+ */
+// TODO more efficient scaling algorithm
+public class MonocularPlaneVisualOdometryScaleInput <T extends ImageBase> implements MonocularPlaneVisualOdometry<T>{
+
+	double scaleFactor;
+
+	IntrinsicParameters scaleParameter;
+
+	T scaled;
+
+	MonocularPlaneVisualOdometry<T> alg;
+
+	public MonocularPlaneVisualOdometryScaleInput( MonocularPlaneVisualOdometry<T> alg , double scaleFactor ) {
+		this.alg = alg;
+		this.scaleFactor = scaleFactor;
+		scaled = alg.getImageType().createImage(1, 1);
+	}
+
+	@Override
+	public void setIntrinsic(IntrinsicParameters parameters) {
+		scaleParameter = new IntrinsicParameters(parameters);
+
+		PerspectiveOps.scaleIntrinsic(scaleParameter, scaleFactor);
+
+		scaled.reshape(scaleParameter.width,scaleParameter.height);
+
+		alg.setIntrinsic(scaleParameter);
+	}
+
+	@Override
+	public void setExtrinsic(Se3_F64 planeToCamera) {
+		alg.setExtrinsic(planeToCamera);
+	}
+
+	@Override
+	public boolean process(T leftImage) {
+
+		DistortImageOps.scale(leftImage, scaled, TypeInterpolate.BILINEAR);
+
+		return alg.process(scaled);
+	}
+
+	@Override
+	public ImageDataType<T> getImageType() {
+		return alg.getImageType();
+	}
+
+	@Override
+	public void reset() {
+		alg.reset();
+	}
+
+	@Override
+	public boolean isFault() {
+		return alg.isFault();
+	}
+
+	@Override
+	public Se3_F64 getCameraToWorld() {
+		return alg.getCameraToWorld();
+	}
+}

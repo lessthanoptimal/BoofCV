@@ -21,7 +21,9 @@ Version : Alpha 0.15
 - Added MonocularPlaneVisualOdometry for computing 2D motion from a camera when traveling over a plane
 - Generalized VisualOdometry interface to allow for arbitrary transforms
 - Cleaned up VisualOdometry and StereoVisualOdometry interfaces
-- Added StereoVisualOdometryScaleInput which will handle rescaling of input images automatically
+- Automatic rescaling of images for visual odometry
+  * StereoVisualOdometryScaleInput
+  * MonocularPlaneVisualOdometryScaleInput
 - Added DistanceHomographyPixelSq so that the fit error for normalized homography can be computed in image pixels.
 - Added MultiViewOps.decomposeHomography().
 - Added more support for convert to/from 16bit BufferedImages
