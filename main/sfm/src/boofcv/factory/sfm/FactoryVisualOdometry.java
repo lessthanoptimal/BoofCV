@@ -71,6 +71,22 @@ import org.ddogleg.fitting.modelset.ransac.Ransac;
 public class FactoryVisualOdometry {
 
 
+	/**
+	 * Monocular plane based visual odometry algorithm which uses both points on the plane and off plane for motion
+	 * estimation.
+	 *
+	 * @see VisOdomMonoPlaneInfinity
+	 *
+	 * @param thresholdAdd  New points are spawned when the number of on plane inliers drops below this value.
+	 * @param thresholdRetire Tracks are dropped when they are not contained in the inlier set for this many frames
+	 *                        in a row.  Try 2
+	 * @param inlierPixelTol Threshold used to determine inliers in pixels.  Try 1.5
+	 * @param ransacIterations Number of RANSAC iterations.  Try 200
+	 * @param tracker Image feature tracker
+	 * @param imageType Type of input image it processes
+	 * @param <T>
+	 * @return New instance of
+	 */
 	public static <T extends ImageSingleBand>
 	MonocularPlaneVisualOdometry<T> monoPlaneRotTran(int thresholdAdd,
 													 int thresholdRetire,
@@ -78,7 +94,8 @@ public class FactoryVisualOdometry {
 													 double inlierPixelTol,
 													 int ransacIterations ,
 
-													 PointTracker<T> tracker ) {
+													 PointTracker<T> tracker ,
+													 ImageDataType<T> imageType ) {
 
 		//squared pixel error
 		double ransacTOL = inlierPixelTol * inlierPixelTol;
@@ -89,30 +106,35 @@ public class FactoryVisualOdometry {
 		ModelMatcher<Se2_F64, PlanePtPixel> motion =
 				new Ransac<Se2_F64, PlanePtPixel>(2323, generator, distance, ransacIterations, ransacTOL);
 
-		VisOdomMonoPlaneRotTran<T> alg =
-				new VisOdomMonoPlaneRotTran<T>(thresholdAdd,thresholdRetire,inlierPixelTol,motion,tracker);
+		VisOdomMonoPlaneInfinity<T> alg =
+				new VisOdomMonoPlaneInfinity<T>(thresholdAdd,thresholdRetire,inlierPixelTol,motion,tracker);
 
-		return new MonoMotion2D_to_MonocularPlaneVisualOdometry<T>(alg,distance,generator);
+		return new MonoPlaneInfinity_to_MonocularPlaneVisualOdometry<T>(alg,distance,generator,imageType);
 	}
 
 	/**
+	 * Monocular plane based visual odometry algorithm which creates a synthetic overhead view and tracks image
+	 * features inside this synthetic view.
+	 *
+	 * @see VisOdomMonoOverheadMotion2D
 	 *
 	 * @param cellSize (Overhead) size of ground cells in overhead image in world units
-	 * @param maxCellsPerPixel (Overhead)
-	 * @param mapHeightFraction (Overhead)
+	 * @param maxCellsPerPixel (Overhead) Specifies the minimum resolution.  Higher values allow lower resolutions.
+	 *                         Try 10
+	 * @param mapHeightFraction (Overhead)  Truncates the overhead view.  Must be from 0 to 1.0.  1.0 includes
+	 *                          the entire image.
 
 	 * @param inlierGroundTol (RANSAC) tolerance on ground plane in world units
-	 * @param ransacIterations (RANSAC)
+	 * @param ransacIterations (RANSAC) Number of iterations used when estimating motion
 	 *
 	 * @param thresholdRetire (2D Motion)
 	 * @param absoluteMinimumTracks (2D Motion)
 	 * @param respawnTrackFraction (2D Motion)
 	 * @param respawnCoverageFraction (2D Motion)
 	 *
-	 * @param tracker
-	 * @param imageType
-	 * @param <T>
-	 * @return
+	 * @param tracker Image feature tracker
+	 * @param imageType Type of image being processed
+	 * @return MonocularPlaneVisualOdometry
 	 */
 	public static <T extends ImageSingleBand>
 	MonocularPlaneVisualOdometry<T> monoPlaneOverhead(double cellSize,
@@ -138,7 +160,7 @@ public class FactoryVisualOdometry {
 		VisOdomMonoOverheadMotion2D<T> alg =
 				new VisOdomMonoOverheadMotion2D<T>(cellSize,maxCellsPerPixel,mapHeightFraction,motion2D,imageType);
 
-		return new MonoOverhead_to_MonocularPlaneVisualOdometry<T>(alg);
+		return new MonoOverhead_to_MonocularPlaneVisualOdometry<T>(alg,imageType);
 	}
 
 	/**
@@ -418,5 +440,20 @@ public class FactoryVisualOdometry {
 	public static <T extends ImageBase> StereoVisualOdometry<T> scaleInput( StereoVisualOdometry<T> vo , double scaleFactor )
 	{
 		return new StereoVisualOdometryScaleInput<T>(vo,scaleFactor);
+	}
+
+	/**
+	 * Wraps around a {@link MonocularPlaneVisualOdometry} instance and will rescale the input images and adjust the cameras
+	 * intrinsic parameters automatically.  Rescaling input images is often an easy way to improve runtime performance
+	 * with a minimal hit on pose accuracy.
+	 *
+	 * @param vo Visual odometry algorithm which is being wrapped
+	 * @param scaleFactor Scale factor that the image should be reduced by,  Try 0.5 for half size.
+	 * @param <T> Image type
+	 * @return StereoVisualOdometry
+	 */
+	public static <T extends ImageBase> MonocularPlaneVisualOdometry<T> scaleInput( MonocularPlaneVisualOdometry<T> vo , double scaleFactor )
+	{
+		return new MonocularPlaneVisualOdometryScaleInput<T>(vo,scaleFactor);
 	}
 }

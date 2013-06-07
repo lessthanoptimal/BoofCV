@@ -16,10 +16,8 @@
  * limitations under the License.
  */
 
-package boofcv.alg.sfm.d3;
+package boofcv.abst.sfm.d3;
 
-import boofcv.abst.sfm.d3.StereoVisualOdometry;
-import boofcv.abst.sfm.d3.StereoVisualOdometryScaleInput;
 import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.image.ImageDataType;
