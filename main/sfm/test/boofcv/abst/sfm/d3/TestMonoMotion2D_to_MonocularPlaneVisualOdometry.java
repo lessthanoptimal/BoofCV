@@ -50,8 +50,7 @@ public class TestMonoMotion2D_to_MonocularPlaneVisualOdometry extends CheckVisua
 
 		PointTracker<ImageUInt8> tracker = FactoryPointTracker.klt(config, configDetector);
 
-		return FactoryVisualOdometry.monoPlaneRotTran(50, 2, 1.5, 300, tracker, ImageDataType.single(ImageUInt8.class));
-
+		return FactoryVisualOdometry.monoPlaneInfinity(50, 2, 1.5, 300, tracker, ImageDataType.single(ImageUInt8.class));
 	}
 
 }

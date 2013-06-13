@@ -51,9 +51,11 @@ public interface DetectDescribeMulti<T extends ImageSingleBand, Desc extends Tup
 	/**
 	 * Returns the most recently detected features for a specific set.  Each time
 	 * {@link #process(boofcv.struct.image.ImageSingleBand)} is called the results are modified.
+	 * </p>
+	 * WARNING: The returned data structure is recycled each time {@link #process(boofcv.struct.image.ImageSingleBand)}
+	 * is called.  Create a copy if this is a problem.
 	 *
 	 * @param set Which set of detected features.
-	 * @param
 	 * @return Results for a set.
 	 */
 	public PointDescSet<Desc> getFeatureSet(int set);

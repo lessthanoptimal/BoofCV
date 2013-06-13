@@ -88,14 +88,14 @@ public class FactoryVisualOdometry {
 	 * @return New instance of
 	 */
 	public static <T extends ImageSingleBand>
-	MonocularPlaneVisualOdometry<T> monoPlaneRotTran(int thresholdAdd,
-													 int thresholdRetire,
+	MonocularPlaneVisualOdometry<T> monoPlaneInfinity(int thresholdAdd,
+													  int thresholdRetire,
 
-													 double inlierPixelTol,
-													 int ransacIterations ,
+													  double inlierPixelTol,
+													  int ransacIterations,
 
-													 PointTracker<T> tracker ,
-													 ImageDataType<T> imageType ) {
+													  PointTracker<T> tracker,
+													  ImageDataType<T> imageType) {
 
 		//squared pixel error
 		double ransacTOL = inlierPixelTol * inlierPixelTol;

@@ -52,7 +52,8 @@ public interface PointDescSet<TD extends TupleDesc> {
 	 * <p>Returns the description of the specified feature.</p>
 	 *
 	 * <p>
-	 * WARNING: The returned description will be overwritten when a new image is processed.
+	 * WARNING: The returned description will be overwritten when a new image is processed. Create a copy if this
+	 * is a problem.
 	 * </p>
 	 *
 	 * @param index Which feature
