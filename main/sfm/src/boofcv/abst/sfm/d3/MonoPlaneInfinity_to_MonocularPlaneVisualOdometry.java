@@ -93,6 +93,7 @@ public class MonoPlaneInfinity_to_MonocularPlaneVisualOdometry<T extends ImageBa
 	public void reset() {
 		active = null;
 		alg.reset();
+		cameraToWorld.reset();
 	}
 
 	@Override

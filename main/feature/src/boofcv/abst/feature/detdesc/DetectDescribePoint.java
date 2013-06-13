@@ -34,6 +34,9 @@ public interface DetectDescribePoint<T extends ImageSingleBand, Desc extends Tup
 {
 	/**
 	 * Returns the feature descriptor at the specified index.
+	 * </p>
+	 * WARNING: The returned data structure is recycled each time {@link #detect(boofcv.struct.image.ImageSingleBand)}
+	 * is called.  Create a copy if this is a problem.
 	 *
 	 * @param index Which feature
 	 * @return Feature descriptor
