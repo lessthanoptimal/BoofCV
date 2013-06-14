@@ -113,9 +113,6 @@ public class SiftDetector {
 			sortBest = new SelectNBestFeatures(maxFeatures);
 		}
 
-		// ignore features along the border since a 3x3 region is assumed in parts of the code
-		extractor.setIgnoreBorder(1);
-
 		createDerivatives();
 
 		this.edgeThreshold = edgeThreshold;
@@ -218,9 +215,19 @@ public class SiftDetector {
 
 		float signAdj = positive ? 1 : -1;
 
+		// precompute border for insignificant speed boost
+		int borderX = scale1.width-1;
+		int borderY = scale1.height-1;
+
 		// see if they are a local max in scale space
 		for( int i = 0; i < features.size; i++ ) {
 			Point2D_I16 p = features.data[i];
+
+			// discard points up against the image border since how it should be interpolated is undefined.  plus
+			// this makes it easier to write faster code
+			if( p.x == 0 || p.y == 0 || p.x == borderX || p.y == borderY )
+				continue;
+
 			float value = scale1.unsafe_get(p.x, p.y);
 			if( isScaleSpaceMax(scale0,scale2,p.x,p.y,value,signAdj)
 					&& !isEdge(p.x,p.y) ) {
@@ -235,6 +242,7 @@ public class SiftDetector {
 	 */
 	private void addPoint(ImageFloat32 scale0 , ImageFloat32 scale1, ImageFloat32 scale2,
 						  short x, short y, float value, float signAdj, boolean white ) {
+		value *= signAdj;
 		float x0 =  scale1.unsafe_get(x - 1, y)*signAdj;
 		float x2 =  scale1.unsafe_get(x + 1, y)*signAdj;
 		float y0 =  scale1.unsafe_get(x , y - 1)*signAdj;
