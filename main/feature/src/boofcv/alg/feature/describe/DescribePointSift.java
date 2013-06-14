@@ -121,6 +121,14 @@ public class DescribePointSift {
 
 	/**
 	 * Compute the descriptor with information on which level in the scale-space to use.
+	 *
+	 * @param c_x Location of feature in input image
+	 * @param c_y Location of feature in input image
+	 * @param scale Size of the feature in the input image
+	 * @param orientation Orientation of the feature
+	 * @param imageIndex Which octave contains the feature
+	 * @param pixelScale The scale of a pixel in the octave
+	 * @param desc (Output) storage for the descriptor
 	 */
 	public void process( double c_x , double c_y , double scale , double orientation ,
 						 int imageIndex ,
@@ -137,7 +145,7 @@ public class DescribePointSift {
 			for( int j = 0; j < histograms[i].length; j++ )
 				histograms[i][j] = 0;
 
-		// account the the scale of the image in each octave
+		// account for the scale of the image in each octave
 		constructHistograms(c_x/pixelScale , c_y/pixelScale, scale/pixelScale, orientation );
 
 		computeDescriptor(desc);

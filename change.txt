@@ -39,6 +39,8 @@ Version : Alpha 0.15
 - CreateSyntheticOverheadView for converting an image into an overhead view when the scene is planar
 - Added numBands to ImageDataType
 - Fixed type-o in triangulation JavaDoc.  Thanks tverbele
+- Fixed bug in SIFT where a change in non-maximum behavior caused features to be detected too close to image border.
+  * Thanks lefman for pointing it out
 
 ---------------------------------------------
 Date    : 2013/04/15
