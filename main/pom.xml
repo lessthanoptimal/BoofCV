@@ -19,13 +19,13 @@
     <dependency>
       <groupId>org.georegression</groupId>
       <artifactId>georegression</artifactId>
-      <version>0.3</version>
+      <version>0.4-SNAPSHOT</version>
     </dependency>
 
     <dependency>
       <groupId>org.ddogleg</groupId>
       <artifactId>ddogleg</artifactId>
-      <version>0.3</version>
+      <version>0.3-SNAPSHOT</version>
     </dependency>
 
     <dependency>
