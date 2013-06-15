@@ -61,12 +61,12 @@ public class BoofMiscOps {
 		}
 	}
 
-   public static <T> T loadXML( Reader r ) {
-      XStreamClassLoader loader = new BoofcvClassLoader();
-      XStream xstream = new XStream(new PureJavaReflectionProvider(),new DomDriver(),loader,null,new DefaultConverterLookup(), null);
+	public static <T> T loadXML( Reader r ) {
+		XStreamClassLoader loader = new BoofcvClassLoader();
+		XStream xstream = new XStream(new PureJavaReflectionProvider(),new DomDriver(),loader,null,new DefaultConverterLookup(), null);
 //		xstream.registerConverter(new JavaBeanConverter(xstream.getMapper()));
-      return (T)xstream.fromXML(r);
-   }
+		return (T)xstream.fromXML(r);
+	}
 
 	public static String toString( Reader r ) {
 		char buff[] = new char[1024];
