@@ -19,9 +19,11 @@
 package boofcv.gui;
 
 import boofcv.io.image.SimpleImageSequence;
-import boofcv.struct.image.ImageBase;
+import boofcv.misc.BoofMiscOps;
+import boofcv.struct.calib.MonoPlaneParameters;
 import boofcv.struct.image.ImageDataType;
-import boofcv.struct.image.ImageTypeInfo;
+import boofcv.struct.image.ImageSingleBand;
+import sun.awt.X11.Depth;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -29,15 +31,20 @@ import javax.swing.event.ChangeListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.Reader;
 
 /**
- * Base class which handles starting and stopping of video streams for apps that process video streams.
+ * Base class for processing sequences of Gray and Depth images.
  *
  * @author Peter Abeles
  */
-public abstract class VideoProcessAppBase<I extends ImageBase>
-		extends SelectAlgorithmAndInputPanel implements VisualizeApp, MouseListener , ChangeListener
+public abstract class MonocularPlaneVideoAppBase<I extends ImageSingleBand>
+		extends SelectAlgorithmAndInputPanel implements VisualizeApp, MouseListener, ChangeListener
 {
+	protected MonoPlaneParameters config;
 	protected SimpleImageSequence<I> sequence;
 
 	volatile boolean requestStop = false;
@@ -48,19 +55,14 @@ public abstract class VideoProcessAppBase<I extends ImageBase>
 
 	JSpinner periodSpinner;
 
-	protected ImageDataType<I> imageInfo;
+	protected Class<I> imageType;
+	protected Class<Depth> depthType;
 
-	public VideoProcessAppBase(int numAlgFamilies, Class<I> imageType) {
+	public MonocularPlaneVideoAppBase(int numAlgFamilies, Class<I> imageType, Class<Depth> depthType) {
 		super(numAlgFamilies);
 
-		this.imageInfo = new ImageDataType<I>(ImageDataType.Family.SINGLE_BAND, ImageTypeInfo.classToType(imageType),1);
-		addToToolbar(createSelectDelay());
-	}
-
-	public VideoProcessAppBase(int numAlgFamilies, ImageDataType<I> imageInfo ) {
-		super(numAlgFamilies);
-
-		this.imageInfo = imageInfo;
+		this.imageType = imageType;
+		this.depthType = depthType;
 		addToToolbar(createSelectDelay());
 	}
 
@@ -84,15 +86,34 @@ public abstract class VideoProcessAppBase<I extends ImageBase>
 
 	protected abstract void process( SimpleImageSequence<I> sequence );
 
-	protected abstract void updateAlg(I frame, BufferedImage buffImage );
+	protected abstract void updateAlg(I frame , BufferedImage buffImage );
 
-	protected abstract void updateAlgGUI( I frame , BufferedImage imageGUI , double fps );
+	protected abstract void updateAlgGUI( I frame , BufferedImage buffImage , double fps );
 
 	@Override
 	public void changeInput(String name, int index) {
 		stopWorker();
-		SimpleImageSequence<I> video = media.openVideo(inputRefs.get(index).getPath(),imageInfo);
-		process(video);
+		Reader r = media.openFile(inputRefs.get(index).getPath());
+		BufferedReader in = new BufferedReader(r);
+		try {
+			String path = new File(inputRefs.get(index).getPath()).getParent();
+
+			String lineConfig = in.readLine();
+			String line1 = in.readLine();
+
+			// adjust for relative paths
+			if( lineConfig.charAt(0) != '/' )
+				lineConfig = path+"/"+lineConfig;
+			if( line1.charAt(0) != '/' )
+				line1 = path+"/"+line1;
+
+			config = BoofMiscOps.loadXML(media.openFile(lineConfig));
+			SimpleImageSequence<I> video = media.openVideo(line1, ImageDataType.single(imageType));
+
+			process(video);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	protected void stopWorker() {

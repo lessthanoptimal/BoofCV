@@ -657,12 +657,12 @@ public class VisOdomMonoPlaneInfinity<T extends ImageBase> {
 
 		// ----- Observations in key-frame
 		// 2D location or angle vector on ground plane for point on ground and at infinity, respectively
-		Point2D_F64 ground = new Point2D_F64();
+		public Point2D_F64 ground = new Point2D_F64();
 
 		// the tick in which it was last an inlier
 		public long lastInlier;
 
 		// true for point on plane and false for infinity
-		boolean onPlane;
+		public boolean onPlane;
 	}
 }

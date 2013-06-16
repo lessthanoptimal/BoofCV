@@ -18,7 +18,9 @@
 
 package boofcv.abst.sfm.d3;
 
+import boofcv.struct.calib.MonoPlaneParameters;
 import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageDataType;
 import georegression.struct.se.Se3_F64;
 
 /**
@@ -29,14 +31,30 @@ import georegression.struct.se.Se3_F64;
  *
  * @author Peter Abeles
  */
-public interface MonocularPlaneVisualOdometry<T extends ImageBase> extends MonocularVisualOdometry<T> {
+public interface MonocularPlaneVisualOdometry<T extends ImageBase> extends VisualOdometry<Se3_F64> {
 
 	/**
-	 * Transform from plane to the camera in the current frame.  In the plane's reference frame, it is parallel
-	 * to the x-z plane and contains point (0,0,0).
+	 * Specifies the camera's intrinsic and extrinsic parameters.  Can be changed at any time.
 	 *
-	 * @param planeToCamera transform from plane to camera.
+	 * @param param Camera calibration parameters
 	 */
-	public void setExtrinsic( Se3_F64 planeToCamera );
+	public void setCalibration( MonoPlaneParameters param );
+
+	/**
+	 * Process the new image and update the motion estimate.  The return value must be checked
+	 * to see if the estimate was actually updated.  If false is returned then {@link #isFault}
+	 * also needs to be checked to see if the pose estimate has been reset.
+	 *
+	 * @param input Next image in the sequence.
+	 * @return If the motion estimate has been updated or not
+	 */
+	public boolean process( T input );
+
+	/**
+	 * Type of input images it can process.
+	 *
+	 * @return The image type
+	 */
+	public ImageDataType<T> getImageType();
 
 }
