@@ -120,17 +120,18 @@ public class FactoryVisualOdometry {
 	 *
 	 * @param cellSize (Overhead) size of ground cells in overhead image in world units
 	 * @param maxCellsPerPixel (Overhead) Specifies the minimum resolution.  Higher values allow lower resolutions.
-	 *                         Try 10
+	 *                         Try 20
 	 * @param mapHeightFraction (Overhead)  Truncates the overhead view.  Must be from 0 to 1.0.  1.0 includes
 	 *                          the entire image.
 
-	 * @param inlierGroundTol (RANSAC) tolerance on ground plane in world units
+	 * @param inlierGroundTol (RANSAC) RANSAC tolerance in overhead image pixels
 	 * @param ransacIterations (RANSAC) Number of iterations used when estimating motion
 	 *
-	 * @param thresholdRetire (2D Motion)
-	 * @param absoluteMinimumTracks (2D Motion)
-	 * @param respawnTrackFraction (2D Motion)
-	 * @param respawnCoverageFraction (2D Motion)
+	 * @param thresholdRetire (2D Motion) Drop tracks if they are not in inliers set for this many turns.
+	 * @param absoluteMinimumTracks (2D Motion) Spawn tracks if the number of inliers drops below the specified number
+	 * @param respawnTrackFraction (2D Motion) Spawn tracks if the number of tracks has dropped below this fraction of the
+	 *                             original number
+	 * @param respawnCoverageFraction (2D Motion) Spawn tracks if the total coverage drops below this relative fraction
 	 *
 	 * @param tracker Image feature tracker
 	 * @param imageType Type of image being processed

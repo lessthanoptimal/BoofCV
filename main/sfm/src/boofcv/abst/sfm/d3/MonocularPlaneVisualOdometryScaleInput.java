@@ -22,6 +22,7 @@ import boofcv.alg.distort.DistortImageOps;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.interpolate.TypeInterpolate;
 import boofcv.struct.calib.IntrinsicParameters;
+import boofcv.struct.calib.MonoPlaneParameters;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageDataType;
 import georegression.struct.se.Se3_F64;
@@ -36,7 +37,7 @@ public class MonocularPlaneVisualOdometryScaleInput <T extends ImageBase> implem
 
 	double scaleFactor;
 
-	IntrinsicParameters scaleParameter;
+	MonoPlaneParameters scaleParameter = new MonoPlaneParameters();
 
 	T scaled;
 
@@ -49,19 +50,15 @@ public class MonocularPlaneVisualOdometryScaleInput <T extends ImageBase> implem
 	}
 
 	@Override
-	public void setIntrinsic(IntrinsicParameters parameters) {
-		scaleParameter = new IntrinsicParameters(parameters);
+	public void setCalibration( MonoPlaneParameters param ) {
+		scaleParameter.intrinsic = new IntrinsicParameters(param.intrinsic);
+		scaleParameter.planeToCamera = param.planeToCamera.copy();
 
-		PerspectiveOps.scaleIntrinsic(scaleParameter, scaleFactor);
+		PerspectiveOps.scaleIntrinsic(scaleParameter.intrinsic, scaleFactor);
 
-		scaled.reshape(scaleParameter.width,scaleParameter.height);
+		scaled.reshape(scaleParameter.intrinsic.width,scaleParameter.intrinsic.height);
 
-		alg.setIntrinsic(scaleParameter);
-	}
-
-	@Override
-	public void setExtrinsic(Se3_F64 planeToCamera) {
-		alg.setExtrinsic(planeToCamera);
+		alg.setCalibration(scaleParameter);
 	}
 
 	@Override

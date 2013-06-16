@@ -68,17 +68,19 @@ public class VisualOdometryPanel
 
 	Listener listener;
 
-	public VisualOdometryPanel( boolean isStereo ) {
+	public VisualOdometryPanel( Type type ) {
 		setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
 		setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
 
 		displayStatus = new JLabel();
 		displayStatus.setFont(new Font("Dialog",Font.BOLD,16));
 
-		if( isStereo )
+		if( type == Type.STEREO )
 			selectView = new JComboBox(new String[]{"Right","3D"});
-		else
+		else if( type == Type.DEPTH )
 			selectView = new JComboBox(new String[]{"Depth","3D"});
+		else if( type == Type.MONO )
+			selectView = new JComboBox(new String[]{"3D"});
 		selectView.addActionListener(this);
 		selectView.setMaximumSize(selectView.getPreferredSize());
 
@@ -214,5 +216,11 @@ public class VisualOdometryPanel
 
 	public static interface Listener {
 		public void eventVoPanel( int view );
+	}
+
+	public static enum Type {
+		STEREO,
+		DEPTH,
+		MONO
 	}
 }

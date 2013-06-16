@@ -64,7 +64,7 @@ public class VisOdomMonoOverheadMotion2D<T extends ImageBase>
 	private Se3_F64 planeToCamera;
 
 	// storage for intermediate results
-	private Se2_F64 worldToCurr2D;
+	private Se2_F64 worldToCurr2D = new Se2_F64();
 	private Se3_F64 worldToCurrCam3D = new Se3_F64();
 	private Se3_F64 worldToCurr3D = new Se3_F64();
 	private Se2_F64 temp = new Se2_F64();
@@ -144,7 +144,7 @@ public class VisOdomMonoOverheadMotion2D<T extends ImageBase>
 			return false;
 		}
 
-		worldToCurr2D = motion2D.getFirstToCurrent();
+		worldToCurr2D.set(motion2D.getFirstToCurrent());
 		worldToCurr2D.T.x *= overhead.cellSize;
 		worldToCurr2D.T.y *= overhead.cellSize;
 
@@ -200,4 +200,6 @@ public class VisOdomMonoOverheadMotion2D<T extends ImageBase>
 	public ImageMotion2D<T, Se2_F64> getMotion2D() {
 		return motion2D;
 	}
+
+
 }

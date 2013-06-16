@@ -109,7 +109,7 @@ public class VisualizeStereoVisualOdometryApp <I extends ImageSingleBand>
 		addAlgorithm(0, "Dual Track : ST-SURF-KLT", 3);
 		addAlgorithm(0, "Quad Match : ST-BRIEF", 4);
 
-		guiInfo = new VisualOdometryPanel(true);
+		guiInfo = new VisualOdometryPanel(VisualOdometryPanel.Type.STEREO);
 		guiLeft = new ImagePanel();
 		guiRight = new ImagePanel();
 		guiCam3D = new Polygon3DSequenceViewer();

@@ -23,7 +23,7 @@ import boofcv.abst.sfm.AccessPointTracks3D;
 import boofcv.alg.sfm.d3.VisOdomMonoPlaneInfinity;
 import boofcv.alg.sfm.robust.DistancePlane2DToPixelSq;
 import boofcv.alg.sfm.robust.GenerateSe2_PlanePtPixel;
-import boofcv.struct.calib.IntrinsicParameters;
+import boofcv.struct.calib.MonoPlaneParameters;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageDataType;
 import georegression.struct.point.Point2D_F64;
@@ -52,6 +52,8 @@ public class MonoPlaneInfinity_to_MonocularPlaneVisualOdometry<T extends ImageBa
 	// list of active tracks
 	List<PointTrack> active = null;
 
+	Point3D_F64 point3D = new Point3D_F64();
+
 	public MonoPlaneInfinity_to_MonocularPlaneVisualOdometry(VisOdomMonoPlaneInfinity<T> alg,
 															 DistancePlane2DToPixelSq distance,
 															 GenerateSe2_PlanePtPixel generator,
@@ -63,16 +65,13 @@ public class MonoPlaneInfinity_to_MonocularPlaneVisualOdometry<T extends ImageBa
 	}
 
 	@Override
-	public void setExtrinsic(Se3_F64 planeToCamera) {
-		alg.setExtrinsic(planeToCamera);
-		generator.setExtrinsic(planeToCamera);
-		distance.setExtrinsic(planeToCamera);
-	}
+	public void setCalibration( MonoPlaneParameters param ) {
+		alg.setIntrinsic(param.intrinsic);
+		distance.setIntrinsic(param.intrinsic.fx,param.intrinsic.fy,param.intrinsic.skew);
 
-	@Override
-	public void setIntrinsic(IntrinsicParameters param) {
-		alg.setIntrinsic(param);
-		distance.setIntrinsic(param.fx,param.fy,param.skew);
+		alg.setExtrinsic(param.planeToCamera);
+		generator.setExtrinsic(param.planeToCamera);
+		distance.setExtrinsic(param.planeToCamera);
 	}
 
 	@Override
@@ -111,7 +110,28 @@ public class MonoPlaneInfinity_to_MonocularPlaneVisualOdometry<T extends ImageBa
 
 	@Override
 	public Point3D_F64 getTrackLocation(int index) {
-		return null;// todo implement
+		if( active == null )
+			active = alg.getTracker().getActiveTracks(null);
+
+		active.get(index);
+
+		VisOdomMonoPlaneInfinity.VoTrack track = active.get(index).getCookie();
+
+		if( track.onPlane ) {
+			point3D.x = -track.ground.y;
+			point3D.z = track.ground.x;
+			point3D.y = 0;
+
+		} else {
+			// just put it some place far away
+			point3D.x = -track.ground.y*1000;
+			point3D.z = track.ground.x*1000;
+			point3D.y = 0;
+		}
+
+//		SePointOps_F64.transform(cameraToWorld,point3D,point3D);
+
+		return point3D;
 	}
 
 	@Override
@@ -147,4 +167,5 @@ public class MonoPlaneInfinity_to_MonocularPlaneVisualOdometry<T extends ImageBa
 		// need to figure out a way to efficiently implement this
 		return false;
 	}
+
 }

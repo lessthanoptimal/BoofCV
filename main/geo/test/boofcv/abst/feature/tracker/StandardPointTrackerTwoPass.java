@@ -148,7 +148,6 @@ public abstract class StandardPointTrackerTwoPass<T extends ImageSingleBand>
 
 	}
 
-
 	/**
 	 * Calling process and finishTracking should be equivalent to process in PointTracker
 	 */

@@ -115,4 +115,8 @@ public class VideoStabilizeSequentialPointApp<I extends ImageSingleBand, D exten
 
 		ShowImages.showWindow(app, "Video Image Stabilize");
 	}
+
+	@Override
+	protected void handleRunningStatus(int status) {
+	}
 }

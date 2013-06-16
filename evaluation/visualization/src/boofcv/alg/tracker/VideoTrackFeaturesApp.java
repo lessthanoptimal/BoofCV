@@ -165,6 +165,9 @@ public class VideoTrackFeaturesApp<I extends ImageSingleBand, D extends ImageSin
 	}
 
 	@Override
+	protected void handleRunningStatus(int status) {}
+
+	@Override
 	protected void updateAlgGUI(ImageSingleBand frame, BufferedImage imageGUI, double fps) {
 		renderFeatures((BufferedImage)sequence.getGuiImage(),fps);
 	}

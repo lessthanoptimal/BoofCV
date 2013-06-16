@@ -150,4 +150,7 @@ public class VideoMosaicSequentialPointApp<I extends ImageSingleBand, D extends 
 
 		ShowImages.showWindow(app, "Video Image Mosaic");
 	}
+
+	@Override
+	protected void handleRunningStatus(int status) {}
 }

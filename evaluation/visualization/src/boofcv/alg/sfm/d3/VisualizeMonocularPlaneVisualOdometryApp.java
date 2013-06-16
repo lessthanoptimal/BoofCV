@@ -18,40 +18,27 @@
 
 package boofcv.alg.sfm.d3;
 
-import boofcv.abst.feature.associate.AssociateDescTo2D;
-import boofcv.abst.feature.associate.AssociateDescription2D;
-import boofcv.abst.feature.associate.ScoreAssociateHamming_B;
-import boofcv.abst.feature.describe.DescribeRegionPoint;
 import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
 import boofcv.abst.feature.tracker.PkltConfig;
 import boofcv.abst.feature.tracker.PointTracker;
-import boofcv.abst.feature.tracker.PointTrackerToTwoPass;
-import boofcv.abst.feature.tracker.PointTrackerTwoPass;
 import boofcv.abst.sfm.AccessPointTracks3D;
-import boofcv.abst.sfm.d3.DepthVisualOdometry;
-import boofcv.alg.distort.DoNothingPixelTransform_F32;
-import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
+import boofcv.abst.sfm.d3.MonocularPlaneVisualOdometry;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.alg.geo.PerspectiveOps;
-import boofcv.alg.sfm.DepthSparse3D;
-import boofcv.factory.feature.associate.FactoryAssociation;
-import boofcv.factory.feature.describe.FactoryDescribeRegionPoint;
 import boofcv.factory.feature.tracker.FactoryPointTracker;
-import boofcv.factory.feature.tracker.FactoryPointTrackerTwoPass;
 import boofcv.factory.sfm.FactoryVisualOdometry;
-import boofcv.gui.DepthVideoAppBase;
+import boofcv.gui.VideoProcessAppBase;
 import boofcv.gui.VisualizeApp;
 import boofcv.gui.d3.Polygon3DSequenceViewer;
 import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ShowImages;
-import boofcv.gui.image.VisualizeImageData;
 import boofcv.io.PathLabel;
 import boofcv.io.image.SimpleImageSequence;
-import boofcv.struct.feature.TupleDesc_B;
+import boofcv.misc.BoofMiscOps;
+import boofcv.struct.calib.MonoPlaneParameters;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.image.ImageUInt16;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
@@ -61,7 +48,7 @@ import org.ejml.data.DenseMatrix64F;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.FileNotFoundException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -69,19 +56,19 @@ import java.util.List;
 /**
  * @author Peter Abeles
  */
-public class VisualizeDepthVisualOdometryApp<I extends ImageSingleBand>
-		extends DepthVideoAppBase<I,ImageUInt16> implements VisualizeApp, VisualOdometryPanel.Listener
+public class VisualizeMonocularPlaneVisualOdometryApp<I extends ImageSingleBand>
+		extends VideoProcessAppBase<I> implements VisualizeApp, VisualOdometryPanel.Listener
 {
 
+	protected MonoPlaneParameters config;
 	VisualOdometryPanel guiInfo;
 
 	ImagePanel guiLeft;
-	ImagePanel guiDepth;
 	Polygon3DSequenceViewer guiCam3D;
 
-	BufferedImage renderedDepth;
+	Class<I> imageType;
 
-	DepthVisualOdometry<I,ImageUInt16> alg;
+	MonocularPlaneVisualOdometry<I> alg;
 
 	boolean hasProcessedImage = false;
 	boolean noFault;
@@ -94,24 +81,25 @@ public class VisualizeDepthVisualOdometryApp<I extends ImageSingleBand>
 	int numInliers;
 	int whichAlg;
 
-	public VisualizeDepthVisualOdometryApp(Class<I> imageType) {
-		super(1, imageType, ImageUInt16.class);
+	public VisualizeMonocularPlaneVisualOdometryApp(Class<I> imageType) {
+		super(1, imageType);
+		this.imageType = imageType;
 
-		addAlgorithm(0, "Single P3P : KLT", 0);
-		addAlgorithm(0, "Single P3P : ST-BRIEF", 1);
-		addAlgorithm(0, "Single P3P : ST-SURF-KLT", 2);
+		addAlgorithm(0, "Plane-Infinity : KLT", 0);
+		addAlgorithm(0, "Overhead : KLT", 1);
 
-		guiInfo = new VisualOdometryPanel(VisualOdometryPanel.Type.DEPTH);
+		guiInfo = new VisualOdometryPanel(VisualOdometryPanel.Type.MONO);
 		guiLeft = new ImagePanel();
-		guiDepth = new ImagePanel();
 		guiCam3D = new Polygon3DSequenceViewer();
 
 		add(guiInfo, BorderLayout.WEST);
-		add(guiDepth, BorderLayout.EAST);
+		add(guiCam3D, BorderLayout.EAST);
 		setMainGUI(guiLeft);
 
 		guiLeft.addMouseListener(this);
 		guiInfo.setListener(this);
+
+
 	}
 
 	private void drawFeatures( AccessPointTracks3D tracker , BufferedImage image )  {
@@ -171,28 +159,50 @@ public class VisualizeDepthVisualOdometryApp<I extends ImageSingleBand>
 //		g2.drawString("Inliers: "+numInliers,30,50);
 	}
 
+	@Override
+	public void changeInput(String name, int index) {
+		stopWorker();
+		Reader r = media.openFile(inputRefs.get(index).getPath());
+		BufferedReader in = new BufferedReader(r);
+		try {
+			String path = new File(inputRefs.get(index).getPath()).getParent();
+
+			String lineConfig = in.readLine();
+			String line1 = in.readLine();
+
+			// adjust for relative paths
+			if( lineConfig.charAt(0) != '/' )
+				lineConfig = path+"/"+lineConfig;
+			if( line1.charAt(0) != '/' )
+				line1 = path+"/"+line1;
+
+			config = BoofMiscOps.loadXML(media.openFile(lineConfig));
+			SimpleImageSequence<I> video = media.openVideo(line1, imageInfo);
+
+			process(video);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
 
 	@Override
-	protected void process(SimpleImageSequence<I> sequence1, SimpleImageSequence<ImageUInt16> sequence2 ) {
+	protected void process(SimpleImageSequence<I> sequence ) {
 		// stop the image processing code
 		stopWorker();
 
-		sequence1.setLoop(false);
-		sequence2.setLoop(false);
-
-		this.sequence1 = sequence1;
-		this.sequence2 = sequence2;
+		this.sequence = sequence;
+		sequence.setLoop(false);
 
 		// start everything up and resume processing
 		doRefreshAll();
 	}
 
 	@Override
-	protected void updateAlg(I frame1, BufferedImage buffImage1, ImageUInt16 frame2, BufferedImage buffImage2) {
-		if( config.visualParam.width != frame1.width || config.visualParam.height != frame1.height )
+	protected void updateAlg(I frame, BufferedImage buffImage ) {
+		if( config.intrinsic.width != frame.width || config.intrinsic.height != frame.height )
 			throw new IllegalArgumentException("Miss match between calibration and actual image size");
 
-		noFault = alg.process(frame1,frame2);
+		noFault = alg.process(frame);
 		if( !noFault ) {
 			alg.reset();
 			guiCam3D.init();
@@ -200,8 +210,7 @@ public class VisualizeDepthVisualOdometryApp<I extends ImageSingleBand>
 	}
 
 	@Override
-	protected void updateAlgGUI(I frame1, final BufferedImage buffImage1,
-								ImageUInt16 frame2, final BufferedImage buffImage2, final double fps) {
+	protected void updateAlgGUI(I frame1, final BufferedImage buffImage1,  final double fps) {
 		if( !noFault) {
 			numFaults++;
 			return;
@@ -210,25 +219,16 @@ public class VisualizeDepthVisualOdometryApp<I extends ImageSingleBand>
 		showTracks = guiInfo.isShowAll();
 		showInliers = guiInfo.isShowInliers();
 
-		if( renderedDepth == null ) {
-			renderedDepth = new BufferedImage(frame2.width,frame2.height,BufferedImage.TYPE_INT_RGB);
-		}
-
-		drawFeatures((AccessPointTracks3D)alg,buffImage1);
+		if( alg instanceof AccessPointTracks3D)
+			drawFeatures((AccessPointTracks3D)alg,buffImage1);
 
 		final Se3_F64 leftToWorld = alg.getCameraToWorld().copy();
-
-		// TODO magic value from kinect.  Add to config file?
-		VisualizeImageData.disparity(frame2, renderedDepth, 0, 10000, 0);
 
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				guiLeft.setBufferedImage(buffImage1);
-				guiDepth.setBufferedImage(renderedDepth);
 				guiLeft.autoSetPreferredSize();
-				guiDepth.autoSetPreferredSize();
 				guiLeft.repaint();
-				guiDepth.repaint();
 
 				guiInfo.setCameraToWorld(leftToWorld);
 				guiInfo.setNumFaults(numFaults);
@@ -265,26 +265,25 @@ public class VisualizeDepthVisualOdometryApp<I extends ImageSingleBand>
 		if( cookies != null )
 			whichAlg = (Integer)cookies[0];
 		alg = createVisualOdometry(whichAlg);
-		alg.setCalibration(config.visualParam,new DoNothingPixelTransform_F32());
+		alg.setCalibration(config);
 
 		guiInfo.reset();
 
 		handleRunningStatus(2);
 
-		DenseMatrix64F K = PerspectiveOps.calibrationMatrix(config.visualParam,null);
+		DenseMatrix64F K = PerspectiveOps.calibrationMatrix(config.intrinsic,null);
 		guiCam3D.init();
 		guiCam3D.setK(K);
-		guiCam3D.setStepSize(0.05);
-		guiCam3D.setPreferredSize(new Dimension(config.visualParam.width, config.visualParam.height));
+		guiCam3D.setStepSize(1);
+		guiCam3D.setPreferredSize(new Dimension(config.intrinsic.width, config.intrinsic.height));
 		guiCam3D.setMaximumSize(guiCam3D.getPreferredSize());
 		startWorkerThread();
 	}
 
-	private DepthVisualOdometry<I,ImageUInt16> createVisualOdometry( int whichAlg ) {
+	private MonocularPlaneVisualOdometry<I> createVisualOdometry( int whichAlg ) {
 
 		Class derivType = GImageDerivativeOps.getDerivativeType(imageType);
 
-		DepthSparse3D<ImageUInt16> sparseDepth = new DepthSparse3D.I<ImageUInt16>(1e-3);
 
 		if( whichAlg == 0 ) {
 			PkltConfig config = PkltConfig.createDefault(imageType, derivType);
@@ -294,36 +293,25 @@ public class VisualizeDepthVisualOdometryApp<I extends ImageSingleBand>
 			config.typeDeriv = derivType;
 			ConfigGeneralDetector configDetector = new ConfigGeneralDetector(600,3,1);
 
-			PointTrackerTwoPass<I> tracker = FactoryPointTrackerTwoPass.klt(config, configDetector);
+			PointTracker<I> tracker = FactoryPointTracker.klt(config, configDetector);
 
-			return FactoryVisualOdometry.
-					depthDepthPnP(1.5, 120, 2, 200, 50, false, sparseDepth, tracker, imageType, ImageUInt16.class);
+			return FactoryVisualOdometry.monoPlaneInfinity(75,2,1.5,200, tracker, imageInfo);
 		} else if( whichAlg == 1 ) {
+			PkltConfig config = PkltConfig.createDefault(imageType, derivType);
+			config.pyramidScaling = new int[]{1,2,4,8};
+			config.templateRadius = 3;
+			config.typeInput = imageType;
+			config.typeDeriv = derivType;
+			ConfigGeneralDetector configDetector = new ConfigGeneralDetector(600,3,1);
 
-			ConfigGeneralDetector configExtract = new ConfigGeneralDetector(600,3,1);
+			PointTracker<I> tracker = FactoryPointTracker.klt(config, configDetector);
 
-			GeneralFeatureDetector detector = FactoryPointTracker.createShiTomasi(configExtract, derivType);
-			DescribeRegionPoint describe = FactoryDescribeRegionPoint.brief(null,imageType);
+			double cellSize = 0.05;
+			double inlierGroundTol = 0.75;
 
-			ScoreAssociateHamming_B score = new ScoreAssociateHamming_B();
-
-			AssociateDescription2D<TupleDesc_B> associate =
-					new AssociateDescTo2D<TupleDesc_B>(FactoryAssociation.greedy(score, 150, true));
-
-			PointTrackerTwoPass tracker = FactoryPointTrackerTwoPass.dda(detector, describe, associate, null, 1, imageType);
-
-			return FactoryVisualOdometry.
-					depthDepthPnP(1.5, 80, 3, 200, 50, false, sparseDepth, tracker, imageType, ImageUInt16.class);
-		} else if( whichAlg == 2 ) {
-			PointTracker<I> tracker = FactoryPointTracker.
-					combined_ST_SURF_KLT(new ConfigGeneralDetector(600, 3, 1), 3,
-							new int[]{1, 2, 4, 8}, 50, null, null, imageType, derivType);
-
-			PointTrackerTwoPass<I> twopass = new PointTrackerToTwoPass<I>(tracker);
-
-			return FactoryVisualOdometry.
-					depthDepthPnP(1.5, 120, 3, 200, 50, false, sparseDepth, twopass, imageType, ImageUInt16.class);
-		} else {
+			return FactoryVisualOdometry.monoPlaneOverhead(cellSize,25,0.7,
+					inlierGroundTol,300,2,100,0.5,0.6, tracker, imageInfo);
+		}  else {
 			throw new RuntimeException("Unknown selection");
 		}
 	}
@@ -335,8 +323,7 @@ public class VisualizeDepthVisualOdometryApp<I extends ImageSingleBand>
 
 		whichAlg = (Integer)cookie;
 
-		sequence1.reset();
-		sequence2.reset();
+		sequence.reset();
 
 		refreshAll(null);
 	}
@@ -383,18 +370,18 @@ public class VisualizeDepthVisualOdometryApp<I extends ImageSingleBand>
 
 	@Override
 	public void eventVoPanel(final int view) {
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				if( view == 0 ) {
-					remove(guiCam3D);
-					add(guiDepth, BorderLayout.EAST);
-				} else {
-					remove(guiDepth);
-					add(guiCam3D,BorderLayout.EAST);
-				}
-				revalidate();
-				repaint();
-			}});
+//		SwingUtilities.invokeLater(new Runnable() {
+//			public void run() {
+//				if( view == 0 ) {
+//					remove(guiCam3D);
+//					add(guiDepth, BorderLayout.EAST);
+//				} else {
+//					remove(guiDepth);
+//					add(guiCam3D,BorderLayout.EAST);
+//				}
+//				revalidate();
+//				repaint();
+//			}});
 	}
 
 	public static void main( String args[] ) throws FileNotFoundException {
@@ -402,11 +389,10 @@ public class VisualizeDepthVisualOdometryApp<I extends ImageSingleBand>
 		Class type = ImageFloat32.class;
 //		Class type = ImageUInt8.class;
 
-		VisualizeDepthVisualOdometryApp app = new VisualizeDepthVisualOdometryApp(type);
+		VisualizeMonocularPlaneVisualOdometryApp app = new VisualizeMonocularPlaneVisualOdometryApp(type);
 
 		List<PathLabel> inputs = new ArrayList<PathLabel>();
-		inputs.add(new PathLabel("Circle", "../data/applet/kinect/circle/config.txt"));
-		inputs.add(new PathLabel("Hallway", "../data/applet/kinect/straight/config.txt"));
+		inputs.add(new PathLabel("Simulation", "../data/applet/vo/drc/config_plane.txt"));
 
 		app.setInputList(inputs);
 
@@ -415,6 +401,6 @@ public class VisualizeDepthVisualOdometryApp<I extends ImageSingleBand>
 			Thread.yield();
 		}
 
-		ShowImages.showWindow(app, "Depth Visual Odometry");
+		ShowImages.showWindow(app, "Monocular Plane Visual Odometry");
 	}
 }

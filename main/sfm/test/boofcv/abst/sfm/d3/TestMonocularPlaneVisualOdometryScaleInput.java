@@ -19,6 +19,7 @@
 package boofcv.abst.sfm.d3;
 
 import boofcv.struct.calib.IntrinsicParameters;
+import boofcv.struct.calib.MonoPlaneParameters;
 import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageFloat32;
 import georegression.struct.se.Se3_F64;
@@ -35,8 +36,7 @@ public class TestMonocularPlaneVisualOdometryScaleInput {
 	int width = 640;
 	int height = 320;
 
-	IntrinsicParameters intrinsic;
-	Se3_F64 extrinsic;
+	MonoPlaneParameters param;
 	ImageFloat32 image;
 	ImageDataType<ImageFloat32> type = ImageDataType.single(ImageFloat32.class);
 	boolean result;
@@ -45,23 +45,19 @@ public class TestMonocularPlaneVisualOdometryScaleInput {
 
 	@Test
 	public void setCalibration() {
-		intrinsic = null;
-		extrinsic = null;
+		param = null;
 
 		IntrinsicParameters intrinsic = createIntrinsic();
 		Se3_F64 extrinsic = new Se3_F64();
 		Dummy dummy = new Dummy();
 
 		MonocularPlaneVisualOdometry<ImageFloat32> alg = new MonocularPlaneVisualOdometryScaleInput<ImageFloat32>(dummy,0.5);
-		assertTrue(this.intrinsic == null);
-		alg.setIntrinsic(intrinsic);
+		assertTrue(this.param == null);
+		alg.setCalibration(new MonoPlaneParameters(intrinsic,extrinsic));
 
-		assertEquals(320, this.intrinsic.width);
-		assertEquals(160, this.intrinsic.height);
-
-		assertTrue(this.extrinsic == null);
-		alg.setExtrinsic(extrinsic);
-		assertTrue(this.extrinsic == extrinsic);
+		assertEquals(320, this.param.intrinsic.width);
+		assertEquals(160, this.param.intrinsic.height);
+		assertTrue(this.param.planeToCamera == extrinsic);
 	}
 
 	@Test
@@ -72,8 +68,7 @@ public class TestMonocularPlaneVisualOdometryScaleInput {
 		Dummy dummy = new Dummy();
 
 		MonocularPlaneVisualOdometry<ImageFloat32> alg = new MonocularPlaneVisualOdometryScaleInput<ImageFloat32>(dummy,0.5);
-		alg.setIntrinsic(intrinsic);
-		alg.setExtrinsic(new Se3_F64());
+		alg.setCalibration(new MonoPlaneParameters(intrinsic, new Se3_F64()));
 
 		ImageFloat32 inputImage = new ImageFloat32(width,height);
 
@@ -102,19 +97,14 @@ public class TestMonocularPlaneVisualOdometryScaleInput {
 	protected class Dummy implements MonocularPlaneVisualOdometry<ImageFloat32> {
 
 		@Override
+		public void setCalibration(MonoPlaneParameters config ) {
+			param = config;
+		}
+
+		@Override
 		public boolean process(ImageFloat32 l) {
 			image = l;
 			return result;
-		}
-
-		@Override
-		public void setIntrinsic(IntrinsicParameters param) {
-			intrinsic = param;
-		}
-
-		@Override
-		public void setExtrinsic(Se3_F64 planeToCamera) {
-			extrinsic = planeToCamera;
 		}
 
 		@Override

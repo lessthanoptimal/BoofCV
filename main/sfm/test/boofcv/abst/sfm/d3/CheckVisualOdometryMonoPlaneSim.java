@@ -20,6 +20,7 @@ package boofcv.abst.sfm.d3;
 
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.calib.IntrinsicParameters;
+import boofcv.struct.calib.MonoPlaneParameters;
 import boofcv.struct.image.ImageSingleBand;
 import georegression.geometry.RotationMatrixGenerator;
 import georegression.metric.UtilAngle;
@@ -156,8 +157,7 @@ public abstract class CheckVisualOdometryMonoPlaneSim<I extends ImageSingleBand>
 		Se3_F64 worldToCamera = new Se3_F64();
 
 		algorithm.reset();
-		algorithm.setExtrinsic(planeToCamera);
-		algorithm.setIntrinsic(param);
+		algorithm.setCalibration(new MonoPlaneParameters(param,planeToCamera));
 
 		for( int i = 0; i < 10; i++ ) {
 //			System.out.println("-------- Real rotY = "+angleRate*i);

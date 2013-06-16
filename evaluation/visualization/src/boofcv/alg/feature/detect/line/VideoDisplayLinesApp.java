@@ -141,6 +141,9 @@ public class VideoDisplayLinesApp<I extends ImageSingleBand, D extends ImageSing
 	}
 
 	@Override
+	protected void handleRunningStatus(int status) {}
+
+	@Override
 	protected void updateAlgGUI(ImageSingleBand frame, BufferedImage imageGUI, double fps) {
 		gui.setBackground(imageGUI);
 	}

@@ -18,11 +18,22 @@
 
 package boofcv.abst.sfm.d3;
 
+import boofcv.abst.sfm.AccessPointTracks;
+import boofcv.abst.sfm.AccessPointTracks3D;
+import boofcv.alg.distort.LensDistortionOps;
 import boofcv.alg.sfm.d3.VisOdomMonoOverheadMotion2D;
-import boofcv.struct.calib.IntrinsicParameters;
+import boofcv.alg.sfm.overhead.OverheadView;
+import boofcv.struct.FastQueue;
+import boofcv.struct.calib.MonoPlaneParameters;
+import boofcv.struct.distort.PointTransform_F64;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageDataType;
+import georegression.struct.point.Point2D_F64;
+import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
+import georegression.transform.se.SePointOps_F64;
+
+import java.util.List;
 
 /**
  * Wrapper around {@link VisOdomMonoOverheadMotion2D} for {@link MonocularPlaneVisualOdometry}.
@@ -30,22 +41,23 @@ import georegression.struct.se.Se3_F64;
  * @author Peter Abeles
  */
 public class MonoOverhead_to_MonocularPlaneVisualOdometry<T extends ImageBase>
-		implements MonocularPlaneVisualOdometry<T>
+		implements MonocularPlaneVisualOdometry<T> , AccessPointTracks3D
 {
 	// motion estimation algorithm
 	VisOdomMonoOverheadMotion2D<T> alg;
 
-	// indicates if camera parameters have changed
-	boolean configChanged = false;
-
-	// camera parameters
-	Se3_F64 planeToCamera;
-	IntrinsicParameters param;
 
 	ImageDataType<T> imageType;
 
 	boolean fault;
 	Se3_F64 cameraToWorld = new Se3_F64();
+
+	boolean computed;
+	FastQueue<Point2D_F64> pixels = new FastQueue<Point2D_F64>(Point2D_F64.class,true);
+	FastQueue<Point3D_F64> points3D = new FastQueue<Point3D_F64>(Point3D_F64.class,true);
+
+	Se3_F64 planeToCamera;
+	PointTransform_F64 normToPixel;
 
 	public MonoOverhead_to_MonocularPlaneVisualOdometry(VisOdomMonoOverheadMotion2D<T> alg, ImageDataType<T> imageType) {
 		this.alg = alg;
@@ -53,26 +65,15 @@ public class MonoOverhead_to_MonocularPlaneVisualOdometry<T extends ImageBase>
 	}
 
 	@Override
-	public void setExtrinsic(Se3_F64 planeToCamera) {
-		this.planeToCamera = planeToCamera;
-		configChanged = true;
-	}
-
-	@Override
-	public void setIntrinsic(IntrinsicParameters param) {
-		this.param = param;
-		configChanged = true;
+	public void setCalibration( MonoPlaneParameters param ) {
+		this.planeToCamera = param.planeToCamera;
+		alg.configureCamera(param.intrinsic, param.planeToCamera);
+		normToPixel = LensDistortionOps.transformNormToRadial_F64(param.intrinsic);
 	}
 
 	@Override
 	public boolean process(T input) {
-		if( configChanged ) {
-			configChanged = false;
-			if( planeToCamera == null || param == null )
-				throw new IllegalArgumentException("Both extrinsic and intrinsic parameters need to be specified");
-			alg.configureCamera(param, planeToCamera);
-		}
-
+		computed = false;
 		fault = alg.process(input);
 		return fault;
 	}
@@ -99,5 +100,72 @@ public class MonoOverhead_to_MonocularPlaneVisualOdometry<T extends ImageBase>
 		worldToCamera.invert(cameraToWorld);
 
 		return cameraToWorld;
+	}
+
+	@Override
+	public Point3D_F64 getTrackLocation(int index) {
+		computeTracks();
+
+		return points3D.get(index);
+	}
+
+	@Override
+	public long getTrackId(int index) {
+		AccessPointTracks accessPlane = (AccessPointTracks)alg.getMotion2D();
+
+		return accessPlane.getTrackId(index);
+	}
+
+	@Override
+	public List<Point2D_F64> getAllTracks() {
+		computeTracks();
+
+		return pixels.toList();
+	}
+
+	@Override
+	public boolean isInlier(int index) {
+		AccessPointTracks accessPlane = (AccessPointTracks)alg.getMotion2D();
+
+		return accessPlane.isInlier(index);
+	}
+
+	@Override
+	public boolean isNew(int index) {
+		AccessPointTracks accessPlane = (AccessPointTracks)alg.getMotion2D();
+
+		return accessPlane.isNew(index);
+	}
+
+	private void computeTracks() {
+		if( computed )
+			return;
+
+		if( !(alg.getMotion2D() instanceof AccessPointTracks))
+			return;
+
+		AccessPointTracks accessPlane = (AccessPointTracks)alg.getMotion2D();
+		List<Point2D_F64> tracksPlane = accessPlane.getAllTracks();
+
+		OverheadView<T> map = alg.getOverhead();
+
+		points3D.reset();
+		pixels.reset();
+
+		for( Point2D_F64 worldPt : tracksPlane ) {
+			// 2D to 3D
+			Point3D_F64 p = points3D.grow();
+			p.z = worldPt.x*map.cellSize-map.centerX;
+			p.x = -(worldPt.y*map.cellSize-map.centerY);
+			p.y = 0;
+
+			// 3D world to camera
+			SePointOps_F64.transform(planeToCamera,p,p);
+
+			// normalized image coordinates
+			normToPixel.compute(p.x/p.z,p.y/p.z,pixels.grow());
+		}
+
+		computed = true;
 	}
 }
