@@ -29,6 +29,7 @@ import boofcv.factory.feature.tracker.FactoryPointTracker;
 import boofcv.factory.sfm.FactoryVisualOdometry;
 import boofcv.gui.VideoProcessAppBase;
 import boofcv.gui.VisualizeApp;
+import boofcv.gui.d2.PlaneView2D;
 import boofcv.gui.d3.Polygon3DSequenceViewer;
 import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.gui.image.ImagePanel;
@@ -65,6 +66,7 @@ public class VisualizeMonocularPlaneVisualOdometryApp<I extends ImageSingleBand>
 
 	ImagePanel guiLeft;
 	Polygon3DSequenceViewer guiCam3D;
+	PlaneView2D gui2D;
 
 	Class<I> imageType;
 
@@ -88,9 +90,10 @@ public class VisualizeMonocularPlaneVisualOdometryApp<I extends ImageSingleBand>
 		addAlgorithm(0, "Plane-Infinity : KLT", 0);
 		addAlgorithm(0, "Overhead : KLT", 1);
 
-		guiInfo = new VisualOdometryPanel(VisualOdometryPanel.Type.MONO);
+		guiInfo = new VisualOdometryPanel(VisualOdometryPanel.Type.MONO_PLANE);
 		guiLeft = new ImagePanel();
 		guiCam3D = new Polygon3DSequenceViewer();
+		gui2D = new PlaneView2D(0.1);
 
 		add(guiInfo, BorderLayout.WEST);
 		add(guiCam3D, BorderLayout.EAST);
@@ -254,6 +257,9 @@ public class VisualizeMonocularPlaneVisualOdometryApp<I extends ImageSingleBand>
 		guiCam3D.add(p1,p2,p3,p4);
 		guiCam3D.repaint();
 
+		gui2D.addPoint(leftToWorld.T.x,leftToWorld.T.z);
+		gui2D.repaint();
+
 		hasProcessedImage = true;
 	}
 
@@ -268,6 +274,7 @@ public class VisualizeMonocularPlaneVisualOdometryApp<I extends ImageSingleBand>
 		alg.setCalibration(config);
 
 		guiInfo.reset();
+		gui2D.reset();
 
 		handleRunningStatus(2);
 
@@ -306,8 +313,8 @@ public class VisualizeMonocularPlaneVisualOdometryApp<I extends ImageSingleBand>
 
 			PointTracker<I> tracker = FactoryPointTracker.klt(config, configDetector);
 
-			double cellSize = 0.05;
-			double inlierGroundTol = 0.75;
+			double cellSize = 0.06;
+			double inlierGroundTol = 1.5;
 
 			return FactoryVisualOdometry.monoPlaneOverhead(cellSize,25,0.7,
 					inlierGroundTol,300,2,100,0.5,0.6, tracker, imageInfo);
@@ -370,18 +377,20 @@ public class VisualizeMonocularPlaneVisualOdometryApp<I extends ImageSingleBand>
 
 	@Override
 	public void eventVoPanel(final int view) {
-//		SwingUtilities.invokeLater(new Runnable() {
-//			public void run() {
-//				if( view == 0 ) {
-//					remove(guiCam3D);
-//					add(guiDepth, BorderLayout.EAST);
-//				} else {
-//					remove(guiDepth);
-//					add(guiCam3D,BorderLayout.EAST);
-//				}
-//				revalidate();
-//				repaint();
-//			}});
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				if( view == 0 ) {
+					guiCam3D.setPreferredSize(gui2D.getPreferredSize());
+					remove(gui2D);
+					add(guiCam3D,BorderLayout.EAST);
+				} else {
+					gui2D.setPreferredSize(guiCam3D.getPreferredSize());
+					remove(guiCam3D);
+					add(gui2D, BorderLayout.EAST);
+				}
+				revalidate();
+				repaint();
+			}});
 	}
 
 	public static void main( String args[] ) throws FileNotFoundException {
