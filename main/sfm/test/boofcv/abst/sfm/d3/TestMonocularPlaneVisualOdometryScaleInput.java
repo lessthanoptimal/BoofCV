@@ -49,6 +49,7 @@ public class TestMonocularPlaneVisualOdometryScaleInput {
 
 		IntrinsicParameters intrinsic = createIntrinsic();
 		Se3_F64 extrinsic = new Se3_F64();
+		extrinsic.T.x=8;
 		Dummy dummy = new Dummy();
 
 		MonocularPlaneVisualOdometry<ImageFloat32> alg = new MonocularPlaneVisualOdometryScaleInput<ImageFloat32>(dummy,0.5);
@@ -57,7 +58,7 @@ public class TestMonocularPlaneVisualOdometryScaleInput {
 
 		assertEquals(320, this.param.intrinsic.width);
 		assertEquals(160, this.param.intrinsic.height);
-		assertTrue(this.param.planeToCamera == extrinsic);
+		assertTrue(this.param.planeToCamera.T.x == extrinsic.T.x);
 	}
 
 	@Test

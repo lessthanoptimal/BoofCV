@@ -79,8 +79,8 @@ public class VisualOdometryPanel
 			selectView = new JComboBox(new String[]{"Right","3D"});
 		else if( type == Type.DEPTH )
 			selectView = new JComboBox(new String[]{"Depth","3D"});
-		else if( type == Type.MONO )
-			selectView = new JComboBox(new String[]{"3D"});
+		else if( type == Type.MONO_PLANE )
+			selectView = new JComboBox(new String[]{"3D","2D"});
 		selectView.addActionListener(this);
 		selectView.setMaximumSize(selectView.getPreferredSize());
 
@@ -221,6 +221,6 @@ public class VisualOdometryPanel
 	public static enum Type {
 		STEREO,
 		DEPTH,
-		MONO
+		MONO_PLANE
 	}
 }
