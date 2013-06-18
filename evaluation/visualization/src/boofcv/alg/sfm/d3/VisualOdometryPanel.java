@@ -80,7 +80,7 @@ public class VisualOdometryPanel
 		else if( type == Type.DEPTH )
 			selectView = new JComboBox(new String[]{"Depth","3D"});
 		else if( type == Type.MONO_PLANE )
-			selectView = new JComboBox(new String[]{"3D","2D"});
+			selectView = new JComboBox(new String[]{"2D","3D"});
 		selectView.addActionListener(this);
 		selectView.setMaximumSize(selectView.getPreferredSize());
 

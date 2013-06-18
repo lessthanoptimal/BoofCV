@@ -327,6 +327,9 @@ public class ConvertBufferedImage {
 	public static <T extends ImageSingleBand> MultiSpectral<T>
 	convertFromMulti(BufferedImage src, MultiSpectral<T> dst , Class<T> type )
 	{
+		if( src == null )
+			throw new IllegalArgumentException("src is null!");
+
 		if (dst != null) {
 			if (src.getWidth() != dst.getWidth() || src.getHeight() != dst.getHeight()) {
 				throw new IllegalArgumentException("image dimension are different");

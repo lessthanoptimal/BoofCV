@@ -96,7 +96,7 @@ public class VisualizeMonocularPlaneVisualOdometryApp<I extends ImageSingleBand>
 		gui2D = new PlaneView2D(0.1);
 
 		add(guiInfo, BorderLayout.WEST);
-		add(guiCam3D, BorderLayout.EAST);
+		add(gui2D, BorderLayout.EAST);
 		setMainGUI(guiLeft);
 
 		guiLeft.addMouseListener(this);
@@ -284,6 +284,8 @@ public class VisualizeMonocularPlaneVisualOdometryApp<I extends ImageSingleBand>
 		guiCam3D.setStepSize(1);
 		guiCam3D.setPreferredSize(new Dimension(config.intrinsic.width, config.intrinsic.height));
 		guiCam3D.setMaximumSize(guiCam3D.getPreferredSize());
+		gui2D.setPreferredSize(new Dimension(config.intrinsic.width, config.intrinsic.height));
+		gui2D.setMaximumSize(gui2D.getPreferredSize());
 		startWorkerThread();
 	}
 
@@ -380,13 +382,13 @@ public class VisualizeMonocularPlaneVisualOdometryApp<I extends ImageSingleBand>
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				if( view == 0 ) {
-					guiCam3D.setPreferredSize(gui2D.getPreferredSize());
-					remove(gui2D);
-					add(guiCam3D,BorderLayout.EAST);
-				} else {
 					gui2D.setPreferredSize(guiCam3D.getPreferredSize());
 					remove(guiCam3D);
 					add(gui2D, BorderLayout.EAST);
+				} else {
+					guiCam3D.setPreferredSize(gui2D.getPreferredSize());
+					remove(gui2D);
+					add(guiCam3D,BorderLayout.EAST);
 				}
 				revalidate();
 				repaint();
