@@ -18,21 +18,16 @@
 
 package boofcv.misc;
 
-import com.thoughtworks.xstream.core.util.XStreamClassLoader;
 
 /**
  * Custom ClassLoader for XStream which allows it to run inside of applets
  *
  * @author Peter Abeles
  */
-public class BoofcvClassLoader implements XStreamClassLoader {
+public class BoofcvClassLoader extends ClassLoader {
 	@Override
 	public Class<?> loadClass(String name) throws ClassNotFoundException {
 		return Class.forName(name);
 	}
-
-	@Override
-	public ClassLoader getClassLoader() {
-		throw new RuntimeException("Hope this isn't needed since it breaks applets");
-	}
+ 
 }
