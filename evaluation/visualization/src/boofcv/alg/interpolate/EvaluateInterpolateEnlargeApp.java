@@ -74,6 +74,7 @@ public class EvaluateInterpolateEnlargeApp<T extends ImageSingleBand>
 
 		color.reshape(image.getWidth(),image.getHeight());
 		ConvertBufferedImage.convertFromMulti(image,color,imageType);
+		ConvertBufferedImage.orderBandsIntoRGB(color,image);
 
 		hasProcessed = true;
 		doRefreshAll();

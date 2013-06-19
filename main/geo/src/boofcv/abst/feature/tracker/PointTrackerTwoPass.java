@@ -74,9 +74,9 @@ public interface PointTrackerTwoPass<T extends ImageBase> extends PointTracker<T
 
 	/**
 	 * Provides a hint for where the
-	 * @param pixelX
-	 * @param pixelY
-	 * @param track
+	 * @param pixelX x-coordinate hint for where the track is in the image
+	 * @param pixelY y-coordinate hint for where the track is in the image
+	 * @param track The track for which the hint is being provided for
 	 */
 	public void setHint( double pixelX , double pixelY , PointTrack track );
 }

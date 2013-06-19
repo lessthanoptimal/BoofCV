@@ -317,7 +317,6 @@ public class TestConvertBufferedImage {
 		ImageUInt8 band1 = input.getBand(1);
 		ImageUInt8 band2 = input.getBand(2);
 
-
 		// test no swap first
 		BufferedImage orig = new BufferedImage(10, 10, BufferedImage.TYPE_INT_RGB);
 		ConvertBufferedImage.orderBandsIntoRGB(input, orig);
@@ -337,6 +336,21 @@ public class TestConvertBufferedImage {
 		assertTrue(band0 == input.getBand(0));
 		assertTrue(band1 == input.getBand(1));
 		assertTrue(band2 == input.getBand(2));
+
+		// 4-band images
+		input = new MultiSpectral<ImageUInt8>(ImageUInt8.class, 10, 10, 4);
+
+		band0 = input.getBand(0);
+		band1 = input.getBand(1);
+		band2 = input.getBand(2);
+		ImageUInt8 band3 = input.getBand(3);
+
+		orig = new BufferedImage(10, 10, BufferedImage.TYPE_4BYTE_ABGR);
+		ConvertBufferedImage.orderBandsIntoRGB(input, orig);
+		assertTrue(band0 == input.getBand(0));
+		assertTrue(band3 == input.getBand(1));
+		assertTrue(band2 == input.getBand(2));
+		assertTrue(band1 == input.getBand(3));
 	}
 
 	@Test
