@@ -80,8 +80,10 @@ public class DescribePointSurf<II extends ImageSingleBand> {
 	// used to weigh feature computation
 	protected Kernel2D_F64 weight;
 
-
+	// computes sparse image gradient around specified points
 	protected SparseScaleGradient<II,?> gradient;
+	// can handle sample requests outside the image border
+	protected SparseImageGradient<II,?> gradientSafe;
 
 	/**
 	 * Creates a SURF descriptor of arbitrary dimension by changing how the local region is sampled.
@@ -114,6 +116,7 @@ public class DescribePointSurf<II extends ImageSingleBand> {
 
 		// create the function that the gradient is sampled with
 		gradient = SurfDescribeOps.createGradient(useHaar,widthSample, inputType);
+		gradientSafe = new SparseGradientSafe(this.gradient);
 	}
 
 	/**
@@ -163,8 +166,7 @@ public class DescribePointSurf<II extends ImageSingleBand> {
 		gradient.setScale(scale);
 
 		// use a safe method if its along the image border
-		SparseImageGradient gradient = isInBounds ?
-				this.gradient : new SparseGradientSafe(this.gradient);
+		SparseImageGradient gradient = isInBounds ? this.gradient : this.gradientSafe;
 
 		// extract descriptor
 		features(x, y, c, s, scale, gradient , ret.value);

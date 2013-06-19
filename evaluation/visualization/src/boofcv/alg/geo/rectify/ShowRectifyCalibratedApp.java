@@ -75,6 +75,8 @@ public class ShowRectifyCalibratedApp extends SelectAlgorithmAndInputPanel {
 		// distorted images
 		distLeft = ConvertBufferedImage.convertFromMulti(origLeft, null, ImageFloat32.class);
 		distRight = ConvertBufferedImage.convertFromMulti(origRight, null, ImageFloat32.class);
+		ConvertBufferedImage.orderBandsIntoRGB(distLeft,origLeft);
+		ConvertBufferedImage.orderBandsIntoRGB(distRight,origRight);
 
 		// storage for undistorted + rectified images
 		rectLeft = new MultiSpectral<ImageFloat32>(ImageFloat32.class,
