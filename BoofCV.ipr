@@ -46,7 +46,23 @@
     <scope name="BoofCV" pattern="src[BoofCV]:*..*||src[BoofCV Calibration]:*..*||src[BoofCV Evaluation]:*..*||src[BoofCV Examples]:*..*||src[BoofCV Feature]:*..*||src[BoofCV Geometric Vision]:*..*||src[BoofCV Image Processing]:*..*||src[BoofCV IO]:*..*||src[BoofCV SFM]:*..*||src[BoofCV V4L4J]:*..*||src[BoofCV Visualize]:*..*||src[BoofCV Xuggler]:*..*||test[BoofCV Calibration]:*..*||test[BoofCV Evaluation]:*..*||test[BoofCV Feature]:*..*||test[BoofCV Geometric Vision]:*..*||test[BoofCV Image Processing]:*..*||test[BoofCV IO]:*..*||test[BoofCV SFM]:*..*||src[openkinect]:*..*||src[BoofCV Applet]:*..*" />
     <option name="SKIP_IMPORT_STATEMENTS" value="false" />
   </component>
-  <component name="Encoding" useUTFGuessing="true" native2AsciiForPropertiesFiles="false" />
+  <component name="Encoding" useUTFGuessing="true" native2AsciiForPropertiesFiles="false">
+    <file url="file://$PROJECT_DIR$/main/ip/src/com/thoughtworks/boofcv/converters/extended/DynamicProxyConverter.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/main/ip/src/com/thoughtworks/boofcv/converters/extended/JavaClassConverter.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/main/ip/src/com/thoughtworks/boofcv/converters/extended/JavaFieldConverter.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/main/ip/src/com/thoughtworks/boofcv/converters/extended/JavaMethodConverter.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/main/ip/src/com/thoughtworks/boofcv/converters/javabean/JavaBeanConverter.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/main/ip/src/com/thoughtworks/boofcv/converters/reflection/AbstractAttributedCharacterIteratorAttributeConverter.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/main/ip/src/com/thoughtworks/boofcv/converters/reflection/ExternalizableConverter.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/main/ip/src/com/thoughtworks/boofcv/converters/reflection/SerializableConverter.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/main/ip/src/com/thoughtworks/boofcv/core/util/ClassLoaderReference.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/main/ip/src/com/thoughtworks/boofcv/core/util/CompositeClassLoader.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/main/ip/src/com/thoughtworks/boofcv/core/util/ConvertClassLoader.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/main/ip/src/com/thoughtworks/boofcv/core/util/CustomObjectInputStream.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/main/ip/src/com/thoughtworks/boofcv/mapper/AnnotationMapper.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/main/ip/src/com/thoughtworks/boofcv/mapper/DefaultMapper.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/main/ip/src/com/thoughtworks/xstream/converters/reflection/CGLIBEnhancedConverter.java" charset="UTF-8" />
+  </component>
   <component name="EntryPointsManager">
     <entry_points version="2.0" />
   </component>
