@@ -613,7 +613,8 @@ public class ConvertBufferedImage {
 
 	/**
 	 * If a MultiSpectral was created from a BufferedImage its colors might not be in the expected order.
-	 * Invoking this function ensures that the image will have the expected ordering.
+	 * Invoking this function ensures that the image will have the expected ordering.  For images with
+	 * 3 bands it will be RGB and for 4 bands it will be ARGB.
 	 */
 	public static <T extends ImageSingleBand>
 	void orderBandsIntoRGB( MultiSpectral<T> image , BufferedImage input ) {
@@ -631,7 +632,8 @@ public class ConvertBufferedImage {
 
 			int bufferedImageType = input.getType();
 			if( bufferedImageType == BufferedImage.TYPE_3BYTE_BGR ||
-					bufferedImageType == BufferedImage.TYPE_INT_BGR ) {
+					bufferedImageType == BufferedImage.TYPE_INT_BGR ||
+					bufferedImageType == BufferedImage.TYPE_4BYTE_ABGR ) {
 				swap = true;
 			}
 		} catch( java.security.AccessControlException e) {
@@ -641,15 +643,29 @@ public class ConvertBufferedImage {
 
 		
 		if( swap ) {
-			T[] temp = (T[])Array.newInstance(image.getType(),3);
+			if( image.getNumBands() == 3 ) {
+				T[] temp = (T[])Array.newInstance(image.getType(),3);
 
-			temp[0] = image.getBand(2);
-			temp[1] = image.getBand(1);
-			temp[2] = image.getBand(0);
+				temp[0] = image.getBand(2);
+				temp[1] = image.getBand(1);
+				temp[2] = image.getBand(0);
 
-			image.bands[0] = temp[0];
-			image.bands[1] = temp[1];
-			image.bands[2] = temp[2];
+				image.bands[0] = temp[0];
+				image.bands[1] = temp[1];
+				image.bands[2] = temp[2];
+			} else if( image.getNumBands() == 4 ) {
+				T[] temp = (T[])Array.newInstance(image.getType(),4);
+
+				temp[0] = image.getBand(0);
+				temp[1] = image.getBand(3);
+				temp[2] = image.getBand(2);
+				temp[3] = image.getBand(1);
+
+				image.bands[0] = temp[0];
+				image.bands[1] = temp[1];
+				image.bands[2] = temp[2];
+				image.bands[3] = temp[3];
+			}
 		}
 	}
 

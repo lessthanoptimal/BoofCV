@@ -69,6 +69,7 @@ public class RemoveLensDistortionApp extends SelectAlgorithmAndInputPanel {
 
 		// distorted image
 		dist = ConvertBufferedImage.convertFromMulti(orig, null, ImageFloat32.class);
+		ConvertBufferedImage.orderBandsIntoRGB(dist,orig);
 
 		// storage for undistorted image
 		undist = new MultiSpectral<ImageFloat32>(ImageFloat32.class,

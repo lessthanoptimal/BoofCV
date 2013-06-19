@@ -243,6 +243,6 @@ public class ShowImageBlurApp<T extends ImageSingleBand>
 			Thread.yield();
 		}
 
-		ShowImages.showWindow(app, "Image Derivative");
+		ShowImages.showWindow(app, "Image Blur");
 	}
 }
