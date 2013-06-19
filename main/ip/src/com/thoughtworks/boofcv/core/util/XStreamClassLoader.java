@@ -16,23 +16,24 @@
  * limitations under the License.
  */
 
-package boofcv.misc;
-
-import com.thoughtworks.boofcv.core.util.XStreamClassLoader;
+package com.thoughtworks.boofcv.core.util;
 
 /**
- * Custom ClassLoader for XStream which allows it to run inside of applets
+ * Interface for loading classes at runtime.  Mimics some of the functionality of {@link ClassLoader}.
  *
  * @author Peter Abeles
  */
-public class BoofcvClassLoader implements XStreamClassLoader {
-	@Override
-	public Class<?> loadClass(String name) throws ClassNotFoundException {
-		return Class.forName(name);
-	}
+public interface XStreamClassLoader {
 
-	@Override
-	public ClassLoader getClassLoader() {
-		throw new RuntimeException("Hope this isn't needed since it breaks applets");
-	}
+	/**
+	 * Mimics functionality of {@link ClassLoader#loadClass(String)}
+	 */
+	public Class<?> loadClass(String name) throws ClassNotFoundException;
+
+	/**
+	 * Returns the underlying {@link ClassLoader}.
+	 *
+	 * @return instance of ClassLoader
+	 */
+	public ClassLoader getClassLoader();
 }
