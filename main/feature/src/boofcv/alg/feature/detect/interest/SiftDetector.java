@@ -225,7 +225,7 @@ public class SiftDetector {
 
 			// discard points up against the image border since how it should be interpolated is undefined.  plus
 			// this makes it easier to write faster code
-			if( p.x == 0 || p.y == 0 || p.x == borderX || p.y == borderY )
+			if( p.x == 0 || p.y == 0 || p.x >= borderX || p.y >= borderY )
 				continue;
 
 			float value = scale1.unsafe_get(p.x, p.y);

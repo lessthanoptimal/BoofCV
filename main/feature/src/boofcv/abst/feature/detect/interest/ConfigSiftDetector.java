@@ -34,7 +34,9 @@ public class ConfigSiftDetector implements Configuration {
 	 */
 	public int extractRadius = 2;
 	/**
-	 * Minimum corner intensity required.  Try 1
+	 * Minimum corner intensity required.  Set to -Float.MAX_VALUE to detect every possible feature.  Try 1.
+	 *
+	 * Feature intensity is computed using a Difference-of-Gaussian operation, which can have negative values.
 	 */
 	public float detectThreshold = 1;
 	/**

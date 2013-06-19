@@ -636,6 +636,7 @@ public class ConvertBufferedImage {
 			}
 		} catch( java.security.AccessControlException e) {
 			// its in an applet or something and will need to use getRGB() to read/write from the image
+			// so no need to re-order the bands
 		}
 
 		

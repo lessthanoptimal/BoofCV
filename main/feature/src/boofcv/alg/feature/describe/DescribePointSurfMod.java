@@ -23,7 +23,6 @@ import boofcv.struct.convolve.Kernel2D_F64;
 import boofcv.struct.feature.SurfFeature;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.sparse.GradientValue;
-import boofcv.struct.sparse.SparseGradientSafe;
 import boofcv.struct.sparse.SparseImageGradient;
 
 /**
@@ -130,8 +129,7 @@ public class DescribePointSurfMod<II extends ImageSingleBand> extends DescribePo
 		gradient.setScale(scale);
 
 		// use a safe method if its along the image border
-		SparseImageGradient gradient = isInBounds ?
-				this.gradient : new SparseGradientSafe(this.gradient);
+		SparseImageGradient gradient = isInBounds ? this.gradient : this.gradientSafe;
 
 		// compute image features
 		features(x, y, c, s, scale, gradient , ret.value);

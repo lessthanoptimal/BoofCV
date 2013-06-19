@@ -29,12 +29,10 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../lib/xstream-1.4.5-SNAPSHOT.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/xstream-1.4.4.jar!/" />
         </CLASSES>
         <JAVADOC />
-        <SOURCES>
-          <root url="jar://$MODULE_DIR$/../../../thirdparty/xstream/xstream/target/xstream-1.4.5-SNAPSHOT-sources.jar!/" />
-        </SOURCES>
+        <SOURCES />
       </library>
     </orderEntry>
   </component>
