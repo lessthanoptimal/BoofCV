@@ -22,6 +22,7 @@ import boofcv.io.MediaManager;
 import boofcv.io.VideoCallBack;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.video.VideoMjpegCodec;
+import boofcv.io.wrapper.images.ImageStreamSequence;
 import boofcv.io.wrapper.images.JpegByteImageSequence;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageDataType;
@@ -92,7 +93,10 @@ public class AppletMediaManager implements MediaManager {
 
 	@Override
 	public <T extends ImageBase> SimpleImageSequence<T> openVideo(String fileName, ImageDataType<T> imageType) {
-		String type = "MJPEG"; // todo should get from file name
+
+		int where = fileName.indexOf('.');
+
+		String type = fileName.substring(where+1);
 		URL url = null;
 		BufferedInputStream stream = null;
 
@@ -125,6 +129,8 @@ public class AppletMediaManager implements MediaManager {
 			List<byte[]> data = codec.read(byteStream);
 //			System.out.println("Loaded "+data.size()+" jpeg images!");
 			return new JpegByteImageSequence<T>(imageType,data,true);
+		} else if( type.compareToIgnoreCase("MPNG") == 0 ) {
+			return new ImageStreamSequence<T>(byteStream,true,imageType);
 		} else {
 			System.err.println("Unknown video type: "+type);
 		}

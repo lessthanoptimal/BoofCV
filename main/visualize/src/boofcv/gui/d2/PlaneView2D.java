@@ -114,7 +114,9 @@ public class PlaneView2D extends JPanel implements MouseMotionListener, MouseLis
 	}
 
 	@Override
-	public void mouseClicked(MouseEvent e) {}
+	public void mouseClicked(MouseEvent e) {
+		grabFocus();
+	}
 
 	@Override
 	public void mousePressed(MouseEvent e) {
@@ -156,7 +158,29 @@ public class PlaneView2D extends JPanel implements MouseMotionListener, MouseLis
 
 	@Override
 	public void keyTyped(KeyEvent e) {
-		//To change body of implemented methods use File | Settings | File Templates.
+		if( e.getKeyChar() == 'w' ) {
+			transform.T.y -= pixelToUnit/scale;
+		} else if( e.getKeyChar() == 's' ) {
+			transform.T.y += pixelToUnit/scale;
+		} else if( e.getKeyChar() == 'a' ) {
+			transform.T.x += pixelToUnit/scale;
+		} else if( e.getKeyChar() == 'd' ) {
+			transform.T.x -= pixelToUnit/scale;
+		} else if( e.getKeyChar() == 'q' ) {
+			scale *= 1.05;
+		} else if( e.getKeyChar() == 'e' ) {
+			scale *= 0.95;
+		} else if( e.getKeyChar() == 'h' ) {
+			transform.reset();
+			scale = 1;
+		}
+
+		if( scale < 0.001 )
+			scale = 0.001;
+		else if( scale > 1000 )
+			scale = 1000;
+
+		repaint();
 	}
 
 	@Override

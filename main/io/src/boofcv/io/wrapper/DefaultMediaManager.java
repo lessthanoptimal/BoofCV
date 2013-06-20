@@ -91,7 +91,7 @@ public class DefaultMediaManager implements MediaManager {
 			}
 		} else if( fileName.endsWith("mpng") || fileName.endsWith("MPNG")) {
 			try {
-				return new ImageStreamSequence<T>(fileName,type);
+				return new ImageStreamSequence<T>(fileName,true,type);
 			} catch (FileNotFoundException e) {
 				throw new RuntimeException(e);
 			}

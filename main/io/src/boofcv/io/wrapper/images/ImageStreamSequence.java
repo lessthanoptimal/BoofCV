@@ -21,6 +21,7 @@ package boofcv.io.wrapper.images;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.video.CombineFilesTogether;
+import boofcv.io.video.VideoMjpegCodec;
 import boofcv.struct.GrowQueue_I8;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageDataType;
@@ -51,16 +52,27 @@ implements SimpleImageSequence<T>
 	int frameNumber;
 	ImageDataType<T> imageType;
 	GrowQueue_I8 buffer = new GrowQueue_I8();
+	byte rawData[];
 
-	public ImageStreamSequence(InputStream in, ImageDataType<T> imageType) {
-		this.in = new DataInputStream(in);
+	public ImageStreamSequence(InputStream in, boolean storeData , ImageDataType<T> imageType) {
+		if( storeData ) {
+			try {
+				rawData = VideoMjpegCodec.convertToByteArray(in);
+				this.in = new DataInputStream(new ByteArrayInputStream(rawData));
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+		} else {
+			this.in = new DataInputStream(in);
+		}
+
 		this.imageType = imageType;
 		image = imageType.createImage(1,1);
 		readNext();
 	}
 
-	public ImageStreamSequence(String fileName, ImageDataType<T> imageType) throws FileNotFoundException {
-		this(new DataInputStream(new BufferedInputStream(new FileInputStream(fileName),1024*200)),imageType);
+	public ImageStreamSequence(String fileName, boolean storeData , ImageDataType<T> imageType) throws FileNotFoundException {
+		this(new DataInputStream(new BufferedInputStream(new FileInputStream(fileName),1024*200)),storeData,imageType);
 		this.fileName = fileName;
 	}
 
@@ -121,7 +133,11 @@ implements SimpleImageSequence<T>
 
 	@Override
 	public void reset() {
-		if( fileName != null ) {
+		if( rawData != null ) {
+			this.in = new DataInputStream(new ByteArrayInputStream(rawData));
+			frameNumber = 0;
+			readNext();
+		} else if( fileName != null ) {
 			try {
 				in = new DataInputStream(new BufferedInputStream(new FileInputStream(fileName),1024*200));
 				frameNumber = 0;
@@ -135,7 +151,7 @@ implements SimpleImageSequence<T>
 	}
 
 	public static void main( String args[] ) throws FileNotFoundException {
-		ImageStreamSequence stream = new ImageStreamSequence("combined.mpng",ImageDataType.single(ImageUInt16.class));
+		ImageStreamSequence stream = new ImageStreamSequence("combined.mpng",true,ImageDataType.single(ImageUInt16.class));
 
 		while( stream.hasNext() ) {
 			System.out.println("Image");
