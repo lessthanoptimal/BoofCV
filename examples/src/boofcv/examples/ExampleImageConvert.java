@@ -79,8 +79,10 @@ public class ExampleImageConvert {
 		// Let's see what all the bad image looks like
 		// ConvertBufferedImage is similar to ImageConvert in that it does a direct coversion with out
 		// adjusting the pixel's value
-		ShowImages.showWindow(ConvertBufferedImage.convertTo(imageBad,null),"Bad Conversion");
-		ShowImages.showWindow(ConvertBufferedImage.convertTo(scaledAbs,null),"Scaled");
+		BufferedImage outBad = new BufferedImage(imageBad.width,imageBad.height,BufferedImage.TYPE_INT_RGB);
+		BufferedImage outScaled = new BufferedImage(imageBad.width,imageBad.height,BufferedImage.TYPE_INT_RGB);
+		ShowImages.showWindow(ConvertBufferedImage.convertTo(imageBad,outBad),"Bad Conversion");
+		ShowImages.showWindow(ConvertBufferedImage.convertTo(scaledAbs,outScaled),"Scaled");
 		ShowImages.showWindow(colorX,"Visualized");
 	}
 

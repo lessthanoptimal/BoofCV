@@ -63,6 +63,7 @@ public class ExampleRemoveLensDistortion {
 		// load images and convert the image into a color BoofCV format
 		BufferedImage orig = UtilImageIO.loadImage(imageDir + "dist_cyto_01.jpg");
 		MultiSpectral<ImageFloat32> distortedImg = ConvertBufferedImage.convertFromMulti(orig, null, ImageFloat32.class);
+		ConvertBufferedImage.orderBandsIntoRGB(distortedImg,orig);
 
 		// compute the transform to remove lens distortion
 		// The inverse transformation (adds distortion) is used when apply adjusting an image.

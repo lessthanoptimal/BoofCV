@@ -19,7 +19,6 @@
 package boofcv.alg.geo.pose;
 
 import boofcv.alg.geo.GeoTestingOps;
-import boofcv.alg.geo.h.CommonHomographyChecks;
 import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.sfm.Stereo2D3D;
@@ -84,7 +83,7 @@ public class CommonStereoMotionNPoint {
 
 		// randomly generate points in space
 		if( planar ) {
-			worldPts = CommonHomographyChecks.createRandomPlane(rand, 3, N);
+			worldPts = createRandomPlane(rand, 3, N);
 		} else {
 			worldPts = GeoTestingOps.randomPoints_F64(-1, 1, -1, 1, 2, 3, N, rand);
 		}
@@ -115,5 +114,22 @@ public class CommonStereoMotionNPoint {
 			o.rightObs.x += rand.nextGaussian()*sigma;
 			o.rightObs.y += rand.nextGaussian()*sigma;
 		}
+	}
+
+	/**
+	 * Creates a set of random points along the (X,Y) plane
+	 */
+	public static List<Point3D_F64> createRandomPlane( Random rand , double d , int N )
+	{
+		List<Point3D_F64> ret = new ArrayList<Point3D_F64>();
+
+		for( int i = 0; i < N; i++ ) {
+			double x = (rand.nextDouble()-0.5)*2;
+			double y = (rand.nextDouble()-0.5)*2;
+
+			ret.add( new Point3D_F64(x,y,d));
+		}
+
+		return ret;
 	}
 }

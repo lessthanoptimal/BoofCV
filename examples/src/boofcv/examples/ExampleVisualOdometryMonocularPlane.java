@@ -44,7 +44,7 @@ import georegression.struct.se.Se3_F64;
  *
  * @author Peter Abeles
  */
-public class ExampleMonocularPlaneVisualOdometry {
+public class ExampleVisualOdometryMonocularPlane {
 
 	public static void main( String args[] ) {
 

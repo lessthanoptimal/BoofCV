@@ -44,7 +44,7 @@ import georegression.struct.se.Se3_F64;
  *
  * @author Peter Abeles
  */
-public class ExampleStereoVisualOdometry {
+public class ExampleVisualOdometryStereo {
 
 	public static void main( String args[] ) {
 

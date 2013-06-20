@@ -21,10 +21,7 @@ package boofcv.gui.image;
 import boofcv.alg.misc.GImageStatistics;
 import boofcv.alg.misc.ImageStatistics;
 import boofcv.core.image.ConvertBufferedImage;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageInteger;
-import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.*;
 
 import java.awt.image.BufferedImage;
 
@@ -85,7 +82,7 @@ public class VisualizeImageData {
 	 * @return Rendered image.
 	 */
 	public static BufferedImage colorizeSign(ImageSingleBand src, BufferedImage dst, double normalize) {
-		dst = ConvertBufferedImage.checkInputs(src, dst);
+		dst = checkInputs(src, dst);
 
 		if (normalize <= 0) {
 			normalize = GImageStatistics.maxAbs(src);
@@ -124,7 +121,7 @@ public class VisualizeImageData {
 	}
 
 	public static BufferedImage grayUnsigned(ImageInteger src, BufferedImage dst, int normalize) {
-		dst = ConvertBufferedImage.checkInputs(src, dst);
+		dst = checkInputs(src, dst);
 
 		if (src.getTypeInfo().isSigned())
 			throw new IllegalArgumentException("Can only convert unsigned images.");
@@ -158,7 +155,7 @@ public class VisualizeImageData {
 		if (normalize < 0)
 			normalize = GImageStatistics.maxAbs(src);
 
-		dst = ConvertBufferedImage.checkInputs(src, dst);
+		dst = checkInputs(src, dst);
 
 		if (src.getTypeInfo().isInteger()) {
 			return grayMagnitude((ImageInteger) src, dst, (int) normalize);
@@ -181,7 +178,7 @@ public class VisualizeImageData {
 		if (normalize < 0)
 			normalize = GImageStatistics.maxAbs(src);
 
-		dst = ConvertBufferedImage.checkInputs(src, dst);
+		dst = checkInputs(src, dst);
 
 		if (src.getTypeInfo().isInteger()) {
 			return grayMagnitudeTemp((ImageInteger) src, dst, (int) normalize);
@@ -336,7 +333,7 @@ public class VisualizeImageData {
 	}
 
 	public static BufferedImage graySign(ImageFloat32 src, BufferedImage dst, float maxAbsValue) {
-		dst = ConvertBufferedImage.checkInputs(src, dst);
+		dst = checkInputs(src, dst);
 
 		if (maxAbsValue < 0)
 			maxAbsValue = ImageStatistics.maxAbs(src);
@@ -365,6 +362,22 @@ public class VisualizeImageData {
 			}
 		}
 
+		return dst;
+	}
+
+	/**
+	 * If null the dst is declared, otherwise it checks to see if the 'dst' as the same shape as 'src'.
+	 *
+	 * The returned image will be 8-bit RGB
+	 */
+	private static BufferedImage checkInputs(ImageBase src, BufferedImage dst) {
+		if (dst != null) {
+			if (dst.getWidth() != src.getWidth() || dst.getHeight() != src.getHeight()) {
+				throw new IllegalArgumentException("image dimension are different");
+			}
+		} else {
+			dst = new BufferedImage(src.getWidth(), src.getHeight(), BufferedImage.TYPE_INT_RGB);
+		}
 		return dst;
 	}
 }

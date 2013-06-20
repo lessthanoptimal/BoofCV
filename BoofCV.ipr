@@ -6,7 +6,6 @@
     <buildFile url="file://$PROJECT_DIR$/../georegression/build.xml" />
     <buildFile url="file://$PROJECT_DIR$/../ddogleg/build.xml" />
     <buildFile url="file://$PROJECT_DIR$/../ejml/trunk/build.xml" />
-    <buildFile url="file://$PROJECT_DIR$/applet/build.xml" />
   </component>
   <component name="CompilerConfiguration">
     <option name="DEFAULT_COMPILER" value="Javac" />
@@ -61,7 +60,6 @@
     <file url="file://$PROJECT_DIR$/main/ip/src/com/thoughtworks/boofcv/core/util/CustomObjectInputStream.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/main/ip/src/com/thoughtworks/boofcv/mapper/AnnotationMapper.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/main/ip/src/com/thoughtworks/boofcv/mapper/DefaultMapper.java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/main/ip/src/com/thoughtworks/xstream/converters/reflection/CGLIBEnhancedConverter.java" charset="UTF-8" />
   </component>
   <component name="EntryPointsManager">
     <entry_points version="2.0" />
@@ -417,7 +415,6 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/BoofCV.iml" filepath="$PROJECT_DIR$/BoofCV.iml" />
-      <module fileurl="file://$PROJECT_DIR$/applet/BoofCV Applet.iml" filepath="$PROJECT_DIR$/applet/BoofCV Applet.iml" />
       <module fileurl="file://$PROJECT_DIR$/main/calibration/BoofCV Calibration.iml" filepath="$PROJECT_DIR$/main/calibration/BoofCV Calibration.iml" />
       <module fileurl="file://$PROJECT_DIR$/evaluation/BoofCV Evaluation.iml" filepath="$PROJECT_DIR$/evaluation/BoofCV Evaluation.iml" />
       <module fileurl="file://$PROJECT_DIR$/examples/BoofCV Examples.iml" filepath="$PROJECT_DIR$/examples/BoofCV Examples.iml" />
