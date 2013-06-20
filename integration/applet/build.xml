@@ -2,12 +2,12 @@
 
 
     <property name="src.dir"     value="src"/>
-    <property name="srceval.dir"     value="../evaluation/visualization/src"/>
-    <property name="lib.dir"     value="../lib"/>
+    <property name="srceval.dir"     value="../../evaluation/visualization/src"/>
+    <property name="lib.dir"     value="../../lib"/>
 
     <property name="build.dir"   value="build"/>
     <property name="classes.dir" value="${build.dir}/classes"/>
-    <property name="jar.dir"     value="."/>
+    <property name="jar.dir"     value="../jar"/>
 
     <property name="junit.dir"  value="lib/"/>
 

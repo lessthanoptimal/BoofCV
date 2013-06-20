@@ -73,6 +73,8 @@ public class ExampleRectifyUncalibratedStereo {
 				distLeft.getWidth(),distLeft.getHeight(),distLeft.getNumBands());
 		MultiSpectral<ImageFloat32> rectRight = new MultiSpectral<ImageFloat32>(ImageFloat32.class,
 				distRight.getWidth(),distRight.getHeight(),distRight.getNumBands());
+		ConvertBufferedImage.orderBandsIntoRGB(distLeft,origLeft);
+		ConvertBufferedImage.orderBandsIntoRGB(distRight,origRight);
 
 		// Compute rectification
 		RectifyFundamental rectifyAlg = RectifyImageOps.createUncalibrated();

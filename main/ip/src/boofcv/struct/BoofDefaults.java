@@ -19,7 +19,6 @@
 package boofcv.struct;
 
 import boofcv.core.image.border.*;
-import boofcv.struct.image.ImageInteger;
 
 
 /**
@@ -30,7 +29,7 @@ public class BoofDefaults {
 	/**
 	 * String specifying BoofCV's version.
 	 */
-	public static String version = "0.14";
+	public static String version = "0.15";
 
 	// Use extended borders when computing image derivatives 
 	public static BorderType DERIV_BORDER_TYPE = BorderType.EXTENDED;

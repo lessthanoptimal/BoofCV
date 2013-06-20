@@ -46,7 +46,7 @@ import java.io.IOException;
  *
  * @author Peter Abeles
  */
-public class ExampleDepthVisualOdometry {
+public class ExampleVisualOdometryDepth {
 
 	public static void main( String args[] ) throws IOException {
 

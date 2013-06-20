@@ -45,6 +45,7 @@ Version : Alpha 0.15
   * Thanks lefman for pointing it out
 - Fixed ConvertBufferedImage.orderBandsIntoRGB() for ABGR images.  Thanks André Ambrósio Boechat
 - Maven build working again.  Thanks JensKapitza for the help.
+- Moved boofcv/applet into boofcv/integration/applet
 
 ---------------------------------------------
 Date    : 2013/04/15

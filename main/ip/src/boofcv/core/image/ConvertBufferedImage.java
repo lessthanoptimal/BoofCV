@@ -576,6 +576,7 @@ public class ConvertBufferedImage {
 
 		return dst;
 	}
+
 	/**
 	 * If null the dst is declared, otherwise it checks to see if the 'dst' as the same shape as 'src'.
 	 */

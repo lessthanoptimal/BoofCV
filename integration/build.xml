@@ -16,6 +16,7 @@
       <pathelement path="android/src"/>
       <pathelement path="xuggler/src"/>
       <pathelement path="v4l4j/src"/>
+      <pathelement path="openkinect/src"/>
     </path>
 
 
@@ -99,6 +100,7 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
 	<ant dir="android/" target="clean"/>
 	<ant dir="xuggler/" target="clean"/>
 	<ant dir="v4l4j/" target="clean"/>
+	<ant dir="openkinect/" target="clean"/>
     </target>
 
     <target name="jar">
@@ -106,6 +108,8 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
 	<ant dir="android" inheritAll="false"/>
 	<ant dir="xuggler" inheritAll="false"/>
 	<ant dir="v4l4j" inheritAll="false"/>
+	<ant dir="openkinect" inheritAll="false"/>
+	<ant dir="applet" inheritAll="false"/>
 	<!--jar destfile="${lib.dir}/${ant.project.name}.jar">
 	  <zipgroupfileset dir="${jar.dir}" includes="*.jar"/> 
 	</jar-->
