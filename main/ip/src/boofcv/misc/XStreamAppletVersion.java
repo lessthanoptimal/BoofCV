@@ -619,19 +619,19 @@ public class XStreamAppletVersion {
         registerConverter(new JavaClassConverter(classLoaderReference), PRIORITY_NORMAL);
         registerConverter(new JavaMethodConverter(classLoaderReference), PRIORITY_NORMAL);
         registerConverter(new JavaFieldConverter(classLoaderReference), PRIORITY_NORMAL);
-        if (jvm.supportsAWT()) {
-            registerConverter(new FontConverter(), PRIORITY_NORMAL);
-            registerConverter(new ColorConverter(), PRIORITY_NORMAL);
-            try { // Hack2
-            registerConverter(new TextAttributeConverter(), PRIORITY_NORMAL);
-            } catch( ExceptionInInitializerError ignored ) {}
-        }
-        if (jvm.supportsSwing()) {
-            registerConverter(
-                new LookAndFeelConverter(mapper, reflectionProvider), PRIORITY_NORMAL);
-        }
-        registerConverter(new LocaleConverter(), PRIORITY_NORMAL);
-        registerConverter(new GregorianCalendarConverter(), PRIORITY_NORMAL);
+//        if (jvm.supportsAWT()) {
+//            registerConverter(new FontConverter(), PRIORITY_NORMAL);
+//            registerConverter(new ColorConverter(), PRIORITY_NORMAL);
+//            try { // Hack2
+//            registerConverter(new TextAttributeConverter(), PRIORITY_NORMAL);
+//            } catch( ExceptionInInitializerError ignored ) {}
+//        }
+//        if (jvm.supportsSwing()) {
+//            registerConverter(
+//                new LookAndFeelConverter(mapper, reflectionProvider), PRIORITY_NORMAL);
+//        }
+//        registerConverter(new LocaleConverter(), PRIORITY_NORMAL);
+//        registerConverter(new GregorianCalendarConverter(), PRIORITY_NORMAL);
 
 //        if (JVM.is14()) {
 //            // late bound converters - allows XStream to be compiled on earlier JDKs

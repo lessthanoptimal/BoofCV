@@ -66,7 +66,7 @@ public class VideoMjpegCodec {
 	}
 
 
-	private byte[] convertToByteArray(InputStream streamIn) throws IOException {
+	public static byte[] convertToByteArray(InputStream streamIn) throws IOException {
 		ByteArrayOutputStream temp = new ByteArrayOutputStream(1024);
 		byte[] data = new byte[ 1024 ];
 		int length;
