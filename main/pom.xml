@@ -4,7 +4,7 @@
   <groupId>org.boofcv</groupId>
   <artifactId>boofcv</artifactId>
   <packaging>jar</packaging>
-  <version>0.15-SNAPSHOT</version>
+  <version>0.15</version>
   <name>BoofCV</name>
   <url>http://boofcv.org</url>
   <description>BoofCV is an open source Java library for real-time computer vision and robotics applications.</description>
@@ -13,19 +13,19 @@
     <dependency>
       <groupId>com.googlecode.efficient-java-matrix-library</groupId>
       <artifactId>ejml</artifactId>
-      <version>0.23-SNAPSHOT</version>
+      <version>0.23</version>
     </dependency>
     
     <dependency>
       <groupId>org.georegression</groupId>
       <artifactId>georegression</artifactId>
-      <version>0.4-SNAPSHOT</version>
+      <version>0.4</version>
     </dependency>
 
     <dependency>
       <groupId>org.ddogleg</groupId>
       <artifactId>ddogleg</artifactId>
-      <version>0.4-SNAPSHOT</version>
+      <version>0.4</version>
     </dependency>
 
     <dependency>
