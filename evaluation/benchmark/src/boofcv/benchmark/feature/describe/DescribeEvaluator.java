@@ -137,11 +137,12 @@ public class DescribeEvaluator<T extends ImageSingleBand, D extends TupleDesc>
 			Point2D_F64 p = points.get(i);
 			theta[i] = orientationAlg.compute(p.x,p.y);
 
-			if( extract.isInBounds(p.x,p.y,theta[i],1) ) {
-				extract.process(p.x,p.y,theta[i],1,initial.grow());
+			D desc = initial.grow();
+			if( extract.process(p.x, p.y, theta[i], 1, desc) ) {
 				initList.add(initial.getTail());
 				initIndexes[initial.size()-1] = i;
 			} else {
+				initial.removeTail();
 				initList.add(null);
 			}
 		}
@@ -164,11 +165,12 @@ public class DescribeEvaluator<T extends ImageSingleBand, D extends TupleDesc>
 			double ang = UtilAngle.bound(this.theta[indexes.get(i)] + theta);
 
 			// extract the description
-			if( extract.isInBounds(p.x, p.y, ang, scale) ) {
-				extract.process(p.x,p.y,ang,scale,current.grow());
+			D desc = current.grow();
+			if( extract.process(p.x, p.y, ang, scale, desc) ) {
 				currentList.add(current.getTail());
 				currentIndexes[current.size()-1] = i;
 			} else {
+				current.removeTail();
 				currentList.add(null);
 			}
 		}

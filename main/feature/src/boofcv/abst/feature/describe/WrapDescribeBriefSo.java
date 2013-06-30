@@ -50,19 +50,12 @@ public class WrapDescribeBriefSo<T extends ImageSingleBand> implements DescribeR
 		return length;
 	}
 
+
 	@Override
-	public boolean isInBounds(double x, double y, double orientation, double scale) {
+	public boolean process(double x, double y, double orientation, double scale, TupleDesc_B storage)
+	{
+		alg.process((float)x,(float)y,(float)orientation,(float)scale,storage);
 		return true;
-	}
-
-	@Override
-	public TupleDesc_B process(double x, double y, double orientation, double scale, TupleDesc_B ret) {
-		if( ret == null )
-			ret = createDescription();
-
-		alg.process((float)x,(float)y,(float)orientation,(float)scale,ret);
-
-		return ret;
 	}
 
 	@Override

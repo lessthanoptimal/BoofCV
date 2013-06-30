@@ -63,19 +63,11 @@ public class WrapDescribeSurf<T extends ImageSingleBand, II extends ImageSingleB
 	}
 
 	@Override
-	public boolean isInBounds(double x, double y, double orientation, double scale) {
+	public boolean process(double x, double y, double orientation , double scale, SurfFeature storage) {
+
+		surf.describe(x,y, orientation, scale, storage);
+
 		return true;
-	}
-
-	@Override
-	public SurfFeature process(double x, double y, double orientation , double scale, SurfFeature ret) {
-
-		if( ret == null )
-			ret = createDescription();
-
-		surf.describe(x,y, orientation, scale, ret);
-
-		return ret;
 	}
 
 	@Override

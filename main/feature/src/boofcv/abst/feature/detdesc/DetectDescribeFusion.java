@@ -126,11 +126,12 @@ public class DetectDescribeFusion<T extends ImageSingleBand, TD extends TupleDes
 				yaw = orientation.compute(p.x,p.y);
 			}
 
-			if( describe.isInBounds(p.x,p.y,yaw,scale) ) {
-				describe.process(p.x,p.y,yaw,scale,descs.grow());
+			if( describe.process(p.x,p.y,yaw,scale,descs.grow()) ) {
 				featureScales.push(scale);
 				featureAngles.push(yaw);
 				location.add(p);
+			} else {
+				descs.removeTail();
 			}
 		}
 	}

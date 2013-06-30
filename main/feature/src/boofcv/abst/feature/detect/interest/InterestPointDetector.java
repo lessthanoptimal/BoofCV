@@ -18,7 +18,7 @@
 
 package boofcv.abst.feature.detect.interest;
 
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageBase;
 
 /**
  * Interface for automatic interest point detection in an image.  Optional support is
@@ -27,7 +27,7 @@ import boofcv.struct.image.ImageSingleBand;
  * @author Peter Abeles
  */
 // TODO Rename to DetectorInterestPoint? or DetectorPointSO
-public interface InterestPointDetector< T extends ImageSingleBand > extends FoundPointSO {
+public interface InterestPointDetector< T extends ImageBase> extends FoundPointSO {
 
 	/**
 	 * Detects interest points inside the provided image.

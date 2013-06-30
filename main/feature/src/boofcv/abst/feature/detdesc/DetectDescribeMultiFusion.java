@@ -91,10 +91,12 @@ public class DetectDescribeMultiFusion<T extends ImageSingleBand, TD extends Tup
 					ori = orientation.compute(p.x,p.y);
 				}
 
-				if( describe.isInBounds(p.x,p.y,ori,scale)) {
-					TD d = setInfo.descriptors.grow();
-					describe.process(p.x,p.y,ori,scale,d);
+				TD d = setInfo.descriptors.grow();
+
+				if( describe.process(p.x,p.y,ori,scale,d)) {
 					setInfo.location.grow().set(p);
+				} else {
+					setInfo.descriptors.removeTail();
 				}
 			}
 		}

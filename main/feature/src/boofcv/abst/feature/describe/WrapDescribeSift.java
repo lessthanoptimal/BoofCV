@@ -57,20 +57,12 @@ public class WrapDescribeSift
 	public int getDescriptionLength() {
 		return alg.getDescriptorLength();
 	}
-
 	@Override
-	public boolean isInBounds(double x, double y, double orientation, double scale) {
+	public boolean process(double x, double y, double orientation, double scale, SurfFeature storage)
+	{
+		alg.process(x,y,scale,orientation,storage);
+
 		return true;
-	}
-
-	@Override
-	public SurfFeature process(double x, double y, double orientation, double scale, SurfFeature ret) {
-		if( ret == null )
-			ret = createDescription();
-
-		alg.process(x,y,scale,orientation,ret);
-
-		return ret;
 	}
 
 	@Override

@@ -40,7 +40,7 @@ public interface PointDescSet<TD extends TupleDesc> {
 	 * The center location of the feature inside the image.
 	 * </p>
 	 * <p>
-	 * WARNING: The returned description will be overwritten when a new image is processed.
+	 * WARNING: The returned point is overwritten when a new image is processed.
 	 * </p>
 	 *
 	 * @param featureIndex The feature's index.

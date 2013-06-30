@@ -3,6 +3,18 @@ Change Log
 Date Format: year/month/day
 
 ---------------------------------------------
+Date    : 2013
+Version : Alpha 0.16
+
+- Simplified DescribeRegionPoint
+  * describe now returns true or false
+  * removed isInBounds()
+- Feature detection and describing related classes now extend ImageBase to allow support of color image processing
+
+- TODO OpenTLD
+- TODO automate high level tests
+
+---------------------------------------------
 Date    : 2013/06/21
 Version : Alpha 0.15
 

@@ -62,19 +62,13 @@ public class DescribeRegionPointConvert<T extends ImageSingleBand,In extends Tup
 	}
 
 	@Override
-	public boolean isInBounds(double x, double y, double orientation, double scale) {
-		return original.isInBounds(x,y,orientation,scale);
-	}
+	public boolean process(double x, double y, double orientation, double scale, Out storage) {
 
-	@Override
-	public Out process(double x, double y, double orientation, double scale, Out ret) {
-		if( ret == null )
-			ret = converter.createOutput();
+		if( !original.process(x,y,orientation,scale, this.storage) )
+			return false;
+		converter.convert(this.storage,storage);
 
-		original.process(x,y,orientation,scale,storage);
-		converter.convert(storage,ret);
-
-		return ret;
+		return true;
 	}
 
 	@Override
