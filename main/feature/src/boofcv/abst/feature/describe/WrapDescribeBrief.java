@@ -51,18 +51,10 @@ public class WrapDescribeBrief<T extends ImageSingleBand> implements DescribeReg
 	}
 
 	@Override
-	public boolean isInBounds(double x, double y, double orientation, double scale) {
+	public boolean process(double x, double y, double orientation, double scale, TupleDesc_B storage)
+	{
+		alg.process(x, y, storage);
 		return true;
-	}
-
-	@Override
-	public TupleDesc_B process(double x, double y, double orientation, double scale, TupleDesc_B ret) {
-		if( ret == null )
-			ret = createDescription();
-
-		alg.process(x, y, ret);
-
-		return ret;
 	}
 
 	@Override

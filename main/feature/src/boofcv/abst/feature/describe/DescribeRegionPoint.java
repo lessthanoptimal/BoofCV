@@ -19,7 +19,7 @@
 package boofcv.abst.feature.describe;
 
 import boofcv.struct.feature.TupleDesc;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageBase;
 
 
 /**
@@ -29,7 +29,7 @@ import boofcv.struct.image.ImageSingleBand;
  *
  * @author Peter Abeles
  */
-public interface DescribeRegionPoint<T extends ImageSingleBand, Desc extends TupleDesc>
+public interface DescribeRegionPoint<T extends ImageBase, Desc extends TupleDesc>
 	extends DescriptorInfo<Desc>
 {
 
@@ -41,26 +41,19 @@ public interface DescribeRegionPoint<T extends ImageSingleBand, Desc extends Tup
 	public void setImage( T image );
 
 	/**
-	 * Checks to see if a description can be extracted at the specified location.  Some descriptors
-	 * cannot handle intersections with the image boundary and will crash if there is an intersection.
+	 * Extract a description of the local image at the given point, scale, and orientation.
 	 *
-	 * @return true if the feature is inside the legal bounds and can be processed.
-	 */
-	public boolean isInBounds(double x , double y , double orientation , double scale);
-
-	/**
-	 * Extract feature information from point at the specified scale.  Before this function
-	 * is called {@link #isInBounds(double, double,double, double)} should be called it make
-	 * sure it is safe to compute the descriptor.
+	 * WARNING: Check the returned value to make sure a description was actually computed.  Some implementations
+	 * might now allow features to extend outside the image border and will return false.
 	 *
 	 * @param x Coordinate of the point.
 	 * @param y Coordinate of the point.
 	 * @param orientation Direction the feature is pointing at in radians. 0 = x-axis PI/2 = y-axis
 	 * @param scale Scale at which the feature was found.
-	 * @param ret Storage for extracted feature.  If null a new descriptor will be declared and returned..
-	 * @return The descriptor.
+	 * @param description (output) Storage for extracted feature.  Use {@link #createDescription} to create descriptor.
+	 * @return true if a descriptor can computed or false if not.
 	 */
-	public Desc process( double x , double y , double orientation , double scale , Desc ret );
+	public boolean process( double x , double y , double orientation , double scale , Desc description );
 
 	/**
 	 * If scale information is used when computing the descriptor.

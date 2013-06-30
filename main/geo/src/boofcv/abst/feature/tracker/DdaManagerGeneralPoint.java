@@ -73,13 +73,16 @@ public class DdaManagerGeneralPoint<I extends ImageSingleBand, D extends ImageSi
 		locations.reset();
 		for( int i = 0; i < found.size; i++ ) {
 			Point2D_I16 p = found.get(i);
-			if( describe.isInBounds(p.x,p.y,0,scale) ) {
+			Desc desc = descriptors.grow();
+
+			if( describe.process(p.x,p.y,0,scale,desc) ) {
 				Point2D_F64 loc = locations.grow();
-				Desc desc = descriptors.grow();
 				loc.set(p.x,p.y);
 				describe.process(loc.x,loc.y,0,scale,desc);
 				featDst.add(desc);
 				locDst.add( loc );
+			} else {
+				descriptors.removeTail();
 			}
 		}
 	}

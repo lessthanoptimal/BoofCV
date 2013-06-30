@@ -102,8 +102,11 @@ public class CompareConvertedDescriptionsApp {
 			double scale = detector.getScale(i);
 			double ori = detector.getOrientation(i);
 
-			list.add( describe.process(p.x,p.y,ori,scale,null) );
-			location.add( p.copy() );
+			TD d = describe.createDescription();
+			if( describe.process(p.x,p.y,ori,scale,d) ) {
+				list.add( d );
+				location.add( p.copy() );
+			}
 		}
 
 		return list;

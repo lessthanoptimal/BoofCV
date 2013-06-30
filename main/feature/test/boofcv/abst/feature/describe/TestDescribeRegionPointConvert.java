@@ -55,10 +55,6 @@ public class TestDescribeRegionPointConvert {
 		assertTrue(alg.requiresScale()==original.requiresScale());
 		assertTrue(alg.getDescriptionType()==TupleDesc_S8.class);
 
-		assertFalse(original.calledIsInBounds);
-		alg.isInBounds(2,3,4,3);
-		assertTrue(original.calledIsInBounds);
-
 	}
 
 	private static class DummyConvert implements ConvertTupleDesc<TupleDesc_F64,TupleDesc_S8> {
@@ -83,7 +79,6 @@ public class TestDescribeRegionPointConvert {
 	private static class DummyDescribe implements DescribeRegionPoint<ImageFloat32,TupleDesc_F64> {
 
 		public boolean calledImageSet = false;
-		public boolean calledIsInBounds = false;
 
 		@Override
 		public void setImage(ImageFloat32 image) {
@@ -100,16 +95,11 @@ public class TestDescribeRegionPointConvert {
 			return 5;
 		}
 
-		@Override
-		public boolean isInBounds(double x, double y, double orientation, double scale) {
-			calledIsInBounds = true;
-			return true;
-		}
 
 		@Override
-		public TupleDesc_F64 process(double x, double y, double orientation, double scale, TupleDesc_F64 ret) {
+		public boolean process(double x, double y, double orientation, double scale, TupleDesc_F64 ret) {
 			ret.value[0] = 1;
-			return ret;
+			return true;
 		}
 
 		@Override

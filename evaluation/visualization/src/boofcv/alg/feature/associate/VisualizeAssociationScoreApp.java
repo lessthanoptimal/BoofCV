@@ -226,8 +226,8 @@ public class VisualizeAssociationScoreApp<T extends ImageSingleBand, D extends I
 					yaw = orientation.compute(pt.x, pt.y);
 				}
 
-				if (describe.isInBounds(pt.x, pt.y, yaw, scale)) {
-					TupleDesc d = describe.process(pt.x, pt.y, yaw, scale, null);
+				TupleDesc d = describe.createDescription();
+				if ( describe.process(pt.x, pt.y, yaw, scale, d) ) {
 					descs.add(d);
 					locs.add(pt.copy());
 				}
@@ -243,8 +243,8 @@ public class VisualizeAssociationScoreApp<T extends ImageSingleBand, D extends I
 					yaw = orientation.compute(pt.x, pt.y);
 				}
 
-				if (describe.isInBounds(pt.x, pt.y, yaw, 1)) {
-					TupleDesc d = describe.process(pt.x, pt.y, yaw, 1, null);
+				TupleDesc d = describe.createDescription();
+				if (describe.process(pt.x, pt.y, yaw, 1, d)) {
 					descs.add(d);
 					locs.add(pt.copy());
 				}

@@ -21,7 +21,7 @@ package boofcv.abst.feature.detdesc;
 import boofcv.abst.feature.describe.DescriptorInfo;
 import boofcv.abst.feature.detect.interest.InterestPointDetector;
 import boofcv.struct.feature.TupleDesc;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageBase;
 
 /**
  * Interface for detecting and describing point features. By detecting and describing at the same time some algorithms
@@ -29,13 +29,13 @@ import boofcv.struct.image.ImageSingleBand;
  *
  * @author Peter Abeles
  */
-public interface DetectDescribePoint<T extends ImageSingleBand, Desc extends TupleDesc>
+public interface DetectDescribePoint<T extends ImageBase, Desc extends TupleDesc>
 		extends InterestPointDetector<T>, DescriptorInfo<Desc>
 {
 	/**
 	 * Returns the feature descriptor at the specified index.
 	 * </p>
-	 * WARNING: The returned data structure is recycled each time {@link #detect(boofcv.struct.image.ImageSingleBand)}
+	 * WARNING: The returned data structure is recycled each time {@link #detect(boofcv.struct.image.ImageBase)}
 	 * is called.  Create a copy if this is a problem.
 	 *
 	 * @param index Which feature

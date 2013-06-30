@@ -244,8 +244,8 @@ public class VisualizeAssociationMatchesApp<T extends ImageSingleBand, D extends
 					yaw = orientation.compute(pt.x, pt.y);
 				}
 
-				if (describe.isInBounds(pt.x, pt.y, yaw, scale)) {
-					describe.process(pt.x, pt.y, yaw, scale, descs.grow());
+				TupleDesc d = describe.createDescription();
+				if (describe.process(pt.x, pt.y, yaw, scale, d)) {
 					locs.add(pt.copy());
 				}
 			}
@@ -259,8 +259,8 @@ public class VisualizeAssociationMatchesApp<T extends ImageSingleBand, D extends
 					yaw = orientation.compute(pt.x, pt.y);
 				}
 
-				if (describe.isInBounds(pt.x, pt.y, yaw, 1)) {
-					describe.process(pt.x, pt.y, yaw, 1, descs.grow());
+				TupleDesc d = describe.createDescription();
+				if (describe.process(pt.x, pt.y, yaw, 1, d)) {
 					locs.add(pt.copy());
 				}
 			}

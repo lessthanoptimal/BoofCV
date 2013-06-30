@@ -26,8 +26,8 @@ import boofcv.factory.feature.detect.interest.FactoryInterestPoint;
 import boofcv.factory.feature.orientation.FactoryOrientationAlgs;
 import boofcv.struct.feature.SurfFeature;
 import boofcv.struct.feature.TupleDesc;
+import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.point.Point2D_F64;
 import org.junit.Test;
 
@@ -95,7 +95,7 @@ public class TestDetectDescribeFusion {
 	public static class DummyDetector implements InterestPointDetector {
 
 		@Override
-		public void detect(ImageSingleBand input) {}
+		public void detect(ImageBase input) {}
 
 		@Override
 		public int getNumberOfFeatures() {
@@ -133,7 +133,7 @@ public class TestDetectDescribeFusion {
 		int calls = 0;
 
 		@Override
-		public void setImage(ImageSingleBand image) {}
+		public void setImage(ImageBase image) {}
 
 		@Override
 		public TupleDesc createDescription() {
@@ -144,13 +144,8 @@ public class TestDetectDescribeFusion {
 		public int getDescriptionLength() {return 0;}
 
 		@Override
-		public boolean isInBounds(double x, double y, double orientation, double scale) {
+		public boolean process(double x, double y, double orientation, double scale, TupleDesc ret) {
 			return calls++ != 5;
-		}
-
-		@Override
-		public TupleDesc process(double x, double y, double orientation, double scale, TupleDesc ret) {
-			return createDescription();
 		}
 
 		@Override

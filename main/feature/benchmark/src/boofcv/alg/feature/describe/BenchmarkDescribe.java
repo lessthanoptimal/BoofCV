@@ -132,11 +132,10 @@ public class BenchmarkDescribe<I extends ImageSingleBand, D extends ImageSingleB
 		@Override
 		public void process() {
 			alg.setImage(image);
-			D d = null;
+			D d = alg.createDescription();
 			for( int i = 0; i < pts.length; i++ ) {
 				Point2D_I32 p = pts[i];
-				if( alg.isInBounds(p.x,p.y,yaws[i],scales[i]))
-					d=alg.process(p.x,p.y,yaws[i],scales[i],d);
+				alg.process(p.x,p.y,yaws[i],scales[i],d);
 			}
 		}
 

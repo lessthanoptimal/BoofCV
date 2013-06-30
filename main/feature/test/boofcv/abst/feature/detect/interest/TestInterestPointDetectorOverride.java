@@ -19,6 +19,7 @@
 package boofcv.abst.feature.detect.interest;
 
 import boofcv.abst.feature.orientation.OrientationImage;
+import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.point.Point2D_F64;
 import org.junit.Test;
@@ -101,7 +102,7 @@ public class TestInterestPointDetectorOverride {
 		}
 
 		@Override
-		public void detect(ImageSingleBand input) {}
+		public void detect(ImageBase input) {}
 
 		@Override
 		public int getNumberOfFeatures() {return 2;}
