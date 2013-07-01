@@ -57,11 +57,6 @@ public class DescribeRegionPointConvert<T extends ImageSingleBand,In extends Tup
 	}
 
 	@Override
-	public int getDescriptionLength() {
-		return original.getDescriptionLength();
-	}
-
-	@Override
 	public boolean process(double x, double y, double orientation, double scale, Out storage) {
 
 		if( !original.process(x,y,orientation,scale, this.storage) )

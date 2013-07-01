@@ -38,8 +38,6 @@ public class TestDescribeRegionPointConvert {
 		DescribeRegionPointConvert<ImageFloat32,TupleDesc_F64,TupleDesc_S8> alg =
 				new DescribeRegionPointConvert<ImageFloat32,TupleDesc_F64,TupleDesc_S8>(original,convert);
 
-		assertEquals(5,alg.getDescriptionLength());
-
 		TupleDesc_S8 found = alg.createDescription();
 		assertTrue(found.value.length==5);
 
@@ -89,12 +87,6 @@ public class TestDescribeRegionPointConvert {
 		public TupleDesc_F64 createDescription() {
 			return new TupleDesc_F64(5);
 		}
-
-		@Override
-		public int getDescriptionLength() {
-			return 5;
-		}
-
 
 		@Override
 		public boolean process(double x, double y, double orientation, double scale, TupleDesc_F64 ret) {

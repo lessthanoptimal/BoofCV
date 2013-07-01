@@ -48,11 +48,6 @@ public class WrapDescribePixelRegionNCC<T extends ImageSingleBand>
 	}
 
 	@Override
-	public int getDescriptionLength() {
-		return alg.getDescriptorLength();
-	}
-
-	@Override
 	public boolean process(double x, double y, double orientation, double scale, NccFeature storage )
 	{
 		if( storage == null )

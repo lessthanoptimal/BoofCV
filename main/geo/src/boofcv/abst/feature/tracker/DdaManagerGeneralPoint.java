@@ -93,11 +93,6 @@ public class DdaManagerGeneralPoint<I extends ImageSingleBand, D extends ImageSi
 	}
 
 	@Override
-	public int getDescriptionLength() {
-		return describe.getDescriptionLength();
-	}
-
-	@Override
 	public Class<Desc> getDescriptionType() {
 		return describe.getDescriptionType();
 	}

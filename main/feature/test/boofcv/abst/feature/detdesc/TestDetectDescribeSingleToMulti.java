@@ -42,7 +42,6 @@ public class TestDetectDescribeSingleToMulti {
 		assertTrue(helper.calledDetect);
 
 		assertTrue(TupleDesc_F64.class == alg.getDescriptionType());
-		assertEquals(10,alg.getDescriptionLength());
 		assertTrue(null != alg.createDescription());
 
 		assertEquals(1,alg.getNumberOfSets());
@@ -68,11 +67,6 @@ public class TestDetectDescribeSingleToMulti {
 		@Override
 		public Class<TupleDesc_F64> getDescriptionType() {
 			return TupleDesc_F64.class;
-		}
-
-		@Override
-		public int getDescriptionLength() {
-			return 10;
 		}
 
 		@Override

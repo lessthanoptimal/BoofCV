@@ -35,13 +35,6 @@ public interface DescriptorInfo<Desc extends TupleDesc> {
 	public Desc createDescription();
 
 	/**
-	 * Returns the number of elements in the descriptor
-	 *
-	 * @return Number of elements in the description
-	 */
-	public int getDescriptionLength();
-
-	/**
 	 * The type of region descriptor generated
 	 *
 	 * @return Returns the descriptor type.

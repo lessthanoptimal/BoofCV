@@ -58,11 +58,6 @@ public class WrapDescribeSurf<T extends ImageSingleBand, II extends ImageSingleB
 	}
 
 	@Override
-	public int getDescriptionLength() {
-		return surf.getDescriptionLength();
-	}
-
-	@Override
 	public boolean process(double x, double y, double orientation , double scale, SurfFeature storage) {
 
 		surf.describe(x,y, orientation, scale, storage);

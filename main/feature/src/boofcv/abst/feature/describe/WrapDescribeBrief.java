@@ -37,19 +37,13 @@ public class WrapDescribeBrief<T extends ImageSingleBand> implements DescribeReg
 
 	@Override
 	public TupleDesc_B createDescription() {
-		return new TupleDesc_B(getDescriptionLength());
+		return new TupleDesc_B(length);
 	}
 
 	@Override
 	public void setImage(T image) {
 		alg.setImage(image);
 	}
-
-	@Override
-	public int getDescriptionLength() {
-		return length;
-	}
-
 	@Override
 	public boolean process(double x, double y, double orientation, double scale, TupleDesc_B storage)
 	{

@@ -242,11 +242,6 @@ public class TestCombinedTrackerScalePoint {
 		public Class getDescriptionType() {return null;}
 
 		@Override
-		public int getDescriptionLength() {
-			return 0;
-		}
-
-		@Override
 		public void detect(ImageBase input) {}
 
 		@Override

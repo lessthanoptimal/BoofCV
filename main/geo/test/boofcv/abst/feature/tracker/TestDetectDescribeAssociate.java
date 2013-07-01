@@ -115,11 +115,6 @@ public class TestDetectDescribeAssociate {
 		}
 
 		@Override
-		public int getDescriptionLength() {
-			return 10;
-		}
-
-		@Override
 		public Class<TupleDesc_F64> getDescriptionType() {
 			return TupleDesc_F64.class;
 		}

@@ -122,11 +122,6 @@ public class DetectDescribeMultiFusion<T extends ImageSingleBand, TD extends Tup
 		return describe.getDescriptionType();
 	}
 
-	@Override
-	public int getDescriptionLength() {
-		return describe.getDescriptionLength();
-	}
-
 	/**
 	 * Storage for a set
 	 */
