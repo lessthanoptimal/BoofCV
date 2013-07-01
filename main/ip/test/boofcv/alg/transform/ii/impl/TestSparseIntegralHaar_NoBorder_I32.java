@@ -40,8 +40,8 @@ public class TestSparseIntegralHaar_NoBorder_I32
 
 		alg = new SparseIntegralHaar_NoBorder_I32(radius);
 
-		IntegralKernel kernelX = DerivativeIntegralImage.kernelHaarX(radius);
-		IntegralKernel kernelY = DerivativeIntegralImage.kernelHaarY(radius);
+		IntegralKernel kernelX = DerivativeIntegralImage.kernelHaarX(radius,null);
+		IntegralKernel kernelY = DerivativeIntegralImage.kernelHaarY(radius,null);
 		setKernels(kernelX,kernelY);
 	}
 

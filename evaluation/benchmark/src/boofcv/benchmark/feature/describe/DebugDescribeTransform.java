@@ -26,6 +26,7 @@ import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.feature.describe.FactoryDescribeRegionPoint;
 import boofcv.struct.feature.SurfFeature;
 import boofcv.struct.feature.TupleDesc_F64;
+import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 
@@ -40,7 +41,8 @@ import java.util.Random;
 public class DebugDescribeTransform {
 
 	public static <T extends ImageSingleBand> void doStuff( Class<T> imageType ) {
-		DescribeRegionPoint<T,SurfFeature> alg =  FactoryDescribeRegionPoint.surfFast(null, imageType);
+		DescribeRegionPoint<T,SurfFeature> alg =  FactoryDescribeRegionPoint.surfFast(null,
+				ImageDataType.single(imageType));
 
 		int r = 8;
 		int w = r*2+1;

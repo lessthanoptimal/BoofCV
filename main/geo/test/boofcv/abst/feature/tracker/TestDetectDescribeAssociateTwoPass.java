@@ -60,7 +60,8 @@ public class TestDetectDescribeAssociateTwoPass extends StandardPointTrackerTwoP
 		AssociateDescription2D<TupleDesc_B> association =
 				new AssociateMaxDistanceNaive<TupleDesc_B>(score,true,400,20);
 
-		DescribeRegionPoint<ImageFloat32,TupleDesc_B> describe = new WrapDescribeBrief<ImageFloat32>(brief);
+		DescribeRegionPoint<ImageFloat32,TupleDesc_B> describe =
+				new WrapDescribeBrief<ImageFloat32>(brief,ImageFloat32.class);
 
 		EasyGeneralFeatureDetector<ImageFloat32,ImageFloat32> easy = new
 				EasyGeneralFeatureDetector<ImageFloat32,ImageFloat32>(corner,ImageFloat32.class,ImageFloat32.class);

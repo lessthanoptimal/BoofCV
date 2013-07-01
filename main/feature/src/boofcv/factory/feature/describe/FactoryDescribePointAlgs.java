@@ -52,13 +52,19 @@ public class FactoryDescribePointAlgs {
 	}
 
 	public static <T extends ImageSingleBand>
-	DescribePointSurf<T> surfStability(ConfigSurfDescribe.Stablility config, Class<T> imageType) {
+	DescribePointSurfMod<T> surfStability(ConfigSurfDescribe.Stablility config, Class<T> imageType) {
 		if( config == null )
 			config = new ConfigSurfDescribe.Stablility();
 		config.checkValidity();
 
 		return new DescribePointSurfMod<T>(config.widthLargeGrid,config.widthSubRegion,config.widthSample,
 				config.overLap,config.sigmaLargeGrid,config.sigmaSubRegion,config.useHaar,imageType);
+	}
+
+	public static <T extends ImageSingleBand>
+	DescribePointSurfMultiSpectral<T> surfColor(DescribePointSurf<T> describe , int numBands ) {
+
+		return new DescribePointSurfMultiSpectral<T>(describe,numBands);
 	}
 
 	public static <T extends ImageSingleBand>

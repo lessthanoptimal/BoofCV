@@ -16,134 +16,116 @@
  * limitations under the License.
  */
 
-package boofcv.abst.feature.detdesc;
+package boofcv.alg.feature.detdesc;
 
 import boofcv.abst.feature.orientation.OrientationIntegral;
-import boofcv.alg.feature.describe.DescribePointSurf;
+import boofcv.alg.feature.describe.DescribePointSurfMultiSpectral;
 import boofcv.alg.feature.detect.interest.FastHessianFeatureDetector;
-import boofcv.alg.transform.ii.GIntegralImageOps;
 import boofcv.struct.GrowQueue_F64;
 import boofcv.struct.feature.ScalePoint;
 import boofcv.struct.feature.SurfFeature;
 import boofcv.struct.feature.SurfFeatureQueue;
 import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.MultiSpectral;
 import georegression.struct.point.Point2D_F64;
 
 import java.util.List;
 
 /**
- * Wrapper around SURF algorithms for {@link DetectDescribePoint}.
+ * Computes a color SURF descriptor from a {@link boofcv.struct.image.MultiSpectral} image.  Features are detected,
+ * orientation estimated, and laplacian sign computed using a gray scale image.  The gray scale image is found by
+ * computing the average across all bands for each pixel.  A descriptor is computed inside band individually
+ * and stored in a descriptor which is N*length long.  N = number of bands and length = number of
+ * elements in normal descriptor.
  *
- * @link FastHessianFeatureDetector
- * @link OrientationIntegral
- * @link DescribePointSurf
+ * @see boofcv.alg.feature.describe.DescribePointSurfMultiSpectral
  *
- * @param <T> Input image type
- * @param <II> Integral image type
+ * @param <II> Type of integral image
  *
  * @author Peter Abeles
  */
-public class WrapDetectDescribeSurf
-		<T extends ImageSingleBand, II extends ImageSingleBand>
-	implements DetectDescribePoint<T,SurfFeature>
+public class DetectDescribeSurfMultiSpectral<II extends ImageSingleBand>
 {
 	// SURF algorithms
 	private FastHessianFeatureDetector<II> detector;
 	private OrientationIntegral<II> orientation;
-	private DescribePointSurf<II> describe;
+	private DescribePointSurfMultiSpectral<II> describe;
 
-	// storage for integral image
-	private II ii;
 
 	// storage for computed features
-	private SurfFeatureQueue features;
+	private SurfFeatureQueue descriptions;
 	// detected scale points
 	private List<ScalePoint> foundPoints;
 	// orientation of features
 	private GrowQueue_F64 featureAngles = new GrowQueue_F64(10);
 
-	public WrapDetectDescribeSurf(FastHessianFeatureDetector<II> detector,
-								  OrientationIntegral<II> orientation,
-								  DescribePointSurf<II> describe)
+	public DetectDescribeSurfMultiSpectral(FastHessianFeatureDetector<II> detector,
+										   OrientationIntegral<II> orientation,
+										   DescribePointSurfMultiSpectral<II> describe )
 	{
 		this.detector = detector;
 		this.orientation = orientation;
 		this.describe = describe;
 
-		features = new SurfFeatureQueue(describe.getDescriptionLength());
+		descriptions = new SurfFeatureQueue(describe.getDescriptorLength());
 	}
 
-	@Override
 	public SurfFeature createDescription() {
 		return describe.createDescription();
 	}
 
-	@Override
 	public SurfFeature getDescription(int index) {
-		return features.get(index);
+		return descriptions.get(index);
 	}
 
-	@Override
-	public Class<SurfFeature> getDescriptionType() {
-		return SurfFeature.class;
-	}
+	/**
+	 * Detects and describes features inside provide images.  All images are integral images.
+	 *
+	 * @param grayII Gray-scale integral image
+	 * @param colorII Color integral image
+	 */
+	public void detect( II grayII , MultiSpectral<II> colorII ) {
 
-	@Override
-	public void detect(T input) {
-		if( ii != null ) {
-			ii.reshape(input.width,input.height);
-		}
+		orientation.setImage(grayII);
+		describe.setImage(grayII,colorII);
 
-		// compute integral image
-		ii = GIntegralImageOps.transform(input, ii);
-		orientation.setImage(ii);
-		describe.setImage(ii);
-		features.reset();
+		descriptions.reset();
 		featureAngles.reset();
 
 		// detect features
-		detector.detect(ii);
+		detector.detect(grayII);
 
 		// describe the found interest points
 		foundPoints = detector.getFoundPoints();
 
 		for( int i = 0; i < foundPoints.size(); i++ ) {
 			ScalePoint p = foundPoints.get(i);
-
 			orientation.setScale(p.scale);
 			double angle = orientation.compute(p.x,p.y);
-			describe.describe(p.x,p.y, angle, p.scale, features.grow());
+
+			describe.describe(p.x, p.y, angle, p.scale, descriptions.grow());
+
 			featureAngles.push(angle);
 		}
 	}
 
-	@Override
+	public DescribePointSurfMultiSpectral<II> getDescribe() {
+		return describe;
+	}
+
 	public int getNumberOfFeatures() {
 		return foundPoints.size();
 	}
 
-	@Override
 	public Point2D_F64 getLocation(int featureIndex) {
 		return foundPoints.get(featureIndex);
 	}
 
-	@Override
 	public double getScale(int featureIndex) {
 		return foundPoints.get(featureIndex).scale;
 	}
 
-	@Override
 	public double getOrientation(int featureIndex) {
 		return featureAngles.get(featureIndex);
-	}
-
-	@Override
-	public boolean hasScale() {
-		return true;
-	}
-
-	@Override
-	public boolean hasOrientation() {
-		return true;
 	}
 }

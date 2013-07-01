@@ -65,7 +65,7 @@ public class TestDdaManagerDetectDescribePoint extends StandardPointTracker<Imag
 
 		DetectDescribeFusion<ImageFloat32,TupleDesc_B> fused =
 				new DetectDescribeFusion<ImageFloat32,TupleDesc_B>(
-						detector,null,new WrapDescribeBrief<ImageFloat32>(brief));
+						detector,null,new WrapDescribeBrief<ImageFloat32>(brief,ImageFloat32.class));
 
 		DdaManagerDetectDescribePoint<ImageFloat32,TupleDesc_B> manager;
 		manager = new DdaManagerDetectDescribePoint<ImageFloat32,TupleDesc_B>(fused);

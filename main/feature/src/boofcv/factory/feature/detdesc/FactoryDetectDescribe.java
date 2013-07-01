@@ -22,17 +22,17 @@ import boofcv.abst.feature.describe.ConfigSiftDescribe;
 import boofcv.abst.feature.describe.ConfigSiftScaleSpace;
 import boofcv.abst.feature.describe.ConfigSurfDescribe;
 import boofcv.abst.feature.describe.DescribeRegionPoint;
-import boofcv.abst.feature.detdesc.DetectDescribeFusion;
-import boofcv.abst.feature.detdesc.DetectDescribePoint;
-import boofcv.abst.feature.detdesc.WrapDetectDescribeSift;
-import boofcv.abst.feature.detdesc.WrapDetectDescribeSurf;
+import boofcv.abst.feature.detdesc.*;
 import boofcv.abst.feature.detect.interest.ConfigFastHessian;
 import boofcv.abst.feature.detect.interest.ConfigSiftDetector;
 import boofcv.abst.feature.detect.interest.InterestPointDetector;
 import boofcv.abst.feature.orientation.*;
 import boofcv.alg.feature.describe.DescribePointSift;
 import boofcv.alg.feature.describe.DescribePointSurf;
+import boofcv.alg.feature.describe.DescribePointSurfMod;
+import boofcv.alg.feature.describe.DescribePointSurfMultiSpectral;
 import boofcv.alg.feature.detdesc.DetectDescribeSift;
+import boofcv.alg.feature.detdesc.DetectDescribeSurfMultiSpectral;
 import boofcv.alg.feature.detect.interest.FastHessianFeatureDetector;
 import boofcv.alg.feature.detect.interest.SiftDetector;
 import boofcv.alg.feature.detect.interest.SiftImageScaleSpace;
@@ -43,6 +43,8 @@ import boofcv.factory.feature.detect.interest.FactoryInterestPointAlgs;
 import boofcv.factory.feature.orientation.FactoryOrientationAlgs;
 import boofcv.struct.feature.SurfFeature;
 import boofcv.struct.feature.TupleDesc;
+import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 
@@ -89,6 +91,7 @@ public class FactoryDetectDescribe {
 	 * <p>
 	 * Creates a SURF descriptor.  SURF descriptors are invariant to illumination, orientation, and scale.
 	 * BoofCV provides two variants. Creates a variant which is designed for speed at the cost of some stability.
+	 * Different descriptors are created for color and gray-scale images.
 	 * </p>
 	 *
 	 * <p>
@@ -97,6 +100,7 @@ public class FactoryDetectDescribe {
 	 *
 	 * @see FastHessianFeatureDetector
 	 * @see DescribePointSurf
+	 * @see DescribePointSurfMultiSpectral
 	 *
 	 * @param configDetector		Configuration for SURF detector
 	 * @param configDesc			Configuration for SURF descriptor
@@ -107,46 +111,77 @@ public class FactoryDetectDescribe {
 	DetectDescribePoint<T,SurfFeature> surfFast( ConfigFastHessian configDetector ,
 												 ConfigSurfDescribe.Speed configDesc,
 												 ConfigAverageIntegral configOrientation,
-												 Class<T> imageType) {
+												 ImageDataType<T> imageType) {
 
-		Class<II> integralType = GIntegralImageOps.getIntegralType(imageType);
-		OrientationIntegral<II> orientation = FactoryOrientationAlgs.average_ii(configOrientation, integralType);
-		DescribePointSurf<II> describe = FactoryDescribePointAlgs.surfSpeed(configDesc, integralType);
+		Class bandType = imageType.getDataType().getImageClass();
+		Class<II> integralType = GIntegralImageOps.getIntegralType(bandType);
+
 		FastHessianFeatureDetector<II> detector = FactoryInterestPointAlgs.fastHessian(configDetector);
+		DescribePointSurf<II> describe = FactoryDescribePointAlgs.surfSpeed(configDesc, integralType);
+		OrientationIntegral<II> orientation = FactoryOrientationAlgs.average_ii(configOrientation, integralType);
 
-		return new WrapDetectDescribeSurf<T,II>( detector, orientation, describe );
+		if( imageType.getFamily() == ImageDataType.Family.SINGLE_BAND ) {
+			return new WrapDetectDescribeSurf( detector, orientation, describe );
+		} else if( imageType.getFamily() == ImageDataType.Family.MULTI_SPECTRAL ) {
+			DescribePointSurfMultiSpectral<II> describeMulti =
+					new DescribePointSurfMultiSpectral<II>(describe,imageType.getNumBands());
+
+			DetectDescribeSurfMultiSpectral<II> deteDesc =
+					new DetectDescribeSurfMultiSpectral<II>(detector,orientation,describeMulti);
+
+			return new SurfMultiSpectral_to_DetectDescribePoint( deteDesc,bandType,integralType );
+		} else {
+			throw new IllegalArgumentException("Image type not supported");
+		}
 	}
 
 	/**
 	 * <p>
 	 * Creates a SURF descriptor.  SURF descriptors are invariant to illumination, orientation, and scale.
-	 * BoofCV provides two variants. Creates a variant which is designed for stability..
+	 * BoofCV provides two variants. Creates a variant which is designed for stability. Different descriptors are
+	 * created for color and gray-scale images.
 	 * </p>
 	 *
 	 * <p>
 	 * [1] Add tech report when its finished.  See SURF performance web page for now.
 	 * </p>
 	 *
+	 * @see DescribePointSurfMultiSpectral
 	 * @see FastHessianFeatureDetector
-	 * @see DescribePointSurf
+	 * @see boofcv.alg.feature.describe.DescribePointSurfMod
 	 *
 	 * @param configDetector Configuration for SURF detector.  Null for default.
 	 * @param configDescribe Configuration for SURF descriptor.  Null for default.
 	 * @param configOrientation Configuration for region orientation.  Null for default.
+	 * @param imageType Specify type of input image.  Gray and color images produce different descriptors.
 	 * @return SURF detector and descriptor
 	 */
-	public static <T extends ImageSingleBand, II extends ImageSingleBand>
+	public static <T extends ImageBase, II extends ImageSingleBand>
 	DetectDescribePoint<T,SurfFeature> surfStable( ConfigFastHessian configDetector,
 												   ConfigSurfDescribe.Stablility configDescribe,
 												   ConfigSlidingIntegral configOrientation,
-												   Class<T> imageType) {
+												   ImageDataType<T> imageType ) {
 
-		Class<II> integralType = GIntegralImageOps.getIntegralType(imageType);
+		Class bandType = imageType.getDataType().getImageClass();
+		Class<II> integralType = GIntegralImageOps.getIntegralType(bandType);
+
 		FastHessianFeatureDetector<II> detector = FactoryInterestPointAlgs.fastHessian(configDetector);
-		DescribePointSurf<II> describe = FactoryDescribePointAlgs.surfStability(configDescribe, integralType);
+		DescribePointSurfMod<II> describe = FactoryDescribePointAlgs.surfStability(configDescribe, integralType);
 		OrientationIntegral<II> orientation = FactoryOrientationAlgs.sliding_ii(configOrientation, integralType);
 
-		return new WrapDetectDescribeSurf<T,II>( detector, orientation, describe );
+		if( imageType.getFamily() == ImageDataType.Family.SINGLE_BAND ) {
+			return new WrapDetectDescribeSurf( detector, orientation, describe );
+		} else if( imageType.getFamily() == ImageDataType.Family.MULTI_SPECTRAL ) {
+			DescribePointSurfMultiSpectral<II> describeMulti =
+					new DescribePointSurfMultiSpectral<II>(describe,imageType.getNumBands());
+
+			DetectDescribeSurfMultiSpectral<II> deteDesc =
+					new DetectDescribeSurfMultiSpectral<II>(detector,orientation,describeMulti);
+
+			return new SurfMultiSpectral_to_DetectDescribePoint( deteDesc,bandType,integralType );
+		} else {
+			throw new IllegalArgumentException("Image type not supported");
+		}
 	}
 
 	/**

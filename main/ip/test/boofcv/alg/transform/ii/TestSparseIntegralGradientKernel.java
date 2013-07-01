@@ -36,8 +36,8 @@ public class TestSparseIntegralGradientKernel
 	public TestSparseIntegralGradientKernel() {
 		super(ImageFloat32.class, ImageFloat32.class,-radius-1,-radius-1,radius,radius);
 
-		IntegralKernel kernelX = DerivativeIntegralImage.kernelDerivX(radius);
-		IntegralKernel kernelY = DerivativeIntegralImage.kernelDerivY(radius);
+		IntegralKernel kernelX = DerivativeIntegralImage.kernelDerivX(radius,null);
+		IntegralKernel kernelY = DerivativeIntegralImage.kernelDerivY(radius,null);
 
 		alg = new SparseIntegralGradientKernel<ImageFloat32>(kernelX,kernelY);
 	}
@@ -50,8 +50,8 @@ public class TestSparseIntegralGradientKernel
 
 	@Override
 	protected void imageGradient(ImageFloat32 input, ImageFloat32 derivX, ImageFloat32 derivY) {
-		IntegralKernel kernelX = DerivativeIntegralImage.kernelDerivX(radius);
-		IntegralKernel kernelY = DerivativeIntegralImage.kernelDerivY(radius);
+		IntegralKernel kernelX = DerivativeIntegralImage.kernelDerivX(radius,null);
+		IntegralKernel kernelY = DerivativeIntegralImage.kernelDerivY(radius,null);
 
 		GIntegralImageOps.convolve(input,kernelX,derivX);
 		GIntegralImageOps.convolve(input,kernelY,derivY);

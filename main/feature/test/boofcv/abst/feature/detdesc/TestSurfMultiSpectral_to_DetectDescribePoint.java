@@ -22,19 +22,21 @@ import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
 import boofcv.struct.feature.SurfFeature;
 import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.MultiSpectral;
 
 /**
  * @author Peter Abeles
  */
-public class TestWrapDetectDescribeSurf extends GenericTestsDetectDescribePoint<ImageFloat32,SurfFeature>
+public class TestSurfMultiSpectral_to_DetectDescribePoint extends
+		GenericTestsDetectDescribePoint<MultiSpectral<ImageFloat32>,SurfFeature>
 {
 
-	public TestWrapDetectDescribeSurf() {
-		super(true, true, ImageDataType.single(ImageFloat32.class), SurfFeature.class);
+	public TestSurfMultiSpectral_to_DetectDescribePoint() {
+		super(true, true, ImageDataType.ms(3,ImageFloat32.class), SurfFeature.class);
 	}
 
 	@Override
-	public DetectDescribePoint<ImageFloat32, SurfFeature> createDetDesc() {
-		return FactoryDetectDescribe.surfStable(null,null,null, ImageDataType.single(ImageFloat32.class));
+	public DetectDescribePoint<MultiSpectral<ImageFloat32>, SurfFeature> createDetDesc() {
+		return FactoryDetectDescribe.surfStable(null, null, null, imageType);
 	}
 }

@@ -63,7 +63,7 @@ public class TestPointTrackerCombined extends StandardPointTracker<ImageFloat32>
 
 		PointTracker<ImageFloat32> pointTracker = FactoryPointTracker.combined(
 				detector, null,
-				new WrapDescribeBrief<ImageFloat32>(brief),
+				new WrapDescribeBrief<ImageFloat32>(brief,ImageFloat32.class),
 				association, 2, new int[]{1, 2, 4}, 20, ImageFloat32.class);
 
 		return pointTracker;

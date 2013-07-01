@@ -24,16 +24,19 @@ import boofcv.alg.feature.describe.brief.FactoryBriefDefinition;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.alg.transform.ii.GIntegralImageOps;
-import boofcv.core.image.GeneralizedImageOps;
+import boofcv.core.image.GConvertImage;
 import boofcv.factory.feature.describe.FactoryDescribePointAlgs;
+import boofcv.factory.feature.describe.FactoryDescribeRegionPoint;
 import boofcv.factory.filter.blur.FactoryBlurFilter;
 import boofcv.misc.Performer;
 import boofcv.misc.PerformerBase;
 import boofcv.misc.ProfileOperation;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.feature.TupleDesc_B;
+import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.MultiSpectral;
 import georegression.struct.point.Point2D_I32;
 
 import java.util.Random;
@@ -52,7 +55,8 @@ public class BenchmarkDescribe<I extends ImageSingleBand, D extends ImageSingleB
 	final static int width = 640;
 	final static int height = 480;
 
-	I image;
+	I gray;
+	MultiSpectral<I> colorMS;
 
 	Point2D_I32 pts[];
 	double scales[];
@@ -69,9 +73,10 @@ public class BenchmarkDescribe<I extends ImageSingleBand, D extends ImageSingleB
 		derivType = GImageDerivativeOps.getDerivativeType(imageType);
 		integralType = GIntegralImageOps.getIntegralType(imageType);
 
-		image = GeneralizedImageOps.createSingleBand(imageType, width, height);
+		colorMS = new MultiSpectral<I>(imageType,width,height,3);
+		GImageMiscOps.fillUniform(colorMS, rand, 0, 100);
 
-		GImageMiscOps.fillUniform(image, rand, 0, 100);
+		gray = GConvertImage.average(colorMS,gray);
 
 		pts = new Point2D_I32[ NUM_POINTS ];
 		scales = new double[ NUM_POINTS ];
@@ -94,7 +99,7 @@ public class BenchmarkDescribe<I extends ImageSingleBand, D extends ImageSingleB
 
 		@Override
 		public void process() {
-			alg.setImage(image);
+			alg.setImage(gray);
 			TupleDesc_B f = alg.createFeature();
 			for( int i = 0; i < pts.length; i++ ) {
 				Point2D_I32 p = pts[i];
@@ -110,7 +115,7 @@ public class BenchmarkDescribe<I extends ImageSingleBand, D extends ImageSingleB
 
 		@Override
 		public void process() {
-			alg.setImage(image);
+			alg.setImage(gray);
 			TupleDesc_B f = alg.createFeature();
 			for( int i = 0; i < pts.length; i++ ) {
 				Point2D_I32 p = pts[i];
@@ -121,18 +126,22 @@ public class BenchmarkDescribe<I extends ImageSingleBand, D extends ImageSingleB
 
 	public class Describe<D extends TupleDesc> implements Performer {
 
-		DescribeRegionPoint<I,D> alg;
+		DescribeRegionPoint alg;
 		String name;
 
-		public Describe(String name, DescribeRegionPoint<I,D> alg) {
+		public Describe(String name, DescribeRegionPoint alg) {
 			this.alg = alg;
 			this.name = name;
 		}
 
 		@Override
 		public void process() {
-			alg.setImage(image);
-			D d = alg.createDescription();
+			if( alg.getImageType().getFamily() == ImageDataType.Family.SINGLE_BAND )
+				alg.setImage(gray);
+			else
+				alg.setImage(colorMS);
+
+			D d = (D)alg.createDescription();
 			for( int i = 0; i < pts.length; i++ ) {
 				Point2D_I32 p = pts[i];
 				alg.process(p.x,p.y,yaws[i],scales[i],d);
@@ -152,8 +161,15 @@ public class BenchmarkDescribe<I extends ImageSingleBand, D extends ImageSingleB
 		ConfigSurfDescribe.Speed surfSpeed = new ConfigSurfDescribe.Speed();
 		ConfigSurfDescribe.Stablility surfStable = new ConfigSurfDescribe.Stablility();
 
-//		ProfileOperation.printOpsPerSec(new Describe("SURF", FactoryDescribeRegionPoint.<I,II>surfFast(surfSpeed, imageType)),TEST_TIME);
-//		ProfileOperation.printOpsPerSec(new Describe("MSURF", FactoryDescribeRegionPoint.<I,II>surfStable(surfStable, imageType)),TEST_TIME);
+		ProfileOperation.printOpsPerSec(new Describe("SURF-F",
+				FactoryDescribeRegionPoint.<I,II>surfFast(surfSpeed, ImageDataType.single(imageType))),TEST_TIME);
+		ProfileOperation.printOpsPerSec(new Describe("SURF-F Color",
+				FactoryDescribeRegionPoint.surfFast(surfSpeed, ImageDataType.ms(3,imageType))),TEST_TIME);
+		ProfileOperation.printOpsPerSec(new Describe("SURF-S",
+				FactoryDescribeRegionPoint.<I,II>surfStable(surfStable,  ImageDataType.single(imageType))),TEST_TIME);
+		ProfileOperation.printOpsPerSec(new Describe("SURF-S Color",
+				FactoryDescribeRegionPoint.surfStable(surfStable,  ImageDataType.ms(3, imageType))),TEST_TIME);
+
 //		if( imageType == ImageFloat32.class )
 //			ProfileOperation.printOpsPerSec(new Describe("SIFT", FactoryDescribeRegionPoint.sift(null,null)),TEST_TIME);
 		ProfileOperation.printOpsPerSec(new Brief512(),TEST_TIME);

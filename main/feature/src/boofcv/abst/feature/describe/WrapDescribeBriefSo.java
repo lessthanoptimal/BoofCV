@@ -20,6 +20,7 @@ package boofcv.abst.feature.describe;
 
 import boofcv.alg.feature.describe.DescribePointBriefSO;
 import boofcv.struct.feature.TupleDesc_B;
+import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageSingleBand;
 
 /**
@@ -29,10 +30,12 @@ public class WrapDescribeBriefSo<T extends ImageSingleBand> implements DescribeR
 
 	int length;
 	DescribePointBriefSO<T> alg;
+	ImageDataType<T> imageType;
 
-	public WrapDescribeBriefSo(DescribePointBriefSO<T> alg ) {
+	public WrapDescribeBriefSo(DescribePointBriefSO<T> alg , Class<T> imageType ) {
 		this.alg = alg;
 		this.length = alg.getDefinition().getLength();
+		this.imageType = ImageDataType.single(imageType);
 	}
 
 	@Override
@@ -60,6 +63,11 @@ public class WrapDescribeBriefSo<T extends ImageSingleBand> implements DescribeR
 	@Override
 	public boolean requiresOrientation() {
 		return true;
+	}
+
+	@Override
+	public ImageDataType<T> getImageType() {
+		return imageType;
 	}
 
 	@Override

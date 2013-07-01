@@ -20,19 +20,20 @@ package boofcv.abst.feature.describe;
 
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageDataType;
 
 
 /**
- * Describes the region around a point in the image.  The number of features used to compute the descriptor
- * is algorithm and scale dependent. The object's scale is defined as the scale according to scale-space theory.
- * Thus, scale is the magnitude of Gaussian blur when the feature was detected.
+ * Computes a description of the local region around a point.  Scale sample regions size relative to an implementation
+ * specific standard.  This if a region is sampled with a radius of 10 pixels at scale of one, it will be 25 pixels
+ * at a scale of 2.5.  Orientation rotates the sample points.  Exactly how and if scale and orientation are used is
+ * implementation specific.
  *
  * @author Peter Abeles
  */
 public interface DescribeRegionPoint<T extends ImageBase, Desc extends TupleDesc>
 	extends DescriptorInfo<Desc>
 {
-
 	/**
 	 * Specified the image which is to be processed.
 	 *
@@ -72,4 +73,11 @@ public interface DescribeRegionPoint<T extends ImageBase, Desc extends TupleDesc
 	 * @return if orientation needs to be provided or not
 	 */
 	public boolean requiresOrientation();
+
+	/**
+	 * Description of the type of image it can process
+	 *
+	 * @return ImageDataType
+	 */
+	public ImageDataType<T> getImageType();
 }

@@ -38,10 +38,7 @@ import boofcv.io.image.UtilImageIO;
 import boofcv.misc.PerformerBase;
 import boofcv.misc.ProfileOperation;
 import boofcv.struct.feature.SurfFeature;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSInt32;
-import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.*;
 import georegression.struct.line.LineParametric2D_F32;
 
 import java.util.List;
@@ -161,7 +158,8 @@ public class BenchmarkForOpenCV<T extends ImageSingleBand, D extends ImageSingle
 
 		public SURF() {
 			// the fast implementation is closer to OpenCV's SURF implementation for stability
-			detector = FactoryDetectDescribe.surfFast(new ConfigFastHessian(20, 2, -1, 1, 9, 4, 4), null, null, imageType);
+			detector = FactoryDetectDescribe.surfFast(new ConfigFastHessian(20, 2, -1, 1, 9, 4, 4), null, null,
+					ImageDataType.single(imageType));
 		}
 
 		@Override

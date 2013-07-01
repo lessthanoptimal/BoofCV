@@ -40,8 +40,8 @@ public class TestSparseIntegralGradient_NoBorder_F32
 		super(ImageFloat32.class, ImageFloat32.class,-radius-1,-radius-1,radius,radius);
 
 		alg = new SparseIntegralGradient_NoBorder_F32(size/2);
-		IntegralKernel kernelX = DerivativeIntegralImage.kernelDerivX(radius);
-		IntegralKernel kernelY = DerivativeIntegralImage.kernelDerivY(radius);
+		IntegralKernel kernelX = DerivativeIntegralImage.kernelDerivX(radius,null);
+		IntegralKernel kernelY = DerivativeIntegralImage.kernelDerivY(radius,null);
 
 		setKernels(kernelX, kernelY);
 	}

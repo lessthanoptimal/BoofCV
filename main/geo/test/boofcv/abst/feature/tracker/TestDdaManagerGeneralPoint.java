@@ -60,7 +60,8 @@ public class TestDdaManagerGeneralPoint extends StandardPointTracker<ImageFloat3
 		AssociateDescription2D<TupleDesc_B> association =
 				new AssociateDescTo2D<TupleDesc_B>(FactoryAssociation.greedy(score,400, true));
 
-		DescribeRegionPoint<ImageFloat32,TupleDesc_B> describe = new WrapDescribeBrief<ImageFloat32>(brief);
+		DescribeRegionPoint<ImageFloat32,TupleDesc_B> describe =
+				new WrapDescribeBrief<ImageFloat32>(brief,ImageFloat32.class);
 
 		EasyGeneralFeatureDetector<ImageFloat32,ImageFloat32> easy = new
 				EasyGeneralFeatureDetector<ImageFloat32,ImageFloat32>(corner,ImageFloat32.class,ImageFloat32.class);

@@ -20,6 +20,7 @@ package boofcv.abst.feature.describe;
 
 import boofcv.alg.feature.describe.DescribePointPixelRegionNCC;
 import boofcv.struct.feature.NccFeature;
+import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageSingleBand;
 
 /**
@@ -32,9 +33,11 @@ public class WrapDescribePixelRegionNCC<T extends ImageSingleBand>
 		implements DescribeRegionPoint<T,NccFeature>
 {
 	DescribePointPixelRegionNCC<T> alg;
+	ImageDataType<T> imageType;
 
-	public WrapDescribePixelRegionNCC(DescribePointPixelRegionNCC<T> alg) {
+	public WrapDescribePixelRegionNCC(DescribePointPixelRegionNCC<T> alg , Class<T> imageType) {
 		this.alg = alg;
+		this.imageType = ImageDataType.single(imageType);
 	}
 
 	@Override
@@ -69,6 +72,11 @@ public class WrapDescribePixelRegionNCC<T extends ImageSingleBand>
 	@Override
 	public boolean requiresOrientation() {
 		return false;
+	}
+
+	@Override
+	public ImageDataType<T> getImageType() {
+		return imageType;
 	}
 
 	@Override

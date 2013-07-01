@@ -22,6 +22,7 @@ import boofcv.alg.feature.describe.DescribePointPixelRegion;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.feature.TupleDesc_F32;
 import boofcv.struct.feature.TupleDesc_U8;
+import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageSingleBand;
 
 /**
@@ -34,9 +35,11 @@ public class WrapDescribePixelRegion<T extends ImageSingleBand, D extends TupleD
 		implements DescribeRegionPoint<T,D>
 {
 	DescribePointPixelRegion<T,D> alg;
+	ImageDataType<T> imageType;
 
-	public WrapDescribePixelRegion(DescribePointPixelRegion<T, D> alg) {
+	public WrapDescribePixelRegion(DescribePointPixelRegion<T, D> alg , Class<T> imageType) {
 		this.alg = alg;
+		this.imageType = ImageDataType.single(imageType);
 	}
 
 	public D createDescription() {
@@ -68,6 +71,11 @@ public class WrapDescribePixelRegion<T extends ImageSingleBand, D extends TupleD
 	@Override
 	public boolean requiresOrientation() {
 		return false;
+	}
+
+	@Override
+	public ImageDataType<T> getImageType() {
+		return imageType;
 	}
 
 	@Override

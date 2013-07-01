@@ -10,7 +10,11 @@ Version : Alpha 0.16
   * describe now returns true or false
   * removed isInBounds()
   * removed getDescriptionLength() since it is contained in the description itself
+  * added getImageType()
 - Feature detection and describing related classes now extend ImageBase to allow support of color image processing
+- SURF
+  * Laplacian sign calculation doesn't declare new memory for every single feature any more
+  * Added a color SURF descriptor
 
 - TODO OpenTLD
 - TODO automate high level tests

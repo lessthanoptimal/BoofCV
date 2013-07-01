@@ -21,6 +21,7 @@ package boofcv.abst.feature.describe;
 import boofcv.alg.feature.describe.DescribePointSurf;
 import boofcv.alg.transform.ii.GIntegralImageOps;
 import boofcv.struct.feature.SurfFeature;
+import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageSingleBand;
 
 
@@ -35,10 +36,12 @@ public class WrapDescribeSurf<T extends ImageSingleBand, II extends ImageSingleB
 	// integral image
 	II ii;
 
+	ImageDataType<T> imageType;
 
-	public WrapDescribeSurf(DescribePointSurf<II> surf )
+	public WrapDescribeSurf(DescribePointSurf<II> surf , Class<T> imageType)
 	{
 		this.surf = surf;
+		this.imageType = ImageDataType.single(imageType);
 	}
 
 	@Override
@@ -73,6 +76,11 @@ public class WrapDescribeSurf<T extends ImageSingleBand, II extends ImageSingleB
 	@Override
 	public boolean requiresOrientation() {
 		return true;
+	}
+
+	@Override
+	public ImageDataType<T> getImageType() {
+		return imageType;
 	}
 
 	@Override

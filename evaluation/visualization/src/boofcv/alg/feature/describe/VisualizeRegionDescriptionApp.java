@@ -30,8 +30,10 @@ import boofcv.gui.image.ShowImages;
 import boofcv.io.PathLabel;
 import boofcv.struct.BoofDefaults;
 import boofcv.struct.feature.TupleDesc;
+import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.MultiSpectral;
 import georegression.struct.point.Point2D_I32;
 
 import javax.swing.*;
@@ -51,9 +53,9 @@ public class VisualizeRegionDescriptionApp <T extends ImageSingleBand, D extends
 	boolean processedImage = false;
 
 	Class<T> imageType;
-	T input;
+	BufferedImage image;
 
-	DescribeRegionPoint<T,TupleDesc> describe;
+	DescribeRegionPoint describe;
 
 	SelectRegionDescriptionPanel panel = new SelectRegionDescriptionPanel();
 
@@ -69,7 +71,8 @@ public class VisualizeRegionDescriptionApp <T extends ImageSingleBand, D extends
 
 		this.imageType = imageType;
 
-		addAlgorithm(0,"SURF", FactoryDescribeRegionPoint.surfStable(null, imageType));
+		addAlgorithm(0,"SURF-S", FactoryDescribeRegionPoint.surfStable(null, ImageDataType.single(imageType)));
+		addAlgorithm(0,"SURF-S Color", FactoryDescribeRegionPoint.surfStable(null, ImageDataType.ms(3, imageType)));
 		if( imageType == ImageFloat32.class )
 			addAlgorithm(0,"SIFT", FactoryDescribeRegionPoint.sift(null,null));
 		addAlgorithm(0,"BRIEF", FactoryDescribeRegionPoint.brief(new ConfigBrief(true), imageType));
@@ -84,10 +87,9 @@ public class VisualizeRegionDescriptionApp <T extends ImageSingleBand, D extends
 	}
 
 	public void process( final BufferedImage image ) {
-		input = ConvertBufferedImage.convertFromSingle(image, null, imageType);
-		if( describe != null ) {
-			describe.setImage(input);
-		}
+		this.image = image;
+		setDescriptorInput();
+
 
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
@@ -98,6 +100,18 @@ public class VisualizeRegionDescriptionApp <T extends ImageSingleBand, D extends
 
 
 		doRefreshAll();
+	}
+
+	private void setDescriptorInput() {
+		if( describe != null )  {
+			if( describe.getImageType().getFamily() == ImageDataType.Family.SINGLE_BAND ) {
+				T input = ConvertBufferedImage.convertFromSingle(image, null, imageType);
+				describe.setImage(input);
+			} else {
+				MultiSpectral<T> input = ConvertBufferedImage.convertFromMulti(image, null, imageType);
+				describe.setImage(input);
+			}
+		}
 	}
 
 	@Override
@@ -116,9 +130,7 @@ public class VisualizeRegionDescriptionApp <T extends ImageSingleBand, D extends
 	@Override
 	public synchronized void setActiveAlgorithm(int indexFamily, String name, Object cookie) {
 		this.describe = (DescribeRegionPoint<T,TupleDesc>)cookie;
-		if( input != null ) {
-			describe.setImage(input);
-		}
+		setDescriptorInput();
 		
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {

@@ -31,6 +31,7 @@ import boofcv.gui.image.ShowImages;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.FastQueue;
 import boofcv.struct.feature.TupleDesc;
+import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.point.Point2D_F64;
@@ -121,7 +122,7 @@ public class ExampleAssociatePoints<T extends ImageSingleBand, TD extends TupleD
 
 		// select which algorithms to use
 		DetectDescribePoint detDesc = FactoryDetectDescribe.surfStable(
-				new ConfigFastHessian(1, 2, 200, 1, 9, 4, 4), null,null, imageType);
+				new ConfigFastHessian(1, 2, 200, 1, 9, 4, 4), null,null, ImageDataType.single(imageType));
 
 		ScoreAssociation scorer = FactoryAssociation.defaultScore(detDesc.getDescriptionType());
 		AssociateDescription associate = FactoryAssociation.greedy(scorer, Double.MAX_VALUE, true);
