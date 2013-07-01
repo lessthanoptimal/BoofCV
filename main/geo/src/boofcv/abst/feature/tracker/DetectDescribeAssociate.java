@@ -363,11 +363,6 @@ public class DetectDescribeAssociate<I extends ImageSingleBand, Desc extends Tup
 	}
 
 	@Override
-	public int getDescriptionLength() {
-		return manager.getDescriptionLength();
-	}
-
-	@Override
 	public Class<Desc> getDescriptionType() {
 		return manager.getDescriptionType();
 	}

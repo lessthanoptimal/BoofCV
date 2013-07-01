@@ -453,19 +453,6 @@ public abstract class StandardPointTracker<T extends ImageSingleBand> {
 
 		TupleDesc desc = extract.createDescription();
 		assertTrue( desc != null );
-		assertTrue( desc.size() == extract.getDescriptionLength() );
-	}
-
-	@Test
-	public void getDescriptionLength() {
-		// is this interface supported?
-		tracker = createTracker();
-		if( !(tracker instanceof ExtractTrackDescription) )
-			return;
-
-		ExtractTrackDescription extract = (ExtractTrackDescription)tracker;
-
-		assertTrue(extract.getDescriptionLength()>0);
 	}
 
 	@Test

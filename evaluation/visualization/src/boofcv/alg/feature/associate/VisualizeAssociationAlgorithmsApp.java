@@ -77,7 +77,7 @@ public class VisualizeAssociationAlgorithmsApp<T extends ImageSingleBand>
 				new ConfigFastHessian(5, 4, 200, 1, 9, 4, 4),null, null, ImageFloat32.class);
 //		detector = (DetectDescribePoint) FactoryDetectDescribe.sift(4,1,false,200);
 
-		int DOF = detector.getDescriptionLength();
+		int DOF = detector.createDescription().size();
 
 		ScoreAssociation<TupleDesc_F64> score = FactoryAssociation.scoreEuclidean(TupleDesc_F64.class,true);
 

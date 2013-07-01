@@ -64,10 +64,6 @@ public class BenchmarkAssociationSpeedSurf {
 		return new General(name,alg);
 	}
 
-	public int getFeatureLength() {
-		return detector.getDescriptionLength();
-	}
-
 	public class General implements Performer {
 
 		AssociateDescription<TupleDesc_F64> alg;
@@ -117,7 +113,7 @@ public class BenchmarkAssociationSpeedSurf {
 
 		ScoreAssociation<TupleDesc_F64> score = FactoryAssociation.scoreEuclidean(TupleDesc_F64.class,true);
 		
-		int DOF = app.getFeatureLength();
+		int DOF = app.detector.createDescription().size();
 
 		ProfileOperation.printOpsPerSec(app.createProfile("Greedy",
 				FactoryAssociation.greedy(score, Double.MAX_VALUE,  false)),TEST_TIME);

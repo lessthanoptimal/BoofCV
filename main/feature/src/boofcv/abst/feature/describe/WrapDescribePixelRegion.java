@@ -53,12 +53,6 @@ public class WrapDescribePixelRegion<T extends ImageSingleBand, D extends TupleD
 	}
 
 	@Override
-	public int getDescriptionLength() {
-		return alg.getDescriptorLength();
-	}
-
-
-	@Override
 	public boolean process(double x, double y, double orientation, double scale, D storage)
 	{
 		alg.process((int)x,(int)y,storage);

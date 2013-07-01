@@ -65,11 +65,6 @@ public class DdaManagerDetectDescribePoint<I extends ImageSingleBand, Desc exten
 	}
 
 	@Override
-	public int getDescriptionLength() {
-		return detDesc.getDescriptionLength();
-	}
-
-	@Override
 	public Class<Desc> getDescriptionType() {
 		return detDesc.getDescriptionType();
 	}

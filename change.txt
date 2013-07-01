@@ -9,6 +9,7 @@ Version : Alpha 0.16
 - Simplified DescribeRegionPoint
   * describe now returns true or false
   * removed isInBounds()
+  * removed getDescriptionLength() since it is contained in the description itself
 - Feature detection and describing related classes now extend ImageBase to allow support of color image processing
 
 - TODO OpenTLD

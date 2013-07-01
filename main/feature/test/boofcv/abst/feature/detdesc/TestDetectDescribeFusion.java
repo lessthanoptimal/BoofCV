@@ -141,9 +141,6 @@ public class TestDetectDescribeFusion {
 		}
 
 		@Override
-		public int getDescriptionLength() {return 0;}
-
-		@Override
 		public boolean process(double x, double y, double orientation, double scale, TupleDesc ret) {
 			return calls++ != 5;
 		}

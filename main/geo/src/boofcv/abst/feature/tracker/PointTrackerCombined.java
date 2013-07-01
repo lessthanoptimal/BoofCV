@@ -226,11 +226,6 @@ public class PointTrackerCombined<I extends ImageSingleBand, D extends ImageSing
 	}
 
 	@Override
-	public int getDescriptionLength() {
-		return tracker.getDetector().getDescriptionLength();
-	}
-
-	@Override
 	public Class<Desc> getDescriptionType() {
 		return tracker.getDetector().getDescriptionType();
 	}

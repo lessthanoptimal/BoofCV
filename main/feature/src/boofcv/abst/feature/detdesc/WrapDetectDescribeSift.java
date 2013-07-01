@@ -52,11 +52,6 @@ public class WrapDetectDescribeSift implements DetectDescribePoint<ImageFloat32,
 	}
 
 	@Override
-	public int getDescriptionLength() {
-		return alg.getDescriptorLength();
-	}
-
-	@Override
 	public void detect(ImageFloat32 input) {
 		alg.process(input);
 	}

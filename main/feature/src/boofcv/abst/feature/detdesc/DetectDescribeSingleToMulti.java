@@ -64,11 +64,6 @@ public class DetectDescribeSingleToMulti<T extends ImageSingleBand, TD extends T
 		return alg.getDescriptionType();
 	}
 
-	@Override
-	public int getDescriptionLength() {
-		return alg.getDescriptionLength();
-	}
-
 	private class Wrap implements PointDescSet<TD> {
 
 		@Override
