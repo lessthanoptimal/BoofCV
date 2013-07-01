@@ -26,7 +26,8 @@ import boofcv.struct.image.MultiSpectral;
 /**
  * Computes a color SURF descriptor from a {@link boofcv.struct.image.MultiSpectral} image.  Each band in the
  * input image is used to compute its own descriptor, which are then combined together into a single one. The
- * laplacian sign is computed from a gray-scale image.
+ * laplacian sign is computed from a gray-scale image.  The descriptor from each band are not individually
+ * normalized.  The whole combined descriptor is normalized.
  *
  * @see DescribePointSurf
  * @see DescribePointSurfMod
@@ -90,6 +91,8 @@ public class DescribePointSurfMultiSpectral<II extends ImageSingleBand>
 			System.arraycopy(bandDesc.value,0,desc.value,featureIndex,bandDesc.size());
 			featureIndex += bandDesc.size();
 		}
+
+		SurfDescribeOps.normalizeFeatures(desc.value);
 
 		describe.setImage(grayII);
 		desc.laplacianPositive = describe.computeLaplaceSign((int)(x+0.5),(int)(y+0.5),scale);

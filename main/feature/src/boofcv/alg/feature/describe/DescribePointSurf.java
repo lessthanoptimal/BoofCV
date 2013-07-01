@@ -162,6 +162,10 @@ public class DescribePointSurf<II extends ImageSingleBand> {
 	{
 		describe(x, y, angle, scale, (TupleDesc_F64) ret);
 
+		// normalize feature vector to have an Euclidean length of 1
+		// adds light invariance
+		SurfDescribeOps.normalizeFeatures(ret.value);
+
 		// Laplacian's sign
 		ret.laplacianPositive = computeLaplaceSign((int)(x+0.5),(int)(y+0.5), scale);
 	}
@@ -198,10 +202,6 @@ public class DescribePointSurf<II extends ImageSingleBand> {
 
 		// extract descriptor
 		features(x, y, c, s, scale, gradient , ret.value);
-
-		// normalize feature vector to have an Euclidean length of 1
-		// adds light invariance
-		SurfDescribeOps.normalizeFeatures(ret.value);
 	}
 
 	/**
