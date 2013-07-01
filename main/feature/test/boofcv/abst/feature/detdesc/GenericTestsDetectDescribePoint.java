@@ -19,9 +19,9 @@
 package boofcv.abst.feature.detdesc;
 
 import boofcv.alg.misc.GImageMiscOps;
-import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.feature.TupleDesc;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageDataType;
 import boofcv.testing.BoofTesting;
 import georegression.struct.point.Point2D_F64;
 import org.junit.Test;
@@ -36,7 +36,7 @@ import static org.junit.Assert.assertTrue;
  *
  * @author Peter Abeles
  */
-public abstract class GenericTestsDetectDescribePoint<T extends ImageSingleBand,D extends TupleDesc> {
+public abstract class GenericTestsDetectDescribePoint<T extends ImageBase,D extends TupleDesc> {
 	int width = 100;
 	int height = 120;
 
@@ -47,17 +47,17 @@ public abstract class GenericTestsDetectDescribePoint<T extends ImageSingleBand,
 	boolean hasOrientation;
 
 	T image;
-	Class<T> imageType;
+	protected ImageDataType<T> imageType;
 	Class<D> descType;
 
 	protected GenericTestsDetectDescribePoint(boolean hasScale, boolean hasOrientation,
-											  Class<T> imageType, Class<D> descType) {
+											  ImageDataType<T> imageType, Class<D> descType) {
 		this.hasScale = hasScale;
 		this.hasOrientation = hasOrientation;
 		this.imageType = imageType;
 		this.descType = descType;
 
-		image = GeneralizedImageOps.createSingleBand(imageType,width,height);
+		image = imageType.createImage(width,height);
 		GImageMiscOps.fillUniform(image, rand, 0, 100);
 	}
 

@@ -39,8 +39,8 @@ public class TestSparseIntegralHaar_NoBorder_F32
 		super(ImageFloat32.class, ImageFloat32.class,-radius,-radius,radius,radius);
 
 		alg = new SparseIntegralHaar_NoBorder_F32(radius);
-		IntegralKernel kernelX = DerivativeIntegralImage.kernelHaarX(radius);
-		IntegralKernel kernelY = DerivativeIntegralImage.kernelHaarY(radius);
+		IntegralKernel kernelX = DerivativeIntegralImage.kernelHaarX(radius,null);
+		IntegralKernel kernelY = DerivativeIntegralImage.kernelHaarY(radius,null);
 		setKernels(kernelX,kernelY);
 	}
 

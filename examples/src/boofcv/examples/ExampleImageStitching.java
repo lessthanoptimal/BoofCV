@@ -40,6 +40,7 @@ import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.SurfFeature;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.geo.AssociatedPair;
+import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.MultiSpectral;
@@ -147,7 +148,7 @@ public class ExampleImageStitching {
 
 		// Detect using the standard SURF feature descriptor and describer
 		DetectDescribePoint detDesc = FactoryDetectDescribe.surfStable(
-				new ConfigFastHessian(1, 2, 200, 1, 9, 4, 4), null,null, imageType);
+				new ConfigFastHessian(1, 2, 200, 1, 9, 4, 4), null,null, ImageDataType.single(imageType));
 		ScoreAssociation<SurfFeature> scorer = FactoryAssociation.scoreEuclidean(SurfFeature.class,true);
 		AssociateDescription<SurfFeature> associate = FactoryAssociation.greedy(scorer,2,true);
 

@@ -62,6 +62,7 @@ import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.factory.tracker.FactoryTrackerAlg;
 import boofcv.factory.transform.pyramid.FactoryPyramid;
 import boofcv.struct.feature.*;
+import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.pyramid.PyramidDiscrete;
 
@@ -156,7 +157,8 @@ public class FactoryPointTracker {
 				new AssociateDescTo2D<SurfFeature>(new WrapAssociateSurfBasic(assoc));
 
 		DetectDescribePoint<I,SurfFeature> fused =
-				FactoryDetectDescribe.surfFast(configDetector, configDescribe, configOrientation, imageType);
+				FactoryDetectDescribe.surfFast(configDetector, configDescribe, configOrientation,
+						ImageDataType.single(imageType));
 
 		DdaManagerDetectDescribePoint<I,SurfFeature> manager = new DdaManagerDetectDescribePoint<I,SurfFeature>(fused);
 
@@ -191,7 +193,8 @@ public class FactoryPointTracker {
 				new AssociateDescTo2D<SurfFeature>(new WrapAssociateSurfBasic(assoc));
 
 		DetectDescribePoint<I,SurfFeature> fused =
-				FactoryDetectDescribe.surfStable(configDetector,configDescribe,configOrientation,imageType);
+				FactoryDetectDescribe.surfStable(configDetector,configDescribe,configOrientation,
+						ImageDataType.single(imageType));
 
 		DdaManagerDetectDescribePoint<I,SurfFeature> manager = new DdaManagerDetectDescribePoint<I,SurfFeature>(fused);
 
@@ -230,7 +233,7 @@ public class FactoryPointTracker {
 				new AssociateDescTo2D<TupleDesc_B>(FactoryAssociation.greedy(score, maxAssociationError, true));
 
 		DdaManagerGeneralPoint<I,D,TupleDesc_B> manager =
-				new DdaManagerGeneralPoint<I,D,TupleDesc_B>(easy,new WrapDescribeBrief<I>(brief),1.0);
+				new DdaManagerGeneralPoint<I,D,TupleDesc_B>(easy,new WrapDescribeBrief<I>(brief,imageType),1.0);
 
 		return new DetectDescribeAssociate<I,TupleDesc_B>(manager, association,false);
 	}
@@ -266,7 +269,7 @@ public class FactoryPointTracker {
 						FactoryAssociation.greedy(score, maxAssociationError, true));
 
 		DdaManagerGeneralPoint<I,D,TupleDesc_B> manager =
-				new DdaManagerGeneralPoint<I,D,TupleDesc_B>(easy,new WrapDescribeBrief<I>(brief),1.0);
+				new DdaManagerGeneralPoint<I,D,TupleDesc_B>(easy,new WrapDescribeBrief<I>(brief,imageType),1.0);
 
 		return new DetectDescribeAssociate<I,TupleDesc_B>(manager, association,false);
 	}
@@ -303,7 +306,7 @@ public class FactoryPointTracker {
 						FactoryAssociation.greedy(score, Double.MAX_VALUE, true));
 
 		DdaManagerGeneralPoint<I,D,NccFeature> manager =
-				new DdaManagerGeneralPoint<I,D,NccFeature>(easy,new WrapDescribePixelRegionNCC<I>(alg),1.0);
+				new DdaManagerGeneralPoint<I,D,NccFeature>(easy,new WrapDescribePixelRegionNCC<I>(alg,imageType),1.0);
 
 		return new DetectDescribeAssociate<I,NccFeature>(manager, association,false);
 	}
@@ -384,7 +387,8 @@ public class FactoryPointTracker {
 		AssociateDescription<SurfFeature> generalAssoc = new WrapAssociateSurfBasic(assoc);
 
 		DetectDescribePoint<I,SurfFeature> fused =
-				FactoryDetectDescribe.surfStable(configDetector, configDescribe, configOrientation, imageType);
+				FactoryDetectDescribe.surfStable(configDetector, configDescribe, configOrientation,
+						ImageDataType.single(imageType));
 
 		return combined(fused,generalAssoc,trackRadius,pyramidScalingKlt,reactivateThreshold,
 				imageType);
@@ -426,7 +430,7 @@ public class FactoryPointTracker {
 		InterestPointDetector<I> detector = FactoryInterestPoint.wrapPoint(corner, 1, imageType, derivType);
 
 		DescribeRegionPoint<I,SurfFeature> regionDesc
-				= FactoryDescribeRegionPoint.surfStable(configDescribe, imageType);
+				= FactoryDescribeRegionPoint.surfStable(configDescribe, ImageDataType.single(imageType));
 
 		ScoreAssociation<TupleDesc_F64> score = FactoryAssociation.scoreEuclidean(TupleDesc_F64.class, true);
 		AssociateSurfBasic assoc = new AssociateSurfBasic(FactoryAssociation.greedy(score, 100000, true));

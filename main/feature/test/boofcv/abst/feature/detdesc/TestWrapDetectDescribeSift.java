@@ -21,6 +21,7 @@ package boofcv.abst.feature.detdesc;
 import boofcv.abst.feature.detect.interest.ConfigSiftDetector;
 import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
 import boofcv.struct.feature.SurfFeature;
+import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageFloat32;
 
 /**
@@ -29,7 +30,7 @@ import boofcv.struct.image.ImageFloat32;
 public class TestWrapDetectDescribeSift extends GenericTestsDetectDescribePoint<ImageFloat32,SurfFeature>{
 
 	public TestWrapDetectDescribeSift() {
-		super(true, true, ImageFloat32.class, SurfFeature.class);
+		super(true, true, ImageDataType.single(ImageFloat32.class), SurfFeature.class);
 	}
 
 	@Override

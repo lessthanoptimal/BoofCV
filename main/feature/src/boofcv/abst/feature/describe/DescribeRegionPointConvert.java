@@ -19,6 +19,7 @@
 package boofcv.abst.feature.describe;
 
 import boofcv.struct.feature.TupleDesc;
+import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageSingleBand;
 
 /**
@@ -74,6 +75,11 @@ public class DescribeRegionPointConvert<T extends ImageSingleBand,In extends Tup
 	@Override
 	public boolean requiresOrientation() {
 		return original.requiresOrientation();
+	}
+
+	@Override
+	public ImageDataType<T> getImageType() {
+		return original.getImageType();
 	}
 
 	@Override

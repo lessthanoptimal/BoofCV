@@ -39,6 +39,7 @@ import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.SurfFeature;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.geo.GeoModelRefine;
+import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageFloat32;
 import org.ddogleg.fitting.modelset.ModelMatcher;
 import org.ddogleg.fitting.modelset.ransac.Ransac;
@@ -131,7 +132,7 @@ public class ExampleFundamentalMatrix {
 	 */
 	public static List<AssociatedPair> computeMatches( BufferedImage left , BufferedImage right ) {
 		DetectDescribePoint detDesc = FactoryDetectDescribe.surfStable(
-				new ConfigFastHessian(1, 2, 200, 1, 9, 4, 4), null,null, ImageFloat32.class);
+				new ConfigFastHessian(1, 2, 200, 1, 9, 4, 4), null,null, ImageDataType.single(ImageFloat32.class));
 //		DetectDescribePoint detDesc = FactoryDetectDescribe.sift(null,new ConfigSiftDetector(2,0,200,5),null,null);
 
 		ScoreAssociation<SurfFeature> scorer = FactoryAssociation.scoreEuclidean(SurfFeature.class,true);

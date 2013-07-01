@@ -20,7 +20,6 @@ package boofcv.alg.feature.describe;
 
 import boofcv.factory.filter.kernel.FactoryKernelGaussian;
 import boofcv.struct.convolve.Kernel2D_F64;
-import boofcv.struct.feature.SurfFeature;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.sparse.GradientValue;
 import boofcv.struct.sparse.SparseImageGradient;
@@ -51,9 +50,6 @@ public class DescribePointSurfMod<II extends ImageSingleBand> extends DescribePo
 
 	private double samplesX[];
 	private double samplesY[];
-
-	// how wide the grid is that's being sampled in units of samples
-	int sampleWidth;
 	
 	/**
 	 * Creates a SURF descriptor of arbitrary dimension by changing how the local region is sampled.
@@ -86,9 +82,13 @@ public class DescribePointSurfMod<II extends ImageSingleBand> extends DescribePo
 		for( int i = 0; i < weightSub.data.length; i++ )
 			weightSub.data[i] /= div;
 
-		sampleWidth = widthLargeGrid*widthSubRegion+overLap*2;
+		// how wide the grid is that's being sampled in units of samples
+		int sampleWidth = widthLargeGrid*widthSubRegion+overLap*2;
+
 		samplesX = new double[sampleWidth*sampleWidth];
 		samplesY = new double[sampleWidth*sampleWidth];
+
+		radiusDescriptor = (widthLargeGrid*widthSubRegion)/2+overLap;
 	}
 
 	/**
@@ -96,50 +96,6 @@ public class DescribePointSurfMod<II extends ImageSingleBand> extends DescribePo
 	 */
 	public DescribePointSurfMod(Class<II> imageType) {
 		this(4,5,3,2, 2.5 , 2.5 , false ,imageType);
-	}
-
-	/**
-	 * <p>
-	 * Computes the SURF descriptor for the specified interest point.  If the feature
-	 * goes outside of the image border (including convolution kernels) then null is returned.
-	 * </p>
-	 *
-	 * @param x Location of interest point.
-	 * @param y Location of interest point.
-	 * @param angle The angle the feature is pointing at in radians.
-	 * @param scale Scale of the interest point. Null is returned if the feature goes outside the image border.
-	 * @param ret storage for the feature. Must have 64 values. If null a new feature will be declared internally.
-	 */
-	public void describe(double x, double y, double angle, double scale, SurfFeature ret)
-	{
-		double c = Math.cos(angle) , s= Math.sin(angle);
-		// By assuming that the entire feature is inside the image faster algorithms can be used
-		// the results are also of dubious value when interacting with the image border.
-		boolean isInBounds =
-				SurfDescribeOps.isInside(ii,x,y,(widthLargeGrid*widthSubRegion)/2+overLap,widthSample,scale,c,s);
-
-		// declare the feature if needed
-		if( ret == null )
-			ret = new SurfFeature(featureDOF);
-		else if( ret.value.length != featureDOF )
-			throw new IllegalArgumentException("Provided feature must have "+featureDOF+" values");
-
-		// extract descriptor
-		gradient.setImage(ii);
-		gradient.setScale(scale);
-
-		// use a safe method if its along the image border
-		SparseImageGradient gradient = isInBounds ? this.gradient : this.gradientSafe;
-
-		// compute image features
-		features(x, y, c, s, scale, gradient , ret.value);
-
-		// normalize feature vector to have an Euclidean length of 1
-		// adds light invariance
-		SurfDescribeOps.normalizeFeatures(ret.value);
-
-		// Laplacian's sign
-		ret.laplacianPositive = computeLaplaceSign((int)Math.round(x),(int)Math.round(y), scale);
 	}
 
 	/**

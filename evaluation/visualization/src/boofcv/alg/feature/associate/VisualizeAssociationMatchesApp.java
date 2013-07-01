@@ -33,6 +33,7 @@ import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.alg.transform.ii.GIntegralImageOps;
 import boofcv.core.image.ConvertBufferedImage;
+import boofcv.core.image.GConvertImage;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.feature.describe.FactoryDescribeRegionPoint;
@@ -46,8 +47,10 @@ import boofcv.gui.image.ShowImages;
 import boofcv.io.PathLabel;
 import boofcv.struct.FastQueue;
 import boofcv.struct.feature.TupleDesc;
+import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.MultiSpectral;
 import georegression.struct.point.Point2D_F64;
 
 import javax.swing.*;
@@ -68,12 +71,15 @@ public class VisualizeAssociationMatchesApp<T extends ImageSingleBand, D extends
 		extends SelectAlgorithmAndInputPanel {
 
 	InterestPointDetector<T> detector;
-	DescribeRegionPoint<T, TupleDesc> describe;
+	DescribeRegionPoint describe;
 	AssociateDescription<TupleDesc> matcher;
 	OrientationImage<T> orientation;
 
-	T imageLeft;
-	T imageRight;
+	MultiSpectral<T> imageLeft;
+	MultiSpectral<T> imageRight;
+	T grayLeft;
+	T grayRight;
+
 	Class<T> imageType;
 
 	// which type of association it should perform
@@ -97,7 +103,8 @@ public class VisualizeAssociationMatchesApp<T extends ImageSingleBand, D extends
 		alg = FactoryDetectPoint.createShiTomasi(new ConfigGeneralDetector(500,2,1), false, derivType);
 		addAlgorithm(0, "Shi-Tomasi", FactoryInterestPoint.wrapPoint(alg, 1, imageType, derivType));
 
-		addAlgorithm(1, "SURF", FactoryDescribeRegionPoint.surfStable(null, imageType));
+		addAlgorithm(1, "SURF-S", FactoryDescribeRegionPoint.surfStable(null, ImageDataType.single(imageType)));
+		addAlgorithm(1, "SURF-S Color", FactoryDescribeRegionPoint.surfStable(null, ImageDataType.ms(3, imageType)));
 		if( imageType == ImageFloat32.class )
 			addAlgorithm(1, "SIFT", FactoryDescribeRegionPoint.sift(null,null));
 		addAlgorithm(1, "BRIEF", FactoryDescribeRegionPoint.brief(new ConfigBrief(true), imageType));
@@ -113,8 +120,10 @@ public class VisualizeAssociationMatchesApp<T extends ImageSingleBand, D extends
 		OrientationIntegral orientationII = FactoryOrientationAlgs.sliding_ii(null, integralType);
 		orientation = FactoryOrientation.convertImage(orientationII,imageType);
 
-		imageLeft = GeneralizedImageOps.createSingleBand(imageType, 1, 1);
-		imageRight = GeneralizedImageOps.createSingleBand(imageType, 1, 1);
+		imageLeft = new MultiSpectral<T>(imageType,1,1,3);
+		imageRight = new MultiSpectral<T>(imageType,1,1,3);
+		grayLeft = GeneralizedImageOps.createSingleBand(imageType, 1, 1);
+		grayRight = GeneralizedImageOps.createSingleBand(imageType, 1, 1);
 
 		setMainGUI(panel);
 	}
@@ -122,9 +131,13 @@ public class VisualizeAssociationMatchesApp<T extends ImageSingleBand, D extends
 	public void process(final BufferedImage buffLeft, final BufferedImage buffRight) {
 		imageLeft.reshape(buffLeft.getWidth(), buffLeft.getHeight());
 		imageRight.reshape(buffRight.getWidth(), buffRight.getHeight());
+		grayLeft.reshape(buffLeft.getWidth(), buffLeft.getHeight());
+		grayRight.reshape(buffRight.getWidth(), buffRight.getHeight());
 
-		ConvertBufferedImage.convertFromSingle(buffLeft, imageLeft, imageType);
-		ConvertBufferedImage.convertFromSingle(buffRight, imageRight, imageType);
+		ConvertBufferedImage.convertFromMulti(buffLeft, imageLeft, imageType);
+		ConvertBufferedImage.convertFromMulti(buffRight, imageRight, imageType);
+		GConvertImage.average(imageLeft, grayLeft);
+		GConvertImage.average(imageRight,grayRight);
 
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
@@ -211,9 +224,9 @@ public class VisualizeAssociationMatchesApp<T extends ImageSingleBand, D extends
 
 
 		// find feature points  and descriptions
-		extractImageFeatures(imageLeft, leftDesc, leftPts);
+		extractImageFeatures(imageLeft,grayLeft, leftDesc, leftPts);
 		progress++;
-		extractImageFeatures(imageRight, rightDesc, rightPts);
+		extractImageFeatures(imageRight,grayRight, rightDesc, rightPts);
 		progress++;
 		matcher.setSource(leftDesc);
 		matcher.setDestination(rightDesc);
@@ -228,10 +241,13 @@ public class VisualizeAssociationMatchesApp<T extends ImageSingleBand, D extends
 		});
 	}
 
-	private void extractImageFeatures(T image, FastQueue<TupleDesc> descs, List<Point2D_F64> locs) {
-		detector.detect(image);
-		describe.setImage(image);
-		orientation.setImage(image);
+	private void extractImageFeatures(MultiSpectral<T> color , T gray, FastQueue<TupleDesc> descs, List<Point2D_F64> locs) {
+		detector.detect(gray);
+		if( describe.getImageType().getFamily() == ImageDataType.Family.SINGLE_BAND )
+			describe.setImage(gray);
+		else
+			describe.setImage(color);
+		orientation.setImage(gray);
 
 		if (detector.hasScale()) {
 			for (int i = 0; i < detector.getNumberOfFeatures(); i++) {
@@ -244,9 +260,11 @@ public class VisualizeAssociationMatchesApp<T extends ImageSingleBand, D extends
 					yaw = orientation.compute(pt.x, pt.y);
 				}
 
-				TupleDesc d = describe.createDescription();
+				TupleDesc d = descs.grow();
 				if (describe.process(pt.x, pt.y, yaw, scale, d)) {
 					locs.add(pt.copy());
+				} else {
+					descs.removeTail();
 				}
 			}
 		} else {
@@ -259,9 +277,11 @@ public class VisualizeAssociationMatchesApp<T extends ImageSingleBand, D extends
 					yaw = orientation.compute(pt.x, pt.y);
 				}
 
-				TupleDesc d = describe.createDescription();
+				TupleDesc d = descs.grow();
 				if (describe.process(pt.x, pt.y, yaw, 1, d)) {
 					locs.add(pt.copy());
+				} else {
+					descs.removeTail();
 				}
 			}
 		}

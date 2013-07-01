@@ -56,7 +56,7 @@ public class TestDerivativeIntegralImage {
 		ImageBorder_F32 border = (ImageBorder_F32)FactoryImageBorderAlgs.value(orig, 0);
 
 		for( int r = 1; r < 5; r++ ) {
-			IntegralKernel kernelI = DerivativeIntegralImage.kernelDerivX(r);
+			IntegralKernel kernelI = DerivativeIntegralImage.kernelDerivX(r,null);
 			Kernel2D_F32 kernel = createDerivX(r);
 
 			ConvolveWithBorder.convolve(kernel,orig,expected,border);
@@ -81,7 +81,7 @@ public class TestDerivativeIntegralImage {
 		ImageBorder_F32 border = (ImageBorder_F32)FactoryImageBorderAlgs.value(orig, 0);
 
 		for( int r = 1; r < 5; r++ ) {
-			IntegralKernel kernelI = DerivativeIntegralImage.kernelDerivY(r);
+			IntegralKernel kernelI = DerivativeIntegralImage.kernelDerivY(r,null);
 			Kernel2D_F32 kernel = createDerivX(r);
 			kernel = KernelMath.transpose(kernel);
 
@@ -107,7 +107,7 @@ public class TestDerivativeIntegralImage {
 		ImageBorder_F32 border = (ImageBorder_F32)FactoryImageBorderAlgs.value(orig, 0);
 
 		for( int r = 1; r < 5; r++ ) {
-			IntegralKernel kernelI = DerivativeIntegralImage.kernelHaarX(r);
+			IntegralKernel kernelI = DerivativeIntegralImage.kernelHaarX(r,null);
 			Kernel2D_F32 kernel = createHaarX(r);
 
 			ConvolveWithBorder.convolve(kernel,orig,expected,border);
@@ -133,7 +133,7 @@ public class TestDerivativeIntegralImage {
 
 		for( int i = 1; i < 5; i++ ) {
 			int size = i*2;
-			IntegralKernel kernelI = DerivativeIntegralImage.kernelHaarY(size);
+			IntegralKernel kernelI = DerivativeIntegralImage.kernelHaarY(size,null);
 			Kernel2D_F32 kernel = createHaarX(size);
 			kernel = KernelMath.transpose(kernel);
 
@@ -160,7 +160,7 @@ public class TestDerivativeIntegralImage {
 
 		for( int i = 1; i <= 5; i += 2 ) {
 			int size = i*3;
-			IntegralKernel kernelI = DerivativeIntegralImage.kernelDerivXX(size);
+			IntegralKernel kernelI = DerivativeIntegralImage.kernelDerivXX(size,null);
 			Kernel2D_F32 kernel = createDerivXX(size);
 
 			ConvolveWithBorder.convolve(kernel,orig,expected,border);
@@ -212,7 +212,7 @@ public class TestDerivativeIntegralImage {
 
 		for( int i = 1; i <= 5; i += 2 ) {
 			int size = i*3;
-			IntegralKernel kernelI = DerivativeIntegralImage.kernelDerivYY(size);
+			IntegralKernel kernelI = DerivativeIntegralImage.kernelDerivYY(size,null);
 			Kernel2D_F32 kernel = createDerivXX(size);
 			kernel = KernelMath.transpose(kernel);
 
@@ -267,7 +267,7 @@ public class TestDerivativeIntegralImage {
 
 		for( int i = 1; i <= 5; i += 2 ) {
 			int size = i*3;
-			IntegralKernel kernelI = DerivativeIntegralImage.kernelDerivXY(size);
+			IntegralKernel kernelI = DerivativeIntegralImage.kernelDerivXY(size,null);
 			Kernel2D_F32 kernel = createDerivXY(size);
 
 			ConvolveWithBorder.convolve(kernel,orig,expected,border);

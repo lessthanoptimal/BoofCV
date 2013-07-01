@@ -34,6 +34,13 @@ public class IntegralKernel {
 	public IntegralKernel( int numBlocks ) {
 		this.blocks = new ImageRectangle[numBlocks];
 		this.scales = new int[ numBlocks ];
+
+		for( int i = 0; i < numBlocks; i++ ) {
+			blocks[i] = new ImageRectangle();
+		}
+	}
+
+	public IntegralKernel() {
 	}
 
 	public int getNumBlocks() {

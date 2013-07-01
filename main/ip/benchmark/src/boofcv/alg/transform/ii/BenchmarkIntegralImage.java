@@ -50,7 +50,7 @@ public class BenchmarkIntegralImage {
 
 	public static class DerivXX extends PerformerBase {
 
-		IntegralKernel kernel = DerivativeIntegralImage.kernelDerivXX(9);
+		IntegralKernel kernel = DerivativeIntegralImage.kernelDerivXX(9,null);
 
 		@Override
 		public void process() {
@@ -61,7 +61,7 @@ public class BenchmarkIntegralImage {
 
 	public static class GenericDerivXX extends PerformerBase {
 
-		IntegralKernel kernel = DerivativeIntegralImage.kernelDerivXX(9);
+		IntegralKernel kernel = DerivativeIntegralImage.kernelDerivXX(9,null);
 
 		@Override
 		public void process() {

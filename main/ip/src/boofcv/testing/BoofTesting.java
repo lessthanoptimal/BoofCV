@@ -78,13 +78,36 @@ public class BoofTesting {
 	 * </p>
 	 */
 	@SuppressWarnings({"unchecked"})
-	public static <T extends ImageSingleBand> T createSubImageOf(T input) {
+	public static <T extends ImageBase> T createSubImageOf(T input) {
+		if( input instanceof ImageSingleBand ) {
+			return (T)createSubImageOf_S((ImageSingleBand)input);
+		} else if( input instanceof MultiSpectral ) {
+			return (T)createSubImageOf_MS((MultiSpectral) input);
+		} else {
+			throw new IllegalArgumentException("Add support for this image type");
+		}
+	}
+
+	public static <T extends ImageSingleBand> T createSubImageOf_S(T input) {
 		// create the larger image
 		T ret = (T) input._createNew(input.width + 10, input.height + 12);
 		// create a sub-image of the inner portion
 		ret = (T) ret.subimage(5, 7, input.width + 5, input.height + 7);
 		// copy input image into the subimage
 		ret.setTo(input);
+
+		return ret;
+	}
+
+	public static <T extends MultiSpectral> T createSubImageOf_MS(T input) {
+		T ret = (T)new MultiSpectral(input.type,input.width,input.height,input.getNumBands());
+
+		for( int i = 0; i < input.getNumBands(); i++ ) {
+			ret.bands[i] = createSubImageOf_S(input.getBand(i));
+		}
+
+		ret.stride = ret.bands[0].stride;
+		ret.startIndex = ret.bands[0].startIndex;
 
 		return ret;
 	}

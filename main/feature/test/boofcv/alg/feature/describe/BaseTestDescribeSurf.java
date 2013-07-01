@@ -127,8 +127,8 @@ public abstract class BaseTestDescribeSurf<I extends ImageSingleBand,II extends 
 	
 		for( int i = 0; i < 10; i++ ) {
 			double angle = (2.0*Math.PI*i)/10;
-			alg.describe(0,0, angle, 1, null);
-			alg.describe(ii.width-1,ii.height-1, angle, 1, null);
+			alg.describe(0,0, angle, 1, alg.createDescription());
+			alg.describe(ii.width-1,ii.height-1, angle, 1, alg.createDescription());
 		}
 	}
 

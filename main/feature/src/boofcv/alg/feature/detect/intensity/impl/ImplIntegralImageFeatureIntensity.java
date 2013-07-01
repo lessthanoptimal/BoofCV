@@ -48,9 +48,9 @@ public class ImplIntegralImageFeatureIntensity {
 		final int h = intensity.height;
 
 		// get convolution kernels for the second order derivatives
-		IntegralKernel kerXX = DerivativeIntegralImage.kernelDerivXX(size);
-		IntegralKernel kerYY = DerivativeIntegralImage.kernelDerivYY(size);
-		IntegralKernel kerXY = DerivativeIntegralImage.kernelDerivXY(size);
+		IntegralKernel kerXX = DerivativeIntegralImage.kernelDerivXX(size,null);
+		IntegralKernel kerYY = DerivativeIntegralImage.kernelDerivYY(size,null);
+		IntegralKernel kerXY = DerivativeIntegralImage.kernelDerivXY(size,null);
 
 		float norm = 1.0f/(size*size);
 
@@ -75,9 +75,9 @@ public class ImplIntegralImageFeatureIntensity {
 		final int h = intensity.height;
 
 		// get convolution kernels for the second order derivatives
-		IntegralKernel kerXX = DerivativeIntegralImage.kernelDerivXX(size);
-		IntegralKernel kerYY = DerivativeIntegralImage.kernelDerivYY(size);
-		IntegralKernel kerXY = DerivativeIntegralImage.kernelDerivXY(size);
+		IntegralKernel kerXX = DerivativeIntegralImage.kernelDerivXX(size,null);
+		IntegralKernel kerYY = DerivativeIntegralImage.kernelDerivYY(size,null);
+		IntegralKernel kerXY = DerivativeIntegralImage.kernelDerivXY(size,null);
 
 		int radiusFeature = size/2;
 		final int borderOrig = radiusFeature+ 1 + (skip-(radiusFeature+1)%skip);
@@ -221,9 +221,9 @@ public class ImplIntegralImageFeatureIntensity {
 		final int h = intensity.height;
 
 		// get convolution kernels for the second order derivatives
-		IntegralKernel kerXX = DerivativeIntegralImage.kernelDerivXX(size);
-		IntegralKernel kerYY = DerivativeIntegralImage.kernelDerivYY(size);
-		IntegralKernel kerXY = DerivativeIntegralImage.kernelDerivXY(size);
+		IntegralKernel kerXX = DerivativeIntegralImage.kernelDerivXX(size,null);
+		IntegralKernel kerYY = DerivativeIntegralImage.kernelDerivYY(size,null);
+		IntegralKernel kerXY = DerivativeIntegralImage.kernelDerivXY(size,null);
 
 		float norm = 1.0f/(size*size);
 
@@ -248,9 +248,9 @@ public class ImplIntegralImageFeatureIntensity {
 		final int h = intensity.height;
 
 		// get convolution kernels for the second order derivatives
-		IntegralKernel kerXX = DerivativeIntegralImage.kernelDerivXX(size);
-		IntegralKernel kerYY = DerivativeIntegralImage.kernelDerivYY(size);
-		IntegralKernel kerXY = DerivativeIntegralImage.kernelDerivXY(size);
+		IntegralKernel kerXX = DerivativeIntegralImage.kernelDerivXX(size,null);
+		IntegralKernel kerYY = DerivativeIntegralImage.kernelDerivYY(size,null);
+		IntegralKernel kerXY = DerivativeIntegralImage.kernelDerivXY(size,null);
 
 		int radiusFeature = size/2;
 		final int borderOrig = radiusFeature+ 1 + (skip-(radiusFeature+1)%skip);

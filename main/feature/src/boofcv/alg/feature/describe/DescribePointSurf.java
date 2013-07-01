@@ -24,6 +24,7 @@ import boofcv.alg.transform.ii.IntegralKernel;
 import boofcv.factory.filter.kernel.FactoryKernelGaussian;
 import boofcv.struct.convolve.Kernel2D_F64;
 import boofcv.struct.feature.SurfFeature;
+import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.sparse.GradientValue;
 import boofcv.struct.sparse.SparseGradientSafe;
@@ -85,6 +86,14 @@ public class DescribePointSurf<II extends ImageSingleBand> {
 	// can handle sample requests outside the image border
 	protected SparseImageGradient<II,?> gradientSafe;
 
+	// radius of the descriptor at a scale of 1.  Used to determine if it touches the image boundary
+	// does not include sample kernel size
+	protected int radiusDescriptor;
+
+	// storage for kernels used to compute laplacian sign
+	protected IntegralKernel kerXX;
+	protected IntegralKernel kerYY;
+
 	/**
 	 * Creates a SURF descriptor of arbitrary dimension by changing how the local region is sampled.
 	 *
@@ -117,6 +126,8 @@ public class DescribePointSurf<II extends ImageSingleBand> {
 		// create the function that the gradient is sampled with
 		gradient = SurfDescribeOps.createGradient(useHaar,widthSample, inputType);
 		gradientSafe = new SparseGradientSafe(this.gradient);
+
+		radiusDescriptor = (widthLargeGrid*widthSubRegion)/2;
 	}
 
 	/**
@@ -149,12 +160,29 @@ public class DescribePointSurf<II extends ImageSingleBand> {
 	 */
 	public void describe(double x, double y, double angle, double scale, SurfFeature ret)
 	{
+		describe(x, y, angle, scale, (TupleDesc_F64) ret);
+
+		// Laplacian's sign
+		ret.laplacianPositive = computeLaplaceSign((int)(x+0.5),(int)(y+0.5), scale);
+	}
+
+	/**
+	 * Compute SURF descriptor, but without laplacian sign
+	 *
+	 * @param x Location of interest point.
+	 * @param y Location of interest point.
+	 * @param angle The angle the feature is pointing at in radians.
+	 * @param scale Scale of the interest point. Null is returned if the feature goes outside the image border.
+	 * @param ret storage for the feature. Must have 64 values.
+	 */
+	public void describe(double x, double y, double angle, double scale, TupleDesc_F64 ret)
+	{
 		double c = Math.cos(angle),s=Math.sin(angle);
-		
+
 		// By assuming that the entire feature is inside the image faster algorithms can be used
 		// the results are also of dubious value when interacting with the image border.
 		boolean isInBounds =
-				SurfDescribeOps.isInside(ii,x,y,(widthLargeGrid*widthSubRegion)/2,widthSample,scale,c,s);
+				SurfDescribeOps.isInside(ii,x,y, radiusDescriptor,widthSample,scale,c,s);
 
 		// declare the feature if needed
 		if( ret == null )
@@ -174,9 +202,6 @@ public class DescribePointSurf<II extends ImageSingleBand> {
 		// normalize feature vector to have an Euclidean length of 1
 		// adds light invariance
 		SurfDescribeOps.normalizeFeatures(ret.value);
-
-		// Laplacian's sign
-		ret.laplacianPositive = computeLaplaceSign((int)Math.round(x),(int)Math.round(y), scale);
 	}
 
 	/**
@@ -269,10 +294,10 @@ public class DescribePointSurf<II extends ImageSingleBand> {
 	 * @param scale scale of the feature
 	 * @return true if positive
 	 */
-	protected boolean computeLaplaceSign(int x, int y, double scale) {
+	public boolean computeLaplaceSign(int x, int y, double scale) {
 		int s = (int)Math.ceil(scale);
-		IntegralKernel kerXX = DerivativeIntegralImage.kernelDerivXX(9*s);
-		IntegralKernel kerYY = DerivativeIntegralImage.kernelDerivYY(9*s);
+		kerXX = DerivativeIntegralImage.kernelDerivXX(9*s,kerXX);
+		kerYY = DerivativeIntegralImage.kernelDerivYY(9*s,kerYY);
 		double lap = GIntegralImageOps.convolveSparse(ii,kerXX,x,y);
 		lap += GIntegralImageOps.convolveSparse(ii,kerYY,x,y);
 

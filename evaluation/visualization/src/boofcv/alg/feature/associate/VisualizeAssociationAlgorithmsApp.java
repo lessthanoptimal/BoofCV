@@ -32,6 +32,7 @@ import boofcv.gui.image.ShowImages;
 import boofcv.io.PathLabel;
 import boofcv.struct.FastQueue;
 import boofcv.struct.feature.TupleDesc_F64;
+import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.point.Point2D_F64;
@@ -74,7 +75,7 @@ public class VisualizeAssociationAlgorithmsApp<T extends ImageSingleBand>
 		this.imageType = imageType;
 
 		detector = (DetectDescribePoint) FactoryDetectDescribe.surfStable(
-				new ConfigFastHessian(5, 4, 200, 1, 9, 4, 4),null, null, ImageFloat32.class);
+				new ConfigFastHessian(5, 4, 200, 1, 9, 4, 4), null, null, ImageDataType.single(ImageFloat32.class));
 //		detector = (DetectDescribePoint) FactoryDetectDescribe.sift(4,1,false,200);
 
 		int DOF = detector.createDescription().size();

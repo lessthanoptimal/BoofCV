@@ -22,6 +22,7 @@ import boofcv.abst.feature.describe.*;
 import boofcv.abst.filter.blur.BlurFilter;
 import boofcv.alg.feature.describe.DescribePointSift;
 import boofcv.alg.feature.describe.DescribePointSurf;
+import boofcv.alg.feature.describe.DescribePointSurfMultiSpectral;
 import boofcv.alg.feature.describe.brief.BinaryCompareDefinition_I32;
 import boofcv.alg.feature.describe.brief.FactoryBriefDefinition;
 import boofcv.alg.feature.detect.interest.SiftImageScaleSpace;
@@ -31,6 +32,8 @@ import boofcv.struct.feature.NccFeature;
 import boofcv.struct.feature.SurfFeature;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.feature.TupleDesc_B;
+import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 
@@ -48,6 +51,7 @@ public class FactoryDescribeRegionPoint {
 	 * <p>
 	 * Creates a SURF descriptor.  SURF descriptors are invariant to illumination, orientation, and scale.
 	 * BoofCV provides two variants. The SURF variant created here is designed for speed and sacrifices some stability.
+	 * Different descriptors are produced for gray-scale and color images.
 	 * </p>
 	 *
 	 * @see DescribePointSurf
@@ -56,20 +60,30 @@ public class FactoryDescribeRegionPoint {
 	 * @param imageType Type of input image.
 	 * @return SURF description extractor
 	 */
-	public static <T extends ImageSingleBand, II extends ImageSingleBand>
-	DescribeRegionPoint<T,SurfFeature> surfFast( ConfigSurfDescribe.Speed config , Class<T> imageType) {
+	public static <T extends ImageBase, II extends ImageSingleBand>
+	DescribeRegionPoint<T,SurfFeature> surfFast( ConfigSurfDescribe.Speed config , ImageDataType<T> imageType) {
 
-		Class<II> integralType = GIntegralImageOps.getIntegralType(imageType);
+		Class bandType = imageType.getDataType().getImageClass();
+		Class<II> integralType = GIntegralImageOps.getIntegralType(bandType);
 
 		DescribePointSurf<II> alg = FactoryDescribePointAlgs.surfSpeed( config, integralType);
 
-		return new WrapDescribeSurf<T,II>( alg );
+		if( imageType.getFamily() == ImageDataType.Family.SINGLE_BAND ) {
+			return new WrapDescribeSurf( alg , bandType );
+		} else if( imageType.getFamily() == ImageDataType.Family.MULTI_SPECTRAL ) {
+			DescribePointSurfMultiSpectral<II> color = FactoryDescribePointAlgs.surfColor( alg,imageType.getNumBands());
+
+			return new SurfMultiSpectral_to_DescribeRegionPoint(color,bandType,integralType);
+		} else {
+			throw new IllegalArgumentException("Unknown image type");
+		}
 	}
 
 	/**
 	 * <p>
 	 * Creates a SURF descriptor.  SURF descriptors are invariant to illumination, orientation, and scale.
-	 * BoofCV provides two variants. The SURF variant created here is designed for stability.
+	 * BoofCV provides two variants. The SURF variant created here is designed for stability.  Different
+	 * descriptors are produced for gray-scale and color images.
 	 * </p>
 	 *
 	 * @see DescribePointSurf
@@ -78,14 +92,23 @@ public class FactoryDescribeRegionPoint {
 	 * @param imageType Type of input image.
 	 * @return SURF description extractor
 	 */
-	public static <T extends ImageSingleBand, II extends ImageSingleBand>
-	DescribeRegionPoint<T,SurfFeature> surfStable(ConfigSurfDescribe.Stablility config, Class<T> imageType) {
+	public static <T extends ImageBase, II extends ImageSingleBand>
+	DescribeRegionPoint<T,SurfFeature> surfStable(ConfigSurfDescribe.Stablility config, ImageDataType<T> imageType) {
 
-		Class<II> integralType = GIntegralImageOps.getIntegralType(imageType);
+		Class bandType = imageType.getDataType().getImageClass();
+		Class<II> integralType = GIntegralImageOps.getIntegralType(bandType);
 
 		DescribePointSurf<II> alg = FactoryDescribePointAlgs.surfStability( config, integralType);
 
-		return new WrapDescribeSurf<T,II>( alg );
+		if( imageType.getFamily() == ImageDataType.Family.SINGLE_BAND ) {
+			return new WrapDescribeSurf( alg , bandType );
+		} else if( imageType.getFamily() == ImageDataType.Family.MULTI_SPECTRAL ) {
+			DescribePointSurfMultiSpectral<II> color = FactoryDescribePointAlgs.surfColor( alg,imageType.getNumBands());
+
+			return new SurfMultiSpectral_to_DescribeRegionPoint(color,bandType,integralType);
+		} else {
+			throw new IllegalArgumentException("Unknown image type");
+		}
 	}
 
 	/**
@@ -140,9 +163,9 @@ public class FactoryDescribeRegionPoint {
 				FactoryBriefDefinition.gaussian2(new Random(123), config.radius, config.numPoints);
 
 		if( config.fixed) {
-			return new WrapDescribeBrief<T>(FactoryDescribePointAlgs.brief(definition,filter));
+			return new WrapDescribeBrief<T>(FactoryDescribePointAlgs.brief(definition,filter),imageType);
 		} else {
-			return new WrapDescribeBriefSo<T>(FactoryDescribePointAlgs.briefso(definition, filter));
+			return new WrapDescribeBriefSo<T>(FactoryDescribePointAlgs.briefso(definition, filter),imageType);
 		}
 	}
 
@@ -160,7 +183,8 @@ public class FactoryDescribeRegionPoint {
 	@SuppressWarnings({"unchecked"})
 	public static <T extends ImageSingleBand, D extends TupleDesc>
 	DescribeRegionPoint<T,D> pixel( int regionWidth , int regionHeight , Class<T> imageType ) {
-		return new WrapDescribePixelRegion(FactoryDescribePointAlgs.pixelRegion(regionWidth,regionHeight,imageType));
+		return new WrapDescribePixelRegion(
+				FactoryDescribePointAlgs.pixelRegion(regionWidth,regionHeight,imageType),imageType);
 	}
 
 	/**
@@ -177,6 +201,7 @@ public class FactoryDescribeRegionPoint {
 	@SuppressWarnings({"unchecked"})
 	public static <T extends ImageSingleBand>
 	DescribeRegionPoint<T,NccFeature> pixelNCC( int regionWidth , int regionHeight , Class<T> imageType ) {
-		return new WrapDescribePixelRegionNCC(FactoryDescribePointAlgs.pixelRegionNCC(regionWidth,regionHeight,imageType));
+		return new WrapDescribePixelRegionNCC(
+				FactoryDescribePointAlgs.pixelRegionNCC(regionWidth,regionHeight,imageType),imageType);
 	}
 }
