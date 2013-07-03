@@ -72,7 +72,7 @@ public class PyramidDiscreteAverage<T extends ImageSingleBand> extends PyramidDi
 	 */
 	@Override
 	public double getSampleOffset(int layer) {
-		return scale[layer]/2.0;
+		return (scale[layer]-1)/2.0;
 	}
 
 	@Override
