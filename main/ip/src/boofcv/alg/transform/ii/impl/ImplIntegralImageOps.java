@@ -20,9 +20,7 @@ package boofcv.alg.transform.ii.impl;
 
 import boofcv.alg.transform.ii.IntegralKernel;
 import boofcv.struct.ImageRectangle;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSInt32;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.*;
 
 
 /**
@@ -311,6 +309,214 @@ public class ImplIntegralImageOps {
 		y1 = Math.min(y1,integral.height-1);
 
 		int br=0,tr=0,bl=0,tl=0;
+
+		if( x1 >= 0 && y1 >= 0)
+			br = integral.data[ integral.startIndex + y1*integral.stride + x1 ];
+		if( y0 >= 0 && x1 >= 0)
+			tr = integral.data[ integral.startIndex + y0*integral.stride + x1 ];
+		if( x0 >= 0 && y1 >= 0)
+			bl = integral.data[ integral.startIndex + y1*integral.stride + x0 ];
+		if( x0 >= 0 && y0 >= 0)
+			tl = integral.data[ integral.startIndex + y0*integral.stride + x0 ];
+
+		return br-tr-bl+tl;
+	}
+
+	public static void convolve( ImageFloat64 integral ,
+								 ImageRectangle[] blocks , int scales[],
+								 ImageFloat64 output )
+	{
+		for( int y = 0; y < integral.height; y++ ) {
+			for( int x = 0; x < integral.width; x++ ) {
+				double total = 0;
+				for( int i = 0; i < blocks.length; i++ ) {
+					ImageRectangle b = blocks[i];
+					total += block_zero(integral,x+b.x0,y+b.y0,x+b.x1,y+b.y1)*scales[i];
+				}
+				output.set(x,y,total);
+			}
+		}
+	}
+
+	public static void convolveBorder( ImageFloat64 integral ,
+									   ImageRectangle[] blocks , int scales[],
+									   ImageFloat64 output , int borderX , int borderY )
+	{
+		for( int x = 0; x < integral.width; x++ ) {
+			for( int y = 0; y < borderY; y++ ) {
+				double total = 0;
+				for( int i = 0; i < blocks.length; i++ ) {
+					ImageRectangle b = blocks[i];
+					total += block_zero(integral,x+b.x0,y+b.y0,x+b.x1,y+b.y1)*scales[i];
+				}
+				output.set(x,y,total);
+			}
+			for( int y = integral.height-borderY; y < integral.height; y++ ) {
+				double total = 0;
+				for( int i = 0; i < blocks.length; i++ ) {
+					ImageRectangle b = blocks[i];
+					total += block_zero(integral,x+b.x0,y+b.y0,x+b.x1,y+b.y1)*scales[i];
+				}
+				output.set(x,y,total);
+			}
+		}
+
+		int endY = integral.height-borderY;
+		for( int y = borderY; y < endY; y++ ) {
+			for( int x = 0; x < borderX; x++ ) {
+				double total = 0;
+				for( int i = 0; i < blocks.length; i++ ) {
+					ImageRectangle b = blocks[i];
+					total += block_zero(integral,x+b.x0,y+b.y0,x+b.x1,y+b.y1)*scales[i];
+				}
+				output.set(x,y,total);
+			}
+			for( int x = integral.width-borderX; x < integral.width; x++ ) {
+				double total = 0;
+				for( int i = 0; i < blocks.length; i++ ) {
+					ImageRectangle b = blocks[i];
+					total += block_zero(integral,x+b.x0,y+b.y0,x+b.x1,y+b.y1)*scales[i];
+				}
+				output.set(x,y,total);
+			}
+		}
+	}
+
+	public static double convolveSparse( ImageFloat64 integral , IntegralKernel kernel , int x , int y )
+	{
+		double ret = 0;
+		int N = kernel.getNumBlocks();
+
+		for( int i = 0; i < N; i++ ) {
+			ImageRectangle r = kernel.blocks[i];
+			ret += block_zero(integral,x+r.x0,y+r.y0,x+r.x1,y+r.y1)*kernel.scales[i];
+		}
+
+		return ret;
+	}
+
+	public static double block_unsafe( ImageFloat64 integral , int x0 , int y0 , int x1 , int y1 )
+	{
+		double br = integral.data[ integral.startIndex + y1*integral.stride + x1 ];
+		double tr = integral.data[ integral.startIndex + y0*integral.stride + x1 ];
+		double bl = integral.data[ integral.startIndex + y1*integral.stride + x0 ];
+		double tl = integral.data[ integral.startIndex + y0*integral.stride + x0 ];
+
+		return br-tr-bl+tl;
+	}
+
+	public static double block_zero( ImageFloat64 integral , int x0 , int y0 , int x1 , int y1 )
+	{
+		x0 = Math.min(x0,integral.width-1);
+		y0 = Math.min(y0,integral.height-1);
+		x1 = Math.min(x1,integral.width-1);
+		y1 = Math.min(y1,integral.height-1);
+
+		double br=0,tr=0,bl=0,tl=0;
+
+		if( x1 >= 0 && y1 >= 0)
+			br = integral.data[ integral.startIndex + y1*integral.stride + x1 ];
+		if( y0 >= 0 && x1 >= 0)
+			tr = integral.data[ integral.startIndex + y0*integral.stride + x1 ];
+		if( x0 >= 0 && y1 >= 0)
+			bl = integral.data[ integral.startIndex + y1*integral.stride + x0 ];
+		if( x0 >= 0 && y0 >= 0)
+			tl = integral.data[ integral.startIndex + y0*integral.stride + x0 ];
+
+		return br-tr-bl+tl;
+	}
+
+	public static void convolve( ImageSInt64 integral ,
+								 ImageRectangle[] blocks , int scales[],
+								 ImageSInt64 output )
+	{
+		for( int y = 0; y < integral.height; y++ ) {
+			for( int x = 0; x < integral.width; x++ ) {
+				long total = 0;
+				for( int i = 0; i < blocks.length; i++ ) {
+					ImageRectangle b = blocks[i];
+					total += block_zero(integral,x+b.x0,y+b.y0,x+b.x1,y+b.y1)*scales[i];
+				}
+				output.set(x,y,total);
+			}
+		}
+	}
+
+	public static void convolveBorder( ImageSInt64 integral ,
+									   ImageRectangle[] blocks , int scales[],
+									   ImageSInt64 output , int borderX , int borderY )
+	{
+		for( int x = 0; x < integral.width; x++ ) {
+			for( int y = 0; y < borderY; y++ ) {
+				long total = 0;
+				for( int i = 0; i < blocks.length; i++ ) {
+					ImageRectangle b = blocks[i];
+					total += block_zero(integral,x+b.x0,y+b.y0,x+b.x1,y+b.y1)*scales[i];
+				}
+				output.set(x,y,total);
+			}
+			for( int y = integral.height-borderY; y < integral.height; y++ ) {
+				long total = 0;
+				for( int i = 0; i < blocks.length; i++ ) {
+					ImageRectangle b = blocks[i];
+					total += block_zero(integral,x+b.x0,y+b.y0,x+b.x1,y+b.y1)*scales[i];
+				}
+				output.set(x,y,total);
+			}
+		}
+
+		int endY = integral.height-borderY;
+		for( int y = borderY; y < endY; y++ ) {
+			for( int x = 0; x < borderX; x++ ) {
+				long total = 0;
+				for( int i = 0; i < blocks.length; i++ ) {
+					ImageRectangle b = blocks[i];
+					total += block_zero(integral,x+b.x0,y+b.y0,x+b.x1,y+b.y1)*scales[i];
+				}
+				output.set(x,y,total);
+			}
+			for( int x = integral.width-borderX; x < integral.width; x++ ) {
+				long total = 0;
+				for( int i = 0; i < blocks.length; i++ ) {
+					ImageRectangle b = blocks[i];
+					total += block_zero(integral,x+b.x0,y+b.y0,x+b.x1,y+b.y1)*scales[i];
+				}
+				output.set(x,y,total);
+			}
+		}
+	}
+
+	public static long convolveSparse( ImageSInt64 integral , IntegralKernel kernel , int x , int y )
+	{
+		long ret = 0;
+		int N = kernel.getNumBlocks();
+
+		for( int i = 0; i < N; i++ ) {
+			ImageRectangle r = kernel.blocks[i];
+			ret += block_zero(integral,x+r.x0,y+r.y0,x+r.x1,y+r.y1)*kernel.scales[i];
+		}
+
+		return ret;
+	}
+
+	public static long block_unsafe( ImageSInt64 integral , int x0 , int y0 , int x1 , int y1 )
+	{
+		long br = integral.data[ integral.startIndex + y1*integral.stride + x1 ];
+		long tr = integral.data[ integral.startIndex + y0*integral.stride + x1 ];
+		long bl = integral.data[ integral.startIndex + y1*integral.stride + x0 ];
+		long tl = integral.data[ integral.startIndex + y0*integral.stride + x0 ];
+
+		return br-tr-bl+tl;
+	}
+
+	public static long block_zero( ImageSInt64 integral , int x0 , int y0 , int x1 , int y1 )
+	{
+		x0 = Math.min(x0,integral.width-1);
+		y0 = Math.min(y0,integral.height-1);
+		x1 = Math.min(x1,integral.width-1);
+		y1 = Math.min(y1,integral.height-1);
+
+		long br=0,tr=0,bl=0,tl=0;
 
 		if( x1 >= 0 && y1 >= 0)
 			br = integral.data[ integral.startIndex + y1*integral.stride + x1 ];
