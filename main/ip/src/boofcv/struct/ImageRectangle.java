@@ -19,10 +19,13 @@
 package boofcv.struct;
 
 
+import georegression.metric.Intersection2D_I32;
+import georegression.struct.shapes.RectangleCorner2D_I32;
+
 /**
  * @author Peter Abeles
  */
-public class ImageRectangle {
+public class ImageRectangle extends RectangleCorner2D_I32 {
 	public int x0,y0,x1,y1;
 
 	public ImageRectangle(int x0, int y0, int x1, int y1) {
@@ -33,32 +36,10 @@ public class ImageRectangle {
 		set(orig);
 	}
 
-	public void set( ImageRectangle orig ) {
-		this.x0 = orig.x0;
-		this.y0 = orig.y0;
-		this.x1 = orig.x1;
-		this.y1 = orig.y1;
-	}
-
-	public void set(int x0, int y0, int x1, int y1) {
-		this.x0 = x0;
-		this.y0 = y0;
-		this.x1 = x1;
-		this.y1 = y1;
-	}
-
 	public ImageRectangle() {
 	}
 
-   public int getWidth() {
-      return x1-x0;
-   }
-
-   public int getHeight() {
-      return y1-y0;
-   }
-
-	public int area() {
-		return (y1-y0)*(x1-x0);
+	public boolean intersection( ImageRectangle b , ImageRectangle result ) {
+		return Intersection2D_I32.intersection(this,b,result);
 	}
 }
