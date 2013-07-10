@@ -30,6 +30,10 @@ public class ImageRectangle {
 	}
 
 	public ImageRectangle( ImageRectangle orig ) {
+		set(orig);
+	}
+
+	public void set( ImageRectangle orig ) {
 		this.x0 = orig.x0;
 		this.y0 = orig.y0;
 		this.x1 = orig.x1;

@@ -48,6 +48,8 @@ public class GenerateImplIntegralImageOps extends CodeGeneratorBase {
 		printTwoInput(AutoTypeImage.S32, AutoTypeImage.S32);
 		singleInput(AutoTypeImage.F32);
 		singleInput(AutoTypeImage.S32);
+		singleInput(AutoTypeImage.F64);
+		singleInput(AutoTypeImage.S64);
 
 		out.print("\n" +
 				"}\n");
