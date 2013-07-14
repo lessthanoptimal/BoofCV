@@ -62,6 +62,32 @@ public class ImplIntegralImageOps {
 		}
 	}
 
+	public static void transform( final ImageFloat64 input , final ImageFloat64 transformed )
+	{
+		int indexSrc = input.startIndex;
+		int indexDst = transformed.startIndex;
+		int end = indexSrc + input.width;
+
+		double total = 0;
+		for( ; indexSrc < end; indexSrc++ ) {
+			transformed.data[indexDst++] = total += input.data[indexSrc];
+		}
+
+		for( int y = 1; y < input.height; y++ ) {
+			indexSrc = input.startIndex + input.stride*y;
+			indexDst = transformed.startIndex + transformed.stride*y;
+			int indexPrev = indexDst - transformed.stride;
+
+			end = indexSrc + input.width;
+
+			total = 0;
+			for( ; indexSrc < end; indexSrc++ ) {
+				total +=  input.data[indexSrc];
+				transformed.data[indexDst++] = transformed.data[indexPrev++] + total;
+			}
+		}
+	}
+
 	public static void transform( final ImageUInt8 input , final ImageSInt32 transformed )
 	{
 		int indexSrc = input.startIndex;
@@ -95,6 +121,32 @@ public class ImplIntegralImageOps {
 		int end = indexSrc + input.width;
 
 		int total = 0;
+		for( ; indexSrc < end; indexSrc++ ) {
+			transformed.data[indexDst++] = total += input.data[indexSrc];
+		}
+
+		for( int y = 1; y < input.height; y++ ) {
+			indexSrc = input.startIndex + input.stride*y;
+			indexDst = transformed.startIndex + transformed.stride*y;
+			int indexPrev = indexDst - transformed.stride;
+
+			end = indexSrc + input.width;
+
+			total = 0;
+			for( ; indexSrc < end; indexSrc++ ) {
+				total +=  input.data[indexSrc];
+				transformed.data[indexDst++] = transformed.data[indexPrev++] + total;
+			}
+		}
+	}
+
+	public static void transform( final ImageSInt64 input , final ImageSInt64 transformed )
+	{
+		int indexSrc = input.startIndex;
+		int indexDst = transformed.startIndex;
+		int end = indexSrc + input.width;
+
+		long total = 0;
 		for( ; indexSrc < end; indexSrc++ ) {
 			transformed.data[indexDst++] = total += input.data[indexSrc];
 		}

@@ -21,12 +21,14 @@ package boofcv.struct.feature;
 /**
  * Description for normalized cross correlation (NCC).  The descriptor's value
  * in a NCC feature is the pixel intensity value minus the mean pixel intensity value.
+ * </p>
+ * value[i] = I(x,y) - mean
  *
  * @author Peter Abeles
  */
 public class NccFeature extends TupleDesc_F64 {
 
-	/** mean pixel intensity */
+	/** Mean pixel intensity   Can be used to reconstruct the original values of the template.*/
 	public double mean;
 	/** standard deviation of pixel intensity*/
 	public double sigma;

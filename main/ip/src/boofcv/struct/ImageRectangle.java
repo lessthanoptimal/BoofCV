@@ -26,7 +26,6 @@ import georegression.struct.shapes.RectangleCorner2D_I32;
  * @author Peter Abeles
  */
 public class ImageRectangle extends RectangleCorner2D_I32 {
-	public int x0,y0,x1,y1;
 
 	public ImageRectangle(int x0, int y0, int x1, int y1) {
 		set(x0,y0,x1,y1);

@@ -18,7 +18,9 @@
 
 package boofcv.alg.feature.associate;
 
-import boofcv.abst.feature.associate.*;
+import boofcv.abst.feature.associate.ScoreAssociateHamming_B;
+import boofcv.abst.feature.associate.ScoreAssociateNccFeature;
+import boofcv.abst.feature.associate.ScoreAssociation;
 import boofcv.misc.Performer;
 import boofcv.misc.PerformerBase;
 import boofcv.misc.ProfileOperation;
@@ -145,9 +147,9 @@ public class BenchmarkFeatureScore {
 		System.out.println();
 
 		// the "fastest" seems to always be the first one tested
-		ProfileOperation.printOpsPerSec(new General("Correlation", new ScoreAssociateCorrelation()),TEST_TIME);
-		ProfileOperation.printOpsPerSec(new General("Euclidean", new ScoreAssociateEuclidean_F64()),TEST_TIME);
-		ProfileOperation.printOpsPerSec(new General("Euclidean Sq", new ScoreAssociateEuclideanSq_F64()),TEST_TIME);
+//		ProfileOperation.printOpsPerSec(new General("Correlation", new ScoreAssociateCorrelation()),TEST_TIME);
+//		ProfileOperation.printOpsPerSec(new General("Euclidean", new ScoreAssociateEuclidean_F64()),TEST_TIME);
+//		ProfileOperation.printOpsPerSec(new General("Euclidean Sq", new ScoreAssociateEuclideanSq_F64()),TEST_TIME);
 		ProfileOperation.printOpsPerSec(new Brief(),TEST_TIME);
 		ProfileOperation.printOpsPerSec(new Ncc(),TEST_TIME);
 

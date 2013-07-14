@@ -18,10 +18,7 @@
 
 package boofcv.alg.transform.ii;
 
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSInt32;
-import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.*;
 
 
 /**
@@ -135,8 +132,37 @@ public class GIntegralImageOps {
 
 	/**
 	 * <p>
+	 * Computes the value of a block inside an integral image and treats pixels outside of the
+	 * image as zero.  The block is defined as follows: x0 < x <= x1 and y0 < y <= y1.
+	 * </p>
+	 *
+	 * @param integral Integral image.
+	 * @param x0 Lower bound of the block.  Exclusive.
+	 * @param y0 Lower bound of the block.  Exclusive.
+	 * @param x1 Upper bound of the block.  Inclusive.
+	 * @param y1 Upper bound of the block.  Inclusive.
+	 * @return Value inside the block.
+	 */
+	public static <T extends ImageSingleBand>
+	double block_zero( T integral , int x0 , int y0 , int x1 , int y1 )
+	{
+		if( integral instanceof ImageFloat32 ) {
+			return IntegralImageOps.block_zero((ImageFloat32)integral,x0,y0,x1,y1);
+		} else if( integral instanceof ImageFloat64) {
+			return IntegralImageOps.block_zero((ImageFloat64)integral,x0,y0,x1,y1);
+		} else if( integral instanceof ImageSInt32) {
+			return IntegralImageOps.block_zero((ImageSInt32)integral,x0,y0,x1,y1);
+		} else if( integral instanceof ImageSInt64) {
+			return IntegralImageOps.block_zero((ImageSInt64)integral,x0,y0,x1,y1);
+		} else {
+			throw new IllegalArgumentException("Unknown input type");
+		}
+	}
+
+	/**
+	 * <p>
 	 * Computes the value of a block inside an integral image without bounds checking.  The block is
-	 * defined as follows: x0 < x <= x1 and y0 < y < y1.
+	 * defined as follows: x0 < x <= x1 and y0 < y <= y1.
 	 * </p>
 	 *
 	 * @param integral Integral image.
@@ -151,10 +177,12 @@ public class GIntegralImageOps {
 	{
 		if( integral instanceof ImageFloat32 ) {
 			return IntegralImageOps.block_unsafe((ImageFloat32)integral,x0,y0,x1,y1);
+		} else if( integral instanceof ImageFloat64) {
+			return IntegralImageOps.block_unsafe((ImageFloat64)integral,x0,y0,x1,y1);
 		} else if( integral instanceof ImageSInt32) {
 			return IntegralImageOps.block_unsafe((ImageSInt32)integral,x0,y0,x1,y1);
-//		} else if( integral instanceof ImageSInt64) {
-//			return IntegralImageOps.block_unsafe((ImageSInt64)integral,x0,y0,x1,y1);
+		} else if( integral instanceof ImageSInt64) {
+			return IntegralImageOps.block_unsafe((ImageSInt64)integral,x0,y0,x1,y1);
 		} else {
 			throw new IllegalArgumentException("Unknown input type");
 		}

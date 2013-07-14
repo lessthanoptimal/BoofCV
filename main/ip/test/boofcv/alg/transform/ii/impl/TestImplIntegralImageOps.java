@@ -31,6 +31,7 @@ import org.junit.Test;
 import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 
 /**
@@ -41,6 +42,11 @@ public class TestImplIntegralImageOps {
 	Random rand = new Random(234);
 	int width = 20;
 	int height = 30;
+
+	@Test
+	public void asdfdf() {
+		fail("move tests from other class here to test for correctness");
+	}
 
 	@Test
 	public void transform_F32() {

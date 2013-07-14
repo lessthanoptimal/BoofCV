@@ -44,8 +44,10 @@ public class GenerateImplIntegralImageOps extends CodeGeneratorBase {
 		printPreamble();
 
 		printTwoInput(AutoTypeImage.F32, AutoTypeImage.F32);
+		printTwoInput(AutoTypeImage.F64, AutoTypeImage.F64);
 		printTwoInput(AutoTypeImage.U8, AutoTypeImage.S32);
 		printTwoInput(AutoTypeImage.S32, AutoTypeImage.S32);
+		printTwoInput(AutoTypeImage.S64, AutoTypeImage.S64);
 		singleInput(AutoTypeImage.F32);
 		singleInput(AutoTypeImage.S32);
 		singleInput(AutoTypeImage.F64);

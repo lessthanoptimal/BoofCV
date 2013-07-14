@@ -100,26 +100,26 @@ public class DescriptorDistance {
 
 	/**
 	 * <p>
-	 * Normalized cross correlation (NCC):<br>
+	 * Normalized cross correlation (NCC) computed using a faster technique.<br>
 	 * <br>
-	 * NCC = sum(a[i]*b[i]) / sqrt( variance_a * variance_b )<br>
-	 * where a[i] = I[i]-mean(a), and I[i] is the image pixel intensity around the feature.
+	 * NCC = sum(a[i]*b[i]) / (N*sigma_a * sigma_b)<br>
+	 * where a[i] = I[i]-mean(a), I[i] is the image pixel intensity around the feature, and N is the number of
+	 * elements.
 	 * </p>
 	 *
 	 * @param a First descriptor
 	 * @param b Second descriptor
 	 * @return NCC score
 	 */
-	public static double ncc( NccFeature a, NccFeature b) {
+	public static double ncc(NccFeature a, NccFeature b) {
 		double top = 0;
 
-		int N = a.value.length;
+		final int N = a.value.length;
 		for( int i = 0; i < N; i++ ) {
 			top += a.value[i]*b.value[i];
 		}
 
-		// negative so that smaller values are better
-		return top/(a.sigma * b.sigma);
+		return top/(N*a.sigma * b.sigma);
 	}
 
 	/**

@@ -21,9 +21,7 @@ package boofcv.alg.transform.ii;
 import boofcv.alg.InputSanityCheck;
 import boofcv.alg.transform.ii.impl.ImplIntegralImageOps;
 import boofcv.struct.ImageRectangle;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSInt32;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.*;
 
 
 /**
@@ -57,6 +55,21 @@ public class IntegralImageOps {
 	 * @param transformed Integral image. If null a new image will be created. Modified.
 	 * @return Integral image.
 	 */
+	public static ImageFloat64 transform( ImageFloat64 input , ImageFloat64 transformed ) {
+		transformed = InputSanityCheck.checkDeclare(input,transformed);
+
+		ImplIntegralImageOps.transform(input,transformed);
+
+		return transformed;
+	}
+
+	/**
+	 * Converts a regular image into an integral image.
+	 *
+	 * @param input Regular image. Not modified.
+	 * @param transformed Integral image. If null a new image will be created. Modified.
+	 * @return Integral image.
+	 */
 	public static ImageSInt32 transform( ImageUInt8 input , ImageSInt32 transformed ) {
 		transformed = InputSanityCheck.checkDeclare(input,transformed,ImageSInt32.class);
 
@@ -74,6 +87,21 @@ public class IntegralImageOps {
 	 */
 	public static ImageSInt32 transform( ImageSInt32 input , ImageSInt32 transformed ) {
 		transformed = InputSanityCheck.checkDeclare(input,transformed,ImageSInt32.class);
+
+		ImplIntegralImageOps.transform(input,transformed);
+
+		return transformed;
+	}
+
+	/**
+	 * Converts a regular image into an integral image.
+	 *
+	 * @param input Regular image. Not modified.
+	 * @param transformed Integral image. If null a new image will be created. Modified.
+	 * @return Integral image.
+	 */
+	public static ImageSInt64 transform( ImageSInt64 input , ImageSInt64 transformed ) {
+		transformed = InputSanityCheck.checkDeclare(input,transformed,ImageSInt64.class);
 
 		ImplIntegralImageOps.transform(input,transformed);
 
@@ -189,7 +217,25 @@ public class IntegralImageOps {
 	/**
 	 * <p>
 	 * Computes the value of a block inside an integral image without bounds checking.  The block is
-	 * defined as follows: x0 < x <= x1 and y0 < y < y1.
+	 * defined as follows: x0 < x <= x1 and y0 < y <= y1.
+	 * </p>
+	 *
+	 * @param integral Integral image.
+	 * @param x0 Lower bound of the block.  Exclusive.
+	 * @param y0 Lower bound of the block.  Exclusive.
+	 * @param x1 Upper bound of the block.  Inclusive.
+	 * @param y1 Upper bound of the block.  Inclusive.
+	 * @return Value inside the block.
+	 */
+	public static double block_unsafe( ImageFloat64 integral , int x0 , int y0 , int x1 , int y1 )
+	{
+		return ImplIntegralImageOps.block_unsafe(integral,x0,y0,x1,y1);
+	}
+
+	/**
+	 * <p>
+	 * Computes the value of a block inside an integral image without bounds checking.  The block is
+	 * defined as follows: x0 < x <= x1 and y0 < y <= y1.
 	 * </p>
 	 *
 	 * @param integral Integral image.
@@ -207,7 +253,7 @@ public class IntegralImageOps {
 	/**
 	 * <p>
 	 * Computes the value of a block inside an integral image without bounds checking.  The block is
-	 * defined as follows: x0 < x <= x1 and y0 < y < y1.
+	 * defined as follows: x0 < x <= x1 and y0 < y <= y1.
 	 * </p>
 	 *
 	 * @param integral Integral image.
@@ -224,8 +270,26 @@ public class IntegralImageOps {
 
 	/**
 	 * <p>
+	 * Computes the value of a block inside an integral image without bounds checking.  The block is
+	 * defined as follows: x0 < x <= x1 and y0 < y <= y1.
+	 * </p>
+	 *
+	 * @param integral Integral image.
+	 * @param x0 Lower bound of the block.  Exclusive.
+	 * @param y0 Lower bound of the block.  Exclusive.
+	 * @param x1 Upper bound of the block.  Inclusive.
+	 * @param y1 Upper bound of the block.  Inclusive.
+	 * @return Value inside the block.
+	 */
+	public static long block_unsafe( ImageSInt64 integral , int x0 , int y0 , int x1 , int y1 )
+	{
+		return ImplIntegralImageOps.block_unsafe(integral,x0,y0,x1,y1);
+	}
+
+	/**
+	 * <p>
 	 * Computes the value of a block inside an integral image and treats pixels outside of the
-	 * image as zero.  The block is defined as follows: x0 < x <= x1 and y0 < y < y1.
+	 * image as zero.  The block is defined as follows: x0 < x <= x1 and y0 < y <= y1.
 	 * </p>
 	 *
 	 * @param integral Integral image.
@@ -243,7 +307,25 @@ public class IntegralImageOps {
 	/**
 	 * <p>
 	 * Computes the value of a block inside an integral image and treats pixels outside of the
-	 * image as zero.  The block is defined as follows: x0 < x <= x1 and y0 < y < y1.
+	 * image as zero.  The block is defined as follows: x0 < x <= x1 and y0 < y <= y1.
+	 * </p>
+	 *
+	 * @param integral Integral image.
+	 * @param x0 Lower bound of the block.  Exclusive.
+	 * @param y0 Lower bound of the block.  Exclusive.
+	 * @param x1 Upper bound of the block.  Inclusive.
+	 * @param y1 Upper bound of the block.  Inclusive.
+	 * @return Value inside the block.
+	 */
+	public static double block_zero( ImageFloat64 integral , int x0 , int y0 , int x1 , int y1 )
+	{
+		return ImplIntegralImageOps.block_zero(integral,x0,y0,x1,y1);
+	}
+
+	/**
+	 * <p>
+	 * Computes the value of a block inside an integral image and treats pixels outside of the
+	 * image as zero.  The block is defined as follows: x0 < x <= x1 and y0 < y <= y1.
 	 * </p>
 	 *
 	 * @param integral Integral image.
@@ -254,6 +336,24 @@ public class IntegralImageOps {
 	 * @return Value inside the block.
 	 */
 	public static int block_zero( ImageSInt32 integral , int x0 , int y0 , int x1 , int y1 )
+	{
+		return ImplIntegralImageOps.block_zero(integral,x0,y0,x1,y1);
+	}
+
+	/**
+	 * <p>
+	 * Computes the value of a block inside an integral image and treats pixels outside of the
+	 * image as zero.  The block is defined as follows: x0 < x <= x1 and y0 < y <= y1.
+	 * </p>
+	 *
+	 * @param integral Integral image.
+	 * @param x0 Lower bound of the block.  Exclusive.
+	 * @param y0 Lower bound of the block.  Exclusive.
+	 * @param x1 Upper bound of the block.  Inclusive.
+	 * @param y1 Upper bound of the block.  Inclusive.
+	 * @return Value inside the block.
+	 */
+	public static long block_zero( ImageSInt64 integral , int x0 , int y0 , int x1 , int y1 )
 	{
 		return ImplIntegralImageOps.block_zero(integral,x0,y0,x1,y1);
 	}

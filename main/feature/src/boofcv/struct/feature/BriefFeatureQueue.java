@@ -31,7 +31,7 @@ public class BriefFeatureQueue extends FastQueue<TupleDesc_B> {
 	int numBits;
 
 	public BriefFeatureQueue(int numBits) {
-		super(TupleDesc_B.class,true);
+		super(0,TupleDesc_B.class,true);
 		this.numBits = numBits;
 		growArray(10);
 	}

@@ -31,7 +31,7 @@ public class NccFeatureQueue extends FastQueue<NccFeature> {
 	int descriptorLength;
 
 	public NccFeatureQueue(int descriptorLength) {
-		super(NccFeature.class,true);
+		super(0,NccFeature.class,true);
 		this.descriptorLength = descriptorLength;
 		growArray(10);
 	}
