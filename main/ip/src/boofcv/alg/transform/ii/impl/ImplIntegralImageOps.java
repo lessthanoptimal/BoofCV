@@ -167,15 +167,15 @@ public class ImplIntegralImageOps {
 	}
 
 	public static void convolve( ImageFloat32 integral ,
-								 ImageRectangle[] blocks , int scales[],
+								 IntegralKernel kernel,
 								 ImageFloat32 output )
 	{
 		for( int y = 0; y < integral.height; y++ ) {
 			for( int x = 0; x < integral.width; x++ ) {
 				float total = 0;
-				for( int i = 0; i < blocks.length; i++ ) {
-					ImageRectangle b = blocks[i];
-					total += block_zero(integral,x+b.x0,y+b.y0,x+b.x1,y+b.y1)*scales[i];
+				for( int i = 0; i < kernel.blocks.length; i++ ) {
+					ImageRectangle b = kernel.blocks[i];
+					total += block_zero(integral,x+b.x0,y+b.y0,x+b.x1,y+b.y1)*kernel.scales[i];
 				}
 				output.set(x,y,total);
 			}
@@ -183,23 +183,23 @@ public class ImplIntegralImageOps {
 	}
 
 	public static void convolveBorder( ImageFloat32 integral ,
-									   ImageRectangle[] blocks , int scales[],
+									   IntegralKernel kernel,
 									   ImageFloat32 output , int borderX , int borderY )
 	{
 		for( int x = 0; x < integral.width; x++ ) {
 			for( int y = 0; y < borderY; y++ ) {
 				float total = 0;
-				for( int i = 0; i < blocks.length; i++ ) {
-					ImageRectangle b = blocks[i];
-					total += block_zero(integral,x+b.x0,y+b.y0,x+b.x1,y+b.y1)*scales[i];
+				for( int i = 0; i < kernel.blocks.length; i++ ) {
+					ImageRectangle b = kernel.blocks[i];
+					total += block_zero(integral,x+b.x0,y+b.y0,x+b.x1,y+b.y1)*kernel.scales[i];
 				}
 				output.set(x,y,total);
 			}
 			for( int y = integral.height-borderY; y < integral.height; y++ ) {
 				float total = 0;
-				for( int i = 0; i < blocks.length; i++ ) {
-					ImageRectangle b = blocks[i];
-					total += block_zero(integral,x+b.x0,y+b.y0,x+b.x1,y+b.y1)*scales[i];
+				for( int i = 0; i < kernel.blocks.length; i++ ) {
+					ImageRectangle b = kernel.blocks[i];
+					total += block_zero(integral,x+b.x0,y+b.y0,x+b.x1,y+b.y1)*kernel.scales[i];
 				}
 				output.set(x,y,total);
 			}
@@ -209,17 +209,17 @@ public class ImplIntegralImageOps {
 		for( int y = borderY; y < endY; y++ ) {
 			for( int x = 0; x < borderX; x++ ) {
 				float total = 0;
-				for( int i = 0; i < blocks.length; i++ ) {
-					ImageRectangle b = blocks[i];
-					total += block_zero(integral,x+b.x0,y+b.y0,x+b.x1,y+b.y1)*scales[i];
+				for( int i = 0; i < kernel.blocks.length; i++ ) {
+					ImageRectangle b = kernel.blocks[i];
+					total += block_zero(integral,x+b.x0,y+b.y0,x+b.x1,y+b.y1)*kernel.scales[i];
 				}
 				output.set(x,y,total);
 			}
 			for( int x = integral.width-borderX; x < integral.width; x++ ) {
 				float total = 0;
-				for( int i = 0; i < blocks.length; i++ ) {
-					ImageRectangle b = blocks[i];
-					total += block_zero(integral,x+b.x0,y+b.y0,x+b.x1,y+b.y1)*scales[i];
+				for( int i = 0; i < kernel.blocks.length; i++ ) {
+					ImageRectangle b = kernel.blocks[i];
+					total += block_zero(integral,x+b.x0,y+b.y0,x+b.x1,y+b.y1)*kernel.scales[i];
 				}
 				output.set(x,y,total);
 			}
@@ -271,15 +271,15 @@ public class ImplIntegralImageOps {
 	}
 
 	public static void convolve( ImageSInt32 integral ,
-								 ImageRectangle[] blocks , int scales[],
+								 IntegralKernel kernel,
 								 ImageSInt32 output )
 	{
 		for( int y = 0; y < integral.height; y++ ) {
 			for( int x = 0; x < integral.width; x++ ) {
 				int total = 0;
-				for( int i = 0; i < blocks.length; i++ ) {
-					ImageRectangle b = blocks[i];
-					total += block_zero(integral,x+b.x0,y+b.y0,x+b.x1,y+b.y1)*scales[i];
+				for( int i = 0; i < kernel.blocks.length; i++ ) {
+					ImageRectangle b = kernel.blocks[i];
+					total += block_zero(integral,x+b.x0,y+b.y0,x+b.x1,y+b.y1)*kernel.scales[i];
 				}
 				output.set(x,y,total);
 			}
@@ -287,23 +287,23 @@ public class ImplIntegralImageOps {
 	}
 
 	public static void convolveBorder( ImageSInt32 integral ,
-									   ImageRectangle[] blocks , int scales[],
+									   IntegralKernel kernel,
 									   ImageSInt32 output , int borderX , int borderY )
 	{
 		for( int x = 0; x < integral.width; x++ ) {
 			for( int y = 0; y < borderY; y++ ) {
 				int total = 0;
-				for( int i = 0; i < blocks.length; i++ ) {
-					ImageRectangle b = blocks[i];
-					total += block_zero(integral,x+b.x0,y+b.y0,x+b.x1,y+b.y1)*scales[i];
+				for( int i = 0; i < kernel.blocks.length; i++ ) {
+					ImageRectangle b = kernel.blocks[i];
+					total += block_zero(integral,x+b.x0,y+b.y0,x+b.x1,y+b.y1)*kernel.scales[i];
 				}
 				output.set(x,y,total);
 			}
 			for( int y = integral.height-borderY; y < integral.height; y++ ) {
 				int total = 0;
-				for( int i = 0; i < blocks.length; i++ ) {
-					ImageRectangle b = blocks[i];
-					total += block_zero(integral,x+b.x0,y+b.y0,x+b.x1,y+b.y1)*scales[i];
+				for( int i = 0; i < kernel.blocks.length; i++ ) {
+					ImageRectangle b = kernel.blocks[i];
+					total += block_zero(integral,x+b.x0,y+b.y0,x+b.x1,y+b.y1)*kernel.scales[i];
 				}
 				output.set(x,y,total);
 			}
@@ -313,17 +313,17 @@ public class ImplIntegralImageOps {
 		for( int y = borderY; y < endY; y++ ) {
 			for( int x = 0; x < borderX; x++ ) {
 				int total = 0;
-				for( int i = 0; i < blocks.length; i++ ) {
-					ImageRectangle b = blocks[i];
-					total += block_zero(integral,x+b.x0,y+b.y0,x+b.x1,y+b.y1)*scales[i];
+				for( int i = 0; i < kernel.blocks.length; i++ ) {
+					ImageRectangle b = kernel.blocks[i];
+					total += block_zero(integral,x+b.x0,y+b.y0,x+b.x1,y+b.y1)*kernel.scales[i];
 				}
 				output.set(x,y,total);
 			}
 			for( int x = integral.width-borderX; x < integral.width; x++ ) {
 				int total = 0;
-				for( int i = 0; i < blocks.length; i++ ) {
-					ImageRectangle b = blocks[i];
-					total += block_zero(integral,x+b.x0,y+b.y0,x+b.x1,y+b.y1)*scales[i];
+				for( int i = 0; i < kernel.blocks.length; i++ ) {
+					ImageRectangle b = kernel.blocks[i];
+					total += block_zero(integral,x+b.x0,y+b.y0,x+b.x1,y+b.y1)*kernel.scales[i];
 				}
 				output.set(x,y,total);
 			}
@@ -375,15 +375,15 @@ public class ImplIntegralImageOps {
 	}
 
 	public static void convolve( ImageFloat64 integral ,
-								 ImageRectangle[] blocks , int scales[],
+								 IntegralKernel kernel,
 								 ImageFloat64 output )
 	{
 		for( int y = 0; y < integral.height; y++ ) {
 			for( int x = 0; x < integral.width; x++ ) {
 				double total = 0;
-				for( int i = 0; i < blocks.length; i++ ) {
-					ImageRectangle b = blocks[i];
-					total += block_zero(integral,x+b.x0,y+b.y0,x+b.x1,y+b.y1)*scales[i];
+				for( int i = 0; i < kernel.blocks.length; i++ ) {
+					ImageRectangle b = kernel.blocks[i];
+					total += block_zero(integral,x+b.x0,y+b.y0,x+b.x1,y+b.y1)*kernel.scales[i];
 				}
 				output.set(x,y,total);
 			}
@@ -391,23 +391,23 @@ public class ImplIntegralImageOps {
 	}
 
 	public static void convolveBorder( ImageFloat64 integral ,
-									   ImageRectangle[] blocks , int scales[],
+									   IntegralKernel kernel,
 									   ImageFloat64 output , int borderX , int borderY )
 	{
 		for( int x = 0; x < integral.width; x++ ) {
 			for( int y = 0; y < borderY; y++ ) {
 				double total = 0;
-				for( int i = 0; i < blocks.length; i++ ) {
-					ImageRectangle b = blocks[i];
-					total += block_zero(integral,x+b.x0,y+b.y0,x+b.x1,y+b.y1)*scales[i];
+				for( int i = 0; i < kernel.blocks.length; i++ ) {
+					ImageRectangle b = kernel.blocks[i];
+					total += block_zero(integral,x+b.x0,y+b.y0,x+b.x1,y+b.y1)*kernel.scales[i];
 				}
 				output.set(x,y,total);
 			}
 			for( int y = integral.height-borderY; y < integral.height; y++ ) {
 				double total = 0;
-				for( int i = 0; i < blocks.length; i++ ) {
-					ImageRectangle b = blocks[i];
-					total += block_zero(integral,x+b.x0,y+b.y0,x+b.x1,y+b.y1)*scales[i];
+				for( int i = 0; i < kernel.blocks.length; i++ ) {
+					ImageRectangle b = kernel.blocks[i];
+					total += block_zero(integral,x+b.x0,y+b.y0,x+b.x1,y+b.y1)*kernel.scales[i];
 				}
 				output.set(x,y,total);
 			}
@@ -417,17 +417,17 @@ public class ImplIntegralImageOps {
 		for( int y = borderY; y < endY; y++ ) {
 			for( int x = 0; x < borderX; x++ ) {
 				double total = 0;
-				for( int i = 0; i < blocks.length; i++ ) {
-					ImageRectangle b = blocks[i];
-					total += block_zero(integral,x+b.x0,y+b.y0,x+b.x1,y+b.y1)*scales[i];
+				for( int i = 0; i < kernel.blocks.length; i++ ) {
+					ImageRectangle b = kernel.blocks[i];
+					total += block_zero(integral,x+b.x0,y+b.y0,x+b.x1,y+b.y1)*kernel.scales[i];
 				}
 				output.set(x,y,total);
 			}
 			for( int x = integral.width-borderX; x < integral.width; x++ ) {
 				double total = 0;
-				for( int i = 0; i < blocks.length; i++ ) {
-					ImageRectangle b = blocks[i];
-					total += block_zero(integral,x+b.x0,y+b.y0,x+b.x1,y+b.y1)*scales[i];
+				for( int i = 0; i < kernel.blocks.length; i++ ) {
+					ImageRectangle b = kernel.blocks[i];
+					total += block_zero(integral,x+b.x0,y+b.y0,x+b.x1,y+b.y1)*kernel.scales[i];
 				}
 				output.set(x,y,total);
 			}
@@ -479,15 +479,15 @@ public class ImplIntegralImageOps {
 	}
 
 	public static void convolve( ImageSInt64 integral ,
-								 ImageRectangle[] blocks , int scales[],
+								 IntegralKernel kernel,
 								 ImageSInt64 output )
 	{
 		for( int y = 0; y < integral.height; y++ ) {
 			for( int x = 0; x < integral.width; x++ ) {
 				long total = 0;
-				for( int i = 0; i < blocks.length; i++ ) {
-					ImageRectangle b = blocks[i];
-					total += block_zero(integral,x+b.x0,y+b.y0,x+b.x1,y+b.y1)*scales[i];
+				for( int i = 0; i < kernel.blocks.length; i++ ) {
+					ImageRectangle b = kernel.blocks[i];
+					total += block_zero(integral,x+b.x0,y+b.y0,x+b.x1,y+b.y1)*kernel.scales[i];
 				}
 				output.set(x,y,total);
 			}
@@ -495,23 +495,23 @@ public class ImplIntegralImageOps {
 	}
 
 	public static void convolveBorder( ImageSInt64 integral ,
-									   ImageRectangle[] blocks , int scales[],
+									   IntegralKernel kernel,
 									   ImageSInt64 output , int borderX , int borderY )
 	{
 		for( int x = 0; x < integral.width; x++ ) {
 			for( int y = 0; y < borderY; y++ ) {
 				long total = 0;
-				for( int i = 0; i < blocks.length; i++ ) {
-					ImageRectangle b = blocks[i];
-					total += block_zero(integral,x+b.x0,y+b.y0,x+b.x1,y+b.y1)*scales[i];
+				for( int i = 0; i < kernel.blocks.length; i++ ) {
+					ImageRectangle b = kernel.blocks[i];
+					total += block_zero(integral,x+b.x0,y+b.y0,x+b.x1,y+b.y1)*kernel.scales[i];
 				}
 				output.set(x,y,total);
 			}
 			for( int y = integral.height-borderY; y < integral.height; y++ ) {
 				long total = 0;
-				for( int i = 0; i < blocks.length; i++ ) {
-					ImageRectangle b = blocks[i];
-					total += block_zero(integral,x+b.x0,y+b.y0,x+b.x1,y+b.y1)*scales[i];
+				for( int i = 0; i < kernel.blocks.length; i++ ) {
+					ImageRectangle b = kernel.blocks[i];
+					total += block_zero(integral,x+b.x0,y+b.y0,x+b.x1,y+b.y1)*kernel.scales[i];
 				}
 				output.set(x,y,total);
 			}
@@ -521,17 +521,17 @@ public class ImplIntegralImageOps {
 		for( int y = borderY; y < endY; y++ ) {
 			for( int x = 0; x < borderX; x++ ) {
 				long total = 0;
-				for( int i = 0; i < blocks.length; i++ ) {
-					ImageRectangle b = blocks[i];
-					total += block_zero(integral,x+b.x0,y+b.y0,x+b.x1,y+b.y1)*scales[i];
+				for( int i = 0; i < kernel.blocks.length; i++ ) {
+					ImageRectangle b = kernel.blocks[i];
+					total += block_zero(integral,x+b.x0,y+b.y0,x+b.x1,y+b.y1)*kernel.scales[i];
 				}
 				output.set(x,y,total);
 			}
 			for( int x = integral.width-borderX; x < integral.width; x++ ) {
 				long total = 0;
-				for( int i = 0; i < blocks.length; i++ ) {
-					ImageRectangle b = blocks[i];
-					total += block_zero(integral,x+b.x0,y+b.y0,x+b.x1,y+b.y1)*scales[i];
+				for( int i = 0; i < kernel.blocks.length; i++ ) {
+					ImageRectangle b = kernel.blocks[i];
+					total += block_zero(integral,x+b.x0,y+b.y0,x+b.x1,y+b.y1)*kernel.scales[i];
 				}
 				output.set(x,y,total);
 			}

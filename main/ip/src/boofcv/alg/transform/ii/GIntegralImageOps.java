@@ -56,12 +56,16 @@ public class GIntegralImageOps {
 	T transform( I input , T transformed ) {
 		if( input instanceof ImageFloat32 ) {
 			return (T)IntegralImageOps.transform((ImageFloat32)input,(ImageFloat32)transformed);
+		} else if( input instanceof ImageFloat64) {
+			return (T)IntegralImageOps.transform((ImageFloat64)input,(ImageFloat64)transformed);
 		} else if( input instanceof ImageUInt8) {
 			return (T)IntegralImageOps.transform((ImageUInt8)input,(ImageSInt32)transformed);
 		} else if( input instanceof ImageSInt32) {
 			return (T)IntegralImageOps.transform((ImageSInt32)input,(ImageSInt32)transformed);
+		} else if( input instanceof ImageSInt64) {
+			return (T)IntegralImageOps.transform((ImageSInt64)input,(ImageSInt64)transformed);
 		} else {
-			throw new IllegalArgumentException("Unknown input type");
+			throw new IllegalArgumentException("Unknown input type: "+input.getClass().getSimpleName());
 		}
 	}
 
@@ -79,10 +83,14 @@ public class GIntegralImageOps {
 				T output ) {
 		if( integral instanceof ImageFloat32 ) {
 			return (T)IntegralImageOps.convolve((ImageFloat32)integral,kernel,(ImageFloat32)output);
+		} else if( integral instanceof ImageFloat64) {
+			return (T)IntegralImageOps.convolve((ImageFloat64)integral,kernel,(ImageFloat64)output);
 		} else if( integral instanceof ImageSInt32) {
 			return (T)IntegralImageOps.convolve((ImageSInt32)integral,kernel,(ImageSInt32)output);
+		} else if( integral instanceof ImageSInt64) {
+			return (T)IntegralImageOps.convolve((ImageSInt64)integral,kernel,(ImageSInt64)output);
 		} else {
-			throw new IllegalArgumentException("Unknown input type");
+			throw new IllegalArgumentException("Unknown input type: "+integral.getClass().getSimpleName());
 		}
 	}
 
@@ -101,8 +109,12 @@ public class GIntegralImageOps {
 					  T output , int borderX , int borderY ) {
 		if( integral instanceof ImageFloat32 ) {
 			return (T)IntegralImageOps.convolveBorder((ImageFloat32)integral,kernel,(ImageFloat32)output,borderX,borderY);
+		} else if( integral instanceof ImageFloat64) {
+			return (T)IntegralImageOps.convolveBorder((ImageFloat64)integral,kernel,(ImageFloat64)output,borderX,borderY);
 		} else if( integral instanceof ImageSInt32) {
 			return (T)IntegralImageOps.convolveBorder((ImageSInt32)integral,kernel,(ImageSInt32)output,borderX,borderY);
+		} else if( integral instanceof ImageSInt64) {
+			return (T)IntegralImageOps.convolveBorder((ImageSInt64)integral,kernel,(ImageSInt64)output,borderX,borderY);
 		} else {
 			throw new IllegalArgumentException("Unknown input type");
 		}
@@ -123,8 +135,12 @@ public class GIntegralImageOps {
 						   int x , int y ) {
 		if( integral instanceof ImageFloat32 ) {
 			return IntegralImageOps.convolveSparse((ImageFloat32)integral,kernel,x,y);
+		} else if( integral instanceof ImageFloat64) {
+			return IntegralImageOps.convolveSparse((ImageFloat64)integral,kernel,x,y);
 		} else if( integral instanceof ImageSInt32) {
 			return IntegralImageOps.convolveSparse((ImageSInt32)integral,kernel,x,y);
+		} else if( integral instanceof ImageSInt64) {
+			return IntegralImageOps.convolveSparse((ImageSInt64)integral,kernel,x,y);
 		} else {
 			throw new IllegalArgumentException("Unknown input type");
 		}
