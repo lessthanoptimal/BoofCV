@@ -50,6 +50,10 @@ public class TestIntegralImageOps {
 	int width = 20;
 	int height = 30;
 
+	@Test
+	public void asdfdf() {
+		fail("CHeck to see if inputs are handled correctnly, not that II is computed correctly");
+	}
 
 	@Test
 	public void transform() {

@@ -83,12 +83,39 @@ public class TestDescriptorDistance {
 		NccFeature a = new NccFeature(5);
 		NccFeature b = new NccFeature(5);
 
-		a.sigma =12;
-		b.sigma =7;
+		a.sigma = 12;
+		b.sigma = 7;
 		a.value=new double[]{1,2,3,4,5};
 		b.value=new double[]{2,-1,7,-8,10};
 
-		assertEquals(0.46429,DescriptorDistance.ncc(a, b),1e-2);
+		assertEquals(0.46429/5.0,DescriptorDistance.ncc(a, b),1e-2);
+	}
+
+	/**
+	 * When a correctly computed NCC descriptor is compared against itself the distance should be one
+	 */
+	@Test
+	public void ncc_self_distance() {
+		NccFeature a = new NccFeature(5);
+		for( int i = 0; i < a.value.length; i++ )
+			a.value[i] = i*i;
+
+		double mean = 0;
+		for( int i = 0; i < a.value.length; i++ )
+			mean += a.value[i];
+		mean /= a.size();
+
+		double sigma = 0;
+		for( int i = 0; i < a.value.length; i++ ) {
+			double d = a.value[i] -= mean;
+			sigma += d*d;
+		}
+		sigma /= a.size();
+
+		a.mean = mean;
+		a.sigma = Math.sqrt(sigma);
+
+		assertEquals(1,DescriptorDistance.ncc(a, a),1e-2);
 	}
 
 	@Test
