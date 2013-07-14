@@ -18,20 +18,30 @@
 
 package boofcv.alg.transform.ii.impl;
 
+import boofcv.alg.filter.convolve.ConvolveWithBorder;
 import boofcv.alg.misc.GImageMiscOps;
+import boofcv.alg.transform.ii.GIntegralImageOps;
+import boofcv.alg.transform.ii.IntegralKernel;
 import boofcv.core.image.FactoryGImageSingleBand;
+import boofcv.core.image.GConvertImage;
 import boofcv.core.image.GImageSingleBand;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.core.image.GeneralizedImageOps;
+import boofcv.core.image.border.FactoryImageBorderAlgs;
+import boofcv.core.image.border.ImageBorder_I32;
+import boofcv.struct.ImageRectangle;
+import boofcv.struct.convolve.Kernel2D_I32;
 import boofcv.struct.image.ImageSInt32;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
 import boofcv.testing.BoofTesting;
+import org.junit.Assert;
 import org.junit.Test;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 
 
 /**
@@ -44,33 +54,27 @@ public class TestImplIntegralImageOps {
 	int height = 30;
 
 	@Test
-	public void asdfdf() {
-		fail("move tests from other class here to test for correctness");
+	public void transform() {
+		int numFound = BoofTesting.findMethodThenCall(this,"transform",ImplIntegralImageOps.class,"transform");
+		Assert.assertEquals(5, numFound);
 	}
 
-	@Test
-	public void transform_F32() {
-		ImageFloat32 a = new ImageFloat32(width,height);
-		GImageMiscOps.fillUniform(a, rand, 0, 100);
+	public void transform( Method m ) {
+		Class paramType[] = m.getParameterTypes();
+		Class inputType = paramType[0];
+		Class outputType = paramType[1];
 
-		ImageFloat32 b = new ImageFloat32(width,height);
-		ImplIntegralImageOps.transform(a,b);
+		ImageSingleBand input = GeneralizedImageOps.createSingleBand(inputType, width, height);
+		ImageSingleBand integral = GeneralizedImageOps.createSingleBand(outputType, width, height);
 
-		BoofTesting.checkSubImage(this,"checkResults",true,a,b);
+		GImageMiscOps.fillUniform(input, rand, 0, 100);
+
+		BoofTesting.checkSubImage(this,"checkTransformResults",true,m,input,integral);
 	}
 
-	@Test
-	public void transform_U8() {
-		ImageUInt8 a = new ImageUInt8(width,height);
-		GImageMiscOps.fillUniform(a, rand, 0, 100);
+	public void checkTransformResults(Method m , ImageSingleBand a, ImageSingleBand b) throws InvocationTargetException, IllegalAccessException {
 
-		ImageSInt32 b = new ImageSInt32(width,height);
-		ImplIntegralImageOps.transform(a,b);
-
-		BoofTesting.checkSubImage(this,"checkResults",true,a,b);
-	}
-
-	public void checkResults(ImageSingleBand a, ImageSingleBand b) {
+		m.invoke(null,a,b);
 
 		GImageSingleBand aa = FactoryGImageSingleBand.wrap(a);
 		GImageSingleBand bb = FactoryGImageSingleBand.wrap(b);
@@ -85,8 +89,174 @@ public class TestImplIntegralImageOps {
 					}
 				}
 
-				assertEquals(x+" "+y,total,bb.get(x,y).doubleValue(),1e-1);
+				Assert.assertEquals(x+" "+y,total,bb.get(x,y).doubleValue(),1e-1);
 			}
 		}
+	}
+
+	@Test
+	public void convolve() {
+		int numFound = BoofTesting.findMethodThenCall(this,"convolve",ImplIntegralImageOps.class,"convolve");
+		assertEquals(4, numFound);
+	}
+
+	public void convolve( Method m ) throws InvocationTargetException, IllegalAccessException {
+		Kernel2D_I32 kernel = new Kernel2D_I32(3, new int[]{1,1,1,2,2,2,1,1,1});
+		ImageUInt8 input = new ImageUInt8(width,height);
+		ImageSInt32 expected = new ImageSInt32(width,height);
+		GImageMiscOps.fillUniform(input, rand, 0, 10);
+		ImageBorder_I32 border = FactoryImageBorderAlgs.value( input, 0);
+		ConvolveWithBorder.convolve(kernel,input,expected,border);
+
+		Class paramType[] = m.getParameterTypes();
+		Class inputType = paramType[0];
+		Class outputType = paramType[2];
+
+		ImageSingleBand inputII = GeneralizedImageOps.createSingleBand(inputType, width, height);
+		ImageSingleBand integral = GeneralizedImageOps.createSingleBand(outputType, width, height);
+		ImageSingleBand expectedII = GeneralizedImageOps.createSingleBand(outputType, width, height);
+		ImageSingleBand found = GeneralizedImageOps.createSingleBand(outputType, width, height);
+
+		GConvertImage.convert(input,inputII);
+		GConvertImage.convert(expected,expectedII);
+
+		GIntegralImageOps.transform(inputII, integral);
+
+		IntegralKernel kernelII = new IntegralKernel(2);
+		kernelII.blocks[0] = new ImageRectangle(-2,-2,1,1);
+		kernelII.blocks[1] = new ImageRectangle(-2,-1,1,0);
+		kernelII.scales = new int[]{1,1};
+
+		m.invoke(null,integral,kernelII,found);
+
+		BoofTesting.assertEqualsRelative(expected, found, 1e-4f);
+	}
+
+
+	@Test
+	public void convolveBorder() {
+		int numFound = BoofTesting.findMethodThenCall(this,"convolveBorder",ImplIntegralImageOps.class,"convolveBorder");
+		assertEquals(4,numFound);
+	}
+
+	public void convolveBorder( Method m ) throws InvocationTargetException, IllegalAccessException {
+		Kernel2D_I32 kernel = new Kernel2D_I32(3, new int[]{1,1,1,2,2,2,1,1,1});
+		ImageUInt8 input = new ImageUInt8(width,height);
+		ImageSInt32 expected = new ImageSInt32(width,height);
+		GImageMiscOps.fillUniform(input, rand, 0, 10);
+		ImageBorder_I32 border = FactoryImageBorderAlgs.value( input, 0);
+		ConvolveWithBorder.convolve(kernel,input,expected,border);
+
+		Class paramType[] = m.getParameterTypes();
+		Class inputType = paramType[0];
+		Class outputType = paramType[2];
+
+		ImageSingleBand inputII = GeneralizedImageOps.createSingleBand(inputType, width, height);
+		ImageSingleBand integral = GeneralizedImageOps.createSingleBand(outputType, width, height);
+		ImageSingleBand expectedII = GeneralizedImageOps.createSingleBand(outputType, width, height);
+		ImageSingleBand found = GeneralizedImageOps.createSingleBand(outputType, width, height);
+
+		GConvertImage.convert(input,inputII);
+		GConvertImage.convert(expected,expectedII);
+
+		GIntegralImageOps.transform(inputII, integral);
+
+		IntegralKernel kernelII = new IntegralKernel(2);
+		kernelII.blocks[0] = new ImageRectangle(-2,-2,1,1);
+		kernelII.blocks[1] = new ImageRectangle(-2,-1,1,0);
+		kernelII.scales = new int[]{1,1};
+
+		m.invoke(null,integral,kernelII,found,4,5);
+
+		BoofTesting.assertEqualsBorder(expected,found,1e-4f,4,5);
+	}
+
+	@Test
+	public void convolveSparse() {
+		int numFound = BoofTesting.findMethodThenCall(this,"convolveSparse",ImplIntegralImageOps.class,"convolveSparse");
+		assertEquals(4,numFound);
+	}
+
+	public void convolveSparse( Method m ) throws InvocationTargetException, IllegalAccessException {
+		Class paramType[] = m.getParameterTypes();
+		Class inputType = paramType[0];
+
+		ImageSingleBand integral = GeneralizedImageOps.createSingleBand(inputType, width, height);
+
+		GImageMiscOps.fillUniform(integral, rand, 0, 1000);
+
+		ImageSingleBand expected = GeneralizedImageOps.createSingleBand(inputType, width, height);
+
+		IntegralKernel kernel = new IntegralKernel(2);
+		kernel.blocks[0] = new ImageRectangle(-2,-2,1,1);
+		kernel.blocks[1] = new ImageRectangle(-2,-1,1,0);
+		kernel.scales =  new int[]{1,2};
+
+		GIntegralImageOps.convolve(integral,kernel,expected);
+
+		GImageSingleBand e = FactoryGImageSingleBand.wrap(expected);
+
+		double found0 = ((Number)m.invoke(null,integral,kernel,0,0)).doubleValue();
+		double found1 = ((Number)m.invoke(null,integral,kernel,10,12)).doubleValue();
+		double found2 = ((Number)m.invoke(null,integral,kernel,19,29)).doubleValue();
+
+		assertEquals(e.get(0,0).doubleValue(),found0,1e-4f);
+		assertEquals(e.get(10,12).doubleValue(),found1,1e-4f);
+		assertEquals(e.get(19,29).doubleValue(),found2,1e-4f);
+	}
+
+	@Test
+	public void block_unsafe() {
+		int numFound = BoofTesting.findMethodThenCall(this,"block_unsafe",ImplIntegralImageOps.class,"block_unsafe");
+		assertEquals(4,numFound);
+	}
+
+	public void block_unsafe( Method m ) throws InvocationTargetException, IllegalAccessException {
+		Class paramType[] = m.getParameterTypes();
+		Class inputType = paramType[0];
+		Class origType = inputType == ImageSInt32.class ? ImageUInt8.class : inputType;
+
+		ImageSingleBand input = GeneralizedImageOps.createSingleBand(origType, width, height);
+		ImageSingleBand integral = GeneralizedImageOps.createSingleBand(inputType, width, height);
+
+		GImageMiscOps.fill(input,1);
+		GIntegralImageOps.transform(input,integral);
+
+		double found0 = ((Number)m.invoke(null,integral,4,5,8,8)).doubleValue();
+
+		assertEquals(12, found0, 1e-4f);
+	}
+
+	@Test
+	public void block_zero() {
+		int numFound = BoofTesting.findMethodThenCall(this,"block_zero",ImplIntegralImageOps.class,"block_zero");
+		assertEquals(4, numFound);
+	}
+
+	public void block_zero( Method m ) throws InvocationTargetException, IllegalAccessException {
+		Class paramType[] = m.getParameterTypes();
+		Class inputType = paramType[0];
+		Class origType = inputType == ImageSInt32.class ? ImageUInt8.class : inputType;
+
+		ImageSingleBand input = GeneralizedImageOps.createSingleBand(origType, width, height);
+		ImageSingleBand integral = GeneralizedImageOps.createSingleBand(inputType, width, height);
+
+		GImageMiscOps.fill(input,1);
+		GIntegralImageOps.transform(input,integral);
+
+		double found = ((Number)m.invoke(null,integral,4,5,8,8)).doubleValue();
+		assertEquals(12,found,1e-4f);
+
+		found = ((Number)m.invoke(null,integral,-1,-2,2,3)).doubleValue();
+		assertEquals(12,found,1e-4f);
+
+		found = ((Number)m.invoke(null,integral,width-2,height-3,width+1,height+3)).doubleValue();
+		assertEquals(2,found,1e-4f);
+
+		found = ((Number)m.invoke(null,integral,3,-4,-1,-1)).doubleValue();
+		assertEquals(0,found,1e-4f);
+
+		found = ((Number)m.invoke(null,integral,width+1,height+2,width+6,height+8)).doubleValue();
+		assertEquals(0,found,1e-4f);
 	}
 }

@@ -61,6 +61,6 @@ public class TestScoreAssociateNccFeature extends StandardScoreAssociationChecks
 		a.value=new double[]{1,2,3,4,5};
 		b.value=new double[]{2,-1,7,-8,10};
 
-		assertEquals(-0.46429,scorer.score(a,b),1e-2);
+		assertEquals(-0.46429/5.0,scorer.score(a,b),1e-2);
 	}
 }

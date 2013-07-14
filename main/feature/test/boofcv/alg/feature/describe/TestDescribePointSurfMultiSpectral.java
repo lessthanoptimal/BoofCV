@@ -71,12 +71,21 @@ public class TestDescribePointSurfMultiSpectral {
 			assertEquals(expectedLaplace,found.laplacianPositive);
 
 			SurfFeature expected = desc.createDescription();
+
 			for( int b = 0; b < 3; b++ ) {
 				desc.setImage(input.getBand(b));
 				desc.describe(x,y,angle,scale,expected);
 
+				// should be off by a constant scale factor since it is normalized across all bands not just one
+				double norm = 0;
 				for( int j = 0; j < expected.size(); j++ ) {
-					assertEquals(expected.getDouble(j),found.getDouble(j+b*expected.size()),1e-8);
+					double v = found.getDouble(j+b*expected.size());
+					norm += v*v;
+				}
+				norm = Math.sqrt(norm);
+
+				for( int j = 0; j < expected.size(); j++ ) {
+					assertEquals(expected.getDouble(j),found.getDouble(j+b*expected.size())/norm,1e-8);
 				}
 			}
 		}

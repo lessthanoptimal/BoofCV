@@ -88,7 +88,7 @@ public class IntegralImageOps {
 	public static ImageSInt32 transform( ImageSInt32 input , ImageSInt32 transformed ) {
 		transformed = InputSanityCheck.checkDeclare(input,transformed,ImageSInt32.class);
 
-		ImplIntegralImageOps.transform(input,transformed);
+		ImplIntegralImageOps.transform(input, transformed);
 
 		return transformed;
 	}
@@ -103,7 +103,7 @@ public class IntegralImageOps {
 	public static ImageSInt64 transform( ImageSInt64 input , ImageSInt64 transformed ) {
 		transformed = InputSanityCheck.checkDeclare(input,transformed,ImageSInt64.class);
 
-		ImplIntegralImageOps.transform(input,transformed);
+		ImplIntegralImageOps.transform(input, transformed);
 
 		return transformed;
 	}
@@ -122,7 +122,26 @@ public class IntegralImageOps {
 	{
 		output = InputSanityCheck.checkDeclare(integral,output);
 
-		ImplIntegralImageOps.convolve(integral,kernel.blocks,kernel.scales,output);
+		ImplIntegralImageOps.convolve(integral, kernel, output);
+
+		return output;
+	}
+
+	/**
+	 * General code for convolving a box filter across an image using the integral image.
+	 *
+	 * @param integral Integral image.
+	 * @param kernel Convolution kernel.
+	 * @param output The convolved image. If null a new image will be declared and returned. Modified.
+	 * @return Convolved image.
+	 */
+	public static ImageFloat64 convolve( ImageFloat64 integral ,
+										 IntegralKernel kernel ,
+										 ImageFloat64 output )
+	{
+		output = InputSanityCheck.checkDeclare(integral,output);
+
+		ImplIntegralImageOps.convolve(integral,kernel,output);
 
 		return output;
 	}
@@ -141,7 +160,26 @@ public class IntegralImageOps {
 	{
 		output = InputSanityCheck.checkDeclare(integral,output);
 
-		ImplIntegralImageOps.convolve(integral,kernel.blocks,kernel.scales,output);
+		ImplIntegralImageOps.convolve(integral, kernel, output);
+
+		return output;
+	}
+
+	/**
+	 * General code for convolving a box filter across an image using the integral image.
+	 *
+	 * @param integral Integral image.
+	 * @param kernel Convolution kernel.
+	 * @param output The convolved image. If null a new image will be declared and returned. Modified.
+	 * @return Convolved image.
+	 */
+	public static ImageSInt64 convolve( ImageSInt64 integral ,
+										IntegralKernel kernel ,
+										ImageSInt64 output )
+	{
+		output = InputSanityCheck.checkDeclare(integral,output);
+
+		ImplIntegralImageOps.convolve(integral,kernel,output);
 
 		return output;
 	}
@@ -161,7 +199,27 @@ public class IntegralImageOps {
 	{
 		output = InputSanityCheck.checkDeclare(integral,output);
 
-		ImplIntegralImageOps.convolveBorder(integral,kernel.blocks,kernel.scales,output,borderX,borderY);
+		ImplIntegralImageOps.convolveBorder(integral,kernel,output,borderX,borderY);
+
+		return output;
+	}
+
+	/**
+	 * Convolves the kernel only across the image's border.
+	 *
+	 * @param integral Integral image. Not modified.
+	 * @param kernel Convolution kernel.
+	 * @param output The convolved image. If null a new image will be created. Modified.
+	 * @param borderX Size of the image border along the horizontal axis.
+	 * @param borderY size of the image border along the vertical axis.
+	 */
+	public static ImageFloat64 convolveBorder( ImageFloat64 integral ,
+											   IntegralKernel kernel ,
+											   ImageFloat64 output , int borderX , int borderY )
+	{
+		output = InputSanityCheck.checkDeclare(integral,output);
+
+		ImplIntegralImageOps.convolveBorder(integral,kernel,output,borderX,borderY);
 
 		return output;
 	}
@@ -181,7 +239,27 @@ public class IntegralImageOps {
 	{
 		output = InputSanityCheck.checkDeclare(integral,output);
 
-		ImplIntegralImageOps.convolveBorder(integral,kernel.blocks,kernel.scales,output,borderX,borderY);
+		ImplIntegralImageOps.convolveBorder(integral,kernel,output,borderX,borderY);
+
+		return output;
+	}
+
+	/**
+	 * Convolves the kernel only across the image's border.
+	 *
+	 * @param integral Integral image. Not modified.
+	 * @param kernel Convolution kernel.
+	 * @param output The convolved image. If null a new image will be created. Modified.
+	 * @param borderX Size of the image border along the horizontal axis.
+	 * @param borderY size of the image border along the vertical axis.
+	 */
+	public static ImageSInt64 convolveBorder( ImageSInt64 integral ,
+											  IntegralKernel kernel ,
+											  ImageSInt64 output , int borderX , int borderY )
+	{
+		output = InputSanityCheck.checkDeclare(integral,output);
+
+		ImplIntegralImageOps.convolveBorder(integral,kernel,output,borderX,borderY);
 
 		return output;
 	}
@@ -197,6 +275,20 @@ public class IntegralImageOps {
 	 */
 	public static float convolveSparse( ImageFloat32 integral , IntegralKernel kernel , int x , int y )
 	{
+		return ImplIntegralImageOps.convolveSparse(integral, kernel, x, y);
+	}
+
+	/**
+	 * Convolves a kernel around a single point in the integral image.
+	 *
+	 * @param integral Input integral image. Not modified.
+	 * @param kernel Convolution kernel.
+	 * @param x Pixel the convolution is performed at.
+	 * @param y Pixel the convolution is performed at.
+	 * @return Value of the convolution
+	 */
+	public static double convolveSparse( ImageFloat64 integral , IntegralKernel kernel , int x , int y )
+	{
 		return ImplIntegralImageOps.convolveSparse(integral,kernel,x,y);
 	}
 
@@ -210,6 +302,20 @@ public class IntegralImageOps {
 	 * @return Value of the convolution
 	 */
 	public static int convolveSparse( ImageSInt32 integral , IntegralKernel kernel , int x , int y )
+	{
+		return ImplIntegralImageOps.convolveSparse(integral, kernel, x, y);
+	}
+
+	/**
+	 * Convolves a kernel around a single point in the integral image.
+	 *
+	 * @param integral Input integral image. Not modified.
+	 * @param kernel Convolution kernel.
+	 * @param x Pixel the convolution is performed at.
+	 * @param y Pixel the convolution is performed at.
+	 * @return Value of the convolution
+	 */
+	public static long convolveSparse( ImageSInt64 integral , IntegralKernel kernel , int x , int y )
 	{
 		return ImplIntegralImageOps.convolveSparse(integral,kernel,x,y);
 	}
@@ -265,7 +371,7 @@ public class IntegralImageOps {
 	 */
 	public static int block_unsafe( ImageSInt32 integral , int x0 , int y0 , int x1 , int y1 )
 	{
-		return ImplIntegralImageOps.block_unsafe(integral,x0,y0,x1,y1);
+		return ImplIntegralImageOps.block_unsafe(integral, x0, y0, x1, y1);
 	}
 
 	/**
@@ -283,7 +389,7 @@ public class IntegralImageOps {
 	 */
 	public static long block_unsafe( ImageSInt64 integral , int x0 , int y0 , int x1 , int y1 )
 	{
-		return ImplIntegralImageOps.block_unsafe(integral,x0,y0,x1,y1);
+		return ImplIntegralImageOps.block_unsafe(integral, x0, y0, x1, y1);
 	}
 
 	/**
@@ -360,7 +466,7 @@ public class IntegralImageOps {
 
 	/**
 	 * Prints out the kernel.
-	 * 
+	 *
 	 * @param kernel THe kernel which is to be printed.
 	 */
 	public static void print( IntegralKernel kernel )
@@ -408,12 +514,12 @@ public class IntegralImageOps {
 	 * Checks to see if the kernel is applied at this specific spot if all the pixels
 	 * would be inside the image bounds or not
 	 *
-	 * @param x
-	 * @param y
-	 * @param kernel
-	 * @param width
-	 * @param height
-	 * @return
+	 * @param x location where the kernel is applied. x-axis
+	 * @param y location where the kernel is applied. y-axis
+	 * @param kernel The kernel
+	 * @param width Image's width
+	 * @param height Image's height
+	 * @return true if in bounds and false if out of bounds
 	 */
 	public static boolean isInBounds( int x , int y , IntegralKernel kernel , int width , int height )
 	{
