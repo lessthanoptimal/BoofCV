@@ -17,6 +17,7 @@ Version : Alpha 0.16
   * Added a color SURF descriptor
 - NCC error now more "correct" and divides by the number of elements
 - Integral image operations now support more image types.  S64 and F64
+- KltTracker.setDescription() can now fail due to lack of texture
 
 - TODO OpenTLD
 - TODO automate high level tests

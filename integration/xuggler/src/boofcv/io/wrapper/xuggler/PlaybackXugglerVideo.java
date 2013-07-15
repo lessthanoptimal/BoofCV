@@ -33,7 +33,7 @@ public class PlaybackXugglerVideo {
 		String fileName;
 
 		if (args.length == 0) {
-			fileName = "/home/pja/temp/left.mjpeg";
+			fileName = "../data/applet/vo/backyard/left.mjpeg";
 		} else {
 			fileName = args[0];
 		}

@@ -188,9 +188,6 @@ public class VideoSequenceSimulator<I extends ImageSingleBand> {
 				}
 			}
 		}
-
-
-
 	}
 
 	protected static class Square

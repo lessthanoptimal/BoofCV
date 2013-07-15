@@ -126,12 +126,10 @@ public class KltTracker<InputImage extends ImageSingleBand, DerivativeImage exte
 			return false;
 		}
 
-		internalSetDescription(feature);
-
-		return true;
+		return internalSetDescription(feature);
 	}
 
-	private void internalSetDescription(KltFeature feature) {
+	private boolean internalSetDescription(KltFeature feature) {
 		int regionWidth = feature.radius * 2 + 1;
 		int size = regionWidth * regionWidth;
 		
@@ -158,6 +156,10 @@ public class KltTracker<InputImage extends ImageSingleBand, DerivativeImage exte
 		feature.Gxx = Gxx;
 		feature.Gyy = Gyy;
 		feature.Gxy = Gxy;
+
+		float det = Gxx * Gyy - Gxy * Gxy;
+
+		return (det >= config.minDeterminant);
 	}
 
 	/**
