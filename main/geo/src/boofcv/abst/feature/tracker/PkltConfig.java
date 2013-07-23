@@ -47,8 +47,7 @@ public class PkltConfig<I extends ImageSingleBand, D extends ImageSingleBand> {
 	 * @return
 	 */
 	public static <I extends ImageSingleBand, D extends ImageSingleBand>
-	PkltConfig<I,D> createDefault(Class<I> typeInput,
-										 Class<D> typeDeriv) {
+	PkltConfig<I,D> createDefault(Class<I> typeInput, Class<D> typeDeriv) {
 		PkltConfig<I,D> ret = new PkltConfig<I,D>();
 
 		ret.typeInput = typeInput;

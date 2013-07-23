@@ -55,8 +55,10 @@ public class PyramidKltTracker<InputImage extends ImageSingleBand, DerivativeIma
 	 * and {@link #setImage} been called.
 	 *
 	 * @param feature Feature's whose description is being setup.
+	 * @return true if there was sufficient information to create a feature or false if not
 	 */
-	public void setDescription(PyramidKltFeature feature) {
+	public boolean setDescription(PyramidKltFeature feature) {
+		boolean valid = false;
 		for (int layer = 0; layer < image.getNumLayers(); layer++) {
 			float scale = (float)image.getScale(layer);
 			float x = feature.x / scale;
@@ -68,7 +70,9 @@ public class PyramidKltTracker<InputImage extends ImageSingleBand, DerivativeIma
 			if( !tracker.setDescription(feature.desc[layer]) )
 				break;
 			feature.maxLayer = layer;
+			valid = true;
 		}
+		return valid;
 	}
 
 	/**

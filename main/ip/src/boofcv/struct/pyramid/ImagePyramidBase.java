@@ -71,7 +71,8 @@ public abstract class ImagePyramidBase<T extends ImageSingleBand>
 	 * @param width Image width
 	 * @param height Image height
 	 */
-	protected void initialize(int width, int height) {
+	@Override
+	public void initialize(int width, int height) {
 		// see if it has already been initialized
 		if( bottomWidth == width && bottomHeight == height )
 			return;
@@ -109,6 +110,13 @@ public abstract class ImagePyramidBase<T extends ImageSingleBand>
 			if( s < prevScale )
 				throw new IllegalArgumentException("Higher layers must be the same size or larger than previous layers.");
 			prevScale = s;
+		}
+	}
+
+	@Override
+	public void setTo(ImagePyramid<T> input) {
+		for( int i = 0; i < layers.length; i++ ) {
+			getLayer(i).setTo(input.getLayer(i));
 		}
 	}
 

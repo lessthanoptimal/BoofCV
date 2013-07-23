@@ -71,7 +71,7 @@ public class ImplBilinearPixel_U8 extends BilinearPixel<ImageUInt8> {
 		int yt = (int) y;
 
 		if (xt < 0 || yt < 0 || xt >= width || yt >= height)
-			throw new IllegalArgumentException("Point is outside of the image");
+			throw new IllegalArgumentException("Point is outside of the image: "+xt+" "+yt);
 
 		float ax = x - xt;
 		float ay = y - yt;

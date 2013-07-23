@@ -47,6 +47,13 @@ public interface ImagePyramid<T extends ImageBase> {
 	public void process( T input );
 
 	/**
+	 * Declares internal data structures for an image with the specified dimensions
+	 * @param width image width
+	 * @param height image height
+	 */
+	public void initialize( int width , int height );
+
+	/**
 	 * Returns the scale of the specified layer in the pyramid.  Larger the scale
 	 * smaller the image is relative to the input image.
 	 *
@@ -100,6 +107,13 @@ public interface ImagePyramid<T extends ImageBase> {
 	 * @return Image type.
 	 */
 	public Class<T> getImageType();
+
+	/**
+	 * Set's this pyramid to be the same as input.  The two pyramids must have the same structure or else an
+	 * exception will be thrown.
+	 * @param input Input pyramid.  Not modified.
+	 */
+	public void setTo( ImagePyramid<T> input );
 
 	/**
 	 * Returns the sampling offset.  Both x and y axises are assumed to have the same offset.

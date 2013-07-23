@@ -29,6 +29,11 @@ import static org.junit.Assert.*;
  */
 public class TestImagePyramidBase {
 
+	@Test
+	public void setTo() {
+		fail("Implement");
+	}
+
 	/**
 	 * If told to use the original image then no image should be declared for layer 0
 	 */
