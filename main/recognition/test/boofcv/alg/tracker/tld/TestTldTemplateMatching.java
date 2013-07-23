@@ -1,0 +1,138 @@
+package boofcv.alg.tracker.tld;
+
+import boofcv.alg.feature.describe.DescribePointPixelRegionNCC;
+import boofcv.alg.interpolate.InterpolatePixel;
+import boofcv.alg.misc.ImageMiscOps;
+import boofcv.factory.feature.describe.FactoryDescribePointAlgs;
+import boofcv.factory.interpolate.FactoryInterpolation;
+import boofcv.struct.ImageRectangle;
+import boofcv.struct.feature.NccFeature;
+import boofcv.struct.image.ImageUInt8;
+import org.junit.Test;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+/**
+ * @author Peter Abeles
+ */
+public class TestTldTemplateMatching {
+
+	int width = 60;
+	int height = 80;
+
+	Random rand = new Random(234);
+
+	ImageUInt8 input = new ImageUInt8(width,height);
+
+	InterpolatePixel<ImageUInt8> interpolate = FactoryInterpolation.bilinearPixel(ImageUInt8.class);
+
+	public TestTldTemplateMatching() {
+		ImageMiscOps.fillUniform(input, rand, 0, 200);
+		interpolate.setImage(input);
+	}
+
+	@Test
+	public void addDescriptor() {
+		TldTemplateMatching alg = new TldTemplateMatching(interpolate);
+		alg.setImage(input);
+
+		alg.addDescriptor(true,new ImageRectangle(10,12,45,22));
+
+		assertEquals(1,alg.getTemplatePositive().size());
+		assertEquals(0,alg.getTemplateNegative().size());
+
+		alg.addDescriptor(false,new ImageRectangle(10,12,45,22));
+
+		assertEquals(1,alg.getTemplatePositive().size());
+		assertEquals(1,alg.getTemplateNegative().size());
+	}
+
+	@Test
+	public void computeNccDescriptor() {
+		TldTemplateMatching alg = new TldTemplateMatching(interpolate);
+		alg.setImage(input);
+
+		NccFeature found = alg.createDescriptor();
+		alg.computeNccDescriptor(found,2,3,17,18);
+
+		NccFeature expected = alg.createDescriptor();
+		DescribePointPixelRegionNCC descriptor = FactoryDescribePointAlgs.pixelRegionNCC(15,15,ImageUInt8.class);
+	    descriptor.setImage(input);
+		descriptor.process(7+2,7+3,expected);
+
+		assertEquals(expected.mean, found.mean, 1e-8);
+	}
+
+	@Test
+	public void reset() {
+		TldTemplateMatching alg = new TldTemplateMatching(interpolate);
+		alg.setImage(input);
+
+		alg.addDescriptor(true, new ImageRectangle(10, 12, 45, 22));
+		alg.addDescriptor(false,new ImageRectangle(10,12,45,22));
+
+		alg.reset();
+
+		assertEquals(0,alg.getTemplatePositive().size());
+		assertEquals(0,alg.getTemplateNegative().size());
+		assertEquals(2,alg.unused.size());
+	}
+
+	@Test
+	public void createDescriptor() {
+		TldTemplateMatching alg = new TldTemplateMatching(interpolate);
+
+		assertTrue(alg.createDescriptor() != null);
+		alg.unused.push(new NccFeature(5));
+
+		assertTrue(alg.createDescriptor() != null);
+		assertEquals(0, alg.unused.size());
+	}
+
+	@Test
+	public void computeConfidence() {
+		TldTemplateMatching alg = new TldTemplateMatching(interpolate);
+		alg.setImage(input);
+
+		alg.addDescriptor(true, new ImageRectangle(2,3,17,18));
+		alg.addDescriptor(false, new ImageRectangle(20,32,40,60));
+
+		assertEquals(1,alg.computeConfidence(new ImageRectangle(2,3,17,18)),1e-8);
+		assertEquals(0,alg.computeConfidence(new ImageRectangle(20,32,40,60)),1e-8);
+
+		double found = alg.computeConfidence(new ImageRectangle(14, 30, 20, 50));
+		assertTrue(found >= 0 && found <= 1);
+	}
+
+	@Test
+	public void distance() {
+		TldTemplateMatching alg = new TldTemplateMatching(interpolate);
+		alg.setImage(input);
+
+		NccFeature a = alg.createDescriptor();
+		NccFeature b = alg.createDescriptor();
+		NccFeature c = alg.createDescriptor();
+		alg.computeNccDescriptor(a,2,3,17,18);
+		alg.computeNccDescriptor(b,2,3,17,18);
+		alg.computeNccDescriptor(c,20,32,40,60);
+
+		List<NccFeature> list = new ArrayList<NccFeature>();
+		list.add(b);
+		list.add(c);
+
+		// same one should produce a distance of zero since the closest is identical
+		assertEquals(0,alg.distance(a,list),1e-8);
+		assertEquals(0,alg.distance(c,list),1e-8);
+
+		// any random one should be between 0 and 1
+		NccFeature d = alg.createDescriptor();
+		alg.computeNccDescriptor(d,14,30,20,50);
+		double found = alg.distance(d,list);
+		assertTrue(found >= 0 && found <= 1);
+	}
+}

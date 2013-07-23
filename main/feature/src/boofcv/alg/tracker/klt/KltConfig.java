@@ -29,7 +29,13 @@ public class KltConfig {
 	 */
 	public int forbiddenBorder;
 
+	/**
+	 * Maximum allowed average per pixel error across the whole region.
+	 */
 	public float maxPerPixelError;
+	/**
+	 * Maximum number of iterations KLT performs for each feature
+	 */
 	public int maxIterations;
 	public float minDeterminant;
 	public float minPositionDelta;
@@ -42,7 +48,7 @@ public class KltConfig {
 	public static KltConfig createDefault() {
 		KltConfig ret = new KltConfig();
 		ret.maxPerPixelError = 25;
-		ret.maxIterations = 15;
+		ret.maxIterations = 15; // TODO consider increasing this number? TLD seems to like it being 50
 		ret.minDeterminant = 0.001f;
 		ret.minPositionDelta = 0.01f;
 

@@ -70,6 +70,10 @@ public abstract class PyramidDiscrete<T extends ImageSingleBand> extends ImagePy
 		checkScales();
 	}
 
+	public int[] getScales() {
+		return scale;
+	}
+
 	@Override
 	public double getScale(int layer) {
 		return scale[layer];
