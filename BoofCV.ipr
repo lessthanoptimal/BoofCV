@@ -42,7 +42,7 @@
     </LanguageOptions>
   </component>
   <component name="DependencyValidationManager">
-    <scope name="BoofCV" pattern="src[BoofCV]:*..*||src[BoofCV Calibration]:*..*||src[BoofCV Evaluation]:*..*||src[BoofCV Examples]:*..*||src[BoofCV Feature]:*..*||src[BoofCV Geometric Vision]:*..*||src[BoofCV Image Processing]:*..*||src[BoofCV IO]:*..*||src[BoofCV SFM]:*..*||src[BoofCV V4L4J]:*..*||src[BoofCV Visualize]:*..*||src[BoofCV Xuggler]:*..*||test[BoofCV Calibration]:*..*||test[BoofCV Evaluation]:*..*||test[BoofCV Feature]:*..*||test[BoofCV Geometric Vision]:*..*||test[BoofCV Image Processing]:*..*||test[BoofCV IO]:*..*||test[BoofCV SFM]:*..*||src[openkinect]:*..*||src[BoofCV Applet]:*..*" />
+    <scope name="BoofCV" pattern="src[BoofCV]:*..*||src[BoofCV Calibration]:*..*||src[BoofCV Evaluation]:*..*||src[BoofCV Examples]:*..*||src[BoofCV Feature]:*..*||src[BoofCV Geometric Vision]:*..*||src[BoofCV Image Processing]:*..*||src[BoofCV IO]:*..*||src[BoofCV SFM]:*..*||src[BoofCV V4L4J]:*..*||src[BoofCV Visualize]:*..*||src[BoofCV Xuggler]:*..*||test[BoofCV Calibration]:*..*||test[BoofCV Evaluation]:*..*||test[BoofCV Feature]:*..*||test[BoofCV Geometric Vision]:*..*||test[BoofCV Image Processing]:*..*||test[BoofCV IO]:*..*||test[BoofCV SFM]:*..*||src[openkinect]:*..*||src[BoofCV Applet]:*..*||src[BoofCV Recognition]:*..*||src[BoofCV OpenKinect]:*..*" />
     <option name="SKIP_IMPORT_STATEMENTS" value="false" />
   </component>
   <component name="Encoding" useUTFGuessing="true" native2AsciiForPropertiesFiles="false">
