@@ -18,8 +18,12 @@ Version : Alpha 0.16
 - NCC error now more "correct" and divides by the number of elements
 - Integral image operations now support more image types.  S64 and F64
 - KltTracker.setDescription() can now fail due to lack of texture
+- Added an implementation of TLD tracker
+  * created recognition package since there was no good place to put it
+- UtilImageIO
+  * Can read PPM from InputStream
+  * Can read images from URL
 
-- TODO OpenTLD
 - TODO automate high level tests
 
 ---------------------------------------------

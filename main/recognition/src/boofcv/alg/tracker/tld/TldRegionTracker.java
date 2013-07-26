@@ -274,7 +274,7 @@ public class TldRegionTracker< Image extends ImageSingleBand , Derivative extend
 
 //		System.out.println("Median tracking error FB: "+medianFB);
 
-		if( medianFB > maxErrorFB )
+		if( medianFB > maxErrorFB || numTracksRemaining < 4 )
 			return false;
 
 		return true;

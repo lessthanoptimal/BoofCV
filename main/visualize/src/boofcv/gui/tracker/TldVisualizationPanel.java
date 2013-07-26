@@ -18,6 +18,7 @@
 
 package boofcv.gui.tracker;
 
+import boofcv.alg.tracker.tld.TldHelperFunctions;
 import boofcv.alg.tracker.tld.TldRegion;
 import boofcv.alg.tracker.tld.TldTemplatePanel;
 import boofcv.alg.tracker.tld.TldTracker;
@@ -87,9 +88,9 @@ public class TldVisualizationPanel extends JPanel implements MouseListener{
 
 		if( hasSelected ) {
 			RectangleCorner2D_F64 r = tracker.getTargetRegion();
-			TldTracker.convertRegion(r,this.selected);
+			TldHelperFunctions.convertRegion(r, this.selected);
 
-			addDetections(tracker.getDetectedTargets());
+			addDetections(tracker.getDetection().getDetectedTargets());
 
 			positivePanel.update(tracker.getTemplateMatching().getTemplatePositive(),false);
 			negativePanel.update(tracker.getTemplateMatching().getTemplateNegative(),false);

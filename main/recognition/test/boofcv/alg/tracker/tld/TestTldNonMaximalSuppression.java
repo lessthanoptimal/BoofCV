@@ -49,19 +49,20 @@ public class TestTldNonMaximalSuppression {
 
 	@Test
 	public void computeOverlap() {
-		TldNonMaximalSuppression alg = new TldNonMaximalSuppression(0.5);
-
-		ImageRectangle a = new ImageRectangle(0,100,10,120);
-		ImageRectangle b = new ImageRectangle(2,3,8,33);
-
-		// no overlap
-		assertEquals(0,alg.computeOverlap(a,b),1e-8);
-
-		// non-zero overlap
-
-		ImageRectangle c = new ImageRectangle(0,100,2,102);
-		double expected = (4.0)/(200.0);
-		assertEquals(expected,alg.computeOverlap(a,c),1e-8);
+		fail("move");
+//		TldNonMaximalSuppression alg = new TldNonMaximalSuppression(0.5);
+//
+//		ImageRectangle a = new ImageRectangle(0,100,10,120);
+//		ImageRectangle b = new ImageRectangle(2,3,8,33);
+//
+//		// no overlap
+//		assertEquals(0,alg.computeOverlap(a,b),1e-8);
+//
+//		// non-zero overlap
+//
+//		ImageRectangle c = new ImageRectangle(0,100,2,102);
+//		double expected = (4.0)/(200.0);
+//		assertEquals(expected,alg.computeOverlap(a,c),1e-8);
 	}
 
 	@Test

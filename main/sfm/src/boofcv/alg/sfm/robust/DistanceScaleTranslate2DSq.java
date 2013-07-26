@@ -25,7 +25,7 @@ import org.ddogleg.fitting.modelset.DistanceFromModel;
 import java.util.List;
 
 /**
- * Computes distance squared between p1 after applying the {@link ScaleTranslate2D} motion model and p2.
+ * Computes distance squared between p1 after applying the {@link boofcv.struct.sfm.ScaleTranslate2D} motion model and p2.
  * </p>
  * ||p2 - (p1*scale+trans)||^2
  *

@@ -10,8 +10,8 @@ import org.junit.Test;
 
 import java.util.Random;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
@@ -34,36 +34,38 @@ public class TestTldFernClassifier {
 
 	@Test
 	public void updateFerns() {
-		CheckUpdateFernsClass alg = new CheckUpdateFernsClass();
-
-		alg.updateFerns(true,new ImageRectangle());
-
-		for( int i = 0; i < alg.managers.length; i++ ) {
-			TldFernFeature f =  alg.managers[i].table[i];
-			assertTrue(f != null);
-			assertEquals(1, f.numP);
-			assertEquals(0, f.numN);
-		}
-
-		alg.num = 0;
-		alg.updateFerns(false,new ImageRectangle());
-
-		for( int i = 0; i < alg.managers.length; i++ ) {
-			TldFernFeature f =  alg.managers[i].table[i];
-			assertTrue(f != null);
-			assertEquals(1, f.numP);
-			assertEquals(1, f.numN);
-		}
+		fail("update");
+//		CheckUpdateFernsClass alg = new CheckUpdateFernsClass();
+//
+//		alg.learnFernNoise(true, new ImageRectangle());
+//
+//		for( int i = 0; i < alg.managers.length; i++ ) {
+//			TldFernFeature f =  alg.managers[i].table[i];
+//			assertTrue(f != null);
+//			assertEquals(1, f.numP);
+//			assertEquals(0, f.numN);
+//		}
+//
+//		alg.num = 0;
+//		alg.learnFernNoise(false, new ImageRectangle());
+//
+//		for( int i = 0; i < alg.managers.length; i++ ) {
+//			TldFernFeature f =  alg.managers[i].table[i];
+//			assertTrue(f != null);
+//			assertEquals(1, f.numP);
+//			assertEquals(1, f.numN);
+//		}
 	}
 
 	@Test
 	public void performTest() {
-		CheckUpdateFernsClass alg = new CheckUpdateFernsClass();
-
-		alg.updateFerns(true, new ImageRectangle());
-
-		alg.num = 0;
-		assertTrue(alg.performTest(new ImageRectangle()));
+		fail("update");
+//		CheckUpdateFernsClass alg = new CheckUpdateFernsClass();
+//
+//		alg.learnFernNoise(true, new ImageRectangle());
+//
+//		alg.num = 0;
+//		assertTrue(alg.performTest(new ImageRectangle()));
 	}
 
 	@Test
@@ -96,22 +98,23 @@ public class TestTldFernClassifier {
 	}
 
 	private TldFernClassifier<ImageUInt8> createAlg() {
-
-		InterpolatePixel<ImageUInt8> interpolate = FactoryInterpolation.bilinearPixel(ImageUInt8.class);
-		return new TldFernClassifier<ImageUInt8>(rand,10,8,interpolate);
+		fail("update");
+//		InterpolatePixel<ImageUInt8> interpolate = FactoryInterpolation.bilinearPixel(ImageUInt8.class);
+//		return new TldFernClassifier<ImageUInt8>(rand,10,8,interpolate);
+		return null;
 	}
 
-	private class CheckUpdateFernsClass extends TldFernClassifier {
-
-		int num = 0;
-
-		private CheckUpdateFernsClass() {
-			super(rand,10,8,null);
-		}
-
-		@Override
-		protected int computeFernValue(float x0, float y0, float rectWidth, float rectHeight, TldFernDescription fern) {
-			return num++;
-		}
-	}
+//	private class CheckUpdateFernsClass extends TldFernClassifier {
+//
+//		int num = 0;
+//
+//		private CheckUpdateFernsClass() {
+//			super(rand,10,8,null);
+//		}
+//
+//		@Override
+//		protected int computeFernValue(float x0, float y0, float rectWidth, float rectHeight, TldFernDescription fern) {
+//			return num++;
+//		}
+//	}
 }

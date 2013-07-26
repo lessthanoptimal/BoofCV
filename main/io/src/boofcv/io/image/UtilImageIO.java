@@ -28,6 +28,7 @@ import sun.awt.image.IntegerInterleavedRaster;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.*;
+import java.net.URL;
 import java.security.AccessControlException;
 
 /**
@@ -49,6 +50,21 @@ public class UtilImageIO {
 			if( img == null && fileName.endsWith("ppm") || fileName.endsWith("PPM") ) {
 				return loadPPM(fileName,null);
 			}
+		} catch (IOException e) {
+			return null;
+		}
+
+		return img;
+	}
+
+	/**
+	 * A function that load the specified image.  If anything goes wrong it returns a
+	 * null.
+	 */
+	public static BufferedImage loadImage(URL fileName) {
+		BufferedImage img;
+		try {
+			img = ImageIO.read(fileName);
 		} catch (IOException e) {
 			return null;
 		}
@@ -105,7 +121,21 @@ public class UtilImageIO {
 	 * @throws IOException
 	 */
 	public static BufferedImage loadPPM( String fileName , BufferedImage storage ) throws IOException {
-		DataInputStream in = new DataInputStream(new FileInputStream(fileName));
+		return loadPPM(new FileInputStream(fileName),storage);
+	}
+
+	/**
+	 * Loads a PPM image from an {@link InputStream}.
+	 *
+	 * @param inputStream InputStream for PPM image
+	 * @param storage (Optional) Storage for output image.  Must be the width and height of the image being read.
+	 *                Better performance of type BufferedImage.TYPE_INT_RGB.  If null or width/height incorrect a new image
+	 *                will be declared.
+	 * @return The read in image
+	 * @throws IOException
+	 */
+	public static BufferedImage loadPPM( InputStream inputStream , BufferedImage storage ) throws IOException {
+		DataInputStream in = new DataInputStream(inputStream);
 
 		readLine(in);
 		String s[] = readLine(in).split(" ");
@@ -167,7 +197,24 @@ public class UtilImageIO {
 	public static MultiSpectral<ImageUInt8> loadPPM_U8( String fileName , MultiSpectral<ImageUInt8> storage , GrowQueue_I8 temp )
 			throws IOException
 	{
-		DataInputStream in = new DataInputStream(new FileInputStream(fileName));
+		return loadPPM_U8(new FileInputStream(fileName),storage,temp);
+	}
+
+	/**
+	 * Reads a PPM image file directly into a MultiSpectral<ImageUInt8> image.   To improve performance when reading
+	 * many images, the user can provide work space memory in the optional parameters
+	 *
+	 * @param inputStream InputStream for PPM image
+	 * @param storage (Optional) Where the image is written in to.  Will be resized if needed.
+	 *                   If null or the number of bands isn't 3, a new instance is declared.
+	 * @param temp (Optional) Used internally to store the image.  Can be null.
+	 * @return The image.
+	 * @throws IOException
+	 */
+	public static MultiSpectral<ImageUInt8> loadPPM_U8( InputStream inputStream, MultiSpectral<ImageUInt8> storage , GrowQueue_I8 temp )
+			throws IOException
+	{
+		DataInputStream in = new DataInputStream(inputStream);
 
 		readLine(in);
 		String s[] = readLine(in).split(" ");
