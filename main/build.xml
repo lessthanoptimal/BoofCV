@@ -11,9 +11,10 @@
       <pathelement path="io/src"/>
       <pathelement path="feature/src"/>
       <pathelement path="geo/src"/>
-      <pathelement path="visualize/src"/>
       <pathelement path="calibration/src"/>
       <pathelement path="sfm/src"/>
+      <pathelement path="recognition/src"/>
+      <pathelement path="visualize/src"/>
     </path>
     
 
@@ -56,7 +57,7 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
 
 </script>
 <br>
-<b>Copyright &copy; 2011-2012 Peter Abeles</b>
+<b>Copyright &copy; 2011-2013 Peter Abeles</b>
 ]]>
 </bottom>
  
@@ -73,7 +74,7 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
 	        sourcepathref="source.classpath" >
 
             <doctitle><![CDATA[<h1>BoofCV API Specification</h1>]]></doctitle>
-            <bottom><![CDATA[<b>Copyright &copy; 2011-2012 Peter Abeles</b>]]></bottom>
+            <bottom><![CDATA[<b>Copyright &copy; 2011-2013 Peter Abeles</b>]]></bottom>
  
         </javadoc>
 	<jar compress="true" destfile="docs/javadoc.jar" basedir="docs/api" />
@@ -84,9 +85,10 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
 	<ant dir="feature/" target="test"/>
 	<ant dir="geo/" target="test"/>
 	<ant dir="io/" target="test"/>
-	<ant dir="visualize/" target="test"/>
 	<ant dir="calibration/" target="test"/>
 	<ant dir="sfm/" target="test"/>
+	<ant dir="recognition/" target="test"/>
+  <ant dir="visualize/" target="test"/>
     </target>
 
     <target name="testreport">
@@ -104,9 +106,10 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
 	<ant dir="feature/" target="clean"/>
 	<ant dir="geo/" target="clean"/>
 	<ant dir="io/" target="clean"/>
-	<ant dir="visualize/" target="clean"/>
 	<ant dir="calibration/" target="clean"/>
 	<ant dir="sfm/" target="clean"/>
+	<ant dir="recognition/" target="clean"/>
+      <ant dir="visualize/" target="clean"/>
     </target>
 
     <target name="jar">
@@ -115,9 +118,10 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
 	<ant dir="feature" inheritAll="false"/>
 	<ant dir="geo" inheritAll="false"/>
 	<ant dir="io" inheritAll="false"/>
-	<ant dir="visualize/" inheritAll="false"/>
 	<ant dir="calibration/" inheritAll="false"/>
 	<ant dir="sfm/" inheritAll="false"/>
+	<ant dir="recognition/" inheritAll="false"/>
+      <ant dir="visualize/" inheritAll="false"/>
 	<jar destfile="${lib.dir}/${ant.project.name}.jar">
 	  <zipgroupfileset dir="${jar.dir}" includes="*.jar"/> 
 	</jar>

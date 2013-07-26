@@ -43,12 +43,12 @@ public class TldConfig<T extends ImageSingleBand, D extends ImageSingleBand> {
 	 * Maximum number of NCC templates it will examine inside the detection cascade.  Used to limit the amount
 	 * of processing used during detection.  To disable set to Integer.MAX_VALUE
 	 */
-	public int maximumCascadeConsider = 1000;
+	public int maximumCascadeConsider = 500;
 
 	/**
 	 * The maximum allowed forwards-backwards error (pixels) for a track.  Suggested value is 10.
 	 */
-	public double maximumErrorFB = 15;  // TODO should be 10
+	public double maximumErrorFB = 10;
 
 	/**
 	 * Tracks are spawned in an evenly spaced grid inside the previous region.  This value specifies the

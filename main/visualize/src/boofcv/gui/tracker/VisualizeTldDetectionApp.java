@@ -26,10 +26,12 @@ import boofcv.alg.tracker.tld.TldTracker;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.gui.image.ShowImages;
+import boofcv.io.image.UtilImageIO;
 import boofcv.struct.FastQueue;
 import boofcv.struct.ImageRectangle;
 import boofcv.struct.feature.NccFeature;
 import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageUInt8;
 
 import javax.swing.*;
 import java.awt.*;
@@ -79,10 +81,18 @@ public class VisualizeTldDetectionApp<T extends ImageSingleBand,D extends ImageS
 		g2.drawImage(input,0,0,null);
 
 //		FastQueue<TldRegion> detected = tracker.getDetectedTargets();
-		FastQueue<TldRegion> detected = tracker.getCandidateDetections();
+		FastQueue<TldRegion> detected = tracker.getDetection().getCandidateDetections();
 
-		drawDetections(g2, tracker.getCandidateDetections(),0);
-		drawDetections(g2, tracker.getDetectedTargets(),Color.RED);
+		drawDetections(g2, detected,0);
+		if( tracker.getDetection().isAmbiguous())
+			drawDetections(g2, tracker.getDetection().getDetectedTargets(),Color.RED);
+		else {
+			TldRegion r = tracker.getDetection().getBest();
+			if( r != null )
+				drawRectangle(g2,r.rect,Color.RED,3);
+		}
+
+		drawRectangle(g2,target,Color.GREEN,3);
 
 		if( detected.size() != 0 ) {
 //			drawRectangle(g2,target,Color.RED,3);
@@ -139,7 +149,7 @@ public class VisualizeTldDetectionApp<T extends ImageSingleBand,D extends ImageS
 
 	private void printDetectedConfidence() {
 
-		FastQueue<TldRegion> detected = tracker.getDetectedTargets();
+		FastQueue<TldRegion> detected = tracker.getDetection().getDetectedTargets();
 
 		System.out.println("Target: "+target);
 		for( int i = 0; i < detected.size; i++ ) {
@@ -151,7 +161,7 @@ public class VisualizeTldDetectionApp<T extends ImageSingleBand,D extends ImageS
 	private void printDescriptions() {
 		TldTemplateMatching<T> matching = tracker.getTemplateMatching();
 
-		FastQueue<TldRegion> detected = tracker.getDetectedTargets();
+		FastQueue<TldRegion> detected = tracker.getDetection().getDetectedTargets();
 
 		NccFeature t = matching.createDescriptor();
 		NccFeature f = matching.createDescriptor();
@@ -205,7 +215,10 @@ public class VisualizeTldDetectionApp<T extends ImageSingleBand,D extends ImageS
 
 	public static void main(String[] args) {
 
-		String fileName = "/home/pja/Downloads/multi_face_turning/motinas_multi_face_turning.avi";
+		BufferedImage image = UtilImageIO.loadImage("/home/pja/projects/ValidationBoof/data/track_rect/TLD/01_david/00001.jpg");
+		new VisualizeTldDetectionApp(image,ImageUInt8.class);
+
+//		String fileName = "/home/pja/Downloads/multi_face_turning/motinas_multi_face_turning.avi";
 
 //		SimpleImageSequence<ImageUInt8> sequence =
 //				new XugglerSimplified<ImageUInt8>(fileName, ImageDataType.single(ImageUInt8.class));

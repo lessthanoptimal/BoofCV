@@ -24,7 +24,7 @@ import java.util.Random;
 
 /**
  * Fern descriptor used in {@link TldTracker}.  The number of features can be at most 32, enough to fit inside
- * an integer. The location of each point is from 0 to 1 and randomly selected.  When computed it is scaled
+ * an integer. The location of each point is from -0.5 to 0.5 and randomly selected.  When computed it is scaled
  * independently along x and y axis to the region's width and height, respectively.
  *
  * @author Peter Abeles
@@ -50,8 +50,8 @@ public class TldFernDescription {
 		for( int i = 0; i < num; i++ ) {
 			SamplePair p = new SamplePair();
 
-			p.a.set( rand.nextFloat() , rand.nextFloat() );
-			p.b.set( rand.nextFloat() , rand.nextFloat() );
+			p.a.set( rand.nextFloat()-0.5f , rand.nextFloat()-0.5f );
+			p.b.set( rand.nextFloat()-0.5f , rand.nextFloat()-0.5f );
 
 			pairs[i] = p;
 		}

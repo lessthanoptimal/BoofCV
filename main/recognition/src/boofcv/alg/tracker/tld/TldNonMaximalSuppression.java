@@ -41,8 +41,7 @@ public class TldNonMaximalSuppression {
 	// connection graph
 	private FastQueue<Connections> conn = new FastQueue<Connections>(Connections.class,true);
 
-	// storage for intermediate results
-	private ImageRectangle work = new ImageRectangle();
+	TldHelperFunctions helper = new TldHelperFunctions();
 
 	/**
 	 * Configures non-maximum suppression
@@ -82,7 +81,7 @@ public class TldNonMaximalSuppression {
 				Connections cb = conn.data[j];
 
 				// see if they are connected
-				double overlap = computeOverlap(ra.rect,rb.rect);
+				double overlap = helper.computeOverlap(ra.rect,rb.rect);
 				if( overlap < connectionThreshold ) {
 					continue;
 				}
@@ -110,22 +109,6 @@ public class TldNonMaximalSuppression {
 				System.out.println("Not a maximum but has zero connections?");
 			}
 		}
-	}
-
-	/**
-	 * Computes the fractional area of intersection between the two regions.
-	 *
-	 * @return number from 0 to 1.  higher means more intersection
-	 */
-	public double computeOverlap( ImageRectangle a , ImageRectangle b ) {
-		if( !a.intersection(b,work) )
-			return 0;
-
-		int areaI = work.area();
-
-		int bottom = a.area() + b.area() - areaI;
-
-		return areaI/ (double)bottom;
 	}
 
 	/**

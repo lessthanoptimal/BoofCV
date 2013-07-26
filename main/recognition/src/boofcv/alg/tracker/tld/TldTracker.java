@@ -22,18 +22,11 @@ import boofcv.alg.tracker.klt.PyramidKltTracker;
 import boofcv.factory.tracker.FactoryTrackerAlg;
 import boofcv.factory.transform.pyramid.FactoryPyramid;
 import boofcv.struct.FastQueue;
-import boofcv.struct.GrowQueue_F64;
-import boofcv.struct.GrowQueue_I32;
 import boofcv.struct.ImageRectangle;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.pyramid.PyramidDiscrete;
 import georegression.struct.shapes.RectangleCorner2D_F64;
-import georegression.struct.shapes.RectangleCorner2D_I32;
-import org.ddogleg.sorting.QuickSelectArray;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import java.util.Random;
 
 /**
@@ -65,6 +58,9 @@ import java.util.Random;
  * </p>
  * @author Peter Abeles
  */
+// TODO adjust detection variance threshold
+//    if it has a track use previous estimate
+//    if track is lost use initial value
 public class TldTracker<T extends ImageSingleBand, D extends ImageSingleBand> {
 
 	// specified configuration parameters for the tracker
@@ -72,7 +68,6 @@ public class TldTracker<T extends ImageSingleBand, D extends ImageSingleBand> {
 
 	// selected region for output
 	private RectangleCorner2D_F64 targetRegion = new RectangleCorner2D_F64();
-	private ImageRectangle targetRegion_I32 = new ImageRectangle();
 
 	// region selected by KLT tracker
 	// NOTE: The tracker updates a pointing point region.  Rounding to the closest integer rectangle introduces errors
@@ -96,13 +91,8 @@ public class TldTracker<T extends ImageSingleBand, D extends ImageSingleBand> {
 	private TldFernClassifier<T> fern;
 	// Detects rectangles: Removes candidates don't match NCC descriptors
 	private TldTemplateMatching<T> template;
-	// Removes all but the best rectangles.
-	private TldNonMaximalSuppression nonmax;
 
-	// All rectangles which pass the detection tests
-	private FastQueue<TldRegion> candidateDetections = new FastQueue<TldRegion>(TldRegion.class,true);
-	// Rectangles after non-maximum suppression
-	private FastQueue<TldRegion> detectedTargets = new FastQueue<TldRegion>(TldRegion.class,true);
+	private TldDetection<T> detection;
 
 	// did tracking totally fail and it needs to reacquire a track?
 	private boolean reacquiring;
@@ -112,18 +102,10 @@ public class TldTracker<T extends ImageSingleBand, D extends ImageSingleBand> {
 	// Was the previous region hypothesis valid?
 	private boolean previousValid;
 
-	// Variables used when initializing
-	private List<ImageRectangle> initPositive = new ArrayList<ImageRectangle>();
-	private List<ImageRectangle> initNegative = new ArrayList<ImageRectangle>();
 
-	// Storage for sorting of reslts
-	private GrowQueue_F64 storageMetric = new GrowQueue_F64();
-	private GrowQueue_I32 storageIndexes = new GrowQueue_I32();
-	private List<ImageRectangle> storageRect = new ArrayList<ImageRectangle>();
+	TldHelperFunctions helper = new TldHelperFunctions();
 
-	// regions which need to have their ferns updated
-	private List<ImageRectangle> fernPositive = new ArrayList<ImageRectangle>();
-	private List<ImageRectangle> fernNegative = new ArrayList<ImageRectangle>();
+	TldLearning<T> learning;
 
 	// random number generator
 	private Random rand;
@@ -149,8 +131,10 @@ public class TldTracker<T extends ImageSingleBand, D extends ImageSingleBand> {
 		variance = new TldVarianceFilter<T>(config.imageType);
 		template = new TldTemplateMatching<T>(config.interpolate);
 		fern = new TldFernClassifier<T>(
-				rand,config.numFerns,config.fernSize,config.interpolate);
-		nonmax = new TldNonMaximalSuppression(config.regionConnect);
+				rand,config.numFerns,config.fernSize,1,1.0f,config.interpolate);
+
+		detection = new TldDetection<T>(fern,template,variance,config);
+		learning = new TldLearning<T>(rand,5,5,config,template,variance,fern,detection,config.interpolate);
 	}
 
 	/**
@@ -186,7 +170,7 @@ public class TldTracker<T extends ImageSingleBand, D extends ImageSingleBand> {
 
 		previousValid = false;
 
-		initialLearning();
+		learning.initialLearning(targetRegion, cascadeRegions,false);
 	}
 
 
@@ -240,73 +224,6 @@ public class TldTracker<T extends ImageSingleBand, D extends ImageSingleBand> {
 		}
 	}
 
-
-	/**
-	 * Select positive and negative examples based on the region the user initially selected.  Only use regions
-	 * with significant variance during this initial learning phase
-	 */
-	private void initialLearning() {
-
-		initPositive.clear();
-		initNegative.clear();
-		storageMetric.reset();
-		storageIndexes.reset();
-
-		// set the user selected region as a positive example
-		convertRegion(targetRegion,targetRegion_I32);
-		fern.updateFerns(true, targetRegion_I32);
-		template.addDescriptor(true, targetRegion_I32);
-		variance.selectThreshold(targetRegion_I32);
-
-		// Create a list of regions which are close to and far away from the selected region and have texture
-		for( int i = 0; i < cascadeRegions.size; i++ ) {
-			ImageRectangle region = cascadeRegions.get(i);
-
-			if( !variance.checkVariance(region))
-				continue;
-
-			double overlap = nonmax.computeOverlap(region, targetRegion_I32);
-
-			if( overlap < config.overlapLower ) {
-				initNegative.add(region);
-			} else if( overlap > config.overlapUpper ) {
-				initPositive.add(region);
-				storageMetric.add(overlap);
-			}
-		}
-
-		// select the most similar examples to the selected target and train on those
-		int N = Math.min(initPositive.size(),config.initLearnPositive);
-		storageIndexes.resize(storageMetric.getSize());
-		QuickSelectArray.selectIndex(storageMetric.data, N, storageMetric.getSize(), storageIndexes.data);
-
-		for( int i = 0; i < N; i++ ) {
-			ImageRectangle r = initPositive.get(storageIndexes.get(i));
-//			if( !fern.performTest(r) )
-				fern.updateFerns(true,r);
-//			double confidence = template.computeConfidence(r);  // TODO twice here too
-//			if( confidence < config.confidenceThresholdLower )
-//				template.addDescriptor(true,r);
-		}
-
-		// train using the first N negative examples
-		N = Math.min(initNegative.size(),config.initLearnNegative);
-		Collections.shuffle(initNegative,rand);
-		for( int i = 0; i < N; i++ ) {
-			ImageRectangle r = initNegative.get(i);
-			fern.updateFerns(false, r);
-
-			double confidence = template.computeConfidence(r);
-			if( confidence >= config.confidenceThresholdUpper ) {
-				template.addDescriptor(false,r);
-			}
-		}
-
-//		System.out.println("Initial Learning");
-//		System.out.println("  NCC positive = "+template.getTemplatePositive().size()+" negative "+template.getTemplateNegative().size());
-//		System.out.println("  variance threshold "+variance.getThreshold());
-	}
-
 	/**
 	 * Updates track region.
 	 *
@@ -315,7 +232,7 @@ public class TldTracker<T extends ImageSingleBand, D extends ImageSingleBand> {
 	 */
 	public boolean track( T image ) {
 
-//		System.out.println("----------------------- TRACKING ---------------------------");
+		System.out.println("----------------------- TRACKING ---------------------------");
 
 		boolean success = true;
 		valid = false;
@@ -327,9 +244,10 @@ public class TldTracker<T extends ImageSingleBand, D extends ImageSingleBand> {
 
 		if( reacquiring ) {
 			// It can reinitialize if there is a single detection
-			if( detectionCascade() && detectedTargets.size == 1 ) {
-				TldRegion region = detectedTargets.get(0);
-//				System.out.println("Track reacquired: confidence = "+region.confidence+"  num regions "+detectedTargets.size);
+			detection.detectionCascade(cascadeRegions);
+			if( detection.isSuccess() && !detection.isAmbiguous() ) {
+				TldRegion region = detection.getBest();
+				System.out.println("Track reacquired: confidence = "+region.confidence);
 				reacquiring = false;
 				valid = false;
 				// set it to the detected region
@@ -341,21 +259,22 @@ public class TldTracker<T extends ImageSingleBand, D extends ImageSingleBand> {
 				success = false;
 			}
 		} else {
-			detectionCascade();
+			detection.detectionCascade(cascadeRegions);
 
 			// update the previous track region using the tracker
 			trackerRegion.set(targetRegion);
 			boolean trackingWorked = tracking.process(imagePyramid, trackerRegion);
 			trackingWorked &= adjustRegion.process(tracking.getPairs(), trackerRegion);
-//			if( trackingWorked ) {
-//				convertRegion(trackerRegion,trackerRegion_I32);
+			if( trackingWorked ) {
+				TldHelperFunctions.convertRegion(trackerRegion, trackerRegion_I32);
 //				trackingWorked &= variance.checkVariance(trackerRegion_I32);
-//			}
+			}
 
-			if( hypothesisFusion( trackingWorked ) ) {
+			if( hypothesisFusion( trackingWorked , detection.isSuccess() ) ) {
 				// if it found a hypothesis and it is valid for learning, then learn
 				if( valid && performLearning )
-					performLearning();
+					learning.initialLearning(targetRegion,cascadeRegions,true);
+//					performLearning();
 			} else {
 				reacquiring = true;
 				success = false;
@@ -368,85 +287,17 @@ public class TldTracker<T extends ImageSingleBand, D extends ImageSingleBand> {
 	}
 
 	/**
-	 * Detects the object inside the image.  Eliminates candidate regions using a cascade of tests
-	 */
-	protected boolean detectionCascade() {
-
-		candidateDetections.reset();
-		detectedTargets.reset();
-
-		storageMetric.reset();
-		storageIndexes.reset();
-		storageRect.clear();
-		initPositive.clear();
-
-		// go through all detection regions
-		for( int i = 0; i < cascadeRegions.size; i++ ) {
-			ImageRectangle region = cascadeRegions.get(i);
-
-			if( !variance.checkVariance(region)) {
-				continue;
-			}
-
-			if( !fern.performTest(region))
-				continue;
-
-			storageMetric.add(fern.getProbability());
-			storageRect.add(region);
-		}
-
-		if( storageMetric.size == 0 )
-			return false;
-
-		// Give preference towards regions with a higher probability
-		if( config.maximumCascadeConsider < storageMetric.size ) {
-			int N = Math.min(config.maximumCascadeConsider, storageMetric.size);
-			storageIndexes.resize(storageMetric.size);
-
-			QuickSelectArray.selectIndex(storageMetric.data,N-1, storageMetric.size, storageIndexes.data);
-			for( int i = 0; i < N; i++ ) {
-				initPositive.add( storageRect.get( storageIndexes.get(i)));
-			}
-		} else {
-			initPositive.addAll(storageRect);
-		}
-
-		for( int i = 0; i < initPositive.size(); i++ ) {
-			ImageRectangle region = initPositive.get(i);
-
-			double confidence = template.computeConfidence(region);
-			if( confidence < config.confidenceThresholdUpper)
-				continue;
-
-			TldRegion r = candidateDetections.grow();
-			r.connections = 0;
-			r.rect.set(region);
-			r.confidence = confidence;
-		}
-
-//		System.out.println("considered regions = "+initPositive.size());
-//		System.out.println("Candidate regions  = "+candidateDetections.size);
-
-		// use non-maximum suppression to reduce the number of candidates
-		nonmax.process(candidateDetections, detectedTargets);
-
-//		System.out.println("Detected targets   = "+detectedTargets.size);
-
-		return detectedTargets.size > 0;
-	}
-
-	/**
 	 * Combines hypotheses from tracking and detection.
 	 *
 	 * @param trackingWorked If the sequential tracker updated the track region successfully or not
 	 * @return true a hypothesis was found, false if it failed to find a hypothesis
 	 */
-	protected boolean hypothesisFusion( boolean trackingWorked ) {
+	protected boolean hypothesisFusion( boolean trackingWorked , boolean detectionWorked ) {
 
 		valid = false;
 
-		boolean uniqueDetection = detectedTargets.size == 1;
-		TldRegion detectedRegion = uniqueDetection ? detectedTargets.get(0) : null;
+		boolean uniqueDetection = detectionWorked && !detection.isAmbiguous();
+		TldRegion detectedRegion = detection.getBest();
 
 		double confidenceTarget = 0;
 
@@ -457,128 +308,47 @@ public class TldTracker<T extends ImageSingleBand, D extends ImageSingleBand> {
 			double scoreDetected = 0;
 			double overlap = 0;
 
-			if( detectedRegion != null ) {
+			if( uniqueDetection ) {
 				scoreDetected = detectedRegion.confidence;
-				overlap = nonmax.computeOverlap(trackerRegion_I32, detectedRegion.rect);
+				overlap = helper.computeOverlap(trackerRegion_I32, detectedRegion.rect);
 			}
 
-//			System.out.println("FUSION: score track "+scoreTrack+" detection "+scoreDetected);
+			System.out.println("FUSION: score track "+scoreTrack+" detection "+scoreDetected);
 
-			if( detectedRegion != null && scoreDetected > scoreTrack && overlap < config.overlapUpper ) {
-//				System.out.println("FUSION: using detection region");
+			if( uniqueDetection && scoreDetected > scoreTrack && overlap < config.overlapUpper ) {
+				System.out.println("FUSION: using detection region");
 				// if there is a unique detection and it has higher confidence than the
 				// track region, use the detected region
-				convertRegion(detectedRegion.rect, targetRegion);
+				TldHelperFunctions.convertRegion(detectedRegion.rect, targetRegion);
 				confidenceTarget = detectedRegion.confidence;
 			} else {
-//				System.out.println("FUSION: using track region");
+				System.out.println("FUSION: using track region");
 				// Otherwise use the tracker region
 				targetRegion.set(trackerRegion);
 				confidenceTarget = scoreTrack;
 
 				// see if the most likely detected region overlaps the track region
-				if( scoreTrack >= config.confidenceThresholdUpper)  {
+				if( scoreTrack >= config.confidenceThresholdUpper && scoreTrack >= scoreDetected+0.1 )  {
 					valid = true;
 				} else if( previousValid && scoreTrack >= config.confidenceThresholdLower) {
 					valid = true;
+				} else if( !detectionWorked ) {
+					valid = true;
 				}
 			}
-		} else if( detectedTargets.size == 1 ) {
-//			System.out.println("FUSION: tracker failed, using detection: total detections "+detectedTargets.size);
+		} else if( uniqueDetection ) {
+			System.out.println("FUSION: tracker failed, using detection ");
 			// just go with the best detected region
-			detectedRegion = detectedTargets.get(0);
-			convertRegion(detectedRegion.rect, targetRegion);
+			detectedRegion = detection.getBest();
+			TldHelperFunctions.convertRegion(detectedRegion.rect, targetRegion);
 			confidenceTarget = detectedRegion.confidence;
 		} else {
-//			System.out.println("FUSION: failed");
+			System.out.println("FUSION: failed");
 			return false;
 		}
-//		System.out.println("FUSION: valid = "+valid);
+		System.out.println("FUSION: valid = "+valid+" confidence "+confidenceTarget);
 
 		return confidenceTarget >= config.confidenceAccept;
-	}
-
-
-//	private TldRegion selectBestTarget() {
-//		double bestScore = 0;
-//		TldRegion best = null;
-//		for( int i = 0; i < detectedTargets.size; i++ ) {
-//			TldRegion r = detectedTargets.get(i);
-//			if( r.confidence > bestScore ) {
-//				bestScore = r.confidence;
-//				best = r;
-//			}
-//		}
-//
-//		return best;
-//	}
-
-	/**
-	 * Performs P/N-Learning to update the target's description
-	 */
-	protected void performLearning() {
-
-		fernPositive.clear();
-		fernNegative.clear();
-
-		convertRegion(targetRegion,targetRegion_I32);
-		convertRegion(trackerRegion,trackerRegion_I32);
-
-//		System.out.println(" *** LEARNING ****");
-		for( int i = 0; i < candidateDetections.size; i++ ) {
-			TldRegion r = candidateDetections.get(i);
-
-			double overlap = nonmax.computeOverlap(r.rect, targetRegion_I32);
-
-			boolean fernTest = fern.performTest(r.rect);
-
-			if( overlap >= config.overlapUpper ) {
-				// mark regions which overlap the target as positive
-
-				// be more careful about updating positives.  Computing confidence is computationally expensive
-				if( !fernTest )
-					fern.updateFerns(true,r.rect);
-//					fernPositive.add(r.rect);
-
-			} else if( overlap <= config.overlapLower ) {
-				// mark regions which do not overlap the target as negative
-
-				// an unknown fern is by default negative, by always incrementing negative ferns it makes
-				// it harder for one to turn into a false positive
-				if( fernTest )
-					fern.updateFerns(false, r.rect);
-//					fernNegative.add(r.rect);
-
-				if( r.confidence > config.confidenceThresholdLower) {
-					// add a negative template if it had a high score
-					template.addDescriptor(false,r.rect);
-				}
-			}
-		}
-
-		// TODO rever this back to doing learning inside the main loop.  Can reduce number of templates/ferns added
-		// since they will only be added when neccisary.  near duplicates can work in otherwise
-
-		// update the fern models
-//		for( int i = 0; i < fernPositive.size(); i++ ) {
-//			fern.updateFerns(true,fernPositive.get(i));
-//		}
-//		for( int i = 0; i < fernNegative.size(); i++ ) {
-//			fern.updateFerns(false,fernNegative.get(i));
-//		}
-
-
-		// See if the track region dipped below the threshold
-		double confidenceTrack = template.computeConfidence(trackerRegion_I32);
-		if( confidenceTrack < config.confidenceThresholdUpper ) {
-			template.addDescriptor(true, trackerRegion_I32);
-		}
-		if( !fern.performTest(trackerRegion_I32))
-			fern.updateFerns(true,trackerRegion_I32);
-
-//		System.out.println("  confidence trackRegion "+confidenceTrack);
-//		System.out.println("  templates positive = "+template.getTemplatePositive().size()+" negative "+
-//		template.getTemplateNegative().size());
 	}
 
 	/**
@@ -607,20 +377,6 @@ public class TldTracker<T extends ImageSingleBand, D extends ImageSingleBand> {
 		return ret;
 	}
 
-	public static void convertRegion(RectangleCorner2D_F64 input, RectangleCorner2D_I32 output) {
-		output.x0 = (int)(input.x0+0.5);
-		output.x1 = (int)(input.x1+0.5);
-		output.y0 = (int)(input.y0+0.5);
-		output.y1 = (int)(input.y1+0.5);
-	}
-
-	public static void convertRegion(RectangleCorner2D_I32 input, RectangleCorner2D_F64 output) {
-		output.x0 = input.x0;
-		output.x1 = input.x1;
-		output.y0 = input.y0;
-		output.y1 = input.y1;
-	}
-
 	public boolean isPerformLearning() {
 		return performLearning;
 	}
@@ -641,14 +397,6 @@ public class TldTracker<T extends ImageSingleBand, D extends ImageSingleBand> {
 		return targetRegion;
 	}
 
-	public FastQueue<TldRegion> getCandidateDetections() {
-		return candidateDetections;
-	}
-
-	public FastQueue<TldRegion> getDetectedTargets() {
-		return detectedTargets;
-	}
-
 	public RectangleCorner2D_F64 getTrackerRegion() {
 		return trackerRegion;
 	}
@@ -657,7 +405,7 @@ public class TldTracker<T extends ImageSingleBand, D extends ImageSingleBand> {
 		return config;
 	}
 
-	public TldNonMaximalSuppression getNonmax() {
-		return nonmax;
+	public TldDetection<T> getDetection() {
+		return detection;
 	}
 }
