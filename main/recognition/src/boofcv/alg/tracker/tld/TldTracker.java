@@ -113,6 +113,8 @@ public class TldTracker<T extends ImageSingleBand, D extends ImageSingleBand> {
 	// is learning on or off
 	private boolean performLearning = true;
 
+	LearningTask learningTask;
+
 	/**
 	 * Configures the TLD tracker
 	 *
@@ -272,9 +274,18 @@ public class TldTracker<T extends ImageSingleBand, D extends ImageSingleBand> {
 
 			if( hypothesisFusion( trackingWorked , detection.isSuccess() ) ) {
 				// if it found a hypothesis and it is valid for learning, then learn
-				if( valid && performLearning )
-					learning.initialLearning(targetRegion,cascadeRegions,true);
-//					performLearning();
+				if( valid && performLearning ) {
+					System.out.println("  learning type "+learningTask);
+					switch( learningTask ) {
+						case LEARN_POSITIVE:
+							learning.initialLearning(targetRegion,cascadeRegions,true);
+							break;
+
+						case LEARN_NEGATIVE:
+							learning.learnNegative(targetRegion);
+							break;
+					}
+				}
 			} else {
 				reacquiring = true;
 				success = false;
@@ -293,6 +304,8 @@ public class TldTracker<T extends ImageSingleBand, D extends ImageSingleBand> {
 	 * @return true a hypothesis was found, false if it failed to find a hypothesis
 	 */
 	protected boolean hypothesisFusion( boolean trackingWorked , boolean detectionWorked ) {
+
+		System.out.println(" FUSION: tracking "+trackingWorked+"  detection "+detectionWorked);
 
 		valid = false;
 
@@ -315,7 +328,7 @@ public class TldTracker<T extends ImageSingleBand, D extends ImageSingleBand> {
 
 			System.out.println("FUSION: score track "+scoreTrack+" detection "+scoreDetected);
 
-			if( uniqueDetection && scoreDetected > scoreTrack && overlap < config.overlapUpper ) {
+			if( uniqueDetection && scoreDetected > scoreTrack ) {
 				System.out.println("FUSION: using detection region");
 				// if there is a unique detection and it has higher confidence than the
 				// track region, use the detected region
@@ -328,12 +341,21 @@ public class TldTracker<T extends ImageSingleBand, D extends ImageSingleBand> {
 				confidenceTarget = scoreTrack;
 
 				// see if the most likely detected region overlaps the track region
-				if( scoreTrack >= config.confidenceThresholdUpper && scoreTrack >= scoreDetected+0.1 )  {
+				if( scoreTrack >= config.confidenceThresholdLower )  {
+//					if( detectionWorked && !uniqueDetection) {
+//						learningTask = LearningTask.LEARN_NEGATIVE;
+//					} else { //if( !detectionWorked ){
+						learningTask = LearningTask.LEARN_POSITIVE;
+//					} else {
+//						learningTask = LearningTask.NOTHING;
+//					}
 					valid = true;
-				} else if( previousValid && scoreTrack >= config.confidenceThresholdLower) {
-					valid = true;
-				} else if( !detectionWorked ) {
-					valid = true;
+//				} else if( previousValid && scoreTrack >= config.confidenceThresholdLower) {
+//					learningTask = LearningTask.LEARN_POSITIVE;
+//					valid = true;
+//				} else {
+//					learningTask = LearningTask.NOTHING;
+//					valid = true;
 				}
 			}
 		} else if( uniqueDetection ) {
@@ -357,7 +379,7 @@ public class TldTracker<T extends ImageSingleBand, D extends ImageSingleBand> {
 	 */
 	public static int[] selectPyramidScale( int imageWidth , int imageHeight, int featureRadius ) {
 		int w = Math.max(imageWidth,imageHeight);
-		int minSize = (featureRadius*2+1)*10;
+		int minSize = (featureRadius*2+1)*5;
 
 		int maxScale = w/minSize;
 		int n = 1;
@@ -375,6 +397,12 @@ public class TldTracker<T extends ImageSingleBand, D extends ImageSingleBand> {
 		}
 
 		return ret;
+	}
+
+	private static enum LearningTask {
+		NOTHING,
+		LEARN_POSITIVE,
+		LEARN_NEGATIVE
 	}
 
 	public boolean isPerformLearning() {
