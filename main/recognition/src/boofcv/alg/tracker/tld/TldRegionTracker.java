@@ -298,14 +298,14 @@ public class TldRegionTracker< Image extends ImageSingleBand , Derivative extend
 
 		for( int i = 0; i < gridWidth; i++ ) {
 
-			double y = spawnRect.y0 + i*spawnHeight/(gridWidth-1);
+			float y = (float)(spawnRect.y0 + i*spawnHeight/(gridWidth-1));
 
 			for( int j = 0; j < gridWidth; j++ ) {
-				double x = spawnRect.x0 + j*spawnWidth/(gridWidth-1);
+				float x = (float)(spawnRect.x0 + j*spawnWidth/(gridWidth-1));
 
 				Track t = tracks[i*gridWidth+j];
-				t.klt.x = (int)(x+0.5);
-				t.klt.y = (int)(y+0.5);
+				t.klt.x = x;
+				t.klt.y = y;
 
 				if( tracker.setDescription(t.klt) ) {
 					t.active = true;

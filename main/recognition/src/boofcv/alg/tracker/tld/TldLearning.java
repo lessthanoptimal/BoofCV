@@ -163,6 +163,16 @@ public class TldLearning<T extends ImageSingleBand> {
 		if( !detectionHasRun )
 			detection.detectionCascade(cascadeRegions);
 
+		learnNegative(targetRegion);
+
+		System.out.println("  LEARNING: template positive "+
+				template.getTemplatePositive().size()+" negative "+template.getTemplateNegative().size());
+	}
+
+	public void learnNegative( RectangleCorner2D_F64 targetRegion) {
+
+		TldHelperFunctions.convertRegion(targetRegion, targetRegion_I32);
+
 		if( detection.isSuccess() ) {
 			TldRegion best = detection.getBest();
 
@@ -181,9 +191,6 @@ public class TldLearning<T extends ImageSingleBand> {
 				}
 			}
 		}
-
-		System.out.println("  LEARNING: template positive "+
-				template.getTemplatePositive().size()+" negative "+template.getTemplateNegative().size());
 	}
 
 	/**
