@@ -123,24 +123,11 @@ public class TldLearning<T extends ImageSingleBand> {
 		if( !detectionHasRun )
 			variance.selectThreshold(targetRegion_I32);
 		template.addDescriptor(true, targetRegion_I32);
-		fern.learnFernNoise(true, targetRegion, affine);
+		fern.learnFernNoise(true, targetRegion_I32);
+//		fern.learnFernNoise(true, targetRegion, affine);
 
 		// learn a distorted region which has been translated and scaled
-		for( int iterTranY = 0; iterTranY < numSamplesTranslation; iterTranY++ ) {
-			affine.ty = -0.05f + (iterTranY*0.1f/(numSamplesTranslation-1));
-			for( int iterTranX = 0; iterTranX < numSamplesTranslation; iterTranX++ ) {
-				affine.tx = -0.05f + (iterTranX*0.1f/(numSamplesTranslation-1));
-				for( int iterScale = 0; iterScale < numSamplesScale; iterScale++ ) {
-					affine.a11 = affine.a22 = 0.8f + (iterScale*0.4f/(numSamplesScale-1));
-
-					if( !checkInBounds(targetRegion,affine))
-						continue;
-
-					fern.learnFernNoise(true, targetRegion, affine);
-					template.addDescriptor(true, targetRegion , affine );
-				}
-			}
-		}
+//		learnRegionDistorted(targetRegion,true);
 
 		// Mark all other regions as negative ferns
 		affine.reset();
@@ -169,6 +156,24 @@ public class TldLearning<T extends ImageSingleBand> {
 				template.getTemplatePositive().size()+" negative "+template.getTemplateNegative().size());
 	}
 
+	public void learnRegionDistorted( RectangleCorner2D_F64 targetRegion , boolean positive ) {
+		for( int iterTranY = 0; iterTranY < numSamplesTranslation; iterTranY++ ) {
+			affine.ty = -0.05f + (iterTranY*0.1f/(numSamplesTranslation-1));
+			for( int iterTranX = 0; iterTranX < numSamplesTranslation; iterTranX++ ) {
+				affine.tx = -0.05f + (iterTranX*0.1f/(numSamplesTranslation-1));
+				for( int iterScale = 0; iterScale < numSamplesScale; iterScale++ ) {
+					affine.a11 = affine.a22 = 0.8f + (iterScale*0.4f/(numSamplesScale-1));
+
+					if( !checkInBounds(targetRegion,affine))
+						continue;
+
+					fern.learnFernNoise(positive, targetRegion, affine);
+					template.addDescriptor(positive, targetRegion , affine );
+				}
+			}
+		}
+	}
+
 	public void learnNegative( RectangleCorner2D_F64 targetRegion) {
 
 		TldHelperFunctions.convertRegion(targetRegion, targetRegion_I32);
@@ -180,6 +185,7 @@ public class TldLearning<T extends ImageSingleBand> {
 			double overlap = helper.computeOverlap(best.rect,targetRegion_I32);
 			if( overlap <= config.overlapLower ) {
 				template.addDescriptor(false,best.rect);
+				fern.learnFernNoise(false, best.rect );
 			}
 
 			// mark all ambiguous regions as bad
@@ -187,6 +193,13 @@ public class TldLearning<T extends ImageSingleBand> {
 			for( ImageRectangle r : ambiguous ) {
 				overlap = helper.computeOverlap(r,targetRegion_I32);
 				if( overlap <= config.overlapLower ) {
+//					tempRect.x0 = r.x0;
+//					tempRect.y0 = r.y0;
+//					tempRect.x1 = r.x1;
+//					tempRect.y1 = r.y1;
+//
+//					learnRegionDistorted(tempRect,false);
+					fern.learnFernNoise(false, r );
 					template.addDescriptor(false,r);
 				}
 			}
@@ -198,34 +211,34 @@ public class TldLearning<T extends ImageSingleBand> {
 	 */
 	private boolean checkInBounds( RectangleCorner2D_F64 r , Affine2D_F32 affine ) {
 
-		double c_x = (r.x0+r.x1)/2.0;
-		double c_y = (r.y0+r.y1)/2.0;
+		float c_x = (float)(r.x0+r.x1)/2.0f;
+		float c_y = (float)(r.y0+r.y1)/2.0f;
+		float width = (float)r.getWidth();
+		float height = (float)r.getHeight();
 
-		point.set( (float)(c_x-r.x0) , (float)(c_y-r.y0) );
-		AffinePointOps.transform(affine,point,point);
-
-		if( !interpolate.isInSafeBounds(point.x,point.y))
+		if( !checkInBounds(c_x,c_y,width,height,-0.5f,-0.5f))
 			return false;
 
-		point.set( (float)(c_x-r.x0) , (float)(c_y-r.y1) );
-		AffinePointOps.transform(affine,point,point);
-
-		if( !interpolate.isInSafeBounds(point.x,point.y))
+		if( !checkInBounds(c_x,c_y,width,height, 0.5f,-0.5f))
 			return false;
 
-		point.set( (float)(c_x-r.x1) , (float)(c_y-r.y1) );
-		AffinePointOps.transform(affine,point,point);
-
-		if( !interpolate.isInSafeBounds(point.x,point.y))
+		if( !checkInBounds(c_x,c_y,width,height, 0.5f, 0.5f))
 			return false;
 
-		point.set( (float)(c_x-r.x1) , (float)(c_y-r.y0) );
-		AffinePointOps.transform(affine,point,point);
-
-		if( !interpolate.isInSafeBounds(point.x,point.y))
+		if( !checkInBounds(c_x,c_y,width,height,-0.5f, 0.5f))
 			return false;
 
 		return true;
+	}
+
+	private boolean checkInBounds( float c_x, float c_y , float width , float height , float x , float y )  {
+		point.set(x,y);
+		AffinePointOps.transform(affine,point,point);
+
+		x = c_x + point.x*width;
+		y = c_y + point.y*height;
+
+		return interpolate.isInSafeBounds(x,y);
 	}
 
 	/**

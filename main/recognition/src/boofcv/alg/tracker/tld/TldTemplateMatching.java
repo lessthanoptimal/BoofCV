@@ -96,11 +96,11 @@ public class TldTemplateMatching<T extends ImageSingleBand> {
 
 		// avoid adding the same descriptor twice or adding contradicting results
 		if( positive)
-			if( distance(f,templatePositive) < 0.05 ) {
+			if( distance(f,templatePositive) < 0.1 ) {
 				return;
 			}
 		if( !positive)
-			if( distance(f,templateNegative) < 0.05 ) {
+			if( distance(f,templateNegative) < 0.1 ) {
 				return;
 			}
 
