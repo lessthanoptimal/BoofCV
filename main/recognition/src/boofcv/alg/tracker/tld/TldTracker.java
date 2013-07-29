@@ -133,7 +133,7 @@ public class TldTracker<T extends ImageSingleBand, D extends ImageSingleBand> {
 		variance = new TldVarianceFilter<T>(config.imageType);
 		template = new TldTemplateMatching<T>(config.interpolate);
 		fern = new TldFernClassifier<T>(
-				rand,config.numFerns,config.fernSize,1,1.0f,config.interpolate);
+				rand,config.numFerns,config.fernSize,20,0.5f,config.interpolate);
 
 		detection = new TldDetection<T>(fern,template,variance,config);
 		learning = new TldLearning<T>(rand,5,5,config,template,variance,fern,detection,config.interpolate);

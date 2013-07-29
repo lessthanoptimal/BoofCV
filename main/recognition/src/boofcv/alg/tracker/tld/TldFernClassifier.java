@@ -57,10 +57,6 @@ public class TldFernClassifier<T extends ImageSingleBand> {
 	private Point2D_F32 tranA = new Point2D_F32();
 	private Point2D_F32 tranB = new Point2D_F32();
 
-	// TODO make a comment about this change
-	private int totalPositive;
-	private int totalNegative;
-
 	/**
 	 * Configures fern algorithm
 	 *
@@ -93,9 +89,6 @@ public class TldFernClassifier<T extends ImageSingleBand> {
 	 * Discard all information on fern values and their probabilities
 	 */
 	public void reset() {
-		totalPositive = 0;
-		totalNegative = 0;
-
 		for( int i = 0; i < managers.length; i++ )
 			managers[i].reset();
 	}
@@ -120,11 +113,6 @@ public class TldFernClassifier<T extends ImageSingleBand> {
 	 * WARNING: Make sure the transformed rectangle is in bounds first!
 	 */
 	public void learnFernNoise(boolean positive, RectangleCorner2D_F64 r, Affine2D_F32 transform) {
-
-		if( positive )
-			totalPositive += 1 + numLearnRandom;
-		else
-			totalNegative += 1 + numLearnRandom;
 
 		float rectWidth = (float)r.getWidth();
 		float rectHeight = (float)r.getHeight();
@@ -156,11 +144,6 @@ public class TldFernClassifier<T extends ImageSingleBand> {
 
 	public void learnFern(boolean positive, ImageRectangle r) {
 
-		if( positive )
-			totalPositive += 1;
-		else
-			totalNegative += 1;
-
 		float rectWidth = r.getWidth();
 		float rectHeight = r.getHeight();
 
@@ -179,15 +162,7 @@ public class TldFernClassifier<T extends ImageSingleBand> {
 		}
 	}
 
-	/**
-	 * Checks the probability of all ferns at the specified location.  If they pass the test 1 is returned, otherwise
-	 * 0 is returned.  To pass the test the forms must have an average posterior probability of 0.5
-	 *
-	 * The test aborts early if it finds that the probability is too low to pass
-	 *
-	 * @return true if it could be the target and false if not
-	 */
-	public boolean performTest( ImageRectangle r ) {
+	public void learnFernNoise(boolean positive, ImageRectangle r) {
 
 		float rectWidth = r.getWidth();
 		float rectHeight = r.getHeight();
@@ -195,35 +170,25 @@ public class TldFernClassifier<T extends ImageSingleBand> {
 		float c_x = r.x0+rectWidth/2.0f;
 		float c_y = r.y0+rectHeight/2.0f;
 
-		probability = 0;
-
-		int h = ferns.length/2;
-
 		for( int i = 0; i < ferns.length; i++ ) {
-			TldFernDescription fern = ferns[i];
 
-			int value = computeFernValue(c_x, c_y, rectWidth, rectHeight, fern);
-//			if( managers[i].lookupPosterior(value) > 0.5 )
-//				return true;
-
+			// first learn it with no noise
+			int value = computeFernValue(c_x, c_y, rectWidth, rectHeight,ferns[i]);
 			TldFernFeature f = managers[i].lookupFern(value);
-			if( f != null ) {
-				double fracP = f.numP/(double)totalPositive;
-				double fracN = f.numN/(double)totalNegative;
+			if( positive )
+				f.incrementP();
+			else
+				f.incrementN();
 
-				double p = fracP/(fracN + fracP);
-				probability += p;
+			for( int j = 0; j < numLearnRandom; j++ ) {
+				value = computeFernValueRand(c_x, c_y, rectWidth, rectHeight,ferns[i]);
+				f = managers[i].lookupFern(value);
+				if( positive )
+					f.incrementP();
+				else
+					f.incrementN();
 			}
-//				continue;
-
-//			probability += managers[i].lookupPosterior(value);
-//
-			if( i == h && probability <= 0 )
-				return false;
 		}
-
-//		return false;
-		return probability/ferns.length > 0.5;
 	}
 
 	public boolean lookupFernPN( TldRegionFernInfo info ) {
@@ -333,6 +298,30 @@ public class TldFernClassifier<T extends ImageSingleBand> {
 			// TODO make sure this is safe
 			float valA = interpolate.get_unsafe(c_x + p_a.x * rectWidth, c_y + p_a.y * rectHeight);
 			float valB = interpolate.get_unsafe(c_x + p_b.x * rectWidth, c_y + p_b.y * rectHeight);
+
+			desc *= 2;
+
+			if( valA < valB ) {
+				desc += 1;
+			}
+		}
+
+		return desc;
+	}
+
+	protected int computeFernValueRand(float c_x, float c_y, float rectWidth , float rectHeight , TldFernDescription fern ) {
+
+		int desc = 0;
+		for( int i = 0; i < fern.pairs.length; i++ ) {
+			Point2D_F32 p_a = fern.pairs[i].a;
+			Point2D_F32 p_b = fern.pairs[i].b;
+
+			// TODO make sure this is safe
+			float valA = interpolate.get_unsafe(c_x + p_a.x * rectWidth, c_y + p_a.y * rectHeight);
+			float valB = interpolate.get_unsafe(c_x + p_b.x * rectWidth, c_y + p_b.y * rectHeight);
+
+			valA += rand.nextGaussian()*fernLearnNoise;
+			valB += rand.nextGaussian()*fernLearnNoise;
 
 			desc *= 2;
 
