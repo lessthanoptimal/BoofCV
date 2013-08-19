@@ -109,7 +109,7 @@ public class TldConfig<T extends ImageSingleBand, D extends ImageSingleBand> {
 	/**
 	 * Random number seed.  Used to create ferns and perform robust model fitting.
 	 */
-	public long randomSeed = 0xDEADBEEF;
+	public long randomSeed = 0xDEADBEE;
 
 	/**
 	 * Number of fern descriptors.  A value of 10 is recommended.
