@@ -185,7 +185,7 @@ public class TldLearning<T extends ImageSingleBand> {
 			double overlap = helper.computeOverlap(best.rect,targetRegion_I32);
 			if( overlap <= config.overlapLower ) {
 				template.addDescriptor(false,best.rect);
-				fern.learnFernNoise(false, best.rect );
+//				fern.learnFernNoise(false, best.rect );
 			}
 
 			// mark all ambiguous regions as bad
@@ -199,7 +199,7 @@ public class TldLearning<T extends ImageSingleBand> {
 //					tempRect.y1 = r.y1;
 //
 //					learnRegionDistorted(tempRect,false);
-					fern.learnFernNoise(false, r );
+//					fern.learnFernNoise(false, r );
 					template.addDescriptor(false,r);
 				}
 			}

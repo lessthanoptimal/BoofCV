@@ -21,6 +21,7 @@ package boofcv.alg.tracker.tld;
 import boofcv.alg.tracker.klt.PyramidKltTracker;
 import boofcv.factory.tracker.FactoryTrackerAlg;
 import boofcv.factory.transform.pyramid.FactoryPyramid;
+import boofcv.misc.BoofMiscOps;
 import boofcv.struct.FastQueue;
 import boofcv.struct.ImageRectangle;
 import boofcv.struct.image.ImageSingleBand;
@@ -61,6 +62,9 @@ import java.util.Random;
 // TODO adjust detection variance threshold
 //    if it has a track use previous estimate
 //    if track is lost use initial value
+// TODO for walking 2 and 3 need to handle tracking outside of image border
+//      tracking can be adjusted to handle that case, but it needs to realize when the target is no longer
+//      inside the view rectangle
 public class TldTracker<T extends ImageSingleBand, D extends ImageSingleBand> {
 
 	// specified configuration parameters for the tracker
@@ -267,10 +271,7 @@ public class TldTracker<T extends ImageSingleBand, D extends ImageSingleBand> {
 			trackerRegion.set(targetRegion);
 			boolean trackingWorked = tracking.process(imagePyramid, trackerRegion);
 			trackingWorked &= adjustRegion.process(tracking.getPairs(), trackerRegion);
-			if( trackingWorked ) {
-				TldHelperFunctions.convertRegion(trackerRegion, trackerRegion_I32);
-//				trackingWorked &= variance.checkVariance(trackerRegion_I32);
-			}
+			TldHelperFunctions.convertRegion(trackerRegion, trackerRegion_I32);
 
 			if( hypothesisFusion( trackingWorked , detection.isSuccess() ) ) {
 				// if it found a hypothesis and it is valid for learning, then learn

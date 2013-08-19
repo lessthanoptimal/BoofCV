@@ -150,21 +150,25 @@ public class TldDetection<T extends ImageSingleBand> {
 			initPositive.addAll(storageRect);
 		}
 
+		double maxConfidence = -1;
 		for( int i = 0; i < initPositive.size(); i++ ) {
 			ImageRectangle region = initPositive.get(i);
 
 			double confidence = template.computeConfidence(region);
+			maxConfidence = Math.max(confidence,maxConfidence);
+
 			if( confidence < config.confidenceThresholdUpper)
 				continue;
-
 			TldRegion r = candidateDetections.grow();
 			r.connections = 0;
 			r.rect.set(region);
 			r.confidence = confidence;
+
 		}
 
 		if( candidateDetections.size == 0 ) {
-			System.out.println("DETECTION: No strong candidates");
+			System.out.println("DETECTION: No strong candidates: ferns "+initPositive.size());
+			System.out.println("           max confidence "+maxConfidence);
 			return;
 		}
 

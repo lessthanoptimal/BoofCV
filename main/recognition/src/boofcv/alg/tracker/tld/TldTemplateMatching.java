@@ -96,11 +96,11 @@ public class TldTemplateMatching<T extends ImageSingleBand> {
 
 		// avoid adding the same descriptor twice or adding contradicting results
 		if( positive)
-			if( distance(f,templatePositive) < 0.1 ) {
+			if( distance(f,templatePositive) < 0.05 ) {
 				return;
 			}
 		if( !positive)
-			if( distance(f,templateNegative) < 0.1 ) {
+			if( distance(f,templateNegative) < 0.05 ) {
 				return;
 			}
 
@@ -144,7 +144,7 @@ public class TldTemplateMatching<T extends ImageSingleBand> {
 		for( int y = 0; y < 15; y++ ) {
 			float sampleY = y0 + y*heightStep;
 			for( int x = 0; x < 15; x++ ) {
-				mean += f.value[index++] = interpolate.get(x0 + x*widthStep,sampleY);
+				mean += f.value[index++] = interpolate.get_unsafe(x0 + x*widthStep,sampleY);
 			}
 		}
 		mean /= 15*15;
@@ -186,7 +186,7 @@ public class TldTemplateMatching<T extends ImageSingleBand> {
 				temp.x = (x-7)*widthStep;
 				temp.y = (y-7)*heightStep;
 				AffinePointOps.transform(affine,temp,temp);
-				mean += f.value[index++] = interpolate.get(c_x + temp.x*width,c_y + temp.y*height);
+				mean += f.value[index++] = interpolate.get_unsafe(c_x + temp.x*width,c_y + temp.y*height);
 			}
 		}
 		mean /= 15*15;
