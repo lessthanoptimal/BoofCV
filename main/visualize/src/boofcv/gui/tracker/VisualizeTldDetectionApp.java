@@ -28,6 +28,7 @@ import boofcv.core.image.GeneralizedImageOps;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.FastQueue;
+import boofcv.struct.GrowQueue_F64;
 import boofcv.struct.ImageRectangle;
 import boofcv.struct.feature.NccFeature;
 import boofcv.struct.image.ImageSingleBand;
@@ -84,6 +85,8 @@ public class VisualizeTldDetectionApp<T extends ImageSingleBand,D extends ImageS
 		FastQueue<TldRegion> detected = tracker.getDetection().getCandidateDetections();
 
 		drawDetections(g2, detected,0);
+//		drawFerns(g2,0);
+
 		if( tracker.getDetection().isAmbiguous())
 			drawDetections(g2, tracker.getDetection().getDetectedTargets(),Color.RED);
 		else {
@@ -119,6 +122,35 @@ public class VisualizeTldDetectionApp<T extends ImageSingleBand,D extends ImageS
 			int v = (int)(255*(r.confidence-min)/range);
 			int rgb = v << shift;
 			drawRectangle(g2,r.rect,new Color(rgb),3);
+		}
+	}
+
+	private void drawFerns(Graphics2D g2 , int shift ) {
+		double max = 0;
+		double min = Double.MAX_VALUE;
+
+		GrowQueue_F64 value = tracker.getDetection().getStorageMetric();
+		java.util.List<ImageRectangle> rects = tracker.getDetection().getStorageRect();
+
+		for( int i = 0; i < value.size; i++ ) {
+			double r = -value.get(i);
+
+			if( r > max ) {
+				max = r;
+			}
+			if( r < min ) {
+				min = r;
+			}
+		}
+		double range = max-min;
+
+		for( int i = 0; i < value.size; i++ ) {
+			double r = value.get(i);
+			ImageRectangle rect = rects.get(i);
+
+			int v = (int)(255*(r-min)/range);
+			int rgb = v << shift;
+			drawRectangle(g2,rect,new Color(rgb),3);
 		}
 	}
 
@@ -215,7 +247,7 @@ public class VisualizeTldDetectionApp<T extends ImageSingleBand,D extends ImageS
 
 	public static void main(String[] args) {
 
-		BufferedImage image = UtilImageIO.loadImage("/home/pja/projects/ValidationBoof/data/track_rect/TLD/01_david/00001.jpg");
+		BufferedImage image = UtilImageIO.loadImage("/home/pja/projects/ValidationBoof/data/track_rect/TLD/04_pedestrian2/00001.jpg");
 		new VisualizeTldDetectionApp(image,ImageUInt8.class);
 
 //		String fileName = "/home/pja/Downloads/multi_face_turning/motinas_multi_face_turning.avi";

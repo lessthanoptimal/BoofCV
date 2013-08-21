@@ -107,8 +107,6 @@ public class TldLearning<T extends ImageSingleBand> {
 	 * Select positive and negative examples based on the region the user initially selected.  Only use regions
 	 * with significant variance during this initial learning phase
 	 */
-	// TODO sample translations around the selected rect
-	// TODO sample different scales around selected rectangle
 	public void initialLearning( RectangleCorner2D_F64 targetRegion ,
 								 FastQueue<ImageRectangle> cascadeRegions , boolean detectionHasRun ) {
 
@@ -152,8 +150,8 @@ public class TldLearning<T extends ImageSingleBand> {
 
 		learnNegative(targetRegion);
 
-		System.out.println("  LEARNING: template positive "+
-				template.getTemplatePositive().size()+" negative "+template.getTemplateNegative().size());
+//		System.out.println("  LEARNING: template positive "+
+//				template.getTemplatePositive().size()+" negative "+template.getTemplateNegative().size());
 	}
 
 	public void learnRegionDistorted( RectangleCorner2D_F64 targetRegion , boolean positive ) {

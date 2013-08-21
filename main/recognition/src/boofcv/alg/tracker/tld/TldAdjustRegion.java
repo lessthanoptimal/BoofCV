@@ -81,10 +81,6 @@ public class TldAdjustRegion {
 		if( targetRectangle.x1 >= imageWidth || targetRectangle.y1 >= imageHeight )
 			return false;
 
-
-//		System.out.println("Motion: x = "+motion.transX+" y = "+motion.transY+" scale "+motion.scale);
-//		System.out.println("        error = "+estimateMotion.getError());
-
 		return true;
 	}
 
