@@ -38,7 +38,6 @@ public class TldConfig<T extends ImageSingleBand, D extends ImageSingleBand> {
 	public Class<T> imageType;
 	public Class<D> derivType;
 
-
 	/**
 	 * Maximum number of NCC templates it will examine inside the detection cascade.  Used to limit the amount
 	 * of processing used during detection.  To disable set to Integer.MAX_VALUE
@@ -62,6 +61,11 @@ public class TldConfig<T extends ImageSingleBand, D extends ImageSingleBand> {
 	public int trackerFeatureRadius = 5;
 
 	/**
+	 * The minimum number of pixels along a side in a detection rectangle which will be considered.
+	 */
+	public int detectMinimumSide = 20;
+
+	/**
 	 * Number of iterations in LSMeD to estimate the region's motion.
 	 */
 	public int motionIterations = 50;
@@ -73,26 +77,15 @@ public class TldConfig<T extends ImageSingleBand, D extends ImageSingleBand> {
 	public double regionConnect = 0.5;
 
 	/**
-	 * When initializing, this is the maximum number of positive examples it will learn.  Regions with the most
-	 * overlap are selected first.
-	 */
-	public int initLearnPositive = 10;
-
-	/**
-	 * When initializing, this is the maximum number of negative examples it will learn.  The specific regions
-	 * are randomly selected.
-	 */
-	public int initLearnNegative = 1000;
-
-	/**
-	 * If two regions have an overlap more than this value they are considered to be connected
-	 */
-	public double overlapUpper = 0.6;
-
-	/**
 	 * If two regions have an overlap less than this value they are considered to be disconnected
 	 */
 	public double overlapLower = 0.2;
+
+	/**
+	 * A track must have a confidence above this value to be considered highly confident, allowing learning
+	 * to be activated again.
+	 */
+	public double confidenceThresholdStrong = 0.80;
 
 	/**
 	 * Upper acceptance threshold for confidence.  Suggested value is 0.65

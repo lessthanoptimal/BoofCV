@@ -21,7 +21,6 @@ package boofcv.alg.tracker.tld;
 import boofcv.alg.tracker.klt.PyramidKltTracker;
 import boofcv.factory.tracker.FactoryTrackerAlg;
 import boofcv.factory.transform.pyramid.FactoryPyramid;
-import boofcv.misc.BoofMiscOps;
 import boofcv.struct.FastQueue;
 import boofcv.struct.ImageRectangle;
 import boofcv.struct.image.ImageSingleBand;
@@ -62,9 +61,8 @@ import java.util.Random;
 // TODO adjust detection variance threshold
 //    if it has a track use previous estimate
 //    if track is lost use initial value
-// TODO for walking 2 and 3 need to handle tracking outside of image border
-//      tracking can be adjusted to handle that case, but it needs to realize when the target is no longer
-//      inside the view rectangle
+// TODO get comparable results for float and integer images
+// TODO speed up to 10 fps for 320x240 images
 public class TldTracker<T extends ImageSingleBand, D extends ImageSingleBand> {
 
 	// specified configuration parameters for the tracker
@@ -106,6 +104,7 @@ public class TldTracker<T extends ImageSingleBand, D extends ImageSingleBand> {
 	// Was the previous region hypothesis valid?
 	private boolean previousValid;
 
+	boolean strongMatch;
 
 	TldHelperFunctions helper = new TldHelperFunctions();
 
@@ -116,8 +115,6 @@ public class TldTracker<T extends ImageSingleBand, D extends ImageSingleBand> {
 
 	// is learning on or off
 	private boolean performLearning = true;
-
-	LearningTask learningTask;
 
 	/**
 	 * Configures the TLD tracker
@@ -177,6 +174,7 @@ public class TldTracker<T extends ImageSingleBand, D extends ImageSingleBand> {
 		previousValid = false;
 
 		learning.initialLearning(targetRegion, cascadeRegions,false);
+		strongMatch = true;
 	}
 
 
@@ -199,7 +197,7 @@ public class TldTracker<T extends ImageSingleBand, D extends ImageSingleBand> {
 			int actualHeight = (int)(rectHeight*scale);
 
 			// see if the region is too small or too large
-			if( actualWidth < 25 || actualHeight < 25 )
+			if( actualWidth < config.detectMinimumSide || actualHeight < config.detectMinimumSide )
 				continue;
 
 			if( actualWidth >= imageWidth || actualHeight >= imageHeight )
@@ -238,7 +236,7 @@ public class TldTracker<T extends ImageSingleBand, D extends ImageSingleBand> {
 	 */
 	public boolean track( T image ) {
 
-		System.out.println("----------------------- TRACKING ---------------------------");
+//		System.out.println("----------------------- TRACKING ---------------------------");
 
 		boolean success = true;
 		valid = false;
@@ -253,7 +251,7 @@ public class TldTracker<T extends ImageSingleBand, D extends ImageSingleBand> {
 			detection.detectionCascade(cascadeRegions);
 			if( detection.isSuccess() && !detection.isAmbiguous() ) {
 				TldRegion region = detection.getBest();
-				System.out.println("Track reacquired: confidence = "+region.confidence);
+//				System.out.println("Track reacquired: confidence = "+region.confidence);
 				reacquiring = false;
 				valid = false;
 				// set it to the detected region
@@ -261,6 +259,8 @@ public class TldTracker<T extends ImageSingleBand, D extends ImageSingleBand> {
 				targetRegion.set(r.x0, r.y0, r.x1, r.y1);
 				// get tracking running again
 				tracking.initialize(imagePyramid);
+
+				strongMatch = region.confidence > config.confidenceThresholdStrong;
 			} else {
 				success = false;
 			}
@@ -276,16 +276,7 @@ public class TldTracker<T extends ImageSingleBand, D extends ImageSingleBand> {
 			if( hypothesisFusion( trackingWorked , detection.isSuccess() ) ) {
 				// if it found a hypothesis and it is valid for learning, then learn
 				if( valid && performLearning ) {
-					System.out.println("  learning type "+learningTask);
-					switch( learningTask ) {
-						case LEARN_POSITIVE:
-							learning.initialLearning(targetRegion,cascadeRegions,true);
-							break;
-
-						case LEARN_NEGATIVE:
-							learning.learnNegative(targetRegion);
-							break;
-					}
+					learning.initialLearning(targetRegion,cascadeRegions,true);
 				}
 			} else {
 				reacquiring = true;
@@ -306,7 +297,7 @@ public class TldTracker<T extends ImageSingleBand, D extends ImageSingleBand> {
 	 */
 	protected boolean hypothesisFusion( boolean trackingWorked , boolean detectionWorked ) {
 
-		System.out.println(" FUSION: tracking "+trackingWorked+"  detection "+detectionWorked);
+//		System.out.println(" FUSION: tracking "+trackingWorked+"  detection "+detectionWorked);
 
 		valid = false;
 
@@ -327,49 +318,41 @@ public class TldTracker<T extends ImageSingleBand, D extends ImageSingleBand> {
 				overlap = helper.computeOverlap(trackerRegion_I32, detectedRegion.rect);
 			}
 
-			System.out.println("FUSION: score track "+scoreTrack+" detection "+scoreDetected);
+//			System.out.println("FUSION: score track "+scoreTrack+" detection "+scoreDetected);
 
-			if( uniqueDetection && scoreDetected > scoreTrack ) {
-				System.out.println("FUSION: using detection region");
+			if( uniqueDetection && scoreDetected > scoreTrack + 0.07 ) {
+//				System.out.println("FUSION: using detection region");
 				// if there is a unique detection and it has higher confidence than the
 				// track region, use the detected region
 				TldHelperFunctions.convertRegion(detectedRegion.rect, targetRegion);
 				confidenceTarget = detectedRegion.confidence;
+
+				strongMatch = confidenceTarget > config.confidenceThresholdStrong;
 			} else {
-				System.out.println("FUSION: using track region");
+//				System.out.println("FUSION: using track region");
 				// Otherwise use the tracker region
 				targetRegion.set(trackerRegion);
 				confidenceTarget = scoreTrack;
 
+				strongMatch |= confidenceTarget > config.confidenceThresholdStrong;
+
 				// see if the most likely detected region overlaps the track region
-				if( scoreTrack >= config.confidenceThresholdLower )  {
-//					if( detectionWorked && !uniqueDetection) {
-//						learningTask = LearningTask.LEARN_NEGATIVE;
-//					} else { //if( !detectionWorked ){
-						learningTask = LearningTask.LEARN_POSITIVE;
-//					} else {
-//						learningTask = LearningTask.NOTHING;
-//					}
+				if( trackingWorked && strongMatch && confidenceTarget >= config.confidenceThresholdLower )  {
 					valid = true;
-//				} else if( previousValid && scoreTrack >= config.confidenceThresholdLower) {
-//					learningTask = LearningTask.LEARN_POSITIVE;
-//					valid = true;
-//				} else {
-//					learningTask = LearningTask.NOTHING;
-//					valid = true;
 				}
 			}
 		} else if( uniqueDetection ) {
-			System.out.println("FUSION: tracker failed, using detection ");
+//			System.out.println("FUSION: tracker failed, using detection ");
 			// just go with the best detected region
 			detectedRegion = detection.getBest();
 			TldHelperFunctions.convertRegion(detectedRegion.rect, targetRegion);
 			confidenceTarget = detectedRegion.confidence;
+			strongMatch = confidenceTarget > config.confidenceThresholdStrong;
 		} else {
-			System.out.println("FUSION: failed");
+//			System.out.println("FUSION: failed");
 			return false;
 		}
-		System.out.println("FUSION: valid = "+valid+" confidence "+confidenceTarget);
+//		System.out.println("FUSION: valid = "+valid+" confidence "+confidenceTarget);
 
 		return confidenceTarget >= config.confidenceAccept;
 	}
@@ -398,12 +381,6 @@ public class TldTracker<T extends ImageSingleBand, D extends ImageSingleBand> {
 		}
 
 		return ret;
-	}
-
-	private static enum LearningTask {
-		NOTHING,
-		LEARN_POSITIVE,
-		LEARN_NEGATIVE
 	}
 
 	public boolean isPerformLearning() {

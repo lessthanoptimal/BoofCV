@@ -70,6 +70,13 @@ public class TldVisualizationPanel extends JPanel implements MouseListener{
 		centerPanel.grabFocus();
 	}
 
+	public void setSelectRectangle( boolean value ) {
+		if( value )
+			numClicks = 0;
+		else
+			numClicks = 2;
+	}
+
 	public void setFrame( final BufferedImage frame) {
 		SwingUtilities.invokeLater( new Runnable() {
 			@Override
