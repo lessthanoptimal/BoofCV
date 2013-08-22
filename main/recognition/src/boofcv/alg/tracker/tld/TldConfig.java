@@ -82,10 +82,16 @@ public class TldConfig<T extends ImageSingleBand, D extends ImageSingleBand> {
 	public double overlapLower = 0.2;
 
 	/**
+	 * How similar the area needs to be for it to be considered a continuation of the previous track and will
+	 * update the description
+	 */
+	public double thresholdSimilarArea = 0.2;
+
+	/**
 	 * A track must have a confidence above this value to be considered highly confident, allowing learning
 	 * to be activated again.
 	 */
-	public double confidenceThresholdStrong = 0.80;
+	public double confidenceThresholdStrong = 0.75; // 0.75
 
 	/**
 	 * Upper acceptance threshold for confidence.  Suggested value is 0.65

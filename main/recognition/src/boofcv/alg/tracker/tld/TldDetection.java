@@ -133,7 +133,7 @@ public class TldDetection<T extends ImageSingleBand> {
 		}
 
 		if( storageMetric.size == 0 ) {
-//			System.out.println("  DETECTION: All regions failed fern test");
+			System.out.println("  DETECTION: All regions failed fern test");
 			return;
 		}
 
@@ -167,23 +167,23 @@ public class TldDetection<T extends ImageSingleBand> {
 		}
 
 		if( candidateDetections.size == 0 ) {
-//			System.out.println("DETECTION: No strong candidates: ferns "+initPositive.size());
-//			System.out.println("           max confidence "+maxConfidence);
+			System.out.println("DETECTION: No strong candidates: ferns "+initPositive.size());
+			System.out.println("           max confidence "+maxConfidence);
 			return;
 		}
 
-//		System.out.println("DETECTION: pass fern regions     = "+initPositive.size());
-//		System.out.println("DETECTION: pass template regions = "+candidateDetections.size);
+		System.out.println("DETECTION: pass fern regions     = "+initPositive.size());
+		System.out.println("DETECTION: pass template regions = "+candidateDetections.size);
 
 		// use non-maximum suppression to reduce the number of candidates
 		nonmax.process(candidateDetections, detectedTargets);
 
-//		System.out.println("DETECTION: maximum regions       = " + detectedTargets.size);
+		System.out.println("DETECTION: maximum regions       = " + detectedTargets.size);
 
 		best = selectBest();
 		ambiguous = checkAmbiguous(best);
 
-//		System.out.println("DETECTION: ambiguous = "+ambiguous+" best confidence = "+best.confidence);
+		System.out.println("DETECTION: ambiguous = "+ambiguous+" best confidence = "+best.confidence);
 		success = true;
 	}
 

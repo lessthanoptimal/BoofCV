@@ -105,6 +105,7 @@ public class TldTracker<T extends ImageSingleBand, D extends ImageSingleBand> {
 	private boolean previousValid;
 
 	boolean strongMatch;
+	double previousTrackArea;
 
 	TldHelperFunctions helper = new TldHelperFunctions();
 
@@ -175,6 +176,7 @@ public class TldTracker<T extends ImageSingleBand, D extends ImageSingleBand> {
 
 		learning.initialLearning(targetRegion, cascadeRegions,false);
 		strongMatch = true;
+		previousTrackArea = targetRegion.area();
 	}
 
 
@@ -236,7 +238,7 @@ public class TldTracker<T extends ImageSingleBand, D extends ImageSingleBand> {
 	 */
 	public boolean track( T image ) {
 
-//		System.out.println("----------------------- TRACKING ---------------------------");
+		System.out.println("----------------------- TRACKING ---------------------------");
 
 		boolean success = true;
 		valid = false;
@@ -260,7 +262,8 @@ public class TldTracker<T extends ImageSingleBand, D extends ImageSingleBand> {
 				// get tracking running again
 				tracking.initialize(imagePyramid);
 
-				strongMatch = region.confidence > config.confidenceThresholdStrong;
+				checkNewTrackStrong(region.confidence);
+
 			} else {
 				success = false;
 			}
@@ -276,17 +279,35 @@ public class TldTracker<T extends ImageSingleBand, D extends ImageSingleBand> {
 			if( hypothesisFusion( trackingWorked , detection.isSuccess() ) ) {
 				// if it found a hypothesis and it is valid for learning, then learn
 				if( valid && performLearning ) {
+					System.out.println("LEARNING!!!");
 					learning.initialLearning(targetRegion,cascadeRegions,true);
+				} else {
+					System.out.println("NO LEARNING");
 				}
+
 			} else {
 				reacquiring = true;
 				success = false;
 			}
 		}
 
+		if( strongMatch ) {
+			previousTrackArea = targetRegion.area();
+		}
+
 		previousValid = valid;
 
 		return success;
+	}
+
+	private void checkNewTrackStrong( double confidence ) {
+		// see if there is very high confidence of a match
+		strongMatch = confidence > config.confidenceThresholdStrong;
+		// otherwise see if it's the expected shape
+		if( !strongMatch ) {
+			double similarity = Math.abs( (targetRegion.area() - previousTrackArea)/previousTrackArea);
+			strongMatch = similarity <= config.thresholdSimilarArea;
+		}
 	}
 
 	/**
@@ -297,7 +318,7 @@ public class TldTracker<T extends ImageSingleBand, D extends ImageSingleBand> {
 	 */
 	protected boolean hypothesisFusion( boolean trackingWorked , boolean detectionWorked ) {
 
-//		System.out.println(" FUSION: tracking "+trackingWorked+"  detection "+detectionWorked);
+		System.out.println(" FUSION: tracking "+trackingWorked+"  detection "+detectionWorked);
 
 		valid = false;
 
@@ -318,7 +339,7 @@ public class TldTracker<T extends ImageSingleBand, D extends ImageSingleBand> {
 				overlap = helper.computeOverlap(trackerRegion_I32, detectedRegion.rect);
 			}
 
-//			System.out.println("FUSION: score track "+scoreTrack+" detection "+scoreDetected);
+			System.out.println("FUSION: score track "+scoreTrack+" detection "+scoreDetected);
 
 			if( uniqueDetection && scoreDetected > scoreTrack + 0.07 ) {
 //				System.out.println("FUSION: using detection region");
@@ -327,7 +348,7 @@ public class TldTracker<T extends ImageSingleBand, D extends ImageSingleBand> {
 				TldHelperFunctions.convertRegion(detectedRegion.rect, targetRegion);
 				confidenceTarget = detectedRegion.confidence;
 
-				strongMatch = confidenceTarget > config.confidenceThresholdStrong;
+				checkNewTrackStrong(scoreDetected);
 			} else {
 //				System.out.println("FUSION: using track region");
 				// Otherwise use the tracker region
