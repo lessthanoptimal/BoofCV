@@ -339,16 +339,23 @@ public class TldTracker<T extends ImageSingleBand, D extends ImageSingleBand> {
 				overlap = helper.computeOverlap(trackerRegion_I32, detectedRegion.rect);
 			}
 
-			System.out.println("FUSION: score track "+scoreTrack+" detection "+scoreDetected);
+			System.out.println("FUSION: score track "+scoreTrack+" detection "+scoreDetected+"  strong "+strongMatch);
 
-			if( uniqueDetection && scoreDetected > scoreTrack + 0.07 ) {
+			double adjustment = strongMatch ? 0.07 : 0.02;
+
+			if( uniqueDetection && scoreDetected > scoreTrack + adjustment ) {
 //				System.out.println("FUSION: using detection region");
 				// if there is a unique detection and it has higher confidence than the
 				// track region, use the detected region
 				TldHelperFunctions.convertRegion(detectedRegion.rect, targetRegion);
 				confidenceTarget = detectedRegion.confidence;
 
-				checkNewTrackStrong(scoreDetected);
+				// if it's far away from the current track, re-evaluate if it's a strongMatch
+//				if( overlap < config.overlapLower )
+					checkNewTrackStrong(scoreDetected);
+//				else
+//					strongMatch |= confidenceTarget > config.confidenceThresholdStrong;
+
 			} else {
 //				System.out.println("FUSION: using track region");
 				// Otherwise use the tracker region
