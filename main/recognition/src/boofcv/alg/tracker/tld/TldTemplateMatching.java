@@ -93,37 +93,32 @@ public class TldTemplateMatching<T extends ImageSingleBand> {
 
 		NccFeature f = createDescriptor();
 		computeNccDescriptor(f,(float)rect.x0,(float)rect.y0,(float)rect.x1,(float)rect.y1,affine);
-
-		// avoid adding the same descriptor twice or adding contradicting results
-		if( positive)
-			if( distance(f,templatePositive) < 0.05 ) {
-				return;
-			}
-		if( !positive)
-			if( distance(f,templateNegative) < 0.05 ) {
-				return;
-			}
-
-		if( positive )
-			templatePositive.add(f);
-		else
-			templateNegative.add(f);
+		addDescriptor(positive, f);
 	}
 
 	public void addDescriptor( boolean positive , float x0 , float y0 , float x1 , float y1 ) {
 
 		NccFeature f = createDescriptor();
 		computeNccDescriptor(f,x0,y0,x1,y1);
+		addDescriptor(positive, f);
+	}
 
+	private void addDescriptor(boolean positive, NccFeature f) {
 		// avoid adding the same descriptor twice or adding contradicting results
 		if( positive)
 			if( distance(f,templatePositive) < 0.05 ) {
 				return;
 			}
-		if( !positive)
+		if( !positive) {
 			if( distance(f,templateNegative) < 0.05 ) {
 				return;
 			}
+			// a positive positive can have very bad affects on tracking, try to avoid learning a positive
+			// example as a negative one
+			if( distance(f,templatePositive) < 0.05 ) {
+				return;
+			}
+		}
 
 		if( positive )
 			templatePositive.add(f);

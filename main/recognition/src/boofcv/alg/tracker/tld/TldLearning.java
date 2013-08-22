@@ -197,7 +197,7 @@ public class TldLearning<T extends ImageSingleBand> {
 //					tempRect.y1 = r.y1;
 //
 //					learnRegionDistorted(tempRect,false);
-//					fern.learnFernNoise(false, r );
+					fern.learnFernNoise(false, r );
 					template.addDescriptor(false,r);
 				}
 			}
