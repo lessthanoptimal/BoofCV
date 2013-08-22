@@ -247,7 +247,7 @@ public class VisualizeTldDetectionApp<T extends ImageSingleBand,D extends ImageS
 
 	public static void main(String[] args) {
 
-		BufferedImage image = UtilImageIO.loadImage("/home/pja/projects/ValidationBoof/data/track_rect/TLD/04_pedestrian2/00001.jpg");
+		BufferedImage image = UtilImageIO.loadImage("/home/pja/projects/ValidationBoof/data/track_rect/TLD/01_david/00050.jpg");
 		new VisualizeTldDetectionApp(image,ImageUInt8.class);
 
 //		String fileName = "/home/pja/Downloads/multi_face_turning/motinas_multi_face_turning.avi";
