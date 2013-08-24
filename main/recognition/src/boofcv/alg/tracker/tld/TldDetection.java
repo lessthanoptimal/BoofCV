@@ -93,10 +93,13 @@ public class TldDetection<T extends ImageSingleBand> {
 
 		fernInfo.reset();
 
+//		long time0 = System.currentTimeMillis();
+
 		int totalP = 0;
 		int totalN = 0;
 
 		// go through all detection regions
+		TldRegionFernInfo info = fernInfo.grow();
 		for( int i = 0; i < cascadeRegions.size; i++ ) {
 			ImageRectangle region = cascadeRegions.get(i);
 
@@ -104,16 +107,26 @@ public class TldDetection<T extends ImageSingleBand> {
 				continue;
 			}
 
-			TldRegionFernInfo info = fernInfo.grow();
 			info.reset();
 			info.r = region;
 
-			if( !fern.lookupFernPN(info))
-				fernInfo.removeTail();
-
-			totalP += info.sumP;
-			totalN += info.sumN;
+			if( fern.lookupFernPN(info)) {
+				totalP += info.sumP;
+				totalN += info.sumN;
+				info = fernInfo.grow();
+			}
 		}
+		fernInfo.removeTail();
+		if( totalP > 0x0fffffff)
+			fern.renormalizeP();
+		if( totalN > 0x0fffffff)
+			fern.renormalizeN();
+
+//		long time1 = System.currentTimeMillis();
+
+		// TODO Handle this issue....
+		if( totalP < 0 || totalN < 0 )
+			throw new RuntimeException("Oh crap");
 
 		double ftotalP = totalP;
 		double ftotalN = totalN;
@@ -121,21 +134,21 @@ public class TldDetection<T extends ImageSingleBand> {
 		// compute the probability that each region is the target conditional upon this image
 		// the sumP and sumN are needed for image conditional probability
 		for( int i = 0; i < fernInfo.size; i++ ) {
-			TldRegionFernInfo info = fernInfo.get(i);
+			info = fernInfo.get(i);
 
 			double probP = info.sumP/ftotalP;
 			double probN = info.sumN/ftotalN;
 
 			if( probP > probN ) {
-				storageMetric.add(-probP);
+				storageMetric.add(-(probP-probN));  // todo penalize for negative probability
 				storageRect.add( info.r );
 			}
 		}
 
-		if( storageMetric.size == 0 ) {
-			System.out.println("  DETECTION: All regions failed fern test");
-			return;
-		}
+//		if( storageMetric.size == 0 ) {
+//			System.out.println("  DETECTION: All regions failed fern test");
+//			return;
+//		}
 
 		// Give preference towards regions with a higher Fern probability
 		if( config.maximumCascadeConsider < storageMetric.size ) {
@@ -166,24 +179,27 @@ public class TldDetection<T extends ImageSingleBand> {
 
 		}
 
+//		long time2 = System.currentTimeMillis();
+//		System.out.println("  TIME DETECTION: ferns "+(time1-time0)+" rest "+(time2-time1));
+
 		if( candidateDetections.size == 0 ) {
-			System.out.println("DETECTION: No strong candidates: ferns "+initPositive.size());
-			System.out.println("           max confidence "+maxConfidence);
+//			System.out.println("DETECTION: No strong candidates: ferns "+initPositive.size());
+//			System.out.println("           max confidence "+maxConfidence);
 			return;
 		}
 
-		System.out.println("DETECTION: pass fern regions     = "+initPositive.size());
-		System.out.println("DETECTION: pass template regions = "+candidateDetections.size);
+//		System.out.println("DETECTION: pass fern regions     = "+initPositive.size());
+//		System.out.println("DETECTION: pass template regions = "+candidateDetections.size);
 
 		// use non-maximum suppression to reduce the number of candidates
 		nonmax.process(candidateDetections, detectedTargets);
 
-		System.out.println("DETECTION: maximum regions       = " + detectedTargets.size);
+//		System.out.println("DETECTION: maximum regions       = " + detectedTargets.size);
 
 		best = selectBest();
 		ambiguous = checkAmbiguous(best);
 
-		System.out.println("DETECTION: ambiguous = "+ambiguous+" best confidence = "+best.confidence);
+//		System.out.println("DETECTION: ambiguous = "+ambiguous+" best confidence = "+best.confidence);
 		success = true;
 	}
 
@@ -251,6 +267,18 @@ public class TldDetection<T extends ImageSingleBand> {
 
 	public List<ImageRectangle> getAmbiguousRegions() {
 		return ambiguousRegions;
+	}
+
+	public FastQueue<TldRegionFernInfo> getFernInfo() {
+		return fernInfo;
+	}
+
+	/**
+	 * Rectangles selected by the fern classifier as candidates
+	 * @return
+	 */
+	public List<ImageRectangle> getSelectedFernRectangles() {
+		return initPositive;
 	}
 
 	public boolean isSuccess() {

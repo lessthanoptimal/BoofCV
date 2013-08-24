@@ -12,7 +12,7 @@ public class TestTld_to_TrackerObjectRectangle extends GenericTrackerObjectRecta
 	@Override
 	public TrackerObjectRectangle<ImageUInt8> create(Class<ImageUInt8> imageType) {
 
-		TldConfig config = new TldConfig(imageType);
+		TldConfig config = new TldConfig(false,imageType);
 
 		config.trackerFeatureRadius = 10;
 		TldTracker tracker = new TldTracker(config);

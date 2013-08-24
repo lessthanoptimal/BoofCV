@@ -108,7 +108,7 @@ public class TldLearning<T extends ImageSingleBand> {
 	 * with significant variance during this initial learning phase
 	 */
 	public void initialLearning( RectangleCorner2D_F64 targetRegion ,
-								 FastQueue<ImageRectangle> cascadeRegions , boolean detectionHasRun ) {
+								 FastQueue<ImageRectangle> cascadeRegions ) {
 
 		this.cascadeRegions = cascadeRegions;
 
@@ -118,8 +118,8 @@ public class TldLearning<T extends ImageSingleBand> {
 		// learn the initial descriptor
 		affine.reset();
 		TldHelperFunctions.convertRegion(targetRegion, targetRegion_I32);
-		if( !detectionHasRun )
-			variance.selectThreshold(targetRegion_I32);
+
+		variance.selectThreshold(targetRegion_I32);
 		template.addDescriptor(true, targetRegion_I32);
 		fern.learnFernNoise(true, targetRegion_I32);
 //		fern.learnFernNoise(true, targetRegion, affine);
@@ -128,7 +128,6 @@ public class TldLearning<T extends ImageSingleBand> {
 //		learnRegionDistorted(targetRegion,true);
 
 		// Mark all other regions as negative ferns
-		affine.reset();
 		for( int i = 0; i < cascadeRegions.size; i++ ) {
 			ImageRectangle r = cascadeRegions.get(i);
 
@@ -145,13 +144,62 @@ public class TldLearning<T extends ImageSingleBand> {
 		}
 
 		// run detection algorithm and if there is an ambiguous solution mark it as not target
-		if( !detectionHasRun )
-			detection.detectionCascade(cascadeRegions);
+		detection.detectionCascade(cascadeRegions);
 
 		learnNegative(targetRegion);
 
 //		System.out.println("  LEARNING: template positive "+
 //				template.getTemplatePositive().size()+" negative "+template.getTemplateNegative().size());
+	}
+
+
+	public void updateLearning( RectangleCorner2D_F64 targetRegion ,
+								 FastQueue<ImageRectangle> cascadeRegions ) {
+
+		this.cascadeRegions = cascadeRegions;
+
+		storageMetric.reset();
+		fernNegative.clear();
+
+		// learn the initial descriptor
+		affine.reset();
+		TldHelperFunctions.convertRegion(targetRegion, targetRegion_I32);
+
+		template.addDescriptor(true, targetRegion_I32);
+		fern.learnFernNoise(true, targetRegion_I32);
+//		fern.learnFernNoise(true, targetRegion, affine);
+
+		// learn a distorted region which has been translated and scaled
+//		learnRegionDistorted(targetRegion,true);
+
+//		List<ImageRectangle> rectFerns = detection.getSelectedFernRectangles();
+//		// Mark all other regions as negative ferns
+//		for( int i = 0; i < rectFerns.size(); i++ ) {
+//			ImageRectangle r = rectFerns.get(i);
+//
+//			// learn features far away from the target region
+//			double overlap = helper.computeOverlap(targetRegion_I32, r);
+//			if( overlap > config.overlapLower )
+//				continue;
+//
+//			fern.learnFern(false, r );
+//		}
+
+		FastQueue<TldRegionFernInfo> ferns = detection.getFernInfo();
+		int N = Math.min(config.numNegativeFerns,ferns.size);
+		for( int i = 0; i < N; i++ ) {
+			int index = rand.nextInt(ferns.size);
+			TldRegionFernInfo f = ferns.get(index);
+
+			// learn features far away from the target region
+			double overlap = helper.computeOverlap(targetRegion_I32, f.r);
+			if( overlap > config.overlapLower )
+				continue;
+
+			fern.learnFern(false, f.r );
+		}
+
+		learnNegative(targetRegion);
 	}
 
 	public void learnRegionDistorted( RectangleCorner2D_F64 targetRegion , boolean positive ) {

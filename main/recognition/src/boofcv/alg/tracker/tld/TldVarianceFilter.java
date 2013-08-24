@@ -31,7 +31,9 @@ import boofcv.struct.image.*;
 public class TldVarianceFilter<T extends ImageSingleBand> {
 
 	// threshold for selecting candidate regions
-	private double threshold;
+	private double thresholdLower;
+	private double thresholdUpper;
+	private double previousVariance = -1;
 
 	// integral image used to compute mean
 	private ImageSingleBand integral;
@@ -72,7 +74,15 @@ public class TldVarianceFilter<T extends ImageSingleBand> {
 	 * Selects a threshold based on image statistics.  The paper suggestions 1/2 the variance in the initial patch
 	 */
 	public void selectThreshold( ImageRectangle r ) {
-		threshold = computeVariance(r.x0,r.y0,r.x1,r.y1)*0.5;
+		double variance = computeVarianceSafe(r.x0, r.y0, r.x1, r.y1);
+
+//		if( previousVariance != -1 ) {
+//			if( Math.abs(variance-previousVariance)/Math.min(variance,previousVariance) > 0.5 )
+//				return;
+//		}
+
+		thresholdLower = variance*0.5;
+		thresholdUpper = Double.MAX_VALUE;//variance*10;
 	}
 
 	/**
@@ -84,7 +94,7 @@ public class TldVarianceFilter<T extends ImageSingleBand> {
 
 		double sigma2 = computeVariance(r.x0,r.y0,r.x1,r.y1);
 
-		return sigma2 >= threshold;
+		return sigma2 >= thresholdLower && sigma2 <= thresholdUpper;
 	}
 
 	/**
@@ -97,6 +107,20 @@ public class TldVarianceFilter<T extends ImageSingleBand> {
 
 		double area = (x1-x0)*(y1-y0);
 		double mean = GIntegralImageOps.block_unsafe(integral, x0 - 1, y0 - 1, x1 - 1, y1 - 1)/area;
+
+		return square/area - mean*mean;
+	}
+
+	/**
+	 * Computes the variance inside the specified rectangle.
+	 * @return variance
+	 */
+	protected double computeVarianceSafe(int x0, int y0, int x1, int y1) {
+		// can use unsafe operations here since x0 > 0 and y0 > 0
+		double square = GIntegralImageOps.block_zero(integralSq, x0 - 1, y0 - 1, x1 - 1, y1 - 1);
+
+		double area = (x1-x0)*(y1-y0);
+		double mean = GIntegralImageOps.block_zero(integral, x0 - 1, y0 - 1, x1 - 1, y1 - 1)/area;
 
 		return square/area - mean*mean;
 	}
@@ -163,7 +187,7 @@ public class TldVarianceFilter<T extends ImageSingleBand> {
 		}
 	}
 
-	public double getThreshold() {
-		return threshold;
+	public double getThresholdLower() {
+		return thresholdLower;
 	}
 }

@@ -45,7 +45,7 @@ public class VisualizeTldTrackerApp<T extends ImageSingleBand,D extends ImageSin
 
 	public VisualizeTldTrackerApp( Class<T> imageType ) {
 
-		TldConfig<T,D> config = new TldConfig<T, D>(imageType);
+		TldConfig<T,D> config = new TldConfig<T, D>(false,imageType);
 		tracker = new TldTracker<T, D>(config);
 
 	}

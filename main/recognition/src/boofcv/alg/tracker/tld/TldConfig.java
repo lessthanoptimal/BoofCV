@@ -45,6 +45,11 @@ public class TldConfig<T extends ImageSingleBand, D extends ImageSingleBand> {
 	public int maximumCascadeConsider = 500;
 
 	/**
+	 * Number of ferns it will use to train the negative classifier
+	 */
+	public int numNegativeFerns = 1000;
+
+	/**
 	 * The maximum allowed forwards-backwards error (pixels) for a track.  Suggested value is 10.
 	 */
 	public double maximumErrorFB = 10;
@@ -145,11 +150,20 @@ public class TldConfig<T extends ImageSingleBand, D extends ImageSingleBand> {
 	 * Creates a configuration using default values.
 	 * @param imageType Type of gray-scale image it processes.
 	 */
-	public TldConfig(Class<T> imageType) {
+	public TldConfig( boolean fast , Class<T> imageType) {
 		this.imageType = imageType;
 		this.derivType = GImageDerivativeOps.getDerivativeType(imageType);
 
-		interpolate = FactoryInterpolation.bilinearPixel(imageType);
+		if( fast ) {
+			interpolate = FactoryInterpolation.nearestNeighborPixel(imageType);
+//			maximumCascadeConsider = 500;
+//			numNegativeFerns = 500;
+		} else {
+			interpolate = FactoryInterpolation.bilinearPixel(imageType);
+//			maximumCascadeConsider = 500;
+//			numNegativeFerns = 500;
+		}
+
 		gradient = FactoryDerivative.sobel(imageType, derivType);
 
 		trackerConfig = KltConfig.createDefault();
