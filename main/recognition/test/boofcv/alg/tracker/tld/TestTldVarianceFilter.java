@@ -29,7 +29,7 @@ public class TestTldVarianceFilter {
 
 		alg.selectThreshold(new ImageRectangle(10,8,21,33));
 
-		double found = alg.getThreshold();
+		double found = alg.getThresholdLower();
 		double expected = computeVariance(image,10,8,21,33)/2.0;
 
 		assertEquals(expected, found, 1e-8);

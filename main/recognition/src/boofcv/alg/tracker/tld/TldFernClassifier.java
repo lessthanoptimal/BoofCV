@@ -35,6 +35,10 @@ import java.util.Random;
  */
 public class TldFernClassifier<T extends ImageSingleBand> {
 
+	// maximum value of a fern for P and N.  Used for re-normalization
+	private int maxP = 0;
+	private int maxN = 0;
+
 	// random number generator used while learning
 	private Random rand;
 	// number of random ferns it learns
@@ -125,19 +129,13 @@ public class TldFernClassifier<T extends ImageSingleBand> {
 			// first learn it with no noise
 			int value = computeFernValue(c_x, c_y, rectWidth, rectHeight,transform,ferns[i]);
 			TldFernFeature f = managers[i].lookupFern(value);
-			if( positive )
-				f.incrementP();
-			else
-				f.incrementN();
+			increment(f,positive);
 
 			for( int j = 0; j < numLearnRandom; j++ ) {
 				value = computeFernValueRand(c_x, c_y, rectWidth, rectHeight,transform,ferns[i]);
 
 				f = managers[i].lookupFern(value);
-				if( positive )
-					f.incrementP();
-				else
-					f.incrementN();
+				increment(f,positive);
 			}
 		}
 	}
@@ -155,10 +153,7 @@ public class TldFernClassifier<T extends ImageSingleBand> {
 			// first learn it with no noise
 			int value = computeFernValue(c_x, c_y, rectWidth, rectHeight,ferns[i]);
 			TldFernFeature f = managers[i].lookupFern(value);
-			if( positive )
-				f.incrementP();
-			else
-				f.incrementN();
+			increment(f,positive);
 		}
 	}
 
@@ -175,19 +170,25 @@ public class TldFernClassifier<T extends ImageSingleBand> {
 			// first learn it with no noise
 			int value = computeFernValue(c_x, c_y, rectWidth, rectHeight,ferns[i]);
 			TldFernFeature f = managers[i].lookupFern(value);
-			if( positive )
-				f.incrementP();
-			else
-				f.incrementN();
+			increment(f,positive);
 
 			for( int j = 0; j < numLearnRandom; j++ ) {
 				value = computeFernValueRand(c_x, c_y, rectWidth, rectHeight,ferns[i]);
 				f = managers[i].lookupFern(value);
-				if( positive )
-					f.incrementP();
-				else
-					f.incrementN();
+				increment(f,positive);
 			}
+		}
+	}
+
+	private void increment( TldFernFeature f , boolean positive ) {
+		if( positive ) {
+			f.incrementP();
+			if( f.numP > maxP )
+				maxP = f.numP;
+		} else {
+			f.incrementN();
+			if( f.numN > maxN )
+				maxN = f.numN;
 		}
 	}
 
@@ -211,7 +212,7 @@ public class TldFernClassifier<T extends ImageSingleBand> {
 
 			int value = computeFernValue(c_x, c_y, rectWidth, rectHeight, fern);
 
-			TldFernFeature f = managers[i].lookupFern(value);
+			TldFernFeature f = managers[i].table[value];
 			if( f != null ) {
 				sumP += f.numP;
 				sumN += f.numN;
@@ -331,6 +332,38 @@ public class TldFernClassifier<T extends ImageSingleBand> {
 		}
 
 		return desc;
+	}
+
+
+
+	public void renormalizeP() {
+		int targetMax = maxP/20;
+
+		for( int i = 0; i < managers.length; i++ ) {
+			TldFernManager m = managers[i];
+			for( int j = 0; j < m.table.length; j++ ) {
+				TldFernFeature f = m.table[j];
+				if( f == null )
+					continue;
+				f.numP = targetMax*f.numP/maxP;
+			}
+		}
+		maxP = targetMax;
+	}
+
+	public void renormalizeN() {
+		int targetMax = maxN/20;
+
+		for( int i = 0; i < managers.length; i++ ) {
+			TldFernManager m = managers[i];
+			for( int j = 0; j < m.table.length; j++ ) {
+				TldFernFeature f = m.table[j];
+				if( f == null )
+					continue;
+				f.numN = targetMax*f.numN/maxN;
+			}
+		}
+		maxN = targetMax;
 	}
 
 	public double getProbability() {

@@ -174,7 +174,7 @@ public class TldTracker<T extends ImageSingleBand, D extends ImageSingleBand> {
 
 		previousValid = false;
 
-		learning.initialLearning(targetRegion, cascadeRegions,false);
+		learning.initialLearning(targetRegion, cascadeRegions);
 		strongMatch = true;
 		previousTrackArea = targetRegion.area();
 	}
@@ -238,7 +238,7 @@ public class TldTracker<T extends ImageSingleBand, D extends ImageSingleBand> {
 	 */
 	public boolean track( T image ) {
 
-		System.out.println("----------------------- TRACKING ---------------------------");
+//		System.out.println("----------------------- TRACKING ---------------------------");
 
 		boolean success = true;
 		valid = false;
@@ -268,27 +268,32 @@ public class TldTracker<T extends ImageSingleBand, D extends ImageSingleBand> {
 				success = false;
 			}
 		} else {
+			long time0 = System.currentTimeMillis();
 			detection.detectionCascade(cascadeRegions);
-
+			long time1 = System.currentTimeMillis();
 			// update the previous track region using the tracker
 			trackerRegion.set(targetRegion);
 			boolean trackingWorked = tracking.process(imagePyramid, trackerRegion);
 			trackingWorked &= adjustRegion.process(tracking.getPairs(), trackerRegion);
 			TldHelperFunctions.convertRegion(trackerRegion, trackerRegion_I32);
+			long time2 = System.currentTimeMillis();
 
 			if( hypothesisFusion( trackingWorked , detection.isSuccess() ) ) {
 				// if it found a hypothesis and it is valid for learning, then learn
 				if( valid && performLearning ) {
-					System.out.println("LEARNING!!!");
-					learning.initialLearning(targetRegion,cascadeRegions,true);
+//					System.out.println("LEARNING!!!");
+					learning.updateLearning(targetRegion,cascadeRegions);
 				} else {
-					System.out.println("NO LEARNING");
+//					System.out.println("NO LEARNING");
 				}
 
 			} else {
 				reacquiring = true;
 				success = false;
 			}
+
+			long time3 = System.currentTimeMillis();
+//			System.out.printf("  TIME: det = %4d track = %4d fuse = %4d\n",time1-time0,time2-time1,time3-time2);
 		}
 
 		if( strongMatch ) {
@@ -318,7 +323,7 @@ public class TldTracker<T extends ImageSingleBand, D extends ImageSingleBand> {
 	 */
 	protected boolean hypothesisFusion( boolean trackingWorked , boolean detectionWorked ) {
 
-		System.out.println(" FUSION: tracking "+trackingWorked+"  detection "+detectionWorked);
+//		System.out.println(" FUSION: tracking "+trackingWorked+"  detection "+detectionWorked);
 
 		valid = false;
 
@@ -339,7 +344,7 @@ public class TldTracker<T extends ImageSingleBand, D extends ImageSingleBand> {
 				overlap = helper.computeOverlap(trackerRegion_I32, detectedRegion.rect);
 			}
 
-			System.out.println("FUSION: score track "+scoreTrack+" detection "+scoreDetected+"  strong "+strongMatch);
+//			System.out.println("FUSION: score track "+scoreTrack+" detection "+scoreDetected+"  strong "+strongMatch);
 
 			double adjustment = strongMatch ? 0.07 : 0.02;
 
