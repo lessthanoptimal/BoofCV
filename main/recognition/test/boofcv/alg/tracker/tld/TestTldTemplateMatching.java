@@ -46,9 +46,23 @@ public class TestTldTemplateMatching {
 		assertEquals(1,alg.getTemplatePositive().size());
 		assertEquals(0,alg.getTemplateNegative().size());
 
+		// adding another similar positive should fail
+		alg.addDescriptor(true,new ImageRectangle(10,12,45,22));
+		assertEquals(1,alg.getTemplatePositive().size());
+
+		// don't add a negative which is very similar positive
 		alg.addDescriptor(false,new ImageRectangle(10,12,45,22));
 
 		assertEquals(1,alg.getTemplatePositive().size());
+		assertEquals(0,alg.getTemplateNegative().size());
+
+		// This negative should be added since it is different
+		alg.addDescriptor(false,new ImageRectangle(23,12,55,22));
+
+		assertEquals(1,alg.getTemplatePositive().size());
+		assertEquals(1,alg.getTemplateNegative().size());
+
+		alg.addDescriptor(false,new ImageRectangle(23,12,55,22));
 		assertEquals(1,alg.getTemplateNegative().size());
 	}
 
@@ -74,7 +88,9 @@ public class TestTldTemplateMatching {
 		alg.setImage(input);
 
 		alg.addDescriptor(true, new ImageRectangle(10, 12, 45, 22));
-		alg.addDescriptor(false,new ImageRectangle(10,12,45,22));
+		alg.addDescriptor(false,new ImageRectangle(23,12,55,22));
+		assertEquals(1,alg.getTemplatePositive().size());
+		assertEquals(1,alg.getTemplateNegative().size());
 
 		alg.reset();
 

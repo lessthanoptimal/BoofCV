@@ -19,8 +19,6 @@
 package boofcv.alg.tracker.tld;
 
 import boofcv.struct.FastQueue;
-import boofcv.struct.GrowQueue_I32;
-import boofcv.struct.ImageRectangle;
 
 /**
  * Performs non-maximum suppression on high confidence detected regions.  A graph of connected regions is constructed.
@@ -41,7 +39,8 @@ public class TldNonMaximalSuppression {
 	// connection graph
 	private FastQueue<Connections> conn = new FastQueue<Connections>(Connections.class,true);
 
-	TldHelperFunctions helper = new TldHelperFunctions();
+	// used for computing the overlap between two regions
+	private TldHelperFunctions helper = new TldHelperFunctions();
 
 	/**
 	 * Configures non-maximum suppression
@@ -63,6 +62,7 @@ public class TldNonMaximalSuppression {
 
 		final int N = regions.size;
 
+		// set all connections to be a local maximum initially
 		conn.growArray(N);
 		for( int i = 0; i < N; i++ ) {
 			conn.data[i].reset();
@@ -72,9 +72,6 @@ public class TldNonMaximalSuppression {
 		for( int i = 0; i < N; i++ ) {
 			TldRegion ra = regions.get(i);
 			Connections ca = conn.data[i];
-
-			// it is connected to itself
-//			ca.indexes.add(i);
 
 			for( int j = i+1; j < N; j++ ) {
 				TldRegion rb = regions.get(j);
@@ -104,56 +101,22 @@ public class TldNonMaximalSuppression {
 				o.connections = ra.connections;
 				o.confidence = ra.confidence;
 				o.rect.set(ra.rect);
-//				computeAverage(regions,ca.indexes,o.rect);       // TODO this is changed
 			} else if( ra.connections == 0 ) {
 				System.out.println("Not a maximum but has zero connections?");
 			}
 		}
 	}
 
-	/**
-	 * Weighted average of connected rectangles.
-	 * @param regions List of all regions
-	 * @param connections List of connected regions being considered
-	 * @param output The average output
-	 */
-	public static void computeAverage( FastQueue<TldRegion> regions , GrowQueue_I32 connections , ImageRectangle output ) {
-
-		double centerX=0,centerY=0;
-		double width=0,height=0;
-
-		double total = 0;
-
-		for( int i = 0; i < connections.size; i++ ) {
-			TldRegion r = regions.get( connections.get(i) );
-			ImageRectangle a = r.rect;
-
-			total += r.confidence;
-
-			centerX += r.confidence *(a.x0+a.x1)/2.0;
-			centerY += r.confidence *(a.y0+a.y1)/2.0;
-
-			width += r.confidence *a.getWidth();
-			height += r.confidence *a.getHeight();
-		}
-
-		centerX /= total;
-		centerY /= total;
-		width /= total;
-		height /= total;
-
-		output.x0 = (int)(centerX - width/2.0 + 0.5);
-		output.y0 = (int)(centerY - height/2.0 + 0.5);
-		output.x1 = output.x0 + (int)(width+0.5);
-		output.y1 = output.y0 + (int)(height+0.5);
-	}
-
 	public FastQueue<Connections> getConnections() {
 		return conn;
 	}
 
+	/**
+	 * Contains connection information for a specific rectangular region
+	 */
 	public static class Connections
 	{
+		// if true then it's a local maximum
 		boolean maximum;
 
 		public void reset() {

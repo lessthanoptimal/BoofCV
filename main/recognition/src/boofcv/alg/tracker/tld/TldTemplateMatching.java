@@ -23,10 +23,6 @@ import boofcv.alg.interpolate.InterpolatePixel;
 import boofcv.struct.ImageRectangle;
 import boofcv.struct.feature.NccFeature;
 import boofcv.struct.image.ImageSingleBand;
-import georegression.struct.affine.Affine2D_F32;
-import georegression.struct.point.Point2D_F32;
-import georegression.struct.shapes.RectangleCorner2D_F64;
-import georegression.transform.affine.AffinePointOps;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -54,10 +50,11 @@ public class TldTemplateMatching<T extends ImageSingleBand> {
 	// storage for descriptors which can be recycled
 	protected Stack<NccFeature> unused = new Stack<NccFeature>();
 
-	Point2D_F32 temp = new Point2D_F32();
-
 	public TldTemplateMatching( InterpolatePixel<T> interpolate ) {
 		this.interpolate = interpolate;
+	}
+
+	protected TldTemplateMatching() {
 	}
 
 	/**
@@ -70,6 +67,11 @@ public class TldTemplateMatching<T extends ImageSingleBand> {
 		templatePositive.clear();
 	}
 
+	/**
+	 * Must call this function before any of the others which process descriptions
+	 *
+	 * @param gray Input image
+	 */
 	public void setImage( T gray ) {
 		interpolate.setImage(gray);
 	}
@@ -81,19 +83,7 @@ public class TldTemplateMatching<T extends ImageSingleBand> {
 	 */
 	public void addDescriptor( boolean positive , ImageRectangle rect ) {
 
-		addDescriptor(positive, rect.x0,rect.y0,rect.x1,rect.y1);
-	}
-
-	/**
-	 * Creates a new descriptor for the specified region
-	 *
-	 * @param positive if it is a positive or negative example
-	 */
-	public void addDescriptor( boolean positive , RectangleCorner2D_F64 rect , Affine2D_F32 affine) {
-
-		NccFeature f = createDescriptor();
-		computeNccDescriptor(f,(float)rect.x0,(float)rect.y0,(float)rect.x1,(float)rect.y1,affine);
-		addDescriptor(positive, f);
+		addDescriptor(positive, rect.x0, rect.y0, rect.x1, rect.y1);
 	}
 
 	public void addDescriptor( boolean positive , float x0 , float y0 , float x1 , float y1 ) {
@@ -103,6 +93,13 @@ public class TldTemplateMatching<T extends ImageSingleBand> {
 		addDescriptor(positive, f);
 	}
 
+	/**
+	 * Adds a descriptor to the positive or negative list.  If it is very similar to an existing one it is not
+	 * added.   Look at code for details
+	 *
+	 * @param positive true for positive list and false for negative list
+	 * @param f The feature which is to be added
+	 */
 	private void addDescriptor(boolean positive, NccFeature f) {
 		// avoid adding the same descriptor twice or adding contradicting results
 		if( positive)
@@ -140,48 +137,6 @@ public class TldTemplateMatching<T extends ImageSingleBand> {
 			float sampleY = y0 + y*heightStep;
 			for( int x = 0; x < 15; x++ ) {
 				mean += f.value[index++] = interpolate.get_unsafe(x0 + x*widthStep,sampleY);
-			}
-		}
-		mean /= 15*15;
-
-		// compute the variance and save the difference from the mean
-		double variance = 0;
-		index = 0;
-		for( int y = 0; y < 15; y++ ) {
-			for( int x = 0; x < 15; x++ ) {
-				double v = f.value[index++] -= mean;
-				variance += v*v;
-			}
-		}
-		variance /= 15*15;
-		f.mean = mean;
-		f.sigma = Math.sqrt(variance);
-	}
-
-	/**
-	 * Computes the NCC descriptor by sample points at evenly spaced distances inside the rectangle
-	 *
-	 * Transform is relative to the rectangle's origin and translation is relative to width and height
-	 */
-	public void computeNccDescriptor( NccFeature f , float x0 , float y0 , float x1 , float y1 , Affine2D_F32 affine ) {
-		double mean = 0;
-		float widthStep = 1.0f/15.0f;
-		float heightStep = 1.0f/15.0f;
-
-		float width = x1-x0;
-		float height = y1-y0;
-
-		float c_x = (x0+x1)/2.0f;
-		float c_y = (y0+y1)/2.0f;
-
-		// compute the mean value
-		int index = 0;
-		for( int y = 0; y < 15; y++ ) {
-			for( int x = 0; x < 15; x++ ) {
-				temp.x = (x-7)*widthStep;
-				temp.y = (y-7)*heightStep;
-				AffinePointOps.transform(affine,temp,temp);
-				mean += f.value[index++] = interpolate.get_unsafe(c_x + temp.x*width,c_y + temp.y*height);
 			}
 		}
 		mean /= 15*15;

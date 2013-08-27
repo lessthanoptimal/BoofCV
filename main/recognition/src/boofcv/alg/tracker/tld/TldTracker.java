@@ -138,7 +138,7 @@ public class TldTracker<T extends ImageSingleBand, D extends ImageSingleBand> {
 				rand,config.numFerns,config.fernSize,20,0.5f,config.interpolate);
 
 		detection = new TldDetection<T>(fern,template,variance,config);
-		learning = new TldLearning<T>(rand,5,5,config,template,variance,fern,detection,config.interpolate);
+		learning = new TldLearning<T>(rand,config,template,variance,fern,detection);
 	}
 
 	/**
@@ -282,7 +282,7 @@ public class TldTracker<T extends ImageSingleBand, D extends ImageSingleBand> {
 				// if it found a hypothesis and it is valid for learning, then learn
 				if( valid && performLearning ) {
 //					System.out.println("LEARNING!!!");
-					learning.updateLearning(targetRegion,cascadeRegions);
+					learning.updateLearning(targetRegion);
 				} else {
 //					System.out.println("NO LEARNING");
 				}

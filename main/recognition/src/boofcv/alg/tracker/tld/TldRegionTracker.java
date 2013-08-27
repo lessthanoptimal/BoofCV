@@ -36,10 +36,11 @@ import org.ddogleg.sorting.QuickSelectArray;
 import java.lang.reflect.Array;
 
 /**
- * Tracks features inside target's rectangle and updates the rectangle using found motion.  A scale and translation
- * model model is used.  A major departure from the paper is that KLT forward-backward (FB) error and robust model
- * fitting is used to prune tracks and estimate motion.  In the paper FB and NCC error is used to prune tracks
- * and a (in my opinion) hack is used by computing median error values.  The way the motion is computed is more
+ * Tracks features inside target's rectangle using pyramidal KLT and updates the rectangle using found motion.
+ * A scale and translation model model is used.  A major departure from the paper is that KLT forward-backward (FB)
+ * error and robust model fitting is used to prune tracks and estimate motion.
+ * In the paper FB and NCC error is used to prune tracks and a (in my opinion) hack is used by computing
+ * median error values.  The way the motion is computed is more
  * mathematically sound this way.  NCC would provide a good sanity check, but is probably not needed.
  *
  * @author Peter Abeles
@@ -241,7 +242,7 @@ public class TldRegionTracker< Image extends ImageSingleBand , Derivative extend
 			float currY = t.klt.y;
 
 			// track in reverse direction
-			tracker.setDescription(t.klt); // TODO delete to speed up?  doesn't seem to make a big difference
+			tracker.setDescription(t.klt);
 			tracker.setImage(previousImage, previousDerivX, previousDerivY);
 			result = tracker.track(t.klt);
 			if( result != KltTrackFault.SUCCESS ) {

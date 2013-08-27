@@ -21,10 +21,7 @@ package boofcv.alg.tracker.tld;
 import boofcv.alg.interpolate.InterpolatePixel;
 import boofcv.struct.ImageRectangle;
 import boofcv.struct.image.ImageSingleBand;
-import georegression.struct.affine.Affine2D_F32;
 import georegression.struct.point.Point2D_F32;
-import georegression.struct.shapes.RectangleCorner2D_F64;
-import georegression.transform.affine.AffinePointOps;
 
 import java.util.Random;
 
@@ -89,6 +86,10 @@ public class TldFernClassifier<T extends ImageSingleBand> {
 			managers[i] = new TldFernManager(descriptorSize);
 		}
 	}
+
+	protected TldFernClassifier() {
+	}
+
 	/**
 	 * Discard all information on fern values and their probabilities
 	 */
@@ -104,40 +105,6 @@ public class TldFernClassifier<T extends ImageSingleBand> {
 	 */
 	public void setImage(T gray) {
 		interpolate.setImage(gray);
-	}
-
-	/**
-	 * Learns ferns inside the specified rectangle.  An affine transform is applied to each sample point in the fern.
-	 * Noise is added to the sample image points to create a more robust representation of the fern.  Otherwise
-	 * the fern test will fail for the exact same region with no motion due to image noise.
-	 *
-	 * WARNING: Affine is applied to the sample point before being adjusted to the rectangle's width/height.  So
-	 * specify it as a relative fraction.
-	 *
-	 * WARNING: Make sure the transformed rectangle is in bounds first!
-	 */
-	public void learnFernNoise(boolean positive, RectangleCorner2D_F64 r, Affine2D_F32 transform) {
-
-		float rectWidth = (float)r.getWidth();
-		float rectHeight = (float)r.getHeight();
-
-		float c_x = (float)r.x0+rectWidth/2.0f;
-		float c_y = (float)r.y0+rectHeight/2.0f;
-
-		for( int i = 0; i < ferns.length; i++ ) {
-
-			// first learn it with no noise
-			int value = computeFernValue(c_x, c_y, rectWidth, rectHeight,transform,ferns[i]);
-			TldFernFeature f = managers[i].lookupFern(value);
-			increment(f,positive);
-
-			for( int j = 0; j < numLearnRandom; j++ ) {
-				value = computeFernValueRand(c_x, c_y, rectWidth, rectHeight,transform,ferns[i]);
-
-				f = managers[i].lookupFern(value);
-				increment(f,positive);
-			}
-		}
 	}
 
 	public void learnFern(boolean positive, ImageRectangle r) {
@@ -157,6 +124,10 @@ public class TldFernClassifier<T extends ImageSingleBand> {
 		}
 	}
 
+	/**
+	 * Computes the value for each fern inside the region and update's their P and N value.  Noise is added
+	 * to the image measurements to take in account the variability.
+	 */
 	public void learnFernNoise(boolean positive, ImageRectangle r) {
 
 		float rectWidth = r.getWidth();
@@ -180,6 +151,10 @@ public class TldFernClassifier<T extends ImageSingleBand> {
 		}
 	}
 
+	/**
+	 * Increments the P and N value for a fern.  Also updates the maxP and maxN statistics so that it
+	 * knows when to re-normalize data structures.
+	 */
 	private void increment( TldFernFeature f , boolean positive ) {
 		if( positive ) {
 			f.incrementP();
@@ -192,6 +167,12 @@ public class TldFernClassifier<T extends ImageSingleBand> {
 		}
 	}
 
+	/**
+	 * For the specified regions, computes the values of each fern inside of it and then retrives their P and N values.
+	 * The sum of which is stored inside of info.
+	 * @param info (Input) Location/Rectangle (output) P and N values
+	 * @return true if a known value for any of the ferns was observed in this region
+	 */
 	public boolean lookupFernPN( TldRegionFernInfo info ) {
 
 		ImageRectangle r = info.r;
@@ -223,67 +204,6 @@ public class TldFernClassifier<T extends ImageSingleBand> {
 		info.sumN = sumN;
 
 		return sumN != 0 || sumP != 0;
-	}
-
-	/**
-	 * Computes the value of the specified fern at the specified location in the image. Noise is added
-	 * to the measurements and an affine transform applied to each sample point
-	 */
-	protected int computeFernValueRand(float c_x, float c_y, float rectWidth, float rectHeight,
-									   Affine2D_F32 transform,
-									   TldFernDescription fern) {
-
-		int desc = 0;
-		for( int i = 0; i < fern.pairs.length; i++ ) {
-			Point2D_F32 p_a = fern.pairs[i].a;
-			Point2D_F32 p_b = fern.pairs[i].b;
-
-			AffinePointOps.transform(transform,p_a,tranA);
-			AffinePointOps.transform(transform,p_b,tranB);
-
-			float valA = interpolate.get_unsafe(c_x + tranA.x * rectWidth, c_y + tranA.y * rectHeight);
-			float valB = interpolate.get_unsafe(c_x + tranB.x * rectWidth, c_y + tranB.y * rectHeight);
-
-			valA += rand.nextGaussian()*fernLearnNoise;
-			valB += rand.nextGaussian()*fernLearnNoise;
-
-			desc *= 2;
-
-			if( valA < valB ) {
-				desc += 1;
-			}
-		}
-
-		return desc;
-	}
-
-	/**
-	 * Computes the fern's value with no random noise applied to it inside a distorted region
-	 */
-	protected int computeFernValue(float c_x, float c_y, float rectWidth, float rectHeight,
-								   Affine2D_F32 transform,
-								   TldFernDescription fern) {
-
-		int desc = 0;
-		for( int i = 0; i < fern.pairs.length; i++ ) {
-			Point2D_F32 p_a = fern.pairs[i].a;
-			Point2D_F32 p_b = fern.pairs[i].b;
-
-			AffinePointOps.transform(transform,p_a,tranA);
-			AffinePointOps.transform(transform,p_b,tranB);
-
-			// todo change back to unsafe
-			float valA = interpolate.get(c_x + tranA.x * rectWidth, c_y + tranA.y * rectHeight);
-			float valB = interpolate.get(c_x + tranB.x * rectWidth, c_y + tranB.y * rectHeight);
-
-			desc *= 2;
-
-			if( valA < valB ) {
-				desc += 1;
-			}
-		}
-
-		return desc;
 	}
 
 	/**
@@ -333,8 +253,6 @@ public class TldFernClassifier<T extends ImageSingleBand> {
 
 		return desc;
 	}
-
-
 
 	public void renormalizeP() {
 		int targetMax = maxP/20;

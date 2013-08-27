@@ -28,6 +28,7 @@ import georegression.struct.shapes.RectangleCorner2D_F64;
  *
  * @author Peter Abeles
  */
+// TODO change so that it is abstracted by the input/output object type?
 public interface TrackerObjectRectangle<T extends ImageBase> {
 
 	/**
