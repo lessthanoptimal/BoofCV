@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.tracker.tld;
+package boofcv.gui.tracker;
 
 import boofcv.struct.feature.NccFeature;
 

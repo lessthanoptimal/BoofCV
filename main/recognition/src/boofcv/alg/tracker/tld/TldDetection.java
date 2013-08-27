@@ -75,6 +75,9 @@ public class TldDetection<T extends ImageSingleBand> {
 		nonmax = new TldNonMaximalSuppression(config.regionConnect);
 	}
 
+	protected TldDetection() {
+	}
+
 	/**
 	 * Detects the object inside the image.  Eliminates candidate regions using a cascade of tests
 	 */
@@ -107,7 +110,6 @@ public class TldDetection<T extends ImageSingleBand> {
 				continue;
 			}
 
-			info.reset();
 			info.r = region;
 
 			if( fern.lookupFernPN(info)) {

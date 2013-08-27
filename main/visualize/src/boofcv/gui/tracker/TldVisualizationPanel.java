@@ -20,7 +20,6 @@ package boofcv.gui.tracker;
 
 import boofcv.alg.tracker.tld.TldHelperFunctions;
 import boofcv.alg.tracker.tld.TldRegion;
-import boofcv.alg.tracker.tld.TldTemplatePanel;
 import boofcv.alg.tracker.tld.TldTracker;
 import boofcv.struct.FastQueue;
 import boofcv.struct.ImageRectangle;

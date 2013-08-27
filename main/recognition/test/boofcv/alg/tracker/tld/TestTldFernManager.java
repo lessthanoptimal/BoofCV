@@ -32,7 +32,7 @@ public class TestTldFernManager {
 	public void lookupPosterior() {
 		TldFernManager alg = new TldFernManager(10);
 
-		assertEquals(-1,alg.lookupPosterior(234),1e-8);
+		assertEquals(0,alg.lookupPosterior(234),1e-8);
 
 		TldFernFeature a = alg.lookupFern(234);
 		a.numN = 100;

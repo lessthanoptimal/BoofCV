@@ -24,7 +24,10 @@ import boofcv.struct.ImageRectangle;
 import boofcv.struct.image.*;
 
 /**
- * TODO comment
+ * Compute the variance for a rectangular region using the integral image.  Supports both U8 and F32 input images.
+ * For each new image in the sequence a call to {@link #setImage(boofcv.struct.image.ImageSingleBand)} must be done
+ * so that it can compute the required integral images.  See paper for mathematical details on how the variance
+ * is computed using integral images.
  *
  * @author Peter Abeles
  */
@@ -32,16 +35,17 @@ public class TldVarianceFilter<T extends ImageSingleBand> {
 
 	// threshold for selecting candidate regions
 	private double thresholdLower;
-	private double thresholdUpper;
-	private double previousVariance = -1;
 
 	// integral image used to compute mean
 	private ImageSingleBand integral;
 	// integral image of the pixel value squared
 	private ImageSingleBand integralSq;
 
-	ImageRectangle r = new ImageRectangle();
-
+	/**
+	 * Constructor which specifies the input image type.
+	 *
+	 * @param imageType  Either ImageUInt8 or ImageFloat32
+	 */
 	public TldVarianceFilter( Class<T> imageType ) {
 
 		// declare integral images.
@@ -54,8 +58,11 @@ public class TldVarianceFilter<T extends ImageSingleBand> {
 		}
 	}
 
+	protected TldVarianceFilter() {
+	}
+
 	/**
-	 * Sets the input image
+	 * Sets the input image.  Must be called before other functions/
 	 *
 	 * @param gray input image
 	 */
@@ -76,13 +83,7 @@ public class TldVarianceFilter<T extends ImageSingleBand> {
 	public void selectThreshold( ImageRectangle r ) {
 		double variance = computeVarianceSafe(r.x0, r.y0, r.x1, r.y1);
 
-//		if( previousVariance != -1 ) {
-//			if( Math.abs(variance-previousVariance)/Math.min(variance,previousVariance) > 0.5 )
-//				return;
-//		}
-
 		thresholdLower = variance*0.5;
-		thresholdUpper = Double.MAX_VALUE;//variance*10;
 	}
 
 	/**
@@ -94,11 +95,12 @@ public class TldVarianceFilter<T extends ImageSingleBand> {
 
 		double sigma2 = computeVariance(r.x0,r.y0,r.x1,r.y1);
 
-		return sigma2 >= thresholdLower && sigma2 <= thresholdUpper;
+		return sigma2 >= thresholdLower;
 	}
 
 	/**
-	 * Computes the variance inside the specified rectangle.
+	 * Computes the variance inside the specified rectangle.  x0 and y0 must be > 0.
+	 *
 	 * @return variance
 	 */
 	protected double computeVariance(int x0, int y0, int x1, int y1) {

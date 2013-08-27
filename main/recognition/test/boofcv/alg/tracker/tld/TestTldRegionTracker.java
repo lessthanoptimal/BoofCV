@@ -7,10 +7,10 @@ import boofcv.alg.tracker.klt.PyramidKltTracker;
 import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.factory.tracker.FactoryTrackerAlg;
 import boofcv.factory.transform.pyramid.FactoryPyramid;
-import boofcv.struct.ImageRectangle;
 import boofcv.struct.image.ImageSInt16;
 import boofcv.struct.image.ImageUInt8;
 import boofcv.struct.pyramid.PyramidDiscrete;
+import georegression.struct.shapes.RectangleCorner2D_F64;
 import org.junit.Test;
 
 import java.util.Random;
@@ -18,6 +18,8 @@ import java.util.Random;
 import static org.junit.Assert.*;
 
 /**
+ * Basic sanity tests for tracking.  Checks for the object's motion are handled by higher level unit tests.
+ *
  * @author Peter Abeles
  */
 public class TestTldRegionTracker {
@@ -44,14 +46,13 @@ public class TestTldRegionTracker {
 	public void process() {
 		TldRegionTracker alg = createAlg();
 
-		ImageRectangle rect = new ImageRectangle(10,20,115,125);
+		RectangleCorner2D_F64 rect = new RectangleCorner2D_F64(10,20,115,125);
 
 		alg.initialize(pyramid);
-//		assertTrue(alg.process(pyramid, rect));
-
+		assertTrue(alg.process(pyramid, rect));
 		assertEquals(alg.getPairs().size,10*10);
-
-		fail("update test");
+		assertTrue(alg.process(pyramid, rect));
+		assertEquals(alg.getPairs().size,10*10);
 	}
 
 	/**
@@ -62,7 +63,7 @@ public class TestTldRegionTracker {
 		TldRegionTracker alg = createAlg();
 
 		alg.initialize(pyramid);
-//		alg.spawnGrid(new ImageRectangle(10,20,80,100));
+		alg.spawnGrid(new RectangleCorner2D_F64(10,20,80,100));
 
 		TldRegionTracker.Track[] tracks = alg.getTracks();
 
@@ -77,8 +78,6 @@ public class TestTldRegionTracker {
 
 			assertTrue(tracks[i].active);
 		}
-
-		fail("update test");
 	}
 
 	/**
@@ -93,15 +92,13 @@ public class TestTldRegionTracker {
 
 		alg.initialize(pyramid);
 		alg.updateCurrent(pyramid);
-//		alg.spawnGrid(new ImageRectangle(10,20,80,100));
+		alg.spawnGrid(new RectangleCorner2D_F64(10,20,80,100));
 
 		TldRegionTracker.Track[] tracks = alg.getTracks();
 
 		for( int i = 0; i < tracks.length; i++ ) {
 			assertFalse(tracks[i].active);
 		}
-
-		fail("update test");
 	}
 
 	private TldRegionTracker<ImageUInt8,ImageSInt16> createAlg() {

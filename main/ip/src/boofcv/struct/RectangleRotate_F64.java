@@ -16,26 +16,16 @@
  * limitations under the License.
  */
 
-package boofcv.alg.tracker.tld;
-
-import boofcv.struct.ImageRectangle;
+package boofcv.struct;
 
 /**
- * Storage for fern classification results for a particular rectangle in the image.
+ * A rectangle which can be rotated.  Angle of rotation is relative to +x axis, which is along the rectangle's
+ * width. +y is along its height.
  *
  * @author Peter Abeles
  */
-public class TldRegionFernInfo {
-	/**
-	 * Location being considered
-	 */
-	public ImageRectangle r;
-	/**
-	 * Sum of positive fern examples in this region
-	 */
-	public int sumP;
-	/**
-	 * Sum of negative fern examples in this region
-	 */
-	public int sumN;
+public class RectangleRotate_F64 {
+	public double width;
+	public double height;
+	public double theta;
 }

@@ -23,10 +23,10 @@ public class TestTldFernDescription {
 			if( fern.pairs[i].a.x  != 0 )
 				numNotZeroA++;
 
-			assertTrue(fern.pairs[i].a.x >= 0);
-			assertTrue(fern.pairs[i].a.x < 1);
-			assertTrue(fern.pairs[i].b.x >= 0);
-			assertTrue(fern.pairs[i].b.x < 1);
+			assertTrue(fern.pairs[i].a.x >= -0.5);
+			assertTrue(fern.pairs[i].a.x < 0.5);
+			assertTrue(fern.pairs[i].b.x >= -0.5);
+			assertTrue(fern.pairs[i].b.x < 0.5);
 		}
 
 		assertTrue(numNotZeroA > 0);
