@@ -10,7 +10,7 @@ import boofcv.struct.image.ImageUInt8;
 public class TestTld_to_TrackerObjectRectangle extends GenericTrackerObjectRectangleTests {
 
 	@Override
-	public TrackerObjectRectangle<ImageUInt8> create(Class<ImageUInt8> imageType) {
+	public TrackerObjectQuad<ImageUInt8> create(Class<ImageUInt8> imageType) {
 
 		TldConfig config = new TldConfig(false,imageType);
 
