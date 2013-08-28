@@ -2,21 +2,30 @@ package boofcv.alg.tracker.tld;
 
 import org.junit.Test;
 
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Peter Abeles
  */
 public class TestTldTracker {
 
-	@Test
-	public void stuff() {
-		// This function is intentionally left blank.  Tests are performed inside the wrapper class.
-	}
-
+	/**
+	 * Basic sanity check on the pyramid it selects
+	 */
 	@Test
 	public void selectPyramidScale() {
-		fail("Implement");
+		int minSize = (5*2+1)*5;
+		int[] scales = TldTracker.selectPyramidScale(640,480,5);
+
+		assertTrue(scales.length > 3);
+
+		for( int i = 0; i < scales.length; i++ ) {
+			int w = 640/scales[i];
+			int h = 6480/scales[i];
+
+			assertTrue(w>minSize);
+			assertTrue(h>minSize);
+		}
 	}
 
 }

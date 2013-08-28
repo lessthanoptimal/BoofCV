@@ -29,6 +29,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * Runs a detection cascade for each region.  The cascade is composed of a variance test, Fern classifier, and finally
+ * the template classifier.  The next test in the cascade is only considered if the previous passes.  Several changes
+ * have been made in how the cascade operates compared to the original paper.  See code for comments.
+ *
  * @author Peter Abeles
  */
 public class TldDetection<T extends ImageSingleBand> {
@@ -36,32 +40,39 @@ public class TldDetection<T extends ImageSingleBand> {
 	// Detects rectangles: Removes candidates don't match the fern descriptors
 	private TldFernClassifier<T> fern;
 	// Detects rectangles: Removes candidates don't match NCC descriptors
-	private TldTemplateMatching<T> template;
+	protected TldTemplateMatching<T> template;
 	// Detects rectangles: Removes candidates which lack texture
 	private TldVarianceFilter<T> variance;
 
+	// Storage for results of the fern test on individual regions
+	protected FastQueue<TldRegionFernInfo> fernInfo = new FastQueue<TldRegionFernInfo>(TldRegionFernInfo.class,true);
 
-	FastQueue<TldRegionFernInfo> fernInfo = new FastQueue<TldRegionFernInfo>(TldRegionFernInfo.class,true);
+	protected TldConfig config;
 
-	TldConfig config;
-
-	// Storage for sorting of reslts
+	// Storage for sorting of results
 	private GrowQueue_F64 storageMetric = new GrowQueue_F64();
 	private GrowQueue_I32 storageIndexes = new GrowQueue_I32();
 	private List<ImageRectangle> storageRect = new ArrayList<ImageRectangle>();
 
-	private List<ImageRectangle> initPositive = new ArrayList<ImageRectangle>();
+	// storage for regions which pass the fern test
+	protected List<ImageRectangle> fernRegions = new ArrayList<ImageRectangle>();
 
-	FastQueue<TldRegion> candidateDetections = new FastQueue<TldRegion>(TldRegion.class,true);
-	FastQueue<TldRegion> detectedTargets = new FastQueue<TldRegion>(TldRegion.class,true);
+	// list all regions which had the template test run on them
+	protected FastQueue<TldRegion> candidateDetections = new FastQueue<TldRegion>(TldRegion.class,true);
+	// results from non-maximum suppression
+	private FastQueue<TldRegion> localMaximums = new FastQueue<TldRegion>(TldRegion.class,true);
 
+	// list of regions which have almost the same confidence as the maximum
 	private List<ImageRectangle> ambiguousRegions = new ArrayList<ImageRectangle>();
 
-	TldHelperFunctions helper = new TldHelperFunctions();
+	private TldHelperFunctions helper = new TldHelperFunctions();
 
-	TldRegion best;
-	boolean ambiguous;
-	boolean success;
+	// the most likely region
+	private TldRegion best;
+	// is it ambiguous which region is the best?
+	protected boolean ambiguous;
+	// was it successful at selecting a single region?
+	private boolean success;
 
 	// Removes all but the best rectangles.
 	private TldNonMaximalSuppression nonmax;
@@ -83,25 +94,25 @@ public class TldDetection<T extends ImageSingleBand> {
 	 */
 	protected void detectionCascade( FastQueue<ImageRectangle> cascadeRegions ) {
 
+		// initialize data structures
 		success = false;
 		best = null;
 		candidateDetections.reset();
-		detectedTargets.reset();
+		localMaximums.reset();
 		ambiguousRegions.clear();
 
 		storageMetric.reset();
 		storageIndexes.reset();
 		storageRect.clear();
-		initPositive.clear();
+		fernRegions.clear();
 
 		fernInfo.reset();
-
-//		long time0 = System.currentTimeMillis();
 
 		int totalP = 0;
 		int totalN = 0;
 
-		// go through all detection regions
+		// Run through all candidate regions, ignore ones without enough variance, compute
+		// the fern for each one
 		TldRegionFernInfo info = fernInfo.grow();
 		for( int i = 0; i < cascadeRegions.size; i++ ) {
 			ImageRectangle region = cascadeRegions.get(i);
@@ -119,58 +130,41 @@ public class TldDetection<T extends ImageSingleBand> {
 			}
 		}
 		fernInfo.removeTail();
+
+		// avoid overflow errors in the future by re-normalizing the Fern detector
 		if( totalP > 0x0fffffff)
 			fern.renormalizeP();
 		if( totalN > 0x0fffffff)
 			fern.renormalizeN();
 
-//		long time1 = System.currentTimeMillis();
 
-		// TODO Handle this issue....
-		if( totalP < 0 || totalN < 0 )
-			throw new RuntimeException("Oh crap");
+		// Slect the ferns with the highest likelihood
+		selectBestRegionsFern(totalP, totalN);
 
-		double ftotalP = totalP;
-		double ftotalN = totalN;
+		// From the remaining regions, score using the template algorithm
+		computeTemplateConfidence();
 
-		// compute the probability that each region is the target conditional upon this image
-		// the sumP and sumN are needed for image conditional probability
-		for( int i = 0; i < fernInfo.size; i++ ) {
-			info = fernInfo.get(i);
-
-			double probP = info.sumP/ftotalP;
-			double probN = info.sumN/ftotalN;
-
-			if( probP > probN ) {
-				storageMetric.add(-(probP-probN));  // todo penalize for negative probability
-				storageRect.add( info.r );
-			}
+		if( candidateDetections.size == 0 ) {
+			return;
 		}
 
-//		if( storageMetric.size == 0 ) {
-//			System.out.println("  DETECTION: All regions failed fern test");
-//			return;
-//		}
+		// use non-maximum suppression to reduce the number of candidates
+		nonmax.process(candidateDetections, localMaximums);
 
-		// Give preference towards regions with a higher Fern probability
-		if( config.maximumCascadeConsider < storageMetric.size ) {
-			int N = Math.min(config.maximumCascadeConsider, storageMetric.size);
-			storageIndexes.resize(storageMetric.size);
+		best = selectBest();
+		ambiguous = checkAmbiguous(best);
 
-			QuickSelectArray.selectIndex(storageMetric.data,N-1, storageMetric.size, storageIndexes.data);
-			for( int i = 0; i < N; i++ ) {
-				initPositive.add( storageRect.get( storageIndexes.get(i)));
-			}
-		} else {
-			initPositive.addAll(storageRect);
-		}
+		success = true;
+	}
 
-		double maxConfidence = -1;
-		for( int i = 0; i < initPositive.size(); i++ ) {
-			ImageRectangle region = initPositive.get(i);
+	/**
+	 * Computes the confidence for all the regions which pass the fern test
+	 */
+	protected void computeTemplateConfidence() {
+		for( int i = 0; i < fernRegions.size(); i++ ) {
+			ImageRectangle region = fernRegions.get(i);
 
 			double confidence = template.computeConfidence(region);
-			maxConfidence = Math.max(confidence,maxConfidence);
 
 			if( confidence < config.confidenceThresholdUpper)
 				continue;
@@ -178,39 +172,51 @@ public class TldDetection<T extends ImageSingleBand> {
 			r.connections = 0;
 			r.rect.set(region);
 			r.confidence = confidence;
+		}
+	}
 
+	/**
+	 * compute the probability that each region is the target conditional upon this image
+	 * the sumP and sumN are needed for image conditional probability
+	 *
+	 * NOTE: This is a big change from the original paper
+	 */
+	protected void selectBestRegionsFern(double totalP, double totalN) {
+
+		for( int i = 0; i < fernInfo.size; i++ ) {
+			TldRegionFernInfo info = fernInfo.get(i);
+
+			double probP = info.sumP/totalP;
+			double probN = info.sumN/totalN;
+
+			// only consider regions with a higher P likelihood
+			if( probP > probN ) {
+				// reward regions with a large difference between the P and N values
+				storageMetric.add(-(probP-probN));
+				storageRect.add( info.r );
+			}
 		}
 
-//		long time2 = System.currentTimeMillis();
-//		System.out.println("  TIME DETECTION: ferns "+(time1-time0)+" rest "+(time2-time1));
+		// Select the N regions with the highest fern probability
+		if( config.maximumCascadeConsider < storageMetric.size ) {
+			int N = Math.min(config.maximumCascadeConsider, storageMetric.size);
+			storageIndexes.resize(storageMetric.size);
 
-		if( candidateDetections.size == 0 ) {
-//			System.out.println("DETECTION: No strong candidates: ferns "+initPositive.size());
-//			System.out.println("           max confidence "+maxConfidence);
-			return;
+			QuickSelectArray.selectIndex(storageMetric.data, N - 1, storageMetric.size, storageIndexes.data);
+			for( int i = 0; i < N; i++ ) {
+				fernRegions.add(storageRect.get(storageIndexes.get(i)));
+			}
+		} else {
+			fernRegions.addAll(storageRect);
 		}
-
-//		System.out.println("DETECTION: pass fern regions     = "+initPositive.size());
-//		System.out.println("DETECTION: pass template regions = "+candidateDetections.size);
-
-		// use non-maximum suppression to reduce the number of candidates
-		nonmax.process(candidateDetections, detectedTargets);
-
-//		System.out.println("DETECTION: maximum regions       = " + detectedTargets.size);
-
-		best = selectBest();
-		ambiguous = checkAmbiguous(best);
-
-//		System.out.println("DETECTION: ambiguous = "+ambiguous+" best confidence = "+best.confidence);
-		success = true;
 	}
 
 	public TldRegion selectBest() {
 		TldRegion best = null;
 		double bestConfidence = 0;
 
-		for( int i = 0; i < detectedTargets.size; i++ ) {
-			TldRegion r = detectedTargets.get(i);
+		for( int i = 0; i < localMaximums.size; i++ ) {
+			TldRegion r = localMaximums.get(i);
 
 			if( r.confidence > bestConfidence ) {
 				bestConfidence = r.confidence;
@@ -224,8 +230,8 @@ public class TldDetection<T extends ImageSingleBand> {
 	private boolean checkAmbiguous( TldRegion best ) {
 		double thresh = best.confidence*0.9;
 
-		for( int i = 0; i < detectedTargets.size; i++ ) {
-			TldRegion r = detectedTargets.get(i);
+		for( int i = 0; i < localMaximums.size; i++ ) {
+			TldRegion r = localMaximums.get(i);
 
 			if( r.confidence >= thresh ) {
 				double overlap = helper.computeOverlap(r.rect,best.rect);
@@ -263,8 +269,8 @@ public class TldDetection<T extends ImageSingleBand> {
 		return candidateDetections;
 	}
 
-	public FastQueue<TldRegion> getDetectedTargets() {
-		return detectedTargets;
+	public FastQueue<TldRegion> getLocalMaximums() {
+		return localMaximums;
 	}
 
 	public List<ImageRectangle> getAmbiguousRegions() {
@@ -280,7 +286,7 @@ public class TldDetection<T extends ImageSingleBand> {
 	 * @return
 	 */
 	public List<ImageRectangle> getSelectedFernRectangles() {
-		return initPositive;
+		return fernRegions;
 	}
 
 	public boolean isSuccess() {

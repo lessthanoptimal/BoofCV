@@ -18,9 +18,13 @@
 
 package boofcv.struct.pyramid;
 
+import boofcv.alg.misc.GImageMiscOps;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageUInt8;
+import boofcv.testing.BoofTesting;
 import org.junit.Test;
+
+import java.util.Random;
 
 import static org.junit.Assert.*;
 
@@ -29,9 +33,26 @@ import static org.junit.Assert.*;
  */
 public class TestImagePyramidBase {
 
+	Random rand = new Random(234);
+
 	@Test
 	public void setTo() {
-		fail("Implement");
+		Dummy a = new Dummy(ImageUInt8.class,false);
+		a.setScaleFactors(1, 2, 4);
+		a.initialize(100, 120);
+		Dummy b = new Dummy(ImageUInt8.class,false);
+		b.setScaleFactors(1, 2, 4);
+		b.initialize(100, 120);
+
+		for( int i = 0; i < b.getNumLayers(); i++ ) {
+			GImageMiscOps.fillUniform(b.getLayer(i),rand,0,100);
+		}
+
+		a.setTo(b);
+
+		for( int i = 0; i < b.getNumLayers(); i++ ) {
+			BoofTesting.assertEquals(a.getLayer(i), b.getLayer(i), 1);
+		}
 	}
 
 	/**

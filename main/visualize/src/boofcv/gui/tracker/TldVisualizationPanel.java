@@ -96,7 +96,7 @@ public class TldVisualizationPanel extends JPanel implements MouseListener{
 			RectangleCorner2D_F64 r = tracker.getTargetRegion();
 			TldHelperFunctions.convertRegion(r, this.selected);
 
-			addDetections(tracker.getDetection().getDetectedTargets());
+			addDetections(tracker.getDetection().getLocalMaximums());
 
 			positivePanel.update(tracker.getTemplateMatching().getTemplatePositive(),false);
 			negativePanel.update(tracker.getTemplateMatching().getTemplateNegative(),false);

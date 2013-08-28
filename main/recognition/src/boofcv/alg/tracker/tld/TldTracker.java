@@ -46,11 +46,13 @@ import java.util.Random;
  *
  * <p>
  * NOTE: This implementation is based the description found in [1].  The spirit of the original algorithm is replicated,
- * but there are a few algorithmic changes.  The most significant modifications are as follow; 1) The KLT tracker
+ * but there are a several algorithmic changes.  The most significant modifications are as follow; 1) The KLT tracker
  * used to update the rectangle does not use NCC features to validate a track or the median based outlier removal.
  * Instead a robust model matching algorithm finds the best fit motion. 2) The non-maximum suppression algorithm has
  * been changed so that it computes a more accurate local maximum and only uses local rectangles to
- * compute the average response.  See code for more details. Note, this is not a port of the OpenTLD project.
+ * compute the average response.  3) Fern selection is done by selecting the N best using a likelihood ratio
+ * conditional on the current image.  4) Learning only happens when a track is considered strong.
+ * See code for more details. Note, this is not a port of the OpenTLD project.
  * </p>
  * <p>
  * [1] Nebehay, G. "Robust Object Tracking Based on Tracking-Learning-Detection." Master's Thesis.
@@ -58,11 +60,6 @@ import java.util.Random;
  * </p>
  * @author Peter Abeles
  */
-// TODO adjust detection variance threshold
-//    if it has a track use previous estimate
-//    if track is lost use initial value
-// TODO get comparable results for float and integer images
-// TODO speed up to 10 fps for 320x240 images
 public class TldTracker<T extends ImageSingleBand, D extends ImageSingleBand> {
 
 	// specified configuration parameters for the tracker
@@ -93,7 +90,7 @@ public class TldTracker<T extends ImageSingleBand, D extends ImageSingleBand> {
 	private TldFernClassifier<T> fern;
 	// Detects rectangles: Removes candidates don't match NCC descriptors
 	private TldTemplateMatching<T> template;
-
+	// code for detection cascade
 	private TldDetection<T> detection;
 
 	// did tracking totally fail and it needs to reacquire a track?
@@ -101,18 +98,13 @@ public class TldTracker<T extends ImageSingleBand, D extends ImageSingleBand> {
 
 	// Is the region hypothesis valid and can be used for learning?
 	private boolean valid;
-	// Was the previous region hypothesis valid?
-	private boolean previousValid;
 
-	boolean strongMatch;
-	double previousTrackArea;
+	// is the current track considered a strong match and learning can occur?
+	private boolean strongMatch;
+	// area of the previous track before it lost track
+	private double previousTrackArea;
 
-	TldHelperFunctions helper = new TldHelperFunctions();
-
-	TldLearning<T> learning;
-
-	// random number generator
-	private Random rand;
+	private TldLearning<T> learning;
 
 	// is learning on or off
 	private boolean performLearning = true;
@@ -125,7 +117,7 @@ public class TldTracker<T extends ImageSingleBand, D extends ImageSingleBand> {
 	public TldTracker( TldConfig<T,D> config ) {
 		this.config = config;
 
-		rand = new Random(config.randomSeed);
+		Random rand = new Random(config.randomSeed);
 
 		PyramidKltTracker<T, D> tracker = FactoryTrackerAlg.kltPyramid(config.trackerConfig, config.imageType, config.derivType);
 
@@ -171,8 +163,6 @@ public class TldTracker<T extends ImageSingleBand, D extends ImageSingleBand> {
 		template.setImage(image);
 		fern.setImage(image);
 		adjustRegion.init(image.width,image.height);
-
-		previousValid = false;
 
 		learning.initialLearning(targetRegion, cascadeRegions);
 		strongMatch = true;
@@ -238,8 +228,6 @@ public class TldTracker<T extends ImageSingleBand, D extends ImageSingleBand> {
 	 */
 	public boolean track( T image ) {
 
-//		System.out.println("----------------------- TRACKING ---------------------------");
-
 		boolean success = true;
 		valid = false;
 
@@ -253,7 +241,7 @@ public class TldTracker<T extends ImageSingleBand, D extends ImageSingleBand> {
 			detection.detectionCascade(cascadeRegions);
 			if( detection.isSuccess() && !detection.isAmbiguous() ) {
 				TldRegion region = detection.getBest();
-//				System.out.println("Track reacquired: confidence = "+region.confidence);
+
 				reacquiring = false;
 				valid = false;
 				// set it to the detected region
@@ -268,39 +256,30 @@ public class TldTracker<T extends ImageSingleBand, D extends ImageSingleBand> {
 				success = false;
 			}
 		} else {
-			long time0 = System.currentTimeMillis();
 			detection.detectionCascade(cascadeRegions);
-			long time1 = System.currentTimeMillis();
+
 			// update the previous track region using the tracker
 			trackerRegion.set(targetRegion);
 			boolean trackingWorked = tracking.process(imagePyramid, trackerRegion);
 			trackingWorked &= adjustRegion.process(tracking.getPairs(), trackerRegion);
 			TldHelperFunctions.convertRegion(trackerRegion, trackerRegion_I32);
-			long time2 = System.currentTimeMillis();
 
 			if( hypothesisFusion( trackingWorked , detection.isSuccess() ) ) {
 				// if it found a hypothesis and it is valid for learning, then learn
 				if( valid && performLearning ) {
-//					System.out.println("LEARNING!!!");
 					learning.updateLearning(targetRegion);
-				} else {
-//					System.out.println("NO LEARNING");
 				}
 
 			} else {
 				reacquiring = true;
 				success = false;
 			}
-
-			long time3 = System.currentTimeMillis();
-//			System.out.printf("  TIME: det = %4d track = %4d fuse = %4d\n",time1-time0,time2-time1,time3-time2);
 		}
 
 		if( strongMatch ) {
 			previousTrackArea = targetRegion.area();
 		}
 
-		previousValid = valid;
 
 		return success;
 	}
@@ -323,46 +302,35 @@ public class TldTracker<T extends ImageSingleBand, D extends ImageSingleBand> {
 	 */
 	protected boolean hypothesisFusion( boolean trackingWorked , boolean detectionWorked ) {
 
-//		System.out.println(" FUSION: tracking "+trackingWorked+"  detection "+detectionWorked);
-
 		valid = false;
 
 		boolean uniqueDetection = detectionWorked && !detection.isAmbiguous();
 		TldRegion detectedRegion = detection.getBest();
 
-		double confidenceTarget = 0;
+		double confidenceTarget;
 
 		if( trackingWorked ) {
 
 			// get the scores from tracking and detection
 			double scoreTrack = template.computeConfidence(trackerRegion_I32);
 			double scoreDetected = 0;
-			double overlap = 0;
 
 			if( uniqueDetection ) {
 				scoreDetected = detectedRegion.confidence;
-				overlap = helper.computeOverlap(trackerRegion_I32, detectedRegion.rect);
 			}
-
-//			System.out.println("FUSION: score track "+scoreTrack+" detection "+scoreDetected+"  strong "+strongMatch);
 
 			double adjustment = strongMatch ? 0.07 : 0.02;
 
 			if( uniqueDetection && scoreDetected > scoreTrack + adjustment ) {
-//				System.out.println("FUSION: using detection region");
 				// if there is a unique detection and it has higher confidence than the
 				// track region, use the detected region
 				TldHelperFunctions.convertRegion(detectedRegion.rect, targetRegion);
 				confidenceTarget = detectedRegion.confidence;
 
 				// if it's far away from the current track, re-evaluate if it's a strongMatch
-//				if( overlap < config.overlapLower )
-					checkNewTrackStrong(scoreDetected);
-//				else
-//					strongMatch |= confidenceTarget > config.confidenceThresholdStrong;
+				checkNewTrackStrong(scoreDetected);
 
 			} else {
-//				System.out.println("FUSION: using track region");
 				// Otherwise use the tracker region
 				targetRegion.set(trackerRegion);
 				confidenceTarget = scoreTrack;
@@ -370,22 +338,19 @@ public class TldTracker<T extends ImageSingleBand, D extends ImageSingleBand> {
 				strongMatch |= confidenceTarget > config.confidenceThresholdStrong;
 
 				// see if the most likely detected region overlaps the track region
-				if( trackingWorked && strongMatch && confidenceTarget >= config.confidenceThresholdLower )  {
+				if( strongMatch && confidenceTarget >= config.confidenceThresholdLower )  {
 					valid = true;
 				}
 			}
 		} else if( uniqueDetection ) {
-//			System.out.println("FUSION: tracker failed, using detection ");
 			// just go with the best detected region
 			detectedRegion = detection.getBest();
 			TldHelperFunctions.convertRegion(detectedRegion.rect, targetRegion);
 			confidenceTarget = detectedRegion.confidence;
 			strongMatch = confidenceTarget > config.confidenceThresholdStrong;
 		} else {
-//			System.out.println("FUSION: failed");
 			return false;
 		}
-//		System.out.println("FUSION: valid = "+valid+" confidence "+confidenceTarget);
 
 		return confidenceTarget >= config.confidenceAccept;
 	}

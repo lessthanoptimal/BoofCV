@@ -88,7 +88,7 @@ public class VisualizeTldDetectionApp<T extends ImageSingleBand,D extends ImageS
 //		drawFerns(g2,0);
 
 		if( tracker.getDetection().isAmbiguous())
-			drawDetections(g2, tracker.getDetection().getDetectedTargets(),Color.RED);
+			drawDetections(g2, tracker.getDetection().getLocalMaximums(),Color.RED);
 		else {
 			TldRegion r = tracker.getDetection().getBest();
 			if( r != null )
@@ -181,7 +181,7 @@ public class VisualizeTldDetectionApp<T extends ImageSingleBand,D extends ImageS
 
 	private void printDetectedConfidence() {
 
-		FastQueue<TldRegion> detected = tracker.getDetection().getDetectedTargets();
+		FastQueue<TldRegion> detected = tracker.getDetection().getLocalMaximums();
 
 		System.out.println("Target: "+target);
 		for( int i = 0; i < detected.size; i++ ) {
@@ -193,7 +193,7 @@ public class VisualizeTldDetectionApp<T extends ImageSingleBand,D extends ImageS
 	private void printDescriptions() {
 		TldTemplateMatching<T> matching = tracker.getTemplateMatching();
 
-		FastQueue<TldRegion> detected = tracker.getDetection().getDetectedTargets();
+		FastQueue<TldRegion> detected = tracker.getDetection().getLocalMaximums();
 
 		NccFeature t = matching.createDescriptor();
 		NccFeature f = matching.createDescriptor();
