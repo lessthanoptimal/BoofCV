@@ -20,16 +20,19 @@ package boofcv.abst.tracker;
 
 import boofcv.alg.tracker.tld.TldTracker;
 import boofcv.struct.image.ImageSingleBand;
+import georegression.geometry.UtilPolygons2D_F64;
+import georegression.struct.shapes.Quadrilateral_F64;
 import georegression.struct.shapes.RectangleCorner2D_F64;
 
 /**
- * Wrapper around {@link boofcv.alg.tracker.tld.TldTracker} for {@link boofcv.abst.tracker.TrackerObjectRectangle}.
+ * Wrapper around {@link boofcv.alg.tracker.tld.TldTracker} for {@link TrackerObjectQuad}.
  *
  * @author Peter Abeles
  */
 public class Tld_to_TrackerObjectRectangle<T extends ImageSingleBand, D extends ImageSingleBand>
-		implements TrackerObjectRectangle<T>
+		implements TrackerObjectQuad<T>
 {
+	RectangleCorner2D_F64 rect = new RectangleCorner2D_F64();
 	TldTracker<T,D> tracker;
 
 	public Tld_to_TrackerObjectRectangle(TldTracker<T, D> tracker) {
@@ -37,21 +40,34 @@ public class Tld_to_TrackerObjectRectangle<T extends ImageSingleBand, D extends 
 	}
 
 	@Override
-	public boolean initialize(T image, int x0, int y0, int x1, int y1) {
+	public boolean initialize(T image, Quadrilateral_F64 location ) {
 
-		tracker.initialize(image,x0,y0,x1,y1);
+		UtilPolygons2D_F64.bounding(location, rect);
+
+		tracker.initialize(image,(int)rect.x0,(int)rect.y0,(int)rect.x1,(int)rect.y1);
 
 		return true;
 	}
 
 	@Override
-	public boolean process(T image, RectangleCorner2D_F64 location) {
+	public boolean process(T image, Quadrilateral_F64 location ) {
 
 		if( !tracker.track(image) )
 			return false;
 
-		location.set(tracker.getTargetRegion());
+		RectangleCorner2D_F64 rect = tracker.getTargetRegion();
+
+		location.a.x = rect.x0;
+		location.a.y = rect.y0;
+		location.b.x = rect.x1;
+		location.b.y = rect.y0;
+		location.c.x = rect.x1;
+		location.c.y = rect.y1;
+		location.d.x = rect.x0;
+		location.d.y = rect.y1;
 
 		return true;
 	}
+
+
 }

@@ -10,7 +10,7 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I32;
 import georegression.struct.shapes.Polygon2D_F64;
 import georegression.struct.shapes.Polygon2D_I32;
-import georegression.struct.shapes.RectangleCorner2D_F64;
+import georegression.struct.shapes.Quadrilateral_F64;
 import org.junit.Test;
 
 import java.util.Random;
@@ -27,28 +27,28 @@ public abstract class GenericTrackerObjectRectangleTests {
 	int height = 240;
 
 	ImageUInt8 input = new ImageUInt8(width,height);
-	RectangleCorner2D_F64 where = new RectangleCorner2D_F64();
+	Quadrilateral_F64 where = new Quadrilateral_F64();
 
-	public abstract TrackerObjectRectangle<ImageUInt8> create( Class<ImageUInt8> imageType );
+	public abstract TrackerObjectQuad<ImageUInt8> create( Class<ImageUInt8> imageType );
 
 	@Test
 	public void stationary() {
-		TrackerObjectRectangle<ImageUInt8> tracker = create(ImageUInt8.class);
+		TrackerObjectQuad<ImageUInt8> tracker = create(ImageUInt8.class);
 		render(1,0,0);
-		assertTrue(tracker.initialize(input, 10, 20, 110, 160));
+		assertTrue(tracker.initialize(input, rect(10, 20, 110, 160)));
 		assertTrue(tracker.process(input, where));
 
-		assertEquals(10, where.x0, 1e-8);
-		assertEquals(20, where.y0, 1e-8);
-		assertEquals(110, where.x1, 1e-8);
-		assertEquals(160, where.y1, 1e-8);
+		assertEquals(10, where.a.x, 1e-8);
+		assertEquals(20, where.a.y, 1e-8);
+		assertEquals(110, where.c.x, 1e-8);
+		assertEquals(160, where.c.y, 1e-8);
 	}
 
 	@Test
 	public void translation_small() {
-		TrackerObjectRectangle<ImageUInt8> tracker = create(ImageUInt8.class);
+		TrackerObjectQuad<ImageUInt8> tracker = create(ImageUInt8.class);
 		render(1,0,0);
-		assertTrue(tracker.initialize(input, 20, 25, 120, 160));
+		assertTrue(tracker.initialize(input, rect(20, 25, 120, 160)));
 
 		int tranX =  3;
 		int tranY = -3;
@@ -61,9 +61,9 @@ public abstract class GenericTrackerObjectRectangleTests {
 
 	@Test
 	public void translation_large() {
-		TrackerObjectRectangle<ImageUInt8> tracker = create(ImageUInt8.class);
+		TrackerObjectQuad<ImageUInt8> tracker = create(ImageUInt8.class);
 		render(1,0,0);
-		assertTrue(tracker.initialize(input, 20, 25, 120, 160));
+		assertTrue(tracker.initialize(input, rect(20, 25, 120, 160)));
 
 		int tranX =  20;
 		int tranY =  30;
@@ -76,9 +76,9 @@ public abstract class GenericTrackerObjectRectangleTests {
 
 	@Test
 	public void zooming_in() {
-		TrackerObjectRectangle<ImageUInt8> tracker = create(ImageUInt8.class);
+		TrackerObjectQuad<ImageUInt8> tracker = create(ImageUInt8.class);
 		render(1,0,0);
-		assertTrue(tracker.initialize(input, 20, 25, 120, 160));
+		assertTrue(tracker.initialize(input, rect(20, 25, 120, 160)));
 
 		for( int i = 0; i < 10; i++ ) {
 			double scale = 1 - 0.2*(i/9.0);
@@ -93,9 +93,9 @@ public abstract class GenericTrackerObjectRectangleTests {
 
 	@Test
 	public void zooming_out() {
-		TrackerObjectRectangle<ImageUInt8> tracker = create(ImageUInt8.class);
+		TrackerObjectQuad<ImageUInt8> tracker = create(ImageUInt8.class);
 		render(1,0,0);
-		assertTrue(tracker.initialize(input, 20, 25, 120, 160));
+		assertTrue(tracker.initialize(input, rect(20, 25, 120, 160)));
 
 		for( int i = 0; i < 10; i++ ) {
 			double scale = 1 + 0.2*(i/9.0);
@@ -114,25 +114,25 @@ public abstract class GenericTrackerObjectRectangleTests {
 	 */
 	@Test
 	public void reinitialize() {
-		RectangleCorner2D_F64 where1 = new RectangleCorner2D_F64();
+		Quadrilateral_F64 where1 = new Quadrilateral_F64();
 
-		TrackerObjectRectangle<ImageUInt8> tracker = create(ImageUInt8.class);
+		TrackerObjectQuad<ImageUInt8> tracker = create(ImageUInt8.class);
 		render(1,0,0);
-		assertTrue(tracker.initialize(input, 20, 25, 120, 160));
+		assertTrue(tracker.initialize(input, rect(20, 25, 120, 160)));
 		render(1,3,-3);
 		assertTrue(tracker.process(input, where));
 		render(1,6,-6);
 		assertTrue(tracker.process(input, where));
 
 		render(1,0,0);
-		assertTrue(tracker.initialize(input, 20, 25, 120, 160));
+		assertTrue(tracker.initialize(input, rect(20, 25, 120, 160)));
 		render(1,3,-3);
 		assertTrue(tracker.process(input, where1));
 		render(1,6,-6);
 		assertTrue(tracker.process(input, where1));
 
 		// Might not be a perfect match due to robust algorithm not being reset to their initial state
-		checkSolution(where1.x0,where1.y0,where1.x1,where1.y1,0.02);
+		checkSolution(where1.a.x,where1.a.y,where1.c.x,where1.c.y,0.02);
 	}
 
 	private void checkSolution( double x0 , double y0 , double x1 , double y1 , double fractionError ) {
@@ -142,10 +142,10 @@ public abstract class GenericTrackerObjectRectangleTests {
 		double tolX = (x1-x0)*fractionError;
 		double tolY = (y1-y0)*fractionError;
 
-		assertTrue(Math.abs(where.x0 - x0) <= tolX);
-		assertTrue(Math.abs(where.y0 - y0) <= tolY);
-		assertTrue(Math.abs(where.x1 - x1) <= tolX);
-		assertTrue(Math.abs(where.y1 - y1) <= tolY);
+		assertTrue(Math.abs(where.a.x - x0) <= tolX);
+		assertTrue(Math.abs(where.a.y - y0) <= tolY);
+		assertTrue(Math.abs(where.c.x - x1) <= tolX);
+		assertTrue(Math.abs(where.c.y - y1) <= tolY);
 	}
 
 	private void render( double scale , int tranX , int tranY ) {
@@ -204,6 +204,10 @@ public abstract class GenericTrackerObjectRectangleTests {
 				}
 			}
 		}
+	}
+
+	private static Quadrilateral_F64 rect( int x0 , int y0 , int x1 , int y1 ) {
+		return new Quadrilateral_F64(x0,y0,x1,y0,x1,y1,x0,y1);
 	}
 
 }
