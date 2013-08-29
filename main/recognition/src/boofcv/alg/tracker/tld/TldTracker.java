@@ -145,7 +145,8 @@ public class TldTracker<T extends ImageSingleBand, D extends ImageSingleBand> {
 	public void initialize( T image , int x0 , int y0 , int x1 , int y1 ) {
 
 		if( imagePyramid == null ) {
-			int scales[] = selectPyramidScale(image.width,image.height,config.trackerFeatureRadius);
+			int minSize = (config.trackerFeatureRadius*2+1)*5;
+			int scales[] = selectPyramidScale(image.width,image.height,minSize);
 			imagePyramid = FactoryPyramid.discreteGaussian(scales,-1,1,true,(Class<T>)image.getClass());
 		}
 		imagePyramid.process(image);
@@ -359,9 +360,8 @@ public class TldTracker<T extends ImageSingleBand, D extends ImageSingleBand> {
 	 * Selects the scale for the image pyramid based on image size and feature size
 	 * @return scales for image pyramid
 	 */
-	public static int[] selectPyramidScale( int imageWidth , int imageHeight, int featureRadius ) {
+	public static int[] selectPyramidScale( int imageWidth , int imageHeight, int minSize ) {
 		int w = Math.max(imageWidth,imageHeight);
-		int minSize = (featureRadius*2+1)*5;
 
 		int maxScale = w/minSize;
 		int n = 1;

@@ -132,7 +132,7 @@ public class TldConfig<T extends ImageSingleBand, D extends ImageSingleBand> {
 	public double confidenceAccept = 0.4;
 
 	/**
-	 * Basic parameters for tracker.  KltConfig.createDefault() is suggested.
+	 * Basic parameters for tracker.  KltConfig.createDefault() with maxIterations = 50 is suggested.
 	 */
 	public KltConfig trackerConfig;
 

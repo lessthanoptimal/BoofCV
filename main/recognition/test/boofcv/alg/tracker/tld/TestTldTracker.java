@@ -15,7 +15,7 @@ public class TestTldTracker {
 	@Test
 	public void selectPyramidScale() {
 		int minSize = (5*2+1)*5;
-		int[] scales = TldTracker.selectPyramidScale(640,480,5);
+		int[] scales = TldTracker.selectPyramidScale(640,480,minSize);
 
 		assertTrue(scales.length > 3);
 
