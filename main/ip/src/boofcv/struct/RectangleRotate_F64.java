@@ -25,7 +25,17 @@ package boofcv.struct;
  * @author Peter Abeles
  */
 public class RectangleRotate_F64 {
+	public double cx;
+	public double cy;
 	public double width;
 	public double height;
 	public double theta;
+
+	public void set( RectangleRotate_F64 r ) {
+		this.cx = r.cx;
+		this.cy = r.cy;
+		this.width = r.width;
+		this.height = r.height;
+		this.theta = r.theta;
+	}
 }

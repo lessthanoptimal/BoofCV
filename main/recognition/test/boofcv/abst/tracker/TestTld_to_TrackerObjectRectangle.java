@@ -17,6 +17,6 @@ public class TestTld_to_TrackerObjectRectangle extends GenericTrackerObjectRecta
 		config.trackerFeatureRadius = 10;
 		TldTracker tracker = new TldTracker(config);
 
-		return new Tld_to_TrackerObjectRectangle(tracker);
+		return new Tld_to_TrackerObjectQuad(tracker);
 	}
 }

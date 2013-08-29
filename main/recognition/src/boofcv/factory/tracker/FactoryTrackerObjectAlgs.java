@@ -18,21 +18,28 @@
 
 package boofcv.factory.tracker;
 
-import boofcv.abst.tracker.Tld_to_TrackerObjectRectangle;
-import boofcv.abst.tracker.TrackerObjectQuad;
+import boofcv.alg.tracker.sfot.SfotConfig;
+import boofcv.alg.tracker.sfot.SparseFlowObjectTracker;
 import boofcv.alg.tracker.tld.TldConfig;
 import boofcv.alg.tracker.tld.TldTracker;
 import boofcv.struct.image.ImageSingleBand;
 
 /**
+ * Factory for creating low level implementations of object tracking algorithms.  These algorithms allow
+ * the user to specify an object in a video stream and then track it.  For a high level and user to use
+ * common interface see {@kink FactoryTrackerObjectQuad}
+ *
  * @author Peter Abeles
  */
-public class FactoryTrackerObjectRectangle {
+public class FactoryTrackerObjectAlgs {
 
 	public static <T extends ImageSingleBand,D extends ImageSingleBand>
-	TrackerObjectQuad<T> createTLD( TldConfig<T,D> config ) {
-		TldTracker<T,D> tracker = new TldTracker<T,D>(config);
+	TldTracker<T,D> createTLD( TldConfig<T,D> config ) {
+		return new TldTracker<T,D>(config);
+	}
 
-		return new Tld_to_TrackerObjectRectangle<T,D>(tracker);
+	public static <T extends ImageSingleBand,D extends ImageSingleBand>
+	SparseFlowObjectTracker<T,D> createSparseFlow( SfotConfig<T,D> config ) {
+		return new SparseFlowObjectTracker<T,D>(config);
 	}
 }

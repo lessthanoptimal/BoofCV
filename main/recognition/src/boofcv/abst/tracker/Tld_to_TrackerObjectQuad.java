@@ -29,13 +29,13 @@ import georegression.struct.shapes.RectangleCorner2D_F64;
  *
  * @author Peter Abeles
  */
-public class Tld_to_TrackerObjectRectangle<T extends ImageSingleBand, D extends ImageSingleBand>
+public class Tld_to_TrackerObjectQuad<T extends ImageSingleBand, D extends ImageSingleBand>
 		implements TrackerObjectQuad<T>
 {
 	RectangleCorner2D_F64 rect = new RectangleCorner2D_F64();
 	TldTracker<T,D> tracker;
 
-	public Tld_to_TrackerObjectRectangle(TldTracker<T, D> tracker) {
+	public Tld_to_TrackerObjectQuad(TldTracker<T, D> tracker) {
 		this.tracker = tracker;
 	}
 

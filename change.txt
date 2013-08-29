@@ -18,8 +18,11 @@ Version : Alpha 0.16
 - NCC error now more "correct" and divides by the number of elements
 - Integral image operations now support more image types.  S64 and F64
 - KltTracker.setDescription() can now fail due to lack of texture
-- Added an implementation of TLD tracker
-  * created recognition package since there was no good place to put it
+- Created TrackObjectQuad for tracking user select objects inside an image
+  * Added TLD tracker
+  * Added Sparse Flow Object Tracker
+- Created recognition package
+  * No other good place to put object trackers
 - UtilImageIO
   * Can read PPM from InputStream
   * Can read images from URL
