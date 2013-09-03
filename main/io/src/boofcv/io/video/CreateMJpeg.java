@@ -166,11 +166,12 @@ public class CreateMJpeg {
 
 		DataOutputStream out = new DataOutputStream(new FileOutputStream(directory.getPath()+"/movie.mjpeg"));
 		for( String n : list ) {
-//			i++;
+			i++;
 //			if( !(i % 2 == 0) )
 //				continue;
-//			if( i < 360 || i > 1050 )
-//				continue;
+
+			if( i < 338 || i > 800 )
+				continue;
 
 			System.out.println("Reading in: "+n);
 			DataInputStream in = new DataInputStream(new FileInputStream(n));
