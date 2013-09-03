@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.gui.tracker;
+package boofcv.alg.tracker;
 
 import boofcv.alg.feature.associate.DescriptorDistance;
 import boofcv.alg.tracker.tld.TldConfig;

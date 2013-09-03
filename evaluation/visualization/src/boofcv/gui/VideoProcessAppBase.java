@@ -42,7 +42,7 @@ public abstract class VideoProcessAppBase<I extends ImageBase>
 
 	volatile boolean requestStop = false;
 	volatile boolean isRunning = false;
-	volatile boolean isPaused = false;
+	volatile protected boolean isPaused = false;
 
 	long framePeriod = 100;
 
@@ -170,7 +170,11 @@ public abstract class VideoProcessAppBase<I extends ImageBase>
 		if( !isRunning )
 			return;
 
-		isPaused = !isPaused;
+		setPause(!isPaused);
+	}
+
+	protected void setPause( boolean paused ) {
+		isPaused = paused;
 
 		if( isPaused )
 			handleRunningStatus(1);

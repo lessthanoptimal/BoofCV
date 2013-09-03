@@ -43,6 +43,14 @@ public class StandardAlgConfigPanel extends JPanel {
 		owner.add(p);
 	}
 
+	public void addAlignRight( JComponent target, JPanel owner ) {
+		JPanel p = new JPanel();
+		p.setLayout(new BoxLayout(p,BoxLayout.X_AXIS));
+		p.add(Box.createHorizontalGlue());
+		p.add(target);
+		owner.add(p);
+	}
+
 	public void addAlignCenter( JComponent target, JPanel owner ) {
 		JPanel p = new JPanel();
 		p.setLayout(new BoxLayout(p,BoxLayout.X_AXIS));
@@ -74,6 +82,18 @@ public class StandardAlgConfigPanel extends JPanel {
 		p.setLayout(new BoxLayout(p,BoxLayout.X_AXIS));
 		p.add(label);
 		p.add(Box.createHorizontalGlue());
+		p.add(target);
+		owner.add(p);
+	}
+
+	public void addLabeledV( JComponent target , String text , JPanel owner ) {
+		JLabel label = new JLabel(text);
+		label.setLabelFor(target);
+		target.setAlignmentX(Component.CENTER_ALIGNMENT);
+		label.setAlignmentX(Component.CENTER_ALIGNMENT);
+		JPanel p = new JPanel();
+		p.setLayout(new BoxLayout(p, BoxLayout.Y_AXIS));
+		p.add(label);
 		p.add(target);
 		owner.add(p);
 	}

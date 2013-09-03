@@ -16,11 +16,12 @@
  * limitations under the License.
  */
 
-package boofcv.gui.tracker;
+package boofcv.alg.tracker;
 
 import boofcv.alg.tracker.tld.TldConfig;
 import boofcv.alg.tracker.tld.TldTracker;
 import boofcv.gui.image.ShowImages;
+import boofcv.gui.tracker.TldVisualizationPanel;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;

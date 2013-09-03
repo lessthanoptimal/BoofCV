@@ -101,8 +101,6 @@ public class VisualizeMonocularPlaneVisualOdometryApp<I extends ImageSingleBand>
 
 		guiLeft.addMouseListener(this);
 		guiInfo.setListener(this);
-
-
 	}
 
 	private void drawFeatures( AccessPointTracks3D tracker , BufferedImage image )  {
