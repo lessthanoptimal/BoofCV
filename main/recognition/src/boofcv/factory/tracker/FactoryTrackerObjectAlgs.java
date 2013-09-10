@@ -18,11 +18,17 @@
 
 package boofcv.factory.tracker;
 
+import boofcv.alg.tracker.meanshift.LikelihoodHistCoupled_U8;
+import boofcv.alg.tracker.meanshift.LikelihoodHueSatHistCoupled_U8;
+import boofcv.alg.tracker.meanshift.LikelihoodHueSatHistInd_U8;
+import boofcv.alg.tracker.meanshift.PixelLikelihood;
 import boofcv.alg.tracker.sfot.SfotConfig;
 import boofcv.alg.tracker.sfot.SparseFlowObjectTracker;
 import boofcv.alg.tracker.tld.TldConfig;
 import boofcv.alg.tracker.tld.TldTracker;
 import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.MultiSpectral;
 
 /**
  * Factory for creating low level implementations of object tracking algorithms.  These algorithms allow
@@ -41,5 +47,38 @@ public class FactoryTrackerObjectAlgs {
 	public static <T extends ImageSingleBand,D extends ImageSingleBand>
 	SparseFlowObjectTracker<T,D> createSparseFlow( SfotConfig<T,D> config ) {
 		return new SparseFlowObjectTracker<T,D>(config);
+	}
+
+	public static <T extends ImageSingleBand>
+	PixelLikelihood<MultiSpectral<T>> likelihoodHueSatHistIndependent( double maxPixelValue , int numHistogramBins ,
+																	   Class<T> bandType )
+	{
+		if( bandType == ImageUInt8.class ) {
+			return (PixelLikelihood)new LikelihoodHueSatHistInd_U8((int)maxPixelValue,numHistogramBins);
+		} else {
+			throw new RuntimeException("Band type not yet supported "+bandType.getSimpleName());
+		}
+	}
+
+	public static <T extends ImageSingleBand>
+	PixelLikelihood<MultiSpectral<T>> likelihoodHueSatHistCoupled( double maxPixelValue , int numHistogramBins ,
+																	   Class<T> bandType )
+	{
+		if( bandType == ImageUInt8.class ) {
+			return (PixelLikelihood)new LikelihoodHueSatHistCoupled_U8((int)maxPixelValue,numHistogramBins);
+		} else {
+			throw new RuntimeException("Band type not yet supported "+bandType.getSimpleName());
+		}
+	}
+
+	public static <T extends ImageSingleBand>
+	PixelLikelihood<MultiSpectral<T>> likelihoodHistogramCoupled( double maxPixelValue , int numHistogramBins ,
+																	   Class<T> bandType )
+	{
+		if( bandType == ImageUInt8.class ) {
+			return (PixelLikelihood)new LikelihoodHistCoupled_U8((int)maxPixelValue,numHistogramBins);
+		} else {
+			throw new RuntimeException("Band type not yet supported "+bandType.getSimpleName());
+		}
 	}
 }

@@ -55,11 +55,15 @@ import java.util.Random;
  * See code for more details. Note, this is not a port of the OpenTLD project.
  * </p>
  * <p>
- * [1] Nebehay, G. "Robust Object Tracking Based on Tracking-Learning-Detection." Master's Thesis.
- * Faculty of Informatics, TU Vienna (2012).
+ * [1] Zdenek Kalal, "Tracking-Learning-Detection" University of Surrey, April 2011 Phd Thesis.
  * </p>
  * @author Peter Abeles
  */
+// TODO revisit model update Pg. 108
+// TODO Blur input image for Fern classifier Pg. 109
+// TODO change how Fern definitions are created.  Pg. 111
+// TODO Update KLT parameters
+// TODO Learning....
 public class TldTracker<T extends ImageSingleBand, D extends ImageSingleBand> {
 
 	// specified configuration parameters for the tracker

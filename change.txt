@@ -27,6 +27,9 @@ Version : Alpha 0.16
   * Can read PPM from InputStream
   * Can read images from URL
 
+- TODO improve KLT edge handling
+- TODO mean-shift color
+- TODO cam-shift
 - TODO automate high level tests
 
 ---------------------------------------------
