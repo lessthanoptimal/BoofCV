@@ -19,6 +19,7 @@
 package boofcv.abst.tracker;
 
 import boofcv.alg.tracker.tld.TldTracker;
+import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageSingleBand;
 import georegression.geometry.UtilPolygons2D_F64;
 import georegression.struct.shapes.Quadrilateral_F64;
@@ -34,9 +35,11 @@ public class Tld_to_TrackerObjectQuad<T extends ImageSingleBand, D extends Image
 {
 	RectangleCorner2D_F64 rect = new RectangleCorner2D_F64();
 	TldTracker<T,D> tracker;
+	ImageDataType<T> type;
 
 	public Tld_to_TrackerObjectQuad(TldTracker<T, D> tracker) {
 		this.tracker = tracker;
+		this.type = ImageDataType.single(tracker.getConfig().imageType);
 	}
 
 	@Override
@@ -69,5 +72,9 @@ public class Tld_to_TrackerObjectQuad<T extends ImageSingleBand, D extends Image
 		return true;
 	}
 
+	@Override
+	public ImageDataType<T> getImageType() {
+		return type;
+	}
 
 }

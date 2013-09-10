@@ -19,6 +19,7 @@
 package boofcv.abst.tracker;
 
 import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageDataType;
 import georegression.struct.shapes.Quadrilateral_F64;
 
 /**
@@ -33,6 +34,7 @@ import georegression.struct.shapes.Quadrilateral_F64;
  *
  * @author Peter Abeles
  */
+// TODO add binary image for background model?
 public interface TrackerObjectQuad<T extends ImageBase> {
 
 	/**
@@ -55,4 +57,11 @@ public interface TrackerObjectQuad<T extends ImageBase> {
 	 * @return true if the target was found and 'location' updated.
 	 */
 	public boolean process( T image , Quadrilateral_F64 location );
+
+	/**
+	 * Returns information on the type of image that it can process.
+	 *
+	 * @return Image type
+	 */
+	public ImageDataType<T> getImageType();
 }

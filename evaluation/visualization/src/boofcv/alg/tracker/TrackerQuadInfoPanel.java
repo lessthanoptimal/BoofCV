@@ -37,7 +37,6 @@ public class TrackerQuadInfoPanel extends StandardAlgConfigPanel implements Acti
 	JTextArea displayTracking;
 
 	JButton buttonPlay;
-	JButton buttonReset;
 
 	JButton buttonSelect;
 
@@ -55,9 +54,6 @@ public class TrackerQuadInfoPanel extends StandardAlgConfigPanel implements Acti
 		buttonPlay = new JButton("Start");
 		buttonPlay.addActionListener(this);
 
-		buttonReset = new JButton("Reset");
-		buttonReset.addActionListener(this);
-
 		buttonSelect = new JButton("Select");
 		buttonSelect.addActionListener(this);
 
@@ -66,7 +62,6 @@ public class TrackerQuadInfoPanel extends StandardAlgConfigPanel implements Acti
 		addSeparator(200);
 		add(buttonPlay);
 		addAlignCenter(buttonPlay, this);
-		addAlignCenter(buttonReset, this);
 		addSeparator(200);
 		addAlignCenter(buttonSelect, this);
 	}
@@ -98,8 +93,6 @@ public class TrackerQuadInfoPanel extends StandardAlgConfigPanel implements Acti
 	public void actionPerformed(ActionEvent e) {
 		if( e.getSource() == buttonPlay ) {
 			listener.togglePause();
-		} else if( e.getSource() == buttonReset ) {
-			listener.resetVideo();
 		} else if( e.getSource() == buttonSelect ) {
 			listener.selectTarget();
 		}
@@ -107,8 +100,6 @@ public class TrackerQuadInfoPanel extends StandardAlgConfigPanel implements Acti
 
 	public static interface Listener {
 		public void togglePause();
-
-		public void resetVideo();
 
 		public void selectTarget();
 	}

@@ -18,14 +18,15 @@
 
 package boofcv.factory.tracker;
 
-import boofcv.abst.tracker.Sfot_to_TrackObjectQuad;
-import boofcv.abst.tracker.Tld_to_TrackerObjectQuad;
-import boofcv.abst.tracker.TrackerObjectQuad;
+import boofcv.abst.tracker.*;
+import boofcv.alg.tracker.meanshift.PixelLikelihood;
+import boofcv.alg.tracker.meanshift.TrackerMeanShiftLikelihood;
 import boofcv.alg.tracker.sfot.SfotConfig;
 import boofcv.alg.tracker.sfot.SparseFlowObjectTracker;
 import boofcv.alg.tracker.tld.TldConfig;
 import boofcv.alg.tracker.tld.TldTracker;
 import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.MultiSpectral;
 
 /**
  * Factory for implementations of {@link TrackerObjectQuad}, a high level interface for tracking user specified
@@ -64,5 +65,36 @@ public class FactoryTrackerObjectQuad {
 		SparseFlowObjectTracker<T,D> tracker = new SparseFlowObjectTracker<T,D>(config);
 
 		return new Sfot_to_TrackObjectQuad<T,D>(tracker);
+	}
+
+	public static <T extends ImageSingleBand>
+	TrackerObjectQuad<MultiSpectral<T>> createMeanShiftLikelihood( int maxIterations ,
+																   int numBins ,
+																   double maxPixelValue ,
+																   MeanShiftLikelihoodType modelType,
+																   Class<T> bandType ) {
+		PixelLikelihood<MultiSpectral<T>> likelihood;
+
+		switch( modelType ) {
+			case HISTOGRAM:
+				likelihood = FactoryTrackerObjectAlgs.likelihoodHistogramCoupled(maxPixelValue,numBins,bandType);
+				break;
+
+			case HISTOGRAM_INDEPENDENT_RGB_to_HSV:
+				likelihood = FactoryTrackerObjectAlgs.likelihoodHueSatHistIndependent(maxPixelValue,numBins,bandType);
+				break;
+
+			case HISTOGRAM_RGB_to_HSV:
+				likelihood = FactoryTrackerObjectAlgs.likelihoodHueSatHistCoupled(maxPixelValue,numBins,bandType);
+				break;
+
+			default:
+				throw new IllegalArgumentException("Unknown likelihood model "+modelType);
+		}
+
+		TrackerMeanShiftLikelihood<MultiSpectral<T>> alg =
+				new TrackerMeanShiftLikelihood<MultiSpectral<T>>(likelihood,maxIterations,0.1f);
+
+		return new Msl_to_TrackerObjectQuad<T>(alg,bandType);
 	}
 }

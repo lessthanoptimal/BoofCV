@@ -275,5 +275,9 @@ public class SparseFlowObjectTracker<Image extends ImageSingleBand, Derivative e
 	public boolean isTrackLost() {
 		return trackLost;
 	}
+
+	public SfotConfig<Image, Derivative> getConfig() {
+		return config;
+	}
 }
 

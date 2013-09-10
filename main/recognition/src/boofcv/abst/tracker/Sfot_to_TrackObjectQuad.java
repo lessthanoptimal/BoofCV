@@ -20,6 +20,7 @@ package boofcv.abst.tracker;
 
 import boofcv.alg.tracker.sfot.SparseFlowObjectTracker;
 import boofcv.struct.RectangleRotate_F64;
+import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageSingleBand;
 import georegression.geometry.UtilPoint2D_F64;
 import georegression.struct.point.Point2D_F64;
@@ -37,8 +38,11 @@ public class Sfot_to_TrackObjectQuad<T extends ImageSingleBand, D extends ImageS
 
 	RectangleRotate_F64 region = new RectangleRotate_F64();
 
+	ImageDataType<T> type;
+
 	public Sfot_to_TrackObjectQuad(SparseFlowObjectTracker<T, D> alg) {
 		this.alg = alg;
+		this.type = ImageDataType.single(alg.getConfig().imageType);
 	}
 
 	@Override
@@ -61,6 +65,11 @@ public class Sfot_to_TrackObjectQuad<T extends ImageSingleBand, D extends ImageS
 		rectRotToQuad(region, location);
 
 		return true;
+	}
+
+	@Override
+	public ImageDataType<T> getImageType() {
+		return type;
 	}
 
 	public static void quadToRectRot( Quadrilateral_F64 q , RectangleRotate_F64 r ) {
