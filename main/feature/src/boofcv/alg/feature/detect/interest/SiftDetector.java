@@ -25,12 +25,12 @@ import boofcv.alg.filter.kernel.KernelMath;
 import boofcv.core.image.border.FactoryImageBorder;
 import boofcv.core.image.border.ImageBorder;
 import boofcv.factory.filter.convolve.FactoryConvolveSparse;
-import boofcv.struct.FastQueue;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.convolve.Kernel2D_F32;
 import boofcv.struct.feature.ScalePoint;
 import boofcv.struct.image.ImageFloat32;
 import georegression.struct.point.Point2D_I16;
+import org.ddogleg.struct.FastQueue;
 
 import static boofcv.alg.feature.detect.interest.FastHessianFeatureDetector.polyPeak;
 

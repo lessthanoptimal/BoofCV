@@ -19,7 +19,6 @@
 package boofcv.alg.depth;
 
 import boofcv.alg.distort.RemoveRadialPtoN_F64;
-import boofcv.struct.FastQueue;
 import boofcv.struct.FastQueueArray_I32;
 import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.image.ImageUInt16;
@@ -27,6 +26,7 @@ import boofcv.struct.image.ImageUInt8;
 import boofcv.struct.image.MultiSpectral;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
+import org.ddogleg.struct.FastQueue;
 
 /**
  * Various functions and operations specific to visual depth sensors.

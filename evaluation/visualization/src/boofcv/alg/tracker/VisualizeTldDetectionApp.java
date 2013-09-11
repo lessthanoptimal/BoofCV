@@ -27,12 +27,12 @@ import boofcv.core.image.ConvertBufferedImage;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.image.UtilImageIO;
-import boofcv.struct.FastQueue;
-import boofcv.struct.GrowQueue_F64;
 import boofcv.struct.ImageRectangle;
 import boofcv.struct.feature.NccFeature;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
+import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.GrowQueue_F64;
 
 import javax.swing.*;
 import java.awt.*;
@@ -224,6 +224,7 @@ public class VisualizeTldDetectionApp<T extends ImageSingleBand,D extends ImageS
 	}
 
 	@Override
+
 	public void mousePressed(MouseEvent e) {}
 
 	@Override

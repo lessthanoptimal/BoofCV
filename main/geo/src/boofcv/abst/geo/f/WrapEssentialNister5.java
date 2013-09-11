@@ -20,8 +20,8 @@ package boofcv.abst.geo.f;
 
 import boofcv.abst.geo.EstimateNofEpipolar;
 import boofcv.alg.geo.f.EssentialNister5;
-import boofcv.struct.FastQueue;
 import boofcv.struct.geo.AssociatedPair;
+import org.ddogleg.struct.FastQueue;
 import org.ejml.data.DenseMatrix64F;
 
 import java.util.List;

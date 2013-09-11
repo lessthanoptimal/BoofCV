@@ -1,9 +1,9 @@
 package boofcv.alg.tracker.tld;
 
-import boofcv.struct.FastQueue;
 import boofcv.struct.ImageRectangle;
 import boofcv.struct.image.ImageUInt8;
 import georegression.struct.shapes.RectangleCorner2D_F64;
+import org.ddogleg.struct.FastQueue;
 import org.junit.Test;
 
 import java.util.Random;

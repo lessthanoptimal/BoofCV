@@ -35,7 +35,6 @@ import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.image.UtilImageIO;
-import boofcv.struct.FastQueue;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.SurfFeature;
 import boofcv.struct.feature.TupleDesc;
@@ -50,6 +49,7 @@ import georegression.struct.point.Point2D_I32;
 import georegression.transform.homo.HomographyPointOps_F64;
 import org.ddogleg.fitting.modelset.ModelMatcher;
 import org.ddogleg.fitting.modelset.ransac.Ransac;
+import org.ddogleg.struct.FastQueue;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;

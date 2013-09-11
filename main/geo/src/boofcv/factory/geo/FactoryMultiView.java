@@ -36,7 +36,6 @@ import boofcv.alg.geo.pose.P3PGrunert;
 import boofcv.alg.geo.pose.PnPLepetitEPnP;
 import boofcv.alg.geo.pose.PoseFromPairLinear6;
 import boofcv.alg.geo.trifocal.TrifocalAlgebraicPoint7;
-import boofcv.struct.FastQueue;
 import boofcv.struct.geo.AssociatedPair;
 import georegression.fitting.MotionTransformPoint;
 import georegression.fitting.se.FitSpecialEuclideanOps_F64;
@@ -46,6 +45,7 @@ import org.ddogleg.optimization.FactoryOptimization;
 import org.ddogleg.optimization.UnconstrainedLeastSquares;
 import org.ddogleg.solver.PolynomialOps;
 import org.ddogleg.solver.RootFinderType;
+import org.ddogleg.struct.FastQueue;
 
 /**
  * Factory for creating abstracted algorithms related to multi-view geometry

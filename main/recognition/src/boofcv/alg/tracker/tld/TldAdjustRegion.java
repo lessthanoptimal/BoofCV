@@ -20,13 +20,13 @@ package boofcv.alg.tracker.tld;
 
 import boofcv.alg.sfm.robust.DistanceScaleTranslate2DSq;
 import boofcv.alg.sfm.robust.GenerateScaleTranslate2D;
-import boofcv.struct.FastQueue;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.sfm.ScaleTranslate2D;
 import georegression.struct.shapes.RectangleCorner2D_F64;
 import org.ddogleg.fitting.modelset.DistanceFromModel;
 import org.ddogleg.fitting.modelset.ModelGenerator;
 import org.ddogleg.fitting.modelset.lmeds.LeastMedianOfSquares;
+import org.ddogleg.struct.FastQueue;
 
 /**
  * Adjusts the previous region using information from the region tracker.

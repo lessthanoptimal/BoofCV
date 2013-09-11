@@ -22,10 +22,10 @@ import boofcv.core.image.ConvertBufferedImage;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.video.CombineFilesTogether;
 import boofcv.io.video.VideoMjpegCodec;
-import boofcv.struct.GrowQueue_I8;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageUInt16;
+import org.ddogleg.struct.GrowQueue_I8;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;

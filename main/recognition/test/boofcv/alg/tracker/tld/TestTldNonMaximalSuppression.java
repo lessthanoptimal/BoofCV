@@ -1,6 +1,6 @@
 package boofcv.alg.tracker.tld;
 
-import boofcv.struct.FastQueue;
+import org.ddogleg.struct.FastQueue;
 import org.junit.Test;
 
 import static org.junit.Assert.*;

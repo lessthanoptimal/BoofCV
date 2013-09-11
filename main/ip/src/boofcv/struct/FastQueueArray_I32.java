@@ -18,6 +18,8 @@
 
 package boofcv.struct;
 
+import org.ddogleg.struct.FastQueue;
+
 /**
  * @author Peter Abeles
  */

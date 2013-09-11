@@ -1,9 +1,9 @@
 package boofcv.alg.tracker.tld;
 
-import boofcv.struct.FastQueue;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.sfm.ScaleTranslate2D;
 import georegression.struct.shapes.RectangleCorner2D_F64;
+import org.ddogleg.struct.FastQueue;
 import org.junit.Test;
 
 import java.util.Random;

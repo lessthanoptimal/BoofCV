@@ -21,13 +21,13 @@ package boofcv.alg.feature.detect.template;
 import boofcv.abst.feature.detect.extract.ConfigExtract;
 import boofcv.abst.feature.detect.extract.NonMaxSuppression;
 import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
-import boofcv.struct.FastQueue;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.feature.Match;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
 import georegression.struct.point.Point2D_I16;
 import org.ddogleg.sorting.QuickSelectArray;
+import org.ddogleg.struct.FastQueue;
 
 /**
  * Runs a template matching algorithm across the image. Local peaks are found in the resulting

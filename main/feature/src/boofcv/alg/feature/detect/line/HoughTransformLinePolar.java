@@ -21,14 +21,14 @@ package boofcv.alg.feature.detect.line;
 
 import boofcv.abst.feature.detect.extract.NonMaxSuppression;
 import boofcv.alg.misc.ImageMiscOps;
-import boofcv.struct.FastQueue;
-import boofcv.struct.GrowQueue_F32;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.feature.CachedSineCosine_F32;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageUInt8;
 import georegression.struct.line.LineParametric2D_F32;
 import georegression.struct.point.Point2D_I16;
+import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.GrowQueue_F32;
 
 /**
  * <p>

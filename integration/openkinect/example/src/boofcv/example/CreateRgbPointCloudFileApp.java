@@ -22,13 +22,13 @@ import boofcv.alg.depth.VisualDepthOps;
 import boofcv.io.image.UtilImageIO;
 import boofcv.misc.BoofMiscOps;
 import boofcv.openkinect.UtilOpenKinect;
-import boofcv.struct.FastQueue;
 import boofcv.struct.FastQueueArray_I32;
 import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.image.ImageUInt16;
 import boofcv.struct.image.ImageUInt8;
 import boofcv.struct.image.MultiSpectral;
 import georegression.struct.point.Point3D_F64;
+import org.ddogleg.struct.FastQueue;
 
 import java.io.DataOutputStream;
 import java.io.FileOutputStream;

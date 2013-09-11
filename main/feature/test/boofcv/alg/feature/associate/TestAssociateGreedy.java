@@ -20,8 +20,8 @@ package boofcv.alg.feature.associate;
 
 import boofcv.abst.feature.associate.ScoreAssociateEuclidean_F64;
 import boofcv.abst.feature.associate.ScoreAssociation;
-import boofcv.struct.FastQueue;
 import boofcv.struct.feature.TupleDesc_F64;
+import org.ddogleg.struct.FastQueue;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

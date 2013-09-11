@@ -18,13 +18,13 @@
 
 package boofcv.alg.geo.pose;
 
-import boofcv.struct.FastQueue;
 import boofcv.struct.geo.GeoModelEstimator1;
 import boofcv.struct.geo.GeoModelEstimatorN;
 import boofcv.struct.geo.Point2D3D;
 import boofcv.struct.sfm.Stereo2D3D;
 import georegression.struct.se.Se3_F64;
 import org.ddogleg.fitting.modelset.DistanceFromModel;
+import org.ddogleg.struct.FastQueue;
 
 import java.util.List;
 

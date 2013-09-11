@@ -21,8 +21,8 @@ package boofcv.alg.feature;
 import boofcv.abst.feature.describe.DescribeRegionPoint;
 import boofcv.abst.feature.detdesc.DetectDescribeMulti;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
-import boofcv.struct.FastQueue;
 import boofcv.struct.feature.TupleDesc;
+import org.ddogleg.struct.FastQueue;
 
 /**
  * Various utilities related to image features

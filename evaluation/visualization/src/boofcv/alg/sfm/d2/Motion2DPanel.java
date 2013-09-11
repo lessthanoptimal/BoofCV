@@ -19,10 +19,10 @@
 package boofcv.alg.sfm.d2;
 
 import boofcv.gui.feature.VisualizeFeatures;
-import boofcv.struct.FastQueue;
 import georegression.struct.homo.Homography2D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.transform.homo.HomographyPointOps_F64;
+import org.ddogleg.struct.FastQueue;
 
 import javax.swing.*;
 import java.awt.*;

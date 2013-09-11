@@ -21,12 +21,12 @@ package boofcv.abst.feature.tracker;
 import boofcv.abst.feature.describe.DescribeRegionPoint;
 import boofcv.alg.feature.UtilFeature;
 import boofcv.alg.feature.detect.interest.EasyGeneralFeatureDetector;
-import boofcv.struct.FastQueue;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I16;
+import org.ddogleg.struct.FastQueue;
 
 /**
  * Detects simple features (corners and blobs) whose location if fully described by a pixel coordinate.  Unlike more

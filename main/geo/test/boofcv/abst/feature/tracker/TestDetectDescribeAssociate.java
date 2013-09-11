@@ -18,10 +18,10 @@
 
 package boofcv.abst.feature.tracker;
 
-import boofcv.struct.FastQueue;
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.ImageFloat32;
 import georegression.struct.point.Point2D_F64;
+import org.ddogleg.struct.FastQueue;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

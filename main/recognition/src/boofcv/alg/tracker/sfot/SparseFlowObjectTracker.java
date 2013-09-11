@@ -27,7 +27,6 @@ import boofcv.alg.tracker.tld.TldTracker;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.tracker.FactoryTrackerAlg;
 import boofcv.factory.transform.pyramid.FactoryPyramid;
-import boofcv.struct.FastQueue;
 import boofcv.struct.RectangleRotate_F64;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.image.ImageSingleBand;
@@ -35,6 +34,7 @@ import boofcv.struct.pyramid.ImagePyramid;
 import boofcv.struct.sfm.ScaleTranslateRotate2D;
 import georegression.geometry.UtilPoint2D_F32;
 import org.ddogleg.fitting.modelset.lmeds.LeastMedianOfSquares;
+import org.ddogleg.struct.FastQueue;
 
 import java.lang.reflect.Array;
 

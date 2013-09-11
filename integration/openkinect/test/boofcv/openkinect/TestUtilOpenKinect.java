@@ -1,8 +1,8 @@
 package boofcv.openkinect;
 
 import boofcv.alg.misc.ImageMiscOps;
-import boofcv.struct.GrowQueue_I8;
 import boofcv.struct.image.ImageUInt16;
+import org.ddogleg.struct.GrowQueue_I8;
 import org.junit.Test;
 
 import java.io.File;

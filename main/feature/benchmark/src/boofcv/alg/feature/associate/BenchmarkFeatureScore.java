@@ -24,8 +24,8 @@ import boofcv.abst.feature.associate.ScoreAssociation;
 import boofcv.misc.Performer;
 import boofcv.misc.PerformerBase;
 import boofcv.misc.ProfileOperation;
-import boofcv.struct.FastQueue;
 import boofcv.struct.feature.*;
+import org.ddogleg.struct.FastQueue;
 
 import java.util.Random;
 

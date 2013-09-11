@@ -18,10 +18,10 @@
 
 package boofcv.gui.feature;
 
-import boofcv.struct.FastQueue;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.geo.AssociatedPair;
 import georegression.struct.point.Point2D_F64;
+import org.ddogleg.struct.FastQueue;
 
 import java.awt.*;
 import java.awt.event.MouseListener;

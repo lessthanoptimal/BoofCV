@@ -32,11 +32,11 @@ import boofcv.io.MediaManager;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.wrapper.DefaultMediaManager;
 import boofcv.misc.BoofMiscOps;
-import boofcv.struct.GrowQueue_I8;
 import boofcv.struct.calib.VisualDepthParameters;
 import boofcv.struct.image.*;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
+import org.ddogleg.struct.GrowQueue_I8;
 
 import java.io.IOException;
 

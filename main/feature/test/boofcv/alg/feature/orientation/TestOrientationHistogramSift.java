@@ -20,9 +20,9 @@ package boofcv.alg.feature.orientation;
 
 import boofcv.alg.feature.detect.interest.SiftImageScaleSpace;
 import boofcv.alg.misc.ImageMiscOps;
-import boofcv.struct.GrowQueue_F64;
 import boofcv.struct.image.ImageFloat32;
 import georegression.metric.UtilAngle;
+import org.ddogleg.struct.GrowQueue_F64;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

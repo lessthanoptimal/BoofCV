@@ -18,8 +18,8 @@
 
 package boofcv.alg.feature.associate;
 
-import boofcv.struct.FastQueue;
 import boofcv.struct.feature.AssociatedIndex;
+import org.ddogleg.struct.FastQueue;
 
 /**
  * Removes any ambiguous associations.  If multiple features from the 'src' match the same feature

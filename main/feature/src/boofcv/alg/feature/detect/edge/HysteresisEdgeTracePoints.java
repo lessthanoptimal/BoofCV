@@ -19,10 +19,10 @@
 package boofcv.alg.feature.detect.edge;
 
 import boofcv.alg.InputSanityCheck;
-import boofcv.struct.FastQueue;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSInt8;
 import georegression.struct.point.Point2D_I32;
+import org.ddogleg.struct.FastQueue;
 
 import java.util.ArrayList;
 import java.util.List;

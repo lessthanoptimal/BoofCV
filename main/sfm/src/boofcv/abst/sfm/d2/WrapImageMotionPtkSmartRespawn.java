@@ -22,10 +22,10 @@ import boofcv.abst.feature.tracker.PointTrack;
 import boofcv.abst.sfm.AccessPointTracks;
 import boofcv.alg.sfm.d2.AssociatedPairTrack;
 import boofcv.alg.sfm.d2.ImageMotionPtkSmartRespawn;
-import boofcv.struct.GrowQueue_B;
 import boofcv.struct.image.ImageBase;
 import georegression.struct.InvertibleTransform;
 import georegression.struct.point.Point2D_F64;
+import org.ddogleg.struct.GrowQueue_B;
 
 import java.util.ArrayList;
 import java.util.List;

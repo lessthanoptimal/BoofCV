@@ -21,12 +21,12 @@ package boofcv.abst.geo.pose;
 import boofcv.abst.geo.EstimateNofPnP;
 import boofcv.alg.geo.pose.P3PLineDistance;
 import boofcv.alg.geo.pose.PointDistance3;
-import boofcv.struct.FastQueue;
 import boofcv.struct.geo.Point2D3D;
 import georegression.fitting.MotionTransformPoint;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
+import org.ddogleg.struct.FastQueue;
 
 import java.util.ArrayList;
 import java.util.List;

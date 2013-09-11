@@ -18,10 +18,10 @@
 
 package boofcv.gui.d2;
 
-import boofcv.struct.FastQueue;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.se.Se2_F64;
 import georegression.transform.se.SePointOps_F64;
+import org.ddogleg.struct.FastQueue;
 
 import javax.swing.*;
 import java.awt.*;

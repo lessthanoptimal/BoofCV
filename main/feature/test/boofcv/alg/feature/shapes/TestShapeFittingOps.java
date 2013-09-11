@@ -18,13 +18,13 @@
 
 package boofcv.alg.feature.shapes;
 
-import boofcv.struct.GrowQueue_F64;
 import boofcv.struct.PointIndex_I32;
 import georegression.geometry.UtilEllipse_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I32;
 import georegression.struct.shapes.EllipseRotated_F64;
 import georegression.struct.trig.Circle2D_F64;
+import org.ddogleg.struct.GrowQueue_F64;
 import org.junit.Test;
 
 import java.util.ArrayList;

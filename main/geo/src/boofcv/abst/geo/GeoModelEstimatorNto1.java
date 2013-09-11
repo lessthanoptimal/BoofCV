@@ -18,10 +18,10 @@
 
 package boofcv.abst.geo;
 
-import boofcv.struct.FastQueue;
 import boofcv.struct.geo.GeoModelEstimator1;
 import boofcv.struct.geo.GeoModelEstimatorN;
 import org.ddogleg.fitting.modelset.DistanceFromModel;
+import org.ddogleg.struct.FastQueue;
 
 import java.util.ArrayList;
 import java.util.List;

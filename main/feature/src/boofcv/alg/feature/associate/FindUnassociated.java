@@ -18,9 +18,9 @@
 
 package boofcv.alg.feature.associate;
 
-import boofcv.struct.FastQueue;
-import boofcv.struct.GrowQueue_I32;
 import boofcv.struct.feature.AssociatedIndex;
+import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.GrowQueue_I32;
 
 /**
  * Given a list of associated features, find all the unassociated features.

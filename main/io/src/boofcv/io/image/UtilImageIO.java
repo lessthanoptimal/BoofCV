@@ -19,10 +19,10 @@
 package boofcv.io.image;
 
 import boofcv.core.image.ConvertBufferedImage;
-import boofcv.struct.GrowQueue_I8;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
 import boofcv.struct.image.MultiSpectral;
+import org.ddogleg.struct.GrowQueue_I8;
 import sun.awt.image.IntegerInterleavedRaster;
 
 import javax.imageio.ImageIO;

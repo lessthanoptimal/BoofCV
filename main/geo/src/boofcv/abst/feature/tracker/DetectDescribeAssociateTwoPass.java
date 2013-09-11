@@ -19,16 +19,16 @@
 package boofcv.abst.feature.tracker;
 
 import boofcv.abst.feature.associate.AssociateDescription2D;
-import boofcv.struct.FastQueue;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.point.Point2D_F64;
+import org.ddogleg.struct.FastQueue;
 
 /**
  * Changes behavior of {@link DetectDescribeAssociate} so that it conforms to the {@link PointTrackerTwoPass} interface.
  * It can now take hints for where tracks might appear in the image.   If possible
- * {@link AssociateDescription2D#setSource(boofcv.struct.FastQueue, boofcv.struct.FastQueue)} will only be called once
+ * {@link AssociateDescription2D#setSource(org.ddogleg.struct.FastQueue, org.ddogleg.struct.FastQueue)} will only be called once
  * on the second pass.
  *
  * @author Peter Abeles

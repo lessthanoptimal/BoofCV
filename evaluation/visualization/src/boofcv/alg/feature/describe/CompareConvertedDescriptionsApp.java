@@ -33,7 +33,6 @@ import boofcv.factory.feature.detect.interest.FactoryInterestPoint;
 import boofcv.gui.feature.AssociationPanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.image.UtilImageIO;
-import boofcv.struct.FastQueue;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.feature.TupleDesc_F64;
@@ -41,6 +40,7 @@ import boofcv.struct.feature.TupleDesc_S8;
 import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageFloat32;
 import georegression.struct.point.Point2D_F64;
+import org.ddogleg.struct.FastQueue;
 
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;

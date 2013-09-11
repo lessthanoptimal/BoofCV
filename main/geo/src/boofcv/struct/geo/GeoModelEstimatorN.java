@@ -18,7 +18,7 @@
 
 package boofcv.struct.geo;
 
-import boofcv.struct.FastQueue;
+import org.ddogleg.struct.FastQueue;
 
 import java.util.List;
 

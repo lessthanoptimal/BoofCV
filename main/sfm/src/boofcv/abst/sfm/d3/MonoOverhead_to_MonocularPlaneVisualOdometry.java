@@ -23,7 +23,6 @@ import boofcv.abst.sfm.AccessPointTracks3D;
 import boofcv.alg.distort.LensDistortionOps;
 import boofcv.alg.sfm.d3.VisOdomMonoOverheadMotion2D;
 import boofcv.alg.sfm.overhead.OverheadView;
-import boofcv.struct.FastQueue;
 import boofcv.struct.calib.MonoPlaneParameters;
 import boofcv.struct.distort.PointTransform_F64;
 import boofcv.struct.image.ImageBase;
@@ -32,6 +31,7 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
+import org.ddogleg.struct.FastQueue;
 
 import java.util.List;
 

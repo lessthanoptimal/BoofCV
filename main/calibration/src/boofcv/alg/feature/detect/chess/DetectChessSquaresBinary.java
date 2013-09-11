@@ -21,11 +21,11 @@ package boofcv.alg.feature.detect.chess;
 import boofcv.alg.feature.detect.grid.ConnectGridSquares;
 import boofcv.alg.feature.detect.quadblob.DetectQuadBlobsBinary;
 import boofcv.alg.feature.detect.quadblob.QuadBlob;
-import boofcv.struct.FastQueue;
 import boofcv.struct.ImageRectangle;
 import boofcv.struct.image.ImageUInt8;
 import georegression.geometry.UtilPoint2D_I32;
 import georegression.struct.point.Point2D_I32;
+import org.ddogleg.struct.FastQueue;
 
 import java.util.List;
 

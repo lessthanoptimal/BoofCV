@@ -24,7 +24,6 @@ import boofcv.alg.tracker.klt.PyramidKltFeature;
 import boofcv.alg.tracker.klt.PyramidKltTracker;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.transform.pyramid.FactoryPyramid;
-import boofcv.struct.FastQueue;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.pyramid.ImagePyramid;
@@ -32,6 +31,7 @@ import boofcv.struct.pyramid.PyramidDiscrete;
 import georegression.geometry.UtilPoint2D_F32;
 import georegression.struct.shapes.RectangleCorner2D_F64;
 import org.ddogleg.sorting.QuickSelectArray;
+import org.ddogleg.struct.FastQueue;
 
 import java.lang.reflect.Array;
 

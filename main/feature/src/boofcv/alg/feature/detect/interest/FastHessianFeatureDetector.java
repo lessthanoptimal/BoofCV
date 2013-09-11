@@ -23,12 +23,12 @@ import boofcv.alg.feature.detect.extract.SelectNBestFeatures;
 import boofcv.alg.feature.detect.intensity.GIntegralImageFeatureIntensity;
 import boofcv.core.image.border.FactoryImageBorderAlgs;
 import boofcv.core.image.border.ImageBorder_F32;
-import boofcv.struct.FastQueue;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.feature.ScalePoint;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.point.Point2D_I16;
+import org.ddogleg.struct.FastQueue;
 
 import java.util.List;
 

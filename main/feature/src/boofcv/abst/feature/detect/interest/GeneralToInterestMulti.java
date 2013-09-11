@@ -20,11 +20,11 @@ package boofcv.abst.feature.detect.interest;
 
 import boofcv.alg.feature.detect.interest.EasyGeneralFeatureDetector;
 import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
-import boofcv.struct.FastQueue;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I16;
+import org.ddogleg.struct.FastQueue;
 
 /**
  * Allows a {@link GeneralFeatureDetector} to be used inside a {@link DetectorInterestPointMulti}.  The number of sets

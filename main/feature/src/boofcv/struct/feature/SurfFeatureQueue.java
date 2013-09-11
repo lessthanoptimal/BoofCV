@@ -18,11 +18,11 @@
 
 package boofcv.struct.feature;
 
-import boofcv.struct.FastQueue;
+import org.ddogleg.struct.FastQueue;
 
 
 /**
- * {@link boofcv.struct.FastQueue} for {@link SurfFeature}.
+ * {@link org.ddogleg.struct.FastQueue} for {@link SurfFeature}.
  *
  * @author Peter Abeles
  */
