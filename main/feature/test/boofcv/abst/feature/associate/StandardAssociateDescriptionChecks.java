@@ -18,9 +18,9 @@
 
 package boofcv.abst.feature.associate;
 
-import boofcv.struct.FastQueue;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.MatchScoreType;
+import org.ddogleg.struct.FastQueue;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

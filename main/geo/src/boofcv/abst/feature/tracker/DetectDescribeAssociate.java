@@ -19,11 +19,11 @@
 package boofcv.abst.feature.tracker;
 
 import boofcv.abst.feature.associate.AssociateDescription2D;
-import boofcv.struct.FastQueue;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.point.Point2D_F64;
+import org.ddogleg.struct.FastQueue;
 
 import java.util.ArrayList;
 import java.util.List;

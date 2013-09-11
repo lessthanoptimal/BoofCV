@@ -21,8 +21,6 @@ package boofcv.alg.tracker.combined;
 import boofcv.abst.feature.associate.AssociateDescription;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
 import boofcv.alg.tracker.klt.PyramidKltFeature;
-import boofcv.struct.FastQueue;
-import boofcv.struct.GrowQueue_I32;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.MatchScoreType;
 import boofcv.struct.feature.SurfFeature;
@@ -31,6 +29,8 @@ import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.pyramid.ImagePyramid;
 import georegression.struct.point.Point2D_F64;
+import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.GrowQueue_I32;
 import org.junit.Test;
 
 import java.util.List;

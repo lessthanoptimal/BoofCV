@@ -26,6 +26,7 @@ Version : Alpha 0.16
 - UtilImageIO
   * Can read PPM from InputStream
   * Can read images from URL
+- Moved FastQueue and GrowQueue into DDogleg project so that other projects can use those data stuctures
 
 - TODO improve KLT edge handling
 - TODO mean-shift color

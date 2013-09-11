@@ -21,11 +21,11 @@ package boofcv.alg.tracker.tld;
 import boofcv.alg.tracker.klt.PyramidKltTracker;
 import boofcv.factory.tracker.FactoryTrackerAlg;
 import boofcv.factory.transform.pyramid.FactoryPyramid;
-import boofcv.struct.FastQueue;
 import boofcv.struct.ImageRectangle;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.pyramid.PyramidDiscrete;
 import georegression.struct.shapes.RectangleCorner2D_F64;
+import org.ddogleg.struct.FastQueue;
 
 import java.util.Random;
 

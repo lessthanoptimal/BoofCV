@@ -22,12 +22,12 @@ import boofcv.abst.feature.orientation.OrientationIntegral;
 import boofcv.alg.feature.describe.DescribePointSurf;
 import boofcv.alg.feature.detect.interest.FastHessianFeatureDetector;
 import boofcv.alg.transform.ii.GIntegralImageOps;
-import boofcv.struct.GrowQueue_F64;
 import boofcv.struct.feature.ScalePoint;
 import boofcv.struct.feature.SurfFeature;
 import boofcv.struct.feature.SurfFeatureQueue;
 import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.point.Point2D_F64;
+import org.ddogleg.struct.GrowQueue_F64;
 
 import java.util.List;
 

@@ -19,11 +19,11 @@
 package boofcv.alg.feature.associate;
 
 import boofcv.abst.feature.associate.AssociateDescription;
-import boofcv.struct.FastQueue;
-import boofcv.struct.GrowQueue_I32;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.SurfFeature;
 import boofcv.struct.feature.TupleDesc_F64;
+import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.GrowQueue_I32;
 
 
 /**

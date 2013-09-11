@@ -20,11 +20,11 @@ package boofcv.alg.geo.pose;
 
 import boofcv.alg.geo.GeoTestingOps;
 import boofcv.alg.geo.h.CommonHomographyChecks;
-import boofcv.struct.FastQueue;
 import boofcv.struct.geo.AssociatedPair;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
+import org.ddogleg.struct.FastQueue;
 import org.ejml.data.DenseMatrix64F;
 import org.ejml.ops.RandomMatrices;
 import org.ejml.simple.SimpleMatrix;

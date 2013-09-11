@@ -11,6 +11,7 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" scope="TEST" name="testing" level="project" />
     <orderEntry type="module" module-name="BoofCV Image Processing" />
+    <orderEntry type="module" module-name="DDogleg" />
   </component>
 </module>
 

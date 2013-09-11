@@ -19,6 +19,7 @@
 package boofcv.struct;
 
 import georegression.struct.point.Point2D_I16;
+import org.ddogleg.struct.FastQueue;
 
 
 /**
@@ -27,7 +28,7 @@ import georegression.struct.point.Point2D_I16;
  *
  * @author Peter Abeles
  */
-public class QueueCorner extends FastQueue<Point2D_I16>{
+public class QueueCorner extends FastQueue<Point2D_I16> {
 
 	public QueueCorner(int max) {
 		super(max,Point2D_I16.class,true);

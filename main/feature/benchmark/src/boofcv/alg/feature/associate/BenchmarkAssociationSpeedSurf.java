@@ -26,10 +26,10 @@ import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
 import boofcv.misc.Performer;
 import boofcv.misc.ProfileOperation;
-import boofcv.struct.FastQueue;
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageFloat32;
+import org.ddogleg.struct.FastQueue;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;

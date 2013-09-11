@@ -20,11 +20,11 @@ package boofcv.abst.geo;
 
 import boofcv.alg.geo.f.DistanceEpipolarConstraint;
 import boofcv.alg.geo.f.EssentialNister5;
-import boofcv.struct.FastQueue;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.geo.GeoModelEstimatorN;
 import boofcv.struct.geo.QueueMatrix;
 import org.ddogleg.fitting.modelset.DistanceFromModel;
+import org.ddogleg.struct.FastQueue;
 import org.ejml.data.DenseMatrix64F;
 import org.ejml.ops.MatrixFeatures;
 import org.ejml.ops.RandomMatrices;

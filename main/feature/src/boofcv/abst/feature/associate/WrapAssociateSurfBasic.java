@@ -20,11 +20,11 @@ package boofcv.abst.feature.associate;
 
 import boofcv.alg.feature.associate.AssociateSurfBasic;
 import boofcv.alg.feature.associate.FindUnassociated;
-import boofcv.struct.FastQueue;
-import boofcv.struct.GrowQueue_I32;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.MatchScoreType;
 import boofcv.struct.feature.SurfFeature;
+import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.GrowQueue_I32;
 
 /**
  * Wrapper around {@Link AssociateSurfBasic} for {@link AssociateDescription}.

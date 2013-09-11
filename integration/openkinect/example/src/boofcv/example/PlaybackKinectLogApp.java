@@ -25,10 +25,10 @@ import boofcv.gui.image.VisualizeImageData;
 import boofcv.io.image.UtilImageIO;
 import boofcv.misc.BoofMiscOps;
 import boofcv.openkinect.UtilOpenKinect;
-import boofcv.struct.GrowQueue_I8;
 import boofcv.struct.image.ImageUInt16;
 import boofcv.struct.image.ImageUInt8;
 import boofcv.struct.image.MultiSpectral;
+import org.ddogleg.struct.GrowQueue_I8;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;

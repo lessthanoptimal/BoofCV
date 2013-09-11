@@ -21,10 +21,10 @@ package boofcv.alg.feature.orientation;
 import boofcv.alg.feature.detect.interest.SiftImageScaleSpace;
 import boofcv.misc.BoofMiscOps;
 import boofcv.numerics.InterpolateArray;
-import boofcv.struct.GrowQueue_F64;
-import boofcv.struct.GrowQueue_I32;
 import boofcv.struct.ImageRectangle;
 import boofcv.struct.image.ImageFloat32;
+import org.ddogleg.struct.GrowQueue_F64;
+import org.ddogleg.struct.GrowQueue_I32;
 
 /**
  * <p>

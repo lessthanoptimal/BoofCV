@@ -22,7 +22,6 @@ import boofcv.alg.feature.detect.edge.CannyEdge;
 import boofcv.alg.feature.detect.edge.EdgeContour;
 import boofcv.alg.feature.detect.edge.EdgeSegment;
 import boofcv.factory.feature.detect.edge.FactoryEdgeDetectors;
-import boofcv.struct.FastQueue;
 import boofcv.struct.image.ImageFloat32;
 import georegression.geometry.UtilPoint2D_F64;
 import georegression.metric.Distance2D_F64;
@@ -33,6 +32,7 @@ import org.ddogleg.optimization.FactoryOptimization;
 import org.ddogleg.optimization.UnconstrainedMinimization;
 import org.ddogleg.optimization.UtilOptimize;
 import org.ddogleg.optimization.functions.FunctionNtoS;
+import org.ddogleg.struct.FastQueue;
 
 import java.util.ArrayList;
 import java.util.List;

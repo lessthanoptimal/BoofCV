@@ -19,7 +19,6 @@
 package boofcv.gui.d3;
 
 import boofcv.misc.BoofMiscOps;
-import boofcv.struct.FastQueue;
 import boofcv.struct.distort.PointTransform_F64;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
@@ -32,6 +31,7 @@ import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
+import org.ddogleg.struct.FastQueue;
 import org.ejml.data.DenseMatrix64F;
 
 import javax.swing.*;

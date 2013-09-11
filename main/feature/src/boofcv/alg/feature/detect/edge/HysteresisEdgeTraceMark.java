@@ -20,11 +20,11 @@ package boofcv.alg.feature.detect.edge;
 
 import boofcv.alg.InputSanityCheck;
 import boofcv.alg.misc.ImageMiscOps;
-import boofcv.struct.FastQueue;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSInt8;
 import boofcv.struct.image.ImageUInt8;
 import georegression.struct.point.Point2D_I32;
+import org.ddogleg.struct.FastQueue;
 
 /**
  * Given the output from edge non-maximum suppression, perform hysteresis threshold along the edge and mark selected

@@ -18,8 +18,8 @@
 
 package boofcv.alg.feature.associate;
 
-import boofcv.struct.FastQueue;
 import boofcv.struct.feature.AssociatedIndex;
+import org.ddogleg.struct.FastQueue;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

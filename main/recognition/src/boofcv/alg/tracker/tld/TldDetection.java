@@ -18,12 +18,12 @@
 
 package boofcv.alg.tracker.tld;
 
-import boofcv.struct.FastQueue;
-import boofcv.struct.GrowQueue_F64;
-import boofcv.struct.GrowQueue_I32;
 import boofcv.struct.ImageRectangle;
 import boofcv.struct.image.ImageSingleBand;
 import org.ddogleg.sorting.QuickSelectArray;
+import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.GrowQueue_F64;
+import org.ddogleg.struct.GrowQueue_I32;
 
 import java.util.ArrayList;
 import java.util.List;

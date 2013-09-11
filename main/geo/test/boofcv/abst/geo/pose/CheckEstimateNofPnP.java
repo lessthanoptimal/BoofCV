@@ -20,11 +20,11 @@ package boofcv.abst.geo.pose;
 
 import boofcv.abst.geo.EstimateNofPnP;
 import boofcv.alg.geo.f.EpipolarTestSimulation;
-import boofcv.struct.FastQueue;
 import boofcv.struct.geo.Point2D3D;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
+import org.ddogleg.struct.FastQueue;
 import org.ejml.ops.MatrixFeatures;
 import org.junit.Test;
 

@@ -23,10 +23,10 @@ import boofcv.abst.feature.detect.interest.DetectorInterestPointMulti;
 import boofcv.abst.feature.detect.interest.FoundPointSO;
 import boofcv.abst.feature.orientation.OrientationImage;
 import boofcv.alg.feature.UtilFeature;
-import boofcv.struct.FastQueue;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.point.Point2D_F64;
+import org.ddogleg.struct.FastQueue;
 
 /**
  * Wrapper class around independent multi feature detectors, region orientation, and descriptors, that allow

@@ -18,8 +18,8 @@
 
 package boofcv.alg.geo.f;
 
-import boofcv.struct.FastQueue;
 import boofcv.struct.geo.AssociatedPair;
+import org.ddogleg.struct.FastQueue;
 import org.ejml.data.DenseMatrix64F;
 import org.ejml.simple.SimpleMatrix;
 import org.junit.Test;

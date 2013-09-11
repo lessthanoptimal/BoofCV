@@ -30,12 +30,12 @@ import boofcv.gui.SelectAlgorithmAndInputPanel;
 import boofcv.gui.feature.AssociationPanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.PathLabel;
-import boofcv.struct.FastQueue;
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.point.Point2D_F64;
+import org.ddogleg.struct.FastQueue;
 
 import javax.swing.*;
 import java.awt.*;

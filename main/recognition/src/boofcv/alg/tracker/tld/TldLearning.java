@@ -18,11 +18,11 @@
 
 package boofcv.alg.tracker.tld;
 
-import boofcv.struct.FastQueue;
-import boofcv.struct.GrowQueue_F64;
 import boofcv.struct.ImageRectangle;
 import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.shapes.RectangleCorner2D_F64;
+import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.GrowQueue_F64;
 
 import java.util.ArrayList;
 import java.util.List;

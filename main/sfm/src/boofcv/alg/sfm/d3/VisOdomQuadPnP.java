@@ -24,8 +24,6 @@ import boofcv.abst.feature.detdesc.PointDescSet;
 import boofcv.abst.geo.TriangulateTwoViewsCalibrated;
 import boofcv.alg.distort.LensDistortionOps;
 import boofcv.alg.feature.UtilFeature;
-import boofcv.struct.FastQueue;
-import boofcv.struct.GrowQueue_I32;
 import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.distort.PointTransform_F64;
 import boofcv.struct.feature.AssociatedIndex;
@@ -38,6 +36,8 @@ import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import org.ddogleg.fitting.modelset.ModelFitter;
 import org.ddogleg.fitting.modelset.ModelMatcher;
+import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.GrowQueue_I32;
 
 /**
  * Stereo visual odometry algorithm which associates image features across two stereo pairs for a total of four images.

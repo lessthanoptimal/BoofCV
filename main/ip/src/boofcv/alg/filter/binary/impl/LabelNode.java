@@ -18,7 +18,7 @@
 
 package boofcv.alg.filter.binary.impl;
 
-import boofcv.struct.GrowQueue_I32;
+import org.ddogleg.struct.GrowQueue_I32;
 
 
 /**

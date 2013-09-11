@@ -19,9 +19,9 @@
 package boofcv.alg.feature.associate;
 
 import boofcv.abst.feature.associate.ScoreAssociation;
-import boofcv.struct.FastQueue;
 import boofcv.struct.feature.MatchScoreType;
 import georegression.struct.point.Point2D_F64;
+import org.ddogleg.struct.FastQueue;
 import org.junit.Before;
 import org.junit.Test;
 

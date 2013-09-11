@@ -19,7 +19,6 @@
 package boofcv.alg.sfm.robust;
 
 import boofcv.alg.sfm.overhead.CameraPlaneProjection;
-import boofcv.struct.FastQueue;
 import boofcv.struct.sfm.PlanePtPixel;
 import georegression.fitting.MotionTransformPoint;
 import georegression.fitting.se.MotionSe2PointSVD_F64;
@@ -27,6 +26,7 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.se.Se2_F64;
 import georegression.struct.se.Se3_F64;
 import org.ddogleg.fitting.modelset.ModelGenerator;
+import org.ddogleg.struct.FastQueue;
 
 import java.util.ArrayList;
 import java.util.List;

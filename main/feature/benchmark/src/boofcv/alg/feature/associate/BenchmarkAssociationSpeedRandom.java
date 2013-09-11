@@ -23,8 +23,8 @@ import boofcv.abst.feature.associate.ScoreAssociation;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.misc.Performer;
 import boofcv.misc.ProfileOperation;
-import boofcv.struct.FastQueue;
 import boofcv.struct.feature.TupleDesc_F64;
+import org.ddogleg.struct.FastQueue;
 
 import java.util.Random;
 

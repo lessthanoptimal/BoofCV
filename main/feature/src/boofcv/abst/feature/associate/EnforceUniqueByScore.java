@@ -20,11 +20,11 @@ package boofcv.abst.feature.associate;
 
 import boofcv.alg.feature.associate.AssociateUniqueByScoreAlg;
 import boofcv.alg.feature.associate.FindUnassociated;
-import boofcv.struct.FastQueue;
-import boofcv.struct.GrowQueue_I32;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.MatchScoreType;
 import georegression.struct.point.Point2D_F64;
+import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.GrowQueue_I32;
 
 /**
  * <p>

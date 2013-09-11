@@ -18,11 +18,11 @@
 
 package boofcv.abst.feature.associate;
 
-import boofcv.struct.FastQueue;
-import boofcv.struct.GrowQueue_I32;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.MatchScoreType;
 import georegression.struct.point.Point2D_F64;
+import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.GrowQueue_I32;
 
 /**
  * Wrapper around {@link AssociateDescription} that allows it to be used inside of {@link AssociateDescription2D}

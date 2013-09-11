@@ -18,10 +18,10 @@
 
 package boofcv.openkinect;
 
-import boofcv.struct.GrowQueue_I8;
 import boofcv.struct.image.ImageUInt16;
 import boofcv.struct.image.ImageUInt8;
 import boofcv.struct.image.MultiSpectral;
+import org.ddogleg.struct.GrowQueue_I8;
 import org.openkinect.freenect.Resolution;
 
 import java.io.*;

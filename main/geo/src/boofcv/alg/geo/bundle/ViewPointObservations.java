@@ -18,7 +18,7 @@
 
 package boofcv.alg.geo.bundle;
 
-import boofcv.struct.FastQueue;
+import org.ddogleg.struct.FastQueue;
 
 /**
  *

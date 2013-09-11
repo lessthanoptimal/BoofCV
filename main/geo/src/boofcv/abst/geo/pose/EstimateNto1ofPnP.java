@@ -21,10 +21,10 @@ package boofcv.abst.geo.pose;
 import boofcv.abst.geo.Estimate1ofPnP;
 import boofcv.abst.geo.GeoModelEstimatorNto1;
 import boofcv.alg.geo.pose.PnPDistanceReprojectionSq;
-import boofcv.struct.FastQueue;
 import boofcv.struct.geo.GeoModelEstimatorN;
 import boofcv.struct.geo.Point2D3D;
 import georegression.struct.se.Se3_F64;
+import org.ddogleg.struct.FastQueue;
 
 /**
  * Implementation of {@link GeoModelEstimatorNto1} for PnP problem.

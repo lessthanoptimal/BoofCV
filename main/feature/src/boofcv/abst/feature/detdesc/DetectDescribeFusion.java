@@ -21,11 +21,11 @@ package boofcv.abst.feature.detdesc;
 import boofcv.abst.feature.describe.DescribeRegionPoint;
 import boofcv.abst.feature.detect.interest.InterestPointDetector;
 import boofcv.abst.feature.orientation.OrientationImage;
-import boofcv.struct.FastQueue;
-import boofcv.struct.GrowQueue_F64;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.point.Point2D_F64;
+import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.GrowQueue_F64;
 
 /**
  * Wrapper class around independent feature detectors, region orientation, and descriptors, that allow

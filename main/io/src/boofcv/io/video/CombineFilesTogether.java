@@ -19,7 +19,7 @@
 package boofcv.io.video;
 
 import boofcv.misc.BoofMiscOps;
-import boofcv.struct.GrowQueue_I8;
+import org.ddogleg.struct.GrowQueue_I8;
 
 import java.io.*;
 import java.util.Collections;

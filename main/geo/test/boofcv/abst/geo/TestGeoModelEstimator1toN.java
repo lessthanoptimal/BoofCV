@@ -18,10 +18,10 @@
 
 package boofcv.abst.geo;
 
-import boofcv.struct.FastQueue;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.geo.GeoModelEstimator1;
 import boofcv.struct.geo.QueueMatrix;
+import org.ddogleg.struct.FastQueue;
 import org.ejml.data.DenseMatrix64F;
 import org.junit.Test;
 

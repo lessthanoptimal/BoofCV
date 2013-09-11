@@ -20,10 +20,10 @@ package boofcv.alg.filter.binary;
 
 import boofcv.core.image.border.FactoryImageBorder;
 import boofcv.core.image.border.ImageBorder;
-import boofcv.struct.FastQueue;
 import boofcv.struct.image.ImageSInt32;
 import boofcv.struct.image.ImageUInt8;
 import georegression.struct.point.Point2D_I32;
+import org.ddogleg.struct.FastQueue;
 import org.junit.Test;
 
 import java.util.ArrayList;

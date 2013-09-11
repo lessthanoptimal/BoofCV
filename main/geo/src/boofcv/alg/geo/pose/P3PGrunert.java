@@ -18,10 +18,10 @@
 
 package boofcv.alg.geo.pose;
 
-import boofcv.struct.FastQueue;
 import georegression.struct.point.Point2D_F64;
 import org.ddogleg.solver.Polynomial;
 import org.ddogleg.solver.PolynomialRoots;
+import org.ddogleg.struct.FastQueue;
 import org.ejml.data.Complex64F;
 
 import java.util.List;

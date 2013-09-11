@@ -18,8 +18,8 @@
 
 package boofcv.alg.geo.pose;
 
-import boofcv.struct.FastQueue;
 import georegression.struct.point.Point3D_F64;
+import org.ddogleg.struct.FastQueue;
 import org.ejml.data.DenseMatrix64F;
 
 import java.util.List;

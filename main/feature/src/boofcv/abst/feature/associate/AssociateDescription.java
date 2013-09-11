@@ -18,7 +18,7 @@
 
 package boofcv.abst.feature.associate;
 
-import boofcv.struct.FastQueue;
+import org.ddogleg.struct.FastQueue;
 
 
 /**

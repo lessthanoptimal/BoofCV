@@ -22,8 +22,6 @@ import boofcv.abst.feature.tracker.PointTrack;
 import boofcv.abst.feature.tracker.PointTracker;
 import boofcv.alg.distort.LensDistortionOps;
 import boofcv.alg.sfm.overhead.CameraPlaneProjection;
-import boofcv.struct.FastQueue;
-import boofcv.struct.GrowQueue_F64;
 import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.distort.PointTransform_F64;
 import boofcv.struct.image.ImageBase;
@@ -36,6 +34,8 @@ import georegression.struct.se.Se2_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
 import org.ddogleg.fitting.modelset.ModelMatcher;
+import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.GrowQueue_F64;
 import org.ejml.data.DenseMatrix64F;
 
 import java.util.ArrayList;

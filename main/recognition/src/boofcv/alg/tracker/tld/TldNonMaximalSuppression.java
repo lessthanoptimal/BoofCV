@@ -18,7 +18,7 @@
 
 package boofcv.alg.tracker.tld;
 
-import boofcv.struct.FastQueue;
+import org.ddogleg.struct.FastQueue;
 
 /**
  * Performs non-maximum suppression on high confidence detected regions.  A graph of connected regions is constructed.
