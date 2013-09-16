@@ -66,13 +66,13 @@ public class RemoveLensDistortionSequenceApp {
 			sequence.next();
 			BufferedImage image = sequence.getGuiImage();
 
-			input = ConvertBufferedImage.convertFromMulti(image,input,ImageUInt8.class);
+			input = ConvertBufferedImage.convertFromMulti(image,input,true,ImageUInt8.class);
 			if( output == null )
 				output = new MultiSpectral<ImageUInt8>(ImageUInt8.class,input.width,input.height,input.getNumBands());
 
 			DistortImageOps.distortMS(input,output,undistorter);
 
-			undistorted = ConvertBufferedImage.convertTo_U8(output, undistorted);
+			undistorted = ConvertBufferedImage.convertTo_U8(output, undistorted,true);
 
 			System.out.println("Saving image " + num);
 			UtilImageIO.saveImage(undistorted, outputDir + String.format("frame%06d.bmp", num++));

@@ -94,7 +94,7 @@ public class ScaleSpacePyramidPointPanel extends JPanel implements MouseListener
 					(levelImage.getWidth() != enlarge.width || levelImage.getHeight() != enlarge.height )) {
 				levelImage = null;
 			}
-			levelImage = ConvertBufferedImage.convertTo(enlarge,levelImage);
+			levelImage = ConvertBufferedImage.convertTo(enlarge,levelImage,true);
 
 			double scale = ss.getScale(level-1);
 			levelPoints.clear();

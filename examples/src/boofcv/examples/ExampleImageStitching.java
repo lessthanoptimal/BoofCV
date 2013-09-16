@@ -176,8 +176,10 @@ public class ExampleImageStitching {
 		int outputHeight = imageA.getHeight();
 
 		// Convert into a BoofCV color format
-		MultiSpectral<ImageFloat32> colorA = ConvertBufferedImage.convertFromMulti(imageA, null, ImageFloat32.class);
-		MultiSpectral<ImageFloat32> colorB = ConvertBufferedImage.convertFromMulti(imageB, null, ImageFloat32.class);
+		MultiSpectral<ImageFloat32> colorA =
+				ConvertBufferedImage.convertFromMulti(imageA, null,true, ImageFloat32.class);
+		MultiSpectral<ImageFloat32> colorB =
+				ConvertBufferedImage.convertFromMulti(imageB, null,true, ImageFloat32.class);
 
 		// Where the output images are rendered into
 		MultiSpectral<ImageFloat32> work = new MultiSpectral<ImageFloat32>(ImageFloat32.class,outputWidth,outputHeight,3);
@@ -202,7 +204,7 @@ public class ExampleImageStitching {
 
 		// Convert the rendered image into a BufferedImage
 		BufferedImage output = new BufferedImage(work.width,work.height,imageA.getType());
-		ConvertBufferedImage.convertTo(work,output);
+		ConvertBufferedImage.convertTo(work,output,true);
 
 		Graphics2D g2 = output.createGraphics();
 

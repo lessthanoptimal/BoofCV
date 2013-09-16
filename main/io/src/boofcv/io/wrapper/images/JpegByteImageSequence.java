@@ -20,7 +20,9 @@ package boofcv.io.wrapper.images;
 
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.io.image.SimpleImageSequence;
-import boofcv.struct.image.*;
+import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageDataType;
+import boofcv.struct.image.ImageTypeInfo;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -98,19 +100,7 @@ public class JpegByteImageSequence<T extends ImageBase> implements SimpleImageSe
 		}
 
 		output.reshape(imageGUI.getWidth(),imageGUI.getHeight());
-		switch( imageType.getFamily()) {
-			case SINGLE_BAND:
-				ConvertBufferedImage.convertFromSingle(imageGUI, (ImageSingleBand)output, imageType.getDataType().getImageClass());
-			break;
-
-			case MULTI_SPECTRAL:
-				ConvertBufferedImage.convertFromMulti(imageGUI, (MultiSpectral) output, imageType.getDataType().getImageClass());
-				ConvertBufferedImage.orderBandsIntoRGB((MultiSpectral) output,imageGUI);
-				break;
-
-			default:
-				throw new RuntimeException("Not supported yet: "+imageType.getFamily());
-		}
+		ConvertBufferedImage.convertFrom(imageGUI, output, true );
 
 		return output;
 	}

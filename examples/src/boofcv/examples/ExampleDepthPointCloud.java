@@ -58,8 +58,7 @@ public class ExampleDepthPointCloud {
 		VisualDepthParameters param = BoofMiscOps.loadXML(nameCalib);
 
 		BufferedImage buffered = UtilImageIO.loadImage(nameRgb);
-		MultiSpectral<ImageUInt8> rgb = ConvertBufferedImage.convertFromMulti(buffered,null,ImageUInt8.class);
-		ConvertBufferedImage.orderBandsIntoRGB(rgb,buffered);
+		MultiSpectral<ImageUInt8> rgb = ConvertBufferedImage.convertFromMulti(buffered,null,true,ImageUInt8.class);
 		ImageUInt16 depth =
 				ConvertBufferedImage.convertFrom(UtilImageIO.loadImage(nameDepth),null,ImageUInt16.class);
 

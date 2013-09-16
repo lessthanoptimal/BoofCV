@@ -113,7 +113,7 @@ public class ShowImageBlurApp<T extends ImageSingleBand>
 		output.reshape(image.getWidth(),image.getHeight());
 		storage.reshape(image.getWidth(),image.getHeight());
 
-		ConvertBufferedImage.convertFromMulti(image, input, imageType);
+		ConvertBufferedImage.convertFromMulti(image, input, true, imageType);
 
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
@@ -181,7 +181,7 @@ public class ShowImageBlurApp<T extends ImageSingleBand>
 
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
-				ConvertBufferedImage.convertTo(output, renderedImage);
+				ConvertBufferedImage.convertTo(output, renderedImage, true);
 				gui.repaint();
 			}
 		});

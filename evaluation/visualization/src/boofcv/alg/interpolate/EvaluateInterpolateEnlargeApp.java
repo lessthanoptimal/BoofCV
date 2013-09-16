@@ -73,8 +73,7 @@ public class EvaluateInterpolateEnlargeApp<T extends ImageSingleBand>
 		setInputImage(image);
 
 		color.reshape(image.getWidth(),image.getHeight());
-		ConvertBufferedImage.convertFromMulti(image,color,imageType);
-		ConvertBufferedImage.orderBandsIntoRGB(color,image);
+		ConvertBufferedImage.convertFromMulti(image,color,true,imageType);
 
 		hasProcessed = true;
 		doRefreshAll();
@@ -105,7 +104,7 @@ public class EvaluateInterpolateEnlargeApp<T extends ImageSingleBand>
 		// of pixel value bounds
 //		GeneralizedImageOps.boundImage(scaledImage,0,255);
 
-		BufferedImage out = ConvertBufferedImage.convertTo(scaledImage,null);
+		BufferedImage out = ConvertBufferedImage.convertTo(scaledImage,null,true);
 		panel.setBufferedImage(out);
 		panel.repaint();
 	}

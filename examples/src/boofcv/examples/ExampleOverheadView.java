@@ -44,8 +44,7 @@ public class ExampleOverheadView {
 	public static void main( String args[] ) {
 		BufferedImage input = UtilImageIO.loadImage("../data/applet/road/left01.png");
 
-		MultiSpectral<ImageUInt8> imageRGB = ConvertBufferedImage.convertFromMulti(input, null, ImageUInt8.class);
-		ConvertBufferedImage.orderBandsIntoRGB(imageRGB,input);
+		MultiSpectral<ImageUInt8> imageRGB = ConvertBufferedImage.convertFromMulti(input, null,true, ImageUInt8.class);
 
 		StereoParameters stereoParam = BoofMiscOps.loadXML("../data/applet/road/stereo01.xml");
 		Se3_F64 groundToLeft = BoofMiscOps.loadXML("../data/applet/road/ground_to_left_01.xml");
@@ -72,7 +71,7 @@ public class ExampleOverheadView {
 
 		// note that the left/right values are swapped in the overhead image.  This is an artifact of the plane's
 		// 2D coordinate system having +y pointing up, while images have +y pointing down.
-		BufferedImage output = ConvertBufferedImage.convertTo(overheadRGB,null);
+		BufferedImage output = ConvertBufferedImage.convertTo(overheadRGB,null,true);
 
 		ShowImages.showWindow(input,"Input Image");
 		ShowImages.showWindow(output,"Overhead Image");

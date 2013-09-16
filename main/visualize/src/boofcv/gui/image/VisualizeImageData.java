@@ -90,7 +90,7 @@ public class VisualizeImageData {
 
 		if (normalize == 0) {
 			// sets the output to black
-			ConvertBufferedImage.convertTo(src,dst);
+			ConvertBufferedImage.convertTo(src,dst,true);
 			return dst;
 		}
 

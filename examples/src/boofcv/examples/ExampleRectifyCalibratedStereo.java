@@ -67,10 +67,10 @@ public class ExampleRectifyCalibratedStereo {
 		BufferedImage origRight = UtilImageIO.loadImage(dir+"right05.jpg");
 
 		// distorted images
-		MultiSpectral<ImageFloat32> distLeft = ConvertBufferedImage.convertFromMulti(origLeft, null, ImageFloat32.class);
-		MultiSpectral<ImageFloat32> distRight = ConvertBufferedImage.convertFromMulti(origRight, null, ImageFloat32.class);
-		ConvertBufferedImage.orderBandsIntoRGB(distLeft,origLeft);
-		ConvertBufferedImage.orderBandsIntoRGB(distRight,origRight);
+		MultiSpectral<ImageFloat32> distLeft =
+				ConvertBufferedImage.convertFromMulti(origLeft, null,true, ImageFloat32.class);
+		MultiSpectral<ImageFloat32> distRight =
+				ConvertBufferedImage.convertFromMulti(origRight, null,true, ImageFloat32.class);
 
 		// storage for undistorted + rectified images
 		MultiSpectral<ImageFloat32> rectLeft = new MultiSpectral<ImageFloat32>(ImageFloat32.class,
@@ -109,8 +109,8 @@ public class ExampleRectifyCalibratedStereo {
 		DistortImageOps.distortMS(distRight, rectRight, imageDistortRight);
 
 		// convert for output
-		BufferedImage outLeft = ConvertBufferedImage.convertTo(rectLeft,null);
-		BufferedImage outRight = ConvertBufferedImage.convertTo(rectRight, null);
+		BufferedImage outLeft = ConvertBufferedImage.convertTo(rectLeft,null,true);
+		BufferedImage outRight = ConvertBufferedImage.convertTo(rectRight, null,true);
 
 		// show results and draw a horizontal line where the user clicks to see rectification easier
 		ListDisplayPanel panel = new ListDisplayPanel();

@@ -116,7 +116,7 @@ public class WaveletVisualizeApp
 		// adjust the values inside the wavelet transform to make it easier to see
 		UtilWavelet.adjustForDisplay(imageWavelet, waveletTran.getLevels(), 255);
 		BufferedImage buffWavelet = VisualizeImageData.grayMagnitude(imageWavelet,null,255);
-		BufferedImage buffInv = ConvertBufferedImage.convertTo(imageInv,null);
+		BufferedImage buffInv = ConvertBufferedImage.convertTo(imageInv,null,true);
 
 		panel.addImage(buffWavelet,"Transform");
 		panel.addImage(buffInv,"Inverse");

@@ -149,7 +149,7 @@ public class LoadFileImageSequence<T extends ImageSingleBand> implements SimpleI
 			return null;
 
 		image = type.createImage(imageGUI.getWidth(),imageGUI.getHeight());
-		ConvertBufferedImage.convertFrom(imageGUI, image);
+		ConvertBufferedImage.convertFrom(imageGUI, image,true);
 
 		// no changes needed so return the original
 		if (scalefactor == 1)

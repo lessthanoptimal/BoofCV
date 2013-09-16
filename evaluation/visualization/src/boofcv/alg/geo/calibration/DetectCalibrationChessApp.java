@@ -128,7 +128,7 @@ public class DetectCalibrationChessApp<T extends ImageSingleBand, D extends Imag
 		workImage = new BufferedImage(input.getWidth(),input.getHeight(),BufferedImage.TYPE_INT_RGB);
 
 		gray.reshape(input.getWidth(),input.getHeight());
-		ConvertBufferedImage.convertFrom(input, gray);
+		ConvertBufferedImage.convertFrom(input, gray, true);
 
 		intensity.reshape(gray.width,gray.height);
 

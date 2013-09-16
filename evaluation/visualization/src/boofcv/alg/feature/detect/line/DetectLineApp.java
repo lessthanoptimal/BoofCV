@@ -125,7 +125,7 @@ public class DetectLineApp<T extends ImageSingleBand, D extends ImageSingleBand>
 
 			SwingUtilities.invokeLater(new Runnable() {
 				public void run() {
-					ConvertBufferedImage.convertTo(inputCorrupted, gui.background);
+					ConvertBufferedImage.convertTo(inputCorrupted, gui.background, true);
 					gui.setLines(detector.detect(blur));
 					gui.repaint();
 					processedImage = true;
@@ -136,7 +136,7 @@ public class DetectLineApp<T extends ImageSingleBand, D extends ImageSingleBand>
 
 			SwingUtilities.invokeLater(new Runnable() {
 				public void run() {
-					ConvertBufferedImage.convertTo(inputCorrupted,gui.background);
+					ConvertBufferedImage.convertTo(inputCorrupted,gui.background, true);
 					gui.setLineSegments(detector.detect(blur));
 					gui.repaint();
 					processedImage = true;

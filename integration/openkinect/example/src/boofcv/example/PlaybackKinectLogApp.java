@@ -68,7 +68,7 @@ public class PlaybackKinectLogApp {
 		int frame = 1;
 		while( true ) {
 			parseFrame(frame++);
-			ConvertBufferedImage.convertTo_U8(rgb,outRgb);
+			ConvertBufferedImage.convertTo_U8(rgb,outRgb,true);
 			VisualizeImageData.disparity(depth, outDepth, 0, UtilOpenKinect.FREENECT_DEPTH_MM_MAX_VALUE, 0);
 			gui.repaint();
 			BoofMiscOps.pause(30);
@@ -79,7 +79,7 @@ public class PlaybackKinectLogApp {
 		UtilImageIO.loadPPM_U8(String.format("%s/rgb%07d.ppm", directory, frameNumber), rgb, data);
 		if( depthIsPng ) {
 			BufferedImage image = UtilImageIO.loadImage(String.format("%s/depth%07d.png", directory, frameNumber));
-			ConvertBufferedImage.convertFrom(image,depth);
+			ConvertBufferedImage.convertFrom(image,depth,true);
 		} else {
 			UtilOpenKinect.parseDepth(String.format("%s/depth%07d.depth", directory, frameNumber), depth, data);
 		}

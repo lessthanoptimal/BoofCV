@@ -390,23 +390,44 @@ public class ConvertRaster {
 		int srcOffset = src.getDataOffset(0)-src.getPixelStride()+1;
 		int srcStrideDiff = srcStride-src.getPixelStride()*dst.width;
 
+		int numBands = src.getNumBands();
 		byte[] data1 = dst.getBand(0).data;
 		byte[] data2 = dst.getBand(1).data;
 		byte[] data3 = dst.getBand(2).data;
 
-		int indexSrc = srcOffset;
-		for (int y = 0; y < dst.height; y++) {
-			int indexDst = dst.startIndex + y * dst.stride;
-			for (int x = 0; x < dst.width; x++, indexDst++) {
+		if( numBands == 3 ) {
+			int indexSrc = srcOffset;
+			for (int y = 0; y < dst.height; y++) {
+				int indexDst = dst.startIndex + y * dst.stride;
+				for (int x = 0; x < dst.width; x++, indexDst++) {
 
-				int rgb = srcData[indexSrc++];
+					int rgb = srcData[indexSrc++];
 
-				data1[indexDst] = (byte) (rgb >>> 16);
-				data2[indexDst] = (byte) (rgb >>> 8);
-				data3[indexDst] = (byte) rgb;
+					data1[indexDst] = (byte) (rgb >>> 16);
+					data2[indexDst] = (byte) (rgb >>> 8);
+					data3[indexDst] = (byte) rgb;
+				}
+
+				indexSrc += srcStrideDiff;
 			}
+		} else if( numBands == 4 ) {
+			byte[] data4 = dst.getBand(3).data;
 
-			indexSrc += srcStrideDiff;
+			int indexSrc = srcOffset;
+			for (int y = 0; y < dst.height; y++) {
+				int indexDst = dst.startIndex + y * dst.stride;
+				for (int x = 0; x < dst.width; x++, indexDst++) {
+
+					int rgb = srcData[indexSrc++];
+
+					data1[indexDst] = (byte) (rgb >>> 24);
+					data2[indexDst] = (byte) (rgb >>> 16);
+					data3[indexDst] = (byte) (rgb >>> 8);
+					data4[indexDst] = (byte) rgb;
+				}
+
+				indexSrc += srcStrideDiff;
+			}
 		}
 	}
 
@@ -425,18 +446,40 @@ public class ConvertRaster {
 		float[] data3 = dst.getBand(2).data;
 
 		int indexSrc = srcOffset;
-		for (int y = 0; y < dst.height; y++) {
-			int indexDst = dst.startIndex + y * dst.stride;
-			for (int x = 0; x < dst.width; x++, indexDst++) {
 
-				int rgb = srcData[indexSrc++];
+		int numBands = src.getNumBands();
 
-				data1[indexDst] = (rgb >>> 16) & 0xFF;
-				data2[indexDst] = (rgb >>> 8) & 0xFF;
-				data3[indexDst] = rgb & 0xFF;
+		if( numBands == 3 ) {
+			for (int y = 0; y < dst.height; y++) {
+				int indexDst = dst.startIndex + y * dst.stride;
+				for (int x = 0; x < dst.width; x++, indexDst++) {
+
+					int rgb = srcData[indexSrc++];
+
+					data1[indexDst] = (rgb >>> 16) & 0xFF;
+					data2[indexDst] = (rgb >>> 8) & 0xFF;
+					data3[indexDst] = rgb & 0xFF;
+				}
+
+				indexSrc += srcStrideDiff;
 			}
+		} else if( numBands == 4 ) {
+			float[] data4 = dst.getBand(3).data;
 
-			indexSrc += srcStrideDiff;
+			for (int y = 0; y < dst.height; y++) {
+				int indexDst = dst.startIndex + y * dst.stride;
+				for (int x = 0; x < dst.width; x++, indexDst++) {
+
+					int rgb = srcData[indexSrc++];
+
+					data1[indexDst] = (rgb >>> 24) & 0xFF;
+					data2[indexDst] = (rgb >>> 16) & 0xFF;
+					data3[indexDst] = (rgb >>> 8) & 0xFF;
+					data4[indexDst] = rgb & 0xFF;
+				}
+
+				indexSrc += srcStrideDiff;
+			}
 		}
 	}
 
@@ -655,6 +698,23 @@ public class ConvertRaster {
 					band1[index] = (argb >>> 16) & 0xFF;
 					band2[index] = (argb >>> 8) & 0xFF;
 					band3[index] = argb & 0xFF;
+				}
+			}
+		} else if (dst.getNumBands() == 4) {
+			final float[] band1 = dst.getBand(0).data;
+			final float[] band2 = dst.getBand(1).data;
+			final float[] band3 = dst.getBand(2).data;
+			final float[] band4 = dst.getBand(3).data;
+
+			for (int y = 0; y < height; y++) {
+				int index = dst.startIndex + y * dst.stride;
+				for (int x = 0; x < width; x++, index++) {
+					int argb = src.getRGB(x, y);
+
+					band1[index] = (argb >>> 24) & 0xFF;
+					band2[index] = (argb >>> 16) & 0xFF;
+					band3[index] = (argb >>> 8) & 0xFF;
+					band4[index] = argb & 0xFF;
 				}
 			}
 		} else {
@@ -898,6 +958,24 @@ public class ConvertRaster {
 					dstData[indexDst++] = band3[indexSrc];
 				}
 			}
+		} else if (numBands == 4) {
+			final byte[] band1 = src.getBand(0).data;
+			final byte[] band2 = src.getBand(1).data;
+			final byte[] band3 = src.getBand(2).data;
+			final byte[] band4 = src.getBand(3).data;
+
+			int indexDst = 0;
+			for (int y = 0; y < src.height; y++) {
+				int indexSrc = src.startIndex + src.stride * y;
+				int indexSrcEnd = indexSrc + src.width;
+
+				for (; indexSrc < indexSrcEnd; indexSrc++) {
+					dstData[indexDst++] = band1[indexSrc];
+					dstData[indexDst++] = band2[indexSrc];
+					dstData[indexDst++] = band3[indexSrc];
+					dstData[indexDst++] = band4[indexSrc];
+				}
+			}
 		} else {
 			byte bands[][] = new byte[numBands][];
 			for (int i = 0; i < numBands; i++) {
@@ -942,6 +1020,24 @@ public class ConvertRaster {
 					dstData[indexDst++] = (byte) band3[indexSrc];
 				}
 			}
+		} else if (numBands == 4) {
+			final float[] band1 = src.getBand(0).data;
+			final float[] band2 = src.getBand(1).data;
+			final float[] band3 = src.getBand(2).data;
+			final float[] band4 = src.getBand(3).data;
+
+			int indexDst = 0;
+			for (int y = 0; y < src.height; y++) {
+				int indexSrc = src.startIndex + src.stride * y;
+				int indexSrcEnd = indexSrc + src.width;
+
+				for (; indexSrc < indexSrcEnd; indexSrc++) {
+					dstData[indexDst++] = (byte) band1[indexSrc];
+					dstData[indexDst++] = (byte) band2[indexSrc];
+					dstData[indexDst++] = (byte) band3[indexSrc];
+					dstData[indexDst++] = (byte) band4[indexSrc];
+				}
+			}
 		} else {
 			float bands[][] = new float[numBands][];
 			for (int i = 0; i < numBands; i++) {
@@ -979,6 +1075,17 @@ public class ConvertRaster {
 					dstData[indexDst++] = v << 16 | v << 8 | v;
 				}
 			}
+		} else if (numBands == 4) {
+			int indexDst = 0;
+			for (int y = 0; y < src.height; y++) {
+				int indexSrc = src.startIndex + y * src.stride;
+
+				for (int x = 0; x < src.width; x++) {
+					int v = srcData[indexSrc++] & 0xFF;
+
+					dstData[indexDst++] = 0xFF << 24 | v << 16 | v << 8 | v;
+				}
+			}
 		} else {
 			throw new RuntimeException("Code more here");
 		}
@@ -999,6 +1106,17 @@ public class ConvertRaster {
 					int v = (int) srcData[indexSrc++];
 
 					dstData[indexDst++] = v << 16 | v << 8 | v;
+				}
+			}
+		} else if (numBands == 4) {
+			int indexDst = 0;
+			for (int y = 0; y < src.height; y++) {
+				int indexSrc = src.startIndex + y * src.stride;
+
+				for (int x = 0; x < src.width; x++) {
+					int v = (int) srcData[indexSrc++];
+
+					dstData[indexDst++] = 0xFF << 24 | v << 16 | v << 8 | v;
 				}
 			}
 		} else {
@@ -1048,11 +1166,11 @@ public class ConvertRaster {
 
 		final int numBands = dst.getNumBands();
 
-		if (numBands == 3) {
-			final byte[] band1 = src.getBand(0).data;
-			final byte[] band2 = src.getBand(1).data;
-			final byte[] band3 = src.getBand(2).data;
+		final byte[] band1 = src.getBand(0).data;
+		final byte[] band2 = src.getBand(1).data;
+		final byte[] band3 = src.getBand(2).data;
 
+		if (numBands == 3) {
 			int indexDst = 0;
 			for (int y = 0; y < src.height; y++) {
 				int indexSrc = src.startIndex + y * src.stride;
@@ -1063,6 +1181,22 @@ public class ConvertRaster {
 					int c3 = band3[indexSrc] & 0xFF;
 
 					dstData[indexDst++] = c1 << 16 | c2 << 8 | c3;
+				}
+			}
+		} else if (numBands == 4) {
+			final byte[] band4 = src.getBand(3).data;
+
+			int indexDst = 0;
+			for (int y = 0; y < src.height; y++) {
+				int indexSrc = src.startIndex + y * src.stride;
+
+				for (int x = 0; x < src.width; x++, indexSrc++) {
+					int c1 = band1[indexSrc] & 0xFF;
+					int c2 = band2[indexSrc] & 0xFF;
+					int c3 = band3[indexSrc] & 0xFF;
+					int c4 = band4[indexSrc] & 0xFF;
+
+					dstData[indexDst++] = c1 << 24 | c2 << 16 | c3 << 8 | c4;
 				}
 			}
 		} else {
@@ -1079,11 +1213,11 @@ public class ConvertRaster {
 
 		final int numBands = dst.getNumBands();
 
-		if (numBands == 3) {
-			final float[] band1 = src.getBand(0).data;
-			final float[] band2 = src.getBand(1).data;
-			final float[] band3 = src.getBand(2).data;
+		final float[] band1 = src.getBand(0).data;
+		final float[] band2 = src.getBand(1).data;
+		final float[] band3 = src.getBand(2).data;
 
+		if (numBands == 3) {
 			int indexDst = 0;
 			for (int y = 0; y < src.height; y++) {
 				int indexSrc = src.startIndex + y * src.stride;
@@ -1094,6 +1228,22 @@ public class ConvertRaster {
 					int c3 = (int) band3[indexSrc];
 
 					dstData[indexDst++] = c1 << 16 | c2 << 8 | c3;
+				}
+			}
+		} else if (numBands == 4) {
+			final float[] band4 = src.getBand(3).data;
+
+			int indexDst = 0;
+			for (int y = 0; y < src.height; y++) {
+				int indexSrc = src.startIndex + y * src.stride;
+
+				for (int x = 0; x < src.width; x++, indexSrc++) {
+					int c1 = (int) band1[indexSrc];
+					int c2 = (int) band2[indexSrc];
+					int c3 = (int) band3[indexSrc];
+					int c4 = (int) band4[indexSrc];
+
+					dstData[indexDst++] = c1 << 24 | c2 << 16 | c3 << 8 | c4;
 				}
 			}
 		} else {

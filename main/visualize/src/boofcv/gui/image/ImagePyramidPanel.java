@@ -90,7 +90,7 @@ public class ImagePyramidPanel<T extends ImageSingleBand> extends ListDisplayPan
 		int N = pyramid.getNumLayers();
 
 		for( int i = 0; i < N; i++ ) {
-			BufferedImage b = ConvertBufferedImage.convertTo(pyramid.getLayer(i),null);
+			BufferedImage b = ConvertBufferedImage.convertTo(pyramid.getLayer(i),null,true);
 			addImage(b,String.format("%5.2f",pyramid.getScale(i)));
 		}
 	}
@@ -108,7 +108,7 @@ public class ImagePyramidPanel<T extends ImageSingleBand> extends ListDisplayPan
 
 		for( int i = 0; i < N; i++ ) {
 			DistortImageOps.scale(pyramid.getLayer(i),upscale, TypeInterpolate.NEAREST_NEIGHBOR);
-			BufferedImage b = ConvertBufferedImage.convertTo(upscale,null);
+			BufferedImage b = ConvertBufferedImage.convertTo(upscale,null,true);
 			if( showScales )
 				addImage(b,String.format("%5.2f",pyramid.getScale(i)));
 			else

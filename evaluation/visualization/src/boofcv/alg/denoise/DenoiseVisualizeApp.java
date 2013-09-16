@@ -156,9 +156,9 @@ public class DenoiseVisualizeApp<T extends ImageSingleBand,D extends ImageSingle
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				images.clear();
-				images.add(ConvertBufferedImage.convertTo(output,null));
-				images.add(ConvertBufferedImage.convertTo(noisy,null));
-				images.add(ConvertBufferedImage.convertTo(input,null));
+				images.add(ConvertBufferedImage.convertTo(output,null,true));
+				images.add(ConvertBufferedImage.convertTo(noisy,null,true));
+				images.add(ConvertBufferedImage.convertTo(input,null,true));
 				info.reset();
 				doRefreshAll();
 			}});
@@ -223,8 +223,8 @@ public class DenoiseVisualizeApp<T extends ImageSingleBand,D extends ImageSingle
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				info.setWaveletActive(denoiser!=null);
-				ConvertBufferedImage.convertTo(output,images.get(0));
-				ConvertBufferedImage.convertTo(noisy,images.get(1));
+				ConvertBufferedImage.convertTo(output,images.get(0),true);
+				ConvertBufferedImage.convertTo(noisy,images.get(1),true);
 				info.setError(algError,algErrorEdge,noiseError,noiseErrorEdge);
 				imagePanel.repaint();
 				info.repaint();

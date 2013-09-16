@@ -138,7 +138,7 @@ public class DetectFeaturePointSOApp<T extends ImageSingleBand, D extends ImageS
 
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
-				ConvertBufferedImage.convertTo(corruptImage, workImage);
+				ConvertBufferedImage.convertTo(corruptImage, workImage, true);
 				Graphics2D g2 = workImage.createGraphics();
 				g2.setStroke(new BasicStroke(3));
 				render.draw(g2);

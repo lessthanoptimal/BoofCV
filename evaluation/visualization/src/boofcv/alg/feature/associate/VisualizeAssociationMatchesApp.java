@@ -33,7 +33,6 @@ import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.alg.transform.ii.GIntegralImageOps;
 import boofcv.core.image.ConvertBufferedImage;
-import boofcv.core.image.GConvertImage;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.feature.describe.FactoryDescribeRegionPoint;
@@ -134,10 +133,8 @@ public class VisualizeAssociationMatchesApp<T extends ImageSingleBand, D extends
 		grayLeft.reshape(buffLeft.getWidth(), buffLeft.getHeight());
 		grayRight.reshape(buffRight.getWidth(), buffRight.getHeight());
 
-		ConvertBufferedImage.convertFromMulti(buffLeft, imageLeft, imageType);
-		ConvertBufferedImage.convertFromMulti(buffRight, imageRight, imageType);
-		GConvertImage.average(imageLeft, grayLeft);
-		GConvertImage.average(imageRight,grayRight);
+		ConvertBufferedImage.convertFromMulti(buffLeft, imageLeft, true, imageType);
+		ConvertBufferedImage.convertFromMulti(buffRight, imageRight, true, imageType);
 
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {

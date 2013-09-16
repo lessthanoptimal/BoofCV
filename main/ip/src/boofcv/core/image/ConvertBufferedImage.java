@@ -187,15 +187,16 @@ public class ConvertBufferedImage {
 	 * Converts a buffered image into an image of the specified type.
 	 * 
 	 * @param src Input BufferedImage which is to be converted
-	 * @param dst The image which it is being converted into   
+	 * @param dst The image which it is being converted into
+	 * @param orderRgb If applicable, should it adjust the ordering of each color band to maintain color consistency
 	 */
-	public static <T extends ImageBase> void convertFrom(BufferedImage src, T dst ) {
+	public static <T extends ImageBase> void convertFrom(BufferedImage src, T dst , boolean orderRgb) {
 		if( dst instanceof ImageSingleBand ) {
 			ImageSingleBand sb = (ImageSingleBand)dst;
 			convertFromSingle(src, sb, (Class<ImageSingleBand>) sb.getClass());
 		} else if( dst instanceof MultiSpectral ) {
 			MultiSpectral ms = (MultiSpectral)dst;
-			convertFromMulti(src,ms,ms.getType());
+			convertFromMulti(src,ms,orderRgb,ms.getType());
 		} else {
 			throw new IllegalArgumentException("Unknown type " + dst.getClass().getSimpleName());
 		}
@@ -319,13 +320,15 @@ public class ConvertBufferedImage {
 	 * Converts the buffered image into an {@link boofcv.struct.image.MultiSpectral} image of the specified
 	 * type. 
 	 *
-	 * @param src Input image.
-	 * @param dst Where the converted image is written to.  If null a new unsigned image is created.
+	 * @param src Input image. Not modified.
+	 * @param dst Output. The converted image is written to.  If null a new unsigned image is created.
+	 * @param orderRgb If applicable, should it adjust the ordering of each color band to maintain color consistency.
+	 *                 Most of the time you want this to be true.
 	 * @param type Which type of data structure is each band. (ImageUInt8 or ImageFloat32)
 	 * @return Converted image.
 	 */
 	public static <T extends ImageSingleBand> MultiSpectral<T>
-	convertFromMulti(BufferedImage src, MultiSpectral<T> dst , Class<T> type )
+	convertFromMulti(BufferedImage src, MultiSpectral<T> dst , boolean orderRgb , Class<T> type )
 	{
 		if( src == null )
 			throw new IllegalArgumentException("src is null!");
@@ -394,17 +397,24 @@ public class ConvertBufferedImage {
 			}
 		}
 
+		// if requested, ensure the ordering of the bands
+		if( orderRgb ) {
+			orderBandsIntoRGB(dst,src);
+		}
+
 		return dst;
 	}
 
 	/**
-	 * Converts an image which extends {@link boofcv.struct.image.ImageSingleBand} into a BufferedImage.
+	 * Converts an image into a BufferedImage.
 	 *
 	 * @param src Input image.  Pixels must have a value from 0 to 255.
 	 * @param dst Where the converted image is written to.  If null a new image is created.
+	 * @param orderRgb If applicable, should it change the order of the color bands (assumed RGB or ARGB) into the
+	 *                 order based on BufferedImage.TYPE. Most of the time you want this to be true.
 	 * @return Converted image.
 	 */
-	public static BufferedImage convertTo( ImageBase src, BufferedImage dst) {
+	public static BufferedImage convertTo( ImageBase src, BufferedImage dst, boolean orderRgb ) {
 		if( src instanceof ImageSingleBand ) {
 			if( ImageUInt8.class == src.getClass() ) {
 				return convertTo((ImageUInt8)src,dst);
@@ -417,10 +427,11 @@ public class ConvertBufferedImage {
 			}
 		} else if( src instanceof MultiSpectral ) {
 			MultiSpectral ms = (MultiSpectral)src;
+
 			if( ImageUInt8.class == ms.getType() ) {
-				return convertTo_U8((MultiSpectral<ImageUInt8>) ms, dst);
+				return convertTo_U8((MultiSpectral<ImageUInt8>) ms, dst, orderRgb);
 			} else if( ImageFloat32.class == ms.getType() ) {
-				return convertTo_F32((MultiSpectral<ImageFloat32>) ms, dst);
+				return convertTo_F32((MultiSpectral<ImageFloat32>) ms, dst, orderRgb);
 			} else {
 				throw new IllegalArgumentException("MultiSpectral type is not yet supported: "+ ms.getType().getSimpleName());
 			}
@@ -525,10 +536,16 @@ public class ConvertBufferedImage {
 	 *
 	 * @param src Input image.
 	 * @param dst Where the converted image is written to.  If null a new image is created.
+	 * @param orderRgb If applicable, should it change the order of the color bands (assumed RGB or ARGB) into the
+	 *                 order based on BufferedImage.TYPE. Most of the time you want this to be true.
 	 * @return Converted image.
 	 */
-	public static BufferedImage convertTo_U8(MultiSpectral<ImageUInt8> src, BufferedImage dst) {
+	public static BufferedImage convertTo_U8(MultiSpectral<ImageUInt8> src, BufferedImage dst, boolean orderRgb ) {
 		dst = checkInputs(src, dst);
+
+		if( orderRgb ) {
+			src = orderBandsIntoBuffered(src, dst);
+		}
 
 		try {
 			if (dst.getRaster() instanceof ByteInterleavedRaster &&
@@ -554,10 +571,16 @@ public class ConvertBufferedImage {
 	 *
 	 * @param src Input image.
 	 * @param dst Where the converted image is written to.  If null a new image is created.
+	 * @param orderRgb If applicable, should it change the order of the color bands (assumed RGB or ARGB) into the
+	 *                 order based on BufferedImage.TYPE. Most of the time you want this to be true.
 	 * @return Converted image.
 	 */
-	public static BufferedImage convertTo_F32(MultiSpectral<ImageFloat32> src, BufferedImage dst) {
+	public static BufferedImage convertTo_F32(MultiSpectral<ImageFloat32> src, BufferedImage dst, boolean orderRgb) {
 		dst = checkInputs(src, dst);
+
+		if( orderRgb ) {
+			src = orderBandsIntoBuffered(src, dst);
+		}
 
 		try {
 			if (dst.getRaster() instanceof ByteInterleavedRaster &&
@@ -613,13 +636,35 @@ public class ConvertBufferedImage {
 	}
 
 	/**
+	 * Returns a new image with the color bands in the appropriate ordering.  The returned image will
+	 * reference the original image's image arrays.
+	 */
+	public static MultiSpectral orderBandsIntoBuffered(MultiSpectral src, BufferedImage dst) {
+		// see if no change is required
+		if( dst.getType() == BufferedImage.TYPE_INT_RGB )
+			return src;
+
+		MultiSpectral tmp = new MultiSpectral(src.type, src.getNumBands());
+		tmp.width = src.width;
+		tmp.height = src.height;
+		tmp.stride = src.stride;
+		tmp.startIndex = src.startIndex;
+		for( int i = 0; i < src.getNumBands(); i++ ) {
+			tmp.bands[i] = src.bands[i];
+		}
+		orderBandsIntoRGB(tmp, dst);
+		return tmp;
+	}
+
+	/**
 	 * If a MultiSpectral was created from a BufferedImage its colors might not be in the expected order.
 	 * Invoking this function ensures that the image will have the expected ordering.  For images with
 	 * 3 bands it will be RGB and for 4 bands it will be ARGB.
 	 */
 	public static <T extends ImageSingleBand>
 	void orderBandsIntoRGB( MultiSpectral<T> image , BufferedImage input ) {
-		
+
+		int bufferedImageType = -1;
 		boolean swap = false;
 
 		// see if access to the raster is restricted or not
@@ -631,9 +676,10 @@ public class ConvertBufferedImage {
 				((IntegerInterleavedRaster)raster).getDataStorage();
 			}
 
-			int bufferedImageType = input.getType();
+			bufferedImageType = input.getType();
 			if( bufferedImageType == BufferedImage.TYPE_3BYTE_BGR ||
 					bufferedImageType == BufferedImage.TYPE_INT_BGR ||
+					bufferedImageType == BufferedImage.TYPE_INT_ARGB ||
 					bufferedImageType == BufferedImage.TYPE_4BYTE_ABGR ) {
 				swap = true;
 			}
@@ -642,7 +688,8 @@ public class ConvertBufferedImage {
 			// so no need to re-order the bands
 		}
 
-		
+		// Output formats are: RGB and RGBA
+
 		if( swap ) {
 			if( image.getNumBands() == 3 ) {
 				T[] temp = (T[])Array.newInstance(image.getType(),3);
@@ -657,10 +704,17 @@ public class ConvertBufferedImage {
 			} else if( image.getNumBands() == 4 ) {
 				T[] temp = (T[])Array.newInstance(image.getType(),4);
 
-				temp[0] = image.getBand(0);
-				temp[1] = image.getBand(3);
-				temp[2] = image.getBand(2);
-				temp[3] = image.getBand(1);
+				if( bufferedImageType == BufferedImage.TYPE_INT_ARGB ) {
+					temp[0] = image.getBand(1);
+					temp[1] = image.getBand(2);
+					temp[2] = image.getBand(3);
+					temp[3] = image.getBand(0);
+				} else if( bufferedImageType == BufferedImage.TYPE_4BYTE_ABGR ) {
+					temp[0] = image.getBand(3);
+					temp[1] = image.getBand(2);
+					temp[2] = image.getBand(1);
+					temp[3] = image.getBand(0);
+				}
 
 				image.bands[0] = temp[0];
 				image.bands[1] = temp[1];

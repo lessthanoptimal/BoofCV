@@ -176,7 +176,7 @@ public class V4l4jVideo<T extends ImageBase> extends WindowAdapter
 		// This method is called when a new frame is ready.
 		// Don't forget to recycle it when done dealing with the frame.
 
-		ConvertBufferedImage.convertFrom(frame.getBufferedImage(),imageBoof);
+		ConvertBufferedImage.convertFrom(frame.getBufferedImage(),imageBoof,true);
 		callback.nextFrame(imageBoof,frame.getBufferedImage(),frame.getCaptureTime());
 
 		// recycle the frame

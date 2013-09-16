@@ -141,6 +141,10 @@ public class TestAssociateNearestNeighbor extends StandardAssociateDescriptionCh
 
 			return false;
 		}
+
+		@Override
+		public void findNearest(double[] point, double maxDistance, int numNeighbors, FastQueue<NnData<D>> result) {
+		}
 	}
 
 }

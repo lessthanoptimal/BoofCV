@@ -76,7 +76,7 @@ public class OverlayRgbDepthStreamsApp implements StreamOpenKinectRgbDepth.Liste
 	@Override
 	public void processKinect(MultiSpectral<ImageUInt8> rgb, ImageUInt16 depth, long timeRgb, long timeDepth) {
 		VisualizeImageData.disparity(depth, buffDepth, 0, UtilOpenKinect.FREENECT_DEPTH_MM_MAX_VALUE,0);
-		ConvertBufferedImage.convertTo_U8(rgb,buffRgb);
+		ConvertBufferedImage.convertTo_U8(rgb,buffRgb,true);
 
 		Graphics2D g2 = buffRgb.createGraphics();
 		float alpha = 0.5f;

@@ -99,8 +99,7 @@ public class UtilImageIO {
 
 			if( !ImageIO.write(img, type, new File(fileName)) ) {
 				if( fileName.endsWith("ppm") || fileName.endsWith("PPM") ) {
-					MultiSpectral<ImageUInt8> color = ConvertBufferedImage.convertFromMulti(img,null,ImageUInt8.class);
-					ConvertBufferedImage.orderBandsIntoRGB(color,img);
+					MultiSpectral<ImageUInt8> color = ConvertBufferedImage.convertFromMulti(img,null,true,ImageUInt8.class);
 					savePPM(color, fileName, null);
 				}else
 					throw new IllegalArgumentException("No writter appropriate found");

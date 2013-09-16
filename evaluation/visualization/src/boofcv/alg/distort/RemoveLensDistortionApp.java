@@ -68,8 +68,7 @@ public class RemoveLensDistortionApp extends SelectAlgorithmAndInputPanel {
 		this.param = param;
 
 		// distorted image
-		dist = ConvertBufferedImage.convertFromMulti(orig, null, ImageFloat32.class);
-		ConvertBufferedImage.orderBandsIntoRGB(dist,orig);
+		dist = ConvertBufferedImage.convertFromMulti(orig, null,true, ImageFloat32.class);
 
 		// storage for undistorted image
 		undist = new MultiSpectral<ImageFloat32>(ImageFloat32.class,
@@ -104,7 +103,7 @@ public class RemoveLensDistortionApp extends SelectAlgorithmAndInputPanel {
 		GImageMiscOps.fill(undist, 0);
 		DistortImageOps.distortMS(dist, undist, undistorter);
 
-		final BufferedImage out = ConvertBufferedImage.convertTo(undist,null);
+		final BufferedImage out = ConvertBufferedImage.convertTo(undist,null,true);
 
 		// Add this rectified image
 		SwingUtilities.invokeLater(new Runnable() {

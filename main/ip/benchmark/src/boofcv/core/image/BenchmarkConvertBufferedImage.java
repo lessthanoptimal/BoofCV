@@ -49,7 +49,7 @@ public class BenchmarkConvertBufferedImage {
 	{
 		@Override
 		public void process() {
-			ConvertBufferedImage.convertFrom(imgBuff,boofImg);
+			ConvertBufferedImage.convertFrom(imgBuff,boofImg,true);
 		}
 	}
 
@@ -57,7 +57,7 @@ public class BenchmarkConvertBufferedImage {
 	{
 		@Override
 		public void process() {
-			ConvertBufferedImage.convertTo(boofImg,imgBuff);
+			ConvertBufferedImage.convertTo(boofImg,imgBuff,true);
 		}
 	}
 

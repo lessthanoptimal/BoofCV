@@ -73,7 +73,7 @@ public class ShowColorModelApp
 		input.reshape(image.getWidth(),image.getHeight());
 		output.reshape(image.getWidth(),image.getHeight());
 
-		ConvertBufferedImage.convertFromMulti(image, input, ImageFloat32.class);
+		ConvertBufferedImage.convertFromMulti(image, input,true, ImageFloat32.class);
 
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
