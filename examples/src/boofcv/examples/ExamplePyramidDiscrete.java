@@ -90,7 +90,7 @@ public class ExamplePyramidDiscrete<T extends ImageSingleBand> {
 		// To get an image at any of the scales simply call this get function
 		T imageAtScale = pyramid.getLayer(1);
 
-		ShowImages.showWindow(ConvertBufferedImage.convertTo(imageAtScale,null),"Image at layer 1");
+		ShowImages.showWindow(ConvertBufferedImage.convertTo(imageAtScale,null,true),"Image at layer 1");
 	}
 
 	public static void main( String[] args ) {

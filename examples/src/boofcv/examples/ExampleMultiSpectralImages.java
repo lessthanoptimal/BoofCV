@@ -52,7 +52,7 @@ public class ExampleMultiSpectralImages {
 	 */
 	public static void independent( BufferedImage input ) {
 		// convert the BufferedImage into a MultiSpectral
-		MultiSpectral<ImageUInt8> image = ConvertBufferedImage.convertFromMulti(input,null,ImageUInt8.class);
+		MultiSpectral<ImageUInt8> image = ConvertBufferedImage.convertFromMulti(input,null,true,ImageUInt8.class);
 
 		// declare the output blurred image
 		MultiSpectral<ImageUInt8> blurred =
@@ -68,38 +68,9 @@ public class ExampleMultiSpectralImages {
 		// Declare the BufferedImage manually to ensure that the color bands have the same ordering on input
 		// and output
 		BufferedImage output = new BufferedImage(image.width,image.height,input.getType());
-		ConvertBufferedImage.convertTo(blurred, output);
+		ConvertBufferedImage.convertTo(blurred, output,true);
 		ShowImages.showWindow(input,"Input");
 		ShowImages.showWindow(output,"Ouput");
-	}
-
-	/**
-	 * BufferedImage support many different image formats internally.  More often than not the order
-	 * of its bands are not RGB, which can cause problems when you expect it to be RGB.  A function
-	 * is provided that will swap the bands of a MultiSpectral image created from a BufferedImage
-	 * to ensure that it is in RGB ordering.
-	 */
-	public static void convertBufferedToRGB( BufferedImage input ) {
-
-		// convert the BufferedImage into a MultiSpectral
-		MultiSpectral<ImageUInt8> image = ConvertBufferedImage.convertFromMulti(input,null,ImageUInt8.class);
-
-		int x=15,y=15;
-		
-		// print the value of "red" at a pixel to make it easy to see the change
-		System.out.print("before: ");
-		for( int i = 0; i < image.getNumBands(); i++ )
-			System.out.print(image.getBand(i).get(x,y)+" ");
-		System.out.println();
-		
-		// change the bands
-		ConvertBufferedImage.orderBandsIntoRGB(image,input);
-
-		// THe value of red should be different of the BufferedImage was not in RGB format.
-		System.out.print("After:  ");
-		for( int i = 0; i < image.getNumBands(); i++ )
-			System.out.print(image.getBand(i).get(x,y)+" ");
-		System.out.println();
 	}
 
 	/**
@@ -107,7 +78,7 @@ public class ExampleMultiSpectralImages {
 	 */
 	public static void pixelAccess(  BufferedImage input ) {
 		// convert the BufferedImage into a MultiSpectral
-		MultiSpectral<ImageUInt8> image = ConvertBufferedImage.convertFromMulti(input,null,ImageUInt8.class);
+		MultiSpectral<ImageUInt8> image = ConvertBufferedImage.convertFromMulti(input,null,true,ImageUInt8.class);
 
 		int x = 10, y = 10;
 
@@ -131,7 +102,7 @@ public class ExampleMultiSpectralImages {
 	 */
 	public static void convertToGray( BufferedImage input ) {
 		// convert the BufferedImage into a MultiSpectral
-		MultiSpectral<ImageUInt8> image = ConvertBufferedImage.convertFromMulti(input,null,ImageUInt8.class);
+		MultiSpectral<ImageUInt8> image = ConvertBufferedImage.convertFromMulti(input,null,true,ImageUInt8.class);
 		
 		ImageUInt8 gray = new ImageUInt8( image.width,image.height);
 		
@@ -152,7 +123,6 @@ public class ExampleMultiSpectralImages {
 		// Uncomment lines below to run each example
 
 		ExampleMultiSpectralImages.independent(input);
-//		ExampleMultiSpectralImages.convertBufferedToRGB(input);
 //		ExampleMultiSpectralImages.pixelAccess(input);
 //		ExampleMultiSpectralImages.convertToGray(input);
 	}

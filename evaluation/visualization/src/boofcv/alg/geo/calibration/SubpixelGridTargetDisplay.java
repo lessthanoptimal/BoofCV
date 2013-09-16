@@ -107,7 +107,7 @@ public class SubpixelGridTargetDisplay<T extends ImageSingleBand>
 		double y = -visibleRect.y;
 
 		DistortImageOps.affine(input,transformed,TypeInterpolate.NEAREST_NEIGHBOR,scale,0,0,scale,x,y);
-		ConvertBufferedImage.convertTo(transformed,workImage);
+		ConvertBufferedImage.convertTo(transformed,workImage,true);
 	}
 
 	@Override

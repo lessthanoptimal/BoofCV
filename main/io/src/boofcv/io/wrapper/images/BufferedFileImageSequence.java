@@ -77,7 +77,7 @@ public class BufferedFileImageSequence<T extends ImageBase> implements SimpleIma
 		for (String s : listNames) {
 			BufferedImage b = orig[index] = UtilImageIO.loadImage(directory.getPath()+"/"+s);
 			T a = images[index++] = type.createImage(b.getWidth(),b.getHeight());
-			ConvertBufferedImage.convertFrom(b, a);
+			ConvertBufferedImage.convertFrom(b, a, true);
 		}
 	}
 
@@ -92,7 +92,7 @@ public class BufferedFileImageSequence<T extends ImageBase> implements SimpleIma
 		for( int i = 0; i < orig.length; i++ ) {
 			BufferedImage b = orig[i];
 			images[i] = type.createImage(b.getWidth(),b.getHeight());
-			ConvertBufferedImage.convertFrom(orig[i], images[i]);
+			ConvertBufferedImage.convertFrom(orig[i], images[i], true);
 		}
 	}
 

@@ -79,7 +79,7 @@ implements SimpleImageSequence<T>
 	public T next() {
 		original = next;
 		image.reshape(original.getWidth(),original.getHeight());
-		ConvertBufferedImage.convertFrom(original,image);
+		ConvertBufferedImage.convertFrom(original,image, true);
 		readNext();
 		return image;
 	}

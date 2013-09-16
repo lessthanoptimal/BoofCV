@@ -228,7 +228,7 @@ public class XugglerSimplified<T extends ImageBase> implements SimpleImageSequen
 		}
 
 		image.reshape(imageGUI.getWidth(),imageGUI.getHeight());
-		ConvertBufferedImage.convertFrom(imageGUI, image);
+		ConvertBufferedImage.convertFrom(imageGUI, image,true);
 		return image;
 	}
 

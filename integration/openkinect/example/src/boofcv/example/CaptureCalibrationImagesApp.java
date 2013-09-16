@@ -142,7 +142,7 @@ public class CaptureCalibrationImagesApp implements KeyListener, StreamOpenKinec
 	public void processKinect(MultiSpectral<ImageUInt8> rgb, ImageUInt16 depth, long timeRgb, long timeDepth) {
 
 		if( updateDisplay ) {
-			ConvertBufferedImage.convertTo_U8(rgb,buffRgb);
+			ConvertBufferedImage.convertTo_U8(rgb,buffRgb,true);
 
 			if( timeText >= System.currentTimeMillis() ) {
 				Graphics2D g2 = buffRgb.createGraphics();

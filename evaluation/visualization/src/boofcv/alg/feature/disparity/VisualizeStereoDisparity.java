@@ -388,8 +388,8 @@ public class VisualizeStereoDisparity <T extends ImageSingleBand, D extends Imag
 		rectLeft = GeneralizedImageOps.createSingleBand(activeAlg.getInputType(),w,h);
 		rectRight = GeneralizedImageOps.createSingleBand(activeAlg.getInputType(),w,h);
 
-		ConvertBufferedImage.convertFrom(colorLeft,inputLeft);
-		ConvertBufferedImage.convertFrom(colorRight,inputRight);
+		ConvertBufferedImage.convertFrom(colorLeft,inputLeft,true);
+		ConvertBufferedImage.convertFrom(colorRight,inputRight,true);
 
 		rectifyInputImages();
 

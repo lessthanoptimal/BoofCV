@@ -85,7 +85,7 @@ public class ScaleSpacePointPanel extends JPanel {
 					(levelImage.getWidth() != background.getWidth() ||
 					levelImage.getHeight() != background.getHeight()))
 				levelImage = null;
-			levelImage = ConvertBufferedImage.convertTo(ss.getScaledImage(),levelImage);
+			levelImage = ConvertBufferedImage.convertTo(ss.getScaledImage(),levelImage,true);
 
 			double scale = ss.getCurrentScale();
 			levelPoints.clear();

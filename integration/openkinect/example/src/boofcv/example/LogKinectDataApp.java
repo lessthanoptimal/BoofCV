@@ -114,7 +114,7 @@ public class LogKinectDataApp implements StreamOpenKinectRgbDepth.Listener {
 			frameNumber++;
 
 			if( showImage ) {
-				ConvertBufferedImage.convertTo_U8(rgb,buffRgb);
+				ConvertBufferedImage.convertTo_U8(rgb,buffRgb,true);
 				gui.repaint();
 			}
 		} catch (IOException e) {

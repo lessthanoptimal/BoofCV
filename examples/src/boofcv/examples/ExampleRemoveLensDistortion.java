@@ -62,8 +62,8 @@ public class ExampleRemoveLensDistortion {
 
 		// load images and convert the image into a color BoofCV format
 		BufferedImage orig = UtilImageIO.loadImage(imageDir + "dist_cyto_01.jpg");
-		MultiSpectral<ImageFloat32> distortedImg = ConvertBufferedImage.convertFromMulti(orig, null, ImageFloat32.class);
-		ConvertBufferedImage.orderBandsIntoRGB(distortedImg,orig);
+		MultiSpectral<ImageFloat32> distortedImg =
+				ConvertBufferedImage.convertFromMulti(orig, null,true, ImageFloat32.class);
 
 		// compute the transform to remove lens distortion
 		// The inverse transformation (adds distortion) is used when apply adjusting an image.
@@ -100,17 +100,17 @@ public class ExampleRemoveLensDistortion {
 		distort.setModel(new PointToPixelTransform_F32(tran));
 		GImageMiscOps.fill(undistortedImg, 0);
 		DistortImageOps.distortMS(distortedImg, undistortedImg, distort);
-		BufferedImage out1 = ConvertBufferedImage.convertTo(undistortedImg, null);
+		BufferedImage out1 = ConvertBufferedImage.convertTo(undistortedImg, null,true);
 
 		distort.setModel(new PointToPixelTransform_F32(fullView));
 		GImageMiscOps.fill(undistortedImg,0);
 		DistortImageOps.distortMS(distortedImg,undistortedImg,distort);
-		BufferedImage out2 = ConvertBufferedImage.convertTo(undistortedImg,null);
+		BufferedImage out2 = ConvertBufferedImage.convertTo(undistortedImg,null,true);
 
 		distort.setModel(new PointToPixelTransform_F32(allInside));
 		GImageMiscOps.fill(undistortedImg,0);
 		DistortImageOps.distortMS(distortedImg,undistortedImg,distort);
-		BufferedImage out3 = ConvertBufferedImage.convertTo(undistortedImg,null);
+		BufferedImage out3 = ConvertBufferedImage.convertTo(undistortedImg,null,true);
 
 		// display in a single window where the user can easily switch between images
 		ListDisplayPanel panel = new ListDisplayPanel();

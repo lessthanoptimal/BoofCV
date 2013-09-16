@@ -73,10 +73,8 @@ public class ShowRectifyCalibratedApp extends SelectAlgorithmAndInputPanel {
 		this.param = param;
 
 		// distorted images
-		distLeft = ConvertBufferedImage.convertFromMulti(origLeft, null, ImageFloat32.class);
-		distRight = ConvertBufferedImage.convertFromMulti(origRight, null, ImageFloat32.class);
-		ConvertBufferedImage.orderBandsIntoRGB(distLeft,origLeft);
-		ConvertBufferedImage.orderBandsIntoRGB(distRight,origRight);
+		distLeft = ConvertBufferedImage.convertFromMulti(origLeft, null, true, ImageFloat32.class);
+		distRight = ConvertBufferedImage.convertFromMulti(origRight, null, true, ImageFloat32.class);
 
 		// storage for undistorted + rectified images
 		rectLeft = new MultiSpectral<ImageFloat32>(ImageFloat32.class,
@@ -133,8 +131,8 @@ public class ShowRectifyCalibratedApp extends SelectAlgorithmAndInputPanel {
 		DistortImageOps.distortMS(distRight, rectRight, imageDistortRight);
 
 		// convert for output
-		final BufferedImage outLeft = ConvertBufferedImage.convertTo(rectLeft,null);
-		final BufferedImage outRight = ConvertBufferedImage.convertTo(rectRight, null);
+		final BufferedImage outLeft = ConvertBufferedImage.convertTo(rectLeft, null,true);
+		final BufferedImage outRight = ConvertBufferedImage.convertTo(rectRight, null, true);
 
 		// Add this rectified image
 		SwingUtilities.invokeLater(new Runnable() {

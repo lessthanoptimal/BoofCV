@@ -176,7 +176,7 @@ public abstract class VideoStitchBaseApp<I extends ImageBase, IT extends Inverti
 			return;
 
 		corners = alg.getImageCorners(frame.width,frame.height,null);
-		ConvertBufferedImage.convertTo(alg.getStitchedImage(), stitchOut);
+		ConvertBufferedImage.convertTo(alg.getStitchedImage(), stitchOut,true);
 
 		if( checkLocation(corners) ) {
 			// the change will only be visible in the next update

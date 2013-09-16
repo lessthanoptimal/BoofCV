@@ -108,7 +108,7 @@ public class VisualizeRegionDescriptionApp <T extends ImageSingleBand, D extends
 				T input = ConvertBufferedImage.convertFromSingle(image, null, imageType);
 				describe.setImage(input);
 			} else {
-				MultiSpectral<T> input = ConvertBufferedImage.convertFromMulti(image, null, imageType);
+				MultiSpectral<T> input = ConvertBufferedImage.convertFromMulti(image, null, true, imageType);
 				describe.setImage(input);
 			}
 		}

@@ -39,8 +39,7 @@ public class ExampleColorSpace {
 		BufferedImage image = UtilImageIO.loadImage("../data/applet/sunflowers.jpg");
 
 		// Convert input image into a BoofCV RGB image
-		MultiSpectral<ImageFloat32> rgb = ConvertBufferedImage.convertFromMulti(image, null, ImageFloat32.class);
-		ConvertBufferedImage.orderBandsIntoRGB(rgb,image);
+		MultiSpectral<ImageFloat32> rgb = ConvertBufferedImage.convertFromMulti(image, null,true, ImageFloat32.class);
 
 		//---- convert RGB image into different color formats
 		MultiSpectral<ImageFloat32> hsv = new MultiSpectral<ImageFloat32>(ImageFloat32.class,rgb.width,rgb.height,3);

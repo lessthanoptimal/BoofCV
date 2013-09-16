@@ -70,11 +70,8 @@ public class ExampleSegmentColor {
 	 * models.
 	 */
 	public static void showSelectedColor( String name , BufferedImage image , float hue , float saturation ) {
-		MultiSpectral<ImageFloat32> input = ConvertBufferedImage.convertFromMulti(image,null,ImageFloat32.class);
+		MultiSpectral<ImageFloat32> input = ConvertBufferedImage.convertFromMulti(image,null,true,ImageFloat32.class);
 		MultiSpectral<ImageFloat32> hsv = new MultiSpectral<ImageFloat32>(ImageFloat32.class,input.width,input.height,3);
-
-		// Ensure the the bands are in RGB order
-		ConvertBufferedImage.orderBandsIntoRGB(input,image);
 
 		// Convert into HSV
 		ColorHsv.rgbToHsv_F32(input,hsv);

@@ -62,7 +62,7 @@ public class VisualizeTldDetectionApp<T extends ImageSingleBand,D extends ImageS
 		super(new BorderLayout());
 		this.input = input;
 		gray = GeneralizedImageOps.createSingleBand(imageType,input.getWidth(),input.getHeight());
-		ConvertBufferedImage.convertFrom(input,gray);
+		ConvertBufferedImage.convertFrom(input,gray,true);
 
 		tracker = new TldTracker<T,D>(new TldConfig<T,D>(false,imageType));
 		tracker.setPerformLearning(false);

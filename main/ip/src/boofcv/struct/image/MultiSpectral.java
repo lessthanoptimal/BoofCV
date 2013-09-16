@@ -96,7 +96,7 @@ public class MultiSpectral<T extends ImageSingleBand> extends ImageBase<MultiSpe
 	 * @param type The type of image which each band is stored as. 
 	 * @param numBands Number of bands in the image.
 	 */
-	protected MultiSpectral(Class<T> type, int numBands) {
+	public MultiSpectral(Class<T> type, int numBands) {
 		this.type = type;
 		bands = (T[]) Array.newInstance(type, numBands);
 	}

@@ -60,11 +60,11 @@ public class TestConvertRaster {
 			if (!isTestMethod(m))
 				continue;
 
-//			System.out.println("Examining: " + m.getName());
+			System.out.println("Examining: " + m.getName());
 			if (m.getName().contains("bufferedTo"))
 				testBufferedTo(m);
 			else if (m.getName().contains("ToBuffered"))
-				testGrayTo(m);
+				testImageTo(m);
 			else
 				throw new RuntimeException("Unknown convert type.");
 
@@ -182,11 +182,14 @@ public class TestConvertRaster {
 		if (paramType == ByteInterleavedRaster.class) {
 			// the code is handled different when a different number of channels is used
 			input = new BufferedImage[]{
-					createByteBuff(imgWidth, imgHeight, 4, rand),
-					createByteBuff(imgWidth, imgHeight, 3, rand),
-					createByteBuff(imgWidth, imgHeight, 1, rand)};
+					createByteBuffByType(imgWidth, imgHeight, BufferedImage.TYPE_3BYTE_BGR, rand),
+					createByteBuffByType(imgWidth, imgHeight, BufferedImage.TYPE_4BYTE_ABGR, rand),
+					createByteBuffByType(imgWidth, imgHeight, BufferedImage.TYPE_BYTE_GRAY, rand)};
 		} else if (paramType == IntegerInterleavedRaster.class) {
-			input = new BufferedImage[]{createIntBuff(imgWidth, imgHeight, rand)};
+			input = new BufferedImage[]{
+					createByteBuffByType(imgWidth, imgHeight, BufferedImage.TYPE_INT_ARGB, rand),
+					createByteBuffByType(imgWidth, imgHeight,BufferedImage.TYPE_INT_BGR, rand),
+					createByteBuffByType(imgWidth, imgHeight,BufferedImage.TYPE_INT_RGB, rand)};
 		} else if( paramType == ShortInterleavedRaster.class ) {
 			input = new BufferedImage[]{createShortBuff(imgWidth, imgHeight, rand)};
 		} else if (paramType == BufferedImage.class) {
@@ -200,12 +203,18 @@ public class TestConvertRaster {
 
 	public void performBufferedTo(Method m, BufferedImage input, ImageBase output) {
 		try {
-			if (Raster.class.isAssignableFrom(m.getParameterTypes()[0]))
+			if (Raster.class.isAssignableFrom(m.getParameterTypes()[0])) {
 				m.invoke(null, input.getRaster(), output);
-			else
-				m.invoke(null, input, output);
 
-			BoofTesting.checkEquals(input, output, 1f);
+				// read directly from raster if the raster is an input
+				if( MultiSpectral.class.isAssignableFrom(output.getClass()) )
+					BoofTesting.checkEquals(input.getRaster(),(MultiSpectral)output,1);
+				else
+					BoofTesting.checkEquals(input, output, false, 1f);
+			} else {
+				m.invoke(null, input, output);
+				BoofTesting.checkEquals(input, output, false, 1f);
+			}
 		} catch (IllegalAccessException e) {
 			throw new RuntimeException(e);
 		} catch (InvocationTargetException e) {
@@ -213,7 +222,7 @@ public class TestConvertRaster {
 		}
 	}
 
-	private void testGrayTo(Method m) {
+	private void testImageTo(Method m) {
 
 		Class paramTypes[] = m.getParameterTypes();
 
@@ -223,18 +232,25 @@ public class TestConvertRaster {
 			ImageBase input = createImage(m, paramTypes[0], output[i]);
 			GImageMiscOps.fillUniform(input, rand, 0, 50);
 
-			BoofTesting.checkSubImage(this, "performGrayTo", true, m, input, output[i]);
+			BoofTesting.checkSubImage(this, "performImageTo", true, m, input, output[i]);
 		}
 	}
 
-	public void performGrayTo(Method m, ImageBase input, BufferedImage output) {
+	public void performImageTo(Method m, ImageBase input, BufferedImage output) {
 		try {
-			if (Raster.class.isAssignableFrom(m.getParameterTypes()[1]))
+			if (Raster.class.isAssignableFrom(m.getParameterTypes()[1])) {
 				m.invoke(null, input, output.getRaster());
-			else
-				m.invoke(null, input, output);
 
-			BoofTesting.checkEquals(output, input, 1f);
+				// read directly from raster if the raster is an input
+				if( MultiSpectral.class.isAssignableFrom(input.getClass()) )
+					BoofTesting.checkEquals(output.getRaster(),(MultiSpectral)input,1);
+				else
+					BoofTesting.checkEquals(output, input,false,  1f);
+			} else {
+				m.invoke(null, input, output);
+				BoofTesting.checkEquals(output, input, false, 1f);
+			}
+
 		} catch (IllegalAccessException e) {
 			throw new RuntimeException(e);
 		} catch (InvocationTargetException e) {
@@ -255,6 +271,14 @@ public class TestConvertRaster {
 		} else {
 			throw new RuntimeException("Unexpected number of bands");
 		}
+
+		randomize(ret, rand);
+
+		return ret;
+	}
+
+	public static BufferedImage createByteBuffByType(int width, int height, int type, Random rand) {
+		BufferedImage ret = new BufferedImage(width, height, type);
 
 		randomize(ret, rand);
 

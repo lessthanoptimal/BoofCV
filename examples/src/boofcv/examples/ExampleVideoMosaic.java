@@ -113,8 +113,8 @@ public class ExampleVideoMosaic {
 			}
 
 			// display the mosaic
-			ConvertBufferedImage.convertTo(frame,gui.getImage(0, 0));
-			ConvertBufferedImage.convertTo(stitch.getStitchedImage(), gui.getImage(0, 1));
+			ConvertBufferedImage.convertTo(frame,gui.getImage(0, 0),true);
+			ConvertBufferedImage.convertTo(stitch.getStitchedImage(), gui.getImage(0, 1),true);
 
 			gui.repaint();
 

@@ -122,7 +122,7 @@ public class ShowLensDistortion<T extends ImageSingleBand>
 		input.reshape(image.getWidth(),image.getHeight());
 		output.reshape(image.getWidth(),image.getHeight());
 
-		ConvertBufferedImage.convertFromMulti(image, input, imageType);
+		ConvertBufferedImage.convertFromMulti(image, input, true, imageType);
 
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
@@ -171,7 +171,7 @@ public class ShowLensDistortion<T extends ImageSingleBand>
 			DistortImageOps.distortSingle(bandIn,bandOut,tran,false, TypeInterpolate.BILINEAR);
 		}
 		thread.stopThread();
-		ConvertBufferedImage.convertTo(output, renderedImage);
+		ConvertBufferedImage.convertTo(output, renderedImage, true);
 
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {

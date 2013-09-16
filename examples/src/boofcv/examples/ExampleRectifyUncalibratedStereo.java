@@ -65,16 +65,16 @@ public class ExampleRectifyUncalibratedStereo {
 	public static void rectify( DenseMatrix64F F , List<AssociatedPair> inliers ,
 								BufferedImage origLeft , BufferedImage origRight ) {
 		// distorted images
-		MultiSpectral<ImageFloat32> distLeft = ConvertBufferedImage.convertFromMulti(origLeft, null, ImageFloat32.class);
-		MultiSpectral<ImageFloat32> distRight = ConvertBufferedImage.convertFromMulti(origRight, null, ImageFloat32.class);
+		MultiSpectral<ImageFloat32> distLeft =
+				ConvertBufferedImage.convertFromMulti(origLeft, null,true, ImageFloat32.class);
+		MultiSpectral<ImageFloat32> distRight =
+				ConvertBufferedImage.convertFromMulti(origRight, null,true, ImageFloat32.class);
 
 		// storage for rectified images
 		MultiSpectral<ImageFloat32> rectLeft = new MultiSpectral<ImageFloat32>(ImageFloat32.class,
 				distLeft.getWidth(),distLeft.getHeight(),distLeft.getNumBands());
 		MultiSpectral<ImageFloat32> rectRight = new MultiSpectral<ImageFloat32>(ImageFloat32.class,
 				distRight.getWidth(),distRight.getHeight(),distRight.getNumBands());
-		ConvertBufferedImage.orderBandsIntoRGB(distLeft,origLeft);
-		ConvertBufferedImage.orderBandsIntoRGB(distRight,origRight);
 
 		// Compute rectification
 		RectifyFundamental rectifyAlg = RectifyImageOps.createUncalibrated();
@@ -99,8 +99,8 @@ public class ExampleRectifyUncalibratedStereo {
 		DistortImageOps.distortMS(distRight, rectRight, imageDistortRight);
 
 		// convert for output
-		BufferedImage outLeft = ConvertBufferedImage.convertTo(rectLeft,null);
-		BufferedImage outRight = ConvertBufferedImage.convertTo(rectRight, null);
+		BufferedImage outLeft = ConvertBufferedImage.convertTo(rectLeft,null,true);
+		BufferedImage outRight = ConvertBufferedImage.convertTo(rectRight, null,true);
 
 		// show results and draw a horizontal line where the user clicks to see rectification easier
 		// Don't worry if the image appears upside down

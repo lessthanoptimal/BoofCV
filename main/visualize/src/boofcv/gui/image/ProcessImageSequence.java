@@ -186,7 +186,7 @@ public abstract class ProcessImageSequence<T extends ImageSingleBand> implements
 			System.out.println("Saving image");
 			String name = String.format("image%05d.jpg", savedIndex++);
 
-			BufferedImage img = ConvertBufferedImage.convertTo(image,null);
+			BufferedImage img = ConvertBufferedImage.convertTo(image,null,true);
 			UtilImageIO.saveImage(img, name);
 
 		} else {

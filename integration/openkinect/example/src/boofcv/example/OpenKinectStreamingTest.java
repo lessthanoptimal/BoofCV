@@ -116,7 +116,7 @@ public class OpenKinectStreamingTest {
 		}
 
 		UtilOpenKinect.bufferRgbToMsU8(frame, rgb);
-		ConvertBufferedImage.convertTo_U8(rgb,outRgb);
+		ConvertBufferedImage.convertTo_U8(rgb,outRgb,true);
 
 		guiRgb.repaint();
 	}
