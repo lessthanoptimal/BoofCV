@@ -265,7 +265,7 @@ public class VisOdomDualTrackPnP<T extends ImageSingleBand,Desc extends TupleDes
 		if( !matcher.process(data) )
 			return false;
 
-		Se3_F64 keyToCurr = matcher.getModel();
+		Se3_F64 keyToCurr = matcher.getModelParameters();
 		keyToCurr.invert(currToKey);
 
 		// mark tracks that are in the inlier set

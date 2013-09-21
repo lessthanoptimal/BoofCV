@@ -235,7 +235,7 @@ public class TestImageMotionPointTrackerKey {
 		}
 
 		@Override
-		public T getModel() {
+		public T getModelParameters() {
 			return found;
 		}
 
@@ -254,7 +254,7 @@ public class TestImageMotionPointTrackerKey {
 		}
 
 		@Override
-		public double getError() {
+		public double getFitQuality() {
 			return 0;
 		}
 

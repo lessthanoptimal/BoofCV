@@ -52,8 +52,8 @@ public class ModelMatcherTranGivenRot implements ModelMatcher<Vector3D_F64,Point
 	}
 
 	@Override
-	public Vector3D_F64 getModel() {
-		return alg.getModel();
+	public Vector3D_F64 getModelParameters() {
+		return alg.getModelParameters();
 	}
 
 	@Override
@@ -67,8 +67,8 @@ public class ModelMatcherTranGivenRot implements ModelMatcher<Vector3D_F64,Point
 	}
 
 	@Override
-	public double getError() {
-		return alg.getError();
+	public double getFitQuality() {
+		return alg.getFitQuality();
 	}
 
 	@Override

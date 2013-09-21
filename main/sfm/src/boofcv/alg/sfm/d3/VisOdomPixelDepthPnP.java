@@ -282,9 +282,9 @@ public class VisOdomPixelDepthPnP<T extends ImageBase> {
 
 		if( refine != null ) {
 			keyToCurr = new Se3_F64();
-			refine.process(motionEstimator.getModel(),motionEstimator.getMatchSet(),keyToCurr);
+			refine.process(motionEstimator.getModelParameters(),motionEstimator.getMatchSet(),keyToCurr);
 		} else {
-			keyToCurr = motionEstimator.getModel();
+			keyToCurr = motionEstimator.getModelParameters();
 		}
 
 		keyToCurr.invert(currToKey);
@@ -302,7 +302,7 @@ public class VisOdomPixelDepthPnP<T extends ImageBase> {
 	}
 
 	private boolean performSecondPass(List<PointTrack> active, List<Point2D3D> obs) {
-		Se3_F64 keyToCurr = motionEstimator.getModel();
+		Se3_F64 keyToCurr = motionEstimator.getModelParameters();
 
 		Point3D_F64 cameraPt = new Point3D_F64();
 		Point2D_F64 predicted = new Point2D_F64();

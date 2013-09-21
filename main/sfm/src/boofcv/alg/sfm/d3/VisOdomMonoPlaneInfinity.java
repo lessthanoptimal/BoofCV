@@ -481,7 +481,7 @@ public class VisOdomMonoPlaneInfinity<T extends ImageBase> {
 			return false;
 
 		// save solutions
-		closeMotionKeyToCurr = planeMotion.getModel();
+		closeMotionKeyToCurr = planeMotion.getModelParameters();
 		closeInlierCount = planeMotion.getMatchSet().size();
 
 		// mark inliers as used

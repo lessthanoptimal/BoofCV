@@ -257,7 +257,7 @@ public class TestImageMotionPtkSmartRespawn {
 		public boolean process(List<AssociatedPair> dataSet) {return false;}
 
 		@Override
-		public Affine2D_F64 getModel() {return null;}
+		public Affine2D_F64 getModelParameters() {return null;}
 
 		@Override
 		public List<AssociatedPair> getMatchSet() {
@@ -268,7 +268,7 @@ public class TestImageMotionPtkSmartRespawn {
 		public int getInputIndex(int matchIndex) {return 0;}
 
 		@Override
-		public double getError() {return 0;}
+		public double getFitQuality() {return 0;}
 
 		@Override
 		public int getMinimumSize() {return 0;}

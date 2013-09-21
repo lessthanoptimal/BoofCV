@@ -175,7 +175,7 @@ public abstract class GridRansacLineDetector<D extends ImageSingleBand> {
 				list.remove(e);
 			}
 
-			gridLines.add(convertToLineSegment(matchSet, robustMatcher.getModel()));
+			gridLines.add(convertToLineSegment(matchSet, robustMatcher.getModelParameters()));
 		}
 	}
 

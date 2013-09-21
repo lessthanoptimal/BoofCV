@@ -131,10 +131,10 @@ public class ImageMotionPointTrackerKey<I extends ImageBase, IT extends Invertib
 		}
 
 		if( modelRefiner != null ) {
-			if( !modelRefiner.fitModel(modelMatcher.getMatchSet(),modelMatcher.getModel(),keyToCurr) )
+			if( !modelRefiner.fitModel(modelMatcher.getMatchSet(),modelMatcher.getModelParameters(),keyToCurr) )
 				return false;
 		} else {
-			keyToCurr.set(modelMatcher.getModel());
+			keyToCurr.set(modelMatcher.getModelParameters());
 		}
 
 		// mark that the track is in the inlier set

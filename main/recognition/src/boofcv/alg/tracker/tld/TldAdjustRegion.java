@@ -71,7 +71,7 @@ public class TldAdjustRegion {
 		if( !estimateMotion.process(pairs.toList()) )
 			return false;
 
-		ScaleTranslate2D motion = estimateMotion.getModel();
+		ScaleTranslate2D motion = estimateMotion.getModelParameters();
 
 		adjustRectangle(targetRectangle,motion);
 
