@@ -424,7 +424,7 @@ public class VisOdomQuadPnP<T extends ImageSingleBand,TD extends TupleDesc> {
 		if( !matcher.process(modelFitData.toList()) )
 			return false;
 
-		Se3_F64 oldToNew = matcher.getModel();
+		Se3_F64 oldToNew = matcher.getModelParameters();
 
 //		System.out.println("matcher rot = "+toString(oldToNew));
 		// optionally refine the results

@@ -101,7 +101,7 @@ public class ExampleFundamentalMatrix {
 		DenseMatrix64F F = new DenseMatrix64F(3,3);
 		GeoModelRefine<DenseMatrix64F,AssociatedPair> refine =
 				FactoryMultiView.refineFundamental(1e-8, 400, EpipolarError.SAMPSON);
-		if( !refine.process(robustF.getModel(), inliers,F) )
+		if( !refine.process(robustF.getModelParameters(), inliers,F) )
 			throw new IllegalArgumentException("Failed");
 
 		// Return the solution

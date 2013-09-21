@@ -124,13 +124,13 @@ public class SparseFlowObjectTracker<Image extends ImageSingleBand, Derivative e
 			return false;
 		}
 
-		if( estimateMotion.getError() > config.robustMaxError ) {
+		if( estimateMotion.getFitQuality() > config.robustMaxError ) {
 			trackLost = true;
 			return false;
 		}
 
 		// update the target's location using the found motion
-		ScaleTranslateRotate2D model = estimateMotion.getModel();
+		ScaleTranslateRotate2D model = estimateMotion.getModelParameters();
 
 		region.width *= model.scale;
 		region.height *= model.scale;

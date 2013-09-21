@@ -176,7 +176,7 @@ public class ExampleStereoTwoViewsOneCamera {
 		// save inlier set for debugging purposes
 		inliers.addAll(epipolarMotion.getMatchSet());
 
-		return epipolarMotion.getModel();
+		return epipolarMotion.getModelParameters();
 	}
 
 	/**
