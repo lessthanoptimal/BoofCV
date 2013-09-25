@@ -19,7 +19,7 @@
 package boofcv.alg.geo;
 
 import georegression.geometry.RotationMatrixGenerator;
-import georegression.struct.so.Rodrigues;
+import georegression.struct.so.Rodrigues_F64;
 import org.ddogleg.optimization.JacobianChecker;
 import org.ddogleg.optimization.functions.FunctionNtoM;
 import org.ddogleg.optimization.functions.FunctionNtoMxN;
@@ -79,7 +79,7 @@ public class TestRodriguesRotationGradient {
 
 		@Override
 		public void process(double[] input, double[] output) {
-			Rodrigues r = new Rodrigues();
+			Rodrigues_F64 r = new Rodrigues_F64();
 
 			r.setParamVector(input[0],input[1],input[2]);
 			DenseMatrix64F M = DenseMatrix64F.wrap(3,3,output);
