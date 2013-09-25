@@ -22,7 +22,7 @@ import georegression.geometry.RotationMatrixGenerator;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
-import georegression.struct.so.Rodrigues;
+import georegression.struct.so.Rodrigues_F64;
 import org.ddogleg.fitting.modelset.ModelCodec;
 import org.ejml.data.DenseMatrix64F;
 import org.ejml.factory.DecompositionFactory;
@@ -31,7 +31,7 @@ import org.ejml.ops.CommonOps;
 
 /**
  * Parametrization for Bundle Adjustment with known calibration where the
- * rotation matrix is encoded using {@link Rodrigues} coordinates.
+ * rotation matrix is encoded using {@link Rodrigues_F64} coordinates.
  * 
  * @author Peter Abeles
  */
@@ -49,7 +49,7 @@ public class CalibPoseAndPointRodriguesCodec
 	boolean knownView[];
 
 	// storage
-	Rodrigues rotation = new Rodrigues();
+	Rodrigues_F64 rotation = new Rodrigues_F64();
 	DenseMatrix64F R = new DenseMatrix64F(3,3);
 
 	// used to make sure the rotation matrix is in SO(3)

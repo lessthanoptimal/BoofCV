@@ -21,7 +21,7 @@ package boofcv.alg.geo.pose;
 import georegression.geometry.RotationMatrixGenerator;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
-import georegression.struct.so.Rodrigues;
+import georegression.struct.so.Rodrigues_F64;
 import org.ddogleg.fitting.modelset.ModelCodec;
 import org.ejml.data.DenseMatrix64F;
 import org.ejml.factory.DecompositionFactory;
@@ -42,7 +42,7 @@ public class PnPRodriguesCodec implements ModelCodec<Se3_F64> {
 	// storage for rotation matrix
 	DenseMatrix64F R = new DenseMatrix64F(3,3);
 
-	Rodrigues rotation = new Rodrigues();
+	Rodrigues_F64 rotation = new Rodrigues_F64();
 
 	@Override
 	public void decode(double[] input, Se3_F64 outputModel) {

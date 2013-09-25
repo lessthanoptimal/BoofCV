@@ -20,7 +20,7 @@ package boofcv.alg.geo.calibration;
 
 import boofcv.struct.calib.IntrinsicParameters;
 import georegression.struct.point.Vector3D_F64;
-import georegression.struct.so.Rodrigues;
+import georegression.struct.so.Rodrigues_F64;
 
 /**
  * <p>
@@ -96,7 +96,7 @@ public class Zhang99Parameters {
 	public static class View
 	{
 		// description of rotation
-		public Rodrigues rotation = new Rodrigues();
+		public Rodrigues_F64 rotation = new Rodrigues_F64();
 		// translation
 		public Vector3D_F64 T = new Vector3D_F64();
 	}

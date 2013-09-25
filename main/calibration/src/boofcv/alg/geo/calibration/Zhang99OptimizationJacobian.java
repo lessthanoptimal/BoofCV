@@ -24,7 +24,7 @@ import georegression.geometry.RotationMatrixGenerator;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
-import georegression.struct.so.Rodrigues;
+import georegression.struct.so.Rodrigues_F64;
 import georegression.transform.se.SePointOps_F64;
 import org.ddogleg.optimization.functions.FunctionNtoMxN;
 import org.ejml.data.DenseMatrix64F;
@@ -52,7 +52,7 @@ public class Zhang99OptimizationJacobian implements FunctionNtoMxN {
 	RodriguesRotationJacobian rodJacobian = new RodriguesRotationJacobian();
 
 	// local variable which stores the predicted location of the feature in the camera frame
-	Rodrigues rodrigues = new Rodrigues();
+	Rodrigues_F64 rodrigues = new Rodrigues_F64();
 
 	// number of functions and parameters being optimized
 	private int numParam, numFuncs;
