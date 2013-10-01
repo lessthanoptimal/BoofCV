@@ -49,7 +49,7 @@ public class TestGridLineModelFitter {
 		l.add( new Edgel(0,0,(float)Math.PI/2f));
 		l.add( new Edgel(1,0,(float)-Math.PI/2f));
 
-		LinePolar2D_F32 model = alg.createModelInstance();
+		LinePolar2D_F32 model = new LinePolar2D_F32();
 		assertTrue(alg.generate(l, model));
 
 		// this one should fail
@@ -69,7 +69,7 @@ public class TestGridLineModelFitter {
 		l.add( new Edgel(1,0,0f));
 		l.add( new Edgel(1,2,(float)Math.PI));
 
-		LinePolar2D_F32 model = alg.createModelInstance();
+		LinePolar2D_F32 model = new LinePolar2D_F32();
 		assertTrue(alg.generate(l, model));
 
 		assertEquals(1,model.distance,1e-4f);

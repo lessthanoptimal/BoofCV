@@ -19,6 +19,7 @@
 package boofcv.factory.sfm;
 
 import boofcv.abst.feature.tracker.PointTracker;
+import boofcv.abst.geo.fitting.ModelManagerEpipolarMatrix;
 import boofcv.abst.sfm.d2.ImageMotion2D;
 import boofcv.abst.sfm.d2.WrapImageMotionPtkSmartRespawn;
 import boofcv.alg.distort.ImageDistort;
@@ -33,16 +34,15 @@ import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.MultiSpectral;
 import georegression.fitting.MotionTransformPoint;
+import georegression.fitting.affine.ModelManagerAffine2D_F64;
+import georegression.fitting.se.ModelManagerSe2_F64;
 import georegression.fitting.se.MotionSe2PointSVD_F64;
 import georegression.struct.InvertibleTransform;
 import georegression.struct.affine.Affine2D_F64;
 import georegression.struct.homo.Homography2D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.se.Se2_F64;
-import org.ddogleg.fitting.modelset.DistanceFromModel;
-import org.ddogleg.fitting.modelset.ModelFitter;
-import org.ddogleg.fitting.modelset.ModelGenerator;
-import org.ddogleg.fitting.modelset.ModelMatcher;
+import org.ddogleg.fitting.modelset.*;
 import org.ddogleg.fitting.modelset.ransac.Ransac;
 
 /**
@@ -77,23 +77,27 @@ public class FactoryMotion2D {
 										boolean refineEstimate ,
 										PointTracker<I> tracker , IT motionModel ) {
 
+		ModelManager<IT> manager;
 		ModelGenerator<IT,AssociatedPair> fitter;
 		DistanceFromModel<IT,AssociatedPair> distance;
 		ModelFitter<IT,AssociatedPair> modelRefiner = null;
 
 		if( motionModel instanceof Homography2D_F64) {
 			GenerateHomographyLinear mf = new GenerateHomographyLinear(true);
+			manager = (ModelManager)new ModelManagerEpipolarMatrix();
 			fitter = (ModelGenerator)mf;
 			if( refineEstimate )
 				modelRefiner = (ModelFitter)mf;
 			distance = (DistanceFromModel)new DistanceHomographySq();
 		} else if( motionModel instanceof Affine2D_F64) {
+			manager = (ModelManager)new ModelManagerAffine2D_F64();
 			GenerateAffine2D mf = new GenerateAffine2D();
 			fitter = (ModelGenerator)mf;
 			if( refineEstimate )
 				modelRefiner = (ModelFitter)mf;
 			distance =  (DistanceFromModel)new DistanceAffine2DSq();
 		} else if( motionModel instanceof Se2_F64) {
+			manager = (ModelManager)new ModelManagerSe2_F64();
 			MotionTransformPoint<Se2_F64, Point2D_F64> alg = new MotionSe2PointSVD_F64();
 			GenerateSe2_AssociatedPair mf = new GenerateSe2_AssociatedPair(alg);
 			fitter = (ModelGenerator)mf;
@@ -104,7 +108,7 @@ public class FactoryMotion2D {
 		}
 
 		ModelMatcher<IT,AssociatedPair>  modelMatcher =
-				new Ransac(123123,fitter,distance,ransacIterations,inlierThreshold);
+				new Ransac(123123,manager,fitter,distance,ransacIterations,inlierThreshold);
 
 		ImageMotionPointTrackerKey<I,IT> lowlevel =
 				new ImageMotionPointTrackerKey<I, IT>(tracker,modelMatcher,modelRefiner,motionModel,outlierPrune);

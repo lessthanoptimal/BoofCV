@@ -57,6 +57,8 @@ import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.sfm.PlanePtPixel;
 import boofcv.struct.sfm.Stereo2D3D;
+import georegression.fitting.se.ModelManagerSe2_F64;
+import georegression.fitting.se.ModelManagerSe3_F64;
 import georegression.struct.se.Se2_F64;
 import georegression.struct.se.Se3_F64;
 import org.ddogleg.fitting.modelset.ModelFitter;
@@ -100,11 +102,12 @@ public class FactoryVisualOdometry {
 		//squared pixel error
 		double ransacTOL = inlierPixelTol * inlierPixelTol;
 
+		ModelManagerSe2_F64 manager = new ModelManagerSe2_F64();
 		DistancePlane2DToPixelSq distance = new DistancePlane2DToPixelSq();
 		GenerateSe2_PlanePtPixel generator = new GenerateSe2_PlanePtPixel();
 
 		ModelMatcher<Se2_F64, PlanePtPixel> motion =
-				new Ransac<Se2_F64, PlanePtPixel>(2323, generator, distance, ransacIterations, ransacTOL);
+				new Ransac<Se2_F64, PlanePtPixel>(2323, manager, generator, distance, ransacIterations, ransacTOL);
 
 		VisOdomMonoPlaneInfinity<T> alg =
 				new VisOdomMonoPlaneInfinity<T>(thresholdAdd,thresholdRetire,inlierPixelTol,motion,tracker);
@@ -194,19 +197,15 @@ public class FactoryVisualOdometry {
 		Estimate1ofPnP estimator = FactoryMultiView.computePnP_1(EnumPNP.P3P_FINSTERWALDER,-1,2);
 		final DistanceModelMonoPixels<Se3_F64,Point2D3D> distance = new PnPDistanceReprojectionSq();
 
+		ModelManagerSe3_F64 manager = new ModelManagerSe3_F64();
 		EstimatorToGenerator<Se3_F64,Point2D3D> generator =
-				new EstimatorToGenerator<Se3_F64,Point2D3D>(estimator) {
-					@Override
-					public Se3_F64 createModelInstance() {
-						return new Se3_F64();
-					}
-				};
+				new EstimatorToGenerator<Se3_F64,Point2D3D>(estimator);
 
 		// 1/2 a pixel tolerance for RANSAC inliers
 		double ransacTOL = inlierPixelTol * inlierPixelTol;
 
 		ModelMatcher<Se3_F64, Point2D3D> motion =
-				new Ransac<Se3_F64, Point2D3D>(2323, generator, distance, ransacIterations, ransacTOL);
+				new Ransac<Se3_F64, Point2D3D>(2323, manager, generator, distance, ransacIterations, ransacTOL);
 
 		RefinePnP refine = null;
 
@@ -251,19 +250,14 @@ public class FactoryVisualOdometry {
 		Estimate1ofPnP estimator = FactoryMultiView.computePnP_1(EnumPNP.P3P_FINSTERWALDER,-1,2);
 		final DistanceModelMonoPixels<Se3_F64,Point2D3D> distance = new PnPDistanceReprojectionSq();
 
-		EstimatorToGenerator<Se3_F64,Point2D3D> generator =
-				new EstimatorToGenerator<Se3_F64,Point2D3D>(estimator) {
-					@Override
-					public Se3_F64 createModelInstance() {
-						return new Se3_F64();
-					}
-				};
+		ModelManagerSe3_F64 manager = new ModelManagerSe3_F64();
+		EstimatorToGenerator<Se3_F64,Point2D3D> generator = new EstimatorToGenerator<Se3_F64,Point2D3D>(estimator);
 
 		// 1/2 a pixel tolerance for RANSAC inliers
 		double ransacTOL = inlierPixelTol * inlierPixelTol;
 
 		ModelMatcher<Se3_F64, Point2D3D> motion =
-				new Ransac<Se3_F64, Point2D3D>(2323, generator, distance, ransacIterations, ransacTOL);
+				new Ransac<Se3_F64, Point2D3D>(2323, manager, generator, distance, ransacIterations, ransacTOL);
 
 		RefinePnP refine = null;
 
@@ -312,19 +306,14 @@ public class FactoryVisualOdometry {
 		PnPStereoDistanceReprojectionSq distanceStereo = new PnPStereoDistanceReprojectionSq();
 		PnPStereoEstimator pnpStereo = new PnPStereoEstimator(pnp,distanceMono,0);
 
-		EstimatorToGenerator<Se3_F64,Stereo2D3D> generator =
-				new EstimatorToGenerator<Se3_F64,Stereo2D3D>(pnpStereo) {
-					@Override
-					public Se3_F64 createModelInstance() {
-						return new Se3_F64();
-					}
-				};
+		ModelManagerSe3_F64 manager = new ModelManagerSe3_F64();
+		EstimatorToGenerator<Se3_F64,Stereo2D3D> generator = new EstimatorToGenerator<Se3_F64,Stereo2D3D>(pnpStereo);
 
 		// Pixel tolerance for RANSAC inliers - euclidean error squared from left + right images
 		double ransacTOL = 2*inlierPixelTol * inlierPixelTol;
 
 		ModelMatcher<Se3_F64, Stereo2D3D> motion =
-				new Ransac<Se3_F64, Stereo2D3D>(2323, generator, distanceStereo, ransacIterations, ransacTOL);
+				new Ransac<Se3_F64, Stereo2D3D>(2323, manager, generator, distanceStereo, ransacIterations, ransacTOL);
 
 		RefinePnPStereo refinePnP = null;
 		ModelFitter<Se3_F64,Stereo2D3D> refine = null;
@@ -342,13 +331,7 @@ public class FactoryVisualOdometry {
 
 		if( refineIterations > 0 ) {
 			refinePnP = new PnPStereoRefineRodrigues(1e-12,refineIterations);
-			refine = new GeoModelRefineToModelFitter<Se3_F64,Stereo2D3D>(refinePnP) {
-
-				@Override
-				public Se3_F64 createModelInstance() {
-					return new Se3_F64();
-				}
-			};
+			refine = new GeoModelRefineToModelFitter<Se3_F64,Stereo2D3D>(refinePnP);
 		}
 
 		TriangulateTwoViewsCalibrated triangulate = FactoryTriangulate.twoGeometric();
@@ -380,32 +363,21 @@ public class FactoryVisualOdometry {
 		PnPStereoDistanceReprojectionSq distanceStereo = new PnPStereoDistanceReprojectionSq();
 		PnPStereoEstimator pnpStereo = new PnPStereoEstimator(pnp,distanceMono,0);
 
-		EstimatorToGenerator<Se3_F64,Stereo2D3D> generator =
-				new EstimatorToGenerator<Se3_F64,Stereo2D3D>(pnpStereo) {
-					@Override
-					public Se3_F64 createModelInstance() {
-						return new Se3_F64();
-					}
-				};
+		ModelManagerSe3_F64 manager = new ModelManagerSe3_F64();
+		EstimatorToGenerator<Se3_F64,Stereo2D3D> generator = new EstimatorToGenerator<Se3_F64,Stereo2D3D>(pnpStereo);
 
 		// Pixel tolerance for RANSAC inliers - euclidean error squared from left + right images
 		double ransacTOL = 2*inlierPixelTol * inlierPixelTol;
 
 		ModelMatcher<Se3_F64, Stereo2D3D> motion =
-				new Ransac<Se3_F64, Stereo2D3D>(2323, generator, distanceStereo, ransacIterations, ransacTOL);
+				new Ransac<Se3_F64, Stereo2D3D>(2323, manager, generator, distanceStereo, ransacIterations, ransacTOL);
 
 		RefinePnPStereo refinePnP = null;
 		ModelFitter<Se3_F64,Stereo2D3D> refine = null;
 
 		if( refineIterations > 0 ) {
 			refinePnP = new PnPStereoRefineRodrigues(1e-12,refineIterations);
-			refine = new GeoModelRefineToModelFitter<Se3_F64,Stereo2D3D>(refinePnP) {
-
-				@Override
-				public Se3_F64 createModelInstance() {
-					return new Se3_F64();
-				}
-			};
+			refine = new GeoModelRefineToModelFitter<Se3_F64,Stereo2D3D>(refinePnP);
 		}
 		Class<Desc> descType = detector.getDescriptionType();
 

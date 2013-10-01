@@ -16,33 +16,20 @@
  * limitations under the License.
  */
 
-package boofcv.alg.sfm.robust;
+package boofcv.abst.geo.fitting;
 
-import boofcv.struct.geo.GeoModelEstimator1;
-import org.ddogleg.fitting.modelset.ModelGenerator;
+import org.junit.Test;
 
-import java.util.List;
+import static org.junit.Assert.fail;
 
 /**
- * Wrapper class for converting {@link GeoModelEstimator1} into {@link ModelGenerator}.
- *
  * @author Peter Abeles
  */
-public class EstimatorToGenerator<Model,Point> implements ModelGenerator<Model,Point> {
+public class TestModelManagerEpipolarMatrix {
 
-	GeoModelEstimator1<Model,Point> alg;
-
-	public EstimatorToGenerator(GeoModelEstimator1<Model, Point> alg ) {
-		this.alg = alg;
+	@Test
+	public void stuff() {
+		fail("Implement");
 	}
 
-	@Override
-	public boolean generate(List<Point> dataSet, Model out) {
-		return alg.process(dataSet,out);
-	}
-
-	@Override
-	public int getMinimumPoints() {
-		return alg.getMinimumPoints();
-	}
 }

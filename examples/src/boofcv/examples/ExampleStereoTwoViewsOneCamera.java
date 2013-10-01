@@ -50,9 +50,11 @@ import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSInt16;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
+import georegression.fitting.se.ModelManagerSe3_F64;
 import georegression.struct.se.Se3_F64;
 import org.ddogleg.fitting.modelset.DistanceFromModel;
 import org.ddogleg.fitting.modelset.ModelGenerator;
+import org.ddogleg.fitting.modelset.ModelManager;
 import org.ddogleg.fitting.modelset.ModelMatcher;
 import org.ddogleg.fitting.modelset.ransac.Ransac;
 import org.ejml.data.DenseMatrix64F;
@@ -155,6 +157,7 @@ public class ExampleStereoTwoViewsOneCamera {
 	{
 		Estimate1ofEpipolar essentialAlg = FactoryMultiView.computeFundamental_1(EnumEpipolar.ESSENTIAL_5_NISTER, 5);
 		TriangulateTwoViewsCalibrated triangulate = FactoryTriangulate.twoGeometric();
+		ModelManager<Se3_F64> manager = new ModelManagerSe3_F64();
 		ModelGenerator<Se3_F64, AssociatedPair> generateEpipolarMotion =
 				new Se3FromEssentialGenerator(essentialAlg, triangulate);
 
@@ -167,7 +170,7 @@ public class ExampleStereoTwoViewsOneCamera {
 		double ransacTOL = 0.5 * 0.5 * 2.0;
 
 		ModelMatcher<Se3_F64, AssociatedPair> epipolarMotion =
-				new Ransac<Se3_F64, AssociatedPair>(2323, generateEpipolarMotion, distanceSe3,
+				new Ransac<Se3_F64, AssociatedPair>(2323, manager, generateEpipolarMotion, distanceSe3,
 						200, ransacTOL);
 
 		if (!epipolarMotion.process(matchedNorm))

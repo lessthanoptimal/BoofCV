@@ -78,7 +78,7 @@ public class TestSe3FromEssentialGenerator {
 
 		Se3FromEssentialGenerator alg = new Se3FromEssentialGenerator(essentialAlg,triangulate);
 
-		Se3_F64 found = alg.createModelInstance();
+		Se3_F64 found = new Se3_F64();
 
 		// recompute the motion
 		assertTrue(alg.generate(obs, found));

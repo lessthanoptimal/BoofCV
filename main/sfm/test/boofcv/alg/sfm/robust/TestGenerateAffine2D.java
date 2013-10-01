@@ -54,11 +54,16 @@ public class TestGenerateAffine2D implements ModelTestingInterface<Affine2D_F64,
 	public void modelGenerator() {
 		StandardModelGeneratorTests<Affine2D_F64,AssociatedPair> alg =
 				new StandardModelGeneratorTests<Affine2D_F64,AssociatedPair>(this,3) {
-			@Override
-			public ModelGenerator<Affine2D_F64,AssociatedPair> createAlg() {
-				return new GenerateAffine2D();
-			}
-		};
+					@Override
+					public ModelGenerator<Affine2D_F64,AssociatedPair> createAlg() {
+						return new GenerateAffine2D();
+					}
+
+					@Override
+					public Affine2D_F64 createModelInstance() {
+						return new Affine2D_F64();
+					}
+				};
 
 		alg.checkMinPoints();
 		alg.simpleTest();

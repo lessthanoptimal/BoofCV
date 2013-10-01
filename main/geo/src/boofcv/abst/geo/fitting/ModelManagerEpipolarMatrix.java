@@ -16,33 +16,24 @@
  * limitations under the License.
  */
 
-package boofcv.alg.sfm.robust;
+package boofcv.abst.geo.fitting;
 
-import boofcv.struct.geo.GeoModelEstimator1;
-import org.ddogleg.fitting.modelset.ModelGenerator;
-
-import java.util.List;
+import org.ddogleg.fitting.modelset.ModelManager;
+import org.ejml.data.DenseMatrix64F;
 
 /**
- * Wrapper class for converting {@link GeoModelEstimator1} into {@link ModelGenerator}.
+ * {@link ModelManager} for 3x3 {@liuk DenseMatrix64F}.
  *
  * @author Peter Abeles
  */
-public class EstimatorToGenerator<Model,Point> implements ModelGenerator<Model,Point> {
-
-	GeoModelEstimator1<Model,Point> alg;
-
-	public EstimatorToGenerator(GeoModelEstimator1<Model, Point> alg ) {
-		this.alg = alg;
+public class ModelManagerEpipolarMatrix implements ModelManager<DenseMatrix64F> {
+	@Override
+	public DenseMatrix64F createModelInstance() {
+		return new DenseMatrix64F(3,3);
 	}
 
 	@Override
-	public boolean generate(List<Point> dataSet, Model out) {
-		return alg.process(dataSet,out);
-	}
-
-	@Override
-	public int getMinimumPoints() {
-		return alg.getMinimumPoints();
+	public void copyModel(DenseMatrix64F src, DenseMatrix64F dst) {
+		dst.set(src);
 	}
 }

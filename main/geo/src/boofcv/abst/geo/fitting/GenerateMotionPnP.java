@@ -39,11 +39,6 @@ public class GenerateMotionPnP implements ModelGenerator<Se3_F64,Point2D3D> {
 	}
 
 	@Override
-	public Se3_F64 createModelInstance() {
-		return new Se3_F64();
-	}
-
-	@Override
 	public boolean generate(List<Point2D3D> dataSet, Se3_F64 model ) {
 		return alg.process(dataSet,model);
 	}

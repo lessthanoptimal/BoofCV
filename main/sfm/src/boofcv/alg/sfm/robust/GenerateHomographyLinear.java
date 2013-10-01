@@ -47,11 +47,6 @@ public class GenerateHomographyLinear implements
 	}
 
 	@Override
-	public Homography2D_F64 createModelInstance() {
-		return new Homography2D_F64();
-	}
-
-	@Override
 	public boolean fitModel(List<AssociatedPair> dataSet, Homography2D_F64 initial, Homography2D_F64 found) {
 		if( !alg.process(dataSet,H) )
 			return false;

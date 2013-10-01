@@ -58,11 +58,6 @@ public class Se3FromEssentialGenerator implements ModelGenerator<Se3_F64,Associa
 		this.depthCheck = new PositiveDepthConstraintCheck(triangulate);
 	}
 
-	@Override
-	public Se3_F64 createModelInstance() {
-		return new Se3_F64();
-	}
-
 	/**
 	 * Computes the camera motion from the set of observations.   The motion is from the first
 	 * into the second camera frame.

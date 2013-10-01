@@ -51,11 +51,6 @@ public class GenerateScaleTranslateRotate2D
 	private SingularValueDecomposition<DenseMatrix64F> svd = DecompositionFactory.svd(2,2,true,true,true);
 
 	@Override
-	public ScaleTranslateRotate2D createModelInstance() {
-		return new ScaleTranslateRotate2D();
-	}
-
-	@Override
 	public boolean generate(List<AssociatedPair> dataSet, ScaleTranslateRotate2D output) {
 
 		if( !generateAffine.generate(dataSet,affine) )

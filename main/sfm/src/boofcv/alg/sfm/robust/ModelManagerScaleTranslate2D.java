@@ -18,31 +18,22 @@
 
 package boofcv.alg.sfm.robust;
 
-import boofcv.struct.geo.GeoModelEstimator1;
-import org.ddogleg.fitting.modelset.ModelGenerator;
-
-import java.util.List;
+import boofcv.struct.sfm.ScaleTranslate2D;
+import org.ddogleg.fitting.modelset.ModelManager;
 
 /**
- * Wrapper class for converting {@link GeoModelEstimator1} into {@link ModelGenerator}.
+ * {@link ModelManager} for {@link ScaleTranslate2D}
  *
  * @author Peter Abeles
  */
-public class EstimatorToGenerator<Model,Point> implements ModelGenerator<Model,Point> {
-
-	GeoModelEstimator1<Model,Point> alg;
-
-	public EstimatorToGenerator(GeoModelEstimator1<Model, Point> alg ) {
-		this.alg = alg;
+public class ModelManagerScaleTranslate2D implements ModelManager<ScaleTranslate2D> {
+	@Override
+	public ScaleTranslate2D createModelInstance() {
+		return new ScaleTranslate2D();
 	}
 
 	@Override
-	public boolean generate(List<Point> dataSet, Model out) {
-		return alg.process(dataSet,out);
-	}
-
-	@Override
-	public int getMinimumPoints() {
-		return alg.getMinimumPoints();
+	public void copyModel(ScaleTranslate2D src, ScaleTranslate2D dst) {
+		dst.set(src);
 	}
 }

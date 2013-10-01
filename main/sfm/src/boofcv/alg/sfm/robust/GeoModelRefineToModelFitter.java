@@ -28,11 +28,11 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public abstract class GeoModelRefineToModelFitter<Model,Point> implements ModelFitter<Model,Point> {
+public class GeoModelRefineToModelFitter<Model,Point> implements ModelFitter<Model,Point> {
 
 	GeoModelRefine<Model,Point> alg;
 
-	protected GeoModelRefineToModelFitter(GeoModelRefine<Model, Point> alg) {
+	public GeoModelRefineToModelFitter(GeoModelRefine<Model, Point> alg) {
 		this.alg = alg;
 	}
 

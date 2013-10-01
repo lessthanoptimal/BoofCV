@@ -53,6 +53,13 @@ public class ScaleTranslateRotate2D {
 	public ScaleTranslateRotate2D() {
 	}
 
+	public void set( ScaleTranslateRotate2D src ) {
+		this.theta = src.theta;
+		this.scale = src.scale;
+		this.transX = src.transX;
+		this.transY = src.transY;
+	}
+
 	public double getTheta() {
 		return theta;
 	}

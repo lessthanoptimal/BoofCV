@@ -40,11 +40,6 @@ public class GenerateEpipolarMatrix implements ModelGenerator<DenseMatrix64F,Ass
 	}
 
 	@Override
-	public DenseMatrix64F createModelInstance() {
-		return new DenseMatrix64F(3,3);
-	}
-
-	@Override
 	public boolean generate(List<AssociatedPair> dataSet, DenseMatrix64F model ) {
 		if( alg.process(dataSet,model) ) {
 			return true;

@@ -43,8 +43,8 @@ public class FourierTransformNaive {
 
 			}
 
-			outputR[k] = real/length;
-			outputI[k] = img/length;
+			outputR[start+k] = real/length;
+			outputI[start+k] = img/length;
 		}
 	}
 
@@ -66,18 +66,27 @@ public class FourierTransformNaive {
 				// assume imaginary component is zero
 			}
 
-			outputR[k] = real;
+			outputR[start+k] = real;
 		}
 	}
 
-	public static void forward( float inputR[] , float inputI[], float outputR[] , float outputI[] , int start , int length ) {
+	public static void transform( boolean forward  ,
+								  float inputR[] , float inputI[],
+								  float outputR[] , float outputI[] ,
+								  int start , int length )
+	{
+
+		float coef = PI2/(float)length;
+		if( forward )
+			coef = -coef;
+
 		for( int k = 0; k < length; k++ ) {
 
 			float real = 0;
 			float img = 0;
 
 			for( int l = 0; l < length; l++ ) {
-				float theta = -PI2*l*k/(float)length;
+				float theta = coef*l*k;
 
 				float ra = (float)Math.cos(theta);
 				float ia = (float)Math.sin(theta);
@@ -89,35 +98,16 @@ public class FourierTransformNaive {
 				img += ia*rb + ra*ib;
 			}
 
-			outputR[k] = real/length;
-			outputI[k] = img/length;
-		}
-	}
-
-	public static void inverse( float inputR[] , float inputI[], float outputR[] , float outputI[] , int start , int length ) {
-		for( int k = 0; k < length; k++ ) {
-
-			float real = 0;
-			float img = 0;
-
-			for( int l = 0; l < length; l++ ) {
-				float theta = PI2*l*k/(float)length;
-
-				float ra = (float)Math.cos(theta);
-				float ia = (float)Math.sin(theta);
-
-				float rb = inputR[start+l];
-				float ib = inputI[start+l];
-
-				real += ra*rb - ia*ib;
-				img += ia*rb + ra*ib;
+			if( forward ) {
+				outputR[start+k] = real/length;
+				outputI[start+k] = img/length;
+			} else {
+				outputR[start+k] = real;
+				outputI[start+k] = img;
 			}
-
-			outputR[k] = real;
-			outputI[k] = img;
 		}
 	}
-	
+
 	public static void forward( ImageFloat32 inputR , ImageFloat32 outputR , ImageFloat32 outputI ) {
 
 		ImageFloat32 tempR = new ImageFloat32(inputR.width,inputR.height);
@@ -128,19 +118,56 @@ public class FourierTransformNaive {
 			forward( inputR.data , tempR.data , tempI.data , index , inputR.width);
 		}
 
-		// todo transpose the images
+		float columnR0[] = new float[ inputR.height ];
+		float columnI0[] = new float[ inputR.height ];
 
-		// again
+		float columnR1[] = new float[ inputR.height ];
+		float columnI1[] = new float[ inputR.height ];
 
-		// transpose back
+		for( int x = 0; x < inputR.width; x++ ) {
+			// copy the column
+			for( int y = 0; y < inputR.height; y++ ) {
+				columnR0[y] = tempR.unsafe_get(x,y);
+				columnI0[y] = tempI.unsafe_get(x,y);
+			}
 
+			transform(true,columnR0,columnI0,columnR1,columnI1,0,inputR.height);
+
+			// copy the results back
+			for( int y = 0; y < inputR.height; y++ ) {
+				outputR.unsafe_set(x,y,columnR1[y]);
+				outputI.unsafe_set(x,y,columnI1[y]);
+			}
+		}
 	}
 
 	public static void inverse( ImageFloat32 inputR , ImageFloat32 inputI, ImageFloat32 outputR ) {
+		ImageFloat32 tempR = new ImageFloat32(inputR.width,inputR.height);
+		ImageFloat32 tempI = new ImageFloat32(inputI.width,inputI.height);
 
-	}
+		for( int y = 0; y < inputR.height; y++ ) {
+			int index = inputR.startIndex + inputR.stride*y;
+			transform(false,inputR.data , inputI.data, tempR.data , tempI.data,index,inputR.width);
+		}
 
-	public static void transpose( ImageFloat32 a ) {
+		float columnR0[] = new float[ inputR.height ];
+		float columnI0[] = new float[ inputR.height ];
 
+		float columnR1[] = new float[ inputR.height ];
+
+		for( int x = 0; x < inputR.width; x++ ) {
+			// copy the column
+			for( int y = 0; y < inputR.height; y++ ) {
+				columnR0[y] = tempR.unsafe_get(x,y);
+				columnI0[y] = tempI.unsafe_get(x,y);
+			}
+
+			inverse(columnR0,columnI0,columnR1,0,inputR.height);
+
+			// copy the results back
+			for( int y = 0; y < inputR.height; y++ ) {
+				outputR.unsafe_set(x,y,columnR1[y]);
+			}
+		}
 	}
 }

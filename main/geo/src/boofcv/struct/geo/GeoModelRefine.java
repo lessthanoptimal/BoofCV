@@ -25,6 +25,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
+// TODO replace with ModelFitter?
 public interface GeoModelRefine<Model,Sample> {
 
 	/**
