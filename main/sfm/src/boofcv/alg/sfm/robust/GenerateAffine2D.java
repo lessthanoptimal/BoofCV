@@ -48,11 +48,6 @@ public class GenerateAffine2D implements
 	List<Point2D_F64> to = new ArrayList<Point2D_F64>();
 
 	@Override
-	public Affine2D_F64 createModelInstance() {
-		return new Affine2D_F64();
-	}
-
-	@Override
 	public boolean fitModel(List<AssociatedPair> dataSet, Affine2D_F64 initial, Affine2D_F64 found) {
 		from.clear();
 		to.clear();

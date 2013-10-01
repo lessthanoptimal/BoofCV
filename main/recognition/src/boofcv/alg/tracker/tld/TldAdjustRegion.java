@@ -20,11 +20,13 @@ package boofcv.alg.tracker.tld;
 
 import boofcv.alg.sfm.robust.DistanceScaleTranslate2DSq;
 import boofcv.alg.sfm.robust.GenerateScaleTranslate2D;
+import boofcv.alg.sfm.robust.ModelManagerScaleTranslate2D;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.sfm.ScaleTranslate2D;
 import georegression.struct.shapes.RectangleCorner2D_F64;
 import org.ddogleg.fitting.modelset.DistanceFromModel;
 import org.ddogleg.fitting.modelset.ModelGenerator;
+import org.ddogleg.fitting.modelset.ModelManager;
 import org.ddogleg.fitting.modelset.lmeds.LeastMedianOfSquares;
 import org.ddogleg.struct.FastQueue;
 
@@ -47,11 +49,12 @@ public class TldAdjustRegion {
 	 */
 	public TldAdjustRegion( int numCycles ) {
 
+		ModelManager<ScaleTranslate2D> manager = new ModelManagerScaleTranslate2D();
 		ModelGenerator<ScaleTranslate2D,AssociatedPair> generator = new GenerateScaleTranslate2D();
 		DistanceFromModel<ScaleTranslate2D,AssociatedPair> distance = new DistanceScaleTranslate2DSq();
 
 		estimateMotion = new LeastMedianOfSquares<ScaleTranslate2D, AssociatedPair>(123123,numCycles,Double.MAX_VALUE,
-				0,generator,distance);
+				0,manager,generator,distance);
 	}
 
 	public void init( int imageWidth , int imageHeight ) {

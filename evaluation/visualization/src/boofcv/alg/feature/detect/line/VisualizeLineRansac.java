@@ -38,8 +38,10 @@ import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSInt8;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
+import georegression.fitting.line.ModelManagerLinePolar2D_F32;
 import georegression.struct.line.LinePolar2D_F32;
 import georegression.struct.line.LineSegment2D_F32;
+import org.ddogleg.fitting.modelset.ModelManager;
 import org.ddogleg.fitting.modelset.ModelMatcher;
 import org.ddogleg.fitting.modelset.ransac.Ransac;
 
@@ -74,11 +76,12 @@ public class VisualizeLineRansac<I extends ImageSingleBand, D extends ImageSingl
 		ImageSInt8 direction = new ImageSInt8(input.width,input.height);
 		ImageUInt8 detected = new ImageUInt8(input.width,input.height);
 
+		ModelManager<LinePolar2D_F32> manager = new ModelManagerLinePolar2D_F32();
 		GridLineModelDistance distance = new GridLineModelDistance((float)(Math.PI*0.75));
 		GridLineModelFitter fitter = new GridLineModelFitter((float)(Math.PI*0.75));
 
 		ModelMatcher<LinePolar2D_F32, Edgel> matcher =
-				new Ransac<LinePolar2D_F32,Edgel>(123123,fitter,distance,25,1);
+				new Ransac<LinePolar2D_F32,Edgel>(123123,manager,fitter,distance,25,1);
 
 		ImageGradient<I,D> gradient = FactoryDerivative.sobel(imageType, derivType);
 

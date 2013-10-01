@@ -26,6 +26,7 @@ import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.feature.MatrixOfList;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
+import georegression.fitting.line.ModelManagerLinePolar2D_F32;
 import georegression.struct.line.LinePolar2D_F32;
 import georegression.struct.line.LineSegment2D_F32;
 import org.ddogleg.fitting.modelset.ModelMatcher;
@@ -78,11 +79,12 @@ public abstract class CommonGridRansacLineDetectorChecks< D extends ImageSingleB
 			GeneralizedImageOps.set(derivX,where,i,20);
 		}
 
+		ModelManagerLinePolar2D_F32 manager = new ModelManagerLinePolar2D_F32();
 		GridLineModelDistance distance = new GridLineModelDistance(0.9f);
 		GridLineModelFitter fitter = new GridLineModelFitter(0.9f);
 
 		ModelMatcher<LinePolar2D_F32, Edgel> matcher =
-				new Ransac<LinePolar2D_F32,Edgel>(123123,fitter,distance,25,1);
+				new Ransac<LinePolar2D_F32,Edgel>(123123,manager,fitter,distance,25,1);
 		GridRansacLineDetector<D> alg = createDetector(regionSize,5,matcher);
 
 		alg.process(derivX,derivY,edgeImage);

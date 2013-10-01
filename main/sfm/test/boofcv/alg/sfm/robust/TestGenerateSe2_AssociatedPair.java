@@ -46,6 +46,11 @@ public class TestGenerateSe2_AssociatedPair implements ModelTestingInterface<Se2
 						MotionTransformPoint<Se2_F64, Point2D_F64> alg = new MotionSe2PointSVD_F64();
 						return new GenerateSe2_AssociatedPair(alg);
 					}
+
+					@Override
+					public Se2_F64 createModelInstance() {
+						return new Se2_F64();
+					}
 				};
 
 		alg.checkMinPoints();

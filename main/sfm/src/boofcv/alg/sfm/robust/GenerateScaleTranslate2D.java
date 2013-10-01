@@ -41,12 +41,6 @@ public class GenerateScaleTranslate2D
 	double centerX1,centerY1;
 	double centerX2,centerY2;
 
-
-	@Override
-	public ScaleTranslate2D createModelInstance() {
-		return new ScaleTranslate2D();
-	}
-
 	@Override
 	public boolean generate(List<AssociatedPair> dataSet, ScaleTranslate2D output) {
 		AssociatedPair a = dataSet.get(0);

@@ -32,6 +32,7 @@ Version : Alpha 0.16
 - Change behavior of ConvertRaster so that it does not modify the order of color bands at all
   * Improved unit tests
 
+- TODO remove GeoModelRefine and replace with ModelFitter
 - TODO improve KLT edge handling
 - TODO mean-shift color
 - TODO cam-shift

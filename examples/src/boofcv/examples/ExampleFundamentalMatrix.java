@@ -25,6 +25,7 @@ import boofcv.abst.feature.detect.interest.ConfigFastHessian;
 import boofcv.abst.geo.Estimate1ofEpipolar;
 import boofcv.abst.geo.fitting.DistanceFromModelResidual;
 import boofcv.abst.geo.fitting.GenerateEpipolarMatrix;
+import boofcv.abst.geo.fitting.ModelManagerEpipolarMatrix;
 import boofcv.alg.geo.f.FundamentalResidualSampson;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
@@ -40,6 +41,7 @@ import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.geo.GeoModelRefine;
 import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageFloat32;
+import org.ddogleg.fitting.modelset.ModelManager;
 import org.ddogleg.fitting.modelset.ModelMatcher;
 import org.ddogleg.fitting.modelset.ransac.Ransac;
 import org.ddogleg.struct.FastQueue;
@@ -77,6 +79,8 @@ public class ExampleFundamentalMatrix {
 	public static DenseMatrix64F robustFundamental( List<AssociatedPair> matches ,
 													List<AssociatedPair> inliers ) {
 
+		// used to create and copy new instances of the fit model
+		ModelManager<DenseMatrix64F> managerF = new ModelManagerEpipolarMatrix();
 		// Select which linear algorithm is to be used.  Try playing with the number of remove ambiguity points
 		Estimate1ofEpipolar estimateF = FactoryMultiView.computeFundamental_1(EnumEpipolar.FUNDAMENTAL_7_LINEAR, 2);
 		// Wrapper so that this estimator can be used by the robust estimator
@@ -88,7 +92,7 @@ public class ExampleFundamentalMatrix {
 
 		// Use RANSAC to estimate the Fundamental matrix
 		ModelMatcher<DenseMatrix64F,AssociatedPair> robustF =
-				new Ransac<DenseMatrix64F, AssociatedPair>(123123,generateF,errorMetric,6000,0.1);
+				new Ransac<DenseMatrix64F, AssociatedPair>(123123,managerF,generateF,errorMetric,6000,0.1);
 
 		// Estimate the fundamental matrix while removing outliers
 		if( !robustF.process(matches) )

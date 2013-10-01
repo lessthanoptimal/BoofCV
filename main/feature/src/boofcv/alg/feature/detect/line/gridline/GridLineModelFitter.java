@@ -43,11 +43,6 @@ public class GridLineModelFitter implements ModelGenerator<LinePolar2D_F32,Edgel
 	}
 
 	@Override
-	public LinePolar2D_F32 createModelInstance() {
-		return new LinePolar2D_F32();
-	}
-
-	@Override
 	public boolean generate(List<Edgel> dataSet, LinePolar2D_F32 model ) {
 
 		if( dataSet.size() == 2 ) {

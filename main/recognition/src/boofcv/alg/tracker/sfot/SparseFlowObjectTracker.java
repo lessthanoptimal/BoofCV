@@ -20,6 +20,7 @@ package boofcv.alg.tracker.sfot;
 
 import boofcv.alg.sfm.robust.DistanceScaleTranslateRotate2DSq;
 import boofcv.alg.sfm.robust.GenerateScaleTranslateRotate2D;
+import boofcv.alg.sfm.robust.ModelManagerScaleTranslateRotate2D;
 import boofcv.alg.tracker.klt.KltTrackFault;
 import boofcv.alg.tracker.klt.PyramidKltFeature;
 import boofcv.alg.tracker.klt.PyramidKltTracker;
@@ -80,12 +81,12 @@ public class SparseFlowObjectTracker<Image extends ImageSingleBand, Derivative e
 
 		klt = FactoryTrackerAlg.kltPyramid(config.trackerConfig, config.imageType, config.derivType);
 
+		ModelManagerScaleTranslateRotate2D manager = new ModelManagerScaleTranslateRotate2D();
 		GenerateScaleTranslateRotate2D generator = new GenerateScaleTranslateRotate2D();
 		DistanceScaleTranslateRotate2DSq distance = new DistanceScaleTranslateRotate2DSq();
 
 		estimateMotion = new LeastMedianOfSquares<ScaleTranslateRotate2D, AssociatedPair>(
-				config.randSeed,config.robustCycles,
-				Double.MAX_VALUE,0,generator,distance);
+				config.randSeed,config.robustCycles,Double.MAX_VALUE,0,manager,generator,distance);
 	}
 
 	public void init( Image input , RectangleRotate_F64 region ) {

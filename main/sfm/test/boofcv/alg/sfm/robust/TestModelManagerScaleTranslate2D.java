@@ -18,31 +18,37 @@
 
 package boofcv.alg.sfm.robust;
 
-import boofcv.struct.geo.GeoModelEstimator1;
-import org.ddogleg.fitting.modelset.ModelGenerator;
+import boofcv.struct.sfm.ScaleTranslate2D;
+import org.junit.Test;
 
-import java.util.List;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
- * Wrapper class for converting {@link GeoModelEstimator1} into {@link ModelGenerator}.
- *
  * @author Peter Abeles
  */
-public class EstimatorToGenerator<Model,Point> implements ModelGenerator<Model,Point> {
+public class TestModelManagerScaleTranslate2D {
 
-	GeoModelEstimator1<Model,Point> alg;
+	@Test
+	public void createModelInstance() {
+		ModelManagerScaleTranslate2D alg = new ModelManagerScaleTranslate2D();
 
-	public EstimatorToGenerator(GeoModelEstimator1<Model, Point> alg ) {
-		this.alg = alg;
+		assertTrue(alg.createModelInstance() != null);
 	}
 
-	@Override
-	public boolean generate(List<Point> dataSet, Model out) {
-		return alg.process(dataSet,out);
+	@Test
+	public void copyModel() {
+		ModelManagerScaleTranslate2D alg = new ModelManagerScaleTranslate2D();
+
+		ScaleTranslate2D model = new ScaleTranslate2D(1,2,3);
+		ScaleTranslate2D found = new ScaleTranslate2D();
+
+		alg.copyModel(model,found);
+
+		assertEquals(model.scale,found.scale,1e-8);
+		assertEquals(model.transX,found.transX,1e-8);
+		assertEquals(model.transY,found.transY,1e-8);
+
 	}
 
-	@Override
-	public int getMinimumPoints() {
-		return alg.getMinimumPoints();
-	}
 }

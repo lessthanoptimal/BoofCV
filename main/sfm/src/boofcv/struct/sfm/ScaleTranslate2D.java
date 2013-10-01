@@ -44,6 +44,12 @@ public class ScaleTranslate2D {
 	public ScaleTranslate2D() {
 	}
 
+	public void set( ScaleTranslate2D src ) {
+		this.scale = src.scale;
+		this.transX = src.transX;
+		this.transY = src.transY;
+	}
+
 	public double getScale() {
 		return scale;
 	}

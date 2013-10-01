@@ -18,7 +18,12 @@
 
 package boofcv.alg.transform.fft;
 
+import boofcv.alg.misc.ImageMiscOps;
+import boofcv.struct.image.ImageFloat32;
+import boofcv.testing.BoofTesting;
 import org.junit.Test;
+
+import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
 
@@ -26,6 +31,8 @@ import static org.junit.Assert.assertEquals;
  * @author Peter Abeles
  */
 public class TestFourierTransformNaive {
+
+	Random rand = new Random(234);
 
 	@Test
 	public void forwardsRRI_inverseRIR() {
@@ -43,7 +50,7 @@ public class TestFourierTransformNaive {
 	}
 
 	@Test
-	public void forwardsRIRI_inverseRIRI() {
+	public void transform_RIRI_RIRI() {
 		float originalR[] = new float[]{0.5f,2f,-0.34f,5f,6f,2f,10f,10f,10f,0f,-0.4f,-6f};
 		float originalI[] = new float[]{-0.5f,1.5f,-3f,1.5f,3.5f,-0.6f,-4f,4f,3f,-2f,-3f,2.5f};
 		float tranImag[] = new float[originalR.length];
@@ -51,13 +58,28 @@ public class TestFourierTransformNaive {
 		float foundR[] = new float[originalR.length];
 		float foundI[] = new float[originalR.length];
 
-		FourierTransformNaive.forward(originalR,originalI,tranReal,tranImag,0,originalR.length);
-		FourierTransformNaive.inverse(tranReal, tranImag, foundR,foundI, 0, originalR.length);
+		FourierTransformNaive.transform(true, originalR, originalI, tranReal, tranImag, 0, originalR.length);
+		FourierTransformNaive.transform(false, tranReal, tranImag, foundR, foundI, 0, originalR.length);
 
 		for( int i = 0; i < originalR.length; i++ ) {
 			assertEquals(originalR[i],foundR[i],1e-4);
 			assertEquals(originalI[i],foundI[i],1e-4);
 		}
+	}
+
+	@Test
+	public void forward_reverse_image() {
+		ImageFloat32 input = new ImageFloat32(30,40);
+		ImageFloat32 tranR = new ImageFloat32(30,40);
+		ImageFloat32 tranI = new ImageFloat32(30,40);
+		ImageFloat32 output = new ImageFloat32(30,40);
+
+		ImageMiscOps.fillUniform(input,rand,0,100);
+		FourierTransformNaive.forward(input,tranR,tranI);
+		FourierTransformNaive.inverse(tranR,tranI,output);
+
+		BoofTesting.assertEquals(input,output,1e-3);
+
 	}
 
 }

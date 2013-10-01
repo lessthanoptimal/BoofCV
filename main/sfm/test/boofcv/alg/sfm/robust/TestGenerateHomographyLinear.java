@@ -58,6 +58,11 @@ public class TestGenerateHomographyLinear implements ModelTestingInterface<Homog
 					public ModelGenerator<Homography2D_F64,AssociatedPair> createAlg() {
 						return new GenerateHomographyLinear(true);
 					}
+
+					@Override
+					public Homography2D_F64 createModelInstance() {
+						return new Homography2D_F64();
+					}
 				};
 
 		alg.allTest();

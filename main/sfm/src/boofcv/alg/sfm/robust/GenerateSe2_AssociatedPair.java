@@ -45,11 +45,6 @@ public class GenerateSe2_AssociatedPair implements
 	}
 
 	@Override
-	public Se2_F64 createModelInstance() {
-		return new Se2_F64();
-	}
-
-	@Override
 	public boolean generate(List<AssociatedPair> dataSet, Se2_F64 output) {
 		from.clear();
 		to.clear();

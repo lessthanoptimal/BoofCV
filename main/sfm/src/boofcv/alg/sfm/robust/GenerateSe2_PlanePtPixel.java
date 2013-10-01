@@ -66,11 +66,6 @@ public class GenerateSe2_PlanePtPixel implements
 	}
 
 	@Override
-	public Se2_F64 createModelInstance() {
-		return new Se2_F64();
-	}
-
-	@Override
 	public boolean generate(List<PlanePtPixel> dataSet, Se2_F64 keyToCurr) {
 		from.clear();
 		to.reset();

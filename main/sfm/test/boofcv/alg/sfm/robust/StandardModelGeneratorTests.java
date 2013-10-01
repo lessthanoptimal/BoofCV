@@ -51,6 +51,8 @@ public abstract class StandardModelGeneratorTests<Model, Point> {
 	 */
 	public abstract ModelGenerator<Model, Point> createAlg();
 
+	public abstract Model createModelInstance();
+
 	public void allTest() {
 		checkMinPoints();
 		simpleTest();
@@ -81,7 +83,7 @@ public abstract class StandardModelGeneratorTests<Model, Point> {
 
 		ModelGenerator<Model, Point> fitter = createAlg();
 
-		Model found = fitter.createModelInstance();
+		Model found = createModelInstance();
 		assertTrue(fitter.generate(dataSet,found));
 
 		// test the found transform by seeing if it recomputes the current points
