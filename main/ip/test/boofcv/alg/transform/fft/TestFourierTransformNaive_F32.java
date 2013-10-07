@@ -30,7 +30,7 @@ import static org.junit.Assert.assertEquals;
 /**
  * @author Peter Abeles
  */
-public class TestFourierTransformNaive {
+public class TestFourierTransformNaive_F32 {
 
 	Random rand = new Random(234);
 
@@ -41,8 +41,8 @@ public class TestFourierTransformNaive {
 		float tranReal[] = new float[original.length];
 		float found[] = new float[original.length];
 
-		FourierTransformNaive.forward(original,tranReal,tranImag,0,original.length);
-		FourierTransformNaive.inverse(tranReal, tranImag, found, 0, original.length);
+		FourierTransformNaive_F32.forward(original, tranReal, tranImag, 0, original.length);
+		FourierTransformNaive_F32.inverse(tranReal, tranImag, found, 0, original.length);
 
 		for( int i = 0; i < original.length; i++ ) {
 			assertEquals(original[i],found[i],1e-4);
@@ -58,8 +58,8 @@ public class TestFourierTransformNaive {
 		float foundR[] = new float[originalR.length];
 		float foundI[] = new float[originalR.length];
 
-		FourierTransformNaive.transform(true, originalR, originalI, tranReal, tranImag, 0, originalR.length);
-		FourierTransformNaive.transform(false, tranReal, tranImag, foundR, foundI, 0, originalR.length);
+		FourierTransformNaive_F32.transform(true, originalR, originalI, tranReal, tranImag, 0, originalR.length);
+		FourierTransformNaive_F32.transform(false, tranReal, tranImag, foundR, foundI, 0, originalR.length);
 
 		for( int i = 0; i < originalR.length; i++ ) {
 			assertEquals(originalR[i],foundR[i],1e-4);
@@ -75,8 +75,8 @@ public class TestFourierTransformNaive {
 		ImageFloat32 output = new ImageFloat32(30,40);
 
 		ImageMiscOps.fillUniform(input,rand,0,100);
-		FourierTransformNaive.forward(input,tranR,tranI);
-		FourierTransformNaive.inverse(tranR,tranI,output);
+		FourierTransformNaive_F32.forward(input, tranR, tranI);
+		FourierTransformNaive_F32.inverse(tranR, tranI, output);
 
 		BoofTesting.assertEquals(input,output,1e-3);
 
