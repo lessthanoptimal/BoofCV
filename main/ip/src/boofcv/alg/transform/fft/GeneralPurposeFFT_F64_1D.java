@@ -18,6 +18,30 @@
 
 package boofcv.alg.transform.fft;
 
+/**
+ * Computes 1D Discrete Fourier Transform (DFT) of complex and real, double
+ * precision data. The size of the data can be an arbitrary number. The code originally comes from
+ * General Purpose FFT Package written by Takuya Ooura
+ * (http://www.kurims.kyoto-u.ac.jp/~ooura/fft.html).  See below for the full history.
+ * <p></p>
+ * This code has a bit of a history.  Originally from General Purpose FFT.  Which was then ported into
+ * JFFTPack written by Baoshe Zhang (http://jfftpack.sourceforge.net/), and then into JTransforms by Piotr Wendykier.
+ * The major modification from JTransforms is that the SMP code has been stripped out.  It might be added back in
+ * once an SMP strategy has been finalized in BoofCV.
+ * <p></p>
+ * Code License:  The original license of General Purpose FFT Package is shown below.  This file will fall
+ * under the same license:
+ * <pre>
+ * Copyright Takuya OOURA, 1996-2001
+ *
+ * You may use, copy, modify and distribute this code for any purpose (include commercial use) and without fee.
+ * Please refer to this package when you modify this code.
+ * </pre>
+ *
+ * @author Piotr Wendykier (piotr.wendykier@gmail.com)
+ * @author Peter Abeles
+ *
+ */
 public class GeneralPurposeFFT_F64_1D {
 
 	private static enum Plans {
