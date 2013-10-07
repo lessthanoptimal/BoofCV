@@ -18,25 +18,25 @@
 
 package boofcv.alg.transform.fft;
 
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageFloat64;
 
 /**
  * Direct implementation of a Fourier transform.  Horribly inefficient.
  *
  * @author Peter Abeles
  */
-public class FourierTransformNaive {
+public class FourierTransformNaive_F64 {
 
-	public static float PI2 = (float)(2.0*Math.PI);
+	public static double PI2 = 2.0*Math.PI;
 
-	public static void forward( float inputR[] , float outputR[] , float outputI[] , int start , int length ) {
+	public static void forward( double inputR[] , double outputR[] , double outputI[] , int start , int length ) {
 		for( int k = 0; k < length; k++ ) {
 
-			float real = 0;
-			float img = 0;
+			double real = 0;
+			double img = 0;
 
 			for( int l = 0; l < length; l++ ) {
-				float theta = -PI2*l*k/(float)length;
+				double theta = -PI2*l*k/(double)length;
 
 				real += inputR[start+l]*Math.cos(theta);
 				img += inputR[start+l]*Math.sin(theta);
@@ -48,19 +48,19 @@ public class FourierTransformNaive {
 		}
 	}
 
-	public static void inverse( float inputR[] , float inputI[] , float outputR[] , int start , int length ) {
+	public static void inverse( double inputR[] , double inputI[] , double outputR[] , int start , int length ) {
 		for( int k = 0; k < length; k++ ) {
 
-			float real = 0;
+			double real = 0;
 
 			for( int l = 0; l < length; l++ ) {
-				float theta = PI2*l*k/(float)length;
+				double theta = PI2*l*k/(double)length;
 
-				float ra = (float)Math.cos(theta);
-				float ia = (float)Math.sin(theta);
+				double ra = Math.cos(theta);
+				double ia = Math.sin(theta);
 
-				float rb = inputR[start+l];
-				float ib = inputI[start+l];
+				double rb = inputR[start+l];
+				double ib = inputI[start+l];
 
 				real += ra*rb - ia*ib;
 				// assume imaginary component is zero
@@ -71,28 +71,28 @@ public class FourierTransformNaive {
 	}
 
 	public static void transform( boolean forward  ,
-								  float inputR[] , float inputI[],
-								  float outputR[] , float outputI[] ,
+								  double inputR[] , double inputI[],
+								  double outputR[] , double outputI[] ,
 								  int start , int length )
 	{
 
-		float coef = PI2/(float)length;
+		double coef = PI2/(double)length;
 		if( forward )
 			coef = -coef;
 
 		for( int k = 0; k < length; k++ ) {
 
-			float real = 0;
-			float img = 0;
+			double real = 0;
+			double img = 0;
 
 			for( int l = 0; l < length; l++ ) {
-				float theta = coef*l*k;
+				double theta = coef*l*k;
 
-				float ra = (float)Math.cos(theta);
-				float ia = (float)Math.sin(theta);
+				double ra = Math.cos(theta);
+				double ia = Math.sin(theta);
 
-				float rb = inputR[start+l];
-				float ib = inputI[start+l];
+				double rb = inputR[start+l];
+				double ib = inputI[start+l];
 
 				real += ra*rb - ia*ib;
 				img += ia*rb + ra*ib;
@@ -108,21 +108,21 @@ public class FourierTransformNaive {
 		}
 	}
 
-	public static void forward( ImageFloat32 inputR , ImageFloat32 outputR , ImageFloat32 outputI ) {
+	public static void forward( ImageFloat64 inputR , ImageFloat64 outputR , ImageFloat64 outputI ) {
 
-		ImageFloat32 tempR = new ImageFloat32(inputR.width,inputR.height);
-		ImageFloat32 tempI = new ImageFloat32(outputI.width,outputI.height);
+		ImageFloat64 tempR = new ImageFloat64(inputR.width,inputR.height);
+		ImageFloat64 tempI = new ImageFloat64(outputI.width,outputI.height);
 
 		for( int y = 0; y < inputR.height; y++ ) {
 			int index = inputR.startIndex + inputR.stride*y;
 			forward( inputR.data , tempR.data , tempI.data , index , inputR.width);
 		}
 
-		float columnR0[] = new float[ inputR.height ];
-		float columnI0[] = new float[ inputR.height ];
+		double columnR0[] = new double[ inputR.height ];
+		double columnI0[] = new double[ inputR.height ];
 
-		float columnR1[] = new float[ inputR.height ];
-		float columnI1[] = new float[ inputR.height ];
+		double columnR1[] = new double[ inputR.height ];
+		double columnI1[] = new double[ inputR.height ];
 
 		for( int x = 0; x < inputR.width; x++ ) {
 			// copy the column
@@ -141,19 +141,19 @@ public class FourierTransformNaive {
 		}
 	}
 
-	public static void inverse( ImageFloat32 inputR , ImageFloat32 inputI, ImageFloat32 outputR ) {
-		ImageFloat32 tempR = new ImageFloat32(inputR.width,inputR.height);
-		ImageFloat32 tempI = new ImageFloat32(inputI.width,inputI.height);
+	public static void inverse( ImageFloat64 inputR , ImageFloat64 inputI, ImageFloat64 outputR ) {
+		ImageFloat64 tempR = new ImageFloat64(inputR.width,inputR.height);
+		ImageFloat64 tempI = new ImageFloat64(inputI.width,inputI.height);
 
 		for( int y = 0; y < inputR.height; y++ ) {
 			int index = inputR.startIndex + inputR.stride*y;
 			transform(false,inputR.data , inputI.data, tempR.data , tempI.data,index,inputR.width);
 		}
 
-		float columnR0[] = new float[ inputR.height ];
-		float columnI0[] = new float[ inputR.height ];
+		double columnR0[] = new double[ inputR.height ];
+		double columnI0[] = new double[ inputR.height ];
 
-		float columnR1[] = new float[ inputR.height ];
+		double columnR1[] = new double[ inputR.height ];
 
 		for( int x = 0; x < inputR.width; x++ ) {
 			// copy the column

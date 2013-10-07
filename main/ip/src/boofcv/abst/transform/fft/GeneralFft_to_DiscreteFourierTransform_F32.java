@@ -16,10 +16,27 @@
  * limitations under the License.
  */
 
-package boofcv.alg.transform.fft;
+package boofcv.abst.transform.fft;
+
+import boofcv.alg.transform.fft.GeneralPurposeFFT_F32_2D;
+import boofcv.struct.image.ImageFloat32;
 
 /**
+ * Wrapper around {@link GeneralPurposeFFT_F32_2D} which implements {@link DiscreteFourierTransform}
+ *
  * @author Peter Abeles
  */
-public class FftCooleyTukey {
+public class GeneralFft_to_DiscreteFourierTransform_F32 implements DiscreteFourierTransform<ImageFloat32>
+{
+	GeneralPurposeFFT_F32_2D alg;
+
+	@Override
+	public void forward(ImageFloat32 image, ImageFloat32 transform) {
+		//To change body of implemented methods use File | Settings | File Templates.
+	}
+
+	@Override
+	public void inverse(ImageFloat32 transform, ImageFloat32 image) {
+		//To change body of implemented methods use File | Settings | File Templates.
+	}
 }
