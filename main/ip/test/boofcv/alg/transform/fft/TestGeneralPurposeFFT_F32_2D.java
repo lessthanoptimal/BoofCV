@@ -34,7 +34,7 @@ public class TestGeneralPurposeFFT_F32_2D {
 
 	Random rand = new Random(234);
 
-	int sizes[] = new int[]{2,3,16,32,100,103};
+	int sizes[] = new int[]{1,2,3,16,32,100,103};
 
 	@Test
 	public void realFull() {

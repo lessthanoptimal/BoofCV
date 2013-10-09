@@ -142,6 +142,28 @@ public class GPixelMath {
 	}
 
 	/**
+	 * <p>
+	 * Performs pixel-wise division<br>
+	 * output(x,y) = imgA(x,y) / imgB(x,y)
+	 * </p>
+	 * Only floating point images are supported.
+	 *
+	 * @param imgA Input image. Not modified.
+	 * @param imgB Input image. Not modified.
+	 * @param output Output image. Modified.
+	 */
+	public static <T extends ImageSingleBand> void divide(T imgA, T imgB , T output)
+	{
+		if( ImageFloat32.class == imgA.getClass() ) {
+			PixelMath.divide((ImageFloat32)imgA,(ImageFloat32)imgB,(ImageFloat32)output);
+		} else if( ImageFloat64.class == imgA.getClass() ) {
+			PixelMath.divide((ImageFloat64)imgA,(ImageFloat64)imgB,(ImageFloat64)output);
+		} else {
+			throw new IllegalArgumentException("Unknown image Type: "+imgA.getClass().getSimpleName());
+		}
+	}
+
+	/**
 	 * Multiply each element by a scalar value. Both input and output images can
 	 * be the same instance.
 	 *
@@ -203,6 +225,28 @@ public class GPixelMath {
 			PixelMath.multiply((ImageFloat64)input,value,lower,upper,(ImageFloat64)output);
 		} else {
 			throw new IllegalArgumentException("Unknown image Type: "+input.getClass().getSimpleName());
+		}
+	}
+
+	/**
+	 * <p>
+	 * Performs pixel-wise multiplication<br>
+	 * output(x,y) = imgA(x,y) * imgB(x,y)
+	 * </p>
+	 * Only floating point images are supported.
+	 *
+	 * @param imgA Input image. Not modified.
+	 * @param imgB Input image. Not modified.
+	 * @param output Output image. Modified.
+	 */
+	public static <T extends ImageSingleBand> void multiply(T imgA, T imgB , T output)
+	{
+		if( ImageFloat32.class == imgA.getClass() ) {
+			PixelMath.multiply((ImageFloat32)imgA,(ImageFloat32)imgB,(ImageFloat32)output);
+		} else if( ImageFloat64.class == imgA.getClass() ) {
+			PixelMath.multiply((ImageFloat64)imgA,(ImageFloat64)imgB,(ImageFloat64)output);
+		} else {
+			throw new IllegalArgumentException("Unknown image Type: "+imgA.getClass().getSimpleName());
 		}
 	}
 

@@ -83,6 +83,11 @@ public class GeneratePixelMath extends CodeGeneratorBase {
 		for( int i = 0; i < types.length; i++ ) {
 			printAddTwoImages(types[i],outputsAdd[i]);
 			printSubtractTwoImages(types[i],outputsSub[i]);
+
+			if( !types[i].isInteger() ) {
+				printMultTwoImages(types[i],types[i]);
+				printDivTwoImages(types[i],types[i]);
+			}
 		}
 	}
 
@@ -400,7 +405,7 @@ public class GeneratePixelMath extends CodeGeneratorBase {
 		out.print("\t/**\n" +
 				"\t * <p>\n" +
 				"\t * Performs pixel-wise addition<br>\n" +
-				"\t * d(x,y) = imgA(x,y) + imgB(x,y)\n" +
+				"\t * output(x,y) = imgA(x,y) + imgB(x,y)\n" +
 				"\t * </p>\n" +
 				"\t * @param imgA Input image. Not modified.\n" +
 				"\t * @param imgB Input image. Not modified.\n" +
@@ -434,7 +439,7 @@ public class GeneratePixelMath extends CodeGeneratorBase {
 		out.print("\t/**\n" +
 				"\t * <p>\n" +
 				"\t * Performs pixel-wise subtraction.<br>\n" +
-				"\t * d(x,y) = imgA(x,y) - imgB(x,y)\n" +
+				"\t * output(x,y) = imgA(x,y) - imgB(x,y)\n" +
 				"\t * </p>\n" +
 				"\t * @param imgA Input image. Not modified.\n" +
 				"\t * @param imgB Input image. Not modified.\n" +
@@ -460,6 +465,75 @@ public class GeneratePixelMath extends CodeGeneratorBase {
 				"\t\t}\n" +
 				"\t}\n\n");
 	}
+
+	public void printMultTwoImages( AutoTypeImage typeIn , AutoTypeImage typeOut  ) {
+
+		String bitWise = typeIn.getBitWise();
+		String typeCast = typeOut.isInteger() ? "("+typeOut.getDataType()+")" : "";
+
+		out.print("\t/**\n" +
+				"\t * <p>\n" +
+				"\t * Performs pixel-wise multiplication<br>\n" +
+				"\t * output(x,y) = imgA(x,y) * imgB(x,y)\n" +
+				"\t * </p>\n" +
+				"\t * @param imgA Input image. Not modified.\n" +
+				"\t * @param imgB Input image. Not modified.\n" +
+				"\t * @param output Output image. Modified.\n" +
+				"\t */\n" +
+				"\tpublic static void multiply( "+typeIn.getImageName()+" imgA , "+typeIn.getImageName()+" imgB , "+typeOut.getImageName()+" output ) {\n" +
+				"\t\tInputSanityCheck.checkSameShape(imgA,imgB,output);\n" +
+				"\t\t\n" +
+				"\t\tfinal int h = imgA.getHeight();\n" +
+				"\t\tfinal int w = imgA.getWidth();\n" +
+				"\n" +
+				"\t\tfor (int y = 0; y < h; y++) {\n" +
+				"\t\t\tint indexA = imgA.getStartIndex() + y * imgA.getStride();\n" +
+				"\t\t\tint indexB = imgB.getStartIndex() + y * imgB.getStride();\n" +
+				"\t\t\tint indexOut = output.getStartIndex() + y * output.getStride();\n" +
+				"\t\t\t\n" +
+				"\t\t\tint indexEnd = indexA+w;\n" +
+				"\t\t\t// for(int x = 0; x < w; x++ ) {\n" +
+				"\t\t\tfor (; indexA < indexEnd; indexA++, indexB++, indexOut++ ) {\n" +
+				"\t\t\t\toutput.data[indexOut] = "+typeCast+"((imgA.data[indexA] "+bitWise+") * (imgB.data[indexB] "+bitWise+"));\n" +
+				"\t\t\t}\n" +
+				"\t\t}\n" +
+				"\t}\n\n");
+	}
+
+	public void printDivTwoImages( AutoTypeImage typeIn , AutoTypeImage typeOut  ) {
+
+		String bitWise = typeIn.getBitWise();
+		String typeCast = typeOut.isInteger() ? "("+typeOut.getDataType()+")" : "";
+
+		out.print("\t/**\n" +
+				"\t * <p>\n" +
+				"\t * Performs pixel-wise division<br>\n" +
+				"\t * output(x,y) = imgA(x,y) / imgB(x,y)\n" +
+				"\t * </p>\n" +
+				"\t * @param imgA Input image. Not modified.\n" +
+				"\t * @param imgB Input image. Not modified.\n" +
+				"\t * @param output Output image. Modified.\n" +
+				"\t */\n" +
+				"\tpublic static void divide( "+typeIn.getImageName()+" imgA , "+typeIn.getImageName()+" imgB , "+typeOut.getImageName()+" output ) {\n" +
+				"\t\tInputSanityCheck.checkSameShape(imgA,imgB,output);\n" +
+				"\t\t\n" +
+				"\t\tfinal int h = imgA.getHeight();\n" +
+				"\t\tfinal int w = imgA.getWidth();\n" +
+				"\n" +
+				"\t\tfor (int y = 0; y < h; y++) {\n" +
+				"\t\t\tint indexA = imgA.getStartIndex() + y * imgA.getStride();\n" +
+				"\t\t\tint indexB = imgB.getStartIndex() + y * imgB.getStride();\n" +
+				"\t\t\tint indexOut = output.getStartIndex() + y * output.getStride();\n" +
+				"\t\t\t\n" +
+				"\t\t\tint indexEnd = indexA+w;\n" +
+				"\t\t\t// for(int x = 0; x < w; x++ ) {\n" +
+				"\t\t\tfor (; indexA < indexEnd; indexA++, indexB++, indexOut++ ) {\n" +
+				"\t\t\t\toutput.data[indexOut] = "+typeCast+"((imgA.data[indexA] "+bitWise+") / (imgB.data[indexB] "+bitWise+"));\n" +
+				"\t\t\t}\n" +
+				"\t\t}\n" +
+				"\t}\n\n");
+	}
+
 
 	public void printAverageBand() {
 		

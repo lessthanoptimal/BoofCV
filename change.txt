@@ -31,6 +31,12 @@ Version : Alpha 0.16
   * No need to explicitly call orderBandsIntoRGB() any more
 - Change behavior of ConvertRaster so that it does not modify the order of color bands at all
   * Improved unit tests
+- Added Fast Fourier Transform
+  * Code originally from General Purpose FFT by Takuya Ooura, actual Java code copied from JTransforms
+    with minor modifications.
+- PixelMath
+  * pixel-wise image-to-image multiplication
+  * pixel-wise image-to-image division
 
 - TODO remove GeoModelRefine and replace with ModelFitter
 - TODO improve KLT edge handling
