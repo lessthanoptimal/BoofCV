@@ -39,7 +39,7 @@ public class TestGPixelMath extends BaseGClassChecksInMisc {
 
 	@Test
 	public void compareToPixelMath() {
-		performTests(13);
+		performTests(15);
 	}
 
 	@Override
@@ -62,9 +62,15 @@ public class TestGPixelMath extends BaseGClassChecksInMisc {
 			ret[0][1] = output;
 		} else if( name.equals("divide") && param.length == 3) {
 			output = createImage(param[param.length-1],null);
-			ret[0][0] = inputA;
-			ret[0][1] = 3;
-			ret[0][2] = output;
+			if( ImageBase.class.isAssignableFrom(param[1]) )  {
+				ret[0][0] = inputA;
+				ret[0][1] = inputB = createImage(param[1],null);
+				ret[0][2] = output;
+			} else {
+				ret[0][0] = inputA;
+				ret[0][1] = 3;
+				ret[0][2] = output;
+			}
 		} else if( name.equals("divide") && param.length == 5) {
 			output = createImage(param[param.length - 1],null);
 			ret[0][0] = inputA;
@@ -73,10 +79,16 @@ public class TestGPixelMath extends BaseGClassChecksInMisc {
 			ret[0][3] = 5;
 			ret[0][4] = output;
 		} else if( name.equals("multiply") && param.length == 3) {
-			output = createImage(param[param.length - 1],null);
-			ret[0][0] = inputA;
-			ret[0][1] = 3;
-			ret[0][2] = output;
+			output = createImage(param[param.length-1],null);
+			if( ImageBase.class.isAssignableFrom(param[1]) )  {
+				ret[0][0] = inputA;
+				ret[0][1] = inputB = createImage(param[1],null);
+				ret[0][2] = output;
+			} else {
+				ret[0][0] = inputA;
+				ret[0][1] = 3;
+				ret[0][2] = output;
+			}
 		} else if( name.equals("multiply") && param.length == 5) {
 			output = createImage(param[param.length - 1],null);
 			ret[0][0] = inputA;

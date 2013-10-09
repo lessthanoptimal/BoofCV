@@ -19,7 +19,7 @@
 package boofcv.alg.transform.fft;
 
 /**
- * Computes 1D Discrete Fourier Transform (DFT) of complex and real, double
+ * Computes 1D Discrete Fourier Transform (DFT) of complex and real, float
  * precision data. The size of the data can be an arbitrary number. The code originally comes from
  * General Purpose FFT Package written by Takuya Ooura
  * (http://www.kurims.kyoto-u.ac.jp/~ooura/fft.html).  See below for the full history.
@@ -76,8 +76,14 @@ public class GeneralPurposeFFT_F32_1D {
 
 	private static final float TWO_PI = 6.28318530717958623199592693708837032f;
 
+	// local storage which is predeclared
+	private float[] ak;
+	private float[] ch;
+	private float[] ch2;
+	private int[] nac = new int[1];
+
 	/**
-	 * Creates new instance of floatFFT_1D.
+	 * Creates new instance of DoubleFFT_1D.
 	 *
 	 * @param n
 	 *            size of data
@@ -88,10 +94,10 @@ public class GeneralPurposeFFT_F32_1D {
 		}
 		this.n = n;
 
-		if (!UtilDiscreteFourierTransform.isPowerOf2(n)) {
+		if (!DiscreteFourierTransformOps.isPowerOf2(n)) {
 			if (getReminder(n, factors) >= 211) {
 				plan = Plans.BLUESTEIN;
-				nBluestein = UtilDiscreteFourierTransform.nextPow2(n * 2 - 1);
+				nBluestein = DiscreteFourierTransformOps.nextPow2(n * 2 - 1);
 				bk1 = new float[2 * nBluestein];
 				bk2 = new float[2 * nBluestein];
 				this.ip = new int[2 + (int) Math.ceil(2 + (1 << (int) (Math.log(nBluestein + 0.5) / Math.log(2)) / 2))];
@@ -108,6 +114,7 @@ public class GeneralPurposeFFT_F32_1D {
 					makect(nc, w, nw);
 				}
 				bluesteini();
+				ak = new float[2 * nBluestein];
 			} else {
 				plan = Plans.MIXED_RADIX;
 				wtable = new float[4 * n + 15];
@@ -131,6 +138,8 @@ public class GeneralPurposeFFT_F32_1D {
 				makect(nc, w, nw);
 			}
 		}
+		ch = new float[n];
+		ch2 = new float[n*2];
 	}
 
 	/**
@@ -332,6 +341,7 @@ public class GeneralPurposeFFT_F32_1D {
 					a[idx] = a[idx - 1];
 					a[idx - 1] = tmp;
 				}
+				ch = new float[n];
 				break;
 			case BLUESTEIN:
 				bluestein_real_forward(a, offa);
@@ -675,93 +685,6 @@ public class GeneralPurposeFFT_F32_1D {
 
 	/* -------- initializing routines -------- */
 
-	/*---------------------------------------------------------
-       cffti: initialization of Complex FFT
-      --------------------------------------------------------*/
-
-	void cffti(int n, int offw) {
-		if (n == 1)
-			return;
-
-		final int twon = 2 * n;
-		final int fourn = 4 * n;
-		float argh;
-		int idot, ntry = 0, i, j;
-		float argld;
-		int i1, k1, l1, l2, ib;
-		float fi;
-		int ld, ii, nf, ip, nl, nq, nr;
-		float arg;
-		int ido, ipm;
-
-		nl = n;
-		nf = 0;
-		j = 0;
-
-		factorize_loop: while (true) {
-			j++;
-			if (j <= 4)
-				ntry = factors[j - 1];
-			else
-				ntry += 2;
-			do {
-				nq = nl / ntry;
-				nr = nl - ntry * nq;
-				if (nr != 0)
-					continue factorize_loop;
-				nf++;
-				wtable[offw + nf + 1 + fourn] = ntry;
-				nl = nq;
-				if (ntry == 2 && nf != 1) {
-					for (i = 2; i <= nf; i++) {
-						ib = nf - i + 2;
-						int idx = ib + fourn;
-						wtable[offw + idx + 1] = wtable[offw + idx];
-					}
-					wtable[offw + 2 + fourn] = 2;
-				}
-			} while (nl != 1);
-			break factorize_loop;
-		}
-		wtable[offw + fourn] = n;
-		wtable[offw + 1 + fourn] = nf;
-		argh = TWO_PI / (float) n;
-		i = 1;
-		l1 = 1;
-		for (k1 = 1; k1 <= nf; k1++) {
-			ip = (int) wtable[offw + k1 + 1 + fourn];
-			ld = 0;
-			l2 = l1 * ip;
-			ido = n / l2;
-			idot = ido + ido + 2;
-			ipm = ip - 1;
-			for (j = 1; j <= ipm; j++) {
-				i1 = i;
-				wtable[offw + i - 1 + twon] = 1;
-				wtable[offw + i + twon] = 0;
-				ld += l1;
-				fi = 0;
-				argld = ld * argh;
-				for (ii = 4; ii <= idot; ii += 2) {
-					i += 2;
-					fi += 1;
-					arg = fi * argld;
-					int idx = i + twon;
-					wtable[offw + idx - 1] = (float)Math.cos(arg);
-					wtable[offw + idx] = (float)Math.sin(arg);
-				}
-				if (ip > 5) {
-					int idx1 = i1 + twon;
-					int idx2 = i + twon;
-					wtable[offw + idx1 - 1] = wtable[offw + idx2 - 1];
-					wtable[offw + idx1] = wtable[offw + idx2];
-				}
-			}
-			l1 = l2;
-		}
-
-	}
-
 	void cffti() {
 		if (n == 1)
 			return;
@@ -1051,8 +974,6 @@ public class GeneralPurposeFFT_F32_1D {
 	}
 
 	private void bluestein_complex(final float[] a, final int offa, final int isign) {
-		final float[] ak = new float[2 * nBluestein];
-
 		if (isign > 0) {
 			for (int i = 0; i < n; i++) {
 				int idx1 = 2 * i;
@@ -1116,8 +1037,6 @@ public class GeneralPurposeFFT_F32_1D {
 	}
 
 	private void bluestein_real_full(final float[] a, final int offa, final int isign) {
-		final float[] ak = new float[2 * nBluestein];
-
 		if (isign > 0) {
 			for (int i = 0; i < n; i++) {
 				int idx1 = 2 * i;
@@ -1176,7 +1095,7 @@ public class GeneralPurposeFFT_F32_1D {
 	}
 
 	private void bluestein_real_forward(final float[] a, final int offa) {
-		final float[] ak = new float[2 * nBluestein];
+
 		for (int i = 0; i < n; i++) {
 			int idx1 = 2 * i;
 			int idx2 = idx1 + 1;
@@ -1220,7 +1139,7 @@ public class GeneralPurposeFFT_F32_1D {
 	}
 
 	private void bluestein_real_inverse(final float[] a, final int offa) {
-		final float[] ak = new float[2 * nBluestein];
+
 		if (n % 2 == 0) {
 			ak[0] = a[offa] * bk1[0];
 			ak[1] = a[offa] * bk1[1];
@@ -1295,7 +1214,7 @@ public class GeneralPurposeFFT_F32_1D {
 	}
 
 	private void bluestein_real_inverse2(final float[] a, final int offa) {
-		final float[] ak = new float[2 * nBluestein];
+
 		for (int i = 0; i < n; i++) {
 			int idx1 = 2 * i;
 			int idx2 = idx1 + 1;
@@ -1348,7 +1267,6 @@ public class GeneralPurposeFFT_F32_1D {
 			return;
 		int l1, l2, na, kh, nf, ip, iw, ido, idl1;
 
-		final float[] ch = new float[n];
 		final int twon = 2 * n;
 		nf = (int) wtable_r[1 + twon];
 		na = 1;
@@ -1418,7 +1336,6 @@ public class GeneralPurposeFFT_F32_1D {
 			return;
 		int l1, l2, na, nf, ip, iw, ido, idl1;
 
-		float[] ch = new float[n];
 		final int twon = 2 * n;
 		nf = (int) wtable_r[1 + twon];
 		na = 0;
@@ -2943,11 +2860,10 @@ public class GeneralPurposeFFT_F32_1D {
 		int idot;
 		int l1, l2;
 		int na, nf, ip, iw, ido, idl1;
-		int[] nac = new int[1];
 		final int twon = 2 * n;
 
 		int iw1, iw2;
-		float[] ch = new float[twon];
+		float[] ch = ch2;
 
 		iw1 = twon;
 		iw2 = 4 * n;

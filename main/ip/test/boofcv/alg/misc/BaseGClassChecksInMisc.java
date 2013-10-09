@@ -58,7 +58,14 @@ public abstract class BaseGClassChecksInMisc extends CompareEquivalentFunctions 
 		if( c.length != v.length)
 			return false;
 
-		return candidate.getName().compareTo(validation.getName()) == 0;
+		if( candidate.getName().compareTo(validation.getName()) != 0 )
+			return false;
+
+		for( int i = 0; i < v.length; i++ ) {
+			if( !v[i].isAssignableFrom(c[i]))
+				return false;
+		}
+		return true;
 	}
 
 	@Override

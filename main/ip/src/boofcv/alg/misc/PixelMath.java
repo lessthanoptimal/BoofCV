@@ -2147,7 +2147,7 @@ public class PixelMath {
 	/**
 	 * <p>
 	 * Performs pixel-wise addition<br>
-	 * d(x,y) = imgA(x,y) + imgB(x,y)
+	 * output(x,y) = imgA(x,y) + imgB(x,y)
 	 * </p>
 	 * @param imgA Input image. Not modified.
 	 * @param imgB Input image. Not modified.
@@ -2175,7 +2175,7 @@ public class PixelMath {
 	/**
 	 * <p>
 	 * Performs pixel-wise subtraction.<br>
-	 * d(x,y) = imgA(x,y) - imgB(x,y)
+	 * output(x,y) = imgA(x,y) - imgB(x,y)
 	 * </p>
 	 * @param imgA Input image. Not modified.
 	 * @param imgB Input image. Not modified.
@@ -2203,7 +2203,7 @@ public class PixelMath {
 	/**
 	 * <p>
 	 * Performs pixel-wise addition<br>
-	 * d(x,y) = imgA(x,y) + imgB(x,y)
+	 * output(x,y) = imgA(x,y) + imgB(x,y)
 	 * </p>
 	 * @param imgA Input image. Not modified.
 	 * @param imgB Input image. Not modified.
@@ -2231,7 +2231,7 @@ public class PixelMath {
 	/**
 	 * <p>
 	 * Performs pixel-wise subtraction.<br>
-	 * d(x,y) = imgA(x,y) - imgB(x,y)
+	 * output(x,y) = imgA(x,y) - imgB(x,y)
 	 * </p>
 	 * @param imgA Input image. Not modified.
 	 * @param imgB Input image. Not modified.
@@ -2259,7 +2259,7 @@ public class PixelMath {
 	/**
 	 * <p>
 	 * Performs pixel-wise addition<br>
-	 * d(x,y) = imgA(x,y) + imgB(x,y)
+	 * output(x,y) = imgA(x,y) + imgB(x,y)
 	 * </p>
 	 * @param imgA Input image. Not modified.
 	 * @param imgB Input image. Not modified.
@@ -2287,7 +2287,7 @@ public class PixelMath {
 	/**
 	 * <p>
 	 * Performs pixel-wise subtraction.<br>
-	 * d(x,y) = imgA(x,y) - imgB(x,y)
+	 * output(x,y) = imgA(x,y) - imgB(x,y)
 	 * </p>
 	 * @param imgA Input image. Not modified.
 	 * @param imgB Input image. Not modified.
@@ -2315,7 +2315,7 @@ public class PixelMath {
 	/**
 	 * <p>
 	 * Performs pixel-wise addition<br>
-	 * d(x,y) = imgA(x,y) + imgB(x,y)
+	 * output(x,y) = imgA(x,y) + imgB(x,y)
 	 * </p>
 	 * @param imgA Input image. Not modified.
 	 * @param imgB Input image. Not modified.
@@ -2343,7 +2343,7 @@ public class PixelMath {
 	/**
 	 * <p>
 	 * Performs pixel-wise subtraction.<br>
-	 * d(x,y) = imgA(x,y) - imgB(x,y)
+	 * output(x,y) = imgA(x,y) - imgB(x,y)
 	 * </p>
 	 * @param imgA Input image. Not modified.
 	 * @param imgB Input image. Not modified.
@@ -2371,7 +2371,7 @@ public class PixelMath {
 	/**
 	 * <p>
 	 * Performs pixel-wise addition<br>
-	 * d(x,y) = imgA(x,y) + imgB(x,y)
+	 * output(x,y) = imgA(x,y) + imgB(x,y)
 	 * </p>
 	 * @param imgA Input image. Not modified.
 	 * @param imgB Input image. Not modified.
@@ -2399,7 +2399,7 @@ public class PixelMath {
 	/**
 	 * <p>
 	 * Performs pixel-wise subtraction.<br>
-	 * d(x,y) = imgA(x,y) - imgB(x,y)
+	 * output(x,y) = imgA(x,y) - imgB(x,y)
 	 * </p>
 	 * @param imgA Input image. Not modified.
 	 * @param imgB Input image. Not modified.
@@ -2427,7 +2427,7 @@ public class PixelMath {
 	/**
 	 * <p>
 	 * Performs pixel-wise addition<br>
-	 * d(x,y) = imgA(x,y) + imgB(x,y)
+	 * output(x,y) = imgA(x,y) + imgB(x,y)
 	 * </p>
 	 * @param imgA Input image. Not modified.
 	 * @param imgB Input image. Not modified.
@@ -2455,7 +2455,7 @@ public class PixelMath {
 	/**
 	 * <p>
 	 * Performs pixel-wise subtraction.<br>
-	 * d(x,y) = imgA(x,y) - imgB(x,y)
+	 * output(x,y) = imgA(x,y) - imgB(x,y)
 	 * </p>
 	 * @param imgA Input image. Not modified.
 	 * @param imgB Input image. Not modified.
@@ -2483,7 +2483,7 @@ public class PixelMath {
 	/**
 	 * <p>
 	 * Performs pixel-wise addition<br>
-	 * d(x,y) = imgA(x,y) + imgB(x,y)
+	 * output(x,y) = imgA(x,y) + imgB(x,y)
 	 * </p>
 	 * @param imgA Input image. Not modified.
 	 * @param imgB Input image. Not modified.
@@ -2511,7 +2511,7 @@ public class PixelMath {
 	/**
 	 * <p>
 	 * Performs pixel-wise subtraction.<br>
-	 * d(x,y) = imgA(x,y) - imgB(x,y)
+	 * output(x,y) = imgA(x,y) - imgB(x,y)
 	 * </p>
 	 * @param imgA Input image. Not modified.
 	 * @param imgB Input image. Not modified.
@@ -2538,8 +2538,64 @@ public class PixelMath {
 
 	/**
 	 * <p>
+	 * Performs pixel-wise multiplication<br>
+	 * output(x,y) = imgA(x,y) * imgB(x,y)
+	 * </p>
+	 * @param imgA Input image. Not modified.
+	 * @param imgB Input image. Not modified.
+	 * @param output Output image. Modified.
+	 */
+	public static void multiply( ImageFloat32 imgA , ImageFloat32 imgB , ImageFloat32 output ) {
+		InputSanityCheck.checkSameShape(imgA,imgB,output);
+		
+		final int h = imgA.getHeight();
+		final int w = imgA.getWidth();
+
+		for (int y = 0; y < h; y++) {
+			int indexA = imgA.getStartIndex() + y * imgA.getStride();
+			int indexB = imgB.getStartIndex() + y * imgB.getStride();
+			int indexOut = output.getStartIndex() + y * output.getStride();
+			
+			int indexEnd = indexA+w;
+			// for(int x = 0; x < w; x++ ) {
+			for (; indexA < indexEnd; indexA++, indexB++, indexOut++ ) {
+				output.data[indexOut] = ((imgA.data[indexA] ) * (imgB.data[indexB] ));
+			}
+		}
+	}
+
+	/**
+	 * <p>
+	 * Performs pixel-wise division<br>
+	 * output(x,y) = imgA(x,y) / imgB(x,y)
+	 * </p>
+	 * @param imgA Input image. Not modified.
+	 * @param imgB Input image. Not modified.
+	 * @param output Output image. Modified.
+	 */
+	public static void divide( ImageFloat32 imgA , ImageFloat32 imgB , ImageFloat32 output ) {
+		InputSanityCheck.checkSameShape(imgA,imgB,output);
+		
+		final int h = imgA.getHeight();
+		final int w = imgA.getWidth();
+
+		for (int y = 0; y < h; y++) {
+			int indexA = imgA.getStartIndex() + y * imgA.getStride();
+			int indexB = imgB.getStartIndex() + y * imgB.getStride();
+			int indexOut = output.getStartIndex() + y * output.getStride();
+			
+			int indexEnd = indexA+w;
+			// for(int x = 0; x < w; x++ ) {
+			for (; indexA < indexEnd; indexA++, indexB++, indexOut++ ) {
+				output.data[indexOut] = ((imgA.data[indexA] ) / (imgB.data[indexB] ));
+			}
+		}
+	}
+
+	/**
+	 * <p>
 	 * Performs pixel-wise addition<br>
-	 * d(x,y) = imgA(x,y) + imgB(x,y)
+	 * output(x,y) = imgA(x,y) + imgB(x,y)
 	 * </p>
 	 * @param imgA Input image. Not modified.
 	 * @param imgB Input image. Not modified.
@@ -2567,7 +2623,7 @@ public class PixelMath {
 	/**
 	 * <p>
 	 * Performs pixel-wise subtraction.<br>
-	 * d(x,y) = imgA(x,y) - imgB(x,y)
+	 * output(x,y) = imgA(x,y) - imgB(x,y)
 	 * </p>
 	 * @param imgA Input image. Not modified.
 	 * @param imgB Input image. Not modified.
@@ -2588,6 +2644,62 @@ public class PixelMath {
 			// for(int x = 0; x < w; x++ ) {
 			for (; indexA < indexEnd; indexA++, indexB++, indexOut++ ) {
 				output.data[indexOut] = ((imgA.data[indexA] ) - (imgB.data[indexB] ));
+			}
+		}
+	}
+
+	/**
+	 * <p>
+	 * Performs pixel-wise multiplication<br>
+	 * output(x,y) = imgA(x,y) * imgB(x,y)
+	 * </p>
+	 * @param imgA Input image. Not modified.
+	 * @param imgB Input image. Not modified.
+	 * @param output Output image. Modified.
+	 */
+	public static void multiply( ImageFloat64 imgA , ImageFloat64 imgB , ImageFloat64 output ) {
+		InputSanityCheck.checkSameShape(imgA,imgB,output);
+		
+		final int h = imgA.getHeight();
+		final int w = imgA.getWidth();
+
+		for (int y = 0; y < h; y++) {
+			int indexA = imgA.getStartIndex() + y * imgA.getStride();
+			int indexB = imgB.getStartIndex() + y * imgB.getStride();
+			int indexOut = output.getStartIndex() + y * output.getStride();
+			
+			int indexEnd = indexA+w;
+			// for(int x = 0; x < w; x++ ) {
+			for (; indexA < indexEnd; indexA++, indexB++, indexOut++ ) {
+				output.data[indexOut] = ((imgA.data[indexA] ) * (imgB.data[indexB] ));
+			}
+		}
+	}
+
+	/**
+	 * <p>
+	 * Performs pixel-wise division<br>
+	 * output(x,y) = imgA(x,y) / imgB(x,y)
+	 * </p>
+	 * @param imgA Input image. Not modified.
+	 * @param imgB Input image. Not modified.
+	 * @param output Output image. Modified.
+	 */
+	public static void divide( ImageFloat64 imgA , ImageFloat64 imgB , ImageFloat64 output ) {
+		InputSanityCheck.checkSameShape(imgA,imgB,output);
+		
+		final int h = imgA.getHeight();
+		final int w = imgA.getWidth();
+
+		for (int y = 0; y < h; y++) {
+			int indexA = imgA.getStartIndex() + y * imgA.getStride();
+			int indexB = imgB.getStartIndex() + y * imgB.getStride();
+			int indexOut = output.getStartIndex() + y * output.getStride();
+			
+			int indexEnd = indexA+w;
+			// for(int x = 0; x < w; x++ ) {
+			for (; indexA < indexEnd; indexA++, indexB++, indexOut++ ) {
+				output.data[indexOut] = ((imgA.data[indexA] ) / (imgB.data[indexB] ));
 			}
 		}
 	}

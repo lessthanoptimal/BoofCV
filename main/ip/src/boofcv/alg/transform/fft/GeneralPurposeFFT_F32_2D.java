@@ -19,7 +19,7 @@
 package boofcv.alg.transform.fft;
 
 /**
- * Computes 2D Discrete Fourier Transform (DFT) of complex and real, double
+ * Computes 2D Discrete Fourier Transform (DFT) of complex and real, float
  * precision data. The size of the data can be an arbitrary number. The code originally comes from
  * General Purpose FFT Package written by Takuya Ooura
  * (http://www.kurims.kyoto-u.ac.jp/~ooura/fft.html).  See below for the full history.
@@ -54,8 +54,12 @@ public class GeneralPurposeFFT_F32_2D {
 
 	private boolean isPowerOfTwo = false;
 
+	// local storage pre-declared
+	private float[] temp;
+	private float[][] temp2;
+
 	/**
-	 * Creates new instance of floatFFT_2D.
+	 * Creates new instance of DoubleFFT_2D.
 	 *
 	 * @param rows
 	 *            number of rows
@@ -63,13 +67,14 @@ public class GeneralPurposeFFT_F32_2D {
 	 *            number of columns
 	 */
 	public GeneralPurposeFFT_F32_2D(int rows, int columns) {
-		if (rows <= 1 || columns <= 1) {
-			throw new IllegalArgumentException("rows and columns must be greater than 1");
+		if (rows < 1 || columns < 1 ) {
+			throw new IllegalArgumentException("rows and columns must be greater than 0");
 		}
+
 		this.rows = rows;
 		this.columns = columns;
 
-		if (UtilDiscreteFourierTransform.isPowerOf2(rows) && UtilDiscreteFourierTransform.isPowerOf2(columns)) {
+		if (DiscreteFourierTransformOps.isPowerOf2(rows) && DiscreteFourierTransformOps.isPowerOf2(columns)) {
 			isPowerOfTwo = true;
 
 			int oldNthreads = 1;
@@ -88,6 +93,8 @@ public class GeneralPurposeFFT_F32_2D {
 		} else {
 			fftColumns = new GeneralPurposeFFT_F32_1D(columns);
 		}
+
+		temp = new float[2 * rows];
 	}
 
 	/**
@@ -106,6 +113,15 @@ public class GeneralPurposeFFT_F32_2D {
 	 *            data to transform
 	 */
 	public void complexForward(final float[] a) {
+		// handle special case
+		if( rows == 1 || columns == 1 ) {
+			if( rows > 1 )
+				fftRows.complexForward(a);
+			else
+				fftColumns.complexForward(a);
+			return;
+		}
+
 		if (isPowerOfTwo) {
 			int oldn2 = columns;
 			columns = 2 * columns;
@@ -120,7 +136,7 @@ public class GeneralPurposeFFT_F32_2D {
 			for (int r = 0; r < rows; r++) {
 				fftColumns.complexForward(a, r * rowStride);
 			}
-			float[] temp = new float[2 * rows];
+
 			for (int c = 0; c < columns; c++) {
 				int idx0 = 2 * c;
 				for (int r = 0; r < rows; r++) {
@@ -160,6 +176,15 @@ public class GeneralPurposeFFT_F32_2D {
 	 *
 	 */
 	public void complexInverse(final float[] a, final boolean scale) {
+		// handle special case
+		if( rows == 1 || columns == 1 ) {
+			if( rows > 1 )
+				fftRows.complexInverse(a, scale);
+			else
+				fftColumns.complexInverse(a, scale);
+			return;
+		}
+
 		if (isPowerOfTwo) {
 			int oldn2 = columns;
 			columns = 2 * columns;
@@ -173,7 +198,7 @@ public class GeneralPurposeFFT_F32_2D {
 			for (int r = 0; r < rows; r++) {
 				fftColumns.complexInverse(a, r * rowspan, scale);
 			}
-			float[] temp = new float[2 * rows];
+
 			for (int c = 0; c < columns; c++) {
 				int idx1 = 2 * c;
 				for (int r = 0; r < rows; r++) {
@@ -250,6 +275,15 @@ public class GeneralPurposeFFT_F32_2D {
 	 *            data to transform
 	 */
 	public void realForwardFull(float[] a) {
+		// handle special case
+		if( rows == 1 || columns == 1 ) {
+			if( rows > 1 )
+				fftRows.realForwardFull(a);
+			else
+				fftColumns.realForwardFull(a);
+			return;
+		}
+
 		if (isPowerOfTwo) {
 			for (int r = 0; r < rows; r++) {
 				fftColumns.realForward(a, r * columns);
@@ -258,6 +292,7 @@ public class GeneralPurposeFFT_F32_2D {
 			rdft2d_sub(1, a);
 			fillSymmetric(a);
 		} else {
+			declareRadixRealData();
 			mixedRadixRealForwardFull(a);
 		}
 	}
@@ -297,6 +332,15 @@ public class GeneralPurposeFFT_F32_2D {
 	 *            if true then scaling is performed
 	 */
 	public void realInverse(float[] a, boolean scale) {
+		// handle special case
+		if( rows == 1 || columns == 1 ) {
+			if( rows > 1 )
+				fftRows.realInverse(a, scale);
+			else
+				fftColumns.realInverse(a, scale);
+			return;
+		}
+
 		if (isPowerOfTwo == false) {
 			throw new IllegalArgumentException("rows and columns must be power of two numbers");
 		} else {
@@ -323,6 +367,15 @@ public class GeneralPurposeFFT_F32_2D {
 	 *            if true then scaling is performed
 	 */
 	public void realInverseFull(float[] a, boolean scale) {
+		// handle special case
+		if( rows == 1 || columns == 1 ) {
+			if( rows > 1 )
+				fftRows.realInverseFull(a, scale);
+			else
+				fftColumns.realInverseFull(a, scale);
+			return;
+		}
+
 		if (isPowerOfTwo) {
 			for (int r = 0; r < rows; r++) {
 				fftColumns.realInverse2(a, r * columns, scale);
@@ -331,14 +384,22 @@ public class GeneralPurposeFFT_F32_2D {
 			rdft2d_sub(1, a);
 			fillSymmetric(a);
 		} else {
+			declareRadixRealData();
 			mixedRadixRealInverseFull(a, scale);
+		}
+	}
+
+	private void declareRadixRealData() {
+		if( temp2 == null ) {
+			final int n2d2 = columns / 2 + 1;
+			temp2 = new float[n2d2][2 * rows];
 		}
 	}
 
 	private void mixedRadixRealForwardFull(final float[] a) {
 		final int rowStride = 2 * columns;
 		final int n2d2 = columns / 2 + 1;
-		final float[][] temp = new float[n2d2][2 * rows];
+		final float[][] temp = temp2;
 
 		for (int r = 0; r < rows; r++) {
 			fftColumns.realForward(a, r * columns);
@@ -407,7 +468,7 @@ public class GeneralPurposeFFT_F32_2D {
 	private void mixedRadixRealInverseFull(final float[] a, final boolean scale) {
 		final int rowStride = 2 * columns;
 		final int n2d2 = columns / 2 + 1;
-		final float[][] temp = new float[n2d2][2 * rows];
+		final float[][] temp = temp2;
 
 		for (int r = 0; r < rows; r++) {
 			fftColumns.realInverse2(a, r * columns, scale);
