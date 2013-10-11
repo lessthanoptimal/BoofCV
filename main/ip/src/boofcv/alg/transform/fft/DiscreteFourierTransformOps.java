@@ -19,6 +19,7 @@
 package boofcv.alg.transform.fft;
 
 import boofcv.struct.convolve.Kernel2D_F32;
+import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
 
 /**
@@ -65,11 +66,11 @@ public class DiscreteFourierTransformOps {
 	 * @param image Storage for an image
 	 * @param transform Storage for a Fourier Transform
 	 */
-	public static void checkImageArguments( ImageFloat32 image , ImageFloat32 transform ) {
+	public static void checkImageArguments( ImageBase image , ImageBase transform ) {
 		if( image.width*2 != transform.width )
 			throw new IllegalArgumentException("Transform must be twice the width of the input image");
-		if( image.height*2 != transform.height )
-			throw new IllegalArgumentException("Transform must be twice the height of the input image");
+		if( image.height != transform.height )
+			throw new IllegalArgumentException("Transform have the same height of the input image");
 	}
 
 	public static boolean isOptimalSize( ImageFloat32 image ) {
