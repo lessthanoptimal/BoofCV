@@ -18,14 +18,26 @@
 
 package boofcv.alg.transform.fft;
 
-import boofcv.struct.convolve.Kernel2D_F32;
+import boofcv.abst.transform.fft.DiscreteFourierTransform;
+import boofcv.abst.transform.fft.GeneralFft_to_DiscreteFourierTransform_F32;
+import boofcv.abst.transform.fft.GeneralFft_to_DiscreteFourierTransform_F64;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageFloat64;
 
 /**
  * @author Peter Abeles
  */
 public class DiscreteFourierTransformOps {
+
+	public static DiscreteFourierTransform<ImageFloat32>  createTransformF32() {
+		return new GeneralFft_to_DiscreteFourierTransform_F32();
+	}
+
+	public static DiscreteFourierTransform<ImageFloat64>  createTransformF64() {
+		return new GeneralFft_to_DiscreteFourierTransform_F64();
+	}
+
 	/**
 	 * true if the number provided is a power of two
 	 * @param x number
@@ -81,14 +93,50 @@ public class DiscreteFourierTransformOps {
 		return 0;
 	}
 
+	// TODO will this work for even and odd length images?
+	// TODO do in a single pass
 	public static void centerZeroFrequency( ImageFloat32 transform ) {
 
+		if( transform.width%2 != 0 || transform.height%2 != 0 )
+			throw new IllegalArgumentException("Not uspported et");
+
+		int hw = transform.width/2;
+		int hh = transform.height/2;
+
+		for( int y = 0; y < transform.height; y++ ) {
+
+			int indexTran = transform.startIndex + y*transform.stride;
+
+			for( int x = 0; x < hw; x += 2, indexTran += 2 ) {
+				float ra = transform.data[indexTran];
+				float ia = transform.data[indexTran+1];
+
+				transform.data[indexTran] = transform.data[indexTran+hw];
+				transform.data[indexTran+1] = transform.data[indexTran+1+hw];
+
+				transform.data[indexTran+hw] = ra;
+				transform.data[indexTran+hw+1] = ia;
+			}
+		}
+
+		int stepY = hh*transform.stride;
+
+		for( int x = 0; x < transform.width; x += 2 ) {
+
+			int indexTran = transform.startIndex + x;
+
+			for( int y = 0; y < hh; y++ , indexTran += transform.stride ) {
+				float ra = transform.data[indexTran];
+				float ia = transform.data[indexTran+1];
+
+				transform.data[indexTran] = transform.data[indexTran+stepY];
+				transform.data[indexTran+1] = transform.data[indexTran+1+stepY];
+
+				transform.data[indexTran+stepY] = ra;
+				transform.data[indexTran+stepY+1] = ia;
+			}
+		}
 	}
-
-	public static void undoCenterZeroFrequency( ImageFloat32 transform ) {
-
-	}
-
 
 	public static void resizeOptimal( ImageFloat32 input , ImageFloat32 output , FftBorderType type , float value )
 	{
@@ -99,19 +147,123 @@ public class DiscreteFourierTransformOps {
 
 	}
 
-	public static void insertKernel( Kernel2D_F32 kenel , ImageFloat32 image ) {
+	public static void split( ImageFloat32 transform , ImageFloat32 real , ImageFloat32 imaginary ) {
+		for( int y = 0; y < transform.height; y++ ) {
 
+			int indexTran = transform.startIndex + y*transform.stride;
+			int indexReal = real.startIndex + y*real.stride;
+			int indexImg = imaginary.startIndex + y*imaginary.stride;
+
+			for( int x = 0; x < transform.width; x += 2, indexTran += 2 ) {
+
+				real.data[indexReal++] = transform.data[indexTran];
+				imaginary.data[indexImg++] = transform.data[indexTran+1];
+			}
+		}
 	}
 
-	public static void split( ImageFloat32 complex , ImageFloat32 real , ImageFloat32 imaginary ) {
+	public static void merge( ImageFloat32 real , ImageFloat32 imaginary , ImageFloat32 transform ) {
+		for( int y = 0; y < transform.height; y++ ) {
 
-	}
+			int indexTran = transform.startIndex + y*transform.stride;
+			int indexReal = real.startIndex + y*real.stride;
+			int indexImg = imaginary.startIndex + y*imaginary.stride;
 
-	public static void merge( ImageFloat32 real , ImageFloat32 imaginary , ImageFloat32 complex ) {
+			for( int x = 0; x < transform.width; x += 2, indexTran += 2 ) {
 
+				transform.data[indexTran] = real.data[indexReal++];
+				transform.data[indexTran+1] = imaginary.data[indexImg++];
+			}
+		}
 	}
 
 	public static void magnitude( ImageFloat32 transform , ImageFloat32 magnitude ) {
+		for( int y = 0; y < transform.height; y++ ) {
 
+			int indexTran = transform.startIndex + y*transform.stride;
+			int indexMag = magnitude.startIndex + y*magnitude.stride;
+
+			for( int x = 0; x < transform.width; x += 2, indexTran += 2 ) {
+
+				float real = transform.data[indexTran];
+				float img = transform.data[indexTran+1];
+
+				magnitude.data[indexMag++] = (float)Math.sqrt(real*real + img*img);
+			}
+		}
+	}
+
+	public static void phase( ImageFloat32 transform , ImageFloat32 phase ) {
+		for( int y = 0; y < transform.height; y++ ) {
+
+			int indexTran = transform.startIndex + y*transform.stride;
+			int indexPhase = phase.startIndex + y*phase.stride;
+
+			for( int x = 0; x < transform.width; x += 2, indexTran += 2 ) {
+
+				float real = transform.data[indexTran];
+				float img = transform.data[indexTran+1];
+
+				phase.data[indexPhase++] = (float)Math.atan2(img, real);
+			}
+		}
+	}
+
+	public static void realToComplex( ImageFloat32 real , ImageFloat32 complex ) {
+		for( int y = 0; y < complex.height; y++ ) {
+
+			int indexReal = real.startIndex + y*real.stride;
+			int indexComplex = complex.startIndex + y*complex.stride;
+
+			for( int x = 0; x < real.width; x++, indexReal++ , indexComplex += 2 ) {
+				complex.data[indexComplex] = real.data[indexReal];
+				complex.data[indexComplex+1] = 0;
+			}
+		}
+	}
+
+	public static void multiplyRealComplex( ImageFloat32 realA , ImageFloat32 complexB , ImageFloat32 complexC ) {
+
+		if( realA.width*2 != complexB.width) {
+			throw new IllegalArgumentException("First needs to be real");
+		}
+
+		for( int y = 0; y < realA.height; y++ ) {
+
+			int indexA = realA.startIndex + y*realA.stride;
+			int indexB = complexB.startIndex + y*complexB.stride;
+			int indexC = complexC.startIndex + y*complexC.stride;
+
+			for( int x = 0; x < realA.width; x++, indexA++ , indexB += 2  ,indexC += 2 ) {
+
+				float real = realA.data[indexA];
+				float realB = complexB.data[indexB];
+				float imgB = complexB.data[indexB+1];
+
+				complexC.data[indexC] = real*realB;
+				complexC.data[indexC+1] = real*imgB;
+			}
+		}
+	}
+
+	public static void multiplyComplex( ImageFloat32 complexA , ImageFloat32 complexB , ImageFloat32 complexC ) {
+
+		for( int y = 0; y < complexA.height; y++ ) {
+
+			int indexA = complexA.startIndex + y*complexA.stride;
+			int indexB = complexB.startIndex + y*complexB.stride;
+			int indexC = complexC.startIndex + y*complexC.stride;
+
+			for( int x = 0; x < complexA.width; x += 2, indexA += 2 , indexB += 2  ,indexC += 2 ) {
+
+				float realA = complexA.data[indexA];
+				float imgA = complexA.data[indexA+1];
+				float realB = complexB.data[indexB];
+				float imgB = complexB.data[indexB+1];
+
+				complexC.data[indexC] = realA*realB - imgA*imgB;
+				complexC.data[indexC+1] = realA*imgB + imgA*realB;
+			}
+		}
 	}
 }
