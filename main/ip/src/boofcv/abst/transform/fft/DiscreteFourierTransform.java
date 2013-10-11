@@ -40,9 +40,6 @@ import boofcv.struct.image.ImageBase;
  * {@link #setModifyInputs(boolean)}.
  * </p>
  *
- * TODO SPECIFY EVEN/ODD IMAGE SIZE FORMAT VARIANTS
- *
- *
  * @author Peter Abeles
  */
 public interface DiscreteFourierTransform<T extends ImageBase> {
@@ -51,13 +48,13 @@ public interface DiscreteFourierTransform<T extends ImageBase> {
 	 * Applies forward transform to the input image.
 	 *
 	 * @param image (Input) Input image.  Default: Not modified.
-	 * @param transform (Output) Fourier transform, twice width and height of input.  Modified.
+	 * @param transform (Output) Fourier transform, twice width and same height of input.  Modified.
 	 */
 	public void forward( T image , T transform );
 
 	/**
 	 * Applies the inverse transform to a fourier transformed image to recover the original image
-	 * @param transform (Input) Fourier transform. twice width and height of output.  Default: Not modified.
+	 * @param transform (Input) Fourier transform. twice width and same height of output.  Default: Not modified.
 	 * @param image (Output) reconstructed image.  Modified.
 	 */
 	public void inverse( T transform , T image );

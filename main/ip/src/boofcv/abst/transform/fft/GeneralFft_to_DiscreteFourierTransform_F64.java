@@ -19,31 +19,31 @@
 package boofcv.abst.transform.fft;
 
 import boofcv.alg.transform.fft.DiscreteFourierTransformOps;
-import boofcv.alg.transform.fft.GeneralPurposeFFT_F32_2D;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.alg.transform.fft.GeneralPurposeFFT_F64_2D;
+import boofcv.struct.image.ImageFloat64;
 
 /**
- * Wrapper around {@link GeneralPurposeFFT_F32_2D} which implements {@link DiscreteFourierTransform}
+ * Wrapper around {@link GeneralPurposeFFT_F64_2D} which implements {@link DiscreteFourierTransform}
  *
  * @author Peter Abeles
  */
-public class GeneralFft_to_DiscreteFourierTransform_F32 implements DiscreteFourierTransform<ImageFloat32>
+public class GeneralFft_to_DiscreteFourierTransform_F64 implements DiscreteFourierTransform<ImageFloat64>
 {
 	// previous size of input image
 	private int prevWidth = -1;
 	private int prevHeight = -1;
 
 	// performs the FFT
-	private GeneralPurposeFFT_F32_2D alg;
+	private GeneralPurposeFFT_F64_2D alg;
 
 	// storage for temporary results
-	private ImageFloat32 tmp = new ImageFloat32(1,1);
+	private ImageFloat64 tmp = new ImageFloat64(1,1);
 
 	// if true then it can modify the input images
 	private boolean modifyInputs = false;
 
 	@Override
-	public void forward(ImageFloat32 image, ImageFloat32 transform ) {
+	public void forward(ImageFloat64 image, ImageFloat64 transform ) {
 		DiscreteFourierTransformOps.checkImageArguments(image,transform);
 		if( image.isSubimage() )
 			throw new IllegalArgumentException("Subimages are not supported");
@@ -58,7 +58,7 @@ public class GeneralFft_to_DiscreteFourierTransform_F32 implements DiscreteFouri
 	}
 
 	@Override
-	public void inverse(ImageFloat32 transform, ImageFloat32 image ) {
+	public void inverse(ImageFloat64 transform, ImageFloat64 image ) {
 		DiscreteFourierTransformOps.checkImageArguments(image,transform);
 		if( image.isSubimage() )
 			throw new IllegalArgumentException("Subimages are not supported");
@@ -66,7 +66,7 @@ public class GeneralFft_to_DiscreteFourierTransform_F32 implements DiscreteFouri
 		checkDeclareAlg(image);
 
 		// If he user lets us, modify the transform
-		ImageFloat32 workImage;
+		ImageFloat64 workImage;
 		if(modifyInputs) {
 			workImage = transform;
 		} else {
@@ -87,11 +87,11 @@ public class GeneralFft_to_DiscreteFourierTransform_F32 implements DiscreteFouri
 	/**
 	 * Declare the algorithm if the image size has changed
 	 */
-	private void checkDeclareAlg(ImageFloat32 image) {
+	private void checkDeclareAlg(ImageFloat64 image) {
 		if( prevWidth != image.width || prevHeight != image.height ) {
 			prevWidth = image.width;
 			prevHeight = image.height;
-			alg = new GeneralPurposeFFT_F32_2D(image.height,image.width);
+			alg = new GeneralPurposeFFT_F64_2D(image.height,image.width);
 		}
 	}
 
