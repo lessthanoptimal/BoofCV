@@ -89,8 +89,8 @@ public class ListDisplayPanel extends JPanel implements ListSelectionListener  {
 	/**
 	 * Displays a new image in the list.
 	 *
-	 * @param image
-	 * @param name
+	 * @param image The image being displayed
+	 * @param name Name of the image.  Shown in the list.
 	 */
 	public void addImage( BufferedImage image , String name ) {
 		addItem(new ImagePanel(image,true), name );
@@ -99,8 +99,8 @@ public class ListDisplayPanel extends JPanel implements ListSelectionListener  {
 	/**
 	 * Displays a new JPanel in the list.
 	 *
-	 * @param panel
-	 * @param name
+	 * @param panel The panel being displayed
+	 * @param name Name of the image.  Shown in the list.
 	 */
 	public void addItem( final JPanel panel , final String name ) {
 		SwingUtilities.invokeLater(new Runnable() {
@@ -112,7 +112,7 @@ public class ListDisplayPanel extends JPanel implements ListSelectionListener  {
 				}
 				Dimension d = listPanel.getMinimumSize();
 				listPanel.setPreferredSize(new Dimension(d.width + scroll.getVerticalScrollBar().getWidth(), d.height));
-				validate();
+				revalidate();
 			}
 		});
 	}
