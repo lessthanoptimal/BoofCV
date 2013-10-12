@@ -52,7 +52,7 @@ public class LeastSquaresHomography implements RefineEpipolar {
 	}
 
 	@Override
-	public boolean process(DenseMatrix64F F, List<AssociatedPair> obs, DenseMatrix64F refinedF ) {
+	public boolean fitModel(List<AssociatedPair> obs, DenseMatrix64F F, DenseMatrix64F refinedF) {
 
 		func.setObservations(obs);
 		minimizer.setFunction(func,null);

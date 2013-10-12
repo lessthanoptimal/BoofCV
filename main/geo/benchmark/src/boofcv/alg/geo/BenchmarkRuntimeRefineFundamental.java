@@ -45,7 +45,7 @@ public class BenchmarkRuntimeRefineFundamental extends ArtificialStereoScene{
 
 		@Override
 		public void process() {
-			alg.process(initialF, pairs, refinement);
+			alg.fitModel(pairs, initialF, refinement);
 		}
 
 		@Override

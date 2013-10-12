@@ -44,7 +44,7 @@ public class TestPnPStereoRefineRodrigues extends CommonStereoMotionNPoint {
 
 
 		Se3_F64 found = new Se3_F64();
-		assertTrue(alg.process(worldToLeft.copy(), pointPose, found));
+		assertTrue(alg.fitModel(pointPose, worldToLeft.copy(), found));
 		assertTrue(alg.minimizer.getFunctionValue() < 1e-10);
 
 		assertTrue(MatrixFeatures.isIdentical(worldToLeft.getR(), found.getR(), 1e-8));
@@ -71,7 +71,7 @@ public class TestPnPStereoRefineRodrigues extends CommonStereoMotionNPoint {
 		input.T.z += 0.03;
 
 		Se3_F64 found = new Se3_F64();
-		assertTrue(alg.process(input, pointPose, found));
+		assertTrue(alg.fitModel(pointPose, input, found));
 		assertTrue(alg.minimizer.getFunctionValue()<1e-12);
 
 		assertTrue(MatrixFeatures.isIdentical(worldToLeft.getR(), found.getR(), 1e-8));

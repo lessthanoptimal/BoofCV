@@ -21,19 +21,36 @@ package boofcv.alg.transform.fft;
 import boofcv.abst.transform.fft.DiscreteFourierTransform;
 import boofcv.abst.transform.fft.GeneralFft_to_DiscreteFourierTransform_F32;
 import boofcv.abst.transform.fft.GeneralFft_to_DiscreteFourierTransform_F64;
+import boofcv.alg.InputSanityCheck;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageFloat64;
 
 /**
+ * Various functions related to {@link DiscreteFourierTransform}.
+ *
  * @author Peter Abeles
  */
 public class DiscreteFourierTransformOps {
 
+	/**
+	 * Creates a {@link DiscreteFourierTransform} for images of type {@link ImageFloat32}.
+	 *
+	 * @see GeneralPurposeFFT_F32_2D
+	 *
+	 * @return {@link DiscreteFourierTransform}
+	 */
 	public static DiscreteFourierTransform<ImageFloat32>  createTransformF32() {
 		return new GeneralFft_to_DiscreteFourierTransform_F32();
 	}
 
+	/**
+	 * Creates a {@link DiscreteFourierTransform} for images of type {@link ImageFloat64}.
+	 *
+	 * @see GeneralPurposeFFT_F64_2D
+	 *
+	 * @return {@link DiscreteFourierTransform}
+	 */
 	public static DiscreteFourierTransform<ImageFloat64>  createTransformF64() {
 		return new GeneralFft_to_DiscreteFourierTransform_F64();
 	}
@@ -60,6 +77,8 @@ public class DiscreteFourierTransformOps {
 		if (x < 1)
 			throw new IllegalArgumentException("x must be greater or equal 1");
 		if ((x & (x - 1)) == 0) {
+			if( x == 1 )
+				return 2;
 			return x; // x is already a power-of-two number
 		}
 		x |= (x >>> 1);
@@ -83,14 +102,6 @@ public class DiscreteFourierTransformOps {
 			throw new IllegalArgumentException("Transform must be twice the width of the input image");
 		if( image.height != transform.height )
 			throw new IllegalArgumentException("Transform have the same height of the input image");
-	}
-
-	public static boolean isOptimalSize( ImageFloat32 image ) {
-		return false;
-	}
-
-	public static int optimalSize( int x ) {
-		return 0;
 	}
 
 	// TODO will this work for even and odd length images?
@@ -138,16 +149,17 @@ public class DiscreteFourierTransformOps {
 		}
 	}
 
-	public static void resizeOptimal( ImageFloat32 input , ImageFloat32 output , FftBorderType type , float value )
-	{
-
-	}
-
-	public static void cropFromOptimal( ImageFloat32 input , ImageFloat32 output ) {
-
-	}
-
+	/**
+	 * Splits the real and imaginary components into separate images.
+	 *
+	 * @param transform (Input) Complex image with real and imaginary components interleaved.
+	 * @param real (Output) The real components
+	 * @param imaginary (Output) The imaginary components
+	 */
 	public static void split( ImageFloat32 transform , ImageFloat32 real , ImageFloat32 imaginary ) {
+		checkImageArguments(real,transform);
+		checkImageArguments(imaginary,transform);
+
 		for( int y = 0; y < transform.height; y++ ) {
 
 			int indexTran = transform.startIndex + y*transform.stride;
@@ -162,7 +174,17 @@ public class DiscreteFourierTransformOps {
 		}
 	}
 
+	/**
+	 * Combines two images into a single interleaved image.
+	 *
+	 * @param real (Input) Real component.
+	 * @param imaginary (Input) Imaginary component.
+	 * @param transform (Output) Combined interleaved image with real and imaginary components.
+	 */
 	public static void merge( ImageFloat32 real , ImageFloat32 imaginary , ImageFloat32 transform ) {
+		checkImageArguments(real,transform);
+		checkImageArguments(imaginary,transform);
+
 		for( int y = 0; y < transform.height; y++ ) {
 
 			int indexTran = transform.startIndex + y*transform.stride;
@@ -177,7 +199,15 @@ public class DiscreteFourierTransformOps {
 		}
 	}
 
+	/**
+	 * Computes the magnitude of the complex image:<br>
+	 * magnitude = sqrt( real<sup>2</sup> + imaginary<sup>2</sup> )
+	 * @param transform (Input)  Complex interleaved image
+	 * @param magnitude (Output) Magnitude of image
+	 */
 	public static void magnitude( ImageFloat32 transform , ImageFloat32 magnitude ) {
+		checkImageArguments(magnitude,transform);
+
 		for( int y = 0; y < transform.height; y++ ) {
 
 			int indexTran = transform.startIndex + y*transform.stride;
@@ -193,7 +223,15 @@ public class DiscreteFourierTransformOps {
 		}
 	}
 
+	/**
+	 * Computes the phase of the complex image:<br>
+	 * phase = atan2( imaginary , real )
+	 * @param transform (Input) Complex interleaved image
+	 * @param phase (output) Phase of image
+	 */
 	public static void phase( ImageFloat32 transform , ImageFloat32 phase ) {
+		checkImageArguments(phase,transform);
+
 		for( int y = 0; y < transform.height; y++ ) {
 
 			int indexTran = transform.startIndex + y*transform.stride;
@@ -209,7 +247,14 @@ public class DiscreteFourierTransformOps {
 		}
 	}
 
+	/**
+	 * Converts a regular image into a complex interleaved image with the imaginary component set to zero.
+	 *
+	 * @param real (Input) Regular image.
+	 * @param complex (Output) Equivalent complex image.
+	 */
 	public static void realToComplex( ImageFloat32 real , ImageFloat32 complex ) {
+		checkImageArguments(real,complex);
 		for( int y = 0; y < complex.height; y++ ) {
 
 			int indexReal = real.startIndex + y*real.stride;
@@ -222,11 +267,18 @@ public class DiscreteFourierTransformOps {
 		}
 	}
 
+	/**
+	 * Performs element-wise complex multiplication between a real image and a complex image.
+	 *
+	 * @param realA (Input) Regular image
+	 * @param complexB (Input) Complex image
+	 * @param complexC (Output) Complex image
+	 */
 	public static void multiplyRealComplex( ImageFloat32 realA , ImageFloat32 complexB , ImageFloat32 complexC ) {
 
-		if( realA.width*2 != complexB.width) {
-			throw new IllegalArgumentException("First needs to be real");
-		}
+		checkImageArguments(realA,complexB);
+
+		InputSanityCheck.checkSameShape( complexB,complexC);
 
 		for( int y = 0; y < realA.height; y++ ) {
 
@@ -246,7 +298,16 @@ public class DiscreteFourierTransformOps {
 		}
 	}
 
+	/**
+	 * Performs element-wise complex multiplication between two complex images.
+	 *
+	 * @param complexA (Input) Complex image
+	 * @param complexB (Input) Complex image
+	 * @param complexC (Output) Complex image
+	 */
 	public static void multiplyComplex( ImageFloat32 complexA , ImageFloat32 complexB , ImageFloat32 complexC ) {
+
+		InputSanityCheck.checkSameShape(complexA, complexB,complexC);
 
 		for( int y = 0; y < complexA.height; y++ ) {
 

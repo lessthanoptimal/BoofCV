@@ -38,9 +38,9 @@ import boofcv.io.image.UtilImageIO;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.SurfFeature;
 import boofcv.struct.geo.AssociatedPair;
-import boofcv.struct.geo.GeoModelRefine;
 import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageFloat32;
+import org.ddogleg.fitting.modelset.ModelFitter;
 import org.ddogleg.fitting.modelset.ModelManager;
 import org.ddogleg.fitting.modelset.ModelMatcher;
 import org.ddogleg.fitting.modelset.ransac.Ransac;
@@ -103,9 +103,9 @@ public class ExampleFundamentalMatrix {
 
 		// Improve the estimate of the fundamental matrix using non-linear optimization
 		DenseMatrix64F F = new DenseMatrix64F(3,3);
-		GeoModelRefine<DenseMatrix64F,AssociatedPair> refine =
+		ModelFitter<DenseMatrix64F,AssociatedPair> refine =
 				FactoryMultiView.refineFundamental(1e-8, 400, EpipolarError.SAMPSON);
-		if( !refine.process(robustF.getModelParameters(), inliers,F) )
+		if( !refine.fitModel(inliers, robustF.getModelParameters(), F) )
 			throw new IllegalArgumentException("Failed");
 
 		// Return the solution

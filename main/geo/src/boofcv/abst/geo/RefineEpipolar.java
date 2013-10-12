@@ -19,7 +19,7 @@
 package boofcv.abst.geo;
 
 import boofcv.struct.geo.AssociatedPair;
-import boofcv.struct.geo.GeoModelRefine;
+import org.ddogleg.fitting.modelset.ModelFitter;
 import org.ejml.data.DenseMatrix64F;
 
 /**
@@ -34,5 +34,5 @@ import org.ejml.data.DenseMatrix64F;
  *
  * @author Peter Abeles
  */
-public interface RefineEpipolar extends GeoModelRefine<DenseMatrix64F,AssociatedPair>{
+public interface RefineEpipolar extends ModelFitter<DenseMatrix64F,AssociatedPair> {
 }

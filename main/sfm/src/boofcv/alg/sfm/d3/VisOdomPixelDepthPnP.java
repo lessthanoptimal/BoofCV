@@ -282,7 +282,7 @@ public class VisOdomPixelDepthPnP<T extends ImageBase> {
 
 		if( refine != null ) {
 			keyToCurr = new Se3_F64();
-			refine.process(motionEstimator.getModelParameters(),motionEstimator.getMatchSet(),keyToCurr);
+			refine.fitModel(motionEstimator.getMatchSet(), motionEstimator.getModelParameters(), keyToCurr);
 		} else {
 			keyToCurr = motionEstimator.getModelParameters();
 		}

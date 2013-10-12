@@ -2593,6 +2593,28 @@ public class PixelMath {
 	}
 
 	/**
+	 * Sets each pixel in the output image to log( 1 + input(x,y)) of the input image.
+	 * Both the input and output image can be the same instance.
+	 *
+	 * @param input The input image. Not modified.
+	 * @param output Where the log image is written to. Modified.
+	 */
+	public static void log( ImageFloat32 input , ImageFloat32 output ) {
+
+		InputSanityCheck.checkSameShape(input,output);
+
+		for( int y = 0; y < input.height; y++ ) {
+			int indexSrc = input.startIndex + y* input.stride;
+			int indexDst = output.startIndex + y* output.stride;
+			int end = indexSrc + input.width;
+
+			for( ; indexSrc < end; indexSrc++ , indexDst++) {
+				output.data[indexDst] = (float)Math.log(1 + input.data[indexSrc]);
+			}
+		}
+	}
+
+	/**
 	 * <p>
 	 * Performs pixel-wise addition<br>
 	 * output(x,y) = imgA(x,y) + imgB(x,y)
@@ -2700,6 +2722,28 @@ public class PixelMath {
 			// for(int x = 0; x < w; x++ ) {
 			for (; indexA < indexEnd; indexA++, indexB++, indexOut++ ) {
 				output.data[indexOut] = ((imgA.data[indexA] ) / (imgB.data[indexB] ));
+			}
+		}
+	}
+
+	/**
+	 * Sets each pixel in the output image to log( 1 + input(x,y)) of the input image.
+	 * Both the input and output image can be the same instance.
+	 *
+	 * @param input The input image. Not modified.
+	 * @param output Where the log image is written to. Modified.
+	 */
+	public static void log( ImageFloat64 input , ImageFloat64 output ) {
+
+		InputSanityCheck.checkSameShape(input,output);
+
+		for( int y = 0; y < input.height; y++ ) {
+			int indexSrc = input.startIndex + y* input.stride;
+			int indexDst = output.startIndex + y* output.stride;
+			int end = indexSrc + input.width;
+
+			for( ; indexSrc < end; indexSrc++ , indexDst++) {
+				output.data[indexDst] = Math.log(1 + input.data[indexSrc]);
 			}
 		}
 	}
