@@ -22,6 +22,7 @@ import boofcv.abst.transform.fft.DiscreteFourierTransform;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.alg.misc.GImageStatistics;
 import boofcv.core.image.GeneralizedImageOps;
+import boofcv.struct.image.ImageInterleaved;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.testing.BoofTesting;
 import org.junit.Test;
@@ -33,7 +34,7 @@ import static org.junit.Assert.*;
 /**
  * @author Peter Abeles
  */
-public abstract class GenericTestDiscreteFourierTransform<T extends ImageSingleBand> {
+public abstract class GenericTestDiscreteFourierTransform<T extends ImageSingleBand, I extends ImageInterleaved> {
 
 	protected Random rand = new Random(234);
 
@@ -45,9 +46,11 @@ public abstract class GenericTestDiscreteFourierTransform<T extends ImageSingleB
 		this.tolerance = tolerance;
 	}
 
-	public abstract DiscreteFourierTransform<T> createAlgorithm();
+	public abstract DiscreteFourierTransform<T,I> createAlgorithm();
 
 	public abstract T createImage( int width , int height );
+
+	public abstract I createTransform( int width , int height );
 
 	/**
 	 * Check correctness by having it convert an image to and from
@@ -55,7 +58,7 @@ public abstract class GenericTestDiscreteFourierTransform<T extends ImageSingleB
 	@Test
 	public void forwardsBackwards() {
 
-		for( int h = 1; h < 10; h++ ) {
+		for( int h = 2; h < 10; h++ ) {
 			for( int w = 1; w < 10; w++ ) {
 				checkForwardsBackwards(w,h);
 			}
@@ -67,12 +70,12 @@ public abstract class GenericTestDiscreteFourierTransform<T extends ImageSingleB
 
 	protected void checkForwardsBackwards( int width , int height ) {
 		T input = createImage(width,height);
-		T transform = createImage(width*2,height);
+		I transform = createTransform(width,height);
 		T found = createImage(width,height);
 
 		GImageMiscOps.fillUniform(input,rand,-20,20);
 
-		DiscreteFourierTransform<T> alg = createAlgorithm();
+		DiscreteFourierTransform<T,I> alg = createAlgorithm();
 
 		alg.forward(input,transform);
 		alg.inverse(transform, found);
@@ -86,20 +89,20 @@ public abstract class GenericTestDiscreteFourierTransform<T extends ImageSingleB
 	@Test
 	public void zeroFrequency() {
 		T input = createImage(20,25);
-		T transform = createImage(20*2,25);
+		I transform = createTransform(20,25);
 
 		GImageMiscOps.fillUniform(input,rand,-20,20);
 		double value = GImageStatistics.sum(input);
 		// NOTE: the value probably depends on when the scaling is invoked.  Must need to be more robust here
 
-		DiscreteFourierTransform<T> alg = createAlgorithm();
+		DiscreteFourierTransform<T,I> alg = createAlgorithm();
 
 		alg.forward(input, transform);
 
 		// imaginary component should be zero
-		assertEquals(0,GeneralizedImageOps.get(transform,1,0),tolerance);
+		assertEquals(0,GeneralizedImageOps.get(transform,0,0,1),tolerance);
 		// this should be the average value
-		assertEquals(value, GeneralizedImageOps.get(transform, 0, 0), tolerance);
+		assertEquals(value, GeneralizedImageOps.get(transform, 0, 0,0), tolerance);
 	}
 
 	/**
@@ -119,11 +122,11 @@ public abstract class GenericTestDiscreteFourierTransform<T extends ImageSingleB
 	}
 
 	private void checkMultipleCalls(int[] sizes) {
-		DiscreteFourierTransform<T> alg = createAlgorithm();
+		DiscreteFourierTransform<T,I> alg = createAlgorithm();
 
 		for( int s : sizes ) {
 			T input = createImage(s,s+1);
-			T transform = createImage(s*2,(s+1));
+			I transform = createTransform(s,s+1);
 			T found = createImage(s,s+1);
 
 			GImageMiscOps.fillUniform(input,rand,-20,20);
@@ -141,14 +144,14 @@ public abstract class GenericTestDiscreteFourierTransform<T extends ImageSingleB
 	@Test
 	public void format_even() {
 		T input = createImage(10,1);
-		T transform = createImage(20,1);
+		I transform = createTransform(10,1);
 		GImageMiscOps.fillUniform(input,rand,-20,20);
 
-		DiscreteFourierTransform<T> alg = createAlgorithm();
+		DiscreteFourierTransform<T,I> alg = createAlgorithm();
 
 		alg.forward(input,transform);
-		assertEquals( GeneralizedImageOps.get(transform,4*2,0),GeneralizedImageOps.get(transform,6*2,0),tolerance);
-		assertEquals( GeneralizedImageOps.get(transform,4*2+1,0),-GeneralizedImageOps.get(transform,6*2+1,0),tolerance);
+		assertEquals( GeneralizedImageOps.get(transform,4,0,0),GeneralizedImageOps.get(transform,6,0,0),tolerance);
+		assertEquals( GeneralizedImageOps.get(transform,4,0,1),-GeneralizedImageOps.get(transform,6,0,1),tolerance);
 	}
 
 	/**
@@ -157,14 +160,14 @@ public abstract class GenericTestDiscreteFourierTransform<T extends ImageSingleB
 	@Test
 	public void format_odd() {
 		T input = createImage(7,1);
-		T transform = createImage(14,1);
+		I transform = createTransform(7,1);
 		GImageMiscOps.fillUniform(input,rand,-20,20);
 
-		DiscreteFourierTransform<T> alg = createAlgorithm();
+		DiscreteFourierTransform<T,I> alg = createAlgorithm();
 
 		alg.forward(input,transform);
-		assertEquals( GeneralizedImageOps.get(transform,3*2,0),GeneralizedImageOps.get(transform,4*2,0),tolerance);
-		assertEquals( GeneralizedImageOps.get(transform,3*2+1,0),-GeneralizedImageOps.get(transform,4*2+1,0),tolerance);
+		assertEquals( GeneralizedImageOps.get(transform,3,0,0),GeneralizedImageOps.get(transform,4,0,0),tolerance);
+		assertEquals( GeneralizedImageOps.get(transform,3,0,1),-GeneralizedImageOps.get(transform,4,0,1),tolerance);
 	}
 
 	@Test
@@ -172,17 +175,17 @@ public abstract class GenericTestDiscreteFourierTransform<T extends ImageSingleB
 		int w = 20;
 		int h = 32;
 		T input = createImage(w,h);
-		T transform = createImage(w*2,h);
+		I transform = createTransform(w,h);
 		T found = createImage(w,h);
 
 		GImageMiscOps.fillUniform(input,rand,-20,20);
 
-		DiscreteFourierTransform<T> alg = createAlgorithm();
+		DiscreteFourierTransform<T,I> alg = createAlgorithm();
 		alg.forward(input,transform);
 		alg.inverse(transform, found);
 
 		T inputSub = BoofTesting.createSubImageOf(input);
-		T transformSub = BoofTesting.createSubImageOf(transform);
+		I transformSub = BoofTesting.createSubImageOf(transform);
 		T foundSub = BoofTesting.createSubImageOf(found);
 
 		if( subimage ) {
@@ -211,15 +214,15 @@ public abstract class GenericTestDiscreteFourierTransform<T extends ImageSingleB
 		int w = 20;
 		int h = 32;
 		T input = createImage(w,h);
-		T transform = createImage(w*2,h);
+		I transform = createTransform(w,h);
 		T found = createImage(w,h);
 
 		GImageMiscOps.fillUniform(input,rand,-20,20);
 
-		DiscreteFourierTransform<T> alg = createAlgorithm();
+		DiscreteFourierTransform<T,I> alg = createAlgorithm();
 		T inputOrig = (T)input.clone();
 		alg.forward(input, transform);
-		T transformOrig = (T)transform.clone();
+		I transformOrig = (I)transform.clone();
 		alg.inverse(transform, found);
 
 		// by default nothing should be modified
@@ -245,18 +248,18 @@ public abstract class GenericTestDiscreteFourierTransform<T extends ImageSingleB
 
 	protected void checkSameResultsWithModify( int width , int height ) {
 		T input = createImage(width,height);
-		T transform = createImage(width*2,height);
+		I transform = createTransform(width,height);
 		T found = createImage(width,height);
 
 		GImageMiscOps.fillUniform(input,rand,-20,20);
 
-		DiscreteFourierTransform<T> alg = createAlgorithm();
+		DiscreteFourierTransform<T,I> alg = createAlgorithm();
 		assertFalse(alg.isModifyInputs());
 
 		alg.forward(input,transform);
 		alg.inverse(transform, found);
 
-		T transformM = createImage(width*2,height);
+		I transformM = createTransform(width,height);
 		T foundM = createImage(width,height);
 
 		alg.setModifyInputs(true);
@@ -277,15 +280,15 @@ public abstract class GenericTestDiscreteFourierTransform<T extends ImageSingleB
 		int height = 25;
 		T input = createImage(width,height);
 
-		DiscreteFourierTransform<T> alg = createAlgorithm();
+		DiscreteFourierTransform<T,I> alg = createAlgorithm();
 
 		try {
-			alg.forward(input,createImage(width,height) );
+			alg.forward(input,createTransform(width-1,height) );
 			fail("Should have thrown an exception");
 		} catch( IllegalArgumentException ignore ){}
 
 		try {
-			alg.inverse(input,createImage(width,height) );
+			alg.inverse(createTransform(width-1,height),input );
 			fail("Should have thrown an exception");
 		} catch( IllegalArgumentException ignore ){}
 	}

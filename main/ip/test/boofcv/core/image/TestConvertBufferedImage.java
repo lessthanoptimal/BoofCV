@@ -46,7 +46,7 @@ public class TestConvertBufferedImage {
 	public void extractInterlacedInt8() {
 		BufferedImage origImg = TestConvertRaster.createByteBuff(imgWidth, imgHeight, 3, rand);
 
-		ImageInterleavedInt8 found = ConvertBufferedImage.extractInterlacedInt8(origImg);
+		InterleavedI8 found = ConvertBufferedImage.extractInterlacedInt8(origImg);
 
 		assertEquals(imgWidth, found.width);
 		assertEquals(imgHeight, found.height);
@@ -109,9 +109,9 @@ public class TestConvertBufferedImage {
 	}
 
 	@Test
-	public void extractBuffered_InterleavedInt8() {
+	public void extractBuffered_InterleavedU8() {
 		// test it with 3 bands
-		ImageInterleavedInt8 srcImg = new ImageInterleavedInt8(imgWidth, imgHeight, 3);
+		InterleavedU8 srcImg = new InterleavedU8(imgWidth, imgHeight, 3);
 		ImageInterleavedTestingOps.randomize(srcImg, rand);
 
 		BufferedImage img = ConvertBufferedImage.extractBuffered(srcImg);
@@ -119,7 +119,7 @@ public class TestConvertBufferedImage {
 		BoofTesting.checkEquals(img, srcImg);
 
 		// now test it with a single band
-		srcImg = new ImageInterleavedInt8(imgWidth, imgHeight, 1);
+		srcImg = new InterleavedU8(imgWidth, imgHeight, 1);
 		ImageInterleavedTestingOps.randomize(srcImg, rand);
 		img = ConvertBufferedImage.extractBuffered(srcImg);
 		BoofTesting.checkEquals(img, srcImg);

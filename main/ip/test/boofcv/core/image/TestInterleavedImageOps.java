@@ -16,21 +16,25 @@
  * limitations under the License.
  */
 
-package boofcv.struct.image;
+package boofcv.core.image;
+
+import org.junit.Test;
+
+import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
  */
-public class TestImageInterleavedInt8 extends StandardImageInterleavedTests {
+public class TestInterleavedImageOps {
 
-
-	@Override
-	public ImageInterleaved createImage(int width, int height, int numBands) {
-		return new ImageInterleavedInt8(width, height, numBands);
+	@Test
+	public void split2() {
+		fail("Implement");
 	}
 
-	@Override
-	public Number randomNumber() {
-		return (byte) (rand.nextInt(255) - 126);
+	@Test
+	public void merge2() {
+		fail("Implement");
 	}
+
 }

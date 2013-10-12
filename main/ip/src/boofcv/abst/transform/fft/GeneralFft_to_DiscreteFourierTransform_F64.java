@@ -21,13 +21,15 @@ package boofcv.abst.transform.fft;
 import boofcv.alg.transform.fft.DiscreteFourierTransformOps;
 import boofcv.alg.transform.fft.GeneralPurposeFFT_F64_2D;
 import boofcv.struct.image.ImageFloat64;
+import boofcv.struct.image.InterleavedF64;
 
 /**
  * Wrapper around {@link GeneralPurposeFFT_F64_2D} which implements {@link DiscreteFourierTransform}
  *
  * @author Peter Abeles
  */
-public class GeneralFft_to_DiscreteFourierTransform_F64 implements DiscreteFourierTransform<ImageFloat64>
+public class GeneralFft_to_DiscreteFourierTransform_F64
+		implements DiscreteFourierTransform<ImageFloat64,InterleavedF64>
 {
 	// previous size of input image
 	private int prevWidth = -1;
@@ -37,13 +39,13 @@ public class GeneralFft_to_DiscreteFourierTransform_F64 implements DiscreteFouri
 	private GeneralPurposeFFT_F64_2D alg;
 
 	// storage for temporary results
-	private ImageFloat64 tmp = new ImageFloat64(1,1);
+	private InterleavedF64 tmp = new InterleavedF64(1,1,2);
 
 	// if true then it can modify the input images
 	private boolean modifyInputs = false;
 
 	@Override
-	public void forward(ImageFloat64 image, ImageFloat64 transform ) {
+	public void forward(ImageFloat64 image, InterleavedF64 transform ) {
 		DiscreteFourierTransformOps.checkImageArguments(image,transform);
 		if( image.isSubimage() )
 			throw new IllegalArgumentException("Subimages are not supported");
@@ -58,7 +60,7 @@ public class GeneralFft_to_DiscreteFourierTransform_F64 implements DiscreteFouri
 	}
 
 	@Override
-	public void inverse(ImageFloat64 transform, ImageFloat64 image ) {
+	public void inverse(InterleavedF64 transform, ImageFloat64 image ) {
 		DiscreteFourierTransformOps.checkImageArguments(image,transform);
 		if( image.isSubimage() )
 			throw new IllegalArgumentException("Subimages are not supported");
@@ -66,7 +68,7 @@ public class GeneralFft_to_DiscreteFourierTransform_F64 implements DiscreteFouri
 		checkDeclareAlg(image);
 
 		// If he user lets us, modify the transform
-		ImageFloat64 workImage;
+		InterleavedF64 workImage;
 		if(modifyInputs) {
 			workImage = transform;
 		} else {

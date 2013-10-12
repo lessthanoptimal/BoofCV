@@ -112,6 +112,7 @@ public abstract class ImageSingleBand<T extends ImageSingleBand> extends ImageBa
 		ret.width = x1 - x0;
 		ret.height = y1 - y0;
 		ret.startIndex = startIndex + y0 * stride + x0;
+		ret.subImage = true;
 
 		return ret;
 	}
@@ -164,22 +165,6 @@ public abstract class ImageSingleBand<T extends ImageSingleBand> extends ImageBa
 				indexDst += stride;
 			}
 		}
-	}
-
-	/**
-	 * Creates an identical image.  Note that if this image is a sub-image portions of hte image which are not part
-	 * of the sub-image are not copied.
-	 *
-	 * @return Clone of this image.
-	 */
-	@SuppressWarnings({"unchecked", "CloneDoesntDeclareCloneNotSupportedException", "CloneDoesntCallSuperClone"})
-	@Override
-	public T clone() {
-		T ret = _createNew(width,height);
-
-		ret.setTo(this);
-
-		return ret;
 	}
 
 	/**

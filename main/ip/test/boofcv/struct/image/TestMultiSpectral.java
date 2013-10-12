@@ -18,6 +18,7 @@
 
 package boofcv.struct.image;
 
+import boofcv.testing.BoofTesting;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -68,11 +69,14 @@ public class TestMultiSpectral {
 	@Test
 	public void subimage() {
 		MultiSpectral<ImageUInt8> img = new MultiSpectral<ImageUInt8>(ImageUInt8.class,5, 10, 3);
+		assertFalse(img.isSubimage());
+
 		MultiSpectral<ImageUInt8> sub = img.subimage(2,3,4,6);
 		
 		assertEquals(3,sub.getNumBands());
 		assertEquals(2,sub.getWidth());
 		assertEquals(3,sub.getHeight());
+		assertTrue(sub.isSubimage());
 
 		for( int i = 0; i < sub.getNumBands(); i++ )
 			assertEquals(img.getBand(i).get(2,3),sub.getBand(i).get(0,0));
@@ -91,5 +95,36 @@ public class TestMultiSpectral {
 		img.reshape(15,21);
 		assertEquals(15,img.getWidth());
 		assertEquals(21,img.getHeight());
+	}
+
+	@Test
+	public void reshape_subimage() {
+		MultiSpectral<ImageUInt8> img = new MultiSpectral<ImageUInt8>(ImageUInt8.class,5, 10, 3);
+		img = img.subimage(0,0,2,2);
+
+		try {
+			img.reshape(10,20);
+			fail("Should have thrown exception");
+		} catch( IllegalArgumentException ignore ) {}
+	}
+
+	@Test
+	public void setTo() {
+		MultiSpectral<ImageUInt8> a = new MultiSpectral<ImageUInt8>(ImageUInt8.class,5, 10, 3);
+		a.getBand(0).set(1,2,3);
+		a.getBand(1).set(2,1,4);
+		a.getBand(2).set(2,2,5);
+
+		MultiSpectral<ImageUInt8> b = new MultiSpectral<ImageUInt8>(ImageUInt8.class,5, 10, 3);
+		b.setTo(a);
+
+		BoofTesting.assertEquals(a,b,1e-8);
+
+		// try a sub-image now
+		MultiSpectral<ImageUInt8> c = new MultiSpectral<ImageUInt8>(ImageUInt8.class,20, 20, 3);
+		c = c.subimage(7,8,12,18);
+		c.setTo(a);
+
+		BoofTesting.assertEquals(a,c,1e-8);
 	}
 }

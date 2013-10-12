@@ -21,23 +21,30 @@ package boofcv.abst.filter.transform.fft;
 import boofcv.abst.transform.fft.DiscreteFourierTransform;
 import boofcv.abst.transform.fft.GeneralFft_to_DiscreteFourierTransform_F32;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.InterleavedF32;
 
 /**
  * @author Peter Abeles
  */
-public class TestGeneralFft_to_DiscreteFourierTransform_F32 extends GenericTestDiscreteFourierTransform<ImageFloat32> {
+public class TestGeneralFft_to_DiscreteFourierTransform_F32
+		extends GenericTestDiscreteFourierTransform<ImageFloat32,InterleavedF32> {
 
 	public TestGeneralFft_to_DiscreteFourierTransform_F32() {
 		super(false,1e-3);
 	}
 
 	@Override
-	public DiscreteFourierTransform<ImageFloat32> createAlgorithm() {
+	public DiscreteFourierTransform<ImageFloat32,InterleavedF32> createAlgorithm() {
 		return new GeneralFft_to_DiscreteFourierTransform_F32();
 	}
 
 	@Override
 	public ImageFloat32 createImage(int width, int height) {
 		return new ImageFloat32(width,height);
+	}
+
+	@Override
+	public InterleavedF32 createTransform(int width, int height) {
+		return new InterleavedF32(width,height,2);
 	}
 }

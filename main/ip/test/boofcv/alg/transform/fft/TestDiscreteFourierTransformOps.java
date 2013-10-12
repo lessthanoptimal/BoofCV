@@ -18,6 +18,8 @@
 
 package boofcv.alg.transform.fft;
 
+import boofcv.struct.image.ImageFloat64;
+import boofcv.struct.image.InterleavedF32;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -25,7 +27,7 @@ import static org.junit.Assert.*;
 /**
  * @author Peter Abeles
  */
-public class TestDiscreteFourierTransform {
+public class TestDiscreteFourierTransformOps {
 
 	@Test
 	public void isPowerOf2() {
@@ -53,21 +55,25 @@ public class TestDiscreteFourierTransform {
 
 	@Test
 	public void checkImageArguments() {
-		fail("implement");
+		DiscreteFourierTransformOps.checkImageArguments(new ImageFloat64(10,12),new InterleavedF32(10,12,2));
+
+		// test negative cases
+		try {
+			DiscreteFourierTransformOps.checkImageArguments(new ImageFloat64(10,12),new InterleavedF32(10,12,1));
+			fail("Should have thrown an exception");
+		} catch( IllegalArgumentException ignore ){}
+		try {
+			DiscreteFourierTransformOps.checkImageArguments(new ImageFloat64(10,12),new InterleavedF32(20,12,2));
+			fail("Should have thrown an exception");
+		} catch( IllegalArgumentException ignore ){}
+		try {
+			DiscreteFourierTransformOps.checkImageArguments(new ImageFloat64(10,12),new InterleavedF32(10,14,2));
+			fail("Should have thrown an exception");
+		} catch( IllegalArgumentException ignore ){}
 	}
 
 	@Test
 	public void centerZeroFrequency() {
-		fail("implement");
-	}
-
-	@Test
-	public void split() {
-		fail("implement");
-	}
-
-	@Test
-	public void merge() {
 		fail("implement");
 	}
 

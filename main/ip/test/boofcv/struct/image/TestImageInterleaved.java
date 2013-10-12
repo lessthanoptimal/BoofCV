@@ -47,6 +47,36 @@ public class TestImageInterleaved {
 		assertEquals(6, c.data[35]);
 	}
 
+	@Test
+	public void reshape() {
+		DummyImage a = new DummyImage(10, 20, 3);
+
+		a.reshape(5,10);
+		assertTrue(50 <= a.data.length);
+		assertEquals(5,a.width);
+		assertEquals(10,a.height);
+		assertEquals(3,a.numBands);
+		assertEquals(5*3,a.stride);
+
+		a.reshape(30,25);
+		assertTrue(30*25 <= a.data.length);
+		assertEquals(30,a.width);
+		assertEquals(25,a.height);
+		assertEquals(3,a.numBands);
+		assertEquals(30*3,a.stride);
+	}
+
+	@Test
+	public void reshape_subimage() {
+		DummyImage img = new DummyImage(10, 20, 3);
+		img = img.subimage(0,0,2,2);
+
+		try {
+			img.reshape(10,20);
+			fail("Should have thrown exception");
+		} catch( IllegalArgumentException ignore ) {}
+	}
+
 	/**
 	 * The two matrices do not have the same shape
 	 */
@@ -86,8 +116,12 @@ public class TestImageInterleaved {
 
 	@Test
 	public void createSubImage() {
-		DummyImage a = new DummyImage(10, 20, 3).subimage(2, 3, 8, 10);
+		DummyImage a = new DummyImage(10, 20, 3);
+		assertFalse(a.isSubimage());
 
+		a = a.subimage(2, 3, 8, 10);
+
+		assertTrue(a.isSubimage());
 		assertEquals(10 * 20 * 3, a.data.length);
 		assertEquals(6, a.getWidth());
 		assertEquals(7, a.getHeight());
@@ -144,7 +178,7 @@ public class TestImageInterleaved {
 
 		@Override
 		public DummyImage _createNew(int imgWidth, int imgHeight) {
-			return new DummyImage();
+			return new DummyImage(imgWidth,imgHeight,numBands);
 		}
 	}
 }

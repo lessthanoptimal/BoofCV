@@ -21,13 +21,15 @@ package boofcv.abst.transform.fft;
 import boofcv.alg.transform.fft.DiscreteFourierTransformOps;
 import boofcv.alg.transform.fft.GeneralPurposeFFT_F32_2D;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.InterleavedF32;
 
 /**
  * Wrapper around {@link GeneralPurposeFFT_F32_2D} which implements {@link DiscreteFourierTransform}
  *
  * @author Peter Abeles
  */
-public class GeneralFft_to_DiscreteFourierTransform_F32 implements DiscreteFourierTransform<ImageFloat32>
+public class GeneralFft_to_DiscreteFourierTransform_F32
+		implements DiscreteFourierTransform<ImageFloat32,InterleavedF32>
 {
 	// previous size of input image
 	private int prevWidth = -1;
@@ -37,15 +39,15 @@ public class GeneralFft_to_DiscreteFourierTransform_F32 implements DiscreteFouri
 	private GeneralPurposeFFT_F32_2D alg;
 
 	// storage for temporary results
-	private ImageFloat32 tmp = new ImageFloat32(1,1);
+	private InterleavedF32 tmp = new InterleavedF32(1,1,2);
 
 	// if true then it can modify the input images
 	private boolean modifyInputs = false;
 
 	@Override
-	public void forward(ImageFloat32 image, ImageFloat32 transform ) {
+	public void forward(ImageFloat32 image, InterleavedF32 transform ) {
 		DiscreteFourierTransformOps.checkImageArguments(image,transform);
-		if( image.isSubimage() )
+		if( image.isSubimage() || transform.isSubimage() )
 			throw new IllegalArgumentException("Subimages are not supported");
 
 		checkDeclareAlg(image);
@@ -58,15 +60,15 @@ public class GeneralFft_to_DiscreteFourierTransform_F32 implements DiscreteFouri
 	}
 
 	@Override
-	public void inverse(ImageFloat32 transform, ImageFloat32 image ) {
+	public void inverse(InterleavedF32 transform, ImageFloat32 image ) {
 		DiscreteFourierTransformOps.checkImageArguments(image,transform);
-		if( image.isSubimage() )
+		if( image.isSubimage() || transform.isSubimage() )
 			throw new IllegalArgumentException("Subimages are not supported");
 
 		checkDeclareAlg(image);
 
 		// If he user lets us, modify the transform
-		ImageFloat32 workImage;
+		InterleavedF32 workImage;
 		if(modifyInputs) {
 			workImage = transform;
 		} else {

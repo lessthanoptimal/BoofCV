@@ -19,7 +19,8 @@
 package boofcv.core.image;
 
 import boofcv.alg.misc.ImageInterleavedTestingOps;
-import boofcv.struct.image.ImageInterleavedInt8;
+import boofcv.struct.image.InterleavedI8;
+import boofcv.struct.image.InterleavedU8;
 import boofcv.testing.BoofTesting;
 import org.junit.Test;
 
@@ -31,18 +32,18 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestUtilImageInterleavedInt8 {
+public class TestImageInterleavedTestingOps {
 
 	Random rand = new Random(234234);
 
 	@Test
 	public void fill() {
-		ImageInterleavedInt8 image = new ImageInterleavedInt8(10, 20, 3);
+		InterleavedU8 image = new InterleavedU8(10, 20, 3);
 
 		BoofTesting.checkSubImage(this, "checkFill", true, image);
 	}
 
-	public void checkFill(ImageInterleavedInt8 image) {
+	public void checkFill(InterleavedI8 image) {
 		ImageInterleavedTestingOps.fill(image, (byte) 6, (byte) 7, (byte) 8);
 
 		for (int y = 0; y < image.getHeight(); y++) {
@@ -56,12 +57,12 @@ public class TestUtilImageInterleavedInt8 {
 
 	@Test
 	public void randomize() {
-		ImageInterleavedInt8 image = new ImageInterleavedInt8(10, 20, 3);
+		InterleavedU8 image = new InterleavedU8(10, 20, 3);
 
 		BoofTesting.checkSubImage(this, "checkRandomize", false, image);
 	}
 
-	public void checkRandomize(ImageInterleavedInt8 image) {
+	public void checkRandomize(InterleavedI8 image) {
 		ImageInterleavedTestingOps.randomize(image, rand);
 
 		int totalZero = 0;

@@ -29,6 +29,7 @@ import boofcv.gui.image.ShowImages;
 import boofcv.gui.image.VisualizeImageData;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.InterleavedF32;
 
 import java.awt.image.BufferedImage;
 
@@ -48,14 +49,14 @@ public class ExampleFourierTransform {
 
 		// declare storage
 		ImageFloat32 boxImage = new ImageFloat32(input.width, input.height);
-		ImageFloat32 boxTransform = new ImageFloat32(input.width*2,input.height);
+		InterleavedF32 boxTransform = new InterleavedF32(input.width,input.height,2);
+		InterleavedF32 transform = new InterleavedF32(input.width,input.height,2);
 		ImageFloat32 blurredImage = new ImageFloat32(input.width, input.height);
 		ImageFloat32 spatialBlur = new ImageFloat32(input.width, input.height);
 
-		DiscreteFourierTransform<ImageFloat32> dft = DiscreteFourierTransformOps.createTransformF32();
+		DiscreteFourierTransform<ImageFloat32,InterleavedF32> dft =
+				DiscreteFourierTransformOps.createTransformF32();
 
-		// the transform has twice the width since it stores real and imaginary components
-		ImageFloat32 transform = new ImageFloat32(input.width*2,input.height);
 
 		// Make the image scaled from 0 to 1 to reduce overflow issues
 		PixelMath.divide(input,255.0f,input);
@@ -108,13 +109,13 @@ public class ExampleFourierTransform {
 	}
 
 	/**
-	 * Display the fourier trasnform's magnitude and phase.
+	 * Display the fourier transform's magnitude and phase.
 	 */
-	public static void displayTransform( ImageFloat32 transform , String name ) {
+	public static void displayTransform( InterleavedF32 transform , String name ) {
 
 		// declare storage
-		ImageFloat32 magnitude = new ImageFloat32(transform.width/2,transform.height);
-		ImageFloat32 phase = new ImageFloat32(transform.width/2,transform.height);
+		ImageFloat32 magnitude = new ImageFloat32(transform.width,transform.height);
+		ImageFloat32 phase = new ImageFloat32(transform.width,transform.height);
 
 		// Make a copy so that you don't modify the input
 		transform = transform.clone();
