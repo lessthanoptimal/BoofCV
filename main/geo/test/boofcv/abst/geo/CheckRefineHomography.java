@@ -21,7 +21,7 @@ package boofcv.abst.geo;
 import boofcv.alg.geo.h.CommonHomographyChecks;
 import boofcv.alg.geo.h.HomographyLinear4;
 import boofcv.struct.geo.AssociatedPair;
-import boofcv.struct.geo.GeoModelRefine;
+import org.ddogleg.fitting.modelset.ModelFitter;
 import org.ejml.data.DenseMatrix64F;
 import org.ejml.ops.CommonOps;
 import org.ejml.ops.MatrixFeatures;
@@ -47,10 +47,10 @@ public abstract class CheckRefineHomography extends CommonHomographyChecks {
 		HomographyLinear4 estimator = new HomographyLinear4(true);
 		estimator.process(pairs,H);
 
-		GeoModelRefine<DenseMatrix64F,AssociatedPair> alg = createAlgorithm();
+		ModelFitter<DenseMatrix64F,AssociatedPair> alg = createAlgorithm();
 
 		//give it the perfect matrix and see if it screwed it up
-		assertTrue(alg.process(H, pairs, found));
+		assertTrue(alg.fitModel(pairs, H, found));
 
 		// normalize so that they are the same
 		CommonOps.divide(H.get(2, 2), H);
@@ -67,13 +67,13 @@ public abstract class CheckRefineHomography extends CommonHomographyChecks {
 		HomographyLinear4 estimator = new HomographyLinear4(true);
 		estimator.process(pairs,H);
 
-		GeoModelRefine<DenseMatrix64F,AssociatedPair> alg = createAlgorithm();
+		ModelFitter<DenseMatrix64F,AssociatedPair> alg = createAlgorithm();
 
 		//give it the perfect matrix and see if it screwed it up
 		DenseMatrix64F Hmod = H.copy();
 		Hmod.data[0] += 0.1;
 		Hmod.data[5] += 0.1;
-		assertTrue(alg.process(Hmod, pairs, found));
+		assertTrue(alg.fitModel(pairs, Hmod, found));
 
 		// normalize to allow comparison
 		CommonOps.divide(H.get(2,2),H);

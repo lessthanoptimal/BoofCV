@@ -60,7 +60,7 @@ public class PnPRefineRodrigues implements RefinePnP {
 	}
 
 	@Override
-	public boolean process(Se3_F64 worldToCamera, List<Point2D3D> obs, Se3_F64 refinedWorldToCamera ) {
+	public boolean fitModel(List<Point2D3D> obs, Se3_F64 worldToCamera, Se3_F64 refinedWorldToCamera) {
 
 		paramModel.encode(worldToCamera, param);
 

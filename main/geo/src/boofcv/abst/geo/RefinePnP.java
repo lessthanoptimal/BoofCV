@@ -18,14 +18,14 @@
 
 package boofcv.abst.geo;
 
-import boofcv.struct.geo.GeoModelRefine;
 import boofcv.struct.geo.Point2D3D;
 import georegression.struct.se.Se3_F64;
+import org.ddogleg.fitting.modelset.ModelFitter;
 
 /**
  * Refines a pose estimate given a set of observations and associated 3D point in world coordinates.
  *
  * @author Peter Abeles
  */
-public interface RefinePnP extends GeoModelRefine<Se3_F64,Point2D3D> {
+public interface RefinePnP extends ModelFitter<Se3_F64,Point2D3D> {
 }

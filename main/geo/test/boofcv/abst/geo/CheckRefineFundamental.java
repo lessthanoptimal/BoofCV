@@ -21,8 +21,8 @@ package boofcv.abst.geo;
 import boofcv.alg.geo.MultiViewOps;
 import boofcv.alg.geo.f.EpipolarTestSimulation;
 import boofcv.struct.geo.AssociatedPair;
-import boofcv.struct.geo.GeoModelRefine;
 import georegression.struct.point.Vector3D_F64;
+import org.ddogleg.fitting.modelset.ModelFitter;
 import org.ejml.data.DenseMatrix64F;
 import org.ejml.ops.CommonOps;
 import org.ejml.ops.MatrixFeatures;
@@ -42,7 +42,7 @@ public abstract class CheckRefineFundamental extends EpipolarTestSimulation {
 
 	@Test
 	public void checkMarkerInterface() {
-		GeoModelRefine<DenseMatrix64F,AssociatedPair> alg = createAlgorithm();
+		ModelFitter<DenseMatrix64F,AssociatedPair> alg = createAlgorithm();
 	}
 
 	@Test
@@ -52,10 +52,10 @@ public abstract class CheckRefineFundamental extends EpipolarTestSimulation {
 		// compute true essential matrix
 		DenseMatrix64F E = MultiViewOps.createEssential(worldToCamera.getR(), worldToCamera.getT());
 
-		GeoModelRefine<DenseMatrix64F,AssociatedPair> alg = createAlgorithm();
+		ModelFitter<DenseMatrix64F,AssociatedPair> alg = createAlgorithm();
 
 		//give it the perfect matrix and see if it screwed it up
-		assertTrue(alg.process(E, pairs, found));
+		assertTrue(alg.fitModel(pairs, E, found));
 
 		// normalize so that they are the same
 		CommonOps.divide(E.get(2, 2), E);
@@ -76,10 +76,10 @@ public abstract class CheckRefineFundamental extends EpipolarTestSimulation {
 		T.x += 0.1;
 		DenseMatrix64F Emod = MultiViewOps.createEssential(worldToCamera.getR(), T);
 
-		GeoModelRefine<DenseMatrix64F,AssociatedPair> alg = createAlgorithm();
+		ModelFitter<DenseMatrix64F,AssociatedPair> alg = createAlgorithm();
 
 		// compute and compare results
-		assertTrue(alg.process(Emod, pairs,found));
+		assertTrue(alg.fitModel(pairs, Emod, found));
 
 		// normalize to allow comparison
 		CommonOps.divide(E.get(2,2),E);

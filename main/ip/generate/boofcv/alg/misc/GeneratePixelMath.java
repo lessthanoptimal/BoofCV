@@ -87,6 +87,7 @@ public class GeneratePixelMath extends CodeGeneratorBase {
 			if( !types[i].isInteger() ) {
 				printMultTwoImages(types[i],types[i]);
 				printDivTwoImages(types[i],types[i]);
+				printLog(types[i],types[i]);
 			}
 		}
 	}
@@ -495,6 +496,33 @@ public class GeneratePixelMath extends CodeGeneratorBase {
 				"\t\t\t// for(int x = 0; x < w; x++ ) {\n" +
 				"\t\t\tfor (; indexA < indexEnd; indexA++, indexB++, indexOut++ ) {\n" +
 				"\t\t\t\toutput.data[indexOut] = "+typeCast+"((imgA.data[indexA] "+bitWise+") * (imgB.data[indexB] "+bitWise+"));\n" +
+				"\t\t\t}\n" +
+				"\t\t}\n" +
+				"\t}\n\n");
+	}
+
+	public void printLog( AutoTypeImage typeIn , AutoTypeImage typeOut ) {
+		String bitWise = typeIn.getBitWise();
+		String typeCast = typeOut != AutoTypeImage.F64 ? "("+typeOut.getDataType()+")" : "";
+
+		out.print("\t/**\n" +
+				"\t * Sets each pixel in the output image to log( 1 + input(x,y)) of the input image.\n" +
+				"\t * Both the input and output image can be the same instance.\n" +
+				"\t *\n" +
+				"\t * @param input The input image. Not modified.\n" +
+				"\t * @param output Where the log image is written to. Modified.\n" +
+				"\t */\n" +
+				"\tpublic static void log( "+typeIn.getImageName()+" input , "+typeOut.getImageName()+" output ) {\n" +
+				"\n" +
+				"\t\tInputSanityCheck.checkSameShape(input,output);\n" +
+				"\n" +
+				"\t\tfor( int y = 0; y < input.height; y++ ) {\n" +
+				"\t\t\tint indexSrc = input.startIndex + y* input.stride;\n" +
+				"\t\t\tint indexDst = output.startIndex + y* output.stride;\n" +
+				"\t\t\tint end = indexSrc + input.width;\n" +
+				"\n" +
+				"\t\t\tfor( ; indexSrc < end; indexSrc++ , indexDst++) {\n" +
+				"\t\t\t\toutput.data[indexDst] = "+typeCast+"Math.log(1 + input.data[indexSrc]"+bitWise+");\n" +
 				"\t\t\t}\n" +
 				"\t\t}\n" +
 				"\t}\n\n");

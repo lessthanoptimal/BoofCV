@@ -37,8 +37,9 @@ Version : Alpha 0.16
 - PixelMath
   * pixel-wise image-to-image multiplication
   * pixel-wise image-to-image division
+  * pixel-wise log(1+x)
+- Removed GeoModelRefine and replaced with ModelFitter
 
-- TODO remove GeoModelRefine and replace with ModelFitter
 - TODO improve KLT edge handling
 - TODO mean-shift color
 - TODO cam-shift

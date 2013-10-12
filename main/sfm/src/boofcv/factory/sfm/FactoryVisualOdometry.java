@@ -45,7 +45,6 @@ import boofcv.alg.sfm.d3.*;
 import boofcv.alg.sfm.robust.DistancePlane2DToPixelSq;
 import boofcv.alg.sfm.robust.EstimatorToGenerator;
 import boofcv.alg.sfm.robust.GenerateSe2_PlanePtPixel;
-import boofcv.alg.sfm.robust.GeoModelRefineToModelFitter;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.geo.EnumPNP;
 import boofcv.factory.geo.FactoryMultiView;
@@ -61,7 +60,6 @@ import georegression.fitting.se.ModelManagerSe2_F64;
 import georegression.fitting.se.ModelManagerSe3_F64;
 import georegression.struct.se.Se2_F64;
 import georegression.struct.se.Se3_F64;
-import org.ddogleg.fitting.modelset.ModelFitter;
 import org.ddogleg.fitting.modelset.ModelMatcher;
 import org.ddogleg.fitting.modelset.ransac.Ransac;
 
@@ -316,7 +314,6 @@ public class FactoryVisualOdometry {
 				new Ransac<Se3_F64, Stereo2D3D>(2323, manager, generator, distanceStereo, ransacIterations, ransacTOL);
 
 		RefinePnPStereo refinePnP = null;
-		ModelFitter<Se3_F64,Stereo2D3D> refine = null;
 
 		ExtractTrackDescription<Desc> extractor = (ExtractTrackDescription)trackerLeft;
 		Class<Desc> descType = extractor.getDescriptionType();
@@ -331,13 +328,12 @@ public class FactoryVisualOdometry {
 
 		if( refineIterations > 0 ) {
 			refinePnP = new PnPStereoRefineRodrigues(1e-12,refineIterations);
-			refine = new GeoModelRefineToModelFitter<Se3_F64,Stereo2D3D>(refinePnP);
 		}
 
 		TriangulateTwoViewsCalibrated triangulate = FactoryTriangulate.twoGeometric();
 
 		VisOdomDualTrackPnP<T,Desc> alg =  new VisOdomDualTrackPnP<T,Desc>(thresholdAdd,thresholdRetire,epipolarPixelTol,
-				trackerLeft,trackerRight,associateUnique,triangulate,motion,refine);
+				trackerLeft,trackerRight,associateUnique,triangulate,motion,refinePnP);
 
 		return new WrapVisOdomDualTrackPnP<T>(pnpStereo,distanceMono,distanceStereo,associateStereo,alg,refinePnP,imageType);
 	}
@@ -373,11 +369,9 @@ public class FactoryVisualOdometry {
 				new Ransac<Se3_F64, Stereo2D3D>(2323, manager, generator, distanceStereo, ransacIterations, ransacTOL);
 
 		RefinePnPStereo refinePnP = null;
-		ModelFitter<Se3_F64,Stereo2D3D> refine = null;
 
 		if( refineIterations > 0 ) {
 			refinePnP = new PnPStereoRefineRodrigues(1e-12,refineIterations);
-			refine = new GeoModelRefineToModelFitter<Se3_F64,Stereo2D3D>(refinePnP);
 		}
 		Class<Desc> descType = detector.getDescriptionType();
 
@@ -395,7 +389,7 @@ public class FactoryVisualOdometry {
 		associateStereo.setThreshold(maxAssociationError);
 
 		VisOdomQuadPnP<T,Desc> alg = new VisOdomQuadPnP<T,Desc>(
-				detector,assocSame,associateStereo,triangulate,motion,refine);
+				detector,assocSame,associateStereo,triangulate,motion,refinePnP);
 
 		return new WrapVisOdomQuadPnP<T,Desc>(alg,refinePnP,associateStereo,distanceStereo,distanceMono,imageType);
 	}

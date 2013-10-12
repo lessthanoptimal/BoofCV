@@ -26,7 +26,7 @@ import boofcv.misc.Performer;
 import boofcv.misc.PerformerBase;
 import boofcv.misc.ProfileOperation;
 import boofcv.struct.geo.AssociatedPair;
-import boofcv.struct.geo.GeoModelRefine;
+import org.ddogleg.fitting.modelset.ModelFitter;
 import org.ejml.data.DenseMatrix64F;
 
 import static boofcv.factory.geo.FactoryMultiView.refineHomography;
@@ -44,17 +44,17 @@ public class BenchmarkRuntimeRefineHomography extends ArtificialStereoScene{
 
 	public class Refine implements Performer {
 
-		GeoModelRefine<DenseMatrix64F,AssociatedPair> alg;
+		ModelFitter<DenseMatrix64F,AssociatedPair> alg;
 		String name;
 
-		public Refine(String name ,GeoModelRefine<DenseMatrix64F,AssociatedPair> alg) {
+		public Refine(String name , ModelFitter<DenseMatrix64F,AssociatedPair> alg) {
 			this.name = name;
 			this.alg = alg;
 		}
 
 		@Override
 		public void process() {
-			alg.process(initialF, pairs, refinedF);
+			alg.fitModel(pairs, initialF, refinedF);
 		}
 
 		@Override

@@ -77,7 +77,7 @@ public class PnPStereoRefineRodrigues implements RefinePnPStereo {
 	}
 
 	@Override
-	public boolean process(Se3_F64 worldToLeft, List<Stereo2D3D> obs, Se3_F64 refinedWorldToLeft ) {
+	public boolean fitModel(List<Stereo2D3D> obs, Se3_F64 worldToLeft, Se3_F64 refinedWorldToLeft) {
 
 		// put into a parameterized format
 		motionCodec.encode(worldToLeft, param);

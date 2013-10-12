@@ -112,7 +112,7 @@ public class ListDisplayPanel extends JPanel implements ListSelectionListener  {
 				}
 				Dimension d = listPanel.getMinimumSize();
 				listPanel.setPreferredSize(new Dimension(d.width + scroll.getVerticalScrollBar().getWidth(), d.height));
-				revalidate();
+				validate();
 			}
 		});
 	}
@@ -122,18 +122,13 @@ public class ListDisplayPanel extends JPanel implements ListSelectionListener  {
 		if( e.getValueIsAdjusting() )
 			return;
 
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				final int index = listPanel.getSelectedIndex();
-				if( index >= 0 ) {
-					removeCenterBody();
-					bodyPanel.add(panels.get(index), BorderLayout.CENTER);
-					bodyPanel.validate();
-					bodyPanel.repaint();
-				}
-			}
-		});
-
+		final int index = listPanel.getSelectedIndex();
+		if( index >= 0 ) {
+			removeCenterBody();
+			bodyPanel.add(panels.get(index), BorderLayout.CENTER);
+			bodyPanel.validate();
+			bodyPanel.repaint();
+		}
 	}
 
 	private void removeCenterBody() {

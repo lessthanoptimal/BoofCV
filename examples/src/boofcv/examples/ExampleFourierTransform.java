@@ -127,10 +127,7 @@ public class ExampleFourierTransform {
 		DiscreteFourierTransformOps.phase(transform, phase);
 
 		// Convert it to a log scale for visibility
-		// TODO add PixelMath.log()
-		for( int i = 0; i < magnitude.data.length; i++ ) {
-			magnitude.data[i] = (float)Math.log( 1 + magnitude.data[i]);
-		}
+		PixelMath.log(magnitude,magnitude);
 
 		// Display the results
 		BufferedImage visualMag = VisualizeImageData.grayMagnitude(magnitude, null, -1);

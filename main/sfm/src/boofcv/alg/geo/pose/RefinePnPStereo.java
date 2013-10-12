@@ -18,16 +18,16 @@
 
 package boofcv.alg.geo.pose;
 
-import boofcv.struct.geo.GeoModelRefine;
 import boofcv.struct.sfm.Stereo2D3D;
 import georegression.struct.se.Se3_F64;
+import org.ddogleg.fitting.modelset.ModelFitter;
 
 /**
  * Refines a pose estimate given a set of stereo observations and associated 3D point in world coordinates.
  *
  * @author Peter Abeles
  */
-public interface RefinePnPStereo extends GeoModelRefine<Se3_F64,Stereo2D3D> {
+public interface RefinePnPStereo extends ModelFitter<Se3_F64,Stereo2D3D> {
 
 	public void setLeftToRight( Se3_F64 leftToRight );
 }

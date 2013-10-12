@@ -19,10 +19,10 @@
 package boofcv.abst.geo.pose;
 
 import boofcv.alg.geo.pose.CommonMotionNPoint;
-import boofcv.struct.geo.GeoModelRefine;
 import boofcv.struct.geo.Point2D3D;
 import georegression.geometry.RotationMatrixGenerator;
 import georegression.struct.se.Se3_F64;
+import org.ddogleg.fitting.modelset.ModelFitter;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -44,9 +44,9 @@ public class TestPnPRefineRodrigues extends CommonMotionNPoint {
 
 		generateScene(10,motion,false);
 
-		GeoModelRefine<Se3_F64,Point2D3D> alg = new PnPRefineRodrigues(1e-8,200);
+		ModelFitter<Se3_F64,Point2D3D> alg = new PnPRefineRodrigues(1e-8,200);
 		
-		assertTrue(alg.process(motion, pointPose, found));
+		assertTrue(alg.fitModel(pointPose, motion, found));
 
 		assertEquals(motion.getT().getX(),found.getX(),1e-8);
 		assertEquals(motion.getT().getY(),found.getY(),1e-8);
@@ -67,7 +67,7 @@ public class TestPnPRefineRodrigues extends CommonMotionNPoint {
 		Se3_F64 n = motion.copy();
 		n.getT().setX(0);
 		
-		assertTrue(alg.process(n, pointPose,found));
+		assertTrue(alg.fitModel(pointPose, n, found));
 
 		assertEquals(motion.getT().getX(),found.getX(),1e-5);
 		assertEquals(motion.getT().getY(),found.getY(),1e-5);
