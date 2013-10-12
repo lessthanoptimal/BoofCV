@@ -42,7 +42,7 @@ import boofcv.struct.image.ImageBase;
  *
  * @author Peter Abeles
  */
-public interface DiscreteFourierTransform<T extends ImageBase> {
+public interface DiscreteFourierTransform<I extends ImageBase, T extends ImageBase> {
 
 	/**
 	 * Applies forward transform to the input image.
@@ -50,14 +50,14 @@ public interface DiscreteFourierTransform<T extends ImageBase> {
 	 * @param image (Input) Input image.  Default: Not modified.
 	 * @param transform (Output) Fourier transform, twice width and same height of input.  Modified.
 	 */
-	public void forward( T image , T transform );
+	public void forward( I image , T transform );
 
 	/**
 	 * Applies the inverse transform to a fourier transformed image to recover the original image
 	 * @param transform (Input) Fourier transform. twice width and same height of output.  Default: Not modified.
 	 * @param image (Output) reconstructed image.  Modified.
 	 */
-	public void inverse( T transform , T image );
+	public void inverse( T transform , I image );
 
 	/**
 	 * This function can toggle the internal implementations ability to modify the input image or input transform.

@@ -45,13 +45,13 @@ public class ConvertBufferedImage {
 	 * @param img Image whose internal data is extracted and wrapped.
 	 * @return An image whose internal data is the same as the input image.
 	 */
-	public static ImageInterleavedInt8 extractInterlacedInt8(BufferedImage img) {
+	public static InterleavedU8 extractInterlacedInt8(BufferedImage img) {
 
 		if (img.getRaster() instanceof ByteInterleavedRaster &&
 				img.getType() != BufferedImage.TYPE_BYTE_INDEXED ) {
 			ByteInterleavedRaster raster = (ByteInterleavedRaster) img.getRaster();
 
-			ImageInterleavedInt8 ret = new ImageInterleavedInt8();
+			InterleavedU8 ret = new InterleavedU8();
 
 			ret.width = img.getWidth();
 			ret.height = img.getHeight();
@@ -96,13 +96,13 @@ public class ConvertBufferedImage {
 
 	/**
 	 * Creates a new BufferedImage that internally uses the same data as the provided
-	 * ImageInterleavedInt8.  If 3 bands then the image will be of type TYPE_3BYTE_BGR
+	 * {@link InterleavedU8}.  If 3 bands then the image will be of type TYPE_3BYTE_BGR
 	 * or if 1 band TYPE_BYTE_GRAY.
 	 *
 	 * @param img Input image who's data will be wrapped by the returned BufferedImage.
 	 * @return BufferedImage which shared data with the input image.
 	 */
-	public static BufferedImage extractBuffered(ImageInterleavedInt8 img) {
+	public static BufferedImage extractBuffered(InterleavedU8 img) {
 		if (img.isSubimage())
 			throw new IllegalArgumentException("Sub-images are not supported for this operation");
 

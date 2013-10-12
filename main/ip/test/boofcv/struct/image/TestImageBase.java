@@ -60,22 +60,11 @@ public class TestImageBase {
 	@Test
 	public void isSubimage() {
 		Dummy a = new Dummy();
-		a.startIndex = 0;
-		a.stride = 10;
-		a.width = 10;
-		a.height = 11;
-		
+		a.subImage = false;
+
 		assertFalse(a.isSubimage());
-		
-		a.startIndex = 1;
-		assertTrue(a.isSubimage());
-		a.startIndex = 0;
 
-		a.stride = 5;
-		assertTrue(a.isSubimage());
-		a.startIndex = 10;
-
-		a.height = 5;
+		a.subImage = true;
 		assertTrue(a.isSubimage());
 	}
 	

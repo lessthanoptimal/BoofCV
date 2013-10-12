@@ -25,7 +25,6 @@ import java.lang.reflect.Array;
  * Base class for images that contain multiple interleaved bands. Typically each band represents
  * a different color or frequency of light detected in the imaging sensor.
  * </p>
- * <p/>
  * <p>
  * Each pixel is composed of N bands.  In an RGB image each pixel would be composed of 3 elements, [red][green][blue].
  * The index of the green band at pixel (3,10) would be:<br>
@@ -80,6 +79,7 @@ public abstract class ImageInterleaved<T extends ImageInterleaved> extends Image
 		ret.height = y1 - y0;
 		ret.numBands = numBands;
 		ret.startIndex = startIndex + y0 * stride + x0 * numBands;
+		ret.subImage = true;
 
 		return ret;
 	}
@@ -93,12 +93,12 @@ public abstract class ImageInterleaved<T extends ImageInterleaved> extends Image
 
 		if( Array.getLength(data) < width*height*numBands ) {
 			ImageInterleaved<?> a = _createNew(width,height);
-			_setData(a);
+			_setData(a._getData());
 		}
 
 		this.width = width;
 		this.height = height;
-		this.stride = width;
+		this.stride = width*numBands;
 	}
 
 	@Override

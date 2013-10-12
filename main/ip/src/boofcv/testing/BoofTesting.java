@@ -24,6 +24,7 @@ import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.*;
 import sun.awt.image.ByteInterleavedRaster;
 import sun.awt.image.IntegerInterleavedRaster;
+import sun.awt.image.ShortInterleavedRaster;
 
 import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
@@ -85,12 +86,25 @@ public class BoofTesting {
 			return (T)createSubImageOf_S((ImageSingleBand)input);
 		} else if( input instanceof MultiSpectral ) {
 			return (T)createSubImageOf_MS((MultiSpectral) input);
+		} else if( input instanceof ImageInterleaved ) {
+			return (T)createSubImageOf_I((ImageInterleaved) input);
 		} else {
 			throw new IllegalArgumentException("Add support for this image type");
 		}
 	}
 
 	public static <T extends ImageSingleBand> T createSubImageOf_S(T input) {
+		// create the larger image
+		T ret = (T) input._createNew(input.width + 10, input.height + 12);
+		// create a sub-image of the inner portion
+		ret = (T) ret.subimage(5, 7, input.width + 5, input.height + 7);
+		// copy input image into the subimage
+		ret.setTo(input);
+
+		return ret;
+	}
+
+	public static <T extends ImageInterleaved> T createSubImageOf_I(T input) {
 		// create the larger image
 		T ret = (T) input._createNew(input.width + 10, input.height + 12);
 		// create a sub-image of the inner portion
@@ -456,8 +470,8 @@ public class BoofTesting {
 				assertEquals(a.getBand(band),b.getBand(band),tol );
 			}
 		} else if( imgA instanceof ImageInterleaved ) {
-			ImageInterleavedInt8 a = (ImageInterleavedInt8)imgA;
-			ImageInterleavedInt8 b = (ImageInterleavedInt8)imgB;
+			ImageInterleaved a = (ImageInterleaved)imgA;
+			ImageInterleaved b = (ImageInterleaved)imgB;
 
 			if( a.getNumBands() != b.getNumBands() )
 				throw new RuntimeException("Number of bands not equal");
@@ -467,8 +481,8 @@ public class BoofTesting {
 			for( int y = 0; y < imgA.height; y++ ) {
 				for( int x = 0; x < imgA.width; x++ ) {
 					for( int band = 0; band < numBands; band++ ) {
-						int valA = a.getBand(x, y, band);
-						int valB = b.getBand(x, y, band);
+						double valA = GeneralizedImageOps.get(a,x,y,band);
+						double valB = GeneralizedImageOps.get(b, x, y, band);
 
 						double difference = valA - valB;
 						if( Math.abs(difference) > tol )
@@ -598,12 +612,16 @@ public class BoofTesting {
 	public static void checkEquals(BufferedImage imgA, ImageBase imgB, boolean boofcvBandOrder,double tol ) {
 		if (ImageUInt8.class == imgB.getClass()) {
 			checkEquals(imgA, (ImageUInt8) imgB);
+		} else if (ImageInt16.class.isAssignableFrom(imgB.getClass())) {
+			checkEquals( imgA, (ImageInt16) imgB );
 		} else if (ImageFloat32.class == imgB.getClass()) {
 			checkEquals(imgA, (ImageFloat32) imgB, (float) tol);
-		} else if (ImageInterleavedInt8.class == imgB.getClass()) {
-			checkEquals(imgA, (ImageInterleavedInt8) imgB);
+		} else if (InterleavedU8.class == imgB.getClass()) {
+			checkEquals(imgA, (InterleavedU8) imgB);
 		} else if (MultiSpectral.class == imgB.getClass()) {
 			checkEquals(imgA, (MultiSpectral) imgB, boofcvBandOrder,(float) tol);
+		} else {
+			throw new IllegalArgumentException("Unknown");
 		}
 	}
 
@@ -661,6 +679,74 @@ public class BoofTesting {
 	 * @param imgA BufferedImage
 	 * @param imgB ImageUInt8
 	 */
+	public static void checkEquals(BufferedImage imgA, ImageInt16 imgB) {
+
+		if (imgA.getRaster() instanceof ByteInterleavedRaster &&
+				imgA.getType() != BufferedImage.TYPE_BYTE_INDEXED) {
+			ByteInterleavedRaster raster = (ByteInterleavedRaster) imgA.getRaster();
+
+			if (raster.getNumBands() == 1) {
+				int strideA = raster.getScanlineStride();
+				int offsetA = raster.getDataOffset(0)-raster.getNumBands()+1;
+
+				// handle a special case where the RGB conversion is screwed
+				for (int i = 0; i < imgA.getHeight(); i++) {
+					for (int j = 0; j < imgA.getWidth(); j++) {
+						int valB = imgB.get(j, i);
+						int valA = raster.getDataStorage()[ offsetA + i*strideA + j];
+						if (!imgB.getTypeInfo().isSigned())
+							valA &= 0xFFFF;
+
+						if (valA != valB)
+							throw new RuntimeException("Images are not equal: "+valA+" "+valB);
+					}
+				}
+				return;
+			}
+		} else if (imgA.getRaster() instanceof ShortInterleavedRaster) {
+			ShortInterleavedRaster raster = (ShortInterleavedRaster) imgA.getRaster();
+
+			if (raster.getNumBands() == 1) {
+				int strideA = raster.getScanlineStride();
+				int offsetA = raster.getDataOffset(0)-raster.getNumBands()+1;
+
+				// handle a special case where the RGB conversion is screwed
+				for (int i = 0; i < imgA.getHeight(); i++) {
+					for (int j = 0; j < imgA.getWidth(); j++) {
+						int valB = imgB.get(j, i);
+						int valA = raster.getDataStorage()[ offsetA + i*strideA + j];
+						if (!imgB.getTypeInfo().isSigned())
+							valA &= 0xFFFF;
+
+						if (valA != valB)
+							throw new RuntimeException("Images are not equal: "+valA+" "+valB);
+					}
+				}
+			}
+		} else {
+			for (int y = 0; y < imgA.getHeight(); y++) {
+				for (int x = 0; x < imgA.getWidth(); x++) {
+					int rgb = imgA.getRGB(x, y);
+
+					int gray = ((((rgb >>> 16) & 0xFF) + ((rgb >>> 8) & 0xFF) + (rgb & 0xFF)) / 3);
+					int grayB = imgB.get(x, y);
+					if (!imgB.getTypeInfo().isSigned())
+						gray &= 0xFFFF;
+
+					if (Math.abs(gray - grayB) != 0) {
+						throw new RuntimeException("images are not equal: (" + x + " , " + y + ") A = " + gray + " B = " + grayB);
+					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * Checks to see if the BufferedImage has the same intensity values as the ImageUInt8
+	 *
+	 * @param imgA BufferedImage
+	 * @param imgB ImageUInt8
+	 */
 	public static void checkEquals(BufferedImage imgA, ImageFloat32 imgB, float tol) {
 
 		if (imgA.getRaster() instanceof ByteInterleavedRaster &&
@@ -706,7 +792,7 @@ public class BoofTesting {
 	 * @param imgA BufferedImage
 	 * @param imgB ImageUInt8
 	 */
-	public static void checkEquals(BufferedImage imgA, ImageInterleavedInt8 imgB) {
+	public static void checkEquals(BufferedImage imgA, InterleavedU8 imgB) {
 
 		if (imgA.getRaster() instanceof ByteInterleavedRaster) {
 			ByteInterleavedRaster raster = (ByteInterleavedRaster) imgA.getRaster();
@@ -716,7 +802,7 @@ public class BoofTesting {
 				for (int i = 0; i < imgA.getHeight(); i++) {
 					for (int j = 0; j < imgA.getWidth(); j++) {
 						int valB = imgB.getBand(j, i, 0);
-						int valA = raster.getDataStorage()[i * imgA.getWidth() + j];
+						int valA = raster.getDataStorage()[i * imgA.getWidth() + j] & 0xFF;
 
 						if (valA != valB)
 							throw new RuntimeException("Images are not equal");

@@ -109,6 +109,18 @@ public class GeneralizedImageOps {
 		}
 	}
 
+	public static double get(ImageInterleaved img, int x, int y , int band ) {
+		if (img instanceof InterleavedU8) {
+			return ((InterleavedU8) img).getBand(x, y, band);
+		} else if (img instanceof InterleavedF32) {
+			return ((InterleavedF32) img).getBand(x, y, band);
+		} else if (img instanceof InterleavedF64) {
+			return ((InterleavedF64) img).getBand(x, y, band);
+		} else {
+			throw new IllegalArgumentException("Unknown or incompatible image type: " + img.getClass().getSimpleName());
+		}
+	}
+
 	public static <T extends ImageSingleBand> T createSingleBand(Class<T> type, int width, int height) {
 		type = BoofTesting.convertGenericToSpecificType(type);
 

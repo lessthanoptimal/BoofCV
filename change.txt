@@ -39,6 +39,10 @@ Version : Alpha 0.16
   * pixel-wise image-to-image division
   * pixel-wise log(1+x)
 - Removed GeoModelRefine and replaced with ModelFitter
+- Image Types
+  * Improved and renamed interleaved image types
+  * Added ImageBase.subimage class variable
+  * Added InterleavedImageOps
 
 - TODO improve KLT edge handling
 - TODO mean-shift color

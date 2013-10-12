@@ -101,7 +101,7 @@ public class TestConvolveImageBox extends CompareEquivalentFunctions {
 		Class<?> params[] = m.getParameterTypes();
 		Object kernel = TestConvolveImageBox.createTableKernel(params[0],kernelRadius,rand);
 
-		ImageSingleBand output = ((ImageSingleBand)targetParam[1]).clone();
+		ImageSingleBand output = (ImageSingleBand)((ImageSingleBand)targetParam[1]).clone();
 
 		ImageBorder border = output.getTypeInfo().isInteger() ? new ImageBorderValue.Value_I(0) : new ImageBorderValue.Value_F32(0);
 

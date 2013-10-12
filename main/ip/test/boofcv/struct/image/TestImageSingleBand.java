@@ -35,6 +35,7 @@ public class TestImageSingleBand {
 
 		a.reshape(11,12);
 
+		assertFalse(a.subImage);
 		assertEquals(b.stride,a.stride);
 		assertEquals(b.width,a.width);
 		assertEquals(b.height,a.height);
@@ -66,6 +67,7 @@ public class TestImageSingleBand {
 
 		a.data[5] = 6;
 		b.setTo(a);
+		assertFalse(b.subImage);
 		assertEquals(6, b.data[5]);
 
 		// test it against a submatrix
@@ -76,6 +78,7 @@ public class TestImageSingleBand {
 		assertEquals(6, c.data[15]);
 	}
 
+
 	/**
 	 * The two matrices do not have the same shape
 	 */
@@ -85,16 +88,6 @@ public class TestImageSingleBand {
 		DummyImage b = new DummyImage(11, 20);
 
 		a.setTo(b);
-	}
-
-	@Test
-	public void isSubmatrix() {
-		DummyImage a = new DummyImage(10, 20);
-
-		assertFalse(a.isSubimage());
-
-		assertTrue(a.subimage(0, 5, 0, 5).isSubimage());
-		assertTrue(a.subimage(2, 5, 2, 5).isSubimage());
 	}
 
 	/**
@@ -115,6 +108,7 @@ public class TestImageSingleBand {
 	public void subimage() {
 		DummyImage a = new DummyImage(10, 20).subimage(2, 3, 8, 10);
 
+		assertTrue(a.subImage);
 		assertEquals(10 * 20, a.data.length);
 		assertEquals(6, a.getWidth());
 		assertEquals(7, a.getHeight());

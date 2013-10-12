@@ -290,7 +290,7 @@ public class TestImageMiscOps {
 		ImageSingleBand imgA = GeneralizedImageOps.createSingleBand(paramTypes[0], width, height);
 
 		GImageMiscOps.fillUniform(imgA,rand,0,100);
-		ImageSingleBand imgB = imgA.clone();
+		ImageSingleBand imgB = (ImageSingleBand)imgA.clone();
 
 		m.invoke(null,imgB);
 

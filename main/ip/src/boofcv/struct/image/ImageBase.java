@@ -46,6 +46,11 @@ public abstract class ImageBase<T extends ImageBase> implements Serializable, Cl
 	 */
 	public int height;
 
+	/**
+	 * Indicates if it is a sub-image or not
+	 */
+	public boolean subImage = false;
+
 	public abstract T subimage(int x0, int y0, int x1, int y1);
 
 	public abstract void reshape(int width, int height);
@@ -64,7 +69,7 @@ public abstract class ImageBase<T extends ImageBase> implements Serializable, Cl
 	 * @return true if it is a subimage, otherwise false.
 	 */
 	public boolean isSubimage() {
-		return startIndex != 0 || width != stride;
+		return subImage;
 	}
 
 	public final boolean isInBounds(int x, int y) {
@@ -119,9 +124,25 @@ public abstract class ImageBase<T extends ImageBase> implements Serializable, Cl
 	 * a new image is created with the specified dimensions which has all
 	 * other parameters the same as the original matrix.
 	 *
-	 * @param imgWidth
-	 * @param imgHeight
+	 * @param imgWidth Width of the new image
+	 * @param imgHeight height of the new image
 	 * @return new image
 	 */
 	public abstract T _createNew(int imgWidth, int imgHeight);
+
+	/**
+	 * Creates an identical image.  Note that if this image is a sub-image portions of hte image which are not part
+	 * of the sub-image are not copied.
+	 *
+	 * @return Clone of this image.
+	 */
+	@SuppressWarnings({"unchecked", "CloneDoesntDeclareCloneNotSupportedException", "CloneDoesntCallSuperClone"})
+	@Override
+	public T clone() {
+		T ret = _createNew(width,height);
+
+		ret.setTo(this);
+
+		return ret;
+	}
 }

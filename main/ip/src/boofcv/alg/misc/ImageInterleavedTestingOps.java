@@ -18,7 +18,7 @@
 
 package boofcv.alg.misc;
 
-import boofcv.struct.image.ImageInterleavedInt8;
+import boofcv.struct.image.InterleavedI8;
 
 import java.util.Random;
 
@@ -33,7 +33,7 @@ public class ImageInterleavedTestingOps {
 	 * @param img   An image.
 	 * @param value The value that the image is being filled with.
 	 */
-	public static void fill(ImageInterleavedInt8 img, byte... value) {
+	public static void fill(InterleavedI8 img, byte... value) {
 		if (value.length != img.numBands)
 			throw new IllegalArgumentException("Unexpected number of bands");
 
@@ -57,7 +57,7 @@ public class ImageInterleavedTestingOps {
 	 * @param img  An image.
 	 * @param rand The value that the image is being filled with.
 	 */
-	public static void randomize(ImageInterleavedInt8 img, Random rand) {
+	public static void randomize(InterleavedI8 img, Random rand) {
 		final int h = img.getHeight();
 		final int w = img.getWidth();
 

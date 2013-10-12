@@ -42,6 +42,8 @@ public abstract class StandardImageInterleavedTests {
 
 	public abstract Number randomNumber();
 
+	public abstract Number getNumber( Number value );
+
 	/**
 	 * Sets each element in the image to a random value.
 	 */
@@ -105,7 +107,7 @@ public abstract class StandardImageInterleavedTests {
 		// set the expected to the point in the image
 		call(img, "setBand", 1, expected, 1, 1, 0);
 		Number found = (Number) call(img, "getBand", 0, null, 1, 1, 0);
-		assertTrue(expected.doubleValue() == found.doubleValue());
+		assertTrue(getNumber(expected).doubleValue() == found.doubleValue() );
 	}
 
 	/**

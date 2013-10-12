@@ -144,7 +144,7 @@ public class TestWaveletTransformOps {
 				ImageSingleBand output = GeneralizedImageOps.createSingleBand(typeInput, dim.width, dim.height);
 //				System.out.println("adjust "+adjust+" level "+level+" scale "+ div);
 
-				invokeTransformN(desc, input.clone(), output, found, level, 0, 255);
+				invokeTransformN(desc, (ImageSingleBand)input.clone(), output, found, level, 0, 255);
 
 				BoofTesting.assertEquals(input, found, 1e-4f);
 			}

@@ -20,12 +20,12 @@ package boofcv.struct.image;
 
 /**
  * <p>
- * An image where the primitive type is a byte.
+ * {@link ImageInterleaved} for data of type byte.
  * </p>
  *
  * @author Peter Abeles
  */
-public class ImageInterleavedInt8 extends ImageInterleaved<ImageInterleavedInt8> {
+public abstract class InterleavedI8 extends ImageInterleaved<InterleavedI8> {
 
 	public byte data[];
 
@@ -36,11 +36,11 @@ public class ImageInterleavedInt8 extends ImageInterleaved<ImageInterleavedInt8>
 	 * @param height   number of rows in the image.
 	 * @param numBands number of bands/colors in the image.
 	 */
-	public ImageInterleavedInt8(int width, int height, int numBands) {
+	public InterleavedI8(int width, int height, int numBands) {
 		super(width, height, numBands);
 	}
 
-	public ImageInterleavedInt8() {
+	public InterleavedI8() {
 	}
 
 	/**
@@ -92,14 +92,7 @@ public class ImageInterleavedInt8 extends ImageInterleaved<ImageInterleavedInt8>
 	 * @param band which color band in the pixel
 	 * @return an intensity value.
 	 */
-	public int getBand(int x, int y, int band) {
-		if (!isInBounds(x, y))
-			throw new ImageAccessException("Requested pixel is out of bounds.");
-		if (band < 0 || band >= numBands)
-			throw new ImageAccessException("Invalid band requested.");
-
-		return data[getIndex(x, y, band)];
-	}
+	public abstract int getBand(int x, int y, int band);
 
 	/**
 	 * Returns the value of the specified band in the specified pixel.
@@ -143,10 +136,4 @@ public class ImageInterleavedInt8 extends ImageInterleaved<ImageInterleavedInt8>
 		this.data = (byte[]) data;
 	}
 
-	@Override
-	public ImageInterleavedInt8 _createNew(int imgWidth, int imgHeight) {
-		if (imgWidth == -1 || imgHeight == -1)
-			return new ImageInterleavedInt8();
-		return new ImageInterleavedInt8(imgWidth, imgHeight, numBands);
-	}
 }
