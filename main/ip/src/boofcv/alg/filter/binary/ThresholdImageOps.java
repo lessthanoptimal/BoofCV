@@ -35,15 +35,14 @@ import boofcv.struct.image.*;
 public class ThresholdImageOps {
 
 	/**
-	 * Applies a global threshold across the whole image.  Pixels which are
-	 * considered in the set defined by the threshold are set to 1, all others
-	 * are set to zero.  If the down flag is set to true then the inlier set
-	 * is defined as <= to the the threshold and >= if true.
+	 * Applies a global threshold across the whole image.  If 'down' is true, then pixels with values <=
+	 * to 'threshold' are set to 1 and the others set to 0.  If 'down' is false, then pixels with values >=
+	 * to 'threshold' are set to 1 and the others set to 0.
 	 *
 	 * @param input Input image. Not modified.
 	 * @param output Binary output image. If null a new image will be declared. Modified.
 	 * @param threshold threshold value.
-	 * @param down If true inliers are below the threshold and false they are above the threshold.
+	 * @param down If true then the inequality <= is used, otherwise if false then >= is used.
 	 * @return Output image.
 	 */
 	public static ImageUInt8 threshold( ImageFloat32 input , ImageUInt8 output ,
@@ -85,15 +84,14 @@ public class ThresholdImageOps {
 	}
 
 	/**
-	 * Applies a global threshold across the whole image.  Pixels which are
-	 * considered in the set defined by the threshold are set to 1, all others
-	 * are set to zero.  If the down flag is set to true then the inlier set
-	 * is defined as <= to the the threshold and >= if true.
+	 * Applies a global threshold across the whole image.  If 'down' is true, then pixels with values <=
+	 * to 'threshold' are set to 1 and the others set to 0.  If 'down' is false, then pixels with values >=
+	 * to 'threshold' are set to 1 and the others set to 0.
 	 *
 	 * @param input Input image. Not modified.
 	 * @param output Binary output image. If null a new image will be declared. Modified.
 	 * @param threshold threshold value.
-	 * @param down If true inliers are below the threshold and false they are above the threshold.
+	 * @param down If true then the inequality <= is used, otherwise if false then >= is used.
 	 * @return Output image.
 	 */
 	public static ImageUInt8 threshold( ImageFloat64 input , ImageUInt8 output ,
@@ -135,15 +133,14 @@ public class ThresholdImageOps {
 	}
 
 	/**
-	 * Applies a global threshold across the whole image.  Pixels which are
-	 * considered in the set defined by the threshold are set to 1, all others
-	 * are set to zero.  If the down flag is set to true then the inlier set
-	 * is defined as <= to the the threshold and >= if true.
+	 * Applies a global threshold across the whole image.  If 'down' is true, then pixels with values <=
+	 * to 'threshold' are set to 1 and the others set to 0.  If 'down' is false, then pixels with values >=
+	 * to 'threshold' are set to 1 and the others set to 0.
 	 *
 	 * @param input Input image. Not modified.
 	 * @param output Binary output image. If null a new image will be declared. Modified.
 	 * @param threshold threshold value.
-	 * @param down If true inliers are below the threshold and false they are above the threshold.
+	 * @param down If true then the inequality <= is used, otherwise if false then >= is used.
 	 * @return Output image.
 	 */
 	public static ImageUInt8 threshold( ImageUInt8 input , ImageUInt8 output ,
@@ -185,15 +182,14 @@ public class ThresholdImageOps {
 	}
 
 	/**
-	 * Applies a global threshold across the whole image.  Pixels which are
-	 * considered in the set defined by the threshold are set to 1, all others
-	 * are set to zero.  If the down flag is set to true then the inlier set
-	 * is defined as <= to the the threshold and >= if true.
+	 * Applies a global threshold across the whole image.  If 'down' is true, then pixels with values <=
+	 * to 'threshold' are set to 1 and the others set to 0.  If 'down' is false, then pixels with values >=
+	 * to 'threshold' are set to 1 and the others set to 0.
 	 *
 	 * @param input Input image. Not modified.
 	 * @param output Binary output image. If null a new image will be declared. Modified.
 	 * @param threshold threshold value.
-	 * @param down If true inliers are below the threshold and false they are above the threshold.
+	 * @param down If true then the inequality <= is used, otherwise if false then >= is used.
 	 * @return Output image.
 	 */
 	public static ImageUInt8 threshold( ImageSInt16 input , ImageUInt8 output ,
@@ -235,15 +231,14 @@ public class ThresholdImageOps {
 	}
 
 	/**
-	 * Applies a global threshold across the whole image.  Pixels which are
-	 * considered in the set defined by the threshold are set to 1, all others
-	 * are set to zero.  If the down flag is set to true then the inlier set
-	 * is defined as <= to the the threshold and >= if true.
+	 * Applies a global threshold across the whole image.  If 'down' is true, then pixels with values <=
+	 * to 'threshold' are set to 1 and the others set to 0.  If 'down' is false, then pixels with values >=
+	 * to 'threshold' are set to 1 and the others set to 0.
 	 *
 	 * @param input Input image. Not modified.
 	 * @param output Binary output image. If null a new image will be declared. Modified.
 	 * @param threshold threshold value.
-	 * @param down If true inliers are below the threshold and false they are above the threshold.
+	 * @param down If true then the inequality <= is used, otherwise if false then >= is used.
 	 * @return Output image.
 	 */
 	public static ImageUInt8 threshold( ImageUInt16 input , ImageUInt8 output ,
@@ -285,15 +280,14 @@ public class ThresholdImageOps {
 	}
 
 	/**
-	 * Applies a global threshold across the whole image.  Pixels which are
-	 * considered in the set defined by the threshold are set to 1, all others
-	 * are set to zero.  If the down flag is set to true then the inlier set
-	 * is defined as <= to the the threshold and >= if true.
+	 * Applies a global threshold across the whole image.  If 'down' is true, then pixels with values <=
+	 * to 'threshold' are set to 1 and the others set to 0.  If 'down' is false, then pixels with values >=
+	 * to 'threshold' are set to 1 and the others set to 0.
 	 *
 	 * @param input Input image. Not modified.
 	 * @param output Binary output image. If null a new image will be declared. Modified.
 	 * @param threshold threshold value.
-	 * @param down If true inliers are below the threshold and false they are above the threshold.
+	 * @param down If true then the inequality <= is used, otherwise if false then >= is used.
 	 * @return Output image.
 	 */
 	public static ImageUInt8 threshold( ImageSInt32 input , ImageUInt8 output ,
