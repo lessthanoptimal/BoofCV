@@ -72,15 +72,14 @@ public class GenerateThresholdImageOps extends CodeGeneratorBase {
 
 	public void printThreshold( AutoTypeImage imageIn ) {
 		out.print("\t/**\n" +
-				"\t * Applies a global threshold across the whole image.  Pixels which are\n" +
-				"\t * considered in the set defined by the threshold are set to 1, all others\n" +
-				"\t * are set to zero.  If the down flag is set to true then the inlier set\n" +
-				"\t * is defined as <= to the the threshold and >= if true.\n" +
+				"\t * Applies a global threshold across the whole image.  If 'down' is true, then pixels with values <=\n" +
+				"\t * to 'threshold' are set to 1 and the others set to 0.  If 'down' is false, then pixels with values >=\n" +
+				"\t * to 'threshold' are set to 1 and the others set to 0.\n" +
 				"\t *\n" +
 				"\t * @param input Input image. Not modified.\n" +
 				"\t * @param output Binary output image. If null a new image will be declared. Modified.\n" +
 				"\t * @param threshold threshold value.\n" +
-				"\t * @param down If true inliers are below the threshold and false they are above the threshold.\n" +
+				"\t * @param down If true then the inequality <= is used, otherwise if false then >= is used.\n" +
 				"\t * @return Output image.\n" +
 				"\t */\n" +
 				"\tpublic static ImageUInt8 threshold( "+imageIn.getImageName()+" input , ImageUInt8 output ,\n" +
