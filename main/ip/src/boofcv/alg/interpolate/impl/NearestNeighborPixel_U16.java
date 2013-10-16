@@ -48,7 +48,7 @@ public class NearestNeighborPixel_U16 extends NearestNeighborPixel<ImageUInt16> 
 	}
 
 	@Override
-	public float get_unsafe(float x, float y) {
+	public float get_fast(float x, float y) {
 		return data[ orig.startIndex + ((int)y)*stride + (int)x] & 0xFFFF;
 	}
 

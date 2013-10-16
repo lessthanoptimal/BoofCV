@@ -18,7 +18,7 @@
 
 package boofcv.alg.interpolate.impl;
 
-import boofcv.alg.interpolate.InterpolatePixel;
+import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.interpolate.InterpolateRectangle;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.image.ImageFloat32;
@@ -35,7 +35,7 @@ public class TestNearestNeighborRectangle_F32 extends GeneralBilinearRectangleCh
 	}
 
 	@Override
-	public InterpolatePixel<ImageFloat32> createPixelInterpolate() {
+	public InterpolatePixelS<ImageFloat32> createPixelInterpolate() {
 		return FactoryInterpolation.nearestNeighborPixel(imageType);
 	}
 

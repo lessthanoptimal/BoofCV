@@ -48,7 +48,7 @@ public class NearestNeighborPixel_F32 extends NearestNeighborPixel<ImageFloat32>
 	}
 
 	@Override
-	public float get_unsafe(float x, float y) {
+	public float get_fast(float x, float y) {
 		return data[ orig.startIndex + ((int)y)*stride + (int)x];
 	}
 

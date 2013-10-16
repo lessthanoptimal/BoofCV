@@ -18,7 +18,7 @@
 
 package boofcv.alg.sfm.overhead;
 
-import boofcv.alg.interpolate.InterpolatePixel;
+import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.calib.IntrinsicParameters;
@@ -54,7 +54,7 @@ public class TestCreateSyntheticOverheadViewS {
 
 		Se3_F64 planeToCamera = cameraToPlane.invert(null);
 
-		InterpolatePixel<ImageFloat32> interp = FactoryInterpolation.bilinearPixel(ImageFloat32.class);
+		InterpolatePixelS<ImageFloat32> interp = FactoryInterpolation.bilinearPixel(ImageFloat32.class);
 		CreateSyntheticOverheadViewS<ImageFloat32> alg = new CreateSyntheticOverheadViewS<ImageFloat32>(interp);
 
 		alg.configure(param,planeToCamera,centerX,centerY,cellSize,overheadW,overheadH);

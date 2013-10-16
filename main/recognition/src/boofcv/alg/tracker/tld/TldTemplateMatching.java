@@ -19,7 +19,7 @@
 package boofcv.alg.tracker.tld;
 
 import boofcv.alg.feature.associate.DescriptorDistance;
-import boofcv.alg.interpolate.InterpolatePixel;
+import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.struct.ImageRectangle;
 import boofcv.struct.feature.NccFeature;
 import boofcv.struct.image.ImageSingleBand;
@@ -45,12 +45,12 @@ public class TldTemplateMatching<T extends ImageSingleBand> {
 	private NccFeature observed = new NccFeature(15*15);
 
 	// used when sampling the image
-	private InterpolatePixel<T> interpolate;
+	private InterpolatePixelS<T> interpolate;
 
 	// storage for descriptors which can be recycled
 	protected Stack<NccFeature> unused = new Stack<NccFeature>();
 
-	public TldTemplateMatching( InterpolatePixel<T> interpolate ) {
+	public TldTemplateMatching( InterpolatePixelS<T> interpolate ) {
 		this.interpolate = interpolate;
 	}
 
@@ -136,7 +136,7 @@ public class TldTemplateMatching<T extends ImageSingleBand> {
 		for( int y = 0; y < 15; y++ ) {
 			float sampleY = y0 + y*heightStep;
 			for( int x = 0; x < 15; x++ ) {
-				mean += f.value[index++] = interpolate.get_unsafe(x0 + x*widthStep,sampleY);
+				mean += f.value[index++] = interpolate.get_fast(x0 + x * widthStep, sampleY);
 			}
 		}
 		mean /= 15*15;

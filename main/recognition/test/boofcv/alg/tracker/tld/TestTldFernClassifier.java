@@ -1,6 +1,6 @@
 package boofcv.alg.tracker.tld;
 
-import boofcv.alg.interpolate.InterpolatePixel;
+import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.ImageRectangle;
@@ -28,7 +28,7 @@ public class TestTldFernClassifier {
 
 	ImageUInt8 input = new ImageUInt8(width,height);
 
-	InterpolatePixel<ImageUInt8> interpolate = FactoryInterpolation.bilinearPixel(ImageUInt8.class);
+	InterpolatePixelS<ImageUInt8> interpolate = FactoryInterpolation.bilinearPixel(ImageUInt8.class);
 
 	public TestTldFernClassifier() {
 		ImageMiscOps.fillUniform(input,rand,0,200);
@@ -186,7 +186,7 @@ public class TestTldFernClassifier {
 	}
 
 	private TldFernClassifier<ImageUInt8> createAlg() {
-		InterpolatePixel<ImageUInt8> interpolate = FactoryInterpolation.bilinearPixel(ImageUInt8.class);
+		InterpolatePixelS<ImageUInt8> interpolate = FactoryInterpolation.bilinearPixel(ImageUInt8.class);
 		return new TldFernClassifier<ImageUInt8>(rand,numFerns,8,numLearnRandom,10,interpolate);
 	}
 

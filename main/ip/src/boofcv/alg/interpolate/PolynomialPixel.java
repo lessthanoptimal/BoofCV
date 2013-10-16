@@ -35,7 +35,7 @@ import boofcv.struct.image.ImageSingleBand;
  *
  * @author Peter Abeles
  */
-public abstract class PolynomialPixel<T extends ImageSingleBand> implements InterpolatePixel<T> {
+public abstract class PolynomialPixel<T extends ImageSingleBand> implements InterpolatePixelS<T> {
 	// the image that is being interpolated
 	protected T image;
 
@@ -81,7 +81,7 @@ public abstract class PolynomialPixel<T extends ImageSingleBand> implements Inte
 	}
 
 	@Override
-	public boolean isInSafeBounds(float x, float y) {
+	public boolean isInFastBounds(float x, float y) {
 		int x0 = (int)x - M/2 + offM;
 		int x1 = x0 + M;
 		int y0 = (int)y - M/2 + offM;
@@ -91,12 +91,12 @@ public abstract class PolynomialPixel<T extends ImageSingleBand> implements Inte
 	}
 
 	@Override
-	public int getUnsafeBorderX() {
+	public int getFastBorderX() {
 		return M;
 	}
 
 	@Override
-	public int getUnsafeBorderY() {
+	public int getFastBorderY() {
 		return M;
 	}
 }

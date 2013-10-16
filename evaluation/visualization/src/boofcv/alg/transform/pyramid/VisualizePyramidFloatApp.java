@@ -18,7 +18,7 @@
 
 package boofcv.alg.transform.pyramid;
 
-import boofcv.alg.interpolate.InterpolatePixel;
+import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.gui.SelectInputPanel;
@@ -45,7 +45,7 @@ public class VisualizePyramidFloatApp <T extends ImageSingleBand>
 	double scales[] = new double[]{1,1.2,2.4,3.6,4.8,6.0,12,20};
 
 	Class<T> imageType;
-	InterpolatePixel<T> interp;
+	InterpolatePixelS<T> interp;
 	ImagePyramidPanel<T> gui = new ImagePyramidPanel<T>();
 	boolean processedImage = false;
 

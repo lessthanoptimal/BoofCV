@@ -18,7 +18,7 @@
 
 package boofcv.factory.sfm;
 
-import boofcv.alg.interpolate.InterpolatePixel;
+import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.interpolate.TypeInterpolate;
 import boofcv.alg.sfm.overhead.CreateSyntheticOverheadView;
 import boofcv.alg.sfm.overhead.CreateSyntheticOverheadViewMS;
@@ -41,7 +41,7 @@ public class FactorySfmMisc {
 		switch( imageType.getFamily() ) {
 			case SINGLE_BAND:
 			{
-				InterpolatePixel interp = FactoryInterpolation.bilinearPixel(classType);
+				InterpolatePixelS interp = FactoryInterpolation.bilinearPixel(classType);
 				return new CreateSyntheticOverheadViewS(interp);
 			}
 

@@ -18,7 +18,7 @@
 
 package boofcv.alg.interpolate.impl;
 
-import boofcv.alg.interpolate.InterpolatePixel;
+import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.interpolate.InterpolateRectangle;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.factory.interpolate.FactoryInterpolation;
@@ -54,7 +54,7 @@ public abstract class GeneralBilinearRectangleChecks<T extends ImageSingleBand> 
 
 	protected abstract T createImage( int width , int height );
 
-	public InterpolatePixel<T> createPixelInterpolate() {
+	public InterpolatePixelS<T> createPixelInterpolate() {
 		return FactoryInterpolation.bilinearPixel(imageType);
 	}
 
@@ -105,7 +105,7 @@ public abstract class GeneralBilinearRectangleChecks<T extends ImageSingleBand> 
 	}
 
 	public void region(T img) {
-		InterpolatePixel<T> interpPt = createPixelInterpolate();
+		InterpolatePixelS<T> interpPt = createPixelInterpolate();
 		InterpolateRectangle<T> interp = createRectangleInterpolate();
 		interp.setImage(img);
 		interpPt.setImage(img);

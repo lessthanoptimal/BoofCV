@@ -20,7 +20,7 @@ package boofcv.alg.interpolate.impl;
 
 import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.distort.PixelTransformAffine_F32;
-import boofcv.alg.interpolate.InterpolatePixel;
+import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.border.FactoryImageBorder;
 import boofcv.core.image.border.ImageBorder;
@@ -37,7 +37,7 @@ import java.util.Random;
 /**
  * @author Peter Abeles
  */
-public class TestImplPolynomialPixel_F32 extends GeneralInterpolationPixelChecks<ImageFloat32> {
+public class TestImplPolynomialPixel_F32 extends GeneralChecksInterpolationPixelS<ImageFloat32> {
 
 	int DOF = 2;
 
@@ -66,7 +66,7 @@ public class TestImplPolynomialPixel_F32 extends GeneralInterpolationPixelChecks
 		distorter.setModel(new PixelTransformAffine_F32(tran));
 		distorter.apply(img,found);
 
-		InterpolatePixel<ImageFloat32> bilinear = FactoryInterpolation.bilinearPixel(ImageFloat32.class);
+		InterpolatePixelS<ImageFloat32> bilinear = FactoryInterpolation.bilinearPixel(ImageFloat32.class);
 
 		distorter = FactoryDistort.distort(bilinear, border, ImageFloat32.class);
 		distorter.setModel(new PixelTransformAffine_F32(tran));
@@ -81,8 +81,8 @@ public class TestImplPolynomialPixel_F32 extends GeneralInterpolationPixelChecks
 	}
 
 	@Override
-	protected InterpolatePixel<ImageFloat32> wrap(ImageFloat32 image, int minValue, int maxValue) {
-		InterpolatePixel<ImageFloat32> ret = new ImplPolynomialPixel_F32(DOF,minValue,maxValue);
+	protected InterpolatePixelS<ImageFloat32> wrap(ImageFloat32 image, int minValue, int maxValue) {
+		InterpolatePixelS<ImageFloat32> ret = new ImplPolynomialPixel_F32(DOF,minValue,maxValue);
 		ret.setImage(image);
 		return ret;
 	}

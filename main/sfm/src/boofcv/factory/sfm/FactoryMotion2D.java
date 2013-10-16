@@ -23,7 +23,7 @@ import boofcv.abst.geo.fitting.ModelManagerEpipolarMatrix;
 import boofcv.abst.sfm.d2.ImageMotion2D;
 import boofcv.abst.sfm.d2.WrapImageMotionPtkSmartRespawn;
 import boofcv.alg.distort.ImageDistort;
-import boofcv.alg.interpolate.InterpolatePixel;
+import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.interpolate.TypeInterpolate;
 import boofcv.alg.sfm.d2.*;
 import boofcv.alg.sfm.robust.*;
@@ -142,7 +142,7 @@ public class FactoryMotion2D {
 			transform = FactoryStitchingTransform.createHomography_F64();
 		}
 
-		InterpolatePixel<I> interp = FactoryInterpolation.createPixel(0, 255, TypeInterpolate.BILINEAR, imageType);
+		InterpolatePixelS<I> interp = FactoryInterpolation.createPixel(0, 255, TypeInterpolate.BILINEAR, imageType);
 		ImageDistort<I> distorter = FactoryDistort.distort(interp, null, imageType);
 
 		return new StitchingFromMotion2D<I, IT>(motion2D,distorter,transform,maxJumpFraction );
@@ -171,7 +171,7 @@ public class FactoryMotion2D {
 			transform = FactoryStitchingTransform.createHomography_F64();
 		}
 
-		InterpolatePixel<I> interp = FactoryInterpolation.createPixel(0, 255, TypeInterpolate.BILINEAR, imageType);
+		InterpolatePixelS<I> interp = FactoryInterpolation.createPixel(0, 255, TypeInterpolate.BILINEAR, imageType);
 		ImageDistort<MultiSpectral<I>> distorter = FactoryDistort.distortMS(interp, null, imageType);
 
 		return new StitchingFromMotion2D<MultiSpectral<I>, IT>(motion2D,distorter,transform,maxJumpFraction );

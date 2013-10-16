@@ -67,7 +67,7 @@ public class BenchmarkInterpolatePixel {
 		public void process() {
 			for (float x = start; x <= end; x += step)
 				for (float y = start; y <= end; y += step)
-					alg.get_unsafe(x, y);
+					alg.get_fast(x, y);
 		}
 	}
 

@@ -78,7 +78,7 @@ public class ImplPolynomialPixel_I extends PolynomialPixel<ImageInteger> {
 	}
 
 	@Override
-	public float get_unsafe(float x, float y) {
+	public float get_fast(float x, float y) {
 		int xt = (int) x;
 		int yt = (int) y;
 

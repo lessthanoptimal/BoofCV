@@ -19,7 +19,7 @@
 package boofcv.gui.image;
 
 import boofcv.alg.distort.DistortImageOps;
-import boofcv.alg.interpolate.InterpolatePixel;
+import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.interpolate.TypeInterpolate;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.factory.interpolate.FactoryInterpolation;
@@ -43,7 +43,7 @@ public class ImagePyramidPanel<T extends ImageSingleBand> extends ListDisplayPan
 	// the image pyramid.
 	ImagePyramid<T> pyramid;
 	// interpolation used for upscaling
-	InterpolatePixel<T> interp;
+	InterpolatePixelS<T> interp;
 	// temporary storage for upscaled image
 	T upscale;
 	// if each layer should be scaled up to the original resolution or not
@@ -98,7 +98,7 @@ public class ImagePyramidPanel<T extends ImageSingleBand> extends ListDisplayPan
 	private void scaleUpLayers() {
 		T l = pyramid.getLayer(0);
 		if( upscale == null ) {
-			interp = (InterpolatePixel<T>) FactoryInterpolation.nearestNeighborPixel(l.getClass());
+			interp = (InterpolatePixelS<T>) FactoryInterpolation.nearestNeighborPixel(l.getClass());
 			upscale = (T)l._createNew(l.width,l.height);
 		} else {
 			upscale.reshape(l.width,l.height);

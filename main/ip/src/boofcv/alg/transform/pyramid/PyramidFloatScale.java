@@ -21,7 +21,7 @@ package boofcv.alg.transform.pyramid;
 import boofcv.alg.distort.DistortImageOps;
 import boofcv.alg.distort.PixelTransformAffine_F32;
 import boofcv.alg.distort.impl.DistortSupport;
-import boofcv.alg.interpolate.InterpolatePixel;
+import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.pyramid.PyramidFloat;
 
@@ -39,9 +39,9 @@ public class PyramidFloatScale< T extends ImageSingleBand>
 		extends PyramidFloat<T> {
 
 	// interpolation algorithm
-	protected InterpolatePixel<T> interpolate;
+	protected InterpolatePixelS<T> interpolate;
 
-	public PyramidFloatScale(InterpolatePixel<T> interpolate, double scaleFactors[] , Class<T> imageType) {
+	public PyramidFloatScale(InterpolatePixelS<T> interpolate, double scaleFactors[] , Class<T> imageType) {
 		super(imageType,scaleFactors);
 		this.interpolate = interpolate;
 	}

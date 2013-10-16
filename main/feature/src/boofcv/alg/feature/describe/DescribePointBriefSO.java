@@ -20,7 +20,7 @@ package boofcv.alg.feature.describe;
 
 import boofcv.abst.filter.blur.BlurFilter;
 import boofcv.alg.feature.describe.brief.BinaryCompareDefinition_I32;
-import boofcv.alg.interpolate.InterpolatePixel;
+import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.feature.TupleDesc_B;
@@ -52,14 +52,14 @@ public class DescribePointBriefSO<T extends ImageSingleBand> {
 	protected T blur;
 
 	// used to interpolate pixel value at rotated coordinate
-	protected InterpolatePixel<T> interp;
+	protected InterpolatePixelS<T> interp;
 
 	// values at each sample point
 	float values[];
 
 	public DescribePointBriefSO(BinaryCompareDefinition_I32 definition,
 								BlurFilter<T> filterBlur,
-								InterpolatePixel<T> interp) {
+								InterpolatePixelS<T> interp) {
 		this.definition = definition;
 		this.filterBlur = filterBlur;
 		this.interp = interp;
@@ -97,7 +97,7 @@ public class DescribePointBriefSO<T extends ImageSingleBand> {
 				float x0 = c_x + (c*a.x - s*a.y)*scale;
 				float y0 = c_y + (s*a.x + c*a.y)*scale;
 
-				values[i] = interp.get_unsafe(x0,y0);
+				values[i] = interp.get_fast(x0, y0);
 			}
 		} else {
 			// handle the image border case

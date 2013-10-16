@@ -28,6 +28,17 @@ import boofcv.struct.image.*;
  */
 public class GThresholdImageOps {
 
+	/**
+	 * Applies a global threshold across the whole image.  If 'down' is true, then pixels with values <=
+	 * to 'threshold' are set to 1 and the others set to 0.  If 'down' is false, then pixels with values >=
+	 * to 'threshold' are set to 1 and the others set to 0.
+	 *
+	 * @param input Input image. Not modified.
+	 * @param output Binary output image. If null a new image will be declared. Modified.
+	 * @param threshold threshold value.
+	 * @param down If true then the inequality <= is used, otherwise if false then >= is used.
+	 * @return Output image.
+	 */
 	public static <T extends ImageSingleBand>
 	ImageUInt8 threshold( T input , ImageUInt8 output ,
 						  double threshold , boolean down )

@@ -20,7 +20,7 @@ package boofcv.alg.distort.impl;
 
 import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.distort.PixelTransformAffine_F32;
-import boofcv.alg.interpolate.InterpolatePixel;
+import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.core.image.border.ImageBorder;
 import boofcv.factory.distort.FactoryDistort;
 import boofcv.struct.distort.PixelTransform_F32;
@@ -100,7 +100,7 @@ public class DistortSupport {
 	public static <T extends ImageSingleBand>
 	ImageDistort<MultiSpectral<T>> createDistortMS(Class<T> imageType,
 												   PixelTransform_F32 dstToSrc,
-												   InterpolatePixel<T> interp, ImageBorder border)
+												   InterpolatePixelS<T> interp, ImageBorder border)
 	{
 		ImageDistort<T> bandDistort = FactoryDistort.distort(interp, border, imageType);
 		bandDistort.setModel(dstToSrc);

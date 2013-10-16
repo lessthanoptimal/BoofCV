@@ -19,7 +19,7 @@
 package boofcv.alg.distort;
 
 import boofcv.alg.distort.impl.DistortSupport;
-import boofcv.alg.interpolate.InterpolatePixel;
+import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.interpolate.TypeInterpolate;
 import boofcv.core.image.border.FactoryImageBorder;
 import boofcv.core.image.border.ImageBorder;
@@ -100,7 +100,7 @@ public class DistortImageOps {
 					   boolean skipOutsidePixels, TypeInterpolate interpType)
 	{
 		Class<T> inputType = (Class<T>)input.getClass();
-		InterpolatePixel<T> interp = FactoryInterpolation.createPixel(0, 255, interpType, inputType);
+		InterpolatePixelS<T> interp = FactoryInterpolation.createPixel(0, 255, interpType, inputType);
 
 		ImageBorder<T> border;
 		if( skipOutsidePixels ) {
@@ -127,7 +127,7 @@ public class DistortImageOps {
 	void distortSingle(T input, T output,
 					   PixelTransform_F32 transform,
 					   ImageBorder<T> border,
-					   InterpolatePixel<T> interp )
+					   InterpolatePixelS<T> interp )
 	{
 		Class<T> inputType = (Class<T>)input.getClass();
 		ImageDistort<T> distorter = FactoryDistort.distort(interp, border, inputType);
@@ -151,7 +151,7 @@ public class DistortImageOps {
 				   TypeInterpolate interpType)
 	{
 		Class<T> bandType = input.getType();
-		InterpolatePixel<T> interp = FactoryInterpolation.createPixel(0, 255, interpType, bandType);
+		InterpolatePixelS<T> interp = FactoryInterpolation.createPixel(0, 255, interpType, bandType);
 
 		ImageBorder<T> border;
 		if( skipOutsidePixels ) {
@@ -182,7 +182,7 @@ public class DistortImageOps {
 	ImageDistort<T> createImageDistort( PointTransform_F32 transform ,
 										TypeInterpolate interpType,
 										Class<T> imageType ) {
-		InterpolatePixel<T> interp = FactoryInterpolation.createPixel(0, 255, interpType, imageType);
+		InterpolatePixelS<T> interp = FactoryInterpolation.createPixel(0, 255, interpType, imageType);
 		ImageDistort<T> distorter = FactoryDistort.distortCached(interp, FactoryImageBorder.value(imageType, 0), imageType);
 		distorter.setModel(new PointToPixelTransform_F32(transform));
 

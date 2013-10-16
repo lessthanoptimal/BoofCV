@@ -18,7 +18,7 @@
 
 package boofcv.alg.tracker.tld;
 
-import boofcv.alg.interpolate.InterpolatePixel;
+import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.struct.ImageRectangle;
 import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.point.Point2D_F32;
@@ -49,7 +49,7 @@ public class TldFernClassifier<T extends ImageSingleBand> {
 	protected TldFernManager[] managers;
 
 	// provides sub-pixel interpolation to improve quality at different scales
-	private InterpolatePixel<T> interpolate;
+	private InterpolatePixelS<T> interpolate;
 
 	/**
 	 * Configures fern algorithm
@@ -63,7 +63,7 @@ public class TldFernClassifier<T extends ImageSingleBand> {
 	 */
 	public TldFernClassifier( Random rand , int numFerns , int descriptorSize ,
 							  int numLearnRandom , float fernLearnNoise ,
-							  InterpolatePixel<T> interpolate ) {
+							  InterpolatePixelS<T> interpolate ) {
 
 		this.rand = rand;
 		this.interpolate = interpolate;
@@ -210,8 +210,8 @@ public class TldFernClassifier<T extends ImageSingleBand> {
 			Point2D_F32 p_a = fern.pairs[i].a;
 			Point2D_F32 p_b = fern.pairs[i].b;
 
-			float valA = interpolate.get_unsafe(c_x + p_a.x * rectWidth, c_y + p_a.y * rectHeight);
-			float valB = interpolate.get_unsafe(c_x + p_b.x * rectWidth, c_y + p_b.y * rectHeight);
+			float valA = interpolate.get_fast(c_x + p_a.x * rectWidth, c_y + p_a.y * rectHeight);
+			float valB = interpolate.get_fast(c_x + p_b.x * rectWidth, c_y + p_b.y * rectHeight);
 
 			desc *= 2;
 
@@ -233,8 +233,8 @@ public class TldFernClassifier<T extends ImageSingleBand> {
 			Point2D_F32 p_a = fern.pairs[i].a;
 			Point2D_F32 p_b = fern.pairs[i].b;
 
-			float valA = interpolate.get_unsafe(c_x + p_a.x * rectWidth, c_y + p_a.y * rectHeight);
-			float valB = interpolate.get_unsafe(c_x + p_b.x * rectWidth, c_y + p_b.y * rectHeight);
+			float valA = interpolate.get_fast(c_x + p_a.x * rectWidth, c_y + p_a.y * rectHeight);
+			float valB = interpolate.get_fast(c_x + p_b.x * rectWidth, c_y + p_b.y * rectHeight);
 
 			valA += rand.nextGaussian()*fernLearnNoise;
 			valB += rand.nextGaussian()*fernLearnNoise;

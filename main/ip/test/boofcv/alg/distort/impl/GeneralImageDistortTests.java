@@ -19,7 +19,7 @@
 package boofcv.alg.distort.impl;
 
 import boofcv.alg.distort.ImageDistort;
-import boofcv.alg.interpolate.InterpolatePixel;
+import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.core.image.ImageGenerator;
@@ -51,7 +51,7 @@ public abstract class GeneralImageDistortTests<T extends ImageSingleBand> {
 	int offX = 2;
 	int offY = 1;
 
-	InterpolatePixel<T> interp;
+	InterpolatePixelS<T> interp;
 	Class<?> imageType;
 	ImageGenerator<T> generator;
 	ImageBorder border;
@@ -64,7 +64,7 @@ public abstract class GeneralImageDistortTests<T extends ImageSingleBand> {
 	}
 
 	public abstract ImageDistort<T> createDistort(PixelTransform_F32 dstToSrc,
-												  InterpolatePixel<T> interp,
+												  InterpolatePixelS<T> interp,
 												  ImageBorder<T> border );
 
 

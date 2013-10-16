@@ -18,9 +18,11 @@
 
 package boofcv.core.image;
 
+import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.InterleavedF32;
 import org.junit.Test;
 
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Peter Abeles
@@ -29,12 +31,43 @@ public class TestInterleavedImageOps {
 
 	@Test
 	public void split2() {
-		fail("Implement");
+		InterleavedF32 interleaved = new InterleavedF32(2,4,2);
+		for( int i = 0; i < interleaved.data.length; i++ ) {
+			interleaved.data[i] = i+1;
+		}
+		ImageFloat32 a = new ImageFloat32(2,4);
+		ImageFloat32 b = new ImageFloat32(2,4);
+
+		InterleavedImageOps.split2(interleaved,a,b);
+
+		for( int y = 0; y < interleaved.height; y++ ) {
+			for( int x = 0; x < interleaved.width; x++ ) {
+				assertEquals(interleaved.getBand(x,y,0),a.get(x,y),1e-8);
+				assertEquals(interleaved.getBand(x,y,1),b.get(x,y),1e-8);
+			}
+		}
 	}
 
 	@Test
 	public void merge2() {
-		fail("Implement");
+		ImageFloat32 a = new ImageFloat32(2,4);
+		ImageFloat32 b = new ImageFloat32(2,4);
+
+		for( int i = 0; i < a.data.length; i++ ) {
+			a.data[i] = i*2+1;
+			b.data[i] = i*2+2;
+		}
+
+		InterleavedF32 interleaved = new InterleavedF32(2,4,2);
+
+		InterleavedImageOps.merge2(a, b, interleaved);
+
+		for( int y = 0; y < interleaved.height; y++ ) {
+			for( int x = 0; x < interleaved.width; x++ ) {
+				assertEquals(a.get(x,y),interleaved.getBand(x,y,0),1e-8);
+				assertEquals(b.get(x,y),interleaved.getBand(x,y,1),1e-8);
+			}
+		}
 	}
 
 }

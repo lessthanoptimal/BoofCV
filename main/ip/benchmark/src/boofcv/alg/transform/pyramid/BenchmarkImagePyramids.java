@@ -18,7 +18,7 @@
 
 package boofcv.alg.transform.pyramid;
 
-import boofcv.alg.interpolate.InterpolatePixel;
+import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.factory.filter.kernel.FactoryKernelGaussian;
 import boofcv.factory.interpolate.FactoryInterpolation;
@@ -73,7 +73,7 @@ public class BenchmarkImagePyramids {
 		Kernel1D_F32 kernel = FactoryKernelGaussian.gaussian(Kernel1D_F32.class,-1.0,2);
 		pyramidD = new PyramidDiscreteSampleBlur<ImageFloat32>(kernel,2,ImageFloat32.class,true,scalesD);
 
-		InterpolatePixel<ImageFloat32> interp = FactoryInterpolation.bilinearPixel(ImageFloat32.class);
+		InterpolatePixelS<ImageFloat32> interp = FactoryInterpolation.bilinearPixel(ImageFloat32.class);
 		pyramidF = FactoryPyramid.scaleSpacePyramid(scalesF, ImageFloat32.class);
 
 	}
