@@ -22,7 +22,7 @@ import boofcv.abst.filter.blur.BlurStorageFilter;
 import boofcv.alg.distort.DistortImageOps;
 import boofcv.alg.distort.PixelTransformAffine_F32;
 import boofcv.alg.distort.impl.DistortSupport;
-import boofcv.alg.interpolate.InterpolatePixel;
+import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.factory.filter.blur.FactoryBlurFilter;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.pyramid.PyramidFloat;
@@ -47,7 +47,7 @@ import boofcv.struct.pyramid.PyramidFloat;
 public class PyramidFloatGaussianScale< T extends ImageSingleBand> extends PyramidFloat<T> {
 
 	// interpolation algorithm
-	protected InterpolatePixel<T> interpolate;
+	protected InterpolatePixelS<T> interpolate;
 
 	// used to store the blurred image
 	protected T tempImage;
@@ -66,7 +66,7 @@ public class PyramidFloatGaussianScale< T extends ImageSingleBand> extends Pyram
 	 * @param sigmaLayers Amount of blur applied to the previous layer while constructing the pyramid.
 	 * @param imageType Type of image it's processing
 	 */
-	public PyramidFloatGaussianScale(InterpolatePixel<T> interpolate, double scales[], double sigmaLayers[],
+	public PyramidFloatGaussianScale(InterpolatePixelS<T> interpolate, double scales[], double sigmaLayers[],
 									 Class<T> imageType) {
 		super(imageType, scales);
 		if( scales.length != sigmaLayers.length )
@@ -117,11 +117,11 @@ public class PyramidFloatGaussianScale< T extends ImageSingleBand> extends Pyram
 		}
 	}
 
-	public InterpolatePixel<T> getInterpolate() {
+	public InterpolatePixelS<T> getInterpolate() {
 		return interpolate;
 	}
 
-	public void setInterpolate(InterpolatePixel<T> interpolate) {
+	public void setInterpolate(InterpolatePixelS<T> interpolate) {
 		this.interpolate = interpolate;
 	}
 

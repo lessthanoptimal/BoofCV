@@ -18,14 +18,14 @@
 
 package boofcv.alg.interpolate.impl;
 
-import boofcv.alg.interpolate.InterpolatePixel;
+import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.struct.convolve.KernelContinuous1D_F32;
 import boofcv.struct.image.ImageFloat32;
 
 /**
  * @author Peter Abeles
  */
-public class TestImplInterpolatePixelConvolution_F32 extends GeneralInterpolationPixelChecks<ImageFloat32>{
+public class TestImplInterpolatePixelConvolution_F32 extends GeneralChecksInterpolationPixelS<ImageFloat32> {
 
 	public TestImplInterpolatePixelConvolution_F32() {
 		exceptionOutside = false;
@@ -37,8 +37,8 @@ public class TestImplInterpolatePixelConvolution_F32 extends GeneralInterpolatio
 	}
 
 	@Override
-	protected InterpolatePixel<ImageFloat32> wrap(ImageFloat32 image, int minValue, int maxValue) {
-		InterpolatePixel<ImageFloat32> ret = new ImplInterpolatePixelConvolution_F32(new Dummy(),0,255);
+	protected InterpolatePixelS<ImageFloat32> wrap(ImageFloat32 image, int minValue, int maxValue) {
+		InterpolatePixelS<ImageFloat32> ret = new ImplInterpolatePixelConvolution_F32(new Dummy(),0,255);
 		ret.setImage(image);
 
 		return ret;

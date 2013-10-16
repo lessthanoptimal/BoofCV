@@ -44,7 +44,7 @@ public class ImplBilinearPixel_S16 extends BilinearPixel<ImageSInt16> {
 
 
 	@Override
-	public float get_unsafe(float x, float y) {
+	public float get_fast(float x, float y) {
 		int xt = (int) x;
 		int yt = (int) y;
 		float ax = x - xt;

@@ -19,7 +19,7 @@
 package boofcv.alg.distort.impl;
 
 import boofcv.alg.distort.ImageDistortCache;
-import boofcv.alg.interpolate.InterpolatePixel;
+import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.core.image.border.ImageBorder;
 import boofcv.struct.image.ImageInt16;
 
@@ -29,7 +29,7 @@ import boofcv.struct.image.ImageInt16;
  * @author Peter Abeles
  */
 public class ImplImageDistortCache_I16<T extends ImageInt16> extends ImageDistortCache<T> {
-	public ImplImageDistortCache_I16(InterpolatePixel<T> interp,
+	public ImplImageDistortCache_I16(InterpolatePixelS<T> interp,
 									 ImageBorder<T> border)
 	{
 		super(interp, border);

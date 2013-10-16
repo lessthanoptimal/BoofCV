@@ -19,8 +19,16 @@
 package boofcv.struct;
 
 /**
+ * <p>
  * A rectangle which can be rotated.  Angle of rotation is relative to +x axis, which is along the rectangle's
  * width. +y is along its height.
+ * </p>
+ * <p>
+ * Conversion from rectangle to parent frame:<br>
+ * x' = x*cos(theta) - y*sin(theta) + cx;<br>
+ * y' = x*sin(theta) + y*cos(theta) + cy;<br>
+ * where (x,y) are points in the rectangle's frame.
+ * </p>
  *
  * @author Peter Abeles
  */

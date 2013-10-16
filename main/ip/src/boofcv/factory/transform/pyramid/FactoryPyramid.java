@@ -18,7 +18,7 @@
 
 package boofcv.factory.transform.pyramid;
 
-import boofcv.alg.interpolate.InterpolatePixel;
+import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.transform.pyramid.PyramidDiscreteSampleBlur;
 import boofcv.alg.transform.pyramid.PyramidFloatGaussianScale;
 import boofcv.factory.filter.kernel.FactoryKernel;
@@ -68,7 +68,7 @@ public class FactoryPyramid {
 	public static <T extends ImageSingleBand>
 	PyramidFloat<T> floatGaussian( double scaleFactors[], double []sigmas , Class<T> imageType ) {
 
-		InterpolatePixel<T> interp = FactoryInterpolation.bilinearPixel(imageType);
+		InterpolatePixelS<T> interp = FactoryInterpolation.bilinearPixel(imageType);
 
 		return new PyramidFloatGaussianScale<T>(interp,scaleFactors,sigmas,imageType);
 	}

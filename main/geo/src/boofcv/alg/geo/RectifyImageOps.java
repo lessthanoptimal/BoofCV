@@ -21,7 +21,7 @@ package boofcv.alg.geo;
 import boofcv.alg.distort.*;
 import boofcv.alg.geo.rectify.RectifyCalibrated;
 import boofcv.alg.geo.rectify.RectifyFundamental;
-import boofcv.alg.interpolate.InterpolatePixel;
+import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.factory.distort.FactoryDistort;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.calib.IntrinsicParameters;
@@ -448,7 +448,7 @@ public class RectifyImageOps {
 	public static <T extends ImageSingleBand> ImageDistort<T>
 	rectifyImage( DenseMatrix64F rectify , Class<T> imageType)
 	{
-		InterpolatePixel<T> interp = FactoryInterpolation.bilinearPixel(imageType);
+		InterpolatePixelS<T> interp = FactoryInterpolation.bilinearPixel(imageType);
 
 		DenseMatrix64F rectifyInv = new DenseMatrix64F(3,3);
 		CommonOps.invert(rectify,rectifyInv);
@@ -475,7 +475,7 @@ public class RectifyImageOps {
 	rectifyImage(IntrinsicParameters param,
 				 DenseMatrix64F rectify , Class<T> imageType)
 	{
-		InterpolatePixel<T> interp = FactoryInterpolation.bilinearPixel(imageType);
+		InterpolatePixelS<T> interp = FactoryInterpolation.bilinearPixel(imageType);
 
 		// only compute the transform once
 		ImageDistort<T> ret = FactoryDistort.distortCached(interp,null,imageType);

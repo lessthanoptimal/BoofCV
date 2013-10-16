@@ -18,13 +18,13 @@
 
 package boofcv.alg.interpolate.impl;
 
-import boofcv.alg.interpolate.InterpolatePixel;
+import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.struct.image.ImageFloat32;
 
 /**
  * @author Peter Abeles
  */
-public class TestNearestNeighborPixel_F32 extends GeneralInterpolationPixelChecks<ImageFloat32>
+public class TestNearestNeighborPixel_F32 extends GeneralChecksInterpolationPixelS<ImageFloat32>
 {
 	@Override
 	protected ImageFloat32 createImage(int width, int height) {
@@ -32,7 +32,7 @@ public class TestNearestNeighborPixel_F32 extends GeneralInterpolationPixelCheck
 	}
 
 	@Override
-	protected InterpolatePixel<ImageFloat32> wrap(ImageFloat32 image, int minValue, int maxValue) {
+	protected InterpolatePixelS<ImageFloat32> wrap(ImageFloat32 image, int minValue, int maxValue) {
 		return new NearestNeighborPixel_F32(image);
 	}
 

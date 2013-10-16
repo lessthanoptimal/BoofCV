@@ -19,7 +19,7 @@
 package boofcv.alg.distort;
 
 import boofcv.alg.geo.PerspectiveOps;
-import boofcv.alg.interpolate.InterpolatePixel;
+import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.core.image.border.BorderType;
 import boofcv.core.image.border.FactoryImageBorder;
 import boofcv.core.image.border.ImageBorder;
@@ -231,7 +231,7 @@ public class LensDistortionOps {
 	public static <T extends ImageSingleBand> ImageDistort<T>
 	removeRadialImage(IntrinsicParameters param, BorderType borderType, Class<T> imageType)
 	{
-		InterpolatePixel<T> interp = FactoryInterpolation.bilinearPixel(imageType);
+		InterpolatePixelS<T> interp = FactoryInterpolation.bilinearPixel(imageType);
 		ImageBorder<T> border;
 		if( borderType == BorderType.VALUE )
 			border = FactoryImageBorder.value(imageType, 0);

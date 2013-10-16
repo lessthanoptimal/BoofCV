@@ -25,15 +25,17 @@ import georegression.struct.shapes.Rectangle2D_I32;
 import georegression.struct.shapes.RectangleCorner2D_I32;
 
 /**
- * Mean shift tracker which tracks the target inside a likelihood image using a basic implementation of the
- * mean shift algorithm using a flat rectangular kernel.  The likelihood image is computed using a target
- * model based on characteristics of each pixel, usually color.  The likelihood of each pixel is computed
- * as needed only inside part of the image being considered.
+ * <p>
+ * Mean-shift [1] based tracker which tracks the target inside a likelihood image using a flat rectangular kernel
+ * of fixed size.  The value of each pixel in the likelihood image is computed using features from a single pixel,
+ * at the same coordinate, in the input image.  These features are most often
+ * based on color.  The likelihood of each pixel is computed as needed only inside part of the image being considered.
+ * </p>
  *
+ * <p>
  * This algorithm can run very fast and works well when the target being tracked is visually distinctive from
  * the background.  It can't handle changes in scale or shape of the target, which does limit its applications.
- *
- * For more information on mean shift see [1]. Note that the shape of the kernels are different.
+ * </p>
  *
  * <p>
  * [1] Yizong Chen, "Mean Shift, Mode Seeking, and Clustering" IEEE Trans. Pattern Analysis and Machine Intelligence,
@@ -42,6 +44,7 @@ import georegression.struct.shapes.RectangleCorner2D_I32;
  *
  * @author Peter Abeles
  */
+// TODO Rename to MeanShiftPixel?  Lkelihood is always used
 public class TrackerMeanShiftLikelihood<T extends ImageBase> {
 
 	// likelihood model for the target being tracked
@@ -121,6 +124,7 @@ public class TrackerMeanShiftLikelihood<T extends ImageBase> {
 	/**
 	 * Updates the target's location in the image by performing a mean-shift search.  Returns if it was
 	 * successful at finding the target or not.  If it fails once it will need to be re-initialized
+	 *
 	 * @param image Most recent image in the sequence
 	 * @return true for success or false if it failed
 	 */

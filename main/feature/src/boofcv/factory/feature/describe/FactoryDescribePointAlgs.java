@@ -24,7 +24,7 @@ import boofcv.abst.filter.blur.BlurFilter;
 import boofcv.alg.feature.describe.*;
 import boofcv.alg.feature.describe.brief.BinaryCompareDefinition_I32;
 import boofcv.alg.feature.describe.impl.*;
-import boofcv.alg.interpolate.InterpolatePixel;
+import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.image.ImageFloat32;
@@ -89,7 +89,7 @@ public class FactoryDescribePointAlgs {
 	DescribePointBriefSO<T> briefso(BinaryCompareDefinition_I32 definition, BlurFilter<T> filterBlur) {
 		Class<T> imageType = filterBlur.getInputType();
 
-		InterpolatePixel<T> interp = FactoryInterpolation.bilinearPixel(imageType);
+		InterpolatePixelS<T> interp = FactoryInterpolation.bilinearPixel(imageType);
 
 		return new DescribePointBriefSO<T>(definition,filterBlur,interp);
 	}

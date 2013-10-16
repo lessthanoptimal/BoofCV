@@ -18,7 +18,7 @@
 
 package boofcv.alg.interpolate.impl;
 
-import boofcv.alg.interpolate.InterpolatePixel;
+import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.core.image.FactoryGImageSingleBand;
 import boofcv.core.image.GImageSingleBand;
 import boofcv.core.image.border.BorderType;
@@ -33,10 +33,10 @@ import boofcv.struct.image.ImageSingleBand;
  *
  * @author Peter Abeles
  */
-public abstract class GeneralBilinearPixelChecks<T extends ImageSingleBand> extends GeneralInterpolationPixelChecks<T> {
+public abstract class GeneralBilinearPixelChecks<T extends ImageSingleBand> extends GeneralChecksInterpolationPixelS<T> {
 
 	@Override
-	protected InterpolatePixel<T> wrap(T image, int minValue, int maxValue) {
+	protected InterpolatePixelS<T> wrap(T image, int minValue, int maxValue) {
 		return FactoryInterpolation.bilinearPixel(image);
 	}
 

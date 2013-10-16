@@ -49,7 +49,7 @@ public class NearestNeighborPixel_U8 extends NearestNeighborPixel<ImageUInt8> {
 	}
 
 	@Override
-	public float get_unsafe(float x, float y) {
+	public float get_fast(float x, float y) {
 		return data[ orig.startIndex + ((int)y)*stride + (int)x] & 0xFF;
 	}
 

@@ -20,7 +20,7 @@ package boofcv.alg.interpolate.impl;
 
 import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.distort.PixelTransformAffine_F32;
-import boofcv.alg.interpolate.InterpolatePixel;
+import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.border.FactoryImageBorder;
 import boofcv.core.image.border.ImageBorder;
@@ -37,7 +37,7 @@ import java.util.Random;
 /**
  * @author Peter Abeles
  */
-public class TestImplPolynomialPixel_I extends GeneralInterpolationPixelChecks<ImageUInt8> {
+public class TestImplPolynomialPixel_I extends GeneralChecksInterpolationPixelS<ImageUInt8> {
 
 	int DOF = 2;
 
@@ -59,14 +59,14 @@ public class TestImplPolynomialPixel_I extends GeneralInterpolationPixelChecks<I
 		Affine2D_F32 tran = new Affine2D_F32(1,0,0,1,0.25f,0.25f);
 
 		// set it up so that it will be equivalent to bilinear interpolation
-		InterpolatePixel<ImageUInt8> alg = (InterpolatePixel)new ImplPolynomialPixel_I(2,0,255);
+		InterpolatePixelS<ImageUInt8> alg = (InterpolatePixelS)new ImplPolynomialPixel_I(2,0,255);
 
 		ImageBorder<ImageUInt8> border = FactoryImageBorder.value(ImageUInt8.class, 0);
 		ImageDistort<ImageUInt8> distorter = FactoryDistort.distort(alg, border, ImageUInt8.class);
 		distorter.setModel(new PixelTransformAffine_F32(tran));
 		distorter.apply(img,found);
 
-		InterpolatePixel<ImageUInt8> bilinear = FactoryInterpolation.bilinearPixel(ImageUInt8.class);
+		InterpolatePixelS<ImageUInt8> bilinear = FactoryInterpolation.bilinearPixel(ImageUInt8.class);
 
 		distorter = FactoryDistort.distort(bilinear, border,ImageUInt8.class);
 		distorter.setModel(new PixelTransformAffine_F32(tran));
@@ -81,8 +81,8 @@ public class TestImplPolynomialPixel_I extends GeneralInterpolationPixelChecks<I
 	}
 
 	@Override
-	protected InterpolatePixel<ImageUInt8> wrap(ImageUInt8 image, int minValue, int maxValue) {
-		InterpolatePixel ret = new ImplPolynomialPixel_I(DOF,minValue,maxValue);
+	protected InterpolatePixelS<ImageUInt8> wrap(ImageUInt8 image, int minValue, int maxValue) {
+		InterpolatePixelS ret = new ImplPolynomialPixel_I(DOF,minValue,maxValue);
 		ret.setImage(image);
 		return ret;
 	}
@@ -91,7 +91,7 @@ public class TestImplPolynomialPixel_I extends GeneralInterpolationPixelChecks<I
 	protected float compute(ImageUInt8 img, float x, float y) {
 		// yes by using the same algorithm for this compute several unit tests are being defeated
 		// polynomial interpolation is more complex and a simple compute alg here is not possible
-		InterpolatePixel a = new ImplPolynomialPixel_I(DOF,0,255);
+		InterpolatePixelS a = new ImplPolynomialPixel_I(DOF,0,255);
 		a.setImage(img);
 		return a.get(x,y);
 	}

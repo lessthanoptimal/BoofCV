@@ -19,7 +19,7 @@
 package boofcv.alg.distort.impl;
 
 import boofcv.alg.distort.ImageDistortBasic;
-import boofcv.alg.interpolate.InterpolatePixel;
+import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.core.image.border.ImageBorder;
 import boofcv.struct.image.ImageInt8;
 
@@ -32,7 +32,7 @@ import boofcv.struct.image.ImageInt8;
 @SuppressWarnings({"UnnecessaryLocalVariable"})
 public class ImplImageDistort_I8<T extends ImageInt8> extends ImageDistortBasic<T> {
 
-	public ImplImageDistort_I8(InterpolatePixel<T> interp,
+	public ImplImageDistort_I8(InterpolatePixelS<T> interp,
 							   ImageBorder<T> border) {
 		super(interp, border);
 	}

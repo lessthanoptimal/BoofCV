@@ -21,7 +21,7 @@ package boofcv.alg.distort.impl;
 import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.distort.ImageDistortCache;
 import boofcv.alg.distort.PixelTransformAffine_F32;
-import boofcv.alg.interpolate.InterpolatePixel;
+import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.core.image.border.FactoryImageBorder;
@@ -47,7 +47,7 @@ public abstract class CommonImageDistortCacheTests<T extends ImageSingleBand> {
 	Affine2D_F32 affine = new Affine2D_F32(1,2,3,4,5,6);
 	PixelTransformAffine_F32 tran = new PixelTransformAffine_F32(affine);
 
-	InterpolatePixel<T> interp;
+	InterpolatePixelS<T> interp;
 	ImageBorder<T> border;
 
 	T src;
@@ -97,5 +97,5 @@ public abstract class CommonImageDistortCacheTests<T extends ImageSingleBand> {
 	}
 	
 	public abstract ImageDistortCache<T> 
-	create(InterpolatePixel<T> interp, ImageBorder<T> border , Class<T> imageType );
+	create(InterpolatePixelS<T> interp, ImageBorder<T> border , Class<T> imageType );
 }

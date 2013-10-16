@@ -20,7 +20,7 @@ package boofcv.factory.distort;
 
 import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.distort.impl.*;
-import boofcv.alg.interpolate.InterpolatePixel;
+import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.core.image.border.ImageBorder;
 import boofcv.struct.image.*;
 
@@ -38,16 +38,16 @@ public class FactoryDistort {
 	 * @param imageType Type of image being processed.
 	 */
 	public static <T extends ImageSingleBand>
-	ImageDistort<T> distort(InterpolatePixel<T> interp, ImageBorder border, Class<T> imageType)
+	ImageDistort<T> distort(InterpolatePixelS<T> interp, ImageBorder border, Class<T> imageType)
 	{
 		if( imageType == ImageFloat32.class ) {
-			return (ImageDistort<T>)new ImplImageDistort_F32((InterpolatePixel<ImageFloat32>)interp,border);
+			return (ImageDistort<T>)new ImplImageDistort_F32((InterpolatePixelS<ImageFloat32>)interp,border);
 		} else if( ImageSInt32.class.isAssignableFrom(imageType) ) {
-			return (ImageDistort<T>)new ImplImageDistort_S32((InterpolatePixel<ImageSInt32>)interp,border);
+			return (ImageDistort<T>)new ImplImageDistort_S32((InterpolatePixelS<ImageSInt32>)interp,border);
 		} else if( ImageInt16.class.isAssignableFrom(imageType) ) {
-			return (ImageDistort<T>)new ImplImageDistort_I16((InterpolatePixel<ImageInt16>)interp,border);
+			return (ImageDistort<T>)new ImplImageDistort_I16((InterpolatePixelS<ImageInt16>)interp,border);
 		} else if( ImageInt8.class.isAssignableFrom(imageType) ) {
-			return (ImageDistort<T>)new ImplImageDistort_I8((InterpolatePixel<ImageInt8>)interp,border);
+			return (ImageDistort<T>)new ImplImageDistort_I8((InterpolatePixelS<ImageInt8>)interp,border);
 		} else {
 			throw new IllegalArgumentException("Image type not supported: "+imageType.getSimpleName());
 		}
@@ -62,7 +62,7 @@ public class FactoryDistort {
 	 * @param imageType Type of image being processed.
 	 */
 	public static <T extends ImageSingleBand>
-	ImageDistort<MultiSpectral<T>> distortMS(InterpolatePixel<T> interp, ImageBorder border, Class<T> imageType)
+	ImageDistort<MultiSpectral<T>> distortMS(InterpolatePixelS<T> interp, ImageBorder border, Class<T> imageType)
 	{
 		ImageDistort<T> distortSingle = distort(interp,border,imageType);
 		return new ImplImageDistort_MS<T>(distortSingle);
@@ -79,17 +79,17 @@ public class FactoryDistort {
 	 * @return Image distort which caches the distortion.
 	 */
 	public static <T extends ImageSingleBand>
-	ImageDistort<T> distortCached(InterpolatePixel<T> interp, ImageBorder border ,
+	ImageDistort<T> distortCached(InterpolatePixelS<T> interp, ImageBorder border ,
 								  Class<T> imageType)
 	{
 		if( imageType == ImageFloat32.class ) {
-			return (ImageDistort<T>)new ImplImageDistortCache_F32((InterpolatePixel<ImageFloat32>)interp,border);
+			return (ImageDistort<T>)new ImplImageDistortCache_F32((InterpolatePixelS<ImageFloat32>)interp,border);
 		} else if( ImageSInt32.class.isAssignableFrom(imageType) ) {
-			return (ImageDistort<T>)new ImplImageDistortCache_S32((InterpolatePixel<ImageSInt32>)interp,border);
+			return (ImageDistort<T>)new ImplImageDistortCache_S32((InterpolatePixelS<ImageSInt32>)interp,border);
 		} else if( ImageInt16.class.isAssignableFrom(imageType) ) {
-			return (ImageDistort<T>)new ImplImageDistortCache_I16((InterpolatePixel<ImageInt16>)interp,border);
+			return (ImageDistort<T>)new ImplImageDistortCache_I16((InterpolatePixelS<ImageInt16>)interp,border);
 		} else if( ImageInt8.class.isAssignableFrom(imageType) ) {
-			return (ImageDistort<T>)new ImplImageDistortCache_I8((InterpolatePixel<ImageInt8>)interp,border);
+			return (ImageDistort<T>)new ImplImageDistortCache_I8((InterpolatePixelS<ImageInt8>)interp,border);
 		} else {
 			throw new IllegalArgumentException("Image type not supported: "+imageType.getSimpleName());
 		}

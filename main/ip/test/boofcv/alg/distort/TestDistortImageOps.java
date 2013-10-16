@@ -18,7 +18,7 @@
 
 package boofcv.alg.distort;
 
-import boofcv.alg.interpolate.InterpolatePixel;
+import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.interpolate.TypeInterpolate;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.factory.interpolate.FactoryInterpolation;
@@ -56,7 +56,7 @@ public class TestDistortImageOps {
 
 		DistortImageOps.scale(input,output, TypeInterpolate.BILINEAR);
 
-		InterpolatePixel<ImageFloat32> interp = FactoryInterpolation.bilinearPixel(input);
+		InterpolatePixelS<ImageFloat32> interp = FactoryInterpolation.bilinearPixel(input);
 		interp.setImage(input);
 
 		float scaleX = (float)input.width/(float)output.width;

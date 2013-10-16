@@ -18,7 +18,7 @@
 
 package boofcv.alg.distort;
 
-import boofcv.alg.interpolate.InterpolatePixel;
+import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.core.image.border.ImageBorder;
 import boofcv.struct.distort.PixelTransform_F32;
 import boofcv.struct.image.ImageSingleBand;
@@ -37,7 +37,7 @@ public abstract class ImageDistortCache<T extends ImageSingleBand> implements Im
 	private int width=-1,height=-1;
 	private Point2D_F32 map[];
 	// sub pixel interpolation
-	private InterpolatePixel<T> interp;
+	private InterpolatePixelS<T> interp;
 	// handle the image border
 	private ImageBorder<T> border;
 
@@ -56,7 +56,7 @@ public abstract class ImageDistortCache<T extends ImageSingleBand> implements Im
 	 * @param interp Interpolation algorithm
 	 * @param border How borders are handled
 	 */
-	public ImageDistortCache(InterpolatePixel<T> interp,
+	public ImageDistortCache(InterpolatePixelS<T> interp,
 							 ImageBorder<T> border) {
 		this.interp = interp;
 		this.border = border;
@@ -119,10 +119,10 @@ public abstract class ImageDistortCache<T extends ImageSingleBand> implements Im
 
 		border.setImage(srcImg);
 
-		final float minInterpX = interp.getUnsafeBorderX();
-		final float minInterpY = interp.getUnsafeBorderY();
-		final float maxInterpX = srcImg.getWidth()-interp.getUnsafeBorderX();
-		final float maxInterpY = srcImg.getHeight()-interp.getUnsafeBorderY();
+		final float minInterpX = interp.getFastBorderX();
+		final float minInterpY = interp.getFastBorderY();
+		final float maxInterpX = srcImg.getWidth()-interp.getFastBorderX();
+		final float maxInterpY = srcImg.getHeight()-interp.getFastBorderY();
 
 		final float widthF = srcImg.getWidth();
 		final float heightF = srcImg.getHeight();
@@ -138,17 +138,17 @@ public abstract class ImageDistortCache<T extends ImageSingleBand> implements Im
 					else
 						assign(indexDst,interp.get(s.x, s.y));
 				} else {
-					assign(indexDst,interp.get_unsafe(s.x, s.y));
+					assign(indexDst,interp.get_fast(s.x, s.y));
 				}
 			}
 		}
 	}
 
 	public void applyNoBorder() {
-		final float minInterpX = interp.getUnsafeBorderX();
-		final float minInterpY = interp.getUnsafeBorderY();
-		final float maxInterpX = srcImg.getWidth()-interp.getUnsafeBorderX();
-		final float maxInterpY = srcImg.getHeight()-interp.getUnsafeBorderY();
+		final float minInterpX = interp.getFastBorderX();
+		final float minInterpY = interp.getFastBorderY();
+		final float maxInterpX = srcImg.getWidth()-interp.getFastBorderX();
+		final float maxInterpY = srcImg.getHeight()-interp.getFastBorderY();
 
 		final float widthF = srcImg.getWidth();
 		final float heightF = srcImg.getHeight();
@@ -162,7 +162,7 @@ public abstract class ImageDistortCache<T extends ImageSingleBand> implements Im
 					if( s.x >= 0f && s.x < widthF && s.y >= 0f && s.y < heightF )
 						assign(indexDst,interp.get(s.x, s.y));
 				} else {
-					assign(indexDst,interp.get_unsafe(s.x, s.y));
+					assign(indexDst,interp.get_fast(s.x, s.y));
 				}
 			}
 		}

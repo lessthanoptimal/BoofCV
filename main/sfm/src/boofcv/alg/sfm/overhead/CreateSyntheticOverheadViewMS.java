@@ -18,7 +18,7 @@
 
 package boofcv.alg.sfm.overhead;
 
-import boofcv.alg.interpolate.InterpolatePixel;
+import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.interpolate.TypeInterpolate;
 import boofcv.core.image.FactoryGImageSingleBand;
 import boofcv.core.image.GImageSingleBand;
@@ -37,7 +37,7 @@ public class CreateSyntheticOverheadViewMS<T extends ImageSingleBand>
 {
 	// computes interpolated pixel value.
 	// have one for each band so that you don't need to constantly change the image it's set to
-	private InterpolatePixel<T> interp[];
+	private InterpolatePixelS<T> interp[];
 
 	// local variables
 	private GImageSingleBand output[];
@@ -47,7 +47,7 @@ public class CreateSyntheticOverheadViewMS<T extends ImageSingleBand>
 	 *
 	 * @param interp Interpolator for each band
 	 */
-	public CreateSyntheticOverheadViewMS(InterpolatePixel<T> interp[]) {
+	public CreateSyntheticOverheadViewMS(InterpolatePixelS<T> interp[]) {
 		this.interp = interp;
 		output = new GImageSingleBand[interp.length];
 	}
@@ -60,7 +60,7 @@ public class CreateSyntheticOverheadViewMS<T extends ImageSingleBand>
 	 * @param imageType Image of each band
 	 */
 	public CreateSyntheticOverheadViewMS( TypeInterpolate type , int numBands , Class<T> imageType ) {
-		this.interp = new InterpolatePixel[numBands];
+		this.interp = new InterpolatePixelS[numBands];
 		for( int i = 0; i < numBands; i++ ) {
 			interp[i] = FactoryInterpolation.createPixel(0,255,type,imageType);
 		}

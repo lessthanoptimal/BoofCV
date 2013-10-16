@@ -16,27 +16,34 @@
  * limitations under the License.
  */
 
-package boofcv.alg.distort.impl;
-
-import boofcv.alg.distort.ImageDistortCache;
-import boofcv.alg.interpolate.InterpolatePixelS;
-import boofcv.core.image.border.ImageBorder;
-import boofcv.struct.image.ImageFloat32;
+package boofcv.struct;
 
 /**
- * Implementation of {@link boofcv.alg.distort.ImageDistortCache} for {@link ImageFloat32}.
- * 
+ * <p>
+ * A rectangle which can be rotated.  Angle of rotation is relative to +x axis, which is along the rectangle's
+ * width. +y is along its height.
+ * </p>
+ * <p>
+ * Conversion from rectangle to parent frame:<br>
+ * x' = x*cos(theta) - y*sin(theta) + cx;<br>
+ * y' = x*sin(theta) + y*cos(theta) + cy;<br>
+ * where (x,y) are points in the rectangle's frame.
+ * </p>
+ *
  * @author Peter Abeles
  */
-public class ImplImageDistortCache_F32 extends ImageDistortCache<ImageFloat32> {
-	public ImplImageDistortCache_F32(InterpolatePixelS<ImageFloat32> interp,
-									 ImageBorder<ImageFloat32> border)
-	{
-		super(interp, border);
-	}
+public class RectangleRotate_F32 {
+	public float cx;
+	public float cy;
+	public float width;
+	public float height;
+	public float theta;
 
-	@Override
-	protected void assign(int indexDst, float value) {
-		dstImg.data[indexDst] = value;
+	public void set( RectangleRotate_F32 r ) {
+		this.cx = r.cx;
+		this.cy = r.cy;
+		this.width = r.width;
+		this.height = r.height;
+		this.theta = r.theta;
 	}
 }

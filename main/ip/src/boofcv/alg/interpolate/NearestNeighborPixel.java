@@ -25,7 +25,7 @@ import boofcv.struct.image.ImageSingleBand;
  *
  * @author Peter Abeles
  */
-public abstract class NearestNeighborPixel<T extends ImageSingleBand> implements InterpolatePixel<T> {
+public abstract class NearestNeighborPixel<T extends ImageSingleBand> implements InterpolatePixelS<T> {
 	protected T orig;
 	protected int stride;
 	protected int width;
@@ -37,17 +37,17 @@ public abstract class NearestNeighborPixel<T extends ImageSingleBand> implements
 	}
 
 	@Override
-	public boolean isInSafeBounds(float x, float y) {
+	public boolean isInFastBounds(float x, float y) {
 		return( x >= 0 && y >= 0 && x < width && y < height );
 	}
 
 	@Override
-	public int getUnsafeBorderX() {
+	public int getFastBorderX() {
 		return 0;
 	}
 
 	@Override
-	public int getUnsafeBorderY() {
+	public int getFastBorderY() {
 		return 0;
 	}
 }

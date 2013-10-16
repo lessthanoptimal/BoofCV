@@ -18,7 +18,7 @@
 
 package boofcv.alg.sfm.overhead;
 
-import boofcv.alg.interpolate.InterpolatePixel;
+import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.core.image.FactoryGImageSingleBand;
 import boofcv.core.image.GImageSingleBand;
 import boofcv.struct.image.ImageSingleBand;
@@ -32,7 +32,7 @@ import georegression.struct.point.Point2D_F32;
 public class CreateSyntheticOverheadViewS<T extends ImageSingleBand> extends CreateSyntheticOverheadView<T>
 {
 	// computes interpolated pixel value
-	private InterpolatePixel<T> interp;
+	private InterpolatePixelS<T> interp;
 
 	// local variables
 	private GImageSingleBand output;
@@ -42,7 +42,7 @@ public class CreateSyntheticOverheadViewS<T extends ImageSingleBand> extends Cre
 	 *
 	 * @param interp Interpolation used when sampling camera image
 	 */
-	public CreateSyntheticOverheadViewS(InterpolatePixel<T> interp) {
+	public CreateSyntheticOverheadViewS(InterpolatePixelS<T> interp) {
 		this.interp = interp;
 	}
 	/**

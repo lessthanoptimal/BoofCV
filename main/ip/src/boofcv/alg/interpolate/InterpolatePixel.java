@@ -18,16 +18,16 @@
 
 package boofcv.alg.interpolate;
 
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageBase;
 
 
 /**
  * Interface for interpolation between pixels on a per-pixel basis.  If a whole rectangular region needs
- * to be interpolated then {@link InterpolateRectangle} should be considered for performance reasons.
+ * to be interpolated then {@link boofcv.alg.interpolate.InterpolateRectangle} should be considered for performance reasons.
  *
  * @author Peter Abeles
  */
-public interface InterpolatePixel<T extends ImageSingleBand> {
+public interface InterpolatePixel<T extends ImageBase> {
 
 	/**
 	 * Change the image that is being interpolated.
@@ -44,50 +44,26 @@ public interface InterpolatePixel<T extends ImageSingleBand> {
 	public T getImage();
 
 	/**
-	 * Returns the intensity value of the image at the specified coordinate.
-	 * This value is computed using interpolation.  Bounds checking is performed
-	 * to make sure a point that can be interpolated inside the image is requested.
-	 * If a point can't be interpolated then Float.NaN is returned.
-	 *
-	 * @param x Point's x-coordinate.
-	 * @param y Point's y-coordinate.
-	 * @return Interpolated intensity value or NaN if it can't be interpolated.
-	 */
-	public float get(float x, float y);
-
-	/**
-	 * Returns the intensity value of the image at the specified coordinate using
-	 * interpolation.  No bounds checks are done to see if it is inside the image
-	 * and the image border might not be handled.
-	 *
-	 * @param x Point's x-coordinate.
-	 * @param y Point's y-coordinate.
-	 * @return Interpolated intensity value.
-	 */
-	public float get_unsafe(float x, float y);
-
-	/**
-	 * Is the requested pixel inside the image bounds in which get_unsafe() can be called without throwing
-	 * an exception?
+	 * Is the requested pixel inside the image boundary for which fast unsafe interpolation can be performed.
 	 *
 	 * @param x Point's x-coordinate.
 	 * @param y Point's y-coordinate.
 	 * @return  true if get_unsafe() can be called.
 	 */
-	public boolean isInSafeBounds( float x , float y );
+	public boolean isInFastBounds(float x, float y);
 
 	/**
-	 * Border around the image that {@link #get_unsafe(float, float)} cannot be called.
+	 * Border around the image that fast interpolation cannot be called.
 	 *
 	 * @return Border size in pixels
 	 */
-	public int getUnsafeBorderX();
+	public int getFastBorderX();
 
 	/**
-	 * Border around the image that {@link #get_unsafe(float, float)} cannot be called.
+	 * Border around the image that fast interpolation cannot be called.
 	 *
 	 * @return Border size in pixels
 	 */
-	public int getUnsafeBorderY();
+	public int getFastBorderY();
 
 }

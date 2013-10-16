@@ -22,7 +22,7 @@ import boofcv.alg.distort.DistortImageOps;
 import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.distort.LensDistortionOps;
 import boofcv.alg.distort.PointToPixelTransform_F32;
-import boofcv.alg.interpolate.InterpolatePixel;
+import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.factory.distort.FactoryDistort;
@@ -77,7 +77,7 @@ public class ExampleRemoveLensDistortion {
 		PointTransform_F32 allInside = LensDistortionOps.allInside(param, null);
 
 		// Set up image distort
-		InterpolatePixel<ImageFloat32> interp = FactoryInterpolation.bilinearPixel(ImageFloat32.class);
+		InterpolatePixelS<ImageFloat32> interp = FactoryInterpolation.bilinearPixel(ImageFloat32.class);
 		ImageDistort<ImageFloat32> distort = FactoryDistort.distort(interp,null,ImageFloat32.class);
 
 		// render and display the different types of views in a window

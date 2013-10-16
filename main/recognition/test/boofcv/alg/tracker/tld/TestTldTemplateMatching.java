@@ -1,7 +1,7 @@
 package boofcv.alg.tracker.tld;
 
 import boofcv.alg.feature.describe.DescribePointPixelRegionNCC;
-import boofcv.alg.interpolate.InterpolatePixel;
+import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.factory.feature.describe.FactoryDescribePointAlgs;
 import boofcv.factory.interpolate.FactoryInterpolation;
@@ -29,7 +29,7 @@ public class TestTldTemplateMatching {
 
 	ImageUInt8 input = new ImageUInt8(width,height);
 
-	InterpolatePixel<ImageUInt8> interpolate = FactoryInterpolation.bilinearPixel(ImageUInt8.class);
+	InterpolatePixelS<ImageUInt8> interpolate = FactoryInterpolation.bilinearPixel(ImageUInt8.class);
 
 	public TestTldTemplateMatching() {
 		ImageMiscOps.fillUniform(input, rand, 0, 200);

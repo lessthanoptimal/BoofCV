@@ -19,7 +19,7 @@
 package boofcv.alg.distort.impl;
 
 import boofcv.alg.distort.ImageDistortCache;
-import boofcv.alg.interpolate.InterpolatePixel;
+import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.core.image.border.ImageBorder;
 import boofcv.struct.image.ImageSInt32;
 
@@ -33,7 +33,7 @@ public class TestImplImageDistortCache_S32 extends CommonImageDistortCacheTests<
 	}
 
 	@Override
-	public ImageDistortCache<ImageSInt32> create(InterpolatePixel<ImageSInt32> interp,
+	public ImageDistortCache<ImageSInt32> create(InterpolatePixelS<ImageSInt32> interp,
 												ImageBorder<ImageSInt32> border,
 												Class<ImageSInt32> imageType) {
 		return new ImplImageDistortCache_S32(interp,border);

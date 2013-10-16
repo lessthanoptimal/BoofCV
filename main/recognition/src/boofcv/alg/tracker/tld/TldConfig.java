@@ -20,7 +20,7 @@ package boofcv.alg.tracker.tld;
 
 import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
-import boofcv.alg.interpolate.InterpolatePixel;
+import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.tracker.klt.KltConfig;
 import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.factory.interpolate.FactoryInterpolation;
@@ -139,7 +139,7 @@ public class TldConfig<T extends ImageSingleBand, D extends ImageSingleBand> {
 	/**
 	 * Interpolation routine. Bilinear is recommended.
 	 */
-	InterpolatePixel<T> interpolate;
+	InterpolatePixelS<T> interpolate;
 
 	/**
 	 * Computes image gradient. Sobel is recommended.

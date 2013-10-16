@@ -93,7 +93,7 @@ public class EvaluateInterpolateEnlargeApp<T extends ImageSingleBand>
 			return;
 		}
 
-		InterpolatePixel<T> interp = (InterpolatePixel<T>)cookie;
+		InterpolatePixelS<T> interp = (InterpolatePixelS<T>)cookie;
 
 		scaledImage.reshape(panel.getWidth(),panel.getHeight());
 		PixelTransformAffine_F32 model = DistortSupport.transformScale(scaledImage,color);

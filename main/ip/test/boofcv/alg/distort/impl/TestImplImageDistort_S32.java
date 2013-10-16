@@ -19,7 +19,7 @@
 package boofcv.alg.distort.impl;
 
 import boofcv.alg.distort.ImageDistort;
-import boofcv.alg.interpolate.InterpolatePixel;
+import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.core.image.border.ImageBorder;
 import boofcv.struct.distort.PixelTransform_F32;
 import boofcv.struct.image.ImageSInt32;
@@ -36,7 +36,7 @@ public class TestImplImageDistort_S32 extends GeneralImageDistortTests<ImageSInt
 
 	@Override
 	public ImageDistort<ImageSInt32> createDistort(PixelTransform_F32 dstToSrc,
-												   InterpolatePixel<ImageSInt32> interp ,
+												   InterpolatePixelS<ImageSInt32> interp ,
 												   ImageBorder<ImageSInt32> border) {
 		ImageDistort<ImageSInt32> ret = new ImplImageDistort_S32<ImageSInt32>(interp,border);
 		ret.setModel(dstToSrc);

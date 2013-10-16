@@ -18,7 +18,7 @@
 
 package boofcv.alg.interpolate.impl;
 
-import boofcv.alg.interpolate.InterpolatePixel;
+import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.struct.convolve.KernelContinuous1D_F32;
 import boofcv.struct.image.ImageUInt8;
 
@@ -35,7 +35,7 @@ import boofcv.struct.image.ImageUInt8;
  *
  * @author Peter Abeles
  */
-public class ImplInterpolatePixelConvolution_U8 implements InterpolatePixel<ImageUInt8>  {
+public class ImplInterpolatePixelConvolution_U8 implements InterpolatePixelS<ImageUInt8> {
 
 	// kernel used to perform interpolation
 	private KernelContinuous1D_F32 kernel;
@@ -108,7 +108,7 @@ public class ImplInterpolatePixelConvolution_U8 implements InterpolatePixel<Imag
 	}
 
 	@Override
-	public float get_unsafe(float x, float y) {
+	public float get_fast(float x, float y) {
 		int xx = (int)x;
 		int yy = (int)y;
 
@@ -141,18 +141,18 @@ public class ImplInterpolatePixelConvolution_U8 implements InterpolatePixel<Imag
 			return value;
 	}
 	@Override
-	public boolean isInSafeBounds(float x, float y) {
+	public boolean isInFastBounds(float x, float y) {
 		float r = kernel.getRadius();
 		
 		return (x-r >= 0 && y-r >= 0 && x+r < image.width && y+r <image.height);
 	}
 	@Override
-	public int getUnsafeBorderX() {
+	public int getFastBorderX() {
 		return kernel.getRadius();
 	}
 
 	@Override
-	public int getUnsafeBorderY() {
+	public int getFastBorderY() {
 		return kernel.getRadius();
 	}
 
