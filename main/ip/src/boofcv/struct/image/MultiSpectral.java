@@ -58,7 +58,7 @@ import java.lang.reflect.Array;
  *
  * @author Peter Abeles
  */
-public class MultiSpectral<T extends ImageSingleBand> extends ImageBase<MultiSpectral<T>>{
+public class MultiSpectral<T extends ImageSingleBand> extends ImageMultiBand<MultiSpectral<T>>{
 
 	/**
 	 * Type of image in each band
@@ -116,6 +116,7 @@ public class MultiSpectral<T extends ImageSingleBand> extends ImageBase<MultiSpe
 	 * 
 	 * @return Number of bands in the image.
 	 */
+	@Override
 	public int getNumBands() {
 		return bands.length;
 	}

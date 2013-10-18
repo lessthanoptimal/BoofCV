@@ -43,6 +43,7 @@ Version : Alpha 0.16
   * Improved and renamed interleaved image types
   * Added ImageBase.subimage class variable
   * Added InterleavedImageOps
+  * Added ImageMultiBand as a base class for multi-band images.
 - Generalized interpolation so that support can be provided for single-band and multi-band images.
   * InterpolatePixelS for single-band
   * InterpolatePixelMB for multi-band

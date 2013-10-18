@@ -46,27 +46,40 @@ public class TestConvertBufferedImage {
 	public void extractInterlacedInt8() {
 		BufferedImage origImg = TestConvertRaster.createByteBuff(imgWidth, imgHeight, 3, rand);
 
-		InterleavedI8 found = ConvertBufferedImage.extractInterlacedInt8(origImg);
+		InterleavedU8 found = ConvertBufferedImage.extractInterleavedU8(origImg);
 
+		assertEquals(0, found.startIndex);
+		assertEquals(imgWidth*3, found.stride);
 		assertEquals(imgWidth, found.width);
 		assertEquals(imgHeight, found.height);
 		assertEquals(3, found.numBands);
 		assertTrue(found.data != null);
 		assertEquals(imgWidth * imgHeight * 3, found.data.length);
+
+		// test a sub-image input
+		origImg = origImg.getSubimage(1,2,5,6);
+
+		found = ConvertBufferedImage.extractInterleavedU8(origImg);
+
+		assertEquals(2*10*3+3, found.startIndex);
+		assertEquals(imgWidth*3, found.stride);
+		assertEquals(5, found.width);
+		assertEquals(6, found.height);
+		assertEquals(3, found.numBands);
 	}
 
 	@Test(expected=IllegalArgumentException.class)
 	public void extractInterlacedInt8_indexed() {
 		BufferedImage origImg = new BufferedImage(imgWidth,imgHeight,BufferedImage.TYPE_BYTE_INDEXED);
 
-		ConvertBufferedImage.extractInterlacedInt8(origImg);
+		ConvertBufferedImage.extractInterleavedU8(origImg);
 	}
 
 	@Test
 	public void extractInterlacedInt8_fail() {
 		try {
 			BufferedImage origImg = TestConvertRaster.createIntBuff(imgWidth, imgHeight, rand);
-			ConvertBufferedImage.extractInterlacedInt8(origImg);
+			ConvertBufferedImage.extractInterleavedU8(origImg);
 			fail("Should hbe the wrong type");
 		} catch (IllegalArgumentException e) {
 		}

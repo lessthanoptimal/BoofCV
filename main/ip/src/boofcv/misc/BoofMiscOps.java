@@ -258,6 +258,10 @@ public class BoofMiscOps {
 		return b.isInBounds((int) x, (int) y);
 	}
 
+	public static boolean checkInside( ImageBase b , float x , float y ) {
+		return x >= 0 && x < b.width && y >= 0 && y < b.height;
+	}
+
 	/**
 	 * Invokes wait until the elapsed time has passed.  In the thread is interrupted, the interrupt is ignored.
 	 * @param milli Length of desired pause in milliseconds.

@@ -38,14 +38,14 @@ public class ConvertBufferedImage {
 
 	/**
 	 * For BufferedImage stored as a byte array internally it extracts an
-	 * interlaced image.  The input image and the returned image will both
+	 * interleaved image.  The input image and the returned image will both
 	 * share the same internal data array.  Using this function allows unnecessary
 	 * memory copying to be avoided.
 	 *
 	 * @param img Image whose internal data is extracted and wrapped.
 	 * @return An image whose internal data is the same as the input image.
 	 */
-	public static InterleavedU8 extractInterlacedInt8(BufferedImage img) {
+	public static InterleavedU8 extractInterleavedU8(BufferedImage img) {
 
 		if (img.getRaster() instanceof ByteInterleavedRaster &&
 				img.getType() != BufferedImage.TYPE_BYTE_INDEXED ) {
@@ -55,7 +55,8 @@ public class ConvertBufferedImage {
 
 			ret.width = img.getWidth();
 			ret.height = img.getHeight();
-			ret.stride = ret.width;
+			ret.stride = raster.getScanlineStride();
+			ret.startIndex = raster.getDataOffset(0)-raster.getPixelStride()+1;
 			ret.numBands = raster.getNumBands();
 			ret.data = raster.getDataStorage();
 
