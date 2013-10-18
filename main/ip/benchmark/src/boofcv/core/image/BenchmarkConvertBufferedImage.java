@@ -73,7 +73,7 @@ public class BenchmarkConvertBufferedImage {
 	{
 		@Override
 		public void process() {
-			ConvertBufferedImage.extractImageInt8(imgBuff);
+			ConvertBufferedImage.extractImageUInt8(imgBuff);
 		}
 	}
 

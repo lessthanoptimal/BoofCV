@@ -47,6 +47,8 @@ Version : Alpha 0.16
 - Generalized interpolation so that support can be provided for single-band and multi-band images.
   * InterpolatePixelS for single-band
   * InterpolatePixelMB for multi-band
+- Fixed sub-image support for ConvertBufferedImage.extract*
+  * Thanks pcmoen
 
 - TODO improve KLT edge handling
 - TODO mean-shift color
