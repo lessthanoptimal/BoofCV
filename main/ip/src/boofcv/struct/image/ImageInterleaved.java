@@ -33,7 +33,7 @@ import java.lang.reflect.Array;
  *
  * @author Peter Abeles
  */
-public abstract class ImageInterleaved<T extends ImageInterleaved> extends ImageBase<T> {
+public abstract class ImageInterleaved<T extends ImageInterleaved> extends ImageMultiBand<T> {
 	/**
 	 * How many color bands are contained in each pixel
 	 */
@@ -137,7 +137,8 @@ public abstract class ImageInterleaved<T extends ImageInterleaved> extends Image
 		}
 	}
 
-	public final int getNumBands() {
+	@Override
+	public int getNumBands() {
 		return numBands;
 	}
 

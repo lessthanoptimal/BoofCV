@@ -7,7 +7,7 @@ import static org.junit.Assert.fail;
 /**
  * @author Peter Abeles
  */
-public class TestHueSaturationLikelihood_U8 {
+public class TestLikelihoodHistCoupled_U8 {
 
 	@Test
 	public void stuff() {
