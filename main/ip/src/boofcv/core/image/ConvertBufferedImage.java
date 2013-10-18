@@ -74,11 +74,9 @@ public class ConvertBufferedImage {
 	 * @param img Image whose internal data is extracted and wrapped.
 	 * @return An image whose internal data is the same as the input image.
 	 */
-	public static ImageUInt8 extractImageInt8(BufferedImage img) {
+	public static ImageUInt8 extractImageUInt8(BufferedImage img) {
 		if (img.getRaster() instanceof ByteInterleavedRaster &&
 				img.getType() != BufferedImage.TYPE_BYTE_INDEXED ) {
-			if( isSubImage(img) )
-				throw new IllegalArgumentException("Sub-images of BufferedImages are not yet supported");
 
 			ByteInterleavedRaster raster = (ByteInterleavedRaster) img.getRaster();
 			if (raster.getNumBands() != 1)
@@ -87,7 +85,8 @@ public class ConvertBufferedImage {
 
 			ret.width = img.getWidth();
 			ret.height = img.getHeight();
-			ret.stride = ret.width;
+			ret.startIndex = raster.getDataOffset(0);
+			ret.stride = raster.getScanlineStride();
 			ret.data = raster.getDataStorage();
 
 			return ret;
