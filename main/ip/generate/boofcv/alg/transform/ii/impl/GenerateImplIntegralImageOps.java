@@ -99,7 +99,7 @@ public class GenerateImplIntegralImageOps extends CodeGeneratorBase {
 		String bitWise = imageIn.getBitWise();
 		String typeCast = imageOut.getTypeCastFromSum();
 
-		out.print("\tpublic static void transform( final "+imageIn.getImageName()+" input , final "+imageOut.getImageName()+" transformed )\n" +
+		out.print("\tpublic static void transform( final "+imageIn.getSingleBandName()+" input , final "+imageOut.getSingleBandName()+" transformed )\n" +
 				"\t{\n" +
 				"\t\tint indexSrc = input.startIndex;\n" +
 				"\t\tint indexDst = transformed.startIndex;\n" +
@@ -127,9 +127,9 @@ public class GenerateImplIntegralImageOps extends CodeGeneratorBase {
 	}
 
 	private void printConvolve( AutoTypeImage imageIn , AutoTypeImage imageOut) {
-		out.print("\tpublic static void convolve( "+imageIn.getImageName()+" integral ,\n" +
+		out.print("\tpublic static void convolve( "+imageIn.getSingleBandName()+" integral ,\n" +
 				"\t\t\t\t\t\t\t\t IntegralKernel kernel,\n" +
-				"\t\t\t\t\t\t\t\t "+imageOut.getImageName()+" output )\n" +
+				"\t\t\t\t\t\t\t\t "+imageOut.getSingleBandName()+" output )\n" +
 				"\t{\n" +
 				"\t\tfor( int y = 0; y < integral.height; y++ ) {\n" +
 				"\t\t\tfor( int x = 0; x < integral.width; x++ ) {\n" +
@@ -146,9 +146,9 @@ public class GenerateImplIntegralImageOps extends CodeGeneratorBase {
 
 	private void printConvolveBorder(AutoTypeImage imageIn , AutoTypeImage imageOut) {
 		String sumType = imageIn.getSumType();
-		out.print("\tpublic static void convolveBorder( "+imageIn.getImageName()+" integral ,\n" +
+		out.print("\tpublic static void convolveBorder( "+imageIn.getSingleBandName()+" integral ,\n" +
 				"\t\t\t\t\t\t\t\t\t   IntegralKernel kernel,\n" +
-				"\t\t\t\t\t\t\t\t\t   "+imageOut.getImageName()+" output , int borderX , int borderY )\n" +
+				"\t\t\t\t\t\t\t\t\t   "+imageOut.getSingleBandName()+" output , int borderX , int borderY )\n" +
 				"\t{\n" +
 				"\t\tfor( int x = 0; x < integral.width; x++ ) {\n" +
 				"\t\t\tfor( int y = 0; y < borderY; y++ ) {\n" +
@@ -194,7 +194,7 @@ public class GenerateImplIntegralImageOps extends CodeGeneratorBase {
 	private void printConvolveSparse(AutoTypeImage image ) {
 		String sumType = image.getSumType();
 
-		out.print("\tpublic static "+sumType+" convolveSparse( "+image.getImageName()+" integral , IntegralKernel kernel , int x , int y )\n" +
+		out.print("\tpublic static "+sumType+" convolveSparse( "+image.getSingleBandName()+" integral , IntegralKernel kernel , int x , int y )\n" +
 				"\t{\n" +
 				"\t\t"+sumType+" ret = 0;\n" +
 				"\t\tint N = kernel.getNumBlocks();\n" +
@@ -212,7 +212,7 @@ public class GenerateImplIntegralImageOps extends CodeGeneratorBase {
 		String sumType = image.getSumType();
 		String bitWise = image.getBitWise();
 
-		out.print("\tpublic static " + sumType + " block_unsafe( " + image.getImageName() + " integral , int x0 , int y0 , int x1 , int y1 )\n" +
+		out.print("\tpublic static " + sumType + " block_unsafe( " + image.getSingleBandName() + " integral , int x0 , int y0 , int x1 , int y1 )\n" +
 				"\t{\n" +
 				"\t\t" + sumType + " br = integral.data[ integral.startIndex + y1*integral.stride + x1 ]" + bitWise + ";\n" +
 				"\t\t" + sumType + " tr = integral.data[ integral.startIndex + y0*integral.stride + x1 ]" + bitWise + ";\n" +
@@ -227,7 +227,7 @@ public class GenerateImplIntegralImageOps extends CodeGeneratorBase {
 		String sumType = image.getSumType();
 		String bitWise = image.getBitWise();
 
-		out.print("\tpublic static " + sumType + " block_zero( " + image.getImageName() + " integral , int x0 , int y0 , int x1 , int y1 )\n" +
+		out.print("\tpublic static " + sumType + " block_zero( " + image.getSingleBandName() + " integral , int x0 , int y0 , int x1 , int y1 )\n" +
 				"\t{\n" +
 				"\t\tx0 = Math.min(x0,integral.width-1);\n" +
 				"\t\ty0 = Math.min(y0,integral.height-1);\n" +

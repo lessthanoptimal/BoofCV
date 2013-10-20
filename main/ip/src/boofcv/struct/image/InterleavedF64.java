@@ -43,6 +43,11 @@ public class InterleavedF64 extends ImageInterleaved<InterleavedF64> {
 	public InterleavedF64() {
 	}
 
+	@Override
+	public ImageTypeInfo getTypeInfo() {
+		return ImageTypeInfo.F64;
+	}
+
 	/**
 	 * Returns the pixel's value for all the bands as an array.
 	 *
@@ -116,16 +121,6 @@ public class InterleavedF64 extends ImageInterleaved<InterleavedF64> {
 			throw new ImageAccessException("Invalid band requested.");
 
 		data[getIndex(x, y, band)] = value;
-	}
-
-	/**
-	 * If this matrix is a sub-image or not.
-	 *
-	 * @return true if it is a subimage, otherwise false.
-	 */
-	@Override
-	public boolean isSubimage() {
-		return startIndex != 0 || width * numBands != stride;
 	}
 
 	@Override

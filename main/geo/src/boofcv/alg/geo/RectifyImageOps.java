@@ -448,7 +448,7 @@ public class RectifyImageOps {
 	public static <T extends ImageSingleBand> ImageDistort<T>
 	rectifyImage( DenseMatrix64F rectify , Class<T> imageType)
 	{
-		InterpolatePixelS<T> interp = FactoryInterpolation.bilinearPixel(imageType);
+		InterpolatePixelS<T> interp = FactoryInterpolation.bilinearPixelS(imageType);
 
 		DenseMatrix64F rectifyInv = new DenseMatrix64F(3,3);
 		CommonOps.invert(rectify,rectifyInv);
@@ -475,7 +475,7 @@ public class RectifyImageOps {
 	rectifyImage(IntrinsicParameters param,
 				 DenseMatrix64F rectify , Class<T> imageType)
 	{
-		InterpolatePixelS<T> interp = FactoryInterpolation.bilinearPixel(imageType);
+		InterpolatePixelS<T> interp = FactoryInterpolation.bilinearPixelS(imageType);
 
 		// only compute the transform once
 		ImageDistort<T> ret = FactoryDistort.distortCached(interp,null,imageType);

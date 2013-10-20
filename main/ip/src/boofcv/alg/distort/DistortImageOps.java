@@ -100,7 +100,7 @@ public class DistortImageOps {
 					   boolean skipOutsidePixels, TypeInterpolate interpType)
 	{
 		Class<T> inputType = (Class<T>)input.getClass();
-		InterpolatePixelS<T> interp = FactoryInterpolation.createPixel(0, 255, interpType, inputType);
+		InterpolatePixelS<T> interp = FactoryInterpolation.createPixelS(0, 255, interpType, inputType);
 
 		ImageBorder<T> border;
 		if( skipOutsidePixels ) {
@@ -151,7 +151,7 @@ public class DistortImageOps {
 				   TypeInterpolate interpType)
 	{
 		Class<T> bandType = input.getType();
-		InterpolatePixelS<T> interp = FactoryInterpolation.createPixel(0, 255, interpType, bandType);
+		InterpolatePixelS<T> interp = FactoryInterpolation.createPixelS(0, 255, interpType, bandType);
 
 		ImageBorder<T> border;
 		if( skipOutsidePixels ) {
@@ -182,7 +182,7 @@ public class DistortImageOps {
 	ImageDistort<T> createImageDistort( PointTransform_F32 transform ,
 										TypeInterpolate interpType,
 										Class<T> imageType ) {
-		InterpolatePixelS<T> interp = FactoryInterpolation.createPixel(0, 255, interpType, imageType);
+		InterpolatePixelS<T> interp = FactoryInterpolation.createPixelS(0, 255, interpType, imageType);
 		ImageDistort<T> distorter = FactoryDistort.distortCached(interp, FactoryImageBorder.value(imageType, 0), imageType);
 		distorter.setModel(new PointToPixelTransform_F32(transform));
 

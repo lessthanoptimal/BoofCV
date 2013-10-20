@@ -54,7 +54,7 @@ public class GenerateImplOrientationAverage extends CodeGeneratorBase {
 	private void printPreamble() throws FileNotFoundException {
 		setOutputFile(className);
 		out.print("import boofcv.alg.feature.describe.OrientationAverage;\n" +
-				"import boofcv.struct.image."+imageType.getImageName()+";\n" +
+				"import boofcv.struct.image."+imageType.getSingleBandName()+";\n" +
 				"\n" +
 				"\n" +
 				"/** \n" +
@@ -68,7 +68,7 @@ public class GenerateImplOrientationAverage extends CodeGeneratorBase {
 				" *\n" +
 				" * @author Peter Abeles\n" +
 				" */\n" +
-				"public class "+className+" extends OrientationAverage<"+imageType.getImageName()+"> {\n" +
+				"public class "+className+" extends OrientationAverage<"+imageType.getSingleBandName()+"> {\n" +
 				"\t\n" +
 				"\tpublic "+className+"(boolean weighted) {\n" +
 				"\t\tsuper(weighted);\n" +
@@ -83,8 +83,8 @@ public class GenerateImplOrientationAverage extends CodeGeneratorBase {
 
 	private void printVarious() {
 		out.print("\t@Override\n" +
-				"\tpublic Class<"+imageType.getImageName()+"> getImageType() {\n" +
-				"\t\treturn "+imageType.getImageName()+".class;\n" +
+				"\tpublic Class<"+imageType.getSingleBandName()+"> getImageType() {\n" +
+				"\t\treturn "+imageType.getSingleBandName()+".class;\n" +
 				"\t}\n\n");
 	}
 

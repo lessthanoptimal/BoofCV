@@ -69,7 +69,7 @@ public class GenerateImplConvertMsToSingle extends CodeGeneratorBase {
 
 	private void printAverage( AutoTypeImage in ) {
 
-		String imageType = in.getImageName();
+		String imageType = in.getSingleBandName();
 		String sumType = in.getSumType();
 		String typecast = in.getTypeCastFromSum();
 		String bitwise = in.getBitWise();

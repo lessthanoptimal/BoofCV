@@ -179,7 +179,7 @@ public abstract class ImageSingleBand<T extends ImageSingleBand> extends ImageBa
 	 *
 	 * @return The type of image.
 	 */
-	public abstract ImageTypeInfo<T> getTypeInfo();
+	public abstract ImageTypeInfo getTypeInfo();
 
 	/**
 	 * Sets the image's internal data array.

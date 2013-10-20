@@ -59,8 +59,8 @@ public class GenerateConvolvedUnrolled extends CodeGeneratorBase {
 			name += "_Div";
 
 		typeKernel = isInteger ? "I32" : "F32";
-		typeInput = inputImg.getImageName();
-		typeOutput = outputImg.getImageName();
+		typeInput = inputImg.getSingleBandName();
+		typeOutput = outputImg.getSingleBandName();
 		dataKernel = isInteger ? "int" : "float";
 		dataInput = inputImg.getDataType();
 		dataOutput = outputImg.getDataType();

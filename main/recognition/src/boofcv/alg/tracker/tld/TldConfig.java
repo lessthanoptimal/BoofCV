@@ -155,11 +155,11 @@ public class TldConfig<T extends ImageSingleBand, D extends ImageSingleBand> {
 		this.derivType = GImageDerivativeOps.getDerivativeType(imageType);
 
 		if( fast ) {
-			interpolate = FactoryInterpolation.nearestNeighborPixel(imageType);
+			interpolate = FactoryInterpolation.nearestNeighborPixelS(imageType);
 //			maximumCascadeConsider = 500;
 //			numNegativeFerns = 500;
 		} else {
-			interpolate = FactoryInterpolation.bilinearPixel(imageType);
+			interpolate = FactoryInterpolation.bilinearPixelS(imageType);
 //			maximumCascadeConsider = 500;
 //			numNegativeFerns = 500;
 		}

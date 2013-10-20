@@ -18,9 +18,15 @@
 
 package boofcv.alg.transform.fft;
 
+import boofcv.alg.misc.ImageMiscOps;
 import boofcv.struct.image.ImageFloat64;
 import boofcv.struct.image.InterleavedF32;
+import boofcv.testing.BoofTesting;
+import org.ddogleg.complex.ComplexMath64F;
+import org.ejml.data.Complex64F;
 import org.junit.Test;
+
+import java.util.Random;
 
 import static org.junit.Assert.*;
 
@@ -28,6 +34,8 @@ import static org.junit.Assert.*;
  * @author Peter Abeles
  */
 public class TestDiscreteFourierTransformOps {
+
+	Random rand = new Random(234);
 
 	@Test
 	public void isPowerOf2() {
@@ -95,5 +103,37 @@ public class TestDiscreteFourierTransformOps {
 	@Test
 	public void multiplyRealComplex() {
 		fail("implement");
+	}
+
+	@Test
+	public void multiplyComplex() {
+		InterleavedF32 complexA = new InterleavedF32(10,20,2);
+		InterleavedF32 complexB = new InterleavedF32(10,20,2);
+		InterleavedF32 complexC = new InterleavedF32(10,20,2);
+
+		ImageMiscOps.fillUniform(complexA,rand,-5,5);
+		ImageMiscOps.fillUniform(complexB,rand,-5,5);
+
+		multiplyComplex(complexA,complexB,complexC);
+
+		BoofTesting.checkSubImage(this,"multiplyComplex",false,complexA,complexB,complexC);
+	}
+
+	public void multiplyComplex( InterleavedF32 complexA , InterleavedF32 complexB , InterleavedF32 complexC ) {
+		DiscreteFourierTransformOps.multiplyComplex(complexA,complexB,complexC);
+
+		Complex64F expected = new Complex64F();
+
+		for( int y = 0; y < complexA.height; y++ ) {
+			for( int x = 0; x < complexA.width; x++ ) {
+				Complex64F a = new Complex64F(complexA.getBand(x,y,0),complexA.getBand(x,y,1));
+				Complex64F b = new Complex64F(complexB.getBand(x,y,0),complexB.getBand(x,y,1));
+
+				ComplexMath64F.mult(a,b,expected);
+
+				assertEquals(expected.getReal(),complexC.getBand(x,y,0),1e-4);
+				assertEquals(expected.getImaginary(),complexC.getBand(x,y,1),1e-4);
+			}
+		}
 	}
 }

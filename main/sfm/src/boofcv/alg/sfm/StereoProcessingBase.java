@@ -113,7 +113,7 @@ public class StereoProcessingBase<T extends ImageSingleBand> {
 		rectK = rectifyAlg.getCalibrationMatrix();
 		rectR = rectifyAlg.getRectifiedRotation();
 
-		Class<T> imageType = imageLeftRect.getTypeInfo().getImageClass();
+		Class<T> imageType = (Class<T>)imageLeftRect.getClass();
 		distortLeftRect = RectifyImageOps.rectifyImage(stereoParam.left, rect1, imageType);
 		distortRightRect = RectifyImageOps.rectifyImage(stereoParam.right, rect2, imageType);
 

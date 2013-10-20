@@ -20,6 +20,7 @@ package boofcv.alg.misc;
 
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageInterleaved;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.MultiSpectral;
 import boofcv.testing.CompareEquivalentFunctions;
@@ -35,6 +36,7 @@ public abstract class BaseGClassChecksInMisc extends CompareEquivalentFunctions 
 	Random rand = new Random(234);
 	int width = 20;
 	int height = 30;
+	int numBands = 3;
 
 	protected BaseGClassChecksInMisc(Class<?> testClass, Class<?> validationClass) {
 		super(testClass, validationClass);
@@ -100,6 +102,10 @@ public abstract class BaseGClassChecksInMisc extends CompareEquivalentFunctions 
 		boolean isSigned = false;
 		if( img instanceof ImageSingleBand ) {
 			if( ((ImageSingleBand)img).getTypeInfo().isSigned() ) {
+				isSigned = true;
+			}
+		} else if( img instanceof ImageInterleaved ) {
+			if( ((ImageInterleaved)img).getTypeInfo().isSigned() ) {
 				isSigned = true;
 			}
 		} else {

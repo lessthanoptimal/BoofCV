@@ -231,7 +231,7 @@ public class LensDistortionOps {
 	public static <T extends ImageSingleBand> ImageDistort<T>
 	removeRadialImage(IntrinsicParameters param, BorderType borderType, Class<T> imageType)
 	{
-		InterpolatePixelS<T> interp = FactoryInterpolation.bilinearPixel(imageType);
+		InterpolatePixelS<T> interp = FactoryInterpolation.bilinearPixelS(imageType);
 		ImageBorder<T> border;
 		if( borderType == BorderType.VALUE )
 			border = FactoryImageBorder.value(imageType, 0);

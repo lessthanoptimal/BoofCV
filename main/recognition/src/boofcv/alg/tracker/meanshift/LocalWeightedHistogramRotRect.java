@@ -22,11 +22,16 @@ import boofcv.alg.interpolate.InterpolatePixelMB;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.RectangleRotate_F32;
 import boofcv.struct.image.ImageMultiBand;
+import georegression.struct.point.Point2D_F32;
 import org.ddogleg.stats.UtilGaussian;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Computes a local histogram weighted using a Gaussian function.  The weighting function is shaped using a rotated
- * rectangle, where the sigma along each axis is set by the rectangle's width and height.
+ * rectangle, where the sigma along each axis is set by the rectangle's width and height.    For use with
+ * {@link TrackerMeanShiftComaniciu2003}.
  *
  * The histogram is stored in a row major format.
  *
@@ -39,26 +44,26 @@ public class LocalWeightedHistogramRotRect<T extends ImageMultiBand> {
 	// storage for interpolated pixel
 	private float value[];
 
-	// number of samples along each axis
-	private int numSamples;
-
 	// maximum value of a pixel in any band
 	private float maxPixelValue;
 	// number of binds in the histogram
 	private int numBins;
 
 	// cosine and sine of rotation rectangle angle
-	private float c,s;
+	protected float c,s;
 
 	// output of conversion from region to image coordinates
-	private float imageX,imageY;
+	public float imageX,imageY;
 
 	// which element in the histogram does a coordinate in the grid belong to
 	private int sampleHistIndex[];
 
 	// storage for sample weights and the histogram
-	private float weights[];
-	private float histogram[];
+	protected float weights[];
+	protected float histogram[];
+
+	// list of sample points.  in square coordinates.  where 0.5 is 1/2 the width or height
+	private List<Point2D_F32> samplePts = new ArrayList<Point2D_F32>();
 
 	/**
 	 * Configures histogram calculation.
@@ -74,7 +79,6 @@ public class LocalWeightedHistogramRotRect<T extends ImageMultiBand> {
 										 int numHistogramBins, int numBands,
 										 float maxPixelValue,
 										 InterpolatePixelMB<T> interpolate) {
-		this.numSamples = numSamples;
 		this.numBins = numHistogramBins;
 		this.maxPixelValue = maxPixelValue;
 		this.interpolate = interpolate;
@@ -83,13 +87,20 @@ public class LocalWeightedHistogramRotRect<T extends ImageMultiBand> {
 		histogram = new float[ (int)Math.pow(numHistogramBins,numBands) ];
 		value = new float[ numBands ];
 
-		// compute the weights by convolving 1D gaussian kernel
+		createSamplePoints(numSamples);
+		computeWeights(numSamples, numSigmas);
+	}
+
+	/**
+	 * compute the weights by convolving 1D gaussian kernel
+	 */
+	protected void computeWeights(int numSamples, double numSigmas) {
 		weights = new float[ numSamples*numSamples ];
 
 		float w[] = new float[ numSamples ];
 		for( int i = 0; i < numSamples; i++ ) {
 			float x = i/(float)(numSamples-1);
-			w[i] =  (float)UtilGaussian.computePDF(0, 1, numSigmas*(x-0.5f) );
+			w[i] =  (float) UtilGaussian.computePDF(0, 1, 2f*numSigmas * (x - 0.5f));
 		}
 
 		for( int y = 0; y < numSamples; y++ ) {
@@ -97,7 +108,21 @@ public class LocalWeightedHistogramRotRect<T extends ImageMultiBand> {
 				weights[y*numSamples + x] = w[y]*w[x];
 			}
 		}
+	}
 
+	/**
+	 * create the list of points in square coordinates that it will sample.  values will range
+	 * from -0.5 to 0.5 along each axis.
+	 */
+	protected void createSamplePoints(int numSamples) {
+		for( int y = 0; y < numSamples; y++ ) {
+			float regionY = (y/(numSamples-1.0f) - 0.5f);
+
+			for( int x = 0; x < numSamples; x++  ) {
+				float regionX = (x/(numSamples-1.0f) - 0.5f);
+				samplePts.add( new Point2D_F32(regionX,regionY));
+			}
+		}
 	}
 
 	/**
@@ -130,65 +155,58 @@ public class LocalWeightedHistogramRotRect<T extends ImageMultiBand> {
 	/**
 	 * Computes the histogram quickly inside the image
 	 */
-	private void computeHistogramInside(T image, RectangleRotate_F32 region) {
-		int indexWeight = 0;
-		for( int y = 0; y < numSamples; y++ ) {
-			float regionY = (y/(numSamples-1.0f) - 0.5f)*region.height;
+	protected void computeHistogramInside(T image, RectangleRotate_F32 region) {
+		for( int i = 0; i < samplePts.size(); i++ ) {
+			Point2D_F32 p = samplePts.get(i);
 
-			for( int x = 0; x < numSamples; x++ , indexWeight++ ) {
-				float regionX = (x/(numSamples-1.0f) - 0.5f)*region.width;
+			squareToImage(p.x, p.y, region);
 
-				rectToImage(regionX,regionY,region);
+			interpolate.get_fast(imageX,imageY,value);
 
-				interpolate.get_fast(imageX,imageY,value);
+			int indexHistogram = computeHistogramBin(value);
 
-				int indexHistogram = 0;
-				int binStride = 1;
-				for( int i = 0; i < image.getNumBands(); i++ ) {
-					int bin = (int)(numBins*value[i]/maxPixelValue);
-
-					indexHistogram += bin*binStride;
-					binStride *= numBins;
-				}
-
-				sampleHistIndex[ y*numSamples + x ] = indexHistogram;
-				histogram[indexHistogram] += weights[indexWeight];
-			}
+			sampleHistIndex[ i ] = indexHistogram;
+			histogram[indexHistogram] += weights[i];
 		}
 	}
 
 	/**
 	 * Computes the histogram and skips pixels which are outside the image border
 	 */
-	private void computeHistogramBorder(T image, RectangleRotate_F32 region) {
-		int indexWeight = 0;
-		for( int y = 0; y < numSamples; y++ ) {
-			float regionY = (y/(numSamples-1.0f) - 0.5f)*region.height;
+	protected void computeHistogramBorder(T image, RectangleRotate_F32 region) {
+		for( int i = 0; i < samplePts.size(); i++ ) {
+			Point2D_F32 p = samplePts.get(i);
 
-			for( int x = 0; x < numSamples; x++ , indexWeight++ ) {
-				float regionX = (x/(numSamples-1.0f) - 0.5f)*region.width;
+			squareToImage(p.x, p.y, region);
 
-				rectToImage(regionX,regionY,region);
-
-				// make sure its inside the image
-				if( !BoofMiscOps.checkInside(image, imageX, imageY))
-					continue;
-
+			// make sure its inside the image
+			if( !BoofMiscOps.checkInside(image, imageX, imageY)) {
+				sampleHistIndex[ i ] = -1;
+			} else {
 				// use the slower interpolation which can handle the border
 				interpolate.get(imageX, imageY, value);
 
-				int indexHistogram = 0;
-				int binStride = 1;
-				for( int i = 0; i < image.getNumBands(); i++ ) {
-					int bin = (int)(numBins*value[i]/maxPixelValue);
+				int indexHistogram = computeHistogramBin(value);
 
-					indexHistogram += bin*binStride;
-					binStride *= numBins;
-				}
-
-				histogram[indexHistogram] += weights[indexWeight];
+				sampleHistIndex[ i ] = indexHistogram;
+				histogram[indexHistogram] += weights[i];
 			}
 		}
+	}
+
+	/**
+	 * Given the value of a pixel, compute which bin in the histogram it belongs in
+	 */
+	protected int computeHistogramBin( float value[] ) {
+		int indexHistogram = 0;
+		int binStride = 1;
+		for( int bandIndex = 0; bandIndex < value.length; bandIndex++ ) {
+			int bin = (int)(numBins*value[bandIndex]/maxPixelValue);
+
+			indexHistogram += bin*binStride;
+			binStride *= numBins;
+		}
+		return indexHistogram;
 	}
 
 	/**
@@ -196,26 +214,23 @@ public class LocalWeightedHistogramRotRect<T extends ImageMultiBand> {
 	 */
 	protected boolean isInFastBounds(RectangleRotate_F32 region) {
 
-		float w2 = region.width/2.0f;
-		float h2 = region.height/2.0f;
-
-		rectToImage(-w2,-h2,region);
+		squareToImage(-0.5f, -0.5f, region);
 		if( !interpolate.isInFastBounds(imageX, imageY))
 			return false;
-		rectToImage(-w2,h2,region);
+		squareToImage(-0.5f, 0.5f, region);
 		if( !interpolate.isInFastBounds(imageX, imageY))
 			return false;
-		rectToImage(w2,-h2,region);
+		squareToImage(0.5f, 0.5f, region);
 		if( !interpolate.isInFastBounds(imageX, imageY))
 			return false;
-		rectToImage(w2,h2,region);
+		squareToImage(0.5f, -0.5f, region);
 		if( !interpolate.isInFastBounds(imageX, imageY))
 			return false;
 
 		return true;
 	}
 
-	private void normalizeHistogram() {
+	protected void normalizeHistogram() {
 		float total = 0;
 		for( int i = 0; i < histogram.length; i++ ) {
 			total += histogram[i];
@@ -226,9 +241,12 @@ public class LocalWeightedHistogramRotRect<T extends ImageMultiBand> {
 	}
 
 	/**
-	 * Converts a point from rectangle coordinates into image coordinates
+	 * Converts a point from square coordinates into image coordinates
 	 */
-	protected void rectToImage( float x , float y , RectangleRotate_F32 region ) {
+	protected void squareToImage(float x, float y, RectangleRotate_F32 region) {
+		x *= region.width;
+		y *= region.height;
+
 		imageX = x*c - y*s + region.cx;
 		imageY = x*s + y*c + region.cy;
 	}
@@ -240,4 +258,9 @@ public class LocalWeightedHistogramRotRect<T extends ImageMultiBand> {
 	public int[] getSampleHistIndex() {
 		return sampleHistIndex;
 	}
+
+	public List<Point2D_F32> getSamplePts() {
+		return samplePts;
+	}
+
 }

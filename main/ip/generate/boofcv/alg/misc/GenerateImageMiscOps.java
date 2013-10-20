@@ -67,12 +67,14 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 
 		for( AutoTypeImage t : types ) {
 			imageType = t;
-			imageName = t.getImageName();
+			imageName = t.getSingleBandName();
 			dataType = t.getDataType();
 			printFill();
+			printFillInterleaved();
 			printFillBorder();
 			printFillRectangle();
 			printFillUniform();
+			printFillUniformInterleaved();
 			printFillGaussian();
 			printFlipVertical();
 		}
@@ -83,7 +85,7 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 
 		for( AutoTypeImage t : types ) {
 			imageType = t;
-			imageName = t.getImageName();
+			imageName = t.getSingleBandName();
 			dataType = t.getDataType();
 			bitWise = t.getBitWise();
 			printAddUniform();
@@ -106,6 +108,28 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 				"\t\t\tint index = input.getStartIndex() + y * input.getStride();\n" +
 				"\t\t\tfor (int x = 0; x < input.width; x++) {\n" +
 				"\t\t\t\tinput.data[index++] = "+typeCast+"value;\n" +
+				"\t\t\t}\n" +
+				"\t\t}\n" +
+				"\t}\n\n");
+	}
+
+	public void printFillInterleaved()
+	{
+		String imageName = imageType.getInterleavedName();
+		String typeCast = imageType.getTypeCastFromSum();
+		out.print("\t/**\n" +
+				"\t * Fills the whole image with the specified value\n" +
+				"\t *\n" +
+				"\t * @param input An image.\n" +
+				"\t * @param value The value that the image is being filled with.\n" +
+				"\t */\n" +
+				"\tpublic static void fill("+imageName+" input, "+imageType.getSumType()+" value) {\n" +
+				"\n" +
+				"\t\tfor (int y = 0; y < input.height; y++) {\n" +
+				"\t\t\tint index = input.getStartIndex() + y * input.getStride();\n" +
+				"\t\t\tint end = index + input.width*input.numBands;\n" +
+				"\t\t\tfor (; index < end; index++ ) {\n" +
+				"\t\t\t\tinput.data[index] = "+typeCast+"value;\n" +
 				"\t\t\t}\n" +
 				"\t\t}\n" +
 				"\t}\n\n");
@@ -204,6 +228,42 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 		} else {
 			String randType = imageType.getRandType();
 			out.print("\t\t\t\tdata[index++] = rand.next"+randType+"()*range+min;\n");
+		}
+		out.print("\t\t\t}\n" +
+				"\t\t}\n" +
+				"\t}\n\n");
+	}
+
+	public void printFillUniformInterleaved() {
+
+		String imageName = imageType.getInterleavedName();
+		String sumType = imageType.getSumType();
+		String typeCast = imageType.getTypeCastFromSum();
+
+		out.print("\t/**\n" +
+				"\t * Sets each value in the image to a value drawn from an uniform distribution that has a range of min <= X < max.\n" +
+				"\t *\n" +
+				"\t * @param img Image which is to be filled.  Modified,\n" +
+				"\t * @param rand Random number generator\n" +
+				"\t * @param min Minimum value of the distribution, inclusive\n" +
+				"\t * @param max Maximum value of the distribution, exclusive\n" +
+				"\t */\n" +
+				"\tpublic static void fillUniform("+imageName+" img, Random rand , "+sumType+" min , "+sumType+" max) {\n" +
+				"\t\t"+sumType+" range = max-min;\n" +
+				"\n" +
+				"\t\t"+dataType+"[] data = img.data;\n" +
+				"\n" +
+				"\t\tfor (int y = 0; y < img.height; y++) {\n" +
+				"\t\t\tint index = img.getStartIndex() + y * img.getStride();\n" +
+				"\t\t\tint end = index + img.width*img.numBands;\n" +
+				"\t\t\tfor (; index <  end; index++) {\n");
+		if( imageType.isInteger() && imageType.getNumBits() < 64) {
+			out.print("\t\t\t\tdata[index] = "+typeCast+"(rand.nextInt(range)+min);\n");
+		} else if( imageType.isInteger() ) {
+			out.print("\t\t\t\tdata[index] = rand.nextInt((int)range)+min;\n");
+		} else {
+			String randType = imageType.getRandType();
+			out.print("\t\t\t\tdata[index] = rand.next"+randType+"()*range+min;\n");
 		}
 		out.print("\t\t\t}\n" +
 				"\t\t}\n" +

@@ -83,7 +83,7 @@ public class GenerateImplMedianSortEdgeNaive extends CodeGeneratorBase {
 		String primitiveType = image.getDataType();
 		String sumType = image.getSumType();
 
-		out.print("\tpublic static void process("+image.getImageName()+" input, "+image.getImageName()+" output, int radius , "+sumType+" storage[] )\n" +
+		out.print("\tpublic static void process("+image.getSingleBandName()+" input, "+image.getSingleBandName()+" output, int radius , "+sumType+" storage[] )\n" +
 				"\t{\n" +
 				"\t\tint w = 2*radius+1;\n" +
 				"\t\tif( storage == null ) {\n" +

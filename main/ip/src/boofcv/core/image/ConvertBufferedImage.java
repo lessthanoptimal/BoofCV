@@ -62,7 +62,7 @@ public class ConvertBufferedImage {
 
 			return ret;
 		}
-		throw new IllegalArgumentException("Buffered image does not have an interlaced int raster");
+		throw new IllegalArgumentException("Buffered image does not have an interleaved byte raster");
 	}
 
 	/**

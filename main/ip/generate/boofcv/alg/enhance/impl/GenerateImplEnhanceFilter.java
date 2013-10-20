@@ -77,7 +77,7 @@ public class GenerateImplEnhanceFilter extends CodeGeneratorBase {
 	}
 
 	private void sharpen4(AutoTypeImage image) {
-		String name = image.getImageName();
+		String name = image.getSingleBandName();
 		String bitwise = image.getBitWise();
 		String cast = image.getTypeCastFromSum();
 		String sumtype = image.getSumType();
@@ -106,7 +106,7 @@ public class GenerateImplEnhanceFilter extends CodeGeneratorBase {
 
 	private void sharpenBorder4( AutoTypeImage image ) {
 
-		String name = image.getImageName();
+		String name = image.getSingleBandName();
 		String cast = image.getTypeCastFromSum();
 		String sumtype = image.getSumType();
 
@@ -168,7 +168,7 @@ public class GenerateImplEnhanceFilter extends CodeGeneratorBase {
 	}
 
 	private void sharpen8(AutoTypeImage image) {
-		String name = image.getImageName();
+		String name = image.getSingleBandName();
 		String bitwise = image.getBitWise();
 		String cast = image.getTypeCastFromSum();
 		String sumtype = image.getSumType();
@@ -204,7 +204,7 @@ public class GenerateImplEnhanceFilter extends CodeGeneratorBase {
 	}
 
 	private void sharpenBorder8(AutoTypeImage image) {
-		String name = image.getImageName();
+		String name = image.getSingleBandName();
 		String cast = image.getTypeCastFromSum();
 		String sumtype = image.getSumType();
 

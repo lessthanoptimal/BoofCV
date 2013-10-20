@@ -71,7 +71,7 @@ public class ImageSInt32 extends ImageInteger<ImageSInt32> {
 	}
 
 	@Override
-	public ImageTypeInfo<ImageSInt32> getTypeInfo() {
+	public ImageTypeInfo getTypeInfo() {
 		return ImageTypeInfo.S32;
 	}
 

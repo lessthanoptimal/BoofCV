@@ -35,8 +35,8 @@ public abstract class ImageFloat <T extends ImageFloat> extends ImageSingleBand<
 	}
 
 	@Override
-	public ImageTypeInfo<T> getTypeInfo() {
-		return (ImageTypeInfo<T>)ImageTypeInfo.F;
+	public ImageTypeInfo getTypeInfo() {
+		return ImageTypeInfo.F;
 	}
 
 }

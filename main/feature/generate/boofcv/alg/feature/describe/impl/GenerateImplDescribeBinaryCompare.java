@@ -70,7 +70,7 @@ public class GenerateImplDescribeBinaryCompare extends CodeGeneratorBase {
 				" *\n" +
 				" * @author Peter Abeles\n" +
 				" */\n" +
-				"public class "+className+" extends DescribePointBinaryCompare<"+imageType.getImageName()+"> {\n" +
+				"public class "+className+" extends DescribePointBinaryCompare<"+imageType.getSingleBandName()+"> {\n" +
 				"\n" +
 				"\tpublic "+className+"(BinaryCompareDefinition_I32 definition) {\n" +
 				"\t\tsuper(definition);\n" +

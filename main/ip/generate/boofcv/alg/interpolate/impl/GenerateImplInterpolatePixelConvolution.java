@@ -76,12 +76,12 @@ public class GenerateImplInterpolatePixelConvolution extends CodeGeneratorBase {
 				" *\n" +
 				" * @author Peter Abeles\n" +
 				" */\n" +
-				"public class "+fileName+" implements InterpolatePixel<"+inputType.getImageName()+">  {\n" +
+				"public class "+fileName+" implements InterpolatePixel<"+inputType.getSingleBandName()+">  {\n" +
 				"\n" +
 				"\t// kernel used to perform interpolation\n" +
 				"\tprivate KernelContinuous1D_F32 kernel;\n" +
 				"\t// input image\n" +
-				"\tprivate "+inputType.getImageName()+" image;\n" +
+				"\tprivate "+inputType.getSingleBandName()+" image;\n" +
 				"\t// minimum and maximum allowed pixel values\n" +
 				"\tprivate float min,max;\n" +
 				"\n" +
@@ -97,12 +97,12 @@ public class GenerateImplInterpolatePixelConvolution extends CodeGeneratorBase {
 		String bitWise = inputType.getBitWise();
 
 		out.print("\t@Override\n" +
-				"\tpublic void setImage("+inputType.getImageName()+" image ) {\n" +
+				"\tpublic void setImage("+inputType.getSingleBandName()+" image ) {\n" +
 				"\t\tthis.image = image;\n" +
 				"\t}\n" +
 				"\n" +
 				"\t@Override\n" +
-				"\tpublic "+inputType.getImageName()+" getImage() {\n" +
+				"\tpublic "+inputType.getSingleBandName()+" getImage() {\n" +
 				"\t\treturn image;\n" +
 				"\t}\n" +
 				"\n" +

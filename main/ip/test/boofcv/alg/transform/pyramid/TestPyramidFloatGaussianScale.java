@@ -58,7 +58,7 @@ public class TestPyramidFloatGaussianScale extends GenericPyramidTests<ImageFloa
 
 	public void _update(ImageFloat32 img) {
 
-		InterpolatePixelS<ImageFloat32> interp = FactoryInterpolation.bilinearPixel(img);
+		InterpolatePixelS<ImageFloat32> interp = FactoryInterpolation.bilinearPixelS(img);
 
 		PyramidFloatGaussianScale<ImageFloat32> alg = new PyramidFloatGaussianScale<ImageFloat32>(interp,scales,sigmas,imageType);
 
@@ -91,7 +91,7 @@ public class TestPyramidFloatGaussianScale extends GenericPyramidTests<ImageFloa
 		double sigmas[] = new double[ scales.length ];
 		for( int i = 0; i < sigmas.length; i++ )
 			sigmas[i] = i+1;
-		InterpolatePixelS<ImageFloat32> interp = FactoryInterpolation.bilinearPixel(imageType);
+		InterpolatePixelS<ImageFloat32> interp = FactoryInterpolation.bilinearPixelS(imageType);
 		return new PyramidFloatGaussianScale<ImageFloat32>(interp,a,sigmas,imageType);
 	}
 
@@ -101,7 +101,7 @@ public class TestPyramidFloatGaussianScale extends GenericPyramidTests<ImageFloa
 	 */
 	@Test
 	public void checkSigmas() {
-		InterpolatePixelS<ImageFloat32> interp = FactoryInterpolation.bilinearPixel(ImageFloat32.class);
+		InterpolatePixelS<ImageFloat32> interp = FactoryInterpolation.bilinearPixelS(ImageFloat32.class);
 		double scales[] = new double[]{1,1};
 		PyramidFloatGaussianScale<ImageFloat32> alg = new PyramidFloatGaussianScale<ImageFloat32>(interp,scales,sigmas,imageType);
 

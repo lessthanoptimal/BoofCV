@@ -68,7 +68,7 @@ public class FactoryPyramid {
 	public static <T extends ImageSingleBand>
 	PyramidFloat<T> floatGaussian( double scaleFactors[], double []sigmas , Class<T> imageType ) {
 
-		InterpolatePixelS<T> interp = FactoryInterpolation.bilinearPixel(imageType);
+		InterpolatePixelS<T> interp = FactoryInterpolation.bilinearPixelS(imageType);
 
 		return new PyramidFloatGaussianScale<T>(interp,scaleFactors,sigmas,imageType);
 	}

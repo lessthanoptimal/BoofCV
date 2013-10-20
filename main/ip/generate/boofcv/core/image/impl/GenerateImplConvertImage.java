@@ -83,7 +83,7 @@ public class GenerateImplConvertImage extends CodeGeneratorBase {
 		else if( sameTypes && imageIn.isSigned() )
 			typeCast = "";
 
-		out.print("\tpublic static void convert( "+imageIn.getImageName()+" from, "+imageOut.getImageName()+" to ) {\n" +
+		out.print("\tpublic static void convert( "+imageIn.getSingleBandName()+" from, "+imageOut.getSingleBandName()+" to ) {\n" +
 				"\n" +
 				"\t\tif (from.isSubimage() || to.isSubimage()) {\n" +
 				"\n" +

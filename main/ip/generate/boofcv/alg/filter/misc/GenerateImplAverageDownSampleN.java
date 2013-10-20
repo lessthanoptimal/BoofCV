@@ -86,7 +86,7 @@ public class GenerateImplAverageDownSampleN extends CodeGeneratorBase {
 
 
 		out.print(
-				"\tpublic static void down( "+input.getImageName()+" input , int sampleWidth , "+output.getImageName()+" output ) {\n" +
+				"\tpublic static void down( "+input.getSingleBandName()+" input , int sampleWidth , "+output.getSingleBandName()+" output ) {\n" +
 				"\t\tint maxY = input.height - input.height%sampleWidth;\n" +
 				"\t\tint maxX = input.width - input.width%sampleWidth;\n" +
 				"\n" +

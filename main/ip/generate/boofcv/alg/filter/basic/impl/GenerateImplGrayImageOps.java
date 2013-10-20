@@ -88,7 +88,7 @@ public class GenerateImplGrayImageOps extends CodeGeneratorBase {
 	}
 
 	private void printInvert() {
-		out.print("\tpublic static void invert("+imageType.getImageName()+" input, "+sumType+" max , "+imageType.getImageName()+" output) {\n" +
+		out.print("\tpublic static void invert("+imageType.getSingleBandName()+" input, "+sumType+" max , "+imageType.getSingleBandName()+" output) {\n" +
 				"\n" +
 				"\t\tfor (int y = 0; y < input.height; y++) {\n" +
 				"\t\t\tint indexSrc = input.startIndex + input.stride*y;\n" +
@@ -102,7 +102,7 @@ public class GenerateImplGrayImageOps extends CodeGeneratorBase {
 	}
 
 	private void printBrighten() {
-		out.print("\tpublic static void brighten("+imageType.getImageName()+" input, "+sumType+" beta, "+sumType+" max , "+imageType.getImageName()+" output ) {\n" +
+		out.print("\tpublic static void brighten("+imageType.getSingleBandName()+" input, "+sumType+" beta, "+sumType+" max , "+imageType.getSingleBandName()+" output ) {\n" +
 				"\n" +
 				"\t\tfor (int y = 0; y < input.height; y++) {\n" +
 				"\t\t\tint indexSrc = input.startIndex + input.stride*y;\n" +
@@ -119,7 +119,7 @@ public class GenerateImplGrayImageOps extends CodeGeneratorBase {
 	}
 
 	private void printStretch() {
-		out.print("\tpublic static void stretch("+imageType.getImageName()+" input, double gamma, "+sumType+" beta, "+sumType+" max , "+imageType.getImageName()+" output ) {\n" +
+		out.print("\tpublic static void stretch("+imageType.getSingleBandName()+" input, double gamma, "+sumType+" beta, "+sumType+" max , "+imageType.getSingleBandName()+" output ) {\n" +
 				"\t\tfor (int y = 0; y < input.height; y++) {\n" +
 				"\t\t\tint indexSrc = input.startIndex + input.stride*y;\n" +
 				"\t\t\tint indexDst = output.startIndex + output.stride*y;\n" +

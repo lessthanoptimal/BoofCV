@@ -39,7 +39,7 @@ public enum AutoTypeImage {
 	F32(ImageFloat32.class),
 	F64(ImageFloat64.class);
 
-	private String imageName;
+	private String imageSingleName;
 	private String dataType;
 	private String bitWise;
 	private String sumType;
@@ -53,7 +53,7 @@ public enum AutoTypeImage {
 
 	AutoTypeImage( Class<?> imageType ) {
 
-		imageName = imageType.getSimpleName();
+		imageSingleName = imageType.getSimpleName();
 		bitWise = "";
 		try {
 			ImageSingleBand img = (ImageSingleBand)imageType.newInstance();
@@ -106,8 +106,8 @@ public enum AutoTypeImage {
 		}
 	}
 
-	AutoTypeImage(String imageName, String dataType, boolean isInteger , int numBits ) {
-		this.imageName = imageName;
+	AutoTypeImage(String imageSingleName, String dataType, boolean isInteger , int numBits ) {
+		this.imageSingleName = imageSingleName;
 		this.dataType = dataType;
 		this.isInteger = isInteger;
 		this.numBits = numBits;
@@ -150,8 +150,12 @@ public enum AutoTypeImage {
 		return new AutoTypeImage[]{U8,U16};
 	}
 
-	public String getImageName() {
-		return imageName;
+	public String getInterleavedName() {
+		return "Interleaved"+toString();
+	}
+
+	public String getSingleBandName() {
+		return imageSingleName;
 	}
 
 	public String getDataType() {

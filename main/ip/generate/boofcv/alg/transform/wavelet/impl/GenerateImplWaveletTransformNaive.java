@@ -109,7 +109,7 @@ public class GenerateImplWaveletTransformNaive extends CodeGeneratorBase {
 				"\t * @param output where the output is written to. Modified\n" +
 				"\t */\n" +
 				"\tpublic static void horizontal( BorderIndex1D border , WlCoef_"+genName+" coefficients ,\n" +
-				"\t\t\t\t\t\t\t\t   "+imageIn.getImageName()+" input , "+imageIn.getImageName()+" output ) {\n" +
+				"\t\t\t\t\t\t\t\t   "+imageIn.getSingleBandName()+" input , "+imageIn.getSingleBandName()+" output ) {\n" +
 				"\n" +
 				"\t\tUtilWavelet.checkShape(input,output);\n" +
 				"\n" +
@@ -166,7 +166,7 @@ public class GenerateImplWaveletTransformNaive extends CodeGeneratorBase {
 				"\t * @param output where the output is written to. Modified\n" +
 				"\t */\n" +
 				"\tpublic static void vertical( BorderIndex1D border , WlCoef_"+genName+" coefficients ,\n" +
-				"\t\t\t\t\t\t\t\t "+imageIn.getImageName()+" input , "+imageIn.getImageName()+" output ) {\n" +
+				"\t\t\t\t\t\t\t\t "+imageIn.getSingleBandName()+" input , "+imageIn.getSingleBandName()+" output ) {\n" +
 				"\n" +
 				"\t\tUtilWavelet.checkShape(input,output);\n" +
 				"\n" +
@@ -219,7 +219,7 @@ public class GenerateImplWaveletTransformNaive extends CodeGeneratorBase {
 				"\t * @param input Transformed image. Not modified.\n" +
 				"\t * @param output Reconstruction of original image. Modified\n" +
 				"\t */\n" +
-				"\tpublic static void horizontalInverse( BorderIndex1D border , WlBorderCoef<WlCoef_"+genName+"> inverseCoef , "+imageIn.getImageName()+" input , "+imageIn.getImageName()+" output ) {\n" +
+				"\tpublic static void horizontalInverse( BorderIndex1D border , WlBorderCoef<WlCoef_"+genName+"> inverseCoef , "+imageIn.getSingleBandName()+" input , "+imageIn.getSingleBandName()+" output ) {\n" +
 				"\n" +
 				"\t\tUtilWavelet.checkShape(output,input);\n" +
 				"\n" +
@@ -305,7 +305,7 @@ public class GenerateImplWaveletTransformNaive extends CodeGeneratorBase {
 				"\t * @param input Transformed image. Not modified.\n" +
 				"\t * @param output Reconstruction of original image. Modified\n" +
 				"\t */\n" +
-				"\tpublic static void verticalInverse( BorderIndex1D border , WlBorderCoef<WlCoef_"+genName+"> inverseCoef , "+imageIn.getImageName()+" input , "+imageIn.getImageName()+" output ) {\n" +
+				"\tpublic static void verticalInverse( BorderIndex1D border , WlBorderCoef<WlCoef_"+genName+"> inverseCoef , "+imageIn.getSingleBandName()+" input , "+imageIn.getSingleBandName()+" output ) {\n" +
 				"\n" +
 				"\t\tUtilWavelet.checkShape(output,input);\n" +
 				"\n" +

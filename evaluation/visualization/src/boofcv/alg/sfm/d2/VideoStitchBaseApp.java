@@ -114,7 +114,7 @@ public abstract class VideoStitchBaseApp<I extends ImageBase, IT extends Inverti
 	protected StitchingFromMotion2D createAlgorithm( PointTracker<I> tracker ) {
 
 		if( imageInfo.getFamily() == ImageDataType.Family.MULTI_SPECTRAL ) {
-			Class imageType = imageInfo.getDataType().getImageClass();
+			Class imageType = imageInfo.getImageClass();
 
 			ImageMotion2D<I,IT> motion = FactoryMotion2D.createMotion2D(maxIterations,inlierThreshold,2,absoluteMinimumTracks,
 					respawnTrackFraction,respawnCoverageFraction,false,tracker,fitModel);
@@ -126,7 +126,7 @@ public abstract class VideoStitchBaseApp<I extends ImageBase, IT extends Inverti
 			ImageMotion2D motion = FactoryMotion2D.createMotion2D(maxIterations,inlierThreshold,2,absoluteMinimumTracks,
 					respawnTrackFraction,respawnCoverageFraction,false,tracker,fitModel);
 
-			return FactoryMotion2D.createVideoStitch(maxJumpFraction,motion,imageInfo.getDataType().getImageClass());
+			return FactoryMotion2D.createVideoStitch(maxJumpFraction,motion,imageInfo.getImageClass());
 		}
 	}
 

@@ -24,31 +24,31 @@ package boofcv.struct.image;
  *
  * @author Peter Abeles
  */
-public final class ImageTypeInfo <T extends ImageSingleBand> {
+public enum ImageTypeInfo {
 	/** Single Band Unsigned 8-bit image */
-	public static ImageTypeInfo<ImageUInt8> U8 = new ImageTypeInfo<ImageUInt8>(false,byte.class,ImageUInt8.class);
+	U8(false,byte.class),
 	/** Single Band Signed 8-bit image */
-	public static ImageTypeInfo<ImageSInt8> S8 = new ImageTypeInfo<ImageSInt8>(true,byte.class,ImageSInt8.class);
+	S8(true,byte.class),
 	/** Single Band Unsigned 16-bit image */
-	public static ImageTypeInfo<ImageUInt16> U16 = new ImageTypeInfo<ImageUInt16>(false,short.class,ImageUInt16.class);
+	U16(false,short.class),
 	/** Single Band Signed 16-bit integer image */
-	public static ImageTypeInfo<ImageSInt16> S16 = new ImageTypeInfo<ImageSInt16>(true,short.class,ImageSInt16.class);
+	S16(true,short.class),
 	/** Single Band Signed 32-bit integer image */
-	public static ImageTypeInfo<ImageSInt32> S32 = new ImageTypeInfo<ImageSInt32>(true,int.class,ImageSInt32.class);
+	S32(true,int.class),
 	/** Single Band Signed 64-bit integer image */
-	public static ImageTypeInfo<ImageSInt64> S64 = new ImageTypeInfo<ImageSInt64>(true,long.class,ImageSInt64.class);
+	S64(true,long.class),
 	/** Single Band 32-bit floating point image */
-	public static ImageTypeInfo<ImageFloat32> F32 = new ImageTypeInfo<ImageFloat32>(true,float.class,ImageFloat32.class);
+	F32(true,float.class),
 	/** Single Band 64-bit floating point image */
-	public static ImageTypeInfo<ImageFloat64> F64 = new ImageTypeInfo<ImageFloat64>(true,double.class,ImageFloat64.class);
+	F64(true,double.class),
 	/** Single Band 8-bit integer image */
-	public static ImageTypeInfo<ImageInt8> I8 = new ImageTypeInfo<ImageInt8>(byte.class,ImageInt8.class);
+	I8(byte.class),
 	/** Single Band 16-bit integer image */
-	public static ImageTypeInfo<ImageInt16> I16 = new ImageTypeInfo<ImageInt16>(short.class,ImageInt16.class);
+	I16(short.class),
 	/** Single Band Integer image */
-	public static ImageTypeInfo<ImageInteger> I = new ImageTypeInfo<ImageInteger>(true,ImageInteger.class);
+	I(true),
 	/** Single Band floating point image */
-	public static ImageTypeInfo<ImageFloat> F = new ImageTypeInfo<ImageFloat>(true,ImageFloat.class);
+	F(true);
 
 	private int numBits;
 	private boolean isAbstract;
@@ -58,7 +58,7 @@ public final class ImageTypeInfo <T extends ImageSingleBand> {
 	private double minValue;
 	private Class dataType;
 	private Class sumType;
-	private Class<T> imageClass;
+//	private Class<T> imageClass;
 
 	public static ImageTypeInfo classToType( Class imageClass ) {
 		if( imageClass == ImageUInt8.class )
@@ -89,24 +89,21 @@ public final class ImageTypeInfo <T extends ImageSingleBand> {
 			throw new RuntimeException("Add");
 	}
 
-	ImageTypeInfo( boolean isInteger , Class imageClass ) {
+	ImageTypeInfo( boolean isInteger ) {
 		this.isAbstract = true;
 		this.isInteger = isInteger;
-		this.imageClass = imageClass;
 	}
 
-	ImageTypeInfo(Class dataType , Class imageClass) {
+	ImageTypeInfo(Class dataType ) {
 		this.isAbstract = true;
 		this.dataType = dataType;
-		this.imageClass = imageClass;
 		configureByDataType(dataType);
 	}
 
-	ImageTypeInfo(boolean isSigned, Class<?> dataType , Class imageClass ) {
+	ImageTypeInfo(boolean isSigned, Class<?> dataType ) {
 		this.isAbstract = false;
 		this.isSigned = isSigned;
 		this.dataType = dataType;
-		this.imageClass = imageClass;
 
 		configureByDataType(dataType);
 	}
@@ -222,13 +219,6 @@ public final class ImageTypeInfo <T extends ImageSingleBand> {
 	 */
 	public Class getSumType() {
 		return sumType;
-	}
-
-	/**
-	 * The image class
-	 */
-	public Class<T> getImageClass() {
-		return imageClass;
 	}
 
 	/**

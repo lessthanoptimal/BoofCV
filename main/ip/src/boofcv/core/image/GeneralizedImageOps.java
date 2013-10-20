@@ -112,6 +112,16 @@ public class GeneralizedImageOps {
 	public static double get(ImageInterleaved img, int x, int y , int band ) {
 		if (img instanceof InterleavedU8) {
 			return ((InterleavedU8) img).getBand(x, y, band);
+		} else if (img instanceof InterleavedS8) {
+			return ((InterleavedS8) img).getBand(x, y, band);
+		} else if (img instanceof InterleavedS16) {
+			return ((InterleavedS16) img).getBand(x, y, band);
+		} else if (img instanceof InterleavedU16) {
+			return ((InterleavedU16) img).getBand(x, y, band);
+		} else if (img instanceof InterleavedS32) {
+			return ((InterleavedS32) img).getBand(x, y, band);
+		} else if (img instanceof InterleavedS64) {
+			return ((InterleavedS64) img).getBand(x, y, band);
 		} else if (img instanceof InterleavedF32) {
 			return ((InterleavedF32) img).getBand(x, y, band);
 		} else if (img instanceof InterleavedF64) {
@@ -143,6 +153,32 @@ public class GeneralizedImageOps {
 		} else if( type == ImageInteger.class ) {
 			// ImageInteger is a generic type, so just create something
 			return (T)new ImageSInt32(width,height);
+		}
+		throw new RuntimeException("Unknown type: "+type.getSimpleName());
+	}
+
+	public static <T extends ImageInterleaved> T createInterleaved(Class<T> type, int width, int height , int numBands) {
+		type = BoofTesting.convertGenericToSpecificType(type);
+
+		if (type == InterleavedU8.class) {
+			return (T)new InterleavedU8(width, height,numBands);
+		} else if (type == InterleavedS8.class) {
+			return (T)new InterleavedS8(width, height,numBands);
+		} else if (type == InterleavedU16.class) {
+			return (T)new InterleavedU16(width, height,numBands);
+		} else if (type == InterleavedS16.class) {
+			return (T)new InterleavedS16(width, height,numBands);
+		} else if (type == InterleavedS32.class) {
+			return (T)new InterleavedS32(width, height,numBands);
+		} else if (type == InterleavedS64.class) {
+			return (T)new InterleavedS64(width, height,numBands);
+		} else if (type == InterleavedF32.class) {
+			return (T)new InterleavedF32(width, height,numBands);
+		} else if (type == InterleavedF64.class) {
+			return (T)new InterleavedF64(width, height,numBands);
+		} else if( type == ImageInterleaved.class ) {
+			// ImageInteger is a generic type, so just create something
+			return (T)new InterleavedS32(width,height,numBands);
 		}
 		throw new RuntimeException("Unknown type: "+type.getSimpleName());
 	}

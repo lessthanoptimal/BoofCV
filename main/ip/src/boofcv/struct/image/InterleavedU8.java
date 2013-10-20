@@ -20,7 +20,7 @@ package boofcv.struct.image;
 
 /**
  * <p>
- * An image where the primitive type is a byte.
+ * An image where the primitive type is an unsigned byte.
  * </p>
  *
  * @author Peter Abeles
@@ -39,6 +39,11 @@ public class InterleavedU8 extends InterleavedI8 {
 	}
 
 	public InterleavedU8() {
+	}
+
+	@Override
+	public ImageTypeInfo getTypeInfo() {
+		return ImageTypeInfo.U8;
 	}
 
 	/**

@@ -28,7 +28,7 @@ public class TestTldFernClassifier {
 
 	ImageUInt8 input = new ImageUInt8(width,height);
 
-	InterpolatePixelS<ImageUInt8> interpolate = FactoryInterpolation.bilinearPixel(ImageUInt8.class);
+	InterpolatePixelS<ImageUInt8> interpolate = FactoryInterpolation.bilinearPixelS(ImageUInt8.class);
 
 	public TestTldFernClassifier() {
 		ImageMiscOps.fillUniform(input,rand,0,200);
@@ -186,7 +186,7 @@ public class TestTldFernClassifier {
 	}
 
 	private TldFernClassifier<ImageUInt8> createAlg() {
-		InterpolatePixelS<ImageUInt8> interpolate = FactoryInterpolation.bilinearPixel(ImageUInt8.class);
+		InterpolatePixelS<ImageUInt8> interpolate = FactoryInterpolation.bilinearPixelS(ImageUInt8.class);
 		return new TldFernClassifier<ImageUInt8>(rand,numFerns,8,numLearnRandom,10,interpolate);
 	}
 

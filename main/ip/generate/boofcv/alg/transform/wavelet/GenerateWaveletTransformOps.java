@@ -136,8 +136,8 @@ public class GenerateWaveletTransformOps extends CodeGeneratorBase {
 				"\t * an image is declared internally.\n" +
 				"\t */\n" +
 				"\tpublic static void transform1( WaveletDescription<WlCoef_"+genName+"> desc ,\n" +
-				"\t\t\t\t\t\t\t\t   "+imageIn.getImageName()+" input , "+imageOut.getImageName()+" output ,\n" +
-				"\t\t\t\t\t\t\t\t   "+imageOut.getImageName()+" storage )\n" +
+				"\t\t\t\t\t\t\t\t   "+imageIn.getSingleBandName()+" input , "+imageOut.getSingleBandName()+" output ,\n" +
+				"\t\t\t\t\t\t\t\t   "+imageOut.getSingleBandName()+" storage )\n" +
 				"\t{\n" +
 				"\t\tUtilWavelet.checkShape(input,output);\n" +
 				"\n" +
@@ -180,8 +180,8 @@ public class GenerateWaveletTransformOps extends CodeGeneratorBase {
 				"\t * @param numLevels Number of levels which should be computed in the transform.\n" +
 				"\t */\n" +
 				"\tpublic static void transformN( WaveletDescription<WlCoef_"+genName+"> desc ,\n" +
-				"\t\t\t\t\t\t\t\t   "+imageIn.getImageName()+" input , "+imageOut.getImageName()+" output ,\n" +
-				"\t\t\t\t\t\t\t\t   "+imageOut.getImageName()+" storage ,\n" +
+				"\t\t\t\t\t\t\t\t   "+imageIn.getSingleBandName()+" input , "+imageOut.getSingleBandName()+" output ,\n" +
+				"\t\t\t\t\t\t\t\t   "+imageOut.getSingleBandName()+" storage ,\n" +
 				"\t\t\t\t\t\t\t\t   int numLevels )\n" +
 				"\t{\n" +
 				"\t\tif( numLevels == 1 ) {\n" +
@@ -232,8 +232,8 @@ public class GenerateWaveletTransformOps extends CodeGeneratorBase {
 				"\t * @param maxValue Maximum allowed pixel value\n" +
 				"\t */\n" +
 				"\tpublic static void inverse1( WaveletDescription<WlCoef_"+genName+"> desc ,\n" +
-				"\t\t\t\t\t\t\t\t "+imageOut.getImageName()+" input , "+imageIn.getImageName()+" output ,\n" +
-				"\t\t\t\t\t\t\t\t "+imageIn.getImageName()+" storage , "+primitive+" minValue , "+primitive+" maxValue )\n" +
+				"\t\t\t\t\t\t\t\t "+imageOut.getSingleBandName()+" input , "+imageIn.getSingleBandName()+" output ,\n" +
+				"\t\t\t\t\t\t\t\t "+imageIn.getSingleBandName()+" storage , "+primitive+" minValue , "+primitive+" maxValue )\n" +
 				"\t{\n" +
 				"\t\tUtilWavelet.checkShape(output,input);\n" +
 				"\t\tWlCoef_"+genName+" coef = desc.getForward();\n" +
@@ -279,8 +279,8 @@ public class GenerateWaveletTransformOps extends CodeGeneratorBase {
 				"\t * @param maxValue Maximum allowed pixel value\n" +
 				"\t */\n" +
 				"\tpublic static void inverseN( WaveletDescription<WlCoef_"+genName+"> desc ,\n" +
-				"\t\t\t\t\t\t\t\t "+imageOut.getImageName()+" input , "+imageIn.getImageName()+" output ,\n" +
-				"\t\t\t\t\t\t\t\t "+imageOut.getImageName()+" storage,\n" +
+				"\t\t\t\t\t\t\t\t "+imageOut.getSingleBandName()+" input , "+imageIn.getSingleBandName()+" output ,\n" +
+				"\t\t\t\t\t\t\t\t "+imageOut.getSingleBandName()+" storage,\n" +
 				"\t\t\t\t\t\t\t\t int numLevels ,\n" +
 				"\t\t\t\t\t\t\t\t "+primitive+" minValue , "+primitive+" maxValue)\n" +
 				"\t{\n" +
@@ -304,8 +304,8 @@ public class GenerateWaveletTransformOps extends CodeGeneratorBase {
 				"\t\twidth += width%2;\n" +
 				"\t\theight += height%2;\n" +
 				"\n" +
-				"\t\t"+imageOut.getImageName()+" levelIn = input.subimage(0,0,width,height);\n" +
-				"\t\t"+imageIn.getImageName()+" levelOut = output.subimage(0,0,width,height);\n" +
+				"\t\t"+imageOut.getSingleBandName()+" levelIn = input.subimage(0,0,width,height);\n" +
+				"\t\t"+imageIn.getSingleBandName()+" levelOut = output.subimage(0,0,width,height);\n" +
 				"\t\tstorage.reshape(width,height);\n" +
 				"\t\tinverse1(desc,levelIn,levelOut, storage,"+MIN_VALUE+","+MAX_VALUE+");\n" +
 				"\n" +

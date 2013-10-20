@@ -59,7 +59,7 @@ public class BenchmarkImageDistort<T extends ImageSingleBand> {
 
 		public HomographyBilinear_F32(Homography2D_F32 affine) {
 			PixelTransform_F32 tran = new PixelTransformHomography_F32(affine);
-			InterpolatePixelS<T> interp = FactoryInterpolation.bilinearPixel(imageType);
+			InterpolatePixelS<T> interp = FactoryInterpolation.bilinearPixelS(imageType);
 			ImageBorder<T> border = FactoryImageBorder.general(imageType, BorderType.EXTENDED);
 			
 			alg = FactoryDistort.distort(interp, border, imageType);
@@ -77,7 +77,7 @@ public class BenchmarkImageDistort<T extends ImageSingleBand> {
 
 		public HomographyBilinearCrop_F32(Homography2D_F32 affine) {
 			PixelTransform_F32 tran = new PixelTransformHomography_F32(affine);
-			InterpolatePixelS<T> interp = FactoryInterpolation.bilinearPixel(imageType);
+			InterpolatePixelS<T> interp = FactoryInterpolation.bilinearPixelS(imageType);
 			ImageBorder<T> border = FactoryImageBorder.general(imageType, BorderType.EXTENDED);
 
 			alg = FactoryDistort.distort(interp,border,imageType);
@@ -95,7 +95,7 @@ public class BenchmarkImageDistort<T extends ImageSingleBand> {
 
 		public MapBilinear_F32( Homography2D_F32 homography ) {
 			PixelTransform_F32 tran = new PixelTransformHomography_F32(homography);
-			InterpolatePixelS<T> interp = FactoryInterpolation.bilinearPixel(imageType);
+			InterpolatePixelS<T> interp = FactoryInterpolation.bilinearPixelS(imageType);
 			ImageBorder<T> border = FactoryImageBorder.general(imageType, BorderType.EXTENDED);
 
 			alg = FactoryDistort.distortCached(interp,border,imageType);

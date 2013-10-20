@@ -82,8 +82,8 @@ public class GenerateConvolveNormalized_JustBorder extends CodeGeneratorBase  {
 		boolean isInteger = input.isInteger();
 
 		kernelType = isInteger ? "I32" : "F32";
-		inputType = input.getImageName();
-		outputType = output.getImageName();
+		inputType = input.getSingleBandName();
+		outputType = output.getSingleBandName();
 		kernelData = isInteger ? "int" : "float";
 		inputData = input.getDataType();
 		outputData = output.getDataType();

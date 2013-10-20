@@ -59,7 +59,7 @@ public class GenerateImplOrientationHistogram extends CodeGeneratorBase {
 				"\n" +
 				"import boofcv.alg.InputSanityCheck;\n" +
 				"import boofcv.alg.feature.describe.OrientationHistogram;\n" +
-				"import boofcv.struct.image."+imageType.getImageName()+";\n" +
+				"import boofcv.struct.image."+imageType.getSingleBandName()+";\n" +
 				"\n" +
 				"\n" +
 				"/**\n" +
@@ -73,7 +73,7 @@ public class GenerateImplOrientationHistogram extends CodeGeneratorBase {
 				" *\n" +
 				" * @author Peter Abeles\n" +
 				" */\n" +
-				"public class "+className+" extends OrientationHistogram<"+imageType.getImageName()+"> {\n" +
+				"public class "+className+" extends OrientationHistogram<"+imageType.getSingleBandName()+"> {\n" +
 				"\n" +
 				"\tpublic "+className+"(int numAngles , boolean isWeighted ) {\n" +
 				"\t\tsuper(numAngles,isWeighted);\n" +
@@ -88,8 +88,8 @@ public class GenerateImplOrientationHistogram extends CodeGeneratorBase {
 
 	private void printVarious() {
 		out.print("\t@Override\n" +
-				"\tpublic Class<"+imageType.getImageName()+"> getImageType() {\n" +
-				"\t\treturn "+imageType.getImageName()+".class;\n" +
+				"\tpublic Class<"+imageType.getSingleBandName()+"> getImageType() {\n" +
+				"\t\treturn "+imageType.getSingleBandName()+".class;\n" +
 				"\t}\n\n");
 	}
 

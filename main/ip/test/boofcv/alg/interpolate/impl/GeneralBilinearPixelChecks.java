@@ -37,7 +37,7 @@ public abstract class GeneralBilinearPixelChecks<T extends ImageSingleBand> exte
 
 	@Override
 	protected InterpolatePixelS<T> wrap(T image, int minValue, int maxValue) {
-		return FactoryInterpolation.bilinearPixel(image);
+		return FactoryInterpolation.bilinearPixelS(image);
 	}
 
 	@Override

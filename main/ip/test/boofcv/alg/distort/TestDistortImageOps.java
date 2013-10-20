@@ -56,7 +56,7 @@ public class TestDistortImageOps {
 
 		DistortImageOps.scale(input,output, TypeInterpolate.BILINEAR);
 
-		InterpolatePixelS<ImageFloat32> interp = FactoryInterpolation.bilinearPixel(input);
+		InterpolatePixelS<ImageFloat32> interp = FactoryInterpolation.bilinearPixelS(input);
 		interp.setImage(input);
 
 		float scaleX = (float)input.width/(float)output.width;

@@ -78,16 +78,20 @@ public abstract class StandardImageInterleavedTests {
 		ImageInterleaved img = createImage(10, 20, 3);
 		setRandom(img);
 
-		Object expected = createPixelArray(img);
-		Object orig = call(img, "get", 2, null, 1, 1);
+		for( int y = 0; y < img.height; y++ ) {
+			for( int x = 0; x < img.width; x++ ) {
+				Object expected = createPixelArray(img);
+				Object orig = call(img, "get", 2, null, x, y);
 
-		// make sure the two are not equal
-		assertFalse(compareArrays(expected, orig, img.getNumBands()));
+				// make sure the two are not equal
+				assertFalse(compareArrays(expected, orig, img.getNumBands()));
 
-		// set the expected to the point in the image
-		call(img, "set", 2, expected, 1, 1);
-		Object found = call(img, "get", 2, null, 1, 1);
-		assertTrue(compareArrays(expected, found, img.getNumBands()));
+				// set the expected to the point in the image
+				call(img, "set", 2, expected, x, y);
+				Object found = call(img, "get", 2, null, x, y);
+				assertTrue(compareArrays(expected, found, img.getNumBands()));
+			}
+		}
 	}
 
 	/**
@@ -98,16 +102,22 @@ public abstract class StandardImageInterleavedTests {
 		ImageInterleaved img = createImage(10, 20, 2);
 		setRandom(img);
 
-		Number expected = randomNumber();
-		Number orig = (Number) call(img, "getBand", 0, null, 1, 1, 0);
+		for( int y = 0; y < img.height; y++ ) {
+			for( int x = 0; x < img.width; x++ ) {
+				for( int b = 0; b < img.numBands; b++ ) {
+					Number expected = randomNumber();
+					Number orig = (Number) call(img, "getBand", 0, null, x, y, b);
 
-		// make sure the two are not equal
-		assertFalse(expected.equals(orig));
+					// make sure the two are not equal
+					assertFalse(expected.equals(orig));
 
-		// set the expected to the point in the image
-		call(img, "setBand", 1, expected, 1, 1, 0);
-		Number found = (Number) call(img, "getBand", 0, null, 1, 1, 0);
-		assertTrue(getNumber(expected).doubleValue() == found.doubleValue() );
+					// set the expected to the point in the image
+					call(img, "setBand", 1, expected, x, y, b);
+					Number found = (Number) call(img, "getBand", 0, null, x, y, b);
+					assertTrue(getNumber(expected).doubleValue() == found.doubleValue() );
+				}
+			}
+		}
 	}
 
 	/**
@@ -170,6 +180,8 @@ public abstract class StandardImageInterleavedTests {
 				args[index] = typeData;
 			} else if (type == 2) {
 				String name = "[" + img.getDataType().getName().toUpperCase().charAt(0);
+				if( name.charAt(1) == 'L')
+					name = "[J";
 				paramTypes[index] = Class.forName(name);
 				args[index] = typeData;
 			}

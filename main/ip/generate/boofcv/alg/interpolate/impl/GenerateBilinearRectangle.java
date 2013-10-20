@@ -64,8 +64,8 @@ public class GenerateBilinearRectangle extends CodeGeneratorBase {
 		out.print("package boofcv.alg.interpolate.impl;\n");
 		out.println();
 		out.print("import boofcv.alg.interpolate.InterpolateRectangle;\n" +
-				"import boofcv.struct.image."+image.getImageName()+";\n");
-		if( image.getImageName().compareTo("ImageFloat32") != 0 )
+				"import boofcv.struct.image."+image.getSingleBandName()+";\n");
+		if( image.getSingleBandName().compareTo("ImageFloat32") != 0 )
 			out.println("import boofcv.struct.image.ImageFloat32;");
 		out.println();
 		out.println();
@@ -81,14 +81,14 @@ public class GenerateBilinearRectangle extends CodeGeneratorBase {
 				" *\n" +
 				" * @author Peter Abeles\n" +
 				" */\n" +
-				"public class "+className+" implements InterpolateRectangle<"+image.getImageName()+"> {\n" +
+				"public class "+className+" implements InterpolateRectangle<"+image.getSingleBandName()+"> {\n" +
 				"\n" +
-				"\tprivate "+image.getImageName()+" orig;\n" +
+				"\tprivate "+image.getSingleBandName()+" orig;\n" +
 				"\n" +
 				"\tprivate "+image.getDataType()+" data[];\n" +
 				"\tprivate int stride;\n" +
 				"\n" +
-				"\tpublic "+className+"("+image.getImageName()+" image) {\n" +
+				"\tpublic "+className+"("+image.getSingleBandName()+" image) {\n" +
 				"\t\tsetImage(image);\n" +
 				"\t}\n" +
 				"\n" +
@@ -101,14 +101,14 @@ public class GenerateBilinearRectangle extends CodeGeneratorBase {
 		String bitWise = image.getBitWise();
 
 		out.print("\t@Override\n" +
-				"\tpublic void setImage("+image.getImageName()+" image) {\n" +
+				"\tpublic void setImage("+image.getSingleBandName()+" image) {\n" +
 				"\t\tthis.orig = image;\n" +
 				"\t\tthis.data = orig.data;\n" +
 				"\t\tthis.stride = orig.getStride();\n" +
 				"\t}\n" +
 				"\n" +
 				"\t@Override\n" +
-				"\tpublic "+image.getImageName()+" getImage() {\n" +
+				"\tpublic "+image.getSingleBandName()+" getImage() {\n" +
 				"\t\treturn orig;\n" +
 				"\t}\n" +
 				"\n" +

@@ -62,7 +62,7 @@ public class CreateSyntheticOverheadViewMS<T extends ImageSingleBand>
 	public CreateSyntheticOverheadViewMS( TypeInterpolate type , int numBands , Class<T> imageType ) {
 		this.interp = new InterpolatePixelS[numBands];
 		for( int i = 0; i < numBands; i++ ) {
-			interp[i] = FactoryInterpolation.createPixel(0,255,type,imageType);
+			interp[i] = FactoryInterpolation.createPixelS(0, 255, type, imageType);
 		}
 		output = new GImageSingleBand[interp.length];
 	}

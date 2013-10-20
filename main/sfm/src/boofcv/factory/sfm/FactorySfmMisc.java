@@ -36,12 +36,12 @@ public class FactorySfmMisc {
 
 	public static <T extends ImageBase> CreateSyntheticOverheadView<T> createOverhead( ImageDataType<T> imageType ) {
 
-		Class classType = imageType.getDataType().getImageClass();
+		Class classType = imageType.getImageClass();
 
 		switch( imageType.getFamily() ) {
 			case SINGLE_BAND:
 			{
-				InterpolatePixelS interp = FactoryInterpolation.bilinearPixel(classType);
+				InterpolatePixelS interp = FactoryInterpolation.bilinearPixelS(classType);
 				return new CreateSyntheticOverheadViewS(interp);
 			}
 

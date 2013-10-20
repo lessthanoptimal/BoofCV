@@ -79,7 +79,7 @@ public class GenerateImplEnhanceHistogram extends CodeGeneratorBase {
 		String typecast = image.getTypeCastFromSum();
 		String bitwise = image.getBitWise();
 
-		out.print("\tpublic static void applyTransform( "+image.getImageName()+" input , int transform[] , "+image.getImageName()+" output ) {\n" +
+		out.print("\tpublic static void applyTransform( "+image.getSingleBandName()+" input , int transform[] , "+image.getSingleBandName()+" output ) {\n" +
 				"\t\tfor( int i = 0; i < input.height; i++ ) {\n" +
 				"\t\t\tint indexInput = input.startIndex + i*input.stride;\n" +
 				"\t\t\tint indexOutput = output.startIndex + i*output.stride;\n" +
@@ -94,7 +94,7 @@ public class GenerateImplEnhanceHistogram extends CodeGeneratorBase {
 	private void applyTransform_S( AutoTypeImage image ) {
 		String typecast = image.getTypeCastFromSum();
 
-		out.print("\tpublic static void applyTransform( "+image.getImageName()+" input , int transform[] , int minValue , "+image.getImageName()+" output ) {\n" +
+		out.print("\tpublic static void applyTransform( "+image.getSingleBandName()+" input , int transform[] , int minValue , "+image.getSingleBandName()+" output ) {\n" +
 				"\t\tfor( int i = 0; i < input.height; i++ ) {\n" +
 				"\t\t\tint indexInput = input.startIndex + i*input.stride;\n" +
 				"\t\t\tint indexOutput = output.startIndex + i*output.stride;\n" +
@@ -107,7 +107,7 @@ public class GenerateImplEnhanceHistogram extends CodeGeneratorBase {
 	}
 
 	private void equalizeLocalNaive( AutoTypeImage image ) {
-		String name = image.getImageName();
+		String name = image.getSingleBandName();
 		String typecast = image.getTypeCastFromSum();
 		String bitwise = image.getBitWise();
 
@@ -173,7 +173,7 @@ public class GenerateImplEnhanceHistogram extends CodeGeneratorBase {
 	}
 
 	private void equalizeLocalInner( AutoTypeImage image ) {
-		String name = image.getImageName();
+		String name = image.getSingleBandName();
 		String typecast = image.getTypeCastFromSum();
 		String bitwise = image.getBitWise();
 
@@ -236,7 +236,7 @@ public class GenerateImplEnhanceHistogram extends CodeGeneratorBase {
 	}
 
 	private void equalizeLocalRow( AutoTypeImage image ) {
-		String name = image.getImageName();
+		String name = image.getSingleBandName();
 		String typecast = image.getTypeCastFromSum();
 		String bitwise = image.getBitWise();
 
@@ -337,7 +337,7 @@ public class GenerateImplEnhanceHistogram extends CodeGeneratorBase {
 	}
 
 	private void equalizeLocalCol( AutoTypeImage image ) {
-		String name = image.getImageName();
+		String name = image.getSingleBandName();
 		String typecast = image.getTypeCastFromSum();
 		String bitwise = image.getBitWise();
 
@@ -409,7 +409,7 @@ public class GenerateImplEnhanceHistogram extends CodeGeneratorBase {
 	}
 
 	private void localHistogram( AutoTypeImage image ) {
-		String name = image.getImageName();
+		String name = image.getSingleBandName();
 		String bitwise = image.getBitWise();
 
 		out.print("\t/**\n" +

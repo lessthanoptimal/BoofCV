@@ -52,6 +52,22 @@ public class GImageMiscOps {
 			} else {
 				throw new IllegalArgumentException("Unknown image Type: "+input.getClass().getSimpleName());
 			}
+		} else if( input instanceof ImageInterleaved ) {
+			if( InterleavedI8.class.isAssignableFrom(input.getClass()) ) {
+				ImageMiscOps.fill((InterleavedI8)input,(int)value);
+			} else if( InterleavedI16.class.isAssignableFrom(input.getClass()) ) {
+				ImageMiscOps.fill((InterleavedI16)input,(int)value);
+			} else if( InterleavedS32.class == input.getClass() ) {
+				ImageMiscOps.fill((InterleavedS32)input,(int)value);
+			} else if( InterleavedS64.class == input.getClass() ) {
+				ImageMiscOps.fill((InterleavedS64)input,(long)value);
+			} else if( InterleavedF32.class == input.getClass() ) {
+				ImageMiscOps.fill((InterleavedF32)input,(float)value);
+			} else if( InterleavedF64.class == input.getClass() ) {
+				ImageMiscOps.fill((InterleavedF64)input,value);
+			} else {
+				throw new IllegalArgumentException("Unknown image Type: "+input.getClass().getSimpleName());
+			}
 		} else if( input instanceof MultiSpectral ) {
 			MultiSpectral m = (MultiSpectral)input;
 			for( int i = 0; i < m.getNumBands(); i++ )
@@ -190,6 +206,22 @@ public class GImageMiscOps {
 				ImageMiscOps.fillUniform((ImageFloat32) input, rand, (float)min, (float) max);
 			} else if( ImageFloat64.class == input.getClass() ) {
 				ImageMiscOps.fillUniform((ImageFloat64) input, rand, min,  max);
+			} else {
+				throw new IllegalArgumentException("Unknown image Type: "+input.getClass().getSimpleName());
+			}
+		} else if( input instanceof ImageInterleaved ) {
+			if( InterleavedI8.class.isAssignableFrom(input.getClass()) ) {
+				ImageMiscOps.fillUniform((InterleavedI8)input,rand, (int) min, (int) max);
+			} else if( InterleavedI16.class.isAssignableFrom(input.getClass()) ) {
+				ImageMiscOps.fillUniform((InterleavedI16)input,rand, (int) min, (int) max);
+			} else if( InterleavedS32.class == input.getClass() ) {
+				ImageMiscOps.fillUniform((InterleavedS32)input,rand, (int) min, (int) max);
+			} else if( InterleavedS64.class == input.getClass() ) {
+				ImageMiscOps.fillUniform((InterleavedS64)input,rand, (long) min, (long) max);
+			} else if( InterleavedF32.class == input.getClass() ) {
+				ImageMiscOps.fillUniform((InterleavedF32)input,rand, (float)min, (float) max);
+			} else if( InterleavedF64.class == input.getClass() ) {
+				ImageMiscOps.fillUniform((InterleavedF64)input,rand, min,  max);
 			} else {
 				throw new IllegalArgumentException("Unknown image Type: "+input.getClass().getSimpleName());
 			}
