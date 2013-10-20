@@ -48,7 +48,7 @@ public class ImageSInt16 extends ImageInt16<ImageSInt16> {
 	}
 
 	@Override
-	public ImageTypeInfo<ImageSInt16> getTypeInfo() {
+	public ImageTypeInfo getTypeInfo() {
 		return ImageTypeInfo.S16;
 	}
 

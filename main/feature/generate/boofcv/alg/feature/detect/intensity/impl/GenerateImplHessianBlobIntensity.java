@@ -70,7 +70,7 @@ public class GenerateImplHessianBlobIntensity extends CodeGeneratorBase {
 	}
 
 	private void printDeterminant() {
-		String derivName = derivType.getImageName();
+		String derivName = derivType.getSingleBandName();
 		String sumType = derivType.getSumType();
 		String bitWise = derivType.getBitWise();
 
@@ -101,7 +101,7 @@ public class GenerateImplHessianBlobIntensity extends CodeGeneratorBase {
 	}
 
 	private void printTrace() {
-		String derivName = derivType.getImageName();
+		String derivName = derivType.getSingleBandName();
 		String sumType = derivType.getSumType();
 		String bitWise = derivType.getBitWise();
 

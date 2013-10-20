@@ -66,7 +66,7 @@ public class TestImplPolynomialPixel_F32 extends GeneralChecksInterpolationPixel
 		distorter.setModel(new PixelTransformAffine_F32(tran));
 		distorter.apply(img,found);
 
-		InterpolatePixelS<ImageFloat32> bilinear = FactoryInterpolation.bilinearPixel(ImageFloat32.class);
+		InterpolatePixelS<ImageFloat32> bilinear = FactoryInterpolation.bilinearPixelS(ImageFloat32.class);
 
 		distorter = FactoryDistort.distort(bilinear, border, ImageFloat32.class);
 		distorter.setModel(new PixelTransformAffine_F32(tran));

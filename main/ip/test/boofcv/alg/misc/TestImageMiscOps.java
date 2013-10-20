@@ -21,6 +21,8 @@ package boofcv.alg.misc;
 import boofcv.core.image.FactoryGImageSingleBand;
 import boofcv.core.image.GImageSingleBand;
 import boofcv.core.image.GeneralizedImageOps;
+import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageInterleaved;
 import boofcv.struct.image.ImageSingleBand;
 import org.junit.Test;
 
@@ -39,11 +41,12 @@ public class TestImageMiscOps {
 
 	int width = 10;
 	int height = 15;
+	int numBands = 3;
 	Random rand = new Random(234);
 
 	@Test
 	public void checkAll() {
-		int numExpected = 6*6 + 8*2;
+		int numExpected = 8*6 + 8*2;
 		Method methods[] = ImageMiscOps.class.getMethods();
 
 		// sanity check to make sure the functions are being found
@@ -93,10 +96,19 @@ public class TestImageMiscOps {
 		if( param.length < 1 )
 			return false;
 
-		return ImageSingleBand.class.isAssignableFrom(param[0]);
+		return ImageBase.class.isAssignableFrom(param[0]);
 	}
 
 	private void testFill( Method m ) throws InvocationTargetException, IllegalAccessException {
+		Class paramTypes[] = m.getParameterTypes();
+		if( ImageSingleBand.class.isAssignableFrom(paramTypes[0])) {
+			testFill_Single(m);
+		} else {
+			testFill_Interleaved(m);
+		}
+	}
+
+	private void testFill_Single( Method m ) throws InvocationTargetException, IllegalAccessException {
 		Class paramTypes[] = m.getParameterTypes();
 		ImageSingleBand orig = GeneralizedImageOps.createSingleBand(paramTypes[0], width, height);
 		GImageMiscOps.fillUniform(orig, rand, 0,20);
@@ -111,6 +123,27 @@ public class TestImageMiscOps {
 		for( int i = 0; i < height; i++ ) {
 			for( int j = 0; j < width; j++ ) {
 				assertEquals(10.0,a.get(j,i).doubleValue(),1e-4);
+			}
+		}
+	}
+
+	private void testFill_Interleaved(Method m) throws InvocationTargetException, IllegalAccessException {
+		Class paramTypes[] = m.getParameterTypes();
+		ImageInterleaved orig = GeneralizedImageOps.createInterleaved(paramTypes[0], width, height, numBands);
+		GImageMiscOps.fillUniform(orig, rand, 0,20);
+
+		if( orig.getTypeInfo().isInteger()) {
+			m.invoke(null,orig,10);
+		} else {
+			m.invoke(null,orig,10.0f);
+		}
+
+		for( int i = 0; i < height; i++ ) {
+			for( int j = 0; j < width; j++ ) {
+				for( int band = 0; band < numBands; band++ ) {
+					double value = GeneralizedImageOps.get(orig,j,i,band);
+					assertEquals(10.0,value,1e-4);
+				}
 			}
 		}
 	}
@@ -164,7 +197,16 @@ public class TestImageMiscOps {
 		}
 	}
 
-	private void testFillUniform(Method m) throws InvocationTargetException, IllegalAccessException {
+	private void testFillUniform( Method m ) throws InvocationTargetException, IllegalAccessException {
+		Class paramTypes[] = m.getParameterTypes();
+		if( ImageSingleBand.class.isAssignableFrom(paramTypes[0])) {
+			testFillUniform_Single(m);
+		} else {
+			testFillUniform_Interleaved(m);
+		}
+	}
+
+	private void testFillUniform_Single(Method m) throws InvocationTargetException, IllegalAccessException {
 		Class paramTypes[] = m.getParameterTypes();
 		ImageSingleBand orig = GeneralizedImageOps.createSingleBand(paramTypes[0], width, height);
 
@@ -191,6 +233,36 @@ public class TestImageMiscOps {
 		}
 
 		assertTrue( numZero < width*height );
+	}
+
+	private void testFillUniform_Interleaved(Method m) throws InvocationTargetException, IllegalAccessException {
+		Class paramTypes[] = m.getParameterTypes();
+		ImageInterleaved orig = GeneralizedImageOps.createInterleaved(paramTypes[0], width, height, numBands);
+
+		if( orig.getTypeInfo().isInteger() ) {
+			if( orig.getTypeInfo().isSigned() )
+				m.invoke(null,orig,rand,-10,10);
+			else {
+				m.invoke(null,orig,rand,1,10);
+			}
+		} else {
+			m.invoke(null,orig,rand,-10,10);
+		}
+
+		int numZero = 0;
+
+		for( int i = 0; i < height; i++ ) {
+			for( int j = 0; j < width; j++ ) {
+				for( int band = 0; band < numBands; band++ ) {
+					double value = GeneralizedImageOps.get(orig,j,i,band);
+					assertTrue("value = "+value,value>=-10 && value < 10);
+					if( value == 0 )
+						numZero++;
+				}
+			}
+		}
+
+		assertTrue( numZero < width*height*numBands );
 	}
 
 	private void testFillGaussian(Method m) throws InvocationTargetException, IllegalAccessException {

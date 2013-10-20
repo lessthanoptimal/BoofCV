@@ -142,7 +142,7 @@ public class FactoryMotion2D {
 			transform = FactoryStitchingTransform.createHomography_F64();
 		}
 
-		InterpolatePixelS<I> interp = FactoryInterpolation.createPixel(0, 255, TypeInterpolate.BILINEAR, imageType);
+		InterpolatePixelS<I> interp = FactoryInterpolation.createPixelS(0, 255, TypeInterpolate.BILINEAR, imageType);
 		ImageDistort<I> distorter = FactoryDistort.distort(interp, null, imageType);
 
 		return new StitchingFromMotion2D<I, IT>(motion2D,distorter,transform,maxJumpFraction );
@@ -171,7 +171,7 @@ public class FactoryMotion2D {
 			transform = FactoryStitchingTransform.createHomography_F64();
 		}
 
-		InterpolatePixelS<I> interp = FactoryInterpolation.createPixel(0, 255, TypeInterpolate.BILINEAR, imageType);
+		InterpolatePixelS<I> interp = FactoryInterpolation.createPixelS(0, 255, TypeInterpolate.BILINEAR, imageType);
 		ImageDistort<MultiSpectral<I>> distorter = FactoryDistort.distortMS(interp, null, imageType);
 
 		return new StitchingFromMotion2D<MultiSpectral<I>, IT>(motion2D,distorter,transform,maxJumpFraction );

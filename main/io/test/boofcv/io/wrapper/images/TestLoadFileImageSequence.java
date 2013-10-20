@@ -21,6 +21,7 @@ package boofcv.io.wrapper.images;
 import boofcv.io.UtilIO;
 import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageTypeInfo;
 import org.junit.Test;
 
 import java.awt.image.BufferedImage;
@@ -42,7 +43,7 @@ public class TestLoadFileImageSequence {
 
 
 		assertTrue(alg.getImageType().getFamily() == ImageDataType.Family.SINGLE_BAND);
-		assertTrue(ImageFloat32.class == alg.getImageType().getDataType().getImageClass());
+		assertTrue(ImageTypeInfo.F32 == alg.getImageType().getDataType());
 		assertTrue(!alg.isLoop());
 
 		int total = 0;

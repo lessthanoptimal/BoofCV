@@ -36,6 +36,10 @@ public class InterpolatePixel_S_to_MB_MultiSpectral<T extends ImageSingleBand>
 
 	MultiSpectral<T> image;
 
+	public InterpolatePixel_S_to_MB_MultiSpectral(InterpolatePixelS<T> alg) {
+		this.alg = alg;
+	}
+
 	@Override
 	public void get(float x, float y, float[] values) {
 		final int N = image.getNumBands();

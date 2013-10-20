@@ -40,7 +40,7 @@ public class GenerateSelectRectBasicWta extends CodeGeneratorBase {
 	}
 
 	public void createFile( boolean isFloat , AutoTypeImage disparity ) throws FileNotFoundException {
-		typeDisparity = disparity.getImageName();
+		typeDisparity = disparity.getSingleBandName();
 		dataType = disparity.getDataType();
 		if( isFloat ) {
 			sumType = "float";

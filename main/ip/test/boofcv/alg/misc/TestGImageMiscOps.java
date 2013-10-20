@@ -47,7 +47,12 @@ public class TestGImageMiscOps extends BaseGClassChecksInMisc{
 		Class<?> param[] = validation.getParameterTypes();
 		String name = candidate.getName();
 
-		ImageSingleBand inputA = GeneralizedImageOps.createSingleBand((Class) param[0], width, height);
+		ImageBase inputA;
+
+		if( ImageSingleBand.class.isAssignableFrom(param[0]))
+			inputA = GeneralizedImageOps.createSingleBand((Class) param[0], width, height);
+		else
+			inputA = GeneralizedImageOps.createInterleaved((Class) param[0], width, height, numBands);
 
 		Object[][] ret = new Object[1][param.length];
 

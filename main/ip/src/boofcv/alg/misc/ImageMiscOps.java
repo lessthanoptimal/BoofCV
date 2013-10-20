@@ -49,6 +49,23 @@ public class ImageMiscOps {
 	}
 
 	/**
+	 * Fills the whole image with the specified value
+	 *
+	 * @param input An image.
+	 * @param value The value that the image is being filled with.
+	 */
+	public static void fill(InterleavedI8 input, int value) {
+
+		for (int y = 0; y < input.height; y++) {
+			int index = input.getStartIndex() + y * input.getStride();
+			int end = index + input.width*input.numBands;
+			for (; index < end; index++ ) {
+				input.data[index] = (byte)value;
+			}
+		}
+	}
+
+	/**
 	 * Fills the outside border with the specified value
 	 *
 	 * @param input An image.
@@ -127,6 +144,28 @@ public class ImageMiscOps {
 	}
 
 	/**
+	 * Sets each value in the image to a value drawn from an uniform distribution that has a range of min <= X < max.
+	 *
+	 * @param img Image which is to be filled.  Modified,
+	 * @param rand Random number generator
+	 * @param min Minimum value of the distribution, inclusive
+	 * @param max Maximum value of the distribution, exclusive
+	 */
+	public static void fillUniform(InterleavedI8 img, Random rand , int min , int max) {
+		int range = max-min;
+
+		byte[] data = img.data;
+
+		for (int y = 0; y < img.height; y++) {
+			int index = img.getStartIndex() + y * img.getStride();
+			int end = index + img.width*img.numBands;
+			for (; index <  end; index++) {
+				data[index] = (byte)(rand.nextInt(range)+min);
+			}
+		}
+	}
+
+	/**
 	 * Sets each value in the image to a value drawn from a Gaussian distribution.  A user
 	 * specified lower and upper bound is provided to ensure that the values are within a legal
 	 * range.  A drawn value outside the allowed range will be set to the closest bound.
@@ -184,6 +223,23 @@ public class ImageMiscOps {
 			int index = input.getStartIndex() + y * input.getStride();
 			for (int x = 0; x < input.width; x++) {
 				input.data[index++] = (short)value;
+			}
+		}
+	}
+
+	/**
+	 * Fills the whole image with the specified value
+	 *
+	 * @param input An image.
+	 * @param value The value that the image is being filled with.
+	 */
+	public static void fill(InterleavedI16 input, int value) {
+
+		for (int y = 0; y < input.height; y++) {
+			int index = input.getStartIndex() + y * input.getStride();
+			int end = index + input.width*input.numBands;
+			for (; index < end; index++ ) {
+				input.data[index] = (short)value;
 			}
 		}
 	}
@@ -267,6 +323,28 @@ public class ImageMiscOps {
 	}
 
 	/**
+	 * Sets each value in the image to a value drawn from an uniform distribution that has a range of min <= X < max.
+	 *
+	 * @param img Image which is to be filled.  Modified,
+	 * @param rand Random number generator
+	 * @param min Minimum value of the distribution, inclusive
+	 * @param max Maximum value of the distribution, exclusive
+	 */
+	public static void fillUniform(InterleavedI16 img, Random rand , int min , int max) {
+		int range = max-min;
+
+		short[] data = img.data;
+
+		for (int y = 0; y < img.height; y++) {
+			int index = img.getStartIndex() + y * img.getStride();
+			int end = index + img.width*img.numBands;
+			for (; index <  end; index++) {
+				data[index] = (short)(rand.nextInt(range)+min);
+			}
+		}
+	}
+
+	/**
 	 * Sets each value in the image to a value drawn from a Gaussian distribution.  A user
 	 * specified lower and upper bound is provided to ensure that the values are within a legal
 	 * range.  A drawn value outside the allowed range will be set to the closest bound.
@@ -324,6 +402,23 @@ public class ImageMiscOps {
 			int index = input.getStartIndex() + y * input.getStride();
 			for (int x = 0; x < input.width; x++) {
 				input.data[index++] = value;
+			}
+		}
+	}
+
+	/**
+	 * Fills the whole image with the specified value
+	 *
+	 * @param input An image.
+	 * @param value The value that the image is being filled with.
+	 */
+	public static void fill(InterleavedS32 input, int value) {
+
+		for (int y = 0; y < input.height; y++) {
+			int index = input.getStartIndex() + y * input.getStride();
+			int end = index + input.width*input.numBands;
+			for (; index < end; index++ ) {
+				input.data[index] = value;
 			}
 		}
 	}
@@ -407,6 +502,28 @@ public class ImageMiscOps {
 	}
 
 	/**
+	 * Sets each value in the image to a value drawn from an uniform distribution that has a range of min <= X < max.
+	 *
+	 * @param img Image which is to be filled.  Modified,
+	 * @param rand Random number generator
+	 * @param min Minimum value of the distribution, inclusive
+	 * @param max Maximum value of the distribution, exclusive
+	 */
+	public static void fillUniform(InterleavedS32 img, Random rand , int min , int max) {
+		int range = max-min;
+
+		int[] data = img.data;
+
+		for (int y = 0; y < img.height; y++) {
+			int index = img.getStartIndex() + y * img.getStride();
+			int end = index + img.width*img.numBands;
+			for (; index <  end; index++) {
+				data[index] = (rand.nextInt(range)+min);
+			}
+		}
+	}
+
+	/**
 	 * Sets each value in the image to a value drawn from a Gaussian distribution.  A user
 	 * specified lower and upper bound is provided to ensure that the values are within a legal
 	 * range.  A drawn value outside the allowed range will be set to the closest bound.
@@ -464,6 +581,23 @@ public class ImageMiscOps {
 			int index = input.getStartIndex() + y * input.getStride();
 			for (int x = 0; x < input.width; x++) {
 				input.data[index++] = value;
+			}
+		}
+	}
+
+	/**
+	 * Fills the whole image with the specified value
+	 *
+	 * @param input An image.
+	 * @param value The value that the image is being filled with.
+	 */
+	public static void fill(InterleavedS64 input, long value) {
+
+		for (int y = 0; y < input.height; y++) {
+			int index = input.getStartIndex() + y * input.getStride();
+			int end = index + input.width*input.numBands;
+			for (; index < end; index++ ) {
+				input.data[index] = value;
 			}
 		}
 	}
@@ -547,6 +681,28 @@ public class ImageMiscOps {
 	}
 
 	/**
+	 * Sets each value in the image to a value drawn from an uniform distribution that has a range of min <= X < max.
+	 *
+	 * @param img Image which is to be filled.  Modified,
+	 * @param rand Random number generator
+	 * @param min Minimum value of the distribution, inclusive
+	 * @param max Maximum value of the distribution, exclusive
+	 */
+	public static void fillUniform(InterleavedS64 img, Random rand , long min , long max) {
+		long range = max-min;
+
+		long[] data = img.data;
+
+		for (int y = 0; y < img.height; y++) {
+			int index = img.getStartIndex() + y * img.getStride();
+			int end = index + img.width*img.numBands;
+			for (; index <  end; index++) {
+				data[index] = rand.nextInt((int)range)+min;
+			}
+		}
+	}
+
+	/**
 	 * Sets each value in the image to a value drawn from a Gaussian distribution.  A user
 	 * specified lower and upper bound is provided to ensure that the values are within a legal
 	 * range.  A drawn value outside the allowed range will be set to the closest bound.
@@ -604,6 +760,23 @@ public class ImageMiscOps {
 			int index = input.getStartIndex() + y * input.getStride();
 			for (int x = 0; x < input.width; x++) {
 				input.data[index++] = value;
+			}
+		}
+	}
+
+	/**
+	 * Fills the whole image with the specified value
+	 *
+	 * @param input An image.
+	 * @param value The value that the image is being filled with.
+	 */
+	public static void fill(InterleavedF32 input, float value) {
+
+		for (int y = 0; y < input.height; y++) {
+			int index = input.getStartIndex() + y * input.getStride();
+			int end = index + input.width*input.numBands;
+			for (; index < end; index++ ) {
+				input.data[index] = value;
 			}
 		}
 	}
@@ -687,6 +860,28 @@ public class ImageMiscOps {
 	}
 
 	/**
+	 * Sets each value in the image to a value drawn from an uniform distribution that has a range of min <= X < max.
+	 *
+	 * @param img Image which is to be filled.  Modified,
+	 * @param rand Random number generator
+	 * @param min Minimum value of the distribution, inclusive
+	 * @param max Maximum value of the distribution, exclusive
+	 */
+	public static void fillUniform(InterleavedF32 img, Random rand , float min , float max) {
+		float range = max-min;
+
+		float[] data = img.data;
+
+		for (int y = 0; y < img.height; y++) {
+			int index = img.getStartIndex() + y * img.getStride();
+			int end = index + img.width*img.numBands;
+			for (; index <  end; index++) {
+				data[index] = rand.nextFloat()*range+min;
+			}
+		}
+	}
+
+	/**
 	 * Sets each value in the image to a value drawn from a Gaussian distribution.  A user
 	 * specified lower and upper bound is provided to ensure that the values are within a legal
 	 * range.  A drawn value outside the allowed range will be set to the closest bound.
@@ -744,6 +939,23 @@ public class ImageMiscOps {
 			int index = input.getStartIndex() + y * input.getStride();
 			for (int x = 0; x < input.width; x++) {
 				input.data[index++] = value;
+			}
+		}
+	}
+
+	/**
+	 * Fills the whole image with the specified value
+	 *
+	 * @param input An image.
+	 * @param value The value that the image is being filled with.
+	 */
+	public static void fill(InterleavedF64 input, double value) {
+
+		for (int y = 0; y < input.height; y++) {
+			int index = input.getStartIndex() + y * input.getStride();
+			int end = index + input.width*input.numBands;
+			for (; index < end; index++ ) {
+				input.data[index] = value;
 			}
 		}
 	}
@@ -822,6 +1034,28 @@ public class ImageMiscOps {
 			int index = img.getStartIndex() + y * img.getStride();
 			for (int x = 0; x < img.width; x++) {
 				data[index++] = rand.nextDouble()*range+min;
+			}
+		}
+	}
+
+	/**
+	 * Sets each value in the image to a value drawn from an uniform distribution that has a range of min <= X < max.
+	 *
+	 * @param img Image which is to be filled.  Modified,
+	 * @param rand Random number generator
+	 * @param min Minimum value of the distribution, inclusive
+	 * @param max Maximum value of the distribution, exclusive
+	 */
+	public static void fillUniform(InterleavedF64 img, Random rand , double min , double max) {
+		double range = max-min;
+
+		double[] data = img.data;
+
+		for (int y = 0; y < img.height; y++) {
+			int index = img.getStartIndex() + y * img.getStride();
+			int end = index + img.width*img.numBands;
+			for (; index <  end; index++) {
+				data[index] = rand.nextDouble()*range+min;
 			}
 		}
 	}

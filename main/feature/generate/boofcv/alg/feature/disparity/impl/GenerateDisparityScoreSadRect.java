@@ -42,7 +42,7 @@ public class GenerateDisparityScoreSadRect extends CodeGeneratorBase {
 
 	public void createFile( AutoTypeImage image ) throws FileNotFoundException {
 		setOutputFile("ImplDisparityScoreSadRect_"+image.getAbbreviatedType());
-		typeInput = image.getImageName();
+		typeInput = image.getSingleBandName();
 		bitWise = image.getBitWise();
 		sumType = image.getSumType();
 

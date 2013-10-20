@@ -63,7 +63,7 @@ public class GenerateImplPolynomialPixel extends CodeGeneratorBase {
 				" * \n" +
 				" * @author Peter Abeles\n" +
 				" */\n" +
-				"public class "+className+" extends PolynomialPixel<"+image.getImageName()+"> {\n" +
+				"public class "+className+" extends PolynomialPixel<"+image.getSingleBandName()+"> {\n" +
 				"\n" +
 				"\tpublic "+className+"(int maxDegree, float min, float max) {\n" +
 				"\t\tsuper(maxDegree, min, max);\n" +

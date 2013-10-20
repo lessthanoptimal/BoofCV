@@ -81,7 +81,7 @@ public class GenerateImplConvolveMean {
 		String sumType = imageIn.getSumType();
 		String bitWise = imageIn.getBitWise();
 
-		out.print("\tpublic static void horizontal( " + imageIn.getImageName() + " input , " + imageOut.getImageName() + " output , int radius , boolean includeBorder) {\n" +
+		out.print("\tpublic static void horizontal( " + imageIn.getSingleBandName() + " input , " + imageOut.getSingleBandName() + " output , int radius , boolean includeBorder) {\n" +
 				"\t\tfinal int kernelWidth = radius*2 + 1;\n" +
 				"\n" +
 				"\t\tfinal int startY = includeBorder ? 0 : radius;\n" +
@@ -118,7 +118,7 @@ public class GenerateImplConvolveMean {
 		String sumType = imageIn.getSumType();
 		String bitWise = imageIn.getBitWise();
 
-		out.print("\tpublic static void vertical( " + imageIn.getImageName() + " input , " + imageOut.getImageName() + " output , int radius , boolean includeBorder ) {\n" +
+		out.print("\tpublic static void vertical( " + imageIn.getSingleBandName() + " input , " + imageOut.getSingleBandName() + " output , int radius , boolean includeBorder ) {\n" +
 				"\t\tfinal int kernelWidth = radius*2 + 1;\n" +
 				"\n" +
 				"\t\tfinal int startX = includeBorder ? 0 : radius;\n" +

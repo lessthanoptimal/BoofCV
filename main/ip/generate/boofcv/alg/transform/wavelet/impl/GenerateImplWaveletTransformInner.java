@@ -101,7 +101,7 @@ public class GenerateImplWaveletTransformInner extends CodeGeneratorBase {
 	}
 
 	private void printHorizontal() {
-		out.print("\tpublic static void horizontal( WlCoef_"+genName+" coefficients , "+imageIn.getImageName()+" input , "+imageOut.getImageName()+" output )\n" +
+		out.print("\tpublic static void horizontal( WlCoef_"+genName+" coefficients , "+imageIn.getSingleBandName()+" input , "+imageOut.getSingleBandName()+" output )\n" +
 				"\t{\n" +
 				"\t\tfinal int offsetA = coefficients.offsetScaling;\n" +
 				"\t\tfinal int offsetB = coefficients.offsetWavelet;\n" +
@@ -150,7 +150,7 @@ public class GenerateImplWaveletTransformInner extends CodeGeneratorBase {
 	}
 
 	private void printVertical() {
-		out.print("\tpublic static void vertical( WlCoef_"+genName+" coefficients , "+imageIn.getImageName()+" input , "+imageOut.getImageName()+" output )\n" +
+		out.print("\tpublic static void vertical( WlCoef_"+genName+" coefficients , "+imageIn.getSingleBandName()+" input , "+imageOut.getSingleBandName()+" output )\n" +
 				"\t{\n" +
 				"\t\tfinal int offsetA = coefficients.offsetScaling*input.stride;\n" +
 				"\t\tfinal int offsetB = coefficients.offsetWavelet*input.stride;\n" +
@@ -200,7 +200,7 @@ public class GenerateImplWaveletTransformInner extends CodeGeneratorBase {
 	}
 
 	private void printHorizontalInverse() {
-		out.print("\tpublic static void horizontalInverse( WlCoef_"+genName+" coefficients , "+imageIn.getImageName()+" input , "+imageOut.getImageName()+" output )\n" +
+		out.print("\tpublic static void horizontalInverse( WlCoef_"+genName+" coefficients , "+imageIn.getSingleBandName()+" input , "+imageOut.getSingleBandName()+" output )\n" +
 				"\t{\n" +
 				"\t\tfinal int offsetA = coefficients.offsetScaling;\n" +
 				"\t\tfinal int offsetB = coefficients.offsetWavelet;\n" +
@@ -278,7 +278,7 @@ public class GenerateImplWaveletTransformInner extends CodeGeneratorBase {
 	}
 
 	private void printVerticalInverse() {
-		out.print("\tpublic static void verticalInverse( WlCoef_"+genName+" coefficients , "+imageIn.getImageName()+" input , "+imageOut.getImageName()+" output )\n" +
+		out.print("\tpublic static void verticalInverse( WlCoef_"+genName+" coefficients , "+imageIn.getSingleBandName()+" input , "+imageOut.getSingleBandName()+" output )\n" +
 				"\t{\n" +
 				"\t\tfinal int offsetA = coefficients.offsetScaling;\n" +
 				"\t\tfinal int offsetB = coefficients.offsetWavelet;\n" +

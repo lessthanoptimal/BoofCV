@@ -77,7 +77,7 @@ public class GenerateImplEdgeNonMaxSuppressionCrude extends CodeGeneratorBase {
 		out.print("\t/**\n" +
 				"\t * Only processes the inner image.  Ignoring the border.\n" +
 				"\t */\n" +
-				"\tstatic public void inner4( ImageFloat32 intensity , "+derivType.getImageName()+" derivX , "+derivType.getImageName()+" derivY, ImageFloat32 output )\n" +
+				"\tstatic public void inner4( ImageFloat32 intensity , "+derivType.getSingleBandName()+" derivX , "+derivType.getSingleBandName()+" derivY, ImageFloat32 output )\n" +
 				"\t{\n" +
 				"\t\tfinal int w = intensity.width;\n" +
 				"\t\tfinal int h = intensity.height-1;\n" +
@@ -112,7 +112,7 @@ public class GenerateImplEdgeNonMaxSuppressionCrude extends CodeGeneratorBase {
 		out.print("\t/**\n" +
 				"\t * Just processes the image border.\n" +
 				"\t */\n" +
-				"\tstatic public void border4( ImageFloat32 _intensity , "+derivType.getImageName()+" derivX , "+derivType.getImageName()+" derivY , ImageFloat32 output )\n" +
+				"\tstatic public void border4( ImageFloat32 _intensity , "+derivType.getSingleBandName()+" derivX , "+derivType.getSingleBandName()+" derivY , ImageFloat32 output )\n" +
 				"\t{\n" +
 				"\t\tint w = _intensity.width;\n" +
 				"\t\tint h = _intensity.height-1;\n" +

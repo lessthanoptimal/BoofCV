@@ -24,6 +24,7 @@ import boofcv.core.image.border.BorderType;
 import boofcv.factory.denoise.FactoryDenoiseWaveletAlg;
 import boofcv.factory.transform.wavelet.FactoryWaveletDaub;
 import boofcv.factory.transform.wavelet.FactoryWaveletTransform;
+import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageTypeInfo;
 import boofcv.struct.wavelet.WaveletDescription;
@@ -114,7 +115,8 @@ public class FactoryImageDenoise {
 		} else {
 			WaveletDescription<WlCoef_I32> waveletDesc_I32 = FactoryWaveletDaub.biorthogonal_I32(5, BorderType.REFLECT);
 			descTran = FactoryWaveletTransform.create_I(waveletDesc_I32,numLevels,
-					(int)minPixelValue,(int)maxPixelValue,imageType.getImageClass());
+					(int)minPixelValue,(int)maxPixelValue,
+					ImageDataType.getImageClass(ImageDataType.Family.SINGLE_BAND,imageType));
 		}
 		return descTran;
 	}

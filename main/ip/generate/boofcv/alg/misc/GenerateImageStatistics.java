@@ -82,7 +82,7 @@ public class GenerateImageStatistics extends CodeGeneratorBase {
 					"\t * @param minValue (input) Minimum possible intensity value   \n" +
 					"\t * @param histogram (output) Storage for histogram. Number of elements must be equal to max value.\n" +
 					"\t */\n" +
-					"\tpublic static void histogram( "+input.getImageName()+" input , int minValue , int histogram[] ) {\n" +
+					"\tpublic static void histogram( "+input.getSingleBandName()+" input , int minValue , int histogram[] ) {\n" +
 					"\t\tfor( int i = 0; i < histogram.length; i++ )\n" +
 					"\t\t\thistogram[i] = 0;\n" +
 					"\t\t\n" +
@@ -109,7 +109,7 @@ public class GenerateImageStatistics extends CodeGeneratorBase {
 					"\t * @param input (input) Image.\n" +
 					"\t * @param histogram (output) Storage for histogram. Number of elements must be equal to max value.\n" +
 					"\t */\n" +
-					"\tpublic static void histogram( "+input.getImageName()+" input , int histogram[] ) {\n" +
+					"\tpublic static void histogram( "+input.getSingleBandName()+" input , int histogram[] ) {\n" +
 					"\t\tfor( int i = 0; i < histogram.length; i++ )\n" +
 					"\t\t\thistogram[i] = 0;\n" +
 					"\t\t\n" +
@@ -132,7 +132,7 @@ public class GenerateImageStatistics extends CodeGeneratorBase {
 				"\t * @param input Input image. Not modified.\n" +
 				"\t * @return Largest pixel absolute value.\n" +
 				"\t */\n" +
-				"\tpublic static "+input.getSumType()+" maxAbs( "+input.getImageName()+" input ) {\n" +
+				"\tpublic static "+input.getSumType()+" maxAbs( "+input.getSingleBandName()+" input ) {\n" +
 				"\n" +
 				"\t\t"+input.getSumType()+" max = 0;\n" +
 				"\n" +
@@ -160,7 +160,7 @@ public class GenerateImageStatistics extends CodeGeneratorBase {
 				"\t * @param input Input image. Not modified.\n" +
 				"\t * @return Maximum pixel value.\n" +
 				"\t */\n" +
-				"\tpublic static "+input.getSumType()+" max( "+input.getImageName()+" input ) {\n" +
+				"\tpublic static "+input.getSumType()+" max( "+input.getSingleBandName()+" input ) {\n" +
 				"\n" +
 				"\t\t"+input.getSumType()+" max = input.get(0,0);\n" +
 				"\n" +
@@ -185,7 +185,7 @@ public class GenerateImageStatistics extends CodeGeneratorBase {
 				"\t * @param input Input image. Not modified.\n" +
 				"\t * @return Minimum pixel value.\n" +
 				"\t */\n" +
-				"\tpublic static "+input.getSumType()+" min( "+input.getImageName()+" input ) {\n" +
+				"\tpublic static "+input.getSumType()+" min( "+input.getSingleBandName()+" input ) {\n" +
 				"\n" +
 				"\t\t"+input.getSumType()+" min = input.get(0,0);\n" +
 				"\n" +
@@ -214,7 +214,7 @@ public class GenerateImageStatistics extends CodeGeneratorBase {
 				"\t * \n" +
 				"\t * @param img Input image. Not modified.\n" +
 				"\t */\n" +
-				"\tpublic static "+input.getSumType()+" sum( "+input.getImageName()+" img ) {\n" +
+				"\tpublic static "+input.getSumType()+" sum( "+input.getSingleBandName()+" img ) {\n" +
 				"\n" +
 				"\t\tfinal int h = img.getHeight();\n" +
 				"\t\tfinal int w = img.getWidth();\n" +
@@ -242,7 +242,7 @@ public class GenerateImageStatistics extends CodeGeneratorBase {
 				"\t * @param img Input image.  Not modified.\n" +
 				"\t * @return Mean pixel intensity value\n" +
 				"\t */\n" +
-				"\tpublic static double mean( "+input.getImageName()+" img ) {\n" +
+				"\tpublic static double mean( "+input.getSingleBandName()+" img ) {\n" +
 				"\t\treturn sum(img)/(double)(img.width*img.height);\n" +
 				"\t}\n\n");
 	}
@@ -258,7 +258,7 @@ public class GenerateImageStatistics extends CodeGeneratorBase {
 				"\t * @param mean Mean pixel intensity value.   \n" +
 				"\t * @return Pixel variance   \n" +
 				"\t */\n" +
-				"\tpublic static double variance( "+input.getImageName()+" img , double mean ) {\n" +
+				"\tpublic static double variance( "+input.getSingleBandName()+" img , double mean ) {\n" +
 				"\n" +
 				"\t\tdouble variance = 0;\n" +
 				"\n" +
@@ -279,7 +279,7 @@ public class GenerateImageStatistics extends CodeGeneratorBase {
 
 	public void printMeanDiffSq() {
 
-		String imageName = input.getImageName();
+		String imageName = input.getSingleBandName();
 		String bitWise = input.getBitWise();
 		String sumType = input.getSumType();
 		String largeSumType = input.getLargeSumType();
@@ -309,7 +309,7 @@ public class GenerateImageStatistics extends CodeGeneratorBase {
 
 	public void printMeanDiffAbs() {
 
-		String imageName = input.getImageName();
+		String imageName = input.getSingleBandName();
 		String bitWise = input.getBitWise();
 		String sumType = input.getSumType();
 

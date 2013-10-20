@@ -51,7 +51,7 @@ public class VisualizePyramidFloatApp <T extends ImageSingleBand>
 
 	public VisualizePyramidFloatApp( Class<T> imageType ) {
 		this.imageType = imageType;
-		interp = FactoryInterpolation.bilinearPixel(imageType);
+		interp = FactoryInterpolation.bilinearPixelS(imageType);
 
 		setMainGUI(gui);
 	}

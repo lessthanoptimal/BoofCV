@@ -47,7 +47,7 @@ public class GenerateImplOrientationImageAverage extends CodeGeneratorBase {
 	}
 
 	private void printPreamble() {
-		String type = imageType.getImageName();
+		String type = imageType.getSingleBandName();
 
 		out.print("import boofcv.alg.feature.orientation.OrientationImageAverage;\n" +
 				"import boofcv.struct.image."+type+";\n" +
@@ -98,8 +98,8 @@ public class GenerateImplOrientationImageAverage extends CodeGeneratorBase {
 				"\t\treturn Math.atan2(sumY,sumX);\n" +
 				"\t}\n" +
 				"\n" +
-				"\tpublic Class<"+imageType.getImageName()+"> getImageType() {\n" +
-				"\t\treturn "+imageType.getImageName()+".class;\n" +
+				"\tpublic Class<"+imageType.getSingleBandName()+"> getImageType() {\n" +
+				"\t\treturn "+imageType.getSingleBandName()+".class;\n" +
 				"\t}\n\n");
 	}
 

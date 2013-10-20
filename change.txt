@@ -41,6 +41,7 @@ Version : Alpha 0.16
 - Removed GeoModelRefine and replaced with ModelFitter
 - Image Types
   * Improved and renamed interleaved image types
+  * Added full support to all primitive data structures in interleaved images
   * Added ImageBase.subimage class variable
   * Added InterleavedImageOps
   * Added ImageMultiBand as a base class for multi-band images.
@@ -51,8 +52,6 @@ Version : Alpha 0.16
   * Thanks pcmoen
 
 - TODO improve KLT edge handling
-- TODO mean-shift color
-- TODO cam-shift
 - TODO automate high level tests
 
 ---------------------------------------------

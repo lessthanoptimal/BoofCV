@@ -43,8 +43,8 @@ public class GenerateImplSsdCorner extends CodeGeneratorBase  {
 	public void createFile( AutoTypeImage input , AutoTypeImage output ) throws FileNotFoundException {
 		className = "ImplSsdCorner_"+input.getAbbreviatedType();
 
-		typeInput = input.getImageName();
-		typeOutput = output.getImageName();
+		typeInput = input.getSingleBandName();
+		typeOutput = output.getSingleBandName();
 		dataInput = input.getDataType();
 		dataOutput = output.getDataType();
 		sumType = input.getSumType();

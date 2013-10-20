@@ -113,7 +113,7 @@ public class FactoryDetectDescribe {
 												 ConfigAverageIntegral configOrientation,
 												 ImageDataType<T> imageType) {
 
-		Class bandType = imageType.getDataType().getImageClass();
+		Class bandType = imageType.getImageClass();
 		Class<II> integralType = GIntegralImageOps.getIntegralType(bandType);
 
 		FastHessianFeatureDetector<II> detector = FactoryInterestPointAlgs.fastHessian(configDetector);
@@ -162,7 +162,7 @@ public class FactoryDetectDescribe {
 												   ConfigSlidingIntegral configOrientation,
 												   ImageDataType<T> imageType ) {
 
-		Class bandType = imageType.getDataType().getImageClass();
+		Class bandType = imageType.getImageClass();
 		Class<II> integralType = GIntegralImageOps.getIntegralType(bandType);
 
 		FastHessianFeatureDetector<II> detector = FactoryInterestPointAlgs.fastHessian(configDetector);

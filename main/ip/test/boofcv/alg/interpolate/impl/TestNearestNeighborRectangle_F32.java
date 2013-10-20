@@ -36,7 +36,7 @@ public class TestNearestNeighborRectangle_F32 extends GeneralBilinearRectangleCh
 
 	@Override
 	public InterpolatePixelS<ImageFloat32> createPixelInterpolate() {
-		return FactoryInterpolation.nearestNeighborPixel(imageType);
+		return FactoryInterpolation.nearestNeighborPixelS(imageType);
 	}
 
 	@Override

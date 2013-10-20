@@ -70,10 +70,13 @@ public class ImageDataType<T extends ImageBase> {
 	public T createImage( int width , int height ) {
 		switch( family ) {
 			case SINGLE_BAND:
-				return (T)GeneralizedImageOps.createSingleBand(dataType.getImageClass(),width,height);
+				return (T)GeneralizedImageOps.createSingleBand(getImageClass(),width,height);
+
+			case INTERLEAVED:
+				return (T)GeneralizedImageOps.createInterleaved(getImageClass(), width, height, numBands);
 
 			case MULTI_SPECTRAL:
-				return (T)new MultiSpectral(dataType.getImageClass(),width,height,numBands);
+				return (T)new MultiSpectral(getImageClass(),width,height,numBands);
 
 			default:
 				throw new IllegalArgumentException("Type not yet supported");
@@ -88,7 +91,8 @@ public class ImageDataType<T extends ImageBase> {
 	public T[] createArray( int length ) {
 		switch( family ) {
 			case SINGLE_BAND:
-				return (T[])Array.newInstance(dataType.getImageClass(),length);
+			case INTERLEAVED:
+				return (T[])Array.newInstance(getImageClass(),length);
 
 			case MULTI_SPECTRAL:
 				return (T[])new MultiSpectral[ length ];
@@ -104,6 +108,46 @@ public class ImageDataType<T extends ImageBase> {
 
 	public Family getFamily() {
 		return family;
+	}
+
+	public Class getImageClass() {
+		return getImageClass(family,dataType);
+	}
+
+	public static Class getImageClass( Family family , ImageTypeInfo dataType ) {
+		switch( family ) {
+			case SINGLE_BAND:
+			case MULTI_SPECTRAL:
+				switch( dataType ) {
+					case F32: return ImageFloat32.class;
+					case F64: return ImageFloat64.class;
+					case U8: return ImageUInt8.class;
+					case S8: return ImageSInt8.class;
+					case U16: return ImageUInt16.class;
+					case S16: return ImageSInt16.class;
+					case S32: return ImageSInt32.class;
+					case S64: return ImageSInt64.class;
+					case I8: return ImageInt8.class;
+					case I16: return ImageInt16.class;
+				}
+				break;
+
+			case INTERLEAVED:
+				switch( dataType ) {
+					case F32: return InterleavedF32.class;
+					case F64: return InterleavedF64.class;
+					case U8: return InterleavedU8.class;
+					case S8: return InterleavedS8.class;
+					case U16: return InterleavedU16.class;
+					case S16: return InterleavedS16.class;
+					case S32: return InterleavedS32.class;
+					case S64: return InterleavedS64.class;
+					case I8: return InterleavedI8.class;
+					case I16: return InterleavedI16.class;
+				}
+				break;
+		}
+		throw new RuntimeException("Support this image type thing");
 	}
 
 	public static enum Family

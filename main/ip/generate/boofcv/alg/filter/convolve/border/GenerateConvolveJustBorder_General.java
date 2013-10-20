@@ -125,7 +125,7 @@ public class GenerateConvolveJustBorder_General {
 	}
 
 	public void addHorizontal( String typeCast ) {
-		String typeOutput = imageOut.getImageName();
+		String typeOutput = imageOut.getSingleBandName();
 		String dataOutput = imageOut.getDataType();
 
 		out.print("\tpublic static void horizontal(Kernel1D_"+typeKernel+" kernel, "+typeInput+" input, "+typeOutput+" output , int border ) {\n" +
@@ -160,7 +160,7 @@ public class GenerateConvolveJustBorder_General {
 	}
 
 	public void addVertical( String typeCast ) {
-		String typeOutput = imageOut.getImageName();
+		String typeOutput = imageOut.getSingleBandName();
 		String dataOutput = imageOut.getDataType();
 
 		out.print("\tpublic static void vertical(Kernel1D_"+typeKernel+" kernel, "+typeInput+" input, "+typeOutput+" output , int border ) {\n" +
@@ -195,7 +195,7 @@ public class GenerateConvolveJustBorder_General {
 	}
 
 	public void addConvolution( String typeCast ) {
-		String typeOutput = imageOut.getImageName();
+		String typeOutput = imageOut.getSingleBandName();
 		String dataOutput = imageOut.getDataType();
 
 		out.print("\tpublic static void convolve(Kernel2D_"+typeKernel+" kernel, "+typeInput+" input, "+typeOutput+" output , int border ) {\n" +
@@ -265,7 +265,7 @@ public class GenerateConvolveJustBorder_General {
 	}
 
 	public void addConvolutionBound( String typeCast ) {
-		String typeOutput = imageOut.getImageName();
+		String typeOutput = imageOut.getSingleBandName();
 		String dataOutput = imageOut.getDataType();
 
 		out.print("\tpublic static void convolve(Kernel2D_"+typeKernel+" kernel, "+typeInput+" input, "+typeOutput+" output , int border ,\n" +

@@ -54,7 +54,7 @@ public class GenerateImplOrientationSlidingWindow extends CodeGeneratorBase {
 	private void printPreamble() throws FileNotFoundException {
 		setOutputFile(className);
 		out.print("import boofcv.alg.feature.orientation.OrientationSlidingWindow;\n" +
-				"import boofcv.struct.image."+imageType.getImageName()+";\n" +
+				"import boofcv.struct.image."+imageType.getSingleBandName()+";\n" +
 				"import georegression.metric.UtilAngle;\n" +
 				"\n" +
 				"/**\n" +
@@ -68,15 +68,15 @@ public class GenerateImplOrientationSlidingWindow extends CodeGeneratorBase {
 				" *\n" +
 				" * @author Peter Abeles\n" +
 				" */\n" +
-				"public class "+className+" extends OrientationSlidingWindow<"+imageType.getImageName()+"> {\n" +
+				"public class "+className+" extends OrientationSlidingWindow<"+imageType.getSingleBandName()+"> {\n" +
 				"\n" +
 				"\tpublic "+className+"(int numAngles, double windowSize, boolean isWeighted) {\n" +
 				"\t\tsuper(numAngles, windowSize, isWeighted);\n" +
 				"\t}\n" +
 				"\n" +
 				"\t@Override\n" +
-				"\tpublic Class<"+imageType.getImageName()+"> getImageType() {\n" +
-				"\t\treturn "+imageType.getImageName()+".class;\n" +
+				"\tpublic Class<"+imageType.getSingleBandName()+"> getImageType() {\n" +
+				"\t\treturn "+imageType.getSingleBandName()+".class;\n" +
 				"\t}\n\n");
 	}
 

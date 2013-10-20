@@ -139,7 +139,7 @@ public class FactoryBenchmarkFeatureDistort {
 			Affine2D_F32 initToImage = StabilityEvaluatorPoint.createScale((float)scale,image.width,image.height);
 			Affine2D_F32 imageToInit = initToImage.invert(null);
 			PixelTransformAffine_F32 affine = new PixelTransformAffine_F32(imageToInit);
-			InterpolatePixelS<T> interp = FactoryInterpolation.createPixel(0, 255, TypeInterpolate.BILINEAR, imageType);
+			InterpolatePixelS<T> interp = FactoryInterpolation.createPixelS(0, 255, TypeInterpolate.BILINEAR, imageType);
 			ImageDistort<T> distorter = FactoryDistort.distort(interp, FactoryImageBorder.value(imageType, 0), imageType);
 			distorter.setModel(affine);
 			distorter.apply(image,distortedImage);

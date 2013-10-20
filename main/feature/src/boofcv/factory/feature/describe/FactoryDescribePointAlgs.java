@@ -89,7 +89,7 @@ public class FactoryDescribePointAlgs {
 	DescribePointBriefSO<T> briefso(BinaryCompareDefinition_I32 definition, BlurFilter<T> filterBlur) {
 		Class<T> imageType = filterBlur.getInputType();
 
-		InterpolatePixelS<T> interp = FactoryInterpolation.bilinearPixel(imageType);
+		InterpolatePixelS<T> interp = FactoryInterpolation.bilinearPixelS(imageType);
 
 		return new DescribePointBriefSO<T>(definition,filterBlur,interp);
 	}

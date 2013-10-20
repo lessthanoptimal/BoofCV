@@ -18,6 +18,8 @@
 
 package boofcv.factory.interpolate;
 
+import boofcv.abst.filter.interpolate.InterpolatePixel_S_to_MB_MultiSpectral;
+import boofcv.alg.interpolate.InterpolatePixelMB;
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.interpolate.InterpolateRectangle;
 import boofcv.alg.interpolate.TypeInterpolate;
@@ -34,33 +36,47 @@ import boofcv.struct.image.*;
 public class FactoryInterpolation {
 
 	public static <T extends ImageSingleBand> InterpolatePixelS<T>
-	createPixel(double min, double max, TypeInterpolate type, Class<T> imageType)
+	createPixelS(double min, double max, TypeInterpolate type, Class<T> imageType)
 	{
 		switch( type ) {
 			case NEAREST_NEIGHBOR:
-				return nearestNeighborPixel(imageType);
+				return nearestNeighborPixelS(imageType);
 
 			case BILINEAR:
-				return bilinearPixel(imageType);
+				return bilinearPixelS(imageType);
 
 			case BICUBIC:
-				return bicubic(0.5f, (float)min, (float)max, imageType);
+				return bicubicS(0.5f, (float) min, (float) max, imageType);
 
 			case POLYNOMIAL4:
-				return polynomial(4,min,max,imageType);
+				return polynomialS(4, min, max, imageType);
 		}
 		throw new IllegalArgumentException("Add type: "+type);
 	}
 
-	public static <T extends ImageSingleBand> InterpolatePixelS<T> bilinearPixel( T image ) {
+	/**
+	 * Converts a single band interpolation algorithm into a mult-band interpolation for {@link MultiSpectral} images.
+	 * NOTE: If a specialized interpolation exists you should use that instead of this the specialized code can
+	 * reduce the number of calculations.
+	 *
+	 * @param singleBand Interpolation for a single band.
+	 * @param <T> Single band image trype
+	 * @return Interpolation for MultiSpectral images
+	 */
+	public static <T extends ImageSingleBand> InterpolatePixelMB<MultiSpectral<T>>
+	createPixelMB( InterpolatePixelS<T> singleBand ) {
+		return new InterpolatePixel_S_to_MB_MultiSpectral<T>(singleBand);
+	}
 
-		InterpolatePixelS<T> ret = bilinearPixel((Class)image.getClass());
+	public static <T extends ImageSingleBand> InterpolatePixelS<T> bilinearPixelS(T image) {
+
+		InterpolatePixelS<T> ret = bilinearPixelS((Class) image.getClass());
 		ret.setImage(image);
 
 		return ret;
 	}
 
-	public static <T extends ImageSingleBand> InterpolatePixelS<T> bilinearPixel(Class<T> type ) {
+	public static <T extends ImageSingleBand> InterpolatePixelS<T> bilinearPixelS(Class<T> type) {
 		if( type == ImageFloat32.class )
 			return (InterpolatePixelS<T>)new ImplBilinearPixel_F32();
 		else if( type == ImageUInt8.class )
@@ -92,7 +108,7 @@ public class FactoryInterpolation {
 			throw new RuntimeException("Unknown image type: "+type.getName());
 	}
 
-	public static <T extends ImageSingleBand> InterpolatePixelS<T> nearestNeighborPixel( Class<T> type ) {
+	public static <T extends ImageSingleBand> InterpolatePixelS<T> nearestNeighborPixelS(Class<T> type) {
 		if( type == ImageFloat32.class )
 			return (InterpolatePixelS<T>)new NearestNeighborPixel_F32();
 		else if( type == ImageUInt8.class )
@@ -118,7 +134,7 @@ public class FactoryInterpolation {
 			throw new RuntimeException("Unknown image type: "+type.getName());
 	}
 
-	public static <T extends ImageSingleBand> InterpolatePixelS<T> bicubic(float param, float min , float max ,Class<T> type) {
+	public static <T extends ImageSingleBand> InterpolatePixelS<T> bicubicS(float param, float min, float max, Class<T> type) {
 		BicubicKernel_F32 kernel = new BicubicKernel_F32(param);
 		if( type == ImageFloat32.class )
 			return (InterpolatePixelS<T>)new ImplInterpolatePixelConvolution_F32(kernel,min,max);
@@ -130,7 +146,7 @@ public class FactoryInterpolation {
 			throw new RuntimeException("Unknown image type: "+type.getName());
 	}
 
-	public static <T extends ImageSingleBand> InterpolatePixelS<T> polynomial( int maxDegree , double min , double max , Class<T> type ) {
+	public static <T extends ImageSingleBand> InterpolatePixelS<T> polynomialS(int maxDegree, double min, double max, Class<T> type) {
 		if( type == ImageFloat32.class )
 			return (InterpolatePixelS<T>)new ImplPolynomialPixel_F32(maxDegree,(float)min,(float)max);
 		else if( ImageInteger.class.isAssignableFrom(type) ) {

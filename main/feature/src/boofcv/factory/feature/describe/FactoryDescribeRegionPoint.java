@@ -63,7 +63,7 @@ public class FactoryDescribeRegionPoint {
 	public static <T extends ImageBase, II extends ImageSingleBand>
 	DescribeRegionPoint<T,SurfFeature> surfFast( ConfigSurfDescribe.Speed config , ImageDataType<T> imageType) {
 
-		Class bandType = imageType.getDataType().getImageClass();
+		Class bandType = imageType.getImageClass();
 		Class<II> integralType = GIntegralImageOps.getIntegralType(bandType);
 
 		DescribePointSurf<II> alg = FactoryDescribePointAlgs.surfSpeed( config, integralType);
@@ -95,7 +95,7 @@ public class FactoryDescribeRegionPoint {
 	public static <T extends ImageBase, II extends ImageSingleBand>
 	DescribeRegionPoint<T,SurfFeature> surfStable(ConfigSurfDescribe.Stablility config, ImageDataType<T> imageType) {
 
-		Class bandType = imageType.getDataType().getImageClass();
+		Class bandType = imageType.getImageClass();
 		Class<II> integralType = GIntegralImageOps.getIntegralType(bandType);
 
 		DescribePointSurf<II> alg = FactoryDescribePointAlgs.surfStability( config, integralType);

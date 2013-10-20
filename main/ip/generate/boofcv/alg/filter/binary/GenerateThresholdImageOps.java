@@ -82,7 +82,7 @@ public class GenerateThresholdImageOps extends CodeGeneratorBase {
 				"\t * @param down If true then the inequality <= is used, otherwise if false then >= is used.\n" +
 				"\t * @return Output image.\n" +
 				"\t */\n" +
-				"\tpublic static ImageUInt8 threshold( "+imageIn.getImageName()+" input , ImageUInt8 output ,\n" +
+				"\tpublic static ImageUInt8 threshold( "+imageIn.getSingleBandName()+" input , ImageUInt8 output ,\n" +
 				"\t\t\t\t\t\t\t\t\t\t"+imageIn.getSumType()+" threshold , boolean down )\n" +
 				"\t{\n" +
 				"\t\toutput = InputSanityCheck.checkDeclare(input,output,ImageUInt8.class);\n" +

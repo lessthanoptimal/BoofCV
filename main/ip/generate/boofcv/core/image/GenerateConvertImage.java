@@ -78,16 +78,16 @@ public class GenerateConvertImage extends CodeGeneratorBase {
 
 		out.print("\t/**\n" +
 				"\t * <p>\n" +
-				"\t * Converts an {@link boofcv.struct.image."+imageIn.getImageName()+"} into a {@link boofcv.struct.image."+imageOut.getImageName()+"}.\n" +
+				"\t * Converts an {@link boofcv.struct.image."+imageIn.getSingleBandName()+"} into a {@link boofcv.struct.image."+imageOut.getSingleBandName()+"}.\n" +
 				"\t * </p>\n" +
 				"\t *\n" +
 				"\t * @param input Input image which is being converted. Not modified.\n" +
 				"\t * @param output (Optional) The output image.  If null a new image is created. Modified.\n" +
 				"\t * @return Converted image.\n" +
 				"\t */\n" +
-				"\tpublic static "+imageOut.getImageName()+" convert("+imageIn.getImageName()+" input, "+imageOut.getImageName()+" output) {\n" +
+				"\tpublic static "+imageOut.getSingleBandName()+" convert("+imageIn.getSingleBandName()+" input, "+imageOut.getSingleBandName()+" output) {\n" +
 				"\t\tif (output == null) {\n" +
-				"\t\t\toutput = new "+imageOut.getImageName()+"(input.width, input.height);\n" +
+				"\t\t\toutput = new "+imageOut.getSingleBandName()+"(input.width, input.height);\n" +
 				"\t\t} else {\n" +
 				"\t\t\tInputSanityCheck.checkSameShape(input, output);\n" +
 				"\t\t}\n" +
@@ -100,7 +100,7 @@ public class GenerateConvertImage extends CodeGeneratorBase {
 
 	private void printAverage( AutoTypeImage imageIn ) {
 
-		String imageName = imageIn.getImageName();
+		String imageName = imageIn.getSingleBandName();
 
 		out.print("\t/**\n" +
 				"\t * Converts a {@link MultiSpectral} into a {@link ImageSingleBand} by computing the average value of each pixel\n" +

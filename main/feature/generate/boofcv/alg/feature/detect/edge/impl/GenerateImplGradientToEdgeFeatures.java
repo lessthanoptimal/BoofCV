@@ -76,7 +76,7 @@ public class GenerateImplGradientToEdgeFeatures extends CodeGeneratorBase {
 		String bitWise = derivType.getBitWise();
 		String sumType = derivType.getSumType();
 
-		out.print("\tstatic public void intensityE( "+derivType.getImageName()+" derivX , "+derivType.getImageName()+" derivY , ImageFloat32 intensity )\n" +
+		out.print("\tstatic public void intensityE( "+derivType.getSingleBandName()+" derivX , "+derivType.getSingleBandName()+" derivY , ImageFloat32 intensity )\n" +
 				"\t{\n" +
 				"\t\tfinal int w = derivX.width;\n" +
 				"\t\tfinal int h = derivY.height;\n" +
@@ -101,7 +101,7 @@ public class GenerateImplGradientToEdgeFeatures extends CodeGeneratorBase {
 
 		String bitWise = derivType.getBitWise();
 
-		out.print("\tstatic public void intensityAbs( "+derivType.getImageName()+" derivX , "+derivType.getImageName()+" derivY , ImageFloat32 intensity )\n" +
+		out.print("\tstatic public void intensityAbs( "+derivType.getSingleBandName()+" derivX , "+derivType.getSingleBandName()+" derivY , ImageFloat32 intensity )\n" +
 				"\t{\n" +
 				"\t\tfinal int w = derivX.width;\n" +
 				"\t\tfinal int h = derivY.height;\n" +
@@ -125,7 +125,7 @@ public class GenerateImplGradientToEdgeFeatures extends CodeGeneratorBase {
 		String bitWise = derivType.getBitWise();
 		String sumType = derivType.getSumType();
 
-		out.print("\tstatic public void direction( "+derivType.getImageName()+" derivX , "+derivType.getImageName()+" derivY , ImageFloat32 angle )\n" +
+		out.print("\tstatic public void direction( "+derivType.getSingleBandName()+" derivX , "+derivType.getSingleBandName()+" derivY , ImageFloat32 angle )\n" +
 				"\t{\n" +
 				"\t\tfinal int w = derivX.width;\n" +
 				"\t\tfinal int h = derivY.height;\n" +
@@ -157,7 +157,7 @@ public class GenerateImplGradientToEdgeFeatures extends CodeGeneratorBase {
 		String bitWise = derivType.getBitWise();
 		String sumType = derivType.getSumType();
 
-		out.print("\tstatic public void direction2( "+derivType.getImageName()+" derivX , "+derivType.getImageName()+" derivY , ImageFloat32 angle )\n" +
+		out.print("\tstatic public void direction2( "+derivType.getSingleBandName()+" derivX , "+derivType.getSingleBandName()+" derivY , ImageFloat32 angle )\n" +
 				"\t{\n" +
 				"\t\tfinal int w = derivX.width;\n" +
 				"\t\tfinal int h = derivY.height;\n" +

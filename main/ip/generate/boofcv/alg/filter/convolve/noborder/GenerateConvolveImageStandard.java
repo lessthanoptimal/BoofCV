@@ -90,8 +90,8 @@ public class GenerateConvolveImageStandard extends CodeGeneratorBase {
 
 		typeCast = output.getTypeCastFromSum();
 		kernelType = isInteger ? "I32" : "F32";
-		inputType = input.getImageName();
-		outputType = output.getImageName();
+		inputType = input.getSingleBandName();
+		outputType = output.getSingleBandName();
 		kernelData = isInteger ? "int" : "float";
 		inputData = input.getDataType();
 		outputData = output.getDataType();

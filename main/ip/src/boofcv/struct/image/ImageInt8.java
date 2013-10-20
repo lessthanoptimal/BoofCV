@@ -73,7 +73,7 @@ public abstract class ImageInt8<T extends ImageInt8> extends ImageInteger<T> {
 	}
 
 	@Override
-	public ImageTypeInfo<T> getTypeInfo() {
-		return (ImageTypeInfo<T>)ImageTypeInfo.I8;
+	public ImageTypeInfo getTypeInfo() {
+		return ImageTypeInfo.I8;
 	}
 }

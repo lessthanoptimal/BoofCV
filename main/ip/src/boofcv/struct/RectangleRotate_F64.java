@@ -39,6 +39,17 @@ public class RectangleRotate_F64 {
 	public double height;
 	public double theta;
 
+	public RectangleRotate_F64(double cx, double cy, double width, double height, double theta) {
+		this.cx = cx;
+		this.cy = cy;
+		this.width = width;
+		this.height = height;
+		this.theta = theta;
+	}
+
+	public RectangleRotate_F64() {
+	}
+
 	public void set( RectangleRotate_F64 r ) {
 		this.cx = r.cx;
 		this.cy = r.cy;

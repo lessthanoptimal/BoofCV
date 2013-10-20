@@ -152,8 +152,8 @@ public class TestImageSingleBand {
 		}
 
 		@Override
-		public ImageTypeInfo<DummyImage> getTypeInfo() {
-			return (ImageTypeInfo)ImageTypeInfo.S32;
+		public ImageTypeInfo getTypeInfo() {
+			return ImageTypeInfo.S32;
 		}
 
 		@Override

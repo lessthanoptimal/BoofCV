@@ -74,7 +74,7 @@ public abstract class ImageInt16<T extends ImageInt16> extends ImageInteger<T> {
 	}
 
 	@Override
-	public ImageTypeInfo<T> getTypeInfo() {
-		return (ImageTypeInfo<T>)ImageTypeInfo.I16;
+	public ImageTypeInfo getTypeInfo() {
+		return ImageTypeInfo.I16;
 	}
 }

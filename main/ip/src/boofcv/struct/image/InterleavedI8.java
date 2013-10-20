@@ -32,8 +32,8 @@ public abstract class InterleavedI8 extends ImageInterleaved<InterleavedI8> {
 	/**
 	 * Creates a new image with an arbitrary number of bands/colors.
 	 *
-	 * @param width	number of columns in the image.
-	 * @param height   number of rows in the image.
+	 * @param width number of columns in the image.
+	 * @param height number of rows in the image.
 	 * @param numBands number of bands/colors in the image.
 	 */
 	public InterleavedI8(int width, int height, int numBands) {
@@ -41,6 +41,11 @@ public abstract class InterleavedI8 extends ImageInterleaved<InterleavedI8> {
 	}
 
 	public InterleavedI8() {
+	}
+
+	@Override
+	public ImageTypeInfo getTypeInfo() {
+		return ImageTypeInfo.I8;
 	}
 
 	/**
@@ -109,16 +114,6 @@ public abstract class InterleavedI8 extends ImageInterleaved<InterleavedI8> {
 			throw new ImageAccessException("Invalid band requested.");
 
 		data[getIndex(x, y, band)] = value;
-	}
-
-	/**
-	 * If this matrix is a sub-image or not.
-	 *
-	 * @return true if it is a subimage, otherwise false.
-	 */
-	@Override
-	public boolean isSubimage() {
-		return startIndex != 0 || width * numBands != stride;
 	}
 
 	@Override

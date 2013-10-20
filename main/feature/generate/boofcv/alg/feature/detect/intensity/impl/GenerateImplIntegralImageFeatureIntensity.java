@@ -85,7 +85,7 @@ public class GenerateImplIntegralImageFeatureIntensity extends CodeGeneratorBase
 		out.print("\t/**\n" +
 				"\t * Brute force approach which is easy to validate through visual inspection.\n" +
 				"\t */\n" +
-				"\tpublic static void hessianNaive( "+input.getImageName()+" integral, int skip , int size ,\n" +
+				"\tpublic static void hessianNaive( "+input.getSingleBandName()+" integral, int skip , int size ,\n" +
 				"\t\t\t\t\t\t\t\t\t ImageFloat32 intensity)\n" +
 				"\t{\n" +
 				"\t\tfinal int w = intensity.width;\n" +
@@ -114,7 +114,7 @@ public class GenerateImplIntegralImageFeatureIntensity extends CodeGeneratorBase
 		out.print("\t/**\n" +
 				"\t * Only computes the fast hessian along the border using a brute force approach\n" +
 				"\t */\n" +
-				"\tpublic static void hessianBorder( "+input.getImageName()+" integral, int skip , int size ,\n" +
+				"\tpublic static void hessianBorder( "+input.getSingleBandName()+" integral, int skip , int size ,\n" +
 				"\t\t\t\t\t\t\t\t\t  ImageFloat32 intensity)\n" +
 				"\t{\n" +
 				"\t\tfinal int w = intensity.width;\n" +
@@ -159,7 +159,7 @@ public class GenerateImplIntegralImageFeatureIntensity extends CodeGeneratorBase
 	}
 
 	private void computeIntensity( AutoTypeImage input ) {
-		out.print("\tprivate static void computeHessian("+input.getImageName()+" integral, ImageFloat32 intensity, IntegralKernel kerXX, IntegralKernel kerYY, IntegralKernel kerXY, float norm, int y, int yy, int x, int xx) {\n" +
+		out.print("\tprivate static void computeHessian("+input.getSingleBandName()+" integral, ImageFloat32 intensity, IntegralKernel kerXX, IntegralKernel kerYY, IntegralKernel kerXY, float norm, int y, int yy, int x, int xx) {\n" +
 				"\t\tfloat Dxx = IntegralImageOps.convolveSparse(integral,kerXX,xx,yy);\n" +
 				"\t\tfloat Dyy = IntegralImageOps.convolveSparse(integral,kerYY,xx,yy);\n" +
 				"\t\tfloat Dxy = IntegralImageOps.convolveSparse(integral,kerXY,xx,yy);\n" +
@@ -179,7 +179,7 @@ public class GenerateImplIntegralImageFeatureIntensity extends CodeGeneratorBase
 		out.print("\t/**\n" +
 				"\t * Optimizes intensity for the inner image.  \n" +
 				"\t */\n" +
-				"\tpublic static void hessianInner( "+input.getImageName()+" integral, int skip , int size ,\n" +
+				"\tpublic static void hessianInner( "+input.getSingleBandName()+" integral, int skip , int size ,\n" +
 				"\t\t\t\t\t\t\t\t\t ImageFloat32 intensity)\n" +
 				"\t{\n" +
 				"\t\tfinal int w = intensity.width;\n" +

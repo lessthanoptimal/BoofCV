@@ -55,7 +55,7 @@ public abstract class GeneralBilinearRectangleChecks<T extends ImageSingleBand> 
 	protected abstract T createImage( int width , int height );
 
 	public InterpolatePixelS<T> createPixelInterpolate() {
-		return FactoryInterpolation.bilinearPixel(imageType);
+		return FactoryInterpolation.bilinearPixelS(imageType);
 	}
 
 	public InterpolateRectangle<T> createRectangleInterpolate() {

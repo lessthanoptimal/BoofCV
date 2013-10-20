@@ -39,6 +39,17 @@ public class RectangleRotate_F32 {
 	public float height;
 	public float theta;
 
+	public RectangleRotate_F32(float cx, float cy, float width, float height, float theta) {
+		this.cx = cx;
+		this.cy = cy;
+		this.width = width;
+		this.height = height;
+		this.theta = theta;
+	}
+
+	public RectangleRotate_F32() {
+	}
+
 	public void set( RectangleRotate_F32 r ) {
 		this.cx = r.cx;
 		this.cy = r.cy;

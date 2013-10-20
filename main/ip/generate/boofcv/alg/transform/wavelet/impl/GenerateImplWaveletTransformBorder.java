@@ -119,7 +119,7 @@ public class GenerateImplWaveletTransformBorder extends CodeGeneratorBase {
 	}
 
 	private void printHorizontal() {
-		out.print("\tpublic static void horizontal( BorderIndex1D border , WlCoef_"+genName+" coefficients , "+imageIn.getImageName()+" input , "+imageOut.getImageName()+" output )\n" +
+		out.print("\tpublic static void horizontal( BorderIndex1D border , WlCoef_"+genName+" coefficients , "+imageIn.getSingleBandName()+" input , "+imageOut.getSingleBandName()+" output )\n" +
 				"\t{\n" +
 				"\t\tfinal int offsetA = coefficients.offsetScaling;\n" +
 				"\t\tfinal int offsetB = coefficients.offsetWavelet;\n" +
@@ -196,7 +196,7 @@ public class GenerateImplWaveletTransformBorder extends CodeGeneratorBase {
 	}
 
 	private void printVertical() {
-		out.print("\tpublic static void vertical( BorderIndex1D border , WlCoef_"+genName+" coefficients , "+imageIn.getImageName()+" input , "+imageOut.getImageName()+" output )\n" +
+		out.print("\tpublic static void vertical( BorderIndex1D border , WlCoef_"+genName+" coefficients , "+imageIn.getSingleBandName()+" input , "+imageOut.getSingleBandName()+" output )\n" +
 				"\t{\n" +
 				"\t\tfinal int offsetA = coefficients.offsetScaling;\n" +
 				"\t\tfinal int offsetB = coefficients.offsetWavelet;\n" +
@@ -283,7 +283,7 @@ public class GenerateImplWaveletTransformBorder extends CodeGeneratorBase {
 			outputSum = "\t\t\t\toutput.data[ indexDst + x ] = "+outputCast+"(trends[x] + details[x]);\n";
 		}
 
-		out.print("\tpublic static void horizontalInverse( BorderIndex1D border , WlBorderCoef<WlCoef_"+genName+"> desc , "+imageIn.getImageName()+" input , "+imageOut.getImageName()+" output )\n" +
+		out.print("\tpublic static void horizontalInverse( BorderIndex1D border , WlBorderCoef<WlCoef_"+genName+"> desc , "+imageIn.getSingleBandName()+" input , "+imageOut.getSingleBandName()+" output )\n" +
 				"\t{\n" +
 				"\t\t"+sumType+" []trends = new "+sumType+"[ input.width ];\n" +
 				"\t\t"+sumType+" []details = new "+sumType+"[ input.width ];\n" +
@@ -394,7 +394,7 @@ public class GenerateImplWaveletTransformBorder extends CodeGeneratorBase {
 			outputSum = "\t\t\t\toutput.data[ indexDst + y*output.stride ] = "+outputCast+"(trends[y] + details[y]);\n";
 		}
 
-		out.print("\tpublic static void verticalInverse( BorderIndex1D border , WlBorderCoef<WlCoef_"+genName+"> desc , "+imageIn.getImageName()+" input , "+imageOut.getImageName()+" output )\n" +
+		out.print("\tpublic static void verticalInverse( BorderIndex1D border , WlBorderCoef<WlCoef_"+genName+"> desc , "+imageIn.getSingleBandName()+" input , "+imageOut.getSingleBandName()+" output )\n" +
 				"\t{\n" +
 				"\t\t"+sumType+" []trends = new "+sumType+"[ input.height ];\n" +
 				"\t\t"+sumType+" []details = new "+sumType+"[ input.height ];\n" +

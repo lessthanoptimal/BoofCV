@@ -88,8 +88,8 @@ public abstract class ImageInteger<T extends ImageInteger> extends ImageSingleBa
 	public abstract int unsafe_get( int x , int y );
 
 	@Override
-	public ImageTypeInfo<T> getTypeInfo() {
-		return (ImageTypeInfo<T>)ImageTypeInfo.I;
+	public ImageTypeInfo getTypeInfo() {
+		return ImageTypeInfo.I;
 	}
 
 	public void print() {

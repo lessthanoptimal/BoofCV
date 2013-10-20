@@ -72,7 +72,7 @@ public class GenerateImplAverageDownSample2 extends CodeGeneratorBase {
 		String computeAve4 = input.isInteger() ? "((total+2)/4)" : "(total/4)";
 		String computeAve2 = input.isInteger() ? "((total+1)/2)" : "(total/2)";
 
-		out.print("\tpublic static void down( "+input.getImageName()+" input , "+output.getImageName()+" output ) {\n" +
+		out.print("\tpublic static void down( "+input.getSingleBandName()+" input , "+output.getSingleBandName()+" output ) {\n" +
 				"\t\tint maxY = input.height - input.height%2;\n" +
 				"\t\tint maxX = input.width - input.width%2;\n" +
 				"\n" +

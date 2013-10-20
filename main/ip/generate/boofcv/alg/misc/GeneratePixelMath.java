@@ -111,7 +111,7 @@ public class GeneratePixelMath extends CodeGeneratorBase {
 				"\t * @param input The input image. Not modified.\n" +
 				"\t * @param output Where the absolute value image is written to. Modified.\n" +
 				"\t */\n" +
-				"\tpublic static void abs( "+ input.getImageName()+" input , "+ input.getImageName()+" output ) {\n" +
+				"\tpublic static void abs( "+ input.getSingleBandName()+" input , "+ input.getSingleBandName()+" output ) {\n" +
 				"\n" +
 				"\t\tInputSanityCheck.checkSameShape(input,output);\n" +
 				"\t\t\n" +
@@ -134,7 +134,7 @@ public class GeneratePixelMath extends CodeGeneratorBase {
 				"\t * @param input The input image. Not modified.\n" +
 				"\t * @param output Where the inverted image is written to. Modified.\n" +
 				"\t */\n" +
-				"\tpublic static void invert( "+input.getImageName()+" input , "+input.getImageName()+" output ) {\n" +
+				"\tpublic static void invert( "+input.getSingleBandName()+" input , "+input.getSingleBandName()+" output ) {\n" +
 				"\n" +
 				"\t\tInputSanityCheck.checkSameShape(input,output);\n" +
 				"\n" +
@@ -161,7 +161,7 @@ public class GeneratePixelMath extends CodeGeneratorBase {
 				"\t * @param denominator What each element is divided by.\n" +
 				"\t * @param output The output image. Modified.\n" +
 				"\t */\n" +
-				"\tpublic static void divide( "+input.getImageName()+" input , "+scaleType+" denominator , "+input.getImageName()+" output ) {\n" +
+				"\tpublic static void divide( "+input.getSingleBandName()+" input , "+scaleType+" denominator , "+input.getSingleBandName()+" output ) {\n" +
 				"\n" +
 				"\t\tInputSanityCheck.checkSameShape(input,output);\n" +
 				"\n" +
@@ -191,8 +191,8 @@ public class GeneratePixelMath extends CodeGeneratorBase {
 				"\t * @param upper Upper bound on output\n" +
 				"\t * @param output The output image. Modified.\n" +
 				"\t */\n" +
-				"\tpublic static void divide( "+input.getImageName()+" input , "+scaleType+" denominator , "+
-				sumType+" lower , "+sumType+" upper , "+input.getImageName()+" output ) {\n" +
+				"\tpublic static void divide( "+input.getSingleBandName()+" input , "+scaleType+" denominator , "+
+				sumType+" lower , "+sumType+" upper , "+input.getSingleBandName()+" output ) {\n" +
 				"\n" +
 				"\t\tInputSanityCheck.checkSameShape(input,output);\n" +
 				"\n" +
@@ -224,7 +224,7 @@ public class GeneratePixelMath extends CodeGeneratorBase {
 				"\t * @param value What each element is multiplied by.\n" +
 				"\t * @param output The output image. Modified.\n" +
 				"\t */\n" +
-				"\tpublic static void multiply( "+input.getImageName()+" input , "+scaleType+" value , "+input.getImageName()+" output ) {\n" +
+				"\tpublic static void multiply( "+input.getSingleBandName()+" input , "+scaleType+" value , "+input.getSingleBandName()+" output ) {\n" +
 				"\n" +
 				"\t\tInputSanityCheck.checkSameShape(input,output);\n" +
 				"\n" +
@@ -255,8 +255,8 @@ public class GeneratePixelMath extends CodeGeneratorBase {
 				"\t * @param upper Upper bound on output\n" +
 				"\t * @param output The output image. Modified.\n" +
 				"\t */\n" +
-				"\tpublic static void multiply( "+input.getImageName()+" input , "+scaleType+" value , " +
-				sumType+" lower , "+sumType+" upper , "+input.getImageName()+" output ) {\n" +
+				"\tpublic static void multiply( "+input.getSingleBandName()+" input , "+scaleType+" value , " +
+				sumType+" lower , "+sumType+" upper , "+input.getSingleBandName()+" output ) {\n" +
 				"\n" +
 				"\t\tInputSanityCheck.checkSameShape(input,output);\n" +
 				"\n" +
@@ -283,7 +283,7 @@ public class GeneratePixelMath extends CodeGeneratorBase {
 				"\t * @param value What is added to each element.\n" +
 				"\t * @param output The output image. Modified.\n" +
 				"\t */\n" +
-				"\tpublic static void plus( "+input.getImageName()+" input , "+input.getSumType()+" value , "+input.getImageName()+" output ) {\n" +
+				"\tpublic static void plus( "+input.getSingleBandName()+" input , "+input.getSumType()+" value , "+input.getSingleBandName()+" output ) {\n" +
 				"\n" +
 				"\t\tInputSanityCheck.checkSameShape(input,output);\n" +
 				"\n" +
@@ -311,8 +311,8 @@ public class GeneratePixelMath extends CodeGeneratorBase {
 				"\t * @param upper Upper bound on output\n" +
 				"\t * @param output The output image. Modified.\n" +
 				"\t */\n" +
-				"\tpublic static void plus( "+input.getImageName()+" input , "+sumType+" value , "+
-				sumType+" lower , "+sumType+" upper , "+input.getImageName()+" output ) {\n" +
+				"\tpublic static void plus( "+input.getSingleBandName()+" input , "+sumType+" value , "+
+				sumType+" lower , "+sumType+" upper , "+input.getSingleBandName()+" output ) {\n" +
 				"\n" +
 				"\t\tInputSanityCheck.checkSameShape(input,output);\n" +
 				"\n" +
@@ -343,7 +343,7 @@ public class GeneratePixelMath extends CodeGeneratorBase {
 				"\t * @param min minimum value.\n" +
 				"\t * @param max maximum value.\n" +
 				"\t */\n" +
-				"\tpublic static void boundImage( "+input.getImageName()+" img , "+sumType+" min , "+sumType+" max ) {\n" +
+				"\tpublic static void boundImage( "+input.getSingleBandName()+" img , "+sumType+" min , "+sumType+" max ) {\n" +
 				"\t\tfinal int h = img.getHeight();\n" +
 				"\t\tfinal int w = img.getWidth();\n" +
 				"\n" +
@@ -378,7 +378,7 @@ public class GeneratePixelMath extends CodeGeneratorBase {
 				"\t * @param imgB Input image. Not modified.\n" +
 				"\t * @param diff Absolute value of difference image. Modified.\n" +
 				"\t */\n" +
-				"\tpublic static void diffAbs( "+input.getImageName()+" imgA , "+input.getImageName()+" imgB , "+input.getImageName()+" diff ) {\n" +
+				"\tpublic static void diffAbs( "+input.getSingleBandName()+" imgA , "+input.getSingleBandName()+" imgB , "+input.getSingleBandName()+" diff ) {\n" +
 				"\t\tInputSanityCheck.checkSameShape(imgA,imgB,diff);\n" +
 				"\t\t\n" +
 				"\t\tfinal int h = imgA.getHeight();\n" +
@@ -412,7 +412,7 @@ public class GeneratePixelMath extends CodeGeneratorBase {
 				"\t * @param imgB Input image. Not modified.\n" +
 				"\t * @param output Output image. Modified.\n" +
 				"\t */\n" +
-				"\tpublic static void add( "+typeIn.getImageName()+" imgA , "+typeIn.getImageName()+" imgB , "+typeOut.getImageName()+" output ) {\n" +
+				"\tpublic static void add( "+typeIn.getSingleBandName()+" imgA , "+typeIn.getSingleBandName()+" imgB , "+typeOut.getSingleBandName()+" output ) {\n" +
 				"\t\tInputSanityCheck.checkSameShape(imgA,imgB,output);\n" +
 				"\t\t\n" +
 				"\t\tfinal int h = imgA.getHeight();\n" +
@@ -446,8 +446,8 @@ public class GeneratePixelMath extends CodeGeneratorBase {
 				"\t * @param imgB Input image. Not modified.\n" +
 				"\t * @param output Output image. Modified.\n" +
 				"\t */\n" +
-				"\tpublic static void subtract( "+typeIn.getImageName()+" imgA , "+typeIn.getImageName()+" imgB , "
-				+typeOut.getImageName()+" output ) {\n" +
+				"\tpublic static void subtract( "+typeIn.getSingleBandName()+" imgA , "+typeIn.getSingleBandName()+" imgB , "
+				+typeOut.getSingleBandName()+" output ) {\n" +
 				"\t\tInputSanityCheck.checkSameShape(imgA,imgB,output);\n" +
 				"\t\t\n" +
 				"\t\tfinal int h = imgA.getHeight();\n" +
@@ -481,7 +481,7 @@ public class GeneratePixelMath extends CodeGeneratorBase {
 				"\t * @param imgB Input image. Not modified.\n" +
 				"\t * @param output Output image. Modified.\n" +
 				"\t */\n" +
-				"\tpublic static void multiply( "+typeIn.getImageName()+" imgA , "+typeIn.getImageName()+" imgB , "+typeOut.getImageName()+" output ) {\n" +
+				"\tpublic static void multiply( "+typeIn.getSingleBandName()+" imgA , "+typeIn.getSingleBandName()+" imgB , "+typeOut.getSingleBandName()+" output ) {\n" +
 				"\t\tInputSanityCheck.checkSameShape(imgA,imgB,output);\n" +
 				"\t\t\n" +
 				"\t\tfinal int h = imgA.getHeight();\n" +
@@ -512,7 +512,7 @@ public class GeneratePixelMath extends CodeGeneratorBase {
 				"\t * @param input The input image. Not modified.\n" +
 				"\t * @param output Where the log image is written to. Modified.\n" +
 				"\t */\n" +
-				"\tpublic static void log( "+typeIn.getImageName()+" input , "+typeOut.getImageName()+" output ) {\n" +
+				"\tpublic static void log( "+typeIn.getSingleBandName()+" input , "+typeOut.getSingleBandName()+" output ) {\n" +
 				"\n" +
 				"\t\tInputSanityCheck.checkSameShape(input,output);\n" +
 				"\n" +
@@ -542,7 +542,7 @@ public class GeneratePixelMath extends CodeGeneratorBase {
 				"\t * @param imgB Input image. Not modified.\n" +
 				"\t * @param output Output image. Modified.\n" +
 				"\t */\n" +
-				"\tpublic static void divide( "+typeIn.getImageName()+" imgA , "+typeIn.getImageName()+" imgB , "+typeOut.getImageName()+" output ) {\n" +
+				"\tpublic static void divide( "+typeIn.getSingleBandName()+" imgA , "+typeIn.getSingleBandName()+" imgB , "+typeOut.getSingleBandName()+" output ) {\n" +
 				"\t\tInputSanityCheck.checkSameShape(imgA,imgB,output);\n" +
 				"\t\t\n" +
 				"\t\tfinal int h = imgA.getHeight();\n" +
@@ -565,7 +565,7 @@ public class GeneratePixelMath extends CodeGeneratorBase {
 
 	public void printAverageBand() {
 		
-		String imageName = input.getImageName();
+		String imageName = input.getSingleBandName();
 		String sumType = input.getSumType();
 		String typecast = input.getTypeCastFromSum();
 		String bitwise = input.getBitWise();
