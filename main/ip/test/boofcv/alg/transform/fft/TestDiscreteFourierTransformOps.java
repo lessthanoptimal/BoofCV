@@ -18,10 +18,9 @@
 
 package boofcv.alg.transform.fft;
 
-import boofcv.alg.misc.ImageMiscOps;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageFloat64;
-import boofcv.struct.image.InterleavedF32;
+import boofcv.alg.misc.GImageMiscOps;
+import boofcv.core.image.GeneralizedImageOps;
+import boofcv.struct.image.*;
 import boofcv.testing.BoofTesting;
 import org.ddogleg.complex.ComplexMath64F;
 import org.ejml.data.Complex64F;
@@ -29,6 +28,7 @@ import org.junit.Test;
 
 import java.util.Random;
 
+import static boofcv.core.image.GeneralizedImageOps.get;
 import static org.junit.Assert.*;
 
 /**
@@ -37,6 +37,9 @@ import static org.junit.Assert.*;
 public class TestDiscreteFourierTransformOps {
 
 	Random rand = new Random(234);
+
+	Class imageTypes[] = new Class[]{InterleavedF32.class,InterleavedF64.class};
+	Class imageTypesS[] = new Class[]{ImageFloat32.class,ImageFloat64.class};
 
 	@Test
 	public void isPowerOf2() {
@@ -83,184 +86,218 @@ public class TestDiscreteFourierTransformOps {
 
 	@Test
 	public void shiftZeroFrequency() {
-		InterleavedF32 complex;
+		for( Class type : imageTypes ) {
+			ImageInterleaved complex;
 
-		// test even images first
-		complex = new InterleavedF32(4,6,2);
-		shiftZeroFrequency(complex);
-		BoofTesting.checkSubImage(this, "shiftZeroFrequency", false, complex);
+			// test even images first
+			complex = GeneralizedImageOps.createInterleaved(type,4,6,2);
+			shiftZeroFrequency(complex);
+			BoofTesting.checkSubImage(this, "shiftZeroFrequency", false, complex);
 
-		// test odd images now
-		complex = new InterleavedF32(5,7,2);
-		shiftZeroFrequency(complex);
-		BoofTesting.checkSubImage(this, "shiftZeroFrequency", false, complex);
+			// test odd images now
+			complex = GeneralizedImageOps.createInterleaved(type,5,7,2);
+			shiftZeroFrequency(complex);
+			BoofTesting.checkSubImage(this, "shiftZeroFrequency", false, complex);
+		}
 	}
 
-	public void shiftZeroFrequency( InterleavedF32 input ) {
-		ImageMiscOps.fillUniform(input,rand,-5,5);
+	public void shiftZeroFrequency( ImageInterleaved input ) {
+		GImageMiscOps.fillUniform(input, rand, -5, 5);
 
-		InterleavedF32 original = input.clone();
+		ImageInterleaved original = (ImageInterleaved)input.clone();
 
 		// corners should be at zero now
-		DiscreteFourierTransformOps.shiftZeroFrequency(input,true);
+		if( input instanceof InterleavedF32 )
+			DiscreteFourierTransformOps.shiftZeroFrequency((InterleavedF32)input,true);
+		else
+			DiscreteFourierTransformOps.shiftZeroFrequency((InterleavedF64)input,true);
 
 		int hw = input.width/2;
 		int hh = input.height/2;
 		int w = input.width;
 		int h = input.height;
 
-		assertEquals(original.getBand(0,0,0),input.getBand(hw,hh,0),1e-4);
-		assertEquals(original.getBand(0,0,1),input.getBand(hw,hh,1),1e-4);
+		assertEquals(get(original, 0, 0, 0), get(input, hw, hh, 0),1e-4);
+		assertEquals(get(original, 0, 0, 1), get(input, hw, hh, 1),1e-4);
 
-		assertEquals(original.getBand(w-1,h-1,0),input.getBand(hw-1,hh-1,0),1e-4);
-		assertEquals(original.getBand(w-1,h-1,1),input.getBand(hw-1,hh-1,1),1e-4);
+		assertEquals(get(original, w - 1, h - 1, 0),get(input, hw - 1, hh - 1, 0),1e-4);
+		assertEquals(get(original, w - 1, h - 1, 1),get(input, hw - 1, hh - 1, 1),1e-4);
 
-		assertEquals(original.getBand(w-1,0,0),input.getBand(hw-1,hh,0),1e-4);
-		assertEquals(original.getBand(w-1,0,1),input.getBand(hw-1,hh,1),1e-4);
+		assertEquals(get(original, w - 1, 0, 0),get(input, hw - 1, hh, 0),1e-4);
+		assertEquals(get(original, w - 1, 0, 1),get(input, hw - 1, hh, 1),1e-4);
 
-		assertEquals(original.getBand(0,h-1,0),input.getBand(hw,hh-1,0),1e-4);
-		assertEquals(original.getBand(0,h-1,1),input.getBand(hw,hh-1,1),1e-4);
+		assertEquals(get(original, 0, h - 1, 0),get(input, hw, hh - 1, 0),1e-4);
+		assertEquals(get(original, 0, h - 1, 1),get(input, hw, hh - 1, 1),1e-4);
 
 		// undo the transform
-		DiscreteFourierTransformOps.shiftZeroFrequency(input,false);
+		if( input instanceof InterleavedF32 )
+			DiscreteFourierTransformOps.shiftZeroFrequency((InterleavedF32)input,false);
+		else
+			DiscreteFourierTransformOps.shiftZeroFrequency((InterleavedF64)input,false);
 		BoofTesting.assertEquals(original,input,1e-4);
 	}
 
 	@Test
 	public void magnitude() {
-		InterleavedF32 complex = new InterleavedF32(10,20,2);
-		ImageFloat32 output = new ImageFloat32(10,20);
+		for( int i = 0; i < imageTypes.length; i++ ) {
+			ImageInterleaved complex = GeneralizedImageOps.createInterleaved(imageTypes[i],10,20,2);
+			ImageSingleBand output = GeneralizedImageOps.createSingleBand(imageTypesS[i], 10, 20);
 
-		magnitude(complex, output);
-		BoofTesting.checkSubImage(this, "magnitude", false, complex, output);
+			magnitude(complex, output);
+			BoofTesting.checkSubImage(this, "magnitude", false, complex, output);
+		}
 	}
 
-	public void magnitude( InterleavedF32 transform , ImageFloat32 output ) {
-		ImageMiscOps.fillUniform(transform,rand,-5,5);
-		ImageMiscOps.fillUniform(output,rand,-5,5);
+	public void magnitude( ImageInterleaved transform , ImageSingleBand output ) {
+		GImageMiscOps.fillUniform(transform,rand,-5,5);
+		GImageMiscOps.fillUniform(output,rand,-5,5);
 
-		DiscreteFourierTransformOps.magnitude(transform, output);
+		if( transform instanceof InterleavedF32 )
+			DiscreteFourierTransformOps.magnitude((InterleavedF32)transform, (ImageFloat32)output);
+		else
+			DiscreteFourierTransformOps.magnitude((InterleavedF64)transform, (ImageFloat64)output);
 
 		for( int y = 0; y < transform.height; y++ ) {
 			for( int x = 0; x < transform.width; x++ ) {
-				float r = transform.getBand(x,y,0);
-				float i = transform.getBand(x,y,1);
+				double r = get(transform,x,y,0);
+				double i = get(transform, x, y, 1);
 
 				double m = Math.sqrt(r*r + i*i);
-				assertEquals(m,output.get(x,y),1e-4);
+				assertEquals(m,get(output, x, y),1e-4);
 			}
 		}
 	}
 
 	@Test
 	public void phase() {
-		InterleavedF32 complex = new InterleavedF32(10,20,2);
-		ImageFloat32 output = new ImageFloat32(10,20);
+		for( int i = 0; i < imageTypes.length; i++ ) {
+			ImageInterleaved complex = GeneralizedImageOps.createInterleaved(imageTypes[i],10,20,2);
+			ImageSingleBand output = GeneralizedImageOps.createSingleBand(imageTypesS[i],10,20);
 
-		phase(complex,output);
-		BoofTesting.checkSubImage(this, "phase", false, complex, output );
+			phase(complex,output);
+			BoofTesting.checkSubImage(this, "phase", false, complex, output );
+		}
 	}
 
-	public void phase( InterleavedF32 transform , ImageFloat32 phase ) {
-		ImageMiscOps.fillUniform(transform,rand,-5,5);
-		ImageMiscOps.fillUniform(phase,rand,-5,5);
+	public void phase( ImageInterleaved transform , ImageSingleBand output ) {
+		GImageMiscOps.fillUniform(transform,rand,-5,5);
+		GImageMiscOps.fillUniform(output,rand,-5,5);
 
-		DiscreteFourierTransformOps.phase(transform,phase);
+		if( transform instanceof InterleavedF32 )
+			DiscreteFourierTransformOps.phase((InterleavedF32) transform, (ImageFloat32) output);
+		else
+			DiscreteFourierTransformOps.phase((InterleavedF64) transform, (ImageFloat64) output);
+
 
 		for( int y = 0; y < transform.height; y++ ) {
 			for( int x = 0; x < transform.width; x++ ) {
-				float r = transform.getBand(x,y,0);
-				float i = transform.getBand(x,y,1);
+				double r = get(transform, x, y, 0);
+				double i = get(transform, x, y, 1);
 
-				double theta = Math.atan2(i,r);
-				assertEquals(theta,phase.get(x, y),1e-4);
+				double m = Math.atan2(i, r);
+				assertEquals(m,get(output, x, y),1e-4);
 			}
 		}
 	}
 
 	@Test
 	public void realToComplex() {
-		ImageFloat32 real = new ImageFloat32(10,20);
-		InterleavedF32 complex = new InterleavedF32(10,20,2);
+		for( int i = 0; i < imageTypes.length; i++ ) {
+			ImageSingleBand real = GeneralizedImageOps.createSingleBand(imageTypesS[i], 10, 20);
+			ImageInterleaved complex = GeneralizedImageOps.createInterleaved(imageTypes[i],10,20,2);
 
-		realToComplex(real,complex);
-		BoofTesting.checkSubImage(this, "realToComplex", false, real, complex );
+			realToComplex(real,complex);
+			BoofTesting.checkSubImage(this, "realToComplex", false, real, complex );
+		}
 	}
 
-	public void realToComplex( ImageFloat32 real , InterleavedF32 complex ) {
-		ImageMiscOps.fillUniform(real,rand,-5,5);
-		ImageMiscOps.fillUniform(complex,rand,-5,5);
+	public void realToComplex( ImageSingleBand real , ImageInterleaved complex ) {
+		GImageMiscOps.fillUniform(real,rand,-5,5);
+		GImageMiscOps.fillUniform(complex,rand,-5,5);
 
-		DiscreteFourierTransformOps.realToComplex(real,complex);
+		if( complex instanceof InterleavedF32 )
+			DiscreteFourierTransformOps.realToComplex((ImageFloat32) real, (InterleavedF32) complex);
+		else
+			DiscreteFourierTransformOps.realToComplex((ImageFloat64) real, (InterleavedF64) complex);
 
 		for( int y = 0; y < real.height; y++ ) {
 			for( int x = 0; x < real.width; x++ ) {
-				assertEquals(real.get(x,y),complex.getBand(x,y,0),1e-4);
-				assertEquals(0,complex.getBand(x,y,1),1e-4);
+				assertEquals(get(real,x,y),get(complex, x, y, 0),1e-4);
+				assertEquals(0,get(complex,x,y,1),1e-4);
 			}
 		}
 	}
 
 	@Test
 	public void multiplyRealComplex() {
-		ImageFloat32 realA = new ImageFloat32(10,20);
-		InterleavedF32 complexB = new InterleavedF32(10,20,2);
-		InterleavedF32 complexC = new InterleavedF32(10,20,2);
+		for( int i = 0; i < imageTypes.length; i++ ) {
+			ImageSingleBand realA = GeneralizedImageOps.createSingleBand(imageTypesS[i],10,20);
+			ImageInterleaved complexB = GeneralizedImageOps.createInterleaved(imageTypes[i],10,20,2);
+			ImageInterleaved complexC = GeneralizedImageOps.createInterleaved(imageTypes[i],10,20,2);
 
-		ImageMiscOps.fillUniform(realA,rand,-5,5);
-		ImageMiscOps.fillUniform(complexB,rand,-5,5);
+			GImageMiscOps.fillUniform(realA,rand,-5,5);
+			GImageMiscOps.fillUniform(complexB,rand,-5,5);
 
-		multiplyRealComplex(realA,complexB,complexC);
+			multiplyRealComplex(realA,complexB,complexC);
 
-		BoofTesting.checkSubImage(this, "multiplyRealComplex", false, realA, complexB, complexC);
+			BoofTesting.checkSubImage(this, "multiplyRealComplex", false, realA, complexB, complexC);
+		}
 	}
 
-	public void multiplyRealComplex( ImageFloat32 realA , InterleavedF32 complexB , InterleavedF32 complexC ) {
-		DiscreteFourierTransformOps.multiplyRealComplex(realA, complexB, complexC);
+	public void multiplyRealComplex( ImageSingleBand realA , ImageInterleaved complexB , ImageInterleaved complexC ) {
+		if( complexB instanceof InterleavedF32 )
+			DiscreteFourierTransformOps.multiplyRealComplex((ImageFloat32)realA, (InterleavedF32)complexB, (InterleavedF32)complexC);
+		else
+			DiscreteFourierTransformOps.multiplyRealComplex((ImageFloat64)realA, (InterleavedF64)complexB, (InterleavedF64)complexC);
 
 		Complex64F expected = new Complex64F();
 
 		for( int y = 0; y < realA.height; y++ ) {
 			for( int x = 0; x < realA.width; x++ ) {
-				Complex64F a = new Complex64F(realA.get(x, y),0);
-				Complex64F b = new Complex64F(complexB.getBand(x,y,0),complexB.getBand(x,y,1));
+				Complex64F a = new Complex64F(get(realA,x, y),0);
+				Complex64F b = new Complex64F(get(complexB,x,y,0),get(complexB, x, y, 1));
 
 				ComplexMath64F.mult(a,b,expected);
 
-				assertEquals(expected.getReal(),complexC.getBand(x,y,0),1e-4);
-				assertEquals(expected.getImaginary(),complexC.getBand(x,y,1),1e-4);
+				assertEquals(expected.getReal(),get(complexC, x, y, 0),1e-4);
+				assertEquals(expected.getImaginary(),get(complexC, x, y, 1),1e-4);
 			}
 		}
 	}
 
 	@Test
 	public void multiplyComplex() {
-		InterleavedF32 complexA = new InterleavedF32(10,20,2);
-		InterleavedF32 complexB = new InterleavedF32(10,20,2);
-		InterleavedF32 complexC = new InterleavedF32(10,20,2);
+		for( int i = 0; i < imageTypes.length; i++ ) {
+			ImageInterleaved complexA = GeneralizedImageOps.createInterleaved(imageTypes[i], 10, 20, 2);
+			ImageInterleaved complexB = GeneralizedImageOps.createInterleaved(imageTypes[i],10,20,2);
+			ImageInterleaved complexC = GeneralizedImageOps.createInterleaved(imageTypes[i],10,20,2);
 
-		ImageMiscOps.fillUniform(complexA,rand,-5,5);
-		ImageMiscOps.fillUniform(complexB,rand,-5,5);
+			GImageMiscOps.fillUniform(complexA,rand,-5,5);
+			GImageMiscOps.fillUniform(complexB,rand,-5,5);
 
-		multiplyComplex(complexA,complexB,complexC);
+			multiplyComplex(complexA,complexB,complexC);
 
-		BoofTesting.checkSubImage(this,"multiplyComplex",false,complexA,complexB,complexC);
+			BoofTesting.checkSubImage(this,"multiplyComplex",false,complexA,complexB,complexC);
+		}
 	}
 
-	public void multiplyComplex( InterleavedF32 complexA , InterleavedF32 complexB , InterleavedF32 complexC ) {
-		DiscreteFourierTransformOps.multiplyComplex(complexA,complexB,complexC);
+	public void multiplyComplex( ImageInterleaved complexA , ImageInterleaved complexB , ImageInterleaved complexC ) {
+		if( complexB instanceof InterleavedF32 )
+			DiscreteFourierTransformOps.multiplyComplex((InterleavedF32) complexA, (InterleavedF32) complexB, (InterleavedF32) complexC);
+		else
+			DiscreteFourierTransformOps.multiplyComplex((InterleavedF64) complexA, (InterleavedF64) complexB, (InterleavedF64) complexC);
 
 		Complex64F expected = new Complex64F();
 
 		for( int y = 0; y < complexA.height; y++ ) {
 			for( int x = 0; x < complexA.width; x++ ) {
-				Complex64F a = new Complex64F(complexA.getBand(x,y,0),complexA.getBand(x,y,1));
-				Complex64F b = new Complex64F(complexB.getBand(x,y,0),complexB.getBand(x,y,1));
+				Complex64F a = new Complex64F(get(complexA, x, y, 0),get(complexA, x, y, 1));
+				Complex64F b = new Complex64F(get(complexB, x, y, 0),get(complexB,x,y,1));
 
 				ComplexMath64F.mult(a,b,expected);
 
-				assertEquals(expected.getReal(),complexC.getBand(x,y,0),1e-4);
-				assertEquals(expected.getImaginary(),complexC.getBand(x,y,1),1e-4);
+				assertEquals(expected.getReal(),get(complexC, x, y, 0),1e-4);
+				assertEquals(expected.getImaginary(),get(complexC, x, y, 1),1e-4);
 			}
 		}
 	}
