@@ -176,6 +176,80 @@ public class DiscreteFourierTransformOps {
 	}
 
 	/**
+	 * Moves the zero-frequency component into the image center (width/2,height/2).   This function can
+	 * be called to undo the transform.
+	 *
+	 * @param transform the DFT which is to be shifted.
+	 * @param forward If true then it does the shift in the forward direction.  If false then it undoes the transforms.
+	 */
+	public static void shiftZeroFrequency(InterleavedF64 transform, boolean forward ) {
+
+		int hw = transform.width/2;
+		int hh = transform.height/2;
+
+		if( transform.width%2 == 0 && transform.height%2 == 0 ) {
+			// if both sides are even then a simple transform can be done
+			for( int y = 0; y < hh; y++ ) {
+				for( int x = 0; x < hw; x++ ) {
+					double ra = transform.getBand(x,y,0);
+					double ia = transform.getBand(x,y,1);
+
+					double rb = transform.getBand(x+hw,y+hh,0);
+					double ib = transform.getBand(x+hw,y+hh,1);
+
+					transform.setBand(x,y,0,rb);
+					transform.setBand(x,y,1,ib);
+					transform.setBand(x+hw,y+hh,0,ra);
+					transform.setBand(x+hw,y+hh,1,ia);
+
+					ra = transform.getBand(x+hw,y,0);
+					ia = transform.getBand(x+hw,y,1);
+
+					rb = transform.getBand(x,y+hh,0);
+					ib = transform.getBand(x,y+hh,1);
+
+					transform.setBand(x+hw,y,0,rb);
+					transform.setBand(x+hw,y,1,ib);
+					transform.setBand(x,y+hh,0,ra);
+					transform.setBand(x,y+hh,1,ia);
+				}
+			}
+		} else {
+			// with odd images, the easiest way to do it is by copying the regions
+			int w = transform.width;
+			int h = transform.height;
+
+			int hw1 = hw + 1;
+			int hh1 = hh + 1;
+
+			if( forward ) {
+				InterleavedF64 storageTL = new InterleavedF64(hw1,hh1,2);
+				storageTL.setTo(transform.subimage(0, 0, hw1, hh1));
+
+				InterleavedF64 storageTR = new InterleavedF64(hw,hh1,2);
+				storageTR.setTo(transform.subimage(hw1, 0, w, hh1));
+
+				transform.subimage(0,0,hw,hh).setTo(transform.subimage(hw1,hh1,w,h));
+				transform.subimage(hw,0,w, hh).setTo(transform.subimage(0,hh1,hw1,h));
+				transform.subimage(hw,hh,w,h).setTo(storageTL);
+				transform.subimage(0,hh,hw,h).setTo(storageTR);
+			} else {
+				InterleavedF64 storageBL = new InterleavedF64(hw,hh1,2);
+				storageBL.setTo(transform.subimage(0, hh, hw, h));
+
+				InterleavedF64 storageBR = new InterleavedF64(hw1,hh1,2);
+				storageBR.setTo(transform.subimage(hw, hh, w, h));
+
+
+				transform.subimage(hw1,hh1,w,h).setTo(transform.subimage(0,0,hw,hh));
+				transform.subimage(0,hh1,hw1,h).setTo(transform.subimage(hw,0,w, hh));
+				transform.subimage(hw1,0,w,hh1).setTo(storageBL);
+				transform.subimage(0,0,hw1,hh1).setTo(storageBR);
+			}
+		}
+	}
+
+	/**
 	 * Computes the magnitude of the complex image:<br>
 	 * magnitude = sqrt( real<sup>2</sup> + imaginary<sup>2</sup> )
 	 * @param transform (Input)  Complex interleaved image
@@ -195,6 +269,30 @@ public class DiscreteFourierTransformOps {
 				float img = transform.data[indexTran+1];
 
 				magnitude.data[indexMag++] = (float)Math.sqrt(real*real + img*img);
+			}
+		}
+	}
+
+	/**
+	 * Computes the magnitude of the complex image:<br>
+	 * magnitude = sqrt( real<sup>2</sup> + imaginary<sup>2</sup> )
+	 * @param transform (Input)  Complex interleaved image
+	 * @param magnitude (Output) Magnitude of image
+	 */
+	public static void magnitude( InterleavedF64 transform , ImageFloat64 magnitude ) {
+		checkImageArguments(magnitude,transform);
+
+		for( int y = 0; y < transform.height; y++ ) {
+
+			int indexTran = transform.startIndex + y*transform.stride;
+			int indexMag = magnitude.startIndex + y*magnitude.stride;
+
+			for( int x = 0; x < transform.width; x++, indexTran += 2 ) {
+
+				double real = transform.data[indexTran];
+				double img = transform.data[indexTran+1];
+
+				magnitude.data[indexMag++] = Math.sqrt(real*real + img*img);
 			}
 		}
 	}
@@ -224,12 +322,56 @@ public class DiscreteFourierTransformOps {
 	}
 
 	/**
+	 * Computes the phase of the complex image:<br>
+	 * phase = atan2( imaginary , real )
+	 * @param transform (Input) Complex interleaved image
+	 * @param phase (output) Phase of image
+	 */
+	public static void phase( InterleavedF64 transform , ImageFloat64 phase ) {
+		checkImageArguments(phase,transform);
+
+		for( int y = 0; y < transform.height; y++ ) {
+
+			int indexTran = transform.startIndex + y*transform.stride;
+			int indexPhase = phase.startIndex + y*phase.stride;
+
+			for( int x = 0; x < transform.width; x++, indexTran += 2 ) {
+
+				double real = transform.data[indexTran];
+				double img = transform.data[indexTran+1];
+
+				phase.data[indexPhase++] = Math.atan2(img, real);
+			}
+		}
+	}
+
+	/**
 	 * Converts a regular image into a complex interleaved image with the imaginary component set to zero.
 	 *
 	 * @param real (Input) Regular image.
 	 * @param complex (Output) Equivalent complex image.
 	 */
 	public static void realToComplex( ImageFloat32 real , InterleavedF32 complex ) {
+		checkImageArguments(real,complex);
+		for( int y = 0; y < complex.height; y++ ) {
+
+			int indexReal = real.startIndex + y*real.stride;
+			int indexComplex = complex.startIndex + y*complex.stride;
+
+			for( int x = 0; x < real.width; x++, indexReal++ , indexComplex += 2 ) {
+				complex.data[indexComplex] = real.data[indexReal];
+				complex.data[indexComplex+1] = 0;
+			}
+		}
+	}
+
+	/**
+	 * Converts a regular image into a complex interleaved image with the imaginary component set to zero.
+	 *
+	 * @param real (Input) Regular image.
+	 * @param complex (Output) Equivalent complex image.
+	 */
+	public static void realToComplex( ImageFloat64 real , InterleavedF64 complex ) {
 		checkImageArguments(real,complex);
 		for( int y = 0; y < complex.height; y++ ) {
 
@@ -276,6 +418,38 @@ public class DiscreteFourierTransformOps {
 	}
 
 	/**
+	 * Performs element-wise complex multiplication between a real image and a complex image.
+	 *
+	 * @param realA (Input) Regular image
+	 * @param complexB (Input) Complex image
+	 * @param complexC (Output) Complex image
+	 */
+	public static void multiplyRealComplex( ImageFloat64 realA ,
+											InterleavedF64 complexB , InterleavedF64 complexC ) {
+
+		checkImageArguments(realA,complexB);
+
+		InputSanityCheck.checkSameShape( complexB,complexC);
+
+		for( int y = 0; y < realA.height; y++ ) {
+
+			int indexA = realA.startIndex + y*realA.stride;
+			int indexB = complexB.startIndex + y*complexB.stride;
+			int indexC = complexC.startIndex + y*complexC.stride;
+
+			for( int x = 0; x < realA.width; x++, indexA++ , indexB += 2  ,indexC += 2 ) {
+
+				double real = realA.data[indexA];
+				double realB = complexB.data[indexB];
+				double imgB = complexB.data[indexB+1];
+
+				complexC.data[indexC] = real*realB;
+				complexC.data[indexC+1] = real*imgB;
+			}
+		}
+	}
+
+	/**
 	 * Performs element-wise complex multiplication between two complex images.
 	 *
 	 * @param complexA (Input) Complex image
@@ -298,6 +472,36 @@ public class DiscreteFourierTransformOps {
 				float imgA = complexA.data[indexA+1];
 				float realB = complexB.data[indexB];
 				float imgB = complexB.data[indexB+1];
+
+				complexC.data[indexC] = realA*realB - imgA*imgB;
+				complexC.data[indexC+1] = realA*imgB + imgA*realB;
+			}
+		}
+	}
+
+	/**
+	 * Performs element-wise complex multiplication between two complex images.
+	 *
+	 * @param complexA (Input) Complex image
+	 * @param complexB (Input) Complex image
+	 * @param complexC (Output) Complex image
+	 */
+	public static void multiplyComplex( InterleavedF64 complexA , InterleavedF64 complexB , InterleavedF64 complexC ) {
+
+		InputSanityCheck.checkSameShape(complexA, complexB,complexC);
+
+		for( int y = 0; y < complexA.height; y++ ) {
+
+			int indexA = complexA.startIndex + y*complexA.stride;
+			int indexB = complexB.startIndex + y*complexB.stride;
+			int indexC = complexC.startIndex + y*complexC.stride;
+
+			for( int x = 0; x < complexA.width; x++, indexA += 2 , indexB += 2  ,indexC += 2 ) {
+
+				double realA = complexA.data[indexA];
+				double imgA = complexA.data[indexA+1];
+				double realB = complexB.data[indexB];
+				double imgB = complexB.data[indexB+1];
 
 				complexC.data[indexC] = realA*realB - imgA*imgB;
 				complexC.data[indexC+1] = realA*imgB + imgA*realB;
