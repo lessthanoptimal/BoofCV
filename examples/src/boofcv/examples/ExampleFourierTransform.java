@@ -121,7 +121,7 @@ public class ExampleFourierTransform {
 		transform = transform.clone();
 
 		// shift the zero-frequency into the image center, as is standard in image processing
-		DiscreteFourierTransformOps.centerZeroFrequency(transform);
+		DiscreteFourierTransformOps.shiftZeroFrequency(transform,true);
 
 		// Compute the transform's magnitude and phase
 		DiscreteFourierTransformOps.magnitude(transform,magnitude);

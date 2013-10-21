@@ -312,6 +312,21 @@ public class BoofMiscOps {
 		System.out.println();
 	}
 
+	public static void print(InterleavedF32 a) {
+		for (int y = 0; y < a.height; y++) {
+			for (int x = 0; x < a.width; x++) {
+				System.out.print("|");
+				for( int band = 0; band < a.numBands; band++ ) {
+					System.out.printf(" %6.2f", a.getBand(x, y,band));
+				}
+				System.out.print(" |");
+
+			}
+			System.out.println();
+		}
+		System.out.println();
+	}
+
 	public static void print(ImageInteger a) {
 		for (int y = 0; y < a.height; y++) {
 			for (int x = 0; x < a.width; x++) {

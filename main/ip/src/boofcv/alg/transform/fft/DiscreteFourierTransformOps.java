@@ -101,48 +101,76 @@ public class DiscreteFourierTransformOps {
 			throw new IllegalArgumentException("The transform must have two bands");
 	}
 
-	// TODO will this work for even and odd length images?
-	// TODO do in a single pass
-	public static void centerZeroFrequency( InterleavedF32 transform ) {
+	/**
+	 * Moves the zero-frequency component into the image center (width/2,height/2).   This function can
+	 * be called to undo the transform.
+	 *
+	 * @param transform the DFT which is to be shifted.
+	 * @param forward If true then it does the shift in the forward direction.  If false then it undoes the transforms.
+	 */
+	public static void shiftZeroFrequency(InterleavedF32 transform, boolean forward ) {
 
-		if( transform.width%2 != 0 || transform.height%2 != 0 )
-			throw new IllegalArgumentException("Not uspported et");
-
-		int fw = transform.width;
 		int hw = transform.width/2;
 		int hh = transform.height/2;
 
-		for( int y = 0; y < transform.height; y++ ) {
+		if( transform.width%2 == 0 && transform.height%2 == 0 ) {
+			// if both sides are even then a simple transform can be done
+			for( int y = 0; y < hh; y++ ) {
+				for( int x = 0; x < hw; x++ ) {
+					float ra = transform.getBand(x,y,0);
+					float ia = transform.getBand(x,y,1);
 
-			int indexTran = transform.startIndex + y*transform.stride;
+					float rb = transform.getBand(x+hw,y+hh,0);
+					float ib = transform.getBand(x+hw,y+hh,1);
 
-			for( int x = 0; x < hw; x++, indexTran += 2 ) {
-				float ra = transform.data[indexTran];
-				float ia = transform.data[indexTran+1];
+					transform.setBand(x,y,0,rb);
+					transform.setBand(x,y,1,ib);
+					transform.setBand(x+hw,y+hh,0,ra);
+					transform.setBand(x+hw,y+hh,1,ia);
 
-				transform.data[indexTran] = transform.data[indexTran+fw];
-				transform.data[indexTran+1] = transform.data[indexTran+1+fw];
+					ra = transform.getBand(x+hw,y,0);
+					ia = transform.getBand(x+hw,y,1);
 
-				transform.data[indexTran+fw] = ra;
-				transform.data[indexTran+fw+1] = ia;
+					rb = transform.getBand(x,y+hh,0);
+					ib = transform.getBand(x,y+hh,1);
+
+					transform.setBand(x+hw,y,0,rb);
+					transform.setBand(x+hw,y,1,ib);
+					transform.setBand(x,y+hh,0,ra);
+					transform.setBand(x,y+hh,1,ia);
+				}
 			}
-		}
+		} else {
+			// with odd images, the easiest way to do it is by copying the regions
+			int w = transform.width;
+			int h = transform.height;
 
-		int stepY = hh*transform.stride;
+			int hw1 = hw + 1;
+			int hh1 = hh + 1;
 
-		for( int x = 0; x < transform.width; x++ ) {
+			if( forward ) {
+				InterleavedF32 storageTL = new InterleavedF32(hw1,hh1,2);
+				storageTL.setTo(transform.subimage(0, 0, hw1, hh1));
 
-			int indexTran = transform.startIndex + x*2;
+				InterleavedF32 storageTR = new InterleavedF32(hw,hh1,2);
+				storageTR.setTo(transform.subimage(hw1, 0, w, hh1));
 
-			for( int y = 0; y < hh; y++ , indexTran += transform.stride ) {
-				float ra = transform.data[indexTran];
-				float ia = transform.data[indexTran+1];
+				transform.subimage(0,0,hw,hh).setTo(transform.subimage(hw1,hh1,w,h));
+				transform.subimage(hw,0,w, hh).setTo(transform.subimage(0,hh1,hw1,h));
+				transform.subimage(hw,hh,w,h).setTo(storageTL);
+				transform.subimage(0,hh,hw,h).setTo(storageTR);
+			} else {
+				InterleavedF32 storageBL = new InterleavedF32(hw,hh1,2);
+				storageBL.setTo(transform.subimage(0, hh, hw, h));
 
-				transform.data[indexTran] = transform.data[indexTran+stepY];
-				transform.data[indexTran+1] = transform.data[indexTran+1+stepY];
+				InterleavedF32 storageBR = new InterleavedF32(hw1,hh1,2);
+				storageBR.setTo(transform.subimage(hw, hh, w, h));
 
-				transform.data[indexTran+stepY] = ra;
-				transform.data[indexTran+stepY+1] = ia;
+
+				transform.subimage(hw1,hh1,w,h).setTo(transform.subimage(0,0,hw,hh));
+				transform.subimage(0,hh1,hw1,h).setTo(transform.subimage(hw,0,w, hh));
+				transform.subimage(hw1,0,w,hh1).setTo(storageBL);
+				transform.subimage(0,0,hw1,hh1).setTo(storageBR);
 			}
 		}
 	}
