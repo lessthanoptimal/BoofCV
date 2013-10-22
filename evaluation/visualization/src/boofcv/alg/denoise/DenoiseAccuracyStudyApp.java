@@ -20,7 +20,7 @@ package boofcv.alg.denoise;
 
 import boofcv.abst.denoise.WaveletDenoiseFilter;
 import boofcv.abst.filter.FilterImageInterface;
-import boofcv.abst.wavelet.WaveletTransform;
+import boofcv.abst.transform.wavelet.WaveletTransform;
 import boofcv.alg.filter.derivative.LaplacianEdge;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.alg.misc.ImageStatistics;

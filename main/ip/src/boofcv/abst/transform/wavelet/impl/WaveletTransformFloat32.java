@@ -16,9 +16,9 @@
  * limitations under the License.
  */
 
-package boofcv.abst.wavelet.impl;
+package boofcv.abst.transform.wavelet.impl;
 
-import boofcv.abst.wavelet.WaveletTransform;
+import boofcv.abst.transform.wavelet.WaveletTransform;
 import boofcv.alg.transform.wavelet.UtilWavelet;
 import boofcv.alg.transform.wavelet.WaveletTransformOps;
 import boofcv.core.image.border.BorderType;
@@ -29,7 +29,7 @@ import boofcv.struct.wavelet.WlCoef_F32;
 
 
 /**
- * Implementation of {@link boofcv.abst.wavelet.WaveletTransform} for {@link ImageFloat32}.
+ * Implementation of {@link boofcv.abst.transform.wavelet.WaveletTransform} for {@link ImageFloat32}.
  *
  * @author Peter Abeles
  */

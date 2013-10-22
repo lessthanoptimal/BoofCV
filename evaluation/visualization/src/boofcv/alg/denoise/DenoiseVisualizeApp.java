@@ -21,7 +21,7 @@ package boofcv.alg.denoise;
 import boofcv.abst.denoise.WaveletDenoiseFilter;
 import boofcv.abst.filter.FilterImageInterface;
 import boofcv.abst.filter.blur.BlurFilter;
-import boofcv.abst.wavelet.WaveletTransform;
+import boofcv.abst.transform.wavelet.WaveletTransform;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.alg.misc.GPixelMath;

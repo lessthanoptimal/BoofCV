@@ -18,9 +18,9 @@
 
 package boofcv.factory.transform.wavelet;
 
-import boofcv.abst.wavelet.WaveletTransform;
-import boofcv.abst.wavelet.impl.WaveletTransformFloat32;
-import boofcv.abst.wavelet.impl.WaveletTransformInt;
+import boofcv.abst.transform.wavelet.WaveletTransform;
+import boofcv.abst.transform.wavelet.impl.WaveletTransformFloat32;
+import boofcv.abst.transform.wavelet.impl.WaveletTransformInt;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageInteger;
 import boofcv.struct.image.ImageSInt32;
@@ -32,7 +32,7 @@ import boofcv.struct.wavelet.WlCoef_I32;
 
 
 /**
- * Simplified factory for creating {@link boofcv.abst.wavelet.WaveletTransform}.  Factories are provided
+ * Simplified factory for creating {@link boofcv.abst.transform.wavelet.WaveletTransform}.  Factories are provided
  * for creating the different wavelet descriptions.
  *
  * @author Peter Abeles

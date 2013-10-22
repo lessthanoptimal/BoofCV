@@ -7,7 +7,7 @@ import static org.junit.Assert.fail;
 /**
  * @author Peter Abeles
  */
-public class TestMeanShiftLikelihood {
+public class TestTrackerMeanShiftComaniciu2003 {
 
 	@Test
 	public void stuff() {

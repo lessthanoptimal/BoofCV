@@ -18,7 +18,7 @@
 
 package boofcv.abst.denoise;
 
-import boofcv.abst.wavelet.WaveletTransform;
+import boofcv.abst.transform.wavelet.WaveletTransform;
 import boofcv.alg.denoise.DenoiseWavelet;
 import boofcv.core.image.border.BorderType;
 import boofcv.factory.denoise.FactoryDenoiseWaveletAlg;

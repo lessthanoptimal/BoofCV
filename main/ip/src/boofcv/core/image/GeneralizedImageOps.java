@@ -131,6 +131,11 @@ public class GeneralizedImageOps {
 		}
 	}
 
+	public static <T extends ImageSingleBand> T createSingleBand(ImageTypeInfo type, int width, int height) {
+		Class<T> typeClass = ImageDataType.getImageClass(ImageDataType.Family.SINGLE_BAND,type);
+		return createSingleBand(typeClass, width, height);
+	}
+
 	public static <T extends ImageSingleBand> T createSingleBand(Class<T> type, int width, int height) {
 		type = BoofTesting.convertGenericToSpecificType(type);
 
@@ -155,6 +160,11 @@ public class GeneralizedImageOps {
 			return (T)new ImageSInt32(width,height);
 		}
 		throw new RuntimeException("Unknown type: "+type.getSimpleName());
+	}
+
+	public static <T extends ImageInterleaved> T createInterleaved(ImageTypeInfo type, int width, int height , int numBands) {
+		Class<T> typeClass = ImageDataType.getImageClass(ImageDataType.Family.INTERLEAVED,type);
+		return createInterleaved(typeClass,width,height,numBands);
 	}
 
 	public static <T extends ImageInterleaved> T createInterleaved(Class<T> type, int width, int height , int numBands) {

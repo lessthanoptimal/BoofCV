@@ -18,7 +18,7 @@
 
 package boofcv.alg.denoise.impl;
 
-import boofcv.abst.wavelet.WaveletTransform;
+import boofcv.abst.transform.wavelet.WaveletTransform;
 import boofcv.alg.denoise.GenericDenoiseTests;
 import boofcv.factory.transform.wavelet.FactoryWaveletTransform;
 import boofcv.struct.image.ImageSingleBand;
