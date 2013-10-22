@@ -16,23 +16,20 @@
  * limitations under the License.
  */
 
-package boofcv.alg.transform.wavelet;
+package boofcv.alg.transform.fft;
 
-import boofcv.abst.transform.wavelet.WaveletTransform;
+import boofcv.abst.transform.fft.DiscreteFourierTransform;
+import boofcv.alg.misc.GPixelMath;
 import boofcv.core.image.ConvertBufferedImage;
-import boofcv.core.image.border.BorderType;
-import boofcv.factory.transform.wavelet.FactoryWaveletTransform;
-import boofcv.factory.transform.wavelet.GFactoryWavelet;
+import boofcv.core.image.GeneralizedImageOps;
 import boofcv.gui.ListDisplayPanel;
-import boofcv.gui.SelectAlgorithmAndInputPanel;
+import boofcv.gui.SelectInputPanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.gui.image.VisualizeImageData;
 import boofcv.io.PathLabel;
-import boofcv.io.image.UtilImageIO;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.wavelet.WaveletDescription;
-import boofcv.struct.wavelet.WlCoef;
+import boofcv.struct.image.ImageFloat;
+import boofcv.struct.image.ImageInterleaved;
+import boofcv.struct.image.ImageTypeInfo;
 
 import javax.swing.*;
 import java.awt.*;
@@ -43,37 +40,52 @@ import java.util.ArrayList;
 /**
  * @author Peter Abeles
  */
-public class WaveletVisualizeApp
-		<T extends ImageSingleBand, W extends ImageSingleBand, C extends WlCoef>
-		extends SelectAlgorithmAndInputPanel
+public class FourierVisualizeApp
+		<T extends ImageFloat, W extends ImageInterleaved>
+		extends SelectInputPanel
 {
-	int numLevels = 3;
+	DiscreteFourierTransform<T,W> fft;
 
 	T image;
-	T imageInv;
+	W transform;
+	T magnitude;
+	T phase;
 
-	Class<T> imageType;
+	ImageTypeInfo imageType;
 
 	ListDisplayPanel panel = new ListDisplayPanel();
 	boolean processedImage = false;
 
-	public WaveletVisualizeApp(Class<T> imageType ) {
-		super(1);
+	public FourierVisualizeApp(ImageTypeInfo imageType) {
 		this.imageType = imageType;
 
-		addWaveletDesc("Haar",GFactoryWavelet.haar(imageType));
-		addWaveletDesc("Daub 4", GFactoryWavelet.daubJ(imageType,4));
-		addWaveletDesc("Bi-orthogonal 5",GFactoryWavelet.biorthogoal(imageType,5, BorderType.REFLECT));
-		addWaveletDesc("Coiflet 6",GFactoryWavelet.coiflet(imageType,6));
+		image = GeneralizedImageOps.createSingleBand(imageType,1,1);
+		transform = GeneralizedImageOps.createInterleaved(imageType, 1, 1, 2);
+		magnitude = GeneralizedImageOps.createSingleBand(imageType,1,1);
+		phase = GeneralizedImageOps.createSingleBand(imageType,1,1);
+		fft = GDiscreteFourierTransformOps.createTransform(imageType);
 
 		setMainGUI(panel);
 	}
 
 	public void process( BufferedImage input ) {
 		setInputImage(input);
-		
-		image = ConvertBufferedImage.convertFromSingle(input, null, imageType);
-		imageInv = (T)image._createNew(image.width,image.height);
+
+		image.reshape(input.getWidth(),input.getHeight());
+		transform.reshape(input.getWidth(),input.getHeight());
+		magnitude.reshape(input.getWidth(),input.getHeight());
+		phase.reshape(input.getWidth(),input.getHeight());
+
+		ConvertBufferedImage.convertFrom(input, image, true);
+		fft.forward(image,transform);
+
+		GDiscreteFourierTransformOps.shiftZeroFrequency(transform,true);
+
+		GDiscreteFourierTransformOps.magnitude(transform, magnitude);
+		GDiscreteFourierTransformOps.phase(transform, phase);
+
+		// Convert it to a log scale for visibility
+		GPixelMath.log(magnitude, magnitude);
 
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
@@ -89,37 +101,17 @@ public class WaveletVisualizeApp
 
 	@Override
 	public void refreshAll(Object[] cookies) {
-		setActiveAlgorithm(0,null,cookies[0]);
-	}
-
-	private void addWaveletDesc( String name , WaveletDescription desc )
-	{
-		if( desc != null )
-			addAlgorithm(0, name,desc);
-	}
-
-	@Override
-	public void setActiveAlgorithm(int indexFamily, String name, Object cookie) {
 		if( image == null )
 			return;
 
-		WaveletDescription<C> desc = (WaveletDescription<C>)cookie;
-		WaveletTransform<T,W,C> waveletTran =
-				FactoryWaveletTransform.create((Class)image.getClass(),desc,numLevels,0,255);
-
 		panel.reset();
 
-		W imageWavelet = waveletTran.transform(image,null);
+		BufferedImage buffMag = VisualizeImageData.grayMagnitude(magnitude,null,-1);
+		BufferedImage buffPhase = VisualizeImageData.colorizeSign(phase,null,Math.PI);
 
-		waveletTran.invert(imageWavelet,imageInv);
-
-		// adjust the values inside the wavelet transform to make it easier to see
-		UtilWavelet.adjustForDisplay(imageWavelet, waveletTran.getLevels(), 255);
-		BufferedImage buffWavelet = VisualizeImageData.grayMagnitude(imageWavelet,null,255);
-		BufferedImage buffInv = ConvertBufferedImage.convertTo(imageInv,null,true);
-
-		panel.addImage(buffWavelet,"Transform");
-		panel.addImage(buffInv,"Inverse");
+		panel.addImage(inputImage,"Original");
+		panel.addImage(buffMag,"Magnitude");
+		panel.addImage(buffPhase,"Phase");
 	}
 
 	@Override
@@ -137,9 +129,8 @@ public class WaveletVisualizeApp
 	}
 
 	public static void main( String args[] ) {
-		BufferedImage in = UtilImageIO.loadImage("data/standard/lena512.bmp");
-		WaveletVisualizeApp app = new WaveletVisualizeApp(ImageFloat32.class);
-//		WaveletVisualizeApp app = new WaveletVisualizeApp(ImageUInt8.class);
+		FourierVisualizeApp app = new FourierVisualizeApp(ImageTypeInfo.F32);
+//		FourierVisualizeApp app = new FourierVisualizeApp(ImageTypeInfo.F64);
 
 		java.util.List<PathLabel> inputs = new ArrayList<PathLabel>();
 		inputs.add(new PathLabel("lena","../data/evaluation/standard/lena512.bmp"));
@@ -155,6 +146,6 @@ public class WaveletVisualizeApp
 			Thread.yield();
 		}
 
-		ShowImages.showWindow(app,"Wavelet Transforms");
+		ShowImages.showWindow(app,"Discrete Fourier Transform");
 	}
 }

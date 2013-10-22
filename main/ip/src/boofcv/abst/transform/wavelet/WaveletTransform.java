@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.abst.wavelet;
+package boofcv.abst.transform.wavelet;
 
 import boofcv.core.image.border.BorderType;
 import boofcv.struct.image.ImageSingleBand;

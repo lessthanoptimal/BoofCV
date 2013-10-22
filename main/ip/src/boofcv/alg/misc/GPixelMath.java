@@ -251,6 +251,23 @@ public class GPixelMath {
 	}
 
 	/**
+	 * Sets each pixel in the output image to log( 1 + input(x,y)) of the input image.
+	 * Both the input and output image can be the same instance.
+	 *
+	 * @param input The input image. Not modified.
+	 * @param output Where the log image is written to. Modified.
+	 */
+	public static <T extends ImageSingleBand> void log( T input , T output ) {
+		if( ImageFloat32.class == input.getClass() ) {
+			PixelMath.log((ImageFloat32) input, (ImageFloat32) output);
+		} else if( ImageFloat64.class == input.getClass() ) {
+			PixelMath.log((ImageFloat64) input, (ImageFloat64) output);
+		} else {
+			throw new IllegalArgumentException("Unknown image Type: "+input.getClass().getSimpleName());
+		}
+	}
+
+	/**
 	 * Each element has the specified number added to it. Both input and output images can
 	 * be the same.
 	 *

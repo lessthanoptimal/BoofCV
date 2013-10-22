@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.abst.wavelet.impl;
+package boofcv.abst.transform.wavelet.impl;
 
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.alg.transform.wavelet.UtilWavelet;

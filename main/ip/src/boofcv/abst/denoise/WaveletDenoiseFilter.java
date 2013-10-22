@@ -19,7 +19,7 @@
 package boofcv.abst.denoise;
 
 import boofcv.abst.filter.FilterImageInterface;
-import boofcv.abst.wavelet.WaveletTransform;
+import boofcv.abst.transform.wavelet.WaveletTransform;
 import boofcv.alg.denoise.DenoiseWavelet;
 import boofcv.alg.transform.wavelet.UtilWavelet;
 import boofcv.struct.image.ImageDimension;
