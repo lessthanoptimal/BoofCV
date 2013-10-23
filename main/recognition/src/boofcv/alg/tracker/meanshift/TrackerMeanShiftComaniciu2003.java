@@ -25,45 +25,66 @@ import georegression.struct.point.Point2D_F32;
 import java.util.List;
 
 /**
- * TODO fill
+ * <p>
+ * Mean shift tracker which adjusts the scale (or bandwidth) to account for changes in scale of the target [1].
+ * The mean-shift region is sampled using an oriented rectangle and weighted using a 2D gaussian.  The target
+ * is modeled using a color histogram of the input image, which can be optionally updated after each frame
+ * is processed.  The scale is selected by scoring different sized regions using the Bhattacharyya coefficient
+ * </p>
  *
+ * <p>
+ * [1] Meer, Peter. "Kernel-Based Object Tracking." IEEE Transactions on Pattern Analysis and Machine Intelligence
+ * 25.4 (2003): 1.
+ * </p>
  * @author Peter Abeles
  */
 public class TrackerMeanShiftComaniciu2003<T extends ImageMultiBand> {
 
 	// computes the histogram inside a rotated rectangle
-	LocalWeightedHistogramRotRect<T> calcHistogram;
+	private LocalWeightedHistogramRotRect<T> calcHistogram;
 	// the key-frame histogram which is being compared again
-	float keyHistogram[];
+	private float keyHistogram[];
 
-	RectangleRotate_F32 region = new RectangleRotate_F32();
+	// most recently select target region
+	private RectangleRotate_F32 region = new RectangleRotate_F32();
 
 	// maximum allowed mean-shift iterations
-	int maxIterations;
+	private int maxIterations;
 	// minimum change stopping condition
-	float minimumChange;
+	private float minimumChange;
 
 	// storage for the track region at different sizes
-	RectangleRotate_F32 region0 = new RectangleRotate_F32();
-	RectangleRotate_F32 region1 = new RectangleRotate_F32();
-	RectangleRotate_F32 region2 = new RectangleRotate_F32();
-	float histogram0[];
-	float histogram1[];
-	float histogram2[];
+	private RectangleRotate_F32 region0 = new RectangleRotate_F32();
+	private RectangleRotate_F32 region1 = new RectangleRotate_F32();
+	private RectangleRotate_F32 region2 = new RectangleRotate_F32();
+	private float histogram0[];
+	private float histogram1[];
+	private float histogram2[];
 
-	// weighting factor for change in scale
-	float gamma;
+	// weighting factor for change in scale. 0 to 1.  0 is 100% selected region
+	private float gamma;
 
 	// should it update the histogram after tracking?
-	boolean updateHistogram;
+	private boolean updateHistogram;
 
+	/**
+	 *
+	 * @param updateHistogram If true the historgram will be updated using the most recent image.
+	 * @param maxIterations Maximum number of mean-shift iterations
+	 * @param minimumChange Mean-shift will stop when the change is below this threshold
+	 * @param gamma Scale weighting factor.  Value from 0 to 1. Closer to 0 the more it will prefer
+	 *              the most recent estimate.  Try 0.1
+	 * @param calcHistogram Calculates the histogram
+	 */
 	public TrackerMeanShiftComaniciu2003(boolean updateHistogram,
 										 int maxIterations,
 										 float minimumChange,
+										 float gamma ,
 										 LocalWeightedHistogramRotRect<T> calcHistogram) {
 		this.updateHistogram = updateHistogram;
 		this.maxIterations = maxIterations;
 		this.minimumChange = minimumChange;
+		this.gamma = gamma;
 		this.calcHistogram = calcHistogram;
 
 		keyHistogram = new float[ calcHistogram.getHistogram().length ];
@@ -74,12 +95,21 @@ public class TrackerMeanShiftComaniciu2003<T extends ImageMultiBand> {
 		}
 	}
 
+	/**
+	 * Specifies the initial image to learn the target description
+	 * @param image Image
+	 * @param initial Initial image which contains the target
+	 */
 	public void initialize( T image , RectangleRotate_F32 initial ) {
 		this.region.set(initial);
 		calcHistogram.computeHistogram(image,initial);
 		System.arraycopy(calcHistogram.getHistogram(),0,keyHistogram,0,keyHistogram.length);
 	}
 
+	/**
+	 * Searches for the target in the most recent image.
+	 * @param image Most recent image in the sequence
+	 */
 	public void track( T image ) {
 
 		// configure the different regions based on size
@@ -110,12 +140,13 @@ public class TrackerMeanShiftComaniciu2003<T extends ImageMultiBand> {
 			case 0: selected = region0; selectedHist = histogram0; break;
 			case 1: selected = region1; selectedHist = histogram1; break;
 			case 2: selected = region2; selectedHist = histogram2; break;
+			default: throw new RuntimeException("Bug in selectBest");
 		}
 
 		// Set region to the best scale, but reduce sensitivity by weighting it against the original size
 		// equation 14
-		float w = selected.width*gamma + (1-gamma)*region.width;
-		float h = selected.height*gamma + (1-gamma)*region.height;
+		float w = selected.width*(1-gamma) + gamma*region.width;
+		float h = selected.height*(1-gamma) + gamma*region.height;
 
 		region.set(selected);
 		region.width = w;
@@ -126,6 +157,9 @@ public class TrackerMeanShiftComaniciu2003<T extends ImageMultiBand> {
 		}
 	}
 
+	/**
+	 * Given the 3 scores return the index of the best
+	 */
 	private int selectBest( double a , double b , double c ) {
 		if( a < b ) {
 			if( a < c )

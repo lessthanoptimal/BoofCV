@@ -56,14 +56,14 @@ public class LocalWeightedHistogramRotRect<T extends ImageMultiBand> {
 	public float imageX,imageY;
 
 	// which element in the histogram does a coordinate in the grid belong to
-	private int sampleHistIndex[];
+	protected int sampleHistIndex[];
 
 	// storage for sample weights and the histogram
 	protected float weights[];
 	protected float histogram[];
 
 	// list of sample points.  in square coordinates.  where 0.5 is 1/2 the width or height
-	private List<Point2D_F32> samplePts = new ArrayList<Point2D_F32>();
+	protected List<Point2D_F32> samplePts = new ArrayList<Point2D_F32>();
 
 	/**
 	 * Configures histogram calculation.
@@ -100,7 +100,7 @@ public class LocalWeightedHistogramRotRect<T extends ImageMultiBand> {
 		float w[] = new float[ numSamples ];
 		for( int i = 0; i < numSamples; i++ ) {
 			float x = i/(float)(numSamples-1);
-			w[i] =  (float) UtilGaussian.computePDF(0, 1, 2f*numSigmas * (x - 0.5f));
+			w[i] = (float) UtilGaussian.computePDF(0, 1, 2f*numSigmas * (x - 0.5f));
 		}
 
 		for( int y = 0; y < numSamples; y++ ) {
@@ -144,7 +144,7 @@ public class LocalWeightedHistogramRotRect<T extends ImageMultiBand> {
 
 		// if it is entirely inside the image, interpolate using a faster technique
 		if( isInFastBounds(region) ) {
-			computeHistogramInside(image, region);
+			computeHistogramInside( region);
 		} else {
 			computeHistogramBorder(image, region);
 		}
@@ -155,7 +155,7 @@ public class LocalWeightedHistogramRotRect<T extends ImageMultiBand> {
 	/**
 	 * Computes the histogram quickly inside the image
 	 */
-	protected void computeHistogramInside(T image, RectangleRotate_F32 region) {
+	protected void computeHistogramInside( RectangleRotate_F32 region) {
 		for( int i = 0; i < samplePts.size(); i++ ) {
 			Point2D_F32 p = samplePts.get(i);
 

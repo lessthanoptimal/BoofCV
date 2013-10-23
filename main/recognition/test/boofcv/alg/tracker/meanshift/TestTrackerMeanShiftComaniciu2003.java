@@ -10,7 +10,22 @@ import static org.junit.Assert.fail;
 public class TestTrackerMeanShiftComaniciu2003 {
 
 	@Test
-	public void stuff() {
+	public void track() {
+		fail("Implement");
+	}
+
+	@Test
+	public void selectBest() {
+		fail("Implement");
+	}
+
+	@Test
+	public void updateLocation() {
+		fail("Implement");
+	}
+
+	@Test
+	public void distanceHistogram() {
 		fail("Implement");
 	}
 

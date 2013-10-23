@@ -1,66 +1,176 @@
 package boofcv.alg.tracker.meanshift;
 
 import boofcv.alg.interpolate.InterpolatePixelMB;
+import boofcv.alg.misc.GImageMiscOps;
+import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.RectangleRotate_F32;
 import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.InterleavedF32;
+import boofcv.struct.image.MultiSpectral;
 import georegression.struct.point.Point2D_F32;
 import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Peter Abeles
  */
 public class TestLocalWeightedHistogramRotRect {
 
+	Random rand = new Random(234);
+
+	/**
+	 * Crudely checks to see that the center has the most weight
+	 */
 	@Test
 	public void computeWeights() {
-		fail("Implement");
+
+		int w = 9;
+
+		LocalWeightedHistogramRotRect alg = new LocalWeightedHistogramRotRect(w,3,12,3,255,null);
+
+		float maxW = alg.weights[w*6 + 6];
+
+		assertTrue(alg.weights[0] < maxW);
+		assertTrue(alg.weights[w-1] < maxW);
+		assertTrue(alg.weights[(w-1)*w + w-1] < maxW);
+		assertTrue(alg.weights[(w-1)*w] < maxW);
 	}
 
 	@Test
 	public void createSamplePoints() {
-		fail("Implement");
+		int w = 9;
+
+		LocalWeightedHistogramRotRect alg = new LocalWeightedHistogramRotRect(w,3,12,3,255,null);
+
+		int i = 0;
+		for( int y = 0; y < w; y++ ) {
+			for( int x = 0; x < w; x++ , i++ ) {
+				Point2D_F32 p = (Point2D_F32)alg.samplePts.get(i);
+				float expectedX = (x/(float)(w-1))-0.5f;
+				float expectedY = (y/(float)(w-1))-0.5f;
+
+				assertEquals(expectedX,p.x,1e-4f);
+				assertEquals(expectedY,p.y,1e-4f);
+			}
+		}
 	}
 
 	@Test
 	public void computeHistogram() {
-		fail("Implement");
+		MultiSpectral<ImageFloat32> image = new MultiSpectral<ImageFloat32>(ImageFloat32.class,40,50,3);
+		InterpolatePixelMB interp = FactoryInterpolation.createPixelMB(FactoryInterpolation.bilinearPixelS(ImageFloat32.class));
+		GImageMiscOps.fillUniform(image,rand,0,100);
+		interp.setImage(image);
 
-		// multiple calls should produce the same solution as a single call
+		RectangleRotate_F32 rect = new RectangleRotate_F32(20,25,10,15,0);
+		LocalWeightedHistogramRotRect alg = new LocalWeightedHistogramRotRect(10,3,12,3,255,interp);
+
+		alg.computeHistogram(image, rect);
+
+		float hist[] = alg.getHistogram().clone();
+		int histIndex[] = alg.getSampleHistIndex().clone();
+
+		// crude sanity check
+		int numNotZero = 0;
+		for( int i = 0; i < hist.length; i++ )
+			if( hist[i] != 0 ) numNotZero++;
+		assertTrue(numNotZero > 0);
+		for( int i = 0; i < histIndex.length; i++ )
+			assertTrue(histIndex[i] != 0);
+
+		// should produce the same answer after a second call
+		alg.computeHistogram(image,rect);
+
+		for( int i = 0; i < hist.length; i++ )
+			assertEquals(hist[i], alg.getHistogram()[i], 1e-4);
+		for( int i = 0; i < histIndex.length; i++ )
+			assertEquals(histIndex[i], alg.getSampleHistIndex()[i], 1e-4);
 	}
 
-
 	/**
-	 * Should produce the same as the border case when they are given the same solution inside
+	 * When given a region entirely inside, both inside and outside should produce identical solutions
 	 */
 	@Test
-	public void computeHistogramInside() {
-		fail("Implement");
+	public void computeHistogramBorder_compare() {
+		MultiSpectral<ImageFloat32> image = new MultiSpectral<ImageFloat32>(ImageFloat32.class,40,50,3);
+		InterpolatePixelMB interp = FactoryInterpolation.createPixelMB(FactoryInterpolation.bilinearPixelS(ImageFloat32.class));
+		GImageMiscOps.fillUniform(image,rand,0,100);
+		interp.setImage(image);
+
+		RectangleRotate_F32 rect = new RectangleRotate_F32(20,25,10,15,0);
+		LocalWeightedHistogramRotRect alg = new LocalWeightedHistogramRotRect(10,3,12,3,255,interp);
+
+		alg.computeHistogramBorder(image,rect);
+
+		int[] insideHistIndex = alg.sampleHistIndex.clone();
+		float[] insideHist = alg.histogram.clone();
+
+		alg = new LocalWeightedHistogramRotRect(10,3,12,3,255,interp);
+
+		alg.computeHistogramInside(rect);
+
+		for( int i = 0; i < insideHist.length; i++ ) {
+			assertEquals(insideHist[i],alg.histogram[i],1e-4f);
+		}
+		for( int i = 0; i < insideHistIndex.length; i++ ) {
+			assertEquals(insideHistIndex[i],alg.sampleHistIndex[i],1e-4f);
+		}
 	}
 
 	/**
-	 * Test it when the region is entirely inside the image
-	 */
-	@Test
-	public void computeHistogramBorder_inside() {
-		fail("Implement");
-	}
-
-	/**
-	 * Make sure it is skipping pixels outside the image
+	 * Make sure it handles pixels outside the image correctly
 	 */
 	@Test
 	public void computeHistogramBorder_outside() {
-		fail("Implement");
+		int numSamples = 10;
+
+		InterleavedF32 image = new InterleavedF32(40,50,3);
+		DummyInterpolate interp = new DummyInterpolate();
+		RectangleRotate_F32 rect = new RectangleRotate_F32(4,5,10,20,0);
+		LocalWeightedHistogramRotRect alg = new LocalWeightedHistogramRotRect(numSamples,3,12,3,255,interp);
+
+	    alg.c = 1; alg.s = 0;
+
+		alg.computeHistogramBorder(image,rect);
+
+		int numInside = 0;
+		int i = 0;
+		for( int y = 0; y < numSamples; y++ ) {
+			for( int x = 0; x < numSamples; x++ , i++ ) {
+				alg.squareToImage((float)x/(numSamples-1)-0.5f,(float)y/(numSamples-1)-0.5f,rect);
+
+				boolean inside = alg.imageX >= 0 && alg.imageX < 40 && alg.imageY >= 0 && alg.imageY < 50;
+
+				if( inside ) {
+					numInside++;
+					assertTrue(alg.sampleHistIndex[i] >= 0 );
+					assertTrue(alg.histogram[alg.sampleHistIndex[i]] > 0 );
+				} else {
+					assertTrue(alg.sampleHistIndex[i] == -1 );
+				}
+			}
+		}
+
+		assertTrue(numInside != numSamples*numSamples);
+
 	}
 
 	@Test
 	public void computeHistogramBin() {
-		fail("implement");
+		LocalWeightedHistogramRotRect alg = new LocalWeightedHistogramRotRect(10,3,12,3,255,null);
+
+		float div = 255.0f/12;
+
+		assertEquals(0,alg.computeHistogramBin(new float[]{0,0,0}));
+		assertEquals(1+2*12+3*144,alg.computeHistogramBin(new float[]{1*div,2*div,3*div}));
+
 	}
 
 	@Test
@@ -128,9 +238,9 @@ public class TestLocalWeightedHistogramRotRect {
 
 		alg.c = 0.5f; alg.s = -0.5f;
 		alg.squareToImage(-0.5f,0.5f,rect);
-
-		assertEquals(4f+2.5f-5f,alg.imageX,1e-4f);
-		assertEquals(5f+5f-2.5f,alg.imageY,1e-4f);
+		                                            // -5 +10
+		assertEquals(4f-2.5f+5f,alg.imageX,1e-4f);
+		assertEquals(5f+2.5f+5f,alg.imageY,1e-4f);
 	}
 
 	static class DummyInterpolate implements InterpolatePixelMB {

@@ -18,18 +18,61 @@
 
 package boofcv.abst.filter.interpolate;
 
+import boofcv.alg.interpolate.InterpolatePixelMB;
+import boofcv.alg.interpolate.InterpolatePixelS;
+import boofcv.alg.misc.ImageMiscOps;
+import boofcv.factory.interpolate.FactoryInterpolation;
+import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.MultiSpectral;
 import org.junit.Test;
 
-import static org.junit.Assert.fail;
+import java.util.Random;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Peter Abeles
  */
 public class TestInterpolatePixel_S_to_MB_MultiSpectral {
 
+	Random rand = new Random(234);
+	int width = 30;
+	int height = 40;
+
 	@Test
-	public void stuff() {
-		fail("Implement");
+	public void compareToIndividual() {
+		ImageFloat32 image0 = new ImageFloat32(width,height);
+		ImageFloat32 image1 = new ImageFloat32(width,height);
+
+		ImageMiscOps.fillUniform(image0,rand,0,100);
+		ImageMiscOps.fillUniform(image1,rand,0,100);
+
+		InterpolatePixelS<ImageFloat32> interpA = FactoryInterpolation.bilinearPixelS(ImageFloat32.class);
+		InterpolatePixelS<ImageFloat32> interpB = FactoryInterpolation.bilinearPixelS(ImageFloat32.class);
+
+		InterpolatePixelMB<MultiSpectral<ImageFloat32>> alg = new InterpolatePixel_S_to_MB_MultiSpectral<ImageFloat32>(interpB);
+
+		MultiSpectral<ImageFloat32> mb = new MultiSpectral<ImageFloat32>(ImageFloat32.class,width,height,2);
+		mb.bands[0] = image0;
+		mb.bands[1] = image1;
+
+		alg.setImage(mb);
+
+		float vals[] = new float[2];
+		for( int y = 0; y < height; y++ ) {
+			for( int x = 0; x < width; x++ ) {
+				alg.get(x+0.5f,y+0.5f,vals);
+
+				interpA.setImage(image0);
+				float expected0 = interpA.get(x+0.5f,y+0.5f);
+				interpA.setImage(image1);
+				float expected1 = interpA.get(x+0.5f,y+0.5f);
+
+				assertEquals(expected0,vals[0],1e-4);
+				assertEquals(expected1,vals[1],1e-4);
+			}
+		}
+
 	}
 
 }
