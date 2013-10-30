@@ -136,7 +136,7 @@ public class PnPLepetitEPnP {
 	private MotionTransformPoint<Se3_F64, Point3D_F64> motionFit = FitSpecialEuclideanOps_F64.fitPoints3D();
 
 	// mean location of world points
-	private Point3D_F64 meanWorldPts;
+	private Point3D_F64 meanWorldPts = new Point3D_F64();
 
 	// number of iterations it will perform
 	private int numIterations;
@@ -307,7 +307,7 @@ public class PnPLepetitEPnP {
 	 */
 	public void selectWorldControlPoints(List<Point3D_F64> worldPts, FastQueue<Point3D_F64> controlWorldPts) {
 
-		meanWorldPts = UtilPoint3D_F64.mean(worldPts);
+		UtilPoint3D_F64.mean(worldPts,meanWorldPts);
 
 		// covariance matrix elements, summed up here for speed
 		double c11=0,c12=0,c13=0,c22=0,c23=0,c33=0;
@@ -485,8 +485,8 @@ public class PnPLepetitEPnP {
 	protected double matchScale( List<Point3D_F64> nullPts ,
 								 FastQueue<Point3D_F64> controlWorldPts ) {
 
-		Point3D_F64 meanNull = UtilPoint3D_F64.mean(nullPts,numControl);
-		Point3D_F64 meanWorld = UtilPoint3D_F64.mean(controlWorldPts.toList(),numControl);
+		Point3D_F64 meanNull = UtilPoint3D_F64.mean(nullPts,numControl,null);
+		Point3D_F64 meanWorld = UtilPoint3D_F64.mean(controlWorldPts.toList(),numControl,null);
 
 		// compute the ratio of distance between world and null points from the centroid
 		double top = 0;

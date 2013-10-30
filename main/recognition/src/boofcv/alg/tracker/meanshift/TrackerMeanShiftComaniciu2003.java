@@ -43,7 +43,7 @@ public class TrackerMeanShiftComaniciu2003<T extends ImageMultiBand> {
 	// computes the histogram inside a rotated rectangle
 	private LocalWeightedHistogramRotRect<T> calcHistogram;
 	// the key-frame histogram which is being compared again
-	private float keyHistogram[];
+	protected float keyHistogram[];
 
 	// most recently select target region
 	private RectangleRotate_F32 region = new RectangleRotate_F32();
@@ -69,7 +69,7 @@ public class TrackerMeanShiftComaniciu2003<T extends ImageMultiBand> {
 
 	/**
 	 *
-	 * @param updateHistogram If true the historgram will be updated using the most recent image.
+	 * @param updateHistogram If true the histogram will be updated using the most recent image.
 	 * @param maxIterations Maximum number of mean-shift iterations
 	 * @param minimumChange Mean-shift will stop when the change is below this threshold
 	 * @param gamma Scale weighting factor.  Value from 0 to 1. Closer to 0 the more it will prefer
@@ -125,13 +125,13 @@ public class TrackerMeanShiftComaniciu2003<T extends ImageMultiBand> {
 
 		// perform mean-shift at the different sizes and compute their distance
 		updateLocation(image,region0);
-		double distance0 = distanceHistogram();
+		double distance0 = distanceHistogram(calcHistogram.getSampleHistIndex(),calcHistogram.getHistogram());
 		if( updateHistogram ) System.arraycopy(calcHistogram.getHistogram(),0,histogram0,0,histogram0.length);
 		updateLocation(image,region1);
-		double distance1 = distanceHistogram();
+		double distance1 = distanceHistogram(calcHistogram.getSampleHistIndex(),calcHistogram.getHistogram());
 		if( updateHistogram ) System.arraycopy(calcHistogram.getHistogram(),0,histogram1,0,histogram1.length);
 		updateLocation(image,region2);
-		double distance2 = distanceHistogram();
+		double distance2 = distanceHistogram(calcHistogram.getSampleHistIndex(),calcHistogram.getHistogram());
 		if( updateHistogram ) System.arraycopy(calcHistogram.getHistogram(),0,histogram2,0,histogram2.length);
 
 		RectangleRotate_F32 selected = null;
@@ -235,15 +235,15 @@ public class TrackerMeanShiftComaniciu2003<T extends ImageMultiBand> {
 	 * Equations 6 and 7.
 	 * Must be called immediately after {@link #updateLocation}.
 	 */
-	protected double distanceHistogram() {
+	protected double distanceHistogram( int sampleHistIndex[] , float histogram[] ) {
 		double sumP = 0;
-		int sampleHistIndex[] = calcHistogram.getSampleHistIndex();
-		float histogram[] = calcHistogram.getHistogram();
-		for( int j = 0; j < histogram.length; j++ ) {
-			int histIndex = sampleHistIndex[j];
-			float q = keyHistogram[histIndex];
-			float p = histogram[histIndex];
-			sumP +=  Math.sqrt(q*p);
+		for( int i = 0; i < histogram.length; i++ ) {
+			int histIndex = sampleHistIndex[i];
+			if( histIndex != -1 ) {
+				float q = keyHistogram[histIndex];
+				float p = histogram[histIndex];
+				sumP += Math.sqrt(q*p);
+			}
 		}
 		return Math.sqrt(1-sumP);
 	}
