@@ -33,9 +33,9 @@ import boofcv.misc.PerformerBase;
 import boofcv.misc.ProfileOperation;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.feature.TupleDesc_B;
-import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageType;
 import boofcv.struct.image.MultiSpectral;
 import georegression.struct.point.Point2D_I32;
 
@@ -136,7 +136,7 @@ public class BenchmarkDescribe<I extends ImageSingleBand, D extends ImageSingleB
 
 		@Override
 		public void process() {
-			if( alg.getImageType().getFamily() == ImageDataType.Family.SINGLE_BAND )
+			if( alg.getImageType().getFamily() == ImageType.Family.SINGLE_BAND )
 				alg.setImage(gray);
 			else
 				alg.setImage(colorMS);
@@ -162,13 +162,13 @@ public class BenchmarkDescribe<I extends ImageSingleBand, D extends ImageSingleB
 		ConfigSurfDescribe.Stablility surfStable = new ConfigSurfDescribe.Stablility();
 
 		ProfileOperation.printOpsPerSec(new Describe("SURF-F",
-				FactoryDescribeRegionPoint.<I,II>surfFast(surfSpeed, ImageDataType.single(imageType))),TEST_TIME);
+				FactoryDescribeRegionPoint.<I,II>surfFast(surfSpeed, ImageType.single(imageType))),TEST_TIME);
 		ProfileOperation.printOpsPerSec(new Describe("SURF-F Color",
-				FactoryDescribeRegionPoint.surfFast(surfSpeed, ImageDataType.ms(3,imageType))),TEST_TIME);
+				FactoryDescribeRegionPoint.surfFast(surfSpeed, ImageType.ms(3, imageType))),TEST_TIME);
 		ProfileOperation.printOpsPerSec(new Describe("SURF-S",
-				FactoryDescribeRegionPoint.<I,II>surfStable(surfStable,  ImageDataType.single(imageType))),TEST_TIME);
+				FactoryDescribeRegionPoint.<I,II>surfStable(surfStable,  ImageType.single(imageType))),TEST_TIME);
 		ProfileOperation.printOpsPerSec(new Describe("SURF-S Color",
-				FactoryDescribeRegionPoint.surfStable(surfStable,  ImageDataType.ms(3, imageType))),TEST_TIME);
+				FactoryDescribeRegionPoint.surfStable(surfStable,  ImageType.ms(3, imageType))),TEST_TIME);
 
 //		if( imageType == ImageFloat32.class )
 //			ProfileOperation.printOpsPerSec(new Describe("SIFT", FactoryDescribeRegionPoint.sift(null,null)),TEST_TIME);

@@ -84,8 +84,8 @@ public class ExampleVisualOdometryDepth {
 		GrowQueue_I8 data = new GrowQueue_I8();
 
 		// Process the video sequence and output the location plus number of inliers
-		SimpleImageSequence<ImageUInt8> videoVisual = media.openVideo(directory+"rgb.mjpeg",ImageDataType.single(ImageUInt8.class));
-		SimpleImageSequence<ImageUInt16> videoDepth = media.openVideo(directory + "depth.mpng", ImageDataType.single(ImageUInt16.class));
+		SimpleImageSequence<ImageUInt8> videoVisual = media.openVideo(directory+"rgb.mjpeg", ImageType.single(ImageUInt8.class));
+		SimpleImageSequence<ImageUInt16> videoDepth = media.openVideo(directory + "depth.mpng", ImageType.single(ImageUInt16.class));
 
 		while( videoVisual.hasNext() ) {
 			ImageUInt8 left = videoVisual.next();

@@ -21,7 +21,7 @@ package boofcv.io.wrapper.xuggler;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageDataType;
+import boofcv.struct.image.ImageType;
 import com.xuggle.xuggler.*;
 import com.xuggle.xuggler.video.ConverterFactory;
 import com.xuggle.xuggler.video.IConverter;
@@ -49,7 +49,7 @@ public class XugglerSimplified<T extends ImageBase> implements SimpleImageSequen
 	// the output image
 	T image;
 	// type of output image
-	ImageDataType<T> typeOutput;
+	ImageType<T> typeOutput;
 
 	// read in buffered images
 	BufferedImage bufferedImage;
@@ -63,12 +63,12 @@ public class XugglerSimplified<T extends ImageBase> implements SimpleImageSequen
 
 	String fileName;
 
-	public XugglerSimplified(String filename, ImageDataType<T> typeOutput) {
+	public XugglerSimplified(String filename, ImageType<T> typeOutput) {
 		image = typeOutput.createImage(1,1);
 		open(filename,typeOutput);
 	}
 
-	public void open(String filename, ImageDataType<T> typeOutput) {
+	public void open(String filename, ImageType<T> typeOutput) {
 		this.fileName = filename;
 
 		if (!IVideoResampler.isSupported(
@@ -242,7 +242,7 @@ public class XugglerSimplified<T extends ImageBase> implements SimpleImageSequen
 	}
 
 	@Override
-	public ImageDataType<T> getImageType() {
+	public ImageType<T> getImageType() {
 		return typeOutput;
 	}
 

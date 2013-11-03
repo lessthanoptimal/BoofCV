@@ -21,7 +21,7 @@ package boofcv.gui;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageDataType;
-import boofcv.struct.image.ImageTypeInfo;
+import boofcv.struct.image.ImageType;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -48,16 +48,16 @@ public abstract class VideoProcessAppBase<I extends ImageBase>
 
 	JSpinner periodSpinner;
 
-	protected ImageDataType<I> imageInfo;
+	protected ImageType<I> imageInfo;
 
 	public VideoProcessAppBase(int numAlgFamilies, Class<I> imageType) {
 		super(numAlgFamilies);
 
-		this.imageInfo = new ImageDataType<I>(ImageDataType.Family.SINGLE_BAND, ImageTypeInfo.classToType(imageType),1);
+		this.imageInfo = new ImageType<I>(ImageType.Family.SINGLE_BAND, ImageDataType.classToType(imageType),1);
 		addToToolbar(createSelectDelay());
 	}
 
-	public VideoProcessAppBase(int numAlgFamilies, ImageDataType<I> imageInfo ) {
+	public VideoProcessAppBase(int numAlgFamilies, ImageType<I> imageInfo ) {
 		super(numAlgFamilies);
 
 		this.imageInfo = imageInfo;

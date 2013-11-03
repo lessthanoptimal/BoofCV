@@ -20,8 +20,8 @@ package boofcv.abst.feature.detdesc;
 
 import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
 import boofcv.struct.feature.SurfFeature;
-import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageType;
 
 /**
  * @author Peter Abeles
@@ -30,11 +30,11 @@ public class TestWrapDetectDescribeSurf extends GenericTestsDetectDescribePoint<
 {
 
 	public TestWrapDetectDescribeSurf() {
-		super(true, true, ImageDataType.single(ImageFloat32.class), SurfFeature.class);
+		super(true, true, ImageType.single(ImageFloat32.class), SurfFeature.class);
 	}
 
 	@Override
 	public DetectDescribePoint<ImageFloat32, SurfFeature> createDetDesc() {
-		return FactoryDetectDescribe.surfStable(null,null,null, ImageDataType.single(ImageFloat32.class));
+		return FactoryDetectDescribe.surfStable(null,null,null, ImageType.single(ImageFloat32.class));
 	}
 }

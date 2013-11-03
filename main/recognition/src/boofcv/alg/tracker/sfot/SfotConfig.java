@@ -25,6 +25,8 @@ import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.struct.image.ImageSingleBand;
 
 /**
+ * fContains configuration parameters for {@link SparseFlowObjectTracker}.
+ *
  * @author Peter Abeles
  */
 public class SfotConfig <T extends ImageSingleBand, D extends ImageSingleBand> {
@@ -48,7 +50,7 @@ public class SfotConfig <T extends ImageSingleBand, D extends ImageSingleBand> {
 
 
 	/**
-	 *
+	 * Number of points it samples along one side of the grid.
 	 */
 	public int numberOfSamples = 15;
 

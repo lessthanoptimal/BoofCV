@@ -18,6 +18,7 @@
 
 package boofcv.alg.tracker;
 
+import boofcv.abst.tracker.ConfigComaniciu2003;
 import boofcv.abst.tracker.MeanShiftLikelihoodType;
 import boofcv.abst.tracker.TrackerObjectQuad;
 import boofcv.alg.tracker.sfot.SfotConfig;
@@ -29,8 +30,8 @@ import boofcv.gui.VideoProcessAppBase;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.PathLabel;
 import boofcv.io.image.SimpleImageSequence;
-import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageType;
 import boofcv.struct.image.ImageUInt8;
 import boofcv.struct.image.MultiSpectral;
 import georegression.struct.shapes.Quadrilateral_F64;
@@ -72,7 +73,7 @@ public class VideoTrackerObjectQuadApp<I extends ImageSingleBand>
 	boolean firstFrame = true;
 
 	public VideoTrackerObjectQuadApp( Class<I> imageType ) {
-		super(1, ImageDataType.ms(3,imageType));
+		super(1, ImageType.ms(3, imageType));
 		this.imageType = imageType;
 
 		gray = GeneralizedImageOps.createSingleBand(imageType,1,1);
@@ -81,6 +82,7 @@ public class VideoTrackerObjectQuadApp<I extends ImageSingleBand>
 		addAlgorithm(0, "Sparse Flow", 1);
 		addAlgorithm(0, "Mean Shift Likelihood HSV", 2);
 		addAlgorithm(0, "Mean Shift Likelihood RGB", 3);
+		addAlgorithm(0, "Mean Shift Scale", 4);
 
 		videoPanel = new TrackerObjectQuadPanel(this);
 		infoBar = new TrackerQuadInfoPanel(this);
@@ -118,6 +120,9 @@ public class VideoTrackerObjectQuadApp<I extends ImageSingleBand>
 		else if( whichAlg == 3 )
 			tracker = FactoryTrackerObjectQuad.createMeanShiftLikelihood(30, 4,255,
 					MeanShiftLikelihoodType.HISTOGRAM,imageType);
+		else if( whichAlg == 4 )
+			tracker = FactoryTrackerObjectQuad.createMeanShiftComaniciu2003(
+					new ConfigComaniciu2003(imageInfo));
 		else
 			throw new RuntimeException("Unknown algorithm");
 
@@ -148,7 +153,7 @@ public class VideoTrackerObjectQuadApp<I extends ImageSingleBand>
 
 		boolean grayScale = false;
 
-		if( tracker.getImageType().getFamily() == ImageDataType.Family.SINGLE_BAND ) {
+		if( tracker.getImageType().getFamily() == ImageType.Family.SINGLE_BAND ) {
 			gray.reshape(frame.width,frame.height);
 			GConvertImage.average(frame, gray);
 			grayScale = true;
@@ -222,7 +227,7 @@ public class VideoTrackerObjectQuadApp<I extends ImageSingleBand>
 
 		parseQuad(path+"_rect.txt");
 
-		SimpleImageSequence<MultiSpectral<I>> video = media.openVideo(path+".mjpeg", ImageDataType.ms(3,imageType));
+		SimpleImageSequence<MultiSpectral<I>> video = media.openVideo(path+".mjpeg", ImageType.ms(3, imageType));
 
 		process(video);
 	}

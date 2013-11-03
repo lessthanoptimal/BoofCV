@@ -28,8 +28,8 @@ import boofcv.factory.feature.detect.interest.FactoryInterestPoint;
 import boofcv.factory.feature.orientation.FactoryOrientationAlgs;
 import boofcv.struct.feature.SurfFeature;
 import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageType;
 import georegression.struct.point.Point2D_F64;
 import org.junit.Test;
 
@@ -80,7 +80,7 @@ public class TestDetectDescribeMultiFusion {
 		final InterestPointDetector<ImageFloat32> detector = FactoryInterestPoint.fastHessian(null);
 		final OrientationImage ori = FactoryOrientationAlgs.nogradient(5, ImageFloat32.class);
 		final DescribeRegionPoint<ImageFloat32,SurfFeature> desc =
-				FactoryDescribeRegionPoint.surfStable(null, ImageDataType.single(ImageFloat32.class));
+				FactoryDescribeRegionPoint.surfStable(null, ImageType.single(ImageFloat32.class));
 
 		new GenericTestsDetectDescribeMulti(ImageFloat32.class,SurfFeature.class) {
 			@Override
@@ -95,7 +95,7 @@ public class TestDetectDescribeMultiFusion {
 	public void checkWithoutOrientation() {
 		final InterestPointDetector<ImageFloat32> detector = FactoryInterestPoint.fastHessian(null);
 		final DescribeRegionPoint<ImageFloat32,SurfFeature> desc =
-				FactoryDescribeRegionPoint.surfStable(null, ImageDataType.single(ImageFloat32.class));
+				FactoryDescribeRegionPoint.surfStable(null, ImageType.single(ImageFloat32.class));
 
 		new GenericTestsDetectDescribeMulti(ImageFloat32.class,SurfFeature.class) {
 

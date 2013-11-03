@@ -44,9 +44,9 @@ import boofcv.factory.feature.orientation.FactoryOrientationAlgs;
 import boofcv.struct.feature.SurfFeature;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageType;
 
 /**
  * Creates instances of {@link DetectDescribePoint} for different feature detectors/describers.
@@ -111,7 +111,7 @@ public class FactoryDetectDescribe {
 	DetectDescribePoint<T,SurfFeature> surfFast( ConfigFastHessian configDetector ,
 												 ConfigSurfDescribe.Speed configDesc,
 												 ConfigAverageIntegral configOrientation,
-												 ImageDataType<T> imageType) {
+												 ImageType<T> imageType) {
 
 		Class bandType = imageType.getImageClass();
 		Class<II> integralType = GIntegralImageOps.getIntegralType(bandType);
@@ -120,9 +120,9 @@ public class FactoryDetectDescribe {
 		DescribePointSurf<II> describe = FactoryDescribePointAlgs.surfSpeed(configDesc, integralType);
 		OrientationIntegral<II> orientation = FactoryOrientationAlgs.average_ii(configOrientation, integralType);
 
-		if( imageType.getFamily() == ImageDataType.Family.SINGLE_BAND ) {
+		if( imageType.getFamily() == ImageType.Family.SINGLE_BAND ) {
 			return new WrapDetectDescribeSurf( detector, orientation, describe );
-		} else if( imageType.getFamily() == ImageDataType.Family.MULTI_SPECTRAL ) {
+		} else if( imageType.getFamily() == ImageType.Family.MULTI_SPECTRAL ) {
 			DescribePointSurfMultiSpectral<II> describeMulti =
 					new DescribePointSurfMultiSpectral<II>(describe,imageType.getNumBands());
 
@@ -160,7 +160,7 @@ public class FactoryDetectDescribe {
 	DetectDescribePoint<T,SurfFeature> surfStable( ConfigFastHessian configDetector,
 												   ConfigSurfDescribe.Stablility configDescribe,
 												   ConfigSlidingIntegral configOrientation,
-												   ImageDataType<T> imageType ) {
+												   ImageType<T> imageType ) {
 
 		Class bandType = imageType.getImageClass();
 		Class<II> integralType = GIntegralImageOps.getIntegralType(bandType);
@@ -169,9 +169,9 @@ public class FactoryDetectDescribe {
 		DescribePointSurfMod<II> describe = FactoryDescribePointAlgs.surfStability(configDescribe, integralType);
 		OrientationIntegral<II> orientation = FactoryOrientationAlgs.sliding_ii(configOrientation, integralType);
 
-		if( imageType.getFamily() == ImageDataType.Family.SINGLE_BAND ) {
+		if( imageType.getFamily() == ImageType.Family.SINGLE_BAND ) {
 			return new WrapDetectDescribeSurf( detector, orientation, describe );
-		} else if( imageType.getFamily() == ImageDataType.Family.MULTI_SPECTRAL ) {
+		} else if( imageType.getFamily() == ImageType.Family.MULTI_SPECTRAL ) {
 			DescribePointSurfMultiSpectral<II> describeMulti =
 					new DescribePointSurfMultiSpectral<II>(describe,imageType.getNumBands());
 

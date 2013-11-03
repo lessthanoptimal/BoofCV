@@ -23,8 +23,8 @@ import boofcv.alg.transform.ii.GIntegralImageOps;
 import boofcv.core.image.GConvertImage;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.feature.SurfFeature;
-import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageType;
 import boofcv.struct.image.MultiSpectral;
 
 /**
@@ -44,7 +44,7 @@ public class SurfMultiSpectral_to_DescribeRegionPoint<T extends ImageSingleBand,
 	II grayII;
 	MultiSpectral<II> bandII;
 
-	ImageDataType<MultiSpectral<T>> imageType;
+	ImageType<MultiSpectral<T>> imageType;
 
 	public SurfMultiSpectral_to_DescribeRegionPoint(DescribePointSurfMultiSpectral<II> alg,
 													Class<T> imageType, Class<II> integralType ) {
@@ -54,7 +54,7 @@ public class SurfMultiSpectral_to_DescribeRegionPoint<T extends ImageSingleBand,
 		grayII = GeneralizedImageOps.createSingleBand(integralType,1,1);
 		bandII = new MultiSpectral<II>(integralType,1,1,alg.getNumBands());
 
-		this.imageType = ImageDataType.ms(alg.getNumBands(), imageType);
+		this.imageType = ImageType.ms(alg.getNumBands(), imageType);
 	}
 
 	@Override
@@ -90,7 +90,7 @@ public class SurfMultiSpectral_to_DescribeRegionPoint<T extends ImageSingleBand,
 	}
 
 	@Override
-	public ImageDataType<MultiSpectral<T>> getImageType() {
+	public ImageType<MultiSpectral<T>> getImageType() {
 		return imageType;
 	}
 

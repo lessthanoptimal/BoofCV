@@ -23,8 +23,8 @@ import boofcv.abst.feature.tracker.PkltConfig;
 import boofcv.abst.feature.tracker.PointTracker;
 import boofcv.factory.feature.tracker.FactoryPointTracker;
 import boofcv.factory.sfm.FactoryVisualOdometry;
-import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageSInt16;
+import boofcv.struct.image.ImageType;
 import boofcv.struct.image.ImageUInt8;
 
 /**
@@ -54,7 +54,7 @@ public class TestMonoOverhead_to_MonocularPlaneVisualOdometry extends CheckVisua
 		double ransacTol = 0.2;
 
 		return FactoryVisualOdometry.monoPlaneOverhead(
-				cellSize, 25,0.5, ransacTol,300,2,30,0.5,0.3, tracker,ImageDataType.single(ImageUInt8.class));
+				cellSize, 25,0.5, ransacTol,300,2,30,0.5,0.3, tracker, ImageType.single(ImageUInt8.class));
 
 	}
 

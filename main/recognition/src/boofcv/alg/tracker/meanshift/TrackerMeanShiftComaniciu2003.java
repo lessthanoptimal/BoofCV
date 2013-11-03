@@ -68,10 +68,11 @@ public class TrackerMeanShiftComaniciu2003<T extends ImageMultiBand> {
 	private boolean updateHistogram;
 
 	/**
+	 * Configures tracker.
 	 *
-	 * @param updateHistogram If true the histogram will be updated using the most recent image.
-	 * @param maxIterations Maximum number of mean-shift iterations
-	 * @param minimumChange Mean-shift will stop when the change is below this threshold
+	 * @param updateHistogram If true the histogram will be updated using the most recent image. Try true.
+	 * @param maxIterations Maximum number of mean-shift iterations.  Try 30
+	 * @param minimumChange Mean-shift will stop when the change is below this threshold.  Try 1e-4f
 	 * @param gamma Scale weighting factor.  Value from 0 to 1. Closer to 0 the more it will prefer
 	 *              the most recent estimate.  Try 0.1
 	 * @param calcHistogram Calculates the histogram
@@ -125,13 +126,13 @@ public class TrackerMeanShiftComaniciu2003<T extends ImageMultiBand> {
 
 		// perform mean-shift at the different sizes and compute their distance
 		updateLocation(image,region0);
-		double distance0 = distanceHistogram(calcHistogram.getSampleHistIndex(),calcHistogram.getHistogram());
+		double distance0 = distanceHistogram(keyHistogram,calcHistogram.getHistogram());
 		if( updateHistogram ) System.arraycopy(calcHistogram.getHistogram(),0,histogram0,0,histogram0.length);
 		updateLocation(image,region1);
-		double distance1 = distanceHistogram(calcHistogram.getSampleHistIndex(),calcHistogram.getHistogram());
+		double distance1 = distanceHistogram(keyHistogram,calcHistogram.getHistogram());
 		if( updateHistogram ) System.arraycopy(calcHistogram.getHistogram(),0,histogram1,0,histogram1.length);
 		updateLocation(image,region2);
-		double distance2 = distanceHistogram(calcHistogram.getSampleHistIndex(),calcHistogram.getHistogram());
+		double distance2 = distanceHistogram(keyHistogram,calcHistogram.getHistogram());
 		if( updateHistogram ) System.arraycopy(calcHistogram.getHistogram(),0,histogram2,0,histogram2.length);
 
 		RectangleRotate_F32 selected = null;
@@ -166,7 +167,7 @@ public class TrackerMeanShiftComaniciu2003<T extends ImageMultiBand> {
 				return 0;
 			else
 				return 2;
-		} else if( b < c ) {
+		} else if( b <= c ) {
 			return 1;
 		} else {
 			return 2;
@@ -177,9 +178,6 @@ public class TrackerMeanShiftComaniciu2003<T extends ImageMultiBand> {
 	 * Updates the region's location using the standard mean-shift algorithm
 	 */
 	protected void updateLocation( T image , RectangleRotate_F32 region ) {
-
-		float beforeX = region.cx;
-		float beforeY = region.cy;
 
 		for( int i = 0; i < maxIterations; i++ ) {
 			calcHistogram.computeHistogram(image,region);
@@ -197,6 +195,9 @@ public class TrackerMeanShiftComaniciu2003<T extends ImageMultiBand> {
 
 				int histIndex = sampleHistIndex[j];
 
+				if( histIndex < 0 )
+					continue;
+
 				float q = keyHistogram[histIndex];
 				float p = histogram[histIndex];
 
@@ -211,23 +212,19 @@ public class TrackerMeanShiftComaniciu2003<T extends ImageMultiBand> {
 			meanY /= totalWeight;
 
 			// convert to image pixels
-			calcHistogram.squareToImage(meanX, meanY, region);
+			calcHistogram.squareToImageSample(meanX, meanY, region);
 			meanX = calcHistogram.imageX;
 			meanY = calcHistogram.imageY;
 
 			// see if the change is below the threshold
-			boolean done = Math.abs(meanX-beforeX) <= minimumChange && Math.abs(meanY-beforeY) <= minimumChange;
-			beforeX = meanX;
-			beforeY = meanY;
+			boolean done = Math.abs(meanX-region.cx ) <= minimumChange && Math.abs(meanY-region.cy ) <= minimumChange;
+			region.cx = meanX;
+			region.cy = meanY;
 
 			if( done ) {
 				break;
 			}
 		}
-
-		// save the results
-		region.cx = beforeX;
-		region.cy = beforeY;
 	}
 
 	/**
@@ -235,16 +232,21 @@ public class TrackerMeanShiftComaniciu2003<T extends ImageMultiBand> {
 	 * Equations 6 and 7.
 	 * Must be called immediately after {@link #updateLocation}.
 	 */
-	protected double distanceHistogram( int sampleHistIndex[] , float histogram[] ) {
+	protected double distanceHistogram( float histogramA[] , float histogramB[] ) {
 		double sumP = 0;
-		for( int i = 0; i < histogram.length; i++ ) {
-			int histIndex = sampleHistIndex[i];
-			if( histIndex != -1 ) {
-				float q = keyHistogram[histIndex];
-				float p = histogram[histIndex];
-				sumP += Math.sqrt(q*p);
-			}
+		for( int i = 0; i < histogramA.length; i++ ) {
+			float q = histogramA[i];
+			float p = histogramB[i];
+			sumP += Math.sqrt(q*p);
 		}
-		return Math.sqrt(1-sumP);
+		// will get same solution without sqrt() and less hassle
+		return 1-sumP;
+//		if( sumP > 1)
+//			return 0;
+//		return Math.sqrt(1-sumP);
+	}
+
+	public RectangleRotate_F32 getRegion() {
+		return region;
 	}
 }

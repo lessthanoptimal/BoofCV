@@ -28,8 +28,8 @@ import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.distort.PointTransform_F64;
 import boofcv.struct.geo.Point2D3D;
-import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageType;
 import boofcv.struct.sfm.Point2D3DTrack;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
@@ -120,8 +120,8 @@ public class WrapVisOdomPixelDepthPnP<T extends ImageSingleBand>
 	}
 
 	@Override
-	public ImageDataType<T> getImageType() {
-		return ImageDataType.single(imageType);
+	public ImageType<T> getImageType() {
+		return ImageType.single(imageType);
 	}
 
 	@Override

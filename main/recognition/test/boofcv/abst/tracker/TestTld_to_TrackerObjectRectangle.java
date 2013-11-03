@@ -2,17 +2,20 @@ package boofcv.abst.tracker;
 
 import boofcv.alg.tracker.tld.TldConfig;
 import boofcv.alg.tracker.tld.TldTracker;
+import boofcv.struct.image.ImageDataType;
+import boofcv.struct.image.ImageType;
 import boofcv.struct.image.ImageUInt8;
 
 /**
  * @author Peter Abeles
  */
-public class TestTld_to_TrackerObjectRectangle extends GenericTrackerObjectRectangleTests {
+public class TestTld_to_TrackerObjectRectangle extends TextureGrayTrackerObjectRectangleTests {
 
 	@Override
-	public TrackerObjectQuad<ImageUInt8> create(Class<ImageUInt8> imageType) {
+	public TrackerObjectQuad<ImageUInt8> create(ImageType<ImageUInt8> imageTypee) {
 
-		TldConfig config = new TldConfig(false,imageType);
+		Class ct = ImageDataType.typeToClass(imageType.getDataType());
+		TldConfig config = new TldConfig(false,ct);
 
 		config.trackerFeatureRadius = 10;
 		TldTracker tracker = new TldTracker(config);

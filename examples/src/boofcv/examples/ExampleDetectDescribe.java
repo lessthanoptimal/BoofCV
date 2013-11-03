@@ -35,9 +35,9 @@ import boofcv.factory.feature.detect.interest.FactoryDetectPoint;
 import boofcv.factory.feature.detect.interest.FactoryInterestPoint;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.feature.TupleDesc;
-import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageType;
 
 import java.awt.image.BufferedImage;
 
@@ -61,7 +61,7 @@ public class ExampleDetectDescribe {
 	public static <T extends ImageSingleBand, TD extends TupleDesc>
 	DetectDescribePoint<T, TD> createFromPremade( Class<T> imageType ) {
 		return (DetectDescribePoint)FactoryDetectDescribe.surfStable(
-				new ConfigFastHessian(1, 2, 200, 1, 9, 4, 4), null,null, ImageDataType.single(ImageFloat32.class));
+				new ConfigFastHessian(1, 2, 200, 1, 9, 4, 4), null,null, ImageType.single(ImageFloat32.class));
 		// note that SIFT only supports ImageFloat32
 //		if( imageType == ImageFloat32.class )
 //			return (DetectDescribePoint)FactoryDetectDescribe.sift(null,new ConfigSiftDetector(2,0,200,5),null,null);

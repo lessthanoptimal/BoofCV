@@ -37,8 +37,8 @@ import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.feature.TupleDesc_S8;
-import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageType;
 import georegression.struct.point.Point2D_F64;
 import org.ddogleg.struct.FastQueue;
 
@@ -121,7 +121,7 @@ public class CompareConvertedDescriptionsApp {
 				FactoryInterestPoint.fastHessian(new ConfigFastHessian(1,10,-1,2,9,4,4));
 
 		DescribeRegionPoint<ImageFloat32,TupleDesc_F64> describeA =
-				(DescribeRegionPoint)FactoryDescribeRegionPoint.surfStable(null, ImageDataType.single(ImageFloat32.class));
+				(DescribeRegionPoint)FactoryDescribeRegionPoint.surfStable(null, ImageType.single(ImageFloat32.class));
 
 		ConvertTupleDesc<TupleDesc_F64,TupleDesc_S8> converter =
 				FactoryConvertTupleDesc.real_F64_S8(describeA.createDescription().size());

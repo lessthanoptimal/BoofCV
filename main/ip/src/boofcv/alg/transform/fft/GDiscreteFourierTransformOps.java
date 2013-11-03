@@ -39,7 +39,7 @@ public class GDiscreteFourierTransformOps {
 	 * @return {@link boofcv.abst.transform.fft.DiscreteFourierTransform}
 	 */
 	public static <T extends ImageFloat, W extends ImageInterleaved>
-	DiscreteFourierTransform<T,W> createTransform( ImageTypeInfo type ) {
+	DiscreteFourierTransform<T,W> createTransform( ImageDataType type ) {
 		switch( type ) {
 			case F32: return (DiscreteFourierTransform)createTransformF32();
 			case F64: return (DiscreteFourierTransform)createTransformF64();

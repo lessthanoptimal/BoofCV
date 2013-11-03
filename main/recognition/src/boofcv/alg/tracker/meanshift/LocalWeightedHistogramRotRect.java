@@ -72,7 +72,7 @@ public class LocalWeightedHistogramRotRect<T extends ImageMultiBand> {
 	 * @param numSigmas Number of standard deviations away the sides will be from the center.  Try 3
 	 * @param numHistogramBins Number of bins in the histogram
 	 * @param numBands Number of bands in the input image
-	 * @param maxPixelValue Maximum value of a pixel across all bands
+	 * @param maxPixelValue Maximum value + 1 of a pixel across all bands
 	 * @param interpolate Function used to interpolate the image
 	 */
 	public LocalWeightedHistogramRotRect(int numSamples, double numSigmas,
@@ -159,14 +159,18 @@ public class LocalWeightedHistogramRotRect<T extends ImageMultiBand> {
 		for( int i = 0; i < samplePts.size(); i++ ) {
 			Point2D_F32 p = samplePts.get(i);
 
-			squareToImage(p.x, p.y, region);
+			squareToImageSample(p.x, p.y, region);
 
 			interpolate.get_fast(imageX,imageY,value);
 
 			int indexHistogram = computeHistogramBin(value);
 
 			sampleHistIndex[ i ] = indexHistogram;
-			histogram[indexHistogram] += weights[i];
+			try {
+				histogram[indexHistogram] += weights[i];
+			} catch( ArrayIndexOutOfBoundsException e) {
+				System.out.println("caught");
+			}
 		}
 	}
 
@@ -177,7 +181,7 @@ public class LocalWeightedHistogramRotRect<T extends ImageMultiBand> {
 		for( int i = 0; i < samplePts.size(); i++ ) {
 			Point2D_F32 p = samplePts.get(i);
 
-			squareToImage(p.x, p.y, region);
+			squareToImageSample(p.x, p.y, region);
 
 			// make sure its inside the image
 			if( !BoofMiscOps.checkInside(image, imageX, imageY)) {
@@ -214,16 +218,16 @@ public class LocalWeightedHistogramRotRect<T extends ImageMultiBand> {
 	 */
 	protected boolean isInFastBounds(RectangleRotate_F32 region) {
 
-		squareToImage(-0.5f, -0.5f, region);
+		squareToImageSample(-0.5f, -0.5f, region);
 		if( !interpolate.isInFastBounds(imageX, imageY))
 			return false;
-		squareToImage(-0.5f, 0.5f, region);
+		squareToImageSample(-0.5f, 0.5f, region);
 		if( !interpolate.isInFastBounds(imageX, imageY))
 			return false;
-		squareToImage(0.5f, 0.5f, region);
+		squareToImageSample(0.5f, 0.5f, region);
 		if( !interpolate.isInFastBounds(imageX, imageY))
 			return false;
-		squareToImage(0.5f, -0.5f, region);
+		squareToImageSample(0.5f, -0.5f, region);
 		if( !interpolate.isInFastBounds(imageX, imageY))
 			return false;
 
@@ -243,9 +247,10 @@ public class LocalWeightedHistogramRotRect<T extends ImageMultiBand> {
 	/**
 	 * Converts a point from square coordinates into image coordinates
 	 */
-	protected void squareToImage(float x, float y, RectangleRotate_F32 region) {
-		x *= region.width;
-		y *= region.height;
+	protected void squareToImageSample(float x, float y, RectangleRotate_F32 region) {
+		// -1 because it starts counting at 0.  otherwise width+1 samples are made
+		x *= region.width-1;
+		y *= region.height-1;
 
 		imageX = x*c - y*s + region.cx;
 		imageY = x*s + y*c + region.cy;

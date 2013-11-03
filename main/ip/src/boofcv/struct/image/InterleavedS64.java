@@ -44,8 +44,8 @@ public class InterleavedS64 extends ImageInterleaved<InterleavedS64> {
 	}
 
 	@Override
-	public ImageTypeInfo getTypeInfo() {
-		return ImageTypeInfo.S64;
+	public ImageDataType getTypeInfo() {
+		return ImageDataType.S64;
 	}
 
 	/**

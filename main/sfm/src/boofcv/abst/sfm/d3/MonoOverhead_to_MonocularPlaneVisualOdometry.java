@@ -26,7 +26,7 @@ import boofcv.alg.sfm.overhead.OverheadView;
 import boofcv.struct.calib.MonoPlaneParameters;
 import boofcv.struct.distort.PointTransform_F64;
 import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageDataType;
+import boofcv.struct.image.ImageType;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
@@ -47,7 +47,7 @@ public class MonoOverhead_to_MonocularPlaneVisualOdometry<T extends ImageBase>
 	VisOdomMonoOverheadMotion2D<T> alg;
 
 
-	ImageDataType<T> imageType;
+	ImageType<T> imageType;
 
 	boolean fault;
 	Se3_F64 cameraToWorld = new Se3_F64();
@@ -59,7 +59,7 @@ public class MonoOverhead_to_MonocularPlaneVisualOdometry<T extends ImageBase>
 	Se3_F64 planeToCamera;
 	PointTransform_F64 normToPixel;
 
-	public MonoOverhead_to_MonocularPlaneVisualOdometry(VisOdomMonoOverheadMotion2D<T> alg, ImageDataType<T> imageType) {
+	public MonoOverhead_to_MonocularPlaneVisualOdometry(VisOdomMonoOverheadMotion2D<T> alg, ImageType<T> imageType) {
 		this.alg = alg;
 		this.imageType = imageType;
 	}
@@ -79,7 +79,7 @@ public class MonoOverhead_to_MonocularPlaneVisualOdometry<T extends ImageBase>
 	}
 
 	@Override
-	public ImageDataType<T> getImageType() {
+	public ImageType<T> getImageType() {
 		return imageType;
 	}
 

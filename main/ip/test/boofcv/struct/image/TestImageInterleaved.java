@@ -161,8 +161,8 @@ public class TestImageInterleaved {
 		}
 
 		@Override
-		public ImageTypeInfo getTypeInfo() {
-			return ImageTypeInfo.S32;
+		public ImageDataType getTypeInfo() {
+			return ImageDataType.S32;
 		}
 
 		@Override

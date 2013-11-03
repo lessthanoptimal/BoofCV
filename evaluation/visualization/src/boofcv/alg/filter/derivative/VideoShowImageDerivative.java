@@ -27,8 +27,8 @@ import boofcv.gui.image.ShowImages;
 import boofcv.gui.image.VisualizeImageData;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.video.BoofVideoManager;
-import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageSInt16;
+import boofcv.struct.image.ImageType;
 import boofcv.struct.image.ImageUInt8;
 
 import java.awt.event.MouseEvent;
@@ -113,7 +113,7 @@ public class VideoShowImageDerivative extends ProcessImageSequence<ImageUInt8> {
 		} else {
 			fileName = args[0];
 		}
-		SimpleImageSequence<ImageUInt8> sequence = BoofVideoManager.loadManagerDefault().load(fileName, ImageDataType.single(ImageUInt8.class));
+		SimpleImageSequence<ImageUInt8> sequence = BoofVideoManager.loadManagerDefault().load(fileName, ImageType.single(ImageUInt8.class));
 
 		ImageGradient<ImageUInt8, ImageSInt16> gradient = FactoryDerivative.sobel_I8();
 

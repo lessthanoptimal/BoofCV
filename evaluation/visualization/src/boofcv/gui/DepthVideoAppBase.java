@@ -21,8 +21,8 @@ package boofcv.gui;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.VisualDepthParameters;
-import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageType;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -114,8 +114,8 @@ public abstract class DepthVideoAppBase<I extends ImageSingleBand, Depth extends
 				line2 = path+"/"+line2;
 
 			config = BoofMiscOps.loadXML(media.openFile(lineConfig));
-			SimpleImageSequence<I> video1 = media.openVideo(line1, ImageDataType.single(imageType));
-			SimpleImageSequence<Depth> video2 = media.openVideo(line2,ImageDataType.single(depthType));
+			SimpleImageSequence<I> video1 = media.openVideo(line1, ImageType.single(imageType));
+			SimpleImageSequence<Depth> video2 = media.openVideo(line2, ImageType.single(depthType));
 
 			process(video1,video2);
 		} catch (IOException e) {

@@ -34,9 +34,9 @@ import boofcv.factory.feature.orientation.FactoryOrientationAlgs;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.feature.ScalePoint;
 import boofcv.struct.feature.SurfFeature;
-import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -58,7 +58,7 @@ public class ExampleFeatureSurf {
 		// create the detector and descriptors
 		DetectDescribePoint<ImageFloat32,SurfFeature> surf = FactoryDetectDescribe.
 				surfStable(new ConfigFastHessian(0, 2, 200, 2, 9, 4, 4), null, null,
-						ImageDataType.single(ImageFloat32.class));
+						ImageType.single(ImageFloat32.class));
 
 		 // specify the image to process
 		surf.detect(image);

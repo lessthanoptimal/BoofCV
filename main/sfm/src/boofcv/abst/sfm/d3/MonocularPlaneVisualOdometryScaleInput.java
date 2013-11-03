@@ -24,7 +24,7 @@ import boofcv.alg.interpolate.TypeInterpolate;
 import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.calib.MonoPlaneParameters;
 import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageDataType;
+import boofcv.struct.image.ImageType;
 import georegression.struct.se.Se3_F64;
 
 /**
@@ -70,7 +70,7 @@ public class MonocularPlaneVisualOdometryScaleInput <T extends ImageBase> implem
 	}
 
 	@Override
-	public ImageDataType<T> getImageType() {
+	public ImageType<T> getImageType() {
 		return alg.getImageType();
 	}
 

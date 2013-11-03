@@ -52,8 +52,8 @@ import boofcv.factory.geo.FactoryTriangulate;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.geo.Point2D3D;
 import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageType;
 import boofcv.struct.sfm.PlanePtPixel;
 import boofcv.struct.sfm.Stereo2D3D;
 import georegression.fitting.se.ModelManagerSe2_F64;
@@ -95,7 +95,7 @@ public class FactoryVisualOdometry {
 													  int ransacIterations,
 
 													  PointTracker<T> tracker,
-													  ImageDataType<T> imageType) {
+													  ImageType<T> imageType) {
 
 		//squared pixel error
 		double ransacTOL = inlierPixelTol * inlierPixelTol;
@@ -152,7 +152,7 @@ public class FactoryVisualOdometry {
 													  double respawnCoverageFraction,
 
 													  PointTracker<T> tracker ,
-													  ImageDataType<T> imageType ) {
+													  ImageType<T> imageType ) {
 
 		ImageMotion2D<T,Se2_F64> motion2D = FactoryMotion2D.createMotion2D(
 				ransacIterations,inlierGroundTol*inlierGroundTol,thresholdRetire,
@@ -267,7 +267,7 @@ public class FactoryVisualOdometry {
 						(thresholdAdd,thresholdRetire ,doublePass,motion,pixelTo3D,refine,tracker,null,null);
 
 		return new VisOdomPixelDepthPnP_to_DepthVisualOdometry<Vis,Depth>
-				(sparseDepth,alg,distance,ImageDataType.single(visualType),depthType);
+				(sparseDepth,alg,distance, ImageType.single(visualType),depthType);
 	}
 
 	/**

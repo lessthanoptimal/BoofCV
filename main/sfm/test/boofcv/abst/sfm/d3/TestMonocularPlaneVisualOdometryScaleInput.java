@@ -20,8 +20,8 @@ package boofcv.abst.sfm.d3;
 
 import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.calib.MonoPlaneParameters;
-import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageType;
 import georegression.struct.se.Se3_F64;
 import org.junit.Test;
 
@@ -38,7 +38,7 @@ public class TestMonocularPlaneVisualOdometryScaleInput {
 
 	MonoPlaneParameters param;
 	ImageFloat32 image;
-	ImageDataType<ImageFloat32> type = ImageDataType.single(ImageFloat32.class);
+	ImageType<ImageFloat32> type = ImageType.single(ImageFloat32.class);
 	boolean result;
 	boolean resetCalled = false;
 
@@ -109,7 +109,7 @@ public class TestMonocularPlaneVisualOdometryScaleInput {
 		}
 
 		@Override
-		public ImageDataType<ImageFloat32> getImageType() {
+		public ImageType<ImageFloat32> getImageType() {
 			return type;
 		}
 

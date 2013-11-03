@@ -23,8 +23,8 @@ import boofcv.abst.feature.tracker.PkltConfig;
 import boofcv.abst.feature.tracker.PointTracker;
 import boofcv.factory.feature.tracker.FactoryPointTracker;
 import boofcv.factory.sfm.FactoryVisualOdometry;
-import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageSInt16;
+import boofcv.struct.image.ImageType;
 import boofcv.struct.image.ImageUInt8;
 
 /**
@@ -50,7 +50,7 @@ public class TestMonoMotion2D_to_MonocularPlaneVisualOdometry extends CheckVisua
 
 		PointTracker<ImageUInt8> tracker = FactoryPointTracker.klt(config, configDetector);
 
-		return FactoryVisualOdometry.monoPlaneInfinity(50, 2, 1.5, 300, tracker, ImageDataType.single(ImageUInt8.class));
+		return FactoryVisualOdometry.monoPlaneInfinity(50, 2, 1.5, 300, tracker, ImageType.single(ImageUInt8.class));
 	}
 
 }

@@ -19,8 +19,8 @@
 package boofcv.abst.feature.describe;
 
 import boofcv.struct.feature.TupleDesc;
-import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageType;
 
 /**
  * Converts the region descriptor type from the {@link DescribeRegionPoint} into the desired output using a
@@ -78,7 +78,7 @@ public class DescribeRegionPointConvert<T extends ImageSingleBand,In extends Tup
 	}
 
 	@Override
-	public ImageDataType<T> getImageType() {
+	public ImageType<T> getImageType() {
 		return original.getImageType();
 	}
 

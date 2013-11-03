@@ -22,7 +22,7 @@ import boofcv.core.image.ConvertBufferedImage;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageDataType;
+import boofcv.struct.image.ImageType;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -46,7 +46,7 @@ public class BufferedFileImageSequence<T extends ImageBase> implements SimpleIma
 	BufferedImage imageGUI;
 
 	// type of image it outputs
-	ImageDataType<T> type;
+	ImageType<T> type;
 
 	boolean loop = true;
 	boolean forwards = true;
@@ -57,7 +57,7 @@ public class BufferedFileImageSequence<T extends ImageBase> implements SimpleIma
 	 * @param directory The directory containing the images.
 	 * @param suffix	The suffix that the images have.
 	 */
-	public BufferedFileImageSequence(ImageDataType<T> type, File directory, String suffix) {
+	public BufferedFileImageSequence(ImageType<T> type, File directory, String suffix) {
 		this.type = type;
 
 		if (!directory.isDirectory()) throw new IllegalArgumentException("directory must specify a directory");
@@ -84,7 +84,7 @@ public class BufferedFileImageSequence<T extends ImageBase> implements SimpleIma
 	/**
 	 *
 	 */
-	public BufferedFileImageSequence(ImageDataType<T> type, BufferedImage[] orig) {
+	public BufferedFileImageSequence(ImageType<T> type, BufferedImage[] orig) {
 		this.type = type;
 		this.orig = orig;
 		images = type.createArray( orig.length );
@@ -147,7 +147,7 @@ public class BufferedFileImageSequence<T extends ImageBase> implements SimpleIma
 	}
 
 	@Override
-	public ImageDataType<T> getImageType() {
+	public ImageType<T> getImageType() {
 		return type;
 	}
 

@@ -21,7 +21,7 @@ package boofcv.abst.feature.detdesc;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageDataType;
+import boofcv.struct.image.ImageType;
 import boofcv.testing.BoofTesting;
 import georegression.struct.point.Point2D_F64;
 import org.junit.Test;
@@ -47,11 +47,11 @@ public abstract class GenericTestsDetectDescribePoint<T extends ImageBase,D exte
 	boolean hasOrientation;
 
 	T image;
-	protected ImageDataType<T> imageType;
+	protected ImageType<T> imageType;
 	Class<D> descType;
 
 	protected GenericTestsDetectDescribePoint(boolean hasScale, boolean hasOrientation,
-											  ImageDataType<T> imageType, Class<D> descType) {
+											  ImageType<T> imageType, Class<D> descType) {
 		this.hasScale = hasScale;
 		this.hasOrientation = hasOrientation;
 		this.imageType = imageType;
