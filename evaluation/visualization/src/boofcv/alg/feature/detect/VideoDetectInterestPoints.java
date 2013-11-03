@@ -30,9 +30,9 @@ import boofcv.gui.image.ShowImages;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.video.BoofVideoManager;
 import boofcv.struct.BoofDefaults;
-import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageType;
 import georegression.struct.point.Point2D_F64;
 
 import java.awt.*;
@@ -103,7 +103,7 @@ public class VideoDetectInterestPoints<T extends ImageSingleBand>
 	public static <T extends ImageSingleBand, D extends ImageSingleBand>
 	void perform( String fileName , Class<T> imageType , Class<D> derivType )
 	{
-		SimpleImageSequence<T> sequence = BoofVideoManager.loadManagerDefault().load(fileName, ImageDataType.single(imageType));
+		SimpleImageSequence<T> sequence = BoofVideoManager.loadManagerDefault().load(fileName, ImageType.single(imageType));
 
 		int maxCorners = 200;
 		int radius = 2;

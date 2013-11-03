@@ -22,7 +22,7 @@ import boofcv.core.image.ConvertBufferedImage;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageDataType;
-import boofcv.struct.image.ImageTypeInfo;
+import boofcv.struct.image.ImageType;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -44,7 +44,7 @@ public class JpegByteImageSequence<T extends ImageBase> implements SimpleImageSe
 	List<byte[]> jpegData = new ArrayList<byte[]>();
 
 	// type of image it outputs
-	ImageDataType<T> imageType;
+	ImageType<T> imageType;
 
 	BufferedImage imageGUI;
 	T output;
@@ -54,7 +54,7 @@ public class JpegByteImageSequence<T extends ImageBase> implements SimpleImageSe
 	// is it traversing in the forwards or backwards direction
 	boolean forward = true;
 
-	public JpegByteImageSequence(ImageDataType<T> imageType, List<byte[]> jpegData, boolean loop) {
+	public JpegByteImageSequence(ImageType<T> imageType, List<byte[]> jpegData, boolean loop) {
 		this.imageType = imageType;
 		this.jpegData = jpegData;
 		this.loop = loop;
@@ -63,7 +63,7 @@ public class JpegByteImageSequence<T extends ImageBase> implements SimpleImageSe
 	}
 
 	public JpegByteImageSequence(Class<T> imageType, List<byte[]> jpegData, boolean loop) {
-		this.imageType = new ImageDataType<T>(ImageDataType.Family.SINGLE_BAND, ImageTypeInfo.classToType(imageType),1);
+		this.imageType = new ImageType<T>(ImageType.Family.SINGLE_BAND, ImageDataType.classToType(imageType),1);
 		this.jpegData = jpegData;
 		this.loop = loop;
 
@@ -125,7 +125,7 @@ public class JpegByteImageSequence<T extends ImageBase> implements SimpleImageSe
 	}
 
 	@Override
-	public ImageDataType<T> getImageType() {
+	public ImageType<T> getImageType() {
 		return imageType;
 	}
 

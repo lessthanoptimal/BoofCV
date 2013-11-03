@@ -19,7 +19,7 @@
 package boofcv.io;
 
 import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageDataType;
+import boofcv.struct.image.ImageType;
 
 /**
  * Simplified interface for processing frames in a video sequence.
@@ -64,6 +64,6 @@ public interface VideoCallBack<T extends ImageBase> {
 	 *
 	 * @return
 	 */
-	public ImageDataType<T> getImageDataType();
+	public ImageType<T> getImageDataType();
 
 }

@@ -20,8 +20,8 @@ package boofcv.abst.feature.describe;
 
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.feature.TupleDesc_S8;
-import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageType;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -111,6 +111,6 @@ public class TestDescribeRegionPointConvert {
 		}
 
 		@Override
-		public ImageDataType getImageType() {return null;}
+		public ImageType getImageType() {return null;}
 	}
 }

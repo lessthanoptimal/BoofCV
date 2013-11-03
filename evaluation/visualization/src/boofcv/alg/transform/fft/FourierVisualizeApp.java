@@ -27,9 +27,9 @@ import boofcv.gui.SelectInputPanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.gui.image.VisualizeImageData;
 import boofcv.io.PathLabel;
+import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageFloat;
 import boofcv.struct.image.ImageInterleaved;
-import boofcv.struct.image.ImageTypeInfo;
 
 import javax.swing.*;
 import java.awt.*;
@@ -51,12 +51,12 @@ public class FourierVisualizeApp
 	T magnitude;
 	T phase;
 
-	ImageTypeInfo imageType;
+	ImageDataType imageType;
 
 	ListDisplayPanel panel = new ListDisplayPanel();
 	boolean processedImage = false;
 
-	public FourierVisualizeApp(ImageTypeInfo imageType) {
+	public FourierVisualizeApp(ImageDataType imageType) {
 		this.imageType = imageType;
 
 		image = GeneralizedImageOps.createSingleBand(imageType,1,1);
@@ -129,7 +129,7 @@ public class FourierVisualizeApp
 	}
 
 	public static void main( String args[] ) {
-		FourierVisualizeApp app = new FourierVisualizeApp(ImageTypeInfo.F32);
+		FourierVisualizeApp app = new FourierVisualizeApp(ImageDataType.F32);
 //		FourierVisualizeApp app = new FourierVisualizeApp(ImageTypeInfo.F64);
 
 		java.util.List<PathLabel> inputs = new ArrayList<PathLabel>();

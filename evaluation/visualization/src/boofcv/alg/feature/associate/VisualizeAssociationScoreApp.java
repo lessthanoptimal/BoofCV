@@ -40,9 +40,9 @@ import boofcv.gui.feature.AssociationScorePanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.PathLabel;
 import boofcv.struct.feature.TupleDesc;
-import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageType;
 import georegression.struct.point.Point2D_F64;
 
 import javax.swing.*;
@@ -95,7 +95,7 @@ public class VisualizeAssociationScoreApp<T extends ImageSingleBand, D extends I
 		alg = FactoryDetectPoint.createShiTomasi(new ConfigGeneralDetector(500,2,1), false, derivType);
 		addAlgorithm(0, "Shi-Tomasi", FactoryInterestPoint.wrapPoint(alg, 1, imageType, derivType));
 
-		addAlgorithm(1, "SURF", FactoryDescribeRegionPoint.surfStable(null, ImageDataType.single(imageType)));
+		addAlgorithm(1, "SURF", FactoryDescribeRegionPoint.surfStable(null, ImageType.single(imageType)));
 		if( imageType == ImageFloat32.class )
 			addAlgorithm(1, "SIFT", FactoryDescribeRegionPoint.sift(null,null));
 		addAlgorithm(1, "BRIEF", FactoryDescribeRegionPoint.brief(new ConfigBrief(true), imageType));

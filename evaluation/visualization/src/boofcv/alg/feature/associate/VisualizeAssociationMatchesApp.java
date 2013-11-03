@@ -45,9 +45,9 @@ import boofcv.gui.feature.AssociationPanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.PathLabel;
 import boofcv.struct.feature.TupleDesc;
-import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageType;
 import boofcv.struct.image.MultiSpectral;
 import georegression.struct.point.Point2D_F64;
 import org.ddogleg.struct.FastQueue;
@@ -102,8 +102,8 @@ public class VisualizeAssociationMatchesApp<T extends ImageSingleBand, D extends
 		alg = FactoryDetectPoint.createShiTomasi(new ConfigGeneralDetector(500,2,1), false, derivType);
 		addAlgorithm(0, "Shi-Tomasi", FactoryInterestPoint.wrapPoint(alg, 1, imageType, derivType));
 
-		addAlgorithm(1, "SURF-S", FactoryDescribeRegionPoint.surfStable(null, ImageDataType.single(imageType)));
-		addAlgorithm(1, "SURF-S Color", FactoryDescribeRegionPoint.surfStable(null, ImageDataType.ms(3, imageType)));
+		addAlgorithm(1, "SURF-S", FactoryDescribeRegionPoint.surfStable(null, ImageType.single(imageType)));
+		addAlgorithm(1, "SURF-S Color", FactoryDescribeRegionPoint.surfStable(null, ImageType.ms(3, imageType)));
 		if( imageType == ImageFloat32.class )
 			addAlgorithm(1, "SIFT", FactoryDescribeRegionPoint.sift(null,null));
 		addAlgorithm(1, "BRIEF", FactoryDescribeRegionPoint.brief(new ConfigBrief(true), imageType));
@@ -240,7 +240,7 @@ public class VisualizeAssociationMatchesApp<T extends ImageSingleBand, D extends
 
 	private void extractImageFeatures(MultiSpectral<T> color , T gray, FastQueue<TupleDesc> descs, List<Point2D_F64> locs) {
 		detector.detect(gray);
-		if( describe.getImageType().getFamily() == ImageDataType.Family.SINGLE_BAND )
+		if( describe.getImageType().getFamily() == ImageType.Family.SINGLE_BAND )
 			describe.setImage(gray);
 		else
 			describe.setImage(color);

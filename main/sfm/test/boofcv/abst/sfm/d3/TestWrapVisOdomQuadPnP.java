@@ -31,8 +31,8 @@ import boofcv.factory.feature.describe.FactoryDescribeRegionPoint;
 import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
 import boofcv.factory.feature.detect.intensity.FactoryIntensityPoint;
 import boofcv.factory.sfm.FactoryVisualOdometry;
-import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageType;
 
 /**
  * @author Peter Abeles
@@ -53,7 +53,7 @@ public class TestWrapVisOdomQuadPnP extends CheckVisualOdometryStereoSim<ImageFl
 				new GeneralFeatureDetector<ImageFloat32,ImageFloat32>(intensity,nonmax);
 		general.setMaxFeatures(600);
 		DetectorInterestPointMulti detector = new GeneralToInterestMulti(general,2,ImageFloat32.class,ImageFloat32.class);
-		DescribeRegionPoint describe = FactoryDescribeRegionPoint.surfFast(null, ImageDataType.single(ImageFloat32.class));
+		DescribeRegionPoint describe = FactoryDescribeRegionPoint.surfFast(null, ImageType.single(ImageFloat32.class));
 		DetectDescribeMulti detDescMulti =  new DetectDescribeMultiFusion(detector,null,describe);
 
 		return FactoryVisualOdometry.stereoQuadPnP(1.5, 0.5, 200, Double.MAX_VALUE, 300, 50, detDescMulti, ImageFloat32.class);

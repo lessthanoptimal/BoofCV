@@ -20,7 +20,7 @@ package boofcv.abst.sfm.d3;
 
 import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageDataType;
+import boofcv.struct.image.ImageType;
 import georegression.struct.se.Se3_F64;
 
 /**
@@ -64,6 +64,6 @@ public interface MonocularVisualOdometry<T extends ImageBase> extends VisualOdom
 	 *
 	 * @return The image type
 	 */
-	public ImageDataType<T> getImageType();
+	public ImageType<T> getImageType();
 
 }

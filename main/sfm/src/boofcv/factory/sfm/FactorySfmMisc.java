@@ -25,7 +25,7 @@ import boofcv.alg.sfm.overhead.CreateSyntheticOverheadViewMS;
 import boofcv.alg.sfm.overhead.CreateSyntheticOverheadViewS;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageDataType;
+import boofcv.struct.image.ImageType;
 
 /**
  * Factory for creating classes which don't go anywhere else.
@@ -34,7 +34,7 @@ import boofcv.struct.image.ImageDataType;
  */
 public class FactorySfmMisc {
 
-	public static <T extends ImageBase> CreateSyntheticOverheadView<T> createOverhead( ImageDataType<T> imageType ) {
+	public static <T extends ImageBase> CreateSyntheticOverheadView<T> createOverhead( ImageType<T> imageType ) {
 
 		Class classType = imageType.getImageClass();
 

@@ -25,7 +25,7 @@ import boofcv.alg.sfm.robust.DistancePlane2DToPixelSq;
 import boofcv.alg.sfm.robust.GenerateSe2_PlanePtPixel;
 import boofcv.struct.calib.MonoPlaneParameters;
 import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageDataType;
+import boofcv.struct.image.ImageType;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
@@ -44,7 +44,7 @@ public class MonoPlaneInfinity_to_MonocularPlaneVisualOdometry<T extends ImageBa
 	DistancePlane2DToPixelSq distance;
 	GenerateSe2_PlanePtPixel generator;
 
-	ImageDataType<T> imageType;
+	ImageType<T> imageType;
 
 	boolean fault;
 	Se3_F64 cameraToWorld = new Se3_F64();
@@ -57,7 +57,7 @@ public class MonoPlaneInfinity_to_MonocularPlaneVisualOdometry<T extends ImageBa
 	public MonoPlaneInfinity_to_MonocularPlaneVisualOdometry(VisOdomMonoPlaneInfinity<T> alg,
 															 DistancePlane2DToPixelSq distance,
 															 GenerateSe2_PlanePtPixel generator,
-															 ImageDataType<T> imageType) {
+															 ImageType<T> imageType) {
 		this.alg = alg;
 		this.distance = distance;
 		this.generator = generator;
@@ -84,7 +84,7 @@ public class MonoPlaneInfinity_to_MonocularPlaneVisualOdometry<T extends ImageBa
 	}
 
 	@Override
-	public ImageDataType<T> getImageType() {
+	public ImageType<T> getImageType() {
 		return imageType;
 	}
 

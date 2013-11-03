@@ -19,7 +19,7 @@
 package boofcv.abst.tracker;
 
 import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageDataType;
+import boofcv.struct.image.ImageType;
 import georegression.struct.shapes.Quadrilateral_F64;
 
 /**
@@ -63,5 +63,5 @@ public interface TrackerObjectQuad<T extends ImageBase> {
 	 *
 	 * @return Image type
 	 */
-	public ImageDataType<T> getImageType();
+	public ImageType<T> getImageType();
 }

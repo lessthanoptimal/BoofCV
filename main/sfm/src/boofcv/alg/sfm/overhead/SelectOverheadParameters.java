@@ -20,7 +20,7 @@ package boofcv.alg.sfm.overhead;
 
 import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageDataType;
+import boofcv.struct.image.ImageType;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.se.Se3_F64;
 
@@ -122,7 +122,7 @@ public class SelectOverheadParameters {
 	/**
 	 * Creates a new instance of the overhead view
 	 */
-	public <T extends ImageBase> OverheadView createOverhead( ImageDataType<T> imageType ) {
+	public <T extends ImageBase> OverheadView createOverhead( ImageType<T> imageType ) {
 		OverheadView ret = new OverheadView();
 		ret.image = imageType.createImage(overheadWidth,overheadHeight);
 		ret.cellSize = cellSize;

@@ -19,8 +19,8 @@
 package boofcv.abst.tracker;
 
 import boofcv.alg.tracker.meanshift.TrackerMeanShiftLikelihood;
-import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageType;
 import boofcv.struct.image.MultiSpectral;
 import georegression.geometry.UtilPolygons2D_F64;
 import georegression.struct.shapes.Quadrilateral_F64;
@@ -36,7 +36,7 @@ public class Msl_to_TrackerObjectQuad <T extends ImageSingleBand> implements Tra
 
 	TrackerMeanShiftLikelihood<MultiSpectral<T>> tracker;
 
-	ImageDataType<MultiSpectral<T>> type;
+	ImageType<MultiSpectral<T>> type;
 
 	RectangleCorner2D_F64 rect = new RectangleCorner2D_F64();
 	Rectangle2D_I32 target = new Rectangle2D_I32();
@@ -44,7 +44,7 @@ public class Msl_to_TrackerObjectQuad <T extends ImageSingleBand> implements Tra
 	public Msl_to_TrackerObjectQuad(TrackerMeanShiftLikelihood<MultiSpectral<T>> tracker, Class<T> bandType ) {
 		this.tracker = tracker;
 
-		type = ImageDataType.ms(3,bandType);
+		type = ImageType.ms(3, bandType);
 	}
 
 	@Override
@@ -83,7 +83,7 @@ public class Msl_to_TrackerObjectQuad <T extends ImageSingleBand> implements Tra
 	}
 
 	@Override
-	public ImageDataType<MultiSpectral<T>> getImageType() {
+	public ImageType<MultiSpectral<T>> getImageType() {
 		return type;
 	}
 }

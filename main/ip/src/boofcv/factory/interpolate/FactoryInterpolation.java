@@ -36,6 +36,15 @@ import boofcv.struct.image.*;
 public class FactoryInterpolation {
 
 	public static <T extends ImageSingleBand> InterpolatePixelS<T>
+	createPixelS(double min, double max, TypeInterpolate type, ImageDataType dataType )
+	{
+
+		Class t = ImageDataType.typeToClass(dataType);
+
+		return createPixelS(min,max,type,t);
+	}
+
+	public static <T extends ImageSingleBand> InterpolatePixelS<T>
 	createPixelS(double min, double max, TypeInterpolate type, Class<T> imageType)
 	{
 		switch( type ) {
@@ -52,6 +61,25 @@ public class FactoryInterpolation {
 				return polynomialS(4, min, max, imageType);
 		}
 		throw new IllegalArgumentException("Add type: "+type);
+	}
+
+	public static <T extends ImageMultiBand> InterpolatePixelMB<T>
+	createPixelMB(double min, double max, TypeInterpolate type, ImageType<T> imageType )
+	{
+		switch (imageType.getFamily()) {
+
+			case MULTI_SPECTRAL:
+				return (InterpolatePixelMB)createPixelMB(createPixelS(min,max,type,imageType.getDataType()));
+
+			case SINGLE_BAND:
+				throw new IllegalArgumentException("Need to specify a multi-band image type");
+
+			case INTERLEAVED:
+				throw new IllegalArgumentException("Not yet supported.  Post a message letting us know you need this");
+
+			default:
+				throw new IllegalArgumentException("Add type: "+type);
+		}
 	}
 
 	/**

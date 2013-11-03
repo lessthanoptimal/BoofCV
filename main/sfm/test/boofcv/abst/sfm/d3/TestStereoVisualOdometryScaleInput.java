@@ -20,8 +20,8 @@ package boofcv.abst.sfm.d3;
 
 import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.calib.StereoParameters;
-import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageType;
 import georegression.geometry.RotationMatrixGenerator;
 import georegression.struct.se.Se3_F64;
 import org.junit.Test;
@@ -40,7 +40,7 @@ public class TestStereoVisualOdometryScaleInput {
 	StereoParameters parameters;
 	ImageFloat32 leftImage;
 	ImageFloat32 rightImage;
-	ImageDataType<ImageFloat32> type = ImageDataType.single(ImageFloat32.class);
+	ImageType<ImageFloat32> type = ImageType.single(ImageFloat32.class);
 	boolean result;
 	boolean resetCalled = false;
 
@@ -120,7 +120,7 @@ public class TestStereoVisualOdometryScaleInput {
 		}
 
 		@Override
-		public ImageDataType<ImageFloat32> getImageType() {
+		public ImageType<ImageFloat32> getImageType() {
 			return type;
 		}
 

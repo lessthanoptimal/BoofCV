@@ -31,8 +31,8 @@ import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.wrapper.DefaultMediaManager;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.MonoPlaneParameters;
-import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageSInt16;
+import boofcv.struct.image.ImageType;
 import boofcv.struct.image.ImageUInt8;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
@@ -54,7 +54,7 @@ public class ExampleVisualOdometryMonocularPlane {
 
 		// load camera description and the video sequence
 		MonoPlaneParameters calibration = BoofMiscOps.loadXML(media.openFile(directory + "mono_plane.xml"));
-		SimpleImageSequence<ImageUInt8> video = media.openVideo(directory + "left.mjpeg", ImageDataType.single(ImageUInt8.class));
+		SimpleImageSequence<ImageUInt8> video = media.openVideo(directory + "left.mjpeg", ImageType.single(ImageUInt8.class));
 
 		// specify how the image features are going to be tracked
 		PkltConfig<ImageUInt8, ImageSInt16> configKlt = PkltConfig.createDefault(ImageUInt8.class, ImageSInt16.class);
@@ -66,7 +66,7 @@ public class ExampleVisualOdometryMonocularPlane {
 
 		// declares the algorithm
 		MonocularPlaneVisualOdometry<ImageUInt8> visualOdometry =
-				FactoryVisualOdometry.monoPlaneInfinity(75, 2, 1.5, 200, tracker, ImageDataType.single(ImageUInt8.class));
+				FactoryVisualOdometry.monoPlaneInfinity(75, 2, 1.5, 200, tracker, ImageType.single(ImageUInt8.class));
 
 		// Pass in intrinsic/extrinsic calibration.  This can be changed in the future.
 		visualOdometry.setCalibration(calibration);

@@ -44,8 +44,8 @@ public class InterleavedS32 extends ImageInterleaved<InterleavedS32> {
 	}
 
 	@Override
-	public ImageTypeInfo getTypeInfo() {
-		return ImageTypeInfo.S32;
+	public ImageDataType getTypeInfo() {
+		return ImageDataType.S32;
 	}
 
 	/**

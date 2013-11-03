@@ -21,7 +21,7 @@ package boofcv.io.video;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.wrapper.images.MjpegStreamSequence;
 import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageDataType;
+import boofcv.struct.image.ImageType;
 
 import java.io.FileNotFoundException;
 
@@ -30,7 +30,7 @@ import java.io.FileNotFoundException;
  */
 public class BoofMjpegVideo implements VideoInterface {
 	@Override
-	public <T extends ImageBase> SimpleImageSequence<T> load(String fileName, ImageDataType<T> imageType) {
+	public <T extends ImageBase> SimpleImageSequence<T> load(String fileName, ImageType<T> imageType) {
 
 		try {
 			return new MjpegStreamSequence(fileName,imageType);

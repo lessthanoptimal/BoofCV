@@ -23,7 +23,7 @@ import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.video.CombineFilesTogether;
 import boofcv.io.video.VideoMjpegCodec;
 import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageDataType;
+import boofcv.struct.image.ImageType;
 import boofcv.struct.image.ImageUInt16;
 import org.ddogleg.struct.GrowQueue_I8;
 
@@ -50,11 +50,11 @@ implements SimpleImageSequence<T>
 	BufferedImage next;
 	T image;
 	int frameNumber;
-	ImageDataType<T> imageType;
+	ImageType<T> imageType;
 	GrowQueue_I8 buffer = new GrowQueue_I8();
 	byte rawData[];
 
-	public ImageStreamSequence(InputStream in, boolean storeData , ImageDataType<T> imageType) {
+	public ImageStreamSequence(InputStream in, boolean storeData , ImageType<T> imageType) {
 		if( storeData ) {
 			try {
 				rawData = VideoMjpegCodec.convertToByteArray(in);
@@ -71,7 +71,7 @@ implements SimpleImageSequence<T>
 		readNext();
 	}
 
-	public ImageStreamSequence(String fileName, boolean storeData , ImageDataType<T> imageType) throws FileNotFoundException {
+	public ImageStreamSequence(String fileName, boolean storeData , ImageType<T> imageType) throws FileNotFoundException {
 		this(new DataInputStream(new BufferedInputStream(new FileInputStream(fileName),1024*200)),storeData,imageType);
 		this.fileName = fileName;
 	}
@@ -127,7 +127,7 @@ implements SimpleImageSequence<T>
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public ImageDataType<T> getImageType() {
+	public ImageType<T> getImageType() {
 		return imageType;
 	}
 
@@ -151,7 +151,7 @@ implements SimpleImageSequence<T>
 	}
 
 	public static void main( String args[] ) throws FileNotFoundException {
-		ImageStreamSequence stream = new ImageStreamSequence("combined.mpng",true,ImageDataType.single(ImageUInt16.class));
+		ImageStreamSequence stream = new ImageStreamSequence("combined.mpng",true, ImageType.single(ImageUInt16.class));
 
 		while( stream.hasNext() ) {
 			System.out.println("Image");

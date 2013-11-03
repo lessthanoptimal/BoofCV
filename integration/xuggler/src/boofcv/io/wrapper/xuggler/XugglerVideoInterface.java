@@ -21,7 +21,7 @@ package boofcv.io.wrapper.xuggler;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.video.VideoInterface;
 import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageDataType;
+import boofcv.struct.image.ImageType;
 
 
 /**
@@ -29,7 +29,7 @@ import boofcv.struct.image.ImageDataType;
  */
 public class XugglerVideoInterface implements VideoInterface {
 	@Override
-	public <T extends ImageBase> SimpleImageSequence<T> load(String fileName, ImageDataType<T> imageType) {
+	public <T extends ImageBase> SimpleImageSequence<T> load(String fileName, ImageType<T> imageType) {
 		return new XugglerSimplified(fileName,imageType);
 	}
 }

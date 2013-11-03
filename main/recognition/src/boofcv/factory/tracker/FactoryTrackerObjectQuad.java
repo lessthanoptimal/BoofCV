@@ -19,12 +19,17 @@
 package boofcv.factory.tracker;
 
 import boofcv.abst.tracker.*;
+import boofcv.alg.interpolate.InterpolatePixelMB;
+import boofcv.alg.tracker.meanshift.LocalWeightedHistogramRotRect;
 import boofcv.alg.tracker.meanshift.PixelLikelihood;
+import boofcv.alg.tracker.meanshift.TrackerMeanShiftComaniciu2003;
 import boofcv.alg.tracker.meanshift.TrackerMeanShiftLikelihood;
 import boofcv.alg.tracker.sfot.SfotConfig;
 import boofcv.alg.tracker.sfot.SparseFlowObjectTracker;
 import boofcv.alg.tracker.tld.TldConfig;
 import boofcv.alg.tracker.tld.TldTracker;
+import boofcv.factory.interpolate.FactoryInterpolation;
+import boofcv.struct.image.ImageMultiBand;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.MultiSpectral;
 
@@ -67,6 +72,19 @@ public class FactoryTrackerObjectQuad {
 		return new Sfot_to_TrackObjectQuad<T,D>(tracker);
 	}
 
+	/**
+	 * Very basic and very fast implementation of mean-shift which uses a fixed sized rectangle for its region.
+	 * The type of color model it uses is specified by modelType.
+	 *
+	 * @see TrackerMeanShiftLikelihood
+	 *
+	 * @param maxIterations Maximum number of mean-shift iteraions.  Try 30.
+	 * @param numBins Number of bins in the histogram color model.  Try 5.
+	 * @param maxPixelValue Maximum pixel value.  For 8-bit images this will be 255
+	 * @param modelType Type of color model used.
+	 * @param bandType Type of band in the color image
+	 * @return TrackerObjectQuad based on {@link TrackerMeanShiftLikelihood}.
+	 */
 	public static <T extends ImageSingleBand>
 	TrackerObjectQuad<MultiSpectral<T>> createMeanShiftLikelihood( int maxIterations ,
 																   int numBins ,
@@ -96,5 +114,30 @@ public class FactoryTrackerObjectQuad {
 				new TrackerMeanShiftLikelihood<MultiSpectral<T>>(likelihood,maxIterations,0.1f);
 
 		return new Msl_to_TrackerObjectQuad<T>(alg,bandType);
+	}
+
+	/**
+	 * Implementation of mean-shift which can handle gradual changes in scale of the object being tracked.
+	 * The region is specified using a rotated rectangle and its orientation is assumed to be constant.
+	 *
+	 * @see TrackerMeanShiftComaniciu2003
+	 * @param config Configuration
+	 * @param <T> Image type
+	 * @return TrackerObjectQuad based on Comaniciu2003
+	 */
+	public static <T extends ImageMultiBand>
+	TrackerObjectQuad<T> createMeanShiftComaniciu2003( ConfigComaniciu2003<T> config ) {
+
+		InterpolatePixelMB<T> interp = FactoryInterpolation.createPixelMB(0,config.maxPixelValue,
+				config.interpolation,config.imageType);
+
+		LocalWeightedHistogramRotRect<T> hist =
+				new LocalWeightedHistogramRotRect<T>(config.numSamples,config.numSigmas,config.numHistogramBins,
+						config.imageType.getNumBands(),config.maxPixelValue,interp);
+		TrackerMeanShiftComaniciu2003<T> alg = new TrackerMeanShiftComaniciu2003<T>(
+				config.updateHistogram,config.meanShiftMaxIterations,config.meanShiftMinimumChange,
+				config.scaleWeight,hist);
+
+		return new Comaniciu2003_to_TrackObjectQuad<T>(alg,config.imageType);
 	}
 }

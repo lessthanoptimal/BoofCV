@@ -22,8 +22,8 @@ import boofcv.abst.feature.describe.DescribeRegionPoint;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageSInt8;
+import boofcv.struct.image.ImageType;
 import boofcv.struct.image.MultiSpectral;
 import org.junit.Test;
 
@@ -110,7 +110,7 @@ public class TestDescribeMultiSpectral {
 		}
 
 		@Override
-		public ImageDataType getImageType() {return null;}
+		public ImageType getImageType() {return null;}
 	}
 
 	private class DummyDesc implements DescribeRegionPoint {
@@ -150,6 +150,6 @@ public class TestDescribeMultiSpectral {
 		}
 
 		@Override
-		public ImageDataType getImageType() {return null;}
+		public ImageType getImageType() {return null;}
 	}
 }

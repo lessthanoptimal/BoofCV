@@ -20,7 +20,7 @@ package boofcv.abst.sfm.d3;
 
 import boofcv.struct.calib.MonoPlaneParameters;
 import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageDataType;
+import boofcv.struct.image.ImageType;
 import georegression.struct.se.Se3_F64;
 
 /**
@@ -55,6 +55,6 @@ public interface MonocularPlaneVisualOdometry<T extends ImageBase> extends Visua
 	 *
 	 * @return The image type
 	 */
-	public ImageDataType<T> getImageType();
+	public ImageType<T> getImageType();
 
 }

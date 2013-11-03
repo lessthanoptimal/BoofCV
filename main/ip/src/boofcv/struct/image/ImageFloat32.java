@@ -117,7 +117,7 @@ public class ImageFloat32 extends ImageFloat<ImageFloat32> {
 	}
 
 	@Override
-	public ImageTypeInfo getTypeInfo() {
-		return ImageTypeInfo.F32;
+	public ImageDataType getTypeInfo() {
+		return ImageDataType.F32;
 	}
 }

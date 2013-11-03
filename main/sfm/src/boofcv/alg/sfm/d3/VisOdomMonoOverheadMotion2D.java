@@ -26,7 +26,7 @@ import boofcv.alg.sfm.overhead.SelectOverheadParameters;
 import boofcv.factory.sfm.FactorySfmMisc;
 import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageDataType;
+import boofcv.struct.image.ImageType;
 import georegression.struct.se.Se2_F64;
 import georegression.struct.se.Se3_F64;
 import org.ejml.data.DenseMatrix64F;
@@ -87,7 +87,7 @@ public class VisOdomMonoOverheadMotion2D<T extends ImageBase>
 	public VisOdomMonoOverheadMotion2D(double cellSize,
 									   double maxCellsPerPixel,
 									   double mapHeightFraction ,
-									   ImageMotion2D<T, Se2_F64> motion2D , ImageDataType<T> imageType )
+									   ImageMotion2D<T, Se2_F64> motion2D , ImageType<T> imageType )
 	{
 		selectOverhead = new SelectOverheadParameters(cellSize,maxCellsPerPixel,mapHeightFraction);
 		this.motion2D = motion2D;

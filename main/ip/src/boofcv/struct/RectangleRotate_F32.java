@@ -57,4 +57,8 @@ public class RectangleRotate_F32 {
 		this.height = r.height;
 		this.theta = r.theta;
 	}
+
+	public String toString() {
+		return getClass().getSimpleName()+"( cx = "+cx+" cy = "+cy+" width = "+width+" height = "+height+" theta = "+theta+" )";
+	}
 }

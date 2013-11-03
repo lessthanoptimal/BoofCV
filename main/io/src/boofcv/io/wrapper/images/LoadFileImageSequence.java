@@ -21,8 +21,8 @@ package boofcv.io.wrapper.images;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.image.UtilImageIO;
-import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageType;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
@@ -49,7 +49,7 @@ public class LoadFileImageSequence<T extends ImageSingleBand> implements SimpleI
 	java.util.List<String> fileNames = new ArrayList<String>();
 
 	// type of image it outputs
-	ImageDataType<T> type;
+	ImageType<T> type;
 	// the output image
 	T image;
 	int scalefactor;
@@ -66,7 +66,7 @@ public class LoadFileImageSequence<T extends ImageSingleBand> implements SimpleI
 	 * @param directory The directory containing the images.
 	 * @param suffix	The suffix that the images have.
 	 */
-	public LoadFileImageSequence(ImageDataType<T> type, String directory, String suffix) {
+	public LoadFileImageSequence(ImageType<T> type, String directory, String suffix) {
 		this(type, directory, suffix, 1);
 	}
 
@@ -77,7 +77,7 @@ public class LoadFileImageSequence<T extends ImageSingleBand> implements SimpleI
 	 * @param suffix	  The suffix that the images have.
 	 * @param scalefactor How much the images will be scaled down by.
 	 */
-	public LoadFileImageSequence(ImageDataType<T> type, String directory, String suffix, int scalefactor) {
+	public LoadFileImageSequence(ImageType<T> type, String directory, String suffix, int scalefactor) {
 		this.directoryName = directory;
 		this.suffix = suffix;
 		this.scalefactor = scalefactor;
@@ -179,7 +179,7 @@ public class LoadFileImageSequence<T extends ImageSingleBand> implements SimpleI
 	}
 
 	@Override
-	public ImageDataType<T> getImageType() {
+	public ImageType<T> getImageType() {
 		return type;
 	}
 

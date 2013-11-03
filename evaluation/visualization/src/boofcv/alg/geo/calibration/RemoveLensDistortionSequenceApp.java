@@ -29,7 +29,7 @@ import boofcv.io.image.UtilImageIO;
 import boofcv.io.wrapper.DefaultMediaManager;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.IntrinsicParameters;
-import boofcv.struct.image.ImageDataType;
+import boofcv.struct.image.ImageType;
 import boofcv.struct.image.ImageUInt8;
 import boofcv.struct.image.MultiSpectral;
 
@@ -57,7 +57,7 @@ public class RemoveLensDistortionSequenceApp {
 		MultiSpectral<ImageUInt8> input = null;
 		MultiSpectral<ImageUInt8> output = null;
 
-		SimpleImageSequence<ImageUInt8> sequence = media.openVideo(fileName, ImageDataType.single(ImageUInt8.class));
+		SimpleImageSequence<ImageUInt8> sequence = media.openVideo(fileName, ImageType.single(ImageUInt8.class));
 
 		BufferedImage undistorted = null;
 

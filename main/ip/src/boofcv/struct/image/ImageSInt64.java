@@ -82,8 +82,8 @@ public class ImageSInt64 extends ImageSingleBand<ImageSInt64> {
 	}
 
 	@Override
-	public ImageTypeInfo getTypeInfo() {
-		return ImageTypeInfo.S64;
+	public ImageDataType getTypeInfo() {
+		return ImageDataType.S64;
 	}
 
 	@Override

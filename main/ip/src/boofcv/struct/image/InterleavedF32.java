@@ -44,8 +44,8 @@ public class InterleavedF32 extends ImageInterleaved<InterleavedF32> {
 	}
 
 	@Override
-	public ImageTypeInfo getTypeInfo() {
-		return ImageTypeInfo.F32;
+	public ImageDataType getTypeInfo() {
+		return ImageDataType.F32;
 	}
 
 	/**

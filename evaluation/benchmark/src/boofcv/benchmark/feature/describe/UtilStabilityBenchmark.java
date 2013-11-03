@@ -21,8 +21,8 @@ package boofcv.benchmark.feature.describe;
 import boofcv.abst.feature.describe.ConfigBrief;
 import boofcv.benchmark.feature.BenchmarkAlgorithm;
 import boofcv.factory.feature.describe.FactoryDescribeRegionPoint;
-import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,8 +36,8 @@ public class UtilStabilityBenchmark {
 	List<BenchmarkAlgorithm> createAlgorithms(int radius, Class<T> imageType , Class<D> derivType ) {
 		List<BenchmarkAlgorithm> ret = new ArrayList<BenchmarkAlgorithm>();
 
-		ret.add( new BenchmarkAlgorithm("SURF", FactoryDescribeRegionPoint.surfFast(null, ImageDataType.single(imageType))));
-		ret.add( new BenchmarkAlgorithm("SURF-M", FactoryDescribeRegionPoint.surfStable(null, ImageDataType.single(imageType))));
+		ret.add( new BenchmarkAlgorithm("SURF", FactoryDescribeRegionPoint.surfFast(null, ImageType.single(imageType))));
+		ret.add( new BenchmarkAlgorithm("SURF-M", FactoryDescribeRegionPoint.surfStable(null, ImageType.single(imageType))));
 		ret.add( new BenchmarkAlgorithm("BRIEF", FactoryDescribeRegionPoint.brief(new ConfigBrief(true), imageType)));
 		ret.add( new BenchmarkAlgorithm("BRIEF-SO", FactoryDescribeRegionPoint.brief(new ConfigBrief(false), imageType)));
 

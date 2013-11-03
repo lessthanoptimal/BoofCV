@@ -28,7 +28,7 @@ import boofcv.gui.VideoProcessAppBase;
 import boofcv.gui.VisualizeApp;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageDataType;
+import boofcv.struct.image.ImageType;
 import georegression.struct.InvertibleTransform;
 import georegression.struct.homo.Homography2D_F64;
 import georegression.struct.point.Point2D_F64;
@@ -94,7 +94,7 @@ public abstract class VideoStitchBaseApp<I extends ImageBase, IT extends Inverti
 							  Class imageType,
 							  boolean color ,
 							  Motion2DPanel gui) {
-		super(numAlgFamilies, color ? ImageDataType.ms(3,imageType) : ImageDataType.single(imageType));
+		super(numAlgFamilies, color ? ImageType.ms(3, imageType) : ImageType.single(imageType));
 
 		this.gui = gui;
 		gui.addMouseListener(this);
@@ -113,7 +113,7 @@ public abstract class VideoStitchBaseApp<I extends ImageBase, IT extends Inverti
 
 	protected StitchingFromMotion2D createAlgorithm( PointTracker<I> tracker ) {
 
-		if( imageInfo.getFamily() == ImageDataType.Family.MULTI_SPECTRAL ) {
+		if( imageInfo.getFamily() == ImageType.Family.MULTI_SPECTRAL ) {
 			Class imageType = imageInfo.getImageClass();
 
 			ImageMotion2D<I,IT> motion = FactoryMotion2D.createMotion2D(maxIterations,inlierThreshold,2,absoluteMinimumTracks,

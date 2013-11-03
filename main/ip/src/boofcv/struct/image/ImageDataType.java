@@ -18,142 +18,251 @@
 
 package boofcv.struct.image;
 
-import boofcv.core.image.GeneralizedImageOps;
-
-import java.lang.reflect.Array;
 
 /**
- * Specifies the type of image data structure.
+ * Describes the physical characteristics of the internal primitive data types inside the image
  *
  * @author Peter Abeles
  */
-public class ImageDataType<T extends ImageBase> {
+public enum ImageDataType {
+	/** Single Band Unsigned 8-bit image */
+	U8(false,byte.class),
+	/** Single Band Signed 8-bit image */
+	S8(true,byte.class),
+	/** Single Band Unsigned 16-bit image */
+	U16(false,short.class),
+	/** Single Band Signed 16-bit integer image */
+	S16(true,short.class),
+	/** Single Band Signed 32-bit integer image */
+	S32(true,int.class),
+	/** Single Band Signed 64-bit integer image */
+	S64(true,long.class),
+	/** Single Band 32-bit floating point image */
+	F32(true,float.class),
+	/** Single Band 64-bit floating point image */
+	F64(true,double.class),
+	/** Single Band 8-bit integer image */
+	I8(byte.class),
+	/** Single Band 16-bit integer image */
+	I16(short.class),
+	/** Single Band Integer image */
+	I(true),
+	/** Single Band floating point image */
+	F(true);
 
-	/**
-	 * Specifies the image data structure
-	 */
-	Family family;
-	/**
-	 * Specifies the type of data used to store pixel information
-	 */
-	ImageTypeInfo dataType;
-	/**
-	 * Number of bands in the image.  Single band images ignore this field.
-	 */
-	int numBands;
+	private int numBits;
+	private boolean isAbstract;
+	private boolean isSigned;
+	private boolean isInteger;
+	private double maxValue;
+	private double minValue;
+	private Class dataType;
+	private Class sumType;
+//	private Class<T> imageClass;
 
-	public ImageDataType(Family family, ImageTypeInfo dataType , int numBands ) {
-		this.family = family;
+	public static ImageDataType classToType( Class imageClass ) {
+		if( imageClass == ImageUInt8.class )
+			return U8;
+		else if( imageClass == ImageSInt8.class )
+			return S8;
+		else if( imageClass == ImageUInt16.class )
+			return U16;
+		else if( imageClass == ImageSInt16.class )
+			return S16;
+		else if( imageClass == ImageSInt32.class )
+			return S32;
+		else if( imageClass == ImageSInt64.class )
+			return S64;
+		else if( imageClass == ImageFloat32.class )
+			return F32;
+		else if( imageClass == ImageFloat64.class )
+			return F64;
+		else if( imageClass == ImageInt8.class )
+			return I8;
+		else if( imageClass == ImageInt16.class )
+			return I16;
+		else if( imageClass == ImageInteger.class )
+			return I;
+		else if( imageClass == ImageFloat.class )
+			return F;
+		else
+			throw new RuntimeException("Add");
+	}
+
+	public static Class typeToClass( ImageDataType type ) {
+		switch (type) {
+			case U8:
+				return ImageUInt8.class;
+			case S8:
+				return ImageSInt8.class;
+			case U16:
+				return ImageUInt16.class;
+			case S16:
+				return ImageSInt16.class;
+			case S32:
+				return ImageSInt32.class;
+			case S64:
+				return ImageSInt64.class;
+			case F32:
+				return ImageFloat32.class;
+			case F64:
+				return ImageFloat64.class;
+			case I8:
+				return ImageInt8.class;
+			case I16:
+				return ImageInt16.class;
+			case I:
+				return ImageInteger.class;
+			case F:
+				return ImageFloat.class;
+		}
+
+		throw new RuntimeException("Add");
+	}
+
+	ImageDataType(boolean isInteger) {
+		this.isAbstract = true;
+		this.isInteger = isInteger;
+	}
+
+	ImageDataType(Class dataType) {
+		this.isAbstract = true;
 		this.dataType = dataType;
-		this.numBands = numBands;
+		configureByDataType(dataType);
 	}
 
-	public static <I extends ImageSingleBand> ImageDataType<I> single( Class<I> imageType ) {
-		return new ImageDataType<I>(Family.SINGLE_BAND,ImageTypeInfo.classToType(imageType),1);
+	ImageDataType(boolean isSigned, Class<?> dataType) {
+		this.isAbstract = false;
+		this.isSigned = isSigned;
+		this.dataType = dataType;
+
+		configureByDataType(dataType);
 	}
 
-	public static <I extends ImageSingleBand> ImageDataType<MultiSpectral<I>> ms( int numBands , Class<I> imageType ) {
-		return new ImageDataType<MultiSpectral<I>>(Family.MULTI_SPECTRAL,ImageTypeInfo.classToType(imageType),numBands);
+	private void configureByDataType(Class<?> dataType ) {
+		if( dataType == float.class || dataType == double.class ) {
+			sumType = dataType;
+			isInteger = false;
+			if( dataType == float.class )
+				numBits = 32;
+			else
+				numBits = 64;
+		} else {
+			isInteger = true;
+			if( dataType == byte.class )
+				numBits = 8;
+			else if( dataType == short.class )
+				numBits = 16;
+			else if( dataType == int.class )
+				numBits = 32;
+			else if( dataType == long.class )
+				numBits = 64;
+
+			if( numBits <= 32 )
+				sumType = int.class;
+			else
+				sumType = long.class;
+		}
+
+		configureMinMaxValues();
 	}
 
-	public ImageTypeInfo getDataType() {
+	private void configureMinMaxValues() {
+		if( isInteger ) {
+			switch( numBits ) {
+				case 8:
+					minValue = Byte.MIN_VALUE;
+					maxValue = Byte.MAX_VALUE;
+					break;
+
+				case 16:
+					minValue = Short.MIN_VALUE;
+					maxValue = Short.MAX_VALUE;
+					break;
+
+				case 32:
+					minValue = Integer.MIN_VALUE;
+					maxValue = Integer.MAX_VALUE;
+					break;
+
+				case 64:
+					minValue = Long.MIN_VALUE;
+					maxValue = Long.MAX_VALUE;
+					break;
+			}
+		} else {
+			switch( numBits ) {
+				case 32:
+					minValue = Float.MIN_VALUE;
+					maxValue = Float.MAX_VALUE;
+					break;
+
+				case 64:
+					minValue = Double.MIN_VALUE;
+					maxValue = Double.MAX_VALUE;
+					break;
+			}
+		}
+
+		if( !isSigned ) {
+			maxValue += -minValue;
+			minValue = 0;
+		}
+	}
+
+	/**
+	 * Number of bits per pixel in the image.
+	 */
+	public int getNumBits() {
+		return numBits;
+	}
+
+	/**
+	 * If the image is an abstract data type or not.
+	 */
+	public boolean isAbstract() {
+		return isAbstract;
+	}
+
+	/**
+	 * If the image has a signed or unsigned data type.
+	 */
+	public boolean isSigned() {
+		return isSigned;
+	}
+
+	/**
+	 * If each pixel is an integer or not.
+	 */
+	public boolean isInteger() {
+		return isInteger;
+	}
+
+	/**
+	 * The primitive data type used by each pixel.
+	 */
+	public Class getDataType() {
 		return dataType;
 	}
 
 	/**
-	 * Creates a new image.
-	 *
-	 * @param width Number of columns in the image.
-	 * @param height Number of rows in the image.
-	 * @return New instance of the image.
+	 * Type of data used when summing elements in the image.
 	 */
-	public T createImage( int width , int height ) {
-		switch( family ) {
-			case SINGLE_BAND:
-				return (T)GeneralizedImageOps.createSingleBand(getImageClass(),width,height);
-
-			case INTERLEAVED:
-				return (T)GeneralizedImageOps.createInterleaved(getImageClass(), width, height, numBands);
-
-			case MULTI_SPECTRAL:
-				return (T)new MultiSpectral(getImageClass(),width,height,numBands);
-
-			default:
-				throw new IllegalArgumentException("Type not yet supported");
-		}
+	public Class getSumType() {
+		return sumType;
 	}
 
 	/**
-	 * Creates an array of the specified iamge type
-	 * @param length Number of elements in the array
-	 * @return array of image type
+	 * Returns the maximum allowed value for data elements in this data type
 	 */
-	public T[] createArray( int length ) {
-		switch( family ) {
-			case SINGLE_BAND:
-			case INTERLEAVED:
-				return (T[])Array.newInstance(getImageClass(),length);
-
-			case MULTI_SPECTRAL:
-				return (T[])new MultiSpectral[ length ];
-
-			default:
-				throw new IllegalArgumentException("Type not yet supported");
-		}
+	public double getMaxValue() {
+		return maxValue;
 	}
 
-	public int getNumBands() {
-		return numBands;
-	}
-
-	public Family getFamily() {
-		return family;
-	}
-
-	public Class getImageClass() {
-		return getImageClass(family,dataType);
-	}
-
-	public static Class getImageClass( Family family , ImageTypeInfo dataType ) {
-		switch( family ) {
-			case SINGLE_BAND:
-			case MULTI_SPECTRAL:
-				switch( dataType ) {
-					case F32: return ImageFloat32.class;
-					case F64: return ImageFloat64.class;
-					case U8: return ImageUInt8.class;
-					case S8: return ImageSInt8.class;
-					case U16: return ImageUInt16.class;
-					case S16: return ImageSInt16.class;
-					case S32: return ImageSInt32.class;
-					case S64: return ImageSInt64.class;
-					case I8: return ImageInt8.class;
-					case I16: return ImageInt16.class;
-				}
-				break;
-
-			case INTERLEAVED:
-				switch( dataType ) {
-					case F32: return InterleavedF32.class;
-					case F64: return InterleavedF64.class;
-					case U8: return InterleavedU8.class;
-					case S8: return InterleavedS8.class;
-					case U16: return InterleavedU16.class;
-					case S16: return InterleavedS16.class;
-					case S32: return InterleavedS32.class;
-					case S64: return InterleavedS64.class;
-					case I8: return InterleavedI8.class;
-					case I16: return InterleavedI16.class;
-				}
-				break;
-		}
-		throw new RuntimeException("Support this image type thing");
-	}
-
-	public static enum Family
-	{
-		SINGLE_BAND,
-		MULTI_SPECTRAL,
-		INTERLEAVED
+	/**
+	 * Returns the minimum allowed value for data elements in this data type
+	 */
+	public double getMinValue() {
+		return maxValue;
 	}
 }

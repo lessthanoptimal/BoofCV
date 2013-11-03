@@ -62,8 +62,8 @@ import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.factory.tracker.FactoryTrackerAlg;
 import boofcv.factory.transform.pyramid.FactoryPyramid;
 import boofcv.struct.feature.*;
-import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageType;
 import boofcv.struct.pyramid.PyramidDiscrete;
 
 import java.util.Random;
@@ -158,7 +158,7 @@ public class FactoryPointTracker {
 
 		DetectDescribePoint<I,SurfFeature> fused =
 				FactoryDetectDescribe.surfFast(configDetector, configDescribe, configOrientation,
-						ImageDataType.single(imageType));
+						ImageType.single(imageType));
 
 		DdaManagerDetectDescribePoint<I,SurfFeature> manager = new DdaManagerDetectDescribePoint<I,SurfFeature>(fused);
 
@@ -194,7 +194,7 @@ public class FactoryPointTracker {
 
 		DetectDescribePoint<I,SurfFeature> fused =
 				FactoryDetectDescribe.surfStable(configDetector,configDescribe,configOrientation,
-						ImageDataType.single(imageType));
+						ImageType.single(imageType));
 
 		DdaManagerDetectDescribePoint<I,SurfFeature> manager = new DdaManagerDetectDescribePoint<I,SurfFeature>(fused);
 
@@ -388,7 +388,7 @@ public class FactoryPointTracker {
 
 		DetectDescribePoint<I,SurfFeature> fused =
 				FactoryDetectDescribe.surfStable(configDetector, configDescribe, configOrientation,
-						ImageDataType.single(imageType));
+						ImageType.single(imageType));
 
 		return combined(fused,generalAssoc,trackRadius,pyramidScalingKlt,reactivateThreshold,
 				imageType);
@@ -430,7 +430,7 @@ public class FactoryPointTracker {
 		InterestPointDetector<I> detector = FactoryInterestPoint.wrapPoint(corner, 1, imageType, derivType);
 
 		DescribeRegionPoint<I,SurfFeature> regionDesc
-				= FactoryDescribeRegionPoint.surfStable(configDescribe, ImageDataType.single(imageType));
+				= FactoryDescribeRegionPoint.surfStable(configDescribe, ImageType.single(imageType));
 
 		ScoreAssociation<TupleDesc_F64> score = FactoryAssociation.scoreEuclidean(TupleDesc_F64.class, true);
 		AssociateSurfBasic assoc = new AssociateSurfBasic(FactoryAssociation.greedy(score, 100000, true));

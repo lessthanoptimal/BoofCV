@@ -26,7 +26,7 @@ import boofcv.factory.transform.wavelet.FactoryWaveletDaub;
 import boofcv.factory.transform.wavelet.FactoryWaveletTransform;
 import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.image.ImageTypeInfo;
+import boofcv.struct.image.ImageType;
 import boofcv.struct.wavelet.WaveletDescription;
 import boofcv.struct.wavelet.WlCoef_F32;
 import boofcv.struct.wavelet.WlCoef_I32;
@@ -55,7 +55,7 @@ public class FactoryImageDenoise {
 	public static <T extends ImageSingleBand> WaveletDenoiseFilter<T>
 	waveletVisu( Class<T> imageType , int numLevels , double minPixelValue , double maxPixelValue )
 	{
-		ImageTypeInfo info = ImageTypeInfo.classToType(imageType);
+		ImageDataType info = ImageDataType.classToType(imageType);
 		WaveletTransform descTran = createDefaultShrinkTransform(info, numLevels,minPixelValue,maxPixelValue);
 		DenoiseWavelet denoiser  = FactoryDenoiseWaveletAlg.visu(imageType);
 
@@ -74,7 +74,7 @@ public class FactoryImageDenoise {
 	public static <T extends ImageSingleBand> WaveletDenoiseFilter<T>
 	waveletBayes( Class<T> imageType , int numLevels , double minPixelValue , double maxPixelValue )
 	{
-		ImageTypeInfo info = ImageTypeInfo.classToType(imageType);
+		ImageDataType info = ImageDataType.classToType(imageType);
 		WaveletTransform descTran = createDefaultShrinkTransform(info, numLevels,minPixelValue,maxPixelValue);
 		DenoiseWavelet denoiser = FactoryDenoiseWaveletAlg.bayes(null, imageType);
 
@@ -93,7 +93,7 @@ public class FactoryImageDenoise {
 	public static <T extends ImageSingleBand> WaveletDenoiseFilter<T>
 	waveletSure( Class<T> imageType , int numLevels , double minPixelValue , double maxPixelValue )
 	{
-		ImageTypeInfo info = ImageTypeInfo.classToType(imageType);
+		ImageDataType info = ImageDataType.classToType(imageType);
 		WaveletTransform descTran = createDefaultShrinkTransform(info, numLevels,minPixelValue,maxPixelValue);
 		DenoiseWavelet denoiser = FactoryDenoiseWaveletAlg.sure(imageType);
 
@@ -103,7 +103,7 @@ public class FactoryImageDenoise {
 	/**
 	 * Default wavelet transform used for denoising images.
 	 */
-	private static WaveletTransform createDefaultShrinkTransform(ImageTypeInfo imageType, int numLevels,
+	private static WaveletTransform createDefaultShrinkTransform(ImageDataType imageType, int numLevels,
 																 double minPixelValue , double maxPixelValue ) {
 
 		WaveletTransform descTran;
@@ -116,7 +116,7 @@ public class FactoryImageDenoise {
 			WaveletDescription<WlCoef_I32> waveletDesc_I32 = FactoryWaveletDaub.biorthogonal_I32(5, BorderType.REFLECT);
 			descTran = FactoryWaveletTransform.create_I(waveletDesc_I32,numLevels,
 					(int)minPixelValue,(int)maxPixelValue,
-					ImageDataType.getImageClass(ImageDataType.Family.SINGLE_BAND,imageType));
+					ImageType.getImageClass(ImageType.Family.SINGLE_BAND, imageType));
 		}
 		return descTran;
 	}

@@ -151,7 +151,7 @@ public abstract class ImageInterleaved<T extends ImageInterleaved> extends Image
 	 *
 	 * @return The type of image.
 	 */
-	public abstract ImageTypeInfo getTypeInfo();
+	public abstract ImageDataType getTypeInfo();
 
 	/**
 	 * Returns the data array the image is stored in.

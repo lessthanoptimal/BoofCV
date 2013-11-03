@@ -20,7 +20,7 @@ package boofcv.abst.feature.describe;
 
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageDataType;
+import boofcv.struct.image.ImageType;
 
 
 /**
@@ -79,5 +79,5 @@ public interface DescribeRegionPoint<T extends ImageBase, Desc extends TupleDesc
 	 *
 	 * @return ImageDataType
 	 */
-	public ImageDataType<T> getImageType();
+	public ImageType<T> getImageType();
 }

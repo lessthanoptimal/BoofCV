@@ -21,7 +21,7 @@ package boofcv.struct;
 /**
  * <p>
  * A rectangle which can be rotated.  Angle of rotation is relative to +x axis, which is along the rectangle's
- * width. +y is along its height.
+ * width. +y is along its height. Point of rotation is the rectangle's center.
  * </p>
  * <p>
  * Conversion from rectangle to parent frame:<br>
@@ -33,10 +33,13 @@ package boofcv.struct;
  * @author Peter Abeles
  */
 public class RectangleRotate_F64 {
-	public double cx;
-	public double cy;
+	/** Center point of rectangle */
+	public double cx,cy;
+	/** Width of rectangle */
 	public double width;
+	/** height of rectangle */
 	public double height;
+	/** Angle of rotation about rectangle's center */
 	public double theta;
 
 	public RectangleRotate_F64(double cx, double cy, double width, double height, double theta) {
@@ -56,5 +59,9 @@ public class RectangleRotate_F64 {
 		this.width = r.width;
 		this.height = r.height;
 		this.theta = r.theta;
+	}
+
+	public String toString() {
+		return getClass().getSimpleName()+"( cx = "+cx+" cy = "+cy+" width = "+width+" height = "+height+" theta = "+theta+" )";
 	}
 }

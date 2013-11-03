@@ -50,12 +50,12 @@ public class BoofTesting {
 		return (T) type;
 	}
 
-	public static ImageTypeInfo convertToGenericType(ImageTypeInfo type) {
+	public static ImageDataType convertToGenericType(ImageDataType type) {
 		if (type.isInteger()) {
 			if (type.getNumBits() == 8)
-				return ImageTypeInfo.I8;
+				return ImageDataType.I8;
 			else if (type.getNumBits() == 16)
-				return ImageTypeInfo.I16;
+				return ImageDataType.I16;
 		}
 
 		return type;

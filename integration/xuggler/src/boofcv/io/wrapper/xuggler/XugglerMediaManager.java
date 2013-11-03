@@ -21,14 +21,14 @@ package boofcv.io.wrapper.xuggler;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.wrapper.DefaultMediaManager;
 import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageDataType;
+import boofcv.struct.image.ImageType;
 
 /**
  * @author Peter Abeles
  */
 public class XugglerMediaManager extends DefaultMediaManager {
 	@Override
-	public <T extends ImageBase> SimpleImageSequence<T> openVideo(String fileName, ImageDataType<T> type) {
+	public <T extends ImageBase> SimpleImageSequence<T> openVideo(String fileName, ImageType<T> type) {
 		return new XugglerSimplified(fileName,type);
 	}
 }

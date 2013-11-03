@@ -32,8 +32,8 @@ import boofcv.io.MediaManager;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.wrapper.DefaultMediaManager;
 import boofcv.misc.BoofMiscOps;
-import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageType;
 import boofcv.struct.image.MultiSpectral;
 import georegression.struct.homo.Homography2D_F64;
 import georegression.struct.point.Point2D_F64;
@@ -79,7 +79,7 @@ public class ExampleVideoMosaic {
 		MediaManager media = DefaultMediaManager.INSTANCE;
 		String fileName = "../data/applet/mosaic/airplane01.mjpeg";
 		SimpleImageSequence<MultiSpectral<ImageFloat32>> video =
-				media.openVideo(fileName, ImageDataType.ms(3,ImageFloat32.class));
+				media.openVideo(fileName, ImageType.ms(3, ImageFloat32.class));
 
 		MultiSpectral<ImageFloat32> frame = video.next();
 

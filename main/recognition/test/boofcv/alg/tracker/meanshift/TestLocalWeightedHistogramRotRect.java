@@ -144,7 +144,7 @@ public class TestLocalWeightedHistogramRotRect {
 		int i = 0;
 		for( int y = 0; y < numSamples; y++ ) {
 			for( int x = 0; x < numSamples; x++ , i++ ) {
-				alg.squareToImage((float)x/(numSamples-1)-0.5f,(float)y/(numSamples-1)-0.5f,rect);
+				alg.squareToImageSample((float)x/(numSamples-1)-0.5f,(float)y/(numSamples-1)-0.5f,rect);
 
 				boolean inside = alg.imageX >= 0 && alg.imageX < 40 && alg.imageY >= 0 && alg.imageY < 50;
 
@@ -226,18 +226,18 @@ public class TestLocalWeightedHistogramRotRect {
 		LocalWeightedHistogramRotRect alg = new LocalWeightedHistogramRotRect(10,3,12,3,255,null);
 
 		alg.c = 1; alg.s = 0;
-		alg.squareToImage(0,0,rect);
+		alg.squareToImageSample(0,0,rect);
 
 		assertEquals(4,alg.imageX,1e-4f);
 		assertEquals(5,alg.imageY,1e-4f);
 
-		alg.squareToImage(-0.5f,0.5f,rect);
+		alg.squareToImageSample(-0.5f,0.5f,rect);
 
 		assertEquals(4f-5f,alg.imageX,1e-4f);
 		assertEquals(5f+10f,alg.imageY,1e-4f);
 
 		alg.c = 0.5f; alg.s = -0.5f;
-		alg.squareToImage(-0.5f,0.5f,rect);
+		alg.squareToImageSample(-0.5f,0.5f,rect);
 		                                            // -5 +10
 		assertEquals(4f-2.5f+5f,alg.imageX,1e-4f);
 		assertEquals(5f+2.5f+5f,alg.imageY,1e-4f);

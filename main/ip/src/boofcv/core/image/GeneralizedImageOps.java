@@ -131,8 +131,8 @@ public class GeneralizedImageOps {
 		}
 	}
 
-	public static <T extends ImageSingleBand> T createSingleBand(ImageTypeInfo type, int width, int height) {
-		Class<T> typeClass = ImageDataType.getImageClass(ImageDataType.Family.SINGLE_BAND,type);
+	public static <T extends ImageSingleBand> T createSingleBand(ImageDataType type, int width, int height) {
+		Class<T> typeClass = ImageType.getImageClass(ImageType.Family.SINGLE_BAND, type);
 		return createSingleBand(typeClass, width, height);
 	}
 
@@ -162,8 +162,8 @@ public class GeneralizedImageOps {
 		throw new RuntimeException("Unknown type: "+type.getSimpleName());
 	}
 
-	public static <T extends ImageInterleaved> T createInterleaved(ImageTypeInfo type, int width, int height , int numBands) {
-		Class<T> typeClass = ImageDataType.getImageClass(ImageDataType.Family.INTERLEAVED,type);
+	public static <T extends ImageInterleaved> T createInterleaved(ImageDataType type, int width, int height , int numBands) {
+		Class<T> typeClass = ImageType.getImageClass(ImageType.Family.INTERLEAVED, type);
 		return createInterleaved(typeClass,width,height,numBands);
 	}
 

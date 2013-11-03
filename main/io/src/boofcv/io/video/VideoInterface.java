@@ -20,7 +20,7 @@ package boofcv.io.video;
 
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageDataType;
+import boofcv.struct.image.ImageType;
 
 
 /**
@@ -30,5 +30,5 @@ import boofcv.struct.image.ImageDataType;
  */
 public interface VideoInterface {
 
-	public <T extends ImageBase> SimpleImageSequence<T> load( String fileName , ImageDataType<T> imageType );
+	public <T extends ImageBase> SimpleImageSequence<T> load( String fileName , ImageType<T> imageType );
 }

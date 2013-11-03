@@ -20,8 +20,8 @@ package boofcv.abst.feature.detdesc;
 
 import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
 import boofcv.struct.feature.SurfFeature;
-import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageType;
 import boofcv.struct.image.MultiSpectral;
 
 /**
@@ -32,7 +32,7 @@ public class TestSurfMultiSpectral_to_DetectDescribePoint extends
 {
 
 	public TestSurfMultiSpectral_to_DetectDescribePoint() {
-		super(true, true, ImageDataType.ms(3,ImageFloat32.class), SurfFeature.class);
+		super(true, true, ImageType.ms(3, ImageFloat32.class), SurfFeature.class);
 	}
 
 	@Override

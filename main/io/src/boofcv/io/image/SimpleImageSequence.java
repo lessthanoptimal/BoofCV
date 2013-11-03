@@ -19,7 +19,7 @@
 package boofcv.io.image;
 
 import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageDataType;
+import boofcv.struct.image.ImageType;
 
 /**
  * Simplified interface for reading in a sequence of images.  This interface hides the complexities of reading
@@ -74,7 +74,7 @@ public interface SimpleImageSequence<T extends ImageBase> {
 	/**
 	 * Returns the type of class used to store the output image
 	 */
-	public ImageDataType<T> getImageType();
+	public ImageType<T> getImageType();
 
 	/**
 	 * Start reading the sequence from the start

@@ -99,7 +99,7 @@ public class ImageFloat64 extends ImageFloat<ImageFloat64> {
 	}
 
 	@Override
-	public ImageTypeInfo getTypeInfo() {
-		return ImageTypeInfo.F64;
+	public ImageDataType getTypeInfo() {
+		return ImageDataType.F64;
 	}
 }

@@ -23,7 +23,7 @@ import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.interpolate.TypeInterpolate;
 import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageDataType;
+import boofcv.struct.image.ImageType;
 import georegression.struct.se.Se3_F64;
 
 /**
@@ -73,7 +73,7 @@ public class StereoVisualOdometryScaleInput<T extends ImageBase> implements Ster
 	}
 
 	@Override
-	public ImageDataType<T> getImageType() {
+	public ImageType<T> getImageType() {
 		return alg.getImageType();
 	}
 

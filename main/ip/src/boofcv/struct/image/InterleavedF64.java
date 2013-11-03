@@ -44,8 +44,8 @@ public class InterleavedF64 extends ImageInterleaved<InterleavedF64> {
 	}
 
 	@Override
-	public ImageTypeInfo getTypeInfo() {
-		return ImageTypeInfo.F64;
+	public ImageDataType getTypeInfo() {
+		return ImageDataType.F64;
 	}
 
 	/**

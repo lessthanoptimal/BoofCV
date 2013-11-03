@@ -44,8 +44,8 @@ public abstract class InterleavedI8 extends ImageInterleaved<InterleavedI8> {
 	}
 
 	@Override
-	public ImageTypeInfo getTypeInfo() {
-		return ImageTypeInfo.I8;
+	public ImageDataType getTypeInfo() {
+		return ImageDataType.I8;
 	}
 
 	/**

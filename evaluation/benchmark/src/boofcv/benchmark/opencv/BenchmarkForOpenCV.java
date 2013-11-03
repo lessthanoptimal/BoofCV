@@ -159,7 +159,7 @@ public class BenchmarkForOpenCV<T extends ImageSingleBand, D extends ImageSingle
 		public SURF() {
 			// the fast implementation is closer to OpenCV's SURF implementation for stability
 			detector = FactoryDetectDescribe.surfFast(new ConfigFastHessian(20, 2, -1, 1, 9, 4, 4), null, null,
-					ImageDataType.single(imageType));
+					ImageType.single(imageType));
 		}
 
 		@Override

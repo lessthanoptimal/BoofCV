@@ -22,7 +22,7 @@ import boofcv.core.image.ConvertBufferedImage;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.video.VideoMjpegCodec;
 import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageDataType;
+import boofcv.struct.image.ImageType;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -43,16 +43,16 @@ implements SimpleImageSequence<T>
 	BufferedImage next;
 	T image;
 	int frameNumber;
-	ImageDataType<T> imageType;
+	ImageType<T> imageType;
 
-	public MjpegStreamSequence( InputStream in , ImageDataType<T> imageType ) {
+	public MjpegStreamSequence( InputStream in , ImageType<T> imageType ) {
 		this.in = new DataInputStream(in);
 		this.imageType = imageType;
 		image = imageType.createImage(1,1);
 		readNext();
 	}
 
-	public MjpegStreamSequence( String fileName , ImageDataType<T> imageType ) throws FileNotFoundException {
+	public MjpegStreamSequence( String fileName , ImageType<T> imageType ) throws FileNotFoundException {
 		this(new DataInputStream(new BufferedInputStream(new FileInputStream(fileName),1024*200)),imageType);
 	}
 
@@ -110,7 +110,7 @@ implements SimpleImageSequence<T>
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public ImageDataType<T> getImageType() {
+	public ImageType<T> getImageType() {
 		return imageType;
 	}
 

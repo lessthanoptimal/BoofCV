@@ -19,9 +19,10 @@
 package boofcv.abst.tracker;
 
 import boofcv.alg.tracker.sfot.SparseFlowObjectTracker;
+import boofcv.struct.RectangleRotate_F32;
 import boofcv.struct.RectangleRotate_F64;
-import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageType;
 import georegression.geometry.UtilPoint2D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.Quadrilateral_F64;
@@ -38,11 +39,11 @@ public class Sfot_to_TrackObjectQuad<T extends ImageSingleBand, D extends ImageS
 
 	RectangleRotate_F64 region = new RectangleRotate_F64();
 
-	ImageDataType<T> type;
+	ImageType<T> type;
 
 	public Sfot_to_TrackObjectQuad(SparseFlowObjectTracker<T, D> alg) {
 		this.alg = alg;
-		this.type = ImageDataType.single(alg.getConfig().imageType);
+		this.type = ImageType.single(alg.getConfig().imageType);
 	}
 
 	@Override
@@ -68,7 +69,7 @@ public class Sfot_to_TrackObjectQuad<T extends ImageSingleBand, D extends ImageS
 	}
 
 	@Override
-	public ImageDataType<T> getImageType() {
+	public ImageType<T> getImageType() {
 		return type;
 	}
 
@@ -89,7 +90,47 @@ public class Sfot_to_TrackObjectQuad<T extends ImageSingleBand, D extends ImageS
 		r.theta = Math.atan2( sideY - centerY , sideX - centerX );
 	}
 
+	public static void quadToRectRot( Quadrilateral_F64 q , RectangleRotate_F32 r ) {
+		double centerX = (q.a.x + q.b.x + q.c.x + q.d.x)/4.0;
+		double centerY = (q.a.y + q.b.y + q.c.y + q.d.y)/4.0;
+
+		double topX = (q.a.x + q.b.x)/2.0;
+		double topY = (q.a.y + q.b.y)/2.0;
+
+		double sideX = (q.b.x + q.c.x)/2.0;
+		double sideY = (q.b.y + q.c.y)/2.0;
+
+		r.cx = (float)centerX;
+		r.cy = (float)centerY;
+		r.height = 2*(float)UtilPoint2D_F64.distance(topX,topY,centerX,centerY);
+		r.width = 2*(float)UtilPoint2D_F64.distance(sideX,sideY,centerX,centerY);
+		r.theta = (float)Math.atan2( sideY - centerY , sideX - centerX );
+	}
+
 	public static void rectRotToQuad( RectangleRotate_F64 r , Quadrilateral_F64 q ) {
+
+		double c = Math.cos(r.theta);
+		double s = Math.sin(r.theta);
+
+		setPoint(q.a,-r.width/2, -r.height/2.0,c,s);
+		setPoint(q.b, r.width/2, -r.height/2.0,c,s);
+		setPoint(q.c, r.width/2,  r.height/2.0,c,s);
+		setPoint(q.d,-r.width/2,  r.height/2.0,c,s);
+
+		q.a.x += r.cx;
+		q.a.y += r.cy;
+
+		q.b.x += r.cx;
+		q.b.y += r.cy;
+
+		q.c.x += r.cx;
+		q.c.y += r.cy;
+
+		q.d.x += r.cx;
+		q.d.y += r.cy;
+	}
+
+	public static void rectRotToQuad( RectangleRotate_F32 r , Quadrilateral_F64 q ) {
 
 		double c = Math.cos(r.theta);
 		double s = Math.sin(r.theta);

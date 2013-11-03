@@ -2,17 +2,20 @@ package boofcv.abst.tracker;
 
 import boofcv.alg.tracker.sfot.SfotConfig;
 import boofcv.alg.tracker.sfot.SparseFlowObjectTracker;
+import boofcv.struct.image.ImageDataType;
+import boofcv.struct.image.ImageType;
 import boofcv.struct.image.ImageUInt8;
 
 /**
  * @author Peter Abeles
  */
-public class TestSfot_to_TrackObjectQuad extends GenericTrackerObjectRectangleTests {
+public class TestSfot_to_TrackObjectQuad extends TextureGrayTrackerObjectRectangleTests {
 
 	@Override
-	public TrackerObjectQuad<ImageUInt8> create(Class<ImageUInt8> imageType) {
+	public TrackerObjectQuad<ImageUInt8> create(ImageType<ImageUInt8> imageType) {
 
-		SfotConfig config = new SfotConfig(imageType);
+		Class ct = ImageDataType.typeToClass(imageType.getDataType());
+		SfotConfig config = new SfotConfig(ct);
 
 		SparseFlowObjectTracker tracker = new SparseFlowObjectTracker(config);
 

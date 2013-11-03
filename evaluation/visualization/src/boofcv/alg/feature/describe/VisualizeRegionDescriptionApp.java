@@ -30,9 +30,9 @@ import boofcv.gui.image.ShowImages;
 import boofcv.io.PathLabel;
 import boofcv.struct.BoofDefaults;
 import boofcv.struct.feature.TupleDesc;
-import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageType;
 import boofcv.struct.image.MultiSpectral;
 import georegression.struct.point.Point2D_I32;
 
@@ -71,8 +71,8 @@ public class VisualizeRegionDescriptionApp <T extends ImageSingleBand, D extends
 
 		this.imageType = imageType;
 
-		addAlgorithm(0,"SURF-S", FactoryDescribeRegionPoint.surfStable(null, ImageDataType.single(imageType)));
-		addAlgorithm(0,"SURF-S Color", FactoryDescribeRegionPoint.surfStable(null, ImageDataType.ms(3, imageType)));
+		addAlgorithm(0,"SURF-S", FactoryDescribeRegionPoint.surfStable(null, ImageType.single(imageType)));
+		addAlgorithm(0,"SURF-S Color", FactoryDescribeRegionPoint.surfStable(null, ImageType.ms(3, imageType)));
 		if( imageType == ImageFloat32.class )
 			addAlgorithm(0,"SIFT", FactoryDescribeRegionPoint.sift(null,null));
 		addAlgorithm(0,"BRIEF", FactoryDescribeRegionPoint.brief(new ConfigBrief(true), imageType));
@@ -104,7 +104,7 @@ public class VisualizeRegionDescriptionApp <T extends ImageSingleBand, D extends
 
 	private void setDescriptorInput() {
 		if( describe != null )  {
-			if( describe.getImageType().getFamily() == ImageDataType.Family.SINGLE_BAND ) {
+			if( describe.getImageType().getFamily() == ImageType.Family.SINGLE_BAND ) {
 				T input = ConvertBufferedImage.convertFromSingle(image, null, imageType);
 				describe.setImage(input);
 			} else {

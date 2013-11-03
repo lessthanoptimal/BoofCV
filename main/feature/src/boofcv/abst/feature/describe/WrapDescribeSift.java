@@ -21,8 +21,8 @@ package boofcv.abst.feature.describe;
 import boofcv.alg.feature.describe.DescribePointSift;
 import boofcv.alg.feature.detect.interest.SiftImageScaleSpace;
 import boofcv.struct.feature.SurfFeature;
-import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageType;
 
 /**
  * Wrapper around {@link DescribePointSift} for {@link DescribeRegionPoint}.  Orientation is optionally
@@ -35,13 +35,13 @@ public class WrapDescribeSift
 {
 	DescribePointSift alg;
 	SiftImageScaleSpace ss;
-	ImageDataType<ImageFloat32> imageType;
+	ImageType<ImageFloat32> imageType;
 
 	public WrapDescribeSift(DescribePointSift alg,
 							SiftImageScaleSpace ss) {
 		this.alg = alg;
 		this.ss = ss;
-		imageType = ImageDataType.single(ImageFloat32.class);
+		imageType = ImageType.single(ImageFloat32.class);
 	}
 
 	@Override
@@ -75,7 +75,7 @@ public class WrapDescribeSift
 	}
 
 	@Override
-	public ImageDataType<ImageFloat32> getImageType() {
+	public ImageType<ImageFloat32> getImageType() {
 		return imageType;
 	}
 
