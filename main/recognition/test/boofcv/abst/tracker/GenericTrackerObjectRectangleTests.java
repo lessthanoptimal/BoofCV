@@ -5,6 +5,8 @@ import boofcv.struct.image.ImageType;
 import georegression.struct.shapes.Quadrilateral_F64;
 import org.junit.Test;
 
+import java.util.Random;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -12,6 +14,8 @@ import static org.junit.Assert.assertTrue;
  * @author Peter Abeles
  */
 public abstract class GenericTrackerObjectRectangleTests<T extends ImageBase> {
+
+	Random rand = new Random(234);
 
 	int width = 320;
 	int height = 240;
@@ -24,6 +28,8 @@ public abstract class GenericTrackerObjectRectangleTests<T extends ImageBase> {
 	protected double tolTranslateSmall = 0.02;
 	// tolerance for scale changes
 	protected double tolScale = 0.1;
+	// tolerance for stationary test
+	protected double tolStationary = 1e-8;
 
 	// the initial location of the target in the image
 	protected Quadrilateral_F64 initRegion = rect(20,25,120,160);
@@ -41,10 +47,10 @@ public abstract class GenericTrackerObjectRectangleTests<T extends ImageBase> {
 		assertTrue(tracker.initialize(input, initRegion));
 		assertTrue(tracker.process(input, where));
 
-		assertEquals(20, where.a.x, 1e-8);
-		assertEquals(25, where.a.y, 1e-8);
-		assertEquals(120, where.c.x, 1e-8);
-		assertEquals(160, where.c.y, 1e-8);
+		assertEquals(initRegion.a.x, where.a.x, tolStationary);
+		assertEquals(initRegion.a.y, where.a.y, tolStationary);
+		assertEquals(initRegion.c.x, where.c.x, tolStationary);
+		assertEquals(initRegion.c.y, where.c.y, tolStationary);
 	}
 
 	@Test
@@ -62,6 +68,15 @@ public abstract class GenericTrackerObjectRectangleTests<T extends ImageBase> {
 
 			checkSolution(20+tranX,25+tranY,120+tranX,160+tranY,tolTranslateSmall);
 		}
+
+		double totalX = (where.a.x+where.b.x+where.c.x+where.d.x)/4 -
+				(initRegion.a.x+initRegion.b.x+initRegion.c.x+initRegion.d.x)/4;
+		double totalY = (where.a.y+where.b.y+where.c.y+where.d.y)/4 -
+				(initRegion.a.y+initRegion.b.y+initRegion.c.y+initRegion.d.y)/4;
+
+		assertEquals(2*9,totalX,4);
+		assertEquals(-2*9,totalY,4);
+
 	}
 
 	@Test
@@ -101,7 +116,7 @@ public abstract class GenericTrackerObjectRectangleTests<T extends ImageBase> {
 		double centerX = 20+50;
 		double centerY = 25+(160-25)/2.0;
 
-		for( int i = 0; i < 10; i++ ) {
+		for( int i = 0; i < 20; i++ ) {
 			double scale = 1 + dir*0.2*(i/9.0);
 //			System.out.println("scale "+scale);
 
@@ -114,7 +129,6 @@ public abstract class GenericTrackerObjectRectangleTests<T extends ImageBase> {
 			render(scale,tranX,tranY);
 			assertTrue(tracker.process(input, where));
 
-//			System.out.println("actual width "+2*w2);
 			checkSolution(centerX-w2,centerY-h2,centerX+w2,centerY+h2,tolScale);
 		}
 	}
@@ -147,8 +161,8 @@ public abstract class GenericTrackerObjectRectangleTests<T extends ImageBase> {
 	}
 
 	private void checkSolution( double x0 , double y0 , double x1 , double y1 , double fractionError ) {
-		System.out.println("Expected "+x0+" "+y0+" "+x1+" "+y1);
-		System.out.println("Actual "+where.a.x+" "+where.a.y+" "+where.c.x+" "+where.c.y);
+//		System.out.println("Expected "+x0+" "+y0+" "+x1+" "+y1);
+//		System.out.println("Actual "+where.a.x+" "+where.a.y+" "+where.c.x+" "+where.c.y);
 
 		double tolX = (x1-x0)*fractionError;
 		double tolY = (y1-y0)*fractionError;

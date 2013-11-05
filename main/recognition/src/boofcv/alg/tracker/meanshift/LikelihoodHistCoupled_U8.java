@@ -79,6 +79,9 @@ public class LikelihoodHistCoupled_U8 implements PixelLikelihood<MultiSpectral<I
 		float total = target.width*target.height;
 		for( int i = 0; i < hist.length; i++ ) {
 			hist[i] /= total;
+			if( hist[i] != 0 ) {
+				System.out.printf("%2d  = %5.2f\n",i,hist[i]);
+			}
 		}
 	}
 

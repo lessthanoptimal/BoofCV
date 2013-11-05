@@ -2,6 +2,8 @@ package boofcv.abst.tracker;
 
 import boofcv.alg.distort.DistortImageOps;
 import boofcv.alg.interpolate.TypeInterpolate;
+import boofcv.alg.misc.GImageMiscOps;
+import boofcv.alg.misc.ImageMiscOps;
 import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageType;
 import boofcv.struct.image.ImageUInt8;
@@ -19,8 +21,12 @@ public abstract class ColorTrackerObjectRectangleTests extends GenericTrackerObj
 
 	MultiSpectral<ImageUInt8> original = new MultiSpectral<ImageUInt8>(ImageUInt8.class,width,height,3);
 
-	public ColorTrackerObjectRectangleTests() {
+	boolean multiColor;
+
+	public ColorTrackerObjectRectangleTests( boolean multiColor ) {
 		super(new ImageType<MultiSpectral<ImageUInt8>>(ImageType.Family.MULTI_SPECTRAL, ImageDataType.U8,3));
+
+		this.multiColor = multiColor;
 
 		input = new MultiSpectral<ImageUInt8>(ImageUInt8.class,width,height,3);
 	}
@@ -33,7 +39,8 @@ public abstract class ColorTrackerObjectRectangleTests extends GenericTrackerObj
 		Quadrilateral_F64 q = initRegion.copy();
 
 		// scale it down a bit so that there is a border
-		scale(q,0.9);
+		if( multiColor )
+			scale(q,0.95);
 
 		Point2D_F64 ab = average(q.a,q.b);
 		Point2D_F64 bc = average(q.b,q.c);
@@ -56,10 +63,20 @@ public abstract class ColorTrackerObjectRectangleTests extends GenericTrackerObj
 		int band1[] = new int[]{150,200,240,40};
 		int band2[] = new int[]{20,234,176,210};
 
+		GImageMiscOps.fill(original,0);
+		GImageMiscOps.fill(input,0);
+
 		for( int i = 0; i < 4; i++ ) {
-			TextureGrayTrackerObjectRectangleTests.convexFill(region[i],original.getBand(0),band0[i]);
-			TextureGrayTrackerObjectRectangleTests.convexFill(region[i],original.getBand(1),band1[i]);
-			TextureGrayTrackerObjectRectangleTests.convexFill(region[i],original.getBand(2),band2[i]);
+
+			int colorIndex;
+			if( multiColor )
+				colorIndex = i;
+			else
+				colorIndex = 0;
+
+			TextureGrayTrackerObjectRectangleTests.convexFill(region[i],original.getBand(0),band0[colorIndex]);
+			TextureGrayTrackerObjectRectangleTests.convexFill(region[i],original.getBand(1),band1[colorIndex]);
+			TextureGrayTrackerObjectRectangleTests.convexFill(region[i],original.getBand(2),band2[colorIndex]);
 		}
 
 		DistortImageOps.affine(original,input, TypeInterpolate.BILINEAR,scale,0,0,scale,tranX,tranY);

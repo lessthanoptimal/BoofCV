@@ -83,6 +83,7 @@ public class VideoTrackerObjectQuadApp<I extends ImageSingleBand>
 		addAlgorithm(0, "Mean Shift Likelihood HSV", 2);
 		addAlgorithm(0, "Mean Shift Likelihood RGB", 3);
 		addAlgorithm(0, "Mean Shift Scale", 4);
+		addAlgorithm(0, "Mean Shift Fixed", 5);
 
 		videoPanel = new TrackerObjectQuadPanel(this);
 		infoBar = new TrackerQuadInfoPanel(this);
@@ -123,7 +124,11 @@ public class VideoTrackerObjectQuadApp<I extends ImageSingleBand>
 		else if( whichAlg == 4 )
 			tracker = FactoryTrackerObjectQuad.createMeanShiftComaniciu2003(
 					new ConfigComaniciu2003(imageInfo));
-		else
+		else if( whichAlg == 5 ) {
+			ConfigComaniciu2003 config = new ConfigComaniciu2003(imageInfo);
+			config.constantScale = true;
+			tracker = FactoryTrackerObjectQuad.createMeanShiftComaniciu2003(config);
+		} else
 			throw new RuntimeException("Unknown algorithm");
 
 		// use default rectangle
