@@ -190,17 +190,17 @@ public class TestLocalWeightedHistogramRotRect {
 		Point2D_F32 p3 = interp.list.get(3);
 
 		// the order really doesn't matter, but easier to code the test this way
-		assertEquals(4f-5f,p0.x,1e-4f);
-		assertEquals(5f-10f,p0.y,1e-4f);
+		assertEquals(4f-4.5f,p0.x,1e-4f);
+		assertEquals(5f-9.5f,p0.y,1e-4f);
 
-		assertEquals(4f-5f,p1.x,1e-4f);
-		assertEquals(5f+10f,p1.y,1e-4f);
+		assertEquals(4f-4.5f,p1.x,1e-4f);
+		assertEquals(5f+9.5f,p1.y,1e-4f);
 
-		assertEquals(4f+5f,p2.x,1e-4f);
-		assertEquals(5f+10f,p2.y,1e-4f);
+		assertEquals(4f+4.5f,p2.x,1e-4f);
+		assertEquals(5f+9.5f,p2.y,1e-4f);
 
-		assertEquals(4f+5f,p3.x,1e-4f);
-		assertEquals(5f-10f,p3.y,1e-4f);
+		assertEquals(4f+4.5f,p3.x,1e-4f);
+		assertEquals(5f-9.5f,p3.y,1e-4f);
 	}
 
 	@Test
@@ -233,14 +233,14 @@ public class TestLocalWeightedHistogramRotRect {
 
 		alg.squareToImageSample(-0.5f,0.5f,rect);
 
-		assertEquals(4f-5f,alg.imageX,1e-4f);
-		assertEquals(5f+10f,alg.imageY,1e-4f);
+		assertEquals(4f-4.5f,alg.imageX,1e-4f);
+		assertEquals(5f+9.5f,alg.imageY,1e-4f);
 
 		alg.c = 0.5f; alg.s = -0.5f;
 		alg.squareToImageSample(-0.5f,0.5f,rect);
-		                                            // -5 +10
-		assertEquals(4f-2.5f+5f,alg.imageX,1e-4f);
-		assertEquals(5f+2.5f+5f,alg.imageY,1e-4f);
+		                                            // -4.5 + 9.5
+		assertEquals(4f-2.25f+4.75f,alg.imageX,1e-4f);
+		assertEquals(5f+2.25f+4.75f,alg.imageY,1e-4f);
 	}
 
 	static class DummyInterpolate implements InterpolatePixelMB {

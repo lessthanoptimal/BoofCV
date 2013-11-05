@@ -7,12 +7,13 @@ import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.RectangleRotate_F32;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.MultiSpectral;
+import org.ddogleg.util.UtilDouble;
 import org.junit.Test;
 
 import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Peter Abeles
@@ -26,7 +27,7 @@ public class TestTrackerMeanShiftComaniciu2003 {
 		InterpolatePixelS interpSB = FactoryInterpolation.bilinearPixelS(ImageFloat32.class);
 		InterpolatePixelMB interpolate = FactoryInterpolation.createPixelMB(interpSB);
 		LocalWeightedHistogramRotRect calcHistogram = new LocalWeightedHistogramRotRect(30,3,10,3,255,interpolate);
-		TrackerMeanShiftComaniciu2003 alg = new TrackerMeanShiftComaniciu2003(false,100,1e-8f,0.0f,calcHistogram);
+		TrackerMeanShiftComaniciu2003 alg = new TrackerMeanShiftComaniciu2003(false,100,1e-8f,0.0f,false,calcHistogram);
 
 		MultiSpectral<ImageFloat32> image = new MultiSpectral<ImageFloat32>(ImageFloat32.class,100,150,3);
 
@@ -60,7 +61,7 @@ public class TestTrackerMeanShiftComaniciu2003 {
 		InterpolatePixelS interpSB = FactoryInterpolation.bilinearPixelS(ImageFloat32.class);
 		InterpolatePixelMB interpolate = FactoryInterpolation.createPixelMB(interpSB);
 		LocalWeightedHistogramRotRect calcHistogram = new LocalWeightedHistogramRotRect(30,3,10,3,255,interpolate);
-		TrackerMeanShiftComaniciu2003 alg = new TrackerMeanShiftComaniciu2003(false,100,1e-8f,0.1f,calcHistogram);
+		TrackerMeanShiftComaniciu2003 alg = new TrackerMeanShiftComaniciu2003(false,100,1e-8f,0.1f,false,calcHistogram);
 
 		MultiSpectral<ImageFloat32> image = new MultiSpectral<ImageFloat32>(ImageFloat32.class,100,150,3);
 
@@ -93,36 +94,33 @@ public class TestTrackerMeanShiftComaniciu2003 {
 
 	@Test
 	public void distanceHistogram() {
-//		LocalWeightedHistogramRotRect calcHist = new LocalWeightedHistogramRotRect(10,3,5,3,255,null);
-//
-//		TrackerMeanShiftComaniciu2003 alg = new TrackerMeanShiftComaniciu2003(true,100,1e-4f,0.1f,calcHist);
-//
-//		int sampleHistIndex[] = new int[ calcHist.getHistogram().length ];
-//		float histogram[] = new float[ calcHist.getHistogram().length ];
-//
-//		// score for identical histograms
-//		for( int i = 0; i < histogram.length; i++ ) {
-//			sampleHistIndex[i] = i;
-//			histogram[i] = alg.keyHistogram[i] = rand.nextFloat();
-//		}
-//		UtilDouble.normalize(histogram);
-//		UtilDouble.normalize(alg.keyHistogram);
-//
-//		double foundIdentical = alg.distanceHistogram(sampleHistIndex,histogram);
-//		assertEquals(0,foundIdentical,1e-3);
-//
-//		// make the histograms very different
-//		for( int i = 0; i < histogram.length; i++ ) {
-//			histogram[i] = rand.nextFloat();
-//			alg.keyHistogram[i] = rand.nextFloat();
-//		}
-//		UtilDouble.normalize(histogram);
-//		UtilDouble.normalize(alg.keyHistogram);
-//
-//		double foundDifferent = alg.distanceHistogram(sampleHistIndex,histogram);
-//
-//		assertTrue( foundDifferent > 0.05 );
-		fail("redo");
+		LocalWeightedHistogramRotRect calcHist = new LocalWeightedHistogramRotRect(10,3,5,3,255,null);
+
+		TrackerMeanShiftComaniciu2003 alg = new TrackerMeanShiftComaniciu2003(true,100,1e-4f,0.1f,false,calcHist);
+
+		float histogramA[] = new float[ calcHist.getHistogram().length ];
+		float histogramB[] = new float[ calcHist.getHistogram().length ];
+
+		// score for identical histograms
+		for( int i = 0; i < histogramA.length; i++ ) {
+			histogramA[i] = histogramB[i] = rand.nextFloat();
+		}
+		UtilDouble.normalize(histogramA);
+		UtilDouble.normalize(histogramB);
+
+		double foundIdentical = alg.distanceHistogram(histogramA,histogramB);
+		assertEquals(0,foundIdentical,1e-3);
+
+		// make the histograms very different
+		for( int i = 0; i < histogramA.length; i++ ) {
+			histogramA[i] = rand.nextFloat();
+		}
+		UtilDouble.normalize(histogramA);
+
+		double foundDifferent = alg.distanceHistogram(histogramA,histogramB);
+
+		assertTrue(foundDifferent <= 1.0 );
+		assertTrue(foundDifferent > 0.05);
 	}
 
 	private void render( MultiSpectral<ImageFloat32> image , int cx , int cy , int w , int h ) {

@@ -147,8 +147,8 @@ public abstract class GenericTrackerObjectRectangleTests<T extends ImageBase> {
 	}
 
 	private void checkSolution( double x0 , double y0 , double x1 , double y1 , double fractionError ) {
-//		System.out.println("Expected "+x0+" "+y0+" "+x1+" "+y1);
-//		System.out.println("Actual "+where.a.x+" "+where.a.y+" "+where.c.x+" "+where.c.y);
+		System.out.println("Expected "+x0+" "+y0+" "+x1+" "+y1);
+		System.out.println("Actual "+where.a.x+" "+where.a.y+" "+where.c.x+" "+where.c.y);
 
 		double tolX = (x1-x0)*fractionError;
 		double tolY = (y1-y0)*fractionError;

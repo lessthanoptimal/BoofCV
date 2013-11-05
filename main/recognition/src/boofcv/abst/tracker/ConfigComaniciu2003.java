@@ -33,7 +33,8 @@ public class ConfigComaniciu2003<T extends ImageMultiBand> {
 	 */
 	public int numSamples = 30;
 	/**
-	 * Used to compute weights. Number of standard deviations away the sides will be from the center. Try 3.
+	 * Used to compute weights. Number of standard deviations away the sides will be from the center. Shouldn't
+	 * need to tune this.  Try 3.
 	 */
 	public double numSigmas = 3;
 	/**
@@ -52,16 +53,23 @@ public class ConfigComaniciu2003<T extends ImageMultiBand> {
 	/**
 	 * Maximum number of mean-shift iterations.  Try 30
 	 */
-	public int meanShiftMaxIterations = 30;
+	public int meanShiftMaxIterations = 15;
 	/**
 	 * Mean-shift will stop when the change is below this threshold.  Try 1e-4f
 	 */
-	public float meanShiftMinimumChange = 1e-4f;
+	public float meanShiftMinimumChange = 1e-3f;
 	/**
 	 * Weighting factor which limits the amount it will change the scale.  Value from 0 to 1.
 	 * Closer to 0 the more it will prefer the most recent estimate.  Try 0.1
 	 */
 	public float scaleWeight = 0.1f;
+	/**
+	 * True it will assume the scale is known.  If false it will estimate gradual changes in scale.
+	 *
+	 * Can run 3x faster if it doesn't need to estimate the scale and in some applications, when the scale
+	 * is constant, will be more robust.
+	 */
+	public boolean constantScale = false;
 	/**
 	 * Which interpolation method should it use.
 	 */
