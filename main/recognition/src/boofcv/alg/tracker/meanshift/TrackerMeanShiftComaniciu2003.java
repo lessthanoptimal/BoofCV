@@ -67,6 +67,9 @@ public class TrackerMeanShiftComaniciu2003<T extends ImageMultiBand> {
 	// should it update the histogram after tracking?
 	private boolean updateHistogram;
 
+	// if true assume the scale is constant
+	private boolean constantScale;
+
 	/**
 	 * Configures tracker.
 	 *
@@ -75,17 +78,20 @@ public class TrackerMeanShiftComaniciu2003<T extends ImageMultiBand> {
 	 * @param minimumChange Mean-shift will stop when the change is below this threshold.  Try 1e-4f
 	 * @param gamma Scale weighting factor.  Value from 0 to 1. Closer to 0 the more it will prefer
 	 *              the most recent estimate.  Try 0.1
+	 * @param constantScale If true it will assume the scale is known.  If false it will estimate the change in scale.
 	 * @param calcHistogram Calculates the histogram
 	 */
 	public TrackerMeanShiftComaniciu2003(boolean updateHistogram,
 										 int maxIterations,
 										 float minimumChange,
 										 float gamma ,
+										 boolean constantScale,
 										 LocalWeightedHistogramRotRect<T> calcHistogram) {
 		this.updateHistogram = updateHistogram;
 		this.maxIterations = maxIterations;
 		this.minimumChange = minimumChange;
 		this.gamma = gamma;
+		this.constantScale = constantScale;
 		this.calcHistogram = calcHistogram;
 
 		keyHistogram = new float[ calcHistogram.getHistogram().length ];
@@ -124,16 +130,27 @@ public class TrackerMeanShiftComaniciu2003<T extends ImageMultiBand> {
 		region2.width  *= 1.1;
 		region2.height *= 1.1;
 
+		// distance from histogram
+		double distance0=1,distance1,distance2=1;
+
 		// perform mean-shift at the different sizes and compute their distance
-		updateLocation(image,region0);
-		double distance0 = distanceHistogram(keyHistogram,calcHistogram.getHistogram());
-		if( updateHistogram ) System.arraycopy(calcHistogram.getHistogram(),0,histogram0,0,histogram0.length);
+		if( !constantScale ) {
+			updateLocation(image,region0);
+			distance0 = distanceHistogram(keyHistogram,calcHistogram.getHistogram());
+			if( updateHistogram ) System.arraycopy(calcHistogram.getHistogram(),0,histogram0,0,histogram0.length);
+			updateLocation(image,region2);
+			distance2 = distanceHistogram(keyHistogram,calcHistogram.getHistogram());
+			if( updateHistogram ) System.arraycopy(calcHistogram.getHistogram(),0,histogram2,0,histogram2.length);
+		}
+		// update the no scale change hypothesis
 		updateLocation(image,region1);
-		double distance1 = distanceHistogram(keyHistogram,calcHistogram.getHistogram());
+		if( !constantScale ) {
+			distance1 = distanceHistogram(keyHistogram,calcHistogram.getHistogram());
+		} else {
+			// force it to select
+			distance1 = 0;
+		}
 		if( updateHistogram ) System.arraycopy(calcHistogram.getHistogram(),0,histogram1,0,histogram1.length);
-		updateLocation(image,region2);
-		double distance2 = distanceHistogram(keyHistogram,calcHistogram.getHistogram());
-		if( updateHistogram ) System.arraycopy(calcHistogram.getHistogram(),0,histogram2,0,histogram2.length);
 
 		RectangleRotate_F32 selected = null;
 		float selectedHist[] = null;

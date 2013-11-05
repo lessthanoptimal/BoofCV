@@ -166,11 +166,7 @@ public class LocalWeightedHistogramRotRect<T extends ImageMultiBand> {
 			int indexHistogram = computeHistogramBin(value);
 
 			sampleHistIndex[ i ] = indexHistogram;
-			try {
-				histogram[indexHistogram] += weights[i];
-			} catch( ArrayIndexOutOfBoundsException e) {
-				System.out.println("caught");
-			}
+			histogram[indexHistogram] += weights[i];
 		}
 	}
 

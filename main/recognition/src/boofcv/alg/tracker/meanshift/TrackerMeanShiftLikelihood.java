@@ -34,7 +34,8 @@ import georegression.struct.shapes.RectangleCorner2D_I32;
  *
  * <p>
  * This algorithm can run very fast and works well when the target being tracked is visually distinctive from
- * the background.  It can't handle changes in scale or shape of the target, which does limit its applications.
+ * the background and largely composed of one color.  It can't handle changes in scale or shape of the target,
+ * which does limit its applications.
  * </p>
  *
  * <p>
