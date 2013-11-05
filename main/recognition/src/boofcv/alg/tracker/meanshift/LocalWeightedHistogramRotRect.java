@@ -72,7 +72,7 @@ public class LocalWeightedHistogramRotRect<T extends ImageMultiBand> {
 	 * @param numSigmas Number of standard deviations away the sides will be from the center.  Try 3
 	 * @param numHistogramBins Number of bins in the histogram
 	 * @param numBands Number of bands in the input image
-	 * @param maxPixelValue Maximum value + 1 of a pixel across all bands
+	 * @param maxPixelValue Maximum value of a pixel across all bands
 	 * @param interpolate Function used to interpolate the image
 	 */
 	public LocalWeightedHistogramRotRect(int numSamples, double numSigmas,
@@ -80,7 +80,7 @@ public class LocalWeightedHistogramRotRect<T extends ImageMultiBand> {
 										 float maxPixelValue,
 										 InterpolatePixelMB<T> interpolate) {
 		this.numBins = numHistogramBins;
-		this.maxPixelValue = maxPixelValue;
+		this.maxPixelValue = maxPixelValue*1.0001f; // avoid the possibility exceeding the max histogram size
 		this.interpolate = interpolate;
 
 		sampleHistIndex = new int[ numSamples*numSamples ];

@@ -212,7 +212,7 @@ public class TrackerMeanShiftLikelihood<T extends ImageBase> {
 	}
 
 	/**
-	 * Coomputes the PDF only inside the image as needed amd update the dirty rectangle
+	 * Computes the PDF only inside the image as needed amd update the dirty rectangle
 	 */
 	protected void updatePdfImage(  int x0 , int y0 , int x1 , int y1 ) {
 

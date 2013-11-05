@@ -80,7 +80,7 @@ public class FactoryTrackerObjectQuad {
 	 *
 	 * @param maxIterations Maximum number of mean-shift iteraions.  Try 30.
 	 * @param numBins Number of bins in the histogram color model.  Try 5.
-	 * @param maxPixelValue Maximum pixel value.  For 8-bit images this will be 255
+	 * @param maxPixelValue Maximum number of pixel values.  For 8-bit images this will be 256
 	 * @param modelType Type of color model used.
 	 * @param bandType Type of band in the color image
 	 * @return TrackerObjectQuad based on {@link TrackerMeanShiftLikelihood}.

@@ -11,14 +11,17 @@ import boofcv.struct.image.MultiSpectral;
 public class TestComaniciu2003_to_TrackObjectQuad extends ColorTrackerObjectRectangleTests {
 
 	public TestComaniciu2003_to_TrackObjectQuad() {
+		super(true);
 		tolTranslateSmall = 0.05;
-		tolScale = 0.2;
+		tolScale = 0.1;
 	}
 
 	@Override
 	public TrackerObjectQuad<MultiSpectral<ImageUInt8>> create(ImageType<MultiSpectral<ImageUInt8>> imageType) {
 		ConfigComaniciu2003<MultiSpectral<ImageUInt8>> config =
 				new ConfigComaniciu2003<MultiSpectral<ImageUInt8>>(imageType);
+
+		config.constantScale = false;
 
 		return FactoryTrackerObjectQuad.createMeanShiftComaniciu2003(config);
 	}

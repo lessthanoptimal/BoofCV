@@ -29,7 +29,7 @@ import boofcv.struct.image.ImageType;
  */
 public class ConfigComaniciu2003<T extends ImageMultiBand> {
 	/**
-	 * Number of points it samples along each axis of the rectangle.  Default is 40.
+	 * Number of points it samples along each axis of the rectangle.  Default is 30.
 	 */
 	public int numSamples = 30;
 	/**
@@ -42,10 +42,10 @@ public class ConfigComaniciu2003<T extends ImageMultiBand> {
 	 */
 	public int numHistogramBins = 5;
 	/**
-	 * Largest value a pixel can have + 1.  For 8-bit images this is 256. Floating point images are some times normalized
+	 * Largest value a pixel can have.  For 8-bit images this is 255. Floating point images are some times normalized
 	 * to 1.
 	 */
-	public float maxPixelValue = 256f;
+	public float maxPixelValue = 255f;
 	/**
 	 * If true the histogram will be updated using the most recent image. Try false.
 	 */
@@ -64,12 +64,13 @@ public class ConfigComaniciu2003<T extends ImageMultiBand> {
 	 */
 	public float scaleWeight = 0.1f;
 	/**
-	 * True it will assume the scale is known.  If false it will estimate gradual changes in scale.
+	 * True it will assume the scale is known.  If false it will estimate gradual changes in scale.  By default
+	 * it is set to true.
 	 *
 	 * Can run 3x faster if it doesn't need to estimate the scale and in some applications, when the scale
 	 * is constant, will be more robust.
 	 */
-	public boolean constantScale = false;
+	public boolean constantScale = true;
 	/**
 	 * Which interpolation method should it use.
 	 */
@@ -79,9 +80,10 @@ public class ConfigComaniciu2003<T extends ImageMultiBand> {
 	 */
 	public ImageType<T> imageType;
 
-	public ConfigComaniciu2003(int numSamples, float maxPixelValue, ImageType<T> imageType) {
+	public ConfigComaniciu2003(int numSamples, int numHistogramBins, float scaleWeight,ImageType<T> imageType) {
 		this.numSamples = numSamples;
-		this.maxPixelValue = maxPixelValue;
+		this.numHistogramBins = numHistogramBins;
+		this.scaleWeight = scaleWeight;
 		this.imageType = imageType;
 	}
 

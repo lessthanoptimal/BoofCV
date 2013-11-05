@@ -29,7 +29,19 @@ import java.util.List;
  * Mean shift tracker which adjusts the scale (or bandwidth) to account for changes in scale of the target [1].
  * The mean-shift region is sampled using an oriented rectangle and weighted using a 2D gaussian.  The target
  * is modeled using a color histogram of the input image, which can be optionally updated after each frame
- * is processed.  The scale is selected by scoring different sized regions using the Bhattacharyya coefficient
+ * is processed.
+ * </p>
+ *
+ * <p>
+ * Scale selection is done using sum-of-absolute-difference (SAD) error instead of Bhattacharyya as the paper
+ * suggests.  Situations where found that two errors counteracted each other when using Bhattacharyya
+ * and the incorrect scale would be selected even with perfect data.
+ * </p>
+ *
+ * <p>
+ * Another difference from the paper is that mean shift records which hypothesis has the best SAD error.  After
+ * mean-shift stops iterating it selects the best solution.  This is primarily helpful in situations where mean-shift
+ * doesn't converge in time and jumped away from the solution.
  * </p>
  *
  * <p>
@@ -44,6 +56,8 @@ public class TrackerMeanShiftComaniciu2003<T extends ImageMultiBand> {
 	private LocalWeightedHistogramRotRect<T> calcHistogram;
 	// the key-frame histogram which is being compared again
 	protected float keyHistogram[];
+	// weight each element contributes
+	protected float weightHistogram[];
 
 	// most recently select target region
 	private RectangleRotate_F32 region = new RectangleRotate_F32();
@@ -95,6 +109,7 @@ public class TrackerMeanShiftComaniciu2003<T extends ImageMultiBand> {
 		this.calcHistogram = calcHistogram;
 
 		keyHistogram = new float[ calcHistogram.getHistogram().length ];
+		weightHistogram = new float[ keyHistogram.length ];
 		if( updateHistogram ) {
 			histogram0 = new float[ calcHistogram.getHistogram().length ];
 			histogram1 = new float[ calcHistogram.getHistogram().length ];
@@ -118,7 +133,6 @@ public class TrackerMeanShiftComaniciu2003<T extends ImageMultiBand> {
 	 * @param image Most recent image in the sequence
 	 */
 	public void track( T image ) {
-
 		// configure the different regions based on size
 		region0.set( region );
 		region1.set( region );
@@ -136,16 +150,16 @@ public class TrackerMeanShiftComaniciu2003<T extends ImageMultiBand> {
 		// perform mean-shift at the different sizes and compute their distance
 		if( !constantScale ) {
 			updateLocation(image,region0);
-			distance0 = distanceHistogram(keyHistogram,calcHistogram.getHistogram());
+			distance0 = distanceHistogram(keyHistogram, calcHistogram.getHistogram());
 			if( updateHistogram ) System.arraycopy(calcHistogram.getHistogram(),0,histogram0,0,histogram0.length);
 			updateLocation(image,region2);
-			distance2 = distanceHistogram(keyHistogram,calcHistogram.getHistogram());
+			distance2 = distanceHistogram(keyHistogram, calcHistogram.getHistogram());
 			if( updateHistogram ) System.arraycopy(calcHistogram.getHistogram(),0,histogram2,0,histogram2.length);
 		}
 		// update the no scale change hypothesis
 		updateLocation(image,region1);
 		if( !constantScale ) {
-			distance1 = distanceHistogram(keyHistogram,calcHistogram.getHistogram());
+			distance1 = distanceHistogram(keyHistogram, calcHistogram.getHistogram());
 		} else {
 			// force it to select
 			distance1 = 0;
@@ -196,12 +210,26 @@ public class TrackerMeanShiftComaniciu2003<T extends ImageMultiBand> {
 	 */
 	protected void updateLocation( T image , RectangleRotate_F32 region ) {
 
+		double bestHistScore = Double.MAX_VALUE;
+		float bestX = -1, bestY = -1;
+
 		for( int i = 0; i < maxIterations; i++ ) {
 			calcHistogram.computeHistogram(image,region);
 
+			float histogram[] = calcHistogram.getHistogram();
+			updateWeights(histogram);
+
+			// the histogram fit doesn't always improve with each mean-shift iteration
+			// save the best one and use it later on
+			double histScore = distanceHistogram(keyHistogram, histogram);
+			if( histScore < bestHistScore ) {
+				bestHistScore = histScore;
+				bestX = region.cx;
+				bestY = region.cy;
+			}
+
 			List<Point2D_F32> samples = calcHistogram.getSamplePts();
 			int sampleHistIndex[] = calcHistogram.getSampleHistIndex();
-			float histogram[] = calcHistogram.getHistogram();
 
 			// Compute equation 13
 			float meanX = 0;
@@ -215,11 +243,8 @@ public class TrackerMeanShiftComaniciu2003<T extends ImageMultiBand> {
 				if( histIndex < 0 )
 					continue;
 
-				float q = keyHistogram[histIndex];
-				float p = histogram[histIndex];
-
 				// compute the weight derived from the Bhattacharyya coefficient.  Equation 10.
-				float w = (float)Math.sqrt(q/p);
+				float w = weightHistogram[histIndex];
 
 				meanX += w*samplePt.x;
 				meanY += w*samplePt.y;
@@ -242,25 +267,40 @@ public class TrackerMeanShiftComaniciu2003<T extends ImageMultiBand> {
 				break;
 			}
 		}
+
+		// use the best location found
+//		region.cx = bestX;
+//		region.cy = bestY;
 	}
 
 	/**
-	 * Compute the distance between the two distributions using Bhattacharyya coefficient
-	 * Equations 6 and 7.
-	 * Must be called immediately after {@link #updateLocation}.
+	 * Update the weights for each element in the histogram.  Weights are used to favor colors which are
+	 * less than expected.
 	 */
-	protected double distanceHistogram( float histogramA[] , float histogramB[] ) {
+	private void updateWeights(float[] histogram) {
+		for( int j = 0; j < weightHistogram.length; j++ ) {
+			float h = histogram[j];
+			if( h != 0 ) {
+				weightHistogram[j] = (float)Math.sqrt(keyHistogram[j]/h);
+			}
+		}
+	}
+
+	/**
+	 * Computes the difference between two histograms using SAD.
+	 *
+	 * This is a change from the paper, which uses Bhattacharyya.  Bhattacharyya could give poor performance
+	 * even with perfect data since two errors can cancel each other out.  For example, part of the histogram
+	 * is too small and another part is too large.
+	 */
+	protected double distanceHistogram(float histogramA[], float histogramB[]) {
 		double sumP = 0;
 		for( int i = 0; i < histogramA.length; i++ ) {
 			float q = histogramA[i];
 			float p = histogramB[i];
-			sumP += Math.sqrt(q*p);
+			sumP += Math.abs(q-p);
 		}
-		// will get same solution without sqrt() and less hassle
-		return 1-sumP;
-//		if( sumP > 1)
-//			return 0;
-//		return Math.sqrt(1-sumP);
+		return sumP;
 	}
 
 	public RectangleRotate_F32 getRegion() {
