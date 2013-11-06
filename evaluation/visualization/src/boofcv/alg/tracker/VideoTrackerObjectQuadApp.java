@@ -121,10 +121,11 @@ public class VideoTrackerObjectQuadApp<I extends ImageSingleBand>
 		else if( whichAlg == 3 )
 			tracker = FactoryTrackerObjectQuad.createMeanShiftLikelihood(30, 4,255,
 					MeanShiftLikelihoodType.HISTOGRAM,imageType);
-		else if( whichAlg == 4 )
-			tracker = FactoryTrackerObjectQuad.createMeanShiftComaniciu2003(
-					new ConfigComaniciu2003(imageInfo));
-		else if( whichAlg == 5 ) {
+		else if( whichAlg == 4 ) {
+			ConfigComaniciu2003 config = new ConfigComaniciu2003(imageInfo);
+			config.constantScale = false;
+			tracker = FactoryTrackerObjectQuad.createMeanShiftComaniciu2003(config);
+		} else if( whichAlg == 5 ) {
 			ConfigComaniciu2003 config = new ConfigComaniciu2003(imageInfo);
 			config.constantScale = true;
 			tracker = FactoryTrackerObjectQuad.createMeanShiftComaniciu2003(config);

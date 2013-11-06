@@ -45,7 +45,7 @@ public class LocalWeightedHistogramRotRect<T extends ImageMultiBand> {
 	private float value[];
 
 	// maximum value of a pixel in any band
-	private float maxPixelValue;
+	protected float maxPixelValue;
 	// number of binds in the histogram
 	private int numBins;
 

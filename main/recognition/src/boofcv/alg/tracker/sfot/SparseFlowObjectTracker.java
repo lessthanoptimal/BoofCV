@@ -40,7 +40,11 @@ import org.ddogleg.struct.FastQueue;
 import java.lang.reflect.Array;
 
 /**
- * TODO asdfasdf
+ * Uses a pyramidal KLT tracker to track features inside the user selected region.  The motion of the region
+ * is found robustly using {@link LeastMedianOfSquares} and a translation + rotation model.  Drift is a problem
+ * since motion is estimated relative to the previous frame and it will eventually drift away from the original target.
+ * When it works well it is very smooth and can handle partially obscured objects.  Can't recover after the target
+ * has been lost.  Runs very fast.
  *
  * @author Peter Abeles
  */
@@ -58,20 +62,23 @@ public class SparseFlowObjectTracker<Image extends ImageSingleBand, Derivative e
 
 	// tracks features from frame-to-frame
 	private PyramidKltTracker<Image, Derivative> klt;
-	PyramidKltFeature track;
+	private PyramidKltFeature track;
 
 	private FastQueue<AssociatedPair> pairs = new FastQueue<AssociatedPair>(AssociatedPair.class,true);
 
 	// used for estimating motion from track locations
 	private LeastMedianOfSquares<ScaleTranslateRotate2D,AssociatedPair> estimateMotion;
 
+	// if true the object track has been last and can't be recovered
 	private boolean trackLost;
 
-	SfotConfig<Image,Derivative> config;
+	// configuration parameters
+	private SfotConfig<Image,Derivative> config;
 
 	// maximum allowed forward-backwards error squared
 	private float maximumErrorFB;
 
+	// location of the target in the current frame
 	RectangleRotate_F64 region = new RectangleRotate_F64();
 
 	public SparseFlowObjectTracker( SfotConfig<Image,Derivative> config  ) {
@@ -106,6 +113,13 @@ public class SparseFlowObjectTracker<Image extends ImageSingleBand, Derivative e
 
 	}
 
+	/**
+	 * Given the input image compute the new location of the target region and store the results in output.
+	 *
+	 * @param input next image in the sequence.
+	 * @param output Storage for the output.
+	 * @return true if tracking is successful
+	 */
 	public boolean update( Image input , RectangleRotate_F64 output ) {
 
 		if( trackLost )
@@ -155,6 +169,10 @@ public class SparseFlowObjectTracker<Image extends ImageSingleBand, Derivative e
 		return true;
 	}
 
+	/**
+	 * Tracks features from the previous image into the current image. Tracks are created inside the specified
+	 * region in a grid pattern.
+	 */
 	private void trackFeatures(Image input, RectangleRotate_F64 region) {
 		pairs.reset();
 
@@ -227,6 +245,9 @@ public class SparseFlowObjectTracker<Image extends ImageSingleBand, Derivative e
 		}
 	}
 
+	/**
+	 * Declares internal data structures
+	 */
 	private void declarePyramid( int imageWidth , int imageHeight ) {
 		int minSize = (config.trackerFeatureRadius*2+1)*5;
 		int scales[] = TldTracker.selectPyramidScale(imageWidth, imageHeight, minSize);
@@ -255,6 +276,9 @@ public class SparseFlowObjectTracker<Image extends ImageSingleBand, Derivative e
 		track = new PyramidKltFeature(numPyramidLayers,config.trackerFeatureRadius);
 	}
 
+	/**
+	 * Swaps the current and previous so that image derivative doesn't need to be recomputed or compied.
+	 */
 	private void swapImages() {
 		ImagePyramid<Image> tempP;
 

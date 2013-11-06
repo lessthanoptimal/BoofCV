@@ -11,6 +11,10 @@ import boofcv.struct.image.ImageUInt8;
  */
 public class TestTld_to_TrackerObjectRectangle extends TextureGrayTrackerObjectRectangleTests {
 
+	public TestTld_to_TrackerObjectRectangle() {
+		tolScale = 0.15;
+	}
+
 	@Override
 	public TrackerObjectQuad<ImageUInt8> create(ImageType<ImageUInt8> imageTypee) {
 

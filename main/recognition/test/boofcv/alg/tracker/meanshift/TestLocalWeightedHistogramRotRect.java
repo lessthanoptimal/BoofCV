@@ -166,7 +166,7 @@ public class TestLocalWeightedHistogramRotRect {
 	public void computeHistogramBin() {
 		LocalWeightedHistogramRotRect alg = new LocalWeightedHistogramRotRect(10,3,12,3,255,null);
 
-		float div = 255.0f/12;
+		float div = alg.maxPixelValue/12;
 
 		assertEquals(0,alg.computeHistogramBin(new float[]{0,0,0}));
 		assertEquals(1+2*12+3*144,alg.computeHistogramBin(new float[]{1*div,2*div,3*div}));
