@@ -27,7 +27,7 @@ public class TestTrackerMeanShiftComaniciu2003 {
 		InterpolatePixelS interpSB = FactoryInterpolation.bilinearPixelS(ImageFloat32.class);
 		InterpolatePixelMB interpolate = FactoryInterpolation.createPixelMB(interpSB);
 		LocalWeightedHistogramRotRect calcHistogram = new LocalWeightedHistogramRotRect(30,3,10,3,255,interpolate);
-		TrackerMeanShiftComaniciu2003 alg = new TrackerMeanShiftComaniciu2003(false,100,1e-8f,0.0f,false,calcHistogram);
+		TrackerMeanShiftComaniciu2003 alg = new TrackerMeanShiftComaniciu2003(false,100,1e-8f,0.0f,0.0f,false,calcHistogram);
 
 		MultiSpectral<ImageFloat32> image = new MultiSpectral<ImageFloat32>(ImageFloat32.class,100,150,3);
 
@@ -50,8 +50,8 @@ public class TestTrackerMeanShiftComaniciu2003 {
 		render(image,55,34,23,34);
 		alg.track(image);
 
-		assertEquals(alg.getRegion().cx,55,0.5f);
-		assertEquals(alg.getRegion().cy,34,0.5f);
+		assertEquals(alg.getRegion().cx,55,1f);
+		assertEquals(alg.getRegion().cy,34,1f);
 		assertEquals(alg.getRegion().width,23,1);
 		assertEquals(alg.getRegion().height,34,1);
 	}
@@ -61,7 +61,7 @@ public class TestTrackerMeanShiftComaniciu2003 {
 		InterpolatePixelS interpSB = FactoryInterpolation.bilinearPixelS(ImageFloat32.class);
 		InterpolatePixelMB interpolate = FactoryInterpolation.createPixelMB(interpSB);
 		LocalWeightedHistogramRotRect calcHistogram = new LocalWeightedHistogramRotRect(30,3,10,3,255,interpolate);
-		TrackerMeanShiftComaniciu2003 alg = new TrackerMeanShiftComaniciu2003(false,100,1e-8f,0.1f,false,calcHistogram);
+		TrackerMeanShiftComaniciu2003 alg = new TrackerMeanShiftComaniciu2003(false,100,1e-8f,0.1f,0.0f,false,calcHistogram);
 
 		MultiSpectral<ImageFloat32> image = new MultiSpectral<ImageFloat32>(ImageFloat32.class,100,150,3);
 
@@ -96,7 +96,7 @@ public class TestTrackerMeanShiftComaniciu2003 {
 	public void distanceHistogram() {
 		LocalWeightedHistogramRotRect calcHist = new LocalWeightedHistogramRotRect(10,3,5,3,255,null);
 
-		TrackerMeanShiftComaniciu2003 alg = new TrackerMeanShiftComaniciu2003(true,100,1e-4f,0.1f,false,calcHist);
+		TrackerMeanShiftComaniciu2003 alg = new TrackerMeanShiftComaniciu2003(true,100,1e-4f,0.1f,0.0f,false,calcHist);
 
 		float histogramA[] = new float[ calcHist.getHistogram().length ];
 		float histogramB[] = new float[ calcHist.getHistogram().length ];

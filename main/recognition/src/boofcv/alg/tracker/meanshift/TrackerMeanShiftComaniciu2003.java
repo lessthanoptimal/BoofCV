@@ -84,6 +84,11 @@ public class TrackerMeanShiftComaniciu2003<T extends ImageMultiBand> {
 	// if true assume the scale is constant
 	private boolean constantScale;
 
+	// ratio of the original object size that the track can become
+	private float minimumSizeRatio;
+	// stores the minimum width that the object can be
+	private float minimumWidth;
+
 	/**
 	 * Configures tracker.
 	 *
@@ -92,6 +97,7 @@ public class TrackerMeanShiftComaniciu2003<T extends ImageMultiBand> {
 	 * @param minimumChange Mean-shift will stop when the change is below this threshold.  Try 1e-4f
 	 * @param gamma Scale weighting factor.  Value from 0 to 1. Closer to 0 the more it will prefer
 	 *              the most recent estimate.  Try 0.1
+	 * @param minimumSizeRatio Fraction of the original region that the track is allowed to shrink to.  Try 0.25
 	 * @param constantScale If true it will assume the scale is known.  If false it will estimate the change in scale.
 	 * @param calcHistogram Calculates the histogram
 	 */
@@ -99,6 +105,7 @@ public class TrackerMeanShiftComaniciu2003<T extends ImageMultiBand> {
 										 int maxIterations,
 										 float minimumChange,
 										 float gamma ,
+										 float minimumSizeRatio ,
 										 boolean constantScale,
 										 LocalWeightedHistogramRotRect<T> calcHistogram) {
 		this.updateHistogram = updateHistogram;
@@ -106,6 +113,7 @@ public class TrackerMeanShiftComaniciu2003<T extends ImageMultiBand> {
 		this.minimumChange = minimumChange;
 		this.gamma = gamma;
 		this.constantScale = constantScale;
+		this.minimumSizeRatio = minimumSizeRatio;
 		this.calcHistogram = calcHistogram;
 
 		keyHistogram = new float[ calcHistogram.getHistogram().length ];
@@ -126,6 +134,8 @@ public class TrackerMeanShiftComaniciu2003<T extends ImageMultiBand> {
 		this.region.set(initial);
 		calcHistogram.computeHistogram(image,initial);
 		System.arraycopy(calcHistogram.getHistogram(),0,keyHistogram,0,keyHistogram.length);
+
+		this.minimumWidth = initial.width*minimumSizeRatio;
 	}
 
 	/**
@@ -149,9 +159,11 @@ public class TrackerMeanShiftComaniciu2003<T extends ImageMultiBand> {
 
 		// perform mean-shift at the different sizes and compute their distance
 		if( !constantScale ) {
-			updateLocation(image,region0);
-			distance0 = distanceHistogram(keyHistogram, calcHistogram.getHistogram());
-			if( updateHistogram ) System.arraycopy(calcHistogram.getHistogram(),0,histogram0,0,histogram0.length);
+			if( region0.width >= minimumWidth ) {
+				updateLocation(image,region0);
+				distance0 = distanceHistogram(keyHistogram, calcHistogram.getHistogram());
+				if( updateHistogram ) System.arraycopy(calcHistogram.getHistogram(),0,histogram0,0,histogram0.length);
+			}
 			updateLocation(image,region2);
 			distance2 = distanceHistogram(keyHistogram, calcHistogram.getHistogram());
 			if( updateHistogram ) System.arraycopy(calcHistogram.getHistogram(),0,histogram2,0,histogram2.length);
@@ -269,8 +281,8 @@ public class TrackerMeanShiftComaniciu2003<T extends ImageMultiBand> {
 		}
 
 		// use the best location found
-//		region.cx = bestX;
-//		region.cy = bestY;
+		region.cx = bestX;
+		region.cy = bestY;
 	}
 
 	/**

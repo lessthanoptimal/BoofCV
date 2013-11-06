@@ -71,6 +71,13 @@ public class ConfigComaniciu2003<T extends ImageMultiBand> {
 	 * is constant, will be more robust.
 	 */
 	public boolean constantScale = true;
+
+	/**
+	 * The scale is allowed to be reduced by this much from the original region which is selected.  Default
+	 * is 0.25
+	 */
+	public float minimumSizeRatio = 0.25f;
+
 	/**
 	 * Which interpolation method should it use.
 	 */
