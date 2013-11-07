@@ -23,7 +23,7 @@ public class TestComaniciu2003_to_TrackObjectQuad extends ColorTrackerObjectRect
 
 		config.constantScale = false;
 
-		return FactoryTrackerObjectQuad.createMeanShiftComaniciu2003(config);
+		return FactoryTrackerObjectQuad.meanShiftComaniciu2003(config);
 	}
 
 	@Override

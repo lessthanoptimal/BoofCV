@@ -52,7 +52,7 @@ public class VideoTrackerObjectQuadApp<I extends ImageSingleBand>
 		extends VideoProcessAppBase<MultiSpectral<I>>
 		implements TrackerObjectQuadPanel.Listener  , TrackerQuadInfoPanel.Listener
 {
-	Class<I> imageType;
+	Class<I> imageClass;
 	TrackerObjectQuad tracker;
 
 	TrackerObjectQuadPanel videoPanel;
@@ -74,7 +74,7 @@ public class VideoTrackerObjectQuadApp<I extends ImageSingleBand>
 
 	public VideoTrackerObjectQuadApp( Class<I> imageType ) {
 		super(1, ImageType.ms(3, imageType));
-		this.imageType = imageType;
+		this.imageClass = imageType;
 
 		gray = GeneralizedImageOps.createSingleBand(imageType,1,1);
 
@@ -112,23 +112,23 @@ public class VideoTrackerObjectQuadApp<I extends ImageSingleBand>
 	@Override
 	public void refreshAll(Object[] cookies) {
 		if( whichAlg == 0 )
-			tracker = FactoryTrackerObjectQuad.createTLD(new TldConfig(true,imageType));
+			tracker = FactoryTrackerObjectQuad.tld(new TldConfig(true, imageClass));
 		else if( whichAlg == 1 )
-			tracker = FactoryTrackerObjectQuad.createSparseFlow(new SfotConfig(imageType));
+			tracker = FactoryTrackerObjectQuad.sparseFlow(new SfotConfig(imageClass));
 		else if( whichAlg == 2 )
-			tracker = FactoryTrackerObjectQuad.createMeanShiftLikelihood(30, 6,255,
-					MeanShiftLikelihoodType.HISTOGRAM_RGB_to_HSV,imageType);
+			tracker = FactoryTrackerObjectQuad.meanShiftLikelihood(30, 6, 255,
+					MeanShiftLikelihoodType.HISTOGRAM_RGB_to_HSV, imageType);
 		else if( whichAlg == 3 )
-			tracker = FactoryTrackerObjectQuad.createMeanShiftLikelihood(30, 4,255,
-					MeanShiftLikelihoodType.HISTOGRAM,imageType);
+			tracker = FactoryTrackerObjectQuad.meanShiftLikelihood(30, 4, 255,
+					MeanShiftLikelihoodType.HISTOGRAM, imageType);
 		else if( whichAlg == 4 ) {
-			ConfigComaniciu2003 config = new ConfigComaniciu2003(imageInfo);
+			ConfigComaniciu2003 config = new ConfigComaniciu2003(imageType);
 			config.constantScale = false;
-			tracker = FactoryTrackerObjectQuad.createMeanShiftComaniciu2003(config);
+			tracker = FactoryTrackerObjectQuad.meanShiftComaniciu2003(config);
 		} else if( whichAlg == 5 ) {
-			ConfigComaniciu2003 config = new ConfigComaniciu2003(imageInfo);
+			ConfigComaniciu2003 config = new ConfigComaniciu2003(imageType);
 			config.constantScale = true;
-			tracker = FactoryTrackerObjectQuad.createMeanShiftComaniciu2003(config);
+			tracker = FactoryTrackerObjectQuad.meanShiftComaniciu2003(config);
 		} else
 			throw new RuntimeException("Unknown algorithm");
 
@@ -233,7 +233,7 @@ public class VideoTrackerObjectQuadApp<I extends ImageSingleBand>
 
 		parseQuad(path+"_rect.txt");
 
-		SimpleImageSequence<MultiSpectral<I>> video = media.openVideo(path+".mjpeg", ImageType.ms(3, imageType));
+		SimpleImageSequence<MultiSpectral<I>> video = media.openVideo(path+".mjpeg", ImageType.ms(3, imageClass));
 
 		process(video);
 	}

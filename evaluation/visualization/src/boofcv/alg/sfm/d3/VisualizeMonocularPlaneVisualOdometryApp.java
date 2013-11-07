@@ -68,7 +68,7 @@ public class VisualizeMonocularPlaneVisualOdometryApp<I extends ImageSingleBand>
 	Polygon3DSequenceViewer guiCam3D;
 	PlaneView2D gui2D;
 
-	Class<I> imageType;
+	Class<I> imageClass;
 
 	MonocularPlaneVisualOdometry<I> alg;
 
@@ -83,9 +83,9 @@ public class VisualizeMonocularPlaneVisualOdometryApp<I extends ImageSingleBand>
 	int numInliers;
 	int whichAlg;
 
-	public VisualizeMonocularPlaneVisualOdometryApp(Class<I> imageType) {
-		super(1, imageType);
-		this.imageType = imageType;
+	public VisualizeMonocularPlaneVisualOdometryApp(Class<I> imageClass) {
+		super(1, imageClass);
+		this.imageClass = imageClass;
 
 		addAlgorithm(0, "Plane-Infinity : KLT", 0);
 		addAlgorithm(0, "Overhead : KLT", 1);
@@ -178,7 +178,7 @@ public class VisualizeMonocularPlaneVisualOdometryApp<I extends ImageSingleBand>
 				line1 = path+"/"+line1;
 
 			config = BoofMiscOps.loadXML(media.openFile(lineConfig));
-			SimpleImageSequence<I> video = media.openVideo(line1, imageInfo);
+			SimpleImageSequence<I> video = media.openVideo(line1, imageType);
 
 			process(video);
 		} catch (IOException e) {
@@ -289,25 +289,25 @@ public class VisualizeMonocularPlaneVisualOdometryApp<I extends ImageSingleBand>
 
 	private MonocularPlaneVisualOdometry<I> createVisualOdometry( int whichAlg ) {
 
-		Class derivType = GImageDerivativeOps.getDerivativeType(imageType);
+		Class derivType = GImageDerivativeOps.getDerivativeType(imageClass);
 
 
 		if( whichAlg == 0 ) {
-			PkltConfig config = PkltConfig.createDefault(imageType, derivType);
+			PkltConfig config = PkltConfig.createDefault(imageClass, derivType);
 			config.pyramidScaling = new int[]{1,2,4,8};
 			config.templateRadius = 3;
-			config.typeInput = imageType;
+			config.typeInput = imageClass;
 			config.typeDeriv = derivType;
 			ConfigGeneralDetector configDetector = new ConfigGeneralDetector(600,3,1);
 
 			PointTracker<I> tracker = FactoryPointTracker.klt(config, configDetector);
 
-			return FactoryVisualOdometry.monoPlaneInfinity(75,2,1.5,200, tracker, imageInfo);
+			return FactoryVisualOdometry.monoPlaneInfinity(75,2,1.5,200, tracker, imageType);
 		} else if( whichAlg == 1 ) {
-			PkltConfig config = PkltConfig.createDefault(imageType, derivType);
+			PkltConfig config = PkltConfig.createDefault(imageClass, derivType);
 			config.pyramidScaling = new int[]{1,2,4,8};
 			config.templateRadius = 3;
-			config.typeInput = imageType;
+			config.typeInput = imageClass;
 			config.typeDeriv = derivType;
 			ConfigGeneralDetector configDetector = new ConfigGeneralDetector(600,3,1);
 
@@ -317,7 +317,7 @@ public class VisualizeMonocularPlaneVisualOdometryApp<I extends ImageSingleBand>
 			double inlierGroundTol = 1.5;
 
 			return FactoryVisualOdometry.monoPlaneOverhead(cellSize,25,0.7,
-					inlierGroundTol,300,2,100,0.5,0.6, tracker, imageInfo);
+					inlierGroundTol,300,2,100,0.5,0.6, tracker, imageType);
 		}  else {
 			throw new RuntimeException("Unknown selection");
 		}

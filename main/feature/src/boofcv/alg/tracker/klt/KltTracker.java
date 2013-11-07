@@ -230,6 +230,70 @@ public class KltTracker<InputImage extends ImageSingleBand, DerivativeImage exte
 		return KltTrackFault.SUCCESS;
 	}
 
+	/**
+	 * <p>
+	 * Updates the feature's location inside the image and can handle tracks which intersects the image border.
+	 * The feature's position can be modified even if tracking fails.
+	 * </p>
+	 *
+	 * @param feature Feature being tracked.
+	 * @return If the tracking was successful or not.
+	 */
+	public KltTrackFault trackBorder(KltFeature feature) {
+		// save the original location so that a drifting fault can be detected
+		float origX = feature.x, origY = feature.y;
+
+		setAllowedBounds(feature);
+
+		// see if the determinant is too small
+		Gxx = feature.Gxx;
+		Gyy = feature.Gyy;
+		Gxy = feature.Gxy;
+		float det = Gxx * Gyy - Gxy * Gxy;
+		if (det < config.minDeterminant) {
+			return KltTrackFault.FAILED;
+		}
+
+		// compute the feature's width and temporary storage related to it
+		widthFeature = feature.radius * 2 + 1;
+		lengthFeature = widthFeature * widthFeature;
+
+		if (descFeature.data.length < lengthFeature)
+			descFeature.reshape(widthFeature,widthFeature);
+
+		for (int iter = 0; iter < config.maxIterations; iter++) {
+			computeE(feature, feature.x, feature.y);
+
+			// solve for D
+			float dx = (Gyy * Ex - Gxy * Ey) / det;
+			float dy = (Gxx * Ey - Gxy * Ex) / det;
+
+			feature.x += dx;
+			feature.y += dy;
+
+			// see if it moved outside of the image
+			// TODO Change to see if its mostly out of the image
+			if (!isFullyInside(feature.x, feature.y))
+				return KltTrackFault.OUT_OF_BOUNDS;
+
+			// see if it has moved more than possible if it is really tracking a target
+			// this happens in regions with little texture
+			if (Math.abs(feature.x - origX) > widthFeature
+					|| Math.abs(feature.y - origY) > widthFeature)
+				return KltTrackFault.DRIFTED;
+
+			// see if it has converged to a solution
+			if (Math.abs(dx) < config.minPositionDelta && Math.abs(dy) < config.minPositionDelta) {
+				break;
+			}
+		}
+
+		if (computeError(feature) > config.maxPerPixelError)
+			return KltTrackFault.LARGE_ERROR;
+
+		return KltTrackFault.SUCCESS;
+	}
+
 	private void setAllowedBounds(KltFeature feature) {
 		allowedLeft = feature.radius + config.forbiddenBorder;
 		allowedTop = feature.radius + config.forbiddenBorder;
@@ -247,6 +311,40 @@ public class KltTracker<InputImage extends ImageSingleBand, DerivativeImage exte
 	}
 
 	private void computeE(KltFeature feature, float x, float y) {
+		// extract the region in the current image
+		interpInput.region(x - feature.radius, y - feature.radius, descFeature);
+
+		Ex = 0;
+		Ey = 0;
+		for (int i = 0; i < lengthFeature; i++) {
+			// compute the difference between the previous and the current image
+			float d = feature.desc.data[i] - descFeature.data[i];
+
+			Ex += d * feature.derivX.data[i];
+			Ey += d * feature.derivY.data[i];
+		}
+	}
+
+	/**
+	 * Updates E and G using only features inside the image
+	 * @param feature
+	 * @param x
+	 * @param y
+	 */
+	private void computeE_border(KltFeature feature, float x, float y) {
+		// find the bounds of the rectangle inside the image
+		float minX = x < 0 ? -(x%1) : x;
+		float minY = y < 0 ? -(y%1) : y;
+		float maxX = minX + widthFeature;
+		float maxY = minY + widthFeature;
+		if( maxX > image.width )
+			maxX = image.width;
+		if( maxY > image.height )
+			maxY = image.height;
+
+		descFeature.width = (int) (maxX-minX);
+
+
 		// extract the region in the current image
 		interpInput.region(x - feature.radius, y - feature.radius, descFeature);
 

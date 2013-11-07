@@ -48,19 +48,19 @@ public abstract class VideoProcessAppBase<I extends ImageBase>
 
 	JSpinner periodSpinner;
 
-	protected ImageType<I> imageInfo;
+	protected ImageType<I> imageType;
 
-	public VideoProcessAppBase(int numAlgFamilies, Class<I> imageType) {
+	public VideoProcessAppBase(int numAlgFamilies, Class<I> imageClass) {
 		super(numAlgFamilies);
 
-		this.imageInfo = new ImageType<I>(ImageType.Family.SINGLE_BAND, ImageDataType.classToType(imageType),1);
+		this.imageType = new ImageType<I>(ImageType.Family.SINGLE_BAND, ImageDataType.classToType(imageClass),1);
 		addToToolbar(createSelectDelay());
 	}
 
-	public VideoProcessAppBase(int numAlgFamilies, ImageType<I> imageInfo ) {
+	public VideoProcessAppBase(int numAlgFamilies, ImageType<I> imageType) {
 		super(numAlgFamilies);
 
-		this.imageInfo = imageInfo;
+		this.imageType = imageType;
 		addToToolbar(createSelectDelay());
 	}
 
@@ -91,7 +91,7 @@ public abstract class VideoProcessAppBase<I extends ImageBase>
 	@Override
 	public void changeInput(String name, int index) {
 		stopWorker();
-		SimpleImageSequence<I> video = media.openVideo(inputRefs.get(index).getPath(),imageInfo);
+		SimpleImageSequence<I> video = media.openVideo(inputRefs.get(index).getPath(), imageType);
 		process(video);
 	}
 

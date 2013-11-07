@@ -26,9 +26,10 @@ import boofcv.alg.tracker.sfot.SfotConfig;
 import boofcv.alg.tracker.sfot.SparseFlowObjectTracker;
 import boofcv.alg.tracker.tld.TldConfig;
 import boofcv.alg.tracker.tld.TldTracker;
+import boofcv.struct.image.ImageDataType;
+import boofcv.struct.image.ImageMultiBand;
 import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.image.ImageUInt8;
-import boofcv.struct.image.MultiSpectral;
+import boofcv.struct.image.ImageType;
 
 /**
  * Factory for creating low level implementations of object tracking algorithms.  These algorithms allow
@@ -49,36 +50,48 @@ public class FactoryTrackerObjectAlgs {
 		return new SparseFlowObjectTracker<T,D>(config);
 	}
 
-	public static <T extends ImageSingleBand>
-	PixelLikelihood<MultiSpectral<T>> likelihoodHueSatHistIndependent( double maxPixelValue , int numHistogramBins ,
-																	   Class<T> bandType )
+	public static <T extends ImageMultiBand>
+	PixelLikelihood<T> likelihoodHueSatHistIndependent(
+			double maxPixelValue , int numHistogramBins , ImageType<T> imageType )
 	{
-		if( bandType == ImageUInt8.class ) {
+		if( imageType.getFamily() != ImageType.Family.MULTI_SPECTRAL )
+			throw new IllegalArgumentException("Only MultiSpectral images supported currently");
+		if( imageType.getNumBands() != 3 )
+			throw new IllegalArgumentException("Input image type must have 3 bands.");
+
+		if( imageType.getDataType() == ImageDataType.U8 ) {
 			return (PixelLikelihood)new LikelihoodHueSatHistInd_U8((int)maxPixelValue,numHistogramBins);
 		} else {
-			throw new RuntimeException("Band type not yet supported "+bandType.getSimpleName());
+			throw new RuntimeException("Band type not yet supported "+imageType.getDataType());
 		}
 	}
 
-	public static <T extends ImageSingleBand>
-	PixelLikelihood<MultiSpectral<T>> likelihoodHueSatHistCoupled( double maxPixelValue , int numHistogramBins ,
-																	   Class<T> bandType )
+	public static <T extends ImageMultiBand>
+	PixelLikelihood<T> likelihoodHueSatHistCoupled(
+			double maxPixelValue , int numHistogramBins , ImageType<T> imageType )
 	{
-		if( bandType == ImageUInt8.class ) {
+		if( imageType.getFamily() != ImageType.Family.MULTI_SPECTRAL )
+			throw new IllegalArgumentException("Only MultiSpectral images supported currently");
+		if( imageType.getNumBands() != 3 )
+			throw new IllegalArgumentException("Input image type must have 3 bands.");
+
+		if( imageType.getDataType() == ImageDataType.U8 ) {
 			return (PixelLikelihood)new LikelihoodHueSatHistCoupled_U8((int)maxPixelValue,numHistogramBins);
 		} else {
-			throw new RuntimeException("Band type not yet supported "+bandType.getSimpleName());
+			throw new RuntimeException("Band type not yet supported "+imageType.getDataType());
 		}
 	}
 
-	public static <T extends ImageSingleBand>
-	PixelLikelihood<MultiSpectral<T>> likelihoodHistogramCoupled( double maxPixelValue , int numHistogramBins ,
-																	   Class<T> bandType )
+	public static <T extends ImageMultiBand>
+	PixelLikelihood<T> likelihoodHistogramCoupled( double maxPixelValue , int numHistogramBins , ImageType<T> imageType )
 	{
-		if( bandType == ImageUInt8.class ) {
+		if( imageType.getFamily() != ImageType.Family.MULTI_SPECTRAL )
+			throw new IllegalArgumentException("Only MultiSpectral images supported currently");
+
+		if( imageType.getDataType() == ImageDataType.U8 ) {
 			return (PixelLikelihood)new LikelihoodHistCoupled_U8((int)maxPixelValue,numHistogramBins);
 		} else {
-			throw new RuntimeException("Band type not yet supported "+bandType.getSimpleName());
+			throw new RuntimeException("Band type not yet supported "+imageType.getDataType());
 		}
 	}
 }
