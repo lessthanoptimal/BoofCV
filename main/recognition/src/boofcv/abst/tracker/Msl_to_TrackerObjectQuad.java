@@ -19,9 +19,8 @@
 package boofcv.abst.tracker;
 
 import boofcv.alg.tracker.meanshift.TrackerMeanShiftLikelihood;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageMultiBand;
 import boofcv.struct.image.ImageType;
-import boofcv.struct.image.MultiSpectral;
 import georegression.geometry.UtilPolygons2D_F64;
 import georegression.struct.shapes.Quadrilateral_F64;
 import georegression.struct.shapes.Rectangle2D_I32;
@@ -32,23 +31,23 @@ import georegression.struct.shapes.RectangleCorner2D_F64;
  *
  * @author Peter Abeles
  */
-public class Msl_to_TrackerObjectQuad <T extends ImageSingleBand> implements TrackerObjectQuad<MultiSpectral<T>> {
+public class Msl_to_TrackerObjectQuad <T extends ImageMultiBand> implements TrackerObjectQuad<T> {
 
-	TrackerMeanShiftLikelihood<MultiSpectral<T>> tracker;
+	TrackerMeanShiftLikelihood<T> tracker;
 
-	ImageType<MultiSpectral<T>> type;
+	ImageType<T> type;
 
 	RectangleCorner2D_F64 rect = new RectangleCorner2D_F64();
 	Rectangle2D_I32 target = new Rectangle2D_I32();
 
-	public Msl_to_TrackerObjectQuad(TrackerMeanShiftLikelihood<MultiSpectral<T>> tracker, Class<T> bandType ) {
+	public Msl_to_TrackerObjectQuad(TrackerMeanShiftLikelihood<T> tracker, ImageType<T> imageType) {
 		this.tracker = tracker;
 
-		type = ImageType.ms(3, bandType);
+		type = imageType;
 	}
 
 	@Override
-	public boolean initialize(MultiSpectral<T> image, Quadrilateral_F64 location) {
+	public boolean initialize( T image, Quadrilateral_F64 location) {
 
 		UtilPolygons2D_F64.bounding(location, rect);
 
@@ -63,7 +62,7 @@ public class Msl_to_TrackerObjectQuad <T extends ImageSingleBand> implements Tra
 	}
 
 	@Override
-	public boolean process(MultiSpectral<T> image, Quadrilateral_F64 location) {
+	public boolean process(T image, Quadrilateral_F64 location) {
 
 		if( !tracker.process(image ))
 		    return false;
@@ -83,7 +82,7 @@ public class Msl_to_TrackerObjectQuad <T extends ImageSingleBand> implements Tra
 	}
 
 	@Override
-	public ImageType<MultiSpectral<T>> getImageType() {
+	public ImageType<T> getImageType() {
 		return type;
 	}
 }

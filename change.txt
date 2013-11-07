@@ -21,6 +21,7 @@ Version : Alpha 0.16
 - Created TrackObjectQuad for tracking user select objects inside an image
   * Added TLD tracker
   * Added Sparse Flow Object Tracker
+  * Added various mean-shift trackers
 - Created recognition package
   * No other good place to put object trackers
 - UtilImageIO
@@ -53,6 +54,7 @@ Version : Alpha 0.16
 
 - TODO improve KLT edge handling
 - TODO automate high level tests
+- TODO Mean-Shift common histogram model code for both code bases
 
 ---------------------------------------------
 Date    : 2013/06/21

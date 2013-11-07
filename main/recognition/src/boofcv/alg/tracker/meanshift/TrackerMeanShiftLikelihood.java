@@ -28,7 +28,7 @@ import georegression.struct.shapes.RectangleCorner2D_I32;
  * <p>
  * Mean-shift [1] based tracker which tracks the target inside a likelihood image using a flat rectangular kernel
  * of fixed size.  The value of each pixel in the likelihood image is computed using features from a single pixel,
- * at the same coordinate, in the input image.  These features are most often
+ * at the same coordinate, in the input image using a user provided function.  These features are most often
  * based on color.  The likelihood of each pixel is computed as needed only inside part of the image being considered.
  * </p>
  *
@@ -45,7 +45,6 @@ import georegression.struct.shapes.RectangleCorner2D_I32;
  *
  * @author Peter Abeles
  */
-// TODO Rename to MeanShiftPixel?  Lkelihood is always used
 public class TrackerMeanShiftLikelihood<T extends ImageBase> {
 
 	// likelihood model for the target being tracked

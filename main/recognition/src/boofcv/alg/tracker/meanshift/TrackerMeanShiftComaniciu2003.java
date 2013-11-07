@@ -26,10 +26,11 @@ import java.util.List;
 
 /**
  * <p>
- * Mean shift tracker which adjusts the scale (or bandwidth) to account for changes in scale of the target [1].
+ * Mean shift tracker which adjusts the scale (or bandwidth) to account for changes in scale of the target
+ * and is based off of [1].  The tracker seeks to minimize the histogram error within the sampled region.
  * The mean-shift region is sampled using an oriented rectangle and weighted using a 2D gaussian.  The target
  * is modeled using a color histogram of the input image, which can be optionally updated after each frame
- * is processed.
+ * is processed. It can also be configured to not allow scale changes, which can improve stability.
  * </p>
  *
  * <p>

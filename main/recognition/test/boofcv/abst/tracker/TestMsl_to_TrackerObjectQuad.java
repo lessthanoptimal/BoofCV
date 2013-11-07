@@ -4,9 +4,6 @@ import boofcv.factory.tracker.FactoryTrackerObjectQuad;
 import boofcv.struct.image.ImageType;
 import boofcv.struct.image.ImageUInt8;
 import boofcv.struct.image.MultiSpectral;
-import org.junit.Test;
-
-import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
@@ -22,8 +19,7 @@ public class TestMsl_to_TrackerObjectQuad extends ColorTrackerObjectRectangleTes
 
 	@Override
 	public TrackerObjectQuad<MultiSpectral<ImageUInt8>> create(ImageType<MultiSpectral<ImageUInt8>> imageType) {
-		return FactoryTrackerObjectQuad.createMeanShiftLikelihood(30,6,255,
-				MeanShiftLikelihoodType.HISTOGRAM,ImageUInt8.class);
+		return FactoryTrackerObjectQuad.meanShiftLikelihood(30, 6, 255, MeanShiftLikelihoodType.HISTOGRAM, imageType);
 	}
 
 	@Override

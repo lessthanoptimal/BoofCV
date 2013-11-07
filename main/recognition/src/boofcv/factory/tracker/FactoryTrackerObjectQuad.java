@@ -31,7 +31,7 @@ import boofcv.alg.tracker.tld.TldTracker;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.image.ImageMultiBand;
 import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.image.MultiSpectral;
+import boofcv.struct.image.ImageType;
 
 /**
  * Factory for implementations of {@link TrackerObjectQuad}, a high level interface for tracking user specified
@@ -51,7 +51,7 @@ public class FactoryTrackerObjectQuad {
 	 * @return TrackerObjectQuad
 	 */
 	public static <T extends ImageSingleBand,D extends ImageSingleBand>
-	TrackerObjectQuad<T> createTLD( TldConfig<T,D> config ) {
+	TrackerObjectQuad<T> tld(TldConfig<T, D> config) {
 		TldTracker<T,D> tracker = new TldTracker<T,D>(config);
 
 		return new Tld_to_TrackerObjectQuad<T,D>(tracker);
@@ -66,7 +66,7 @@ public class FactoryTrackerObjectQuad {
 	 * @return TrackerObjectQuad
 	 */
 	public static <T extends ImageSingleBand,D extends ImageSingleBand>
-	TrackerObjectQuad<T> createSparseFlow( SfotConfig<T,D> config ) {
+	TrackerObjectQuad<T> sparseFlow(SfotConfig<T, D> config) {
 		SparseFlowObjectTracker<T,D> tracker = new SparseFlowObjectTracker<T,D>(config);
 
 		return new Sfot_to_TrackObjectQuad<T,D>(tracker);
@@ -74,59 +74,61 @@ public class FactoryTrackerObjectQuad {
 
 	/**
 	 * Very basic and very fast implementation of mean-shift which uses a fixed sized rectangle for its region.
-	 * The type of color model it uses is specified by modelType.
+	 * Works best when the target is composed of a single color.
 	 *
 	 * @see TrackerMeanShiftLikelihood
 	 *
-	 * @param maxIterations Maximum number of mean-shift iteraions.  Try 30.
+	 * @param maxIterations Maximum number of mean-shift iterations.  Try 30.
 	 * @param numBins Number of bins in the histogram color model.  Try 5.
 	 * @param maxPixelValue Maximum number of pixel values.  For 8-bit images this will be 256
 	 * @param modelType Type of color model used.
-	 * @param bandType Type of band in the color image
+	 * @param imageType Type of image
 	 * @return TrackerObjectQuad based on {@link TrackerMeanShiftLikelihood}.
 	 */
-	public static <T extends ImageSingleBand>
-	TrackerObjectQuad<MultiSpectral<T>> createMeanShiftLikelihood( int maxIterations ,
-																   int numBins ,
-																   double maxPixelValue ,
-																   MeanShiftLikelihoodType modelType,
-																   Class<T> bandType ) {
-		PixelLikelihood<MultiSpectral<T>> likelihood;
+	public static <T extends ImageMultiBand>
+	TrackerObjectQuad<T> meanShiftLikelihood(int maxIterations,
+											 int numBins,
+											 double maxPixelValue,
+											 MeanShiftLikelihoodType modelType,
+											 ImageType<T> imageType) {
+		PixelLikelihood<T> likelihood;
 
 		switch( modelType ) {
 			case HISTOGRAM:
-				likelihood = FactoryTrackerObjectAlgs.likelihoodHistogramCoupled(maxPixelValue,numBins,bandType);
+				likelihood = FactoryTrackerObjectAlgs.likelihoodHistogramCoupled(maxPixelValue,numBins,imageType);
 				break;
 
 			case HISTOGRAM_INDEPENDENT_RGB_to_HSV:
-				likelihood = FactoryTrackerObjectAlgs.likelihoodHueSatHistIndependent(maxPixelValue,numBins,bandType);
+				likelihood = FactoryTrackerObjectAlgs.likelihoodHueSatHistIndependent(maxPixelValue,numBins,imageType);
 				break;
 
 			case HISTOGRAM_RGB_to_HSV:
-				likelihood = FactoryTrackerObjectAlgs.likelihoodHueSatHistCoupled(maxPixelValue,numBins,bandType);
+				likelihood = FactoryTrackerObjectAlgs.likelihoodHueSatHistCoupled(maxPixelValue,numBins,imageType);
 				break;
 
 			default:
 				throw new IllegalArgumentException("Unknown likelihood model "+modelType);
 		}
 
-		TrackerMeanShiftLikelihood<MultiSpectral<T>> alg =
-				new TrackerMeanShiftLikelihood<MultiSpectral<T>>(likelihood,maxIterations,0.1f);
+		TrackerMeanShiftLikelihood<T> alg =
+				new TrackerMeanShiftLikelihood<T>(likelihood,maxIterations,0.1f);
 
-		return new Msl_to_TrackerObjectQuad<T>(alg,bandType);
+		return new Msl_to_TrackerObjectQuad<T>(alg,imageType);
 	}
 
 	/**
-	 * Implementation of mean-shift which can handle gradual changes in scale of the object being tracked.
-	 * The region is specified using a rotated rectangle and its orientation is assumed to be constant.
+	 * Implementation of mean-shift which matches the histogram and can handle targets composed of multiple colors.
+	 * The tracker can also be configured to estimate gradual changes in scale.  The track region is
+	 * composed of a rotated rectangle.
 	 *
 	 * @see TrackerMeanShiftComaniciu2003
-	 * @param config Configuration
+	 *
+	 * @param config Tracker configuration
 	 * @param <T> Image type
 	 * @return TrackerObjectQuad based on Comaniciu2003
 	 */
 	public static <T extends ImageMultiBand>
-	TrackerObjectQuad<T> createMeanShiftComaniciu2003( ConfigComaniciu2003<T> config ) {
+	TrackerObjectQuad<T> meanShiftComaniciu2003(ConfigComaniciu2003<T> config) {
 
 		InterpolatePixelMB<T> interp = FactoryInterpolation.createPixelMB(0,config.maxPixelValue,
 				config.interpolation,config.imageType);
