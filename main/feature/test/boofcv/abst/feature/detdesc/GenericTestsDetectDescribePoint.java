@@ -79,38 +79,45 @@ public abstract class GenericTestsDetectDescribePoint<T extends ImageBase,D exte
 	public void detectFeatures() {
 		DetectDescribePoint<T,D> alg = createDetDesc();
 
-		int numScaleNotOne = 0;
-		int numOrientationNotZero = 0;
+		for( int imageIndex = 0; imageIndex < 10; imageIndex++ ) {
+			int numScaleNotOne = 0;
+			int numOrientationNotZero = 0;
 
-		alg.detect(image);
+			GImageMiscOps.fillUniform(image, rand, 0, 100);
+			alg.detect(image);
 
-		int N = alg.getNumberOfFeatures();
-		assertTrue(N>5);
+			int N = alg.getNumberOfFeatures();
+			assertTrue(N>5);
 
-		for( int i = 0; i < N; i++ ) {
-			Point2D_F64 p = alg.getLocation(i);
-			double scale = alg.getScale(i);
-			double angle = alg.getOrientation(i);
-			D desc = alg.getDescription(i);
+			for( int i = 0; i < N; i++ ) {
+				Point2D_F64 p = alg.getLocation(i);
+				double scale = alg.getScale(i);
+				double angle = alg.getOrientation(i);
+				D desc = alg.getDescription(i);
 
-			assertTrue(desc!=null);
-			assertTrue(p.x != 0 && p.y != 0);
+				for( int j = 0; j < desc.size(); j++ ) {
+					assertTrue( !Double.isNaN(desc.getDouble(j)) && !Double.isInfinite(desc.getDouble(j)));
+				}
 
-			if( scale != 1 )
-				numScaleNotOne++;
-			if( angle != 0 )
-				numOrientationNotZero++;
+				assertTrue(desc!=null);
+				assertTrue(p.x != 0 && p.y != 0);
+
+				if( scale != 1 )
+					numScaleNotOne++;
+				if( angle != 0 )
+					numOrientationNotZero++;
+			}
+
+			if( hasScale )
+				assertTrue(numScaleNotOne>0);
+			else
+				assertTrue(numScaleNotOne==0);
+
+			if( hasOrientation )
+				assertTrue(numOrientationNotZero>0);
+			else
+				assertTrue(numOrientationNotZero==0);
 		}
-
-		if( hasScale )
-			assertTrue(numScaleNotOne>0);
-		else
-			assertTrue(numScaleNotOne==0);
-
-		if( hasOrientation )
-			assertTrue(numOrientationNotZero>0);
-		else
-			assertTrue(numOrientationNotZero==0);
 	}
 
 	/**

@@ -15,6 +15,11 @@ Version : Alpha 0.16
 - SURF
   * Laplacian sign calculation doesn't declare new memory for every single feature any more
   * Added a color SURF descriptor
+- Fixed SIFT bug which produced a feature with NaN in its descriptor
+  * The extractor border was not being taken in account when examining features.  The net result was that the
+  localization interpolation would messed up since the center would not be a maximum, causing really bad stuff.
+  * Unit tests updated so that it they can detect it.
+  * Thanks Lefteris for detecting this bug.
 - NCC error now more "correct" and divides by the number of elements
 - Integral image operations now support more image types.  S64 and F64
 - KltTracker.setDescription() can now fail due to lack of texture

@@ -100,8 +100,6 @@ public abstract class NonMaxBlock {
 
 	protected abstract void searchBlock( int x0 , int y0 , int x1 , int y1 , ImageFloat32 img );
 
-
-
 	public void setSearchRadius(int radius) {
 		this.radius = radius;
 	}

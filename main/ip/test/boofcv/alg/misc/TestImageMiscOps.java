@@ -30,7 +30,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Random;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 
 /**
@@ -97,11 +98,33 @@ public class TestImageMiscOps {
 		if( param.length < 1 )
 			return false;
 
-		return ImageBase.class.isAssignableFrom(param[0]);
+		for( int i = 0; i < param.length; i++ ) {
+			if( ImageBase.class.isAssignableFrom(param[i] ))
+				return true;
+		}
+		return false;
 	}
 
 	private void testCopy( Method m ) throws InvocationTargetException, IllegalAccessException {
-		fail("implement");
+		Class paramTypes[] = m.getParameterTypes();
+		ImageSingleBand src = GeneralizedImageOps.createSingleBand(paramTypes[6], width, height);
+		ImageSingleBand dst = GeneralizedImageOps.createSingleBand(paramTypes[7], width, height);
+
+		GImageMiscOps.fillUniform(src, rand, 0,20);
+		GImageMiscOps.fillUniform(dst, rand, 0,20);
+
+		int w = 5,h=8;
+		int x0=1,y0=2;
+		int x1=3,y1=4;
+		m.invoke(null,1,2,3,4,w,h,src,dst);
+
+		GImageSingleBand a = FactoryGImageSingleBand.wrap(src);
+		GImageSingleBand b = FactoryGImageSingleBand.wrap(dst);
+		for( int i = 0; i < h; i++ ) {
+			for( int j = 0; j < w; j++ ) {
+				assertEquals(a.get(x0+j,y0+i).doubleValue(),b.get(x1+j,y1+i).doubleValue(),1e-4);
+			}
+		}
 	}
 
 	private void testFill( Method m ) throws InvocationTargetException, IllegalAccessException {
