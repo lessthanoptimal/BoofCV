@@ -203,7 +203,6 @@ public class SiftDetector {
 	private void addFoundFeatures( ImageFloat32 scale0, ImageFloat32 scale1, ImageFloat32 scale2,
 								   QueueCorner found , boolean positive ) {
 
-
 		// if configured to do so, only select the features with the highest intensity
 		QueueCorner features;
 		if( sortBest != null ) {
@@ -216,8 +215,9 @@ public class SiftDetector {
 		float signAdj = positive ? 1 : -1;
 
 		// precompute border for insignificant speed boost
-		int borderX = scale1.width-1;
-		int borderY = scale1.height-1;
+		int ignoreRadius = extractor.getIgnoreBorder();
+		int borderX = scale1.width-ignoreRadius-1;
+		int borderY = scale1.height-ignoreRadius-1;
 
 		// see if they are a local max in scale space
 		for( int i = 0; i < features.size; i++ ) {
@@ -225,7 +225,7 @@ public class SiftDetector {
 
 			// discard points up against the image border since how it should be interpolated is undefined.  plus
 			// this makes it easier to write faster code
-			if( p.x == 0 || p.y == 0 || p.x >= borderX || p.y >= borderY )
+			if( p.x <= ignoreRadius || p.y <= ignoreRadius || p.x >= borderX || p.y >= borderY )
 				continue;
 
 			float value = scale1.unsafe_get(p.x, p.y);
