@@ -139,7 +139,7 @@ public abstract class GenericNonMaxTests {
 			// make sure it handles sub images correctly
 			if (useSubImage == 1) {
 				ImageFloat32 larger = new ImageFloat32(inten.width + 10, inten.height + 8);
-				inten = larger.subimage(5, 5, inten.width + 5, inten.height + 5);
+				inten = larger.subimage(5, 5, inten.width + 5, inten.height + 5, null);
 			}
 
 			for (int nonMaxWidth = 3; nonMaxWidth <= 9; nonMaxWidth += 2) {

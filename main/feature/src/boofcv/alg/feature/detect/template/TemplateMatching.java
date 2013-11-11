@@ -109,7 +109,7 @@ public class TemplateMatching<T extends ImageBase> {
 			int x1 = image.width - (template.width - offsetX);
 			int y0 = match.getOffsetY();
 			int y1 = image.height - (template.height - offsetY);
-			intensity = intensity.subimage(x0, y0, x1, y1);
+			intensity = intensity.subimage(x0, y0, x1, y1, null);
 		} else {
 			offsetX = match.getOffsetX();
 			offsetY = match.getOffsetY();

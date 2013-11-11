@@ -41,7 +41,7 @@ public class TestImageInterleaved {
 
 		// test it against a submatrix
 		DummyImage c = new DummyImage(20, 20, 3);
-		c = c.subimage(10, 0, 20, 20);
+		c = c.subimage(10, 0, 20, 20, null);
 		c.setTo(a);
 		assertEquals(0, c.data[5]);
 		assertEquals(6, c.data[35]);
@@ -69,7 +69,7 @@ public class TestImageInterleaved {
 	@Test
 	public void reshape_subimage() {
 		DummyImage img = new DummyImage(10, 20, 3);
-		img = img.subimage(0,0,2,2);
+		img = img.subimage(0,0,2,2, null);
 
 		try {
 			img.reshape(10,20);
@@ -119,7 +119,7 @@ public class TestImageInterleaved {
 		DummyImage a = new DummyImage(10, 20, 3);
 		assertFalse(a.isSubimage());
 
-		a = a.subimage(2, 3, 8, 10);
+		a = a.subimage(2, 3, 8, 10, null);
 
 		assertTrue(a.isSubimage());
 		assertEquals(10 * 20 * 3, a.data.length);

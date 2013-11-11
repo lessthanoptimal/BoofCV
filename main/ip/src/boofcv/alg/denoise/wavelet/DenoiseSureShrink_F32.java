@@ -89,7 +89,7 @@ public class DenoiseSureShrink_F32 extends SubbandShrink<ImageFloat32> {
 		int h = transform.height;
 
 		// compute the noise variance using the HH_1 subband
-		noiseSigma = UtilDenoiseWavelet.estimateNoiseStdDev(transform.subimage(w/2,h/2,w,h),null);
+		noiseSigma = UtilDenoiseWavelet.estimateNoiseStdDev(transform.subimage(w/2,h/2,w,h, null),null);
 
 //		System.out.println("Noise sigma: "+noiseSigma);
 

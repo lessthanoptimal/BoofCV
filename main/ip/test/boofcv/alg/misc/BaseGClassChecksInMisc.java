@@ -49,7 +49,11 @@ public abstract class BaseGClassChecksInMisc extends CompareEquivalentFunctions 
 		if( param.length < 1 )
 			return false;
 
-		return(ImageBase.class.isAssignableFrom(param[0]) );
+		for( int i = 0; i < param.length; i++ ) {
+			if( ImageBase.class.isAssignableFrom(param[i]) )
+				return true;
+		}
+		return false;
 	}
 
 	@Override

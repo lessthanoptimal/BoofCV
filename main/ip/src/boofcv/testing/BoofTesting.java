@@ -101,7 +101,7 @@ public class BoofTesting {
 		// create the larger image
 		T ret = (T) input._createNew(input.width + 10, input.height + 12);
 		// create a sub-image of the inner portion
-		ret = (T) ret.subimage(5, 7, input.width + 5, input.height + 7);
+		ret = (T) ret.subimage(5, 7, input.width + 5, input.height + 7, null);
 		// copy input image into the subimage
 		ret.setTo(input);
 
@@ -112,7 +112,7 @@ public class BoofTesting {
 		// create the larger image
 		T ret = (T) input._createNew(input.width + 10, input.height + 12);
 		// create a sub-image of the inner portion
-		ret = (T) ret.subimage(5, 7, input.width + 5, input.height + 7);
+		ret = (T) ret.subimage(5, 7, input.width + 5, input.height + 7, null);
 		// copy input image into the subimage
 		ret.setTo(input);
 
@@ -234,7 +234,7 @@ public class BoofTesting {
 					// copy the original image inside of a larger image
 					larger[i] = img._createNew(img.getWidth() + 10, img.getHeight() + 12);
 					// extract a sub-image and make it equivalent to the original image.
-					subImg[i] = larger[i].subimage(5, 6, 5 + img.getWidth(), 6 + img.getHeight());
+					subImg[i] = larger[i].subimage(5, 6, 5 + img.getWidth(), 6 + img.getHeight(), null);
 					subImg[i].setTo(img);
 
 				}

@@ -43,11 +43,11 @@ public class DerivativeHelperFunctions {
 		ImageUInt8 origSub;
 		ImageSInt16 derivSub;
 
-		origSub = orig.subimage(0,0,orig.width,2);
-		derivSub = deriv.subimage(0,0,orig.width,2);
+		origSub = orig.subimage(0,0,orig.width,2, null);
+		derivSub = deriv.subimage(0,0,orig.width,2, null);
 		ConvolveImageNoBorder.horizontal(kernel,origSub,derivSub,true);
-		origSub = orig.subimage(0,orig.height-2,orig.width,orig.height);
-		derivSub = deriv.subimage(0,orig.height-2,orig.width,orig.height);
+		origSub = orig.subimage(0,orig.height-2,orig.width,orig.height, null);
+		derivSub = deriv.subimage(0,orig.height-2,orig.width,orig.height, null);
 		ConvolveImageNoBorder.horizontal(kernel,origSub,derivSub,true);
 	}
 
@@ -60,11 +60,11 @@ public class DerivativeHelperFunctions {
 		ImageSInt16 origSub;
 		ImageSInt16 derivSub;
 
-		origSub = orig.subimage(0,0,orig.width,2);
-		derivSub = deriv.subimage(0,0,orig.width,2);
+		origSub = orig.subimage(0,0,orig.width,2, null);
+		derivSub = deriv.subimage(0,0,orig.width,2, null);
 		ConvolveImageNoBorder.horizontal(kernel,origSub,derivSub,true);
-		origSub = orig.subimage(0,orig.height-2,orig.width,orig.height);
-		derivSub = deriv.subimage(0,orig.height-2,orig.width,orig.height);
+		origSub = orig.subimage(0,orig.height-2,orig.width,orig.height, null);
+		derivSub = deriv.subimage(0,orig.height-2,orig.width,orig.height, null);
 		ConvolveImageNoBorder.horizontal(kernel,origSub,derivSub,true);
 	}
 
@@ -77,11 +77,11 @@ public class DerivativeHelperFunctions {
 		ImageUInt8 origSub;
 		ImageSInt16 derivSub;
 
-		origSub = orig.subimage(0,0,2,orig.height);
-		derivSub = deriv.subimage(0,0,2,orig.height);
+		origSub = orig.subimage(0,0,2,orig.height, null);
+		derivSub = deriv.subimage(0,0,2,orig.height, null);
 		ConvolveImageNoBorder.vertical(kernel,origSub,derivSub,true);
-		origSub = orig.subimage(orig.width-2,0,orig.width,orig.height);
-		derivSub = deriv.subimage(orig.width-2,0,orig.width,orig.height);
+		origSub = orig.subimage(orig.width-2,0,orig.width,orig.height, null);
+		derivSub = deriv.subimage(orig.width-2,0,orig.width,orig.height, null);
 		ConvolveImageNoBorder.vertical(kernel,origSub,derivSub,true);
 	}
 
@@ -94,11 +94,11 @@ public class DerivativeHelperFunctions {
 		ImageSInt16 origSub;
 		ImageSInt16 derivSub;
 
-		origSub = orig.subimage(0,0,2,orig.height);
-		derivSub = deriv.subimage(0,0,2,orig.height);
+		origSub = orig.subimage(0,0,2,orig.height, null);
+		derivSub = deriv.subimage(0,0,2,orig.height, null);
 		ConvolveImageNoBorder.vertical(kernel,origSub,derivSub,true);
-		origSub = orig.subimage(orig.width-2,0,orig.width,orig.height);
-		derivSub = deriv.subimage(orig.width-2,0,orig.width,orig.height);
+		origSub = orig.subimage(orig.width-2,0,orig.width,orig.height, null);
+		derivSub = deriv.subimage(orig.width-2,0,orig.width,orig.height, null);
 		ConvolveImageNoBorder.vertical(kernel,origSub,derivSub,true);
 	}
 
@@ -111,11 +111,11 @@ public class DerivativeHelperFunctions {
 		ImageFloat32 origSub;
 		ImageFloat32 derivSub;
 
-		origSub = orig.subimage(0,0,orig.width,2);
-		derivSub = deriv.subimage(0,0,orig.width,2);
+		origSub = orig.subimage(0,0,orig.width,2, null);
+		derivSub = deriv.subimage(0,0,orig.width,2, null);
 		ConvolveImageNoBorder.horizontal(kernel,origSub,derivSub,true);
-		origSub = orig.subimage(0,orig.height-2,orig.width,orig.height);
-		derivSub = deriv.subimage(0,orig.height-2,orig.width,orig.height);
+		origSub = orig.subimage(0,orig.height-2,orig.width,orig.height, null);
+		derivSub = deriv.subimage(0,orig.height-2,orig.width,orig.height, null);
 		ConvolveImageNoBorder.horizontal(kernel,origSub,derivSub,true);
 	}
 
@@ -128,11 +128,11 @@ public class DerivativeHelperFunctions {
 		ImageFloat32 origSub;
 		ImageFloat32 derivSub;
 
-		origSub = orig.subimage(0,0,2,orig.height);
-		derivSub = deriv.subimage(0,0,2,orig.height);
+		origSub = orig.subimage(0,0,2,orig.height, null);
+		derivSub = deriv.subimage(0,0,2,orig.height, null);
 		ConvolveImageNoBorder.vertical(kernel,origSub,derivSub,true);
-		origSub = orig.subimage(orig.width-2,0,orig.width,orig.height);
-		derivSub = deriv.subimage(orig.width-2,0,orig.width,orig.height);
+		origSub = orig.subimage(orig.width-2,0,orig.width,orig.height, null);
+		derivSub = deriv.subimage(orig.width-2,0,orig.width,orig.height, null);
 		ConvolveImageNoBorder.vertical(kernel,origSub,derivSub,true);
 	}
 

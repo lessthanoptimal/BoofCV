@@ -113,8 +113,8 @@ public class GenericOrientationGradientTests<D extends ImageSingleBand> {
 		GImageMiscOps.fillRectangle(derivX,c*100,5,0,regionSize+5,regionSize);
 		GImageMiscOps.fillRectangle(derivY,s*100,5,0,regionSize+5,regionSize);
 
-		D subX = (D)derivX.subimage(5,0,regionSize+5,regionSize);
-		D subY = (D)derivY.subimage(5,0,regionSize+5,regionSize);
+		D subX = (D)derivX.subimage(5,0,regionSize+5,regionSize, null);
+		D subY = (D)derivY.subimage(5,0,regionSize+5,regionSize, null);
 
 		alg.setImage(subX,subY);
 

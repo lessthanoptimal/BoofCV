@@ -64,14 +64,16 @@ public abstract class ImageInterleaved<T extends ImageInterleaved> extends Image
 	 * that stores each pixel's value, but will only pertain to an axis-aligned rectangular segment
 	 * of the original.
 	 *
+	 *
 	 * @param x0 x-coordinate of top-left corner of the sub-image.
 	 * @param y0 y-coordinate of top-left corner of the sub-image.
 	 * @param x1 x-coordinate of bottom-right corner of the sub-image.
 	 * @param y1 y-coordinate of bottom-right corner of the sub-image.
+	 * @param subimage
 	 * @return A sub-image of this image.
 	 */
 	@Override
-	public T subimage(int x0, int y0, int x1, int y1) {
+	public T subimage(int x0, int y0, int x1, int y1, T subimage) {
 		T ret = _createNew(-1, -1);
 		ret._setData(_getData());
 		ret.stride = Math.max(width * numBands, stride);

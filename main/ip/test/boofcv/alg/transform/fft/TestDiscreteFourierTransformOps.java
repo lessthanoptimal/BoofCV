@@ -301,4 +301,9 @@ public class TestDiscreteFourierTransformOps {
 			}
 		}
 	}
+
+	@Test
+	public void multiplyComplexR() {
+		fail("implement");
+	}
 }

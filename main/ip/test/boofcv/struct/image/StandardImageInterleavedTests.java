@@ -66,8 +66,8 @@ public abstract class StandardImageInterleavedTests {
 
 		assertFalse(a.isSubimage());
 
-		assertTrue(a.subimage(0, 5, 0, 5).isSubimage());
-		assertTrue(a.subimage(2, 5, 2, 5).isSubimage());
+		assertTrue(a.subimage(0, 5, 0, 5, null).isSubimage());
+		assertTrue(a.subimage(2, 5, 2, 5, null).isSubimage());
 	}
 
 	/**

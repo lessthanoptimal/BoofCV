@@ -61,8 +61,8 @@ public class TestImplIntegralImageFeatureIntensity {
 
 			int w = found.width;
 			int h = found.height;
-			ImageFloat32 f = found.subimage(r+1,r+1,w-r,h-r);
-			ImageFloat32 e = expected.subimage(r+1,r+1,w-r,h-r);
+			ImageFloat32 f = found.subimage(r+1,r+1,w-r,h-r, null);
+			ImageFloat32 e = expected.subimage(r+1,r+1,w-r,h-r, null);
 
 			BoofTesting.assertEquals(e,f, 1e-4f);
 		}
@@ -92,8 +92,8 @@ public class TestImplIntegralImageFeatureIntensity {
 
 			int w = found.width;
 			int h = found.height;
-			ImageFloat32 f = found.subimage(r+1,r+1,w-r,h-r);
-			ImageFloat32 e = expected.subimage(r+1,r+1,w-r,h-r);
+			ImageFloat32 f = found.subimage(r+1,r+1,w-r,h-r, null);
+			ImageFloat32 e = expected.subimage(r+1,r+1,w-r,h-r, null);
 
 			BoofTesting.assertEquals(e,f, 1e-4f);
 		}

@@ -22,12 +22,9 @@ import boofcv.alg.enhance.EnhanceImageOps;
 import boofcv.alg.enhance.GEnhanceImageOps;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.alg.misc.GImageStatistics;
-import boofcv.alg.misc.ImageMiscOps;
-import boofcv.alg.misc.ImageStatistics;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.ImageInteger;
 import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.image.ImageUInt8;
 import boofcv.testing.BoofTesting;
 import org.junit.Test;
 
@@ -35,7 +32,6 @@ import java.lang.reflect.Method;
 import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
@@ -158,8 +154,8 @@ public class TestImplEnhanceHistogram {
 					}
 
 					// use the full image algorithm
-					ImageInteger subIn = (ImageInteger)input.subimage(x0,y0,x1,y1);
-					ImageInteger subOut = (ImageInteger)tmp.subimage(x0,y0,x1,y1);
+					ImageInteger subIn = (ImageInteger)input.subimage(x0,y0,x1,y1, null);
+					ImageInteger subOut = (ImageInteger)tmp.subimage(x0,y0,x1,y1, null);
 					GImageStatistics.histogram(subIn,0, histogram);
 					EnhanceImageOps.equalize(histogram, transform);
 					GEnhanceImageOps.applyTransform(subIn, transform, 0,subOut);
@@ -252,8 +248,8 @@ public class TestImplEnhanceHistogram {
 			BoofTesting.callStaticMethod(ImplEnhanceHistogram.class,
 					"equalizeLocalRow", input, radius, 0, found, histogram,transform);
 
-			ImageInteger subExpected = (ImageInteger)expected.subimage(0,0,width,radius);
-			ImageInteger subFound = (ImageInteger)found.subimage(0,0,width,radius);
+			ImageInteger subExpected = (ImageInteger)expected.subimage(0,0,width,radius, null);
+			ImageInteger subFound = (ImageInteger)found.subimage(0,0,width,radius, null);
 
 			// check solution
 			BoofTesting.assertEquals(subExpected,subFound,1e-10);
@@ -272,8 +268,8 @@ public class TestImplEnhanceHistogram {
 			BoofTesting.callStaticMethod(ImplEnhanceHistogram.class,
 					"equalizeLocalRow", input, radius, start, found, histogram,transform);
 
-			ImageInteger subExpected = (ImageInteger)expected.subimage(0,start,width,height);
-			ImageInteger subFound = (ImageInteger)found.subimage(0,start,width,height);
+			ImageInteger subExpected = (ImageInteger)expected.subimage(0,start,width,height, null);
+			ImageInteger subFound = (ImageInteger)found.subimage(0,start,width,height, null);
 
 			// check solution
 			BoofTesting.assertEquals(subExpected,subFound,1e-10);
@@ -330,8 +326,8 @@ public class TestImplEnhanceHistogram {
 			BoofTesting.callStaticMethod(ImplEnhanceHistogram.class,
 					"equalizeLocalCol", input, radius, 0, found, histogram, transform);
 
-			ImageInteger subExpected = (ImageInteger)expected.subimage(0,radius,radius,height-radius-1);
-			ImageInteger subFound = (ImageInteger)found.subimage(0,radius,radius,height-radius-1);
+			ImageInteger subExpected = (ImageInteger)expected.subimage(0,radius,radius,height-radius-1, null);
+			ImageInteger subFound = (ImageInteger)found.subimage(0,radius,radius,height-radius-1, null);
 
 			// check solution
 			BoofTesting.assertEquals(subExpected,subFound,1e-10);
@@ -350,8 +346,8 @@ public class TestImplEnhanceHistogram {
 			BoofTesting.callStaticMethod(ImplEnhanceHistogram.class,
 					"equalizeLocalCol", input, radius, start, found, histogram, transform);
 
-			ImageInteger subExpected = (ImageInteger)expected.subimage(start,radius,width,height-radius-1);
-			ImageInteger subFound = (ImageInteger)found.subimage(start,radius,width,height-radius-1);
+			ImageInteger subExpected = (ImageInteger)expected.subimage(start,radius,width,height-radius-1, null);
+			ImageInteger subFound = (ImageInteger)found.subimage(start,radius,width,height-radius-1, null);
 
 			// check solution
 			BoofTesting.assertEquals(subExpected,subFound,1e-10);

@@ -30,11 +30,52 @@ import java.util.Random;
 public class GImageMiscOps {
 
 	/**
-	 * Computes the mean of the absolute value of the difference between the two images.
+	 * Copies a rectangular region from one image into another.<br>
+	 * output[dstX:(dstX+width) , dstY:(dstY+height-1)] = input[srcX:(srcX+width) , srcY:(srcY+height-1)]
 	 *
-	 * @param input Input image. Not modified.
-	 * @param value fill value
+	 * @param srcX x-coordinate of corner in input image
+	 * @param srcY y-coordinate of corner in input image
+	 * @param dstX x-coordinate of corner in output image
+	 * @param dstY y-coordinate of corner in output image
+	 * @param width Width of region to be copied
+	 * @param height Height of region to be copied
+	 * @param input Input image
+	 * @param output output image
 	 */
+	public static void copy( int srcX , int srcY , int dstX , int dstY , int width , int height ,
+							 ImageBase input , ImageBase output ) {
+		if( input instanceof ImageSingleBand ) {
+			if( ImageInt8.class.isAssignableFrom(input.getClass()) ) {
+				ImageMiscOps.copy(srcX, srcY, dstX, dstY, width, height, (ImageInt8) input, (ImageInt8) output);
+			} else if( ImageInt16.class.isAssignableFrom(input.getClass()) ) {
+				ImageMiscOps.copy(srcX, srcY, dstX, dstY, width, height, (ImageInt16) input, (ImageInt16) output);
+			} else if( ImageSInt32.class == input.getClass() ) {
+				ImageMiscOps.copy(srcX, srcY, dstX, dstY, width, height, (ImageSInt32) input, (ImageSInt32) output);
+			} else if( ImageSInt64.class == input.getClass() ) {
+				ImageMiscOps.copy(srcX, srcY, dstX, dstY, width, height, (ImageSInt64) input, (ImageSInt64) output);
+			} else if( ImageFloat32.class == input.getClass() ) {
+				ImageMiscOps.copy(srcX, srcY, dstX, dstY, width, height, (ImageFloat32) input, (ImageFloat32) output);
+			} else if( ImageFloat64.class == input.getClass() ) {
+				ImageMiscOps.copy(srcX, srcY, dstX, dstY, width, height, (ImageFloat64) input, (ImageFloat64) output);
+			} else {
+				throw new IllegalArgumentException("Unknown image Type: "+input.getClass().getSimpleName());
+			}
+		} else if( input instanceof MultiSpectral ) {
+			MultiSpectral mi = (MultiSpectral)input;
+			MultiSpectral mo = (MultiSpectral)output;
+			for( int i = 0; i < mi.getNumBands(); i++ )
+				copy(srcX,srcY,dstX,dstY,width,height,mi.getBand(i),mo.getBand(i));
+		} else {
+			throw new IllegalArgumentException("Unknown image type: " + input.getClass().getSimpleName());
+		}
+	}
+
+		/**
+		 * Computes the mean of the absolute value of the difference between the two images.
+		 *
+		 * @param input Input image. Not modified.
+		 * @param value fill value
+		 */
 	public static void fill( ImageBase input , double value ) {
 		if( input instanceof ImageSingleBand ) {
 			if( ImageInt8.class.isAssignableFrom(input.getClass()) ) {

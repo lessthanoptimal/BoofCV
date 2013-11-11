@@ -39,6 +39,9 @@ Version : Alpha 0.16
   * pixel-wise image-to-image multiplication
   * pixel-wise image-to-image division
   * pixel-wise log(1+x)
+- ImageMiscOps
+  * added copy() for rectangular sub-images
+  * limited support for Interleaved images
 - Removed GeoModelRefine and replaced with ModelFitter
 - Image Types
   * Improved and renamed interleaved image types

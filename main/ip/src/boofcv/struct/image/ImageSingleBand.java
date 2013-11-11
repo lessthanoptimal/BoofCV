@@ -91,14 +91,16 @@ public abstract class ImageSingleBand<T extends ImageSingleBand> extends ImageBa
 	 * When specifying the sub-image, the top-left corner is inclusive and the bottom right corner exclusive.  Thus,
 	 * a sub-image will contain all the original pixels if the following is used: subimage(0,0,width,height).
 	 *
+	 *
 	 * @param x0 x-coordinate of top-left corner of the sub-image, inclusive.
 	 * @param y0 y-coordinate of top-left corner of the sub-image, inclusive.
 	 * @param x1 x-coordinate of bottom-right corner of the sub-image, exclusive.
 	 * @param y1 y-coordinate of bottom-right corner of the sub-image, exclusive.
+	 * @param subimage Optional output for sub-image.  If not null the subimage will be written into this image.
 	 * @return A sub-image of 'this' image.
 	 */
 	@Override
-	public T subimage(int x0, int y0, int x1, int y1) {
+	public T subimage(int x0, int y0, int x1, int y1, T subimage) {
 		if (x0 < 0 || y0 < 0)
 			throw new IllegalArgumentException("x0 or y0 is less than zero");
 		if (x1 < x0 || y1 < y0)
@@ -106,15 +108,18 @@ public abstract class ImageSingleBand<T extends ImageSingleBand> extends ImageBa
 		if (x1 > width || y1 > height)
 			throw new IllegalArgumentException("x1 or y1 is more than the width or height respectively");
 
-		T ret = _createNew(-1, -1);
-		ret._setData(_getData());
-		ret.stride = Math.max(width, stride);
-		ret.width = x1 - x0;
-		ret.height = y1 - y0;
-		ret.startIndex = startIndex + y0 * stride + x0;
-		ret.subImage = true;
+		if( subimage == null ) {
+			subimage = _createNew(-1, -1);
+		}
 
-		return ret;
+		subimage._setData(_getData());
+		subimage.stride = Math.max(width, stride);
+		subimage.width = x1 - x0;
+		subimage.height = y1 - y0;
+		subimage.startIndex = startIndex + y0 * stride + x0;
+		subimage.subImage = true;
+
+		return subimage;
 	}
 
 	/**

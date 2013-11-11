@@ -56,7 +56,7 @@ public abstract class CompareImageBorder extends CompareEquivalentFunctions {
 	}
 	
 	protected ImageSingleBand stripBorder( ImageSingleBand a ) {
-		return a.subimage(kernelRadius,kernelRadius,width+kernelRadius,height+kernelRadius);
+		return a.subimage(kernelRadius,kernelRadius,width+kernelRadius,height+kernelRadius, null);
 	}
 
 	protected Object createKernel(Class kernelType) {

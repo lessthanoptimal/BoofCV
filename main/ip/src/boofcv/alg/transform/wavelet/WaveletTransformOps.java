@@ -120,7 +120,7 @@ public class WaveletTransformOps {
 		UtilWavelet.checkShape(desc.getForward(),input,output,numLevels);
 		storage = InputSanityCheck.checkDeclare(output, storage);
 		// modify the shape of a temporary image not the original
-		storage = storage.subimage(0,0,output.width,output.height);
+		storage = storage.subimage(0,0,output.width,output.height, null);
 		storage.subImage = false;
 
 		transform1(desc,input,output, storage);
@@ -131,8 +131,8 @@ public class WaveletTransformOps {
 			width += width%2;
 			height += height%2;
 
-			input = input.subimage(0,0,width,height);
-			output = output.subimage(0,0,width,height);
+			input = input.subimage(0,0,width,height, null);
+			output = output.subimage(0,0,width,height, null);
 			input.setTo(output);
 
 			// transform the scaling image and save the results in the output image
@@ -213,7 +213,7 @@ public class WaveletTransformOps {
 		UtilWavelet.checkShape(desc.getForward(),output,input,numLevels);
 		storage = InputSanityCheck.checkDeclare(input, storage);
 		// modify the shape of a temporary image not the original
-		storage = storage.subimage(0,0,input.width,input.height);
+		storage = storage.subimage(0,0,input.width,input.height, null);
 		storage.subImage = false;
 
 		int width,height;
@@ -224,8 +224,8 @@ public class WaveletTransformOps {
 		width += width%2;
 		height += height%2;
 
-		ImageFloat32 levelIn = input.subimage(0,0,width,height);
-		ImageFloat32 levelOut = output.subimage(0,0,width,height);
+		ImageFloat32 levelIn = input.subimage(0,0,width,height, null);
+		ImageFloat32 levelOut = output.subimage(0,0,width,height, null);
 		storage.reshape(width,height);
 		inverse1(desc,levelIn,levelOut, storage,-Float.MAX_VALUE,Float.MAX_VALUE);
 
@@ -240,8 +240,8 @@ public class WaveletTransformOps {
 				height += height%2;
 
 				storage.reshape(width,height);
-				levelIn = input.subimage(0,0,width,height);
-				levelOut = output.subimage(0,0,width,height);
+				levelIn = input.subimage(0,0,width,height, null);
+				levelOut = output.subimage(0,0,width,height, null);
 			} else {
 				levelIn = input;
 				levelOut = output;
@@ -321,7 +321,7 @@ public class WaveletTransformOps {
 		UtilWavelet.checkShape(desc.getForward(),input,output,numLevels);
 		storage = InputSanityCheck.checkDeclare(output, storage);
 		// modify the shape of a temporary image not the original
-		storage = storage.subimage(0,0,output.width,output.height);
+		storage = storage.subimage(0,0,output.width,output.height, null);
 		storage.subImage = false;
 
 		transform1(desc,input,output, storage);
@@ -332,8 +332,8 @@ public class WaveletTransformOps {
 			width += width%2;
 			height += height%2;
 
-			input = input.subimage(0,0,width,height);
-			output = output.subimage(0,0,width,height);
+			input = input.subimage(0,0,width,height, null);
+			output = output.subimage(0,0,width,height, null);
 			input.setTo(output);
 
 			// transform the scaling image and save the results in the output image
@@ -414,7 +414,7 @@ public class WaveletTransformOps {
 		UtilWavelet.checkShape(desc.getForward(),output,input,numLevels);
 		storage = InputSanityCheck.checkDeclare(input, storage);
 		// modify the shape of a temporary image not the original
-		storage = storage.subimage(0,0,input.width,input.height);
+		storage = storage.subimage(0,0,input.width,input.height, null);
 		storage.subImage = false;
 
 		int width,height;
@@ -425,8 +425,8 @@ public class WaveletTransformOps {
 		width += width%2;
 		height += height%2;
 
-		ImageSInt32 levelIn = input.subimage(0,0,width,height);
-		ImageSInt32 levelOut = output.subimage(0,0,width,height);
+		ImageSInt32 levelIn = input.subimage(0,0,width,height, null);
+		ImageSInt32 levelOut = output.subimage(0,0,width,height, null);
 		storage.reshape(width,height);
 		inverse1(desc,levelIn,levelOut, storage,Integer.MIN_VALUE,Integer.MAX_VALUE);
 
@@ -441,8 +441,8 @@ public class WaveletTransformOps {
 				height += height%2;
 
 				storage.reshape(width,height);
-				levelIn = input.subimage(0,0,width,height);
-				levelOut = output.subimage(0,0,width,height);
+				levelIn = input.subimage(0,0,width,height, null);
+				levelOut = output.subimage(0,0,width,height, null);
 			} else {
 				levelIn = input;
 				levelOut = output;
