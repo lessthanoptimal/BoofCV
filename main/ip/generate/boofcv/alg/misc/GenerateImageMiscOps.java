@@ -69,6 +69,7 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 			imageType = t;
 			imageName = t.getSingleBandName();
 			dataType = t.getDataType();
+			printCopy();
 			printFill();
 			printFillInterleaved();
 			printFillBorder();
@@ -91,6 +92,39 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 			printAddUniform();
 			printAddGaussian();
 		}
+	}
+
+	public void printCopy() {
+		out.print("\t/**\n" +
+				"\t * Copies a rectangular region from one image into another.<br>\n" +
+				"\t * output[dstX:(dstX+width) , dstY:(dstY+height-1)] = input[srcX:(srcX+width) , srcY:(srcY+height-1)]\n" +
+				"\t *\n" +
+				"\t * @param srcX x-coordinate of corner in input image\n" +
+				"\t * @param srcY y-coordinate of corner in input image\n" +
+				"\t * @param dstX x-coordinate of corner in output image\n" +
+				"\t * @param dstY y-coordinate of corner in output image\n" +
+				"\t * @param width Width of region to be copied\n" +
+				"\t * @param height Height of region to be copied\n" +
+				"\t * @param input Input image\n" +
+				"\t * @param output output image\n" +
+				"\t */\n" +
+				"\tpublic static void copy( int srcX , int srcY , int dstX , int dstY , int width , int height ,\n" +
+				"\t\t\t\t\t\t\t "+imageName+" input , "+imageName+" output ) {\n" +
+				"\n" +
+				"\t\tif( input.width < srcX+width || input.height < srcY+height )\n" +
+				"\t\t\tthrow new IllegalArgumentException(\"Copy region must be contained input image\");\n" +
+				"\t\tif( output.width < dstX+width || output.height < dstY+height )\n" +
+				"\t\t\tthrow new IllegalArgumentException(\"Copy region must be contained output image\");\n" +
+				"\n" +
+				"\t\tfor (int y = 0; y < height; y++) {\n" +
+				"\t\t\tint indexSrc = input.startIndex + (srcY + y) * input.stride + srcX;\n" +
+				"\t\t\tint indexDst = output.startIndex + (dstY + y) * output.stride + dstX;\n" +
+				"\n" +
+				"\t\t\tfor (int x = 0; x < width; x++) {\n" +
+				"\t\t\t\toutput.data[indexDst++] = input.data[indexSrc++];\n" +
+				"\t\t\t}\n" +
+				"\t\t}\n" +
+				"\t}\n\n");
 	}
 
 	public void printFill()

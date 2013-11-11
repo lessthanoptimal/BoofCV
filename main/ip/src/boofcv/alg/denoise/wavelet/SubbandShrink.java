@@ -65,27 +65,27 @@ public abstract class SubbandShrink<I extends ImageSingleBand<I>> implements Den
 			I subband;
 
 			// HL
-			subband = transform.subimage(ww,0,w,hh);
+			subband = transform.subimage(ww,0,w,hh, null);
 			threshold = computeThreshold(subband);
 			rule.process(subband,threshold);
 
 //			System.out.print("HL = "+threshold);
 
 			// LH
-			subband = transform.subimage(0,hh,ww,h);
+			subband = transform.subimage(0,hh,ww,h, null);
 			threshold = computeThreshold(subband);
 			rule.process(subband,threshold);
 
 //			System.out.print("  LH = "+threshold);
 
 			// HH
-			subband = transform.subimage(ww,hh,w,h);
+			subband = transform.subimage(ww,hh,w,h, null);
 			threshold = computeThreshold(subband);
 			rule.process(subband,threshold);
 
 //			System.out.println("  HH = "+threshold);
 
-			transform = transform.subimage(0,0,ww,hh);
+			transform = transform.subimage(0,0,ww,hh, null);
 		}
 
 	}

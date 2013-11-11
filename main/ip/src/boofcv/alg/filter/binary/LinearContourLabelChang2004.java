@@ -87,7 +87,7 @@ public class LinearContourLabelChang2004 {
 			border.reshape(binary.width + 2, binary.height + 2);
 			ImageMiscOps.fillBorder(border, 0, 1);
 		}
-		border.subimage(1,1,border.width-1,border.height-1).setTo(binary);
+		border.subimage(1,1,border.width-1,border.height-1, null).setTo(binary);
 
 		// labeled image must initially be filled with zeros
 		ImageMiscOps.fill(labeled,0);

@@ -30,8 +30,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Random;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 
 /**
@@ -46,7 +45,7 @@ public class TestImageMiscOps {
 
 	@Test
 	public void checkAll() {
-		int numExpected = 8*6 + 8*2;
+		int numExpected = 9*6 + 8*2;
 		Method methods[] = ImageMiscOps.class.getMethods();
 
 		// sanity check to make sure the functions are being found
@@ -56,7 +55,9 @@ public class TestImageMiscOps {
 				continue;
 			try {
 //				System.out.println(m.getName());
-				if( m.getName().compareTo("fill") == 0 ) {
+				if( m.getName().compareTo("copy") == 0 ) {
+					testCopy(m);
+				} else if( m.getName().compareTo("fill") == 0 ) {
 					testFill(m);
 				} else if( m.getName().compareTo("fillBorder") == 0 ) {
 					testFillBorder(m);
@@ -97,6 +98,10 @@ public class TestImageMiscOps {
 			return false;
 
 		return ImageBase.class.isAssignableFrom(param[0]);
+	}
+
+	private void testCopy( Method m ) throws InvocationTargetException, IllegalAccessException {
+		fail("implement");
 	}
 
 	private void testFill( Method m ) throws InvocationTargetException, IllegalAccessException {

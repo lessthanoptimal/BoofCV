@@ -62,7 +62,7 @@ public class WrapRefineCornerCanny
 						cp.x + searchRadius +1,cp.y+ searchRadius +1);
 				BoofMiscOps.boundRectangleInside(image, r);
 
-				ImageFloat32 sub = image.subimage(r.x0,r.y0,r.x1,r.y1);
+				ImageFloat32 sub = image.subimage(r.x0,r.y0,r.x1,r.y1, null);
 
 				alg.process(sub);
 				rp.x = r.x0 + (float)alg.getCorner().x;

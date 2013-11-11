@@ -33,13 +33,15 @@ public class TestGImageMiscOps extends BaseGClassChecksInMisc{
 
 	long randomSeed = 2345;
 
+	Random rand = new Random(234);
+
 	public TestGImageMiscOps() {
 		super(GImageMiscOps.class, ImageMiscOps.class);
 	}
 
 	@Test
 	public void compareToPixelMath() {
-		performTests(8);
+		performTests(9);
 	}
 
 	@Override
@@ -47,16 +49,37 @@ public class TestGImageMiscOps extends BaseGClassChecksInMisc{
 		Class<?> param[] = validation.getParameterTypes();
 		String name = candidate.getName();
 
-		ImageBase inputA;
+		ImageBase inputA = null;
 
-		if( ImageSingleBand.class.isAssignableFrom(param[0]))
-			inputA = GeneralizedImageOps.createSingleBand((Class) param[0], width, height);
-		else
-			inputA = GeneralizedImageOps.createInterleaved((Class) param[0], width, height, numBands);
+		for( int i = 0; i < param.length; i++ ) {
+			if( ImageBase.class.isAssignableFrom(param[i]) ) {
+				if( ImageSingleBand.class.isAssignableFrom(param[i]))
+					inputA = GeneralizedImageOps.createSingleBand((Class) param[i], width, height);
+				else
+					inputA = GeneralizedImageOps.createInterleaved((Class) param[i], width, height, numBands);
+			}
+		}
+		if( inputA == null )
+			throw new RuntimeException("Invalid funciton");
 
 		Object[][] ret = new Object[1][param.length];
 
-		if( name.equals("fill")) {
+		if( name.equals("copy")) {
+			ImageBase inputB = inputA._createNew(width,height);
+
+			GImageMiscOps.fillUniform(inputA,rand,0,10);
+			GImageMiscOps.fillUniform(inputB,rand,0,10);
+
+			ret[0][0] = 10;
+			ret[0][1] = 15;
+			ret[0][2] = 12;
+			ret[0][3] = 8;
+			ret[0][4] = 5;
+			ret[0][5] = 6;
+			ret[0][6] = inputA;
+			ret[0][7] = inputB;
+
+		} else if( name.equals("fill")) {
 			ret[0][0] = inputA;
 			ret[0][1] = 3;
 		} else if( name.equals("fillBorder")) {

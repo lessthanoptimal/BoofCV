@@ -71,7 +71,7 @@ public class TestMultiSpectral {
 		MultiSpectral<ImageUInt8> img = new MultiSpectral<ImageUInt8>(ImageUInt8.class,5, 10, 3);
 		assertFalse(img.isSubimage());
 
-		MultiSpectral<ImageUInt8> sub = img.subimage(2,3,4,6);
+		MultiSpectral<ImageUInt8> sub = img.subimage(2,3,4,6, null);
 		
 		assertEquals(3,sub.getNumBands());
 		assertEquals(2,sub.getWidth());
@@ -100,7 +100,7 @@ public class TestMultiSpectral {
 	@Test
 	public void reshape_subimage() {
 		MultiSpectral<ImageUInt8> img = new MultiSpectral<ImageUInt8>(ImageUInt8.class,5, 10, 3);
-		img = img.subimage(0,0,2,2);
+		img = img.subimage(0,0,2,2, null);
 
 		try {
 			img.reshape(10,20);
@@ -122,7 +122,7 @@ public class TestMultiSpectral {
 
 		// try a sub-image now
 		MultiSpectral<ImageUInt8> c = new MultiSpectral<ImageUInt8>(ImageUInt8.class,20, 20, 3);
-		c = c.subimage(7,8,12,18);
+		c = c.subimage(7,8,12,18, null);
 		c.setTo(a);
 
 		BoofTesting.assertEquals(a,c,1e-8);

@@ -150,27 +150,27 @@ public class DiscreteFourierTransformOps {
 
 			if( forward ) {
 				InterleavedF32 storageTL = new InterleavedF32(hw1,hh1,2);
-				storageTL.setTo(transform.subimage(0, 0, hw1, hh1));
+				storageTL.setTo(transform.subimage(0, 0, hw1, hh1, null));
 
 				InterleavedF32 storageTR = new InterleavedF32(hw,hh1,2);
-				storageTR.setTo(transform.subimage(hw1, 0, w, hh1));
+				storageTR.setTo(transform.subimage(hw1, 0, w, hh1, null));
 
-				transform.subimage(0,0,hw,hh).setTo(transform.subimage(hw1,hh1,w,h));
-				transform.subimage(hw,0,w, hh).setTo(transform.subimage(0,hh1,hw1,h));
-				transform.subimage(hw,hh,w,h).setTo(storageTL);
-				transform.subimage(0,hh,hw,h).setTo(storageTR);
+				transform.subimage(0,0,hw,hh, null).setTo(transform.subimage(hw1,hh1,w,h, null));
+				transform.subimage(hw,0,w, hh, null).setTo(transform.subimage(0,hh1,hw1,h, null));
+				transform.subimage(hw,hh,w,h, null).setTo(storageTL);
+				transform.subimage(0,hh,hw,h, null).setTo(storageTR);
 			} else {
 				InterleavedF32 storageBL = new InterleavedF32(hw,hh1,2);
-				storageBL.setTo(transform.subimage(0, hh, hw, h));
+				storageBL.setTo(transform.subimage(0, hh, hw, h, null));
 
 				InterleavedF32 storageBR = new InterleavedF32(hw1,hh1,2);
-				storageBR.setTo(transform.subimage(hw, hh, w, h));
+				storageBR.setTo(transform.subimage(hw, hh, w, h, null));
 
 
-				transform.subimage(hw1,hh1,w,h).setTo(transform.subimage(0,0,hw,hh));
-				transform.subimage(0,hh1,hw1,h).setTo(transform.subimage(hw,0,w, hh));
-				transform.subimage(hw1,0,w,hh1).setTo(storageBL);
-				transform.subimage(0,0,hw1,hh1).setTo(storageBR);
+				transform.subimage(hw1,hh1,w,h, null).setTo(transform.subimage(0,0,hw,hh, null));
+				transform.subimage(0,hh1,hw1,h, null).setTo(transform.subimage(hw,0,w, hh, null));
+				transform.subimage(hw1,0,w,hh1, null).setTo(storageBL);
+				transform.subimage(0,0,hw1,hh1, null).setTo(storageBR);
 			}
 		}
 	}
@@ -224,27 +224,27 @@ public class DiscreteFourierTransformOps {
 
 			if( forward ) {
 				InterleavedF64 storageTL = new InterleavedF64(hw1,hh1,2);
-				storageTL.setTo(transform.subimage(0, 0, hw1, hh1));
+				storageTL.setTo(transform.subimage(0, 0, hw1, hh1, null));
 
 				InterleavedF64 storageTR = new InterleavedF64(hw,hh1,2);
-				storageTR.setTo(transform.subimage(hw1, 0, w, hh1));
+				storageTR.setTo(transform.subimage(hw1, 0, w, hh1, null));
 
-				transform.subimage(0,0,hw,hh).setTo(transform.subimage(hw1,hh1,w,h));
-				transform.subimage(hw,0,w, hh).setTo(transform.subimage(0,hh1,hw1,h));
-				transform.subimage(hw,hh,w,h).setTo(storageTL);
-				transform.subimage(0,hh,hw,h).setTo(storageTR);
+				transform.subimage(0,0,hw,hh, null).setTo(transform.subimage(hw1,hh1,w,h, null));
+				transform.subimage(hw,0,w, hh, null).setTo(transform.subimage(0,hh1,hw1,h, null));
+				transform.subimage(hw,hh,w,h, null).setTo(storageTL);
+				transform.subimage(0,hh,hw,h, null).setTo(storageTR);
 			} else {
 				InterleavedF64 storageBL = new InterleavedF64(hw,hh1,2);
-				storageBL.setTo(transform.subimage(0, hh, hw, h));
+				storageBL.setTo(transform.subimage(0, hh, hw, h, null));
 
 				InterleavedF64 storageBR = new InterleavedF64(hw1,hh1,2);
-				storageBR.setTo(transform.subimage(hw, hh, w, h));
+				storageBR.setTo(transform.subimage(hw, hh, w, h, null));
 
 
-				transform.subimage(hw1,hh1,w,h).setTo(transform.subimage(0,0,hw,hh));
-				transform.subimage(0,hh1,hw1,h).setTo(transform.subimage(hw,0,w, hh));
-				transform.subimage(hw1,0,w,hh1).setTo(storageBL);
-				transform.subimage(0,0,hw1,hh1).setTo(storageBR);
+				transform.subimage(hw1,hh1,w,h, null).setTo(transform.subimage(0,0,hw,hh, null));
+				transform.subimage(0,hh1,hw1,h, null).setTo(transform.subimage(hw,0,w, hh, null));
+				transform.subimage(hw1,0,w,hh1, null).setTo(storageBL);
+				transform.subimage(0,0,hw1,hh1, null).setTo(storageBR);
 			}
 		}
 	}
@@ -268,7 +268,7 @@ public class DiscreteFourierTransformOps {
 				float real = transform.data[indexTran];
 				float img = transform.data[indexTran+1];
 
-				magnitude.data[indexMag++] = (float)Math.sqrt(real*real + img*img);
+				magnitude.data[indexMag++] = (float)Math.sqrt(real * real + img * img);
 			}
 		}
 	}
@@ -292,7 +292,7 @@ public class DiscreteFourierTransformOps {
 				double real = transform.data[indexTran];
 				double img = transform.data[indexTran+1];
 
-				magnitude.data[indexMag++] = Math.sqrt(real*real + img*img);
+				magnitude.data[indexMag++] = Math.sqrt(real * real + img * img);
 			}
 		}
 	}

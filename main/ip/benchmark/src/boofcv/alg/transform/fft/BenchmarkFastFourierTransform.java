@@ -18,8 +18,48 @@
 
 package boofcv.alg.transform.fft;
 
+import boofcv.abst.transform.fft.DiscreteFourierTransform;
+import boofcv.alg.misc.ImageMiscOps;
+import boofcv.misc.PerformerBase;
+import boofcv.misc.ProfileOperation;
+import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.InterleavedF32;
+
+import java.util.Random;
+
 /**
  * @author Peter Abeles
  */
 public class BenchmarkFastFourierTransform {
+
+	static int width = 640;
+	static int height = 480;
+	static long TEST_TIME = 1000;
+
+	static ImageFloat32 input = new ImageFloat32(width,height);
+	static InterleavedF32 fourier = new InterleavedF32(width,height,2);
+	static ImageFloat32 output = new ImageFloat32(width,height);
+
+
+	public static class ComputeFFT extends PerformerBase {
+
+		DiscreteFourierTransform dft = DiscreteFourierTransformOps.createTransformF32();
+
+		@Override
+		public void process() {
+			dft.forward(input,fourier);
+			dft.inverse(fourier,output);
+		}
+	}
+
+	public static void main( String args[] ) {
+
+		Random rand = new Random(234);
+		ImageMiscOps.fillUniform(input, rand, 0, 100);
+
+		System.out.println("=========  Profile Image Size " + width + " x " + height + " ==========");
+		System.out.println();
+
+		ProfileOperation.printOpsPerSec(new ComputeFFT(), TEST_TIME);
+	}
 }

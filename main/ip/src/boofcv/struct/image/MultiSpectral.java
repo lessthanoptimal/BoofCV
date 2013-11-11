@@ -139,14 +139,16 @@ public class MultiSpectral<T extends ImageSingleBand> extends ImageMultiBand<Mul
 	 * that stores each pixel's value, but will only pertain to an axis-aligned rectangular segment
 	 * of the original.
 	 *
+	 *
 	 * @param x0 x-coordinate of top-left corner of the sub-image.
 	 * @param y0 y-coordinate of top-left corner of the sub-image.
 	 * @param x1 x-coordinate of bottom-right corner of the sub-image.
 	 * @param y1 y-coordinate of bottom-right corner of the sub-image.
+	 * @param subimage
 	 * @return A sub-image of this image.
 	 */
 	@Override
-	public MultiSpectral<T> subimage(int x0, int y0, int x1, int y1) {
+	public MultiSpectral<T> subimage(int x0, int y0, int x1, int y1, MultiSpectral<T> subimage) {
 		if (x0 < 0 || y0 < 0)
 			throw new IllegalArgumentException("x0 or y0 is less than zero");
 		if (x1 < x0 || y1 < y0)
@@ -162,7 +164,7 @@ public class MultiSpectral<T extends ImageSingleBand> extends ImageMultiBand<Mul
 		ret.subImage = true;
 
 		for( int i = 0; i < bands.length; i++ ) {
-			ret.bands[i] = (T)bands[i].subimage(x0,y0,x1,y1);
+			ret.bands[i] = (T)bands[i].subimage(x0,y0,x1,y1, null);
 		}
 		
 		return ret;

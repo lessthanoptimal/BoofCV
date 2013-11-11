@@ -33,6 +33,37 @@ import java.util.Random;
 public class ImageMiscOps {
 
 	/**
+	 * Copies a rectangular region from one image into another.<br>
+	 * output[dstX:(dstX+width) , dstY:(dstY+height-1)] = input[srcX:(srcX+width) , srcY:(srcY+height-1)]
+	 *
+	 * @param srcX x-coordinate of corner in input image
+	 * @param srcY y-coordinate of corner in input image
+	 * @param dstX x-coordinate of corner in output image
+	 * @param dstY y-coordinate of corner in output image
+	 * @param width Width of region to be copied
+	 * @param height Height of region to be copied
+	 * @param input Input image
+	 * @param output output image
+	 */
+	public static void copy( int srcX , int srcY , int dstX , int dstY , int width , int height ,
+							 ImageInt8 input , ImageInt8 output ) {
+
+		if( input.width < srcX+width || input.height < srcY+height )
+			throw new IllegalArgumentException("Copy region must be contained input image");
+		if( output.width < dstX+width || output.height < dstY+height )
+			throw new IllegalArgumentException("Copy region must be contained output image");
+
+		for (int y = 0; y < height; y++) {
+			int indexSrc = input.startIndex + (srcY + y) * input.stride + srcX;
+			int indexDst = output.startIndex + (dstY + y) * output.stride + dstX;
+
+			for (int x = 0; x < width; x++) {
+				output.data[indexDst++] = input.data[indexSrc++];
+			}
+		}
+	}
+
+	/**
 	 * Fills the whole image with the specified value
 	 *
 	 * @param input An image.
@@ -207,6 +238,37 @@ public class ImageMiscOps {
 				int tmp = input.data[index1];
 				input.data[index1++] = input.data[index2];
 				input.data[index2++] = (byte)tmp;
+			}
+		}
+	}
+
+	/**
+	 * Copies a rectangular region from one image into another.<br>
+	 * output[dstX:(dstX+width) , dstY:(dstY+height-1)] = input[srcX:(srcX+width) , srcY:(srcY+height-1)]
+	 *
+	 * @param srcX x-coordinate of corner in input image
+	 * @param srcY y-coordinate of corner in input image
+	 * @param dstX x-coordinate of corner in output image
+	 * @param dstY y-coordinate of corner in output image
+	 * @param width Width of region to be copied
+	 * @param height Height of region to be copied
+	 * @param input Input image
+	 * @param output output image
+	 */
+	public static void copy( int srcX , int srcY , int dstX , int dstY , int width , int height ,
+							 ImageInt16 input , ImageInt16 output ) {
+
+		if( input.width < srcX+width || input.height < srcY+height )
+			throw new IllegalArgumentException("Copy region must be contained input image");
+		if( output.width < dstX+width || output.height < dstY+height )
+			throw new IllegalArgumentException("Copy region must be contained output image");
+
+		for (int y = 0; y < height; y++) {
+			int indexSrc = input.startIndex + (srcY + y) * input.stride + srcX;
+			int indexDst = output.startIndex + (dstY + y) * output.stride + dstX;
+
+			for (int x = 0; x < width; x++) {
+				output.data[indexDst++] = input.data[indexSrc++];
 			}
 		}
 	}
@@ -391,6 +453,37 @@ public class ImageMiscOps {
 	}
 
 	/**
+	 * Copies a rectangular region from one image into another.<br>
+	 * output[dstX:(dstX+width) , dstY:(dstY+height-1)] = input[srcX:(srcX+width) , srcY:(srcY+height-1)]
+	 *
+	 * @param srcX x-coordinate of corner in input image
+	 * @param srcY y-coordinate of corner in input image
+	 * @param dstX x-coordinate of corner in output image
+	 * @param dstY y-coordinate of corner in output image
+	 * @param width Width of region to be copied
+	 * @param height Height of region to be copied
+	 * @param input Input image
+	 * @param output output image
+	 */
+	public static void copy( int srcX , int srcY , int dstX , int dstY , int width , int height ,
+							 ImageSInt32 input , ImageSInt32 output ) {
+
+		if( input.width < srcX+width || input.height < srcY+height )
+			throw new IllegalArgumentException("Copy region must be contained input image");
+		if( output.width < dstX+width || output.height < dstY+height )
+			throw new IllegalArgumentException("Copy region must be contained output image");
+
+		for (int y = 0; y < height; y++) {
+			int indexSrc = input.startIndex + (srcY + y) * input.stride + srcX;
+			int indexDst = output.startIndex + (dstY + y) * output.stride + dstX;
+
+			for (int x = 0; x < width; x++) {
+				output.data[indexDst++] = input.data[indexSrc++];
+			}
+		}
+	}
+
+	/**
 	 * Fills the whole image with the specified value
 	 *
 	 * @param input An image.
@@ -565,6 +658,37 @@ public class ImageMiscOps {
 				int tmp = input.data[index1];
 				input.data[index1++] = input.data[index2];
 				input.data[index2++] = (int)tmp;
+			}
+		}
+	}
+
+	/**
+	 * Copies a rectangular region from one image into another.<br>
+	 * output[dstX:(dstX+width) , dstY:(dstY+height-1)] = input[srcX:(srcX+width) , srcY:(srcY+height-1)]
+	 *
+	 * @param srcX x-coordinate of corner in input image
+	 * @param srcY y-coordinate of corner in input image
+	 * @param dstX x-coordinate of corner in output image
+	 * @param dstY y-coordinate of corner in output image
+	 * @param width Width of region to be copied
+	 * @param height Height of region to be copied
+	 * @param input Input image
+	 * @param output output image
+	 */
+	public static void copy( int srcX , int srcY , int dstX , int dstY , int width , int height ,
+							 ImageSInt64 input , ImageSInt64 output ) {
+
+		if( input.width < srcX+width || input.height < srcY+height )
+			throw new IllegalArgumentException("Copy region must be contained input image");
+		if( output.width < dstX+width || output.height < dstY+height )
+			throw new IllegalArgumentException("Copy region must be contained output image");
+
+		for (int y = 0; y < height; y++) {
+			int indexSrc = input.startIndex + (srcY + y) * input.stride + srcX;
+			int indexDst = output.startIndex + (dstY + y) * output.stride + dstX;
+
+			for (int x = 0; x < width; x++) {
+				output.data[indexDst++] = input.data[indexSrc++];
 			}
 		}
 	}
@@ -749,6 +873,37 @@ public class ImageMiscOps {
 	}
 
 	/**
+	 * Copies a rectangular region from one image into another.<br>
+	 * output[dstX:(dstX+width) , dstY:(dstY+height-1)] = input[srcX:(srcX+width) , srcY:(srcY+height-1)]
+	 *
+	 * @param srcX x-coordinate of corner in input image
+	 * @param srcY y-coordinate of corner in input image
+	 * @param dstX x-coordinate of corner in output image
+	 * @param dstY y-coordinate of corner in output image
+	 * @param width Width of region to be copied
+	 * @param height Height of region to be copied
+	 * @param input Input image
+	 * @param output output image
+	 */
+	public static void copy( int srcX , int srcY , int dstX , int dstY , int width , int height ,
+							 ImageFloat32 input , ImageFloat32 output ) {
+
+		if( input.width < srcX+width || input.height < srcY+height )
+			throw new IllegalArgumentException("Copy region must be contained input image");
+		if( output.width < dstX+width || output.height < dstY+height )
+			throw new IllegalArgumentException("Copy region must be contained output image");
+
+		for (int y = 0; y < height; y++) {
+			int indexSrc = input.startIndex + (srcY + y) * input.stride + srcX;
+			int indexDst = output.startIndex + (dstY + y) * output.stride + dstX;
+
+			for (int x = 0; x < width; x++) {
+				output.data[indexDst++] = input.data[indexSrc++];
+			}
+		}
+	}
+
+	/**
 	 * Fills the whole image with the specified value
 	 *
 	 * @param input An image.
@@ -923,6 +1078,37 @@ public class ImageMiscOps {
 				float tmp = input.data[index1];
 				input.data[index1++] = input.data[index2];
 				input.data[index2++] = (float)tmp;
+			}
+		}
+	}
+
+	/**
+	 * Copies a rectangular region from one image into another.<br>
+	 * output[dstX:(dstX+width) , dstY:(dstY+height-1)] = input[srcX:(srcX+width) , srcY:(srcY+height-1)]
+	 *
+	 * @param srcX x-coordinate of corner in input image
+	 * @param srcY y-coordinate of corner in input image
+	 * @param dstX x-coordinate of corner in output image
+	 * @param dstY y-coordinate of corner in output image
+	 * @param width Width of region to be copied
+	 * @param height Height of region to be copied
+	 * @param input Input image
+	 * @param output output image
+	 */
+	public static void copy( int srcX , int srcY , int dstX , int dstY , int width , int height ,
+							 ImageFloat64 input , ImageFloat64 output ) {
+
+		if( input.width < srcX+width || input.height < srcY+height )
+			throw new IllegalArgumentException("Copy region must be contained input image");
+		if( output.width < dstX+width || output.height < dstY+height )
+			throw new IllegalArgumentException("Copy region must be contained output image");
+
+		for (int y = 0; y < height; y++) {
+			int indexSrc = input.startIndex + (srcY + y) * input.stride + srcX;
+			int indexDst = output.startIndex + (dstY + y) * output.stride + dstX;
+
+			for (int x = 0; x < width; x++) {
+				output.data[indexDst++] = input.data[indexSrc++];
 			}
 		}
 	}

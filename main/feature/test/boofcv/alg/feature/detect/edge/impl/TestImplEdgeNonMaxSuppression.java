@@ -143,8 +143,8 @@ public class TestImplEdgeNonMaxSuppression {
 		ImplEdgeNonMaxSuppression.inner4(intensity,direction,found);
 
 		// just test the inside border
-		BoofTesting.assertEquals(expected.subimage(1,1,width-1,height-1),
-				found.subimage(1,1,width-1,height-1), 1e-4);
+		BoofTesting.assertEquals(expected.subimage(1,1,width-1,height-1, null),
+				found.subimage(1,1,width-1,height-1, null), 1e-4);
 	}
 
 	@Test
@@ -165,8 +165,8 @@ public class TestImplEdgeNonMaxSuppression {
 		ImplEdgeNonMaxSuppression.inner8(intensity,direction,found);
 
 		// just test the inside border
-		BoofTesting.assertEquals(expected.subimage(1,1,width-1,height-1),
-				found.subimage(1,1,width-1,height-1), 1e-4);
+		BoofTesting.assertEquals(expected.subimage(1,1,width-1,height-1, null),
+				found.subimage(1,1,width-1,height-1, null), 1e-4);
 	}
 
 	@Test

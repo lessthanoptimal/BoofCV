@@ -161,7 +161,7 @@ public abstract class GeneralTemplateMatchTests<T extends ImageSingleBand> {
 		int y0 = alg.getOffsetY();
 		int y1 = image.height - (template.height - x0);
 
-		ImageFloat32 adjusted = alg.getIntensity().subimage(x0, y0, x1, y1);
+		ImageFloat32 adjusted = alg.getIntensity().subimage(x0, y0, x1, y1, null);
 
 		// solutions should be local maximums
 		NonMaxSuppression extractor = FactoryFeatureExtractor.nonmax(new ConfigExtract(2, -Float.MAX_VALUE, 0, true));
@@ -186,6 +186,6 @@ public abstract class GeneralTemplateMatchTests<T extends ImageSingleBand> {
 	}
 
 	private void setTemplate(int x, int y) {
-		image.subimage(x, y, x + template.width, y + template.height).setTo(template);
+		image.subimage(x, y, x + template.width, y + template.height, null).setTo(template);
 	}
 }

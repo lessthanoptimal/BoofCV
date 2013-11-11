@@ -228,7 +228,7 @@ public class TestContourTracer {
 			for( int x = 0; x < input.width-pattern.width+1; x++ ) {
 				// paste the pattern in to the larger image
 				ImageMiscOps.fill(input,0);
-				ImageUInt8 sub = input.subimage(x,y,x+pattern.width,y+pattern.height);
+				ImageUInt8 sub = input.subimage(x,y,x+pattern.width,y+pattern.height, null);
 				sub.setTo(pattern);
 
 				// reset other data structures
@@ -263,7 +263,7 @@ public class TestContourTracer {
 
 	private ImageUInt8 addBorder( ImageUInt8 original ) {
 		ImageUInt8 border = new ImageUInt8(original.width+2,original.height+2);
-		border.subimage(1,1,border.width-1,border.height-1).setTo(original);
+		border.subimage(1,1,border.width-1,border.height-1, null).setTo(original);
 		ImageMiscOps.fillBorder(border,0,1);
 		return border;
 	}

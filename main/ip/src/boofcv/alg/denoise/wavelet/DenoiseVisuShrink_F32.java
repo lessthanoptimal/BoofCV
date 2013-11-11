@@ -59,12 +59,12 @@ public class DenoiseVisuShrink_F32 implements DenoiseWavelet<ImageFloat32> {
 		final int innerWidth = w/scale;
 		final int innerHeight = h/scale;
 
-		ImageFloat32 subbandHH = transform.subimage(w/2,h/2,w,h);
+		ImageFloat32 subbandHH = transform.subimage(w/2,h/2,w,h, null);
 		float sigma = UtilDenoiseWavelet.estimateNoiseStdDev(subbandHH,null);
 		float threshold = (float) UtilDenoiseWavelet.universalThreshold(subbandHH,sigma);
 
 		// apply same threshold to all wavelet coefficients
-		rule.process(transform.subimage(innerWidth,0,w,h),threshold);
-		rule.process(transform.subimage(0,innerHeight,innerWidth,h),threshold);
+		rule.process(transform.subimage(innerWidth,0,w,h, null),threshold);
+		rule.process(transform.subimage(0,innerHeight,innerWidth,h, null),threshold);
 	}
 }

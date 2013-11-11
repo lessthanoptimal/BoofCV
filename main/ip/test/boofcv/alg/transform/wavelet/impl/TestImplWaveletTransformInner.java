@@ -102,8 +102,8 @@ public class TestImplWaveletTransformInner extends CompareToNaiveWavelet {
 //				System.out.print("lb "+lowerBorder+" ub "+upperBorder);
 
 				// only compare the relevant portion of the images
-				expected = expected.subimage(lowerBorder,0,w+w%2-upperBorder,h);
-				found = found.subimage(lowerBorder,0,w+w%2-upperBorder,h);
+				expected = expected.subimage(lowerBorder,0,w+w%2-upperBorder,h, null);
+				found = found.subimage(lowerBorder,0,w+w%2-upperBorder,h, null);
 				BoofTesting.assertEquals(expected, found, 1e-4f);
 			}
 		};
@@ -123,8 +123,8 @@ public class TestImplWaveletTransformInner extends CompareToNaiveWavelet {
 				int h = expected.getWidth();
 
 				// only compare the relevant portion of the images
-				expected = expected.subimage(0,lowerBorder,w,h+h%2-upperBorder);
-				found = found.subimage(0,lowerBorder,w,h+h%2-upperBorder);
+				expected = expected.subimage(0,lowerBorder,w,h+h%2-upperBorder, null);
+				found = found.subimage(0,lowerBorder,w,h+h%2-upperBorder, null);
 
 				BoofTesting.assertEquals(expected, found, 1e-4f);
 			}
@@ -146,8 +146,8 @@ public class TestImplWaveletTransformInner extends CompareToNaiveWavelet {
 		int lowerBorder = UtilWavelet.borderForwardLower(desc.getInverse().getInnerCoefficients());
 		int upperBorder = input.width-UtilWavelet.borderForwardUpper(desc.getInverse().getInnerCoefficients(),input.width);
 
-		equalsTranHorizontal(expected.subimage(0,0,w/2,h),found.subimage(0,0,w/2,h),lowerBorder/2,upperBorder/2,"left");
-		equalsTranHorizontal(expected.subimage(w/2,0,w,h),found.subimage(w/2,0,w,h),lowerBorder/2,upperBorder/2,"right");
+		equalsTranHorizontal(expected.subimage(0,0,w/2,h, null),found.subimage(0,0,w/2,h, null),lowerBorder/2,upperBorder/2,"left");
+		equalsTranHorizontal(expected.subimage(w/2,0,w,h, null),found.subimage(w/2,0,w,h, null),lowerBorder/2,upperBorder/2,"right");
 	}
 
 	/**
@@ -181,8 +181,8 @@ public class TestImplWaveletTransformInner extends CompareToNaiveWavelet {
 		int lowerBorder = UtilWavelet.borderForwardLower(desc.getInverse().getInnerCoefficients());
 		int upperBorder = input.height-UtilWavelet.borderForwardUpper(desc.getInverse().getInnerCoefficients(),input.height);
 
-		equalsTranVertical(expected.subimage(0,0,w,h/2),found.subimage(0,0,w,h/2),lowerBorder/2,upperBorder/2,"top");
-		equalsTranVertical(expected.subimage(0,h/2,w,h),found.subimage(0,h/2,w,h),lowerBorder/2,upperBorder/2,"bottom");
+		equalsTranVertical(expected.subimage(0,0,w,h/2, null),found.subimage(0,0,w,h/2, null),lowerBorder/2,upperBorder/2,"top");
+		equalsTranVertical(expected.subimage(0,h/2,w,h, null),found.subimage(0,h/2,w,h, null),lowerBorder/2,upperBorder/2,"bottom");
 	}
 
 	private void equalsTranVertical( ImageSingleBand expected , ImageSingleBand found ,

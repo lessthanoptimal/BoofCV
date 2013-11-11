@@ -255,7 +255,7 @@ public class TestBinaryNaiveOps {
 
 		// check it against sub-images
 		ImageUInt8 temp = new ImageUInt8(3 + output.width, 4 + output.height);
-		temp = temp.subimage(0, 0, output.width, output.height);
+		temp = temp.subimage(0, 0, output.width, output.height, null);
 		temp.setTo(input);
 
 		output = createOutput(methodName, temp);
@@ -271,7 +271,7 @@ public class TestBinaryNaiveOps {
 
 		// check it against sub-images
 		ImageUInt8 temp = new ImageUInt8(3 + output.width, 4 + output.height);
-		temp = temp.subimage(0, 0, output.width, output.height);
+		temp = temp.subimage(0, 0, output.width, output.height, null);
 		temp.setTo(input);
 
 		output = createOutput(methodName, temp);

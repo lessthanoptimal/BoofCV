@@ -72,7 +72,7 @@ public class TestImageBase {
 	{
 
 		@Override
-		public ImageBase subimage(int x0, int y0, int x1, int y1) {return null;}
+		public ImageBase subimage(int x0, int y0, int x1, int y1, ImageBase subimage) {return null;}
 
 		@Override
 		public void reshape(int width, int height) {}

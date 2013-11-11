@@ -51,7 +51,7 @@ public class TestImageSingleBand {
 
 		// should throw an exception if a sub-image is reshaped
 		try {
-			a.subimage(1,2,1,2).reshape(100,200);
+			a.subimage(1,2,1,2, null).reshape(100,200);
 
 			fail("should have thrown an exception");
 		} catch( IllegalArgumentException e ) {}
@@ -72,7 +72,7 @@ public class TestImageSingleBand {
 
 		// test it against a submatrix
 		DummyImage c = new DummyImage(20, 20);
-		c = c.subimage(10, 0, 20, 20);
+		c = c.subimage(10, 0, 20, 20, null);
 		c.setTo(a);
 		assertEquals(0, c.data[5]);
 		assertEquals(6, c.data[15]);
@@ -106,7 +106,7 @@ public class TestImageSingleBand {
 
 	@Test
 	public void subimage() {
-		DummyImage a = new DummyImage(10, 20).subimage(2, 3, 8, 10);
+		DummyImage a = new DummyImage(10, 20).subimage(2, 3, 8, 10, null);
 
 		assertTrue(a.subImage);
 		assertEquals(10 * 20, a.data.length);

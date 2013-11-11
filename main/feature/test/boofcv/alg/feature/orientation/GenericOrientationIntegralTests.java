@@ -153,7 +153,7 @@ public class GenericOrientationIntegralTests<T extends ImageSingleBand> {
 		}
 
 
-		T sub = (T)ii.subimage(0,0,regionSize,regionSize);
+		T sub = (T)ii.subimage(0,0,regionSize,regionSize, null);
 
 		alg.setImage(sub);
 		alg.setScale(1);

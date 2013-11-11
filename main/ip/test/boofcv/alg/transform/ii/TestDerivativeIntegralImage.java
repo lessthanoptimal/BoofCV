@@ -189,8 +189,8 @@ public class TestDerivativeIntegralImage {
 			DerivativeIntegralImage.derivXX(integral,found,size);
 
 			int r = size/2;
-			ImageFloat32 a = expected.subimage(r+1,r+1,expected.width-r,expected.height-r);
-			ImageFloat32 b = found.subimage(r+1,r+1,found.width-r,found.height-r);
+			ImageFloat32 a = expected.subimage(r+1,r+1,expected.width-r,expected.height-r, null);
+			ImageFloat32 b = found.subimage(r+1,r+1,found.width-r,found.height-r, null);
 
 			BoofTesting.assertEquals(a,b,1e-2);
 		}
@@ -244,8 +244,8 @@ public class TestDerivativeIntegralImage {
 			DerivativeIntegralImage.derivYY(integral,found,size);
 
 			int r = size/2;
-			ImageFloat32 a = expected.subimage(r+1,r+1,expected.width-r,expected.height-r);
-			ImageFloat32 b = found.subimage(r+1,r+1,found.width-r,found.height-r);
+			ImageFloat32 a = expected.subimage(r+1,r+1,expected.width-r,expected.height-r, null);
+			ImageFloat32 b = found.subimage(r+1,r+1,found.width-r,found.height-r, null);
 
 			BoofTesting.assertEquals(a,b,1e-2);
 		}
@@ -297,8 +297,8 @@ public class TestDerivativeIntegralImage {
 			DerivativeIntegralImage.derivXY(integral,found,size);
 
 			int r = size/2;
-			ImageFloat32 a = expected.subimage(r+1,r+1,expected.width-r,expected.height-r);
-			ImageFloat32 b = found.subimage(r+1,r+1,found.width-r,found.height-r);
+			ImageFloat32 a = expected.subimage(r+1,r+1,expected.width-r,expected.height-r, null);
+			ImageFloat32 b = found.subimage(r+1,r+1,found.width-r,found.height-r, null);
 
 			BoofTesting.assertEquals(a,b,1e-2);
 		}

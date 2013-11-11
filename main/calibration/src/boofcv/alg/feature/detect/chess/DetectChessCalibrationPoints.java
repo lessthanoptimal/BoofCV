@@ -173,7 +173,7 @@ public class DetectChessCalibrationPoints<T extends ImageSingleBand, D extends I
 		// rectangle that contains the area of interest
 		targetRect = findBound.getBoundRect();
 
-		T subGray = (T) gray.subimage(targetRect.x0, targetRect.y0, targetRect.x1, targetRect.y1);
+		T subGray = (T) gray.subimage(targetRect.x0, targetRect.y0, targetRect.x1, targetRect.y1, null);
 		derivX.reshape(subGray.width, subGray.height);
 		derivY.reshape(subGray.width, subGray.height);
 
@@ -289,11 +289,11 @@ public class DetectChessCalibrationPoints<T extends ImageSingleBand, D extends I
 
 		// create sub-images for processing.  recompute threshold just around the area of interest and
 		// only look for the target inside that
-		T subGray = (T)gray.subimage(expanded.x0,expanded.y0,expanded.x1,expanded.y1);
+		T subGray = (T)gray.subimage(expanded.x0,expanded.y0,expanded.x1,expanded.y1, null);
 		actualBinaryThreshold = UtilCalibrationGrid.selectThreshold(subGray,histogram);
 
 		GImageMiscOps.fill(binary,0);
-		ImageUInt8 subBinary = (ImageUInt8)binary.subimage(expanded.x0,expanded.y0,expanded.x1,expanded.y1);
+		ImageUInt8 subBinary = (ImageUInt8)binary.subimage(expanded.x0,expanded.y0,expanded.x1,expanded.y1, null);
 		GThresholdImageOps.threshold(subGray, subBinary, actualBinaryThreshold, true);
 
 		// The new threshold tends to require two erodes
@@ -452,7 +452,7 @@ public class DetectChessCalibrationPoints<T extends ImageSingleBand, D extends I
 			ImageMiscOps.fill(wholeImage,0);
 		} else {
 			ImageFloat32 found = intensityAlg.getIntensity();
-			ImageFloat32 out = wholeImage.subimage(targetRect.x0, targetRect.y0, targetRect.x1, targetRect.y1);
+			ImageFloat32 out = wholeImage.subimage(targetRect.x0, targetRect.y0, targetRect.x1, targetRect.y1, null);
 			out.setTo(found);
 		}
 	}

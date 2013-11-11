@@ -51,7 +51,7 @@ public abstract class ImageBase<T extends ImageBase> implements Serializable, Cl
 	 */
 	public boolean subImage = false;
 
-	public abstract T subimage(int x0, int y0, int x1, int y1);
+	public abstract T subimage(int x0, int y0, int x1, int y1, T subimage);
 
 	public abstract void reshape(int width, int height);
 
