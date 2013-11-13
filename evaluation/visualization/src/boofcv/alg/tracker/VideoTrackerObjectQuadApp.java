@@ -123,11 +123,11 @@ public class VideoTrackerObjectQuadApp<I extends ImageSingleBand>
 					MeanShiftLikelihoodType.HISTOGRAM, imageType);
 		else if( whichAlg == 4 ) {
 			ConfigComaniciu2003 config = new ConfigComaniciu2003(imageType);
-			config.constantScale = false;
+			config.scaleChange = 0.05f;
 			tracker = FactoryTrackerObjectQuad.meanShiftComaniciu2003(config);
 		} else if( whichAlg == 5 ) {
 			ConfigComaniciu2003 config = new ConfigComaniciu2003(imageType);
-			config.constantScale = true;
+			config.scaleChange = 0;
 			tracker = FactoryTrackerObjectQuad.meanShiftComaniciu2003(config);
 		} else
 			throw new RuntimeException("Unknown algorithm");

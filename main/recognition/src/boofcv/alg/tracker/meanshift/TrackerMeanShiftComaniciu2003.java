@@ -59,6 +59,8 @@ public class TrackerMeanShiftComaniciu2003<T extends ImageMultiBand> {
 	protected float keyHistogram[];
 	// weight each element contributes
 	protected float weightHistogram[];
+	// the amount the scale can change
+	protected float scaleChange;
 
 	// most recently select target region
 	private RectangleRotate_F32 region = new RectangleRotate_F32();
@@ -99,7 +101,8 @@ public class TrackerMeanShiftComaniciu2003<T extends ImageMultiBand> {
 	 * @param gamma Scale weighting factor.  Value from 0 to 1. Closer to 0 the more it will prefer
 	 *              the most recent estimate.  Try 0.1
 	 * @param minimumSizeRatio Fraction of the original region that the track is allowed to shrink to.  Try 0.25
-	 * @param constantScale If true it will assume the scale is known.  If false it will estimate the change in scale.
+	 * @param scaleChange The scale can be changed by this much between frames.  0 to 1.  0 = no scale change. 0.1 is
+	 *                    recommended value in paper.  no scale change is more stable.
 	 * @param calcHistogram Calculates the histogram
 	 */
 	public TrackerMeanShiftComaniciu2003(boolean updateHistogram,
@@ -107,13 +110,17 @@ public class TrackerMeanShiftComaniciu2003<T extends ImageMultiBand> {
 										 float minimumChange,
 										 float gamma ,
 										 float minimumSizeRatio ,
-										 boolean constantScale,
+										 float scaleChange,
 										 LocalWeightedHistogramRotRect<T> calcHistogram) {
+		if( scaleChange < 0 || scaleChange > 1 )
+			throw new IllegalArgumentException("Scale change must be >= 0 and <= 1");
+
 		this.updateHistogram = updateHistogram;
 		this.maxIterations = maxIterations;
 		this.minimumChange = minimumChange;
 		this.gamma = gamma;
-		this.constantScale = constantScale;
+		this.scaleChange = scaleChange;
+		this.constantScale = scaleChange == 0;
 		this.minimumSizeRatio = minimumSizeRatio;
 		this.calcHistogram = calcHistogram;
 
@@ -149,11 +156,11 @@ public class TrackerMeanShiftComaniciu2003<T extends ImageMultiBand> {
 		region1.set( region );
 		region2.set( region );
 
-		region0.width  *= 0.9;
-		region0.height *= 0.9;
+		region0.width  *= 1-scaleChange;
+		region0.height *= 1-scaleChange;
 
-		region2.width  *= 1.1;
-		region2.height *= 1.1;
+		region2.width  *= 1+scaleChange;
+		region2.height *= 1+scaleChange;
 
 		// distance from histogram
 		double distance0=1,distance1,distance2=1;

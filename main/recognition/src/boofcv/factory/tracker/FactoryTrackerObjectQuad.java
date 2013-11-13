@@ -138,7 +138,7 @@ public class FactoryTrackerObjectQuad {
 						config.imageType.getNumBands(),config.maxPixelValue,interp);
 		TrackerMeanShiftComaniciu2003<T> alg = new TrackerMeanShiftComaniciu2003<T>(
 				config.updateHistogram,config.meanShiftMaxIterations,config.meanShiftMinimumChange,
-				config.scaleWeight,config.minimumSizeRatio,config.constantScale,hist);
+				config.scaleWeight,config.minimumSizeRatio,config.scaleChange,hist);
 
 		return new Comaniciu2003_to_TrackObjectQuad<T>(alg,config.imageType);
 	}
