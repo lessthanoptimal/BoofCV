@@ -64,13 +64,13 @@ public class ConfigComaniciu2003<T extends ImageMultiBand> {
 	 */
 	public float scaleWeight = 0.1f;
 	/**
-	 * True it will assume the scale is known.  If false it will estimate gradual changes in scale.  By default
-	 * it is set to true.
+	 * Specifies how much it will scale the region up and down by when testing for a scale change.  Allowed
+	 * values are from 0 to 1, inclusive.  0 means no scale change and 1 is 100% increase and decrease.
 	 *
-	 * Can run 3x faster if it doesn't need to estimate the scale and in some applications, when the scale
-	 * is constant, will be more robust.
+	 * If no scale change is considered it can run 3x faster. If the target doesn't change scale then the tracker
+	 * is much more robust.  The paper recommends 0.1.  By default scale change is set to 0.
 	 */
-	public boolean constantScale = true;
+	public float scaleChange = 0;
 
 	/**
 	 * The scale is allowed to be reduced by this much from the original region which is selected.  Default
