@@ -30,6 +30,11 @@ import georegression.struct.shapes.Rectangle2D_I32;
  *
  * TODO write
  *
+ * <p>
+ * NOTE: To avoid overflow it is recommended that image pixels have values from 0 to 1.  Sum of pixel square of
+ * every pixel in the image is computed.
+ * </p>
+ *
  * @author Peter Abeles
  */
 public class CirculantTracker {
@@ -46,17 +51,20 @@ public class CirculantTracker {
 	// linear interpolation term.  Adjusts how fast it can learn
 	private float interp_factor;
 
+	// the maximum pixel value
+	private float maxPixelValue;
+
 	//----- Internal variables
 	// computes the FFT
 	private DiscreteFourierTransform<ImageFloat32,InterleavedF32> fft = DiscreteFourierTransformOps.createTransformF32();
 
 	// storage for subimage of input image
-	private ImageFloat32 subInput = new ImageFloat32();
+	private ImageFloat32 subInput = new ImageFloat32(1,1);
 	// storage for the subimage of the previous frame
-	private ImageFloat32 subPrev = new ImageFloat32();
+	private ImageFloat32 subPrev = new ImageFloat32(1,1);
 
 	// cosine window used to reduce artifacts from FFT
-	private ImageFloat32 cosine = new ImageFloat32(1,1);
+	protected ImageFloat32 cosine = new ImageFloat32(1,1);
 
 	// Storage for the kernel's response
 	private ImageFloat32 k = new ImageFloat32(1,1);
@@ -69,14 +77,15 @@ public class CirculantTracker {
 	private InterleavedF32 newAlphaf = new InterleavedF32(1,1,2);
 
 	// location of target
-	private Rectangle2D_I32 region = new Rectangle2D_I32();
+	protected Rectangle2D_I32 region = new Rectangle2D_I32();
 
 	// Used for computing the gaussian kernel
-	private ImageFloat32 gaussianWeight = new ImageFloat32(1,1);
-	private InterleavedF32 gaussianWeightDFT = new InterleavedF32(1,1,2);
+	protected ImageFloat32 gaussianWeight = new ImageFloat32(1,1);
+	protected InterleavedF32 gaussianWeightDFT = new InterleavedF32(1,1,2);
 
 	// storage for storing temporary results
 	private ImageFloat32 tmpReal0 = new ImageFloat32(1,1);
+	private ImageFloat32 tmpReal1 = new ImageFloat32(1,1);
 
 	private InterleavedF32 tmpFourier0 = new InterleavedF32(1,1,2);
 	private InterleavedF32 tmpFourier1 = new InterleavedF32(1,1,2);
@@ -89,11 +98,13 @@ public class CirculantTracker {
 	 * @param lambda Try 1e-2f
 	 * @param interp_factor Try 0.075f
 	 */
-	public CirculantTracker(double output_sigma_factor, float sigma, float lambda, float interp_factor) {
+	public CirculantTracker(double output_sigma_factor, float sigma, float lambda, float interp_factor,
+							float maxPixelValue) {
 		this.output_sigma_factor = output_sigma_factor;
 		this.sigma = sigma;
 		this.lambda = lambda;
 		this.interp_factor = interp_factor;
+		this.maxPixelValue = maxPixelValue;
 	}
 
 	/**
@@ -112,18 +123,20 @@ public class CirculantTracker {
 		this.region.tl_x = x0;
 		this.region.tl_y = y0;
 
+		ensureInBounds(region,image.width,image.height);
+
 		initializeData(image);
-		initialLearning(image,x0,y0);
+		initialLearning(image,region.tl_x,region.tl_y);
 	}
 
 	/**
 	 * Declare and compute various data structures
 	 */
-	private void initializeData(ImageFloat32 image ) {
+	protected void initializeData(ImageFloat32 image ) {
 		boolean sizeChange = cosine.width != region.width || cosine.height != region.height;
 		if( sizeChange ) {
-			if( region.width >= image.width || region.height >= image.height )
-				throw new IllegalArgumentException("Bad");
+			if( region.width > image.width || region.height > image.height )
+				throw new IllegalArgumentException("Specified target is larger than the input image!");
 			resizeImages(region.width, region.height);
 			computeCosineWindow(cosine);
 			computeGaussianWeights();
@@ -133,7 +146,7 @@ public class CirculantTracker {
 	/**
 	 * Learn the target's appearance.
 	 */
-	private void initialLearning( ImageFloat32 image , int x0 , int y0 ) {
+	protected void initialLearning( ImageFloat32 image , int x0 , int y0 ) {
 		// get subwindow at current estimated target position, to train classifer
 		get_subwindow(image, x0, y0, subInput);
 		
@@ -143,7 +156,8 @@ public class CirculantTracker {
 		fft.forward(k, kf);
 
 		// new_alphaf = yf ./ (fft2(k) + lambda);   %(Eq. 7)
-		computeAlphas(gaussianWeightDFT, kf, lambda, alpha, alphaf);
+		computeAlphas(gaussianWeightDFT, kf, lambda, alphaf);
+		fft.inverse(alphaf,alpha);
 
 		ImageFloat32 tmp = subInput;
 		subInput = subPrev;
@@ -156,13 +170,13 @@ public class CirculantTracker {
 	protected static void computeCosineWindow( ImageFloat32 cosine ) {
 		double cosX[] = new double[ cosine.width ];
 		for( int x = 0; x < cosine.width; x++ ) {
-			cosX[x] = Math.cos( Math.PI*x/(cosine.width-1) );
+			cosX[x] = 0.5*(1 - Math.cos( 2.0*Math.PI*x/(cosine.width-1) ));
 		}
 		for( int y = 0; y < cosine.height; y++ ) {
 			int index = cosine.startIndex + y*cosine.stride;
-			double cosY = Math.cos( Math.PI*y/(cosine.height-1) );
+			double cosY = 0.5*(1 - Math.cos( 2.0*Math.PI*y/(cosine.height-1) ));
 			for( int x = 0; x < cosine.width; x++ ) {
-				cosine.data[index++] = (float)Math.cos(cosX[x]*cosY);
+				cosine.data[index++] = (float)(cosX[x]*cosY);
 			}
 		}
 	}
@@ -170,19 +184,22 @@ public class CirculantTracker {
 	/**
 	 * Computes the weights used in the gaussian kernel
 	 */
-	private void computeGaussianWeights() {
+	protected void computeGaussianWeights() {
 		// desired output (gaussian shaped), bandwidth proportional to target size
 		double output_sigma = (float)(Math.sqrt(region.width*region.height) * output_sigma_factor);
 
 		double left = -0.5/(output_sigma*output_sigma);
 
+		double radiusX = (gaussianWeight.width-1)/2.0;
+		double radiusY = (gaussianWeight.height-1)/2.0;
+
 		for( int y = 0; y < gaussianWeight.height; y++ ) {
 			int index = gaussianWeight.startIndex + y*gaussianWeight.stride;
 
-			int ry = y-gaussianWeight.height/2;
+			double ry = y-radiusY;
 
 			for( int x = 0; x < gaussianWeight.width; x++ ) {
-				int rx = x-gaussianWeight.width/2;
+				double rx = x-radiusX;
 
 				gaussianWeight.data[index++] = (float)Math.exp(left * (ry * ry + rx * rx));
 			}
@@ -202,6 +219,7 @@ public class CirculantTracker {
 		newAlpha.reshape(width,height);
 		newAlphaf.reshape(width,height);
 		tmpReal0.reshape(width,height);
+		tmpReal1.reshape(width,height);
 		tmpFourier0.reshape(width,height);
 		tmpFourier1.reshape(width,height);
 		tmpFourier2.reshape(width,height);
@@ -250,9 +268,11 @@ public class CirculantTracker {
 		int cx = indexBest % tmpReal0.width;
 		int cy = indexBest / tmpReal0.width;
 
-		// compute peak in original image coordinate sytem
+		// convert peak location into image coordinate system
 		region.tl_x = (region.tl_x+cx) - subInput.width/2;
 		region.tl_y = (region.tl_y+cy) - subInput.height/2;
+
+		ensureInBounds(region,image.width,image.height);
 	}
 
 	/**
@@ -268,7 +288,8 @@ public class CirculantTracker {
 		fft.forward(k,kf);
 
 		// new_alphaf = yf ./ (fft2(k) + lambda);   %(Eq. 7)
-		computeAlphas(gaussianWeightDFT, kf, lambda, newAlpha, newAlphaf);
+		computeAlphas(gaussianWeightDFT, kf, lambda, newAlphaf);
+		fft.inverse(newAlphaf,newAlpha);
 
 		// subsequent frames, interpolate model
 		// alphaf = (1 - interp_factor) * alphaf + interp_factor * new_alphaf;
@@ -295,7 +316,7 @@ public class CirculantTracker {
 	 * @param sigma Gaussian kernel bandwidth
 	 * @param x Input image
 	 * @param y Input image
-	 * @param k Output
+	 * @param k Output containing Gaussian kernel for each element in target region
 	 */
 	public void dense_gauss_kernel( float sigma , ImageFloat32 x , ImageFloat32 y , ImageFloat32 k ) {
 
@@ -318,13 +339,31 @@ public class CirculantTracker {
 			yy = xx;
 		}
 
+		//----   xy = invF[ F(x)*F(y) ]
 		// cross-correlation term in Fourier domain
 		elementMultConjB(xf,yf,xyf);
 		// convert to spatial domain
 		fft.inverse(xyf,xy);
+		circshift(xy,tmpReal1);
 
 		// calculate gaussian response for all positions
-		gaussianKernel(xx,yy,xy,sigma,k);
+		gaussianKernel(xx, yy, tmpReal1, sigma, k);
+	}
+
+	public static void circshift( ImageFloat32 a, ImageFloat32 b ) {
+		int w2 = a.width/2;
+		int h2 = b.height/2;
+
+		for( int y = 0; y < a.height; y++ ) {
+			int yy = (y+h2)%a.height;
+
+			for( int x = 0; x < a.width; x++ ) {
+				int xx = (x+w2)%a.width;
+
+				b.set( xx , yy , a.get(x,y));
+			}
+		}
+
 	}
 
 	/**
@@ -334,13 +373,10 @@ public class CirculantTracker {
 
 		float total = 0;
 
-		for( int y = 0; y < a.height; y++ ) {
-			int indexA = a.startIndex + y*a.stride;
-
-			for( int x = 0; x < a.width; x++ ) {
-				float value = a.data[indexA];
-				total += value*value;
-			}
+		int N = a.width*a.height;
+		for( int index = 0; index < N; index++ ) {
+			float value = a.data[index];
+			total += value*value;
 		}
 
 		return total;
@@ -362,7 +398,7 @@ public class CirculantTracker {
 				float imgB = b.data[index+1];
 
 				output.data[index] = realA*realB + imgA*imgB;
-				output.data[index+1] = realA*imgB - imgA*realB;
+				output.data[index+1] = -realA*imgB + imgA*realB;
 			}
 		}
 	}
@@ -370,19 +406,19 @@ public class CirculantTracker {
 	/**
 	 * new_alphaf = yf ./ (fft2(k) + lambda);   %(Eq. 7)
 	 */
-	public void computeAlphas( InterleavedF32 yf , InterleavedF32 kf , float lambda ,
-							   ImageFloat32 alpha, InterleavedF32 alphaf) {
+	protected static void computeAlphas( InterleavedF32 yf , InterleavedF32 kf , float lambda ,
+										 InterleavedF32 alphaf ) {
 
 		for( int y = 0; y < kf.height; y++ ) {
 
 			int index = yf.startIndex + y*yf.stride;
 
 			for( int x = 0; x < kf.width; x++, index += 2 ) {
-				float a = kf.data[index] + lambda;
-				float b = kf.data[index+1];
+				float a = yf.data[index];
+				float b = yf.data[index+1];
 
-				float c = yf.data[index];
-				float d = yf.data[index+1];
+				float c = kf.data[index] + lambda;
+				float d = kf.data[index+1];
 
 				float bottom = c*c + d*d;
 
@@ -390,51 +426,60 @@ public class CirculantTracker {
 				alphaf.data[index+1] = (b*c - a*d)/bottom;
 			}
 		}
-
-		fft.inverse(alphaf,alpha);
 	}
 
 	/**
+	 * Computes the output of the Gaussian kernel for each element in the target region
+	 *
 	 * k = exp(-1 / sigma^2 * max(0, (xx + yy - 2 * xy) / numel(x)));
+	 *
+	 * @param xx ||x||^2
+	 * @param yy ||y||^2
 	 */
-	public static void gaussianKernel( float xx , float yy , ImageFloat32 xy , float sigma  , ImageFloat32 output ) {
+	protected static void gaussianKernel( float xx , float yy , ImageFloat32 xy , float sigma  , ImageFloat32 output ) {
 		float sigma2 = sigma*sigma;
+		float N = xy.width*xy.height;
 
 		for( int y = 0; y < xy.height; y++ ) {
-			int indexXY = xy.startIndex + y*xy.stride;
-			int indexOut = output.startIndex + y*output.stride;
+			int index = xy.startIndex + y*xy.stride;
 
-			for( int x = 0; x < xy.width; x++ ) {
+			for( int x = 0; x < xy.width; x++ , index++ ) {
 
-				float valueXY = xy.data[indexXY++];
+				// (xx + yy - 2 * xy) / numel(x)
+				float value = (xx + yy - 2f*xy.data[index])/N;
 
-				double v = Math.sqrt( -(1.0f/sigma2)*(xx + yy - 2.0f*Math.max(0,valueXY)) );
+				double v = Math.exp(-Math.max(0, value) / sigma2);
 
-				output.data[indexOut++] = (float)v;
+				output.data[index] = (float)v;
 			}
-
 		}
 	}
 
 	/**
-	 * Copies the target into the output image and applies the cosine window to it.  Takes in account
-	 * image bounds.
+	 * Copies the target into the output image and applies the cosine window to it.
 	 */
 	protected void get_subwindow( ImageFloat32 image , int x0 , int y0 , ImageFloat32 output ) {
-		// make sure it is in bounds
-		if( x0 < 0 )
-			x0 = 0;
-		if( x0 > image.width-region.width )
-			x0 = image.width-region.width;
-		if( y0 < 0 )
-			y0 = 0;
-		if( y0 > image.height-region.height )
-			y0 = image.height-region.height;
-
 		// copy the target
 		ImageMiscOps.copy(x0, y0, 0, 0, region.width, region.height, image, output);
+		// normalize values to be from -0.5 to 0.5
+		PixelMath.divide(image, 255f, output);
+		PixelMath.plus(image, -0.5f, output);
 		// apply the cosine window to it
 		PixelMath.multiply(output,cosine,output);
+	}
+
+	/**
+	 * Makes sure the specified region is inside the image bounds
+	 */
+	protected static void ensureInBounds( Rectangle2D_I32 region , int imgWidth , int imgHeight ) {
+		if( region.tl_x < 0 )
+			region.tl_x = 0;
+		else if( region.tl_x > imgWidth-region.width )
+			region.tl_x = imgWidth-region.width;
+		if( region.tl_y < 0 )
+			region.tl_y = 0;
+		else if( region.tl_y > imgHeight-region.height )
+			region.tl_y = imgHeight-region.height;
 	}
 
 
