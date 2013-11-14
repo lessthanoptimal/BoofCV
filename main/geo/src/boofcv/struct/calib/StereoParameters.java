@@ -96,7 +96,7 @@ public class StereoParameters implements Serializable {
 	}
 
 	public void print() {
-		double euler[] = RotationMatrixGenerator.matrixToEulerXYZ(rightToLeft.getR());
+		double euler[] = RotationMatrixGenerator.matrixToEulerXYZ(rightToLeft.getR(),null);
 		Vector3D_F64 t = rightToLeft.getT();
 		System.out.println();
 		System.out.println("Left Camera");

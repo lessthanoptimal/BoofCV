@@ -450,7 +450,7 @@ public class VisOdomQuadPnP<T extends ImageSingleBand,TD extends TupleDesc> {
 	}
 
 	private String toString( Se3_F64 motion ) {
-		double euler[] = RotationMatrixGenerator.matrixToEulerXYZ(motion.getR());
+		double euler[] = RotationMatrixGenerator.matrixToEulerXYZ(motion.getR(),null);
 		return String.format("%5e %5e %5e",euler[0],euler[1],euler[2]);
 	}
 
