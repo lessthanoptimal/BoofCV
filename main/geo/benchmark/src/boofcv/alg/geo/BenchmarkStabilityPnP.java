@@ -53,8 +53,8 @@ public class BenchmarkStabilityPnP extends ArtificialStereoScene {
 			if( !target.process(observationPose,found) )
 				throw new RuntimeException("Not expected to fail");
 			
-			double expectedEuler[] = RotationMatrixGenerator.matrixToEulerXYZ(motion.getR());
-			double foundEuler[] = RotationMatrixGenerator.matrixToEulerXYZ(found.getR());
+			double expectedEuler[] = RotationMatrixGenerator.matrixToEulerXYZ(motion.getR(),null);
+			double foundEuler[] = RotationMatrixGenerator.matrixToEulerXYZ(found.getR(),null);
 
 			Vector3D_F64 expectedTran = motion.getT();
 			Vector3D_F64 foundTran = found.getT();
@@ -110,8 +110,8 @@ public class BenchmarkStabilityPnP extends ArtificialStereoScene {
 				continue;
 			}
 
-			double expectedEuler[] = RotationMatrixGenerator.matrixToEulerXYZ(motion.getR());
-			double foundEuler[] = RotationMatrixGenerator.matrixToEulerXYZ(found.getR());
+			double expectedEuler[] = RotationMatrixGenerator.matrixToEulerXYZ(motion.getR(),null);
+			double foundEuler[] = RotationMatrixGenerator.matrixToEulerXYZ(found.getR(),null);
 
 			Vector3D_F64 expectedTran = motion.getT();
 			Vector3D_F64 foundTran = found.getT();
