@@ -209,7 +209,7 @@ public class VideoTrackerObjectQuadApp<I extends ImageSingleBand>
 
 	@Override
 	public void selectedTarget(Quadrilateral_F64 target) {
-		System.out.println();
+		System.out.println(target.a.x+" "+target.a.y+" "+target.b.x+" "+target.b.y+" "+target.c.x+" "+target.c.y+" "+target.d.x+" "+target.d.y);
 		this.target.set(target);
 		targetSelected = true;
 		selectionChanged = true;

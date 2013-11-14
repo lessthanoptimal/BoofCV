@@ -17,6 +17,12 @@
 -----
 Maven
 
+SNAPSHOT
+
+- Change version to v.11-SNAPSHOT
+mvn clean deploy
+
+Full Release
 https://docs.sonatype.org/display/Repository/Sonatype+OSS+Maven+Repository+Usage+Guide
 
 - change version in pom.xml
