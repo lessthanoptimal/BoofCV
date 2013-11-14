@@ -27,12 +27,22 @@ import boofcv.struct.image.InterleavedF32;
 import georegression.struct.shapes.Rectangle2D_I32;
 
 /**
- *
- * TODO write
+ * <p>
+ * Tracker that uses the theory of Circulant matrices, Discrete Fourier Transform (DCF), and linear classifiers to track
+ * a target and learn its changes in appearance [1].  The target is assumed to be rectangular and has fixed size and
+ * location.  A dense local search is performed around the most recent target location.  The search is done quickly
+ * using the DCF.
+ * </p>
  *
  * <p>
- * NOTE: To avoid overflow it is recommended that image pixels have values from 0 to 1.  Sum of pixel square of
- * every pixel in the image is computed.
+ * Tracking is performed using texture information.  Since only one description of the target is saved, tracks can
+ * drift over time.  Tracking performance seems to improve if the object has distinctive edges and that's included
+ * in the track region.
+ * </p>
+ *
+ * <p>
+ * [1] Henriques, Joao F., et al. "Exploiting the circulant structure of tracking-by-detection with kernels."
+ * Computer Vision–ECCV 2012. Springer Berlin Heidelberg, 2012. 702-715.
  * </p>
  *
  * @author Peter Abeles
@@ -59,9 +69,9 @@ public class CirculantTracker {
 	private DiscreteFourierTransform<ImageFloat32,InterleavedF32> fft = DiscreteFourierTransformOps.createTransformF32();
 
 	// storage for subimage of input image
-	private ImageFloat32 subInput = new ImageFloat32(1,1);
+	protected ImageFloat32 subInput = new ImageFloat32(1,1);
 	// storage for the subimage of the previous frame
-	private ImageFloat32 subPrev = new ImageFloat32(1,1);
+	protected ImageFloat32 subPrev = new ImageFloat32(1,1);
 
 	// cosine window used to reduce artifacts from FFT
 	protected ImageFloat32 cosine = new ImageFloat32(1,1);
@@ -92,11 +102,13 @@ public class CirculantTracker {
 	private InterleavedF32 tmpFourier2 = new InterleavedF32(1,1,2);
 
 	/**
+	 * Configure tracker
 	 *
-	 * @param output_sigma_factor  Try 1.0/16.0
-	 * @param sigma Try 0.2f
+	 * @param output_sigma_factor  spatial bandwidth (proportional to target) Try 1.0/16.0
+	 * @param sigma Sigma for Gaussian kernel in linear classifier.  Try 0.2f
 	 * @param lambda Try 1e-2f
 	 * @param interp_factor Try 0.075f
+	 * @param maxPixelValue Maximum pixel value.  Typically 255
 	 */
 	public CirculantTracker(double output_sigma_factor, float sigma, float lambda, float interp_factor,
 							float maxPixelValue) {
@@ -116,6 +128,8 @@ public class CirculantTracker {
 	 * @param regionHeight region's height
 	 */
 	public void initialize( ImageFloat32 image , int x0 , int y0 , int regionWidth , int regionHeight ) {
+
+		// works better with odd length regions
 
 		// save the track location
 		this.region.width = regionWidth;
@@ -240,7 +254,7 @@ public class CirculantTracker {
 	/**
 	 * Find the target inside the current image by searching around its last known location
 	 */
-	private void updateTrackLocation(ImageFloat32 image) {
+	protected void updateTrackLocation(ImageFloat32 image) {
 		get_subwindow(image, region.tl_x, region.tl_y, subInput);
 
 		// calculate response of the classifier at all locations
@@ -265,12 +279,12 @@ public class CirculantTracker {
 		}
 
 		// peak in region's coordinate system
-		int cx = indexBest % tmpReal0.width;
-		int cy = indexBest / tmpReal0.width;
+		int deltaX = subInput.width/2 - (indexBest % tmpReal0.width);
+		int deltaY = subInput.height/2 - (indexBest / tmpReal0.width);
 
 		// convert peak location into image coordinate system
-		region.tl_x = (region.tl_x+cx) - subInput.width/2;
-		region.tl_y = (region.tl_y+cy) - subInput.height/2;
+		region.tl_x = region.tl_x + deltaX;
+		region.tl_y = region.tl_y + deltaY;
 
 		ensureInBounds(region,image.width,image.height);
 	}
@@ -462,8 +476,8 @@ public class CirculantTracker {
 		// copy the target
 		ImageMiscOps.copy(x0, y0, 0, 0, region.width, region.height, image, output);
 		// normalize values to be from -0.5 to 0.5
-		PixelMath.divide(image, 255f, output);
-		PixelMath.plus(image, -0.5f, output);
+		PixelMath.divide(output, maxPixelValue, output);
+		PixelMath.plus(output, -0.5f, output);
 		// apply the cosine window to it
 		PixelMath.multiply(output,cosine,output);
 	}

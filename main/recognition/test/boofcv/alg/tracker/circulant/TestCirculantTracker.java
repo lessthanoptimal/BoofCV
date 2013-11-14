@@ -2,6 +2,7 @@ package boofcv.alg.tracker.circulant;
 
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.alg.misc.ImageMiscOps;
+import boofcv.alg.misc.ImageStatistics;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.InterleavedF32;
 import georegression.struct.shapes.Rectangle2D_I32;
@@ -11,7 +12,8 @@ import org.junit.Test;
 
 import java.util.Random;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Peter Abeles
@@ -25,7 +27,24 @@ public class TestCirculantTracker {
 
 	@Test
 	public void basicTrackingCheck() {
-		fail("Implement");
+		ImageFloat32 a = new ImageFloat32(30,35);
+		ImageFloat32 b = new ImageFloat32(30,35);
+
+		// randomize input image and move it
+		GImageMiscOps.fillUniform(a,rand,0,200);
+		GImageMiscOps.fillUniform(b,rand,0,200);
+
+		CirculantTracker alg = new CirculantTracker(1f/16f,0.2f,1e-2f,0.075f,255f);
+		alg.initialize(a, 5, 6, 20, 25);
+
+		shiftCopy(2,4,a,b);
+		alg.performTracking(b);
+
+		double tolerance = 1;
+
+		Rectangle2D_I32 r = alg.getTargetLocation();
+		assertEquals(5+2,r.tl_x,tolerance);
+		assertEquals(6 + 4, r.tl_y, tolerance);
 	}
 
 	@Test
@@ -83,14 +102,87 @@ public class TestCirculantTracker {
 		}
 	}
 
+	/**
+	 * Check a few simple motions.  It seems to be accurate to within 1 pixel.  Considering alphas seems to be the issue
+	 */
 	@Test
 	public void updateTrackLocation() {
-		fail("Implement");
+		ImageFloat32 a = new ImageFloat32(30,35);
+		ImageFloat32 b = new ImageFloat32(30,35);
+
+		// randomize input image and move it
+		GImageMiscOps.fillUniform(a,rand,0,200);
+		GImageMiscOps.fillUniform(b,rand,0,200);
+		shiftCopy(0,0,a,b);
+
+		CirculantTracker alg = new CirculantTracker(1f/16f,0.2f,1e-2f,0.075f,255f);
+		alg.initialize(a,5,6,20,25);
+
+		alg.updateTrackLocation(b);
+
+		// not super precise...
+		int tolerance = 0;
+
+		// No motion motion
+		Rectangle2D_I32 r = alg.getTargetLocation();
+		assertEquals(5,r.tl_x,tolerance);
+		assertEquals(6,r.tl_y,tolerance);
+
+		// check estimated motion
+		GImageMiscOps.fillUniform(b,rand,0,200);
+		shiftCopy(-3,2,a,b);
+		alg.updateTrackLocation(b);
+		r = alg.getTargetLocation();
+		assertEquals(5-3,r.tl_x,tolerance);
+		assertEquals(6+2,r.tl_y,tolerance);
+
+		// try out of bounds case
+		GImageMiscOps.fillUniform(b,rand,0,200);
+		shiftCopy(-6,0,a,b);
+		alg.updateTrackLocation(b);
+		assertEquals(0,r.tl_x,tolerance);
+		assertEquals(6,r.tl_y,tolerance);
 	}
 
 	@Test
 	public void performLearning() {
-		fail("Implement");
+		float interp_factor = 0.075f;
+
+		ImageFloat32 a = new ImageFloat32(20,25);
+		ImageFloat32 b = new ImageFloat32(20,25);
+
+		ImageMiscOps.fill(a,100);
+		ImageMiscOps.fill(b,200);
+
+		CirculantTracker alg = new CirculantTracker(1f/16f,0.2f,1e-2f,interp_factor,255f);
+		alg.initialize(a,0,0,20,25);
+
+		// copy its internal value
+		a.setTo(alg.subPrev);
+
+		// give it two images
+		alg.performLearning(b);
+
+		// make sure the images aren't full of zero
+		assertTrue(Math.abs(ImageStatistics.sum(a)) > 0.1 );
+		assertTrue(Math.abs(ImageStatistics.sum(alg.subInput)) > 0.1 );
+
+
+		int numNotSame = 0;
+		// the result should be an average of the two
+		for( int i = 0; i < a.data.length; i++ ) {
+			if( Math.abs(a.data[i]-alg.subInput.data[i]) > 1e-4 )
+				numNotSame++;
+
+			// should be more like the original one than the new one
+			float expected = a.data[i]*(1-interp_factor) + interp_factor*alg.subInput.data[i];
+			float found = alg.subPrev.data[i];
+
+			assertEquals(expected,found,1e-4);
+		}
+
+		// make sure it is actually different
+		assertTrue(numNotSame>100);
 	}
 
 	@Test
@@ -115,16 +207,7 @@ public class TestCirculantTracker {
 		GImageMiscOps.fillUniform(target,rand,0,200);
 
 		// copy a shifted portion of the region
-		for( int y = 0; y < region.height; y++ ) {
-			for( int x = 0; x < region.width; x++ ) {
-				int xx = x + offX;
-				int yy = y + offY;
-
-				if( xx >= 0 && xx < region.width && yy >= 0 && yy < region.height ) {
-					target.set(xx,yy,region.get(x,y));
-				}
-			}
-		}
+		shiftCopy(offX, offY, region, target);
 
 		// initialize data structures
 		alg.get_subwindow(region,0,0,region);
@@ -150,6 +233,19 @@ public class TestCirculantTracker {
 
 		assertEquals(expectedX,maxX);
 		assertEquals(expectedY,maxY);
+	}
+
+	private void shiftCopy(int offX, int offY, ImageFloat32 src, ImageFloat32 dst) {
+		for( int y = 0; y < src.height; y++ ) {
+			for( int x = 0; x < src.width; x++ ) {
+				int xx = x + offX;
+				int yy = y + offY;
+
+				if( xx >= 0 && xx < src.width && yy >= 0 && yy < src.height ) {
+					dst.set(xx, yy, src.get(x, y));
+				}
+			}
+		}
 	}
 
 	@Test
