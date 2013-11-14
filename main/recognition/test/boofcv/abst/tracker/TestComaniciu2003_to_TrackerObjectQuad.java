@@ -8,9 +8,9 @@ import boofcv.struct.image.MultiSpectral;
 /**
  * @author Peter Abeles
  */
-public class TestComaniciu2003_to_TrackObjectQuad extends ColorTrackerObjectRectangleTests {
+public class TestComaniciu2003_to_TrackerObjectQuad extends ColorTrackerObjectRectangleTests {
 
-	public TestComaniciu2003_to_TrackObjectQuad() {
+	public TestComaniciu2003_to_TrackerObjectQuad() {
 		super(true);
 		tolTranslateSmall = 0.05;
 		tolScale = 0.1;

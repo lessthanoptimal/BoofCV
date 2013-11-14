@@ -18,6 +18,7 @@
 
 package boofcv.alg.tracker;
 
+import boofcv.abst.tracker.ConfigCirculantTracker;
 import boofcv.abst.tracker.ConfigComaniciu2003;
 import boofcv.abst.tracker.MeanShiftLikelihoodType;
 import boofcv.abst.tracker.TrackerObjectQuad;
@@ -80,10 +81,11 @@ public class VideoTrackerObjectQuadApp<I extends ImageSingleBand>
 
 		addAlgorithm(0, "TLD", 0);
 		addAlgorithm(0, "Sparse Flow", 1);
-		addAlgorithm(0, "Mean Shift Likelihood HSV", 2);
-		addAlgorithm(0, "Mean Shift Likelihood RGB", 3);
-		addAlgorithm(0, "Mean Shift Scale", 4);
-		addAlgorithm(0, "Mean Shift Fixed", 5);
+		addAlgorithm(0, "Ciruclant", 2);
+		addAlgorithm(0, "Mean Shift Likelihood HSV", 3);
+		addAlgorithm(0, "Mean Shift Likelihood RGB", 4);
+		addAlgorithm(0, "Mean Shift Scale", 5);
+		addAlgorithm(0, "Mean Shift Fixed", 6);
 
 		videoPanel = new TrackerObjectQuadPanel(this);
 		infoBar = new TrackerQuadInfoPanel(this);
@@ -116,16 +118,18 @@ public class VideoTrackerObjectQuadApp<I extends ImageSingleBand>
 		else if( whichAlg == 1 )
 			tracker = FactoryTrackerObjectQuad.sparseFlow(new SfotConfig(imageClass));
 		else if( whichAlg == 2 )
+			tracker = FactoryTrackerObjectQuad.circulant(new ConfigCirculantTracker(), imageClass);
+		else if( whichAlg == 3 )
 			tracker = FactoryTrackerObjectQuad.meanShiftLikelihood(30, 6, 255,
 					MeanShiftLikelihoodType.HISTOGRAM_RGB_to_HSV, imageType);
-		else if( whichAlg == 3 )
+		else if( whichAlg == 4 )
 			tracker = FactoryTrackerObjectQuad.meanShiftLikelihood(30, 4, 255,
 					MeanShiftLikelihoodType.HISTOGRAM, imageType);
-		else if( whichAlg == 4 ) {
+		else if( whichAlg == 5 ) {
 			ConfigComaniciu2003 config = new ConfigComaniciu2003(imageType);
 			config.scaleChange = 0.05f;
 			tracker = FactoryTrackerObjectQuad.meanShiftComaniciu2003(config);
-		} else if( whichAlg == 5 ) {
+		} else if( whichAlg == 6 ) {
 			ConfigComaniciu2003 config = new ConfigComaniciu2003(imageType);
 			config.scaleChange = 0;
 			tracker = FactoryTrackerObjectQuad.meanShiftComaniciu2003(config);

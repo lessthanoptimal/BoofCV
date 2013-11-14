@@ -29,7 +29,7 @@ import georegression.struct.shapes.Quadrilateral_F64;
  *
  * @author Peter Abeles
  */
-public class Comaniciu2003_to_TrackObjectQuad<T extends ImageMultiBand>
+public class Comaniciu2003_to_TrackerObjectQuad<T extends ImageMultiBand>
 		implements TrackerObjectQuad<T>
 {
 	TrackerMeanShiftComaniciu2003<T> alg;
@@ -38,7 +38,7 @@ public class Comaniciu2003_to_TrackObjectQuad<T extends ImageMultiBand>
 
 	ImageType<T> type;
 
-	public Comaniciu2003_to_TrackObjectQuad(TrackerMeanShiftComaniciu2003<T> alg, ImageType<T> type) {
+	public Comaniciu2003_to_TrackerObjectQuad(TrackerMeanShiftComaniciu2003<T> alg, ImageType<T> type) {
 		this.alg = alg;
 		this.type = type;
 	}

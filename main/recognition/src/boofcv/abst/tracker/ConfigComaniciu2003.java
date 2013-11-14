@@ -23,7 +23,7 @@ import boofcv.struct.image.ImageMultiBand;
 import boofcv.struct.image.ImageType;
 
 /**
- * Configuration for {@link Comaniciu2003_to_TrackObjectQuad}.
+ * Configuration for {@link Comaniciu2003_to_TrackerObjectQuad}.
  *
  * @author Peter Abeles
  */
