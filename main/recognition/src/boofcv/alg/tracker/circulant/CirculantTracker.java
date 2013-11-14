@@ -129,8 +129,6 @@ public class CirculantTracker {
 	 */
 	public void initialize( ImageFloat32 image , int x0 , int y0 , int regionWidth , int regionHeight ) {
 
-		// works better with odd length regions
-
 		// save the track location
 		this.region.width = regionWidth;
 		this.region.height = regionHeight;
@@ -248,7 +246,8 @@ public class CirculantTracker {
 	 */
 	public void performTracking( ImageFloat32 image ) {
 		updateTrackLocation(image);
-		performLearning(image);
+		if( interp_factor != 0 )
+			performLearning(image);
 	}
 
 	/**
@@ -258,8 +257,9 @@ public class CirculantTracker {
 		get_subwindow(image, region.tl_x, region.tl_y, subInput);
 
 		// calculate response of the classifier at all locations
-		// k = dense_gauss_kernel(sigma, x, z);
+		// matlab: k = dense_gauss_kernel(sigma, x, z);
 		dense_gauss_kernel(sigma, subPrev,subInput,k);
+
 		fft.forward(k,kf);
 
 		// response = real(ifft2(alphaf .* fft2(k)));   %(Eq. 9)

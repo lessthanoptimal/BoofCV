@@ -83,6 +83,7 @@ public abstract class GenericTestsDetectDescribeMulti<T extends ImageSingleBand,
 
 				assertTrue(desc!=null);
 				assertTrue(p.x != 0 && p.y != 0);
+				assertTrue(p.x >= 0 && p.y >= 0 && p.x < image.width && p.y < image.height );
 			}
 		}
 	}

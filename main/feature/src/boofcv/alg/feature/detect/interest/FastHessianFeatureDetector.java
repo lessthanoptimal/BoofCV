@@ -237,8 +237,14 @@ public class FastHessianFeatureDetector<II extends ImageSingleBand> {
 		// false positives are found around them as an artifact of pixels outside being
 		// treated as being zero.
 		foundFeatures.reset();
-		extractor.setIgnoreBorder(size[level] / (2 * skip)+extractor.getSearchRadius());
+		extractor.setIgnoreBorder(size[level] / (2 * skip));
 		extractor.process(intensity[index1],null,null,null,foundFeatures);
+
+		// Can't consider feature which are right up against the border since they might not be a true local
+		// maximum when you consider the features on the other side of the ignore border
+		int ignoreRadius = extractor.getIgnoreBorder() + extractor.getSearchRadius();
+		int ignoreWidth = intensity[index1].width-ignoreRadius;
+		int ignoreHeight = intensity[index1].height-ignoreRadius;
 
 		// number of features which can be added
 		int numberRemaining;
@@ -260,6 +266,10 @@ public class FastHessianFeatureDetector<II extends ImageSingleBand> {
 		// see if these local maximums are also a maximum in scale-space
 		for( int i = 0; i < features.size && numberRemaining > 0; i++ ) {
 			Point2D_I16 f = features.get(i);
+
+			// avoid false positives.  see above comment
+			if( f.x < ignoreRadius || f.x >= ignoreWidth || f.y < ignoreRadius || f.y >= ignoreHeight )
+				continue;
 
 			float val = inten1.get(f.x,f.y);
 
@@ -322,6 +332,9 @@ public class FastHessianFeatureDetector<II extends ImageSingleBand> {
 	 */
 	public static float polyPeak( float lower , float middle , float upper )
 	{
+//		if( lower >= middle || upper >= middle )
+//			throw new IllegalArgumentException("Crap");
+
 		// only need two coefficients to compute the peak's location
 		float a = 0.5f*lower - middle + 0.5f*upper;
 		float b = 0.5f*upper - 0.5f*lower;
