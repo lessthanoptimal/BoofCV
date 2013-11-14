@@ -20,6 +20,8 @@ Version : Alpha 0.16
   localization interpolation would messed up since the center would not be a maximum, causing really bad stuff.
   * Unit tests updated so that it they can detect it.
   * Thanks Lefteris for detecting this bug.
+- SURF detector (Fast-Hessian)
+  * Was affected in a similar fashion to the SIFT bug.  The fix doesn't seem to change its stability at all.
 - NCC error now more "correct" and divides by the number of elements
 - Integral image operations now support more image types.  S64 and F64
 - KltTracker.setDescription() can now fail due to lack of texture

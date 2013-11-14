@@ -101,6 +101,7 @@ public abstract class GenericTestsDetectDescribePoint<T extends ImageBase,D exte
 
 				assertTrue(desc!=null);
 				assertTrue(p.x != 0 && p.y != 0);
+				assertTrue(p.x >= 0 && p.y >= 0 && p.x < image.width && p.y < image.height );
 
 				if( scale != 1 )
 					numScaleNotOne++;
