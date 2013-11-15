@@ -157,7 +157,7 @@ public class FactoryTrackerObjectQuad {
 	public static <T extends ImageSingleBand>
 	TrackerObjectQuad<T> circulant( ConfigCirculantTracker config , Class<T> imageType ) {
 		CirculantTracker alg = new CirculantTracker(
-				config.output_sigma_factor,config.sigma,config.lambda,config.interp_factor,config.maxPixelValue);
+				config.output_sigma_factor,config.sigma,config.lambda,config.interp_factor,128,config.maxPixelValue);
 
 		return new Circulant_to_TrackerObjectQuad(alg,ImageType.single(imageType));
 	}

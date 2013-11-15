@@ -26,7 +26,7 @@ import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageType;
 import georegression.geometry.UtilPolygons2D_F64;
 import georegression.struct.shapes.Quadrilateral_F64;
-import georegression.struct.shapes.Rectangle2D_I32;
+import georegression.struct.shapes.Rectangle2D_F32;
 import georegression.struct.shapes.RectangleCorner2D_F64;
 
 /**
@@ -81,12 +81,12 @@ public class Circulant_to_TrackerObjectQuad<T extends ImageSingleBand> implement
 		}
 
 		tracker.performTracking(tmp);
-		Rectangle2D_I32 r = tracker.getTargetLocation();
+		Rectangle2D_F32 r = tracker.getTargetLocation();
 
-		int x0 = r.tl_x;
-		int y0 = r.tl_y;
-		int x1 = r.tl_x + r.width;
-		int y1 = r.tl_y + r.height;
+		int x0 = (int)(r.tl_x + 0.5f);
+		int y0 = (int)(r.tl_y + 0.5f);
+		int x1 = (int)(r.tl_x + r.width);
+		int y1 = (int)(r.tl_y + r.height);
 
 		location.a.x = x0;
 		location.a.y = y0;
