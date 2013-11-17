@@ -61,7 +61,7 @@ public class ExampleDetectDescribe {
 	public static <T extends ImageSingleBand, TD extends TupleDesc>
 	DetectDescribePoint<T, TD> createFromPremade( Class<T> imageType ) {
 		return (DetectDescribePoint)FactoryDetectDescribe.surfStable(
-				new ConfigFastHessian(1, 2, 200, 1, 9, 4, 4), null,null, ImageType.single(ImageFloat32.class));
+				new ConfigFastHessian(1, 2, 200, 1, 9, 4, 4), null,null, ImageType.single(imageType));
 		// note that SIFT only supports ImageFloat32
 //		if( imageType == ImageFloat32.class )
 //			return (DetectDescribePoint)FactoryDetectDescribe.sift(null,new ConfigSiftDetector(2,0,200,5),null,null);
