@@ -144,4 +144,13 @@ public class InterleavedF32 extends ImageInterleaved<InterleavedF32> {
 			return new InterleavedF32();
 		return new InterleavedF32(imgWidth, imgHeight, numBands);
 	}
+
+	public void print( String format ) {
+		for (int y = 0; y < height; y++) {
+			for (int x = 0; x < width; x++) {
+				System.out.printf(format+" "+format+"i ",getBand(x, y,0),getBand(x,y,1));
+			}
+			System.out.println();
+		}
+	}
 }

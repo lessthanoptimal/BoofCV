@@ -65,7 +65,7 @@ public class TestCirculantTracker {
 	public void computeGaussianWeights() {
 		CirculantTracker alg = new CirculantTracker(0.5f,2f,0.01f,0.1f,255f);
 
-		alg.region.set(2,3,10,15);
+		alg.regionTrack.set(2,3,10,15);
 		alg.gaussianWeight.reshape(10,15);
 		alg.gaussianWeightDFT.reshape(10, 15);
 
