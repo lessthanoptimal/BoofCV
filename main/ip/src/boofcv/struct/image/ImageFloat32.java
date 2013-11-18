@@ -90,6 +90,15 @@ public class ImageFloat32 extends ImageFloat<ImageFloat32> {
 		}
 	}
 
+	public void print( String format ) {
+		for (int y = 0; y < height; y++) {
+			for (int x = 0; x < width; x++) {
+				System.out.printf(format+" ",unsafe_get(x, y));
+			}
+			System.out.println();
+		}
+	}
+
 	public void printInt() {
 		for (int y = 0; y < height; y++) {
 			for (int x = 0; x < width; x++) {
