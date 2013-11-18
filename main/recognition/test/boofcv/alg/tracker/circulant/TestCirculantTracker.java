@@ -3,8 +3,10 @@ package boofcv.alg.tracker.circulant;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.alg.misc.ImageStatistics;
+import boofcv.core.image.ConvertImage;
 import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.InterleavedF32;
+import boofcv.struct.image.ImageFloat64;
+import boofcv.struct.image.InterleavedF64;
 import georegression.struct.shapes.Rectangle2D_I32;
 import org.ddogleg.complex.ComplexMath64F;
 import org.ejml.data.Complex64F;
@@ -16,8 +18,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 /**
- * @author Peter Abeles
- */
+* @author Peter Abeles
+*/
 public class TestCirculantTracker {
 
 	Random rand = new Random(234);
@@ -34,7 +36,7 @@ public class TestCirculantTracker {
 		GImageMiscOps.fillUniform(a,rand,0,200);
 		GImageMiscOps.fillUniform(b,rand,0,200);
 
-		CirculantTracker alg = new CirculantTracker(1f/16f,0.2f,1e-2f,0.075f,255f);
+		CirculantTracker alg = new CirculantTracker(1.0/16.0,0.2f,1e-2f,0.075f,255f);
 		alg.initialize(a, 5, 6, 20, 25);
 
 		shiftCopy(2,4,a,b);
@@ -49,7 +51,7 @@ public class TestCirculantTracker {
 
 	@Test
 	public void computeCosineWindow() {
-		ImageFloat32 found = new ImageFloat32(20,25);
+		ImageFloat64 found = new ImageFloat64(20,25);
 
 		CirculantTracker.computeCosineWindow(found);
 
@@ -74,7 +76,7 @@ public class TestCirculantTracker {
 		centeredSymmetricChecks(alg.gaussianWeight);
 	}
 
-	private void centeredSymmetricChecks( ImageFloat32 image ) {
+	private void centeredSymmetricChecks( ImageFloat64 image ) {
 
 		int cx = image.width/2;
 		int cy = image.height/2;
@@ -90,10 +92,10 @@ public class TestCirculantTracker {
 		// symmetry check
 		for( int i = 0; i < cy; i++ ) {
 			for( int j = 0; j < cx; j++ ) {
-				float v0 = image.get(j,i);
-				float v1 = image.get(w-j,i);
-				float v2 = image.get(j,h-i);
-				float v3 = image.get(w-j,h-i);
+				double v0 = image.get(j,i);
+				double v1 = image.get(w-j,i);
+				double v2 = image.get(j,h-i);
+				double v3 = image.get(w-j,h-i);
 
 				assertEquals(v0,v1,1e-4);
 				assertEquals(v0,v2,1e-4);
@@ -158,7 +160,7 @@ public class TestCirculantTracker {
 		alg.initialize(a,0,0,20,25);
 
 		// copy its internal value
-		a.setTo(alg.subPrev);
+		ConvertImage.convert(alg.subPrev, a);
 
 		// give it two images
 		alg.performLearning(b);
@@ -175,8 +177,8 @@ public class TestCirculantTracker {
 				numNotSame++;
 
 			// should be more like the original one than the new one
-			float expected = a.data[i]*(1-interp_factor) + interp_factor*alg.subInput.data[i];
-			float found = alg.subPrev.data[i];
+			double expected = a.data[i]*(1-interp_factor) + interp_factor*alg.subInput.data[i];
+			double found = alg.subPrev.data[i];
 
 			assertEquals(expected,found,1e-4);
 		}
@@ -195,29 +197,31 @@ public class TestCirculantTracker {
 	}
 
 	public void dense_gauss_kernel( int offX , int offY ) {
-		ImageFloat32 region = new ImageFloat32(20,25);
-		ImageFloat32 target = new ImageFloat32(20,25);
-		ImageFloat32 k = new ImageFloat32(20,25);
+		ImageFloat32 regionIn = new ImageFloat32(20,25);
+		ImageFloat64 regionOut = new ImageFloat64(20,25);
+		ImageFloat32 targetIn = new ImageFloat32(20,25);
+		ImageFloat64 targetOut = new ImageFloat64(20,25);
+		ImageFloat64 k = new ImageFloat64(20,25);
 
 		CirculantTracker alg = new CirculantTracker(1f/16f,0.2f,1e-2f,0.075f,255f);
-		alg.initialize(region,0,0,20,25);
+		alg.initialize(regionIn,0,0,20,25);
 
 		// randomize input image and add a known shape in it
-		GImageMiscOps.fillUniform(region,rand,0,200);
-		GImageMiscOps.fillUniform(target,rand,0,200);
+		GImageMiscOps.fillUniform(regionIn,rand,0,200);
+		GImageMiscOps.fillUniform(targetIn,rand,0,200);
 
 		// copy a shifted portion of the region
-		shiftCopy(offX, offY, region, target);
+		shiftCopy(offX, offY, regionIn, targetIn);
 
 		// initialize data structures
-		alg.get_subwindow(region,0,0,region);
-		alg.get_subwindow(target,0,0,target);
+		alg.get_subwindow(regionIn,0,0,regionOut);
+		alg.get_subwindow(targetIn,0,0,targetOut);
 
 		// process and see if the peak is where it should be
-		alg.dense_gauss_kernel(0.2f,region,target,k);
+		alg.dense_gauss_kernel(0.2f,regionOut,targetOut,k);
 
 		int maxX=-1,maxY=-1;
-		float maxValue = -1;
+		double maxValue = -1;
 		for( int y = 0; y < k.height;y++ ){
 			for( int x=0; x < k.width;x++ ) {
 				if( k.get(x,y) > maxValue ) {
@@ -247,27 +251,39 @@ public class TestCirculantTracker {
 			}
 		}
 	}
+	private void shiftCopy(int offX, int offY, ImageFloat32 src, ImageFloat64 dst) {
+		for( int y = 0; y < src.height; y++ ) {
+			for( int x = 0; x < src.width; x++ ) {
+				int xx = x + offX;
+				int yy = y + offY;
+
+				if( xx >= 0 && xx < src.width && yy >= 0 && yy < src.height ) {
+					dst.set(xx, yy, src.get(x, y));
+				}
+			}
+		}
+	}
 
 	@Test
 	public void imageDotProduct() {
-		ImageFloat32 a = new ImageFloat32(width,height);
+		ImageFloat64 a = new ImageFloat64(width,height);
 		ImageMiscOps.fillUniform(a,rand,0,10);
 
-		float total = 0;
+		double total = 0;
 		for( int y = 0; y < height; y++ ) {
 			for( int x = 0; x < width; x++ ) {
 				total += a.get(x,y)*a.get(x,y);
 			}
 		}
-		float found = CirculantTracker.imageDotProduct(a);
+		double found = CirculantTracker.imageDotProduct(a);
 		assertEquals(total,found,1e-4);
 	}
 
 	@Test
 	public void elementMultConjB() {
-		InterleavedF32 a = new InterleavedF32(width,height,2);
-		InterleavedF32 b = new InterleavedF32(width,height,2);
-		InterleavedF32 c = new InterleavedF32(width,height,2);
+		InterleavedF64 a = new InterleavedF64(width,height,2);
+		InterleavedF64 b = new InterleavedF64(width,height,2);
+		InterleavedF64 c = new InterleavedF64(width,height,2);
 
 		ImageMiscOps.fillUniform(a,rand,-10,10);
 		ImageMiscOps.fillUniform(b,rand,-10,10);
@@ -295,9 +311,9 @@ public class TestCirculantTracker {
 
 	@Test
 	public void computeAlphas() {
-		InterleavedF32 yf = new InterleavedF32(width,height,2);
-		InterleavedF32 kf = new InterleavedF32(width,height,2);
-		InterleavedF32 alphaf = new InterleavedF32(width,height,2);
+		InterleavedF64 yf = new InterleavedF64(width,height,2);
+		InterleavedF64 kf = new InterleavedF64(width,height,2);
+		InterleavedF64 alphaf = new InterleavedF64(width,height,2);
 
 		ImageMiscOps.fillUniform(yf,rand,-10,10);
 		ImageMiscOps.fillUniform(kf,rand,-10,10);
