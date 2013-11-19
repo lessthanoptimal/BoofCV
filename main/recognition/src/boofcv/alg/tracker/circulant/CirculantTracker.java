@@ -22,9 +22,9 @@ import boofcv.abst.transform.fft.DiscreteFourierTransform;
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.misc.PixelMath;
 import boofcv.alg.transform.fft.DiscreteFourierTransformOps;
-import boofcv.factory.interpolate.FactoryInterpolation;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.InterleavedF32;
+import boofcv.struct.image.ImageFloat64;
+import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.InterleavedF64;
 import georegression.struct.shapes.Rectangle2D_F32;
 
 /**
@@ -54,61 +54,64 @@ import georegression.struct.shapes.Rectangle2D_F32;
  */
 // TODO Visualize tracker internal data
 // TODO fix unit tests
-public class CirculantTracker {
+public class CirculantTracker<T extends ImageSingleBand> {
 
 	// --- Tuning parameters
 	// spatial bandwidth (proportional to target)
 	private double output_sigma_factor;
 
 	// gaussian kernel bandwidth
-	private float sigma;
+	private double sigma;
 
 	// regularization term
-	private float lambda;
+	private double lambda;
 	// linear interpolation term.  Adjusts how fast it can learn
-	private float interp_factor;
+	private double interp_factor;
 
 	// the maximum pixel value
-	private float maxPixelValue;
+	private double maxPixelValue;
+
+	// extra padding around the selected region
+	private double padding;
 
 	//----- Internal variables
 	// computes the FFT
-	private DiscreteFourierTransform<ImageFloat32,InterleavedF32> fft = DiscreteFourierTransformOps.createTransformF32();
+	private DiscreteFourierTransform<ImageFloat64,InterleavedF64> fft = DiscreteFourierTransformOps.createTransformF64();
 
 	// storage for subimage of input image
-	protected ImageFloat32 subInput = new ImageFloat32(1,1);
+	protected ImageFloat64 subInput = new ImageFloat64(1,1);
 	// storage for the subimage of the previous frame
-	protected ImageFloat32 subPrev = new ImageFloat32(1,1);
+	protected ImageFloat64 subPrev = new ImageFloat64(1,1);
 
 	// cosine window used to reduce artifacts from FFT
-	protected ImageFloat32 cosine = new ImageFloat32(1,1);
+	protected ImageFloat64 cosine = new ImageFloat64(1,1);
 
 	// Storage for the kernel's response
-	private ImageFloat32 k = new ImageFloat32(1,1);
-	private InterleavedF32 kf = new InterleavedF32(1,1,2);
+	private ImageFloat64 k = new ImageFloat64(1,1);
+	private InterleavedF64 kf = new InterleavedF64(1,1,2);
 
 	// Learn values.  used to compute weight in linear classifier
-	private ImageFloat32 alpha = new ImageFloat32(1,1);
-	private InterleavedF32 alphaf = new InterleavedF32(1,1,2);
-	private ImageFloat32 newAlpha = new ImageFloat32(1,1);
-	private InterleavedF32 newAlphaf = new InterleavedF32(1,1,2);
+	private InterleavedF64 alphaf = new InterleavedF64(1,1,2);
+	private ImageFloat64 newAlpha = new ImageFloat64(1,1);
+	private InterleavedF64 newAlphaf = new InterleavedF64(1,1,2);
 
 	// location of target
-	protected Rectangle2D_F32 region = new Rectangle2D_F32();
+	protected Rectangle2D_F32 regionTrack = new Rectangle2D_F32();
+	protected Rectangle2D_F32 regionOut = new Rectangle2D_F32();
 
 	// Used for computing the gaussian kernel
-	protected ImageFloat32 gaussianWeight = new ImageFloat32(1,1);
-	protected InterleavedF32 gaussianWeightDFT = new InterleavedF32(1,1,2);
+	protected ImageFloat64 gaussianWeight = new ImageFloat64(1,1);
+	protected InterleavedF64 gaussianWeightDFT = new InterleavedF64(1,1,2);
 
 	// storage for storing temporary results
-	private ImageFloat32 tmpReal0 = new ImageFloat32(1,1);
-	private ImageFloat32 tmpReal1 = new ImageFloat32(1,1);
+	private ImageFloat64 tmpReal0 = new ImageFloat64(1,1);
+	private ImageFloat64 tmpReal1 = new ImageFloat64(1,1);
 
-	private InterleavedF32 tmpFourier0 = new InterleavedF32(1,1,2);
-	private InterleavedF32 tmpFourier1 = new InterleavedF32(1,1,2);
-	private InterleavedF32 tmpFourier2 = new InterleavedF32(1,1,2);
+	private InterleavedF64 tmpFourier0 = new InterleavedF64(1,1,2);
+	private InterleavedF64 tmpFourier1 = new InterleavedF64(1,1,2);
+	private InterleavedF64 tmpFourier2 = new InterleavedF64(1,1,2);
 
-	private InterpolatePixelS<ImageFloat32> interp = FactoryInterpolation.bilinearPixelS(ImageFloat32.class);
+	private InterpolatePixelS<T> interp;
 
 	private int workRegionSize;
 	private float stepX,stepY;
@@ -117,21 +120,26 @@ public class CirculantTracker {
 	 * Configure tracker
 	 *
 	 * @param output_sigma_factor  spatial bandwidth (proportional to target) Try 1.0/16.0
-	 * @param sigma Sigma for Gaussian kernel in linear classifier.  Try 0.2f
-	 * @param lambda Try 1e-2f
-	 * @param interp_factor Try 0.075f
+	 * @param sigma Sigma for Gaussian kernel in linear classifier.  Try 0.2
+	 * @param lambda Try 1e-2
+	 * @param interp_factor Try 0.075
+	 * @param padding
 	 * @param workRegionSize
 	 * @param maxPixelValue Maximum pixel value.  Typically 255
 	 */
-	public CirculantTracker(double output_sigma_factor, float sigma, float lambda, float interp_factor,
+	public CirculantTracker(double output_sigma_factor, double sigma, double lambda, double interp_factor,
+							double padding ,
 							int workRegionSize ,
-							float maxPixelValue) {
+							double maxPixelValue,
+							InterpolatePixelS<T> interp ) {
 		this.output_sigma_factor = output_sigma_factor;
 		this.sigma = sigma;
 		this.lambda = lambda;
 		this.interp_factor = interp_factor;
 		this.maxPixelValue = maxPixelValue;
+		this.interp = interp;
 
+		this.padding = padding;
 		this.workRegionSize = workRegionSize;
 
 		resizeImages(workRegionSize);
@@ -147,18 +155,29 @@ public class CirculantTracker {
 	 * @param regionWidth region's width
 	 * @param regionHeight region's height
 	 */
-	public void initialize( ImageFloat32 image , int x0 , int y0 , int regionWidth , int regionHeight ) {
+	public void initialize( T image , int x0 , int y0 , int regionWidth , int regionHeight ) {
+
+		regionOut.width = regionWidth;
+		regionOut.height = regionHeight;
+		regionOut.tl_x = x0;
+		regionOut.tl_y = y0;
+
+		// adjust for padding
+		int w = (int)(regionWidth*(1+padding));
+		int h = (int)(regionHeight*(1+padding));
+		int cx = x0 + regionWidth/2;
+		int cy = y0 + regionHeight/2;
 
 		// save the track location
-		this.region.width = regionWidth;
-		this.region.height = regionHeight;
-		this.region.tl_x = x0;
-		this.region.tl_y = y0;
+		this.regionTrack.width = w;
+		this.regionTrack.height = h;
+		this.regionTrack.tl_x = cx-w/2;
+		this.regionTrack.tl_y = cy-h/2;
 
 		stepX = (regionWidth-1)/(float)(workRegionSize-1);
 		stepY = (regionHeight-1)/(float)(workRegionSize-1);
 
-		ensureInBounds(region,image.width,image.height);
+		ensureInBounds(regionTrack,image.width,image.height);
 
 		initialLearning(image);
 	}
@@ -167,8 +186,8 @@ public class CirculantTracker {
 	/**
 	 * Learn the target's appearance.
 	 */
-	protected void initialLearning( ImageFloat32 image ) {
-		// get subwindow at current estimated target position, to train classifer
+	protected void initialLearning( T image ) {
+		// get subwindow at current estimated target position, to train classifier
 		get_subwindow(image, subInput);
 		
 		// Kernel Regularized Least-Squares, calculate alphas (in Fourier domain)
@@ -178,9 +197,8 @@ public class CirculantTracker {
 
 		// new_alphaf = yf ./ (fft2(k) + lambda);   %(Eq. 7)
 		computeAlphas(gaussianWeightDFT, kf, lambda, alphaf);
-		fft.inverse(alphaf,alpha);
 
-		ImageFloat32 tmp = subInput;
+		ImageFloat64 tmp = subInput;
 		subInput = subPrev;
 		subPrev = tmp;
 	}
@@ -188,7 +206,7 @@ public class CirculantTracker {
 	/**
 	 * Computes the cosine window
 	 */
-	protected static void computeCosineWindow( ImageFloat32 cosine ) {
+	protected static void computeCosineWindow( ImageFloat64 cosine ) {
 		double cosX[] = new double[ cosine.width ];
 		for( int x = 0; x < cosine.width; x++ ) {
 			cosX[x] = 0.5*(1 - Math.cos( 2.0*Math.PI*x/(cosine.width-1) ));
@@ -197,7 +215,7 @@ public class CirculantTracker {
 			int index = cosine.startIndex + y*cosine.stride;
 			double cosY = 0.5*(1 - Math.cos( 2.0*Math.PI*y/(cosine.height-1) ));
 			for( int x = 0; x < cosine.width; x++ ) {
-				cosine.data[index++] = (float)(cosX[x]*cosY);
+				cosine.data[index++] = cosX[x]*cosY;
 			}
 		}
 	}
@@ -207,12 +225,12 @@ public class CirculantTracker {
 	 */
 	protected void computeGaussianWeights( int width ) {
 		// desired output (gaussian shaped), bandwidth proportional to target size
-		double output_sigma = (float)(Math.sqrt(width*width) * output_sigma_factor);
+		double output_sigma = Math.sqrt(width*width) * output_sigma_factor;
 
 		double left = -0.5/(output_sigma*output_sigma);
 
-		double radiusX = (gaussianWeight.width-1)/2.0;
-		double radiusY = (gaussianWeight.height-1)/2.0;
+		int radiusX = gaussianWeight.width/2;
+		int radiusY = gaussianWeight.height/2;
 
 		for( int y = 0; y < gaussianWeight.height; y++ ) {
 			int index = gaussianWeight.startIndex + y*gaussianWeight.stride;
@@ -222,7 +240,7 @@ public class CirculantTracker {
 			for( int x = 0; x < gaussianWeight.width; x++ ) {
 				double rx = x-radiusX;
 
-				gaussianWeight.data[index++] = (float)Math.exp(left * (ry * ry + rx * rx));
+				gaussianWeight.data[index++] = Math.exp(left * (ry * ry + rx * rx));
 			}
 		}
 
@@ -236,7 +254,6 @@ public class CirculantTracker {
 		cosine.reshape(workRegionSize,workRegionSize);
 		k.reshape(workRegionSize,workRegionSize);
 		kf.reshape(workRegionSize,workRegionSize);
-		alpha.reshape(workRegionSize,workRegionSize);
 		alphaf.reshape(workRegionSize,workRegionSize);
 		newAlpha.reshape(workRegionSize,workRegionSize);
 		newAlphaf.reshape(workRegionSize,workRegionSize);
@@ -254,7 +271,7 @@ public class CirculantTracker {
 	 *
 	 * @param image Next image in the sequence
 	 */
-	public void performTracking( ImageFloat32 image ) {
+	public void performTracking( T image ) {
 		updateTrackLocation(image);
 		if( interp_factor != 0 )
 			performLearning(image);
@@ -263,12 +280,12 @@ public class CirculantTracker {
 	/**
 	 * Find the target inside the current image by searching around its last known location
 	 */
-	protected void updateTrackLocation(ImageFloat32 image) {
+	protected void updateTrackLocation(T image) {
 		get_subwindow(image, subInput);
 
 		// calculate response of the classifier at all locations
 		// matlab: k = dense_gauss_kernel(sigma, x, z);
-		dense_gauss_kernel(sigma, subPrev,subInput,k);
+		dense_gauss_kernel(sigma, subInput,subPrev,k);
 
 		fft.forward(k,kf);
 
@@ -279,9 +296,9 @@ public class CirculantTracker {
 		// find the pixel with the largest response
 		int N = tmpReal0.width*tmpReal0.height;
 		int indexBest = -1;
-		float valueBest = -1;
+		double valueBest = -1;
 		for( int i = 0; i < N; i++ ) {
-			float v = tmpReal0.data[i];
+			double v = tmpReal0.data[i];
 			if( v > valueBest ) {
 				valueBest = v;
 				indexBest = i;
@@ -293,35 +310,40 @@ public class CirculantTracker {
 		float offX=0,offY=0;
 
 		// TODO try different techniques
-//		float b = tmpReal0.get(peakX,peakY);
+//		float b = (float)tmpReal0.get(peakX,peakY);
 //
 //		if( peakX >= 1 && peakX < tmpReal0.width-1 ){
-//			float a = tmpReal0.get(peakX-1,peakY);
-//			float c = tmpReal0.get(peakX+1,peakY);
+//			float a = (float)tmpReal0.get(peakX-1,peakY);
+//			float c = (float)tmpReal0.get(peakX+1,peakY);
 //			offX = FastHessianFeatureDetector.polyPeak(a,b,c);
 //		}
 //		if( peakY >= 1 && peakY < tmpReal0.height-1 ) {
-//			float d = tmpReal0.get(peakX,peakY-1);
-//			float e = tmpReal0.get(peakX,peakY+1);
-//			offY = FastHessianFeatureDetector.polyPeak(d,b,e);
+//			float d = (float)tmpReal0.get(peakX,peakY-1);
+//			float e = (float)tmpReal0.get(peakX,peakY+1);
+//			offY = FastHessianFeatureDetector.polyPeak(d, b, e);
 //		}
 
 		// TODO there appears to be an offset of 0.5
 		// peak in region's coordinate system
-		float deltaX = subInput.width/2 - (peakX+offX);
-		float deltaY = subInput.height/2 - (peakY+offY);
+		float deltaX = (peakX+offX) - subInput.width/2;
+		float deltaY = (peakY+offY) - subInput.height/2;
+
+		System.out.printf("delts %7.5f %7.5f\n",deltaX,deltaY);
 
 		// convert peak location into image coordinate system
-		region.tl_x = region.tl_x + deltaX*stepX;
-		region.tl_y = region.tl_y + deltaY*stepY;
+		regionTrack.tl_x = regionTrack.tl_x + deltaX*stepX;
+		regionTrack.tl_y = regionTrack.tl_y + deltaY*stepY;
 
-		ensureInBounds(region,image.width,image.height);
+		ensureInBounds(regionTrack,image.width,image.height);
+
+		regionOut.tl_x = (regionTrack.tl_x+regionTrack.width/2)-regionOut.width/2;
+		regionOut.tl_y = (regionTrack.tl_y+regionTrack.height/2)-regionOut.height/2;
 	}
 
 	/**
 	 * Update the alphas and the track's appearance
 	 */
-	public void performLearning(ImageFloat32 image) {
+	public void performLearning(T image) {
 		// use the update track location
 		get_subwindow(image, subInput);
 
@@ -336,7 +358,7 @@ public class CirculantTracker {
 
 		// subsequent frames, interpolate model
 		// alphaf = (1 - interp_factor) * alphaf + interp_factor * new_alphaf;
-		int N = alpha.width*alpha.height*2;
+		int N = alphaf.width*alphaf.height*2;
 		for( int i = 0; i < N; i++ ) {
 			alphaf.data[i] = (1-interp_factor)*alphaf.data[i] + interp_factor*newAlphaf.data[i];
 		}
@@ -361,15 +383,15 @@ public class CirculantTracker {
 	 * @param y Input image
 	 * @param k Output containing Gaussian kernel for each element in target region
 	 */
-	public void dense_gauss_kernel( float sigma , ImageFloat32 x , ImageFloat32 y , ImageFloat32 k ) {
+	public void dense_gauss_kernel( double sigma , ImageFloat64 x , ImageFloat64 y , ImageFloat64 k ) {
 
-		InterleavedF32 xf=tmpFourier0,yf,xyf=tmpFourier2;
-		ImageFloat32 xy = tmpReal0;
-		float yy;
+		InterleavedF64 xf=tmpFourier0,yf,xyf=tmpFourier2;
+		ImageFloat64 xy = tmpReal0;
+		double yy;
 
 		// find x in Fourier domain
 		fft.forward(x, xf);
-		float xx = imageDotProduct(x);
+		double xx = imageDotProduct(x);
 
 		if( x != y ) {
 			// general case, x and y are different
@@ -393,7 +415,7 @@ public class CirculantTracker {
 		gaussianKernel(xx, yy, tmpReal1, sigma, k);
 	}
 
-	public static void circshift( ImageFloat32 a, ImageFloat32 b ) {
+	public static void circshift( ImageFloat64 a, ImageFloat64 b ) {
 		int w2 = a.width/2;
 		int h2 = b.height/2;
 
@@ -412,13 +434,13 @@ public class CirculantTracker {
 	/**
 	 * Computes the dot product of the image with itself
 	 */
-	public static float imageDotProduct(ImageFloat32 a) {
+	public static double imageDotProduct(ImageFloat64 a) {
 
-		float total = 0;
+		double total = 0;
 
 		int N = a.width*a.height;
 		for( int index = 0; index < N; index++ ) {
-			float value = a.data[index];
+			double value = a.data[index];
 			total += value*value;
 		}
 
@@ -428,17 +450,17 @@ public class CirculantTracker {
 	/**
 	 * Element-wise multiplication of 'a' and the complex conjugate of 'b'
 	 */
-	public static void elementMultConjB( InterleavedF32 a , InterleavedF32 b , InterleavedF32 output ) {
+	public static void elementMultConjB( InterleavedF64 a , InterleavedF64 b , InterleavedF64 output ) {
 		for( int y = 0; y < a.height; y++ ) {
 
 			int index = a.startIndex + y*a.stride;
 
 			for( int x = 0; x < a.width; x++, index += 2 ) {
 
-				float realA = a.data[index];
-				float imgA = a.data[index+1];
-				float realB = b.data[index];
-				float imgB = b.data[index+1];
+				double realA = a.data[index];
+				double imgA = a.data[index+1];
+				double realB = b.data[index];
+				double imgB = b.data[index+1];
 
 				output.data[index] = realA*realB + imgA*imgB;
 				output.data[index+1] = -realA*imgB + imgA*realB;
@@ -449,21 +471,21 @@ public class CirculantTracker {
 	/**
 	 * new_alphaf = yf ./ (fft2(k) + lambda);   %(Eq. 7)
 	 */
-	protected static void computeAlphas( InterleavedF32 yf , InterleavedF32 kf , float lambda ,
-										 InterleavedF32 alphaf ) {
+	protected static void computeAlphas( InterleavedF64 yf , InterleavedF64 kf , double lambda ,
+										 InterleavedF64 alphaf ) {
 
 		for( int y = 0; y < kf.height; y++ ) {
 
 			int index = yf.startIndex + y*yf.stride;
 
 			for( int x = 0; x < kf.width; x++, index += 2 ) {
-				float a = yf.data[index];
-				float b = yf.data[index+1];
+				double a = yf.data[index];
+				double b = yf.data[index+1];
 
-				float c = kf.data[index] + lambda;
-				float d = kf.data[index+1];
+				double c = kf.data[index] + lambda;
+				double d = kf.data[index+1];
 
-				float bottom = c*c + d*d;
+				double bottom = c*c + d*d;
 
 				alphaf.data[index] = (a*c + b*d)/bottom;
 				alphaf.data[index+1] = (b*c - a*d)/bottom;
@@ -479,9 +501,9 @@ public class CirculantTracker {
 	 * @param xx ||x||^2
 	 * @param yy ||y||^2
 	 */
-	protected static void gaussianKernel( float xx , float yy , ImageFloat32 xy , float sigma  , ImageFloat32 output ) {
-		float sigma2 = sigma*sigma;
-		float N = xy.width*xy.height;
+	protected static void gaussianKernel( double xx , double yy , ImageFloat64 xy , double sigma  , ImageFloat64 output ) {
+		double sigma2 = sigma*sigma;
+		double N = xy.width*xy.height;
 
 		for( int y = 0; y < xy.height; y++ ) {
 			int index = xy.startIndex + y*xy.stride;
@@ -489,11 +511,11 @@ public class CirculantTracker {
 			for( int x = 0; x < xy.width; x++ , index++ ) {
 
 				// (xx + yy - 2 * xy) / numel(x)
-				float value = (xx + yy - 2f*xy.data[index])/N;
+				double value = (xx + yy - 2*xy.data[index])/N;
 
 				double v = Math.exp(-Math.max(0, value) / sigma2);
 
-				output.data[index] = (float)v;
+				output.data[index] = v;
 			}
 		}
 	}
@@ -501,17 +523,17 @@ public class CirculantTracker {
 	/**
 	 * Copies the target into the output image and applies the cosine window to it.
 	 */
-	protected void get_subwindow( ImageFloat32 image , ImageFloat32 output ) {
+	protected void get_subwindow( T image , ImageFloat64 output ) {
 
 		// copy the target region
 
 		interp.setImage(image);
 		int index = 0;
 		for( int y = 0; y < workRegionSize; y++ ) {
-			float yy = region.tl_y + y*stepY;
+			float yy = regionTrack.tl_y + y*stepY;
 
 			for( int x = 0; x < workRegionSize; x++ ) {
-				float xx = region.tl_x + x*stepX;
+				float xx = regionTrack.tl_x + x*stepX;
 
 				if( interp.isInFastBounds(xx,yy))
 					output.data[index++] = interp.get_fast(xx,yy);
@@ -546,13 +568,13 @@ public class CirculantTracker {
 	 * The location of the target in the image
 	 */
 	public Rectangle2D_F32 getTargetLocation() {
-		return region;
+		return regionOut;
 	}
 
 	/**
 	 * Visual appearance of the target
 	 */
-	public ImageFloat32 getTargetTemplate() {
+	public ImageFloat64 getTargetTemplate() {
 		return subInput;
 	}
 }
