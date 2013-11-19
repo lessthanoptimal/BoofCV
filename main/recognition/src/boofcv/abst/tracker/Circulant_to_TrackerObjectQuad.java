@@ -19,9 +19,6 @@
 package boofcv.abst.tracker;
 
 import boofcv.alg.tracker.circulant.CirculantTracker;
-import boofcv.core.image.GConvertImage;
-import boofcv.struct.image.ImageDataType;
-import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageType;
 import georegression.geometry.UtilPolygons2D_F64;
@@ -36,37 +33,27 @@ import georegression.struct.shapes.RectangleCorner2D_F64;
  */
 public class Circulant_to_TrackerObjectQuad<T extends ImageSingleBand> implements TrackerObjectQuad<T> {
 
-	CirculantTracker tracker;
+	CirculantTracker<T> tracker;
 	RectangleCorner2D_F64 rect = new RectangleCorner2D_F64();
 
 	ImageType<T> imageType;
-	ImageFloat32 tmp;
 
-	public Circulant_to_TrackerObjectQuad(CirculantTracker tracker , ImageType<T> imageType) {
+	public Circulant_to_TrackerObjectQuad(CirculantTracker<T> tracker , ImageType<T> imageType) {
 		this.tracker = tracker;
 		this.imageType = imageType;
 
-		if( imageType.getDataType() != ImageDataType.F32 ) {
-			tmp = new ImageFloat32(1,1);
-		}
 	}
 
 	@Override
 	public boolean initialize(T image, Quadrilateral_F64 location) {
 
-		if( imageType.getDataType() != ImageDataType.F32 ) {
-			tmp.reshape(image.width,image.height);
-			GConvertImage.convert(image,tmp);
-		} else {
-			tmp = (ImageFloat32)image;
-		}
 
 		UtilPolygons2D_F64.bounding(location, rect);
 
 		int width = (int)(rect.x1 - rect.x0);
 		int height = (int)(rect.y1 - rect.y0);
 
-		tracker.initialize(tmp,(int)rect.x0,(int)rect.y0,width,height);
+		tracker.initialize(image,(int)rect.x0,(int)rect.y0,width,height);
 
 		return true;
 	}
@@ -74,13 +61,7 @@ public class Circulant_to_TrackerObjectQuad<T extends ImageSingleBand> implement
 	@Override
 	public boolean process(T image, Quadrilateral_F64 location) {
 
-		if( imageType.getDataType() != ImageDataType.F32 ) {
-			GConvertImage.convert(image,tmp);
-		} else {
-			tmp = (ImageFloat32)image;
-		}
-
-		tracker.performTracking(tmp);
+		tracker.performTracking(image);
 		Rectangle2D_F32 r = tracker.getTargetLocation();
 
 		int x0 = (int)(r.tl_x + 0.5f);
