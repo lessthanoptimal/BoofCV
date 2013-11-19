@@ -47,7 +47,7 @@ public class ConfigCirculantTracker {
 	 */
 	public double maxPixelValue = 255.0;
 
-	public double padding = 0.5;
+	public double padding = 1;
 
 	public int workSpace = 64;//128;
 

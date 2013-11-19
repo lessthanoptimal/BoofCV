@@ -20,7 +20,6 @@ package boofcv.factory.tracker;
 
 import boofcv.abst.tracker.*;
 import boofcv.alg.interpolate.InterpolatePixelMB;
-import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.tracker.circulant.CirculantTracker;
 import boofcv.alg.tracker.meanshift.LocalWeightedHistogramRotRect;
 import boofcv.alg.tracker.meanshift.PixelLikelihood;
@@ -157,14 +156,9 @@ public class FactoryTrackerObjectQuad {
 	 */
 	public static <T extends ImageSingleBand>
 	TrackerObjectQuad<T> circulant( ConfigCirculantTracker config , Class<T> imageType ) {
-		InterpolatePixelS<T> interp = FactoryInterpolation.bilinearPixelS(imageType);
 
-		CirculantTracker alg = new CirculantTracker(
-				config.output_sigma_factor,config.sigma,config.lambda,config.interp_factor,
-				config.padding,
-				config.workSpace,
-				config.maxPixelValue,interp);
+		CirculantTracker<T> alg = FactoryTrackerObjectAlgs.circulant(config,imageType);
 
-		return new Circulant_to_TrackerObjectQuad(alg,ImageType.single(imageType));
+		return new Circulant_to_TrackerObjectQuad<T>(alg,ImageType.single(imageType));
 	}
 }

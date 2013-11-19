@@ -79,9 +79,9 @@ public class CirculantTracker<T extends ImageSingleBand> {
 	private DiscreteFourierTransform<ImageFloat64,InterleavedF64> fft = DiscreteFourierTransformOps.createTransformF64();
 
 	// storage for subimage of input image
-	protected ImageFloat64 subInput = new ImageFloat64(1,1);
+	protected ImageFloat64 templateNew = new ImageFloat64(1,1);
 	// storage for the subimage of the previous frame
-	protected ImageFloat64 subPrev = new ImageFloat64(1,1);
+	protected ImageFloat64 template = new ImageFloat64(1,1);
 
 	// cosine window used to reduce artifacts from FFT
 	protected ImageFloat64 cosine = new ImageFloat64(1,1);
@@ -101,6 +101,9 @@ public class CirculantTracker<T extends ImageSingleBand> {
 	// Used for computing the gaussian kernel
 	protected ImageFloat64 gaussianWeight = new ImageFloat64(1,1);
 	protected InterleavedF64 gaussianWeightDFT = new InterleavedF64(1,1,2);
+
+	// detector response
+	private ImageFloat64 response = new ImageFloat64(1,1);
 
 	// storage for storing temporary results
 	private ImageFloat64 tmpReal0 = new ImageFloat64(1,1);
@@ -173,8 +176,8 @@ public class CirculantTracker<T extends ImageSingleBand> {
 		this.regionTrack.tl_x = cx-w/2;
 		this.regionTrack.tl_y = cy-h/2;
 
-		stepX = (regionWidth-1)/(float)(workRegionSize-1);
-		stepY = (regionHeight-1)/(float)(workRegionSize-1);
+		stepX = (w-1)/(float)(workRegionSize-1);
+		stepY = (h-1)/(float)(workRegionSize-1);
 
 		ensureInBounds(regionTrack,image.width,image.height);
 
@@ -187,19 +190,15 @@ public class CirculantTracker<T extends ImageSingleBand> {
 	 */
 	protected void initialLearning( T image ) {
 		// get subwindow at current estimated target position, to train classifier
-		get_subwindow(image, subInput);
+		get_subwindow(image, template);
 		
 		// Kernel Regularized Least-Squares, calculate alphas (in Fourier domain)
 		//	k = dense_gauss_kernel(sigma, x);
-		dense_gauss_kernel(sigma,subInput,subInput,k);
+		dense_gauss_kernel(sigma, template, template,k);
 		fft.forward(k, kf);
 
 		// new_alphaf = yf ./ (fft2(k) + lambda);   %(Eq. 7)
 		computeAlphas(gaussianWeightDFT, kf, lambda, alphaf);
-
-		ImageFloat64 tmp = subInput;
-		subInput = subPrev;
-		subPrev = tmp;
 	}
 
 	/**
@@ -248,13 +247,14 @@ public class CirculantTracker<T extends ImageSingleBand> {
 
 
 	protected void resizeImages( int workRegionSize ) {
-		subInput.reshape(workRegionSize,workRegionSize);
-		subPrev.reshape(workRegionSize,workRegionSize);
+		templateNew.reshape(workRegionSize, workRegionSize);
+		template.reshape(workRegionSize, workRegionSize);
 		cosine.reshape(workRegionSize,workRegionSize);
 		k.reshape(workRegionSize,workRegionSize);
 		kf.reshape(workRegionSize,workRegionSize);
 		alphaf.reshape(workRegionSize,workRegionSize);
 		newAlphaf.reshape(workRegionSize,workRegionSize);
+		response.reshape(workRegionSize,workRegionSize);
 		tmpReal0.reshape(workRegionSize,workRegionSize);
 		tmpReal1.reshape(workRegionSize,workRegionSize);
 		tmpFourier0.reshape(workRegionSize,workRegionSize);
@@ -279,32 +279,32 @@ public class CirculantTracker<T extends ImageSingleBand> {
 	 * Find the target inside the current image by searching around its last known location
 	 */
 	protected void updateTrackLocation(T image) {
-		get_subwindow(image, subInput);
+		get_subwindow(image, templateNew);
 
 		// calculate response of the classifier at all locations
 		// matlab: k = dense_gauss_kernel(sigma, x, z);
-		dense_gauss_kernel(sigma, subInput,subPrev,k);
+		dense_gauss_kernel(sigma, templateNew, template,k);
 
 		fft.forward(k,kf);
 
 		// response = real(ifft2(alphaf .* fft2(k)));   %(Eq. 9)
 		DiscreteFourierTransformOps.multiplyComplex(alphaf, kf, tmpFourier0);
-		fft.inverse(tmpFourier0, tmpReal0);
+		fft.inverse(tmpFourier0, response);
 
 		// find the pixel with the largest response
-		int N = tmpReal0.width*tmpReal0.height;
+		int N = response.width*response.height;
 		int indexBest = -1;
 		double valueBest = -1;
 		for( int i = 0; i < N; i++ ) {
-			double v = tmpReal0.data[i];
+			double v = response.data[i];
 			if( v > valueBest ) {
 				valueBest = v;
 				indexBest = i;
 			}
 		}
 
-		int peakX = indexBest % tmpReal0.width;
-		int peakY = indexBest / tmpReal0.width;
+		int peakX = indexBest % response.width;
+		int peakY = indexBest / response.width;
 		float offX=0,offY=0;
 
 		// TODO try different techniques
@@ -323,8 +323,8 @@ public class CirculantTracker<T extends ImageSingleBand> {
 
 		// TODO there appears to be an offset of 0.5
 		// peak in region's coordinate system
-		float deltaX = (peakX+offX) - subInput.width/2;
-		float deltaY = (peakY+offY) - subInput.height/2;
+		float deltaX = (peakX+offX) - templateNew.width/2;
+		float deltaY = (peakY+offY) - templateNew.height/2;
 
 		System.out.printf("delts %7.5f %7.5f\n",deltaX,deltaY);
 
@@ -343,11 +343,11 @@ public class CirculantTracker<T extends ImageSingleBand> {
 	 */
 	public void performLearning(T image) {
 		// use the update track location
-		get_subwindow(image, subInput);
+		get_subwindow(image, templateNew);
 
 		// Kernel Regularized Least-Squares, calculate alphas (in Fourier domain)
 		//	k = dense_gauss_kernel(sigma, x);
-		dense_gauss_kernel(sigma, subInput, subInput, k);
+		dense_gauss_kernel(sigma, templateNew, templateNew, k);
 		fft.forward(k,kf);
 
 		// new_alphaf = yf ./ (fft2(k) + lambda);   %(Eq. 7)
@@ -362,9 +362,9 @@ public class CirculantTracker<T extends ImageSingleBand> {
 
 		// Set the previous image to be an interpolated version
 		//		z = (1 - interp_factor) * z + interp_factor * new_z;
-		N = subInput.width*subInput.height;
+		N = templateNew.width* templateNew.height;
 		for( int i = 0; i < N; i++ ) {
-			subPrev.data[i] = (1-interp_factor)*subPrev.data[i] + interp_factor*subInput.data[i];
+			template.data[i] = (1-interp_factor)* template.data[i] + interp_factor*templateNew.data[i];
 		}
 	}
 
@@ -572,6 +572,10 @@ public class CirculantTracker<T extends ImageSingleBand> {
 	 * Visual appearance of the target
 	 */
 	public ImageFloat64 getTargetTemplate() {
-		return subInput;
+		return template;
+	}
+
+	public ImageFloat64 getResponse() {
+		return response;
 	}
 }

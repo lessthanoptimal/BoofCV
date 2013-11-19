@@ -18,6 +18,9 @@
 
 package boofcv.factory.tracker;
 
+import boofcv.abst.tracker.ConfigCirculantTracker;
+import boofcv.alg.interpolate.InterpolatePixelS;
+import boofcv.alg.tracker.circulant.CirculantTracker;
 import boofcv.alg.tracker.meanshift.LikelihoodHistCoupled_U8;
 import boofcv.alg.tracker.meanshift.LikelihoodHueSatHistCoupled_U8;
 import boofcv.alg.tracker.meanshift.LikelihoodHueSatHistInd_U8;
@@ -26,6 +29,7 @@ import boofcv.alg.tracker.sfot.SfotConfig;
 import boofcv.alg.tracker.sfot.SparseFlowObjectTracker;
 import boofcv.alg.tracker.tld.TldConfig;
 import boofcv.alg.tracker.tld.TldTracker;
+import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageMultiBand;
 import boofcv.struct.image.ImageSingleBand;
@@ -93,5 +97,16 @@ public class FactoryTrackerObjectAlgs {
 		} else {
 			throw new RuntimeException("Band type not yet supported "+imageType.getDataType());
 		}
+	}
+
+	public static <T extends ImageSingleBand>
+	CirculantTracker<T> circulant( ConfigCirculantTracker config , Class<T> imageType) {
+		InterpolatePixelS<T> interp = FactoryInterpolation.bilinearPixelS(imageType);
+
+		return new CirculantTracker(
+				config.output_sigma_factor,config.sigma,config.lambda,config.interp_factor,
+				config.padding,
+				config.workSpace,
+				config.maxPixelValue,interp);
 	}
 }
