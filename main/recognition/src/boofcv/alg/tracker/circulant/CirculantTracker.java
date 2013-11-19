@@ -87,7 +87,6 @@ public class CirculantTracker {
 
 	// Learn values.  used to compute weight in linear classifier
 	private InterleavedF64 alphaf = new InterleavedF64(1,1,2);
-	private ImageFloat64 newAlpha = new ImageFloat64(1,1);
 	private InterleavedF64 newAlphaf = new InterleavedF64(1,1,2);
 
 	// location of target
@@ -240,7 +239,7 @@ public class CirculantTracker {
 			}
 		}
 
-		fft.forward(gaussianWeight,gaussianWeightDFT);
+		fft.forward(gaussianWeight, gaussianWeightDFT);
 	}
 
 	protected void resizeImages(int width, int height) {
@@ -250,7 +249,6 @@ public class CirculantTracker {
 		k.reshape(width,height);
 		kf.reshape(width,height);
 		alphaf.reshape(width,height);
-		newAlpha.reshape(width,height);
 		newAlphaf.reshape(width,height);
 		tmpReal0.reshape(width,height);
 		tmpReal1.reshape(width,height);
@@ -328,7 +326,6 @@ public class CirculantTracker {
 
 		// new_alphaf = yf ./ (fft2(k) + lambda);   %(Eq. 7)
 		computeAlphas(gaussianWeightDFT, kf, lambda, newAlphaf);
-		fft.inverse(newAlphaf,newAlpha);
 
 		// subsequent frames, interpolate model
 		// alphaf = (1 - interp_factor) * alphaf + interp_factor * new_alphaf;
