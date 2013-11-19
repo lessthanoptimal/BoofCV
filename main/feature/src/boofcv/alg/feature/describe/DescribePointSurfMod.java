@@ -115,7 +115,7 @@ public class DescribePointSurfMod<II extends ImageSingleBand> extends DescribePo
 						 double c , double s,
 						 double scale,  SparseImageGradient gradient , double[] features)
 	{
-		int regionSize = widthLargeGrid*widthSubRegion-1;
+		int regionSize = widthLargeGrid*widthSubRegion;
 
 		int totalSampleWidth = widthSubRegion+overLap*2;
 
