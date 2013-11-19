@@ -92,7 +92,6 @@ public class CirculantTracker<T extends ImageSingleBand> {
 
 	// Learn values.  used to compute weight in linear classifier
 	private InterleavedF64 alphaf = new InterleavedF64(1,1,2);
-	private ImageFloat64 newAlpha = new ImageFloat64(1,1);
 	private InterleavedF64 newAlphaf = new InterleavedF64(1,1,2);
 
 	// location of target
@@ -255,7 +254,6 @@ public class CirculantTracker<T extends ImageSingleBand> {
 		k.reshape(workRegionSize,workRegionSize);
 		kf.reshape(workRegionSize,workRegionSize);
 		alphaf.reshape(workRegionSize,workRegionSize);
-		newAlpha.reshape(workRegionSize,workRegionSize);
 		newAlphaf.reshape(workRegionSize,workRegionSize);
 		tmpReal0.reshape(workRegionSize,workRegionSize);
 		tmpReal1.reshape(workRegionSize,workRegionSize);
@@ -354,7 +352,6 @@ public class CirculantTracker<T extends ImageSingleBand> {
 
 		// new_alphaf = yf ./ (fft2(k) + lambda);   %(Eq. 7)
 		computeAlphas(gaussianWeightDFT, kf, lambda, newAlphaf);
-		fft.inverse(newAlphaf,newAlpha);
 
 		// subsequent frames, interpolate model
 		// alphaf = (1 - interp_factor) * alphaf + interp_factor * new_alphaf;
