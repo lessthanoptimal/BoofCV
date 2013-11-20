@@ -159,10 +159,11 @@ public class CirculantTracker<T extends ImageSingleBand> {
 	 */
 	public void initialize( T image , int x0 , int y0 , int regionWidth , int regionHeight ) {
 
+		if( image.width < regionWidth || image.height < regionHeight)
+			throw new IllegalArgumentException("Track region is larger than input image");
+
 		regionOut.width = regionWidth;
 		regionOut.height = regionHeight;
-		regionOut.tl_x = x0;
-		regionOut.tl_y = y0;
 
 		// adjust for padding
 		int w = (int)(regionWidth*(1+padding));
@@ -180,6 +181,8 @@ public class CirculantTracker<T extends ImageSingleBand> {
 		stepY = (h-1)/(float)(workRegionSize-1);
 
 		ensureInBounds(regionTrack,image.width,image.height);
+
+		updateRegionOut();
 
 		initialLearning(image);
 	}
@@ -307,7 +310,7 @@ public class CirculantTracker<T extends ImageSingleBand> {
 		int peakY = indexBest / response.width;
 		float offX=0,offY=0;
 
-		// TODO try different techniques
+		// TODO try different techniques.  Average of a larger region?
 //		float b = (float)tmpReal0.get(peakX,peakY);
 //
 //		if( peakX >= 1 && peakX < tmpReal0.width-1 ){
@@ -321,12 +324,11 @@ public class CirculantTracker<T extends ImageSingleBand> {
 //			offY = FastHessianFeatureDetector.polyPeak(d, b, e);
 //		}
 
-		// TODO there appears to be an offset of 0.5
 		// peak in region's coordinate system
 		float deltaX = (peakX+offX) - templateNew.width/2;
 		float deltaY = (peakY+offY) - templateNew.height/2;
 
-		System.out.printf("delts %7.5f %7.5f\n",deltaX,deltaY);
+//		System.out.printf("delts %7.5f %7.5f\n",deltaX,deltaY);
 
 		// convert peak location into image coordinate system
 		regionTrack.tl_x = regionTrack.tl_x + deltaX*stepX;
@@ -334,6 +336,10 @@ public class CirculantTracker<T extends ImageSingleBand> {
 
 		ensureInBounds(regionTrack,image.width,image.height);
 
+		updateRegionOut();
+	}
+
+	private void updateRegionOut() {
 		regionOut.tl_x = (regionTrack.tl_x+regionTrack.width/2)-regionOut.width/2;
 		regionOut.tl_y = (regionTrack.tl_y+regionTrack.height/2)-regionOut.height/2;
 	}
@@ -534,8 +540,10 @@ public class CirculantTracker<T extends ImageSingleBand> {
 
 				if( interp.isInFastBounds(xx,yy))
 					output.data[index++] = interp.get_fast(xx,yy);
-				else
+				else if( image.isInBounds((int)xx,(int)yy))
 					output.data[index++] = interp.get(xx, yy);
+				else
+					output.data[index++] = 0;
 			}
 		}
 
