@@ -49,6 +49,11 @@ Version : Alpha 0.16
 - ImageMiscOps
   * added copy() for rectangular sub-images
   * limited support for Interleaved images
+- ThresholdImageOps
+  * Added adaptiveSquare
+  * Added adaptiveGaussian
+- ImageBlurOps
+  * Improved accuracy of operations on integer images
 - Removed GeoModelRefine and replaced with ModelFitter
 - Image Types
   * Improved and renamed interleaved image types
