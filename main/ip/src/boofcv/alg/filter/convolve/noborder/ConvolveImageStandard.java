@@ -18,10 +18,7 @@
 
 package boofcv.alg.filter.convolve.noborder;
 
-import boofcv.struct.convolve.Kernel1D_F32;
-import boofcv.struct.convolve.Kernel1D_I32;
-import boofcv.struct.convolve.Kernel2D_F32;
-import boofcv.struct.convolve.Kernel2D_I32;
+import boofcv.struct.convolve.*;
 import boofcv.struct.image.*;
 
 
@@ -31,7 +28,7 @@ import boofcv.struct.image.*;
  * </p>
  * 
  * <p>
- * NOTE: This code was automatically generated using {@link GenerateConvolveImageStandard}.
+ * NOTE: This code was automatically generated using {@link boofcv.alg.filter.convolve.noborder.GenerateConvolveImageStandard}.
  * </p>
  * 
  * @author Peter Abeles
@@ -120,6 +117,99 @@ public class ConvolveImageStandard {
 			int indexDst = dest.startIndex + y*dest.stride+kernelRadius;
 			for( int x = kernelRadius; x < width-kernelRadius; x++ ) {
 				float total = 0;
+				int indexKer = 0;
+				for( int ki = -kernelRadius; ki <= kernelRadius; ki++ ) {
+					int indexSrc = src.startIndex+(y+ki)*src.stride+ x;
+					for( int kj = -kernelRadius; kj <= kernelRadius; kj++ ) {
+						total += (dataSrc[indexSrc+kj]  )* dataKernel[indexKer++];
+					}
+				}
+				dataDst[indexDst++] = total;
+			}
+		}
+	}
+
+	public static void horizontal( Kernel1D_F64 kernel ,
+								  ImageFloat64 image, ImageFloat64 dest,
+								  boolean includeBorder) {
+		final double[] dataSrc = image.data;
+		final double[] dataDst = dest.data;
+		final double[] dataKer = kernel.data;
+
+		final int radius = kernel.getRadius();
+		final int kernelWidth = kernel.getWidth();
+
+		final int yBorder = includeBorder ? 0 : radius;
+
+		final int width = image.getWidth();
+		final int height = image.getHeight()-yBorder;
+
+		for( int i = yBorder; i < height; i++ ) {
+			int indexDst = dest.startIndex + i*dest.stride+radius;
+			int j = image.startIndex + i*image.stride - radius;
+			final int jEnd = j+width-radius;
+
+			for( j += radius; j < jEnd; j++ ) {
+				double total = 0;
+				int indexSrc = j;
+				for( int k = 0; k < kernelWidth; k++ ) {
+					total += (dataSrc[indexSrc++] ) * dataKer[k];
+				}
+				dataDst[indexDst++] = total;
+			}
+		}
+	}
+
+	public static void vertical( Kernel1D_F64 kernel,
+								 ImageFloat64 image, ImageFloat64 dest,
+								 boolean includeBorder)
+	{
+		final double[] dataSrc = image.data;
+		final double[] dataDst = dest.data;
+		final double[] dataKer = kernel.data;
+
+		final int radius = kernel.getRadius();
+		final int kernelWidth = kernel.getWidth();
+
+		final int imgWidth = dest.getWidth();
+		final int imgHeight = dest.getHeight();
+
+		final int yEnd = imgHeight-radius;
+
+		final int xBorder = includeBorder ? 0 : radius;
+
+		for( int y = radius; y < yEnd; y++ ) {
+			int indexDst = dest.startIndex+y*dest.stride+xBorder;
+			int i = image.startIndex + (y-radius)*image.stride;
+			final int iEnd = i+imgWidth-xBorder;
+
+			for( i += xBorder; i < iEnd; i++ ) {
+				double total = 0;
+				int indexSrc = i;
+				for( int k = 0; k < kernelWidth; k++ ) {
+					total += (dataSrc[indexSrc] )* dataKer[k];
+					indexSrc += image.stride;
+				}
+				dataDst[indexDst++] = total;
+			}
+		}
+	}
+
+	public static void convolve( Kernel2D_F64 kernel , ImageFloat64 src , ImageFloat64 dest )
+	{
+		final double[] dataKernel = kernel.data;
+		final double[] dataSrc = src.data;
+		final double[] dataDst = dest.data;
+
+		final int width = src.getWidth();
+		final int height = src.getHeight();
+
+		int kernelRadius = kernel.width/2;
+
+		for( int y = kernelRadius; y < height-kernelRadius; y++ ) {
+			int indexDst = dest.startIndex + y*dest.stride+kernelRadius;
+			for( int x = kernelRadius; x < width-kernelRadius; x++ ) {
+				double total = 0;
 				int indexKer = 0;
 				for( int ki = -kernelRadius; ki <= kernelRadius; ki++ ) {
 					int indexSrc = src.startIndex+(y+ki)*src.stride+ x;
@@ -420,6 +510,7 @@ public class ConvolveImageStandard {
 
 		final int radius = kernel.getRadius();
 		final int kernelWidth = kernel.getWidth();
+		final int halfDivisor = divisor/2;
 
 		final int yBorder = includeBorder ? 0 : radius;
 
@@ -437,7 +528,8 @@ public class ConvolveImageStandard {
 				for( int k = 0; k < kernelWidth; k++ ) {
 					total += (dataSrc[indexSrc++] & 0xFF) * dataKer[k];
 				}
-				dataDst[indexDst++] = (byte)(total/divisor);
+
+				dataDst[indexDst++] = (byte)((total+halfDivisor)/divisor);
 			}
 		}
 	}
@@ -452,6 +544,7 @@ public class ConvolveImageStandard {
 
 		final int radius = kernel.getRadius();
 		final int kernelWidth = kernel.getWidth();
+		final int halfDivisor = divisor/2;
 
 		final int imgWidth = dest.getWidth();
 		final int imgHeight = dest.getHeight();
@@ -472,7 +565,8 @@ public class ConvolveImageStandard {
 					total += (dataSrc[indexSrc] & 0xFF)* dataKer[k];
 					indexSrc += image.stride;
 				}
-				dataDst[indexDst++] = (byte)(total/divisor);
+
+				dataDst[indexDst++] = (byte)((total+halfDivisor)/divisor);
 			}
 		}
 	}
@@ -485,6 +579,7 @@ public class ConvolveImageStandard {
 
 		final int width = src.getWidth();
 		final int height = src.getHeight();
+		final int halfDivisor = divisor/2;
 
 		int kernelRadius = kernel.width/2;
 
@@ -499,7 +594,7 @@ public class ConvolveImageStandard {
 						total += (dataSrc[indexSrc+kj] & 0xFF )* dataKernel[indexKer++];
 					}
 				}
-				dataDst[indexDst++] = (byte)(total/divisor);
+				dataDst[indexDst++] = (byte)((total+halfDivisor)/divisor);
 			}
 		}
 	}
@@ -513,6 +608,7 @@ public class ConvolveImageStandard {
 
 		final int radius = kernel.getRadius();
 		final int kernelWidth = kernel.getWidth();
+		final int halfDivisor = divisor/2;
 
 		final int yBorder = includeBorder ? 0 : radius;
 
@@ -530,7 +626,7 @@ public class ConvolveImageStandard {
 				for( int k = 0; k < kernelWidth; k++ ) {
 					total += (dataSrc[indexSrc++] ) * dataKer[k];
 				}
-				dataDst[indexDst++] = (short)(total/divisor);
+				dataDst[indexDst++] = (short)((total+halfDivisor)/divisor);
 			}
 		}
 	}
@@ -545,6 +641,7 @@ public class ConvolveImageStandard {
 
 		final int radius = kernel.getRadius();
 		final int kernelWidth = kernel.getWidth();
+		final int halfDivisor = divisor/2;
 
 		final int imgWidth = dest.getWidth();
 		final int imgHeight = dest.getHeight();
@@ -565,7 +662,7 @@ public class ConvolveImageStandard {
 					total += (dataSrc[indexSrc] )* dataKer[k];
 					indexSrc += image.stride;
 				}
-				dataDst[indexDst++] = (short)(total/divisor);
+				dataDst[indexDst++] = (short)((total+halfDivisor)/divisor);
 			}
 		}
 	}
@@ -578,6 +675,7 @@ public class ConvolveImageStandard {
 
 		final int width = src.getWidth();
 		final int height = src.getHeight();
+		final int halfDivisor = divisor/2;
 
 		int kernelRadius = kernel.width/2;
 
@@ -592,7 +690,7 @@ public class ConvolveImageStandard {
 						total += (dataSrc[indexSrc+kj]  )* dataKernel[indexKer++];
 					}
 				}
-				dataDst[indexDst++] = (short)(total/divisor);
+				dataDst[indexDst++] = (short)((total+halfDivisor)/divisor);
 			}
 		}
 	}
@@ -699,6 +797,7 @@ public class ConvolveImageStandard {
 
 		final int radius = kernel.getRadius();
 		final int kernelWidth = kernel.getWidth();
+		final int halfDivisor = divisor/2;
 
 		final int yBorder = includeBorder ? 0 : radius;
 
@@ -716,7 +815,7 @@ public class ConvolveImageStandard {
 				for( int k = 0; k < kernelWidth; k++ ) {
 					total += (dataSrc[indexSrc++] ) * dataKer[k];
 				}
-				dataDst[indexDst++] = (total/divisor);
+				dataDst[indexDst++] = ((total+halfDivisor)/divisor);
 			}
 		}
 	}
@@ -731,6 +830,7 @@ public class ConvolveImageStandard {
 
 		final int radius = kernel.getRadius();
 		final int kernelWidth = kernel.getWidth();
+		final int halfDivisor = divisor/2;
 
 		final int imgWidth = dest.getWidth();
 		final int imgHeight = dest.getHeight();
@@ -751,7 +851,7 @@ public class ConvolveImageStandard {
 					total += (dataSrc[indexSrc] )* dataKer[k];
 					indexSrc += image.stride;
 				}
-				dataDst[indexDst++] = (total/divisor);
+				dataDst[indexDst++] = ((total+halfDivisor)/divisor);
 			}
 		}
 	}
@@ -764,6 +864,7 @@ public class ConvolveImageStandard {
 
 		final int width = src.getWidth();
 		final int height = src.getHeight();
+		final int halfDivisor = divisor/2;
 
 		int kernelRadius = kernel.width/2;
 
@@ -778,7 +879,7 @@ public class ConvolveImageStandard {
 						total += (dataSrc[indexSrc+kj]  )* dataKernel[indexKer++];
 					}
 				}
-				dataDst[indexDst++] = (total/divisor);
+				dataDst[indexDst++] = ((total+halfDivisor)/divisor);
 			}
 		}
 	}

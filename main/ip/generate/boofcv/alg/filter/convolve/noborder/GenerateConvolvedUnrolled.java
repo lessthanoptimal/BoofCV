@@ -39,6 +39,10 @@ public class GenerateConvolvedUnrolled extends CodeGeneratorBase {
 	String bitWise;
 	String sumType;
 	boolean hasDivisor;
+	boolean isInteger;
+
+	String declareHalf;
+	String divide;
 
 	@Override
 	public void generate() throws FileNotFoundException {
@@ -52,7 +56,7 @@ public class GenerateConvolvedUnrolled extends CodeGeneratorBase {
 	}
 
 	protected void create( AutoTypeImage inputImg , AutoTypeImage outputImg , boolean divided ) throws FileNotFoundException {
-		boolean isInteger = inputImg.isInteger();
+		isInteger = inputImg.isInteger();
 
 		String name = "ConvolveImageUnrolled_"+inputImg.getAbbreviatedType()+"_"+outputImg.getAbbreviatedType();
 		if( divided )
@@ -67,6 +71,9 @@ public class GenerateConvolvedUnrolled extends CodeGeneratorBase {
 		sumType = isInteger ? "int" : "float";
 		bitWise = inputImg.getBitWise();
 		hasDivisor = divided;
+
+		declareHalf = isInteger ? "\t\tfinal " + sumType + " halfDivisor = divisor/2;\n" : "";
+		divide = isInteger ? "(total+halfDivisor)/divisor" : "total/divisor";
 
 		createFile(name);
 	}
@@ -188,6 +195,7 @@ public class GenerateConvolvedUnrolled extends CodeGeneratorBase {
 				"\n" +
 				"\t\tfinal int width = image.getWidth();\n" +
 				"\t\tfinal int height = image.getHeight()-yBorder;\n" +
+				(hasDivisor ? declareHalf : "")+
 				"\n" +
 				"\t\tfor( int i = yBorder; i < height; i++ ) {\n" +
 				"\t\t\tint indexDst = dest.startIndex + i*dest.stride+radius;\n" +
@@ -203,7 +211,7 @@ public class GenerateConvolvedUnrolled extends CodeGeneratorBase {
 		out.printf("\t\t\t\ttotal += (dataSrc[indexSrc]" + bitWise + ")*k%d;\n", num);
 		out.printf("\n");
 		if( hasDivisor ) {
-			out.print("\t\t\t\tdataDst[indexDst++] = " + typeCast + "(total/divisor);\n");
+			out.print("\t\t\t\tdataDst[indexDst++] = " + typeCast + "("+divide+");\n");
 		} else {
 			out.print("\t\t\t\tdataDst[indexDst++] = " + typeCast + "total;\n");
 		}
@@ -234,6 +242,7 @@ public class GenerateConvolvedUnrolled extends CodeGeneratorBase {
 				"\n" +
 				"\t\tfinal int imgWidth = dest.getWidth();\n" +
 				"\t\tfinal int imgHeight = dest.getHeight();\n" +
+				(hasDivisor ? declareHalf : "") +
 				"\n" +
 				"\t\tfinal int yEnd = imgHeight-radius;\n" +
 				"\n" +
@@ -254,7 +263,7 @@ public class GenerateConvolvedUnrolled extends CodeGeneratorBase {
 		}
 		out.print("\n");
 		if( hasDivisor )
-			out.print("\t\t\t\tdataDst[indexDst++] = " + typeCast + "(total/divisor);\n");
+			out.print("\t\t\t\tdataDst[indexDst++] = " + typeCast + "("+divide+");\n");
 		else
 			out.print("\t\t\t\tdataDst[indexDst++] = " + typeCast + "total;\n");
 		out.print("\t\t\t}\n" +
@@ -333,6 +342,7 @@ public class GenerateConvolvedUnrolled extends CodeGeneratorBase {
 				"\n");
 		out.print("\t\tfinal int width = src.getWidth();\n" +
 				"\t\tfinal int height = src.getHeight();\n" +
+				declareHalf +
 				"\n" +
 				"\t\tfinal int kernelRadius = kernel.getRadius();\n");
 		out.print("\t\tfinal "+sumType+" totalRow[] = new int[ width ];\n");
@@ -379,7 +389,7 @@ public class GenerateConvolvedUnrolled extends CodeGeneratorBase {
 				"\t\t\t}\n" +
 				"\t\t\tint indexDst = dest.startIndex + y*dest.stride+kernelRadius;\n" +
 				"\t\t\tfor( int x = kernelRadius; x < width-kernelRadius; x++ ) {\n" +
-				"\t\t\t\tdataDst[indexDst++] = "+typeCast+"(totalRow[x] / divisor);\n" +
+				"\t\t\t\tdataDst[indexDst++] = "+typeCast+"((totalRow[x]+halfDivisor)/ divisor);\n" +
 				"\t\t\t}\n"+
 				"\t\t}\n" +
 				"\t}\n\n");

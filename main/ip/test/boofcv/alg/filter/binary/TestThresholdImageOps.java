@@ -18,19 +18,14 @@
 
 package boofcv.alg.filter.binary;
 
-import boofcv.alg.filter.convolve.GConvolveImageOps;
+import boofcv.alg.filter.blur.BlurImageOps;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.alg.misc.GImageStatistics;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.core.image.FactoryGImageSingleBand;
 import boofcv.core.image.GImageSingleBand;
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.factory.filter.kernel.FactoryKernelGaussian;
-import boofcv.misc.BoofMiscOps;
-import boofcv.struct.ImageRectangle;
-import boofcv.struct.convolve.Kernel2D;
-import boofcv.struct.convolve.Kernel2D_F32;
-import boofcv.struct.convolve.Kernel2D_I32;
+import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
 import boofcv.testing.BoofTesting;
@@ -95,7 +90,7 @@ public class TestThresholdImageOps {
 				ImageMiscOps.fillUniform(expected,rand,0,200);
 				m.invoke(null,input,output,radius,bias,false,null,null);
 				naiveAdaptiveSquare(input, expected, radius, bias, false);
-;
+
 				BoofTesting.assertEquals(expected,output,0);
 			}
 		}
@@ -106,22 +101,17 @@ public class TestThresholdImageOps {
 
 		int w = radius*2+1;
 
+		ImageSingleBand blur;
+		if( input instanceof ImageUInt8 ) {
+			blur = BlurImageOps.mean((ImageUInt8)input,null,radius,null);
+		} else {
+			blur = BlurImageOps.mean((ImageFloat32)input,null,radius,null);
+		}
+
 		for( int y = 0; y < input.height; y++ ) {
 			for( int x = 0; x < input.width; x++ ) {
-				ImageRectangle r = new ImageRectangle(x-radius,y-radius,x+radius+1,y+radius+1);
-				BoofMiscOps.boundRectangleInside(input,r);
 
-				double threshold = 0;
-				for( int i = r.y0; i < r.y1; i++ ) {
-					for( int j = r.x0; j < r.x1; j++ ) {
-						threshold += GeneralizedImageOps.get(input,j,i);
-					}
-				}
-				threshold = threshold/r.area() + bias;
-				if( input.getTypeInfo().isInteger() ) {
-					threshold = (int)threshold;
-				}
-
+				double threshold = GeneralizedImageOps.get(blur,x,y)+bias;
 				double v = GeneralizedImageOps.get(input,x,y);
 
 				if( down ) {
@@ -194,16 +184,16 @@ public class TestThresholdImageOps {
 	public void naiveAdaptiveGaussian( ImageSingleBand input , ImageUInt8 output ,
 									   int radius , double bias , boolean down ) {
 
-		Class kernelType = input.getTypeInfo().isInteger() ? Kernel2D_I32.class : Kernel2D_F32.class;
-		Kernel2D kernel = (Kernel2D)FactoryKernelGaussian.gaussian(kernelType,-1,radius);
-
-		ImageSingleBand filtered = (ImageSingleBand)input._createNew(input.width,input.height);
-
-		GConvolveImageOps.convolveNormalized(kernel,input,filtered);
+		ImageSingleBand blur;
+		if( input instanceof ImageUInt8 ) {
+			blur = BlurImageOps.gaussian((ImageUInt8) input, null, -1, radius, null);
+		} else {
+			blur = BlurImageOps.gaussian((ImageFloat32) input, null, -1, radius, null);
+		}
 
 		for( int y = 0; y < input.height; y++ ) {
 			for( int x = 0; x < input.width; x++ ) {
-				double threshold = GeneralizedImageOps.get(filtered,x,y)+bias;
+				double threshold = GeneralizedImageOps.get(blur,x,y)+bias;
 				double v = GeneralizedImageOps.get(input,x,y);
 
 				if( down ) {

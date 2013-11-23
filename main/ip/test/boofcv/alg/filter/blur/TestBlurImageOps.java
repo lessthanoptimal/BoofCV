@@ -20,11 +20,12 @@ package boofcv.alg.filter.blur;
 
 import boofcv.alg.filter.blur.impl.ImplMedianSortNaive;
 import boofcv.alg.filter.convolve.ConvolveNormalized;
+import boofcv.alg.filter.convolve.normalized.ConvolveNormalizedNaive;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.factory.filter.kernel.FactoryKernelGaussian;
+import boofcv.struct.convolve.Kernel1D_I32;
 import boofcv.struct.convolve.Kernel2D_F32;
-import boofcv.struct.convolve.Kernel2D_I32;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageUInt8;
 import boofcv.testing.BoofTesting;
@@ -47,6 +48,7 @@ public class TestBlurImageOps {
 		ImageUInt8 input = new ImageUInt8(width,height);
 		ImageUInt8 found = new ImageUInt8(width,height);
 		ImageUInt8 expected = new ImageUInt8(width,height);
+		ImageUInt8 work = new ImageUInt8(width,height);
 
 		GImageMiscOps.fillUniform(input, rand, 0, 20);
 
@@ -56,11 +58,12 @@ public class TestBlurImageOps {
 
 			int w = radius*2+1;
 
-			Kernel2D_I32 kernel = new Kernel2D_I32(w);
+			Kernel1D_I32 kernel = new Kernel1D_I32(w);
 			for( int i = 0; i < kernel.data.length; i++ )
 				kernel.data[i] = 1;
 
-			ConvolveNormalized.convolve(kernel,input,expected);
+			ConvolveNormalizedNaive.horizontal(kernel, input, work);
+			ConvolveNormalizedNaive.vertical(kernel, work, expected);
 
 			BlurImageOps.mean(input,found, radius, null);
 
@@ -131,6 +134,7 @@ public class TestBlurImageOps {
 		ImageUInt8 input = new ImageUInt8(width,height);
 		ImageUInt8 found = new ImageUInt8(width,height);
 		ImageUInt8 expected = new ImageUInt8(width,height);
+		ImageUInt8 work = new ImageUInt8(width,height);
 
 		GImageMiscOps.fillUniform(input, rand, 0, 20);
 
@@ -138,8 +142,9 @@ public class TestBlurImageOps {
 			ImageMiscOps.fill(expected,0);
 			ImageMiscOps.fill(found,0);
 
-			Kernel2D_I32 kernel = FactoryKernelGaussian.gaussian(Kernel2D_I32.class,-1,radius);
-			ConvolveNormalized.convolve(kernel,input,expected);
+			Kernel1D_I32 kernel = FactoryKernelGaussian.gaussian(Kernel1D_I32.class,-1,radius);
+			ConvolveNormalizedNaive.horizontal(kernel, input, work);
+			ConvolveNormalizedNaive.vertical(kernel, work, expected);
 
 			double sigma = FactoryKernelGaussian.sigmaForRadius(radius,0);
 

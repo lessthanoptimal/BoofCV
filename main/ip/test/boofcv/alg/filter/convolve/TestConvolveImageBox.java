@@ -24,6 +24,7 @@ import boofcv.core.image.border.ImageBorder;
 import boofcv.core.image.border.ImageBorderValue;
 import boofcv.factory.filter.kernel.FactoryKernel;
 import boofcv.struct.convolve.Kernel1D_F32;
+import boofcv.struct.convolve.Kernel1D_F64;
 import boofcv.struct.convolve.Kernel1D_I32;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.testing.BoofTesting;
@@ -119,11 +120,13 @@ public class TestConvolveImageBox extends CompareEquivalentFunctions {
 	public static Object createTableKernel(Class<?> kernelType, int kernelRadius, Random rand) {
 		Object kernel;
 		if (Kernel1D_F32.class == kernelType) {
-			kernel = FactoryKernel.table1D_F32(kernelRadius,false);
+			kernel = FactoryKernel.table1D_F32(kernelRadius, false);
+		} else if (Kernel1D_F64.class == kernelType) {
+			kernel = FactoryKernel.table1D_F64(kernelRadius, false);
 		} else if (Kernel1D_I32.class == kernelType) {
 			kernel = FactoryKernel.table1D_I32(kernelRadius);
 		} else {
-			throw new RuntimeException("Unknown kernel type");
+			throw new RuntimeException("Unknown kernel type: "+kernelType.getSimpleName());
 		}
 		return kernel;
 	}

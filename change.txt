@@ -52,8 +52,8 @@ Version : Alpha 0.16
 - ThresholdImageOps
   * Added adaptiveSquare
   * Added adaptiveGaussian
-- ImageBlurOps
-  * Improved accuracy of operations on integer images
+- Convolution and ImageBlurOps
+  * Improved accuracy of operations on integer images.  Rounded instead of floored.
 - Removed GeoModelRefine and replaced with ModelFitter
 - Image Types
   * Improved and renamed interleaved image types

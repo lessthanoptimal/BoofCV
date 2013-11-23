@@ -104,7 +104,7 @@ public class TestImplConvolveMean extends CompareEquivalentFunctions {
 	@Override
 	protected Object[] reformatForValidation(Method m, Object[] targetParam) {
 		Class<?> params[] = m.getParameterTypes();
-		Object kernel = createTableKernel(params[0],kernelRadius,rand);
+		Object kernel = createTableKernel(params[0],kernelRadius);
 
 		ImageSingleBand output = (ImageSingleBand)((ImageSingleBand)targetParam[1]).clone();
 
@@ -122,7 +122,7 @@ public class TestImplConvolveMean extends CompareEquivalentFunctions {
 		BoofTesting.assertEquals(expected, found, 1e-4);
 	}
 
-	public static Object createTableKernel(Class<?> kernelType, int kernelRadius, Random rand) {
+	public static Object createTableKernel(Class<?> kernelType, int kernelRadius ) {
 		Object kernel;
 		if (Kernel1D_F32.class == kernelType) {
 			kernel = FactoryKernel.table1D_F32(kernelRadius,true);

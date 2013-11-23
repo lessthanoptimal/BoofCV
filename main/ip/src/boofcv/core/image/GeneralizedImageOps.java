@@ -204,4 +204,25 @@ public class GeneralizedImageOps {
 			throw new IllegalArgumentException("Unknown or incompatible image type: " + img.getClass().getSimpleName());
 		}
 	}
+
+	public static <T extends ImageSingleBand> int getNumBits(Class<T> type) {
+		if (type == ImageUInt8.class) {
+			return 8;
+		} else if (type == ImageSInt8.class) {
+			return 8;
+		} else if (type == ImageSInt16.class) {
+			return 16;
+		} else if (type == ImageUInt16.class) {
+			return 16;
+		} else if (type == ImageSInt32.class) {
+			return 32;
+		} else if (type == ImageSInt64.class) {
+			return 64;
+		} else if (type == ImageFloat32.class) {
+			return 32;
+		} else if (type == ImageFloat64.class) {
+			return 64;
+		}
+		throw new RuntimeException("Unknown type: "+type.getSimpleName());
+	}
 }

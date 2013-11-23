@@ -88,6 +88,18 @@ public class FactoryKernel {
 		return ret;
 	}
 
+	public static Kernel1D_F64 table1D_F64(int radius, boolean normalized) {
+		Kernel1D_F64 ret = new Kernel1D_F64(radius * 2 + 1);
+
+		double val = normalized ? 1.0 / ret.width : 1.0;
+
+		for (int i = 0; i < ret.data.length; i++) {
+			ret.data[i] = val;
+		}
+
+		return ret;
+	}
+
 	/**
 	 * Creates a random kernel of the specified type where each element is drawn from an uniform
 	 * distribution.
@@ -200,6 +212,26 @@ public class FactoryKernel {
 		float range = max - min;
 		for (int i = 0; i < ret.data.length; i++) {
 			ret.data[i] = rand.nextFloat() * range + min;
+		}
+
+		return ret;
+	}
+
+	/**
+	 * Creates a random 2D kernel drawn from a uniform distribution.
+	 *
+	 * @param radius Kernel's radius.
+	 * @param min	minimum value.
+	 * @param max	maximum value.
+	 * @param rand   Random number generator.
+	 * @return Randomized kernel.
+	 */
+	public static Kernel2D_F64 random2D_F64(int radius, double min, double max, Random rand) {
+		Kernel2D_F64 ret = new Kernel2D_F64(radius * 2 + 1);
+
+		double range = max - min;
+		for (int i = 0; i < ret.data.length; i++) {
+			ret.data[i] = rand.nextDouble() * range + min;
 		}
 
 		return ret;
