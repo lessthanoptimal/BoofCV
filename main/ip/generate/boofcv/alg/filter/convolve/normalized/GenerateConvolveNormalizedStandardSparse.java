@@ -56,7 +56,7 @@ public class GenerateConvolveNormalizedStandardSparse {
 				"\n" +
 				"/**\n" +
 				" * <p>\n" +
-				" * Straight forward implementation of {@link boofcv.alg.filter.convolve.edge.ConvolveNormalizedSparse} with minimal\n" +
+				" * Straight forward implementation of {@link boofcv.alg.filter.convolve.ConvolveNormalizedSparse} with minimal\n" +
 				" * optimizations.\n" +
 				" * </p>\n" +
 				" *\n" +
@@ -70,6 +70,9 @@ public class GenerateConvolveNormalizedStandardSparse {
 	}
 
 	private void printConvolve(String kernelType , String inputType ,  String sumType , String bitWise) {
+
+		String divide = sumType.compareTo("int") == 0 ? "(total+div/2)/div" : "total/div";
+
 		out.print("\tpublic static "+sumType+" convolve( Kernel1D_"+kernelType+" horizontal, Kernel1D_"+kernelType+" vertical,\n" +
 				"\t\t\t\t\t\t\t\t"+inputType+" input, int c_x , int c_y, "+sumType+" storage[] )\n" +
 				"\t{\n" +
@@ -100,7 +103,7 @@ public class GenerateConvolveNormalizedStandardSparse {
 				"\t\t\t\ttotal += (input.data[indexImg]"+bitWise+")*kerVal;\n" +
 				"\t\t\t\tdiv += kerVal;\n" +
 				"\t\t\t}\n" +
-				"\t\t\tstorage[indexStorage] = total/div;\n" +
+				"\t\t\tstorage[indexStorage] = "+divide+";\n" +
 				"\t\t}\n" +
 				"\n" +
 				"\t\t// convolve vertically\n" +
@@ -112,7 +115,7 @@ public class GenerateConvolveNormalizedStandardSparse {
 				"\t\t\ttotal += storage[i]*kerVal;\n" +
 				"\t\t\tdiv += kerVal;\n" +
 				"\t\t}\n" +
-				"\t\treturn total/div;\n" +
+				"\t\treturn "+divide+";\n" +
 				"\t}\n\n");
 	}
 

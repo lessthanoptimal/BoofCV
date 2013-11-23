@@ -318,9 +318,26 @@ public class KernelMath {
 		return ret;
 	}
 
+	public static Kernel1D_I32 convert( Kernel1D_F64 original , double minFrac ) {
+
+		Kernel1D_I32 ret = new Kernel1D_I32(original.width);
+		convert( original.data,ret.data,original.width,minFrac);
+
+		return ret;
+	}
+
 	public static void convert( float input[] , int output[] , int size , float minFrac) {
 		float max = maxAbs(input,size);
 		float min = minAbs(input,size,max*minFrac);
+
+		for( int i = 0; i < size; i++ ) {
+			output[i] = (int)(input[i]/min);
+		}
+	}
+
+	public static void convert( double input[] , int output[] , int size , double minFrac) {
+		double max = maxAbs(input,size);
+		double min = minAbs(input,size,max*minFrac);
 
 		for( int i = 0; i < size; i++ ) {
 			output[i] = (int)(input[i]/min);
@@ -338,10 +355,32 @@ public class KernelMath {
 		return max;
 	}
 
+	public static double maxAbs( double data[] , int size ) {
+		double max = 0;
+		for( int i = 0; i < size; i++ ) {
+			double v = Math.abs(data[i]);
+
+			if( v > max )
+				max = v;
+		}
+		return max;
+	}
+
 	public static float minAbs( float data[] , int size , float minValue ) {
 		float min = Float.MAX_VALUE;
 		for( int i = 0; i < size; i++ ) {
 			float v = Math.abs(data[i]);
+
+			if( v < min && v >= minValue )
+				min = v;
+		}
+		return min;
+	}
+
+	public static double minAbs( double data[] , int size , double minValue ) {
+		double min = Float.MAX_VALUE;
+		for( int i = 0; i < size; i++ ) {
+			double v = Math.abs(data[i]);
 
 			if( v < min && v >= minValue )
 				min = v;

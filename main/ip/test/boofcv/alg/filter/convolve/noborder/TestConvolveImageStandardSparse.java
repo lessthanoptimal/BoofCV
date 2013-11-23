@@ -51,6 +51,7 @@ public class TestConvolveImageStandardSparse {
 
 	static Kernel1D_F32 kernelF32;
 	static Kernel1D_I32 kernelI32;
+	static int sumKernel;
 	static float expectedOutput;
 
 	/**
@@ -84,13 +85,17 @@ public class TestConvolveImageStandardSparse {
 		ImageFloat32 floatImage = new ImageFloat32(width,height);
 		ConvertImage.convert(seedImage,floatImage);
 
+		sumKernel = 0;
 		kernelI32 = FactoryKernelGaussian.gaussian(Kernel1D_I32.class,-1,kernelRadius);
 		kernelF32 = new Kernel1D_F32(kernelI32.width);
-		for( int i = 0; i < kernelI32.width; i++ )
-			kernelF32.data[i] = kernelI32.data[i];
+		for( int i = 0; i < kernelI32.width; i++ ) {
+			sumKernel += kernelF32.data[i] = kernelI32.data[i];
+		}
 
-		expectedOutput = computeExpected(floatImage);
 		boolean isFloatingKernel = method.getParameterTypes()[0] == Kernel1D_F32.class;
+		boolean isDivisor = method.getParameterTypes().length != 6;
+
+		expectedOutput = computeExpected(seedImage,!isFloatingKernel,isDivisor);
 
 		ImageSingleBand inputImage = GeneralizedImageOps.convert(floatImage,null,(Class)method.getParameterTypes()[2]);
 		Object inputKernel = isFloatingKernel ? kernelF32 : kernelI32;
@@ -105,8 +110,11 @@ public class TestConvolveImageStandardSparse {
 			if( method.getParameterTypes().length == 6 )
 				result = (Number)method.invoke(null,inputKernel,inputKernel,inputImage,targetX,targetY,inputStorage);
 			else
-				result = (Number)method.invoke(null,inputKernel,inputKernel,inputImage,targetX,targetY,inputStorage,1,1);
-			assertEquals((int)expectedOutput,result.intValue());
+				result = (Number)method.invoke(null,inputKernel,inputKernel,inputImage,targetX,targetY,inputStorage,sumKernel,sumKernel);
+
+			String description = method.getName()+" "+inputImage.getClass().getSimpleName()+" "+method.getParameterTypes().length;
+
+			assertEquals(description,(int)expectedOutput,result.intValue());
 		} catch (IllegalAccessException e) {                                                         
 			throw new RuntimeException(e);
 		} catch (InvocationTargetException e) {
@@ -114,13 +122,28 @@ public class TestConvolveImageStandardSparse {
 		}
 	}
 
-	private float computeExpected( ImageFloat32 image ) {
-		ImageFloat32 temp = new ImageFloat32(image.width,image.height);
-		ImageFloat32 temp2 = new ImageFloat32(image.width,image.height);
+	private float computeExpected( ImageUInt8 image , boolean isInteger , boolean isDivisor ) {
 
-		ConvolveImageNoBorder.horizontal(kernelF32,image,temp,true);
-		ConvolveImageNoBorder.vertical(kernelF32,temp,temp2,true);
+		if( isInteger && isDivisor  ) {
+			ImageUInt8 temp = new ImageUInt8(image.width,image.height);
+			ImageUInt8 temp2 = new ImageUInt8(image.width,image.height);
 
-		return temp2.get(targetX,targetY);
+			ConvolveImageNoBorder.horizontal(kernelI32,image,temp,sumKernel,true);
+			ConvolveImageNoBorder.vertical(kernelI32,temp,temp2,sumKernel,true);
+
+			return temp2.get(targetX,targetY);
+		} else {
+			ImageFloat32 imageF = new ImageFloat32(image.width,image.height);
+			ImageFloat32 temp = new ImageFloat32(image.width,image.height);
+			ImageFloat32 temp2 = new ImageFloat32(image.width,image.height);
+
+			ConvertImage.convert(image,imageF);
+
+			ConvolveImageNoBorder.horizontal(kernelF32,imageF,temp,true);
+			ConvolveImageNoBorder.vertical(kernelF32,temp,temp2,true);
+
+			return temp2.get(targetX,targetY);
+		}
+
 	}
 }

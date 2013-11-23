@@ -56,7 +56,7 @@ public class TestConvolveImageStandard {
 	 */
 	@Test
 	public void checkAll() {
-		int numExpected = 24;
+		int numExpected = 27;
 		Method methods[] = ConvolveImageStandard.class.getMethods();
 
 		// sanity check to make sure the functions are being found
@@ -146,6 +146,7 @@ public class TestConvolveImageStandard {
 	 */
 	public void horizontalDiv(ImageSingleBand img, ImageSingleBand dest) {
 		int divisor = 11;
+		int halfDivisor = divisor/2;
 		Object ker = FactoryKernelGaussian.gaussian1D(img.getClass(),-1,kernelRadius);
 
 		invokeMethod("horizontal", ker, img, dest, divisor, false);
@@ -153,7 +154,7 @@ public class TestConvolveImageStandard {
 		assertEquals(0, get(dest, 1, 0), 1e-6);
 
 		//  see if some point was convolved correctly
-		double val = (get(img, 0, 1) * getKernel(ker, 0) + get(img, 1, 1) * getKernel(ker, 1) + get(img, 2, 1) * getKernel(ker, 2)) / divisor;
+		double val = (get(img, 0, 1) * getKernel(ker, 0) + get(img, 1, 1) * getKernel(ker, 1) + get(img, 2, 1) * getKernel(ker, 2) + halfDivisor) / divisor;
 		if (dest.getTypeInfo().isInteger())
 			val = (int) val;
 
@@ -193,12 +194,13 @@ public class TestConvolveImageStandard {
 		Object ker = FactoryKernelGaussian.gaussian1D(img.getClass(),-1,kernelRadius);
 
 		int divisor = 11;
+		int halfDivisor = divisor/2;
 		invokeMethod("vertical", ker, img, dest, divisor, false);
 
 		// the left border should not be convolved yet
 		assertEquals(0, get(dest, 0, 1), 1e-6);
 
-		double val = (get(img, 1, 0) * getKernel(ker, 0) + get(img, 1, 1) * getKernel(ker, 1) + get(img, 1, 2) * getKernel(ker, 2)) / divisor;
+		double val = (get(img, 1, 0) * getKernel(ker, 0) + get(img, 1, 1) * getKernel(ker, 1) + get(img, 1, 2) * getKernel(ker, 2) + halfDivisor) / divisor;
 		if (dest.getTypeInfo().isInteger())
 			val = (int) val;
 
@@ -215,9 +217,12 @@ public class TestConvolveImageStandard {
 	 */
 	public void convolve(ImageSingleBand img, ImageSingleBand dest) {
 		Object ker;
-		if (!img.getTypeInfo().isInteger())
-			ker = FactoryKernel.random2D_F32(kernelRadius, 0f, 1f, new Random(234));
-		else
+		if (!img.getTypeInfo().isInteger()) {
+			if( img.getTypeInfo().getNumBits() == 32 )
+				ker = FactoryKernel.random2D_F32(kernelRadius, 0f, 1f, new Random(234));
+			else
+				ker = FactoryKernel.random2D_F64(kernelRadius, 0f, 1f, new Random(234));
+		} else
 			ker = FactoryKernel.random2D_I32(kernelRadius, 0, 10, new Random(234));
 
 		int testX = 1;
@@ -256,6 +261,7 @@ public class TestConvolveImageStandard {
 			ker = FactoryKernel.random2D_I32(kernelRadius, 0, 4, new Random(234));
 
 		int divisor = 11;
+		int halfDivisor = divisor/2;
 		int testX = 1;
 		int testY = 2;
 		double expected = 0;
@@ -266,7 +272,7 @@ public class TestConvolveImageStandard {
 				expected += getKernel(ker, kernelRadius + i, kernelRadius + j) * get(img, testX + i, testY + j);
 			}
 		}
-		expected /= divisor;
+		expected = (expected + halfDivisor)/divisor;
 		if (dest.getTypeInfo().isInteger())
 			expected = (int) expected;
 
