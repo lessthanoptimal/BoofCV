@@ -38,12 +38,15 @@ public class TestGeneralPurposeFFT_F32_2D {
 
 	@Test
 	public void realFull() {
-
 		for( int i = 0; i < sizes.length; i++ ) {
 			for( int j = 0; j < sizes.length; j++ ) {
 				checkRealFull(sizes[i], sizes[j]);
 			}
 		}
+
+		// cases which caused problems
+		checkRealFull(323,768);
+
 	}
 
 	private void checkRealFull(int numRows, int numColumns) {

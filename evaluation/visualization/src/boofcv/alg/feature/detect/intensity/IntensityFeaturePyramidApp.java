@@ -196,12 +196,11 @@ public class IntensityFeaturePyramidApp<T extends ImageSingleBand, D extends Ima
 
 	public static void main( String args[] ) {
 
-
 		IntensityFeaturePyramidApp<ImageFloat32,ImageFloat32> app =
 				new IntensityFeaturePyramidApp<ImageFloat32,ImageFloat32>(ImageFloat32.class,ImageFloat32.class);
 
 //		IntensityFeaturePyramidApp<ImageUInt8, ImageSInt16> app =
-//				new IntensityFeaturePyramidApp<ImageUInt8,ImageSInt16>(ImageUInt8.class,ImageSInt16.class,usePyramid);
+//				new IntensityFeaturePyramidApp<ImageUInt8,ImageSInt16>(ImageUInt8.class,ImageSInt16.class);
 
 		java.util.List<PathLabel> inputs = new ArrayList<PathLabel>();
 

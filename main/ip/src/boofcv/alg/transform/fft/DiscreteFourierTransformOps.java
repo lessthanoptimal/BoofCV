@@ -145,8 +145,8 @@ public class DiscreteFourierTransformOps {
 			int w = transform.width;
 			int h = transform.height;
 
-			int hw1 = hw + 1;
-			int hh1 = hh + 1;
+			int hw1 = hw + w%2;
+			int hh1 = hh + h%2;
 
 			if( forward ) {
 				InterleavedF32 storageTL = new InterleavedF32(hw1,hh1,2);
@@ -219,8 +219,8 @@ public class DiscreteFourierTransformOps {
 			int w = transform.width;
 			int h = transform.height;
 
-			int hw1 = hw + 1;
-			int hh1 = hh + 1;
+			int hw1 = hw + w%2;
+			int hh1 = hh + h%2;
 
 			if( forward ) {
 				InterleavedF64 storageTL = new InterleavedF64(hw1,hh1,2);

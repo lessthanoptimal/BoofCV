@@ -18,6 +18,8 @@
 
 package boofcv.alg.transform.fft;
 
+import java.util.Arrays;
+
 /**
  * Computes 1D Discrete Fourier Transform (DFT) of complex and real, double
  * precision data. The size of the data can be an arbitrary number. The code originally comes from
@@ -974,6 +976,7 @@ public class GeneralPurposeFFT_F64_1D {
 	}
 
 	private void bluestein_complex(final double[] a, final int offa, final int isign) {
+		Arrays.fill(ak,0);
 		if (isign > 0) {
 			for (int i = 0; i < n; i++) {
 				int idx1 = 2 * i;
@@ -1037,6 +1040,8 @@ public class GeneralPurposeFFT_F64_1D {
 	}
 
 	private void bluestein_real_full(final double[] a, final int offa, final int isign) {
+		Arrays.fill(ak,0);
+
 		if (isign > 0) {
 			for (int i = 0; i < n; i++) {
 				int idx1 = 2 * i;
@@ -1095,6 +1100,7 @@ public class GeneralPurposeFFT_F64_1D {
 	}
 
 	private void bluestein_real_forward(final double[] a, final int offa) {
+		Arrays.fill(ak,0);
 
 		for (int i = 0; i < n; i++) {
 			int idx1 = 2 * i;
@@ -1139,6 +1145,7 @@ public class GeneralPurposeFFT_F64_1D {
 	}
 
 	private void bluestein_real_inverse(final double[] a, final int offa) {
+		Arrays.fill(ak,0);
 
 		if (n % 2 == 0) {
 			ak[0] = a[offa] * bk1[0];
@@ -1214,6 +1221,7 @@ public class GeneralPurposeFFT_F64_1D {
 	}
 
 	private void bluestein_real_inverse2(final double[] a, final int offa) {
+		Arrays.fill(ak,0);
 
 		for (int i = 0; i < n; i++) {
 			int idx1 = 2 * i;
