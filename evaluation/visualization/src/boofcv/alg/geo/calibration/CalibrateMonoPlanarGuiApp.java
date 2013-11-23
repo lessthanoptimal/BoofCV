@@ -20,7 +20,6 @@ package boofcv.alg.geo.calibration;
 
 import boofcv.abst.calib.CalibrateMonoPlanar;
 import boofcv.abst.calib.ConfigChessboard;
-import boofcv.abst.calib.ConfigSquareGrid;
 import boofcv.abst.calib.PlanarCalibrationDetector;
 import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.distort.LensDistortionOps;
@@ -195,24 +194,24 @@ public class CalibrateMonoPlanarGuiApp extends JPanel
 	}
 
 	public static void main( String args[] ) {
-		PlanarCalibrationDetector detector = FactoryPlanarCalibrationTarget.detectorSquareGrid(new ConfigSquareGrid(15,15));
+//		PlanarCalibrationDetector detector = FactoryPlanarCalibrationTarget.detectorSquareGrid(new ConfigSquareGrid(15,15));
 //		PlanarCalibrationDetector detector = FactoryPlanarCalibrationTarget.detectorSquareGrid(new ConfigSquareGrid(5,7));
-//		PlanarCalibrationDetector detector = FactoryPlanarCalibrationTarget.detectorChessboard(new ConfigChessboard(5,7));
+		PlanarCalibrationDetector detector = FactoryPlanarCalibrationTarget.detectorChessboard(new ConfigChessboard(5,7));
 
-		PlanarCalibrationTarget target = FactoryPlanarCalibrationTarget.gridSquare(15, 15, 0.5, 7.0 / 18.0);
+//		PlanarCalibrationTarget target = FactoryPlanarCalibrationTarget.gridSquare(15, 15, 0.5, 7.0 / 18.0);
 //		PlanarCalibrationTarget target = FactoryPlanarCalibrationTarget.gridSquare(5, 7,30,30);
-//		PlanarCalibrationTarget target = FactoryPlanarCalibrationTarget.gridChess(5, 7, 30);
+		PlanarCalibrationTarget target = FactoryPlanarCalibrationTarget.gridChess(5, 7, 30);
 
 //		String directory = "../data/evaluation/calibration/mono/Sony_DSC-HX5V_Square";
-//		String directory = "../data/evaluation/calibration/mono/Sony_DSC-HX5V_Chess";
-		String directory = "../data/evaluation/calibration/mono/PULNiX_CCD_6mm_Zhang";
+		String directory = "../data/evaluation/calibration/mono/Sony_DSC-HX5V_Chess";
+//		String directory = "../data/evaluation/calibration/mono/PULNiX_CCD_6mm_Zhang";
 //		String directory = "../data/evaluation/calibration/stereo/Bumblebee2_Chess";
 //		String directory = "../data/evaluation/calibration/stereo/Bumblebee2_Square";
 
 		CalibrateMonoPlanarGuiApp app = new CalibrateMonoPlanarGuiApp();
-//		app.configure(detector,target,BoofMiscOps.directoryList(directory, "frame" ),false);
+		app.configure(detector,target,BoofMiscOps.directoryList(directory, "frame" ),false);
 //		app.configure(detector,target,BoofMiscOps.directoryList(directory, "left" ),false);
-		app.configure(detector,target,BoofMiscOps.directoryList(directory, "CalibIm" ),false);
+//		app.configure(detector,target,BoofMiscOps.directoryList(directory, "CalibIm" ),false);
 
 		JFrame frame = new JFrame("Planar Calibration");
 		frame.add(app, BorderLayout.CENTER);
