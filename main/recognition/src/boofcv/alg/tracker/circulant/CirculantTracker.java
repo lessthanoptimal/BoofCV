@@ -316,7 +316,7 @@ public class CirculantTracker<T extends ImageSingleBand> {
 //		if( peakX >= 1 && peakX < tmpReal0.width-1 ){
 //			float a = (float)tmpReal0.get(peakX-1,peakY);
 //			float c = (float)tmpReal0.get(peakX+1,peakY);
-//			offX = FastHessianFeatureDetector.polyPeak(a,b,c);
+//			offX = FastHessianFeatureDetector.polyPeak(a, b, c);
 //		}
 //		if( peakY >= 1 && peakY < tmpReal0.height-1 ) {
 //			float d = (float)tmpReal0.get(peakX,peakY-1);
@@ -340,8 +340,9 @@ public class CirculantTracker<T extends ImageSingleBand> {
 	}
 
 	private void updateRegionOut() {
-		regionOut.tl_x = (regionTrack.tl_x+regionTrack.width/2)-regionOut.width/2;
-		regionOut.tl_y = (regionTrack.tl_y+regionTrack.height/2)-regionOut.height/2;
+		// add integer rounding?
+		regionOut.tl_x = (regionTrack.tl_x+((int)regionTrack.width)/2)-((int)regionOut.width)/2;
+		regionOut.tl_y = (regionTrack.tl_y+((int)regionTrack.height)/2)-((int)regionOut.height)/2;
 	}
 
 	/**
