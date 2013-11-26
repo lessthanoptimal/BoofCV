@@ -108,10 +108,10 @@ public class TestCannyEdge {
 		input.set(5,4,5);
 		input.set(5,5,5);
 
-		// manually inspecting the image shows that the intensity image has a max value of 136 and a
+		// manually inspecting the image shows that the intensity image has a max value of 34 and a
 		// smallest value of 2
 		CannyEdge<ImageUInt8,ImageSInt16> alg = createCanny(true);
-		alg.process(input,1,100,null);
+		alg.process(input,1,28,null);
 		assertEquals(1, alg.getContours().size());
 
 		// the high threshold should be too high
@@ -119,7 +119,7 @@ public class TestCannyEdge {
 		assertEquals(0, alg.getContours().size());
 
 		// the low threshold is too low now for everything to be connected
-		alg.process(input,99,100,null);
+		alg.process(input,30,31,null);
 		assertEquals(2, alg.getContours().size());
 	}
 
@@ -163,7 +163,7 @@ public class TestCannyEdge {
 
 	private CannyEdge<ImageUInt8,ImageSInt16> createCanny( boolean saveTrace ) {
 		BlurFilter<ImageUInt8> blur = FactoryBlurFilter.gaussian(ImageUInt8.class, -1, 1);
-		ImageGradient<ImageUInt8,ImageSInt16> gradient = FactoryDerivative.sobel(ImageUInt8.class, ImageSInt16.class);
+		ImageGradient<ImageUInt8,ImageSInt16> gradient = FactoryDerivative.three(ImageUInt8.class, ImageSInt16.class);
 
 		return new CannyEdge<ImageUInt8,ImageSInt16>(blur,gradient,saveTrace);
 	}

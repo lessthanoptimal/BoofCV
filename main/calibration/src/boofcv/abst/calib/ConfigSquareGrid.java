@@ -45,23 +45,17 @@ public class ConfigSquareGrid implements Configuration {
 	 */
 	public double relativeSizeThreshold = 1;
 
-	/**
-	 * Threshold used to compute binary image.  If < 0 then the mean image intensity is used.
-	 */
-	public double binaryThreshold = -1;
-
 	public ConfigSquareGrid(int numCols, int numRows) {
 		this.numCols = numCols;
 		this.numRows = numRows;
 	}
 
 	public ConfigSquareGrid(int numCols, int numRows, int maxCombinations,
-							double relativeSizeThreshold, double binaryThreshold) {
+							double relativeSizeThreshold) {
 		this.numCols = numCols;
 		this.numRows = numRows;
 		this.maxCombinations = maxCombinations;
 		this.relativeSizeThreshold = relativeSizeThreshold;
-		this.binaryThreshold = binaryThreshold;
 	}
 
 	@Override

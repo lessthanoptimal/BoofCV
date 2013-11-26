@@ -18,17 +18,18 @@
 
 package boofcv.alg.geo.calibration;
 
-import boofcv.alg.feature.detect.grid.AutoThresholdCalibrationGrid;
 import boofcv.alg.feature.detect.grid.DetectSquareCalibrationPoints;
 import boofcv.alg.feature.detect.grid.RefineCalibrationGridCorner;
 import boofcv.alg.feature.detect.grid.refine.WrapRefineCornerCanny;
 import boofcv.alg.feature.detect.quadblob.QuadBlob;
+import boofcv.alg.filter.binary.GThresholdImageOps;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.gui.SelectInputPanel;
 import boofcv.gui.VisualizeApp;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.PathLabel;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageUInt8;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I32;
 
@@ -54,13 +55,13 @@ public class DebugSquaresSubpixelApp
 
 	// detects the calibration target
 	DetectSquareCalibrationPoints detectAlg;
-	AutoThresholdCalibrationGrid auto = new AutoThresholdCalibrationGrid(-1);
 
 	// refines the initial corner estimate
 	RefineCalibrationGridCorner refineAlg;
 
 	// gray scale image that targets are detected inside of
 	ImageFloat32 gray = new ImageFloat32(1,1);
+	ImageUInt8 binary = new ImageUInt8(1,1);
 
 	// GUI related classes
 	JScrollPane scroll;
@@ -98,12 +99,14 @@ public class DebugSquaresSubpixelApp
 	public void process( BufferedImage image ) {
 		System.out.println("Processing subpixel app");
 		gray.reshape(image.getWidth(),image.getHeight());
+		binary.reshape(image.getWidth(),image.getHeight());
 		ConvertBufferedImage.convertFrom(image,gray);
 
 		List<Point2D_I32> crude = null;
 		List<Point2D_F64> refined = null;
-		
-		if( !auto.process(detectAlg,gray) ) {
+
+		GThresholdImageOps.adaptiveSquare(gray, binary, 50, -10, true);
+		if( !detectAlg.process(binary) ) {
 			System.out.println("Detect Target Failed!");
 		} else {
 			List<QuadBlob> squares = detectAlg.getInterestSquares();

@@ -28,7 +28,6 @@ import boofcv.alg.feature.detect.quadblob.OrderPointsIntoGrid;
 import boofcv.alg.filter.binary.BinaryImageOps;
 import boofcv.alg.filter.binary.GThresholdImageOps;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
-import boofcv.alg.misc.GImageMiscOps;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.core.image.border.BorderType;
@@ -85,8 +84,6 @@ public class DetectChessCalibrationPoints<T extends ImageSingleBand, D extends I
 	private ImageUInt8 eroded = new ImageUInt8(1, 1);
 	// Threshold used to create binary image.  if < 0 then a threshold is automatically selected
 	private double userBinaryThreshold = -1;
-	// the actual threshold used
-	private double actualBinaryThreshold;
 	// relative blob size threshold.  Adjusted relative to image size.  Small objects are pruned
 	private double relativeSizeThreshold;
 
@@ -140,8 +137,7 @@ public class DetectChessCalibrationPoints<T extends ImageSingleBand, D extends I
 		intensityAlg = FactoryIntensityPoint.shiTomasi(radius, true, derivType);
 //		intensityAlg = FactoryIntensityPoint.harris(radius,0.04f,true,derivType);
 
-		NonMaxSuppression extractor =
-				FactoryFeatureExtractor.nonmax(new ConfigExtract(radius + 2, 20, radius + 2, true));
+		NonMaxSuppression extractor = FactoryFeatureExtractor.nonmax(new ConfigExtract(radius, 20, radius + 2, true));
 		detectorAlg = new GeneralFeatureDetector<T, D>(intensityAlg, extractor);
 
 		// minContourSize is specified later after the image's size is known
@@ -167,7 +163,7 @@ public class DetectChessCalibrationPoints<T extends ImageSingleBand, D extends I
 		adjustForImageSize(gray.width,gray.height);
 
 		// detect the chess board
-		if (!(foundBound = detectChessBoard(gray,userBinaryThreshold,true)))
+		if (!(foundBound = detectChessBoard(gray,userBinaryThreshold)))
 			return false;
 
 		// rectangle that contains the area of interest
@@ -236,75 +232,17 @@ public class DetectChessCalibrationPoints<T extends ImageSingleBand, D extends I
 	/**
 	 * Threshold the image and find squares
 	 */
-	private boolean detectChessBoard(T gray, double threshold , boolean first ) {
+	private boolean detectChessBoard(T gray, double threshold ) {
 
-		actualBinaryThreshold = threshold;
-		if( actualBinaryThreshold < 0 )
-			actualBinaryThreshold = UtilCalibrationGrid.selectThreshold(gray,histogram);
-
-		GThresholdImageOps.threshold(gray, binary, actualBinaryThreshold, true);
+		if( threshold < 0 )
+			GThresholdImageOps.adaptiveSquare(gray, binary, 50,-10, true);
+		else
+			GThresholdImageOps.threshold(gray, binary, threshold, true);
 
 		// erode to make the squares separated
 		BinaryImageOps.erode8(binary, eroded);
 
-		if (findBound.process(eroded)) {
-			if( userBinaryThreshold < 0 ) {
-				// second pass to improve threshold
-				return detectChessBoardSubImage(gray);
-			} else {
-				return true;
-			}
-		} else if( first && userBinaryThreshold < 0 ) {
-			// if the target is small and the background dark, the threshold will be too low
-			// if the target is small and the background white, it will still estimate a good threshold
-			// so try a larger value before giving up
-			threshold = (255+threshold)/2;
-			return detectChessBoard(gray,threshold,false);
-		}
-
-		return false;
-	}
-
-	/**
-	 * Look for the target only inside a specific region.  The threshold can be more accurate selected this way
-	 */
-	private boolean detectChessBoardSubImage( T gray ) {
-
-		// region the target is contained inside of
-		ImageRectangle targetBound = findBound.getBoundRect();
-
-		// expand the bound a bit
-		int w = targetBound.getWidth();
-		int h = targetBound.getHeight();
-
-		ImageRectangle expanded = new ImageRectangle();
-		int adj = (int)(w*0.12);
-		expanded.x0 = targetBound.x0-adj;
-		expanded.x1 = targetBound.x1+adj;
-		adj = (int)(h*0.12);
-		expanded.y0 = targetBound.y0-adj;
-		expanded.y1 = targetBound.y1+adj;
-
-		BoofMiscOps.boundRectangleInside(gray, expanded);
-
-		// create sub-images for processing.  recompute threshold just around the area of interest and
-		// only look for the target inside that
-		T subGray = (T)gray.subimage(expanded.x0,expanded.y0,expanded.x1,expanded.y1, null);
-		actualBinaryThreshold = UtilCalibrationGrid.selectThreshold(subGray,histogram);
-
-		GImageMiscOps.fill(binary,0);
-		ImageUInt8 subBinary = (ImageUInt8)binary.subimage(expanded.x0,expanded.y0,expanded.x1,expanded.y1, null);
-		GThresholdImageOps.threshold(subGray, subBinary, actualBinaryThreshold, true);
-
-		// The new threshold tends to require two erodes
-		BinaryImageOps.erode8(binary, eroded);
-		BinaryImageOps.erode4(eroded, binary);
-		BinaryImageOps.dilate4(binary, eroded);
-
-		if (findBound.process(eroded))
-			return true;
-
-		return false;
+		return findBound.process(eroded);
 	}
 
 	/**
@@ -467,10 +405,6 @@ public class DetectChessCalibrationPoints<T extends ImageSingleBand, D extends I
 
 	public ImageUInt8 getBinary() {
 			return eroded;
-	}
-
-	public double getActualBinaryThreshold() {
-		return actualBinaryThreshold;
 	}
 
 	public void setUserBinaryThreshold(double userBinaryThreshold) {

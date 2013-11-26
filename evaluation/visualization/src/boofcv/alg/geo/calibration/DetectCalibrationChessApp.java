@@ -151,7 +151,7 @@ public class DetectCalibrationChessApp<T extends ImageSingleBand, D extends Imag
 		foundTarget = alg.process(gray);
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
-				calibGUI.setThreshold((int) alg.getActualBinaryThreshold());
+				calibGUI.setThreshold((int) alg.getUserBinaryThreshold());
 			}
 		});
 	}

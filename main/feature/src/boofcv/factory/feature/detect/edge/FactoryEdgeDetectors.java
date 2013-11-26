@@ -51,7 +51,7 @@ public class FactoryEdgeDetectors {
 	CannyEdge<T,D> canny( int blurRadius , boolean saveTrace , boolean dynamicThreshold, Class<T> imageType , Class<D> derivType )
 	{
 		BlurFilter<T> blur = FactoryBlurFilter.gaussian(imageType, -1, blurRadius);
-		ImageGradient<T,D> gradient = FactoryDerivative.sobel(imageType, derivType);
+		ImageGradient<T,D> gradient = FactoryDerivative.three(imageType, derivType);
 
 		if( dynamicThreshold )
 			return new CannyEdgeDynamic<T,D>(blur,gradient,saveTrace);

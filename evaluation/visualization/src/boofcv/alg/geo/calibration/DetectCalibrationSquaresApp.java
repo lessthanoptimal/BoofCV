@@ -18,7 +18,6 @@
 
 package boofcv.alg.geo.calibration;
 
-import boofcv.alg.feature.detect.grid.AutoThresholdCalibrationGrid;
 import boofcv.alg.feature.detect.grid.DetectSquareCalibrationPoints;
 import boofcv.alg.feature.detect.quadblob.QuadBlob;
 import boofcv.alg.filter.binary.GThresholdImageOps;
@@ -74,9 +73,6 @@ public class DetectCalibrationSquaresApp
 	BufferedImage workImage;
 	// original untainted image
 	BufferedImage input;
-
-	// used to automatically select the threshold
-	AutoThresholdCalibrationGrid auto = new AutoThresholdCalibrationGrid(-1);
 
 	// if a target was found or not
 	boolean foundTarget;
@@ -318,13 +314,10 @@ public class DetectCalibrationSquaresApp
 
 		if( calibGUI.isManual() ) {
 			GThresholdImageOps.threshold(gray,binary,calibGUI.getThresholdLevel(),true);
-
-			foundTarget = alg.process(binary);
 		} else {
-			foundTarget = auto.process(alg,gray);
-			calibGUI.setThreshold((int)auto.getThreshold());
-			binary.setTo(auto.getBinary());
+			GThresholdImageOps.adaptiveSquare(gray, binary, 50, -10, true);
 		}
+		foundTarget = alg.process(binary);
 
 	}
 

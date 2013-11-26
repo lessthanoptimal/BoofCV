@@ -122,7 +122,7 @@ public class DetectQuadBlobsBinary {
 			return fail("Not enough blobs detected");
 
 		//remove blobs with holes
-		removeBlobsHolesAndTooSmall();
+		removeTooSmall();
 
 		// remove blobs that touch the image border
 		filterTouchEdge();
@@ -144,15 +144,13 @@ public class DetectQuadBlobsBinary {
 	}
 
 	/**
-	 * Remove blobs with internal contours and whose external contour is too small
+	 * Remove blobs with external contour that are too small
 	 */
-	private void removeBlobsHolesAndTooSmall()
+	private void removeTooSmall()
 	{
 		for( int i = 0; i < contours.size(); ) {
 			Contour c = contours.get(i);
-			if( c.internal.size() > 0 ) {
-				contours.remove(i);
-			} else if( c.external.size() < 10 ) {//minContourSize ) {
+			if( c.external.size() < 10 ) {//minContourSize ) {
 				contours.remove(i);
 			} else {
 				i++;

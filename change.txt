@@ -66,6 +66,9 @@ Version : Alpha 0.16
   * InterpolatePixelMB for multi-band
 - Fixed sub-image support for ConvertBufferedImage.extract*
   * Thanks pcmoen
+- Calibration target detection
+  * Locally adaptive thresholding is now used for square and chessboard target types.  Less sensitive to lighting
+    conditions
 
 - TODO improve KLT edge handling
 - TODO automate high level tests
