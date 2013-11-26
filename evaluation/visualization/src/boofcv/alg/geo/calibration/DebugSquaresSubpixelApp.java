@@ -105,7 +105,7 @@ public class DebugSquaresSubpixelApp
 		List<Point2D_I32> crude = null;
 		List<Point2D_F64> refined = null;
 
-		GThresholdImageOps.adaptiveSquare(gray, binary, 50, -10, true);
+		GThresholdImageOps.adaptiveSquare(gray, binary, 50, -10, true,null,null);
 		if( !detectAlg.process(binary) ) {
 			System.out.println("Detect Target Failed!");
 		} else {

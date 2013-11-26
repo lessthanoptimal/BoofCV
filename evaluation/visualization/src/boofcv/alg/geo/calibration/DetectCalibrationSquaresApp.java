@@ -315,7 +315,7 @@ public class DetectCalibrationSquaresApp
 		if( calibGUI.isManual() ) {
 			GThresholdImageOps.threshold(gray,binary,calibGUI.getThresholdLevel(),true);
 		} else {
-			GThresholdImageOps.adaptiveSquare(gray, binary, 50, -10, true);
+			GThresholdImageOps.adaptiveSquare(gray, binary, 50, -10, true,null,null);
 		}
 		foundTarget = alg.process(binary);
 

@@ -40,6 +40,7 @@ public class BenchmarkThresholding extends SimpleBenchmark {
 	static ImageSInt32 output_S32 = new ImageSInt32(imgWidth, imgHeight);
 	static ImageUInt8 output_U8 = new ImageUInt8(imgWidth, imgHeight);
 	static ImageUInt8 work = new ImageUInt8(imgWidth, imgHeight);
+	static ImageUInt8 work2 = new ImageUInt8(imgWidth, imgHeight);
 
 	static int threshLower = 20;
 	static int threshUpper = 30;
@@ -53,6 +54,18 @@ public class BenchmarkThresholding extends SimpleBenchmark {
 	public int timeThreshold(int reps) {
 		for( int i = 0; i < reps; i++ )
 			ThresholdImageOps.threshold(input, output_U8, threshLower, true);
+		return 0;
+	}
+
+	public int timeAdaptiveSquare(int reps) {
+		for( int i = 0; i < reps; i++ )
+			ThresholdImageOps.adaptiveSquare(input, output_U8, 20,0, true,work,work2);
+		return 0;
+	}
+
+	public int timeAdaptiveGaussian(int reps) {
+		for( int i = 0; i < reps; i++ )
+			ThresholdImageOps.adaptiveGaussian(input, output_U8, 20, 0, true, work, work2);
 		return 0;
 	}
 

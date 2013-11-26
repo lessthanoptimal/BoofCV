@@ -88,11 +88,13 @@ public class DemoImageThresholdingApp<T extends ImageSingleBand> extends SelectI
 				break;
 
 			case 1:
-				GThresholdImageOps.adaptiveSquare(imageInput, imageBinary, threshRadius, threshBias, thresholdDown);
+				GThresholdImageOps.adaptiveSquare(imageInput, imageBinary,
+						threshRadius, threshBias, thresholdDown,null,null);
 				break;
 
 			case 2:
-				GThresholdImageOps.adaptiveGaussian(imageInput, imageBinary, threshRadius, threshBias, thresholdDown);
+				GThresholdImageOps.adaptiveGaussian(imageInput, imageBinary,
+						threshRadius, threshBias, thresholdDown,null,null);
 				break;
 		}
 

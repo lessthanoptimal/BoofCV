@@ -54,6 +54,9 @@ public class WrapPlanarSquareGridTarget implements PlanarCalibrationDetector {
 
 	OrderPointsIntoGrid orderAlg = new OrderPointsIntoGrid();
 
+	ImageFloat32 work1 = new ImageFloat32(1,1);
+	ImageFloat32 work2 = new ImageFloat32(1,1);
+
 	public WrapPlanarSquareGridTarget( ConfigSquareGrid config ) {
 		refine = new WrapRefineCornerSegmentFit();
 //		refine = new WrapRefineCornerCanny();
@@ -69,9 +72,12 @@ public class WrapPlanarSquareGridTarget implements PlanarCalibrationDetector {
 	@Override
 	public boolean process(ImageFloat32 input) {
 
+		work1.reshape(input.width,input.height);
+		work2.reshape(input.width,input.height);
+
 		binary.reshape(input.width,input.height);
 
-		GThresholdImageOps.adaptiveSquare(input, binary, 50,-10, true);
+		GThresholdImageOps.adaptiveSquare(input, binary, 50,-10, true,work1,work2);
 
 		// detect the target at pixel level accuracy
 		if( !detect.process(binary) )

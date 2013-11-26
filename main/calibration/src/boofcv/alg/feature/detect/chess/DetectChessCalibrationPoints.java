@@ -106,8 +106,9 @@ public class DetectChessCalibrationPoints<T extends ImageSingleBand, D extends I
 	// true if it found the rectangular bound
 	private boolean foundBound;
 
-	// storage for image histogram
-	private int histogram[] = new int[256];
+	// work space for thresholding
+	private T work1;
+	private T work2;
 
 	/**
 	 * Configures detection parameters
@@ -130,6 +131,9 @@ public class DetectChessCalibrationPoints<T extends ImageSingleBand, D extends I
 		this.numRowsPoints = numRows-1;
 
 		expectedPoints = numColsPoints * numRowsPoints;
+
+		work1 = GeneralizedImageOps.createSingleBand(imageType,1,1);
+		work2 = GeneralizedImageOps.createSingleBand(imageType,1,1);
 
 		derivX = GeneralizedImageOps.createSingleBand(derivType, 1, 1);
 		derivY = GeneralizedImageOps.createSingleBand(derivType, 1, 1);
@@ -234,9 +238,11 @@ public class DetectChessCalibrationPoints<T extends ImageSingleBand, D extends I
 	 */
 	private boolean detectChessBoard(T gray, double threshold ) {
 
-		if( threshold < 0 )
-			GThresholdImageOps.adaptiveSquare(gray, binary, 50,-10, true);
-		else
+		if( threshold < 0 ) {
+			work1.reshape(gray.width,gray.height);
+			work2.reshape(gray.width,gray.height);
+			GThresholdImageOps.adaptiveSquare(gray, binary, 50,-10, true, work1, work2);
+		} else
 			GThresholdImageOps.threshold(gray, binary, threshold, true);
 
 		// erode to make the squares separated

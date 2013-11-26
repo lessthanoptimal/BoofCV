@@ -78,15 +78,20 @@ public class GThresholdImageOps {
 	 * @param radius Radius of square region.
 	 * @param bias Bias used to adjust threshold
 	 * @param down Should it threshold up or down.
+	 * @param work1 (Optional) Internal workspace.  Can be null
+	 * @param work2 (Optional) Internal workspace.  Can be null
 	 * @return Thresholded image.
 	 */
-	public static ImageUInt8 adaptiveSquare( ImageSingleBand input , ImageUInt8 output ,
-											 int radius , double bias , boolean down )
+	public static <T extends ImageSingleBand>
+	ImageUInt8 adaptiveSquare( T input , ImageUInt8 output ,
+							   int radius , double bias , boolean down, T work1 , T work2 )
 	{
 		if( input instanceof ImageFloat32 ) {
-			return ThresholdImageOps.adaptiveSquare((ImageFloat32)input,output,radius,(float)bias,down,null,null);
+			return ThresholdImageOps.adaptiveSquare((ImageFloat32) input, output, radius, (float) bias, down,
+					(ImageFloat32) work1, (ImageFloat32) work2);
 		} else if( input instanceof ImageUInt8 ) {
-			return ThresholdImageOps.adaptiveSquare((ImageUInt8)input,output,radius,(int)bias,down,null,null);
+			return ThresholdImageOps.adaptiveSquare((ImageUInt8) input, output, radius, (int) bias, down,
+					(ImageUInt8) work1, (ImageUInt8) work2);
 		} else {
 			throw new IllegalArgumentException("Unknown image type: "+input.getClass().getSimpleName());
 		}
@@ -110,15 +115,21 @@ public class GThresholdImageOps {
 	 * @param radius Radius of square region.
 	 * @param bias Bias used to adjust threshold
 	 * @param down Should it threshold up or down.
+	 * @param work1 (Optional) Internal workspace.  Can be null
+	 * @param work2 (Optional) Internal workspace.  Can be null
 	 * @return Thresholded image.
 	 */
-	public static ImageUInt8 adaptiveGaussian( ImageSingleBand input , ImageUInt8 output ,
-											   int radius , double bias , boolean down )
+	public static <T extends ImageSingleBand>
+	ImageUInt8 adaptiveGaussian( T input , ImageUInt8 output ,
+								 int radius , double bias , boolean down ,
+								 T work1 , T work2 )
 	{
 		if( input instanceof ImageFloat32 ) {
-			return ThresholdImageOps.adaptiveGaussian((ImageFloat32)input,output,radius,(float)bias,down,null,null);
+			return ThresholdImageOps.adaptiveGaussian((ImageFloat32)input,output,radius,(float)bias,down,
+					(ImageFloat32)work1,(ImageFloat32)work2);
 		} else if( input instanceof ImageUInt8 ) {
-			return ThresholdImageOps.adaptiveGaussian((ImageUInt8)input,output,radius,(int)bias,down,null,null);
+			return ThresholdImageOps.adaptiveGaussian((ImageUInt8)input,output,radius,(int)bias,down,
+					(ImageUInt8)work1,(ImageUInt8)work2);
 		} else {
 			throw new IllegalArgumentException("Unknown image type: "+input.getClass().getSimpleName());
 		}
