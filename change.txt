@@ -70,6 +70,7 @@ Version : Alpha 0.16
   * Locally adaptive thresholding is now used for square and chessboard target types.  Less sensitive to lighting
     conditions
 
+- TODO Chessboard calibration doesn't reject bad calibration points after sub-pixel
 - TODO improve KLT edge handling
 - TODO automate high level tests
    * Move SURFPerformance into ValidationBoof
