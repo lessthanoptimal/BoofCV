@@ -44,6 +44,18 @@ public class ConfigSquareGrid implements Configuration {
 	 * Increases or decreases the minimum allowed blob size. Try 1.0
 	 */
 	public double relativeSizeThreshold = 1;
+	/**
+	 * Global threshold used on the image.  If <= 0 then a local adaptive threshold is used instead
+	 */
+	public double binaryGlobalThreshold = -1;
+	/**
+	 * Size of local region used by adaptive threshold
+	 */
+	public int binaryAdaptiveRadius = 20;
+	/**
+	 * Bias used by local adaptive threshold
+	 */
+	public double binaryAdaptiveBias = -10;
 
 	public ConfigSquareGrid(int numCols, int numRows) {
 		this.numCols = numCols;

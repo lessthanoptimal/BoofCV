@@ -18,6 +18,7 @@
 
 package boofcv.alg.geo.calibration;
 
+import boofcv.abst.calib.ConfigChessboard;
 import boofcv.alg.feature.detect.grid.DetectSquareCalibrationPoints;
 import boofcv.alg.feature.detect.quadblob.QuadBlob;
 import boofcv.alg.filter.binary.GThresholdImageOps;
@@ -312,10 +313,12 @@ public class DetectCalibrationSquaresApp
 	 */
 	private void detectTarget() {
 
+		ConfigChessboard config = new ConfigChessboard(1,1);
+
 		if( calibGUI.isManual() ) {
 			GThresholdImageOps.threshold(gray,binary,calibGUI.getThresholdLevel(),true);
 		} else {
-			GThresholdImageOps.adaptiveSquare(gray, binary, 50, -10, true,null,null);
+			GThresholdImageOps.adaptiveSquare(gray, binary, config.binaryAdaptiveRadius, config.binaryAdaptiveBias, true, null, null);
 		}
 		foundTarget = alg.process(binary);
 

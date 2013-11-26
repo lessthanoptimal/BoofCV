@@ -82,8 +82,11 @@ public class DetectChessCalibrationPoints<T extends ImageSingleBand, D extends I
 	// binary images used to detect chess board
 	private ImageUInt8 binary = new ImageUInt8(1, 1);
 	private ImageUInt8 eroded = new ImageUInt8(1, 1);
-	// Threshold used to create binary image.  if < 0 then a threshold is automatically selected
+	// Threshold used to create binary image.  if < 0 then a threshold a local adaptive threshold is used
 	private double userBinaryThreshold = -1;
+	// parameters for local adaptive threshold
+	private int userAdaptiveRadius = 20;
+	private double userAdaptiveBias = -10;
 	// relative blob size threshold.  Adjusted relative to image size.  Small objects are pruned
 	private double relativeSizeThreshold;
 
@@ -238,12 +241,13 @@ public class DetectChessCalibrationPoints<T extends ImageSingleBand, D extends I
 	 */
 	private boolean detectChessBoard(T gray, double threshold ) {
 
-		if( threshold < 0 ) {
+		if( threshold <= 0 ) {
 			work1.reshape(gray.width,gray.height);
 			work2.reshape(gray.width,gray.height);
-			GThresholdImageOps.adaptiveSquare(gray, binary, 50,-10, true, work1, work2);
-		} else
+			GThresholdImageOps.adaptiveSquare(gray, binary, userAdaptiveRadius, userAdaptiveBias, true, work1, work2);
+		} else {
 			GThresholdImageOps.threshold(gray, binary, threshold, true);
+		}
 
 		// erode to make the squares separated
 		BinaryImageOps.erode8(binary, eroded);
@@ -419,6 +423,22 @@ public class DetectChessCalibrationPoints<T extends ImageSingleBand, D extends I
 
 	public double getUserBinaryThreshold() {
 		return userBinaryThreshold;
+	}
+
+	public int getUserAdaptiveRadius() {
+		return userAdaptiveRadius;
+	}
+
+	public void setUserAdaptiveRadius(int userAdaptiveRadius) {
+		this.userAdaptiveRadius = userAdaptiveRadius;
+	}
+
+	public double getUserAdaptiveBias() {
+		return userAdaptiveBias;
+	}
+
+	public void setUserAdaptiveBias(double userAdaptiveBias) {
+		this.userAdaptiveBias = userAdaptiveBias;
 	}
 
 	public boolean isFoundBound() {

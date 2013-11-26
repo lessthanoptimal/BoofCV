@@ -18,6 +18,7 @@
 
 package boofcv.alg.geo.calibration;
 
+import boofcv.abst.calib.ConfigChessboard;
 import boofcv.alg.feature.detect.chess.DetectChessCalibrationPoints;
 import boofcv.alg.feature.detect.quadblob.DetectQuadBlobsBinary;
 import boofcv.alg.feature.detect.quadblob.QuadBlob;
@@ -69,7 +70,9 @@ public class DetectCalibrationChessApp<T extends ImageSingleBand, D extends Imag
 	// feature intensity image
 	ImageFloat32 intensity = new ImageFloat32(1,1);
 
+	// if a target was found or not
 	boolean foundTarget;
+
 	boolean processed = false;
 	
 	public DetectCalibrationChessApp(Class<T> imageType) {
@@ -92,7 +95,13 @@ public class DetectCalibrationChessApp<T extends ImageSingleBand, D extends Imag
 	}
 
 	public void configure( int numCols , int numRows ) {
+		ConfigChessboard config = new ConfigChessboard(numCols,numRows);
+
 		alg = new DetectChessCalibrationPoints<T,D>(numCols,numRows,5,1,imageType);
+
+		alg.setUserBinaryThreshold(config.binaryGlobalThreshold);
+		alg.setUserAdaptiveBias(config.binaryAdaptiveBias);
+		alg.setUserAdaptiveRadius(config.binaryAdaptiveRadius);
 	}
 
 	@Override
@@ -149,11 +158,6 @@ public class DetectCalibrationChessApp<T extends ImageSingleBand, D extends Imag
 			alg.setUserBinaryThreshold(-1);
 
 		foundTarget = alg.process(gray);
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				calibGUI.setThreshold((int) alg.getUserBinaryThreshold());
-			}
-		});
 	}
 
 	private synchronized void renderOutput() {
@@ -189,6 +193,9 @@ public class DetectCalibrationChessApp<T extends ImageSingleBand, D extends Imag
 			if( calibGUI.isShowNumbers() ) {
 				drawNumbers(g2, alg.getPoints(),1);
 			}
+			calibGUI.setSuccessMessage("FOUND",true);
+		} else {
+			calibGUI.setSuccessMessage("FAILED",false);
 		}
 
 		if( calibGUI.isShowPoints() ) {
