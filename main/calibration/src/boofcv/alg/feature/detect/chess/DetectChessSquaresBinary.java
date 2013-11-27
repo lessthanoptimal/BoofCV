@@ -24,9 +24,14 @@ import boofcv.alg.feature.detect.quadblob.QuadBlob;
 import boofcv.struct.ImageRectangle;
 import boofcv.struct.image.ImageUInt8;
 import georegression.geometry.UtilPoint2D_I32;
+import georegression.geometry.UtilPolygons2D_I32;
 import georegression.struct.point.Point2D_I32;
+import georegression.struct.shapes.Polygon2D_I32;
+import org.ddogleg.sorting.QuickSort_F64;
 import org.ddogleg.struct.FastQueue;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -50,11 +55,15 @@ public class DetectChessSquaresBinary {
 
 	// Find a rectangle which contains the whole target
 	private ImageRectangle boundRect = new ImageRectangle();
+	// bounding quadrilateral
+	private Polygon2D_I32 boundPolygon = new Polygon2D_I32();
 	// graph of connected bobs
 	private List<QuadBlob> graphBlobs;
 
 	// corners on detected squares
 	FastQueue<Point2D_I32> corners = new FastQueue<Point2D_I32>(Point2D_I32.class,true);
+
+	QuickSort_F64 sort = new QuickSort_F64();
 
 	/**
 	 * Configures chess board detector.
@@ -88,6 +97,7 @@ public class DetectChessSquaresBinary {
 	 * @return True if successful.
 	 */
 	public boolean process( ImageUInt8 binary ) {
+		boundPolygon.vertexes.reset();
 		graphBlobs = null;
 
 		// detect blobs
@@ -112,7 +122,7 @@ public class DetectChessSquaresBinary {
 			return false;
 		}
 
-		findBoundingRectangle(graphBlobs);
+		findBoundingPolygon(graphBlobs);
 
 		return true;
 	}
@@ -163,9 +173,20 @@ public class DetectChessSquaresBinary {
 				}
 
 				if( match != null && bestScore < tol) {
-//					if( a.conn.contains(match) )
-//						throw new RuntimeException("MUltiple matches");
-					a.conn.add(match);
+					// it is possible to try connecting to the same shape more than once
+					int index = a.conn.indexOf(match);
+					if( index != -1  ) {
+						// save the match with the closest distance
+						if( a.connDist.get(index) > bestScore ) {
+							a.conn.set(index,match);
+							a.connDist.data[index] = bestScore;
+							a.connIndex.data[index] = indexA;
+						}
+					} else {
+						a.conn.add(match);
+						a.connDist.add( bestScore );
+						a.connIndex.add(indexA);
+					}
 				}
 			}
 		}
@@ -178,6 +199,8 @@ public class DetectChessSquaresBinary {
 				QuadBlob b = a.conn.get(j);
 				if( !b.conn.contains(a) ) {
 					a.conn.remove(j);
+					a.connDist.remove(j);
+					a.connIndex.remove(j);
 				} else {
 					j++;
 				}
@@ -186,26 +209,87 @@ public class DetectChessSquaresBinary {
 	}
 
 	/**
-	 * Finds bounds of target using corner points of each blob
+	 * For targets with even sides this isn't the best.  Corners can be chopped too close.  a rectangle
+	 * should be returned instead
 	 */
-	private void findBoundingRectangle( List<QuadBlob> blobs) {
-		boundRect.x0 = Integer.MAX_VALUE;
-		boundRect.x1 = -Integer.MAX_VALUE;
-		boundRect.y0 = Integer.MAX_VALUE;
-		boundRect.y1 = -Integer.MAX_VALUE;
+	boolean connected[] = new boolean[4];
+	List<QuadBlob> outside = new ArrayList<QuadBlob>();
+	List<Point2D_I32> points = new ArrayList<Point2D_I32>();
+	private void findBoundingPolygon(List<QuadBlob> blobs) {
 
-		for( QuadBlob b : blobs ) {
-			for( Point2D_I32 c : b.corners ) {
-				if( c.x < boundRect.x0 )
-					boundRect.x0 = c.x;
-				if( c.x > boundRect.x1 )
-					boundRect.x1 = c.x;
-				if( c.y < boundRect.y0 )
-					boundRect.y0 = c.y;
-				if( c.y > boundRect.y1 )
-					boundRect.y1 = c.y;
+		outside.clear();
+		points.clear();
+
+		int x = 0,y = 0;
+		for( int i = 0; i < blobs.size(); i++ ) {
+			QuadBlob b = blobs.get(i);
+			if( b.conn.size() != 4 ) {
+				outside.add( b );
+				x += b.center.x;
+				y += b.center.y;
 			}
 		}
+
+		// center
+		x /= outside.size();
+		y /= outside.size();
+
+
+		for( int i = 0; i < outside.size(); i++ ) {
+			QuadBlob b = outside.get(i);
+
+			Arrays.fill(connected,false);
+
+			for( int j = 0; j < b.conn.size(); j++ ) {
+				connected[ b.connIndex.data[j]] = true;
+			}
+
+//			if( b.conn.size() == 2 ) {
+//				// this strategy fills out the corners in the rectangle
+//				int num = 0;
+//				Point2D_I32 p0=null,p1=null;
+//				for( int j = 0; j < 4; j++ ) {
+//					if( !connected[j] )  {
+//						if( num == 0 ) {
+//							p0 = b.corners.get(j);
+//						} else {
+//							p1 = b.corners.get(j);
+//						}
+//						num++;
+//					}
+//				}
+//
+//				int dx = p1.x - p0.x;
+//				int dy = p1.y - p0.y;
+//
+//				points.add(new Point2D_I32(p0.x - dx , p0.y - dy));
+//				points.add(new Point2D_I32(p1.x + dx , p1.y + dy));
+//			} else {
+			for( int j = 0; j < 4; j++ ) {
+				if( !connected[j] ) {
+					points.add(b.corners.get(j));
+				}
+			}
+//			}
+
+		}
+
+		int indexes[] = new int[points.size()];
+		double angles[] = new double[points.size()];
+
+		for( int i = 0; i < points.size(); i++ ) {
+			Point2D_I32 p = points.get(i);
+			angles[i] = Math.atan2( p.y - y , p.x - x );
+		}
+
+		sort.sort(angles,points.size(),indexes);
+
+		for( int i = 0; i < points.size(); i++ ) {
+			Point2D_I32 b = points.get(indexes[i]);
+			boundPolygon.vertexes.grow().set(b.x,b.y);
+		}
+
+		UtilPolygons2D_I32.bounding(boundPolygon,boundRect);
 	}
 
 	/**
@@ -300,6 +384,10 @@ public class DetectChessSquaresBinary {
 
 	public ImageRectangle getBoundRect() {
 		return boundRect;
+	}
+
+	public Polygon2D_I32 getBoundPolygon() {
+		return boundPolygon;
 	}
 
 	/**

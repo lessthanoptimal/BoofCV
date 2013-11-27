@@ -258,4 +258,13 @@ public class GeneralFeatureDetector<I extends ImageSingleBand, D extends ImageSi
 	public boolean isDetectMaximums() {
 		return intensity.localMaximums();
 	}
+
+	/**
+	 * Species the search radius for the feature
+	 *
+	 * @param radius Radius in pixels
+	 */
+	public void setSearchRadius( int radius ) {
+		extractor.setSearchRadius(radius);
+	}
 }

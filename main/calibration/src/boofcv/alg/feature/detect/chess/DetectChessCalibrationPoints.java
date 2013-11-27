@@ -40,9 +40,11 @@ import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
 import georegression.geometry.UtilPoint2D_I32;
+import georegression.metric.Intersection2D_I32;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I16;
 import georegression.struct.point.Point2D_I32;
+import georegression.struct.shapes.Polygon2D_I32;
 import org.ddogleg.sorting.QuickSort_F64;
 
 import java.util.ArrayList;
@@ -170,7 +172,7 @@ public class DetectChessCalibrationPoints<T extends ImageSingleBand, D extends I
 		adjustForImageSize(gray.width,gray.height);
 
 		// detect the chess board
-		if (!(foundBound = detectChessBoard(gray,userBinaryThreshold)))
+		if (!(foundBound = detectChessBoard(gray)))
 			return false;
 
 		// rectangle that contains the area of interest
@@ -199,7 +201,7 @@ public class DetectChessCalibrationPoints<T extends ImageSingleBand, D extends I
 			return false;
 
 		// select N brightest features
-		points = selectBrightest(points, intensityAlg.getIntensity(), targetRect.x0, targetRect.y0);
+		points = selectBrightest(points, intensityAlg.getIntensity(), targetRect.x0, targetRect.y0, findBound.getBoundPolygon());
 
 		// compute pixels to sub-pixel accuracy
 		for (Point2D_F64 p : points)
@@ -239,14 +241,14 @@ public class DetectChessCalibrationPoints<T extends ImageSingleBand, D extends I
 	/**
 	 * Threshold the image and find squares
 	 */
-	private boolean detectChessBoard(T gray, double threshold ) {
+	private boolean detectChessBoard(T gray ) {
 
-		if( threshold <= 0 ) {
+		if( userBinaryThreshold <= 0 ) {
 			work1.reshape(gray.width,gray.height);
 			work2.reshape(gray.width,gray.height);
 			GThresholdImageOps.adaptiveSquare(gray, binary, userAdaptiveRadius, userAdaptiveBias, true, work1, work2);
 		} else {
-			GThresholdImageOps.threshold(gray, binary, threshold, true);
+			GThresholdImageOps.threshold(gray, binary, userBinaryThreshold, true);
 		}
 
 		// erode to make the squares separated
@@ -364,7 +366,7 @@ public class DetectChessCalibrationPoints<T extends ImageSingleBand, D extends I
 	 * Out of the remaining points, just select the brightest to remove any remaining false positives
 	 */
 	private List<Point2D_F64> selectBrightest(List<Point2D_F64> points, ImageFloat32 intensity,
-											  int offX, int offY) {
+											  int offX, int offY, Polygon2D_I32 polygon ) {
 		if (points.size() == expectedPoints)
 			return points;
 
@@ -372,10 +374,14 @@ public class DetectChessCalibrationPoints<T extends ImageSingleBand, D extends I
 		double values[] = new double[points.size()];
 		int indexes[] = new int[points.size()];
 
+		Point2D_I32 pp = new Point2D_I32();
 		for (int i = 0; i < points.size(); i++) {
 			Point2D_F64 p = points.get(i);
 
-			values[i] = -intensity.get((int) (p.x - offX), (int) (p.y - offY));
+			pp.set((int)p.x,(int)p.y);
+			if(Intersection2D_I32.containConcave(polygon,pp)) {
+				values[i] = -intensity.get((int) (p.x - offX), (int) (p.y - offY));
+			}
 		}
 
 		new QuickSort_F64().sort(values, points.size(), indexes);
