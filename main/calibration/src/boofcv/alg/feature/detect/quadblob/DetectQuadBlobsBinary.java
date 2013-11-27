@@ -22,7 +22,9 @@ import boofcv.alg.filter.binary.Contour;
 import boofcv.alg.filter.binary.LinearContourLabelChang2004;
 import boofcv.struct.image.ImageSInt32;
 import boofcv.struct.image.ImageUInt8;
+import georegression.geometry.UtilPolygons2D_I32;
 import georegression.struct.point.Point2D_I32;
+import georegression.struct.shapes.RectangleCorner2D_I32;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -124,6 +126,8 @@ public class DetectQuadBlobsBinary {
 		//remove blobs with holes
 		removeTooSmall();
 
+		removeBadPerimeterRatio();
+
 		// remove blobs that touch the image border
 		filterTouchEdge();
 
@@ -151,6 +155,27 @@ public class DetectQuadBlobsBinary {
 		for( int i = 0; i < contours.size(); ) {
 			Contour c = contours.get(i);
 			if( c.external.size() < 10 ) {//minContourSize ) {
+				contours.remove(i);
+			} else {
+				i++;
+			}
+		}
+	}
+
+	RectangleCorner2D_I32 rectangle = new RectangleCorner2D_I32();
+	private void removeBadPerimeterRatio()
+	{
+		for( int i = 0; i < contours.size(); ) {
+			Contour c = contours.get(i);
+			UtilPolygons2D_I32.bounding(c.external,rectangle);
+			int perimeter = (rectangle.getWidth() + rectangle.getHeight())*2;
+
+			boolean remove = rectangle.getWidth() <= 2 || rectangle.getHeight() <= 2;
+
+			if( !remove )
+				remove = perimeter*1.3 < c.external.size();
+
+			if( remove ) {
 				contours.remove(i);
 			} else {
 				i++;

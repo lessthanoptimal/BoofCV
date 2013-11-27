@@ -34,10 +34,11 @@ import boofcv.gui.image.ShowImages;
 import boofcv.gui.image.VisualizeImageData;
 import boofcv.io.PathLabel;
 import boofcv.io.SimpleStringNumberReader;
-import boofcv.struct.ImageRectangle;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.point.Point2D_F64;
+import georegression.struct.point.Point2D_I32;
+import georegression.struct.shapes.Polygon2D_I32;
 
 import javax.swing.*;
 import java.awt.*;
@@ -186,8 +187,8 @@ public class DetectCalibrationChessApp<T extends ImageSingleBand, D extends Imag
 		Graphics2D g2 = workImage.createGraphics();
 		if( foundTarget ) {
 			if( calibGUI.isShowBound() ) {
-				ImageRectangle boundary =  alg.getFindBound().getBoundRect();
-				drawBounds(g2, boundary);
+				Polygon2D_I32 bounds =  alg.getFindBound().getBoundPolygon();
+				drawBounds(g2, bounds);
 			}
 			
 			if( calibGUI.isShowNumbers() ) {
@@ -195,6 +196,11 @@ public class DetectCalibrationChessApp<T extends ImageSingleBand, D extends Imag
 			}
 			calibGUI.setSuccessMessage("FOUND",true);
 		} else {
+			if( calibGUI.isShowBound() ) {
+				Polygon2D_I32 bounds =  alg.getFindBound().getBoundPolygon();
+				drawBounds(g2, bounds);
+			}
+
 			calibGUI.setSuccessMessage("FAILED",false);
 		}
 
@@ -219,13 +225,21 @@ public class DetectCalibrationChessApp<T extends ImageSingleBand, D extends Imag
 		processed = true;
 	}
 
-	public static void drawBounds( Graphics2D g2 , ImageRectangle rectangle ) {
+	public static void drawBounds( Graphics2D g2 , Polygon2D_I32 bounds) {
+		if( bounds.size() <= 0 )
+			return;
+
 		g2.setColor(Color.BLUE);
 		g2.setStroke(new BasicStroke(2.0f));
-		g2.drawLine(rectangle.x0,rectangle.y0,rectangle.x1,rectangle.y0);
-		g2.drawLine(rectangle.x1,rectangle.y0,rectangle.x1,rectangle.y1);
-		g2.drawLine(rectangle.x1,rectangle.y1,rectangle.x0,rectangle.y1);
-		g2.drawLine(rectangle.x0,rectangle.y1,rectangle.x0,rectangle.y0);
+		for( int i = 1; i < bounds.vertexes.size(); i++ ) {
+			Point2D_I32 p0 = bounds.vertexes.get(i-1);
+			Point2D_I32 p1 = bounds.vertexes.get(i);
+
+			g2.drawLine(p0.x,p0.y,p1.x,p1.y);
+		}
+		Point2D_I32 p0 = bounds.vertexes.get(bounds.size()-1);
+		Point2D_I32 p1 = bounds.vertexes.get(0);
+		g2.drawLine(p0.x,p0.y,p1.x,p1.y);
 
 	}
 

@@ -39,10 +39,10 @@ public abstract class TextureGrayTrackerObjectRectangleTests extends GenericTrac
 			int h = (int)(scale*rand.nextInt(100)+20);
 
 			Polygon2D_I32 p = new Polygon2D_I32(4);
-			p.vertexes[0].set(x,y);
-			p.vertexes[1].set(x+w,y);
-			p.vertexes[2].set(x+w,y+h);
-			p.vertexes[3].set(x,y+h);
+			p.vertexes.data[0].set(x,y);
+			p.vertexes.data[1].set(x+w,y);
+			p.vertexes.data[2].set(x+w,y+h);
+			p.vertexes.data[3].set(x,y+h);
 
 			convexFill(p, input,rand.nextInt(255));
 		}
@@ -52,8 +52,8 @@ public abstract class TextureGrayTrackerObjectRectangleTests extends GenericTrac
 		int minX = Integer.MAX_VALUE; int maxX = Integer.MIN_VALUE;
 		int minY = Integer.MAX_VALUE; int maxY = Integer.MIN_VALUE;
 
-		for( int i = 0; i < poly.vertexes.length; i++ ) {
-			Point2D_I32 p = poly.vertexes[i];
+		for( int i = 0; i < poly.size(); i++ ) {
+			Point2D_I32 p = poly.vertexes.data[i];
 			if( p.y < minY ) {
 				minY = p.y;
 			} else if( p.y > maxY ) {
@@ -71,7 +71,7 @@ public abstract class TextureGrayTrackerObjectRectangleTests extends GenericTrac
 		Point2D_F64 p = new Point2D_F64();
 		Polygon2D_F64 poly64 = new Polygon2D_F64(4);
 		for( int i = 0; i < 4; i++ )
-			poly64.vertexes[i].set( poly.vertexes[i].x , poly.vertexes[i].y );
+			poly64.vertexes.data[i].set( poly.vertexes.data[i].x , poly.vertexes.data[i].y );
 
 		for( int y = bounds.y0; y < bounds.y1; y++ ) {
 			p.y = y;

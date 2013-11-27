@@ -21,6 +21,8 @@ package boofcv.alg.feature.detect.quadblob;
 import boofcv.alg.feature.detect.grid.UtilCalibrationGrid;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I32;
+import org.ddogleg.struct.GrowQueue_F64;
+import org.ddogleg.struct.GrowQueue_I32;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -53,6 +55,8 @@ public class QuadBlob {
 
 	// what each corner is connected to
 	public List<QuadBlob> conn = new ArrayList<QuadBlob>();
+	public GrowQueue_F64 connDist = new GrowQueue_F64();
+	public GrowQueue_I32 connIndex = new GrowQueue_I32();
 
 	public QuadBlob(List<Point2D_I32> contour, List<Point2D_I32> corners) {
 		this();

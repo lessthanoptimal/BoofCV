@@ -61,8 +61,6 @@ public class ImageZoomPanel extends JScrollPane {
 		getViewport().setView(panel);
 		
 		centerView(centerX,centerY);
-		
-		r = panel.getVisibleRect();
 	}
 	
 	public void centerView( double cx , double cy ) {
@@ -112,7 +110,6 @@ public class ImageZoomPanel extends JScrollPane {
 			Graphics2D g2 = (Graphics2D)g;
 
 			AffineTransform tran = AffineTransform.getScaleInstance(scale, scale);
-//		g2.setRenderingHint();
 			g2.drawImage(img,tran,null);
 		}
 	}

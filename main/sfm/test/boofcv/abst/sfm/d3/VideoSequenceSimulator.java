@@ -116,10 +116,10 @@ public class VideoSequenceSimulator<I extends ImageSingleBand> {
 				continue;
 
 			Polygon2D_I32 p = new Polygon2D_I32(4);
-			p.vertexes[0].set((int) p1.x, (int) p1.y);
-			p.vertexes[1].set((int) p2.x, (int) p2.y);
-			p.vertexes[2].set((int) p3.x, (int) p3.y);
-			p.vertexes[3].set((int) p4.x, (int) p4.y);
+			p.vertexes.data[0].set((int) p1.x, (int) p1.y);
+			p.vertexes.data[1].set((int) p2.x, (int) p2.y);
+			p.vertexes.data[2].set((int) p3.x, (int) p3.y);
+			p.vertexes.data[3].set((int) p4.x, (int) p4.y);
 
 			convexFill(p, outputImage, s.gray);
 		}
@@ -141,10 +141,10 @@ public class VideoSequenceSimulator<I extends ImageSingleBand> {
 				continue;
 
 			Polygon2D_I32 p = new Polygon2D_I32(4);
-			p.vertexes[0].set((int) p1.x, (int) p1.y);
-			p.vertexes[1].set((int) p2.x, (int) p2.y);
-			p.vertexes[2].set((int) p3.x, (int) p3.y);
-			p.vertexes[3].set((int) p4.x, (int) p4.y);
+			p.vertexes.data[0].set((int) p1.x, (int) p1.y);
+			p.vertexes.data[1].set((int) p2.x, (int) p2.y);
+			p.vertexes.data[2].set((int) p3.x, (int) p3.y);
+			p.vertexes.data[3].set((int) p4.x, (int) p4.y);
 
 			int depth = (int)(s.a.z/units);
 
@@ -157,8 +157,8 @@ public class VideoSequenceSimulator<I extends ImageSingleBand> {
 		int minX = Integer.MAX_VALUE; int maxX = Integer.MIN_VALUE;
 		int minY = Integer.MAX_VALUE; int maxY = Integer.MIN_VALUE;
 
-		for( int i = 0; i < poly.vertexes.length; i++ ) {
-			Point2D_I32 p = poly.vertexes[i];
+		for( int i = 0; i < poly.size(); i++ ) {
+			Point2D_I32 p = poly.vertexes.data[i];
 			if( p.y < minY ) {
 				minY = p.y;
 			} else if( p.y > maxY ) {
@@ -176,7 +176,7 @@ public class VideoSequenceSimulator<I extends ImageSingleBand> {
 		Point2D_F64 p = new Point2D_F64();
 		Polygon2D_F64 poly64 = new Polygon2D_F64(4);
 		for( int i = 0; i < 4; i++ )
-			poly64.vertexes[i].set( poly.vertexes[i].x , poly.vertexes[i].y );
+			poly64.vertexes.data[i].set( poly.vertexes.data[i].x , poly.vertexes.data[i].y );
 
 		for( int y = bounds.y0; y < bounds.y1; y++ ) {
 			p.y = y;
