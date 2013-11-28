@@ -118,7 +118,7 @@ public class VideoTrackerObjectQuadApp<I extends ImageSingleBand>
 		else if( whichAlg == 1 )
 			tracker = FactoryTrackerObjectQuad.sparseFlow(new SfotConfig(imageClass));
 		else if( whichAlg == 2 )
-			tracker = FactoryTrackerObjectQuad.circulant(new ConfigCirculantTracker(), imageClass);
+			tracker = FactoryTrackerObjectQuad.circulantOrig(new ConfigCirculantTracker(), imageClass);
 		else if( whichAlg == 3 )
 			tracker = FactoryTrackerObjectQuad.meanShiftLikelihood(30, 6, 255,
 					MeanShiftLikelihoodType.HISTOGRAM_RGB_to_HSV, imageType);

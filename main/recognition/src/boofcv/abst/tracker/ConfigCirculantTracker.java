@@ -19,7 +19,7 @@
 package boofcv.abst.tracker;
 
 /**
- * Configuration for {@link boofcv.alg.tracker.circulant.CirculantTracker}.
+ * Configuration for {@link boofcv.alg.tracker.circulant.CirculantTrackerOrig}.
  *
  * @author Peter Abeles
  */

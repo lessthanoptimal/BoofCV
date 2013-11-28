@@ -18,7 +18,7 @@
 
 package boofcv.abst.tracker;
 
-import boofcv.alg.tracker.circulant.CirculantTracker;
+import boofcv.alg.tracker.circulant.CirculantTrackerOrig;
 import boofcv.core.image.GConvertImage;
 import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageFloat32;
@@ -30,19 +30,19 @@ import georegression.struct.shapes.Rectangle2D_I32;
 import georegression.struct.shapes.RectangleCorner2D_F64;
 
 /**
- * Wrapper around {@link CirculantTracker} for {@link TrackerObjectQuad}.
+ * Wrapper around {@link boofcv.alg.tracker.circulant.CirculantTrackerOrig} for {@link TrackerObjectQuad}.
  *
  * @author Peter Abeles
  */
-public class Circulant_to_TrackerObjectQuad<T extends ImageSingleBand> implements TrackerObjectQuad<T> {
+public class CirculantOrig_to_TrackerObjectQuad<T extends ImageSingleBand> implements TrackerObjectQuad<T> {
 
-	CirculantTracker tracker;
+	CirculantTrackerOrig tracker;
 	RectangleCorner2D_F64 rect = new RectangleCorner2D_F64();
 
 	ImageType<T> imageType;
 	ImageFloat32 tmp;
 
-	public Circulant_to_TrackerObjectQuad(CirculantTracker tracker , ImageType<T> imageType) {
+	public CirculantOrig_to_TrackerObjectQuad(CirculantTrackerOrig tracker, ImageType<T> imageType) {
 		this.tracker = tracker;
 		this.imageType = imageType;
 
