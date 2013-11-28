@@ -49,7 +49,7 @@ public class DetectQuadBlobsBinary {
 
 	// given a blob it finds the 4 corners in the blob
 	FindQuadCorners cornerFinder = new FindQuadCorners();
-	
+
 	// smallest allowed size of a blob's contour
 	private int minContourSize;
 
@@ -172,8 +172,9 @@ public class DetectQuadBlobsBinary {
 
 			boolean remove = rectangle.getWidth() <= 2 || rectangle.getHeight() <= 2;
 
-			if( !remove )
+			if( !remove ) {
 				remove = perimeter*1.3 < c.external.size();
+			}
 
 			if( remove ) {
 				contours.remove(i);

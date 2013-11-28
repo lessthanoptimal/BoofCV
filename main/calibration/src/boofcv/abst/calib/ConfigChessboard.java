@@ -54,7 +54,7 @@ public class ConfigChessboard implements Configuration {
 	/**
 	 * Size of local region used by adaptive threshold
 	 */
-	public int binaryAdaptiveRadius = 30;
+	public int binaryAdaptiveRadius = 20;
 	/**
 	 * Bias used by local adaptive threshold
 	 */

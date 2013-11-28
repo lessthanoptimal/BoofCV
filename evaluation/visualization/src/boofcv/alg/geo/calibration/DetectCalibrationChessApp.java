@@ -98,7 +98,7 @@ public class DetectCalibrationChessApp<T extends ImageSingleBand, D extends Imag
 	public void configure( int numCols , int numRows ) {
 		ConfigChessboard config = new ConfigChessboard(numCols,numRows);
 
-		alg = new DetectChessCalibrationPoints<T,D>(numCols,numRows,5,1,imageType);
+		alg = new DetectChessCalibrationPoints<T,D>(numCols,numRows,5,2,imageType);
 
 		alg.setUserBinaryThreshold(config.binaryGlobalThreshold);
 		alg.setUserAdaptiveBias(config.binaryAdaptiveBias);
@@ -207,7 +207,7 @@ public class DetectCalibrationChessApp<T extends ImageSingleBand, D extends Imag
 		if( calibGUI.isShowPoints() ) {
 			List<Point2D_F64> candidates =  alg.getPoints();
 			for( Point2D_F64 c : candidates ) {
-				VisualizeFeatures.drawPoint(g2, (int)c.x, (int)c.y, 2, Color.RED);
+				VisualizeFeatures.drawPoint(g2, (int)c.x, (int)c.y, 1, Color.RED);
 			}
 		}
 
@@ -253,10 +253,10 @@ public class DetectCalibrationChessApp<T extends ImageSingleBand, D extends Imag
 		Graphics2D g2 = workImage.createGraphics();
 		if( detectBlobs.getDetected() != null ) {
 			for( QuadBlob b : detectBlobs.getDetected() ) {
-				g2.setColor(Color.BLACK);
-				g2.fillOval(b.center.x - 2, b.center.y - 2, 5, 5);
-				g2.setColor(Color.CYAN);
-				g2.fillOval(b.center.x-1,b.center.y-1,3,3);
+				for( int i = 0; i < b.corners.size(); i++ ) {
+					Point2D_I32 c = b.corners.get(i);
+					VisualizeFeatures.drawPoint(g2, c.x, c.y, 1, Color.GREEN);
+				}
 			}
 		}
 	}
