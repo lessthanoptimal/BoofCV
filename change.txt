@@ -69,6 +69,8 @@ Version : Alpha 0.16
 - Calibration target detection
   * Locally adaptive thresholding is now used for square and chessboard target types.  Less sensitive to lighting
     conditions
+  * Chessboard target detector works much better on small targets.  Uses corners to estimate initial calibration
+    point position then uses mean-shift to refine
 
 - TODO Chessboard calibration doesn't reject bad calibration points after sub-pixel
 - TODO improve KLT edge handling

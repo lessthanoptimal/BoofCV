@@ -160,6 +160,11 @@ public class DetectChessSquaresBinary {
 
 					QuadBlob b = blobs.get(j);
 
+					// they should be about the same size
+					double sizeRatio = Math.min(a.contour.size(),b.contour.size())/(double)Math.max(a.contour.size(),b.contour.size());
+					if( sizeRatio < 0.25 )
+						continue;
+
 					for( int indexB = 0; indexB < 4; indexB++ ) {
 						Point2D_I32 bc = b.corners.get(indexB);
 

@@ -23,6 +23,7 @@ import georegression.geometry.UtilPoint2D_I32;
 import georegression.metric.UtilAngle;
 import georegression.struct.point.Point2D_I32;
 import org.ddogleg.sorting.QuickSort_F64;
+import org.ddogleg.struct.GrowQueue_F64;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,7 +42,15 @@ public class FindQuadCorners {
 	// number of pixels in the contour
 	int N;
 	// storage for acute angles along the contour
-	double acuteAngles[] = new double[1];
+	GrowQueue_F64 acuteAngles = new GrowQueue_F64();
+	// angles for selected corners
+	GrowQueue_F64 acuteCorners = new GrowQueue_F64();
+
+	// center point in the contour
+	Point2D_I32 center = new Point2D_I32();
+
+	// storage for points which are candidate corners
+	List<Point2D_I32> candidates = new ArrayList<Point2D_I32>();
 
 	/**
 	 * Finds corners from list of contour points and orders contour points into clockwise order.
@@ -51,36 +60,45 @@ public class FindQuadCorners {
 	 */
 	public List<Point2D_I32> process( List<Point2D_I32> contour ) {
 		// order points in clockwise order
-		Point2D_I32 center = findAverage(contour);
+		findAverage(contour,center);
 		sortByAngleCCW(center, contour);
 
 		N = contour.size();
 		int radiusLarge = N / 10;
-		if( radiusLarge < 2 )
-			radiusLarge = 2;
+		if( radiusLarge < 3 )
+			radiusLarge = 3;
 
-		if( acuteAngles.length < N ) {
-			acuteAngles = new double[N];
-		}
+		acuteAngles.reset();
+		acuteCorners.reset();
+		candidates.clear();
 
-		computeResponse(contour,radiusLarge, acuteAngles);
-		
+		acuteAngles.resize(N);
+
+		computeResponse(contour, radiusLarge, acuteAngles.data);
+
 		// find local minimums
-		int minIndex=-1;
-		double minValue = Double.MAX_VALUE;
-		List<Point2D_I32> candidates = new ArrayList<Point2D_I32>();
 		for( int i = 0; i < N; i++ ) {
 			int indexBefore = UtilCalibrationGrid.incrementCircle(i, -1, N);
 			int indexAfter = UtilCalibrationGrid.incrementCircle(i, 1, N);
 			
-			double r = acuteAngles[i];
-			if( r <= acuteAngles[indexBefore] && r <= acuteAngles[indexAfter ]) {
+			double r = acuteAngles.data[i];
+			if( r <= acuteAngles.data[indexBefore] && r <= acuteAngles.data[indexAfter ]) {
 				candidates.add(contour.get(i));
-				
-				if( r < minValue ) {
-					minValue = r;
-					minIndex = candidates.size()-1;
-				}
+				acuteCorners.add(r);
+			}
+		}
+
+		// remove duplicates now to avoid confusion later
+		removeNeighbors(candidates);
+
+		// find the best corner
+		int minIndex=-1;
+		double minValue = Double.MAX_VALUE;
+		for( int i = 0; i < candidates.size(); i++ ) {
+			double r = acuteCorners.get(i);
+			if( r < minValue ) {
+				minValue = r;
+				minIndex = i;
 			}
 		}
 		
@@ -103,6 +121,27 @@ public class FindQuadCorners {
 	}
 
 	/**
+	 * If two corners are right next to each other, remove one of them.  This is a problem for small
+	 * targets.
+	 */
+	private void removeNeighbors( List<Point2D_I32> corners ) {
+		for( int i = 0; i < corners.size(); i++ ) {
+			Point2D_I32 c = corners.get(i);
+
+			for( int j = i+1; j < corners.size(); ) {
+				Point2D_I32 d = corners.get(j);
+
+				if( Math.abs(d.x - c.x) <= 2 && Math.abs(d.y - c.y) <= 2 ) {
+					acuteCorners.remove(j);
+					corners.remove(j);
+				} else {
+					j++;
+				}
+			}
+		}
+	}
+
+	/**
 	 * Selects the corner which has the largest sum of cartesian distance from the already selected
 	 * corners.
 	 */
@@ -114,29 +153,30 @@ public class FindQuadCorners {
 			Point2D_I32 c = candidates.get(i);
 			double d = 0;
 			for( Point2D_I32 p : corners ) {
-				d += UtilPoint2D_I32.distance(c,p);
+				d += UtilPoint2D_I32.distance(c, p);
 			}
 			if( d > maxDistance ) {
 				maxDistance = d;
 				maxIndex = i;
 			}
-		}                    
+		}
 		
 		corners.add(candidates.remove(maxIndex));
 	}
 
 	/**
 	 * Find the average of all the points in the list.
-	 *
-	 * @param contour
-	 * @return
 	 */
-	protected static Point2D_I32 findAverage(List<Point2D_I32> contour) {
+	protected static Point2D_I32 findAverage(List<Point2D_I32> contour , Point2D_I32 ret ) {
+
+		if( ret == null )
+			ret = new Point2D_I32();
 
 		int x = 0;
 		int y = 0;
 
-		for( Point2D_I32 p : contour ) {
+		for( int i = 0; i < contour.size(); i++ ) {
+			Point2D_I32 p = contour.get(i);
 			x += p.x;
 			y += p.y;
 		}
@@ -144,7 +184,9 @@ public class FindQuadCorners {
 		x /= contour.size();
 		y /= contour.size();
 
-		return new Point2D_I32(x,y);
+		ret.set(x,y);
+
+		return ret;
 	}
 
 

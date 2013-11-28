@@ -56,7 +56,11 @@ public class QuadBlob {
 	// what each corner is connected to
 	public List<QuadBlob> conn = new ArrayList<QuadBlob>();
 	public GrowQueue_F64 connDist = new GrowQueue_F64();
+	// index of the corner this index corresponds to
 	public GrowQueue_I32 connIndex = new GrowQueue_I32();
+
+	// index of the blob in a list
+	public int index;
 
 	public QuadBlob(List<Point2D_I32> contour, List<Point2D_I32> corners) {
 		this();
