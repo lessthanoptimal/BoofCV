@@ -18,7 +18,7 @@
 
 package boofcv.alg.geo.calibration;
 
-import boofcv.alg.feature.detect.grid.AutoThresholdCalibrationGrid;
+import boofcv.abst.calib.ConfigChessboard;
 import boofcv.alg.feature.detect.grid.DetectSquareCalibrationPoints;
 import boofcv.alg.feature.detect.quadblob.QuadBlob;
 import boofcv.alg.filter.binary.GThresholdImageOps;
@@ -74,9 +74,6 @@ public class DetectCalibrationSquaresApp
 	BufferedImage workImage;
 	// original untainted image
 	BufferedImage input;
-
-	// used to automatically select the threshold
-	AutoThresholdCalibrationGrid auto = new AutoThresholdCalibrationGrid(-1);
 
 	// if a target was found or not
 	boolean foundTarget;
@@ -227,24 +224,32 @@ public class DetectCalibrationSquaresApp
 			QuadBlob p = squares.get(i);
 			Point2D_I32 c = p.center;
 
-			g2.setColor(Color.ORANGE);
+			int red = 255;
+			int green = 255*i/squares.size();
+			int blue = 255*(i%(squares.size()/2))/(squares.size()/2);
+
+			g2.setColor(new Color(red,green,blue));
 			for( QuadBlob w : p.conn ) {
 				g2.drawLine(c.x,c.y,w.center.x,w.center.y);
 			}
 		}
+		g2.setColor(Color.RED);
 		for( int i = 0; i < squares.size(); i++ ) {
 			QuadBlob p = squares.get(i);
 			Point2D_I32 c = p.center;
-			VisualizeFeatures.drawPoint(g2, c.x, c.y, Color.GREEN );
-		}
-
-		for( int i = 0; i < squares.size(); i++ ) {
-			QuadBlob p = squares.get(i);
-			for( int j = 0; j < p.corners.size(); j++ ) {
-				Point2D_I32 c = p.corners.get(j);
-				VisualizeFeatures.drawPoint(g2, c.x, c.y, 1, Color.BLUE );
+			g2.drawString(String.format("%d", p.conn.size()), c.x, c.y);
+			if( p.conn.size() == 3 ) {
+				System.out.println();
 			}
 		}
+
+//		for( int i = 0; i < squares.size(); i++ ) {
+//			QuadBlob p = squares.get(i);
+//			for( int j = 0; j < p.corners.size(); j++ ) {
+//				Point2D_I32 c = p.corners.get(j);
+//				VisualizeFeatures.drawPoint(g2, c.x, c.y, 1, Color.BLUE );
+//			}
+//		}
 	}
 
 	/**
@@ -316,15 +321,14 @@ public class DetectCalibrationSquaresApp
 	 */
 	private void detectTarget() {
 
+		ConfigChessboard config = new ConfigChessboard(1,1);
+
 		if( calibGUI.isManual() ) {
 			GThresholdImageOps.threshold(gray,binary,calibGUI.getThresholdLevel(),true);
-
-			foundTarget = alg.process(binary);
 		} else {
-			foundTarget = auto.process(alg,gray);
-			calibGUI.setThreshold((int)auto.getThreshold());
-			binary.setTo(auto.getBinary());
+			GThresholdImageOps.adaptiveSquare(gray, binary, config.binaryAdaptiveRadius, config.binaryAdaptiveBias, true, null, null);
 		}
+		foundTarget = alg.process(binary);
 
 	}
 

@@ -18,25 +18,19 @@
 
 package boofcv.alg.filter.convolve.noborder;
 
-import boofcv.misc.CodeGeneratorUtil;
+import boofcv.misc.CodeGeneratorBase;
 
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.PrintStream;
 
 /**
  * @author Peter Abeles
  */
-public class GenerateConvolveStandardSparse {
+public class GenerateConvolveStandardSparse extends CodeGeneratorBase {
 	String className = "ConvolveImageStandardSparse";
 
-	PrintStream out;
-
-	public GenerateConvolveStandardSparse() throws FileNotFoundException {
-		out = new PrintStream(new FileOutputStream(className + ".java"));
-	}
-
-	public void generate() {
+	@Override
+	public void generate() throws FileNotFoundException {
+		setOutputFile(className);
 		printPreamble();
 		printAllOps("F32", "ImageFloat32","float","",false);
 		printAllOps("I32", "ImageUInt8","int"," & 0xFF",false);
@@ -47,10 +41,8 @@ public class GenerateConvolveStandardSparse {
 	}
 
 	private void printPreamble() {
-		out.print(CodeGeneratorUtil.copyright);
-		out.print("package boofcv.alg.filter.convolve.noborder;\n" +
-				"\n" +
-				"import boofcv.struct.convolve.Kernel1D_F32;\n" +
+
+		out.print("import boofcv.struct.convolve.Kernel1D_F32;\n" +
 				"import boofcv.struct.convolve.Kernel1D_I32;\n" +
 				"import boofcv.struct.image.ImageFloat32;\n" +
 				"import boofcv.struct.image.ImageSInt16;\n" +
@@ -59,7 +51,7 @@ public class GenerateConvolveStandardSparse {
 				"/**\n" +
 				" *\n" +
 				" * <p>\n" +
-				" * General implementation of {@link boofcv.alg.filter.convolve.Convolve1D_Sparse}.\n" +
+				" * General implementation of {@link boofcv.alg.filter.convolve.ConvolveImageNoBorderSparse}.\n" +
 				" * </p>\n" +
 				" *\n" +
 				" * <p>\n" +
@@ -82,13 +74,15 @@ public class GenerateConvolveStandardSparse {
 			out.print("\t\t\t\t\t\t\t\t"+inputType+" input, int c_x , int c_y, "+sumType+" storage[] )\n");
 		}
 
-		String divideHorizontal = hasDivide ? "/divisorHorizontal" : "";
-		String divideVertical = hasDivide ? "/divisorVertical" : "";
+		String declareHalf = hasDivide ? "\t\tint halfHorizontal = divisorHorizontal/2;\n" : "";
+		String outputHorizontal = hasDivide ? "(total + halfHorizontal)/divisorHorizontal" : "total";
+		String outputVertical = hasDivide ? "(total + divisorVertical/2)/divisorVertical" : "total";
 
 		out.print("\t{\n" +
 				"\t\t// convolve horizontally first\n" +
 				"\t\tint width = horizontal.getWidth();\n" +
 				"\t\tint radius = width/2;\n" +
+				declareHalf +
 				"\n" +
 				"\t\tfor( int i = 0; i < width; i++ ) {\n" +
 				"\t\t\tint indexImg = input.startIndex + (i+c_y-radius)*input.stride + c_x-radius;\n" +
@@ -97,7 +91,7 @@ public class GenerateConvolveStandardSparse {
 				"\t\t\tfor( int j = 0; j < width; j++ ,indexImg++) {\n" +
 				"\t\t\t\ttotal += (input.data[indexImg]"+bitWise+")*horizontal.data[j];\n" +
 				"\t\t\t}\n" +
-				"\t\t\tstorage[i] = total"+divideHorizontal+";\n" +
+				"\t\t\tstorage[i] = "+outputHorizontal+";\n" +
 				"\t\t}\n" +
 				"\n" +
 				"\t\t// convolve vertically\n" +
@@ -105,7 +99,7 @@ public class GenerateConvolveStandardSparse {
 				"\t\tfor( int i = 0; i < width; i++ ) {\n" +
 				"\t\t\ttotal += storage[i]*vertical.data[i];\n" +
 				"\t\t}\n" +
-				"\t\treturn total"+divideVertical+";\n" +
+				"\t\treturn "+outputVertical+";\n" +
 				"\t}\n\n");
 	}
 

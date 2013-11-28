@@ -18,36 +18,32 @@
 
 package boofcv.alg.feature.detect.chess;
 
-import boofcv.abst.feature.detect.extract.ConfigExtract;
-import boofcv.abst.feature.detect.extract.NonMaxSuppression;
 import boofcv.abst.feature.detect.intensity.GeneralFeatureIntensity;
 import boofcv.alg.feature.detect.InvalidCalibrationTarget;
 import boofcv.alg.feature.detect.grid.UtilCalibrationGrid;
-import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.alg.feature.detect.quadblob.OrderPointsIntoGrid;
+import boofcv.alg.feature.detect.quadblob.QuadBlob;
 import boofcv.alg.filter.binary.BinaryImageOps;
 import boofcv.alg.filter.binary.GThresholdImageOps;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
-import boofcv.alg.misc.GImageMiscOps;
+import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.core.image.border.BorderType;
-import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
 import boofcv.factory.feature.detect.intensity.FactoryIntensityPoint;
+import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.ImageRectangle;
-import boofcv.struct.QueueCorner;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
 import georegression.geometry.UtilPoint2D_I32;
+import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_F64;
-import georegression.struct.point.Point2D_I16;
 import georegression.struct.point.Point2D_I32;
-import org.ddogleg.sorting.QuickSort_F64;
+import org.ddogleg.struct.FastQueue;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -83,22 +79,19 @@ public class DetectChessCalibrationPoints<T extends ImageSingleBand, D extends I
 	// binary images used to detect chess board
 	private ImageUInt8 binary = new ImageUInt8(1, 1);
 	private ImageUInt8 eroded = new ImageUInt8(1, 1);
-	// Threshold used to create binary image.  if < 0 then a threshold is automatically selected
+	// Threshold used to create binary image.  if < 0 then a threshold a local adaptive threshold is used
 	private double userBinaryThreshold = -1;
-	// the actual threshold used
-	private double actualBinaryThreshold;
+	// parameters for local adaptive threshold
+	private int userAdaptiveRadius = 20;
+	private double userAdaptiveBias = -10;
 	// relative blob size threshold.  Adjusted relative to image size.  Small objects are pruned
 	private double relativeSizeThreshold;
 
 	// point detection algorithms
 	private GeneralFeatureIntensity<T, D> intensityAlg;
-	private GeneralFeatureDetector<T, D> detectorAlg;
 
 	// point location at subpixel accuracy
 	private List<Point2D_F64> subpixel;
-
-	// number of points it expects to observer in the target
-	private int expectedPoints;
 
 	// rectangle the target is contained inside of
 	private ImageRectangle targetRect;
@@ -109,8 +102,11 @@ public class DetectChessCalibrationPoints<T extends ImageSingleBand, D extends I
 	// true if it found the rectangular bound
 	private boolean foundBound;
 
-	// storage for image histogram
-	private int histogram[] = new int[256];
+	// work space for thresholding
+	private T work1;
+	private T work2;
+
+	FastQueue<Point2D_F32> corners = new FastQueue<Point2D_F32>(Point2D_F32.class,true);
 
 	/**
 	 * Configures detection parameters
@@ -132,17 +128,14 @@ public class DetectChessCalibrationPoints<T extends ImageSingleBand, D extends I
 		this.numColsPoints = numCols-1;
 		this.numRowsPoints = numRows-1;
 
-		expectedPoints = numColsPoints * numRowsPoints;
+		work1 = GeneralizedImageOps.createSingleBand(imageType,1,1);
+		work2 = GeneralizedImageOps.createSingleBand(imageType,1,1);
 
 		derivX = GeneralizedImageOps.createSingleBand(derivType, 1, 1);
 		derivY = GeneralizedImageOps.createSingleBand(derivType, 1, 1);
 
 		intensityAlg = FactoryIntensityPoint.shiTomasi(radius, true, derivType);
 //		intensityAlg = FactoryIntensityPoint.harris(radius,0.04f,true,derivType);
-
-		NonMaxSuppression extractor =
-				FactoryFeatureExtractor.nonmax(new ConfigExtract(radius + 2, 20, radius + 2, true));
-		detectorAlg = new GeneralFeatureDetector<T, D>(intensityAlg, extractor);
 
 		// minContourSize is specified later after the image's size is known
 		findBound = new DetectChessSquaresBinary(numCols, numRows, 0);
@@ -167,7 +160,7 @@ public class DetectChessCalibrationPoints<T extends ImageSingleBand, D extends I
 		adjustForImageSize(gray.width,gray.height);
 
 		// detect the chess board
-		if (!(foundBound = detectChessBoard(gray,userBinaryThreshold,true)))
+		if (!(foundBound = detectChessBoard(gray)))
 			return false;
 
 		// rectangle that contains the area of interest
@@ -181,42 +174,41 @@ public class DetectChessCalibrationPoints<T extends ImageSingleBand, D extends I
 		GImageDerivativeOps.sobel(subGray, derivX, derivY, BorderType.EXTENDED);
 
 		// detect interest points
-		detectorAlg.process(subGray, derivX, derivY, null, null, null);
+		intensityAlg.process(subGray, derivX, derivY, null, null, null);
 
-		QueueCorner corners = detectorAlg.getMaximums();
+		seedPointsFromQuadCorner();
+		meanShiftBlobCorners(intensityAlg.getIntensity(),targetRect);
 
-		// put points into original image coordinates
-		List<Point2D_F64> points = convert(corners, targetRect.x0, targetRect.y0);
+		List<Point2D_F64> points = new ArrayList<Point2D_F64>();
+		for( int i = 0; i < corners.size(); i++ ) {
+			Point2D_F32 c = corners.get(i);
+			points.add( new Point2D_F64(c.x,c.y));
+		}
 
-		// prune features which are not near any candidate corners
-		pruneFarFromBlobCorners(points, findBound.getCandidatePoints());
-
-		// make sure enough points were detected
-		if (points.size() < expectedPoints)
+		try {
+			orderAlg.process(points);
+		} catch( InvalidCalibrationTarget e ) {
+//			System.err.println(e.getMessage());
 			return false;
+		}
 
-		// select N brightest features
-		points = selectBrightest(points, intensityAlg.getIntensity(), targetRect.x0, targetRect.y0);
+		points = UtilCalibrationGrid.rotatePoints(orderAlg.getOrdered(),
+				orderAlg.getNumRows(), orderAlg.getNumCols(),
+				numRowsPoints, numColsPoints);
+
+		if (numColsPoints * numRowsPoints != orderAlg.getNumCols() * orderAlg.getNumRows()) {
+//			System.err.println("Unexpected grid size");
+			return false;
+		}
+
+		// distance apart two points are from each other.
+		int dist = (int)(points.get(0).distance(points.get(1))+1);
 
 		// compute pixels to sub-pixel accuracy
 		for (Point2D_F64 p : points)
-			subpixel.add(refineSubpixel(p, targetRect.x0, targetRect.y0, intensityAlg.getIntensity()));
+			subpixel.add(refineSubpixel(p, dist, targetRect.x0, targetRect.y0, intensityAlg.getIntensity()));
 
-		try {
-			orderAlg.process(subpixel);
-		} catch( InvalidCalibrationTarget e ) {
-			System.err.println(e.getMessage());
-			return false;
-		}
-
-		if (numColsPoints * numRowsPoints != orderAlg.getNumCols() * orderAlg.getNumRows()) {
-			System.err.println("Unexpected grid size");
-			return false;
-		}
-
-		subpixel = UtilCalibrationGrid.rotatePoints(orderAlg.getOrdered(),
-				orderAlg.getNumRows(), orderAlg.getNumCols(),
-				numRowsPoints, numColsPoints);
+//		subpixel.addAll(points);
 
 		return subpixel != null;
 	}
@@ -236,75 +228,20 @@ public class DetectChessCalibrationPoints<T extends ImageSingleBand, D extends I
 	/**
 	 * Threshold the image and find squares
 	 */
-	private boolean detectChessBoard(T gray, double threshold , boolean first ) {
+	private boolean detectChessBoard(T gray ) {
 
-		actualBinaryThreshold = threshold;
-		if( actualBinaryThreshold < 0 )
-			actualBinaryThreshold = UtilCalibrationGrid.selectThreshold(gray,histogram);
-
-		GThresholdImageOps.threshold(gray, binary, actualBinaryThreshold, true);
+		if( userBinaryThreshold <= 0 ) {
+			work1.reshape(gray.width,gray.height);
+			work2.reshape(gray.width,gray.height);
+			GThresholdImageOps.adaptiveSquare(gray, binary, userAdaptiveRadius, userAdaptiveBias, true, work1, work2);
+		} else {
+			GThresholdImageOps.threshold(gray, binary, userBinaryThreshold, true);
+		}
 
 		// erode to make the squares separated
 		BinaryImageOps.erode8(binary, eroded);
 
-		if (findBound.process(eroded)) {
-			if( userBinaryThreshold < 0 ) {
-				// second pass to improve threshold
-				return detectChessBoardSubImage(gray);
-			} else {
-				return true;
-			}
-		} else if( first && userBinaryThreshold < 0 ) {
-			// if the target is small and the background dark, the threshold will be too low
-			// if the target is small and the background white, it will still estimate a good threshold
-			// so try a larger value before giving up
-			threshold = (255+threshold)/2;
-			return detectChessBoard(gray,threshold,false);
-		}
-
-		return false;
-	}
-
-	/**
-	 * Look for the target only inside a specific region.  The threshold can be more accurate selected this way
-	 */
-	private boolean detectChessBoardSubImage( T gray ) {
-
-		// region the target is contained inside of
-		ImageRectangle targetBound = findBound.getBoundRect();
-
-		// expand the bound a bit
-		int w = targetBound.getWidth();
-		int h = targetBound.getHeight();
-
-		ImageRectangle expanded = new ImageRectangle();
-		int adj = (int)(w*0.12);
-		expanded.x0 = targetBound.x0-adj;
-		expanded.x1 = targetBound.x1+adj;
-		adj = (int)(h*0.12);
-		expanded.y0 = targetBound.y0-adj;
-		expanded.y1 = targetBound.y1+adj;
-
-		BoofMiscOps.boundRectangleInside(gray, expanded);
-
-		// create sub-images for processing.  recompute threshold just around the area of interest and
-		// only look for the target inside that
-		T subGray = (T)gray.subimage(expanded.x0,expanded.y0,expanded.x1,expanded.y1, null);
-		actualBinaryThreshold = UtilCalibrationGrid.selectThreshold(subGray,histogram);
-
-		GImageMiscOps.fill(binary,0);
-		ImageUInt8 subBinary = (ImageUInt8)binary.subimage(expanded.x0,expanded.y0,expanded.x1,expanded.y1, null);
-		GThresholdImageOps.threshold(subGray, subBinary, actualBinaryThreshold, true);
-
-		// The new threshold tends to require two erodes
-		BinaryImageOps.erode8(binary, eroded);
-		BinaryImageOps.erode4(eroded, binary);
-		BinaryImageOps.dilate4(binary, eroded);
-
-		if (findBound.process(eroded))
-			return true;
-
-		return false;
+		return findBound.process(eroded);
 	}
 
 	/**
@@ -315,15 +252,20 @@ public class DetectChessCalibrationPoints<T extends ImageSingleBand, D extends I
 	 * result.  Most papers seem to recommend using the quadratic.
 	 *
 	 * @param pt        Point in image coordinates
+	 * @param dist		Distsance two points are from each other approximately
 	 * @param x0        intensity image x offset
 	 * @param y0        intensity image y offset
 	 * @param intensity Intensity image
 	 * @return Sub-pixel point location
 	 */
 	private Point2D_F64 refineSubpixel(Point2D_F64 pt,
+									   int dist ,
 									   int x0, int y0,
 									   ImageFloat32 intensity) {
-		int r = radius + 3;
+		// adjust the search area.  For small targets you don't want to search too large of a region
+		// or it will bleed into the intensity of neighboring points
+		int r = Math.min(dist/4,radius + 3);
+		if( r < 1 ) r = 1;
 		ImageRectangle area = new ImageRectangle((int) (pt.x - r - x0), (int) (pt.y - r - y0),
 				(int) (pt.x + r - x0 + 1), (int) (pt.y + r + 1 - y0));
 		BoofMiscOps.boundRectangleInside(intensity, area);
@@ -376,69 +318,96 @@ public class DetectChessCalibrationPoints<T extends ImageSingleBand, D extends I
 	}
 
 	/**
-	 * Prunes detected corners that are not near any of the corners
+	 * Pick the points between two corners on different quads and the initial point for where a calibration
+	 * point will be.
 	 */
-	private void pruneFarFromBlobCorners(List<Point2D_F64> corners , List<Point2D_I32> initial ) {
+	private void seedPointsFromQuadCorner() {
 
-		int tolerance = 10;
-		Iterator<Point2D_F64> iter = corners.iterator();
+		corners.reset();
 
-		while( iter.hasNext() ) {
-			Point2D_F64 c = iter.next();
-			int x = (int)c.x;
-			int y = (int)c.y;
+		List<QuadBlob> blobs = findBound.getGraphBlobs();
 
-			boolean matched = false;
+		for( int i = 0; i < blobs.size(); i++ ) {
+			blobs.get(i).index = i;
+		}
 
-			for( Point2D_I32 i : initial )
-				if( UtilPoint2D_I32.distance(x,y,i.x,i.y) < tolerance )  {
-					matched = true;
-					break;
+		boolean marked[] = new boolean[ blobs.size()];
+
+		for( int i = 0; i < blobs.size(); i++ ) {
+			QuadBlob b = blobs.get(i);
+			marked[i] = true;
+
+			for( int j = 0; j < b.conn.size(); j++ ) {
+				// avoid adding the same points twice
+				if( marked[b.conn.get(j).index] )
+					continue;
+				QuadBlob c = b.conn.get(j);
+
+				// find the corners and compute the average point
+				Point2D_I32 c0 = b.corners.get(b.connIndex.data[j]);
+
+				int indexOfB = c.conn.indexOf(b);
+				Point2D_I32 c1 = c.corners.get(c.connIndex.data[indexOfB]);
+
+				int x = (c0.x+c1.x)/2;
+				int y = (c0.y+c1.y)/2;
+
+				corners.grow().set(x,y);
+			}
+
+
+		}
+	}
+
+	private void meanShiftBlobCorners( ImageFloat32 intensity , ImageRectangle rect ) {
+		for( int i = 0; i < corners.size(); i++ ) {
+			Point2D_F32 c = corners.get(i);
+			c.x -= rect.x0;
+			c.y -= rect.y0;
+			meanShift( c,intensity);
+			c.x += rect.x0;
+			c.y += rect.y0;
+		}
+	}
+
+	private void meanShift( Point2D_F32 corner , ImageFloat32 intensity ) {
+
+		InterpolatePixelS<ImageFloat32> interp = FactoryInterpolation.bilinearPixelS(ImageFloat32.class);
+		interp.setImage(intensity);
+
+		int w = 5;
+		int r = w/2;
+		float x0,y0;
+		float x = corner.x;
+		float y = corner.y;
+
+		for( int iter = 0; iter < 10; iter++ ) {
+			x0 = x - r;
+			y0 = y - r;
+
+			if( x0 < 0 ) { x0 = 0;}
+			else if( x0+w > intensity.width ) { x0 = intensity.width-w; }
+			if( y0 < 0 ) { y0 = 0;}
+			else if( y0+w > intensity.height ) { y0 = intensity.height-w; }
+
+			float total = 0;
+			float sumX = 0, sumY = 0;
+
+			for( int yy = 0; yy < w; yy++ ) {
+				for( int xx = 0; xx < w; xx++ ) {
+					float weight = interp.get(x0+xx,y0+yy);
+					total += weight;
+					sumX += weight*(xx+x0);
+					sumY += weight*(yy+y0);
 				}
-			if( !matched )
-				iter.remove();
-		}
-	}
+			}
 
-	/**
-	 * Converts from a corner in the sub-image into a point in the full image
-	 */
-	private List<Point2D_F64> convert(QueueCorner found, int x0, int y0) {
-		List<Point2D_F64> points = new ArrayList<Point2D_F64>();
-		for (int i = 0; i < found.size(); i++) {
-			Point2D_I16 c = found.get(i);
-			points.add(new Point2D_F64(c.x + x0, c.y + y0));
-		}
-		return points;
-	}
-
-	/**
-	 * Out of the remaining points, just select the brightest to remove any remaining false positives
-	 */
-	private List<Point2D_F64> selectBrightest(List<Point2D_F64> points, ImageFloat32 intensity,
-											  int offX, int offY) {
-		if (points.size() == expectedPoints)
-			return points;
-
-
-		double values[] = new double[points.size()];
-		int indexes[] = new int[points.size()];
-
-		for (int i = 0; i < points.size(); i++) {
-			Point2D_F64 p = points.get(i);
-
-			values[i] = -intensity.get((int) (p.x - offX), (int) (p.y - offY));
+			x = sumX/total;
+			y = sumY/total;
 		}
 
-		new QuickSort_F64().sort(values, points.size(), indexes);
-
-		List<Point2D_F64> ret = new ArrayList<Point2D_F64>();
-
-		for (int i = 0; i < expectedPoints; i++) {
-			ret.add(points.get(indexes[i]));
-		}
-
-		return ret;
+		corner.x = x;
+		corner.y = y;
 	}
 
 	/**
@@ -469,10 +438,6 @@ public class DetectChessCalibrationPoints<T extends ImageSingleBand, D extends I
 			return eroded;
 	}
 
-	public double getActualBinaryThreshold() {
-		return actualBinaryThreshold;
-	}
-
 	public void setUserBinaryThreshold(double userBinaryThreshold) {
 		this.userBinaryThreshold = userBinaryThreshold;
 	}
@@ -481,22 +446,23 @@ public class DetectChessCalibrationPoints<T extends ImageSingleBand, D extends I
 		return userBinaryThreshold;
 	}
 
-	public boolean isFoundBound() {
-		return foundBound;
+	public int getUserAdaptiveRadius() {
+		return userAdaptiveRadius;
 	}
 
-	public List<Point2D_F64> detectedPointFeatures() {
+	public void setUserAdaptiveRadius(int userAdaptiveRadius) {
+		this.userAdaptiveRadius = userAdaptiveRadius;
+	}
 
-		List<Point2D_F64> ret = new ArrayList<Point2D_F64>();
+	public double getUserAdaptiveBias() {
+		return userAdaptiveBias;
+	}
 
-		int offX = targetRect.x0, offY = targetRect.y0;
-		QueueCorner found = detectorAlg.getMaximums();
+	public void setUserAdaptiveBias(double userAdaptiveBias) {
+		this.userAdaptiveBias = userAdaptiveBias;
+	}
 
-		for( int i = 0; i < found.size; i++ ) {
-			Point2D_I16 c = found.get(i);
-			ret.add(new Point2D_F64(offX + c.x , offY + c.y) );
-		}
-
-		return ret;
+	public boolean isFoundBound() {
+		return foundBound;
 	}
 }

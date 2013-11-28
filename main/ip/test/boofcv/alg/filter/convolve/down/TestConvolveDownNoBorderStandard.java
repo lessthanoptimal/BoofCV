@@ -217,8 +217,6 @@ public class TestConvolveDownNoBorderStandard {
 					if( sum > 0 ) {
 						// normalizing the magnitude is needed for floating point numbers
 						double diff = Math.abs(valV-valT)/sum;
-						if( diff > 1e-4 )
-							System.out.println("sadfasfd");
 						assertTrue(valV+" "+valT+"  diff "+diff+"  at ( "+x+" "+y+" )",diff<=1e-4);
 					}
 				}

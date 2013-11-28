@@ -145,6 +145,7 @@ public class ConvolveImageUnrolled_S32_S32_Div {
 
 		final int width = image.getWidth();
 		final int height = image.getHeight()-yBorder;
+		final int halfDivisor = divisor/2;
 
 		for( int i = yBorder; i < height; i++ ) {
 			int indexDst = dest.startIndex + i*dest.stride+radius;
@@ -157,7 +158,7 @@ public class ConvolveImageUnrolled_S32_S32_Div {
 				total += (dataSrc[indexSrc++])*k2;
 				total += (dataSrc[indexSrc])*k3;
 
-				dataDst[indexDst++] = (total/divisor);
+				dataDst[indexDst++] = ((total+halfDivisor)/divisor);
 			}
 		}
 	}
@@ -180,6 +181,7 @@ public class ConvolveImageUnrolled_S32_S32_Div {
 
 		final int width = image.getWidth();
 		final int height = image.getHeight()-yBorder;
+		final int halfDivisor = divisor/2;
 
 		for( int i = yBorder; i < height; i++ ) {
 			int indexDst = dest.startIndex + i*dest.stride+radius;
@@ -194,7 +196,7 @@ public class ConvolveImageUnrolled_S32_S32_Div {
 				total += (dataSrc[indexSrc++])*k4;
 				total += (dataSrc[indexSrc])*k5;
 
-				dataDst[indexDst++] = (total/divisor);
+				dataDst[indexDst++] = ((total+halfDivisor)/divisor);
 			}
 		}
 	}
@@ -219,6 +221,7 @@ public class ConvolveImageUnrolled_S32_S32_Div {
 
 		final int width = image.getWidth();
 		final int height = image.getHeight()-yBorder;
+		final int halfDivisor = divisor/2;
 
 		for( int i = yBorder; i < height; i++ ) {
 			int indexDst = dest.startIndex + i*dest.stride+radius;
@@ -235,7 +238,7 @@ public class ConvolveImageUnrolled_S32_S32_Div {
 				total += (dataSrc[indexSrc++])*k6;
 				total += (dataSrc[indexSrc])*k7;
 
-				dataDst[indexDst++] = (total/divisor);
+				dataDst[indexDst++] = ((total+halfDivisor)/divisor);
 			}
 		}
 	}
@@ -262,6 +265,7 @@ public class ConvolveImageUnrolled_S32_S32_Div {
 
 		final int width = image.getWidth();
 		final int height = image.getHeight()-yBorder;
+		final int halfDivisor = divisor/2;
 
 		for( int i = yBorder; i < height; i++ ) {
 			int indexDst = dest.startIndex + i*dest.stride+radius;
@@ -280,7 +284,7 @@ public class ConvolveImageUnrolled_S32_S32_Div {
 				total += (dataSrc[indexSrc++])*k8;
 				total += (dataSrc[indexSrc])*k9;
 
-				dataDst[indexDst++] = (total/divisor);
+				dataDst[indexDst++] = ((total+halfDivisor)/divisor);
 			}
 		}
 	}
@@ -309,6 +313,7 @@ public class ConvolveImageUnrolled_S32_S32_Div {
 
 		final int width = image.getWidth();
 		final int height = image.getHeight()-yBorder;
+		final int halfDivisor = divisor/2;
 
 		for( int i = yBorder; i < height; i++ ) {
 			int indexDst = dest.startIndex + i*dest.stride+radius;
@@ -329,7 +334,7 @@ public class ConvolveImageUnrolled_S32_S32_Div {
 				total += (dataSrc[indexSrc++])*k10;
 				total += (dataSrc[indexSrc])*k11;
 
-				dataDst[indexDst++] = (total/divisor);
+				dataDst[indexDst++] = ((total+halfDivisor)/divisor);
 			}
 		}
 	}
@@ -349,6 +354,7 @@ public class ConvolveImageUnrolled_S32_S32_Div {
 
 		final int imgWidth = dest.getWidth();
 		final int imgHeight = dest.getHeight();
+		final int halfDivisor = divisor/2;
 
 		final int yEnd = imgHeight-radius;
 
@@ -368,7 +374,7 @@ public class ConvolveImageUnrolled_S32_S32_Div {
 				indexSrc += image.stride;
 				total += (dataSrc[indexSrc])*k3;
 
-				dataDst[indexDst++] = (total/divisor);
+				dataDst[indexDst++] = ((total+halfDivisor)/divisor);
 			}
 		}
 	}
@@ -390,6 +396,7 @@ public class ConvolveImageUnrolled_S32_S32_Div {
 
 		final int imgWidth = dest.getWidth();
 		final int imgHeight = dest.getHeight();
+		final int halfDivisor = divisor/2;
 
 		final int yEnd = imgHeight-radius;
 
@@ -413,7 +420,7 @@ public class ConvolveImageUnrolled_S32_S32_Div {
 				indexSrc += image.stride;
 				total += (dataSrc[indexSrc])*k5;
 
-				dataDst[indexDst++] = (total/divisor);
+				dataDst[indexDst++] = ((total+halfDivisor)/divisor);
 			}
 		}
 	}
@@ -437,6 +444,7 @@ public class ConvolveImageUnrolled_S32_S32_Div {
 
 		final int imgWidth = dest.getWidth();
 		final int imgHeight = dest.getHeight();
+		final int halfDivisor = divisor/2;
 
 		final int yEnd = imgHeight-radius;
 
@@ -464,7 +472,7 @@ public class ConvolveImageUnrolled_S32_S32_Div {
 				indexSrc += image.stride;
 				total += (dataSrc[indexSrc])*k7;
 
-				dataDst[indexDst++] = (total/divisor);
+				dataDst[indexDst++] = ((total+halfDivisor)/divisor);
 			}
 		}
 	}
@@ -490,6 +498,7 @@ public class ConvolveImageUnrolled_S32_S32_Div {
 
 		final int imgWidth = dest.getWidth();
 		final int imgHeight = dest.getHeight();
+		final int halfDivisor = divisor/2;
 
 		final int yEnd = imgHeight-radius;
 
@@ -521,7 +530,7 @@ public class ConvolveImageUnrolled_S32_S32_Div {
 				indexSrc += image.stride;
 				total += (dataSrc[indexSrc])*k9;
 
-				dataDst[indexDst++] = (total/divisor);
+				dataDst[indexDst++] = ((total+halfDivisor)/divisor);
 			}
 		}
 	}
@@ -549,6 +558,7 @@ public class ConvolveImageUnrolled_S32_S32_Div {
 
 		final int imgWidth = dest.getWidth();
 		final int imgHeight = dest.getHeight();
+		final int halfDivisor = divisor/2;
 
 		final int yEnd = imgHeight-radius;
 
@@ -584,7 +594,7 @@ public class ConvolveImageUnrolled_S32_S32_Div {
 				indexSrc += image.stride;
 				total += (dataSrc[indexSrc])*k11;
 
-				dataDst[indexDst++] = (total/divisor);
+				dataDst[indexDst++] = ((total+halfDivisor)/divisor);
 			}
 		}
 	}
@@ -596,6 +606,7 @@ public class ConvolveImageUnrolled_S32_S32_Div {
 
 		final int width = src.getWidth();
 		final int height = src.getHeight();
+		final int halfDivisor = divisor/2;
 
 		final int kernelRadius = kernel.getRadius();
 		final int totalRow[] = new int[ width ];
@@ -640,7 +651,7 @@ public class ConvolveImageUnrolled_S32_S32_Div {
 			}
 			int indexDst = dest.startIndex + y*dest.stride+kernelRadius;
 			for( int x = kernelRadius; x < width-kernelRadius; x++ ) {
-				dataDst[indexDst++] = (totalRow[x] / divisor);
+				dataDst[indexDst++] = ((totalRow[x]+halfDivisor)/ divisor);
 			}
 		}
 	}
@@ -652,6 +663,7 @@ public class ConvolveImageUnrolled_S32_S32_Div {
 
 		final int width = src.getWidth();
 		final int height = src.getHeight();
+		final int halfDivisor = divisor/2;
 
 		final int kernelRadius = kernel.getRadius();
 		final int totalRow[] = new int[ width ];
@@ -704,7 +716,7 @@ public class ConvolveImageUnrolled_S32_S32_Div {
 			}
 			int indexDst = dest.startIndex + y*dest.stride+kernelRadius;
 			for( int x = kernelRadius; x < width-kernelRadius; x++ ) {
-				dataDst[indexDst++] = (totalRow[x] / divisor);
+				dataDst[indexDst++] = ((totalRow[x]+halfDivisor)/ divisor);
 			}
 		}
 	}
@@ -716,6 +728,7 @@ public class ConvolveImageUnrolled_S32_S32_Div {
 
 		final int width = src.getWidth();
 		final int height = src.getHeight();
+		final int halfDivisor = divisor/2;
 
 		final int kernelRadius = kernel.getRadius();
 		final int totalRow[] = new int[ width ];
@@ -776,7 +789,7 @@ public class ConvolveImageUnrolled_S32_S32_Div {
 			}
 			int indexDst = dest.startIndex + y*dest.stride+kernelRadius;
 			for( int x = kernelRadius; x < width-kernelRadius; x++ ) {
-				dataDst[indexDst++] = (totalRow[x] / divisor);
+				dataDst[indexDst++] = ((totalRow[x]+halfDivisor)/ divisor);
 			}
 		}
 	}
@@ -788,6 +801,7 @@ public class ConvolveImageUnrolled_S32_S32_Div {
 
 		final int width = src.getWidth();
 		final int height = src.getHeight();
+		final int halfDivisor = divisor/2;
 
 		final int kernelRadius = kernel.getRadius();
 		final int totalRow[] = new int[ width ];
@@ -856,7 +870,7 @@ public class ConvolveImageUnrolled_S32_S32_Div {
 			}
 			int indexDst = dest.startIndex + y*dest.stride+kernelRadius;
 			for( int x = kernelRadius; x < width-kernelRadius; x++ ) {
-				dataDst[indexDst++] = (totalRow[x] / divisor);
+				dataDst[indexDst++] = ((totalRow[x]+halfDivisor)/ divisor);
 			}
 		}
 	}
@@ -868,6 +882,7 @@ public class ConvolveImageUnrolled_S32_S32_Div {
 
 		final int width = src.getWidth();
 		final int height = src.getHeight();
+		final int halfDivisor = divisor/2;
 
 		final int kernelRadius = kernel.getRadius();
 		final int totalRow[] = new int[ width ];
@@ -944,7 +959,7 @@ public class ConvolveImageUnrolled_S32_S32_Div {
 			}
 			int indexDst = dest.startIndex + y*dest.stride+kernelRadius;
 			for( int x = kernelRadius; x < width-kernelRadius; x++ ) {
-				dataDst[indexDst++] = (totalRow[x] / divisor);
+				dataDst[indexDst++] = ((totalRow[x]+halfDivisor)/ divisor);
 			}
 		}
 	}

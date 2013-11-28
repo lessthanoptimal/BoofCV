@@ -152,7 +152,7 @@ public class ConvolveNormalizedNaive {
 					total += input.get(j,y)*v;
 					div += v;
 				}
-				output.set(x,y, total/div );
+				output.set(x,y, (total+div/2)/div );
 			}
 		}
 	}
@@ -180,7 +180,7 @@ public class ConvolveNormalizedNaive {
 					total += input.get(x,i)*v;
 					div += v;
 				}
-				output.set(x,y, total/div );
+				output.set(x,y, (total+div/2)/div );
 			}
 		}
 	}
@@ -217,7 +217,7 @@ public class ConvolveNormalizedNaive {
 						div += v;
 					}
 				}
-				output.set(x,y, total/div );
+				output.set(x,y, (total+div/2)/div );
 			}
 		}
 	}
@@ -245,7 +245,7 @@ public class ConvolveNormalizedNaive {
 					total += input.get(j,y)*v;
 					div += v;
 				}
-				output.set(x,y, total/div );
+				output.set(x,y, (total+div/2)/div );
 			}
 		}
 	}
@@ -273,7 +273,7 @@ public class ConvolveNormalizedNaive {
 					total += input.get(x,i)*v;
 					div += v;
 				}
-				output.set(x,y, total/div );
+				output.set(x,y, (total+div/2)/div );
 			}
 		}
 	}
@@ -310,7 +310,7 @@ public class ConvolveNormalizedNaive {
 						div += v;
 					}
 				}
-				output.set(x,y, total/div );
+				output.set(x,y, (total+div/2)/div );
 			}
 		}
 	}
@@ -338,7 +338,7 @@ public class ConvolveNormalizedNaive {
 					total += input.get(j,y)*v;
 					div += v;
 				}
-				output.set(x,y, total/div );
+				output.set(x,y, (total+div/2)/div );
 			}
 		}
 	}
@@ -366,7 +366,7 @@ public class ConvolveNormalizedNaive {
 					total += input.get(x,i)*v;
 					div += v;
 				}
-				output.set(x,y, total/div );
+				output.set(x,y, (total+div/2)/div );
 			}
 		}
 	}
@@ -403,7 +403,7 @@ public class ConvolveNormalizedNaive {
 						div += v;
 					}
 				}
-				output.set(x,y, total/div );
+				output.set(x,y, (total+div/2)/div );
 			}
 		}
 	}

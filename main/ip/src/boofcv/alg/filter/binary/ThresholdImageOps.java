@@ -19,6 +19,7 @@
 package boofcv.alg.filter.binary;
 
 import boofcv.alg.InputSanityCheck;
+import boofcv.alg.filter.blur.BlurImageOps;
 import boofcv.struct.image.*;
 
 /**
@@ -317,6 +318,270 @@ public class ThresholdImageOps {
 				int end = indexIn + input.width;
 
 				for( ; indexIn < end; indexIn++ , indexOut++ ) {
+					if( (input.data[indexIn]) >= threshold )
+						output.data[indexOut] = 1;
+					else
+						output.data[indexOut] = 0;
+				}
+			}
+		}
+
+		return output;
+	}
+
+	/**
+	 * Thresholds the image using an adaptive threshold that is computed using a local square region centered
+	 * on each pixel.  The threshold is equal to the average value of the surrounding pixels plus the bias.
+	 * If down is true then b(x,y) = I(x,y) <= T(x,y) + bias ? 1 : 0.  Otherwise
+	 * b(x,y) = I(x,y) >= T(x,y) + bias ? 0 : 1
+	 *
+	 * @param input Input image.
+	 * @param output (optional) Output binary image.  If null it will be declared internally.
+	 * @param radius Radius of square region.
+	 * @param bias Bias used to adjust threshold
+	 * @param down Should it threshold up or down.
+	 * @param storage1 (Optional) Storage for intermediate step. If null will be declared internally.
+	 * @param storage2 (Optional) Storage for intermediate step. If null will be declared internally.
+	 * @return Thresholded image.
+	 */
+	public static ImageUInt8 adaptiveSquare( ImageUInt8 input , ImageUInt8 output ,
+											 int radius , int bias , boolean down ,
+											 ImageUInt8 storage1 , ImageUInt8 storage2 ) {
+
+		output = InputSanityCheck.checkDeclare(input,output,ImageUInt8.class);
+		storage1 = InputSanityCheck.checkDeclare(input,storage1,ImageUInt8.class);
+		storage2 = InputSanityCheck.checkDeclare(input,storage2,ImageUInt8.class);
+
+		ImageUInt8 mean = storage1;
+
+		BlurImageOps.mean(input,mean,radius,storage2);
+
+		if( down ) {
+			for( int y = 0; y < input.height; y++ ) {
+				int indexIn = input.startIndex + y*input.stride;
+				int indexOut = output.startIndex + y*output.stride;
+				int indexMean = mean.startIndex + y*mean.stride;
+
+				int end = indexIn + input.width;
+
+				for( ; indexIn < end; indexIn++ , indexOut++, indexMean++ ) {
+					int threshold = (mean.data[indexMean]& 0xFF) + bias;
+
+					if( (input.data[indexIn]& 0xFF) <= threshold )
+						output.data[indexOut] = 1;
+					else
+						output.data[indexOut] = 0;
+				}
+			}
+		} else {
+			for( int y = 0; y < input.height; y++ ) {
+				int indexIn = input.startIndex + y*input.stride;
+				int indexOut = output.startIndex + y*output.stride;
+				int indexMean = mean.startIndex + y*mean.stride;
+
+				int end = indexIn + input.width;
+
+				for( ; indexIn < end; indexIn++ , indexOut++, indexMean++ ) {
+					int threshold = (mean.data[indexMean]& 0xFF) + bias;
+
+					if( (input.data[indexIn]& 0xFF) >= threshold )
+						output.data[indexOut] = 1;
+					else
+						output.data[indexOut] = 0;
+				}
+			}
+		}
+
+		return output;
+	}
+
+	/**
+	 * Thresholds the image using an adaptive threshold that is computed using a local square region centered
+	 * on each pixel.  The threshold is equal to the gaussian weighted sum of the surrounding pixels plus the bias.
+	 * If down is true then b(x,y) = I(x,y) <= T(x,y) + bias ? 1 : 0.  Otherwise
+	 * b(x,y) = I(x,y) >= T(x,y) + bias ? 0 : 1
+	 *
+	 * @param input Input image.
+	 * @param output (optional) Output binary image.  If null it will be declared internally.
+	 * @param radius Radius of square region.
+	 * @param bias Bias used to adjust threshold
+	 * @param down Should it threshold up or down.
+	 * @param storage1 (Optional) Storage for intermediate step. If null will be declared internally.
+	 * @param storage2 (Optional) Storage for intermediate step. If null will be declared internally.
+	 * @return Thresholded image.
+	 */
+	public static ImageUInt8 adaptiveGaussian( ImageUInt8 input , ImageUInt8 output ,
+											   int radius , int bias , boolean down ,
+											   ImageUInt8 storage1 , ImageUInt8 storage2 ) {
+
+		output = InputSanityCheck.checkDeclare(input,output,ImageUInt8.class);
+		storage1 = InputSanityCheck.checkDeclare(input,storage1,ImageUInt8.class);
+		storage2 = InputSanityCheck.checkDeclare(input,storage2,ImageUInt8.class);
+
+		ImageUInt8 blur = storage1;
+
+		BlurImageOps.gaussian(input,blur,-1,radius,storage2);
+
+		if( down ) {
+			for( int y = 0; y < input.height; y++ ) {
+				int indexIn = input.startIndex + y*input.stride;
+				int indexOut = output.startIndex + y*output.stride;
+				int indexMean = blur.startIndex + y*blur.stride;
+
+				int end = indexIn + input.width;
+
+				for( ; indexIn < end; indexIn++ , indexOut++, indexMean++ ) {
+					int threshold = (blur.data[indexMean]& 0xFF) + bias;
+
+					if( (input.data[indexIn]& 0xFF) <= threshold )
+						output.data[indexOut] = 1;
+					else
+						output.data[indexOut] = 0;
+				}
+			}
+		} else {
+			for( int y = 0; y < input.height; y++ ) {
+				int indexIn = input.startIndex + y*input.stride;
+				int indexOut = output.startIndex + y*output.stride;
+				int indexMean = blur.startIndex + y*blur.stride;
+
+				int end = indexIn + input.width;
+
+				for( ; indexIn < end; indexIn++ , indexOut++, indexMean++ ) {
+					int threshold = (blur.data[indexMean]& 0xFF) + bias;
+
+					if( (input.data[indexIn]& 0xFF) >= threshold )
+						output.data[indexOut] = 1;
+					else
+						output.data[indexOut] = 0;
+				}
+			}
+		}
+
+		return output;
+	}
+
+	/**
+	 * Thresholds the image using an adaptive threshold that is computed using a local square region centered
+	 * on each pixel.  The threshold is equal to the average value of the surrounding pixels plus the bias.
+	 * If down is true then b(x,y) = I(x,y) <= T(x,y) + bias ? 1 : 0.  Otherwise
+	 * b(x,y) = I(x,y) >= T(x,y) + bias ? 0 : 1
+	 *
+	 * @param input Input image.
+	 * @param output (optional) Output binary image.  If null it will be declared internally.
+	 * @param radius Radius of square region.
+	 * @param bias Bias used to adjust threshold
+	 * @param down Should it threshold up or down.
+	 * @param storage1 (Optional) Storage for intermediate step. If null will be declared internally.
+	 * @param storage2 (Optional) Storage for intermediate step. If null will be declared internally.
+	 * @return Thresholded image.
+	 */
+	public static ImageUInt8 adaptiveSquare( ImageFloat32 input , ImageUInt8 output ,
+											 int radius , float bias , boolean down ,
+											 ImageFloat32 storage1 , ImageFloat32 storage2 ) {
+
+		output = InputSanityCheck.checkDeclare(input,output,ImageUInt8.class);
+		storage1 = InputSanityCheck.checkDeclare(input,storage1,ImageFloat32.class);
+		storage2 = InputSanityCheck.checkDeclare(input,storage2,ImageFloat32.class);
+
+		ImageFloat32 mean = storage1;
+
+		BlurImageOps.mean(input,mean,radius,storage2);
+
+		if( down ) {
+			for( int y = 0; y < input.height; y++ ) {
+				int indexIn = input.startIndex + y*input.stride;
+				int indexOut = output.startIndex + y*output.stride;
+				int indexMean = mean.startIndex + y*mean.stride;
+
+				int end = indexIn + input.width;
+
+				for( ; indexIn < end; indexIn++ , indexOut++, indexMean++ ) {
+					float threshold = (mean.data[indexMean]) + bias;
+
+					if( (input.data[indexIn]) <= threshold )
+						output.data[indexOut] = 1;
+					else
+						output.data[indexOut] = 0;
+				}
+			}
+		} else {
+			for( int y = 0; y < input.height; y++ ) {
+				int indexIn = input.startIndex + y*input.stride;
+				int indexOut = output.startIndex + y*output.stride;
+				int indexMean = mean.startIndex + y*mean.stride;
+
+				int end = indexIn + input.width;
+
+				for( ; indexIn < end; indexIn++ , indexOut++, indexMean++ ) {
+					float threshold = (mean.data[indexMean]) + bias;
+
+					if( (input.data[indexIn]) >= threshold )
+						output.data[indexOut] = 1;
+					else
+						output.data[indexOut] = 0;
+				}
+			}
+		}
+
+		return output;
+	}
+
+	/**
+	 * Thresholds the image using an adaptive threshold that is computed using a local square region centered
+	 * on each pixel.  The threshold is equal to the gaussian weighted sum of the surrounding pixels plus the bias.
+	 * If down is true then b(x,y) = I(x,y) <= T(x,y) + bias ? 1 : 0.  Otherwise
+	 * b(x,y) = I(x,y) >= T(x,y) + bias ? 0 : 1
+	 *
+	 * @param input Input image.
+	 * @param output (optional) Output binary image.  If null it will be declared internally.
+	 * @param radius Radius of square region.
+	 * @param bias Bias used to adjust threshold
+	 * @param down Should it threshold up or down.
+	 * @param storage1 (Optional) Storage for intermediate step. If null will be declared internally.
+	 * @param storage2 (Optional) Storage for intermediate step. If null will be declared internally.
+	 * @return Thresholded image.
+	 */
+	public static ImageUInt8 adaptiveGaussian( ImageFloat32 input , ImageUInt8 output ,
+											   int radius , float bias , boolean down ,
+											   ImageFloat32 storage1 , ImageFloat32 storage2 ) {
+
+		output = InputSanityCheck.checkDeclare(input,output,ImageUInt8.class);
+		storage1 = InputSanityCheck.checkDeclare(input,storage1,ImageFloat32.class);
+		storage2 = InputSanityCheck.checkDeclare(input,storage2,ImageFloat32.class);
+
+		ImageFloat32 blur = storage1;
+
+		BlurImageOps.gaussian(input,blur,-1,radius,storage2);
+
+		if( down ) {
+			for( int y = 0; y < input.height; y++ ) {
+				int indexIn = input.startIndex + y*input.stride;
+				int indexOut = output.startIndex + y*output.stride;
+				int indexMean = blur.startIndex + y*blur.stride;
+
+				int end = indexIn + input.width;
+
+				for( ; indexIn < end; indexIn++ , indexOut++, indexMean++ ) {
+					float threshold = (blur.data[indexMean]) + bias;
+
+					if( (input.data[indexIn]) <= threshold )
+						output.data[indexOut] = 1;
+					else
+						output.data[indexOut] = 0;
+				}
+			}
+		} else {
+			for( int y = 0; y < input.height; y++ ) {
+				int indexIn = input.startIndex + y*input.stride;
+				int indexOut = output.startIndex + y*output.stride;
+				int indexMean = blur.startIndex + y*blur.stride;
+
+				int end = indexIn + input.width;
+
+				for( ; indexIn < end; indexIn++ , indexOut++, indexMean++ ) {
+					float threshold = (blur.data[indexMean]) + bias;
+
 					if( (input.data[indexIn]) >= threshold )
 						output.data[indexOut] = 1;
 					else

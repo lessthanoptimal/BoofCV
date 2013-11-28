@@ -30,7 +30,6 @@ import org.junit.Test;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 /**
  * @author Peter Abeles
@@ -55,19 +54,22 @@ public class TestCannyEdgeDynamic {
 
 		CannyEdgeDynamic<ImageUInt8,ImageSInt16> alg = new CannyEdgeDynamic<ImageUInt8, ImageSInt16>(blur,gradient,true);
 
-		alg.process(input,0.1f,0.2f,null);
+		alg.process(input,0.2f,0.4f,null);
 
 		List<EdgeContour> contour = alg.getContours();
-		assertEquals(1,contour.size());
 
-		int total = 0;
+		int totalPass = 0;
 		for( EdgeContour e : contour ) {
+			int total = 0;
 			for( EdgeSegment s : e.segments ) {
+				// really should check to see if the points are near the rectangle....
 				total += s.points.size();
 			}
+			if( total >= 2 * 50 + 2 * 38 )
+				totalPass++;
 		}
 
-		assertTrue(total >= 2 * 50 + 2 * 38);
+		assertEquals(1,totalPass);
 	}
 
 }

@@ -44,6 +44,8 @@ public class OrderPointsIntoGrid {
 	// number of rows
 	private int numRows;
 
+	// internal copy of unordered list which can be modified.
+	List<Point2D_F64> internal = new ArrayList<Point2D_F64>();
 
 	/**
 	 * Process the list of points and puts them into grid order
@@ -54,8 +56,8 @@ public class OrderPointsIntoGrid {
 	 */
 	public List<Point2D_F64> process( List<Point2D_F64> unordered ) throws InvalidCalibrationTarget {
 
-		// internal copy of unordered list which can be modified.
-		List<Point2D_F64> internal = new ArrayList<Point2D_F64>(unordered);
+		internal.clear();
+		internal.addAll(unordered);
 
 		// Corners of calibration grid
 		targetCorners = FindBoundingQuadrilateral.findCorners(internal);

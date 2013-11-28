@@ -47,9 +47,18 @@ public class ConfigChessboard implements Configuration {
 	public double relativeSizeThreshold = 1;
 
 	/**
-	 * Threshold used to compute binary image.  If < 0 then the mean image intensity is used.
+	 * Global threshold used on the image.  If <= 0 then a local adaptive threshold is used instead
 	 */
-	public double binaryThreshold = -1;
+	public double binaryGlobalThreshold = -1;
+
+	/**
+	 * Size of local region used by adaptive threshold
+	 */
+	public int binaryAdaptiveRadius = 20;
+	/**
+	 * Bias used by local adaptive threshold
+	 */
+	public double binaryAdaptiveBias = -10;
 
 	public ConfigChessboard(int numCols, int numRows) {
 		this.numCols = numCols;
@@ -57,12 +66,11 @@ public class ConfigChessboard implements Configuration {
 	}
 
 	public ConfigChessboard(int numCols, int numRows, int nonmaxRadius,
-							double relativeSizeThreshold, double binaryThreshold) {
+							double relativeSizeThreshold ) {
 		this.numCols = numCols;
 		this.numRows = numRows;
 		this.nonmaxRadius = nonmaxRadius;
 		this.relativeSizeThreshold = relativeSizeThreshold;
-		this.binaryThreshold = binaryThreshold;
 	}
 
 	@Override

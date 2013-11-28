@@ -32,6 +32,7 @@ import org.ddogleg.stats.UtilGaussian;
 public class FactoryKernelGaussian {
 	// when converting to integer kernels what is the minimum size of the an element relative to the maximum
 	public static float MIN_FRAC = 1.0f/100f;
+	public static double MIN_FRACD = 1.0/100;
 
 	/**
 	 * Creates a Gaussian kernel of the specified type.
@@ -68,7 +69,10 @@ public class FactoryKernelGaussian {
 	K gaussian1D(Class<T> imageType, double sigma, int radius )
 	{
 		boolean isFloat = GeneralizedImageOps.isFloatingPoint(imageType);
-		return gaussian(1,isFloat, 32, sigma,radius);
+		int numBits = GeneralizedImageOps.getNumBits(imageType);
+		if( numBits < 32 )
+			numBits = 32;
+		return gaussian(1,isFloat, numBits, sigma,radius);
 	}
 
 	/**
@@ -83,7 +87,8 @@ public class FactoryKernelGaussian {
 	K gaussian2D(Class<T> imageType, double sigma, int radius )
 	{
 		boolean isFloat = GeneralizedImageOps.isFloatingPoint(imageType);
-		return gaussian(2,isFloat, 32, sigma,radius);
+		int numBits = GeneralizedImageOps.getNumBits(imageType);
+		return gaussian(2,isFloat, numBits, sigma,radius);
 	}
 
 	/**
@@ -123,8 +128,13 @@ public class FactoryKernelGaussian {
 				if( isFloat )
 					return (T)k;
 				return (T)KernelMath.convert(k,MIN_FRAC);
+			} else if( numBits == 64 ) {
+				Kernel1D_F64 k = gaussian1D_F64(sigma, radius, isFloat);
+				if( isFloat )
+					return (T)k;
+				return (T)KernelMath.convert(k,MIN_FRACD);
 			} else {
-				throw new IllegalArgumentException("Bits must be 32 ");
+				throw new IllegalArgumentException("Bits must be 32 or 64 not "+numBits);
 			}
 		} else {
 			throw new IllegalArgumentException("DOF not supported");

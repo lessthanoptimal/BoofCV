@@ -31,21 +31,25 @@ public class ConfigCirculantTracker {
 	/**
 	 *  gaussian kernel bandwidth
 	 */
-	public float sigma = 0.2f;
+	public double sigma = 0.2;
 	/**
 	 * Regularization term.
 	 */
-	public float lambda = 1e-2f;
+	public double lambda = 1e-2;
 	/**
 	 * Weighting factor mixing old track image and new one.  Effectively adjusts the rate at which it can adjust
 	 * to changes in appearance.  Values closer to zero slow down the rate of change.  0f is no update.
 	 * 0.075f is recommended.
 	 */
-	public float interp_factor = 0.075f;
+	public double interp_factor = 0.075;
 	/**
 	 * Maximum pixel value.  Used to normalize image.  8-bit images are 255
 	 */
-	public float maxPixelValue = 255.0f;
+	public double maxPixelValue = 255.0;
+
+	public double padding = 1;
+
+	public int workSpace = 64;//128;
 
 	public ConfigCirculantTracker(float interp_factor) {
 		this.interp_factor = interp_factor;

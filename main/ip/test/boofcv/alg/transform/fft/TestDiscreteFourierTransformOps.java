@@ -98,6 +98,15 @@ public class TestDiscreteFourierTransformOps {
 			complex = GeneralizedImageOps.createInterleaved(type,5,7,2);
 			shiftZeroFrequency(complex);
 			BoofTesting.checkSubImage(this, "shiftZeroFrequency", false, complex);
+
+			// check one side being odd or even
+			complex = GeneralizedImageOps.createInterleaved(type,6,7,2);
+			shiftZeroFrequency(complex);
+			BoofTesting.checkSubImage(this, "shiftZeroFrequency", false, complex);
+
+			complex = GeneralizedImageOps.createInterleaved(type,5,8,2);
+			shiftZeroFrequency(complex);
+			BoofTesting.checkSubImage(this, "shiftZeroFrequency", false, complex);
 		}
 	}
 
