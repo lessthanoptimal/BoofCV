@@ -8,9 +8,9 @@ import org.junit.Test;
 /**
  * @author Peter Abeles
  */
-public class TestCirculant_to_TrackerObjectQuad extends TextureGrayTrackerObjectRectangleTests {
+public class TestCirculantOrig_to_TrackerObjectQuad extends TextureGrayTrackerObjectRectangleTests {
 
-	public TestCirculant_to_TrackerObjectQuad() {
+	public TestCirculantOrig_to_TrackerObjectQuad() {
 		tolStationary = 1;
 	}
 
@@ -19,7 +19,7 @@ public class TestCirculant_to_TrackerObjectQuad extends TextureGrayTrackerObject
 
 		ConfigCirculantTracker config = new ConfigCirculantTracker();
 
-		return FactoryTrackerObjectQuad.circulant(config,ImageUInt8.class);
+		return FactoryTrackerObjectQuad.circulantOrig(config, ImageUInt8.class);
 	}
 
 	@Test

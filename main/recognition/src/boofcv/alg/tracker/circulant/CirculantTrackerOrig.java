@@ -48,7 +48,7 @@ import georegression.struct.shapes.Rectangle2D_I32;
  *
  * @author Peter Abeles
  */
-public class CirculantTracker {
+public class CirculantTrackerOrig {
 
 	// --- Tuning parameters
 	// spatial bandwidth (proportional to target)
@@ -114,8 +114,8 @@ public class CirculantTracker {
 	 * @param interp_factor Try 0.075f
 	 * @param maxPixelValue Maximum pixel value.  Typically 255
 	 */
-	public CirculantTracker(double output_sigma_factor, double sigma, double lambda, double interp_factor,
-							double maxPixelValue) {
+	public CirculantTrackerOrig(double output_sigma_factor, double sigma, double lambda, double interp_factor,
+								double maxPixelValue) {
 		this.output_sigma_factor = output_sigma_factor;
 		this.sigma = sigma;
 		this.lambda = lambda;

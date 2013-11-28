@@ -20,7 +20,7 @@ import static org.junit.Assert.assertTrue;
 /**
 * @author Peter Abeles
 */
-public class TestCirculantTracker {
+public class TestCirculantTrackerOrig {
 
 	Random rand = new Random(234);
 
@@ -36,7 +36,7 @@ public class TestCirculantTracker {
 		GImageMiscOps.fillUniform(a,rand,0,200);
 		GImageMiscOps.fillUniform(b,rand,0,200);
 
-		CirculantTracker alg = new CirculantTracker(1.0/16.0,0.2f,1e-2f,0.075f,255f);
+		CirculantTrackerOrig alg = new CirculantTrackerOrig(1.0/16.0,0.2f,1e-2f,0.075f,255f);
 		alg.initialize(a, 5, 6, 20, 25);
 
 		shiftCopy(2,4,a,b);
@@ -53,7 +53,7 @@ public class TestCirculantTracker {
 	public void computeCosineWindow() {
 		ImageFloat64 found = new ImageFloat64(20,25);
 
-		CirculantTracker.computeCosineWindow(found);
+		CirculantTrackerOrig.computeCosineWindow(found);
 
 		// should be between 0 and 1
 		for( int i = 0; i < found.data.length; i++ ) {
@@ -65,7 +65,7 @@ public class TestCirculantTracker {
 
 	@Test
 	public void computeGaussianWeights() {
-		CirculantTracker alg = new CirculantTracker(0.5f,2f,0.01f,0.1f,255f);
+		CirculantTrackerOrig alg = new CirculantTrackerOrig(0.5f,2f,0.01f,0.1f,255f);
 
 		alg.regionTrack.set(2,3,10,15);
 		alg.gaussianWeight.reshape(10,15);
@@ -117,7 +117,7 @@ public class TestCirculantTracker {
 		GImageMiscOps.fillUniform(b,rand,0,200);
 		shiftCopy(0,0,a,b);
 
-		CirculantTracker alg = new CirculantTracker(1f/16f,0.2f,1e-2f,0.075f,255f);
+		CirculantTrackerOrig alg = new CirculantTrackerOrig(1f/16f,0.2f,1e-2f,0.075f,255f);
 		alg.initialize(a,5,6,20,25);
 
 		alg.updateTrackLocation(b);
@@ -156,7 +156,7 @@ public class TestCirculantTracker {
 		ImageMiscOps.fill(a,100);
 		ImageMiscOps.fill(b,200);
 
-		CirculantTracker alg = new CirculantTracker(1f/16f,0.2f,1e-2f,interp_factor,255f);
+		CirculantTrackerOrig alg = new CirculantTrackerOrig(1f/16f,0.2f,1e-2f,interp_factor,255f);
 		alg.initialize(a,0,0,20,25);
 
 		// copy its internal value
@@ -203,7 +203,7 @@ public class TestCirculantTracker {
 		ImageFloat64 targetOut = new ImageFloat64(20,25);
 		ImageFloat64 k = new ImageFloat64(20,25);
 
-		CirculantTracker alg = new CirculantTracker(1f/16f,0.2f,1e-2f,0.075f,255f);
+		CirculantTrackerOrig alg = new CirculantTrackerOrig(1f/16f,0.2f,1e-2f,0.075f,255f);
 		alg.initialize(regionIn,0,0,20,25);
 
 		// randomize input image and add a known shape in it
@@ -275,7 +275,7 @@ public class TestCirculantTracker {
 				total += a.get(x,y)*a.get(x,y);
 			}
 		}
-		double found = CirculantTracker.imageDotProduct(a);
+		double found = CirculantTrackerOrig.imageDotProduct(a);
 		assertEquals(total,found,1e-4);
 	}
 
@@ -289,7 +289,7 @@ public class TestCirculantTracker {
 		ImageMiscOps.fillUniform(b,rand,-10,10);
 		ImageMiscOps.fillUniform(c,rand,-10,10);
 
-		CirculantTracker.elementMultConjB(a, b, c);
+		CirculantTrackerOrig.elementMultConjB(a, b, c);
 
 		for( int y = 0; y < height; y++ ) {
 			for( int x = 0; x < width; x++ ) {
@@ -320,7 +320,7 @@ public class TestCirculantTracker {
 		ImageMiscOps.fillUniform(alphaf,rand,-10,10);
 
 		float lambda = 0.01f;
-		CirculantTracker.computeAlphas(yf, kf, lambda, alphaf);
+		CirculantTrackerOrig.computeAlphas(yf, kf, lambda, alphaf);
 
 		for( int y = 0; y < height; y++ ) {
 			for( int x = 0; x < width; x++ ) {
@@ -344,17 +344,17 @@ public class TestCirculantTracker {
 		Rectangle2D_I32 r = new Rectangle2D_I32();
 
 		r.set(-1,-2,5,6);
-		CirculantTracker.ensureInBounds(r, 20, 25);
+		CirculantTrackerOrig.ensureInBounds(r, 20, 25);
 		assertEquals(0, r.tl_x);
 		assertEquals(0,r.tl_y);
 
 		r.set(16,21,5,6);
-		CirculantTracker.ensureInBounds(r,20,25);
+		CirculantTrackerOrig.ensureInBounds(r, 20, 25);
 		assertEquals(20-5,r.tl_x);
 		assertEquals(25-6,r.tl_y);
 
 		r.set(1,2,5,6);
-		CirculantTracker.ensureInBounds(r,20,25);
+		CirculantTrackerOrig.ensureInBounds(r, 20, 25);
 		assertEquals(1,r.tl_x);
 		assertEquals(2,r.tl_y);
 	}
