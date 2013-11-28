@@ -46,7 +46,7 @@ public class TestImplConvolveBox extends CompareEquivalentFunctions {
 
 	@Test
 	public void compareToStandard() {
-		performTests(8);
+		performTests(12);
 	}
 
 	@Override

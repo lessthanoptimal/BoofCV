@@ -18,6 +18,8 @@
 
 package boofcv.alg.transform.fft;
 
+import java.util.Arrays;
+
 /**
  * Computes 1D Discrete Fourier Transform (DFT) of complex and real, float
  * precision data. The size of the data can be an arbitrary number. The code originally comes from
@@ -341,7 +343,6 @@ public class GeneralPurposeFFT_F32_1D {
 					a[idx] = a[idx - 1];
 					a[idx - 1] = tmp;
 				}
-				ch = new float[n];
 				break;
 			case BLUESTEIN:
 				bluestein_real_forward(a, offa);
@@ -974,6 +975,7 @@ public class GeneralPurposeFFT_F32_1D {
 	}
 
 	private void bluestein_complex(final float[] a, final int offa, final int isign) {
+		Arrays.fill(ak,0);
 		if (isign > 0) {
 			for (int i = 0; i < n; i++) {
 				int idx1 = 2 * i;
@@ -1037,6 +1039,7 @@ public class GeneralPurposeFFT_F32_1D {
 	}
 
 	private void bluestein_real_full(final float[] a, final int offa, final int isign) {
+		Arrays.fill(ak,0);
 		if (isign > 0) {
 			for (int i = 0; i < n; i++) {
 				int idx1 = 2 * i;
@@ -1095,6 +1098,7 @@ public class GeneralPurposeFFT_F32_1D {
 	}
 
 	private void bluestein_real_forward(final float[] a, final int offa) {
+		Arrays.fill(ak,0);
 
 		for (int i = 0; i < n; i++) {
 			int idx1 = 2 * i;
@@ -1139,6 +1143,7 @@ public class GeneralPurposeFFT_F32_1D {
 	}
 
 	private void bluestein_real_inverse(final float[] a, final int offa) {
+		Arrays.fill(ak,0);
 
 		if (n % 2 == 0) {
 			ak[0] = a[offa] * bk1[0];
@@ -1214,6 +1219,7 @@ public class GeneralPurposeFFT_F32_1D {
 	}
 
 	private void bluestein_real_inverse2(final float[] a, final int offa) {
+		Arrays.fill(ak,0);
 
 		for (int i = 0; i < n; i++) {
 			int idx1 = 2 * i;
@@ -1267,6 +1273,8 @@ public class GeneralPurposeFFT_F32_1D {
 			return;
 		int l1, l2, na, kh, nf, ip, iw, ido, idl1;
 
+		Arrays.fill(ch,0);
+		ch = new float[ch.length];
 		final int twon = 2 * n;
 		nf = (int) wtable_r[1 + twon];
 		na = 1;

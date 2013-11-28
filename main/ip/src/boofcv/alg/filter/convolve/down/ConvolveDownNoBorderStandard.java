@@ -330,6 +330,7 @@ public class ConvolveDownNoBorderStandard {
 
 		final int radius = kernel.getRadius();
 		final int kernelWidth = kernel.getWidth();
+		int halfDivisor = divisor/2;
 
 		final int widthEnd = UtilDownConvolve.computeMaxSide(input.width,skip,radius);
 		final int height = input.height;
@@ -348,7 +349,7 @@ public class ConvolveDownNoBorderStandard {
 					total += (dataSrc[indexSrc++] & 0xFF) * dataKer[k];
 				}
 
-				dataDst[indexDst++] = (byte)(total/divisor);
+				dataDst[indexDst++] = (byte)((total+halfDivisor)/divisor);
 			}
 		}
 	}
@@ -362,6 +363,7 @@ public class ConvolveDownNoBorderStandard {
 
 		final int radius = kernel.getRadius();
 		final int kernelWidth = kernel.getWidth();
+		int halfDivisor = divisor/2;
 
 		final int width = input.width;
 		final int heightEnd = UtilDownConvolve.computeMaxSide(input.height,skip,radius);
@@ -381,7 +383,7 @@ public class ConvolveDownNoBorderStandard {
 					indexSrc += input.stride;
 				}
 
-				dataDst[indexDst++] = (byte)(total/divisor);
+				dataDst[indexDst++] = (byte)((total+halfDivisor)/divisor);
 			}
 		}
 	}
@@ -396,6 +398,7 @@ public class ConvolveDownNoBorderStandard {
 		final int radius = kernel.getRadius();
 		final int widthEnd = UtilDownConvolve.computeMaxSide(input.width,skip,radius);
 		final int heightEnd = UtilDownConvolve.computeMaxSide(input.height,skip,radius);
+		int halfDivisor = divisor/2;
 
 		final int offset = UtilDownConvolve.computeOffset(skip,radius); 
 
@@ -410,7 +413,7 @@ public class ConvolveDownNoBorderStandard {
 						total += (dataSrc[indexSrc+kj] & 0xFF)* dataKernel[indexKer++];
 					}
 				}
-				dataDst[indexDst++] = (byte)(total/divisor);
+				dataDst[indexDst++] = (byte)((total+halfDivisor)/divisor);
 			}
 		}
 	}
@@ -424,6 +427,7 @@ public class ConvolveDownNoBorderStandard {
 
 		final int radius = kernel.getRadius();
 		final int kernelWidth = kernel.getWidth();
+		int halfDivisor = divisor/2;
 
 		final int widthEnd = UtilDownConvolve.computeMaxSide(input.width,skip,radius);
 		final int height = input.height;
@@ -442,7 +446,7 @@ public class ConvolveDownNoBorderStandard {
 					total += (dataSrc[indexSrc++] ) * dataKer[k];
 				}
 
-				dataDst[indexDst++] = (short)(total/divisor);
+				dataDst[indexDst++] = (short)((total+halfDivisor)/divisor);
 			}
 		}
 	}
@@ -456,6 +460,7 @@ public class ConvolveDownNoBorderStandard {
 
 		final int radius = kernel.getRadius();
 		final int kernelWidth = kernel.getWidth();
+		int halfDivisor = divisor/2;
 
 		final int width = input.width;
 		final int heightEnd = UtilDownConvolve.computeMaxSide(input.height,skip,radius);
@@ -475,7 +480,7 @@ public class ConvolveDownNoBorderStandard {
 					indexSrc += input.stride;
 				}
 
-				dataDst[indexDst++] = (short)(total/divisor);
+				dataDst[indexDst++] = (short)((total+halfDivisor)/divisor);
 			}
 		}
 	}
@@ -490,6 +495,7 @@ public class ConvolveDownNoBorderStandard {
 		final int radius = kernel.getRadius();
 		final int widthEnd = UtilDownConvolve.computeMaxSide(input.width,skip,radius);
 		final int heightEnd = UtilDownConvolve.computeMaxSide(input.height,skip,radius);
+		int halfDivisor = divisor/2;
 
 		final int offset = UtilDownConvolve.computeOffset(skip,radius); 
 
@@ -504,7 +510,7 @@ public class ConvolveDownNoBorderStandard {
 						total += (dataSrc[indexSrc+kj] )* dataKernel[indexKer++];
 					}
 				}
-				dataDst[indexDst++] = (short)(total/divisor);
+				dataDst[indexDst++] = (short)((total+halfDivisor)/divisor);
 			}
 		}
 	}

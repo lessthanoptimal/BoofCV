@@ -41,9 +41,6 @@ public class ConvolveImageStandardSparse {
 	public static float convolve( Kernel1D_F32 horizontal, Kernel1D_F32 vertical,
 								ImageFloat32 input, int c_x , int c_y, float storage[] )
 	{
-//		if( c_x == 2 && c_y == 2 )
-//			System.out.println("stp here");
-
 		// convolve horizontally first
 		int width = horizontal.getWidth();
 		int radius = width/2;
@@ -99,6 +96,7 @@ public class ConvolveImageStandardSparse {
 		// convolve horizontally first
 		int width = horizontal.getWidth();
 		int radius = width/2;
+		int halfHorizontal = divisorHorizontal/2;
 
 		for( int i = 0; i < width; i++ ) {
 			int indexImg = input.startIndex + (i+c_y-radius)*input.stride + c_x-radius;
@@ -107,7 +105,7 @@ public class ConvolveImageStandardSparse {
 			for( int j = 0; j < width; j++ ,indexImg++) {
 				total += (input.data[indexImg] & 0xFF)*horizontal.data[j];
 			}
-			storage[i] = total/divisorHorizontal;
+			storage[i] = (total + halfHorizontal)/divisorHorizontal;
 		}
 
 		// convolve vertically
@@ -115,7 +113,7 @@ public class ConvolveImageStandardSparse {
 		for( int i = 0; i < width; i++ ) {
 			total += storage[i]*vertical.data[i];
 		}
-		return total/divisorVertical;
+		return (total + divisorVertical/2)/divisorVertical;
 	}
 
 	public static int convolve( Kernel1D_I32 horizontal, Kernel1D_I32 vertical,
@@ -151,6 +149,7 @@ public class ConvolveImageStandardSparse {
 		// convolve horizontally first
 		int width = horizontal.getWidth();
 		int radius = width/2;
+		int halfHorizontal = divisorHorizontal/2;
 
 		for( int i = 0; i < width; i++ ) {
 			int indexImg = input.startIndex + (i+c_y-radius)*input.stride + c_x-radius;
@@ -159,7 +158,7 @@ public class ConvolveImageStandardSparse {
 			for( int j = 0; j < width; j++ ,indexImg++) {
 				total += (input.data[indexImg])*horizontal.data[j];
 			}
-			storage[i] = total/divisorHorizontal;
+			storage[i] = (total + halfHorizontal)/divisorHorizontal;
 		}
 
 		// convolve vertically
@@ -167,7 +166,7 @@ public class ConvolveImageStandardSparse {
 		for( int i = 0; i < width; i++ ) {
 			total += storage[i]*vertical.data[i];
 		}
-		return total/divisorVertical;
+		return (total + divisorVertical/2)/divisorVertical;
 	}
 
 }

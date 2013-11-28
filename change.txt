@@ -49,6 +49,11 @@ Version : Alpha 0.16
 - ImageMiscOps
   * added copy() for rectangular sub-images
   * limited support for Interleaved images
+- ThresholdImageOps
+  * Added adaptiveSquare
+  * Added adaptiveGaussian
+- Convolution and ImageBlurOps
+  * Improved accuracy of operations on integer images.  Rounded instead of floored.
 - Removed GeoModelRefine and replaced with ModelFitter
 - Image Types
   * Improved and renamed interleaved image types
@@ -61,9 +66,17 @@ Version : Alpha 0.16
   * InterpolatePixelMB for multi-band
 - Fixed sub-image support for ConvertBufferedImage.extract*
   * Thanks pcmoen
+- Calibration target detection
+  * Locally adaptive thresholding is now used for square and chessboard target types.  Less sensitive to lighting
+    conditions
+  * Chessboard target detector works much better on small targets.  Uses corners to estimate initial calibration
+    point position then uses mean-shift to refine
 
+- TODO Chessboard calibration doesn't reject bad calibration points after sub-pixel
 - TODO improve KLT edge handling
 - TODO automate high level tests
+   * Move SURFPerformance into ValidationBoof
+   * Create logs for BoofCV performance
 - TODO Mean-Shift common histogram model code for both code bases
 
 ---------------------------------------------

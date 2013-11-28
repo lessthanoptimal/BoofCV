@@ -38,6 +38,7 @@ public class GenerateConvolveNormalized_JustBorder extends CodeGeneratorBase  {
 	String outputData;
 	String sumType;
 	String bitWiseOp;
+	String divide;
 
 	public GenerateConvolveNormalized_JustBorder() throws FileNotFoundException {
 		setOutputFile("ConvolveNormalized_JustBorder");
@@ -90,6 +91,8 @@ public class GenerateConvolveNormalized_JustBorder extends CodeGeneratorBase  {
 		sumType = isInteger ? "int" : "float";
 		bitWiseOp = input.getBitWise();
 
+		divide = isInteger ? "(total+weight/2)/weight" : "total/weight";
+
 		printHorizontal();
 		printVertical();
 		printConvolve();
@@ -119,14 +122,14 @@ public class GenerateConvolveNormalized_JustBorder extends CodeGeneratorBase  {
 				"\n" +
 				"\t\t\tfor (; j < jEnd; j++) {\n" +
 				"\t\t\t\t"+sumType+" total = 0;\n" +
-				"\t\t\t\t"+sumType+" totalWeight = 0;\n" +
+				"\t\t\t\t"+sumType+" weight = 0;\n" +
 				"\t\t\t\tint indexSrc = jStart;\n" +
 				"\t\t\t\tfor (int k = kernelWidth - (radius + 1 + j - jStart); k < kernelWidth; k++) {\n" +
 				"\t\t\t\t\t"+kernelData+" w = dataKer[k];\n" +
-				"\t\t\t\t\ttotalWeight += w;\n" +
+				"\t\t\t\t\tweight += w;\n" +
 				"\t\t\t\t\ttotal += (dataSrc[indexSrc++]"+bitWiseOp+") * w;\n" +
 				"\t\t\t\t}\n" +
-				"\t\t\t\tdataDst[indexDest++] = "+typeCast+"(total / totalWeight);\n" +
+				"\t\t\t\tdataDst[indexDest++] = "+typeCast+"("+divide+");\n" +
 				"\t\t\t}\n" +
 				"\n" +
 				"\t\t\tj += width - 2*radius;\n" +
@@ -135,16 +138,16 @@ public class GenerateConvolveNormalized_JustBorder extends CodeGeneratorBase  {
 				"\t\t\tjEnd = jStart + width;\n" +
 				"\t\t\tfor (; j < jEnd; j++) {\n" +
 				"\t\t\t\t"+sumType+" total = 0;\n" +
-				"\t\t\t\t"+sumType+" totalWeight = 0;\n" +
+				"\t\t\t\t"+sumType+" weight = 0;\n" +
 				"\t\t\t\tint indexSrc = j - radius;\n" +
 				"\t\t\t\tfinal int kEnd = jEnd - indexSrc;\n" +
 				"\n" +
 				"\t\t\t\tfor (int k = 0; k < kEnd; k++) {\n" +
 				"\t\t\t\t\t"+kernelData+" w = dataKer[k];\n" +
-				"\t\t\t\t\ttotalWeight += w;\n" +
+				"\t\t\t\t\tweight += w;\n" +
 				"\t\t\t\t\ttotal += (dataSrc[indexSrc++]"+bitWiseOp+") * w;\n" +
 				"\t\t\t\t}\n" +
-				"\t\t\t\tdataDst[indexDest++] = "+typeCast+"(total / totalWeight);\n" +
+				"\t\t\t\tdataDst[indexDest++] = "+typeCast+"("+divide+");\n" +
 				"\t\t\t}\n" +
 				"\t\t}\n" +
 				"\t}\n\n");
@@ -185,7 +188,7 @@ public class GenerateConvolveNormalized_JustBorder extends CodeGeneratorBase  {
 				"\t\t\t\tfor (int k = kStart; k < kernelWidth; k++, indexSrc += input.stride) {\n" +
 				"\t\t\t\t\ttotal += (dataSrc[indexSrc]"+bitWiseOp+") * dataKer[k];\n" +
 				"\t\t\t\t}\n" +
-				"\t\t\t\tdataDst[indexDst++] = "+typeCast+"(total / weight);\n" +
+				"\t\t\t\tdataDst[indexDst++] = "+typeCast+"("+divide+");\n" +
 				"\t\t\t}\n" +
 				"\t\t}\n" +
 				"\n" +
@@ -207,7 +210,7 @@ public class GenerateConvolveNormalized_JustBorder extends CodeGeneratorBase  {
 				"\t\t\t\tfor (int k = 0; k < kEnd; k++, indexSrc += input.stride) {\n" +
 				"\t\t\t\t\ttotal += (dataSrc[indexSrc]"+bitWiseOp+") * dataKer[k];\n" +
 				"\t\t\t\t}\n" +
-				"\t\t\t\tdataDst[indexDst++] = "+typeCast+"(total / weight);\n" +
+				"\t\t\t\tdataDst[indexDst++] = "+typeCast+"("+divide+");\n" +
 				"\t\t\t}\n" +
 				"\t\t}\n" +
 				"\t}\n\n");
@@ -239,7 +242,7 @@ public class GenerateConvolveNormalized_JustBorder extends CodeGeneratorBase  {
 				"\t\t\tfor( int x = 0; x < radius; x++ ) {\n" +
 				"\n" +
 				"\t\t\t\t"+sumType+" total = 0;\n" +
-				"\t\t\t\t"+sumType+" totalWeight = 0;\n" +
+				"\t\t\t\t"+sumType+" weight = 0;\n" +
 				"\n" +
 				"\t\t\t\tfor( int i = minI; i <= maxI; i++ ) {\n" +
 				"\t\t\t\t\tint indexSrc = input.startIndex + (y+i)* input.stride+x;\n" +
@@ -247,12 +250,12 @@ public class GenerateConvolveNormalized_JustBorder extends CodeGeneratorBase  {
 				"\n" +
 				"\t\t\t\t\tfor( int j = -x; j <= radius; j++ ) {\n" +
 				"\t\t\t\t\t\t"+kernelData+" w = dataKer[indexKer+j+radius];\n" +
-				"\t\t\t\t\t\ttotalWeight += w;\n" +
+				"\t\t\t\t\t\tweight += w;\n" +
 				"\t\t\t\t\t\ttotal += (dataSrc[indexSrc+j]"+bitWiseOp+") * w;\n" +
 				"\t\t\t\t\t}\n" +
 				"\t\t\t\t}\n" +
 				"\n" +
-				"\t\t\t\tdataDst[indexDst++] = "+typeCast+"(total / totalWeight);\n" +
+				"\t\t\t\tdataDst[indexDst++] = "+typeCast+"("+divide+");\n" +
 				"\t\t\t}\n" +
 				"\n" +
 				"\t\t\tindexDst = output.startIndex + y* output.stride + width-radius;\n" +
@@ -261,7 +264,7 @@ public class GenerateConvolveNormalized_JustBorder extends CodeGeneratorBase  {
 				"\t\t\t\tint maxJ = width-x-1;\n" +
 				"\n" +
 				"\t\t\t\t"+sumType+" total = 0;\n" +
-				"\t\t\t\t"+sumType+" totalWeight = 0;\n" +
+				"\t\t\t\t"+sumType+" weight = 0;\n" +
 				"\n" +
 				"\t\t\t\tfor( int i = minI; i <= maxI; i++ ) {\n" +
 				"\t\t\t\t\tint indexSrc = input.startIndex + (y+i)* input.stride+x;\n" +
@@ -269,12 +272,12 @@ public class GenerateConvolveNormalized_JustBorder extends CodeGeneratorBase  {
 				"\n" +
 				"\t\t\t\t\tfor( int j = -radius; j <= maxJ; j++ ) {\n" +
 				"\t\t\t\t\t\t"+kernelData+" w = dataKer[indexKer+j+radius];\n" +
-				"\t\t\t\t\t\ttotalWeight += w;\n" +
+				"\t\t\t\t\t\tweight += w;\n" +
 				"\t\t\t\t\t\ttotal += (dataSrc[indexSrc+j]"+bitWiseOp+") * w;\n" +
 				"\t\t\t\t\t}\n" +
 				"\t\t\t\t}\n" +
 				"\n" +
-				"\t\t\t\tdataDst[indexDst++] = "+typeCast+"(total / totalWeight);\n" +
+				"\t\t\t\tdataDst[indexDst++] = "+typeCast+"("+divide+");\n" +
 				"\t\t\t}\n" +
 				"\t\t}\n" +
 				"\n" +
@@ -286,7 +289,7 @@ public class GenerateConvolveNormalized_JustBorder extends CodeGeneratorBase  {
 				"\t\t\tfor( int x = radius; x < width-radius; x++ ) {\n" +
 				"\n" +
 				"\t\t\t\t"+sumType+" total = 0;\n" +
-				"\t\t\t\t"+sumType+" totalWeight = 0;\n" +
+				"\t\t\t\t"+sumType+" weight = 0;\n" +
 				"\n" +
 				"\t\t\t\tfor( int i = -y; i <= radius; i++ ) {\n" +
 				"\t\t\t\t\tint indexSrc = input.startIndex + (y+i)* input.stride+x;\n" +
@@ -294,11 +297,11 @@ public class GenerateConvolveNormalized_JustBorder extends CodeGeneratorBase  {
 				"\n" +
 				"\t\t\t\t\tfor( int j = -radius; j <= radius; j++ ) {\n" +
 				"\t\t\t\t\t\t"+kernelData+" w = dataKer[indexKer+j+radius];\n" +
-				"\t\t\t\t\t\ttotalWeight += w;\n" +
+				"\t\t\t\t\t\tweight += w;\n" +
 				"\t\t\t\t\t\ttotal += (dataSrc[indexSrc + j]"+bitWiseOp+") * w;\n" +
 				"\t\t\t\t\t}\n" +
 				"\t\t\t\t}\n" +
-				"\t\t\t\tdataDst[indexDst++] = "+typeCast+"(total / totalWeight);\n" +
+				"\t\t\t\tdataDst[indexDst++] = "+typeCast+"("+divide+");\n" +
 				"\t\t\t}\n" +
 				"\t\t}\n" +
 				"\n" +
@@ -311,7 +314,7 @@ public class GenerateConvolveNormalized_JustBorder extends CodeGeneratorBase  {
 				"\t\t\tfor( int x = radius; x < width-radius; x++ ) {\n" +
 				"\n" +
 				"\t\t\t\t"+sumType+" total = 0;\n" +
-				"\t\t\t\t"+sumType+" totalWeight = 0;\n" +
+				"\t\t\t\t"+sumType+" weight = 0;\n" +
 				"\n" +
 				"\t\t\t\tfor( int i = -radius; i <= maxI; i++ ) {\n" +
 				"\t\t\t\t\tint indexSrc = input.startIndex + (y+i)* input.stride+x;\n" +
@@ -319,11 +322,11 @@ public class GenerateConvolveNormalized_JustBorder extends CodeGeneratorBase  {
 				"\n" +
 				"\t\t\t\t\tfor( int j = -radius; j <= radius; j++ ) {\n" +
 				"\t\t\t\t\t\t"+kernelData+" w = dataKer[indexKer+j+radius];\n" +
-				"\t\t\t\t\t\ttotalWeight += w;\n" +
+				"\t\t\t\t\t\tweight += w;\n" +
 				"\t\t\t\t\t\ttotal += (dataSrc[indexSrc + j]"+bitWiseOp+") * w;\n" +
 				"\t\t\t\t\t}\n" +
 				"\t\t\t\t}\n" +
-				"\t\t\t\tdataDst[indexDst++] = "+typeCast+"(total / totalWeight);\n" +
+				"\t\t\t\tdataDst[indexDst++] = "+typeCast+"("+divide+");\n" +
 				"\t\t\t}\n" +
 				"\t\t}\n" +
 				"\t}\n\n");

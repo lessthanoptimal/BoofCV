@@ -136,6 +136,7 @@ public class ConvolveDownNoBorderUnrolled_U8_I8_Div {
 
 		final int widthEnd = UtilDownConvolve.computeMaxSide(input.width,skip,radius);
 		final int height = input.getHeight();
+		int halfDivisor = divisor/2;
 
 		final int offsetX = UtilDownConvolve.computeOffset(skip,radius);
 
@@ -151,7 +152,7 @@ public class ConvolveDownNoBorderUnrolled_U8_I8_Div {
 				total += (dataSrc[indexSrc++] & 0xFF)*k2;
 				total += (dataSrc[indexSrc] & 0xFF)*k3;
 
-				dataDst[indexDst++] = ( byte )(total/divisor);
+				dataDst[indexDst++] = ( byte )((total+halfDivisor)/divisor);
 			}
 		}
 	}
@@ -172,6 +173,7 @@ public class ConvolveDownNoBorderUnrolled_U8_I8_Div {
 
 		final int widthEnd = UtilDownConvolve.computeMaxSide(input.width,skip,radius);
 		final int height = input.getHeight();
+		int halfDivisor = divisor/2;
 
 		final int offsetX = UtilDownConvolve.computeOffset(skip,radius);
 
@@ -189,7 +191,7 @@ public class ConvolveDownNoBorderUnrolled_U8_I8_Div {
 				total += (dataSrc[indexSrc++] & 0xFF)*k4;
 				total += (dataSrc[indexSrc] & 0xFF)*k5;
 
-				dataDst[indexDst++] = ( byte )(total/divisor);
+				dataDst[indexDst++] = ( byte )((total+halfDivisor)/divisor);
 			}
 		}
 	}
@@ -212,6 +214,7 @@ public class ConvolveDownNoBorderUnrolled_U8_I8_Div {
 
 		final int widthEnd = UtilDownConvolve.computeMaxSide(input.width,skip,radius);
 		final int height = input.getHeight();
+		int halfDivisor = divisor/2;
 
 		final int offsetX = UtilDownConvolve.computeOffset(skip,radius);
 
@@ -231,7 +234,7 @@ public class ConvolveDownNoBorderUnrolled_U8_I8_Div {
 				total += (dataSrc[indexSrc++] & 0xFF)*k6;
 				total += (dataSrc[indexSrc] & 0xFF)*k7;
 
-				dataDst[indexDst++] = ( byte )(total/divisor);
+				dataDst[indexDst++] = ( byte )((total+halfDivisor)/divisor);
 			}
 		}
 	}
@@ -256,6 +259,7 @@ public class ConvolveDownNoBorderUnrolled_U8_I8_Div {
 
 		final int widthEnd = UtilDownConvolve.computeMaxSide(input.width,skip,radius);
 		final int height = input.getHeight();
+		int halfDivisor = divisor/2;
 
 		final int offsetX = UtilDownConvolve.computeOffset(skip,radius);
 
@@ -277,7 +281,7 @@ public class ConvolveDownNoBorderUnrolled_U8_I8_Div {
 				total += (dataSrc[indexSrc++] & 0xFF)*k8;
 				total += (dataSrc[indexSrc] & 0xFF)*k9;
 
-				dataDst[indexDst++] = ( byte )(total/divisor);
+				dataDst[indexDst++] = ( byte )((total+halfDivisor)/divisor);
 			}
 		}
 	}
@@ -304,6 +308,7 @@ public class ConvolveDownNoBorderUnrolled_U8_I8_Div {
 
 		final int widthEnd = UtilDownConvolve.computeMaxSide(input.width,skip,radius);
 		final int height = input.getHeight();
+		int halfDivisor = divisor/2;
 
 		final int offsetX = UtilDownConvolve.computeOffset(skip,radius);
 
@@ -327,7 +332,7 @@ public class ConvolveDownNoBorderUnrolled_U8_I8_Div {
 				total += (dataSrc[indexSrc++] & 0xFF)*k10;
 				total += (dataSrc[indexSrc] & 0xFF)*k11;
 
-				dataDst[indexDst++] = ( byte )(total/divisor);
+				dataDst[indexDst++] = ( byte )((total+halfDivisor)/divisor);
 			}
 		}
 	}
@@ -346,6 +351,7 @@ public class ConvolveDownNoBorderUnrolled_U8_I8_Div {
 
 		final int width = input.width;
 		final int heightEnd = UtilDownConvolve.computeMaxSide(input.height,skip,radius);
+		int halfDivisor = divisor/2;
 
 		final int offsetY = UtilDownConvolve.computeOffset(skip,radius);
 
@@ -362,7 +368,7 @@ public class ConvolveDownNoBorderUnrolled_U8_I8_Div {
 				indexSrc += input.stride;
 				total += (dataSrc[indexSrc] & 0xFF)*k3;
 
-				dataDst[indexDst++] = ( byte )(total/divisor);
+				dataDst[indexDst++] = ( byte )((total+halfDivisor)/divisor);
 			}
 		}
 	}
@@ -383,6 +389,7 @@ public class ConvolveDownNoBorderUnrolled_U8_I8_Div {
 
 		final int width = input.width;
 		final int heightEnd = UtilDownConvolve.computeMaxSide(input.height,skip,radius);
+		int halfDivisor = divisor/2;
 
 		final int offsetY = UtilDownConvolve.computeOffset(skip,radius);
 
@@ -403,7 +410,7 @@ public class ConvolveDownNoBorderUnrolled_U8_I8_Div {
 				indexSrc += input.stride;
 				total += (dataSrc[indexSrc] & 0xFF)*k5;
 
-				dataDst[indexDst++] = ( byte )(total/divisor);
+				dataDst[indexDst++] = ( byte )((total+halfDivisor)/divisor);
 			}
 		}
 	}
@@ -426,6 +433,7 @@ public class ConvolveDownNoBorderUnrolled_U8_I8_Div {
 
 		final int width = input.width;
 		final int heightEnd = UtilDownConvolve.computeMaxSide(input.height,skip,radius);
+		int halfDivisor = divisor/2;
 
 		final int offsetY = UtilDownConvolve.computeOffset(skip,radius);
 
@@ -450,7 +458,7 @@ public class ConvolveDownNoBorderUnrolled_U8_I8_Div {
 				indexSrc += input.stride;
 				total += (dataSrc[indexSrc] & 0xFF)*k7;
 
-				dataDst[indexDst++] = ( byte )(total/divisor);
+				dataDst[indexDst++] = ( byte )((total+halfDivisor)/divisor);
 			}
 		}
 	}
@@ -475,6 +483,7 @@ public class ConvolveDownNoBorderUnrolled_U8_I8_Div {
 
 		final int width = input.width;
 		final int heightEnd = UtilDownConvolve.computeMaxSide(input.height,skip,radius);
+		int halfDivisor = divisor/2;
 
 		final int offsetY = UtilDownConvolve.computeOffset(skip,radius);
 
@@ -503,7 +512,7 @@ public class ConvolveDownNoBorderUnrolled_U8_I8_Div {
 				indexSrc += input.stride;
 				total += (dataSrc[indexSrc] & 0xFF)*k9;
 
-				dataDst[indexDst++] = ( byte )(total/divisor);
+				dataDst[indexDst++] = ( byte )((total+halfDivisor)/divisor);
 			}
 		}
 	}
@@ -530,6 +539,7 @@ public class ConvolveDownNoBorderUnrolled_U8_I8_Div {
 
 		final int width = input.width;
 		final int heightEnd = UtilDownConvolve.computeMaxSide(input.height,skip,radius);
+		int halfDivisor = divisor/2;
 
 		final int offsetY = UtilDownConvolve.computeOffset(skip,radius);
 
@@ -562,7 +572,7 @@ public class ConvolveDownNoBorderUnrolled_U8_I8_Div {
 				indexSrc += input.stride;
 				total += (dataSrc[indexSrc] & 0xFF)*k11;
 
-				dataDst[indexDst++] = ( byte )(total/divisor);
+				dataDst[indexDst++] = ( byte )((total+halfDivisor)/divisor);
 			}
 		}
 	}
@@ -575,6 +585,7 @@ public class ConvolveDownNoBorderUnrolled_U8_I8_Div {
 		final int radius = kernel.getRadius();
 		final int widthEnd = UtilDownConvolve.computeMaxSide(input.width,skip,radius);
 		final int heightEnd = UtilDownConvolve.computeMaxSide(input.height,skip,radius);
+		int halfDivisor = divisor/2;
 
 		final int totalRow[] = new int[ widthEnd+1 ];
 
@@ -620,7 +631,7 @@ public class ConvolveDownNoBorderUnrolled_U8_I8_Div {
 			}
 			int indexDst = output.startIndex + (y/skip)*output.stride + offset/skip;
 			for( int x = offset; x <= widthEnd; x += skip ) {
-				dataDst[indexDst++] = ( byte )(totalRow[x] / divisor);
+				dataDst[indexDst++] = ( byte )((totalRow[x] + halfDivisor) / divisor);
 			}
 		}
 	}
@@ -633,6 +644,7 @@ public class ConvolveDownNoBorderUnrolled_U8_I8_Div {
 		final int radius = kernel.getRadius();
 		final int widthEnd = UtilDownConvolve.computeMaxSide(input.width,skip,radius);
 		final int heightEnd = UtilDownConvolve.computeMaxSide(input.height,skip,radius);
+		int halfDivisor = divisor/2;
 
 		final int totalRow[] = new int[ widthEnd+1 ];
 
@@ -686,7 +698,7 @@ public class ConvolveDownNoBorderUnrolled_U8_I8_Div {
 			}
 			int indexDst = output.startIndex + (y/skip)*output.stride + offset/skip;
 			for( int x = offset; x <= widthEnd; x += skip ) {
-				dataDst[indexDst++] = ( byte )(totalRow[x] / divisor);
+				dataDst[indexDst++] = ( byte )((totalRow[x] + halfDivisor) / divisor);
 			}
 		}
 	}
@@ -699,6 +711,7 @@ public class ConvolveDownNoBorderUnrolled_U8_I8_Div {
 		final int radius = kernel.getRadius();
 		final int widthEnd = UtilDownConvolve.computeMaxSide(input.width,skip,radius);
 		final int heightEnd = UtilDownConvolve.computeMaxSide(input.height,skip,radius);
+		int halfDivisor = divisor/2;
 
 		final int totalRow[] = new int[ widthEnd+1 ];
 
@@ -760,7 +773,7 @@ public class ConvolveDownNoBorderUnrolled_U8_I8_Div {
 			}
 			int indexDst = output.startIndex + (y/skip)*output.stride + offset/skip;
 			for( int x = offset; x <= widthEnd; x += skip ) {
-				dataDst[indexDst++] = ( byte )(totalRow[x] / divisor);
+				dataDst[indexDst++] = ( byte )((totalRow[x] + halfDivisor) / divisor);
 			}
 		}
 	}
@@ -773,6 +786,7 @@ public class ConvolveDownNoBorderUnrolled_U8_I8_Div {
 		final int radius = kernel.getRadius();
 		final int widthEnd = UtilDownConvolve.computeMaxSide(input.width,skip,radius);
 		final int heightEnd = UtilDownConvolve.computeMaxSide(input.height,skip,radius);
+		int halfDivisor = divisor/2;
 
 		final int totalRow[] = new int[ widthEnd+1 ];
 
@@ -842,7 +856,7 @@ public class ConvolveDownNoBorderUnrolled_U8_I8_Div {
 			}
 			int indexDst = output.startIndex + (y/skip)*output.stride + offset/skip;
 			for( int x = offset; x <= widthEnd; x += skip ) {
-				dataDst[indexDst++] = ( byte )(totalRow[x] / divisor);
+				dataDst[indexDst++] = ( byte )((totalRow[x] + halfDivisor) / divisor);
 			}
 		}
 	}
@@ -855,6 +869,7 @@ public class ConvolveDownNoBorderUnrolled_U8_I8_Div {
 		final int radius = kernel.getRadius();
 		final int widthEnd = UtilDownConvolve.computeMaxSide(input.width,skip,radius);
 		final int heightEnd = UtilDownConvolve.computeMaxSide(input.height,skip,radius);
+		int halfDivisor = divisor/2;
 
 		final int totalRow[] = new int[ widthEnd+1 ];
 
@@ -932,7 +947,7 @@ public class ConvolveDownNoBorderUnrolled_U8_I8_Div {
 			}
 			int indexDst = output.startIndex + (y/skip)*output.stride + offset/skip;
 			for( int x = offset; x <= widthEnd; x += skip ) {
-				dataDst[indexDst++] = ( byte )(totalRow[x] / divisor);
+				dataDst[indexDst++] = ( byte )((totalRow[x] + halfDivisor) / divisor);
 			}
 		}
 	}

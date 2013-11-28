@@ -19,14 +19,15 @@
 package boofcv.abst.calib;
 
 import boofcv.alg.feature.detect.InvalidCalibrationTarget;
-import boofcv.alg.feature.detect.grid.AutoThresholdCalibrationGrid;
 import boofcv.alg.feature.detect.grid.DetectSquareCalibrationPoints;
 import boofcv.alg.feature.detect.grid.RefineCalibrationGridCorner;
 import boofcv.alg.feature.detect.grid.UtilCalibrationGrid;
 import boofcv.alg.feature.detect.grid.refine.WrapRefineCornerSegmentFit;
 import boofcv.alg.feature.detect.quadblob.OrderPointsIntoGrid;
 import boofcv.alg.feature.detect.quadblob.QuadBlob;
+import boofcv.alg.filter.binary.GThresholdImageOps;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageUInt8;
 import georegression.struct.point.Point2D_F64;
 
 import java.util.ArrayList;
@@ -43,15 +44,23 @@ public class WrapPlanarSquareGridTarget implements PlanarCalibrationDetector {
 	int pointRows;
 
 	RefineCalibrationGridCorner refine;
-	AutoThresholdCalibrationGrid autoThreshold;
 	DetectSquareCalibrationPoints detect;
+
+	// binary image computed from the threshold
+	private ImageUInt8 binary = new ImageUInt8(1,1);
 
 	// set of found points
 	List<Point2D_F64> ret;
 
 	OrderPointsIntoGrid orderAlg = new OrderPointsIntoGrid();
 
+	ImageFloat32 work1 = new ImageFloat32(1,1);
+	ImageFloat32 work2 = new ImageFloat32(1,1);
+
+	ConfigSquareGrid config;
+
 	public WrapPlanarSquareGridTarget( ConfigSquareGrid config ) {
+		this.config = config;
 		refine = new WrapRefineCornerSegmentFit();
 //		refine = new WrapRefineCornerCanny();
 
@@ -61,14 +70,26 @@ public class WrapPlanarSquareGridTarget implements PlanarCalibrationDetector {
 		pointRows = (config.numRows/2+1)*2;
 
 		detect = new DetectSquareCalibrationPoints(500,config.relativeSizeThreshold,squareColumns,config.numRows);
-		autoThreshold = new AutoThresholdCalibrationGrid(config.binaryThreshold);
 	}
 
 	@Override
 	public boolean process(ImageFloat32 input) {
 
+		work1.reshape(input.width,input.height);
+		work2.reshape(input.width,input.height);
+
+		binary.reshape(input.width,input.height);
+
+		if( config.binaryGlobalThreshold <= 0 ) {
+			work1.reshape(input.width,input.height);
+			work2.reshape(input.width,input.height);
+			GThresholdImageOps.adaptiveSquare(input, binary, config.binaryAdaptiveRadius, config.binaryAdaptiveBias, true, work1, work2);
+		} else
+			GThresholdImageOps.threshold(input, binary, config.binaryGlobalThreshold, true);
+
+
 		// detect the target at pixel level accuracy
-		if( !autoThreshold.process(detect,input) )
+		if( !detect.process(binary) )
 			return false;
 		try {
 			List<QuadBlob> squares = detect.getInterestSquares();
@@ -101,10 +122,6 @@ public class WrapPlanarSquareGridTarget implements PlanarCalibrationDetector {
 		return ret;
 	}
 
-	public AutoThresholdCalibrationGrid getAutoThreshold() {
-		return autoThreshold;
-	}
-
 	public RefineCalibrationGridCorner getRefine() {
 		return refine;
 	}
@@ -112,4 +129,5 @@ public class WrapPlanarSquareGridTarget implements PlanarCalibrationDetector {
 	public DetectSquareCalibrationPoints getDetect() {
 		return detect;
 	}
+
 }

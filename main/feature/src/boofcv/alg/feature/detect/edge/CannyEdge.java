@@ -124,10 +124,10 @@ public class CannyEdge<T extends ImageSingleBand, D extends ImageSingleBand> {
 
 		// run canny edge detector
 		blur.process(input,blurred);
-		gradient.process(blurred,derivX,derivY);
-		GGradientToEdgeFeatures.intensityAbs(derivX,derivY,intensity);
-		GGradientToEdgeFeatures.direction(derivX,derivY,angle);
-		GradientToEdgeFeatures.discretizeDirection4(angle,direction);
+		gradient.process(blurred, derivX, derivY);
+		GGradientToEdgeFeatures.intensityAbs(derivX, derivY, intensity);
+		GGradientToEdgeFeatures.direction(derivX, derivY, angle);
+		GradientToEdgeFeatures.discretizeDirection4(angle, direction);
 		GradientToEdgeFeatures.nonMaxSuppression4(intensity, direction, suppressed);
 
 		performThresholding(threshLow, threshHigh, output);

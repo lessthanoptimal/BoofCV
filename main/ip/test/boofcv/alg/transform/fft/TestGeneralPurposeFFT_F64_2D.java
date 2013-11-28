@@ -42,6 +42,9 @@ public class TestGeneralPurposeFFT_F64_2D {
 				checkRealFull(sizes[i], sizes[j]);
 			}
 		}
+
+		// cases which caused problems
+		checkRealFull(323,768);
 	}
 
 	private void checkRealFull(int numRows, int numColumns) {

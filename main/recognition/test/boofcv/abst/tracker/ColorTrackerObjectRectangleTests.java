@@ -3,7 +3,6 @@ package boofcv.abst.tracker;
 import boofcv.alg.distort.DistortImageOps;
 import boofcv.alg.interpolate.TypeInterpolate;
 import boofcv.alg.misc.GImageMiscOps;
-import boofcv.alg.misc.ImageMiscOps;
 import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageType;
 import boofcv.struct.image.ImageUInt8;
@@ -90,10 +89,10 @@ public abstract class ColorTrackerObjectRectangleTests extends GenericTrackerObj
 		q = q.copy();
 
 		Polygon2D_I32 p = new Polygon2D_I32(4);
-		p.vertexes[0].set((int)q.a.x,(int)q.a.y);
-		p.vertexes[1].set((int)q.b.x,(int)q.b.y);
-		p.vertexes[2].set((int)q.c.x,(int)q.c.y);
-		p.vertexes[3].set((int)q.d.x,(int)q.d.y);
+		p.vertexes.data[0].set((int)q.a.x,(int)q.a.y);
+		p.vertexes.data[1].set((int)q.b.x,(int)q.b.y);
+		p.vertexes.data[2].set((int)q.c.x,(int)q.c.y);
+		p.vertexes.data[3].set((int)q.d.x,(int)q.d.y);
 
 		return p;
 	}

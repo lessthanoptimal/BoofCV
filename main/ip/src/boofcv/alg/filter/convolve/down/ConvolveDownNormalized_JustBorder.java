@@ -26,7 +26,7 @@ import boofcv.struct.image.*;
 
 /**
  * <p>
- * Covolves a 1D kernel in the horizontal or vertical direction while skipping pixels across an image's border.  The
+ * Convolves a 1D kernel in the horizontal or vertical direction while skipping pixels across an image's border.  The
  * kernel is re-normalizing the depending upon the amount of overlap it has with the image.  These functions will
  * NOT work on kernels which are large than the image.
  * </p>
@@ -59,14 +59,14 @@ public class ConvolveDownNormalized_JustBorder {
 			for( int x = 0; x < offset; x += skip ) {
 				int indexSrc = input.startIndex + y*input.stride+x;
 				float total = 0;
-				float totalWeight = 0;
+				float weight = 0;
 
 				for( int k = -x; k <= radius; k++ ) {
 					float w = dataKer[k+radius];
-					totalWeight += w;
+					weight += w;
 					total += (dataSrc[indexSrc+k]) * w;
 				}
-				dataDst[indexDest++] = (total / totalWeight);
+				dataDst[indexDest++] = (total/weight);
 			}
 
 			indexDest = output.startIndex + y*output.stride + offsetEnd/skip;
@@ -74,17 +74,17 @@ public class ConvolveDownNormalized_JustBorder {
 			for( int x = offsetEnd; x < width; x += skip ) {
 				int indexSrc = input.startIndex + y*input.stride+x;
 				float total = 0;
-				float totalWeight = 0;
+				float weight = 0;
 
 				int endKernel = input.width-x-1;
 				if( endKernel > radius ) endKernel = radius;
 
 				for( int k = -radius; k <= endKernel; k++ ) {
 					float w = dataKer[k+radius];
-					totalWeight += w;
+					weight += w;
 					total += (dataSrc[indexSrc+k]) * w;
 				}
-				dataDst[indexDest++] = (total / totalWeight);
+				dataDst[indexDest++] = (total/weight);
 			}
 		}
 	}
@@ -107,14 +107,14 @@ public class ConvolveDownNormalized_JustBorder {
 			for( int x = 0; x < width; x++ ) {
 				int indexSrc = input.startIndex + y*input.stride+x;
 				float total = 0;
-				float totalWeight = 0;
+				float weight = 0;
 
 				for( int k = -y; k <= radius; k++ ) {
 					float w = dataKer[k+radius];
-					totalWeight += w;
+					weight += w;
 					total += (dataSrc[indexSrc+k*input.stride]) * w;
 				}
-				dataDst[indexDest++] = (total / totalWeight);
+				dataDst[indexDest++] = (total/weight);
 			}
 		}
 
@@ -126,14 +126,14 @@ public class ConvolveDownNormalized_JustBorder {
 			for( int x = 0; x < width; x++ ) {
 				int indexSrc = input.startIndex + y*input.stride+x;
 				float total = 0;
-				float totalWeight = 0;
+				float weight = 0;
 
 				for( int k = -radius; k <= endKernel; k++ ) {
 					float w = dataKer[k+radius];
-					totalWeight += w;
+					weight += w;
 					total += (dataSrc[indexSrc+k*input.stride]) * w;
 				}
-				dataDst[indexDest++] = (total / totalWeight);
+				dataDst[indexDest++] = (total/weight);
 			}
 		}
 	}
@@ -165,7 +165,7 @@ public class ConvolveDownNormalized_JustBorder {
 			for( int x = 0; x < offset; x += skip ) {
 
 				float total = 0;
-				float totalWeight = 0;
+				float weight = 0;
 
 				for( int i = minI; i <= maxI; i++ ) {
 					int indexSrc = input.startIndex + (y+i)* input.stride+x;
@@ -173,12 +173,12 @@ public class ConvolveDownNormalized_JustBorder {
 
 					for( int j = -x; j <= radius; j++ ) {
 						float w = dataKer[indexKer+j+radius];
-						totalWeight += w;
+						weight += w;
 						total += (dataSrc[indexSrc+j]) * w;
 					}
 				}
 
-				dataDst[indexDst++] = (total / totalWeight);
+				dataDst[indexDst++] = (total/weight);
 			}
 
 			indexDst = output.startIndex + (y/skip)* output.stride + offsetEndX/skip;
@@ -188,7 +188,7 @@ public class ConvolveDownNormalized_JustBorder {
 				if( maxJ > radius ) maxJ = radius;
 
 				float total = 0;
-				float totalWeight = 0;
+				float weight = 0;
 
 				for( int i = minI; i <= maxI; i++ ) {
 					int indexSrc = input.startIndex + (y+i)*input.stride + x;
@@ -196,12 +196,12 @@ public class ConvolveDownNormalized_JustBorder {
 
 					for( int j = -radius; j <= maxJ; j++ ) {
 						float w = dataKer[indexKer+j+radius];
-						totalWeight += w;
+						weight += w;
 						total += (dataSrc[indexSrc+j])* w;
 					}
 				}
 
-				dataDst[indexDst++] = (total / totalWeight);
+				dataDst[indexDst++] = (total/weight);
 			}
 		}
 
@@ -213,7 +213,7 @@ public class ConvolveDownNormalized_JustBorder {
 			for( int x = offset; x < offsetEndX; x += skip ) {
 
 				float total = 0;
-				float totalWeight = 0;
+				float weight = 0;
 
 				for( int i = -y; i <= radius; i++ ) {
 					int indexSrc = input.startIndex + (y+i)* input.stride+x;
@@ -221,12 +221,12 @@ public class ConvolveDownNormalized_JustBorder {
 
 					for( int j = -radius; j <= radius; j++ ) {
 						float w = dataKer[indexKer+j+radius];
-						totalWeight += w;
+						weight += w;
 						total += (dataSrc[indexSrc + j])* w;
 					}
 				}
 
-				dataDst[indexDst++] = (total / totalWeight);
+				dataDst[indexDst++] = (total/weight);
 			}
 		}
 
@@ -241,7 +241,7 @@ public class ConvolveDownNormalized_JustBorder {
 			for( int x = offset; x < offsetEndX; x += skip ) {
 
 				float total = 0;
-				float totalWeight = 0;
+				float weight = 0;
 
 				for( int i = -radius; i <= maxI; i++ ) {
 					int indexSrc = input.startIndex + (y+i)* input.stride+x;
@@ -249,12 +249,12 @@ public class ConvolveDownNormalized_JustBorder {
 
 					for( int j = -radius; j <= radius; j++ ) {
 						float w = dataKer[indexKer+j+radius];
-						totalWeight += w;
+						weight += w;
 						total += (dataSrc[indexSrc + j])* w;
 					}
 				}
 
-				dataDst[indexDst++] = (total / totalWeight);
+				dataDst[indexDst++] = (total/weight);
 			}
 		}
 	}
@@ -278,14 +278,14 @@ public class ConvolveDownNormalized_JustBorder {
 			for( int x = 0; x < offset; x += skip ) {
 				int indexSrc = input.startIndex + y*input.stride+x;
 				int total = 0;
-				int totalWeight = 0;
+				int weight = 0;
 
 				for( int k = -x; k <= radius; k++ ) {
 					int w = dataKer[k+radius];
-					totalWeight += w;
+					weight += w;
 					total += (dataSrc[indexSrc+k] & 0xFF) * w;
 				}
-				dataDst[indexDest++] = (byte)(total / totalWeight);
+				dataDst[indexDest++] = (byte)((total+weight/2)/weight);
 			}
 
 			indexDest = output.startIndex + y*output.stride + offsetEnd/skip;
@@ -293,17 +293,17 @@ public class ConvolveDownNormalized_JustBorder {
 			for( int x = offsetEnd; x < width; x += skip ) {
 				int indexSrc = input.startIndex + y*input.stride+x;
 				int total = 0;
-				int totalWeight = 0;
+				int weight = 0;
 
 				int endKernel = input.width-x-1;
 				if( endKernel > radius ) endKernel = radius;
 
 				for( int k = -radius; k <= endKernel; k++ ) {
 					int w = dataKer[k+radius];
-					totalWeight += w;
+					weight += w;
 					total += (dataSrc[indexSrc+k] & 0xFF) * w;
 				}
-				dataDst[indexDest++] = (byte)(total / totalWeight);
+				dataDst[indexDest++] = (byte)((total+weight/2)/weight);
 			}
 		}
 	}
@@ -326,14 +326,14 @@ public class ConvolveDownNormalized_JustBorder {
 			for( int x = 0; x < width; x++ ) {
 				int indexSrc = input.startIndex + y*input.stride+x;
 				int total = 0;
-				int totalWeight = 0;
+				int weight = 0;
 
 				for( int k = -y; k <= radius; k++ ) {
 					int w = dataKer[k+radius];
-					totalWeight += w;
+					weight += w;
 					total += (dataSrc[indexSrc+k*input.stride] & 0xFF) * w;
 				}
-				dataDst[indexDest++] = (byte)(total / totalWeight);
+				dataDst[indexDest++] = (byte)((total+weight/2)/weight);
 			}
 		}
 
@@ -345,14 +345,14 @@ public class ConvolveDownNormalized_JustBorder {
 			for( int x = 0; x < width; x++ ) {
 				int indexSrc = input.startIndex + y*input.stride+x;
 				int total = 0;
-				int totalWeight = 0;
+				int weight = 0;
 
 				for( int k = -radius; k <= endKernel; k++ ) {
 					int w = dataKer[k+radius];
-					totalWeight += w;
+					weight += w;
 					total += (dataSrc[indexSrc+k*input.stride] & 0xFF) * w;
 				}
-				dataDst[indexDest++] = (byte)(total / totalWeight);
+				dataDst[indexDest++] = (byte)((total+weight/2)/weight);
 			}
 		}
 	}
@@ -384,7 +384,7 @@ public class ConvolveDownNormalized_JustBorder {
 			for( int x = 0; x < offset; x += skip ) {
 
 				int total = 0;
-				int totalWeight = 0;
+				int weight = 0;
 
 				for( int i = minI; i <= maxI; i++ ) {
 					int indexSrc = input.startIndex + (y+i)* input.stride+x;
@@ -392,12 +392,12 @@ public class ConvolveDownNormalized_JustBorder {
 
 					for( int j = -x; j <= radius; j++ ) {
 						int w = dataKer[indexKer+j+radius];
-						totalWeight += w;
+						weight += w;
 						total += (dataSrc[indexSrc+j] & 0xFF) * w;
 					}
 				}
 
-				dataDst[indexDst++] = (byte)(total / totalWeight);
+				dataDst[indexDst++] = (byte)((total+weight/2)/weight);
 			}
 
 			indexDst = output.startIndex + (y/skip)* output.stride + offsetEndX/skip;
@@ -407,7 +407,7 @@ public class ConvolveDownNormalized_JustBorder {
 				if( maxJ > radius ) maxJ = radius;
 
 				int total = 0;
-				int totalWeight = 0;
+				int weight = 0;
 
 				for( int i = minI; i <= maxI; i++ ) {
 					int indexSrc = input.startIndex + (y+i)*input.stride + x;
@@ -415,12 +415,12 @@ public class ConvolveDownNormalized_JustBorder {
 
 					for( int j = -radius; j <= maxJ; j++ ) {
 						int w = dataKer[indexKer+j+radius];
-						totalWeight += w;
+						weight += w;
 						total += (dataSrc[indexSrc+j] & 0xFF)* w;
 					}
 				}
 
-				dataDst[indexDst++] = (byte)(total / totalWeight);
+				dataDst[indexDst++] = (byte)((total+weight/2)/weight);
 			}
 		}
 
@@ -432,7 +432,7 @@ public class ConvolveDownNormalized_JustBorder {
 			for( int x = offset; x < offsetEndX; x += skip ) {
 
 				int total = 0;
-				int totalWeight = 0;
+				int weight = 0;
 
 				for( int i = -y; i <= radius; i++ ) {
 					int indexSrc = input.startIndex + (y+i)* input.stride+x;
@@ -440,12 +440,12 @@ public class ConvolveDownNormalized_JustBorder {
 
 					for( int j = -radius; j <= radius; j++ ) {
 						int w = dataKer[indexKer+j+radius];
-						totalWeight += w;
+						weight += w;
 						total += (dataSrc[indexSrc + j] & 0xFF)* w;
 					}
 				}
 
-				dataDst[indexDst++] = (byte)(total / totalWeight);
+				dataDst[indexDst++] = (byte)((total+weight/2)/weight);
 			}
 		}
 
@@ -460,7 +460,7 @@ public class ConvolveDownNormalized_JustBorder {
 			for( int x = offset; x < offsetEndX; x += skip ) {
 
 				int total = 0;
-				int totalWeight = 0;
+				int weight = 0;
 
 				for( int i = -radius; i <= maxI; i++ ) {
 					int indexSrc = input.startIndex + (y+i)* input.stride+x;
@@ -468,12 +468,12 @@ public class ConvolveDownNormalized_JustBorder {
 
 					for( int j = -radius; j <= radius; j++ ) {
 						int w = dataKer[indexKer+j+radius];
-						totalWeight += w;
+						weight += w;
 						total += (dataSrc[indexSrc + j] & 0xFF)* w;
 					}
 				}
 
-				dataDst[indexDst++] = (byte)(total / totalWeight);
+				dataDst[indexDst++] = (byte)((total+weight/2)/weight);
 			}
 		}
 	}
@@ -497,14 +497,14 @@ public class ConvolveDownNormalized_JustBorder {
 			for( int x = 0; x < offset; x += skip ) {
 				int indexSrc = input.startIndex + y*input.stride+x;
 				int total = 0;
-				int totalWeight = 0;
+				int weight = 0;
 
 				for( int k = -x; k <= radius; k++ ) {
 					int w = dataKer[k+radius];
-					totalWeight += w;
+					weight += w;
 					total += (dataSrc[indexSrc+k]) * w;
 				}
-				dataDst[indexDest++] = (short)(total / totalWeight);
+				dataDst[indexDest++] = (short)((total+weight/2)/weight);
 			}
 
 			indexDest = output.startIndex + y*output.stride + offsetEnd/skip;
@@ -512,17 +512,17 @@ public class ConvolveDownNormalized_JustBorder {
 			for( int x = offsetEnd; x < width; x += skip ) {
 				int indexSrc = input.startIndex + y*input.stride+x;
 				int total = 0;
-				int totalWeight = 0;
+				int weight = 0;
 
 				int endKernel = input.width-x-1;
 				if( endKernel > radius ) endKernel = radius;
 
 				for( int k = -radius; k <= endKernel; k++ ) {
 					int w = dataKer[k+radius];
-					totalWeight += w;
+					weight += w;
 					total += (dataSrc[indexSrc+k]) * w;
 				}
-				dataDst[indexDest++] = (short)(total / totalWeight);
+				dataDst[indexDest++] = (short)((total+weight/2)/weight);
 			}
 		}
 	}
@@ -545,14 +545,14 @@ public class ConvolveDownNormalized_JustBorder {
 			for( int x = 0; x < width; x++ ) {
 				int indexSrc = input.startIndex + y*input.stride+x;
 				int total = 0;
-				int totalWeight = 0;
+				int weight = 0;
 
 				for( int k = -y; k <= radius; k++ ) {
 					int w = dataKer[k+radius];
-					totalWeight += w;
+					weight += w;
 					total += (dataSrc[indexSrc+k*input.stride]) * w;
 				}
-				dataDst[indexDest++] = (short)(total / totalWeight);
+				dataDst[indexDest++] = (short)((total+weight/2)/weight);
 			}
 		}
 
@@ -564,14 +564,14 @@ public class ConvolveDownNormalized_JustBorder {
 			for( int x = 0; x < width; x++ ) {
 				int indexSrc = input.startIndex + y*input.stride+x;
 				int total = 0;
-				int totalWeight = 0;
+				int weight = 0;
 
 				for( int k = -radius; k <= endKernel; k++ ) {
 					int w = dataKer[k+radius];
-					totalWeight += w;
+					weight += w;
 					total += (dataSrc[indexSrc+k*input.stride]) * w;
 				}
-				dataDst[indexDest++] = (short)(total / totalWeight);
+				dataDst[indexDest++] = (short)((total+weight/2)/weight);
 			}
 		}
 	}
@@ -603,7 +603,7 @@ public class ConvolveDownNormalized_JustBorder {
 			for( int x = 0; x < offset; x += skip ) {
 
 				int total = 0;
-				int totalWeight = 0;
+				int weight = 0;
 
 				for( int i = minI; i <= maxI; i++ ) {
 					int indexSrc = input.startIndex + (y+i)* input.stride+x;
@@ -611,12 +611,12 @@ public class ConvolveDownNormalized_JustBorder {
 
 					for( int j = -x; j <= radius; j++ ) {
 						int w = dataKer[indexKer+j+radius];
-						totalWeight += w;
+						weight += w;
 						total += (dataSrc[indexSrc+j]) * w;
 					}
 				}
 
-				dataDst[indexDst++] = (short)(total / totalWeight);
+				dataDst[indexDst++] = (short)((total+weight/2)/weight);
 			}
 
 			indexDst = output.startIndex + (y/skip)* output.stride + offsetEndX/skip;
@@ -626,7 +626,7 @@ public class ConvolveDownNormalized_JustBorder {
 				if( maxJ > radius ) maxJ = radius;
 
 				int total = 0;
-				int totalWeight = 0;
+				int weight = 0;
 
 				for( int i = minI; i <= maxI; i++ ) {
 					int indexSrc = input.startIndex + (y+i)*input.stride + x;
@@ -634,12 +634,12 @@ public class ConvolveDownNormalized_JustBorder {
 
 					for( int j = -radius; j <= maxJ; j++ ) {
 						int w = dataKer[indexKer+j+radius];
-						totalWeight += w;
+						weight += w;
 						total += (dataSrc[indexSrc+j])* w;
 					}
 				}
 
-				dataDst[indexDst++] = (short)(total / totalWeight);
+				dataDst[indexDst++] = (short)((total+weight/2)/weight);
 			}
 		}
 
@@ -651,7 +651,7 @@ public class ConvolveDownNormalized_JustBorder {
 			for( int x = offset; x < offsetEndX; x += skip ) {
 
 				int total = 0;
-				int totalWeight = 0;
+				int weight = 0;
 
 				for( int i = -y; i <= radius; i++ ) {
 					int indexSrc = input.startIndex + (y+i)* input.stride+x;
@@ -659,12 +659,12 @@ public class ConvolveDownNormalized_JustBorder {
 
 					for( int j = -radius; j <= radius; j++ ) {
 						int w = dataKer[indexKer+j+radius];
-						totalWeight += w;
+						weight += w;
 						total += (dataSrc[indexSrc + j])* w;
 					}
 				}
 
-				dataDst[indexDst++] = (short)(total / totalWeight);
+				dataDst[indexDst++] = (short)((total+weight/2)/weight);
 			}
 		}
 
@@ -679,7 +679,7 @@ public class ConvolveDownNormalized_JustBorder {
 			for( int x = offset; x < offsetEndX; x += skip ) {
 
 				int total = 0;
-				int totalWeight = 0;
+				int weight = 0;
 
 				for( int i = -radius; i <= maxI; i++ ) {
 					int indexSrc = input.startIndex + (y+i)* input.stride+x;
@@ -687,12 +687,12 @@ public class ConvolveDownNormalized_JustBorder {
 
 					for( int j = -radius; j <= radius; j++ ) {
 						int w = dataKer[indexKer+j+radius];
-						totalWeight += w;
+						weight += w;
 						total += (dataSrc[indexSrc + j])* w;
 					}
 				}
 
-				dataDst[indexDst++] = (short)(total / totalWeight);
+				dataDst[indexDst++] = (short)((total+weight/2)/weight);
 			}
 		}
 	}

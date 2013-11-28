@@ -18,6 +18,7 @@
 
 package boofcv.alg.geo.calibration;
 
+import boofcv.abst.calib.ConfigChessboard;
 import boofcv.alg.feature.detect.chess.DetectChessCalibrationPoints;
 import boofcv.alg.feature.detect.quadblob.DetectQuadBlobsBinary;
 import boofcv.alg.feature.detect.quadblob.QuadBlob;
@@ -33,10 +34,11 @@ import boofcv.gui.image.ShowImages;
 import boofcv.gui.image.VisualizeImageData;
 import boofcv.io.PathLabel;
 import boofcv.io.SimpleStringNumberReader;
-import boofcv.struct.ImageRectangle;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.point.Point2D_F64;
+import georegression.struct.point.Point2D_I32;
+import georegression.struct.shapes.Polygon2D_I32;
 
 import javax.swing.*;
 import java.awt.*;
@@ -69,7 +71,9 @@ public class DetectCalibrationChessApp<T extends ImageSingleBand, D extends Imag
 	// feature intensity image
 	ImageFloat32 intensity = new ImageFloat32(1,1);
 
+	// if a target was found or not
 	boolean foundTarget;
+
 	boolean processed = false;
 	
 	public DetectCalibrationChessApp(Class<T> imageType) {
@@ -92,7 +96,13 @@ public class DetectCalibrationChessApp<T extends ImageSingleBand, D extends Imag
 	}
 
 	public void configure( int numCols , int numRows ) {
-		alg = new DetectChessCalibrationPoints<T,D>(numCols,numRows,5,1,imageType);
+		ConfigChessboard config = new ConfigChessboard(numCols,numRows);
+
+		alg = new DetectChessCalibrationPoints<T,D>(numCols,numRows,5,2,imageType);
+
+		alg.setUserBinaryThreshold(config.binaryGlobalThreshold);
+		alg.setUserAdaptiveBias(config.binaryAdaptiveBias);
+		alg.setUserAdaptiveRadius(config.binaryAdaptiveRadius);
 	}
 
 	@Override
@@ -149,11 +159,6 @@ public class DetectCalibrationChessApp<T extends ImageSingleBand, D extends Imag
 			alg.setUserBinaryThreshold(-1);
 
 		foundTarget = alg.process(gray);
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				calibGUI.setThreshold((int) alg.getActualBinaryThreshold());
-			}
-		});
 	}
 
 	private synchronized void renderOutput() {
@@ -182,19 +187,27 @@ public class DetectCalibrationChessApp<T extends ImageSingleBand, D extends Imag
 		Graphics2D g2 = workImage.createGraphics();
 		if( foundTarget ) {
 			if( calibGUI.isShowBound() ) {
-				ImageRectangle boundary =  alg.getFindBound().getBoundRect();
-				drawBounds(g2, boundary);
+				Polygon2D_I32 bounds =  alg.getFindBound().getBoundPolygon();
+				drawBounds(g2, bounds);
 			}
 			
 			if( calibGUI.isShowNumbers() ) {
 				drawNumbers(g2, alg.getPoints(),1);
 			}
+			calibGUI.setSuccessMessage("FOUND",true);
+		} else {
+			if( calibGUI.isShowBound() ) {
+				Polygon2D_I32 bounds =  alg.getFindBound().getBoundPolygon();
+				drawBounds(g2, bounds);
+			}
+
+			calibGUI.setSuccessMessage("FAILED",false);
 		}
 
 		if( calibGUI.isShowPoints() ) {
 			List<Point2D_F64> candidates =  alg.getPoints();
 			for( Point2D_F64 c : candidates ) {
-				VisualizeFeatures.drawPoint(g2, (int)c.x, (int)c.y, 2, Color.RED);
+				VisualizeFeatures.drawPoint(g2, (int)c.x, (int)c.y, 1, Color.RED);
 			}
 		}
 
@@ -212,13 +225,21 @@ public class DetectCalibrationChessApp<T extends ImageSingleBand, D extends Imag
 		processed = true;
 	}
 
-	public static void drawBounds( Graphics2D g2 , ImageRectangle rectangle ) {
+	public static void drawBounds( Graphics2D g2 , Polygon2D_I32 bounds) {
+		if( bounds.size() <= 0 )
+			return;
+
 		g2.setColor(Color.BLUE);
 		g2.setStroke(new BasicStroke(2.0f));
-		g2.drawLine(rectangle.x0,rectangle.y0,rectangle.x1,rectangle.y0);
-		g2.drawLine(rectangle.x1,rectangle.y0,rectangle.x1,rectangle.y1);
-		g2.drawLine(rectangle.x1,rectangle.y1,rectangle.x0,rectangle.y1);
-		g2.drawLine(rectangle.x0,rectangle.y1,rectangle.x0,rectangle.y0);
+		for( int i = 1; i < bounds.vertexes.size(); i++ ) {
+			Point2D_I32 p0 = bounds.vertexes.get(i-1);
+			Point2D_I32 p1 = bounds.vertexes.get(i);
+
+			g2.drawLine(p0.x,p0.y,p1.x,p1.y);
+		}
+		Point2D_I32 p0 = bounds.vertexes.get(bounds.size()-1);
+		Point2D_I32 p1 = bounds.vertexes.get(0);
+		g2.drawLine(p0.x,p0.y,p1.x,p1.y);
 
 	}
 
@@ -232,10 +253,10 @@ public class DetectCalibrationChessApp<T extends ImageSingleBand, D extends Imag
 		Graphics2D g2 = workImage.createGraphics();
 		if( detectBlobs.getDetected() != null ) {
 			for( QuadBlob b : detectBlobs.getDetected() ) {
-				g2.setColor(Color.BLACK);
-				g2.fillOval(b.center.x - 2, b.center.y - 2, 5, 5);
-				g2.setColor(Color.CYAN);
-				g2.fillOval(b.center.x-1,b.center.y-1,3,3);
+				for( int i = 0; i < b.corners.size(); i++ ) {
+					Point2D_I32 c = b.corners.get(i);
+					VisualizeFeatures.drawPoint(g2, c.x, c.y, 1, Color.GREEN);
+				}
 			}
 		}
 	}

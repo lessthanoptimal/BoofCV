@@ -113,7 +113,7 @@ public class ConvolveNormalizedStandardSparse {
 				total += (input.data[indexImg] & 0xFF)*kerVal;
 				div += kerVal;
 			}
-			storage[indexStorage] = total/div;
+			storage[indexStorage] = (total+div/2)/div;
 		}
 
 		// convolve vertically
@@ -125,7 +125,7 @@ public class ConvolveNormalizedStandardSparse {
 			total += storage[i]*kerVal;
 			div += kerVal;
 		}
-		return total/div;
+		return (total+div/2)/div;
 	}
 
 	public static int convolve( Kernel1D_I32 horizontal, Kernel1D_I32 vertical,
@@ -158,7 +158,7 @@ public class ConvolveNormalizedStandardSparse {
 				total += (input.data[indexImg])*kerVal;
 				div += kerVal;
 			}
-			storage[indexStorage] = total/div;
+			storage[indexStorage] = (total+div/2)/div;
 		}
 
 		// convolve vertically
@@ -170,7 +170,7 @@ public class ConvolveNormalizedStandardSparse {
 			total += storage[i]*kerVal;
 			div += kerVal;
 		}
-		return total/div;
+		return (total+div/2)/div;
 	}
 
 }

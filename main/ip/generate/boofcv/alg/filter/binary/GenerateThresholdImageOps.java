@@ -41,6 +41,9 @@ public class GenerateThresholdImageOps extends CodeGeneratorBase {
 		printAll(AutoTypeImage.U16);
 		printAll(AutoTypeImage.S32);
 
+		printAdaptive(AutoTypeImage.U8);
+		printAdaptive(AutoTypeImage.F32);
+
 		out.print("\n" +
 				"}\n");
 	}
@@ -48,8 +51,8 @@ public class GenerateThresholdImageOps extends CodeGeneratorBase {
 	private void printPreamble() throws FileNotFoundException {
 		setOutputFile(className);
 		out.print("import boofcv.alg.InputSanityCheck;\n" +
-				"import boofcv.misc.BoofMiscOps;\n" +
 				"import boofcv.struct.image.*;\n" +
+				"import boofcv.alg.filter.blur.BlurImageOps;\n" +
 				"\n" +
 				"/**\n" +
 				" * <p>\n" +
@@ -68,6 +71,11 @@ public class GenerateThresholdImageOps extends CodeGeneratorBase {
 
 	public void printAll( AutoTypeImage imageIn ) {
 		printThreshold(imageIn);
+	}
+
+	public void printAdaptive( AutoTypeImage imageIn ) {
+		printAdaptiveSquare(imageIn);
+		printAdaptiveGaussian(imageIn);
 	}
 
 	public void printThreshold( AutoTypeImage imageIn ) {
@@ -119,6 +127,153 @@ public class GenerateThresholdImageOps extends CodeGeneratorBase {
 				"\n" +
 				"\t\treturn output;\n" +
 				"\t}\n\n");
+	}
+
+	public void printAdaptiveSquare( AutoTypeImage imageIn ) {
+
+		String imageName = imageIn.getSingleBandName();
+		String sumType = imageIn.getSumType();
+		String bitwise = imageIn.getBitWise();
+
+		out.print("\t/**\n" +
+				"\t * Thresholds the image using an adaptive threshold that is computed using a local square region centered\n" +
+				"\t * on each pixel.  The threshold is equal to the average value of the surrounding pixels plus the bias.\n" +
+				"\t * If down is true then b(x,y) = I(x,y) <= T(x,y) + bias ? 1 : 0.  Otherwise\n" +
+				"\t * b(x,y) = I(x,y) >= T(x,y) + bias ? 0 : 1\n" +
+				"\t *\n" +
+				"\t * @param input Input image.\n" +
+				"\t * @param output (optional) Output binary image.  If null it will be declared internally.\n" +
+				"\t * @param radius Radius of square region.\n" +
+				"\t * @param bias Bias used to adjust threshold\n" +
+				"\t * @param down Should it threshold up or down.\n" +
+				"\t * @param storage1 (Optional) Storage for intermediate step. If null will be declared internally.\n" +
+				"\t * @param storage2 (Optional) Storage for intermediate step. If null will be declared internally.\n" +
+				"\t * @return Thresholded image.\n" +
+				"\t */\n" +
+				"\tpublic static ImageUInt8 adaptiveSquare( "+imageName+" input , ImageUInt8 output ,\n" +
+				"\t\t\t\t\t\t\t\t\t\t\t int radius , "+sumType+" bias , boolean down ,\n" +
+				"\t\t\t\t\t\t\t\t\t\t\t "+imageName+" storage1 , "+imageName+" storage2 ) {\n" +
+				"\n" +
+				"\t\toutput = InputSanityCheck.checkDeclare(input,output,ImageUInt8.class);\n" +
+				"\t\tstorage1 = InputSanityCheck.checkDeclare(input,storage1,"+imageName+".class);\n" +
+				"\t\tstorage2 = InputSanityCheck.checkDeclare(input,storage2,"+imageName+".class);\n" +
+				"\n" +
+				"\t\t"+imageName+" mean = storage1;\n" +
+				"\n" +
+				"\t\tBlurImageOps.mean(input,mean,radius,storage2);\n" +
+				"\n" +
+				"\t\tif( down ) {\n" +
+				"\t\t\tfor( int y = 0; y < input.height; y++ ) {\n" +
+				"\t\t\t\tint indexIn = input.startIndex + y*input.stride;\n" +
+				"\t\t\t\tint indexOut = output.startIndex + y*output.stride;\n" +
+				"\t\t\t\tint indexMean = mean.startIndex + y*mean.stride;\n" +
+				"\n" +
+				"\t\t\t\tint end = indexIn + input.width;\n" +
+				"\n" +
+				"\t\t\t\tfor( ; indexIn < end; indexIn++ , indexOut++, indexMean++ ) {\n" +
+				"\t\t\t\t\t"+sumType+" threshold = (mean.data[indexMean]"+bitwise+") + bias;\n" +
+				"\n" +
+				"\t\t\t\t\tif( (input.data[indexIn]"+bitwise+") <= threshold )\n" +
+				"\t\t\t\t\t\toutput.data[indexOut] = 1;\n" +
+				"\t\t\t\t\telse\n" +
+				"\t\t\t\t\t\toutput.data[indexOut] = 0;\n" +
+				"\t\t\t\t}\n" +
+				"\t\t\t}\n" +
+				"\t\t} else {\n" +
+				"\t\t\tfor( int y = 0; y < input.height; y++ ) {\n" +
+				"\t\t\t\tint indexIn = input.startIndex + y*input.stride;\n" +
+				"\t\t\t\tint indexOut = output.startIndex + y*output.stride;\n" +
+				"\t\t\t\tint indexMean = mean.startIndex + y*mean.stride;\n" +
+				"\n" +
+				"\t\t\t\tint end = indexIn + input.width;\n" +
+				"\n" +
+				"\t\t\t\tfor( ; indexIn < end; indexIn++ , indexOut++, indexMean++ ) {\n" +
+				"\t\t\t\t\t"+sumType+" threshold = (mean.data[indexMean]"+bitwise+") + bias;\n" +
+				"\n" +
+				"\t\t\t\t\tif( (input.data[indexIn]"+bitwise+") >= threshold )\n" +
+				"\t\t\t\t\t\toutput.data[indexOut] = 1;\n" +
+				"\t\t\t\t\telse\n" +
+				"\t\t\t\t\t\toutput.data[indexOut] = 0;\n" +
+				"\t\t\t\t}\n" +
+				"\t\t\t}\n" +
+				"\t\t}\n" +
+				"\n" +
+				"\t\treturn output;\n" +
+				"\t}\n\n");
+	}
+
+	public void printAdaptiveGaussian( AutoTypeImage imageIn ) {
+
+		String imageName = imageIn.getSingleBandName();
+		String sumType = imageIn.getSumType();
+		String bitwise = imageIn.getBitWise();
+
+		out.print("\t/**\n" +
+				"\t * Thresholds the image using an adaptive threshold that is computed using a local square region centered\n" +
+				"\t * on each pixel.  The threshold is equal to the gaussian weighted sum of the surrounding pixels plus the bias.\n" +
+				"\t * If down is true then b(x,y) = I(x,y) <= T(x,y) + bias ? 1 : 0.  Otherwise\n" +
+				"\t * b(x,y) = I(x,y) >= T(x,y) + bias ? 0 : 1\n" +
+				"\t *\n" +
+				"\t * @param input Input image.\n" +
+				"\t * @param output (optional) Output binary image.  If null it will be declared internally.\n" +
+				"\t * @param radius Radius of square region.\n" +
+				"\t * @param bias Bias used to adjust threshold\n" +
+				"\t * @param down Should it threshold up or down.\n" +
+				"\t * @param storage1 (Optional) Storage for intermediate step. If null will be declared internally.\n" +
+				"\t * @param storage2 (Optional) Storage for intermediate step. If null will be declared internally.\n" +
+				"\t * @return Thresholded image.\n" +
+				"\t */\n" +
+				"\tpublic static ImageUInt8 adaptiveGaussian( "+imageName+" input , ImageUInt8 output ,\n" +
+				"\t\t\t\t\t\t\t\t\t\t\t   int radius , "+sumType+" bias , boolean down ,\n" +
+				"\t\t\t\t\t\t\t\t\t\t\t   "+imageName+" storage1 , "+imageName+" storage2 ) {\n" +
+				"\n" +
+				"\t\toutput = InputSanityCheck.checkDeclare(input,output,ImageUInt8.class);\n" +
+				"\t\tstorage1 = InputSanityCheck.checkDeclare(input,storage1,"+imageName+".class);\n" +
+				"\t\tstorage2 = InputSanityCheck.checkDeclare(input,storage2,"+imageName+".class);\n" +
+				"\n" +
+				"\t\t"+imageName+" blur = storage1;\n" +
+				"\n" +
+				"\t\tBlurImageOps.gaussian(input,blur,-1,radius,storage2);\n" +
+				"\n" +
+				"\t\tif( down ) {\n" +
+				"\t\t\tfor( int y = 0; y < input.height; y++ ) {\n" +
+				"\t\t\t\tint indexIn = input.startIndex + y*input.stride;\n" +
+				"\t\t\t\tint indexOut = output.startIndex + y*output.stride;\n" +
+				"\t\t\t\tint indexMean = blur.startIndex + y*blur.stride;\n" +
+				"\n" +
+				"\t\t\t\tint end = indexIn + input.width;\n" +
+				"\n" +
+				"\t\t\t\tfor( ; indexIn < end; indexIn++ , indexOut++, indexMean++ ) {\n" +
+				"\t\t\t\t\t"+sumType+" threshold = (blur.data[indexMean]"+bitwise+") + bias;\n" +
+				"\n" +
+				"\t\t\t\t\tif( (input.data[indexIn]"+bitwise+") <= threshold )\n" +
+				"\t\t\t\t\t\toutput.data[indexOut] = 1;\n" +
+				"\t\t\t\t\telse\n" +
+				"\t\t\t\t\t\toutput.data[indexOut] = 0;\n" +
+				"\t\t\t\t}\n" +
+				"\t\t\t}\n" +
+				"\t\t} else {\n" +
+				"\t\t\tfor( int y = 0; y < input.height; y++ ) {\n" +
+				"\t\t\t\tint indexIn = input.startIndex + y*input.stride;\n" +
+				"\t\t\t\tint indexOut = output.startIndex + y*output.stride;\n" +
+				"\t\t\t\tint indexMean = blur.startIndex + y*blur.stride;\n" +
+				"\n" +
+				"\t\t\t\tint end = indexIn + input.width;\n" +
+				"\n" +
+				"\t\t\t\tfor( ; indexIn < end; indexIn++ , indexOut++, indexMean++ ) {\n" +
+				"\t\t\t\t\t"+sumType+" threshold = (blur.data[indexMean]"+bitwise+") + bias;\n" +
+				"\n" +
+				"\t\t\t\t\tif( (input.data[indexIn]"+bitwise+") >= threshold )\n" +
+				"\t\t\t\t\t\toutput.data[indexOut] = 1;\n" +
+				"\t\t\t\t\telse\n" +
+				"\t\t\t\t\t\toutput.data[indexOut] = 0;\n" +
+				"\t\t\t\t}\n" +
+				"\t\t\t}\n" +
+				"\t\t}\n" +
+				"\n" +
+				"\t\treturn output;\n" +
+				"\t}\n\n");
+
 	}
 
 	public static void main( String args[] ) throws FileNotFoundException {

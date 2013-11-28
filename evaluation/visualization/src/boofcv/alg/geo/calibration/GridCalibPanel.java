@@ -232,10 +232,7 @@ public class GridCalibPanel extends StandardAlgConfigPanel
 				isManual = manualThreshold.isSelected();
 				thresholdSpinner.setEnabled(isManual);
 
-				// if it switched into manual mode the threshold has not changed since it was
-				// in automatic made and does not need to be recomputed
-				if( !isManual )
-					listener.calibEventProcess();
+				listener.calibEventProcess();
 			}
 		}
 	}
