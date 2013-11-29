@@ -1,30 +1,26 @@
-//package boofcv.alg.tracker.circulant;
-//
-//import boofcv.alg.misc.GImageMiscOps;
-//import boofcv.alg.misc.ImageMiscOps;
-//import boofcv.alg.misc.ImageStatistics;
-//import boofcv.struct.image.ImageFloat32;
-//import boofcv.struct.image.InterleavedF32;
-//import georegression.struct.shapes.Rectangle2D_I32;
-//import org.ddogleg.complex.ComplexMath64F;
-//import org.ejml.data.Complex64F;
-//import org.junit.Test;
-//
-//import java.util.Random;
-//
-//import static org.junit.Assert.assertEquals;
-//import static org.junit.Assert.assertTrue;
-//
-///**
-// * @author Peter Abeles
-// */
-//public class TestCirculantTracker {
-//
-//	Random rand = new Random(234);
-//
-//	int width = 60;
-//	int height = 80;
-//
+package boofcv.alg.tracker.circulant;
+
+import org.junit.Test;
+
+import java.util.Random;
+
+import static org.junit.Assert.fail;
+
+/**
+* @author Peter Abeles
+*/
+public class TestCirculantTracker {
+
+	Random rand = new Random(234);
+
+	int width = 60;
+	int height = 80;
+
+	@Test
+	public void meanShift() {
+		fail("implement");
+	}
+
 //	@Test
 //	public void basicTrackingCheck() {
 //		ImageFloat32 a = new ImageFloat32(30,35);
@@ -341,3 +337,5 @@
 //		CirculantTracker.ensureInBounds(r,20,25);
 //		assertEquals(1,r.tl_x);
 //		assertEquals(2,r.tl_y
+//	}
+}

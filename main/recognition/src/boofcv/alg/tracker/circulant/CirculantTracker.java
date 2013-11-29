@@ -22,6 +22,7 @@ import boofcv.abst.transform.fft.DiscreteFourierTransform;
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.misc.PixelMath;
 import boofcv.alg.transform.fft.DiscreteFourierTransformOps;
+import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.image.ImageFloat64;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.InterleavedF64;
@@ -37,12 +38,15 @@ import georegression.struct.shapes.Rectangle2D_F32;
  *
  * <p>
  * Tracking is performed using texture information.  Since only one description of the target is saved, tracks can
- * drift over time.  Tracking performance seems to improve if the object has distinctive edges and that's included
- * in the track region.
+ * drift over time.  Tracking performance seems to improve if the object has distinctive edges.
  * </p>
  *
  * <p>
- * TODO note change from paper here
+ * CHANGES FROM PAPER:<br>
+ * <ul>
+ * <li>Input image is sampled into a square work region of constant size to improve runtime speed of FFT.</li>
+ * <li>Peak of response is found using mean-shift.  Provides sub-pixel precision.</li>
+ * </ul>
  * </p>
  *
  * <p>
@@ -52,8 +56,6 @@ import georegression.struct.shapes.Rectangle2D_F32;
  *
  * @author Peter Abeles
  */
-// TODO Visualize tracker internal data
-// TODO fix unit tests
 public class CirculantTracker<T extends ImageSingleBand> {
 
 	// --- Tuning parameters
@@ -113,9 +115,17 @@ public class CirculantTracker<T extends ImageSingleBand> {
 	private InterleavedF64 tmpFourier1 = new InterleavedF64(1,1,2);
 	private InterleavedF64 tmpFourier2 = new InterleavedF64(1,1,2);
 
+	// interpolation used when sampling input image into work space
 	private InterpolatePixelS<T> interp;
+	// interpolation used inside of mean-shift
+	private InterpolatePixelS<ImageFloat64> interpF64;
 
+	// adjustment from sub-pixel
+	private float offX,offY;
+
+	// size of the work space in pixels
 	private int workRegionSize;
+	// conversion from workspace to image pixels
 	private float stepX,stepY;
 
 	/**
@@ -134,6 +144,9 @@ public class CirculantTracker<T extends ImageSingleBand> {
 							int workRegionSize ,
 							double maxPixelValue,
 							InterpolatePixelS<T> interp ) {
+		if( workRegionSize < 3 )
+			throw new IllegalArgumentException("Minimum size of work region is 3 pixels.");
+
 		this.output_sigma_factor = output_sigma_factor;
 		this.sigma = sigma;
 		this.lambda = lambda;
@@ -147,6 +160,9 @@ public class CirculantTracker<T extends ImageSingleBand> {
 		resizeImages(workRegionSize);
 		computeCosineWindow(cosine);
 		computeGaussianWeights(workRegionSize);
+
+		interpF64 = FactoryInterpolation.bilinearPixelS(ImageFloat64.class);
+		interpF64.setImage(response);
 	}
 
 	/**
@@ -308,21 +324,9 @@ public class CirculantTracker<T extends ImageSingleBand> {
 
 		int peakX = indexBest % response.width;
 		int peakY = indexBest / response.width;
-		float offX=0,offY=0;
 
-		// TODO try different techniques.  Average of a larger region?
-//		float b = (float)tmpReal0.get(peakX,peakY);
-//
-//		if( peakX >= 1 && peakX < tmpReal0.width-1 ){
-//			float a = (float)tmpReal0.get(peakX-1,peakY);
-//			float c = (float)tmpReal0.get(peakX+1,peakY);
-//			offX = FastHessianFeatureDetector.polyPeak(a, b, c);
-//		}
-//		if( peakY >= 1 && peakY < tmpReal0.height-1 ) {
-//			float d = (float)tmpReal0.get(peakX,peakY-1);
-//			float e = (float)tmpReal0.get(peakX,peakY+1);
-//			offY = FastHessianFeatureDetector.polyPeak(d, b, e);
-//		}
+		// sub-pixel peak estimation
+		meanShift(peakX,peakY);
 
 		// peak in region's coordinate system
 		float deltaX = (peakX+offX) - templateNew.width/2;
@@ -337,6 +341,54 @@ public class CirculantTracker<T extends ImageSingleBand> {
 		ensureInBounds(regionTrack,image.width,image.height);
 
 		updateRegionOut();
+	}
+
+	/**
+	 * Find the peak using mean-shift.  Provides sub-pixel accuracy.  Mean-shift finds the average position
+	 * weighted by intensity, re-centers, and iterates until it converges.
+	 */
+	private void meanShift( int peakX , int peakY ) {
+		// this function for r was determined empirically by using work regions of 32,64,128
+		int r = Math.min(2,response.width/25);
+		int w = r*2+1;
+
+		if( w <= 1 )
+			return;
+
+		if( r < 1 )
+			return;
+
+		// optimal:  128 = 2  64 = 2  32 = 1
+
+		float x0 = peakX-r;
+		float y0 = peakY-r;
+
+		for( int iter = 0; iter < 5; iter++ ) {
+			// stop if it is out of bands.  Trickier to handle that situation question since a mean is computed
+			if( x0 < 0 ) break;
+			else if( x0 > response.width-w ) break;
+			if( y0 < 0 ) break;
+			else if( y0 > response.height-w )break;
+
+			float sumX = 0, sumY = 0, sumWeight = 0;
+			for( int i = 0; i < w; i++ ) {
+				float yy = y0+i;
+				for( int j = 0; j < w; j++ ) {
+					float xx = x0+j;
+					float weight = interpF64.get_fast(xx,yy);
+
+					sumWeight += weight;
+					sumX += xx*weight;
+					sumY += yy*weight;
+				}
+			}
+
+			x0 = (sumX/sumWeight) - r;
+			y0 = (sumY/sumWeight) - r;
+		}
+
+		offX = x0+r - peakX;
+		offY = y0+r - peakY;
 	}
 
 	private void updateRegionOut() {

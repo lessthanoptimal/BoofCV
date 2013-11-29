@@ -107,6 +107,8 @@ public class FactoryInterpolation {
 	public static <T extends ImageSingleBand> InterpolatePixelS<T> bilinearPixelS(Class<T> type) {
 		if( type == ImageFloat32.class )
 			return (InterpolatePixelS<T>)new ImplBilinearPixel_F32();
+		if( type == ImageFloat64.class )
+			return (InterpolatePixelS<T>)new ImplBilinearPixel_F64();
 		else if( type == ImageUInt8.class )
 			return (InterpolatePixelS<T>)new ImplBilinearPixel_U8();
 		else if( type == ImageSInt16.class )

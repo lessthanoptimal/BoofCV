@@ -41,6 +41,8 @@ import georegression.struct.shapes.Rectangle2D_I32;
  * in the track region.
  * </p>
  *
+ * No intentional changes from the original implementation.
+ *
  * <p>
  * [1] Henriques, Joao F., et al. "Exploiting the circulant structure of tracking-by-detection with kernels."
  * Computer Vision–ECCV 2012. Springer Berlin Heidelberg, 2012. 702-715.
