@@ -19,7 +19,7 @@
 package boofcv.alg.interpolate.impl;
 
 import boofcv.alg.interpolate.BilinearPixel;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageFloat64;
 
 
 /**
@@ -33,34 +33,34 @@ import boofcv.struct.image.ImageFloat32;
  *
  * @author Peter Abeles
  */
-public class ImplBilinearPixel_F32 extends BilinearPixel<ImageFloat32> {
+public class ImplBilinearPixel_F64 extends BilinearPixel<ImageFloat64> {
 
-	public ImplBilinearPixel_F32() {
+	public ImplBilinearPixel_F64() {
 	}
 
-	public ImplBilinearPixel_F32(ImageFloat32 orig) {
+	public ImplBilinearPixel_F64(ImageFloat64 orig) {
 		setImage(orig);
 	}
 	@Override
 	public float get_fast(float x, float y) {
 		int xt = (int) x;
 		int yt = (int) y;
-		float ax = x - xt;
-		float ay = y - yt;
+		double ax = x - xt;
+		double ay = y - yt;
 
 		int index = orig.startIndex + yt * stride + xt;
 
 		int dx = xt == width - 1 ? 0 : 1;
 		int dy = yt == height - 1 ? 0 : stride;
 
-		float[] data = orig.data;
+		double[] data = orig.data;
 
-		float val = (1.0f - ax) * (1.0f - ay) * (data[index] ); // (x,y)
-		val += ax * (1.0f - ay) * (data[index + dx] ); // (x+1,y)
+		double val = (1.0 - ax) * (1.0 - ay) * (data[index] ); // (x,y)
+		val += ax * (1.0 - ay) * (data[index + dx] ); // (x+1,y)
 		val += ax * ay * (data[index + dx + dy] ); // (x+1,y+1)
-		val += (1.0f - ax) * ay * (data[index + dy] ); // (x,y+1)
+		val += (1.0 - ax) * ay * (data[index + dy] ); // (x,y+1)
 
-		return val;
+		return (float)val;
 	}
 
 	@Override
@@ -71,8 +71,8 @@ public class ImplBilinearPixel_F32 extends BilinearPixel<ImageFloat32> {
 		if (xt < 0 || yt < 0 || xt >= width || yt >= height)
 			throw new IllegalArgumentException("Point is outside of the image");
 
-		float ax = x - xt;
-		float ay = y - yt;
+		double ax = x - xt;
+		double ay = y - yt;
 
 		int index = orig.startIndex + yt * stride + xt;
 
@@ -80,14 +80,14 @@ public class ImplBilinearPixel_F32 extends BilinearPixel<ImageFloat32> {
 		int dx = xt == width - 1 ? 0 : 1;
 		int dy = yt == height - 1 ? 0 : stride;
 
-		float[] data = orig.data;
+		double[] data = orig.data;
 
-		float val = (1.0f - ax) * (1.0f - ay) * (data[index] ); // (x,y)
-		val += ax * (1.0f - ay) * (data[index + dx] ); // (x+1,y)
+		double val = (1.0 - ax) * (1.0 - ay) * (data[index] ); // (x,y)
+		val += ax * (1.0 - ay) * (data[index + dx] ); // (x+1,y)
 		val += ax * ay * (data[index + dx + dy] ); // (x+1,y+1)
-		val += (1.0f - ax) * ay * (data[index + dy] ); // (x,y+1)
+		val += (1.0 - ax) * ay * (data[index + dy] ); // (x,y+1)
 
-		return val;
+		return (float)val;
 	}
 
 }

@@ -41,8 +41,6 @@ public class ImplBilinearPixel_S16 extends BilinearPixel<ImageSInt16> {
 	public ImplBilinearPixel_S16(ImageSInt16 orig) {
 		setImage(orig);
 	}
-
-
 	@Override
 	public float get_fast(float x, float y) {
 		int xt = (int) x;
@@ -78,7 +76,7 @@ public class ImplBilinearPixel_S16 extends BilinearPixel<ImageSInt16> {
 
 		int index = orig.startIndex + yt * stride + xt;
 
-		// throw allows borders to be interpolated gracefully by double counting appropriate pixels
+		// allows borders to be interpolated gracefully by double counting appropriate pixels
 		int dx = xt == width - 1 ? 0 : 1;
 		int dy = yt == height - 1 ? 0 : stride;
 

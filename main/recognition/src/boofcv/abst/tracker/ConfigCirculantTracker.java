@@ -19,7 +19,7 @@
 package boofcv.abst.tracker;
 
 /**
- * Configuration for {@link boofcv.alg.tracker.circulant.CirculantTrackerOrig}.
+ * Configuration for {@link boofcv.alg.tracker.circulant.CirculantTracker}.
  *
  * @author Peter Abeles
  */
@@ -47,9 +47,17 @@ public class ConfigCirculantTracker {
 	 */
 	public double maxPixelValue = 255.0;
 
+	/**
+	 * How much padding is added around the region requested by the user.  Specified as fraction of original image.
+	 * Padding of 1 = 2x original size.
+	 */
 	public double padding = 1;
 
-	public int workSpace = 64;//128;
+	/**
+	 * Length of size in work space image.  A total of N*N points are sampled.  Should be set to a power of two
+	 * to maximize speed.  In general, larger numbers are more stable but slower.
+	 */
+	public int workSpace = 64;
 
 	public ConfigCirculantTracker(float interp_factor) {
 		this.interp_factor = interp_factor;

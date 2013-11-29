@@ -30,8 +30,12 @@ import java.io.FileNotFoundException;
 public class GenerateImplBilinearPixel extends CodeGeneratorBase {
 	AutoTypeImage image;
 
+	String floatType;
+	String f;
+
 	@Override
 	public void generate() throws FileNotFoundException {
+		createType(AutoTypeImage.F64);
 		createType(AutoTypeImage.F32);
 		createType(AutoTypeImage.U8);
 		createType(AutoTypeImage.S16);
@@ -46,6 +50,10 @@ public class GenerateImplBilinearPixel extends CodeGeneratorBase {
 	}
 
 	private void createFile() throws FileNotFoundException {
+
+		floatType = !image.isInteger() && image.getNumBits()==64 ? "double" : "float";
+		f = !image.isInteger() && image.getNumBits()==64 ? "" : "f";
+
 		printPreamble();
 		printTheRest();
 		out.println("}");
@@ -82,12 +90,14 @@ public class GenerateImplBilinearPixel extends CodeGeneratorBase {
 	private void printTheRest() {
 		String bitWise = image.getBitWise();
 
+
+
 		out.print("\t@Override\n" +
-				"\tpublic float get_unsafe(float x, float y) {\n" +
+				"\tpublic float get_fast(float x, float y) {\n" +
 				"\t\tint xt = (int) x;\n" +
 				"\t\tint yt = (int) y;\n" +
-				"\t\tfloat ax = x - xt;\n" +
-				"\t\tfloat ay = y - yt;\n" +
+				"\t\t"+floatType+" ax = x - xt;\n" +
+				"\t\t"+floatType+" ay = y - yt;\n" +
 				"\n" +
 				"\t\tint index = orig.startIndex + yt * stride + xt;\n" +
 				"\n" +
@@ -96,10 +106,10 @@ public class GenerateImplBilinearPixel extends CodeGeneratorBase {
 				"\n" +
 				"\t\t"+image.getDataType()+"[] data = orig.data;\n" +
 				"\n" +
-				"\t\tfloat val = (1.0f - ax) * (1.0f - ay) * (data[index] "+bitWise+"); // (x,y)\n" +
-				"\t\tval += ax * (1.0f - ay) * (data[index + dx] "+bitWise+"); // (x+1,y)\n" +
+				"\t\t"+floatType+" val = (1.0"+f+" - ax) * (1.0"+f+" - ay) * (data[index] "+bitWise+"); // (x,y)\n" +
+				"\t\tval += ax * (1.0"+f+" - ay) * (data[index + dx] "+bitWise+"); // (x+1,y)\n" +
 				"\t\tval += ax * ay * (data[index + dx + dy] "+bitWise+"); // (x+1,y+1)\n" +
-				"\t\tval += (1.0f - ax) * ay * (data[index + dy] "+bitWise+"); // (x,y+1)\n" +
+				"\t\tval += (1.0"+f+" - ax) * ay * (data[index + dy] "+bitWise+"); // (x,y+1)\n" +
 				"\n" +
 				"\t\treturn val;\n" +
 				"\t}\n" +
@@ -112,8 +122,8 @@ public class GenerateImplBilinearPixel extends CodeGeneratorBase {
 				"\t\tif (xt < 0 || yt < 0 || xt >= width || yt >= height)\n" +
 				"\t\t\tthrow new IllegalArgumentException(\"Point is outside of the image\");\n" +
 				"\n" +
-				"\t\tfloat ax = x - xt;\n" +
-				"\t\tfloat ay = y - yt;\n" +
+				"\t\t"+floatType+" ax = x - xt;\n" +
+				"\t\t"+floatType+" ay = y - yt;\n" +
 				"\n" +
 				"\t\tint index = orig.startIndex + yt * stride + xt;\n" +
 				"\n" +
@@ -123,10 +133,10 @@ public class GenerateImplBilinearPixel extends CodeGeneratorBase {
 				"\n" +
 				"\t\t"+image.getDataType()+"[] data = orig.data;\n" +
 				"\n" +
-				"\t\tfloat val = (1.0f - ax) * (1.0f - ay) * (data[index] "+bitWise+"); // (x,y)\n" +
-				"\t\tval += ax * (1.0f - ay) * (data[index + dx] "+bitWise+"); // (x+1,y)\n" +
+				"\t\t"+floatType+" val = (1.0"+f+" - ax) * (1.0"+f+" - ay) * (data[index] "+bitWise+"); // (x,y)\n" +
+				"\t\tval += ax * (1.0"+f+" - ay) * (data[index + dx] "+bitWise+"); // (x+1,y)\n" +
 				"\t\tval += ax * ay * (data[index + dx + dy] "+bitWise+"); // (x+1,y+1)\n" +
-				"\t\tval += (1.0f - ax) * ay * (data[index + dy] "+bitWise+"); // (x,y+1)\n" +
+				"\t\tval += (1.0"+f+" - ax) * ay * (data[index + dy] "+bitWise+"); // (x,y+1)\n" +
 				"\n" +
 				"\t\treturn val;\n" +
 				"\t}\n\n");
