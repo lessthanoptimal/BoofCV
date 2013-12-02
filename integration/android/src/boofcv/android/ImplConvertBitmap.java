@@ -55,7 +55,7 @@ public class ImplConvertBitmap {
 			for (int x = 0; x < w; x++) {
 				int rgb = input.getPixel(x, y);
 
-				int value = (((rgb >> 16) & 0xFF) + ((rgb >> 8) & 0xFF) + (rgb & 0xFF)) / 3;
+				float value = (((rgb >> 16) & 0xFF) + ((rgb >> 8) & 0xFF) + (rgb & 0xFF)) / 3f;
 				output.data[index++] = value;
 			}
 		}
@@ -129,8 +129,7 @@ public class ImplConvertBitmap {
 			for (int x = 0; x < w; x++) {
 				int gray = (int)input.data[index++];
 
-				output.setPixel(x, y, 0xFF << 24 | gray << 16 | gray << 8
-						| gray);
+				output.setPixel(x, y, 0xFF << 24 | gray << 16 | gray << 8 | gray);
 			}
 		}
 	}
@@ -358,8 +357,7 @@ public class ImplConvertBitmap {
 				int end = indexDst + w;
 				// for (int x = 0; x < w; x++, indexSrc++) {
 				while (indexDst < end) {
-					int value = ((array[indexSrc++] & 0xFF)
-							+ (array[indexSrc++] & 0xFF) + (array[indexSrc++] & 0xFF)) / 3;
+					float value = ((array[indexSrc++] & 0xFF) + (array[indexSrc++] & 0xFF) + (array[indexSrc++] & 0xFF)) / 3f;
 					output.data[indexDst++] = value;
 					indexSrc++;// skip over alpha channel
 				}

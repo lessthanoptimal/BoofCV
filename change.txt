@@ -71,6 +71,9 @@ Version : Alpha 0.16
     conditions
   * Chessboard target detector works much better on small targets.  Uses corners to estimate initial calibration
     point position then uses mean-shift to refine
+- ImplConvertBitmap incorrectly converted floating point images
+  * Was doing an integer divide instead of a floating point divide
+  * Thanks Vagoster for reporting the bug
 
 - TODO Chessboard calibration doesn't reject bad calibration points after sub-pixel
 - TODO improve KLT edge handling
