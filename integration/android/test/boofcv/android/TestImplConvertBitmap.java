@@ -21,8 +21,11 @@ public class TestImplConvertBitmap extends AndroidTestCase {
 	
 	int buffer32[] = new int[w*h];
 	byte buffer8[] = new byte[w*h*4];
-	
-	
+
+	public void testUpdateForFloat() {
+		fail("Should check to see if floating point gray scale images are handled correctly.  won't always be int");
+	}
+
 	public void testAll_ArrayToGray() {
 		Method methods[] = ImplConvertBitmap.class.getMethods();
 	
