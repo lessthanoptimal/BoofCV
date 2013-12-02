@@ -34,6 +34,7 @@ import georegression.struct.shapes.RectangleCorner2D_F64;
  *
  * @author Peter Abeles
  */
+@Deprecated
 public class CirculantOrig_to_TrackerObjectQuad<T extends ImageSingleBand> implements TrackerObjectQuad<T> {
 
 	CirculantTrackerOrig tracker;

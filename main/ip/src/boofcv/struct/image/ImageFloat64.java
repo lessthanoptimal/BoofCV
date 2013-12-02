@@ -81,6 +81,24 @@ public class ImageFloat64 extends ImageFloat<ImageFloat64> {
 		data[getIndex(x, y)] = value;
 	}
 
+	public void print( String format ) {
+		for (int y = 0; y < height; y++) {
+			for (int x = 0; x < width; x++) {
+				System.out.printf(format+" ",unsafe_get(x, y));
+			}
+			System.out.println();
+		}
+	}
+
+	public void printInt() {
+		for (int y = 0; y < height; y++) {
+			for (int x = 0; x < width; x++) {
+				System.out.printf("%3d ",(int)unsafe_get(x,y));
+			}
+			System.out.println();
+		}
+	}
+
 	@Override
 	protected Object _getData() {
 		return data;

@@ -28,6 +28,8 @@ import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.InterleavedF64;
 import georegression.struct.shapes.Rectangle2D_F32;
 
+import java.util.Random;
+
 /**
  * <p>
  * Tracker that uses the theory of Circulant matrices, Discrete Fourier Transform (DCF), and linear classifiers to track
@@ -46,6 +48,8 @@ import georegression.struct.shapes.Rectangle2D_F32;
  * <ul>
  * <li>Input image is sampled into a square work region of constant size to improve runtime speed of FFT.</li>
  * <li>Peak of response is found using mean-shift.  Provides sub-pixel precision.</li>
+ * <li>Pixels outside the image are assigned random values to avoid the tracker from fitting to them. Ideally they
+ * wouldn't be processed, but that is complex to implement </li>
  * </ul>
  * </p>
  *
@@ -121,12 +125,15 @@ public class CirculantTracker<T extends ImageSingleBand> {
 	private InterpolatePixelS<ImageFloat64> interpF64;
 
 	// adjustment from sub-pixel
-	private float offX,offY;
+	protected float offX,offY;
 
 	// size of the work space in pixels
 	private int workRegionSize;
 	// conversion from workspace to image pixels
 	private float stepX,stepY;
+
+	// used to fill the area outside of the image with unstructured data.
+	private Random rand = new Random(234);
 
 	/**
 	 * Configure tracker
@@ -135,8 +142,8 @@ public class CirculantTracker<T extends ImageSingleBand> {
 	 * @param sigma Sigma for Gaussian kernel in linear classifier.  Try 0.2
 	 * @param lambda Try 1e-2
 	 * @param interp_factor Try 0.075
-	 * @param padding
-	 * @param workRegionSize
+	 * @param padding Padding added around the selected target.  Try 1
+	 * @param workRegionSize Size of work region. Best if power of 2.  Try 64
 	 * @param maxPixelValue Maximum pixel value.  Typically 255
 	 */
 	public CirculantTracker(double output_sigma_factor, double sigma, double lambda, double interp_factor,
@@ -196,8 +203,6 @@ public class CirculantTracker<T extends ImageSingleBand> {
 		stepX = (w-1)/(float)(workRegionSize-1);
 		stepY = (h-1)/(float)(workRegionSize-1);
 
-		ensureInBounds(regionTrack,image.width,image.height);
-
 		updateRegionOut();
 
 		initialLearning(image);
@@ -239,6 +244,10 @@ public class CirculantTracker<T extends ImageSingleBand> {
 
 	/**
 	 * Computes the weights used in the gaussian kernel
+	 *
+	 * This isn't actually symmetric for even widths.  These weights are used has label in the learning phase.  Closer
+	 * to one the more likely it is the true target.  It should be a peak in the image center.  If it is not then
+	 * it will learn an incorrect model.
 	 */
 	protected void computeGaussianWeights( int width ) {
 		// desired output (gaussian shaped), bandwidth proportional to target size
@@ -246,16 +255,15 @@ public class CirculantTracker<T extends ImageSingleBand> {
 
 		double left = -0.5/(output_sigma*output_sigma);
 
-		int radiusX = gaussianWeight.width/2;
-		int radiusY = gaussianWeight.height/2;
+		int radius = width/2;
 
 		for( int y = 0; y < gaussianWeight.height; y++ ) {
 			int index = gaussianWeight.startIndex + y*gaussianWeight.stride;
 
-			double ry = y-radiusY;
+			double ry = y-radius;
 
-			for( int x = 0; x < gaussianWeight.width; x++ ) {
-				double rx = x-radiusX;
+			for( int x = 0; x < width; x++ ) {
+				double rx = x-radius;
 
 				gaussianWeight.data[index++] = Math.exp(left * (ry * ry + rx * rx));
 			}
@@ -332,13 +340,9 @@ public class CirculantTracker<T extends ImageSingleBand> {
 		float deltaX = (peakX+offX) - templateNew.width/2;
 		float deltaY = (peakY+offY) - templateNew.height/2;
 
-//		System.out.printf("delts %7.5f %7.5f\n",deltaX,deltaY);
-
 		// convert peak location into image coordinate system
 		regionTrack.tl_x = regionTrack.tl_x + deltaX*stepX;
 		regionTrack.tl_y = regionTrack.tl_y + deltaY*stepY;
-
-		ensureInBounds(regionTrack,image.width,image.height);
 
 		updateRegionOut();
 	}
@@ -347,7 +351,7 @@ public class CirculantTracker<T extends ImageSingleBand> {
 	 * Find the peak using mean-shift.  Provides sub-pixel accuracy.  Mean-shift finds the average position
 	 * weighted by intensity, re-centers, and iterates until it converges.
 	 */
-	private void meanShift( int peakX , int peakY ) {
+	protected void meanShift( int peakX , int peakY ) {
 		// this function for r was determined empirically by using work regions of 32,64,128
 		int r = Math.min(2,response.width/25);
 		int w = r*2+1;
@@ -357,8 +361,6 @@ public class CirculantTracker<T extends ImageSingleBand> {
 
 		if( r < 1 )
 			return;
-
-		// optimal:  128 = 2  64 = 2  32 = 1
 
 		float x0 = peakX-r;
 		float y0 = peakY-r;
@@ -383,6 +385,9 @@ public class CirculantTracker<T extends ImageSingleBand> {
 				}
 			}
 
+			if( sumWeight == 0 )
+				break;
+
 			x0 = (sumX/sumWeight) - r;
 			y0 = (sumY/sumWeight) - r;
 		}
@@ -392,7 +397,6 @@ public class CirculantTracker<T extends ImageSingleBand> {
 	}
 
 	private void updateRegionOut() {
-		// add integer rounding?
 		regionOut.tl_x = (regionTrack.tl_x+((int)regionTrack.width)/2)-((int)regionOut.width)/2;
 		regionOut.tl_y = (regionTrack.tl_y+((int)regionTrack.height)/2)-((int)regionOut.height)/2;
 	}
@@ -595,8 +599,11 @@ public class CirculantTracker<T extends ImageSingleBand> {
 					output.data[index++] = interp.get_fast(xx,yy);
 				else if( image.isInBounds((int)xx,(int)yy))
 					output.data[index++] = interp.get(xx, yy);
-				else
-					output.data[index++] = 0;
+				else {
+					// randomize to make pixels outside the image poorly correlate.  It will then focus on matching
+					// what's inside the image since it has structure
+					output.data[index++] = rand.nextFloat()*maxPixelValue;
+				}
 			}
 		}
 
@@ -606,21 +613,6 @@ public class CirculantTracker<T extends ImageSingleBand> {
 		// apply the cosine window to it
 		PixelMath.multiply(output,cosine,output);
 	}
-
-	/**
-	 * Makes sure the specified region is inside the image bounds
-	 */
-	protected static void ensureInBounds( Rectangle2D_F32 region , int imgWidth , int imgHeight ) {
-		if( region.tl_x < 0 )
-			region.tl_x = 0;
-		else if( region.tl_x > imgWidth-region.width )
-			region.tl_x = imgWidth-region.width;
-		if( region.tl_y < 0 )
-			region.tl_y = 0;
-		else if( region.tl_y > imgHeight-region.height )
-			region.tl_y = imgHeight-region.height;
-	}
-
 
 	/**
 	 * The location of the target in the image

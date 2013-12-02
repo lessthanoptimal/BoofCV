@@ -1,6 +1,6 @@
 package boofcv.abst.tracker;
 
-import boofcv.alg.tracker.circulant.CirculantTrackerOrig;
+import boofcv.factory.tracker.FactoryTrackerObjectQuad;
 import boofcv.struct.image.ImageType;
 import boofcv.struct.image.ImageUInt8;
 import org.junit.Test;
@@ -8,9 +8,9 @@ import org.junit.Test;
 /**
  * @author Peter Abeles
  */
-public class TestCirculantOrig_to_TrackerObjectQuad extends TextureGrayTrackerObjectRectangleTests {
+public class TestCirculant_to_TrackerObjectQuad extends TextureGrayTrackerObjectRectangleTests {
 
-	public TestCirculantOrig_to_TrackerObjectQuad() {
+	public TestCirculant_to_TrackerObjectQuad() {
 		tolStationary = 1;
 	}
 
@@ -19,10 +19,7 @@ public class TestCirculantOrig_to_TrackerObjectQuad extends TextureGrayTrackerOb
 
 		ConfigCirculantTracker config = new ConfigCirculantTracker();
 
-		CirculantTrackerOrig alg = new CirculantTrackerOrig(
-				config.output_sigma_factor,config.sigma,config.lambda,config.interp_factor,config.maxPixelValue);
-
-		return new CirculantOrig_to_TrackerObjectQuad(alg, imageType);
+		return FactoryTrackerObjectQuad.circulant(config, ImageUInt8.class);
 	}
 
 	@Test

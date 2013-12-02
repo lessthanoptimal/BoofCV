@@ -21,7 +21,6 @@ package boofcv.factory.tracker;
 import boofcv.abst.tracker.*;
 import boofcv.alg.interpolate.InterpolatePixelMB;
 import boofcv.alg.tracker.circulant.CirculantTracker;
-import boofcv.alg.tracker.circulant.CirculantTrackerOrig;
 import boofcv.alg.tracker.meanshift.LocalWeightedHistogramRotRect;
 import boofcv.alg.tracker.meanshift.PixelLikelihood;
 import boofcv.alg.tracker.meanshift.TrackerMeanShiftComaniciu2003;
@@ -161,23 +160,5 @@ public class FactoryTrackerObjectQuad {
 		CirculantTracker<T> alg = FactoryTrackerObjectAlgs.circulant(config,imageType);
 
 		return new Circulant_to_TrackerObjectQuad<T>(alg,ImageType.single(imageType));
-	}
-
-	/**
-	 * Creates the Circulant feature tracker.  Texture based tracker which uses the theory of circulant matrices,
-	 * Discrete Fourier Transform (DCF), and linear classifiers to track a target.  Fixed sized rectangular target
-	 * and only estimates translation.  Can't detect when it loses track or re-aquire track.
-	 *
-	 * @see {@link boofcv.alg.tracker.circulant.CirculantTrackerOrig}
-	 *
-	 * @param config Configuration
-	 * @return CirculantTracker
-	 */
-	public static <T extends ImageSingleBand>
-	TrackerObjectQuad<T> circulantOrig(ConfigCirculantTracker config, Class<T> imageType) {
-		CirculantTrackerOrig alg = new CirculantTrackerOrig(
-				config.output_sigma_factor,config.sigma,config.lambda,config.interp_factor,config.maxPixelValue);
-
-		return new CirculantOrig_to_TrackerObjectQuad(alg,ImageType.single(imageType));
 	}
 }
