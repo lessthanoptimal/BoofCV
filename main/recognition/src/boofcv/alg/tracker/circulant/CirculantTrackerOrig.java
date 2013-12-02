@@ -29,27 +29,13 @@ import georegression.struct.shapes.Rectangle2D_I32;
 
 /**
  * <p>
- * Tracker that uses the theory of Circulant matrices, Discrete Fourier Transform (DCF), and linear classifiers to track
- * a target and learn its changes in appearance [1].  The target is assumed to be rectangular and has fixed size and
- * location.  A dense local search is performed around the most recent target location.  The search is done quickly
- * using the DCF.
- * </p>
- *
- * <p>
- * Tracking is performed using texture information.  Since only one description of the target is saved, tracks can
- * drift over time.  Tracking performance seems to improve if the object has distinctive edges and that's included
- * in the track region.
- * </p>
- *
- * No intentional changes from the original implementation.
- *
- * <p>
- * [1] Henriques, Joao F., et al. "Exploiting the circulant structure of tracking-by-detection with kernels."
- * Computer Vision–ECCV 2012. Springer Berlin Heidelberg, 2012. 702-715.
- * </p>
+ * Version of {@link CirculantTracker} which tries to be 100% faithful to the original.  No real reason to use
+ * this one since the other is faster and more stable.  It is kept around for evaluation purposes.  This should be
+ * moved into an extras library or something.
  *
  * @author Peter Abeles
  */
+@Deprecated
 public class CirculantTrackerOrig {
 
 	// --- Tuning parameters
@@ -150,8 +136,6 @@ public class CirculantTrackerOrig {
 		this.regionTrack.tl_x = cx-w/2;
 		this.regionTrack.tl_y = cy-h/2;
 
-		ensureInBounds(regionTrack,image.width,image.height);
-
 		initializeData(image);
 		initialLearning(image, regionTrack.tl_x, regionTrack.tl_y);
 	}
@@ -162,8 +146,6 @@ public class CirculantTrackerOrig {
 	protected void initializeData(ImageBase image ) {
 		boolean sizeChange = cosine.width != regionTrack.width || cosine.height != regionTrack.height;
 		if( sizeChange ) {
-			if( regionTrack.width > image.width || regionTrack.height > image.height )
-				throw new IllegalArgumentException("Specified target is larger than the input image!");
 			resizeImages(regionTrack.width, regionTrack.height);
 			computeCosineWindow(cosine);
 			computeGaussianWeights();
@@ -307,8 +289,6 @@ public class CirculantTrackerOrig {
 		// convert peak location into image coordinate system
 		regionTrack.tl_x = regionTrack.tl_x + deltaX;
 		regionTrack.tl_y = regionTrack.tl_y + deltaY;
-
-		ensureInBounds(regionTrack,image.width,image.height);
 
 		regionOut.tl_x = (regionTrack.tl_x+regionTrack.width/2)-regionOut.width/2;
 		regionOut.tl_y = (regionTrack.tl_y+regionTrack.height/2)-regionOut.height/2;
@@ -499,11 +479,15 @@ public class CirculantTrackerOrig {
 	protected void get_subwindow( ImageFloat32 image , int x0 , int y0 , ImageFloat64 output ) {
 		// copy the target
 		for (int y = 0; y < regionTrack.height; y++) {
-			int indexSrc = image.startIndex + (y0 + y) * image.stride + x0;
+			int srcY = y+y0;
 			int indexDst = output.startIndex + y * output.stride;
 
 			for (int x = 0; x < regionTrack.width; x++) {
-				output.data[indexDst++] = image.data[indexSrc++];
+				int srcX = x+x0;
+				if( image.isInBounds(srcX,srcY))
+					output.data[indexDst++] = image.unsafe_get(srcX,srcY);
+				else
+					output.data[indexDst++] = 0;
 			}
 		}
 		// normalize values to be from -0.5 to 0.5
@@ -512,21 +496,6 @@ public class CirculantTrackerOrig {
 		// apply the cosine window to it
 		PixelMath.multiply(output,cosine,output);
 	}
-
-	/**
-	 * Makes sure the specified region is inside the image bounds
-	 */
-	protected static void ensureInBounds( Rectangle2D_I32 region , int imgWidth , int imgHeight ) {
-		if( region.tl_x < 0 )
-			region.tl_x = 0;
-		else if( region.tl_x > imgWidth-region.width )
-			region.tl_x = imgWidth-region.width;
-		if( region.tl_y < 0 )
-			region.tl_y = 0;
-		else if( region.tl_y > imgHeight-region.height )
-			region.tl_y = imgHeight-region.height;
-	}
-
 
 	/**
 	 * The location of the target in the image
