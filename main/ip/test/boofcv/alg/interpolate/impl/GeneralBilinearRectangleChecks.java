@@ -30,6 +30,7 @@ import org.junit.Test;
 import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 
 /**
@@ -90,6 +91,37 @@ public abstract class GeneralBilinearRectangleChecks<T extends ImageSingleBand> 
 		interp.region(width-1, height-1, out );
 	}
 
+
+	/**
+	 * Should produce identical results when given a sub-image.
+	 */
+	@Test
+	public void checkSubImage() {
+		T imgA = createImage(width, height);
+		GImageMiscOps.fillUniform(imgA, rand, 0, 200);
+
+		regionWidth = 20;
+		regionHeight = 25;
+
+		InterpolateRectangle<T> interpA = createRectangleInterpolate();
+		ImageFloat32 outA = new ImageFloat32(regionWidth,regionHeight);
+
+		T imgB = BoofTesting.createSubImageOf(imgA);
+		InterpolateRectangle<T> interpB = createRectangleInterpolate();
+		ImageFloat32 outB = new ImageFloat32(regionWidth,regionHeight);
+
+		interpA.setImage(imgA);
+		interpB.setImage(imgB);
+
+		interpA.region(5.4f, 8.6f, outA );
+		interpB.region(5.4f, 8.6f, outB );
+
+		for (int y = 0; y < regionHeight; y++) {
+			for (int x = 0; x < regionWidth; x++) {
+				assertTrue("( " + x + " , " + y + " )", outA.get(x, y) == outB.get(x, y));
+			}
+		}
+	}
 	/**
 	 * Compare region against the value returned by get ImplBilinearPixel_F32
 	 */
@@ -114,7 +146,6 @@ public abstract class GeneralBilinearRectangleChecks<T extends ImageSingleBand> 
 
 		interp.region(tl_x, tl_y, out );
 
-		int i = 0;
 		for (int y = 0; y < regionHeight; y++) {
 			for (int x = 0; x < regionWidth; x++) {
 				assertEquals("( "+x+" , "+y+" )",interpPt.get(x + tl_x, y + tl_y), out.get(x,y), 1e-4);

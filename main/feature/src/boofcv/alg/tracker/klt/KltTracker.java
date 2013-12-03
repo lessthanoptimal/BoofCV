@@ -119,8 +119,7 @@ public class KltTracker<InputImage extends ImageSingleBand, DerivativeImage exte
 	 * @param derivY Image derivative along the y-axis
 	 */
 	public void setImage(InputImage image, DerivativeImage derivX, DerivativeImage derivY) {
-		if (derivX != null && derivY != null)
-			InputSanityCheck.checkSameShape(image, derivX, derivY);
+		InputSanityCheck.checkSameShape(image, derivX, derivY);
 
 		this.image = image;
 		interpInput.setImage(image);
@@ -141,9 +140,6 @@ public class KltTracker<InputImage extends ImageSingleBand, DerivativeImage exte
 	 */
 	@SuppressWarnings({"SuspiciousNameCombination"})
 	public boolean setDescription(KltFeature feature) {
-		if (derivX == null || derivY == null)
-			throw new IllegalArgumentException("Image derivatives must be set");
-
 		setAllowedBounds(feature);
 
 		if (!isFullyInside(feature.x, feature.y)) {
@@ -159,7 +155,7 @@ public class KltTracker<InputImage extends ImageSingleBand, DerivativeImage exte
 	private boolean internalSetDescription(KltFeature feature) {
 		int regionWidth = feature.radius * 2 + 1;
 		int size = regionWidth * regionWidth;
-		
+
 		float tl_x = feature.x - feature.radius;
 		float tl_y = feature.y - feature.radius;
 
@@ -206,7 +202,7 @@ public class KltTracker<InputImage extends ImageSingleBand, DerivativeImage exte
 				float pixelX = feature.x - feature.radius + x;
 
 				float dX,dY,value;
-				if( interpPixelDX.isInFastBounds(pixelX,pixelY) ) {
+				if( interpPixelI.isInFastBounds(pixelX,pixelY) ) {
 					value = interpPixelI.get_fast(pixelX,pixelY);
 					dX = interpPixelDX.get_fast(pixelX,pixelY);
 					dY = interpPixelDY.get_fast(pixelX,pixelY);
@@ -222,6 +218,8 @@ public class KltTracker<InputImage extends ImageSingleBand, DerivativeImage exte
 				total++;
 				// save the description
 				feature.desc.data[i] = value;
+				feature.derivX.data[i] = dX;
+				feature.derivY.data[i] = dY;
 
 				Gxx += dX * dX;
 				Gyy += dY * dY;
@@ -250,12 +248,8 @@ public class KltTracker<InputImage extends ImageSingleBand, DerivativeImage exte
 	 */
 	public KltTrackFault track(KltFeature feature) {
 
-		// compute the feature's width and temporary storage related to it
-		widthFeature = feature.radius * 2 + 1;
-		lengthFeature = widthFeature * widthFeature;
-
-		// if it starts outside it has a partial description and can't be processed the fast way
-		boolean startedOutside;
+		// precompute bounds and other values
+		setAllowedBounds(feature);
 
 		if (descFeature.data.length < lengthFeature)
 			descFeature.reshape(widthFeature,widthFeature);
@@ -263,14 +257,13 @@ public class KltTracker<InputImage extends ImageSingleBand, DerivativeImage exte
 		// save the original location so that a drifting fault can be detected
 		float origX = feature.x, origY = feature.y;
 
-		setAllowedBounds(feature);
+		// If the feature is complete then the fast code can be used when entirely inside
+		boolean complete = isDescriptionComplete(feature);
 
 		float det = 0;
 
 		// make sure its inside this image
-		if (isFullyInside(feature.x, feature.y)) {
-			startedOutside = false;
-
+		if ( complete ) {
 			// see if the determinant is too small
 			Gxx = feature.Gxx;
 			Gyy = feature.Gyy;
@@ -279,13 +272,11 @@ public class KltTracker<InputImage extends ImageSingleBand, DerivativeImage exte
 			if (det < config.minDeterminant*lengthFeature) {
 				return KltTrackFault.FAILED;
 			}
-		} else {
-			startedOutside = true;
 		}
 
 		for (int iter = 0; iter < config.maxIterations; iter++) {
 			float dx,dy;
-			if( !startedOutside && isFullyInside(feature.x, feature.y) ) {
+			if( complete && isFullyInside(feature.x, feature.y) ) {
 				computeE(feature, feature.x, feature.y);
 			} else {
 				// once it goes outside it must remain outside.  If it starts outside
@@ -326,16 +317,23 @@ public class KltTracker<InputImage extends ImageSingleBand, DerivativeImage exte
 		return KltTrackFault.SUCCESS;
 	}
 
-	private void setAllowedBounds(KltFeature feature) {
-		allowedLeft = feature.radius + config.forbiddenBorder;
-		allowedTop = feature.radius + config.forbiddenBorder;
-		allowedRight = image.width - (feature.radius + config.forbiddenBorder);
-		allowedBottom = image.height - (feature.radius + config.forbiddenBorder);
+	/**
+	 * Precompute image bounds that the feature is allowed inside of
+	 */
+	protected void setAllowedBounds(KltFeature feature) {
+		// compute the feature's width and temporary storage related to it
+		widthFeature = feature.radius * 2 + 1;
+		lengthFeature = widthFeature * widthFeature;
 
-		outsideLeft = -feature.radius + config.forbiddenBorder;
-		outsideTop = -feature.radius + config.forbiddenBorder;
-		outsideRight = image.width + (feature.radius - config.forbiddenBorder);
-		outsideBottom = image.height + (feature.radius - config.forbiddenBorder);
+		allowedLeft = feature.radius;
+		allowedTop = feature.radius;
+		allowedRight = image.width - feature.radius-1;
+		allowedBottom = image.height - feature.radius-1;
+
+		outsideLeft = -feature.radius;
+		outsideTop = -feature.radius;
+		outsideRight = image.width + feature.radius-1;
+		outsideBottom = image.height + feature.radius-1;
 	}
 
 	private float computeError(KltFeature feature) {
@@ -353,7 +351,7 @@ public class KltTracker<InputImage extends ImageSingleBand, DerivativeImage exte
 		return error / total;
 	}
 
-	private void computeE(KltFeature feature, float x, float y) {
+	protected void computeE(KltFeature feature, float x, float y) {
 		// extract the region in the current image
 		interpInput.region(x - feature.radius, y - feature.radius, descFeature);
 
@@ -371,7 +369,7 @@ public class KltTracker<InputImage extends ImageSingleBand, DerivativeImage exte
 	/**
 	 * When part of the region is outside the image G and E need to be recomputed
 	 */
-	private int computeGandE_border(KltFeature feature, float cx, float cy) {
+	protected int computeGandE_border(KltFeature feature, float cx, float cy) {
 		int total = 0;
 
 		Gxx = 0; Gyy = 0; Gxy = 0;
@@ -388,14 +386,10 @@ public class KltTracker<InputImage extends ImageSingleBand, DerivativeImage exte
 				float pixelX = cx - feature.radius + x;
 
 				float dX,dY,value;
-				if( interpPixelDX.isInFastBounds(pixelX,pixelY) ) {
+				if( interpPixelI.isInFastBounds(pixelX,pixelY) ) {
 					value = interpPixelI.get_fast(pixelX,pixelY);
-					dX = interpPixelDX.get_fast(pixelX,pixelY);
-					dY = interpPixelDY.get_fast(pixelX,pixelY);
 				} else if( image.isInBounds((int)pixelX,(int)pixelY)) {
 					value = interpPixelI.get(pixelX,pixelY);
-					dX = interpPixelDX.get(pixelX,pixelY);
-					dY = interpPixelDY.get(pixelX,pixelY);
 				} else {
 					// make this pixel as outside
 					descFeature.data[i] = Float.NaN;
@@ -403,14 +397,18 @@ public class KltTracker<InputImage extends ImageSingleBand, DerivativeImage exte
 				}
 				// save the description
 				descFeature.data[i] = value;
+
 				// count total number of points inbounds
 				total++;
+
+				dX = feature.derivX.data[i];
+				dY = feature.derivY.data[i];
 
 				// compute the difference between the previous and the current image
 				float d = feature.desc.data[i] - value;
 
-				Ex += d * feature.derivX.data[i];
-				Ey += d * feature.derivY.data[i];
+				Ex += d * dX;
+				Ey += d * dY;
 
 				Gxx += dX * dX;
 				Gyy += dY * dY;
@@ -422,24 +420,38 @@ public class KltTracker<InputImage extends ImageSingleBand, DerivativeImage exte
 	}
 
 	/**
+	 * Checks to see if the feature description is complete or if it was created by a feature partially
+	 * outside the image
+	 */
+	public boolean isDescriptionComplete( KltFeature feature ) {
+		for( int i = 0; i < lengthFeature; i++ ) {
+			if( Float.isNaN(feature.desc.data[i]) )
+				return false;
+		}
+		return true;
+	}
+
+	/**
 	 * Returns true if the features is entirely enclosed inside of the image.
 	 */
 	public boolean isFullyInside(float x, float y) {
-		if (x < allowedLeft || x >= allowedRight)
+		if (x < allowedLeft || x > allowedRight)
 			return false;
-		if (y < allowedTop || y >= allowedBottom)
+		if (y < allowedTop || y > allowedBottom)
 			return false;
 
 		return true;
 	}
 
 	/**
-	 * Returns true if the features is entirely outside of the image.
+	 * Returns true if the features is entirely outside of the image.  A region is entirely outside if not
+	 * an entire pixel is contained inside the image.  So if only  0.999 of a pixel is inside then the whole
+	 * region is considered to be outside.  Can't interpolate nothing...
 	 */
 	public boolean isFullyOutside(float x, float y) {
-		if (x < outsideLeft || x >= outsideRight)
+		if (x < outsideLeft || x > outsideRight)
 			return true;
-		if (y < outsideTop || y >= outsideBottom)
+		if (y < outsideTop || y > outsideBottom)
 			return true;
 
 		return false;
