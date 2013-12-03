@@ -20,6 +20,7 @@ package boofcv.abst.feature.tracker;
 
 import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
+import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.interpolate.InterpolateRectangle;
 import boofcv.alg.tracker.klt.KltConfig;
 import boofcv.alg.tracker.klt.KltTrackFault;
@@ -54,9 +55,13 @@ public class PointTrackerTwoPassKltPyramid<I extends ImageSingleBand,D extends I
 										 GeneralFeatureDetector<I, D> detector,
 										 ImageGradient<I, D> gradient,
 										 InterpolateRectangle<I> interpInput,
-										 InterpolateRectangle<D> interpDeriv )
+										 InterpolateRectangle<D> interpDeriv,
+										 InterpolatePixelS<I> interpPixelI,
+										 InterpolatePixelS<D> interpPixelDX,
+										 InterpolatePixelS<D> interpPixelDY)
 	{
-		super(config, templateRadius, pyramid , detector, gradient, interpInput, interpDeriv, gradient.getDerivType());
+		super(config, templateRadius, pyramid , detector, gradient, interpInput, interpDeriv,
+				interpPixelI,interpPixelDX,interpPixelDY,gradient.getDerivType());
 	}
 
 	@Override

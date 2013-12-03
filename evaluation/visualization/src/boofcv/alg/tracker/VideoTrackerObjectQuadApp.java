@@ -233,14 +233,11 @@ public class VideoTrackerObjectQuadApp<I extends ImageSingleBand>
 	public void changeInput(String name, int index) {
 		processedInputImage = false;
 
-		String videoName = inputRefs.get(index).getPath();
-
-		int indexDot = videoName.lastIndexOf('.');
-		String path = videoName.substring(0,indexDot);
+		String path = inputRefs.get(index).getPath();
 
 		parseQuad(path+"_rect.txt");
 
-		SimpleImageSequence<MultiSpectral<I>> video = media.openVideo(videoName, ImageType.ms(3, imageClass));
+		SimpleImageSequence<MultiSpectral<I>> video = media.openVideo(path+".mjpeg", ImageType.ms(3, imageClass));
 
 		process(video);
 	}
