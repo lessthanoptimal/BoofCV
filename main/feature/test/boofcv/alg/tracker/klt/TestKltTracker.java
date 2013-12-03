@@ -29,6 +29,8 @@ import boofcv.struct.image.ImageFloat32;
 import boofcv.testing.BoofTesting;
 import org.junit.Test;
 
+import java.util.Random;
+
 import static org.junit.Assert.*;
 
 /**
@@ -36,137 +38,163 @@ import static org.junit.Assert.*;
  */
 public class TestKltTracker {
 
+	Random rand = new Random(234);
+
 	int imageWidth = 40;
 	int imageHeight = 50;
 
-	ImageFloat32 image;
-	ImageFloat32 derivX;
-	ImageFloat32 derivY;
+	ImageFloat32 image = new ImageFloat32(imageWidth, imageHeight);
+	ImageFloat32 derivX = new ImageFloat32(imageWidth, imageHeight);
+	ImageFloat32 derivY = new ImageFloat32(imageWidth, imageHeight);
 
 	/**
-	 * Create an artificial image with a corner and create a feature over the corner.  Then move the corner and
-	 * see if the KLT tracker can accurate track that feature.
+	 * Process the same features in two different sets of image.  only difference is that one is a sub image
+	 * results should be identical
 	 */
 	@Test
-	public void testCornerTracking() {
+	public void testSubImages() {
 
-		checkMovementSub(3, 0, 0);
-		checkMovementSub(3, 1, 0);
-		checkMovementSub(3, -1, 0);
-		checkMovementSub(3, 0, 1);
-		checkMovementSub(3, 0, -1);
-		checkMovementSub(3, 1, 1);
-		checkMovementSub(3, -1, -1);
-		checkMovementSub(3, 2, 2);
-		checkMovementSub(3, -2, -2);
-		checkMovementSub(3, 2, -2);
-		checkMovementSub(3, -2, 2);
+		ImageMiscOps.fillUniform(image, rand, 0, 100);
+		GradientSobel.process(image, derivX, derivY, new ImageBorder1D_F32(BorderIndex1D_Extend.class));
 
-		checkMovementSub(2, -1, 1);
+		KltTracker<ImageFloat32, ImageFloat32> trackerA = createDefaultTracker();
+		trackerA.setImage(image, derivX, derivY);
+
+		KltTracker<ImageFloat32, ImageFloat32> trackerB = createDefaultTracker();
+		ImageFloat32 image = BoofTesting.createSubImageOf(this.image);
+		ImageFloat32 derivX = BoofTesting.createSubImageOf(this.derivX);
+		ImageFloat32 derivY = BoofTesting.createSubImageOf(this.derivY);
+		trackerB.setImage(image, derivX, derivY);
+
+		for( int y = 0; y < imageHeight; y += 4) {
+			for( int x = 0; x < imageWidth; x += 4) {
+				KltFeature featureA = new KltFeature(3);
+				KltFeature featureB = new KltFeature(3);
+
+				featureA.setPosition(x,y);
+				featureB.setPosition(x,y);
+
+				trackerA.setDescription(featureA);
+				trackerB.setDescription(featureB);
+
+				float dx = rand.nextFloat()*2-1;
+				float dy = rand.nextFloat()*2-1;
+
+				featureA.setPosition(x+dx,y+dy);
+				featureB.setPosition(x+dx,y+dy);
+
+				KltTrackFault faultA = trackerA.track(featureA);
+				KltTrackFault faultB = trackerB.track(featureB);
+
+				assertTrue(faultA == faultB);
+
+				if( x == 4 )
+					System.out.println();
+
+				if( faultA == KltTrackFault.SUCCESS ) {
+					assertTrue(x+" "+y,featureA.x == featureB.x);
+					assertTrue(x+" "+y,featureA.y == featureB.y);
+				}
+			}
+		}
+
 	}
 
 	/**
-	 * Check its ability to estimate the feature's motion for regular and sub-images
+	 * Create a description of a feature next to the border then place the feature just outside of the image
+	 * and see if it can track to its original position.
 	 */
-	private void checkMovementSub(int radius, int deltaX, int deltaY) {
-		image = new ImageFloat32(imageWidth, imageHeight);
-		derivX = new ImageFloat32(imageWidth, imageHeight);
-		derivY = new ImageFloat32(imageWidth, imageHeight);
+	@Test
+	public void testTracking_border1() {
 
-		checkMovement(radius, deltaX, deltaY);
-
-		image = BoofTesting.createSubImageOf(image);
-		derivX = BoofTesting.createSubImageOf(derivX);
-		derivY = BoofTesting.createSubImageOf(derivY);
-
-		checkMovement(radius, deltaX, deltaY);
-	}
-
-	/**
-	 * Estimate the feature's motion
-	 *
-	 * @param radius feature's radius
-	 * @param deltaX motion in x direction
-	 * @param deltaY motion in y direction
-	 */
-	private void checkMovement(int radius, int deltaX, int deltaY) {
-		ImageMiscOps.fill(image, 0);
-		ImageMiscOps.fillRectangle(image, 100, 20, 20, imageWidth-20, imageHeight-20);
+		ImageMiscOps.fillUniform(image,rand,0,100);
 		GradientSobel.process(image, derivX, derivY, new ImageBorder1D_F32(BorderIndex1D_Extend.class));
 
 		KltTracker<ImageFloat32, ImageFloat32> tracker = createDefaultTracker();
 		tracker.setImage(image, derivX, derivY);
-		KltFeature feature = new KltFeature(radius);
+		KltFeature feature = new KltFeature(3);
 
-		// put a feature right on the corner
-		feature.setPosition(20, 20);
+		// lower right border, but fully inside the image
+		feature.setPosition(imageWidth-4, imageHeight-4);
 		tracker.setDescription(feature);
+		// put it partially outside the image
+		feature.setPosition(imageWidth-2, imageHeight-1);
 
-		// move the rectangle a bit
-		ImageMiscOps.fill(image, 0);
-		ImageMiscOps.fillRectangle(image, 100, 20 + deltaX, 20 + deltaY, imageWidth, imageHeight);
-		GradientSobel.process(image, derivX, derivY, new ImageBorder1D_F32(BorderIndex1D_Extend.class));
-
-		// update the feature's position
-		tracker.setImage(image, derivX, derivY);
+		// see if it got sucked back
 		assertTrue(tracker.track(feature) == KltTrackFault.SUCCESS);
+		assertEquals(imageWidth-4,feature.x,0.01);
+		assertEquals(imageHeight-4,feature.y,0.01);
 
-		// see if it moved with the corner
-		assertEquals(20 + deltaX, feature.x, 0.1f);
-		assertEquals(20 + deltaY, feature.y, 0.1f);
+		// same thing but with the top left image
+		feature.setPosition(3, 3);
+		tracker.setDescription(feature);
+		// put it partially outside the image
+		feature.setPosition(1, 2);
+
+		// see if it got sucked back
+		assertTrue(tracker.track(feature) == KltTrackFault.SUCCESS);
+		assertEquals(3,feature.x,0.01);
+		assertEquals(3,feature.y,0.01);
 	}
 
+	/**
+	 * Place a feature on the border then put it inside the image.  See if it moves towards the border
+	 */
 	@Test
-	public void addBorderCases() {
+	public void testTracking_border2() {
+		ImageMiscOps.fillUniform(image,rand,0,100);
+		GradientSobel.process(image, derivX, derivY, new ImageBorder1D_F32(BorderIndex1D_Extend.class));
+
+		KltTracker<ImageFloat32, ImageFloat32> tracker = createDefaultTracker();
+		tracker.setImage(image, derivX, derivY);
+		KltFeature feature = new KltFeature(3);
+
+		// just outside the image
+		feature.setPosition(imageWidth-3-1+2, imageHeight-3-1+1);
+		tracker.setDescription(feature);
+		// now fuly inside the image
+		feature.setPosition(imageWidth-3-1, imageHeight-3-1);
+
+		// see if it got sucked back
+		assertTrue(tracker.track(feature) == KltTrackFault.SUCCESS);
+		assertEquals(imageWidth-3-1+2,feature.x,0.01);
+		assertEquals(imageHeight-3-1+1,feature.y,0.01);
+
+		// same thing but with the top left image
+		feature.setPosition(2, 1);
+		tracker.setDescription(feature);
+		// put it fully inside the image
+		feature.setPosition(3, 3);
+
+		// see if it got sucked back
+		assertTrue(tracker.track(feature) == KltTrackFault.SUCCESS);
+		assertEquals(2,feature.x,0.01);
+		assertEquals(1,feature.y,0.01);
+	}
+
+	/**
+	 * Set description should fail if a feature is entirely outside the image
+	 */
+	@Test
+	public void setDescription_outsideFail() {
 		fail("implement");
 	}
 
 	/**
-	 * Make sure it uses the
+	 * Compares the border algorithm to the inner algorithm
 	 */
 	@Test
-	public void testBorder() {
-		image = new ImageFloat32(imageWidth, imageHeight);
-		derivX = new ImageFloat32(imageWidth, imageHeight);
-		derivY = new ImageFloat32(imageWidth, imageHeight);
+	public void setDescription_compare() {
 
-		KltTracker<ImageFloat32, ImageFloat32> tracker = createDefaultTracker();
-		tracker.setImage(image, derivX, derivY);
-		KltFeature feature = new KltFeature(2);
-
-		// put a feature right on the corner
-		feature.setPosition(imageWidth/2, imageHeight/2);
-		tracker.setDescription(feature);
-
-		// this should make the feature be out of bounds
-		tracker.getConfig().forbiddenBorder=10000;
-
-		// update the feature's position
-		tracker.setImage(image, derivX, derivY);
-		assertTrue(tracker.track(feature) == KltTrackFault.OUT_OF_BOUNDS);
+		fail("implement");
 	}
 
 	/**
-	 * Passes in a feature which is out of bands and sees if a fault happens.
+	 * When placed outside the image pixels should be NaN
 	 */
 	@Test
-	public void handleOutOfBounds() {
-		image = new ImageFloat32(imageWidth, imageHeight);
-		derivX = new ImageFloat32(imageWidth, imageHeight);
-		derivY = new ImageFloat32(imageWidth, imageHeight);
-
-		KltTracker<ImageFloat32, ImageFloat32> tracker = createDefaultTracker();
-		tracker.setImage(image, derivX, derivY);
-		KltFeature feature = new KltFeature(2);
-
-		// put a feature right on the corner
-		feature.setPosition(imageWidth/2, imageHeight/2);
-		tracker.setDescription(feature);
-		feature.setPosition(imageWidth, imageHeight);
-
-		// update the feature's position
-		tracker.setImage(image, derivX, derivY);
-		assertTrue(tracker.track(feature) == KltTrackFault.OUT_OF_BOUNDS);
+	public void setDescription_borderNaN() {
+		fail("implement");
 	}
 
 	/**
@@ -174,9 +202,6 @@ public class TestKltTracker {
 	 */
 	@Test
 	public void detectBadFeature() {
-		image = new ImageFloat32(imageWidth, imageHeight);
-		derivX = new ImageFloat32(imageWidth, imageHeight);
-		derivY = new ImageFloat32(imageWidth, imageHeight);
 		KltTracker<ImageFloat32, ImageFloat32> tracker = createDefaultTracker();
 		tracker.setImage(image, derivX, derivY);
 		KltFeature feature = new KltFeature(2);
@@ -190,19 +215,117 @@ public class TestKltTracker {
 		assertTrue(tracker.track(feature) != KltTrackFault.SUCCESS);
 	}
 
+	@Test
+	public void compare_computeGandE_border_toInsideImage() {
+		ImageMiscOps.fillUniform(image,rand,0,100);
+		GradientSobel.process(image, derivX, derivY, new ImageBorder1D_F32(BorderIndex1D_Extend.class));
+
+		KltTracker<ImageFloat32, ImageFloat32> tracker = createDefaultTracker();
+		tracker.setImage(image, derivX, derivY);
+		KltFeature feature = new KltFeature(2);
+
+		feature.setPosition(20, 22);
+		tracker.setDescription(feature);
+		tracker.descFeature.reshape(5,5);
+		// need to compute E from a shifted location or else it will be zero
+		tracker.computeE(feature,21,23);
+
+		float expectedGxx = feature.Gxx;
+		float expectedGxy = feature.Gxy;
+		float expectedGyy = feature.Gyy;
+		float expectedEx = tracker.Ex;
+		float expectedEy = tracker.Ey;
+
+		assertTrue( 0 != expectedGxx );
+		assertTrue( 0 != expectedEy );
+
+		assertEquals(25,tracker.computeGandE_border(feature,20,22));
+
+		assertEquals(expectedGxx,tracker.Gxx,1e-8);
+		assertEquals(expectedGxy,tracker.Gxy,1e-8);
+		assertEquals(expectedGyy,tracker.Gyy,1e-8);
+
+		assertEquals(25,tracker.computeGandE_border(feature,21,23));
+		assertEquals(expectedEx,tracker.Ex,1e-8);
+		assertEquals(expectedEy,tracker.Ey,1e-8);
+	}
+
+	@Test
+	public void isDescriptionComplete() {
+		KltTracker<ImageFloat32, ImageFloat32> tracker = createDefaultTracker();
+
+		KltFeature f = new KltFeature(2);
+		tracker.lengthFeature = 25;
+
+		assertTrue(tracker.isDescriptionComplete(f));
+
+		for( int i = 0; i < f.desc.data.length; i++ ) {
+			f.desc.data[i] = Float.NaN;
+			assertFalse(tracker.isDescriptionComplete(f));
+			f.desc.data[i] = 0;
+			assertTrue(tracker.isDescriptionComplete(f));
+		}
+	}
+
+	@Test
+	public void isFullyInside() {
+		KltTracker<ImageFloat32, ImageFloat32> tracker = createDefaultTracker();
+
+		KltFeature f = new KltFeature(2);
+
+		tracker.image = new ImageFloat32(imageWidth,imageHeight);
+		tracker.setAllowedBounds(f);
+
+		assertTrue(tracker.isFullyInside(imageWidth/2,imageHeight/2));
+		assertTrue(tracker.isFullyInside(2,2));
+		assertTrue(tracker.isFullyInside(imageWidth-3,imageHeight-3));
+
+		// check border cases
+		assertFalse(tracker.isFullyInside(1.99f,imageHeight/2));
+		assertFalse(tracker.isFullyInside(imageWidth/2f,1.99f));
+		assertFalse(tracker.isFullyInside(imageWidth-2.99f,imageHeight-3));
+		assertFalse(tracker.isFullyInside(imageWidth-3,imageHeight-2.99f));
+
+		// negative numbers
+		assertFalse(tracker.isFullyInside(-imageWidth/2,imageHeight/2));
+		assertFalse(tracker.isFullyInside(imageWidth/2,-imageHeight/2));
+	}
+
+	@Test
+	public void isFullyOutside() {
+		KltTracker<ImageFloat32, ImageFloat32> tracker = createDefaultTracker();
+
+		int r = 2;
+		KltFeature f = new KltFeature(r);
+
+		tracker.image = new ImageFloat32(imageWidth,imageHeight);
+		tracker.setAllowedBounds(f);
+
+		assertFalse(tracker.isFullyOutside(-r,-r));
+		assertFalse(tracker.isFullyOutside(imageWidth/2,imageHeight/2));
+		assertFalse(tracker.isFullyOutside(imageWidth+r-1,imageHeight+r-1));
+
+		assertTrue(tracker.isFullyOutside(imageWidth/2,1000));
+		assertTrue(tracker.isFullyOutside(1000,imageHeight/2));
+		assertTrue(tracker.isFullyOutside(-r-0.001f,-r));
+		assertTrue(tracker.isFullyOutside(-r,-r-0.001f));
+		assertTrue(tracker.isFullyOutside(imageWidth+r-0.999f,imageHeight+r-1));
+		assertTrue(tracker.isFullyOutside(imageWidth+r-1,imageHeight+r-0.999f));
+	}
+
 	public static KltTracker<ImageFloat32, ImageFloat32> createDefaultTracker() {
 		KltConfig config = new KltConfig();
-		config.forbiddenBorder = 1;
 		config.maxPerPixelError = 10;
 		config.maxIterations = 30;
 		config.minDeterminant = 0.01f;
-		config.minPositionDelta = 0.01f;
+		config.minPositionDelta = 0.001f;
 
-		InterpolateRectangle<ImageFloat32> interp = FactoryInterpolation.bilinearRectangle(ImageFloat32.class);
+		InterpolateRectangle<ImageFloat32> interp1 = FactoryInterpolation.bilinearRectangle(ImageFloat32.class);
+		InterpolateRectangle<ImageFloat32> interp2 = FactoryInterpolation.bilinearRectangle(ImageFloat32.class);
 		InterpolatePixelS<ImageFloat32> interpI = FactoryInterpolation.bilinearPixelS(ImageFloat32.class);
 		InterpolatePixelS<ImageFloat32> interpDx = FactoryInterpolation.bilinearPixelS(ImageFloat32.class);
 		InterpolatePixelS<ImageFloat32> interpDy = FactoryInterpolation.bilinearPixelS(ImageFloat32.class);
 
-		return new KltTracker<ImageFloat32, ImageFloat32>(interp, interp,interpI,interpDx,interpDy, config);
+		return new KltTracker<ImageFloat32, ImageFloat32>(interp1, interp2,interpI,interpDx,interpDy, config);
 	}
 }
