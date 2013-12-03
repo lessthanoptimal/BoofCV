@@ -19,6 +19,7 @@
 package boofcv.alg.tracker.klt;
 
 import boofcv.alg.filter.derivative.GradientSobel;
+import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.interpolate.InterpolateRectangle;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.core.image.border.BorderIndex1D_Extend;
@@ -28,8 +29,7 @@ import boofcv.struct.image.ImageFloat32;
 import boofcv.testing.BoofTesting;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * @author Peter Abeles
@@ -116,6 +116,11 @@ public class TestKltTracker {
 		assertEquals(20 + deltaY, feature.y, 0.1f);
 	}
 
+	@Test
+	public void addBorderCases() {
+		fail("implement");
+	}
+
 	/**
 	 * Make sure it uses the
 	 */
@@ -194,7 +199,10 @@ public class TestKltTracker {
 		config.minPositionDelta = 0.01f;
 
 		InterpolateRectangle<ImageFloat32> interp = FactoryInterpolation.bilinearRectangle(ImageFloat32.class);
+		InterpolatePixelS<ImageFloat32> interpI = FactoryInterpolation.bilinearPixelS(ImageFloat32.class);
+		InterpolatePixelS<ImageFloat32> interpDx = FactoryInterpolation.bilinearPixelS(ImageFloat32.class);
+		InterpolatePixelS<ImageFloat32> interpDy = FactoryInterpolation.bilinearPixelS(ImageFloat32.class);
 
-		return new KltTracker<ImageFloat32, ImageFloat32>(interp, interp, config);
+		return new KltTracker<ImageFloat32, ImageFloat32>(interp, interp,interpI,interpDx,interpDy, config);
 	}
 }

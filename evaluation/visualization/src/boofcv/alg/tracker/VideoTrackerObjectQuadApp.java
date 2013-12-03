@@ -298,6 +298,8 @@ public class VideoTrackerObjectQuadApp<I extends ImageSingleBand>
 
 		java.util.List<PathLabel> inputs = new ArrayList<PathLabel>();
 		inputs.add(new PathLabel("snow_follow_car", "../data/applet/tracking/snow_follow_car"));
+		inputs.add(new PathLabel("day_follow_car", "../data/applet/tracking/day_follow_car"));
+		inputs.add(new PathLabel("night_follow_car", "../data/applet/tracking/night_follow_car"));
 		inputs.add(new PathLabel("track_book", "../data/applet/tracking/track_book"));
 		inputs.add(new PathLabel("track_peter", "../data/applet/tracking/track_peter"));
 		inputs.add(new PathLabel("chipmunk", "../data/applet/tracking/chipmunk"));
