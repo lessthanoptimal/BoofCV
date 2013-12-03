@@ -74,9 +74,11 @@ Version : Alpha 0.16
 - ImplConvertBitmap incorrectly converted floating point images
   * Was doing an integer divide instead of a floating point divide
   * Thanks Vagoster for reporting the bug
+- KLT can now handle features which extend outside the image border
+  * It only tracks using part of the feature which is inside the image
 
 - TODO Chessboard calibration doesn't reject bad calibration points after sub-pixel
-- TODO improve KLT edge handling
+- TODO improve KLT edge handling -> Make faster by using rect region interpolation only
 - TODO automate high level tests
    * Move SURFPerformance into ValidationBoof
    * Create logs for BoofCV performance

@@ -74,8 +74,8 @@ import java.util.List;
  * </p>
  *
  * <p>
- * [1] Herbert Bay, Andreas Ess, Tinne Tuytelaars, and Luc Van Gool, "Speeded-Up Robust Features (SURF)", CVIU June, 2008, Volume
- * 110, Issue 3, pages 346-359
+ * [1] Herbert Bay, Andreas Ess, Tinne Tuytelaars, and Luc Van Gool, "Speeded-Up Robust Features (SURF)",
+ * CVIU June, 2008, Volume 110, Issue 3, pages 346-359
  * </p>
  *
  * @see boofcv.factory.feature.detect.interest.FactoryInterestPoint

@@ -21,6 +21,7 @@ package boofcv.alg.tracker;
 import boofcv.abst.tracker.ConfigCirculantTracker;
 import boofcv.alg.tracker.circulant.CirculantTracker;
 import boofcv.factory.tracker.FactoryTrackerObjectAlgs;
+import boofcv.gui.image.ShowImages;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.wrapper.DefaultMediaManager;
 import boofcv.struct.image.ImageSingleBand;
@@ -59,11 +60,11 @@ public class VisualizeCirculantTrackerApp<T extends ImageSingleBand>
 
 		image = sequence.next();
 		gui.setFrame((BufferedImage) sequence.getGuiImage());
-//		ShowImages.showWindow(gui, "Circulant Tracker");
+		ShowImages.showWindow(gui, "Circulant Tracker");
 
-		tracker.initialize(image,273,156,358-273,293-156);
+//		tracker.initialize(image,273,156,358-273,293-156);
 
-		paused = false;
+		paused = true;
 
 		while( paused ) {
 			Thread.yield();
@@ -115,7 +116,7 @@ public class VisualizeCirculantTrackerApp<T extends ImageSingleBand>
 		VisualizeCirculantTrackerApp app = new VisualizeCirculantTrackerApp<ImageUInt8>(ImageUInt8.class);
 
 //		String fileName = "../data/applet/trackzing/track_peter.mjpeg";
-		String fileName = "../data/applet/tracking/track_book.mjpeg";
+		String fileName = "../data/applet/tracking/day_follow_car.mjpeg";
 
 		SimpleImageSequence<ImageUInt8> sequence = DefaultMediaManager.INSTANCE.
 				openVideo(fileName, ImageType.single(ImageUInt8.class));

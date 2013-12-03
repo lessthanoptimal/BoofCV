@@ -36,6 +36,7 @@ import boofcv.struct.pyramid.ImagePyramid;
  *
  * @author Peter Abeles
  */
+// TODO change behavior to allow tracks along the image border
 public class PyramidKltTracker<InputImage extends ImageSingleBand, DerivativeImage extends ImageSingleBand> {
 
 	// basic KLT tracker which works on a single image
