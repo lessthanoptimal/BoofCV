@@ -233,11 +233,14 @@ public class VideoTrackerObjectQuadApp<I extends ImageSingleBand>
 	public void changeInput(String name, int index) {
 		processedInputImage = false;
 
-		String path = inputRefs.get(index).getPath();
+		String videoName = inputRefs.get(index).getPath();
+
+		int indexDot = videoName.lastIndexOf('.');
+		String path = videoName.substring(0,indexDot);
 
 		parseQuad(path+"_rect.txt");
 
-		SimpleImageSequence<MultiSpectral<I>> video = media.openVideo(path+".mjpeg", ImageType.ms(3, imageClass));
+		SimpleImageSequence<MultiSpectral<I>> video = media.openVideo(videoName, ImageType.ms(3, imageClass));
 
 		process(video);
 	}
@@ -297,10 +300,12 @@ public class VideoTrackerObjectQuadApp<I extends ImageSingleBand>
 		VideoTrackerObjectQuadApp app = new VideoTrackerObjectQuadApp(type);
 
 		java.util.List<PathLabel> inputs = new ArrayList<PathLabel>();
-		inputs.add(new PathLabel("snow_follow_car", "../data/applet/tracking/snow_follow_car"));
-		inputs.add(new PathLabel("track_book", "../data/applet/tracking/track_book"));
-		inputs.add(new PathLabel("track_peter", "../data/applet/tracking/track_peter"));
-		inputs.add(new PathLabel("chipmunk", "../data/applet/tracking/chipmunk"));
+		inputs.add(new PathLabel("track_book", "../data/applet/tracking/track_book.mjpeg"));
+		inputs.add(new PathLabel("track_peter", "../data/applet/tracking/track_peter.mjpeg"));
+		inputs.add(new PathLabel("chipmunk", "../data/applet/tracking/chipmunk.mjpeg"));
+		inputs.add(new PathLabel("Driving Snow", "../data/applet/tracking/snow_follow_car.mjpeg"));
+		inputs.add(new PathLabel("Driving Night", "../data/applet/tracking/night_follow_car.mjpeg"));
+		inputs.add(new PathLabel("Driving Day", "../data/applet/tracking/day_follow_car.mjpeg"));
 
 		app.setInputList(inputs);
 
