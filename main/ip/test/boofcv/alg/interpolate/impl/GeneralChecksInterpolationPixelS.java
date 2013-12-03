@@ -187,4 +187,29 @@ public abstract class GeneralChecksInterpolationPixelS< T extends ImageSingleBan
 			}
 		}
 	}
+
+	/**
+	 * Should produce identical results when given a sub-image.
+	 */
+	@Test
+	public void checkSubImage() {
+		T imgA = createImage(30, 40);
+		GImageMiscOps.fillUniform(imgA, rand, 0, 100);
+
+		InterpolatePixelS<T> interpA = wrap(imgA, 0, 100);
+
+		T imgB = BoofTesting.createSubImageOf(imgA);
+		InterpolatePixelS<T> interpB = wrap(imgB, 0, 100);
+
+		for (int y = 0; y < 40; y++) {
+			for (int x = 0; x < 30; x++) {
+
+				float dx = rand.nextFloat()*2-1f;
+				float dy = rand.nextFloat()*2-1f;
+
+
+				assertTrue("( " + x + " , " + y + " )", interpA.get(x + dx, y + dy) == interpB.get(x + dx, y + dy));
+			}
+		}
+	}
 }
