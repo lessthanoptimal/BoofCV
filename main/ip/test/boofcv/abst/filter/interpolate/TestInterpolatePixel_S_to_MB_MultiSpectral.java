@@ -61,12 +61,18 @@ public class TestInterpolatePixel_S_to_MB_MultiSpectral {
 		float vals[] = new float[2];
 		for( int y = 0; y < height; y++ ) {
 			for( int x = 0; x < width; x++ ) {
-				alg.get(x+0.5f,y+0.5f,vals);
+				float xx = (rand.nextFloat()-0.5f) + x;
+				float yy = (rand.nextFloat()-0.5f) + y;
+
+				if( xx < 0 ) xx = 0; else if( xx > width-1) xx = width-1;
+				if( yy < 0 ) yy = 0; else if( yy > height-1) yy = height-1;
+
+				alg.get(xx,yy,vals);
 
 				interpA.setImage(image0);
-				float expected0 = interpA.get(x+0.5f,y+0.5f);
+				float expected0 = interpA.get(xx,yy);
 				interpA.setImage(image1);
-				float expected1 = interpA.get(x+0.5f,y+0.5f);
+				float expected1 = interpA.get(xx,yy);
 
 				assertEquals(expected0,vals[0],1e-4);
 				assertEquals(expected1,vals[1],1e-4);

@@ -393,7 +393,7 @@ public class KltTracker<InputImage extends ImageSingleBand, DerivativeImage exte
 				float dX,dY,value;
 				if( interpPixelI.isInFastBounds(pixelX,pixelY) ) {
 					value = interpPixelI.get_fast(pixelX,pixelY);
-				} else if( image.isInBounds((int)pixelX,(int)pixelY)) {
+				} else if( BoofMiscOps.checkInside(image, pixelX, pixelY)) {
 					value = interpPixelI.get(pixelX,pixelY);
 				} else {
 					// make this pixel as outside

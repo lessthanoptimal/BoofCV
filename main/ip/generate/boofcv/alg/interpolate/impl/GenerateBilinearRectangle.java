@@ -114,6 +114,9 @@ public class GenerateBilinearRectangle extends CodeGeneratorBase {
 				"\n" +
 				"\t@Override\n" +
 				"\tpublic void region(float tl_x, float tl_y, ImageFloat32 output ) {\n" +
+				"\t\tif( tl_x < 0 || tl_y < 0 || tl_x + output.width > orig.width || tl_y + output.height > orig.height ) {\n" +
+				"\t\t\tthrow new IllegalArgumentException(\"Region is outside of the image\");\n" +
+				"\t\t}\n" +
 				"\t\tint xt = (int) tl_x;\n" +
 				"\t\tint yt = (int) tl_y;\n" +
 				"\t\tfloat ax = tl_x - xt;\n" +
