@@ -42,6 +42,9 @@ import java.util.List;
 public class PointTrackerKltPyramid<I extends ImageSingleBand,D extends ImageSingleBand>
 		implements PointTracker<I>
 {
+	// reference to input image
+	protected I input;
+
 	// Updates the image pyramid's gradient.
 	protected ImageGradient<I,D> gradient;
 
@@ -143,9 +146,14 @@ public class PointTrackerKltPyramid<I extends ImageSingleBand,D extends ImageSin
 	 * @return the new track if successful or null if no new track could be created
 	 */
 	public PointTrack addTrack( double x , double y ) {
+		if( !input.isInBounds((int)x,(int)y))
+			return null;
+
 		// grow the number of tracks if needed
 		if( unused.isEmpty() )
 			addTrackToUnused();
+
+		// TODO make sure the feature is inside the image
 
 		PyramidKltFeature t = unused.remove(unused.size() - 1);
 		t.setPosition((float)x,(float)y);
@@ -166,7 +174,7 @@ public class PointTrackerKltPyramid<I extends ImageSingleBand,D extends ImageSin
 	public void spawnTracks() {
 		spawned.clear();
 
-		// used to convert it from the scale if the bottom layer into the original image
+		// used to convert it from the scale of the bottom layer into the original image
 		float scaleBottom = (float) basePyramid.getScale(0);
 
 		// exclude active tracks
@@ -229,9 +237,11 @@ public class PointTrackerKltPyramid<I extends ImageSingleBand,D extends ImageSin
 
 	@Override
 	public void process(I image) {
+		this.input = image;
+
 		spawned.clear();
 		dropped.clear();
-		
+
 		// update image pyramids
 		basePyramid.process(image);
 		if( derivX == null ) {
@@ -247,12 +257,20 @@ public class PointTrackerKltPyramid<I extends ImageSingleBand,D extends ImageSin
 			PyramidKltFeature t = active.get(i);
 			KltTrackFault ret = tracker.track(t);
 
+			boolean success = false;
+
 			if( ret == KltTrackFault.SUCCESS ) {
-				tracker.setDescription(t);
-				PointTrack p = t.getCookie();
-				p.set(t.x,t.y);
-				i++;
-			} else {
+				// discard a track if its center drifts outside the image.
+				if( image.isInBounds((int)t.x,(int)t.y)) {
+					tracker.setDescription(t);
+					PointTrack p = t.getCookie();
+					p.set(t.x,t.y);
+					i++;
+					success = true;
+				}
+			}
+
+			if( !success ) {
 				active.remove(i);
 				dropped.add( t );
 				unused.add( t );

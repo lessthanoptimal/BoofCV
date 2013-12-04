@@ -66,6 +66,8 @@ public class PointTrackerTwoPassKltPyramid<I extends ImageSingleBand,D extends I
 
 	@Override
 	public void process(I image) {
+		this.input = image;
+
 		finishedTracking = false;
 		spawned.clear();
 		dropped.clear();
@@ -92,11 +94,19 @@ public class PointTrackerTwoPassKltPyramid<I extends ImageSingleBand,D extends I
 			PyramidKltFeature t = originalActive.get(i);
 			KltTrackFault ret = tracker.track(t);
 
+			boolean success = false;
+
 			if( ret == KltTrackFault.SUCCESS ) {
-				active.add(t);
-				PointTrack p = t.getCookie();
-				p.set(t.x,t.y);
-			} else {
+				// discard a track if its center drifts outside the image.
+				if( image.isInBounds((int)t.x,(int)t.y)) {
+					active.add(t);
+					PointTrack p = t.getCookie();
+					p.set(t.x,t.y);
+					success = true;
+				}
+			}
+
+			if( !success ) {
 				candidateDrop.add(t);
 			}
 		}
@@ -111,11 +121,18 @@ public class PointTrackerTwoPassKltPyramid<I extends ImageSingleBand,D extends I
 			PyramidKltFeature t = originalActive.get(i);
 			KltTrackFault ret = tracker.track(t);
 
+			boolean success = false;
+
 			if( ret == KltTrackFault.SUCCESS ) {
-				active.add(t);
-				PointTrack p = t.getCookie();
-				p.set(t.x,t.y);
-			} else {
+				// discard a track if its center drifts outside the image.
+				if( input.isInBounds((int)t.x,(int)t.y)) {
+					active.add(t);
+					PointTrack p = t.getCookie();
+					p.set(t.x,t.y);
+					success = true;
+				}
+			}
+			if( !success) {
 				candidateDrop.add(t);
 			}
 		}

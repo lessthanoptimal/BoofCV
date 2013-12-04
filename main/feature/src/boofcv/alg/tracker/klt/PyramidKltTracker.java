@@ -29,14 +29,11 @@ import boofcv.struct.pyramid.ImagePyramid;
  * </p>
  *
  * <p>
- * Features are tracked at the lowest layer in the pyramid which can contain the feature.  If a feature is contained
- * or not is defined by the basic tracker provided to the pyramid tracker.  In other words, if this tracker can handle
- * partial features then so can the pyramid tracker.
+ * Tracking is allowed along the image border.  A track is dropped if the smallest track is outside the image.
  * </p>
  *
  * @author Peter Abeles
  */
-// TODO change behavior to allow tracks along the image border
 public class PyramidKltTracker<InputImage extends ImageSingleBand, DerivativeImage extends ImageSingleBand> {
 
 	// basic KLT tracker which works on a single image
@@ -59,7 +56,6 @@ public class PyramidKltTracker<InputImage extends ImageSingleBand, DerivativeIma
 	 * @return true if there was sufficient information to create a feature or false if not
 	 */
 	public boolean setDescription(PyramidKltFeature feature) {
-		boolean valid = false;
 		for (int layer = 0; layer < image.getNumLayers(); layer++) {
 			float scale = (float)image.getScale(layer);
 			float x = feature.x / scale;
@@ -69,11 +65,9 @@ public class PyramidKltTracker<InputImage extends ImageSingleBand, DerivativeIma
 
 			feature.desc[layer].setPosition(x, y);
 			if( !tracker.setDescription(feature.desc[layer]) )
-				break;
-			feature.maxLayer = layer;
-			valid = true;
+				return false;
 		}
-		return valid;
+		return true;
 	}
 
 	/**
@@ -107,7 +101,6 @@ public class PyramidKltTracker<InputImage extends ImageSingleBand, DerivativeIma
 	 * @return If tracking failed or not.
 	 */
 	public KltTrackFault track(PyramidKltFeature feature) {
-		boolean worked = false;
 
 		// this is the first level it was able to track the feature at
 		int firstLevelTracked = -1;
@@ -116,29 +109,23 @@ public class PyramidKltTracker<InputImage extends ImageSingleBand, DerivativeIma
 		float y = feature.y;
 
 		// track from the top of the pyramid to the bottom
-		for (int layer = feature.maxLayer; layer >= 0; layer--) {
+		for (int layer = image.getNumLayers()-1; layer >= 0; layer--) {
 			float scale = (float)image.getScale(layer);
 			x /= scale;
 			y /= scale;
 
 			setupKltTracker(layer);
 
-			feature.desc[layer].setPosition(x, y);
-			KltTrackFault ret = tracker.track(feature.desc[layer]);
+			KltFeature f = feature.desc[layer];
+			f.setPosition(x, y);
+			KltTrackFault ret = tracker.track(f);
 
-			if (ret == KltTrackFault.OUT_OF_BOUNDS) {
-				x = feature.desc[layer].x;
-				y = feature.desc[layer].y;
-				feature.maxLayer = layer-1;
-				worked = false;
-				// if out of bounds try tracking on a lower layer
-			} else if (ret == KltTrackFault.SUCCESS) {
+			if (ret == KltTrackFault.SUCCESS) {
 				if( firstLevelTracked == -1 )
 					firstLevelTracked = layer;
 				// nothing bad happened, save this result
 				x = feature.desc[layer].x;
 				y = feature.desc[layer].y;
-				worked = true;
 			} else {
 				// tracking failed
 				return ret;
@@ -148,12 +135,8 @@ public class PyramidKltTracker<InputImage extends ImageSingleBand, DerivativeIma
 			y *= scale;
 		}
 
-		if (worked) {
-			feature.setPosition(x, y);
-			return KltTrackFault.SUCCESS;
-		} else {
-			return KltTrackFault.OUT_OF_BOUNDS;
-		}
+		feature.setPosition(x, y);
+		return KltTrackFault.SUCCESS;
 	}
 
 	private void setupKltTracker(int layer) {

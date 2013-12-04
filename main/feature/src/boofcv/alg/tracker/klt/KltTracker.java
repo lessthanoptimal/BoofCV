@@ -152,7 +152,7 @@ public class KltTracker<InputImage extends ImageSingleBand, DerivativeImage exte
 		return internalSetDescription(feature);
 	}
 
-	private boolean internalSetDescription(KltFeature feature) {
+	protected boolean internalSetDescription(KltFeature feature) {
 		int regionWidth = feature.radius * 2 + 1;
 		int size = regionWidth * regionWidth;
 
@@ -190,7 +190,7 @@ public class KltTracker<InputImage extends ImageSingleBand, DerivativeImage exte
 	 * is save the pixel value, but derivative information is also computed
 	 * so that it can reject bad features immediately.
 	 */
-	private boolean internalSetDescriptionBorder(KltFeature feature) {
+	protected boolean internalSetDescriptionBorder(KltFeature feature) {
 
 		int total= 0;
 
@@ -250,6 +250,10 @@ public class KltTracker<InputImage extends ImageSingleBand, DerivativeImage exte
 
 		// precompute bounds and other values
 		setAllowedBounds(feature);
+
+		// sanity check to make sure it is actually inside the image
+		if ( isFullyOutside(feature.x, feature.y))
+			return KltTrackFault.OUT_OF_BOUNDS;
 
 		if (descFeature.data.length < lengthFeature)
 			descFeature.reshape(widthFeature,widthFeature);
