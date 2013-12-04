@@ -266,6 +266,14 @@ public class BoofMiscOps {
 		return x >= 0 && x <= b.width-1 && y >= 0 && y <= b.height-1;
 	}
 
+	public static boolean checkInside( int width , int height , float x , float y ) {
+		return x >= 0 && x <= width-1 && y >= 0 && y <= height-1;
+	}
+
+	public static boolean checkInside( int width , int height , double x , double y ) {
+		return x >= 0 && x <= width-1 && y >= 0 && y <= height-1;
+	}
+
 	/**
 	 * Invokes wait until the elapsed time has passed.  In the thread is interrupted, the interrupt is ignored.
 	 * @param milli Length of desired pause in milliseconds.

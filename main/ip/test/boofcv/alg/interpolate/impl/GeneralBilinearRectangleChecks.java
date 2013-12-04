@@ -98,7 +98,7 @@ public abstract class GeneralBilinearRectangleChecks<T extends ImageSingleBand> 
 		interp.setImage(img);
 
 		ImageFloat32 out = new ImageFloat32(20,25);
-		interp.region(width-19.9f, height-24.9f, out );
+		interp.region(-0.1f, -0.1f, out );
 	}
 
 	@Test(expected=IllegalArgumentException.class)

@@ -53,7 +53,7 @@ public class TestBoofMiscOps {
 	}
 
 	@Test
-	public void checkInside_float() {
+	public void checkInside_img_float() {
 		ImageUInt8 image = new ImageUInt8(20,25);
 
 		assertTrue(BoofMiscOps.checkInside(image,0f,0f));
@@ -67,7 +67,19 @@ public class TestBoofMiscOps {
 	}
 
 	@Test
-	public void checkInside_double() {
+	public void checkInside_wh_float() {
+		assertTrue(BoofMiscOps.checkInside(20,25,0f,0f));
+		assertTrue(BoofMiscOps.checkInside(20,25,19f,24f));
+		assertTrue(BoofMiscOps.checkInside(20,25,5f,10f));
+
+		assertFalse(BoofMiscOps.checkInside(20,25,-0.01f,0));
+		assertFalse(BoofMiscOps.checkInside(20,25,0,-0.01f));
+		assertFalse(BoofMiscOps.checkInside(20,25,0,24.01f));
+		assertFalse(BoofMiscOps.checkInside(20,25,19.01f,0));
+	}
+
+	@Test
+	public void checkInside_img_double() {
 		ImageUInt8 image = new ImageUInt8(20,25);
 
 		assertTrue(BoofMiscOps.checkInside(image,0d,0d));
@@ -78,6 +90,19 @@ public class TestBoofMiscOps {
 		assertFalse(BoofMiscOps.checkInside(image,0,-0.01d));
 		assertFalse(BoofMiscOps.checkInside(image,0,24.01d));
 		assertFalse(BoofMiscOps.checkInside(image,19.01d,0));
+	}
+
+	@Test
+	public void checkInside_wh_double() {
+
+		assertTrue(BoofMiscOps.checkInside(20,25,0d,0d));
+		assertTrue(BoofMiscOps.checkInside(20,25,19d,24d));
+		assertTrue(BoofMiscOps.checkInside(20,25,5d,10d));
+
+		assertFalse(BoofMiscOps.checkInside(20,25,-0.01d,0));
+		assertFalse(BoofMiscOps.checkInside(20,25,0,-0.01d));
+		assertFalse(BoofMiscOps.checkInside(20,25,0,24.01d));
+		assertFalse(BoofMiscOps.checkInside(20,25,19.01d,0));
 	}
 
 	@Test

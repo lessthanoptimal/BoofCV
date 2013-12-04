@@ -107,7 +107,7 @@ public class DescribePointBriefSO<T extends ImageSingleBand> {
 				float x0 = c_x + (c*a.x - s*a.y)*scale;
 				float y0 = c_y + (s*a.x + c*a.y)*scale;
 
-				if( blur.isInBounds((int) x0, (int) y0) ) {
+				if( BoofMiscOps.checkInside(blur, x0, y0) ) {
 					// it might be inside the image but too close to the border for unsafe
 					values[i] = interp.get(x0,y0);
 				}

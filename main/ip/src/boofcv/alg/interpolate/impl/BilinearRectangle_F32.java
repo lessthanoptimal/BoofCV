@@ -62,6 +62,9 @@ public class BilinearRectangle_F32 implements InterpolateRectangle<ImageFloat32>
 
 	@Override
 	public void region(float tl_x, float tl_y, ImageFloat32 output ) {
+		if( tl_x < 0 || tl_y < 0 || tl_x + output.width > orig.width || tl_y + output.height > orig.height ) {
+			throw new IllegalArgumentException("Region is outside of the image");
+		}
 		int xt = (int) tl_x;
 		int yt = (int) tl_y;
 		float ax = tl_x - xt;

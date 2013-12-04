@@ -50,6 +50,8 @@ public abstract class ImageDistortCache<T extends ImageSingleBand> implements Im
 	protected T srcImg;
 	protected T dstImg;
 
+	protected boolean dirty;
+
 	/**
 	 * Specifies configuration parameters
 	 *
@@ -64,6 +66,7 @@ public abstract class ImageDistortCache<T extends ImageSingleBand> implements Im
 
 	@Override
 	public void setModel(PixelTransform_F32 dstToSrc) {
+		this.dirty = true;
 		this.dstToSrc = dstToSrc;
 	}
 
@@ -92,7 +95,7 @@ public abstract class ImageDistortCache<T extends ImageSingleBand> implements Im
 	}
 
 	private void init(T srcImg, T dstImg) {
-		if( width == -1 ) {
+		if( dirty || width != dstImg.width || height != dstImg.height) {
 			width = dstImg.width;
 			height = dstImg.height;
 			map = new Point2D_F32[width*height];
@@ -121,19 +124,19 @@ public abstract class ImageDistortCache<T extends ImageSingleBand> implements Im
 
 		final float minInterpX = interp.getFastBorderX();
 		final float minInterpY = interp.getFastBorderY();
-		final float maxInterpX = srcImg.getWidth()-interp.getFastBorderX();
-		final float maxInterpY = srcImg.getHeight()-interp.getFastBorderY();
+		final float maxInterpX = srcImg.getWidth()-interp.getFastBorderX()-1;
+		final float maxInterpY = srcImg.getHeight()-interp.getFastBorderY()-1;
 
-		final float widthF = srcImg.getWidth();
-		final float heightF = srcImg.getHeight();
+		final float widthF = srcImg.getWidth()-1;
+		final float heightF = srcImg.getHeight()-1;
 
 		for( int y = y0; y < y1; y++ ) {
 			int indexDst = dstImg.startIndex + dstImg.stride*y + x0;
 			for( int x = x0; x < x1; x++ , indexDst++ ) {
 				Point2D_F32 s = map[indexDst];
 
-				if( s.x < minInterpX || s.x >= maxInterpX || s.y < minInterpY || s.y >= maxInterpY ) {
-					if( s.x < 0f || s.x >= widthF || s.y < 0f || s.y >= heightF )
+				if( s.x < minInterpX || s.x > maxInterpX || s.y < minInterpY || s.y > maxInterpY ) {
+					if( s.x < 0f || s.x > widthF || s.y < 0f || s.y > heightF )
 						assign(indexDst,(float)border.getGeneral((int)s.x,(int)s.y));
 					else
 						assign(indexDst,interp.get(s.x, s.y));
@@ -147,19 +150,19 @@ public abstract class ImageDistortCache<T extends ImageSingleBand> implements Im
 	public void applyNoBorder() {
 		final float minInterpX = interp.getFastBorderX();
 		final float minInterpY = interp.getFastBorderY();
-		final float maxInterpX = srcImg.getWidth()-interp.getFastBorderX();
-		final float maxInterpY = srcImg.getHeight()-interp.getFastBorderY();
+		final float maxInterpX = srcImg.getWidth()-interp.getFastBorderX()-1;
+		final float maxInterpY = srcImg.getHeight()-interp.getFastBorderY()-1;
 
-		final float widthF = srcImg.getWidth();
-		final float heightF = srcImg.getHeight();
+		final float widthF = srcImg.getWidth()-1;
+		final float heightF = srcImg.getHeight()-1;
 
 		for( int y = y0; y < y1; y++ ) {
 			int indexDst = dstImg.startIndex + dstImg.stride*y + x0;
 			for( int x = x0; x < x1; x++ , indexDst++ ) {
 				Point2D_F32 s = map[indexDst];
 
-				if( s.x < minInterpX || s.x >= maxInterpX || s.y < minInterpY || s.y >= maxInterpY ) {
-					if( s.x >= 0f && s.x < widthF && s.y >= 0f && s.y < heightF )
+				if( s.x < minInterpX || s.x > maxInterpX || s.y < minInterpY || s.y > maxInterpY ) {
+					if( s.x >= 0f && s.x <= widthF && s.y >= 0f && s.y <= heightF )
 						assign(indexDst,interp.get(s.x, s.y));
 				} else {
 					assign(indexDst,interp.get_fast(s.x, s.y));

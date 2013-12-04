@@ -19,6 +19,7 @@
 package boofcv.alg.sfm.overhead;
 
 import boofcv.alg.distort.LensDistortionOps;
+import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.distort.PointTransform_F64;
 import boofcv.struct.image.ImageBase;
@@ -87,10 +88,6 @@ public abstract class CreateSyntheticOverheadView<T extends ImageBase>
 
 		PointTransform_F64 normToPixel = LensDistortionOps.transformNormToRadial_F64(intrinsic);
 
-		// precompute the transform
-		float w = intrinsic.width;
-		float h = intrinsic.height;
-
 		// Declare storage for precomputed pixel locations
 		int overheadPixels = overheadHeight*overheadWidth;
 		if( mapPixels == null || mapPixels.length < overheadPixels) {
@@ -123,7 +120,7 @@ public abstract class CreateSyntheticOverheadView<T extends ImageBase>
 					float y = (float)pixel.y;
 
 					// make sure it's in the image
-					if( x >= 0 && y >= 0 && x < w && y < h ) {
+					if(BoofMiscOps.checkInside(intrinsic.width,intrinsic.height,x,y) ){
 						Point2D_F32 p = points.grow();
 						p.set(x,y);
 						mapPixels[ indexOut ]= p;
