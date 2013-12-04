@@ -47,7 +47,7 @@ public class NearestNeighborRectangle_F32 implements InterpolateRectangle<ImageF
 		int x = (int)tl_x;
 		int y = (int)tl_y;
 
-		if( x < 0 || y < 0 || x + dest.width > image.width || y + dest.height > image.height )
+		if( x < 0 || y < 0 || x + dest.width > image.width-1 || y + dest.height > image.height-1 )
 			throw new IllegalArgumentException("Out of bounds");
 
 		for( int i = 0; i < dest.height; i++ ) {

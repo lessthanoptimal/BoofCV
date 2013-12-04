@@ -101,26 +101,23 @@ public class GenerateImplBilinearPixel extends CodeGeneratorBase {
 				"\n" +
 				"\t\tint index = orig.startIndex + yt * stride + xt;\n" +
 				"\n" +
-				"\t\tint dx = xt == width - 1 ? 0 : 1;\n" +
-				"\t\tint dy = yt == height - 1 ? 0 : stride;\n" +
-				"\n" +
 				"\t\t"+image.getDataType()+"[] data = orig.data;\n" +
 				"\n" +
 				"\t\t"+floatType+" val = (1.0"+f+" - ax) * (1.0"+f+" - ay) * (data[index] "+bitWise+"); // (x,y)\n" +
-				"\t\tval += ax * (1.0"+f+" - ay) * (data[index + dx] "+bitWise+"); // (x+1,y)\n" +
-				"\t\tval += ax * ay * (data[index + dx + dy] "+bitWise+"); // (x+1,y+1)\n" +
-				"\t\tval += (1.0"+f+" - ax) * ay * (data[index + dy] "+bitWise+"); // (x,y+1)\n" +
+				"\t\tval += ax * (1.0"+f+" - ay) * (data[index + 1] "+bitWise+"); // (x+1,y)\n" +
+				"\t\tval += ax * ay * (data[index + 1 + stride] "+bitWise+"); // (x+1,y+1)\n" +
+				"\t\tval += (1.0"+f+" - ax) * ay * (data[index + stride] "+bitWise+"); // (x,y+1)\n" +
 				"\n" +
 				"\t\treturn val;\n" +
 				"\t}\n" +
 				"\n" +
 				"\t@Override\n" +
 				"\tpublic float get(float x, float y) {\n" +
+				"\t\tif (x < 0 || y < 0 || x > width-1 || y > height-1)\n" +
+				"\t\t\tthrow new IllegalArgumentException(\"Point is outside of the image\");\n" +
+				"\n" +
 				"\t\tint xt = (int) x;\n" +
 				"\t\tint yt = (int) y;\n" +
-				"\n" +
-				"\t\tif (xt < 0 || yt < 0 || xt >= width || yt >= height)\n" +
-				"\t\t\tthrow new IllegalArgumentException(\"Point is outside of the image\");\n" +
 				"\n" +
 				"\t\t"+floatType+" ax = x - xt;\n" +
 				"\t\t"+floatType+" ay = y - yt;\n" +

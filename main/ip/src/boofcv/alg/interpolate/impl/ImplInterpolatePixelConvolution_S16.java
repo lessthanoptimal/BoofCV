@@ -35,7 +35,7 @@ import boofcv.struct.image.ImageSInt16;
  *
  * @author Peter Abeles
  */
-public class ImplInterpolatePixelConvolution_S16 implements InterpolatePixelS<ImageSInt16> {
+public class ImplInterpolatePixelConvolution_S16 implements InterpolatePixelS<ImageSInt16>  {
 
 	// kernel used to perform interpolation
 	private KernelContinuous1D_F32 kernel;
@@ -62,6 +62,9 @@ public class ImplInterpolatePixelConvolution_S16 implements InterpolatePixelS<Im
 
 	@Override
 	public float get(float x, float y) {
+
+		if( x < 0 || y < 0 || x > image.width-1 || y > image.height-1 )
+			throw new IllegalArgumentException("Pixel out of bounds. "+x+" "+y);
 
 		int xx = (int)x;
 		int yy = (int)y;

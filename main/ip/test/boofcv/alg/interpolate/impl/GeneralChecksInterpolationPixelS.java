@@ -80,12 +80,12 @@ public abstract class GeneralChecksInterpolationPixelS< T extends ImageSingleBan
 	public void get_edges(T img) {
 		InterpolatePixelS<T> interp = wrap(img, 0, 100);
 
-		compare(interp,img, width-0.01f, height/2);
+		compare(interp,img, width-1, height/2);
 		compare(interp,img, 0, height/2);
-		compare(interp,img, width/2, height-0.01f);
+		compare(interp,img, width/2, height-1);
 		compare(interp,img, width/2, 0);
 		compare(interp,img, 0, 0);
-		compare(interp,img, width-0.01f, height-0.01f);
+		compare(interp,img, width-1, height-1);
 	}
 
 	protected void compare( InterpolatePixelS<T> interp , T img , float x , float y )
@@ -103,18 +103,24 @@ public abstract class GeneralChecksInterpolationPixelS< T extends ImageSingleBan
 	/**
 	 * Sees if get throws an exception if it is out of bounds
 	 */
+	@Test
 	public void get_outside() {
 		T img = createImage(width, height);
 
 		InterpolatePixelS<T> interp = wrap(img, 0, 100);
 
+		checkOutside(interp,-0.1f,0);
+		checkOutside(interp,0,-0.1f);
+		checkOutside(interp,width-0.99f,0);
+		checkOutside(interp,0,height-0.99f);
+	}
+
+	private void checkOutside(InterpolatePixelS<T> interp, float x , float y) {
 		try {
-			interp.get(500, 10);
+			interp.get(x, y);
 			if( exceptionOutside )
 				fail("Didn't throw an exception when accessing an outside pixel");
-		} catch( IllegalArgumentException e ) {
-
-		}
+		} catch( IllegalArgumentException e ) {}
 	}
 
 
@@ -150,7 +156,7 @@ public abstract class GeneralChecksInterpolationPixelS< T extends ImageSingleBan
 	 * value to the unsafe value.
 	 */
 	@Test
-	public void isInSafeBounds() {
+	public void isInFastBounds() {
 		T img = createImage(width, height);
 		GImageMiscOps.fillUniform(img, rand, 0, 100);
 		InterpolatePixelS<T> interp = wrap(img, 0, 100);
@@ -166,6 +172,43 @@ public abstract class GeneralChecksInterpolationPixelS< T extends ImageSingleBan
 		}
 	}
 
+	/**
+	 * Pixels out of the image are clearly not in the fast bounds
+	 */
+	@Test
+	public void isInFastBounds_outOfBounds() {
+		T img = createImage(width, height);
+		InterpolatePixelS<T> interp = wrap(img, 0, 100);
+
+		assertFalse(interp.isInFastBounds(-0.1f,0));
+		assertFalse(interp.isInFastBounds(0, -0.1f));
+		assertFalse(interp.isInFastBounds(width-0.99f,0));
+		assertFalse(interp.isInFastBounds(0,height-0.99f));
+	}
+
+	@Test
+	public void getFastBorder() {
+		T img = createImage(width, height);
+		InterpolatePixelS<T> interp = wrap(img, 0, 100);
+
+		// create a region with positive cases
+		int x0 = interp.getFastBorderX();
+		int x1 = width - interp.getFastBorderX();
+		int y0 = interp.getFastBorderX();
+		int y1 = height - interp.getFastBorderX();
+
+		for( int y = 0; y < height; y++ ) {
+			for( int x = 0; x < width; x++ ) {
+				if( x >= x0 && x < x1 && y >= y0 && y < y1 ) {
+					assertTrue(interp.isInFastBounds(x,y));
+				} else {
+					// stuff outside of the border does not need to be outside the fast bounds
+					// this is a crude test to avoid checking the bounds every time through a loop
+//					assertFalse(interp.isInFastBounds(x,y));
+				}
+			}
+		}
+	}
 
 	/**
 	 * Interpolates the whole image and sees if the values returned are within the specified bounds
@@ -179,8 +222,8 @@ public abstract class GeneralChecksInterpolationPixelS< T extends ImageSingleBan
 		for( int off = 0; off < 5; off++ ) {
 			float frac = off/5.0f;
 
-			for( int y = 0; y < img.height; y++ ) {
-				for( int x = 0; x < img.width; x++ ) {
+			for( int y = 0; y < img.height-1; y++ ) {
+				for( int x = 0; x < img.width-1; x++ ) {
 					float v = interp.get(x+frac,y+frac);
 					assertTrue( v >= 0 && v <= 100 );
 				}
@@ -207,8 +250,14 @@ public abstract class GeneralChecksInterpolationPixelS< T extends ImageSingleBan
 				float dx = rand.nextFloat()*2-1f;
 				float dy = rand.nextFloat()*2-1f;
 
+				float xx = x + dx;
+				float yy = y + dy;
 
-				assertTrue("( " + x + " , " + y + " )", interpA.get(x + dx, y + dy) == interpB.get(x + dx, y + dy));
+				// ,make sure it is inside the image bound
+				if( yy < 0 ) yy = 0; else if( yy > 39 ) yy = 39;
+				if( xx < 0 ) xx = 0; else if( xx > 29 ) xx = 29;
+
+				assertTrue("( " + x + " , " + y + " )", interpA.get(xx, yy) == interpB.get(xx,yy));
 			}
 		}
 	}

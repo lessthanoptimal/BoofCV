@@ -23,6 +23,7 @@ import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.misc.PixelMath;
 import boofcv.alg.transform.fft.DiscreteFourierTransformOps;
 import boofcv.factory.interpolate.FactoryInterpolation;
+import boofcv.misc.BoofMiscOps;
 import boofcv.struct.image.ImageFloat64;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.InterleavedF64;
@@ -597,7 +598,7 @@ public class CirculantTracker<T extends ImageSingleBand> {
 
 				if( interp.isInFastBounds(xx,yy))
 					output.data[index++] = interp.get_fast(xx,yy);
-				else if( image.isInBounds((int)xx,(int)yy))
+				else if( BoofMiscOps.checkInside(image, xx, yy))
 					output.data[index++] = interp.get(xx, yy);
 				else {
 					// randomize to make pixels outside the image poorly correlate.  It will then focus on matching

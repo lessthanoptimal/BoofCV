@@ -131,6 +131,7 @@ public abstract class StandardPointTracker<T extends ImageSingleBand> {
 		assertTrue(tracker.getActiveTracks(null).size()>0);
 		assertTrue(tracker.getActiveTracks(null).size() ==
 				tracker.getNewTracks(null).size() );
+		checkInside(tracker.getAllTracks(null));
 
 		// Tweak the input image and make sure that everything has the expected size
 		ImageMiscOps.addGaussian(image,rand,2,0,255);
@@ -142,12 +143,14 @@ public abstract class StandardPointTracker<T extends ImageSingleBand> {
 		assertTrue(beforeAll > 0);
 		assertTrue(beforeActive>0);
 		assertEquals(0, tracker.getNewTracks(null).size());
+		checkInside(tracker.getAllTracks(null));
 
 		// Call spawn again.  There should be more tracks now
 		tracker.spawnTracks();
 
 		assertTrue(beforeAll < tracker.getAllTracks(null).size());
 		assertTrue(beforeActive < tracker.getActiveTracks(null).size());
+		checkInside(tracker.getAllTracks(null));
 
 		// there should be some pre-existing tracks
 		assertTrue(tracker.getActiveTracks(null).size() !=
@@ -472,6 +475,16 @@ public abstract class StandardPointTracker<T extends ImageSingleBand> {
 
 		for( int i = 0; i < a.size(); i++ ) {
 			assertTrue(a.get(i) == b.get(i));
+		}
+	}
+
+	/**
+	 * Makes sure all the tracks are inside the image
+	 */
+	protected void checkInside( List<PointTrack> tracks ) {
+		for( PointTrack t : tracks ) {
+			if( t.x < 0 || t.y < 0 || t.x > width-1 || t.y > height-1 )
+				fail("track is outside of the image: "+t.x+" "+t.y);
 		}
 	}
 

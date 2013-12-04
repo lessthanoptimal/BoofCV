@@ -38,7 +38,7 @@ public abstract class NearestNeighborPixel<T extends ImageSingleBand> implements
 
 	@Override
 	public boolean isInFastBounds(float x, float y) {
-		return( x >= 0 && y >= 0 && x < width && y < height );
+		return( x >= 0 && y >= 0 && x <= width-1 && y <= height-1 );
 	}
 
 	@Override

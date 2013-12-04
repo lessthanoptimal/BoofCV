@@ -62,8 +62,9 @@ public abstract class StandardPointTrackerTwoPass<T extends ImageSingleBand>
 
 		tracker2.process((T)image);
 		List<PointTrack> tracks = tracker2.getAllTracks(null);
+		checkInside(tracks);
 		// since the image is the same the tracks should all be the same
-		assertEquals(allBefore, tracker2.getAllTracks(null).size());
+		assertEquals(allBefore, tracks.size());
 		assertEquals(activeBefore, tracker2.getActiveTracks(null).size());
 
 		// The bad hints below should cause stuff to break
@@ -72,6 +73,7 @@ public abstract class StandardPointTrackerTwoPass<T extends ImageSingleBand>
 		}
 		tracker2.performSecondPass();
 		// make sure that lists which shouldn't change haven't changed
+		checkInside(tracker2.getAllTracks(null));
 		assertEquals(allBefore, tracker2.getAllTracks(null).size());
 		assertEquals(0, tracker2.getDroppedTracks(null).size());
 		assertEquals(0, tracker2.getNewTracks(null).size());
@@ -85,6 +87,7 @@ public abstract class StandardPointTrackerTwoPass<T extends ImageSingleBand>
 			assertTrue( tracker2.getDroppedTracks(null).size() > 0 );
 		}
 		assertTrue(activeBefore > tracker2.getActiveTracks(null).size());
+		checkInside(tracker2.getAllTracks(null));
 	}
 
 	/**
@@ -138,6 +141,8 @@ public abstract class StandardPointTrackerTwoPass<T extends ImageSingleBand>
 		assertEquals(0, tracker2.getDroppedTracks(null).size());
 		assertEquals(0, tracker2.getNewTracks(null).size());
 		assertTrue(activeBefore != tracker2.getActiveTracks(null).size());
+		checkInside(tracker2.getAllTracks(null));
+
 		// and finalize the bad tracking
 		tracker2.finishTracking();
 		if( shouldDropTracks ) {
@@ -145,6 +150,7 @@ public abstract class StandardPointTrackerTwoPass<T extends ImageSingleBand>
 			assertTrue( tracker2.getDroppedTracks(null).size() > 0 );
 		}
 		assertTrue(activeBefore > tracker2.getActiveTracks(null).size());
+		checkInside(tracker2.getAllTracks(null));
 
 	}
 

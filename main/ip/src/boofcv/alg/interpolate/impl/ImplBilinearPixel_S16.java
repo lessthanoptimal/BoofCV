@@ -50,26 +50,23 @@ public class ImplBilinearPixel_S16 extends BilinearPixel<ImageSInt16> {
 
 		int index = orig.startIndex + yt * stride + xt;
 
-		int dx = xt == width - 1 ? 0 : 1;
-		int dy = yt == height - 1 ? 0 : stride;
-
 		short[] data = orig.data;
 
 		float val = (1.0f - ax) * (1.0f - ay) * (data[index] ); // (x,y)
-		val += ax * (1.0f - ay) * (data[index + dx] ); // (x+1,y)
-		val += ax * ay * (data[index + dx + dy] ); // (x+1,y+1)
-		val += (1.0f - ax) * ay * (data[index + dy] ); // (x,y+1)
+		val += ax * (1.0f - ay) * (data[index + 1] ); // (x+1,y)
+		val += ax * ay * (data[index + 1 + stride] ); // (x+1,y+1)
+		val += (1.0f - ax) * ay * (data[index + stride] ); // (x,y+1)
 
 		return val;
 	}
 
 	@Override
 	public float get(float x, float y) {
+		if (x < 0 || y < 0 || x > width-1 || y > height-1)
+			throw new IllegalArgumentException("Point is outside of the image");
+
 		int xt = (int) x;
 		int yt = (int) y;
-
-		if (xt < 0 || yt < 0 || xt >= width || yt >= height)
-			throw new IllegalArgumentException("Point is outside of the image");
 
 		float ax = x - xt;
 		float ay = y - yt;

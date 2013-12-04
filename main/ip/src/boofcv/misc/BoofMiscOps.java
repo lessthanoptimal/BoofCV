@@ -259,7 +259,11 @@ public class BoofMiscOps {
 	}
 
 	public static boolean checkInside( ImageBase b , float x , float y ) {
-		return x >= 0 && x < b.width && y >= 0 && y < b.height;
+		return x >= 0 && x <= b.width-1 && y >= 0 && y <= b.height-1;
+	}
+
+	public static boolean checkInside( ImageBase b , double x , double y ) {
+		return x >= 0 && x <= b.width-1 && y >= 0 && y <= b.height-1;
 	}
 
 	/**
