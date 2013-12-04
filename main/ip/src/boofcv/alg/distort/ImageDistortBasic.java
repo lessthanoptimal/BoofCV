@@ -32,14 +32,14 @@ import boofcv.struct.image.ImageSingleBand;
 public abstract class ImageDistortBasic<T extends ImageSingleBand> implements ImageDistort<T> {
 
 	// distortion model from the dst to src image
-	private PixelTransform_F32 dstToSrc;
+	protected PixelTransform_F32 dstToSrc;
 	// sub pixel interpolation
-	private InterpolatePixelS<T> interp;
+	protected InterpolatePixelS<T> interp;
 	// handle the image border
-	private ImageBorder<T> border;
+	protected ImageBorder<T> border;
 
 	// crop boundary
-	private int x0,y0,x1,y1;
+	protected int x0,y0,x1,y1;
 
 	protected T srcImg;
 	protected T dstImg;
@@ -97,20 +97,20 @@ public abstract class ImageDistortBasic<T extends ImageSingleBand> implements Im
 
 		final float minInterpX = interp.getFastBorderX();
 		final float minInterpY = interp.getFastBorderY();
-		final float maxInterpX = srcImg.getWidth()-interp.getFastBorderX();
-		final float maxInterpY = srcImg.getHeight()-interp.getFastBorderY();
+		final float maxInterpX = srcImg.getWidth()-interp.getFastBorderX()-1;
+		final float maxInterpY = srcImg.getHeight()-interp.getFastBorderY()-1;
 
-		final float widthF = srcImg.getWidth();
-		final float heightF = srcImg.getHeight();
+		final float widthF = srcImg.getWidth()-1;
+		final float heightF = srcImg.getHeight()-1;
 
 		for( int y = y0; y < y1; y++ ) {
 			int indexDst = dstImg.startIndex + dstImg.stride*y + x0;
 			for( int x = x0; x < x1; x++ , indexDst++ ) {
 				dstToSrc.compute(x,y);
 
-				if( dstToSrc.distX < minInterpX || dstToSrc.distX >= maxInterpX ||
-						dstToSrc.distY < minInterpY || dstToSrc.distY >= maxInterpY ) {
-					if( dstToSrc.distX < 0f || dstToSrc.distX >= widthF || dstToSrc.distY < 0f || dstToSrc.distY >= heightF )
+				if( dstToSrc.distX < minInterpX || dstToSrc.distX > maxInterpX ||
+						dstToSrc.distY < minInterpY || dstToSrc.distY > maxInterpY ) {
+					if( dstToSrc.distX < 0f || dstToSrc.distX > widthF || dstToSrc.distY < 0f || dstToSrc.distY > heightF )
 						assign(indexDst,(float)border.getGeneral((int)dstToSrc.distX,(int)dstToSrc.distY));
 					else
 						assign(indexDst,interp.get(dstToSrc.distX, dstToSrc.distY));
@@ -124,20 +124,20 @@ public abstract class ImageDistortBasic<T extends ImageSingleBand> implements Im
 	public void applyNoBorder() {
 		final float minInterpX = interp.getFastBorderX();
 		final float minInterpY = interp.getFastBorderY();
-		final float maxInterpX = srcImg.getWidth()-interp.getFastBorderX();
-		final float maxInterpY = srcImg.getHeight()-interp.getFastBorderY();
+		final float maxInterpX = srcImg.getWidth()-interp.getFastBorderX()-1;
+		final float maxInterpY = srcImg.getHeight()-interp.getFastBorderY()-1;
 
-		final float widthF = srcImg.getWidth();
-		final float heightF = srcImg.getHeight();
+		final float widthF = srcImg.getWidth()-1;
+		final float heightF = srcImg.getHeight()-1;
 
 		for( int y = y0; y < y1; y++ ) {
 			int indexDst = dstImg.startIndex + dstImg.stride*y + x0;
 			for( int x = x0; x < x1; x++ , indexDst++ ) {
 				dstToSrc.compute(x,y);
 
-				if( dstToSrc.distX < minInterpX || dstToSrc.distX >= maxInterpX ||
-						dstToSrc.distY < minInterpY || dstToSrc.distY >= maxInterpY ) {
-					if( dstToSrc.distX >= 0f && dstToSrc.distX < widthF && dstToSrc.distY >= 0f && dstToSrc.distY < heightF )
+				if( dstToSrc.distX < minInterpX || dstToSrc.distX > maxInterpX ||
+						dstToSrc.distY < minInterpY || dstToSrc.distY > maxInterpY ) {
+					if( dstToSrc.distX >= 0f && dstToSrc.distX <= widthF && dstToSrc.distY >= 0f && dstToSrc.distY <= heightF )
 						assign(indexDst,interp.get(dstToSrc.distX, dstToSrc.distY));
 				} else {
 					assign(indexDst,interp.get_fast(dstToSrc.distX, dstToSrc.distY));

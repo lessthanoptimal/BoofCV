@@ -72,12 +72,12 @@ public abstract class GeneralBilinearRectangleChecks<T extends ImageSingleBand> 
 	}
 
 	/**
-	 * See if it handles edge conditions gracefully
+	 * See if it handles edge conditions gracefully.  should be barely inside
 	 */
 	@Test
 	public void checkBottomRightEdge() {
-		checkRegion(10, 15, width - 10, height - 15);
-		checkRegion(10, 15, width - 9.9f, height - 14.8f);
+		checkRegion(10, 15, 0, 0);
+		checkRegion(10, 15, width - 10 - 1, height - 15 - 1);
 	}
 
 
@@ -89,6 +89,26 @@ public abstract class GeneralBilinearRectangleChecks<T extends ImageSingleBand> 
 
 		ImageFloat32 out = new ImageFloat32(20,20);
 		interp.region(width-1, height-1, out );
+	}
+
+	@Test(expected=IllegalArgumentException.class)
+	public void outsideImageBorder1_barely() {
+		T img = createImage(20, 25);
+		InterpolateRectangle<T> interp = createRectangleInterpolate();
+		interp.setImage(img);
+
+		ImageFloat32 out = new ImageFloat32(20,25);
+		interp.region(width-19.9f, height-24.9f, out );
+	}
+
+	@Test(expected=IllegalArgumentException.class)
+	public void outsideImageBorder2_barely() {
+		T img = createImage(20, 25);
+		InterpolateRectangle<T> interp = createRectangleInterpolate();
+		interp.setImage(img);
+
+		ImageFloat32 out = new ImageFloat32(20,25);
+		interp.region(0.1f, 0.1f, out );
 	}
 
 

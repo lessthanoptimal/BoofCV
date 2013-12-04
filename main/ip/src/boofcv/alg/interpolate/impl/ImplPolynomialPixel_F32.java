@@ -36,6 +36,9 @@ public class ImplPolynomialPixel_F32 extends PolynomialPixel<ImageFloat32> {
 
 	@Override
 	public float get(float x, float y) {
+		if( x < 0 || y < 0 || x > image.width-1 || y > image.height-1 )
+			throw new IllegalArgumentException("Pixel out of bounds. "+x+" "+y);
+
 		int width = image.getWidth();
 		int height = image.getHeight();
 

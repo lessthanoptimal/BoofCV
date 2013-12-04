@@ -82,12 +82,12 @@ public abstract class PolynomialPixel<T extends ImageSingleBand> implements Inte
 
 	@Override
 	public boolean isInFastBounds(float x, float y) {
-		int x0 = (int)x - M/2 + offM;
-		int x1 = x0 + M;
-		int y0 = (int)y - M/2 + offM;
-		int y1 = y0 + M;
+		float x0 = x - M/2 + offM;
+		float x1 = x0 + M;
+		float y0 = y - M/2 + offM;
+		float y1 = y0 + M;
 
-		return (x0 >= 0 && y0 >= 0 && x1 < image.width && y1 <image.height);
+		return (x0 >= 0 && y0 >= 0 && x1 <= image.width-1 && y1 <= image.height-1 );
 	}
 
 	@Override

@@ -43,12 +43,12 @@ public class TestPointTrackerTwoPassKltPyramid extends StandardPointTrackerTwoPa
 	}
 
 	@Test
-	public void dropTracksOutside_firstPass() {
+	public void allPointsInside_firstPass() {
 		fail("make sure tracks outside the image are dropped");
 	}
 
 	@Test
-	public void dropTracksOutside_secondPass() {
+	public void allPointsInside_secondPass() {
 		fail("make sure tracks outside the image are dropped");
 	}
 }

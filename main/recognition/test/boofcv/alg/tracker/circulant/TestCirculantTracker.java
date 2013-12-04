@@ -115,8 +115,6 @@ public class TestCirculantTracker {
 		int w = image.width-1;
 		int h = image.height-1;
 
-		image.print("%1.2f");
-
 		// edges should be smaller than center
 		assertTrue(image.get(cx, cy) > image.get(0, 0));
 		assertTrue( image.get(cx,cy) > image.get(w,h) );

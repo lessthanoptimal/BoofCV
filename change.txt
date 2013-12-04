@@ -76,6 +76,9 @@ Version : Alpha 0.16
   * Thanks Vagoster for reporting the bug
 - KLT can now handle features which extend outside the image border
   * It only tracks using part of the feature which is inside the image
+- Image Interpolation
+  * Almost all interpolation routines incorrectly treated pixels 1 outside of the image as inside.  Unit tests
+  have been added and other classes modified for the change in behavior.
 
 - TODO Chessboard calibration doesn't reject bad calibration points after sub-pixel
 - TODO improve KLT edge handling -> Make faster by using rect region interpolation only

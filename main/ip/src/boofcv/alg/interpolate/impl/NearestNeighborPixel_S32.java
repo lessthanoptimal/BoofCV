@@ -54,10 +54,10 @@ public class NearestNeighborPixel_S32 extends NearestNeighborPixel<ImageSInt32> 
 
 	@Override
 	public float get(float x, float y) {
+		if (x < 0 || y < 0 || x > width-1 || y > height-1 )
+			throw new IllegalArgumentException("Point is outside of the image");
 		int xx = (int)x;
 		int yy = (int)y;
-		if (xx < 0 || yy < 0 || xx >= width || yy >= height)
-			throw new IllegalArgumentException("Point is outside of the image");
 
 		return data[ orig.startIndex + yy*stride + xx];
 	}

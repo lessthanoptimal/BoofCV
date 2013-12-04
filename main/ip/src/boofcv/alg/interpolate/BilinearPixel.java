@@ -50,16 +50,16 @@ public abstract class BilinearPixel<T extends ImageSingleBand> implements Interp
 
 	@Override
 	public boolean isInFastBounds(float x, float y) {
-		return !(x < 0 || y < 0 || x >= width || y >= height);
+		return !(x < 0 || y < 0 || x > width-2 || y > height-2);
 	}
 
 	@Override
 	public int getFastBorderX() {
-		return 0;
+		return 1;
 	}
 
 	@Override
 	public int getFastBorderY() {
-		return 0;
+		return 1;
 	}
 }

@@ -134,7 +134,7 @@ public class TestPointTrackerKltPyramid extends StandardPointTracker<ImageFloat3
 	 * The center of tracks should all be inside the image after process() has been called
 	 */
 	@Test
-	public void process_pruneOutside() {
+	public void process_allPointsInside() {
 		fail("make sure tracks outside the image are dropped");
 	}
 }

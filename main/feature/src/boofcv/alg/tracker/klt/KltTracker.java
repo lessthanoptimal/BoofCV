@@ -21,6 +21,7 @@ package boofcv.alg.tracker.klt;
 import boofcv.alg.InputSanityCheck;
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.interpolate.InterpolateRectangle;
+import boofcv.misc.BoofMiscOps;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 
@@ -206,7 +207,7 @@ public class KltTracker<InputImage extends ImageSingleBand, DerivativeImage exte
 					value = interpPixelI.get_fast(pixelX,pixelY);
 					dX = interpPixelDX.get_fast(pixelX,pixelY);
 					dY = interpPixelDY.get_fast(pixelX,pixelY);
-				} else if( image.isInBounds((int)pixelX,(int)pixelY)) {
+				} else if( BoofMiscOps.checkInside(image, pixelX, pixelY)) {
 					value = interpPixelI.get(pixelX,pixelY);
 					dX = interpPixelDX.get(pixelX,pixelY);
 					dY = interpPixelDY.get(pixelX,pixelY);

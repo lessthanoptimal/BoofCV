@@ -20,11 +20,8 @@ package boofcv.alg.interpolate.impl;
 
 import boofcv.misc.AutoTypeImage;
 import boofcv.misc.CodeGeneratorBase;
-import boofcv.misc.CodeGeneratorUtil;
 
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.PrintStream;
 
 
 /**
@@ -32,7 +29,6 @@ import java.io.PrintStream;
  */
 public class GenerateImplInterpolatePixelConvolution extends CodeGeneratorBase {
 
-	PrintStream out;
 	AutoTypeImage inputType;
 
 	@Override
@@ -44,8 +40,7 @@ public class GenerateImplInterpolatePixelConvolution extends CodeGeneratorBase {
 
 	private void createFile( AutoTypeImage inputType ) throws FileNotFoundException {
 		this.inputType = inputType;
-		String className = "ImplInterpolatePixelConvolution_"+inputType.getAbbreviatedType();
-		out = new PrintStream(new FileOutputStream(className + ".java"));
+		setOutputFile("ImplInterpolatePixelConvolution_"+inputType.getAbbreviatedType());
 
 		printPreamble(className);
 
@@ -56,10 +51,7 @@ public class GenerateImplInterpolatePixelConvolution extends CodeGeneratorBase {
 	}
 
 	private void printPreamble( String fileName ) {
-		out.print(CodeGeneratorUtil.copyright);
-		out.print("package boofcv.alg.interpolate.impl;\n" +
-				"\n" +
-				"import boofcv.alg.interpolate.InterpolatePixel;\n" +
+		out.print("import boofcv.alg.interpolate.InterpolatePixelS;\n" +
 				"import boofcv.struct.convolve.KernelContinuous1D_F32;\n" +
 				"import boofcv.struct.image.*;\n" +
 				"\n" +
@@ -76,7 +68,7 @@ public class GenerateImplInterpolatePixelConvolution extends CodeGeneratorBase {
 				" *\n" +
 				" * @author Peter Abeles\n" +
 				" */\n" +
-				"public class "+fileName+" implements InterpolatePixel<"+inputType.getSingleBandName()+">  {\n" +
+				"public class "+fileName+" implements InterpolatePixelS<"+inputType.getSingleBandName()+">  {\n" +
 				"\n" +
 				"\t// kernel used to perform interpolation\n" +
 				"\tprivate KernelContinuous1D_F32 kernel;\n" +
@@ -108,6 +100,9 @@ public class GenerateImplInterpolatePixelConvolution extends CodeGeneratorBase {
 				"\n" +
 				"\t@Override\n" +
 				"\tpublic float get(float x, float y) {\n" +
+				"\n" +
+				"\t\tif( x < 0 || y < 0 || x > image.width-1 || y > image.height-1 )\n" +
+				"\t\t\tthrow new IllegalArgumentException(\"Pixel out of bounds. \"+x+\" \"+y);\n" +
 				"\n" +
 				"\t\tint xx = (int)x;\n" +
 				"\t\tint yy = (int)y;\n" +
@@ -154,7 +149,7 @@ public class GenerateImplInterpolatePixelConvolution extends CodeGeneratorBase {
 				"\t}\n" +
 				"\n" +
 				"\t@Override\n" +
-				"\tpublic float get_unsafe(float x, float y) {\n" +
+				"\tpublic float get_fast(float x, float y) {\n" +
 				"\t\tint xx = (int)x;\n" +
 				"\t\tint yy = (int)y;\n" +
 				"\n" +
@@ -187,18 +182,18 @@ public class GenerateImplInterpolatePixelConvolution extends CodeGeneratorBase {
 				"\t\t\treturn value;\n"+
 				"\t}\n"+
 				"\t@Override\n" +
-				"\tpublic boolean isInSafeBounds(float x, float y) {\n" +
+				"\tpublic boolean isInFastBounds(float x, float y) {\n" +
 				"\t\tfloat r = kernel.getRadius();\n" +
 				"\t\t\n" +
 				"\t\treturn (x-r >= 0 && y-r >= 0 && x+r < image.width && y+r <image.height);\n" +
 				"\t}\n"+
 				"\t@Override\n" +
-				"\tpublic int getUnsafeBorderX() {\n" +
+				"\tpublic int getFastBorderX() {\n" +
 				"\t\treturn kernel.getRadius();\n" +
 				"\t}\n" +
 				"\n" +
 				"\t@Override\n" +
-				"\tpublic int getUnsafeBorderY() {\n" +
+				"\tpublic int getFastBorderY() {\n" +
 				"\t\treturn kernel.getRadius();\n" +
 				"\t}\n");
 	}

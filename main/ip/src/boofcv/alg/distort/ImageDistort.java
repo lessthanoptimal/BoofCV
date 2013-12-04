@@ -51,10 +51,10 @@ public interface ImageDistort<T extends ImageBase> {
 	 *
 	 * @param srcImg Input image. Not modified.
 	 * @param dstImg Output image. Modified.
-	 * @param dstX0 Left most crop boundary.
-	 * @param dstY0 Top most crop boundary.
-	 * @param dstX1 Right most crop boundary.
-	 * @param dstY1 Bottom most crop boundary.
+	 * @param dstX0 Left most crop boundary. Inclusive.
+	 * @param dstY0 Top most crop boundary. Inclusive.
+	 * @param dstX1 Right most crop boundary. Exclusive.
+	 * @param dstY1 Bottom most crop boundary. Exclusive.
 	 */
 	public void apply( T srcImg , T dstImg , int dstX0 , int dstY0 , int dstX1 , int dstY1 );
 }
