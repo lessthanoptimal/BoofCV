@@ -26,8 +26,7 @@ import boofcv.factory.feature.tracker.FactoryPointTracker;
 import boofcv.struct.image.ImageFloat32;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 
 /**
@@ -129,5 +128,13 @@ public class TestPointTrackerKltPyramid extends StandardPointTracker<ImageFloat3
 		for(KltFeature f : desc.desc ) {
 			assertTrue(f.Gxx != 0 );
 		}
+	}
+
+	/**
+	 * The center of tracks should all be inside the image after process() has been called
+	 */
+	@Test
+	public void process_pruneOutside() {
+		fail("make sure tracks outside the image are dropped");
 	}
 }

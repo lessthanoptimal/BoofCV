@@ -25,8 +25,7 @@ import boofcv.core.image.border.ImageBorder1D_F32;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * @author Peter Abeles
@@ -153,6 +152,14 @@ public class TestPyramidKltTracker extends PyramidKltTestBase {
 
 		// outside layers should not be updated automatically
 		assertTrue(feature.desc[2].Gxx == 0);
+	}
+
+	/**
+	 * Try tracking when the upper layer in the pyramid is in bounds, but it is out of bounds in the lower layer
+	 */
+	@Test
+	public void track_someIn_somOut() {
+		fail("implement");
 	}
 
 	/**

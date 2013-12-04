@@ -21,6 +21,9 @@ package boofcv.abst.feature.tracker;
 import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
 import boofcv.factory.feature.tracker.FactoryPointTrackerTwoPass;
 import boofcv.struct.image.ImageFloat32;
+import org.junit.Test;
+
+import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
@@ -37,5 +40,15 @@ public class TestPointTrackerTwoPassKltPyramid extends StandardPointTrackerTwoPa
 	public PointTrackerTwoPass<ImageFloat32> createTracker() {
 		config = PkltConfig.createDefault(ImageFloat32.class, ImageFloat32.class);
 		return FactoryPointTrackerTwoPass.klt(config, new ConfigGeneralDetector(200, 3, 1000, 0, true));
+	}
+
+	@Test
+	public void dropTracksOutside_firstPass() {
+		fail("make sure tracks outside the image are dropped");
+	}
+
+	@Test
+	public void dropTracksOutside_secondPass() {
+		fail("make sure tracks outside the image are dropped");
 	}
 }

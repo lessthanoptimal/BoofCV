@@ -119,6 +119,9 @@ public class ImageMotionPtkSmartRespawn<I extends ImageBase, IT extends Invertib
 			}
 		}
 
+		// make sure points are mostly in the image.  Low quality if outside
+		pruneOutsideImage(tracker,input);
+
 		if(setKeyFrame) {
 			// use the new keyframe as an opportunity to discard points that are too close.  commonly occurs
 			// when zooming out and points cluster together
@@ -140,6 +143,22 @@ public class ImageMotionPtkSmartRespawn<I extends ImageBase, IT extends Invertib
 		}
 	}
 
+
+	/**
+	 * Prune a point if its center is outside the image
+	 */
+	private void pruneOutsideImage( PointTracker<I> tracker, I input ) {
+		prune.clear();
+		List<PointTrack> active = tracker.getActiveTracks(null);
+		for( int i = 0; i < active.size(); i++ ) {
+			PointTrack t = active.get(i);
+			if( !input.isInBounds((int)t.x,(int)t.y))
+				prune.add(t);
+		}
+		for( PointTrack t : prune ) {
+			tracker.dropTrack(t);
+		}
+	}
 	/**
 	 * Computes an axis-aligned rectangle that contains all the inliers.  It then computes the area contained in
 	 * that rectangle to the total area of the image

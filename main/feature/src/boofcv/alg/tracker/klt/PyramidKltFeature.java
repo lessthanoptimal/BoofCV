@@ -28,8 +28,6 @@ public class PyramidKltFeature {
 	public KltFeature desc[];
 	/** the feature's location in the original image */
 	public float x,y;
-	/** the maximum layer in which this description is valid */
-	public int maxLayer=-1;
 
 	/** user specified data, not used by the tracker */
 	public Object cookie;
