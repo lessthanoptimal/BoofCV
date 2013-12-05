@@ -19,11 +19,16 @@
 package boofcv.abst.feature.tracker;
 
 import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
+import boofcv.alg.tracker.klt.KltTrackFault;
+import boofcv.alg.tracker.klt.KltTracker;
+import boofcv.alg.tracker.klt.PyramidKltFeature;
+import boofcv.alg.tracker.klt.PyramidKltTracker;
 import boofcv.factory.feature.tracker.FactoryPointTrackerTwoPass;
 import boofcv.struct.image.ImageFloat32;
 import org.junit.Test;
 
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Peter Abeles
@@ -44,11 +49,75 @@ public class TestPointTrackerTwoPassKltPyramid extends StandardPointTrackerTwoPa
 
 	@Test
 	public void allPointsInside_firstPass() {
-		fail("make sure tracks outside the image are dropped");
+		PointTrackerTwoPassKltPyramid<ImageFloat32,ImageFloat32> alg =
+				(PointTrackerTwoPassKltPyramid<ImageFloat32,ImageFloat32>)createTracker();
+
+		alg.process(image);
+		alg.spawnTracks();
+
+		// swap in a new tracker which won't change the track states
+		alg.tracker = new DummyTracker(null);
+		int N = alg.active.size();
+		assertTrue(N>10);
+		// put two tracks outside of the image, but still close enough to be tracked by KLT
+		alg.active.get(0).setPosition(-1,-2);
+		alg.active.get(2).setPosition(image.width+1,image.height);
+
+		// process it again, location's wont change so two tracks should be dropped since they are outside
+		alg.process(image);
+		assertEquals(2, alg.candidateDrop.size());
+		assertEquals(N-2,alg.getActiveTracks(null).size());
+
+		alg.finishTracking();
+		assertEquals(N-2,alg.getAllTracks(null).size());
 	}
 
 	@Test
 	public void allPointsInside_secondPass() {
-		fail("make sure tracks outside the image are dropped");
+		PointTrackerTwoPassKltPyramid<ImageFloat32,ImageFloat32> alg =
+				(PointTrackerTwoPassKltPyramid<ImageFloat32,ImageFloat32>)createTracker();
+
+		alg.process(image);
+		alg.spawnTracks();
+
+		// swap in a new tracker which won't change the track states
+		alg.tracker = new DummyTracker(null);
+		int N = alg.active.size();
+		assertTrue(N > 10);
+
+		// no change after first pass
+		alg.process(image);
+		assertEquals(0, alg.candidateDrop.size());
+		assertEquals(N,alg.getActiveTracks(null).size());
+		// should drop tracks after the second pass
+		alg.active.get(0).setPosition(-1, -2);
+		alg.active.get(2).setPosition(image.width + 1, image.height);
+		alg.performSecondPass();
+
+		assertEquals(2,alg.candidateDrop.size());
+		assertEquals(N-2,alg.getActiveTracks(null).size());
+
+		alg.finishTracking();
+		assertEquals(N-2,alg.getAllTracks(null).size());
+	}
+
+	/**
+	 * Don't change the track state
+	 */
+	private static class DummyTracker extends PyramidKltTracker {
+
+		public DummyTracker(KltTracker tracker) {
+			super(tracker);
+		}
+
+		@Override
+		public boolean setDescription(PyramidKltFeature feature) {
+			return true;
+		}
+
+		@Override
+		public KltTrackFault track(PyramidKltFeature feature) {
+			return KltTrackFault.SUCCESS;
+		}
 	}
 }

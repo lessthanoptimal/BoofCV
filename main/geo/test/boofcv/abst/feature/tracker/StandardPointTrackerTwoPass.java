@@ -62,7 +62,6 @@ public abstract class StandardPointTrackerTwoPass<T extends ImageSingleBand>
 
 		tracker2.process((T)image);
 		List<PointTrack> tracks = tracker2.getAllTracks(null);
-		checkInside(tracks);
 		// since the image is the same the tracks should all be the same
 		assertEquals(allBefore, tracks.size());
 		assertEquals(activeBefore, tracker2.getActiveTracks(null).size());
@@ -73,7 +72,6 @@ public abstract class StandardPointTrackerTwoPass<T extends ImageSingleBand>
 		}
 		tracker2.performSecondPass();
 		// make sure that lists which shouldn't change haven't changed
-		checkInside(tracker2.getAllTracks(null));
 		assertEquals(allBefore, tracker2.getAllTracks(null).size());
 		assertEquals(0, tracker2.getDroppedTracks(null).size());
 		assertEquals(0, tracker2.getNewTracks(null).size());
@@ -82,6 +80,7 @@ public abstract class StandardPointTrackerTwoPass<T extends ImageSingleBand>
 
 		// now everything can change
 		tracker2.finishTracking();
+		checkInside(tracker2.getAllTracks(null));
 		if( shouldDropTracks ) {
 			assertTrue(allBefore > tracker2.getAllTracks(null).size());
 			assertTrue( tracker2.getDroppedTracks(null).size() > 0 );
@@ -108,6 +107,8 @@ public abstract class StandardPointTrackerTwoPass<T extends ImageSingleBand>
 		tracker2.performSecondPass();
 
 		// since the same image was processed twice nothing should change
+		tracker2.finishTracking();
+		checkInside(tracker2.getAllTracks(null));
 		assertEquals(allBefore, tracker2.getAllTracks(null).size());
 		assertEquals(activeBefore, tracker2.getActiveTracks(null).size());
 	}
