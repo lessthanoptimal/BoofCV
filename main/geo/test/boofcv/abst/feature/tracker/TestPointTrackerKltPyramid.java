@@ -20,13 +20,13 @@ package boofcv.abst.feature.tracker;
 
 import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
 import boofcv.alg.misc.GImageMiscOps;
-import boofcv.alg.tracker.klt.KltFeature;
-import boofcv.alg.tracker.klt.PyramidKltFeature;
+import boofcv.alg.tracker.klt.*;
 import boofcv.factory.feature.tracker.FactoryPointTracker;
 import boofcv.struct.image.ImageFloat32;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 
 /**
@@ -135,6 +135,44 @@ public class TestPointTrackerKltPyramid extends StandardPointTracker<ImageFloat3
 	 */
 	@Test
 	public void process_allPointsInside() {
-		fail("make sure tracks outside the image are dropped");
+		PointTrackerKltPyramid<ImageFloat32,ImageFloat32> alg =
+				(PointTrackerKltPyramid<ImageFloat32,ImageFloat32>)createTracker();
+
+		alg.process(image);
+		alg.spawnTracks();
+
+		// swap in a new tracker which won't change the track states
+		alg.tracker = new DummyTracker(null);
+		int N = alg.active.size();
+		assertTrue(N>10);
+		// put two tracks outside of the image, but still close enough to be tracked by KLT
+		alg.active.get(0).setPosition(-1,-2);
+		alg.active.get(2).setPosition(image.width+1,image.height);
+
+		// process it again, location's wont change so two tracks should be dropped since they are outside
+		alg.process(image);
+		assertEquals(2, alg.getDroppedTracks(null).size());
+		assertEquals(N-2,alg.getActiveTracks(null).size());
+
+	}
+
+	/**
+	 * Don't change the track state
+	 */
+	private static class DummyTracker extends PyramidKltTracker {
+
+		public DummyTracker(KltTracker tracker) {
+			super(tracker);
+		}
+
+		@Override
+		public boolean setDescription(PyramidKltFeature feature) {
+			return true;
+		}
+
+		@Override
+		public KltTrackFault track(PyramidKltFeature feature) {
+			return KltTrackFault.SUCCESS;
+		}
 	}
 }

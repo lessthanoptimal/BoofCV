@@ -59,7 +59,7 @@ public class PyramidKltTestBase {
 	public void setup( int ...scales ) {
 
 		pyramid = FactoryPyramid.discreteGaussian(scales,-1,2,false,ImageFloat32.class);
-		ImageMiscOps.fillUniform(image,rand,0,1);
+		ImageMiscOps.fillUniform(image,rand,0,10);
 		ImageMiscOps.fillRectangle(image,100,cornerX,cornerY,20,20);
 		pyramid.process(image);
 

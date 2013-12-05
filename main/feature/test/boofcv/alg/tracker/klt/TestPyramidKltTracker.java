@@ -56,7 +56,7 @@ public class TestPyramidKltTracker extends PyramidKltTestBase {
 		PyramidKltFeature feature = new PyramidKltFeature(pyramid.getNumLayers(),featureReadius);
 		feature.setPosition(25,20);
 		tracker.setImage(pyramid,derivX,derivY);
-		tracker.setDescription(feature);
+		assertTrue(tracker.setDescription(feature));
 
 		// all the layers should have been set
 		for( int i = 0; i < pyramid.getNumLayers(); i++ ) {
@@ -65,20 +65,34 @@ public class TestPyramidKltTracker extends PyramidKltTestBase {
 	}
 
 	/**
-	 * Test set description when a feature is inside the allowed region for only part of the pyramid.
+	 * Test set description when a feature partially inside and outside of the image at all levels
 	 */
 	@Test
-	public void setDescription_partial() {
+	public void setDescription_border() {
 		// now tell it to set a description near the edge
 		// only the first layer should be set
 		PyramidKltFeature feature = new PyramidKltFeature(pyramid.getNumLayers(),featureReadius);
-		feature.setPosition(featureReadius,featureReadius);
+		feature.setPosition(featureReadius-1,featureReadius-1);
 		tracker.setImage(pyramid,derivX,derivY);
-		tracker.setDescription(feature);
-		assertTrue( feature.desc[0].x != 0 );
-		for( int i = 1; i < pyramid.getNumLayers(); i++ ) {
-			assertTrue( feature.desc[i].Gxx == 0.0f );
+		assertTrue(tracker.setDescription(feature));
+		for( int i = 0; i < pyramid.getNumLayers(); i++ ) {
+			assertTrue( feature.desc[i].x != 0 );
+			assertTrue( feature.desc[i].y != 0 );
+			assertTrue( feature.desc[i].Gxx != 0.0f );
 		}
+	}
+
+	/**
+	 * Test set description when a feature is completely outside the image
+	 */
+	@Test
+	public void setDescription_outside() {
+		// now tell it to set a description near the edge
+		// only the first layer should be set
+		PyramidKltFeature feature = new PyramidKltFeature(pyramid.getNumLayers(),featureReadius);
+		feature.setPosition(-featureReadius-1,-featureReadius-1);
+		tracker.setImage(pyramid,derivX,derivY);
+		assertFalse(tracker.setDescription(feature));
 	}
 
 	/**
@@ -128,38 +142,25 @@ public class TestPyramidKltTracker extends PyramidKltTestBase {
 	}
 
 	/**
-	 * Test tracking when a feature is out of bounds in the middle of the pyramid
+	 *
 	 */
 	@Test
-	public void track_outside_middle() {
-		setTargetLocation(5*4+1,22);
+	public void track_border() {
+		float targetX = width-featureReadius;
+		float targetY = height-featureReadius-3;
 
 		// set the feature right on the corner
-		PyramidKltFeature feature = new PyramidKltFeature(pyramid.getNumLayers(),4);
-		feature.setPosition(21,22);
+		PyramidKltFeature feature = new PyramidKltFeature(pyramid.getNumLayers(),featureReadius);
+		feature.setPosition(targetX,targetY);
 		tracker.setImage(pyramid,derivX,derivY);
 		tracker.setDescription(feature);
 
-		// move it towards the image border so that it won't be on the pyramids last layer
-		feature.setPosition(19,22);
-		feature.desc[2].Gxx = feature.desc[2].Gyy = feature.desc[2].Gxy = 0;
-
-		// see if it tracked the target
+		// start it outside the image, but still near its true position
+		feature.setPosition(width-featureReadius+2,height-featureReadius-1);
 		assertTrue( tracker.track(feature) == KltTrackFault.SUCCESS);
 
-		assertEquals(21,feature.x,0.2);
-		assertEquals(22,feature.y,0.2);
-
-		// outside layers should not be updated automatically
-		assertTrue(feature.desc[2].Gxx == 0);
-	}
-
-	/**
-	 * Try tracking when the upper layer in the pyramid is in bounds, but it is out of bounds in the lower layer
-	 */
-	@Test
-	public void track_someIn_somOut() {
-		fail("implement");
+		assertEquals(targetX,feature.x,0.2);
+		assertEquals(targetY,feature.y,0.2);
 	}
 
 	/**
@@ -176,7 +177,7 @@ public class TestPyramidKltTracker extends PyramidKltTestBase {
 		tracker.setDescription(feature);
 
 		// put the feature out of bounds
-		feature.setPosition(5,0);
+		feature.setPosition(-20,-20);
 
 		assertTrue( tracker.track(feature) == KltTrackFault.OUT_OF_BOUNDS);
 	}

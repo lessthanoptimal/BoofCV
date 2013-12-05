@@ -26,6 +26,7 @@ import boofcv.alg.tracker.klt.KltConfig;
 import boofcv.alg.tracker.klt.KltTrackFault;
 import boofcv.alg.tracker.klt.PyramidKltFeature;
 import boofcv.alg.transform.pyramid.PyramidOps;
+import boofcv.misc.BoofMiscOps;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.pyramid.PyramidDiscrete;
 
@@ -98,7 +99,7 @@ public class PointTrackerTwoPassKltPyramid<I extends ImageSingleBand,D extends I
 
 			if( ret == KltTrackFault.SUCCESS ) {
 				// discard a track if its center drifts outside the image.
-				if( image.isInBounds((int)t.x,(int)t.y)) {
+				if( BoofMiscOps.checkInside(input, t.x, t.y)) {
 					active.add(t);
 					PointTrack p = t.getCookie();
 					p.set(t.x,t.y);
@@ -125,7 +126,7 @@ public class PointTrackerTwoPassKltPyramid<I extends ImageSingleBand,D extends I
 
 			if( ret == KltTrackFault.SUCCESS ) {
 				// discard a track if its center drifts outside the image.
-				if( input.isInBounds((int)t.x,(int)t.y)) {
+				if(BoofMiscOps.checkInside(input, t.x, t.y)) {
 					active.add(t);
 					PointTrack p = t.getCookie();
 					p.set(t.x,t.y);
@@ -140,9 +141,14 @@ public class PointTrackerTwoPassKltPyramid<I extends ImageSingleBand,D extends I
 
 	@Override
 	public void finishTracking() {
-		for( int i = 0; i < active.size(); i++ ) {
+		for( int i = 0; i < active.size(); ) {
 			PyramidKltFeature t = active.get(i);
-			tracker.setDescription(t);
+			if( tracker.setDescription(t) ) {
+				i++;
+			} else {
+				candidateDrop.add(t);
+				active.remove(i);
+			}
 		}
 
 		for( int i = 0; i < candidateDrop.size(); i++ ) {

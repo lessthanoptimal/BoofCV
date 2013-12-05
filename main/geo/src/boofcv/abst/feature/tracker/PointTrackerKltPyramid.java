@@ -244,11 +244,7 @@ public class PointTrackerKltPyramid<I extends ImageSingleBand,D extends ImageSin
 
 		// update image pyramids
 		basePyramid.process(image);
-		if( derivX == null ) {
-			// declare storage for image derivative since the image size is now known
-			derivX = PyramidOps.declareOutput(basePyramid,derivType);
-			derivY = PyramidOps.declareOutput(basePyramid,derivType);
-		}
+		declareOutput();
 		PyramidOps.gradient(basePyramid, gradient, derivX,derivY);
 
 		// track features
@@ -261,8 +257,7 @@ public class PointTrackerKltPyramid<I extends ImageSingleBand,D extends ImageSin
 
 			if( ret == KltTrackFault.SUCCESS ) {
 				// discard a track if its center drifts outside the image.
-				if( image.isInBounds((int)t.x,(int)t.y)) {
-					tracker.setDescription(t);
+				if( image.isInBounds((int)t.x,(int)t.y) && tracker.setDescription(t) ) {
 					PointTrack p = t.getCookie();
 					p.set(t.x,t.y);
 					i++;
@@ -275,6 +270,20 @@ public class PointTrackerKltPyramid<I extends ImageSingleBand,D extends ImageSin
 				dropped.add( t );
 				unused.add( t );
 			}
+		}
+	}
+
+	private void declareOutput() {
+		if( derivX == null ) {
+			// declare storage for image derivative since the image size is now known
+			derivX = PyramidOps.declareOutput(basePyramid, derivType);
+			derivY = PyramidOps.declareOutput(basePyramid,derivType);
+		}
+		else if( derivX[0].width != basePyramid.getLayer(0).width ||
+				derivX[0].height != basePyramid.getLayer(0).height )
+		{
+			PyramidOps.reshapeOutput(basePyramid,derivX);
+			PyramidOps.reshapeOutput(basePyramid,derivY);
 		}
 	}
 

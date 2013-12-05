@@ -86,7 +86,7 @@ public abstract class CheckVisualOdometryStereoSim<I extends ImageSingleBand>
 			right.setTo(render(worldToRight));
 
 			// process the images
-			assertTrue(algorithm.process(left,right));
+			assertTrue("iteration "+i,algorithm.process(left,right));
 
 			// Compare to truth.  Only go for a crude approximation
 			Se3_F64 foundWorldToLeft = algorithm.getCameraToWorld().invert(null);
