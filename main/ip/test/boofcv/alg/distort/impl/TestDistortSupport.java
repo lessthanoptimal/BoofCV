@@ -36,10 +36,20 @@ public class TestDistortSupport {
 
 		PixelTransform_F32 tran = DistortSupport.transformScale(a, b);
 
+		// check edge cases at the image border
+		tran.compute(0,0);
+		assertEquals(0,tran.distX,1e-8);
+		assertEquals(0,tran.distY,1e-8);
+
+		tran.compute(24,29);
+		assertEquals(14,tran.distX,1e-8);
+		assertEquals(24,tran.distY,1e-8);
+
+		// some point inside now
 		tran.compute(5,6);
 
-		assertEquals(5.0*15.0/25.0,tran.distX,1e-4);
-		assertEquals(6.0*25.0/30.0,tran.distY,1e-4);
+		assertEquals(5.0*14.0/24.0,tran.distX,1e-4);
+		assertEquals(6.0*24.0/29.0,tran.distY,1e-4);
 	}
 
 	@Test
