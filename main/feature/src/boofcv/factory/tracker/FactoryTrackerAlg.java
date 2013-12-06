@@ -20,7 +20,6 @@ package boofcv.factory.tracker;
 
 import boofcv.abst.feature.associate.AssociateDescription;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
-import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.interpolate.InterpolateRectangle;
 import boofcv.alg.tracker.combined.CombinedTrackerScalePoint;
 import boofcv.alg.tracker.combined.PyramidKltForCombined;
@@ -56,11 +55,7 @@ public class FactoryTrackerAlg {
 		InterpolateRectangle<I> interpInput = FactoryInterpolation.<I>bilinearRectangle(imageType);
 		InterpolateRectangle<D> interpDeriv = FactoryInterpolation.<D>bilinearRectangle(derivType);
 
-		InterpolatePixelS<I> interpI = FactoryInterpolation.bilinearPixelS(imageType);
-		InterpolatePixelS<D> interpDx = FactoryInterpolation.bilinearPixelS(derivType);
-		InterpolatePixelS<D> interpDy = FactoryInterpolation.bilinearPixelS(derivType);
-
-		return new KltTracker<I, D>(interpInput, interpDeriv,interpI,interpDx,interpDy, config);
+		return new KltTracker<I, D>(interpInput, interpDeriv,config);
 	}
 
 	/**
@@ -83,11 +78,7 @@ public class FactoryTrackerAlg {
 		InterpolateRectangle<I> interpInput = FactoryInterpolation.<I>bilinearRectangle(imageType);
 		InterpolateRectangle<D> interpDeriv = FactoryInterpolation.<D>bilinearRectangle(derivType);
 
-		InterpolatePixelS<I> interpI = FactoryInterpolation.bilinearPixelS(imageType);
-		InterpolatePixelS<D> interpDx = FactoryInterpolation.bilinearPixelS(derivType);
-		InterpolatePixelS<D> interpDy = FactoryInterpolation.bilinearPixelS(derivType);
-
-		KltTracker<I, D> klt = new KltTracker<I, D>(interpInput, interpDeriv, interpI,interpDx,interpDy,config);
+		KltTracker<I, D> klt = new KltTracker<I, D>(interpInput, interpDeriv, config);
 		return new PyramidKltTracker<I, D>(klt);
 	}
 

@@ -44,7 +44,6 @@ import boofcv.alg.feature.detect.intensity.GradientCornerIntensity;
 import boofcv.alg.feature.detect.interest.EasyGeneralFeatureDetector;
 import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
-import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.interpolate.InterpolateRectangle;
 import boofcv.alg.tracker.combined.CombinedTrackerScalePoint;
 import boofcv.alg.transform.ii.GIntegralImageOps;
@@ -122,16 +121,12 @@ public class FactoryPointTracker {
 		InterpolateRectangle<I> interpInput = FactoryInterpolation.<I>bilinearRectangle(config.typeInput);
 		InterpolateRectangle<D> interpDeriv = FactoryInterpolation.<D>bilinearRectangle(config.typeDeriv);
 
-		InterpolatePixelS<I> interpI = FactoryInterpolation.bilinearPixelS(config.typeInput);
-		InterpolatePixelS<D> interpDx = FactoryInterpolation.bilinearPixelS(config.typeDeriv);
-		InterpolatePixelS<D> interpDy = FactoryInterpolation.bilinearPixelS(config.typeDeriv);
-
 		ImageGradient<I,D> gradient = FactoryDerivative.sobel(config.typeInput, config.typeDeriv);
 
 		PyramidDiscrete<I> pyramid = FactoryPyramid.discreteGaussian(config.pyramidScaling,-1,2,true,config.typeInput);
 
 		return new PointTrackerKltPyramid<I, D>(config.config,config.templateRadius,pyramid,detector,
-				gradient,interpInput,interpDeriv,interpI,interpDx,interpDy,config.typeDeriv);
+				gradient,interpInput,interpDeriv,config.typeDeriv);
 	}
 
 	/**
