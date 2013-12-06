@@ -77,7 +77,6 @@ Version : Alpha 0.16
 - KLT can now track features which partially extend outside the image border
 - Image Interpolation
   * Almost all interpolation routines incorrectly treated pixels 1 outside of the image as inside.  Unit tests
-
   have been added and other classes modified for the change in behavior.
 - Fixed FactoryDistort.scale().  Off by one error when specifying scale factor
 

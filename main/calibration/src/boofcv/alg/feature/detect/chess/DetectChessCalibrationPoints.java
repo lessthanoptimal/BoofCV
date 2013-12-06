@@ -138,7 +138,7 @@ public class DetectChessCalibrationPoints<T extends ImageSingleBand, D extends I
 //		intensityAlg = FactoryIntensityPoint.harris(radius,0.04f,true,derivType);
 
 		// minContourSize is specified later after the image's size is known
-		findBound = new DetectChessSquaresBinary(numCols, numRows, 0);
+		findBound = new DetectChessSquaresBinary(numCols, numRows, 10);
 
 		reset();
 	}
@@ -217,12 +217,12 @@ public class DetectChessCalibrationPoints<T extends ImageSingleBand, D extends I
 	 * Adjust image processing parameters for the input image size
 	 */
 	private void adjustForImageSize( int imgWidth , int imgHeight ) {
-		int size = (int)(relativeSizeThreshold*40.0/640.0*imgWidth);
-
-		if( size < 10 )
-			size = 10;
-
-		findBound.setMinimumContourSize(size);
+//		int size = (int)(relativeSizeThreshold*10.0/640.0*imgWidth);
+//
+//		if( size < 10 )
+//			size = 10;
+//
+//		findBound.setMinimumContourSize(size);
 	}
 
 	/**
