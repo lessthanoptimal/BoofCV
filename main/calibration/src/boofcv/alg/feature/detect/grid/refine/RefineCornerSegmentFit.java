@@ -432,7 +432,7 @@ public class RefineCornerSegmentFit {
 		LineParametric2D_F64 lineB = new LineParametric2D_F64();
 
 		@Override
-		public int getN() {
+		public int getInputsN() {
 			return 4;
 		}
 

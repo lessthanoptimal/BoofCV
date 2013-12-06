@@ -68,12 +68,12 @@ public class TestRodriguesRotationGradient {
 	public static class RodToMatrix implements FunctionNtoM
 	{
 		@Override
-		public int getN() {
+		public int getInputsN() {
 			return 3;
 		}
 
 		@Override
-		public int getM() {
+		public int getOutputsM() {
 			return 9;
 		}
 
@@ -91,12 +91,12 @@ public class TestRodriguesRotationGradient {
 	public static class RodToGradient implements FunctionNtoMxN
 	{
 		@Override
-		public int getN() {
+		public int getInputsN() {
 			return 3;
 		}
 
 		@Override
-		public int getM() {
+		public int getOutputsM() {
 			return 9;
 		}
 

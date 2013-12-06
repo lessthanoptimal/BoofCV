@@ -35,9 +35,9 @@ public class WrapMultivariateMatrixFunction implements MultivariateMatrixFunctio
 	public WrapMultivariateMatrixFunction(FunctionNtoMxN jacobian) {
 		this.jacobian = jacobian;
 
-		mat = new DenseMatrix64F(jacobian.getM(),jacobian.getN());
+		mat = new DenseMatrix64F(jacobian.getOutputsM(),jacobian.getInputsN());
 
-		output = new double[jacobian.getM()][jacobian.getN()];
+		output = new double[jacobian.getOutputsM()][jacobian.getInputsN()];
 	}
 
 	@Override
@@ -45,8 +45,8 @@ public class WrapMultivariateMatrixFunction implements MultivariateMatrixFunctio
 
 		jacobian.process(point,mat.data);
 
-		for( int i = 0; i < jacobian.getM(); i++ ) {
-			for( int j = 0; j < jacobian.getN(); j++ ) {
+		for( int i = 0; i < jacobian.getOutputsM(); i++ ) {
+			for( int j = 0; j < jacobian.getInputsN(); j++ ) {
 				output[i][j] = mat.unsafe_get(i,j);
 			}
 		}
