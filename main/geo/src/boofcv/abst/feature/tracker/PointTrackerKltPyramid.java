@@ -20,7 +20,6 @@ package boofcv.abst.feature.tracker;
 
 import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
-import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.interpolate.InterpolateRectangle;
 import boofcv.alg.tracker.klt.*;
 import boofcv.alg.transform.pyramid.PyramidOps;
@@ -92,11 +91,8 @@ public class PointTrackerKltPyramid<I extends ImageSingleBand,D extends ImageSin
 								  ImageGradient<I, D> gradient,
 								  InterpolateRectangle<I> interpInput,
 								  InterpolateRectangle<D> interpDeriv,
-								  InterpolatePixelS<I> interpPixelI,
-								  InterpolatePixelS<D> interpPixelDX,
-								  InterpolatePixelS<D> interpPixelDY,
 								  Class<D> derivType ) {
-		this(config,templateRadius,pyramid,gradient,interpInput,interpDeriv,interpPixelI,interpPixelDX,interpPixelDY,derivType);
+		this(config,templateRadius,pyramid,gradient,interpInput,interpDeriv,derivType);
 
 		if( detector.getRequiresHessian() )
 			throw new IllegalArgumentException("Hessian based feature detectors not yet supported");
@@ -111,9 +107,6 @@ public class PointTrackerKltPyramid<I extends ImageSingleBand,D extends ImageSin
 								  ImageGradient<I, D> gradient,
 								  InterpolateRectangle<I> interpInput,
 								  InterpolateRectangle<D> interpDeriv,
-								  InterpolatePixelS<I> interpPixelI,
-								  InterpolatePixelS<D> interpPixelDX,
-								  InterpolatePixelS<D> interpPixelDY,
 								  Class<D> derivType ) {
 
 		this.config = config;
@@ -121,7 +114,7 @@ public class PointTrackerKltPyramid<I extends ImageSingleBand,D extends ImageSin
 		this.gradient = gradient;
 		this.basePyramid = pyramid;
 
-		KltTracker<I, D> klt = new KltTracker<I, D>(interpInput, interpDeriv, interpPixelI,interpPixelDX,interpPixelDY,config);
+		KltTracker<I, D> klt = new KltTracker<I, D>(interpInput, interpDeriv,config);
 		tracker = new PyramidKltTracker<I, D>(klt);
 	}
 

@@ -79,25 +79,6 @@ public class TestDistortImageOps {
 		}
 	}
 
-	@Test
-	public void scaleSanityCheck() {
-		ImageFloat32 input = new ImageFloat32(width,height);
-		ImageFloat32 output = new ImageFloat32(width/2,height/2);
-
-		GImageMiscOps.fillUniform(input, rand, 0, 100);
-
-		DistortImageOps.scale(input, output, TypeInterpolate.BILINEAR);
-
-		double error = 0;
-		for( int y = 0; y < output.height; y++ ) {
-			for( int x = 0; x < output.width; x++ ) {
-				double e = input.get(x*2,y*2)-output.get(x,y);
-				error += Math.abs(e);
-			}
-		}
-		assertTrue(error / (output.width * output.height) < 0.1);
-	}
-
 	/**
 	 * Very simple test for rotation accuracy.
 	 */

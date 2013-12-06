@@ -159,11 +159,6 @@ public class TestImageMotionPtkSmartRespawn {
 		assertEquals(2, motion.numChangeKeyFrame);
 	}
 
-	@Test
-	public void testFeatureInside() {
-		fail("add tests which test to see if features outside the image are handled correctly");
-	}
-
 	private List<AssociatedPair> createGoodFeatureList( int num ) {
 		List<AssociatedPair> ret = new ArrayList<AssociatedPair>();
 
