@@ -77,13 +77,13 @@ public class DetectQuadBlobsBinary {
 
 	/**
 	 * Constructor and specify pruning parameters
-	 * 
-	 * @param minContourSize Minimum allowed pixels in blob contour.
+	 *
+	 * @param minContourSize Minimum allowed pixels in blob contour. Try 10
 	 * @param polySideRatio Prune threshold based on side length. 0 to 1. Typically 0.25
 	 * @param minimumBlobCount Stop processing if fewer than this number of blobs have been detected
 	 */
-	public DetectQuadBlobsBinary(int minContourSize, 
-								 double polySideRatio, 
+	public DetectQuadBlobsBinary(int minContourSize,
+								 double polySideRatio,
 								 int minimumBlobCount) 
 	{
 		this.minContourSize = minContourSize;
@@ -154,7 +154,7 @@ public class DetectQuadBlobsBinary {
 	{
 		for( int i = 0; i < contours.size(); ) {
 			Contour c = contours.get(i);
-			if( c.external.size() < 10 ) {//minContourSize ) {
+			if( c.external.size() < minContourSize ) {
 				contours.remove(i);
 			} else {
 				i++;

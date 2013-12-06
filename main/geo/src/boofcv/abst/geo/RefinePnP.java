@@ -23,7 +23,8 @@ import georegression.struct.se.Se3_F64;
 import org.ddogleg.fitting.modelset.ModelFitter;
 
 /**
- * Refines a pose estimate given a set of observations and associated 3D point in world coordinates.
+ * Refines a pose estimate given a set of observations and associated 3D point in world coordinates. Observations
+ * are in normalized image coordinates.
  *
  * @author Peter Abeles
  */
