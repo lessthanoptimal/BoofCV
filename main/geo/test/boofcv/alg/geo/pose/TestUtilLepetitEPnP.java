@@ -93,12 +93,12 @@ public class TestUtilLepetitEPnP {
 		}
 
 		@Override
-		public int getN() {
+		public int getInputsN() {
 			return numControl;
 		}
 
 		@Override
-		public int getM() {
+		public int getOutputsM() {
 			return L_full.numRows;
 		}
 
@@ -138,12 +138,12 @@ public class TestUtilLepetitEPnP {
 		}
 
 		@Override
-		public int getN() {
+		public int getInputsN() {
 			return numControl;
 		}
 
 		@Override
-		public int getM() {
+		public int getOutputsM() {
 			return L_full.numRows;
 		}
 

@@ -63,12 +63,12 @@ public class PnPJacobianRodrigues implements FunctionNtoMxN {
 	}
 
 	@Override
-	public int getN() {
+	public int getInputsN() {
 		return 6;
 	}
 
 	@Override
-	public int getM() {
+	public int getOutputsM() {
 		return observations.size()*2;
 	}
 
