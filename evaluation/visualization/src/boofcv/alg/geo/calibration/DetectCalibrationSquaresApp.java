@@ -238,9 +238,6 @@ public class DetectCalibrationSquaresApp
 			QuadBlob p = squares.get(i);
 			Point2D_I32 c = p.center;
 			g2.drawString(String.format("%d", p.conn.size()), c.x, c.y);
-			if( p.conn.size() == 3 ) {
-				System.out.println();
-			}
 		}
 
 //		for( int i = 0; i < squares.size(); i++ ) {
@@ -250,6 +247,18 @@ public class DetectCalibrationSquaresApp
 //				VisualizeFeatures.drawPoint(g2, c.x, c.y, 1, Color.BLUE );
 //			}
 //		}
+	}
+
+	public static void drawBlobNumbers(Graphics2D g2, List<QuadBlob> squares) {
+
+		g2.setColor(Color.RED);
+		g2.setStroke(new BasicStroke(2.0f));
+		for( int i = 0; i < squares.size(); i++ ) {
+			QuadBlob p = squares.get(i);
+			Point2D_I32 c = p.center;
+			g2.drawString(String.format("%d", p.index), c.x, c.y);
+
+		}
 	}
 
 	/**

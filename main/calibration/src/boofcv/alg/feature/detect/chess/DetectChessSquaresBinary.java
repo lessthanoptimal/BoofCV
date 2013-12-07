@@ -130,7 +130,7 @@ public class DetectChessSquaresBinary {
 
 	/**
 	 * Connect blobs together based on corner distance. If two corners are uniquely close
-	 * together then.
+	 * then connect them together.
 	 */
 	public static void connect( List<QuadBlob> blobs  )
 	{

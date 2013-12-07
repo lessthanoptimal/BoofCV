@@ -341,11 +341,9 @@ public class PerspectiveOps {
 		if( K == null )
 			return norm;
 
-		Point2D_F64 pixel = new Point2D_F64();
+		GeometryMath_F64.mult(K, norm, norm);
 
-		GeometryMath_F64.mult(K, norm, pixel);
-
-		return pixel;
+		return norm;
 	}
 
 	/**
