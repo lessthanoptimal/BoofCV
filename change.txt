@@ -27,6 +27,7 @@ Version : Alpha 0.16
 - KltTracker.setDescription() can now fail due to lack of texture
 - Created TrackObjectQuad for tracking user select objects inside an image
   * Added TLD tracker
+  * Added Circulant tracker
   * Added Sparse Flow Object Tracker
   * Added various mean-shift trackers
 - Created recognition package
@@ -69,14 +70,14 @@ Version : Alpha 0.16
 - Calibration target detection
   * Locally adaptive thresholding is now used for square and chessboard target types.  Less sensitive to lighting
     conditions
-  * Chessboard target detector works much better on small targets.  Uses corners to estimate initial calibration
-    point position then uses mean-shift to refine
+  * Chessboard target detector works much better on small targets.  Uses QuadBlob corners to estimate initial
+    calibration point position then uses mean-shift for refinement
   * Chessboard now orders calibration points using QuadBlobs.  Allowing orientation ambiguity to be correctly resolved
     when the target is not symmetric.
 - ImplConvertBitmap incorrectly converted floating point images
   * Was doing an integer divide instead of a floating point divide
   * Thanks Vagoster for reporting the bug
-- KLT can now track features which partially extend outside the image border
+- KLT can now track features which partially extend outside the image
 - Image Interpolation
   * Almost all interpolation routines incorrectly treated pixels 1 outside of the image as inside.  Unit tests
   have been added and other classes modified for the change in behavior.

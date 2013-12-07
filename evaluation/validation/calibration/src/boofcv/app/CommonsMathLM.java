@@ -50,7 +50,7 @@ public class CommonsMathLM implements UnconstrainedLeastSquares {
 
 		problem = new WrapDifferentiable(function,jacobian);
 
-		int numFuncs = function.getOutputsM();
+		int numFuncs = function.getNumOfOutputsM();
 		target = new double[numFuncs];
 		weights = new double[numFuncs];
 		Arrays.fill(weights,1);

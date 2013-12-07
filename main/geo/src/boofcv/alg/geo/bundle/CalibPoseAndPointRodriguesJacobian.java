@@ -102,12 +102,12 @@ public class CalibPoseAndPointRodriguesJacobian implements FunctionNtoMxN {
 	}
 	
 	@Override
-	public int getInputsN() {
+	public int getNumOfInputsN() {
 		return numParameters;
 	}
 
 	@Override
-	public int getOutputsM() {
+	public int getNumOfOutputsM() {
 		return numObservations*2;
 	}
 

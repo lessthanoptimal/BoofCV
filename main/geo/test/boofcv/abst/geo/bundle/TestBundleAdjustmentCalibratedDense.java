@@ -92,7 +92,7 @@ public class TestBundleAdjustmentCalibratedDense {
 	{
 		CalibPoseAndPointResiduals func = new CalibPoseAndPointResiduals();
 		func.configure(null,model,observations);
-		double residuals[] = new double[ func.getOutputsM() ];
+		double residuals[] = new double[ func.getNumOfOutputsM() ];
 
 		func.process(model,residuals);
 

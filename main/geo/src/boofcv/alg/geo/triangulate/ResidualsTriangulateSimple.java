@@ -57,12 +57,12 @@ public class ResidualsTriangulateSimple implements FunctionNtoM  {
 	}
 	
 	@Override
-	public int getInputsN() {
+	public int getNumOfInputsN() {
 		return 3;
 	}
 
 	@Override
-	public int getOutputsM() {
+	public int getNumOfOutputsM() {
 		return observations.size();
 	}
 

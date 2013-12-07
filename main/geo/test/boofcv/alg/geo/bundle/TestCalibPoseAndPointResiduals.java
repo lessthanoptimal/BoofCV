@@ -83,7 +83,7 @@ public class TestCalibPoseAndPointResiduals {
 		double param[] = new double[ codec.getParamLength() ];
 		codec.encode(model,param);
 		
-		double residuals[] = new double[alg.getOutputsM()];
+		double residuals[] = new double[alg.getNumOfOutputsM()];
 		alg.process(param,residuals);
 		
 		assertEquals(0, GeoTestingOps.residualError(residuals),1e-8);

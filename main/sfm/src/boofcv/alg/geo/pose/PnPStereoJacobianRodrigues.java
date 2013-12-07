@@ -75,12 +75,12 @@ public class PnPStereoJacobianRodrigues implements FunctionNtoMxN {
 	}
 
 	@Override
-	public int getInputsN() {
+	public int getNumOfInputsN() {
 		return 6;
 	}
 
 	@Override
-	public int getOutputsM() {
+	public int getNumOfOutputsM() {
 		return observations.size()*4;
 	}
 
