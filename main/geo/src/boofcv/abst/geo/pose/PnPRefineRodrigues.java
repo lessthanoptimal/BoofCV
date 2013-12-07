@@ -28,6 +28,7 @@ import georegression.struct.se.Se3_F64;
 import org.ddogleg.fitting.modelset.ModelCodec;
 import org.ddogleg.optimization.FactoryOptimization;
 import org.ddogleg.optimization.UnconstrainedLeastSquares;
+import org.ddogleg.optimization.UtilOptimize;
 
 import java.util.List;
 
@@ -71,12 +72,12 @@ public class PnPRefineRodrigues implements RefinePnP {
 
 		minimizer.initialize(param,0,convergenceTol*obs.size());
 
-//		System.out.println("  error before "+minimizer.getFunctionValue());
+		System.out.println("  error before "+minimizer.getFunctionValue());
 		for( int i = 0; i < maxIterations; i++ ) {
-			if( minimizer.iterate() )
+			if( UtilOptimize.step(minimizer) )
 				break;
 		}
-//		System.out.println("  error after  "+minimizer.getFunctionValue());
+		System.out.println("  error after  "+minimizer.getFunctionValue());
 
 		paramModel.decode(minimizer.getParameters(), refinedWorldToCamera);
 

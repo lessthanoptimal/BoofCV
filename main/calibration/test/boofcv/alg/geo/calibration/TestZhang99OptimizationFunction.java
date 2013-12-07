@@ -60,7 +60,7 @@ public class TestZhang99OptimizationFunction {
 		Zhang99OptimizationFunction alg =
 				new Zhang99OptimizationFunction( new Zhang99Parameters(false,2,3),gridPts,observations );
 
-		double residuals[] = new double[ alg.getM()];
+		double residuals[] = new double[ alg.getOutputsM()];
 		for( int i = 0; i < residuals.length; i++ )
 			residuals[i] = 1;
 		

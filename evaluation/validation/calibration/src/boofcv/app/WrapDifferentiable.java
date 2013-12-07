@@ -37,7 +37,7 @@ public class WrapDifferentiable implements DifferentiableMultivariateVectorFunct
 		this.function = function;
 		this.jacobian = jacobian;
 
-		output = new double[function.getM()];
+		output = new double[function.getOutputsM()];
 	}
 
 	@Override

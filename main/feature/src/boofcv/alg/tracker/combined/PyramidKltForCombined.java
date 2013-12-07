@@ -18,7 +18,6 @@
 
 package boofcv.alg.tracker.combined;
 
-import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.interpolate.InterpolateRectangle;
 import boofcv.alg.tracker.klt.*;
 import boofcv.factory.interpolate.FactoryInterpolation;
@@ -54,11 +53,7 @@ public class PyramidKltForCombined<I extends ImageSingleBand, D extends ImageSin
 		InterpolateRectangle<I> interpInput = FactoryInterpolation.<I>bilinearRectangle(inputType);
 		InterpolateRectangle<D> interpDeriv = FactoryInterpolation.<D>bilinearRectangle(derivType);
 
-		InterpolatePixelS<I> interpI = FactoryInterpolation.bilinearPixelS(inputType);
-		InterpolatePixelS<D> interpDx = FactoryInterpolation.bilinearPixelS(derivType);
-		InterpolatePixelS<D> interpDy = FactoryInterpolation.bilinearPixelS(derivType);
-
-		KltTracker<I, D> klt = new KltTracker<I, D>(interpInput,interpDeriv,interpI,interpDx,interpDy,config);
+		KltTracker<I, D> klt = new KltTracker<I, D>(interpInput,interpDeriv,config);
 		tracker = new PyramidKltTracker<I,D>(klt);
 	}
 
