@@ -19,7 +19,6 @@
 package boofcv.factory.sfm;
 
 import boofcv.abst.feature.tracker.PointTracker;
-import boofcv.abst.geo.fitting.ModelManagerEpipolarMatrix;
 import boofcv.abst.sfm.d2.ImageMotion2D;
 import boofcv.abst.sfm.d2.WrapImageMotionPtkSmartRespawn;
 import boofcv.alg.distort.ImageDistort;
@@ -35,6 +34,7 @@ import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.MultiSpectral;
 import georegression.fitting.MotionTransformPoint;
 import georegression.fitting.affine.ModelManagerAffine2D_F64;
+import georegression.fitting.homography.ModelManagerHomography2D_F64;
 import georegression.fitting.se.ModelManagerSe2_F64;
 import georegression.fitting.se.MotionSe2PointSVD_F64;
 import georegression.struct.InvertibleTransform;
@@ -84,7 +84,7 @@ public class FactoryMotion2D {
 
 		if( motionModel instanceof Homography2D_F64) {
 			GenerateHomographyLinear mf = new GenerateHomographyLinear(true);
-			manager = (ModelManager)new ModelManagerEpipolarMatrix();
+			manager = (ModelManager)new ModelManagerHomography2D_F64();
 			fitter = (ModelGenerator)mf;
 			if( refineEstimate )
 				modelRefiner = (ModelFitter)mf;

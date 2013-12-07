@@ -54,7 +54,7 @@ import java.util.List;
  */
 public class DetectCalibrationChessApp<T extends ImageSingleBand, D extends ImageSingleBand>
 		extends SelectInputPanel implements VisualizeApp, GridCalibPanel.Listener
-		
+
 {
 	Class<T> imageType;
 	DetectChessCalibrationPoints<T,D> alg;
@@ -75,7 +75,7 @@ public class DetectCalibrationChessApp<T extends ImageSingleBand, D extends Imag
 	boolean foundTarget;
 
 	boolean processed = false;
-	
+
 	public DetectCalibrationChessApp(Class<T> imageType) {
 		this.imageType = imageType;
 
@@ -88,10 +88,10 @@ public class DetectCalibrationChessApp<T extends ImageSingleBand, D extends Imag
 		calibGUI.addView("Feature");
 		calibGUI.setListener( this );
 		calibGUI.setMinimumSize(calibGUI.getPreferredSize());
-		
+
 		panel.add(gui,BorderLayout.CENTER);
 		panel.add(calibGUI,BorderLayout.WEST);
-		
+
 		setMainGUI(panel);
 	}
 
@@ -108,11 +108,11 @@ public class DetectCalibrationChessApp<T extends ImageSingleBand, D extends Imag
 	@Override
 	public void loadConfigurationFile(String fileName) {
 		Reader r = media.openFile(fileName);
-		
+
 		SimpleStringNumberReader reader = new SimpleStringNumberReader('#');
 		if( !reader.read(r) )
 			throw new RuntimeException("Parsing configuration failed");
-		
+
 		if( reader.remainingTokens() != 6) {
 			while( reader.remainingTokens() != 0 ) {
 				System.out.println("token: "+reader.nextString());
@@ -190,7 +190,7 @@ public class DetectCalibrationChessApp<T extends ImageSingleBand, D extends Imag
 				Polygon2D_I32 bounds =  alg.getFindBound().getBoundPolygon();
 				drawBounds(g2, bounds);
 			}
-			
+
 			if( calibGUI.isShowNumbers() ) {
 				drawNumbers(g2, alg.getPoints(),1);
 			}
@@ -211,18 +211,11 @@ public class DetectCalibrationChessApp<T extends ImageSingleBand, D extends Imag
 			}
 		}
 
-//		if( calibGUI.doShowGraph ) {
-//
-//			List<QuadBlob> graph = alg.getFindBound().getGraphBlobs();
-//			if( graph != null )
-//				DetectCalibrationSquaresApp.drawGraph(g2,graph);
-//		}
-
 		if( calibGUI.doShowGraph ) {
 
-			List<QuadBlob> graph = alg.getOrderAlg().getResults();
+			List<QuadBlob> graph = alg.getFindBound().getGraphBlobs();
 			if( graph != null )
-				DetectCalibrationSquaresApp.drawBlobNumbers(g2,graph);
+				DetectCalibrationSquaresApp.drawGraph(g2,graph);
 		}
 
 		gui.setBufferedImage(workImage);
@@ -333,26 +326,23 @@ public class DetectCalibrationChessApp<T extends ImageSingleBand, D extends Imag
 
 		String prefix = "../data/applet/calibration/mono/Sony_DSC-HX5V_Chess/";
 
-//		app.loadConfigurationFile(prefix + "info.txt");
-		app.configure(4,5);
+		app.loadConfigurationFile(prefix + "info.txt");
 
 //		app.setBaseDirectory(prefix);
 //		app.loadInputData(prefix+"images.txt");
 
 		List<PathLabel> inputs = new ArrayList<PathLabel>();
 
-		prefix = "/home/pja/Desktop/calibBoard/";
-
-		inputs.add(new PathLabel("View 01","/home/pja/Desktop/problem_images/bad_order.png"));
-		inputs.add(new PathLabel("View 02","/home/pja/Desktop/problem_images/good_order.png"));
-		inputs.add(new PathLabel("View 03",prefix+"frame0002.jpg"));
-		inputs.add(new PathLabel("View 04",prefix+"frame0003.jpg"));
-		inputs.add(new PathLabel("View 05",prefix+"frame0004.jpg"));
-		inputs.add(new PathLabel("View 06",prefix+"frame0005.jpg"));
-		inputs.add(new PathLabel("View 07",prefix+"frame0006.jpg"));
-		inputs.add(new PathLabel("View 08",prefix+"frame0007.jpg"));
-		inputs.add(new PathLabel("View 09",prefix+"frame0008.jpg"));
-
+		inputs.add(new PathLabel("View 01",prefix+"frame01.jpg"));
+		inputs.add(new PathLabel("View 02",prefix+"frame02.jpg"));
+		inputs.add(new PathLabel("View 03",prefix+"frame03.jpg"));
+		inputs.add(new PathLabel("View 04",prefix+"frame04.jpg"));
+		inputs.add(new PathLabel("View 05",prefix+"frame05.jpg"));
+		inputs.add(new PathLabel("View 06",prefix+"frame06.jpg"));
+		inputs.add(new PathLabel("View 07",prefix+"frame07.jpg"));
+		inputs.add(new PathLabel("View 08",prefix+"frame08.jpg"));
+		inputs.add(new PathLabel("View 11",prefix+"frame11.jpg"));
+		inputs.add(new PathLabel("View 12",prefix+"frame12.jpg"));
 
 		app.setInputList(inputs);
 

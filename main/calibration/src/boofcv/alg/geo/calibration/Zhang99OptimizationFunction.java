@@ -77,12 +77,12 @@ public class Zhang99OptimizationFunction implements FunctionNtoM {
 	}
 
 	@Override
-	public int getInputsN() {
+	public int getNumOfInputsN() {
 		return N;
 	}
 
 	@Override
-	public int getOutputsM() {
+	public int getNumOfOutputsM() {
 		return M;
 	}
 

@@ -18,9 +18,11 @@
 
 package boofcv.abst.geo.fitting;
 
+import org.ejml.data.DenseMatrix64F;
 import org.junit.Test;
 
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Peter Abeles
@@ -28,8 +30,27 @@ import static org.junit.Assert.fail;
 public class TestModelManagerEpipolarMatrix {
 
 	@Test
-	public void stuff() {
-		fail("Implement");
+	public void createModelInstance() {
+		ModelManagerEpipolarMatrix alg = new ModelManagerEpipolarMatrix();
+		DenseMatrix64F found = alg.createModelInstance();
+
+		assertTrue( found != null );
+		assertEquals(3, found.getNumRows());
+		assertEquals(3,found.getNumCols());
+	}
+
+	@Test
+	public void copyModel() {
+		ModelManagerEpipolarMatrix alg = new ModelManagerEpipolarMatrix();
+
+		DenseMatrix64F m = new DenseMatrix64F(3,3);
+		for( int i = 0; i < 9; i++ )
+			m.data[i] = i+1;
+		DenseMatrix64F copy = new DenseMatrix64F(3,3);
+
+		alg.copyModel(m,copy);
+		for( int i = 0; i < 9; i++ )
+			assertEquals(i+1,copy.data[i],1e-8);
 	}
 
 }

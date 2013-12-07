@@ -63,7 +63,7 @@ public class FunctionSampsonFundamental implements FunctionNtoS {
 	}
 
 	@Override
-	public int getInputsN() {
+	public int getNumOfInputsN() {
 		return param.getParamLength();
 	}
 

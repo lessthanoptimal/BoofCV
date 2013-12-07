@@ -116,12 +116,12 @@ public class Zhang99OptimizationJacobian implements FunctionNtoMxN {
 	}
 
 	@Override
-	public int getInputsN() {
+	public int getNumOfInputsN() {
 		return numParam;
 	}
 
 	@Override
-	public int getOutputsM() {
+	public int getNumOfOutputsM() {
 		return numFuncs;
 	}
 
