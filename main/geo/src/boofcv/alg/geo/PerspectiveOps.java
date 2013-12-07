@@ -341,9 +341,8 @@ public class PerspectiveOps {
 		if( K == null )
 			return norm;
 
-		GeometryMath_F64.mult(K, norm, norm);
-
-		return norm;
+		// convert into pixel coordinates
+		return GeometryMath_F64.mult(K, norm, norm);
 	}
 
 	/**

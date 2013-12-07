@@ -61,12 +61,12 @@ public class ResidualsEpipolarMatrix implements FunctionNtoM {
 	}
 
 	@Override
-	public int getN() {
+	public int getInputsN() {
 		return param.getParamLength();
 	}
 
 	@Override
-	public int getM() {
+	public int getOutputsM() {
 		return obs.size();
 	}
 

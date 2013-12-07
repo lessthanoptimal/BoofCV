@@ -19,7 +19,6 @@
 package boofcv.alg.tracker.klt;
 
 import boofcv.alg.filter.derivative.GradientSobel;
-import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.interpolate.InterpolateRectangle;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.core.image.border.BorderIndex1D_Extend;
@@ -265,7 +264,7 @@ public class TestKltTracker {
 
 		feature.setPosition(20, 22);
 		tracker.setDescription(feature);
-		tracker.descFeature.reshape(5,5);
+		tracker.currDesc.reshape(5,5);
 		// need to compute E from a shifted location or else it will be zero
 		tracker.computeE(feature,21,23);
 
@@ -361,10 +360,7 @@ public class TestKltTracker {
 
 		InterpolateRectangle<ImageFloat32> interp1 = FactoryInterpolation.bilinearRectangle(ImageFloat32.class);
 		InterpolateRectangle<ImageFloat32> interp2 = FactoryInterpolation.bilinearRectangle(ImageFloat32.class);
-		InterpolatePixelS<ImageFloat32> interpI = FactoryInterpolation.bilinearPixelS(ImageFloat32.class);
-		InterpolatePixelS<ImageFloat32> interpDx = FactoryInterpolation.bilinearPixelS(ImageFloat32.class);
-		InterpolatePixelS<ImageFloat32> interpDy = FactoryInterpolation.bilinearPixelS(ImageFloat32.class);
 
-		return new KltTracker<ImageFloat32, ImageFloat32>(interp1, interp2,interpI,interpDx,interpDy, config);
+		return new KltTracker<ImageFloat32, ImageFloat32>(interp1, interp2,config);
 	}
 }

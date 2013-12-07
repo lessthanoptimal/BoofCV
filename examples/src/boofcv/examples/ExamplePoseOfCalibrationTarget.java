@@ -38,8 +38,8 @@ import java.awt.image.BufferedImage;
 /**
  * The 6-DOF pose of calibration targets relative to the camera can be estimated very accurately once a camera
  * has been calibrated.  This example demonstrates how detect a calibration target and convert it into a rigid body
- * transformation from target's frame into the camera's frame.  If the target is symmetric then the pose can only
- * be solved up the ambiguity.
+ * transformation from target's frame into the camera's frame.  Using a standard calibration grid the target will
+ * always be symmetric and orientation can't be uniquely defined.
  *
  * @author Peter Abeles
  */
@@ -59,7 +59,7 @@ public class ExamplePoseOfCalibrationTarget {
 		// specify target's shape.  This also specifies where the center of the target's coordinate system is.
 		// Look at source code to be sure, but it is probably the target's center.  You can change this by
 		// creating your own target.. Note z=0 is assumed
-		PlanarCalibrationTarget target = FactoryPlanarCalibrationTarget.gridChess(5, 7, 10);
+		PlanarCalibrationTarget target = FactoryPlanarCalibrationTarget.gridChess(5, 7, 0.03);
 		// Computes the homography
 		Zhang99ComputeTargetHomography computeH = new Zhang99ComputeTargetHomography(target);
 		// decomposes the homography

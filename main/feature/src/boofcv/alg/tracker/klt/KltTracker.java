@@ -19,9 +19,8 @@
 package boofcv.alg.tracker.klt;
 
 import boofcv.alg.InputSanityCheck;
-import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.interpolate.InterpolateRectangle;
-import boofcv.misc.BoofMiscOps;
+import boofcv.alg.misc.ImageMiscOps;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 
@@ -52,7 +51,6 @@ import boofcv.struct.image.ImageSingleBand;
  *
  * @author Peter Abeles
  */
-// TODO remove per-pixel interpolation.  Could use rectangle for all of this.  just more complex
 @SuppressWarnings({"SuspiciousNameCombination"})
 public class KltTracker<InputImage extends ImageSingleBand, DerivativeImage extends ImageSingleBand> {
 
@@ -64,11 +62,6 @@ public class KltTracker<InputImage extends ImageSingleBand, DerivativeImage exte
 	// Used to interpolate the image and gradient
 	protected InterpolateRectangle<InputImage> interpInput;
 	protected InterpolateRectangle<DerivativeImage> interpDeriv;
-
-	// per pixel interpolation for image border
-	protected InterpolatePixelS<InputImage>  interpPixelI;
-	protected InterpolatePixelS<DerivativeImage>  interpPixelDX;
-	protected InterpolatePixelS<DerivativeImage>  interpPixelDY;
 
 	// tracker configuration
 	protected KltConfig config;
@@ -83,7 +76,15 @@ public class KltTracker<InputImage extends ImageSingleBand, DerivativeImage exte
 	// length of the feature description
 	protected int lengthFeature;
 	// the feature in the current image
-	protected ImageFloat32 descFeature = new ImageFloat32(1,1);
+	protected ImageFloat32 currDesc = new ImageFloat32(1,1);
+
+	// storage for sub-region used when computing interpolation
+	protected ImageFloat32 subimage = new ImageFloat32();
+
+	// destination image for current feature data in border case
+	int dstX0,dstY0,dstX1,dstY1;
+	// top-left corner of feature in input image for border case
+	float srcX0 , srcY0;
 
 	// allowed feature bounds
 	float allowedLeft;
@@ -99,17 +100,10 @@ public class KltTracker<InputImage extends ImageSingleBand, DerivativeImage exte
 
 	public KltTracker(InterpolateRectangle<InputImage> interpInput,
 					  InterpolateRectangle<DerivativeImage> interpDeriv,
-					  InterpolatePixelS<InputImage>  interpPixelI,
-					  InterpolatePixelS<DerivativeImage>  interpPixelDX,
-					  InterpolatePixelS<DerivativeImage>  interpPixelDY,
 					  KltConfig config) {
 		this.interpInput = interpInput;
 		this.interpDeriv = interpDeriv;
 		this.config = config;
-
-		this.interpPixelI = interpPixelI;
-		this.interpPixelDX = interpPixelDX;
-		this.interpPixelDY = interpPixelDY;
 	}
 
 	/**
@@ -127,10 +121,6 @@ public class KltTracker<InputImage extends ImageSingleBand, DerivativeImage exte
 
 		this.derivX = derivX;
 		this.derivY = derivY;
-
-		interpPixelI.setImage(image);
-		interpPixelDX.setImage(derivX);
-		interpPixelDY.setImage(derivY);
 	}
 
 	/**
@@ -193,39 +183,36 @@ public class KltTracker<InputImage extends ImageSingleBand, DerivativeImage exte
 	 */
 	protected boolean internalSetDescriptionBorder(KltFeature feature) {
 
+		computeSubImageBounds(feature, feature.x, feature.y);
+
+		ImageMiscOps.fill(feature.desc, Float.NaN);
+		feature.desc.subimage(dstX0, dstY0, dstX1, dstY1, subimage);
+		interpInput.setImage(image);
+		interpInput.region(srcX0, srcY0, subimage);
+
+		feature.derivX.subimage(dstX0, dstY0, dstX1, dstY1, subimage);
+		interpDeriv.setImage(derivX);
+		interpDeriv.region(srcX0, srcY0, subimage);
+
+		feature.derivY.subimage(dstX0, dstY0, dstX1, dstY1, subimage);
+		interpDeriv.setImage(derivY);
+		interpDeriv.region(srcX0, srcY0, subimage);
+
 		int total= 0;
 
 		Gxx = Gyy = Gxy = 0;
-		int i = 0;
-		for( int y = 0; y < widthFeature; y++ ) {
-			float pixelY = feature.y - feature.radius + y;
-			for( int x = 0; x < widthFeature; x++ , i++ ) {
-				float pixelX = feature.x - feature.radius + x;
+		for( int i = 0; i < lengthFeature; i++ ) {
+			if( Float.isNaN(feature.desc.data[i]))
+				continue;
 
-				float dX,dY,value;
-				if( interpPixelI.isInFastBounds(pixelX,pixelY) ) {
-					value = interpPixelI.get_fast(pixelX,pixelY);
-					dX = interpPixelDX.get_fast(pixelX,pixelY);
-					dY = interpPixelDY.get_fast(pixelX,pixelY);
-				} else if( BoofMiscOps.checkInside(image, pixelX, pixelY)) {
-					value = interpPixelI.get(pixelX,pixelY);
-					dX = interpPixelDX.get(pixelX,pixelY);
-					dY = interpPixelDY.get(pixelX,pixelY);
-				} else {
-					// make this pixel as outside
-					feature.desc.data[i] = Float.NaN;
-					continue;
-				}
-				total++;
-				// save the description
-				feature.desc.data[i] = value;
-				feature.derivX.data[i] = dX;
-				feature.derivY.data[i] = dY;
+			total++;
 
-				Gxx += dX * dX;
-				Gyy += dY * dY;
-				Gxy += dX * dY;
-			}
+			float dX = feature.derivX.data[i];
+			float dY = feature.derivY.data[i];
+
+			Gxx += dX * dX;
+			Gyy += dY * dY;
+			Gxy += dX * dY;
 		}
 
 		// technically don't need to save this...
@@ -256,8 +243,9 @@ public class KltTracker<InputImage extends ImageSingleBand, DerivativeImage exte
 		if ( isFullyOutside(feature.x, feature.y))
 			return KltTrackFault.OUT_OF_BOUNDS;
 
-		if (descFeature.data.length < lengthFeature)
-			descFeature.reshape(widthFeature,widthFeature);
+		if (currDesc.data.length < lengthFeature) {
+			currDesc.reshape(widthFeature,widthFeature);
+		}
 
 		// save the original location so that a drifting fault can be detected
 		float origX = feature.x, origY = feature.y;
@@ -346,11 +334,11 @@ public class KltTracker<InputImage extends ImageSingleBand, DerivativeImage exte
 		int total = 0;
 		for (int i = 0; i < lengthFeature; i++) {
 
-			if( Float.isNaN(feature.desc.data[i]) || Float.isNaN(descFeature.data[i]))
+			if( Float.isNaN(feature.desc.data[i]) || Float.isNaN(currDesc.data[i]))
 				continue;
 
 			// compute the difference between the previous and the current image
-			error += Math.abs(feature.desc.data[i] - descFeature.data[i]);
+			error += Math.abs(feature.desc.data[i] - currDesc.data[i]);
 			total++;
 		}
 		return error / total;
@@ -358,13 +346,13 @@ public class KltTracker<InputImage extends ImageSingleBand, DerivativeImage exte
 
 	protected void computeE(KltFeature feature, float x, float y) {
 		// extract the region in the current image
-		interpInput.region(x - feature.radius, y - feature.radius, descFeature);
+		interpInput.region(x - feature.radius, y - feature.radius, currDesc);
 
 		Ex = 0;
 		Ey = 0;
 		for (int i = 0; i < lengthFeature; i++) {
 			// compute the difference between the previous and the current image
-			float d = feature.desc.data[i] - descFeature.data[i];
+			float d = feature.desc.data[i] - currDesc.data[i];
 
 			Ex += d * feature.derivX.data[i];
 			Ey += d * feature.derivY.data[i];
@@ -375,53 +363,85 @@ public class KltTracker<InputImage extends ImageSingleBand, DerivativeImage exte
 	 * When part of the region is outside the image G and E need to be recomputed
 	 */
 	protected int computeGandE_border(KltFeature feature, float cx, float cy) {
+
+		computeSubImageBounds(feature, cx, cy);
+
+		ImageMiscOps.fill(currDesc, Float.NaN);
+		currDesc.subimage(dstX0, dstY0, dstX1, dstY1, subimage);
+		interpInput.setImage(image);
+		interpInput.region(srcX0, srcY0, subimage);
+
 		int total = 0;
 
 		Gxx = 0; Gyy = 0; Gxy = 0;
 		Ex = 0; Ey = 0;
 
-		int i = 0;
-		for( int y = 0; y < widthFeature; y++ ) {
-			float pixelY = cy - feature.radius + y;
-			for( int x = 0; x < widthFeature; x++ , i++ ) {
-				// if the description was outside of the image here skip it
-				if( Float.isNaN(feature.desc.data[i]))
-					continue;
+		for( int i = 0; i < lengthFeature; i++ ) {
+			float template = feature.desc.data[i];
+			float current = currDesc.data[i];
 
-				float pixelX = cx - feature.radius + x;
+			// if the description was outside of the image here skip it
+			if( Float.isNaN(template) || Float.isNaN(current))
+				continue;
 
-				float dX,dY,value;
-				if( interpPixelI.isInFastBounds(pixelX,pixelY) ) {
-					value = interpPixelI.get_fast(pixelX,pixelY);
-				} else if( BoofMiscOps.checkInside(image, pixelX, pixelY)) {
-					value = interpPixelI.get(pixelX,pixelY);
-				} else {
-					// make this pixel as outside
-					descFeature.data[i] = Float.NaN;
-					continue;
-				}
-				// save the description
-				descFeature.data[i] = value;
+			// count total number of points inbounds
+			total++;
 
-				// count total number of points inbounds
-				total++;
+			float dX = feature.derivX.data[i];
+			float dY = feature.derivY.data[i];
 
-				dX = feature.derivX.data[i];
-				dY = feature.derivY.data[i];
+			// compute the difference between the previous and the current image
+			float d = template - current;
 
-				// compute the difference between the previous and the current image
-				float d = feature.desc.data[i] - value;
+			Ex += d * dX;
+			Ey += d * dY;
 
-				Ex += d * dX;
-				Ey += d * dY;
-
-				Gxx += dX * dX;
-				Gyy += dY * dY;
-				Gxy += dX * dY;
-			}
+			Gxx += dX * dX;
+			Gyy += dY * dY;
+			Gxy += dX * dY;
 		}
 
 		return total;
+	}
+
+	private void computeSubImageBounds(KltFeature feature, float cx, float cy) {
+		// initially include the whole destination image
+		dstX0 = 0;
+		dstY0 = 0;
+		dstX1 = widthFeature;
+		dstY1 = widthFeature;
+
+		// location of upper left corner of feature in input image
+		srcX0 = cx - feature.radius;
+		srcY0 = cy - feature.radius;
+		float srxX1 = srcX0 + widthFeature;
+		float srxY1 = srcY0 + widthFeature;
+
+		int origDstY1 = dstY1;
+
+		// take in account the image border
+		if( srcX0 < 0 ) {
+			dstX0 = (int)-Math.floor(srcX0);
+			srcX0 += dstX0;
+		}
+		if( srxX1 > image.width ) {
+			dstX1 -= (int)Math.ceil(srxX1-image.width);
+			// rounding error
+			dstX1 -= (srcX0 + (dstX1-dstX0) > image.width ? 1 : 0);
+		}
+		if( srcY0 < 0 ) {
+			dstY0 = (int)-Math.floor(srcY0);
+			srcY0 += dstY0;
+		}
+		if( srxY1 > image.height ) {
+			dstY1 -= (int)Math.ceil(srxY1-image.height);
+			// rounding error
+			dstY1 -= srcY0 + (dstY1-dstY0) > image.height ? 1 : 0;
+		}
+
+		if( srcX0 < 0 || srcY0 < 0 || srcX0 + (dstX1-dstX0) > image.width || srcY0 + (dstY1-dstY0) > image.height ) {
+			throw new IllegalArgumentException("Region is outside of the image");
+		}
 	}
 
 	/**

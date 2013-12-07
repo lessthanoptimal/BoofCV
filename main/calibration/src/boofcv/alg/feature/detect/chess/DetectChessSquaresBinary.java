@@ -373,7 +373,7 @@ public class DetectChessSquaresBinary {
 	/**
 	 * Adjusts the minimum contour for a square blob
 	 *
-	 * @param minContourSize The minimum contour size
+	 * @param minContourSize The minimum contour size. Try 10
 	 */
 	public void setMinimumContourSize( int minContourSize ) {
 		detectBlobs = new DetectQuadBlobsBinary(minContourSize,0.25,expectedBlobs);

@@ -148,12 +148,12 @@ public class TrifocalAlgebraicPoint7 extends TrifocalLinearPoint7 {
 		}
 
 		@Override
-		public int getN() {
+		public int getInputsN() {
 			return 6;
 		}
 
 		@Override
-		public int getM() {
+		public int getOutputsM() {
 			return A.numRows;
 		}
 

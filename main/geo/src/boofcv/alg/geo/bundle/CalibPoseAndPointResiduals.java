@@ -77,12 +77,12 @@ public class CalibPoseAndPointResiduals
 	}
 
 	@Override
-	public int getN() {
+	public int getInputsN() {
 		return codec.getParamLength();
 	}
 
 	@Override
-	public int getM() {
+	public int getOutputsM() {
 		return numObservations;
 	}
 
