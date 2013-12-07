@@ -207,15 +207,22 @@ public class DetectCalibrationChessApp<T extends ImageSingleBand, D extends Imag
 		if( calibGUI.isShowPoints() ) {
 			List<Point2D_F64> candidates =  alg.getPoints();
 			for( Point2D_F64 c : candidates ) {
-				VisualizeFeatures.drawPoint(g2, (int)c.x, (int)c.y, 1, Color.RED);
+				VisualizeFeatures.drawPoint(g2, (int)(c.x+0.5), (int)(c.y+0.5), 1, Color.RED);
 			}
 		}
 
+//		if( calibGUI.doShowGraph ) {
+//
+//			List<QuadBlob> graph = alg.getFindBound().getGraphBlobs();
+//			if( graph != null )
+//				DetectCalibrationSquaresApp.drawGraph(g2,graph);
+//		}
+
 		if( calibGUI.doShowGraph ) {
 
-			List<QuadBlob> graph = alg.getFindBound().getGraphBlobs();
+			List<QuadBlob> graph = alg.getOrderAlg().getResults();
 			if( graph != null )
-				DetectCalibrationSquaresApp.drawGraph(g2,graph);
+				DetectCalibrationSquaresApp.drawBlobNumbers(g2,graph);
 		}
 
 		gui.setBufferedImage(workImage);
@@ -326,23 +333,26 @@ public class DetectCalibrationChessApp<T extends ImageSingleBand, D extends Imag
 
 		String prefix = "../data/applet/calibration/mono/Sony_DSC-HX5V_Chess/";
 
-		app.loadConfigurationFile(prefix + "info.txt");
+//		app.loadConfigurationFile(prefix + "info.txt");
+		app.configure(4,5);
 
 //		app.setBaseDirectory(prefix);
 //		app.loadInputData(prefix+"images.txt");
 
 		List<PathLabel> inputs = new ArrayList<PathLabel>();
 
-		inputs.add(new PathLabel("View 01",prefix+"frame01.jpg"));
-		inputs.add(new PathLabel("View 02",prefix+"frame02.jpg"));
-		inputs.add(new PathLabel("View 03",prefix+"frame03.jpg"));
-		inputs.add(new PathLabel("View 04",prefix+"frame04.jpg"));
-		inputs.add(new PathLabel("View 05",prefix+"frame05.jpg"));
-		inputs.add(new PathLabel("View 06",prefix+"frame06.jpg"));
-		inputs.add(new PathLabel("View 07",prefix+"frame07.jpg"));
-		inputs.add(new PathLabel("View 08",prefix+"frame08.jpg"));
-		inputs.add(new PathLabel("View 11",prefix+"frame11.jpg"));
-		inputs.add(new PathLabel("View 12",prefix+"frame12.jpg"));
+		prefix = "/home/pja/Desktop/calibBoard/";
+
+		inputs.add(new PathLabel("View 01","/home/pja/Desktop/problem_images/bad_order.png"));
+		inputs.add(new PathLabel("View 02","/home/pja/Desktop/problem_images/good_order.png"));
+		inputs.add(new PathLabel("View 03",prefix+"frame0002.jpg"));
+		inputs.add(new PathLabel("View 04",prefix+"frame0003.jpg"));
+		inputs.add(new PathLabel("View 05",prefix+"frame0004.jpg"));
+		inputs.add(new PathLabel("View 06",prefix+"frame0005.jpg"));
+		inputs.add(new PathLabel("View 07",prefix+"frame0006.jpg"));
+		inputs.add(new PathLabel("View 08",prefix+"frame0007.jpg"));
+		inputs.add(new PathLabel("View 09",prefix+"frame0008.jpg"));
+
 
 		app.setInputList(inputs);
 

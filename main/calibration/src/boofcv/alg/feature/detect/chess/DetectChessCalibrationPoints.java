@@ -19,9 +19,6 @@
 package boofcv.alg.feature.detect.chess;
 
 import boofcv.abst.feature.detect.intensity.GeneralFeatureIntensity;
-import boofcv.alg.feature.detect.InvalidCalibrationTarget;
-import boofcv.alg.feature.detect.grid.UtilCalibrationGrid;
-import boofcv.alg.feature.detect.quadblob.OrderPointsIntoGrid;
 import boofcv.alg.feature.detect.quadblob.QuadBlob;
 import boofcv.alg.filter.binary.BinaryImageOps;
 import boofcv.alg.filter.binary.GThresholdImageOps;
@@ -41,6 +38,7 @@ import georegression.geometry.UtilPoint2D_I32;
 import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I32;
+import org.ddogleg.sorting.QuickSort_S32;
 import org.ddogleg.struct.FastQueue;
 
 import java.util.ArrayList;
@@ -67,7 +65,7 @@ public class DetectChessCalibrationPoints<T extends ImageSingleBand, D extends I
 	private D derivX;
 	private D derivY;
 
-	// number of control points 
+	// number of control points
 	private int numColsPoints;
 	private int numRowsPoints;
 
@@ -96,8 +94,8 @@ public class DetectChessCalibrationPoints<T extends ImageSingleBand, D extends I
 	// rectangle the target is contained inside of
 	private ImageRectangle targetRect;
 
-	// puts points into the correct order
-	private OrderPointsIntoGrid orderAlg = new OrderPointsIntoGrid();
+	// puts the quad blobs into order and thus the detected points
+	private OrderChessboardQuadBlobs orderAlg;
 
 	// true if it found the rectangular bound
 	private boolean foundBound;
@@ -105,6 +103,12 @@ public class DetectChessCalibrationPoints<T extends ImageSingleBand, D extends I
 	// work space for thresholding
 	private T work1;
 	private T work2;
+
+	// storage for selecting control points from QuadBlob graphs
+	private int indexes[] = new int[4];
+	private int values[] = new int[4];
+	private QuickSort_S32 sorter = new QuickSort_S32();
+
 
 	FastQueue<Point2D_F32> corners = new FastQueue<Point2D_F32>(Point2D_F32.class,true);
 
@@ -127,6 +131,8 @@ public class DetectChessCalibrationPoints<T extends ImageSingleBand, D extends I
 
 		this.numColsPoints = numCols-1;
 		this.numRowsPoints = numRows-1;
+
+		orderAlg = new OrderChessboardQuadBlobs(numCols,numRows);
 
 		work1 = GeneralizedImageOps.createSingleBand(imageType,1,1);
 		work2 = GeneralizedImageOps.createSingleBand(imageType,1,1);
@@ -176,29 +182,19 @@ public class DetectChessCalibrationPoints<T extends ImageSingleBand, D extends I
 		// detect interest points
 		intensityAlg.process(subGray, derivX, derivY, null, null, null);
 
-		seedPointsFromQuadCorner();
+		List<QuadBlob> unorderedBlobs = findBound.getGraphBlobs();
+
+		if( !orderAlg.order(unorderedBlobs) ) {
+			return false;
+		}
+
+		seedPointsFromQuadCorner(orderAlg.getResults());
 		meanShiftBlobCorners(intensityAlg.getIntensity(),targetRect);
 
 		List<Point2D_F64> points = new ArrayList<Point2D_F64>();
 		for( int i = 0; i < corners.size(); i++ ) {
 			Point2D_F32 c = corners.get(i);
 			points.add( new Point2D_F64(c.x,c.y));
-		}
-
-		try {
-			orderAlg.process(points);
-		} catch( InvalidCalibrationTarget e ) {
-//			System.err.println(e.getMessage());
-			return false;
-		}
-
-		points = UtilCalibrationGrid.rotatePoints(orderAlg.getOrdered(),
-				orderAlg.getNumRows(), orderAlg.getNumCols(),
-				numRowsPoints, numColsPoints);
-
-		if (numColsPoints * numRowsPoints != orderAlg.getNumCols() * orderAlg.getNumRows()) {
-//			System.err.println("Unexpected grid size");
-			return false;
 		}
 
 		// distance apart two points are from each other.
@@ -321,30 +317,41 @@ public class DetectChessCalibrationPoints<T extends ImageSingleBand, D extends I
 	 * Pick the points between two corners on different quads and the initial point for where a calibration
 	 * point will be.
 	 */
-	private void seedPointsFromQuadCorner() {
+	private void seedPointsFromQuadCorner( List<QuadBlob> blobs ) {
 
 		corners.reset();
-
-		List<QuadBlob> blobs = findBound.getGraphBlobs();
 
 		for( int i = 0; i < blobs.size(); i++ ) {
 			blobs.get(i).index = i;
 		}
 
-		boolean marked[] = new boolean[ blobs.size()];
+		boolean marked[] = new boolean[ blobs.size()]; // todo remove this memory creation
 
 		for( int i = 0; i < blobs.size(); i++ ) {
 			QuadBlob b = blobs.get(i);
 			marked[i] = true;
 
-			for( int j = 0; j < b.conn.size(); j++ ) {
+			// the next blob which isn't marked should be connected to next.  The ordering
+			// the blobs ensures that this strategy will populate the control points in the correct order
+			int N = b.conn.size();
+			for( int j = 0; j < N; j++ ) {
+				values[j] = b.conn.get(j).index;
+			}
+
+			sorter.sort(values,N,indexes);
+
+			for( int j = 0; j < N; j++ ) {
+				// index of the connected blob with the lowest index
+				int next = indexes[j];
+
 				// avoid adding the same points twice
-				if( marked[b.conn.get(j).index] )
+				if( marked[b.conn.get(next).index] )
 					continue;
-				QuadBlob c = b.conn.get(j);
+
+				QuadBlob c = b.conn.get(next);
 
 				// find the corners and compute the average point
-				Point2D_I32 c0 = b.corners.get(b.connIndex.data[j]);
+				Point2D_I32 c0 = b.corners.get(b.connIndex.data[next]);
 
 				int indexOfB = c.conn.indexOf(b);
 				Point2D_I32 c1 = c.corners.get(c.connIndex.data[indexOfB]);
@@ -424,6 +431,10 @@ public class DetectChessCalibrationPoints<T extends ImageSingleBand, D extends I
 			ImageFloat32 out = wholeImage.subimage(targetRect.x0, targetRect.y0, targetRect.x1, targetRect.y1, null);
 			out.setTo(found);
 		}
+	}
+
+	public OrderChessboardQuadBlobs getOrderAlg() {
+		return orderAlg;
 	}
 
 	public DetectChessSquaresBinary getFindBound() {
