@@ -71,6 +71,8 @@ Version : Alpha 0.16
     conditions
   * Chessboard target detector works much better on small targets.  Uses corners to estimate initial calibration
     point position then uses mean-shift to refine
+  * Chessboard now orders calibration points using QuadBlobs.  Allowing orientation ambiguity to be correctly resolved
+    when the target is not symmetric.
 - ImplConvertBitmap incorrectly converted floating point images
   * Was doing an integer divide instead of a floating point divide
   * Thanks Vagoster for reporting the bug
@@ -80,7 +82,6 @@ Version : Alpha 0.16
   have been added and other classes modified for the change in behavior.
 - Fixed FactoryDistort.scale().  Off by one error when specifying scale factor
 
-- TODO Chessboard calibration doesn't reject bad calibration points after sub-pixel
 - TODO automate high level tests
    * Move SURFPerformance into ValidationBoof
    * Create logs for BoofCV performance
