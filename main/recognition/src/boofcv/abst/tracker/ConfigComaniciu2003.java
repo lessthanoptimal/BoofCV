@@ -19,15 +19,13 @@
 package boofcv.abst.tracker;
 
 import boofcv.alg.interpolate.TypeInterpolate;
-import boofcv.struct.image.ImageMultiBand;
-import boofcv.struct.image.ImageType;
 
 /**
  * Configuration for {@link Comaniciu2003_to_TrackerObjectQuad}.
  *
  * @author Peter Abeles
  */
-public class ConfigComaniciu2003<T extends ImageMultiBand> {
+public class ConfigComaniciu2003 {
 	/**
 	 * Number of points it samples along each axis of the rectangle.  Default is 30.
 	 */
@@ -82,20 +80,16 @@ public class ConfigComaniciu2003<T extends ImageMultiBand> {
 	 * Which interpolation method should it use.
 	 */
 	public TypeInterpolate interpolation = TypeInterpolate.BILINEAR;
-	/**
-	 * Which type of input image will it process.
-	 */
-	public ImageType<T> imageType;
 
-	public ConfigComaniciu2003(int numSamples, int numHistogramBins, float scaleWeight,ImageType<T> imageType) {
+	public ConfigComaniciu2003(int numSamples, int numHistogramBins, float scaleWeight ) {
 		this.numSamples = numSamples;
 		this.numHistogramBins = numHistogramBins;
 		this.scaleWeight = scaleWeight;
-		this.imageType = imageType;
 	}
 
-	public ConfigComaniciu2003(ImageType<T> imageType) {
-		this.imageType = imageType;
+	public ConfigComaniciu2003( boolean estimateScale ) {
+		if( estimateScale )
+			scaleChange = 0.1f;
 	}
 
 	public ConfigComaniciu2003() {

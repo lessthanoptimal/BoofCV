@@ -33,7 +33,9 @@ public class LikelihoodHistCoupled_U8 implements PixelLikelihood<MultiSpectral<I
 {
 	MultiSpectral<ImageUInt8> image;
 
+	// maximum value a pixel can have.
 	int maxPixelValue;
+	// Number of bins for each channel in the histogram
 	int numBins;
 	float hist[] = new float[0];
 
@@ -55,6 +57,11 @@ public class LikelihoodHistCoupled_U8 implements PixelLikelihood<MultiSpectral<I
 		if( hist.length != histElements ) {
 			hist = new float[histElements];
 		}
+	}
+
+	@Override
+	public boolean isInBounds(int x, int y) {
+		return image.isInBounds(x,y);
 	}
 
 	@Override
@@ -85,7 +92,7 @@ public class LikelihoodHistCoupled_U8 implements PixelLikelihood<MultiSpectral<I
 	}
 
 	@Override
-	public float likelihood(int x, int y) {
+	public float compute(int x, int y) {
 		int index = image.startIndex + y*image.stride + x;
 
 		int indexBin = 0;

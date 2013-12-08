@@ -16,39 +16,17 @@
  * limitations under the License.
  */
 
-package boofcv.alg.transform.ii.impl;
+package boofcv.struct.sparse;
 
-import boofcv.alg.transform.ii.IntegralImageOps;
-import boofcv.struct.image.ImageSInt32;
-import boofcv.struct.sparse.SparseScaleSample_F64;
+import boofcv.struct.image.ImageBase;
 
 /**
- * Samples a square region inside an integral image
+ * Applies a kernel to an individual pixel
  *
  * @author Peter Abeles
  */
-public class SparseIntegralSample_I32 extends SparseScaleSample_F64<ImageSInt32> {
-	
-	int baseR;
-	int r;
-
-	public SparseIntegralSample_I32(int baseR) {
-		this.baseR = baseR;
-		setScale(1);
-	}
-
-	@Override
-	public void setScale(double scale) {
-		r = (int)(baseR*scale + 0.5);
-		if( r <= 0 )
-			r = 1;
-		
-		x0 = y0 = -r-1;
-		x1 = y1 = r;
-	}
-
-	@Override
-	public double compute(int x, int y) {
-		return IntegralImageOps.block_unsafe(input,x+x0,y+y0,x+x1,y+y1);
-	}
+public interface SparseImageSample_F64<T extends ImageBase>
+	extends SparseImageOperator<T>
+{
+	public double compute( int x , int y );
 }

@@ -23,7 +23,7 @@ import boofcv.factory.transform.ii.FactorySparseIntegralFilters;
 import boofcv.struct.convolve.Kernel2D_F64;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.sparse.GradientValue;
-import boofcv.struct.sparse.SparseScaleSample;
+import boofcv.struct.sparse.SparseScaleSample_F64;
 
 
 /**
@@ -42,7 +42,7 @@ public class ImplOrientationImageAverageIntegral<T extends ImageSingleBand,G ext
 	// sine values for each pixel
 	protected Kernel2D_F64 kerSine;
 
-	private SparseScaleSample<T> sampler;
+	private SparseScaleSample_F64<T> sampler;
 	
 	/**
 	 *

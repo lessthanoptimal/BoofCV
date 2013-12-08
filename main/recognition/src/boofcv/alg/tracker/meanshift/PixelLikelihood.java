@@ -19,6 +19,7 @@
 package boofcv.alg.tracker.meanshift;
 
 import boofcv.struct.image.ImageBase;
+import boofcv.struct.sparse.SparseImageSample_F32;
 import georegression.struct.shapes.Rectangle2D_I32;
 
 /**
@@ -26,7 +27,7 @@ import georegression.struct.shapes.Rectangle2D_I32;
  *
  * @author Peter Abeles
  */
-public interface PixelLikelihood<T extends ImageBase> {
+public interface PixelLikelihood<T extends ImageBase> extends SparseImageSample_F32<T> {
 
 	/**
 	 * Sets the input image
@@ -40,8 +41,4 @@ public interface PixelLikelihood<T extends ImageBase> {
 	 */
 	public void createModel( Rectangle2D_I32 target );
 
-	/**
-	 * Computes the likelihood for the specified pixel
-	 */
-	public float likelihood( int x , int y );
 }

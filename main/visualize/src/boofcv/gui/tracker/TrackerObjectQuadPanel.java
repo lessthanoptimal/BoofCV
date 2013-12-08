@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.tracker;
+package boofcv.gui.tracker;
 
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.Quadrilateral_F64;
@@ -28,6 +28,8 @@ import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 
 /**
+ * Panel for displaying results of {@link boofcv.abst.tracker.TrackerObjectQuad}.
+ *
  * @author Peter Abeles
  */
 public class TrackerObjectQuadPanel extends JPanel implements MouseListener {
@@ -46,8 +48,10 @@ public class TrackerObjectQuadPanel extends JPanel implements MouseListener {
 	public TrackerObjectQuadPanel(Listener listener) {
 		super(new BorderLayout());
 		this.listener = listener;
-		addMouseListener(this);
-		grabFocus();
+		if( listener != null ){
+			addMouseListener(this);
+			grabFocus();
+		}
 	}
 
 	public synchronized void setBackGround( BufferedImage image ) {

@@ -18,6 +18,7 @@
 
 package boofcv.abst.tracker;
 
+import boofcv.alg.tracker.meanshift.PixelLikelihood;
 import boofcv.alg.tracker.meanshift.TrackerMeanShiftLikelihood;
 import boofcv.struct.image.ImageMultiBand;
 import boofcv.struct.image.ImageType;
@@ -34,14 +35,17 @@ import georegression.struct.shapes.RectangleCorner2D_F64;
 public class Msl_to_TrackerObjectQuad <T extends ImageMultiBand> implements TrackerObjectQuad<T> {
 
 	TrackerMeanShiftLikelihood<T> tracker;
+	PixelLikelihood<T> likelihood;
 
 	ImageType<T> type;
 
 	RectangleCorner2D_F64 rect = new RectangleCorner2D_F64();
 	Rectangle2D_I32 target = new Rectangle2D_I32();
 
-	public Msl_to_TrackerObjectQuad(TrackerMeanShiftLikelihood<T> tracker, ImageType<T> imageType) {
+	public Msl_to_TrackerObjectQuad(TrackerMeanShiftLikelihood<T> tracker,
+									PixelLikelihood<T> likelihood , ImageType<T> imageType) {
 		this.tracker = tracker;
+		this.likelihood = likelihood;
 
 		type = imageType;
 	}
@@ -56,6 +60,8 @@ public class Msl_to_TrackerObjectQuad <T extends ImageMultiBand> implements Trac
 		target.width = (int)rect.getWidth();
 		target.height = (int)rect.getHeight();
 
+		likelihood.setImage(image);
+		likelihood.createModel(target);
 		tracker.initialize(image,target);
 
 		return true;

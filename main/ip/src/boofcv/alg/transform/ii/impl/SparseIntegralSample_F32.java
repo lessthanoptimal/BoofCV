@@ -20,14 +20,14 @@ package boofcv.alg.transform.ii.impl;
 
 import boofcv.alg.transform.ii.IntegralImageOps;
 import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.sparse.SparseScaleSample;
+import boofcv.struct.sparse.SparseScaleSample_F64;
 
 /**
  * Samples a square region inside an integral image
  *
  * @author Peter Abeles
  */
-public class SparseIntegralSample_F32 extends SparseScaleSample<ImageFloat32> {
+public class SparseIntegralSample_F32 extends SparseScaleSample_F64<ImageFloat32> {
 	
 	int baseR;
 	int r;

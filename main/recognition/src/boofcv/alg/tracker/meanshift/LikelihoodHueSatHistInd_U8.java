@@ -24,11 +24,14 @@ import boofcv.struct.image.MultiSpectral;
 import georegression.struct.shapes.Rectangle2D_I32;
 
 /**
+ * <p>
  * Converts an RGB image into HSV image to add invariance to changes in lighting conditions.  Creates independent
  * histograms for the target's Hue and Saturation, which are then normalized such that
  * their sums are equal to one.  Likelihood is computed multiply the value of the histograms together.
- *
+ * </p>
+ * <p>
  * Colors with a very small "Value" are ignored since their hue and saturation are not reliable.
+ * </p>
  *
  * @author Peter Abeles
  */
@@ -46,12 +49,12 @@ public class LikelihoodHueSatHistInd_U8 implements PixelLikelihood<MultiSpectral
 	private float minimumValue;
 
 	// Hue has a range of 0 to 2*pi and this is a discretized histogram
-	private float binsH[];
+	protected float binsH[];
 	// Saturation has a range of 0 to 1 and this is a discretized histogram
-	private float binsS[];
+	protected float binsS[];
 
 	// size of the hue and saturation bins
-	private float sizeH, sizeS;
+	protected float sizeH, sizeS;
 
 	/**
 	 * Configures likelihood function
@@ -66,8 +69,8 @@ public class LikelihoodHueSatHistInd_U8 implements PixelLikelihood<MultiSpectral
 		binsS = new float[ numHistogramBins ];
 
 		// divide it by a number slightly larger than the max to avoid the special case where it is equal to the max
-		sizeH = (float)(2.01*Math.PI/numHistogramBins);
-		sizeS = 1.01f/numHistogramBins;
+		sizeH = (float)(2.001*Math.PI/numHistogramBins);
+		sizeS = 1.001f/numHistogramBins;
 	}
 
 	@Override
@@ -75,6 +78,11 @@ public class LikelihoodHueSatHistInd_U8 implements PixelLikelihood<MultiSpectral
 		imageRed = image.getBand(0);
 		imageGreen = image.getBand(1);
 		imageBlue = image.getBand(2);
+	}
+
+	@Override
+	public boolean isInBounds(int x, int y) {
+		return imageRed.isInBounds(x,y);
 	}
 
 	@Override
@@ -109,7 +117,7 @@ public class LikelihoodHueSatHistInd_U8 implements PixelLikelihood<MultiSpectral
 	}
 
 	@Override
-	public float likelihood(int x, int y) {
+	public float compute(int x, int y) {
 
 		int index = imageRed.getIndex(x,y);
 

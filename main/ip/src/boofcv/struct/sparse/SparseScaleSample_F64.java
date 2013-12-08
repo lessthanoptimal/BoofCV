@@ -21,12 +21,27 @@ package boofcv.struct.sparse;
 import boofcv.struct.image.ImageSingleBand;
 
 /**
- * Applies a kernel to an individual pixel
+ * Samples the image using a kernel which can be rescaled
  *
  * @author Peter Abeles
  */
-public interface SparseImageSample<T extends ImageSingleBand>
-	extends SparseImageOperator<T>
+public abstract class SparseScaleSample_F64<T extends ImageSingleBand>
+		implements SparseImageSample_F64<T>
 {
-	public double compute( int x , int y );
+	protected T input;
+
+	// defines the kernel's bounds
+	protected int x0,y0,x1,y1;
+
+	public abstract void setScale( double scale );
+
+	@Override
+	public void setImage(T input ) {
+		this.input = input;
+	}
+
+	@Override
+	public boolean isInBounds( int x , int y ) {
+		return( x+x0 >= 0 && y+y0 >= 0 && x+x1 < input.width && y+y1 < input.height );
+	}
 }

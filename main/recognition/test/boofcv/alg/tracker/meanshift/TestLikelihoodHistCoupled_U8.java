@@ -41,9 +41,9 @@ public class TestLikelihoodHistCoupled_U8 {
 		alg.setImage(image);
 		alg.createModel(r);
 
-		assertEquals(1.0f,alg.likelihood(3,4),1e-4);
-		assertEquals(1.0f,alg.likelihood(14,11),1e-4);
-		assertEquals(0,alg.likelihood(10,30),1e-4);
+		assertEquals(1.0f,alg.compute(3,4),1e-4);
+		assertEquals(1.0f,alg.compute(14,11),1e-4);
+		assertEquals(0,alg.compute(10,30),1e-4);
 
 	}
 
@@ -64,14 +64,14 @@ public class TestLikelihoodHistCoupled_U8 {
 		alg.createModel(region);
 
 
-		float v0 = alg.likelihood(3,4);
-		float v1 = alg.likelihood(11,4);
+		float v0 = alg.compute(3,4);
+		float v1 = alg.compute(11,4);
 
 		assertEquals(1.0f,v0+v1,1e-4);
 		assertTrue(v0>v1);
 	}
 
-	private void setColor(MultiSpectral<ImageUInt8> image , Rectangle2D_I32 rect , int r , int g , int b ) {
+	public static void setColor(MultiSpectral<ImageUInt8> image , Rectangle2D_I32 rect , int r , int g , int b ) {
 
 		for( int y = 0; y < rect.height; y++ ) {
 			for( int x = 0; x < rect.width; x++ ) {
@@ -81,7 +81,7 @@ public class TestLikelihoodHistCoupled_U8 {
 
 	}
 
-	private void setColor( MultiSpectral<ImageUInt8> image , int x , int y , int r , int g , int b ) {
+	public static void setColor( MultiSpectral<ImageUInt8> image , int x , int y , int r , int g , int b ) {
 		image.getBand(0).set(x,y,r);
 		image.getBand(1).set(x,y,g);
 		image.getBand(2).set(x,y,b);
