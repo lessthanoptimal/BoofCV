@@ -23,7 +23,7 @@ import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSInt32;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.sparse.SparseScaleGradient;
-import boofcv.struct.sparse.SparseScaleSample;
+import boofcv.struct.sparse.SparseScaleSample_F64;
 
 
 /**
@@ -34,11 +34,11 @@ import boofcv.struct.sparse.SparseScaleSample;
 public class FactorySparseIntegralFilters {
 
 	public static <T extends ImageSingleBand>
-	SparseScaleSample<T> sample( int radius , Class<T> imageType ) {
+	SparseScaleSample_F64<T> sample( int radius , Class<T> imageType ) {
 		if( imageType == ImageFloat32.class )
-			return (SparseScaleSample<T>)new SparseIntegralSample_F32(radius);
+			return (SparseScaleSample_F64<T>)new SparseIntegralSample_F32(radius);
 		else if( imageType == ImageSInt32.class )
-			return (SparseScaleSample<T>)new SparseIntegralSample_I32(radius);
+			return (SparseScaleSample_F64<T>)new SparseIntegralSample_I32(radius);
 		else
 			throw new IllegalArgumentException("Unsupported image type: "+imageType.getSimpleName());
 	}

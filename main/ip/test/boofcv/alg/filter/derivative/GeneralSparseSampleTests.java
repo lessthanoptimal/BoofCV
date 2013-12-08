@@ -19,7 +19,7 @@
 package boofcv.alg.filter.derivative;
 
 import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.sparse.SparseImageSample;
+import boofcv.struct.sparse.SparseImageSample_F64;
 import boofcv.testing.BoofTesting;
 
 import static org.junit.Assert.assertTrue;
@@ -30,10 +30,10 @@ import static org.junit.Assert.assertTrue;
 public class GeneralSparseSampleTests <T extends ImageSingleBand>
 	extends GeneralSparseOperatorTests<T>
 {
-	SparseImageSample<T> alg;
+	SparseImageSample_F64<T> alg;
 
 	protected GeneralSparseSampleTests(Class<T> inputType,
-									   SparseImageSample<T> alg ,
+									   SparseImageSample_F64<T> alg ,
 									   int sampleBoxX0 , int sampleBoxY0 ,
 									   int sampleBoxX1 , int sampleBoxY1) {
 		super(inputType,sampleBoxX0,sampleBoxY0,sampleBoxX1,sampleBoxY1);

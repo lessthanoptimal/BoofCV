@@ -114,7 +114,7 @@ public class FactoryTrackerObjectQuad {
 		TrackerMeanShiftLikelihood<T> alg =
 				new TrackerMeanShiftLikelihood<T>(likelihood,maxIterations,0.1f);
 
-		return new Msl_to_TrackerObjectQuad<T>(alg,imageType);
+		return new Msl_to_TrackerObjectQuad<T>(alg,likelihood,imageType);
 	}
 
 	/**
@@ -129,19 +129,19 @@ public class FactoryTrackerObjectQuad {
 	 * @return TrackerObjectQuad based on Comaniciu2003
 	 */
 	public static <T extends ImageMultiBand>
-	TrackerObjectQuad<T> meanShiftComaniciu2003(ConfigComaniciu2003<T> config) {
+	TrackerObjectQuad<T> meanShiftComaniciu2003(ConfigComaniciu2003 config, ImageType<T> imageType ) {
 
 		InterpolatePixelMB<T> interp = FactoryInterpolation.createPixelMB(0,config.maxPixelValue,
-				config.interpolation,config.imageType);
+				config.interpolation,imageType);
 
 		LocalWeightedHistogramRotRect<T> hist =
 				new LocalWeightedHistogramRotRect<T>(config.numSamples,config.numSigmas,config.numHistogramBins,
-						config.imageType.getNumBands(),config.maxPixelValue,interp);
+						imageType.getNumBands(),config.maxPixelValue,interp);
 		TrackerMeanShiftComaniciu2003<T> alg = new TrackerMeanShiftComaniciu2003<T>(
 				config.updateHistogram,config.meanShiftMaxIterations,config.meanShiftMinimumChange,
 				config.scaleWeight,config.minimumSizeRatio,config.scaleChange,hist);
 
-		return new Comaniciu2003_to_TrackerObjectQuad<T>(alg,config.imageType);
+		return new Comaniciu2003_to_TrackerObjectQuad<T>(alg,imageType);
 	}
 
 	/**

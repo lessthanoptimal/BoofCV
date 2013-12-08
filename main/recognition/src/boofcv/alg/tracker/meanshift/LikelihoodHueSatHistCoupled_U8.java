@@ -43,17 +43,20 @@ public class LikelihoodHueSatHistCoupled_U8 implements PixelLikelihood<MultiSpec
 	// storage for RGB to HSV conversion
 	private float hsv[] = new float[3];
 
-	int numHistogramBins;
+	// number of bins for Hue and Saturation bands
+	protected int numHistogramBins;
+	// largest element index in a histogram bin.  numBins-1
+	protected int maxElementInBin;
 
-	// the minimum value allowed
-	private float minimumValue;
+	// the minimum value allowed.  used to avoid pathological case in HSV color space
+	protected float minimumValue;
 
 	// Hue has a range of 0 to 2*pi and this is a discretized histogram
 	// Saturation has a range of 0 to 1 and this is a discretized histogram
-	private float bins[];
+	protected float bins[];
 
 	// size of the hue and saturation bins
-	private float sizeH, sizeS;
+	protected float sizeH, sizeS;
 
 	/**
 	 * Configures likelihood function
@@ -68,8 +71,8 @@ public class LikelihoodHueSatHistCoupled_U8 implements PixelLikelihood<MultiSpec
 		bins = new float[ numHistogramBins*numHistogramBins ];
 
 		// divide it by a number slightly larger than the max to avoid the special case where it is equal to the max
-		sizeH = (float)(2.01*Math.PI/numHistogramBins);
-		sizeS = 1.01f/numHistogramBins;
+		sizeH = (float)(2.001*Math.PI/numHistogramBins);
+		sizeS = 1.001f/numHistogramBins;
 	}
 
 	@Override
@@ -77,6 +80,11 @@ public class LikelihoodHueSatHistCoupled_U8 implements PixelLikelihood<MultiSpec
 		imageRed = image.getBand(0);
 		imageGreen = image.getBand(1);
 		imageBlue = image.getBand(2);
+	}
+
+	@Override
+	public boolean isInBounds(int x, int y) {
+		return imageRed.isInBounds(x,y);
 	}
 
 	@Override
@@ -112,7 +120,7 @@ public class LikelihoodHueSatHistCoupled_U8 implements PixelLikelihood<MultiSpec
 	}
 
 	@Override
-	public float likelihood(int x, int y) {
+	public float compute(int x, int y) {
 
 		int index = imageRed.getIndex(x,y);
 

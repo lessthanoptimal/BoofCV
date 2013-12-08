@@ -18,12 +18,11 @@ public class TestComaniciu2003_to_TrackerObjectQuad extends ColorTrackerObjectRe
 
 	@Override
 	public TrackerObjectQuad<MultiSpectral<ImageUInt8>> create(ImageType<MultiSpectral<ImageUInt8>> imageType) {
-		ConfigComaniciu2003<MultiSpectral<ImageUInt8>> config =
-				new ConfigComaniciu2003<MultiSpectral<ImageUInt8>>(imageType);
+		ConfigComaniciu2003 config = new ConfigComaniciu2003();
 
 		config.scaleChange = 0.1f;
 
-		return FactoryTrackerObjectQuad.meanShiftComaniciu2003(config);
+		return FactoryTrackerObjectQuad.meanShiftComaniciu2003(config,imageType);
 	}
 
 	@Override

@@ -21,15 +21,16 @@ package boofcv.alg.tracker.meanshift;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.sparse.SparseImageSample_F32;
 import georegression.struct.shapes.Rectangle2D_I32;
 import georegression.struct.shapes.RectangleCorner2D_I32;
 
 /**
  * <p>
  * Mean-shift [1] based tracker which tracks the target inside a likelihood image using a flat rectangular kernel
- * of fixed size.  The value of each pixel in the likelihood image is computed using features from a single pixel,
- * at the same coordinate, in the input image using a user provided function.  These features are most often
- * based on color.  The likelihood of each pixel is computed as needed only inside part of the image being considered.
+ * of fixed size. The likelihood for each pixel is computed using {@link SparseImageSample_F32}.  How that
+ * model is computed is not specified by this class, but is often based on color.  For sake of efficiency, the
+ * likelihood for a pixel is only computed as needed.
  * </p>
  *
  * <p>
@@ -48,7 +49,7 @@ import georegression.struct.shapes.RectangleCorner2D_I32;
 public class TrackerMeanShiftLikelihood<T extends ImageBase> {
 
 	// likelihood model for the target being tracked
-	private PixelLikelihood<T> targetModel;
+	private SparseImageSample_F32<T> targetModel;
 
 	// image used to store the likelihood
 	private ImageFloat32 pdf = new ImageFloat32(1,1);
@@ -87,7 +88,7 @@ public class TrackerMeanShiftLikelihood<T extends ImageBase> {
 	/**
 	 * Specifies the initial target location so that it can learn its description
 	 * @param image Image
-	 * @param initial Initial target location
+	 * @param initial Initial target location and the mean-shift bandwidth
 	 */
 	public void initialize( T image , Rectangle2D_I32 initial ) {
 		if( !image.isInBounds(initial.tl_x,initial.tl_y) )
@@ -111,11 +112,10 @@ public class TrackerMeanShiftLikelihood<T extends ImageBase> {
 		// compute the initial sum of the likelihood so that it can detect when the target is no longer visible
 		minimumSum = 0;
 		targetModel.setImage(image);
-		targetModel.createModel(location);
 
 		for( int y = 0; y < initial.height; y++ ) {
 			for( int x = 0; x < initial.width; x++ ) {
-				minimumSum += targetModel.likelihood(x+initial.tl_x,y+initial.tl_y);
+				minimumSum += targetModel.compute(x+initial.tl_x,y+initial.tl_y);
 			}
 		}
 		minimumSum *= minFractionDrop;
@@ -220,7 +220,7 @@ public class TrackerMeanShiftLikelihood<T extends ImageBase> {
 			for( int x = x0; x < x1; x++ , indexOut++ ) {
 
 				if( pdf.data[indexOut] < 0 )
-					pdf.data[indexOut] = targetModel.likelihood(x,y);
+					pdf.data[indexOut] = targetModel.compute(x, y);
 			}
 		}
 
