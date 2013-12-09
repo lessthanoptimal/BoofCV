@@ -80,19 +80,19 @@ public class OrderChessboardQuadBlobs {
 		// if multiple solutions exist pick the one which is the most to the top left
 		// this is needed for the stereo case where the order must be the same in both images
 		QuadBlob first = null;
+		double firstDistance = 0;
 
 		for( QuadBlob b : blobs ) {
 			if( b.conn.size() == 1 ) {
 				if( findFirstTwoRows(b)){
 					if( first != null ) {
-						if( b.center.y < first.center.y ) {
+						double d = Math.sqrt(b.center.x*b.center.x +  b.center.y*b.center.y)+b.center.y;
+						if( d < firstDistance ) {
 							first = b;
-						} else if( b.center.y == first.center.y ) {
-							if( b.center.x < first.center.x ) {
-								first = b;
-							}
+							firstDistance = d;
 						}
 					} else {
+						firstDistance = Math.sqrt(b.center.x*b.center.x +  b.center.y*b.center.y)+b.center.y;
 						first = b;
 					}
 				}

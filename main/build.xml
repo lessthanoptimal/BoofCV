@@ -127,5 +127,19 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
 	</jar>
     </target>
 
+    <!-- Creates a jar file with the project's source code -->
+    <target name="srcjar">
+       <jar destfile="${lib.dir}/${ant.project.name}-src.jar">
+	<fileset dir="ip/src" includes="**/*.java"/>
+	<fileset dir="io/src" includes="**/*.java"/>
+	<fileset dir="feature/src" includes="**/*.java"/>
+	<fileset dir="geo/src" includes="**/*.java"/>
+	<fileset dir="calibration/src" includes="**/*.java"/>
+	<fileset dir="sfm/src" includes="**/*.java"/>
+	<fileset dir="recognition/src" includes="**/*.java"/>
+	<fileset dir="visualize/src" includes="**/*.java"/>
+      </jar>
+    </target>
+
     <target name="main" depends="clean,jar"/>
 </project>
