@@ -19,22 +19,21 @@
 package boofcv.alg.feature.detect.chess;
 
 import boofcv.abst.feature.detect.intensity.GeneralFeatureIntensity;
+import boofcv.abst.feature.detect.peak.SearchLocalPeak;
 import boofcv.alg.feature.detect.quadblob.QuadBlob;
 import boofcv.alg.filter.binary.BinaryImageOps;
 import boofcv.alg.filter.binary.GThresholdImageOps;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
-import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.core.image.border.BorderType;
 import boofcv.factory.feature.detect.intensity.FactoryIntensityPoint;
-import boofcv.factory.interpolate.FactoryInterpolation;
+import boofcv.factory.feature.detect.peak.FactorySearchLocalPeak;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.ImageRectangle;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
-import georegression.geometry.UtilPoint2D_I32;
 import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I32;
@@ -65,10 +64,6 @@ public class DetectChessCalibrationPoints<T extends ImageSingleBand, D extends I
 	private D derivX;
 	private D derivY;
 
-	// number of control points
-	private int numColsPoints;
-	private int numRowsPoints;
-
 	// radius of the feature being detected
 	private int radius;
 
@@ -82,8 +77,6 @@ public class DetectChessCalibrationPoints<T extends ImageSingleBand, D extends I
 	// parameters for local adaptive threshold
 	private int userAdaptiveRadius = 20;
 	private double userAdaptiveBias = -10;
-	// relative blob size threshold.  Adjusted relative to image size.  Small objects are pruned
-	private double relativeSizeThreshold;
 
 	// point detection algorithms
 	private GeneralFeatureIntensity<T, D> intensityAlg;
@@ -100,6 +93,9 @@ public class DetectChessCalibrationPoints<T extends ImageSingleBand, D extends I
 	// true if it found the rectangular bound
 	private boolean foundBound;
 
+	// local search algorithm for peaks in corner intensity image
+	private SearchLocalPeak localPeak = FactorySearchLocalPeak.meanShiftUniform(10, 1e-4f);
+
 	// work space for thresholding
 	private T work1;
 	private T work2;
@@ -108,7 +104,6 @@ public class DetectChessCalibrationPoints<T extends ImageSingleBand, D extends I
 	private int indexes[] = new int[4];
 	private int values[] = new int[4];
 	private QuickSort_S32 sorter = new QuickSort_S32();
-
 
 	FastQueue<Point2D_F32> corners = new FastQueue<Point2D_F32>(Point2D_F32.class,true);
 
@@ -122,15 +117,11 @@ public class DetectChessCalibrationPoints<T extends ImageSingleBand, D extends I
 	 * @param imageType     Type of image being processed
 	 */
 	public DetectChessCalibrationPoints(int numCols, int numRows, int radius,
-										double relativeSizeThreshold ,
+										double relativeSizeThreshold , // TODo remove or re-active this threshold?
 										Class<T> imageType) {
 		Class<D> derivType = GImageDerivativeOps.getDerivativeType(imageType);
 
 		this.radius = radius;
-		this.relativeSizeThreshold = relativeSizeThreshold;
-
-		this.numColsPoints = numCols-1;
-		this.numRowsPoints = numRows-1;
 
 		orderAlg = new OrderChessboardQuadBlobs(numCols,numRows);
 
@@ -145,6 +136,8 @@ public class DetectChessCalibrationPoints<T extends ImageSingleBand, D extends I
 
 		// minContourSize is specified later after the image's size is known
 		findBound = new DetectChessSquaresBinary(numCols, numRows, 10);
+
+		localPeak.setSearchRadius(2);
 
 		reset();
 	}
@@ -284,36 +277,6 @@ public class DetectChessCalibrationPoints<T extends ImageSingleBand, D extends I
 	}
 
 	/**
-	 * Ensures that the detected points are in correct grid order.  This is done by using the
-	 * predicted point locations, which are already in order
-	 *
-	 * @param predicted Predicted and order points
-	 * @param detected  Detect corner location
-	 * @return Ordered detected points
-	 */
-	private List<Point2D_I32> orderPoints(List<Point2D_I32> predicted, List<Point2D_I32> detected) {
-		List<Point2D_I32> ret = new ArrayList<Point2D_I32>();
-
-		for (Point2D_I32 p : predicted) {
-			double bestDist = Double.MAX_VALUE;
-			Point2D_I32 best = null;
-
-			for (Point2D_I32 d : detected) {
-				double dist = UtilPoint2D_I32.distance(p, d);
-
-				if (dist < bestDist) {
-					bestDist = dist;
-					best = d;
-				}
-			}
-
-			ret.add(best);
-		}
-
-		return ret;
-	}
-
-	/**
 	 * Pick the points between two corners on different quads and the initial point for where a calibration
 	 * point will be.
 	 */
@@ -367,54 +330,13 @@ public class DetectChessCalibrationPoints<T extends ImageSingleBand, D extends I
 	}
 
 	private void meanShiftBlobCorners( ImageFloat32 intensity , ImageRectangle rect ) {
+		localPeak.setImage(intensity);
 		for( int i = 0; i < corners.size(); i++ ) {
 			Point2D_F32 c = corners.get(i);
-			c.x -= rect.x0;
-			c.y -= rect.y0;
-			meanShift( c,intensity);
-			c.x += rect.x0;
-			c.y += rect.y0;
+			localPeak.search(c.x - rect.x0, c.y - rect.y0);
+			c.x = localPeak.getPeakX() + rect.x0;
+			c.y = localPeak.getPeakY() + rect.y0;
 		}
-	}
-
-	private void meanShift( Point2D_F32 corner , ImageFloat32 intensity ) {
-
-		InterpolatePixelS<ImageFloat32> interp = FactoryInterpolation.bilinearPixelS(ImageFloat32.class);
-		interp.setImage(intensity);
-
-		int w = 5;
-		int r = w/2;
-		float x0,y0;
-		float x = corner.x;
-		float y = corner.y;
-
-		for( int iter = 0; iter < 10; iter++ ) {
-			x0 = x - r;
-			y0 = y - r;
-
-			if( x0 < 0 ) { x0 = 0;}
-			else if( x0+w > intensity.width ) { x0 = intensity.width-w; }
-			if( y0 < 0 ) { y0 = 0;}
-			else if( y0+w > intensity.height ) { y0 = intensity.height-w; }
-
-			float total = 0;
-			float sumX = 0, sumY = 0;
-
-			for( int yy = 0; yy < w; yy++ ) {
-				for( int xx = 0; xx < w; xx++ ) {
-					float weight = interp.get(x0+xx,y0+yy);
-					total += weight;
-					sumX += weight*(xx+x0);
-					sumY += weight*(yy+y0);
-				}
-			}
-
-			x = sumX/total;
-			y = sumY/total;
-		}
-
-		corner.x = x;
-		corner.y = y;
 	}
 
 	/**
