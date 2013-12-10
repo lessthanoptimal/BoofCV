@@ -90,7 +90,7 @@ Version : Alpha 0.16
    * Move SURFPerformance into ValidationBoof
    * Create logs for BoofCV performance
 - TODO Finish mean-shift example
-- TODO Add example where perspective distortion is removed using 4 corners
+- TODO Add example where perspective distortion is removed using 4 corners    ExampleRemovePerspectiveDistortion
 
 ---------------------------------------------
 Date    : 2013/06/21
