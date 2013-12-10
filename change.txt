@@ -82,12 +82,15 @@ Version : Alpha 0.16
   * Almost all interpolation routines incorrectly treated pixels 1 outside of the image as inside.  Unit tests
   have been added and other classes modified for the change in behavior.
 - Fixed FactoryDistort.scale().  Off by one error when specifying scale factor
+- SearchLocalPeak high level interface
+  * For algorithms which perform a local search for a peak
+  * Added two mean-shift variants
 
 - TODO automate high level tests
    * Move SURFPerformance into ValidationBoof
    * Create logs for BoofCV performance
-- TODO Mean-Shift abstract likelihood model even more?
 - TODO Finish mean-shift example
+- TODO Add example where perspective distortion is removed using 4 corners
 
 ---------------------------------------------
 Date    : 2013/06/21
