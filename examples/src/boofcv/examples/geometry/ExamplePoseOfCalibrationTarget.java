@@ -36,8 +36,10 @@ import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.distort.PointTransform_F64;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageType;
+import georegression.geometry.RotationMatrixGenerator;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
+import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
 import org.ejml.data.DenseMatrix64F;
@@ -73,9 +75,7 @@ public class ExamplePoseOfCalibrationTarget {
 
 		// Detects the target and calibration point inside the target
 		PlanarCalibrationDetector detector = FactoryPlanarCalibrationTarget.detectorChessboard(new ConfigChessboard(5, 4));
-		// specify target's shape.  This also specifies where the center of the target's coordinate system is.
-		// Look at source code to be sure, but it is probably the target's center.  You can change this by
-		// creating your own target.. Note z=0 is assumed
+		// Specifies the location of calibration points in the target's coordinate system.  Note that z=0
 		double sizeOfSquareInMeters = 0.03;
 		PlanarCalibrationTarget target = FactoryPlanarCalibrationTarget.gridChess(5, 4, sizeOfSquareInMeters);
 		// Computes the homography
@@ -91,10 +91,11 @@ public class ExamplePoseOfCalibrationTarget {
 
 		// Set up visualization
 		JPanel gui = new JPanel();
-		PointCloudViewer viewer = new PointCloudViewer(K, 0.01);
-		ImagePanel imagePanel = new ImagePanel();
-		viewer.setPreferredSize(new Dimension(width,height));
-		imagePanel.setPreferredSize(new Dimension(width, height));
+		PointCloudViewer viewer = new PointCloudViewer(intrinsic, 0.01);
+		// make the view more interest.  From the side.
+		DenseMatrix64F rotY = RotationMatrixGenerator.rotY(-Math.PI/2.0,null);
+		viewer.setWorldToCamera(new Se3_F64(rotY,new Vector3D_F64(0.75,0,1.25)));
+		ImagePanel imagePanel = new ImagePanel(width, height);
 		gui.add(BorderLayout.WEST, imagePanel); gui.add(BorderLayout.CENTER, viewer);
 		ShowImages.showWindow(gui,"Calibration Target Pose");
 

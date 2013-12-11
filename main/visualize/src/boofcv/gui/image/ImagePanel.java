@@ -45,6 +45,10 @@ public class ImagePanel extends JPanel {
 		autoSetPreferredSize();
 	}
 
+	public ImagePanel( int width , int height ) {
+		setPreferredSize(new Dimension(width,height));
+	}
+
 	public ImagePanel() {
 	}
 
