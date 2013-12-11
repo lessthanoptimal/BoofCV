@@ -57,7 +57,7 @@ public class TestMeanShiftPeak {
 
 	public static class Helper extends MeanShiftPeak {
 		public Helper(int maxIterations, float convergenceTol, int radius) {
-			super(maxIterations, convergenceTol, radius);
+			super(maxIterations, convergenceTol, radius,ImageFloat32.class);
 		}
 
 		@Override

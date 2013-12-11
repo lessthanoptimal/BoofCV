@@ -18,12 +18,14 @@
 
 package boofcv.alg.feature.detect.peak;
 
+import boofcv.struct.image.ImageSingleBand;
+
 /**
  *  Implementation of {@link MeanShiftPeak} which uses a flat kernel.
  *
  * @author Peter Abeles
  */
-public class MeanShiftUniformPeak extends MeanShiftPeak {
+public class MeanShiftUniformPeak<T extends ImageSingleBand> extends MeanShiftPeak<T> {
 
 	/**
 	 * Configures search.
@@ -32,8 +34,8 @@ public class MeanShiftUniformPeak extends MeanShiftPeak {
 	 * @param convergenceTol Convergence tolerance.  Try 1e-3
 	 * @param radius         Search radius.  Application dependent.
 	 */
-	public MeanShiftUniformPeak(int maxIterations, float convergenceTol, int radius) {
-		super(maxIterations, convergenceTol, radius);
+	public MeanShiftUniformPeak(int maxIterations, float convergenceTol, int radius, Class<T> imageType) {
+		super(maxIterations, convergenceTol, radius, imageType);
 	}
 
 	/**

@@ -18,24 +18,24 @@
 
 package boofcv.abst.feature.detect.peak;
 
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageSingleBand;
 
 /**
  * Interface for searching for local peaks near by a user specified point.
  *
  * @author Peter Abeles
  */
-public interface SearchLocalPeak {
+public interface SearchLocalPeak<T extends ImageSingleBand> {
 
 	/**
 	 * Specifies the image which is to be searched
 	 * @param image input image
 	 */
-	public void setImage( ImageFloat32 image );
+	public void setImage( T image );
 
 	/**
 	 * How far around the center it consider when searching for the peak
-	 * @param radius Search's radius
+	 * @param radius Search radius
 	 */
 	public void setSearchRadius( int radius );
 

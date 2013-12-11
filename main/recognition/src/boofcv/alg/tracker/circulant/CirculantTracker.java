@@ -18,11 +18,12 @@
 
 package boofcv.alg.tracker.circulant;
 
+import boofcv.abst.feature.detect.peak.SearchLocalPeak;
 import boofcv.abst.transform.fft.DiscreteFourierTransform;
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.misc.PixelMath;
 import boofcv.alg.transform.fft.DiscreteFourierTransformOps;
-import boofcv.factory.interpolate.FactoryInterpolation;
+import boofcv.factory.feature.detect.peak.FactorySearchLocalPeak;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.image.ImageFloat64;
 import boofcv.struct.image.ImageSingleBand;
@@ -122,8 +123,10 @@ public class CirculantTracker<T extends ImageSingleBand> {
 
 	// interpolation used when sampling input image into work space
 	private InterpolatePixelS<T> interp;
-	// interpolation used inside of mean-shift
-	private InterpolatePixelS<ImageFloat64> interpF64;
+
+	// used to compute sub-pixel location
+	private SearchLocalPeak<ImageFloat64> localPeak =
+			FactorySearchLocalPeak.meanShiftUniform(5, 1e-4f, ImageFloat64.class);
 
 	// adjustment from sub-pixel
 	protected float offX,offY;
@@ -169,8 +172,7 @@ public class CirculantTracker<T extends ImageSingleBand> {
 		computeCosineWindow(cosine);
 		computeGaussianWeights(workRegionSize);
 
-		interpF64 = FactoryInterpolation.bilinearPixelS(ImageFloat64.class);
-		interpF64.setImage(response);
+		localPeak.setImage(response);
 	}
 
 	/**
@@ -335,7 +337,7 @@ public class CirculantTracker<T extends ImageSingleBand> {
 		int peakY = indexBest / response.width;
 
 		// sub-pixel peak estimation
-		meanShift(peakX,peakY);
+		subpixelPeak(peakX, peakY);
 
 		// peak in region's coordinate system
 		float deltaX = (peakX+offX) - templateNew.width/2;
@@ -349,52 +351,19 @@ public class CirculantTracker<T extends ImageSingleBand> {
 	}
 
 	/**
-	 * Find the peak using mean-shift.  Provides sub-pixel accuracy.  Mean-shift finds the average position
-	 * weighted by intensity, re-centers, and iterates until it converges.
+	 * Refine the local-peak using a search algorithm for sub-pixel accuracy.
 	 */
-	protected void meanShift( int peakX , int peakY ) {
+	protected void subpixelPeak(int peakX, int peakY) {
 		// this function for r was determined empirically by using work regions of 32,64,128
 		int r = Math.min(2,response.width/25);
-		int w = r*2+1;
-
-		if( w <= 1 )
+		if( r < 0 )
 			return;
 
-		if( r < 1 )
-			return;
+		localPeak.setSearchRadius(r);
+		localPeak.search(peakX,peakY);
 
-		float x0 = peakX-r;
-		float y0 = peakY-r;
-
-		for( int iter = 0; iter < 5; iter++ ) {
-			// stop if it is out of bands.  Trickier to handle that situation question since a mean is computed
-			if( x0 < 0 ) break;
-			else if( x0 > response.width-w ) break;
-			if( y0 < 0 ) break;
-			else if( y0 > response.height-w )break;
-
-			float sumX = 0, sumY = 0, sumWeight = 0;
-			for( int i = 0; i < w; i++ ) {
-				float yy = y0+i;
-				for( int j = 0; j < w; j++ ) {
-					float xx = x0+j;
-					float weight = interpF64.get_fast(xx,yy);
-
-					sumWeight += weight;
-					sumX += xx*weight;
-					sumY += yy*weight;
-				}
-			}
-
-			if( sumWeight == 0 )
-				break;
-
-			x0 = (sumX/sumWeight) - r;
-			y0 = (sumY/sumWeight) - r;
-		}
-
-		offX = x0+r - peakX;
-		offY = y0+r - peakY;
+		offX = localPeak.getPeakX() - peakX;
+		offY = localPeak.getPeakY() - peakY;
 	}
 
 	private void updateRegionOut() {

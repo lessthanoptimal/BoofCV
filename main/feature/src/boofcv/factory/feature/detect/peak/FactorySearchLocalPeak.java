@@ -23,6 +23,7 @@ import boofcv.abst.feature.detect.peak.SearchLocalPeak;
 import boofcv.alg.feature.detect.peak.MeanShiftGaussianPeak;
 import boofcv.alg.feature.detect.peak.MeanShiftPeak;
 import boofcv.alg.feature.detect.peak.MeanShiftUniformPeak;
+import boofcv.struct.image.ImageSingleBand;
 
 /**
  * Factory for implementations of {@link SearchLocalPeak}
@@ -35,10 +36,12 @@ public class FactorySearchLocalPeak {
 	 * Mean-shift based search with a uniform kernel
 	 * @param maxIterations Maximum number of iterations.  Try 15
 	 * @param convergenceTol Convergence tolerance.  try 1e-3
+	 * @param imageType Type of input image
 	 * @return mean-shift search
 	 */
-	public static SearchLocalPeak meanShiftUniform( int maxIterations, float convergenceTol ) {
-		MeanShiftPeak alg = new MeanShiftUniformPeak(maxIterations,convergenceTol,-1);
+	public static <T extends ImageSingleBand>
+	SearchLocalPeak<T> meanShiftUniform( int maxIterations, float convergenceTol , Class<T> imageType ) {
+		MeanShiftPeak alg = new MeanShiftUniformPeak(maxIterations,convergenceTol,-1, imageType);
 		return new MeanShiftPeak_to_SearchLocalPeak(alg);
 	}
 
@@ -46,10 +49,12 @@ public class FactorySearchLocalPeak {
 	 * Mean-shift based search with a Gaussian kernel
 	 * @param maxIterations Maximum number of iterations.  Try 15
 	 * @param convergenceTol Convergence tolerance.  try 1e-3
+	 * @param imageType Type of input image
 	 * @return mean-shift search
 	 */
-	public static SearchLocalPeak meanShiftGaussian( int maxIterations, float convergenceTol ) {
-		MeanShiftPeak alg = new MeanShiftGaussianPeak(maxIterations,convergenceTol,-1);
+	public static <T extends ImageSingleBand>
+	SearchLocalPeak<T> meanShiftGaussian( int maxIterations, float convergenceTol , Class<T> imageType) {
+		MeanShiftPeak alg = new MeanShiftGaussianPeak(maxIterations,convergenceTol,-1,imageType);
 		return new MeanShiftPeak_to_SearchLocalPeak(alg);
 	}
 }
