@@ -20,7 +20,7 @@ package boofcv.alg.feature.detect.peak;
 
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.factory.interpolate.FactoryInterpolation;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageSingleBand;
 
 /**
  * Base class for simple implementations of mean-shift intended to finding local peaks inside an intensity image.
@@ -33,11 +33,11 @@ import boofcv.struct.image.ImageFloat32;
  *
  * @author Peter Abeles
  */
-public abstract class MeanShiftPeak {
+public abstract class MeanShiftPeak<T extends ImageSingleBand> {
 
 	// Input image and interpolation function
-	protected ImageFloat32 image;
-	protected InterpolatePixelS<ImageFloat32> interpolate = FactoryInterpolation.bilinearPixelS(ImageFloat32.class);
+	protected T image;
+	protected InterpolatePixelS<T> interpolate;
 
 	// the maximum number of iterations it will perform
 	protected int maxIterations;
@@ -62,18 +62,20 @@ public abstract class MeanShiftPeak {
 	 * @param convergenceTol Convergence tolerance.  Try 1e-3
 	 * @param radius Search radius.  Application dependent.
 	 */
-	public MeanShiftPeak(int maxIterations, float convergenceTol, int radius) {
+	public MeanShiftPeak(int maxIterations, float convergenceTol, int radius,
+						 Class<T> imageType ) {
 		this.maxIterations = maxIterations;
 		this.convergenceTol = convergenceTol;
 		this.radius = radius;
 		this.width = radius*2+1;
+		interpolate = FactoryInterpolation.bilinearPixelS(imageType);
 	}
 
 	/**
 	 * Specifies the input image
 	 * @param image input image
 	 */
-	public void setImage(ImageFloat32 image) {
+	public void setImage(T image) {
 		this.image = image;
 		this.interpolate.setImage(image);
 	}

@@ -94,7 +94,8 @@ public class DetectChessCalibrationPoints<T extends ImageSingleBand, D extends I
 	private boolean foundBound;
 
 	// local search algorithm for peaks in corner intensity image
-	private SearchLocalPeak localPeak = FactorySearchLocalPeak.meanShiftUniform(10, 1e-4f);
+	private SearchLocalPeak<ImageFloat32> localPeak =
+			FactorySearchLocalPeak.meanShiftUniform(10, 1e-4f,ImageFloat32.class);
 
 	// work space for thresholding
 	private T work1;

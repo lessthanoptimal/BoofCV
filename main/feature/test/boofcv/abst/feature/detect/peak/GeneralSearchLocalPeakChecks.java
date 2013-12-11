@@ -31,11 +31,12 @@ import static org.junit.Assert.assertEquals;
  */
 public abstract class GeneralSearchLocalPeakChecks {
 
+	Class<ImageFloat32> imageType = ImageFloat32.class;
 	ImageFloat32 image = new ImageFloat32(30,40);
 
 	protected float toleranceCenter = 0.1f;
 
-	public abstract SearchLocalPeak createSearch();
+	public abstract SearchLocalPeak createSearch( Class<ImageFloat32> imageType );
 
 	@Test
 	public void gaussian() {
@@ -51,7 +52,7 @@ public abstract class GeneralSearchLocalPeakChecks {
 			}
 		}
 
-		SearchLocalPeak search = createSearch();
+		SearchLocalPeak<ImageFloat32> search = createSearch(imageType);
 		search.setImage(image);
 		search.setSearchRadius(5);
 
@@ -68,7 +69,7 @@ public abstract class GeneralSearchLocalPeakChecks {
 
 		image.set(cx,cy,10);
 
-		SearchLocalPeak search = createSearch();
+		SearchLocalPeak<ImageFloat32> search = createSearch(imageType);
 		search.setImage(image);
 		search.setSearchRadius(5);
 
@@ -102,7 +103,7 @@ public abstract class GeneralSearchLocalPeakChecks {
 
 		image.set(1,10,10);
 
-		SearchLocalPeak search = createSearch();
+		SearchLocalPeak<ImageFloat32> search = createSearch(imageType);
 		search.setImage(image);
 		search.setSearchRadius(5);
 
@@ -115,7 +116,7 @@ public abstract class GeneralSearchLocalPeakChecks {
 
 		image.set(image.width-2,10,10);
 
-		SearchLocalPeak search = createSearch();
+		SearchLocalPeak<ImageFloat32> search = createSearch(imageType);
 		search.setImage(image);
 		search.setSearchRadius(5);
 
@@ -128,7 +129,7 @@ public abstract class GeneralSearchLocalPeakChecks {
 
 		image.set(10,1,10);
 
-		SearchLocalPeak search = createSearch();
+		SearchLocalPeak<ImageFloat32> search = createSearch(imageType);
 		search.setImage(image);
 		search.setSearchRadius(5);
 
@@ -141,7 +142,7 @@ public abstract class GeneralSearchLocalPeakChecks {
 
 		image.set(10,image.height-2,10);
 
-		SearchLocalPeak search = createSearch();
+		SearchLocalPeak<ImageFloat32> search = createSearch(imageType);
 		search.setImage(image);
 		search.setSearchRadius(5);
 

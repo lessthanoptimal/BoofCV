@@ -19,23 +19,23 @@
 package boofcv.abst.feature.detect.peak;
 
 import boofcv.alg.feature.detect.peak.MeanShiftPeak;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageSingleBand;
 
 /**
  * Wrapper around {@link MeanShiftPeak} for {@link SearchLocalPeak}
  *
  * @author Peter Abeles
  */
-public class MeanShiftPeak_to_SearchLocalPeak implements SearchLocalPeak{
+public class MeanShiftPeak_to_SearchLocalPeak<T extends ImageSingleBand> implements SearchLocalPeak<T> {
 
-	MeanShiftPeak search;
+	MeanShiftPeak<T> search;
 
-	public MeanShiftPeak_to_SearchLocalPeak(MeanShiftPeak search) {
+	public MeanShiftPeak_to_SearchLocalPeak(MeanShiftPeak<T> search) {
 		this.search = search;
 	}
 
 	@Override
-	public void setImage(ImageFloat32 image) {
+	public void setImage(T image) {
 		search.setImage(image);
 	}
 

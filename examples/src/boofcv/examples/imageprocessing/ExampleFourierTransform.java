@@ -78,7 +78,7 @@ public class ExampleFourierTransform {
 		dft.forward(boxImage,boxTransform);
 
 		// Visualize the Fourier Transform for the input image and the box filter
-		displayTransform(transform,"Input");
+		displayTransform(transform,"Input Image");
 		displayTransform(boxTransform,"Box Filter");
 
 		// apply the filter. convolution in spacial domain is the same as multiplication in the frequency domain
@@ -105,7 +105,7 @@ public class ExampleFourierTransform {
 		listPanel.addImage(spacialOut,"Spacial Domain Box");
 		listPanel.addImage(blurredOut,"Frequency Domain Box");
 
-		ShowImages.showWindow(listPanel,"Results");
+		ShowImages.showWindow(listPanel,"Box Blur in Spacial and Frequency Domain of Input Image");
 	}
 
 	/**

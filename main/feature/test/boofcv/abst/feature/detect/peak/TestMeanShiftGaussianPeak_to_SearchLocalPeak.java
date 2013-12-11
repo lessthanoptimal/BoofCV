@@ -19,14 +19,15 @@
 package boofcv.abst.feature.detect.peak;
 
 import boofcv.alg.feature.detect.peak.MeanShiftGaussianPeak;
+import boofcv.struct.image.ImageFloat32;
 
 /**
  * @author Peter Abeles
  */
 public class TestMeanShiftGaussianPeak_to_SearchLocalPeak extends GeneralSearchLocalPeakChecks {
 	@Override
-	public SearchLocalPeak createSearch() {
-		MeanShiftGaussianPeak alg = new MeanShiftGaussianPeak(50,1e-3f,-1);
+	public SearchLocalPeak createSearch( Class<ImageFloat32> imageType ) {
+		MeanShiftGaussianPeak alg = new MeanShiftGaussianPeak(50,1e-3f,-1,imageType);
 		return new MeanShiftPeak_to_SearchLocalPeak(alg);
 	}
 }

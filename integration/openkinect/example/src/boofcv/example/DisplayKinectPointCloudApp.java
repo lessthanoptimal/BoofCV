@@ -66,7 +66,7 @@ public class DisplayKinectPointCloudApp {
 
 		DenseMatrix64F K = PerspectiveOps.calibrationMatrix(param,null);
 
-		PointCloudViewer viewer = new PointCloudViewer(K,20);
+		PointCloudViewer viewer = new PointCloudViewer(K, 0.05);
 		viewer.setPreferredSize(new Dimension(rgb.width,rgb.height));
 
 		for( int i = 0; i < cloud.size; i++ ) {

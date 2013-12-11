@@ -293,6 +293,7 @@ public class VideoTrackerObjectQuadApp<I extends ImageSingleBand>
 		inputs.add(new PathLabel("track_book", "../data/applet/tracking/track_book.mjpeg"));
 		inputs.add(new PathLabel("track_peter", "../data/applet/tracking/track_peter.mjpeg"));
 		inputs.add(new PathLabel("chipmunk", "../data/applet/tracking/chipmunk.mjpeg"));
+		inputs.add(new PathLabel("Balls", "../data/applet/tracking/balls_blue_red.mjpeg"));
 		inputs.add(new PathLabel("Driving Snow", "../data/applet/tracking/snow_follow_car.mjpeg"));
 		inputs.add(new PathLabel("Driving Night", "../data/applet/tracking/night_follow_car.mjpeg"));
 		inputs.add(new PathLabel("Driving Day", "../data/applet/tracking/day_follow_car.mjpeg"));

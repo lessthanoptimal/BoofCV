@@ -36,23 +36,27 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 
 /**
+ * Mean-shift based trackers use color information to perform a local search.  The Comaniciu based trackers match
+ * the color histogram directly and are more robust to objects with complex distributions.  Comaniciu can also
+ * be configured to estimate the object's scale.  Likelihood based trackers use color to compute a likelihood
+ * function which mean-shift is then run on.  The likelihood based trackers are very fast but only work well
+ * when the target is composed of a single color.
+ *
  * @author Peter Abeles
  */
 public class ExampleTrackerMeanShift {
 	public static void main(String[] args) {
 		MediaManager media = DefaultMediaManager.INSTANCE;
-		// TODO add a simple video which can be tracked by likelihood
-		String fileName = "../data/applet/tracking/track_book.mjpeg";
-		Quadrilateral_F64 location = new Quadrilateral_F64(276,159,362,163,358,292,273,289);
+		String fileName = "../data/applet/tracking/balls_blue_red.mjpeg";
+		Quadrilateral_F64 location = new Quadrilateral_F64(394,247,474,244,475,325,389,321);
 
 		ImageType<MultiSpectral<ImageUInt8>> imageType = ImageType.ms(3,ImageUInt8.class);
 
 		SimpleImageSequence<MultiSpectral<ImageUInt8>> video = media.openVideo(fileName, imageType);
 
-		// Create the tracker.  Comment/Uncomment to change the tracker.  Mean-shift trackers have been omitted
-		// from the list since they use color information and including color images could clutter up the example.
+		// Create the tracker.  Comment/Uncomment to change the tracker.
 		TrackerObjectQuad<MultiSpectral<ImageUInt8>> tracker =
-				FactoryTrackerObjectQuad.meanShiftComaniciu2003(new ConfigComaniciu2003(),imageType);
+				FactoryTrackerObjectQuad.meanShiftComaniciu2003(new ConfigComaniciu2003(), imageType);
 //				FactoryTrackerObjectQuad.meanShiftComaniciu2003(new ConfigComaniciu2003(true),imageType);
 //				FactoryTrackerObjectQuad.meanShiftLikelihood(30,5,255, MeanShiftLikelihoodType.HISTOGRAM,imageType);
 

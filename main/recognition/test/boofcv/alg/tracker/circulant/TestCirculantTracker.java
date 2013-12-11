@@ -49,7 +49,7 @@ public class TestCirculantTracker {
 			}
 		}
 
-		alg.meanShift(peakX-2, peakY+1 );
+		alg.subpixelPeak(peakX - 2, peakY + 1);
 
 		assertEquals(2,alg.offX,0.3);
 		assertEquals(-1,alg.offY,0.3);

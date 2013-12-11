@@ -21,13 +21,14 @@ package boofcv.alg.feature.detect.peak;
 import boofcv.alg.filter.kernel.KernelMath;
 import boofcv.factory.filter.kernel.FactoryKernelGaussian;
 import boofcv.struct.convolve.Kernel2D_F32;
+import boofcv.struct.image.ImageSingleBand;
 
 /**
  * Implementation of {@link MeanShiftPeak} which uses a gaussian kernel.  The sigma is specified by the radius.
  *
  * @author Peter Abeles
  */
-public class MeanShiftGaussianPeak extends MeanShiftPeak {
+public class MeanShiftGaussianPeak<T extends ImageSingleBand> extends MeanShiftPeak<T> {
 
 	// sampling weight kernel
 	protected Kernel2D_F32 kernel;
@@ -37,15 +38,12 @@ public class MeanShiftGaussianPeak extends MeanShiftPeak {
 	 *
 	 * @param maxIterations  Maximum number of iterations.  Try 10
 	 * @param convergenceTol Convergence tolerance.  Try 1e-3
-	 * @param radius         Radius of the Gaussian kernel
+	 * @param radius         Search radius.  Application dependent.
 	 */
-	public MeanShiftGaussianPeak(int maxIterations, float convergenceTol, int radius) {
-		super(maxIterations, convergenceTol, radius);
-
-		if( radius > 0 ) {
-			setRadius(radius);
-		}
+	public MeanShiftGaussianPeak(int maxIterations, float convergenceTol, int radius, Class<T> imageType) {
+		super(maxIterations, convergenceTol, radius, imageType);
 	}
+
 
 	public void setRadius( int radius ) {
 		super.setRadius(radius);
