@@ -48,7 +48,7 @@ public class ExampleRemovePerspectiveDistortion {
 	public static void main(String[] args) {
 
 		// load a color image
-		BufferedImage buffered = UtilImageIO.loadImage("/home/pja/Desktop/goals_and_stuff.jpg");
+		BufferedImage buffered = UtilImageIO.loadImage("../data/applet/goals_and_stuff.jpg");
 		MultiSpectral<ImageFloat32> input = ConvertBufferedImage.convertFromMulti(buffered, null, true, ImageFloat32.class);
 
 		// Create a smaller output image for processing later on

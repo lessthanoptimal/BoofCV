@@ -129,17 +129,20 @@ public class SparseFlowObjectTracker<Image extends ImageSingleBand, Derivative e
 
 		// See if there are enough points remaining.  use of config.numberOfSamples is some what arbitrary
 		if( pairs.size() < config.numberOfSamples ) {
+			System.out.println("Lack of sample pairs");
 			trackLost = true;
 			return false;
 		}
 
 		// find the motion using tracked features
 		if( !estimateMotion.process(pairs.toList()) ) {
+			System.out.println("estimate motion failed");
 			trackLost = true;
 			return false;
 		}
 
 		if( estimateMotion.getFitQuality() > config.robustMaxError ) {
+			System.out.println("exceeded Max estimation error");
 			trackLost = true;
 			return false;
 		}
@@ -230,9 +233,9 @@ public class SparseFlowObjectTracker<Image extends ImageSingleBand, Derivative e
 
 				float error = UtilPoint2D_F32.distanceSq(track.x, track.y, xx, yy);
 
-				if( error > maximumErrorFB ) {
-					continue;
-				}
+//				if( error > maximumErrorFB ) {
+//					continue;
+//				}
 
 				// create a list of the observations
 				AssociatedPair a = pairs.grow();

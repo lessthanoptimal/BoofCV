@@ -18,6 +18,8 @@
 
 package boofcv.gui.d3;
 
+import boofcv.alg.geo.PerspectiveOps;
+import boofcv.struct.calib.IntrinsicParameters;
 import georegression.geometry.GeometryMath_F64;
 import georegression.geometry.RotationMatrixGenerator;
 import georegression.struct.point.Point2D_F64;
@@ -88,6 +90,16 @@ public class PointCloudViewer extends JPanel
    public PointCloudViewer(DenseMatrix64F K, double keyStepSize) {
 		this(keyStepSize);
 		configure(K);
+	}
+
+	public PointCloudViewer( IntrinsicParameters intrinsic, double keyStepSize) {
+		this(keyStepSize);
+		configure(PerspectiveOps.calibrationMatrix(intrinsic,null));
+		setPreferredSize(new Dimension(intrinsic.width,intrinsic.height));
+	}
+
+	public void setWorldToCamera( Se3_F64 worldToCamera ) {
+		this.worldToCamera.set(worldToCamera);
 	}
 
 	/**
