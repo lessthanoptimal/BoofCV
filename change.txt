@@ -85,11 +85,14 @@ Version : Alpha 0.16
 - SearchLocalPeak high level interface
   * For algorithms which perform a local search for a peak
   * Added two mean-shift variants
+- New examples
+  * Estimating position of calibration grids
+  * Two examples for object tracking
+  * How to remove perspective distortion
 
 - TODO automate high level tests
    * Move SURFPerformance into ValidationBoof
    * Create logs for BoofCV performance
-- TODO Add example where perspective distortion is removed using 4 corners    ExampleRemovePerspectiveDistortion
 
 ---------------------------------------------
 Date    : 2013/06/21

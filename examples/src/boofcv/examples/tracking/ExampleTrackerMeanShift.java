@@ -37,9 +37,9 @@ import java.awt.image.BufferedImage;
 
 /**
  * Mean-shift based trackers use color information to perform a local search.  The Comaniciu based trackers match
- * the color histogram directly and are more robust to objects with complex distributions.  Comaniciu can also
+ * the color histogram directly, are more robust to objects with complex distributions, and estimate scale changes.
  * be configured to estimate the object's scale.  Likelihood based trackers use color to compute a likelihood
- * function which mean-shift is then run on.  The likelihood based trackers are very fast but only work well
+ * function, which mean-shift is then run on.  The likelihood based trackers are very fast but only work well
  * when the target is composed of a single color.
  *
  * @author Peter Abeles
