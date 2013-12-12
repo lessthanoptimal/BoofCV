@@ -121,7 +121,8 @@ public class TldRegionTracker< Image extends ImageSingleBand , Derivative extend
 	 * @param image Most recent video image.
 	 */
 	public void initialize(PyramidDiscrete<Image> image ) {
-		if( previousDerivX == null || previousDerivX.length != image.getNumLayers() ) {
+		if( previousDerivX == null || previousDerivX.length != image.getNumLayers()
+				|| previousImage.getInputWidth() != image.getInputWidth() || previousImage.getInputHeight() != image.getInputHeight() ) {
 			declareDataStructures(image);
 		}
 
@@ -138,7 +139,7 @@ public class TldRegionTracker< Image extends ImageSingleBand , Derivative extend
 	protected void declareDataStructures(PyramidDiscrete<Image> image) {
 		numPyramidLayers = image.getNumLayers();
 
-		previousDerivX = (Derivative[]) Array.newInstance(derivType, image.getNumLayers());
+		previousDerivX = (Derivative[])Array.newInstance(derivType,image.getNumLayers());
 		previousDerivY = (Derivative[])Array.newInstance(derivType,image.getNumLayers());
 		currentDerivX = (Derivative[])Array.newInstance(derivType,image.getNumLayers());
 		currentDerivY = (Derivative[])Array.newInstance(derivType,image.getNumLayers());

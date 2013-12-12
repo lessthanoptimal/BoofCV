@@ -37,6 +37,42 @@ public class TestKernelMath {
 	Random rand = new Random(234);
 
 	@Test
+	public void scale_F32() {
+		Kernel1D_F32 a = FactoryKernel.random1D_F32(5,-1,1,rand);
+		Kernel1D_F32 expected = new Kernel1D_F32(11);
+
+		float scale = 1.5f;
+
+		for( int i = 0; i < a.width; i++ ) {
+			expected.data[i] = a.data[i]*scale;
+		}
+
+		KernelMath.scale(a,scale);
+
+		for( int i = 0; i < a.width; i++ ) {
+			assertEquals(expected.data[i],a.data[i],1e-4);
+		}
+	}
+
+	@Test
+	public void scale_F64() {
+		Kernel1D_F64 a = FactoryKernel.random1D_F64(5,-1,1,rand);
+		Kernel1D_F64 expected = new Kernel1D_F64(11);
+
+		double scale = 1.5;
+
+		for( int i = 0; i < a.width; i++ ) {
+			expected.data[i] = a.data[i]*scale;
+		}
+
+		KernelMath.scale(a,scale);
+
+		for( int i = 0; i < a.width; i++ ) {
+			assertEquals(expected.data[i],a.data[i],1e-4);
+		}
+	}
+
+	@Test
 	public void fill_F32() {
 		Kernel2D_F32 a = FactoryKernel.random2D_F32(2, -2, 2, rand);
 		KernelMath.fill(a,1);
