@@ -205,6 +205,9 @@ public class TldFernClassifier<T extends ImageSingleBand> {
 	 */
 	protected int computeFernValue(float c_x, float c_y, float rectWidth , float rectHeight , TldFernDescription fern ) {
 
+		rectWidth -= 1;
+		rectHeight -= 1;
+
 		int desc = 0;
 		for( int i = 0; i < fern.pairs.length; i++ ) {
 			Point2D_F32 p_a = fern.pairs[i].a;
@@ -227,6 +230,9 @@ public class TldFernClassifier<T extends ImageSingleBand> {
 	 * Computes the value of a fern after adding noise to the image being sampled.
 	 */
 	protected int computeFernValueRand(float c_x, float c_y, float rectWidth , float rectHeight , TldFernDescription fern ) {
+
+		rectWidth -= 1;
+		rectHeight -= 1;
 
 		int desc = 0;
 		for( int i = 0; i < fern.pairs.length; i++ ) {

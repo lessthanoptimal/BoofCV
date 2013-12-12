@@ -1,5 +1,7 @@
 package boofcv.abst.tracker;
 
+import boofcv.alg.distort.DistortImageOps;
+import boofcv.alg.interpolate.TypeInterpolate;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 import georegression.struct.shapes.Quadrilateral_F64;
@@ -39,6 +41,22 @@ public abstract class GenericTrackerObjectRectangleTests<T extends ImageBase> {
 	}
 
 	public abstract TrackerObjectQuad<T> create( ImageType<T> imageType );
+
+	@Test
+	public void changeInputImageSize() {
+		TrackerObjectQuad<T> tracker = create(imageType);
+		render(1,0,0);
+
+		T smaller = (T)input._createNew(width/2,height/2);
+
+		DistortImageOps.scale(input,smaller, TypeInterpolate.BILINEAR);
+
+		assertTrue(tracker.initialize(smaller, rect(20, 25, 70, 100)));
+		assertTrue(tracker.process(smaller, where));
+
+		assertTrue(tracker.initialize(input, initRegion));
+		assertTrue(tracker.process(input, where));
+	}
 
 	@Test
 	public void stationary() {

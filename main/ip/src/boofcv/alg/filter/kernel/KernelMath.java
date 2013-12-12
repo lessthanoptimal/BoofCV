@@ -29,6 +29,18 @@ import boofcv.struct.image.ImageSInt32;
  */
 public class KernelMath {
 
+	public static void scale( Kernel1D_F32 kernel , float value ) {
+		for( int i = 0; i < kernel.width; i++ ) {
+			kernel.data[i] *= value;
+		}
+	}
+
+	public static void scale( Kernel1D_F64 kernel , double value ) {
+		for( int i = 0; i < kernel.width; i++ ) {
+			kernel.data[i] *= value;
+		}
+	}
+
 	public static void fill( Kernel2D_F32 kernel , float value ) {
 		int N = kernel.width*kernel.width;
 		for( int i = 0; i < N; i++ ) {
