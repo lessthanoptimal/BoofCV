@@ -35,6 +35,6 @@ public class TestWrapDetectDescribeSurf extends GenericTestsDetectDescribePoint<
 
 	@Override
 	public DetectDescribePoint<ImageFloat32, SurfFeature> createDetDesc() {
-		return FactoryDetectDescribe.surfStable(null,null,null, ImageType.single(ImageFloat32.class));
+		return FactoryDetectDescribe.surfStable(null,null,null, ImageFloat32.class);
 	}
 }

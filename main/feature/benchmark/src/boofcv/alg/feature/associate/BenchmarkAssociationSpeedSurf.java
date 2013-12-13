@@ -28,7 +28,6 @@ import boofcv.misc.Performer;
 import boofcv.misc.ProfileOperation;
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageType;
 import org.ddogleg.struct.FastQueue;
 
 import javax.imageio.ImageIO;
@@ -54,7 +53,7 @@ public class BenchmarkAssociationSpeedSurf {
 	DetectDescribePoint<ImageFloat32,TupleDesc_F64> detector;
 
 	public BenchmarkAssociationSpeedSurf() {
-		detector = (DetectDescribePoint)FactoryDetectDescribe.surfStable(null, null, null, ImageType.single(ImageFloat32.class));
+		detector = (DetectDescribePoint)FactoryDetectDescribe.surfStable(null, null, null, ImageFloat32.class);
 		listA = createSet(image1);
 		listB = createSet(image2);
 		

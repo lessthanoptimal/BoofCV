@@ -90,6 +90,25 @@ public class TestUtilImageIO {
 		assertTrue(f.delete());
 	}
 
+	@Test
+	public void loadImage_saveImage_PGM() throws IOException {
+		ImageUInt8 orig = new ImageUInt8(width,height);
+		GImageMiscOps.fillUniform(orig,rand,0,256);
+
+		UtilImageIO.savePGM(orig,"temp.pgm");
+		ImageUInt8 found = UtilImageIO.loadPGM_U8("temp.pgm",null);
+
+		for( int y = 0; y < height; y++ ) {
+			for( int x = 0; x < width; x++ ) {
+				assertEquals(orig.get(x,y),found.get(x,y));
+			}
+		}
+
+		// clean up
+		File f = new File("temp.pgm");
+		assertTrue(f.delete());
+	}
+
 	/**
 	 * See if load image fails gracefully if an image is not present
 	 */
