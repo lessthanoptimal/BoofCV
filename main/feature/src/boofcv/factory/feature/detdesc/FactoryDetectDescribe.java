@@ -43,8 +43,8 @@ import boofcv.factory.feature.detect.interest.FactoryInterestPointAlgs;
 import boofcv.factory.feature.orientation.FactoryOrientationAlgs;
 import boofcv.struct.feature.SurfFeature;
 import boofcv.struct.feature.TupleDesc;
-import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageMultiBand;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageType;
 
@@ -111,7 +111,38 @@ public class FactoryDetectDescribe {
 	DetectDescribePoint<T,SurfFeature> surfFast( ConfigFastHessian configDetector ,
 												 ConfigSurfDescribe.Speed configDesc,
 												 ConfigAverageIntegral configOrientation,
-												 ImageType<T> imageType) {
+												 Class<T> imageType) {
+
+		Class<II> integralType = GIntegralImageOps.getIntegralType(imageType);
+
+		FastHessianFeatureDetector<II> detector = FactoryInterestPointAlgs.fastHessian(configDetector);
+		DescribePointSurf<II> describe = FactoryDescribePointAlgs.surfSpeed(configDesc, integralType);
+		OrientationIntegral<II> orientation = FactoryOrientationAlgs.average_ii(configOrientation, integralType);
+
+		return new WrapDetectDescribeSurf<T,II>( detector, orientation, describe );
+	}
+
+	/**
+	 * <p>
+	 * Color version of SURF stable.  Features are detected in a gray scale image, but the descriptors are
+	 * computed using a color image.  Each band in the page adds to the descriptor length.  See
+	 * {@link DetectDescribeSurfMultiSpectral} for details.
+	 * </p>
+	 *
+	 * @see FastHessianFeatureDetector
+	 * @see DescribePointSurf
+	 * @see DescribePointSurfMultiSpectral
+	 *
+	 * @param configDetector		Configuration for SURF detector
+	 * @param configDesc			Configuration for SURF descriptor
+	 * @param configOrientation		Configuration for orientation
+	 * @return SURF detector and descriptor
+	 */
+	public static <T extends ImageSingleBand, II extends ImageSingleBand>
+	DetectDescribePoint<T,SurfFeature> surfColorFast( ConfigFastHessian configDetector ,
+													  ConfigSurfDescribe.Speed configDesc,
+													  ConfigAverageIntegral configOrientation,
+													  ImageType<T> imageType) {
 
 		Class bandType = imageType.getImageClass();
 		Class<II> integralType = GIntegralImageOps.getIntegralType(bandType);
@@ -120,9 +151,7 @@ public class FactoryDetectDescribe {
 		DescribePointSurf<II> describe = FactoryDescribePointAlgs.surfSpeed(configDesc, integralType);
 		OrientationIntegral<II> orientation = FactoryOrientationAlgs.average_ii(configOrientation, integralType);
 
-		if( imageType.getFamily() == ImageType.Family.SINGLE_BAND ) {
-			return new WrapDetectDescribeSurf( detector, orientation, describe );
-		} else if( imageType.getFamily() == ImageType.Family.MULTI_SPECTRAL ) {
+		if( imageType.getFamily() == ImageType.Family.MULTI_SPECTRAL ) {
 			DescribePointSurfMultiSpectral<II> describeMulti =
 					new DescribePointSurfMultiSpectral<II>(describe,imageType.getNumBands());
 
@@ -153,14 +182,46 @@ public class FactoryDetectDescribe {
 	 * @param configDetector Configuration for SURF detector.  Null for default.
 	 * @param configDescribe Configuration for SURF descriptor.  Null for default.
 	 * @param configOrientation Configuration for region orientation.  Null for default.
-	 * @param imageType Specify type of input image.  Gray and color images produce different descriptors.
+	 * @param imageType Specify type of input image.
 	 * @return SURF detector and descriptor
 	 */
-	public static <T extends ImageBase, II extends ImageSingleBand>
+	public static <T extends ImageSingleBand, II extends ImageSingleBand>
 	DetectDescribePoint<T,SurfFeature> surfStable( ConfigFastHessian configDetector,
 												   ConfigSurfDescribe.Stablility configDescribe,
 												   ConfigSlidingIntegral configOrientation,
-												   ImageType<T> imageType ) {
+												   Class<T> imageType ) {
+
+		Class<II> integralType = GIntegralImageOps.getIntegralType(imageType);
+
+		FastHessianFeatureDetector<II> detector = FactoryInterestPointAlgs.fastHessian(configDetector);
+		DescribePointSurfMod<II> describe = FactoryDescribePointAlgs.surfStability(configDescribe, integralType);
+		OrientationIntegral<II> orientation = FactoryOrientationAlgs.sliding_ii(configOrientation, integralType);
+
+		return new WrapDetectDescribeSurf( detector, orientation, describe );
+	}
+
+	/**
+	 * <p>
+	 * Color version of SURF stable feature.  Features are detected in a gray scale image, but the descriptors are
+	 * computed using a color image.  Each band in the page adds to the descriptor length.  See
+	 * {@link DetectDescribeSurfMultiSpectral} for details.
+	 * </p>
+	 *
+	 * @see DescribePointSurfMultiSpectral
+	 * @see FastHessianFeatureDetector
+	 * @see boofcv.alg.feature.describe.DescribePointSurfMod
+	 *
+	 * @param configDetector Configuration for SURF detector.  Null for default.
+	 * @param configDescribe Configuration for SURF descriptor.  Null for default.
+	 * @param configOrientation Configuration for region orientation.  Null for default.
+	 * @param imageType Specify type of color input image.
+	 * @return SURF detector and descriptor
+	 */
+	public static <T extends ImageMultiBand, II extends ImageSingleBand>
+	DetectDescribePoint<T,SurfFeature> surfColorStable( ConfigFastHessian configDetector,
+														ConfigSurfDescribe.Stablility configDescribe,
+														ConfigSlidingIntegral configOrientation,
+														ImageType<T> imageType ) {
 
 		Class bandType = imageType.getImageClass();
 		Class<II> integralType = GIntegralImageOps.getIntegralType(bandType);
@@ -169,9 +230,7 @@ public class FactoryDetectDescribe {
 		DescribePointSurfMod<II> describe = FactoryDescribePointAlgs.surfStability(configDescribe, integralType);
 		OrientationIntegral<II> orientation = FactoryOrientationAlgs.sliding_ii(configOrientation, integralType);
 
-		if( imageType.getFamily() == ImageType.Family.SINGLE_BAND ) {
-			return new WrapDetectDescribeSurf( detector, orientation, describe );
-		} else if( imageType.getFamily() == ImageType.Family.MULTI_SPECTRAL ) {
+		if( imageType.getFamily() == ImageType.Family.MULTI_SPECTRAL ) {
 			DescribePointSurfMultiSpectral<II> describeMulti =
 					new DescribePointSurfMultiSpectral<II>(describe,imageType.getNumBands());
 

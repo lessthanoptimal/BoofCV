@@ -157,8 +157,7 @@ public class FactoryPointTracker {
 				new AssociateDescTo2D<SurfFeature>(new WrapAssociateSurfBasic(assoc));
 
 		DetectDescribePoint<I,SurfFeature> fused =
-				FactoryDetectDescribe.surfFast(configDetector, configDescribe, configOrientation,
-						ImageType.single(imageType));
+				FactoryDetectDescribe.surfFast(configDetector, configDescribe, configOrientation,imageType);
 
 		DdaManagerDetectDescribePoint<I,SurfFeature> manager = new DdaManagerDetectDescribePoint<I,SurfFeature>(fused);
 
@@ -193,8 +192,7 @@ public class FactoryPointTracker {
 				new AssociateDescTo2D<SurfFeature>(new WrapAssociateSurfBasic(assoc));
 
 		DetectDescribePoint<I,SurfFeature> fused =
-				FactoryDetectDescribe.surfStable(configDetector,configDescribe,configOrientation,
-						ImageType.single(imageType));
+				FactoryDetectDescribe.surfStable(configDetector,configDescribe,configOrientation,imageType);
 
 		DdaManagerDetectDescribePoint<I,SurfFeature> manager = new DdaManagerDetectDescribePoint<I,SurfFeature>(fused);
 
@@ -387,8 +385,7 @@ public class FactoryPointTracker {
 		AssociateDescription<SurfFeature> generalAssoc = new WrapAssociateSurfBasic(assoc);
 
 		DetectDescribePoint<I,SurfFeature> fused =
-				FactoryDetectDescribe.surfStable(configDetector, configDescribe, configOrientation,
-						ImageType.single(imageType));
+				FactoryDetectDescribe.surfStable(configDetector, configDescribe, configOrientation,imageType);
 
 		return combined(fused,generalAssoc,trackRadius,pyramidScalingKlt,reactivateThreshold,
 				imageType);

@@ -37,6 +37,6 @@ public class TestSurfMultiSpectral_to_DetectDescribePoint extends
 
 	@Override
 	public DetectDescribePoint<MultiSpectral<ImageFloat32>, SurfFeature> createDetDesc() {
-		return FactoryDetectDescribe.surfStable(null, null, null, imageType);
+		return FactoryDetectDescribe.surfColorStable(null, null, null, imageType);
 	}
 }

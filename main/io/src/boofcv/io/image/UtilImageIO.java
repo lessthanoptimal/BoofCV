@@ -23,6 +23,7 @@ import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
 import boofcv.struct.image.MultiSpectral;
 import org.ddogleg.struct.GrowQueue_I8;
+import sun.awt.image.ByteInterleavedRaster;
 import sun.awt.image.IntegerInterleavedRaster;
 
 import javax.imageio.ImageIO;
@@ -47,8 +48,12 @@ public class UtilImageIO {
 		try {
 			img = ImageIO.read(new File(fileName));
 
-			if( img == null && fileName.endsWith("ppm") || fileName.endsWith("PPM") ) {
-				return loadPPM(fileName,null);
+			if(  img == null) {
+				if( fileName.endsWith("ppm") || fileName.endsWith("PPM") ) {
+					return loadPPM(fileName,null);
+				} else if( fileName.endsWith("pgm") || fileName.endsWith("PGM") ) {
+					return loadPGM(fileName, null);
+				}
 			}
 		} catch (IOException e) {
 			return null;
@@ -101,6 +106,9 @@ public class UtilImageIO {
 				if( fileName.endsWith("ppm") || fileName.endsWith("PPM") ) {
 					MultiSpectral<ImageUInt8> color = ConvertBufferedImage.convertFromMulti(img,null,true,ImageUInt8.class);
 					savePPM(color, fileName, null);
+				} else if( fileName.endsWith("pgm") || fileName.endsWith("PGM") ) {
+					ImageUInt8 gray = ConvertBufferedImage.convertFrom(img, (ImageUInt8) null);
+					savePGM(gray, fileName);
 				}else
 					throw new IllegalArgumentException("No writter appropriate found");
 			}
@@ -124,6 +132,20 @@ public class UtilImageIO {
 	}
 
 	/**
+	 * Loads a PGM image from a file.
+	 *
+	 * @param fileName Location of PGM image
+	 * @param storage (Optional) Storage for output image.  Must be the width and height of the image being read.
+	 *                Better performance of type BufferedImage.TYPE_BYTE_GRAY.  If null or width/height incorrect a new image
+	 *                will be declared.
+	 * @return The read in image
+	 * @throws IOException
+	 */
+	public static BufferedImage loadPGM( String fileName , BufferedImage storage ) throws IOException {
+		return loadPGM(new FileInputStream(fileName), storage);
+	}
+
+	/**
 	 * Loads a PPM image from an {@link InputStream}.
 	 *
 	 * @param inputStream InputStream for PPM image
@@ -137,7 +159,10 @@ public class UtilImageIO {
 		DataInputStream in = new DataInputStream(inputStream);
 
 		readLine(in);
-		String s[] = readLine(in).split(" ");
+		String line = readLine(in);
+		while( line.charAt(0) == '#')
+			line = readLine(in);
+		String s[] = line.split(" ");
 		int w = Integer.parseInt(s[0]);
 		int h = Integer.parseInt(s[1]);
 		readLine(in);
@@ -183,6 +208,67 @@ public class UtilImageIO {
 	}
 
 	/**
+	 * Loads a PGM image from an {@link InputStream}.
+	 *
+	 * @param inputStream InputStream for PGM image
+	 * @param storage (Optional) Storage for output image.  Must be the width and height of the image being read.
+	 *                Better performance of type BufferedImage.TYPE_BYTE_GRAY.  If null or width/height incorrect a new image
+	 *                will be declared.
+	 * @return The read in image
+	 * @throws IOException
+	 */
+	public static BufferedImage loadPGM( InputStream inputStream , BufferedImage storage ) throws IOException {
+		DataInputStream in = new DataInputStream(inputStream);
+
+		readLine(in);
+		String line = readLine(in);
+		while( line.charAt(0) == '#')
+			line = readLine(in);
+		String s[] = line.split(" ");
+		int w = Integer.parseInt(s[0]);
+		int h = Integer.parseInt(s[1]);
+		readLine(in);
+
+		if( storage == null || storage.getWidth() != w || storage.getHeight() != h )
+			storage = new BufferedImage(w,h,BufferedImage.TYPE_BYTE_GRAY );
+
+		int length = w*h;
+		byte[] data = new byte[length];
+
+		in.read(data,0,length);
+
+		boolean useFailSafe = storage.getType() != BufferedImage.TYPE_BYTE_GRAY;
+		// try using the internal array for better performance
+		try {
+			byte gray[] =  ((ByteInterleavedRaster)storage.getRaster()).getDataStorage();
+
+			int indexIn = 0;
+			int indexOut = 0;
+			for( int y = 0; y < h; y++ ) {
+				for( int x = 0; x < w; x++ ) {
+					gray[indexOut++] =  data[indexIn++];
+				}
+			}
+		} catch( AccessControlException e ) {
+			useFailSafe = true;
+
+		}
+
+		if( useFailSafe ) {
+			// use the slow setRGB() function
+			int indexIn = 0;
+			for( int y = 0; y < h; y++ ) {
+				for( int x = 0; x < w; x++ ) {
+					int gray = data[indexIn++] & 0xFF;
+					storage.setRGB(x, y, gray << 16 | gray << 8 | gray );
+				}
+			}
+		}
+
+		return storage;
+	}
+
+	/**
 	 * Reads a PPM image file directly into a MultiSpectral<ImageUInt8> image.   To improve performance when reading
 	 * many images, the user can provide work space memory in the optional parameters
 	 *
@@ -216,7 +302,10 @@ public class UtilImageIO {
 		DataInputStream in = new DataInputStream(inputStream);
 
 		readLine(in);
-		String s[] = readLine(in).split(" ");
+		String line = readLine(in);
+		while( line.charAt(0) == '#')
+			line = readLine(in);
+		String s[] = line.split(" ");
 		int w = Integer.parseInt(s[0]);
 		int h = Integer.parseInt(s[1]);
 		readLine(in);
@@ -252,6 +341,50 @@ public class UtilImageIO {
 	}
 
 	/**
+	 * Loads a PGM image from an {@link InputStream}.
+	 *
+	 * @param fileName InputStream for PGM image
+	 * @param storage (Optional) Storage for output image.  Must be the width and height of the image being read.
+	 *                If null a new image will be declared.
+	 * @return The read in image
+	 * @throws IOException
+	 */
+	public static ImageUInt8 loadPGM_U8( String fileName , ImageUInt8 storage )
+			throws IOException
+	{
+		return loadPGM_U8(new FileInputStream(fileName),storage);
+	}
+
+	/**
+	 * Loads a PGM image from an {@link InputStream}.
+	 *
+	 * @param inputStream InputStream for PGM image
+	 * @param storage (Optional) Storage for output image.  Must be the width and height of the image being read.
+	 *                If null a new image will be declared.
+	 * @return The read in image
+	 * @throws IOException
+	 */
+	public static ImageUInt8 loadPGM_U8( InputStream inputStream , ImageUInt8 storage ) throws IOException {
+		DataInputStream in = new DataInputStream(inputStream);
+
+		readLine(in);
+		String line = readLine(in);
+		while( line.charAt(0) == '#')
+			line = readLine(in);
+		String s[] = line.split(" ");
+		int w = Integer.parseInt(s[0]);
+		int h = Integer.parseInt(s[1]);
+		readLine(in);
+
+		if( storage == null )
+			storage = new ImageUInt8(w,h);
+
+		in.read(storage.data,0,w*h);
+
+		return storage;
+	}
+
+	/**
 	 * Saves an image in PPM format.
 	 *
 	 * @param rgb 3-band RGB image
@@ -265,11 +398,6 @@ public class UtilImageIO {
 
 		String header = String.format("P6\n%d %d\n255\n", rgb.width, rgb.height);
 		os.write(header.getBytes());
-
-		int length = rgb.width*rgb.height*3;
-		if( temp == null )
-			temp = new GrowQueue_I8(length);
-		temp.resize(length);
 
 		byte data[] = temp.data;
 
@@ -288,6 +416,25 @@ public class UtilImageIO {
 		}
 
 		os.write(data,0,rgb.width*rgb.height*3);
+
+		os.close();
+	}
+
+	/**
+	 * Saves an image in PGM format.
+	 *
+	 * @param gray Gray scale image
+	 * @param fileName Location where the image is to be written to.
+	 * @throws IOException
+	 */
+	public static void savePGM(  ImageUInt8 gray , String fileName ) throws IOException {
+		File out = new File(fileName);
+		DataOutputStream os = new DataOutputStream(new FileOutputStream(out));
+
+		String header = String.format("P5\n%d %d\n255\n", gray.width, gray.height);
+		os.write(header.getBytes());
+
+		os.write(gray.data,0,gray.width*gray.height);
 
 		os.close();
 	}
