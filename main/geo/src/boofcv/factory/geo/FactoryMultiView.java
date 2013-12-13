@@ -69,6 +69,8 @@ public class FactoryMultiView {
 	 * Returns an algorithm for estimating a homography matrix given a set of
 	 * {@link AssociatedPair}.
 	 *
+	 * @see HomographyLinear4
+	 *
     * @param normalize If input is in pixel coordinates set to true.  False if in normalized image coordinates.
 	 * @return Homography estimator.
 	 */
@@ -79,6 +81,9 @@ public class FactoryMultiView {
 
 	/**
 	 * Creates a non-linear optimizer for refining estimates of homography matrices.
+	 *
+	 * @see HomographyResidualSampson
+	 * @see HomographyResidualTransfer
 	 *
 	 * @param tol Tolerance for convergence.  Try 1e-8
 	 * @param maxIterations Maximum number of iterations it will perform.  Try 100 or more.
