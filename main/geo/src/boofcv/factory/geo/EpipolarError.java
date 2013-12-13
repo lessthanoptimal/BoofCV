@@ -25,8 +25,8 @@ package boofcv.factory.geo;
  */
 public enum EpipolarError {
 	/**
-	 * Simple to compute error function.  Has a minimum at the global solution, but the cost
-	 * does not try to compute any "optimal" error
+	 * Simple to compute error function.  Has a minimum at the global solution, but cost is not the
+	 * same as the"optimal" error
 	 */
 	SIMPLE,
 	/**

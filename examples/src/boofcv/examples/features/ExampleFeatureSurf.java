@@ -36,7 +36,6 @@ import boofcv.struct.feature.ScalePoint;
 import boofcv.struct.feature.SurfFeature;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.image.ImageType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -57,8 +56,7 @@ public class ExampleFeatureSurf {
 	public static void easy( ImageFloat32 image ) {
 		// create the detector and descriptors
 		DetectDescribePoint<ImageFloat32,SurfFeature> surf = FactoryDetectDescribe.
-				surfStable(new ConfigFastHessian(0, 2, 200, 2, 9, 4, 4), null, null,
-						ImageType.single(ImageFloat32.class));
+				surfStable(new ConfigFastHessian(0, 2, 200, 2, 9, 4, 4), null, null,ImageFloat32.class);
 
 		 // specify the image to process
 		surf.detect(image);

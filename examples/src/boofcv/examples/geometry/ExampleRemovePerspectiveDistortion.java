@@ -54,7 +54,7 @@ public class ExampleRemovePerspectiveDistortion {
 		// Create a smaller output image for processing later on
 		MultiSpectral<ImageFloat32> output = input._createNew(400,500);
 
-		// create homography estimation algorithm.  Requests a minimum of 4 points
+		// Homography estimation algorithm.  Requires a minimum of 4 points
 		Estimate1ofEpipolar computeHomography = FactoryMultiView.computeHomography(true);
 
 		// Specify the pixel coordinates from destination to target

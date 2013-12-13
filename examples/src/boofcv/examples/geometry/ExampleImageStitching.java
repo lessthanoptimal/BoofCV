@@ -41,7 +41,6 @@ import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.image.ImageType;
 import boofcv.struct.image.MultiSpectral;
 import georegression.fitting.homography.ModelManagerHomography2D_F64;
 import georegression.struct.homo.Homography2D_F64;
@@ -150,7 +149,7 @@ public class ExampleImageStitching {
 
 		// Detect using the standard SURF feature descriptor and describer
 		DetectDescribePoint detDesc = FactoryDetectDescribe.surfStable(
-				new ConfigFastHessian(1, 2, 200, 1, 9, 4, 4), null,null, ImageType.single(imageType));
+				new ConfigFastHessian(1, 2, 200, 1, 9, 4, 4), null,null, imageType);
 		ScoreAssociation<SurfFeature> scorer = FactoryAssociation.scoreEuclidean(SurfFeature.class,true);
 		AssociateDescription<SurfFeature> associate = FactoryAssociation.greedy(scorer,2,true);
 
