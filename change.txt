@@ -91,11 +91,14 @@ Version : Alpha 0.16
   * Estimating position of calibration grids
   * Two examples for object tracking
   * How to remove perspective distortion
+- VisOdomDualTrackPnP
+  * It is now possible for it to produce a fatal error when all its tracks are lost
 
 - TODO automate high level tests
    * Move SURFPerformance into ValidationBoof
    * Create logs for BoofCV performance
 - TODO remove sparse flow if its performance doesn't improve
+- TODO VisOdomDualTrackPnP should be able to extract feature descriptions from the.  Don't default to hybrid trackers
 
 ---------------------------------------------
 Date    : 2013/06/21

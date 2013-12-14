@@ -89,25 +89,23 @@ public class FactoryTrackerAlg {
 	 *
 	 * @param detector Feature detector and describer.
 	 * @param associate Association algorithm.
+	 * @param kltConfig Configuration for KLT
 	 * @param featureRadiusKlt KLT feature radius
 	 * @param pyramidScalingKlt KLT pyramid configuration
-	 * @param imageType Input image type.
-	 * @param <I> Input image type.
-	 * @param <D> Derivative image type.
-	 * @param <Desc> Feature description type.
-	 * @return Feature tracker
+	 * @param imageType Input image type.    @return Feature tracker
 	 */
 	public static <I extends ImageSingleBand, D extends ImageSingleBand, Desc extends TupleDesc>
-	CombinedTrackerScalePoint<I,D,Desc> combined( DetectDescribePoint<I,Desc> detector ,
-												  AssociateDescription<Desc> associate ,
-												  int featureRadiusKlt,
-												  int[] pyramidScalingKlt ,
-												  Class<I> imageType ,
-												  Class<D> derivType )
+	CombinedTrackerScalePoint<I,D,Desc> combined(DetectDescribePoint<I, Desc> detector,
+												 AssociateDescription<Desc> associate,
+												 KltConfig kltConfig, int featureRadiusKlt,
+												 int[] pyramidScalingKlt,
+												 Class<I> imageType,
+												 Class<D> derivType)
 	{
-		KltConfig configKlt =  KltConfig.createDefault();
+		if( kltConfig == null)
+			kltConfig =  KltConfig.createDefault();
 
-		PyramidKltForCombined<I,D> klt = new PyramidKltForCombined<I, D>(configKlt,
+		PyramidKltForCombined<I,D> klt = new PyramidKltForCombined<I, D>(kltConfig,
 				featureRadiusKlt,pyramidScalingKlt,imageType,derivType);
 
 		return new CombinedTrackerScalePoint<I, D, Desc>(klt,detector,associate);

@@ -71,8 +71,8 @@ public class VisualizeRegionDescriptionApp <T extends ImageSingleBand, D extends
 
 		this.imageType = imageType;
 
-		addAlgorithm(0,"SURF-S", FactoryDescribeRegionPoint.surfStable(null, ImageType.single(imageType)));
-		addAlgorithm(0,"SURF-S Color", FactoryDescribeRegionPoint.surfStable(null, ImageType.ms(3, imageType)));
+		addAlgorithm(0,"SURF-S", FactoryDescribeRegionPoint.surfStable(null, imageType));
+		addAlgorithm(0,"SURF-S Color", FactoryDescribeRegionPoint.surfColorStable(null, ImageType.ms(3, imageType)));
 		if( imageType == ImageFloat32.class )
 			addAlgorithm(0,"SIFT", FactoryDescribeRegionPoint.sift(null,null));
 		addAlgorithm(0,"BRIEF", FactoryDescribeRegionPoint.brief(new ConfigBrief(true), imageType));

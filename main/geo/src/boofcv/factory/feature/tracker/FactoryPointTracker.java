@@ -63,7 +63,6 @@ import boofcv.factory.tracker.FactoryTrackerAlg;
 import boofcv.factory.transform.pyramid.FactoryPyramid;
 import boofcv.struct.feature.*;
 import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.image.ImageType;
 import boofcv.struct.pyramid.PyramidDiscrete;
 
 import java.util.Random;
@@ -360,8 +359,7 @@ public class FactoryPointTracker {
 	 * @see DescribePointSurf
 	 * @see boofcv.abst.feature.tracker.DdaManagerDetectDescribePoint
 	 *
-	 * @param trackRadius Size of feature being tracked by KLT
-	 * @param pyramidScalingKlt Image pyramid used for KLT
+	 * @param kltConfig Configuration for KLT tracker
 	 * @param reactivateThreshold Tracks are reactivated after this many have been dropped.  Try 10% of maxMatches
 	 * @param configDetector Configuration for SURF detector
 	 * @param configDescribe Configuration for SURF descriptor
@@ -371,13 +369,12 @@ public class FactoryPointTracker {
 	 * @return SURF based tracker.
 	 */
 	public static <I extends ImageSingleBand>
-	PointTracker<I> combined_FH_SURF_KLT(int trackRadius,
-													  int[] pyramidScalingKlt ,
-													  int reactivateThreshold ,
-													  ConfigFastHessian configDetector ,
-													  ConfigSurfDescribe.Stablility configDescribe ,
-													  ConfigSlidingIntegral configOrientation ,
-													  Class<I> imageType) {
+	PointTracker<I> combined_FH_SURF_KLT( PkltConfig kltConfig ,
+										  int reactivateThreshold ,
+										  ConfigFastHessian configDetector ,
+										  ConfigSurfDescribe.Stablility configDescribe ,
+										  ConfigSlidingIntegral configOrientation ,
+										  Class<I> imageType) {
 
 		ScoreAssociation<TupleDesc_F64> score = FactoryAssociation.defaultScore(TupleDesc_F64.class);
 		AssociateSurfBasic assoc = new AssociateSurfBasic(FactoryAssociation.greedy(score, 100000, true));
@@ -387,8 +384,7 @@ public class FactoryPointTracker {
 		DetectDescribePoint<I,SurfFeature> fused =
 				FactoryDetectDescribe.surfStable(configDetector, configDescribe, configOrientation,imageType);
 
-		return combined(fused,generalAssoc,trackRadius,pyramidScalingKlt,reactivateThreshold,
-				imageType);
+		return combined(fused,generalAssoc, kltConfig,reactivateThreshold, imageType);
 	}
 
 	/**
@@ -400,25 +396,21 @@ public class FactoryPointTracker {
 	 * @see boofcv.abst.feature.tracker.DdaManagerDetectDescribePoint
 	 *
 	 * @param configExtract Configuration for extracting features
-	 * @param trackRadius Size of feature being tracked by KLT
-	 * @param pyramidScalingKlt Image pyramid used for KLT
+	 * @param kltConfig Configuration for KLT
 	 * @param reactivateThreshold Tracks are reactivated after this many have been dropped.  Try 10% of maxMatches
 	 * @param configDescribe Configuration for SURF descriptor
 	 * @param configOrientation Configuration for region orientation.  If null then orientation isn't estimated
 	 * @param imageType      Type of image the input is.
-	 * @param derivType      Image derivative type.
-	 * @param <I>            Input image type.
-	 * @return SURF based tracker.
+	 * @param derivType      Image derivative type.        @return SURF based tracker.
 	 */
 	public static <I extends ImageSingleBand, D extends ImageSingleBand>
 	PointTracker<I> combined_ST_SURF_KLT(ConfigGeneralDetector configExtract,
-													  int trackRadius,
-													  int[] pyramidScalingKlt ,
-													  int reactivateThreshold ,
-													  ConfigSurfDescribe.Stablility configDescribe,
-													  ConfigSlidingIntegral configOrientation ,
-													  Class<I> imageType,
-													  Class<D> derivType ) {
+										 PkltConfig kltConfig,
+										 int reactivateThreshold,
+										 ConfigSurfDescribe.Stablility configDescribe,
+										 ConfigSlidingIntegral configOrientation,
+										 Class<I> imageType,
+										 Class<D> derivType) {
 
 		if( derivType == null )
 			derivType = GImageDerivativeOps.getDerivativeType(imageType);
@@ -427,7 +419,7 @@ public class FactoryPointTracker {
 		InterestPointDetector<I> detector = FactoryInterestPoint.wrapPoint(corner, 1, imageType, derivType);
 
 		DescribeRegionPoint<I,SurfFeature> regionDesc
-				= FactoryDescribeRegionPoint.surfStable(configDescribe, ImageType.single(imageType));
+				= FactoryDescribeRegionPoint.surfStable(configDescribe, imageType);
 
 		ScoreAssociation<TupleDesc_F64> score = FactoryAssociation.scoreEuclidean(TupleDesc_F64.class, true);
 		AssociateSurfBasic assoc = new AssociateSurfBasic(FactoryAssociation.greedy(score, 100000, true));
@@ -442,7 +434,7 @@ public class FactoryPointTracker {
 			orientation = FactoryOrientation.convertImage(orientationII,imageType);
 		}
 
-		return combined(detector,orientation,regionDesc,generalAssoc,trackRadius,pyramidScalingKlt,reactivateThreshold,
+		return combined(detector,orientation,regionDesc,generalAssoc, kltConfig,reactivateThreshold,
 				imageType);
 	}
 
@@ -455,27 +447,22 @@ public class FactoryPointTracker {
 	 * @param orientation Optional feature orientation.  Can be null.
 	 * @param describe Feature description
 	 * @param associate Association algorithm.
-	 * @param featureRadiusKlt KLT feature radius
-	 * @param pyramidScalingKlt KLT pyramid configuration
+	 * @param kltConfig Configuration for KLT tracker
 	 * @param reactivateThreshold Tracks are reactivated after this many have been dropped.  Try 10% of maxMatches
-	 * @param imageType Input image type.
-	 * @param <I> Input image type.
-	 * @param <Desc> Feature description type.
-	 * @return Feature tracker
+	 * @param imageType Input image type.     @return Feature tracker
 	 */
 	public static <I extends ImageSingleBand, Desc extends TupleDesc>
-	PointTracker<I> combined( InterestPointDetector<I> detector,
-							  OrientationImage<I> orientation ,
-							  DescribeRegionPoint<I, Desc> describe,
-							  AssociateDescription<Desc> associate ,
-							  int featureRadiusKlt,
-							  int[] pyramidScalingKlt ,
-							  int reactivateThreshold,
-							  Class<I> imageType )
+	PointTracker<I> combined(InterestPointDetector<I> detector,
+							 OrientationImage<I> orientation,
+							 DescribeRegionPoint<I, Desc> describe,
+							 AssociateDescription<Desc> associate,
+							 PkltConfig kltConfig ,
+							 int reactivateThreshold,
+							 Class<I> imageType)
 	{
 		DetectDescribeFusion<I,Desc> fused = new DetectDescribeFusion<I,Desc>(detector,orientation,describe);
 
-		return combined(fused,associate,featureRadiusKlt,pyramidScalingKlt,reactivateThreshold,imageType);
+		return combined(fused,associate, kltConfig, reactivateThreshold,imageType);
 	}
 
 	/**
@@ -485,27 +472,25 @@ public class FactoryPointTracker {
 	 *
 	 * @param detector Feature detector and describer.
 	 * @param associate Association algorithm.
-	 * @param featureRadiusKlt KLT feature radius
-	 * @param pyramidScalingKlt KLT pyramid configuration
+	 * @param kltConfig Configuration for KLT tracker
 	 * @param reactivateThreshold Tracks are reactivated after this many have been dropped.  Try 10% of maxMatches
-	 * @param imageType Input image type.
-	 * @param <I> Input image type.
-	 * @param <D> Derivative image type.
-	 * @param <Desc> Feature description type.
-	 * @return Feature tracker
+	 * @param imageType Input image type.     @return Feature tracker
 	 */
 	public static <I extends ImageSingleBand, D extends ImageSingleBand, Desc extends TupleDesc>
-	PointTracker<I> combined( DetectDescribePoint<I,Desc> detector ,
-								   AssociateDescription<Desc> associate ,
-								   int featureRadiusKlt,
-								   int[] pyramidScalingKlt ,
-								   int reactivateThreshold,
-								   Class<I> imageType )
+	PointTracker<I> combined(DetectDescribePoint<I, Desc> detector,
+							 AssociateDescription<Desc> associate,
+							 PkltConfig<I,D> kltConfig ,
+							 int reactivateThreshold,
+							 Class<I> imageType)
 	{
 		Class<D> derivType = GImageDerivativeOps.getDerivativeType(imageType);
 
+		if( kltConfig == null ) {
+			kltConfig = PkltConfig.createDefault(imageType,derivType);
+		}
+
 		CombinedTrackerScalePoint<I, D,Desc> tracker =
-				FactoryTrackerAlg.combined(detector,associate,featureRadiusKlt,pyramidScalingKlt,
+				FactoryTrackerAlg.combined(detector,associate, kltConfig.config, kltConfig.templateRadius,kltConfig.pyramidScaling,
 						imageType,derivType);
 
 		return new PointTrackerCombined<I,D,Desc>(tracker,reactivateThreshold,imageType,derivType);

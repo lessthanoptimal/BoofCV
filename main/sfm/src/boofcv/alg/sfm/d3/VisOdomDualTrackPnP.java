@@ -192,10 +192,12 @@ public class VisOdomDualTrackPnP<T extends ImageSingleBand,Desc extends TupleDes
 		} else {
 			mutualTrackDrop();
 			selectCandidateTracks();
-			if( !estimateMotion() )
+			boolean failed = !estimateMotion();
+			dropUnusedTracks();
+
+			if( failed )
 				return false;
 
-			dropUnusedTracks();
 			int N = matcher.getMatchSet().size();
 
 			if( modelRefiner != null )
@@ -501,6 +503,14 @@ public class VisOdomDualTrackPnP<T extends ImageSingleBand,Desc extends TupleDes
 
 	public int getTick() {
 		return tick;
+	}
+
+	/**
+	 * If there are no candidates then a fault happened.
+	 * @return true if fault.  false is no fault
+	 */
+	public boolean isFault() {
+		return candidates.isEmpty();
 	}
 
 	/**

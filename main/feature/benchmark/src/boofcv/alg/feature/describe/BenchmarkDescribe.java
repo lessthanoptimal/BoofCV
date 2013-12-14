@@ -162,13 +162,13 @@ public class BenchmarkDescribe<I extends ImageSingleBand, D extends ImageSingleB
 		ConfigSurfDescribe.Stablility surfStable = new ConfigSurfDescribe.Stablility();
 
 		ProfileOperation.printOpsPerSec(new Describe("SURF-F",
-				FactoryDescribeRegionPoint.<I,II>surfFast(surfSpeed, ImageType.single(imageType))),TEST_TIME);
+				FactoryDescribeRegionPoint.<I,II>surfFast(surfSpeed, imageType)),TEST_TIME);
 		ProfileOperation.printOpsPerSec(new Describe("SURF-F Color",
-				FactoryDescribeRegionPoint.surfFast(surfSpeed, ImageType.ms(3, imageType))),TEST_TIME);
+				FactoryDescribeRegionPoint.surfColorFast(surfSpeed, ImageType.ms(3, imageType))),TEST_TIME);
 		ProfileOperation.printOpsPerSec(new Describe("SURF-S",
-				FactoryDescribeRegionPoint.<I,II>surfStable(surfStable,  ImageType.single(imageType))),TEST_TIME);
+				FactoryDescribeRegionPoint.<I,II>surfStable(surfStable,  imageType)),TEST_TIME);
 		ProfileOperation.printOpsPerSec(new Describe("SURF-S Color",
-				FactoryDescribeRegionPoint.surfStable(surfStable,  ImageType.ms(3, imageType))),TEST_TIME);
+				FactoryDescribeRegionPoint.surfColorStable(surfStable,  ImageType.ms(3, imageType))),TEST_TIME);
 
 //		if( imageType == ImageFloat32.class )
 //			ProfileOperation.printOpsPerSec(new Describe("SIFT", FactoryDescribeRegionPoint.sift(null,null)),TEST_TIME);

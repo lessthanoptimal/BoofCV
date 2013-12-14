@@ -102,8 +102,8 @@ public class VisualizeAssociationMatchesApp<T extends ImageSingleBand, D extends
 		alg = FactoryDetectPoint.createShiTomasi(new ConfigGeneralDetector(500,2,1), false, derivType);
 		addAlgorithm(0, "Shi-Tomasi", FactoryInterestPoint.wrapPoint(alg, 1, imageType, derivType));
 
-		addAlgorithm(1, "SURF-S", FactoryDescribeRegionPoint.surfStable(null, ImageType.single(imageType)));
-		addAlgorithm(1, "SURF-S Color", FactoryDescribeRegionPoint.surfStable(null, ImageType.ms(3, imageType)));
+		addAlgorithm(1, "SURF-S", FactoryDescribeRegionPoint.surfStable(null, imageType));
+		addAlgorithm(1, "SURF-S Color", FactoryDescribeRegionPoint.surfColorStable(null, ImageType.ms(3, imageType)));
 		if( imageType == ImageFloat32.class )
 			addAlgorithm(1, "SIFT", FactoryDescribeRegionPoint.sift(null,null));
 		addAlgorithm(1, "BRIEF", FactoryDescribeRegionPoint.brief(new ConfigBrief(true), imageType));

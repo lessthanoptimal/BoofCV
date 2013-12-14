@@ -90,12 +90,10 @@ public class PnPStereoRefineRodrigues implements RefinePnPStereo {
 		minimizer.initialize(param,0,convergenceTol*obs.size());
 
 		// iterate until it converges
-//		System.out.println("  error before "+minimizer.getFunctionValue());
 		for( int i = 0; i < maxIterations; i++ ) {
 			if( minimizer.iterate() )
 				break;
 		}
-//		System.out.println("  error after  "+minimizer.getFunctionValue());
 
 		// decode the solution
 		motionCodec.decode(minimizer.getParameters(),refinedWorldToLeft);

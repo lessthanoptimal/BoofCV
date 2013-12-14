@@ -72,12 +72,10 @@ public class PnPRefineRodrigues implements RefinePnP {
 
 		minimizer.initialize(param,0,convergenceTol*obs.size());
 
-		System.out.println("  error before "+minimizer.getFunctionValue());
 		for( int i = 0; i < maxIterations; i++ ) {
 			if( UtilOptimize.step(minimizer) )
 				break;
 		}
-		System.out.println("  error after  "+minimizer.getFunctionValue());
 
 		paramModel.decode(minimizer.getParameters(), refinedWorldToCamera);
 
