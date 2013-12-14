@@ -41,7 +41,7 @@ import java.util.List;
 // TODO drop after no associate after X detections
 // TODO Speed up combination of respawn and spawn
 public class PointTrackerCombined<I extends ImageSingleBand, D extends ImageSingleBand, Desc extends TupleDesc>
-		implements PointTracker<I> , ExtractTrackDescription<Desc> {
+		implements PointTracker<I> {
 
 	CombinedTrackerScalePoint<I,D, Desc> tracker;
 
@@ -212,21 +212,5 @@ public class PointTrackerCombined<I extends ImageSingleBand, D extends ImageSing
 		for( int i = 0; i < in.size(); i++ ) {
 			out.add( (PointTrack)in.get(i).getCookie() );
 		}
-	}
-
-	@Override
-	public Desc extractDescription(PointTrack track) {
-		CombinedTrack<Desc> c = track.getDescription();
-		return c.desc;
-	}
-
-	@Override
-	public Desc createDescription() {
-		return tracker.getDetector().createDescription();
-	}
-
-	@Override
-	public Class<Desc> getDescriptionType() {
-		return tracker.getDetector().getDescriptionType();
 	}
 }

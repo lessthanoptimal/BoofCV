@@ -54,8 +54,7 @@ public class VideoMosaicSequentialPointApp<I extends ImageSingleBand, D extends 
 	public VideoMosaicSequentialPointApp(Class<I> imageType, Class<D> derivType) {
 		super(2,imageType,true,new Mosaic2DPanel());
 
-		PkltConfig<I, D> config =
-				PkltConfig.createDefault(imageType, derivType);
+		PkltConfig<I, D> config = PkltConfig.createDefault(imageType, derivType);
 		config.templateRadius = 3;
 		config.pyramidScaling = new int[]{1,2,4,8};
 
@@ -71,10 +70,10 @@ public class VideoMosaicSequentialPointApp<I extends ImageSingleBand, D extends 
 				dda_ST_NCC(new ConfigGeneralDetector(500, 3, 9), 10, imageType, derivType));
 		addAlgorithm(0, "FH-SURF", FactoryPointTracker.dda_FH_SURF_Fast(configFH, null, null, imageType));
 		addAlgorithm(0, "ST-SURF-KLT", FactoryPointTracker.
-				combined_ST_SURF_KLT(new ConfigGeneralDetector(400, 3, 1), 3,
-						config.pyramidScaling, 75, null, null, imageType, derivType));
-		addAlgorithm(0, "FH-SURF-KLT", FactoryPointTracker.combined_FH_SURF_KLT(3,
-				config.pyramidScaling, 75, configFH, null, null, imageType));
+				combined_ST_SURF_KLT(new ConfigGeneralDetector(400, 3, 1),
+						config, 75, null, null, imageType, derivType));
+		addAlgorithm(0, "FH-SURF-KLT", FactoryPointTracker.combined_FH_SURF_KLT(
+				config, 75, configFH, null, null, imageType));
 
 		addAlgorithm(1,"Affine", new Affine2D_F64());
 		addAlgorithm(1,"Homography", new Homography2D_F64());

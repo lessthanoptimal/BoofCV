@@ -399,6 +399,9 @@ public class UtilImageIO {
 		String header = String.format("P6\n%d %d\n255\n", rgb.width, rgb.height);
 		os.write(header.getBytes());
 
+		if( temp == null )
+			temp = new GrowQueue_I8();
+		temp.resize(rgb.width*rgb.height*3);
 		byte data[] = temp.data;
 
 		ImageUInt8 band0 = rgb.getBand(0);
@@ -415,7 +418,7 @@ public class UtilImageIO {
 			}
 		}
 
-		os.write(data,0,rgb.width*rgb.height*3);
+		os.write(data,0,temp.size);
 
 		os.close();
 	}

@@ -70,11 +70,7 @@ public class PointTrackerTwoPassKltPyramid<I extends ImageSingleBand,D extends I
 
 		// update image pyramids
 		basePyramid.process(image);
-		if( derivX == null ) {
-			// declare storage for image derivative since the image size is now known
-			derivX = PyramidOps.declareOutput(basePyramid,derivType);
-			derivY = PyramidOps.declareOutput(basePyramid,derivType);
-		}
+		declareOutput();
 		PyramidOps.gradient(basePyramid, gradient, derivX, derivY);
 
 		// setup active list

@@ -34,20 +34,17 @@ public class TestWrapVisOdomPixelDepthPnP extends CheckVisualOdometryStereoSim<I
 
 	public TestWrapVisOdomPixelDepthPnP() {
 		super(ImageFloat32.class);
-
-		setAlgorithm(createAlgorithm());
 	}
 
-	protected StereoVisualOdometry<ImageFloat32> createAlgorithm() {
+	@Override
+	public StereoVisualOdometry<ImageFloat32> createAlgorithm() {
 		StereoDisparitySparse<ImageFloat32> disparity =
 				FactoryStereoDisparity.regionSparseWta(2, 150, 3, 3, 30, -1, true, ImageFloat32.class);
 
-		PkltConfig config =
-				PkltConfig.createDefault(ImageFloat32.class, ImageFloat32.class);
+		PkltConfig config = PkltConfig.createDefault(ImageFloat32.class, ImageFloat32.class);
 		config.pyramidScaling = new int[]{1,2,4,8};
 		config.templateRadius = 3;
-		config.typeInput = ImageFloat32.class;
-		config.typeDeriv = ImageFloat32.class;
+
 		ConfigGeneralDetector configDetector = new ConfigGeneralDetector(600,3,1);
 
 		PointTrackerTwoPass<ImageFloat32> tracker = FactoryPointTrackerTwoPass.klt(config, configDetector);
