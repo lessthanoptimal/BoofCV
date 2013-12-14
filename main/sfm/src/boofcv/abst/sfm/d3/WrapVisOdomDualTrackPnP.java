@@ -56,7 +56,7 @@ public class WrapVisOdomDualTrackPnP<T extends ImageSingleBand>
 
 	Class<T> imageType;
 
-	boolean error;
+	boolean success;
 
 	public WrapVisOdomDualTrackPnP(PnPStereoEstimator pnp,
 								   DistanceModelMonoPixels<Se3_F64, Point2D3D> distanceMono,
@@ -135,12 +135,15 @@ public class WrapVisOdomDualTrackPnP<T extends ImageSingleBand>
 
 	@Override
 	public boolean process(T leftImage, T rightImage) {
-		return error = alg.process(leftImage,rightImage);
+		return success = alg.process(leftImage,rightImage);
 	}
 
 	@Override
 	public boolean isFault() {
-		return error;
+		if( !success)
+			return alg.isFault();
+		else
+			return false;
 	}
 
 	@Override

@@ -32,10 +32,7 @@ import boofcv.struct.feature.NccFeature;
 import boofcv.struct.feature.SurfFeature;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.feature.TupleDesc_B;
-import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.image.ImageType;
+import boofcv.struct.image.*;
 
 import java.util.Random;
 
@@ -50,27 +47,45 @@ public class FactoryDescribeRegionPoint {
 	/**
 	 * <p>
 	 * Creates a SURF descriptor.  SURF descriptors are invariant to illumination, orientation, and scale.
-	 * BoofCV provides two variants. The SURF variant created here is designed for speed and sacrifices some stability.
+	 * BoofCV provides two variants. This SURF variant created here is designed for speed and sacrifices some stability.
 	 * Different descriptors are produced for gray-scale and color images.
 	 * </p>
 	 *
 	 * @see DescribePointSurf
 	 *
 	 * @param config SURF configuration. Pass in null for default options.
-	 * @param imageType Type of input image.
+	 * @param bandType Type of input image.
 	 * @return SURF description extractor
 	 */
-	public static <T extends ImageBase, II extends ImageSingleBand>
-	DescribeRegionPoint<T,SurfFeature> surfFast( ConfigSurfDescribe.Speed config , ImageType<T> imageType) {
+	public static <T extends ImageSingleBand, II extends ImageSingleBand>
+	DescribeRegionPoint<T,SurfFeature> surfFast( ConfigSurfDescribe.Speed config , Class<T> bandType) {
+
+
+		Class<II> integralType = GIntegralImageOps.getIntegralType(bandType);
+
+		DescribePointSurf<II> alg = FactoryDescribePointAlgs.surfSpeed( config, integralType);
+
+		return new WrapDescribeSurf( alg , bandType );
+	}
+
+	/**
+	 * Color variant of the SURF descriptor which has been designed for speed and sacrifices some stability.
+	 *
+	 * @see DescribePointSurfMultiSpectral
+	 *
+	 * @param config SURF configuration. Pass in null for default options.
+	 * @param imageType Type of input image.
+	 * @return SURF color description extractor
+	 */
+	public static <T extends ImageMultiBand, II extends ImageSingleBand>
+	DescribeRegionPoint<T,SurfFeature> surfColorFast( ConfigSurfDescribe.Speed config , ImageType<T> imageType) {
 
 		Class bandType = imageType.getImageClass();
 		Class<II> integralType = GIntegralImageOps.getIntegralType(bandType);
 
 		DescribePointSurf<II> alg = FactoryDescribePointAlgs.surfSpeed( config, integralType);
 
-		if( imageType.getFamily() == ImageType.Family.SINGLE_BAND ) {
-			return new WrapDescribeSurf( alg , bandType );
-		} else if( imageType.getFamily() == ImageType.Family.MULTI_SPECTRAL ) {
+		if( imageType.getFamily() == ImageType.Family.MULTI_SPECTRAL ) {
 			DescribePointSurfMultiSpectral<II> color = FactoryDescribePointAlgs.surfColor( alg,imageType.getNumBands());
 
 			return new SurfMultiSpectral_to_DescribeRegionPoint(color,bandType,integralType);
@@ -92,17 +107,34 @@ public class FactoryDescribeRegionPoint {
 	 * @param imageType Type of input image.
 	 * @return SURF description extractor
 	 */
+	public static <T extends ImageSingleBand, II extends ImageSingleBand>
+	DescribeRegionPoint<T,SurfFeature> surfStable(ConfigSurfDescribe.Stablility config, Class<T> imageType) {
+
+		Class<II> integralType = GIntegralImageOps.getIntegralType(imageType);
+
+		DescribePointSurf<II> alg = FactoryDescribePointAlgs.surfStability( config, integralType);
+
+		return new WrapDescribeSurf( alg , imageType );
+	}
+
+	/**
+	 * Color variant of the SURF descriptor which has been designed for stability.
+	 *
+	 * @see DescribePointSurfMultiSpectral
+	 *
+	 * @param config SURF configuration. Pass in null for default options.
+	 * @param imageType Type of input image.
+	 * @return SURF color description extractor
+	 */
 	public static <T extends ImageBase, II extends ImageSingleBand>
-	DescribeRegionPoint<T,SurfFeature> surfStable(ConfigSurfDescribe.Stablility config, ImageType<T> imageType) {
+	DescribeRegionPoint<T,SurfFeature> surfColorStable(ConfigSurfDescribe.Stablility config, ImageType<T> imageType) {
 
 		Class bandType = imageType.getImageClass();
 		Class<II> integralType = GIntegralImageOps.getIntegralType(bandType);
 
 		DescribePointSurf<II> alg = FactoryDescribePointAlgs.surfStability( config, integralType);
 
-		if( imageType.getFamily() == ImageType.Family.SINGLE_BAND ) {
-			return new WrapDescribeSurf( alg , bandType );
-		} else if( imageType.getFamily() == ImageType.Family.MULTI_SPECTRAL ) {
+		if( imageType.getFamily() == ImageType.Family.MULTI_SPECTRAL ) {
 			DescribePointSurfMultiSpectral<II> color = FactoryDescribePointAlgs.surfColor( alg,imageType.getNumBands());
 
 			return new SurfMultiSpectral_to_DescribeRegionPoint(color,bandType,integralType);

@@ -19,6 +19,7 @@
 package boofcv.abst.sfm.d3;
 
 import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
+import boofcv.abst.feature.tracker.PkltConfig;
 import boofcv.abst.feature.tracker.PointTracker;
 import boofcv.factory.feature.tracker.FactoryPointTracker;
 import boofcv.factory.sfm.FactoryVisualOdometry;
@@ -37,11 +38,16 @@ public class TestWrapVisOdomDualTrackPnP extends CheckVisualOdometryStereoSim<Im
 
 	protected StereoVisualOdometry<ImageFloat32> createAlgorithm() {
 		ConfigGeneralDetector configDetector = new ConfigGeneralDetector(600,2,1);
+
+		PkltConfig kltConfig = PkltConfig.createDefault(ImageFloat32.class,ImageFloat32.class);
+		kltConfig.templateRadius = 3;
+		kltConfig.pyramidScaling =  new int[]{1, 2, 4, 8};
+
 		PointTracker trackerLeft = FactoryPointTracker.
-				combined_ST_SURF_KLT(configDetector, 3, new int[]{1, 2, 4, 8}, 100000, null, null,
+				combined_ST_SURF_KLT(configDetector,kltConfig, 100000, null, null,
 						ImageFloat32.class, ImageFloat32.class);
 		PointTracker trackerRight = FactoryPointTracker.
-				combined_ST_SURF_KLT(configDetector, 3, new int[]{1, 2, 4, 8}, 100000, null, null,
+				combined_ST_SURF_KLT(configDetector, kltConfig, 100000, null, null,
 						ImageFloat32.class, ImageFloat32.class);
 
 		return FactoryVisualOdometry.stereoDualTrackerPnP(90, 2, 1.5, 1.5, 200, 50,

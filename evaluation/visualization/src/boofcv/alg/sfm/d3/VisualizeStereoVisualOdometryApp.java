@@ -60,7 +60,6 @@ import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.feature.TupleDesc_B;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.image.ImageType;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
@@ -337,7 +336,7 @@ public class VisualizeStereoVisualOdometryApp <I extends ImageSingleBand>
 			DetectorInterestPointMulti detector = new GeneralToInterestMulti(general,2,imageType,derivType);
 //			DescribeRegionPoint describe = FactoryDescribeRegionPoint.brief(new ConfigBrief(true),imageType);
 //			DescribeRegionPoint describe = FactoryDescribeRegionPoint.pixelNCC(5,5,imageType);
-			DescribeRegionPoint describe = FactoryDescribeRegionPoint.surfFast(null, ImageType.single(imageType));
+			DescribeRegionPoint describe = FactoryDescribeRegionPoint.surfFast(null, imageType);
 			DetectDescribeMulti detDescMulti =  new DetectDescribeMultiFusion(detector,null,describe);
 
 			return FactoryVisualOdometry.stereoQuadPnP(1.5, 0.5 ,75, Double.MAX_VALUE, 300, 50, detDescMulti, imageType);
