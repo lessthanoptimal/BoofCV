@@ -40,11 +40,10 @@ public class TestWrapVisOdomQuadPnP extends CheckVisualOdometryStereoSim<ImageFl
 
 	public TestWrapVisOdomQuadPnP() {
 		super(ImageFloat32.class,0.3);
-
-		setAlgorithm(createAlgorithm());
 	}
 
-	protected StereoVisualOdometry<ImageFloat32> createAlgorithm() {
+	@Override
+	public StereoVisualOdometry<ImageFloat32> createAlgorithm() {
 		GeneralFeatureIntensity intensity =
 				FactoryIntensityPoint.shiTomasi(1, false, ImageFloat32.class);
 		NonMaxSuppression nonmax = FactoryFeatureExtractor.nonmax(new ConfigExtract(2, 1, 0, true, false, true));

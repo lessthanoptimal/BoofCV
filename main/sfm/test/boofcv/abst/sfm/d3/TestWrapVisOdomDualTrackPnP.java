@@ -18,9 +18,11 @@
 
 package boofcv.abst.sfm.d3;
 
+import boofcv.abst.feature.describe.DescribeRegionPoint;
 import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
 import boofcv.abst.feature.tracker.PkltConfig;
 import boofcv.abst.feature.tracker.PointTracker;
+import boofcv.factory.feature.describe.FactoryDescribeRegionPoint;
 import boofcv.factory.feature.tracker.FactoryPointTracker;
 import boofcv.factory.sfm.FactoryVisualOdometry;
 import boofcv.struct.image.ImageFloat32;
@@ -32,25 +34,22 @@ public class TestWrapVisOdomDualTrackPnP extends CheckVisualOdometryStereoSim<Im
 
 	public TestWrapVisOdomDualTrackPnP() {
 		super(ImageFloat32.class);
-
-		setAlgorithm(createAlgorithm());
 	}
 
-	protected StereoVisualOdometry<ImageFloat32> createAlgorithm() {
+	@Override
+	public StereoVisualOdometry<ImageFloat32> createAlgorithm() {
 		ConfigGeneralDetector configDetector = new ConfigGeneralDetector(600,2,1);
 
-		PkltConfig kltConfig = PkltConfig.createDefault(ImageFloat32.class,ImageFloat32.class);
+		PkltConfig<ImageFloat32,ImageFloat32> kltConfig = PkltConfig.createDefault(ImageFloat32.class,ImageFloat32.class);
 		kltConfig.templateRadius = 3;
 		kltConfig.pyramidScaling =  new int[]{1, 2, 4, 8};
 
-		PointTracker trackerLeft = FactoryPointTracker.
-				combined_ST_SURF_KLT(configDetector,kltConfig, 100000, null, null,
-						ImageFloat32.class, ImageFloat32.class);
-		PointTracker trackerRight = FactoryPointTracker.
-				combined_ST_SURF_KLT(configDetector, kltConfig, 100000, null, null,
-						ImageFloat32.class, ImageFloat32.class);
+		PointTracker<ImageFloat32> trackerLeft = FactoryPointTracker.klt(kltConfig, configDetector);
+		PointTracker<ImageFloat32> trackerRight = FactoryPointTracker.klt(kltConfig, configDetector);
+
+		DescribeRegionPoint describe = FactoryDescribeRegionPoint.surfFast(null, ImageFloat32.class);
 
 		return FactoryVisualOdometry.stereoDualTrackerPnP(90, 2, 1.5, 1.5, 200, 50,
-				trackerLeft, trackerRight, ImageFloat32.class);
+				trackerLeft, trackerRight, describe,ImageFloat32.class);
 	}
 }

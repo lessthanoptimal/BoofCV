@@ -108,8 +108,8 @@ public class TldFernClassifier<T extends ImageSingleBand> {
 		float rectWidth = r.getWidth();
 		float rectHeight = r.getHeight();
 
-		float c_x = r.x0+rectWidth/2.0f;
-		float c_y = r.y0+rectHeight/2.0f;
+		float c_x = r.x0+(rectWidth-1)/2f;
+		float c_y = r.y0+(rectHeight-1)/2f;
 
 		for( int i = 0; i < ferns.length; i++ ) {
 
@@ -129,8 +129,8 @@ public class TldFernClassifier<T extends ImageSingleBand> {
 		float rectWidth = r.getWidth();
 		float rectHeight = r.getHeight();
 
-		float c_x = r.x0+rectWidth/2.0f;
-		float c_y = r.y0+rectHeight/2.0f;
+		float c_x = r.x0+(rectWidth-1)/2.0f;
+		float c_y = r.y0+(rectHeight-1)/2.0f;
 
 		for( int i = 0; i < ferns.length; i++ ) {
 
@@ -176,8 +176,8 @@ public class TldFernClassifier<T extends ImageSingleBand> {
 		float rectWidth = r.getWidth();
 		float rectHeight = r.getHeight();
 
-		float c_x = r.x0+rectWidth/2.0f;
-		float c_y = r.y0+rectHeight/2.0f;
+		float c_x = r.x0+(rectWidth-1)/2.0f;
+		float c_y = r.y0+(rectHeight-1)/2.0f;
 
 		int sumP = 0;
 		int sumN = 0;

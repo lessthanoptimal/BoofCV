@@ -54,9 +54,11 @@ public class VideoSequenceSimulator<I extends ImageSingleBand> {
 	I outputImage;
 
 	List<Square> squares = new ArrayList<Square>();
+	protected Class<I> inputType;
 
 	public VideoSequenceSimulator( int width , int height, Class<I> inputType ) {
 
+		this.inputType = inputType;
 		this.width = width;
 		this.height = height;
 		workImage = new BufferedImage(width,height,BufferedImage.TYPE_INT_BGR);

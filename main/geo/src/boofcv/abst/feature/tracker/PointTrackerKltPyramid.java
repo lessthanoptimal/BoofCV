@@ -266,7 +266,7 @@ public class PointTrackerKltPyramid<I extends ImageSingleBand,D extends ImageSin
 		}
 	}
 
-	private void declareOutput() {
+	protected void declareOutput() {
 		if( derivX == null ) {
 			// declare storage for image derivative since the image size is now known
 			derivX = PyramidOps.declareOutput(basePyramid, derivType);

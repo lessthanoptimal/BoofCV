@@ -286,15 +286,14 @@ public class VisualizeDepthVisualOdometryApp<I extends ImageSingleBand>
 
 		DepthSparse3D<ImageUInt16> sparseDepth = new DepthSparse3D.I<ImageUInt16>(1e-3);
 
+		PkltConfig pkltConfig = PkltConfig.createDefault(imageType, derivType);
+		pkltConfig.templateRadius = 3;
+		pkltConfig.pyramidScaling = new int[]{1,2,4,8};
+
 		if( whichAlg == 0 ) {
-			PkltConfig config = PkltConfig.createDefault(imageType, derivType);
-			config.pyramidScaling = new int[]{1,2,4,8};
-			config.templateRadius = 3;
-			config.typeInput = imageType;
-			config.typeDeriv = derivType;
 			ConfigGeneralDetector configDetector = new ConfigGeneralDetector(600,3,1);
 
-			PointTrackerTwoPass<I> tracker = FactoryPointTrackerTwoPass.klt(config, configDetector);
+			PointTrackerTwoPass<I> tracker = FactoryPointTrackerTwoPass.klt(pkltConfig, configDetector);
 
 			return FactoryVisualOdometry.
 					depthDepthPnP(1.5, 120, 2, 200, 50, false, sparseDepth, tracker, imageType, ImageUInt16.class);
@@ -316,8 +315,8 @@ public class VisualizeDepthVisualOdometryApp<I extends ImageSingleBand>
 					depthDepthPnP(1.5, 80, 3, 200, 50, false, sparseDepth, tracker, imageType, ImageUInt16.class);
 		} else if( whichAlg == 2 ) {
 			PointTracker<I> tracker = FactoryPointTracker.
-					combined_ST_SURF_KLT(new ConfigGeneralDetector(600, 3, 1), 3,
-							new int[]{1, 2, 4, 8}, 50, null, null, imageType, derivType);
+					combined_ST_SURF_KLT(new ConfigGeneralDetector(600, 3, 1),
+							pkltConfig, 50, null, null, imageType, derivType);
 
 			PointTrackerTwoPass<I> twopass = new PointTrackerToTwoPass<I>(tracker);
 

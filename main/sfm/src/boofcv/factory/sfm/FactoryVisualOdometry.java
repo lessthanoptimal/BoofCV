@@ -22,9 +22,9 @@ import boofcv.abst.feature.associate.AssociateDescTo2D;
 import boofcv.abst.feature.associate.AssociateDescription2D;
 import boofcv.abst.feature.associate.EnforceUniqueByScore;
 import boofcv.abst.feature.associate.ScoreAssociation;
+import boofcv.abst.feature.describe.DescribeRegionPoint;
 import boofcv.abst.feature.detdesc.DetectDescribeMulti;
 import boofcv.abst.feature.disparity.StereoDisparitySparse;
-import boofcv.abst.feature.tracker.ExtractTrackDescription;
 import boofcv.abst.feature.tracker.PointTracker;
 import boofcv.abst.feature.tracker.PointTrackerTwoPass;
 import boofcv.abst.geo.Estimate1ofPnP;
@@ -293,12 +293,9 @@ public class FactoryVisualOdometry {
 												 int ransacIterations,
 												 int refineIterations,
 												 PointTracker<T> trackerLeft, PointTracker<T> trackerRight,
+												 DescribeRegionPoint<T,Desc> descriptor,
 												 Class<T> imageType)
 	{
-		if( !(trackerLeft instanceof ExtractTrackDescription) || !(trackerRight instanceof ExtractTrackDescription) ) {
-			throw new IllegalArgumentException("Both trackers must implement TrackDescription");
-		}
-
 		EstimateNofPnP pnp = FactoryMultiView.computePnP_N(EnumPNP.P3P_FINSTERWALDER, -1);
 		DistanceModelMonoPixels<Se3_F64,Point2D3D> distanceMono = new PnPDistanceReprojectionSq();
 		PnPStereoDistanceReprojectionSq distanceStereo = new PnPStereoDistanceReprojectionSq();
@@ -315,8 +312,7 @@ public class FactoryVisualOdometry {
 
 		RefinePnPStereo refinePnP = null;
 
-		ExtractTrackDescription<Desc> extractor = (ExtractTrackDescription)trackerLeft;
-		Class<Desc> descType = extractor.getDescriptionType();
+		Class<Desc> descType = descriptor.getDescriptionType();
 		ScoreAssociation<Desc> scorer = FactoryAssociation.defaultScore(descType);
 		AssociateStereo2D<Desc> associateStereo = new AssociateStereo2D<Desc>(scorer,epipolarPixelTol,descType);
 
@@ -333,7 +329,7 @@ public class FactoryVisualOdometry {
 		TriangulateTwoViewsCalibrated triangulate = FactoryTriangulate.twoGeometric();
 
 		VisOdomDualTrackPnP<T,Desc> alg =  new VisOdomDualTrackPnP<T,Desc>(thresholdAdd,thresholdRetire,epipolarPixelTol,
-				trackerLeft,trackerRight,associateUnique,triangulate,motion,refinePnP);
+				trackerLeft,trackerRight,descriptor,associateUnique,triangulate,motion,refinePnP);
 
 		return new WrapVisOdomDualTrackPnP<T>(pnpStereo,distanceMono,distanceStereo,associateStereo,alg,refinePnP,imageType);
 	}

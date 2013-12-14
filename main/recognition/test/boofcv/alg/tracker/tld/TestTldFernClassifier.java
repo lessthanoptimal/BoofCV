@@ -91,10 +91,10 @@ public class TestTldFernClassifier {
 
 		ImageRectangle r = new ImageRectangle(2,20,12,28);
 
-		float cx = r.x0 + r.getWidth()/2.0f;
-		float cy = r.x0 + r.getHeight()/2.0f;
-		float w = r.getWidth();
-		float h = r.getHeight();
+		float cx = r.x0 + (r.getWidth()-1)/2.0f;
+		float cy = r.x0 + (r.getHeight()-1)/2.0f;
+		float w = r.getWidth()-1;
+		float h = r.getHeight()-1;
 
 		boolean expected[] = new boolean[10];
 		for( int i = 0; i < 10; i++ ) {
@@ -110,7 +110,7 @@ public class TestTldFernClassifier {
 		TldFernClassifier<ImageUInt8> alg = createAlg();
 		alg.setImage(input);
 
-		int found = alg.computeFernValue(cx,cy,w,h,fern);
+		int found = alg.computeFernValue(cx,cy,r.getWidth(),r.getHeight(),fern);
 
 		for( int i = 0; i < 10; i++ ) {
 			assertTrue(expected[i] == (((found >> i) & 0x0001) == 1));

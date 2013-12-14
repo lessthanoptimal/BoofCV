@@ -19,7 +19,7 @@
 package boofcv.alg.sfm.d3;
 
 import boofcv.abst.feature.associate.AssociateDescription2D;
-import boofcv.abst.feature.tracker.ExtractTrackDescription;
+import boofcv.abst.feature.describe.DescribeRegionPoint;
 import boofcv.abst.feature.tracker.PointTrack;
 import boofcv.abst.feature.tracker.PointTracker;
 import boofcv.abst.geo.TriangulateTwoViewsCalibrated;
@@ -29,7 +29,7 @@ import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.distort.PointTransform_F64;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.TupleDesc;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageBase;
 import boofcv.struct.sfm.Stereo2D3D;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
@@ -54,7 +54,11 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class VisOdomDualTrackPnP<T extends ImageSingleBand,Desc extends TupleDesc> {
+public class VisOdomDualTrackPnP<T extends ImageBase,Desc extends TupleDesc> {
+
+	// Left and right input images
+	private T inputLeft;
+	private T inputRight;
 
 	// when the inlier set is less than this number new features are detected
 	private int thresholdAdd;
@@ -69,8 +73,7 @@ public class VisOdomDualTrackPnP<T extends ImageSingleBand,Desc extends TupleDes
 	// trackers for left and right cameras
 	private PointTracker<T> trackerLeft;
 	private PointTracker<T> trackerRight;
-	private ExtractTrackDescription<Desc> extractLeft;
-	private ExtractTrackDescription<Desc> extractRight;
+	private DescribeRegionPoint<T,Desc> describe;
 
 	// Data structures used when associating left and right cameras
 	private FastQueue<Point2D_F64> pointsLeft = new FastQueue<Point2D_F64>(Point2D_F64.class,false);
@@ -115,6 +118,7 @@ public class VisOdomDualTrackPnP<T extends ImageSingleBand,Desc extends TupleDes
 	 * @param epilolarTol Tolerance in pixels for enforcing the epipolar constraint
 	 * @param trackerLeft Tracker used for left camera
 	 * @param trackerRight Tracker used for right camera
+	 * @param describe Describes features in tracks
 	 * @param assocL2R Assocation for left to right
 	 * @param triangulate Triangulation for estimating 3D location from stereo pair
 	 * @param matcher Robust motion model estimation with outlier rejection
@@ -122,6 +126,7 @@ public class VisOdomDualTrackPnP<T extends ImageSingleBand,Desc extends TupleDes
 	 */
 	public VisOdomDualTrackPnP(int thresholdAdd, int thresholdRetire, double epilolarTol,
 							   PointTracker<T> trackerLeft, PointTracker<T> trackerRight,
+							   DescribeRegionPoint<T,Desc> describe,
 							   AssociateDescription2D<Desc> assocL2R,
 							   TriangulateTwoViewsCalibrated triangulate,
 							   ModelMatcher<Se3_F64, Stereo2D3D> matcher,
@@ -130,13 +135,7 @@ public class VisOdomDualTrackPnP<T extends ImageSingleBand,Desc extends TupleDes
 		if( !assocL2R.uniqueSource() || !assocL2R.uniqueDestination() )
 			throw new IllegalArgumentException("Both unique source and destination must be ensure by association");
 
-		try {
-			extractLeft = (ExtractTrackDescription)trackerLeft;
-			extractRight = (ExtractTrackDescription)trackerRight;
-		} catch( ClassCastException e ) {
-			throw new RuntimeException("Both trackers must implement TrackDescription");
-		}
-
+		this.describe = describe;
 		this.thresholdAdd = thresholdAdd;
 		this.thresholdRetire = thresholdRetire;
 		this.trackerLeft = trackerLeft;
@@ -146,8 +145,8 @@ public class VisOdomDualTrackPnP<T extends ImageSingleBand,Desc extends TupleDes
 		this.matcher = matcher;
 		this.modelRefiner = modelRefiner;
 
-		descLeft = new FastQueue<Desc>(extractLeft.getDescriptionType(),false);
-		descRight = new FastQueue<Desc>(extractRight.getDescriptionType(),false);
+		descLeft = new DescriptorQueue();
+		descRight = new DescriptorQueue();
 
 		stereoCheck = new StereoConsistencyCheck(epilolarTol,epilolarTol);
 	}
@@ -181,6 +180,9 @@ public class VisOdomDualTrackPnP<T extends ImageSingleBand,Desc extends TupleDes
 	 */
 	public boolean process( T left , T right ) {
 //		System.out.println("----------- Process --------------");
+
+		this.inputLeft = left;
+		this.inputRight = right;
 
 		tick++;
 		trackerLeft.process(left);
@@ -336,6 +338,8 @@ public class VisOdomDualTrackPnP<T extends ImageSingleBand,Desc extends TupleDes
 
 //		System.out.println("Active Tracks: Left "+trackerLeft.getActiveTracks(null).size()+" right "+
 //				trackerRight.getActiveTracks(null).size());
+//		System.out.println("All Tracks:    Left "+trackerLeft.getAllTracks(null).size()+" right "+
+//				trackerRight.getAllTracks(null).size());
 //		System.out.println("Candidates = "+candidates.size()+" mutual active = "+mutualActive);
 	}
 
@@ -393,8 +397,8 @@ public class VisOdomDualTrackPnP<T extends ImageSingleBand,Desc extends TupleDes
 		List<PointTrack> newRight = trackerRight.getNewTracks(null);
 
 		// get a list of new tracks and their descriptions
-		addNewToList(trackerLeft,extractLeft,newLeft,pointsLeft,descLeft);
-		addNewToList(trackerRight,extractRight,newRight,pointsRight,descRight);
+		addNewToList(inputLeft, newLeft, pointsLeft, descLeft);
+		addNewToList(inputRight,newRight,pointsRight,descRight);
 
 		// associate using L2R
 		assocL2R.setSource(pointsLeft,descLeft);
@@ -457,6 +461,8 @@ public class VisOdomDualTrackPnP<T extends ImageSingleBand,Desc extends TupleDes
 			trackerLeft.dropTrack(newLeft.get(index));
 		}
 
+//		System.out.println("Total left "+trackerLeft.getAllTracks(null).size()+"  right "+trackerRight.getAllTracks(null).size());
+
 //		System.out.println("Associated: "+matches.size+" new left "+newLeft.size()+" new right "+newRight.size());
 //		System.out.println("New Tracks: Total: Left "+trackerLeft.getAllTracks(null).size()+" right "+
 //				trackerRight.getAllTracks(null).size());
@@ -473,18 +479,19 @@ public class VisOdomDualTrackPnP<T extends ImageSingleBand,Desc extends TupleDes
 //		}
 	}
 
-	private void addNewToList( PointTracker<T> tracker , ExtractTrackDescription<Desc> extract ,
+	private void addNewToList( T image,
 							   List<PointTrack> tracks ,
 							   FastQueue<Point2D_F64> points , FastQueue<Desc> descs )
 	{
+		describe.setImage(image);
 		points.reset(); descs.reset();
 
 		for( int i = 0; i < tracks.size(); i++ ) {
 			PointTrack t = tracks.get(i);
-			Desc desc = extract.extractDescription(t);
+			// ignoring the return value.  most descriptors never return false and the ones that due will rarely do so
+			describe.process(t.x,t.y,0,2,descs.grow());
 
 			points.add( t );
-			descs.add( desc );
 		}
 	}
 
@@ -541,5 +548,17 @@ public class VisOdomDualTrackPnP<T extends ImageSingleBand,Desc extends TupleDes
 		public int lastActiveList;
 		// left camera track it is associated with
 		public PointTrack left;
+	}
+
+	private class DescriptorQueue extends FastQueue<Desc>
+	{
+		private DescriptorQueue() {
+			super(describe.getDescriptionType(), true);
+		}
+
+		@Override
+		protected Desc createInstance() {
+			return describe.createDescription();
+		}
 	}
 }

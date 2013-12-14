@@ -18,6 +18,7 @@
 
 package boofcv.abst.sfm.d3;
 
+import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.calib.StereoParameters;
@@ -38,7 +39,6 @@ public abstract class CheckVisualOdometryStereoSim<I extends ImageSingleBand>
 	extends VideoSequenceSimulator<I>
 {
 	StereoParameters param = createStereoParam();
-	StereoVisualOdometry<I> algorithm;
 
 	I left;
 	I right;
@@ -61,12 +61,43 @@ public abstract class CheckVisualOdometryStereoSim<I extends ImageSingleBand>
 		this.tolerance = tolerance;
 	}
 
-	public void setAlgorithm(StereoVisualOdometry<I> algorithm) {
-		this.algorithm = algorithm;
+	public abstract StereoVisualOdometry<I> createAlgorithm();
+
+	@Test
+	public void changeInputSize() {
+		StereoVisualOdometry<I> algorithm = createAlgorithm();
+
+		I leftSmall = GeneralizedImageOps.createSingleBand(inputType,width/2,height/2);
+		I rightSmall = GeneralizedImageOps.createSingleBand(inputType,width/2,height/2);
+
+		I leftLarge = GeneralizedImageOps.createSingleBand(inputType,width,height);
+		I rightLarge = GeneralizedImageOps.createSingleBand(inputType,width,height);
+
+		GImageMiscOps.fillUniform(leftSmall,rand,0,100);
+		GImageMiscOps.fillUniform(leftSmall,rand,0,100);
+
+		GImageMiscOps.fillUniform(leftLarge,rand,0,100);
+		GImageMiscOps.fillUniform(rightLarge,rand,0,100);
+
+		StereoParameters paramSmall = createStereoParam();
+		paramSmall.left.width = paramSmall.right.width = leftSmall.width;
+		paramSmall.left.height = paramSmall.right.height = leftSmall.height;
+
+		algorithm.setCalibration(paramSmall);
+		algorithm.process(leftSmall,rightSmall);
+
+		StereoParameters paramLarge = createStereoParam();
+		paramLarge.left.width = paramLarge.right.width = leftLarge.width;
+		paramLarge.left.height = paramLarge.right.height = leftLarge.height;
+
+		algorithm.setCalibration(paramLarge);
+		algorithm.process(leftLarge,rightSmall);
 	}
 
 	@Test
 	public void moveForward() {
+		StereoVisualOdometry<I> algorithm = createAlgorithm();
+
 		algorithm.reset();
 		algorithm.setCalibration(param);
 

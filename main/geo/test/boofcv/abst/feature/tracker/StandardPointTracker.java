@@ -20,7 +20,6 @@ package boofcv.abst.feature.tracker;
 
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.alg.misc.ImageMiscOps;
-import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 import org.junit.Before;
@@ -421,53 +420,6 @@ public abstract class StandardPointTracker<T extends ImageSingleBand> {
 		assertTrue(ret.size() > 0 );
 
 		checkIdentical(input, ret);
-	}
-
-	/**
-	 * Just checks to see if the extracted description is not zero from new tracks
-	 */
-	@Test
-	public void extractDescription() {
-		// is this interface supported?
-		tracker = createTracker();
-		if( !(tracker instanceof ExtractTrackDescription) )
-			return;
-
-		processImage((T)image);
-		tracker.spawnTracks();
-		ExtractTrackDescription extract = (ExtractTrackDescription)tracker;
-
-		List<PointTrack> tracks = tracker.getNewTracks(null);
-		assertTrue( tracks.size() > 0 );
-		for( PointTrack t : tracks ) {
-			TupleDesc des = extract.extractDescription(t);
-			assertTrue(des != null);
-		}
-	}
-
-	@Test
-	public void createDescription() {
-		// is this interface supported?
-		tracker = createTracker();
-		if( !(tracker instanceof ExtractTrackDescription) )
-			return;
-
-		ExtractTrackDescription extract = (ExtractTrackDescription)tracker;
-
-		TupleDesc desc = extract.createDescription();
-		assertTrue( desc != null );
-	}
-
-	@Test
-	public void getDescriptionType() {
-		// is this interface supported?
-		tracker = createTracker();
-		if( !(tracker instanceof ExtractTrackDescription) )
-			return;
-
-		ExtractTrackDescription extract = (ExtractTrackDescription)tracker;
-
-		assertTrue(extract.getDescriptionType() != null);
 	}
 
 	private void checkIdentical( List<PointTrack> a , List<PointTrack> b ){

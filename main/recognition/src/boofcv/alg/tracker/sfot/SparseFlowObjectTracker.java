@@ -97,7 +97,8 @@ public class SparseFlowObjectTracker<Image extends ImageSingleBand, Derivative e
 	}
 
 	public void init( Image input , RectangleRotate_F64 region ) {
-		if( currentImage == null ) {
+		if( currentImage == null ||
+				currentImage.getInputWidth() != input.width || currentImage.getInputHeight() != input.height) {
 			declarePyramid(input.width,input.height);
 		}
 

@@ -93,6 +93,8 @@ Version : Alpha 0.16
   * How to remove perspective distortion
 - VisOdomDualTrackPnP
   * It is now possible for it to produce a fatal error when all its tracks are lost
+  * Computes a descriptor of the feature each time as needed.  Doesn't extract it from the track itself.
+    Made the code base more complex.  Maybe old version has a slight runtime speed advantage
 
 - TODO automate high level tests
    * Move SURFPerformance into ValidationBoof

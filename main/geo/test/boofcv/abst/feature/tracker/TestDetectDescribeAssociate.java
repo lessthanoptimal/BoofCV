@@ -72,7 +72,7 @@ public class TestDetectDescribeAssociate {
 	public void addNewTrack() {
 		Helper dat = new Helper();
 
-		TupleDesc_F64 desc = dat.createDescription();
+		TupleDesc_F64 desc = dat.manager.createDescription();
 		desc.value[0] = 5;
 
 		PointTrack found0 = dat.addNewTrack(5,10,desc);

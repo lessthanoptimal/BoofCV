@@ -106,7 +106,7 @@ public class VisualizeStereoVisualOdometryApp <I extends ImageSingleBand>
 		addAlgorithm(0, "Single Depth : KLT", 0);
 		addAlgorithm(0, "Single Depth : ST-BRIEF", 1);
 		addAlgorithm(0, "Single Depth : ST-SURF-KLT", 2);
-		addAlgorithm(0, "Dual Track : ST-SURF-KLT", 3);
+		addAlgorithm(0, "Dual Track : KLT + SURF", 3);
 		addAlgorithm(0, "Quad Match : ST-BRIEF", 4);
 
 		guiInfo = new VisualOdometryPanel(VisualOdometryPanel.Type.STEREO);
@@ -282,15 +282,14 @@ public class VisualizeStereoVisualOdometryApp <I extends ImageSingleBand>
 		StereoDisparitySparse<I> disparity =
 				FactoryStereoDisparity.regionSparseWta(2,150,3,3,30,-1,true,imageType);
 
+		PkltConfig kltConfig = PkltConfig.createDefault(imageType,derivType);
+		kltConfig.templateRadius = 3;
+		kltConfig.pyramidScaling = new int[]{1, 2, 4, 8};
+
 		if( whichAlg == 0 ) {
-			PkltConfig config = PkltConfig.createDefault(imageType, derivType);
-			config.pyramidScaling = new int[]{1,2,4,8};
-			config.templateRadius = 3;
-			config.typeInput = imageType;
-			config.typeDeriv = derivType;
 			ConfigGeneralDetector configDetector = new ConfigGeneralDetector(600,3,1);
 
-			PointTrackerTwoPass<I> tracker = FactoryPointTrackerTwoPass.klt(config, configDetector);
+			PointTrackerTwoPass<I> tracker = FactoryPointTrackerTwoPass.klt(kltConfig, configDetector);
 
 			return FactoryVisualOdometry.stereoDepth(1.5,120,2,200,50, false, disparity, tracker, imageType);
 		} else if( whichAlg == 1 ) {
@@ -310,21 +309,22 @@ public class VisualizeStereoVisualOdometryApp <I extends ImageSingleBand>
 			return FactoryVisualOdometry.stereoDepth(1.5,80,3,200,50, false, disparity, tracker, imageType);
 		} else if( whichAlg == 2 ) {
 			PointTracker<I> tracker = FactoryPointTracker.
-					combined_ST_SURF_KLT(new ConfigGeneralDetector(600, 3, 0), 3,
-							new int[]{1, 2, 4, 8}, 50, null, null, imageType, derivType);
+					combined_ST_SURF_KLT(new ConfigGeneralDetector(600, 3, 0),
+							kltConfig, 50, null, null, imageType, derivType);
 
 			PointTrackerTwoPass<I> twopass = new PointTrackerToTwoPass<I>(tracker);
 
 			return FactoryVisualOdometry.stereoDepth(1.5,80,3,200,50, false, disparity, twopass, imageType);
 		} else if( whichAlg == 3 ) {
-			ConfigGeneralDetector configDetector = new ConfigGeneralDetector(600,2,1);
-			PointTracker trackerLeft = FactoryPointTracker.
-					combined_ST_SURF_KLT(configDetector,3,new int[]{1, 2, 4, 8},100000,null,null,imageType,derivType);
-			PointTracker trackerRight = FactoryPointTracker.
-					combined_ST_SURF_KLT(configDetector, 3, new int[]{1, 2, 4, 8}, 100000, null, null, imageType, derivType);
+			ConfigGeneralDetector configDetector = new ConfigGeneralDetector(600,3,1);
+
+			PointTracker<I> trackerLeft = FactoryPointTracker.klt(kltConfig, configDetector);
+			PointTracker<I> trackerRight = FactoryPointTracker.klt(kltConfig, configDetector);
+
+			DescribeRegionPoint describe = FactoryDescribeRegionPoint.surfFast(null, imageType);
 
 			return FactoryVisualOdometry.stereoDualTrackerPnP(90, 2, 1.5, 1.5, 200, 50,
-					trackerLeft, trackerRight, imageType);
+					trackerLeft, trackerRight,describe, imageType);
 		} else if( whichAlg == 4 ) {
 //			GeneralFeatureIntensity intensity =
 //					FactoryIntensityPoint.hessian(HessianBlobIntensity.Type.TRACE,imageType);
