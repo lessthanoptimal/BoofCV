@@ -23,7 +23,6 @@ import boofcv.abst.feature.associate.AssociateDescription2D;
 import boofcv.abst.feature.associate.ScoreAssociateHamming_B;
 import boofcv.abst.feature.describe.DescribeRegionPoint;
 import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
-import boofcv.abst.feature.tracker.PkltConfig;
 import boofcv.abst.feature.tracker.PointTracker;
 import boofcv.abst.feature.tracker.PointTrackerToTwoPass;
 import boofcv.abst.feature.tracker.PointTrackerTwoPass;
@@ -34,6 +33,7 @@ import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.sfm.DepthSparse3D;
+import boofcv.alg.tracker.klt.PkltConfig;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.feature.describe.FactoryDescribeRegionPoint;
 import boofcv.factory.feature.tracker.FactoryPointTracker;
@@ -286,14 +286,15 @@ public class VisualizeDepthVisualOdometryApp<I extends ImageSingleBand>
 
 		DepthSparse3D<ImageUInt16> sparseDepth = new DepthSparse3D.I<ImageUInt16>(1e-3);
 
-		PkltConfig pkltConfig = PkltConfig.createDefault(imageType, derivType);
+		PkltConfig pkltConfig = new PkltConfig();
 		pkltConfig.templateRadius = 3;
 		pkltConfig.pyramidScaling = new int[]{1,2,4,8};
 
 		if( whichAlg == 0 ) {
 			ConfigGeneralDetector configDetector = new ConfigGeneralDetector(600,3,1);
 
-			PointTrackerTwoPass<I> tracker = FactoryPointTrackerTwoPass.klt(pkltConfig, configDetector);
+			PointTrackerTwoPass<I> tracker = FactoryPointTrackerTwoPass.klt(pkltConfig, configDetector,
+					imageType, derivType);
 
 			return FactoryVisualOdometry.
 					depthDepthPnP(1.5, 120, 2, 200, 50, false, sparseDepth, tracker, imageType, ImageUInt16.class);

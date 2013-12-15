@@ -19,12 +19,12 @@
 package boofcv.alg.sfm.d3;
 
 import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
-import boofcv.abst.feature.tracker.PkltConfig;
 import boofcv.abst.feature.tracker.PointTracker;
 import boofcv.abst.sfm.AccessPointTracks3D;
 import boofcv.abst.sfm.d3.MonocularPlaneVisualOdometry;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.alg.geo.PerspectiveOps;
+import boofcv.alg.tracker.klt.PkltConfig;
 import boofcv.factory.feature.tracker.FactoryPointTracker;
 import boofcv.factory.sfm.FactoryVisualOdometry;
 import boofcv.gui.VideoProcessAppBase;
@@ -293,25 +293,21 @@ public class VisualizeMonocularPlaneVisualOdometryApp<I extends ImageSingleBand>
 
 
 		if( whichAlg == 0 ) {
-			PkltConfig config = PkltConfig.createDefault(imageClass, derivType);
+			PkltConfig config = new PkltConfig();
 			config.pyramidScaling = new int[]{1,2,4,8};
 			config.templateRadius = 3;
-			config.typeInput = imageClass;
-			config.typeDeriv = derivType;
 			ConfigGeneralDetector configDetector = new ConfigGeneralDetector(600,3,1);
 
-			PointTracker<I> tracker = FactoryPointTracker.klt(config, configDetector);
+			PointTracker<I> tracker = FactoryPointTracker.klt(config, configDetector,imageClass,derivType);
 
 			return FactoryVisualOdometry.monoPlaneInfinity(75,2,1.5,200, tracker, imageType);
 		} else if( whichAlg == 1 ) {
-			PkltConfig config = PkltConfig.createDefault(imageClass, derivType);
+			PkltConfig config = new PkltConfig();
 			config.pyramidScaling = new int[]{1,2,4,8};
 			config.templateRadius = 3;
-			config.typeInput = imageClass;
-			config.typeDeriv = derivType;
 			ConfigGeneralDetector configDetector = new ConfigGeneralDetector(600,3,1);
 
-			PointTracker<I> tracker = FactoryPointTracker.klt(config, configDetector);
+			PointTracker<I> tracker = FactoryPointTracker.klt(config, configDetector,imageClass,derivType);
 
 			double cellSize = 0.06;
 			double inlierGroundTol = 1.5;

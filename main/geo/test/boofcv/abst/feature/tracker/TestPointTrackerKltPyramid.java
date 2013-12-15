@@ -34,7 +34,7 @@ import static org.junit.Assert.assertTrue;
  */
 public class TestPointTrackerKltPyramid extends StandardPointTracker<ImageFloat32> {
 
-	PkltConfig<ImageFloat32,ImageFloat32> config;
+	PkltConfig config;
 
 	public TestPointTrackerKltPyramid() {
 		super(false, true);
@@ -42,8 +42,9 @@ public class TestPointTrackerKltPyramid extends StandardPointTracker<ImageFloat3
 
 	@Override
 	public PointTracker<ImageFloat32> createTracker() {
-		config = PkltConfig.createDefault(ImageFloat32.class, ImageFloat32.class);
-		return FactoryPointTracker.klt(config, new ConfigGeneralDetector(200, 3, 1000, 0, true));
+		config = new PkltConfig();
+		return FactoryPointTracker.klt(config, new ConfigGeneralDetector(200, 3, 1000, 0, true),
+				ImageFloat32.class, ImageFloat32.class);
 	}
 
 	/**

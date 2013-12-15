@@ -20,8 +20,8 @@ package boofcv.abst.sfm.d3;
 
 import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
 import boofcv.abst.feature.disparity.StereoDisparitySparse;
-import boofcv.abst.feature.tracker.PkltConfig;
 import boofcv.abst.feature.tracker.PointTrackerTwoPass;
+import boofcv.alg.tracker.klt.PkltConfig;
 import boofcv.factory.feature.disparity.FactoryStereoDisparity;
 import boofcv.factory.feature.tracker.FactoryPointTrackerTwoPass;
 import boofcv.factory.sfm.FactoryVisualOdometry;
@@ -41,13 +41,14 @@ public class TestWrapVisOdomPixelDepthPnP extends CheckVisualOdometryStereoSim<I
 		StereoDisparitySparse<ImageFloat32> disparity =
 				FactoryStereoDisparity.regionSparseWta(2, 150, 3, 3, 30, -1, true, ImageFloat32.class);
 
-		PkltConfig config = PkltConfig.createDefault(ImageFloat32.class, ImageFloat32.class);
+		PkltConfig config = new PkltConfig();
 		config.pyramidScaling = new int[]{1,2,4,8};
 		config.templateRadius = 3;
 
 		ConfigGeneralDetector configDetector = new ConfigGeneralDetector(600,3,1);
 
-		PointTrackerTwoPass<ImageFloat32> tracker = FactoryPointTrackerTwoPass.klt(config, configDetector);
+		PointTrackerTwoPass<ImageFloat32> tracker = FactoryPointTrackerTwoPass.klt(config, configDetector,
+				ImageFloat32.class, ImageFloat32.class);
 
 		return FactoryVisualOdometry.stereoDepth(1.5,40,2,200,50,false,disparity,tracker,ImageFloat32.class);
 	}

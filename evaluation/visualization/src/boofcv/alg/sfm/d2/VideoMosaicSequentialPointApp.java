@@ -20,7 +20,7 @@ package boofcv.alg.sfm.d2;
 
 import boofcv.abst.feature.detect.interest.ConfigFastHessian;
 import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
-import boofcv.abst.feature.tracker.PkltConfig;
+import boofcv.alg.tracker.klt.PkltConfig;
 import boofcv.factory.feature.tracker.FactoryPointTracker;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.PathLabel;
@@ -54,7 +54,7 @@ public class VideoMosaicSequentialPointApp<I extends ImageSingleBand, D extends 
 	public VideoMosaicSequentialPointApp(Class<I> imageType, Class<D> derivType) {
 		super(2,imageType,true,new Mosaic2DPanel());
 
-		PkltConfig<I, D> config = PkltConfig.createDefault(imageType, derivType);
+		PkltConfig config = new PkltConfig();
 		config.templateRadius = 3;
 		config.pyramidScaling = new int[]{1,2,4,8};
 
@@ -62,7 +62,8 @@ public class VideoMosaicSequentialPointApp<I extends ImageSingleBand, D extends 
 		configFH.initialSampleSize = 2;
 		configFH.maxFeaturesPerScale = 200;
 
-		addAlgorithm(0, "KLT", FactoryPointTracker.klt(config, new ConfigGeneralDetector(maxFeatures, 3, 1)));
+		addAlgorithm(0, "KLT", FactoryPointTracker.klt(config, new ConfigGeneralDetector(maxFeatures, 3, 1),
+				imageType, derivType));
 		addAlgorithm(0, "ST-BRIEF", FactoryPointTracker.
 				dda_ST_BRIEF(150, new ConfigGeneralDetector(400, 1, 10), imageType, null));
 		// size of the description region has been increased to improve quality.

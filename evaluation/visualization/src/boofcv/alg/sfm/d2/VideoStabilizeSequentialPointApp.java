@@ -20,7 +20,7 @@ package boofcv.alg.sfm.d2;
 
 import boofcv.abst.feature.detect.interest.ConfigFastHessian;
 import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
-import boofcv.abst.feature.tracker.PkltConfig;
+import boofcv.alg.tracker.klt.PkltConfig;
 import boofcv.factory.feature.tracker.FactoryPointTracker;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.PathLabel;
@@ -54,8 +54,7 @@ public class VideoStabilizeSequentialPointApp<I extends ImageSingleBand, D exten
 	public VideoStabilizeSequentialPointApp(Class<I> imageType, Class<D> derivType) {
 		super(2,imageType,true,new Stabilize2DPanel());
 
-		PkltConfig<I, D> config =
-				PkltConfig.createDefault(imageType, derivType);
+		PkltConfig config = new PkltConfig();
 		config.templateRadius = 3;
 		config.pyramidScaling = new int[]{1,2,4,8};
 
@@ -63,11 +62,8 @@ public class VideoStabilizeSequentialPointApp<I extends ImageSingleBand, D exten
 		configFH.maxFeaturesPerScale = 200;
 		configFH.initialSampleSize = 2;
 
-		PkltConfig<I, D> pkltConfig = PkltConfig.createDefault(imageType, derivType);
-		config.templateRadius = 3;
-		config.pyramidScaling = new int[]{1,2,4,8};
-
-		addAlgorithm(0, "KLT", FactoryPointTracker.klt(config, new ConfigGeneralDetector(maxFeatures, 1, 3)));
+		addAlgorithm(0, "KLT", FactoryPointTracker.klt(config, new ConfigGeneralDetector(maxFeatures, 1, 3),
+				imageType,derivType));
 		addAlgorithm(0, "ST-BRIEF", FactoryPointTracker.
 				dda_ST_BRIEF(100, new ConfigGeneralDetector(400, 1, 10), imageType, derivType));
 		// size of the description region has been increased to improve quality.
@@ -76,9 +72,9 @@ public class VideoStabilizeSequentialPointApp<I extends ImageSingleBand, D exten
 		addAlgorithm(0, "FH-SURF", FactoryPointTracker.dda_FH_SURF_Fast(configFH, null, null, imageType));
 		addAlgorithm(0, "ST-SURF-KLT", FactoryPointTracker.
 				combined_ST_SURF_KLT(new ConfigGeneralDetector(400, 3, 1),
-						pkltConfig, 50, null, null, imageType, derivType));
+						config, 50, null, null, imageType, derivType));
 		addAlgorithm(0, "FH-SURF-KLT", FactoryPointTracker.combined_FH_SURF_KLT(
-				pkltConfig, 50, configFH, null, null, imageType));
+				config, 50, configFH, null, null, imageType));
 
 		addAlgorithm(1,"Affine", new Affine2D_F64());
 		addAlgorithm(1,"Homography", new Homography2D_F64());

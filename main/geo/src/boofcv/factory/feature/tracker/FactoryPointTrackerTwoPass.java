@@ -27,6 +27,7 @@ import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.alg.feature.detect.interest.EasyGeneralFeatureDetector;
 import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.alg.interpolate.InterpolateRectangle;
+import boofcv.alg.tracker.klt.PkltConfig;
 import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.factory.transform.pyramid.FactoryPyramid;
@@ -49,16 +50,17 @@ public class FactoryPointTrackerTwoPass {
 	 * @return KLT based tracker.
 	 */
 	public static <I extends ImageSingleBand, D extends ImageSingleBand>
-	PointTrackerTwoPass<I> klt(PkltConfig<I, D> config, ConfigGeneralDetector configExtract) {
+	PointTrackerTwoPass<I> klt(PkltConfig config, ConfigGeneralDetector configExtract,
+							   Class<I> imageType, Class<D> derivType) {
 
-		GeneralFeatureDetector<I, D> detector = createShiTomasi(configExtract, config.typeDeriv);
+		GeneralFeatureDetector<I, D> detector = createShiTomasi(configExtract, derivType);
 
-		InterpolateRectangle<I> interpInput = FactoryInterpolation.<I>bilinearRectangle(config.typeInput);
-		InterpolateRectangle<D> interpDeriv = FactoryInterpolation.<D>bilinearRectangle(config.typeDeriv);
+		InterpolateRectangle<I> interpInput = FactoryInterpolation.<I>bilinearRectangle(imageType);
+		InterpolateRectangle<D> interpDeriv = FactoryInterpolation.<D>bilinearRectangle(derivType);
 
-		ImageGradient<I,D> gradient = FactoryDerivative.sobel(config.typeInput, config.typeDeriv);
+		ImageGradient<I,D> gradient = FactoryDerivative.sobel(imageType, derivType);
 
-		PyramidDiscrete<I> pyramid = FactoryPyramid.discreteGaussian(config.pyramidScaling,-1,2,true,config.typeInput);
+		PyramidDiscrete<I> pyramid = FactoryPyramid.discreteGaussian(config.pyramidScaling,-1,2,true,imageType);
 
 		return new PointTrackerTwoPassKltPyramid<I, D>(config.config,config.templateRadius,pyramid,detector,
 				gradient,interpInput,interpDeriv);
