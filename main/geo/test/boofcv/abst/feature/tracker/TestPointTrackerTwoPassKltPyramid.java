@@ -19,10 +19,7 @@
 package boofcv.abst.feature.tracker;
 
 import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
-import boofcv.alg.tracker.klt.KltTrackFault;
-import boofcv.alg.tracker.klt.KltTracker;
-import boofcv.alg.tracker.klt.PyramidKltFeature;
-import boofcv.alg.tracker.klt.PyramidKltTracker;
+import boofcv.alg.tracker.klt.*;
 import boofcv.factory.feature.tracker.FactoryPointTrackerTwoPass;
 import boofcv.struct.image.ImageFloat32;
 import org.junit.Test;
@@ -35,7 +32,7 @@ import static org.junit.Assert.assertTrue;
  */
 public class TestPointTrackerTwoPassKltPyramid extends StandardPointTrackerTwoPass<ImageFloat32> {
 
-	PkltConfig<ImageFloat32,ImageFloat32> config;
+	PkltConfig config;
 
 	public TestPointTrackerTwoPassKltPyramid() {
 		super(false, true);
@@ -43,8 +40,9 @@ public class TestPointTrackerTwoPassKltPyramid extends StandardPointTrackerTwoPa
 
 	@Override
 	public PointTrackerTwoPass<ImageFloat32> createTracker() {
-		config = PkltConfig.createDefault(ImageFloat32.class, ImageFloat32.class);
-		return FactoryPointTrackerTwoPass.klt(config, new ConfigGeneralDetector(200, 3, 1000, 0, true));
+		config = new PkltConfig();
+		return FactoryPointTrackerTwoPass.klt(config, new ConfigGeneralDetector(200, 3, 1000, 0, true),
+				ImageFloat32.class, ImageFloat32.class);
 	}
 
 	@Test

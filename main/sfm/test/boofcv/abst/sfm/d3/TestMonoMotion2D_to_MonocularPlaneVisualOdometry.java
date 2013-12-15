@@ -19,8 +19,8 @@
 package boofcv.abst.sfm.d3;
 
 import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
-import boofcv.abst.feature.tracker.PkltConfig;
 import boofcv.abst.feature.tracker.PointTracker;
+import boofcv.alg.tracker.klt.PkltConfig;
 import boofcv.factory.feature.tracker.FactoryPointTracker;
 import boofcv.factory.sfm.FactoryVisualOdometry;
 import boofcv.struct.image.ImageSInt16;
@@ -40,15 +40,13 @@ public class TestMonoMotion2D_to_MonocularPlaneVisualOdometry extends CheckVisua
 
 	protected MonocularPlaneVisualOdometry<ImageUInt8> createAlgorithm() {
 
-		PkltConfig config =
-				PkltConfig.createDefault(ImageUInt8.class, ImageSInt16.class);
+		PkltConfig config = new PkltConfig();
 		config.pyramidScaling = new int[]{1,2,4,8};
 		config.templateRadius = 3;
-		config.typeInput = ImageUInt8.class;
-		config.typeDeriv = ImageSInt16.class;
 		ConfigGeneralDetector configDetector = new ConfigGeneralDetector(600,3,1);
 
-		PointTracker<ImageUInt8> tracker = FactoryPointTracker.klt(config, configDetector);
+		PointTracker<ImageUInt8> tracker = FactoryPointTracker.klt(config, configDetector,
+				ImageUInt8.class, ImageSInt16.class);
 
 		return FactoryVisualOdometry.monoPlaneInfinity(50, 2, 1.5, 300, tracker, ImageType.single(ImageUInt8.class));
 	}

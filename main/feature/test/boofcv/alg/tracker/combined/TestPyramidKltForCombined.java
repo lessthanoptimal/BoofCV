@@ -54,7 +54,7 @@ public class TestPyramidKltForCombined {
 
 	public PyramidKltForCombined<ImageFloat32,ImageFloat32> createAlg()
 	{
-		KltConfig config = KltConfig.createDefault();
+		KltConfig config = new KltConfig();
 
 		return new PyramidKltForCombined<ImageFloat32,ImageFloat32>(config,5,scales,
 				ImageFloat32.class,ImageFloat32.class);

@@ -46,6 +46,7 @@ import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.alg.interpolate.InterpolateRectangle;
 import boofcv.alg.tracker.combined.CombinedTrackerScalePoint;
+import boofcv.alg.tracker.klt.PkltConfig;
 import boofcv.alg.transform.ii.GIntegralImageOps;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.feature.describe.FactoryDescribePointAlgs;
@@ -95,12 +96,11 @@ public class FactoryPointTracker {
 	public static <I extends ImageSingleBand, D extends ImageSingleBand>
 	PointTracker<I> klt(int scaling[], ConfigGeneralDetector configExtract, int featureRadius,
 							 Class<I> imageType, Class<D> derivType) {
-		PkltConfig<I, D> config =
-				PkltConfig.createDefault(imageType, derivType);
+		PkltConfig config = new PkltConfig();
 		config.pyramidScaling = scaling;
 		config.templateRadius = featureRadius;
 
-		return klt(config, configExtract);
+		return klt(config, configExtract, imageType, derivType );
 	}
 
 	/**
@@ -113,19 +113,28 @@ public class FactoryPointTracker {
 	 * @return KLT based tracker.
 	 */
 	public static <I extends ImageSingleBand, D extends ImageSingleBand>
-	PointTracker<I> klt(PkltConfig<I, D> config, ConfigGeneralDetector configExtract) {
+	PointTracker<I> klt(PkltConfig config, ConfigGeneralDetector configExtract,
+						Class<I> imageType, Class<D> derivType ) {
 
-		GeneralFeatureDetector<I, D> detector = createShiTomasi(configExtract, config.typeDeriv);
+		if( config == null ) {
+			config = new PkltConfig();
+		}
 
-		InterpolateRectangle<I> interpInput = FactoryInterpolation.<I>bilinearRectangle(config.typeInput);
-		InterpolateRectangle<D> interpDeriv = FactoryInterpolation.<D>bilinearRectangle(config.typeDeriv);
+		if( configExtract == null ) {
+			configExtract = new ConfigGeneralDetector();
+		}
 
-		ImageGradient<I,D> gradient = FactoryDerivative.sobel(config.typeInput, config.typeDeriv);
+		GeneralFeatureDetector<I, D> detector = createShiTomasi(configExtract, derivType);
 
-		PyramidDiscrete<I> pyramid = FactoryPyramid.discreteGaussian(config.pyramidScaling,-1,2,true,config.typeInput);
+		InterpolateRectangle<I> interpInput = FactoryInterpolation.<I>bilinearRectangle(imageType);
+		InterpolateRectangle<D> interpDeriv = FactoryInterpolation.<D>bilinearRectangle(derivType);
+
+		ImageGradient<I,D> gradient = FactoryDerivative.sobel(imageType, derivType);
+
+		PyramidDiscrete<I> pyramid = FactoryPyramid.discreteGaussian(config.pyramidScaling,-1,2,true,imageType);
 
 		return new PointTrackerKltPyramid<I, D>(config.config,config.templateRadius,pyramid,detector,
-				gradient,interpInput,interpDeriv,config.typeDeriv);
+				gradient,interpInput,interpDeriv,derivType);
 	}
 
 	/**
@@ -479,19 +488,17 @@ public class FactoryPointTracker {
 	public static <I extends ImageSingleBand, D extends ImageSingleBand, Desc extends TupleDesc>
 	PointTracker<I> combined(DetectDescribePoint<I, Desc> detector,
 							 AssociateDescription<Desc> associate,
-							 PkltConfig<I,D> kltConfig ,
-							 int reactivateThreshold,
-							 Class<I> imageType)
+							 PkltConfig kltConfig ,
+							 int reactivateThreshold, Class<I> imageType )
 	{
 		Class<D> derivType = GImageDerivativeOps.getDerivativeType(imageType);
 
 		if( kltConfig == null ) {
-			kltConfig = PkltConfig.createDefault(imageType,derivType);
+			kltConfig = new PkltConfig();
 		}
 
 		CombinedTrackerScalePoint<I, D,Desc> tracker =
-				FactoryTrackerAlg.combined(detector,associate, kltConfig.config, kltConfig.templateRadius,kltConfig.pyramidScaling,
-						imageType,derivType);
+				FactoryTrackerAlg.combined(detector,associate, kltConfig,imageType,derivType);
 
 		return new PointTrackerCombined<I,D,Desc>(tracker,reactivateThreshold,imageType,derivType);
 	}

@@ -25,6 +25,7 @@ import boofcv.alg.tracker.combined.CombinedTrackerScalePoint;
 import boofcv.alg.tracker.combined.PyramidKltForCombined;
 import boofcv.alg.tracker.klt.KltConfig;
 import boofcv.alg.tracker.klt.KltTracker;
+import boofcv.alg.tracker.klt.PkltConfig;
 import boofcv.alg.tracker.klt.PyramidKltTracker;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.feature.TupleDesc;
@@ -90,23 +91,20 @@ public class FactoryTrackerAlg {
 	 * @param detector Feature detector and describer.
 	 * @param associate Association algorithm.
 	 * @param kltConfig Configuration for KLT
-	 * @param featureRadiusKlt KLT feature radius
-	 * @param pyramidScalingKlt KLT pyramid configuration
 	 * @param imageType Input image type.    @return Feature tracker
 	 */
 	public static <I extends ImageSingleBand, D extends ImageSingleBand, Desc extends TupleDesc>
 	CombinedTrackerScalePoint<I,D,Desc> combined(DetectDescribePoint<I, Desc> detector,
 												 AssociateDescription<Desc> associate,
-												 KltConfig kltConfig, int featureRadiusKlt,
-												 int[] pyramidScalingKlt,
+												 PkltConfig kltConfig ,
 												 Class<I> imageType,
 												 Class<D> derivType)
 	{
 		if( kltConfig == null)
-			kltConfig =  KltConfig.createDefault();
+			kltConfig = new PkltConfig();
 
-		PyramidKltForCombined<I,D> klt = new PyramidKltForCombined<I, D>(kltConfig,
-				featureRadiusKlt,pyramidScalingKlt,imageType,derivType);
+		PyramidKltForCombined<I,D> klt = new PyramidKltForCombined<I, D>(kltConfig.config,
+				kltConfig.templateRadius,kltConfig.pyramidScaling,imageType,derivType);
 
 		return new CombinedTrackerScalePoint<I, D, Desc>(klt,detector,associate);
 	}

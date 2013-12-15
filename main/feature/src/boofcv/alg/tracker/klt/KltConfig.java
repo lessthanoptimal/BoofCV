@@ -26,32 +26,25 @@ public class KltConfig {
 	/**
 	 * Due to how the image derivative and interpolation is performed outer most pixels. Features are
 	 * not allowed to overlap this close to the image's edge.
+	 *
+	 * WARNING: currently not used.  will probably be removed.
 	 */
 	public int forbiddenBorder;
 
 	/**
 	 * Maximum allowed average per pixel error across the whole region.
 	 */
-	public float maxPerPixelError;
+	public float maxPerPixelError = 25;
 	/**
 	 * Maximum number of iterations KLT performs for each feature
 	 */
-	public int maxIterations;
-	public float minDeterminant;
-	public float minPositionDelta;
-
+	public int maxIterations = 15;  // TODO consider increasing this number? TLD seems to like it being 50
 	/**
-	 * Creates a config with reasonable values for most applications.  These should be tuned
-	 * for better performance.
-	 *
+	 * Declare a feature as invalid if hte detemrinant is less than this value.
 	 */
-	public static KltConfig createDefault() {
-		KltConfig ret = new KltConfig();
-		ret.maxPerPixelError = 25;
-		ret.maxIterations = 15; // TODO consider increasing this number? TLD seems to like it being 50
-		ret.minDeterminant = 0.001f;
-		ret.minPositionDelta = 0.01f;
-
-		return ret;
-	}
+	public float minDeterminant = 0.001f;
+	/**
+	 * Stop iterating of the change in x and y is less than this number.
+	 */
+	public float minPositionDelta = 0.01f;
 }

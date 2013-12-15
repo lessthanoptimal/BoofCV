@@ -76,7 +76,7 @@ public class SfotConfig <T extends ImageSingleBand, D extends ImageSingleBand> {
 
 		gradient = FactoryDerivative.sobel(imageType, derivType);
 
-		trackerConfig = KltConfig.createDefault();
+		trackerConfig = new KltConfig();
 		trackerConfig.maxIterations = 50;
 	}
 

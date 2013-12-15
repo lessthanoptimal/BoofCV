@@ -105,7 +105,7 @@ public class TestTldRegionTracker {
 
 		ImageGradient<ImageUInt8,ImageSInt16> gradient = FactoryDerivative.sobel(ImageUInt8.class,ImageSInt16.class);
 		PyramidKltTracker<ImageUInt8,ImageSInt16> tracker =
-				FactoryTrackerAlg.kltPyramid(KltConfig.createDefault(), ImageUInt8.class, ImageSInt16.class);
+				FactoryTrackerAlg.kltPyramid(new KltConfig(), ImageUInt8.class, ImageSInt16.class);
 
 		return new TldRegionTracker<ImageUInt8,ImageSInt16>(10,5,100,gradient,tracker,ImageUInt8.class,ImageSInt16.class);
 	}

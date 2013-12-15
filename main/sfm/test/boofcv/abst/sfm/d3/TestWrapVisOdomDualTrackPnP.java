@@ -20,8 +20,8 @@ package boofcv.abst.sfm.d3;
 
 import boofcv.abst.feature.describe.DescribeRegionPoint;
 import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
-import boofcv.abst.feature.tracker.PkltConfig;
 import boofcv.abst.feature.tracker.PointTracker;
+import boofcv.alg.tracker.klt.PkltConfig;
 import boofcv.factory.feature.describe.FactoryDescribeRegionPoint;
 import boofcv.factory.feature.tracker.FactoryPointTracker;
 import boofcv.factory.sfm.FactoryVisualOdometry;
@@ -40,12 +40,14 @@ public class TestWrapVisOdomDualTrackPnP extends CheckVisualOdometryStereoSim<Im
 	public StereoVisualOdometry<ImageFloat32> createAlgorithm() {
 		ConfigGeneralDetector configDetector = new ConfigGeneralDetector(600,2,1);
 
-		PkltConfig<ImageFloat32,ImageFloat32> kltConfig = PkltConfig.createDefault(ImageFloat32.class,ImageFloat32.class);
+		PkltConfig kltConfig = new PkltConfig();
 		kltConfig.templateRadius = 3;
 		kltConfig.pyramidScaling =  new int[]{1, 2, 4, 8};
 
-		PointTracker<ImageFloat32> trackerLeft = FactoryPointTracker.klt(kltConfig, configDetector);
-		PointTracker<ImageFloat32> trackerRight = FactoryPointTracker.klt(kltConfig, configDetector);
+		PointTracker<ImageFloat32> trackerLeft = FactoryPointTracker.klt(kltConfig, configDetector,
+				ImageFloat32.class,ImageFloat32.class);
+		PointTracker<ImageFloat32> trackerRight = FactoryPointTracker.klt(kltConfig, configDetector,
+				ImageFloat32.class,ImageFloat32.class);
 
 		DescribeRegionPoint describe = FactoryDescribeRegionPoint.surfFast(null, ImageFloat32.class);
 
