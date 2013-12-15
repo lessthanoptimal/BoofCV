@@ -22,6 +22,8 @@ import boofcv.alg.feature.detect.intensity.GenericCornerIntensityGradientTests;
 import boofcv.struct.image.ImageFloat32;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+
 /**
  * @author Peter Abeles
  */
@@ -36,5 +38,22 @@ public class TestImplHarrisCorner_S16 extends GenericCornerIntensityGradientTest
 	@Override
 	public void computeIntensity( ImageFloat32 intensity ) {
 		detector.process(derivX_I16,derivY_I16,intensity);
+	}
+
+	@Test
+	public void checkOverflow() {
+		detector.totalXX = (1<<18)+10;
+		detector.totalYY = (1<<20)+50;
+		detector.totalXY = (1<<16)+5;
+
+		long totalXX = detector.totalXX;
+		long totalYY = detector.totalYY;
+		long totalXY = detector.totalXY;
+
+		float trace = totalXX + totalYY;
+		float expected = (totalXX * totalYY - totalXY * totalXY) - detector.kappa * trace*trace;
+
+		float found = detector.computeIntensity();
+		assertEquals(expected,found,1e-4);
 	}
 }

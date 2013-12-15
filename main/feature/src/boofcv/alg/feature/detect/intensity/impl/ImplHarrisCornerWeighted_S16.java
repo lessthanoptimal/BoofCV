@@ -42,7 +42,9 @@ public class ImplHarrisCornerWeighted_S16 extends ImplSsdCornerWeighted_S16
 	@Override
 	protected float computeResponse() {
 		// det(A) - kappa*trace(A)^2
+		float totalXX = this.totalXX, totalYY = this.totalYY, totalXY = this.totalXY;
 		float trace = totalXX + totalYY;
+
 		return (totalXX * totalYY - totalXY * totalXY) - kappa * trace*trace;
 	}
 

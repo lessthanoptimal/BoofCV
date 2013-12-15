@@ -41,7 +41,7 @@ public class ImplShiTomasiCornerWeighted_S16 extends ImplSsdCornerWeighted_S16
 		// compute the smallest eigenvalue
 		double left = (totalXX + totalYY) * 0.5;
 		double b = (totalXX - totalYY) * 0.5;
-		double right = Math.sqrt(b * b + totalXY * totalXY);
+		double right = Math.sqrt(b * b + ((double)totalXY) * totalXY);
 
 		// the smallest eigenvalue will be minus the right side
 		return (float)(left - right);

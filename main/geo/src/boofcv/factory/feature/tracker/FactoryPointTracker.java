@@ -116,6 +116,9 @@ public class FactoryPointTracker {
 	PointTracker<I> klt(PkltConfig config, ConfigGeneralDetector configExtract,
 						Class<I> imageType, Class<D> derivType ) {
 
+		if( derivType == null )
+			derivType = GImageDerivativeOps.getDerivativeType(imageType);
+
 		if( config == null ) {
 			config = new PkltConfig();
 		}
