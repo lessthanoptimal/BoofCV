@@ -36,20 +36,17 @@ import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageType;
 import boofcv.struct.image.MultiSpectral;
 import georegression.struct.homo.Homography2D_F64;
-import georegression.struct.point.Point2D_F64;
 
 import java.awt.image.BufferedImage;
 
 /**
- * Example of how to create a mosaic from a video sequence using StitchingFromMotion2D.  Mosaics work best
- * when the scene being observed is far away or a flat surface.  The camera motion should typically be rotational only,
- * but translation can work depending on the scene's geometry.  Motion blur and cheap cameras in general will degrade
- * performance significantly with the current algorithm.  This example just demonstrates a gray scale image, but
- * with additional work color images can also be processed.
+ * Example of how to stabilizing a video sequence using StitchingFromMotion2D.  Video stabilization is almost
+ * the same as creating a video mosaic and the code in this example is a tweaked version of the mosaic example.
+ * The differences are that the output size is the same as the input image size and that the origin is never changed.
  *
  * @author Peter Abeles
  */
-public class ExampleVideoMosaic {
+public class ExampleVideoStabilization {
 	public static void main( String args[] ) {
 
 		// Configure the feature detector
@@ -73,7 +70,7 @@ public class ExampleVideoMosaic {
 
 		// This fuses the images together
 		StitchingFromMotion2D<MultiSpectral<ImageFloat32>,Homography2D_F64>
-				stitch = FactoryMotion2D.createVideoStitchMS(0.5, motion2DColor, ImageFloat32.class);
+				stabilize = FactoryMotion2D.createVideoStitchMS(0.5, motion2DColor, ImageFloat32.class);
 
 		// Load an image sequence
 		MediaManager media = DefaultMediaManager.INSTANCE;
@@ -83,15 +80,10 @@ public class ExampleVideoMosaic {
 
 		MultiSpectral<ImageFloat32> frame = video.next();
 
-		// shrink the input image and center it
-		Homography2D_F64 shrink = new Homography2D_F64(0.5,0,frame.width/3,0,0.5,frame.height/2,0,0,1);
-		shrink = shrink.invert(null);
-
-		// The mosaic will be larger in terms of pixels but the image will be scaled down.
-		// To change this into stabilization just make it the same size as the input with no shrink.
-		stitch.configure(frame.width,frame.height,null);
+		// The output image size is the same as the input image size
+		stabilize.configure(frame.width, frame.height, null);
 		// process the first frame
-		stitch.process(frame);
+		stabilize.process(frame);
 
 		// Create the GUI for displaying the results + input image
 		ImageGridPanel gui = new ImageGridPanel(1,2);
@@ -99,43 +91,20 @@ public class ExampleVideoMosaic {
 		gui.setImage(0,1,new BufferedImage(frame.width,frame.height,BufferedImage.TYPE_INT_RGB));
 		gui.autoSetPreferredSize();
 
-		ShowImages.showWindow(gui,"Example Mosaic");
+		ShowImages.showWindow(gui,"Example Stabilization");
 
 		// process the video sequence one frame at a time
 		while( video.hasNext() ) {
-			frame = video.next();
-			stitch.process(frame);
-
-			// if the current image is close to the image border recenter the mosaic
-			StitchingFromMotion2D.Corners corners = stitch.getImageCorners(frame.width,frame.height,null);
-			if( nearBorder(corners.p0,stitch) || nearBorder(corners.p1,stitch) ||
-					nearBorder(corners.p2,stitch) || nearBorder(corners.p3,stitch) ) {
-				stitch.setOriginToCurrent();
-			}
+			stabilize.process(video.next());
 
 			// display the mosaic
 			ConvertBufferedImage.convertTo(frame,gui.getImage(0, 0),true);
-			ConvertBufferedImage.convertTo(stitch.getStitchedImage(), gui.getImage(0, 1),true);
+			ConvertBufferedImage.convertTo(stabilize.getStitchedImage(), gui.getImage(0, 1),true);
 
 			gui.repaint();
 
 			// throttle the speed just in case it's on a fast computer
 			BoofMiscOps.pause(50);
 		}
-	}
-
-	/**
-	 * Checks to see if the point is near the image border
-	 */
-	private static boolean nearBorder( Point2D_F64 p , StitchingFromMotion2D<?,?> stitch ) {
-		int r = 10;
-		if( p.x < r || p.y < r )
-			return true;
-		if( p.x >= stitch.getStitchedImage().width-r )
-			return true;
-		if( p.y >= stitch.getStitchedImage().height-r )
-			return true;
-
-		return false;
 	}
 }
