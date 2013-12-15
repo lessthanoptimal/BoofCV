@@ -32,6 +32,8 @@ import org.junit.Test;
 
 import java.util.Random;
 
+import static org.junit.Assert.assertTrue;
+
 /**
  * @author Peter Abeles
  */
@@ -83,5 +85,16 @@ public class TestImplShiTomasiCornerWeighted_S16 {
 		// how the weighted is applied is different between these two verisons, which is why the error
 		// tolerance is so high
 		BoofTesting.assertEqualsInner(expected, found, 0.5, 3, 3, true);
+	}
+
+	@Test
+	public void checkOverflow() {
+		ImplShiTomasiCornerWeighted_S16 detector = new ImplShiTomasiCornerWeighted_S16(1);
+
+		detector.totalXX = (1<<18)+10;
+		detector.totalYY = (1<<20)+50;
+		detector.totalXY = (1<<16)+5;
+
+		assertTrue(detector.computeResponse() > 0);
 	}
 }

@@ -29,8 +29,8 @@ import boofcv.struct.image.ImageSInt16;
  *
  * @author Peter Abeles
  */
-@SuppressWarnings({"ForLoopReplaceableByForEach"})
-public class ImplShiTomasiCorner_S16 extends ImplSsdCorner_S16 implements ShiTomasiCornerIntensity<ImageSInt16> {
+public class ImplShiTomasiCorner_S16 extends ImplSsdCorner_S16 implements ShiTomasiCornerIntensity<ImageSInt16>
+{
 	public ImplShiTomasiCorner_S16(int windowRadius) {
 		super(windowRadius);
 	}
@@ -38,9 +38,9 @@ public class ImplShiTomasiCorner_S16 extends ImplSsdCorner_S16 implements ShiTom
 	@Override
 	protected float computeIntensity() {
 		// compute the smallest eigenvalue
-		double left = (totalXX + totalYY) * 0.5f;
-		double b = (totalXX - totalYY) * 0.5f;
-		double right = Math.sqrt(b * b + (double)totalXY * totalXY);
+		double left = (totalXX + totalYY) * 0.5;
+		double b = (totalXX - totalYY) * 0.5;
+		double right = Math.sqrt(b * b + ((double)totalXY) * totalXY);
 
 		// the smallest eigenvalue will be minus the right side
 		return (float)(left - right);

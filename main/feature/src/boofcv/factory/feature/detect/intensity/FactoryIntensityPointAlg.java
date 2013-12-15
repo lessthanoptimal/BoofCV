@@ -41,7 +41,7 @@ public class FactoryIntensityPointAlg {
 	 * Common interface for creating a {@link boofcv.alg.feature.detect.intensity.FastCornerIntensity} from different image types.
 	 *
 	 * @param pixelTol How different pixels need to be to be considered part of a corner. Image dependent.  Try 20 to start.
-	 * @param minCont Minimum number of continue pixels in a circle for it ot be a corner.  11 or 12 are good numbers.
+	 * @param minCont Minimum number of continue pixels in a circle for it ot be a corner.  Can be 9,10,11 or 12.
 	 * @param imageType Type of input image it is computed form.
 	 * @return Fast corner
 	 */

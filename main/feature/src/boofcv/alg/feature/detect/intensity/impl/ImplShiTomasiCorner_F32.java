@@ -29,10 +29,8 @@ import boofcv.struct.image.ImageFloat32;
  *
  * @author Peter Abeles
  */
-@SuppressWarnings({"ForLoopReplaceableByForEach"})
-public class ImplShiTomasiCorner_F32 extends ImplSsdCorner_F32 implements ShiTomasiCornerIntensity<ImageFloat32> {
-
-
+public class ImplShiTomasiCorner_F32 extends ImplSsdCorner_F32 implements ShiTomasiCornerIntensity<ImageFloat32>
+{
 	public ImplShiTomasiCorner_F32(int windowRadius) {
 		super(windowRadius);
 	}

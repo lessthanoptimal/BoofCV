@@ -32,6 +32,8 @@ import org.junit.Test;
 
 import java.util.Random;
 
+import static org.junit.Assert.assertTrue;
+
 /**
  * @author Peter Abeles
  */
@@ -81,5 +83,16 @@ public class TestImplShiTomasiCorner_S16 {
 		fast.process(derivX, derivY,found);
 
 		BoofTesting.assertEquals(expected, found,1e-4);
+	}
+
+	@Test
+	public void checkOverflow() {
+		ImplShiTomasiCorner_S16 detector = new ImplShiTomasiCorner_S16(1);
+
+		detector.totalXX = (1<<18)+10;
+		detector.totalYY = (1<<20)+50;
+		detector.totalXY = (1<<16)+5;
+
+		assertTrue(detector.computeIntensity() > 0);
 	}
 }

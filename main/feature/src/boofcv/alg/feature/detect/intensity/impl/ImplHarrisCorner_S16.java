@@ -46,7 +46,9 @@ public class ImplHarrisCorner_S16 extends ImplSsdCorner_S16 implements HarrisCor
 	@Override
 	protected float computeIntensity() {
 		// det(A) -+ kappa*trace(A)^2
+		float totalXX = this.totalXX, totalYY = this.totalYY, totalXY = this.totalXY;
 		float trace = totalXX + totalYY;
+
 		return (totalXX * totalYY - totalXY * totalXY) - kappa * trace*trace;
 	}
 
