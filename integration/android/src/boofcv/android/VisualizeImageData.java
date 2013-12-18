@@ -125,6 +125,72 @@ public class VisualizeImageData {
 	}
 
 	/**
+	 * Renders the image using its gray magnitude
+	 *
+	 * @param input (Input) Image image
+	 * @param maxAbsValue (Input) Largest absolute value of a pixel in the image
+	 * @param output (Output) Bitmap ARGB_8888 image.
+	 * @param storage Optional working buffer for Bitmap image.
+	 */
+	public static void grayMagnitude(ImageSInt32 input , int maxAbsValue , Bitmap output , byte[] storage) {
+		shapeShape(input, output);
+
+		if( storage == null )
+			storage = declareStorage(output,null);
+
+		if( maxAbsValue < 0 )
+			maxAbsValue = ImageStatistics.maxAbs(input);
+
+		int indexDst = 0;
+
+		for( int y = 0; y < input.height; y++ ) {
+			int indexSrc = input.startIndex + y*input.stride;
+			for( int x = 0; x < input.width; x++ ) {
+				byte gray = (byte)(255*Math.abs(input.data[ indexSrc++ ])/maxAbsValue);
+				storage[indexDst++] = gray;
+				storage[indexDst++] = gray;
+				storage[indexDst++] = gray;
+				storage[indexDst++] = (byte) 0xFF;
+			}
+		}
+
+		output.copyPixelsFromBuffer(ByteBuffer.wrap(storage));
+	}
+
+	/**
+	 * Renders the image using its gray magnitude
+	 *
+	 * @param input (Input) Image image
+	 * @param maxAbsValue (Input) Largest absolute value of a pixel in the image
+	 * @param output (Output) Bitmap ARGB_8888 image.
+	 * @param storage Optional working buffer for Bitmap image.
+	 */
+	public static void grayMagnitude(ImageFloat32 input , float maxAbsValue , Bitmap output , byte[] storage) {
+		shapeShape(input, output);
+
+		if( storage == null )
+			storage = declareStorage(output,null);
+
+		if( maxAbsValue < 0 )
+			maxAbsValue = ImageStatistics.maxAbs(input);
+
+		int indexDst = 0;
+
+		for( int y = 0; y < input.height; y++ ) {
+			int indexSrc = input.startIndex + y*input.stride;
+			for( int x = 0; x < input.width; x++ ) {
+				byte gray = (byte)(255f*Math.abs(input.data[ indexSrc++ ])/maxAbsValue);
+				storage[indexDst++] = gray;
+				storage[indexDst++] = gray;
+				storage[indexDst++] = gray;
+				storage[indexDst++] = (byte) 0xFF;
+			}
+		}
+
+		output.copyPixelsFromBuffer(ByteBuffer.wrap(storage));
+	}
+
+	/**
 	 * Renders two gradients on the same image using two sets of colors, on for each input image.
 	 *
 	 * @param derivX (Input) Image with positive and negative values.
