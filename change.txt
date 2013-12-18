@@ -99,6 +99,7 @@ Version : Alpha 0.16
     Made the code base more complex.  Maybe old version has a slight runtime speed advantage
 - Fixed overflow issue in HarrisCorner_S16 weighted and unweighted
 - Improved Maven support by breaking it up into multiple modules
+- Fixed bug in UtilWavelet for integer images.  X and Y got reversed in for loop
 
 - TODO remove sparse flow if its performance doesn't improve
 

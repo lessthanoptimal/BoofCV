@@ -122,6 +122,10 @@ public class WrapPlanarSquareGridTarget implements PlanarCalibrationDetector {
 		return ret;
 	}
 
+	public ImageUInt8 getBinary() {
+		return binary;
+	}
+
 	public RefineCalibrationGridCorner getRefine() {
 		return refine;
 	}

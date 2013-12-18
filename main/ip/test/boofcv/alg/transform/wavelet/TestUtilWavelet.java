@@ -18,12 +18,19 @@
 
 package boofcv.alg.transform.wavelet;
 
+import boofcv.alg.misc.GImageMiscOps;
+import boofcv.core.image.GeneralizedImageOps;
 import boofcv.core.image.border.BorderIndex1D_Reflect;
 import boofcv.core.image.border.BorderIndex1D_Wrap;
 import boofcv.core.image.border.BorderType;
+import boofcv.struct.image.ImageDimension;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageSInt32;
+import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.wavelet.WlCoef_F32;
 import org.junit.Test;
+
+import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -33,6 +40,9 @@ import static org.junit.Assert.fail;
  * @author Peter Abeles
  */
 public class TestUtilWavelet {
+
+	Random rand = new Random(234);
+
 	@Test
 	public void checkShape_positive() {
 		ImageFloat32 orig = new ImageFloat32(10,20);
@@ -137,5 +147,23 @@ public class TestUtilWavelet {
 	public void convertToType() {
 		assertEquals(BorderType.REFLECT,UtilWavelet.convertToType(new BorderIndex1D_Reflect()));
 		assertEquals(BorderType.WRAP,UtilWavelet.convertToType(new BorderIndex1D_Wrap()));
+	}
+
+	/**
+	 * Just see if it blows up
+	 */
+	@Test
+	public void adjustForDisplay() {
+		adjustForDisplay(ImageFloat32.class);
+		adjustForDisplay(ImageSInt32.class);
+	}
+
+	public <T extends ImageSingleBand>
+	void adjustForDisplay( Class<T> imageType ) {
+		ImageDimension d = UtilWavelet.transformDimension(320, 240, 3);
+		T b = GeneralizedImageOps.createSingleBand(imageType,d.width,d.height);
+		GImageMiscOps.fillUniform(b, rand, 0, 200);
+
+		UtilWavelet.adjustForDisplay(b,3,255);
 	}
 }

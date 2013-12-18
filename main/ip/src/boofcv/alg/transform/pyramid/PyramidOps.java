@@ -34,8 +34,15 @@ import java.lang.reflect.Array;
  */
 public class PyramidOps {
 
-
-
+	/**
+	 * Creates an array of single band images for each layer in the provided pyramid.  Each image will
+	 * be the same size as the corresponding layer in the pyramid.
+	 *
+	 * @param pyramid (Input) Image pyramid
+	 * @param outputType (Input) Output image type
+	 * @param <O> Output image type
+	 * @return An array of images
+	 */
 	public static <O extends ImageSingleBand>
 	O[] declareOutput( ImagePyramid<?> pyramid , Class<O> outputType ) {
 		O[] ret = (O[])Array.newInstance(outputType,pyramid.getNumLayers());
@@ -49,6 +56,12 @@ public class PyramidOps {
 		return ret;
 	}
 
+	/**
+	 * Reshapes each image in the array to match the layers in the pyramid
+	 * @param pyramid (Input) Image pyramid
+	 * @param output (Output) List of images which is to be resized
+	 * @param <O> Image type
+	 */
 	public static <O extends ImageSingleBand>
 	void reshapeOutput( ImagePyramid<?> pyramid , O[] output ) {
 
@@ -75,8 +88,7 @@ public class PyramidOps {
 	 * @param output Output pyramid where filter results are saved.
 	 */
 	public static <I extends ImageSingleBand, O extends ImageSingleBand>
-	void filter(ImagePyramid<I> input, FilterImageInterface<I, O> filter, O[] output
-	)
+	void filter(ImagePyramid<I> input, FilterImageInterface<I, O> filter, O[] output )
 	{
 		for( int i = 0; i < input.getNumLayers(); i++ ) {
 			I imageIn = input.getLayer(i);
@@ -101,8 +113,7 @@ public class PyramidOps {
 	 * @param derivY Pyramid where y-derivative is stored.
 	 */
 	public static <I extends ImageSingleBand, O extends ImageSingleBand>
-	void gradient(ImagePyramid<I> input, ImageGradient<I, O> gradient,
-				  O[] derivX, O[] derivY )
+	void gradient(ImagePyramid<I> input, ImageGradient<I, O> gradient, O[] derivX, O[] derivY )
 	{
 		for( int i = 0; i < input.getNumLayers(); i++ ) {
 			I imageIn = input.getLayer(i);

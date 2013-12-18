@@ -22,10 +22,7 @@ import boofcv.core.image.border.BorderIndex1D;
 import boofcv.core.image.border.BorderIndex1D_Reflect;
 import boofcv.core.image.border.BorderIndex1D_Wrap;
 import boofcv.core.image.border.BorderType;
-import boofcv.struct.image.ImageDimension;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageInteger;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.*;
 import boofcv.struct.wavelet.WlBorderCoef;
 import boofcv.struct.wavelet.WlCoef;
 
@@ -93,7 +90,7 @@ public class UtilWavelet {
 	 * Returns dimension which is required for the transformed image in a multilevel
 	 * wavelet transform.
 	 */
-	public static ImageDimension transformDimension( ImageSingleBand orig , int level )
+	public static ImageDimension transformDimension( ImageBase orig , int level )
 	{
 		return transformDimension(orig.width,orig.height,level);
 	}
@@ -382,8 +379,8 @@ public class UtilWavelet {
 			int maxY = transform.height/div;
 
 			int max = 0;
-			for( int y = 0; y < maxX; y++ ) {
-				for( int x = 0; x < maxY; x++ ) {
+			for( int y = 0; y < maxY; y++ ) {
+				for( int x = 0; x < maxX; x++ ) {
 					if( x >= minX || y >= minY ) {
 						int val = Math.abs(transform.get(x,y));
 						max = Math.max(val,max);
@@ -391,8 +388,8 @@ public class UtilWavelet {
 				}
 			}
 
-			for( int y = 0; y < maxX; y++ ) {
-				for( int x = 0; x < maxY; x++ ) {
+			for( int y = 0; y < maxY; y++ ) {
+				for( int x = 0; x < maxX; x++ ) {
 					if( x >= minX || y >= minY ) {
 						int val = transform.get(x,y);
 						transform.set( x,y,val * valueRange/max);
