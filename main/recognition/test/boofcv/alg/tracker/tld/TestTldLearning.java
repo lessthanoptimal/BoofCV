@@ -16,7 +16,7 @@ import static org.junit.Assert.assertEquals;
 public class TestTldLearning {
 
 	Random rand = new Random(234);
-	TldConfig config = new TldConfig(true, ImageUInt8.class);
+	TldParameters config = new TldParameters();
 
 	@Test
 	public void initialLearning() {

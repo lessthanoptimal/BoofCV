@@ -18,8 +18,11 @@
 
 package boofcv.factory.tracker;
 
+import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.abst.tracker.*;
+import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.alg.interpolate.InterpolatePixelMB;
+import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.tracker.circulant.CirculantTracker;
 import boofcv.alg.tracker.meanshift.LocalWeightedHistogramRotRect;
 import boofcv.alg.tracker.meanshift.PixelLikelihood;
@@ -27,8 +30,8 @@ import boofcv.alg.tracker.meanshift.TrackerMeanShiftComaniciu2003;
 import boofcv.alg.tracker.meanshift.TrackerMeanShiftLikelihood;
 import boofcv.alg.tracker.sfot.SfotConfig;
 import boofcv.alg.tracker.sfot.SparseFlowObjectTracker;
-import boofcv.alg.tracker.tld.TldConfig;
 import boofcv.alg.tracker.tld.TldTracker;
+import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.image.ImageMultiBand;
 import boofcv.struct.image.ImageSingleBand;
@@ -52,10 +55,18 @@ public class FactoryTrackerObjectQuad {
 	 * @return TrackerObjectQuad
 	 */
 	public static <T extends ImageSingleBand,D extends ImageSingleBand>
-	TrackerObjectQuad<T> tld(TldConfig<T, D> config) {
-		TldTracker<T,D> tracker = new TldTracker<T,D>(config);
+	TrackerObjectQuad<T> tld(ConfigTld config , Class<T> imageType ) {
+		if( config == null )
+			config = new ConfigTld();
 
-		return new Tld_to_TrackerObjectQuad<T,D>(tracker);
+		Class<D> derivType = GImageDerivativeOps.getDerivativeType(imageType);
+
+		InterpolatePixelS<T> interpolate = FactoryInterpolation.bilinearPixelS(imageType);
+		ImageGradient<T,D> gradient =  FactoryDerivative.sobel(imageType, derivType);
+
+		TldTracker<T,D> tracker = new TldTracker<T,D>(config.parameters,interpolate,gradient,imageType,derivType);
+
+		return new Tld_to_TrackerObjectQuad<T,D>(tracker,imageType);
 	}
 
 	/**

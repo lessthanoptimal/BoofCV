@@ -18,13 +18,18 @@
 
 package boofcv.alg.tracker;
 
+import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.alg.feature.associate.DescriptorDistance;
-import boofcv.alg.tracker.tld.TldConfig;
+import boofcv.alg.filter.derivative.GImageDerivativeOps;
+import boofcv.alg.interpolate.InterpolatePixelS;
+import boofcv.alg.tracker.tld.TldParameters;
 import boofcv.alg.tracker.tld.TldRegion;
 import boofcv.alg.tracker.tld.TldTemplateMatching;
 import boofcv.alg.tracker.tld.TldTracker;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.core.image.GeneralizedImageOps;
+import boofcv.factory.filter.derivative.FactoryDerivative;
+import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.ImageRectangle;
@@ -64,7 +69,12 @@ public class VisualizeTldDetectionApp<T extends ImageSingleBand,D extends ImageS
 		gray = GeneralizedImageOps.createSingleBand(imageType,input.getWidth(),input.getHeight());
 		ConvertBufferedImage.convertFrom(input,gray,true);
 
-		tracker = new TldTracker<T,D>(new TldConfig<T,D>(false,imageType));
+		Class<D> derivType = GImageDerivativeOps.getDerivativeType(imageType);
+
+		InterpolatePixelS<T> interpolate = FactoryInterpolation.bilinearPixelS(imageType);
+		ImageGradient<T,D> gradient =  FactoryDerivative.sobel(imageType, derivType);
+
+		tracker = new TldTracker<T,D>(new TldParameters(),interpolate,gradient,imageType,derivType);
 		tracker.setPerformLearning(false);
 
 

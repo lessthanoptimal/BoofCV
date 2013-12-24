@@ -15,7 +15,7 @@ public class TestTldDetection {
 	@Test
 	public void computeTemplateConfidence() {
 		TldDetection<ImageUInt8> alg = new TldDetection<ImageUInt8>();
-		alg.config = new TldConfig();
+		alg.config = new TldParameters();
 		alg.config.confidenceThresholdUpper = 0.6;
 		alg.template = new HelperTemplate();
 
@@ -41,7 +41,7 @@ public class TestTldDetection {
 	@Test
 	public void selectBestRegionsFern_largerN() {
 		TldDetection<ImageUInt8> alg = new TldDetection<ImageUInt8>();
-		alg.config = new TldConfig();
+		alg.config = new TldParameters();
 		alg.config.maximumCascadeConsider = 20;
 
 		// check eliminate ones which are more N than P
@@ -63,7 +63,7 @@ public class TestTldDetection {
 	@Test
 	public void selectBestRegionsFern_smaller() {
 		TldDetection<ImageUInt8> alg = new TldDetection<ImageUInt8>();
-		alg.config = new TldConfig();
+		alg.config = new TldParameters();
 		alg.config.maximumCascadeConsider = 20;
 
 		// all 10 should be accepted
@@ -84,7 +84,7 @@ public class TestTldDetection {
 	@Test
 	public void selectBestRegionsFern_larger() {
 		TldDetection<ImageUInt8> alg = new TldDetection<ImageUInt8>();
-		alg.config = new TldConfig();
+		alg.config = new TldParameters();
 		alg.config.maximumCascadeConsider = 20;
 
 		// all 10 should be accepted

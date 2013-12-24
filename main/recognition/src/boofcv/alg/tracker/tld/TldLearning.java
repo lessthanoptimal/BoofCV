@@ -25,6 +25,7 @@ import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_F64;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
@@ -57,12 +58,12 @@ public class TldLearning<T extends ImageSingleBand> {
 	private ImageRectangle targetRegion_I32 = new ImageRectangle();
 
 	private TldHelperFunctions helper = new TldHelperFunctions();
-	private TldConfig config;
+	private TldParameters config;
 
 	/**
 	 * Creates and configures learning
 	 */
-	public TldLearning(Random rand, TldConfig config,
+	public TldLearning(Random rand, TldParameters config,
 					   TldTemplateMatching<T> template, TldVarianceFilter<T> variance, TldFernClassifier<T> fern,
 					   TldDetection<T> detection ) {
 		this.rand = rand;
@@ -85,6 +86,7 @@ public class TldLearning<T extends ImageSingleBand> {
 		storageMetric.reset();
 		fernNegative.clear();
 
+
 		// learn the initial descriptor
 		TldHelperFunctions.convertRegion(targetRegion, targetRegion_I32);
 
@@ -94,7 +96,7 @@ public class TldLearning<T extends ImageSingleBand> {
 		template.addDescriptor(true, targetRegion_I32);
 		fern.learnFernNoise(true, targetRegion_I32);
 
-		// Mark all other regions as negative ferns
+		// Find all the regions which can be used to learn a negative descriptor
 		for( int i = 0; i < cascadeRegions.size; i++ ) {
 			ImageRectangle r = cascadeRegions.get(i);
 
@@ -107,7 +109,15 @@ public class TldLearning<T extends ImageSingleBand> {
 			if( overlap > config.overlapLower )
 				continue;
 
-			fern.learnFern(false, r );
+			fernNegative.add(r);
+		}
+
+		// randomize which regions are used
+		Collections.shuffle(fernNegative,rand);
+		int N = Math.min(config.numNegativeFerns,fernNegative.size());
+
+		for( int i = 0; i < N; i++ ) {
+			fern.learnFern(false, fernNegative.get(i) );
 		}
 
 		// run detection algorithm and if there is an ambiguous solution mark it as not target
@@ -124,22 +134,22 @@ public class TldLearning<T extends ImageSingleBand> {
 	public void updateLearning( RectangleCorner2D_F64 targetRegion ) {
 
 		storageMetric.reset();
-		fernNegative.clear();
 
 		// learn the initial descriptor
 		TldHelperFunctions.convertRegion(targetRegion, targetRegion_I32);
 
 		template.addDescriptor(true, targetRegion_I32);
 		fern.learnFernNoise(true, targetRegion_I32);
-//		fern.learnFernNoise(true, targetRegion, affine);
 
-		// mark only a few of the far away regions as negative.  Marking all of them as negative is computationally
-		// expensive
+		// mark only a few of the far away regions as negative.  Marking all of them as negative is
+		// computationally expensive
 		FastQueue<TldRegionFernInfo> ferns = detection.getFernInfo();
 		int N = Math.min(config.numNegativeFerns,ferns.size);
 		for( int i = 0; i < N; i++ ) {
 			int index = rand.nextInt(ferns.size);
 			TldRegionFernInfo f = ferns.get(index);
+
+			// no need to check variance here since the detector already did it
 
 			// learn features far away from the target region
 			double overlap = helper.computeOverlap(targetRegion_I32, f.r);

@@ -18,8 +18,13 @@
 
 package boofcv.alg.tracker;
 
-import boofcv.alg.tracker.tld.TldConfig;
+import boofcv.abst.filter.derivative.ImageGradient;
+import boofcv.alg.filter.derivative.GImageDerivativeOps;
+import boofcv.alg.interpolate.InterpolatePixelS;
+import boofcv.alg.tracker.tld.TldParameters;
 import boofcv.alg.tracker.tld.TldTracker;
+import boofcv.factory.filter.derivative.FactoryDerivative;
+import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.gui.image.ShowImages;
 import boofcv.gui.tracker.TldVisualizationPanel;
 import boofcv.io.image.SimpleImageSequence;
@@ -46,9 +51,12 @@ public class VisualizeTldTrackerApp<T extends ImageSingleBand,D extends ImageSin
 
 	public VisualizeTldTrackerApp( Class<T> imageType ) {
 
-		TldConfig<T,D> config = new TldConfig<T, D>(false,imageType);
-		tracker = new TldTracker<T, D>(config);
+		Class<D> derivType = GImageDerivativeOps.getDerivativeType(imageType);
 
+		InterpolatePixelS<T> interpolate = FactoryInterpolation.bilinearPixelS(imageType);
+		ImageGradient<T,D> gradient =  FactoryDerivative.sobel(imageType, derivType);
+
+		tracker = new TldTracker<T, D>(new TldParameters(),interpolate,gradient,imageType,derivType);
 	}
 
 	public void process( final SimpleImageSequence<T> sequence ) {

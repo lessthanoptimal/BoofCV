@@ -18,13 +18,7 @@
 
 package boofcv.alg.tracker.tld;
 
-import boofcv.abst.filter.derivative.ImageGradient;
-import boofcv.alg.filter.derivative.GImageDerivativeOps;
-import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.tracker.klt.KltConfig;
-import boofcv.factory.filter.derivative.FactoryDerivative;
-import boofcv.factory.interpolate.FactoryInterpolation;
-import boofcv.struct.image.ImageSingleBand;
 
 /**
  * Configuration file for TLD tracker.
@@ -33,10 +27,7 @@ import boofcv.struct.image.ImageSingleBand;
  *
  * @author Peter Abeles
  */
-public class TldConfig<T extends ImageSingleBand, D extends ImageSingleBand> {
-
-	public Class<T> imageType;
-	public Class<D> derivType;
+public class TldParameters {
 
 	/**
 	 * Maximum number of NCC templates it will examine inside the detection cascade.  Used to limit the amount
@@ -96,7 +87,7 @@ public class TldConfig<T extends ImageSingleBand, D extends ImageSingleBand> {
 	 * A track must have a confidence above this value to be considered highly confident, allowing learning
 	 * to be activated again.
 	 */
-	public double confidenceThresholdStrong = 0.75; // 0.75
+	public double confidenceThresholdStrong = 0.75;
 
 	/**
 	 * Upper acceptance threshold for confidence.  Suggested value is 0.65
@@ -132,44 +123,18 @@ public class TldConfig<T extends ImageSingleBand, D extends ImageSingleBand> {
 	public double confidenceAccept = 0.4;
 
 	/**
+	 * Determines the number of scales it will search in increments of powers of 1.2.  All scales from
+	 * 1.2^(-scaleSpread) to 1.2^scaleSpread are checked.
+	 */
+	public int scaleSpread = 10;
+
+	/**
 	 * Basic parameters for tracker.  KltConfig.createDefault() with maxIterations = 50 is suggested.
 	 */
 	public KltConfig trackerConfig;
 
-	/**
-	 * Interpolation routine. Bilinear is recommended.
-	 */
-	InterpolatePixelS<T> interpolate;
-
-	/**
-	 * Computes image gradient. Sobel is recommended.
-	 */
-	ImageGradient<T, D> gradient;
-
-	/**
-	 * Creates a configuration using default values.
-	 * @param imageType Type of gray-scale image it processes.
-	 */
-	public TldConfig( boolean fast , Class<T> imageType) {
-		this.imageType = imageType;
-		this.derivType = GImageDerivativeOps.getDerivativeType(imageType);
-
-		if( fast ) {
-			interpolate = FactoryInterpolation.nearestNeighborPixelS(imageType);
-//			maximumCascadeConsider = 500;
-//			numNegativeFerns = 500;
-		} else {
-			interpolate = FactoryInterpolation.bilinearPixelS(imageType);
-//			maximumCascadeConsider = 500;
-//			numNegativeFerns = 500;
-		}
-
-		gradient = FactoryDerivative.sobel(imageType, derivType);
-
+	public TldParameters() {
 		trackerConfig = new KltConfig();
 		trackerConfig.maxIterations = 50;
-	}
-
-	public TldConfig() {
 	}
 }
