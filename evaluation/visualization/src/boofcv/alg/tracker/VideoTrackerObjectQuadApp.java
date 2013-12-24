@@ -20,6 +20,7 @@ package boofcv.alg.tracker;
 
 import boofcv.abst.tracker.ConfigCirculantTracker;
 import boofcv.abst.tracker.ConfigComaniciu2003;
+import boofcv.abst.tracker.ConfigTld;
 import boofcv.abst.tracker.TrackerObjectQuad;
 import boofcv.alg.tracker.sfot.SfotConfig;
 import boofcv.core.image.GConvertImage;
@@ -78,11 +79,11 @@ public class VideoTrackerObjectQuadApp<I extends ImageSingleBand>
 
 		gray = GeneralizedImageOps.createSingleBand(imageType,1,1);
 
-		addAlgorithm(0, "TLD", 0);
-		addAlgorithm(0, "Sparse Flow", 1);
-		addAlgorithm(0, "Ciruclant", 2);
-		addAlgorithm(0, "Mean Shift Fixed", 3);
-		addAlgorithm(0, "Mean Shift Scale", 4);
+		addAlgorithm(0, "Ciruclant", 0);
+		addAlgorithm(0, "TLD", 1);
+		addAlgorithm(0, "Mean Shift Fixed", 2);
+		addAlgorithm(0, "Mean Shift Scale", 3);
+		addAlgorithm(0, "Sparse Flow", 4);
 
 		videoPanel = new TrackerObjectQuadPanel(this);
 		infoBar = new TrackerQuadInfoPanel(this);
@@ -111,19 +112,19 @@ public class VideoTrackerObjectQuadApp<I extends ImageSingleBand>
 	@Override
 	public void refreshAll(Object[] cookies) {
 		if( whichAlg == 0 )
-			tracker = FactoryTrackerObjectQuad.tld(null,imageClass);
-		else if( whichAlg == 1 )
-			tracker = FactoryTrackerObjectQuad.sparseFlow(new SfotConfig(imageClass));
-		else if( whichAlg == 2 )
 			tracker = FactoryTrackerObjectQuad.circulant(new ConfigCirculantTracker(), imageClass);
-		else if( whichAlg == 3 ) {
+		else if( whichAlg == 1 )
+			tracker = FactoryTrackerObjectQuad.tld(new ConfigTld(false),imageClass);
+		else if( whichAlg == 2 ) {
 			ConfigComaniciu2003 config = new ConfigComaniciu2003();
 			config.scaleChange = 0;
 			tracker = FactoryTrackerObjectQuad.meanShiftComaniciu2003(config,imageType);
-		} else if( whichAlg == 4 ) {
+		} else if( whichAlg == 3 ) {
 			ConfigComaniciu2003 config = new ConfigComaniciu2003();
 			config.scaleChange = 0.05f;
 			tracker = FactoryTrackerObjectQuad.meanShiftComaniciu2003(config,imageType);
+		} else if( whichAlg == 4 ) {
+			tracker = FactoryTrackerObjectQuad.sparseFlow(new SfotConfig(imageClass));
 		} else
 			throw new RuntimeException("Unknown algorithm");
 
@@ -289,13 +290,14 @@ public class VideoTrackerObjectQuadApp<I extends ImageSingleBand>
 		VideoTrackerObjectQuadApp app = new VideoTrackerObjectQuadApp(type);
 
 		java.util.List<PathLabel> inputs = new ArrayList<PathLabel>();
-		inputs.add(new PathLabel("track_book", "../data/applet/tracking/track_book.mjpeg"));
-		inputs.add(new PathLabel("track_peter", "../data/applet/tracking/track_peter.mjpeg"));
-		inputs.add(new PathLabel("chipmunk", "../data/applet/tracking/chipmunk.mjpeg"));
+		inputs.add(new PathLabel("WildCat", "../data/applet/tracking/wildcat_robot.mjpeg"));
+		inputs.add(new PathLabel("Tree", "../data/applet/tracking/tree.mjpeg"));
+		inputs.add(new PathLabel("Book", "../data/applet/tracking/track_book.mjpeg"));
+		inputs.add(new PathLabel("Face", "../data/applet/tracking/track_peter.mjpeg"));
+		inputs.add(new PathLabel("Chipmunk", "../data/applet/tracking/chipmunk.mjpeg"));
 		inputs.add(new PathLabel("Balls", "../data/applet/tracking/balls_blue_red.mjpeg"));
 		inputs.add(new PathLabel("Driving Snow", "../data/applet/tracking/snow_follow_car.mjpeg"));
 		inputs.add(new PathLabel("Driving Night", "../data/applet/tracking/night_follow_car.mjpeg"));
-		inputs.add(new PathLabel("Driving Day", "../data/applet/tracking/day_follow_car.mjpeg"));
 
 		app.setInputList(inputs);
 
