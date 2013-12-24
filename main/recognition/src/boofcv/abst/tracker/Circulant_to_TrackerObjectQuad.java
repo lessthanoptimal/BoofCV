@@ -64,6 +64,11 @@ public class Circulant_to_TrackerObjectQuad<T extends ImageSingleBand> implement
 		tracker.performTracking(image);
 		Rectangle2D_F32 r = tracker.getTargetLocation();
 
+		if( r.tl_x >= image.width || r.tl_y >= image.height )
+			return false;
+		if( r.tl_x+r.width < 0 || r.tl_y+r.height < 0 )
+			return false;
+
 		float x0 = r.tl_x;
 		float y0 = r.tl_y;
 		float x1 = r.tl_x + r.width;
