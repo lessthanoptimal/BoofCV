@@ -186,7 +186,7 @@ public class CirculantTracker<T extends ImageSingleBand> {
 	public void initialize( T image , int x0 , int y0 , int regionWidth , int regionHeight ) {
 
 		if( image.width < regionWidth || image.height < regionHeight)
-			throw new IllegalArgumentException("Track region is larger than input image");
+			throw new IllegalArgumentException("Track region is larger than input image: "+regionWidth+" "+regionHeight);
 
 		regionOut.width = regionWidth;
 		regionOut.height = regionHeight;

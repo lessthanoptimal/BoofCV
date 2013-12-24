@@ -47,7 +47,7 @@ public class TldDetection<T extends ImageSingleBand> {
 	// Storage for results of the fern test on individual regions
 	protected FastQueue<TldRegionFernInfo> fernInfo = new FastQueue<TldRegionFernInfo>(TldRegionFernInfo.class,true);
 
-	protected TldConfig config;
+	protected TldParameters config;
 
 	// Storage for sorting of results
 	private GrowQueue_F64 storageMetric = new GrowQueue_F64();
@@ -77,7 +77,7 @@ public class TldDetection<T extends ImageSingleBand> {
 	// Removes all but the best rectangles.
 	private TldNonMaximalSuppression nonmax;
 
-	public TldDetection(TldFernClassifier<T> fern, TldTemplateMatching<T> template, TldVarianceFilter<T> variance, TldConfig config) {
+	public TldDetection(TldFernClassifier<T> fern, TldTemplateMatching<T> template, TldVarianceFilter<T> variance, TldParameters config) {
 		this.fern = fern;
 		this.template = template;
 		this.variance = variance;

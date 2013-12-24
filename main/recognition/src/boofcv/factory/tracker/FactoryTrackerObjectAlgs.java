@@ -18,6 +18,7 @@
 
 package boofcv.factory.tracker;
 
+import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.abst.tracker.ConfigCirculantTracker;
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.tracker.circulant.CirculantTracker;
@@ -27,7 +28,7 @@ import boofcv.alg.tracker.meanshift.LikelihoodHueSatHistInd_U8;
 import boofcv.alg.tracker.meanshift.PixelLikelihood;
 import boofcv.alg.tracker.sfot.SfotConfig;
 import boofcv.alg.tracker.sfot.SparseFlowObjectTracker;
-import boofcv.alg.tracker.tld.TldConfig;
+import boofcv.alg.tracker.tld.TldParameters;
 import boofcv.alg.tracker.tld.TldTracker;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.image.ImageDataType;
@@ -45,8 +46,10 @@ import boofcv.struct.image.ImageType;
 public class FactoryTrackerObjectAlgs {
 
 	public static <T extends ImageSingleBand,D extends ImageSingleBand>
-	TldTracker<T,D> createTLD( TldConfig<T,D> config ) {
-		return new TldTracker<T,D>(config);
+	TldTracker<T,D> createTLD( TldParameters config ,
+							   InterpolatePixelS<T> interpolate , ImageGradient<T,D> gradient ,
+							   Class<T> imageType , Class<D> derivType ) {
+		return new TldTracker<T,D>(config,interpolate,gradient,imageType,derivType);
 	}
 
 	public static <T extends ImageSingleBand,D extends ImageSingleBand>
@@ -101,6 +104,9 @@ public class FactoryTrackerObjectAlgs {
 
 	public static <T extends ImageSingleBand>
 	CirculantTracker<T> circulant( ConfigCirculantTracker config , Class<T> imageType) {
+		if( config == null )
+			config = new ConfigCirculantTracker();
+
 		InterpolatePixelS<T> interp = FactoryInterpolation.bilinearPixelS(imageType);
 
 		return new CirculantTracker(

@@ -18,6 +18,8 @@
 
 package boofcv.alg.tracker.tld;
 
+import boofcv.abst.filter.derivative.ImageGradient;
+import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.tracker.klt.PyramidKltTracker;
 import boofcv.factory.tracker.FactoryTrackerAlg;
 import boofcv.factory.transform.pyramid.FactoryPyramid;
@@ -67,7 +69,7 @@ import java.util.Random;
 public class TldTracker<T extends ImageSingleBand, D extends ImageSingleBand> {
 
 	// specified configuration parameters for the tracker
-	private TldConfig<T,D> config;
+	private TldParameters config;
 
 	// selected region for output
 	private RectangleCorner2D_F64 targetRegion = new RectangleCorner2D_F64();
@@ -118,20 +120,22 @@ public class TldTracker<T extends ImageSingleBand, D extends ImageSingleBand> {
 	 *
 	 * @param config Configuration class which specifies the tracker's behavior
 	 */
-	public TldTracker( TldConfig<T,D> config ) {
+	public TldTracker( TldParameters config ,
+					   InterpolatePixelS<T> interpolate , ImageGradient<T,D> gradient ,
+					   Class<T> imageType , Class<D> derivType) {
 		this.config = config;
 
 		Random rand = new Random(config.randomSeed);
 
-		PyramidKltTracker<T, D> tracker = FactoryTrackerAlg.kltPyramid(config.trackerConfig, config.imageType, config.derivType);
+		PyramidKltTracker<T, D> tracker = FactoryTrackerAlg.kltPyramid(config.trackerConfig, imageType, derivType);
 
 		tracking = new TldRegionTracker<T, D>(config.trackerGridWidth,config.trackerFeatureRadius,
-				config.maximumErrorFB,config.gradient,tracker,config.imageType,config.derivType);
+				config.maximumErrorFB,gradient,tracker,imageType,derivType);
 		adjustRegion = new TldAdjustRegion(config.motionIterations);
-		variance = new TldVarianceFilter<T>(config.imageType);
-		template = new TldTemplateMatching<T>(config.interpolate);
+		variance = new TldVarianceFilter<T>(imageType);
+		template = new TldTemplateMatching<T>(interpolate);
 		fern = new TldFernClassifier<T>(
-				rand,config.numFerns,config.fernSize,20,0.5f,config.interpolate);
+				rand,config.numFerns,config.fernSize,20,0.5f,interpolate);
 
 		detection = new TldDetection<T>(fern,template,variance,config);
 		learning = new TldLearning<T>(rand,config,template,variance,fern,detection);
@@ -186,7 +190,7 @@ public class TldTracker<T extends ImageSingleBand, D extends ImageSingleBand> {
 		int rectWidth = (int)(targetRegion.getWidth()+0.5);
 		int rectHeight = (int)(targetRegion.getHeight()+0.5);
 
-		for( int scaleInt = -10; scaleInt <= 10; scaleInt++ ) {
+		for( int scaleInt = -config.scaleSpread; scaleInt <= config.scaleSpread; scaleInt++ ) {
 			// try several scales as specified in the paper
 			double scale = Math.pow(1.2,scaleInt);
 
@@ -410,7 +414,7 @@ public class TldTracker<T extends ImageSingleBand, D extends ImageSingleBand> {
 		return trackerRegion;
 	}
 
-	public TldConfig<T, D> getConfig() {
+	public TldParameters getConfig() {
 		return config;
 	}
 

@@ -44,6 +44,10 @@ public class CannyEdgeDynamic<T extends ImageSingleBand, D extends ImageSingleBa
 
 	@Override
 	protected void performThresholding(float threshLow, float threshHigh, ImageUInt8 output) {
+
+		if( threshLow < 0 || threshLow > 1 || threshHigh < 0 || threshHigh > 1 )
+			throw new IllegalArgumentException("Relative thresholds must be from 0 to 1, inclusive.");
+
 		// find the largest intensity value
 		float max = ImageStatistics.max(suppressed);
 

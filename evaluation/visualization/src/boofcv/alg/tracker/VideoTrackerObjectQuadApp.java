@@ -22,7 +22,6 @@ import boofcv.abst.tracker.ConfigCirculantTracker;
 import boofcv.abst.tracker.ConfigComaniciu2003;
 import boofcv.abst.tracker.TrackerObjectQuad;
 import boofcv.alg.tracker.sfot.SfotConfig;
-import boofcv.alg.tracker.tld.TldConfig;
 import boofcv.core.image.GConvertImage;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.tracker.FactoryTrackerObjectQuad;
@@ -112,7 +111,7 @@ public class VideoTrackerObjectQuadApp<I extends ImageSingleBand>
 	@Override
 	public void refreshAll(Object[] cookies) {
 		if( whichAlg == 0 )
-			tracker = FactoryTrackerObjectQuad.tld(new TldConfig(true, imageClass));
+			tracker = FactoryTrackerObjectQuad.tld(null,imageClass);
 		else if( whichAlg == 1 )
 			tracker = FactoryTrackerObjectQuad.sparseFlow(new SfotConfig(imageClass));
 		else if( whichAlg == 2 )

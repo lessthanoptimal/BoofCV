@@ -34,7 +34,7 @@ import boofcv.struct.image.ImageSingleBand;
 public class FactoryEdgeDetectors {
 
 	/**
-	 * Detects the edge of an object using the canny edge detector. THe output can be a binary image and/or a
+	 * Detects the edge of an object using the canny edge detector. The output can be a binary image and/or a
 	 * graph of connected contour points.
 	 *
 	 * @see CannyEdge

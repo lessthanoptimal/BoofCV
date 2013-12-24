@@ -37,9 +37,9 @@ public class Tld_to_TrackerObjectQuad<T extends ImageSingleBand, D extends Image
 	TldTracker<T,D> tracker;
 	ImageType<T> type;
 
-	public Tld_to_TrackerObjectQuad(TldTracker<T, D> tracker) {
+	public Tld_to_TrackerObjectQuad(TldTracker<T, D> tracker , Class<T> imageType ) {
 		this.tracker = tracker;
-		this.type = ImageType.single(tracker.getConfig().imageType);
+		this.type = ImageType.single(imageType);
 	}
 
 	@Override

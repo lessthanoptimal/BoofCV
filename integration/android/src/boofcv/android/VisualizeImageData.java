@@ -1,10 +1,15 @@
 package boofcv.android;
 
 import android.graphics.Bitmap;
+import boofcv.alg.feature.detect.edge.EdgeContour;
+import boofcv.alg.feature.detect.edge.EdgeSegment;
 import boofcv.alg.misc.ImageStatistics;
 import boofcv.struct.image.*;
+import georegression.struct.point.Point2D_I32;
 
 import java.nio.ByteBuffer;
+import java.util.Arrays;
+import java.util.List;
 
 import static boofcv.android.ConvertBitmap.declareStorage;
 
@@ -315,12 +320,11 @@ public class VisualizeImageData {
 	 * @param minValue Minimum possible disparity
 	 * @param maxValue Maximum possible disparity
 	 * @param invalidColor RGB value of an invalid pixel
-	 * @param output (Output) Bitmap ARGB_8888 image.  Can be null.
-	 * @param storage Optional working buffer for Bitmap image.
-	 * @return Colorized disparity image
+	 * @param output (Output) Bitmap ARGB_8888 image.
+	 * @param storage Optional working buffer for Bitmap image. Can be null.
 	 */
-	public static Bitmap disparity( ImageInteger disparity, int minValue, int maxValue,
-									int invalidColor, Bitmap output , byte[] storage ) {
+	public static void disparity( ImageInteger disparity, int minValue, int maxValue,
+								  int invalidColor, Bitmap output , byte[] storage ) {
 		shapeShape(disparity, output);
 
 		if( storage == null )
@@ -357,7 +361,6 @@ public class VisualizeImageData {
 		}
 
 		output.copyPixelsFromBuffer(ByteBuffer.wrap(storage));
-		return output;
 	}
 
 	/**
@@ -367,12 +370,11 @@ public class VisualizeImageData {
 	 * @param minValue Minimum possible disparity
 	 * @param maxValue Maximum possible disparity
 	 * @param invalidColor RGB value of an invalid pixel
-	 * @param output (Output) Bitmap ARGB_8888 image.  Can be null.
-	 * @param storage Optional working buffer for Bitmap image.
-	 * @return Colorized disparity image
+	 * @param output (Output) Bitmap ARGB_8888 image.
+	 * @param storage Optional working buffer for Bitmap image. Can be null.
 	 */
-	public static Bitmap disparity( ImageFloat32 disparity, int minValue, int maxValue,
-									int invalidColor, Bitmap output , byte[] storage ) {
+	public static void disparity( ImageFloat32 disparity, int minValue, int maxValue,
+								  int invalidColor, Bitmap output , byte[] storage ) {
 		shapeShape(disparity, output);
 
 		if( storage == null )
@@ -409,7 +411,91 @@ public class VisualizeImageData {
 		}
 
 		output.copyPixelsFromBuffer(ByteBuffer.wrap(storage));
-		return output;
+	}
+
+	/**
+	 * Draws each contour using a unique color.  Each segment of each edge is drawn using the same colors.
+	 *
+	 * @param contours List of edge contours
+	 * @param colors RGB color for each edge
+	 * @param output Where the output is written to
+	 * @param storage Optional working buffer for Bitmap image. Can be null.
+	 */
+	public static void drawEdgeContours( List<EdgeContour> contours , int colors[] , Bitmap output , byte[] storage ) {
+		if( output.getConfig() != Bitmap.Config.ARGB_8888 )
+			throw new IllegalArgumentException("Only ARGB_8888 is supported");
+
+		if( storage == null )
+			storage = declareStorage(output,null);
+		else
+			Arrays.fill(storage,(byte)0);
+
+		for( int i = 0; i < contours.size(); i++ ) {
+			EdgeContour e = contours.get(i);
+
+			int c = colors[i];
+
+			for( int j = 0; j < e.segments.size(); j++ ) {
+				EdgeSegment s = e.segments.get(j);
+
+				for( int k = 0; k < s.points.size(); k++ ) {
+					Point2D_I32 p = s.points.get(k);
+
+					int index = p.y*4*output.getWidth() + p.x*4;
+
+					storage[index++] = (byte)(c >> 16);
+					storage[index++] = (byte)(c >> 8);
+					storage[index++] = (byte)c;
+					storage[index]   = (byte)0xFF;
+				}
+			}
+		}
+
+		output.copyPixelsFromBuffer(ByteBuffer.wrap(storage));
+	}
+
+	/**
+	 * Draws each contour using a single color.
+	 *
+	 * @param contours List of edge contours
+	 * @param color The RGB color that each edge pixel should be drawn
+	 * @param output Where the output is written to
+	 * @param storage Optional working buffer for Bitmap image. Can be null.
+	 */
+	public static void drawEdgeContours( List<EdgeContour> contours , int color , Bitmap output , byte[] storage ) {
+		if( output.getConfig() != Bitmap.Config.ARGB_8888 )
+			throw new IllegalArgumentException("Only ARGB_8888 is supported");
+
+		if( storage == null )
+			storage = declareStorage(output,null);
+		else
+			Arrays.fill(storage,(byte)0);
+
+		byte r = (byte)((color >> 16) & 0xFF);
+		byte g = (byte)((color >> 8) & 0xFF);
+		byte b = (byte)( color );
+
+
+		for( int i = 0; i < contours.size(); i++ ) {
+			EdgeContour e = contours.get(i);
+
+			for( int j = 0; j < e.segments.size(); j++ ) {
+				EdgeSegment s = e.segments.get(j);
+
+				for( int k = 0; k < s.points.size(); k++ ) {
+					Point2D_I32 p = s.points.get(k);
+
+					int index = p.y*4*output.getWidth() + p.x*4;
+
+					storage[index++] = b;
+					storage[index++] = g;
+					storage[index++] = r;
+					storage[index]   = (byte)0xFF;
+				}
+			}
+		}
+
+		output.copyPixelsFromBuffer(ByteBuffer.wrap(storage));
 	}
 
 	private static void shapeShape(ImageBase input, Bitmap output) {
