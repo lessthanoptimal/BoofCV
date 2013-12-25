@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.examples.shapes;
+package boofcv.examples.features;
 
 import boofcv.alg.feature.detect.edge.CannyEdge;
 import boofcv.alg.feature.detect.edge.EdgeContour;

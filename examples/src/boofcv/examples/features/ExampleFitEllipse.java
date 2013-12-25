@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.examples.shapes;
+package boofcv.examples.features;
 
 import boofcv.alg.feature.shapes.FitData;
 import boofcv.alg.feature.shapes.ShapeFittingOps;
