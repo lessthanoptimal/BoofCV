@@ -3,7 +3,7 @@ Change Log
 Date Format: year/month/day
 
 ---------------------------------------------
-Date    : 2013
+Date    : 2013/12/25
 Version : Alpha 0.16
 
 - Simplified DescribeRegionPoint
