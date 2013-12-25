@@ -25,7 +25,6 @@ import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_F64;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
@@ -113,8 +112,8 @@ public class TldLearning<T extends ImageSingleBand> {
 		}
 
 		// randomize which regions are used
-		Collections.shuffle(fernNegative,rand);
-		int N = Math.min(config.numNegativeFerns,fernNegative.size());
+//		Collections.shuffle(fernNegative,rand);
+		int N = fernNegative.size();//Math.min(config.numNegativeFerns,fernNegative.size());
 
 		for( int i = 0; i < N; i++ ) {
 			fern.learnFern(false, fernNegative.get(i) );
