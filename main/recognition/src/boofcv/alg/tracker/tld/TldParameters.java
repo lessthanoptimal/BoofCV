@@ -73,6 +73,11 @@ public class TldParameters {
 	public double regionConnect = 0.5;
 
 	/**
+	 * If two regions have an overlap more than or equal to this value they are considered to be strongly connected
+	 */
+	public double overlapUpper = 0.8;
+
+	/**
 	 * If two regions have an overlap less than this value they are considered to be disconnected
 	 */
 	public double overlapLower = 0.2;
