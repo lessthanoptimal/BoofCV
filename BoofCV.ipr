@@ -6,6 +6,7 @@
     <buildFile url="file://$PROJECT_DIR$/../georegression/build.xml" />
     <buildFile url="file://$PROJECT_DIR$/../ddogleg/build.xml" />
     <buildFile url="file://$PROJECT_DIR$/../ejml/trunk/build.xml" />
+    <buildFile url="file://$PROJECT_DIR$/integration/applet/build.xml" />
   </component>
   <component name="CompilerConfiguration">
     <option name="DEFAULT_COMPILER" value="Javac" />

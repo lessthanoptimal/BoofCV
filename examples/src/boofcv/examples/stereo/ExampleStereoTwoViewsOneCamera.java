@@ -75,8 +75,8 @@ import java.util.List;
 public class ExampleStereoTwoViewsOneCamera {
 
 	// Disparity calculation parameters
-	private static final int minDisparity = 30;
-	private static final int maxDisparity = 160;
+	private static final int minDisparity = 15;
+	private static final int maxDisparity = 100;
 
 	public static void main(String args[]) {
 		// specify location of images and calibration
@@ -88,8 +88,7 @@ public class ExampleStereoTwoViewsOneCamera {
 
 		// Input images from the camera moving left to right
 		BufferedImage origLeft = UtilImageIO.loadImage(imageDir + "mono_wall_01.jpg");
-//		BufferedImage origRight = UtilImageIO.loadImage(imageDir+"mono_wall_02.jpg");
-		BufferedImage origRight = UtilImageIO.loadImage(imageDir + "mono_wall_03.jpg");
+		BufferedImage origRight = UtilImageIO.loadImage(imageDir+"mono_wall_02.jpg");
 
 		// Input images with lens distortion
 		ImageUInt8 distortedLeft = ConvertBufferedImage.convertFrom(origLeft, (ImageUInt8) null);
