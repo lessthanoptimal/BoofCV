@@ -106,17 +106,21 @@ public class TldLearning<T extends ImageSingleBand> {
 
 			// learn features far away from the target region
 			double overlap = helper.computeOverlap(targetRegion_I32, r);
-			if( overlap > config.overlapLower )
+			if( overlap >= config.overlapUpper ) {
+				template.addDescriptor(true, r);
+				fern.learnFernNoise(true, r);
+				continue;
+			} else if( overlap > config.overlapLower )
 				continue;
 
 			fernNegative.add(r);
 		}
 
 		// randomize which regions are used
-		Collections.shuffle(fernNegative,rand);
-		int N = Math.min(config.numNegativeFerns,fernNegative.size());
+//		Collections.shuffle(fernNegative,rand);
+//		int N = Math.min(config.numNegativeFerns,fernNegative.size());
 
-		for( int i = 0; i < N; i++ ) {
+		for( int i = 0; i < fernNegative.size(); i++ ) {
 			fern.learnFern(false, fernNegative.get(i) );
 		}
 
