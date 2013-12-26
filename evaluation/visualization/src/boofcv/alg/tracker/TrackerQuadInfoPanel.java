@@ -40,6 +40,8 @@ public class TrackerQuadInfoPanel extends StandardAlgConfigPanel implements Acti
 
 	JButton buttonSelect;
 
+	JButton buttonReset;
+
 	Listener listener;
 
 	public TrackerQuadInfoPanel( Listener listener ) {
@@ -57,11 +59,15 @@ public class TrackerQuadInfoPanel extends StandardAlgConfigPanel implements Acti
 		buttonSelect = new JButton("Select");
 		buttonSelect.addActionListener(this);
 
+		buttonReset = new JButton("Reset");
+		buttonReset.addActionListener(this);
+
 		addLabeledV(displayFPS,"Algorithm FPS:",this);
 		addLabeledV(displayTracking, "Tracking:", this);
 		addSeparator(200);
 		add(buttonPlay);
 		addAlignCenter(buttonPlay, this);
+		addAlignCenter(buttonReset, this);
 		addSeparator(200);
 		addAlignCenter(buttonSelect, this);
 	}
@@ -95,6 +101,8 @@ public class TrackerQuadInfoPanel extends StandardAlgConfigPanel implements Acti
 			listener.togglePause();
 		} else if( e.getSource() == buttonSelect ) {
 			listener.selectTarget();
+		} else if( e.getSource() == buttonReset ) {
+			listener.resetVideo();
 		}
 	}
 
@@ -102,5 +110,7 @@ public class TrackerQuadInfoPanel extends StandardAlgConfigPanel implements Acti
 		public void togglePause();
 
 		public void selectTarget();
+
+		public void resetVideo();
 	}
 }

@@ -96,6 +96,7 @@ public class TldDetection<T extends ImageSingleBand> {
 
 		// initialize data structures
 		success = false;
+		ambiguous = false;
 		best = null;
 		candidateDetections.reset();
 		localMaximums.reset();
@@ -137,8 +138,7 @@ public class TldDetection<T extends ImageSingleBand> {
 		if( totalN > 0x0fffffff)
 			fern.renormalizeN();
 
-
-		// Slect the ferns with the highest likelihood
+		// Select the ferns with the highest likelihood
 		selectBestRegionsFern(totalP, totalN);
 
 		// From the remaining regions, score using the template algorithm
@@ -152,19 +152,24 @@ public class TldDetection<T extends ImageSingleBand> {
 		nonmax.process(candidateDetections, localMaximums);
 
 		best = selectBest();
-		ambiguous = checkAmbiguous(best);
+		if( best != null ) {
+			ambiguous = checkAmbiguous(best);
 
-		success = true;
+			success = true;
+		}
 	}
 
 	/**
 	 * Computes the confidence for all the regions which pass the fern test
 	 */
 	protected void computeTemplateConfidence() {
+		double max = 0;
 		for( int i = 0; i < fernRegions.size(); i++ ) {
 			ImageRectangle region = fernRegions.get(i);
 
 			double confidence = template.computeConfidence(region);
+
+			max = Math.max(max,confidence);
 
 			if( confidence < config.confidenceThresholdUpper)
 				continue;

@@ -115,7 +115,7 @@ public class VisualizeCirculantTrackerApp<T extends ImageSingleBand>
 	public static void main( String args[] ) {
 		VisualizeCirculantTrackerApp app = new VisualizeCirculantTrackerApp<ImageUInt8>(ImageUInt8.class);
 
-//		String fileName = "../data/applet/trackzing/track_peter.mjpeg";
+//		String fileName = "../data/applet/tracking/track_peter.mjpeg";
 		String fileName = "../data/applet/tracking/day_follow_car.mjpeg";
 
 		SimpleImageSequence<ImageUInt8> sequence = DefaultMediaManager.INSTANCE.

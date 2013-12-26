@@ -222,6 +222,15 @@ public class VideoTrackerObjectQuadApp<I extends ImageSingleBand>
 	}
 
 	@Override
+	public void resetVideo() {
+		stopWorker();
+
+		sequence.reset();
+
+		refreshAll(null);
+	}
+
+	@Override
 	public void changeInput(String name, int index) {
 		processedInputImage = false;
 
@@ -288,6 +297,9 @@ public class VideoTrackerObjectQuadApp<I extends ImageSingleBand>
 		Class type = ImageUInt8.class;
 
 		VideoTrackerObjectQuadApp app = new VideoTrackerObjectQuadApp(type);
+
+//		app.setBaseDirectory("../data/applet/");
+//		app.loadInputData("../data/applet/tracking/file_list.txt");
 
 		java.util.List<PathLabel> inputs = new ArrayList<PathLabel>();
 		inputs.add(new PathLabel("WildCat", "../data/applet/tracking/wildcat_robot.mjpeg"));

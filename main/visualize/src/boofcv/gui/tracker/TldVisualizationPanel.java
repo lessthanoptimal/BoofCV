@@ -142,7 +142,6 @@ public class TldVisualizationPanel extends JPanel implements MouseListener{
 		}
 	}
 
-
 	private void drawRectangle(Graphics2D g2 , ImageRectangle r , Color c , int size) {
 		g2.setColor(c);
 		g2.setStroke(new BasicStroke(size));
@@ -151,6 +150,10 @@ public class TldVisualizationPanel extends JPanel implements MouseListener{
 		g2.drawLine(r.x1,r.y0,r.x1,r.y1);
 		g2.drawLine(r.x1,r.y1,r.x0,r.y1);
 		g2.drawLine(r.x0,r.y1,r.x0,r.y0);
+	}
+
+	public void turnOffSelect() {
+		numClicks = 2;
 	}
 
 	@Override
@@ -163,6 +166,7 @@ public class TldVisualizationPanel extends JPanel implements MouseListener{
 			selected.y1 = e.getY();
 			hasSelected = true;
 			listener.startTracking(selected.x0,selected.y0,selected.x1,selected.y1);
+			System.out.println("Selected = "+selected);
 		} else {
 			listener.togglePause();
 		}
