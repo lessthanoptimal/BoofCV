@@ -28,7 +28,9 @@ import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.gui.image.ShowImages;
 import boofcv.gui.tracker.TldVisualizationPanel;
 import boofcv.io.image.SimpleImageSequence;
+import boofcv.io.wrapper.DefaultMediaManager;
 import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageType;
 import boofcv.struct.image.ImageUInt8;
 import georegression.struct.shapes.RectangleCorner2D_F64;
 
@@ -68,7 +70,8 @@ public class VisualizeTldTrackerApp<T extends ImageSingleBand,D extends ImageSin
 		gui.setFrame((BufferedImage) sequence.getGuiImage());
 		ShowImages.showWindow(gui,"TLD Tracker");
 
-//		tracker.initialize(image,77,203,77+51,203+83);
+//		tracker.initialize(image,274,159,356,292);
+//		gui.turnOffSelect();
 
 		paused = true;
 
@@ -124,12 +127,11 @@ public class VisualizeTldTrackerApp<T extends ImageSingleBand,D extends ImageSin
 	public static void main( String args[] ) {
 		VisualizeTldTrackerApp app = new VisualizeTldTrackerApp(ImageUInt8.class);
 
-//		String fileName = "/home/pja/Downloads/multi_face_turning/motinas_multi_face_turning.avi";
-		String fileName = "/home/pja/Downloads/david_indoor/david_indoor.avi";
+		String fileName = "../data/applet/tracking/track_book.mjpeg";
 
-//		SimpleImageSequence<ImageUInt8> sequence =
-//				new XugglerSimplified<ImageUInt8>(fileName, ImageDataType.single(ImageUInt8.class));
-//
-//		app.process(sequence);
+		SimpleImageSequence<ImageUInt8> sequence =
+				DefaultMediaManager.INSTANCE.openVideo(fileName,ImageType.single(ImageUInt8.class));
+
+		app.process(sequence);
 	}
 }
