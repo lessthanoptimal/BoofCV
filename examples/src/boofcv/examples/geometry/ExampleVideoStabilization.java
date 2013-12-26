@@ -97,7 +97,7 @@ public class ExampleVideoStabilization {
 		while( video.hasNext() ) {
 			stabilize.process(video.next());
 
-			// display the mosaic
+			// display the stabilized image
 			ConvertBufferedImage.convertTo(frame,gui.getImage(0, 0),true);
 			ConvertBufferedImage.convertTo(stabilize.getStitchedImage(), gui.getImage(0, 1),true);
 

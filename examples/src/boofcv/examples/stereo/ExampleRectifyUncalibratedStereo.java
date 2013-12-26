@@ -64,17 +64,17 @@ public class ExampleRectifyUncalibratedStereo {
 	 */
 	public static void rectify( DenseMatrix64F F , List<AssociatedPair> inliers ,
 								BufferedImage origLeft , BufferedImage origRight ) {
-		// distorted images
-		MultiSpectral<ImageFloat32> distLeft =
+		// Unrectified images
+		MultiSpectral<ImageFloat32> unrectLeft =
 				ConvertBufferedImage.convertFromMulti(origLeft, null,true, ImageFloat32.class);
-		MultiSpectral<ImageFloat32> distRight =
+		MultiSpectral<ImageFloat32> unrectRight =
 				ConvertBufferedImage.convertFromMulti(origRight, null,true, ImageFloat32.class);
 
 		// storage for rectified images
 		MultiSpectral<ImageFloat32> rectLeft = new MultiSpectral<ImageFloat32>(ImageFloat32.class,
-				distLeft.getWidth(),distLeft.getHeight(),distLeft.getNumBands());
+				unrectLeft.getWidth(),unrectLeft.getHeight(),unrectLeft.getNumBands());
 		MultiSpectral<ImageFloat32> rectRight = new MultiSpectral<ImageFloat32>(ImageFloat32.class,
-				distRight.getWidth(),distRight.getHeight(),distRight.getNumBands());
+				unrectRight.getWidth(),unrectRight.getHeight(),unrectRight.getNumBands());
 
 		// Compute rectification
 		RectifyFundamental rectifyAlg = RectifyImageOps.createUncalibrated();
@@ -95,8 +95,8 @@ public class ExampleRectifyUncalibratedStereo {
 		ImageDistort<ImageFloat32> imageDistortRight =
 				RectifyImageOps.rectifyImage(rect2,ImageFloat32.class);
 
-		DistortImageOps.distortMS(distLeft, rectLeft, imageDistortLeft);
-		DistortImageOps.distortMS(distRight, rectRight, imageDistortRight);
+		DistortImageOps.distortMS(unrectLeft, rectLeft, imageDistortLeft);
+		DistortImageOps.distortMS(unrectRight, rectRight, imageDistortRight);
 
 		// convert for output
 		BufferedImage outLeft = ConvertBufferedImage.convertTo(rectLeft,null,true);
@@ -109,10 +109,11 @@ public class ExampleRectifyUncalibratedStereo {
 
 	public static void main( String args[] ) {
 
-		// load images with lens distortion removed
+		// Load images with lens distortion removed.  If lens distortion has not been
+		// removed then the results will be approximate
 		String dir = "../data/applet/stereo/";
-		BufferedImage imageA = UtilImageIO.loadImage(dir + "mono_wall_01.jpg");
-		BufferedImage imageB = UtilImageIO.loadImage(dir + "mono_wall_03.jpg");
+		BufferedImage imageA = UtilImageIO.loadImage(dir + "mono_wall_01_undist.jpg");
+		BufferedImage imageB = UtilImageIO.loadImage(dir + "mono_wall_03_undist.jpg");
 
 		// Find a set of point feature matches
 		List<AssociatedPair> matches = ExampleFundamentalMatrix.computeMatches(imageA, imageB);

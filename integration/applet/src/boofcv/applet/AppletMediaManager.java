@@ -26,6 +26,7 @@ import boofcv.io.wrapper.images.ImageStreamSequence;
 import boofcv.io.wrapper.images.JpegByteImageSequence;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageDataType;
+import boofcv.struct.image.ImageType;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -92,7 +93,7 @@ public class AppletMediaManager implements MediaManager {
 	}
 
 	@Override
-	public <T extends ImageBase> SimpleImageSequence<T> openVideo(String fileName, ImageDataType<T> imageType) {
+	public <T extends ImageBase> SimpleImageSequence<T> openVideo(String fileName, ImageType<T> imageType) {
 
 		int where = fileName.indexOf('.');
 
