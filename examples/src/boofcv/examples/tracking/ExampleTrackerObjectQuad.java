@@ -59,7 +59,7 @@ public class ExampleTrackerObjectQuad {
 		TrackerObjectQuad<ImageUInt8> tracker =
 				FactoryTrackerObjectQuad.circulant(new ConfigCirculantTracker(), ImageUInt8.class);
 //				FactoryTrackerObjectQuad.sparseFlow(new SfotConfig<ImageUInt8, ImageUInt16>(ImageUInt8.class));
-//				FactoryTrackerObjectQuad.tld(new TldConfig<ImageUInt8, ImageUInt16>(true,ImageUInt8.class));
+//				FactoryTrackerObjectQuad.tld(null,ImageUInt8.class);
 
 		// specify the target's initial location and initialize with the first frame
 		Quadrilateral_F64 location = new Quadrilateral_F64(276,159,362,163,358,292,273,289);
