@@ -32,9 +32,7 @@ https://docs.sonatype.org/display/Repository/Sonatype+OSS+Maven+Repository+Usage
 - mvn source:jar
 - mvn gpg:sign-and-deploy-file -Durl=https://oss.sonatype.org/service/local/staging/deploy/maven2/ -DrepositoryId=sonatype-nexus-staging -DpomFile=pom.xml -Dfile=target/boofcv-XX.jar
 - mvn gpg:sign-and-deploy-file -Durl=https://oss.sonatype.org/service/local/staging/deploy/maven2/ -DrepositoryId=sonatype-nexus-staging -DpomFile=pom.xml -Dfile=target/boofcv-XX-sources.jar -Dclassifier=sources
-ant javadoc
-mv docs/javadoc.jar boofcv-XX-javadoc.jar
-- mvn gpg:sign-and-deploy-file -Durl=https://oss.sonatype.org/service/local/staging/deploy/maven2/ -DrepositoryId=sonatype-nexus-staging -DpomFile=pom.xml -Dfile=boofcv-XX-javadoc.jar -Dclassifier=javadoc
+- mvn gpg:sign-and-deploy-file -Durl=https://oss.sonatype.org/service/local/staging/deploy/maven2/ -DrepositoryId=sonatype-nexus-staging -DpomFile=pom.xml -Dfile=target/boofcv-XX-javadoc.jar -Dclassifier=javadoc
 - Then go to the website  https://oss.sonatype.org/
   * click close button
   * double check the files
