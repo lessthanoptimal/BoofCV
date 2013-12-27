@@ -1,66 +1,36 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
+
+  <name>BoofCV</name>
   <groupId>org.boofcv</groupId>
   <artifactId>boofcv</artifactId>
-  <packaging>pom</packaging>
   <version>0.16</version>
-  <name>BoofCV</name>
+  <packaging>pom</packaging>
   <url>http://boofcv.org</url>
-  <description>BoofCV is an open source Java library for real-time computer vision and robotics applications.
-  </description>
+  <description>BoofCV is an open source Java library for real-time computer vision and robotics applications.</description>
 
-  <dependencies>
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>com.googlecode.efficient-java-matrix-library</groupId>
+        <artifactId>ejml</artifactId>
+        <version>0.24</version>
+      </dependency>
 
-    <dependency>
-      <groupId>org.boofcv</groupId>
-      <artifactId>ip</artifactId>
-      <version>0.16</version>
-    </dependency>
+      <dependency>
+        <groupId>org.georegression</groupId>
+        <artifactId>georegression</artifactId>
+        <version>0.5</version>
+      </dependency>
 
-    <dependency>
-      <groupId>org.boofcv</groupId>
-      <artifactId>io</artifactId>
-      <version>0.16</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.boofcv</groupId>
-      <artifactId>feature</artifactId>
-      <version>0.16</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.boofcv</groupId>
-      <artifactId>geo</artifactId>
-      <version>0.16</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.boofcv</groupId>
-      <artifactId>calibration</artifactId>
-      <version>0.16</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.boofcv</groupId>
-      <artifactId>sfm</artifactId>
-      <version>0.16</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.boofcv</groupId>
-      <artifactId>recognition</artifactId>
-      <version>0.16</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.boofcv</groupId>
-      <artifactId>visualize</artifactId>
-      <version>0.16</version>
-    </dependency>
-
-  </dependencies>
+      <dependency>
+        <groupId>org.ddogleg</groupId>
+        <artifactId>ddogleg</artifactId>
+        <version>0.4</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
 
   <modules>
     <module>ip</module>

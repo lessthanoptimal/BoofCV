@@ -8,40 +8,6 @@
   <name>BoofCV Integration</name>
   <url>http://boofcv.org</url>
 
-  <dependencies>
-
-    <!--<dependency>-->
-      <!--<groupId>org.boofcv</groupId>-->
-      <!--<artifactId>android</artifactId>-->
-      <!--<version>0.16</version>-->
-    <!--</dependency>-->
-
-    <!--<dependency>-->
-      <!--<groupId>org.boofcv</groupId>-->
-      <!--<artifactId>jcodec</artifactId>-->
-      <!--<version>0.16</version>-->
-    <!--</dependency>-->
-
-    <!--<dependency>-->
-      <!--<groupId>org.boofcv</groupId>-->
-      <!--<artifactId>openkinect</artifactId>-->
-      <!--<version>0.16</version>-->
-    <!--</dependency>-->
-
-    <dependency>
-      <groupId>org.boofcv</groupId>
-      <artifactId>xuggler</artifactId>
-      <version>0.16</version>
-    </dependency>
-
-    <!--<dependency>-->
-      <!--<groupId>org.boofcv</groupId>-->
-      <!--<artifactId>v4l4j</artifactId>-->
-      <!--<version>0.16</version>-->
-    <!--</dependency>-->
-
-  </dependencies>
-
   <modules>
     <!--<module>jcodec</module>-->
     <!--<module>openkinect</module>-->
