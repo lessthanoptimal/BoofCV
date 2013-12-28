@@ -101,8 +101,6 @@ Version : Alpha 0.16
 - Improved Maven support by breaking it up into multiple modules
 - Fixed bug in UtilWavelet for integer images.  X and Y got reversed in for loop
 
-- TODO remove sparse flow if its performance doesn't improve
-
 ---------------------------------------------
 Date    : 2013/06/21
 Version : Alpha 0.15
