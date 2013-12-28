@@ -433,10 +433,14 @@
       <module fileurl="file://$PROJECT_DIR$/../georegression/GeoRegression.iml" filepath="$PROJECT_DIR$/../georegression/GeoRegression.iml" />
       <module fileurl="file://$PROJECT_DIR$/../VisionTools/VisionTools.iml" filepath="$PROJECT_DIR$/../VisionTools/VisionTools.iml" />
       <module fileurl="file://$PROJECT_DIR$/../ejml/trunk/ejml.iml" filepath="$PROJECT_DIR$/../ejml/trunk/ejml.iml" />
+      <module fileurl="file://$PROJECT_DIR$/main/python/python.iml" filepath="$PROJECT_DIR$/main/python/python.iml" />
     </modules>
   </component>
   <component name="ProjectRootManager" version="2" languageLevel="JDK_1_6" assert-keyword="true" jdk-15="true" project-jdk-name="1.6 (64bit)" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/out" />
+  </component>
+  <component name="PyDocumentationSettings">
+    <option name="myDocStringFormat" value="Epytext" />
   </component>
   <component name="SvnBranchConfigurationManager">
     <option name="myConfigurationMap">
@@ -451,6 +455,10 @@
       </map>
     </option>
     <option name="mySupportsUserInfoFilter" value="true" />
+  </component>
+  <component name="TestRunnerService">
+    <option name="projectConfiguration" value="Nosetests" />
+    <option name="PROJECT_TEST_RUNNER" value="Nosetests" />
   </component>
   <component name="VcsDirectoryMappings">
     <mapping directory="" vcs="Git" />
