@@ -19,6 +19,12 @@ os.system("mvn package")
 os.system("mvn javadoc:jar")
 os.system("mvn source:jar")
 
+strMvnSignDeploy = 'mvn gpg:sign-and-deploy-file -Durl=https://oss.sonatype.org/service/local/staging/deploy/maven2/ ' \
+                   '-DrepositoryId=sonatype-nexus-staging -DpomFile=pom.xml '
+
+
+os.system(strMvnSignDeploy+' -Dfile=pom.xml')
+
 def formatMvn(module):
     # get the jar which contains the java byte code.  it's format is known
     binjar = fnmatch.filter(os.listdir('target'),"*[0-9].jar")[0]
@@ -30,8 +36,7 @@ def formatMvn(module):
     docjar = module+'-'+version+'-javadoc.jar'
     srcjar = module+'-'+version+'-sources.jar'
 
-    r = 'mvn gpg:sign-and-deploy-file -Durl=https://oss.sonatype.org/service/local/staging/deploy/maven2/ -DrepositoryId=sonatype-nexus-staging -DpomFile=pom.xml '
-    r = r + '-Dfile=target/'+binjar+' '
+    r = strMvnSignDeploy + '-Dfile=target/'+binjar+' '
     r = r + '-Dfiles=target/'+docjar+',target/'+srcjar+' -Dclassifiers=javadoc,sources -Dtypes=jar,jar'
     return r
 

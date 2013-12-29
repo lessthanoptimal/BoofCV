@@ -17,23 +17,13 @@
 -----
 Maven
 
-SNAPSHOT
+Update Version:
+  * Change in parent pom.xml
+  * mvn -N versions:update-child-modules
 
-- Change version to v.11-SNAPSHOT
-mvn clean deploy
+Post a SNAPSHOT:
+  mvn clean deploy
 
 Full Release
-https://docs.sonatype.org/display/Repository/Sonatype+OSS+Maven+Repository+Usage+Guide
-
-- change version in pom.xml
-- rm -rf target
-- mvn package
-- mvn javadoc:jar
-- mvn source:jar
-- mvn gpg:sign-and-deploy-file -Durl=https://oss.sonatype.org/service/local/staging/deploy/maven2/ -DrepositoryId=sonatype-nexus-staging -DpomFile=pom.xml -Dfile=target/boofcv-XX.jar
-- mvn gpg:sign-and-deploy-file -Durl=https://oss.sonatype.org/service/local/staging/deploy/maven2/ -DrepositoryId=sonatype-nexus-staging -DpomFile=pom.xml -Dfile=target/boofcv-XX-sources.jar -Dclassifier=sources
-- mvn gpg:sign-and-deploy-file -Durl=https://oss.sonatype.org/service/local/staging/deploy/maven2/ -DrepositoryId=sonatype-nexus-staging -DpomFile=pom.xml -Dfile=target/boofcv-XX-javadoc.jar -Dclassifier=javadoc
-- Then go to the website  https://oss.sonatype.org/
-  * click close button
-  * double check the files
-  * click release button
+  * ./python/src/packagemvn.py
+  * type password a lot
