@@ -9,7 +9,7 @@
   <parent>
     <groupId>org.boofcv</groupId>
     <artifactId>boofcv</artifactId>
-    <version>0.16</version>
+    <version>0.17-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
 

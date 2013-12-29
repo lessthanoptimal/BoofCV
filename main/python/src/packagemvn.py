@@ -16,6 +16,7 @@ for m in modules:
 
 os.system("mvn clean")
 os.system("mvn package")
+os.system("mvn install")
 os.system("mvn javadoc:jar")
 os.system("mvn source:jar")
 
@@ -40,6 +41,25 @@ def formatMvn(module):
     r = r + '-Dfiles=target/'+docjar+',target/'+srcjar+' -Dclassifiers=javadoc,sources -Dtypes=jar,jar'
     return r
 
+for m in modules:
+    os.chdir(m)
+
+    mvncmd = formatMvn(m)
+    os.system(mvncmd)
+
+    os.chdir("..")
+
+# Install the integration jars
+os.chdir("../integration")
+
+os.system("mvn clean")
+os.system("mvn package")
+os.system("mvn javadoc:jar")
+os.system("mvn source:jar")
+
+modules = ["xuggler"]
+
+os.system(strMvnSignDeploy+' -Dfile=pom.xml')
 for m in modules:
     os.chdir(m)
 

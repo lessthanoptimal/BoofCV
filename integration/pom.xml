@@ -4,7 +4,7 @@
   <groupId>org.boofcv</groupId>
   <artifactId>boofcv-integration</artifactId>
   <packaging>pom</packaging>
-  <version>0.16</version>
+  <version>0.17-SNAPSHOT</version>
   <name>BoofCV Integration</name>
   <url>http://boofcv.org</url>
 

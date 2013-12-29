@@ -4,7 +4,7 @@
   <name>BoofCV</name>
   <groupId>org.boofcv</groupId>
   <artifactId>boofcv</artifactId>
-  <version>0.16</version>
+  <version>0.17-SNAPSHOT</version>
   <packaging>pom</packaging>
   <url>http://boofcv.org</url>
   <description>BoofCV is an open source Java library for real-time computer vision and robotics applications.</description>
