@@ -27,3 +27,7 @@ Post a SNAPSHOT:
 Full Release
   * ./python/src/packagemvn.py
   * type password a lot
+
+Log onto oss.sonatype.org
+Make sure all the modules are there.
+Promote
