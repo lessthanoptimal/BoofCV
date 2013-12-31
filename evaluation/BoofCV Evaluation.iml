@@ -25,7 +25,6 @@
     <orderEntry type="module" module-name="BoofCV Visualize" />
     <orderEntry type="module" module-name="BoofCV Calibration" />
     <orderEntry type="module" module-name="BoofCV SFM" />
-    <orderEntry type="module" module-name="BoofCV Xuggler" />
     <orderEntry type="module" module-name="DDogleg" />
     <orderEntry type="module" module-name="BoofCV Recognition" />
   </component>

@@ -45,7 +45,7 @@ import java.util.ArrayList;
  * @author Peter Abeles
  */
 // todo extract out base class for handling videos
-public class VideoTrackFeaturesApp<I extends ImageSingleBand, D extends ImageSingleBand>
+public class VideoTrackerPointFeaturesApp<I extends ImageSingleBand, D extends ImageSingleBand>
 		extends VideoProcessAppBase<I> implements MouseListener
 {
 
@@ -58,7 +58,7 @@ public class VideoTrackFeaturesApp<I extends ImageSingleBand, D extends ImageSin
 
 	BufferedImage workImage;
 
-	public VideoTrackFeaturesApp( Class<I> imageType , Class<D> derivType ) {
+	public VideoTrackerPointFeaturesApp(Class<I> imageType, Class<D> derivType) {
 		super(1,imageType);
 
 		PkltConfig config = new PkltConfig();
@@ -179,7 +179,7 @@ public class VideoTrackFeaturesApp<I extends ImageSingleBand, D extends ImageSin
 //		Class imageType = ImageUInt8.class;
 //		Class derivType = ImageSInt16.class;
 
-		VideoTrackFeaturesApp app = new VideoTrackFeaturesApp(imageType, derivType);
+		VideoTrackerPointFeaturesApp app = new VideoTrackerPointFeaturesApp(imageType, derivType);
 
 		java.util.List<PathLabel> inputs = new ArrayList<PathLabel>();
 		inputs.add(new PathLabel("Shake", "../data/applet/shake.mjpeg"));
