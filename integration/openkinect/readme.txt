@@ -10,6 +10,8 @@ https://maven.java.net/content/repositories/releases/net/java/dev/jna/platform/3
 
 You will also need to checkout libfreenect:  https://github.com/OpenKinect/libfreenect
 
+git clone https://github.com/OpenKinect/libfreenect.git libfreenect
+
 Compiling and running example code with ant:
 
 ant

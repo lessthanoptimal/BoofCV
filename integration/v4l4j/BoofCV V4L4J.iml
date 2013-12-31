@@ -8,18 +8,16 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="BoofCV IO" />
+    <orderEntry type="module" module-name="BoofCV Image Processing" />
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/v4l4j-0.9.0/v4l4j.jar!/" />
+          <root url="jar://$MODULE_DIR$/v4l4j-0.9.1/v4l4j.jar!/" />
         </CLASSES>
         <JAVADOC />
-        <SOURCES>
-          <root url="file://$MODULE_DIR$/v4l4j-0.9.0/src" />
-        </SOURCES>
+        <SOURCES />
       </library>
     </orderEntry>
-    <orderEntry type="module" module-name="BoofCV Image Processing" />
   </component>
 </module>
 

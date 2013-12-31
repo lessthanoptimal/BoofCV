@@ -18,10 +18,7 @@
 
 package boofcv.alg.tracker;
 
-import boofcv.abst.tracker.ConfigCirculantTracker;
-import boofcv.abst.tracker.ConfigComaniciu2003;
-import boofcv.abst.tracker.ConfigTld;
-import boofcv.abst.tracker.TrackerObjectQuad;
+import boofcv.abst.tracker.*;
 import boofcv.alg.tracker.sfot.SfotConfig;
 import boofcv.core.image.GConvertImage;
 import boofcv.core.image.GeneralizedImageOps;
@@ -79,11 +76,12 @@ public class VideoTrackerObjectQuadApp<I extends ImageSingleBand>
 
 		gray = GeneralizedImageOps.createSingleBand(imageType,1,1);
 
-		addAlgorithm(0, "Ciruclant", 0);
+		addAlgorithm(0, "Circulant", 0);
 		addAlgorithm(0, "TLD", 1);
-		addAlgorithm(0, "Mean Shift Fixed", 2);
-		addAlgorithm(0, "Mean Shift Scale", 3);
-		addAlgorithm(0, "Sparse Flow", 4);
+		addAlgorithm(0, "Mean-Shift Region Fixed", 2);
+		addAlgorithm(0, "Mean-Shift Region Scale", 3);
+		addAlgorithm(0, "Mean-Shift Pixel", 4);
+		addAlgorithm(0, "Sparse Flow Tracker", 5);
 
 		videoPanel = new TrackerObjectQuadPanel(this);
 		infoBar = new TrackerQuadInfoPanel(this);
@@ -124,6 +122,8 @@ public class VideoTrackerObjectQuadApp<I extends ImageSingleBand>
 			config.scaleChange = 0.05f;
 			tracker = FactoryTrackerObjectQuad.meanShiftComaniciu2003(config,imageType);
 		} else if( whichAlg == 4 ) {
+			tracker = FactoryTrackerObjectQuad.meanShiftLikelihood(30, 5, 256, MeanShiftLikelihoodType.HISTOGRAM, imageType);
+		} else if( whichAlg == 5 ) {
 			tracker = FactoryTrackerObjectQuad.sparseFlow(new SfotConfig(imageClass));
 		} else
 			throw new RuntimeException("Unknown algorithm");
