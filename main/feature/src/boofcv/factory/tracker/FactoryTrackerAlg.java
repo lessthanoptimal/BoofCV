@@ -53,6 +53,9 @@ public class FactoryTrackerAlg {
 	public static <I extends ImageSingleBand, D extends ImageSingleBand>
 	KltTracker<I, D> klt( KltConfig config, Class<I> imageType , Class<D> derivType )
 	{
+		if( config == null )
+			config = new KltConfig();
+
 		InterpolateRectangle<I> interpInput = FactoryInterpolation.<I>bilinearRectangle(imageType);
 		InterpolateRectangle<D> interpDeriv = FactoryInterpolation.<D>bilinearRectangle(derivType);
 

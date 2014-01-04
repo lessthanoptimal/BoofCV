@@ -42,9 +42,9 @@ public class FactoryPyramid {
 	 * prior to sub-sampling.
 	 *
 	 * @param imageType Type of input image.
-	 * @param sigma Gaussian sigma.  If < 0 then a sigma is selected using the radius.
-	 * @param radius Radius of the Gaussian kernel.  If < 0 then the radius is selected using sigma.
-	 * @return PyramidUpdaterDiscrete
+	 * @param sigma Gaussian sigma.  If < 0 then a sigma is selected using the radius.  Try -1.
+	 * @param radius Radius of the Gaussian kernel.  If < 0 then the radius is selected using sigma. Try 2.
+	 * @return PyramidDiscrete
 	 */
 	public static <T extends ImageSingleBand>
 	PyramidDiscrete<T> discreteGaussian( int[] scaleFactors , double sigma , int radius ,
@@ -58,12 +58,14 @@ public class FactoryPyramid {
 	}
 
 	/**
-	 * Creates an updater for float pyramids where each layer is blurred using a Gaussian with the specified
+	 * Creates a float pyramid where each layer is blurred using a Gaussian with the specified
 	 * sigma.  Bilinear interpolation is used when sub-sampling.
 	 *
-	 * @param imageType Type of image in the pyramid.
+	 * @param scaleFactors The scale factor of each layer relative to the previous layer.
+	 *                     Layer 0 is relative to the input image.
 	 * @param sigmas Gaussian blur magnitude for each layer.
-	 * @return PyramidUpdaterFloat
+	 * @param imageType Type of image in the pyramid.
+	 * @return PyramidFloat
 	 */
 	public static <T extends ImageSingleBand>
 	PyramidFloat<T> floatGaussian( double scaleFactors[], double []sigmas , Class<T> imageType ) {
@@ -79,7 +81,7 @@ public class FactoryPyramid {
 	 *
 	 * @param scaleSpace The scale of each layer and the desired amount of blur relative to the original image
 	 * @param imageType Type of image
-	 * @return Image pyramid
+	 * @return PyramidFloat
 	 */
 	public static <T extends ImageSingleBand>
 	PyramidFloat<T> scaleSpacePyramid( double scaleSpace[], Class<T> imageType ) {
@@ -101,6 +103,15 @@ public class FactoryPyramid {
 		return floatGaussian(scaleSpace,sigmas,imageType);
 	}
 
+	/**
+	 * Constructs a scale-space image pyramid.  Each layer in the pyramid is the same size as the input image but
+	 * has a different amount of blur applied to it.
+	 *
+	 * @param scaleSpace Amount of blur applied to each layer in the pyramid relative to the input image.
+	 * @param imageType Type of image
+	 * @param <T> Type of image
+	 * @return Scale-space image pyramid
+	 */
 	public static <T extends ImageSingleBand>
 	PyramidFloat<T> scaleSpace( double scaleSpace[], Class<T> imageType ) {
 

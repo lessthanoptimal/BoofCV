@@ -295,7 +295,6 @@ public class VisOdomMonoPlaneInfinity<T extends ImageBase> {
 				p.ground.x = pointing.z;
 				p.ground.y = -pointing.x;
 				// normalize to make later calculations easier
-				double norm = p.ground.norm();
 				p.ground.x /= normXZ;
 				p.ground.y /= normXZ;
 

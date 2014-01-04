@@ -6,6 +6,11 @@ Date Format: year/month/day
 Date    : 2014
 Version : Alpha 0.17
 
+- Dense Optical Flow
+  * KLT based
+  * Exhaustive block search
+
+
 - TODO make those two failed unit tests ago away
 
 ---------------------------------------------

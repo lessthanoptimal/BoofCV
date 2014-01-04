@@ -117,7 +117,18 @@ public class KltTracker<InputImage extends ImageSingleBand, DerivativeImage exte
 		InputSanityCheck.checkSameShape(image, derivX, derivY);
 
 		this.image = image;
-		interpInput.setImage(image);
+		this.interpInput.setImage(image);
+
+		this.derivX = derivX;
+		this.derivY = derivY;
+	}
+
+	/**
+	 * Same as {@link #setImage}, but it doesn't check to see if the images are the same size each time
+	 */
+	public void unsafe_setImage(InputImage image, DerivativeImage derivX, DerivativeImage derivY) {
+		this.image = image;
+		this.interpInput.setImage(image);
 
 		this.derivX = derivX;
 		this.derivY = derivY;
@@ -276,7 +287,7 @@ public class KltTracker<InputImage extends ImageSingleBand, DerivativeImage exte
 				int length = computeGandE_border(feature, feature.x, feature.y);
 
 				det = Gxx * Gyy - Gxy * Gxy;
-				if (det < config.minDeterminant*length) {
+				if (det <= config.minDeterminant*length) {
 					return KltTrackFault.FAILED;
 				}
 			}
@@ -417,12 +428,10 @@ public class KltTracker<InputImage extends ImageSingleBand, DerivativeImage exte
 		float srxX1 = srcX0 + widthFeature;
 		float srxY1 = srcY0 + widthFeature;
 
-		int origDstY1 = dstY1;
-
 		// take in account the image border
 		if( srcX0 < 0 ) {
 			dstX0 = (int)-Math.floor(srcX0);
-			srcX0 += dstX0;
+			srcX0 = 0;
 		}
 		if( srxX1 > image.width ) {
 			dstX1 -= (int)Math.ceil(srxX1-image.width);
@@ -431,7 +440,7 @@ public class KltTracker<InputImage extends ImageSingleBand, DerivativeImage exte
 		}
 		if( srcY0 < 0 ) {
 			dstY0 = (int)-Math.floor(srcY0);
-			srcY0 += dstY0;
+			srcY0 = 0;
 		}
 		if( srxY1 > image.height ) {
 			dstY1 -= (int)Math.ceil(srxY1-image.height);
