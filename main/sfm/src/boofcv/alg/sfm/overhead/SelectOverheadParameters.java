@@ -139,7 +139,7 @@ public class SelectOverheadParameters {
 			return false;
 
 		double width = Math.abs(plane0.x - plane1.x);
-		double height = Math.abs(plane0.x - plane1.x);
+		double height = Math.abs(plane0.y - plane1.y);
 
 		if( width > maxCellsPerPixel *cellSize)
 			return false;

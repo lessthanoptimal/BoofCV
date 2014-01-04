@@ -60,6 +60,9 @@ public class FactoryDetectPoint {
 	public static <T extends ImageSingleBand, D extends ImageSingleBand>
 	GeneralFeatureDetector<T, D> createHarris(ConfigGeneralDetector configDetector,
 											  boolean weighted, Class<D> derivType) {
+		if( configDetector == null)
+			configDetector = new ConfigGeneralDetector();
+
 		GradientCornerIntensity<D> cornerIntensity =
 				FactoryIntensityPointAlg.harris(configDetector.radius, 0.04f, weighted, derivType);
 		return createGeneral(cornerIntensity, configDetector);
@@ -76,6 +79,9 @@ public class FactoryDetectPoint {
 	public static <T extends ImageSingleBand, D extends ImageSingleBand>
 	GeneralFeatureDetector<T, D> createShiTomasi(ConfigGeneralDetector configDetector,
 												 boolean weighted, Class<D> derivType) {
+		if( configDetector == null)
+			configDetector = new ConfigGeneralDetector();
+
 		GradientCornerIntensity<D> cornerIntensity =
 				FactoryIntensityPointAlg.shiTomasi(configDetector.radius, weighted, derivType);
 		return createGeneral(cornerIntensity, configDetector);
@@ -90,6 +96,9 @@ public class FactoryDetectPoint {
 	 */
 	public static <T extends ImageSingleBand, D extends ImageSingleBand>
 	GeneralFeatureDetector<T, D> createKitRos(ConfigGeneralDetector configDetector, Class<D> derivType) {
+		if( configDetector == null)
+			configDetector = new ConfigGeneralDetector();
+
 		GeneralFeatureIntensity<T, D> intensity = new WrapperKitRosCornerIntensity<T, D>(derivType);
 		return createGeneral(intensity, configDetector);
 	}
@@ -129,6 +138,10 @@ public class FactoryDetectPoint {
 	 */
 	public static <T extends ImageSingleBand, D extends ImageSingleBand>
 	GeneralFeatureDetector<T, D> createMedian(ConfigGeneralDetector configDetector, Class<T> imageType) {
+
+		if( configDetector == null)
+			configDetector = new ConfigGeneralDetector();
+
 		MedianImageFilter<T> medianFilter = FactoryBlurFilter.median(imageType, configDetector.radius);
 		GeneralFeatureIntensity<T, D> intensity = new WrapperMedianCornerIntensity<T, D>(medianFilter, imageType);
 		return createGeneral(intensity, configDetector);
@@ -145,6 +158,9 @@ public class FactoryDetectPoint {
 	public static <T extends ImageSingleBand, D extends ImageSingleBand>
 	GeneralFeatureDetector<T, D> createHessian(HessianBlobIntensity.Type type,
 											   ConfigGeneralDetector configDetector, Class<D> derivType) {
+		if( configDetector == null)
+			configDetector = new ConfigGeneralDetector();
+
 		GeneralFeatureIntensity<T, D> intensity = FactoryIntensityPoint.hessian(type, derivType);
 		return createGeneral(intensity, configDetector);
 	}

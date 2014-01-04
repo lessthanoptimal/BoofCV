@@ -16,11 +16,20 @@
  * limitations under the License.
  */
 
-package boofcv.struct.primitive;
+package boofcv.struct.flow;
 
+import org.junit.Test;
+
+import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
  */
-public class F32 extends PrimativeType {
+public class TestFlowImage {
+
+	@Test
+	public void stuff() {
+		fail("Implement");
+	}
+
 }

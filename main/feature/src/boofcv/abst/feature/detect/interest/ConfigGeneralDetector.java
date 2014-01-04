@@ -33,7 +33,6 @@ public class ConfigGeneralDetector extends ConfigExtract {
 	 */
 	public int maxFeatures = -1;
 
-
 	public ConfigGeneralDetector(int maxFeatures ,
 								 int radius, float threshold, int ignoreBorder, boolean useStrictRule,
 								 boolean detectMinimums, boolean detectMaximums) {

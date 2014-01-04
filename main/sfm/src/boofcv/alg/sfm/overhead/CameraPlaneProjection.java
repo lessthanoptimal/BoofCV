@@ -85,12 +85,12 @@ public class CameraPlaneProjection {
 	 * Specifies camera's extrinsic parameters.
 	 *
 	 * @param planeToCamera Transform from plane to camera reference frame
-	 * @param invert Set to true if pixelToPlane is going to be called.  performs extra calculation
+	 * @param computeInverse Set to true if pixelToPlane is going to be called.  performs extra calculation
 	 */
-	public void setPlaneToCamera(Se3_F64 planeToCamera, boolean invert ) {
+	public void setPlaneToCamera(Se3_F64 planeToCamera, boolean computeInverse ) {
 		this.planeToCamera = planeToCamera;
 
-		if( invert )
+		if( computeInverse )
 			planeToCamera.invert(cameraToPlane);
 	}
 
@@ -144,7 +144,7 @@ public class CameraPlaneProjection {
 	}
 
 	/**
-	 * Given a pixel, find the point on the plane.  Make sure invert was set to true in
+	 * Given a pixel, find the point on the plane.  Be sure computeInverse was set to true in
 	 * {@link #setPlaneToCamera(georegression.struct.se.Se3_F64, boolean)}
 	 *
 	 * @param pixelX (input) Pixel in the image, x-axis

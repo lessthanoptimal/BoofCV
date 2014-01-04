@@ -16,11 +16,20 @@
  * limitations under the License.
  */
 
-package boofcv.struct.primitive;
+package boofcv.abst.flow;
 
+import org.junit.Test;
+
+import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
  */
-public class PrimativeType {
+public class TestFlowRegion_to_DenseOpticalFlow extends GeneralDenseOpticalFlowChecks {
+
+	@Test
+	public void stuff() {
+		fail("Implement");
+	}
+
 }
