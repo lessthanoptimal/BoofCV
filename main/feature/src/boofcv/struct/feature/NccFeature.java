@@ -37,6 +37,9 @@ public class NccFeature extends TupleDesc_F64 {
 		super(numFeatures);
 	}
 
+	protected NccFeature() {
+	}
+
 	@Override
 	public NccFeature copy() {
 		NccFeature ret = new NccFeature( value.length );
