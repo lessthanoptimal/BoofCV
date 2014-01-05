@@ -37,6 +37,11 @@ import boofcv.struct.image.ImageUInt8;
  * </p>
  *
  * <p>
+ * When scoring hypotheses for optical flow and there is a tie, select the hypothesis with the least amount of motion.
+ * This only really comes into play when there is absolutely no texture in real-world data.
+ * </p>
+ *
+ * <p>
  * By checking all pixels associated with the score and not just the center one to see if it has a better
  * score the edges of objects is handled better.
  * </p>
@@ -129,6 +134,14 @@ public abstract class DenseOpticalFlowBlock<T extends ImageSingleBand> {
 					bestScore = error;
 					bestFlowX = j;
 					bestFlowY = i;
+				} else if ( error == bestScore ) {
+					// Pick solution with the least motion when ambiguous
+					float m0 = j*j + i*i;
+					float m1 = bestFlowX*bestFlowX + bestFlowY*bestFlowY;
+					if( m0 < m1 ) {
+						bestFlowX = j;
+						bestFlowY = i;
+					}
 				}
 			}
 		}
@@ -157,6 +170,14 @@ public abstract class DenseOpticalFlowBlock<T extends ImageSingleBand> {
 				if( !f.valid || s > score ) {
 					f.set(flow);
 					scores[index] = score;
+				} else if( s == score ) {
+					// Pick solution with the least motion when ambiguous
+					float m0 = f.x*f.x + f.y*f.y;
+					float m1 = flow.x*flow.x + flow.y*flow.y;
+					if( m1 < m0 ) {
+						f.set(flow);
+						scores[index] = score;
+					}
 				}
 			}
 		}
