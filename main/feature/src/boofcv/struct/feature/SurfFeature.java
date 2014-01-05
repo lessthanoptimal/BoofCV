@@ -32,6 +32,8 @@ public class SurfFeature extends TupleDesc_F64 {
 		super(numFeatures);
 	}
 
+	protected SurfFeature(){}
+
 	@Override
 	public void setTo(TupleDesc_F64 source) {
 		SurfFeature f = (SurfFeature)source;
