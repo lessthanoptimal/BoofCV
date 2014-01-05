@@ -21,7 +21,7 @@ package boofcv.alg.flow;
 import boofcv.alg.tracker.klt.KltFeature;
 import boofcv.alg.tracker.klt.KltTrackFault;
 import boofcv.alg.tracker.klt.KltTracker;
-import boofcv.struct.flow.FlowImage;
+import boofcv.struct.flow.ImageFlow;
 import boofcv.struct.image.ImageSingleBand;
 
 /**
@@ -41,12 +41,12 @@ public class DenseOpticalFlowKlt<I extends ImageSingleBand, D extends ImageSingl
 		feature = new KltFeature(radius);
 	}
 
-	public void process( I prev , D prevDerivX , D prevDerivY , I curr , FlowImage output ) {
+	public void process( I prev , D prevDerivX , D prevDerivY , I curr , ImageFlow output ) {
 
 		int indexOut = 0;
 		for( int y = 0; y < prev.height; y++ ) {
 			for( int x = 0; x < prev.width; x++ , indexOut++ ) {
-				FlowImage.D flow = output.data[indexOut];
+				ImageFlow.D flow = output.data[indexOut];
 				flow.valid = false;
 
 				tracker.unsafe_setImage(prev,prevDerivX,prevDerivY);

@@ -18,7 +18,7 @@
 
 package boofcv.abst.flow;
 
-import boofcv.struct.flow.FlowImage;
+import boofcv.struct.flow.ImageFlow;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 
@@ -36,7 +36,7 @@ public interface DenseOpticalFlow<T extends ImageBase> {
 	 * @param destination (Input) Second image
 	 * @param flow (Output) Computed flow information
 	 */
-	public void process( T source , T destination, FlowImage flow );
+	public void process( T source , T destination, ImageFlow flow );
 
 	/**
 	 * Input image type

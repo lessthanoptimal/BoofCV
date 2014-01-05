@@ -431,7 +431,7 @@ public class KltTracker<InputImage extends ImageSingleBand, DerivativeImage exte
 		// take in account the image border
 		if( srcX0 < 0 ) {
 			dstX0 = (int)-Math.floor(srcX0);
-			srcX0 = 0;
+			srcX0 += dstX0;
 		}
 		if( srxX1 > image.width ) {
 			dstX1 -= (int)Math.ceil(srxX1-image.width);
@@ -440,7 +440,7 @@ public class KltTracker<InputImage extends ImageSingleBand, DerivativeImage exte
 		}
 		if( srcY0 < 0 ) {
 			dstY0 = (int)-Math.floor(srcY0);
-			srcY0 = 0;
+			srcY0 += dstY0;
 		}
 		if( srxY1 > image.height ) {
 			dstY1 -= (int)Math.ceil(srxY1-image.height);

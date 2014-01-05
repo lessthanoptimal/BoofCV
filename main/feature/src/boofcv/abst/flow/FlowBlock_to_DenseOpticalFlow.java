@@ -19,7 +19,7 @@
 package boofcv.abst.flow;
 
 import boofcv.alg.flow.DenseOpticalFlowBlock;
-import boofcv.struct.flow.FlowImage;
+import boofcv.struct.flow.ImageFlow;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageType;
 
@@ -42,7 +42,7 @@ public class FlowBlock_to_DenseOpticalFlow<T extends ImageSingleBand>
 	}
 
 	@Override
-	public void process(T source, T destination, FlowImage flow) {
+	public void process(T source, T destination, ImageFlow flow) {
 		flowAlg.process(source,destination,flow);
 	}
 
