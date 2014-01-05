@@ -18,18 +18,20 @@
 
 package boofcv.abst.flow;
 
-import org.junit.Test;
-
-import static org.junit.Assert.fail;
+import boofcv.factory.flow.FactoryDenseOpticalFlow;
+import boofcv.struct.image.ImageFloat32;
 
 /**
  * @author Peter Abeles
  */
-public class TestFlowKlt_to_DenseOpticalFlow extends GeneralDenseOpticalFlowChecks{
+public class TestFlowKlt_to_DenseOpticalFlow extends GeneralDenseOpticalFlowChecks<ImageFloat32> {
 
-	@Test
-	public void stuff() {
-		fail("Implement");
+	public TestFlowKlt_to_DenseOpticalFlow() {
+		super(ImageFloat32.class);
 	}
 
+	@Override
+	public DenseOpticalFlow<ImageFloat32> createAlg(Class<ImageFloat32> imageType) {
+		return (DenseOpticalFlow)FactoryDenseOpticalFlow.flowKlt(null,2,imageType,null);
+	}
 }

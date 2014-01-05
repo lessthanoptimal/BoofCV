@@ -20,6 +20,7 @@ package boofcv.factory.tracker;
 
 import boofcv.abst.feature.associate.AssociateDescription;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
+import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.alg.interpolate.InterpolateRectangle;
 import boofcv.alg.tracker.combined.CombinedTrackerScalePoint;
 import boofcv.alg.tracker.combined.PyramidKltForCombined;
@@ -55,6 +56,8 @@ public class FactoryTrackerAlg {
 	{
 		if( config == null )
 			config = new KltConfig();
+		if( derivType == null )
+			derivType = GImageDerivativeOps.getDerivativeType(imageType);
 
 		InterpolateRectangle<I> interpInput = FactoryInterpolation.<I>bilinearRectangle(imageType);
 		InterpolateRectangle<D> interpDeriv = FactoryInterpolation.<D>bilinearRectangle(derivType);
@@ -79,6 +82,11 @@ public class FactoryTrackerAlg {
 										Class<I> imageType ,
 										Class<D> derivType )
 	{
+		if( config == null )
+			config = new KltConfig();
+		if( derivType == null )
+			derivType = GImageDerivativeOps.getDerivativeType(imageType);
+
 		InterpolateRectangle<I> interpInput = FactoryInterpolation.<I>bilinearRectangle(imageType);
 		InterpolateRectangle<D> interpDeriv = FactoryInterpolation.<D>bilinearRectangle(derivType);
 
@@ -105,6 +113,8 @@ public class FactoryTrackerAlg {
 	{
 		if( kltConfig == null)
 			kltConfig = new PkltConfig();
+		if( derivType == null )
+			derivType = GImageDerivativeOps.getDerivativeType(imageType);
 
 		PyramidKltForCombined<I,D> klt = new PyramidKltForCombined<I, D>(kltConfig.config,
 				kltConfig.templateRadius,kltConfig.pyramidScaling,imageType,derivType);

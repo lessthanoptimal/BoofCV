@@ -20,7 +20,7 @@ package boofcv.alg.flow;
 
 import boofcv.alg.InputSanityCheck;
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.struct.flow.FlowImage;
+import boofcv.struct.flow.ImageFlow;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
@@ -30,8 +30,10 @@ import boofcv.struct.image.ImageUInt8;
  * Computes optical flow using square regions and a locally exhaustive search.  For each pixel in the prev image, a
  * square region centered around it is compared against all other regions within the specified search radius of it
  * in image 'curr'.  For each candidate flow the error is computed.  After the best score has been found each local
- * pixel which contributed to that square region is checked.  When a pixel is checked if the current score is better
- * than the score it was previously assigned (if any) then its flow and score will be set to the current.
+ * pixel which contributed to that square region is checked.  When a pixel is checked its current score compared
+ * to see if it's better than the score it was previously assigned (if any) then its flow and score will be set to
+ * the current.  This improves the handled along object edges.  If only the flow is considered when a pixel is the
+ * center then it almost always fails at edges.
  * </p>
  *
  * <p>
@@ -54,10 +56,10 @@ public abstract class DenseOpticalFlowBlock<T extends ImageSingleBand> {
 	// maximum allowed error between two regions for it to be a valid flow
 	protected int maxError;
 
-	private FlowImage.D tmp = new FlowImage.D();
+	protected ImageFlow.D tmp = new ImageFlow.D();
 
 	// fit score for each pixel
-	private float scores[] = new float[0];
+	protected float scores[] = new float[0];
 
 	/**
 	 * Configures the search.
@@ -84,7 +86,7 @@ public abstract class DenseOpticalFlowBlock<T extends ImageSingleBand> {
 	 * @param curr Current image
 	 * @param output Dense optical flow output
 	 */
-	public void process( T prev , T curr , FlowImage output ) {
+	public void process( T prev , T curr , ImageFlow output ) {
 
 		InputSanityCheck.checkSameShape(prev, curr);
 		output.invalidateAll();
@@ -114,7 +116,7 @@ public abstract class DenseOpticalFlowBlock<T extends ImageSingleBand> {
 	 * Performs an exhaustive search centered around (cx,cy) for the region in 'curr' which is the best
 	 * match for the template.  Results are written into 'flow'
 	 */
-	protected float findFlow( int cx , int cy , T curr , FlowImage.D flow ) {
+	protected float findFlow( int cx , int cy , T curr , ImageFlow.D flow ) {
 		float bestScore = Float.MAX_VALUE;
 		int bestFlowX=0,bestFlowY=0;
 
@@ -146,12 +148,12 @@ public abstract class DenseOpticalFlowBlock<T extends ImageSingleBand> {
 	 * Examines every pixel inside the region centered at (cx,cy) to see if their optical flow has a worse
 	 * score the one specified in 'flow'
 	 */
-	protected void checkNeighbors( int cx , int cy , FlowImage.D flow , FlowImage image , float score ) {
+	protected void checkNeighbors( int cx , int cy , ImageFlow.D flow , ImageFlow image , float score ) {
 		for( int i = -searchRadius; i <= searchRadius; i++ ) {
 			int index = image.width*(cy+i) + (cx-searchRadius);
 			for( int j = -searchRadius; j <= searchRadius; j++ , index++ ) {
 				float s = scores[ index ];
-				FlowImage.D f = image.data[index];
+				ImageFlow.D f = image.data[index];
 				if( !f.valid || s > score ) {
 					f.set(flow);
 					scores[index] = score;

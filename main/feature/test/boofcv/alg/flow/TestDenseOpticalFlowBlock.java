@@ -1,0 +1,122 @@
+/*
+ * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ *
+ * This file is part of BoofCV (http://boofcv.org).
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package boofcv.alg.flow;
+
+import boofcv.struct.flow.ImageFlow;
+import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageUInt8;
+import org.junit.Test;
+
+import static org.junit.Assert.*;
+
+/**
+ * @author Peter Abeles
+ */
+public class TestDenseOpticalFlowBlock {
+
+	@Test
+	public void findFlow() {
+		Dummy alg = new Dummy(3,2,200,ImageUInt8.class);
+
+		alg.minScore = 0.1f;
+		alg.targetX = 4;
+		alg.targetY = 8;
+
+		ImageUInt8 image = new ImageUInt8(30,40);
+		ImageFlow.D flow = new ImageFlow.D();
+
+		// see if it selects the obvious minimum
+		assertEquals(0.1f, alg.findFlow(6, 7, image, flow), 1e-4);
+		assertTrue(flow.valid);
+		assertEquals(-2,flow.x,1e-4);
+		assertEquals(1,flow.y,1e-4);
+
+		// now try the case where the error is too high
+		alg.minScore = 100000000f;
+		alg.findFlow(6, 7, image, flow);
+		assertFalse(flow.valid);
+	}
+
+	@Test
+	public void checkNeighbors() {
+		int r = 3;
+		Dummy alg = new Dummy(r,2,200,ImageUInt8.class);
+
+		alg.scores = new float[20*30];
+		ImageFlow flows = new ImageFlow(20,30);
+		ImageFlow.D tmp = new ImageFlow.D();
+
+		tmp.valid = true;
+		tmp.x = -1;
+		tmp.y = 2;
+
+		// checks to see if a pixel is invalid that it's flow is always set
+		// if a pixel is valid then the score is only set if the score is better
+		flows.get(6,5).valid = true;
+		alg.scores[ 5*20+6 ] = 10;
+		flows.get(5,5).valid = true;
+		alg.scores[ 5*20+5 ] = 4;
+
+		alg.checkNeighbors(6,7,tmp,flows,5);
+
+		for( int i = -r; i <= r; i++ ) {
+			for( int j = -r; j <= r; j++ ) {
+				int x = j+6;
+				int y = i+7;
+
+				ImageFlow.D f = flows.get(x,y);
+
+				assertTrue(f.valid);
+				if( x == 5 && y == 5 ) {
+					assertEquals(4,alg.scores[y*20+x],1e-4);
+					assertEquals(0,f.x,1e-4);
+					assertEquals(0,f.y,1e-4);
+				} else {
+					assertEquals(x+" "+y,5,alg.scores[y*20+x],1e-4);
+					assertEquals(-1,f.x,1e-4);
+					assertEquals(2,f.y,1e-4);
+				}
+			}
+		}
+
+	}
+
+	public static class Dummy extends DenseOpticalFlowBlock {
+
+		public int targetX;
+		public int targetY;
+		public float minScore;
+
+		public Dummy(int searchRadius, int regionRadius, int maxPerPixelError, Class imageType) {
+			super(searchRadius, regionRadius, maxPerPixelError, imageType);
+		}
+
+		@Override
+		protected void extractTemplate(int cx, int cy, ImageSingleBand prev) {}
+
+		@Override
+		protected float computeError(int cx, int cy, ImageSingleBand curr) {
+			int dx = cx-targetX;
+			int dy = cy-targetY;
+
+			return dx*dx + dy*dy + minScore;
+		}
+	}
+
+}

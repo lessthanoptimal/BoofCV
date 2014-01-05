@@ -21,7 +21,7 @@ package boofcv.abst.flow;
 import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.alg.flow.DenseOpticalFlowKlt;
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.struct.flow.FlowImage;
+import boofcv.struct.flow.ImageFlow;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageType;
 
@@ -53,7 +53,7 @@ public class FlowKlt_to_DenseOpticalFlow<I extends ImageSingleBand, D extends Im
 	}
 
 	@Override
-	public void process(I source, I destination, FlowImage flow) {
+	public void process(I source, I destination, ImageFlow flow) {
 		derivX.reshape(source.width,source.height);
 		derivY.reshape(source.width,source.height);
 

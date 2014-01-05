@@ -24,17 +24,23 @@ package boofcv.struct.flow;
  *
  * @author Peter Abeles
  */
-public class FlowImage {
+public class ImageFlow {
 	// image dimension
 	public int width,height;
 
 	// storage for flow information
 	public D data[] = new D[0];
 
-	public FlowImage(int width, int height) {
+	public ImageFlow(int width, int height) {
 		reshape(width,height);
 	}
 
+	/**
+	 * Changes the shape to match the specified dimension. Memory will only be created/destroyed if the requested
+	 * size is larger than any previously requested size
+	 * @param width New image width
+	 * @param height new image height
+	 */
 	public void reshape( int width , int height ) {
 		int N = width*height;
 

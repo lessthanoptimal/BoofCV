@@ -26,7 +26,6 @@ import org.junit.Test;
 import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 
 /**
  * Tests for implementations of {@link DenseOpticalFlowBlock}
@@ -92,15 +91,5 @@ public abstract class ChecksDenseOpticalFlowBlock<T extends ImageSingleBand> {
 		}
 
 		assertEquals(expected,found,1e-5);
-	}
-
-	@Test
-	public void findFlow() {
-		fail("Implement");
-	}
-
-	@Test
-	public void checkNeighbors() {
-		fail("implement");
 	}
 }
