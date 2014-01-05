@@ -51,6 +51,14 @@ public class TestDenseOpticalFlowBlock {
 		alg.minScore = 100000000f;
 		alg.findFlow(6, 7, image, flow);
 		assertFalse(flow.valid);
+
+		// now give it a case where everything has the same score.  See if it picks the one with the least motion
+		alg.sameScore = true;
+		alg.minScore = 0.1f;
+		alg.findFlow(6, 7, image, flow);
+		assertTrue(flow.valid);
+		assertEquals(0,flow.x,1e-4);
+		assertEquals(0,flow.y,1e-4);
 	}
 
 	@Test
@@ -72,6 +80,16 @@ public class TestDenseOpticalFlowBlock {
 		alg.scores[ 5*20+6 ] = 10;
 		flows.get(5,5).valid = true;
 		alg.scores[ 5*20+5 ] = 4;
+		// same score, but more motion
+		flows.get(5,6).valid = true;
+		alg.scores[ 6*20+5 ] = 5;
+		flows.get(5,6).x = 2;
+		flows.get(5,6).y = 2;
+		// same score, but less motion
+		flows.get(6,6).valid = true;
+		alg.scores[ 6*20+6 ] = 5;
+		flows.get(6,6).x = 0;
+		flows.get(6,6).y = 1;
 
 		alg.checkNeighbors(6,7,tmp,flows,5);
 
@@ -87,6 +105,10 @@ public class TestDenseOpticalFlowBlock {
 					assertEquals(4,alg.scores[y*20+x],1e-4);
 					assertEquals(0,f.x,1e-4);
 					assertEquals(0,f.y,1e-4);
+				} else if( x == 6 && y == 6 ) {
+					assertEquals(5,alg.scores[y*20+x],1e-4);
+					assertEquals(0,f.x,1e-4);
+					assertEquals(1,f.y,1e-4);
 				} else {
 					assertEquals(x+" "+y,5,alg.scores[y*20+x],1e-4);
 					assertEquals(-1,f.x,1e-4);
@@ -94,11 +116,12 @@ public class TestDenseOpticalFlowBlock {
 				}
 			}
 		}
-
 	}
+
 
 	public static class Dummy extends DenseOpticalFlowBlock {
 
+		public boolean sameScore = false;
 		public int targetX;
 		public int targetY;
 		public float minScore;
@@ -112,10 +135,14 @@ public class TestDenseOpticalFlowBlock {
 
 		@Override
 		protected float computeError(int cx, int cy, ImageSingleBand curr) {
-			int dx = cx-targetX;
-			int dy = cy-targetY;
+			if( sameScore )
+				return minScore;
+			else {
+				int dx = cx-targetX;
+				int dy = cy-targetY;
 
-			return dx*dx + dy*dy + minScore;
+				return dx*dx + dy*dy + minScore;
+			}
 		}
 	}
 
