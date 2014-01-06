@@ -9,9 +9,11 @@ Version : Alpha 0.17
 - Dense Optical Flow
   * KLT based
   * Exhaustive block search
-
+- Improved/Fixed serialization
+  * Several classes were missing no argument constructors
 
 - TODO make those two failed unit tests ago away
+- TODO BoofMiscOps move XML serialization into IO package
 
 ---------------------------------------------
 Date    : 2013/12/25
