@@ -78,6 +78,7 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 			printFillUniformInterleaved();
 			printFillGaussian();
 			printFlipVertical();
+			printFlipHorizontal();
 		}
 	}
 
@@ -428,6 +429,29 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 				"\t}\n\n");
 	}
 
+	public void printFlipHorizontal() {
+		String sumType = imageType.getSumType();
+
+		out.print("\t/**\n" +
+				"\t * Flips the image from left to right\n" +
+				"\t */\n" +
+				"\tpublic static void flipHorizontal( "+imageName+" input ) {\n" +
+				"\t\tint w2 = input.width/2;\n" +
+				"\n" +
+				"\t\tfor( int y = 0; y < input.height; y++ ) {\n" +
+				"\t\t\tint index1 = input.getStartIndex() + y * input.getStride();\n" +
+				"\t\t\tint index2 = index1 + input.width-1;\n" +
+				"\n" +
+				"\t\t\tint end = index1 + w2;\n" +
+				"\n" +
+				"\t\t\twhile( index1 < end ) {\n" +
+				"\t\t\t\t"+sumType+" tmp = input.data[index1];\n" +
+				"\t\t\t\tinput.data[index1++] = input.data[index2];\n" +
+				"\t\t\t\tinput.data[index2--] = ("+dataType+")tmp;\n" +
+				"\t\t\t}\n" +
+				"\t\t}\n" +
+				"\t}\n\n");
+	}
 
 	public static void main( String args[] ) throws FileNotFoundException {
 		GenerateImageMiscOps gen = new GenerateImageMiscOps();
