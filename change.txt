@@ -11,6 +11,7 @@ Version : Alpha 0.17
   * Exhaustive block search
 - Improved/Fixed serialization
   * Several classes were missing no argument constructors
+- Added ImageMiscOps.flipHorizontal()
 
 - TODO make those two failed unit tests ago away
 - TODO BoofMiscOps move XML serialization into IO package

@@ -378,4 +378,33 @@ public class GImageMiscOps {
 			throw new IllegalArgumentException("Unknown image type: " + img.getClass().getSimpleName());
 		}
 	}
+
+	/**
+	 * Flips the image from left to right
+	 */
+	public static void flipHorizontal( ImageBase img ) {
+		if( img instanceof ImageSingleBand ) {
+			if( ImageInt8.class.isAssignableFrom(img.getClass()) ) {
+				ImageMiscOps.flipHorizontal((ImageInt8) img);
+			} else if( ImageInt16.class.isAssignableFrom(img.getClass()) ) {
+				ImageMiscOps.flipHorizontal((ImageInt16) img);
+			} else if ( ImageSInt32.class.isAssignableFrom(img.getClass()) ) {
+				ImageMiscOps.flipHorizontal((ImageSInt32) img);
+			} else if ( ImageSInt64.class.isAssignableFrom(img.getClass()) ) {
+				ImageMiscOps.flipHorizontal((ImageSInt64) img);
+			} else if (ImageFloat32.class.isAssignableFrom(img.getClass()) ) {
+				ImageMiscOps.flipHorizontal((ImageFloat32) img);
+			} else if (ImageFloat64.class.isAssignableFrom(img.getClass()) ) {
+				ImageMiscOps.flipHorizontal((ImageFloat64) img);
+			} else {
+				throw new IllegalArgumentException("Unknown or incompatible image type: " + img.getClass().getSimpleName());
+			}
+		} else if( img instanceof MultiSpectral ) {
+			MultiSpectral m = (MultiSpectral)img;
+			for( int i = 0; i < m.getNumBands(); i++ )
+				flipHorizontal(m.getBand(i));
+		} else {
+			throw new IllegalArgumentException("Unknown image type: " + img.getClass().getSimpleName());
+		}
+	}
 }

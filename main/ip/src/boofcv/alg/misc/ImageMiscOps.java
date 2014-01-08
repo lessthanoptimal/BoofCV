@@ -243,6 +243,26 @@ public class ImageMiscOps {
 	}
 
 	/**
+	 * Flips the image from left to right
+	 */
+	public static void flipHorizontal( ImageInt8 input ) {
+		int w2 = input.width/2;
+
+		for( int y = 0; y < input.height; y++ ) {
+			int index1 = input.getStartIndex() + y * input.getStride();
+			int index2 = index1 + input.width-1;
+
+			int end = index1 + w2;
+
+			while( index1 < end ) {
+				int tmp = input.data[index1];
+				input.data[index1++] = input.data[index2];
+				input.data[index2--] = (byte)tmp;
+			}
+		}
+	}
+
+	/**
 	 * Copies a rectangular region from one image into another.<br>
 	 * output[dstX:(dstX+width) , dstY:(dstY+height-1)] = input[srcX:(srcX+width) , srcY:(srcY+height-1)]
 	 *
@@ -448,6 +468,26 @@ public class ImageMiscOps {
 				int tmp = input.data[index1];
 				input.data[index1++] = input.data[index2];
 				input.data[index2++] = (short)tmp;
+			}
+		}
+	}
+
+	/**
+	 * Flips the image from left to right
+	 */
+	public static void flipHorizontal( ImageInt16 input ) {
+		int w2 = input.width/2;
+
+		for( int y = 0; y < input.height; y++ ) {
+			int index1 = input.getStartIndex() + y * input.getStride();
+			int index2 = index1 + input.width-1;
+
+			int end = index1 + w2;
+
+			while( index1 < end ) {
+				int tmp = input.data[index1];
+				input.data[index1++] = input.data[index2];
+				input.data[index2--] = (short)tmp;
 			}
 		}
 	}
@@ -663,6 +703,26 @@ public class ImageMiscOps {
 	}
 
 	/**
+	 * Flips the image from left to right
+	 */
+	public static void flipHorizontal( ImageSInt32 input ) {
+		int w2 = input.width/2;
+
+		for( int y = 0; y < input.height; y++ ) {
+			int index1 = input.getStartIndex() + y * input.getStride();
+			int index2 = index1 + input.width-1;
+
+			int end = index1 + w2;
+
+			while( index1 < end ) {
+				int tmp = input.data[index1];
+				input.data[index1++] = input.data[index2];
+				input.data[index2--] = (int)tmp;
+			}
+		}
+	}
+
+	/**
 	 * Copies a rectangular region from one image into another.<br>
 	 * output[dstX:(dstX+width) , dstY:(dstY+height-1)] = input[srcX:(srcX+width) , srcY:(srcY+height-1)]
 	 *
@@ -868,6 +928,26 @@ public class ImageMiscOps {
 				long tmp = input.data[index1];
 				input.data[index1++] = input.data[index2];
 				input.data[index2++] = (long)tmp;
+			}
+		}
+	}
+
+	/**
+	 * Flips the image from left to right
+	 */
+	public static void flipHorizontal( ImageSInt64 input ) {
+		int w2 = input.width/2;
+
+		for( int y = 0; y < input.height; y++ ) {
+			int index1 = input.getStartIndex() + y * input.getStride();
+			int index2 = index1 + input.width-1;
+
+			int end = index1 + w2;
+
+			while( index1 < end ) {
+				long tmp = input.data[index1];
+				input.data[index1++] = input.data[index2];
+				input.data[index2--] = (long)tmp;
 			}
 		}
 	}
@@ -1083,6 +1163,26 @@ public class ImageMiscOps {
 	}
 
 	/**
+	 * Flips the image from left to right
+	 */
+	public static void flipHorizontal( ImageFloat32 input ) {
+		int w2 = input.width/2;
+
+		for( int y = 0; y < input.height; y++ ) {
+			int index1 = input.getStartIndex() + y * input.getStride();
+			int index2 = index1 + input.width-1;
+
+			int end = index1 + w2;
+
+			while( index1 < end ) {
+				float tmp = input.data[index1];
+				input.data[index1++] = input.data[index2];
+				input.data[index2--] = (float)tmp;
+			}
+		}
+	}
+
+	/**
 	 * Copies a rectangular region from one image into another.<br>
 	 * output[dstX:(dstX+width) , dstY:(dstY+height-1)] = input[srcX:(srcX+width) , srcY:(srcY+height-1)]
 	 *
@@ -1288,6 +1388,26 @@ public class ImageMiscOps {
 				double tmp = input.data[index1];
 				input.data[index1++] = input.data[index2];
 				input.data[index2++] = (double)tmp;
+			}
+		}
+	}
+
+	/**
+	 * Flips the image from left to right
+	 */
+	public static void flipHorizontal( ImageFloat64 input ) {
+		int w2 = input.width/2;
+
+		for( int y = 0; y < input.height; y++ ) {
+			int index1 = input.getStartIndex() + y * input.getStride();
+			int index2 = index1 + input.width-1;
+
+			int end = index1 + w2;
+
+			while( index1 < end ) {
+				double tmp = input.data[index1];
+				input.data[index1++] = input.data[index2];
+				input.data[index2--] = (double)tmp;
 			}
 		}
 	}
