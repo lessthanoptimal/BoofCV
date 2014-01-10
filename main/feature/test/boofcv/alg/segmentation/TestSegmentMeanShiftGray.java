@@ -16,18 +16,43 @@
  * limitations under the License.
  */
 
-package boofcv.alg.feature.detect.peak;
+package boofcv.alg.segmentation;
 
 import org.junit.Test;
+
+import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
  */
-public class TestMeanShiftUniformPeak {
+public class TestSegmentMeanShiftGray {
+
+	/**
+	 * Basic input image and see if it can segment it as expected
+	 */
+	@Test
+	public void simpleTest() {
+		fail("implement");
+	}
 
 	@Test
-	public void intentionallyBlank() {
-		// This is tested by the GeneralSearchLocalPeakChecks
+	public void findPeak_inside() {
+		fail("Implement");
+	}
+
+	@Test
+	public void findPeak_border() {
+		fail("Implement");
+	}
+
+	@Test
+	public void computeGray_inside() {
+		fail("Implement");
+	}
+
+	@Test
+	public void computeGray_border() {
+		fail("Implement");
 	}
 
 }

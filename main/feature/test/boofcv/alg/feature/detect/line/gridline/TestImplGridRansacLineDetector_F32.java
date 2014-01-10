@@ -16,28 +16,26 @@
  * limitations under the License.
  */
 
-package boofcv.alg.feature.line.gridline;
+package boofcv.alg.feature.detect.line.gridline;
 
+import boofcv.alg.feature.detect.line.CommonGridRansacLineDetectorChecks;
 import boofcv.alg.feature.detect.line.GridRansacLineDetector;
-import boofcv.alg.feature.detect.line.gridline.Edgel;
-import boofcv.alg.feature.detect.line.gridline.ImplGridRansacLineDetector_S16;
-import boofcv.alg.feature.line.CommonGridRansacLineDetectorChecks;
-import boofcv.struct.image.ImageSInt16;
+import boofcv.struct.image.ImageFloat32;
 import georegression.struct.line.LinePolar2D_F32;
 import org.ddogleg.fitting.modelset.ModelMatcher;
 
 /**
  * @author Peter Abeles
  */
-public class TestImplGridRansacLineDetector_S16 extends CommonGridRansacLineDetectorChecks<ImageSInt16> {
+public class TestImplGridRansacLineDetector_F32 extends CommonGridRansacLineDetectorChecks<ImageFloat32> {
 
-	public TestImplGridRansacLineDetector_S16() {
-		super(ImageSInt16.class);
+	public TestImplGridRansacLineDetector_F32() {
+		super(ImageFloat32.class);
 	}
 
 	@Override
-	public GridRansacLineDetector<ImageSInt16> createDetector(int regionSize, int maxDetectLines,
+	public GridRansacLineDetector<ImageFloat32> createDetector(int regionSize, int maxDetectLines,
 															   ModelMatcher<LinePolar2D_F32, Edgel> robustMatcher) {
-		return new ImplGridRansacLineDetector_S16(regionSize,maxDetectLines,robustMatcher);
+		return new ImplGridRansacLineDetector_F32(regionSize,maxDetectLines,robustMatcher);
 	}
 }

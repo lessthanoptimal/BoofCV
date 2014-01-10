@@ -237,7 +237,7 @@ public class FactoryKernelGaussian {
 	 * @param radius	Kernel's radius.
 	 * @param normalize If the kernel should be normalized to one or not.
 	 */
-	protected static Kernel2D_F32 gaussian2D_F32(double sigma, int radius, boolean normalize) {
+	public static Kernel2D_F32 gaussian2D_F32(double sigma, int radius, boolean normalize) {
 		Kernel1D_F32 kernel1D = gaussian1D_F32(sigma,radius,false);
 		Kernel2D_F32 ret = KernelMath.convolve(kernel1D,kernel1D);
 
@@ -248,7 +248,7 @@ public class FactoryKernelGaussian {
 		return ret;
 	}
 
-	protected static Kernel2D_F64 gaussian2D_F64(double sigma, int radius, boolean normalize) {
+	public static Kernel2D_F64 gaussian2D_F64(double sigma, int radius, boolean normalize) {
 		Kernel1D_F64 kernel1D = gaussian1D_F64(sigma,radius,false);
 		Kernel2D_F64 ret = KernelMath.convolve(kernel1D,kernel1D);
 

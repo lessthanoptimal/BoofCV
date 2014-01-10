@@ -16,20 +16,25 @@
  * limitations under the License.
  */
 
-package boofcv.alg.feature.line;
-
-import org.junit.Test;
-
+package boofcv.struct.weights;
 
 /**
+ * The distribution is a cropped Gaussian distribution with mean at 0.  Note
+ * that this matches the shape of the distribution but is not correctly normalized.  Input is assumed to be
+ * the distance squared.
+ *
  * @author Peter Abeles
  */
-public class TestGridRansacLineDetector {
+public class WeightDistanceSqGaussian_F32 implements WeightDistance_F32  {
 
+	float sigma;
 
-	@Test
-	public void seeComment() {
-		// intentionally empty since all tests are handled by implementations
+	public WeightDistanceSqGaussian_F32(float sigma) {
+		this.sigma = sigma;
 	}
 
+	@Override
+	public float weight(float distanceSq) {
+		return (float)Math.exp( - distanceSq/(2.0f*sigma*sigma) );
+	}
 }

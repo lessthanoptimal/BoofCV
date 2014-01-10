@@ -41,7 +41,7 @@ public class TestGImageMiscOps extends BaseGClassChecksInMisc{
 
 	@Test
 	public void compareToPixelMath() {
-		performTests(9);
+		performTests(10);
 	}
 
 	@Override
@@ -117,6 +117,8 @@ public class TestGImageMiscOps extends BaseGClassChecksInMisc{
 			ret[0][2] = 1;
 			ret[0][3] = 10;
 		} else if( name.equals("flipVertical")) {
+			ret[0][0] = inputA;
+		} else if( name.equals("flipHorizontal")) {
 			ret[0][0] = inputA;
 		} else {
 			throw new RuntimeException("Unknown function");

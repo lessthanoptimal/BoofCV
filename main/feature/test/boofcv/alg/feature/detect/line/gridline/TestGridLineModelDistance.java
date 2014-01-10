@@ -16,10 +16,8 @@
  * limitations under the License.
  */
 
-package boofcv.alg.feature.line.gridline;
+package boofcv.alg.feature.detect.line.gridline;
 
-import boofcv.alg.feature.detect.line.gridline.Edgel;
-import boofcv.alg.feature.detect.line.gridline.GridLineModelDistance;
 import georegression.metric.UtilAngle;
 import georegression.struct.line.LinePolar2D_F32;
 import org.junit.Test;

@@ -16,18 +16,20 @@
  * limitations under the License.
  */
 
-package boofcv.abst.feature.detect.peak;
-
-import boofcv.alg.feature.detect.peak.MeanShiftGaussianPeak;
-import boofcv.struct.image.ImageFloat32;
+package boofcv.struct.weights;
 
 /**
+ * Converts the distance a sample is into a weight.
+ *
  * @author Peter Abeles
  */
-public class TestMeanShiftGaussianPeak_to_SearchLocalPeak extends GeneralSearchLocalPeakChecks {
-	@Override
-	public SearchLocalPeak createSearch( Class<ImageFloat32> imageType ) {
-		MeanShiftGaussianPeak alg = new MeanShiftGaussianPeak(50,1e-3f,-1,imageType);
-		return new MeanShiftPeak_to_SearchLocalPeak(alg);
-	}
+public interface WeightDistance_F32 {
+
+	/**
+	 * Returns the weight given a distance
+	 *
+	 * @param distance Distance a sample is
+	 * @return the weight
+	 */
+	public float weight( float distance );
 }

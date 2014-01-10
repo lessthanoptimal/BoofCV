@@ -21,9 +21,10 @@ package boofcv.alg.feature.detect.peak;
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.weights.WeightPixel_F32;
 
 /**
- * Base class for simple implementations of mean-shift intended to finding local peaks inside an intensity image.
+ * Simple implementations of mean-shift intended to finding local peaks inside an intensity image.
  * Implementations differ in how they weigh each point.  In each iterations the mean of the square sample region
  * centered around the target is computed and the center shifted so that location.  It stops when change
  * is less than a delta or the maximum number of iterations has been exceeded.
@@ -33,7 +34,7 @@ import boofcv.struct.image.ImageSingleBand;
  *
  * @author Peter Abeles
  */
-public abstract class MeanShiftPeak<T extends ImageSingleBand> {
+public class MeanShiftPeak<T extends ImageSingleBand> {
 
 	// Input image and interpolation function
 	protected T image;
@@ -55,19 +56,22 @@ public abstract class MeanShiftPeak<T extends ImageSingleBand> {
 	// top left corner of sample region
 	protected float x0,y0;
 
+	// used to compute the weight each pixel contributes to the mean
+	protected WeightPixel_F32 weights;
+
 	/**
 	 * Configures search.
 	 *
 	 * @param maxIterations  Maximum number of iterations.  Try 10
 	 * @param convergenceTol Convergence tolerance.  Try 1e-3
-	 * @param radius Search radius.  Application dependent.
+	 * @param weights Used to compute the weight each pixel contributes to the mean.  Try a uniform distribution.
 	 */
-	public MeanShiftPeak(int maxIterations, float convergenceTol, int radius,
-						 Class<T> imageType ) {
+	public MeanShiftPeak(int maxIterations, float convergenceTol,
+						 WeightPixel_F32 weights,
+						 Class<T> imageType) {
 		this.maxIterations = maxIterations;
 		this.convergenceTol = convergenceTol;
-		this.radius = radius;
-		this.width = radius*2+1;
+		this.weights = weights;
 		interpolate = FactoryInterpolation.bilinearPixelS(imageType);
 	}
 
@@ -81,6 +85,7 @@ public abstract class MeanShiftPeak<T extends ImageSingleBand> {
 	}
 
 	public void setRadius(int radius) {
+		this.weights.setRadius( radius );
 		this.radius = radius;
 		this.width = radius*2+1;
 	}
@@ -88,7 +93,56 @@ public abstract class MeanShiftPeak<T extends ImageSingleBand> {
 	/**
 	 * Performs a mean-shift search center at the specified coordinates
 	 */
-	public abstract void search( float cx , float cy );
+	public void search( float cx , float cy ) {
+
+		peakX = cx; peakY = cy;
+		setRegion(cx, cy);
+
+		for( int i = 0; i < maxIterations; i++ ) {
+			float total = 0;
+			float sumX = 0, sumY = 0;
+
+			int kernelIndex = 0;
+
+			// see if it can use fast interpolation otherwise use the safer technique
+			if( interpolate.isInFastBounds(x0, y0) &&
+					interpolate.isInFastBounds(x0 + width - 1, y0 + width - 1)) {
+				for( int yy = 0; yy < width; yy++ ) {
+					for( int xx = 0; xx < width; xx++ ) {
+						float w = weights.weightIndex(kernelIndex++);
+						float weight = w*interpolate.get_fast(x0 + xx, y0 + yy);
+						total += weight;
+						sumX += weight*(xx+x0);
+						sumY += weight*(yy+y0);
+					}
+				}
+			} else {
+				for( int yy = 0; yy < width; yy++ ) {
+					for( int xx = 0; xx < width; xx++ ) {
+						float w = weights.weightIndex(kernelIndex++);
+						float weight = w*interpolate.get(x0 + xx, y0 + yy);
+						total += weight;
+						sumX += weight*(xx+x0);
+						sumY += weight*(yy+y0);
+					}
+				}
+			}
+
+			cx = sumX/total;
+			cy = sumY/total;
+
+			setRegion(cx, cy);
+
+			float dx = cx-peakX;
+			float dy = cy-peakY;
+
+			peakX = cx; peakY = cy;
+
+			if( Math.abs(dx) < convergenceTol && Math.abs(dy) < convergenceTol ) {
+				break;
+			}
+		}
+	}
 
 	/**
 	 * Updates the location of the rectangular bounding box

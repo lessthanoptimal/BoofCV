@@ -20,6 +20,7 @@ package boofcv.alg.feature.detect.peak;
 
 
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.weights.WeightPixelGaussian_F32;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -34,7 +35,8 @@ public class TestMeanShiftPeak {
 	@Test
 	public void setRegion_inside() {
 
-		Helper helper = new Helper(10,0.01f,5);
+		Helper helper = new Helper(10,0.01f);
+		helper.setRadius(5);
 
 		helper.setImage(image);
 		helper.setRegion(6.2f,7.5f);
@@ -55,9 +57,14 @@ public class TestMeanShiftPeak {
 
 	}
 
+	@Test
+	public void searchTest() {
+		// this is intentionally blank since it is covered by the abstract test
+	}
+
 	public static class Helper extends MeanShiftPeak {
-		public Helper(int maxIterations, float convergenceTol, int radius) {
-			super(maxIterations, convergenceTol, radius,ImageFloat32.class);
+		public Helper(int maxIterations, float convergenceTol) {
+			super(maxIterations, convergenceTol,new WeightPixelGaussian_F32(),ImageFloat32.class);
 		}
 
 		@Override

@@ -20,10 +20,11 @@ package boofcv.factory.feature.detect.peak;
 
 import boofcv.abst.feature.detect.peak.MeanShiftPeak_to_SearchLocalPeak;
 import boofcv.abst.feature.detect.peak.SearchLocalPeak;
-import boofcv.alg.feature.detect.peak.MeanShiftGaussianPeak;
 import boofcv.alg.feature.detect.peak.MeanShiftPeak;
-import boofcv.alg.feature.detect.peak.MeanShiftUniformPeak;
 import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.weights.WeightPixelGaussian_F32;
+import boofcv.struct.weights.WeightPixelUniform_F32;
+import boofcv.struct.weights.WeightPixel_F32;
 
 /**
  * Factory for implementations of {@link SearchLocalPeak}
@@ -41,8 +42,9 @@ public class FactorySearchLocalPeak {
 	 */
 	public static <T extends ImageSingleBand>
 	SearchLocalPeak<T> meanShiftUniform( int maxIterations, float convergenceTol , Class<T> imageType ) {
-		MeanShiftPeak alg = new MeanShiftUniformPeak(maxIterations,convergenceTol,-1, imageType);
-		return new MeanShiftPeak_to_SearchLocalPeak(alg);
+		WeightPixel_F32 weights = new WeightPixelUniform_F32();
+		MeanShiftPeak<T> alg = new MeanShiftPeak<T>(maxIterations,convergenceTol,weights, imageType);
+		return new MeanShiftPeak_to_SearchLocalPeak<T>(alg);
 	}
 
 	/**
@@ -54,7 +56,8 @@ public class FactorySearchLocalPeak {
 	 */
 	public static <T extends ImageSingleBand>
 	SearchLocalPeak<T> meanShiftGaussian( int maxIterations, float convergenceTol , Class<T> imageType) {
-		MeanShiftPeak alg = new MeanShiftGaussianPeak(maxIterations,convergenceTol,-1,imageType);
-		return new MeanShiftPeak_to_SearchLocalPeak(alg);
+		WeightPixel_F32 weights = new WeightPixelGaussian_F32();
+		MeanShiftPeak<T> alg = new MeanShiftPeak<T>(maxIterations,convergenceTol,weights,imageType);
+		return new MeanShiftPeak_to_SearchLocalPeak<T>(alg);
 	}
 }

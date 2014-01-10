@@ -16,18 +16,19 @@
  * limitations under the License.
  */
 
-package boofcv.abst.feature.detect.peak;
+package boofcv.struct.weights;
 
-import boofcv.alg.feature.detect.peak.MeanShiftUniformPeak;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.factory.filter.kernel.FactoryKernelGaussian;
 
 /**
  * @author Peter Abeles
  */
-public class TestMeanShiftUniformPeak_to_SearchLocalPeak extends GeneralSearchLocalPeakChecks {
+public class WeightPixelGaussian_F32 extends WeightPixelKernel_F32 {
 	@Override
-	public SearchLocalPeak createSearch(Class<ImageFloat32> imageType) {
-		MeanShiftUniformPeak alg = new MeanShiftUniformPeak(50,1e-3f,-1,imageType);
-		return new MeanShiftPeak_to_SearchLocalPeak(alg);
+	public void setRadius(int radius) {
+		if( kernel == null || kernel.getRadius() != radius ) {
+			double sigma = FactoryKernelGaussian.sigmaForRadius(radius,0);
+			kernel = FactoryKernelGaussian.gaussian2D_F32((float)sigma,radius,true);
+		}
 	}
 }

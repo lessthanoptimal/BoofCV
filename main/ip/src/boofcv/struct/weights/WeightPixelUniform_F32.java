@@ -16,46 +16,39 @@
  * limitations under the License.
  */
 
-package boofcv.abst.feature.detect.peak;
-
-import boofcv.alg.feature.detect.peak.MeanShiftPeak;
-import boofcv.struct.image.ImageSingleBand;
+package boofcv.struct.weights;
 
 /**
- * Wrapper around {@link boofcv.alg.feature.detect.peak.MeanShiftPeak} for {@link SearchLocalPeak}
+ * Weights from a uniform distribution.
  *
  * @author Peter Abeles
  */
-public class MeanShiftPeak_to_SearchLocalPeak<T extends ImageSingleBand> implements SearchLocalPeak<T> {
+public class WeightPixelUniform_F32 implements WeightPixel_F32 {
+	int radius;
+	float weight;
 
-	MeanShiftPeak<T> search;
-
-	public MeanShiftPeak_to_SearchLocalPeak(MeanShiftPeak<T> search) {
-		this.search = search;
+	public WeightPixelUniform_F32() {
 	}
 
 	@Override
-	public void setImage(T image) {
-		search.setImage(image);
+	public float weightIndex(int index) {
+		return weight;
 	}
 
 	@Override
-	public void setSearchRadius(int radius) {
-		search.setRadius(radius);
+	public float weight(int x, int y) {
+		return weight;
 	}
 
 	@Override
-	public void search(float x, float y) {
-		search.search(x,y);
+	public void setRadius(int radius) {
+		this.radius = radius;
+		int w = radius*2+1;
+		weight = 1.0f/(w*w);
 	}
 
 	@Override
-	public float getPeakX() {
-		return search.getPeakX();
-	}
-
-	@Override
-	public float getPeakY() {
-		return search.getPeakY();
+	public int getRadius() {
+		return radius;
 	}
 }
