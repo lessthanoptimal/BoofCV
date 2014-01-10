@@ -89,7 +89,6 @@ public abstract class GeneralSearchLocalPeakChecks {
 				if( startY < 0 ) startY = 0;
 				if( startY > image.height-1) startY = image.height-1;
 
-
 				search.search(startX,startY);
 				assertEquals(cx,search.getPeakX(), toleranceCenter);
 				assertEquals(cy,search.getPeakY(), toleranceCenter);

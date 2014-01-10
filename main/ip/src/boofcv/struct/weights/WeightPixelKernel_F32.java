@@ -16,18 +16,33 @@
  * limitations under the License.
  */
 
-package boofcv.alg.feature.detect.peak;
+package boofcv.struct.weights;
 
-import org.junit.Test;
+import boofcv.struct.convolve.Kernel2D_F32;
 
 /**
+ * Weight which uses the values contained in a {@link Kernel2D_F32}.
+ *
  * @author Peter Abeles
  */
-public class TestMeanShiftGaussianPeak {
+public abstract class WeightPixelKernel_F32 implements WeightPixel_F32 {
+	Kernel2D_F32 kernel;
 
-	@Test
-	public void intentionallyBlank() {
-		// This is tested by the GeneralSearchLocalPeakChecks
+	@Override
+	public float weightIndex(int index) {
+		return kernel.data[index];
 	}
 
+	@Override
+	public float weight(int x, int y) {
+		x += kernel.getRadius();
+		y += kernel.getRadius();
+
+		return kernel.data[ y*kernel.width + x ];
+	}
+
+	@Override
+	public int getRadius() {
+		return kernel.getRadius();
+	}
 }

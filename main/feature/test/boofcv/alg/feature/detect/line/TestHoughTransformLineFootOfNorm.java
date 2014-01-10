@@ -16,11 +16,10 @@
  * limitations under the License.
  */
 
-package boofcv.alg.feature.line;
+package boofcv.alg.feature.detect.line;
 
 import boofcv.abst.feature.detect.extract.ConfigExtract;
 import boofcv.abst.feature.detect.extract.NonMaxSuppression;
-import boofcv.alg.feature.detect.line.HoughTransformLineFootOfNorm;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
 import boofcv.struct.image.*;

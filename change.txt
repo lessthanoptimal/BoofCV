@@ -12,9 +12,14 @@ Version : Alpha 0.17
 - Improved/Fixed serialization
   * Several classes were missing no argument constructors
 - Added ImageMiscOps.flipHorizontal()
+- Added WeightSample2D_F32 for computing the weight of a sample in an abstract manor
+  * Reduced MeanShiftPeak from 3 classes into one
 
 - TODO make those two failed unit tests ago away
 - TODO BoofMiscOps move XML serialization into IO package
+- long distance dense optical flow
+- Mean-shift segmentation
+- watershed segmentation
 
 ---------------------------------------------
 Date    : 2013/12/25

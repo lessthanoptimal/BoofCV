@@ -16,9 +16,8 @@
  * limitations under the License.
  */
 
-package boofcv.alg.feature.line;
+package boofcv.alg.feature.detect.line;
 
-import boofcv.alg.feature.detect.line.ConnectLinesGrid;
 import boofcv.struct.feature.MatrixOfList;
 import georegression.struct.line.LineSegment2D_F32;
 import georegression.struct.point.Point2D_F32;

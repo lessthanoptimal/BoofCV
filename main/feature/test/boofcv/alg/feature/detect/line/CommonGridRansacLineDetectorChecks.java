@@ -16,9 +16,8 @@
  * limitations under the License.
  */
 
-package boofcv.alg.feature.line;
+package boofcv.alg.feature.detect.line;
 
-import boofcv.alg.feature.detect.line.GridRansacLineDetector;
 import boofcv.alg.feature.detect.line.gridline.Edgel;
 import boofcv.alg.feature.detect.line.gridline.GridLineModelDistance;
 import boofcv.alg.feature.detect.line.gridline.GridLineModelFitter;
