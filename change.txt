@@ -19,7 +19,8 @@ Version : Alpha 0.17
   better results
   * Improved unit tests to explicitly test for this behavior
 - Canny edge detector would fail if threshold was zero and the image had no texture
-  * Improved unit tests for canny edge
+  * HysteresisEdge* code was using a value of 0 to mark traversed regions.  It now uses -1 and sanity checks
+    the lower threshold.
   * Thanks Lucaro for finding this bug
 
 - TODO make those two failed unit tests ago away

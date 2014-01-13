@@ -31,6 +31,7 @@ import org.junit.Test;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Peter Abeles
@@ -42,7 +43,7 @@ public class TestCannyEdgeDynamic {
 
 	/**
 	 * Test the pathological case where the input image has no texture.  The threshold will be zero and the
-	 * edge intensity will be zero everywhere.  If not handled correctly things will blow up.
+	 * edge intensity will be zero everywhere.
 	 */
 	@Test
 	public void canHandleNoTexture() {
@@ -57,7 +58,7 @@ public class TestCannyEdgeDynamic {
 		alg.process(input,0.075f,0.3f,output);
 
 		for( int i = 0; i < output.data.length; i++ ) {
-			assertEquals(0,output.data[i]);
+			assertEquals(1,output.data[i]);
 		}
 
 		// try it with a trace now
@@ -66,10 +67,18 @@ public class TestCannyEdgeDynamic {
 		alg.process(input,0.075f,0.3f,output);
 
 		List<EdgeContour> contour = alg.getContours();
-		assertEquals(0,contour.size());
-		for( int i = 0; i < output.data.length; i++ ) {
-			assertEquals(0,output.data[i]);
+		assertTrue(contour.size() > 0);
+
+		int numEdgePixels = 0;
+		for( EdgeContour e : contour ) {
+			for( EdgeSegment s : e.segments ) {
+				numEdgePixels += s.points.size();
+			}
 		}
+		assertEquals(numEdgePixels,input.width*input.height);
+
+		for( int i = 0; i < output.data.length; i++ )
+			assertEquals(1,output.data[i]);
 	}
 
 	/**

@@ -20,7 +20,6 @@ package boofcv.alg.feature.detect.edge;
 
 import boofcv.abst.filter.blur.BlurFilter;
 import boofcv.abst.filter.derivative.ImageGradient;
-import boofcv.alg.misc.ImageMiscOps;
 import boofcv.alg.misc.ImageStatistics;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
@@ -56,16 +55,6 @@ public class CannyEdgeDynamic<T extends ImageSingleBand, D extends ImageSingleBa
 		threshLow = max*threshLow;
 		threshHigh = max*threshHigh;
 
-		// test for the pathological case
-		if( threshLow <= 0 && threshHigh <= 0 ) {
-			// return nothing
-			if( hysteresisPts != null )
-				hysteresisPts.getContours().clear();
-			if( output != null )
-				ImageMiscOps.fill(output,0);
-		} else {
-			super.performThresholding(threshLow, threshHigh, output);
-		}
+		super.performThresholding(threshLow, threshHigh, output);
 	}
-
 }
