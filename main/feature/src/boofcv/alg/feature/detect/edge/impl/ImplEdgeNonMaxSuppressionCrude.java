@@ -29,7 +29,8 @@ import boofcv.struct.image.ImageSInt32;
 /**
  * <p>
  * Implementations of the crude version of non-maximum edge suppression.  If the gradient is positive or negative
- * is used to determine the direction of suppression.
+ * is used to determine the direction of suppression. This is faster since an expensive orientation calculation
+ * is avoided.
  * </p>
  *
  * <p>

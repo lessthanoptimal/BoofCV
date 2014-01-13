@@ -18,16 +18,51 @@
 
 package boofcv.alg.segmentation;
 
+import org.junit.Test;
+
+import static org.junit.Assert.fail;
+
 /**
- * In uniform regions mean-shift segmentation will produce lots of segments with identical colors since they
- * are all local maximums.  This will find all such neighbors and merge them into one group.  For each
- * pixel it checks its 4-connect neighbors to see if they are in the same segment or not.  If not in the same
- * segment it checks to see if their peaks have the same color to within tolerance.  If so a mark will be
- * made in an integer list of segments that one should be merged into another.  A check is made to see
- * if the segment it is merged into doesn't merge into another one.  If it does a link will be made directly to
- * the last one it gets merged into.
- *
  * @author Peter Abeles
  */
-public class MergeSegmentsMeanShiftGray {
+public class TestMergeRegionMeanShiftGray {
+	@Test
+	public void basicAll() {
+		fail("Implement");
+	}
+
+	@Test
+	public void compactRegionId() {
+		fail("Implement");
+	}
+
+	@Test
+	public void updateMemberCount() {
+		fail("Implement");
+	}
+
+	@Test
+	public void createMergeList() {
+		fail("Implement");
+	}
+
+	@Test
+	public void checkMerge_both() {
+		fail("Implement");
+	}
+
+	@Test
+	public void checkMerge_justA() {
+		fail("Implement");
+	}
+
+	@Test
+	public void checkMerge_justB() {
+		fail("Implement");
+	}
+
+	@Test
+	public void checkMerge_neither() {
+		fail("Implement");
+	}
 }

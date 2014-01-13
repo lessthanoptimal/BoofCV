@@ -199,16 +199,66 @@ public class TestGradientToEdgeFeatures {
 		ImageFloat32 expected = new ImageFloat32(width,height);
 		ImageFloat32 found = new ImageFloat32(width,height);
 
-		ImageMiscOps.fillUniform(intensity, rand, 0, 100);
-		ImageMiscOps.fillUniform(direction, rand, 0, 4);
-
 		BoofTesting.checkSubImage(this,"nonMaxSuppression4",true,intensity, direction, expected, found);
 	}
 
 	public void nonMaxSuppression4(ImageFloat32 intensity, ImageSInt8 direction, ImageFloat32 expected, ImageFloat32 found) {
+
+		// compare to naive
+		ImageMiscOps.fillUniform(intensity, rand, 0, 100);
+		ImageMiscOps.fillUniform(direction, rand, 0, 4);
+
 		ImplEdgeNonMaxSuppression.naive4(intensity,direction,expected);
 		GradientToEdgeFeatures.nonMaxSuppression4(intensity,direction,found);
 
 		BoofTesting.assertEquals(expected,found, 1e-4);
+
+		// make sure it does not suppresses values which are equal.
+		ImageMiscOps.fill(intensity, 2);
+
+		ImplEdgeNonMaxSuppression.naive4(intensity,direction,expected);
+		GradientToEdgeFeatures.nonMaxSuppression4(intensity,direction,found);
+
+		BoofTesting.assertEquals(expected,found, 1e-4);
+		for( int y = 0; y < found.height; y++ ) {
+			for( int x = 0; x < found.width; x++ ) {
+				assertEquals(2,found.unsafe_get(x,y),1e-4f);
+			}
+		}
+	}
+
+	@Test
+	public void nonMaxSuppression8() {
+		ImageFloat32 intensity = new ImageFloat32(width,height);
+		ImageSInt8 direction = new ImageSInt8(width,height);
+		ImageFloat32 expected = new ImageFloat32(width,height);
+		ImageFloat32 found = new ImageFloat32(width,height);
+
+		BoofTesting.checkSubImage(this,"nonMaxSuppression4",true,intensity, direction, expected, found);
+	}
+
+	public void nonMaxSuppression8(ImageFloat32 intensity, ImageSInt8 direction, ImageFloat32 expected, ImageFloat32 found) {
+
+		// compare to naive
+		ImageMiscOps.fillUniform(intensity, rand, 0, 100);
+		ImageMiscOps.fillUniform(direction, rand, 0, 4);
+
+		ImplEdgeNonMaxSuppression.naive8(intensity, direction, expected);
+		GradientToEdgeFeatures.nonMaxSuppression8(intensity, direction, found);
+
+		BoofTesting.assertEquals(expected,found, 1e-4);
+
+		// make sure it does not suppresses values which are equal.
+		ImageMiscOps.fill(intensity, 2);
+
+		ImplEdgeNonMaxSuppression.naive4(intensity,direction,expected);
+		GradientToEdgeFeatures.nonMaxSuppression4(intensity,direction,found);
+
+		BoofTesting.assertEquals(expected,found, 1e-4);
+		for( int y = 0; y < found.height; y++ ) {
+			for( int x = 0; x < found.width; x++ ) {
+				assertEquals(2,found.unsafe_get(x,y),1e-4f);
+			}
+		}
 	}
 }

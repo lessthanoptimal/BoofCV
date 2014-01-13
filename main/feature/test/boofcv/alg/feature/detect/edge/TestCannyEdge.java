@@ -44,6 +44,42 @@ public class TestCannyEdge {
 
 	Random rand = new Random(234);
 
+	/**
+	 * Image has no texture and the sadistic user and specified a threshold of zero.  Exception should be
+	 * thrown because the threshold is zero
+	 */
+	@Test(expected=IllegalArgumentException.class)
+	public void canHandleNoTexture_and_zeroThresh() {
+		ImageUInt8 input = new ImageUInt8(width,height);
+		ImageUInt8 output = new ImageUInt8(width,height);
+
+		CannyEdge<ImageUInt8,ImageSInt16> alg = createCanny(true);
+
+		alg.process(input,0,0,output);
+	}
+
+	/**
+	 * Test a pathological case. The input image has a constant gradient
+	 */
+	@Test
+	public void constantGradient() {
+		ImageUInt8 input = new ImageUInt8(width,height);
+		ImageUInt8 output = new ImageUInt8(width,height);
+
+		// the whole image has a constant gradient
+		for( int i = 0; i < input.width; i++ ) {
+			for( int j = 0; j < input.height; j++ ) {
+				input.unsafe_set(i,j,i*2);
+			}
+		}
+
+		CannyEdge<ImageUInt8,ImageSInt16> alg = createCanny(true);
+
+		alg.process(input,1,2,output);
+
+		// just see if it blows up or freezes
+	}
+
 	@Test
 	public void basicTestPoints() {
 

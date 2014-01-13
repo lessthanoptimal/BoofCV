@@ -82,6 +82,23 @@ public class TestImplEdgeNonMaxSuppression {
 		}
 	}
 
+	/**
+	 * Make sure it suppresses values of equal intensity
+	 */
+	@Test
+	public void naive4_equal() {
+		ImageFloat32 intensity = new ImageFloat32(3,3);
+		ImageFloat32 output = new ImageFloat32(3,3);
+		ImageSInt8 direction = new ImageSInt8(3,3);
+
+		GImageMiscOps.fill(intensity, 2);
+
+		ImplEdgeNonMaxSuppression.naive4(intensity,direction,output);
+
+		for( int i = 0; i < output.data.length; i++ )
+			assertEquals(2,output.data[i],1e-4f);
+	}
+
 	@Test
 	public void naive8() {
 		ImageFloat32 intensity = new ImageFloat32(3,3);
@@ -125,6 +142,23 @@ public class TestImplEdgeNonMaxSuppression {
 		}
 	}
 
+	/**
+	 * Make sure it suppresses values of equal intensity
+	 */
+	@Test
+	public void naive8_equal() {
+		ImageFloat32 intensity = new ImageFloat32(3,3);
+		ImageFloat32 output = new ImageFloat32(3,3);
+		ImageSInt8 direction = new ImageSInt8(3,3);
+
+		GImageMiscOps.fill(intensity, 2);
+
+		ImplEdgeNonMaxSuppression.naive8(intensity, direction, output);
+
+		for( int i = 0; i < output.data.length; i++ )
+			assertEquals(2,output.data[i],1e-4f);
+	}
+
 	@Test
 	public void inner4() {
 		ImageFloat32 intensity = new ImageFloat32(width,height);
@@ -132,17 +166,27 @@ public class TestImplEdgeNonMaxSuppression {
 		ImageFloat32 expected = new ImageFloat32(width,height);
 		ImageFloat32 found = new ImageFloat32(width,height);
 
-		ImageMiscOps.fillUniform(intensity, rand, 0, 100);
-		ImageMiscOps.fillUniform(direction, rand, -1, 3);
-
 		BoofTesting.checkSubImage(this,"inner4",true,intensity, direction, expected, found);
 	}
 
 	public void inner4(ImageFloat32 intensity, ImageSInt8 direction, ImageFloat32 expected, ImageFloat32 found) {
+
+		ImageMiscOps.fillUniform(intensity, rand, 0, 100);
+		ImageMiscOps.fillUniform(direction, rand, -1, 3);
+
 		ImplEdgeNonMaxSuppression.naive4(intensity,direction,expected);
 		ImplEdgeNonMaxSuppression.inner4(intensity,direction,found);
 
 		// just test the inside border
+		BoofTesting.assertEquals(expected.subimage(1,1,width-1,height-1, null),
+				found.subimage(1,1,width-1,height-1, null), 1e-4);
+
+		// make sure it handles the constant intensity case
+		ImageMiscOps.fill(intensity,2);
+
+		ImplEdgeNonMaxSuppression.naive4(intensity,direction,expected);
+		ImplEdgeNonMaxSuppression.inner4(intensity,direction,found);
+
 		BoofTesting.assertEquals(expected.subimage(1,1,width-1,height-1, null),
 				found.subimage(1,1,width-1,height-1, null), 1e-4);
 	}
@@ -154,17 +198,26 @@ public class TestImplEdgeNonMaxSuppression {
 		ImageFloat32 expected = new ImageFloat32(width,height);
 		ImageFloat32 found = new ImageFloat32(width,height);
 
-		ImageMiscOps.fillUniform(intensity, rand, 0, 100);
-		ImageMiscOps.fillUniform(direction, rand, -3, 5);
-
 		BoofTesting.checkSubImage(this,"inner8",true,intensity, direction, expected, found);
 	}
 
 	public void inner8(ImageFloat32 intensity, ImageSInt8 direction, ImageFloat32 expected, ImageFloat32 found) {
+		ImageMiscOps.fillUniform(intensity, rand, 0, 100);
+		ImageMiscOps.fillUniform(direction, rand, -3, 5);
+
 		ImplEdgeNonMaxSuppression.naive8(intensity,direction,expected);
 		ImplEdgeNonMaxSuppression.inner8(intensity,direction,found);
 
 		// just test the inside border
+		BoofTesting.assertEquals(expected.subimage(1,1,width-1,height-1, null),
+				found.subimage(1,1,width-1,height-1, null), 1e-4);
+
+		// make sure it handles the constant intensity case
+		ImageMiscOps.fill(intensity,2);
+
+		ImplEdgeNonMaxSuppression.naive8(intensity, direction, expected);
+		ImplEdgeNonMaxSuppression.inner8(intensity, direction, found);
+
 		BoofTesting.assertEquals(expected.subimage(1,1,width-1,height-1, null),
 				found.subimage(1,1,width-1,height-1, null), 1e-4);
 	}
@@ -176,18 +229,28 @@ public class TestImplEdgeNonMaxSuppression {
 		ImageFloat32 expected = new ImageFloat32(width,height);
 		ImageFloat32 found = new ImageFloat32(width,height);
 
-		ImageMiscOps.fillUniform(intensity, rand, 0, 100);
-		ImageMiscOps.fillUniform(direction, rand, -1, 3);
-
 		BoofTesting.checkSubImage(this,"border4",true,intensity, direction, expected, found);
 	}
 
 	public void border4(ImageFloat32 intensity, ImageSInt8 direction, ImageFloat32 expected, ImageFloat32 found) {
+
+		// just test the image border
+		ImageMiscOps.fillUniform(intensity, rand, 0, 100);
+		ImageMiscOps.fillUniform(direction, rand, -1, 3);
+
 		ImplEdgeNonMaxSuppression.naive4(intensity,direction,expected);
 		ImplEdgeNonMaxSuppression.border4(intensity,direction,found);
 
-		// just test the image border
 		BoofTesting.assertEqualsBorder(expected,found,1e-3f,1,1);
+
+		// make sure it handles the constant intensity case
+		ImageMiscOps.fill(intensity,2);
+
+		ImplEdgeNonMaxSuppression.naive4(intensity,direction,expected);
+		ImplEdgeNonMaxSuppression.border4(intensity,direction,found);
+
+		BoofTesting.assertEqualsBorder(expected,found,1e-3f,1,1);
+
 	}
 
 @Test
@@ -197,17 +260,25 @@ public class TestImplEdgeNonMaxSuppression {
 		ImageFloat32 expected = new ImageFloat32(width,height);
 		ImageFloat32 found = new ImageFloat32(width,height);
 
-		ImageMiscOps.fillUniform(intensity, rand, 0, 100);
-		ImageMiscOps.fillUniform(direction, rand, -3, 5);
-
 		BoofTesting.checkSubImage(this,"border8",true,intensity, direction, expected, found);
 	}
 
 	public void border8(ImageFloat32 intensity, ImageSInt8 direction, ImageFloat32 expected, ImageFloat32 found) {
+		// just test the image border
+		ImageMiscOps.fillUniform(intensity, rand, 0, 100);
+		ImageMiscOps.fillUniform(direction, rand, -3, 5);
+
 		ImplEdgeNonMaxSuppression.naive8(intensity,direction,expected);
 		ImplEdgeNonMaxSuppression.border8(intensity,direction,found);
 
-		// just test the image border
+		BoofTesting.assertEqualsBorder(expected,found,1e-3f,1,1);
+
+		// make sure it handles the constant intensity case
+		ImageMiscOps.fill(intensity,2);
+
+		ImplEdgeNonMaxSuppression.naive8(intensity, direction, expected);
+		ImplEdgeNonMaxSuppression.border8(intensity, direction, found);
+
 		BoofTesting.assertEqualsBorder(expected,found,1e-3f,1,1);
 	}
 }

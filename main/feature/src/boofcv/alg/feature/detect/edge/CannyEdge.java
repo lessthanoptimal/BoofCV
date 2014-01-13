@@ -68,8 +68,8 @@ public class CannyEdge<T extends ImageSingleBand, D extends ImageSingleBand> {
 	private ImageUInt8 work = new ImageUInt8(1,1);
 
 	// different algorithms for performing hysteresis thresholding
-	private HysteresisEdgeTracePoints hysteresisPts; // saves a list of points
-	private HysteresisEdgeTraceMark hysteresisMark; // just marks a binary image
+	protected HysteresisEdgeTracePoints hysteresisPts; // saves a list of points
+	protected HysteresisEdgeTraceMark hysteresisMark; // just marks a binary image
 
 	/**
 	 * Specify internal algorithms and behavior.
@@ -97,15 +97,23 @@ public class CannyEdge<T extends ImageSingleBand, D extends ImageSingleBand> {
 	}
 
 	/**
+	 * <p>
 	 * Runs a canny edge detector on the input image given the provided thresholds.  If configured to save
 	 * a list of trace points then the output image is optional.
-	 *
+	 * </p>
+	 * <p>
+	 * NOTE: Input and output can be the same instance if the image type allows it.
+	 * </p>
 	 * @param input Input image. Not modified.
 	 * @param threshLow Lower threshold.
 	 * @param threshHigh Upper threshold.
 	 * @param output (Might be option) Output binary image.  Edge pixels are marked with 1 and everything else 0.
 	 */
 	public void process(T input , float threshLow, float threshHigh , ImageUInt8 output ) {
+
+		// can't handle this case because it assumes edges are at most one pixel thick
+		if( threshLow <= 0 && threshHigh <= 0 )
+			throw new IllegalArgumentException("Both thresholds are <= 0.  This will make every pixel an edge!");
 
 		if( hysteresisMark != null ) {
 			if( output == null )

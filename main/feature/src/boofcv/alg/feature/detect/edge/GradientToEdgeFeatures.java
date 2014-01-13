@@ -306,7 +306,7 @@ public class GradientToEdgeFeatures {
 
 	/**
 	 * <p>
-	 * Sets edge intensities to zero if the pixel has an intensity which is not greater than any of
+	 * Sets edge intensities to zero if the pixel has an intensity which is less than either of
 	 * the two adjacent pixels.  Pixel adjacency is determined by the gradients discretized direction.
 	 * </p>
 	 *
@@ -328,7 +328,7 @@ public class GradientToEdgeFeatures {
 
 	/**
 	 * <p>
-	 * Sets edge intensities to zero if the pixel has an intensity which is not greater than any of
+	 * Sets edge intensities to zero if the pixel has an intensity which is less than either of
 	 * the two adjacent pixels.  Pixel adjacency is determined by the gradients discretized direction.
 	 * </p>
 	 *
@@ -350,7 +350,7 @@ public class GradientToEdgeFeatures {
 
 	/**
 	 * <p>
-	 * Sets edge intensities to zero if the pixel has an intensity which is not greater than any of
+	 * Sets edge intensities to zero if the pixel has an intensity which is less than any of
 	 * the two adjacent pixels.  Pixel adjacency is determined based upon the sign of the image gradient.  Less precise
 	 * than other methods, but faster.
 	 * </p>
@@ -374,7 +374,7 @@ public class GradientToEdgeFeatures {
 
 	/**
 	 * <p>
-	 * Sets edge intensities to zero if the pixel has an intensity which is not greater than any of
+	 * Sets edge intensities to zero if the pixel has an intensity which is less than any of
 	 * the two adjacent pixels.  Pixel adjacency is determined based upon the sign of the image gradient.  Less precise
 	 * than other methods, but faster.
 	 * </p>
@@ -398,7 +398,7 @@ public class GradientToEdgeFeatures {
 
 	/**
 	 * <p>
-	 * Sets edge intensities to zero if the pixel has an intensity which is not greater than any of
+	 * Sets edge intensities to zero if the pixel has an intensity which is less than any of
 	 * the two adjacent pixels.  Pixel adjacency is determined based upon the sign of the image gradient.  Less precise
 	 * than other methods, but faster.
 	 * </p>

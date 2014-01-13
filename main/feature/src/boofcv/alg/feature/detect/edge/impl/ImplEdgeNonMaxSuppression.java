@@ -26,8 +26,10 @@ import boofcv.struct.image.ImageSInt8;
 
 /**
  * Algorithms for performing non-max suppression.  Edge intensities are set to zero if adjacent pixels
- * have a value equal to or greater than the current value.  Adjacency is determined by the gradients
+ * have a value greater than the current value.  Adjacency is determined by the gradients
  * discretized direction.
+ *
+ * NOTE: This is technically not true non-maximum suppression because equal values are allowed.
  *
  * @author Peter Abeles
  */

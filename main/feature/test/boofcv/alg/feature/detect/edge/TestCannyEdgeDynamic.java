@@ -21,6 +21,7 @@ package boofcv.alg.feature.detect.edge;
 import boofcv.abst.filter.blur.BlurFilter;
 import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.alg.misc.ImageMiscOps;
+import boofcv.factory.feature.detect.edge.FactoryEdgeDetectors;
 import boofcv.factory.filter.blur.FactoryBlurFilter;
 import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.struct.image.ImageSInt16;
@@ -38,6 +39,38 @@ public class TestCannyEdgeDynamic {
 
 	int width = 150;
 	int height = 200;
+
+	/**
+	 * Test the pathological case where the input image has no texture.  The threshold will be zero and the
+	 * edge intensity will be zero everywhere.  If not handled correctly things will blow up.
+	 */
+	@Test
+	public void canHandleNoTexture() {
+		ImageUInt8 input = new ImageUInt8(width,height);
+		ImageUInt8 output = new ImageUInt8(width,height);
+
+		ImageMiscOps.fill(output,2);
+
+		CannyEdge<ImageUInt8,ImageSInt16> alg =
+				FactoryEdgeDetectors.canny(2, false, true, ImageUInt8.class, ImageSInt16.class);
+
+		alg.process(input,0.075f,0.3f,output);
+
+		for( int i = 0; i < output.data.length; i++ ) {
+			assertEquals(0,output.data[i]);
+		}
+
+		// try it with a trace now
+		alg = FactoryEdgeDetectors.canny(2, true, true, ImageUInt8.class, ImageSInt16.class);
+		ImageMiscOps.fill(output,2);
+		alg.process(input,0.075f,0.3f,output);
+
+		List<EdgeContour> contour = alg.getContours();
+		assertEquals(0,contour.size());
+		for( int i = 0; i < output.data.length; i++ ) {
+			assertEquals(0,output.data[i]);
+		}
+	}
 
 	/**
 	 * Just checks to see if it computes a reasonable threshold given fractional parameters
