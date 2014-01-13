@@ -16,25 +16,20 @@
  * limitations under the License.
  */
 
-package boofcv.struct.weights;
+package boofcv.factory.weights;
 
 /**
- * The distribution is a cropped Gaussian distribution with mean at 0.  Note
- * that this matches the shape of the distribution but is not correctly normalized.  Input is assumed to be
- * the distance squared.
+ * Types of distributions which are available for use as weights
  *
  * @author Peter Abeles
  */
-public class WeightDistanceSqGaussian_F32 implements WeightDistance_F32  {
-
-	float sigma;
-
-	public WeightDistanceSqGaussian_F32(float sigma) {
-		this.sigma = sigma;
-	}
-
-	@Override
-	public float weight(float distanceSq) {
-		return (float)Math.exp( - distanceSq/(2.0f*sigma*sigma) );
-	}
+public enum WeightType {
+	/**
+	 * Uniform distribution
+	 */
+	UNIFORM,
+	/**
+	 * Gaussian distribution where the input distance is assumed to be the distance squared.
+	 */
+	GAUSSIAN_SQ
 }

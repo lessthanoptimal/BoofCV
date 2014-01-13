@@ -46,8 +46,8 @@ import java.util.List;
  * </p>
  *
  * <p>
- * [1] Meer, Peter. "Kernel-Based Object Tracking." IEEE Transactions on Pattern Analysis and Machine Intelligence
- * 25.4 (2003): 1.
+ * [1] Dorin Comaniciu, Visvanathan Ramesh, and Peter Meer,"Kernel-Based Object Tracking." IEEE Transactions on
+ * Pattern Analysis and Machine Intelligence 25.4 (2003): 1.
  * </p>
  * @author Peter Abeles
  */

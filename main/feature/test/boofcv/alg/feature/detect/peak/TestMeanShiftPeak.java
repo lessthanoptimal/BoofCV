@@ -19,8 +19,8 @@
 package boofcv.alg.feature.detect.peak;
 
 
+import boofcv.alg.weights.WeightPixelGaussian_F32;
 import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.weights.WeightPixelGaussian_F32;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

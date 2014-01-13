@@ -16,39 +16,20 @@
  * limitations under the License.
  */
 
-package boofcv.struct.weights;
+package boofcv.alg.weights;
 
 /**
- * Weights from a uniform distribution.
+ * Converts the distance a sample is into a weight.
  *
  * @author Peter Abeles
  */
-public class WeightPixelUniform_F32 implements WeightPixel_F32 {
-	int radius;
-	float weight;
+public interface WeightDistance_F32 {
 
-	public WeightPixelUniform_F32() {
-	}
-
-	@Override
-	public float weightIndex(int index) {
-		return weight;
-	}
-
-	@Override
-	public float weight(int x, int y) {
-		return weight;
-	}
-
-	@Override
-	public void setRadius(int radius) {
-		this.radius = radius;
-		int w = radius*2+1;
-		weight = 1.0f/(w*w);
-	}
-
-	@Override
-	public int getRadius() {
-		return radius;
-	}
+	/**
+	 * Returns the weight given a distance
+	 *
+	 * @param distance Distance a sample is
+	 * @return the weight
+	 */
+	public float weight( float distance );
 }

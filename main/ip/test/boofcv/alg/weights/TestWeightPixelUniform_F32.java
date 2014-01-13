@@ -16,11 +16,11 @@
  * limitations under the License.
  */
 
-package boofcv.struct.weights;
+package boofcv.alg.weights;
 
 import org.junit.Test;
 
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Peter Abeles
@@ -28,8 +28,31 @@ import static org.junit.Assert.fail;
 public class TestWeightPixelUniform_F32 {
 
 	@Test
-	public void stuff() {
-		fail("Implement");
+	public void inside() {
+		WeightPixelUniform_F32 alg = new WeightPixelUniform_F32();
+		alg.setRadius(2);
+
+		float expected = 1.0f/25.0f;
+
+		int index = 0;
+		for( int y = -2; y <= 2; y++ )
+			for( int x = -2; x <= 2; x++ , index++) {
+				assertEquals(expected,alg.weight(x,y),1e-4);
+				assertEquals(expected,alg.weightIndex(index),1e-4);
+			}
 	}
 
+	/**
+	 * Well if it is outside the square region it should be zero, but the class specifies that it doesn't actually
+	 * check to see if that's the case.
+	 */
+	@Test
+	public void outside() {
+		WeightPixelUniform_F32 alg = new WeightPixelUniform_F32();
+		alg.setRadius(2);
+
+		float expected = 1.0f/25.0f;
+
+		assertEquals(expected,alg.weight(-3,0),1e-4);
+	}
 }

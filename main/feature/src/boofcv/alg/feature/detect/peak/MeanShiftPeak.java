@@ -19,9 +19,9 @@
 package boofcv.alg.feature.detect.peak;
 
 import boofcv.alg.interpolate.InterpolatePixelS;
+import boofcv.alg.weights.WeightPixel_F32;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.weights.WeightPixel_F32;
 
 /**
  * Simple implementations of mean-shift intended to finding local peaks inside an intensity image.

@@ -16,20 +16,40 @@
  * limitations under the License.
  */
 
-package boofcv.struct.weights;
+package boofcv.alg.weights;
 
+import boofcv.factory.filter.kernel.FactoryKernel;
 import org.junit.Test;
 
-import static org.junit.Assert.fail;
+import java.util.Random;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Peter Abeles
  */
-public class TestWeightDistanceSqGaussian_F32 {
+public class TestWeightPixelKernel_F32 {
+
+	Random rand = new Random(234);
 
 	@Test
-	public void stuff() {
-		fail("Implement");
+	public void kernelLookup() {
+		WeightPixelKernel_F32 alg = new WeightPixelKernel_F32() {
+			@Override
+			public void setRadius(int radius) {}
+		};
+
+		alg.kernel = FactoryKernel.random2D_F32(2,-2,2,rand);
+
+		int index = 0;
+		for( int y = -2; y <= 2; y++ )
+			for( int x = -2; x <= 2; x++ , index++) {
+				float found = alg.weight(x, y);
+				float expected = alg.kernel.get(x+2,y+2);
+
+				assertEquals(expected,found,1e-4);
+				assertEquals(expected,alg.weightIndex(index),1e-4);
+			}
 	}
 
 }
