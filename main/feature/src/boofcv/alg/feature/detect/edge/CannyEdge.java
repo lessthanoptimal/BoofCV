@@ -102,18 +102,17 @@ public class CannyEdge<T extends ImageSingleBand, D extends ImageSingleBand> {
 	 * a list of trace points then the output image is optional.
 	 * </p>
 	 * <p>
-	 * NOTE: Input and output can be the same instance if the image type allows it.
+	 * NOTE: Input and output can be the same instance, if the image type allows it.
 	 * </p>
 	 * @param input Input image. Not modified.
-	 * @param threshLow Lower threshold.
-	 * @param threshHigh Upper threshold.
+	 * @param threshLow Lower threshold. >= 0.
+	 * @param threshHigh Upper threshold. >= 0.
 	 * @param output (Might be option) Output binary image.  Edge pixels are marked with 1 and everything else 0.
 	 */
 	public void process(T input , float threshLow, float threshHigh , ImageUInt8 output ) {
 
-		// can't handle this case because it assumes edges are at most one pixel thick
-		if( threshLow <= 0 && threshHigh <= 0 )
-			throw new IllegalArgumentException("Both thresholds are <= 0.  This will make every pixel an edge!");
+		if( threshLow < 0 || threshHigh < 0 )
+			throw new IllegalArgumentException("Threshold must be >= zero!");
 
 		if( hysteresisMark != null ) {
 			if( output == null )

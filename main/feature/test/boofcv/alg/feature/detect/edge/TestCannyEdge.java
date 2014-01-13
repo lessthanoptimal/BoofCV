@@ -45,10 +45,10 @@ public class TestCannyEdge {
 	Random rand = new Random(234);
 
 	/**
-	 * Image has no texture and the sadistic user and specified a threshold of zero.  Exception should be
-	 * thrown because the threshold is zero
+	 * Image has no texture and the sadistic user and specified a threshold of zero.  Everything should
+	 * be an edge.
 	 */
-	@Test(expected=IllegalArgumentException.class)
+	@Test
 	public void canHandleNoTexture_and_zeroThresh() {
 		ImageUInt8 input = new ImageUInt8(width,height);
 		ImageUInt8 output = new ImageUInt8(width,height);
@@ -56,6 +56,20 @@ public class TestCannyEdge {
 		CannyEdge<ImageUInt8,ImageSInt16> alg = createCanny(true);
 
 		alg.process(input,0,0,output);
+
+		List<EdgeContour> contour = alg.getContours();
+		assertTrue(contour.size()>0);
+
+		int numEdgePixels = 0;
+		for( EdgeContour e : contour ) {
+			for( EdgeSegment s : e.segments ) {
+				numEdgePixels += s.points.size();
+			}
+		}
+		assertEquals(numEdgePixels,input.width*input.height);
+
+		for( int i = 0; i < output.data.length; i++ )
+			assertEquals(1,output.data[i]);
 	}
 
 	/**

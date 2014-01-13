@@ -43,6 +43,10 @@ import java.util.List;
  */
 public class HysteresisEdgeTracePoints {
 
+	// after an edge has been traversed it is set to this value.  This is also why the lower threshold
+	// must be >= 0
+	public static final float MARK_TRAVERSED = -1;
+
 	// reference to input intensity and direction images
 	private ImageFloat32 intensity; // intensity after edge non-maximum suppression
 	private ImageSInt8 direction; // 4-direction
@@ -70,6 +74,8 @@ public class HysteresisEdgeTracePoints {
 	 * @param upper Upper threshold.
 	 */
 	public void process( ImageFloat32 intensity , ImageSInt8 direction , float lower , float upper ) {
+		if( lower < 0 )
+			throw new IllegalArgumentException("Lower must be >= 0!");
 		InputSanityCheck.checkSameShape(intensity, direction);
 
 		// set up internal data structures
@@ -108,7 +114,7 @@ public class HysteresisEdgeTracePoints {
 		int dx,dy;
 
 		addFirstSegment(x, y);
-		intensity.data[ indexInten ] = 0;
+		intensity.data[ indexInten ] = MARK_TRAVERSED;
 
 		while( open.size() > 0 ) {
 			EdgeSegment s = open.remove( open.size()-1 );
@@ -142,7 +148,7 @@ public class HysteresisEdgeTracePoints {
 
 				// See if the forward point is in bounds and above the lower threshold
 				if( intensity.isInBounds(fx,fy) && intensity.data[ indexForward ] >= lower ) {
-					intensity.data[ indexForward ] = 0;
+					intensity.data[ indexForward ] = MARK_TRAVERSED;
 					p = queuePoints.grow();
 					p.set(fx,fy);
 					s.points.add(p);
@@ -152,7 +158,7 @@ public class HysteresisEdgeTracePoints {
 				}
 				// See if the backwards point is in bounds and above the lower threshold
 				if( intensity.isInBounds(bx,by) && intensity.data[ indexBackward ] >= lower ) {
-					intensity.data[ indexBackward ] = 0;
+					intensity.data[ indexBackward ] = MARK_TRAVERSED;
 					if( match ) {
 						// a match was found in the forwards direction, so start a new segment here
 						startNewSegment(bx, by,s);
@@ -219,7 +225,7 @@ public class HysteresisEdgeTracePoints {
 		if( intensity.isInBounds(x,y)  ) {
 			int index = intensity.getIndex(x,y);
 			if( intensity.data[index] >= lower ) {
-				intensity.data[index] = 0;
+				intensity.data[index] = MARK_TRAVERSED;
 
 				if( !match ) {
 					Point2D_I32 p = queuePoints.grow();

@@ -36,6 +36,9 @@ import org.ddogleg.struct.FastQueue;
  */
 public class HysteresisEdgeTraceMark {
 
+	// after an edge has been traversed it is set to this value
+	public static final float MARK_TRAVERSED = -1;
+
 	// reference to input intensity and direction images
 	private ImageFloat32 intensity; // intensity after edge non-maximum suppression
 	private ImageSInt8 direction; // 4-direction
@@ -62,6 +65,8 @@ public class HysteresisEdgeTraceMark {
 	 */
 	public void process( ImageFloat32 intensity , ImageSInt8 direction , float lower , float upper ,
 						 ImageUInt8 output ) {
+		if( lower < 0 )
+			throw new IllegalArgumentException("Lower must be >= 0!");
 		InputSanityCheck.checkSameShape(intensity,direction,output);
 
 		// set up internal data structures
@@ -95,7 +100,7 @@ public class HysteresisEdgeTraceMark {
 		int indexOut = output.getIndex(x,y);
 		open.grow().set(x,y);
 		output.data[indexOut] = 1;
-		intensity.data[ indexInten ] = 0;
+		intensity.data[ indexInten ] = MARK_TRAVERSED;
 
 		while( open.size() > 0 ) {
 			active.set(open.removeTail());
@@ -127,7 +132,7 @@ public class HysteresisEdgeTraceMark {
 				int bx = active.x-dx, by = active.y-dy;
 
 				if( intensity.isInBounds(fx,fy) && intensity.data[ indexForward ] >= lower ) {
-					intensity.data[ indexForward ] = 0;
+					intensity.data[ indexForward ] = MARK_TRAVERSED;
 					output.unsafe_set(fx, fy, 1);
 					active.set(fx, fy);
 					match = true;
@@ -135,7 +140,7 @@ public class HysteresisEdgeTraceMark {
 					indexDir = prevIndexDir  + dy*intensity.stride + dx;
 				}
 				if( intensity.isInBounds(bx,by) && intensity.data[ indexBackward ] >= lower ) {
-					intensity.data[ indexBackward ] = 0;
+					intensity.data[ indexBackward ] = MARK_TRAVERSED;
 					output.unsafe_set(bx,by,1);
 					if( match ) {
 						open.grow().set(bx,by);
@@ -196,7 +201,7 @@ public class HysteresisEdgeTraceMark {
 		if( intensity.isInBounds(x,y)  ) {
 			int index = intensity.getIndex(x,y);
 			if( intensity.data[index] >= lower ) {
-				intensity.data[index] = 0;
+				intensity.data[index] = MARK_TRAVERSED;
 				output.unsafe_set(x,y,1);
 
 				if( match ) {
