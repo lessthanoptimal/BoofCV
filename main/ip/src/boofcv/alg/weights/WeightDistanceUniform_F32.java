@@ -16,20 +16,28 @@
  * limitations under the License.
  */
 
-package boofcv.struct.weights;
-
-import org.junit.Test;
-
-import static org.junit.Assert.fail;
+package boofcv.alg.weights;
 
 /**
+ * A uniform distribution from 0 to maxDistance, inclusive. If value is  greater than maxDistance it returns 0.
+ * Does not check to see if the distance is less than zero.
+ *
  * @author Peter Abeles
  */
-public class TestWeightDistanceUniform_F32 {
+public class WeightDistanceUniform_F32 implements WeightDistance_F32  {
 
-	@Test
-	public void stuff() {
-		fail("Implement");
+	float maxDistance;
+	float weight;
+
+	public WeightDistanceUniform_F32(float maxDistance) {
+		this.maxDistance = maxDistance;
+		this.weight = 1.0f/ maxDistance;
 	}
 
+	@Override
+	public float weight(float distance) {
+		if( distance <= maxDistance)
+			return weight;
+		return 0;
+	}
 }

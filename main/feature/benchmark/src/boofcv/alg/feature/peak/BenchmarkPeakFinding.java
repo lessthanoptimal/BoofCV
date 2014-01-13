@@ -20,14 +20,14 @@ package boofcv.alg.feature.peak;
 
 import boofcv.alg.feature.detect.peak.MeanShiftPeak;
 import boofcv.alg.misc.GImageMiscOps;
+import boofcv.alg.weights.WeightPixelGaussian_F32;
+import boofcv.alg.weights.WeightPixel_F32;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.misc.PerformerBase;
 import boofcv.misc.ProfileOperation;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
-import boofcv.struct.weights.WeightPixelGaussian_F32;
-import boofcv.struct.weights.WeightPixel_F32;
 import georegression.struct.point.Point2D_F32;
 
 import java.util.ArrayList;

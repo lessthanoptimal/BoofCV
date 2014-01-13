@@ -16,19 +16,28 @@
  * limitations under the License.
  */
 
-package boofcv.struct.weights;
+package boofcv.alg.weights;
 
-import boofcv.factory.filter.kernel.FactoryKernelGaussian;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Peter Abeles
  */
-public class WeightPixelGaussian_F32 extends WeightPixelKernel_F32 {
-	@Override
-	public void setRadius(int radius) {
-		if( kernel == null || kernel.getRadius() != radius ) {
-			double sigma = FactoryKernelGaussian.sigmaForRadius(radius,0);
-			kernel = FactoryKernelGaussian.gaussian2D_F32((float)sigma,radius,true);
-		}
+public class TestWeightDistanceUniform_F32 {
+
+	@Test
+	public void basic() {
+		WeightDistanceUniform_F32 alg = new WeightDistanceUniform_F32(1.5f);
+
+		float expected = 1.0f/1.5f;
+
+		assertEquals(expected, alg.weight(0), 1e-4f);
+		assertEquals(expected, alg.weight(0.6f), 1e-4f);
+		assertEquals(expected, alg.weight(1.5f), 1e-4f);
+		assertEquals(0, alg.weight(1.50001f), 1e-4f);
+		assertEquals(0, alg.weight(2f), 1e-4f);
 	}
+
 }

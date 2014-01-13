@@ -21,10 +21,10 @@ package boofcv.factory.feature.detect.peak;
 import boofcv.abst.feature.detect.peak.MeanShiftPeak_to_SearchLocalPeak;
 import boofcv.abst.feature.detect.peak.SearchLocalPeak;
 import boofcv.alg.feature.detect.peak.MeanShiftPeak;
+import boofcv.alg.weights.WeightPixelGaussian_F32;
+import boofcv.alg.weights.WeightPixelUniform_F32;
+import boofcv.alg.weights.WeightPixel_F32;
 import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.weights.WeightPixelGaussian_F32;
-import boofcv.struct.weights.WeightPixelUniform_F32;
-import boofcv.struct.weights.WeightPixel_F32;
 
 /**
  * Factory for implementations of {@link SearchLocalPeak}

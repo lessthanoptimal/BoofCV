@@ -16,20 +16,19 @@
  * limitations under the License.
  */
 
-package boofcv.struct.weights;
+package boofcv.alg.weights;
+
+import boofcv.factory.filter.kernel.FactoryKernelGaussian;
 
 /**
- * Converts the distance a sample is into a weight.
- *
  * @author Peter Abeles
  */
-public interface WeightDistance_F32 {
-
-	/**
-	 * Returns the weight given a distance
-	 *
-	 * @param distance Distance a sample is
-	 * @return the weight
-	 */
-	public float weight( float distance );
+public class WeightPixelGaussian_F32 extends WeightPixelKernel_F32 {
+	@Override
+	public void setRadius(int radius) {
+		if( kernel == null || kernel.getRadius() != radius ) {
+			double sigma = FactoryKernelGaussian.sigmaForRadius(radius,0);
+			kernel = FactoryKernelGaussian.gaussian2D_F32((float)sigma,radius,true);
+		}
+	}
 }

@@ -16,20 +16,25 @@
  * limitations under the License.
  */
 
-package boofcv.struct.weights;
-
-import org.junit.Test;
-
-import static org.junit.Assert.fail;
+package boofcv.alg.weights;
 
 /**
+ * The distribution is a cropped Gaussian distribution with mean at 0.  Note
+ * that this matches the shape of the distribution but is not correctly normalized.  Input is assumed to be
+ * the distance squared.  Does not check to see if distance is less than zero
+ *
  * @author Peter Abeles
  */
-public class TestWeightPixelKernel_F32 {
+public class WeightDistanceSqGaussian_F32 implements WeightDistance_F32  {
 
-	@Test
-	public void stuff() {
-		fail("Implement");
+	float sigma;
+
+	public WeightDistanceSqGaussian_F32(float sigma) {
+		this.sigma = sigma;
 	}
 
+	@Override
+	public float weight(float distanceSq) {
+		return (float)Math.exp( - distanceSq/(2.0f*sigma*sigma) );
+	}
 }

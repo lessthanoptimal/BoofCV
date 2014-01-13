@@ -16,27 +16,41 @@
  * limitations under the License.
  */
 
-package boofcv.struct.weights;
+package boofcv.alg.weights;
 
 /**
- * A uniform distribution from 0 to maxWeight.
+ * Weights from a uniform distribution within a symmetric square region.  All samples within the region return
+ * a constant value, which is 1.0/w^2, where w = radius*2+1. For performance reasons, no checks are done to see if the
+ * sample point is outside the radius and should be zero.
  *
  * @author Peter Abeles
  */
-public class WeightDistanceUniform_F32 implements WeightDistance_F32  {
-
-	float maxWeight;
+public class WeightPixelUniform_F32 implements WeightPixel_F32 {
+	int radius;
 	float weight;
 
-	public WeightDistanceUniform_F32(float maxWeight) {
-		this.maxWeight = maxWeight;
-		this.weight = 1.0f/maxWeight;
+	public WeightPixelUniform_F32() {
 	}
 
 	@Override
-	public float weight(float distance) {
-		if( distance <= maxWeight )
-			return weight;
-		return 0;
+	public float weightIndex(int index) {
+		return weight;
+	}
+
+	@Override
+	public float weight(int x, int y) {
+		return weight;
+	}
+
+	@Override
+	public void setRadius(int radius) {
+		this.radius = radius;
+		int w = radius*2+1;
+		weight = 1.0f/(w*w);
+	}
+
+	@Override
+	public int getRadius() {
+		return radius;
 	}
 }

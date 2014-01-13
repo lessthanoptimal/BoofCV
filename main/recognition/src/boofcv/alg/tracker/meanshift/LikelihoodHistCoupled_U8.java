@@ -39,7 +39,6 @@ public class LikelihoodHistCoupled_U8 implements PixelLikelihood<MultiSpectral<I
 	int numBins;
 	float hist[] = new float[0];
 
-
 	public LikelihoodHistCoupled_U8(int maxPixelValue, int numBins) {
 		this.maxPixelValue = maxPixelValue+1;
 		this.numBins = numBins;

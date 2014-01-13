@@ -16,33 +16,38 @@
  * limitations under the License.
  */
 
-package boofcv.struct.weights;
+package boofcv.alg.weights;
 
-import boofcv.struct.convolve.Kernel2D_F32;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
- * Weight which uses the values contained in a {@link Kernel2D_F32}.
- *
  * @author Peter Abeles
  */
-public abstract class WeightPixelKernel_F32 implements WeightPixel_F32 {
-	Kernel2D_F32 kernel;
+public class TestWeightDistanceSqGaussian_F32 {
 
-	@Override
-	public float weightIndex(int index) {
-		return kernel.data[index];
+	/**
+	 * See if it has some of the features of a gaussian
+	 */
+	@Test
+	public void basic() {
+		WeightDistanceSqGaussian_F32 alg = new WeightDistanceSqGaussian_F32(2);
+
+		// should always decrease in value
+		float prev = alg.weight(0);
+		for( int i = 1; i < 10; i++ ) {
+			float dist = 0.2f*i;
+			float found = alg.weight(dist);
+
+			assertTrue( found < prev );
+			prev = found;
+		}
+
+		// likelihood of something 6 stdevs away is practically zero
+		// remember, the input is distance squared.
+		assertEquals(0,alg.weight(12*12),1e-4);
 	}
 
-	@Override
-	public float weight(int x, int y) {
-		x += kernel.getRadius();
-		y += kernel.getRadius();
-
-		return kernel.data[ y*kernel.width + x ];
-	}
-
-	@Override
-	public int getRadius() {
-		return kernel.getRadius();
-	}
 }

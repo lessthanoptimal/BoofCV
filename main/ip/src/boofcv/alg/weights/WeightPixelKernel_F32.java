@@ -16,20 +16,34 @@
  * limitations under the License.
  */
 
-package boofcv.struct.weights;
+package boofcv.alg.weights;
 
-import org.junit.Test;
-
-import static org.junit.Assert.fail;
+import boofcv.struct.convolve.Kernel2D_F32;
 
 /**
+ * Weight which uses the values contained in a {@link Kernel2D_F32}. For performance reasons no checks are
+ * done to see if a request has been made outside the kernel's radius.  Those values should be zero.
+ *
  * @author Peter Abeles
  */
-public class TestWeightPixelGaussian_F32 {
+public abstract class WeightPixelKernel_F32 implements WeightPixel_F32 {
+	protected Kernel2D_F32 kernel;
 
-	@Test
-	public void stuff() {
-		fail("Implement");
+	@Override
+	public float weightIndex(int index) {
+		return kernel.data[index];
 	}
 
+	@Override
+	public float weight(int x, int y) {
+		x += kernel.getRadius();
+		y += kernel.getRadius();
+
+		return kernel.data[ y*kernel.width + x ];
+	}
+
+	@Override
+	public int getRadius() {
+		return kernel.getRadius();
+	}
 }
