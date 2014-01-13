@@ -14,6 +14,13 @@ Version : Alpha 0.17
 - Added ImageMiscOps.flipHorizontal()
 - Added WeightSample2D_F32 for computing the weight of a sample in an abstract manor
   * Reduced MeanShiftPeak from 3 classes into one
+- Edge Non-Maximum suppression's documentation now clearly states that it suppresses only if adjacent pixel is
+  less than.  This is not true non-maximum suppression since it allows equal values but seems to produce
+  better results
+  * Improved unit tests to explicitly test for this behavior
+- Canny edge detector would fail if threshold was zero and the image had no texture
+  * Improved unit tests for canny edge
+  * Thanks Lucaro for finding this bug
 
 - TODO make those two failed unit tests ago away
 - TODO BoofMiscOps move XML serialization into IO package

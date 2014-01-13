@@ -106,6 +106,10 @@ public class TestImplEdgeNonMaxSuppressionCrude {
 				GeneralizedImageOps.set(input,2+dx,2+dy,10);
 			}
 		}
+
+		// uniform case should be NOT suppressed
+		GImageMiscOps.fill(input, 2);
+		BoofTesting.checkSubImage(this, "inner", true, m, input, derivX, derivY, output, false);
 	}
 
 	public static <D extends ImageSingleBand>
@@ -139,17 +143,17 @@ public class TestImplEdgeNonMaxSuppressionCrude {
 		ImageSingleBand derivX = GeneralizedImageOps.createSingleBand(derivType, width, height);
 		ImageSingleBand derivY = GeneralizedImageOps.createSingleBand(derivType, width, height);
 
-		Random rand = new Random(123);
-		GImageMiscOps.fillUniform(input, rand, 0, 30);
-		GImageMiscOps.fillUniform(derivX, rand, -30, 30);
-		GImageMiscOps.fillUniform(derivY, rand, -30, 30);
-
 		BoofTesting.checkSubImage(this, "border", true, m, input, derivX, derivY, output );
 	}
 
 	public static <D extends ImageSingleBand>
 	void border( Method m , ImageFloat32 input , D derivX , D derivY , ImageFloat32 output )
 	{
+		Random rand = new Random(123);
+		GImageMiscOps.fillUniform(input, rand, 0, 30);
+		GImageMiscOps.fillUniform(derivX, rand, -30, 30);
+		GImageMiscOps.fillUniform(derivY, rand, -30, 30);
+
 		try {
 			m.invoke(null,input,derivX,derivY,output);
 
@@ -171,6 +175,29 @@ public class TestImplEdgeNonMaxSuppressionCrude {
 					float right = intensity.get(x+dx,y+dy);
 
 					assertEquals( (left < middle && right < middle), output.get(x,y) != 0);
+				}
+			}
+
+			// uniform case should be NOT suppressed
+			GImageMiscOps.fill(input,2);
+			m.invoke(null, input, derivX, derivY, output);
+			for( int y = 0; y < input.height; y++ ) {
+				if( y != 0 && y != input.height-1 )
+					continue;
+
+				for( int x = 0; x < input.width; x++ ) {
+					if( x != 0 && x != input.width-1 )
+						continue;
+
+					// skip the corners too since it's poorly defined how that should be handled
+					// the two adjacent pixels could be outside the image, depending on gradient direction
+					if((x == 0 && y == 0) || (x ==input.width-1 && y == 0) )
+						continue;
+					if((x ==input.width-1 && y == input.height-1) || (x ==0 && y == input.height-1) )
+						continue;
+
+
+					assertTrue( output.get(x,y) == 2);
 				}
 			}
 
