@@ -57,11 +57,13 @@ public class MergeRegionMeanShiftGray {
 		// compact the region id's
 		compactRegionId(regionMemberCount, regionColor);
 
-		// update the pixelToregion
+		// update the pixelToRegion
+		int count = 0;
 		for( int i = 0; i < mergeList.size; i++ ) {
 			if( mergeList.data[i] == -1 )
-				mergeList.data[i] = i;
+				mergeList.data[i] = count++;
 		}
+
 		BinaryImageOps.relabel(pixelToRegion, mergeList.data);
 
 	}
@@ -72,34 +74,35 @@ public class MergeRegionMeanShiftGray {
 	 *
 	 * mergeList is changed to use the new compacted IDs.  the two input lists are compacted.
 	 */
+	// TODO speed this up also
 	protected void compactRegionId(GrowQueue_I32 regionMemberCount, GrowQueue_F32 regionColor) {
-		int offset = 0;
+
+		GrowQueue_I32 rmcNew = new GrowQueue_I32();
+		GrowQueue_F32 colorNew = new GrowQueue_F32();
+
+		int count = 0;
 		for( int i = 0; i < mergeList.size; i++ ) {
 			int w = mergeList.data[i];
 			if( w == -1 ){
-				// see if there is a need to change anything
-				if( offset == 0 )
-					continue;
-
-				// find all references to the original region and change it to the new index
-				int dst = i-offset;
 				for( int j = 0; j < mergeList.size; j++ ) {
 					if( mergeList.data[j] == i ) {
-						mergeList.data[j] = dst;
+						mergeList.data[j] = count;
 					}
 				}
 
 				// shift over data which describes the region
-				regionMemberCount.data[dst] = regionMemberCount.data[i];
-				regionColor.data[dst] = regionColor.data[i];
-			} else {
-				// skip over these since it will be over written later
-				offset++;
+				rmcNew.add(regionMemberCount.data[i]);
+				colorNew.add(regionColor.data[i]);
+
+				count++;
 			}
 		}
 
-		regionMemberCount.size -= offset;
-		regionColor.size -= offset;
+		regionMemberCount.reset();
+		regionColor.reset();
+
+		regionMemberCount.addAll(rmcNew);
+		regionColor.addAll(colorNew);
 	}
 
 	/**
@@ -119,20 +122,20 @@ public class MergeRegionMeanShiftGray {
 	 * see if their pixel intensity values are within tolerance of each other.  If so they are then marked for
 	 * merging.
 	 */
-	private void createMergeList(ImageSInt32 pixelToregion, GrowQueue_F32 regionColor) {
+	protected void createMergeList(ImageSInt32 pixelToRegion, GrowQueue_F32 regionColor) {
 		// merge the merge list as initial all no merge
 		mergeList.resize(regionColor.getSize());
 		for( int i = 0; i < mergeList.size; i++ ) {
 			mergeList.data[i] = -1;
 		}
 
-		// TODO handle border case
-		for( int y = 0; y < pixelToregion.height-1; y++ ) {
-			int pixelIndex = y*pixelToregion.width;
-			for( int x = 0; x < pixelToregion.width-1; x++ , pixelIndex++) {
-				int a = pixelToregion.data[pixelIndex];
-				int b = pixelToregion.data[pixelIndex+1]; // pixel +1 x
-				int c = pixelToregion.data[pixelIndex+pixelToregion.width]; // pixel +1 y
+		// the inner image, excluding the right and bottom borders
+		for( int y = 0; y < pixelToRegion.height-1; y++ ) {
+			int pixelIndex = y*pixelToRegion.width;
+			for( int x = 0; x < pixelToRegion.width-1; x++ , pixelIndex++) {
+				int a = pixelToRegion.data[pixelIndex];
+				int b = pixelToRegion.data[pixelIndex+1]; // pixel +1 x
+				int c = pixelToRegion.data[pixelIndex+pixelToRegion.width]; // pixel +1 y
 
 				float colorA = regionColor.get(a);
 
@@ -153,6 +156,44 @@ public class MergeRegionMeanShiftGray {
 				}
 			}
 		}
+
+		// right side of the image
+		for( int y = 0; y < pixelToRegion.height-1; y++ ) {
+			// location (w-1,y)
+			int pixelIndex = y*pixelToRegion.width+pixelToRegion.width-1;
+
+			int a = pixelToRegion.data[pixelIndex];
+			int c = pixelToRegion.data[pixelIndex+pixelToRegion.width]; // pixel +1 y
+
+			float colorA = regionColor.get(a);
+
+			if( a != c ) {
+				float colorC = regionColor.get(c);
+				boolean merge = Math.abs(colorA-colorC) <= tolerance;
+				if( merge ) {
+					checkMerge(a,c);
+				}
+			}
+		}
+
+		// bottom of the image
+		for( int x = 0; x < pixelToRegion.width-1; x++ ) {
+			// location (x,h-1)
+			int pixelIndex = (pixelToRegion.height-1)*pixelToRegion.width + x;
+
+			int a = pixelToRegion.data[pixelIndex];
+			int b = pixelToRegion.data[pixelIndex+1]; // pixel +1 x
+
+			float colorA = regionColor.get(a);
+
+			if( a != b ) {
+				float colorB = regionColor.get(b);
+				boolean merge = Math.abs(colorA-colorB) <= tolerance;
+				if( merge ) {
+					checkMerge(a,b);
+				}
+			}
+		}
 	}
 
 	/**
@@ -161,7 +202,12 @@ public class MergeRegionMeanShiftGray {
 	 * they will point to one of their end destinations.
 	 *
 	 * This procedure ensures that any merge reference will be at most one deep.  E.g. nothing like A -> B -> C
+	 *
+	 * DESIGN NOTE: Could speed this function up a lot by saving which nodes references others instead of traversing
+	 * the entire mergeList each time there is a modification
 	 */
+	// TODO update unit test for changes
+	// TODO must speed up
 	protected void checkMerge( int regionA , int regionB ) {
 		boolean alreadyA = mergeList.data[regionA] != -1;
 		boolean alreadyB = mergeList.data[regionB] != -1;
@@ -178,17 +224,43 @@ public class MergeRegionMeanShiftGray {
 					if( mergeList.data[i] == dstB )
 						mergeList.data[i] = dstA;
 				}
+				mergeList.data[dstB] = dstA;
 			}
 
 		} else if( alreadyA ) {
-			// have B link to the same one as A
-			mergeList.data[regionB] = mergeList.data[regionA];
+			// make sure A is not already pointing to B
+			if( mergeList.data[regionA] != regionB ) {
+				int dstA = mergeList.data[regionA];
+
+				// have B link to the same one as A
+				mergeList.data[regionB] = dstA;
+
+				for( int i = 0; i < mergeList.size; i++ ) {
+					if( mergeList.data[i] == regionB )
+						mergeList.data[i] = dstA;
+				}
+			}
 		} else if( alreadyB ) {
-			// have A link to the same one as B
-			mergeList.data[regionA] = mergeList.data[regionB];
+			// make sure B is not already pointing to A
+			if( mergeList.data[regionB] != regionA ) {
+				int dstB = mergeList.data[regionB];
+
+				// have A link to the same one as B
+				mergeList.data[regionA] = dstB;
+
+				for( int i = 0; i < mergeList.size; i++ ) {
+					if( mergeList.data[i] == regionA )
+						mergeList.data[i] = dstB;
+				}
+			}
 		} else {
 			// have B point to A, arbitrary choice
 			mergeList.data[regionB] = regionA;
+
+			for( int i = 0; i < mergeList.size; i++ ) {
+				if( mergeList.data[i] == regionB )
+					mergeList.data[i] = regionA;
+			}
 		}
 	}
 }
