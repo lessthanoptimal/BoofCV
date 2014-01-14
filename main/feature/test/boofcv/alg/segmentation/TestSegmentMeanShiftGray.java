@@ -138,49 +138,4 @@ public class TestSegmentMeanShiftGray {
 		assertEquals( cx , index%20 );
 		assertEquals(cy, index / 20);
 	}
-
-	@Test
-	public void computeGray_inside() {
-		ImageFloat32 image = new ImageFloat32(30,40);
-
-		ImageMiscOps.fillUniform(image,rand,0,256);
-
-		computeGray_border(image, 10, 12);
-	}
-
-	@Test
-	public void computeGray_border() {
-		ImageFloat32 image = new ImageFloat32(30,40);
-
-		ImageMiscOps.fillUniform(image,rand,0,256);
-
-		computeGray_border(image, 0, 0);
-		computeGray_border(image, 29, 39);
-	}
-
-	private void computeGray_border(ImageFloat32 image, int cx, int cy) {
-		SegmentMeanShiftGray<ImageFloat32> alg =
-				new SegmentMeanShiftGray<ImageFloat32>(30,0.05f,interp,weightSpacial, weightDist);
-		alg.setRadius(2);
-
-		interp.setImage(image);
-		alg.image = image;
-		float found = alg.computeGray(cx,cy);
-
-		float expected = 0;
-		float area = 0;
-		for( int i = -2; i <= 2; i++ ) {
-			for( int j = -2; j <= 2; j++ ) {
-				if( image.isInBounds(cx+j,cy+i)) {
-					float w = weightSpacial.weight(j,i);
-					expected += w*image.get(cx+j,cy+i);
-					area += w;
-				}
-			}
-		}
-		expected /= area;
-
-		assertEquals(expected,found,1e-4f);
-	}
-
 }

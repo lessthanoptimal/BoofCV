@@ -129,50 +129,14 @@ public class SegmentMeanShiftGray<T extends ImageSingleBand> {
 		peakToIndex.reshape(image.width,image.height);
 		ImageMiscOps.fill(peakToIndex,-1);
 
-		GrowQueue_I32 history = new GrowQueue_I32();
-
 		// use mean shift to find the peak of each pixel in the image
 		for( int y = 0; y < image.height; y++ ) {
 			for( int x = 0; x < image.width; x++ ) {
-				history.reset();
-				float localGray = computeGray(x,y);
-				int prevPeakLocation = findPeak(x,y,localGray);
-				history.add( prevPeakLocation );
-
-				int cycleIndex = -1;
-				// keep on moving until it finds a stable peak
-				meanshift:
-				for( int i = 0; i < 200; i++ ) { // just to be safe put a max limit on iterations
-					int peakX = prevPeakLocation%image.width;
-					int peakY = prevPeakLocation/image.width;
-					localGray = computeGray(peakX,peakY);
-					int currLocation = findPeak(peakX,peakY,localGray);
-					// see if it has cycled
-					for( int j = 0; j < history.size; j++ ) {
-						if( history.get(j) == currLocation ) {
-							cycleIndex = j;
-							break meanshift;
-						}
-					}
-					history.add( currLocation );
-					prevPeakLocation = currLocation;
-				}
-				if( cycleIndex == -1 ) {
-					cycleIndex = history.getSize()-1;
-				}
-
-				// select the index in the cycle with the smallest index
-				// If this cycle is encountered in the future it should go with the same solution, I think
-				int peakLocation = Integer.MAX_VALUE;
-				for( int i = cycleIndex; i < history.getSize(); i++ ) {
-					int v = history.get(i);
-					if( v < peakLocation ) {
-						peakLocation = v;
-					}
-				}
+				float localGray = interpolate.get(x, y);
+				int peakLocation = findPeak(x,y,localGray);
 
 				// get index in the list of peaks
-				int peakIndex = peakToIndex.data[prevPeakLocation];
+				int peakIndex = peakToIndex.data[peakLocation];
 				if( peakIndex < 0 ) {
 					peakIndex = this.peakLocation.getSize();
 					this.peakLocation.add(peakLocation);
@@ -285,39 +249,6 @@ public class SegmentMeanShiftGray<T extends ImageSingleBand> {
 
 		// return the pixel index
 		return pixelY*image.width + pixelX;
-	}
-
-	/**
-	 * Compute the gray value of the region using the 2D spacial kernel
-	 */
-	protected float computeGray( int cx , int cy ) {
-
-		float sumGray = 0;
-
-		int x0 = cx - radius;
-		int y0 = cy - radius;
-
-		float total = 0;
-		int kernelIndex = 0;
-		for( int yy = 0; yy < width; yy++ ) {
-			float sampleY = y0+yy;
-			if( sampleY < 0 ||sampleY > image.height-1 ) {
-				kernelIndex += width;
-				continue;
-			}
-			for( int xx = 0; xx < width; xx++ , kernelIndex++ ) {
-				float sampleX = x0+xx;
-				if( sampleX < 0 ||sampleX > image.width-1 ) {
-					continue;
-				}
-
-				float ws = weightSpacial.weightIndex(kernelIndex);
-				total += ws;
-				sumGray += ws*interpolate.get(sampleX, sampleY);
-			}
-		}
-
-		return sumGray/total;
 	}
 
 	/**

@@ -58,7 +58,7 @@ public class TestCannyEdgeDynamic {
 		alg.process(input,0.075f,0.3f,output);
 
 		for( int i = 0; i < output.data.length; i++ ) {
-			assertEquals(1,output.data[i]);
+			assertEquals(0,output.data[i]);
 		}
 
 		// try it with a trace now
@@ -67,18 +67,10 @@ public class TestCannyEdgeDynamic {
 		alg.process(input,0.075f,0.3f,output);
 
 		List<EdgeContour> contour = alg.getContours();
-		assertTrue(contour.size() > 0);
-
-		int numEdgePixels = 0;
-		for( EdgeContour e : contour ) {
-			for( EdgeSegment s : e.segments ) {
-				numEdgePixels += s.points.size();
-			}
-		}
-		assertEquals(numEdgePixels,input.width*input.height);
+		assertTrue(contour.size() == 0);
 
 		for( int i = 0; i < output.data.length; i++ )
-			assertEquals(1,output.data[i]);
+			assertEquals(0,output.data[i]);
 	}
 
 	/**
