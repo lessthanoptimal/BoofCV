@@ -85,7 +85,7 @@ public class MeanShiftPeak<T extends ImageSingleBand> {
 	}
 
 	public void setRadius(int radius) {
-		this.weights.setRadius( radius );
+		this.weights.setRadius( radius, radius );
 		this.radius = radius;
 		this.width = radius*2+1;
 	}

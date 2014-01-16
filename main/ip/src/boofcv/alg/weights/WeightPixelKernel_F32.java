@@ -43,7 +43,12 @@ public abstract class WeightPixelKernel_F32 implements WeightPixel_F32 {
 	}
 
 	@Override
-	public int getRadius() {
+	public int getRadiusX() {
+		return kernel.getRadius();
+	}
+
+	@Override
+	public int getRadiusY() {
 		return kernel.getRadius();
 	}
 }

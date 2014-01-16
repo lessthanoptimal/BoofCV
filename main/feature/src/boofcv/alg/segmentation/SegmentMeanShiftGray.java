@@ -29,16 +29,24 @@ import org.ddogleg.struct.GrowQueue_I32;
 
 /**
  * <p>
- * Performs mean-shift segmentation on a gray scale image.  Segmentation is performed by finding the mean-shift
- * local peak for each pixel in the image.  The output is an image with the index of each peak in each pixel and
- * lists which contain the location of a peak, the pixel value at the peak, and the number of pixels which
- * have that pixel as a peak. Inspired by [1].
+ * Performs mean-shift segmentation on a gray scale image [1].  Segmentation is done by finding the
+ * mean-shift local peak for each pixel in the image.  The gray/color value which mean-shift is minimizing is the
+ * pixel's intensity value.
+ * </p>
+ * <p>
+ * Output is provided in the form of an image where each pixel contains the index of a region the pixel belongs too.
+ * Three other lists provide color value of the region, number of pixels in the region and the location
+ * of the mean-shift peak for that region.
  * </p>
  *
  * <p>
- * Weight/distance measure is done independently for spacial and color components, allowing for better tuning
- * considering the difference in units.  Image edges are handled by truncating the spacial kernel.  This truncation
- * will create an asymmetric kernel, but there is really no good way to handle image edges.
+ * <ul>
+ * <li>The kernel's spacial radius is specified by the radius of 'weightSpacial' and the gray/color radius is specified
+ * by 'weightGray'.  Those two functions also specified the amount of weight assigned to each sample in the
+ * mean-shift kernel based on its distance from the spacial and color means.<li>
+ * <li>The distance passed into the 'weightGray' function is the difference squared.E.g. (a-b)<sup>2</sup></li>
+ * <li>Image edges are handled by truncating the spacial kernel.  This truncation
+ * will create an asymmetric kernel, but there is really no good way to handle image edges.</li>
  * </p>
  *
  * <p>
@@ -58,8 +66,8 @@ public class SegmentMeanShiftGray<T extends ImageSingleBand> {
 	protected float convergenceTol;
 
 	// specifies the size of the mean-shift kernel
-	protected int radius;
-	protected int width;
+	protected int radiusX,radiusY;
+	protected int widthX,widthY;
 	// Sample weight given location relative to center
 	protected WeightPixel_F32 weightSpacial;
 	// Sample weight given difference in gray scale value
@@ -80,6 +88,8 @@ public class SegmentMeanShiftGray<T extends ImageSingleBand> {
 	// The input image
 	protected T image;
 
+	protected float meanX,meanY,meanGray;
+
 	/**
 	 * Configures mean-shift segmentation
 	 *
@@ -98,17 +108,11 @@ public class SegmentMeanShiftGray<T extends ImageSingleBand> {
 		this.interpolate = interpolate;
 		this.weightSpacial = weightSpacial;
 		this.weightGray = weightGray;
-	}
 
-	/**
-	 * Specifies the size of the spacial kernel
-	 *
-	 * @param radius Size of spacial kernel
-	 */
-	public void setRadius( int radius ) {
-		weightSpacial.setRadius(radius);
-		this.radius = radius;
-		this.width = radius*2+1;
+		this.radiusX = weightSpacial.getRadiusX();
+		this.radiusY = weightSpacial.getRadiusY();
+		this.widthX = radiusX*2+1;
+		this.widthY = radiusY*2+1;
 	}
 
 	/**
@@ -132,8 +136,11 @@ public class SegmentMeanShiftGray<T extends ImageSingleBand> {
 		// use mean shift to find the peak of each pixel in the image
 		for( int y = 0; y < image.height; y++ ) {
 			for( int x = 0; x < image.width; x++ ) {
-				float localGray = interpolate.get(x, y);
-				int peakLocation = findPeak(x,y,localGray);
+				float pixelColor = interpolate.get(x, y);
+				findPeak(x,y,pixelColor);
+
+				// convert mean-shift location into pixel index
+				int peakLocation = (int)(meanY+0.5f)*image.width + (int)(meanX+0.5f);
 
 				// get index in the list of peaks
 				int peakIndex = peakToIndex.data[peakLocation];
@@ -141,9 +148,7 @@ public class SegmentMeanShiftGray<T extends ImageSingleBand> {
 					peakIndex = this.peakLocation.getSize();
 					this.peakLocation.add(peakLocation);
 					// Save the peak's color
-					int peakX = peakLocation%image.width;
-					int peakY = peakLocation/image.width;
-					peakValue.add( interpolate.get(peakX,peakY) );
+					peakValue.add( meanGray );
 					// Remember it's location in the peak arrays
 					peakToIndex.data[peakLocation] = peakIndex;
 					// Set the initial count to zero.  When the peak itself is processed later it will increment it
@@ -158,32 +163,30 @@ public class SegmentMeanShiftGray<T extends ImageSingleBand> {
 
 	/**
 	 * Uses mean-shift to find the peak.  Returns the peak as an index in the image data array.
+	 *
+	 * @param gray The color value which mean-shift is trying to find a region which minimises it
 	 */
-	protected int findPeak( float cx , float cy , float gray ) {
+	protected void findPeak( float cx , float cy , float gray ) {
 
-		float prevX = cx;
-		float prevY = cy;
-
-		float meanGray = gray;
-
-		for( int i = 0; i < maxIterations; i++ ) {
+		int i;
+		for( i = 0; i < maxIterations; i++ ) {
 			float total = 0;
 			float sumX = 0, sumY = 0, sumGray = 0;
 
 			int kernelIndex = 0;
 
-			float x0 = cx - radius;
-			float y0 = cy - radius;
+			float x0 = cx - radiusX;
+			float y0 = cy - radiusY;
 
 			// If it is not near the image border it can use faster techniques
 			if( interpolate.isInFastBounds(x0, y0) &&
-					interpolate.isInFastBounds(x0 + width - 1, y0 + width - 1)) {
-				for( int yy = 0; yy < width; yy++ ) {
-					for( int xx = 0; xx < width; xx++ ) {
+					interpolate.isInFastBounds(x0 + widthX - 1, y0 + widthY - 1)) {
+				for( int yy = 0; yy < widthY; yy++ ) {
+					for( int xx = 0; xx < widthX; xx++ ) {
 						float ws = weightSpacial.weightIndex(kernelIndex++);
 						// compute distance between gray scale value as euclidean squared
 						float pixelGray = interpolate.get_fast(x0 + xx, y0 + yy);
-						float d = pixelGray - meanGray;
+						float d = pixelGray - gray;
 						float wg = weightGray.weight(d*d);
 						// Total weight is the combination of spacial and color values
 						float weight = ws*wg;
@@ -195,16 +198,16 @@ public class SegmentMeanShiftGray<T extends ImageSingleBand> {
 				}
 			} else {
 				// Perform more sanity checks here for the image edge.  Edge pixels are handled by skipping them
-				for( int yy = 0; yy < width; yy++ ) {
+				for( int yy = 0; yy < widthY; yy++ ) {
 					float sampleY = y0+yy;
 					// make sure it is inside the image
 					if( sampleY < 0 ) {
-						kernelIndex += width;
+						kernelIndex += widthX;
 						continue;
 					} else if( sampleY > image.height-1) {
 						break;
 					}
-					for( int xx = 0; xx < width; xx++ , kernelIndex++) {
+					for( int xx = 0; xx < widthX; xx++ , kernelIndex++) {
 						float sampleX = x0+xx;
 
 						// make sure it is inside the image
@@ -214,7 +217,7 @@ public class SegmentMeanShiftGray<T extends ImageSingleBand> {
 
 						float ws = weightSpacial.weightIndex(kernelIndex);
 						float pixelGray = interpolate.get(sampleX, sampleY);
-						float d = pixelGray - meanGray;
+						float d = pixelGray - gray;
 						float wg = weightGray.weight(d*d);
 						float weight = ws*wg;
 						total += weight;
@@ -228,27 +231,23 @@ public class SegmentMeanShiftGray<T extends ImageSingleBand> {
 			if( total == 0 )
 				break;
 
-			cx = sumX/total;
-			cy = sumY/total;
-			meanGray = sumGray/total;
+			float peakX = sumX/total;
+			float peakY = sumY/total;
 
+			float dx = peakX-cx;
+			float dy = peakY-cy;
 
-			float dx = cx-prevX;
-			float dy = cy-prevY;
-
-			prevX = cx; prevY = cy;
+			cx = peakX; cy = peakY;
+			gray = sumGray/total;
 
 			if( Math.abs(dx) < convergenceTol && Math.abs(dy) < convergenceTol ) {
 				break;
 			}
 		}
 
-		// round to the nearest pixel
-		int pixelX = (int)(cx+0.5f);
-		int pixelY = (int)(cy+0.5f);
-
-		// return the pixel index
-		return pixelY*image.width + pixelX;
+		this.meanX = cx;
+		this.meanY = cy;
+		this.meanGray = gray;
 	}
 
 	/**

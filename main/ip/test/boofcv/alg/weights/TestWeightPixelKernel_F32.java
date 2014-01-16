@@ -36,7 +36,7 @@ public class TestWeightPixelKernel_F32 {
 	public void kernelLookup() {
 		WeightPixelKernel_F32 alg = new WeightPixelKernel_F32() {
 			@Override
-			public void setRadius(int radius) {}
+			public void setRadius(int radiusX, int radiusY) {}
 		};
 
 		alg.kernel = FactoryKernel.random2D_F32(2,-2,2,rand);
