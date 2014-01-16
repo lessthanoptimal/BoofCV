@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,7 +24,7 @@ import boofcv.alg.weights.*;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSInt32;
-import org.ddogleg.struct.GrowQueue_F32;
+import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_I32;
 import org.junit.Before;
 import org.junit.Test;
@@ -35,8 +35,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 /**
- * @author Peter Abeles
- */
+* @author Peter Abeles
+*/
 public class TestSegmentMeanShiftGray {
 
 	Random rand = new Random(234);
@@ -68,7 +68,7 @@ public class TestSegmentMeanShiftGray {
 		GrowQueue_I32 locations = alg.getPeakLocation();
 		GrowQueue_I32 counts = alg.getPeakMemberCount();
 		ImageSInt32 peaks = alg.getPeakToIndex();
-		GrowQueue_F32 values = alg.getPeakValue();
+		FastQueue<float[]> values = alg.getPeakValue();
 
 		// there should be a fair number of local peaks due to the image being random
 		assertTrue( locations.size > 20 );
@@ -87,18 +87,14 @@ public class TestSegmentMeanShiftGray {
 		for( int y = 0; y < peaks.height; y++ ) {
 			for( int x = 0; x < peaks.width; x++ ) {
 				int peak = peaks.get(x,y);
-				int locationIndex = locations.get(peak);
-				float value = values.get(peak);
 
-				int peakX = locationIndex%20;
-				int peakY = locationIndex/20;
-
-				assertEquals(x+" "+y,image.get(peakX,peakY),value,1e-4);
+				// can't test the value because its floating point location which is interpolated using the kernel
+				// and the location is lost
+//				assertEquals(x+" "+y,computeValue(peakX,peakY,image),value,50);
 
 				assertTrue( counts.get(peak) > 0 );
 			}
 		}
-
 	}
 
 	@Test
@@ -109,6 +105,7 @@ public class TestSegmentMeanShiftGray {
 
 		// works better with this example when its uniform
 		WeightPixel_F32 weightSpacial = new WeightPixelUniform_F32();
+		weightSpacial.setRadius(2,2);
 		SegmentMeanShiftGray<ImageFloat32> alg =
 				new SegmentMeanShiftGray<ImageFloat32>(30,0.05f,interp,weightSpacial, weightDist);
 

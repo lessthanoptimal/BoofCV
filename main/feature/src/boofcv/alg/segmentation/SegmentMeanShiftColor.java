@@ -18,26 +18,32 @@
 
 package boofcv.alg.segmentation;
 
-import boofcv.alg.interpolate.InterpolatePixelS;
+import boofcv.alg.interpolate.InterpolatePixelMB;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.alg.weights.WeightDistance_F32;
 import boofcv.alg.weights.WeightPixel_F32;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageMultiBand;
+import boofcv.struct.image.ImageType;
 import org.ddogleg.struct.FastQueue;
+
+import java.util.Arrays;
 
 /**
  * <p>
- * Implementation of {@link SegmentMeanShift} for gray-scale images
+ * Implementation of {@link boofcv.alg.segmentation.SegmentMeanShift} for color images
  * </p>
  *
  * @author Peter Abeles
  */
-public class SegmentMeanShiftGray<T extends ImageSingleBand> extends SegmentMeanShift<T> {
+public class SegmentMeanShiftColor<T extends ImageMultiBand> extends SegmentMeanShift<T> {
 
 	// Interpolation routine used to get sub-pixel samples
-	protected InterpolatePixelS<T> interpolate;
+	protected InterpolatePixelMB<T> interpolate;
 
-	protected float meanGray;
+	// storage for interpolated pixel value
+	protected float[] pixelColor;
+	protected float[] meanColor;
+	protected float[] sumColor;
 
 	/**
 	 * Configures mean-shift segmentation
@@ -48,17 +54,23 @@ public class SegmentMeanShiftGray<T extends ImageSingleBand> extends SegmentMean
 	 * @param weightSpacial Weighting function/kernel for spacial component
 	 * @param weightGray Weighting function/kernel for distance of color component
 	 */
-	public SegmentMeanShiftGray(int maxIterations, float convergenceTol,
-								InterpolatePixelS<T> interpolate,
-								WeightPixel_F32 weightSpacial,
-								WeightDistance_F32 weightGray) {
+	public SegmentMeanShiftColor(int maxIterations, float convergenceTol,
+								 InterpolatePixelMB<T> interpolate,
+								 WeightPixel_F32 weightSpacial,
+								 WeightDistance_F32 weightGray,
+								 ImageType<T> imageType ) {
 		super(maxIterations,convergenceTol,weightSpacial,weightGray);
 		this.interpolate = interpolate;
+		this.pixelColor = new float[ imageType.getNumBands() ];
+		this.meanColor = new float[ imageType.getNumBands() ];
+		this.sumColor = new float[ imageType.getNumBands() ];
+
+		final int numBands = imageType.getNumBands();
 
 		peakValue = new FastQueue<float[]>(float[].class,true) {
 			@Override
 			protected float[] createInstance() {
-				return new float[ 1 ];
+				return new float[ numBands ];
 			}
 		};
 	}
@@ -85,8 +97,8 @@ public class SegmentMeanShiftGray<T extends ImageSingleBand> extends SegmentMean
 		// use mean shift to find the peak of each pixel in the image
 		for( int y = 0; y < image.height; y++ ) {
 			for( int x = 0; x < image.width; x++ ) {
-				float pixelColor = interpolate.get(x, y);
-				findPeak(x,y,pixelColor);
+				interpolate.get(x, y, meanColor);
+				findPeak(x,y, meanColor);
 
 				// convert mean-shift location into pixel index
 				int peakLocation = (int)(meanY+0.5f)*image.width + (int)(meanX+0.5f);
@@ -97,7 +109,7 @@ public class SegmentMeanShiftGray<T extends ImageSingleBand> extends SegmentMean
 					peakIndex = this.peakLocation.getSize();
 					this.peakLocation.add(peakLocation);
 					// Save the peak's color
-					peakValue.grow()[0] = meanGray;
+					savePeakColor(meanColor);
 					// Remember it's location in the peak arrays
 					peakToIndex.data[peakLocation] = peakIndex;
 					// Set the initial count to zero.  When the peak itself is processed later it will increment it
@@ -113,13 +125,15 @@ public class SegmentMeanShiftGray<T extends ImageSingleBand> extends SegmentMean
 	/**
 	 * Uses mean-shift to find the peak.  Returns the peak as an index in the image data array.
 	 *
-	 * @param gray The color value which mean-shift is trying to find a region which minimises it
+	 * @param meanColor The color value which mean-shift is trying to find a region which minimises it
 	 */
-	protected void findPeak( float cx , float cy , float gray ) {
+	protected void findPeak( float cx , float cy , float[] meanColor ) {
 
 		for( int i = 0; i < maxIterations; i++ ) {
 			float total = 0;
-			float sumX = 0, sumY = 0, sumGray = 0;
+			float sumX = 0, sumY = 0;
+
+			Arrays.fill(sumColor,0);
 
 			int kernelIndex = 0;
 
@@ -133,15 +147,15 @@ public class SegmentMeanShiftGray<T extends ImageSingleBand> extends SegmentMean
 					for( int xx = 0; xx < widthX; xx++ ) {
 						float ws = weightSpacial.weightIndex(kernelIndex++);
 						// compute distance between gray scale value as euclidean squared
-						float pixelGray = interpolate.get_fast(x0 + xx, y0 + yy);
-						float d = pixelGray - gray;
+						interpolate.get_fast(x0 + xx, y0 + yy, pixelColor);
+						float d = distanceSq(pixelColor,meanColor);
 						float wg = weightColor.weight(d*d);
 						// Total weight is the combination of spacial and color values
 						float weight = ws*wg;
 						total += weight;
 						sumX += weight*(xx+x0);
 						sumY += weight*(yy+y0);
-						sumGray += weight*pixelGray;
+						sumColor(sumColor, pixelColor,weight);
 					}
 				}
 			} else {
@@ -164,14 +178,14 @@ public class SegmentMeanShiftGray<T extends ImageSingleBand> extends SegmentMean
 						}
 
 						float ws = weightSpacial.weightIndex(kernelIndex);
-						float pixelGray = interpolate.get(sampleX, sampleY);
-						float d = pixelGray - gray;
+						interpolate.get(x0 + xx, y0 + yy, pixelColor);
+						float d = distanceSq(pixelColor,meanColor);
 						float wg = weightColor.weight(d*d);
 						float weight = ws*wg;
 						total += weight;
 						sumX += weight*(xx+x0);
 						sumY += weight*(yy+y0);
-						sumGray += weight*pixelGray;
+						sumColor(sumColor, pixelColor,weight);
 					}
 				}
 			}
@@ -186,7 +200,7 @@ public class SegmentMeanShiftGray<T extends ImageSingleBand> extends SegmentMean
 			float dy = peakY-cy;
 
 			cx = peakX; cy = peakY;
-			gray = sumGray/total;
+			meanColor(sumColor,meanColor,total);
 
 			if( Math.abs(dx) < convergenceTol && Math.abs(dy) < convergenceTol ) {
 				break;
@@ -195,6 +209,24 @@ public class SegmentMeanShiftGray<T extends ImageSingleBand> extends SegmentMean
 
 		this.meanX = cx;
 		this.meanY = cy;
-		this.meanGray = gray;
+	}
+
+	protected static void meanColor( float[] sum, float[] mean , float total ) {
+		for( int i = 0; i < sum.length; i++ ) {
+			mean[i] = sum[i]/total;
+		}
+	}
+
+	protected static void sumColor( float[] sum, float[] pixel , float weight ) {
+		for( int i = 0; i < sum.length; i++ ) {
+			sum[i] += pixel[i]*weight;
+		}
+	}
+
+	protected void savePeakColor( float[] a ) {
+		float[] b = peakValue.grow();
+		for( int i = 0; i < a.length; i++ ) {
+			b[i] = a[i];
+		}
 	}
 }

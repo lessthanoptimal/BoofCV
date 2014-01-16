@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,21 +20,21 @@ package boofcv.alg.segmentation;
 
 import boofcv.alg.filter.binary.BinaryImageOps;
 import boofcv.struct.image.ImageSInt32;
-import org.ddogleg.struct.GrowQueue_F32;
+import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_I32;
 
 /**
  * In a region with uniform color, mean-shift segmentation will produce lots of regions with identical colors since they
- * are all local maximums.  This will find all such neighbors and merge them into one group.  For each
+ * are all local maximums.  The code below will find all such neighbors and merge them into one group.  For each
  * pixel it checks its 4-connect neighbors to see if they are in the same region or not.  If not in the same
- * region it checks to see if their peaks have the same color to within tolerance.  If so a mark will be
- * made in an integer list of regions that one should be merged into another.  A check is made to see
- * if the region it is merged into doesn't merge into another one.  If it does a link will be made directly to
- * the last one it gets merged into.
+ * region it checks to see if regions have the same color to within tolerance.  If they are within tolerance a mark will
+ * be made in an integer list of regions that one should be merged into another.  This creates a directed graph of
+ * merged regions.  The graph is flatted such that all references point to the root node and then the segments
+ * are merged together.
  *
  * @author Peter Abeles
  */
-public class MergeRegionMeanShiftGray {
+public class MergeRegionMeanShift {
 
 	// list used to convert the original region ID's into their new compacted ones
 	protected GrowQueue_I32 mergeList = new GrowQueue_I32();
@@ -47,22 +47,29 @@ public class MergeRegionMeanShiftGray {
 
 	// Local copy of these lists after elements which have been merged are removed
 	GrowQueue_I32 tmpMemberCount = new GrowQueue_I32();
-	GrowQueue_F32 tmpColor = new GrowQueue_F32();
+	FastQueue<float[]> tmpColor;
 
 	/**
 	 * Configures merging.
 	 *
-	 * @param tolerance How similar in color two adjacent segments need to be to be considered the same segment.
-	 *                  For 8-bit images try 5.
+	 * @param tolerance Euclidean distance for how similar in color two adjacent segments need to be to be
+	 *                  considered the same segment.  For 8-bit single band images try 5.
 	 */
-	public MergeRegionMeanShiftGray(float tolerance) {
-		this.tolerance = tolerance;
+	public MergeRegionMeanShift(float tolerance, final int numBands) {
+		this.tolerance = tolerance*tolerance;
+
+		tmpColor = new FastQueue<float[]>(float[].class,true) {
+			@Override
+			protected float[] createInstance() {
+				return new float[ numBands ];
+			}
+		};
 	}
 
 	/**
 	 * Merges equivalent segments together and updates all the data structures by removing the redundant segments.
 	 */
-	public void merge( ImageSInt32 pixelToRegion , GrowQueue_I32 regionMemberCount , GrowQueue_F32 regionColor )
+	public void merge( ImageSInt32 pixelToRegion , GrowQueue_I32 regionMemberCount , FastQueue<float[]> regionColor )
 	{
 		// see which ones need to be merged into which ones
 		createMergeList(pixelToRegion, regionColor);
@@ -82,9 +89,9 @@ public class MergeRegionMeanShiftGray {
 	 * see if their pixel intensity values are within tolerance of each other.  If so they are then marked for
 	 * merging.
 	 */
-	protected void createMergeList(ImageSInt32 pixelToRegion, GrowQueue_F32 regionColor) {
+	protected void createMergeList(ImageSInt32 pixelToRegion, FastQueue<float[]> regionColor) {
 		// merge the merge list as initial all no merge
-		mergeList.resize(regionColor.getSize());
+		mergeList.resize(regionColor.size());
 		for( int i = 0; i < mergeList.size; i++ ) {
 			mergeList.data[i] = -1;
 		}
@@ -97,19 +104,19 @@ public class MergeRegionMeanShiftGray {
 				int b = pixelToRegion.data[pixelIndex+1]; // pixel +1 x
 				int c = pixelToRegion.data[pixelIndex+pixelToRegion.width]; // pixel +1 y
 
-				float colorA = regionColor.get(a);
+				float[] colorA = regionColor.get(a);
 
 				if( a != b ) {
-					float colorB = regionColor.get(b);
-					boolean merge = Math.abs(colorA-colorB) <= tolerance;
+					float[] colorB = regionColor.get(b);
+					boolean merge = SegmentMeanShift.distanceSq(colorA,colorB) <= tolerance;
 					if( merge ) {
 						checkMerge(a,b);
 					}
 				}
 
 				if( a != c ) {
-					float colorC = regionColor.get(c);
-					boolean merge = Math.abs(colorA-colorC) <= tolerance;
+					float[] colorC = regionColor.get(c);
+					boolean merge = SegmentMeanShift.distanceSq(colorA, colorC) <= tolerance;
 					if( merge ) {
 						checkMerge(a,c);
 					}
@@ -125,11 +132,11 @@ public class MergeRegionMeanShiftGray {
 			int a = pixelToRegion.data[pixelIndex];
 			int c = pixelToRegion.data[pixelIndex+pixelToRegion.width]; // pixel +1 y
 
-			float colorA = regionColor.get(a);
+			float[] colorA = regionColor.get(a);
 
 			if( a != c ) {
-				float colorC = regionColor.get(c);
-				boolean merge = Math.abs(colorA-colorC) <= tolerance;
+				float[] colorC = regionColor.get(c);
+				boolean merge = SegmentMeanShift.distanceSq(colorA, colorC) <= tolerance;
 				if( merge ) {
 					checkMerge(a,c);
 				}
@@ -144,11 +151,11 @@ public class MergeRegionMeanShiftGray {
 			int a = pixelToRegion.data[pixelIndex];
 			int b = pixelToRegion.data[pixelIndex+1]; // pixel +1 x
 
-			float colorA = regionColor.get(a);
+			float[] colorA = regionColor.get(a);
 
 			if( a != b ) {
-				float colorB = regionColor.get(b);
-				boolean merge = Math.abs(colorA-colorB) <= tolerance;
+				float[] colorB = regionColor.get(b);
+				boolean merge = SegmentMeanShift.distanceSq(colorA, colorB) <= tolerance;
 				if( merge ) {
 					checkMerge(a,b);
 				}
@@ -192,7 +199,7 @@ public class MergeRegionMeanShiftGray {
 	 * Does much of the work needed to remove the redundant segments that are being merged into their root node.
 	 * The list of member count and colors is updated.  mergeList is updated with the new segment IDs.
 	 */
-	protected void setToRootNodeNewID( GrowQueue_I32 regionMemberCount, GrowQueue_F32 regionColor ) {
+	protected void setToRootNodeNewID( GrowQueue_I32 regionMemberCount, FastQueue<float[]> regionColor ) {
 
 		tmpMemberCount.reset();
 		tmpColor.reset();
@@ -203,7 +210,7 @@ public class MergeRegionMeanShiftGray {
 			if( p == -1 ) {
 				mergeList.data[i] = rootID.data[i];
 				tmpMemberCount.add( regionMemberCount.data[i] );
-				tmpColor.add( regionColor.data[i] );
+				copyColor(regionColor.data[i],tmpColor.grow());
 			} else {
 				mergeList.data[i] = rootID.data[mergeList.data[i]];
 			}
@@ -213,7 +220,9 @@ public class MergeRegionMeanShiftGray {
 		regionColor.reset();
 
 		regionMemberCount.addAll(tmpMemberCount);
-		regionColor.addAll(tmpColor);
+		for( int i = 0; i < tmpColor.size; i++ ) {
+			copyColor(tmpColor.data[i],regionColor.grow());
+		}
 	}
 
 
@@ -265,7 +274,11 @@ public class MergeRegionMeanShiftGray {
 		if( mergeList.data[regionA] != -1 ) {
 			mergeList.data[regionA] = rootA;
 		}
+	}
 
-
+	private static void copyColor( float[] src, float []dst ) {
+		for( int i = 0; i < src.length; i++ ) {
+			dst[i] = src[i];
+		}
 	}
 }
