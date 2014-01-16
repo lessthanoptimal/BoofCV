@@ -25,7 +25,12 @@ import boofcv.factory.filter.kernel.FactoryKernelGaussian;
  */
 public class WeightPixelGaussian_F32 extends WeightPixelKernel_F32 {
 	@Override
-	public void setRadius(int radius) {
+	public void setRadius(int radiusX , int radiusY) {
+
+		if( radiusX != radiusY )
+			throw new IllegalArgumentException("Non-symmetric kernels are not yet supported.  You can request this feature");
+
+		int radius = radiusX;
 		if( kernel == null || kernel.getRadius() != radius ) {
 			double sigma = FactoryKernelGaussian.sigmaForRadius(radius,0);
 			kernel = FactoryKernelGaussian.gaussian2D_F32((float)sigma,radius,true);

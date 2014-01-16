@@ -35,8 +35,9 @@ public class TestWeightPixelGaussian_F32 {
 	public void changeRadius() {
 		WeightPixelGaussian_F32 alg = new WeightPixelGaussian_F32();
 
-		alg.setRadius(2);
-		assertEquals(2,alg.getRadius());
+		alg.setRadius(2,2);
+		assertEquals(2,alg.getRadiusX());
+		assertEquals(2,alg.getRadiusY());
 		float middle = alg.weight(0,0);
 
 		// see if it blows up
@@ -44,15 +45,16 @@ public class TestWeightPixelGaussian_F32 {
 		alg.weight( 0, -2);alg.weight(0, 2);
 
 		// make it larger
-		alg.setRadius(3);
-		assertEquals(3,alg.getRadius());
+		alg.setRadius(3,3);
+		assertEquals(3,alg.getRadiusX());
+		assertEquals(3,alg.getRadiusY());
 		assertTrue( middle > alg.weight(0,0));
 		alg.weight(-3,  0);alg.weight(3, 0);
 		alg.weight( 0, -3);alg.weight(0, 3);
 
 		// shouldn't declare a new kernel if the same size is requested
 		Object before = alg.kernel;
-		alg.setRadius(3);
+		alg.setRadius(3,3);
 		assertTrue( before == alg.kernel );
 	}
 

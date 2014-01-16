@@ -41,10 +41,10 @@ public class VisualizeSegmentMeanShiftApp {
 
 	public static void main(String[] args) {
 //		BufferedImage image = UtilImageIO.loadImage("../data/evaluation/sunflowers.png");
-//		BufferedImage image = UtilImageIO.loadImage("../data/evaluation/shapes01.png");
+		BufferedImage image = UtilImageIO.loadImage("../data/evaluation/shapes01.png");
 //		BufferedImage image = UtilImageIO.loadImage("../data/applet/trees_rotate_01.jpg");
 //		BufferedImage image = UtilImageIO.loadImage("../data/applet/segment/mountain_pines_people.jpg");
-		BufferedImage image = UtilImageIO.loadImage("/home/pja/Desktop/segmentation/example-orig.jpg");
+//		BufferedImage image = UtilImageIO.loadImage("/home/pja/Desktop/segmentation/example-orig.jpg");
 
 		ImageFloat32 gray = ConvertBufferedImage.convertFrom(image,(ImageFloat32)null);
 
@@ -53,13 +53,17 @@ public class VisualizeSegmentMeanShiftApp {
 
 //		BlurImageOps.gaussian(gray,gray,0.5,-1,null);
 
+		int spacialRadius = 6;
+		float colorRadius = 4.5f;
+
 		WeightPixel_F32 weightSpacial = new WeightPixelUniform_F32();
-		WeightDistance_F32 weightGray = new WeightDistanceUniform_F32(4.5f);
+		WeightDistance_F32 weightGray = new WeightDistanceUniform_F32(colorRadius*colorRadius);
+
+		weightSpacial.setRadius(spacialRadius,spacialRadius);
 
 		SegmentMeanShiftGray<ImageFloat32> alg =
 				FactorySegmentationAlg.meanShiftGray(30,0.1f,weightSpacial,weightGray,ImageFloat32.class);
 
-		alg.setRadius(6);
 		long time0 = System.currentTimeMillis();
 		alg.process(gray);
 		long time1 = System.currentTimeMillis();

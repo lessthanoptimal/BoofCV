@@ -32,8 +32,8 @@ public interface WeightPixel_F32 {
 	 * <p>
 	 * Faster way to access the weight.  Refers to the index in a row major matrix.<br>
 	 * <br>
-	 * x = (index % width) - radius <br>
-	 * y = (index / width) - radius<br>
+	 * x = (index % widthX) - radiusX <br>
+	 * y = (index / widthX) - radiusY <br>
 	 * </p>
 	 *
 	 * @param index index of grid element
@@ -51,15 +51,22 @@ public interface WeightPixel_F32 {
 	public float weight( int x , int y );
 
 	/**
-	 * Change the kernel's radius
+	 * Change the kernel's size
 	 *
-	 * @param radius The kernel's size
+	 * @param radiusX Radius along x-axis
+	 * @param radiusY Radius along y-axis
 	 */
-	public void setRadius( int radius );
+	public void setRadius( int radiusX , int radiusY );
 
 	/**
-	 * Returns the kernel's radius
+	 * Returns the kernel's radius along the x-axis
 	 * @return Radius of kernel
 	 */
-	public int getRadius();
+	public int getRadiusX();
+
+	/**
+	 * Returns the kernel's radius along the y-axis
+	 * @return Radius of kernel
+	 */
+	public int getRadiusY();
 }

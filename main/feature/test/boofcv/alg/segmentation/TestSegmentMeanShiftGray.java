@@ -26,6 +26,7 @@ import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSInt32;
 import org.ddogleg.struct.GrowQueue_F32;
 import org.ddogleg.struct.GrowQueue_I32;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Random;
@@ -45,6 +46,11 @@ public class TestSegmentMeanShiftGray {
 	WeightPixel_F32 weightSpacial = new WeightPixelGaussian_F32();
 	WeightDistance_F32 weightDist = new WeightDistanceUniform_F32(200);
 
+	@Before
+	public void before() {
+		weightSpacial.setRadius(2,2);
+	}
+
 	/**
 	 * Process a random image and do a basic sanity check on the output
 	 */
@@ -56,7 +62,6 @@ public class TestSegmentMeanShiftGray {
 
 		SegmentMeanShiftGray<ImageFloat32> alg =
 				new SegmentMeanShiftGray<ImageFloat32>(30,0.05f,interp,weightSpacial, weightDist);
-		alg.setRadius(2);
 
 		alg.process(image);
 
@@ -106,14 +111,13 @@ public class TestSegmentMeanShiftGray {
 		WeightPixel_F32 weightSpacial = new WeightPixelUniform_F32();
 		SegmentMeanShiftGray<ImageFloat32> alg =
 				new SegmentMeanShiftGray<ImageFloat32>(30,0.05f,interp,weightSpacial, weightDist);
-		alg.setRadius(2);
 
 		interp.setImage(image);
 		alg.image = image;
-		int index = alg.findPeak(4,2,20);
+		alg.findPeak(4,2,20);
 
-		assertEquals( 6 , index%20 );
-		assertEquals( 4 , index/20 );
+		assertEquals( 6 , alg.meanX , 0.5f );
+		assertEquals( 4 , alg.meanY , 0.5f );
 	}
 
 	@Test
@@ -129,13 +133,12 @@ public class TestSegmentMeanShiftGray {
 
 		SegmentMeanShiftGray<ImageFloat32> alg =
 				new SegmentMeanShiftGray<ImageFloat32>(30,0.05f,interp,weightSpacial, weightDist);
-		alg.setRadius(2);
 
 		interp.setImage(image);
 		alg.image = image;
-		int index = alg.findPeak(startX,startY,20);
+		alg.findPeak(startX,startY,20);
 
-		assertEquals( cx , index%20 );
-		assertEquals(cy, index / 20);
+		assertEquals( cx , alg.meanX , 0.5f );
+		assertEquals( cy , alg.meanY , 0.5f );
 	}
 }

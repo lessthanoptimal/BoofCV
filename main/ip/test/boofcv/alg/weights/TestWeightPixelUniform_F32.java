@@ -30,12 +30,12 @@ public class TestWeightPixelUniform_F32 {
 	@Test
 	public void inside() {
 		WeightPixelUniform_F32 alg = new WeightPixelUniform_F32();
-		alg.setRadius(2);
+		alg.setRadius(2,3);
 
-		float expected = 1.0f/25.0f;
+		float expected = 1.0f/(5f*7f);
 
 		int index = 0;
-		for( int y = -2; y <= 2; y++ )
+		for( int y = -3; y <= 3; y++ )
 			for( int x = -2; x <= 2; x++ , index++) {
 				assertEquals(expected,alg.weight(x,y),1e-4);
 				assertEquals(expected,alg.weightIndex(index),1e-4);
@@ -49,7 +49,7 @@ public class TestWeightPixelUniform_F32 {
 	@Test
 	public void outside() {
 		WeightPixelUniform_F32 alg = new WeightPixelUniform_F32();
-		alg.setRadius(2);
+		alg.setRadius(2,2);
 
 		float expected = 1.0f/25.0f;
 
