@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,7 +28,9 @@ import boofcv.gui.image.ShowImages;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSInt32;
-import org.ddogleg.struct.GrowQueue_F32;
+import boofcv.struct.image.ImageType;
+import boofcv.struct.image.MultiSpectral;
+import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_I32;
 
 import java.awt.image.BufferedImage;
@@ -37,42 +39,43 @@ import java.util.Random;
 /**
  * @author Peter Abeles
  */
-public class VisualizeSegmentMeanShiftApp {
+public class VisualizeSegmentMeanShiftColorApp {
 
 	public static void main(String[] args) {
 //		BufferedImage image = UtilImageIO.loadImage("../data/evaluation/sunflowers.png");
-		BufferedImage image = UtilImageIO.loadImage("../data/evaluation/shapes01.png");
+//		BufferedImage image = UtilImageIO.loadImage("../data/evaluation/shapes01.png");
 //		BufferedImage image = UtilImageIO.loadImage("../data/applet/trees_rotate_01.jpg");
 //		BufferedImage image = UtilImageIO.loadImage("../data/applet/segment/mountain_pines_people.jpg");
-//		BufferedImage image = UtilImageIO.loadImage("/home/pja/Desktop/segmentation/example-orig.jpg");
+		BufferedImage image = UtilImageIO.loadImage("/home/pja/Desktop/segmentation/example-orig.jpg");
 
-		ImageFloat32 gray = ConvertBufferedImage.convertFrom(image,(ImageFloat32)null);
+		MultiSpectral<ImageFloat32> color = ConvertBufferedImage.convertFromMulti(image, null, true, ImageFloat32.class);
+		ImageType<MultiSpectral<ImageFloat32>> imageType = ImageType.ms(3,ImageFloat32.class);
 
-		BufferedImage outColor = new BufferedImage(gray.width,gray.height,BufferedImage.TYPE_INT_RGB);
-		BufferedImage outPeak = new BufferedImage(gray.width,gray.height,BufferedImage.TYPE_INT_RGB);
+		BufferedImage outColor = new BufferedImage(color.width,color.height,BufferedImage.TYPE_INT_RGB);
+		BufferedImage outPeak = new BufferedImage(color.width,color.height,BufferedImage.TYPE_INT_RGB);
 
 //		BlurImageOps.gaussian(gray,gray,0.5,-1,null);
 
 		int spacialRadius = 6;
-		float colorRadius = 4.5f;
+		float colorRadius = 15f;
 
 		WeightPixel_F32 weightSpacial = new WeightPixelUniform_F32();
 		WeightDistance_F32 weightGray = new WeightDistanceUniform_F32(colorRadius*colorRadius);
 
 		weightSpacial.setRadius(spacialRadius,spacialRadius);
 
-		SegmentMeanShiftGray<ImageFloat32> alg =
-				FactorySegmentationAlg.meanShiftGray(30,0.1f,weightSpacial,weightGray,ImageFloat32.class);
+		SegmentMeanShiftColor<MultiSpectral<ImageFloat32>> alg =
+				FactorySegmentationAlg.meanShiftColor(30, 0.1f, weightSpacial, weightGray, imageType);
 
 		long time0 = System.currentTimeMillis();
-		alg.process(gray);
+		alg.process(color);
 		long time1 = System.currentTimeMillis();
 
-		GrowQueue_F32 peakValue = alg.getPeakValue();
+		FastQueue<float[]> peakValue = alg.getPeakValue();
 		ImageSInt32 peakToIndex = alg.getPeakToIndex();
 		GrowQueue_I32 peakCounts = alg.getPeakMemberCount();
 
-		MergeRegionMeanShiftGray merge = new MergeRegionMeanShiftGray(1);
+		MergeRegionMeanShift merge = new MergeRegionMeanShift(5,3);
 		merge.merge(peakToIndex,peakCounts,peakValue);
 
 		long time2 = System.currentTimeMillis();
@@ -87,19 +90,24 @@ public class VisualizeSegmentMeanShiftApp {
 		for( int i = 0; i < peakCounts.size; i++ ) {
 			if( peakCounts.get(i) < 20 ) {
 				colors[i] = 0;
-				peakValue.set(i, -1);
+//				peakValue.set(i, -1);
 			}
 		}
 
-		for( int y = 0; y < gray.height; y++ ) {
-			for( int x = 0; x < gray.width; x++ ) {
+		for( int y = 0; y < color.height; y++ ) {
+			for( int x = 0; x < color.width; x++ ) {
 				int index = peakToIndex.unsafe_get(x,y);
-				int gv = (int)peakValue.get(index);
+				float []cv = peakValue.get(index);
 
-				int grayRGB = gv == -1 ? 0xFF0000 : gv << 16 | gv << 8 | gv;
+//				int grayRGB = gv == -1 ? 0xFF0000 : gv << 16 | gv << 8 | gv;
+				int r = (int)cv[0];
+				int g = (int)cv[1];
+				int b = (int)cv[2];
+
+				int rgb = r << 16 | g << 8 | b;
 
 				outColor.setRGB(x, y, colors[index]);
-				outPeak.setRGB(x,y,grayRGB);
+				outPeak.setRGB(x,y,rgb);
 			}
 		}
 

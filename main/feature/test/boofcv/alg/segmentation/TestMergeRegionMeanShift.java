@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,19 +19,19 @@
 package boofcv.alg.segmentation;
 
 import boofcv.struct.image.ImageSInt32;
-import org.ddogleg.struct.GrowQueue_F32;
+import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_I32;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
 /**
- * @author Peter Abeles
- */
-public class TestMergeRegionMeanShiftGray {
+* @author Peter Abeles
+*/
+public class TestMergeRegionMeanShift {
 	@Test
 	public void basicAll() {
-		MergeRegionMeanShiftGray alg = new MergeRegionMeanShiftGray(1);
+		MergeRegionMeanShift alg = new MergeRegionMeanShift(1,1);
 
 		ImageSInt32 pixelToRegion = new ImageSInt32(4,4);
 		pixelToRegion.data = new int[]
@@ -44,11 +44,7 @@ public class TestMergeRegionMeanShiftGray {
 		regionMemberCount.data = new int[]{1,2,3,4};
 		regionMemberCount.size = 4;
 
-		GrowQueue_F32 regionColor = new GrowQueue_F32(3);
-		regionColor.add(5);
-		regionColor.add(1);
-		regionColor.add(6);
-		regionColor.add(4);
+		FastQueue<float[]> regionColor = createList(5,1,6,4);
 
 		alg.merge(pixelToRegion,regionMemberCount,regionColor);
 
@@ -69,7 +65,7 @@ public class TestMergeRegionMeanShiftGray {
 			assertEquals(expectedCount[i],regionMemberCount.data[i]);
 
 		for( int i = 0; i < expectedColor.length; i++ )
-			assertEquals(expectedColor[i],regionColor.data[i],1e-4f);
+			assertEquals(expectedColor[i],regionColor.data[i][0],1e-4f);
 	}
 
 	@Test
@@ -78,7 +74,7 @@ public class TestMergeRegionMeanShiftGray {
 		regionMemberCount.data = new int[]{1,2,3,4,5};
 		regionMemberCount.size = 5;
 
-		MergeRegionMeanShiftGray alg = new MergeRegionMeanShiftGray(1);
+		MergeRegionMeanShift alg = new MergeRegionMeanShift(1,1);
 		alg.mergeList = new GrowQueue_I32();
 		alg.mergeList.data = new int[]{1,-1,1,-1,3};
 		alg.mergeList.size = 5;
@@ -95,7 +91,7 @@ public class TestMergeRegionMeanShiftGray {
 	 */
 	@Test
 	public void createMergeList() {
-		MergeRegionMeanShiftGray alg = new MergeRegionMeanShiftGray(1);
+		MergeRegionMeanShift alg = new MergeRegionMeanShift(1,1);
 
 		ImageSInt32 pixelToRegion = new ImageSInt32(4,4);
 		pixelToRegion.data = new int[]
@@ -104,11 +100,7 @@ public class TestMergeRegionMeanShiftGray {
 				 2,0,1,1,
 				 0,0,3,1};
 
-		GrowQueue_F32 regionColor = new GrowQueue_F32(3);
-		regionColor.add(5);
-		regionColor.add(1);
-		regionColor.add(6);
-		regionColor.add(10);
+		FastQueue<float[]> regionColor = createList(5,1,6,10);
 
 		alg.createMergeList(pixelToRegion,regionColor);
 		int expected[] = new int[]{-1,-1,0,-1};
@@ -121,7 +113,7 @@ public class TestMergeRegionMeanShiftGray {
 	 */
 	@Test
 	public void createMergeList_border() {
-		MergeRegionMeanShiftGray alg = new MergeRegionMeanShiftGray(1);
+		MergeRegionMeanShift alg = new MergeRegionMeanShift(1,1);
 
 		ImageSInt32 pixelToRegion = new ImageSInt32(4,4);
 		pixelToRegion.data = new int[]
@@ -130,11 +122,7 @@ public class TestMergeRegionMeanShiftGray {
 				 0,0,0,1,
 				 0,0,3,1};
 
-		GrowQueue_F32 regionColor = new GrowQueue_F32(3);
-		regionColor.add(5);
-		regionColor.add(1);
-		regionColor.add(2);
-		regionColor.add(4);
+		FastQueue<float[]> regionColor = createList(5,1,2,4);
 
 		alg.createMergeList(pixelToRegion,regionColor);
 		int expected[] = new int[]{-1,2,-1,0};
@@ -144,7 +132,7 @@ public class TestMergeRegionMeanShiftGray {
 
 	@Test
 	public void flowIntoRootNode() {
-		MergeRegionMeanShiftGray alg = new MergeRegionMeanShiftGray(1);
+		MergeRegionMeanShift alg = new MergeRegionMeanShift(1,1);
 		alg.mergeList.resize(7);
 		alg.mergeList.data = new int[]{1,-1,-1,2,2,3,5};
 
@@ -175,11 +163,9 @@ public class TestMergeRegionMeanShiftGray {
 		regionMemberCount.size = 7;
 		regionMemberCount.data = new int[]{1,2,3,4,5,6,7};
 
-		GrowQueue_F32 regionColor = new GrowQueue_F32(7);
-		regionColor.size = 7;
-		regionColor.data = new float[]{3,2,4,7,4,5,4};
+		FastQueue<float[]> regionColor = createList(3,2,4,7,4,5,4);
 
-		MergeRegionMeanShiftGray alg = new MergeRegionMeanShiftGray(1);
+		MergeRegionMeanShift alg = new MergeRegionMeanShift(1,1);
 		alg.mergeList.resize(7);
 		alg.mergeList.data = new int[]{1,-1,-1,2,2,2,2};
 
@@ -197,7 +183,7 @@ public class TestMergeRegionMeanShiftGray {
 
 		for( int i = 0; i < expectedCount.length; i++ ) {
 			assertEquals(expectedCount[i],regionMemberCount.data[i]);
-			assertEquals(expectedColor[i],regionColor.data[i],1e-4f);
+			assertEquals(expectedColor[i],regionColor.data[i][0],1e-4f);
 		}
 
 		for( int i = 0; i < expectedMerge.length; i++ )
@@ -213,7 +199,7 @@ public class TestMergeRegionMeanShiftGray {
 
 		int expected[] = new int[]{1,-1,-1,2,2,3,5};
 
-		MergeRegionMeanShiftGray alg = new MergeRegionMeanShiftGray(1);
+		MergeRegionMeanShift alg = new MergeRegionMeanShift(1,1);
 		alg.mergeList.resize(7);
 		alg.mergeList.data = new int[]{1,-1,-1,2,2,3,5};
 
@@ -241,7 +227,7 @@ public class TestMergeRegionMeanShiftGray {
 
 		int original[] = new int[]{1,-1,-1,2,2,3,5};
 
-		MergeRegionMeanShiftGray alg = new MergeRegionMeanShiftGray(1);
+		MergeRegionMeanShift alg = new MergeRegionMeanShift(1,1);
 		alg.mergeList.resize(7);
 		alg.mergeList.data = original.clone();
 
@@ -268,5 +254,19 @@ public class TestMergeRegionMeanShiftGray {
 		alg.checkMerge(6,3);
 		for( int i = 0; i < expected.length; i++ )
 			assertEquals(expected[i],alg.mergeList.data[i]);
+	}
+
+	private FastQueue<float[]> createList( int ...colors ) {
+		FastQueue<float[]> ret = new FastQueue<float[]>(float[].class,true) {
+			@Override
+			protected float[] createInstance() {
+				return new float[1];
+			}
+		};
+
+		for( int i = 0; i < colors.length; i++ ) {
+			ret.grow()[0] = colors[i];
+		}
+		return ret;
 	}
 }
