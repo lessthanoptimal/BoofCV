@@ -73,36 +73,6 @@ public class TestMergeRegionMeanShiftGray {
 	}
 
 	@Test
-	public void compactRegionId() {
-		GrowQueue_I32 regionMemberCount = new GrowQueue_I32();
-		regionMemberCount.data = new int[]{1,2,3,4,5};
-		regionMemberCount.size = 5;
-
-		GrowQueue_F32 regionColor = new GrowQueue_F32();
-		regionColor.data = new float[]{2,3,4,5,6};
-		regionColor.size = 5;
-
-		MergeRegionMeanShiftGray alg = new MergeRegionMeanShiftGray(1);
-		alg.mergeList = new GrowQueue_I32();
-		alg.mergeList.data = new int[]{1,-1,1,-1,3};
-		alg.mergeList.size = 5;
-
-		alg.compactRegionId(regionMemberCount,regionColor);
-
-		int expectedMergeList[] = new int[]{0,-1,0,-1,1};
-		for( int i = 0; i < expectedMergeList.length; i++ )
-			assertEquals(expectedMergeList[i],alg.mergeList.data[i]);
-
-		int expectedCount[] = new int[]{2,4};
-		for( int i = 0; i < expectedCount.length; i++ )
-			assertEquals(expectedCount[i],regionMemberCount.data[i]);
-
-		float expectedColor[] = new float[]{3,5};
-		for( int i = 0; i < expectedCount.length; i++ )
-			assertEquals(expectedColor[i],regionColor.data[i],1e-4f);
-	}
-
-	@Test
 	public void updateMemberCount() {
 		GrowQueue_I32 regionMemberCount = new GrowQueue_I32();
 		regionMemberCount.data = new int[]{1,2,3,4,5};
@@ -113,7 +83,7 @@ public class TestMergeRegionMeanShiftGray {
 		alg.mergeList.data = new int[]{1,-1,1,-1,3};
 		alg.mergeList.size = 5;
 
-		alg.updateMemberCount(regionMemberCount);
+		alg.flowIntoRootNode(regionMemberCount);
 
 		int expected[] = new int[]{1,6,3,9,5};
 		for( int i = 0; i < expected.length; i++ )
@@ -173,81 +143,130 @@ public class TestMergeRegionMeanShiftGray {
 	}
 
 	@Test
-	public void checkMerge_both() {
-		MergeRegionMeanShiftGray alg = new MergeRegionMeanShiftGray(5);
+	public void flowIntoRootNode() {
+		MergeRegionMeanShiftGray alg = new MergeRegionMeanShiftGray(1);
+		alg.mergeList.resize(7);
+		alg.mergeList.data = new int[]{1,-1,-1,2,2,3,5};
 
-		alg.mergeList.size = 6;
+		GrowQueue_I32 regionMemberCount = new GrowQueue_I32(7);
+		regionMemberCount.size = 7;
+		regionMemberCount.data = new int[]{1,2,3,4,5,6,7};
 
-		alg.mergeList.data = new int[]{-1,0,-1,4,-1,0};
-		alg.checkMerge(1, 3);
-		int expected[] = new int[]{-1,0,-1,0,0,0};
+		alg.flowIntoRootNode(regionMemberCount);
 
-		for( int i = 0; i < 6; i++ )
-			assertEquals(expected[i],alg.mergeList.data[i]);
+		// check member count
+		int expectedCount[] = new int[]{1,3,3+4+5+6+7,4,5,6,7};
+		for( int i = 0; i < expectedCount.length; i++ )
+			assertEquals(expectedCount[i],regionMemberCount.data[i]);
 
-		alg.mergeList.data = new int[]{-1,0,-1,4,-1,0};
-		alg.checkMerge(3, 1);
-		expected = new int[]{4,4,-1,4,-1,4};
+		// check mergeList
+		int expectedMerge[] = new int[]{1,-1,-1,2,2,2,2};
+		for( int i = 0; i < expectedMerge.length; i++ )
+			assertEquals(expectedMerge[i],alg.mergeList.data[i]);
 
-		for( int i = 0; i < 6; i++ )
-			assertEquals(expected[i],alg.mergeList.data[i]);
+		// check root id
+		assertEquals(0,alg.rootID.get(1));
+		assertEquals(1,alg.rootID.get(2));
 	}
 
 	@Test
-	public void checkMerge_justA() {
-		MergeRegionMeanShiftGray alg = new MergeRegionMeanShiftGray(5);
+	public void setToRootNodeNewID() {
+		GrowQueue_I32 regionMemberCount = new GrowQueue_I32(7);
+		regionMemberCount.size = 7;
+		regionMemberCount.data = new int[]{1,2,3,4,5,6,7};
 
-		alg.mergeList.size = 6;
+		GrowQueue_F32 regionColor = new GrowQueue_F32(7);
+		regionColor.size = 7;
+		regionColor.data = new float[]{3,2,4,7,4,5,4};
 
-		// straight forward example
-		alg.mergeList.data = new int[]{-1,0,-1,-1,-1,0};
-		int expected[] = new int[]{-1,0,-1,0,-1,0};
+		MergeRegionMeanShiftGray alg = new MergeRegionMeanShiftGray(1);
+		alg.mergeList.resize(7);
+		alg.mergeList.data = new int[]{1,-1,-1,2,2,2,2};
 
-		alg.checkMerge(1, 3);
-		for( int i = 0; i < 6; i++ )
+		alg.rootID.resize(7);
+		alg.rootID.data = new int[]{0,0,1,0,0,0,0};
+
+		alg.setToRootNodeNewID(regionMemberCount,regionColor);
+
+		int expectedCount[] = new int[]{2,3};
+		int expectedMerge[] = new int[]{0,0,1,1,1,1,1};
+		float expectedColor[] = new float[]{2,4};
+
+		assertEquals(2,regionMemberCount.size);
+		assertEquals(2,regionColor.size);
+
+		for( int i = 0; i < expectedCount.length; i++ ) {
+			assertEquals(expectedCount[i],regionMemberCount.data[i]);
+			assertEquals(expectedColor[i],regionColor.data[i],1e-4f);
+		}
+
+		for( int i = 0; i < expectedMerge.length; i++ )
+			assertEquals(expectedMerge[i],alg.mergeList.data[i]);
+
+	}
+
+	/**
+	 * Tests focused on the quick test.  All these cases should result in no change
+	 */
+	@Test
+	public void checkMerge_quick() {
+
+		int expected[] = new int[]{1,-1,-1,2,2,3,5};
+
+		MergeRegionMeanShiftGray alg = new MergeRegionMeanShiftGray(1);
+		alg.mergeList.resize(7);
+		alg.mergeList.data = new int[]{1,-1,-1,2,2,3,5};
+
+		// case 1 - Both are references
+		alg.checkMerge(3,4);
+		for( int i = 0; i < expected.length; i++ )
 			assertEquals(expected[i],alg.mergeList.data[i]);
 
-		// A already references B
-		alg.mergeList.data = new int[]{-1,3,-1,-1,-1,0};
-		expected = new int[]{-1,3,-1,-1,-1,0};
-		alg.checkMerge(1, 3);
-		for( int i = 0; i < 6; i++ )
+		// case 2 - A is a reference and B is not
+		alg.checkMerge(3,2);
+		for( int i = 0; i < expected.length; i++ )
+			assertEquals(expected[i],alg.mergeList.data[i]);
+
+		// case 3 - B is a reference and A is not
+		alg.checkMerge(2,3);
+		for( int i = 0; i < expected.length; i++ )
 			assertEquals(expected[i],alg.mergeList.data[i]);
 	}
 
+	/**
+	 * These cases result in an actual merge
+	 */
 	@Test
-	public void checkMerge_justB() {
-		MergeRegionMeanShiftGray alg = new MergeRegionMeanShiftGray(5);
+	public void checkMerge_merge() {
 
-		alg.mergeList.size = 6;
+		int original[] = new int[]{1,-1,-1,2,2,3,5};
 
-		// straight forward example
-		alg.mergeList.data = new int[]{-1,0,-1,-1,-1,0};
-		int expected[] = new int[]{-1,0,-1,0,-1,0};
+		MergeRegionMeanShiftGray alg = new MergeRegionMeanShiftGray(1);
+		alg.mergeList.resize(7);
+		alg.mergeList.data = original.clone();
 
-		alg.checkMerge(3, 1);
-		for( int i = 0; i < 6; i++ )
+		// Both are root nodes
+		alg.checkMerge(1,2);
+		assertEquals(-1, alg.mergeList.data[1]);
+		assertEquals(1,alg.mergeList.data[2]);
+
+		// both are references
+		alg.mergeList.data = original.clone();
+		alg.checkMerge(0,3);
+		int expected[] = new int[]{1,-1,1,1,2,3,5};
+		for( int i = 0; i < expected.length; i++ )
 			assertEquals(expected[i],alg.mergeList.data[i]);
 
-		// B already references A
-		alg.mergeList.data = new int[]{-1,3,-1,-1,-1,0};
-		expected = new int[]{-1,3,-1,-1,-1,0};
-		alg.checkMerge(3, 1);
-		for( int i = 0; i < 6; i++ )
+		// Both point to the same data but aren't equivalent references, so no change
+		alg.mergeList.data = original.clone();
+		alg.checkMerge(3,6);
+		expected = new int[]{1,-1,-1,2,2,3,2};
+		for( int i = 0; i < expected.length; i++ )
 			assertEquals(expected[i],alg.mergeList.data[i]);
-	}
 
-	@Test
-	public void checkMerge_neither() {
-		MergeRegionMeanShiftGray alg = new MergeRegionMeanShiftGray(5);
-
-		alg.mergeList.size = 6;
-
-		alg.mergeList.data = new int[]{-1,-1,-1,-1,-1,-1};
-		int expected[] = new int[]{-1,3,-1,-1,-1,-1};
-
-		alg.checkMerge(3, 1);
-		for( int i = 0; i < 6; i++ )
+		alg.mergeList.data = original.clone();
+		alg.checkMerge(6,3);
+		for( int i = 0; i < expected.length; i++ )
 			assertEquals(expected[i],alg.mergeList.data[i]);
 	}
 }

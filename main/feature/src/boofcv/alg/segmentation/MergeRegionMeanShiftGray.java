@@ -42,79 +42,39 @@ public class MergeRegionMeanShiftGray {
 	// How similar two region's pixel intensity values need to be for them to be merged
 	protected float tolerance;
 
+	// the new ID of the root nodes (segments)
+	protected GrowQueue_I32 rootID = new GrowQueue_I32();
+
+	// Local copy of these lists after elements which have been merged are removed
+	GrowQueue_I32 tmpMemberCount = new GrowQueue_I32();
+	GrowQueue_F32 tmpColor = new GrowQueue_F32();
+
+	/**
+	 * Configures merging.
+	 *
+	 * @param tolerance How similar in color two adjacent segments need to be to be considered the same segment.
+	 *                  For 8-bit images try 5.
+	 */
 	public MergeRegionMeanShiftGray(float tolerance) {
 		this.tolerance = tolerance;
 	}
 
+	/**
+	 * Merges equivalent segments together and updates all the data structures by removing the redundant segments.
+	 */
 	public void merge( ImageSInt32 pixelToRegion , GrowQueue_I32 regionMemberCount , GrowQueue_F32 regionColor )
 	{
 		// see which ones need to be merged into which ones
 		createMergeList(pixelToRegion, regionColor);
 
 		// update member counts
-		updateMemberCount(regionMemberCount);
+		flowIntoRootNode(regionMemberCount);
 
-		// compact the region id's
-		compactRegionId(regionMemberCount, regionColor);
+		// re-assign the number of the root node and trim excessive nodes from the lists
+		setToRootNodeNewID(regionMemberCount,regionColor);
 
-		// update the pixelToRegion
-		int count = 0;
-		for( int i = 0; i < mergeList.size; i++ ) {
-			if( mergeList.data[i] == -1 )
-				mergeList.data[i] = count++;
-		}
-
+		// change the labels in the pixelToRegion image
 		BinaryImageOps.relabel(pixelToRegion, mergeList.data);
-
-	}
-
-	/**
-	 * After merging regions there is likely to be many unused regions.  This removes those unused regions
-	 * and updates all references.
-	 *
-	 * mergeList is changed to use the new compacted IDs.  the two input lists are compacted.
-	 */
-	// TODO speed this up also
-	protected void compactRegionId(GrowQueue_I32 regionMemberCount, GrowQueue_F32 regionColor) {
-
-		GrowQueue_I32 rmcNew = new GrowQueue_I32();
-		GrowQueue_F32 colorNew = new GrowQueue_F32();
-
-		int count = 0;
-		for( int i = 0; i < mergeList.size; i++ ) {
-			int w = mergeList.data[i];
-			if( w == -1 ){
-				for( int j = 0; j < mergeList.size; j++ ) {
-					if( mergeList.data[j] == i ) {
-						mergeList.data[j] = count;
-					}
-				}
-
-				// shift over data which describes the region
-				rmcNew.add(regionMemberCount.data[i]);
-				colorNew.add(regionColor.data[i]);
-
-				count++;
-			}
-		}
-
-		regionMemberCount.reset();
-		regionColor.reset();
-
-		regionMemberCount.addAll(rmcNew);
-		regionColor.addAll(colorNew);
-	}
-
-	/**
-	 * Adds the counts of all the regions that refer to others.
-	 */
-	protected void updateMemberCount(GrowQueue_I32 regionMemberCount) {
-		for( int i = 0; i < mergeList.size; i++ ) {
-			int w = mergeList.data[i];
-			if( w != -1 ) {
-				regionMemberCount.data[w] += regionMemberCount.data[i];
-			}
-		}
 	}
 
 	/**
@@ -197,70 +157,115 @@ public class MergeRegionMeanShiftGray {
 	}
 
 	/**
-	 * Two pixels have been found to have regions of similar color and are not the same region.  This will mark
-	 * one region as being merged into the other.  If one or both have already been previously merged then
-	 * they will point to one of their end destinations.
-	 *
-	 * This procedure ensures that any merge reference will be at most one deep.  E.g. nothing like A -> B -> C
-	 *
-	 * DESIGN NOTE: Could speed this function up a lot by saving which nodes references others instead of traversing
-	 * the entire mergeList each time there is a modification
+	 * For each region in the merge list which is not a root node, find its root node and add to the root node
+	 * its member count and set the index  in mergeList to the root node.  If a node is a root node just note
+	 * what its new ID will be after all the other segments are removed.
 	 */
-	// TODO update unit test for changes
-	// TODO must speed up
-	protected void checkMerge( int regionA , int regionB ) {
-		boolean alreadyA = mergeList.data[regionA] != -1;
-		boolean alreadyB = mergeList.data[regionB] != -1;
+	protected void flowIntoRootNode(GrowQueue_I32 regionMemberCount) {
+		rootID.resize(regionMemberCount.size);
+		int count = 0;
 
-		if( alreadyA && alreadyB ) {
-			// if they already point to the same one, do nothing
-			if( mergeList.data[regionB] != mergeList.data[regionA] ) {
-				// put B into A, arbitrary choice
-				// don't point to A instead point to A's destination
-				int dstA = mergeList.data[regionA];
-				int dstB = mergeList.data[regionB];
-				// look for all reference to B and change to A
-				for( int i = 0; i < mergeList.size; i++ ) {
-					if( mergeList.data[i] == dstB )
-						mergeList.data[i] = dstA;
-				}
-				mergeList.data[dstB] = dstA;
+		for( int i = 0; i < mergeList.size; i++ ) {
+			int p = mergeList.data[i];
+
+			// see if it is a root note
+			if( p == -1 ) {
+				// mark the root nodes new ID
+				rootID.data[i] = count++;
+				continue;
 			}
 
-		} else if( alreadyA ) {
-			// make sure A is not already pointing to B
-			if( mergeList.data[regionA] != regionB ) {
-				int dstA = mergeList.data[regionA];
-
-				// have B link to the same one as A
-				mergeList.data[regionB] = dstA;
-
-				for( int i = 0; i < mergeList.size; i++ ) {
-					if( mergeList.data[i] == regionB )
-						mergeList.data[i] = dstA;
-				}
+			// traverse down until it finds the root note
+			int gp = mergeList.data[p];
+			while( gp != -1 ) {
+				p = gp;
+				gp = mergeList.data[p];
 			}
-		} else if( alreadyB ) {
-			// make sure B is not already pointing to A
-			if( mergeList.data[regionB] != regionA ) {
-				int dstB = mergeList.data[regionB];
 
-				// have A link to the same one as B
-				mergeList.data[regionA] = dstB;
+			// update the count and change this node into the root node
+			regionMemberCount.data[p] += regionMemberCount.data[i];
+			mergeList.data[i] = p;
+		}
+	}
 
-				for( int i = 0; i < mergeList.size; i++ ) {
-					if( mergeList.data[i] == regionA )
-						mergeList.data[i] = dstB;
-				}
-			}
-		} else {
-			// have B point to A, arbitrary choice
-			mergeList.data[regionB] = regionA;
+	/**
+	 * Does much of the work needed to remove the redundant segments that are being merged into their root node.
+	 * The list of member count and colors is updated.  mergeList is updated with the new segment IDs.
+	 */
+	protected void setToRootNodeNewID( GrowQueue_I32 regionMemberCount, GrowQueue_F32 regionColor ) {
 
-			for( int i = 0; i < mergeList.size; i++ ) {
-				if( mergeList.data[i] == regionB )
-					mergeList.data[i] = regionA;
+		tmpMemberCount.reset();
+		tmpColor.reset();
+
+		for( int i = 0; i < mergeList.size; i++ ) {
+			int p = mergeList.data[i];
+
+			if( p == -1 ) {
+				mergeList.data[i] = rootID.data[i];
+				tmpMemberCount.add( regionMemberCount.data[i] );
+				tmpColor.add( regionColor.data[i] );
+			} else {
+				mergeList.data[i] = rootID.data[mergeList.data[i]];
 			}
 		}
+
+		regionMemberCount.reset();
+		regionColor.reset();
+
+		regionMemberCount.addAll(tmpMemberCount);
+		regionColor.addAll(tmpColor);
+	}
+
+
+	/**
+	 * If the two regions are not really the same region regionB will become a member of regionA.  A quick
+	 * check is done to see if they are really the same region.  If that fails it will traverse down the
+	 * inheritance path for each region until it gets to their roots.  If the roots are not the same then
+	 * they are merged.  Either way the path is updated such that the quick check will pass.
+	 */
+	protected void checkMerge( int regionA , int regionB ) {
+
+		int dA = mergeList.data[regionA];
+		int dB = mergeList.data[regionB];
+
+		// see if they link to the same thing doing the quick check
+		if( dA != -1 && dB != -1 ) {
+			if( dA == dB )
+				return;
+		} else if( dA != -1 ) {
+			if( dA == regionB )
+				return;
+		} else if( dB != -1 ) {
+			if( dB == regionA )
+				return;
+		}
+
+		// search down to the root node
+		int rootA = regionA;
+		while( dA != -1 ) {
+			rootA = dA;
+			dA = mergeList.data[rootA];
+		}
+
+		int rootB = regionB;
+		while( dB != -1 ) {
+			rootB = dB;
+			dB = mergeList.data[rootB];
+		}
+
+		// if they are not the same link merge one into the other
+		if( rootA != rootB ) {
+			mergeList.data[rootB] = rootA;
+		}
+
+		// make it so that the quick check will work the next time        '
+		if( regionB != rootA ) {
+			mergeList.data[regionB] = rootA;
+		}
+		if( mergeList.data[regionA] != -1 ) {
+			mergeList.data[regionA] = rootA;
+		}
+
+
 	}
 }

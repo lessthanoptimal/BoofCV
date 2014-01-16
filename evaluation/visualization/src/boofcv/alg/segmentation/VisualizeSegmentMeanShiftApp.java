@@ -18,7 +18,6 @@
 
 package boofcv.alg.segmentation;
 
-import boofcv.alg.filter.blur.BlurImageOps;
 import boofcv.alg.weights.WeightDistanceUniform_F32;
 import boofcv.alg.weights.WeightDistance_F32;
 import boofcv.alg.weights.WeightPixelUniform_F32;
@@ -44,22 +43,23 @@ public class VisualizeSegmentMeanShiftApp {
 //		BufferedImage image = UtilImageIO.loadImage("../data/evaluation/sunflowers.png");
 //		BufferedImage image = UtilImageIO.loadImage("../data/evaluation/shapes01.png");
 //		BufferedImage image = UtilImageIO.loadImage("../data/applet/trees_rotate_01.jpg");
-		BufferedImage image = UtilImageIO.loadImage("../data/applet/segment/mountain_pines_people.jpg");
+//		BufferedImage image = UtilImageIO.loadImage("../data/applet/segment/mountain_pines_people.jpg");
+		BufferedImage image = UtilImageIO.loadImage("/home/pja/Desktop/segmentation/example-orig.jpg");
 
 		ImageFloat32 gray = ConvertBufferedImage.convertFrom(image,(ImageFloat32)null);
 
 		BufferedImage outColor = new BufferedImage(gray.width,gray.height,BufferedImage.TYPE_INT_RGB);
 		BufferedImage outPeak = new BufferedImage(gray.width,gray.height,BufferedImage.TYPE_INT_RGB);
 
-		BlurImageOps.gaussian(gray,gray,0.5,-1,null);
+//		BlurImageOps.gaussian(gray,gray,0.5,-1,null);
 
 		WeightPixel_F32 weightSpacial = new WeightPixelUniform_F32();
-		WeightDistance_F32 weightGray = new WeightDistanceUniform_F32(100);
+		WeightDistance_F32 weightGray = new WeightDistanceUniform_F32(4.5f);
 
 		SegmentMeanShiftGray<ImageFloat32> alg =
 				FactorySegmentationAlg.meanShiftGray(30,0.1f,weightSpacial,weightGray,ImageFloat32.class);
 
-		alg.setRadius(5);
+		alg.setRadius(6);
 		long time0 = System.currentTimeMillis();
 		alg.process(gray);
 		long time1 = System.currentTimeMillis();
@@ -68,7 +68,7 @@ public class VisualizeSegmentMeanShiftApp {
 		ImageSInt32 peakToIndex = alg.getPeakToIndex();
 		GrowQueue_I32 peakCounts = alg.getPeakMemberCount();
 
-		MergeRegionMeanShiftGray merge = new MergeRegionMeanShiftGray(5);
+		MergeRegionMeanShiftGray merge = new MergeRegionMeanShiftGray(1);
 		merge.merge(peakToIndex,peakCounts,peakValue);
 
 		long time2 = System.currentTimeMillis();
@@ -83,6 +83,7 @@ public class VisualizeSegmentMeanShiftApp {
 		for( int i = 0; i < peakCounts.size; i++ ) {
 			if( peakCounts.get(i) < 20 ) {
 				colors[i] = 0;
+				peakValue.set(i, -1);
 			}
 		}
 
@@ -91,7 +92,7 @@ public class VisualizeSegmentMeanShiftApp {
 				int index = peakToIndex.unsafe_get(x,y);
 				int gv = (int)peakValue.get(index);
 
-				int grayRGB = gv << 16 | gv << 8 | gv;
+				int grayRGB = gv == -1 ? 0xFF0000 : gv << 16 | gv << 8 | gv;
 
 				outColor.setRGB(x, y, colors[index]);
 				outPeak.setRGB(x,y,grayRGB);
