@@ -68,18 +68,18 @@ public class VisualizeSegmentMeanShiftGrayApp {
 		alg.process(gray);
 		long time1 = System.currentTimeMillis();
 
-		FastQueue<float[]> peakValue = alg.getPeakValue();
-		ImageSInt32 peakToIndex = alg.getPeakToIndex();
-		GrowQueue_I32 peakCounts = alg.getPeakMemberCount();
+		FastQueue<float[]> modeValue = alg.getModeColor();
+		ImageSInt32 pixelToSegment = alg.getPixelToMode();
+		GrowQueue_I32 peakCounts = alg.getSegmentMemberCount();
 
 		MergeRegionMeanShift merge = new MergeRegionMeanShift(5,1);
-		merge.merge(peakToIndex,peakCounts,peakValue);
+		merge.merge(pixelToSegment,peakCounts,modeValue);
 
 		long time2 = System.currentTimeMillis();
 
 		Random rand = new Random(234);
 
-		int colors[] = new int[ peakValue.size ];
+		int colors[] = new int[ modeValue.size ];
 		for( int i = 0; i < colors.length; i++ ) {
 			colors[i] = rand.nextInt();
 		}
@@ -87,14 +87,14 @@ public class VisualizeSegmentMeanShiftGrayApp {
 		for( int i = 0; i < peakCounts.size; i++ ) {
 			if( peakCounts.get(i) < 20 ) {
 				colors[i] = 0;
-				peakValue.get(i)[0]=-1;
+				modeValue.get(i)[0]=-1;
 			}
 		}
 
 		for( int y = 0; y < gray.height; y++ ) {
 			for( int x = 0; x < gray.width; x++ ) {
-				int index = peakToIndex.unsafe_get(x,y);
-				int gv = (int)peakValue.get(index)[0];
+				int index = pixelToSegment.unsafe_get(x,y);
+				int gv = (int)modeValue.get(index)[0];
 
 				int grayRGB = gv == -1 ? 0xFF0000 : gv << 16 | gv << 8 | gv;
 

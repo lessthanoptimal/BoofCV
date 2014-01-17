@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,9 +18,11 @@
 
 package boofcv.alg.filter.blur;
 
+import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.MultiSpectral;
 
 
 /**
@@ -53,6 +55,30 @@ public class GBlurImageOps {
 	}
 
 	/**
+	 * Applies mean box filter to a {@link MultiSpectral}
+	 *
+	 * @param input Input image.  Not modified.
+	 * @param output (Optional) Storage for output image, Can be null.  Modified.
+	 * @param radius Radius of the box blur function.
+	 * @param storage (Optional) Storage for intermediate results.  Same size as input image.  Can be null.
+	 * @param <T> Input image type.
+	 * @return Output blurred image.
+	 */
+	public static <T extends ImageSingleBand>
+	MultiSpectral<T> mean(MultiSpectral<T> input, MultiSpectral<T> output, int radius , T storage ) {
+
+		if( storage == null )
+			storage = GeneralizedImageOps.createSingleBand(input.getType(),input.width,input.height);
+		if( output == null )
+			output = input._createNew(input.width,input.height);
+
+		for( int band = 0; band < input.getNumBands(); band++ ) {
+			median(input.getBand(band),output.getBand(band),radius);
+		}
+		return output;
+	}
+
+	/**
 	 * Applies a median filter.
 	 *
 	 * @param input Input image.  Not modified.
@@ -73,7 +99,28 @@ public class GBlurImageOps {
 	}
 
 	/**
-	 * Applies Gaussian blur.
+	 * Applies median filter to a {@link MultiSpectral}
+	 *
+	 * @param input Input image.  Not modified.
+	 * @param output (Optional) Storage for output image, Can be null.  Modified.
+	 * @param radius Radius of the median blur function.
+	 * @param <T> Input image type.
+	 * @return Output blurred image.
+	 */
+	public static <T extends ImageSingleBand>
+	MultiSpectral<T> median(MultiSpectral<T> input, MultiSpectral<T> output, int radius ) {
+
+		if( output == null )
+			output = input._createNew(input.width,input.height);
+
+		for( int band = 0; band < input.getNumBands(); band++ ) {
+			median(input.getBand(band),output.getBand(band),radius);
+		}
+		return output;
+	}
+
+	/**
+	 * Applies Gaussian blur to a {@link ImageSingleBand}
 	 *
 	 * @param input Input image.  Not modified.
 	 * @param output (Optional) Storage for output image, Can be null.  Modified.
@@ -92,5 +139,30 @@ public class GBlurImageOps {
 		} else  {
 			throw new IllegalArgumentException("Unsupported image type: "+input.getClass().getSimpleName());
 		}
+	}
+
+	/**
+	 * Applies Gaussian blur to a {@link MultiSpectral}
+	 *
+	 * @param input Input image.  Not modified.
+	 * @param output (Optional) Storage for output image, Can be null.  Modified.
+	 * @param sigma Gaussian distribution's sigma.  If <= 0 then will be selected based on radius.
+	 * @param radius Radius of the Gaussian blur function. If <= 0 then radius will be determined by sigma.
+	 * @param storage (Optional) Storage for intermediate results.  Same size as input image.  Can be null.
+	 * @param <T> Input image type.
+	 * @return Output blurred image.
+	 */
+	public static <T extends ImageSingleBand>
+	MultiSpectral<T> gaussian(MultiSpectral<T> input, MultiSpectral<T> output, double sigma , int radius, T storage ) {
+
+		if( storage == null )
+			storage = GeneralizedImageOps.createSingleBand(input.getType(),input.width,input.height);
+		if( output == null )
+			output = input._createNew(input.width,input.height);
+
+		for( int band = 0; band < input.getNumBands(); band++ ) {
+			gaussian(input.getBand(band),output.getBand(band),sigma,radius,storage);
+		}
+		return output;
 	}
 }

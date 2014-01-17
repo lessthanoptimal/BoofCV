@@ -55,7 +55,7 @@ public class SegmentMeanShiftGray<T extends ImageSingleBand> extends SegmentMean
 		super(maxIterations,convergenceTol,weightSpacial,weightGray);
 		this.interpolate = interpolate;
 
-		peakValue = new FastQueue<float[]>(float[].class,true) {
+		modeColor = new FastQueue<float[]>(float[].class,true) {
 			@Override
 			protected float[] createInstance() {
 				return new float[ 1 ];
@@ -73,9 +73,9 @@ public class SegmentMeanShiftGray<T extends ImageSingleBand> extends SegmentMean
 		// initialize data structures
 		this.image = image;
 
-		peakLocation.reset();
-		peakValue.reset();
-		peakMemberCount.reset();
+		modeLocation.reset();
+		modeColor.reset();
+		modeMemberCount.reset();
 
 		interpolate.setImage(image);
 
@@ -94,17 +94,17 @@ public class SegmentMeanShiftGray<T extends ImageSingleBand> extends SegmentMean
 				// get index in the list of peaks
 				int peakIndex = peakToIndex.data[peakLocation];
 				if( peakIndex < 0 ) {
-					peakIndex = this.peakLocation.getSize();
-					this.peakLocation.add(peakLocation);
+					peakIndex = this.modeLocation.getSize();
+					this.modeLocation.add(peakLocation);
 					// Save the peak's color
-					peakValue.grow()[0] = meanGray;
+					modeColor.grow()[0] = meanGray;
 					// Remember it's location in the peak arrays
 					peakToIndex.data[peakLocation] = peakIndex;
 					// Set the initial count to zero.  When the peak itself is processed later it will increment it
-					peakMemberCount.add(0);
+					modeMemberCount.add(0);
 				}
 				// Remember where this was a peak to
-				peakMemberCount.data[peakIndex]++;
+				modeMemberCount.data[peakIndex]++;
 				peakToIndex.unsafe_set(x,y,peakIndex);
 			}
 		}

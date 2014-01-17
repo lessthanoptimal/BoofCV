@@ -5,6 +5,9 @@ import boofcv.struct.image.ImageUInt8;
 import boofcv.struct.image.MultiSpectral;
 
 /**
+ * NV21:  The format is densely packed.  Y is full resolution and UV are interlaced and 1/2 resolution.
+ *        So same UV values within a 2x2 square
+ *
  * @author Peter Abeles
  */
 public class ImplConvertNV21 {
@@ -12,7 +15,9 @@ public class ImplConvertNV21 {
 	/**
 	 * First block contains gray-scale information and UV data can be ignored.
 	 */
-	public static void nv21ToGray(byte[] dataNV, int yStride, ImageUInt8 output) {
+	public static void nv21ToGray(byte[] dataNV, ImageUInt8 output) {
+
+		final int yStride = output.width;
 
 		// see if the whole thing can be copied as one big block to maximize speed
 		if( yStride == output.width && !output.isSubimage() ) {
@@ -30,10 +35,10 @@ public class ImplConvertNV21 {
 	/**
 	 * First block contains gray-scale information and UV data can be ignored.
 	 */
-	public static void nv21ToGray(byte[] dataNV, int yStride, ImageFloat32 output) {
+	public static void nv21ToGray(byte[] dataNV, ImageFloat32 output) {
 
 		for( int y = 0; y < output.height; y++ ) {
-			int indexIn = y*yStride;
+			int indexIn = y*output.width;
 			int indexOut = output.startIndex + y*output.stride;
 
 			for( int x = 0; x < output.width; x++ ) {
@@ -42,15 +47,17 @@ public class ImplConvertNV21 {
 		}
 	}
 
-	public static void nv21ToMultiYuv_U8(byte[] dataNV, int yStride, int uvStride, MultiSpectral<ImageUInt8> output) {
+	public static void nv21ToMultiYuv_U8(byte[] dataNV, MultiSpectral<ImageUInt8> output) {
 
 		ImageUInt8 Y = output.getBand(0);
 		ImageUInt8 U = output.getBand(1);
 		ImageUInt8 V = output.getBand(2);
 
-		nv21ToGray(dataNV, yStride, Y);
+		final int uvStride = output.width/2;
 
-		int startUV = yStride*output.height;
+		nv21ToGray(dataNV, Y);
+
+		int startUV = output.width*output.height;
 
 		for( int row = 0; row < output.height; row++ ) {
 			int indexUV = startUV + (row/2)*(2*uvStride);
@@ -65,15 +72,17 @@ public class ImplConvertNV21 {
 		}
 	}
 
-	public static void nv21ToMultiYuv_F32(byte[] dataNV, int yStride, int uvStride, MultiSpectral<ImageFloat32> output) {
+	public static void nv21ToMultiYuv_F32(byte[] dataNV, MultiSpectral<ImageFloat32> output) {
 
 		ImageFloat32 Y = output.getBand(0);
 		ImageFloat32 U = output.getBand(1);
 		ImageFloat32 V = output.getBand(2);
 
-		nv21ToGray(dataNV, yStride, Y);
+		final int uvStride = output.width/2;
 
-		int startUV = yStride*output.height;
+		nv21ToGray(dataNV, Y);
+
+		final int startUV = output.width*output.height;
 
 		for( int row = 0; row < output.height; row++ ) {
 			int indexUV = startUV + (row/2)*(2*uvStride);
@@ -88,13 +97,16 @@ public class ImplConvertNV21 {
 		}
 	}
 
-	public static void nv21ToMultiRgb_U8(byte[] dataNV, int yStride, int uvStride, MultiSpectral<ImageUInt8> output) {
+	public static void nv21ToMultiRgb_U8(byte[] dataNV, MultiSpectral<ImageUInt8> output) {
 
 		ImageUInt8 R = output.getBand(0);
 		ImageUInt8 G = output.getBand(1);
 		ImageUInt8 B = output.getBand(2);
 
-		int startUV = yStride*output.height;
+		final int yStride = output.width;
+		final int uvStride = output.width/2;
+
+		final int startUV = yStride*output.height;
 
 		for( int row = 0; row < output.height; row++ ) {
 			int indexY = row*yStride;
@@ -125,13 +137,16 @@ public class ImplConvertNV21 {
 		}
 	}
 
-	public static void nv21ToMultiRgb_F32(byte[] dataNV, int yStride, int uvStride, MultiSpectral<ImageFloat32> output) {
+	public static void nv21ToMultiRgb_F32(byte[] dataNV, MultiSpectral<ImageFloat32> output) {
 
 		ImageFloat32 R = output.getBand(0);
 		ImageFloat32 G = output.getBand(1);
 		ImageFloat32 B = output.getBand(2);
 
-		int startUV = yStride*output.height;
+		final int yStride = output.width;
+		final int uvStride = output.width/2;
+
+		final int startUV = yStride*output.height;
 
 		for( int row = 0; row < output.height; row++ ) {
 			int indexY = row*yStride;

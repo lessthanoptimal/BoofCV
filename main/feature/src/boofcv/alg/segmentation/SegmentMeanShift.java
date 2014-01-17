@@ -27,17 +27,22 @@ import org.ddogleg.struct.GrowQueue_I32;
 
 /**
  * <p>
- * Performs mean-shift segmentation on a gray scale image [1].  Segmentation is done by finding the
- * mean-shift local peak for each pixel in the image.  The gray/color value which mean-shift is minimizing is the
- * pixel's intensity value.
+ * Performs mean-shift segmentation on a color image [1,2].  Segmentation is done by performing mean-shift at
+ * each pixel to find its mode, i.e local maximum/peak.  Pixels which have the same mode belong to the same segment.
+ * Likelihood (or weights) used to compute the mean value comes from a 2D spacial kernel and color distance functions.
+ * Color distance is computed as the difference between the mean and the color value at a pixel which is then
+ * converted into a weight.  The two weights are then multiplied together and normalized based on the total
+ * weight from all the samples.
  * </p>
  * <p>
- * Output is provided in the form of an image where each pixel contains the index of a region the pixel belongs too.
+ * Output is provided in the form of an image where each pixel contains the index of a region the pixel belongs to.
  * Three other lists provide color value of the region, number of pixels in the region and the location
- * of the mean-shift peak for that region.
+ * of the mean-shift peak for that region.  This output is unlikely to be final processing step since it will over
+ * segment the image.  Merging of similar modes and pruning of small regions is a common next step.
  * </p>
  *
  * <p>
+ * NOTES:
  * <ul>
  * <li>The kernel's spacial radius is specified by the radius of 'weightSpacial' and the gray/color radius is specified
  * by 'weightGray'.  Those two functions also specified the amount of weight assigned to each sample in the
@@ -45,15 +50,22 @@ import org.ddogleg.struct.GrowQueue_I32;
  * <li>The distance passed into the 'weightGray' function is the difference squared.E.g. (a-b)<sup>2</sup></li>
  * <li>Image edges are handled by truncating the spacial kernel.  This truncation
  * will create an asymmetric kernel, but there is really no good way to handle image edges.</li>
+ * </ul>
  * </p>
  *
  * <p>
+ * CITATIONS:<br>
  * [1] Cheng, Yizong. "Mean shift, mode seeking, and clustering." Pattern Analysis and Machine Intelligence,
- * IEEE Transactions on 17.8 (1995): 790-799.
+ * IEEE Transactions on 17.8 (1995): 790-799.<br>
+ * [2] Comaniciu, Dorin, and Peter Meer. "Mean shift analysis and applications." Computer Vision, 1999.
+ * The Proceedings of the Seventh IEEE International Conference on. Vol. 2. IEEE, 1999.
  * </p>
  *
  * @author Peter Abeles
  */
+// TODO Paper suggests merging two segments if their modes are near by each other.  Could adjust merge algorithm to
+//      do that instead
+// TODO Need a procedure for eliminating small spacial regions.  Fill them in with something
 public abstract class SegmentMeanShift<T extends ImageBase> {
 
 	// used to detect convergence of mean-shift
@@ -72,13 +84,13 @@ public abstract class SegmentMeanShift<T extends ImageBase> {
 	protected ImageSInt32 peakToIndex = new ImageSInt32(1,1);
 
 	// location of each peak in image pixel indexes
-	protected GrowQueue_I32 peakLocation = new GrowQueue_I32();
+	protected GrowQueue_I32 modeLocation = new GrowQueue_I32();
 
 	// number of members in this peak
-	protected GrowQueue_I32 peakMemberCount = new GrowQueue_I32();
+	protected GrowQueue_I32 modeMemberCount = new GrowQueue_I32();
 
 	// storage for segment colors
-	protected FastQueue<float[]> peakValue;
+	protected FastQueue<float[]> modeColor;
 
 	// The input image
 	protected T image;
@@ -126,25 +138,25 @@ public abstract class SegmentMeanShift<T extends ImageBase> {
 	/**
 	 * From peak index to pixel index
 	 */
-	public ImageSInt32 getPeakToIndex() {
+	public ImageSInt32 getPixelToMode() {
 		return peakToIndex;
 	}
 
 	/**
 	 * Location of each peak in the image
 	 */
-	public GrowQueue_I32 getPeakLocation() {
-		return peakLocation;
+	public GrowQueue_I32 getModeLocation() {
+		return modeLocation;
 	}
 
 	/**
 	 * Number of pixels which each peak as a member
 	 */
-	public GrowQueue_I32 getPeakMemberCount() {
-		return peakMemberCount;
+	public GrowQueue_I32 getSegmentMemberCount() {
+		return modeMemberCount;
 	}
 
-	public FastQueue<float[]> getPeakValue() {
-		return peakValue;
+	public FastQueue<float[]> getModeColor() {
+		return modeColor;
 	}
 }

@@ -18,6 +18,7 @@
 
 package boofcv.alg.segmentation;
 
+import boofcv.alg.filter.blur.GBlurImageOps;
 import boofcv.alg.weights.WeightDistanceUniform_F32;
 import boofcv.alg.weights.WeightDistance_F32;
 import boofcv.alg.weights.WeightPixelUniform_F32;
@@ -48,16 +49,16 @@ public class VisualizeSegmentMeanShiftColorApp {
 //		BufferedImage image = UtilImageIO.loadImage("../data/applet/segment/mountain_pines_people.jpg");
 		BufferedImage image = UtilImageIO.loadImage("/home/pja/Desktop/segmentation/example-orig.jpg");
 
-		MultiSpectral<ImageFloat32> color = ConvertBufferedImage.convertFromMulti(image, null, true, ImageFloat32.class);
+		MultiSpectral<ImageFloat32> colorRGB = ConvertBufferedImage.convertFromMulti(image, null, true, ImageFloat32.class);
 		ImageType<MultiSpectral<ImageFloat32>> imageType = ImageType.ms(3,ImageFloat32.class);
 
-		BufferedImage outColor = new BufferedImage(color.width,color.height,BufferedImage.TYPE_INT_RGB);
-		BufferedImage outPeak = new BufferedImage(color.width,color.height,BufferedImage.TYPE_INT_RGB);
+		BufferedImage outColor = new BufferedImage(colorRGB.width,colorRGB.height,BufferedImage.TYPE_INT_RGB);
+		BufferedImage outPeak = new BufferedImage(colorRGB.width,colorRGB.height,BufferedImage.TYPE_INT_RGB);
 
-//		BlurImageOps.gaussian(gray,gray,0.5,-1,null);
+		GBlurImageOps.gaussian(colorRGB, colorRGB, 0.5, -1, null);
 
 		int spacialRadius = 6;
-		float colorRadius = 15f;
+		float colorRadius = 10f;
 
 		WeightPixel_F32 weightSpacial = new WeightPixelUniform_F32();
 		WeightDistance_F32 weightGray = new WeightDistanceUniform_F32(colorRadius*colorRadius);
@@ -68,36 +69,36 @@ public class VisualizeSegmentMeanShiftColorApp {
 				FactorySegmentationAlg.meanShiftColor(30, 0.1f, weightSpacial, weightGray, imageType);
 
 		long time0 = System.currentTimeMillis();
-		alg.process(color);
+		alg.process(colorRGB);
 		long time1 = System.currentTimeMillis();
 
-		FastQueue<float[]> peakValue = alg.getPeakValue();
-		ImageSInt32 peakToIndex = alg.getPeakToIndex();
-		GrowQueue_I32 peakCounts = alg.getPeakMemberCount();
+		FastQueue<float[]> segmentColor = alg.getModeColor();
+		ImageSInt32 pixelToSegment = alg.getPixelToMode();
+		GrowQueue_I32 segmentCounts = alg.getSegmentMemberCount();
 
-		MergeRegionMeanShift merge = new MergeRegionMeanShift(5,3);
-		merge.merge(peakToIndex,peakCounts,peakValue);
+		MergeRegionMeanShift merge = new MergeRegionMeanShift(colorRadius/2,3);
+		merge.merge(pixelToSegment,segmentCounts,segmentColor);
 
 		long time2 = System.currentTimeMillis();
 
 		Random rand = new Random(234);
 
-		int colors[] = new int[ peakValue.size ];
+		int colors[] = new int[ segmentColor.size ];
 		for( int i = 0; i < colors.length; i++ ) {
 			colors[i] = rand.nextInt();
 		}
 
-		for( int i = 0; i < peakCounts.size; i++ ) {
-			if( peakCounts.get(i) < 20 ) {
-				colors[i] = 0;
+		for( int i = 0; i < segmentCounts.size; i++ ) {
+//			if( peakCounts.get(i) < 50 ) {
+//				colors[i] = 0;
 //				peakValue.set(i, -1);
-			}
+//			}
 		}
 
-		for( int y = 0; y < color.height; y++ ) {
-			for( int x = 0; x < color.width; x++ ) {
-				int index = peakToIndex.unsafe_get(x,y);
-				float []cv = peakValue.get(index);
+		for( int y = 0; y < colorRGB.height; y++ ) {
+			for( int x = 0; x < colorRGB.width; x++ ) {
+				int index = pixelToSegment.unsafe_get(x,y);
+				float []cv = segmentColor.get(index);
 
 //				int grayRGB = gv == -1 ? 0xFF0000 : gv << 16 | gv << 8 | gv;
 				int r = (int)cv[0];
