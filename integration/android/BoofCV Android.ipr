@@ -371,16 +371,41 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/BoofCV Android.iml" filepath="$PROJECT_DIR$/BoofCV Android.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../../main/calibration/BoofCV Calibration.iml" filepath="$PROJECT_DIR$/../../main/calibration/BoofCV Calibration.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../../main/feature/BoofCV Feature.iml" filepath="$PROJECT_DIR$/../../main/feature/BoofCV Feature.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../../main/geo/BoofCV Geometric Vision.iml" filepath="$PROJECT_DIR$/../../main/geo/BoofCV Geometric Vision.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../../main/ip/BoofCV Image Processing.iml" filepath="$PROJECT_DIR$/../../main/ip/BoofCV Image Processing.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../../../ddogleg/DDogleg.iml" filepath="$PROJECT_DIR$/../../../ddogleg/DDogleg.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../../../georegression/GeoRegression.iml" filepath="$PROJECT_DIR$/../../../georegression/GeoRegression.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../../../ejml/trunk/ejml.iml" filepath="$PROJECT_DIR$/../../../ejml/trunk/ejml.iml" />
     </modules>
   </component>
   <component name="ProjectResources">
     <default-html-doctype>http://www.w3.org/1999/xhtml</default-html-doctype>
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_6" assert-keyword="true" jdk-15="true" project-jdk-name="Android 4.2 Platform" project-jdk-type="Android SDK">
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_6" assert-keyword="true" jdk-15="true" project-jdk-name="Android 4.2" project-jdk-type="Android SDK">
     <output url="file://$PROJECT_DIR$/out" />
+  </component>
+  <component name="SvnBranchConfigurationManager">
+    <option name="mySupportsUserInfoFilter" value="true" />
   </component>
   <component name="VcsDirectoryMappings">
     <mapping directory="$PROJECT_DIR$/../.." vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../../../ddogleg" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../../../ejml/trunk" vcs="svn" />
+    <mapping directory="$PROJECT_DIR$/../../../georegression" vcs="Git" />
+  </component>
+  <component name="libraryTable">
+    <library name="testing">
+      <CLASSES>
+        <root url="jar://$PROJECT_DIR$/../../lib/testing/caliper.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../../lib/testing/junit-4.10.jar!/" />
+      </CLASSES>
+      <JAVADOC />
+      <SOURCES>
+        <root url="jar://$PROJECT_DIR$/../../lib/testing/caliper.jar!/" />
+      </SOURCES>
+    </library>
   </component>
 </project>
 
