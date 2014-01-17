@@ -54,8 +54,7 @@ public class ConvertNV21 {
 			output = new ImageUInt8(width,height);
 		}
 
-		int yStride = (int) Math.ceil(width / 16.0) * 16;
-		ImplConvertNV21.nv21ToGray(data, yStride, output);
+		ImplConvertNV21.nv21ToGray(data, output);
 
 		return output;
 	}
@@ -77,8 +76,7 @@ public class ConvertNV21 {
 			output = new ImageFloat32(width,height);
 		}
 
-		int yStride = (int) Math.ceil(width / 16.0) * 16;
-		ImplConvertNV21.nv21ToGray(data, yStride, output);
+		ImplConvertNV21.nv21ToGray(data, output);
 
 		return output;
 	}
@@ -123,10 +121,7 @@ public class ConvertNV21 {
 		else if( output.getNumBands() != 3 )
 			throw new IllegalArgumentException("three bands expected");
 
-		int yStride   = (int) Math.ceil(width / 16.0) * 16;
-		int uvStride  = (int) Math.ceil( (yStride / 2) / 16.0) * 16;
-
-		ImplConvertNV21.nv21ToMultiYuv_U8(data,yStride,uvStride,output);
+		ImplConvertNV21.nv21ToMultiYuv_U8(data,output);
 
 		return output;
 	}
@@ -148,10 +143,7 @@ public class ConvertNV21 {
 		else if( output.getNumBands() != 3 )
 			throw new IllegalArgumentException("three bands expected");
 
-		int yStride   = (int) Math.ceil(width / 16.0) * 16;
-		int uvStride  = (int) Math.ceil( (yStride / 2) / 16.0) * 16;
-
-		ImplConvertNV21.nv21ToMultiRgb_U8(data,yStride,uvStride,output);
+		ImplConvertNV21.nv21ToMultiRgb_U8(data,output);
 
 		return output;
 	}
@@ -173,10 +165,7 @@ public class ConvertNV21 {
 		else if( output.getNumBands() != 3 )
 			throw new IllegalArgumentException("three bands expected");
 
-		int yStride   = (int) Math.ceil(width / 16.0) * 16;
-		int uvStride  = (int) Math.ceil( (yStride / 2) / 16.0) * 16;
-
-		ImplConvertNV21.nv21ToMultiYuv_F32(data,yStride,uvStride,output);
+		ImplConvertNV21.nv21ToMultiYuv_F32(data,output);
 
 		return output;
 	}
@@ -198,10 +187,7 @@ public class ConvertNV21 {
 		else if( output.getNumBands() != 3 )
 			throw new IllegalArgumentException("three bands expected");
 
-		int yStride   = (int) Math.ceil(width / 16.0) * 16;
-		int uvStride  = (int) Math.ceil( (yStride / 2) / 16.0) * 16;
-
-		ImplConvertNV21.nv21ToMultiRgb_F32(data,yStride,uvStride,output);
+		ImplConvertNV21.nv21ToMultiRgb_F32(data,output);
 
 		return output;
 	}

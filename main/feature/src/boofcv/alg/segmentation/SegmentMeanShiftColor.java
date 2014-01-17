@@ -67,7 +67,7 @@ public class SegmentMeanShiftColor<T extends ImageMultiBand> extends SegmentMean
 
 		final int numBands = imageType.getNumBands();
 
-		peakValue = new FastQueue<float[]>(float[].class,true) {
+		modeColor = new FastQueue<float[]>(float[].class,true) {
 			@Override
 			protected float[] createInstance() {
 				return new float[ numBands ];
@@ -85,9 +85,9 @@ public class SegmentMeanShiftColor<T extends ImageMultiBand> extends SegmentMean
 		// initialize data structures
 		this.image = image;
 
-		peakLocation.reset();
-		peakValue.reset();
-		peakMemberCount.reset();
+		modeLocation.reset();
+		modeColor.reset();
+		modeMemberCount.reset();
 
 		interpolate.setImage(image);
 
@@ -106,17 +106,17 @@ public class SegmentMeanShiftColor<T extends ImageMultiBand> extends SegmentMean
 				// get index in the list of peaks
 				int peakIndex = peakToIndex.data[peakLocation];
 				if( peakIndex < 0 ) {
-					peakIndex = this.peakLocation.getSize();
-					this.peakLocation.add(peakLocation);
+					peakIndex = this.modeLocation.getSize();
+					this.modeLocation.add(peakLocation);
 					// Save the peak's color
 					savePeakColor(meanColor);
 					// Remember it's location in the peak arrays
 					peakToIndex.data[peakLocation] = peakIndex;
 					// Set the initial count to zero.  When the peak itself is processed later it will increment it
-					peakMemberCount.add(0);
+					modeMemberCount.add(0);
 				}
 				// Remember where this was a peak to
-				peakMemberCount.data[peakIndex]++;
+				modeMemberCount.data[peakIndex]++;
 				peakToIndex.unsafe_set(x,y,peakIndex);
 			}
 		}
@@ -224,7 +224,7 @@ public class SegmentMeanShiftColor<T extends ImageMultiBand> extends SegmentMean
 	}
 
 	protected void savePeakColor( float[] a ) {
-		float[] b = peakValue.grow();
+		float[] b = modeColor.grow();
 		for( int i = 0; i < a.length; i++ ) {
 			b[i] = a[i];
 		}

@@ -65,10 +65,10 @@ public class TestSegmentMeanShiftGray {
 
 		alg.process(image);
 
-		GrowQueue_I32 locations = alg.getPeakLocation();
-		GrowQueue_I32 counts = alg.getPeakMemberCount();
-		ImageSInt32 peaks = alg.getPeakToIndex();
-		FastQueue<float[]> values = alg.getPeakValue();
+		GrowQueue_I32 locations = alg.getModeLocation();
+		GrowQueue_I32 counts = alg.getSegmentMemberCount();
+		ImageSInt32 peaks = alg.getPixelToMode();
+		FastQueue<float[]> values = alg.getModeColor();
 
 		// there should be a fair number of local peaks due to the image being random
 		assertTrue( locations.size > 20 );
