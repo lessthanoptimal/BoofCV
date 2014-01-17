@@ -669,14 +669,26 @@ public class ImplConvertBitmap {
 
 		switch (config) {
 		case ARGB_8888:
-			ImageFloat32 A = input.getBand(3);
-			for (int y = 0; y < h; y++) {
-				int indexSrc = input.startIndex + y * input.stride;
-				for (int x = 0; x < w; x++,indexSrc++) {
-					output[indexDst++] = (byte)R.data[indexSrc];
-					output[indexDst++] = (byte)G.data[indexSrc];
-					output[indexDst++] = (byte)B.data[indexSrc];
-					output[indexDst++] = (byte)A.data[indexSrc];
+			if( input.getNumBands() == 4 ) {
+				ImageFloat32 A = input.getBand(3);
+				for (int y = 0; y < h; y++) {
+					int indexSrc = input.startIndex + y * input.stride;
+					for (int x = 0; x < w; x++,indexSrc++) {
+						output[indexDst++] = (byte)R.data[indexSrc];
+						output[indexDst++] = (byte)G.data[indexSrc];
+						output[indexDst++] = (byte)B.data[indexSrc];
+						output[indexDst++] = (byte)A.data[indexSrc];
+					}
+				}
+			} else {
+				for (int y = 0; y < h; y++) {
+					int indexSrc = input.startIndex + y * input.stride;
+					for (int x = 0; x < w; x++,indexSrc++) {
+						output[indexDst++] = (byte)R.data[indexSrc];
+						output[indexDst++] = (byte)G.data[indexSrc];
+						output[indexDst++] = (byte)B.data[indexSrc];
+						output[indexDst++] = (byte)255;
+					}
 				}
 			}
 			break;

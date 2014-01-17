@@ -20,6 +20,8 @@
 package org.boofcv.example.android;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.hardware.Camera;
@@ -29,6 +31,7 @@ import android.view.SurfaceView;
 import android.view.Window;
 import android.widget.FrameLayout;
 import boofcv.abst.filter.derivative.ImageGradient;
+import boofcv.alg.misc.GImageMiscOps;
 import boofcv.android.ConvertBitmap;
 import boofcv.android.ConvertNV21;
 import boofcv.android.VisualizeImageData;
@@ -73,6 +76,10 @@ public class VideoActivity extends Activity implements Camera.PreviewCallback {
 	private final Object lockGray = new Object();
 	// Object used for synchronizing output image
 	private final Object lockOutput = new Object();
+
+	// if true the input image is flipped horizontally
+	// Front facing cameras need to be flipped to appear correctly
+	boolean flipHorizontal;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -121,7 +128,7 @@ public class VideoActivity extends Activity implements Camera.PreviewCallback {
 	 */
 	private void setUpAndConfigureCamera() {
 		// Open and configure the camera
-		mCamera = Camera.open();
+		mCamera = selectAndOpenCamera();
 
 		Camera.Parameters param = mCamera.getParameters();
 
@@ -146,6 +153,56 @@ public class VideoActivity extends Activity implements Camera.PreviewCallback {
 
 		// Start the video feed by passing it to mPreview
 		mPreview.setCamera(mCamera);
+	}
+
+	/**
+	 * Step through the camera list and select a camera.  It is also possible that there is no camera.
+	 * The camera hardware requirement in AndroidManifest.xml was turned off so that devices with just
+	 * a front facing camera can be found.  Newer SDK's handle this in a more sane way, but with older devices
+	 * you need this work around.
+	 */
+	private Camera selectAndOpenCamera() {
+		Camera.CameraInfo info = new Camera.CameraInfo();
+		int numberOfCameras = Camera.getNumberOfCameras();
+
+		int selected = -1;
+
+		for (int i = 0; i < numberOfCameras; i++) {
+			Camera.getCameraInfo(i, info);
+
+			if( info.facing == Camera.CameraInfo.CAMERA_FACING_BACK ) {
+				selected = i;
+				flipHorizontal = false;
+				break;
+			} else {
+				// default to a front facing camera if a back facing one can't be found
+				selected = i;
+				flipHorizontal = true;
+			}
+		}
+
+		if( selected == -1 ) {
+			dialogNoCamera();
+			return null; // won't ever be called
+		} else {
+			return Camera.open(selected);
+		}
+	}
+
+	/**
+	 * Gracefully handle the situation where a camera could not be found
+	 */
+	private void dialogNoCamera() {
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setMessage("Your device has no cameras!")
+				.setCancelable(false)
+				.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+						System.exit(0);
+					}
+				});
+		AlertDialog alert = builder.create();
+		alert.show();
 	}
 
 	/**
@@ -267,6 +324,9 @@ public class VideoActivity extends Activity implements Camera.PreviewCallback {
 					gray1 = gray2;
 					gray2 = tmp;
 				}
+
+				if( flipHorizontal )
+					GImageMiscOps.flipHorizontal(gray2);
 
 				// process the image and compute its gradient
 				gradient.process(gray2,derivX,derivY);
