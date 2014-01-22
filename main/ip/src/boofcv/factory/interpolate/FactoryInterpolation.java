@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,6 +35,15 @@ import boofcv.struct.image.*;
 @SuppressWarnings({"unchecked"})
 public class FactoryInterpolation {
 
+	/**
+	 * Returns {@link InterpolatePixelS} of the specified type.
+	 *
+	 * @param min Minimum possible pixel value.  Inclusive.
+	 * @param max Maximum possible pixel value.  Inclusive.
+	 * @param type Type of interpolation.
+	 * @param dataType Type of gray-scale image
+	 * @return Interpolation for single band image
+	 */
 	public static <T extends ImageSingleBand> InterpolatePixelS<T>
 	createPixelS(double min, double max, TypeInterpolate type, ImageDataType dataType )
 	{

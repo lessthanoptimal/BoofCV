@@ -24,6 +24,7 @@ import boofcv.alg.weights.*;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSInt32;
+import georegression.struct.point.Point2D_I32;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_I32;
 import org.junit.Before;
@@ -37,7 +38,7 @@ import static org.junit.Assert.assertTrue;
 /**
 * @author Peter Abeles
 */
-public class TestSegmentMeanShiftGray {
+public class TestSegmentMeanShiftSearchGray {
 
 	Random rand = new Random(234);
 
@@ -60,14 +61,14 @@ public class TestSegmentMeanShiftGray {
 
 		ImageMiscOps.fillUniform(image, rand, 0, 256);
 
-		SegmentMeanShiftGray<ImageFloat32> alg =
-				new SegmentMeanShiftGray<ImageFloat32>(30,0.05f,interp,weightSpacial, weightDist);
+		SegmentMeanShiftSearchGray<ImageFloat32> alg =
+				new SegmentMeanShiftSearchGray<ImageFloat32>(30,0.05f,interp,weightSpacial, weightDist);
 
 		alg.process(image);
 
-		GrowQueue_I32 locations = alg.getModeLocation();
-		GrowQueue_I32 counts = alg.getSegmentMemberCount();
-		ImageSInt32 peaks = alg.getPixelToMode();
+		FastQueue<Point2D_I32> locations = alg.getModeLocation();
+		GrowQueue_I32 counts = alg.getRegionMemberCount();
+		ImageSInt32 peaks = alg.getPixelToRegion();
 		FastQueue<float[]> values = alg.getModeColor();
 
 		// there should be a fair number of local peaks due to the image being random
@@ -106,8 +107,8 @@ public class TestSegmentMeanShiftGray {
 		// works better with this example when its uniform
 		WeightPixel_F32 weightSpacial = new WeightPixelUniform_F32();
 		weightSpacial.setRadius(2,2);
-		SegmentMeanShiftGray<ImageFloat32> alg =
-				new SegmentMeanShiftGray<ImageFloat32>(30,0.05f,interp,weightSpacial, weightDist);
+		SegmentMeanShiftSearchGray<ImageFloat32> alg =
+				new SegmentMeanShiftSearchGray<ImageFloat32>(30,0.05f,interp,weightSpacial, weightDist);
 
 		interp.setImage(image);
 		alg.image = image;
@@ -128,8 +129,8 @@ public class TestSegmentMeanShiftGray {
 
 		ImageMiscOps.fillRectangle(image, 20, cx - 2, cy - 2, 5, 5);
 
-		SegmentMeanShiftGray<ImageFloat32> alg =
-				new SegmentMeanShiftGray<ImageFloat32>(30,0.05f,interp,weightSpacial, weightDist);
+		SegmentMeanShiftSearchGray<ImageFloat32> alg =
+				new SegmentMeanShiftSearchGray<ImageFloat32>(30,0.05f,interp,weightSpacial, weightDist);
 
 		interp.setImage(image);
 		alg.image = image;

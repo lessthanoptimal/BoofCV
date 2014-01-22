@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,6 +30,10 @@ public class WeightPixelUniform_F32 implements WeightPixel_F32 {
 	float weight;
 
 	public WeightPixelUniform_F32() {
+	}
+
+	public WeightPixelUniform_F32(int radiusX, int radiusY) {
+		setRadius(radiusX,radiusY);
 	}
 
 	@Override

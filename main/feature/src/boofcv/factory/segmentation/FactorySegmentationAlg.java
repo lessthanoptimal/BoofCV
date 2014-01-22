@@ -21,39 +21,86 @@ package boofcv.factory.segmentation;
 import boofcv.alg.interpolate.InterpolatePixelMB;
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.interpolate.TypeInterpolate;
-import boofcv.alg.segmentation.SegmentMeanShiftColor;
-import boofcv.alg.segmentation.SegmentMeanShiftGray;
+import boofcv.alg.segmentation.*;
+import boofcv.alg.weights.WeightDistanceUniform_F32;
 import boofcv.alg.weights.WeightDistance_F32;
+import boofcv.alg.weights.WeightPixelUniform_F32;
 import boofcv.alg.weights.WeightPixel_F32;
 import boofcv.factory.interpolate.FactoryInterpolation;
-import boofcv.struct.image.ImageMultiBand;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 
 /**
+ * Factory for segmentation algorithms.
+ *
  * @author Peter Abeles
  */
 public class FactorySegmentationAlg {
 
-	public static<T extends ImageSingleBand> SegmentMeanShiftGray<T>
-	meanShiftGray( int maxIterations, float convergenceTol,
-				   WeightPixel_F32 weightSpacial,
-				   WeightDistance_F32 weightGray, Class<T> imageType ) {
+	/**
+	 * Creates an instance of {@link ComputeRegionMeanColor} for the specified image type.
+	 *
+	 * @param imageType image type
+	 * @return ComputeRegionMeanColor
+	 */
+	public static <T extends ImageBase>
+	ComputeRegionMeanColor<T> regionMeanColor(ImageType<T> imageType) {
+		if( imageType.getFamily() == ImageType.Family.SINGLE_BAND ) {
+			switch( imageType.getDataType() ) {
+				case U8:
+					return (ComputeRegionMeanColor)new ComputeRegionMeanColor.U8();
+				case F32:
+					return (ComputeRegionMeanColor)new ComputeRegionMeanColor.F32();
+			}
+		} else if( imageType.getFamily() == ImageType.Family.MULTI_SPECTRAL ) {
+			int N = imageType.getNumBands();
+			switch( imageType.getDataType() ) {
+				case U8:
+					return (ComputeRegionMeanColor)new ComputeRegionMeanColor.MS_U8(N);
+				case F32:
+					return (ComputeRegionMeanColor)new ComputeRegionMeanColor.MS_F32(N);
+			}
+		}
 
-		InterpolatePixelS<T> interp = FactoryInterpolation.bilinearPixelS(imageType);
-
-		return new SegmentMeanShiftGray<T>(maxIterations,convergenceTol,interp,weightSpacial,weightGray);
-
+		throw new IllegalArgumentException("Unknown imageType");
 	}
 
-	public static<T extends ImageMultiBand> SegmentMeanShiftColor<T>
-	meanShiftColor( int maxIterations, float convergenceTol,
-					WeightPixel_F32 weightSpacial,
-					WeightDistance_F32 weightColor, ImageType<T> imageType ) {
+	/**
+	 * Creates an instance of {@link SegmentMeanShift}.  Uniform distributions are used for spacial and color
+	 * weights.
+	 *
+	 * @param spacialRadius Radius of mean-shift region in pixels
+	 * @param colorRadius Radius of mean-shift region for color in Euclidean distance.
+	 * @param minimumRegionSize Minimum allowed size of a region in pixels.
+	 * @param imageType Type of input image
+	 * @return SegmentMeanShift
+	 */
+	public static<T extends ImageBase>
+	SegmentMeanShift<T> meanShift( int spacialRadius , float colorRadius , int minimumRegionSize ,
+								   ImageType<T> imageType )
+	{
+		WeightPixel_F32 weightSpacial = new WeightPixelUniform_F32(spacialRadius,spacialRadius);
+		WeightDistance_F32 weightColor = new WeightDistanceUniform_F32(colorRadius*colorRadius);
 
-		InterpolatePixelMB<T> interp = FactoryInterpolation.createPixelMB(0,255, TypeInterpolate.BILINEAR,imageType);
+		int maxIterations = 20;
+		float convergenceTol = 0.1f;
 
-		return new SegmentMeanShiftColor<T>(maxIterations,convergenceTol,interp,weightSpacial,weightColor,imageType);
+		SegmentMeanShiftSearch<T> search;
 
+		if( imageType.getFamily() == ImageType.Family.SINGLE_BAND ) {
+			InterpolatePixelS interp = FactoryInterpolation.bilinearPixelS(imageType.getImageClass());
+			search = new SegmentMeanShiftSearchGray(maxIterations,convergenceTol,interp,weightSpacial,weightColor);
+		} else {
+			InterpolatePixelMB interp = FactoryInterpolation.createPixelMB(0,255,
+					TypeInterpolate.BILINEAR,(ImageType)imageType);
+			search = new SegmentMeanShiftSearchColor(maxIterations,convergenceTol,interp,weightSpacial,weightColor,imageType);
+		}
+
+		ComputeRegionMeanColor<T> regionColor = regionMeanColor(imageType);
+		MergeRegionMeanShift merge = new MergeRegionMeanShift(3,colorRadius/2,3);
+
+		PruneSmallRegions<T> prune = new PruneSmallRegions<T>(minimumRegionSize,regionColor);
+
+		return new SegmentMeanShift<T>(search,merge,prune);
 	}
 }

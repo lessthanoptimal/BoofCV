@@ -18,45 +18,56 @@
 
 package boofcv.alg.segmentation;
 
-import boofcv.alg.filter.binary.BinaryImageOps;
 import boofcv.struct.image.ImageSInt32;
+import georegression.struct.point.Point2D_I32;
+import org.ddogleg.nn.FactoryNearestNeighbor;
+import org.ddogleg.nn.NearestNeighbor;
+import org.ddogleg.nn.NnData;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_I32;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
- * In a region with uniform color, mean-shift segmentation will produce lots of regions with identical colors since they
- * are all local maximums.  The code below will find all such neighbors and merge them into one group.  For each
- * pixel it checks its 4-connect neighbors to see if they are in the same region or not.  If not in the same
- * region it checks to see if regions have the same color to within tolerance.  If they are within tolerance a mark will
- * be made in an integer list of regions that one should be merged into another.  This creates a directed graph of
- * merged regions.  The graph is flatted such that all references point to the root node and then the segments
- * are merged together.
+ * Merges together regions which have modes close to each other and have a similar color.
  *
  * @author Peter Abeles
  */
-public class MergeRegionMeanShift {
+public class MergeRegionMeanShift extends RegionMergeTree {
 
-	// list used to convert the original region ID's into their new compacted ones
-	protected GrowQueue_I32 mergeList = new GrowQueue_I32();
+	// maximum distance in pixels that two nodes can be apart to be merged
+	private int maxSpacialDistance;
+	// Maximum Euclidean distance squared two colors can be for them to be considered similar
+	private float maxColorDistanceSq;
 
-	// How similar two region's pixel intensity values need to be for them to be merged
-	protected float tolerance;
+	// ------ Data structures related to nearest-neighbor search
+	private NearestNeighbor<Info> nn = FactoryNearestNeighbor.kdtree();
+	private FastQueue<Info> storageInfo = new FastQueue<Info>(Info.class,true);
+	private List<double[]> nnPoints = new ArrayList<double[]>();
+	private List<Info> nnData = new ArrayList<Info>();
+	private FastQueue<NnData<Info>> nnResult = new FastQueue<NnData<Info>>((Class)NnData.class,true);
+	private double[] point = new double[2];
+	// maximum number of results returned by NN search.  Just to be safe, set it to the upper limit
+	private int nnMaxNumber;
 
-	// the new ID of the root nodes (segments)
-	protected GrowQueue_I32 rootID = new GrowQueue_I32();
-
-	// Local copy of these lists after elements which have been merged are removed
-	GrowQueue_I32 tmpMemberCount = new GrowQueue_I32();
 	FastQueue<float[]> tmpColor;
 
 	/**
-	 * Configures merging.
+	 * Configures MergeRegionMeanShift
 	 *
-	 * @param tolerance Euclidean distance for how similar in color two adjacent segments need to be to be
-	 *                  considered the same segment.  For 8-bit single band images try 5.
+	 * @param maxSpacialDistance The maximum spacial distance (pixels) at which two modes can be for their
+	 *                           regions to be merged together.
+	 * @param maxColorDistance The maximum Euclidean distance two colors can be from each other for them to be merged.
+	 * @param numBands Number of bands in the input image.
 	 */
-	public MergeRegionMeanShift(float tolerance, final int numBands) {
-		this.tolerance = tolerance*tolerance;
+	public MergeRegionMeanShift(int maxSpacialDistance, float maxColorDistance, final int numBands) {
+		nn.init(2);
+
+		this.maxSpacialDistance = maxSpacialDistance;
+		this.maxColorDistanceSq = maxColorDistance*maxColorDistance;
+		int w = maxSpacialDistance*2+1;
+		this.nnMaxNumber = w*w;
 
 		tmpColor = new FastQueue<float[]>(float[].class,true) {
 			@Override
@@ -67,218 +78,102 @@ public class MergeRegionMeanShift {
 	}
 
 	/**
-	 * Merges equivalent segments together and updates all the data structures by removing the redundant segments.
+	 * Merges together similar regions which are in close proximity to each other.  After merging
+	 * most of the input data structures are modified to take in account the  changes.
+	 *
+	 * @param pixelToRegion (Input/output) Image that specifies the segmentation.  Modified.
+	 * @param regionMemberCount (Input/output) Number of pixels in each region. Modified.
+	 * @param regionColor (Input/output) Color of each region. Modified.
+	 * @param modeLocation (Input) Location of each region's mode. Not modified.
 	 */
-	public void merge( ImageSInt32 pixelToRegion , GrowQueue_I32 regionMemberCount , FastQueue<float[]> regionColor )
-	{
-		// see which ones need to be merged into which ones
-		createMergeList(pixelToRegion, regionColor);
+	public void process( ImageSInt32 pixelToRegion ,
+						 GrowQueue_I32 regionMemberCount,
+						 FastQueue<float[]> regionColor ,
+						 FastQueue<Point2D_I32> modeLocation ) {
+		initializeMerge(regionMemberCount.size);
 
-		// update member counts
-		flowIntoRootNode(regionMemberCount);
+		// Merge regions
+		setupSearchNN(modeLocation);
+		markMergeRegions(regionColor,modeLocation);
 
-		// re-assign the number of the root node and trim excessive nodes from the lists
-		setToRootNodeNewID(regionMemberCount,regionColor);
-
-		// change the labels in the pixelToRegion image
-		BinaryImageOps.relabel(pixelToRegion, mergeList.data);
+		performMerge(pixelToRegion,regionMemberCount);
 	}
 
 	/**
-	 * Checks the 4-connect of each pixel to see if it references a different region.  If it does it checks to
-	 * see if their pixel intensity values are within tolerance of each other.  If so they are then marked for
-	 * merging.
+	 * Takes the mode of a region and searches the local area around it for other regions.  If the region's mode
+	 * is also within the local area its color is checked to see if it's similar enough.  If the color is similar
+	 * enough then the two regions are marked for merger.
 	 */
-	protected void createMergeList(ImageSInt32 pixelToRegion, FastQueue<float[]> regionColor) {
-		// merge the merge list as initial all no merge
-		mergeList.resize(regionColor.size());
-		for( int i = 0; i < mergeList.size; i++ ) {
-			mergeList.data[i] = -1;
-		}
-
-		// the inner image, excluding the right and bottom borders
-		for( int y = 0; y < pixelToRegion.height-1; y++ ) {
-			int pixelIndex = y*pixelToRegion.width;
-			for( int x = 0; x < pixelToRegion.width-1; x++ , pixelIndex++) {
-				int a = pixelToRegion.data[pixelIndex];
-				int b = pixelToRegion.data[pixelIndex+1]; // pixel +1 x
-				int c = pixelToRegion.data[pixelIndex+pixelToRegion.width]; // pixel +1 y
-
-				float[] colorA = regionColor.get(a);
-
-				if( a != b ) {
-					float[] colorB = regionColor.get(b);
-					boolean merge = SegmentMeanShift.distanceSq(colorA,colorB) <= tolerance;
-					if( merge ) {
-						checkMerge(a,b);
-					}
-				}
-
-				if( a != c ) {
-					float[] colorC = regionColor.get(c);
-					boolean merge = SegmentMeanShift.distanceSq(colorA, colorC) <= tolerance;
-					if( merge ) {
-						checkMerge(a,c);
-					}
-				}
-			}
-		}
-
-		// right side of the image
-		for( int y = 0; y < pixelToRegion.height-1; y++ ) {
-			// location (w-1,y)
-			int pixelIndex = y*pixelToRegion.width+pixelToRegion.width-1;
-
-			int a = pixelToRegion.data[pixelIndex];
-			int c = pixelToRegion.data[pixelIndex+pixelToRegion.width]; // pixel +1 y
-
-			float[] colorA = regionColor.get(a);
-
-			if( a != c ) {
-				float[] colorC = regionColor.get(c);
-				boolean merge = SegmentMeanShift.distanceSq(colorA, colorC) <= tolerance;
-				if( merge ) {
-					checkMerge(a,c);
-				}
-			}
-		}
-
-		// bottom of the image
-		for( int x = 0; x < pixelToRegion.width-1; x++ ) {
-			// location (x,h-1)
-			int pixelIndex = (pixelToRegion.height-1)*pixelToRegion.width + x;
-
-			int a = pixelToRegion.data[pixelIndex];
-			int b = pixelToRegion.data[pixelIndex+1]; // pixel +1 x
-
-			float[] colorA = regionColor.get(a);
-
-			if( a != b ) {
-				float[] colorB = regionColor.get(b);
-				boolean merge = SegmentMeanShift.distanceSq(colorA, colorB) <= tolerance;
-				if( merge ) {
-					checkMerge(a,b);
-				}
-			}
-		}
-	}
+	// TODO implement the above procedure
 
 	/**
-	 * For each region in the merge list which is not a root node, find its root node and add to the root node
-	 * its member count and set the index  in mergeList to the root node.  If a node is a root node just note
-	 * what its new ID will be after all the other segments are removed.
+	 * For each region, it searches for modes which are close to it.  If those close by modes have a similar
+	 * color they are then marked for merging.
 	 */
-	protected void flowIntoRootNode(GrowQueue_I32 regionMemberCount) {
-		rootID.resize(regionMemberCount.size);
-		int count = 0;
+	protected void markMergeRegions(FastQueue<float[]> regionColor,
+									FastQueue<Point2D_I32> modeLocation) {
 
-		for( int i = 0; i < mergeList.size; i++ ) {
-			int p = mergeList.data[i];
+		for( int i = 0; i < modeLocation.size; i++ ) {
 
-			// see if it is a root note
-			if( p == -1 ) {
-				// mark the root nodes new ID
-				rootID.data[i] = count++;
-				continue;
+			float[] color = regionColor.get(i);
+			Point2D_I32 location = modeLocation.get(i);
+			point[0] = location.x;
+			point[1] = location.y;
+
+			// find the mode locations which are close to each other and consider those regions for merging
+			nnResult.reset();
+			nn.findNearest(point,maxSpacialDistance,nnMaxNumber,nnResult);
+
+			for( int j = 0; j < nnResult.size;j++ ) {
+				Info info = nnResult.get(j).data;
+
+				// make sure it isn't the region being searched around
+				if( info.index == i )
+					continue;
+
+				// see if their colors are close enough
+				float[] candidateColor = regionColor.get(info.index);
+				float colorDistance = distanceSq(color,candidateColor);
+
+				if( colorDistance > maxColorDistanceSq )
+					continue;
+
+				// mark the two regions as merged
+				markMerge(i, info.index);
 			}
 
-			// traverse down until it finds the root note
-			int gp = mergeList.data[p];
-			while( gp != -1 ) {
-				p = gp;
-				gp = mergeList.data[p];
-			}
-
-			// update the count and change this node into the root node
-			regionMemberCount.data[p] += regionMemberCount.data[i];
-			mergeList.data[i] = p;
 		}
 	}
 
-	/**
-	 * Does much of the work needed to remove the redundant segments that are being merged into their root node.
-	 * The list of member count and colors is updated.  mergeList is updated with the new segment IDs.
-	 */
-	protected void setToRootNodeNewID( GrowQueue_I32 regionMemberCount, FastQueue<float[]> regionColor ) {
+	private void setupSearchNN( FastQueue<Point2D_I32> modeLocation) {
+		storageInfo.reset();
 
-		tmpMemberCount.reset();
-		tmpColor.reset();
+		for( int i = 0; i < modeLocation.size; i++ ) {
+			Point2D_I32 location = modeLocation.get(i);
 
-		for( int i = 0; i < mergeList.size; i++ ) {
-			int p = mergeList.data[i];
+			Info info = storageInfo.grow();
+			info.index = i;
+			info.p[0] = location.x;
+			info.p[1] = location.y;
 
-			if( p == -1 ) {
-				mergeList.data[i] = rootID.data[i];
-				tmpMemberCount.add( regionMemberCount.data[i] );
-				copyColor(regionColor.data[i],tmpColor.grow());
-			} else {
-				mergeList.data[i] = rootID.data[mergeList.data[i]];
-			}
+			nnPoints.add(info.p);
+			nnData.add(info);
 		}
 
-		regionMemberCount.reset();
-		regionColor.reset();
-
-		regionMemberCount.addAll(tmpMemberCount);
-		for( int i = 0; i < tmpColor.size; i++ ) {
-			copyColor(tmpColor.data[i],regionColor.grow());
-		}
+		nn.setPoints(nnPoints,nnData);
 	}
 
-
-	/**
-	 * If the two regions are not really the same region regionB will become a member of regionA.  A quick
-	 * check is done to see if they are really the same region.  If that fails it will traverse down the
-	 * inheritance path for each region until it gets to their roots.  If the roots are not the same then
-	 * they are merged.  Either way the path is updated such that the quick check will pass.
-	 */
-	protected void checkMerge( int regionA , int regionB ) {
-
-		int dA = mergeList.data[regionA];
-		int dB = mergeList.data[regionB];
-
-		// see if they link to the same thing doing the quick check
-		if( dA != -1 && dB != -1 ) {
-			if( dA == dB )
-				return;
-		} else if( dA != -1 ) {
-			if( dA == regionB )
-				return;
-		} else if( dB != -1 ) {
-			if( dB == regionA )
-				return;
+	protected static float distanceSq( float[] a , float []b ) {
+		float distanceSq = 0;
+		for( int i = 0; i < a.length; i++ )  {
+			float d = a[i]-b[i];
+			distanceSq += d*d;
 		}
-
-		// search down to the root node
-		int rootA = regionA;
-		while( dA != -1 ) {
-			rootA = dA;
-			dA = mergeList.data[rootA];
-		}
-
-		int rootB = regionB;
-		while( dB != -1 ) {
-			rootB = dB;
-			dB = mergeList.data[rootB];
-		}
-
-		// if they are not the same link merge one into the other
-		if( rootA != rootB ) {
-			mergeList.data[rootB] = rootA;
-		}
-
-		// make it so that the quick check will work the next time        '
-		if( regionB != rootA ) {
-			mergeList.data[regionB] = rootA;
-		}
-		if( mergeList.data[regionA] != -1 ) {
-			mergeList.data[regionA] = rootA;
-		}
+		return distanceSq;
 	}
 
-	private static void copyColor( float[] src, float []dst ) {
-		for( int i = 0; i < src.length; i++ ) {
-			dst[i] = src[i];
-		}
+	public static class Info {
+		public int index;
+		public double[] p = new double[2];
 	}
 }
