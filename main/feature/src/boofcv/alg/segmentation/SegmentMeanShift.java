@@ -18,145 +18,104 @@
 
 package boofcv.alg.segmentation;
 
-import boofcv.alg.weights.WeightDistance_F32;
-import boofcv.alg.weights.WeightPixel_F32;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageSInt32;
+import georegression.struct.point.Point2D_I32;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_I32;
 
 /**
  * <p>
- * Performs mean-shift segmentation on a color image [1,2].  Segmentation is done by performing mean-shift at
- * each pixel to find its mode, i.e local maximum/peak.  Pixels which have the same mode belong to the same segment.
- * Likelihood (or weights) used to compute the mean value comes from a 2D spacial kernel and color distance functions.
- * Color distance is computed as the difference between the mean and the color value at a pixel which is then
- * converted into a weight.  The two weights are then multiplied together and normalized based on the total
- * weight from all the samples.
- * </p>
- * <p>
- * Output is provided in the form of an image where each pixel contains the index of a region the pixel belongs to.
- * Three other lists provide color value of the region, number of pixels in the region and the location
- * of the mean-shift peak for that region.  This output is unlikely to be final processing step since it will over
- * segment the image.  Merging of similar modes and pruning of small regions is a common next step.
+ * Performs mean-shift segmentation on an image.  Primary based upon the description provided in [1], it first
+ * uses mean-shift to find the mode of each pixel in the image.  The mode is the location mean-shift converges to
+ * when initialized at a particular pixel.  All the pixels which have the same mode, to within tolerance, are combined
+ * into one region.  If a minimum size is specified for a segment then small regions are pruned and their pixels
+ * combined into the adjacent region which has the most similar color.
  * </p>
  *
  * <p>
- * NOTES:
- * <ul>
- * <li>The kernel's spacial radius is specified by the radius of 'weightSpacial' and the gray/color radius is specified
- * by 'weightGray'.  Those two functions also specified the amount of weight assigned to each sample in the
- * mean-shift kernel based on its distance from the spacial and color means.<li>
- * <li>The distance passed into the 'weightGray' function is the difference squared.E.g. (a-b)<sup>2</sup></li>
- * <li>Image edges are handled by truncating the spacial kernel.  This truncation
- * will create an asymmetric kernel, but there is really no good way to handle image edges.</li>
- * </ul>
+ * Mean-shift segmentation can be slow but it has the advantage of there being relatively few tuning parameters.
+ * Few tuning parameters make it easier to work with and to some extent more robust.
  * </p>
  *
  * <p>
- * CITATIONS:<br>
- * [1] Cheng, Yizong. "Mean shift, mode seeking, and clustering." Pattern Analysis and Machine Intelligence,
- * IEEE Transactions on 17.8 (1995): 790-799.<br>
- * [2] Comaniciu, Dorin, and Peter Meer. "Mean shift analysis and applications." Computer Vision, 1999.
+ * NOTE: Regions returned by mean-shift might not be entirely continuous.  It is possible for pixels to converge
+ * to the same mode and not be connected.  This is particularly evident in highly textured regions.
+ * </p>
+ *
+ * <p>
+ * [1] Comaniciu, Dorin, and Peter Meer. "Mean shift analysis and applications." Computer Vision, 1999.
  * The Proceedings of the Seventh IEEE International Conference on. Vol. 2. IEEE, 1999.
  * </p>
- *
  * @author Peter Abeles
  */
-// TODO Paper suggests merging two segments if their modes are near by each other.  Could adjust merge algorithm to
-//      do that instead
-// TODO Need a procedure for eliminating small spacial regions.  Fill them in with something
-public abstract class SegmentMeanShift<T extends ImageBase> {
-
-	// used to detect convergence of mean-shift
-	protected int maxIterations;
-	protected float convergenceTol;
-
-	// specifies the size of the mean-shift kernel
-	protected int radiusX,radiusY;
-	protected int widthX,widthY;
-	// Sample weight given location relative to center
-	protected WeightPixel_F32 weightSpacial;
-	// Sample weight given difference in gray scale value
-	protected WeightDistance_F32 weightColor;
-
-	// converts an index of a peak into an index in the pixel image
-	protected ImageSInt32 peakToIndex = new ImageSInt32(1,1);
-
-	// location of each peak in image pixel indexes
-	protected GrowQueue_I32 modeLocation = new GrowQueue_I32();
-
-	// number of members in this peak
-	protected GrowQueue_I32 modeMemberCount = new GrowQueue_I32();
-
-	// storage for segment colors
-	protected FastQueue<float[]> modeColor;
-
-	// The input image
-	protected T image;
-
-	protected float meanX,meanY;
+public class SegmentMeanShift<T extends ImageBase> {
+	SegmentMeanShiftSearch<T> search;
+	MergeRegionMeanShift merge;
+	PruneSmallRegions<T> prune;
 
 	/**
-	 * Configures mean-shift segmentation
+	 * Specifies internal classes used by mean-shift.
 	 *
-	 * @param maxIterations Maximum number of mean-shift iterations.  Try 30
-	 * @param convergenceTol When the change is less than this amount stop.  Try 0.005
-	 * @param weightSpacial Weighting function/kernel for spacial component
-	 * @param weightColor Weighting function/kernel for distance of color component
+	 * @param search mean-shift search
+	 * @param merge Used to merge regions
+	 * @param prune Prunes small regions and merges them
 	 */
-	public SegmentMeanShift(int maxIterations, float convergenceTol,
-							WeightPixel_F32 weightSpacial,
-							WeightDistance_F32 weightColor) {
-		this.maxIterations = maxIterations;
-		this.convergenceTol = convergenceTol;
-		this.weightSpacial = weightSpacial;
-		this.weightColor = weightColor;
-
-		this.radiusX = weightSpacial.getRadiusX();
-		this.radiusY = weightSpacial.getRadiusY();
-		this.widthX = radiusX*2+1;
-		this.widthY = radiusY*2+1;
+	public SegmentMeanShift(SegmentMeanShiftSearch<T> search,
+							MergeRegionMeanShift merge,
+							PruneSmallRegions<T> prune)
+	{
+		this.search = search;
+		this.merge = merge;
+		this.prune = prune;
 	}
 
 	/**
-	 * Performs mean-shift clustering on the input image
+	 * Performs mean-shift segmentation on the input image
 	 *
-	 * @param image Input image
+	 * @param image Image
 	 */
-	public abstract void process( T image );
+	public void process( T image ) {
+		search.process(image);
 
-	public static float distanceSq( float[] a , float[]b ) {
-		float ret = 0;
-		for( int i = 0; i < a.length; i++ ) {
-			float d = a[i] - b[i];
-			ret += d*d;
-		}
-		return ret;
+		FastQueue<float[]> regionColor = search.getModeColor();
+		ImageSInt32 pixelToRegion = search.getPixelToRegion();
+		GrowQueue_I32 regionPixelCount = search.getRegionMemberCount();
+		FastQueue<Point2D_I32> modeLocation = search.getModeLocation();
+
+		merge.process(pixelToRegion,regionPixelCount,regionColor,modeLocation);
+
+		prune.process(image,pixelToRegion,regionPixelCount,regionColor);
 	}
 
 	/**
-	 * From peak index to pixel index
+	 * The value of each pixel in the returned image indicates which region it belongs to.  The
+	 * total number of regions can be found by calling {@link #getNumberOfRegions()}.
+	 * @return Region image
 	 */
-	public ImageSInt32 getPixelToMode() {
-		return peakToIndex;
+	public ImageSInt32 getRegionImage() {
+		return search.getPixelToRegion();
 	}
 
 	/**
-	 * Location of each peak in the image
+	 * The number of regions which it found in the image.
+	 * @return Total regions
 	 */
-	public GrowQueue_I32 getModeLocation() {
-		return modeLocation;
+	public int getNumberOfRegions() {
+		return search.getRegionMemberCount().size;
 	}
 
 	/**
-	 * Number of pixels which each peak as a member
+	 * Average color of each region
 	 */
-	public GrowQueue_I32 getSegmentMemberCount() {
-		return modeMemberCount;
+	public FastQueue<float[]> getRegionColor() {
+		return search.getModeColor();
 	}
 
-	public FastQueue<float[]> getModeColor() {
-		return modeColor;
+	/**
+	 * Number of pixels in each region
+	 */
+	public GrowQueue_I32 getRegionSize() {
+		return search.getRegionMemberCount();
 	}
 }

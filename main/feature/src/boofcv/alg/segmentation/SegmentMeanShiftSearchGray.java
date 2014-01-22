@@ -27,12 +27,12 @@ import org.ddogleg.struct.FastQueue;
 
 /**
  * <p>
- * Implementation of {@link SegmentMeanShift} for gray-scale images
+ * Implementation of {@link SegmentMeanShiftSearch} for gray-scale images
  * </p>
  *
  * @author Peter Abeles
  */
-public class SegmentMeanShiftGray<T extends ImageSingleBand> extends SegmentMeanShift<T> {
+public class SegmentMeanShiftSearchGray<T extends ImageSingleBand> extends SegmentMeanShiftSearch<T> {
 
 	// Interpolation routine used to get sub-pixel samples
 	protected InterpolatePixelS<T> interpolate;
@@ -48,10 +48,10 @@ public class SegmentMeanShiftGray<T extends ImageSingleBand> extends SegmentMean
 	 * @param weightSpacial Weighting function/kernel for spacial component
 	 * @param weightGray Weighting function/kernel for distance of color component
 	 */
-	public SegmentMeanShiftGray(int maxIterations, float convergenceTol,
-								InterpolatePixelS<T> interpolate,
-								WeightPixel_F32 weightSpacial,
-								WeightDistance_F32 weightGray) {
+	public SegmentMeanShiftSearchGray(int maxIterations, float convergenceTol,
+									  InterpolatePixelS<T> interpolate,
+									  WeightPixel_F32 weightSpacial,
+									  WeightDistance_F32 weightGray) {
 		super(maxIterations,convergenceTol,weightSpacial,weightGray);
 		this.interpolate = interpolate;
 
@@ -89,13 +89,16 @@ public class SegmentMeanShiftGray<T extends ImageSingleBand> extends SegmentMean
 				findPeak(x,y,pixelColor);
 
 				// convert mean-shift location into pixel index
-				int peakLocation = (int)(meanY+0.5f)*image.width + (int)(meanX+0.5f);
+				int peakX = (int)(meanX+0.5f);
+				int peakY = (int)(meanY+0.5f);
+
+				int peakLocation = (int)peakY*image.width + peakX;
 
 				// get index in the list of peaks
 				int peakIndex = peakToIndex.data[peakLocation];
 				if( peakIndex < 0 ) {
-					peakIndex = this.modeLocation.getSize();
-					this.modeLocation.add(peakLocation);
+					peakIndex = this.modeLocation.size();
+					this.modeLocation.grow().set(peakX, peakY);
 					// Save the peak's color
 					modeColor.grow()[0] = meanGray;
 					// Remember it's location in the peak arrays

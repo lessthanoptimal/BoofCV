@@ -30,12 +30,12 @@ import java.util.Arrays;
 
 /**
  * <p>
- * Implementation of {@link boofcv.alg.segmentation.SegmentMeanShift} for color images
+ * Implementation of {@link SegmentMeanShiftSearch} for color images
  * </p>
  *
  * @author Peter Abeles
  */
-public class SegmentMeanShiftColor<T extends ImageMultiBand> extends SegmentMeanShift<T> {
+public class SegmentMeanShiftSearchColor<T extends ImageMultiBand> extends SegmentMeanShiftSearch<T> {
 
 	// Interpolation routine used to get sub-pixel samples
 	protected InterpolatePixelMB<T> interpolate;
@@ -54,11 +54,11 @@ public class SegmentMeanShiftColor<T extends ImageMultiBand> extends SegmentMean
 	 * @param weightSpacial Weighting function/kernel for spacial component
 	 * @param weightGray Weighting function/kernel for distance of color component
 	 */
-	public SegmentMeanShiftColor(int maxIterations, float convergenceTol,
-								 InterpolatePixelMB<T> interpolate,
-								 WeightPixel_F32 weightSpacial,
-								 WeightDistance_F32 weightGray,
-								 ImageType<T> imageType ) {
+	public SegmentMeanShiftSearchColor(int maxIterations, float convergenceTol,
+									   InterpolatePixelMB<T> interpolate,
+									   WeightPixel_F32 weightSpacial,
+									   WeightDistance_F32 weightGray,
+									   ImageType<T> imageType) {
 		super(maxIterations,convergenceTol,weightSpacial,weightGray);
 		this.interpolate = interpolate;
 		this.pixelColor = new float[ imageType.getNumBands() ];
@@ -101,13 +101,16 @@ public class SegmentMeanShiftColor<T extends ImageMultiBand> extends SegmentMean
 				findPeak(x,y, meanColor);
 
 				// convert mean-shift location into pixel index
-				int peakLocation = (int)(meanY+0.5f)*image.width + (int)(meanX+0.5f);
+				int peakX = (int)(meanX+0.5f);
+				int peakY = (int)(meanY+0.5f);
+
+				int peakLocation = (int)peakY*image.width + peakX;
 
 				// get index in the list of peaks
 				int peakIndex = peakToIndex.data[peakLocation];
 				if( peakIndex < 0 ) {
-					peakIndex = this.modeLocation.getSize();
-					this.modeLocation.add(peakLocation);
+					peakIndex = this.modeLocation.size();
+					this.modeLocation.grow().set(peakX, peakY);
 					// Save the peak's color
 					savePeakColor(meanColor);
 					// Remember it's location in the peak arrays

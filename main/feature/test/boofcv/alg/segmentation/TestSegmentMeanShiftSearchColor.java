@@ -38,7 +38,7 @@ import static org.junit.Assert.fail;
 /**
  * @author Peter Abeles
  */
-public class TestSegmentMeanShiftColor {
+public class TestSegmentMeanShiftSearchColor {
 
 	Random rand = new Random(234);
 
