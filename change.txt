@@ -30,6 +30,8 @@ Version : Alpha 0.17
 - Fixed bugs in ConvertNV21
   * Was apply YV12 byte alignment to NV21 images.  NV21 is dense and that code causes some images to crash
     depending upon their size.
+- Fixed bug in ImplConvertToBitmap.multiToArray_F32()
+  * Didn't handle case where the input image has 3 bands and not 4
 
 - TODO make those two failed unit tests ago away
 - TODO BoofMiscOps move XML serialization into IO package

@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="testing">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/../../../../lib/testing/caliper.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../../../../lib/testing/junit-4.10.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$PROJECT_DIR$/../../../../lib/testing/caliper.jar!/" />
+    </SOURCES>
+  </library>
+</component>

@@ -62,6 +62,11 @@ public class CameraPreview extends ViewGroup implements SurfaceHolder.Callback {
 	public void setCamera(Camera camera) {
 		mCamera = camera;
 		if (mCamera != null) {
+			// need to start the preview here because it is possible for it to be paused and resumed and not
+			// have surfaceChanged called if the orientation doesn't need to be changed.  Yes, you will have
+			// to start and stop the camera in the more common situations
+			startPreview();
+			// Need to adjust the layout for the new camera
 			requestLayout();
 		}
 	}
@@ -114,13 +119,7 @@ public class CameraPreview extends ViewGroup implements SurfaceHolder.Callback {
 		}
 	}
 
-	@Override
-	public void surfaceCreated(SurfaceHolder holder) {
-		if (mCamera == null) {
-			Log.d(TAG, "Camera is null.  Bug else where in code. ");
-			return;
-		}
-
+	protected void startPreview() {
 		try {
 			mCamera.setPreviewDisplay(mHolder);
 			mCamera.setPreviewCallback(previewCallback);
@@ -128,6 +127,16 @@ public class CameraPreview extends ViewGroup implements SurfaceHolder.Callback {
 		} catch (Exception e){
 			Log.d(TAG, "Error starting camera preview: " + e.getMessage());
 		}
+	}
+
+	@Override
+	public void surfaceCreated(SurfaceHolder holder) {
+		if (mCamera == null) {
+			Log.d(TAG, "Camera is null.  Bug else where in code. ");
+			return;
+		}
+
+		startPreview();
 	}
 
 	@Override

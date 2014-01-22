@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/../../BoofCV Android.iml" filepath="$PROJECT_DIR$/../../BoofCV Android.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../../../../main/calibration/BoofCV Calibration.iml" filepath="$PROJECT_DIR$/../../../../main/calibration/BoofCV Calibration.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../../../../main/feature/BoofCV Feature.iml" filepath="$PROJECT_DIR$/../../../../main/feature/BoofCV Feature.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../../../../main/geo/BoofCV Geometric Vision.iml" filepath="$PROJECT_DIR$/../../../../main/geo/BoofCV Geometric Vision.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../../../../main/ip/BoofCV Image Processing.iml" filepath="$PROJECT_DIR$/../../../../main/ip/BoofCV Image Processing.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../../../../../ddogleg/DDogleg.iml" filepath="$PROJECT_DIR$/../../../../../ddogleg/DDogleg.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../../../../../georegression/GeoRegression.iml" filepath="$PROJECT_DIR$/../../../../../georegression/GeoRegression.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../../../../../ejml/trunk/ejml.iml" filepath="$PROJECT_DIR$/../../../../../ejml/trunk/ejml.iml" />
+      <module fileurl="file://$PROJECT_DIR$/video.iml" filepath="$PROJECT_DIR$/video.iml" />
+    </modules>
+  </component>
+</project>
+
