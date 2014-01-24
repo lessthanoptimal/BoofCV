@@ -69,7 +69,7 @@ public class TestSegmentMeanShiftSearchColor {
 
 		SegmentMeanShiftSearchColor<MultiSpectral<ImageFloat32>> alg =
 				new SegmentMeanShiftSearchColor<MultiSpectral<ImageFloat32>>
-						(30,0.05f,interp,weightSpacial, weightDist,imageType);
+						(30,0.05f,interp,weightSpacial, weightDist,false,imageType);
 
 		alg.process(image);
 
@@ -116,14 +116,14 @@ public class TestSegmentMeanShiftSearchColor {
 		weightSpacial.setRadius(2,2);
 		SegmentMeanShiftSearchColor<MultiSpectral<ImageFloat32>> alg =
 				new SegmentMeanShiftSearchColor<MultiSpectral<ImageFloat32>>
-						(30,0.05f,interp,weightSpacial, weightDist,imageType);
+						(30,0.05f,interp,weightSpacial, weightDist,false,imageType);
 
 		interp.setImage(image);
 		alg.image = image;
 		alg.findPeak(4,2,new float[]{20,20});
 
-		assertEquals( 6 , alg.meanX , 0.5f );
-		assertEquals(4, alg.meanY, 0.5f);
+		assertEquals( 6 , alg.modeX, 0.5f );
+		assertEquals(4, alg.modeY, 0.5f);
 	}
 
 	@Test
@@ -139,14 +139,14 @@ public class TestSegmentMeanShiftSearchColor {
 
 		SegmentMeanShiftSearchColor<MultiSpectral<ImageFloat32>> alg =
 				new SegmentMeanShiftSearchColor<MultiSpectral<ImageFloat32>>
-						(30,0.05f,interp,weightSpacial, weightDist,imageType);
+						(30,0.05f,interp,weightSpacial, weightDist,false,imageType);
 
 		interp.setImage(image);
 		alg.image = image;
 		alg.findPeak(startX,startY,new float[]{20,20});
 
-		assertEquals( cx , alg.meanX , 0.5f );
-		assertEquals(cy, alg.meanY, 0.5f);
+		assertEquals( cx , alg.modeX, 0.5f );
+		assertEquals(cy, alg.modeY, 0.5f);
 	}
 
 	/**
@@ -154,6 +154,11 @@ public class TestSegmentMeanShiftSearchColor {
 	 */
 	@Test
 	public void compareToGray() {
+		compareToGray(false);
+		compareToGray(true);
+	}
+
+	public void compareToGray( boolean fast ) {
 		MultiSpectral<ImageFloat32> image = new MultiSpectral<ImageFloat32>(ImageFloat32.class,20,25,1);
 
 		GImageMiscOps.fillUniform(image, rand, 0, 256);
@@ -165,10 +170,10 @@ public class TestSegmentMeanShiftSearchColor {
 
 		SegmentMeanShiftSearchColor<MultiSpectral<ImageFloat32>> algMB =
 				new SegmentMeanShiftSearchColor<MultiSpectral<ImageFloat32>>
-						(30,0.05f,interpMB,weightSpacial, weightDist,imageType);
+						(30,0.05f,interpMB,weightSpacial, weightDist,fast,imageType);
 
 		SegmentMeanShiftSearchGray<ImageFloat32> algSB =
-				new SegmentMeanShiftSearchGray<ImageFloat32>(30,0.05f,interpSB,weightSpacial, weightDist);
+				new SegmentMeanShiftSearchGray<ImageFloat32>(30,0.05f,interpSB,weightSpacial, weightDist,fast);
 
 		algMB.process(image);
 		algSB.process(image.getBand(0));

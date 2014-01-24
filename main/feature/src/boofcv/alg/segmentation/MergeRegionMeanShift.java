@@ -38,28 +38,18 @@ public class MergeRegionMeanShift extends RegionMergeTree {
 	// Search radius in pixels when looking for regions to merge with
 	private int searchRadius;
 
-	FastQueue<float[]> tmpColor;
-
 	/**
 	 * Configures MergeRegionMeanShift
 	 *
 	 * @param maxSpacialDistance The maximum spacial distance (pixels) at which two modes can be for their
 	 *                           regions to be merged together.
 	 * @param maxColorDistance The maximum Euclidean distance two colors can be from each other for them to be merged.
-	 * @param numBands Number of bands in the input image.
 	 */
-	public MergeRegionMeanShift(int maxSpacialDistance, float maxColorDistance, final int numBands) {
+	public MergeRegionMeanShift(int maxSpacialDistance, float maxColorDistance ) {
 
 		this.searchRadius = maxSpacialDistance;
 		this.maxSpacialDistanceSq = maxSpacialDistance*maxSpacialDistance;
 		this.maxColorDistanceSq = maxColorDistance*maxColorDistance;
-
-		tmpColor = new FastQueue<float[]>(float[].class,true) {
-			@Override
-			protected float[] createInstance() {
-				return new float[ numBands ];
-			}
-		};
 	}
 
 	/**

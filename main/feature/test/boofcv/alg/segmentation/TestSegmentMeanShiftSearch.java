@@ -54,7 +54,7 @@ public class TestSegmentMeanShiftSearch {
 	public static class Dummy extends SegmentMeanShiftSearch {
 
 		public Dummy(int maxIterations, float convergenceTol, WeightPixel_F32 weightSpacial, WeightDistance_F32 weightColor) {
-			super(maxIterations, convergenceTol, weightSpacial, weightColor);
+			super(maxIterations, convergenceTol, weightSpacial, weightColor,false);
 		}
 
 		@Override

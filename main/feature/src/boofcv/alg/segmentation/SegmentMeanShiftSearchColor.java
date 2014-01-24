@@ -24,6 +24,8 @@ import boofcv.alg.weights.WeightDistance_F32;
 import boofcv.alg.weights.WeightPixel_F32;
 import boofcv.struct.image.ImageMultiBand;
 import boofcv.struct.image.ImageType;
+import georegression.struct.point.Point2D_F32;
+import georegression.struct.point.Point2D_I32;
 import org.ddogleg.struct.FastQueue;
 
 import java.util.Arrays;
@@ -45,21 +47,17 @@ public class SegmentMeanShiftSearchColor<T extends ImageMultiBand> extends Segme
 	protected float[] meanColor;
 	protected float[] sumColor;
 
-	/**
-	 * Configures mean-shift segmentation
-	 *
-	 * @param maxIterations Maximum number of mean-shift iterations.  Try 30
-	 * @param convergenceTol When the change is less than this amount stop.  Try 0.005
-	 * @param interpolate Function used to interpolate the input image
-	 * @param weightSpacial Weighting function/kernel for spacial component
-	 * @param weightGray Weighting function/kernel for distance of color component
-	 */
+	// Mean-shift trajectory history
+	protected FastQueue<Point2D_F32> history = new FastQueue<Point2D_F32>(Point2D_F32.class,true);
+
+
 	public SegmentMeanShiftSearchColor(int maxIterations, float convergenceTol,
 									   InterpolatePixelMB<T> interpolate,
 									   WeightPixel_F32 weightSpacial,
 									   WeightDistance_F32 weightGray,
+									   boolean fast,
 									   ImageType<T> imageType) {
-		super(maxIterations,convergenceTol,weightSpacial,weightGray);
+		super(maxIterations,convergenceTol,weightSpacial,weightGray,fast);
 		this.interpolate = interpolate;
 		this.pixelColor = new float[ imageType.getNumBands() ];
 		this.meanColor = new float[ imageType.getNumBands() ];
@@ -91,36 +89,61 @@ public class SegmentMeanShiftSearchColor<T extends ImageMultiBand> extends Segme
 
 		interpolate.setImage(image);
 
-		peakToIndex.reshape(image.width,image.height);
-		ImageMiscOps.fill(peakToIndex,-1);
+		pixelToMode.reshape(image.width, image.height);
+		quickMode.reshape(image.width, image.height);
+		// mark as -1 so it knows which pixels have been assigned a mode already and can skip them
+		ImageMiscOps.fill(pixelToMode, -1);
+		// mark all pixels are not being a mode
+		ImageMiscOps.fill(quickMode,-1);
 
 		// use mean shift to find the peak of each pixel in the image
+		int indexImg = 0;
 		for( int y = 0; y < image.height; y++ ) {
-			for( int x = 0; x < image.width; x++ ) {
+			for( int x = 0; x < image.width; x++ , indexImg++ ) {
+				if( pixelToMode.data[indexImg] != -1 ) {
+					int peakIndex = pixelToMode.data[indexImg];
+					modeMemberCount.data[peakIndex]++;
+					continue;
+				}
+
 				interpolate.get(x, y, meanColor);
 				findPeak(x,y, meanColor);
 
 				// convert mean-shift location into pixel index
-				int peakX = (int)(meanX+0.5f);
-				int peakY = (int)(meanY+0.5f);
+				int modeX = (int)(this.modeX +0.5f);
+				int modeY = (int)(this.modeY +0.5f);
 
-				int peakLocation = (int)peakY*image.width + peakX;
+				int modePixelIndex = modeY*image.width + modeX;
 
 				// get index in the list of peaks
-				int peakIndex = peakToIndex.data[peakLocation];
-				if( peakIndex < 0 ) {
-					peakIndex = this.modeLocation.size();
-					this.modeLocation.grow().set(peakX, peakY);
+				int modeIndex = quickMode.data[modePixelIndex];
+				// If the mode is new add it to the list
+				if( modeIndex < 0 ) {
+					modeIndex = this.modeLocation.size();
+					this.modeLocation.grow().set(modeX, modeY);
 					// Save the peak's color
 					savePeakColor(meanColor);
-					// Remember it's location in the peak arrays
-					peakToIndex.data[peakLocation] = peakIndex;
-					// Set the initial count to zero.  When the peak itself is processed later it will increment it
+					// Mark the mode in the segment image
+					quickMode.data[modePixelIndex] = modeIndex;
+					// Set the initial count to zero. This will be incremented when it is traversed later on
 					modeMemberCount.add(0);
 				}
-				// Remember where this was a peak to
-				modeMemberCount.data[peakIndex]++;
-				peakToIndex.unsafe_set(x,y,peakIndex);
+
+				// add this pixel to the membership list
+				modeMemberCount.data[modeIndex]++;
+
+				// Add all pixels it traversed through to the membership of this mode
+				// This is an approximate of mean-shift
+				for( int i = 0; i < history.size; i++ ) {
+					Point2D_F32 p = history.get(i);
+					int px = (int)(p.x+0.5f);
+					int py = (int)(p.y+0.5f);
+
+					int index = pixelToMode.getIndex(px,py);
+					if( pixelToMode.data[index] == -1 ) {
+						pixelToMode.data[index] = modeIndex;
+					}
+				}
 			}
 		}
 	}
@@ -131,6 +154,9 @@ public class SegmentMeanShiftSearchColor<T extends ImageMultiBand> extends Segme
 	 * @param meanColor The color value which mean-shift is trying to find a region which minimises it
 	 */
 	protected void findPeak( float cx , float cy , float[] meanColor ) {
+
+		history.reset();
+		history.grow().set(cx,cy);
 
 		for( int i = 0; i < maxIterations; i++ ) {
 			float total = 0;
@@ -199,6 +225,25 @@ public class SegmentMeanShiftSearchColor<T extends ImageMultiBand> extends Segme
 			float peakX = sumX/total;
 			float peakY = sumY/total;
 
+			if( fast ) {
+				history.grow().set(peakX,peakY);
+
+				// see if it has already been here before
+				int px = (int)(peakX+0.5f);
+				int py = (int)(peakY+0.5f);
+
+				int index = pixelToMode.getIndex(px,py);
+				int modeIndex = pixelToMode.data[index];
+				if( modeIndex != -1 ) {
+					// it already knows the solution so stop searching
+					Point2D_I32 modeP = modeLocation.get(modeIndex);
+					this.modeX = modeP.x;
+					this.modeY = modeP.y;
+					return;
+				}
+			}
+
+			// move on to the next iteration
 			float dx = peakX-cx;
 			float dy = peakY-cy;
 
@@ -210,8 +255,8 @@ public class SegmentMeanShiftSearchColor<T extends ImageMultiBand> extends Segme
 			}
 		}
 
-		this.meanX = cx;
-		this.meanY = cy;
+		this.modeX = cx;
+		this.modeY = cy;
 	}
 
 	protected static void meanColor( float[] sum, float[] mean , float total ) {

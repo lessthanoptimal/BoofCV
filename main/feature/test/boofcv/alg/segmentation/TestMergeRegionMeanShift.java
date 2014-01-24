@@ -32,7 +32,7 @@ import static org.junit.Assert.assertEquals;
 public class TestMergeRegionMeanShift {
 	@Test
 	public void basicAll() {
-		MergeRegionMeanShift alg = new MergeRegionMeanShift(1,1,1);
+		MergeRegionMeanShift alg = new MergeRegionMeanShift(1,1);
 
 		ImageSInt32 pixelToRegion = new ImageSInt32(4,4);
 		pixelToRegion.data = new int[]

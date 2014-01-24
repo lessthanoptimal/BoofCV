@@ -62,7 +62,7 @@ public class TestSegmentMeanShiftSearchGray {
 		ImageMiscOps.fillUniform(image, rand, 0, 256);
 
 		SegmentMeanShiftSearchGray<ImageFloat32> alg =
-				new SegmentMeanShiftSearchGray<ImageFloat32>(30,0.05f,interp,weightSpacial, weightDist);
+				new SegmentMeanShiftSearchGray<ImageFloat32>(30,0.05f,interp,weightSpacial, weightDist, false);
 
 		alg.process(image);
 
@@ -108,14 +108,14 @@ public class TestSegmentMeanShiftSearchGray {
 		WeightPixel_F32 weightSpacial = new WeightPixelUniform_F32();
 		weightSpacial.setRadius(2,2);
 		SegmentMeanShiftSearchGray<ImageFloat32> alg =
-				new SegmentMeanShiftSearchGray<ImageFloat32>(30,0.05f,interp,weightSpacial, weightDist);
+				new SegmentMeanShiftSearchGray<ImageFloat32>(30,0.05f,interp,weightSpacial, weightDist, false);
 
 		interp.setImage(image);
 		alg.image = image;
 		alg.findPeak(4,2,20);
 
-		assertEquals( 6 , alg.meanX , 0.5f );
-		assertEquals( 4 , alg.meanY , 0.5f );
+		assertEquals( 6 , alg.modeX, 0.5f );
+		assertEquals( 4 , alg.modeY, 0.5f );
 	}
 
 	@Test
@@ -130,13 +130,13 @@ public class TestSegmentMeanShiftSearchGray {
 		ImageMiscOps.fillRectangle(image, 20, cx - 2, cy - 2, 5, 5);
 
 		SegmentMeanShiftSearchGray<ImageFloat32> alg =
-				new SegmentMeanShiftSearchGray<ImageFloat32>(30,0.05f,interp,weightSpacial, weightDist);
+				new SegmentMeanShiftSearchGray<ImageFloat32>(30,0.05f,interp,weightSpacial, weightDist, false);
 
 		interp.setImage(image);
 		alg.image = image;
 		alg.findPeak(startX,startY,20);
 
-		assertEquals( cx , alg.meanX , 0.5f );
-		assertEquals( cy , alg.meanY , 0.5f );
+		assertEquals( cx , alg.modeX, 0.5f );
+		assertEquals( cy , alg.modeY, 0.5f );
 	}
 }

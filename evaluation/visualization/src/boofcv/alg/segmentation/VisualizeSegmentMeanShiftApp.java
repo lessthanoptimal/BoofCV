@@ -36,6 +36,7 @@ public class VisualizeSegmentMeanShiftApp {
 	public static int spacialRadius = 6;
 	public static float colorRadius = 15f;
 	public static int minimumSize = 40;
+	public static boolean fast = true;
 
 	public static <T extends ImageBase> void process( BufferedImage image ,ImageType<T> type ) {
 		T color = type.createImage(image.getWidth(),image.getHeight());
@@ -45,7 +46,8 @@ public class VisualizeSegmentMeanShiftApp {
 		BufferedImage outColor = new BufferedImage(color.width,color.height,BufferedImage.TYPE_INT_RGB);
 		BufferedImage outSegments = new BufferedImage(color.width,color.height,BufferedImage.TYPE_INT_RGB);
 
-		SegmentMeanShift<T> alg = FactorySegmentationAlg.meanShift(spacialRadius, colorRadius, minimumSize , type);
+		SegmentMeanShift<T> alg =
+				FactorySegmentationAlg.meanShift(spacialRadius, colorRadius, minimumSize , fast, type);
 
 		long time0 = System.currentTimeMillis();
 		alg.process(color);
@@ -90,9 +92,9 @@ public class VisualizeSegmentMeanShiftApp {
 	}
 
 	public static void main(String[] args) {
-		BufferedImage image = UtilImageIO.loadImage("../data/evaluation/sunflowers.png");
+//		BufferedImage image = UtilImageIO.loadImage("../data/evaluation/sunflowers.png");
 //		BufferedImage image = UtilImageIO.loadImage("../data/evaluation/shapes01.png");
-//		BufferedImage image = UtilImageIO.loadImage("../data/applet/trees_rotate_01.jpg");
+		BufferedImage image = UtilImageIO.loadImage("../data/applet/trees_rotate_01.jpg");
 //		BufferedImage image = UtilImageIO.loadImage("../data/applet/segment/mountain_pines_people.jpg");
 //		BufferedImage image = UtilImageIO.loadImage("/home/pja/Desktop/segmentation/example-orig.jpg");
 

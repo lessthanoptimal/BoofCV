@@ -72,12 +72,13 @@ public class FactorySegmentationAlg {
 	 * @param spacialRadius Radius of mean-shift region in pixels
 	 * @param colorRadius Radius of mean-shift region for color in Euclidean distance.
 	 * @param minimumRegionSize Minimum allowed size of a region in pixels.
+	 * @param fast Improve runtime by approximating running mean-shift on each pixel. Try true.
 	 * @param imageType Type of input image
 	 * @return SegmentMeanShift
 	 */
 	public static<T extends ImageBase>
 	SegmentMeanShift<T> meanShift( int spacialRadius , float colorRadius , int minimumRegionSize ,
-								   ImageType<T> imageType )
+								   boolean fast ,  ImageType<T> imageType )
 	{
 		WeightPixel_F32 weightSpacial = new WeightPixelUniform_F32(spacialRadius,spacialRadius);
 		WeightDistance_F32 weightColor = new WeightDistanceUniform_F32(colorRadius*colorRadius);
@@ -89,15 +90,16 @@ public class FactorySegmentationAlg {
 
 		if( imageType.getFamily() == ImageType.Family.SINGLE_BAND ) {
 			InterpolatePixelS interp = FactoryInterpolation.bilinearPixelS(imageType.getImageClass());
-			search = new SegmentMeanShiftSearchGray(maxIterations,convergenceTol,interp,weightSpacial,weightColor);
+			search = new SegmentMeanShiftSearchGray(maxIterations,convergenceTol,interp,weightSpacial,weightColor,fast);
 		} else {
 			InterpolatePixelMB interp = FactoryInterpolation.createPixelMB(0,255,
 					TypeInterpolate.BILINEAR,(ImageType)imageType);
-			search = new SegmentMeanShiftSearchColor(maxIterations,convergenceTol,interp,weightSpacial,weightColor,imageType);
+			search = new SegmentMeanShiftSearchColor(maxIterations,convergenceTol,interp,
+					weightSpacial,weightColor,fast,imageType);
 		}
 
 		ComputeRegionMeanColor<T> regionColor = regionMeanColor(imageType);
-		MergeRegionMeanShift merge = new MergeRegionMeanShift(3,colorRadius/2,3);
+		MergeRegionMeanShift merge = new MergeRegionMeanShift(3,colorRadius/2);
 
 		PruneSmallRegions<T> prune = new PruneSmallRegions<T>(minimumRegionSize,regionColor);
 

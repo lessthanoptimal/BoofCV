@@ -43,12 +43,20 @@ import org.ddogleg.struct.GrowQueue_I32;
  * </p>
  *
  * <p>
+ * An approximation of running mean-shift on each pixel is performed if the 'fast' flag is set to true.  The
+ * approximation is about 5x faster and works by saving the mean-shift trajectory [2].  All points along the trajectory
+ * are given the same mode. When performing mean-shift if a pixel is encountered which has already been assigned a
+ * mode the search stops. This approximation tends to produce more regions and reduces clustering quality in high
+ * texture regions.
+ * </p>
+ *
+ * <p>
  * NOTES:
  * <ul>
  * <li>The kernel's spacial radius is specified by the radius of 'weightSpacial' and the gray/color radius is specified
  * by 'weightGray'.  Those two functions also specified the amount of weight assigned to each sample in the
  * mean-shift kernel based on its distance from the spacial and color means.<li>
- * <li>The distance passed into the 'weightGray' function is the difference squared.E.g. (a-b)<sup>2</sup></li>
+ * <li>The distance passed into the 'weightColor' function is the Euclidean distance squared.E.g. ||a-b||<sup>2</sup></li>
  * <li>Image edges are handled by truncating the spacial kernel.  This truncation
  * will create an asymmetric kernel, but there is really no good way to handle image edges.</li>
  * </ul>
@@ -56,8 +64,12 @@ import org.ddogleg.struct.GrowQueue_I32;
  *
  * <p>
  * CITATIONS:<br>
- * [1] Comaniciu, Dorin, and Peter Meer. "Mean shift analysis and applications." Computer Vision, 1999.
- * The Proceedings of the Seventh IEEE International Conference on. Vol. 2. IEEE, 1999.
+ * <ol>
+ * <li>Comaniciu, Dorin, and Peter Meer. "Mean shift analysis and applications." Computer Vision, 1999.
+ * The Proceedings of the Seventh IEEE International Conference on. Vol. 2. IEEE, 1999.</li>
+ * <li>Christoudias, Christopher M., Bogdan Georgescu, and Peter Meer. "Synergism in low level vision."
+ * Pattern Recognition, 2002. Proceedings. 16th International Conference on. Vol. 4. IEEE, 2002.</li>
+ * </ol>
  * </p>
  *
  * @author Peter Abeles
@@ -76,8 +88,12 @@ public abstract class SegmentMeanShiftSearch<T extends ImageBase> {
 	// Sample weight given difference in gray scale value
 	protected WeightDistance_F32 weightColor;
 
-	// converts an index of a peak into an index in the pixel image
-	protected ImageSInt32 peakToIndex = new ImageSInt32(1,1);
+	// converts a pixel location into the index of the mode that mean-shift converged to
+	protected ImageSInt32 pixelToMode = new ImageSInt32(1,1);
+
+	// Quick look up for the index of a mode from an image pixel.  It is possible for a pixel that is a mode
+	// to have mean-shift converge to a different pixel
+	protected ImageSInt32 quickMode = new ImageSInt32(1,1);
 
 	// location of each peak in image pixel indexes
 	protected FastQueue<Point2D_I32> modeLocation = new FastQueue<Point2D_I32>(Point2D_I32.class,true);
@@ -88,10 +104,14 @@ public abstract class SegmentMeanShiftSearch<T extends ImageBase> {
 	// storage for segment colors
 	protected FastQueue<float[]> modeColor;
 
+	// If true it will use the fast approximation of mean-shift
+	boolean fast;
+
 	// The input image
 	protected T image;
 
-	protected float meanX,meanY;
+	// mode of mean-shift
+	protected float modeX, modeY;
 
 	/**
 	 * Configures mean-shift segmentation
@@ -100,14 +120,17 @@ public abstract class SegmentMeanShiftSearch<T extends ImageBase> {
 	 * @param convergenceTol When the change is less than this amount stop.  Try 0.005
 	 * @param weightSpacial Weighting function/kernel for spacial component
 	 * @param weightColor Weighting function/kernel for distance of color component
+	 * @param fast Improve runtime by approximating running mean-shift on each pixel. Try true.
 	 */
 	public SegmentMeanShiftSearch(int maxIterations, float convergenceTol,
 								  WeightPixel_F32 weightSpacial,
-								  WeightDistance_F32 weightColor) {
+								  WeightDistance_F32 weightColor,
+								  boolean fast ) {
 		this.maxIterations = maxIterations;
 		this.convergenceTol = convergenceTol;
 		this.weightSpacial = weightSpacial;
 		this.weightColor = weightColor;
+		this.fast = fast;
 
 		this.radiusX = weightSpacial.getRadiusX();
 		this.radiusY = weightSpacial.getRadiusY();
@@ -138,7 +161,7 @@ public abstract class SegmentMeanShiftSearch<T extends ImageBase> {
 	 * From peak index to pixel index
 	 */
 	public ImageSInt32 getPixelToRegion() {
-		return peakToIndex;
+		return pixelToMode;
 	}
 
 	/**
