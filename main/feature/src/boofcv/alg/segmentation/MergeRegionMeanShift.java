@@ -20,14 +20,8 @@ package boofcv.alg.segmentation;
 
 import boofcv.struct.image.ImageSInt32;
 import georegression.struct.point.Point2D_I32;
-import org.ddogleg.nn.FactoryNearestNeighbor;
-import org.ddogleg.nn.NearestNeighbor;
-import org.ddogleg.nn.NnData;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_I32;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Merges together regions which have modes close to each other and have a similar color.
@@ -36,20 +30,13 @@ import java.util.List;
  */
 public class MergeRegionMeanShift extends RegionMergeTree {
 
-	// maximum distance in pixels that two nodes can be apart to be merged
-	private int maxSpacialDistance;
+	// maximum distance squared in pixels that two nodes can be apart to be merged
+	private int maxSpacialDistanceSq;
 	// Maximum Euclidean distance squared two colors can be for them to be considered similar
 	private float maxColorDistanceSq;
 
-	// ------ Data structures related to nearest-neighbor search
-	private NearestNeighbor<Info> nn = FactoryNearestNeighbor.kdtree();
-	private FastQueue<Info> storageInfo = new FastQueue<Info>(Info.class,true);
-	private List<double[]> nnPoints = new ArrayList<double[]>();
-	private List<Info> nnData = new ArrayList<Info>();
-	private FastQueue<NnData<Info>> nnResult = new FastQueue<NnData<Info>>((Class)NnData.class,true);
-	private double[] point = new double[2];
-	// maximum number of results returned by NN search.  Just to be safe, set it to the upper limit
-	private int nnMaxNumber;
+	// Search radius in pixels when looking for regions to merge with
+	private int searchRadius;
 
 	FastQueue<float[]> tmpColor;
 
@@ -62,12 +49,10 @@ public class MergeRegionMeanShift extends RegionMergeTree {
 	 * @param numBands Number of bands in the input image.
 	 */
 	public MergeRegionMeanShift(int maxSpacialDistance, float maxColorDistance, final int numBands) {
-		nn.init(2);
 
-		this.maxSpacialDistance = maxSpacialDistance;
+		this.searchRadius = maxSpacialDistance;
+		this.maxSpacialDistanceSq = maxSpacialDistance*maxSpacialDistance;
 		this.maxColorDistanceSq = maxColorDistance*maxColorDistance;
-		int w = maxSpacialDistance*2+1;
-		this.nnMaxNumber = w*w;
 
 		tmpColor = new FastQueue<float[]>(float[].class,true) {
 			@Override
@@ -92,11 +77,9 @@ public class MergeRegionMeanShift extends RegionMergeTree {
 						 FastQueue<Point2D_I32> modeLocation ) {
 		initializeMerge(regionMemberCount.size);
 
-		// Merge regions
-		setupSearchNN(modeLocation);
-		markMergeRegions(regionColor,modeLocation);
+		markMergeRegions(regionColor,modeLocation,pixelToRegion);
 
-		performMerge(pixelToRegion,regionMemberCount);
+		performMerge(pixelToRegion, regionMemberCount);
 	}
 
 	/**
@@ -104,72 +87,51 @@ public class MergeRegionMeanShift extends RegionMergeTree {
 	 * is also within the local area its color is checked to see if it's similar enough.  If the color is similar
 	 * enough then the two regions are marked for merger.
 	 */
-	// TODO implement the above procedure
-
-	/**
-	 * For each region, it searches for modes which are close to it.  If those close by modes have a similar
-	 * color they are then marked for merging.
-	 */
 	protected void markMergeRegions(FastQueue<float[]> regionColor,
-									FastQueue<Point2D_I32> modeLocation) {
+									FastQueue<Point2D_I32> modeLocation,
+									ImageSInt32 pixelToRegion  ) {
+		for( int targetId = 0; targetId < modeLocation.size; targetId++ ) {
 
-		for( int i = 0; i < modeLocation.size; i++ ) {
+			float[] color = regionColor.get(targetId);
+			Point2D_I32 location = modeLocation.get(targetId);
 
-			float[] color = regionColor.get(i);
-			Point2D_I32 location = modeLocation.get(i);
-			point[0] = location.x;
-			point[1] = location.y;
+			int x0 = location.x-searchRadius;
+			int x1 = location.x+searchRadius+1;
+			int y0 = location.y-searchRadius;
+			int y1 = location.y+searchRadius+1;
 
-			// find the mode locations which are close to each other and consider those regions for merging
-			nnResult.reset();
-			nn.findNearest(point,maxSpacialDistance,nnMaxNumber,nnResult);
+			// ensure that all pixels it examines are inside the image
+			if( x0 < 0 ) x0 = 0;
+			if( x1 > pixelToRegion.width ) x1 = pixelToRegion.width;
+			if( y0 < 0 ) y0 = 0;
+			if( y1 > pixelToRegion.height ) y1 = pixelToRegion.height;
 
-			for( int j = 0; j < nnResult.size;j++ ) {
-				Info info = nnResult.get(j).data;
+			// look at the local neighborhood
+			for( int y = y0; y < y1; y++ ) {
+				for( int x = x0; x < x1; x++ ) {
+					int candidateId = pixelToRegion.unsafe_get(x,y);
 
-				// make sure it isn't the region being searched around
-				if( info.index == i )
-					continue;
+					// see if it is the same region
+					if( candidateId == targetId )
+						continue;
 
-				// see if their colors are close enough
-				float[] candidateColor = regionColor.get(info.index);
-				float colorDistance = distanceSq(color,candidateColor);
+					// see if the mode is near by
+					Point2D_I32 p = modeLocation.get(candidateId);
+					if( p.distance2(location) <= maxSpacialDistanceSq ) {
 
-				if( colorDistance > maxColorDistanceSq )
-					continue;
+						// see if the color is similar
+						float[] candidateColor = regionColor.get(candidateId);
+						float colorDistance = SegmentMeanShiftSearch.distanceSq(color,candidateColor);
 
-				// mark the two regions as merged
-				markMerge(i, info.index);
+						if( colorDistance <= maxColorDistanceSq ) {
+							// mark the two regions as merged
+							markMerge(targetId, candidateId);
+						}
+					}
+				}
 			}
 
 		}
-	}
-
-	private void setupSearchNN( FastQueue<Point2D_I32> modeLocation) {
-		storageInfo.reset();
-
-		for( int i = 0; i < modeLocation.size; i++ ) {
-			Point2D_I32 location = modeLocation.get(i);
-
-			Info info = storageInfo.grow();
-			info.index = i;
-			info.p[0] = location.x;
-			info.p[1] = location.y;
-
-			nnPoints.add(info.p);
-			nnData.add(info);
-		}
-
-		nn.setPoints(nnPoints,nnData);
-	}
-
-	protected static float distanceSq( float[] a , float []b ) {
-		float distanceSq = 0;
-		for( int i = 0; i < a.length; i++ )  {
-			float d = a[i]-b[i];
-			distanceSq += d*d;
-		}
-		return distanceSq;
 	}
 
 	public static class Info {

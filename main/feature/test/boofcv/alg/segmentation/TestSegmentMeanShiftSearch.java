@@ -18,9 +18,13 @@
 
 package boofcv.alg.segmentation;
 
+import boofcv.alg.weights.WeightDistance_F32;
+import boofcv.alg.weights.WeightPixelUniform_F32;
+import boofcv.alg.weights.WeightPixel_F32;
+import boofcv.struct.image.ImageBase;
 import org.junit.Test;
 
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Peter Abeles
@@ -28,8 +32,33 @@ import static org.junit.Assert.fail;
 public class TestSegmentMeanShiftSearch {
 
 	@Test
-	public void stuff() {
-		fail("Implement");
+	public void constructor() {
+		WeightPixel_F32 weightSpacial = new WeightPixelUniform_F32(2,3);
+
+		SegmentMeanShiftSearch alg = new Dummy(1,2,weightSpacial,null);
+
+		assertEquals(5,alg.widthX);
+		assertEquals(7,alg.widthY);
+	}
+
+	@Test
+	public void distanceSq() {
+		float a[] = new float[]{2,3,4};
+		float b[] = new float[]{4,3,2};
+
+		float found = SegmentMeanShiftSearch.distanceSq(a,b);
+
+		assertEquals(8,found,1e-4);
+	}
+
+	public static class Dummy extends SegmentMeanShiftSearch {
+
+		public Dummy(int maxIterations, float convergenceTol, WeightPixel_F32 weightSpacial, WeightDistance_F32 weightColor) {
+			super(maxIterations, convergenceTol, weightSpacial, weightColor);
+		}
+
+		@Override
+		public void process(ImageBase image) {}
 	}
 
 }

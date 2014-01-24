@@ -28,8 +28,7 @@ Version : Alpha 0.17
 - Image Segmentation
   * Mean-shift (gray and color images)
 - Fixed bugs in ConvertNV21
-  * Was apply YV12 byte alignment to NV21 images.  NV21 is dense and that code causes some images to crash
-    depending upon their size.
+  * Was apply YV12 byte alignment to NV21 images.  Depending on image size, this could cause a crash.
 - Fixed bug in ImplConvertToBitmap.multiToArray_F32()
   * Didn't handle case where the input image has 3 bands and not 4
 
@@ -38,6 +37,7 @@ Version : Alpha 0.17
 - long distance dense optical flow
 - Mean-shift segmentation
 - watershed segmentation
+- Moved some of the android stuff out of demo code and into the android interface
 
 ---------------------------------------------
 Date    : 2013/12/25

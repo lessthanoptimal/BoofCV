@@ -18,9 +18,13 @@
 
 package boofcv.alg.segmentation;
 
+import boofcv.alg.misc.ImageMiscOps;
+import boofcv.factory.segmentation.FactorySegmentationAlg;
+import boofcv.struct.image.ImageType;
+import boofcv.struct.image.ImageUInt8;
 import org.junit.Test;
 
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Peter Abeles
@@ -29,11 +33,51 @@ public class TestSegmentMeanShift {
 
 	@Test
 	public void uniformRegion() {
-		fail("implement");
+		ImageUInt8 image = new ImageUInt8(10,15);
+		ImageMiscOps.fill(image,10);
+
+		SegmentMeanShift<ImageUInt8> alg = FactorySegmentationAlg.meanShift(2,10,10, ImageType.single(ImageUInt8.class));
+
+		alg.process(image);
+
+		assertEquals(1, alg.getNumberOfRegions());
+		assertEquals(1, alg.getRegionColor().size());
+		assertEquals(1, alg.getRegionSize().getSize());
+
+		for( int y = 0; y < 15; y++ ) {
+			for( int x = 0; x < 10; x++ ) {
+				assertEquals(0, alg.getRegionImage().get(x, y));
+			}
+		}
+		assertEquals(10,alg.getRegionColor().get(0)[0],1e-4f);
+		assertEquals(10*15,alg.getRegionSize().get(0));
 	}
 
 	@Test
 	public void obviousSplit() {
-		fail("implement");
+		ImageUInt8 image = new ImageUInt8(10,15);
+		ImageMiscOps.fill(image,10);
+		ImageMiscOps.fill(image.subimage(0,0,4,15,null),25);
+
+		SegmentMeanShift<ImageUInt8> alg = FactorySegmentationAlg.meanShift(2,10,10, ImageType.single(ImageUInt8.class));
+
+		alg.process(image);
+
+		assertEquals(2, alg.getNumberOfRegions());
+		assertEquals(2, alg.getRegionColor().size());
+		assertEquals(2, alg.getRegionSize().getSize());
+
+		for( int y = 0; y < 15; y++ ) {
+			for( int x = 0; x < 10; x++ ) {
+				if( x < 4)
+					assertEquals(0,alg.getRegionImage().get(x,y));
+				else
+					assertEquals(1,alg.getRegionImage().get(x,y));
+			}
+		}
+		assertEquals(25,alg.getRegionColor().get(0)[0],1e-4f);
+		assertEquals(10,alg.getRegionColor().get(1)[0],1e-4f);
+		assertEquals(4 * 15, alg.getRegionSize().get(0));
+		assertEquals(6*15,alg.getRegionSize().get(1));
 	}
 }

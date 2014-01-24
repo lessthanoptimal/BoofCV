@@ -112,8 +112,8 @@ public class TestPruneSmallRegions {
 		assertEquals(2,alg.pruneGraph.size());
 		assertEquals(0,alg.pruneGraph.get(0).segment);
 		assertEquals(4,alg.pruneGraph.get(1).segment);
-		assertEquals(6,alg.pruneGraph.get(0).edges.size);
-		assertEquals(6,alg.pruneGraph.get(1).edges.size);
+		assertEquals(0,alg.pruneGraph.get(0).edges.size);
+		assertEquals(0,alg.pruneGraph.get(1).edges.size);
 
 		boolean flags[] = new boolean[]{true,false,false,false,true,false};
 		for( int i = 0; i <6; i++ )
@@ -145,20 +145,17 @@ public class TestPruneSmallRegions {
 		alg.segmentToPruneID.set(2,0);
 		alg.segmentToPruneID.set(5,1);
 
-		alg.pruneGraph.grow().init(2,N);
-		alg.pruneGraph.grow().init(5,N);
+		alg.pruneGraph.grow().init(2);
+		alg.pruneGraph.grow().init(5);
 
 		alg.findAdjacentRegions(pixelToRegion);
 
-		// See expected graph is constructed
-        //                                0     1   2      3     4    5     6    7     8
-		boolean edges2[] = new boolean[]{false,true,false,true,false,true,false,false,false};
-		boolean edges5[] = new boolean[]{false,true,true,false,false,false,true,false,true};
+		// See expected if the graph is constructed
+		int edges2[] = new int[]{1,3,5};
+		int edges5[] = new int[]{1,2,6,8};
 
-		for( int i = 0; i < N; i++ ) {
-			assertEquals(edges2[i],alg.pruneGraph.get(0).edges.get(i));
-			assertEquals(edges5[i],alg.pruneGraph.get(1).edges.get(i));
-		}
+		checkNode(alg, edges2,0);
+		checkNode(alg, edges5,1);
 	}
 
 	@Test
@@ -186,23 +183,20 @@ public class TestPruneSmallRegions {
 		alg.segmentToPruneID.set(4,1);
 		alg.segmentToPruneID.set(5,2);
 
-		alg.pruneGraph.grow().init(2,N);
-		alg.pruneGraph.grow().init(4,N);
-		alg.pruneGraph.grow().init(5,N);
+		alg.pruneGraph.grow().init(2);
+		alg.pruneGraph.grow().init(4);
+		alg.pruneGraph.grow().init(5);
 
 		alg.findAdjacentRegions(pixelToRegion);
 
-		// See expected graph is constructed
-		//                                0     1   2      3     4    5     6    7     8
-		boolean edges2[] = new boolean[]{false,true,false,true,false,false,false,false,false};
-		boolean edges4[] = new boolean[]{false,false,false,true,false,true,false,true,false};
-		boolean edges5[] = new boolean[]{false,true,false,false,true,false,false,false,false};
+		// See expected if the graph is constructed
+		int edges2[] = new int[]{1,3};
+		int edges4[] = new int[]{3,5,7};
+		int edges5[] = new int[]{1,4};
 
-		for( int i = 0; i < N; i++ ) {
-			assertEquals(edges2[i],alg.pruneGraph.get(0).edges.get(i));
-			assertEquals(edges4[i],alg.pruneGraph.get(1).edges.get(i));
-			assertEquals(edges5[i],alg.pruneGraph.get(2).edges.get(i));
-		}
+		checkNode(alg, edges2,0);
+		checkNode(alg, edges4,1);
+		checkNode(alg, edges5,2);
 	}
 
 	@Test
@@ -230,23 +224,20 @@ public class TestPruneSmallRegions {
 		alg.segmentToPruneID.set(3,1);
 		alg.segmentToPruneID.set(5,2);
 
-		alg.pruneGraph.grow().init(2,N);
-		alg.pruneGraph.grow().init(3,N);
-		alg.pruneGraph.grow().init(5,N);
+		alg.pruneGraph.grow().init(2);
+		alg.pruneGraph.grow().init(3);
+		alg.pruneGraph.grow().init(5);
 
 		alg.findAdjacentRegions(pixelToRegion);
 
-		// See expected graph is constructed
-		//                                0     1   2      3     4    5     6    7     8
-		boolean edges2[] = new boolean[]{false,true,false,false,true,false,false,false,false};
-		boolean edges3[] = new boolean[]{false,true,false,false,false,true,false,false,false};
-		boolean edges5[] = new boolean[]{false,true,false,true,false,false,false,false,false};
+		// See expected if the graph is constructed
+		int edges2[] = new int[]{1,4};
+		int edges3[] = new int[]{1,5};
+		int edges5[] = new int[]{1,3};
 
-		for( int i = 0; i < N; i++ ) {
-			assertEquals(edges2[i],alg.pruneGraph.get(0).edges.get(i));
-			assertEquals(edges3[i],alg.pruneGraph.get(1).edges.get(i));
-			assertEquals(edges5[i],alg.pruneGraph.get(2).edges.get(i));
-		}
+		checkNode(alg, edges2,0);
+		checkNode(alg, edges3,1);
+		checkNode(alg, edges5,2);
 	}
 
 	@Test
@@ -270,9 +261,9 @@ public class TestPruneSmallRegions {
 		PruneSmallRegions.Node n = (PruneSmallRegions.Node)alg.pruneGraph.grow();
 
 		// mark 4 and 6 as being connect to 2
-		n.init(2,N);
-		n.edges.set(4, true);
-		n.edges.set(6,true);
+		n.init(2);
+		n.edges.add(4);
+		n.edges.add(6);
 
 		alg.selectMerge(0,regionColor);
 
@@ -286,4 +277,10 @@ public class TestPruneSmallRegions {
 		}
 	}
 
+	private void checkNode(PruneSmallRegions<ImageFloat32> alg, int[] edges,int pruneId) {
+		assertEquals(edges.length,alg.pruneGraph.get(pruneId).edges.size);
+		for( int i = 0; i < edges.length; i++ ) {
+			assertTrue(alg.pruneGraph.get(pruneId).isConnected(edges[i]));
+		}
+	}
 }

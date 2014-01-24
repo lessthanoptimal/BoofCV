@@ -25,7 +25,6 @@ import org.ddogleg.struct.GrowQueue_I32;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 
 /**
 * @author Peter Abeles
@@ -48,35 +47,28 @@ public class TestMergeRegionMeanShift {
 
 		FastQueue<float[]> regionColor = createList(5,1,6,4);
 		FastQueue<Point2D_I32> modeLocation = new FastQueue<Point2D_I32>(Point2D_I32.class,true);
+		modeLocation.grow().set(0,0);
+		modeLocation.grow().set(3,3);
+		modeLocation.grow().set(0,1);
+		modeLocation.grow().set(2, 3);
 
-
-		alg.process(pixelToRegion,regionMemberCount,regionColor,modeLocation);
+		alg.process(pixelToRegion, regionMemberCount, regionColor, modeLocation);
 
 		ImageSInt32 expectedP2R = new ImageSInt32(4,4);
 		expectedP2R.data = new int[]
 				{0,0,0,1,
 				 0,0,0,1,
 				 0,0,1,1,
-				 0,0,0,1};
+				 0,0,2,1};
 
-		int expectedCount[] = new int[]{8,2};
-		float expectedColor[] = new float[]{5,1};
+		int expectedCount[] = new int[]{4,2,4};
 
 		for( int i = 0; i < expectedP2R.data.length; i++ )
 			assertEquals(expectedP2R.data[i],pixelToRegion.data[i]);
 
 		for( int i = 0; i < expectedCount.length; i++ )
 			assertEquals(expectedCount[i],regionMemberCount.data[i]);
-
-		for( int i = 0; i < expectedColor.length; i++ )
-			assertEquals(expectedColor[i],regionColor.data[i][0],1e-4f);
 	}
-
-	@Test
-	public void stuff() {
-		fail("Update for new code");
-	}
-
 
 	private FastQueue<float[]> createList( int ...colors ) {
 		FastQueue<float[]> ret = new FastQueue<float[]>(float[].class,true) {

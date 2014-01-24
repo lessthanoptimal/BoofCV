@@ -152,7 +152,7 @@ public class SegmentMeanShiftSearchColor<T extends ImageMultiBand> extends Segme
 						// compute distance between gray scale value as euclidean squared
 						interpolate.get_fast(x0 + xx, y0 + yy, pixelColor);
 						float d = distanceSq(pixelColor,meanColor);
-						float wg = weightColor.weight(d*d);
+						float wg = weightColor.weight(d);
 						// Total weight is the combination of spacial and color values
 						float weight = ws*wg;
 						total += weight;
@@ -183,7 +183,7 @@ public class SegmentMeanShiftSearchColor<T extends ImageMultiBand> extends Segme
 						float ws = weightSpacial.weightIndex(kernelIndex);
 						interpolate.get(x0 + xx, y0 + yy, pixelColor);
 						float d = distanceSq(pixelColor,meanColor);
-						float wg = weightColor.weight(d*d);
+						float wg = weightColor.weight(d);
 						float weight = ws*wg;
 						total += weight;
 						sumX += weight*(xx+x0);
