@@ -36,7 +36,8 @@ public class TestSegmentMeanShift {
 		ImageUInt8 image = new ImageUInt8(10,15);
 		ImageMiscOps.fill(image,10);
 
-		SegmentMeanShift<ImageUInt8> alg = FactorySegmentationAlg.meanShift(2,10,10, ImageType.single(ImageUInt8.class));
+		SegmentMeanShift<ImageUInt8> alg =
+				FactorySegmentationAlg.meanShift(2,10,10, false,ImageType.single(ImageUInt8.class));
 
 		alg.process(image);
 
@@ -59,7 +60,8 @@ public class TestSegmentMeanShift {
 		ImageMiscOps.fill(image,10);
 		ImageMiscOps.fill(image.subimage(0,0,4,15,null),25);
 
-		SegmentMeanShift<ImageUInt8> alg = FactorySegmentationAlg.meanShift(2,10,10, ImageType.single(ImageUInt8.class));
+		SegmentMeanShift<ImageUInt8> alg =
+				FactorySegmentationAlg.meanShift(2,10,10, false,ImageType.single(ImageUInt8.class));
 
 		alg.process(image);
 
