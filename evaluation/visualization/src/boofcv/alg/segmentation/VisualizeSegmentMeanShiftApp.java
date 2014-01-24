@@ -22,10 +22,7 @@ import boofcv.core.image.ConvertBufferedImage;
 import boofcv.factory.segmentation.FactorySegmentationAlg;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.image.UtilImageIO;
-import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSInt32;
-import boofcv.struct.image.ImageType;
+import boofcv.struct.image.*;
 import org.ddogleg.struct.FastQueue;
 
 import java.awt.image.BufferedImage;
@@ -89,19 +86,19 @@ public class VisualizeSegmentMeanShiftApp {
 		System.out.println("Time MS "+(time1-time0));
 
 		ShowImages.showWindow(outColor,"Regions");
-		ShowImages.showWindow(outSegments,"Color of Peak");
+		ShowImages.showWindow(outSegments,"Color of Segments");
 	}
 
 	public static void main(String[] args) {
-//		BufferedImage image = UtilImageIO.loadImage("../data/evaluation/sunflowers.png");
+		BufferedImage image = UtilImageIO.loadImage("../data/evaluation/sunflowers.png");
 //		BufferedImage image = UtilImageIO.loadImage("../data/evaluation/shapes01.png");
 //		BufferedImage image = UtilImageIO.loadImage("../data/applet/trees_rotate_01.jpg");
 //		BufferedImage image = UtilImageIO.loadImage("../data/applet/segment/mountain_pines_people.jpg");
-		BufferedImage image = UtilImageIO.loadImage("/home/pja/Desktop/segmentation/example-orig.jpg");
+//		BufferedImage image = UtilImageIO.loadImage("/home/pja/Desktop/segmentation/example-orig.jpg");
 
 
-//		ImageType<MultiSpectral<ImageFloat32>> imageType = ImageType.ms(3,ImageFloat32.class);
-		ImageType<ImageFloat32> imageType = ImageType.single(ImageFloat32.class);
+		ImageType<MultiSpectral<ImageFloat32>> imageType = ImageType.ms(3,ImageFloat32.class);
+//		ImageType<ImageFloat32> imageType = ImageType.single(ImageFloat32.class);
 
 		process(image,imageType);
 	}

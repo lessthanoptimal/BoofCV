@@ -62,8 +62,6 @@ import org.ddogleg.struct.GrowQueue_I32;
  *
  * @author Peter Abeles
  */
-// TODO With the current algorithm it is possible to have islands.  Clusters of pixels with the same label but are
-// not actually connected to each other
 public abstract class SegmentMeanShiftSearch<T extends ImageBase> {
 
 	// used to detect convergence of mean-shift
@@ -124,6 +122,9 @@ public abstract class SegmentMeanShiftSearch<T extends ImageBase> {
 	 */
 	public abstract void process( T image );
 
+	/**
+	 * Returns the Euclidean distance squared between the two vectors
+	 */
 	public static float distanceSq( float[] a , float[]b ) {
 		float ret = 0;
 		for( int i = 0; i < a.length; i++ ) {

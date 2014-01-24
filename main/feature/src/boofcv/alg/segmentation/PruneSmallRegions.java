@@ -24,8 +24,6 @@ import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_B;
 import org.ddogleg.struct.GrowQueue_I32;
 
-import java.util.Arrays;
-
 /**
  * Finds regions which are too small and merges them with a neighbor that is the most similar to it and connected.
  * The process is repeated until there are no more regions below the size threshold.  How similar two neighbors are
@@ -114,9 +112,8 @@ public class PruneSmallRegions<T extends ImageBase> extends RegionMergeTree {
 			if( regionMemberCount.get(i) < minimumSize ) {
 				segmentToPruneID.set(i, pruneGraph.size());
 				Node n = pruneGraph.grow();
-				n.init(i,regionMemberCount.size);
+				n.init(i);
 				segmentPruneFlag.set(i, true);
-
 			} else {
 				segmentPruneFlag.set(i, false);
 			}
@@ -149,11 +146,11 @@ public class PruneSmallRegions<T extends ImageBase> extends RegionMergeTree {
 
 					if( pruneA ) {
 						Node n = pruneGraph.get(segmentToPruneID.get(regionA));
-						n.edges.set(regionB,true);
+						n.connect(regionB);
 					}
 					if( pruneB ) {
 						Node n = pruneGraph.get(segmentToPruneID.get(regionB));
-						n.edges.set(regionA,true);
+						n.connect(regionA);
 					}
 				}
 
@@ -162,11 +159,11 @@ public class PruneSmallRegions<T extends ImageBase> extends RegionMergeTree {
 
 					if( pruneA ) {
 						Node n = pruneGraph.get(segmentToPruneID.get(regionA));
-						n.edges.set(regionC,true);
+						n.connect(regionC);
 					}
 					if( pruneC ) {
 						Node n = pruneGraph.get(segmentToPruneID.get(regionC));
-						n.edges.set(regionA,true);
+						n.connect(regionA);
 					}
 				}
 			}
@@ -187,11 +184,11 @@ public class PruneSmallRegions<T extends ImageBase> extends RegionMergeTree {
 
 					if( pruneA ) {
 						Node n = pruneGraph.get(segmentToPruneID.get(regionA));
-						n.edges.set(regionC,true);
+						n.connect(regionC);
 					}
 					if( pruneC ) {
 						Node n = pruneGraph.get(segmentToPruneID.get(regionC));
-						n.edges.set(regionA,true);
+						n.connect(regionA);
 					}
 				}
 			}
@@ -211,11 +208,11 @@ public class PruneSmallRegions<T extends ImageBase> extends RegionMergeTree {
 
 				if( pruneA ) {
 					Node n = pruneGraph.get(segmentToPruneID.get(regionA));
-					n.edges.set(regionB,true);
+					n.connect(regionB);
 				}
 				if( pruneB ) {
 					Node n = pruneGraph.get(segmentToPruneID.get(regionB));
-					n.edges.set(regionA,true);
+					n.connect(regionA);
 				}
 			}
 		}
@@ -238,14 +235,13 @@ public class PruneSmallRegions<T extends ImageBase> extends RegionMergeTree {
 
 		// Examine all the segments it is connected to to see which one it is most similar too
 		for( int i = 0; i < n.edges.size; i++ ) {
-			if( n.edges.get(i) ) {
-				float[] neighborColor = regionColor.get(i);
-				float d = SegmentMeanShiftSearch.distanceSq(targetColor, neighborColor);
+			int segment = n.edges.get(i);
+			float[] neighborColor = regionColor.get(segment);
+			float d = SegmentMeanShiftSearch.distanceSq(targetColor, neighborColor);
 
-				if( d < bestDistance ) {
-					bestDistance = d;
-					bestId = i;
-				}
+			if( d < bestDistance ) {
+				bestDistance = d;
+				bestId = segment;
 			}
 		}
 
@@ -261,13 +257,27 @@ public class PruneSmallRegions<T extends ImageBase> extends RegionMergeTree {
 	public static class Node
 	{
 		public int segment;
-		// List which indicates a connection.  If an element is true then it is connected to that segment
-		public GrowQueue_B edges = new GrowQueue_B();
+		// List of segments this segment is connected to
+		public GrowQueue_I32 edges = new GrowQueue_I32();
 
-		public void init( int segment , int N ) {
+		public void init( int segment ) {
 			this.segment = segment;
-			edges.resize(N);
-			Arrays.fill(edges.data,0,N,false);
+			edges.reset();
+		}
+
+		public void connect(int segment) {
+			if( isConnected(segment))
+				return;
+
+			this.edges.add(segment);
+		}
+
+		public boolean isConnected( int segment ) {
+			for( int i = 0; i < edges.size; i++ ) {
+				if( edges.data[i] == segment)
+					return true;
+			}
+			return false;
 		}
 	}
 }

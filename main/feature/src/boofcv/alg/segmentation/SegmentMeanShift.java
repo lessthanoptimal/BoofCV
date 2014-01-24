@@ -76,7 +76,11 @@ public class SegmentMeanShift<T extends ImageBase> {
 	 * @param image Image
 	 */
 	public void process( T image ) {
+
+		long time0 = System.currentTimeMillis();
+
 		search.process(image);
+		long time1 = System.currentTimeMillis();
 
 		FastQueue<float[]> regionColor = search.getModeColor();
 		ImageSInt32 pixelToRegion = search.getPixelToRegion();
@@ -85,7 +89,13 @@ public class SegmentMeanShift<T extends ImageBase> {
 
 		merge.process(pixelToRegion,regionPixelCount,regionColor,modeLocation);
 
+		long time2 = System.currentTimeMillis();
+
 		prune.process(image,pixelToRegion,regionPixelCount,regionColor);
+
+		long time3 = System.currentTimeMillis();
+
+		System.out.println("Search: "+(time1-time0)+" Merge: "+(time2-time1)+" Prune: "+(time3-time1));
 	}
 
 	/**
