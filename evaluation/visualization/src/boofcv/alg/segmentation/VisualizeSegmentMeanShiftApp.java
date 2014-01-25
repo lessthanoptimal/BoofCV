@@ -94,10 +94,9 @@ public class VisualizeSegmentMeanShiftApp {
 	public static void main(String[] args) {
 //		BufferedImage image = UtilImageIO.loadImage("../data/evaluation/sunflowers.png");
 //		BufferedImage image = UtilImageIO.loadImage("../data/evaluation/shapes01.png");
-		BufferedImage image = UtilImageIO.loadImage("../data/applet/trees_rotate_01.jpg");
+//		BufferedImage image = UtilImageIO.loadImage("../data/applet/trees_rotate_01.jpg");
 //		BufferedImage image = UtilImageIO.loadImage("../data/applet/segment/mountain_pines_people.jpg");
-//		BufferedImage image = UtilImageIO.loadImage("/home/pja/Desktop/segmentation/example-orig.jpg");
-
+		BufferedImage image = UtilImageIO.loadImage("/home/pja/Desktop/segmentation/example-orig.jpg");
 
 		ImageType<MultiSpectral<ImageFloat32>> imageType = ImageType.ms(3,ImageFloat32.class);
 //		ImageType<ImageFloat32> imageType = ImageType.single(ImageFloat32.class);
