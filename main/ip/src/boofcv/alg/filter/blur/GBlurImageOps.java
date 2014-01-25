@@ -18,11 +18,7 @@
 
 package boofcv.alg.filter.blur;
 
-import boofcv.core.image.GeneralizedImageOps;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.image.ImageUInt8;
-import boofcv.struct.image.MultiSpectral;
+import boofcv.struct.image.*;
 
 
 /**
@@ -43,39 +39,17 @@ public class GBlurImageOps {
 	 * @param <T> Input image type.
 	 * @return Output blurred image.
 	 */
-	public static <T extends ImageSingleBand>
+	public static <T extends ImageBase>
 	T mean(T input, T output, int radius, T storage ) {
 		if( input instanceof ImageUInt8 ) {
 			return (T)BlurImageOps.mean((ImageUInt8)input,(ImageUInt8)output,radius,(ImageUInt8)storage);
 		} else if( input instanceof ImageFloat32) {
 			return (T)BlurImageOps.mean((ImageFloat32)input,(ImageFloat32)output,radius,(ImageFloat32)storage);
+		} else if( input instanceof MultiSpectral ) {
+			return (T)BlurImageOps.mean((MultiSpectral)input,(MultiSpectral)output,radius,(ImageSingleBand)storage);
 		} else  {
 			throw new IllegalArgumentException("Unsupported image type");
 		}
-	}
-
-	/**
-	 * Applies mean box filter to a {@link MultiSpectral}
-	 *
-	 * @param input Input image.  Not modified.
-	 * @param output (Optional) Storage for output image, Can be null.  Modified.
-	 * @param radius Radius of the box blur function.
-	 * @param storage (Optional) Storage for intermediate results.  Same size as input image.  Can be null.
-	 * @param <T> Input image type.
-	 * @return Output blurred image.
-	 */
-	public static <T extends ImageSingleBand>
-	MultiSpectral<T> mean(MultiSpectral<T> input, MultiSpectral<T> output, int radius , T storage ) {
-
-		if( storage == null )
-			storage = GeneralizedImageOps.createSingleBand(input.getType(),input.width,input.height);
-		if( output == null )
-			output = input._createNew(input.width,input.height);
-
-		for( int band = 0; band < input.getNumBands(); band++ ) {
-			median(input.getBand(band),output.getBand(band),radius);
-		}
-		return output;
 	}
 
 	/**
@@ -87,36 +61,17 @@ public class GBlurImageOps {
 	 * @param <T> Input image type.
 	 * @return Output blurred image.
 	 */
-	public static <T extends ImageSingleBand>
+	public static <T extends ImageBase>
 	T median(T input, T output, int radius ) {
 		if( input instanceof ImageUInt8 ) {
-			return (T)BlurImageOps.median((ImageUInt8)input,(ImageUInt8)output,radius);
+			return (T)BlurImageOps.median((ImageUInt8) input, (ImageUInt8) output, radius);
 		} else if( input instanceof ImageFloat32) {
-			return (T)BlurImageOps.median((ImageFloat32)input,(ImageFloat32)output,radius);
+			return (T)BlurImageOps.median((ImageFloat32) input, (ImageFloat32) output, radius);
+		} else if( input instanceof MultiSpectral ) {
+			return (T)BlurImageOps.median((MultiSpectral)input,(MultiSpectral)output,radius);
 		} else  {
 			throw new IllegalArgumentException("Unsupported image type");
 		}
-	}
-
-	/**
-	 * Applies median filter to a {@link MultiSpectral}
-	 *
-	 * @param input Input image.  Not modified.
-	 * @param output (Optional) Storage for output image, Can be null.  Modified.
-	 * @param radius Radius of the median blur function.
-	 * @param <T> Input image type.
-	 * @return Output blurred image.
-	 */
-	public static <T extends ImageSingleBand>
-	MultiSpectral<T> median(MultiSpectral<T> input, MultiSpectral<T> output, int radius ) {
-
-		if( output == null )
-			output = input._createNew(input.width,input.height);
-
-		for( int band = 0; band < input.getNumBands(); band++ ) {
-			median(input.getBand(band),output.getBand(band),radius);
-		}
-		return output;
 	}
 
 	/**
@@ -130,39 +85,16 @@ public class GBlurImageOps {
 	 * @param <T> Input image type.
 	 * @return Output blurred image.
 	 */
-	public static <T extends ImageSingleBand>
+	public static <T extends ImageBase>
 	T gaussian(T input, T output, double sigma , int radius, T storage ) {
 		if( input instanceof ImageUInt8 ) {
 			return (T)BlurImageOps.gaussian((ImageUInt8)input,(ImageUInt8)output,sigma,radius,(ImageUInt8)storage);
 		} else if( input instanceof ImageFloat32) {
 			return (T)BlurImageOps.gaussian((ImageFloat32)input,(ImageFloat32)output,sigma,radius,(ImageFloat32)storage);
+		} else if( input instanceof MultiSpectral ) {
+			return (T)BlurImageOps.gaussian((MultiSpectral)input,(MultiSpectral)output,sigma,radius,(ImageSingleBand)storage);
 		} else  {
 			throw new IllegalArgumentException("Unsupported image type: "+input.getClass().getSimpleName());
 		}
-	}
-
-	/**
-	 * Applies Gaussian blur to a {@link MultiSpectral}
-	 *
-	 * @param input Input image.  Not modified.
-	 * @param output (Optional) Storage for output image, Can be null.  Modified.
-	 * @param sigma Gaussian distribution's sigma.  If <= 0 then will be selected based on radius.
-	 * @param radius Radius of the Gaussian blur function. If <= 0 then radius will be determined by sigma.
-	 * @param storage (Optional) Storage for intermediate results.  Same size as input image.  Can be null.
-	 * @param <T> Input image type.
-	 * @return Output blurred image.
-	 */
-	public static <T extends ImageSingleBand>
-	MultiSpectral<T> gaussian(MultiSpectral<T> input, MultiSpectral<T> output, double sigma , int radius, T storage ) {
-
-		if( storage == null )
-			storage = GeneralizedImageOps.createSingleBand(input.getType(),input.width,input.height);
-		if( output == null )
-			output = input._createNew(input.width,input.height);
-
-		for( int band = 0; band < input.getNumBands(); band++ ) {
-			gaussian(input.getBand(band),output.getBand(band),sigma,radius,storage);
-		}
-		return output;
 	}
 }

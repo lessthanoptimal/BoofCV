@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,11 +24,14 @@ import boofcv.alg.filter.blur.impl.ImplMedianSortEdgeNaive;
 import boofcv.alg.filter.blur.impl.ImplMedianSortNaive;
 import boofcv.alg.filter.convolve.ConvolveImageMean;
 import boofcv.alg.filter.convolve.ConvolveNormalized;
+import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.filter.kernel.FactoryKernelGaussian;
 import boofcv.struct.convolve.Kernel1D_F32;
 import boofcv.struct.convolve.Kernel1D_I32;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.MultiSpectral;
 
 /**
  * Catch all class for function which "blur" an image, typically used to "reduce" the amount
@@ -172,6 +175,76 @@ public class BlurImageOps {
 		ConvolveNormalized.horizontal(kernel,input,storage);
 		ConvolveNormalized.vertical(kernel,storage,output);
 
+		return output;
+	}
+
+	/**
+	 * Applies mean box filter to a {@link MultiSpectral}
+	 *
+	 * @param input Input image.  Not modified.
+	 * @param output (Optional) Storage for output image, Can be null.  Modified.
+	 * @param radius Radius of the box blur function.
+	 * @param storage (Optional) Storage for intermediate results.  Same size as input image.  Can be null.
+	 * @param <T> Input image type.
+	 * @return Output blurred image.
+	 */
+	public static <T extends ImageSingleBand>
+	MultiSpectral<T> mean(MultiSpectral<T> input, MultiSpectral<T> output, int radius , T storage ) {
+
+		if( storage == null )
+			storage = GeneralizedImageOps.createSingleBand(input.getType(),input.width,input.height);
+		if( output == null )
+			output = input._createNew(input.width,input.height);
+
+		for( int band = 0; band < input.getNumBands(); band++ ) {
+			GBlurImageOps.median(input.getBand(band),output.getBand(band),radius);
+		}
+		return output;
+	}
+
+	/**
+	 * Applies median filter to a {@link MultiSpectral}
+	 *
+	 * @param input Input image.  Not modified.
+	 * @param output (Optional) Storage for output image, Can be null.  Modified.
+	 * @param radius Radius of the median blur function.
+	 * @param <T> Input image type.
+	 * @return Output blurred image.
+	 */
+	public static <T extends ImageSingleBand>
+	MultiSpectral<T> median(MultiSpectral<T> input, MultiSpectral<T> output, int radius ) {
+
+		if( output == null )
+			output = input._createNew(input.width,input.height);
+
+		for( int band = 0; band < input.getNumBands(); band++ ) {
+			GBlurImageOps.median(input.getBand(band),output.getBand(band),radius);
+		}
+		return output;
+	}
+
+	/**
+	 * Applies Gaussian blur to a {@link boofcv.struct.image.MultiSpectral}
+	 *
+	 * @param input Input image.  Not modified.
+	 * @param output (Optional) Storage for output image, Can be null.  Modified.
+	 * @param sigma Gaussian distribution's sigma.  If <= 0 then will be selected based on radius.
+	 * @param radius Radius of the Gaussian blur function. If <= 0 then radius will be determined by sigma.
+	 * @param storage (Optional) Storage for intermediate results.  Same size as input image.  Can be null.
+	 * @param <T> Input image type.
+	 * @return Output blurred image.
+	 */
+	public static <T extends ImageSingleBand>
+	MultiSpectral<T> gaussian(MultiSpectral<T> input, MultiSpectral<T> output, double sigma , int radius, T storage ) {
+
+		if( storage == null )
+			storage = GeneralizedImageOps.createSingleBand(input.getType(), input.width, input.height);
+		if( output == null )
+			output = input._createNew(input.width,input.height);
+
+		for( int band = 0; band < input.getNumBands(); band++ ) {
+			GBlurImageOps.gaussian(input.getBand(band),output.getBand(band),sigma,radius,storage);
+		}
 		return output;
 	}
 }

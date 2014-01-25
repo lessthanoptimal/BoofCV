@@ -18,6 +18,7 @@
 
 package boofcv.alg.segmentation;
 
+import boofcv.alg.filter.blur.GBlurImageOps;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.factory.segmentation.FactorySegmentationAlg;
 import boofcv.gui.image.ShowImages;
@@ -42,6 +43,8 @@ public class VisualizeSegmentMeanShiftApp {
 		T color = type.createImage(image.getWidth(),image.getHeight());
 
 		ConvertBufferedImage.convertFrom(image, color, true);
+
+		GBlurImageOps.gaussian(color, color, 0.5, -1, null);
 
 		BufferedImage outColor = new BufferedImage(color.width,color.height,BufferedImage.TYPE_INT_RGB);
 		BufferedImage outSegments = new BufferedImage(color.width,color.height,BufferedImage.TYPE_INT_RGB);
@@ -86,6 +89,7 @@ public class VisualizeSegmentMeanShiftApp {
 		}
 
 		System.out.println("Time MS "+(time1-time0));
+		System.out.println("Total regions: "+alg.getNumberOfRegions());
 
 		ShowImages.showWindow(outColor,"Regions");
 		ShowImages.showWindow(outSegments,"Color of Segments");

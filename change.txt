@@ -24,11 +24,11 @@ Version : Alpha 0.17
   * Thanks Lucaro for finding this bug
 - Added GImageMultiBand for generalized access to multi-band image data
 - Added support for MultiSpectral images to:
-  * GBlurImageOps
+  * GBlurImageOps and BlurImageOps
 - Image Segmentation
   * Mean-shift (gray and color images)
 - Fixed bugs in ConvertNV21
-  * Was apply YV12 byte alignment to NV21 images.  Depending on image size, this could cause a crash.
+  * Was applying YV12 byte alignment to NV21 images.  Depending on image size, this could cause a crash.
 - Fixed bug in ImplConvertToBitmap.multiToArray_F32()
   * Didn't handle case where the input image has 3 bands and not 4
 
