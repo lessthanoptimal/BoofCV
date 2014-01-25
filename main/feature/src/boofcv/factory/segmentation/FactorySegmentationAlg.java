@@ -69,9 +69,9 @@ public class FactorySegmentationAlg {
 	 * Creates an instance of {@link SegmentMeanShift}.  Uniform distributions are used for spacial and color
 	 * weights.
 	 *
-	 * @param spacialRadius Radius of mean-shift region in pixels
-	 * @param colorRadius Radius of mean-shift region for color in Euclidean distance.
-	 * @param minimumRegionSize Minimum allowed size of a region in pixels.
+	 * @param spacialRadius Radius of mean-shift region in pixels. Try 6
+	 * @param colorRadius Radius of mean-shift region for color in Euclidean distance. Try 15
+	 * @param minimumRegionSize Minimum allowed size of a region in pixels. Try 30
 	 * @param fast Improve runtime by approximating running mean-shift on each pixel. Try true.
 	 * @param imageType Type of input image
 	 * @return SegmentMeanShift
@@ -101,8 +101,9 @@ public class FactorySegmentationAlg {
 		ComputeRegionMeanColor<T> regionColor = regionMeanColor(imageType);
 		MergeRegionMeanShift merge = new MergeRegionMeanShift(3,colorRadius/2);
 
-		PruneSmallRegions<T> prune = new PruneSmallRegions<T>(minimumRegionSize,regionColor);
+		PruneSmallRegions<T> prune = minimumRegionSize >= 2 ?
+				new PruneSmallRegions<T>(minimumRegionSize,regionColor) : null;
 
-		return new SegmentMeanShift<T>(search,merge,prune);
+		return new SegmentMeanShift<T>(search,merge,prune,4);
 	}
 }
