@@ -18,27 +18,21 @@
 
 package boofcv.alg.segmentation;
 
-import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_I32;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
  */
 public class TestRegionMergeTree {
 
-	public void performMerge() {
-		fail("Implement");
-	}
-
 	@Test
 	public void flowIntoRootNode() {
 		RegionMergeTree alg = new RegionMergeTree();
 		alg.mergeList.resize(7);
-		alg.mergeList.data = new int[]{1,-1,-1,2,2,3,5};
+		alg.mergeList.data = new int[]{1,1,2,2,2,3,5};
 
 		GrowQueue_I32 regionMemberCount = new GrowQueue_I32(7);
 		regionMemberCount.size = 7;
@@ -52,7 +46,7 @@ public class TestRegionMergeTree {
 			assertEquals(expectedCount[i],regionMemberCount.data[i]);
 
 		// check mergeList
-		int expectedMerge[] = new int[]{1,-1,-1,2,2,2,2};
+		int expectedMerge[] = new int[]{1,1,2,2,2,2,2};
 		for( int i = 0; i < expectedMerge.length; i++ )
 			assertEquals(expectedMerge[i],alg.mergeList.data[i]);
 
@@ -69,7 +63,7 @@ public class TestRegionMergeTree {
 
 		RegionMergeTree alg = new RegionMergeTree();
 		alg.mergeList.resize(7);
-		alg.mergeList.data = new int[]{1,-1,-1,2,2,2,2};
+		alg.mergeList.data = new int[]{1,1,2,2,2,2,2};
 
 		alg.rootID.resize(7);
 		alg.rootID.data = new int[]{0,0,1,0,0,0,0};
@@ -96,11 +90,11 @@ public class TestRegionMergeTree {
 	@Test
 	public void markMerge_quick() {
 
-		int expected[] = new int[]{1,-1,-1,2,2,3,5};
+		int expected[] = new int[]{1,1,2,2,2,3,5};
 
 		RegionMergeTree alg = new RegionMergeTree();
 		alg.mergeList.resize(7);
-		alg.mergeList.data = new int[]{1,-1,-1,2,2,3,5};
+		alg.mergeList.data = new int[]{1,1,2,2,2,3,5};
 
 		// case 1 - Both are references
 		alg.markMerge(3,4);
@@ -124,7 +118,7 @@ public class TestRegionMergeTree {
 	@Test
 	public void markMergee_merge() {
 
-		int original[] = new int[]{1,-1,-1,2,2,3,5};
+		int original[] = new int[]{1,1,2,2,2,3,5};
 
 		RegionMergeTree alg = new RegionMergeTree();
 		alg.mergeList.resize(7);
@@ -132,20 +126,20 @@ public class TestRegionMergeTree {
 
 		// Both are root nodes
 		alg.markMerge(1, 2);
-		assertEquals(-1, alg.mergeList.data[1]);
+		assertEquals(1, alg.mergeList.data[1]);
 		assertEquals(1,alg.mergeList.data[2]);
 
 		// both are references
 		alg.mergeList.data = original.clone();
 		alg.markMerge(0, 3);
-		int expected[] = new int[]{1,-1,1,1,2,3,5};
+		int expected[] = new int[]{1,1,1,1,2,3,5};
 		for( int i = 0; i < expected.length; i++ )
 			assertEquals(expected[i],alg.mergeList.data[i]);
 
 		// Both point to the same data but aren't equivalent references, so no change
 		alg.mergeList.data = original.clone();
 		alg.markMerge(3, 6);
-		expected = new int[]{1,-1,-1,2,2,3,2};
+		expected = new int[]{1,1,2,2,2,3,2};
 		for( int i = 0; i < expected.length; i++ )
 			assertEquals(expected[i],alg.mergeList.data[i]);
 
@@ -153,20 +147,6 @@ public class TestRegionMergeTree {
 		alg.markMerge(6, 3);
 		for( int i = 0; i < expected.length; i++ )
 			assertEquals(expected[i],alg.mergeList.data[i]);
-	}
-
-	private FastQueue<float[]> createList( int ...colors ) {
-		FastQueue<float[]> ret = new FastQueue<float[]>(float[].class,true) {
-			@Override
-			protected float[] createInstance() {
-				return new float[1];
-			}
-		};
-
-		for( int i = 0; i < colors.length; i++ ) {
-			ret.grow()[0] = colors[i];
-		}
-		return ret;
 	}
 
 }

@@ -157,7 +157,7 @@ public class ClusterLabeledImage extends RegionMergeTree {
 				if( outputLabel == -1 ) { // see if it needs to create a new output segment
 					output.data[indexOut] = outputLabel = regionMemberCount.size;
 					regionMemberCount.add(1);
-					mergeList.add(-1);
+					mergeList.add(outputLabel);
 				}
 
 				for( int i = 0; i < edgesIn.length; i++ ) {
@@ -189,7 +189,7 @@ public class ClusterLabeledImage extends RegionMergeTree {
 				outputLabel = regionMemberCount.size;
 				output.unsafe_set(x,y,outputLabel);
 				regionMemberCount.add(1);
-				mergeList.add(-1);
+				mergeList.add(outputLabel);
 			}
 
 			// check right first
@@ -225,7 +225,7 @@ public class ClusterLabeledImage extends RegionMergeTree {
 				outputLabel = regionMemberCount.size;
 				output.unsafe_set(x,y,outputLabel);
 				regionMemberCount.add(1);
-				mergeList.add(-1);
+				mergeList.add(outputLabel);
 			}
 
 			for( int i = 0; i < edges.length; i++ ) {
@@ -262,7 +262,7 @@ public class ClusterLabeledImage extends RegionMergeTree {
 				outputLabel = regionMemberCount.size;
 				output.unsafe_set(x,y,outputLabel);
 				regionMemberCount.add(1);
-				mergeList.add(-1);
+				mergeList.add(outputLabel);
 			}
 
 			// for 4 and 8 connect the check is only +1 x and 0 y

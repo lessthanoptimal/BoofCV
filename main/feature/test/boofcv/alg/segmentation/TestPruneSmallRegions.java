@@ -268,12 +268,12 @@ public class TestPruneSmallRegions {
 		alg.selectMerge(0,regionColor);
 
 		// doesn't matter which one is merged into which
-		if( alg.mergeList.get(2) != -1 ) {
+		if( alg.mergeList.get(4) == 4 ) {
 			assertEquals(4, alg.mergeList.get(2));
-			assertEquals(-1, alg.mergeList.get(4));
+			assertEquals(4, alg.mergeList.get(4));
 		} else {
 			assertEquals(2, alg.mergeList.get(4));
-			assertEquals(-1, alg.mergeList.get(2));
+			assertEquals(2, alg.mergeList.get(2));
 		}
 	}
 
