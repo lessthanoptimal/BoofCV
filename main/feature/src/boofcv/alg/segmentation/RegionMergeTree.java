@@ -27,10 +27,9 @@ import org.ddogleg.struct.GrowQueue_I32;
  * first call {@Link #markMerge}. Then after all the regions which are to be merged are marked call
  * {@link #performMerge}.
  *
- *
- * Internally a directed tree graph is maintained.  When two regions are marked to be merged  they are made to
- * point to the same node.  Later on the graph is examined and all connected nodes are made to point to the same
- * root.  Then all data structures are updated.
+ * Internally a disjoint-set forest tree graph is maintained using an array.  When two regions are marked to be merged
+ * (set-union) path-compression is done.  After merging hsa finished, the graph is fully compressed so that all nodes
+ * point to their root directly.  Then the output is computed.
  *
  * @author Peter Abeles
  */
@@ -38,7 +37,8 @@ public class RegionMergeTree {
 
 	// list used to convert the original region ID's into their new compacted ones
 	// The values indicate which region a region is to be merged into
-	// An value of -1 indicates that the region is not to be merged with any others
+	// An value of equal to its index indicates that the region is a root in the graph and
+	// is not to be merged with any others
 	protected GrowQueue_I32 mergeList = new GrowQueue_I32();
 
 	// Local copy of these lists after elements which have been merged are removed
@@ -53,7 +53,8 @@ public class RegionMergeTree {
 	 */
 	public void initializeMerge(int numRegions) {
 		mergeList.resize(numRegions);
-		mergeList.fill(-1);
+		for( int i = 0; i < numRegions; i++ )
+			mergeList.data[i] = i;
 	}
 
 	/**
@@ -87,7 +88,7 @@ public class RegionMergeTree {
 			int p = mergeList.data[i];
 
 			// see if it is a root note
-			if( p == -1 ) {
+			if( p == i ) {
 				// mark the root nodes new ID
 				rootID.data[i] = count++;
 				continue;
@@ -95,7 +96,7 @@ public class RegionMergeTree {
 
 			// traverse down until it finds the root note
 			int gp = mergeList.data[p];
-			while( gp != -1 ) {
+			while( gp != p ) {
 				p = gp;
 				gp = mergeList.data[p];
 			}
@@ -117,7 +118,7 @@ public class RegionMergeTree {
 		for( int i = 0; i < mergeList.size; i++ ) {
 			int p = mergeList.data[i];
 
-			if( p == -1 ) {
+			if( p == i ) {
 				mergeList.data[i] = rootID.data[i];
 				tmpMemberCount.add( regionMemberCount.data[i] );
 			} else {
@@ -130,7 +131,7 @@ public class RegionMergeTree {
 	}
 
 	/**
-	 * <p>This function will mark two regions for merger.</p>
+	 * <p>This function will mark two regions for merger.  Equivalent to set-union operation.</p>
 	 *
 	 * <p>
 	 * If the two regions have yet to be merged into any others then regionB will become a member of regionA.
@@ -144,42 +145,27 @@ public class RegionMergeTree {
 		int dA = mergeList.data[regionA];
 		int dB = mergeList.data[regionB];
 
-		// see if they link to the same thing doing the quick check
-		if( dA != -1 && dB != -1 ) {
-			if( dA == dB )
-				return;
-		} else if( dA != -1 ) {
-			if( dA == regionB )
-				return;
-		} else if( dB != -1 ) {
-			if( dB == regionA )
-				return;
+		// Quick check to see if they reference the same node
+		if( dA == dB ) {
+			return;
 		}
 
-		// search down to the root node
+		// search down to the root node  (set-find)
 		int rootA = regionA;
-		while( dA != -1 ) {
+		while( dA != rootA ) {
 			rootA = dA;
 			dA = mergeList.data[rootA];
 		}
 
 		int rootB = regionB;
-		while( dB != -1 ) {
+		while( dB != rootB ) {
 			rootB = dB;
 			dB = mergeList.data[rootB];
 		}
 
-		// if they are not the same link merge one into the other
-		if( rootA != rootB ) {
-			mergeList.data[rootB] = rootA;
-		}
-
-		// make it so that the quick check will work the next time        '
-		if( regionB != rootA ) {
-			mergeList.data[regionB] = rootA;
-		}
-		if( mergeList.data[regionA] != -1 ) {
-			mergeList.data[regionA] = rootA;
-		}
+		// make rootA the parent.  This allows the quick test to pass in the future
+		mergeList.data[regionA] = rootA;
+		mergeList.data[regionB] = rootA;
+		mergeList.data[rootB] = rootA;
 	}
 }
