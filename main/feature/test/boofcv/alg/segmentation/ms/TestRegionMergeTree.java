@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.segmentation;
+package boofcv.alg.segmentation.ms;
 
 import org.ddogleg.struct.GrowQueue_I32;
 import org.junit.Test;

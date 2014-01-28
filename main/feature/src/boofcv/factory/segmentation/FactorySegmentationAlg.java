@@ -21,7 +21,7 @@ package boofcv.factory.segmentation;
 import boofcv.alg.interpolate.InterpolatePixelMB;
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.interpolate.TypeInterpolate;
-import boofcv.alg.segmentation.*;
+import boofcv.alg.segmentation.ms.*;
 import boofcv.alg.weights.WeightDistanceUniform_F32;
 import boofcv.alg.weights.WeightDistance_F32;
 import boofcv.alg.weights.WeightPixelUniform_F32;
@@ -38,7 +38,7 @@ import boofcv.struct.image.ImageType;
 public class FactorySegmentationAlg {
 
 	/**
-	 * Creates an instance of {@link ComputeRegionMeanColor} for the specified image type.
+	 * Creates an instance of {@link boofcv.alg.segmentation.ms.ComputeRegionMeanColor} for the specified image type.
 	 *
 	 * @param imageType image type
 	 * @return ComputeRegionMeanColor
@@ -66,7 +66,7 @@ public class FactorySegmentationAlg {
 	}
 
 	/**
-	 * Creates an instance of {@link SegmentMeanShift}.  Uniform distributions are used for spacial and color
+	 * Creates an instance of {@link boofcv.alg.segmentation.ms.SegmentMeanShift}.  Uniform distributions are used for spacial and color
 	 * weights.
 	 *
 	 * @param spacialRadius Radius of mean-shift region in pixels. Try 6

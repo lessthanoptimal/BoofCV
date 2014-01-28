@@ -16,59 +16,46 @@
  * limitations under the License.
  */
 
-package boofcv.alg.segmentation;
+package boofcv.alg.segmentation.ms;
 
-import boofcv.alg.interpolate.InterpolatePixelMB;
+import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.alg.weights.WeightDistance_F32;
 import boofcv.alg.weights.WeightPixel_F32;
-import boofcv.struct.image.ImageMultiBand;
-import boofcv.struct.image.ImageType;
+import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_I32;
 import org.ddogleg.struct.FastQueue;
 
-import java.util.Arrays;
-
 /**
  * <p>
- * Implementation of {@link SegmentMeanShiftSearch} for color images
+ * Implementation of {@link SegmentMeanShiftSearch} for gray-scale images
  * </p>
  *
  * @author Peter Abeles
  */
-public class SegmentMeanShiftSearchColor<T extends ImageMultiBand> extends SegmentMeanShiftSearch<T> {
+public class SegmentMeanShiftSearchGray<T extends ImageSingleBand> extends SegmentMeanShiftSearch<T> {
 
 	// Interpolation routine used to get sub-pixel samples
-	protected InterpolatePixelMB<T> interpolate;
+	protected InterpolatePixelS<T> interpolate;
 
-	// storage for interpolated pixel value
-	protected float[] pixelColor;
-	protected float[] meanColor;
-	protected float[] sumColor;
+	protected float meanGray;
 
 	// Mean-shift trajectory history
 	protected FastQueue<Point2D_F32> history = new FastQueue<Point2D_F32>(Point2D_F32.class,true);
 
-
-	public SegmentMeanShiftSearchColor(int maxIterations, float convergenceTol,
-									   InterpolatePixelMB<T> interpolate,
-									   WeightPixel_F32 weightSpacial,
-									   WeightDistance_F32 weightGray,
-									   boolean fast,
-									   ImageType<T> imageType) {
+	public SegmentMeanShiftSearchGray(int maxIterations, float convergenceTol,
+									  InterpolatePixelS<T> interpolate,
+									  WeightPixel_F32 weightSpacial,
+									  WeightDistance_F32 weightGray,
+									  boolean fast ) {
 		super(maxIterations,convergenceTol,weightSpacial,weightGray,fast);
 		this.interpolate = interpolate;
-		this.pixelColor = new float[ imageType.getNumBands() ];
-		this.meanColor = new float[ imageType.getNumBands() ];
-		this.sumColor = new float[ imageType.getNumBands() ];
-
-		final int numBands = imageType.getNumBands();
 
 		modeColor = new FastQueue<float[]>(float[].class,true) {
 			@Override
 			protected float[] createInstance() {
-				return new float[ numBands ];
+				return new float[ 1 ];
 			}
 		};
 	}
@@ -99,14 +86,14 @@ public class SegmentMeanShiftSearchColor<T extends ImageMultiBand> extends Segme
 		// use mean shift to find the peak of each pixel in the image
 		int indexImg = 0;
 		for( int y = 0; y < image.height; y++ ) {
-			for( int x = 0; x < image.width; x++ , indexImg++ ) {
+			for( int x = 0; x < image.width; x++ , indexImg++) {
 				if( pixelToMode.data[indexImg] != -1 ) {
 					int peakIndex = pixelToMode.data[indexImg];
 					modeMemberCount.data[peakIndex]++;
 					continue;
 				}
 
-				interpolate.get(x, y, meanColor);
+				float meanColor = interpolate.get(x, y);
 				findPeak(x,y, meanColor);
 
 				// convert mean-shift location into pixel index
@@ -122,7 +109,7 @@ public class SegmentMeanShiftSearchColor<T extends ImageMultiBand> extends Segme
 					modeIndex = this.modeLocation.size();
 					this.modeLocation.grow().set(modeX, modeY);
 					// Save the peak's color
-					savePeakColor(meanColor);
+					modeColor.grow()[0] = meanGray;
 					// Mark the mode in the segment image
 					quickMode.data[modePixelIndex] = modeIndex;
 					// Set the initial count to zero. This will be incremented when it is traversed later on
@@ -151,18 +138,16 @@ public class SegmentMeanShiftSearchColor<T extends ImageMultiBand> extends Segme
 	/**
 	 * Uses mean-shift to find the peak.  Returns the peak as an index in the image data array.
 	 *
-	 * @param meanColor The color value which mean-shift is trying to find a region which minimises it
+	 * @param gray The color value which mean-shift is trying to find a region which minimises it
 	 */
-	protected void findPeak( float cx , float cy , float[] meanColor ) {
+	protected void findPeak( float cx , float cy , float gray ) {
 
 		history.reset();
 		history.grow().set(cx,cy);
 
 		for( int i = 0; i < maxIterations; i++ ) {
 			float total = 0;
-			float sumX = 0, sumY = 0;
-
-			Arrays.fill(sumColor,0);
+			float sumX = 0, sumY = 0, sumGray = 0;
 
 			int kernelIndex = 0;
 
@@ -176,15 +161,15 @@ public class SegmentMeanShiftSearchColor<T extends ImageMultiBand> extends Segme
 					for( int xx = 0; xx < widthX; xx++ ) {
 						float ws = weightSpacial.weightIndex(kernelIndex++);
 						// compute distance between gray scale value as euclidean squared
-						interpolate.get_fast(x0 + xx, y0 + yy, pixelColor);
-						float d = distanceSq(pixelColor,meanColor);
-						float wg = weightColor.weight(d);
+						float pixelGray = interpolate.get_fast(x0 + xx, y0 + yy);
+						float d = pixelGray - gray;
+						float wg = weightColor.weight(d*d);
 						// Total weight is the combination of spacial and color values
 						float weight = ws*wg;
 						total += weight;
 						sumX += weight*(xx+x0);
 						sumY += weight*(yy+y0);
-						sumColor(sumColor, pixelColor,weight);
+						sumGray += weight*pixelGray;
 					}
 				}
 			} else {
@@ -207,14 +192,14 @@ public class SegmentMeanShiftSearchColor<T extends ImageMultiBand> extends Segme
 						}
 
 						float ws = weightSpacial.weightIndex(kernelIndex);
-						interpolate.get(x0 + xx, y0 + yy, pixelColor);
-						float d = distanceSq(pixelColor,meanColor);
-						float wg = weightColor.weight(d);
+						float pixelGray = interpolate.get(sampleX, sampleY);
+						float d = pixelGray - gray;
+						float wg = weightColor.weight(d*d);
 						float weight = ws*wg;
 						total += weight;
 						sumX += weight*(xx+x0);
 						sumY += weight*(yy+y0);
-						sumColor(sumColor, pixelColor,weight);
+						sumGray += weight*pixelGray;
 					}
 				}
 			}
@@ -243,12 +228,11 @@ public class SegmentMeanShiftSearchColor<T extends ImageMultiBand> extends Segme
 				}
 			}
 
-			// move on to the next iteration
 			float dx = peakX-cx;
 			float dy = peakY-cy;
 
 			cx = peakX; cy = peakY;
-			meanColor(sumColor,meanColor,total);
+			gray = sumGray/total;
 
 			if( Math.abs(dx) < convergenceTol && Math.abs(dy) < convergenceTol ) {
 				break;
@@ -257,24 +241,6 @@ public class SegmentMeanShiftSearchColor<T extends ImageMultiBand> extends Segme
 
 		this.modeX = cx;
 		this.modeY = cy;
-	}
-
-	protected static void meanColor( float[] sum, float[] mean , float total ) {
-		for( int i = 0; i < sum.length; i++ ) {
-			mean[i] = sum[i]/total;
-		}
-	}
-
-	protected static void sumColor( float[] sum, float[] pixel , float weight ) {
-		for( int i = 0; i < sum.length; i++ ) {
-			sum[i] += pixel[i]*weight;
-		}
-	}
-
-	protected void savePeakColor( float[] a ) {
-		float[] b = modeColor.grow();
-		for( int i = 0; i < a.length; i++ ) {
-			b[i] = a[i];
-		}
+		this.meanGray = gray;
 	}
 }
