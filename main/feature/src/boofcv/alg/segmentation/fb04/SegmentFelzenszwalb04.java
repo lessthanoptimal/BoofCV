@@ -19,8 +19,8 @@
 package boofcv.alg.segmentation.fb04;
 
 import boofcv.alg.InputSanityCheck;
+import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageSInt32;
-import boofcv.struct.image.ImageSingleBand;
 import org.ddogleg.struct.GrowQueue_F32;
 import org.ddogleg.struct.GrowQueue_I32;
 
@@ -37,11 +37,16 @@ import java.util.List;
  * in the region (paper says max weight of MST, see comments in code why this is miss leading). For more details
  * see [1].
  * </p>
- *
+
  * <p>
  * One difference from the original is that Gaussian blur is not applied to the input image by default.  That
  * should be done prior to the image being passed in.
  * </p>
+ *
+ * <P>
+ * NOTE: Region ID's in output image will NOT be sequential.  You need to call {@link #getRegionId()} to find
+ * out what the ID's are.
+ * </P>
  *
  * <p>
  * [1] Felzenszwalb, Pedro F., and Daniel P. Huttenlocher.
@@ -50,14 +55,18 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class SegmentFelzenszwalb04<T extends ImageSingleBand> {
+// TODO optimize sort
+public class SegmentFelzenszwalb04<T extends ImageBase> {
 
 	// tuning parameter.  Determines the number of segments
 	private int K;
 
-	// Storage for the disjoint-set forest.  This is the same image as the output segmented image.
+	// the minimum region size.  Regions smaller than this are merged into larger ones
+	private int minimumSize;
+
+	// Storage for the disjoint-set forest.  Same data structure as 'output', but renamed for convenience.
 	// Value stored in each pixel refers to the parent vertex.  A root vertex contains a reference for itself
-	private ImageSInt32 graph;
+	protected ImageSInt32 graph = new ImageSInt32(1,1);
 
 	// Function that computes the weight for each edge
 	private ComputeEdgeWeights<T> computeWeights;
@@ -70,37 +79,41 @@ public class SegmentFelzenszwalb04<T extends ImageSingleBand> {
 	private List<Edge> nextActiveEdges = new ArrayList<Edge>();
 
 	// Size of each region
-	private GrowQueue_I32 regionSize = new GrowQueue_I32();
+	protected GrowQueue_I32 regionSize = new GrowQueue_I32();
 	// Internal difference of a component, Int(C) Equation 1.  Max edge in the minimum-spanning-tree.
 	// Comment: The only reason this is the a MST is because it is the only tree.  If all adjacent pixels
 	//          were considered for connectivity (as is reasonable/common) then their technique would be incorrect.
 	private GrowQueue_F32 segmentIntDiff = new GrowQueue_F32();
 
-	// Conversion from new label to original label of root nodes
-	private GrowQueue_I32 outputLabels = new GrowQueue_I32();
+	// List of region ID's and their size
+	private GrowQueue_I32 outputRegionId = new GrowQueue_I32();
+	private GrowQueue_I32 outputRegionSizes = new GrowQueue_I32();
 
 	/**
 	 * Specifies tuning parameter
 	 *
 	 * @param k Tuning parameter.  Larger regions are preferred for larger values of K.  Try 300
+	 * @param minimumSize Regions smaller than this are merged into larger regions
 	 * @param computeWeights Function used to compute the weight for all the edges.
 	 */
-	public SegmentFelzenszwalb04(int k, ComputeEdgeWeights<T> computeWeights) {
+	public SegmentFelzenszwalb04(int k, int minimumSize, ComputeEdgeWeights<T> computeWeights) {
 		K = k;
+		this.minimumSize = minimumSize;
 		this.computeWeights = computeWeights;
 	}
 
 	/**
-	 * Segments the image.  Each region is given a unique ID from 0 to N-1.  The number of regions and the number
-	 * of pixels in each region is provided in outputRegionSize.
+	 * Segments the image.  Each region in the output image is given a unique ID.  To find out what the ID
+	 * of each region is call {@link #getRegionId()}.  To get a list of number of pixels in each region call
+	 * {@link #getRegionSizes()}.
+	 *
 	 * @param input Input image.  Not modified.
 	 * @param output Output segmented image.  Modified.
-	 * @param outputRegionSize Output list containing the number of pixels in each region.
 	 */
-	public void process( T input , ImageSInt32 output , GrowQueue_I32 outputRegionSize ) {
-		InputSanityCheck.checkSameShape(input,output);
+	public void process( T input , ImageSInt32 output ) {
+		InputSanityCheck.checkSameShape(input, output);
 
-		initialize(input, output);
+		initialize(input,output);
 
 		// compute edges weights
 		computeWeights.process(input, output.startIndex, output.stride, activeEdges);
@@ -108,16 +121,20 @@ public class SegmentFelzenszwalb04<T extends ImageSingleBand> {
 		// Merge regions together
 		mergeRegions();
 
-		// Update regions in the output image such that they are consecutive
-		formatForOutput(output, outputRegionSize);
+		// Get rid of small ones
+		mergeSmallRegions();
+
+		// compute the final output
+		computeOutput();
 	}
 
 	/**
 	 * Predeclares all memory required and sets data structures to their initial values
 	 */
-	private void initialize(T input, ImageSInt32 output) {
+	protected void initialize(T input , ImageSInt32 output ) {
 		this.graph = output;
 		final int N = input.width*input.height;
+		final int M = computeNumberOfEdges(input.width,input.height);
 
 		edgesStorage.clear();
 		activeEdges.clear();
@@ -130,10 +147,10 @@ public class SegmentFelzenszwalb04<T extends ImageSingleBand> {
 			regionSize.data[i] = 1;
 			segmentIntDiff.data[i] = 0;
 		}
-		for( int i = edgesStorage.size(); i < N; i++ ) {
+		for( int i = edgesStorage.size(); i < M; i++ ) {
 			edgesStorage.add(new Edge());
 		}
-		for( int i = edgesStorage.size(); i < N; i++ ) {
+		for( int i = 0; i < M; i++ ) {
 			activeEdges.add( edgesStorage.get(i) );
 		}
 	}
@@ -142,10 +159,13 @@ public class SegmentFelzenszwalb04<T extends ImageSingleBand> {
 	 * Follows the merge procedure output in [1].  Two regions are merged together if the edge linking them
 	 * has a weight which is <= the minimum of the heaviest edges in the two regions.
 	 */
-	private void mergeRegions() {
+	protected void mergeRegions() {
 
 		// sort edges
+		long time0 = System.currentTimeMillis();
 		Collections.sort(activeEdges);
+		long time1 = System.currentTimeMillis();
+		System.out.println("Sort time " + (time1 - time0));
 
 		// iterate until convergence
 		int M = activeEdges.size();
@@ -172,7 +192,7 @@ public class SegmentFelzenszwalb04<T extends ImageSingleBand> {
 				float intA = segmentIntDiff.get(rootA);
 				float intB = segmentIntDiff.get(rootB);
 
-				float MInt = Math.min(intA + K/sizeA , intB + K/sizeB);
+				float MInt = Math.min(intA + (K/sizeA)*(K/sizeA) , intB + (K/sizeB)*(K/sizeB));
 
 				if( e.weight <= MInt )  {
 					// ----- Merge the two regions/components
@@ -190,23 +210,50 @@ public class SegmentFelzenszwalb04<T extends ImageSingleBand> {
 					graph.data[rootB] = rootA;
 
 					// Update the size of regionA
-					regionSize.data[rootA] += graph.data[rootB];
+					regionSize.data[rootA] = sizeA + sizeB;
 				} else {
 					nextActiveEdges.add(e);
 				}
-
-				// see if the graph has changed
-				if( totalActive == nextActiveEdges.size() ) {
-					break;
-				}
-
-				// swap the lists
 			}
 
 			// swap active lists
 			List<Edge> tmp = activeEdges;
 			activeEdges = nextActiveEdges;
 			nextActiveEdges = tmp;
+
+			// see if the graph has changed
+			if( totalActive == activeEdges.size() ) {
+				break;
+			}
+		}
+	}
+
+	/**
+	 * Look at the remaining regions and if there are any small ones marge them into a larger region
+	 */
+	protected void mergeSmallRegions() {
+		for( int j = 0; j < activeEdges.size(); j++ ) {
+			Edge e = activeEdges.get(j);
+
+			int rootA = find(e.indexA);
+			int rootB = find(e.indexB);
+
+			// see if they are already part of the same segment
+			if( rootA == rootB )
+				continue;
+
+			int sizeA = regionSize.get(rootA);
+			int sizeB = regionSize.get(rootB);
+
+			// merge if one of the regions is too small
+			if( sizeA < minimumSize || sizeB < minimumSize ) {
+				// Point everything towards rootA
+				graph.data[e.indexB] = rootA;
+				graph.data[rootB] = rootA;
+
+				// Update the size of regionA
+				regionSize.data[rootA] = sizeA + sizeB;
+			}
 		}
 	}
 
@@ -214,7 +261,7 @@ public class SegmentFelzenszwalb04<T extends ImageSingleBand> {
 	 * Finds the root given child.  If the child does not point directly to the parent find the parent and make
 	 * the child point directly towards it.
 	 */
-	private int find( int child ) {
+	protected int find( int child ) {
 		int root = graph.data[child];
 
 		if( root == graph.data[root] )
@@ -230,39 +277,51 @@ public class SegmentFelzenszwalb04<T extends ImageSingleBand> {
 	}
 
 	/**
-	 * Compacts the region labels such that they are consecutive numbers starting from 0.  Creates the final list
-	 * of region size.
+	 * Searches for root nodes in the graph and adds their size to the list of region sizes.  Makes sure all
+	 * other nodes in the graph point directly at the root.
 	 */
-	private void formatForOutput(ImageSInt32 output, GrowQueue_I32 outputRegionSize) {
-		outputRegionSize.reset();
-		outputLabels.reset();
-		// in the first pass find all the root nodes and make sure all the children directly point to the root
-		// Also add the size of each region to the output region size
-		for( int i = 0; i < output.data.length; i++ ) {
-			int parent = output.data[i];
-			if( parent == output.data[parent] ) {
-				outputLabels.add( parent );
-				outputRegionSize.add( regionSize.get(parent) );
-			} else {
-				// find the parent and set the child to it
-				int child = i;
-				while( parent != child ) {
-					child = parent;
-					parent = graph.data[child];
+	protected void computeOutput() {
+		outputRegionId.reset();
+		outputRegionSizes.reset();
+		for( int y = 0; y < graph.height; y++ ) {
+			int indexGraph = graph.startIndex + y*graph.stride;
+			for( int x = 0; x < graph.width; x++ , indexGraph++) {
+				int parent = graph.data[indexGraph];
+				if( parent == indexGraph ) {
+					outputRegionId.add(indexGraph);
+					outputRegionSizes.add(regionSize.get(indexGraph));
+				} else {
+					// find the parent and set the child to it
+					int child = indexGraph;
+					while( parent != child ) {
+						child = parent;
+						parent = graph.data[child];
+					}
+					graph.data[indexGraph] = parent;
 				}
-				output.data[i] = parent;
 			}
 		}
-		// Change the label of root nodes to be the new compacted labels
-		for( int i = 0; i < outputLabels.size; i++ ) {
-			output.data[outputLabels.data[i]] = i;
-		}
+	}
 
-		// In the second pass assign all the children to the new compacted labels
-		for( int i = 0; i < output.data.length; i++ ) {
-			int parent = output.data[i];
-			output.data[i] = output.data[parent];
-		}
+	/**
+	 * Computes the number of edge in an image using a 4-connect rule
+	 */
+	public static int computeNumberOfEdges( int width , int height ) {
+		return width*(height-1) + (width-1)*height;
+	}
+
+	/**
+	 * List of ID's for each region in the segmented image.
+	 */
+	public GrowQueue_I32 getRegionId() {
+		return outputRegionId;
+	}
+
+	/**
+	 * Number of pixels in each region
+	 */
+	public GrowQueue_I32 getRegionSizes() {
+		return outputRegionSizes;
 	}
 
 	/**

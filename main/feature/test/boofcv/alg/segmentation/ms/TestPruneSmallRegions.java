@@ -18,6 +18,7 @@
 
 package boofcv.alg.segmentation.ms;
 
+import boofcv.alg.segmentation.ComputeRegionMeanColor;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSInt32;
 import boofcv.struct.image.ImageUInt8;

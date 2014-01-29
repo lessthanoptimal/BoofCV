@@ -21,6 +21,11 @@ package boofcv.factory.segmentation;
 import boofcv.alg.interpolate.InterpolatePixelMB;
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.interpolate.TypeInterpolate;
+import boofcv.alg.segmentation.ComputeRegionMeanColor;
+import boofcv.alg.segmentation.fb04.ComputeEdgeWeights;
+import boofcv.alg.segmentation.fb04.ComputeEdgeWeights_MsU8;
+import boofcv.alg.segmentation.fb04.ComputeEdgeWeights_U8;
+import boofcv.alg.segmentation.fb04.SegmentFelzenszwalb04;
 import boofcv.alg.segmentation.ms.*;
 import boofcv.alg.weights.WeightDistanceUniform_F32;
 import boofcv.alg.weights.WeightDistance_F32;
@@ -38,7 +43,7 @@ import boofcv.struct.image.ImageType;
 public class FactorySegmentationAlg {
 
 	/**
-	 * Creates an instance of {@link boofcv.alg.segmentation.ms.ComputeRegionMeanColor} for the specified image type.
+	 * Creates an instance of {@link boofcv.alg.segmentation.ComputeRegionMeanColor} for the specified image type.
 	 *
 	 * @param imageType image type
 	 * @return ComputeRegionMeanColor
@@ -105,5 +110,34 @@ public class FactorySegmentationAlg {
 				new PruneSmallRegions<T>(minimumRegionSize,regionColor) : null;
 
 		return new SegmentMeanShift<T>(search,merge,prune,4);
+	}
+
+	public static <T extends ImageBase>
+	ComputeEdgeWeights<T> weightsFelzenszwalb04(ImageType<T> imageType) {
+		if( imageType.getFamily() == ImageType.Family.SINGLE_BAND ) {
+			switch( imageType.getDataType() ) {
+				case U8:
+					return (ComputeEdgeWeights)new ComputeEdgeWeights_U8();
+			}
+		} else if( imageType.getFamily() == ImageType.Family.MULTI_SPECTRAL ) {
+			int N = imageType.getNumBands();
+			switch( imageType.getDataType() ) {
+				case U8:
+					return (ComputeEdgeWeights)new ComputeEdgeWeights_MsU8();
+//				case F32:
+//					return (ComputeRegionMeanColor)new ComputeRegionMeanColor.MS_F32(N);
+			}
+		}
+
+		throw new IllegalArgumentException("Unknown imageType");
+	}
+
+	public static<T extends ImageBase>
+	SegmentFelzenszwalb04<T> felzenszwalb04( int K , int minimumRegionSize , ImageType<T> imageType )
+	{
+
+		ComputeEdgeWeights<T> edgeWeights = weightsFelzenszwalb04(imageType);
+
+		return new SegmentFelzenszwalb04<T>(K,minimumRegionSize,edgeWeights);
 	}
 }

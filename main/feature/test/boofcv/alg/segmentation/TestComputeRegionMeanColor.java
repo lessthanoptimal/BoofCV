@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.segmentation.ms;
+package boofcv.alg.segmentation;
 
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSInt32;

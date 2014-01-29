@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.segmentation.ms;
+package boofcv.alg.segmentation;
 
 import boofcv.struct.image.*;
 import org.ddogleg.struct.FastQueue;

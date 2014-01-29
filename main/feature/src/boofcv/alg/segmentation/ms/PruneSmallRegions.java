@@ -18,6 +18,7 @@
 
 package boofcv.alg.segmentation.ms;
 
+import boofcv.alg.segmentation.ComputeRegionMeanColor;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageSInt32;
 import org.ddogleg.struct.FastQueue;
