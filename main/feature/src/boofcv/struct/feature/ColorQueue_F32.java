@@ -18,8 +18,25 @@
 
 package boofcv.struct.feature;
 
+import org.ddogleg.struct.FastQueue;
+
 /**
+ * Stores an array of floats on constant size.  Intended for storing multi band data.
+ *
  * @author Peter Abeles
  */
-public class ColorQueue_F32 {
+public class ColorQueue_F32 extends FastQueue<float[]> {
+
+	int numBands;
+
+	public ColorQueue_F32(int numBands) {
+		super(float[].class, true);
+		this.numBands = numBands;
+	}
+
+	@Override
+	protected float[] createInstance() {
+		return new float[ numBands ];
+	}
+
 }

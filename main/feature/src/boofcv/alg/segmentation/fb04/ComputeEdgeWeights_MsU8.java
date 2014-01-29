@@ -70,11 +70,11 @@ public class ComputeEdgeWeights_MsU8 implements ComputeEdgeWeights<MultiSpectral
 				Edge e1 = edges.get(indexEdge++);
 				Edge e2 = edges.get(indexEdge++);
 
-				e1.weight = (float)Math.sqrt(weight1);
+				e1.sortValue = (float)Math.sqrt(weight1);
 				e1.indexA = indexDst;
 				e1.indexB = indexDst+1;
 
-				e2.weight = (float)Math.sqrt(weight2);
+				e2.sortValue = (float)Math.sqrt(weight2);
 				e2.indexA = indexDst;
 				e2.indexB = indexDst+outputStride;
 			}
@@ -100,7 +100,7 @@ public class ComputeEdgeWeights_MsU8 implements ComputeEdgeWeights<MultiSpectral
 
 			Edge e2 = edges.get(indexEdge++);
 
-			e2.weight = (float)Math.sqrt(weight2);
+			e2.sortValue = (float)Math.sqrt(weight2);
 			e2.indexA = indexDst;
 			e2.indexB = indexDst+outputStride;
 		}
@@ -125,7 +125,7 @@ public class ComputeEdgeWeights_MsU8 implements ComputeEdgeWeights<MultiSpectral
 
 			Edge e1 = edges.get(indexEdge++);
 
-			e1.weight = (float)Math.sqrt(weight1);
+			e1.sortValue = (float)Math.sqrt(weight1);
 			e1.indexA = indexDst;
 			e1.indexB = indexDst+1;
 		}

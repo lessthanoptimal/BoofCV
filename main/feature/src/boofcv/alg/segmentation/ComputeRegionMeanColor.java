@@ -18,6 +18,7 @@
 
 package boofcv.alg.segmentation;
 
+import boofcv.struct.feature.ColorQueue_F32;
 import boofcv.struct.image.*;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_I32;
@@ -45,12 +46,7 @@ public abstract class ComputeRegionMeanColor<T extends ImageBase> {
 	public ComputeRegionMeanColor(final int numBands) {
 		this.numBands = numBands;
 
-		regionSums = new FastQueue<float[]>(float[].class,true) {
-			@Override
-			protected float[] createInstance() {
-				return new float[ numBands ];
-			}
-		};
+		regionSums = new ColorQueue_F32(numBands);
 	}
 
 	/**
@@ -59,7 +55,8 @@ public abstract class ComputeRegionMeanColor<T extends ImageBase> {
 	 * @param image Input image
 	 * @param pixelToRegion Conversion between pixel to region index
 	 * @param regionMemberCount List which stores the number of members for each region
-	 * @param regionColor (Output) Storage for mean color throughout the region
+	 * @param regionColor (Output) Storage for mean color throughout the region.  Internall array must be fully
+	 *                    declared.
 	 */
 	public void process( T image , ImageSInt32 pixelToRegion ,
 						 GrowQueue_I32 regionMemberCount ,

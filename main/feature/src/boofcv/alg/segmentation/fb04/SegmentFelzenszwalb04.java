@@ -21,6 +21,9 @@ package boofcv.alg.segmentation.fb04;
 import boofcv.alg.InputSanityCheck;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageSInt32;
+import org.ddogleg.sorting.QuickSortObj_F32;
+import org.ddogleg.sorting.SortableParameter_F32;
+import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_F32;
 import org.ddogleg.struct.GrowQueue_I32;
 
@@ -59,7 +62,7 @@ import java.util.List;
 public class SegmentFelzenszwalb04<T extends ImageBase> {
 
 	// tuning parameter.  Determines the number of segments
-	private int K;
+	private float K;
 
 	// the minimum region size.  Regions smaller than this are merged into larger ones
 	private int minimumSize;
@@ -71,8 +74,9 @@ public class SegmentFelzenszwalb04<T extends ImageBase> {
 	// Function that computes the weight for each edge
 	private ComputeEdgeWeights<T> computeWeights;
 
+	private QuickSortObj_F32 sorter = new QuickSortObj_F32();
 	// storage for edges so that they can be recycled on the next call
-	private List<Edge> edgesStorage = new ArrayList<Edge>();
+	private FastQueue<Edge> edgesStorage = new FastQueue<Edge>(Edge.class,true);
 	// List of edges currently being examined
 	private List<Edge> activeEdges = new ArrayList<Edge>();
 	// The edges which are to be examined in the next iteration
@@ -96,7 +100,7 @@ public class SegmentFelzenszwalb04<T extends ImageBase> {
 	 * @param minimumSize Regions smaller than this are merged into larger regions
 	 * @param computeWeights Function used to compute the weight for all the edges.
 	 */
-	public SegmentFelzenszwalb04(int k, int minimumSize, ComputeEdgeWeights<T> computeWeights) {
+	public SegmentFelzenszwalb04(float k, int minimumSize, ComputeEdgeWeights<T> computeWeights) {
 		K = k;
 		this.minimumSize = minimumSize;
 		this.computeWeights = computeWeights;
@@ -116,7 +120,7 @@ public class SegmentFelzenszwalb04<T extends ImageBase> {
 		initialize(input,output);
 
 		// compute edges weights
-		computeWeights.process(input, output.startIndex, output.stride, activeEdges);
+		computeWeights.process(input, output.startIndex, output.stride, edgesStorage.toList());
 
 		// Merge regions together
 		mergeRegions();
@@ -136,7 +140,6 @@ public class SegmentFelzenszwalb04<T extends ImageBase> {
 		final int N = input.width*input.height;
 		final int M = computeNumberOfEdges(input.width,input.height);
 
-		edgesStorage.clear();
 		activeEdges.clear();
 		nextActiveEdges.clear();
 
@@ -147,12 +150,8 @@ public class SegmentFelzenszwalb04<T extends ImageBase> {
 			regionSize.data[i] = 1;
 			segmentIntDiff.data[i] = 0;
 		}
-		for( int i = edgesStorage.size(); i < M; i++ ) {
-			edgesStorage.add(new Edge());
-		}
-		for( int i = 0; i < M; i++ ) {
-			activeEdges.add( edgesStorage.get(i) );
-		}
+		edgesStorage.resize(M);
+
 	}
 
 	/**
@@ -163,8 +162,13 @@ public class SegmentFelzenszwalb04<T extends ImageBase> {
 
 		// sort edges
 		long time0 = System.currentTimeMillis();
-		Collections.sort(activeEdges);
+//		sorter.sort(edgesStorage.data,edgesStorage.size);
+		Collections.sort(edgesStorage.toList());
 		long time1 = System.currentTimeMillis();
+
+		for( int i = 0; i < edgesStorage.size; i++ ) {
+			activeEdges.add( edgesStorage.get(i) );
+		}
 		System.out.println("Sort time " + (time1 - time0));
 
 		// iterate until convergence
@@ -192,15 +196,15 @@ public class SegmentFelzenszwalb04<T extends ImageBase> {
 				float intA = segmentIntDiff.get(rootA);
 				float intB = segmentIntDiff.get(rootB);
 
-				float MInt = Math.min(intA + (K/sizeA)*(K/sizeA) , intB + (K/sizeB)*(K/sizeB));
+				float MInt = Math.min(intA + K/sizeA , intB + K/sizeB);
 
-				if( e.weight <= MInt )  {
+				if( e.weight() <= MInt )  {
 					// ----- Merge the two regions/components
 
 					// recompute the internal difference
 					float internalDiff = intA > intB ? intA : intB;
-					if( internalDiff < e.weight )
-						internalDiff = e.weight;
+					if( internalDiff < e.weight() )
+						internalDiff = e.weight();
 
 					// Everything is merged into region A, so update its internal difference
 					segmentIntDiff.data[rootA] = internalDiff;
@@ -325,20 +329,25 @@ public class SegmentFelzenszwalb04<T extends ImageBase> {
 	}
 
 	/**
-	 * Describes the relationship between to adjacent pixels in the image
+	 * Describes the relationship between to adjacent pixels in the image.
+	 *
+	 * The weight is saved in 'sortValue'
 	 */
-	public static class Edge implements Comparable<Edge> {
-		float weight; // could reduce
+	public static class Edge extends SortableParameter_F32 implements Comparable<Edge> {
 		// indexes of connected pixels in output image.
 		// Note: output image could be a sub-image so these might not be simply "y*width + x"
 		int indexA;
 		int indexB;
 
+		public final float weight() {
+			return sortValue;
+		}
+
 		@Override
 		public int compareTo(Edge o) {
-			if( weight < o.weight )
+			if( sortValue < o.sortValue )
 				return -1;
-			else if( weight > o.weight )
+			else if( sortValue > o.sortValue )
 				return 1;
 			return 0;
 		}

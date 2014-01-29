@@ -22,6 +22,7 @@ import boofcv.alg.interpolate.InterpolatePixelMB;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.alg.weights.WeightDistance_F32;
 import boofcv.alg.weights.WeightPixel_F32;
+import boofcv.struct.feature.ColorQueue_F32;
 import boofcv.struct.image.ImageMultiBand;
 import boofcv.struct.image.ImageType;
 import georegression.struct.point.Point2D_F32;
@@ -65,12 +66,7 @@ public class SegmentMeanShiftSearchColor<T extends ImageMultiBand> extends Segme
 
 		final int numBands = imageType.getNumBands();
 
-		modeColor = new FastQueue<float[]>(float[].class,true) {
-			@Override
-			protected float[] createInstance() {
-				return new float[ numBands ];
-			}
-		};
+		modeColor = new ColorQueue_F32(numBands);
 	}
 
 	/**

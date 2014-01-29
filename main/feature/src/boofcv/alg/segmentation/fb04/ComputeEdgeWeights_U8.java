@@ -55,11 +55,11 @@ public class ComputeEdgeWeights_U8 implements ComputeEdgeWeights<ImageUInt8> {
 				Edge e1 = edges.get(indexEdge++);
 				Edge e2 = edges.get(indexEdge++);
 
-				e1.weight = Math.abs(color1-color0);
+				e1.sortValue = Math.abs(color1-color0);
 				e1.indexA = indexDst;
 				e1.indexB = indexDst+1;
 
-				e2.weight = Math.abs(color2-color0);
+				e2.sortValue = Math.abs(color2-color0);
 				e2.indexA = indexDst;
 				e2.indexB = indexDst+outputStride;
 			}
@@ -75,7 +75,7 @@ public class ComputeEdgeWeights_U8 implements ComputeEdgeWeights<ImageUInt8> {
 
 			Edge e2 = edges.get(indexEdge++);
 
-			e2.weight = Math.abs(color2-color0);
+			e2.sortValue = Math.abs(color2-color0);
 			e2.indexA = indexDst;
 			e2.indexB = indexDst+outputStride;
 		}
@@ -90,7 +90,7 @@ public class ComputeEdgeWeights_U8 implements ComputeEdgeWeights<ImageUInt8> {
 
 			Edge e1 = edges.get(indexEdge++);
 
-			e1.weight = Math.abs(color1-color0);
+			e1.sortValue = Math.abs(color1-color0);
 			e1.indexA = indexDst;
 			e1.indexB = indexDst+1;
 		}
