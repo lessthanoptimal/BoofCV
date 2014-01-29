@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -46,7 +46,7 @@ public class ImageUInt16 extends ImageInt16<ImageUInt16> {
 	}
 
 	@Override
-	public ImageDataType getTypeInfo() {
+	public ImageDataType getDataType() {
 		return ImageDataType.U16;
 	}
 

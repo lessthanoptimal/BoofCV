@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -83,11 +83,12 @@ public class MultiSpectral<T extends ImageSingleBand> extends ImageMultiBand<Mul
 		this.stride = width;
 		this.width = width;
 		this.height = height;
-		bands = (T[]) Array.newInstance(type, numBands);
+		this.bands = (T[]) Array.newInstance(type, numBands);
 
 		for (int i = 0; i < numBands; i++) {
 			bands[i] = GeneralizedImageOps.createSingleBand(type, width, height);
 		}
+		this.imageType = ImageType.ms(numBands,type);
 	}
 	
 	/**
@@ -98,7 +99,8 @@ public class MultiSpectral<T extends ImageSingleBand> extends ImageMultiBand<Mul
 	 */
 	public MultiSpectral(Class<T> type, int numBands) {
 		this.type = type;
-		bands = (T[]) Array.newInstance(type, numBands);
+		this.bands = (T[]) Array.newInstance(type, numBands);
+		this.imageType = ImageType.ms(numBands,type);
 	}
 
 

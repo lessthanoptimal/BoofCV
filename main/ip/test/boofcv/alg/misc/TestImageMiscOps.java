@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -143,7 +143,7 @@ public class TestImageMiscOps {
 		ImageSingleBand orig = GeneralizedImageOps.createSingleBand(paramTypes[0], width, height);
 		GImageMiscOps.fillUniform(orig, rand, 0,20);
 
-		if( orig.getTypeInfo().isInteger()) {
+		if( orig.getDataType().isInteger()) {
 			m.invoke(null,orig,10);
 		} else {
 			m.invoke(null,orig,10.0f);
@@ -162,7 +162,7 @@ public class TestImageMiscOps {
 		ImageInterleaved orig = GeneralizedImageOps.createInterleaved(paramTypes[0], width, height, numBands);
 		GImageMiscOps.fillUniform(orig, rand, 0,20);
 
-		if( orig.getTypeInfo().isInteger()) {
+		if( orig.getDataType().isInteger()) {
 			m.invoke(null,orig,10);
 		} else {
 			m.invoke(null,orig,10.0f);
@@ -184,7 +184,7 @@ public class TestImageMiscOps {
 		GImageMiscOps.fill(orig, 4);
 
 		int r = 2;
-		if( orig.getTypeInfo().isInteger()) {
+		if( orig.getDataType().isInteger()) {
 			m.invoke(null,orig,5,r);
 		} else {
 			m.invoke(null,orig,5,r);
@@ -210,7 +210,7 @@ public class TestImageMiscOps {
 		int width = 5;
 		int height = 6;
 
-		if( orig.getTypeInfo().isInteger() ) {
+		if( orig.getDataType().isInteger() ) {
 			m.invoke(null,orig,10,x0,y0,width,height);
 		} else {
 			m.invoke(null,orig,10.0f,x0,y0,width,height);
@@ -240,8 +240,8 @@ public class TestImageMiscOps {
 		Class paramTypes[] = m.getParameterTypes();
 		ImageSingleBand orig = GeneralizedImageOps.createSingleBand(paramTypes[0], width, height);
 
-		if( orig.getTypeInfo().isInteger() ) {
-			if( orig.getTypeInfo().isSigned() )
+		if( orig.getDataType().isInteger() ) {
+			if( orig.getDataType().isSigned() )
 				m.invoke(null,orig,rand,-10,10);
 			else {
 				m.invoke(null,orig,rand,1,10);
@@ -269,8 +269,8 @@ public class TestImageMiscOps {
 		Class paramTypes[] = m.getParameterTypes();
 		ImageInterleaved orig = GeneralizedImageOps.createInterleaved(paramTypes[0], width, height, numBands);
 
-		if( orig.getTypeInfo().isInteger() ) {
-			if( orig.getTypeInfo().isSigned() )
+		if( orig.getDataType().isInteger() ) {
+			if( orig.getDataType().isSigned() )
 				m.invoke(null,orig,rand,-10,10);
 			else {
 				m.invoke(null,orig,rand,1,10);
@@ -299,7 +299,7 @@ public class TestImageMiscOps {
 		Class paramTypes[] = m.getParameterTypes();
 		ImageSingleBand orig = GeneralizedImageOps.createSingleBand(paramTypes[0], width, height);
 
-		if( orig.getTypeInfo().isSigned() )
+		if( orig.getDataType().isSigned() )
 			m.invoke(null,orig,rand,0,5,-2,2);
 		else {
 			m.invoke(null,orig,rand,5,7,0,12);
@@ -312,7 +312,7 @@ public class TestImageMiscOps {
 			for( int j = 0; j < width; j++ ) {
 				double value = a.get(j,i).doubleValue();
 
-				if( orig.getTypeInfo().isSigned() ) {
+				if( orig.getDataType().isSigned() ) {
 					assertTrue("value = "+value,value>=-2 && value <= 2);
 				} else {
 					assertTrue("value = "+value,value>=0 && value <= 12);
@@ -331,7 +331,7 @@ public class TestImageMiscOps {
 		ImageSingleBand orig = GeneralizedImageOps.createSingleBand(paramTypes[0], width, height);
 		GImageMiscOps.fill(orig,1);
 
-		if( orig.getTypeInfo().isInteger() ) {
+		if( orig.getDataType().isInteger() ) {
 			m.invoke(null,orig,rand,1,10);
 		} else {
 			m.invoke(null,orig,rand,1,10);

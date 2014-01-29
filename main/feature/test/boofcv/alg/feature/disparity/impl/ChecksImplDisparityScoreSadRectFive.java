@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -98,7 +98,7 @@ public abstract class ChecksImplDisparityScoreSadRectFive<Image extends ImageSin
 		Image left = GeneralizedImageOps.createSingleBand(imageType,w, h);
 		Image right = GeneralizedImageOps.createSingleBand(imageType,w, h);
 
-		if( left.getTypeInfo().isSigned() ) {
+		if( left.getDataType().isSigned() ) {
 			GImageMiscOps.fillUniform(left, rand, -20, 20);
 			GImageMiscOps.fillUniform(right, rand, -20, 20);
 		} else {

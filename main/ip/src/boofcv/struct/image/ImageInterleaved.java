@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -48,12 +48,13 @@ public abstract class ImageInterleaved<T extends ImageInterleaved> extends Image
 	 * @param numBands Number of bands/colors.
 	 */
 	protected ImageInterleaved(int width, int height, int numBands) {
-		_setData(Array.newInstance(getDataType(), width * height * numBands));
+		_setData(Array.newInstance(getPrimitiveDataType(), width * height * numBands));
 		this.startIndex = 0;
 		this.stride = width * numBands;
 		this.numBands = numBands;
 		this.width = width;
 		this.height = height;
+		this.imageType = (ImageType)ImageType.interleaved(numBands, getClass());
 	}
 
 	protected ImageInterleaved() {
@@ -153,7 +154,7 @@ public abstract class ImageInterleaved<T extends ImageInterleaved> extends Image
 	 *
 	 * @return The type of image.
 	 */
-	public abstract ImageDataType getTypeInfo();
+	public abstract ImageDataType getDataType();
 
 	/**
 	 * Returns the data array the image is stored in.
@@ -162,7 +163,7 @@ public abstract class ImageInterleaved<T extends ImageInterleaved> extends Image
 	 */
 	protected abstract Object _getData();
 
-	protected abstract Class getDataType();
+	protected abstract Class getPrimitiveDataType();
 
 	/**
 	 * Sets the image's internal data array.

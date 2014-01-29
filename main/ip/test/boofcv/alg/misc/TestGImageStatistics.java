@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -73,7 +73,7 @@ public class TestGImageStatistics extends BaseGClassChecksInMisc {
 			ret[0][1] = inputB;
 		} else if( name.equals("histogram")) {
 			int histogramSize = 10;
-			if( inputA.getTypeInfo().isSigned() )
+			if( inputA.getDataType().isSigned() )
 				histogramSize += 11;
 			ret[0][0] = inputA;
 			ret[0][1] = -10;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,14 +33,14 @@ import java.awt.image.BufferedImage;
 public class VisualizeImageData {
 
 	public static BufferedImage standard(ImageSingleBand<?> src, BufferedImage dst) {
-		if (src.getTypeInfo().isInteger()) {
+		if (src.getDataType().isInteger()) {
 			ImageInteger srcInt = (ImageInteger) src;
 
-			if (src.getTypeInfo().isSigned()) {
+			if (src.getDataType().isSigned()) {
 				double max = GImageStatistics.maxAbs(srcInt);
 				return colorizeSign(srcInt, dst, (int) max);
 			} else {
-				if (src.getTypeInfo().getNumBits() == 8) {
+				if (src.getDataType().getNumBits() == 8) {
 					dst = ConvertBufferedImage.convertTo((ImageUInt8) src, dst);
 				} else {
 					double max = GImageStatistics.maxAbs(srcInt);
@@ -123,7 +123,7 @@ public class VisualizeImageData {
 	public static BufferedImage grayUnsigned(ImageInteger src, BufferedImage dst, int normalize) {
 		dst = checkInputs(src, dst);
 
-		if (src.getTypeInfo().isSigned())
+		if (src.getDataType().isSigned())
 			throw new IllegalArgumentException("Can only convert unsigned images.");
 
 		for (int y = 0; y < src.height; y++) {
@@ -157,7 +157,7 @@ public class VisualizeImageData {
 
 		dst = checkInputs(src, dst);
 
-		if (src.getTypeInfo().isInteger()) {
+		if (src.getDataType().isInteger()) {
 			return grayMagnitude((ImageInteger) src, dst, (int) normalize);
 		} else {
 			return grayMagnitude((ImageFloat32) src, dst, (float) normalize);
@@ -180,7 +180,7 @@ public class VisualizeImageData {
 
 		dst = checkInputs(src, dst);
 
-		if (src.getTypeInfo().isInteger()) {
+		if (src.getDataType().isInteger()) {
 			return grayMagnitudeTemp((ImageInteger) src, dst, (int) normalize);
 		} else {
 			throw new RuntimeException("Add support");
@@ -249,7 +249,7 @@ public class VisualizeImageData {
 		if( dst == null )
 			dst = new BufferedImage(disparity.getWidth(),disparity.getHeight(),BufferedImage.TYPE_INT_RGB);
 
-		if (disparity.getTypeInfo().isInteger()) {
+		if (disparity.getDataType().isInteger()) {
 			return disparity((ImageInteger) disparity, dst, minDisparity, maxDisparity, invalidColor);
 		} else if (disparity instanceof ImageFloat32) {
 			return disparity((ImageFloat32) disparity, dst, minDisparity, maxDisparity, invalidColor);

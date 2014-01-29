@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -62,7 +62,7 @@ public class TestDistortImageOps {
 		float scaleX = (float)input.width/(float)output.width;
 		float scaleY = (float)input.height/(float)output.height;
 
-		if( input.getTypeInfo().isInteger() ) {
+		if( input.getDataType().isInteger() ) {
 			for( int i = 0; i < output.height; i++ ) {
 				for( int j = 0; j < output.width; j++ ) {
 					float val = interp.get(j*scaleX,i*scaleY);

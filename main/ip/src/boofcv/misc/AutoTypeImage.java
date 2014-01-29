@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -57,11 +57,11 @@ public enum AutoTypeImage {
 		bitWise = "";
 		try {
 			ImageSingleBand img = (ImageSingleBand)imageType.newInstance();
-			primitiveType = img.getTypeInfo().getDataType();
+			primitiveType = img.getDataType().getDataType();
 			dataType = primitiveType.getSimpleName();
-			numBits = img.getTypeInfo().getNumBits();
+			numBits = img.getDataType().getNumBits();
 
-			if( img.getTypeInfo().isInteger() ) {
+			if( img.getDataType().isInteger() ) {
 				isInteger = true;
 				if( numBits <= 32 )
 					sumType = "int";
@@ -72,7 +72,7 @@ public enum AutoTypeImage {
 				else
 					largeSumType = "long";
 
-				if( !img.getTypeInfo().isSigned() ) {
+				if( !img.getDataType().isSigned() ) {
 					abbreviatedType = "U";
 					isSigned = false;
 					if( byte.class == primitiveType) {

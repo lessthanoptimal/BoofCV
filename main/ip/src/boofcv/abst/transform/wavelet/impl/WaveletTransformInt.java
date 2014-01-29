@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -79,7 +79,7 @@ public class WaveletTransformInt<T extends ImageInteger> implements WaveletTrans
 		temp.reshape(transformed.width,transformed.height);
 
 		copyInput.reshape(original.width,original.height);
-		if( original.getTypeInfo().getDataType() == int.class ) {
+		if( original.getDataType().getDataType() == int.class ) {
 			copyInput.setTo((ImageSInt32)original);
 		} else {
 			GeneralizedImageOps.convert(original, copyInput);
@@ -95,7 +95,7 @@ public class WaveletTransformInt<T extends ImageInteger> implements WaveletTrans
 		temp.reshape(transformed.width,transformed.height);
 		copyInput.setTo(transformed);
 
-		if( original.getTypeInfo().getDataType() == int.class ) {
+		if( original.getDataType().getDataType() == int.class ) {
 			WaveletTransformOps.
 					inverseN(desc, copyInput, (ImageSInt32) original, temp, numLevels, minPixelValue, maxPixelValue);
 		} else {

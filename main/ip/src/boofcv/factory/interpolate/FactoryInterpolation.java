@@ -48,7 +48,7 @@ public class FactoryInterpolation {
 	createPixelS(double min, double max, TypeInterpolate type, ImageDataType dataType )
 	{
 
-		Class t = ImageDataType.typeToClass(dataType);
+		Class t = ImageDataType.typeToSingleClass(dataType);
 
 		return createPixelS(min,max,type,t);
 	}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -71,7 +71,7 @@ public class TldVarianceFilter<T extends ImageSingleBand> {
 		integralSq.reshape(gray.width,gray.height);
 
 		GIntegralImageOps.transform(gray,integral);
-		if( gray.getTypeInfo().isInteger())
+		if( gray.getDataType().isInteger())
 			transformSq((ImageUInt8)gray,(ImageSInt64)integralSq);
 		else
 			transformSq((ImageFloat32)gray,(ImageFloat64)integralSq);

@@ -16,27 +16,10 @@
  * limitations under the License.
  */
 
-package boofcv.struct.image;
+package boofcv.struct.feature;
 
 /**
- * <p>
- * Base class for images with float pixels.
- * </p>
- *
  * @author Peter Abeles
  */
-public abstract class ImageFloat <T extends ImageFloat> extends ImageSingleBand<T> {
-
-	protected ImageFloat(int width, int height) {
-		super(width, height);
-	}
-
-	protected ImageFloat() {
-	}
-
-	@Override
-	public ImageDataType getDataType() {
-		return ImageDataType.F;
-	}
-
+public class ColorQueue_F32 {
 }

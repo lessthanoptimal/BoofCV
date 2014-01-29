@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -108,7 +108,7 @@ public class TestImplConvolveMean extends CompareEquivalentFunctions {
 
 		ImageSingleBand output = (ImageSingleBand)((ImageSingleBand)targetParam[1]).clone();
 
-		if( output.getTypeInfo().isInteger() )
+		if( output.getDataType().isInteger() )
 			return new Object[]{kernel,targetParam[0],output,kernelRadius*2+1,targetParam[3]};
 		else
 			return new Object[]{kernel,targetParam[0],output,targetParam[3]};

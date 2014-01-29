@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -88,7 +88,7 @@ public abstract class ImageInteger<T extends ImageInteger> extends ImageSingleBa
 	public abstract int unsafe_get( int x , int y );
 
 	@Override
-	public ImageDataType getTypeInfo() {
+	public ImageDataType getDataType() {
 		return ImageDataType.I;
 	}
 

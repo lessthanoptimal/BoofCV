@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -125,20 +125,20 @@ public class TestPixelMath {
 		ImageSingleBand output = GeneralizedImageOps.createSingleBand(paramTypes[2], width, height);
 		GImageMiscOps.fillUniform(input, rand, 0,20);
 
-		if( input.getTypeInfo().isSigned() ) {
+		if( input.getDataType().isSigned() ) {
 			GImageMiscOps.fillUniform(input, rand, -20,20);
 		} else {
 			GImageMiscOps.fillUniform(input, rand, 0,20);
 		}
 
-		if( input.getTypeInfo().isInteger() )
+		if( input.getDataType().isInteger() )
 			m.invoke(null,input,10,output);
 		else
 			m.invoke(null,input,10.0f,output);
 
 		GImageSingleBand a = FactoryGImageSingleBand.wrap(input);
 		GImageSingleBand b = FactoryGImageSingleBand.wrap(output);
-		if( input.getTypeInfo().isInteger() ) {
+		if( input.getDataType().isInteger() ) {
 			for( int i = 0; i < height; i++ ) {
 				for( int j = 0; j < width; j++ ) {
 					assertEquals(a.get(j,i).intValue()/10,b.get(j,i).intValue());
@@ -181,20 +181,20 @@ public class TestPixelMath {
 		ImageSingleBand output = GeneralizedImageOps.createSingleBand(paramTypes[4], width, height);
 		GImageMiscOps.fillUniform(input, rand, 0,20);
 
-		if( input.getTypeInfo().isSigned() ) {
+		if( input.getDataType().isSigned() ) {
 			GImageMiscOps.fillUniform(input, rand, -20,20);
 		} else {
 			GImageMiscOps.fillUniform(input, rand, 0,20);
 		}
 
-		if( input.getTypeInfo().isInteger() )
+		if( input.getDataType().isInteger() )
 			m.invoke(null,input,10,-1,1,output);
 		else
 			m.invoke(null,input,10.0f,-1f,1f,output);
 
 		GImageSingleBand a = FactoryGImageSingleBand.wrap(input);
 		GImageSingleBand b = FactoryGImageSingleBand.wrap(output);
-		if( input.getTypeInfo().isInteger() ) {
+		if( input.getDataType().isInteger() ) {
 			for( int i = 0; i < height; i++ ) {
 				for( int j = 0; j < width; j++ ) {
 					int expected = a.get(j,i).intValue()/10;
@@ -225,20 +225,20 @@ public class TestPixelMath {
 		ImageSingleBand output = GeneralizedImageOps.createSingleBand(paramTypes[2], width, height);
 		GImageMiscOps.fillUniform(input, rand, 0,20);
 
-		if( input.getTypeInfo().isSigned() ) {
+		if( input.getDataType().isSigned() ) {
 			GImageMiscOps.fillUniform(input, rand, -20,20);
 		} else {
 			GImageMiscOps.fillUniform(input, rand, 0,20);
 		}
 
-		if( input.getTypeInfo().isInteger() )
+		if( input.getDataType().isInteger() )
 			m.invoke(null,input,2,output);
 		else
 			m.invoke(null,input,2.0f,output);
 
 		GImageSingleBand a = FactoryGImageSingleBand.wrap(input);
 		GImageSingleBand b = FactoryGImageSingleBand.wrap(output);
-		if( input.getTypeInfo().isInteger() ) {
+		if( input.getDataType().isInteger() ) {
 			for( int i = 0; i < height; i++ ) {
 				for( int j = 0; j < width; j++ ) {
 					assertEquals(a.get(j,i).intValue()*2,b.get(j,i).intValue());
@@ -281,20 +281,20 @@ public class TestPixelMath {
 		ImageSingleBand output = GeneralizedImageOps.createSingleBand(paramTypes[4], width, height);
 		GImageMiscOps.fillUniform(input, rand, 0,20);
 
-		if( input.getTypeInfo().isSigned() ) {
+		if( input.getDataType().isSigned() ) {
 			GImageMiscOps.fillUniform(input, rand, -20,20);
 		} else {
 			GImageMiscOps.fillUniform(input, rand, 0,20);
 		}
 
-		if( input.getTypeInfo().isInteger() )
+		if( input.getDataType().isInteger() )
 			m.invoke(null,input,2,-30,30,output);
 		else
 			m.invoke(null,input,2.0f,-30f,30f,output);
 
 		GImageSingleBand a = FactoryGImageSingleBand.wrap(input);
 		GImageSingleBand b = FactoryGImageSingleBand.wrap(output);
-		if( input.getTypeInfo().isInteger() ) {
+		if( input.getDataType().isInteger() ) {
 			for( int i = 0; i < height; i++ ) {
 				for( int j = 0; j < width; j++ ) {
 					int expected = a.get(j,i).intValue()*2;
@@ -324,20 +324,20 @@ public class TestPixelMath {
 		ImageSingleBand input = GeneralizedImageOps.createSingleBand(paramTypes[0], width, height);
 		ImageSingleBand output = GeneralizedImageOps.createSingleBand(paramTypes[0], width, height);
 
-		if( input.getTypeInfo().isSigned() ) {
+		if( input.getDataType().isSigned() ) {
 			GImageMiscOps.fillUniform(input, rand, -20,20);
 		} else {
 			GImageMiscOps.fillUniform(input, rand, 0,20);
 		}
 
-		if( input.getTypeInfo().isInteger() )
+		if( input.getDataType().isInteger() )
 			m.invoke(null,input,2,output);
 		else
 			m.invoke(null,input,2.0f,output);
 
 		GImageSingleBand a = FactoryGImageSingleBand.wrap(input);
 		GImageSingleBand b = FactoryGImageSingleBand.wrap(output);
-		if( input.getTypeInfo().isInteger() ) {
+		if( input.getDataType().isInteger() ) {
 			for( int i = 0; i < height; i++ ) {
 				for( int j = 0; j < width; j++ ) {
 					assertEquals(a.get(j,i).intValue()+2,b.get(j,i).intValue());
@@ -357,20 +357,20 @@ public class TestPixelMath {
 		ImageSingleBand input = GeneralizedImageOps.createSingleBand(paramTypes[0], width, height);
 		ImageSingleBand output = GeneralizedImageOps.createSingleBand(paramTypes[0], width, height);
 
-		if( input.getTypeInfo().isSigned() ) {
+		if( input.getDataType().isSigned() ) {
 			GImageMiscOps.fillUniform(input, rand, -20,20);
 		} else {
 			GImageMiscOps.fillUniform(input, rand, 0,20);
 		}
 
-		if( input.getTypeInfo().isInteger() )
+		if( input.getDataType().isInteger() )
 			m.invoke(null,input,2,-10,12,output);
 		else
 			m.invoke(null,input,2.0f,-10f,12f,output);
 
 		GImageSingleBand a = FactoryGImageSingleBand.wrap(input);
 		GImageSingleBand b = FactoryGImageSingleBand.wrap(output);
-		if( input.getTypeInfo().isInteger() ) {
+		if( input.getDataType().isInteger() ) {
 			for( int i = 0; i < height; i++ ) {
 				for( int j = 0; j < width; j++ ) {
 					int expected = a.get(j,i).intValue() + 2;
@@ -404,13 +404,13 @@ public class TestPixelMath {
 
 		GImageMiscOps.fillUniform(input, rand, (int)min, (int)max);
 
-		if( input.getTypeInfo().isInteger() ) {
+		if( input.getDataType().isInteger() ) {
 			m.invoke(null,input,2,10);
 		} else
 			m.invoke(null,input,2.0f,10.0f);
 
 		GImageSingleBand a = FactoryGImageSingleBand.wrap(input);
-		if( input.getTypeInfo().isInteger() ) {
+		if( input.getDataType().isInteger() ) {
 			for( int i = 0; i < height; i++ ) {
 				for( int j = 0; j < width; j++ ) {
 					int v = a.get(j,i).intValue();
@@ -432,7 +432,7 @@ public class TestPixelMath {
 		ImageSingleBand inputA = GeneralizedImageOps.createSingleBand(paramTypes[0], width, height);
 		ImageSingleBand inputB = GeneralizedImageOps.createSingleBand(paramTypes[1], width, height);
 
-		if( inputA.getTypeInfo().isSigned() ) {
+		if( inputA.getDataType().isSigned() ) {
 			GImageMiscOps.fillUniform(inputA, rand, -20,20);
 		} else {
 			GImageMiscOps.fillUniform(inputA, rand, 0,20);
@@ -455,7 +455,7 @@ public class TestPixelMath {
 		ImageSingleBand inputA = GeneralizedImageOps.createSingleBand(paramTypes[0], width, height);
 		ImageSingleBand inputB = GeneralizedImageOps.createSingleBand(paramTypes[1], width, height);
 
-		if( inputA.getTypeInfo().isSigned() ) {
+		if( inputA.getDataType().isSigned() ) {
 			GImageMiscOps.fillUniform(inputA, rand, -20,20);
 		} else {
 			throw new RuntimeException("Shouldn't be used on unsigned images");
@@ -479,7 +479,7 @@ public class TestPixelMath {
 		ImageSingleBand inputB = GeneralizedImageOps.createSingleBand(paramTypes[0], width, height);
 		ImageSingleBand inputC = GeneralizedImageOps.createSingleBand(paramTypes[0], width, height);
 
-		if( inputA.getTypeInfo().isSigned() ) {
+		if( inputA.getDataType().isSigned() ) {
 			GImageMiscOps.fillUniform(inputA, rand, -20,20);
 			GImageMiscOps.fillUniform(inputB, rand, -20,20);
 		} else {
@@ -507,7 +507,7 @@ public class TestPixelMath {
 		ImageSingleBand inputB = GeneralizedImageOps.createSingleBand(paramTypes[1], width, height);
 		ImageSingleBand inputC = GeneralizedImageOps.createSingleBand(paramTypes[2], width, height);
 
-		if( inputA.getTypeInfo().isSigned() ) {
+		if( inputA.getDataType().isSigned() ) {
 			GImageMiscOps.fillUniform(inputA, rand, -20,20);
 			GImageMiscOps.fillUniform(inputB, rand, -20,20);
 		} else {
@@ -534,7 +534,7 @@ public class TestPixelMath {
 		ImageSingleBand inputB = GeneralizedImageOps.createSingleBand(paramTypes[1], width, height);
 		ImageSingleBand inputC = GeneralizedImageOps.createSingleBand(paramTypes[2], width, height);
 
-		if( inputA.getTypeInfo().isSigned() ) {
+		if( inputA.getDataType().isSigned() ) {
 			GImageMiscOps.fillUniform(inputA, rand, -20,20);
 			GImageMiscOps.fillUniform(inputB, rand, -20,20);
 		} else {
@@ -580,7 +580,7 @@ public class TestPixelMath {
 		MultiSpectral input = new MultiSpectral(paramTypes[1], width, height,3);
 		ImageSingleBand output = GeneralizedImageOps.createSingleBand(paramTypes[1], width, height);
 
-		if( output.getTypeInfo().isSigned() ) {
+		if( output.getDataType().isSigned() ) {
 			GImageMiscOps.fillUniform(input, rand, -20,20);
 		} else {
 			GImageMiscOps.fillUniform(input, rand, 0,20);
@@ -593,7 +593,7 @@ public class TestPixelMath {
 		GImageSingleBand c = FactoryGImageSingleBand.wrap(input.getBand(2));
 		GImageSingleBand d = FactoryGImageSingleBand.wrap(output);
 
-		boolean isInteger = output.getTypeInfo().isInteger();
+		boolean isInteger = output.getDataType().isInteger();
 
 		for( int i = 0; i < height; i++ ) {
 			for( int j = 0; j < width; j++ ) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -44,7 +44,7 @@ public abstract class InterleavedI16 extends ImageInterleaved<InterleavedI16> {
 	}
 
 	@Override
-	public ImageDataType getTypeInfo() {
+	public ImageDataType getDataType() {
 		return ImageDataType.I16;
 	}
 
@@ -122,7 +122,7 @@ public abstract class InterleavedI16 extends ImageInterleaved<InterleavedI16> {
 	}
 
 	@Override
-	protected Class getDataType() {
+	protected Class getPrimitiveDataType() {
 		return short.class;
 	}
 

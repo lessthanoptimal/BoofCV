@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -103,7 +103,7 @@ public class TestImageStatistics {
 
 		GImageSingleBand a = FactoryGImageSingleBand.wrap(input);
 
-		if( input.getTypeInfo().isSigned() ) {
+		if( input.getDataType().isSigned() ) {
 			GImageMiscOps.fillUniform(input, rand, -20,20);
 			a.set(0,3,-100);
 		} else {
@@ -123,7 +123,7 @@ public class TestImageStatistics {
 
 		GImageSingleBand a = FactoryGImageSingleBand.wrap(input);
 
-		if( input.getTypeInfo().isSigned() ) {
+		if( input.getDataType().isSigned() ) {
 			GImageMiscOps.fillUniform(input, rand, -20,-5);
 			a.set(0,3,-2);
 			Number o = (Number)m.invoke(null,input);
@@ -143,7 +143,7 @@ public class TestImageStatistics {
 
 		GImageSingleBand a = FactoryGImageSingleBand.wrap(input);
 
-		if( input.getTypeInfo().isSigned() ) {
+		if( input.getDataType().isSigned() ) {
 			GImageMiscOps.fillUniform(input, rand, -20,-5);
 			a.set(0,3,-30);
 			Number o = (Number)m.invoke(null,input);
@@ -161,7 +161,7 @@ public class TestImageStatistics {
 		Class paramTypes[] = m.getParameterTypes();
 		ImageSingleBand inputA = GeneralizedImageOps.createSingleBand(paramTypes[0], width, height);
 
-		if( inputA.getTypeInfo().isSigned() ) {
+		if( inputA.getDataType().isSigned() ) {
 			GImageMiscOps.fillUniform(inputA, rand, -20,20);
 		} else {
 			GImageMiscOps.fillUniform(inputA, rand, 0,20);
@@ -186,7 +186,7 @@ public class TestImageStatistics {
 		Class paramTypes[] = m.getParameterTypes();
 		ImageSingleBand inputA = GeneralizedImageOps.createSingleBand(paramTypes[0], width, height);
 
-		if( inputA.getTypeInfo().isSigned() ) {
+		if( inputA.getDataType().isSigned() ) {
 			GImageMiscOps.fillUniform(inputA, rand, -20,20);
 		} else {
 			GImageMiscOps.fillUniform(inputA, rand, 0,20);
@@ -210,7 +210,7 @@ public class TestImageStatistics {
 		Class paramTypes[] = m.getParameterTypes();
 		ImageSingleBand inputA = GeneralizedImageOps.createSingleBand(paramTypes[0], width, height);
 
-		if( inputA.getTypeInfo().isSigned() ) {
+		if( inputA.getDataType().isSigned() ) {
 			GImageMiscOps.fillUniform(inputA, rand, -20,20);
 		} else {
 			GImageMiscOps.fillUniform(inputA, rand, 0,20);
@@ -238,7 +238,7 @@ public class TestImageStatistics {
 		ImageSingleBand inputA = GeneralizedImageOps.createSingleBand(paramTypes[0], width, height);
 		ImageSingleBand inputB = GeneralizedImageOps.createSingleBand(paramTypes[1], width, height);
 
-		if( inputA.getTypeInfo().isSigned() ) {
+		if( inputA.getDataType().isSigned() ) {
 			GImageMiscOps.fillUniform(inputA, rand, -20,20);
 			GImageMiscOps.fillUniform(inputB, rand, -20,20);
 		} else {
@@ -268,7 +268,7 @@ public class TestImageStatistics {
 		ImageSingleBand inputA = GeneralizedImageOps.createSingleBand(paramTypes[0], width, height);
 		ImageSingleBand inputB = GeneralizedImageOps.createSingleBand(paramTypes[1], width, height);
 
-		if( inputA.getTypeInfo().isSigned() ) {
+		if( inputA.getDataType().isSigned() ) {
 			GImageMiscOps.fillUniform(inputA, rand, -20,20);
 			GImageMiscOps.fillUniform(inputB, rand, -20,20);
 		} else {
@@ -303,7 +303,7 @@ public class TestImageStatistics {
 			histogram[i] = 100;
 
 		int minValue;
-		if( inputA.getTypeInfo().isSigned() ) {
+		if( inputA.getDataType().isSigned() ) {
 			GImageMiscOps.fillUniform(inputA, rand, -20,20);
 			m.invoke(null,inputA,-20,histogram);
 			minValue = -20;
