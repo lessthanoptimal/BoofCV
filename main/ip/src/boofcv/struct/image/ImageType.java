@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -54,6 +54,10 @@ public class ImageType<T extends ImageBase> {
 
 	public static <I extends ImageSingleBand> ImageType<MultiSpectral<I>> ms( int numBands , Class<I> imageType ) {
 		return new ImageType<MultiSpectral<I>>(Family.MULTI_SPECTRAL, ImageDataType.classToType(imageType),numBands);
+	}
+
+	public static <I extends ImageInterleaved> ImageType<I> interleaved( int numBands , Class<I> imageType ) {
+		return new ImageType<I>(Family.INTERLEAVED, ImageDataType.classToType(imageType),numBands);
 	}
 
 	public ImageDataType getDataType() {

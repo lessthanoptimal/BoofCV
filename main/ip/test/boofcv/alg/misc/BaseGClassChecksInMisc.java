@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -105,15 +105,15 @@ public abstract class BaseGClassChecksInMisc extends CompareEquivalentFunctions 
 
 		boolean isSigned = false;
 		if( img instanceof ImageSingleBand ) {
-			if( ((ImageSingleBand)img).getTypeInfo().isSigned() ) {
+			if( ((ImageSingleBand)img).getDataType().isSigned() ) {
 				isSigned = true;
 			}
 		} else if( img instanceof ImageInterleaved ) {
-			if( ((ImageInterleaved)img).getTypeInfo().isSigned() ) {
+			if( ((ImageInterleaved)img).getDataType().isSigned() ) {
 				isSigned = true;
 			}
 		} else {
-			if( ((MultiSpectral)img).getBand(0).getTypeInfo().isSigned() ) {
+			if( ((MultiSpectral)img).getBand(0).getDataType().isSigned() ) {
 				isSigned = true;
 			}
 		}

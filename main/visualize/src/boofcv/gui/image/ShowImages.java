@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -92,7 +92,7 @@ public class ShowImages {
 	public static ImagePanel showWindow( ImageSInt16 img , String title ) {
 		int max = ImageStatistics.maxAbs(img);
 		BufferedImage buff;
-		if( img.getTypeInfo().isSigned() )
+		if( img.getDataType().isSigned() )
 			buff = VisualizeImageData.colorizeSign(img,null,max);
 		else
 			buff = VisualizeImageData.grayUnsigned(img,null,max);

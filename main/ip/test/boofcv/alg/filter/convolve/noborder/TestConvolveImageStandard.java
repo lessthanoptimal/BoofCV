@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -155,7 +155,7 @@ public class TestConvolveImageStandard {
 
 		//  see if some point was convolved correctly
 		double val = (get(img, 0, 1) * getKernel(ker, 0) + get(img, 1, 1) * getKernel(ker, 1) + get(img, 2, 1) * getKernel(ker, 2) + halfDivisor) / divisor;
-		if (dest.getTypeInfo().isInteger())
+		if (dest.getDataType().isInteger())
 			val = (int) val;
 
 		assertEquals(val, get(dest, 1, 1), 1e-6);
@@ -201,7 +201,7 @@ public class TestConvolveImageStandard {
 		assertEquals(0, get(dest, 0, 1), 1e-6);
 
 		double val = (get(img, 1, 0) * getKernel(ker, 0) + get(img, 1, 1) * getKernel(ker, 1) + get(img, 1, 2) * getKernel(ker, 2) + halfDivisor) / divisor;
-		if (dest.getTypeInfo().isInteger())
+		if (dest.getDataType().isInteger())
 			val = (int) val;
 
 		assertEquals(val, get(dest, 1, 1), 1e-6);
@@ -217,8 +217,8 @@ public class TestConvolveImageStandard {
 	 */
 	public void convolve(ImageSingleBand img, ImageSingleBand dest) {
 		Object ker;
-		if (!img.getTypeInfo().isInteger()) {
-			if( img.getTypeInfo().getNumBits() == 32 )
+		if (!img.getDataType().isInteger()) {
+			if( img.getDataType().getNumBits() == 32 )
 				ker = FactoryKernel.random2D_F32(kernelRadius, 0f, 1f, new Random(234));
 			else
 				ker = FactoryKernel.random2D_F64(kernelRadius, 0f, 1f, new Random(234));
@@ -255,7 +255,7 @@ public class TestConvolveImageStandard {
 	 */
 	public void convolveDiv(ImageSingleBand img, ImageSingleBand dest) {
 		Object ker;
-		if (!img.getTypeInfo().isInteger())
+		if (!img.getDataType().isInteger())
 			ker = FactoryKernel.random2D_F32(kernelRadius, 0f, 1f, new Random(234));
 		else
 			ker = FactoryKernel.random2D_I32(kernelRadius, 0, 4, new Random(234));
@@ -273,7 +273,7 @@ public class TestConvolveImageStandard {
 			}
 		}
 		expected = (expected + halfDivisor)/divisor;
-		if (dest.getTypeInfo().isInteger())
+		if (dest.getDataType().isInteger())
 			expected = (int) expected;
 
 		invokeMethod("convolve",ker, img, dest, divisor);

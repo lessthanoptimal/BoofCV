@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -73,10 +73,10 @@ public abstract class StandardSingleBandTests {
 		// set the expected to the point in the image
 		call(img, "set", 1, expected, 1, 1);
 		Number found = (Number) call(img, "get", 0, null, 1, 1);
-		if (!img.getTypeInfo().isInteger())
+		if (!img.getDataType().isInteger())
 			assertEquals(expected.doubleValue(), found.doubleValue(), 1e-4);
 		else {
-			if( img.getTypeInfo().isSigned() )
+			if( img.getDataType().isSigned() )
 				assertTrue(expected.intValue() == found.intValue());
 			else
 				assertTrue((expected.intValue() & 0xFFFF) == found.intValue());
@@ -100,10 +100,10 @@ public abstract class StandardSingleBandTests {
 		// set the expected to the point in the image
 		call(img, "unsafe_set", 1, expected, 1, 1);
 		Number found = (Number) call(img, "unsafe_get", 0, null, 1, 1);
-		if (!img.getTypeInfo().isInteger())
+		if (!img.getDataType().isInteger())
 			assertEquals(expected.doubleValue(), found.doubleValue(), 1e-4);
 		else {
-			if( img.getTypeInfo().isSigned() )
+			if( img.getDataType().isSigned() )
 				assertTrue(expected.intValue() == found.intValue());
 			else
 				assertTrue((expected.intValue() & 0xFFFF) == found.intValue());
@@ -155,10 +155,10 @@ public abstract class StandardSingleBandTests {
 				args[index] = where[index];
 			}
 			if (type == 1) {
-				paramTypes[index] = img.getTypeInfo().getSumType();
+				paramTypes[index] = img.getDataType().getSumType();
 				args[index] = typeData;
 			} else if (type == 2) {
-				String name = "[" + img.getTypeInfo().getDataType().getName().toUpperCase().charAt(0);
+				String name = "[" + img.getDataType().getDataType().getName().toUpperCase().charAt(0);
 				paramTypes[index] = Class.forName(name);
 				args[index] = typeData;
 			}

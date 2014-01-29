@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -104,7 +104,7 @@ public class TestConvolveImageBox extends CompareEquivalentFunctions {
 
 		ImageSingleBand output = (ImageSingleBand)((ImageSingleBand)targetParam[1]).clone();
 
-		ImageBorder border = output.getTypeInfo().isInteger() ? new ImageBorderValue.Value_I(0) : new ImageBorderValue.Value_F32(0);
+		ImageBorder border = output.getDataType().isInteger() ? new ImageBorderValue.Value_I(0) : new ImageBorderValue.Value_F32(0);
 
 		return new Object[]{kernel,targetParam[0],output,border };
 	}

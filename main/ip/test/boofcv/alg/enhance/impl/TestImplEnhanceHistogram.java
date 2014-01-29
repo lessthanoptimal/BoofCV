@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -67,14 +67,14 @@ public class TestImplEnhanceHistogram {
 	}
 
 	public void applyTransform( ImageSingleBand input , ImageSingleBand output ) {
-		int min = input.getTypeInfo().isSigned() ? -10 : 0;
+		int min = input.getDataType().isSigned() ? -10 : 0;
 		int transform[] = new int[10-min];
 
 		GImageMiscOps.fillUniform(input, rand, Math.min(min+1,0), 10);
 		for( int i = min; i < 10; i++ )
 			transform[i-min] = i*2;
 
-		if(input.getTypeInfo().isSigned() ) {
+		if(input.getDataType().isSigned() ) {
 			BoofTesting.callStaticMethod(ImplEnhanceHistogram.class,"applyTransform",
 					input,transform,-10,output);
 		} else {

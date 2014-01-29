@@ -31,11 +31,11 @@ Version : Alpha 0.17
   * Was applying YV12 byte alignment to NV21 images.  Depending on image size, this could cause a crash.
 - Fixed bug in ImplConvertToBitmap.multiToArray_F32()
   * Didn't handle case where the input image has 3 bands and not 4
+- ImageBase now provides a method for getting ImageType information
 
 - TODO make those two failed unit tests ago away
 - TODO BoofMiscOps move XML serialization into IO package
 - long distance dense optical flow
-- Mean-shift segmentation
 - watershed segmentation
 - Moved some of the android stuff out of demo code and into the android interface
 

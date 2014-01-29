@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -74,7 +74,7 @@ public abstract class ImageInt16<T extends ImageInt16> extends ImageInteger<T> {
 	}
 
 	@Override
-	public ImageDataType getTypeInfo() {
+	public ImageDataType getDataType() {
 		return ImageDataType.I16;
 	}
 }

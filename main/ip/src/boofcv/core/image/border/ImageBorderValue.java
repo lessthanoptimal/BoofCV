@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,12 +28,12 @@ import boofcv.struct.image.*;
 public class ImageBorderValue {
 
 	public static ImageBorder wrap( ImageSingleBand image , double value ) {
-		if( image.getTypeInfo().isInteger() ) {
-			if( image.getTypeInfo().getNumBits() <= 32 )
+		if( image.getDataType().isInteger() ) {
+			if( image.getDataType().getNumBits() <= 32 )
 				return wrap((ImageInteger)image,(int)value);
 			else
 				return wrap((ImageSInt64)image,(long)value);
-		} else if( image.getTypeInfo().getDataType() == float.class ) {
+		} else if( image.getDataType().getDataType() == float.class ) {
 			return wrap((ImageFloat32)image,(float)value);
 		} else {
 			return wrap((ImageFloat64)image,value);

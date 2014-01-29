@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -124,7 +124,7 @@ public class CompareHessianToConvolution {
 			testInputs[i] = images[i];
 		}
 		if( processBorder ) {
-			if( images[0].getTypeInfo().isInteger())
+			if( images[0].getDataType().isInteger())
 				testInputs[5] = new ImageBorder1D_I32(BorderIndex1D_Extend.class);
 			else
 				testInputs[5] = new ImageBorder1D_F32(BorderIndex1D_Extend.class);

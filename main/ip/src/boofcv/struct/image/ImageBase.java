@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -50,6 +50,11 @@ public abstract class ImageBase<T extends ImageBase> implements Serializable, Cl
 	 * Indicates if it is a sub-image or not
 	 */
 	public boolean subImage = false;
+
+	/**
+	 * Description of the image data structure
+	 */
+	public ImageType<T> imageType;
 
 	public abstract T subimage(int x0, int y0, int x1, int y1, T subimage);
 
@@ -129,6 +134,15 @@ public abstract class ImageBase<T extends ImageBase> implements Serializable, Cl
 	 * @return new image
 	 */
 	public abstract T _createNew(int imgWidth, int imgHeight);
+
+	/**
+	 * Description of the image data structure
+	 *
+	 * @return Description of the image data structure
+	 */
+	public ImageType<T> getImageType() {
+		return imageType;
+	}
 
 	/**
 	 * Creates an identical image.  Note that if this image is a sub-image portions of hte image which are not part

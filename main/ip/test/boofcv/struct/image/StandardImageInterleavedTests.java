@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -176,10 +176,10 @@ public abstract class StandardImageInterleavedTests {
 				args[index] = where[index];
 			}
 			if (type == 1) {
-				paramTypes[index] = img.getDataType();
+				paramTypes[index] = img.getPrimitiveDataType();
 				args[index] = typeData;
 			} else if (type == 2) {
-				String name = "[" + img.getDataType().getName().toUpperCase().charAt(0);
+				String name = "[" + img.getPrimitiveDataType().getName().toUpperCase().charAt(0);
 				if( name.charAt(1) == 'L')
 					name = "[J";
 				paramTypes[index] = Class.forName(name);
@@ -204,7 +204,7 @@ public abstract class StandardImageInterleavedTests {
 	private Object createPixelArray(ImageInterleaved img) {
 		int numBands = img.getNumBands();
 
-		Object ret = Array.newInstance(img.getDataType(), numBands);
+		Object ret = Array.newInstance(img.getPrimitiveDataType(), numBands);
 
 		for (int i = 0; i < numBands; i++)
 			Array.set(ret, i, randomNumber());

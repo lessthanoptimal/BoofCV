@@ -14,7 +14,7 @@ public class TestSfot_to_TrackObjectQuad extends TextureGrayTrackerObjectRectang
 	@Override
 	public TrackerObjectQuad<ImageUInt8> create(ImageType<ImageUInt8> imageType) {
 
-		Class ct = ImageDataType.typeToClass(imageType.getDataType());
+		Class ct = ImageDataType.typeToSingleClass(imageType.getDataType());
 		SfotConfig config = new SfotConfig(ct);
 
 		SparseFlowObjectTracker tracker = new SparseFlowObjectTracker(config);

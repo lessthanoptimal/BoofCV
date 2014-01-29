@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -72,11 +72,12 @@ public abstract class ImageSingleBand<T extends ImageSingleBand> extends ImageBa
 	 * @param height Image's height.
 	 */
 	protected ImageSingleBand(int width, int height) {
-		_setData(Array.newInstance(getTypeInfo().getDataType(), width * height));
+		_setData(Array.newInstance(getDataType().getDataType(), width * height));
 		this.startIndex = 0;
 		this.stride = width;
 		this.width = width;
 		this.height = height;
+		this.imageType = (ImageType)ImageType.single(getClass());
 	}
 
 	protected ImageSingleBand() {
@@ -184,7 +185,7 @@ public abstract class ImageSingleBand<T extends ImageSingleBand> extends ImageBa
 	 *
 	 * @return The type of image.
 	 */
-	public abstract ImageDataType getTypeInfo();
+	public abstract ImageDataType getDataType();
 
 	/**
 	 * Sets the image's internal data array.

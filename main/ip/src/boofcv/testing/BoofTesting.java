@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -650,7 +650,7 @@ public class BoofTesting {
 					for (int j = 0; j < imgA.getWidth(); j++) {
 						int valB = imgB.get(j, i);
 						int valA = raster.getDataStorage()[ offsetA + i*strideA + j];
-						if (!imgB.getTypeInfo().isSigned())
+						if (!imgB.getDataType().isSigned())
 							valA &= 0xFF;
 
 						if (valA != valB)
@@ -667,7 +667,7 @@ public class BoofTesting {
 
 				int gray = (byte) ((((rgb >>> 16) & 0xFF) + ((rgb >>> 8) & 0xFF) + (rgb & 0xFF)) / 3);
 				int grayB = imgB.get(x, y);
-				if (!imgB.getTypeInfo().isSigned())
+				if (!imgB.getDataType().isSigned())
 					gray &= 0xFF;
 
 				if (Math.abs(gray - grayB) != 0) {
@@ -698,7 +698,7 @@ public class BoofTesting {
 					for (int j = 0; j < imgA.getWidth(); j++) {
 						int valB = imgB.get(j, i);
 						int valA = raster.getDataStorage()[ offsetA + i*strideA + j];
-						if (!imgB.getTypeInfo().isSigned())
+						if (!imgB.getDataType().isSigned())
 							valA &= 0xFFFF;
 
 						if (valA != valB)
@@ -719,7 +719,7 @@ public class BoofTesting {
 					for (int j = 0; j < imgA.getWidth(); j++) {
 						int valB = imgB.get(j, i);
 						int valA = raster.getDataStorage()[ offsetA + i*strideA + j];
-						if (!imgB.getTypeInfo().isSigned())
+						if (!imgB.getDataType().isSigned())
 							valA &= 0xFFFF;
 
 						if (valA != valB)
@@ -734,7 +734,7 @@ public class BoofTesting {
 
 					int gray = ((((rgb >>> 16) & 0xFF) + ((rgb >>> 8) & 0xFF) + (rgb & 0xFF)) / 3);
 					int grayB = imgB.get(x, y);
-					if (!imgB.getTypeInfo().isSigned())
+					if (!imgB.getDataType().isSigned())
 						gray &= 0xFFFF;
 
 					if (Math.abs(gray - grayB) != 0) {

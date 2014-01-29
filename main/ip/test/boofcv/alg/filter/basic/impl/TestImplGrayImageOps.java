@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -115,7 +115,7 @@ public class TestImplGrayImageOps {
 		GImageSingleBand b = FactoryGImageSingleBand.wrap(output);
 		for (int y = 0; y < height; y++) {
 			for (int x = 0; x < width; x++) {
-				if( output.getTypeInfo().isInteger() )
+				if( output.getDataType().isInteger() )
 					assertEquals(67, b.get(x, y).doubleValue(),1e-4);
 				else
 					assertEquals(67.5, b.get(x, y).doubleValue(),1e-4);

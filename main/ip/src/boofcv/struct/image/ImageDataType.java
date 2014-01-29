@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,29 +25,29 @@ package boofcv.struct.image;
  * @author Peter Abeles
  */
 public enum ImageDataType {
-	/** Single Band Unsigned 8-bit image */
+	/** Unsigned 8-bit image */
 	U8(false,byte.class),
-	/** Single Band Signed 8-bit image */
+	/** Signed 8-bit image */
 	S8(true,byte.class),
-	/** Single Band Unsigned 16-bit image */
+	/** Unsigned 16-bit image */
 	U16(false,short.class),
-	/** Single Band Signed 16-bit integer image */
+	/** Signed 16-bit integer image */
 	S16(true,short.class),
-	/** Single Band Signed 32-bit integer image */
+	/** Signed 32-bit integer image */
 	S32(true,int.class),
-	/** Single Band Signed 64-bit integer image */
+	/** Signed 64-bit integer image */
 	S64(true,long.class),
-	/** Single Band 32-bit floating point image */
+	/** 32-bit floating point image */
 	F32(true,float.class),
-	/** Single Band 64-bit floating point image */
+	/** 64-bit floating point image */
 	F64(true,double.class),
-	/** Single Band 8-bit integer image */
+	/** 8-bit integer image */
 	I8(byte.class),
-	/** Single Band 16-bit integer image */
+	/** 16-bit integer image */
 	I16(short.class),
-	/** Single Band Integer image */
+	/** Integer image */
 	I(true),
-	/** Single Band floating point image */
+	/** floating point image */
 	F(true);
 
 	private int numBits;
@@ -58,7 +58,6 @@ public enum ImageDataType {
 	private double minValue;
 	private Class dataType;
 	private Class sumType;
-//	private Class<T> imageClass;
 
 	public static ImageDataType classToType( Class imageClass ) {
 		if( imageClass == ImageUInt8.class )
@@ -85,11 +84,31 @@ public enum ImageDataType {
 			return I;
 		else if( imageClass == ImageFloat.class )
 			return F;
+		else if( imageClass == InterleavedU8.class )
+			return U8;
+		else if( imageClass == InterleavedS8.class )
+			return S8;
+		else if( imageClass == InterleavedU16.class )
+			return U16;
+		else if( imageClass == InterleavedS16.class )
+			return S16;
+		else if( imageClass == InterleavedS32.class )
+			return S32;
+		else if( imageClass == InterleavedS64.class )
+			return S64;
+		else if( imageClass == InterleavedF32.class )
+			return F32;
+		else if( imageClass == InterleavedF64.class )
+			return F64;
+		else if( imageClass == InterleavedI8.class )
+			return I8;
+		else if( imageClass == InterleavedI16.class )
+			return I16;
 		else
-			throw new RuntimeException("Add");
+			return null;
 	}
 
-	public static Class typeToClass( ImageDataType type ) {
+	public static Class typeToSingleClass(ImageDataType type) {
 		switch (type) {
 			case U8:
 				return ImageUInt8.class;
@@ -115,6 +134,33 @@ public enum ImageDataType {
 				return ImageInteger.class;
 			case F:
 				return ImageFloat.class;
+		}
+
+		throw new RuntimeException("Add");
+	}
+
+	public static Class typeToInterleavedClass(ImageDataType type) {
+		switch (type) {
+			case U8:
+				return InterleavedU8.class;
+			case S8:
+				return InterleavedS8.class;
+			case U16:
+				return InterleavedU16.class;
+			case S16:
+				return InterleavedS16.class;
+			case S32:
+				return InterleavedS32.class;
+			case S64:
+				return InterleavedS64.class;
+			case F32:
+				return InterleavedF32.class;
+			case F64:
+				return InterleavedF64.class;
+			case I8:
+				return InterleavedI8.class;
+			case I16:
+				return InterleavedI16.class;
 		}
 
 		throw new RuntimeException("Add");

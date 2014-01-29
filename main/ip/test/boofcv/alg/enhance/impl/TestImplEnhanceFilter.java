@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -78,7 +78,7 @@ public class TestImplEnhanceFilter {
 		ImageSingleBand expected;
 		GImageMiscOps.fillUniform(input, rand, 0, 10);
 
-		if( input.getTypeInfo().isInteger()) {
+		if( input.getDataType().isInteger()) {
 			BoofTesting.callStaticMethod(ImplEnhanceFilter.class,"sharpenInner4",input,output,0,255);
 
 			expected = new ImageSInt16(input.width,input.height);
@@ -127,7 +127,7 @@ public class TestImplEnhanceFilter {
 		ImageSingleBand expected;
 		GImageMiscOps.fillUniform(input, rand, 0, 10);
 
-		if( input.getTypeInfo().isInteger()) {
+		if( input.getDataType().isInteger()) {
 			BoofTesting.callStaticMethod(ImplEnhanceFilter.class,"sharpenBorder4",input,output,0,255);
 
 			expected = new ImageSInt16(input.width,input.height);
@@ -179,7 +179,7 @@ public class TestImplEnhanceFilter {
 		ImageSingleBand expected;
 		GImageMiscOps.fillUniform(input, rand, 0, 10);
 
-		if( input.getTypeInfo().isInteger()) {
+		if( input.getDataType().isInteger()) {
 			BoofTesting.callStaticMethod(ImplEnhanceFilter.class,"sharpenInner8",input,output,0,255);
 
 			expected = new ImageSInt16(input.width,input.height);
@@ -228,7 +228,7 @@ public class TestImplEnhanceFilter {
 		ImageSingleBand expected;
 		GImageMiscOps.fillUniform(input, rand, 0, 10);
 
-		if( input.getTypeInfo().isInteger()) {
+		if( input.getDataType().isInteger()) {
 			BoofTesting.callStaticMethod(ImplEnhanceFilter.class,"sharpenBorder8",input,output,0,255);
 
 			expected = new ImageSInt16(input.width,input.height);

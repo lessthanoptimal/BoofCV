@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -79,9 +79,9 @@ public class TestConvertImage {
 		boolean outputSigned = true;
 
 		if( ImageInteger.class.isAssignableFrom(inputType) )
-			inputSigned = input.getTypeInfo().isSigned();
+			inputSigned = input.getDataType().isSigned();
 		if( ImageInteger.class.isAssignableFrom(outputType) )
-			outputSigned = output.getTypeInfo().isSigned();
+			outputSigned = output.getDataType().isSigned();
 
 	   // only provide signed numbers of both data types can handle them
 		if( inputSigned && outputSigned ) {
@@ -122,7 +122,7 @@ public class TestConvertImage {
 		boolean signed = true;
 
 		if( ImageInteger.class.isAssignableFrom(outputType) )
-			signed = output.getTypeInfo().isSigned();
+			signed = output.getDataType().isSigned();
 
 		for( int numBands = 1; numBands <= 3; numBands++ ) {
 			MultiSpectral input = new MultiSpectral(outputType,imgWidth,imgHeight,numBands);
@@ -173,7 +173,7 @@ public class TestConvertImage {
 	 * If the two images are both int or float then set a low tolerance, otherwise set the tolerance to one pixel
 	 */
 	private double selectTolerance( ImageSingleBand a , ImageSingleBand b ) {
-		if( a.getTypeInfo().isInteger() == b.getTypeInfo().isInteger() )
+		if( a.getDataType().isInteger() == b.getDataType().isInteger() )
 			return 1e-4;
 		else
 			return 1;

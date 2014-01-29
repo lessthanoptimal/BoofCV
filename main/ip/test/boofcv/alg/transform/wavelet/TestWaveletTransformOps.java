@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -185,14 +185,14 @@ public class TestWaveletTransformOps {
 								  ImageSingleBand input, ImageSingleBand output, ImageSingleBand found,
 								  double minValue , double maxValue ) {
 		if( input != null ) {
-			if( input.getTypeInfo().isInteger() ) {
+			if( input.getDataType().isInteger() ) {
 				WaveletTransformOps.transform1(desc, (ImageSInt32) input, (ImageSInt32) output, null);
 			} else {
 				WaveletTransformOps.transform1(desc, (ImageFloat32) input, (ImageFloat32) output, null);
 			}
 		}
 
-		if( output.getTypeInfo().isInteger() ) {
+		if( output.getDataType().isInteger() ) {
 			WaveletTransformOps.inverse1(desc,(ImageSInt32)output,(ImageSInt32)found,null,
 					(int)minValue,(int)maxValue);
 		} else {
@@ -206,14 +206,14 @@ public class TestWaveletTransformOps {
 								   int numLevels ,
 								   double minValue , double maxValue ) {
 		if( input != null ) {
-			if( input.getTypeInfo().isInteger() ) {
+			if( input.getDataType().isInteger() ) {
 				WaveletTransformOps.transformN(desc, (ImageSInt32) input, (ImageSInt32) output, null, numLevels);
 			} else {
 				WaveletTransformOps.transformN(desc, (ImageFloat32) input, (ImageFloat32) output, null, numLevels);
 			}
 		}
 
-		if( output.getTypeInfo().isInteger() ) {
+		if( output.getDataType().isInteger() ) {
 			WaveletTransformOps.inverseN(desc, (ImageSInt32) output, (ImageSInt32) found, null, numLevels,
 					(int) minValue, (int) maxValue);
 		} else {
