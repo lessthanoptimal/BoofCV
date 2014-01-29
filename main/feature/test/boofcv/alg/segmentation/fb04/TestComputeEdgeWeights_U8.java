@@ -76,7 +76,7 @@ public class TestComputeEdgeWeights_U8 {
 			hist[indexB]++;
 
 			float expected = Math.abs((input.data[indexA]&0xFF) - (input.data[indexB]&0xFF));
-			assertEquals(expected,e.weight,1e-4f);
+			assertEquals(expected,e.weight(),1e-4f);
 		}
 
 		// make sure each pixel was inspected

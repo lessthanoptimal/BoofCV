@@ -22,6 +22,7 @@ import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.alg.weights.WeightDistance_F32;
 import boofcv.alg.weights.WeightPixel_F32;
+import boofcv.struct.feature.ColorQueue_F32;
 import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_I32;
@@ -52,12 +53,7 @@ public class SegmentMeanShiftSearchGray<T extends ImageSingleBand> extends Segme
 		super(maxIterations,convergenceTol,weightSpacial,weightGray,fast);
 		this.interpolate = interpolate;
 
-		modeColor = new FastQueue<float[]>(float[].class,true) {
-			@Override
-			protected float[] createInstance() {
-				return new float[ 1 ];
-			}
-		};
+		modeColor = new ColorQueue_F32(1);
 	}
 
 	/**
