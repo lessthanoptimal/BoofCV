@@ -29,6 +29,19 @@ import org.ddogleg.struct.GrowQueue_I32;
 public class ImageSegmentationOps {
 
 
+	public static int countRegionPixels( ImageSInt32 graph , int which ) {
+		int total = 0;
+		for( int y = 0; y < graph.height; y++ ) {
+			int index = graph.startIndex + y*graph.stride;
+			for( int x = 0; x < graph.width; x++ ) {
+				if( graph.data[index++] == which ) {
+					total++;
+				}
+			}
+		}
+		return total;
+	}
+
 	/**
 	 * Compacts the region labels such that they are consecutive numbers starting from 0.
 	 * The ID of a root node must the index of a pixel in the region.

@@ -22,10 +22,7 @@ import boofcv.alg.interpolate.InterpolatePixelMB;
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.interpolate.TypeInterpolate;
 import boofcv.alg.segmentation.ComputeRegionMeanColor;
-import boofcv.alg.segmentation.fb04.ComputeEdgeWeights;
-import boofcv.alg.segmentation.fb04.ComputeEdgeWeights_MsU8;
-import boofcv.alg.segmentation.fb04.ComputeEdgeWeights_U8;
-import boofcv.alg.segmentation.fb04.SegmentFelzenszwalb04;
+import boofcv.alg.segmentation.fb04.*;
 import boofcv.alg.segmentation.ms.*;
 import boofcv.alg.weights.WeightDistanceUniform_F32;
 import boofcv.alg.weights.WeightDistance_F32;
@@ -117,15 +114,15 @@ public class FactorySegmentationAlg {
 		if( imageType.getFamily() == ImageType.Family.SINGLE_BAND ) {
 			switch( imageType.getDataType() ) {
 				case U8:
-					return (ComputeEdgeWeights)new ComputeEdgeWeights_U8();
+					return (ComputeEdgeWeights)new ComputeEdgeWeights4_U8();
 			}
 		} else if( imageType.getFamily() == ImageType.Family.MULTI_SPECTRAL ) {
 			int N = imageType.getNumBands();
 			switch( imageType.getDataType() ) {
 				case U8:
-					return (ComputeEdgeWeights)new ComputeEdgeWeights_MsU8();
-//				case F32:
-//					return (ComputeRegionMeanColor)new ComputeRegionMeanColor.MS_F32(N);
+					return (ComputeEdgeWeights)new ComputeEdgeWeights8_MsU8(N);
+				case F32:
+					return (ComputeEdgeWeights)new ComputeEdgeWeights8_MsF32(N);
 			}
 		}
 

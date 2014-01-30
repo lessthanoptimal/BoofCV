@@ -105,15 +105,4 @@ public class TestSegmentFelzenszwalb04 {
 
 		BoofTesting.assertEquals(expected, alg.graph, 1e-4);
 	}
-
-	@Test
-	public void computeNumberOfEdges() {
-		assertEquals(0,SegmentFelzenszwalb04.computeNumberOfEdges(1,1));
-		assertEquals(2,SegmentFelzenszwalb04.computeNumberOfEdges(1,3));
-		assertEquals(2,SegmentFelzenszwalb04.computeNumberOfEdges(3,1));
-		assertEquals(4,SegmentFelzenszwalb04.computeNumberOfEdges(2,2));
-		assertEquals(7,SegmentFelzenszwalb04.computeNumberOfEdges(3,2));
-		assertEquals(7,SegmentFelzenszwalb04.computeNumberOfEdges(2,3));
-		assertEquals(40,SegmentFelzenszwalb04.computeNumberOfEdges(5,5));
-	}
 }
