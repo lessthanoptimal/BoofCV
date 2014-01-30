@@ -16,13 +16,13 @@
  * limitations under the License.
  */
 
-package boofcv.alg.segmentation.fb04;
+package boofcv.alg.segmentation.fh04;
 
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.MultiSpectral;
 import org.ddogleg.struct.FastQueue;
 
-import static boofcv.alg.segmentation.fb04.SegmentFelzenszwalb04.Edge;
+import static boofcv.alg.segmentation.fh04.SegmentFelzenHutten04.Edge;
 
 /**
  * Computes edge weight as the absolute value of the different in pixel value.
@@ -31,19 +31,19 @@ import static boofcv.alg.segmentation.fb04.SegmentFelzenszwalb04.Edge;
  * @author Peter Abeles
  */
 // TODO create code generator
-public class ComputeEdgeWeights8_MsU8 implements ComputeEdgeWeights<MultiSpectral<ImageUInt8>> {
+public class ComputeEdgeWeights8_MsF32 implements ComputeEdgeWeights<MultiSpectral<ImageFloat32>> {
 
 
-	int pixelColor[];
+	float pixelColor[];
 	int numBands;
 
-	public ComputeEdgeWeights8_MsU8( int numBands ) {
+	public ComputeEdgeWeights8_MsF32(int numBands) {
 		this.numBands = numBands;
-		pixelColor = new int[numBands];
+		pixelColor = new float[numBands];
 	}
 
 	@Override
-	public void process(MultiSpectral<ImageUInt8> input,
+	public void process(MultiSpectral<ImageFloat32> input,
 						int outputStartIndex , int outputStride ,
 						FastQueue<Edge> edges) {
 
@@ -61,18 +61,18 @@ public class ComputeEdgeWeights8_MsU8 implements ComputeEdgeWeights<MultiSpectra
 				int weight1=0,weight2=0,weight3=0,weight4=0;
 
 				for( int i = 0; i < numBands; i++ ) {
-					ImageUInt8 band = input.getBand(i);
+					ImageFloat32 band = input.getBand(i);
 
-					int color0 = band.data[indexSrc] & 0xFF;                // (x,y)
-					int color1 = band.data[indexSrc+1] & 0xFF;              // (x+1,y)
-					int color2 = band.data[indexSrc+input.stride] & 0xFF;   // (x,y+1)
-					int color3 = band.data[indexSrc+1+input.stride] & 0xFF; // (x+1,y+1)
-					int color4 = band.data[indexSrc-1+input.stride] & 0xFF; // (x-1,y+1)
+					float color0 = band.data[indexSrc];                       // (x,y)
+					float color1 = band.data[indexSrc+1];                     // (x+1,y)
+					float color2 = band.data[indexSrc+input.stride];          // (x,y+1)
+					float color3 = band.data[indexSrc+1+input.stride];        // (x+1,y+1)
+					float color4 = band.data[indexSrc-1+input.stride];        // (x-1,y+1)
 
-					int diff1 = color0-color1;
-					int diff2 = color0-color2;
-					int diff3 = color0-color3;
-					int diff4 = color0-color4;
+					float diff1 = color0-color1;
+					float diff2 = color0-color2;
+					float diff3 = color0-color3;
+					float diff4 = color0-color4;
 
 					weight1 += diff1*diff1;
 					weight2 += diff2*diff2;
@@ -116,15 +116,15 @@ public class ComputeEdgeWeights8_MsU8 implements ComputeEdgeWeights<MultiSpectra
 	}
 
 	private void checkAround( int x , int y ,
-							  MultiSpectral<ImageUInt8> input ,
+							  MultiSpectral<ImageFloat32> input ,
 							  int outputStartIndex , int outputStride ,
 							  FastQueue<Edge> edges )
 	{
 		int indexA = input.startIndex + y*input.stride + x;
 
 		for( int i = 0; i < numBands; i++ ) {
-			ImageUInt8 band = input.getBand(i);
-			pixelColor[i] =  band.data[indexA] & 0xFF;
+			ImageFloat32 band = input.getBand(i);
+			pixelColor[i] =  band.data[indexA];       
 		}
 
 		check(x + 1, y, pixelColor, indexA, input, outputStartIndex, outputStride, edges);
@@ -133,8 +133,8 @@ public class ComputeEdgeWeights8_MsU8 implements ComputeEdgeWeights<MultiSpectra
 		check(x-1,y+1,pixelColor,indexA,input,outputStartIndex,outputStride,edges);
 	}
 
-	private void check( int x , int y , int color0[] , int indexA,
-						MultiSpectral<ImageUInt8> input ,
+	private void check( int x , int y , float color0[] , int indexA,
+						MultiSpectral<ImageFloat32> input ,
 						int outputStartIndex , int outputStride ,
 						FastQueue<Edge> edges ) {
 		if( !input.isInBounds(x,y) )
@@ -146,10 +146,10 @@ public class ComputeEdgeWeights8_MsU8 implements ComputeEdgeWeights<MultiSpectra
 		float weight = 0;
 
 		for( int i = 0; i < numBands; i++ ) {
-			ImageUInt8 band = input.getBand(i);
+			ImageFloat32 band = input.getBand(i);
 
-			int color = band.data[indexSrc] & 0xFF;
-			int diff = color0[i]-color;
+			float color = band.data[indexSrc];
+			float diff = color0[i]-color;
 			weight += diff*diff;
 		}
 

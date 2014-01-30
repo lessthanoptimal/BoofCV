@@ -16,12 +16,12 @@
  * limitations under the License.
  */
 
-package boofcv.alg.segmentation.fb04;
+package boofcv.alg.segmentation.fh04;
 
 import boofcv.struct.image.ImageUInt8;
 import org.ddogleg.struct.FastQueue;
 
-import static boofcv.alg.segmentation.fb04.SegmentFelzenszwalb04.Edge;
+import static boofcv.alg.segmentation.fh04.SegmentFelzenHutten04.Edge;
 
 /**
  * Computes edge weight as the absolute value of the different in pixel value.
