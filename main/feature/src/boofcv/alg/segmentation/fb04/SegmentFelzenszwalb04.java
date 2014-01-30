@@ -27,9 +27,7 @@ import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_F32;
 import org.ddogleg.struct.GrowQueue_I32;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 
 /**
  * <p>
@@ -61,7 +59,7 @@ import java.util.List;
 // TODO optimize sort
 public class SegmentFelzenszwalb04<T extends ImageBase> {
 
-	// tuning parameter.  Determines the number of segments
+	// tuning parameter.  Determines the number of segments.  Larger number means larger
 	private float K;
 
 	// the minimum region size.  Regions smaller than this are merged into larger ones
@@ -69,25 +67,22 @@ public class SegmentFelzenszwalb04<T extends ImageBase> {
 
 	// Storage for the disjoint-set forest.  Same data structure as 'output', but renamed for convenience.
 	// Value stored in each pixel refers to the parent vertex.  A root vertex contains a reference for itself
-	protected ImageSInt32 graph = new ImageSInt32(1,1);
+	protected ImageSInt32 graph;
 
 	// Function that computes the weight for each edge
 	private ComputeEdgeWeights<T> computeWeights;
 
 	private QuickSortObj_F32 sorter = new QuickSortObj_F32();
 	// storage for edges so that they can be recycled on the next call
-	private FastQueue<Edge> edgesStorage = new FastQueue<Edge>(Edge.class,true);
-	// List of edges currently being examined
-	private List<Edge> activeEdges = new ArrayList<Edge>();
-	// The edges which are to be examined in the next iteration
-	private List<Edge> nextActiveEdges = new ArrayList<Edge>();
-
+	private FastQueue<Edge> edges = new FastQueue<Edge>(Edge.class,true);
+	// list of edges which were not matched to anything.  used to merge small regions
+	private FastQueue<Edge> edgesNotMatched = new FastQueue<Edge>(Edge.class,false);
 	// Size of each region
 	protected GrowQueue_I32 regionSize = new GrowQueue_I32();
-	// Internal difference of a component, Int(C) Equation 1.  Max edge in the minimum-spanning-tree.
-	// Comment: The only reason this is the a MST is because it is the only tree.  If all adjacent pixels
-	//          were considered for connectivity (as is reasonable/common) then their technique would be incorrect.
-	private GrowQueue_F32 segmentIntDiff = new GrowQueue_F32();
+	// This is equivalent to Int(C) + tau(C) in Equation 4.
+	// NOTE: Is the maximum weight in the MST really weight of the edge causing the merge?  Maybe I'm missing
+	// something, but it seems trivial to find counter examples.
+	private GrowQueue_F32 threshold = new GrowQueue_F32();
 
 	// List of region ID's and their size
 	private GrowQueue_I32 outputRegionId = new GrowQueue_I32();
@@ -120,7 +115,11 @@ public class SegmentFelzenszwalb04<T extends ImageBase> {
 		initialize(input,output);
 
 		// compute edges weights
-		computeWeights.process(input, output.startIndex, output.stride, edgesStorage.toList());
+		long time0 = System.currentTimeMillis();
+		computeWeights.process(input, output.startIndex, output.stride, edges);
+		long time1 = System.currentTimeMillis();
+
+		System.out.println("Edge weights time "+(time1-time0));
 
 		// Merge regions together
 		mergeRegions();
@@ -138,20 +137,22 @@ public class SegmentFelzenszwalb04<T extends ImageBase> {
 	protected void initialize(T input , ImageSInt32 output ) {
 		this.graph = output;
 		final int N = input.width*input.height;
-		final int M = computeNumberOfEdges(input.width,input.height);
-
-		activeEdges.clear();
-		nextActiveEdges.clear();
 
 		regionSize.resize(N);
-		segmentIntDiff.resize(N);
+		threshold.resize(N);
 		for( int i = 0; i < N; i++ ) {
-			output.data[i] = i;
 			regionSize.data[i] = 1;
-			segmentIntDiff.data[i] = 0;
+			threshold.data[i] = K;
 		}
-		edgesStorage.resize(M);
-
+		int id = 0;
+		for( int y = 0; y < output.height; y++ ) {
+			int index = graph.startIndex + y*graph.stride;
+			for( int x = 0; x < graph.width; x++ ) {
+				graph.data[index++] = id++;
+			}
+		}
+		edges.reset();
+		edgesNotMatched.reset();
 	}
 
 	/**
@@ -162,72 +163,43 @@ public class SegmentFelzenszwalb04<T extends ImageBase> {
 
 		// sort edges
 		long time0 = System.currentTimeMillis();
-//		sorter.sort(edgesStorage.data,edgesStorage.size);
-		Collections.sort(edgesStorage.toList());
+//		sorter.sort(edges.data,edges.size);
+		Collections.sort(edges.toList());
 		long time1 = System.currentTimeMillis();
 
-		for( int i = 0; i < edgesStorage.size; i++ ) {
-			activeEdges.add( edgesStorage.get(i) );
-		}
 		System.out.println("Sort time " + (time1 - time0));
 
-		// iterate until convergence
-		int M = activeEdges.size();
-		for( int i = 0; i < M; i++ ) {
-			int totalActive = activeEdges.size();
-			nextActiveEdges.clear();
+		// examine each edge to see if it can connect two regions
+		for( int i = 0; i < edges.size(); i++ ) {
+			// compare the two nodes connected by the edge to see if their regions they should be merged
+			Edge e = edges.get(i);
 
-			// examine each edge to see if it can connect two regions
-			for( int j = 0; j < activeEdges.size(); j++ ) {
-				// compare the two nodes connected by the edge to see if their regions they should be merged
-				Edge e = activeEdges.get(j);
+			int rootA = find(e.indexA);
+			int rootB = find(e.indexB);
 
-				int rootA = find(e.indexA);
-				int rootB = find(e.indexB);
+			// see if they are already part of the same segment
+			if( rootA == rootB )
+				continue;
 
-				// see if they are already part of the same segment
-				if( rootA == rootB )
-					continue;
+			float threshA = threshold.get(rootA);
+			float threshB = threshold.get(rootB);
 
+			if( e.weight() <= threshA && e.weight() <= threshB )  {
+				// ----- Merge the two regions/components
 				int sizeA = regionSize.get(rootA);
 				int sizeB = regionSize.get(rootB);
 
-				// compute MInt: Equation 4
-				float intA = segmentIntDiff.get(rootA);
-				float intB = segmentIntDiff.get(rootB);
+				// Everything is merged into region A, so update its threshold
+				threshold.data[rootA] = e.weight() + K/(sizeA + sizeB);
 
-				float MInt = Math.min(intA + K/sizeA , intB + K/sizeB);
+				// Point everything towards rootA
+				graph.data[e.indexB] = rootA;
+				graph.data[rootB] = rootA;
 
-				if( e.weight() <= MInt )  {
-					// ----- Merge the two regions/components
-
-					// recompute the internal difference
-					float internalDiff = intA > intB ? intA : intB;
-					if( internalDiff < e.weight() )
-						internalDiff = e.weight();
-
-					// Everything is merged into region A, so update its internal difference
-					segmentIntDiff.data[rootA] = internalDiff;
-
-					// Point everything towards rootA
-					graph.data[e.indexB] = rootA;
-					graph.data[rootB] = rootA;
-
-					// Update the size of regionA
-					regionSize.data[rootA] = sizeA + sizeB;
-				} else {
-					nextActiveEdges.add(e);
-				}
-			}
-
-			// swap active lists
-			List<Edge> tmp = activeEdges;
-			activeEdges = nextActiveEdges;
-			nextActiveEdges = tmp;
-
-			// see if the graph has changed
-			if( totalActive == activeEdges.size() ) {
-				break;
+				// Update the size of regionA
+				regionSize.data[rootA] = sizeA + sizeB;
+			} else {
+				edgesNotMatched.add(e);
 			}
 		}
 	}
@@ -236,8 +208,8 @@ public class SegmentFelzenszwalb04<T extends ImageBase> {
 	 * Look at the remaining regions and if there are any small ones marge them into a larger region
 	 */
 	protected void mergeSmallRegions() {
-		for( int j = 0; j < activeEdges.size(); j++ ) {
-			Edge e = activeEdges.get(j);
+		for( int i = 0; i < edgesNotMatched.size(); i++ ) {
+			Edge e = edgesNotMatched.get(i);
 
 			int rootA = find(e.indexA);
 			int rootB = find(e.indexB);
@@ -282,7 +254,7 @@ public class SegmentFelzenszwalb04<T extends ImageBase> {
 
 	/**
 	 * Searches for root nodes in the graph and adds their size to the list of region sizes.  Makes sure all
-	 * other nodes in the graph point directly at the root.
+	 * other nodes in the graph point directly at their root.
 	 */
 	protected void computeOutput() {
 		outputRegionId.reset();
@@ -305,13 +277,6 @@ public class SegmentFelzenszwalb04<T extends ImageBase> {
 				}
 			}
 		}
-	}
-
-	/**
-	 * Computes the number of edge in an image using a 4-connect rule
-	 */
-	public static int computeNumberOfEdges( int width , int height ) {
-		return width*(height-1) + (width-1)*height;
 	}
 
 	/**

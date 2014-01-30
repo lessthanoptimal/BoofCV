@@ -35,16 +35,16 @@ import java.util.Random;
  */
 public class VisualizeSegmentFelzenszalb04App {
 
+	public static double sigma = 0.5;
 	public static int K = 500;
 	public static int minimumSize = 20;
-	public static boolean fast = true;
 
 	public static <T extends ImageBase> void process( BufferedImage image ,ImageType<T> type ) {
 		T color = type.createImage(image.getWidth(),image.getHeight());
 
 		ConvertBufferedImage.convertFrom(image, color, true);
 
-		GBlurImageOps.gaussian(color, color, 0.5, -1, null);
+		GBlurImageOps.gaussian(color, color, sigma, -1, null);
 
 		BufferedImage outColor = new BufferedImage(color.width,color.height,BufferedImage.TYPE_INT_RGB);
 //		BufferedImage outSegments = new BufferedImage(color.width,color.height,BufferedImage.TYPE_INT_RGB);
@@ -61,6 +61,28 @@ public class VisualizeSegmentFelzenszalb04App {
 
 		ImageSegmentationOps.regionPixelId_to_Compact(pixelToSegmentOld,alg.getRegionId(), pixelToSegment);
 		GrowQueue_I32 segmentSize = alg.getRegionSizes();
+
+//		int numBefore = alg.getRegionSizes().getSize();
+//
+//		ClusterLabeledImage cluster = new ClusterLabeledImage(8);
+//		cluster.process(pixelToSegment,pixelToSegmentOld,alg.getRegionSizes());
+//
+//		int numAfter = alg.getRegionSizes().getSize();
+//
+//		if( numAfter != numBefore )
+//			System.out.println("WTF there are disconnected regions");
+
+//		for( int i = 0; i < alg.getRegionId().getSize(); i++ ) {
+//			int expected = alg.getRegionSizes().get(i);
+//			int found = ImageSegmentationOps.countRegionPixels(pixelToSegment,i);
+//
+//			if( expected != found ) {
+//				System.out.println("Oh shite");
+//			}
+//			if( expected < minimumSize ) {
+//				System.out.println("Oh shite");
+//			}
+//		}
 
 		Random rand = new Random(234);
 
@@ -102,10 +124,11 @@ public class VisualizeSegmentFelzenszalb04App {
 //		BufferedImage image = UtilImageIO.loadImage("../data/evaluation/sunflowers.png");
 //		BufferedImage image = UtilImageIO.loadImage("../data/evaluation/shapes01.png");
 //		BufferedImage image = UtilImageIO.loadImage("../data/applet/trees_rotate_01.jpg");
-		BufferedImage image = UtilImageIO.loadImage("../data/applet/segment/mountain_pines_people.jpg");
-//		BufferedImage image = UtilImageIO.loadImage("/home/pja/Desktop/segmentation/example-orig.jpg");
+//		BufferedImage image = UtilImageIO.loadImage("../data/applet/segment/mountain_pines_people.jpg");
+		BufferedImage image = UtilImageIO.loadImage("/home/pja/Desktop/segmentation/example-orig.ppm");
 
-		ImageType<MultiSpectral<ImageUInt8>> imageType = ImageType.ms(3,ImageUInt8.class);
+//		ImageType<MultiSpectral<ImageUInt8>> imageType = ImageType.ms(3,ImageUInt8.class);
+		ImageType<MultiSpectral<ImageFloat32>> imageType = ImageType.ms(3,ImageFloat32.class);
 //		ImageType<ImageUInt8> imageType = ImageType.single(ImageUInt8.class);
 
 		process(image,imageType);

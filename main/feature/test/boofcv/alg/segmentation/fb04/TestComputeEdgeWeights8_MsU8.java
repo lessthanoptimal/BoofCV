@@ -25,7 +25,7 @@ import static org.junit.Assert.fail;
 /**
  * @author Peter Abeles
  */
-public class TestComputeEdgeWeights_MsU8 {
+public class TestComputeEdgeWeights8_MsU8 {
 	@Test
 	public void stuff() {
 		fail("implement");
