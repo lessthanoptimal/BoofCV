@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.segmentation.fb04;
+package boofcv.alg.segmentation.fh04;
 
 import boofcv.alg.InputSanityCheck;
 import boofcv.struct.image.ImageBase;
@@ -27,27 +27,44 @@ import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_F32;
 import org.ddogleg.struct.GrowQueue_I32;
 
-import java.util.Collections;
-
 /**
  * <p>
- * Fast image segmentation algorithm which uses a graph based heuristic.  The weight of all the edges in the image
- * is computed first and sorted from smallest to largest.  Two pixels are connected using a 4-connect rule.  The
- * weight of an edge is the F-norm of the difference between the colors of the two pixels it connects.  It then
- * iterates until convergence where it joins two regions together if an edge has a weight &le; the maximum weight
- * in the region (paper says max weight of MST, see comments in code why this is miss leading). For more details
- * see [1].
- * </p>
-
- * <p>
- * One difference from the original is that Gaussian blur is not applied to the input image by default.  That
- * should be done prior to the image being passed in.
+ * Implementation of Felzenszwalb-Huttenlocher 2004 [1] image segmentation algorithm. It is fast and uses a graph based
+ * heuristic with a tuning parameter that can be used to adjust region size.  Regions are irregularly shaped.
  * </p>
  *
- * <P>
- * NOTE: Region ID's in output image will NOT be sequential.  You need to call {@link #getRegionId()} to find
- * out what the ID's are.
- * </P>
+ * <p>
+ * It works by constructing a graph in which pixels are the nodes and edges describe the relationship between
+ * adjacent pixels.  Each pixel has a weight that is determined from the difference in pixel values using the F-norm.
+ * The weights for all the edges are computed first and sorted from smallest to largest.  In the next step
+ * the first edge in the list is selected and is tested to see if the nodes should be connected or not.  This
+ * process is repeated for all edges.  Small regions are then merged into large ones. For more details
+ * see [1].
+ * </p>
+ *
+ * <p>
+ * NOTE:
+ * <ul>
+ * <li>Region ID's in output image will NOT be sequential.  You need to call {@link #getRegionId()} to find
+ * out what the ID's are.</li>
+ * <li>Connectivity rule which determines what an adjacent pixel is determined by the {@link ComputeEdgeWeights}
+ * class passed in to the constructor.  8-connect is used in reference implementation.
+ * </ul>
+ * <pP>
+ *
+ * <p>
+ * Algorithmic Changes:<br>
+ * This implementation is a faithful of the original and has been compared against the authors
+ * reference source code.  It does produce different results from the reference, some times significant, due to the
+ * sensitivity of the algorithm to minor differences.  The sensitivity arises from it being a greedy algorithm.</p>
+ *
+ * <p>Here is a list of minor differences that cause different regions due to its sensitivity.  The order in which
+ * edges with identical weights are sorted is arbitrary.  The order that edges are computed is arbitrary.  Floating
+ * point error in weight calculation gradually causes segmentation to diverge to a different solution even
+ * when given the same input.</p>
+ *
+ * <p>One difference from the original is that Gaussian blur is not applied to the input image by default.  That
+ * should be done prior to the image being passed in.</p>
  *
  * <p>
  * [1] Felzenszwalb, Pedro F., and Daniel P. Huttenlocher.
@@ -57,16 +74,17 @@ import java.util.Collections;
  * @author Peter Abeles
  */
 // TODO optimize sort
-public class SegmentFelzenszwalb04<T extends ImageBase> {
+// Looking closely at the results there does appear to be pointless segments.  Maybe a bug some place?
+public class SegmentFelzenHutten04<T extends ImageBase> {
 
-	// tuning parameter.  Determines the number of segments.  Larger number means larger
+	// tuning parameter.  Determines the number of segments.  Larger number means larger regions
 	private float K;
 
 	// the minimum region size.  Regions smaller than this are merged into larger ones
 	private int minimumSize;
 
 	// Storage for the disjoint-set forest.  Same data structure as 'output', but renamed for convenience.
-	// Value stored in each pixel refers to the parent vertex.  A root vertex contains a reference for itself
+	// Value stored in each pixel refers to the parent vertex.  A root vertex contains a reference to itself
 	protected ImageSInt32 graph;
 
 	// Function that computes the weight for each edge
@@ -95,7 +113,7 @@ public class SegmentFelzenszwalb04<T extends ImageBase> {
 	 * @param minimumSize Regions smaller than this are merged into larger regions
 	 * @param computeWeights Function used to compute the weight for all the edges.
 	 */
-	public SegmentFelzenszwalb04(float k, int minimumSize, ComputeEdgeWeights<T> computeWeights) {
+	public SegmentFelzenHutten04(float k, int minimumSize, ComputeEdgeWeights<T> computeWeights) {
 		K = k;
 		this.minimumSize = minimumSize;
 		this.computeWeights = computeWeights;
@@ -119,7 +137,7 @@ public class SegmentFelzenszwalb04<T extends ImageBase> {
 		computeWeights.process(input, output.startIndex, output.stride, edges);
 		long time1 = System.currentTimeMillis();
 
-		System.out.println("Edge weights time "+(time1-time0));
+		System.out.println("Edge weights time " + (time1 - time0));
 
 		// Merge regions together
 		mergeRegions();
@@ -144,11 +162,13 @@ public class SegmentFelzenszwalb04<T extends ImageBase> {
 			regionSize.data[i] = 1;
 			threshold.data[i] = K;
 		}
-		int id = 0;
-		for( int y = 0; y < output.height; y++ ) {
+		// assign initial label to each node in the graph
+		// To reduce memory usage the output image is used to store the graph, but it could be a sub-image,
+		// so the labels are equal to the pixel index in the image.
+		for( int y = 0; y < graph.height; y++ ) {
 			int index = graph.startIndex + y*graph.stride;
-			for( int x = 0; x < graph.width; x++ ) {
-				graph.data[index++] = id++;
+			for( int x = 0; x < graph.width; x++ , index++) {
+				graph.data[index] = index;
 			}
 		}
 		edges.reset();
@@ -163,8 +183,8 @@ public class SegmentFelzenszwalb04<T extends ImageBase> {
 
 		// sort edges
 		long time0 = System.currentTimeMillis();
-//		sorter.sort(edges.data,edges.size);
-		Collections.sort(edges.toList());
+		sorter.sort(edges.data,edges.size);
+//		Collections.sort(edges.toList());
 		long time1 = System.currentTimeMillis();
 
 		System.out.println("Sort time " + (time1 - time0));
@@ -202,6 +222,9 @@ public class SegmentFelzenszwalb04<T extends ImageBase> {
 				edgesNotMatched.add(e);
 			}
 		}
+
+		long time2 = System.currentTimeMillis();
+		System.out.println("Edge merge time " + (time2 - time1));
 	}
 
 	/**
@@ -248,6 +271,7 @@ public class SegmentFelzenszwalb04<T extends ImageBase> {
 			child = root;
 			root = graph.data[child];
 		}
+
 		graph.data[inputChild] = root;
 		return root;
 	}

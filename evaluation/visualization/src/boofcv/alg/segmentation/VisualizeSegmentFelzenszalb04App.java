@@ -19,7 +19,7 @@
 package boofcv.alg.segmentation;
 
 import boofcv.alg.filter.blur.GBlurImageOps;
-import boofcv.alg.segmentation.fb04.SegmentFelzenszwalb04;
+import boofcv.alg.segmentation.fh04.SegmentFelzenHutten04;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.factory.segmentation.FactorySegmentationAlg;
 import boofcv.gui.image.ShowImages;
@@ -44,20 +44,22 @@ public class VisualizeSegmentFelzenszalb04App {
 
 		ConvertBufferedImage.convertFrom(image, color, true);
 
-		GBlurImageOps.gaussian(color, color, sigma, -1, null);
-
 		BufferedImage outColor = new BufferedImage(color.width,color.height,BufferedImage.TYPE_INT_RGB);
 //		BufferedImage outSegments = new BufferedImage(color.width,color.height,BufferedImage.TYPE_INT_RGB);
 
-		SegmentFelzenszwalb04<T> alg = FactorySegmentationAlg.felzenszwalb04(K, minimumSize, type);
+		SegmentFelzenHutten04<T> alg = FactorySegmentationAlg.felzenszwalb04(K, minimumSize, type);
 
 		ImageSInt32 pixelToSegmentOld = new ImageSInt32(color.width,color.height);
 		ImageSInt32 pixelToSegment = new ImageSInt32(color.width,color.height);
 
 
-		long time0 = System.currentTimeMillis();
-		alg.process(color,pixelToSegmentOld);
-		long time1 = System.currentTimeMillis();
+		for( int i = 0; i < 5; i++ ) {
+			long time0 = System.currentTimeMillis();
+			GBlurImageOps.gaussian(color, color, sigma, -1, null);
+			alg.process(color,pixelToSegmentOld);
+			long time1 = System.currentTimeMillis();
+			System.out.println("Time MS "+(time1-time0));
+		}
 
 		ImageSegmentationOps.regionPixelId_to_Compact(pixelToSegmentOld,alg.getRegionId(), pixelToSegment);
 		GrowQueue_I32 segmentSize = alg.getRegionSizes();
@@ -113,7 +115,6 @@ public class VisualizeSegmentFelzenszalb04App {
 			}
 		}
 
-		System.out.println("Time MS "+(time1-time0));
 		System.out.println("Total regions: "+segmentSize.size);
 
 		ShowImages.showWindow(outColor,"Regions");

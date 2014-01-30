@@ -16,18 +16,18 @@
  * limitations under the License.
  */
 
-package boofcv.alg.segmentation.fb04;
+package boofcv.alg.segmentation.fh04;
 
-import org.junit.Test;
-
-import static org.junit.Assert.fail;
+import boofcv.struct.image.ImageBase;
+import org.ddogleg.struct.FastQueue;
 
 /**
+ * TODO comment
+ *
  * @author Peter Abeles
  */
-public class TestComputeEdgeWeights4_MsU8 {
-	@Test
-	public void stuff() {
-		fail("implement");
-	}
+public interface ComputeEdgeWeights<T extends ImageBase> {
+
+	public void process( T input , int outputStartIndex , int outputStride ,
+						 FastQueue<SegmentFelzenHutten04.Edge> edges );
 }

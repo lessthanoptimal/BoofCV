@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.segmentation.fb04;
+package boofcv.alg.segmentation.fh04;
 
 import org.junit.Test;
 
@@ -25,7 +25,7 @@ import static org.junit.Assert.fail;
 /**
  * @author Peter Abeles
  */
-public class TestComputeEdgeWeights8_MsU8 {
+public class TestComputeEdgeWeights4_MsU8 {
 	@Test
 	public void stuff() {
 		fail("implement");

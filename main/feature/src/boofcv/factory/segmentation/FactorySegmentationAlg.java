@@ -22,7 +22,7 @@ import boofcv.alg.interpolate.InterpolatePixelMB;
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.interpolate.TypeInterpolate;
 import boofcv.alg.segmentation.ComputeRegionMeanColor;
-import boofcv.alg.segmentation.fb04.*;
+import boofcv.alg.segmentation.fh04.*;
 import boofcv.alg.segmentation.ms.*;
 import boofcv.alg.weights.WeightDistanceUniform_F32;
 import boofcv.alg.weights.WeightDistance_F32;
@@ -120,6 +120,7 @@ public class FactorySegmentationAlg {
 			int N = imageType.getNumBands();
 			switch( imageType.getDataType() ) {
 				case U8:
+//					return (ComputeEdgeWeights)new ComputeEdgeWeights4_MsU8();
 					return (ComputeEdgeWeights)new ComputeEdgeWeights8_MsU8(N);
 				case F32:
 					return (ComputeEdgeWeights)new ComputeEdgeWeights8_MsF32(N);
@@ -130,11 +131,11 @@ public class FactorySegmentationAlg {
 	}
 
 	public static<T extends ImageBase>
-	SegmentFelzenszwalb04<T> felzenszwalb04( int K , int minimumRegionSize , ImageType<T> imageType )
+	SegmentFelzenHutten04<T> felzenszwalb04( int K , int minimumRegionSize , ImageType<T> imageType )
 	{
 
 		ComputeEdgeWeights<T> edgeWeights = weightsFelzenszwalb04(imageType);
 
-		return new SegmentFelzenszwalb04<T>(K,minimumRegionSize,edgeWeights);
+		return new SegmentFelzenHutten04<T>(K,minimumRegionSize,edgeWeights);
 	}
 }

@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.segmentation.fb04;
+package boofcv.alg.segmentation.fh04;
 
 import boofcv.struct.image.ImageSInt32;
 import boofcv.testing.BoofTesting;
@@ -29,7 +29,7 @@ import static org.junit.Assert.fail;
 /**
  * @author Peter Abeles
  */
-public class TestSegmentFelzenszwalb04 {
+public class TestFelzenHutten04 {
 
 	@Test
 	public void process() {
@@ -48,7 +48,7 @@ public class TestSegmentFelzenszwalb04 {
 
 	@Test
 	public void find() {
-		SegmentFelzenszwalb04 alg = new SegmentFelzenszwalb04(300,20,null);
+		SegmentFelzenHutten04 alg = new SegmentFelzenHutten04(300,20,null);
 
 		alg.graph = new ImageSInt32(4,5);
 		alg.graph.data = new int[]{
@@ -68,7 +68,7 @@ public class TestSegmentFelzenszwalb04 {
 	@Test
 	public void computeOutput() {
 
-		SegmentFelzenszwalb04 alg = new SegmentFelzenszwalb04(300,20,null);
+		SegmentFelzenHutten04 alg = new SegmentFelzenHutten04(300,20,null);
 
 		alg.graph = new ImageSInt32(4,5);
 		alg.graph.data = new int[]{
