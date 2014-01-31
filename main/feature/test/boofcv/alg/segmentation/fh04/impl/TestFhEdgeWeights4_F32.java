@@ -16,27 +16,33 @@
  * limitations under the License.
  */
 
-package boofcv.struct.feature;
+package boofcv.alg.segmentation.fh04.impl;
 
-import org.ddogleg.struct.FastQueue;
+import boofcv.alg.segmentation.fh04.FhEdgeWeights;
+import boofcv.struct.ConnectRule;
+import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageType;
+
+import java.util.Random;
 
 /**
- * Stores an array of floats on constant size.  Intended for storing multi band data.
- *
- * @author Peter Abeles
- */
-public class ColorQueue_F32 extends FastQueue<float[]> {
+* @author Peter Abeles
+*/
+public class TestFhEdgeWeights4_F32 extends GenericFhEdgeWeightsChecks<ImageFloat32> {
 
-	int numBands;
+	Random rand = new Random(234);
 
-	public ColorQueue_F32(int numBands) {
-		this.numBands = numBands;
-		init(10, float[].class, true);
+	public TestFhEdgeWeights4_F32() {
+		super(ImageType.single(ImageFloat32.class), ConnectRule.FOUR);
 	}
 
 	@Override
-	protected float[] createInstance() {
-		return new float[ numBands ];
+	public FhEdgeWeights<ImageFloat32> createAlg() {
+		return new FhEdgeWeights4_F32();
 	}
 
+	@Override
+	public float weight( ImageFloat32 input , int indexA, int indexB) {
+		return Math.abs(input.data[indexA] - input.data[indexB]);
+	}
 }

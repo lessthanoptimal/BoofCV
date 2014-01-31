@@ -16,18 +16,29 @@
  * limitations under the License.
  */
 
-package boofcv.alg.segmentation.fh04;
+package boofcv.alg.segmentation.fh04.impl;
 
-import org.junit.Test;
-
-import static org.junit.Assert.fail;
+import boofcv.alg.segmentation.fh04.FhEdgeWeights;
+import boofcv.struct.ConnectRule;
+import boofcv.struct.image.ImageType;
+import boofcv.struct.image.ImageUInt8;
 
 /**
- * @author Peter Abeles
- */
-public class TestComputeEdgeWeights4_MsU8 {
-	@Test
-	public void stuff() {
-		fail("implement");
+* @author Peter Abeles
+*/
+public class TestFhEdgeWeights8_U8 extends GenericFhEdgeWeightsChecks<ImageUInt8> {
+
+	public TestFhEdgeWeights8_U8() {
+		super(ImageType.single(ImageUInt8.class), ConnectRule.EIGHT);
+	}
+
+	@Override
+	public FhEdgeWeights<ImageUInt8> createAlg() {
+		return new FhEdgeWeights8_U8();
+	}
+
+	@Override
+	public float weight( ImageUInt8 input , int indexA, int indexB) {
+		return Math.abs((input.data[indexA]&0xFF) - (input.data[indexB]&0xFF));
 	}
 }
