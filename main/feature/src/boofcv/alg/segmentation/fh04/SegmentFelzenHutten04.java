@@ -29,7 +29,7 @@ import org.ddogleg.struct.GrowQueue_I32;
 
 /**
  * <p>
- * Implementation of Felzenszwalb-Huttenlocher 2004 [1] image segmentation algorithm. It is fast and uses a graph based
+ * Implementation of Felzenszwalb-Huttenlocher [1] image segmentation algorithm. It is fast and uses a graph based
  * heuristic with a tuning parameter that can be used to adjust region size.  Regions are irregularly shaped.
  * </p>
  *
@@ -47,8 +47,12 @@ import org.ddogleg.struct.GrowQueue_I32;
  * <ul>
  * <li>Region ID's in output image will NOT be sequential.  You need to call {@link #getRegionId()} to find
  * out what the ID's are.</li>
- * <li>Connectivity rule which determines what an adjacent pixel is determined by the {@link ComputeEdgeWeights}
- * class passed in to the constructor.  8-connect is used in reference implementation.
+ * <li>The output image can't be a sub-image because it is used internally and needs to be a continuous
+ * block of memory.</li>
+ * <li>Connectivity rule which determines what an adjacent pixel is determined by the {@link FhEdgeWeights}
+ * class passed in to the constructor.  8-connect is used in reference implementation.</li>
+ * <li>Apologies to Felzenszwalb and Huttenlocher for truncating their name in the class name.  Just too long
+ * otherwise.</li>
  * </ul>
  * <pP>
  *
@@ -73,8 +77,7 @@ import org.ddogleg.struct.GrowQueue_I32;
  *
  * @author Peter Abeles
  */
-// TODO optimize sort
-// Looking closely at the results there does appear to be pointless segments.  Maybe a bug some place?
+// TODO optimize sort - Use approximate method?
 public class SegmentFelzenHutten04<T extends ImageBase> {
 
 	// tuning parameter.  Determines the number of segments.  Larger number means larger regions
@@ -88,19 +91,19 @@ public class SegmentFelzenHutten04<T extends ImageBase> {
 	protected ImageSInt32 graph;
 
 	// Function that computes the weight for each edge
-	private ComputeEdgeWeights<T> computeWeights;
+	private FhEdgeWeights<T> computeWeights;
 
 	private QuickSortObj_F32 sorter = new QuickSortObj_F32();
 	// storage for edges so that they can be recycled on the next call
-	private FastQueue<Edge> edges = new FastQueue<Edge>(Edge.class,true);
+	protected FastQueue<Edge> edges = new FastQueue<Edge>(Edge.class,true);
 	// list of edges which were not matched to anything.  used to merge small regions
-	private FastQueue<Edge> edgesNotMatched = new FastQueue<Edge>(Edge.class,false);
+	protected FastQueue<Edge> edgesNotMatched = new FastQueue<Edge>(Edge.class,false);
 	// Size of each region
 	protected GrowQueue_I32 regionSize = new GrowQueue_I32();
 	// This is equivalent to Int(C) + tau(C) in Equation 4.
 	// NOTE: Is the maximum weight in the MST really weight of the edge causing the merge?  Maybe I'm missing
 	// something, but it seems trivial to find counter examples.
-	private GrowQueue_F32 threshold = new GrowQueue_F32();
+	protected GrowQueue_F32 threshold = new GrowQueue_F32();
 
 	// List of region ID's and their size
 	private GrowQueue_I32 outputRegionId = new GrowQueue_I32();
@@ -113,7 +116,7 @@ public class SegmentFelzenHutten04<T extends ImageBase> {
 	 * @param minimumSize Regions smaller than this are merged into larger regions
 	 * @param computeWeights Function used to compute the weight for all the edges.
 	 */
-	public SegmentFelzenHutten04(float k, int minimumSize, ComputeEdgeWeights<T> computeWeights) {
+	public SegmentFelzenHutten04(float k, int minimumSize, FhEdgeWeights<T> computeWeights) {
 		K = k;
 		this.minimumSize = minimumSize;
 		this.computeWeights = computeWeights;
@@ -128,13 +131,15 @@ public class SegmentFelzenHutten04<T extends ImageBase> {
 	 * @param output Output segmented image.  Modified.
 	 */
 	public void process( T input , ImageSInt32 output ) {
+		if( output.isSubimage() )
+			throw new IllegalArgumentException("Output can't be a sub-image");
 		InputSanityCheck.checkSameShape(input, output);
 
 		initialize(input,output);
 
 		// compute edges weights
 		long time0 = System.currentTimeMillis();
-		computeWeights.process(input, output.startIndex, output.stride, edges);
+		computeWeights.process(input, edges);
 		long time1 = System.currentTimeMillis();
 
 		System.out.println("Edge weights time " + (time1 - time0));
@@ -161,16 +166,9 @@ public class SegmentFelzenHutten04<T extends ImageBase> {
 		for( int i = 0; i < N; i++ ) {
 			regionSize.data[i] = 1;
 			threshold.data[i] = K;
+			graph.data[i] = i; // assign a unique label to each pixel since they are all their own region initially
 		}
-		// assign initial label to each node in the graph
-		// To reduce memory usage the output image is used to store the graph, but it could be a sub-image,
-		// so the labels are equal to the pixel index in the image.
-		for( int y = 0; y < graph.height; y++ ) {
-			int index = graph.startIndex + y*graph.stride;
-			for( int x = 0; x < graph.width; x++ , index++) {
-				graph.data[index] = index;
-			}
-		}
+
 		edges.reset();
 		edgesNotMatched.reset();
 	}
@@ -184,7 +182,6 @@ public class SegmentFelzenHutten04<T extends ImageBase> {
 		// sort edges
 		long time0 = System.currentTimeMillis();
 		sorter.sort(edges.data,edges.size);
-//		Collections.sort(edges.toList());
 		long time1 = System.currentTimeMillis();
 
 		System.out.println("Sort time " + (time1 - time0));
@@ -322,23 +319,22 @@ public class SegmentFelzenHutten04<T extends ImageBase> {
 	 *
 	 * The weight is saved in 'sortValue'
 	 */
-	public static class Edge extends SortableParameter_F32 implements Comparable<Edge> {
+	public static class Edge extends SortableParameter_F32 {
 		// indexes of connected pixels in output image.
 		// Note: output image could be a sub-image so these might not be simply "y*width + x"
-		int indexA;
-		int indexB;
+		public int indexA;
+		public int indexB;
+
+		public Edge(int indexA, int indexB) {
+			this.indexA = indexA;
+			this.indexB = indexB;
+		}
+
+		public Edge() {
+		}
 
 		public final float weight() {
 			return sortValue;
-		}
-
-		@Override
-		public int compareTo(Edge o) {
-			if( sortValue < o.sortValue )
-				return -1;
-			else if( sortValue > o.sortValue )
-				return 1;
-			return 0;
 		}
 	}
 }

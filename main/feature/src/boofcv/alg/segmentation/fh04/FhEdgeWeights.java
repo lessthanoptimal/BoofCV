@@ -16,27 +16,17 @@
  * limitations under the License.
  */
 
-package boofcv.struct.feature;
+package boofcv.alg.segmentation.fh04;
 
+import boofcv.struct.image.ImageBase;
 import org.ddogleg.struct.FastQueue;
 
 /**
- * Stores an array of floats on constant size.  Intended for storing multi band data.
+ * TODO comment
  *
  * @author Peter Abeles
  */
-public class ColorQueue_F32 extends FastQueue<float[]> {
+public interface FhEdgeWeights<T extends ImageBase> {
 
-	int numBands;
-
-	public ColorQueue_F32(int numBands) {
-		this.numBands = numBands;
-		init(10, float[].class, true);
-	}
-
-	@Override
-	protected float[] createInstance() {
-		return new float[ numBands ];
-	}
-
+	public void process( T input , FastQueue<SegmentFelzenHutten04.Edge> edges );
 }

@@ -22,13 +22,16 @@ import boofcv.alg.interpolate.InterpolatePixelMB;
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.interpolate.TypeInterpolate;
 import boofcv.alg.segmentation.ComputeRegionMeanColor;
-import boofcv.alg.segmentation.fh04.*;
+import boofcv.alg.segmentation.fh04.FhEdgeWeights;
+import boofcv.alg.segmentation.fh04.SegmentFelzenHutten04;
+import boofcv.alg.segmentation.fh04.impl.*;
 import boofcv.alg.segmentation.ms.*;
 import boofcv.alg.weights.WeightDistanceUniform_F32;
 import boofcv.alg.weights.WeightDistance_F32;
 import boofcv.alg.weights.WeightPixelUniform_F32;
 import boofcv.alg.weights.WeightPixel_F32;
 import boofcv.factory.interpolate.FactoryInterpolation;
+import boofcv.struct.ConnectRule;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 
@@ -110,31 +113,50 @@ public class FactorySegmentationAlg {
 	}
 
 	public static <T extends ImageBase>
-	ComputeEdgeWeights<T> weightsFelzenszwalb04(ImageType<T> imageType) {
+	FhEdgeWeights<T> weightsFelzenszwalb04( ConnectRule rule , ImageType<T> imageType) {
 		if( imageType.getFamily() == ImageType.Family.SINGLE_BAND ) {
-			switch( imageType.getDataType() ) {
-				case U8:
-					return (ComputeEdgeWeights)new ComputeEdgeWeights4_U8();
+			if( rule == ConnectRule.FOUR ) {
+				switch( imageType.getDataType() ) {
+					case U8:
+						return (FhEdgeWeights)new FhEdgeWeights4_U8();
+					case F32:
+						return (FhEdgeWeights)new FhEdgeWeights4_F32();
+				}
+			} else if( rule == ConnectRule.EIGHT ) {
+				switch( imageType.getDataType() ) {
+					case U8:
+						return (FhEdgeWeights)new FhEdgeWeights8_U8();
+					case F32:
+						return (FhEdgeWeights)new FhEdgeWeights8_F32();
+				}
 			}
 		} else if( imageType.getFamily() == ImageType.Family.MULTI_SPECTRAL ) {
 			int N = imageType.getNumBands();
-			switch( imageType.getDataType() ) {
-				case U8:
-//					return (ComputeEdgeWeights)new ComputeEdgeWeights4_MsU8();
-					return (ComputeEdgeWeights)new ComputeEdgeWeights8_MsU8(N);
-				case F32:
-					return (ComputeEdgeWeights)new ComputeEdgeWeights8_MsF32(N);
+			if( rule == ConnectRule.FOUR ) {
+				switch( imageType.getDataType() ) {
+					case U8:
+						return (FhEdgeWeights)new FhEdgeWeights4_MsU8(N);
+					case F32:
+						return (FhEdgeWeights)new FhEdgeWeights4_MsF32(N);
+				}
+			} else if( rule == ConnectRule.EIGHT ) {
+				switch( imageType.getDataType() ) {
+					case U8:
+						return (FhEdgeWeights)new FhEdgeWeights8_MsU8(N);
+					case F32:
+						return (FhEdgeWeights)new FhEdgeWeights8_MsF32(N);
+				}
 			}
 		}
 
-		throw new IllegalArgumentException("Unknown imageType");
+		throw new IllegalArgumentException("Unknown imageType or connect rule");
 	}
 
 	public static<T extends ImageBase>
-	SegmentFelzenHutten04<T> felzenszwalb04( int K , int minimumRegionSize , ImageType<T> imageType )
+	SegmentFelzenHutten04<T> felzenszwalb04( int K , int minimumRegionSize , ConnectRule rule , ImageType<T> imageType )
 	{
 
-		ComputeEdgeWeights<T> edgeWeights = weightsFelzenszwalb04(imageType);
+		FhEdgeWeights<T> edgeWeights = weightsFelzenszwalb04(rule,imageType);
 
 		return new SegmentFelzenHutten04<T>(K,minimumRegionSize,edgeWeights);
 	}

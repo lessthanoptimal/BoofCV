@@ -16,18 +16,29 @@
  * limitations under the License.
  */
 
-package boofcv.alg.segmentation.fh04;
+package boofcv.alg.segmentation.fh04.impl;
 
-import boofcv.struct.image.ImageBase;
-import org.ddogleg.struct.FastQueue;
+import boofcv.alg.segmentation.fh04.FhEdgeWeights;
+import boofcv.struct.ConnectRule;
+import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageType;
 
 /**
- * TODO comment
- *
- * @author Peter Abeles
- */
-public interface ComputeEdgeWeights<T extends ImageBase> {
+* @author Peter Abeles
+*/
+public class TestFhEdgeWeights8_F32 extends GenericFhEdgeWeightsChecks<ImageFloat32> {
 
-	public void process( T input , int outputStartIndex , int outputStride ,
-						 FastQueue<SegmentFelzenHutten04.Edge> edges );
+	public TestFhEdgeWeights8_F32() {
+		super(ImageType.single(ImageFloat32.class), ConnectRule.EIGHT);
+	}
+
+	@Override
+	public FhEdgeWeights<ImageFloat32> createAlg() {
+		return new FhEdgeWeights8_F32();
+	}
+
+	@Override
+	public float weight( ImageFloat32 input , int indexA, int indexB) {
+		return Math.abs(input.data[indexA] - input.data[indexB]);
+	}
 }

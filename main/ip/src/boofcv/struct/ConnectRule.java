@@ -16,18 +16,30 @@
  * limitations under the License.
  */
 
-package boofcv.alg.segmentation.fh04;
-
-import org.junit.Test;
-
-import static org.junit.Assert.fail;
+package boofcv.struct;
 
 /**
+ * List of connectivity rules.
+ *
  * @author Peter Abeles
  */
-public class TestComputeEdgeWeights8_MsU8 {
-	@Test
-	public void stuff() {
-		fail("implement");
+public enum ConnectRule {
+	/**
+	 * Four connect neighborhood.  (1,0) (0,1) (-1,0) (0,1)
+	 */
+	FOUR("4"),
+	/**
+	 * Eight connect neighborhood. (1,0) (0,1) (-1,0) (0,1) (1,1) (-1,1) (1,-1) (-1,-1)
+	 */
+	EIGHT("8");
+
+	String shortName;
+
+	private ConnectRule(String shortName) {
+		this.shortName = shortName;
+	}
+
+	public String getShortName() {
+		return shortName;
 	}
 }
