@@ -29,7 +29,7 @@ import org.junit.Test;
 
 import java.util.Random;
 
-import static boofcv.alg.segmentation.fh04.SegmentFelzenHutten04.Edge;
+import static boofcv.alg.segmentation.fh04.SegmentFelzenszwalbHuttenlocher04.Edge;
 import static org.junit.Assert.assertEquals;
 
 /**

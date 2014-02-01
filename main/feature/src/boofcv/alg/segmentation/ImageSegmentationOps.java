@@ -29,12 +29,19 @@ import org.ddogleg.struct.GrowQueue_I32;
 public class ImageSegmentationOps {
 
 
-	public static int countRegionPixels( ImageSInt32 graph , int which ) {
+	/**
+	 * Counts the number of instances of 'which' inside the labeled image.
+	 *
+	 * @param labeled Image which has been labeled
+	 * @param which The label being searched for
+	 * @return Number of instances of 'which' in 'labeled'
+	 */
+	public static int countRegionPixels( ImageSInt32 labeled , int which ) {
 		int total = 0;
-		for( int y = 0; y < graph.height; y++ ) {
-			int index = graph.startIndex + y*graph.stride;
-			for( int x = 0; x < graph.width; x++ ) {
-				if( graph.data[index++] == which ) {
+		for( int y = 0; y < labeled.height; y++ ) {
+			int index = labeled.startIndex + y*labeled.stride;
+			for( int x = 0; x < labeled.width; x++ ) {
+				if( labeled.data[index++] == which ) {
 					total++;
 				}
 			}

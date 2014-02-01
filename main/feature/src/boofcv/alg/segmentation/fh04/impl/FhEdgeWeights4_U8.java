@@ -22,7 +22,7 @@ import boofcv.alg.segmentation.fh04.FhEdgeWeights;
 import boofcv.struct.image.ImageUInt8;
 import org.ddogleg.struct.FastQueue;
 
-import static boofcv.alg.segmentation.fh04.SegmentFelzenHutten04.Edge;
+import static boofcv.alg.segmentation.fh04.SegmentFelzenszwalbHuttenlocher04.Edge;
 
 /**
  * <p>Computes edge weight as the absolute value of the different in pixel value for single band images.

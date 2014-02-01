@@ -19,7 +19,7 @@
 package boofcv.alg.segmentation;
 
 import boofcv.alg.filter.blur.GBlurImageOps;
-import boofcv.alg.segmentation.fh04.SegmentFelzenHutten04;
+import boofcv.alg.segmentation.fh04.SegmentFelzenszwalbHuttenlocher04;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.factory.segmentation.FactorySegmentationAlg;
 import boofcv.gui.image.ShowImages;
@@ -34,10 +34,10 @@ import java.util.Random;
 /**
  * @author Peter Abeles
  */
-public class VisualizeSegmentFelzenHutten04App {
+public class VisualizeFelzenszwalbHuttenlocher04App {
 
 	public static double sigma = 0.5;
-	public static int K = 500;
+	public static int K = 200;
 	public static int minimumSize = 20;
 	public static ConnectRule rule = ConnectRule.EIGHT;
 
@@ -49,7 +49,7 @@ public class VisualizeSegmentFelzenHutten04App {
 		BufferedImage outColor = new BufferedImage(color.width,color.height,BufferedImage.TYPE_INT_RGB);
 //		BufferedImage outSegments = new BufferedImage(color.width,color.height,BufferedImage.TYPE_INT_RGB);
 
-		SegmentFelzenHutten04<T> alg = FactorySegmentationAlg.felzenszwalb04(K, minimumSize, rule,type);
+		SegmentFelzenszwalbHuttenlocher04<T> alg = FactorySegmentationAlg.felzenszwalb04(K, minimumSize, rule,type);
 
 		ImageSInt32 pixelToSegmentOld = new ImageSInt32(color.width,color.height);
 		ImageSInt32 pixelToSegment = new ImageSInt32(color.width,color.height);
@@ -130,8 +130,8 @@ public class VisualizeSegmentFelzenHutten04App {
 //		BufferedImage image = UtilImageIO.loadImage("../data/applet/segment/mountain_pines_people.jpg");
 		BufferedImage image = UtilImageIO.loadImage("/home/pja/Desktop/segmentation/example-orig.ppm");
 
-		ImageType<MultiSpectral<ImageUInt8>> imageType = ImageType.ms(3,ImageUInt8.class);
-//		ImageType<MultiSpectral<ImageFloat32>> imageType = ImageType.ms(3,ImageFloat32.class);
+//		ImageType<MultiSpectral<ImageUInt8>> imageType = ImageType.ms(3,ImageUInt8.class);
+		ImageType<MultiSpectral<ImageFloat32>> imageType = ImageType.ms(3,ImageFloat32.class);
 //		ImageType<ImageUInt8> imageType = ImageType.single(ImageUInt8.class);
 
 		process(image,imageType);

@@ -35,7 +35,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestSegmentFelzenHutten04 {
+public class TestSegmentFelzenszwalbHuttenlocher04 {
 
 	Random rand = new Random(234);
 
@@ -59,7 +59,7 @@ public class TestSegmentFelzenHutten04 {
 		ImageMiscOps.fillUniform(output,rand,0,100);
 
 		FhEdgeWeights<ImageUInt8> edgeWeights = new FhEdgeWeights4_U8();
-		SegmentFelzenHutten04<ImageUInt8> alg = new SegmentFelzenHutten04<ImageUInt8>(200,10,edgeWeights);
+		SegmentFelzenszwalbHuttenlocher04<ImageUInt8> alg = new SegmentFelzenszwalbHuttenlocher04<ImageUInt8>(200,10,edgeWeights);
 
 		alg.process(image,output);
 
@@ -79,7 +79,7 @@ public class TestSegmentFelzenHutten04 {
 	public void mergeRegions() {
 
 		// K is zero to make it easier to figure out if two edges should be merged or not
-		SegmentFelzenHutten04 alg = new SegmentFelzenHutten04(0,10,null);
+		SegmentFelzenszwalbHuttenlocher04 alg = new SegmentFelzenszwalbHuttenlocher04(0,10,null);
 
 		// add edges.  Design it such that order is important and to make sure the equality checks
 		// are done correctly
@@ -146,7 +146,7 @@ public class TestSegmentFelzenHutten04 {
 
 	@Test
 	public void mergeSmallRegions() {
-		SegmentFelzenHutten04 alg = new SegmentFelzenHutten04(0,10,null);
+		SegmentFelzenszwalbHuttenlocher04 alg = new SegmentFelzenszwalbHuttenlocher04(0,10,null);
 
 		alg.regionSize.resize(20);
 		alg.regionSize.set(2, 10);
@@ -162,8 +162,8 @@ public class TestSegmentFelzenHutten04 {
 				15,15,15,15,
 				15,15,15,15};
 
-		alg.edgesNotMatched.add( new SegmentFelzenHutten04.Edge(1,5));
-		alg.edgesNotMatched.add( new SegmentFelzenHutten04.Edge(12,8));
+		alg.edgesNotMatched.add( new SegmentFelzenszwalbHuttenlocher04.Edge(1,5));
+		alg.edgesNotMatched.add( new SegmentFelzenszwalbHuttenlocher04.Edge(12,8));
 
 		alg.mergeSmallRegions();
 
@@ -175,7 +175,7 @@ public class TestSegmentFelzenHutten04 {
 
 	@Test
 	public void find() {
-		SegmentFelzenHutten04 alg = new SegmentFelzenHutten04(300,20,null);
+		SegmentFelzenszwalbHuttenlocher04 alg = new SegmentFelzenszwalbHuttenlocher04(300,20,null);
 
 		alg.graph = new ImageSInt32(4,5);
 		alg.graph.data = new int[]{
@@ -195,7 +195,7 @@ public class TestSegmentFelzenHutten04 {
 	@Test
 	public void computeOutput() {
 
-		SegmentFelzenHutten04 alg = new SegmentFelzenHutten04(300,20,null);
+		SegmentFelzenszwalbHuttenlocher04 alg = new SegmentFelzenszwalbHuttenlocher04(300,20,null);
 
 		alg.graph = new ImageSInt32(4,5);
 		alg.graph.data = new int[]{
@@ -233,8 +233,8 @@ public class TestSegmentFelzenHutten04 {
 		BoofTesting.assertEquals(expected, alg.graph, 1e-4);
 	}
 
-	private SegmentFelzenHutten04.Edge edge( int indexA , int indexB , float weight ) {
-		SegmentFelzenHutten04.Edge e = new SegmentFelzenHutten04.Edge();
+	private SegmentFelzenszwalbHuttenlocher04.Edge edge( int indexA , int indexB , float weight ) {
+		SegmentFelzenszwalbHuttenlocher04.Edge e = new SegmentFelzenszwalbHuttenlocher04.Edge();
 		e.indexA = indexA;
 		e.indexB = indexB;
 		e.sortValue = weight;

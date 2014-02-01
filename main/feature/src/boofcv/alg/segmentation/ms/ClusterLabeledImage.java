@@ -19,6 +19,7 @@
 package boofcv.alg.segmentation.ms;
 
 import boofcv.alg.misc.ImageMiscOps;
+import boofcv.struct.ConnectRule;
 import boofcv.struct.image.ImageSInt32;
 import georegression.struct.point.Point2D_I32;
 import org.ddogleg.struct.GrowQueue_I32;
@@ -46,7 +47,7 @@ import org.ddogleg.struct.GrowQueue_I32;
 public class ClusterLabeledImage extends RegionMergeTree {
 
 	// which connectivity rule is used.  4 or 8.
-	protected int connectRule;
+	protected ConnectRule connectRule;
 
 	// offset in pixel indices for adjacent pixels
 	protected int edgesIn[];
@@ -63,14 +64,14 @@ public class ClusterLabeledImage extends RegionMergeTree {
 	 *
 	 * @param connectRule Which connectivity rule to use.  4 or 8
 	 */
-	public ClusterLabeledImage(int connectRule) {
+	public ClusterLabeledImage(ConnectRule connectRule) {
 		this.connectRule = connectRule;
 
-		if( connectRule == 8 ) {
+		if( connectRule == ConnectRule.EIGHT ) {
 			edgesIn = new int[4];
 			edgesOut = new int[4];
 			edges = new Point2D_I32[4];
-		} else if( connectRule == 4 ) {
+		} else if( connectRule == ConnectRule.FOUR ) {
 			edgesIn = new int[2];
 			edgesOut = new int[2];
 			edges = new Point2D_I32[2];
@@ -85,7 +86,7 @@ public class ClusterLabeledImage extends RegionMergeTree {
 	 * Declares lookup tables for neighbors
 	 */
 	protected void setUpEdges( ImageSInt32 input , ImageSInt32 output  ) {
-		if( connectRule == 8 ) {
+		if( connectRule == ConnectRule.EIGHT ) {
 			setUpEdges8(input,edgesIn);
 			setUpEdges8(output,edgesOut);
 
@@ -146,7 +147,7 @@ public class ClusterLabeledImage extends RegionMergeTree {
 	 */
 	protected void connectInner(ImageSInt32 input, ImageSInt32 output) {
 
-		int startX = connectRule == 8 ? 1 : 0;
+		int startX = connectRule == ConnectRule.EIGHT ? 1 : 0;
 
 		for( int y = 0; y < input.height-1; y++ ) {
 			int indexIn = input.startIndex + y*input.stride + startX;
@@ -214,7 +215,7 @@ public class ClusterLabeledImage extends RegionMergeTree {
 			}
 
 			// skip check of left of 4-connect
-			if( connectRule != 8 )
+			if( connectRule != ConnectRule.EIGHT )
 				continue;
 
 			x = 0;

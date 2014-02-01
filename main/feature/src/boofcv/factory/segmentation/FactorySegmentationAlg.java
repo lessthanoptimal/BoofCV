@@ -23,7 +23,7 @@ import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.interpolate.TypeInterpolate;
 import boofcv.alg.segmentation.ComputeRegionMeanColor;
 import boofcv.alg.segmentation.fh04.FhEdgeWeights;
-import boofcv.alg.segmentation.fh04.SegmentFelzenHutten04;
+import boofcv.alg.segmentation.fh04.SegmentFelzenszwalbHuttenlocher04;
 import boofcv.alg.segmentation.fh04.impl.*;
 import boofcv.alg.segmentation.ms.*;
 import boofcv.alg.weights.WeightDistanceUniform_F32;
@@ -109,7 +109,7 @@ public class FactorySegmentationAlg {
 		PruneSmallRegions<T> prune = minimumRegionSize >= 2 ?
 				new PruneSmallRegions<T>(minimumRegionSize,regionColor) : null;
 
-		return new SegmentMeanShift<T>(search,merge,prune,4);
+		return new SegmentMeanShift<T>(search,merge,prune,ConnectRule.FOUR);
 	}
 
 	public static <T extends ImageBase>
@@ -153,11 +153,11 @@ public class FactorySegmentationAlg {
 	}
 
 	public static<T extends ImageBase>
-	SegmentFelzenHutten04<T> felzenszwalb04( int K , int minimumRegionSize , ConnectRule rule , ImageType<T> imageType )
+	SegmentFelzenszwalbHuttenlocher04<T> felzenszwalb04( int K , int minimumRegionSize , ConnectRule rule , ImageType<T> imageType )
 	{
 
 		FhEdgeWeights<T> edgeWeights = weightsFelzenszwalb04(rule,imageType);
 
-		return new SegmentFelzenHutten04<T>(K,minimumRegionSize,edgeWeights);
+		return new SegmentFelzenszwalbHuttenlocher04<T>(K,minimumRegionSize,edgeWeights);
 	}
 }

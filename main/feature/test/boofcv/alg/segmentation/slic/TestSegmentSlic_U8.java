@@ -16,18 +16,18 @@
  * limitations under the License.
  */
 
-package boofcv.alg.segmentation.fh04;
+package boofcv.alg.segmentation.slic;
 
-import boofcv.struct.image.ImageBase;
-import org.ddogleg.struct.FastQueue;
+import org.junit.Test;
+
+import static org.junit.Assert.fail;
 
 /**
- * Computes edge weights for {@Link SegmentFelzenHutten04}.  An edge weight is measure of how different
- * two adjacent pixels are from each other.
- *
  * @author Peter Abeles
  */
-public interface FhEdgeWeights<T extends ImageBase> {
-
-	public void process( T input , FastQueue<SegmentFelzenszwalbHuttenlocher04.Edge> edges );
+public class TestSegmentSlic_U8 {
+	@Test
+	public void stuff() {
+		fail("implement");
+	}
 }
