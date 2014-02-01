@@ -23,10 +23,18 @@ import boofcv.testing.BoofTesting;
 import org.ddogleg.struct.GrowQueue_I32;
 import org.junit.Test;
 
+import static org.junit.Assert.fail;
+
 /**
  * @author Peter Abeles
  */
 public class TestImageSegmentationOps {
+
+	@Test
+	public void countRegionPixels() {
+		fail("Implement");
+	}
+
 	/**
 	 * Manually construct input data and see if it has the expected output
 	 */

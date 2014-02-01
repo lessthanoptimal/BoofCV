@@ -23,7 +23,7 @@ import boofcv.struct.image.ImageUInt8;
 import boofcv.struct.image.MultiSpectral;
 import org.ddogleg.struct.FastQueue;
 
-import static boofcv.alg.segmentation.fh04.SegmentFelzenHutten04.Edge;
+import static boofcv.alg.segmentation.fh04.SegmentFelzenszwalbHuttenlocher04.Edge;
 
 /**
  * <p>Computes edge weight as the F-norm different in pixel value for {@link MultiSpectral} images.

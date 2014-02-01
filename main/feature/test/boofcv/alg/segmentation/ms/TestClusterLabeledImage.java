@@ -19,6 +19,7 @@
 package boofcv.alg.segmentation.ms;
 
 import boofcv.alg.misc.GImageMiscOps;
+import boofcv.struct.ConnectRule;
 import boofcv.struct.image.ImageSInt32;
 import org.ddogleg.struct.GrowQueue_I32;
 import org.junit.Test;
@@ -39,7 +40,7 @@ public class TestClusterLabeledImage {
 			1,2,1,1,2,
 			1,1,2,2,2};
 
-	int rules[] = new int[]{4,8};
+	ConnectRule rules[] = new ConnectRule[]{ConnectRule.FOUR,ConnectRule.EIGHT};
 
 	Random rand = new Random(123);
 
@@ -131,7 +132,7 @@ public class TestClusterLabeledImage {
 
 		ImageSInt32 output = new ImageSInt32(5,5);
 
-		ClusterLabeledImage alg = new ClusterLabeledImage(4);
+		ClusterLabeledImage alg = new ClusterLabeledImage(ConnectRule.FOUR);
 		alg.process(input,output,counts);
 
 		int convert[] = new int[9];
@@ -166,7 +167,7 @@ public class TestClusterLabeledImage {
 
 		ImageSInt32 output = new ImageSInt32(5,5);
 
-		ClusterLabeledImage alg = new ClusterLabeledImage(8);
+		ClusterLabeledImage alg = new ClusterLabeledImage(ConnectRule.EIGHT);
 		alg.process(input,output,counts);
 
 		int convert[] = new int[3];

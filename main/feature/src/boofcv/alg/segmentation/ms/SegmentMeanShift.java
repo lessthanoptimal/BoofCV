@@ -18,6 +18,7 @@
 
 package boofcv.alg.segmentation.ms;
 
+import boofcv.struct.ConnectRule;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageSInt32;
 import georegression.struct.point.Point2D_I32;
@@ -75,7 +76,7 @@ public class SegmentMeanShift<T extends ImageBase> {
 	public SegmentMeanShift(SegmentMeanShiftSearch<T> search,
 							MergeRegionMeanShift merge,
 							PruneSmallRegions<T> prune,
-							int connectRule )
+							ConnectRule connectRule )
 	{
 		this.search = search;
 		this.merge = merge;

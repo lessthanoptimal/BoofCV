@@ -49,10 +49,9 @@ import org.ddogleg.struct.GrowQueue_I32;
  * out what the ID's are.</li>
  * <li>The output image can't be a sub-image because it is used internally and needs to be a continuous
  * block of memory.</li>
- * <li>Connectivity rule which determines what an adjacent pixel is determined by the {@link FhEdgeWeights}
- * class passed in to the constructor.  8-connect is used in reference implementation.</li>
- * <li>Apologies to Felzenszwalb and Huttenlocher for truncating their name in the class name.  Just too long
- * otherwise.</li>
+ * <li>Pixel connectivity rule and weight metric is by the {@link FhEdgeWeights}
+ * class passed in to the constructor.</li>
+ * <li>To emulate the reference implementation use a </li>
  * </ul>
  * <pP>
  *
@@ -78,7 +77,7 @@ import org.ddogleg.struct.GrowQueue_I32;
  * @author Peter Abeles
  */
 // TODO optimize sort - Use approximate method?
-public class SegmentFelzenHutten04<T extends ImageBase> {
+public class SegmentFelzenszwalbHuttenlocher04<T extends ImageBase> {
 
 	// tuning parameter.  Determines the number of segments.  Larger number means larger regions
 	private float K;
@@ -116,7 +115,7 @@ public class SegmentFelzenHutten04<T extends ImageBase> {
 	 * @param minimumSize Regions smaller than this are merged into larger regions
 	 * @param computeWeights Function used to compute the weight for all the edges.
 	 */
-	public SegmentFelzenHutten04(float k, int minimumSize, FhEdgeWeights<T> computeWeights) {
+	public SegmentFelzenszwalbHuttenlocher04(float k, int minimumSize, FhEdgeWeights<T> computeWeights) {
 		K = k;
 		this.minimumSize = minimumSize;
 		this.computeWeights = computeWeights;
@@ -320,8 +319,7 @@ public class SegmentFelzenHutten04<T extends ImageBase> {
 	 * The weight is saved in 'sortValue'
 	 */
 	public static class Edge extends SortableParameter_F32 {
-		// indexes of connected pixels in output image.
-		// Note: output image could be a sub-image so these might not be simply "y*width + x"
+		// indexes of connected pixels in output image.  The index for pixel (x,y) is: index = y*width + x
 		public int indexA;
 		public int indexB;
 
