@@ -18,6 +18,7 @@
 
 package boofcv.alg.segmentation.slic;
 
+import boofcv.alg.InputSanityCheck;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageSInt32;
 import org.ddogleg.struct.FastQueue;
@@ -33,9 +34,11 @@ import java.util.Arrays;
  *
  * @author Peter Abeles
  */
-// TODO They use Euclidean distance squared in actual code
 // TODO it also appears that they are approximating k-means clustersing.  Just doing NN
 public abstract class SegmentSlic<T extends ImageBase> {
+	// border which ensures there is a 3x3 neighborhood around the initial clusters and that there are pixels
+	// which can be sampled when computing the gradient
+	public static final int BORDER = 2;
 
 	// number of bands in the input image
 	private int numBands;
@@ -50,7 +53,7 @@ public abstract class SegmentSlic<T extends ImageBase> {
 	private int totalIterations;
 
 	// Space between superpixel centers.  S in the paper
-	private int gridInterval;
+	protected int gridInterval;
 	// Adjustment to spacial distance.  Computed from m and gridInterval
 	private float adjustSpacial;
 
@@ -58,29 +61,36 @@ public abstract class SegmentSlic<T extends ImageBase> {
 	protected T input;
 
 	// storage for clusters and pixel information
-	private FastQueue<Cluster> clusters = new FastQueue<Cluster>(Cluster.class,true);
-	private FastQueue<Pixel> pixels = new FastQueue<Pixel>(Pixel.class,true);
+	protected FastQueue<Cluster> clusters;
+	protected FastQueue<Pixel> pixels = new FastQueue<Pixel>(Pixel.class,true);
 
 	public SegmentSlic( int numberOfRegions , float m , int totalIterations , int numBands ) {
 		this.numberOfRegions = numberOfRegions;
 		this.m = m;
 		this.totalIterations = totalIterations;
 		this.numBands = numBands;
+
+		// custom declaration for pixel color
+		clusters = new FastQueue<Cluster>(Cluster.class,true) {
+			@Override
+			protected Cluster createInstance() {
+				Cluster c = new Cluster();
+				c.color = new float[ SegmentSlic.this.numBands ];
+				return c;
+			}
+		};
 	}
 
 	public void process( T input , ImageSInt32 output ) {
-		this.input = input;
+		InputSanityCheck.checkSameShape(input,output);
+		if( input.width < 2*BORDER || input.height < 2*BORDER)
+			throw new IllegalArgumentException(
+					"Image is too small to process.  Must have a width and height of at leaest "+(2*BORDER));
 
-		int numOfPixels = input.width*input.height;
+		// initialize all the data structures
+		initalize(input);
 
-		gridInterval = (int)Math.sqrt( numOfPixels/(double)numberOfRegions);
-
-		if( gridInterval <= 0 )
-			throw new IllegalArgumentException("Too many regions for an image of this size");
-
-		// See equation (1)
-		adjustSpacial = m/gridInterval;
-
+		// Seed the clusters
 		initializeClusters();
 
 		// Perform the modified k-means iterations
@@ -98,21 +108,35 @@ public abstract class SegmentSlic<T extends ImageBase> {
 	}
 
 	/**
+	 * prepares all data structures
+	 */
+	protected void initalize(T input) {
+		this.input = input;
+		pixels.resize(input.width * input.height);
+		// number of usable pixels that cluster centers can be placed in
+		int numberOfUsable = (input.width-2*BORDER)*(input.height-2*BORDER);
+		gridInterval = (int)Math.sqrt( numberOfUsable/(double)numberOfRegions);
+
+		if( gridInterval <= 0 )
+			throw new IllegalArgumentException("Too many regions for an image of this size");
+
+		// See equation (1)
+		adjustSpacial = m/gridInterval;
+	}
+
+	/**
 	 * initialize all the clusters at regularly spaced intervals.  Their locations are perturbed a bit to reduce
 	 * the likelihood of a bad location.  Initial color is set to the image color at the location
 	 */
-	private void initializeClusters() {
+	protected void initializeClusters() {
 
-		int offset = gridInterval/2;
+		int offsetX = BORDER+((input.width-2*BORDER) % gridInterval)/2;
+		int offsetY = BORDER+((input.height-2*BORDER) % gridInterval)/2;
 
 		int clusterId = 0;
 		clusters.reset();
-		for( int y = offset; y < input.height; y += gridInterval ) {
-			for( int x = offset; x < input.width; x += gridInterval ) {
-				// this should rarely be a problem, but this way I know it won't blow up with a really small image
-				if( isTooCloseToEdge(x,y) )
-					continue;
-
+		for( int y = offsetY; y < input.height-BORDER; y += gridInterval ) {
+			for( int x = offsetX; x < input.width-BORDER; x += gridInterval ) {
 				Cluster c = clusters.grow();
 				c.id = clusterId++;
 				if( c.color == null)
@@ -122,13 +146,6 @@ public abstract class SegmentSlic<T extends ImageBase> {
 				perturbCenter( c , x , y );
 			}
 		}
-	}
-
-	/**
-	 * Checks to see if the cluster center is too close to the image border.
-	 */
-	protected boolean isTooCloseToEdge( int x , int y ) {
-		return( x < 1 || x >= input.width-1 || y < 1 || y >= input.height-1 );
 	}
 
 	/**
@@ -213,7 +230,7 @@ public abstract class SegmentSlic<T extends ImageBase> {
 
 				int dy = y-centerY;
 
-				for( int x = x0; x < x1; x++ , indexPixel++ ) {
+				for( int x = x0; x < x1; x++ ) {
 					int dx = x-centerX;
 
 					float distanceColor = colorDistance(c.color,indexInput++);
@@ -289,6 +306,10 @@ public abstract class SegmentSlic<T extends ImageBase> {
 
 	}
 
+	public FastQueue<Cluster> getClusters() {
+		return clusters;
+	}
+
 	/**
 	 * K-means clustering information for each pixel.  Stores distance from each cluster mean.
 	 */
@@ -316,12 +337,16 @@ public abstract class SegmentSlic<T extends ImageBase> {
 		}
 
 		public void computeWeights() {
-			float sum = 0;
-			for( int i = 0; i < total; i++ ) {
-				sum += clusters[i].distance;
-			}
-			for( int i = 0; i < total; i++ ) {
-				clusters[i].distance =  1.0f - clusters[i].distance/sum;
+			if( total == 1 ) {
+				clusters[0].distance = 1;
+			} else {
+				float sum = 0;
+				for( int i = 0; i < total; i++ ) {
+					sum += clusters[i].distance;
+				}
+				for( int i = 0; i < total; i++ ) {
+					clusters[i].distance =  1.0f - clusters[i].distance/sum;
+				}
 			}
 		}
 

@@ -16,40 +16,23 @@
  * limitations under the License.
  */
 
-package boofcv.alg.segmentation.slic;
+package boofcv.abst.segmentation;
 
-import boofcv.alg.misc.ImageMiscOps;
+import boofcv.struct.ConnectRule;
+import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageSInt32;
-import boofcv.struct.image.ImageUInt8;
-import org.junit.Test;
-
-import static org.junit.Assert.fail;
 
 /**
+ * High level interface for image segmentation.  Each pixel in the segmented image is assigned an integer label
+ * to identify which region in the image it belongs to.  A region is a continuous connected set of pixels.
+ *
  * @author Peter Abeles
  */
-public class TestSegmentSlic_U8 {
+public interface ImageSegmentation<T extends ImageBase> {
 
-	/**
-	 * Give it an easy image to segment and see how well it does.
-	 */
-	@Test
-	public void easyTest() {
-		ImageUInt8 input = new ImageUInt8(30,40);
-		ImageSInt32 output = new ImageSInt32(30,40);
+	public void segment( T input , ImageSInt32 output );
 
-		ImageMiscOps.fillRectangle(input, 100, 0, 0, 15, 40);
+	public int getTotalSegments();
 
-		SegmentSlic_U8 alg = new SegmentSlic_U8(10,10,10);
-
-		alg.process(input,output);
-
-
-		// TODO make sure that each segment is all one color in the original image
-	}
-
-	@Test
-	public void stuff() {
-		fail("implement");
-	}
+	public ConnectRule getRule();
 }

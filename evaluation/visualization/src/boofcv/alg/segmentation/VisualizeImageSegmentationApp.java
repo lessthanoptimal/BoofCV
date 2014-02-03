@@ -18,15 +18,20 @@
 
 package boofcv.alg.segmentation;
 
+import boofcv.abst.segmentation.ImageSegmentation;
 import boofcv.alg.filter.blur.GBlurImageOps;
-import boofcv.alg.segmentation.ms.SegmentMeanShift;
 import boofcv.core.image.ConvertBufferedImage;
-import boofcv.factory.segmentation.ConfigSegmentMeanShift;
+import boofcv.factory.segmentation.FactoryImageSegmentation;
 import boofcv.factory.segmentation.FactorySegmentationAlg;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.image.UtilImageIO;
-import boofcv.struct.image.*;
+import boofcv.struct.feature.ColorQueue_F32;
+import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSInt32;
+import boofcv.struct.image.ImageType;
+import boofcv.struct.image.ImageUInt8;
 import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.GrowQueue_I32;
 
 import java.awt.image.BufferedImage;
 import java.util.Random;
@@ -34,14 +39,9 @@ import java.util.Random;
 /**
  * @author Peter Abeles
  */
-public class VisualizeSegmentMeanShiftApp {
+public class VisualizeImageSegmentationApp {
 
-	public static int spacialRadius = 6;
-	public static float colorRadius = 15f;
-	public static int minimumSize = 40;
-	public static boolean fast = true;
-
-	public static <T extends ImageBase> void process( BufferedImage image ,ImageType<T> type ) {
+	public static <T extends ImageBase> void process( ImageSegmentation<T> alg , BufferedImage image ,ImageType<T> type ) {
 		T color = type.createImage(image.getWidth(),image.getHeight());
 
 		ConvertBufferedImage.convertFrom(image, color, true);
@@ -51,17 +51,25 @@ public class VisualizeSegmentMeanShiftApp {
 		BufferedImage outColor = new BufferedImage(color.width,color.height,BufferedImage.TYPE_INT_RGB);
 		BufferedImage outSegments = new BufferedImage(color.width,color.height,BufferedImage.TYPE_INT_RGB);
 
-		SegmentMeanShift<T> alg =
-				FactorySegmentationAlg.meanShift(
-						new ConfigSegmentMeanShift(spacialRadius, colorRadius, minimumSize , fast), type);
-
 		ImageSInt32 pixelToSegment = new ImageSInt32(color.width,color.height);
 
 		long time0 = System.currentTimeMillis();
-		alg.process(color,pixelToSegment);
+		alg.segment(color,pixelToSegment);
 		long time1 = System.currentTimeMillis();
 
-		FastQueue<float[]> segmentColor = alg.getRegionColor();
+		int numSegments = alg.getTotalSegments();
+
+		ComputeRegionMeanColor<T> colorize = FactorySegmentationAlg.regionMeanColor(type);
+
+		FastQueue<float[]> segmentColor = new ColorQueue_F32(type.getNumBands());
+		segmentColor.resize(numSegments);
+
+		GrowQueue_I32 regionMemberCount = new GrowQueue_I32();
+		regionMemberCount.resize(numSegments);
+
+		ImageSegmentationOps.countRegionPixels(pixelToSegment,numSegments,regionMemberCount.data);
+
+		colorize.process(color,pixelToSegment,regionMemberCount,segmentColor);
 
 		Random rand = new Random(234);
 
@@ -93,7 +101,7 @@ public class VisualizeSegmentMeanShiftApp {
 		}
 
 		System.out.println("Time MS "+(time1-time0));
-		System.out.println("Total regions: "+alg.getNumberOfRegions());
+		System.out.println("Total regions: "+numSegments);
 
 		ShowImages.showWindow(outColor,"Regions");
 		ShowImages.showWindow(outSegments,"Color of Segments");
@@ -106,9 +114,13 @@ public class VisualizeSegmentMeanShiftApp {
 //		BufferedImage image = UtilImageIO.loadImage("../data/applet/segment/mountain_pines_people.jpg");
 		BufferedImage image = UtilImageIO.loadImage("/home/pja/Desktop/segmentation/example-orig.jpg");
 
-		ImageType<MultiSpectral<ImageFloat32>> imageType = ImageType.ms(3,ImageFloat32.class);
+//		ImageType<MultiSpectral<ImageFloat32>> imageType = ImageType.ms(3,ImageFloat32.class);
 //		ImageType<ImageFloat32> imageType = ImageType.single(ImageFloat32.class);
+		ImageType<ImageUInt8> imageType = ImageType.single(ImageUInt8.class);
 
-		process(image,imageType);
+//		ImageSegmentation alg = FactoryImageSegmentation.meanShift(null,imageType);
+		ImageSegmentation alg = FactoryImageSegmentation.slic(400,15.0f,10,imageType);
+
+		process(alg,image,imageType);
 	}
 }

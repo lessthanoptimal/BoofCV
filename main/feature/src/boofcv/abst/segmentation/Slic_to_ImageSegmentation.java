@@ -16,40 +16,38 @@
  * limitations under the License.
  */
 
-package boofcv.alg.segmentation.slic;
+package boofcv.abst.segmentation;
 
-import boofcv.alg.misc.ImageMiscOps;
+import boofcv.alg.segmentation.slic.SegmentSlic;
+import boofcv.struct.ConnectRule;
+import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageSInt32;
-import boofcv.struct.image.ImageUInt8;
-import org.junit.Test;
-
-import static org.junit.Assert.fail;
 
 /**
+ * Wrapper around {@link SegmentSlic} for {@link ImageSegmentation}.
+ *
  * @author Peter Abeles
  */
-public class TestSegmentSlic_U8 {
+public class Slic_to_ImageSegmentation<T extends ImageBase> implements ImageSegmentation<T> {
 
-	/**
-	 * Give it an easy image to segment and see how well it does.
-	 */
-	@Test
-	public void easyTest() {
-		ImageUInt8 input = new ImageUInt8(30,40);
-		ImageSInt32 output = new ImageSInt32(30,40);
+	SegmentSlic<T> slic;
 
-		ImageMiscOps.fillRectangle(input, 100, 0, 0, 15, 40);
-
-		SegmentSlic_U8 alg = new SegmentSlic_U8(10,10,10);
-
-		alg.process(input,output);
-
-
-		// TODO make sure that each segment is all one color in the original image
+	public Slic_to_ImageSegmentation(SegmentSlic<T> slic) {
+		this.slic = slic;
 	}
 
-	@Test
-	public void stuff() {
-		fail("implement");
+	@Override
+	public void segment(T input, ImageSInt32 output) {
+		slic.process(input,output);
+	}
+
+	@Override
+	public int getTotalSegments() {
+		return slic.getClusters().size;
+	}
+
+	@Override
+	public ConnectRule getRule() {
+		return null;
 	}
 }

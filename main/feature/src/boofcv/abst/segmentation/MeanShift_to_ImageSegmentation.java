@@ -16,40 +16,39 @@
  * limitations under the License.
  */
 
-package boofcv.alg.segmentation.slic;
+package boofcv.abst.segmentation;
 
-import boofcv.alg.misc.ImageMiscOps;
+import boofcv.alg.segmentation.ms.SegmentMeanShift;
+import boofcv.struct.ConnectRule;
+import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageSInt32;
-import boofcv.struct.image.ImageUInt8;
-import org.junit.Test;
-
-import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
  */
-public class TestSegmentSlic_U8 {
+public class MeanShift_to_ImageSegmentation<T extends ImageBase>
+		implements ImageSegmentation<T>
+{
+	SegmentMeanShift<T> ms;
+	ConnectRule rule;
 
-	/**
-	 * Give it an easy image to segment and see how well it does.
-	 */
-	@Test
-	public void easyTest() {
-		ImageUInt8 input = new ImageUInt8(30,40);
-		ImageSInt32 output = new ImageSInt32(30,40);
-
-		ImageMiscOps.fillRectangle(input, 100, 0, 0, 15, 40);
-
-		SegmentSlic_U8 alg = new SegmentSlic_U8(10,10,10);
-
-		alg.process(input,output);
-
-
-		// TODO make sure that each segment is all one color in the original image
+	public MeanShift_to_ImageSegmentation(SegmentMeanShift<T> ms , ConnectRule rule ) {
+		this.ms = ms;
+		this.rule = rule;
 	}
 
-	@Test
-	public void stuff() {
-		fail("implement");
+	@Override
+	public void segment(T input, ImageSInt32 output) {
+		ms.process(input,output);
+	}
+
+	@Override
+	public int getTotalSegments() {
+		return ms.getNumberOfRegions();
+	}
+
+	@Override
+	public ConnectRule getRule() {
+		return rule;
 	}
 }
