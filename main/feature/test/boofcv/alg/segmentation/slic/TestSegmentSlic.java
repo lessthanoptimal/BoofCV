@@ -18,6 +18,7 @@
 
 package boofcv.alg.segmentation.slic;
 
+import boofcv.struct.ConnectRule;
 import boofcv.struct.image.ImageSInt32;
 import boofcv.struct.image.ImageUInt8;
 import org.junit.Test;
@@ -99,8 +100,8 @@ public class TestSegmentSlic {
 				SegmentSlic.Pixel p = alg.pixels.get(index);
 
 				boolean contains = false;
-				for( int i = 0; i < p.total; i++ ) {
-					if( p.clusters[i].cluster == c )
+				for( int i = 0; i < p.clusters.size; i++ ) {
+					if( p.clusters.data[i].cluster == c )
 						contains = true;
 				}
 				assertTrue(contains);
@@ -165,7 +166,7 @@ public class TestSegmentSlic {
 		}
 
 		ImageSInt32 image = new ImageSInt32(2,3);
-		alg.assignLabelsToPixels(image);
+		alg.assignLabelsToPixels(image,null);
 
 		assertEquals(2,image.get(0,0));
 		assertEquals(1,image.get(1,0));
@@ -183,23 +184,23 @@ public class TestSegmentSlic {
 
 		SegmentSlic.Pixel p = new SegmentSlic.Pixel();
 
-		assertEquals(0,p.total);
+		assertEquals(0,p.clusters.size);
 
 		p.add(c0, 2.2f);
-		assertEquals(1, p.total);
-		assertEquals(2.2f, p.clusters[0].distance, 1e-4f);
-		assertTrue(c0 == p.clusters[0].cluster);
+		assertEquals(1, p.clusters.size);
+		assertEquals(2.2f, p.clusters.data[0].distance, 1e-4f);
+		assertTrue(c0 == p.clusters.data[0].cluster);
 
 		p.add(c1, 1.2f);
-		assertEquals(2, p.total);
-		assertEquals(1.2f, p.clusters[1].distance, 1e-4f);
-		assertTrue(c1 == p.clusters[1].cluster);
+		assertEquals(2, p.clusters.size);
+		assertEquals(1.2f, p.clusters.data[1].distance, 1e-4f);
+		assertTrue(c1 == p.clusters.data[1].cluster);
 
 		// should get capped and not go forever
 		for( int i = 0; i < 50; i++ ) {
 			p.add(c0,0.5f);
 		}
-		assertEquals(10, p.total);
+		assertEquals(10, p.clusters.size);
 	}
 
 
@@ -207,22 +208,21 @@ public class TestSegmentSlic {
 	public void Pixel_computeWeights() {
 		SegmentSlic.Pixel p = new SegmentSlic.Pixel();
 
-		p.total = 2;
-		p.clusters[0].distance = 2;
-		p.clusters[1].distance = 0.3f;
+		p.clusters.grow().distance = 2;
+		p.clusters.grow().distance = 0.3f;
 
 		p.computeWeights();
 
-		assertEquals(1.0f - 2f/2.3f,p.clusters[0].distance,1e-4f);
-		assertEquals(1.0f - 0.3f/2.3f,p.clusters[1].distance,1e-4f);
+		assertEquals(1.0f - 2f/2.3f,p.clusters.data[0].distance,1e-4f);
+		assertEquals(1.0f - 0.3f/2.3f,p.clusters.data[1].distance,1e-4f);
 
 		// check special case of 1 item.  The weight will be 1 since it is the only one
-		p.total = 1;
-		p.clusters[0].distance = 2;
+		p.clusters.size = 1;
+		p.clusters.data[0].distance = 2;
 
 		p.computeWeights();
 
-		assertEquals(1.0f,p.clusters[0].distance,1e-4f);
+		assertEquals(1.0f,p.clusters.data[0].distance,1e-4f);
 	}
 
 	@Test
@@ -251,7 +251,7 @@ public class TestSegmentSlic {
 	public static class DummySlic extends SegmentSlic<ImageUInt8> {
 
 		public DummySlic(int numberOfRegions, float m, int totalIterations, int numBands) {
-			super(numberOfRegions, m, totalIterations, numBands);
+			super(numberOfRegions, m, totalIterations, numBands, ConnectRule.EIGHT);
 		}
 
 		@Override

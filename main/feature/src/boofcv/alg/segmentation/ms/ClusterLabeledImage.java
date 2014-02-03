@@ -120,7 +120,7 @@ public class ClusterLabeledImage extends RegionMergeTree {
 	 *
 	 * @param input Labeled input image.
 	 * @param output Labeled output image.
-	 * @param regionMemberCount Number of pixels which belong to each group.
+	 * @param regionMemberCount (Input/Output) Number of pixels which belong to each group.
 	 */
 	public void process( ImageSInt32 input , ImageSInt32 output , GrowQueue_I32 regionMemberCount ) {
 		// initialize data structures

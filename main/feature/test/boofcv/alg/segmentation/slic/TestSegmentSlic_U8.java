@@ -19,6 +19,7 @@
 package boofcv.alg.segmentation.slic;
 
 import boofcv.alg.misc.ImageMiscOps;
+import boofcv.struct.ConnectRule;
 import boofcv.struct.image.ImageSInt32;
 import boofcv.struct.image.ImageUInt8;
 import org.junit.Test;
@@ -40,7 +41,7 @@ public class TestSegmentSlic_U8 {
 
 		ImageMiscOps.fillRectangle(input, 100, 0, 0, 15, 40);
 
-		SegmentSlic_U8 alg = new SegmentSlic_U8(10,10,10);
+		SegmentSlic_U8 alg = new SegmentSlic_U8(10,10,10, ConnectRule.EIGHT );
 
 		alg.process(input,output);
 

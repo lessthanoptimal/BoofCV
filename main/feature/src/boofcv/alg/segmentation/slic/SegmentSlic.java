@@ -19,9 +19,12 @@
 package boofcv.alg.segmentation.slic;
 
 import boofcv.alg.InputSanityCheck;
+import boofcv.alg.segmentation.ms.ClusterLabeledImage;
+import boofcv.struct.ConnectRule;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageSInt32;
 import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.GrowQueue_I32;
 
 import java.util.Arrays;
 
@@ -34,7 +37,8 @@ import java.util.Arrays;
  *
  * @author Peter Abeles
  */
-// TODO it also appears that they are approximating k-means clustersing.  Just doing NN
+// TODO Something is messed up along the image border
+//      mark regions with -1 and try then assign to closest assigned pixel
 public abstract class SegmentSlic<T extends ImageBase> {
 	// border which ensures there is a 3x3 neighborhood around the initial clusters and that there are pixels
 	// which can be sampled when computing the gradient
@@ -60,15 +64,28 @@ public abstract class SegmentSlic<T extends ImageBase> {
 	// The image being processed
 	protected T input;
 
+	// Initial segmentation before connectivity is enforced
+	private ImageSInt32 initialSegments = new ImageSInt32(1,1);
+	// number of members in each region
+	private GrowQueue_I32 regionMemberCount = new GrowQueue_I32();
+	// merges smaller regions into larger ones
+	private MergeSmallRegionsSlic mergeSmall = new MergeSmallRegionsSlic();
+
+	// ensures that all pixels in segment are connected
+	ClusterLabeledImage segment;
+
 	// storage for clusters and pixel information
 	protected FastQueue<Cluster> clusters;
 	protected FastQueue<Pixel> pixels = new FastQueue<Pixel>(Pixel.class,true);
 
-	public SegmentSlic( int numberOfRegions , float m , int totalIterations , int numBands ) {
+	public SegmentSlic( int numberOfRegions , float m , int totalIterations , int numBands ,
+						ConnectRule connectRule ) {
 		this.numberOfRegions = numberOfRegions;
 		this.m = m;
 		this.totalIterations = totalIterations;
 		this.numBands = numBands;
+
+		segment = new ClusterLabeledImage(connectRule);
 
 		// custom declaration for pixel color
 		clusters = new FastQueue<Cluster>(Cluster.class,true) {
@@ -101,10 +118,12 @@ public abstract class SegmentSlic<T extends ImageBase> {
 
 		// Assign labels to each pixel based on how close it is to a cluster
 		computeClusterDistance();
-		assignLabelsToPixels(output);
+		assignLabelsToPixels(initialSegments,regionMemberCount);
 
 		// Assign disconnected pixels to the largest cluster they touch
-		// TODO do this
+		int N = input.width*input.height/numberOfRegions;
+		segment.process(initialSegments,output,regionMemberCount);
+		mergeSmall.process(output,regionMemberCount,N/2);
 	}
 
 	/**
@@ -113,6 +132,8 @@ public abstract class SegmentSlic<T extends ImageBase> {
 	protected void initalize(T input) {
 		this.input = input;
 		pixels.resize(input.width * input.height);
+		initialSegments.reshape(input.width, input.height);
+
 		// number of usable pixels that cluster centers can be placed in
 		int numberOfUsable = (input.width-2*BORDER)*(input.height-2*BORDER);
 		gridInterval = (int)Math.sqrt( numberOfUsable/(double)numberOfRegions);
@@ -178,7 +199,7 @@ public abstract class SegmentSlic<T extends ImageBase> {
 		float dx = getIntensity(x+1,y) - getIntensity(x-1,y);
 		float dy = getIntensity(x,y+1) - getIntensity(x,y-1);
 
-		return dx*dy;
+		return dx*dx + dy*dy;
 	}
 
 	/**
@@ -216,6 +237,7 @@ public abstract class SegmentSlic<T extends ImageBase> {
 			int centerX = (int)(c.x + 0.5f);
 			int centerY = (int)(c.y + 0.5f);
 
+			// todo check search size compared to paper
 			int x0 = centerX - gridInterval; int x1 = centerX + gridInterval + 1;
 			int y0 = centerY - gridInterval; int y1 = centerY + gridInterval + 1;
 
@@ -238,9 +260,6 @@ public abstract class SegmentSlic<T extends ImageBase> {
 					pixels.data[indexPixel++].add(c,distanceColor + adjustSpacial*distanceSpacial);
 				}
 			}
-
-			// update each pixel inside the search rectangle
-			clusters.data[i].reset();
 		}
 	}
 
@@ -261,8 +280,8 @@ public abstract class SegmentSlic<T extends ImageBase> {
 				// convert the distance each cluster is from the pixel into weights
 				p.computeWeights();
 
-				for( int i = 0; i < p.total; i++ ) {
-					ClusterDistance d = p.clusters[i];
+				for( int i = 0; i < p.clusters.size; i++ ) {
+					ClusterDistance d = p.clusters.data[i];
 					d.cluster.x += x*d.distance;
 					d.cluster.y += y*d.distance;
 					d.cluster.totalWeight += d.distance;
@@ -280,30 +299,43 @@ public abstract class SegmentSlic<T extends ImageBase> {
 	/**
 	 * Selects which region each pixel belongs to based on which cluster it is the closest to
 	 */
-	public void assignLabelsToPixels( ImageSInt32 output ) {
+	public void assignLabelsToPixels( ImageSInt32 pixelToRegions , GrowQueue_I32 regionMemberCount ) {
+
+		regionMemberCount.resize(clusters.size()+1);
+		regionMemberCount.fill(0);
 
 		int indexPixel = 0;
-		for( int y = 0; y < output.height; y++ ) {
-			int indexOutput = output.startIndex + y*output.stride;
-			for( int x =0; x < output.width; x++ , indexPixel++ , indexOutput++) {
+		for( int y = 0; y < pixelToRegions.height; y++ ) {
+			int indexOutput = pixelToRegions.startIndex + y*pixelToRegions.stride;
+			for( int x =0; x < pixelToRegions.width; x++ , indexPixel++ , indexOutput++) {
 				Pixel p = pixels.data[indexPixel];
 
-				// in the rare situation when it isn't assigned to anything, just set the ID to 0.
-				int best = 0;
+				// It is possible for a pixel to be unassigned if all the means move too far away from it
+				// Default to a non-existant cluster if that's the case
+				int best = -1;
 				float bestDistance = Float.MAX_VALUE;
 				// find the region/cluster which it is closest to
-				for( int j = 0; j < p.total; j++ ) {
-					ClusterDistance d = p.clusters[j];
+				for( int j = 0; j < p.clusters.size; j++ ) {
+					ClusterDistance d = p.clusters.data[j];
 					if( d.distance < bestDistance ) {
 						bestDistance = d.distance;
 						best = d.cluster.id;
 					}
 				}
+				if( best == -1 ) {
+					best = regionMemberCount.getSize();
+					regionMemberCount.add(0);
+				}
 
-				output.data[indexOutput] = best;
+				pixelToRegions.data[indexOutput] = best;
+				regionMemberCount.data[best]++;
 			}
 		}
 
+	}
+
+	public GrowQueue_I32 getRegionMemberCount() {
+		return regionMemberCount;
 	}
 
 	public FastQueue<Cluster> getClusters() {
@@ -316,42 +348,32 @@ public abstract class SegmentSlic<T extends ImageBase> {
 	public static class Pixel
 	{
 		// list of clusters it is interacting with
-		public ClusterDistance clusters[];
-		// how many clusters it is interacting with
-		int total;
-
-		public Pixel() {
-			this.clusters = new ClusterDistance[10];
-			for( int i = 0; i < clusters.length; i++ )
-				clusters[i] = new ClusterDistance();
-		}
+		public FastQueue<ClusterDistance> clusters = new FastQueue<ClusterDistance>(12,ClusterDistance.class,true);
 
 		public void add( Cluster c , float distance ) {
 			// make sure it isn't already full.  THis should almost never happen
-			if( total >= clusters.length )
-				return;
+			ClusterDistance d = clusters.grow();
 
-			clusters[total].cluster = c;
-			clusters[total].distance = distance;
-			total++;
+			d.cluster = c;
+			d.distance = distance;
 		}
 
 		public void computeWeights() {
-			if( total == 1 ) {
-				clusters[0].distance = 1;
+			if( clusters.size == 1 ) {
+				clusters.data[0].distance = 1;
 			} else {
 				float sum = 0;
-				for( int i = 0; i < total; i++ ) {
-					sum += clusters[i].distance;
+				for( int i = 0; i < clusters.size; i++ ) {
+					sum += clusters.data[i].distance;
 				}
-				for( int i = 0; i < total; i++ ) {
-					clusters[i].distance =  1.0f - clusters[i].distance/sum;
+				for( int i = 0; i < clusters.size; i++ ) {
+					clusters.data[i].distance =  1.0f - clusters.data[i].distance/sum;
 				}
 			}
 		}
 
 		public void reset() {
-			total = 0;
+			clusters.reset();
 		}
 	}
 

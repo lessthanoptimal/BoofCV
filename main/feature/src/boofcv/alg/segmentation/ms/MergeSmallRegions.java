@@ -32,7 +32,8 @@ import org.ddogleg.struct.GrowQueue_I32;
  *
  * @author Peter Abeles
  */
-public class PruneSmallRegions<T extends ImageBase> extends RegionMergeTree {
+// TODO support 4 and 8 connect
+public class MergeSmallRegions<T extends ImageBase> extends RegionMergeTree {
 
 	// minimum allowed size of a region, inclusive
 	protected int minimumSize;
@@ -55,7 +56,7 @@ public class PruneSmallRegions<T extends ImageBase> extends RegionMergeTree {
 	 * @param minimumSize Minimum number of pixels a region must have for it to not be pruned.
 	 * @param computeColor Computes the color of each region
 	 */
-	public PruneSmallRegions(int minimumSize, ComputeRegionMeanColor<T> computeColor) {
+	public MergeSmallRegions(int minimumSize, ComputeRegionMeanColor<T> computeColor) {
 		this.minimumSize = minimumSize;
 		this.computeColor = computeColor;
 	}

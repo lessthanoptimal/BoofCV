@@ -26,13 +26,12 @@ import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_I32;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * @author Peter Abeles
  */
-public class TestPruneSmallRegions {
+public class TestMergeSmallRegions {
 
 	/**
 	 * Runs everything to remove the small patches. This test hsa been designed to take multiple
@@ -79,7 +78,7 @@ public class TestPruneSmallRegions {
 		ComputeRegionMeanColor<ImageUInt8> mean = new ComputeRegionMeanColor.U8();
 		mean.process(image,pixelToRegion,memberCount,regionColor);
 
-		PruneSmallRegions<ImageUInt8> alg = new PruneSmallRegions<ImageUInt8>(3,mean);
+		MergeSmallRegions<ImageUInt8> alg = new MergeSmallRegions<ImageUInt8>(3,mean);
 
 		alg.process(image, pixelToRegion, memberCount, regionColor);
 
@@ -106,7 +105,7 @@ public class TestPruneSmallRegions {
 		regionMemberCount.size = 6;
 		regionMemberCount.data = new int[]{10,11,20,20,10,20};
 
-		PruneSmallRegions<ImageFloat32> alg = new PruneSmallRegions(11,null);
+		MergeSmallRegions<ImageFloat32> alg = new MergeSmallRegions(11,null);
 
 		assertTrue(alg.setupPruneList(regionMemberCount));
 
@@ -133,7 +132,7 @@ public class TestPruneSmallRegions {
 				 1,5,6,7,1,
 				 1,8,8,8,1};
 
-		PruneSmallRegions<ImageFloat32> alg = new PruneSmallRegions(10,null);
+		MergeSmallRegions<ImageFloat32> alg = new MergeSmallRegions(10,null);
 		alg.initializeMerge(N);
 
 		alg.segmentPruneFlag.resize(N);
@@ -169,7 +168,7 @@ public class TestPruneSmallRegions {
 				 1,1,1,7,4,
 				 1,1,1,1,5};
 
-		PruneSmallRegions<ImageFloat32> alg = new PruneSmallRegions(10,null);
+		MergeSmallRegions<ImageFloat32> alg = new MergeSmallRegions(10,null);
 		alg.initializeMerge(N);
 
 		alg.segmentPruneFlag.resize(N);
@@ -210,7 +209,7 @@ public class TestPruneSmallRegions {
 				 4,1,1,1,1,
 				 2,1,1,3,5};
 
-		PruneSmallRegions<ImageFloat32> alg = new PruneSmallRegions(10,null);
+		MergeSmallRegions<ImageFloat32> alg = new MergeSmallRegions(10,null);
 		alg.initializeMerge(N);
 
 		alg.segmentPruneFlag.resize(N);
@@ -245,7 +244,7 @@ public class TestPruneSmallRegions {
 	public void selectMerge() {
 		int N = 10;
 
-		PruneSmallRegions alg = new PruneSmallRegions(10,null);
+		MergeSmallRegions alg = new MergeSmallRegions(10,null);
 		alg.initializeMerge(N);
 
 		FastQueue<float[]> regionColor = new FastQueue<float[]>(float[].class,false);
@@ -259,7 +258,7 @@ public class TestPruneSmallRegions {
 		regionColor.data[4] = new float[]{1.1f,2,3};
 		regionColor.data[6] = new float[]{100,2,3};
 
-		PruneSmallRegions.Node n = (PruneSmallRegions.Node)alg.pruneGraph.grow();
+		MergeSmallRegions.Node n = (MergeSmallRegions.Node)alg.pruneGraph.grow();
 
 		// mark 4 and 6 as being connect to 2
 		n.init(2);
@@ -278,10 +277,15 @@ public class TestPruneSmallRegions {
 		}
 	}
 
-	private void checkNode(PruneSmallRegions<ImageFloat32> alg, int[] edges,int pruneId) {
+	private void checkNode(MergeSmallRegions<ImageFloat32> alg, int[] edges,int pruneId) {
 		assertEquals(edges.length,alg.pruneGraph.get(pruneId).edges.size);
 		for( int i = 0; i < edges.length; i++ ) {
 			assertTrue(alg.pruneGraph.get(pruneId).isConnected(edges[i]));
 		}
+	}
+
+	@Test
+	public void add8connect() {
+		fail("Implement");
 	}
 }

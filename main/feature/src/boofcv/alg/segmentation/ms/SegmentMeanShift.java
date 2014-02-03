@@ -61,7 +61,7 @@ public class SegmentMeanShift<T extends ImageBase> {
 	// ensures that all pixels in segment are connected
 	ClusterLabeledImage segment;
 	// Prunes and merges smaller regions together
-	PruneSmallRegions<T> prune;
+	MergeSmallRegions<T> prune;
 
 	// contains resegmented image after enforcing all points be connected
 //	ImageSInt32 pixelToRegion2 = new ImageSInt32(1,1);
@@ -76,7 +76,7 @@ public class SegmentMeanShift<T extends ImageBase> {
 	 */
 	public SegmentMeanShift(SegmentMeanShiftSearch<T> search,
 							MergeRegionMeanShift merge,
-							PruneSmallRegions<T> prune,
+							MergeSmallRegions<T> prune,
 							ConnectRule connectRule )
 	{
 		this.search = search;

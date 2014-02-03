@@ -20,33 +20,53 @@ package boofcv.alg.segmentation.slic;
 
 import boofcv.struct.ConnectRule;
 import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.MultiSpectral;
 
 /**
  * @author Peter Abeles
  */
-public class SegmentSlic_U8 extends SegmentSlic<ImageUInt8> {
-	public SegmentSlic_U8(int numberOfRegions, float m, int totalIterations, ConnectRule connectRule) {
-		super(numberOfRegions, m , totalIterations, 1,connectRule);
+public class SegmentSlic_MsU8 extends SegmentSlic<MultiSpectral<ImageUInt8>> {
+	public SegmentSlic_MsU8(int numberOfRegions, float m, int totalIterations, int numBands, ConnectRule connectRule) {
+		super(numberOfRegions, m , totalIterations, numBands,connectRule);
 	}
 
 	@Override
 	public void setColor(Cluster c, int x, int y) {
-		c.color[0] = input.unsafe_get(x,y);
+		final int numBands = input.getNumBands();
+		for( int i = 0; i < numBands; i++ ) {
+			c.color[i] = input.getBand(i).unsafe_get(x,y);
+		}
 	}
 
 	@Override
 	public void addColor(Cluster c, int index, float weight) {
-		c.color[0] += (input.data[index]&0xFF)*weight;
+		final int numBands = input.getNumBands();
+		for( int i = 0; i < numBands; i++ ) {
+			c.color[i] += (input.getBand(i).data[index] & 0xFF)*weight;
+		}
 	}
 
 	@Override
 	public float colorDistance(float[] color, int index) {
-		float difference = color[0] - (input.data[index]&0xFF);
-		return difference*difference;
+		final int numBands = input.getNumBands();
+		float total = 0;
+		for( int i = 0; i < numBands; i++ ) {
+			float diff = (input.getBand(i).data[index] & 0xFF) - color[i];
+			total += diff*diff;
+		}
+
+		return total;
 	}
 
 	@Override
 	public float getIntensity(int x, int y) {
-		return input.get(x,y);
+		final int numBands = input.getNumBands();
+		final int index = input.getIndex(x,y);
+		float total = 0;
+		for( int i = 0; i < numBands; i++ ) {
+			total += input.getBand(i).data[index] & 0xFF;
+		}
+
+		return total;
 	}
 }
