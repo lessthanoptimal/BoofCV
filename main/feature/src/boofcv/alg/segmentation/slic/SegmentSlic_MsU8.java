@@ -19,6 +19,7 @@
 package boofcv.alg.segmentation.slic;
 
 import boofcv.struct.ConnectRule;
+import boofcv.struct.image.ImageType;
 import boofcv.struct.image.ImageUInt8;
 import boofcv.struct.image.MultiSpectral;
 
@@ -26,8 +27,9 @@ import boofcv.struct.image.MultiSpectral;
  * @author Peter Abeles
  */
 public class SegmentSlic_MsU8 extends SegmentSlic<MultiSpectral<ImageUInt8>> {
-	public SegmentSlic_MsU8(int numberOfRegions, float m, int totalIterations, int numBands, ConnectRule connectRule) {
-		super(numberOfRegions, m , totalIterations, numBands,connectRule);
+	public SegmentSlic_MsU8(int numberOfRegions, float m, int totalIterations,
+							ConnectRule connectRule , ImageType<MultiSpectral<ImageUInt8>> imageType) {
+		super(numberOfRegions, m , totalIterations, connectRule,imageType);
 	}
 
 	@Override

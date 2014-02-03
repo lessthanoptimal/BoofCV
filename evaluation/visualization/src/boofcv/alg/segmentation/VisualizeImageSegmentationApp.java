@@ -25,11 +25,9 @@ import boofcv.factory.segmentation.FactoryImageSegmentation;
 import boofcv.factory.segmentation.FactorySegmentationAlg;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.image.UtilImageIO;
+import boofcv.struct.ConnectRule;
 import boofcv.struct.feature.ColorQueue_F32;
-import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageSInt32;
-import boofcv.struct.image.ImageType;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.*;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_I32;
 
@@ -115,11 +113,12 @@ public class VisualizeImageSegmentationApp {
 		BufferedImage image = UtilImageIO.loadImage("/home/pja/Desktop/segmentation/example-orig.jpg");
 
 //		ImageType<MultiSpectral<ImageFloat32>> imageType = ImageType.ms(3,ImageFloat32.class);
+		ImageType<MultiSpectral<ImageUInt8>> imageType = ImageType.ms(3,ImageUInt8.class);
 //		ImageType<ImageFloat32> imageType = ImageType.single(ImageFloat32.class);
-		ImageType<ImageUInt8> imageType = ImageType.single(ImageUInt8.class);
+//		ImageType<ImageUInt8> imageType = ImageType.single(ImageUInt8.class);
 
 //		ImageSegmentation alg = FactoryImageSegmentation.meanShift(null,imageType);
-		ImageSegmentation alg = FactoryImageSegmentation.slic(400,15.0f,10,imageType);
+		ImageSegmentation alg = FactoryImageSegmentation.slic(400,200.0f,10, ConnectRule.EIGHT,imageType);
 
 		process(alg,image,imageType);
 	}

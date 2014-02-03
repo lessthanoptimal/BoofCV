@@ -20,6 +20,7 @@ package boofcv.alg.segmentation.slic;
 
 import boofcv.struct.ConnectRule;
 import boofcv.struct.image.ImageSInt32;
+import boofcv.struct.image.ImageType;
 import boofcv.struct.image.ImageUInt8;
 import org.junit.Test;
 
@@ -34,7 +35,7 @@ public class TestSegmentSlic {
 	@Test
 	public void initializeClusters() {
 
-		DummySlic alg = new DummySlic(4,1,10,1) {
+		DummySlic alg = new DummySlic(4,1,10) {
 			@Override
 			protected void perturbCenter(Cluster c, int x, int y) {
 				c.x = x; c.y = y;
@@ -66,7 +67,7 @@ public class TestSegmentSlic {
 	 */
 	@Test
 	public void computeClusterDistance() {
-		DummySlic alg = new DummySlic(4,1,10,1);
+		DummySlic alg = new DummySlic(4,1,10);
 
 		ImageUInt8 input = new ImageUInt8(7,9);
 		alg.initalize(input);
@@ -111,7 +112,7 @@ public class TestSegmentSlic {
 
 	@Test
 	public void updateClusters() {
-		DummySlic alg = new DummySlic(4,1,10,1);
+		DummySlic alg = new DummySlic(4,1,10);
 
 		SegmentSlic.Cluster c0 = alg.clusters.grow();
 		SegmentSlic.Cluster c1 = alg.clusters.grow();
@@ -145,7 +146,7 @@ public class TestSegmentSlic {
 
 	@Test
 	public void assignLabelsToPixels() {
-		DummySlic alg = new DummySlic(4,1,10,1);
+		DummySlic alg = new DummySlic(4,1,10);
 
 		SegmentSlic.Cluster c0 = alg.clusters.grow();
 		SegmentSlic.Cluster c1 = alg.clusters.grow();
@@ -166,7 +167,7 @@ public class TestSegmentSlic {
 		}
 
 		ImageSInt32 image = new ImageSInt32(2,3);
-		alg.assignLabelsToPixels(image,null);
+		alg.assignLabelsToPixels(image,null,null);
 
 		assertEquals(2,image.get(0,0));
 		assertEquals(1,image.get(1,0));
@@ -250,8 +251,8 @@ public class TestSegmentSlic {
 
 	public static class DummySlic extends SegmentSlic<ImageUInt8> {
 
-		public DummySlic(int numberOfRegions, float m, int totalIterations, int numBands) {
-			super(numberOfRegions, m, totalIterations, numBands, ConnectRule.EIGHT);
+		public DummySlic(int numberOfRegions, float m, int totalIterations) {
+			super(numberOfRegions, m, totalIterations, ConnectRule.EIGHT, ImageType.single(ImageUInt8.class));
 		}
 
 		@Override

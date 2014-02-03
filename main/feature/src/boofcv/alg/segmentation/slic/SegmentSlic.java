@@ -19,10 +19,15 @@
 package boofcv.alg.segmentation.slic;
 
 import boofcv.alg.InputSanityCheck;
+import boofcv.alg.segmentation.ComputeRegionMeanColor;
 import boofcv.alg.segmentation.ms.ClusterLabeledImage;
+import boofcv.alg.segmentation.ms.MergeSmallRegions;
+import boofcv.factory.segmentation.FactorySegmentationAlg;
 import boofcv.struct.ConnectRule;
+import boofcv.struct.feature.ColorQueue_F32;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageSInt32;
+import boofcv.struct.image.ImageType;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_I32;
 
@@ -68,24 +73,29 @@ public abstract class SegmentSlic<T extends ImageBase> {
 	private ImageSInt32 initialSegments = new ImageSInt32(1,1);
 	// number of members in each region
 	private GrowQueue_I32 regionMemberCount = new GrowQueue_I32();
+	// color of each region
+	private FastQueue<float[]> regionColor;
 	// merges smaller regions into larger ones
-	private MergeSmallRegionsSlic mergeSmall = new MergeSmallRegionsSlic();
+	private MergeSmallRegions<T> mergeSmall;
 
 	// ensures that all pixels in segment are connected
-	ClusterLabeledImage segment;
+	protected ClusterLabeledImage segment;
 
 	// storage for clusters and pixel information
 	protected FastQueue<Cluster> clusters;
 	protected FastQueue<Pixel> pixels = new FastQueue<Pixel>(Pixel.class,true);
 
-	public SegmentSlic( int numberOfRegions , float m , int totalIterations , int numBands ,
-						ConnectRule connectRule ) {
+	public SegmentSlic( int numberOfRegions , float m , int totalIterations ,
+						ConnectRule connectRule , ImageType<T> imageType ) {
 		this.numberOfRegions = numberOfRegions;
 		this.m = m;
 		this.totalIterations = totalIterations;
-		this.numBands = numBands;
+		this.numBands = imageType.getNumBands();
 
-		segment = new ClusterLabeledImage(connectRule);
+		ComputeRegionMeanColor<T> regionColor = FactorySegmentationAlg.regionMeanColor(imageType);
+		this.mergeSmall = new MergeSmallRegions<T>(-1,regionColor);
+		this.segment = new ClusterLabeledImage(connectRule);
+		this.regionColor = new ColorQueue_F32(numBands);
 
 		// custom declaration for pixel color
 		clusters = new FastQueue<Cluster>(Cluster.class,true) {
@@ -118,12 +128,13 @@ public abstract class SegmentSlic<T extends ImageBase> {
 
 		// Assign labels to each pixel based on how close it is to a cluster
 		computeClusterDistance();
-		assignLabelsToPixels(initialSegments,regionMemberCount);
+		assignLabelsToPixels(initialSegments,regionMemberCount,regionColor);
 
 		// Assign disconnected pixels to the largest cluster they touch
 		int N = input.width*input.height/numberOfRegions;
 		segment.process(initialSegments,output,regionMemberCount);
-		mergeSmall.process(output,regionMemberCount,N/2);
+		mergeSmall.setMinimumSize(N / 2);
+		mergeSmall.process(input,output,regionMemberCount,regionColor);
 	}
 
 	/**
@@ -299,7 +310,18 @@ public abstract class SegmentSlic<T extends ImageBase> {
 	/**
 	 * Selects which region each pixel belongs to based on which cluster it is the closest to
 	 */
-	public void assignLabelsToPixels( ImageSInt32 pixelToRegions , GrowQueue_I32 regionMemberCount ) {
+	public void assignLabelsToPixels( ImageSInt32 pixelToRegions ,
+									  GrowQueue_I32 regionMemberCount ,
+									  FastQueue<float[]> regionColor ) {
+
+		regionColor.reset();
+		for( int i = 0; i < clusters.size(); i++ ) {
+			float[] r = regionColor.grow();
+			float[] c = clusters.get(i).color;
+			for( int j = 0; j < numBands; j++ ) {
+				r[j] = c[j];
+			}
+		}
 
 		regionMemberCount.resize(clusters.size()+1);
 		regionMemberCount.fill(0);
@@ -323,6 +345,7 @@ public abstract class SegmentSlic<T extends ImageBase> {
 					}
 				}
 				if( best == -1 ) {
+					regionColor.grow();
 					best = regionMemberCount.getSize();
 					regionMemberCount.add(0);
 				}

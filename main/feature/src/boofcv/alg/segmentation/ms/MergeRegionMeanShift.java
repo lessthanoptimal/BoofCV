@@ -123,9 +123,4 @@ public class MergeRegionMeanShift extends RegionMergeTree {
 
 		}
 	}
-
-	public static class Info {
-		public int index;
-		public double[] p = new double[2];
-	}
 }

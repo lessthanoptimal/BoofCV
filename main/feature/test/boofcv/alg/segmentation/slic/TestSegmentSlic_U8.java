@@ -41,7 +41,7 @@ public class TestSegmentSlic_U8 {
 
 		ImageMiscOps.fillRectangle(input, 100, 0, 0, 15, 40);
 
-		SegmentSlic_U8 alg = new SegmentSlic_U8(10,10,10, ConnectRule.EIGHT );
+		SegmentSlic_U8 alg = new SegmentSlic_U8(10,10,10, ConnectRule.EIGHT , ImageUInt8.class);
 
 		alg.process(input,output);
 

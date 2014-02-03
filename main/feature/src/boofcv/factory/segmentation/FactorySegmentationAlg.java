@@ -173,15 +173,14 @@ public class FactorySegmentationAlg {
 		if( imageType.getFamily() == ImageType.Family.SINGLE_BAND ) {
 				switch( imageType.getDataType() ) {
 					case U8:
-						return (SegmentSlic)new SegmentSlic_U8(numberOfRegions,m,totalIterations,rule);
+						return (SegmentSlic)new SegmentSlic_U8(numberOfRegions,m,totalIterations,rule,imageType.getImageClass());
 //					case F32:
 //						return (FhEdgeWeights)new FhEdgeWeights4_F32();
 				}
 		} else if( imageType.getFamily() == ImageType.Family.MULTI_SPECTRAL ) {
-			int N = imageType.getNumBands();
 				switch( imageType.getDataType() ) {
 					case U8:
-						return (SegmentSlic)new SegmentSlic_MsU8(numberOfRegions,m,totalIterations,N,rule);
+						return (SegmentSlic)new SegmentSlic_MsU8(numberOfRegions,m,totalIterations,rule,(ImageType)imageType);
 //					case F32:
 //						return (FhEdgeWeights)new FhEdgeWeights4_MsF32(N);
 				}
