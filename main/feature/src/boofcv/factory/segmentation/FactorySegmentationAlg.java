@@ -26,6 +26,8 @@ import boofcv.alg.segmentation.fh04.FhEdgeWeights;
 import boofcv.alg.segmentation.fh04.SegmentFelzenszwalbHuttenlocher04;
 import boofcv.alg.segmentation.fh04.impl.*;
 import boofcv.alg.segmentation.ms.*;
+import boofcv.alg.segmentation.slic.SegmentSlic;
+import boofcv.alg.segmentation.slic.SegmentSlic_U8;
 import boofcv.alg.weights.WeightDistanceUniform_F32;
 import boofcv.alg.weights.WeightDistance_F32;
 import boofcv.alg.weights.WeightPixelUniform_F32;
@@ -74,17 +76,19 @@ public class FactorySegmentationAlg {
 	 * Creates an instance of {@link boofcv.alg.segmentation.ms.SegmentMeanShift}.  Uniform distributions are used for spacial and color
 	 * weights.
 	 *
-	 * @param spacialRadius Radius of mean-shift region in pixels. Try 6
-	 * @param colorRadius Radius of mean-shift region for color in Euclidean distance. Try 15
-	 * @param minimumRegionSize Minimum allowed size of a region in pixels. Try 30
-	 * @param fast Improve runtime by approximating running mean-shift on each pixel. Try true.
+	 * @param config Specify configuration for mean-shift
 	 * @param imageType Type of input image
 	 * @return SegmentMeanShift
 	 */
 	public static<T extends ImageBase>
-	SegmentMeanShift<T> meanShift( int spacialRadius , float colorRadius , int minimumRegionSize ,
-								   boolean fast ,  ImageType<T> imageType )
+	SegmentMeanShift<T> meanShift( ConfigSegmentMeanShift config,  ImageType<T> imageType )
 	{
+		if( config == null )
+			config = new ConfigSegmentMeanShift();
+
+		int spacialRadius = config.spacialRadius;
+		float colorRadius = config.colorRadius;
+
 		WeightPixel_F32 weightSpacial = new WeightPixelUniform_F32(spacialRadius,spacialRadius);
 		WeightDistance_F32 weightColor = new WeightDistanceUniform_F32(colorRadius*colorRadius);
 
@@ -95,21 +99,22 @@ public class FactorySegmentationAlg {
 
 		if( imageType.getFamily() == ImageType.Family.SINGLE_BAND ) {
 			InterpolatePixelS interp = FactoryInterpolation.bilinearPixelS(imageType.getImageClass());
-			search = new SegmentMeanShiftSearchGray(maxIterations,convergenceTol,interp,weightSpacial,weightColor,fast);
+			search = new SegmentMeanShiftSearchGray(maxIterations,convergenceTol,interp,
+					weightSpacial,weightColor,config.fast);
 		} else {
 			InterpolatePixelMB interp = FactoryInterpolation.createPixelMB(0,255,
 					TypeInterpolate.BILINEAR,(ImageType)imageType);
 			search = new SegmentMeanShiftSearchColor(maxIterations,convergenceTol,interp,
-					weightSpacial,weightColor,fast,imageType);
+					weightSpacial,weightColor,config.fast,imageType);
 		}
 
 		ComputeRegionMeanColor<T> regionColor = regionMeanColor(imageType);
 		MergeRegionMeanShift merge = new MergeRegionMeanShift(3,colorRadius/2);
 
-		PruneSmallRegions<T> prune = minimumRegionSize >= 2 ?
-				new PruneSmallRegions<T>(minimumRegionSize,regionColor) : null;
+		PruneSmallRegions<T> prune = config.minimumRegionSize >= 2 ?
+				new PruneSmallRegions<T>(config.minimumRegionSize,regionColor) : null;
 
-		return new SegmentMeanShift<T>(search,merge,prune,ConnectRule.FOUR);
+		return new SegmentMeanShift<T>(search,merge,prune,config.connectRule);
 	}
 
 	public static <T extends ImageBase>
@@ -159,5 +164,11 @@ public class FactorySegmentationAlg {
 		FhEdgeWeights<T> edgeWeights = weightsFelzenszwalb04(rule,imageType);
 
 		return new SegmentFelzenszwalbHuttenlocher04<T>(K,minimumRegionSize,edgeWeights);
+	}
+
+	public static<T extends ImageBase>
+	SegmentSlic<T> slic( int numberOfRegions , float m , int totalIterations , ConnectRule rule , ImageType<T> imageType )
+	{
+		return (SegmentSlic)new SegmentSlic_U8(numberOfRegions,m,totalIterations,imageType.getNumBands());
 	}
 }

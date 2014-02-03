@@ -55,7 +55,7 @@ public class VisualizeFelzenszwalbHuttenlocher04App {
 		ImageSInt32 pixelToSegment = new ImageSInt32(color.width,color.height);
 
 
-		for( int i = 0; i < 5; i++ ) {
+		for( int i = 0; i < 1; i++ ) {
 			long time0 = System.currentTimeMillis();
 			GBlurImageOps.gaussian(color, color, sigma, -1, null);
 			alg.process(color,pixelToSegmentOld);

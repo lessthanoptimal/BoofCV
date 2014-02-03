@@ -21,6 +21,8 @@ package boofcv.alg.segmentation;
 import boofcv.struct.image.ImageSInt32;
 import org.ddogleg.struct.GrowQueue_I32;
 
+import java.util.Arrays;
+
 /**
  * Usefullfunctions related to image segmentation
  *
@@ -48,6 +50,19 @@ public class ImageSegmentationOps {
 		}
 		return total;
 	}
+
+	public static void countRegionPixels( ImageSInt32 labeled , int totalRegions , int counts[] ) {
+
+		Arrays.fill(counts,0,totalRegions,0);
+
+		for( int y = 0; y < labeled.height; y++ ) {
+			int index = labeled.startIndex + y*labeled.stride;
+			for( int x = 0; x < labeled.width; x++ ) {
+				counts[labeled.data[index++]]++;
+			}
+		}
+	}
+
 
 	/**
 	 * Compacts the region labels such that they are consecutive numbers starting from 0.

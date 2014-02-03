@@ -24,8 +24,8 @@ import boofcv.struct.image.ImageUInt8;
  * @author Peter Abeles
  */
 public class SegmentSlic_U8 extends SegmentSlic<ImageUInt8> {
-	public SegmentSlic_U8(int numberOfRegions, float m, int totalIterations, int numBands) {
-		super(numberOfRegions, m , totalIterations, numBands);
+	public SegmentSlic_U8(int numberOfRegions, float m, int totalIterations) {
+		super(numberOfRegions, m , totalIterations, 1);
 	}
 
 	@Override
@@ -46,6 +46,6 @@ public class SegmentSlic_U8 extends SegmentSlic<ImageUInt8> {
 
 	@Override
 	public float getIntensity(int x, int y) {
-		return input.unsafe_get(x,y);
+		return input.get(x,y);
 	}
 }

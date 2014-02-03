@@ -18,6 +18,7 @@
 
 package boofcv.alg.segmentation.ms;
 
+import boofcv.alg.InputSanityCheck;
 import boofcv.struct.ConnectRule;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageSInt32;
@@ -63,7 +64,7 @@ public class SegmentMeanShift<T extends ImageBase> {
 	PruneSmallRegions<T> prune;
 
 	// contains resegmented image after enforcing all points be connected
-	ImageSInt32 pixelToRegion2 = new ImageSInt32(1,1);
+//	ImageSInt32 pixelToRegion2 = new ImageSInt32(1,1);
 
 	/**
 	 * Specifies internal classes used by mean-shift.
@@ -85,13 +86,14 @@ public class SegmentMeanShift<T extends ImageBase> {
 	}
 
 	/**
-	 * Performs mean-shift segmentation on the input image
+	 * Performs mean-shift segmentation on the input image.   The
+	 * total number of regions can be found by calling {@link #getNumberOfRegions()}.
 	 *
 	 * @param image Image
+	 * @param output Storage for output image.  Each pixel is set to the region it belongs to.
 	 */
-	public void process( T image ) {
-
-		pixelToRegion2.reshape(image.width,image.height);
+	public void process( T image , ImageSInt32 output ) {
+		InputSanityCheck.checkSameShape(image,output);
 
 //		long time0 = System.currentTimeMillis();
 
@@ -108,26 +110,17 @@ public class SegmentMeanShift<T extends ImageBase> {
 
 //		long time2 = System.currentTimeMillis();
 
-		segment.process(pixelToRegion, pixelToRegion2, regionPixelCount);
+		segment.process(pixelToRegion, output, regionPixelCount);
 
 //		long time3 = System.currentTimeMillis();
 
 		if( prune != null)
-			prune.process(image,pixelToRegion2,regionPixelCount,regionColor);
+			prune.process(image,output,regionPixelCount,regionColor);
 
 //		long time4 = System.currentTimeMillis();
 
 //		System.out.println("Search: "+(time1-time0)+" Merge: "+(time2-time1)+
 //				" segment: "+(time3-time2)+" Prune: "+(time4-time3));
-	}
-
-	/**
-	 * The value of each pixel in the returned image indicates which region it belongs to.  The
-	 * total number of regions can be found by calling {@link #getNumberOfRegions()}.
-	 * @return Region image
-	 */
-	public ImageSInt32 getRegionImage() {
-		return pixelToRegion2;
 	}
 
 	/**
