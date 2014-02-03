@@ -55,7 +55,7 @@ public abstract class ComputeRegionMeanColor<T extends ImageBase> {
 	 * @param image Input image
 	 * @param pixelToRegion Conversion between pixel to region index
 	 * @param regionMemberCount List which stores the number of members for each region
-	 * @param regionColor (Output) Storage for mean color throughout the region.  Internall array must be fully
+	 * @param regionColor (Output) Storage for mean color throughout the region.  Internal array must be fully
 	 *                    declared.
 	 */
 	public void process( T image , ImageSInt32 pixelToRegion ,

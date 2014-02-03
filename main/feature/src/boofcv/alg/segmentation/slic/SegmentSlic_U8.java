@@ -19,14 +19,16 @@
 package boofcv.alg.segmentation.slic;
 
 import boofcv.struct.ConnectRule;
+import boofcv.struct.image.ImageType;
 import boofcv.struct.image.ImageUInt8;
 
 /**
  * @author Peter Abeles
  */
 public class SegmentSlic_U8 extends SegmentSlic<ImageUInt8> {
-	public SegmentSlic_U8(int numberOfRegions, float m, int totalIterations, ConnectRule connectRule) {
-		super(numberOfRegions, m , totalIterations, 1,connectRule);
+	public SegmentSlic_U8(int numberOfRegions, float m, int totalIterations,
+						  ConnectRule connectRule , Class<ImageUInt8> imageType) {
+		super(numberOfRegions, m , totalIterations, connectRule,ImageType.single(imageType));
 	}
 
 	@Override

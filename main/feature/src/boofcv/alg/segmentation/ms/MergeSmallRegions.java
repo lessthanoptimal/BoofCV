@@ -61,6 +61,10 @@ public class MergeSmallRegions<T extends ImageBase> extends RegionMergeTree {
 		this.computeColor = computeColor;
 	}
 
+	public void setMinimumSize(int minimumSize) {
+		this.minimumSize = minimumSize;
+	}
+
 	/**
 	 * Merges together smaller regions.  Segmented image, region member count, and region color are all updated.
 	 *
@@ -79,7 +83,7 @@ public class MergeSmallRegions<T extends ImageBase> extends RegionMergeTree {
 
 			// Update the color of each region
 			regionColor.resize(regionMemberCount.size);
-			computeColor.process(image,pixelToRegion,regionMemberCount,regionColor);
+			computeColor.process(image, pixelToRegion, regionMemberCount, regionColor);
 
 			initializeMerge(regionMemberCount.size);
 
