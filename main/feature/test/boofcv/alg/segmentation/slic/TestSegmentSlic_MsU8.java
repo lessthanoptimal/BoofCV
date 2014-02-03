@@ -16,38 +16,20 @@
  * limitations under the License.
  */
 
-package boofcv.abst.segmentation;
+package boofcv.alg.segmentation.slic;
 
-import boofcv.alg.segmentation.slic.SegmentSlic;
-import boofcv.struct.ConnectRule;
-import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageSInt32;
+import org.junit.Test;
+
+import static org.junit.Assert.fail;
 
 /**
- * Wrapper around {@link SegmentSlic} for {@link ImageSegmentation}.
- *
  * @author Peter Abeles
  */
-public class Slic_to_ImageSegmentation<T extends ImageBase> implements ImageSegmentation<T> {
+public class TestSegmentSlic_MsU8 {
 
-	SegmentSlic<T> slic;
-
-	public Slic_to_ImageSegmentation(SegmentSlic<T> slic) {
-		this.slic = slic;
+	@Test
+	public void stuff() {
+		fail("Implement");
 	}
 
-	@Override
-	public void segment(T input, ImageSInt32 output) {
-		slic.process(input,output);
-	}
-
-	@Override
-	public int getTotalSegments() {
-		return slic.getRegionMemberCount().size;
-	}
-
-	@Override
-	public ConnectRule getRule() {
-		return null;
-	}
 }

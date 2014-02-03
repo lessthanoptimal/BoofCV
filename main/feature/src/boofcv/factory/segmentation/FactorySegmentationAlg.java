@@ -27,6 +27,7 @@ import boofcv.alg.segmentation.fh04.SegmentFelzenszwalbHuttenlocher04;
 import boofcv.alg.segmentation.fh04.impl.*;
 import boofcv.alg.segmentation.ms.*;
 import boofcv.alg.segmentation.slic.SegmentSlic;
+import boofcv.alg.segmentation.slic.SegmentSlic_MsU8;
 import boofcv.alg.segmentation.slic.SegmentSlic_U8;
 import boofcv.alg.weights.WeightDistanceUniform_F32;
 import boofcv.alg.weights.WeightDistance_F32;
@@ -111,8 +112,8 @@ public class FactorySegmentationAlg {
 		ComputeRegionMeanColor<T> regionColor = regionMeanColor(imageType);
 		MergeRegionMeanShift merge = new MergeRegionMeanShift(3,colorRadius/2);
 
-		PruneSmallRegions<T> prune = config.minimumRegionSize >= 2 ?
-				new PruneSmallRegions<T>(config.minimumRegionSize,regionColor) : null;
+		MergeSmallRegions<T> prune = config.minimumRegionSize >= 2 ?
+				new MergeSmallRegions<T>(config.minimumRegionSize,regionColor) : null;
 
 		return new SegmentMeanShift<T>(search,merge,prune,config.connectRule);
 	}
@@ -169,6 +170,22 @@ public class FactorySegmentationAlg {
 	public static<T extends ImageBase>
 	SegmentSlic<T> slic( int numberOfRegions , float m , int totalIterations , ConnectRule rule , ImageType<T> imageType )
 	{
-		return (SegmentSlic)new SegmentSlic_U8(numberOfRegions,m,totalIterations,imageType.getNumBands());
+		if( imageType.getFamily() == ImageType.Family.SINGLE_BAND ) {
+				switch( imageType.getDataType() ) {
+					case U8:
+						return (SegmentSlic)new SegmentSlic_U8(numberOfRegions,m,totalIterations,rule);
+//					case F32:
+//						return (FhEdgeWeights)new FhEdgeWeights4_F32();
+				}
+		} else if( imageType.getFamily() == ImageType.Family.MULTI_SPECTRAL ) {
+			int N = imageType.getNumBands();
+				switch( imageType.getDataType() ) {
+					case U8:
+						return (SegmentSlic)new SegmentSlic_MsU8(numberOfRegions,m,totalIterations,N,rule);
+//					case F32:
+//						return (FhEdgeWeights)new FhEdgeWeights4_MsF32(N);
+				}
+		}
+		throw new IllegalArgumentException("Unknown imageType or connect rule");
 	}
 }

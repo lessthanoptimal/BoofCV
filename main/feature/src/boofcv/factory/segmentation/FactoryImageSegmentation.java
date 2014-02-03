@@ -23,6 +23,7 @@ import boofcv.abst.segmentation.MeanShift_to_ImageSegmentation;
 import boofcv.abst.segmentation.Slic_to_ImageSegmentation;
 import boofcv.alg.segmentation.ms.SegmentMeanShift;
 import boofcv.alg.segmentation.slic.SegmentSlic;
+import boofcv.struct.ConnectRule;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 
@@ -44,9 +45,9 @@ public class FactoryImageSegmentation {
 	}
 
 	public static <T extends ImageBase>ImageSegmentation<T>
-	slic( int numberOfRegions , float m , int totalIterations , ImageType<T> imageType )
+	slic( int numberOfRegions , float m , int totalIterations , ConnectRule rule , ImageType<T> imageType )
 	{
-		SegmentSlic<T> ms = FactorySegmentationAlg.slic(numberOfRegions,m,totalIterations,null, imageType);
+		SegmentSlic<T> ms = FactorySegmentationAlg.slic(numberOfRegions,m,totalIterations,rule, imageType);
 
 		return new Slic_to_ImageSegmentation<T>(ms);
 	}
