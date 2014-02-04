@@ -93,7 +93,7 @@ public abstract class SegmentSlic<T extends ImageBase> {
 		this.numBands = imageType.getNumBands();
 
 		ComputeRegionMeanColor<T> regionColor = FactorySegmentationAlg.regionMeanColor(imageType);
-		this.mergeSmall = new MergeSmallRegions<T>(-1,regionColor);
+		this.mergeSmall = new MergeSmallRegions<T>(-1,connectRule,regionColor);
 		this.segment = new ClusterLabeledImage(connectRule);
 		this.regionColor = new ColorQueue_F32(numBands);
 
@@ -248,7 +248,6 @@ public abstract class SegmentSlic<T extends ImageBase> {
 			int centerX = (int)(c.x + 0.5f);
 			int centerY = (int)(c.y + 0.5f);
 
-			// todo check search size compared to paper
 			int x0 = centerX - gridInterval; int x1 = centerX + gridInterval + 1;
 			int y0 = centerY - gridInterval; int y1 = centerY + gridInterval + 1;
 
@@ -354,7 +353,6 @@ public abstract class SegmentSlic<T extends ImageBase> {
 				regionMemberCount.data[best]++;
 			}
 		}
-
 	}
 
 	public GrowQueue_I32 getRegionMemberCount() {

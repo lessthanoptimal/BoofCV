@@ -113,7 +113,7 @@ public class FactorySegmentationAlg {
 		MergeRegionMeanShift merge = new MergeRegionMeanShift(3,colorRadius/2);
 
 		MergeSmallRegions<T> prune = config.minimumRegionSize >= 2 ?
-				new MergeSmallRegions<T>(config.minimumRegionSize,regionColor) : null;
+				new MergeSmallRegions<T>(config.minimumRegionSize,config.connectRule,regionColor) : null;
 
 		return new SegmentMeanShift<T>(search,merge,prune,config.connectRule);
 	}
@@ -159,28 +159,36 @@ public class FactorySegmentationAlg {
 	}
 
 	public static<T extends ImageBase>
-	SegmentFelzenszwalbHuttenlocher04<T> felzenszwalb04( int K , int minimumRegionSize , ConnectRule rule , ImageType<T> imageType )
+	SegmentFelzenszwalbHuttenlocher04<T> fh04(ConfigFh04 config, ImageType<T> imageType)
 	{
 
-		FhEdgeWeights<T> edgeWeights = weightsFelzenszwalb04(rule,imageType);
+		if( config == null )
+			config = new ConfigFh04();
 
-		return new SegmentFelzenszwalbHuttenlocher04<T>(K,minimumRegionSize,edgeWeights);
+		FhEdgeWeights<T> edgeWeights = weightsFelzenszwalb04(config.rule,imageType);
+
+		return new SegmentFelzenszwalbHuttenlocher04<T>(config.K,config.minimumRegionSize,edgeWeights);
 	}
 
 	public static<T extends ImageBase>
-	SegmentSlic<T> slic( int numberOfRegions , float m , int totalIterations , ConnectRule rule , ImageType<T> imageType )
+	SegmentSlic<T> slic( ConfigSlic config , ImageType<T> imageType )
 	{
+		if( config == null )
+			throw new IllegalArgumentException("No default configuration since the number of segments must be specified.");
+
 		if( imageType.getFamily() == ImageType.Family.SINGLE_BAND ) {
 				switch( imageType.getDataType() ) {
 					case U8:
-						return (SegmentSlic)new SegmentSlic_U8(numberOfRegions,m,totalIterations,rule,imageType.getImageClass());
+						return (SegmentSlic)new SegmentSlic_U8(config.numberOfRegions,
+								config.spacialWeight,config.totalIterations,config.rule,imageType.getImageClass());
 //					case F32:
 //						return (FhEdgeWeights)new FhEdgeWeights4_F32();
 				}
 		} else if( imageType.getFamily() == ImageType.Family.MULTI_SPECTRAL ) {
 				switch( imageType.getDataType() ) {
 					case U8:
-						return (SegmentSlic)new SegmentSlic_MsU8(numberOfRegions,m,totalIterations,rule,(ImageType)imageType);
+						return (SegmentSlic)new SegmentSlic_MsU8(config.numberOfRegions,
+								config.spacialWeight,config.totalIterations,config.rule,(ImageType)imageType);
 //					case F32:
 //						return (FhEdgeWeights)new FhEdgeWeights4_MsF32(N);
 				}

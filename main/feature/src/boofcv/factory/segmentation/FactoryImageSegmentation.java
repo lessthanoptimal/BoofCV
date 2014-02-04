@@ -18,12 +18,13 @@
 
 package boofcv.factory.segmentation;
 
+import boofcv.abst.segmentation.Fh04_to_ImageSegmentation;
 import boofcv.abst.segmentation.ImageSegmentation;
 import boofcv.abst.segmentation.MeanShift_to_ImageSegmentation;
 import boofcv.abst.segmentation.Slic_to_ImageSegmentation;
+import boofcv.alg.segmentation.fh04.SegmentFelzenszwalbHuttenlocher04;
 import boofcv.alg.segmentation.ms.SegmentMeanShift;
 import boofcv.alg.segmentation.slic.SegmentSlic;
-import boofcv.struct.ConnectRule;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 
@@ -45,10 +46,21 @@ public class FactoryImageSegmentation {
 	}
 
 	public static <T extends ImageBase>ImageSegmentation<T>
-	slic( int numberOfRegions , float m , int totalIterations , ConnectRule rule , ImageType<T> imageType )
+	slic( ConfigSlic config , ImageType<T> imageType )
 	{
-		SegmentSlic<T> ms = FactorySegmentationAlg.slic(numberOfRegions,m,totalIterations,rule, imageType);
+		SegmentSlic<T> ms = FactorySegmentationAlg.slic(config, imageType);
 
 		return new Slic_to_ImageSegmentation<T>(ms);
+	}
+
+	public static <T extends ImageBase>ImageSegmentation<T>
+	fh04( ConfigFh04 config , ImageType<T> imageType )
+	{
+		if( config == null )
+			config = new ConfigFh04();
+
+		SegmentFelzenszwalbHuttenlocher04<T> fh = FactorySegmentationAlg.fh04(config, imageType);
+
+		return new Fh04_to_ImageSegmentation<T>(fh,config.rule);
 	}
 }
