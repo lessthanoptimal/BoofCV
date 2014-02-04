@@ -76,7 +76,6 @@ import org.ddogleg.struct.GrowQueue_I32;
  *
  * @author Peter Abeles
  */
-// TODO optimize sort - Use approximate method?
 public class SegmentFelzenszwalbHuttenlocher04<T extends ImageBase> {
 
 	// tuning parameter.  Determines the number of segments.  Larger number means larger regions

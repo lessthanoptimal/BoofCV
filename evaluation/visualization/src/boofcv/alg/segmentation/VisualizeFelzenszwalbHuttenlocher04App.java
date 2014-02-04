@@ -21,6 +21,7 @@ package boofcv.alg.segmentation;
 import boofcv.alg.filter.blur.GBlurImageOps;
 import boofcv.alg.segmentation.fh04.SegmentFelzenszwalbHuttenlocher04;
 import boofcv.core.image.ConvertBufferedImage;
+import boofcv.factory.segmentation.ConfigFh04;
 import boofcv.factory.segmentation.FactorySegmentationAlg;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.image.UtilImageIO;
@@ -49,7 +50,7 @@ public class VisualizeFelzenszwalbHuttenlocher04App {
 		BufferedImage outColor = new BufferedImage(color.width,color.height,BufferedImage.TYPE_INT_RGB);
 //		BufferedImage outSegments = new BufferedImage(color.width,color.height,BufferedImage.TYPE_INT_RGB);
 
-		SegmentFelzenszwalbHuttenlocher04<T> alg = FactorySegmentationAlg.felzenszwalb04(K, minimumSize, rule,type);
+		SegmentFelzenszwalbHuttenlocher04<T> alg = FactorySegmentationAlg.fh04(new ConfigFh04(K, minimumSize, rule), type);
 
 		ImageSInt32 pixelToSegmentOld = new ImageSInt32(color.width,color.height);
 		ImageSInt32 pixelToSegment = new ImageSInt32(color.width,color.height);

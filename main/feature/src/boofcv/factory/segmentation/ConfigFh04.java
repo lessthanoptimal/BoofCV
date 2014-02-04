@@ -16,24 +16,35 @@
  * limitations under the License.
  */
 
-package boofcv.abst.segmentation;
+package boofcv.factory.segmentation;
 
 import boofcv.struct.ConnectRule;
-import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageSInt32;
 
 /**
- * High level interface for image segmentation.  Each pixel in the segmented image is assigned an integer label
- * to identify which region in the image it belongs to.  A region is a continuous connected set of pixels.
+ * Configuration for {@link boofcv.alg.segmentation.fh04.SegmentFelzenszwalbHuttenlocher04}.
  *
  * @author Peter Abeles
  */
-// TODO add size to the interface since everything computes the size?
-public interface ImageSegmentation<T extends ImageBase> {
+public class ConfigFh04 {
+	/**
+	 * Tuning parameter.  Larger regions are preferred for larger values of K.  Try 300
+	 */
+	public int K = 300;
+	/**
+	 * Minimum allowed size of a region.
+	 */
+	public int minimumRegionSize = 30;
+	/**
+	 * Connection rule used to connect regions.  ConnectRule.EIGHT was using in the original paper.
+	 */
+	public ConnectRule rule = ConnectRule.EIGHT;
 
-	public void segment( T input , ImageSInt32 output );
+	public ConfigFh04() {
+	}
 
-	public int getTotalSegments();
-
-	public ConnectRule getRule();
+	public ConfigFh04(int k, int minimumRegionSize, ConnectRule rule) {
+		K = k;
+		this.minimumRegionSize = minimumRegionSize;
+		this.rule = rule;
+	}
 }

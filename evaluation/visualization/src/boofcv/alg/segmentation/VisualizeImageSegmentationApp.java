@@ -21,11 +21,11 @@ package boofcv.alg.segmentation;
 import boofcv.abst.segmentation.ImageSegmentation;
 import boofcv.alg.filter.blur.GBlurImageOps;
 import boofcv.core.image.ConvertBufferedImage;
+import boofcv.factory.segmentation.ConfigSlic;
 import boofcv.factory.segmentation.FactoryImageSegmentation;
 import boofcv.factory.segmentation.FactorySegmentationAlg;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.image.UtilImageIO;
-import boofcv.struct.ConnectRule;
 import boofcv.struct.feature.ColorQueue_F32;
 import boofcv.struct.image.*;
 import org.ddogleg.struct.FastQueue;
@@ -108,9 +108,9 @@ public class VisualizeImageSegmentationApp {
 	public static void main(String[] args) {
 //		BufferedImage image = UtilImageIO.loadImage("../data/evaluation/sunflowers.png");
 //		BufferedImage image = UtilImageIO.loadImage("../data/evaluation/shapes01.png");
-//		BufferedImage image = UtilImageIO.loadImage("../data/applet/trees_rotate_01.jpg");
+		BufferedImage image = UtilImageIO.loadImage("../data/applet/trees_rotate_01.jpg");
 //		BufferedImage image = UtilImageIO.loadImage("../data/applet/segment/mountain_pines_people.jpg");
-		BufferedImage image = UtilImageIO.loadImage("/home/pja/Desktop/segmentation/example-orig.jpg");
+//		BufferedImage image = UtilImageIO.loadImage("/home/pja/Desktop/segmentation/example-orig.jpg");
 
 //		ImageType<MultiSpectral<ImageFloat32>> imageType = ImageType.ms(3,ImageFloat32.class);
 		ImageType<MultiSpectral<ImageUInt8>> imageType = ImageType.ms(3,ImageUInt8.class);
@@ -118,7 +118,8 @@ public class VisualizeImageSegmentationApp {
 //		ImageType<ImageUInt8> imageType = ImageType.single(ImageUInt8.class);
 
 //		ImageSegmentation alg = FactoryImageSegmentation.meanShift(null,imageType);
-		ImageSegmentation alg = FactoryImageSegmentation.slic(400,200.0f,10, ConnectRule.EIGHT,imageType);
+		ImageSegmentation alg = FactoryImageSegmentation.slic(new ConfigSlic(800), imageType);
+//		ImageSegmentation alg = FactoryImageSegmentation.fh04(null, imageType);
 
 		process(alg,image,imageType);
 	}

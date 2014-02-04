@@ -31,7 +31,12 @@ import static org.junit.Assert.fail;
 public class TestImageSegmentationOps {
 
 	@Test
-	public void countRegionPixels() {
+	public void countRegionPixels_single() {
+		fail("Implement");
+	}
+
+	@Test
+	public void countRegionPixels_all() {
 		fail("Implement");
 	}
 
