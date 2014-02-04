@@ -19,22 +19,21 @@
 package boofcv.alg.segmentation.slic;
 
 import boofcv.struct.ConnectRule;
+import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageType;
-import boofcv.struct.image.ImageUInt8;
-import boofcv.struct.image.MultiSpectral;
 
 /**
  * @author Peter Abeles
  */
-public class TestSegmentSlic_MsU8 extends GeneralSegmentSlicColorChecks<MultiSpectral<ImageUInt8>> {
+public class TestSegmentSlic_F32 extends GeneralSegmentSlicColorChecks<ImageFloat32> {
 
-	public TestSegmentSlic_MsU8() {
-		super(ImageType.ms(3, ImageUInt8.class));
+	public TestSegmentSlic_F32() {
+		super(ImageType.single(ImageFloat32.class));
 	}
 
 	@Override
-	public SegmentSlic<MultiSpectral<ImageUInt8>> createAlg(int numberOfRegions, float m, int totalIterations, ConnectRule rule) {
-		return new SegmentSlic_MsU8(numberOfRegions,m,totalIterations,rule,3);
+	public SegmentSlic<ImageFloat32> createAlg(int numberOfRegions, float m, int totalIterations, ConnectRule rule) {
+		return new SegmentSlic_F32(numberOfRegions,m,totalIterations,rule);
 	}
 
 }

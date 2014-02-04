@@ -19,19 +19,20 @@
 package boofcv.alg.segmentation.slic;
 
 import boofcv.struct.ConnectRule;
+import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageType;
-import boofcv.struct.image.ImageUInt8;
 import boofcv.struct.image.MultiSpectral;
 
 /**
- * Implementation of {@link SegmentSlic} for image of type {@link MultiSpectral} of type {@link ImageUInt8}.
+ * Implementation of {@link boofcv.alg.segmentation.slic.SegmentSlic} for image of type
+ * {@link boofcv.struct.image.MultiSpectral} of type {@link boofcv.struct.image.ImageFloat32}.
  *
  * @author Peter Abeles
  */
-public class SegmentSlic_MsU8 extends SegmentSlic<MultiSpectral<ImageUInt8>> {
-	public SegmentSlic_MsU8(int numberOfRegions, float m, int totalIterations,
-							ConnectRule connectRule , int numBands) {
-		super(numberOfRegions, m , totalIterations, connectRule,ImageType.ms(numBands, ImageUInt8.class));
+public class SegmentSlic_MsF32 extends SegmentSlic<MultiSpectral<ImageFloat32>> {
+	public SegmentSlic_MsF32(int numberOfRegions, float m, int totalIterations,
+							 ConnectRule connectRule, int numBands) {
+		super(numberOfRegions, m , totalIterations, connectRule,ImageType.ms(numBands,ImageFloat32.class));
 	}
 
 	@Override
@@ -46,7 +47,7 @@ public class SegmentSlic_MsU8 extends SegmentSlic<MultiSpectral<ImageUInt8>> {
 	public void addColor(float[] color, int index, float weight) {
 		final int numBands = input.getNumBands();
 		for( int i = 0; i < numBands; i++ ) {
-			color[i] += (input.getBand(i).data[index] & 0xFF)*weight;
+			color[i] += input.getBand(i).data[index]*weight;
 		}
 	}
 
@@ -55,7 +56,7 @@ public class SegmentSlic_MsU8 extends SegmentSlic<MultiSpectral<ImageUInt8>> {
 		final int numBands = input.getNumBands();
 		float total = 0;
 		for( int i = 0; i < numBands; i++ ) {
-			float diff = (input.getBand(i).data[index] & 0xFF) - color[i];
+			float diff = input.getBand(i).data[index] - color[i];
 			total += diff*diff;
 		}
 
@@ -68,7 +69,7 @@ public class SegmentSlic_MsU8 extends SegmentSlic<MultiSpectral<ImageUInt8>> {
 		final int index = input.getIndex(x,y);
 		float total = 0;
 		for( int i = 0; i < numBands; i++ ) {
-			total += input.getBand(i).data[index] & 0xFF;
+			total += input.getBand(i).data[index];
 		}
 
 		return total/numBands;

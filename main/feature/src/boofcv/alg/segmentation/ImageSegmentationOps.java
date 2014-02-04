@@ -24,7 +24,7 @@ import org.ddogleg.struct.GrowQueue_I32;
 import java.util.Arrays;
 
 /**
- * Usefullfunctions related to image segmentation
+ * Useful functions related to image segmentation
  *
  * @author Peter Abeles
  */

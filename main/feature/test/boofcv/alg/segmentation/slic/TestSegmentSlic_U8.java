@@ -18,39 +18,22 @@
 
 package boofcv.alg.segmentation.slic;
 
-import boofcv.alg.misc.ImageMiscOps;
 import boofcv.struct.ConnectRule;
-import boofcv.struct.image.ImageSInt32;
+import boofcv.struct.image.ImageType;
 import boofcv.struct.image.ImageUInt8;
-import org.junit.Test;
-
-import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
  */
-public class TestSegmentSlic_U8 {
+public class TestSegmentSlic_U8 extends GeneralSegmentSlicColorChecks<ImageUInt8> {
 
-	/**
-	 * Give it an easy image to segment and see how well it does.
-	 */
-	@Test
-	public void easyTest() {
-		ImageUInt8 input = new ImageUInt8(30,40);
-		ImageSInt32 output = new ImageSInt32(30,40);
-
-		ImageMiscOps.fillRectangle(input, 100, 0, 0, 15, 40);
-
-		SegmentSlic_U8 alg = new SegmentSlic_U8(10,10,10, ConnectRule.EIGHT , ImageUInt8.class);
-
-		alg.process(input,output);
-
-
-		// TODO make sure that each segment is all one color in the original image
+	public TestSegmentSlic_U8() {
+		super(ImageType.single(ImageUInt8.class));
 	}
 
-	@Test
-	public void stuff() {
-		fail("implement");
+	@Override
+	public SegmentSlic<ImageUInt8> createAlg(int numberOfRegions, float m, int totalIterations, ConnectRule rule) {
+		return new SegmentSlic_U8(numberOfRegions,m,totalIterations,rule);
 	}
+
 }

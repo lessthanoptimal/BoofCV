@@ -26,9 +26,7 @@ import boofcv.alg.segmentation.fh04.FhEdgeWeights;
 import boofcv.alg.segmentation.fh04.SegmentFelzenszwalbHuttenlocher04;
 import boofcv.alg.segmentation.fh04.impl.*;
 import boofcv.alg.segmentation.ms.*;
-import boofcv.alg.segmentation.slic.SegmentSlic;
-import boofcv.alg.segmentation.slic.SegmentSlic_MsU8;
-import boofcv.alg.segmentation.slic.SegmentSlic_U8;
+import boofcv.alg.segmentation.slic.*;
 import boofcv.alg.weights.WeightDistanceUniform_F32;
 import boofcv.alg.weights.WeightDistance_F32;
 import boofcv.alg.weights.WeightPixelUniform_F32;
@@ -180,17 +178,20 @@ public class FactorySegmentationAlg {
 				switch( imageType.getDataType() ) {
 					case U8:
 						return (SegmentSlic)new SegmentSlic_U8(config.numberOfRegions,
-								config.spacialWeight,config.totalIterations,config.rule,imageType.getImageClass());
-//					case F32:
-//						return (FhEdgeWeights)new FhEdgeWeights4_F32();
+								config.spacialWeight,config.totalIterations,config.rule);
+					case F32:
+						return (SegmentSlic)new SegmentSlic_F32(config.numberOfRegions,
+								config.spacialWeight,config.totalIterations,config.rule);
 				}
 		} else if( imageType.getFamily() == ImageType.Family.MULTI_SPECTRAL ) {
+			int N = imageType.getNumBands();
 				switch( imageType.getDataType() ) {
 					case U8:
 						return (SegmentSlic)new SegmentSlic_MsU8(config.numberOfRegions,
-								config.spacialWeight,config.totalIterations,config.rule,(ImageType)imageType);
-//					case F32:
-//						return (FhEdgeWeights)new FhEdgeWeights4_MsF32(N);
+								config.spacialWeight,config.totalIterations,config.rule,N);
+					case F32:
+						return (SegmentSlic)new SegmentSlic_MsF32(config.numberOfRegions,
+								config.spacialWeight,config.totalIterations,config.rule,N);
 				}
 		}
 		throw new IllegalArgumentException("Unknown imageType or connect rule");

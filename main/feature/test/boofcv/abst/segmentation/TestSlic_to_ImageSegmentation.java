@@ -16,25 +16,27 @@
  * limitations under the License.
  */
 
-package boofcv.alg.segmentation.slic;
+package boofcv.abst.segmentation;
 
-import boofcv.struct.ConnectRule;
+import boofcv.factory.segmentation.FactoryImageSegmentation;
+import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageType;
 import boofcv.struct.image.ImageUInt8;
-import boofcv.struct.image.MultiSpectral;
 
 /**
  * @author Peter Abeles
  */
-public class TestSegmentSlic_MsU8 extends GeneralSegmentSlicColorChecks<MultiSpectral<ImageUInt8>> {
-
-	public TestSegmentSlic_MsU8() {
-		super(ImageType.ms(3, ImageUInt8.class));
+public class TestSlic_to_ImageSegmentation<T extends ImageBase> extends GeneralImageSegmentationChecks<T> {
+	public TestSlic_to_ImageSegmentation() {
+		super(ImageType.single(ImageUInt8.class),
+				ImageType.single(ImageFloat32.class),
+				ImageType.ms(3, ImageUInt8.class),
+				ImageType.ms(3, ImageFloat32.class));
 	}
 
 	@Override
-	public SegmentSlic<MultiSpectral<ImageUInt8>> createAlg(int numberOfRegions, float m, int totalIterations, ConnectRule rule) {
-		return new SegmentSlic_MsU8(numberOfRegions,m,totalIterations,rule,3);
+	public ImageSegmentation<T> createAlg( ImageType<T> imageType ) {
+		return FactoryImageSegmentation.slic(null, imageType);
 	}
-
 }

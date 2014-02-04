@@ -23,22 +23,24 @@ import boofcv.struct.image.ImageType;
 import boofcv.struct.image.ImageUInt8;
 
 /**
+ * Implementation of {@link SegmentSlic} for image of type {@link ImageUInt8}.
+ *
  * @author Peter Abeles
  */
 public class SegmentSlic_U8 extends SegmentSlic<ImageUInt8> {
 	public SegmentSlic_U8(int numberOfRegions, float m, int totalIterations,
-						  ConnectRule connectRule , Class<ImageUInt8> imageType) {
-		super(numberOfRegions, m , totalIterations, connectRule,ImageType.single(imageType));
+						  ConnectRule connectRule ) {
+		super(numberOfRegions, m , totalIterations, connectRule,ImageType.single(ImageUInt8.class));
 	}
 
 	@Override
-	public void setColor(Cluster c, int x, int y) {
-		c.color[0] = input.unsafe_get(x,y);
+	public void setColor(float[] color, int x, int y) {
+		color[0] = input.unsafe_get(x,y);
 	}
 
 	@Override
-	public void addColor(Cluster c, int index, float weight) {
-		c.color[0] += (input.data[index]&0xFF)*weight;
+	public void addColor(float[] color, int index, float weight) {
+		color[0] += (input.data[index]&0xFF)*weight;
 	}
 
 	@Override

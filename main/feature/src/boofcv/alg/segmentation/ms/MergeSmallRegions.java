@@ -34,7 +34,6 @@ import org.ddogleg.struct.GrowQueue_I32;
  *
  * @author Peter Abeles
  */
-// TODO support 4 and 8 connect
 public class MergeSmallRegions<T extends ImageBase> extends RegionMergeTree {
 
 	// minimum allowed size of a region, inclusive
@@ -52,6 +51,7 @@ public class MergeSmallRegions<T extends ImageBase> extends RegionMergeTree {
 	// Used to mark pixels as not being a member of any region
 	protected FastQueue<Node> pruneGraph = new FastQueue<Node>(Node.class,true);
 
+	// Relative location of neighbors according to connection rule
 	protected Point2D_I32 connect[];
 
 	/**
