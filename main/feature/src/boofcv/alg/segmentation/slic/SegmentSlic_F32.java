@@ -19,22 +19,38 @@
 package boofcv.alg.segmentation.slic;
 
 import boofcv.struct.ConnectRule;
+import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageType;
-import boofcv.struct.image.ImageUInt8;
-import boofcv.struct.image.MultiSpectral;
 
 /**
+ * Implementation of {@link SegmentSlic} for image of type {@link ImageFloat32}.
+ *
  * @author Peter Abeles
  */
-public class TestSegmentSlic_MsU8 extends GeneralSegmentSlicColorChecks<MultiSpectral<ImageUInt8>> {
-
-	public TestSegmentSlic_MsU8() {
-		super(ImageType.ms(3, ImageUInt8.class));
+public class SegmentSlic_F32 extends SegmentSlic<ImageFloat32> {
+	public SegmentSlic_F32(int numberOfRegions, float m, int totalIterations,
+						   ConnectRule connectRule) {
+		super(numberOfRegions, m , totalIterations, connectRule,ImageType.single(ImageFloat32.class));
 	}
 
 	@Override
-	public SegmentSlic<MultiSpectral<ImageUInt8>> createAlg(int numberOfRegions, float m, int totalIterations, ConnectRule rule) {
-		return new SegmentSlic_MsU8(numberOfRegions,m,totalIterations,rule,3);
+	public void setColor(float[] color, int x, int y) {
+		color[0] = input.unsafe_get(x,y);
 	}
 
+	@Override
+	public void addColor(float[] color, int index, float weight) {
+		color[0] += input.data[index]*weight;
+	}
+
+	@Override
+	public float colorDistance(float[] color, int index) {
+		float difference = color[0] - input.data[index];
+		return difference*difference;
+	}
+
+	@Override
+	public float getIntensity(int x, int y) {
+		return input.get(x,y);
+	}
 }

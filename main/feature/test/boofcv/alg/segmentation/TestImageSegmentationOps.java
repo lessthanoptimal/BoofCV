@@ -23,7 +23,7 @@ import boofcv.testing.BoofTesting;
 import org.ddogleg.struct.GrowQueue_I32;
 import org.junit.Test;
 
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Peter Abeles
@@ -32,12 +32,39 @@ public class TestImageSegmentationOps {
 
 	@Test
 	public void countRegionPixels_single() {
-		fail("Implement");
+		ImageSInt32 output = new ImageSInt32(4,5);
+
+		output.data = new int[]{
+				0, 0, 0, 1,
+				1, 1, 1, 1,
+				0, 0, 3, 3,
+				2, 2, 2, 2,
+				2, 2, 2, 2};
+
+		assertEquals(5,ImageSegmentationOps.countRegionPixels(output,0));
+		assertEquals(5,ImageSegmentationOps.countRegionPixels(output,1));
+		assertEquals(8,ImageSegmentationOps.countRegionPixels(output,2));
+		assertEquals(2,ImageSegmentationOps.countRegionPixels(output,3));
 	}
 
 	@Test
 	public void countRegionPixels_all() {
-		fail("Implement");
+		ImageSInt32 output = new ImageSInt32(4,5);
+
+		output.data = new int[]{
+				0, 0, 0, 1,
+				1, 1, 1, 1,
+				0, 0, 3, 3,
+				2, 2, 2, 2,
+				2, 2, 2, 2};
+
+		int counts[] = new int[10];
+		ImageSegmentationOps.countRegionPixels(output,4,counts);
+
+		assertEquals(5,counts[0]);
+		assertEquals(5,counts[1]);
+		assertEquals(8,counts[2]);
+		assertEquals(2,counts[3]);
 	}
 
 	/**

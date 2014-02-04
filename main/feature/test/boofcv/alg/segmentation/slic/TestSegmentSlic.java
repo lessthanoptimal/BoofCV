@@ -19,9 +19,12 @@
 package boofcv.alg.segmentation.slic;
 
 import boofcv.struct.ConnectRule;
+import boofcv.struct.feature.ColorQueue_F32;
 import boofcv.struct.image.ImageSInt32;
 import boofcv.struct.image.ImageType;
 import boofcv.struct.image.ImageUInt8;
+import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.GrowQueue_I32;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -48,17 +51,17 @@ public class TestSegmentSlic {
 
 		alg.initializeClusters();
 
-		assertEquals(2+3,alg.clusters.get(0).x,1e-4);
-		assertEquals(2+4,alg.clusters.get(0).y,1e-4);
+		assertEquals(4,alg.clusters.get(0).x,1e-4);
+		assertEquals(2,alg.clusters.get(0).y,1e-4);
 
-		assertEquals(2+13,alg.clusters.get(1).x,1e-4);
-		assertEquals(2+4,alg.clusters.get(1).y,1e-4);
+		assertEquals(14,alg.clusters.get(1).x,1e-4);
+		assertEquals(2,alg.clusters.get(1).y,1e-4);
 
-		assertEquals(95,alg.clusters.get(9).x,1e-4);
-		assertEquals(2+4,alg.clusters.get(9).y,1e-4);
+		assertEquals(94,alg.clusters.get(9).x,1e-4);
+		assertEquals(2,alg.clusters.get(9).y,1e-4);
 
-		assertEquals(2+3,alg.clusters.get(10).x,1e-4);
-		assertEquals(2+14,alg.clusters.get(10).y,1e-4);
+		assertEquals(4,alg.clusters.get(10).x,1e-4);
+		assertEquals(12,alg.clusters.get(10).y,1e-4);
 	}
 
 	/**
@@ -167,7 +170,17 @@ public class TestSegmentSlic {
 		}
 
 		ImageSInt32 image = new ImageSInt32(2,3);
-		alg.assignLabelsToPixels(image,null,null);
+		GrowQueue_I32 regionMemberCount = new GrowQueue_I32();
+		FastQueue<float[]> regionColor = new ColorQueue_F32(1);
+
+		alg.assignLabelsToPixels(image,regionMemberCount,regionColor);
+
+		assertEquals(3,regionMemberCount.size);
+		assertEquals(3,regionColor.size);
+
+		assertEquals(0,regionMemberCount.get(0));
+		assertEquals(5,regionMemberCount.get(1));
+		assertEquals(1,regionMemberCount.get(2));
 
 		assertEquals(2,image.get(0,0));
 		assertEquals(1,image.get(1,0));
@@ -196,12 +209,6 @@ public class TestSegmentSlic {
 		assertEquals(2, p.clusters.size);
 		assertEquals(1.2f, p.clusters.data[1].distance, 1e-4f);
 		assertTrue(c1 == p.clusters.data[1].cluster);
-
-		// should get capped and not go forever
-		for( int i = 0; i < 50; i++ ) {
-			p.add(c0,0.5f);
-		}
-		assertEquals(10, p.clusters.size);
 	}
 
 
@@ -256,11 +263,11 @@ public class TestSegmentSlic {
 		}
 
 		@Override
-		public void setColor(Cluster c, int x, int y) {
+		public void setColor(float[]color, int x, int y) {
 		}
 
 		@Override
-		public void addColor(Cluster c, int index, float weight) {
+		public void addColor(float[]color, int index, float weight) {
 		}
 
 		@Override

@@ -34,6 +34,26 @@ import org.ddogleg.struct.GrowQueue_I32;
 import java.util.Arrays;
 
 /**
+ * <p>
+ * K-means based superpixel image segmentation, see [1].  The image is broken up into superpixels (clusters of
+ * connected pixels) in a grid like pattern.  A connectivity rule of 4 or 8 is enforced across all the clusters.
+ * Clustering is done using k-means, where each point is composed on the 2D image coordinate and an intensity
+ * value in each color band, thus K = 2+numBands.  Instead of computing the distance of each cluster's center
+ * from each point only points within a distance of S si considered.  The difference in scale difference between
+ * pixels and image intensity is handled through a user configurable tuning parameter.
+ * </p>
+ *
+ * <p>
+ * Deviations from paper:
+ * <ul>
+ * <li>In the paper a LAB color space is always used.  In this implementation a general purpose N-dimensional
+ * color space is used.</li>
+ * <li>To correctly support LAB or other color spaces a specialized implementation might be needed to ensure
+ * the intensity of a pixel is computed correctly.</li>
+ * <li>Small regions are merged into other regions based on how similar their color is.  In the paper
+ * a small region is merged into the largest region it is connected to.</li>
+ * </ul>
+ * </p>
  *
  * <p>
  * [1] Radhakrishna Achanta, Appu Shaji, Kevin Smith, Aurelien Lucchi, Pascal Fua, and Sabine Süsstrunk,
@@ -42,8 +62,6 @@ import java.util.Arrays;
  *
  * @author Peter Abeles
  */
-// TODO Something is messed up along the image border
-//      mark regions with -1 and try then assign to closest assigned pixel
 public abstract class SegmentSlic<T extends ImageBase> {
 	// border which ensures there is a 3x3 neighborhood around the initial clusters and that there are pixels
 	// which can be sampled when computing the gradient
@@ -112,7 +130,7 @@ public abstract class SegmentSlic<T extends ImageBase> {
 		InputSanityCheck.checkSameShape(input,output);
 		if( input.width < 2*BORDER || input.height < 2*BORDER)
 			throw new IllegalArgumentException(
-					"Image is too small to process.  Must have a width and height of at leaest "+(2*BORDER));
+					"Image is too small to process.  Must have a width and height of at least "+(2*BORDER));
 
 		// initialize all the data structures
 		initalize(input);
@@ -162,8 +180,8 @@ public abstract class SegmentSlic<T extends ImageBase> {
 	 */
 	protected void initializeClusters() {
 
-		int offsetX = BORDER+((input.width-2*BORDER) % gridInterval)/2;
-		int offsetY = BORDER+((input.height-2*BORDER) % gridInterval)/2;
+		int offsetX = Math.max(BORDER,((input.width-1) % gridInterval)/2);
+		int offsetY = Math.max(BORDER,((input.height-1) % gridInterval)/2);
 
 		int clusterId = 0;
 		clusters.reset();
@@ -200,7 +218,7 @@ public abstract class SegmentSlic<T extends ImageBase> {
 
 		c.x = x+bestX;
 		c.y = y+bestY;
-		setColor(c,x+bestX,y+bestY);
+		setColor(c.color,x+bestX,y+bestY);
 	}
 
 	/**
@@ -216,12 +234,12 @@ public abstract class SegmentSlic<T extends ImageBase> {
 	/**
 	 * Sets the cluster's to the pixel color at that location
 	 */
-	public abstract void setColor( Cluster c , int x , int y );
+	public abstract void setColor( float[] color , int x , int y );
 
 	/**
 	 * Performs a weighted add to the cluster's color at the specified pixel in the image
 	 */
-	public abstract void addColor( Cluster c , int index , float weight );
+	public abstract void addColor( float[] color , int index , float weight );
 
 	/**
 	 * Euclidean Squared distance away that the pixel is from the provided color
@@ -295,7 +313,7 @@ public abstract class SegmentSlic<T extends ImageBase> {
 					d.cluster.x += x*d.distance;
 					d.cluster.y += y*d.distance;
 					d.cluster.totalWeight += d.distance;
-					addColor(d.cluster,indexInput,d.distance);
+					addColor(d.cluster.color,indexInput,d.distance);
 				}
 			}
 		}
@@ -322,7 +340,7 @@ public abstract class SegmentSlic<T extends ImageBase> {
 			}
 		}
 
-		regionMemberCount.resize(clusters.size()+1);
+		regionMemberCount.resize(clusters.size());
 		regionMemberCount.fill(0);
 
 		int indexPixel = 0;
