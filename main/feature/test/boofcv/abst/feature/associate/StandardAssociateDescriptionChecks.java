@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -153,10 +153,10 @@ public abstract class StandardAssociateDescriptionChecks<Desc> {
 		alg.associate();
 		assertEquals(0,alg.getMatches().size);
 
-		// Since the threshold is equal to the error NO matches are found
-		alg.setThreshold(0.1);
+		// Test edge case for threshold.  If it is exactly the distance away then should be included
+		alg.setThreshold(1.1-1);
 		alg.associate();
-		assertEquals(0,alg.getMatches().size);
+		assertEquals(1,alg.getMatches().size);
 
 		// Threshold is greater than the assoc error
 		alg.setThreshold(0.2);
@@ -183,7 +183,7 @@ public abstract class StandardAssociateDescriptionChecks<Desc> {
 		listDst.add( c(3+0.05) );
 		listDst.add( c(20) );  // can't be paired with anything
 
-		// set threshold so that on pair won't be considered
+		// set threshold so that one pair won't be considered
 		alg.setThreshold(0.07);
 		alg.setSource(listSrc);
 		alg.setDestination(listDst);

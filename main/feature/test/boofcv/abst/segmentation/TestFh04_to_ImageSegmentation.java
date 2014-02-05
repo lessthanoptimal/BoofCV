@@ -18,7 +18,9 @@
 
 package boofcv.abst.segmentation;
 
+import boofcv.factory.segmentation.ConfigFh04;
 import boofcv.factory.segmentation.FactoryImageSegmentation;
+import boofcv.struct.ConnectRule;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageType;
@@ -37,6 +39,6 @@ public class TestFh04_to_ImageSegmentation<T extends ImageBase> extends GeneralI
 
 	@Override
 	public ImageSegmentation<T> createAlg( ImageType<T> imageType ) {
-		return FactoryImageSegmentation.fh04(null, imageType);
+		return FactoryImageSegmentation.fh04(new ConfigFh04(20,8, ConnectRule.FOUR), imageType);
 	}
 }

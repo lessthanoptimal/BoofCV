@@ -18,6 +18,7 @@
 
 package boofcv.abst.segmentation;
 
+import boofcv.factory.segmentation.ConfigSegmentMeanShift;
 import boofcv.factory.segmentation.FactoryImageSegmentation;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
@@ -37,6 +38,6 @@ public class TestMeanShift_to_ImageSegmentation<T extends ImageBase> extends Gen
 
 	@Override
 	public ImageSegmentation<T> createAlg( ImageType<T> imageType ) {
-		return FactoryImageSegmentation.meanShift(null, imageType);
+		return FactoryImageSegmentation.meanShift(new ConfigSegmentMeanShift(2,20,3,true), imageType);
 	}
 }

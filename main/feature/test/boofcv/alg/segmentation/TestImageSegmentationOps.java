@@ -18,6 +18,7 @@
 
 package boofcv.alg.segmentation;
 
+import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageSInt32;
 import boofcv.testing.BoofTesting;
 import org.ddogleg.struct.GrowQueue_I32;
@@ -75,22 +76,33 @@ public class TestImageSegmentationOps {
 		ImageSInt32 graph = new ImageSInt32(4,5);
 		ImageSInt32 output = new ImageSInt32(4,5);
 
-		graph.data = new int[]{
+		regionPixelId_to_Compact(graph, output);
+		regionPixelId_to_Compact(BoofTesting.createSubImageOf(graph), output);
+		regionPixelId_to_Compact(graph, BoofTesting.createSubImageOf(output));
+	}
+
+	private void regionPixelId_to_Compact(ImageSInt32 graph, ImageSInt32 output) {
+		ImageSInt32 input = new ImageSInt32(4,5);
+		input.data = new int[]{
 				2, 2, 2, 5,
 				5, 5, 5, 5,
 				2, 2, 2, 2,
 				15,15,15,15,
 				15,15,15,15};
 
+		// graph might be a sub-image
+		for( int y = 0; y < graph.height; y++ ) {
+			for( int x = 0; x < graph.width; x++ ) {
+				graph.set(x,y,adjust(input.get(x, y), graph));
+			}
+		}
 
 		GrowQueue_I32 rootNodes = new GrowQueue_I32();
-		rootNodes.add(2);
-		rootNodes.add(5);
-		rootNodes.add(15);
-
+		rootNodes.add(adjust(2,graph));
+		rootNodes.add(adjust(5,graph));
+		rootNodes.add(adjust(15,graph));
 
 		ImageSegmentationOps.regionPixelId_to_Compact(graph, rootNodes, output);
-
 
 		ImageSInt32 expected = new ImageSInt32(4,5);
 		expected.data = new int[]{
@@ -101,6 +113,13 @@ public class TestImageSegmentationOps {
 				2, 2, 2, 2};
 
 		BoofTesting.assertEquals(expected, output, 1e-4);
+	}
+
+	private int adjust( int index , ImageBase image ) {
+		int x = index%image.width;
+		int y = index/image.width;
+
+		return image.getIndex(x,y);
 	}
 
 }

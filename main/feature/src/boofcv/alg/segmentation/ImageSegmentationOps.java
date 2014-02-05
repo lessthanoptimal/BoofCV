@@ -66,7 +66,8 @@ public class ImageSegmentationOps {
 
 	/**
 	 * Compacts the region labels such that they are consecutive numbers starting from 0.
-	 * The ID of a root node must the index of a pixel in the region.
+	 * The ID of a root node must the index of a pixel in the 'graph' image, taking in account the change
+	 * in coordinates for sub-images.
 	 *
 	 * @param graph Input segmented image where the ID's are not compacted
 	 * @param segmentId List of segment ID's.  See comment above about what ID's are acceptable.
@@ -89,7 +90,12 @@ public class ImageSegmentationOps {
 		}
 		// need to do some clean up since the above approach doesn't work for the roots
 		for( int i = 0; i < segmentId.size; i++ ) {
-			output.data[segmentId.data[i]] = i;
+			int indexGraph = segmentId.data[i] - graph.startIndex;
+
+			int x = indexGraph%graph.stride;
+			int y = indexGraph/graph.stride;
+
+			output.data[output.startIndex + y*output.stride + x] = i;
 		}
 	}
 }

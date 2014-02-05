@@ -26,7 +26,7 @@ Version : Alpha 0.17
 - Added support for MultiSpectral images to:
   * GBlurImageOps and BlurImageOps
 - Image Segmentation / Superpixels
-  * Mean-shift (gray and color images)
+  * Mean-shift
   * Felzenszwalb-Huttenlocher 2004
   * SLIC Superpixels
 - Fixed bugs in ConvertNV21
@@ -34,13 +34,14 @@ Version : Alpha 0.17
 - Fixed bug in ImplConvertToBitmap.multiToArray_F32()
   * Didn't handle case where the input image has 3 bands and not 4
 - ImageBase now provides a method for getting ImageType information
+- Threshold in the interface Associate is now <= instead of <
 
-- TODO make those two failed unit tests ago away
+- TODO Make those two failed unit tests ago away
 - TODO BoofMiscOps move XML serialization into IO package
-- TODO add lab color space
-- long distance dense optical flow
-- watershed segmentation
-- Moved some of the android stuff out of demo code and into the android interface
+- TODO Add lab color space
+- TODO Long distance dense optical flow
+- TODO Watershed segmentation
+- TODO Moved some of the android stuff out of demo code and into the android interface
 
 ---------------------------------------------
 Date    : 2013/12/25

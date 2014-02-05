@@ -154,6 +154,11 @@ public class ImageType<T extends ImageBase> {
 		throw new RuntimeException("Support this image type thing");
 	}
 
+	@Override
+	public String toString() {
+		return "ImageType( "+family+" "+dataType+" "+numBands+" )";
+	}
+
 	public static enum Family
 	{
 		SINGLE_BAND,

@@ -18,6 +18,7 @@
 
 package boofcv.abst.segmentation;
 
+import boofcv.factory.segmentation.ConfigSlic;
 import boofcv.factory.segmentation.FactoryImageSegmentation;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
@@ -37,6 +38,6 @@ public class TestSlic_to_ImageSegmentation<T extends ImageBase> extends GeneralI
 
 	@Override
 	public ImageSegmentation<T> createAlg( ImageType<T> imageType ) {
-		return FactoryImageSegmentation.slic(null, imageType);
+		return FactoryImageSegmentation.slic(new ConfigSlic(12), imageType);
 	}
 }
