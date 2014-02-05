@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -63,7 +63,7 @@ public class AssociateNearestNeighbor<D extends TupleDesc_F64>
 	private FindUnassociated unassociated = new FindUnassociated();
 
 	// maximum distance away two points can be
-	private double maxDistance = -1;
+	private double maxDistanceSq = -1;
 
 	public AssociateNearestNeighbor(NearestNeighbor<Integer> alg , int featureDimension ) {
 		this.alg = alg;
@@ -104,7 +104,7 @@ public class AssociateNearestNeighbor<D extends TupleDesc_F64>
 
 		matches.reset();
 		for( int i = 0; i < listDst.size; i++ ) {
-			if( !alg.findNearest(listDst.data[i].value,maxDistance,result) )
+			if( !alg.findNearest(listDst.data[i].value, maxDistanceSq,result) )
 				continue;
 			// get the index of the source feature
 			int indexSrc = result.data;
@@ -130,7 +130,8 @@ public class AssociateNearestNeighbor<D extends TupleDesc_F64>
 
 	@Override
 	public void setThreshold(double score) {
-		this.maxDistance = score;
+		// NN uses Euclidean distance squared
+		this.maxDistanceSq = score < 0 ? score : score*score;
 	}
 
 	@Override

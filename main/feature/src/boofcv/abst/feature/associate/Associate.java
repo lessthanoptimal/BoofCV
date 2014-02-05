@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -78,7 +78,7 @@ public interface Associate {
 	public GrowQueue_I32 getUnassociatedDestination();
 
 	/**
-	 * Associations are only considered if their score is less than the specified threshold.  To remove
+	 * Associations are only considered if their score is less than or equal to the specified threshold.  To remove
 	 * any threshold test set this value to Double.MAX_VALUE
 	 *
 	 * @param score The threshold.
