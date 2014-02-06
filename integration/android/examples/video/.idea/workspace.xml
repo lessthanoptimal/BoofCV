@@ -2,23 +2,119 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" readonly="true" id="11166dbf-2a4c-41fc-a8cd-17d7ccf9611f" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/codeStyleSettings.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../../data" afterPath="$PROJECT_DIR$/../../../../data" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/AndroidManifest.xml" afterPath="$PROJECT_DIR$/AndroidManifest.xml" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/org/boofcv/example/android/ShowGradient.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/boofcv/android/gui/VideoDisplayActivity.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/boofcv/android/gui/VideoImageProcessing.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/boofcv/android/gui/VideoProcessing.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/boofcv/android/gui/VideoRenderProcessing.java" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/org/boofcv/example/android/CameraPreview.java" afterPath="$PROJECT_DIR$/../../src/boofcv/android/gui/CameraPreview.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../../main/geo/src/boofcv/alg/geo/h/AdjustHomographyMatrix.java" afterPath="$PROJECT_DIR$/../../../../main/geo/src/boofcv/alg/geo/h/AdjustHomographyMatrix.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../../main/geo/src/boofcv/alg/geo/bundle/CalibPoseAndPointRodriguesCodec.java" afterPath="$PROJECT_DIR$/../../../../main/geo/src/boofcv/alg/geo/bundle/CalibPoseAndPointRodriguesCodec.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../../../ejml/trunk/src/org/ejml/alg/dense/decomposition/chol/CholeskyDecompositionBlock_D64.java" afterPath="$PROJECT_DIR$/../../../../../ejml/trunk/src/org/ejml/alg/dense/decomposition/chol/CholeskyDecompositionBlock_D64.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../../main/geo/src/boofcv/alg/geo/DecomposeEssential.java" afterPath="$PROJECT_DIR$/../../../../main/geo/src/boofcv/alg/geo/DecomposeEssential.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../../main/geo/src/boofcv/alg/geo/DecomposeHomography.java" afterPath="$PROJECT_DIR$/../../../../main/geo/src/boofcv/alg/geo/DecomposeHomography.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../../../ddogleg/src/org/ddogleg/optimization/impl/DoglegStepF.java" afterPath="$PROJECT_DIR$/../../../../../ddogleg/src/org/ddogleg/optimization/impl/DoglegStepF.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../../../ddogleg/src/org/ddogleg/optimization/impl/DoglegStepFtF.java" afterPath="$PROJECT_DIR$/../../../../../ddogleg/src/org/ddogleg/optimization/impl/DoglegStepFtF.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../../main/geo/src/boofcv/alg/geo/trifocal/EnforceTrifocalGeometry.java" afterPath="$PROJECT_DIR$/../../../../main/geo/src/boofcv/alg/geo/trifocal/EnforceTrifocalGeometry.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../../main/geo/src/boofcv/alg/geo/f/EssentialNister5.java" afterPath="$PROJECT_DIR$/../../../../main/geo/src/boofcv/alg/geo/f/EssentialNister5.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../../../ddogleg/benchmark/src/org/ddogleg/optimization/EvaluateLevenbergMarquardtDampened.java" afterPath="$PROJECT_DIR$/../../../../../ddogleg/benchmark/src/org/ddogleg/optimization/EvaluateLevenbergMarquardtDampened.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../../../ddogleg/benchmark/src/org/ddogleg/optimization/ExamineCubicInterpolateStability.java" afterPath="$PROJECT_DIR$/../../../../../ddogleg/benchmark/src/org/ddogleg/optimization/ExamineCubicInterpolateStability.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../../../ddogleg/src/org/ddogleg/optimization/FactoryOptimization.java" afterPath="$PROJECT_DIR$/../../../../../ddogleg/src/org/ddogleg/optimization/FactoryOptimization.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../../main/ip/src/boofcv/factory/transform/wavelet/FactoryWaveletDaub.java" afterPath="$PROJECT_DIR$/../../../../main/ip/src/boofcv/factory/transform/wavelet/FactoryWaveletDaub.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../../../georegression/src/georegression/fitting/ellipse/FitEllipseAlgebraic.java" afterPath="$PROJECT_DIR$/../../../../../georegression/src/georegression/fitting/ellipse/FitEllipseAlgebraic.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../../../georegression/src/georegression/fitting/plane/FitPlane3D_F32.java" afterPath="$PROJECT_DIR$/../../../../../georegression/src/georegression/fitting/plane/FitPlane3D_F32.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../../../georegression/src/georegression/fitting/plane/FitPlane3D_F64.java" afterPath="$PROJECT_DIR$/../../../../../georegression/src/georegression/fitting/plane/FitPlane3D_F64.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../../../ddogleg/src/org/ddogleg/solver/FitQuadratic1D.java" afterPath="$PROJECT_DIR$/../../../../../ddogleg/src/org/ddogleg/solver/FitQuadratic1D.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../../../ddogleg/src/org/ddogleg/solver/FitQuadratic2D.java" afterPath="$PROJECT_DIR$/../../../../../ddogleg/src/org/ddogleg/solver/FitQuadratic2D.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../../../ddogleg/src/org/ddogleg/solver/FitQuadratic3by3.java" afterPath="$PROJECT_DIR$/../../../../../ddogleg/src/org/ddogleg/solver/FitQuadratic3by3.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../../main/geo/src/boofcv/alg/geo/f/FundamentalLinear.java" afterPath="$PROJECT_DIR$/../../../../main/geo/src/boofcv/alg/geo/f/FundamentalLinear.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../../main/sfm/src/boofcv/alg/sfm/robust/GenerateScaleTranslateRotate2D.java" afterPath="$PROJECT_DIR$/../../../../main/sfm/src/boofcv/alg/sfm/robust/GenerateScaleTranslateRotate2D.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../../main/geo/src/boofcv/alg/geo/h/HomographyInducedStereo3Pts.java" afterPath="$PROJECT_DIR$/../../../../main/geo/src/boofcv/alg/geo/h/HomographyInducedStereo3Pts.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../../main/geo/src/boofcv/alg/geo/h/HomographyLinear4.java" afterPath="$PROJECT_DIR$/../../../../main/geo/src/boofcv/alg/geo/h/HomographyLinear4.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../../main/geo/src/boofcv/alg/geo/h/HomographyResidualSampson.java" afterPath="$PROJECT_DIR$/../../../../main/geo/src/boofcv/alg/geo/h/HomographyResidualSampson.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../../../ddogleg/src/org/ddogleg/optimization/impl/LevenbergDampened.java" afterPath="$PROJECT_DIR$/../../../../../ddogleg/src/org/ddogleg/optimization/impl/LevenbergDampened.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../../../ddogleg/src/org/ddogleg/optimization/impl/LevenbergMarquardtDampened.java" afterPath="$PROJECT_DIR$/../../../../../ddogleg/src/org/ddogleg/optimization/impl/LevenbergMarquardtDampened.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../../../georegression/src/georegression/fitting/affine/MotionAffinePoint2D_F32.java" afterPath="$PROJECT_DIR$/../../../../../georegression/src/georegression/fitting/affine/MotionAffinePoint2D_F32.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../../../georegression/src/georegression/fitting/affine/MotionAffinePoint2D_F64.java" afterPath="$PROJECT_DIR$/../../../../../georegression/src/georegression/fitting/affine/MotionAffinePoint2D_F64.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../../../georegression/src/georegression/fitting/se/MotionSe3PointSVD_F32.java" afterPath="$PROJECT_DIR$/../../../../../georegression/src/georegression/fitting/se/MotionSe3PointSVD_F32.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../../../georegression/src/georegression/fitting/se/MotionSe3PointSVD_F64.java" afterPath="$PROJECT_DIR$/../../../../../georegression/src/georegression/fitting/se/MotionSe3PointSVD_F64.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../../main/geo/src/boofcv/alg/geo/MultiViewOps.java" afterPath="$PROJECT_DIR$/../../../../main/geo/src/boofcv/alg/geo/MultiViewOps.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../../../ddogleg/src/org/ddogleg/rand/MultivariateGaussianDraw.java" afterPath="$PROJECT_DIR$/../../../../../ddogleg/src/org/ddogleg/rand/MultivariateGaussianDraw.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../../main/geo/src/boofcv/alg/geo/pose/PnPLepetitEPnP.java" afterPath="$PROJECT_DIR$/../../../../main/geo/src/boofcv/alg/geo/pose/PnPLepetitEPnP.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../../main/geo/src/boofcv/alg/geo/pose/PnPRodriguesCodec.java" afterPath="$PROJECT_DIR$/../../../../main/geo/src/boofcv/alg/geo/pose/PnPRodriguesCodec.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../../main/geo/src/boofcv/alg/geo/pose/PoseFromPairLinear6.java" afterPath="$PROJECT_DIR$/../../../../main/geo/src/boofcv/alg/geo/pose/PoseFromPairLinear6.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../../main/geo/src/boofcv/alg/geo/pose/PositionFromPairLinear2.java" afterPath="$PROJECT_DIR$/../../../../main/geo/src/boofcv/alg/geo/pose/PositionFromPairLinear2.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../../main/calibration/src/boofcv/alg/geo/calibration/RadialDistortionEstimateLinear.java" afterPath="$PROJECT_DIR$/../../../../main/calibration/src/boofcv/alg/geo/calibration/RadialDistortionEstimateLinear.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../../main/geo/src/boofcv/alg/geo/pose/Relinearlize.java" afterPath="$PROJECT_DIR$/../../../../main/geo/src/boofcv/alg/geo/pose/Relinearlize.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../../../ddogleg/src/org/ddogleg/solver/impl/RootFinderCompanion.java" afterPath="$PROJECT_DIR$/../../../../../ddogleg/src/org/ddogleg/solver/impl/RootFinderCompanion.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../../../georegression/src/georegression/geometry/RotationMatrixGenerator.java" afterPath="$PROJECT_DIR$/../../../../../georegression/src/georegression/geometry/RotationMatrixGenerator.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../../../ddogleg/test/org/ddogleg/optimization/impl/TestLevenbergMarquardtDampened.java" afterPath="$PROJECT_DIR$/../../../../../ddogleg/test/org/ddogleg/optimization/impl/TestLevenbergMarquardtDampened.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../../main/geo/src/boofcv/alg/geo/triangulate/TriangulateLinearDLT.java" afterPath="$PROJECT_DIR$/../../../../main/geo/src/boofcv/alg/geo/triangulate/TriangulateLinearDLT.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../../main/geo/src/boofcv/alg/geo/trifocal/TrifocalExtractEpipoles.java" afterPath="$PROJECT_DIR$/../../../../main/geo/src/boofcv/alg/geo/trifocal/TrifocalExtractEpipoles.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../../main/geo/src/boofcv/alg/geo/trifocal/TrifocalLinearPoint7.java" afterPath="$PROJECT_DIR$/../../../../main/geo/src/boofcv/alg/geo/trifocal/TrifocalLinearPoint7.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/boofcv/example/android/VideoActivity.java" afterPath="$PROJECT_DIR$/src/org/boofcv/example/android/VideoActivity.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../../main/calibration/src/boofcv/alg/geo/calibration/Zhang99CalibrationMatrixFromHomographies.java" afterPath="$PROJECT_DIR$/../../../../main/calibration/src/boofcv/alg/geo/calibration/Zhang99CalibrationMatrixFromHomographies.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../../change.txt" afterPath="$PROJECT_DIR$/../../../../change.txt" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/codeStyleSettings.xml" afterPath="$PROJECT_DIR$/.idea/codeStyleSettings.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/misc.xml" afterPath="$PROJECT_DIR$/.idea/misc.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../../../georegression/pom.xml" afterPath="$PROJECT_DIR$/../../../../../georegression/pom.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="Android Video Example.iws" />
     <ignored path=".idea/workspace.xml" />
-    <file path="/Dummy.txt" changelist="11166dbf-2a4c-41fc-a8cd-17d7ccf9611f" time="1390003098223" ignored="false" />
-    <file path="/VideoActivity.java" changelist="11166dbf-2a4c-41fc-a8cd-17d7ccf9611f" time="1389976338711" ignored="false" />
+    <file path="/Dummy.txt" changelist="11166dbf-2a4c-41fc-a8cd-17d7ccf9611f" time="1391667429197" ignored="false" />
+    <file path="/VideoActivity.java" changelist="11166dbf-2a4c-41fc-a8cd-17d7ccf9611f" time="1391665567700" ignored="false" />
     <file path="/CameraPreview.java" changelist="11166dbf-2a4c-41fc-a8cd-17d7ccf9611f" time="1389977501070" ignored="false" />
     <file path="$PROJECT_DIR$/../../../../../BoofAndroidDemo/src/org/boofcv/android/CameraPreview.java" changelist="11166dbf-2a4c-41fc-a8cd-17d7ccf9611f" time="1389976637300" ignored="false" />
     <file path="/fragment.java" changelist="11166dbf-2a4c-41fc-a8cd-17d7ccf9611f" time="1390003673601" ignored="false" />
-    <file path="/a.java" changelist="11166dbf-2a4c-41fc-a8cd-17d7ccf9611f" time="1390003123519" ignored="false" />
+    <file path="/a.java" changelist="11166dbf-2a4c-41fc-a8cd-17d7ccf9611f" time="1391661755039" ignored="false" />
     <file path="/a.xml" changelist="11166dbf-2a4c-41fc-a8cd-17d7ccf9611f" time="1390003563972" ignored="false" />
     <file path="$USER_HOME$/Downloads/boofcv_example/AndroidManifest.xml" changelist="11166dbf-2a4c-41fc-a8cd-17d7ccf9611f" time="1390003146602" ignored="false" />
     <file path="$USER_HOME$/Downloads/boofcv_example/src/org/boofcv/example/android/VideoActivity.java" changelist="11166dbf-2a4c-41fc-a8cd-17d7ccf9611f" time="1390003512239" ignored="false" />
     <file path="$USER_HOME$/Downloads/boofcv_example/src/org/boofcv/example/android/CameraPreview.java" changelist="11166dbf-2a4c-41fc-a8cd-17d7ccf9611f" time="1390003597859" ignored="false" />
+    <file path="/ShowGradient.java" changelist="11166dbf-2a4c-41fc-a8cd-17d7ccf9611f" time="1391660488052" ignored="false" />
+    <file path="/BoofRenderProcessing.java" changelist="11166dbf-2a4c-41fc-a8cd-17d7ccf9611f" time="1391660951637" ignored="false" />
+    <file path="/VideoDisplayActivity.java" changelist="11166dbf-2a4c-41fc-a8cd-17d7ccf9611f" time="1391665948715" ignored="false" />
+    <file path="$PROJECT_DIR$/../../../../../BoofAndroidDemo/src/org/boofcv/android/DemoVideoDisplayActivity.java" changelist="11166dbf-2a4c-41fc-a8cd-17d7ccf9611f" time="1391664185057" ignored="false" />
+    <file path="/DemoVideoDisplayActivity.java" changelist="11166dbf-2a4c-41fc-a8cd-17d7ccf9611f" time="1391664184442" ignored="false" />
+    <file path="$PROJECT_DIR$/../../../../../BoofAndroidDemo/src/org/boofcv/android/AssociationActivity.java" changelist="11166dbf-2a4c-41fc-a8cd-17d7ccf9611f" time="1391663722129" ignored="false" />
+    <file path="/AssociationActivity.java" changelist="11166dbf-2a4c-41fc-a8cd-17d7ccf9611f" time="1391661646561" ignored="false" />
+    <file path="/MultivariateGaussianDraw.java" changelist="11166dbf-2a4c-41fc-a8cd-17d7ccf9611f" time="1391662047674" ignored="false" />
+    <file path="$PROJECT_DIR$/../../../../../BoofAndroidDemo/src/org/boofcv/android/BinaryDisplayActivity.java" changelist="11166dbf-2a4c-41fc-a8cd-17d7ccf9611f" time="1391663722129" ignored="false" />
+    <file path="/BinaryDisplayActivity.java" changelist="11166dbf-2a4c-41fc-a8cd-17d7ccf9611f" time="1391662761205" ignored="false" />
+    <file path="$PROJECT_DIR$/../../../../../BoofAndroidDemo/src/org/boofcv/android/BlurDisplayActivity.java" changelist="11166dbf-2a4c-41fc-a8cd-17d7ccf9611f" time="1391663722129" ignored="false" />
+    <file path="/BlurDisplayActivity.java" changelist="11166dbf-2a4c-41fc-a8cd-17d7ccf9611f" time="1391662817990" ignored="false" />
+    <file path="$PROJECT_DIR$/../../../../../BoofAndroidDemo/src/org/boofcv/android/CalibrationActivity.java" changelist="11166dbf-2a4c-41fc-a8cd-17d7ccf9611f" time="1391663722128" ignored="false" />
+    <file path="/CalibrationActivity.java" changelist="11166dbf-2a4c-41fc-a8cd-17d7ccf9611f" time="1391662856467" ignored="false" />
+    <file path="$PROJECT_DIR$/../../../../../BoofAndroidDemo/src/org/boofcv/android/CannyEdgeActivity.java" changelist="11166dbf-2a4c-41fc-a8cd-17d7ccf9611f" time="1391663720027" ignored="false" />
+    <file path="/CannyEdgeActivity.java" changelist="11166dbf-2a4c-41fc-a8cd-17d7ccf9611f" time="1391662878647" ignored="false" />
+    <file path="$PROJECT_DIR$/../../../../../BoofAndroidDemo/src/org/boofcv/android/DisparityActivity.java" changelist="11166dbf-2a4c-41fc-a8cd-17d7ccf9611f" time="1391663722129" ignored="false" />
+    <file path="/DisparityActivity.java" changelist="11166dbf-2a4c-41fc-a8cd-17d7ccf9611f" time="1391662953770" ignored="false" />
+    <file path="$PROJECT_DIR$/../../../../../BoofAndroidDemo/src/org/boofcv/android/EnhanceDisplayActivity.java" changelist="11166dbf-2a4c-41fc-a8cd-17d7ccf9611f" time="1391663722129" ignored="false" />
+    <file path="/EnhanceDisplayActivity.java" changelist="11166dbf-2a4c-41fc-a8cd-17d7ccf9611f" time="1391662977687" ignored="false" />
+    <file path="$PROJECT_DIR$/../../../../../BoofAndroidDemo/src/org/boofcv/android/GradientDisplayActivity.java" changelist="11166dbf-2a4c-41fc-a8cd-17d7ccf9611f" time="1391663722129" ignored="false" />
+    <file path="/GradientDisplayActivity.java" changelist="11166dbf-2a4c-41fc-a8cd-17d7ccf9611f" time="1391662986493" ignored="false" />
+    <file path="$PROJECT_DIR$/../../../../../BoofAndroidDemo/src/org/boofcv/android/ImageTransformActivity.java" changelist="11166dbf-2a4c-41fc-a8cd-17d7ccf9611f" time="1391663722129" ignored="false" />
+    <file path="/ImageTransformActivity.java" changelist="11166dbf-2a4c-41fc-a8cd-17d7ccf9611f" time="1391663014144" ignored="false" />
+    <file path="$PROJECT_DIR$/../../../../../BoofAndroidDemo/src/org/boofcv/android/LineDisplayActivity.java" changelist="11166dbf-2a4c-41fc-a8cd-17d7ccf9611f" time="1391663722129" ignored="false" />
+    <file path="/LineDisplayActivity.java" changelist="11166dbf-2a4c-41fc-a8cd-17d7ccf9611f" time="1391663044794" ignored="false" />
+    <file path="$PROJECT_DIR$/../../../../../BoofAndroidDemo/src/org/boofcv/android/MosaicDisplayActivity.java" changelist="11166dbf-2a4c-41fc-a8cd-17d7ccf9611f" time="1391663722129" ignored="false" />
+    <file path="/MosaicDisplayActivity.java" changelist="11166dbf-2a4c-41fc-a8cd-17d7ccf9611f" time="1391663054422" ignored="false" />
+    <file path="$PROJECT_DIR$/../../../../../BoofAndroidDemo/src/org/boofcv/android/ObjectTrackerActivity.java" changelist="11166dbf-2a4c-41fc-a8cd-17d7ccf9611f" time="1391663720027" ignored="false" />
+    <file path="/ObjectTrackerActivity.java" changelist="11166dbf-2a4c-41fc-a8cd-17d7ccf9611f" time="1391663069127" ignored="false" />
+    <file path="$PROJECT_DIR$/../../../../../BoofAndroidDemo/src/org/boofcv/android/PointDisplayActivity.java" changelist="11166dbf-2a4c-41fc-a8cd-17d7ccf9611f" time="1391663722129" ignored="false" />
+    <file path="/PointDisplayActivity.java" changelist="11166dbf-2a4c-41fc-a8cd-17d7ccf9611f" time="1391663077171" ignored="false" />
+    <file path="$PROJECT_DIR$/../../../../../BoofAndroidDemo/src/org/boofcv/android/ScalePointDisplayActivity.java" changelist="11166dbf-2a4c-41fc-a8cd-17d7ccf9611f" time="1391663722129" ignored="false" />
+    <file path="/ScalePointDisplayActivity.java" changelist="11166dbf-2a4c-41fc-a8cd-17d7ccf9611f" time="1391663088852" ignored="false" />
+    <file path="$PROJECT_DIR$/../../../../../BoofAndroidDemo/src/org/boofcv/android/ShapeFittingActivity.java" changelist="11166dbf-2a4c-41fc-a8cd-17d7ccf9611f" time="1391663722129" ignored="false" />
+    <file path="/ShapeFittingActivity.java" changelist="11166dbf-2a4c-41fc-a8cd-17d7ccf9611f" time="1391663096073" ignored="false" />
+    <file path="$PROJECT_DIR$/../../../../../BoofAndroidDemo/src/org/boofcv/android/StabilizeDisplayActivity.java" changelist="11166dbf-2a4c-41fc-a8cd-17d7ccf9611f" time="1391663720028" ignored="false" />
+    <file path="/StabilizeDisplayActivity.java" changelist="11166dbf-2a4c-41fc-a8cd-17d7ccf9611f" time="1391663181144" ignored="false" />
+    <file path="$PROJECT_DIR$/../../../../../BoofAndroidDemo/src/org/boofcv/android/UndistortDisplayActivity.java" changelist="11166dbf-2a4c-41fc-a8cd-17d7ccf9611f" time="1391663722129" ignored="false" />
+    <file path="/UndistortDisplayActivity.java" changelist="11166dbf-2a4c-41fc-a8cd-17d7ccf9611f" time="1391663190474" ignored="false" />
+    <file path="$PROJECT_DIR$/../../../../../BoofAndroidDemo/src/org/boofcv/android/PointTrackerDisplayActivity.java" changelist="11166dbf-2a4c-41fc-a8cd-17d7ccf9611f" time="1391663720029" ignored="false" />
+    <file path="/VideoRenderProcessing.java" changelist="11166dbf-2a4c-41fc-a8cd-17d7ccf9611f" time="1391664420251" ignored="false" />
+    <file path="$PROJECT_DIR$/../../../../../BoofAndroidDemo/change.txt" changelist="11166dbf-2a4c-41fc-a8cd-17d7ccf9611f" time="1391666066049" ignored="false" />
     <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -33,7 +129,6 @@
     <disable_hints />
   </component>
   <component name="DebuggerManager">
-    <ui_properties default_suspend_policy="SuspendAll" default_condition_enabled="true" />
     <breakpoint_any default_suspend_policy="SuspendAll" default_condition_enabled="true">
       <breakpoint>
         <option name="NOTIFY_CAUGHT" value="true" />
@@ -70,6 +165,7 @@
         <option name="LOG_MESSAGE" value="" />
       </breakpoint>
     </breakpoint_any>
+    <ui_properties default_suspend_policy="SuspendAll" default_condition_enabled="true" />
     <breakpoint_rules />
     <ui_properties />
   </component>
@@ -79,46 +175,211 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="CameraPreview.java" pinned="false" current="true" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/org/boofcv/example/android/CameraPreview.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="95" column="65" selection-start="0" selection-end="4447" vertical-scroll-proportion="0.15564202">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="MainActivity.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/org/boofcv/example/android/MainActivity.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="38" column="13" selection-start="1193" selection-end="1193" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file leaf-file-name="VideoActivity.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/org/boofcv/example/android/VideoActivity.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="192" column="50" selection-start="6188" selection-end="6188" vertical-scroll-proportion="0.0">
+            <state line="52" column="47" selection-start="1968" selection-end="1968" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="AndroidManifest.xml" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/AndroidManifest.xml">
+      <file leaf-file-name="MainActivity.java" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/org/boofcv/example/android/MainActivity.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="9" column="0" selection-start="343" selection-end="516" vertical-scroll-proportion="0.0">
+            <state line="30" column="13" selection-start="930" selection-end="930" vertical-scroll-proportion="0.1821192">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="strings.xml" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/res/values/strings.xml">
+      <file leaf-file-name="VideoDisplayActivity.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../../src/boofcv/android/gui/VideoDisplayActivity.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="2" column="18" selection-start="66" selection-end="66" vertical-scroll-proportion="0.0">
+            <state line="34" column="119" selection-start="1500" selection-end="1500" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="CameraPreview.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../../src/boofcv/android/gui/CameraPreview.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="17" column="13" selection-start="401" selection-end="401" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="HomographyResidualSampson.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../../../../main/geo/src/boofcv/alg/geo/h/HomographyResidualSampson.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="56" column="13" selection-start="1973" selection-end="1973" vertical-scroll-proportion="0.0">
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="EssentialNister5.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../../../../main/geo/src/boofcv/alg/geo/f/EssentialNister5.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="68" column="16" selection-start="2454" selection-end="2454" vertical-scroll-proportion="0.0">
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="FundamentalLinear.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../../../../main/geo/src/boofcv/alg/geo/f/FundamentalLinear.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="49" column="31" selection-start="1637" selection-end="1637" vertical-scroll-proportion="0.0">
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="PnPLepetitEPnP.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../../../../main/geo/src/boofcv/alg/geo/pose/PnPLepetitEPnP.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="105" column="16" selection-start="5111" selection-end="5111" vertical-scroll-proportion="0.0">
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Relinearlize.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../../../../main/geo/src/boofcv/alg/geo/pose/Relinearlize.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="66" column="11" selection-start="2313" selection-end="2313" vertical-scroll-proportion="0.0">
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="PositionFromPairLinear2.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../../../../main/geo/src/boofcv/alg/geo/pose/PositionFromPairLinear2.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="57" column="9" selection-start="1984" selection-end="1984" vertical-scroll-proportion="0.0">
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="DecomposeHomography.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../../../../main/geo/src/boofcv/alg/geo/DecomposeHomography.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="58" column="20" selection-start="2156" selection-end="2156" vertical-scroll-proportion="0.0">
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="MultiViewOps.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../../../../main/geo/src/boofcv/alg/geo/MultiViewOps.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="831" column="15" selection-start="26392" selection-end="26392" vertical-scroll-proportion="0.0">
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="CalibPoseAndPointRodriguesCodec.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../../../../main/geo/src/boofcv/alg/geo/bundle/CalibPoseAndPointRodriguesCodec.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="55" column="16" selection-start="1869" selection-end="1869" vertical-scroll-proportion="0.0">
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="PnPRodriguesCodec.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../../../../main/geo/src/boofcv/alg/geo/pose/PnPRodriguesCodec.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="39" column="16" selection-start="1420" selection-end="1420" vertical-scroll-proportion="0.0">
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="HomographyInducedStereo3Pts.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../../../../main/geo/src/boofcv/alg/geo/h/HomographyInducedStereo3Pts.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="68" column="18" selection-start="2493" selection-end="2493" vertical-scroll-proportion="0.0">
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="DecomposeEssential.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../../../../main/geo/src/boofcv/alg/geo/DecomposeEssential.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="49" column="30" selection-start="1815" selection-end="1815" vertical-scroll-proportion="0.0">
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="RadialDistortionEstimateLinear.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../../../../main/calibration/src/boofcv/alg/geo/calibration/RadialDistortionEstimateLinear.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="68" column="14" selection-start="2824" selection-end="2824" vertical-scroll-proportion="0.0">
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Zhang99CalibrationMatrixFromHomographies.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../../../../main/calibration/src/boofcv/alg/geo/calibration/Zhang99CalibrationMatrixFromHomographies.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="62" column="19" selection-start="2404" selection-end="2404" vertical-scroll-proportion="0.0">
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="ShowGradient.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/org/boofcv/example/android/ShowGradient.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="13" column="112" selection-start="618" selection-end="618" vertical-scroll-proportion="0.0">
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="VideoImageProcessing.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../../src/boofcv/android/gui/VideoImageProcessing.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="14" column="22" selection-start="424" selection-end="424" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
@@ -142,15 +403,28 @@
   <component name="IdeDocumentHistory">
     <option name="changedFiles">
       <list>
-        <option value="$PROJECT_DIR$/src/org/boofcv/example/android/CameraPreview.java" />
+        <option value="$PROJECT_DIR$/../../../../main/geo/src/boofcv/alg/geo/f/EssentialNister5.java" />
+        <option value="$PROJECT_DIR$/../../../../main/geo/src/boofcv/alg/geo/f/FundamentalLinear.java" />
+        <option value="$PROJECT_DIR$/../../../../main/geo/src/boofcv/alg/geo/pose/PnPLepetitEPnP.java" />
+        <option value="$PROJECT_DIR$/../../../../main/geo/src/boofcv/alg/geo/pose/Relinearlize.java" />
+        <option value="$PROJECT_DIR$/../../../../main/geo/src/boofcv/alg/geo/pose/PositionFromPairLinear2.java" />
+        <option value="$PROJECT_DIR$/../../../../main/geo/src/boofcv/alg/geo/MultiViewOps.java" />
+        <option value="$PROJECT_DIR$/../../../../main/geo/src/boofcv/alg/geo/DecomposeHomography.java" />
+        <option value="$PROJECT_DIR$/../../../../main/geo/src/boofcv/alg/geo/bundle/CalibPoseAndPointRodriguesCodec.java" />
+        <option value="$PROJECT_DIR$/../../../../main/geo/src/boofcv/alg/geo/pose/PnPRodriguesCodec.java" />
+        <option value="$PROJECT_DIR$/../../../../main/geo/src/boofcv/alg/geo/h/HomographyInducedStereo3Pts.java" />
+        <option value="$PROJECT_DIR$/../../../../main/geo/src/boofcv/alg/geo/DecomposeEssential.java" />
+        <option value="$PROJECT_DIR$/../../../../main/calibration/src/boofcv/alg/geo/calibration/RadialDistortionEstimateLinear.java" />
+        <option value="$PROJECT_DIR$/../../../../main/calibration/src/boofcv/alg/geo/calibration/Zhang99CalibrationMatrixFromHomographies.java" />
+        <option value="$PROJECT_DIR$/src/org/boofcv/example/android/ShowGradient.java" />
         <option value="$PROJECT_DIR$/src/org/boofcv/example/android/VideoActivity.java" />
-        <option value="$PROJECT_DIR$/AndroidManifest.xml" />
+        <option value="$PROJECT_DIR$/../../src/boofcv/android/gui/VideoDisplayActivity.java" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds">
     <option name="width" value="1920" />
-    <option name="height" value="1175" />
+    <option name="height" value="1055" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true">
     <OptionsSetting value="true" id="Add" />
@@ -180,17 +454,18 @@
       <sortByType />
     </navigator>
     <panes>
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
             <PATH_ELEMENT>
-              <option name="myItemId" value="Android Video Example" />
+              <option name="myItemId" value="video" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
             </PATH_ELEMENT>
           </PATH>
           <PATH>
             <PATH_ELEMENT>
-              <option name="myItemId" value="Android Video Example" />
+              <option name="myItemId" value="video" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
@@ -200,7 +475,47 @@
           </PATH>
           <PATH>
             <PATH_ELEMENT>
-              <option name="myItemId" value="Android Video Example" />
+              <option name="myItemId" value="video" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="android" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="android" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="video" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="android" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="android" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="gui" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="video" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
@@ -218,7 +533,7 @@
           </PATH>
           <PATH>
             <PATH_ELEMENT>
-              <option name="myItemId" value="Android Video Example" />
+              <option name="myItemId" value="video" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
@@ -245,18 +560,18 @@
         </subPane>
       </pane>
       <pane id="PackagesPane" />
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
     <property name="GoToFile.includeJavaFiles" value="false" />
     <property name="project.structure.last.edited" value="Modules" />
+    <property name="OverrideImplement.combined" value="true" />
     <property name="project.structure.proportion" value="0.15" />
     <property name="options.splitter.main.proportions" value="0.3" />
     <property name="MemberChooser.sorted" value="false" />
     <property name="recentsLimit" value="5" />
-    <property name="options.lastSelected" value="template.copyright.formatting" />
-    <property name="last_opened_file_path" value="$USER_HOME$/Downloads/boofcv_example/video.ipr" />
+    <property name="options.lastSelected" value="preferences.sourceCode.Java" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="project.structure.side.proportion" value="0.2" />
     <property name="MemberChooser.copyJavadoc" value="false" />
     <property name="GoToClass.toSaveIncludeLibraries" value="false" />
@@ -264,8 +579,8 @@
     <property name="restartRequiresConfirmation" value="true" />
     <property name="MemberChooser.showClasses" value="true" />
     <property name="GoToClass.includeLibraries" value="false" />
-    <property name="options.splitter.details.proportions" value="0.2" />
     <property name="options.searchVisible" value="true" />
+    <property name="options.splitter.details.proportions" value="0.2" />
   </component>
   <component name="PyConsoleOptionsProvider">
     <option name="myPythonConsoleState">
@@ -276,10 +591,22 @@
     </option>
   </component>
   <component name="RunManager" selected="Android Application.video">
-    <configuration default="true" type="#org.jetbrains.idea.devkit.run.PluginConfigurationType" factoryName="Plugin">
+    <configuration default="true" type="AndroidTestRunConfigurationType" factoryName="Android Tests">
       <module name="" />
-      <option name="VM_PARAMETERS" value="-Xmx512m -Xms256m -XX:MaxPermSize=250m" />
-      <option name="PROGRAM_PARAMETERS" />
+      <option name="TESTING_TYPE" value="0" />
+      <option name="INSTRUMENTATION_RUNNER_CLASS" value="" />
+      <option name="METHOD_NAME" value="" />
+      <option name="CLASS_NAME" value="" />
+      <option name="PACKAGE_NAME" value="" />
+      <option name="TARGET_SELECTION_MODE" value="EMULATOR" />
+      <option name="PREFERRED_AVD" value="" />
+      <option name="USE_COMMAND_LINE" value="true" />
+      <option name="COMMAND_LINE" value="" />
+      <option name="WIPE_USER_DATA" value="false" />
+      <option name="DISABLE_BOOT_ANIMATION" value="false" />
+      <option name="NETWORK_SPEED" value="full" />
+      <option name="NETWORK_LATENCY" value="none" />
+      <option name="CLEAR_LOGCAT" value="false" />
       <method />
     </configuration>
     <configuration default="true" type="Remote" factoryName="Remote">
@@ -301,34 +628,6 @@
       <option name="VM_PARAMETERS" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
       <option name="ALTERNATIVE_JRE_PATH" />
-      <method />
-    </configuration>
-    <configuration default="true" type="TestNG" factoryName="TestNG">
-      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
-      <module name="" />
-      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
-      <option name="ALTERNATIVE_JRE_PATH" />
-      <option name="SUITE_NAME" />
-      <option name="PACKAGE_NAME" />
-      <option name="MAIN_CLASS_NAME" />
-      <option name="METHOD_NAME" />
-      <option name="GROUP_NAME" />
-      <option name="TEST_OBJECT" value="CLASS" />
-      <option name="VM_PARAMETERS" value="-ea" />
-      <option name="PARAMETERS" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="OUTPUT_DIRECTORY" />
-      <option name="ANNOTATION_TYPE" />
-      <option name="ENV_VARIABLES" />
-      <option name="PASS_PARENT_ENVS" value="true" />
-      <option name="TEST_SEARCH_SCOPE">
-        <value defaultName="moduleWithDependencies" />
-      </option>
-      <option name="USE_DEFAULT_REPORTERS" value="false" />
-      <option name="PROPERTIES_FILE" />
-      <envs />
-      <properties />
-      <listeners />
       <method />
     </configuration>
     <configuration default="true" type="Application" factoryName="Application">
@@ -456,8 +755,8 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="0" y="0" width="1920" height="1175" extended-state="6" />
-    <editor active="true" />
+    <frame x="0" y="0" width="1920" height="1055" extended-state="0" />
+    <editor active="false" />
     <layout>
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
@@ -466,17 +765,17 @@
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Android" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32944608" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3296582" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Android" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32855567" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.2497332" sideWeight="0.6705539" order="0" side_tool="false" content_ui="combo" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32944608" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.24946466" sideWeight="0.6714443" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32855567" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32944608" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32944608" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
     </layout>
@@ -546,79 +845,136 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/org/boofcv/example/android/CameraPreview.java">
+    <entry file="file://$PROJECT_DIR$/../../../../main/geo/src/boofcv/alg/geo/DecomposeEssential.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="145" column="81" selection-start="4444" selection-end="4444" vertical-scroll-proportion="0.0">
+        <state line="49" column="30" selection-start="1815" selection-end="1815" vertical-scroll-proportion="0.0">
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../../../../main/geo/src/boofcv/alg/geo/trifocal/TrifocalLinearPoint7.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="67" column="31" selection-start="2428" selection-end="2428" vertical-scroll-proportion="0.0">
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../../../../main/calibration/src/boofcv/alg/geo/calibration/RadialDistortionEstimateLinear.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="68" column="14" selection-start="2824" selection-end="2824" vertical-scroll-proportion="0.0">
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../../../../main/geo/src/boofcv/alg/geo/trifocal/EnforceTrifocalGeometry.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="46" column="31" selection-start="1477" selection-end="1477" vertical-scroll-proportion="0.0">
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../../../../main/calibration/src/boofcv/alg/geo/calibration/Zhang99CalibrationMatrixFromHomographies.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="62" column="19" selection-start="2404" selection-end="2404" vertical-scroll-proportion="0.0">
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../../../../main/geo/src/boofcv/alg/geo/trifocal/TrifocalExtractEpipoles.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="56" column="20" selection-start="1791" selection-end="1791" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/org/boofcv/example/android/MainActivity.java">
+    <entry file="file://$PROJECT_DIR$/../../../../main/geo/src/boofcv/alg/geo/triangulate/TriangulateLinearDLT.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="38" column="13" selection-start="1193" selection-end="1193" vertical-scroll-proportion="0.0">
-          <folding />
+        <state line="45" column="24" selection-start="1486" selection-end="1486" vertical-scroll-proportion="0.0">
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../../../../main/geo/src/boofcv/alg/geo/h/HomographyLinear4.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="57" column="30" selection-start="1984" selection-end="1984" vertical-scroll-proportion="0.0">
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/org/boofcv/example/android/ShowGradient.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="13" column="112" selection-start="618" selection-end="618" vertical-scroll-proportion="0.0">
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/org/boofcv/example/android/VideoActivity.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="175" column="16" selection-start="5848" selection-end="5854" vertical-scroll-proportion="0.0">
+        <state line="52" column="47" selection-start="1968" selection-end="1968" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/AndroidManifest.xml">
+    <entry file="file://$PROJECT_DIR$/../../src/boofcv/android/gui/VideoDisplayActivity.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="20" column="0" selection-start="889" selection-end="889" vertical-scroll-proportion="0.0">
+        <state line="34" column="119" selection-start="1500" selection-end="1500" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/res/values/strings.xml">
+    <entry file="file://$PROJECT_DIR$/../../../../main/geo/src/boofcv/alg/geo/h/AdjustHomographyMatrix.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="2" column="18" selection-start="66" selection-end="66" vertical-scroll-proportion="0.0">
+        <state line="40" column="25" selection-start="1448" selection-end="1448" vertical-scroll-proportion="0.0">
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../../src/boofcv/android/gui/CameraPreview.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="17" column="13" selection-start="401" selection-end="401" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file:///opt/android-sdk-linux/sources/android-17/android/app/Activity.java">
+    <entry file="file://$PROJECT_DIR$/../../../../main/geo/src/boofcv/alg/geo/MultiViewOps.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="3532" column="16" selection-start="150734" selection-end="150734" vertical-scroll-proportion="0.33268481">
-          <folding />
+        <state line="831" column="15" selection-start="26392" selection-end="26392" vertical-scroll-proportion="0.0">
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/res/values/strings.xml">
+    <entry file="file://$PROJECT_DIR$/../../../../main/geo/src/boofcv/alg/geo/pose/PoseFromPairLinear6.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="2" column="18" selection-start="66" selection-end="66" vertical-scroll-proportion="0.0">
-          <folding />
+        <state line="71" column="15" selection-start="2766" selection-end="2766" vertical-scroll-proportion="0.0">
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/org/boofcv/example/android/MainActivity.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="38" column="13" selection-start="1193" selection-end="1193" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/AndroidManifest.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="9" column="0" selection-start="343" selection-end="516" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/org/boofcv/example/android/VideoActivity.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="192" column="50" selection-start="6188" selection-end="6188" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/org/boofcv/example/android/CameraPreview.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="95" column="65" selection-start="0" selection-end="4447" vertical-scroll-proportion="0.15564202">
+        <state line="30" column="13" selection-start="930" selection-end="930" vertical-scroll-proportion="0.1821192">
           <folding />
         </state>
       </provider>
@@ -675,7 +1031,7 @@
       </state>
       <state key="JdkListConfigurable.UI">
         <settings>
-          <last-edited>1.5</last-edited>
+          <last-edited>1.5 (64bit)</last-edited>
           <splitter-proportions>
             <option name="proportions">
               <list>
@@ -692,6 +1048,7 @@
             <option name="proportions">
               <list>
                 <option value="0.2" />
+                <option value="0.5" />
               </list>
             </option>
           </splitter-proportions>
