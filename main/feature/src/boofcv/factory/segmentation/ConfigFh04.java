@@ -29,7 +29,7 @@ public class ConfigFh04 {
 	/**
 	 * Tuning parameter.  Larger regions are preferred for larger values of K.  Try 300
 	 */
-	public int K = 300;
+	public float K = 300;
 	/**
 	 * Minimum allowed size of a region.
 	 */
@@ -37,14 +37,14 @@ public class ConfigFh04 {
 	/**
 	 * Connection rule used to connect regions.  ConnectRule.EIGHT was using in the original paper.
 	 */
-	public ConnectRule rule = ConnectRule.EIGHT;
+	public ConnectRule connectRule = ConnectRule.EIGHT;
 
 	public ConfigFh04() {
 	}
 
-	public ConfigFh04(int k, int minimumRegionSize, ConnectRule rule) {
+	public ConfigFh04(int k, int minimumRegionSize, ConnectRule connectRule) {
 		K = k;
 		this.minimumRegionSize = minimumRegionSize;
-		this.rule = rule;
+		this.connectRule = connectRule;
 	}
 }

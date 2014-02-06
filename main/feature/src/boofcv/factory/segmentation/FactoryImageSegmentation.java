@@ -61,6 +61,6 @@ public class FactoryImageSegmentation {
 
 		SegmentFelzenszwalbHuttenlocher04<T> fh = FactorySegmentationAlg.fh04(config, imageType);
 
-		return new Fh04_to_ImageSegmentation<T>(fh,config.rule);
+		return new Fh04_to_ImageSegmentation<T>(fh,config.connectRule);
 	}
 }
