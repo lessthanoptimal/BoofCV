@@ -42,9 +42,8 @@ public class CameraPreview extends ViewGroup implements SurfaceHolder.Callback {
 	public void setCamera(Camera camera) {
 		mCamera = camera;
 		if (mCamera != null) {
-			// need to start the preview here because it is possible for it to be paused and resumed and not
-			// have surfaceChanged called if the orientation doesn't need to be changed.  Yes, you will have
-			// to start and stop the camera in the more common situations
+			// We purposely disregard child measurements so that the SurfaceView will center the camera
+			// preview instead of stretching it.
 			startPreview();
 			// Need to adjust the layout for the new camera
 			requestLayout();
