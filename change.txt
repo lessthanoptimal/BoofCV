@@ -35,6 +35,9 @@ Version : Alpha 0.17
   * Didn't handle case where the input image has 3 bands and not 4
 - ImageBase now provides a method for getting ImageType information
 - Threshold in the interface Associate is now <= instead of <
+- Android
+  * Added classes which greatly simplify dealing with camera previews
+  * Simplified example code
 
 - TODO Make those two failed unit tests ago away
 - TODO BoofMiscOps move XML serialization into IO package
