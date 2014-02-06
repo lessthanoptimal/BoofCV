@@ -18,7 +18,10 @@
 
 package boofcv.alg.segmentation;
 
+import boofcv.alg.InputSanityCheck;
+import boofcv.alg.misc.ImageMiscOps;
 import boofcv.struct.image.ImageSInt32;
+import boofcv.struct.image.ImageUInt8;
 import org.ddogleg.struct.GrowQueue_I32;
 
 import java.util.Arrays;
@@ -51,6 +54,13 @@ public class ImageSegmentationOps {
 		return total;
 	}
 
+	/**
+	 * Counts the number of pixels in all regions.  Regions must be have labels from 0 to totalRegions-1.
+	 *
+	 * @param labeled (Input) labeled image
+	 * @param totalRegions Total number of regions
+	 * @param counts Storage for pixel counts
+	 */
 	public static void countRegionPixels( ImageSInt32 labeled , int totalRegions , int counts[] ) {
 
 		Arrays.fill(counts,0,totalRegions,0);
@@ -63,7 +73,6 @@ public class ImageSegmentationOps {
 		}
 	}
 
-
 	/**
 	 * Compacts the region labels such that they are consecutive numbers starting from 0.
 	 * The ID of a root node must the index of a pixel in the 'graph' image, taking in account the change
@@ -74,6 +83,8 @@ public class ImageSegmentationOps {
 	 * @param output The new image after it has been compacted
 	 */
 	public static void regionPixelId_to_Compact(ImageSInt32 graph, GrowQueue_I32 segmentId, ImageSInt32 output) {
+
+		InputSanityCheck.checkSameShape(graph,output);
 
 		// Change the label of root nodes to be the new compacted labels
 		for( int i = 0; i < segmentId.size; i++ ) {
@@ -96,6 +107,67 @@ public class ImageSegmentationOps {
 			int y = indexGraph/graph.stride;
 
 			output.data[output.startIndex + y*output.stride + x] = i;
+		}
+	}
+
+	/**
+	 * Indicates border pixels between two regions.  If two adjacent pixels (4-connect) are not from the same region
+	 * then both pixels are marked as true (value of 1) in output image, all other pixels are false (0).
+	 *
+	 * @param labeled Input segmented image.
+	 * @param output Output binary image.  1 for border pixels.
+	 */
+	public static void markRegionBorders( ImageSInt32 labeled , ImageUInt8 output ) {
+
+		InputSanityCheck.checkSameShape(labeled,output);
+
+		ImageMiscOps.fill(output,0);
+
+		for( int y = 0; y < output.height-1; y++ ) {
+			int indexLabeled = labeled.startIndex + y*labeled.stride;
+			int indexOutput = output.startIndex + y*output.stride;
+
+			for( int x = 0; x < output.width-1; x++ , indexLabeled++ , indexOutput++ ) {
+				int region0 = labeled.data[indexLabeled];
+				int region1 = labeled.data[indexLabeled+1];
+				int region2 = labeled.data[indexLabeled+labeled.stride];
+
+				if( region0 != region1 ) {
+					output.data[indexOutput] = 1;
+					output.data[indexOutput+1] = 1;
+				}
+
+				if( region0 != region2 ) {
+					output.data[indexOutput] = 1;
+					output.data[indexOutput+output.stride] = 1;
+				}
+			}
+		}
+
+		for( int y = 0; y < output.height-1; y++ ) {
+			int indexLabeled = labeled.startIndex + y*labeled.stride + output.width-1;
+			int indexOutput = output.startIndex + y*output.stride + output.width-1;
+
+			int region0 = labeled.data[indexLabeled];
+			int region2 = labeled.data[indexLabeled+labeled.stride];
+
+			if( region0 != region2 ) {
+				output.data[indexOutput] = 1;
+				output.data[indexOutput+output.stride] = 1;
+			}
+		}
+
+		int y = output.height-1;
+		int indexLabeled = labeled.startIndex + y*labeled.stride;
+		int indexOutput = output.startIndex + y*output.stride;
+		for( int x = 0; x < output.width-1; x++ , indexLabeled++ , indexOutput++ ) {
+			int region0 = labeled.data[indexLabeled];
+			int region1 = labeled.data[indexLabeled+1];
+
+			if( region0 != region1 ) {
+				output.data[indexOutput] = 1;
+				output.data[indexOutput+1] = 1;
+			}
 		}
 	}
 }

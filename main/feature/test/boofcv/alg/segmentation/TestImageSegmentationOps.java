@@ -20,6 +20,7 @@ package boofcv.alg.segmentation;
 
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageSInt32;
+import boofcv.struct.image.ImageUInt8;
 import boofcv.testing.BoofTesting;
 import org.ddogleg.struct.GrowQueue_I32;
 import org.junit.Test;
@@ -115,11 +116,62 @@ public class TestImageSegmentationOps {
 		BoofTesting.assertEquals(expected, output, 1e-4);
 	}
 
+	/**
+	 * Change the image index from one image to another
+	 */
 	private int adjust( int index , ImageBase image ) {
 		int x = index%image.width;
 		int y = index/image.width;
 
 		return image.getIndex(x,y);
+	}
+
+	@Test
+	public void markRegionBorders1() {
+		ImageSInt32 input = new ImageSInt32(4,5);
+		input.data = new int[]{
+				0, 0, 0, 1,
+				0, 0, 0, 1,
+				0, 2, 2, 2,
+				0, 2, 2, 2,
+				0, 2, 2, 2};
+
+		ImageUInt8 expected = new ImageUInt8(4,5);
+		expected.data = new byte[]{
+				0, 0, 1, 1,
+				0, 1, 1, 1,
+				1, 1, 1, 1,
+				1, 1, 0, 0,
+				1, 1, 0, 0};
+
+		ImageUInt8 found = new ImageUInt8(4,5);
+
+		ImageSegmentationOps.markRegionBorders(input, found);
+		BoofTesting.assertEquals(expected, found, 1e-4);
+	}
+
+	@Test
+	public void markRegionBorders2() {
+		ImageSInt32 input = new ImageSInt32(4,5);
+		input.data = new int[]{
+				0, 0, 0, 0,
+				0, 0, 0, 0,
+				0, 0, 0, 0,
+				0, 0, 0, 0,
+				0, 0, 0, 2};
+
+		ImageUInt8 expected = new ImageUInt8(4,5);
+		expected.data = new byte[]{
+				0, 0, 0, 0,
+				0, 0, 0, 0,
+				0, 0, 0, 0,
+				0, 0, 0, 1,
+				0, 0, 1, 1};
+
+		ImageUInt8 found = new ImageUInt8(4,5);
+
+		ImageSegmentationOps.markRegionBorders(input, found);
+		BoofTesting.assertEquals(expected, found, 1e-4);
 	}
 
 }
