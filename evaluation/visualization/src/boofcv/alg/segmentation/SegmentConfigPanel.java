@@ -95,6 +95,7 @@ public class SegmentConfigPanel extends StandardAlgConfigPanel implements Action
 	}
 
 	public void switchAlgorithm( final int which ) {
+		// the GUI freezes if this is invoked in the GUI thread!?!?
 //		SwingUtilities.invokeLater(new Runnable() {
 //			public void run() {
 				recompute.setEnabled(false);
@@ -106,14 +107,15 @@ public class SegmentConfigPanel extends StandardAlgConfigPanel implements Action
 				} else if( which == 2 ) {
 					panelConfig.add(panelMS,BorderLayout.CENTER);
 				}
-				panelConfig.revalidate();
+				revalidate();
+				repaint();
 //			}});
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if( selectVisualize == e.getSource() )
-			owner.updateActiveDisplay(selectVisualize.getSelectedIndex());
+			owner.updateActiveDisplay(selectVisualize.getSelectedIndex(),true);
 		else if( recompute == e.getSource() ) {
 			recompute.setEnabled(false);
 			owner.recompute();

@@ -43,8 +43,6 @@ import java.util.Random;
  * @author Peter Abeles
  */
 // TODO Show image size on left panel
-// TODO Add please be patient dialog during calculation
-// TODO Selectable parameters for each type of segmentation
 public class VisualizeImageSegmentationApp <T extends ImageBase>
 		extends SelectAlgorithmAndInputPanel
 {
@@ -131,7 +129,7 @@ public class VisualizeImageSegmentationApp <T extends ImageBase>
 		leftPanel.setComputing(true);
 		declareAlgorithm((Integer) cookie);
 		performSegmentation();
-		updateActiveDisplay(activeDisplay);
+		updateActiveDisplay(activeDisplay,false);
 		leftPanel.setComputing(false);
 
 		busy = false;
@@ -164,9 +162,10 @@ public class VisualizeImageSegmentationApp <T extends ImageBase>
 		return processImage;
 	}
 
-	public void updateActiveDisplay( final int value ) {
+	public void updateActiveDisplay( final int value , boolean guiThread ) {
 		activeDisplay = value;
-		SwingUtilities.invokeLater(new Runnable() {
+
+		Runnable r = new Runnable() {
 			public void run() {
 				if( activeDisplay == 0 ) {
 					gui.setBufferedImage(outColor);
@@ -176,7 +175,13 @@ public class VisualizeImageSegmentationApp <T extends ImageBase>
 					gui.setBufferedImage(outSegments);
 				}
 				gui.repaint();
-			}});
+			}};
+
+
+		if( guiThread )
+			r.run();
+		else
+			SwingUtilities.invokeLater(r);
 	}
 
 	private void performSegmentation() {
