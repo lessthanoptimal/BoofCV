@@ -136,11 +136,11 @@ public class SegmentFelzenszwalbHuttenlocher04<T extends ImageBase> {
 		initialize(input,output);
 
 		// compute edges weights
-		long time0 = System.currentTimeMillis();
+//		long time0 = System.currentTimeMillis();
 		computeWeights.process(input, edges);
-		long time1 = System.currentTimeMillis();
+//		long time1 = System.currentTimeMillis();
 
-		System.out.println("Edge weights time " + (time1 - time0));
+//		System.out.println("Edge weights time " + (time1 - time0));
 
 		// Merge regions together
 		mergeRegions();
@@ -178,11 +178,11 @@ public class SegmentFelzenszwalbHuttenlocher04<T extends ImageBase> {
 	protected void mergeRegions() {
 
 		// sort edges
-		long time0 = System.currentTimeMillis();
+//		long time0 = System.currentTimeMillis();
 		sorter.sort(edges.data,edges.size);
-		long time1 = System.currentTimeMillis();
+//		long time1 = System.currentTimeMillis();
 
-		System.out.println("Sort time " + (time1 - time0));
+//		System.out.println("Sort time " + (time1 - time0));
 
 		// examine each edge to see if it can connect two regions
 		for( int i = 0; i < edges.size(); i++ ) {
@@ -218,8 +218,8 @@ public class SegmentFelzenszwalbHuttenlocher04<T extends ImageBase> {
 			}
 		}
 
-		long time2 = System.currentTimeMillis();
-		System.out.println("Edge merge time " + (time2 - time1));
+//		long time2 = System.currentTimeMillis();
+//		System.out.println("Edge merge time " + (time2 - time1));
 	}
 
 	/**
