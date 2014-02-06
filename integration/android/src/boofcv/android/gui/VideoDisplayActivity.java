@@ -23,8 +23,7 @@ import android.widget.LinearLayout.LayoutParams;
  * </p>
  *
  * <p>
- * A new thread is spawned  process the video data so that it doesn't cause the application to crash if it
- * takes too long.  Shutting down and restarting the camera as the activity transitions to different
+ * Shutting down and restarting the camera as the activity transitions to different
  * phases in its life cycle is correctly handled here.  The display can also be customized.
  * User interaction and additional display widgets can be added to the activity.  To access the main content
  * view call {@link #getViewContent} and to access the video display call {@link #getViewPreview},

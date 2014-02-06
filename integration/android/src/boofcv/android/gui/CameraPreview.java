@@ -11,7 +11,8 @@ import android.view.ViewGroup;
 import java.io.IOException;
 
 /**
- * Displays camera preview.  Android forces the camera preview to be displayed.
+ * Displays camera preview.  Android forces the camera preview to be displayed at all times.  This gets
+ * around that restriction by making the preview to be 2x2 pixel big .
  *
  * @author Peter Abeles
  */
@@ -142,9 +143,6 @@ public class CameraPreview extends ViewGroup implements SurfaceHolder.Callback {
 		} catch (Exception e){
 			// ignore: tried to stop a non-existent preview
 		}
-
-		// set preview size and make any resize, rotate or
-		// reformatting changes here
 
 		// start preview with new settings
 		startPreview();

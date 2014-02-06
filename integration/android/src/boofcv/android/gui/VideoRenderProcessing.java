@@ -10,17 +10,17 @@ import georegression.struct.point.Point2D_F64;
 
 /**
  * <p>
- * Processing class for displaying more complex visualizations of data.  Children of this class must properly lock
+ * Processing class for displaying more complex visualizations data.  Children of this class must properly lock
  * down the GUI when processing data that can be read/written to when updating GUI.  This is done by synchronizing
  * around the class variable {@link #lockGui}.
  * </p>
  *
  * <p>
- * The image is resized for display purposes.  The scale and translation factors applied to the canvas prior
- * to it being passed in to the child of this class can be access through the class parameters or getter functions.
- * The size of the output image can be accessed in a similar manor, see outputWidth and outputHeight.  The just
- * mentioned output size is used to compute the scale and translation and can be overridden inside {@link #init}
- * or {@link #declareImages(int, int)}.
+ * The canvas is resized and centered for display purposes.  The scale and translation factors applied to the
+ * canvas prior to it being passed in to the child of this class can be access through the class parameters or
+ * getter functions. The size of the output image can be accessed in a similar manor, see outputWidth and
+ * outputHeight.  The just mentioned output size is used to compute the scale and translation and can be
+ * overridden inside {@link #init} or {@link #declareImages(int, int)}.
  * </p>
  *
  * @author Peter Abeles
@@ -217,15 +217,18 @@ public abstract class VideoRenderProcessing<T extends ImageBase> extends Thread 
 	}
 
 	/**
-	 * <p>Image processing should be done here.  process and render will not be called at the same time, but aren't
-	 * be called from the same threads.</p>
+	 * <p>Image processing is done here and is invoked in its own thread, removing any hard time constraints.
+	 * When modifying data structures that are read inside of {@link #render} be sure to use synchronize with
+	 * {@link #lockGui} to avoid crashes or weird visual artifacts.  Use of lockGui should be minimized to
+	 * ensure a fast and responsive GUI</p>
 	 *
-	 * Be sure to use synchronize around lockGui to lock the GUI as needed inside this function!
 	 */
 	protected abstract void process( T gray );
 
 	/**
-	 * Visualize results computed by {@link #process} here.
+	 * Results computed by {@link #process} are visualized here.  This function is called inside a
+	 * synchronize(lockGui) block.  The provided canvas has been adjusted to be centered in the view and to account
+	 * for the resolution difference of the preview image and the display.
 	 *
 	 * @param canvas Canvas which is to be displayed.
 	 * @param imageToOutput Scale factor from input image to output display.  Can also be accessed via {@link #getScale}

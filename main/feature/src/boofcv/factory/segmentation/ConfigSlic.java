@@ -43,7 +43,7 @@ public class ConfigSlic {
 	/**
 	 * Connection rule that is used when merging small regions.
 	 */
-	public ConnectRule rule = ConnectRule.EIGHT;
+	public ConnectRule connectRule = ConnectRule.EIGHT;
 
 	public ConfigSlic(int numberOfRegions) {
 		this.numberOfRegions = numberOfRegions;

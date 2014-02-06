@@ -20,7 +20,6 @@ package boofcv.alg.segmentation;
 
 import boofcv.abst.segmentation.ImageSegmentation;
 import boofcv.core.image.ConvertBufferedImage;
-import boofcv.factory.segmentation.ConfigSlic;
 import boofcv.factory.segmentation.FactoryImageSegmentation;
 import boofcv.factory.segmentation.FactorySegmentationAlg;
 import boofcv.gui.SelectAlgorithmAndInputPanel;
@@ -43,6 +42,7 @@ import java.util.Random;
  *
  * @author Peter Abeles
  */
+// TODO Show image size on left panel
 // TODO Add please be patient dialog during calculation
 // TODO Selectable parameters for each type of segmentation
 public class VisualizeImageSegmentationApp <T extends ImageBase>
@@ -66,6 +66,7 @@ public class VisualizeImageSegmentationApp <T extends ImageBase>
 	ImagePanel gui = new ImagePanel();
 
 	boolean processImage = false;
+	boolean busy = false;
 
 	public VisualizeImageSegmentationApp(ImageType<T> imageType ) {
 		super(1);
@@ -78,17 +79,16 @@ public class VisualizeImageSegmentationApp <T extends ImageBase>
 
 		color = imageType.createImage(1,1);
 
-		declareAlgorithm(0);
-
 		JPanel viewArea = new JPanel(new BorderLayout());
 		leftPanel = new SegmentConfigPanel(this);
 		viewArea.add(leftPanel, BorderLayout.WEST);
 		viewArea.add(gui, BorderLayout.CENTER);
 
+		declareAlgorithm(0);
 		setMainGUI(viewArea);
 	}
 
-	public void process(BufferedImage input) {
+	public void process(final BufferedImage input) {
 		setInputImage(input);
 		this.inputImage = input;
 
@@ -102,16 +102,15 @@ public class VisualizeImageSegmentationApp <T extends ImageBase>
 			outBorder = new BufferedImage(color.width,color.height,BufferedImage.TYPE_INT_RGB);
 		}
 
-		gui.setPreferredSize(new Dimension(color.getWidth(), color.getHeight()));
-		updateActiveDisplay(activeDisplay);
-		doRefreshAll();
-
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
+				gui.setPreferredSize(new Dimension(color.getWidth(), color.getHeight()));
+				gui.setBufferedImage(input);
 				revalidate();
 				processImage = true;
 			}
 		});
+		doRefreshAll();
 	}
 
 	@Override
@@ -127,21 +126,28 @@ public class VisualizeImageSegmentationApp <T extends ImageBase>
 	public synchronized void setActiveAlgorithm(int indexFamily, String name, Object cookie) {
 		if (inputImage == null)
 			return;
+		busy = true;
 
-		declareAlgorithm((Integer)cookie);
+		leftPanel.setComputing(true);
+		declareAlgorithm((Integer) cookie);
 		performSegmentation();
+		updateActiveDisplay(activeDisplay);
+		leftPanel.setComputing(false);
 
+		busy = false;
 		gui.repaint();
 	}
 
 	private void declareAlgorithm(int which) {
 		alg = null;
 		switch( which ) {
-			case 0: alg = FactoryImageSegmentation.fh04(null, imageType); break;
-			case 1: alg = FactoryImageSegmentation.slic(new ConfigSlic(800), imageType); break;
-			case 2: alg = FactoryImageSegmentation.meanShift(null, imageType); break;
+			case 0: alg = FactoryImageSegmentation.fh04(leftPanel.configFh, imageType); break;
+			case 1: alg = FactoryImageSegmentation.slic(leftPanel.configSlic, imageType); break;
+			case 2: alg = FactoryImageSegmentation.meanShift(leftPanel.configMeanShift, imageType); break;
 			default: throw new RuntimeException("BUG!");
 		}
+
+		leftPanel.switchAlgorithm(which);
 	}
 
 	@Override
@@ -158,16 +164,19 @@ public class VisualizeImageSegmentationApp <T extends ImageBase>
 		return processImage;
 	}
 
-	public void updateActiveDisplay( int value ) {
-		this.activeDisplay = value;
-		if( activeDisplay == 0 ) {
-			gui.setBufferedImage(outColor);
-		} else if( activeDisplay == 1 ) {
-			gui.setBufferedImage(outBorder);
-		} else if( activeDisplay == 2 ) {
-			gui.setBufferedImage(outSegments);
-		}
-		gui.repaint();
+	public void updateActiveDisplay( final int value ) {
+		activeDisplay = value;
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				if( activeDisplay == 0 ) {
+					gui.setBufferedImage(outColor);
+				} else if( activeDisplay == 1 ) {
+					gui.setBufferedImage(outBorder);
+				} else if( activeDisplay == 2 ) {
+					gui.setBufferedImage(outSegments);
+				}
+				gui.repaint();
+			}});
 	}
 
 	private void performSegmentation() {
@@ -230,6 +239,13 @@ public class VisualizeImageSegmentationApp <T extends ImageBase>
 		}
 	}
 
+	public void recompute() {
+		if( busy )
+			return;
+		busy = true;
+		doRefreshAll();
+	}
+
 	public static void main(String[] args) {
 		ImageType<MultiSpectral<ImageFloat32>> imageType = ImageType.ms(3,ImageFloat32.class);
 //		ImageType<MultiSpectral<ImageUInt8>> imageType = ImageType.ms(3,ImageUInt8.class);
@@ -239,9 +255,12 @@ public class VisualizeImageSegmentationApp <T extends ImageBase>
 		VisualizeImageSegmentationApp app = new VisualizeImageSegmentationApp(imageType);
 
 		java.util.List<PathLabel> inputs = new ArrayList<PathLabel>();
-		inputs.add(new PathLabel("sunflowers", "../data/evaluation/sunflowers.png"));
-		inputs.add(new PathLabel("shapes", "../data/evaluation/shapes01.png"));
-		inputs.add(new PathLabel("amoeba","../data/evaluation/amoeba_shapes.jpg"));
+		inputs.add(new PathLabel("Horses", "../data/applet/segment/berkeley_horses.jpg"));
+		inputs.add(new PathLabel("Kangaroo", "../data/applet/segment/berkeley_kangaroo.jpg"));
+		inputs.add(new PathLabel("Man", "../data/applet/segment/berkeley_man.jpg"));
+		inputs.add(new PathLabel("Pines People", "../data/applet/segment/mountain_pines_people.jpg"));
+		inputs.add(new PathLabel("Sunflowers", "../data/evaluation/sunflowers.png"));
+		inputs.add(new PathLabel("Shapes", "../data/evaluation/shapes01.png"));
 
 		app.setInputList(inputs);
 

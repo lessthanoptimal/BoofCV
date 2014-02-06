@@ -163,7 +163,7 @@ public class FactorySegmentationAlg {
 		if( config == null )
 			config = new ConfigFh04();
 
-		FhEdgeWeights<T> edgeWeights = weightsFelzenszwalb04(config.rule,imageType);
+		FhEdgeWeights<T> edgeWeights = weightsFelzenszwalb04(config.connectRule,imageType);
 
 		return new SegmentFelzenszwalbHuttenlocher04<T>(config.K,config.minimumRegionSize,edgeWeights);
 	}
@@ -178,20 +178,20 @@ public class FactorySegmentationAlg {
 				switch( imageType.getDataType() ) {
 					case U8:
 						return (SegmentSlic)new SegmentSlic_U8(config.numberOfRegions,
-								config.spacialWeight,config.totalIterations,config.rule);
+								config.spacialWeight,config.totalIterations,config.connectRule);
 					case F32:
 						return (SegmentSlic)new SegmentSlic_F32(config.numberOfRegions,
-								config.spacialWeight,config.totalIterations,config.rule);
+								config.spacialWeight,config.totalIterations,config.connectRule);
 				}
 		} else if( imageType.getFamily() == ImageType.Family.MULTI_SPECTRAL ) {
 			int N = imageType.getNumBands();
 				switch( imageType.getDataType() ) {
 					case U8:
 						return (SegmentSlic)new SegmentSlic_MsU8(config.numberOfRegions,
-								config.spacialWeight,config.totalIterations,config.rule,N);
+								config.spacialWeight,config.totalIterations,config.connectRule,N);
 					case F32:
 						return (SegmentSlic)new SegmentSlic_MsF32(config.numberOfRegions,
-								config.spacialWeight,config.totalIterations,config.rule,N);
+								config.spacialWeight,config.totalIterations,config.connectRule,N);
 				}
 		}
 		throw new IllegalArgumentException("Unknown imageType or connect rule");
