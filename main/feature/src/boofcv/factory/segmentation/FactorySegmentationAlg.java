@@ -165,7 +165,14 @@ public class FactorySegmentationAlg {
 
 		FhEdgeWeights<T> edgeWeights = weightsFelzenszwalb04(config.connectRule,imageType);
 
-		return new SegmentFelzenszwalbHuttenlocher04<T>(config.K,config.minimumRegionSize,edgeWeights);
+		SegmentFelzenszwalbHuttenlocher04<T> alg =
+				new SegmentFelzenszwalbHuttenlocher04<T>(config.K,config.minimumRegionSize,edgeWeights);
+
+		if( config.minimumRegionSize > 0 ) {
+			alg.configureApproximateSort(config.approximateSortBins);
+		}
+
+		return alg;
 	}
 
 	public static<T extends ImageBase>

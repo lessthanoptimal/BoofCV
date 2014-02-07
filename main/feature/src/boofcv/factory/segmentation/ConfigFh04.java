@@ -39,6 +39,12 @@ public class ConfigFh04 {
 	 */
 	public ConnectRule connectRule = ConnectRule.EIGHT;
 
+	/**
+	 * If set to a value larger than 0 then an approximate sorting routine will be used.  This improves speed
+	 * by about 40%.  A value of 2000 is recommended.
+	 */
+	public int approximateSortBins = 0;
+
 	public ConfigFh04() {
 	}
 
@@ -46,5 +52,12 @@ public class ConfigFh04 {
 		K = k;
 		this.minimumRegionSize = minimumRegionSize;
 		this.connectRule = connectRule;
+	}
+
+	public ConfigFh04(float k, int minimumRegionSize, ConnectRule connectRule, int approximateSortBins) {
+		K = k;
+		this.minimumRegionSize = minimumRegionSize;
+		this.connectRule = connectRule;
+		this.approximateSortBins = approximateSortBins;
 	}
 }

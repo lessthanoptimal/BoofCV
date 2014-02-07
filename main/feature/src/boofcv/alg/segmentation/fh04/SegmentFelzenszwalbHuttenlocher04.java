@@ -21,6 +21,7 @@ package boofcv.alg.segmentation.fh04;
 import boofcv.alg.InputSanityCheck;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageSInt32;
+import org.ddogleg.sorting.ApproximateSort_F32;
 import org.ddogleg.sorting.QuickSortObj_F32;
 import org.ddogleg.sorting.SortableParameter_F32;
 import org.ddogleg.struct.FastQueue;
@@ -92,6 +93,7 @@ public class SegmentFelzenszwalbHuttenlocher04<T extends ImageBase> {
 	private FhEdgeWeights<T> computeWeights;
 
 	private QuickSortObj_F32 sorter = new QuickSortObj_F32();
+	private ApproximateSort_F32 sorterApprox = null;
 	// storage for edges so that they can be recycled on the next call
 	protected FastQueue<Edge> edges = new FastQueue<Edge>(Edge.class,true);
 	// list of edges which were not matched to anything.  used to merge small regions
@@ -118,6 +120,15 @@ public class SegmentFelzenszwalbHuttenlocher04<T extends ImageBase> {
 		K = k;
 		this.minimumSize = minimumSize;
 		this.computeWeights = computeWeights;
+	}
+
+	/**
+	 * If this function is called the exact sort routine will not be used and instead an approximate routine will
+	 * be used.
+	 * @param numBins Number of bins.  Try 2000.  More bins the more accurate it will be
+	 */
+	public void configureApproximateSort( int numBins ) {
+		sorterApprox = new ApproximateSort_F32(numBins);
 	}
 
 	/**
@@ -179,7 +190,12 @@ public class SegmentFelzenszwalbHuttenlocher04<T extends ImageBase> {
 
 		// sort edges
 //		long time0 = System.currentTimeMillis();
-		sorter.sort(edges.data,edges.size);
+		if( sorterApprox != null ) {
+			sorterApprox.computeRange(edges.data,0,edges.size);
+			sorterApprox.sortObject(edges.data,0,edges.size);
+		} else {
+			sorter.sort(edges.data,edges.size);
+		}
 //		long time1 = System.currentTimeMillis();
 
 //		System.out.println("Sort time " + (time1 - time0));

@@ -185,7 +185,12 @@ public class VisualizeImageSegmentationApp <T extends ImageBase>
 	}
 
 	private void performSegmentation() {
+		long before = System.currentTimeMillis();
 		alg.segment(color, pixelToRegion);
+		long after = System.currentTimeMillis();
+
+		System.out.println("Total time "+(after-before));
+
 		int numSegments = alg.getTotalSegments();
 
 		// Computes the mean color inside each region
