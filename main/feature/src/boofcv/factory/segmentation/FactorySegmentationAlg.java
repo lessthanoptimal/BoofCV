@@ -168,7 +168,7 @@ public class FactorySegmentationAlg {
 		SegmentFelzenszwalbHuttenlocher04<T> alg =
 				new SegmentFelzenszwalbHuttenlocher04<T>(config.K,config.minimumRegionSize,edgeWeights);
 
-		if( config.minimumRegionSize > 0 ) {
+		if( config.approximateSortBins > 0 ) {
 			alg.configureApproximateSort(config.approximateSortBins);
 		}
 
