@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -239,6 +239,7 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 
 		String sumType = imageType.getSumType();
 		String typeCast = imageType.getTypeCastFromSum();
+		String maxInclusive = imageType.isInteger() ? "exclusive" : "inclusive";
 
 		out.print("\t/**\n" +
 				"\t * Sets each value in the image to a value drawn from an uniform distribution that has a range of min <= X < max.\n" +
@@ -246,7 +247,7 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 				"\t * @param img Image which is to be filled.  Modified,\n" +
 				"\t * @param rand Random number generator\n" +
 				"\t * @param min Minimum value of the distribution, inclusive\n" +
-				"\t * @param max Maximum value of the distribution, exclusive\n" +
+				"\t * @param max Maximum value of the distribution, "+maxInclusive+"\n" +
 				"\t */\n" +
 				"\tpublic static void fillUniform("+imageName+" img, Random rand , "+sumType+" min , "+sumType+" max) {\n" +
 				"\t\t"+sumType+" range = max-min;\n" +
@@ -274,6 +275,7 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 		String imageName = imageType.getInterleavedName();
 		String sumType = imageType.getSumType();
 		String typeCast = imageType.getTypeCastFromSum();
+		String maxInclusive = imageType.isInteger() ? "exclusive" : "inclusive";
 
 		out.print("\t/**\n" +
 				"\t * Sets each value in the image to a value drawn from an uniform distribution that has a range of min <= X < max.\n" +
@@ -281,7 +283,7 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 				"\t * @param img Image which is to be filled.  Modified,\n" +
 				"\t * @param rand Random number generator\n" +
 				"\t * @param min Minimum value of the distribution, inclusive\n" +
-				"\t * @param max Maximum value of the distribution, exclusive\n" +
+				"\t * @param max Maximum value of the distribution, "+maxInclusive+"\n" +
 				"\t */\n" +
 				"\tpublic static void fillUniform("+imageName+" img, Random rand , "+sumType+" min , "+sumType+" max) {\n" +
 				"\t\t"+sumType+" range = max-min;\n" +

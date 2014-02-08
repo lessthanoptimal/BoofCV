@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -230,19 +230,19 @@ public class GImageMiscOps {
 	 *
 	 * @param input Image which is to be filled.  Modified,
 	 * @param rand Random number generator
-	 * @param min Minimum value of the distribution
-	 * @param max Maximum value of the distribution
+	 * @param min Minimum value of the distribution.  Inclusive.
+	 * @param max Maximum value of the distribution.  Inclusive.
 	 */
 	public static void fillUniform( ImageBase input , Random rand , double min , double max  ) {
 		if( input instanceof ImageSingleBand ) {
 			if( ImageInt8.class.isAssignableFrom(input.getClass()) ) {
-				ImageMiscOps.fillUniform((ImageInt8) input, rand, (int) min, (int) max);
+				ImageMiscOps.fillUniform((ImageInt8) input, rand, (int) min, ((int)max)-1);
 			} else if( ImageInt16.class.isAssignableFrom(input.getClass()) ) {
-				ImageMiscOps.fillUniform((ImageInt16) input, rand, (int) min, (int) max);
+				ImageMiscOps.fillUniform((ImageInt16) input, rand, (int) min, ((int)max)-1);
 			} else if( ImageSInt32.class == input.getClass() ) {
-				ImageMiscOps.fillUniform((ImageSInt32) input, rand, (int) min, (int) max);
+				ImageMiscOps.fillUniform((ImageSInt32) input, rand, (int) min, ((int)max)-1);
 			} else if( ImageSInt64.class == input.getClass() ) {
-				ImageMiscOps.fillUniform((ImageSInt64) input, rand, (long) min, (long) max);
+				ImageMiscOps.fillUniform((ImageSInt64) input, rand, (long) min, ((long)max)-1);
 			} else if( ImageFloat32.class == input.getClass() ) {
 				ImageMiscOps.fillUniform((ImageFloat32) input, rand, (float)min, (float) max);
 			} else if( ImageFloat64.class == input.getClass() ) {
@@ -252,13 +252,13 @@ public class GImageMiscOps {
 			}
 		} else if( input instanceof ImageInterleaved ) {
 			if( InterleavedI8.class.isAssignableFrom(input.getClass()) ) {
-				ImageMiscOps.fillUniform((InterleavedI8)input,rand, (int) min, (int) max);
+				ImageMiscOps.fillUniform((InterleavedI8)input,rand, (int) min, ((int)max)-1);
 			} else if( InterleavedI16.class.isAssignableFrom(input.getClass()) ) {
-				ImageMiscOps.fillUniform((InterleavedI16)input,rand, (int) min, (int) max);
+				ImageMiscOps.fillUniform((InterleavedI16)input,rand, (int) min, ((int)max)-1);
 			} else if( InterleavedS32.class == input.getClass() ) {
-				ImageMiscOps.fillUniform((InterleavedS32)input,rand, (int) min, (int) max);
+				ImageMiscOps.fillUniform((InterleavedS32)input,rand, (int) min, ((int)max)-1);
 			} else if( InterleavedS64.class == input.getClass() ) {
-				ImageMiscOps.fillUniform((InterleavedS64)input,rand, (long) min, (long) max);
+				ImageMiscOps.fillUniform((InterleavedS64)input,rand, (long) min, ((long)max)-1);
 			} else if( InterleavedF32.class == input.getClass() ) {
 				ImageMiscOps.fillUniform((InterleavedF32)input,rand, (float)min, (float) max);
 			} else if( InterleavedF64.class == input.getClass() ) {

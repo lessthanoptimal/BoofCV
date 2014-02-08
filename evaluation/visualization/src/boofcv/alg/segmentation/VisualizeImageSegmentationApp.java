@@ -104,7 +104,7 @@ public class VisualizeImageSegmentationApp <T extends ImageBase>
 			public void run() {
 				gui.setPreferredSize(new Dimension(color.getWidth(), color.getHeight()));
 				gui.setBufferedImage(input);
-				revalidate();
+				gui.revalidate();
 				processImage = true;
 			}
 		});
@@ -121,19 +121,22 @@ public class VisualizeImageSegmentationApp <T extends ImageBase>
 	}
 
 	@Override
-	public synchronized void setActiveAlgorithm(int indexFamily, String name, Object cookie) {
+	public void setActiveAlgorithm(int indexFamily, String name, Object cookie) {
 		if (inputImage == null)
 			return;
-		busy = true;
 
-		leftPanel.setComputing(true);
-		declareAlgorithm((Integer) cookie);
-		performSegmentation();
-		updateActiveDisplay(activeDisplay,false);
-		leftPanel.setComputing(false);
+		synchronized( imageType ) {
+			busy = true;
 
-		busy = false;
-		gui.repaint();
+			leftPanel.setComputing(true);
+			declareAlgorithm((Integer) cookie);
+			performSegmentation();
+			updateActiveDisplay(activeDisplay);
+			leftPanel.setComputing(false);
+
+			busy = false;
+			gui.repaint();
+		}
 	}
 
 	private void declareAlgorithm(int which) {
@@ -162,7 +165,7 @@ public class VisualizeImageSegmentationApp <T extends ImageBase>
 		return processImage;
 	}
 
-	public void updateActiveDisplay( final int value , boolean guiThread ) {
+	public void updateActiveDisplay( final int value ) {
 		activeDisplay = value;
 
 		Runnable r = new Runnable() {
@@ -178,7 +181,7 @@ public class VisualizeImageSegmentationApp <T extends ImageBase>
 			}};
 
 
-		if( guiThread )
+		if( SwingUtilities.isEventDispatchThread() )
 			r.run();
 		else
 			SwingUtilities.invokeLater(r);
@@ -250,9 +253,11 @@ public class VisualizeImageSegmentationApp <T extends ImageBase>
 	}
 
 	public void recompute() {
-		if( busy )
-			return;
-		busy = true;
+		synchronized( imageType ) {
+			if( busy )
+				return;
+			busy = true;
+		}
 		doRefreshAll();
 	}
 

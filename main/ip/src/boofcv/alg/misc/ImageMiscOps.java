@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -15,7 +15,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package boofcv.alg.misc;
 
 import boofcv.struct.image.*;
@@ -1079,7 +1078,7 @@ public class ImageMiscOps {
 	 * @param img Image which is to be filled.  Modified,
 	 * @param rand Random number generator
 	 * @param min Minimum value of the distribution, inclusive
-	 * @param max Maximum value of the distribution, exclusive
+	 * @param max Maximum value of the distribution, inclusive
 	 */
 	public static void fillUniform(ImageFloat32 img, Random rand , float min , float max) {
 		float range = max-min;
@@ -1100,7 +1099,7 @@ public class ImageMiscOps {
 	 * @param img Image which is to be filled.  Modified,
 	 * @param rand Random number generator
 	 * @param min Minimum value of the distribution, inclusive
-	 * @param max Maximum value of the distribution, exclusive
+	 * @param max Maximum value of the distribution, inclusive
 	 */
 	public static void fillUniform(InterleavedF32 img, Random rand , float min , float max) {
 		float range = max-min;
@@ -1309,7 +1308,7 @@ public class ImageMiscOps {
 	 * @param img Image which is to be filled.  Modified,
 	 * @param rand Random number generator
 	 * @param min Minimum value of the distribution, inclusive
-	 * @param max Maximum value of the distribution, exclusive
+	 * @param max Maximum value of the distribution, inclusive
 	 */
 	public static void fillUniform(ImageFloat64 img, Random rand , double min , double max) {
 		double range = max-min;
@@ -1330,7 +1329,7 @@ public class ImageMiscOps {
 	 * @param img Image which is to be filled.  Modified,
 	 * @param rand Random number generator
 	 * @param min Minimum value of the distribution, inclusive
-	 * @param max Maximum value of the distribution, exclusive
+	 * @param max Maximum value of the distribution, inclusive
 	 */
 	public static void fillUniform(InterleavedF64 img, Random rand , double min , double max) {
 		double range = max-min;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -60,6 +60,8 @@ public class ShowColorModelApp
 		addAlgorithm(0,"RGB",0);
 		addAlgorithm(0,"HSV",1);
 		addAlgorithm(0,"YUV",2);
+		addAlgorithm(0,"XYZ",3);
+		addAlgorithm(0,"LAB",4);
 
 		input = new MultiSpectral<ImageFloat32>(ImageFloat32.class, 1, 1 , 3);
 		output = new MultiSpectral<ImageFloat32>(ImageFloat32.class, 1, 1 , 3);
@@ -148,7 +150,28 @@ public class ShowColorModelApp
 				names[2] = "V";
 				ColorYuv.rgbToYuv_F32(input, output);
 				ConvertBufferedImage.convertTo(output.getBand(0),out[0]);
-				VisualizeImageData.colorizeSign(output.getBand(1), out[1],-1);
+				VisualizeImageData.colorizeSign(output.getBand(1), out[1], -1);
+				VisualizeImageData.colorizeSign(output.getBand(2), out[2], -1);
+				break;
+
+			case 3:
+				names[0] = "X";
+				names[1] = "Y";
+				names[2] = "Z";
+				ColorXyz.rgbToXyz_F32(input, output);
+				PixelMath.multiply(output.getBand(1),255,output.getBand(1));
+				VisualizeImageData.colorizeSign(output.getBand(0), out[0], -1);
+				ConvertBufferedImage.convertTo(output.getBand(1), out[1]);
+				VisualizeImageData.colorizeSign(output.getBand(2), out[2], -1);
+				break;
+
+			case 4:
+				names[0] = "L";
+				names[1] = "A";
+				names[2] = "B";
+				ColorLab.rgbToLab_F32(input, output);
+				VisualizeImageData.grayMagnitude(output.getBand(0), out[0], -1);
+				VisualizeImageData.colorizeSign(output.getBand(1), out[1], -1);
 				VisualizeImageData.colorizeSign(output.getBand(2), out[2], -1);
 				break;
 		}
@@ -182,7 +205,7 @@ public class ShowColorModelApp
 
 		protected MyMonitor( Component comp , String message ) {
 			super( new ProgressMonitor(comp,
-					"Blurring the Image",
+					"Converting color space",
 					message, 0, input.getNumBands()));
 		}
 
