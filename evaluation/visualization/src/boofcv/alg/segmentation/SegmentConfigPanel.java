@@ -69,8 +69,7 @@ public class SegmentConfigPanel extends StandardAlgConfigPanel implements Action
 		addLabeled(selectVisualize, "Visualize", this);
 		addSeparator(100);
 		addAlignCenter(recompute,this);
-		addAlignCenter(progress,this);
-		addSeparator(100);
+		addAlignCenter(progress, this);
 		addAlignCenter(panelConfig,this);
 	}
 
@@ -78,8 +77,8 @@ public class SegmentConfigPanel extends StandardAlgConfigPanel implements Action
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				if( isComputing ) {
-					progress.setEnabled(true);
 					progress.setIndeterminate(true);
+					progress.setEnabled(true);
 				} else {
 					progress.setIndeterminate(false);
 					progress.setEnabled(false);
@@ -96,8 +95,8 @@ public class SegmentConfigPanel extends StandardAlgConfigPanel implements Action
 
 	public void switchAlgorithm( final int which ) {
 		// the GUI freezes if this is invoked in the GUI thread!?!?
-//		SwingUtilities.invokeLater(new Runnable() {
-//			public void run() {
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
 				recompute.setEnabled(false);
 				panelConfig.removeAll();
 				if( which == 0 ) {
@@ -107,15 +106,15 @@ public class SegmentConfigPanel extends StandardAlgConfigPanel implements Action
 				} else if( which == 2 ) {
 					panelConfig.add(panelMS,BorderLayout.CENTER);
 				}
-				revalidate();
+				panelConfig.revalidate();
 				repaint();
-//			}});
+			}});
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if( selectVisualize == e.getSource() )
-			owner.updateActiveDisplay(selectVisualize.getSelectedIndex(),true);
+			owner.updateActiveDisplay(selectVisualize.getSelectedIndex());
 		else if( recompute == e.getSource() ) {
 			recompute.setEnabled(false);
 			owner.recompute();

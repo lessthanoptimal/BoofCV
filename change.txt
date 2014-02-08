@@ -38,13 +38,13 @@ Version : Alpha 0.17
 - Android
   * Added classes which greatly simplify dealing with camera previews
   * Simplified example code
+- Added XYZ and LAB color spaces
+- GImageMiscOps.fillUniform() max is inclusive for both integer and float and this is enforced
 
 - TODO Make those two failed unit tests ago away
 - TODO BoofMiscOps move XML serialization into IO package
-- TODO Add lab color space
 - TODO Long distance dense optical flow
 - TODO Watershed segmentation
-- TODO Moved some of the android stuff out of demo code and into the android interface
 
 ---------------------------------------------
 Date    : 2013/12/25

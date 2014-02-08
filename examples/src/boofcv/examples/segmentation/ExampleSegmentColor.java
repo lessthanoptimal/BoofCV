@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,7 +34,7 @@ import java.awt.image.BufferedImage;
 /**
  * Example which demonstrates how color can be used to segment an image.  The color space is converted from RGB into
  * HSV.  HSV separates intensity from color and allows you to search for a specific color based on two values
- * independent of lighting conditions.  Other color spaces are supported, such as YUV.
+ * independent of lighting conditions.  Other color spaces are supported, such as YUV, XYZ, and LAB.
  *
  * @author Peter Abeles
  */
@@ -51,12 +51,10 @@ public class ExampleSegmentColor {
 			public void mouseClicked(MouseEvent e) {
 				float[] color = new float[3];
 				int rgb = image.getRGB(e.getX(),e.getY());
-				ColorHsv.rgbToHsv((rgb >> 16) & 0xFF,(rgb >> 8) & 0xFF , rgb&0xFF,color);
-				System.out.println("h = " + color[0]);
-				System.out.println("s = "+color[1]);
-				System.out.println("v = "+color[2]);
+				ColorHsv.rgbToHsv((rgb >> 16) & 0xFF, (rgb >> 8) & 0xFF, rgb & 0xFF, color);
+				System.out.println("H = " + color[0]+" S = "+color[1]+" V = "+color[2]);
 
-				showSelectedColor("Selected",image,(float)color[0],(float)color[1]);
+				showSelectedColor("Selected",image,color[0],color[1]);
 			}
 		});
 
@@ -66,8 +64,8 @@ public class ExampleSegmentColor {
 	/**
 	 * Selectively displays only pixels which have a similar hue and saturation values to what is provided.
 	 * This is intended to be a simple example of color based segmentation.  Color based segmentation can be done
-	 * in RGB color, but is more problematic.  More robust techniques can use Gaussian
-	 * models.
+	 * in RGB color, but is more problematic due to it not being intensity invariant.  More robust techniques
+	 * can use Gaussian models instead of a uniform distribution, as is done below.
 	 */
 	public static void showSelectedColor( String name , BufferedImage image , float hue , float saturation ) {
 		MultiSpectral<ImageFloat32> input = ConvertBufferedImage.convertFromMulti(image,null,true,ImageFloat32.class);
@@ -76,25 +74,26 @@ public class ExampleSegmentColor {
 		// Convert into HSV
 		ColorHsv.rgbToHsv_F32(input,hsv);
 
-		// Pixels which are more than this different from the selected color are set to black
+		// Euclidean distance squared threshold for deciding which pixels are members of the selected set
 		float maxDist2 = 0.4f*0.4f;
 
 		// Extract hue and saturation bands which are independent of intensity
 		ImageFloat32 H = hsv.getBand(0);
 		ImageFloat32 S = hsv.getBand(1);
 
-		// Adjust the relative importance of Hue and Saturation
+		// Adjust the relative importance of Hue and Saturation.
+		// Hue has a range of 0 to 2*PI and Saturation from 0 to 1.
 		float adjustUnits = (float)(Math.PI/2.0);
 
 		// step through each pixel and mark how close it is to the selected color
 		BufferedImage output = new BufferedImage(input.width,input.height,BufferedImage.TYPE_INT_RGB);
 		for( int y = 0; y < hsv.height; y++ ) {
 			for( int x = 0; x < hsv.width; x++ ) {
-				// remember Hue is an angle in radians, so simple subtraction doesn't work
+				// Hue is an angle in radians, so simple subtraction doesn't work
 				float dh = UtilAngle.dist(H.unsafe_get(x,y),hue);
 				float ds = (S.unsafe_get(x,y)-saturation)*adjustUnits;
 
-				// this distance measure is a bit naive, but good enough for this demonstration
+				// this distance measure is a bit naive, but good enough for to demonstrate the concept
 				float dist2 = dh*dh + ds*ds;
 				if( dist2 <= maxDist2 ) {
 					output.setRGB(x,y,image.getRGB(x,y));

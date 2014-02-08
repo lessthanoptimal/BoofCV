@@ -196,9 +196,9 @@ public class ColorYuv {
 
 				float y = 0.299f*r + 0.587f*g + 0.114f*b;
 
-				Y.data[indexRgb] = y;
-				U.data[indexRgb] = 0.492f*(b-y);
-				V.data[indexRgb] = 0.877f*(r-y);
+				Y.data[indexYuv] = y;
+				U.data[indexYuv] = 0.492f*(b-y);
+				V.data[indexYuv] = 0.877f*(r-y);
 			}
 		}
 	}
