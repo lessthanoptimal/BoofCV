@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.alg.filter.binary;
 
+import boofcv.struct.ConnectRule;
 import boofcv.struct.image.ImageSInt32;
 import boofcv.struct.image.ImageUInt8;
 import georegression.struct.point.Point2D_I32;
@@ -35,7 +36,8 @@ import java.util.List;
 public class ContourTracer {
 
 	// which connectivity rule is being used. 4 and 8 supported
-	private int rule;
+	private ConnectRule rule;
+	private int ruleN;
 
 	// storage for contour points.
 	private FastQueue<Point2D_I32> storagePoints;
@@ -69,25 +71,27 @@ public class ContourTracer {
 	 *
 	 * @param rule Specifies 4 or 8 as connectivity rule
 	 */
-	public ContourTracer( int rule ) {
-		if( rule != 4 && rule != 8 )
-			throw new IllegalArgumentException("Connectivity rule must be 4 or 8 not "+rule);
+	public ContourTracer( ConnectRule rule ) {
 		this.rule = rule;
 
-		offsetsBinary = new int[rule];
-		offsetsLabeled = new int[rule];
-
-		if( rule == 8 ) {
+		if( ConnectRule.EIGHT == rule ) {
 			// start the next search +2 away from the square it came from
 			// the square it came from is the opposite from the previous 'dir'
 			nextDirection = new int[8];
 			for( int i = 0; i < 8; i++ )
 				nextDirection[i] = ((i+4)%8 + 2)%8;
-		} else {
+			ruleN = 8;
+		} else if( ConnectRule.FOUR == rule ) {
 			nextDirection = new int[4];
 			for( int i = 0; i < 4; i++ )
 				nextDirection[i] = ((i+2)%4 + 1)%4;
+			ruleN = 4;
+		} else {
+			throw new IllegalArgumentException("Connectivity rule must be 4 or 8 not "+rule);
 		}
+
+		offsetsBinary = new int[ruleN];
+		offsetsLabeled = new int[ruleN];
 	}
 
 	/**
@@ -101,7 +105,7 @@ public class ContourTracer {
 		this.labeled = labeled;
 		this.storagePoints = storagePoints;
 
-		if( rule == 8 ) {
+		if( rule == ConnectRule.EIGHT ) {
 			setOffsets8(offsetsBinary,binary.stride);
 			setOffsets8(offsetsLabeled,labeled.stride);
 		} else {
@@ -141,7 +145,7 @@ public class ContourTracer {
 	public void trace( int label , int initialX , int initialY , boolean external , List<Point2D_I32> contour )
 	{
 		int initialDir;
-		if( rule == 8 )
+		if( rule == ConnectRule.EIGHT )
 			initialDir = external ? 7 : 3;
 		else
 			initialDir = external ? 0 : 2;
@@ -188,7 +192,7 @@ public class ContourTracer {
 		for( int i = 0; i < offsetsBinary.length; i++ ) {
 			if( checkBlack(indexBinary + offsetsBinary[dir]))
 				return true;
-			dir = (dir+1)%rule;
+			dir = (dir+1)%ruleN;
 		}
 		return false;
 	}

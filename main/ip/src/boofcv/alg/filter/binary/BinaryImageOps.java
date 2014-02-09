@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,6 +22,7 @@ import boofcv.alg.InputSanityCheck;
 import boofcv.alg.filter.binary.impl.ImplBinaryBorderOps;
 import boofcv.alg.filter.binary.impl.ImplBinaryInnerOps;
 import boofcv.alg.misc.ImageMiscOps;
+import boofcv.struct.ConnectRule;
 import boofcv.struct.image.ImageSInt32;
 import boofcv.struct.image.ImageUInt8;
 import georegression.struct.point.Point2D_I32;
@@ -297,7 +298,7 @@ public class BinaryImageOps {
 	 * @param output (Optional) Output labeled image. If null, an image will be declared internally.  Modified.
 	 * @return List of found contours for each blob.
 	 */
-	public static List<Contour> contour(ImageUInt8 input, int rule, ImageSInt32 output) {
+	public static List<Contour> contour(ImageUInt8 input, ConnectRule rule, ImageSInt32 output) {
 		if( output == null ) {
 			output = new ImageSInt32(input.width,input.height);
 		} else {

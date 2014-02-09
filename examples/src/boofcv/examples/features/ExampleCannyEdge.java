@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,6 +27,7 @@ import boofcv.factory.feature.detect.edge.FactoryEdgeDetectors;
 import boofcv.gui.binary.VisualizeBinaryData;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.image.UtilImageIO;
+import boofcv.struct.ConnectRule;
 import boofcv.struct.image.ImageSInt16;
 import boofcv.struct.image.ImageUInt8;
 
@@ -60,7 +61,7 @@ public class ExampleCannyEdge {
 		// The 'edgeContours' is a tree graph that can be difficult to process.  An alternative is to extract
 		// the contours from the binary image, which will produce a single loop for each connected cluster of pixels.
 		// Note that you are only interested in external contours.
-		List<Contour> contours = BinaryImageOps.contour(edgeImage, 8, null);
+		List<Contour> contours = BinaryImageOps.contour(edgeImage, ConnectRule.EIGHT, null);
 
 		// display the results
 		BufferedImage visualBinary = VisualizeBinaryData.renderBinary(edgeImage, null);

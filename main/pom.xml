@@ -70,7 +70,7 @@
     <connection>scm:git:git://github.com/lessthanoptimal/BoofCV.git</connection>
     <developerConnection>scm:git:git@github.com:lessthanoptimal/BoofCV.git</developerConnection>
     <tag>HEAD</tag>
-    <url>https://github.com/lessthanoptimal/GeoRegression</url>
+    <url>https://github.com/lessthanoptimal/BoofCV</url>
   </scm>
 
   <developers>

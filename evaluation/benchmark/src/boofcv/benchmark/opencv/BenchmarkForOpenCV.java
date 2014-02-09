@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,6 +37,7 @@ import boofcv.factory.feature.detect.line.FactoryDetectLineAlgs;
 import boofcv.io.image.UtilImageIO;
 import boofcv.misc.PerformerBase;
 import boofcv.misc.ProfileOperation;
+import boofcv.struct.ConnectRule;
 import boofcv.struct.feature.SurfFeature;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSInt32;
@@ -147,7 +148,7 @@ public class BenchmarkForOpenCV<T extends ImageSingleBand, D extends ImageSingle
 		ImageUInt8 binary = new ImageUInt8(input.width,input.height);
 		ImageSInt32 labeled = new ImageSInt32(input.width,input.height);
 
-		LinearContourLabelChang2004 alg = new LinearContourLabelChang2004(8);
+		LinearContourLabelChang2004 alg = new LinearContourLabelChang2004(ConnectRule.EIGHT);
 
 		@Override
 		public synchronized void process() {
