@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,6 +20,7 @@ package boofcv.alg.filter.binary;
 
 import boofcv.core.image.border.FactoryImageBorder;
 import boofcv.core.image.border.ImageBorder;
+import boofcv.struct.ConnectRule;
 import boofcv.struct.image.ImageSInt32;
 import boofcv.struct.image.ImageUInt8;
 import georegression.struct.point.Point2D_I32;
@@ -98,7 +99,7 @@ public class TestLinearContourLabelChang2004 {
 		input.data = TEST1;
 
 		ImageSInt32 labeled = new ImageSInt32(input.width,input.height);
-		LinearContourLabelChang2004 alg = new LinearContourLabelChang2004(4);
+		LinearContourLabelChang2004 alg = new LinearContourLabelChang2004(ConnectRule.FOUR);
 		alg.process(input, labeled);
 
 		assertEquals(2, alg.getContours().size);
@@ -111,7 +112,7 @@ public class TestLinearContourLabelChang2004 {
 		input.data = TEST1;
 
 		ImageSInt32 labeled = new ImageSInt32(input.width,input.height);
-		LinearContourLabelChang2004 alg = new LinearContourLabelChang2004(8);
+		LinearContourLabelChang2004 alg = new LinearContourLabelChang2004(ConnectRule.EIGHT);
 		alg.process(input, labeled);
 
 		assertEquals(1, alg.getContours().size);
@@ -124,7 +125,7 @@ public class TestLinearContourLabelChang2004 {
 		input.data = TEST2;
 
 		ImageSInt32 labeled = new ImageSInt32(input.width,input.height);
-		LinearContourLabelChang2004 alg = new LinearContourLabelChang2004(4);
+		LinearContourLabelChang2004 alg = new LinearContourLabelChang2004(ConnectRule.FOUR);
 		alg.process(input,labeled);
 
 		assertEquals(14,alg.getContours().size);
@@ -137,7 +138,7 @@ public class TestLinearContourLabelChang2004 {
 		input.data = TEST2;
 
 		ImageSInt32 labeled = new ImageSInt32(input.width,input.height);
-		LinearContourLabelChang2004 alg = new LinearContourLabelChang2004(8);
+		LinearContourLabelChang2004 alg = new LinearContourLabelChang2004(ConnectRule.EIGHT);
 		alg.process(input,labeled);
 
 		assertEquals(4,alg.getContours().size);
@@ -150,7 +151,7 @@ public class TestLinearContourLabelChang2004 {
 		input.data = TEST4;
 
 		ImageSInt32 labeled = new ImageSInt32(input.width,input.height);
-		LinearContourLabelChang2004 alg = new LinearContourLabelChang2004(4);
+		LinearContourLabelChang2004 alg = new LinearContourLabelChang2004(ConnectRule.FOUR);
 		alg.process(input,labeled);
 
 		assertEquals(1, alg.getContours().size);
@@ -163,7 +164,7 @@ public class TestLinearContourLabelChang2004 {
 		input.data = TEST4;
 
 		ImageSInt32 labeled = new ImageSInt32(input.width,input.height);
-		LinearContourLabelChang2004 alg = new LinearContourLabelChang2004(8);
+		LinearContourLabelChang2004 alg = new LinearContourLabelChang2004(ConnectRule.EIGHT);
 		alg.process(input, labeled);
 
 		assertEquals(1,alg.getContours().size);
@@ -179,7 +180,7 @@ public class TestLinearContourLabelChang2004 {
 		input.data = TEST3;
 
 		ImageSInt32 labeled = new ImageSInt32(input.width,input.height);
-		LinearContourLabelChang2004 alg = new LinearContourLabelChang2004(8);
+		LinearContourLabelChang2004 alg = new LinearContourLabelChang2004(ConnectRule.EIGHT);
 		alg.process(input,labeled);
 
 		assertEquals(1,alg.getContours().size);

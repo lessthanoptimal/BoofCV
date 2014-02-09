@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,6 +21,7 @@ package boofcv.alg.filter.binary;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.misc.PerformerBase;
 import boofcv.misc.ProfileOperation;
+import boofcv.struct.ConnectRule;
 import boofcv.struct.image.ImageSInt32;
 import boofcv.struct.image.ImageUInt8;
 
@@ -44,7 +45,7 @@ public class BenchmarkBinaryBlobLabeling {
 
 	public static class NewAlg8 extends PerformerBase {
 
-		LinearContourLabelChang2004 alg = new LinearContourLabelChang2004(8);
+		LinearContourLabelChang2004 alg = new LinearContourLabelChang2004(ConnectRule.EIGHT);
 
 		@Override
 		public void process() {
@@ -54,7 +55,7 @@ public class BenchmarkBinaryBlobLabeling {
 
 	public static class NewAlg4 extends PerformerBase {
 
-		LinearContourLabelChang2004 alg = new LinearContourLabelChang2004(4);
+		LinearContourLabelChang2004 alg = new LinearContourLabelChang2004(ConnectRule.FOUR);
 
 		@Override
 		public void process() {

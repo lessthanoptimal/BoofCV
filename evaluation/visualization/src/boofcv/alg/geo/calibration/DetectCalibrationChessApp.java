@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -247,7 +247,7 @@ public class DetectCalibrationChessApp<T extends ImageSingleBand, D extends Imag
 		DetectQuadBlobsBinary detectBlobs = alg.getFindBound().getDetectBlobs();
 
 		int numLabels = detectBlobs.getNumLabels();
-		VisualizeBinaryData.renderLabeled(detectBlobs.getLabeledImage(), numLabels, workImage);
+		VisualizeBinaryData.renderLabeledBG(detectBlobs.getLabeledImage(), numLabels, workImage);
 
 		// put a mark in the center of blobs that were declared as being valid
 		Graphics2D g2 = workImage.createGraphics();

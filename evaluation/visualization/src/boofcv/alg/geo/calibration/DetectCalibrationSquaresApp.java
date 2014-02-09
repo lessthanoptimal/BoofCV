@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -161,7 +161,7 @@ public class DetectCalibrationSquaresApp
 
 			case 2:
 				int numLabels = alg.getNumberOfLabels();
-				VisualizeBinaryData.renderLabeled(alg.getBlobs(),numLabels,workImage);
+				VisualizeBinaryData.renderLabeledBG(alg.getBlobs(), numLabels, workImage);
 				break;
 
 			default:

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -199,15 +199,44 @@ public class VisualizeBinaryData {
 		return out;
 	}
 
-	public static BufferedImage renderLabeled(ImageSInt32 labelImage, int numColors, BufferedImage out) {
+	/**
+	 * Renders a labeled image where label=0 is assumed to be the background and is always set to black.  All
+	 * other labels are assigned a random color.
+	 *
+	 * @param labelImage Labeled image with background having a value of 0
+	 * @param numRegions Number of labeled in the image, excluding the background.
+	 * @param out Output image.  If null a new image is declared
+	 * @return Colorized labeled image
+	 */
+	public static BufferedImage renderLabeledBG(ImageSInt32 labelImage, int numRegions, BufferedImage out) {
 
-		int colors[] = new int[numColors+1];
+		int colors[] = new int[numRegions+1];
 
 		Random rand = new Random(123);
 		for( int i = 0; i < colors.length; i++ ) {
 			colors[i] = rand.nextInt();
 		}
 		colors[0] = 0;
+
+		return renderLabeled(labelImage, colors, out);
+	}
+
+	/**
+	 * Renders a labeled where each region is assigned a random color.
+	 *
+	 * @param labelImage Labeled image with labels from 0 to numRegions-1
+	 * @param numRegions Number of labeled in the image
+	 * @param out Output image.  If null a new image is declared
+	 * @return Colorized labeled image
+	 */
+	public static BufferedImage renderLabeled(ImageSInt32 labelImage, int numRegions, BufferedImage out) {
+
+		int colors[] = new int[numRegions];
+
+		Random rand = new Random(123);
+		for( int i = 0; i < colors.length; i++ ) {
+			colors[i] = rand.nextInt();
+		}
 
 		return renderLabeled(labelImage, colors, out);
 	}

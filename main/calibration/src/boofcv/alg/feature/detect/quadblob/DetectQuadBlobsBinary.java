@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,6 +20,7 @@ package boofcv.alg.feature.detect.quadblob;
 
 import boofcv.alg.filter.binary.Contour;
 import boofcv.alg.filter.binary.LinearContourLabelChang2004;
+import boofcv.struct.ConnectRule;
 import boofcv.struct.image.ImageSInt32;
 import boofcv.struct.image.ImageUInt8;
 import georegression.geometry.UtilPolygons2D_I32;
@@ -60,7 +61,7 @@ public class DetectQuadBlobsBinary {
 	private int minimumBlobCount;
 
 	// computes the contour around binary images
-	LinearContourLabelChang2004 contourAlg = new LinearContourLabelChang2004(8);
+	LinearContourLabelChang2004 contourAlg = new LinearContourLabelChang2004(ConnectRule.EIGHT);
 
 	// labeled blobs blobs found in the binary image
 	ImageSInt32 labeledBlobs = new ImageSInt32(1,1);

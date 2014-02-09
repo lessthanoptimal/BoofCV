@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,6 +26,7 @@ import boofcv.alg.feature.detect.grid.UtilCalibrationGrid;
 import boofcv.alg.filter.binary.BinaryImageOps;
 import boofcv.alg.filter.binary.Contour;
 import boofcv.alg.filter.binary.GThresholdImageOps;
+import boofcv.struct.ConnectRule;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSInt32;
 import boofcv.struct.image.ImageUInt8;
@@ -296,7 +297,7 @@ public class RefineCornerSegmentFit {
 	 */
 	private void removeBinaryNoise(ImageUInt8 binary) {
 		// remove potential noise by only saving the largest cluster
-		List<Contour> contours = BinaryImageOps.contour(binary, 4, blobs);
+		List<Contour> contours = BinaryImageOps.contour(binary, ConnectRule.FOUR, blobs);
 
 		// find the largest blob
 		Contour largest = null;

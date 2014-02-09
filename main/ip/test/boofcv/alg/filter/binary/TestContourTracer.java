@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,7 @@
 package boofcv.alg.filter.binary;
 
 import boofcv.alg.misc.ImageMiscOps;
+import boofcv.struct.ConnectRule;
 import boofcv.struct.image.ImageSInt32;
 import boofcv.struct.image.ImageUInt8;
 import georegression.struct.point.Point2D_I32;
@@ -51,8 +52,8 @@ public class TestContourTracer {
 		ImageUInt8 pattern = new ImageUInt8(1,1);
 		ImageMiscOps.fill(pattern,1);
 
-		shiftContourCheck(pattern,1,4);
-		shiftContourCheck(pattern,1,8);
+		shiftContourCheck(pattern,1,ConnectRule.FOUR);
+		shiftContourCheck(pattern,1,ConnectRule.EIGHT);
 	}
 
 	@Test
@@ -60,8 +61,8 @@ public class TestContourTracer {
 		ImageUInt8 pattern = new ImageUInt8(2,1);
 		ImageMiscOps.fill(pattern,1);
 
-		shiftContourCheck(pattern,2,4);
-		shiftContourCheck(pattern,2,8);
+		shiftContourCheck(pattern,2,ConnectRule.FOUR);
+		shiftContourCheck(pattern,2,ConnectRule.EIGHT);
 	}
 
 	@Test
@@ -69,8 +70,8 @@ public class TestContourTracer {
 		ImageUInt8 pattern = new ImageUInt8(1,2);
 		ImageMiscOps.fill(pattern,1);
 
-		shiftContourCheck(pattern,2,4);
-		shiftContourCheck(pattern,2,8);
+		shiftContourCheck(pattern,2,ConnectRule.FOUR);
+		shiftContourCheck(pattern,2,ConnectRule.EIGHT);
 	}
 
 	@Test
@@ -78,8 +79,8 @@ public class TestContourTracer {
 		ImageUInt8 pattern = new ImageUInt8(2,2);
 		ImageMiscOps.fill(pattern,1);
 
-		shiftContourCheck(pattern,4,4);
-		shiftContourCheck(pattern,4,8);
+		shiftContourCheck(pattern,4,ConnectRule.FOUR);
+		shiftContourCheck(pattern,4,ConnectRule.EIGHT);
 	}
 
 	@Test
@@ -91,7 +92,7 @@ public class TestContourTracer {
 
 		ImageUInt8 pattern = stringToImage(s);
 
-		shiftContourCheck(pattern,4,8);
+		shiftContourCheck(pattern,4,ConnectRule.EIGHT);
 	}
 
 	@Test
@@ -103,7 +104,7 @@ public class TestContourTracer {
 
 		ImageUInt8 pattern = stringToImage(s);
 
-		shiftContourCheck(pattern,8,8);
+		shiftContourCheck(pattern,8,ConnectRule.EIGHT);
 	}
 
 	@Test
@@ -116,7 +117,7 @@ public class TestContourTracer {
 		ImageUInt8 input = stringToImage(s);
 		ImageSInt32 label = new ImageSInt32(input.width,input.height);
 
-		ContourTracer alg = new ContourTracer(8);
+		ContourTracer alg = new ContourTracer(ConnectRule.EIGHT);
 
 		// process the image
 		alg.setInputs(addBorder(input),label,queue);
@@ -135,7 +136,7 @@ public class TestContourTracer {
 
 		ImageUInt8 pattern = stringToImage(s);
 
-		shiftContourCheck(pattern,12,4);
+		shiftContourCheck(pattern,12,ConnectRule.FOUR);
 	}
 
 	@Test
@@ -148,7 +149,7 @@ public class TestContourTracer {
 		ImageUInt8 input = stringToImage(s);
 		ImageSInt32 label = new ImageSInt32(input.width,input.height);
 
-		ContourTracer alg = new ContourTracer(8);
+		ContourTracer alg = new ContourTracer(ConnectRule.EIGHT);
 
 		// process the image
 		alg.setInputs(addBorder(input),label,queue);
@@ -168,7 +169,7 @@ public class TestContourTracer {
 		ImageUInt8 input = stringToImage(s);
 		ImageSInt32 label = new ImageSInt32(input.width,input.height);
 
-		ContourTracer alg = new ContourTracer(4);
+		ContourTracer alg = new ContourTracer(ConnectRule.FOUR);
 
 		// process the image
 		alg.setInputs(addBorder(input),label,queue);
@@ -198,7 +199,7 @@ public class TestContourTracer {
 		ImageUInt8 after = stringToImage(a);
 		ImageSInt32 label = new ImageSInt32(before.width,before.height);
 
-		ContourTracer alg = new ContourTracer(8);
+		ContourTracer alg = new ContourTracer(ConnectRule.EIGHT);
 
 		// process the image
 		alg.setInputs(before,label,queue);
@@ -218,7 +219,7 @@ public class TestContourTracer {
 	 * Given a pattern that is only a contour, it sees if it has the expected results when the pattern
 	 * is shifted to every possible location in the image
 	 */
-	public void shiftContourCheck( ImageUInt8 pattern , int expectedSize , int rule ) {
+	public void shiftContourCheck( ImageUInt8 pattern , int expectedSize , ConnectRule rule ) {
 		ContourTracer alg = new ContourTracer(rule);
 		ImageUInt8 input = new ImageUInt8(4,5);
 		ImageSInt32 label = new ImageSInt32(input.width,input.height);

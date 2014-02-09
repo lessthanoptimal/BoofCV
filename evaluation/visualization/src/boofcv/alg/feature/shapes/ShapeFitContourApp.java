@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,6 +29,7 @@ import boofcv.gui.feature.VisualizeShapes;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.PathLabel;
+import boofcv.struct.ConnectRule;
 import boofcv.struct.PointIndex_I32;
 import boofcv.struct.image.ImageUInt8;
 import georegression.metric.UtilAngle;
@@ -211,7 +212,7 @@ public class ShapeFitContourApp
 		BinaryImageOps.dilate8(filtered, binary);
 
 		// Find the contour around the shapes
-		contours = BinaryImageOps.contour(binary,8,null);
+		contours = BinaryImageOps.contour(binary, ConnectRule.EIGHT,null);
 
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,6 +31,7 @@ import boofcv.gui.binary.VisualizeBinaryData;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.PathLabel;
+import boofcv.struct.ConnectRule;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSInt32;
 import boofcv.struct.image.ImageSingleBand;
@@ -62,7 +63,7 @@ public class DemoBinaryImageLabelOpsApp<T extends ImageSingleBand> extends Selec
 
 	FilterImageInterface<ImageUInt8, ImageUInt8> filter1;
 	FilterImageInterface<ImageUInt8, ImageUInt8> filter2;
-	int connectRule;
+	ConnectRule connectRule;
 	BufferedImage work;
 	int colors[];
 
@@ -165,7 +166,7 @@ public class DemoBinaryImageLabelOpsApp<T extends ImageSingleBand> extends Selec
 	public void refreshAll(Object[] cookies) {
 		filter1 = (FilterImageInterface<ImageUInt8, ImageUInt8>)cookies[0];
 		filter2 = (FilterImageInterface<ImageUInt8, ImageUInt8>)cookies[1];
-		connectRule = (Integer)cookies[2];
+		connectRule = (Integer)cookies[2] == 4 ? ConnectRule.FOUR : ConnectRule.EIGHT;
 		performWork();
 	}
 
@@ -179,7 +180,7 @@ public class DemoBinaryImageLabelOpsApp<T extends ImageSingleBand> extends Selec
 				filter2 = (FilterImageInterface<ImageUInt8, ImageUInt8>)cookie;
 				break;
 			case 2:
-				connectRule = (Integer)cookie;
+				connectRule = (Integer)cookie == 4 ? ConnectRule.FOUR : ConnectRule.EIGHT;
 				break;
 		}
 

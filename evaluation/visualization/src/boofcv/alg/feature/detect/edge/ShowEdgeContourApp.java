@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,6 +29,7 @@ import boofcv.gui.binary.VisualizeBinaryData;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.PathLabel;
+import boofcv.struct.ConnectRule;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSInt32;
 import boofcv.struct.image.ImageSingleBand;
@@ -67,7 +68,7 @@ public class ShowEdgeContourApp<T extends ImageSingleBand, D extends ImageSingle
 
 	int previousBlur;
 	CannyEdge<T,D> canny;
-	LinearContourLabelChang2004 contour = new LinearContourLabelChang2004(8);
+	LinearContourLabelChang2004 contour = new LinearContourLabelChang2004(ConnectRule.EIGHT);
 
 	public ShowEdgeContourApp(Class<T> imageType, Class<D> derivType) {
 		super(1);

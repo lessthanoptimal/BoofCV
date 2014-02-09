@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,6 +20,7 @@ package boofcv.alg.filter.binary;
 
 import boofcv.alg.filter.binary.impl.CompareToBinaryNaive;
 import boofcv.alg.misc.ImageMiscOps;
+import boofcv.struct.ConnectRule;
 import boofcv.struct.image.ImageSInt32;
 import boofcv.struct.image.ImageUInt8;
 import boofcv.testing.BoofTesting;
@@ -142,7 +143,7 @@ public class TestBinaryImageOps {
 		ImageMiscOps.fillRectangle(expected,1,2,3,4,5);
 		expected.set(9,11,2);
 
-		List<Contour> found = BinaryImageOps.contour(input,4,output);
+		List<Contour> found = BinaryImageOps.contour(input, ConnectRule.FOUR,output);
 
 		assertEquals(2,found.size());
 		BoofTesting.assertEquals(expected,output,0);

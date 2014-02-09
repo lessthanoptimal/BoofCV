@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,6 +27,7 @@ import boofcv.core.image.ConvertBufferedImage;
 import boofcv.gui.binary.VisualizeBinaryData;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.image.UtilImageIO;
+import boofcv.struct.ConnectRule;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSInt32;
 import boofcv.struct.image.ImageUInt8;
@@ -64,7 +65,7 @@ public class ExampleBinaryOps {
 		filtered = BinaryImageOps.dilate8(filtered, null);
 
 		// Detect blobs inside the image using an 8-connect rule
-		List<Contour> contours = BinaryImageOps.contour(filtered, 8, label);
+		List<Contour> contours = BinaryImageOps.contour(filtered, ConnectRule.EIGHT, label);
 
 		// colors of contours
 		int colorExternal = 0xFFFFFF;
@@ -73,7 +74,7 @@ public class ExampleBinaryOps {
 		// display the results
 		BufferedImage visualBinary = VisualizeBinaryData.renderBinary(binary, null);
 		BufferedImage visualFiltered = VisualizeBinaryData.renderBinary(filtered, null);
-		BufferedImage visualLabel = VisualizeBinaryData.renderLabeled(label, contours.size(), null);
+		BufferedImage visualLabel = VisualizeBinaryData.renderLabeledBG(label, contours.size(), null);
 		BufferedImage visualContour = VisualizeBinaryData.renderContours(contours,colorExternal,colorInternal,
 				input.width,input.height,null);
 
