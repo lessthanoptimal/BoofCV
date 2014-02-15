@@ -20,8 +20,6 @@ package boofcv.alg.segmentation.ms;
 
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.misc.ImageMiscOps;
-import boofcv.alg.weights.WeightDistance_F32;
-import boofcv.alg.weights.WeightPixel_F32;
 import boofcv.struct.feature.ColorQueue_F32;
 import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.point.Point2D_F32;
@@ -47,10 +45,9 @@ public class SegmentMeanShiftSearchGray<T extends ImageSingleBand> extends Segme
 
 	public SegmentMeanShiftSearchGray(int maxIterations, float convergenceTol,
 									  InterpolatePixelS<T> interpolate,
-									  WeightPixel_F32 weightSpacial,
-									  WeightDistance_F32 weightGray,
+									  int radiusX , int radiusY , float maxColorDistance,
 									  boolean fast ) {
-		super(maxIterations,convergenceTol,weightSpacial,weightGray,fast);
+		super(maxIterations,convergenceTol,radiusX,radiusY,maxColorDistance,fast);
 		this.interpolate = interpolate;
 
 		modeColor = new ColorQueue_F32(1);
@@ -155,13 +152,11 @@ public class SegmentMeanShiftSearchGray<T extends ImageSingleBand> extends Segme
 					interpolate.isInFastBounds(x0 + widthX - 1, y0 + widthY - 1)) {
 				for( int yy = 0; yy < widthY; yy++ ) {
 					for( int xx = 0; xx < widthX; xx++ ) {
-						float ws = weightSpacial.weightIndex(kernelIndex++);
-						// compute distance between gray scale value as euclidean squared
+						float ds = spacialTable[kernelIndex++];
 						float pixelGray = interpolate.get_fast(x0 + xx, y0 + yy);
-						float d = pixelGray - gray;
-						float wg = weightColor.weight(d*d);
-						// Total weight is the combination of spacial and color values
-						float weight = ws*wg;
+						float dc = pixelGray - gray;
+						dc = dc*dc/maxColorDistanceSq;
+						float weight = dc > 1 ? 0 : weight((ds+dc)/2f);
 						total += weight;
 						sumX += weight*(xx+x0);
 						sumY += weight*(yy+y0);
@@ -187,11 +182,11 @@ public class SegmentMeanShiftSearchGray<T extends ImageSingleBand> extends Segme
 							continue;
 						}
 
-						float ws = weightSpacial.weightIndex(kernelIndex);
-						float pixelGray = interpolate.get(sampleX, sampleY);
-						float d = pixelGray - gray;
-						float wg = weightColor.weight(d*d);
-						float weight = ws*wg;
+						float ds = spacialTable[kernelIndex];
+						float pixelGray = interpolate.get(x0 + xx, y0 + yy);
+						float dc = pixelGray - gray;
+						dc = dc*dc/maxColorDistanceSq;
+						float weight = dc > 1 ? 0 : weight((ds+dc)/2f);
 						total += weight;
 						sumX += weight*(xx+x0);
 						sumY += weight*(yy+y0);

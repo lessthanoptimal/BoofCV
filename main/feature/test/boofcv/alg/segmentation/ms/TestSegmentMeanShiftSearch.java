@@ -18,9 +18,6 @@
 
 package boofcv.alg.segmentation.ms;
 
-import boofcv.alg.weights.WeightDistance_F32;
-import boofcv.alg.weights.WeightPixelUniform_F32;
-import boofcv.alg.weights.WeightPixel_F32;
 import boofcv.struct.image.ImageBase;
 import org.junit.Test;
 
@@ -33,9 +30,7 @@ public class TestSegmentMeanShiftSearch {
 
 	@Test
 	public void constructor() {
-		WeightPixel_F32 weightSpacial = new WeightPixelUniform_F32(2,3);
-
-		SegmentMeanShiftSearch alg = new Dummy(1,2,weightSpacial,null);
+		SegmentMeanShiftSearch alg = new Dummy(1,2,2,3,100);
 
 		assertEquals(5,alg.widthX);
 		assertEquals(7,alg.widthY);
@@ -51,10 +46,23 @@ public class TestSegmentMeanShiftSearch {
 		assertEquals(8,found,1e-4);
 	}
 
+	@Test
+	public void weight() {
+		SegmentMeanShiftSearch alg = new Dummy(1,2,2,3,100);
+
+		for( int i = 0; i < 1000; i++ ) {
+			float val = i/999f;
+			float expected = (float)Math.exp(-val);
+			float found = alg.weight(val);
+
+			assertEquals(expected,found,1e-2);
+		}
+	}
+
 	public static class Dummy extends SegmentMeanShiftSearch {
 
-		public Dummy(int maxIterations, float convergenceTol, WeightPixel_F32 weightSpacial, WeightDistance_F32 weightColor) {
-			super(maxIterations, convergenceTol, weightSpacial, weightColor,false);
+		public Dummy(int maxIterations, float convergenceTol, int radiusX , int radiusY , int radiusColor ) {
+			super(maxIterations, convergenceTol,radiusX,radiusY,radiusColor,false);
 		}
 
 		@Override

@@ -27,10 +27,6 @@ import boofcv.alg.segmentation.fh04.SegmentFelzenszwalbHuttenlocher04;
 import boofcv.alg.segmentation.fh04.impl.*;
 import boofcv.alg.segmentation.ms.*;
 import boofcv.alg.segmentation.slic.*;
-import boofcv.alg.weights.WeightDistanceUniform_F32;
-import boofcv.alg.weights.WeightDistance_F32;
-import boofcv.alg.weights.WeightPixelUniform_F32;
-import boofcv.alg.weights.WeightPixel_F32;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.ConnectRule;
 import boofcv.struct.image.ImageBase;
@@ -88,9 +84,6 @@ public class FactorySegmentationAlg {
 		int spacialRadius = config.spacialRadius;
 		float colorRadius = config.colorRadius;
 
-		WeightPixel_F32 weightSpacial = new WeightPixelUniform_F32(spacialRadius,spacialRadius);
-		WeightDistance_F32 weightColor = new WeightDistanceUniform_F32(colorRadius*colorRadius);
-
 		int maxIterations = 20;
 		float convergenceTol = 0.1f;
 
@@ -99,16 +92,16 @@ public class FactorySegmentationAlg {
 		if( imageType.getFamily() == ImageType.Family.SINGLE_BAND ) {
 			InterpolatePixelS interp = FactoryInterpolation.bilinearPixelS(imageType.getImageClass());
 			search = new SegmentMeanShiftSearchGray(maxIterations,convergenceTol,interp,
-					weightSpacial,weightColor,config.fast);
+					spacialRadius,spacialRadius,colorRadius,config.fast);
 		} else {
 			InterpolatePixelMB interp = FactoryInterpolation.createPixelMB(0,255,
 					TypeInterpolate.BILINEAR,(ImageType)imageType);
 			search = new SegmentMeanShiftSearchColor(maxIterations,convergenceTol,interp,
-					weightSpacial,weightColor,config.fast,imageType);
+					spacialRadius,spacialRadius,colorRadius,config.fast,imageType);
 		}
 
 		ComputeRegionMeanColor<T> regionColor = regionMeanColor(imageType);
-		MergeRegionMeanShift merge = new MergeRegionMeanShift(3,colorRadius/2);
+		MergeRegionMeanShift merge = new MergeRegionMeanShift(spacialRadius/2+1,Math.max(1,colorRadius/2));
 
 		MergeSmallRegions<T> prune = config.minimumRegionSize >= 2 ?
 				new MergeSmallRegions<T>(config.minimumRegionSize,config.connectRule,regionColor) : null;

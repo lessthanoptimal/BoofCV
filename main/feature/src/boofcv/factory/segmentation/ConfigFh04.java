@@ -27,9 +27,9 @@ import boofcv.struct.ConnectRule;
  */
 public class ConfigFh04 {
 	/**
-	 * Tuning parameter.  Larger regions are preferred for larger values of K.  Try 300
+	 * Tuning parameter.  Larger regions are preferred for larger values of K.  Try 100
 	 */
-	public float K = 300;
+	public float K = 100;
 	/**
 	 * Minimum allowed size of a region.
 	 */
@@ -46,6 +46,11 @@ public class ConfigFh04 {
 	public int approximateSortBins = 0;
 
 	public ConfigFh04() {
+	}
+
+	public ConfigFh04(float k, int minimumRegionSize) {
+		K = k;
+		this.minimumRegionSize = minimumRegionSize;
 	}
 
 	public ConfigFh04(int k, int minimumRegionSize, ConnectRule connectRule) {

@@ -18,8 +18,6 @@
 
 package boofcv.alg.segmentation.ms;
 
-import boofcv.alg.weights.WeightDistance_F32;
-import boofcv.alg.weights.WeightPixel_F32;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageSInt32;
 import georegression.struct.point.Point2D_I32;
@@ -29,11 +27,9 @@ import org.ddogleg.struct.GrowQueue_I32;
 /**
  * <p>
  * Performs the search step in mean-shift image segmentation [1].  The mode of a pixel is the point at which mean-shift
- * converges when initialized at that pixel.  Pixels which have the same mode belong to the same segment.
- * Likelihood (or weights) used to compute the mean value comes from a 2D spacial kernel and color distance functions.
- * Color distance is computed as the difference between the mean and the color value at a pixel which is then
- * converted into a weight.  The two weights are then multiplied together and normalized based on the total
- * weight from all the samples.
+ * converges when initialized at that pixel.  Pixels which have the same mode belong to the same segment. The weight
+ * kernel G(|x-y|^2/h) has independent normalization factors h for spacial and color components.  A precomputed
+ * Normal distribution is used for the weight kernel.
  * </p>
  * <p>
  * Output is provided in the form of an image where each pixel contains the index of a region the pixel belongs to.
@@ -53,10 +49,10 @@ import org.ddogleg.struct.GrowQueue_I32;
  * <p>
  * NOTES:
  * <ul>
- * <li>The kernel's spacial radius is specified by the radius of 'weightSpacial' and the gray/color radius is specified
- * by 'weightGray'.  Those two functions also specified the amount of weight assigned to each sample in the
- * mean-shift kernel based on its distance from the spacial and color means.<li>
- * <li>The distance passed into the 'weightColor' function is the Euclidean distance squared.E.g. ||a-b||<sup>2</sup></li>
+ * <li>Spacial distance is normalized by dividing the found Euclidean distance squared by the maximum possible
+ * Euclidean distance squared, thus ensuring it will be between 0 and 1.</li>
+ * <li>Color distance is normalized by dividing it by the maximum allows Euclidean distance squared.  If its distance
+ * is more than the maximum allowed value then G() will be zero.</li>
  * <li>Image edges are handled by truncating the spacial kernel.  This truncation
  * will create an asymmetric kernel, but there is really no good way to handle image edges.</li>
  * </ul>
@@ -80,13 +76,11 @@ public abstract class SegmentMeanShiftSearch<T extends ImageBase> {
 	protected int maxIterations;
 	protected float convergenceTol;
 
-	// specifies the size of the mean-shift kernel
+	// specifies the size of the mean-shift kernel in spacial pixels
 	protected int radiusX,radiusY;
 	protected int widthX,widthY;
-	// Sample weight given location relative to center
-	protected WeightPixel_F32 weightSpacial;
-	// Sample weight given difference in gray scale value
-	protected WeightDistance_F32 weightColor;
+	// specifies the maximum Euclidean distance squared for the color components
+	protected float maxColorDistanceSq;
 
 	// converts a pixel location into the index of the mode that mean-shift converged to
 	protected ImageSInt32 pixelToMode = new ImageSInt32(1,1);
@@ -104,6 +98,12 @@ public abstract class SegmentMeanShiftSearch<T extends ImageBase> {
 	// storage for segment colors
 	protected FastQueue<float[]> modeColor;
 
+	// quick lookup for spacial distance
+	protected float[] spacialTable;
+
+	// quick lookup for Gaussian kernel
+	protected float weightTable[] = new float[100];
+
 	// If true it will use the fast approximation of mean-shift
 	boolean fast;
 
@@ -118,24 +118,40 @@ public abstract class SegmentMeanShiftSearch<T extends ImageBase> {
 	 *
 	 * @param maxIterations Maximum number of mean-shift iterations.  Try 30
 	 * @param convergenceTol When the change is less than this amount stop.  Try 0.005
-	 * @param weightSpacial Weighting function/kernel for spacial component
-	 * @param weightColor Weighting function/kernel for distance of color component
+	 * @param radiusX Spacial kernel radius x-axis
+	 * @param radiusY Spacial kernel radius y-axis
+	 * @param maxColorDistance Maximum allowed Euclidean distance squared for the color component
 	 * @param fast Improve runtime by approximating running mean-shift on each pixel. Try true.
 	 */
 	public SegmentMeanShiftSearch(int maxIterations, float convergenceTol,
-								  WeightPixel_F32 weightSpacial,
-								  WeightDistance_F32 weightColor,
+								  int radiusX , int radiusY , float maxColorDistance ,
 								  boolean fast ) {
 		this.maxIterations = maxIterations;
 		this.convergenceTol = convergenceTol;
-		this.weightSpacial = weightSpacial;
-		this.weightColor = weightColor;
 		this.fast = fast;
 
-		this.radiusX = weightSpacial.getRadiusX();
-		this.radiusY = weightSpacial.getRadiusY();
+		this.radiusX = radiusX;
+		this.radiusY = radiusY;
 		this.widthX = radiusX*2+1;
 		this.widthY = radiusY*2+1;
+
+		this.maxColorDistanceSq = maxColorDistance*maxColorDistance;
+
+		// precompute the distance each pixel is from the sample point
+		// normalize the values such that the maximum distance will be 1
+		spacialTable = new float[widthX*widthY];
+		int indexKernel = 0;
+		float maxRadius = radiusX*radiusX + radiusY*radiusY;
+		for( int y = -radiusY; y <= radiusY; y++ ) {
+			for( int x = -radiusX; x <= radiusX; x++ ) {
+				spacialTable[indexKernel++] = (x*x + y*y)/maxRadius;
+			}
+		}
+
+		// precompute the weight table for inputs from 0 to 1, inclusive
+		for( int i = 0; i < weightTable.length; i++ ) {
+			weightTable[i] = (float)Math.exp(-i/(float)(weightTable.length-1));
+		}
 	}
 
 	/**
@@ -155,6 +171,27 @@ public abstract class SegmentMeanShiftSearch<T extends ImageBase> {
 			ret += d*d;
 		}
 		return ret;
+	}
+
+	/**
+	 * Returns the weight given the normalized distance.  Instead of computing the kernel distance every time
+	 * a lookup table with linear interpolation is used.  The distance has a domain from 0 to 1, inclusive
+	 *
+	 * @param distance Normalized Euclidean distance squared.  From 0 to 1.
+	 * @return Weight.
+	 */
+	protected float weight( float distance ) {
+		float findex = distance*100f;
+		int index = (int)findex;
+
+		if( index >= 99 )
+			return weightTable[99];
+
+		float sample0 = weightTable[index];
+		float sample1 = weightTable[index+1];
+
+		float w = findex-index;
+		return sample0*(1f-w) + sample1*w;
 	}
 
 	/**

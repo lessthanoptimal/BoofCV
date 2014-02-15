@@ -23,6 +23,7 @@ import boofcv.alg.filter.blur.GBlurImageOps;
 import boofcv.alg.segmentation.ComputeRegionMeanColor;
 import boofcv.alg.segmentation.ImageSegmentationOps;
 import boofcv.core.image.ConvertBufferedImage;
+import boofcv.factory.segmentation.ConfigFh04;
 import boofcv.factory.segmentation.FactoryImageSegmentation;
 import boofcv.factory.segmentation.FactorySegmentationAlg;
 import boofcv.gui.image.ShowImages;
@@ -59,7 +60,11 @@ public class ExampleImageSegmentation {
 		ImageSInt32 pixelToSegment = new ImageSInt32(color.width,color.height);
 
 		// Segmentation magic happens here
-		alg.segment(color,pixelToSegment);
+		for( int i = 0; i < 1; i++ ) {
+			long before = System.currentTimeMillis();
+			alg.segment(color,pixelToSegment);
+			System.out.println("Time "+(System.currentTimeMillis()-before));
+		}
 
 		// Displays the results
 		visualize(pixelToSegment,color,alg.getTotalSegments());
@@ -141,8 +146,10 @@ public class ExampleImageSegmentation {
 	}
 
 	public static void main(String[] args) {
-		// TODO make sure the image is actually in the data directory
-		BufferedImage image = UtilImageIO.loadImage("/home/pja/Desktop/segmentation/example-orig.jpg");
+		BufferedImage image = UtilImageIO.loadImage("../data/applet/segment/berkeley_horses.jpg");
+//		BufferedImage image = UtilImageIO.loadImage("../data/applet/segment/berkeley_kangaroo.jpg");
+//		BufferedImage image = UtilImageIO.loadImage("../data/applet/segment/berkeley_man.jpg");
+//		BufferedImage image = UtilImageIO.loadImage("../data/applet/segment/mountain_pines_people.jpg");
 
 		// Select input image type.  Some algorithms behave different depending on image type
 		ImageType<MultiSpectral<ImageFloat32>> imageType = ImageType.ms(3,ImageFloat32.class);
@@ -152,7 +159,7 @@ public class ExampleImageSegmentation {
 
 //		ImageSegmentation alg = FactoryImageSegmentation.meanShift(null, imageType);
 //		ImageSegmentation alg = FactoryImageSegmentation.slic(new ConfigSlic(800), imageType);
-		ImageSegmentation alg = FactoryImageSegmentation.fh04(null, imageType);
+		ImageSegmentation alg = FactoryImageSegmentation.fh04(new ConfigFh04(100,30), imageType);
 
 		// Convert image into BoofCV format
 		ImageBase color = imageType.createImage(image.getWidth(),image.getHeight());

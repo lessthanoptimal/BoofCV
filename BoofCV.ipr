@@ -423,6 +423,7 @@
       <module fileurl="file://$PROJECT_DIR$/main/geo/BoofCV Geometric Vision.iml" filepath="$PROJECT_DIR$/main/geo/BoofCV Geometric Vision.iml" />
       <module fileurl="file://$PROJECT_DIR$/main/io/BoofCV IO.iml" filepath="$PROJECT_DIR$/main/io/BoofCV IO.iml" />
       <module fileurl="file://$PROJECT_DIR$/main/ip/BoofCV Image Processing.iml" filepath="$PROJECT_DIR$/main/ip/BoofCV Image Processing.iml" />
+      <module fileurl="file://$PROJECT_DIR$/integration/jcodec/BoofCV JCodec.iml" filepath="$PROJECT_DIR$/integration/jcodec/BoofCV JCodec.iml" />
       <module fileurl="file://$PROJECT_DIR$/integration/openkinect/BoofCV OpenKinect.iml" filepath="$PROJECT_DIR$/integration/openkinect/BoofCV OpenKinect.iml" />
       <module fileurl="file://$PROJECT_DIR$/main/recognition/BoofCV Recognition.iml" filepath="$PROJECT_DIR$/main/recognition/BoofCV Recognition.iml" />
       <module fileurl="file://$PROJECT_DIR$/main/sfm/BoofCV SFM.iml" filepath="$PROJECT_DIR$/main/sfm/BoofCV SFM.iml" />

@@ -20,8 +20,6 @@ package boofcv.alg.segmentation.ms;
 
 import boofcv.alg.interpolate.InterpolatePixelMB;
 import boofcv.alg.misc.ImageMiscOps;
-import boofcv.alg.weights.WeightDistance_F32;
-import boofcv.alg.weights.WeightPixel_F32;
 import boofcv.struct.feature.ColorQueue_F32;
 import boofcv.struct.image.ImageMultiBand;
 import boofcv.struct.image.ImageType;
@@ -54,11 +52,10 @@ public class SegmentMeanShiftSearchColor<T extends ImageMultiBand> extends Segme
 
 	public SegmentMeanShiftSearchColor(int maxIterations, float convergenceTol,
 									   InterpolatePixelMB<T> interpolate,
-									   WeightPixel_F32 weightSpacial,
-									   WeightDistance_F32 weightGray,
+									   int radiusX , int radiusY , float maxColorDistance ,
 									   boolean fast,
 									   ImageType<T> imageType) {
-		super(maxIterations,convergenceTol,weightSpacial,weightGray,fast);
+		super(maxIterations,convergenceTol,radiusX,radiusY,maxColorDistance,fast);
 		this.interpolate = interpolate;
 		this.pixelColor = new float[ imageType.getNumBands() ];
 		this.meanColor = new float[ imageType.getNumBands() ];
@@ -170,13 +167,10 @@ public class SegmentMeanShiftSearchColor<T extends ImageMultiBand> extends Segme
 					interpolate.isInFastBounds(x0 + widthX - 1, y0 + widthY - 1)) {
 				for( int yy = 0; yy < widthY; yy++ ) {
 					for( int xx = 0; xx < widthX; xx++ ) {
-						float ws = weightSpacial.weightIndex(kernelIndex++);
-						// compute distance between gray scale value as euclidean squared
-						interpolate.get_fast(x0 + xx, y0 + yy, pixelColor);
-						float d = distanceSq(pixelColor,meanColor);
-						float wg = weightColor.weight(d);
-						// Total weight is the combination of spacial and color values
-						float weight = ws*wg;
+						float ds = spacialTable[kernelIndex++];
+						interpolate.get(x0 + xx, y0 + yy, pixelColor);
+						float dc = distanceSq(pixelColor,meanColor)/ maxColorDistanceSq;
+						float weight = dc > 1 ? 0 : weight((ds+dc)/2f);
 						total += weight;
 						sumX += weight*(xx+x0);
 						sumY += weight*(yy+y0);
@@ -202,11 +196,10 @@ public class SegmentMeanShiftSearchColor<T extends ImageMultiBand> extends Segme
 							continue;
 						}
 
-						float ws = weightSpacial.weightIndex(kernelIndex);
+						float ds = spacialTable[kernelIndex];
 						interpolate.get(x0 + xx, y0 + yy, pixelColor);
-						float d = distanceSq(pixelColor,meanColor);
-						float wg = weightColor.weight(d);
-						float weight = ws*wg;
+						float dc = distanceSq(pixelColor,meanColor)/ maxColorDistanceSq;
+						float weight = dc > 1 ? 0 : weight((ds+dc)/2f);
 						total += weight;
 						sumX += weight*(xx+x0);
 						sumY += weight*(yy+y0);
