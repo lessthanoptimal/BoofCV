@@ -308,7 +308,7 @@ public class SegmentConfigPanel extends StandardAlgConfigPanel implements Action
 				configMeanShift.minimumRegionSize = ((Number) spinnerSize.getValue()).intValue();
 			} else if( spinnerSpacial == e.getSource() ) {
 				configMeanShift.spacialRadius = ((Number) spinnerSpacial.getValue()).intValue();
-			} else if( spinnerSpacial == e.getSource() ) {
+			} else if( spinnerColor == e.getSource() ) {
 				configMeanShift.colorRadius = ((Number) spinnerColor.getValue()).intValue();
 			} else if( toggleFast == e.getSource() ) {
 				configMeanShift.fast = toggleFast.isSelected();

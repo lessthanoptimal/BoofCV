@@ -22,7 +22,6 @@ import boofcv.alg.interpolate.InterpolatePixelMB;
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.interpolate.TypeInterpolate;
 import boofcv.alg.misc.GImageMiscOps;
-import boofcv.alg.weights.*;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSInt32;
@@ -31,7 +30,6 @@ import boofcv.struct.image.MultiSpectral;
 import georegression.struct.point.Point2D_I32;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_I32;
-import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Random;
@@ -49,14 +47,6 @@ public class TestSegmentMeanShiftSearchColor {
 	ImageType<MultiSpectral<ImageFloat32>> imageType = ImageType.ms(2,ImageFloat32.class);
 	InterpolatePixelMB<MultiSpectral<ImageFloat32>> interp =
 			FactoryInterpolation.createPixelMB(0,255,TypeInterpolate.BILINEAR,imageType);
-	// use a gaussian distribution by default so that the indexes matter
-	WeightPixel_F32 weightSpacial = new WeightPixelGaussian_F32();
-	WeightDistance_F32 weightDist = new WeightDistanceUniform_F32(200);
-
-	@Before
-	public void before() {
-		weightSpacial.setRadius(2, 2);
-	}
 
 	/**
 	 * Process a random image and do a basic sanity check on the output
@@ -69,7 +59,7 @@ public class TestSegmentMeanShiftSearchColor {
 
 		SegmentMeanShiftSearchColor<MultiSpectral<ImageFloat32>> alg =
 				new SegmentMeanShiftSearchColor<MultiSpectral<ImageFloat32>>
-						(30,0.05f,interp,weightSpacial, weightDist,false,imageType);
+						(30,0.05f,interp,2,2,200,false,imageType);
 
 		alg.process(image);
 
@@ -112,11 +102,9 @@ public class TestSegmentMeanShiftSearchColor {
 		GImageMiscOps.fillRectangle(image, 20, 4, 2, 5, 5);
 
 		// works better with this example when its uniform
-		WeightPixel_F32 weightSpacial = new WeightPixelUniform_F32();
-		weightSpacial.setRadius(2,2);
 		SegmentMeanShiftSearchColor<MultiSpectral<ImageFloat32>> alg =
 				new SegmentMeanShiftSearchColor<MultiSpectral<ImageFloat32>>
-						(30,0.05f,interp,weightSpacial, weightDist,false,imageType);
+						(30,0.05f,interp,2,2,3,false,imageType);
 
 		interp.setImage(image);
 		alg.image = image;
@@ -139,7 +127,7 @@ public class TestSegmentMeanShiftSearchColor {
 
 		SegmentMeanShiftSearchColor<MultiSpectral<ImageFloat32>> alg =
 				new SegmentMeanShiftSearchColor<MultiSpectral<ImageFloat32>>
-						(30,0.05f,interp,weightSpacial, weightDist,false,imageType);
+						(30,0.05f,interp,2,2,200,false,imageType);
 
 		interp.setImage(image);
 		alg.image = image;
@@ -170,10 +158,10 @@ public class TestSegmentMeanShiftSearchColor {
 
 		SegmentMeanShiftSearchColor<MultiSpectral<ImageFloat32>> algMB =
 				new SegmentMeanShiftSearchColor<MultiSpectral<ImageFloat32>>
-						(30,0.05f,interpMB,weightSpacial, weightDist,fast,imageType);
+						(30,0.05f,interpMB,2,2,200,fast,imageType);
 
 		SegmentMeanShiftSearchGray<ImageFloat32> algSB =
-				new SegmentMeanShiftSearchGray<ImageFloat32>(30,0.05f,interpSB,weightSpacial, weightDist,fast);
+				new SegmentMeanShiftSearchGray<ImageFloat32>(30,0.05f,interpSB,2,2,200,fast);
 
 		algMB.process(image);
 		algSB.process(image.getBand(0));

@@ -33,7 +33,6 @@ import org.ddogleg.struct.GrowQueue_I32;
  *
  * @author Peter Abeles
  */
-// TODO see if there is a signficant speed up when the rank is kept track of.  merge into the lowest rank
 public class RegionMergeTree {
 
 	// list used to convert the original region ID's into their new compacted ones

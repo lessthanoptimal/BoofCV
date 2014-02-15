@@ -20,14 +20,12 @@ package boofcv.alg.segmentation.ms;
 
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.misc.ImageMiscOps;
-import boofcv.alg.weights.*;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSInt32;
 import georegression.struct.point.Point2D_I32;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_I32;
-import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Random;
@@ -43,14 +41,6 @@ public class TestSegmentMeanShiftSearchGray {
 	Random rand = new Random(234);
 
 	InterpolatePixelS<ImageFloat32> interp = FactoryInterpolation.bilinearPixelS(ImageFloat32.class);
-	// use a gaussian distribution by default so that the indexes matter
-	WeightPixel_F32 weightSpacial = new WeightPixelGaussian_F32();
-	WeightDistance_F32 weightDist = new WeightDistanceUniform_F32(200);
-
-	@Before
-	public void before() {
-		weightSpacial.setRadius(2,2);
-	}
 
 	/**
 	 * Process a random image and do a basic sanity check on the output
@@ -62,7 +52,7 @@ public class TestSegmentMeanShiftSearchGray {
 		ImageMiscOps.fillUniform(image, rand, 0, 256);
 
 		SegmentMeanShiftSearchGray<ImageFloat32> alg =
-				new SegmentMeanShiftSearchGray<ImageFloat32>(30,0.05f,interp,weightSpacial, weightDist, false);
+				new SegmentMeanShiftSearchGray<ImageFloat32>(30,0.05f,interp,2,2,100, false);
 
 		alg.process(image);
 
@@ -105,10 +95,8 @@ public class TestSegmentMeanShiftSearchGray {
 		ImageMiscOps.fillRectangle(image, 20, 4, 2, 5, 5);
 
 		// works better with this example when its uniform
-		WeightPixel_F32 weightSpacial = new WeightPixelUniform_F32();
-		weightSpacial.setRadius(2,2);
 		SegmentMeanShiftSearchGray<ImageFloat32> alg =
-				new SegmentMeanShiftSearchGray<ImageFloat32>(30,0.05f,interp,weightSpacial, weightDist, false);
+				new SegmentMeanShiftSearchGray<ImageFloat32>(30,0.05f,interp,2,2,3, false);
 
 		interp.setImage(image);
 		alg.image = image;
@@ -130,7 +118,7 @@ public class TestSegmentMeanShiftSearchGray {
 		ImageMiscOps.fillRectangle(image, 20, cx - 2, cy - 2, 5, 5);
 
 		SegmentMeanShiftSearchGray<ImageFloat32> alg =
-				new SegmentMeanShiftSearchGray<ImageFloat32>(30,0.05f,interp,weightSpacial, weightDist, false);
+				new SegmentMeanShiftSearchGray<ImageFloat32>(30,0.05f,interp,2,2,100, false);
 
 		interp.setImage(image);
 		alg.image = image;
