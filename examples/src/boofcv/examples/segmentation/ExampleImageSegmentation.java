@@ -60,11 +60,7 @@ public class ExampleImageSegmentation {
 		ImageSInt32 pixelToSegment = new ImageSInt32(color.width,color.height);
 
 		// Segmentation magic happens here
-		for( int i = 0; i < 1; i++ ) {
-			long before = System.currentTimeMillis();
-			alg.segment(color,pixelToSegment);
-			System.out.println("Time "+(System.currentTimeMillis()-before));
-		}
+		alg.segment(color,pixelToSegment);
 
 		// Displays the results
 		visualize(pixelToSegment,color,alg.getTotalSegments());

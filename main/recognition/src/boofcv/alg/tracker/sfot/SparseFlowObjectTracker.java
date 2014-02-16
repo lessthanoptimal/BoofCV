@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.alg.tracker.sfot;
 
+import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.alg.sfm.robust.DistanceScaleTranslateRotate2DSq;
 import boofcv.alg.sfm.robust.GenerateScaleTranslateRotate2D;
 import boofcv.alg.sfm.robust.ModelManagerScaleTranslateRotate2D;
@@ -73,7 +74,12 @@ public class SparseFlowObjectTracker<Image extends ImageSingleBand, Derivative e
 	private boolean trackLost;
 
 	// configuration parameters
-	private SfotConfig<Image,Derivative> config;
+	private SfotConfig config;
+
+	// class used to compute the image derivative
+	private ImageGradient<Image, Derivative> gradient;
+	private Class<Image> imageType;
+	private Class<Derivative> derivType;
 
 	// maximum allowed forward-backwards error squared
 	private float maximumErrorFB;
@@ -81,12 +87,17 @@ public class SparseFlowObjectTracker<Image extends ImageSingleBand, Derivative e
 	// location of the target in the current frame
 	RectangleRotate_F64 region = new RectangleRotate_F64();
 
-	public SparseFlowObjectTracker( SfotConfig<Image,Derivative> config  ) {
+	public SparseFlowObjectTracker( SfotConfig config ,
+									Class<Image> imageType , Class<Derivative> derivType ,
+									ImageGradient<Image, Derivative> gradient ) {
 
 		this.config = config;
+		this.imageType = imageType;
+		this.derivType = derivType;
+		this.gradient = gradient;
 		maximumErrorFB = (float)(config.maximumErrorFB*config.maximumErrorFB);
 
-		klt = FactoryTrackerAlg.kltPyramid(config.trackerConfig, config.imageType, config.derivType);
+		klt = FactoryTrackerAlg.kltPyramid(config.trackerConfig, imageType, derivType);
 
 		ModelManagerScaleTranslateRotate2D manager = new ModelManagerScaleTranslateRotate2D();
 		GenerateScaleTranslateRotate2D generator = new GenerateScaleTranslateRotate2D();
@@ -105,7 +116,7 @@ public class SparseFlowObjectTracker<Image extends ImageSingleBand, Derivative e
 		previousImage.process(input);
 		for( int i = 0; i < previousImage.getNumLayers(); i++ ) {
 			Image layer = previousImage.getLayer(i);
-			config.gradient.process(layer,previousDerivX[i],previousDerivY[i]);
+			gradient.process(layer,previousDerivX[i],previousDerivY[i]);
 		}
 
 		trackLost = false;
@@ -183,7 +194,7 @@ public class SparseFlowObjectTracker<Image extends ImageSingleBand, Derivative e
 		currentImage.process(input);
 		for( int i = 0; i < currentImage.getNumLayers(); i++ ) {
 			Image layer = currentImage.getLayer(i);
-			config.gradient.process(layer,currentDerivX[i],currentDerivY[i]);
+			gradient.process(layer,currentDerivX[i],currentDerivY[i]);
 		}
 
 		// convert to float to avoid excessive conversions from double to float
@@ -255,26 +266,26 @@ public class SparseFlowObjectTracker<Image extends ImageSingleBand, Derivative e
 	private void declarePyramid( int imageWidth , int imageHeight ) {
 		int minSize = (config.trackerFeatureRadius*2+1)*5;
 		int scales[] = TldTracker.selectPyramidScale(imageWidth, imageHeight, minSize);
-		currentImage = FactoryPyramid.discreteGaussian(scales,-1,1,false,config.imageType);
+		currentImage = FactoryPyramid.discreteGaussian(scales,-1,1,false,imageType);
 		currentImage.initialize(imageWidth, imageHeight);
-		previousImage = FactoryPyramid.discreteGaussian(scales, -1, 1, false,config.imageType);
+		previousImage = FactoryPyramid.discreteGaussian(scales, -1, 1, false,imageType);
 		previousImage.initialize(imageWidth, imageHeight);
 
 		int numPyramidLayers = currentImage.getNumLayers();
 
-		previousDerivX = (Derivative[]) Array.newInstance(config.derivType, numPyramidLayers);
-		previousDerivY = (Derivative[])Array.newInstance(config.derivType,numPyramidLayers);
-		currentDerivX = (Derivative[])Array.newInstance(config.derivType,numPyramidLayers);
-		currentDerivY = (Derivative[])Array.newInstance(config.derivType,numPyramidLayers);
+		previousDerivX = (Derivative[]) Array.newInstance(derivType, numPyramidLayers);
+		previousDerivY = (Derivative[])Array.newInstance(derivType,numPyramidLayers);
+		currentDerivX = (Derivative[])Array.newInstance(derivType,numPyramidLayers);
+		currentDerivY = (Derivative[])Array.newInstance(derivType,numPyramidLayers);
 
 		for( int i = 0; i < numPyramidLayers; i++ ) {
 			int w = currentImage.getWidth(i);
 			int h = currentImage.getHeight(i);
 
-			previousDerivX[i] = GeneralizedImageOps.createSingleBand(config.derivType, w, h);
-			previousDerivY[i] = GeneralizedImageOps.createSingleBand(config.derivType, w, h);
-			currentDerivX[i] = GeneralizedImageOps.createSingleBand(config.derivType, w, h);
-			currentDerivY[i] = GeneralizedImageOps.createSingleBand(config.derivType, w, h);
+			previousDerivX[i] = GeneralizedImageOps.createSingleBand(derivType, w, h);
+			previousDerivY[i] = GeneralizedImageOps.createSingleBand(derivType, w, h);
+			currentDerivX[i] = GeneralizedImageOps.createSingleBand(derivType, w, h);
+			currentDerivY[i] = GeneralizedImageOps.createSingleBand(derivType, w, h);
 		}
 
 		track = new PyramidKltFeature(numPyramidLayers,config.trackerFeatureRadius);
@@ -305,7 +316,7 @@ public class SparseFlowObjectTracker<Image extends ImageSingleBand, Derivative e
 		return trackLost;
 	}
 
-	public SfotConfig<Image, Derivative> getConfig() {
+	public SfotConfig getConfig() {
 		return config;
 	}
 }

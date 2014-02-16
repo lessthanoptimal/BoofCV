@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -66,6 +66,10 @@ public class FourierVisualizeApp
 		fft = GDiscreteFourierTransformOps.createTransform(imageType);
 
 		setMainGUI(panel);
+	}
+
+	public FourierVisualizeApp( Class<T> imageType ) {
+		this(ImageDataType.classToType(imageType));
 	}
 
 	public void process( BufferedImage input ) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,21 +18,14 @@
 
 package boofcv.alg.tracker.sfot;
 
-import boofcv.abst.filter.derivative.ImageGradient;
-import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.alg.tracker.klt.KltConfig;
-import boofcv.factory.filter.derivative.FactoryDerivative;
-import boofcv.struct.image.ImageSingleBand;
 
 /**
  * fContains configuration parameters for {@link SparseFlowObjectTracker}.
  *
  * @author Peter Abeles
  */
-public class SfotConfig <T extends ImageSingleBand, D extends ImageSingleBand> {
-
-	public Class<T> imageType;
-	public Class<D> derivType;
+public class SfotConfig {
 
 	/**
 	 * Random seed used by random number generator
@@ -63,23 +56,4 @@ public class SfotConfig <T extends ImageSingleBand, D extends ImageSingleBand> {
 	 * Basic parameters for tracker.  KltConfig.createDefault() with maxIterations = 50 is suggested.
 	 */
 	public KltConfig trackerConfig;
-
-	ImageGradient<T, D> gradient;
-
-	/**
-	 * Creates a configuration using default values.
-	 * @param imageType Type of gray-scale image it processes.
-	 */
-	public SfotConfig(  Class<T> imageType) {
-		this.imageType = imageType;
-		this.derivType = GImageDerivativeOps.getDerivativeType(imageType);
-
-		gradient = FactoryDerivative.sobel(imageType, derivType);
-
-		trackerConfig = new KltConfig();
-		trackerConfig.maxIterations = 50;
-	}
-
-	public SfotConfig() {
-	}
 }

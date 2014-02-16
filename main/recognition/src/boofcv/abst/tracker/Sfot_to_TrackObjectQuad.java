@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -41,9 +41,9 @@ public class Sfot_to_TrackObjectQuad<T extends ImageSingleBand, D extends ImageS
 
 	ImageType<T> type;
 
-	public Sfot_to_TrackObjectQuad(SparseFlowObjectTracker<T, D> alg) {
+	public Sfot_to_TrackObjectQuad(SparseFlowObjectTracker<T, D> alg , Class<T> imageType) {
 		this.alg = alg;
-		this.type = ImageType.single(alg.getConfig().imageType);
+		this.type = ImageType.single(imageType);
 	}
 
 	@Override
