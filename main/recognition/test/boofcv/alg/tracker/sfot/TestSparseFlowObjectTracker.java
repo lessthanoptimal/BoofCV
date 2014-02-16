@@ -1,8 +1,10 @@
 package boofcv.alg.tracker.sfot;
 
+import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.alg.distort.DistortImageOps;
 import boofcv.alg.interpolate.TypeInterpolate;
 import boofcv.alg.misc.ImageMiscOps;
+import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.struct.RectangleRotate_F64;
 import boofcv.struct.image.ImageSInt16;
 import boofcv.struct.image.ImageUInt8;
@@ -53,9 +55,12 @@ public class TestSparseFlowObjectTracker {
 
 		DistortImageOps.affine(frame0,frame1, TypeInterpolate.BILINEAR,c,-s,s,c,tranX,tranY);
 
-		SfotConfig<ImageUInt8,ImageSInt16> config = new SfotConfig<ImageUInt8, ImageSInt16>(ImageUInt8.class);
+		SfotConfig config = new SfotConfig();
 
-		SparseFlowObjectTracker<ImageUInt8,ImageSInt16> alg = new SparseFlowObjectTracker<ImageUInt8, ImageSInt16>(config);
+		ImageGradient<ImageUInt8,ImageSInt16> gradient = FactoryDerivative.sobel(ImageUInt8.class,ImageSInt16.class);
+
+		SparseFlowObjectTracker<ImageUInt8,ImageSInt16> alg = new SparseFlowObjectTracker<ImageUInt8, ImageSInt16>(
+				config,ImageUInt8.class,ImageSInt16.class,gradient);
 
 		RectangleRotate_F64 region0 = new RectangleRotate_F64(120,140,30,40,0.1);
 		RectangleRotate_F64 region1 = new RectangleRotate_F64();

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -72,16 +72,25 @@ public class FactoryTrackerObjectQuad {
 	/**
 	 * Create an instance of {@link SparseFlowObjectTracker  Sparse Flow Object Tracker} for the
 	 * {@link TrackerObjectQuad} interface.
-	 * @param config Configuration for the tracker
+	 * @param config Configuration for the tracker,  Null for default.
 	 * @param <T> Image input type
-	 * @param <D> Image derivative type
+	 * @param <D> Image derivative type.  Null for default.
 	 * @return TrackerObjectQuad
 	 */
 	public static <T extends ImageSingleBand,D extends ImageSingleBand>
-	TrackerObjectQuad<T> sparseFlow(SfotConfig<T, D> config) {
-		SparseFlowObjectTracker<T,D> tracker = new SparseFlowObjectTracker<T,D>(config);
+	TrackerObjectQuad<T> sparseFlow(SfotConfig config, Class<T> imageType , Class<D> derivType ) {
 
-		return new Sfot_to_TrackObjectQuad<T,D>(tracker);
+		if( derivType == null )
+			derivType = GImageDerivativeOps.getDerivativeType(imageType);
+
+		if( config == null )
+			config = new SfotConfig();
+
+		ImageGradient<T, D> gradient = FactoryDerivative.sobel(imageType,derivType);
+
+		SparseFlowObjectTracker<T,D> tracker = new SparseFlowObjectTracker<T,D>(config,imageType,derivType,gradient);
+
+		return new Sfot_to_TrackObjectQuad<T,D>(tracker,imageType);
 	}
 
 	/**

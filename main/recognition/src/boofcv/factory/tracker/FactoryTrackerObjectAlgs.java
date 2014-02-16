@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -53,8 +53,10 @@ public class FactoryTrackerObjectAlgs {
 	}
 
 	public static <T extends ImageSingleBand,D extends ImageSingleBand>
-	SparseFlowObjectTracker<T,D> createSparseFlow( SfotConfig<T,D> config ) {
-		return new SparseFlowObjectTracker<T,D>(config);
+	SparseFlowObjectTracker<T,D> createSparseFlow( SfotConfig config ,
+												   Class<T> imageType , Class<D> derivType ,
+												   ImageGradient<T, D> gradient) {
+		return new SparseFlowObjectTracker<T,D>(config,imageType,derivType,gradient);
 	}
 
 	public static <T extends ImageMultiBand>

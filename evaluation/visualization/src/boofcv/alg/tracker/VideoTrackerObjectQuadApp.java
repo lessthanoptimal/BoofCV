@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,6 @@
 package boofcv.alg.tracker;
 
 import boofcv.abst.tracker.*;
-import boofcv.alg.tracker.sfot.SfotConfig;
 import boofcv.core.image.GConvertImage;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.tracker.FactoryTrackerObjectQuad;
@@ -124,7 +123,7 @@ public class VideoTrackerObjectQuadApp<I extends ImageSingleBand>
 		} else if( whichAlg == 4 ) {
 			tracker = FactoryTrackerObjectQuad.meanShiftLikelihood(30, 5, 256, MeanShiftLikelihoodType.HISTOGRAM, imageType);
 		} else if( whichAlg == 5 ) {
-			tracker = FactoryTrackerObjectQuad.sparseFlow(new SfotConfig(imageClass));
+			tracker = FactoryTrackerObjectQuad.sparseFlow(null,imageClass,null);
 		} else
 			throw new RuntimeException("Unknown algorithm");
 
