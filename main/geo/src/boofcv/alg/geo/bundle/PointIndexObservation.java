@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,16 +21,18 @@ package boofcv.alg.geo.bundle;
 import georegression.struct.point.Point2D_F64;
 
 /**
- * Specifies which feature produced what observation in a particular view
+ * Specifies which feature produced what observation in a particular view.  The individual feature is referenced
+ * by its list index.  The observation itself is specified using a {@link Point2D_F64}, which can be in either
+ * pixel or normalized image coordinates, depending on the application.
  *
  * @author Peter Abeles
  */
 public class PointIndexObservation {
 
-	// which feature it is observing
-	int pointIndex;
-	// the observed feature location on the camera
-	Point2D_F64 obs;
+	/** Index of the feature that is observed */
+	public int pointIndex;
+	/** The observation of the feature */
+	public Point2D_F64 obs;
 
 	public void set( int pointIndex , Point2D_F64 obs ) {
 		this.pointIndex = pointIndex;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,7 +23,11 @@ import georegression.struct.se.Se3_F64;
 
 /**
  * Expanded model for fast computations used by bundle adjustment with calibrated cameras.
- * Designed to minimize unnecessary creating and destroying memory.
+ * Designed to minimize unnecessary creating and destroying memory.  Each view can be marked as known or not.
+ * If a view is known then initial pose is fixed and will not be optimized.  The list of points is a list
+ * of all points which have been observed across all views.  Both views and points are referenced by
+ * their index.  Before the class is used you must call {@link #configure(int, int)} to specif the number
+ * of views and points.
  *
  * @author Peter Abeles
  */
@@ -76,30 +80,64 @@ public class CalibratedPoseAndPoint {
 		}
 	}
 
+	/**
+	 * Specify if a view is assumed to have a known view or not.
+	 * @param view Index of the view
+	 * @param known true of known or false if not.
+	 */
 	public void setViewKnown( int view , boolean known ) {
 		viewKnown[view] = known;
 	}
 
+	/**
+	 * Used to see if a particular view is marked as known or not
+	 *
+	 * @param view The view's index
+	 * @return if true then the view's pose is assumed to be known and is not optimized
+	 */
 	public boolean isViewKnown( int view ) {
 		return viewKnown[view];
 	}
 
+	/**
+	 * Transform from world to camera view
+	 * @param view The view's index
+	 * @return The transform
+	 */
 	public Se3_F64 getWorldToCamera( int view ) {
 		return worldToCamera[view];
 	}
 
+	/**
+	 * Returns the location of a specific point/feature
+	 * @param index Index of the point
+	 * @return The point's location
+	 */
 	public Point3D_F64 getPoint( int index ) {
 		return points[index];
 	}
 
+	/**
+	 * The number of points (or features) whose location is being optimized.
+	 *
+	 * @return number of points
+	 */
 	public int getNumPoints() {
 		return numPoints;
 	}
 
+	/**
+	 * The number of camera views which observed the points/features
+	 * @return Number of views
+	 */
 	public int getNumViews() {
 		return numViews;
 	}
 
+	/**
+	 * Returns the number of camera views which do not have a 'known' or fixed pose.
+	 * @return Number of views whose pose is to be optimized.
+	 */
 	public int getNumUnknownViews() {
 		int ret = 0;
 		for( int i = 0; i < numViews; i++ ) {
@@ -109,6 +147,9 @@ public class CalibratedPoseAndPoint {
 		return ret;
 	}
 
+	/**
+	 * An array that indicates which views are known and which views are not
+	 */
 	public boolean[] getKnownArray() {
 		return viewKnown;
 	}
