@@ -56,4 +56,9 @@ public class SfotConfig {
 	 * Basic parameters for tracker.  KltConfig.createDefault() with maxIterations = 50 is suggested.
 	 */
 	public KltConfig trackerConfig;
+
+	public SfotConfig() {
+		trackerConfig = new KltConfig();
+		trackerConfig.maxIterations = 50;
+	}
 }

@@ -245,9 +245,9 @@ public class SparseFlowObjectTracker<Image extends ImageSingleBand, Derivative e
 
 				float error = UtilPoint2D_F32.distanceSq(track.x, track.y, xx, yy);
 
-//				if( error > maximumErrorFB ) {
-//					continue;
-//				}
+				if( error > maximumErrorFB ) {
+					continue;
+				}
 
 				// create a list of the observations
 				AssociatedPair a = pairs.grow();
