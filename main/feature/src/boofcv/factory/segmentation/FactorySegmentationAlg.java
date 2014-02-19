@@ -27,6 +27,7 @@ import boofcv.alg.segmentation.fh04.SegmentFelzenszwalbHuttenlocher04;
 import boofcv.alg.segmentation.fh04.impl.*;
 import boofcv.alg.segmentation.ms.*;
 import boofcv.alg.segmentation.slic.*;
+import boofcv.alg.segmentation.watershed.WatershedVincentSoille1991;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.ConnectRule;
 import boofcv.struct.image.ImageBase;
@@ -195,5 +196,12 @@ public class FactorySegmentationAlg {
 				}
 		}
 		throw new IllegalArgumentException("Unknown imageType or connect rule");
+	}
+
+	public static WatershedVincentSoille1991 watershed( ConnectRule rule ) {
+		if( rule == ConnectRule.FOUR )
+			return new WatershedVincentSoille1991.Connect4();
+		else
+			throw new IllegalArgumentException("Unknown connectivity rule");
 	}
 }

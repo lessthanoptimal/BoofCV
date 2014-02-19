@@ -41,6 +41,7 @@ Version : Alpha 0.17
 - Added XYZ and LAB color spaces
 - GImageMiscOps.fillUniform() max is inclusive for both integer and float and this is enforced
 
+- TODO Automatically compile and push unstable builds.
 - TODO Add ability to resize mosaic
 - TODO Make those two failed unit tests ago away
 - TODO BoofMiscOps move XML serialization into IO package
