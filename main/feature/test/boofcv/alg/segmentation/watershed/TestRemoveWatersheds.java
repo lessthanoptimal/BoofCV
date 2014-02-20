@@ -18,18 +18,47 @@
 
 package boofcv.alg.segmentation.watershed;
 
+import boofcv.struct.image.ImageSInt32;
+import boofcv.testing.BoofTesting;
 import org.junit.Test;
-
-import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
  */
 public class TestRemoveWatersheds {
 
+	/**
+	 * Simple case.  Still will require multiple passes for all the pixels to be assigned.
+	 */
 	@Test
-	public void stuff() {
-		fail("Implement");
+	public void basic() {
+		ImageSInt32 segmented = new ImageSInt32(5,7);
+		segmented.data = new int[] {
+				-1,-1,-1,-1,-1,
+				-1, 1, 1, 1,-1,
+				-1, 1, 0, 0,-1,
+				-1, 2, 2, 2,-1,
+				-1, 0, 0, 0,-1,
+				-1, 0, 0, 0,-1,
+				-1,-1,-1,-1,-1};
+
+		// technically it could be assigned other values and still be a valid solution
+		// this expected image is created knowing the exact internal algorithm
+		ImageSInt32 expected = new ImageSInt32(5,7);
+		expected.data = new int[] {
+				-1,-1,-1,-1,-1,
+				-1, 0, 0, 0,-1,
+				-1, 0, 0, 0,-1,
+				-1, 1, 1, 1,-1,
+				-1, 1, 1, 1,-1,
+				-1, 1, 1, 1,-1,
+				-1,-1,-1,-1,-1};
+
+		RemoveWatersheds alg = new RemoveWatersheds();
+
+		alg.remove(segmented);
+
+		BoofTesting.assertEquals(expected, segmented, 0);
 	}
 
 }

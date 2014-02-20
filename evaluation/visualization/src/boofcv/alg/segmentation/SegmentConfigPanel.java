@@ -331,7 +331,7 @@ public class SegmentConfigPanel extends StandardAlgConfigPanel implements Action
 			selectConnect.addActionListener(this);
 			selectConnect.setMaximumSize(selectConnect.getPreferredSize());
 
-			spinnerSize = new JSpinner(new SpinnerNumberModel(10,0,200,5));
+			spinnerSize = new JSpinner(new SpinnerNumberModel(10,0,500,5));
 			spinnerSize.addChangeListener(this);
 			spinnerSize.setMaximumSize(spinnerSize.getPreferredSize());
 

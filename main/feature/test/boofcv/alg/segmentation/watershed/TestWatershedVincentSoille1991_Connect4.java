@@ -154,14 +154,14 @@ public class TestWatershedVincentSoille1991_Connect4 {
 
 		ImageSInt32 found = alg.getOutput();
 
-		found.print();
+//		found.print();
 
 		assertEquals(4,alg.getTotalRegions());
 		int expected[] = new int[]{
 				1,1,0,2,2,
 				1,1,0,2,2,
 				1,1,0,0,0,
-				1,0,3,3,3};
+				0,0,3,3,3};
 
 		int index = 0;
 		for( int y = 0; y < image.height; y++ ) {
@@ -173,11 +173,6 @@ public class TestWatershedVincentSoille1991_Connect4 {
 
 	@Test
 	public void exampleSeeds0() {
-		fail("Implement");
-	}
-
-	@Test
-	public void manuallyCheckConnectivity() {
 		fail("Implement");
 	}
 }

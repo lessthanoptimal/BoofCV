@@ -132,7 +132,7 @@ public abstract class WatershedVincentSoille1991 {
 				output.data[index] = MASK;
 
 				// see if its neighbors has been labeled, if so set its distance and add to queue
-				checkNeighborsLabels(index);
+				assignNewToNeighbors(index);
 			}
 
 			currentDistance = 1;
@@ -193,7 +193,7 @@ public abstract class WatershedVincentSoille1991 {
 	 *
 	 * @param index Pixel whose neighbors are being examined
 	 */
-	protected abstract void checkNeighborsLabels(int index);
+	protected abstract void assignNewToNeighbors(int index);
 
 	/**
 	 * Check the neighbors to see if it should become a member or a watershed
@@ -211,7 +211,11 @@ public abstract class WatershedVincentSoille1991 {
 
 			// see if the target belongs to an already labeled basin or watershed
 			if( regionNeighbor > 0 ) {
-				if( regionTarget <= 0 ) {// if is MASK or WSHED
+				if( regionTarget < 0 ) {// if is MASK
+					output.data[indexTarget] = regionNeighbor;
+				} else if( regionTarget == 0 && distanceNeighbor+1 < currentDistance ) {
+					// if it is a watershed only assign to the neighbor value if it would be closer
+					// this is a deviation from what's in the paper.  There might be a type-o there or I miss read it
 					output.data[indexTarget] = regionNeighbor;
 				} else if( regionTarget != regionNeighbor ) {
 					output.data[indexTarget] = WSHED;
@@ -289,7 +293,7 @@ public abstract class WatershedVincentSoille1991 {
 	public static class Connect4 extends WatershedVincentSoille1991 {
 
 		@Override
-		protected void checkNeighborsLabels(int index) {
+		protected void assignNewToNeighbors(int index) {
 			if( output.data[index+1] >= 0 ) {                           // (x+1,y)
 				distance.data[index] = 1;
 				fifo.add(index);
@@ -328,7 +332,7 @@ public abstract class WatershedVincentSoille1991 {
 	public static class Connect8 extends WatershedVincentSoille1991 {
 
 		@Override
-		protected void checkNeighborsLabels(int index) {
+		protected void assignNewToNeighbors(int index) {
 			if( output.data[index+1] >= 0 ) {                           // (x+1,y)
 				distance.data[index] = 1;
 				fifo.add(index);

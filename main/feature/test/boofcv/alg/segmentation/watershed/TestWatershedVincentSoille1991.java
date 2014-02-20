@@ -66,7 +66,7 @@ public class TestWatershedVincentSoille1991 {
 	private static class Dummy extends WatershedVincentSoille1991 {
 
 		@Override
-		protected void checkNeighborsLabels(int index) {}
+		protected void assignNewToNeighbors(int index) {}
 
 		@Override
 		protected void checkNeighborsAssign(int index) {}

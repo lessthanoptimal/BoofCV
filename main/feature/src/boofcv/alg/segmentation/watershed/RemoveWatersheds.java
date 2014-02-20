@@ -22,16 +22,20 @@ import boofcv.struct.image.ImageSInt32;
 import org.ddogleg.struct.GrowQueue_I32;
 
 /**
- * Examines a segmented image created by {@link WatershedVincentSoille1991} and removes segmentation watershed pixels.
+ * Examines a segmented image created by {@link WatershedVincentSoille1991} and merged watershed pixels
+ * into neighboring regions.  Since there is no good rule for which region the pixel should be
+ * merged into, it is merged into the first valid one.
  *
  * @author Peter Abeles
  */
 public class RemoveWatersheds {
 
-	int connect[] = new int[4];
+	// relative indexes of connected pixels
+	private int connect[] = new int[4];
 
-	GrowQueue_I32 open = new GrowQueue_I32();
-	GrowQueue_I32 open2 = new GrowQueue_I32();
+	// list of watershed pixels which have yet to be merged.
+	private GrowQueue_I32 open = new GrowQueue_I32();
+	private GrowQueue_I32 open2 = new GrowQueue_I32();
 
 	/**
 	 * Removes watersheds from the segmented image.  The inputed image should be the entire original
