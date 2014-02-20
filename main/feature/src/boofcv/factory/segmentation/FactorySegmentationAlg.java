@@ -34,7 +34,7 @@ import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 
 /**
- * Factory for segmentation algorithms.
+ * Factory for low level segmentation algorithms.
  *
  * @author Peter Abeles
  */
@@ -201,6 +201,8 @@ public class FactorySegmentationAlg {
 	public static WatershedVincentSoille1991 watershed( ConnectRule rule ) {
 		if( rule == ConnectRule.FOUR )
 			return new WatershedVincentSoille1991.Connect4();
+		else if( rule == ConnectRule.EIGHT )
+			return new WatershedVincentSoille1991.Connect8();
 		else
 			throw new IllegalArgumentException("Unknown connectivity rule");
 	}

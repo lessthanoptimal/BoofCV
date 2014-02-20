@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,24 +34,58 @@ public class GConvertImage {
 
 	/**
 	 * <p>
-	 * Converts one type of {@link ImageSingleBand} into a different type by typecasting each pixel.
+	 * Converts one type of between two types of images using a default method.  Both are the same image type
+	 * then a simple type cast if performed at the pixel level.  If the input is multi-band and the output
+	 * is single band then it will average te bands.
+	 * </p>
+	 *
+	 * <p>
+	 * In some cases a temporary image will be created to store intermediate results.  If this is an issue
+	 * you will need to create a specialized conversion algorithm.
 	 * </p>
 	 *
 	 * @param input Input image which is being converted. Not modified.
 	 * @param output (Optional) The output image.  If null a new image is created. Modified.
 	 * @return Converted image.
 	 */
-	public static void convert( ImageSingleBand input , ImageSingleBand output ) {
+	public static void convert( ImageBase input , ImageBase output ) {
 		if( input.getClass() == output.getClass() ) {
 			output.setTo(input);
+			return;
 		} else {
-			try {
-				Method m = ConvertImage.class.getMethod("convert",input.getClass(),output.getClass());
-				m.invoke(null,input,output);
-			} catch (Exception e) {
-				throw new IllegalArgumentException("Unknown conversion");
+			if( input instanceof ImageSingleBand && output instanceof ImageSingleBand )  {
+				try {
+					Method m = ConvertImage.class.getMethod("convert",input.getClass(),output.getClass());
+					m.invoke(null,input,output);
+					return;
+				} catch (Exception e) {
+					throw new IllegalArgumentException("Unknown conversion");
+				}
+			} else if( input instanceof MultiSpectral && output instanceof ImageSingleBand )  {
+				MultiSpectral mi = (MultiSpectral)input;
+				ImageSingleBand so = (ImageSingleBand)output;
+
+				if( mi.getImageType().getDataType() != so.getDataType() ) {
+					int w = output.width;
+					int h = output.height;
+					ImageSingleBand tmp = GeneralizedImageOps.createSingleBand(mi.getImageType().getDataType(),w,h);
+					average(mi,tmp);
+					convert(tmp,so);
+				} else {
+					average(mi,so);
+				}
+
+				return;
+			} else if( input instanceof MultiSpectral && output instanceof MultiSpectral )  {
+				MultiSpectral mi = (MultiSpectral)input;
+				MultiSpectral mo = (MultiSpectral)output;
+
+				for( int i = 0; i < mi.getNumBands(); i++ ) {
+					convert(mi.getBand(i),mo.getBand(i));
+				}
 			}
 		}
+		throw new IllegalArgumentException("Don't know how to convert between input types");
 	}
 
 	/**

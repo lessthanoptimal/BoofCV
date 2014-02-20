@@ -48,7 +48,7 @@ public class TestSegmentMeanShift {
 
 		assertEquals(1, alg.getNumberOfRegions());
 		assertEquals(1, alg.getRegionColor().size());
-		assertEquals(1, alg.getRegionSize().getSize());
+		assertEquals(1, alg.getRegionSize().size());
 
 		for( int y = 0; y < 15; y++ ) {
 			for( int x = 0; x < 10; x++ ) {
@@ -73,7 +73,7 @@ public class TestSegmentMeanShift {
 
 		assertEquals(2, alg.getNumberOfRegions());
 		assertEquals(2, alg.getRegionColor().size());
-		assertEquals(2, alg.getRegionSize().getSize());
+		assertEquals(2, alg.getRegionSize().size());
 
 		for( int y = 0; y < 15; y++ ) {
 			for( int x = 0; x < 10; x++ ) {

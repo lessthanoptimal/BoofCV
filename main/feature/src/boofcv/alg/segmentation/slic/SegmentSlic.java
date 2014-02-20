@@ -363,7 +363,7 @@ public abstract class SegmentSlic<T extends ImageBase> {
 				}
 				if( best == -1 ) {
 					regionColor.grow();
-					best = regionMemberCount.getSize();
+					best = regionMemberCount.size();
 					regionMemberCount.add(0);
 				}
 

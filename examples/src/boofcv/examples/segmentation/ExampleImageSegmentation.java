@@ -146,6 +146,7 @@ public class ExampleImageSegmentation {
 //		BufferedImage image = UtilImageIO.loadImage("../data/applet/segment/berkeley_kangaroo.jpg");
 //		BufferedImage image = UtilImageIO.loadImage("../data/applet/segment/berkeley_man.jpg");
 //		BufferedImage image = UtilImageIO.loadImage("../data/applet/segment/mountain_pines_people.jpg");
+//		BufferedImage image = UtilImageIO.loadImage("../data/applet/particles01.jpg");
 
 		// Select input image type.  Some algorithms behave different depending on image type
 		ImageType<MultiSpectral<ImageFloat32>> imageType = ImageType.ms(3,ImageFloat32.class);
@@ -156,6 +157,7 @@ public class ExampleImageSegmentation {
 //		ImageSegmentation alg = FactoryImageSegmentation.meanShift(null, imageType);
 //		ImageSegmentation alg = FactoryImageSegmentation.slic(new ConfigSlic(800), imageType);
 		ImageSegmentation alg = FactoryImageSegmentation.fh04(new ConfigFh04(100,30), imageType);
+//		ImageSegmentation alg = FactoryImageSegmentation.watershed(ConnectRule.EIGHT);
 
 		// Convert image into BoofCV format
 		ImageBase color = imageType.createImage(image.getWidth(),image.getHeight());
