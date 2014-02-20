@@ -18,9 +18,11 @@
 
 package boofcv.alg.segmentation.watershed;
 
+import boofcv.struct.image.ImageSInt32;
+import boofcv.struct.image.ImageUInt8;
 import org.junit.Test;
 
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Peter Abeles
@@ -28,32 +30,48 @@ import static org.junit.Assert.fail;
 public class TestWatershedVincentSoille1991 {
 
 	@Test
-	public void example0() {
-		fail("Implement");
-	}
-
-	@Test
-	public void example1() {
-		fail("Implement");
-	}
-
-	@Test
-	public void example2() {
-		fail("Implement");
-	}
-
-	@Test
-	public void example3() {
-		fail("Implement");
-	}
-
-	@Test
-	public void handleNeighborAssign() {
-		fail("Implement");
-	}
-
-	@Test
 	public void sortPixels() {
-		fail("Implement");
+		WatershedVincentSoille1991 alg = new Dummy();
+
+		ImageUInt8 image = new ImageUInt8(3,4);
+		image.data = new byte[]
+				{1,2,3,
+				 2,2,2,
+				 5,6,1,
+				 3,3,(byte)255};
+
+		alg.output = new ImageSInt32(4,5);
+
+		alg.sortPixels(image);
+
+		assertEquals(0,alg.histogram[0].size);
+		assertEquals(2,alg.histogram[1].size);
+		assertEquals(4,alg.histogram[2].size);
+		assertEquals(3,alg.histogram[3].size);
+		assertEquals(0,alg.histogram[4].size);
+		assertEquals(1,alg.histogram[5].size);
+		assertEquals(1,alg.histogram[6].size);
+
+		for( int i = 7; i < 255; i++ )
+			assertEquals(0,alg.histogram[i].size);
+
+		assertEquals(1,alg.histogram[255].size);
+
+		// check output coordinate for (0,2)
+		int indexOut = 3*4 + 1;
+		assertEquals(indexOut,alg.histogram[5].get(0));
+
+	}
+
+	private static class Dummy extends WatershedVincentSoille1991 {
+
+		@Override
+		protected void checkNeighborsLabels(int index) {}
+
+		@Override
+		protected void checkNeighborsAssign(int index) {}
+
+		@Override
+		protected void checkNeighborsMasks(int index) {}
 	}
 }

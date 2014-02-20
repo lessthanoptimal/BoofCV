@@ -53,7 +53,7 @@ public class Fh04_to_ImageSegmentation<T extends ImageBase> implements ImageSegm
 
 	@Override
 	public int getTotalSegments() {
-		return alg.getRegionSizes().getSize();
+		return alg.getRegionSizes().size();
 	}
 
 	@Override

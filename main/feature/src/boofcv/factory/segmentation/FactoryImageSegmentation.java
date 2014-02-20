@@ -18,13 +18,11 @@
 
 package boofcv.factory.segmentation;
 
-import boofcv.abst.segmentation.Fh04_to_ImageSegmentation;
-import boofcv.abst.segmentation.ImageSegmentation;
-import boofcv.abst.segmentation.MeanShift_to_ImageSegmentation;
-import boofcv.abst.segmentation.Slic_to_ImageSegmentation;
+import boofcv.abst.segmentation.*;
 import boofcv.alg.segmentation.fh04.SegmentFelzenszwalbHuttenlocher04;
 import boofcv.alg.segmentation.ms.SegmentMeanShift;
 import boofcv.alg.segmentation.slic.SegmentSlic;
+import boofcv.alg.segmentation.watershed.WatershedVincentSoille1991;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 
@@ -62,5 +60,28 @@ public class FactoryImageSegmentation {
 		SegmentFelzenszwalbHuttenlocher04<T> fh = FactorySegmentationAlg.fh04(config, imageType);
 
 		return new Fh04_to_ImageSegmentation<T>(fh,config.connectRule);
+	}
+
+	/**
+	 * Creates an instance of {@link WatershedVincentSoille1991}.  Watershed works better when initial seeds
+	 * are provided.  In this adaptation of watershed to {@link ImageSegmentation} only the more basic algorithm
+	 * is used where each local minima is a region, which causes over segmentation.  Watershed also only can process
+	 * gray scale U8 images.  All other image types are converted into that format.
+	 *
+	 * @see WatershedVincentSoille1991
+	 *
+	 * @param config Configuration.  If null default is used.
+	 * @param <T>
+	 * @return
+	 */
+	public static <T extends ImageBase>ImageSegmentation<T>
+	watershed( ConfigWatershed config )
+	{
+		if( config == null )
+			config = new ConfigWatershed();
+
+		WatershedVincentSoille1991 watershed = FactorySegmentationAlg.watershed(config.connectRule);
+
+		return new Watershed_to_ImageSegmentation<T>(watershed,config.minimumRegionSize,config.connectRule);
 	}
 }

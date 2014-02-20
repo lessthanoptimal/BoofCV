@@ -21,6 +21,7 @@ package boofcv.alg.segmentation;
 import boofcv.factory.segmentation.ConfigFh04;
 import boofcv.factory.segmentation.ConfigSegmentMeanShift;
 import boofcv.factory.segmentation.ConfigSlic;
+import boofcv.factory.segmentation.ConfigWatershed;
 import boofcv.gui.StandardAlgConfigPanel;
 import boofcv.struct.ConnectRule;
 
@@ -49,11 +50,13 @@ public class SegmentConfigPanel extends StandardAlgConfigPanel implements Action
 	ConfigFh04 configFh = new ConfigFh04();
 	ConfigSlic configSlic = new ConfigSlic(800);
 	ConfigSegmentMeanShift configMeanShift = new ConfigSegmentMeanShift();
+	ConfigWatershed configWatershed = new ConfigWatershed();
 
 	JPanel panelConfig = new JPanel();
 	PanelConfigFH panelFh = new PanelConfigFH();
 	PanelConfigSlic panelSlic = new PanelConfigSlic();
 	PanelConfigMeanShift panelMS = new PanelConfigMeanShift();
+	PanelConfigWatershed panelWater = new PanelConfigWatershed();
 
 	public SegmentConfigPanel(VisualizeImageSegmentationApp owner) {
 		this.owner = owner;
@@ -105,6 +108,8 @@ public class SegmentConfigPanel extends StandardAlgConfigPanel implements Action
 					panelConfig.add(panelSlic,BorderLayout.CENTER);
 				} else if( which == 2 ) {
 					panelConfig.add(panelMS,BorderLayout.CENTER);
+				} else if( which == 3 ) {
+					panelConfig.add(panelWater,BorderLayout.CENTER);
 				}
 				panelConfig.revalidate();
 				repaint();
@@ -316,6 +321,58 @@ public class SegmentConfigPanel extends StandardAlgConfigPanel implements Action
 		}
 	}
 
+	private class PanelConfigWatershed extends StandardAlgConfigPanel implements ActionListener, ChangeListener {
+
+		JComboBox selectConnect;
+		JSpinner spinnerSize;
+
+		public PanelConfigWatershed() {
+			selectConnect = new JComboBox(new String[]{"4-Connect","8-Connect"});
+			selectConnect.addActionListener(this);
+			selectConnect.setMaximumSize(selectConnect.getPreferredSize());
+
+			spinnerSize = new JSpinner(new SpinnerNumberModel(10,0,200,5));
+			spinnerSize.addChangeListener(this);
+			spinnerSize.setMaximumSize(spinnerSize.getPreferredSize());
+
+
+
+			configure();
+
+			addAlignCenter(selectConnect, this);
+			addLabeled(spinnerSize, "Min Size", this);
+		}
+
+		private void configure() {
+			if( configWatershed.connectRule == ConnectRule.FOUR )
+				selectConnect.setSelectedIndex(0);
+			else
+				selectConnect.setSelectedIndex(1);
+
+			spinnerSize.setValue(configWatershed.minimumRegionSize);
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			configHasChange();
+			if( selectConnect == e.getSource() ) {
+				int which = selectConnect.getSelectedIndex();
+				if( which == 0 )
+					configWatershed.connectRule = ConnectRule.FOUR;
+				else
+					configWatershed.connectRule = ConnectRule.EIGHT;
+			}
+		}
+
+		@Override
+		public void stateChanged(ChangeEvent e) {
+			configHasChange();
+			if( spinnerSize == e.getSource() ) {
+				configWatershed.minimumRegionSize = ((Number) spinnerSize.getValue()).intValue();
+			}
+		}
+	}
+
 	public ConfigFh04 getConfigFh() {
 		return configFh;
 	}
@@ -326,5 +383,9 @@ public class SegmentConfigPanel extends StandardAlgConfigPanel implements Action
 
 	public ConfigSegmentMeanShift getConfigMeanShift() {
 		return configMeanShift;
+	}
+
+	public ConfigWatershed getConfigWatershed() {
+		return configWatershed;
 	}
 }

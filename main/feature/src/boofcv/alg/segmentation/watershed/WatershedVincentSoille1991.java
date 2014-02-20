@@ -21,8 +21,11 @@ package boofcv.alg.segmentation.watershed;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.struct.image.ImageSInt32;
 import boofcv.struct.image.ImageUInt8;
+import georegression.struct.point.Point2D_I32;
 import org.ddogleg.struct.CircularQueue_I32;
 import org.ddogleg.struct.GrowQueue_I32;
+
+import java.util.List;
 
 /**
  * <p>
@@ -34,13 +37,19 @@ import org.ddogleg.struct.GrowQueue_I32;
  * </p>
  *
  * <p>
+ * If no initial seeds are used an the image is processed using {@link #process(boofcv.struct.image.ImageUInt8)} then
+ * each local minima will become a region.  In most images this leads to significant oversegmentation.  If additional
+ * information on the image type is available then you can provide seeds for each catchment basin/region.
+ * </p>
+ *
+ * <p>
  * NOTES:<br>
  * <ul>
  * <li>For faster processing, the internal labeled image has a 1 pixel border around it.  If you call
  * {@link #getOutput()} this border is removed automatically by creating a sub-image.</li>
  * <li>Connectivity is handled by child sub-classes.  An index of neighbors could have been used, but the
  * additional additional array access/loop slows things down a little bit.</li>
- * <li>Watersheds are included.  To remove them call BLAH TODO</li>
+ * <li>Watersheds are included.  To remove them using {@link RemoveWatersheds}</li>
  * <li>Pixel values are assumed to range from 0 to 255, inclusive.</li>
  * </ul>
  * </p>
@@ -83,9 +92,6 @@ public abstract class WatershedVincentSoille1991 {
 	// label of the region being marked
 	protected int currentLabel;
 
-	// number of regions labeled so far
-	protected int totalRegions;
-
 	// FIFO circular queue
 	protected CircularQueue_I32 fifo = new CircularQueue_I32();
 
@@ -110,12 +116,10 @@ public abstract class WatershedVincentSoille1991 {
 		ImageMiscOps.fill(distance, 0);
 		fifo.reset();
 
-		totalRegions = 0;
-
 		// sort pixels
 		sortPixels(input);
 
-		int currentLabel = 1;
+		currentLabel = 0;
 
 		for( int i = 0; i < histogram.length; i++ ) {
 			GrowQueue_I32 level = histogram[i];
@@ -123,12 +127,12 @@ public abstract class WatershedVincentSoille1991 {
 				continue;
 
 			// Go through each pixel at this level and mark them according to their neighbors
-			for( int j = 0; j > level.size; j++ ) {
+			for( int j = 0; j < level.size; j++ ) {
 				int index = level.data[j];
 				output.data[index] = MASK;
 
 				// see if its neighbors has been labeled, if so set its distance and add to queue
-				checkNeighborLabel(index);
+				checkNeighborsLabels(index);
 			}
 
 			currentDistance = 1;
@@ -136,6 +140,7 @@ public abstract class WatershedVincentSoille1991 {
 
 			while( true ) {
 				int p = fifo.popHead();
+
 				// end of a cycle.  Exit the loop if it is done or increase the distance and continue processing
 				if( p == MARKER_PIXEL) {
 					if( fifo.isEmpty() )
@@ -146,6 +151,7 @@ public abstract class WatershedVincentSoille1991 {
 						p = fifo.popHead();
 					}
 				}
+
 				// look at its neighbors and see if they have been labeled or belong to a watershed
 				// and update its distance
 				checkNeighborsAssign(p);
@@ -164,11 +170,21 @@ public abstract class WatershedVincentSoille1991 {
 
 					// grow the new region into the surrounding connected pixels
 					while( !fifo.isEmpty() ) {
-						checkNeighborMask(fifo.popHead());
+						checkNeighborsMasks(fifo.popHead());
 					}
 				}
 			}
 		}
+	}
+
+	/**
+	 * Segments the image using the initial seeds for each region.  This is often done to avoid
+	 * over segmentation but requires additional preprocessing or knowledge on the image structure.
+	 * @param input Input image
+	 * @param seeds Initial location for regions to grow from.
+	 */
+	public void process( ImageUInt8 input , List<Point2D_I32> seeds ) {
+
 	}
 
 	/**
@@ -177,7 +193,7 @@ public abstract class WatershedVincentSoille1991 {
 	 *
 	 * @param index Pixel whose neighbors are being examined
 	 */
-	protected abstract void checkNeighborLabel(int index);
+	protected abstract void checkNeighborsLabels(int index);
 
 	/**
 	 * Check the neighbors to see if it should become a member or a watershed
@@ -215,7 +231,7 @@ public abstract class WatershedVincentSoille1991 {
 	 *
 	 * @param index Pixel whose neighbors are being examined.
 	 */
-	protected abstract void checkNeighborMask(int index);
+	protected abstract void checkNeighborsMasks(int index);
 
 	protected void checkMask(int index) {
 		if( output.data[index] == MASK ) {
@@ -235,7 +251,7 @@ public abstract class WatershedVincentSoille1991 {
 		// sort by creating a histogram
 		for( int y = 0; y < input.height; y++ ) {
 			int index = input.startIndex + y*input.stride;
-			int indexOut = (y+1)*input.width + 1;
+			int indexOut = (y+1)*output.stride + 1;
 			for (int x = 0; x < input.width; x++ , index++ , indexOut++) {
 				int value = input.data[index] & 0xFF;
 				histogram[value].add(indexOut);
@@ -253,12 +269,27 @@ public abstract class WatershedVincentSoille1991 {
 	}
 
 	/**
-	 * Implementation which uses a 4 connect rule
+	 * Original output image with the border of -1 valued pixels
+	 */
+	public ImageSInt32 getOutputBorder() {
+		return output;
+	}
+
+	/**
+	 * Returns the total number of regions labeled, including the watershed.
+	 * @return number of regions.
+	 */
+	public int getTotalRegions() {
+		return currentLabel+1;
+	}
+
+	/**
+	 * Implementation which uses a 4-connect rule
 	 */
 	public static class Connect4 extends WatershedVincentSoille1991 {
 
 		@Override
-		protected void checkNeighborLabel(int index) {
+		protected void checkNeighborsLabels(int index) {
 			if( output.data[index+1] >= 0 ) {                           // (x+1,y)
 				distance.data[index] = 1;
 				fifo.add(index);
@@ -283,11 +314,72 @@ public abstract class WatershedVincentSoille1991 {
 		}
 
 		@Override
-		protected void checkNeighborMask(int index) {
+		protected void checkNeighborsMasks(int index) {
 			checkMask(index + 1);
 			checkMask(index - 1);
 			checkMask(index + output.stride);
 			checkMask(index - output.stride);
+		}
+	}
+
+	/**
+	 * Implementation which uses a 8-connect rule
+	 */
+	public static class Connect8 extends WatershedVincentSoille1991 {
+
+		@Override
+		protected void checkNeighborsLabels(int index) {
+			if( output.data[index+1] >= 0 ) {                           // (x+1,y)
+				distance.data[index] = 1;
+				fifo.add(index);
+			} else if( output.data[index-1] >= 0 ) {                    // (x-1,y)
+				distance.data[index] = 1;
+				fifo.add(index);
+			} else if( output.data[index+output.stride] >= 0 ) {        // (x,y+1)
+				distance.data[index] = 1;
+				fifo.add(index);
+			} else if( output.data[index-output.stride] >= 0 ) {        // (x,y-1)
+				distance.data[index] = 1;
+				fifo.add(index);
+			} else if( output.data[index+1+output.stride] >= 0 ) {      // (x+1,y+1)
+				distance.data[index] = 1;
+				fifo.add(index);
+			} else if( output.data[index-1+output.stride] >= 0 ) {      // (x-1,y+1)
+				distance.data[index] = 1;
+				fifo.add(index);
+			} else if( output.data[index+1-output.stride] >= 0 ) {      // (x+1,y-1)
+				distance.data[index] = 1;
+				fifo.add(index);
+			} else if( output.data[index-1-output.stride] >= 0 ) {      // (x-1,y-1)
+				distance.data[index] = 1;
+				fifo.add(index);
+			}
+		}
+
+		@Override
+		protected void checkNeighborsAssign(int index) {
+			handleNeighborAssign(index, index + 1);
+			handleNeighborAssign(index, index - 1);
+			handleNeighborAssign(index, index + output.stride);
+			handleNeighborAssign(index, index - output.stride);
+
+			handleNeighborAssign(index, index + 1 + output.stride);
+			handleNeighborAssign(index, index - 1 + output.stride);
+			handleNeighborAssign(index, index + 1 - output.stride);
+			handleNeighborAssign(index, index - 1 - output.stride);
+		}
+
+		@Override
+		protected void checkNeighborsMasks(int index) {
+			checkMask(index + 1);
+			checkMask(index - 1);
+			checkMask(index + output.stride);
+			checkMask(index - output.stride);
+
+			checkMask(index + 1 + output.stride);
+			checkMask(index - 1 + output.stride);
+			checkMask(index + 1 - output.stride);
+			checkMask(index - 1 - output.stride);
 		}
 	}
 }

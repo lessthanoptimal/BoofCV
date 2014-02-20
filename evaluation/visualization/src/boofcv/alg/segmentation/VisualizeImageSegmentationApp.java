@@ -74,6 +74,7 @@ public class VisualizeImageSegmentationApp <T extends ImageBase>
 		addAlgorithm(0, "FH04",0);
 		addAlgorithm(0, "SLIC Superpixel", 1);
 		addAlgorithm(0, "Mean-Shift", 2);
+		addAlgorithm(0, "Watershed",3);
 
 		color = imageType.createImage(1,1);
 
@@ -145,6 +146,7 @@ public class VisualizeImageSegmentationApp <T extends ImageBase>
 			case 0: alg = FactoryImageSegmentation.fh04(leftPanel.configFh, imageType); break;
 			case 1: alg = FactoryImageSegmentation.slic(leftPanel.configSlic, imageType); break;
 			case 2: alg = FactoryImageSegmentation.meanShift(leftPanel.configMeanShift, imageType); break;
+			case 3: alg = FactoryImageSegmentation.watershed(leftPanel.configWatershed); break;
 			default: throw new RuntimeException("BUG!");
 		}
 
