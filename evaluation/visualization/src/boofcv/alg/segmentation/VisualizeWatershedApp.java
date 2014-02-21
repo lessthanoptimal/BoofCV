@@ -18,7 +18,6 @@
 
 package boofcv.alg.segmentation;
 
-import boofcv.alg.misc.ImageMiscOps;
 import boofcv.alg.segmentation.watershed.WatershedVincentSoille1991;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.factory.segmentation.FactorySegmentationAlg;
@@ -42,11 +41,6 @@ public class VisualizeWatershedApp {
 
 		ConvertBufferedImage.convertFrom(image, gray);
 
-		ImageMiscOps.fill(gray,255);
-		gray.set(10, 15, 10);
-		gray.set(100, 200, 50);
-		gray.set(200,250,20);
-
 		WatershedVincentSoille1991 alg = FactorySegmentationAlg.watershed(ConnectRule.FOUR);
 		alg.process(gray);
 
@@ -57,7 +51,6 @@ public class VisualizeWatershedApp {
 		alg.removeWatersheds();
 		int numRegions = alg.getTotalRegions();
 		BufferedImage outRegions = VisualizeRegions.regions(pixelToRegion,numRegions,null);
-
 
 		ShowImages.showWindow(image, "Watershed");
 		ShowImages.showWindow(outRegions, "Regions");

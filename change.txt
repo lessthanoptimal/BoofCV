@@ -44,6 +44,8 @@ Version : Alpha 0.17
 - BinaryImageOps
   * Erode and dilate can now be applied multiple times with a single function call
 
+- TODO ExampleDenseOpticalFlow
+- TODO Application DenseOpticalFlow
 - TODO ExampleBundleAdjustment
 - TODO Automatically compile and push unstable builds.
 - TODO Add ability to resize mosaic
