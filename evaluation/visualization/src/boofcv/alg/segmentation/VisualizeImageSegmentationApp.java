@@ -212,19 +212,11 @@ public class VisualizeImageSegmentationApp <T extends ImageBase>
 		colorize.process(color,pixelToRegion,regionMemberCount,segmentColor);
 
 		VisualizeRegions.regionsColor(pixelToRegion,segmentColor,outColor);
-		VisualizeRegions.regions(pixelToRegion,segmentColor.size(),outColor);
+		VisualizeRegions.regions(pixelToRegion,segmentColor.size(),outSegments);
 
 		// Make edges appear black
 		ConvertBufferedImage.convertTo(color,outBorder,true);
-		ImageUInt8 binary = new ImageUInt8(pixelToRegion.width,pixelToRegion.height);
-		ImageSegmentationOps.markRegionBorders(pixelToRegion,binary);
-		for( int y = 0; y < binary.height; y++ ) {
-			for( int x = 0; x < binary.width; x++ ) {
-				if( binary.unsafe_get(x,y) == 1 )  {
-					outBorder.setRGB(x,y,0);
-				}
-			}
-		}
+		VisualizeRegions.regionBorders(pixelToRegion,0x000000,outBorder);
 	}
 
 	public void recompute() {
