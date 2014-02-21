@@ -144,14 +144,36 @@ public class BinaryImageOps {
 	 * </p>
 	 *
 	 * @param input  Input image. Not modified.
+	 * @param numTimes How many times the operation will be applied to the image.
 	 * @param output If not null, the output image.  If null a new image is declared and returned.  Modified.
 	 * @return Output image.
 	 */
-	public static ImageUInt8 erode4(ImageUInt8 input, ImageUInt8 output) {
+	public static ImageUInt8 erode4(ImageUInt8 input, int numTimes, ImageUInt8 output) {
 		output = InputSanityCheck.checkDeclare(input, output);
+
+		if( numTimes <= 0 )
+			throw new IllegalArgumentException("numTimes must be >= 1");
 
 		ImplBinaryInnerOps.erode4(input, output);
 		ImplBinaryBorderOps.erode4(input, output);
+
+		if( numTimes > 1 ) {
+			ImageUInt8 tmp1 = new ImageUInt8(input.width,input.height);
+			ImageUInt8 tmp2 = output;
+
+			for( int i = 1; i < numTimes; i++ ) {
+				ImplBinaryInnerOps.erode4(tmp2, tmp1);
+				ImplBinaryBorderOps.erode4(tmp2, tmp1);
+
+				ImageUInt8 a = tmp1;
+				tmp1 = tmp2;
+				tmp2 = a;
+			}
+
+			if( tmp2 != output ) {
+				output.setTo(tmp2);
+			}
+		}
 
 		return output;
 	}
@@ -163,14 +185,33 @@ public class BinaryImageOps {
 	 * </p>
 	 *
 	 * @param input  Input image. Not modified.
+	 * @param numTimes How many times the operation will be applied to the image.
 	 * @param output If not null, the output image.  If null a new image is declared and returned.  Modified.
 	 * @return Output image.
 	 */
-	public static ImageUInt8 dilate4(ImageUInt8 input, ImageUInt8 output) {
+	public static ImageUInt8 dilate4(ImageUInt8 input, int numTimes, ImageUInt8 output) {
 		output = InputSanityCheck.checkDeclare(input, output);
 
 		ImplBinaryInnerOps.dilate4(input, output);
 		ImplBinaryBorderOps.dilate4(input, output);
+
+		if( numTimes > 1 ) {
+			ImageUInt8 tmp1 = new ImageUInt8(input.width,input.height);
+			ImageUInt8 tmp2 = output;
+
+			for( int i = 1; i < numTimes; i++ ) {
+				ImplBinaryInnerOps.dilate4(tmp2, tmp1);
+				ImplBinaryBorderOps.dilate4(tmp2, tmp1);
+
+				ImageUInt8 a = tmp1;
+				tmp1 = tmp2;
+				tmp2 = a;
+			}
+
+			if( tmp2 != output ) {
+				output.setTo(tmp2);
+			}
+		}
 
 		return output;
 	}
@@ -205,14 +246,33 @@ public class BinaryImageOps {
 	 * </p>
 	 *
 	 * @param input  Input image. Not modified.
+	 * @param numTimes How many times the operation will be applied to the image.
 	 * @param output If not null, the output image.  If null a new image is declared and returned.  Modified.
 	 * @return Output image.
 	 */
-	public static ImageUInt8 erode8(ImageUInt8 input, ImageUInt8 output) {
+	public static ImageUInt8 erode8(ImageUInt8 input, int numTimes, ImageUInt8 output) {
 		output = InputSanityCheck.checkDeclare(input, output);
 
 		ImplBinaryInnerOps.erode8(input, output);
 		ImplBinaryBorderOps.erode8(input, output);
+
+		if( numTimes > 1 ) {
+			ImageUInt8 tmp1 = new ImageUInt8(input.width,input.height);
+			ImageUInt8 tmp2 = output;
+
+			for( int i = 1; i < numTimes; i++ ) {
+				ImplBinaryInnerOps.erode8(tmp2, tmp1);
+				ImplBinaryBorderOps.erode8(tmp2, tmp1);
+
+				ImageUInt8 a = tmp1;
+				tmp1 = tmp2;
+				tmp2 = a;
+			}
+
+			if( tmp2 != output ) {
+				output.setTo(tmp2);
+			}
+		}
 
 		return output;
 	}
@@ -224,14 +284,33 @@ public class BinaryImageOps {
 	 * </p>
 	 *
 	 * @param input  Input image. Not modified.
+	 * @param numTimes How many times the operation will be applied to the image.
 	 * @param output If not null, the output image.  If null a new image is declared and returned.  Modified.
 	 * @return Output image.
 	 */
-	public static ImageUInt8 dilate8(ImageUInt8 input, ImageUInt8 output) {
+	public static ImageUInt8 dilate8(ImageUInt8 input, int numTimes, ImageUInt8 output) {
 		output = InputSanityCheck.checkDeclare(input, output);
 
 		ImplBinaryInnerOps.dilate8(input, output);
 		ImplBinaryBorderOps.dilate8(input, output);
+
+		if( numTimes > 1 ) {
+			ImageUInt8 tmp1 = new ImageUInt8(input.width,input.height);
+			ImageUInt8 tmp2 = output;
+
+			for( int i = 1; i < numTimes; i++ ) {
+				ImplBinaryInnerOps.dilate8(tmp2, tmp1);
+				ImplBinaryBorderOps.dilate8(tmp2, tmp1);
+
+				ImageUInt8 a = tmp1;
+				tmp1 = tmp2;
+				tmp2 = a;
+			}
+
+			if( tmp2 != output ) {
+				output.setTo(tmp2);
+			}
+		}
 
 		return output;
 	}
@@ -282,7 +361,8 @@ public class BinaryImageOps {
 	 * Given a binary image, connect together pixels to form blobs/clusters using the specified connectivity rule.
 	 * The found blobs will be labeled in an output image and also described as a set of contours.  Pixels
 	 * in the contours are consecutive order in a clockwise or counter-clockwise direction, depending on the
-	 * implementation.
+	 * implementation.  The labeled image will assign background pixels a label of 0 and each blob will be
+	 * assigned a unique ID starting from 1.
 	 * </p>
 	 *
 	 * <p>

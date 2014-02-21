@@ -70,8 +70,8 @@ public class ExampleFitPolygon {
 		ThresholdImageOps.threshold(input, binary, (float) mean, true);
 
 		// reduce noise with some filtering
-		ImageUInt8 filtered = BinaryImageOps.erode8(binary,null);
-		filtered = BinaryImageOps.dilate8(filtered, null);
+		ImageUInt8 filtered = BinaryImageOps.erode8(binary, 1, null);
+		filtered = BinaryImageOps.dilate8(filtered, 1, null);
 
 		// Find the contour around the shapes
 		List<Contour> contours = BinaryImageOps.contour(filtered, ConnectRule.EIGHT,null);

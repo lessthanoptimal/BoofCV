@@ -38,6 +38,11 @@ import java.util.List;
  * </p>
  *
  * <p>
+ * Output: Background pixels (0 in input image) are assigned a value of 0, Each blob is then assigned a unique
+ * ID starting from 1 up to the number of blobs.
+ * </p>
+ *
+ * <p>
  * Internally, the input binary image is copied into another image which will have a 1 pixel border of all zeros
  * around it.  This ensures that boundary checks will not need to be done, speeding up the algorithm by about 25%.
  * </p>

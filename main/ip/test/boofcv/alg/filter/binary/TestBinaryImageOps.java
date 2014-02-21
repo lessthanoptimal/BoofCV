@@ -28,6 +28,8 @@ import georegression.struct.point.Point2D_I32;
 import org.ddogleg.struct.FastQueue;
 import org.junit.Test;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Random;
 
@@ -125,8 +127,49 @@ public class TestBinaryImageOps {
 	
 	@Test
 	public void compareToNaive() {
-		CompareToBinaryNaive tests = new CompareToBinaryNaive(BinaryImageOps.class);
+		CompareToBinaryNaive tests = new CompareToBinaryNaive(true,BinaryImageOps.class);
 		tests.performTests(7);
+	}
+
+	/**
+	 * Checks to see if multiple calls are supported correctly
+	 */
+	@Test
+	public void checkMultipleCalls() throws InvocationTargetException, IllegalAccessException {
+		Method methods[] = BinaryImageOps.class.getMethods();
+
+		int numTimes = 0;
+		for( Method m : methods ) {
+			if( m.getName().contains("erode") || m.getName().contains("dilate")) {
+				checkMultipleCalls(m);
+				numTimes++;
+			}
+		}
+
+		assertEquals(4,numTimes);
+	}
+
+	public void checkMultipleCalls( Method m ) throws InvocationTargetException, IllegalAccessException {
+		ImageUInt8 input = new ImageUInt8(10,12);
+		ImageMiscOps.fillUniform(input, rand, 0, 1);
+
+		ImageUInt8 tmp = new ImageUInt8(10,12);
+
+		ImageUInt8 found = new ImageUInt8(10,12);
+		ImageUInt8 expected = new ImageUInt8(10,12);
+
+		for( int numTimes = 2; numTimes <= 3; numTimes++ ) {
+			m.invoke(null, input, numTimes, found);
+
+			expected.setTo(input);
+			for( int i = 0; i < numTimes; i++ ) {
+				m.invoke(null, expected, 1, tmp);
+
+				ImageUInt8 a = tmp; tmp = expected; expected = a;
+			}
+
+			BoofTesting.assertEquals(found,expected,0);
+		}
 	}
 
 	/**

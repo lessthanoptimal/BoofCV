@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,28 +32,28 @@ import boofcv.struct.image.ImageUInt8;
 public class FactoryBinaryImageOps {
 
 	/**
-	 * Filter implementation of {@link BinaryImageOps#erode4(boofcv.struct.image.ImageUInt8, boofcv.struct.image.ImageUInt8)}
+	 * Filter implementation of {@link BinaryImageOps#erode4(boofcv.struct.image.ImageUInt8, int, boofcv.struct.image.ImageUInt8)}
 	 */
 	public static FilterImageInterface<ImageUInt8, ImageUInt8> erode4() {
 		return new FilterImageReflection<ImageUInt8, ImageUInt8>(BinaryImageOps.class, "erode4", 0, 0, ImageUInt8.class, ImageUInt8.class);
 	}
 
 	/**
-	 * Filter implementation of {@link BinaryImageOps#erode8(boofcv.struct.image.ImageUInt8, boofcv.struct.image.ImageUInt8)}
+	 * Filter implementation of {@link BinaryImageOps#erode8(boofcv.struct.image.ImageUInt8, int, boofcv.struct.image.ImageUInt8)}
 	 */
 	public static FilterImageInterface<ImageUInt8, ImageUInt8> erode8() {
 		return new FilterImageReflection<ImageUInt8, ImageUInt8>(BinaryImageOps.class, "erode8", 0, 0, ImageUInt8.class, ImageUInt8.class);
 	}
 
 	/**
-	 * Filter implementation of {@link BinaryImageOps#dilate4(boofcv.struct.image.ImageUInt8, boofcv.struct.image.ImageUInt8)}
+	 * Filter implementation of {@link BinaryImageOps#dilate4(boofcv.struct.image.ImageUInt8, int, boofcv.struct.image.ImageUInt8)}
 	 */
 	public static FilterImageInterface<ImageUInt8, ImageUInt8> dilate4() {
 		return new FilterImageReflection<ImageUInt8, ImageUInt8>(BinaryImageOps.class, "dilate4", 0, 0, ImageUInt8.class, ImageUInt8.class);
 	}
 
 	/**
-	 * Filter implementation of {@link BinaryImageOps#dilate8(boofcv.struct.image.ImageUInt8, boofcv.struct.image.ImageUInt8)}
+	 * Filter implementation of {@link BinaryImageOps#dilate8(boofcv.struct.image.ImageUInt8, int, boofcv.struct.image.ImageUInt8)}
 	 */
 	public static FilterImageInterface<ImageUInt8, ImageUInt8> dilate8() {
 		return new FilterImageReflection<ImageUInt8, ImageUInt8>(BinaryImageOps.class, "dilate8", 0, 0, ImageUInt8.class, ImageUInt8.class);

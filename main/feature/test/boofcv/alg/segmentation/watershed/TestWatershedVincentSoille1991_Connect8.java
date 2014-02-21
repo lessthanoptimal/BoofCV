@@ -23,7 +23,8 @@ import boofcv.struct.image.ImageSInt32;
 import boofcv.struct.image.ImageUInt8;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Peter Abeles
@@ -172,7 +173,129 @@ public class TestWatershedVincentSoille1991_Connect8 {
 	}
 
 	@Test
-	public void seeds() {
-		fail("Implement");
+	public void example5() {
+		ImageUInt8 image = new ImageUInt8(5,4);
+		image.data = new byte[] {
+				1,1,1,5,5,
+				1,1,1,5,5,
+				0,1,1,5,5,
+				1,1,1,5,5};
+
+		WatershedVincentSoille1991 alg = new WatershedVincentSoille1991.Connect8();
+
+		alg.process(image);
+
+		ImageSInt32 found = alg.getOutput();
+
+//		found.print();
+
+		assertEquals(2,alg.getTotalRegions());
+
+		for( int y = 0; y < image.height; y++ ) {
+			for( int x = 0; x < image.width; x++ ) {
+				assertEquals(1,found.get(x,y));
+			}
+		}
+	}
+
+	@Test
+	public void exampleSeeds0() {
+		ImageUInt8 image = new ImageUInt8(4,4);
+		image.data = new byte[] {
+				1,5,5,1,
+				1,5,5,1,
+				1,5,5,1,
+				1,5,5,1};
+
+		ImageSInt32 seed = new ImageSInt32(4,4);
+		seed.data = new int[]{
+				0,0,0,0,
+				1,0,0,0,
+				0,0,0,0,
+				0,0,0,0};
+
+		WatershedVincentSoille1991 alg = new WatershedVincentSoille1991.Connect8();
+
+		alg.process(image,seed);
+		ImageSInt32 found = alg.getOutput();
+
+//		found.print();
+
+		// the whole thing should be filled with 1
+		for( int y = 0; y < image.height; y++ ) {
+			for (int x = 0; x < image.width; x++) {
+				assertEquals(1,found.get(x,y));
+			}
+		}
+	}
+
+	@Test
+	public void exampleSeeds1() {
+		ImageUInt8 image = new ImageUInt8(4,4);
+		image.data = new byte[] {
+				1,5,5,1,
+				1,5,5,1,
+				1,5,5,1,
+				1,5,5,1};
+
+		// seed from a value which isn't a local minimum
+		ImageSInt32 seed = new ImageSInt32(4,4);
+		seed.data = new int[]{
+				0,0,0,0,
+				0,1,0,0,
+				0,0,0,0,
+				0,0,0,0};
+
+		WatershedVincentSoille1991 alg = new WatershedVincentSoille1991.Connect8();
+
+		alg.process(image,seed);
+		ImageSInt32 found = alg.getOutput();
+
+//		found.print();
+
+		// the whole thing should be filled with 1
+		for( int y = 0; y < image.height; y++ ) {
+			for (int x = 0; x < image.width; x++) {
+				assertEquals(1,found.get(x,y));
+			}
+		}
+	}
+
+	@Test
+	public void exampleSeeds2() {
+		ImageUInt8 image = new ImageUInt8(4,4);
+		image.data = new byte[] {
+				5,5,5,5,
+				5,5,5,5,
+				5,5,5,5,
+				5,5,5,5};
+
+		// try multiple seeds
+		ImageSInt32 seed = new ImageSInt32(4,4);
+		seed.data = new int[]{
+				1,0,0,0,
+				0,0,0,0,
+				0,0,0,0,
+				0,0,0,2};
+
+		int expected[] = new int[]{
+				1,1,1,0,
+				1,1,0,2,
+				1,0,2,2,
+				0,2,2,2};
+
+		WatershedVincentSoille1991 alg = new WatershedVincentSoille1991.Connect8();
+
+		alg.process(image,seed);
+		ImageSInt32 found = alg.getOutput();
+
+//		found.print();
+
+		int index = 0;
+		for( int y = 0; y < image.height; y++ ) {
+			for( int x = 0; x < image.width; x++ ) {
+				assertEquals(expected[index++],found.get(x,y));
+			}
+		}
 	}
 }

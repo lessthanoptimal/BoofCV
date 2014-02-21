@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,8 +35,34 @@ public class CompareToBinaryNaive extends CompareIdenticalFunctions {
 	protected int width = 20;
 	protected int height = 30;
 
-	public CompareToBinaryNaive(Class<?> testClass) {
+	boolean hasNumTimes;
+
+	public CompareToBinaryNaive( boolean hasNumTimes , Class<?> testClass) {
 		super(testClass, ImplBinaryNaiveOps.class);
+		this.hasNumTimes = hasNumTimes;
+	}
+
+	@Override
+	protected Object[] reformatForValidation(Method m, Object[] targetParam) {
+		if( targetParam.length == 3 ) {
+			Object[] ret = new Object[2];
+			ret[0] = targetParam[0];
+			ret[1] = targetParam[2];
+			return ret;
+		}
+		return targetParam;
+	}
+
+	@Override
+	protected boolean isEquivalent(Method candidate, Method evaluation) {
+		if(isSpecialFunction(candidate)) {
+			if( evaluation.getName().compareTo(candidate.getName()) != 0 )
+				return false;
+
+			return candidate.getParameterTypes().length == 2;
+		} else {
+			return super.isEquivalent(candidate,evaluation);
+		}
 	}
 
 	@Override
@@ -47,6 +73,27 @@ public class CompareToBinaryNaive extends CompareIdenticalFunctions {
 
 		ImageMiscOps.fillUniform(input, rand, 0, 1);
 
-		return new Object[][]{{input, output}};
+		if(isSpecialFunction(candidate)) {
+			return new Object[][]{{input,1, output}};
+		} else {
+			return new Object[][]{{input, output}};
+		}
+	}
+
+	@Override
+	protected void compareResults(Object targetResult, Object[] targetParam, Object validationResult, Object[] validationParam) {
+
+		if( targetParam.length == 3 ) {
+			Object []tmp = new Object[2];
+			tmp[0] = targetParam[0];
+			tmp[1] = targetParam[2];
+			targetParam = tmp;
+		}
+
+		super.compareResults(targetResult,targetParam,validationResult,validationParam);
+	}
+
+	private boolean isSpecialFunction(Method candidate) {
+		return hasNumTimes && (candidate.getName().contains("erode") || candidate.getName().contains("dilate"));
 	}
 }
