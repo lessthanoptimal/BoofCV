@@ -19,10 +19,10 @@
 package boofcv.alg.segmentation;
 
 import boofcv.alg.misc.ImageMiscOps;
-import boofcv.alg.segmentation.watershed.RemoveWatersheds;
 import boofcv.alg.segmentation.watershed.WatershedVincentSoille1991;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.factory.segmentation.FactorySegmentationAlg;
+import boofcv.gui.feature.VisualizeRegions;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.ConnectRule;
@@ -30,7 +30,6 @@ import boofcv.struct.image.ImageSInt32;
 import boofcv.struct.image.ImageUInt8;
 
 import java.awt.image.BufferedImage;
-import java.util.Random;
 
 /**
  * @author Peter Abeles
@@ -52,34 +51,15 @@ public class VisualizeWatershedApp {
 		alg.process(gray);
 
 		ImageSInt32 pixelToRegion = alg.getOutput();
+
+		VisualizeRegions.watersheds(pixelToRegion,image);
+
+		alg.removeWatersheds();
 		int numRegions = alg.getTotalRegions();
+		BufferedImage outRegions = VisualizeRegions.regions(pixelToRegion,numRegions,null);
 
-		RemoveWatersheds remove = new RemoveWatersheds();
-		remove.remove(alg.getOutputBorder());
-		numRegions--;
 
-		BufferedImage outWatersheds = new BufferedImage(gray.width,gray.height,BufferedImage.TYPE_INT_RGB);
-		BufferedImage outRegions = new BufferedImage(gray.width,gray.height,BufferedImage.TYPE_INT_RGB);
-
-		Random rand = new Random(234);
-		int colors[] = new int[numRegions ];
-		for( int i = 0; i < colors.length; i++ ) {
-			colors[i] = rand.nextInt();
-		}
-		colors[0] = 0xFF0000;
-
-		for( int y = 0; y < gray.height; y++ ) {
-			for( int x = 0; x < gray.width; x++ ) {
-				int index = pixelToRegion.unsafe_get(x, y);
-				if( index == 0 )
-					outWatersheds.setRGB(x, y, 0xFF0000);
-				else
-					outWatersheds.setRGB(x, y, 0x00);
-				outRegions.setRGB(x, y, colors[index]);
-			}
-		}
-
-		ShowImages.showWindow(outWatersheds, "Watershed");
+		ShowImages.showWindow(image, "Watershed");
 		ShowImages.showWindow(outRegions, "Regions");
 	}
 }

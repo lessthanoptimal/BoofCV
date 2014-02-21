@@ -18,28 +18,34 @@
 
 package boofcv.alg.segmentation.watershed;
 
+import boofcv.alg.InputSanityCheck;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.struct.image.ImageSInt32;
 import boofcv.struct.image.ImageUInt8;
-import georegression.struct.point.Point2D_I32;
 import org.ddogleg.struct.CircularQueue_I32;
 import org.ddogleg.struct.GrowQueue_I32;
-
-import java.util.List;
 
 /**
  * <p>
  * Fast watershed based upon Vincient and Soille's 1991 paper [1].  Watershed segments an image using the idea
  * of immersion simulation.  For example, the image is treated as a topological map and if you let a droplet
- * of water flow down from each pixel the location the droplets cluster in defines a region.  Each region
- * is assigned an unique ID.  Since each local minima is a region, this can cause over segmentation in some images.
- * The border between two pixels is labeled as having a value of 0.
+ * of water flow down from each pixel the location the droplets cluster in defines a region.  Two different
+ * methods are provided for processing the image, a new region is created at each local minima or the user
+ * provides an initial seed for each region for it to grow from.  The output will be a segmented image
+ * with watersheds being assign a value of 0 and each region a value > 0.  Watersheds are assigned to pixels
+ * which are exactly the same distance from multiple regions, thus it is ambiguous which one it is a member of.
  * </p>
  *
  * <p>
- * If no initial seeds are used an the image is processed using {@link #process(boofcv.struct.image.ImageUInt8)} then
- * each local minima will become a region.  In most images this leads to significant oversegmentation.  If additional
- * information on the image type is available then you can provide seeds for each catchment basin/region.
+ * If the image is processed with {@link #process(boofcv.struct.image.ImageUInt8)} then a new region is
+ * created at each local minima and assigned a unique ID > 0. The total number of regions found is returned
+ * by {@link #getTotalRegions()}.  This technique will lead to over segmentation on many images.
+ * </p>
+ *
+ * <p>
+ * Initial seeds are provided with a call to {@link #process(boofcv.struct.image.ImageUInt8, boofcv.struct.image.ImageSInt32)}.
+ * No new regions will be created.  By providing an initial set of seeds over segmentation can be avoided, but
+ * prior knowledge of the image is typically needed to create the seeds.
  * </p>
  *
  * <p>
@@ -95,6 +101,10 @@ public abstract class WatershedVincentSoille1991 {
 	// FIFO circular queue
 	protected CircularQueue_I32 fifo = new CircularQueue_I32();
 
+	// used to remove watersheds
+	protected RemoveWatersheds removeWatersheds = new RemoveWatersheds();
+	boolean removedWatersheds;
+
 	public WatershedVincentSoille1991() {
 		for( int i = 0; i < histogram.length; i++ ) {
 			histogram[i] = new GrowQueue_I32();
@@ -102,13 +112,14 @@ public abstract class WatershedVincentSoille1991 {
 	}
 
 	/**
-	 * Perform watershed segmentation on the provided input image.
+	 * Perform watershed segmentation on the provided input image.  New basins are created at each local minima.
 	 *
 	 * @param input Input gray-scale image.
 	 */
 	public void process( ImageUInt8 input ) {
 		// input = im_0
 
+		removedWatersheds = false;
 		output.reshape(input.width+2,input.height+2);
 		distance.reshape(input.width+2,input.height+2);
 
@@ -178,13 +189,91 @@ public abstract class WatershedVincentSoille1991 {
 	}
 
 	/**
-	 * Segments the image using the initial seeds for each region.  This is often done to avoid
-	 * over segmentation but requires additional preprocessing or knowledge on the image structure.
-	 * @param input Input image
-	 * @param seeds Initial location for regions to grow from.
+	 * <p>
+	 * Segments the image using initial seeds for each region.  This is often done to avoid
+	 * over segmentation but requires additional preprocessing and/or knowledge on the image structure.  Initial
+	 * seeds are specified in the input image 'seeds'.  A seed is any pixel with a value > 0.  New new regions
+	 * will be created beyond those seeds.  The final segmented image is provided by {@link #getOutput()}.
+	 * </p>
+	 *
+	 * <p>
+	 * NOTE: If seeds are used then {@link #getTotalRegions()} will not return a correct solution.
+	 * </p>
+	 *
+	 * @param input (Input) Input image
+	 * @param seeds (Output) Segmented image containing seeds.  Note that all seeds should have a value > 0 and have a
+	 *              value <= numRegions.
 	 */
-	public void process( ImageUInt8 input , List<Point2D_I32> seeds ) {
+	public void process( ImageUInt8 input , ImageSInt32 seeds ) {
+		InputSanityCheck.checkSameShape(input,seeds);
 
+		removedWatersheds = false;
+		output.reshape(input.width+2,input.height+2);
+		distance.reshape(input.width+2,input.height+2);
+
+		ImageMiscOps.fill(output, INIT);
+		ImageMiscOps.fill(distance, 0);
+		fifo.reset();
+
+		// copy the seeds into the output directory
+		for( int y = 0; y < seeds.height; y++ ) {
+			int indexSeeds = seeds.startIndex + y*seeds.stride;
+			int indexOut = (y+1)*output.stride + 1;
+			for( int x = 0; x < seeds.width; x++ , indexSeeds++, indexOut++ ) {
+				int v = seeds.data[indexSeeds];
+				if( v > 0 ) {
+					output.data[indexOut] = v;
+				}
+			}
+		}
+
+		// sort pixels
+		sortPixels(input);
+
+		// perform watershed
+		for( int i = 0; i < histogram.length; i++ ) {
+			GrowQueue_I32 level = histogram[i];
+			if( level.size == 0 )
+				continue;
+
+			// Go through each pixel at this level and mark them according to their neighbors
+			for( int j = 0; j < level.size; j++ ) {
+				int index = level.data[j];
+
+				// If not has not already been labeled by a seed then try assigning it values
+				// from its neighbors
+				if( output.data[index] == INIT ) {
+					output.data[index] = MASK;
+					assignNewToNeighbors(index);
+				}
+			}
+
+			currentDistance = 1;
+			fifo.add(MARKER_PIXEL);
+
+			while( true ) {
+				int p = fifo.popHead();
+
+				// end of a cycle.  Exit the loop if it is done or increase the distance and continue processing
+				if( p == MARKER_PIXEL) {
+					if( fifo.isEmpty() )
+						break;
+					else {
+						fifo.add(MARKER_PIXEL);
+						currentDistance++;
+						p = fifo.popHead();
+					}
+				}
+
+				// look at its neighbors and see if they have been labeled or belong to a watershed
+				// and update its distance
+				checkNeighborsAssign(p);
+			}
+
+			// Ensure that all pixels have a distance of zero
+			// Could probably do this a bit more intelligently...
+			ImageMiscOps.fill(distance, 0);
+		}
 	}
 
 	/**
@@ -213,10 +302,12 @@ public abstract class WatershedVincentSoille1991 {
 			if( regionNeighbor > 0 ) {
 				if( regionTarget < 0 ) {// if is MASK
 					output.data[indexTarget] = regionNeighbor;
-				} else if( regionTarget == 0 && distanceNeighbor+1 < currentDistance ) {
+				} else if( regionTarget == 0 ) {
 					// if it is a watershed only assign to the neighbor value if it would be closer
 					// this is a deviation from what's in the paper.  There might be a type-o there or I miss read it
-					output.data[indexTarget] = regionNeighbor;
+					if( distanceNeighbor+1 < currentDistance  ) {
+						output.data[indexTarget] = regionNeighbor;
+					}
 				} else if( regionTarget != regionNeighbor ) {
 					output.data[indexTarget] = WSHED;
 				}
@@ -264,8 +355,8 @@ public abstract class WatershedVincentSoille1991 {
 	}
 
 	/**
-	 * Segmented output image with watershed.  1 pixel border has been removed and the returned image is
-	 * a sub-image.
+	 * Segmented output image with watersheds.  This is a sub-image of {@link #getOutputBorder()} to remove
+	 * the outside border of -1 valued pixels.
 	 */
 	public ImageSInt32 getOutput() {
 		output.subimage(1,1,output.width-1,output.height-1,outputSub);
@@ -273,18 +364,31 @@ public abstract class WatershedVincentSoille1991 {
 	}
 
 	/**
-	 * Original output image with the border of -1 valued pixels
+	 * The entire segmented image used internally.  This contains a 1-pixel border around the entire
+	 * image filled with pixels of value -1.
 	 */
 	public ImageSInt32 getOutputBorder() {
 		return output;
 	}
 
 	/**
-	 * Returns the total number of regions labeled, including the watershed.
+	 * Removes watershed pixels from the output image by merging them into an arbitrary neighbor.
+	 */
+	public void removeWatersheds() {
+		removedWatersheds = true;
+		removeWatersheds.remove(output);
+	}
+
+	/**
+	 * Returns the total number of regions labeled.  If watersheds have not
+	 * been removed then this will including the watershed.
+	 *
+	 * <p>THIS IS NOT VALID IF SEEDS ARE USED!!!</p>
+	 *
 	 * @return number of regions.
 	 */
 	public int getTotalRegions() {
-		return currentLabel+1;
+		return removedWatersheds ? currentLabel : currentLabel + 1;
 	}
 
 	/**

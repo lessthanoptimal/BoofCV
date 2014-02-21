@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -229,7 +229,7 @@ public class DetectChessCalibrationPoints<T extends ImageSingleBand, D extends I
 		}
 
 		// erode to make the squares separated
-		BinaryImageOps.erode8(binary, eroded);
+		BinaryImageOps.erode8(binary, 1, eroded);
 
 		return findBound.process(eroded);
 	}

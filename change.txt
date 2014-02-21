@@ -26,6 +26,7 @@ Version : Alpha 0.17
 - Added support for MultiSpectral images to:
   * GBlurImageOps and BlurImageOps
 - Image Segmentation / Superpixels
+  * Watershed
   * Mean-shift
   * Felzenszwalb-Huttenlocher 2004
   * SLIC Superpixels
@@ -40,13 +41,15 @@ Version : Alpha 0.17
   * Simplified example code
 - Added XYZ and LAB color spaces
 - GImageMiscOps.fillUniform() max is inclusive for both integer and float and this is enforced
+- BinaryImageOps
+  * Erode and dilate can now be applied multiple times with a single function call
 
+- TODO ExampleBundleAdjustment
 - TODO Automatically compile and push unstable builds.
 - TODO Add ability to resize mosaic
 - TODO Make those two failed unit tests ago away
 - TODO BoofMiscOps move XML serialization into IO package
 - TODO Long distance dense optical flow
-- TODO Watershed segmentation
 
 ---------------------------------------------
 Date    : 2013/12/25

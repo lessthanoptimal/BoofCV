@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -133,25 +133,25 @@ public class BenchmarkBinaryOps extends SimpleBenchmark {
 
 	public int timeErode4(int reps) {
 		for( int i = 0; i < reps; i++ )
-			BinaryImageOps.erode4(input, output);
+			BinaryImageOps.erode4(input, 1, output);
 		return 0;
 	}
 
 	public int timeErode8(int reps) {
 		for( int i = 0; i < reps; i++ )
-			BinaryImageOps.erode8(input, output);
+			BinaryImageOps.erode8(input, 1, output);
 		return 0;
 	}
 
 	public int timeDilate4(int reps) {
 		for( int i = 0; i < reps; i++ )
-			BinaryImageOps.dilate4(input, output);
+			BinaryImageOps.dilate4(input, 1, output);
 		return 0;
 	}
 
 	public int timeDilate8(int reps) {
 		for( int i = 0; i < reps; i++ )
-			BinaryImageOps.dilate8(input, output);
+			BinaryImageOps.dilate8(input, 1, output);
 		return 0;
 	}
 

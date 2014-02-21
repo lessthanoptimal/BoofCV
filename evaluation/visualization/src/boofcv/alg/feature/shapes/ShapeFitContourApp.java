@@ -208,8 +208,8 @@ public class ShapeFitContourApp
 		GThresholdImageOps.threshold(this.input, binary, mean, true);
 
 		// reduce noise with some filtering
-		BinaryImageOps.erode8(binary, filtered);
-		BinaryImageOps.dilate8(filtered, binary);
+		BinaryImageOps.erode8(binary, 1, filtered);
+		BinaryImageOps.dilate8(filtered, 1, binary);
 
 		// Find the contour around the shapes
 		contours = BinaryImageOps.contour(binary, ConnectRule.EIGHT,null);

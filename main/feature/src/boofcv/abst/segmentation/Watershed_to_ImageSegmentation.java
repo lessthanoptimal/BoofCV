@@ -22,7 +22,6 @@ import boofcv.alg.InputSanityCheck;
 import boofcv.alg.segmentation.ComputeRegionMeanColor;
 import boofcv.alg.segmentation.ImageSegmentationOps;
 import boofcv.alg.segmentation.ms.MergeSmallRegions;
-import boofcv.alg.segmentation.watershed.RemoveWatersheds;
 import boofcv.alg.segmentation.watershed.WatershedVincentSoille1991;
 import boofcv.core.image.GConvertImage;
 import boofcv.struct.ConnectRule;
@@ -46,8 +45,6 @@ public class Watershed_to_ImageSegmentation<T extends ImageBase> implements Imag
 	private ConnectRule rule;
 
 	private ImageUInt8 converted = new ImageUInt8(1,1);
-
-	private RemoveWatersheds removeWatershed = new RemoveWatersheds();
 
 	private MergeSmallRegions<ImageUInt8> pruneSmall;
 
@@ -73,12 +70,9 @@ public class Watershed_to_ImageSegmentation<T extends ImageBase> implements Imag
 
 		// segment the image
 		alg.process(converted);
+		alg.removeWatersheds();
 
-		// remove the watershed labeled pixels
-		removeWatershed.remove(alg.getOutputBorder());
-
-		// -1 because watershed was removed
-		numRegions = alg.getTotalRegions()-1;
+		numRegions = alg.getTotalRegions();
 		ImageSInt32 pixelToRegion = alg.getOutput();
 
 		// Merge small regions together

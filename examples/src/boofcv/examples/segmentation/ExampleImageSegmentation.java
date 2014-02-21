@@ -26,6 +26,7 @@ import boofcv.core.image.ConvertBufferedImage;
 import boofcv.factory.segmentation.ConfigFh04;
 import boofcv.factory.segmentation.FactoryImageSegmentation;
 import boofcv.factory.segmentation.FactorySegmentationAlg;
+import boofcv.gui.feature.VisualizeRegions;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.feature.ColorQueue_F32;
@@ -34,7 +35,6 @@ import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_I32;
 
 import java.awt.image.BufferedImage;
-import java.util.Random;
 
 /**
  * Example demonstrating high level image segmentation interface.  An image segmented using this
@@ -48,8 +48,8 @@ public class ExampleImageSegmentation {
 	/**
 	 * Segments and visualizes the image
 	 */
-	public static <T extends ImageBase> void performSegmentation( ImageSegmentation<T> alg ,
-																  T color )
+	public static <T extends ImageBase>
+	void performSegmentation( ImageSegmentation<T> alg , T color )
 	{
 		// Segmentation often works better after blurring the image.  Reduces high frequency image components which
 		// can cause over segmentation
@@ -71,15 +71,9 @@ public class ExampleImageSegmentation {
 	 * 2) Each pixel is assigned the mean color through out the region. 3) Black pixels represent the border
 	 * between regions.
 	 */
-	public static <T extends ImageBase> void visualize( ImageSInt32 pixelToRegion ,
-														T color ,
-														int numSegments  ) {
-
-		// Declare output buffered images
-		BufferedImage outColor = new BufferedImage(color.width,color.height,BufferedImage.TYPE_INT_RGB);
-		BufferedImage outSegments = new BufferedImage(color.width,color.height,BufferedImage.TYPE_INT_RGB);
-		BufferedImage outBorder = new BufferedImage(color.width,color.height,BufferedImage.TYPE_INT_RGB);
-
+	public static <T extends ImageBase>
+	void visualize( ImageSInt32 pixelToRegion , T color , int numSegments  )
+	{
 		// Computes the mean color inside each region
 		ImageType<T> type = color.getImageType();
 		ComputeRegionMeanColor<T> colorize = FactorySegmentationAlg.regionMeanColor(type);
@@ -93,52 +87,20 @@ public class ExampleImageSegmentation {
 		ImageSegmentationOps.countRegionPixels(pixelToRegion, numSegments, regionMemberCount.data);
 		colorize.process(color,pixelToRegion,regionMemberCount,segmentColor);
 
-		// Select random colors for each region
-		Random rand = new Random(234);
-		int colors[] = new int[ segmentColor.size ];
-		for( int i = 0; i < colors.length; i++ ) {
-			colors[i] = rand.nextInt();
-		}
+		// Draw each region using their average color
+		BufferedImage outColor = VisualizeRegions.regionsColor(pixelToRegion,segmentColor,null);
+		// Draw each region by assigning it a random color
+		BufferedImage outSegments = VisualizeRegions.regions(pixelToRegion, numSegments, null);
 
-		// Assign colors to each pixel depending on their region for mean color image and random segment color image
-		for( int y = 0; y < color.height; y++ ) {
-			for( int x = 0; x < color.width; x++ ) {
-				int index = pixelToRegion.unsafe_get(x,y);
-				float []cv = segmentColor.get(index);
-
-				int r,g,b;
-
-				if( cv.length == 3 ) {
-					r = (int)cv[0];
-					g = (int)cv[1];
-					b = (int)cv[2];
-				} else {
-					r = g = b = (int)cv[0];
-				}
-
-				int rgb = r << 16 | g << 8 | b;
-
-				outColor.setRGB(x, y, colors[index]);
-				outSegments.setRGB(x, y, rgb);
-			}
-		}
-
-		// Make edges appear black
+		// Make region edges appear red
+		BufferedImage outBorder = new BufferedImage(color.width,color.height,BufferedImage.TYPE_INT_RGB);
 		ConvertBufferedImage.convertTo(color,outBorder,true);
-		ImageUInt8 binary = new ImageUInt8(pixelToRegion.width,pixelToRegion.height);
-		ImageSegmentationOps.markRegionBorders(pixelToRegion,binary);
-		for( int y = 0; y < binary.height; y++ ) {
-			for( int x = 0; x < binary.width; x++ ) {
-				if( binary.unsafe_get(x,y) == 1 )  {
-					outBorder.setRGB(x,y,0);
-				}
-			}
-		}
+		VisualizeRegions.regionBorders(pixelToRegion,0xFF0000,outBorder);
 
 		// Show the visualization results
-		ShowImages.showWindow(outColor, "Regions");
-		ShowImages.showWindow(outSegments,"Color of Segments");
+		ShowImages.showWindow(outSegments, "Regions");
 		ShowImages.showWindow(outBorder,"Region Borders");
+		ShowImages.showWindow(outColor,"Color of Segments");
 	}
 
 	public static void main(String[] args) {

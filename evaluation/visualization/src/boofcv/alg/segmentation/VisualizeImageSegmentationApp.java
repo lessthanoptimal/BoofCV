@@ -23,6 +23,7 @@ import boofcv.core.image.ConvertBufferedImage;
 import boofcv.factory.segmentation.FactoryImageSegmentation;
 import boofcv.factory.segmentation.FactorySegmentationAlg;
 import boofcv.gui.SelectAlgorithmAndInputPanel;
+import boofcv.gui.feature.VisualizeRegions;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.PathLabel;
@@ -35,7 +36,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
-import java.util.Random;
 
 /**
  * Visualization for {@link ImageSegmentation}.
@@ -211,35 +211,8 @@ public class VisualizeImageSegmentationApp <T extends ImageBase>
 		ImageSegmentationOps.countRegionPixels(pixelToRegion, numSegments, regionMemberCount.data);
 		colorize.process(color,pixelToRegion,regionMemberCount,segmentColor);
 
-		// Select random colors for each region
-		Random rand = new Random(234);
-		int colors[] = new int[ segmentColor.size ];
-		for( int i = 0; i < colors.length; i++ ) {
-			colors[i] = rand.nextInt();
-		}
-
-		// Assign colors to each pixel depending on their region for mean color image and random segment color image
-		for( int y = 0; y < color.height; y++ ) {
-			for( int x = 0; x < color.width; x++ ) {
-				int index = pixelToRegion.unsafe_get(x,y);
-				float []cv = segmentColor.get(index);
-
-				int r,g,b;
-
-				if( cv.length == 3 ) {
-					r = (int)cv[0];
-					g = (int)cv[1];
-					b = (int)cv[2];
-				} else {
-					r = g = b = (int)cv[0];
-				}
-
-				int rgb = r << 16 | g << 8 | b;
-
-				outColor.setRGB(x, y, rgb);
-				outSegments.setRGB(x, y, colors[index]);
-			}
-		}
+		VisualizeRegions.regionsColor(pixelToRegion,segmentColor,outColor);
+		VisualizeRegions.regions(pixelToRegion,segmentColor.size(),outColor);
 
 		// Make edges appear black
 		ConvertBufferedImage.convertTo(color,outBorder,true);

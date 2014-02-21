@@ -38,15 +38,21 @@ public class RemoveWatersheds {
 	private GrowQueue_I32 open2 = new GrowQueue_I32();
 
 	/**
-	 * Removes watersheds from the segmented image.  The inputed image should be the entire original
-	 * segmented image and assumes the outside border is filled with values < 0.  Each watershed is
-	 * assigned the value of an arbitrary neighbor.  4-connect rule is used for neighbors.  Doesn't matter
-	 * if initial segmented was done using another connectivity rule.  The value of each region is reduced
-	 * by one at the very end.
+	 * Removes watersheds from the segmented image.  The input image must be the entire original
+	 * segmented image and assumes the outside border is filled with values < 0.  To access
+	 * this image call {@link boofcv.alg.segmentation.watershed.WatershedVincentSoille1991#getOutputBorder()}.
+	 * Each watershed is assigned the value of an arbitrary neighbor.  4-connect rule is used for neighbors.
+	 * Doesn't matter if initial segmented was done using another connectivity rule.  The value of each region i
+	 * s reduced by one at the very end.
 	 *
-	 * @param segmented Entire segmented image with watersheds
+	 * @param segmented Entire segmented image (including border of -1 values) with watersheds
 	 */
 	public void remove( ImageSInt32 segmented ) {
+		// very quick sanity check
+		if( segmented.get(0,0) >= 0 )
+			throw new IllegalArgumentException("The segmented image must contain a border of -1 valued pixels.  See" +
+					" JavaDoc for important details you didn't bother to read about.");
+
 		open.reset();
 
 		connect[0] = -1;

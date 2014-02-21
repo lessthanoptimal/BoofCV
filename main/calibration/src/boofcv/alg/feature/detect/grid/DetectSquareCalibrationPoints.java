@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -127,10 +127,10 @@ public class DetectSquareCalibrationPoints {
 		binaryB.reshape(thresholded.width,thresholded.height);
 
 		// filter out small objects
-		BinaryImageOps.erode8(thresholded,binaryA);
-		BinaryImageOps.erode8(binaryA,binaryB);
-		BinaryImageOps.dilate8(binaryB, binaryA);
-		BinaryImageOps.dilate8(binaryA,binaryB);
+		BinaryImageOps.erode8(thresholded, 1, binaryA);
+		BinaryImageOps.erode8(binaryA, 1, binaryB);
+		BinaryImageOps.dilate8(binaryB, 1, binaryA);
+		BinaryImageOps.dilate8(binaryA, 1, binaryB);
 
 		if( !detectBlobs.process(binaryB) )
 			return fail(detectBlobs.getMessage());
