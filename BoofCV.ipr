@@ -467,7 +467,7 @@
     <mapping directory="$PROJECT_DIR$/data" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/integration/openkinect/libfreenect" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/../ddogleg" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/../ejml/trunk" vcs="svn" />
+    <mapping directory="$PROJECT_DIR$/../ejml/trunk" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/../georegression" vcs="Git" />
   </component>
   <component name="libraryTable">

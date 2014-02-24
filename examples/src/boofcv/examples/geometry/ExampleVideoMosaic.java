@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,6 +38,7 @@ import boofcv.struct.image.MultiSpectral;
 import georegression.struct.homo.Homography2D_F64;
 import georegression.struct.point.Point2D_F64;
 
+import java.awt.*;
 import java.awt.image.BufferedImage;
 
 /**
@@ -54,9 +55,9 @@ public class ExampleVideoMosaic {
 
 		// Configure the feature detector
 		ConfigGeneralDetector confDetector = new ConfigGeneralDetector();
-		confDetector.threshold = 10;
+		confDetector.threshold = 1;
 		confDetector.maxFeatures = 300;
-		confDetector.radius = 2;
+		confDetector.radius = 3;
 
 		// Use a KLT tracker
 		PointTracker<ImageFloat32> tracker = FactoryPointTracker.klt(new int[]{1,2,4,8},confDetector,3,
@@ -77,19 +78,19 @@ public class ExampleVideoMosaic {
 
 		// Load an image sequence
 		MediaManager media = DefaultMediaManager.INSTANCE;
-		String fileName = "../data/applet/shake.mjpeg";
+		String fileName = "../data/applet/mosaic/airplane01.mjpeg";
 		SimpleImageSequence<MultiSpectral<ImageFloat32>> video =
 				media.openVideo(fileName, ImageType.ms(3, ImageFloat32.class));
 
 		MultiSpectral<ImageFloat32> frame = video.next();
 
 		// shrink the input image and center it
-		Homography2D_F64 shrink = new Homography2D_F64(0.5,0,frame.width/3,0,0.5,frame.height/2,0,0,1);
+		Homography2D_F64 shrink = new Homography2D_F64(0.5,0,frame.width/4,0,0.5,frame.height/4,0,0,1);
 		shrink = shrink.invert(null);
 
 		// The mosaic will be larger in terms of pixels but the image will be scaled down.
 		// To change this into stabilization just make it the same size as the input with no shrink.
-		stitch.configure(frame.width,frame.height,null);
+		stitch.configure(frame.width,frame.height,shrink);
 		// process the first frame
 		stitch.process(frame);
 
@@ -97,25 +98,55 @@ public class ExampleVideoMosaic {
 		ImageGridPanel gui = new ImageGridPanel(1,2);
 		gui.setImage(0,0,new BufferedImage(frame.width,frame.height,BufferedImage.TYPE_INT_RGB));
 		gui.setImage(0,1,new BufferedImage(frame.width,frame.height,BufferedImage.TYPE_INT_RGB));
-		gui.autoSetPreferredSize();
+		gui.setPreferredSize(new Dimension(3*frame.width,frame.height*2));
 
 		ShowImages.showWindow(gui,"Example Mosaic");
+
+		boolean enlarged = false;
 
 		// process the video sequence one frame at a time
 		while( video.hasNext() ) {
 			frame = video.next();
-			stitch.process(frame);
+			if( !stitch.process(frame) )
+				throw new RuntimeException("You should handle failures");
 
 			// if the current image is close to the image border recenter the mosaic
 			StitchingFromMotion2D.Corners corners = stitch.getImageCorners(frame.width,frame.height,null);
 			if( nearBorder(corners.p0,stitch) || nearBorder(corners.p1,stitch) ||
 					nearBorder(corners.p2,stitch) || nearBorder(corners.p3,stitch) ) {
 				stitch.setOriginToCurrent();
-			}
 
+				// only enlarge the image once
+				if( !enlarged ) {
+					enlarged = true;
+					// double the image size and shift it over to keep it centered
+					int widthOld = stitch.getStitchedImage().width;
+					int heightOld = stitch.getStitchedImage().height;
+
+					int widthNew = widthOld*2;
+					int heightNew = heightOld*2;
+
+					int tranX = (widthNew-widthOld)/2;
+					int tranY = (heightNew-heightOld)/2;
+
+					Homography2D_F64 newToOldStitch = new Homography2D_F64(1,0,-tranX,0,1,-tranY,0,0,1);
+
+					stitch.resizeStitchImage(widthNew, heightNew, newToOldStitch);
+					gui.setImage(0, 1, new BufferedImage(widthNew, heightNew, BufferedImage.TYPE_INT_RGB));
+				}
+				corners = stitch.getImageCorners(frame.width,frame.height,null);
+			}
 			// display the mosaic
 			ConvertBufferedImage.convertTo(frame,gui.getImage(0, 0),true);
 			ConvertBufferedImage.convertTo(stitch.getStitchedImage(), gui.getImage(0, 1),true);
+
+			// draw a red quadrilateral around the current frame in the mosaic
+			Graphics2D g2 = gui.getImage(0,1).createGraphics();
+			g2.setColor(Color.RED);
+			g2.drawLine((int)corners.p0.x,(int)corners.p0.y,(int)corners.p1.x,(int)corners.p1.y);
+			g2.drawLine((int)corners.p1.x,(int)corners.p1.y,(int)corners.p2.x,(int)corners.p2.y);
+			g2.drawLine((int)corners.p2.x,(int)corners.p2.y,(int)corners.p3.x,(int)corners.p3.y);
+			g2.drawLine((int)corners.p3.x,(int)corners.p3.y,(int)corners.p0.x,(int)corners.p0.y);
 
 			gui.repaint();
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,6 +20,11 @@ package boofcv.alg.sfm.d2;
 
 import boofcv.abst.sfm.d2.ImageMotion2D;
 import boofcv.alg.distort.ImageDistort;
+import boofcv.alg.interpolate.InterpolatePixelS;
+import boofcv.alg.interpolate.TypeInterpolate;
+import boofcv.alg.misc.ImageMiscOps;
+import boofcv.factory.distort.FactoryDistort;
+import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.distort.PixelTransform_F32;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
@@ -36,7 +41,6 @@ public class TestStitchingFromMotion2D {
 	ImageFloat32 image = new ImageFloat32(100,150);
 	Affine2D_F64 translation = new Affine2D_F64(1,0,0,1,1,-2);
 	Affine2D_F64 motion0 = new Affine2D_F64(1,2,3,4,5,6);
-
 
 	/**
 	 * Given fake internal algorithms see if it performs as expected.  tests several functions
@@ -146,19 +150,82 @@ public class TestStitchingFromMotion2D {
 		alg.configure(200,300,null);
 		assertTrue(alg.process(image));
 
-		Affine2D_F64 found = alg.getWorldToCurr();
-		assertEquals(1,found.tx,1e-5);
-		assertEquals(-2,found.ty,1e-5);
-
 		alg.setOriginToCurrent();
-
-		// the image should not be at the initial location
-		found = alg.getWorldToCurr();
-		assertEquals(0,found.tx,1e-5);
-		assertEquals(0,found.ty,1e-5);
 
 		assertEquals(2, distort.numSetModel);
 		assertEquals(2, distort.numApply);
+	}
+
+	@Test
+	public void resizeStitchImage_noTransform() {
+		HelperMotion motion = new HelperMotion();
+		HelperDistort distort = new HelperDistort();
+
+		StitchingTransform trans = FactoryStitchingTransform.createAffine_F64();
+
+		StitchingFromMotion2D<ImageFloat32,Affine2D_F64> alg =
+				new StitchingFromMotion2D<ImageFloat32,Affine2D_F64>(motion,distort,trans,0.3);
+
+		alg.configure(200,300,null);
+		assertTrue(alg.process(image));
+
+		ImageMiscOps.fill(alg.getStitchedImage().subimage(2,3,30,40,null),1);
+		alg.resizeStitchImage(250,400,null);
+
+		// see if the image is where it should be
+		checkBlock(2,3,30,40,alg.getStitchedImage());
+		// check the stiched image size
+		assertEquals(250,alg.getStitchedImage().width);
+		assertEquals(400,alg.getStitchedImage().height);
+
+		// no transform provided, should be the same
+		Affine2D_F64 found = alg.getWorldToCurr();
+		assertEquals(1,found.tx,1e-5);
+		assertEquals(-2,found.ty,1e-5);
+	}
+
+	@Test
+	public void resizeStitchImage_Transform() {
+		HelperMotion motion = new HelperMotion();
+		InterpolatePixelS interp = FactoryInterpolation.createPixelS(0, 255, TypeInterpolate.BILINEAR, ImageFloat32.class);
+		ImageDistort distorter = FactoryDistort.distort(interp, null, ImageFloat32.class);
+
+		StitchingTransform trans = FactoryStitchingTransform.createAffine_F64();
+
+		StitchingFromMotion2D<ImageFloat32,Affine2D_F64> alg =
+				new StitchingFromMotion2D<ImageFloat32,Affine2D_F64>(motion,distorter,trans,0.3);
+
+		alg.configure(200,300,null);
+		assertTrue(alg.process(image));
+
+		ImageMiscOps.fill(alg.getStitchedImage().subimage(2,3,30,40,null),1);
+		Affine2D_F64 transform = new Affine2D_F64(1,0,0,1,-2,4);
+		alg.resizeStitchImage(250, 400, transform);
+
+		// see if the image is where it should be
+		checkBlock(4, 0, 32, 36, alg.getStitchedImage());
+		// check the stitched image size
+		assertEquals(250,alg.getStitchedImage().width);
+		assertEquals(400,alg.getStitchedImage().height);
+
+		// check to see if translation was correctly applied
+		Affine2D_F64 found = alg.getWorldToCurr();
+		assertEquals(1-2,found.tx,1e-5);
+		assertEquals(-2+4,found.ty,1e-5);
+	}
+
+	private void checkBlock( int x0 , int y0 , int x1 , int y1 , ImageFloat32 image ) {
+
+		for( int y = 0; y < image.height; y++ ) {
+			for (int x = 0; x < image.width; x++) {
+				float v = image.get(x,y);
+				if( x >= x0 && x < x1 && y >= y0 && y < y1 ) {
+					assertEquals(x+" "+y,1,v,1e-5);
+				} else {
+					assertEquals(0,v,1e-5);
+				}
+			}
+		}
 	}
 
 	@Test
