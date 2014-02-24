@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -48,6 +48,12 @@ import georegression.struct.shapes.Rectangle2D_I32;
 
 public class StitchingFromMotion2D<I extends ImageBase, IT extends InvertibleTransform>
 {
+	// REFERENCE FRAME NOTES:
+	//
+	// World references to the stitched image
+	// Initial is the first video frame in video coordinates
+	// Current is the current video frame in video coordinates
+
 	// estimates image motion
 	private ImageMotion2D<I,IT> motion;
 	// renders the distorted image according to results from motion
@@ -55,7 +61,7 @@ public class StitchingFromMotion2D<I extends ImageBase, IT extends InvertibleTra
 	// converts different types of motion models into other formats
 	private StitchingTransform<IT> converter;
 
-	// initial transform, typical used to adjust the scale and translate
+	// Transform from first video frame to the initial location in the stitched image
 	private IT worldToInit;
 	// size of the stitch image
 	private int widthStitch, heightStitch;
@@ -106,7 +112,8 @@ public class StitchingFromMotion2D<I extends ImageBase, IT extends InvertibleTra
 	 *
 	 * @param widthStitch Width of the image being stitched into
 	 * @param heightStitch Height of the image being stitched into
-	 * @param worldToInit (Option) Used to change the location of the initial frame.  null means no transform.
+	 * @param worldToInit (Option) Used to change the location of the initial frame in stitched image.
+	 *                    null means no transform.
 	 */
 	public void configure( int widthStitch, int heightStitch , IT worldToInit ) {
 		this.worldToInit = (IT)worldToCurr.createInstance();
@@ -215,12 +222,13 @@ public class StitchingFromMotion2D<I extends ImageBase, IT extends InvertibleTra
 	}
 
 	/**
-	 * Sets the current image to be the origin of the stitched coordinate system.
+	 * Sets the current image to be the origin of the stitched coordinate system.  The background is filled
+	 * with a value of 0.
 	 * Must be called after {@link #process(boofcv.struct.image.ImageBase)}.
 	 */
 	public void setOriginToCurrent() {
 		IT currToWorld = (IT)worldToCurr.invert(null);
-		IT oldWorldToNewWorld = (IT)worldToInit.concat(currToWorld,null);
+		IT oldWorldToNewWorld = (IT) worldToInit.concat(currToWorld,null);
 
 		PixelTransform_F32 newToOld = converter.convertPixel(oldWorldToNewWorld,null);
 
@@ -237,8 +245,47 @@ public class StitchingFromMotion2D<I extends ImageBase, IT extends InvertibleTra
 
 		// have motion estimates be relative to this frame
 		motion.setToFirst();
-		worldToCurr.reset();
 		first = true;
+
+		computeCurrToInit_PixelTran();
+	}
+
+	/**
+	 * Resizes the stitch image.  If no transform is provided then the old stitch region is simply
+	 * places on top of the new one and copied.  Pixels which do not exist in the old image are filled with zero.
+	 *
+	 * @param widthStitch The new width of the stitch image.
+	 * @param heightStitch The new height of the stitch image.
+	 * @param newToOldStitch (Optional) Transform from new stitch image pixels to old stick pixels.  Can be null.
+	 */
+	public void resizeStitchImage( int widthStitch, int heightStitch , IT newToOldStitch ) {
+
+		// copy the old image into the new one
+		workImage.reshape(widthStitch,heightStitch);
+		GImageMiscOps.fill(workImage, 0);
+		if( newToOldStitch != null ) {
+			PixelTransform_F32 newToOld = converter.convertPixel(newToOldStitch,null);
+			distorter.setModel(newToOld);
+			distorter.apply(stitchedImage, workImage);
+
+			// update the transforms
+			IT tmp = (IT)worldToCurr.createInstance();
+			newToOldStitch.concat(worldToInit, tmp);
+			worldToInit.set(tmp);
+
+			computeCurrToInit_PixelTran();
+		} else {
+			int overlapWidth = Math.min(widthStitch,stitchedImage.width);
+			int overlapHeight = Math.min(heightStitch,stitchedImage.height);
+			GImageMiscOps.copy(0,0,0,0,overlapWidth,overlapHeight,stitchedImage,workImage);
+		}
+		stitchedImage.reshape(widthStitch,heightStitch);
+		I tmp = stitchedImage;
+		stitchedImage = workImage;
+		workImage = tmp;
+
+		this.widthStitch = widthStitch;
+		this.heightStitch = heightStitch;
 	}
 
 	/**
