@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -95,7 +95,8 @@ public class ExampleVideoStabilization {
 
 		// process the video sequence one frame at a time
 		while( video.hasNext() ) {
-			stabilize.process(video.next());
+			if( !stabilize.process(video.next()) )
+				throw new RuntimeException("Don't forget to handle failures!");
 
 			// display the stabilized image
 			ConvertBufferedImage.convertTo(frame,gui.getImage(0, 0),true);

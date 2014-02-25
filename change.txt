@@ -46,13 +46,15 @@ Version : Alpha 0.17
 - StitchingFromMotion2D can now resize and translate the stitch image
   * Thanks Julien Seinturier for the suggestion
 
-- TODO ExampleDenseOpticalFlow
 - TODO Application DenseOpticalFlow
 - TODO ExampleBundleAdjustment
 - TODO Automatically compile and push unstable builds.
 - TODO Make those two failed unit tests ago away
 - TODO BoofMiscOps move XML serialization into IO package
-- TODO Long distance dense optical flow
+- TODO Dense Optical Flow Horn-Schunck Pyramid
+- TODO                    KLT Pyramid
+- TODO                    Fix up the block one
+
 
 ---------------------------------------------
 Date    : 2013/12/25
