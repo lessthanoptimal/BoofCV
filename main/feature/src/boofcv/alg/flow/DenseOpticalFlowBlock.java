@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -48,6 +48,8 @@ import boofcv.struct.image.ImageUInt8;
  *
  * @author Peter Abeles
  */
+// TODO change algorithm such that it only searches to the right and below.  Assign each pixel the region which
+//      which fits it the best
 public abstract class DenseOpticalFlowBlock<T extends ImageSingleBand> {
 
 	// the maximum displacement it will search
