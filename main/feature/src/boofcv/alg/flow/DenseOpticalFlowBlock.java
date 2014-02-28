@@ -48,8 +48,6 @@ import boofcv.struct.image.ImageUInt8;
  *
  * @author Peter Abeles
  */
-// TODO change algorithm such that it only searches to the right and below.  Assign each pixel the region which
-//      which fits it the best
 public abstract class DenseOpticalFlowBlock<T extends ImageSingleBand> {
 
 	// the maximum displacement it will search
@@ -111,7 +109,7 @@ public abstract class DenseOpticalFlowBlock<T extends ImageSingleBand> {
 				extractTemplate(x,y,prev);
 				float score = findFlow(x,y,curr,tmp);
 
-				if( tmp.valid )
+				if( tmp.isValid() )
 					checkNeighbors(x,y,tmp,output,score);
 			}
 		}
@@ -149,12 +147,11 @@ public abstract class DenseOpticalFlowBlock<T extends ImageSingleBand> {
 		}
 
 		if( bestScore <= maxError ) {
-			flow.valid = true;
 			flow.x = bestFlowX;
 			flow.y = bestFlowY;
 			return bestScore;
 		} else {
-			flow.valid = false;
+			flow.markInvalid();
 			return Float.NaN;
 		}
 	}
@@ -169,7 +166,7 @@ public abstract class DenseOpticalFlowBlock<T extends ImageSingleBand> {
 			for( int j = -searchRadius; j <= searchRadius; j++ , index++ ) {
 				float s = scores[ index ];
 				ImageFlow.D f = image.data[index];
-				if( !f.valid || s > score ) {
+				if( !f.isValid() || s > score ) {
 					f.set(flow);
 					scores[index] = score;
 				} else if( s == score ) {

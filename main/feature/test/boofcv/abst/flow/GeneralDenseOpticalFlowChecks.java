@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,8 +27,7 @@ import org.junit.Test;
 
 import java.util.Random;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * @author Peter Abeles
@@ -77,9 +76,9 @@ public abstract class GeneralDenseOpticalFlowChecks<T extends ImageSingleBand>
 
 		int count0 = 0, count1 = 0;
 		for( int x = 0; x < shifted.width; x++ ) {
-			if( found.get(x,0).valid )
+			if( found.get(x,0).isValid() )
 				count0++;
-			if( found.get(x,found.height-2).valid )
+			if( found.get(x,found.height-2).isValid() )
 				count1++;
 		}
 
@@ -94,9 +93,9 @@ public abstract class GeneralDenseOpticalFlowChecks<T extends ImageSingleBand>
 
 		int count2 = 0, count3 = 0;
 		for( int y = 0; y < shifted.height; y++ ) {
-			if( found.get(0,y).valid )
+			if( found.get(0,y).isValid() )
 				count2++;
-			if( found.get(found.width-2,y).valid )
+			if( found.get(found.width-2,y).isValid() )
 				count3++;
 		}
 
@@ -119,7 +118,7 @@ public abstract class GeneralDenseOpticalFlowChecks<T extends ImageSingleBand>
 				alg.process(orig,shifted,found);
 
 				ImageFlow.D flow = found.get(10,10);
-				assertTrue(flow.valid);
+				assertTrue(flow.isValid());
 				assertEquals(dx, flow.x, 0.2);
 				assertEquals(dy,flow.y,0.2);
 			}
@@ -160,9 +159,12 @@ public abstract class GeneralDenseOpticalFlowChecks<T extends ImageSingleBand>
 				ImageFlow.D a = found.get(x,y);
 				ImageFlow.D b = found2.get(x,y);
 
-				assertTrue( a.valid == b.valid );
-				assertTrue( a.x == b.x );
-				assertTrue( a.y == b.y );
+				if( a.isValid() ) {
+					assertTrue( a.x == b.x );
+					assertTrue( a.y == b.y );
+				} else {
+					assertFalse(b.isValid());
+				}
 			}
 		}
 	}

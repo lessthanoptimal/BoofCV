@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,13 +25,15 @@ import boofcv.abst.flow.FlowKlt_to_DenseOpticalFlow;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.alg.flow.DenseOpticalFlowBlock;
 import boofcv.alg.flow.DenseOpticalFlowKlt;
-import boofcv.alg.tracker.klt.KltConfig;
-import boofcv.alg.tracker.klt.KltTracker;
+import boofcv.alg.tracker.klt.PkltConfig;
+import boofcv.alg.tracker.klt.PyramidKltTracker;
 import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.factory.tracker.FactoryTrackerAlg;
+import boofcv.factory.transform.pyramid.FactoryPyramid;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.pyramid.PyramidDiscrete;
 
 /**
  * Creates implementations of {@link DenseOpticalFlow}.
@@ -41,6 +43,7 @@ import boofcv.struct.image.ImageUInt8;
 public class FactoryDenseOpticalFlow {
 
 	/**
+	 * Compute optical flow using {@link PyramidKltTracker}.
 	 *
 	 * @see DenseOpticalFlowKlt
 	 *
@@ -53,17 +56,25 @@ public class FactoryDenseOpticalFlow {
 	 * @return DenseOpticalFlow
 	 */
 	public static <I extends ImageSingleBand, D extends ImageSingleBand>
-	DenseOpticalFlow<I> flowKlt( KltConfig configKlt, int radius , Class<I> inputType , Class<D> derivType ) {
+	DenseOpticalFlow<I> flowKlt( PkltConfig configKlt, int radius , Class<I> inputType , Class<D> derivType ) {
+
+		if( configKlt == null )
+			configKlt = new PkltConfig();
 
 		if( derivType == null ) {
 			derivType = GImageDerivativeOps.getDerivativeType(inputType);
 		}
 
-		KltTracker<I, D> tracker = FactoryTrackerAlg.klt(configKlt,inputType,derivType);
-		DenseOpticalFlowKlt<I, D> flowKlt = new DenseOpticalFlowKlt<I, D>(tracker,radius);
+		int numLayers = configKlt.pyramidScaling.length;
+
+		PyramidDiscrete<I> pyramidA = FactoryPyramid.discreteGaussian(configKlt.pyramidScaling, -1, 2, true, inputType);
+		PyramidDiscrete<I> pyramidB = FactoryPyramid.discreteGaussian(configKlt.pyramidScaling, -1, 2, true, inputType);
+
+		PyramidKltTracker<I, D> tracker = FactoryTrackerAlg.kltPyramid(configKlt.config, inputType, derivType);
+		DenseOpticalFlowKlt<I, D> flowKlt = new DenseOpticalFlowKlt<I, D>(tracker,numLayers,radius);
 		ImageGradient<I, D> gradient = FactoryDerivative.sobel(inputType,derivType);
 
-		return new FlowKlt_to_DenseOpticalFlow<I,D>(flowKlt,gradient,inputType,derivType);
+		return new FlowKlt_to_DenseOpticalFlow<I,D>(flowKlt,gradient,pyramidA,pyramidB,inputType,derivType);
 	}
 
 	/**

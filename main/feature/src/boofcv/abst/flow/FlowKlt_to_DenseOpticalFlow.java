@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,10 +20,14 @@ package boofcv.abst.flow;
 
 import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.alg.flow.DenseOpticalFlowKlt;
+import boofcv.alg.transform.pyramid.PyramidOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.flow.ImageFlow;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageType;
+import boofcv.struct.pyramid.ImagePyramid;
+
+import java.lang.reflect.Array;
 
 /**
  * Wrapper around {@link DenseOpticalFlowKlt} for {@link DenseOpticalFlow}.
@@ -36,29 +40,49 @@ public class FlowKlt_to_DenseOpticalFlow<I extends ImageSingleBand, D extends Im
 	DenseOpticalFlowKlt<I,D> flowKlt;
 	ImageGradient<I,D> gradient;
 
-	D derivX,derivY;
+	ImagePyramid<I> pyramidSrc;
+	ImagePyramid<I> pyramidDst;
+
+	D[] srcDerivX;
+	D[] srcDerivY;
 
 	ImageType<I> imageType;
 
 	public FlowKlt_to_DenseOpticalFlow(DenseOpticalFlowKlt<I, D> flowKlt,
 									   ImageGradient<I, D> gradient,
+									   ImagePyramid<I> pyramidSrc,
+									   ImagePyramid<I> pyramidDst,
 									   Class<I> inputType , Class<D> derivType ) {
+		if( pyramidSrc.getNumLayers() != pyramidDst.getNumLayers() )
+			throw new IllegalArgumentException("Pyramids do not have the same number of layers!");
+
 		this.flowKlt = flowKlt;
 		this.gradient = gradient;
+		this.pyramidSrc = pyramidSrc;
+		this.pyramidDst = pyramidDst;
 
-		derivX = GeneralizedImageOps.createSingleBand(derivType,1,1);
-		derivY = GeneralizedImageOps.createSingleBand(derivType,1,1);
+		srcDerivX = (D[])Array.newInstance(derivType,pyramidSrc.getNumLayers());
+		srcDerivY = (D[])Array.newInstance(derivType,pyramidSrc.getNumLayers());
+
+		for( int i = 0; i < srcDerivX.length; i++ ) {
+			srcDerivX[i] = GeneralizedImageOps.createSingleBand(derivType,1,1);
+			srcDerivY[i] = GeneralizedImageOps.createSingleBand(derivType,1,1);
+		}
 
 		imageType = ImageType.single(inputType);
 	}
 
 	@Override
 	public void process(I source, I destination, ImageFlow flow) {
-		derivX.reshape(source.width,source.height);
-		derivY.reshape(source.width,source.height);
+		pyramidSrc.process(source);
+		pyramidDst.process(destination);
 
-		gradient.process(source,derivX,derivY);
-		flowKlt.process(source,derivX,derivY,destination,flow);
+		PyramidOps.reshapeOutput(pyramidSrc,srcDerivX);
+		PyramidOps.reshapeOutput(pyramidSrc,srcDerivY);
+
+		PyramidOps.gradient(pyramidSrc, gradient, srcDerivX,srcDerivY);
+
+		flowKlt.process(pyramidSrc,srcDerivX,srcDerivY,pyramidDst,flow);
 	}
 
 	@Override

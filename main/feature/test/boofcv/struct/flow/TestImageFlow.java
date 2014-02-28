@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -55,7 +55,7 @@ public class TestImageFlow {
 	public void invalidateAll() {
 		ImageFlow a = new ImageFlow(3,4);
 		for( int i = 0; i < a.data.length; i++ )
-			a.data[i].valid = true;
+			a.data[i].markInvalid();
 
 		a.invalidateAll();
 
