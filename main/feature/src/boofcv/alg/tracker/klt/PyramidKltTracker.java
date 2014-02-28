@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -87,6 +87,16 @@ public class PyramidKltTracker<InputImage extends ImageSingleBand, DerivativeIma
 	}
 
 	/**
+	 * Only sets the image pyramid.  The derivatives are set to null.  Only use this when tracking.
+	 * @param image Image pyramid
+	 */
+	public void setImage(ImagePyramid<InputImage> image ) {
+		this.image = image;
+		this.derivX = null;
+		this.derivY = null;
+	}
+
+	/**
 	 * <p>
 	 * Finds the feature's new location in the image. The feature's position can be modified even if
 	 * tracking fails.
@@ -114,7 +124,8 @@ public class PyramidKltTracker<InputImage extends ImageSingleBand, DerivativeIma
 			x /= scale;
 			y /= scale;
 
-			setupKltTracker(layer);
+			// tracking never needs the derivative
+			tracker.unsafe_setImage(image.getLayer(layer), null, null);
 
 			KltFeature f = feature.desc[layer];
 			f.setPosition(x, y);
@@ -141,8 +152,8 @@ public class PyramidKltTracker<InputImage extends ImageSingleBand, DerivativeIma
 
 	private void setupKltTracker(int layer) {
 		if (derivX != null)
-			tracker.setImage(image.getLayer(layer), derivX[layer], derivY[layer]);
+			tracker.unsafe_setImage(image.getLayer(layer), derivX[layer], derivY[layer]);
 		else
-			tracker.setImage(image.getLayer(layer), null, null);
+			tracker.unsafe_setImage(image.getLayer(layer), null, null);
 	}
 }

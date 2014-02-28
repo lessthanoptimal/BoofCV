@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -61,7 +61,7 @@ public class ImageFlow {
 	public void invalidateAll() {
 		int N = width*height;
 		for( int i = 0; i < N; i++ )
-			data[i].valid = false;
+			data[i].x = Float.NaN;
 	}
 
 	public D get( int x , int y ) {
@@ -88,25 +88,23 @@ public class ImageFlow {
 	}
 
 	/**
-	 * Specifies the optical flow for a single pixel.  The value of (x,y) is only valid if 'valid' equals true.
-	 * If 'valid' is false then the meaning of (x,y) is undefined and should not be used.
+	 * Specifies the optical flow for a single pixel.  Pixels for which no optical flow could be found are marked
+	 * by setting x to Float.NaN.
 	 */
 	public static class D
 	{
 		/**
-		 * Optical flow
+		 * Optical flow.  If no valid flow could be found then x = Float.NaN
 		 */
 		public float x,y;
-		/**
-		 * If true then the optical flow could be computed at this pixel. If false then the flow could not
-		 * be found and (x,y) have an undefined meaning and should be ignored.
-		 */
-		public boolean valid;
 
 		public void set( D d ) {
 			this.x = d.x;
 			this.y = d.y;
-			this.valid = d.valid;
+		}
+
+		public void markInvalid() {
+			x = Float.NaN;
 		}
 
 		public float getX() {
@@ -118,7 +116,7 @@ public class ImageFlow {
 		}
 
 		public boolean isValid() {
-			return valid;
+			return !Float.isNaN(x);
 		}
 	}
 }

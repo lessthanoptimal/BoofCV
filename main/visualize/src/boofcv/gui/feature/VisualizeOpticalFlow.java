@@ -45,7 +45,7 @@ public class VisualizeOpticalFlow {
 			for( int x = 0; x < flowImage.width; x++ ) {
 				ImageFlow.D f = flowImage.unsafe_get(x,y);
 
-				if( !f.valid ) {
+				if( !f.isValid() ) {
 					out.setRGB(x,y,0xFF);
 				} else {
 					double angle = Math.atan2(f.y,f.x);
@@ -69,7 +69,7 @@ public class VisualizeOpticalFlow {
 			for( int x = 0; x < flowImage.width; x++ ) {
 				ImageFlow.D f = flowImage.unsafe_get(x,y);
 
-				if( !f.valid ) {
+				if( !f.isValid() ) {
 					out.setRGB(x,y,0xFF);
 				} else {
 					float m = Math.max(Math.abs(f.x),Math.abs(f.y));
@@ -94,7 +94,7 @@ public class VisualizeOpticalFlow {
 			for( int x = 0; x < flowImage.width; x++ ) {
 				ImageFlow.D f = flowImage.unsafe_get(x,y);
 
-				if( !f.valid ) {
+				if( !f.isValid() ) {
 					out.setRGB(x,y,0xFF);
 				} else {
 					float m = Math.max(Math.abs(f.x),Math.abs(f.y));
@@ -124,7 +124,7 @@ public class VisualizeOpticalFlow {
 			for( int x = 0; x < flowImage.width; x++ ) {
 				ImageFlow.D f = flowImage.unsafe_get(x,y);
 
-				if( !f.valid ) {
+				if( !f.isValid() ) {
 					out.setRGB(x,y,0x55);
 				} else {
 					float m = Math.max(Math.abs(f.x),Math.abs(f.y))/maxValue;
