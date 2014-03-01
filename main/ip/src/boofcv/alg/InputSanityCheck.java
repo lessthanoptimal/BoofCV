@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,6 +21,7 @@ package boofcv.alg;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.pyramid.ImagePyramid;
 
 /**
  * @author Peter Abeles
@@ -74,6 +75,16 @@ public class InputSanityCheck {
 			throw new IllegalArgumentException("Image widths do not match.");
 		if (imgA.height != imgB.height)
 			throw new IllegalArgumentException("Image heights do not match.");
+	}
+
+	public static void checkSameShape(ImagePyramid<?> imgA, ImagePyramid<?> imgB) {
+		if (imgA.getNumLayers() != imgB.getNumLayers())
+			throw new IllegalArgumentException("Number of layers do not match");
+		int N = imgA.getNumLayers();
+		for( int i = 0; i < N; i++ ) {
+			if( imgA.getScale(i) != imgB.getScale(i) )
+				throw new IllegalArgumentException("Scales do not match at layer "+i);
+		}
 	}
 
 	public static void checkSameShape(ImageBase<?> imgA, ImageBase<?> imgB, ImageBase<?> imgC) {

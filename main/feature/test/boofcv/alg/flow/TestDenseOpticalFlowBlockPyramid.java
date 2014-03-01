@@ -28,7 +28,7 @@ import static org.junit.Assert.*;
 /**
  * @author Peter Abeles
  */
-public class TestDenseOpticalFlowBlock {
+public class TestDenseOpticalFlowBlockPyramid {
 
 	@Test
 	public void findFlow() {
@@ -119,7 +119,7 @@ public class TestDenseOpticalFlowBlock {
 	}
 
 
-	public static class Dummy extends DenseOpticalFlowBlock {
+	public static class Dummy extends DenseOpticalFlowBlockPyramid {
 
 		public boolean sameScore = false;
 		public int targetX;

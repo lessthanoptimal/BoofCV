@@ -16,28 +16,33 @@
  * limitations under the License.
  */
 
-package boofcv.abst.flow;
-
-import boofcv.factory.flow.FactoryDenseOpticalFlow;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageUInt8;
+package boofcv.factory.flow;
 
 /**
  * @author Peter Abeles
  */
-public class TestFlowRegion_to_DenseOpticalFlow {
+public class ConfigOpticalFlowBlockPyramid {
 
-	public void allTests() {
-		Class imageTypes[] = new Class[]{ImageUInt8.class,ImageFloat32.class};
+	/**
+	 * Radius of the search area
+	 */
+	public int searchRadius = 4;
+	/**
+	 * Radius of the square region
+	 */
+	public int regionRadius = 5;
+	/**
+	 * Maximum error allowed per pixel. Default is 30
+	 */
+	public int maxPerPixelError = 30;
 
-		for( Class it : imageTypes ) {
-			new GeneralDenseOpticalFlowChecks(it) {
-				@Override
-				public DenseOpticalFlow createAlg(Class imageType) {
-					return FactoryDenseOpticalFlow.region(null,imageType);
-				}
-			}.allTests();
-		}
-	}
+	/**
+	 * Difference in scale between layers in the pyramid. A value of 1 means a single layer.
+	 */
+	public double pyramidScale = 0.75;
 
+	/**
+	 * The maximum number of layers in the pyramid
+	 */
+	public int maxPyramidLayers = 20;
 }
