@@ -24,11 +24,16 @@ import boofcv.struct.flow.ImageFlow;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.pyramid.ImagePyramid;
+
+import java.util.Arrays;
 
 /**
  * <p>
- * Computes optical flow using square regions and a locally exhaustive search.  For each pixel in the prev image, a
- * square region centered around it is compared against all other regions within the specified search radius of it
+ * Computes dense optical flow optical using pyramidal approach with square regions and a locally exhaustive search.
+ * Flow estimates from higher layers in the pyramid are used to provide an initial estimate flow lower layers.
+ * For each pixel in the 'prev' image, a square region centered around it is compared against
+ * all other regions within the specified search radius of it
  * in image 'curr'.  For each candidate flow the error is computed.  After the best score has been found each local
  * pixel which contributed to that square region is checked.  When a pixel is checked its current score compared
  * to see if it's better than the score it was previously assigned (if any) then its flow and score will be set to
@@ -48,7 +53,7 @@ import boofcv.struct.image.ImageUInt8;
  *
  * @author Peter Abeles
  */
-public abstract class DenseOpticalFlowBlock<T extends ImageSingleBand> {
+public abstract class DenseOpticalFlowBlockPyramid<T extends ImageSingleBand> {
 
 	// the maximum displacement it will search
 	protected int searchRadius;
@@ -60,6 +65,11 @@ public abstract class DenseOpticalFlowBlock<T extends ImageSingleBand> {
 
 	// maximum allowed error between two regions for it to be a valid flow
 	protected int maxError;
+
+	// flow in the previous layer
+	protected ImageFlow flowPrevLayer = new ImageFlow(1,1);
+	// flow in the current layer
+	protected ImageFlow flowCurrLayer = new ImageFlow(1,1);
 
 	protected ImageFlow.D tmp = new ImageFlow.D();
 
@@ -74,8 +84,8 @@ public abstract class DenseOpticalFlowBlock<T extends ImageSingleBand> {
 	 * @param maxPerPixelError Maximum error allowed per pixel.
 	 * @param imageType Type of image which is being processed.
 	 */
-	public DenseOpticalFlowBlock(int searchRadius, int regionRadius,
-								 int maxPerPixelError, Class<T> imageType) {
+	public DenseOpticalFlowBlockPyramid(int searchRadius, int regionRadius,
+										int maxPerPixelError, Class<T> imageType) {
 		this.searchRadius = searchRadius;
 		this.regionRadius = regionRadius;
 
@@ -87,34 +97,85 @@ public abstract class DenseOpticalFlowBlock<T extends ImageSingleBand> {
 
 	/**
 	 * Computes the optical flow form 'prev' to 'curr' and stores the output into output
-	 * @param prev Previous image
-	 * @param curr Current image
-	 * @param output Dense optical flow output
+	 * @param pyramidPrev Previous image
+	 * @param pyramidCurr Current image
 	 */
-	public void process( T prev , T curr , ImageFlow output ) {
+	public void process( ImagePyramid<T> pyramidPrev , ImagePyramid<T> pyramidCurr ) {
 
-		InputSanityCheck.checkSameShape(prev, curr);
-		output.invalidateAll();
+		InputSanityCheck.checkSameShape(pyramidPrev, pyramidCurr);
 
-		int N = prev.width*prev.height;
-		if( scores.length < N )
-			scores = new float[N];
+		int numLayers = pyramidPrev.getNumLayers();
 
-		int r = searchRadius+regionRadius;
-		int x1 = prev.width-r;
-		int y1 = prev.height-r;
+		for( int i = numLayers-1; i >= 0; i-- ) {
 
-		for( int y = r; y < y1; y++ ) {
-			for( int x = r; x < x1; x++ ) {
-				extractTemplate(x,y,prev);
-				float score = findFlow(x,y,curr,tmp);
+			T prev = pyramidPrev.getLayer(i);
+			T curr = pyramidCurr.getLayer(i);
 
-				if( tmp.isValid() )
-					checkNeighbors(x,y,tmp,output,score);
+			flowCurrLayer.reshape(prev.width, prev.height);
+
+			int N = prev.width*prev.height;
+			if( scores.length < N )
+				scores = new float[N];
+			// mark all the scores as being very large so that if it has not been processed its score
+			// will be set inside of checkNeighbors.
+			Arrays.fill(scores,0,N,Float.MAX_VALUE);
+
+			int x1 = prev.width-regionRadius;
+			int y1 = prev.height-regionRadius;
+
+			if( i == numLayers-1 ) {
+				// the top most layer in the pyramid has no hint
+				for( int y = regionRadius; y < y1; y++ ) {
+					for( int x = regionRadius; x < x1; x++ ) {
+						extractTemplate(x,y,prev);
+						float score = findFlow(x,y,curr,tmp);
+
+						if( tmp.isValid() )
+							checkNeighbors(x,y,tmp, flowCurrLayer,score);
+						else
+							flowCurrLayer.unsafe_get(x, y).markInvalid();
+					}
+				}
+			} else {
+				// for all the other layers use the hint of the previous layer to start its search
+				double scale = pyramidPrev.getScale(i+1)/pyramidPrev.getScale(i);
+				for( int y = regionRadius; y < y1; y++ ) {
+					for( int x = regionRadius; x < x1; x++ ) {
+						// grab the flow in higher level pyramid
+						ImageFlow.D p = flowPrevLayer.get((int)(x/scale),(int)(y/scale));
+						if( !p.isValid() )
+							continue;
+
+						// get the template around the current point in this layer
+						extractTemplate(x,y,prev);
+
+						// add the flow from the higher layer (adjusting for scale and rounding) as the start of
+						// this search
+						int deltaX = (int)(p.x*scale+0.5);
+						int deltaY = (int)(p.y*scale+0.5);
+
+						int startX = x + deltaX;
+						int startY = y + deltaY;
+
+						float score = findFlow(startX,startY,curr,tmp);
+
+						// find flow only does it relative to the starting point
+						tmp.x += deltaX;
+						tmp.y += deltaY;
+
+						if( tmp.isValid() )
+							checkNeighbors(x,y,tmp, flowCurrLayer,score);
+						else
+							flowCurrLayer.unsafe_get(x,y).markInvalid();
+					}
+				}
 			}
-		}
 
-		// TODO process image border
+			// swap the flow images
+			ImageFlow tmp = flowPrevLayer;
+			flowPrevLayer = flowCurrLayer;
+			flowCurrLayer = tmp;
+		}
 	}
 
 	/**
@@ -125,9 +186,16 @@ public abstract class DenseOpticalFlowBlock<T extends ImageSingleBand> {
 		float bestScore = Float.MAX_VALUE;
 		int bestFlowX=0,bestFlowY=0;
 
-		for( int i = -searchRadius; i <= searchRadius; i++ ) {
+		// ensure the search region is contained entirely inside the image
+		int startY = cy-searchRadius-regionRadius < 0 ? 0 : -searchRadius;
+		int startX = cx-searchRadius-regionRadius < 0 ? 0 : -searchRadius;
+		int endY = cy+searchRadius+regionRadius >= curr.height ? curr.height-cy-regionRadius-1 : searchRadius;
+		int endX = cx+searchRadius+regionRadius >= curr.width ? curr.width-cx-regionRadius-1 : searchRadius;
+
+		// search around the template's center
+		for( int i = startY; i <= endY; i++ ) {
 			int y = cy+i;
-			for( int j = -searchRadius; j <= searchRadius; j++ ) {
+			for( int j = startX; j <= endX; j++ ) {
 				int x = cx+j;
 				float error = computeError(x,y,curr);
 				if( error < bestScore ) {
@@ -161,12 +229,12 @@ public abstract class DenseOpticalFlowBlock<T extends ImageSingleBand> {
 	 * score the one specified in 'flow'
 	 */
 	protected void checkNeighbors( int cx , int cy , ImageFlow.D flow , ImageFlow image , float score ) {
-		for( int i = -searchRadius; i <= searchRadius; i++ ) {
-			int index = image.width*(cy+i) + (cx-searchRadius);
-			for( int j = -searchRadius; j <= searchRadius; j++ , index++ ) {
+		for( int i = -regionRadius; i <= regionRadius; i++ ) {
+			int index = image.width*(cy+i) + (cx-regionRadius);
+			for( int j = -regionRadius; j <= regionRadius; j++ , index++ ) {
 				float s = scores[ index ];
 				ImageFlow.D f = image.data[index];
-				if( !f.isValid() || s > score ) {
+				if( s > score ) {
 					f.set(flow);
 					scores[index] = score;
 				} else if( s == score ) {
@@ -193,9 +261,16 @@ public abstract class DenseOpticalFlowBlock<T extends ImageSingleBand> {
 	protected abstract float computeError( int cx , int cy , T curr );
 
 	/**
+	 * Returns the found optical flow
+	 */
+	public ImageFlow getOpticalFlow() {
+		return flowPrevLayer;
+	}
+
+	/**
 	 * Implementation for {@link ImageUInt8}
 	 */
-	public static class U8 extends DenseOpticalFlowBlock<ImageUInt8>
+	public static class U8 extends DenseOpticalFlowBlockPyramid<ImageUInt8>
 	{
 		public U8(int searchRadius, int regionRadius, int maxPerPixelError) {
 			super(searchRadius, regionRadius, maxPerPixelError,ImageUInt8.class);
@@ -231,7 +306,7 @@ public abstract class DenseOpticalFlowBlock<T extends ImageSingleBand> {
 	/**
 	 * Implementation for {@link ImageFloat32}
 	 */
-	public static class F32 extends DenseOpticalFlowBlock<ImageFloat32>
+	public static class F32 extends DenseOpticalFlowBlockPyramid<ImageFloat32>
 	{
 		public F32(int searchRadius, int regionRadius, int maxPerPixelError) {
 			super(searchRadius, regionRadius, maxPerPixelError,ImageFloat32.class);
@@ -262,5 +337,13 @@ public abstract class DenseOpticalFlowBlock<T extends ImageSingleBand> {
 
 			return error;
 		}
+	}
+
+	public int getSearchRadius() {
+		return searchRadius;
+	}
+
+	public int getRegionRadius() {
+		return regionRadius;
 	}
 }

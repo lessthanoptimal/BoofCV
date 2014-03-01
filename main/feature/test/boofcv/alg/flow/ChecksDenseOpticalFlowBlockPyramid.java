@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,37 +20,60 @@ package boofcv.alg.flow;
 
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
+import boofcv.factory.transform.pyramid.FactoryPyramid;
+import boofcv.struct.flow.ImageFlow;
 import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.pyramid.ImagePyramid;
 import org.junit.Test;
 
 import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
- * Tests for implementations of {@link DenseOpticalFlowBlock}
+ * Tests for implementations of {@link DenseOpticalFlowBlockPyramid}
  *
  * @author Peter Abeles
  */
-public abstract class ChecksDenseOpticalFlowBlock<T extends ImageSingleBand> {
+public abstract class ChecksDenseOpticalFlowBlockPyramid<T extends ImageSingleBand> {
 
 	Class<T> imageType;
 	Random rand = new Random(234);
 	T image;
 
-	protected ChecksDenseOpticalFlowBlock(Class<T> imageType) {
+	protected ChecksDenseOpticalFlowBlockPyramid(Class<T> imageType) {
 		this.imageType = imageType;
 
 		image = GeneralizedImageOps.createSingleBand(imageType,40,50);
 	}
 
-	public abstract DenseOpticalFlowBlock<T> createAlg( int searchRadius, int regionRadius, int maxPerPixelError);
+	public abstract DenseOpticalFlowBlockPyramid<T> createAlg( int searchRadius, int regionRadius, int maxPerPixelError);
+
+	@Test
+	public void processImageDontBlowUp() {
+		DenseOpticalFlowBlockPyramid<T> alg = createAlg(2,3,10);
+
+		ImagePyramid<T> pyramid = FactoryPyramid.discreteGaussian(new int[]{1,2,4},0,2,false,imageType);
+		GImageMiscOps.fillUniform(image,rand,0,200);
+		pyramid.process(image);
+
+		alg.process(pyramid,pyramid);
+
+		ImageFlow output = alg.getOpticalFlow();
+
+		for( int y = 0; y < output.height; y++ ) {
+			for (int x = 0; x < output.width; x++) {
+				assertTrue(output.get(x,y).isValid());
+			}
+		}
+	}
 
 	@Test
 	public void extractTemplate() {
 
 		int r = 2;
-		DenseOpticalFlowBlock<T> alg = createAlg(1,r,10);
+		DenseOpticalFlowBlockPyramid<T> alg = createAlg(1,r,10);
 
 		GImageMiscOps.fillUniform(image,rand,0,200);
 		alg.extractTemplate(3,4,image);
@@ -71,7 +94,7 @@ public abstract class ChecksDenseOpticalFlowBlock<T extends ImageSingleBand> {
 	public void computeError() {
 		int r = 2;
 		int w = r*2+1;
-		DenseOpticalFlowBlock<T> alg = createAlg(1,r,10);
+		DenseOpticalFlowBlockPyramid<T> alg = createAlg(1,r,10);
 
 		GImageMiscOps.fillUniform(image,rand,0,200);
 		GImageMiscOps.fillUniform(alg.template,rand,0,200);

@@ -64,6 +64,14 @@ public class ImageFlow {
 			data[i].x = Float.NaN;
 	}
 
+	public void fillZero() {
+		int N = width*height;
+		for( int i = 0; i < N; i++ ) {
+			D d = data[i];
+			d.x = d.y = 0;
+		}
+	}
+
 	public D get( int x , int y ) {
 		if( !isInBounds(x,y))
 			throw new IllegalArgumentException("Requested pixel is out of bounds: "+x+" "+y);
@@ -85,6 +93,13 @@ public class ImageFlow {
 
 	public int getHeight() {
 		return height;
+	}
+
+	public void setTo( ImageFlow flow ) {
+		int N = width*height;
+		for( int i = 0; i < N; i++ ) {
+			data[i].set( flow.data[i] );
+		}
 	}
 
 	/**

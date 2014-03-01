@@ -23,7 +23,7 @@ import boofcv.abst.flow.DenseOpticalFlow;
 import boofcv.abst.flow.FlowBlock_to_DenseOpticalFlow;
 import boofcv.abst.flow.FlowKlt_to_DenseOpticalFlow;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
-import boofcv.alg.flow.DenseOpticalFlowBlock;
+import boofcv.alg.flow.DenseOpticalFlowBlockPyramid;
 import boofcv.alg.flow.DenseOpticalFlowKlt;
 import boofcv.alg.tracker.klt.PkltConfig;
 import boofcv.alg.tracker.klt.PyramidKltTracker;
@@ -78,27 +78,32 @@ public class FactoryDenseOpticalFlow {
 	}
 
 	/**
-	 * @see boofcv.alg.flow.DenseOpticalFlowBlock
+	 * Creates a pyramidal block
 	 *
-	 * @param searchRadius
-	 * @param regionRadius
-	 * @param maxPerPixelError
-	 * @param imageType
+	 * @see boofcv.alg.flow.DenseOpticalFlowBlockPyramid
+	 * @see boofcv.alg.flow.UtilDenseOpticalFlow#standardPyramid(int, int, double, double, int, int, Class)
+	 *
+	 * @param config Configuration for block pyramid
 	 * @param <T>
 	 * @return
 	 */
 	public static <T extends ImageSingleBand>
-	DenseOpticalFlow<T> region( int searchRadius, int regionRadius , int maxPerPixelError ,
+	DenseOpticalFlow<T> region( ConfigOpticalFlowBlockPyramid config ,
 								Class<T> imageType ) {
 
-		DenseOpticalFlowBlock<T> alg;
+		if( config == null )
+			config = new ConfigOpticalFlowBlockPyramid();
+
+		DenseOpticalFlowBlockPyramid<T> alg;
 		if( imageType == ImageUInt8.class )
-			alg = (DenseOpticalFlowBlock)new DenseOpticalFlowBlock.U8(searchRadius,regionRadius,maxPerPixelError);
+			alg = (DenseOpticalFlowBlockPyramid)new DenseOpticalFlowBlockPyramid.U8(
+					config.searchRadius,config.regionRadius,config.maxPerPixelError);
 		else if( imageType == ImageFloat32.class )
-			alg = (DenseOpticalFlowBlock)new DenseOpticalFlowBlock.F32(searchRadius,regionRadius,maxPerPixelError);
+			alg = (DenseOpticalFlowBlockPyramid)new DenseOpticalFlowBlockPyramid.F32(
+					config.searchRadius,config.regionRadius,config.maxPerPixelError);
 		else
 			throw new IllegalArgumentException("Unsupported image type "+imageType);
 
-		return new FlowBlock_to_DenseOpticalFlow<T>(alg,imageType);
+		return new FlowBlock_to_DenseOpticalFlow<T>(alg,config.pyramidScale,config.maxPyramidLayers,imageType);
 	}
 }

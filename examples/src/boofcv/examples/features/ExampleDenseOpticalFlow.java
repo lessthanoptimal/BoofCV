@@ -44,18 +44,18 @@ public class ExampleDenseOpticalFlow {
 	public static void main(String[] args) {
 		MediaManager media = DefaultMediaManager.INSTANCE;
 
-		String fileName0 = "../data/applet/denseflow/dogdance07.png";
-		String fileName1 = "../data/applet/denseflow/dogdance08.png";
+//		String fileName0 = "../data/applet/denseflow/dogdance07.png";
+//		String fileName1 = "../data/applet/denseflow/dogdance08.png";
 
-//		String fileName0 = "../data/applet/denseflow/Urban2_07.png";
-//		String fileName1 = "../data/applet/denseflow/Urban2_08.png";
+		String fileName0 = "../data/applet/denseflow/Urban2_07.png";
+		String fileName1 = "../data/applet/denseflow/Urban2_08.png";
 
 //		String fileName0 = "../data/applet/denseflow/Grove2_07.png";
 //		String fileName1 = "../data/applet/denseflow/Grove2_09.png";
 
 		DenseOpticalFlow<ImageUInt8> denseFlow =
-				FactoryDenseOpticalFlow.flowKlt(null, 6, ImageUInt8.class, null);
-//				FactoryDenseOpticalFlow.region(12,3,30,ImageUInt8.class);
+//				FactoryDenseOpticalFlow.flowKlt(null, 6, ImageUInt8.class, null);
+				FactoryDenseOpticalFlow.region(null,ImageUInt8.class);
 
 		BufferedImage buff0 = media.openImage(fileName0);
 		BufferedImage buff1 = media.openImage(fileName1);
@@ -64,8 +64,8 @@ public class ExampleDenseOpticalFlow {
 
 		// Dense optical flow is very computationally expensive.  Just process the image at 1/2 resolution
 		ImageUInt8 previous = new ImageUInt8(full.width/2,full.height/2);
-		ImageUInt8 current = new ImageUInt8(full.width/2,full.height/2);
-		ImageFlow flow = new ImageFlow(full.width/2,full.height/2);
+		ImageUInt8 current = new ImageUInt8(previous.width,previous.height);
+		ImageFlow flow = new ImageFlow(previous.width,previous.height);
 
 		ConvertBufferedImage.convertFrom(buff0,full);
 		DistortImageOps.scale(full, previous, TypeInterpolate.BILINEAR);
