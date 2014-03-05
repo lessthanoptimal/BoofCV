@@ -18,10 +18,13 @@
 
 package boofcv.alg.flow;
 
+import boofcv.alg.flow.impl.ImplImageDifference;
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.transform.pyramid.PyramidFloatGaussianScale;
 import boofcv.alg.transform.pyramid.PyramidFloatScale;
 import boofcv.factory.interpolate.FactoryInterpolation;
+import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.pyramid.PyramidFloat;
 
@@ -117,5 +120,17 @@ public class UtilDenseOpticalFlow {
 
 			return new PyramidFloatScale<T>(interp,scaleFactors,imageType);
 		}
+	}
+
+	public static <T extends ImageBase, D extends ImageBase>
+	void difference4( T imageA , T imageB , D difference ) {
+		if( imageA instanceof ImageSingleBand ) {
+			if( imageA instanceof ImageFloat32) {
+				ImplImageDifference.inner4((ImageFloat32)imageA,(ImageFloat32)imageB,(ImageFloat32)difference);
+				ImplImageDifference.border4((ImageFloat32) imageA, (ImageFloat32) imageB, (ImageFloat32) difference);
+				return;
+			}
+		}
+		throw new IllegalArgumentException("Unknown image type");
 	}
 }

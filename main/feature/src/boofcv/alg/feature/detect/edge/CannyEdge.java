@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -83,11 +83,10 @@ public class CannyEdge<T extends ImageSingleBand, D extends ImageSingleBand> {
 		this.gradient = gradient;
 
 		Class<T> imageType = blur.getInputType();
-		Class<D> derivType = gradient.getDerivType();
 
 		blurred = GeneralizedImageOps.createSingleBand(imageType, 1, 1);
-		derivX = GeneralizedImageOps.createSingleBand(derivType, 1, 1);
-		derivY = GeneralizedImageOps.createSingleBand(derivType, 1, 1);
+		derivX = gradient.getDerivType().createImage(1,1);
+		derivY = gradient.getDerivType().createImage(1, 1);
 
 		if( saveTrace ) {
 			hysteresisPts = new HysteresisEdgeTracePoints();

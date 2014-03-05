@@ -22,8 +22,11 @@ import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.abst.flow.DenseOpticalFlow;
 import boofcv.abst.flow.FlowBlock_to_DenseOpticalFlow;
 import boofcv.abst.flow.FlowKlt_to_DenseOpticalFlow;
+import boofcv.abst.flow.HornSchunck_to_DenseOpticalFlow;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.alg.flow.DenseOpticalFlowBlockPyramid;
+import boofcv.alg.flow.DenseOpticalFlowHornSchunck;
+import boofcv.alg.flow.DenseOpticalFlowHornSchunck_F32;
 import boofcv.alg.flow.DenseOpticalFlowKlt;
 import boofcv.alg.tracker.klt.PkltConfig;
 import boofcv.alg.tracker.klt.PyramidKltTracker;
@@ -32,6 +35,7 @@ import boofcv.factory.tracker.FactoryTrackerAlg;
 import boofcv.factory.transform.pyramid.FactoryPyramid;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageType;
 import boofcv.struct.image.ImageUInt8;
 import boofcv.struct.pyramid.PyramidDiscrete;
 
@@ -105,5 +109,36 @@ public class FactoryDenseOpticalFlow {
 			throw new IllegalArgumentException("Unsupported image type "+imageType);
 
 		return new FlowBlock_to_DenseOpticalFlow<T>(alg,config.pyramidScale,config.maxPyramidLayers,imageType);
+	}
+
+	/**
+	 * TODO comment
+	 *
+	 * @param alpha
+	 * @param numIterations
+	 * @param imageType
+	 * @param <T>
+	 * @param <D>
+	 * @return
+	 */
+	public static <T extends ImageSingleBand,D extends ImageSingleBand>
+	DenseOpticalFlow<T> hornSchunck( float alpha , int numIterations,
+									 Class<T> imageType ) {
+
+		Class derivType = GImageDerivativeOps.getDerivativeType(imageType);
+		ImageGradient<T,D> gradient = FactoryDerivative.sobel(imageType,derivType);
+
+
+		DenseOpticalFlowHornSchunck<D> alg;
+//		if( imageType == ImageUInt8.class )
+//			alg = (DenseOpticalFlowBlockPyramid)new DenseOpticalFlowBlockPyramid.U8(
+//					config.searchRadius,config.regionRadius,config.maxPerPixelError);
+//		else
+		if( imageType == ImageFloat32.class )
+			alg = (DenseOpticalFlowHornSchunck)new DenseOpticalFlowHornSchunck_F32(alpha,numIterations);
+		else
+			throw new IllegalArgumentException("Unsupported image type "+imageType);
+
+		return new HornSchunck_to_DenseOpticalFlow<T,D>(alg,gradient, ImageType.single(imageType));
 	}
 }

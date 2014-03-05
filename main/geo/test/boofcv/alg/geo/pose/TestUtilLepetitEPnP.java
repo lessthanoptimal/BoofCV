@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -79,7 +79,7 @@ public class TestUtilLepetitEPnP {
 		// linear constraint matrix
 		protected DenseMatrix64F L_full;
 
-		protected DenseMatrix64F jacobian = new DenseMatrix64F();
+		protected DenseMatrix64F jacobian = new DenseMatrix64F(1,1);
 
 		public void setParameters( DenseMatrix64F L_full ) {
 			if( L_full.numRows == 6 )

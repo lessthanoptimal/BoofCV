@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,7 +25,6 @@ import boofcv.abst.feature.orientation.RegionOrientation;
 import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.benchmark.feature.BenchmarkAlgorithm;
 import boofcv.benchmark.feature.distort.StabilityEvaluatorPoint;
-import boofcv.core.image.GeneralizedImageOps;
 import boofcv.evaluation.ErrorStatistics;
 import boofcv.struct.image.ImageSingleBand;
 import georegression.metric.UtilAngle;
@@ -58,8 +57,8 @@ public class OrientationEvaluator <T extends ImageSingleBand,D extends ImageSing
 	@Override
 	public void extractInitial(BenchmarkAlgorithm alg, T image, List<Point2D_F64> points) {
 		if( derivX == null ) {
-			derivX = GeneralizedImageOps.createSingleBand(gradient.getDerivType(), image.width, image.height);
-			derivY = GeneralizedImageOps.createSingleBand(gradient.getDerivType(), image.width, image.height);
+			derivX = gradient.getDerivType().createImage(image.width, image.height);
+			derivY = gradient.getDerivType().createImage(image.width, image.height);
 		} else {
 			derivX.reshape(image.width,image.height);
 			derivY.reshape(image.width,image.height);

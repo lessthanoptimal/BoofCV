@@ -16,26 +16,20 @@
  * limitations under the License.
  */
 
-package boofcv.abst.filter.derivative;
+package boofcv.alg.flow;
 
-import boofcv.struct.image.ImageBase;
+import org.junit.Test;
 
+import static org.junit.Assert.fail;
 
 /**
- * A generic interface for computing first order image derivative along the x and y axes.
- *
  * @author Peter Abeles
  */
-public interface ImageGradient<Input extends ImageBase, Output extends ImageBase> extends ImageDerivative<Input,Output> {
+public class TestDenseOpticalFlowHornSchunck_F32 {
 
-	/**
-	 * Computes the image gradient from the input image and stores the results into
-	 * 'derivX' and 'derivY'
-	 *
-	 * @param inputImage Original input image. Not modified.
-	 * @param derivX First order image derivative along the x-axis. Modified.
-	 * @param derivY First order image derivative along the y-axis. Modified.
-	 */
-	public void process( Input inputImage , Output derivX, Output derivY );
+	@Test
+	public void process() {
+		fail("Implement");
+	}
 
 }
