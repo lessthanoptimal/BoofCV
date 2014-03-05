@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,6 @@
 
 package boofcv.examples.tracking;
 
-import boofcv.abst.tracker.ConfigCirculantTracker;
 import boofcv.abst.tracker.TrackerObjectQuad;
 import boofcv.factory.tracker.FactoryTrackerObjectQuad;
 import boofcv.gui.image.ShowImages;
@@ -57,8 +56,8 @@ public class ExampleTrackerObjectQuad {
 		// Create the tracker.  Comment/Uncomment to change the tracker.  Mean-shift trackers have been omitted
 		// from the list since they use color information and including color images could clutter up the example.
 		TrackerObjectQuad<ImageUInt8> tracker =
-				FactoryTrackerObjectQuad.circulant(new ConfigCirculantTracker(), ImageUInt8.class);
-//				FactoryTrackerObjectQuad.sparseFlow(new SfotConfig<ImageUInt8, ImageUInt16>(ImageUInt8.class));
+				FactoryTrackerObjectQuad.circulant(null, ImageUInt8.class);
+//				FactoryTrackerObjectQuad.sparseFlow(null,ImageUInt8.class,null);
 //				FactoryTrackerObjectQuad.tld(null,ImageUInt8.class);
 
 		// specify the target's initial location and initialize with the first frame

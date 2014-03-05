@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,7 +26,6 @@ import boofcv.alg.feature.detect.edge.GGradientToEdgeFeatures;
 import boofcv.alg.feature.detect.line.HoughTransformLinePolar;
 import boofcv.alg.feature.detect.line.ImageLinePruneMerge;
 import boofcv.alg.filter.binary.ThresholdImageOps;
-import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
@@ -126,8 +125,8 @@ public class DetectLineHoughPolar<I extends ImageSingleBand, D extends ImageSing
 		this.resolutionAngle = resolutionAngle;
 		this.maxLines = maxLines <= 0 ? Integer.MAX_VALUE : maxLines;
 		extractor = FactoryFeatureExtractor.nonmax(new ConfigExtract(localMaxRadius, minCounts, 0, true));
-		derivX = GeneralizedImageOps.createSingleBand(gradient.getDerivType(), 1, 1);
-		derivY = GeneralizedImageOps.createSingleBand(gradient.getDerivType(), 1, 1);
+		derivX = gradient.getDerivType().createImage(1, 1);
+		derivY = gradient.getDerivType().createImage(1, 1);
 	}
 
 	@Override

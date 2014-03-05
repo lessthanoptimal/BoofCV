@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,6 +23,7 @@ import boofcv.core.image.border.FactoryImageBorder;
 import boofcv.core.image.border.ImageBorder;
 import boofcv.struct.BoofDefaults;
 import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageType;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -79,7 +80,7 @@ public class ImageHessian_Reflection<Output extends ImageSingleBand>
 	}
 
 	@Override
-	public Class<Output> getDerivType() {
-		return (Class)m.getParameterTypes()[2];
+	public ImageType<Output> getDerivType() {
+		return ImageType.single((Class)m.getParameterTypes()[2]);
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,13 +19,14 @@
 package boofcv.abst.filter.derivative;
 
 import boofcv.core.image.border.BorderType;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageType;
 
 
 /**
  * @author Peter Abeles
  */
-public interface ImageDerivative<T extends ImageSingleBand, D extends ImageSingleBand> {
+public interface ImageDerivative<T extends ImageBase, D extends ImageBase> {
 
 	/**
 	 * Overrides the default border behavior.  See {@link boofcv.factory.filter.derivative.FactoryDerivative} for a discussion
@@ -50,5 +51,8 @@ public interface ImageDerivative<T extends ImageSingleBand, D extends ImageSingl
 	 */
 	public int getBorder();
 
-	public Class<D> getDerivType();
+	/**
+	 * Image type for derivative output
+	 */
+	public ImageType<D> getDerivType();
 }
