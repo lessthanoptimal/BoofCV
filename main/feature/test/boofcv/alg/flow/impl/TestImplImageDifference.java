@@ -20,6 +20,8 @@ package boofcv.alg.flow.impl;
 
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageSInt16;
+import boofcv.struct.image.ImageUInt8;
 import boofcv.testing.BoofTesting;
 import org.junit.Test;
 
@@ -67,6 +69,50 @@ public class TestImplImageDifference {
 	}
 
 	private float get( ImageFloat32 imageA , ImageFloat32 imageB , int x , int y ) {
+		if( x < 0 ) x = 0;
+		else if( x >= imageA.width ) x = imageA.width-1;
+
+		if( y < 0 ) y = 0;
+		else if( y >= imageA.height ) y = imageA.height-1;
+
+		return imageB.get(x,y) - imageA.get(x,y);
+	}
+
+	@Test
+	public void inner4_border4_U8() {
+		ImageUInt8 imageA = new ImageUInt8(20,30);
+		ImageUInt8 imageB = new ImageUInt8(20,30);
+		ImageSInt16 found = new ImageSInt16(20,30);
+		ImageSInt16 expected = new ImageSInt16(20,30);
+
+
+		ImageMiscOps.fillUniform(imageA, rand, 0, 255);
+		ImageMiscOps.fillUniform(imageB, rand, 0, 255);
+
+		for( int y = 0; y < imageA.height; y++ ) {
+			for (int x = 0; x < imageA.width; x++) {
+				expected.set(x,y, diff4(imageA,imageB,x,y));
+			}
+		}
+
+		ImplImageDifference.border4(imageA,imageB,found);
+		ImplImageDifference.inner4(imageA, imageB, found);
+
+		BoofTesting.assertEquals(expected, found, 1e-4);
+	}
+
+	public int diff4( ImageUInt8 imageA , ImageUInt8 imageB , int x , int y ) {
+
+		int p0 = get(imageA,imageB,x,y);
+		int p1 = get(imageA,imageB,x+1,y);
+		int p2 = get(imageA,imageB,x-1,y);
+		int p3 = get(imageA,imageB,x,y+1);
+		int p4 = get(imageA,imageB,x,y-1);
+
+		return (p0+p1+p2+p3+p4)/5;
+	}
+
+	private int get( ImageUInt8 imageA , ImageUInt8 imageB , int x , int y ) {
 		if( x < 0 ) x = 0;
 		else if( x >= imageA.width ) x = imageA.width-1;
 

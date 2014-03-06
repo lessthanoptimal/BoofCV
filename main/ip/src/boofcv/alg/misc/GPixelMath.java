@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -371,24 +371,28 @@ public class GPixelMath {
 	 * @param inputB Input image. Not modified.
 	 * @param output Output image. Modified.
 	 */
-	public static <T extends ImageSingleBand, O extends ImageSingleBand>
+	public static <T extends ImageBase, O extends ImageBase>
 	void subtract(T inputA, T inputB, O output) {
-		if( ImageUInt8.class == inputA.getClass() ) {
-			PixelMath.subtract((ImageUInt8) inputA, (ImageUInt8)inputB, (ImageInt16) output);
-		} else if( ImageSInt8.class == inputA.getClass() ) {
-			PixelMath.subtract((ImageSInt8) inputA, (ImageSInt8)inputB, (ImageSInt16) output);
-		} else if( ImageUInt16.class == inputA.getClass() ) {
-			PixelMath.subtract((ImageUInt16) inputA, (ImageUInt16)inputB, (ImageSInt32) output);
-		} else if( ImageSInt16.class == inputA.getClass() ) {
-			PixelMath.subtract((ImageSInt16) inputA, (ImageSInt16)inputB, (ImageSInt32) output);
-		} else if( ImageSInt32.class == inputA.getClass() ) {
-			PixelMath.subtract((ImageSInt32) inputA, (ImageSInt32)inputB, (ImageSInt32) output);
-		} else if( ImageSInt64.class == inputA.getClass() ) {
-			PixelMath.subtract((ImageSInt64) inputA, (ImageSInt64)inputB, (ImageSInt64) output);
-		} else if( ImageFloat32.class == inputA.getClass() ) {
-			PixelMath.subtract((ImageFloat32) inputA, (ImageFloat32)inputB, (ImageFloat32) output);
-		} else if( ImageFloat64.class == inputA.getClass() ) {
-			PixelMath.subtract((ImageFloat64) inputA, (ImageFloat64)inputB, (ImageFloat64) output);
+		if( inputA instanceof ImageSingleBand ){
+			if( ImageUInt8.class == inputA.getClass() ) {
+				PixelMath.subtract((ImageUInt8) inputA, (ImageUInt8)inputB, (ImageInt16) output);
+			} else if( ImageSInt8.class == inputA.getClass() ) {
+				PixelMath.subtract((ImageSInt8) inputA, (ImageSInt8)inputB, (ImageSInt16) output);
+			} else if( ImageUInt16.class == inputA.getClass() ) {
+				PixelMath.subtract((ImageUInt16) inputA, (ImageUInt16)inputB, (ImageSInt32) output);
+			} else if( ImageSInt16.class == inputA.getClass() ) {
+				PixelMath.subtract((ImageSInt16) inputA, (ImageSInt16)inputB, (ImageSInt32) output);
+			} else if( ImageSInt32.class == inputA.getClass() ) {
+				PixelMath.subtract((ImageSInt32) inputA, (ImageSInt32)inputB, (ImageSInt32) output);
+			} else if( ImageSInt64.class == inputA.getClass() ) {
+				PixelMath.subtract((ImageSInt64) inputA, (ImageSInt64)inputB, (ImageSInt64) output);
+			} else if( ImageFloat32.class == inputA.getClass() ) {
+				PixelMath.subtract((ImageFloat32) inputA, (ImageFloat32)inputB, (ImageFloat32) output);
+			} else if( ImageFloat64.class == inputA.getClass() ) {
+				PixelMath.subtract((ImageFloat64) inputA, (ImageFloat64)inputB, (ImageFloat64) output);
+			} else {
+				throw new IllegalArgumentException("Unknown image Type: "+inputA.getClass().getSimpleName());
+			}
 		} else {
 			throw new IllegalArgumentException("Unknown image Type: "+inputA.getClass().getSimpleName());
 		}

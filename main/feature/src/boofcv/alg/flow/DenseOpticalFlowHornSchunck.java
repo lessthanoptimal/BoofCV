@@ -22,7 +22,18 @@ import boofcv.struct.flow.ImageFlow;
 import boofcv.struct.image.ImageBase;
 
 /**
- * TODO Comment
+ * <p>
+ * This is Horn-Schunk's well known work [1] for dense optical flow estimation.  It is based off the following
+ * equation Ex*u + Ey*v + Et = 0, where (u,v) is the estimated flow for a single pixel, and (Ex,Ey) is the pixel's
+ * gradient and Et is the grave in intensity value.  It is assumed that each pixel maintains a constant intensity
+ * and that changes in flow are smooth. This implementation is faithful to the original
+ * work and does not make any effort to improve its performance using more modern techniques.
+ * </p>
+ *
+ * <p>
+ * [1] Horn, Berthold K., and Brian G. Schunck. "Determining optical flow."
+ * 1981 Technical Symposium East. International Society for Optics and Photonics, 1981.
+ * </p>
  *
  * @author Peter Abeles
  */
@@ -114,21 +125,21 @@ public abstract class DenseOpticalFlowHornSchunck<T extends ImageBase> {
 	protected static void computeBorder(ImageFlow flow, ImageFlow averageFlow, int x, int y) {
 		ImageFlow.D average = averageFlow.get(x,y);
 
-		ImageFlow.D f0 = getExtend(flow,averageFlow,x-1,y);
-		ImageFlow.D f1 = getExtend(flow,averageFlow,x+1,y);
-		ImageFlow.D f2 = getExtend(flow,averageFlow,x,y-1);
-		ImageFlow.D f3 = getExtend(flow,averageFlow,x,y+1);
+		ImageFlow.D f0 = getExtend(flow, x-1,y);
+		ImageFlow.D f1 = getExtend(flow, x+1,y);
+		ImageFlow.D f2 = getExtend(flow, x,y-1);
+		ImageFlow.D f3 = getExtend(flow, x,y+1);
 
-		ImageFlow.D f4 = getExtend(flow,averageFlow,x-1,y-1);
-		ImageFlow.D f5 = getExtend(flow,averageFlow,x+1,y-1);
-		ImageFlow.D f6 = getExtend(flow,averageFlow,x-1,y+1);
-		ImageFlow.D f7 = getExtend(flow,averageFlow,x+1,y+1);
+		ImageFlow.D f4 = getExtend(flow, x-1,y-1);
+		ImageFlow.D f5 = getExtend(flow, x+1,y-1);
+		ImageFlow.D f6 = getExtend(flow, x-1,y+1);
+		ImageFlow.D f7 = getExtend(flow, x+1,y+1);
 
 		average.x = 0.1666667f*(f0.x + f1.x + f2.x + f3.x) + 0.08333333f*(f4.x + f5.x + f6.x + f7.x);
 		average.y = 0.1666667f*(f0.y + f1.y + f2.y + f3.y) + 0.08333333f*(f4.y + f5.y + f6.y + f7.y);
 	}
 
-	protected static ImageFlow.D getExtend( ImageFlow flow , ImageFlow averageFlow, int x , int y ) {
+	protected static ImageFlow.D getExtend(ImageFlow flow, int x, int y) {
 		if( x < 0 ) x = 0;
 		else if( x >= flow.width ) x = flow.width-1;
 		if( y < 0 ) y = 0;

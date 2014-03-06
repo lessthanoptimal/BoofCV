@@ -19,7 +19,7 @@
 package boofcv.alg.flow;
 
 import boofcv.struct.flow.ImageFlow;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageSInt16;
 import org.junit.Test;
 
 import static org.junit.Assert.assertTrue;
@@ -27,21 +27,18 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestDenseOpticalFlowHornSchunck_F32 {
+public class TestDenseOpticalFlowHornSchunck_S16 {
 
 	int width = 20;
 	int height = 30;
 
-	/**
-	 * Manually construct the input so that it has a known and easily understood output
-	 */
 	@Test
 	public void process() {
-		DenseOpticalFlowHornSchunck_F32 alg = new DenseOpticalFlowHornSchunck_F32(0.2f,1);
+		DenseOpticalFlowHornSchunck_S16 alg = new DenseOpticalFlowHornSchunck_S16(0.2f,1);
 
-		ImageFloat32 derivX = new ImageFloat32(width,height);
-		ImageFloat32 derivY = new ImageFloat32(width,height);
-		ImageFloat32 derivT = new ImageFloat32(width,height);
+		ImageSInt16 derivX = new ImageSInt16(width,height);
+		ImageSInt16 derivY = new ImageSInt16(width,height);
+		ImageSInt16 derivT = new ImageSInt16(width,height);
 		ImageFlow output = new ImageFlow(width,height);
 
 		for( int i = 0; i <10; i++ ) {
@@ -66,7 +63,6 @@ public class TestDenseOpticalFlowHornSchunck_F32 {
 
 		assertTrue( output.get(5,9).x < -4);
 		assertTrue( output.get(5,9).y < -4);
-
 	}
 
 }

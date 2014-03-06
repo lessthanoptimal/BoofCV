@@ -41,6 +41,8 @@ public abstract class GeneralDenseOpticalFlowChecks<T extends ImageSingleBand>
 	T shifted;
 	ImageFlow found;
 
+	boolean justCorrectSign = false;
+
 	protected GeneralDenseOpticalFlowChecks(Class<T> imageType) {
 		this.imageType = imageType;
 
@@ -51,6 +53,17 @@ public abstract class GeneralDenseOpticalFlowChecks<T extends ImageSingleBand>
 
 		GImageMiscOps.fillUniform(orig,rand,0,256);
 	}
+
+	public void setJustCorrectSign(boolean justCorrectSign) {
+		this.justCorrectSign = justCorrectSign;
+	}
+
+
+	public void allTests( boolean justCorrectSign ) {
+		this.justCorrectSign = justCorrectSign;
+		allTests();
+	}
+
 
 	public void allTests() {
 		processEdges();
@@ -119,8 +132,21 @@ public abstract class GeneralDenseOpticalFlowChecks<T extends ImageSingleBand>
 
 				ImageFlow.D flow = found.get(10,10);
 				assertTrue(flow.isValid());
-				assertEquals(dx, flow.x, 0.2);
-				assertEquals(dy,flow.y,0.2);
+				if( justCorrectSign ) {
+					// if the two flows are in agreement then sum will be positive
+					float sum = 0;
+					for( int y = 0; y < found.height; y++ ) {
+						for (int x = 0; x < found.width; x++) {
+							flow = found.get(x,y);
+							sum += flow.x*dx;
+							sum += flow.y*dy;
+						}
+					}
+					assertTrue( sum >= 0 );
+				} else {
+					assertEquals(dx, flow.x, 0.2);
+					assertEquals(dy,flow.y,0.2);
+				}
 			}
 		}
 	}

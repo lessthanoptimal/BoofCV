@@ -19,6 +19,8 @@
 package boofcv.alg.flow.impl;
 
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageSInt16;
+import boofcv.struct.image.ImageUInt8;
 
 /**
  * Functions for computing the difference between two images by computing the average of a pixel and its 4-connect
@@ -84,6 +86,68 @@ public class ImplImageDifference {
 	}
 
 	protected static float getExtend( ImageFloat32 imageA , ImageFloat32 imageB , int x , int y ) {
+		if( x < 0 ) x = 0;
+		else if( x >= imageA.width ) x = imageA.width-1;
+		if( y < 0 ) y = 0;
+		else if( y >= imageA.height ) y = imageA.height-1;
+
+		return imageB.unsafe_get(x,y) - imageA.unsafe_get(x,y);
+	}
+
+	/**
+	 * Computes the 4-connect average of inner image pixels.
+	 */
+	public static void inner4( ImageUInt8 imageA , ImageUInt8 imageB , ImageSInt16 difference ) {
+
+		int w = imageA.width-1;
+		int h = imageA.height-1;
+
+		for( int y = 1; y < h; y++ ) {
+			int indexA = imageA.startIndex + y*imageA.stride + 1;
+			int indexB = imageB.startIndex + y*imageB.stride + 1;
+			int indexDiff = difference.startIndex + y*difference.stride + 1;
+
+			for( int x = 1; x < w; x++ , indexA++ , indexB++ , indexDiff++ ) {
+				int d0 = (imageB.data[indexB] & 0xFF) - (imageA.data[indexA] & 0xFF);
+				int d1 = (imageB.data[indexB-1] & 0xFF) - (imageA.data[indexA-1] & 0xFF);
+				int d2 = (imageB.data[indexB+1] & 0xFF) - (imageA.data[indexA+1] & 0xFF);
+				int d3 = (imageB.data[indexB+imageB.stride] & 0xFF) - (imageA.data[indexA+imageA.stride] & 0xFF);
+				int d4 = (imageB.data[indexB-imageB.stride] & 0xFF) - (imageA.data[indexA-imageA.stride] & 0xFF);
+
+				difference.data[indexDiff] = (short)((d0 + d1 + d2 + d3 + d4)/5);
+			}
+		}
+	}
+
+	/**
+	 * Computes the 4-connect average of border image pixels.
+	 */
+	public static void border4( ImageUInt8 imageA , ImageUInt8 imageB ,
+								ImageSInt16 difference) {
+
+		for( int y = 0; y < imageA.height; y++ ) {
+			pixelBorder4(imageA,imageB,difference, 0, y);
+			pixelBorder4(imageA,imageB,difference, imageA.width-1, y);
+		}
+
+		for( int x = 1; x < imageA.width-1; x++ ) {
+			pixelBorder4(imageA,imageB,difference, x, 0);
+			pixelBorder4(imageA,imageB,difference, x, imageA.height-1);
+		}
+	}
+
+	protected static void pixelBorder4(ImageUInt8 imageA , ImageUInt8 imageB ,
+									   ImageSInt16 difference, int x, int y) {
+		int d0 = getExtend(imageA,imageB,x,y);
+		int d1 = getExtend(imageA,imageB,x-1,y);
+		int d2 = getExtend(imageA,imageB,x+1,y);
+		int d3 = getExtend(imageA,imageB,x,y+1);
+		int d4 = getExtend(imageA,imageB,x,y-1);
+
+		difference.unsafe_set(x,y, (d0+d1+d2+d3+d4)/5 );
+	}
+
+	protected static int getExtend( ImageUInt8 imageA , ImageUInt8 imageB , int x , int y ) {
 		if( x < 0 ) x = 0;
 		else if( x >= imageA.width ) x = imageA.width-1;
 		if( y < 0 ) y = 0;

@@ -24,10 +24,7 @@ import boofcv.abst.flow.FlowBlock_to_DenseOpticalFlow;
 import boofcv.abst.flow.FlowKlt_to_DenseOpticalFlow;
 import boofcv.abst.flow.HornSchunck_to_DenseOpticalFlow;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
-import boofcv.alg.flow.DenseOpticalFlowBlockPyramid;
-import boofcv.alg.flow.DenseOpticalFlowHornSchunck;
-import boofcv.alg.flow.DenseOpticalFlowHornSchunck_F32;
-import boofcv.alg.flow.DenseOpticalFlowKlt;
+import boofcv.alg.flow.*;
 import boofcv.alg.tracker.klt.PkltConfig;
 import boofcv.alg.tracker.klt.PyramidKltTracker;
 import boofcv.factory.filter.derivative.FactoryDerivative;
@@ -117,23 +114,18 @@ public class FactoryDenseOpticalFlow {
 	 * @param alpha
 	 * @param numIterations
 	 * @param imageType
-	 * @param <T>
-	 * @param <D>
 	 * @return
 	 */
 	public static <T extends ImageSingleBand,D extends ImageSingleBand>
-	DenseOpticalFlow<T> hornSchunck( float alpha , int numIterations,
-									 Class<T> imageType ) {
+	DenseOpticalFlow<T> hornSchunck( float alpha , int numIterations, Class<T> imageType ) {
 
 		Class derivType = GImageDerivativeOps.getDerivativeType(imageType);
 		ImageGradient<T,D> gradient = FactoryDerivative.sobel(imageType,derivType);
 
-
 		DenseOpticalFlowHornSchunck<D> alg;
-//		if( imageType == ImageUInt8.class )
-//			alg = (DenseOpticalFlowBlockPyramid)new DenseOpticalFlowBlockPyramid.U8(
-//					config.searchRadius,config.regionRadius,config.maxPerPixelError);
-//		else
+		if( imageType == ImageUInt8.class )
+			alg = (DenseOpticalFlowHornSchunck)new DenseOpticalFlowHornSchunck_S16(alpha,numIterations);
+		else
 		if( imageType == ImageFloat32.class )
 			alg = (DenseOpticalFlowHornSchunck)new DenseOpticalFlowHornSchunck_F32(alpha,numIterations);
 		else
