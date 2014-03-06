@@ -56,7 +56,7 @@ public class ExampleDenseOpticalFlow {
 		DenseOpticalFlow<ImageUInt8> denseFlow =
 //				FactoryDenseOpticalFlow.flowKlt(null, 6, ImageUInt8.class, null);
 //				FactoryDenseOpticalFlow.region(null,ImageUInt8.class);
-				FactoryDenseOpticalFlow.hornSchunck(0.4f, 10, ImageUInt8.class);
+				FactoryDenseOpticalFlow.hornSchunck(0.5f, 20, ImageUInt8.class);
 
 		BufferedImage buff0 = media.openImage(fileName0);
 		BufferedImage buff1 = media.openImage(fileName1);

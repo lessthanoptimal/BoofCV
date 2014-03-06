@@ -18,18 +18,71 @@
 
 package boofcv.alg.flow;
 
+import boofcv.struct.flow.ImageFlow;
 import org.junit.Test;
 
-import static org.junit.Assert.fail;
+import java.util.Random;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Peter Abeles
  */
 public class TestDenseOpticalFlowHornSchunck {
 
+	Random rand = new Random(123);
+
 	@Test
 	public void innerAverageFlow_borderAverageFlow() {
-		fail("Implement");
+		ImageFlow flow = new ImageFlow(30,35);
+		ImageFlow found = new ImageFlow(30,35);
+
+		for( int y = 0; y < flow.height; y++ ) {
+			for( int x = 0; x < flow.width; x++ ) {
+				flow.get(x,y).x = rand.nextFloat()*2;
+				flow.get(x,y).y = rand.nextFloat()*2;
+			}
+		}
+
+		DenseOpticalFlowHornSchunck.borderAverageFlow(flow, found);
+		DenseOpticalFlowHornSchunck.innerAverageFlow(flow,found);
+
+		ImageFlow.D expected = new ImageFlow.D();
+
+		for( int y = 0; y < flow.height; y++ ) {
+			for( int x = 0; x < flow.width; x++ ) {
+				computeAverage(flow,x,y,expected);
+
+				assertEquals(expected.x,found.get(x,y).x,1e-4);
+				assertEquals(expected.y,found.get(x,y).y,1e-4);
+			}
+		}
+	}
+
+	private void computeAverage( ImageFlow flow , int x , int y , ImageFlow.D expected )  {
+		expected.x = expected.y = 0;
+
+		addValue(flow,x+1,y  ,0.1666667f,expected);
+		addValue(flow,x-1,y  ,0.1666667f,expected);
+		addValue(flow,x  ,y+1,0.1666667f,expected);
+		addValue(flow,x  ,y-1,0.1666667f,expected);
+
+		addValue(flow,x+1,y+1,0.08333333f,expected);
+		addValue(flow,x-1,y+1,0.08333333f,expected);
+		addValue(flow,x+1,y-1,0.08333333f,expected);
+		addValue(flow,x-1,y-1,0.08333333f,expected);
+	}
+
+	private void addValue( ImageFlow flow , int x , int y , float coef , ImageFlow.D expected ) {
+		if( x < 0 ) x = 0;
+		else if( x >= flow.width ) x = flow.width - 1;
+		if( y < 0 ) y = 0;
+		else if( y >= flow.height ) y = flow.height - 1;
+
+		ImageFlow.D a = flow.get(x,y);
+		expected.x += a.x*coef;
+		expected.y += a.y*coef;
+
 	}
 
 }

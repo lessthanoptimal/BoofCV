@@ -19,22 +19,22 @@
 package boofcv.alg.flow;
 
 import boofcv.struct.flow.ImageFlow;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageSInt16;
 
 /**
- * Implementation of {@link DenseOpticalFlowHornSchunck} for {@link ImageFloat32}.
+ * Implementation of {@link boofcv.alg.flow.DenseOpticalFlowHornSchunck} for {@link boofcv.struct.image.ImageFloat32}.
  *
  * @author Peter Abeles
  */
-public class DenseOpticalFlowHornSchunck_F32 extends DenseOpticalFlowHornSchunck<ImageFloat32>{
+public class DenseOpticalFlowHornSchunck_S16 extends DenseOpticalFlowHornSchunck<ImageSInt16>{
 
-	public DenseOpticalFlowHornSchunck_F32(float alpha , int numIterations ) {
+	public DenseOpticalFlowHornSchunck_S16(float alpha, int numIterations) {
 		super(alpha,numIterations);
 	}
 
 	@Override
-	public void process( ImageFloat32 derivX , ImageFloat32 derivY ,
-						 ImageFloat32 derivT , ImageFlow output) {
+	public void process( ImageSInt16 derivX , ImageSInt16 derivY ,
+						 ImageSInt16 derivT , ImageFlow output) {
 
 		if( derivX.isSubimage() || derivY.isSubimage() || derivT.isSubimage() )
 			throw new IllegalArgumentException("No sub-images allowed.  More efficient processing.");

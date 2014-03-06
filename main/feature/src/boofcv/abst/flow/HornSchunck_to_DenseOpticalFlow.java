@@ -26,7 +26,9 @@ import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 
 /**
- * Implementation of {@link DenseOpticalFlow} for {@link DenseOpticalFlowHornSchunck}.
+ * Implementation of {@link DenseOpticalFlow} for {@link DenseOpticalFlowHornSchunck}.  The gradient and
+ * image difference operators are different from the original work, but should be an improvement
+ * since they are symmetric operators.
  *
  * @author Peter Abeles
  */
@@ -58,6 +60,11 @@ public class HornSchunck_to_DenseOpticalFlow<T extends ImageBase,D extends Image
 
 	@Override
 	public void process(T source, T destination, ImageFlow flow) {
+
+		derivX.reshape(source.width,source.height);
+		derivY.reshape(source.width,source.height);
+		difference.reshape(source.width,source.height);
+
 		gradient.process(source,derivX,derivY);
 
 		UtilDenseOpticalFlow.difference4(source,destination,difference);
