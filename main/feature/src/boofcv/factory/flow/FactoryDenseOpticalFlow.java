@@ -122,12 +122,12 @@ public class FactoryDenseOpticalFlow {
 		Class derivType = GImageDerivativeOps.getDerivativeType(imageType);
 		ImageGradient<T,D> gradient = FactoryDerivative.sobel(imageType,derivType);
 
-		DenseOpticalFlowHornSchunck<D> alg;
+		HornSchunck<D> alg;
 		if( imageType == ImageUInt8.class )
-			alg = (DenseOpticalFlowHornSchunck)new DenseOpticalFlowHornSchunck_S16(alpha,numIterations);
+			alg = (HornSchunck)new HornSchunck_S16(alpha,numIterations);
 		else
 		if( imageType == ImageFloat32.class )
-			alg = (DenseOpticalFlowHornSchunck)new DenseOpticalFlowHornSchunck_F32(alpha,numIterations);
+			alg = (HornSchunck)new HornSchunck_F32(alpha,numIterations);
 		else
 			throw new IllegalArgumentException("Unsupported image type "+imageType);
 

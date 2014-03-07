@@ -22,13 +22,13 @@ import boofcv.struct.flow.ImageFlow;
 import boofcv.struct.image.ImageFloat32;
 
 /**
- * Implementation of {@link DenseOpticalFlowHornSchunck} for {@link ImageFloat32}.
+ * Implementation of {@link HornSchunck} for {@link ImageFloat32}.
  *
  * @author Peter Abeles
  */
-public class DenseOpticalFlowHornSchunck_F32 extends DenseOpticalFlowHornSchunck<ImageFloat32>{
+public class HornSchunck_F32 extends HornSchunck<ImageFloat32> {
 
-	public DenseOpticalFlowHornSchunck_F32(float alpha , int numIterations ) {
+	public HornSchunck_F32(float alpha, int numIterations) {
 		super(alpha,numIterations);
 	}
 

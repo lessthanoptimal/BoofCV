@@ -28,7 +28,7 @@ import static org.junit.Assert.assertEquals;
 /**
  * @author Peter Abeles
  */
-public class TestDenseOpticalFlowHornSchunck {
+public class TestHornSchunck {
 
 	Random rand = new Random(123);
 
@@ -44,8 +44,8 @@ public class TestDenseOpticalFlowHornSchunck {
 			}
 		}
 
-		DenseOpticalFlowHornSchunck.borderAverageFlow(flow, found);
-		DenseOpticalFlowHornSchunck.innerAverageFlow(flow,found);
+		HornSchunck.borderAverageFlow(flow, found);
+		HornSchunck.innerAverageFlow(flow, found);
 
 		ImageFlow.D expected = new ImageFlow.D();
 

@@ -19,14 +19,14 @@
 package boofcv.abst.flow;
 
 import boofcv.abst.filter.derivative.ImageGradient;
-import boofcv.alg.flow.DenseOpticalFlowHornSchunck;
+import boofcv.alg.flow.HornSchunck;
 import boofcv.alg.flow.UtilDenseOpticalFlow;
 import boofcv.struct.flow.ImageFlow;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 
 /**
- * Implementation of {@link DenseOpticalFlow} for {@link DenseOpticalFlowHornSchunck}.  The gradient and
+ * Implementation of {@link DenseOpticalFlow} for {@link boofcv.alg.flow.HornSchunck}.  The gradient and
  * image difference operators are different from the original work, but should be an improvement
  * since they are symmetric operators.
  *
@@ -37,7 +37,7 @@ public class HornSchunck_to_DenseOpticalFlow<T extends ImageBase,D extends Image
 {
 
 	ImageGradient<T,D> gradient;
-	DenseOpticalFlowHornSchunck<D> hornSchunck;
+	HornSchunck<D> hornSchunck;
 
 	// storage for difference image and the gradient
 	D difference;
@@ -46,7 +46,7 @@ public class HornSchunck_to_DenseOpticalFlow<T extends ImageBase,D extends Image
 
 	ImageType<T> imageType;
 
-	public HornSchunck_to_DenseOpticalFlow( DenseOpticalFlowHornSchunck<D> hornSchunck,
+	public HornSchunck_to_DenseOpticalFlow( HornSchunck<D> hornSchunck,
 											ImageGradient<T, D> gradient ,
 											ImageType<T> imageType ) {
 		this.gradient = gradient;

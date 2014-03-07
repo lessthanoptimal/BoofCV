@@ -27,7 +27,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestDenseOpticalFlowHornSchunck_F32 {
+public class TestHornSchunck_F32 {
 
 	int width = 20;
 	int height = 30;
@@ -37,7 +37,7 @@ public class TestDenseOpticalFlowHornSchunck_F32 {
 	 */
 	@Test
 	public void process() {
-		DenseOpticalFlowHornSchunck_F32 alg = new DenseOpticalFlowHornSchunck_F32(0.2f,1);
+		HornSchunck_F32 alg = new HornSchunck_F32(0.2f,1);
 
 		ImageFloat32 derivX = new ImageFloat32(width,height);
 		ImageFloat32 derivY = new ImageFloat32(width,height);

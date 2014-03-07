@@ -45,4 +45,16 @@ public class ConfigOpticalFlowBlockPyramid {
 	 * The maximum number of layers in the pyramid
 	 */
 	public int maxPyramidLayers = 20;
+
+	public ConfigOpticalFlowBlockPyramid(int searchRadius, int regionRadius, int maxPerPixelError,
+										 double pyramidScale, int maxPyramidLayers) {
+		this.searchRadius = searchRadius;
+		this.regionRadius = regionRadius;
+		this.maxPerPixelError = maxPerPixelError;
+		this.pyramidScale = pyramidScale;
+		this.maxPyramidLayers = maxPyramidLayers;
+	}
+
+	public ConfigOpticalFlowBlockPyramid() {
+	}
 }

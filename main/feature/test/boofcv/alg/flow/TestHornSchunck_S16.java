@@ -27,14 +27,14 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestDenseOpticalFlowHornSchunck_S16 {
+public class TestHornSchunck_S16 {
 
 	int width = 20;
 	int height = 30;
 
 	@Test
 	public void process() {
-		DenseOpticalFlowHornSchunck_S16 alg = new DenseOpticalFlowHornSchunck_S16(0.2f,1);
+		HornSchunck_S16 alg = new HornSchunck_S16(0.2f,1);
 
 		ImageSInt16 derivX = new ImageSInt16(width,height);
 		ImageSInt16 derivY = new ImageSInt16(width,height);
