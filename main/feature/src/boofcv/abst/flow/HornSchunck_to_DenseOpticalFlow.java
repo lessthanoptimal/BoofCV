@@ -18,58 +18,32 @@
 
 package boofcv.abst.flow;
 
-import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.alg.flow.HornSchunck;
-import boofcv.alg.flow.UtilDenseOpticalFlow;
 import boofcv.struct.flow.ImageFlow;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 
 /**
- * Implementation of {@link DenseOpticalFlow} for {@link boofcv.alg.flow.HornSchunck}.  The gradient and
- * image difference operators are different from the original work, but should be an improvement
- * since they are symmetric operators.
+ * Implementation of {@link DenseOpticalFlow} for {@link boofcv.alg.flow.HornSchunck}.
  *
  * @author Peter Abeles
  */
 public class HornSchunck_to_DenseOpticalFlow<T extends ImageBase,D extends ImageBase>
 	implements DenseOpticalFlow<T>
 {
-
-	ImageGradient<T,D> gradient;
-	HornSchunck<D> hornSchunck;
-
-	// storage for difference image and the gradient
-	D difference;
-	D derivX;
-	D derivY;
+	HornSchunck<T,D> hornSchunck;
 
 	ImageType<T> imageType;
 
-	public HornSchunck_to_DenseOpticalFlow( HornSchunck<D> hornSchunck,
-											ImageGradient<T, D> gradient ,
+	public HornSchunck_to_DenseOpticalFlow( HornSchunck<T,D> hornSchunck,
 											ImageType<T> imageType ) {
-		this.gradient = gradient;
 		this.hornSchunck = hornSchunck;
 		this.imageType = imageType;
-
-		difference = gradient.getDerivType().createImage(1,1);
-		derivX = gradient.getDerivType().createImage(1,1);
-		derivY = gradient.getDerivType().createImage(1,1);
 	}
 
 	@Override
 	public void process(T source, T destination, ImageFlow flow) {
-
-		derivX.reshape(source.width,source.height);
-		derivY.reshape(source.width,source.height);
-		difference.reshape(source.width,source.height);
-
-		gradient.process(source,derivX,derivY);
-
-		UtilDenseOpticalFlow.difference4(source,destination,difference);
-
-		hornSchunck.process(derivX, derivY, difference, flow);
+		hornSchunck.process(source,destination, flow);
 	}
 
 	@Override

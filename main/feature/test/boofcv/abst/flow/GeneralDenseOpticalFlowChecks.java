@@ -145,7 +145,7 @@ public abstract class GeneralDenseOpticalFlowChecks<T extends ImageSingleBand>
 					assertTrue( sum >= 0 );
 				} else {
 					assertEquals(dx, flow.x, 0.2);
-					assertEquals(dy,flow.y,0.2);
+					assertEquals(dy, flow.y, 0.2);
 				}
 			}
 		}
