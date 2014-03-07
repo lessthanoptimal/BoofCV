@@ -18,8 +18,10 @@
 
 package boofcv.alg.flow;
 
+import boofcv.alg.InputSanityCheck;
 import boofcv.struct.flow.ImageFlow;
 import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageType;
 
 /**
  * <p>
@@ -31,18 +33,13 @@ import boofcv.struct.image.ImageBase;
  * </p>
  *
  * <p>
- * The performance of this algorithm is quite poor compared to any of the more modern ones included.  It
- * is primarily provided for historical purposes since much of the current literature is based off of it.
- * </p>
- *
- * <p>
  * [1] Horn, Berthold K., and Brian G. Schunck. "Determining optical flow."
  * 1981 Technical Symposium East. International Society for Optics and Photonics, 1981.
  * </p>
  *
  * @author Peter Abeles
  */
-public abstract class HornSchunck<T extends ImageBase> {
+public abstract class HornSchunck<T extends ImageBase, D extends ImageBase> {
 
 	// used to weight the error of image brightness and smoothness of velocity flow
 	protected float alpha2;
@@ -53,14 +50,26 @@ public abstract class HornSchunck<T extends ImageBase> {
 	// storage for the average flow
 	protected ImageFlow averageFlow = new ImageFlow(1,1);
 
+	// If the output should be cleared each time a new image is processed or used as an initial estimate
+	protected boolean resetOutput = true;
+
+	// storage for derivatives
+	protected D derivX;
+	protected D derivY;
+	protected D derivT;
+
 	/**
 	 * Constructor
 	 *
 	 * @param alpha Weighting used adjust the importance of brightness and smoothness.  Try ?
 	 */
-	public HornSchunck(float alpha, int numIterations) {
+	public HornSchunck(float alpha, int numIterations, ImageType<D> derivType ) {
 		this.alpha2 = alpha*alpha;
 		this.numIterations = numIterations;
+
+		derivX = derivType.createImage(1,1);
+		derivY = derivType.createImage(1,1);
+		derivT = derivType.createImage(1,1);
 	}
 
 	/**
@@ -75,12 +84,39 @@ public abstract class HornSchunck<T extends ImageBase> {
 	 * Computes dense optical flow from the first image's gradient and the difference between
 	 * the second and the first image.
 	 *
-	 * @param derivX First image's gradient x-axis
-	 * @param derivY First image's gradient y-axis
-	 * @param derivT Second image minus the first image
+	 * @param image1 First image
+	 * @param image2 Second image
 	 * @param output Found dense optical flow
 	 */
-	public abstract void process( T derivX , T derivY , T derivT , ImageFlow output);
+	public void process( T image1 , T image2 , ImageFlow output) {
+
+		InputSanityCheck.checkSameShape(image1,image2);
+
+		derivX.reshape(image1.width,image1.height);
+		derivY.reshape(image1.width,image1.height);
+		derivT.reshape(image1.width,image1.height);
+
+		averageFlow.reshape(output.width,output.height);
+
+		if( resetOutput )
+			output.fillZero();
+
+		computeDerivX(image1,image2,derivX);
+		computeDerivY(image1,image2,derivY);
+		computeDerivT(image1,image2,derivT);
+
+		findFlow(derivX,derivY,derivT,output);
+	}
+
+	protected abstract void computeDerivX( T image1 , T image2 , D derivX );
+	protected abstract void computeDerivY( T image1 , T image2 , D derivY );
+	protected abstract void computeDerivT( T image1 , T image2 , D derivT );
+
+	/**
+	 * Inner function for computing optical flow
+	 */
+	protected abstract void findFlow( D derivX , D derivY , D derivT , ImageFlow output );
+
 
 	/**
 	 * Computes average flow using an 8-connect neighborhood for the inner image

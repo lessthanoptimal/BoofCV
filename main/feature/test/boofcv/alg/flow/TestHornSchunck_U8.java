@@ -16,29 +16,23 @@
  * limitations under the License.
  */
 
-package boofcv.abst.flow;
+package boofcv.alg.flow;
 
-import boofcv.factory.flow.FactoryDenseOpticalFlow;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageSInt16;
 import boofcv.struct.image.ImageUInt8;
-import org.junit.Test;
 
 /**
  * @author Peter Abeles
  */
-public class TestHornSchunck_to_DenseOpticalFlow {
+public class TestHornSchunck_U8 extends ChecksHornSchunck<ImageUInt8,ImageSInt16> {
 
-	@Test
-	public void allTests() {
-		Class imageTypes[] = new Class[]{ImageUInt8.class,ImageFloat32.class};
 
-		for( Class it : imageTypes ) {
-			new GeneralDenseOpticalFlowChecks(it) {
-				@Override
-				public DenseOpticalFlow createAlg(Class imageType) {
-					return FactoryDenseOpticalFlow.hornSchunck(20f, 1000,imageType);
-				}
-			}.allTests(true);
-		}
+	public TestHornSchunck_U8() {
+		super(ImageUInt8.class, ImageSInt16.class);
+	}
+
+	@Override
+	public HornSchunck<ImageUInt8, ImageSInt16> createAlg() {
+		return new HornSchunck_U8(0.2f,1);
 	}
 }

@@ -19,22 +19,23 @@
 package boofcv.alg.flow;
 
 import boofcv.struct.flow.ImageFlow;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageSInt16;
 import boofcv.struct.image.ImageType;
+import boofcv.struct.image.ImageUInt8;
 
 /**
- * Implementation of {@link HornSchunck} for {@link ImageFloat32}.
+ * Implementation of {@link HornSchunck} for {@link boofcv.struct.image.ImageFloat32}.
  *
  * @author Peter Abeles
  */
-public class HornSchunck_F32 extends HornSchunck<ImageFloat32,ImageFloat32> {
+public class HornSchunck_U8 extends HornSchunck<ImageUInt8,ImageSInt16> {
 
-	public HornSchunck_F32(float alpha, int numIterations) {
-		super(alpha, numIterations, ImageType.single(ImageFloat32.class));
+	public HornSchunck_U8(float alpha, int numIterations) {
+		super(alpha,numIterations, ImageType.single(ImageSInt16.class));
 	}
 
 	@Override
-	protected void computeDerivX(ImageFloat32 image1, ImageFloat32 image2, ImageFloat32 derivX) {
+	protected void computeDerivX(ImageUInt8 image1, ImageUInt8 image2, ImageSInt16 derivX) {
 		int w = image1.width-1;
 		int h = image1.height-1;
 
@@ -44,12 +45,12 @@ public class HornSchunck_F32 extends HornSchunck<ImageFloat32,ImageFloat32> {
 			int indexX = derivX.startIndex + y*derivX.stride;
 
 			for( int x = 0; x < w; x++ , index1++ , index2++ , indexX++ ) {
-				float d0 = image1.data[index1+1] - image1.data[index1];
-				float d2 = image2.data[index2+1] - image2.data[index2];
-				float d1 = image1.data[index1+1+image1.stride] - image1.data[index1+image1.stride];
-				float d3 = image2.data[index2+1+image2.stride] - image2.data[index2+image2.stride];
+				int d0 = (image1.data[index1+1]&0xFF) - (image1.data[index1]&0xFF);
+				int d2 = (image2.data[index2+1]&0xFF) - (image2.data[index2]&0xFF);
+				int d1 = (image1.data[index1+1+image1.stride]&0xFF) - (image1.data[index1+image1.stride]&0xFF);
+				int d3 = (image2.data[index2+1+image2.stride]&0xFF) - (image2.data[index2+image2.stride]&0xFF);
 
-				derivX.data[indexX] = 0.25f*(d0 + d1 + d2 + d3);
+				derivX.data[indexX] = (short)((d0 + d1 + d2 + d3)/4);
 			}
 		}
 
@@ -58,15 +59,15 @@ public class HornSchunck_F32 extends HornSchunck<ImageFloat32,ImageFloat32> {
 		}
 
 		for( int x = 0; x < w; x++ ) {
-			float d0 = image1.unsafe_get(x+1,h) - image1.unsafe_get(x,h);
-			float d1 = image2.unsafe_get(x+1,h) - image2.unsafe_get(x,h);
+			int d0 = image1.unsafe_get(x+1,h) - image1.unsafe_get(x,h);
+			int d1 = image2.unsafe_get(x+1,h) - image2.unsafe_get(x,h);
 
-			derivX.unsafe_set(x,h, 0.5f*(d0+d1));
+			derivX.unsafe_set(x,h, (d0+d1)/2);
 		}
 	}
 
 	@Override
-	protected void computeDerivY(ImageFloat32 image1, ImageFloat32 image2, ImageFloat32 derivY) {
+	protected void computeDerivY(ImageUInt8 image1, ImageUInt8 image2, ImageSInt16 derivY) {
 		int w = image1.width-1;
 		int h = image1.height-1;
 
@@ -76,20 +77,20 @@ public class HornSchunck_F32 extends HornSchunck<ImageFloat32,ImageFloat32> {
 			int indexY = derivY.startIndex + y*derivY.stride;
 
 			for( int x = 0; x < w; x++ , index1++ , index2++ , indexY++ ) {
-				float d0 = image1.data[index1+image1.stride] - image1.data[index1];
-				float d2 = image2.data[index2+image2.stride] - image2.data[index2];
-				float d1 = image1.data[index1+1+image1.stride] - image1.data[index1+1];
-				float d3 = image2.data[index2+1+image2.stride] - image2.data[index2+1];
+				int d0 = (image1.data[index1+image1.stride]&0xFF) - (image1.data[index1]&0xFF);
+				int d2 = (image2.data[index2+image2.stride]&0xFF) - (image2.data[index2]&0xFF);
+				int d1 = (image1.data[index1+1+image1.stride]&0xFF) - (image1.data[index1+1]&0xFF);
+				int d3 = (image2.data[index2+1+image2.stride]&0xFF) - (image2.data[index2+1]&0xFF);
 
-				derivY.data[indexY] = 0.25f*(d0 + d1 + d2 + d3);
+				derivY.data[indexY] = (short)((d0 + d1 + d2 + d3)/4);
 			}
 		}
 
 		for( int y = 0; y < h; y++ ) {
-			float d0 = image1.unsafe_get(w, y + 1) - image1.unsafe_get(w,y);
-			float d1 = image2.unsafe_get(w, y + 1) - image2.unsafe_get(w,y);
+			int d0 = image1.unsafe_get(w, y + 1) - image1.unsafe_get(w,y);
+			int d1 = image2.unsafe_get(w, y + 1) - image2.unsafe_get(w,y);
 
-			derivY.unsafe_set(w,y, 0.5f*(d0+d1));
+			derivY.unsafe_set(w,y, (d0+d1)/2);
 		}
 
 		for( int x = 0; x < w; x++ ) {
@@ -98,7 +99,7 @@ public class HornSchunck_F32 extends HornSchunck<ImageFloat32,ImageFloat32> {
 	}
 
 	@Override
-	protected void computeDerivT(ImageFloat32 image1, ImageFloat32 image2, ImageFloat32 difference) {
+	protected void computeDerivT(ImageUInt8 image1, ImageUInt8 image2, ImageSInt16 difference) {
 		int w = image1.width-1;
 		int h = image1.height-1;
 
@@ -108,17 +109,17 @@ public class HornSchunck_F32 extends HornSchunck<ImageFloat32,ImageFloat32> {
 			int indexDiff = difference.startIndex + y*difference.stride;
 
 			for( int x = 0; x < w; x++ , index1++ , index2++ , indexDiff++ ) {
-				float d0 = image2.data[index2] - image1.data[index1];                                // (x  ,y  )
-				float d1 = image2.data[index2+1] - image1.data[index1+1];                            // (x+1,y  )
-				float d2 = image2.data[index2+image2.stride] - image1.data[index1+image1.stride];    // (x  ,y+1)
-				float d3 = image2.data[index2+1+image2.stride] - image1.data[index1+1+image2.stride];// (x+1,y+1)
+				int d0 = (image2.data[index2]&0xFF) - (image1.data[index1]&0xFF);                                // (x  ,y  )
+				int d1 = (image2.data[index2+1]&0xFF) - (image1.data[index1+1]&0xFF);                            // (x+1,y  )
+				int d2 = (image2.data[index2+image2.stride]&0xFF) - (image1.data[index1+image1.stride]&0xFF);    // (x  ,y+1)
+				int d3 = (image2.data[index2+1+image2.stride]&0xFF) - (image1.data[index1+1+image1.stride]&0xFF);// (x+1,y+1)
 
-				difference.data[indexDiff] = 0.25f*(d0 + d1 + d2 + d3);
+				difference.data[indexDiff] = (short)((d0 + d1 + d2 + d3)/4);
 			}
 		}
 
 		for( int y = 0; y < image1.height; y++ ) {
-			borderDerivT(image1,image2,difference,w,y);
+			borderDerivT(image1, image2, difference, w, y);
 		}
 
 		for( int x = 0; x < w; x++ ) {
@@ -126,17 +127,17 @@ public class HornSchunck_F32 extends HornSchunck<ImageFloat32,ImageFloat32> {
 		}
 	}
 
-	protected static void borderDerivT(ImageFloat32 imageA , ImageFloat32 imageB ,
-									   ImageFloat32 difference, int x, int y) {
-		float d0 = getBorderT(imageA, imageB, x, y);
-		float d1 = getBorderT(imageA, imageB, x+1, y);
-		float d2 = getBorderT(imageA, imageB, x, y+1);
-		float d3 = getBorderT(imageA, imageB, x+1, y + 1);
+	protected static void borderDerivT(ImageUInt8 imageA , ImageUInt8 imageB ,
+									   ImageSInt16 difference, int x, int y) {
+		float d0 = getBorderT(imageA, imageB, x    , y    );
+		float d1 = getBorderT(imageA, imageB, x + 1, y    );
+		float d2 = getBorderT(imageA, imageB, x    , y + 1);
+		float d3 = getBorderT(imageA, imageB, x + 1, y + 1);
 
-		difference.unsafe_set(x,y, 0.25f*(d0+d1+d2+d3));
+		difference.unsafe_set(x,y, (short)((d0+d1+d2+d3)/4));
 	}
 
-	protected static float getBorderT(ImageFloat32 imageA, ImageFloat32 imageB, int x, int y) {
+	protected static float getBorderT(ImageUInt8 imageA, ImageUInt8 imageB, int x, int y) {
 		if( x < 0 ) x = 0;
 		else if( x >= imageA.width ) x = imageA.width-1;
 		if( y < 0 ) y = 0;
@@ -146,8 +147,8 @@ public class HornSchunck_F32 extends HornSchunck<ImageFloat32,ImageFloat32> {
 	}
 
 	@Override
-	protected void findFlow( ImageFloat32 derivX , ImageFloat32 derivY ,
-							 ImageFloat32 derivT , ImageFlow output) {
+	protected void findFlow( ImageSInt16 derivX , ImageSInt16 derivY ,
+							 ImageSInt16 derivT , ImageFlow output) {
 
 		int N = output.width*output.height;
 
