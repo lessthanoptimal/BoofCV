@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -84,15 +84,13 @@ public class GenerateImplConvolveMean {
 		String declareHalf = imageIn.isInteger() ? "\t\tfinal " + sumType + " halfDivisor = divisor/2;\n" : "";
 		String divide = imageIn.isInteger() ? "(total+halfDivisor)/divisor" : "total/divisor";
 
-		out.print("\tpublic static void horizontal( " + imageIn.getSingleBandName() + " input , " + imageOut.getSingleBandName() + " output , int radius , boolean includeBorder) {\n" +
+		out.print("\tpublic static void horizontal( " + imageIn.getSingleBandName() + " input , " + imageOut.getSingleBandName() + " output , int radius ) {\n" +
 				"\t\tfinal int kernelWidth = radius*2 + 1;\n" +
 				"\n" +
-				"\t\tfinal int startY = includeBorder ? 0 : radius;\n" +
-				"\t\tfinal int endY = includeBorder ? input.height : input.height - radius;\n" +
 				"\t\tfinal " + sumType + " divisor = kernelWidth;\n" +
 				declareHalf +
 				"\n" +
-				"\t\tfor( int y = startY; y < endY; y++ ) {\n" +
+				"\t\tfor( int y = 0; y < input.height; y++ ) {\n" +
 				"\t\t\tint indexIn = input.startIndex + input.stride*y;\n" +
 				"\t\t\tint indexOut = output.startIndex + output.stride*y + radius;\n" +
 				"\n" +
@@ -125,11 +123,8 @@ public class GenerateImplConvolveMean {
 		String declareHalf = imageIn.isInteger() ? "\t\tfinal " + sumType + " halfDivisor = divisor/2;\n" : "";
 		String divide = imageIn.isInteger() ? "(total+halfDivisor)/divisor" : "total/divisor";
 
-		out.print("\tpublic static void vertical( " + imageIn.getSingleBandName() + " input , " + imageOut.getSingleBandName() + " output , int radius , boolean includeBorder ) {\n" +
+		out.print("\tpublic static void vertical( " + imageIn.getSingleBandName() + " input , " + imageOut.getSingleBandName() + " output , int radius ) {\n" +
 				"\t\tfinal int kernelWidth = radius*2 + 1;\n" +
-				"\n" +
-				"\t\tfinal int startX = includeBorder ? 0 : radius;\n" +
-				"\t\tfinal int endX = includeBorder ? input.width : input.width - radius;\n" +
 				"\n" +
 				"\t\tfinal int backStep = kernelWidth*input.stride;\n" +
 				"\n" +
@@ -137,7 +132,7 @@ public class GenerateImplConvolveMean {
 				declareHalf +
 				"\t\t"+sumType+" totals[] = new "+sumType+"[ input.width ];\n" +
 				"\n" +
-				"\t\tfor( int x = startX; x < endX; x++ ) {\n" +
+				"\t\tfor( int x = 0; x < input.width; x++ ) {\n" +
 				"\t\t\tint indexIn = input.startIndex + x;\n" +
 				"\t\t\tint indexOut = output.startIndex + output.stride*radius + x;\n" +
 				"\n" +
@@ -152,10 +147,10 @@ public class GenerateImplConvolveMean {
 				"\n" +
 				"\t\t// change the order it is processed in to reduce cache misses\n" +
 				"\t\tfor( int y = radius+1; y < output.height-radius; y++ ) {\n" +
-				"\t\t\tint indexIn = input.startIndex + (y+radius)*input.stride+startX;\n" +
-				"\t\t\tint indexOut = output.startIndex + y*output.stride+startX;\n" +
+				"\t\t\tint indexIn = input.startIndex + (y+radius)*input.stride;\n" +
+				"\t\t\tint indexOut = output.startIndex + y*output.stride;\n" +
 				"\n" +
-				"\t\t\tfor( int x = startX; x < endX; x++ ,indexIn++,indexOut++) {\n" +
+				"\t\t\tfor( int x = 0; x < input.width; x++ ,indexIn++,indexOut++) {\n" +
 				"\t\t\t\t"+sumType+" total = totals[ x ]  - (input.data[ indexIn - backStep ]"+bitWise+");\n" +
 				"\t\t\t\ttotals[ x ] = total += input.data[ indexIn ]"+bitWise+";\n" +
 				"\n" +

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -75,17 +75,14 @@ public class CompareToStandardConvolution extends CompareIdenticalFunctions
 		ImageSingleBand dst = ConvolutionTestHelper.createImage(paramTypes[2], width, height);
 
 		if( candidate.getName().compareTo("convolve") != 0 ) {
-			Object[][] ret = new Object[2][paramTypes.length];
+			Object[][] ret = new Object[1][paramTypes.length];
 			int i = 0;
-			ret[0][i] = ret[1][i] = kernel; i++;
-			ret[0][i] = ret[1][i] = src;    i++;
-			ret[0][i] = ret[1][i] = dst;    i++;
-			if( paramTypes.length == 5) {
-				ret[0][i] = ret[1][i] = 11;
-				i++;
+			ret[0][i] = kernel; i++;
+			ret[0][i] = src;    i++;
+			ret[0][i] = dst;    i++;
+			if( paramTypes.length == 4) {
+				ret[0][i] = 11;
 			}
-			ret[0][i] = true;
-			ret[1][i] = false;
 
 			return ret;
 		} else {

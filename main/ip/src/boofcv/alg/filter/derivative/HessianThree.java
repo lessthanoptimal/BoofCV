@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -57,10 +57,10 @@ import boofcv.struct.image.ImageUInt8;
  */
 public class HessianThree {
 
-	public static Kernel1D_I32 kernelXXYY_I32 = new Kernel1D_I32(5,1,0,-2,0,1);
+	public static Kernel1D_I32 kernelXXYY_I32 = new Kernel1D_I32(new int[]{1,0,-2,0,1},5);
 	public static Kernel2D_I32 kernelCross_I32 = new Kernel2D_I32(3, new int[]{1,0,-1,0,0,0,-1,0,1});
 
-	public static Kernel1D_F32 kernelXXYY_F32 = new Kernel1D_F32(5,0.5f,0,-1,0,0.5f);
+	public static Kernel1D_F32 kernelXXYY_F32 = new Kernel1D_F32(new float[]{0.5f,0,-1,0,0.5f},5);
 	public static Kernel2D_F32 kernelCross_F32 = new Kernel2D_F32(3, new float[]{0.5f,0,-0.5f,0,0,0,-0.5f,0,0.5f});
 
 	/**
@@ -81,8 +81,8 @@ public class HessianThree {
 		HessianThree_Standard.process(orig, derivXX, derivYY,derivXY);
 
 		if( border != null ) {
-			DerivativeHelperFunctions.processBorderHorizontal(orig, derivXX ,kernelXXYY_I32, 2 , border );
-			DerivativeHelperFunctions.processBorderVertical(orig, derivYY ,kernelXXYY_I32, 2 , border );
+			DerivativeHelperFunctions.processBorderHorizontal(orig, derivXX ,kernelXXYY_I32, border );
+			DerivativeHelperFunctions.processBorderVertical(orig, derivYY ,kernelXXYY_I32, border );
 			ConvolveJustBorder_General.convolve(kernelCross_I32, border,derivXY,2);
 		}
 	}
@@ -103,8 +103,8 @@ public class HessianThree {
 		HessianThree_Standard.process(orig, derivXX, derivYY, derivXY);
 
 		if( border != null ) {
-			DerivativeHelperFunctions.processBorderHorizontal(orig, derivXX ,kernelXXYY_F32, 2 , border );
-			DerivativeHelperFunctions.processBorderVertical(orig, derivYY ,kernelXXYY_F32, 2 , border );
+			DerivativeHelperFunctions.processBorderHorizontal(orig, derivXX ,kernelXXYY_F32, border );
+			DerivativeHelperFunctions.processBorderVertical(orig, derivYY ,kernelXXYY_F32, border );
 			ConvolveJustBorder_General.convolve(kernelCross_F32,border,derivXY,2);
 		}
 	}

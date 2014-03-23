@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -128,30 +128,32 @@ public class GenerateConvolveJustBorder_General {
 		String typeOutput = imageOut.getSingleBandName();
 		String dataOutput = imageOut.getDataType();
 
-		out.print("\tpublic static void horizontal(Kernel1D_"+typeKernel+" kernel, "+typeInput+" input, "+typeOutput+" output , int border ) {\n" +
+		out.print("\tpublic static void horizontal(Kernel1D_"+typeKernel+" kernel, "+typeInput+" input, "+typeOutput+" output ) {\n" +
 				"\t\tfinal "+dataOutput+"[] dataDst = output.data;\n" +
 				"\t\tfinal "+dataKernel+"[] dataKer = kernel.data;\n" +
 				"\n" +
-				"\t\tfinal int radius = kernel.getRadius();\n"+
+				"\t\tfinal int offset = kernel.getOffset();\n" +
+				"\t\tfinal int kernelWidth = kernel.getWidth();\n" +
 				"\t\tfinal int width = output.getWidth();\n" +
 				"\t\tfinal int height = output.getHeight();\n" +
+				"\t\tfinal int borderRight = kernelWidth-offset-1;\n" +
 				"\n" +
 				"\t\tfor (int y = 0; y < height; y++) {\n" +
 				"\t\t\tint indexDest = output.startIndex + y * output.stride;\n" +
 				"\n" +
-				"\t\t\tfor ( int x = 0; x < border; x++ ) {\n" +
+				"\t\t\tfor ( int x = 0; x < offset; x++ ) {\n" +
 				"\t\t\t\t"+sumType+" total = 0;\n" +
-				"\t\t\t\tfor (int k = -radius; k <= radius; k++) {\n" +
-				"\t\t\t\t\ttotal += input.get(x+k,y) * dataKer[k+radius];\n" +
+				"\t\t\t\tfor (int k = 0; k < kernelWidth; k++) {\n" +
+				"\t\t\t\t\ttotal += input.get(x+k-offset,y) * dataKer[k];\n" +
 				"\t\t\t\t}\n" +
 				"\t\t\t\tdataDst[indexDest++] = "+typeCast+"total;\n" +
 				"\t\t\t}\n" +
 				"\n" +
-				"\t\t\tindexDest = output.startIndex + y * output.stride + width-border;\n" +
-				"\t\t\tfor ( int x = width-border; x < width; x++ ) {\n" +
+				"\t\t\tindexDest = output.startIndex + y * output.stride + width-borderRight;\n" +
+				"\t\t\tfor ( int x = width-borderRight; x < width; x++ ) {\n" +
 				"\t\t\t\t"+sumType+" total = 0;\n" +
-				"\t\t\t\tfor (int k = -radius; k <= radius; k++) {\n" +
-				"\t\t\t\t\ttotal += input.get(x+k,y) * dataKer[k+radius];\n" +
+				"\t\t\t\tfor (int k = 0; k < kernelWidth; k++) {\n" +
+				"\t\t\t\t\ttotal += input.get(x+k-offset,y) * dataKer[k];\n" +
 				"\t\t\t\t}\n" +
 				"\t\t\t\tdataDst[indexDest++] = "+typeCast+"total;\n" +
 				"\t\t\t}\n" +
@@ -163,30 +165,32 @@ public class GenerateConvolveJustBorder_General {
 		String typeOutput = imageOut.getSingleBandName();
 		String dataOutput = imageOut.getDataType();
 
-		out.print("\tpublic static void vertical(Kernel1D_"+typeKernel+" kernel, "+typeInput+" input, "+typeOutput+" output , int border ) {\n" +
+		out.print("\tpublic static void vertical(Kernel1D_"+typeKernel+" kernel, "+typeInput+" input, "+typeOutput+" output ) {\n" +
 				"\t\tfinal "+dataOutput+"[] dataDst = output.data;\n" +
 				"\t\tfinal "+dataKernel+"[] dataKer = kernel.data;\n" +
 				"\n" +
-				"\t\tfinal int radius = kernel.getRadius();\n"+
+				"\t\tfinal int offset = kernel.getOffset();\n" +
+				"\t\tfinal int kernelWidth = kernel.getWidth();\n" +
 				"\t\tfinal int width = output.getWidth();\n" +
 				"\t\tfinal int height = output.getHeight();\n" +
+				"\t\tfinal int borderBottom = kernelWidth-offset-1;\n" +
 				"\n" +
 				"\t\tfor ( int x = 0; x < width; x++ ) {\n" +
 				"\t\t\tint indexDest = output.startIndex + x;\n" +
 				"\n" +
-				"\t\t\tfor (int y = 0; y < border; y++, indexDest += output.stride) {\n" +
+				"\t\t\tfor (int y = 0; y < offset; y++, indexDest += output.stride) {\n" +
 				"\t\t\t\t"+sumType+" total = 0;\n" +
-				"\t\t\t\tfor (int k = -radius; k <= radius; k++) {\n" +
-				"\t\t\t\t\ttotal += input.get(x,y+k) * dataKer[k+radius];\n" +
+				"\t\t\t\tfor (int k = 0; k < kernelWidth; k++) {\n" +
+				"\t\t\t\t\ttotal += input.get(x,y+k-offset) * dataKer[k];\n" +
 				"\t\t\t\t}\n" +
 				"\t\t\t\tdataDst[indexDest] = "+typeCast+"total;\n" +
 				"\t\t\t}\n" +
 				"\n" +
-				"\t\t\tindexDest = output.startIndex + (height-border) * output.stride + x;\n" +
-				"\t\t\tfor (int y = height-border; y < height; y++, indexDest += output.stride) {\n" +
+				"\t\t\tindexDest = output.startIndex + (height-borderBottom) * output.stride + x;\n" +
+				"\t\t\tfor (int y = height-borderBottom; y < height; y++, indexDest += output.stride) {\n" +
 				"\t\t\t\t"+sumType+" total = 0;\n" +
-				"\t\t\t\tfor (int k = -radius; k <= radius; k++ ) {\n" +
-				"\t\t\t\t\ttotal += input.get(x,y+k) * dataKer[k+radius];\n" +
+				"\t\t\t\tfor (int k = 0; k < kernelWidth; k++ ) {\n" +
+				"\t\t\t\t\ttotal += input.get(x,y+k-offset) * dataKer[k];\n" +
 				"\t\t\t\t}\n" +
 				"\t\t\t\tdataDst[indexDest] = "+typeCast+"total;\n" +
 				"\t\t\t}\n" +

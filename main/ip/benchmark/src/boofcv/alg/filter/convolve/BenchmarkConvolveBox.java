@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -72,37 +72,37 @@ public class BenchmarkConvolveBox extends SimpleBenchmark {
 
 	public int timeConvolve_Vertical_I8_I16(int reps) {
 		for( int i = 0; i < reps; i++ )
-			ConvolveImageNoBorder.vertical(kernelI32, input_I8,out_I16,false);
+			ConvolveImageNoBorder.vertical(kernelI32, input_I8,out_I16);
 		return 0;
 	}
 
 	public int timeConvolve_Vertical_I8_I32(int reps) {
 		for( int i = 0; i < reps; i++ )
-			ConvolveImageNoBorder.vertical(kernelI32, input_I8,out_I32,false);
+			ConvolveImageNoBorder.vertical(kernelI32, input_I8,out_I32);
 		return 0;
 	}
 
 	public int timeBox_U8_I16_Vertical(int reps) {
 		for( int i = 0; i < reps; i++ )
-			ImplConvolveBox.vertical(input_I8,out_I16,radius,false);
+			ImplConvolveBox.vertical(input_I8,out_I16,radius);
 		return 0;
 	}
 
 	public int timeBox_U8_I32_Vertical(int reps) {
 		for( int i = 0; i < reps; i++ )
-			ImplConvolveBox.vertical(input_I8,out_I32,radius,false);
+			ImplConvolveBox.vertical(input_I8,out_I32,radius);
 		return 0;
 	}
 
 	public int timeBox_S16_I16_Vertical(int reps) {
 		for( int i = 0; i < reps; i++ )
-			ImplConvolveBox.vertical(input_I16,out_I16,radius,false);
+			ImplConvolveBox.vertical(input_I16,out_I16,radius);
 		return 0;
 	}
 
 	public int timeBox_F32_F32_Vertical(int reps) {
 		for( int i = 0; i < reps; i++ )
-			ImplConvolveBox.vertical(input_F32,out_F32,radius,false);
+			ImplConvolveBox.vertical(input_F32,out_F32,radius);
 		return 0;
 	}
 
@@ -114,25 +114,25 @@ public class BenchmarkConvolveBox extends SimpleBenchmark {
 
 	public int timeBox_U8_I16_Horizontal(int reps) {
 		for( int i = 0; i < reps; i++ )
-			ImplConvolveBox.horizontal(input_I8, out_I16, radius, false);
+			ImplConvolveBox.horizontal(input_I8, out_I16, radius);
 		return 0;
 	}
 
 	public int timeBox_U8_I32_Horizontal(int reps) {
 		for( int i = 0; i < reps; i++ )
-			ImplConvolveBox.horizontal(input_I8,out_I32,radius,false);
+			ImplConvolveBox.horizontal(input_I8,out_I32,radius);
 		return 0;
 	}
 
 	public int timeBox_S16_I16_Horizontal(int reps) {
 		for( int i = 0; i < reps; i++ )
-			ImplConvolveBox.horizontal(input_I16,out_I16,radius,false);
+			ImplConvolveBox.horizontal(input_I16,out_I16,radius);
 		return 0;
 	}
 
 	public int timeBox_F32_F32_Horizontal(int reps) {
 		for( int i = 0; i < reps; i++ )
-			ImplConvolveBox.horizontal(input_F32,out_F32,radius,false);
+			ImplConvolveBox.horizontal(input_F32,out_F32,radius);
 		return 0;
 	}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -134,23 +134,20 @@ public class GenerateConvolvedUnrolled extends CodeGeneratorBase {
 		out.print("\tpublic static boolean " + opName + "( " + kernel + " kernel ,\n" +
 				"\t\t\t\t\t\t\t\t   " + typeInput + " image, " + typeOutput + " dest");
 
-		String includeBorderStr;
 
-		if( kernelDOF == 1 ) {
-			includeBorderStr= ",includeBorder";
-			out.println(",");
-			if( hasDivisor ) {
-				out.print("\t\t\t\t\t\t\t\t   int divisor, boolean includeBorder) {\n");
-			} else {
-				out.print("\t\t\t\t\t\t\t\t   boolean includeBorder) {\n");
-			}
+		if( hasDivisor ) {
+			out.print(", int divisor ) {\n");
 		} else {
-			includeBorderStr="";
-			if( hasDivisor ) {
-				out.print(", int divisor ) {\n");
-			} else {
-				out.print(") {\n");
-			}
+			out.print(") {\n");
+		}
+
+		if( opName.compareTo("convolve") != 0 ) {
+			out.print(
+					"\n" +
+					"\t\t// Unrolled functions only exist for symmetric kernels with an odd width\n" +
+					"\t\tif( kernel.offset != kernel.width/2 || kernel.width%2 == 0 )\n" +
+					"\t\t\treturn false;\n" +
+					"\n");
 		}
 
 		out.print("\t\tswitch( kernel.width ) {\n");
@@ -158,9 +155,9 @@ public class GenerateConvolvedUnrolled extends CodeGeneratorBase {
 			int num = 3 + i * 2;
 			out.print("\t\t\tcase " + num + ":\n");
 			if( hasDivisor )
-				out.print("\t\t\t\t" + opName + num + "(kernel,image,dest,divisor"+includeBorderStr+");\n");
+				out.print("\t\t\t\t" + opName + num + "(kernel,image,dest,divisor);\n");
 			else
-				out.print("\t\t\t\t" + opName + num + "(kernel,image,dest"+includeBorderStr+");\n");
+				out.print("\t\t\t\t" + opName + num + "(kernel,image,dest);\n");
 			out.print("\t\t\t\tbreak;\n" +
 					"\n");
 		}
@@ -174,15 +171,17 @@ public class GenerateConvolvedUnrolled extends CodeGeneratorBase {
 	public void addHorizontal(int num, boolean hasDivisor ) {
 		String typeCast = generateTypeCast();
 
-		out.print("\tpublic static void horizontal" + num + "( Kernel1D_" + typeKernel + " kernel ,\n" +
-				"\t\t\t\t\t\t\t\t\t" + typeInput + " image, " + typeOutput + " dest,\n");
+		out.print("\tpublic static void horizontal" + num + "( Kernel1D_" + typeKernel + " kernel , "
+				+ typeInput + " image, " + typeOutput + " dest ");
 
 		if( hasDivisor ) {
-			out.print("\t\t\t\t\t\t\t\t\tint divisor, boolean includeBorder) {\n");
+			out.print(", int divisor )\n");
 		} else {
-			out.print("\t\t\t\t\t\t\t\t\tboolean includeBorder) {\n");
+			out.print(")\n");
 		}
-		out.print("\t\tfinal " + dataInput + "[] dataSrc = image.data;\n" +
+
+		out.print("\t{\n" +
+				"\t\tfinal " + dataInput + "[] dataSrc = image.data;\n" +
 				"\t\tfinal " + dataOutput + "[] dataDst = dest.data;\n" +
 				"\n");
 		for (int i = 0; i < num; i++) {
@@ -191,13 +190,10 @@ public class GenerateConvolvedUnrolled extends CodeGeneratorBase {
 		out.print("\n" +
 				"\t\tfinal int radius = kernel.getRadius();\n" +
 				"\n" +
-				"\t\tfinal int yBorder = includeBorder ? 0 : radius;\n" +
-				"\n" +
 				"\t\tfinal int width = image.getWidth();\n" +
-				"\t\tfinal int height = image.getHeight()-yBorder;\n" +
 				(hasDivisor ? declareHalf : "")+
 				"\n" +
-				"\t\tfor( int i = yBorder; i < height; i++ ) {\n" +
+				"\t\tfor( int i = 0; i < image.height; i++ ) {\n" +
 				"\t\t\tint indexDst = dest.startIndex + i*dest.stride+radius;\n" +
 				"\t\t\tint j = image.startIndex + i*image.stride - radius;\n" +
 				"\t\t\tfinal int jEnd = j+width-radius;\n" +
@@ -224,12 +220,13 @@ public class GenerateConvolvedUnrolled extends CodeGeneratorBase {
 	public void addVertical(int num, boolean hasDivisor) {
 		String typeCast = generateTypeCast();
 
-		out.print("\tpublic static void vertical" + num + "( Kernel1D_" + typeKernel + " kernel,\n" +
-				"\t\t\t\t\t\t\t\t " + typeInput + " image, " + typeOutput + " dest,\n");
+		out.print("\tpublic static void vertical" + num + "( Kernel1D_" + typeKernel + " kernel , "
+				 + typeInput + " image, " + typeOutput + " dest ");
 		if( hasDivisor )
-			out.print("\t\t\t\t\t\t\t\t int divisor , boolean includeBorder)\n");
+			out.print(", int divisor )\n");
 		else
-			out.print("\t\t\t\t\t\t\t\t boolean includeBorder)\n");
+			out.print(")\n");
+
 		out.print("\t{\n" +
 				"\t\tfinal " + dataInput + "[] dataSrc = image.data;\n" +
 				"\t\tfinal " + dataOutput + "[] dataDst = dest.data;\n" +
@@ -246,14 +243,12 @@ public class GenerateConvolvedUnrolled extends CodeGeneratorBase {
 				"\n" +
 				"\t\tfinal int yEnd = imgHeight-radius;\n" +
 				"\n" +
-				"\t\tfinal int xBorder = includeBorder ? 0 : radius;\n" +
-				"\n" +
 				"\t\tfor( int y = radius; y < yEnd; y++ ) {\n" +
-				"\t\t\tint indexDst = dest.startIndex+y*dest.stride+xBorder;\n" +
+				"\t\t\tint indexDst = dest.startIndex+y*dest.stride;\n" +
 				"\t\t\tint i = image.startIndex + (y-radius)*image.stride;\n" +
-				"\t\t\tfinal int iEnd = i+imgWidth-xBorder;\n" +
+				"\t\t\tfinal int iEnd = i+imgWidth;\n" +
 				"\n" +
-				"\t\t\tfor( i += xBorder; i < iEnd; i++ ) {\n" +
+				"\t\t\tfor( ; i < iEnd; i++ ) {\n" +
 				"\t\t\t\tint indexSrc = i;\n" +
 				"\n" +
 				"\t\t\t\t" + sumType + " total = (dataSrc[indexSrc]"+bitWise+") * k1;\n");

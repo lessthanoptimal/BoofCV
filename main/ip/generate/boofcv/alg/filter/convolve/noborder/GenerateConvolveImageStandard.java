@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -107,32 +107,28 @@ public class GenerateConvolveImageStandard extends CodeGeneratorBase {
 	}
 
 	private void printHorizontal() {
-		String paramDiv = hasDivide ? " int divisor," : "";
+		String paramDiv = hasDivide ? " , int divisor" : "";
 		String totalDiv = hasDivide ? "((total+halfDivisor)/divisor)" : "total";
 
 		out.print("\tpublic static void horizontal( Kernel1D_" + kernelType + " kernel ,\n");
-		out.print("\t\t\t\t\t\t\t\t  " + inputType + " image, " + outputType + " dest," + paramDiv + "\n");
-		out.print("\t\t\t\t\t\t\t\t  boolean includeBorder) {\n" +
+		out.print("\t\t\t\t\t\t\t\t  " + inputType + " image, " + outputType + " dest" + paramDiv + " ) {\n" +
 				"\t\tfinal " + inputData + "[] dataSrc = image.data;\n" +
 				"\t\tfinal " + outputData + "[] dataDst = dest.data;\n" +
 				"\t\tfinal " + kernelData + "[] dataKer = kernel.data;\n" +
 				"\n" +
-				"\t\tfinal int radius = kernel.getRadius();\n" +
+				"\t\tfinal int offset = kernel.getOffset();\n" +
 				"\t\tfinal int kernelWidth = kernel.getWidth();\n");
 		if( hasDivide )
 			out.print("\t\tfinal int halfDivisor = divisor/2;\n");
 		out.print("\n" +
-				"\t\tfinal int yBorder = includeBorder ? 0 : radius;\n" +
-				"\n" +
 				"\t\tfinal int width = image.getWidth();\n" +
-				"\t\tfinal int height = image.getHeight()-yBorder;\n" +
 				"\n" +
-				"\t\tfor( int i = yBorder; i < height; i++ ) {\n" +
-				"\t\t\tint indexDst = dest.startIndex + i*dest.stride+radius;\n" +
-				"\t\t\tint j = image.startIndex + i*image.stride - radius;\n" +
-				"\t\t\tfinal int jEnd = j+width-radius;\n" +
+				"\t\tfor( int i = 0; i < image.height; i++ ) {\n" +
+				"\t\t\tint indexDst = dest.startIndex + i*dest.stride+offset;\n" +
+				"\t\t\tint j = image.startIndex + i*image.stride;\n" +
+				"\t\t\tfinal int jEnd = j+width-(kernelWidth-1);\n" +
 				"\n" +
-				"\t\t\tfor( j += radius; j < jEnd; j++ ) {\n" +
+				"\t\t\tfor( ; j < jEnd; j++ ) {\n" +
 				"\t\t\t\t" + sumType + " total = 0;\n" +
 				"\t\t\t\tint indexSrc = j;\n" +
 				"\t\t\t\tfor( int k = 0; k < kernelWidth; k++ ) {\n" +
@@ -145,18 +141,17 @@ public class GenerateConvolveImageStandard extends CodeGeneratorBase {
 	}
 
 	private void printVertical() {
-		String paramDiv = hasDivide ? " int divisor," : "";
+		String paramDiv = hasDivide ? " , int divisor" : "";
 		String totalDiv = hasDivide ? "((total+halfDivisor)/divisor)" : "total";
 
 		out.print("\tpublic static void vertical( Kernel1D_" + kernelType + " kernel,\n" +
-				"\t\t\t\t\t\t\t\t " + inputType + " image, " + outputType + " dest," + paramDiv + "\n" +
-				"\t\t\t\t\t\t\t\t boolean includeBorder)\n" +
+				"\t\t\t\t\t\t\t\t " + inputType + " image, " + outputType + " dest" + paramDiv +" )\n" +
 				"\t{\n" +
 				"\t\tfinal " + inputData + "[] dataSrc = image.data;\n" +
 				"\t\tfinal " + outputData + "[] dataDst = dest.data;\n" +
 				"\t\tfinal " + kernelData + "[] dataKer = kernel.data;\n" +
 				"\n" +
-				"\t\tfinal int radius = kernel.getRadius();\n" +
+				"\t\tfinal int offset = kernel.getOffset();\n" +
 				"\t\tfinal int kernelWidth = kernel.getWidth();\n");
 		if( hasDivide )
 			out.print("\t\tfinal int halfDivisor = divisor/2;\n");
@@ -164,16 +159,14 @@ public class GenerateConvolveImageStandard extends CodeGeneratorBase {
 				"\t\tfinal int imgWidth = dest.getWidth();\n" +
 				"\t\tfinal int imgHeight = dest.getHeight();\n" +
 				"\n" +
-				"\t\tfinal int yEnd = imgHeight-radius;\n" +
+				"\t\tfinal int yEnd = imgHeight-(kernelWidth-offset-1);\n" +
 				"\n" +
-				"\t\tfinal int xBorder = includeBorder ? 0 : radius;\n" +
+				"\t\tfor( int y = offset; y < yEnd; y++ ) {\n" +
+				"\t\t\tint indexDst = dest.startIndex+y*dest.stride;\n" +
+				"\t\t\tint i = image.startIndex + (y-offset)*image.stride;\n" +
+				"\t\t\tfinal int iEnd = i+imgWidth;\n" +
 				"\n" +
-				"\t\tfor( int y = radius; y < yEnd; y++ ) {\n" +
-				"\t\t\tint indexDst = dest.startIndex+y*dest.stride+xBorder;\n" +
-				"\t\t\tint i = image.startIndex + (y-radius)*image.stride;\n" +
-				"\t\t\tfinal int iEnd = i+imgWidth-xBorder;\n" +
-				"\n" +
-				"\t\t\tfor( i += xBorder; i < iEnd; i++ ) {\n" +
+				"\t\t\tfor( ; i < iEnd; i++ ) {\n" +
 				"\t\t\t\t" + sumType + " total = 0;\n" +
 				"\t\t\t\tint indexSrc = i;\n" +
 				"\t\t\t\tfor( int k = 0; k < kernelWidth; k++ ) {\n" +
@@ -201,7 +194,6 @@ public class GenerateConvolveImageStandard extends CodeGeneratorBase {
 					"\t\t\t\t\ttotal = maxValue;\n" +
 					"\n";
 		}
-
 
 		out.print("\tpublic static void convolve( Kernel2D_" + kernelType + " kernel , " + inputType + " src , " + outputType + " dest " + paramDiv + paramBound + ")\n" +
 				"\t{\n" +

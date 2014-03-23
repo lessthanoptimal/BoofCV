@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -50,268 +50,215 @@ import boofcv.struct.image.*;
 public class ConvolveImageNoBorder {
 
 	/**
-	 * Performs a horizontal 1D convolution across the image.  The horizontal border
-	 * is not processed and the vertical border is optionally processed.  The border is as wide
-	 * as the radius of the kernel.
+	 * Performs a horizontal 1D convolution across the image.  The horizontal border is not processed.
 	 *
 	 * @param input	 The original image. Not modified.
 	 * @param output Where the resulting image is written to. Modified.
 	 * @param kernel The kernel that is being convolved. Not modified.
-	 * @param includeVerticalBorder Should the vertical border of the image be processed?
 	 */
 	public static void horizontal(Kernel1D_F32 kernel,
-								  ImageFloat32 input,  ImageFloat32 output,
-								  boolean includeVerticalBorder) {
+								  ImageFloat32 input,  ImageFloat32 output) {
 		InputSanityCheck.checkSameShape(input, output);
 
-		if (!ConvolveImageUnrolled_F32_F32.horizontal(kernel, input, output, includeVerticalBorder))
-			ConvolveImageStandard.horizontal(kernel, input, output, includeVerticalBorder);
+		if (!ConvolveImageUnrolled_F32_F32.horizontal(kernel, input, output))
+			ConvolveImageStandard.horizontal(kernel, input, output);
 	}
 
 	/**
-	 * Performs a horizontal 1D convolution across the image with division.  The horizontal border
-	 * is not processed and the vertical border is optionally processed.  The border is as wide
-	 * as the radius of the kernel.
+	 * Performs a horizontal 1D convolution across the image.  The horizontal border is not processed.
 	 *
-	 * @param input		The original image. Not modified.
-	 * @param output		Where the resulting image is written to. Modified.
-	 * @param kernel	The kernel that is being convolved. Not modified.
-	 * @param divisor	The value that the convolved image is divided by.
-	 * @param includeVerticalBorder Should the vertical border of the image be processed?
+	 * @param input	 The original image. Not modified.
+	 * @param output Where the resulting image is written to. Modified.
+	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
 	public static void horizontal(Kernel1D_I32 kernel,
-								  ImageUInt8 input,  ImageInt8 output, int divisor, boolean includeVerticalBorder) {
+								  ImageUInt8 input,  ImageInt8 output, int divisor ) {
 		InputSanityCheck.checkSameShape(input, output);
 
-		if( !ConvolveImageUnrolled_U8_I8_Div.horizontal(kernel, input,  output, divisor, includeVerticalBorder))
-			ConvolveImageStandard.horizontal(kernel, input,  output, divisor, includeVerticalBorder);
+		if( !ConvolveImageUnrolled_U8_I8_Div.horizontal(kernel, input,  output, divisor))
+			ConvolveImageStandard.horizontal(kernel, input,  output, divisor);
 	}
 
 	/**
-	 * Performs a horizontal 1D convolution across the image.  The horizontal border
-	 * is not processed and the vertical border is optionally processed.  The border is as wide
-	 * as the radius of the kernel.
+	 * Performs a horizontal 1D convolution across the image.  The horizontal border is not processed.
 	 *
-	 * @param input		 The original image. Not modified.
-	 * @param output		  Where the resulting image is written to. Modified.
-	 * @param kernel		The kernel that is being convolved. Not modified.
-	 * @param includeVerticalBorder Should the vertical border of the image be processed?
+	 * @param input	 The original image. Not modified.
+	 * @param output Where the resulting image is written to. Modified.
+	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
-	public static void horizontal(Kernel1D_I32 kernel,
-								  ImageUInt8 input,  ImageInt16 output, boolean includeVerticalBorder) {
+	public static void horizontal(Kernel1D_I32 kernel, ImageUInt8 input,  ImageInt16 output ) {
 		InputSanityCheck.checkSameShape(input, output);
 
-		if (!ConvolveImageUnrolled_U8_I16.horizontal(kernel, input,  output, includeVerticalBorder))
-			ConvolveImageStandard.horizontal(kernel, input,  output, includeVerticalBorder);
+		if (!ConvolveImageUnrolled_U8_I16.horizontal(kernel, input,  output ))
+			ConvolveImageStandard.horizontal(kernel, input,  output);
 	}
 
 	/**
-	 * Performs a horizontal 1D convolution across the image.  The horizontal border
-	 * is not processed and the vertical border is optionally processed.  The border is as wide
-	 * as the radius of the kernel.
+	 * Performs a horizontal 1D convolution across the image.  The horizontal border is not processed.
 	 *
-	 * @param input		 The original image. Not modified.
-	 * @param output	Where the resulting image is written to. Modified.
-	 * @param kernel	The kernel that is being convolved. Not modified.
-	 * @param includeVerticalBorder Should the vertical border of the image be processed?
+	 * @param input	 The original image. Not modified.
+	 * @param output Where the resulting image is written to. Modified.
+	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
 	public static void horizontal(Kernel1D_I32 kernel,
-								  ImageUInt8 input, ImageSInt32 output, boolean includeVerticalBorder) {
+								  ImageUInt8 input, ImageSInt32 output ) {
 		InputSanityCheck.checkSameShape(input, output);
 
 		// todo add unroll
-		ConvolveImageStandard.horizontal(kernel, input, output, includeVerticalBorder);
+		ConvolveImageStandard.horizontal(kernel, input, output);
 	}
 
 	/**
-	 * Performs a horizontal 1D convolution across the image.  The horizontal border
-	 * is not processed and the vertical border is optionally processed.  The border is as wide
-	 * as the radius of the kernel.
+	 * Performs a horizontal 1D convolution across the image.  The horizontal border is not processed.
 	 *
-	 * @param input		The original image. Not modified.
-	 * @param output	Where the resulting image is written to. Modified.
-	 * @param kernel	The kernel that is being convolved. Not modified.
-	 * @param includeVerticalBorder Should the vertical border of the image be processed?
+	 * @param input	 The original image. Not modified.
+	 * @param output Where the resulting image is written to. Modified.
+	 * @param kernel The kernel that is being convolved. Not modified.
+	 */
+	public static void horizontal(Kernel1D_I32 kernel, ImageSInt16 input, ImageInt16 output) {
+		InputSanityCheck.checkSameShape(input, output);
+
+		if (!ConvolveImageUnrolled_S16_I16.horizontal(kernel, input, output))
+			ConvolveImageStandard.horizontal(kernel, input, output);
+	}
+
+	/**
+	 * Performs a horizontal 1D convolution across the image.  The horizontal border is not processed.
+	 *
+	 * @param input The original image. Not modified.
+	 * @param output Where the resulting image is written to. Modified.
+	 * @param kernel The kernel that is being convolved. Not modified.
+	 * @param divisor The value that the convolved image is divided by.
 	 */
 	public static void horizontal(Kernel1D_I32 kernel,
-								  ImageSInt16 input, ImageInt16 output, boolean includeVerticalBorder) {
+								  ImageSInt16 input, ImageInt16 output, int divisor) {
 		InputSanityCheck.checkSameShape(input, output);
 
-		if (!ConvolveImageUnrolled_S16_I16.horizontal(kernel, input, output, includeVerticalBorder))
-			ConvolveImageStandard.horizontal(kernel, input, output, includeVerticalBorder);
+		if (!ConvolveImageUnrolled_S16_I16_Div.horizontal(kernel, input, output, divisor))
+			ConvolveImageStandard.horizontal(kernel, input, output, divisor);
 	}
 
 	/**
-	 * Performs a horizontal 1D convolution across the image.  The horizontal border
-	 * is not processed and the vertical border is optionally processed.  The border is as wide
-	 * as the radius of the kernel.
+	 * Performs a horizontal 1D convolution across the image.  The horizontal border is not processed.
 	 *
-	 * @param input		 The original image. Not modified.
-	 * @param output		  Where the resulting image is written to. Modified.
-	 * @param kernel		The kernel that is being convolved. Not modified.
-	 * @param divisor	   The value that the convolved image is divided by.
-	 * @param includeVerticalBorder Should the vertical border of the image be processed?
+	 * @param input The original image. Not modified.
+	 * @param output Where the resulting image is written to. Modified.
+	 * @param kernel The kernel that is being convolved. Not modified.
+	 * @param divisor The value that the convolved image is divided by.
 	 */
 	public static void horizontal(Kernel1D_I32 kernel,
-								  ImageSInt16 input, ImageInt16 output, int divisor, boolean includeVerticalBorder) {
+								  ImageSInt32 input, ImageSInt32 output, int divisor) {
 		InputSanityCheck.checkSameShape(input, output);
 
-		if (!ConvolveImageUnrolled_S16_I16_Div.horizontal(kernel, input, output, divisor, includeVerticalBorder))
-			ConvolveImageStandard.horizontal(kernel, input, output, divisor, includeVerticalBorder);
+		if (!ConvolveImageUnrolled_S32_S32_Div.horizontal(kernel, input, output, divisor))
+			ConvolveImageStandard.horizontal(kernel, input, output, divisor);
 	}
 
 	/**
-	 * Performs a horizontal 1D convolution across the image.  The horizontal border
-	 * is not processed and the vertical border is optionally processed.  The border is as wide
-	 * as the radius of the kernel.
+	 * Performs a vertical 1D convolution across the image in the vertical direction.
+	 * The vertical border is not processed.
 	 *
-	 * @param input		 The original image. Not modified.
-	 * @param output		  Where the resulting image is written to. Modified.
-	 * @param kernel		The kernel that is being convolved. Not modified.
-	 * @param divisor	   The value that the convolved image is divided by.
-	 * @param includeVerticalBorder Should the vertical border of the image be processed?
+	 * @param input The original image. Not modified.
+	 * @param output Where the resulting image is written to. Modified.
+	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
-	public static void horizontal(Kernel1D_I32 kernel,
-								  ImageSInt32 input, ImageSInt32 output, int divisor, boolean includeVerticalBorder) {
+	public static void vertical(Kernel1D_F32 kernel, ImageFloat32 input,  ImageFloat32 output) {
 		InputSanityCheck.checkSameShape(input, output);
 
-		if (!ConvolveImageUnrolled_S32_S32_Div.horizontal(kernel, input, output, divisor, includeVerticalBorder))
-			ConvolveImageStandard.horizontal(kernel, input, output, divisor, includeVerticalBorder);
+		if (!ConvolveImageUnrolled_F32_F32.vertical(kernel, input,  output))
+			ConvolveImageStandard.vertical(kernel, input,  output);
 	}
 
 	/**
-	 * Performs a vertical 1D convolution across the image.  The vertical border
-	 * is not processed and the horizontal border is optionally processed.  The border is as wide
-	 * as the radius of the kernel.
+	 * Performs a vertical 1D convolution across the image in the vertical direction.
+	 * The vertical border is not processed.
 	 *
-	 * @param input		 The original image. Not modified.
-	 * @param output		  Where the resulting image is written to. Modified.
-	 * @param kernel		The kernel that is being convolved. Not modified.
-	 * @param includeHorizontalBorder Should the horizontal border of the image be processed?
-	 */
-	public static void vertical(Kernel1D_F32 kernel,
-								ImageFloat32 input,  ImageFloat32 output,
-								boolean includeHorizontalBorder) {
-		InputSanityCheck.checkSameShape(input, output);
-
-		if (!ConvolveImageUnrolled_F32_F32.vertical(kernel, input,  output, includeHorizontalBorder))
-			ConvolveImageStandard.vertical(kernel, input,  output, includeHorizontalBorder);
-	}
-
-	/**
-	 * Performs a vertical 1D convolution with division across the image.  The vertical border
-	 * is not processed and the horizontal border is optionally processed.  The border is as wide
-	 * as the radius of the kernel.
-	 *
-	 * @param input		 The original image. Not modified.
-	 * @param output		  Where the resulting image is written to. Modified.
-	 * @param kernel		The kernel that is being convolved. Not modified.
-	 * @param divisor	   The value that the convolved image is divided by.
-	 * @param includeHorizontalBorder Should the horizontal border of the image be processed?
+	 * @param input The original image. Not modified.
+	 * @param output Where the resulting image is written to. Modified.
+	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
 	public static void vertical(Kernel1D_I32 kernel,
-								ImageUInt8 input,  ImageInt8 output, int divisor, boolean includeHorizontalBorder) {
+								ImageUInt8 input,  ImageInt8 output, int divisor) {
 		InputSanityCheck.checkSameShape(input, output);
 
-		if( !ConvolveImageUnrolled_U8_I8_Div.vertical(kernel, input,  output, divisor, includeHorizontalBorder))
-			ConvolveImageStandard.vertical(kernel, input,  output, divisor, includeHorizontalBorder);
+		if( !ConvolveImageUnrolled_U8_I8_Div.vertical(kernel, input,  output, divisor))
+			ConvolveImageStandard.vertical(kernel, input,  output, divisor);
 	}
 
 	/**
-	 * Performs a vertical 1D convolution across the image.  The vertical border
-	 * is not processed and the horizontal border is optionally processed.  The border is as wide
-	 * as the radius of the kernel.
+	 * Performs a vertical 1D convolution across the image in the vertical direction.
+	 * The vertical border is not processed.
 	 *
-	 * @param input		 The original image. Not modified.
-	 * @param output		  Where the resulting image is written to. Modified.
-	 * @param kernel		The kernel that is being convolved. Not modified.
-	 * @param includeHorizontalBorder Should the horizontal border of the image be processed?
+	 * @param input The original image. Not modified.
+	 * @param output Where the resulting image is written to. Modified.
+	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
-	public static void vertical(Kernel1D_I32 kernel,
-								ImageUInt8 input,  ImageInt16 output,
-								boolean includeHorizontalBorder) {
+	public static void vertical(Kernel1D_I32 kernel, ImageUInt8 input,  ImageInt16 output ) {
 		InputSanityCheck.checkSameShape(input, output);
 
-		if (!ConvolveImageUnrolled_U8_I16.vertical(kernel, input,  output, includeHorizontalBorder))
-			ConvolveImageStandard.vertical(kernel, input,  output, includeHorizontalBorder);
+		if (!ConvolveImageUnrolled_U8_I16.vertical(kernel, input,  output))
+			ConvolveImageStandard.vertical(kernel, input,  output);
 	}
 
 	/**
-	 * Performs a vertical 1D convolution across the image.  The vertical border
-	 * is not processed and the horizontal border is optionally processed.  The border is as wide
-	 * as the radius of the kernel.
+	 * Performs a vertical 1D convolution across the image in the vertical direction.
+	 * The vertical border is not processed.
 	 *
-	 * @param input		 The original image. Not modified.
-	 * @param output		  Where the resulting image is written to. Modified.
-	 * @param kernel		The kernel that is being convolved. Not modified.
-	 * @param includeHorizontalBorder Should the horizontal border of the image be processed?
+	 * @param input The original image. Not modified.
+	 * @param output Where the resulting image is written to. Modified.
+	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
-	public static void vertical(Kernel1D_I32 kernel,
-								ImageUInt8 input,  ImageSInt32 output,
-								boolean includeHorizontalBorder) {
+	public static void vertical(Kernel1D_I32 kernel, ImageUInt8 input,  ImageSInt32 output ) {
 		InputSanityCheck.checkSameShape(input, output);
 
 		// todo add unroll
-		ConvolveImageStandard.vertical(kernel, input,  output, includeHorizontalBorder);
+		ConvolveImageStandard.vertical(kernel, input,  output);
+	}
+	/**
+	 * Performs a vertical 1D convolution across the image in the vertical direction.
+	 * The vertical border is not processed.
+	 *
+	 * @param input The original image. Not modified.
+	 * @param output Where the resulting image is written to. Modified.
+	 * @param kernel The kernel that is being convolved. Not modified.
+	 */
+	public static void vertical(Kernel1D_I32 kernel, ImageSInt16 input, ImageInt16 output ) {
+		InputSanityCheck.checkSameShape(input, output);
+
+		if (!ConvolveImageUnrolled_S16_I16.vertical(kernel, input,  output))
+			ConvolveImageStandard.vertical(kernel, input,  output);
 	}
 
 	/**
-	 * Performs a vertical 1D convolution across the image.  The vertical border
-	 * is not processed and the horizontal border is optionally processed.  The border is as wide
-	 * as the radius of the kernel.
+	 * Performs a vertical 1D convolution across the image in the vertical direction.
+	 * The vertical border is not processed.
 	 *
-	 * @param input		 The original image. Not modified.
-	 * @param output		  Where the resulting image is written to. Modified.
-	 * @param kernel		The kernel that is being convolved. Not modified.
-	 * @param includeHorizontalBorder Should the horizontal border of the image be processed?
+	 * @param input The original image. Not modified.
+	 * @param output Where the resulting image is written to. Modified.
+	 * @param kernel The kernel that is being convolved. Not modified.
+	 * @param divisor The value that the convolved image is divided by.
 	 */
-	public static void vertical(Kernel1D_I32 kernel,
-								ImageSInt16 input,  ImageInt16 output,
-								boolean includeHorizontalBorder) {
+	public static void vertical(Kernel1D_I32 kernel, ImageSInt16 input,  ImageInt16 output, int divisor ) {
 		InputSanityCheck.checkSameShape(input, output);
 
-		if (!ConvolveImageUnrolled_S16_I16.vertical(kernel, input,  output, includeHorizontalBorder))
-			ConvolveImageStandard.vertical(kernel, input,  output, includeHorizontalBorder);
+		if (!ConvolveImageUnrolled_S16_I16_Div.vertical(kernel, input, output, divisor))
+			ConvolveImageStandard.vertical(kernel, input, output, divisor);
 	}
 
 	/**
-	 * Performs a vertical 1D convolution across the image.  The vertical border
-	 * is not processed and the horizontal border is optionally processed.  The border is as wide
-	 * as the radius of the kernel.
+	 * Performs a vertical 1D convolution across the image in the vertical direction.
+	 * The vertical border is not processed.
 	 *
-	 * @param input		 The original image. Not modified.
-	 * @param output		  Where the resulting image is written to. Modified.
-	 * @param kernel		The kernel that is being convolved. Not modified.
-	 * @param divisor	   The value that the convolved image is divided by.
-	 * @param includeHorizontalBorder Should the horizontal border of the image be processed?
+	 * @param input The original image. Not modified.
+	 * @param output Where the resulting image is written to. Modified.
+	 * @param kernel The kernel that is being convolved. Not modified.
+	 * @param divisor The value that the convolved image is divided by.
 	 */
-	public static void vertical(Kernel1D_I32 kernel,
-								ImageSInt16 input,  ImageInt16 output,
-								int divisor , boolean includeHorizontalBorder) {
+	public static void vertical(Kernel1D_I32 kernel, ImageSInt32 input,  ImageSInt32 output, int divisor ) {
 		InputSanityCheck.checkSameShape(input, output);
 
-		if (!ConvolveImageUnrolled_S16_I16_Div.vertical(kernel, input, output, divisor, includeHorizontalBorder))
-			ConvolveImageStandard.vertical(kernel, input, output, divisor, includeHorizontalBorder);
-	}
-
-	/**
-	 * Performs a vertical 1D convolution across the image.  The vertical border
-	 * is not processed and the horizontal border is optionally processed.  The border is as wide
-	 * as the radius of the kernel.
-	 *
-	 * @param input		 The original image. Not modified.
-	 * @param output		  Where the resulting image is written to. Modified.
-	 * @param kernel		The kernel that is being convolved. Not modified.
-	 * @param divisor	   The value that the convolved image is divided by.
-	 * @param includeHorizontalBorder Should the horizontal border of the image be processed?
-	 */
-	public static void vertical(Kernel1D_I32 kernel,
-								ImageSInt32 input,  ImageSInt32 output,
-								int divisor , boolean includeHorizontalBorder) {
-		InputSanityCheck.checkSameShape(input, output);
-
-		if (!ConvolveImageUnrolled_S32_S32_Div.vertical(kernel, input, output, divisor, includeHorizontalBorder))
-			ConvolveImageStandard.vertical(kernel, input, output, divisor, includeHorizontalBorder);
+		if (!ConvolveImageUnrolled_S32_S32_Div.vertical(kernel, input, output, divisor))
+			ConvolveImageStandard.vertical(kernel, input, output, divisor);
 	}
 
 	/**

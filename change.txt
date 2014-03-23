@@ -45,6 +45,8 @@ Version : Alpha 0.17
   * Erode and dilate can now be applied multiple times with a single function call
 - StitchingFromMotion2D can now resize and translate the stitch image
   * Thanks Julien Seinturier for the suggestion
+- Convolution
+  * 1D convolution now supports kernels which are not symmetric
 
 - TODO Application DenseOpticalFlow
 - TODO ExampleBundleAdjustment

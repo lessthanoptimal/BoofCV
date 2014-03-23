@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -324,7 +324,7 @@ public class KernelMath {
 
 	public static Kernel1D_I32 convert( Kernel1D_F32 original , float minFrac ) {
 
-		Kernel1D_I32 ret = new Kernel1D_I32(original.width);
+		Kernel1D_I32 ret = new Kernel1D_I32(original.offset,original.width);
 		convert( original.data,ret.data,original.width,minFrac);
 
 		return ret;
@@ -332,7 +332,7 @@ public class KernelMath {
 
 	public static Kernel1D_I32 convert( Kernel1D_F64 original , double minFrac ) {
 
-		Kernel1D_I32 ret = new Kernel1D_I32(original.width);
+		Kernel1D_I32 ret = new Kernel1D_I32(original.offset,original.width);
 		convert( original.data,ret.data,original.width,minFrac);
 
 		return ret;

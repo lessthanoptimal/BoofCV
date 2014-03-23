@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,6 +24,7 @@ import boofcv.core.image.FactoryGImageSingleBand;
 import boofcv.core.image.GImageSingleBand;
 import boofcv.core.image.border.ImageBorder;
 import boofcv.core.image.border.ImageBorderValue;
+import boofcv.struct.convolve.KernelBase;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageInteger;
 import boofcv.struct.image.ImageSingleBand;
@@ -39,6 +40,7 @@ import static org.junit.Assert.assertEquals;
 @SuppressWarnings({"unchecked"})
 public class TestConvolveJustBorder_General extends CompareImageBorder {
 
+	int kernelWidth = 5;
 	int fillValue = 1;
 
 	public TestConvolveJustBorder_General() {
@@ -54,17 +56,15 @@ public class TestConvolveJustBorder_General extends CompareImageBorder {
 		performTests(9);
 	}
 
-	protected void fillTestImage(ImageSingleBand smaller, ImageSingleBand larger) {
+	protected void fillTestImage(ImageSingleBand smaller, ImageSingleBand larger ,
+								 int borderX0 , int borderY0 ,
+								 int borderX1 , int borderY1 )
+	{
 		// set the while image equal to the specified value
-		GImageSingleBand image = FactoryGImageSingleBand.wrap(larger);
-		for( int y = 0; y < image.getHeight(); y++ ) {
-			for( int x = 0; x < image.getWidth(); x++ ) {
-				image.set(x,y,fillValue);
-			}
-		}
+		GImageMiscOps.fill(larger,fillValue);
 
 		// make the inner post part equal to the original image
-		stripBorder(larger).setTo(smaller);
+		stripBorder(larger,borderX0,borderY0,borderX1,borderY1).setTo(smaller);
 	}
 
 	@Override
@@ -93,19 +93,21 @@ public class TestConvolveJustBorder_General extends CompareImageBorder {
 
 	@Override
 	protected Object[] reformatForValidation(Method m, Object[] targetParam) {
-		Object[] ret;
-		if( m.getName().contains("convolve")) {
-			ret =  new Object[]{targetParam[0],targetParam[1],targetParam[2]};
-		} else {
-			ret = new Object[]{targetParam[0],targetParam[1],targetParam[2],false};
-		}
+		Object[] ret =  new Object[]{targetParam[0],targetParam[1],targetParam[2]};
 
 		ImageSingleBand inputImage = ((ImageBorder)targetParam[1]).getImage();
 
-		ret[1] = inputImage._createNew(width+kernelRadius*2,height+kernelRadius*2);
-		ret[2] = ((ImageSingleBand)targetParam[2])._createNew(width+kernelRadius*2,height+kernelRadius*2);
+		KernelBase kernel = (KernelBase)targetParam[0];
 
-		fillTestImage(inputImage,(ImageSingleBand)ret[1]);
+		computeBorder(kernel,m.getName());
+
+		int borderW = borderX0 + borderX1;
+		int borderH = borderY0 + borderY1;
+
+		ret[1] = inputImage._createNew(width+borderW,height+borderH);
+		ret[2] = ((ImageSingleBand)targetParam[2])._createNew(width+borderW,height+borderH);
+
+		fillTestImage(inputImage,(ImageSingleBand)ret[1],borderX0,borderY0,borderX1,borderY1);
 
 		return ret;
 	}
@@ -114,18 +116,29 @@ public class TestConvolveJustBorder_General extends CompareImageBorder {
 	protected Object[][] createInputParam(Method candidate, Method validation) {
 		Class<?> paramTypes[] = candidate.getParameterTypes();
 
-		Object kernel = createKernel(paramTypes[0]);
+		KernelBase kernel = createKernel(paramTypes[0],kernelWidth/2,kernelWidth);
 
 		ImageSingleBand src = ConvolutionTestHelper.createImage(validation.getParameterTypes()[1], width, height);
 		GImageMiscOps.fillUniform(src, rand, 0, 5);
 		ImageSingleBand dst = ConvolutionTestHelper.createImage(validation.getParameterTypes()[2], width, height);
 
-		Object[][] ret = new Object[1][paramTypes.length];
+		Object[][] ret = new Object[2][paramTypes.length];
+		// normal symmetric odd kernel
 		ret[0][0] = kernel;
 		ret[0][1] = ImageFloat32.class == src.getClass() ?
 				ImageBorderValue.wrap((ImageFloat32)src,fillValue) : ImageBorderValue.wrap((ImageInteger)src,fillValue);
 		ret[0][2] = dst;
-		ret[0][3] = kernelRadius;
+		if( paramTypes.length == 4)
+			ret[0][3] = kernelWidth/2;
+
+		// change the offset
+		kernel = createKernel(paramTypes[0],0,kernelWidth);
+		ret[1][0] = kernel;
+		ret[1][1] = ImageFloat32.class == src.getClass() ?
+				ImageBorderValue.wrap((ImageFloat32)src,fillValue) : ImageBorderValue.wrap((ImageInteger)src,fillValue);
+		ret[1][2] = dst;
+		if( paramTypes.length == 4 )
+			ret[1][3] = kernelWidth/2;
 
 		return ret;
 	}
@@ -136,19 +149,20 @@ public class TestConvolveJustBorder_General extends CompareImageBorder {
 		ImageSingleBand validationOut = (ImageSingleBand)validationParam[2];
 
 		// remove the border
-		validationOut = stripBorder(validationOut);
+		computeBorder((KernelBase)targetParam[0],methodTest.getName());
+		validationOut = stripBorder(validationOut,borderX0,borderY0,borderX1,borderY1);
 
 		GImageSingleBand t = FactoryGImageSingleBand.wrap(targetOut);
 		GImageSingleBand v = FactoryGImageSingleBand.wrap(validationOut);
 
 		for( int y = 0; y < targetOut.height; y++ ) {
-			if( y >= kernelRadius &&  y < targetOut.height-kernelRadius )
+			if( y >= borderX0 &&  y < targetOut.height-borderX1 )
 				continue;
 			for( int x = 0; x < targetOut.width; x++ ) {
-				if( x >= kernelRadius &&  x < targetOut.width-kernelRadius )
+				if( x >= borderX0 &&  x < targetOut.width-borderY1 )
 					continue;
 
-				assertEquals(v.get(x,y).doubleValue(),t.get(x,y).doubleValue(),1e-4f);
+				assertEquals(x+" "+y,v.get(x,y).doubleValue(),t.get(x,y).doubleValue(),1e-4f);
 			}
 		}
 	}

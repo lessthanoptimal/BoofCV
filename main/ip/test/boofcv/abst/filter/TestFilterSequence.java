@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -69,9 +69,9 @@ public class TestFilterSequence {
 
 		ImageFloat32 tmp1 = new ImageFloat32(width,height);
 		ImageFloat32 tmp2 = new ImageFloat32(width,height);
-		ConvolveImageNoBorder.horizontal(ker1,input,tmp1,false);
-		ConvolveImageNoBorder.horizontal(ker2,tmp1,tmp2,false);
-		ConvolveImageNoBorder.horizontal(ker3,tmp2,expected,false);
+		ConvolveImageNoBorder.horizontal(ker1,input,tmp1);
+		ConvolveImageNoBorder.horizontal(ker2,tmp1,tmp2);
+		ConvolveImageNoBorder.horizontal(ker3,tmp2,expected);
 
 		BoofTesting.assertEquals(expected,found,1e-4f);
 	}

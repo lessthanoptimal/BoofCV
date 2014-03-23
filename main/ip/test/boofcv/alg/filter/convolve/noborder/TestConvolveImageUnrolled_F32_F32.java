@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -46,7 +46,7 @@ public class TestConvolveImageUnrolled_F32_F32 {
 	public void horizontal() throws NoSuchMethodException {
 		for (int i = 0; i < GenerateConvolvedUnrolled.numUnrolled; i++) {
 			Method m = ConvolveImageUnrolled_F32_F32.class.getMethod("horizontal",
-					Kernel1D_F32.class, ImageFloat32.class, ImageFloat32.class, boolean.class);
+					Kernel1D_F32.class, ImageFloat32.class, ImageFloat32.class);
 
 			compareToStandard.compareMethod(m, "horizontal", i + 1);
 		}
@@ -56,7 +56,7 @@ public class TestConvolveImageUnrolled_F32_F32 {
 	public void vertical() throws NoSuchMethodException {
 		for (int i = 0; i < GenerateConvolvedUnrolled.numUnrolled; i++) {
 			Method m = ConvolveImageUnrolled_F32_F32.class.getMethod("vertical",
-					Kernel1D_F32.class, ImageFloat32.class, ImageFloat32.class, boolean.class);
+					Kernel1D_F32.class, ImageFloat32.class, ImageFloat32.class);
 
 			compareToStandard.compareMethod(m, "vertical", i + 1);
 		}

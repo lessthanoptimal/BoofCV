@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -47,7 +47,7 @@ public class TestConvolveImageUnrolled_S32_S32_Div {
 
 		for (int i = 0; i < GenerateConvolvedUnrolled.numUnrolled; i++) {
 			Method m = ConvolveImageUnrolled_S32_S32_Div.class.getMethod("horizontal",
-					Kernel1D_I32.class, ImageSInt32.class, ImageSInt32.class, int.class, boolean.class);
+					Kernel1D_I32.class, ImageSInt32.class, ImageSInt32.class, int.class);
 
 			compareToStandard.compareMethod(m, "horizontal", i + 1);
 		}
@@ -58,7 +58,7 @@ public class TestConvolveImageUnrolled_S32_S32_Div {
 
 		for (int i = 0; i < GenerateConvolvedUnrolled.numUnrolled; i++) {
 			Method m = ConvolveImageUnrolled_S32_S32_Div.class.getMethod("vertical",
-					Kernel1D_I32.class, ImageSInt32.class, ImageSInt32.class, int.class, boolean.class);
+					Kernel1D_I32.class, ImageSInt32.class, ImageSInt32.class, int.class);
 
 			compareToStandard.compareMethod(m, "vertical", i + 1);
 		}

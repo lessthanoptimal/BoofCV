@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -122,11 +122,11 @@ public class TestKernelMath {
 
 	@Test
 	public void convolve1D_F32() {
-		Kernel1D_F32 k1 = new Kernel1D_F32(5,1,2,3,4,5);
-		Kernel1D_F32 k2 = new Kernel1D_F32(3,6,7,8);
+		Kernel1D_F32 k1 = new Kernel1D_F32(new float[]{1,2,3,4,5},5);
+		Kernel1D_F32 k2 = new Kernel1D_F32(new float[]{6,7,8},3);
 
 		// computed using conv() in octave
-		Kernel1D_F32 expected = new Kernel1D_F32(7,6,19,40,61,82,67,40);
+		Kernel1D_F32 expected = new Kernel1D_F32(new float[]{6,19,40,61,82,67,40},7);
 		Kernel1D_F32 c = KernelMath.convolve1D(k1,k2);
 
 		for( int i = 0; i < 7; i++ ) {
@@ -319,16 +319,30 @@ public class TestKernelMath {
 
 	@Test
 	public void convert_1D_F32_to_I32() {
-		Kernel1D_F32 orig = new Kernel1D_F32(5,0.1f,1,1e-8f,-1,-0.1f);
+		Kernel1D_F32 orig = new Kernel1D_F32(new float[]{0.1f,1,1e-8f,-1,-0.1f},1,5);
 		Kernel1D_I32 found = KernelMath.convert(orig,1f/60f);
 
+		assertEquals(orig.offset,found.offset);
 		assertEquals(orig.width,found.width);
 		assertEquals(found.data[0],1);
 		assertEquals(found.data[1],10);
 		assertEquals(found.data[2],0);
 		assertEquals(found.data[3],-10);
 		assertEquals(found.data[4],-1);
+	}
 
+	@Test
+	public void convert_1D_F64_to_I32() {
+		Kernel1D_F64 orig = new Kernel1D_F64(new double[]{0.1,1,1e-8,-1,-0.1},1,5);
+		Kernel1D_I32 found = KernelMath.convert(orig,1f/60f);
+
+		assertEquals(orig.offset,found.offset);
+		assertEquals(orig.width,found.width);
+		assertEquals(found.data[0],1);
+		assertEquals(found.data[1],10);
+		assertEquals(found.data[2],0);
+		assertEquals(found.data[3],-10);
+		assertEquals(found.data[4],-1);
 	}
 
 	@Test

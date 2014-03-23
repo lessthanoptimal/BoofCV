@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,6 +24,7 @@ import boofcv.core.image.FactoryGImageSingleBand;
 import boofcv.core.image.GImageSingleBand;
 import boofcv.core.image.border.BorderType;
 import boofcv.core.image.border.FactoryImageBorder;
+import boofcv.struct.convolve.KernelBase;
 import boofcv.struct.image.ImageSingleBand;
 import org.junit.Test;
 
@@ -39,6 +40,9 @@ import static org.junit.Assert.assertEquals;
  */
 @SuppressWarnings({"unchecked"})
 public class TestConvolveWithBorder extends CompareImageBorder {
+
+	int kernelWidth = 5;
+
 	public TestConvolveWithBorder() {
 		super(ConvolveWithBorder.class);
 	}
@@ -52,29 +56,30 @@ public class TestConvolveWithBorder extends CompareImageBorder {
 	 * Fillers the border in the larger image with an extended version of the smaller image.  A duplicate
 	 * of the smaller image is contained in the center of the larger image.
 	 */
-	protected void fillTestImage(ImageSingleBand smaller, ImageSingleBand larger) {
-		stripBorder(larger).setTo(smaller);
+	protected void fillTestImage(ImageSingleBand smaller, ImageSingleBand larger,
+								 KernelBase kernel , String functionName ) {
+
+		computeBorder(kernel,functionName);
+
+		stripBorder(larger,borderX0,borderY0,borderX1,borderY1).setTo(smaller);
 
 		GImageSingleBand s = FactoryGImageSingleBand.wrap(smaller);
 		GImageSingleBand l = FactoryGImageSingleBand.wrap(larger);
 
 		for( int y = 0; y < larger.height; y++ ) {
 			for( int x = 0; x < larger.width; x++ ) {
-				int sx,sy;
+				int sx = x-borderX0;
+				int sy = y-borderY0;
 
-				if( x < kernelRadius )
+				if( sx < 0 )
 					sx = 0;
-				else if( x >= larger.width - kernelRadius )
+				else if( sx >= smaller.width  )
 					sx = smaller.width-1;
-				else
-					sx = x - kernelRadius;
 
-				if( y < kernelRadius )
+				if( sy < 0 )
 					sy = 0;
-				else if( y >= larger.height - kernelRadius )
+				else if( sy >= smaller.height  )
 					sy = smaller.height-1;
-				else
-					sy = y - kernelRadius;
 
 				l.set(x,y,s.get(sx,sy));
 			}
@@ -95,7 +100,7 @@ public class TestConvolveWithBorder extends CompareImageBorder {
 			if( e.length != c.length+1 )
 				return false;
 		} else  {
-			if( e.length != c.length )
+			if( e.length != c.length+1 )
 				return false;
 		}
 		if( e[0] != c[0] )
@@ -112,36 +117,43 @@ public class TestConvolveWithBorder extends CompareImageBorder {
 	protected Object[][] createInputParam(Method candidate, Method validation) {
 		Class<?> paramTypes[] = candidate.getParameterTypes();
 
-		Object kernel = createKernel(paramTypes[0]);
+		Object kernel = createKernel(paramTypes[0],kernelWidth/2,kernelWidth);
 
 		ImageSingleBand src = ConvolutionTestHelper.createImage(validation.getParameterTypes()[1], width, height);
 		GImageMiscOps.fillUniform(src, rand, 0, 5);
 		ImageSingleBand dst = ConvolutionTestHelper.createImage(validation.getParameterTypes()[2], width, height);
 
-		Object[][] ret = new Object[1][paramTypes.length];
+		Object[][] ret = new Object[2][paramTypes.length];
 		ret[0][0] = kernel;
 		ret[0][1] = src;
 		ret[0][2] = dst;
 		ret[0][3] = FactoryImageBorder.general(src, BorderType.EXTENDED);
+
+		ret[1][0] = createKernel(paramTypes[0],0,kernelWidth);
+		ret[1][1] = src;
+		ret[1][2] = dst;
+		ret[1][3] = FactoryImageBorder.general(src, BorderType.EXTENDED);
 
 		return ret;
 	}
 
 	@Override
 	protected Object[] reformatForValidation(Method m, Object[] targetParam) {
-		Object[] ret;
-		if( m.getName().contains("convolve")) {
-			ret =  new Object[]{targetParam[0],targetParam[1],targetParam[2]};
-		} else {
-			ret = new Object[]{targetParam[0],targetParam[1],targetParam[2],false};
-		}
+		Object[] ret =  new Object[]{targetParam[0],targetParam[1],targetParam[2]};
 
 		ImageSingleBand inputImage = (ImageSingleBand)targetParam[1];
 
-		ret[1] = inputImage._createNew(width+kernelRadius*2,height+kernelRadius*2);
-		ret[2] = ((ImageSingleBand)targetParam[2])._createNew(width+kernelRadius*2,height+kernelRadius*2);
+		KernelBase kernel = (KernelBase)targetParam[0];
 
-		fillTestImage(inputImage,(ImageSingleBand)ret[1]);
+		computeBorder(kernel,m.getName());
+
+		int w = borderX0+borderX1;
+		int h = borderY0+borderY1;
+
+		ret[1] = inputImage._createNew(width+w,height+h);
+		ret[2] = ((ImageSingleBand)targetParam[2])._createNew(width+w,height+h);
+
+		fillTestImage(inputImage,(ImageSingleBand)ret[1],kernel,m.getName());
 
 		return ret;
 	}
@@ -152,7 +164,8 @@ public class TestConvolveWithBorder extends CompareImageBorder {
 		ImageSingleBand validationOut = (ImageSingleBand)validationParam[2];
 
 		// remove the border
-		validationOut = stripBorder(validationOut);
+		computeBorder((KernelBase)targetParam[0],methodTest.getName());
+		validationOut = stripBorder(validationOut,borderX0,borderY0,borderX1,borderY1);
 
 		GImageSingleBand t = FactoryGImageSingleBand.wrap(targetOut);
 		GImageSingleBand v = FactoryGImageSingleBand.wrap(validationOut);

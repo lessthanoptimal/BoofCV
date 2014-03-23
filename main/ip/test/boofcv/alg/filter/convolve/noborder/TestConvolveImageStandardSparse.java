@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -69,7 +69,9 @@ public class TestConvolveImageStandardSparse {
 			if (paramTypes.length < 3)
 				continue;
 
-			checkMethod(m, width, height, kernelRadius, rand);
+			checkMethod(m, width, height, kernelRadius,kernelRadius*2+1, rand);
+			checkMethod(m, width, height, 0,kernelRadius*2+1, rand);
+
 			numFound++;
 		}
 
@@ -77,7 +79,7 @@ public class TestConvolveImageStandardSparse {
 		assertEquals(5, numFound);
 	}
 
-	private void checkMethod(Method method, int width, int height, int kernelRadius, Random rand) {
+	private void checkMethod(Method method, int width, int height, int kernelOffset , int kernelWidth, Random rand) {
 		ImageUInt8 seedImage = new ImageUInt8(width,height);
 		ImageMiscOps.fillUniform(seedImage,rand,0,255);
 
@@ -86,11 +88,15 @@ public class TestConvolveImageStandardSparse {
 		ConvertImage.convert(seedImage,floatImage);
 
 		sumKernel = 0;
-		kernelI32 = FactoryKernelGaussian.gaussian(Kernel1D_I32.class,-1,kernelRadius);
+		kernelI32 = FactoryKernelGaussian.gaussian(Kernel1D_I32.class,-1,kernelWidth/2);
 		kernelF32 = new Kernel1D_F32(kernelI32.width);
 		for( int i = 0; i < kernelI32.width; i++ ) {
 			sumKernel += kernelF32.data[i] = kernelI32.data[i];
 		}
+
+		kernelI32.offset = kernelOffset;
+		kernelF32.offset = kernelOffset;
+
 
 		boolean isFloatingKernel = method.getParameterTypes()[0] == Kernel1D_F32.class;
 		boolean isDivisor = method.getParameterTypes().length != 6;
@@ -128,8 +134,8 @@ public class TestConvolveImageStandardSparse {
 			ImageUInt8 temp = new ImageUInt8(image.width,image.height);
 			ImageUInt8 temp2 = new ImageUInt8(image.width,image.height);
 
-			ConvolveImageNoBorder.horizontal(kernelI32,image,temp,sumKernel,true);
-			ConvolveImageNoBorder.vertical(kernelI32,temp,temp2,sumKernel,true);
+			ConvolveImageNoBorder.horizontal(kernelI32,image,temp,sumKernel);
+			ConvolveImageNoBorder.vertical(kernelI32,temp,temp2,sumKernel);
 
 			return temp2.get(targetX,targetY);
 		} else {
@@ -139,8 +145,8 @@ public class TestConvolveImageStandardSparse {
 
 			ConvertImage.convert(image,imageF);
 
-			ConvolveImageNoBorder.horizontal(kernelF32,imageF,temp,true);
-			ConvolveImageNoBorder.vertical(kernelF32,temp,temp2,true);
+			ConvolveImageNoBorder.horizontal(kernelF32,imageF,temp);
+			ConvolveImageNoBorder.vertical(kernelF32,temp,temp2);
 
 			return temp2.get(targetX,targetY);
 		}

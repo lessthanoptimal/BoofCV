@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -79,16 +79,19 @@ public class GenerateConvolveStandardSparse extends CodeGeneratorBase {
 		String outputVertical = hasDivide ? "(total + divisorVertical/2)/divisorVertical" : "total";
 
 		out.print("\t{\n" +
-				"\t\t// convolve horizontally first\n" +
-				"\t\tint width = horizontal.getWidth();\n" +
-				"\t\tint radius = width/2;\n" +
+				"\t\tint widthH = horizontal.getWidth();\n" +
+				"\t\tint widthV = vertical.getWidth();\n" +
+				"\t\tint offsetH = horizontal.getOffset();\n" +
+				"\t\tint offsetV = vertical.getOffset();\n" +
 				declareHalf +
 				"\n" +
-				"\t\tfor( int i = 0; i < width; i++ ) {\n" +
-				"\t\t\tint indexImg = input.startIndex + (i+c_y-radius)*input.stride + c_x-radius;\n" +
+				"\t\t// convolve horizontally first\n" +
+				"\n" +
+				"\t\tfor( int i = 0; i < widthV; i++ ) {\n" +
+				"\t\t\tint indexImg = input.startIndex + (i+c_y-offsetV)*input.stride + c_x-offsetH;\n" +
 				"\n" +
 				"\t\t\t"+sumType+" total = 0;\n" +
-				"\t\t\tfor( int j = 0; j < width; j++ ,indexImg++) {\n" +
+				"\t\t\tfor( int j = 0; j < widthH; j++ ,indexImg++) {\n" +
 				"\t\t\t\ttotal += (input.data[indexImg]"+bitWise+")*horizontal.data[j];\n" +
 				"\t\t\t}\n" +
 				"\t\t\tstorage[i] = "+outputHorizontal+";\n" +
@@ -96,7 +99,7 @@ public class GenerateConvolveStandardSparse extends CodeGeneratorBase {
 				"\n" +
 				"\t\t// convolve vertically\n" +
 				"\t\t"+sumType+" total = 0;\n" +
-				"\t\tfor( int i = 0; i < width; i++ ) {\n" +
+				"\t\tfor( int i = 0; i < widthV; i++ ) {\n" +
 				"\t\t\ttotal += storage[i]*vertical.data[i];\n" +
 				"\t\t}\n" +
 				"\t\treturn "+outputVertical+";\n" +
