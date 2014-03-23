@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -15,7 +15,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package boofcv.alg.filter.convolve.noborder;
 
 import boofcv.struct.convolve.Kernel1D_F32;
@@ -39,17 +38,20 @@ import boofcv.struct.image.ImageUInt8;
 public class ConvolveImageStandardSparse {
 
 	public static float convolve( Kernel1D_F32 horizontal, Kernel1D_F32 vertical,
-								ImageFloat32 input, int c_x , int c_y, float storage[] )
+								  ImageFloat32 input, int c_x , int c_y, float storage[] )
 	{
-		// convolve horizontally first
-		int width = horizontal.getWidth();
-		int radius = width/2;
+		int widthH = horizontal.getWidth();
+		int widthV = vertical.getWidth();
+		int offsetH = horizontal.getOffset();
+		int offsetV = vertical.getOffset();
 
-		for( int i = 0; i < width; i++ ) {
-			int indexImg = input.startIndex + (i+c_y-radius)*input.stride + c_x-radius;
+		// convolve horizontally first
+
+		for( int i = 0; i < widthV; i++ ) {
+			int indexImg = input.startIndex + (i+c_y-offsetV)*input.stride + c_x-offsetH;
 
 			float total = 0;
-			for( int j = 0; j < width; j++ ,indexImg++) {
+			for( int j = 0; j < widthH; j++ ,indexImg++) {
 				total += (input.data[indexImg])*horizontal.data[j];
 			}
 			storage[i] = total;
@@ -57,7 +59,7 @@ public class ConvolveImageStandardSparse {
 
 		// convolve vertically
 		float total = 0;
-		for( int i = 0; i < width; i++ ) {
+		for( int i = 0; i < widthV; i++ ) {
 			total += storage[i]*vertical.data[i];
 		}
 		return total;
@@ -66,15 +68,18 @@ public class ConvolveImageStandardSparse {
 	public static int convolve( Kernel1D_I32 horizontal, Kernel1D_I32 vertical,
 								ImageUInt8 input, int c_x , int c_y, int storage[] )
 	{
-		// convolve horizontally first
-		int width = horizontal.getWidth();
-		int radius = width/2;
+		int widthH = horizontal.getWidth();
+		int widthV = vertical.getWidth();
+		int offsetH = horizontal.getOffset();
+		int offsetV = vertical.getOffset();
 
-		for( int i = 0; i < width; i++ ) {
-			int indexImg = input.startIndex + (i+c_y-radius)*input.stride + c_x-radius;
+		// convolve horizontally first
+
+		for( int i = 0; i < widthV; i++ ) {
+			int indexImg = input.startIndex + (i+c_y-offsetV)*input.stride + c_x-offsetH;
 
 			int total = 0;
-			for( int j = 0; j < width; j++ ,indexImg++) {
+			for( int j = 0; j < widthH; j++ ,indexImg++) {
 				total += (input.data[indexImg] & 0xFF)*horizontal.data[j];
 			}
 			storage[i] = total;
@@ -82,7 +87,7 @@ public class ConvolveImageStandardSparse {
 
 		// convolve vertically
 		int total = 0;
-		for( int i = 0; i < width; i++ ) {
+		for( int i = 0; i < widthV; i++ ) {
 			total += storage[i]*vertical.data[i];
 		}
 		return total;
@@ -93,16 +98,19 @@ public class ConvolveImageStandardSparse {
 								int divisorHorizontal ,
 								int divisorVertical )
 	{
-		// convolve horizontally first
-		int width = horizontal.getWidth();
-		int radius = width/2;
+		int widthH = horizontal.getWidth();
+		int widthV = vertical.getWidth();
+		int offsetH = horizontal.getOffset();
+		int offsetV = vertical.getOffset();
 		int halfHorizontal = divisorHorizontal/2;
 
-		for( int i = 0; i < width; i++ ) {
-			int indexImg = input.startIndex + (i+c_y-radius)*input.stride + c_x-radius;
+		// convolve horizontally first
+
+		for( int i = 0; i < widthV; i++ ) {
+			int indexImg = input.startIndex + (i+c_y-offsetV)*input.stride + c_x-offsetH;
 
 			int total = 0;
-			for( int j = 0; j < width; j++ ,indexImg++) {
+			for( int j = 0; j < widthH; j++ ,indexImg++) {
 				total += (input.data[indexImg] & 0xFF)*horizontal.data[j];
 			}
 			storage[i] = (total + halfHorizontal)/divisorHorizontal;
@@ -110,7 +118,7 @@ public class ConvolveImageStandardSparse {
 
 		// convolve vertically
 		int total = 0;
-		for( int i = 0; i < width; i++ ) {
+		for( int i = 0; i < widthV; i++ ) {
 			total += storage[i]*vertical.data[i];
 		}
 		return (total + divisorVertical/2)/divisorVertical;
@@ -119,15 +127,18 @@ public class ConvolveImageStandardSparse {
 	public static int convolve( Kernel1D_I32 horizontal, Kernel1D_I32 vertical,
 								ImageSInt16 input, int c_x , int c_y, int storage[] )
 	{
-		// convolve horizontally first
-		int width = horizontal.getWidth();
-		int radius = width/2;
+		int widthH = horizontal.getWidth();
+		int widthV = vertical.getWidth();
+		int offsetH = horizontal.getOffset();
+		int offsetV = vertical.getOffset();
 
-		for( int i = 0; i < width; i++ ) {
-			int indexImg = input.startIndex + (i+c_y-radius)*input.stride + c_x-radius;
+		// convolve horizontally first
+
+		for( int i = 0; i < widthV; i++ ) {
+			int indexImg = input.startIndex + (i+c_y-offsetV)*input.stride + c_x-offsetH;
 
 			int total = 0;
-			for( int j = 0; j < width; j++ ,indexImg++) {
+			for( int j = 0; j < widthH; j++ ,indexImg++) {
 				total += (input.data[indexImg])*horizontal.data[j];
 			}
 			storage[i] = total;
@@ -135,7 +146,7 @@ public class ConvolveImageStandardSparse {
 
 		// convolve vertically
 		int total = 0;
-		for( int i = 0; i < width; i++ ) {
+		for( int i = 0; i < widthV; i++ ) {
 			total += storage[i]*vertical.data[i];
 		}
 		return total;
@@ -146,16 +157,19 @@ public class ConvolveImageStandardSparse {
 								int divisorHorizontal ,
 								int divisorVertical )
 	{
-		// convolve horizontally first
-		int width = horizontal.getWidth();
-		int radius = width/2;
+		int widthH = horizontal.getWidth();
+		int widthV = vertical.getWidth();
+		int offsetH = horizontal.getOffset();
+		int offsetV = vertical.getOffset();
 		int halfHorizontal = divisorHorizontal/2;
 
-		for( int i = 0; i < width; i++ ) {
-			int indexImg = input.startIndex + (i+c_y-radius)*input.stride + c_x-radius;
+		// convolve horizontally first
+
+		for( int i = 0; i < widthV; i++ ) {
+			int indexImg = input.startIndex + (i+c_y-offsetV)*input.stride + c_x-offsetH;
 
 			int total = 0;
-			for( int j = 0; j < width; j++ ,indexImg++) {
+			for( int j = 0; j < widthH; j++ ,indexImg++) {
 				total += (input.data[indexImg])*horizontal.data[j];
 			}
 			storage[i] = (total + halfHorizontal)/divisorHorizontal;
@@ -163,7 +177,7 @@ public class ConvolveImageStandardSparse {
 
 		// convolve vertically
 		int total = 0;
-		for( int i = 0; i < width; i++ ) {
+		for( int i = 0; i < widthV; i++ ) {
 			total += storage[i]*vertical.data[i];
 		}
 		return (total + divisorVertical/2)/divisorVertical;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -85,7 +85,7 @@ public class BenchmarkConvolveWithBorder extends SimpleBenchmark {
 
 	public int timeHorizontal_NoBorder_F32(int reps) {
 		for( int i = 0; i < reps; i++ )
-			ConvolveImageNoBorder.horizontal(kernelF32,imgFloat32,out_F32,true);
+			ConvolveImageNoBorder.horizontal(kernelF32,imgFloat32,out_F32);
 		return 0;
 	}
 
@@ -109,7 +109,7 @@ public class BenchmarkConvolveWithBorder extends SimpleBenchmark {
 
 	public int timeVertical_NoBorder_F32(int reps) {
 		for( int i = 0; i < reps; i++ )
-			ConvolveImageNoBorder.vertical(kernelF32,imgFloat32,out_F32,true);
+			ConvolveImageNoBorder.vertical(kernelF32,imgFloat32,out_F32);
 		return 0;
 	}
 

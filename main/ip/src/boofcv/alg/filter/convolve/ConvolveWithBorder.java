@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -50,8 +50,8 @@ public class ConvolveWithBorder {
 		InputSanityCheck.checkSameShape(image, dest);
 
 		border.setImage(image);
-		ConvolveImageNoBorder.horizontal(kernel,image,dest,true);
-		ConvolveJustBorder_General.horizontal(kernel, border,dest,kernel.getRadius());
+		ConvolveImageNoBorder.horizontal(kernel,image,dest);
+		ConvolveJustBorder_General.horizontal(kernel, border,dest);
 	}
 
 	/**
@@ -68,8 +68,8 @@ public class ConvolveWithBorder {
 		InputSanityCheck.checkSameShape(image, dest);
 
 		border.setImage(image);
-		ConvolveImageNoBorder.vertical(kernel,image,dest,true);
-		ConvolveJustBorder_General.vertical(kernel, border,dest,kernel.getRadius());
+		ConvolveImageNoBorder.vertical(kernel,image,dest);
+		ConvolveJustBorder_General.vertical(kernel, border,dest);
 	}
 
 	/**
@@ -104,8 +104,8 @@ public class ConvolveWithBorder {
 		InputSanityCheck.checkSameShape(image, dest);
 
 		border.setImage(image);
-		ConvolveImageNoBorder.horizontal(kernel,image,dest,true);
-		ConvolveJustBorder_General.horizontal(kernel, border,dest,kernel.getRadius());
+		ConvolveImageNoBorder.horizontal(kernel,image,dest);
+		ConvolveJustBorder_General.horizontal(kernel, border,dest);
 	}
 
 	/**
@@ -122,8 +122,8 @@ public class ConvolveWithBorder {
 		InputSanityCheck.checkSameShape(image, dest);
 
 		border.setImage(image);
-		ConvolveImageNoBorder.vertical(kernel,image,dest,true);
-		ConvolveJustBorder_General.vertical(kernel, border,dest,kernel.getRadius());
+		ConvolveImageNoBorder.vertical(kernel,image,dest);
+		ConvolveJustBorder_General.vertical(kernel, border,dest);
 	}
 
 	/**
@@ -158,8 +158,8 @@ public class ConvolveWithBorder {
 		InputSanityCheck.checkSameShape(image, dest);
 
 		border.setImage(image);
-		ConvolveImageNoBorder.horizontal(kernel,image,dest,true);
-		ConvolveJustBorder_General.horizontal(kernel, border,dest,kernel.getRadius());
+		ConvolveImageNoBorder.horizontal(kernel, image, dest);
+		ConvolveJustBorder_General.horizontal(kernel, border, dest);
 	}
 
 	/**
@@ -176,8 +176,8 @@ public class ConvolveWithBorder {
 		InputSanityCheck.checkSameShape(image, dest);
 
 		border.setImage(image);
-		ConvolveImageNoBorder.vertical(kernel,image,dest,true);
-		ConvolveJustBorder_General.vertical(kernel, border,dest,kernel.getRadius());
+		ConvolveImageNoBorder.vertical(kernel,image,dest);
+		ConvolveJustBorder_General.vertical(kernel, border,dest);
 	}
 
 	/**
@@ -212,8 +212,8 @@ public class ConvolveWithBorder {
 		InputSanityCheck.checkSameShape(image, dest);
 
 		border.setImage(image);
-		ConvolveImageNoBorder.horizontal(kernel,image,dest,true);
-		ConvolveJustBorder_General.horizontal(kernel, border,dest,kernel.getRadius());
+		ConvolveImageNoBorder.horizontal(kernel,image,dest);
+		ConvolveJustBorder_General.horizontal(kernel, border, dest);
 	}
 
 	/**
@@ -230,8 +230,8 @@ public class ConvolveWithBorder {
 		InputSanityCheck.checkSameShape(image, dest);
 
 		border.setImage(image);
-		ConvolveImageNoBorder.vertical(kernel,image,dest,true);
-		ConvolveJustBorder_General.vertical(kernel, border,dest,kernel.getRadius());
+		ConvolveImageNoBorder.vertical(kernel,image,dest);
+		ConvolveJustBorder_General.vertical(kernel, border,dest);
 	}
 
 	/**

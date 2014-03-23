@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -41,14 +41,13 @@ public class ConvolveImageBox {
 	 * @param input	 The original image. Not modified.
 	 * @param output	 Where the resulting image is written to. Modified.
 	 * @param radius Kernel size.
-	 * @param includeBorder Should the vertical border of the image be processed?
 	 */
-	public static void horizontal(ImageFloat32 input, ImageFloat32 output, int radius, boolean includeBorder) {
+	public static void horizontal(ImageFloat32 input, ImageFloat32 output, int radius) {
 		InputSanityCheck.checkSameShape(input , output);
 
 		Kernel1D_F32 kernel = FactoryKernel.table1D_F32(radius,false);
-		ConvolveJustBorder_General.horizontal(kernel,ImageBorderValue.wrap(input,0),output,radius);
-		ImplConvolveBox.horizontal(input, output, radius, includeBorder);
+		ConvolveJustBorder_General.horizontal(kernel,ImageBorderValue.wrap(input,0),output);
+		ImplConvolveBox.horizontal(input, output, radius);
 	}
 
 	/**
@@ -57,14 +56,13 @@ public class ConvolveImageBox {
 	 * @param input	 The original image. Not modified.
 	 * @param output	 Where the resulting image is written to. Modified.
 	 * @param radius Kernel size.
-	 * @param includeBorder Should the vertical border of the image be processed?
 	 */
-	public static void horizontal(ImageUInt8 input, ImageInt16 output, int radius, boolean includeBorder) {
+	public static void horizontal(ImageUInt8 input, ImageInt16 output, int radius) {
 		InputSanityCheck.checkSameShape(input , output);
 
 		Kernel1D_I32 kernel = FactoryKernel.table1D_I32(radius);
-		ConvolveJustBorder_General.horizontal(kernel,ImageBorderValue.wrap(input,0),output,radius);
-		ImplConvolveBox.horizontal(input, output, radius, includeBorder);
+		ConvolveJustBorder_General.horizontal(kernel,ImageBorderValue.wrap(input,0),output);
+		ImplConvolveBox.horizontal(input, output, radius);
 	}
 
 	/**
@@ -73,14 +71,13 @@ public class ConvolveImageBox {
 	 * @param input	 The original image. Not modified.
 	 * @param output	 Where the resulting image is written to. Modified.
 	 * @param radius Kernel size.
-	 * @param includeBorder Should the vertical border of the image be processed?
 	 */
-	public static void horizontal(ImageUInt8 input, ImageSInt32 output, int radius, boolean includeBorder) {
+	public static void horizontal(ImageUInt8 input, ImageSInt32 output, int radius) {
 		InputSanityCheck.checkSameShape(input , output);
 
 		Kernel1D_I32 kernel = FactoryKernel.table1D_I32(radius);
-		ConvolveJustBorder_General.horizontal(kernel,ImageBorderValue.wrap(input,0),output,radius);
-		ImplConvolveBox.horizontal(input, output, radius, includeBorder);
+		ConvolveJustBorder_General.horizontal(kernel,ImageBorderValue.wrap(input,0),output);
+		ImplConvolveBox.horizontal(input, output, radius);
 	}
 
 	/**
@@ -89,14 +86,13 @@ public class ConvolveImageBox {
 	 * @param input	 The original image. Not modified.
 	 * @param output	 Where the resulting image is written to. Modified.
 	 * @param radius Kernel size.
-	 * @param includeBorder Should the vertical border of the image be processed?
 	 */
-	public static void horizontal(ImageSInt16 input, ImageInt16 output, int radius, boolean includeBorder) {
+	public static void horizontal(ImageSInt16 input, ImageInt16 output, int radius) {
 		InputSanityCheck.checkSameShape(input , output);
 
 		Kernel1D_I32 kernel = FactoryKernel.table1D_I32(radius);
-		ConvolveJustBorder_General.horizontal(kernel,ImageBorderValue.wrap(input,0),output,radius);
-		ImplConvolveBox.horizontal(input, output, radius, includeBorder);
+		ConvolveJustBorder_General.horizontal(kernel,ImageBorderValue.wrap(input,0),output);
+		ImplConvolveBox.horizontal(input, output, radius);
 	}
 
 	/**
@@ -105,14 +101,13 @@ public class ConvolveImageBox {
 	 * @param input	 The original image. Not modified.
 	 * @param output	 Where the resulting image is written to. Modified.
 	 * @param radius Kernel size.
-	 * @param includeBorder Should the horizontal border of the image be processed?
 	 */
-	public static void vertical(ImageFloat32 input, ImageFloat32 output, int radius, boolean includeBorder) {
+	public static void vertical(ImageFloat32 input, ImageFloat32 output, int radius) {
 		InputSanityCheck.checkSameShape(input , output );
 
 		Kernel1D_F32 kernel = FactoryKernel.table1D_F32(radius,false);
-		ConvolveJustBorder_General.vertical(kernel,ImageBorderValue.wrap(input,0),output,radius);
-		ImplConvolveBox.vertical(input, output, radius, includeBorder);
+		ConvolveJustBorder_General.vertical(kernel,ImageBorderValue.wrap(input,0),output);
+		ImplConvolveBox.vertical(input, output, radius);
 	}
 
 	/**
@@ -121,14 +116,13 @@ public class ConvolveImageBox {
 	 * @param input	 The original image. Not modified.
 	 * @param output	 Where the resulting image is written to. Modified.
 	 * @param radius Kernel size.
-	 * @param includeBorder Should the horizontal border of the image be processed?
 	 */
-	public static void vertical(ImageUInt8 input, ImageInt16 output, int radius, boolean includeBorder) {
+	public static void vertical(ImageUInt8 input, ImageInt16 output, int radius) {
 		InputSanityCheck.checkSameShape(input , output);
 
 		Kernel1D_I32 kernel = FactoryKernel.table1D_I32(radius);
-		ConvolveJustBorder_General.vertical(kernel,ImageBorderValue.wrap(input,0),output,radius);
-		ImplConvolveBox.vertical(input, output, radius, includeBorder);
+		ConvolveJustBorder_General.vertical(kernel,ImageBorderValue.wrap(input,0),output);
+		ImplConvolveBox.vertical(input, output, radius);
 	}
 
 	/**
@@ -137,14 +131,13 @@ public class ConvolveImageBox {
 	 * @param input	 The original image. Not modified.
 	 * @param output	 Where the resulting image is written to. Modified.
 	 * @param radius Kernel size.
-	 * @param includeBorder Should the horizontal border of the image be processed?
 	 */
-	public static void vertical(ImageUInt8 input, ImageSInt32 output, int radius, boolean includeBorder) {
+	public static void vertical(ImageUInt8 input, ImageSInt32 output, int radius) {
 		InputSanityCheck.checkSameShape(input , output);
 
 		Kernel1D_I32 kernel = FactoryKernel.table1D_I32(radius);
-		ConvolveJustBorder_General.vertical(kernel,ImageBorderValue.wrap(input,0),output,radius);
-		ImplConvolveBox.vertical(input, output, radius, includeBorder);
+		ConvolveJustBorder_General.vertical(kernel,ImageBorderValue.wrap(input,0),output);
+		ImplConvolveBox.vertical(input, output, radius);
 	}
 
 	/**
@@ -153,13 +146,12 @@ public class ConvolveImageBox {
 	 * @param input	 The original image. Not modified.
 	 * @param output	 Where the resulting image is written to. Modified.
 	 * @param radius Kernel size.
-	 * @param includeBorder Should the horizontal border of the image be processed?
 	 */
-	public static void vertical(ImageSInt16 input, ImageInt16 output, int radius, boolean includeBorder) {
+	public static void vertical(ImageSInt16 input, ImageInt16 output, int radius) {
 		InputSanityCheck.checkSameShape(input , output);
 
 		Kernel1D_I32 kernel = FactoryKernel.table1D_I32(radius);
-		ConvolveJustBorder_General.vertical(kernel,ImageBorderValue.wrap(input,0),output,radius);
-		ImplConvolveBox.vertical(input, output, radius, includeBorder);
+		ConvolveJustBorder_General.vertical(kernel,ImageBorderValue.wrap(input,0),output);
+		ImplConvolveBox.vertical(input, output, radius);
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -103,6 +103,7 @@ public class TestConvolveDownNoBorderStandard {
 			if( paramTypes.length == 5 )
 				ret[0][4] = DIV;
 
+
 			return ret;
 		}
 
@@ -129,7 +130,7 @@ public class TestConvolveDownNoBorderStandard {
 				if( e.length != c.length+1 )
 					return false;
 			} else  {
-				if( e.length != c.length )
+				if( e.length != c.length+1 )
 					return false;
 			}
 
@@ -152,8 +153,7 @@ public class TestConvolveDownNoBorderStandard {
 		@Override
 		protected Object[] reformatForValidation(Method m, Object[] targetParam) {
 
-			int kernelDimen = ((KernelBase)targetParam[0]).getDimension();
-			int validationParams = kernelDimen == 1 ? targetParam.length : targetParam.length-1;
+			int validationParams = m.getParameterTypes().length;
 
 			ImageSingleBand input = (ImageSingleBand)targetParam[1];
 			ImageSingleBand output = (ImageSingleBand)targetParam[2];
@@ -165,13 +165,7 @@ public class TestConvolveDownNoBorderStandard {
 			ret[2] = output._createNew(input.width,input.height);
 
 			if( ret.length == 4 ) {
-				if( m.getParameterTypes()[3] == int.class )
-					ret[3] = DIV;
-				else
-					ret[3] = true;
-			} else if( ret.length == 5 ) {
 				ret[3] = DIV;
-				ret[4] = true;
 			}
 
 			return ret;

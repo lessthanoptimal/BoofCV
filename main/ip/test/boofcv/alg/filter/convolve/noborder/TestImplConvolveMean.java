@@ -55,7 +55,7 @@ public class TestImplConvolveMean extends CompareEquivalentFunctions {
 	protected boolean isTestMethod(Method m) {
 		Class<?> params[] = m.getParameterTypes();
 
-		if( params.length != 4)
+		if( params.length != 3)
 			return false;
 
 		return ImageSingleBand.class.isAssignableFrom(params[0]);
@@ -67,14 +67,14 @@ public class TestImplConvolveMean extends CompareEquivalentFunctions {
 		Class<?> v[] = candidate.getParameterTypes();
 		Class<?> c[] = validation.getParameterTypes();
 
-		if( v.length < 4 )
+		if( v.length < 3 )
 			return false;
 
 		if( !GeneralizedImageOps.isFloatingPoint(c[0])) {
-			if( v.length != 5 )
+			if( v.length != 4 )
 				return false;
 		} else {
-			if( v.length != 4 )
+			if( v.length != 3 )
 				return false;
 		}
 
@@ -94,9 +94,8 @@ public class TestImplConvolveMean extends CompareEquivalentFunctions {
 
 		GImageMiscOps.fillUniform(input, rand, 0, 20);
 
-		Object[][] ret = new Object[2][];
-		ret[0] = new Object[]{input,output,kernelRadius,true};
-		ret[1] = new Object[]{input,output,kernelRadius,false};
+		Object[][] ret = new Object[1][];
+		ret[0] = new Object[]{input,output,kernelRadius};
 
 		return ret;
 	}
@@ -109,9 +108,9 @@ public class TestImplConvolveMean extends CompareEquivalentFunctions {
 		ImageSingleBand output = (ImageSingleBand)((ImageSingleBand)targetParam[1]).clone();
 
 		if( output.getDataType().isInteger() )
-			return new Object[]{kernel,targetParam[0],output,kernelRadius*2+1,targetParam[3]};
+			return new Object[]{kernel,targetParam[0],output,kernelRadius*2+1};
 		else
-			return new Object[]{kernel,targetParam[0],output,targetParam[3]};
+			return new Object[]{kernel,targetParam[0],output};
 	}
 
 	@Override

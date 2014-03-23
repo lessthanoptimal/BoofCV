@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -15,7 +15,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package boofcv.alg.filter.convolve.noborder;
 
 import boofcv.struct.convolve.Kernel1D_I32;
@@ -42,27 +41,31 @@ import boofcv.struct.image.ImageSInt16;
  */
 public class ConvolveImageUnrolled_S16_I16 {
 	public static boolean horizontal( Kernel1D_I32 kernel ,
-								   ImageSInt16 image, ImageInt16 dest,
-								   boolean includeBorder) {
+								   ImageSInt16 image, ImageInt16 dest) {
+
+		// Unrolled functions only exist for symmetric kernels with an odd width
+		if( kernel.offset != kernel.width/2 || kernel.width%2 == 0 )
+			return false;
+
 		switch( kernel.width ) {
 			case 3:
-				horizontal3(kernel,image,dest,includeBorder);
+				horizontal3(kernel,image,dest);
 				break;
 
 			case 5:
-				horizontal5(kernel,image,dest,includeBorder);
+				horizontal5(kernel,image,dest);
 				break;
 
 			case 7:
-				horizontal7(kernel,image,dest,includeBorder);
+				horizontal7(kernel,image,dest);
 				break;
 
 			case 9:
-				horizontal9(kernel,image,dest,includeBorder);
+				horizontal9(kernel,image,dest);
 				break;
 
 			case 11:
-				horizontal11(kernel,image,dest,includeBorder);
+				horizontal11(kernel,image,dest);
 				break;
 
 			default:
@@ -72,27 +75,31 @@ public class ConvolveImageUnrolled_S16_I16 {
 	}
 
 	public static boolean vertical( Kernel1D_I32 kernel ,
-								   ImageSInt16 image, ImageInt16 dest,
-								   boolean includeBorder) {
+								   ImageSInt16 image, ImageInt16 dest) {
+
+		// Unrolled functions only exist for symmetric kernels with an odd width
+		if( kernel.offset != kernel.width/2 || kernel.width%2 == 0 )
+			return false;
+
 		switch( kernel.width ) {
 			case 3:
-				vertical3(kernel,image,dest,includeBorder);
+				vertical3(kernel,image,dest);
 				break;
 
 			case 5:
-				vertical5(kernel,image,dest,includeBorder);
+				vertical5(kernel,image,dest);
 				break;
 
 			case 7:
-				vertical7(kernel,image,dest,includeBorder);
+				vertical7(kernel,image,dest);
 				break;
 
 			case 9:
-				vertical9(kernel,image,dest,includeBorder);
+				vertical9(kernel,image,dest);
 				break;
 
 			case 11:
-				vertical11(kernel,image,dest,includeBorder);
+				vertical11(kernel,image,dest);
 				break;
 
 			default:
@@ -130,9 +137,8 @@ public class ConvolveImageUnrolled_S16_I16 {
 		return true;
 	}
 
-	public static void horizontal3( Kernel1D_I32 kernel ,
-									ImageSInt16 image, ImageInt16 dest,
-									boolean includeBorder) {
+	public static void horizontal3( Kernel1D_I32 kernel , ImageSInt16 image, ImageInt16 dest )
+	{
 		final short[] dataSrc = image.data;
 		final short[] dataDst = dest.data;
 
@@ -142,12 +148,9 @@ public class ConvolveImageUnrolled_S16_I16 {
 
 		final int radius = kernel.getRadius();
 
-		final int yBorder = includeBorder ? 0 : radius;
-
 		final int width = image.getWidth();
-		final int height = image.getHeight()-yBorder;
 
-		for( int i = yBorder; i < height; i++ ) {
+		for( int i = 0; i < image.height; i++ ) {
 			int indexDst = dest.startIndex + i*dest.stride+radius;
 			int j = image.startIndex + i*image.stride - radius;
 			final int jEnd = j+width-radius;
@@ -163,9 +166,8 @@ public class ConvolveImageUnrolled_S16_I16 {
 		}
 	}
 
-	public static void horizontal5( Kernel1D_I32 kernel ,
-									ImageSInt16 image, ImageInt16 dest,
-									boolean includeBorder) {
+	public static void horizontal5( Kernel1D_I32 kernel , ImageSInt16 image, ImageInt16 dest )
+	{
 		final short[] dataSrc = image.data;
 		final short[] dataDst = dest.data;
 
@@ -177,12 +179,9 @@ public class ConvolveImageUnrolled_S16_I16 {
 
 		final int radius = kernel.getRadius();
 
-		final int yBorder = includeBorder ? 0 : radius;
-
 		final int width = image.getWidth();
-		final int height = image.getHeight()-yBorder;
 
-		for( int i = yBorder; i < height; i++ ) {
+		for( int i = 0; i < image.height; i++ ) {
 			int indexDst = dest.startIndex + i*dest.stride+radius;
 			int j = image.startIndex + i*image.stride - radius;
 			final int jEnd = j+width-radius;
@@ -200,9 +199,8 @@ public class ConvolveImageUnrolled_S16_I16 {
 		}
 	}
 
-	public static void horizontal7( Kernel1D_I32 kernel ,
-									ImageSInt16 image, ImageInt16 dest,
-									boolean includeBorder) {
+	public static void horizontal7( Kernel1D_I32 kernel , ImageSInt16 image, ImageInt16 dest )
+	{
 		final short[] dataSrc = image.data;
 		final short[] dataDst = dest.data;
 
@@ -216,12 +214,9 @@ public class ConvolveImageUnrolled_S16_I16 {
 
 		final int radius = kernel.getRadius();
 
-		final int yBorder = includeBorder ? 0 : radius;
-
 		final int width = image.getWidth();
-		final int height = image.getHeight()-yBorder;
 
-		for( int i = yBorder; i < height; i++ ) {
+		for( int i = 0; i < image.height; i++ ) {
 			int indexDst = dest.startIndex + i*dest.stride+radius;
 			int j = image.startIndex + i*image.stride - radius;
 			final int jEnd = j+width-radius;
@@ -241,9 +236,8 @@ public class ConvolveImageUnrolled_S16_I16 {
 		}
 	}
 
-	public static void horizontal9( Kernel1D_I32 kernel ,
-									ImageSInt16 image, ImageInt16 dest,
-									boolean includeBorder) {
+	public static void horizontal9( Kernel1D_I32 kernel , ImageSInt16 image, ImageInt16 dest )
+	{
 		final short[] dataSrc = image.data;
 		final short[] dataDst = dest.data;
 
@@ -259,12 +253,9 @@ public class ConvolveImageUnrolled_S16_I16 {
 
 		final int radius = kernel.getRadius();
 
-		final int yBorder = includeBorder ? 0 : radius;
-
 		final int width = image.getWidth();
-		final int height = image.getHeight()-yBorder;
 
-		for( int i = yBorder; i < height; i++ ) {
+		for( int i = 0; i < image.height; i++ ) {
 			int indexDst = dest.startIndex + i*dest.stride+radius;
 			int j = image.startIndex + i*image.stride - radius;
 			final int jEnd = j+width-radius;
@@ -286,9 +277,8 @@ public class ConvolveImageUnrolled_S16_I16 {
 		}
 	}
 
-	public static void horizontal11( Kernel1D_I32 kernel ,
-									ImageSInt16 image, ImageInt16 dest,
-									boolean includeBorder) {
+	public static void horizontal11( Kernel1D_I32 kernel , ImageSInt16 image, ImageInt16 dest )
+	{
 		final short[] dataSrc = image.data;
 		final short[] dataDst = dest.data;
 
@@ -306,12 +296,9 @@ public class ConvolveImageUnrolled_S16_I16 {
 
 		final int radius = kernel.getRadius();
 
-		final int yBorder = includeBorder ? 0 : radius;
-
 		final int width = image.getWidth();
-		final int height = image.getHeight()-yBorder;
 
-		for( int i = yBorder; i < height; i++ ) {
+		for( int i = 0; i < image.height; i++ ) {
 			int indexDst = dest.startIndex + i*dest.stride+radius;
 			int j = image.startIndex + i*image.stride - radius;
 			final int jEnd = j+width-radius;
@@ -335,9 +322,7 @@ public class ConvolveImageUnrolled_S16_I16 {
 		}
 	}
 
-	public static void vertical3( Kernel1D_I32 kernel,
-								 ImageSInt16 image, ImageInt16 dest,
-								 boolean includeBorder)
+	public static void vertical3( Kernel1D_I32 kernel , ImageSInt16 image, ImageInt16 dest )
 	{
 		final short[] dataSrc = image.data;
 		final short[] dataDst = dest.data;
@@ -353,14 +338,12 @@ public class ConvolveImageUnrolled_S16_I16 {
 
 		final int yEnd = imgHeight-radius;
 
-		final int xBorder = includeBorder ? 0 : radius;
-
 		for( int y = radius; y < yEnd; y++ ) {
-			int indexDst = dest.startIndex+y*dest.stride+xBorder;
+			int indexDst = dest.startIndex+y*dest.stride;
 			int i = image.startIndex + (y-radius)*image.stride;
-			final int iEnd = i+imgWidth-xBorder;
+			final int iEnd = i+imgWidth;
 
-			for( i += xBorder; i < iEnd; i++ ) {
+			for( ; i < iEnd; i++ ) {
 				int indexSrc = i;
 
 				int total = (dataSrc[indexSrc]) * k1;
@@ -374,9 +357,7 @@ public class ConvolveImageUnrolled_S16_I16 {
 		}
 	}
 
-	public static void vertical5( Kernel1D_I32 kernel,
-								 ImageSInt16 image, ImageInt16 dest,
-								 boolean includeBorder)
+	public static void vertical5( Kernel1D_I32 kernel , ImageSInt16 image, ImageInt16 dest )
 	{
 		final short[] dataSrc = image.data;
 		final short[] dataDst = dest.data;
@@ -394,14 +375,12 @@ public class ConvolveImageUnrolled_S16_I16 {
 
 		final int yEnd = imgHeight-radius;
 
-		final int xBorder = includeBorder ? 0 : radius;
-
 		for( int y = radius; y < yEnd; y++ ) {
-			int indexDst = dest.startIndex+y*dest.stride+xBorder;
+			int indexDst = dest.startIndex+y*dest.stride;
 			int i = image.startIndex + (y-radius)*image.stride;
-			final int iEnd = i+imgWidth-xBorder;
+			final int iEnd = i+imgWidth;
 
-			for( i += xBorder; i < iEnd; i++ ) {
+			for( ; i < iEnd; i++ ) {
 				int indexSrc = i;
 
 				int total = (dataSrc[indexSrc]) * k1;
@@ -419,9 +398,7 @@ public class ConvolveImageUnrolled_S16_I16 {
 		}
 	}
 
-	public static void vertical7( Kernel1D_I32 kernel,
-								 ImageSInt16 image, ImageInt16 dest,
-								 boolean includeBorder)
+	public static void vertical7( Kernel1D_I32 kernel , ImageSInt16 image, ImageInt16 dest )
 	{
 		final short[] dataSrc = image.data;
 		final short[] dataDst = dest.data;
@@ -441,14 +418,12 @@ public class ConvolveImageUnrolled_S16_I16 {
 
 		final int yEnd = imgHeight-radius;
 
-		final int xBorder = includeBorder ? 0 : radius;
-
 		for( int y = radius; y < yEnd; y++ ) {
-			int indexDst = dest.startIndex+y*dest.stride+xBorder;
+			int indexDst = dest.startIndex+y*dest.stride;
 			int i = image.startIndex + (y-radius)*image.stride;
-			final int iEnd = i+imgWidth-xBorder;
+			final int iEnd = i+imgWidth;
 
-			for( i += xBorder; i < iEnd; i++ ) {
+			for( ; i < iEnd; i++ ) {
 				int indexSrc = i;
 
 				int total = (dataSrc[indexSrc]) * k1;
@@ -470,9 +445,7 @@ public class ConvolveImageUnrolled_S16_I16 {
 		}
 	}
 
-	public static void vertical9( Kernel1D_I32 kernel,
-								 ImageSInt16 image, ImageInt16 dest,
-								 boolean includeBorder)
+	public static void vertical9( Kernel1D_I32 kernel , ImageSInt16 image, ImageInt16 dest )
 	{
 		final short[] dataSrc = image.data;
 		final short[] dataDst = dest.data;
@@ -494,14 +467,12 @@ public class ConvolveImageUnrolled_S16_I16 {
 
 		final int yEnd = imgHeight-radius;
 
-		final int xBorder = includeBorder ? 0 : radius;
-
 		for( int y = radius; y < yEnd; y++ ) {
-			int indexDst = dest.startIndex+y*dest.stride+xBorder;
+			int indexDst = dest.startIndex+y*dest.stride;
 			int i = image.startIndex + (y-radius)*image.stride;
-			final int iEnd = i+imgWidth-xBorder;
+			final int iEnd = i+imgWidth;
 
-			for( i += xBorder; i < iEnd; i++ ) {
+			for( ; i < iEnd; i++ ) {
 				int indexSrc = i;
 
 				int total = (dataSrc[indexSrc]) * k1;
@@ -527,9 +498,7 @@ public class ConvolveImageUnrolled_S16_I16 {
 		}
 	}
 
-	public static void vertical11( Kernel1D_I32 kernel,
-								 ImageSInt16 image, ImageInt16 dest,
-								 boolean includeBorder)
+	public static void vertical11( Kernel1D_I32 kernel , ImageSInt16 image, ImageInt16 dest )
 	{
 		final short[] dataSrc = image.data;
 		final short[] dataDst = dest.data;
@@ -553,14 +522,12 @@ public class ConvolveImageUnrolled_S16_I16 {
 
 		final int yEnd = imgHeight-radius;
 
-		final int xBorder = includeBorder ? 0 : radius;
-
 		for( int y = radius; y < yEnd; y++ ) {
-			int indexDst = dest.startIndex+y*dest.stride+xBorder;
+			int indexDst = dest.startIndex+y*dest.stride;
 			int i = image.startIndex + (y-radius)*image.stride;
-			final int iEnd = i+imgWidth-xBorder;
+			final int iEnd = i+imgWidth;
 
-			for( i += xBorder; i < iEnd; i++ ) {
+			for( ; i < iEnd; i++ ) {
 				int indexSrc = i;
 
 				int total = (dataSrc[indexSrc]) * k1;

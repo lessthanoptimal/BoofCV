@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -56,7 +56,7 @@ public class BenchmarkConvolveAbstracted {
 	{
 		@Override
 		public void process() {
-			ConvolveImageNoBorder.vertical(kernelI32,imgInt8,out_I16,false);
+			ConvolveImageNoBorder.vertical(kernelI32,imgInt8,out_I16);
 		}
 	}
 

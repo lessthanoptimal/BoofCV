@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,11 +25,20 @@ package boofcv.struct.convolve;
  * @author Peter Abeles
  */
 public abstract class KernelBase {
-	// number of elements in the kernel
+	/* number of elements in the kernel */
 	public int width;
+
+	/** which index is the kernel's origin.  For symmetric kernels with an odd width it is width/2 */
+	public int offset;
 
 	protected KernelBase(int width) {
 		this.width = width;
+		this.offset = width/2;
+	}
+
+	protected KernelBase(int offset, int width) {
+		this.width = width;
+		this.offset = offset;
 	}
 
 	protected KernelBase() {
@@ -51,6 +60,13 @@ public abstract class KernelBase {
 	 */
 	public int getRadius() {
 		return width / 2;
+	}
+
+	/**
+	 * Which index is the origin in the kernel
+	 */
+	public int getOffset() {
+		return offset;
 	}
 
 	/**

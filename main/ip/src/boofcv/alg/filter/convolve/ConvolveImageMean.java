@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -49,7 +49,7 @@ public class ConvolveImageMean {
 
 		Kernel1D_F32 kernel = FactoryKernel.table1D_F32(radius,true);
 		ConvolveNormalized_JustBorder.horizontal(kernel, input ,output );
-		ImplConvolveMean.horizontal(input, output, radius, true);
+		ImplConvolveMean.horizontal(input, output, radius);
 	}
 
 	/**
@@ -65,7 +65,7 @@ public class ConvolveImageMean {
 
 		Kernel1D_F32 kernel = FactoryKernel.table1D_F32(radius,true);
 		ConvolveNormalized_JustBorder.vertical(kernel, input ,output );
-		ImplConvolveMean.vertical(input, output, radius, true);
+		ImplConvolveMean.vertical(input, output, radius);
 	}
 
 	/**
@@ -81,7 +81,7 @@ public class ConvolveImageMean {
 
 		Kernel1D_I32 kernel = FactoryKernel.table1D_I32(radius);
 		ConvolveNormalized_JustBorder.horizontal(kernel, input, output);
-		ImplConvolveMean.horizontal(input, output, radius, true);
+		ImplConvolveMean.horizontal(input, output, radius);
 	}
 
 	/**
@@ -97,7 +97,7 @@ public class ConvolveImageMean {
 
 		Kernel1D_I32 kernel = FactoryKernel.table1D_I32(radius);
 		ConvolveNormalized_JustBorder.vertical(kernel, input, output);
-		ImplConvolveMean.vertical(input, output, radius, true);
+		ImplConvolveMean.vertical(input, output, radius);
 	}
 
 	/**
@@ -113,7 +113,7 @@ public class ConvolveImageMean {
 
 		Kernel1D_I32 kernel = FactoryKernel.table1D_I32(radius);
 		ConvolveNormalized_JustBorder.horizontal(kernel, input, output);
-		ImplConvolveMean.horizontal(input, output, radius, true);
+		ImplConvolveMean.horizontal(input, output, radius);
 	}
 
 	/**
@@ -129,6 +129,6 @@ public class ConvolveImageMean {
 
 		Kernel1D_I32 kernel = FactoryKernel.table1D_I32(radius);
 		ConvolveNormalized_JustBorder.vertical(kernel, input, output);
-		ImplConvolveMean.vertical(input, output, radius, true);
+		ImplConvolveMean.vertical(input, output, radius);
 	}
 }

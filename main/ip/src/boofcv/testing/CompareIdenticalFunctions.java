@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -80,6 +80,7 @@ public abstract class CompareIdenticalFunctions extends CompareEquivalentFunctio
 
 	@Override
 	protected void compareResults(Object targetResult, Object[] targetParam, Object validationResult, Object[] validationParam) {
+
 		for( int i = 0; i < targetParam.length; i++ ) {
 			if( !ImageSingleBand.class.isAssignableFrom(targetParam[i].getClass()) )
 				continue;

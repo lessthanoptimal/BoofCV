@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -66,7 +66,7 @@ public class TestFactoryConvolve {
 		// CHECK NO BORDER
 		conv = FactoryConvolve.convolve( kernel,ImageFloat32.class,ImageFloat32.class,BorderType.SKIP,true);
 		conv.process(input,found);
-		ConvolveImageNoBorder.horizontal(kernel,input,expected,false);
+		ConvolveImageNoBorder.horizontal(kernel,input,expected);
 		BoofTesting.assertEquals(expected,found,1e-4f);
 
 		// CHECK EXTENDED
@@ -98,7 +98,7 @@ public class TestFactoryConvolve {
 		// CHECK NO BORDER
 		conv = FactoryConvolve.convolve( kernel,ImageUInt8.class,ImageInt16.class, BorderType.SKIP,true);
 		conv.process(input,found);
-		ConvolveImageNoBorder.horizontal(kernel,input,expected,false);
+		ConvolveImageNoBorder.horizontal(kernel,input,expected);
 		BoofTesting.assertEquals(expected,found,0);
 
 		// CHECK EXTENDED

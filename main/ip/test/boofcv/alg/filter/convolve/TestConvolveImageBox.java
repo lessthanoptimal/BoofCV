@@ -59,7 +59,7 @@ public class TestConvolveImageBox extends CompareEquivalentFunctions {
 	protected boolean isTestMethod(Method m) {
 		Class<?> params[] = m.getParameterTypes();
 
-		if( params.length != 4)
+		if( params.length != 3)
 			return false;
 
 		return ImageSingleBand.class.isAssignableFrom(params[0]);
@@ -90,9 +90,8 @@ public class TestConvolveImageBox extends CompareEquivalentFunctions {
 
 		GImageMiscOps.fillUniform(input, rand, 0, 20);
 
-		Object[][] ret = new Object[2][];
-		ret[0] = new Object[]{input,output,kernelRadius,true};
-		ret[1] = new Object[]{input,output,kernelRadius,false};
+		Object[][] ret = new Object[1][];
+		ret[0] = new Object[]{input,output,kernelRadius};
 
 		return ret;
 	}

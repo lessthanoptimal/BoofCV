@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -15,7 +15,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package boofcv.alg.filter.convolve.noborder;
 
 import boofcv.struct.convolve.*;
@@ -37,26 +36,22 @@ import boofcv.struct.image.*;
 public class ConvolveImageStandard {
 
 	public static void horizontal( Kernel1D_F32 kernel ,
-								  ImageFloat32 image, ImageFloat32 dest,
-								  boolean includeBorder) {
+								  ImageFloat32 image, ImageFloat32 dest ) {
 		final float[] dataSrc = image.data;
 		final float[] dataDst = dest.data;
 		final float[] dataKer = kernel.data;
 
-		final int radius = kernel.getRadius();
+		final int offset = kernel.getOffset();
 		final int kernelWidth = kernel.getWidth();
 
-		final int yBorder = includeBorder ? 0 : radius;
-
 		final int width = image.getWidth();
-		final int height = image.getHeight()-yBorder;
 
-		for( int i = yBorder; i < height; i++ ) {
-			int indexDst = dest.startIndex + i*dest.stride+radius;
-			int j = image.startIndex + i*image.stride - radius;
-			final int jEnd = j+width-radius;
+		for( int i = 0; i < image.height; i++ ) {
+			int indexDst = dest.startIndex + i*dest.stride+offset;
+			int j = image.startIndex + i*image.stride;
+			final int jEnd = j+width-(kernelWidth-1);
 
-			for( j += radius; j < jEnd; j++ ) {
+			for( ; j < jEnd; j++ ) {
 				float total = 0;
 				int indexSrc = j;
 				for( int k = 0; k < kernelWidth; k++ ) {
@@ -68,29 +63,26 @@ public class ConvolveImageStandard {
 	}
 
 	public static void vertical( Kernel1D_F32 kernel,
-								 ImageFloat32 image, ImageFloat32 dest,
-								 boolean includeBorder)
+								 ImageFloat32 image, ImageFloat32 dest )
 	{
 		final float[] dataSrc = image.data;
 		final float[] dataDst = dest.data;
 		final float[] dataKer = kernel.data;
 
-		final int radius = kernel.getRadius();
+		final int offset = kernel.getOffset();
 		final int kernelWidth = kernel.getWidth();
 
 		final int imgWidth = dest.getWidth();
 		final int imgHeight = dest.getHeight();
 
-		final int yEnd = imgHeight-radius;
+		final int yEnd = imgHeight-(kernelWidth-offset-1);
 
-		final int xBorder = includeBorder ? 0 : radius;
+		for( int y = offset; y < yEnd; y++ ) {
+			int indexDst = dest.startIndex+y*dest.stride;
+			int i = image.startIndex + (y-offset)*image.stride;
+			final int iEnd = i+imgWidth;
 
-		for( int y = radius; y < yEnd; y++ ) {
-			int indexDst = dest.startIndex+y*dest.stride+xBorder;
-			int i = image.startIndex + (y-radius)*image.stride;
-			final int iEnd = i+imgWidth-xBorder;
-
-			for( i += xBorder; i < iEnd; i++ ) {
+			for( ; i < iEnd; i++ ) {
 				float total = 0;
 				int indexSrc = i;
 				for( int k = 0; k < kernelWidth; k++ ) {
@@ -130,26 +122,22 @@ public class ConvolveImageStandard {
 	}
 
 	public static void horizontal( Kernel1D_F64 kernel ,
-								  ImageFloat64 image, ImageFloat64 dest,
-								  boolean includeBorder) {
+								  ImageFloat64 image, ImageFloat64 dest ) {
 		final double[] dataSrc = image.data;
 		final double[] dataDst = dest.data;
 		final double[] dataKer = kernel.data;
 
-		final int radius = kernel.getRadius();
+		final int offset = kernel.getOffset();
 		final int kernelWidth = kernel.getWidth();
 
-		final int yBorder = includeBorder ? 0 : radius;
-
 		final int width = image.getWidth();
-		final int height = image.getHeight()-yBorder;
 
-		for( int i = yBorder; i < height; i++ ) {
-			int indexDst = dest.startIndex + i*dest.stride+radius;
-			int j = image.startIndex + i*image.stride - radius;
-			final int jEnd = j+width-radius;
+		for( int i = 0; i < image.height; i++ ) {
+			int indexDst = dest.startIndex + i*dest.stride+offset;
+			int j = image.startIndex + i*image.stride;
+			final int jEnd = j+width-(kernelWidth-1);
 
-			for( j += radius; j < jEnd; j++ ) {
+			for( ; j < jEnd; j++ ) {
 				double total = 0;
 				int indexSrc = j;
 				for( int k = 0; k < kernelWidth; k++ ) {
@@ -161,29 +149,26 @@ public class ConvolveImageStandard {
 	}
 
 	public static void vertical( Kernel1D_F64 kernel,
-								 ImageFloat64 image, ImageFloat64 dest,
-								 boolean includeBorder)
+								 ImageFloat64 image, ImageFloat64 dest )
 	{
 		final double[] dataSrc = image.data;
 		final double[] dataDst = dest.data;
 		final double[] dataKer = kernel.data;
 
-		final int radius = kernel.getRadius();
+		final int offset = kernel.getOffset();
 		final int kernelWidth = kernel.getWidth();
 
 		final int imgWidth = dest.getWidth();
 		final int imgHeight = dest.getHeight();
 
-		final int yEnd = imgHeight-radius;
+		final int yEnd = imgHeight-(kernelWidth-offset-1);
 
-		final int xBorder = includeBorder ? 0 : radius;
+		for( int y = offset; y < yEnd; y++ ) {
+			int indexDst = dest.startIndex+y*dest.stride;
+			int i = image.startIndex + (y-offset)*image.stride;
+			final int iEnd = i+imgWidth;
 
-		for( int y = radius; y < yEnd; y++ ) {
-			int indexDst = dest.startIndex+y*dest.stride+xBorder;
-			int i = image.startIndex + (y-radius)*image.stride;
-			final int iEnd = i+imgWidth-xBorder;
-
-			for( i += xBorder; i < iEnd; i++ ) {
+			for( ; i < iEnd; i++ ) {
 				double total = 0;
 				int indexSrc = i;
 				for( int k = 0; k < kernelWidth; k++ ) {
@@ -223,26 +208,22 @@ public class ConvolveImageStandard {
 	}
 
 	public static void horizontal( Kernel1D_I32 kernel ,
-								  ImageUInt8 image, ImageInt16 dest,
-								  boolean includeBorder) {
+								  ImageUInt8 image, ImageInt16 dest ) {
 		final byte[] dataSrc = image.data;
 		final short[] dataDst = dest.data;
 		final int[] dataKer = kernel.data;
 
-		final int radius = kernel.getRadius();
+		final int offset = kernel.getOffset();
 		final int kernelWidth = kernel.getWidth();
 
-		final int yBorder = includeBorder ? 0 : radius;
-
 		final int width = image.getWidth();
-		final int height = image.getHeight()-yBorder;
 
-		for( int i = yBorder; i < height; i++ ) {
-			int indexDst = dest.startIndex + i*dest.stride+radius;
-			int j = image.startIndex + i*image.stride - radius;
-			final int jEnd = j+width-radius;
+		for( int i = 0; i < image.height; i++ ) {
+			int indexDst = dest.startIndex + i*dest.stride+offset;
+			int j = image.startIndex + i*image.stride;
+			final int jEnd = j+width-(kernelWidth-1);
 
-			for( j += radius; j < jEnd; j++ ) {
+			for( ; j < jEnd; j++ ) {
 				int total = 0;
 				int indexSrc = j;
 				for( int k = 0; k < kernelWidth; k++ ) {
@@ -254,29 +235,26 @@ public class ConvolveImageStandard {
 	}
 
 	public static void vertical( Kernel1D_I32 kernel,
-								 ImageUInt8 image, ImageInt16 dest,
-								 boolean includeBorder)
+								 ImageUInt8 image, ImageInt16 dest )
 	{
 		final byte[] dataSrc = image.data;
 		final short[] dataDst = dest.data;
 		final int[] dataKer = kernel.data;
 
-		final int radius = kernel.getRadius();
+		final int offset = kernel.getOffset();
 		final int kernelWidth = kernel.getWidth();
 
 		final int imgWidth = dest.getWidth();
 		final int imgHeight = dest.getHeight();
 
-		final int yEnd = imgHeight-radius;
+		final int yEnd = imgHeight-(kernelWidth-offset-1);
 
-		final int xBorder = includeBorder ? 0 : radius;
+		for( int y = offset; y < yEnd; y++ ) {
+			int indexDst = dest.startIndex+y*dest.stride;
+			int i = image.startIndex + (y-offset)*image.stride;
+			final int iEnd = i+imgWidth;
 
-		for( int y = radius; y < yEnd; y++ ) {
-			int indexDst = dest.startIndex+y*dest.stride+xBorder;
-			int i = image.startIndex + (y-radius)*image.stride;
-			final int iEnd = i+imgWidth-xBorder;
-
-			for( i += xBorder; i < iEnd; i++ ) {
+			for( ; i < iEnd; i++ ) {
 				int total = 0;
 				int indexSrc = i;
 				for( int k = 0; k < kernelWidth; k++ ) {
@@ -316,26 +294,22 @@ public class ConvolveImageStandard {
 	}
 
 	public static void horizontal( Kernel1D_I32 kernel ,
-								  ImageUInt8 image, ImageSInt32 dest,
-								  boolean includeBorder) {
+								  ImageUInt8 image, ImageSInt32 dest ) {
 		final byte[] dataSrc = image.data;
 		final int[] dataDst = dest.data;
 		final int[] dataKer = kernel.data;
 
-		final int radius = kernel.getRadius();
+		final int offset = kernel.getOffset();
 		final int kernelWidth = kernel.getWidth();
 
-		final int yBorder = includeBorder ? 0 : radius;
-
 		final int width = image.getWidth();
-		final int height = image.getHeight()-yBorder;
 
-		for( int i = yBorder; i < height; i++ ) {
-			int indexDst = dest.startIndex + i*dest.stride+radius;
-			int j = image.startIndex + i*image.stride - radius;
-			final int jEnd = j+width-radius;
+		for( int i = 0; i < image.height; i++ ) {
+			int indexDst = dest.startIndex + i*dest.stride+offset;
+			int j = image.startIndex + i*image.stride;
+			final int jEnd = j+width-(kernelWidth-1);
 
-			for( j += radius; j < jEnd; j++ ) {
+			for( ; j < jEnd; j++ ) {
 				int total = 0;
 				int indexSrc = j;
 				for( int k = 0; k < kernelWidth; k++ ) {
@@ -347,29 +321,26 @@ public class ConvolveImageStandard {
 	}
 
 	public static void vertical( Kernel1D_I32 kernel,
-								 ImageUInt8 image, ImageSInt32 dest,
-								 boolean includeBorder)
+								 ImageUInt8 image, ImageSInt32 dest )
 	{
 		final byte[] dataSrc = image.data;
 		final int[] dataDst = dest.data;
 		final int[] dataKer = kernel.data;
 
-		final int radius = kernel.getRadius();
+		final int offset = kernel.getOffset();
 		final int kernelWidth = kernel.getWidth();
 
 		final int imgWidth = dest.getWidth();
 		final int imgHeight = dest.getHeight();
 
-		final int yEnd = imgHeight-radius;
+		final int yEnd = imgHeight-(kernelWidth-offset-1);
 
-		final int xBorder = includeBorder ? 0 : radius;
+		for( int y = offset; y < yEnd; y++ ) {
+			int indexDst = dest.startIndex+y*dest.stride;
+			int i = image.startIndex + (y-offset)*image.stride;
+			final int iEnd = i+imgWidth;
 
-		for( int y = radius; y < yEnd; y++ ) {
-			int indexDst = dest.startIndex+y*dest.stride+xBorder;
-			int i = image.startIndex + (y-radius)*image.stride;
-			final int iEnd = i+imgWidth-xBorder;
-
-			for( i += xBorder; i < iEnd; i++ ) {
+			for( ; i < iEnd; i++ ) {
 				int total = 0;
 				int indexSrc = i;
 				for( int k = 0; k < kernelWidth; k++ ) {
@@ -409,26 +380,22 @@ public class ConvolveImageStandard {
 	}
 
 	public static void horizontal( Kernel1D_I32 kernel ,
-								  ImageSInt16 image, ImageInt16 dest,
-								  boolean includeBorder) {
+								  ImageSInt16 image, ImageInt16 dest ) {
 		final short[] dataSrc = image.data;
 		final short[] dataDst = dest.data;
 		final int[] dataKer = kernel.data;
 
-		final int radius = kernel.getRadius();
+		final int offset = kernel.getOffset();
 		final int kernelWidth = kernel.getWidth();
 
-		final int yBorder = includeBorder ? 0 : radius;
-
 		final int width = image.getWidth();
-		final int height = image.getHeight()-yBorder;
 
-		for( int i = yBorder; i < height; i++ ) {
-			int indexDst = dest.startIndex + i*dest.stride+radius;
-			int j = image.startIndex + i*image.stride - radius;
-			final int jEnd = j+width-radius;
+		for( int i = 0; i < image.height; i++ ) {
+			int indexDst = dest.startIndex + i*dest.stride+offset;
+			int j = image.startIndex + i*image.stride;
+			final int jEnd = j+width-(kernelWidth-1);
 
-			for( j += radius; j < jEnd; j++ ) {
+			for( ; j < jEnd; j++ ) {
 				int total = 0;
 				int indexSrc = j;
 				for( int k = 0; k < kernelWidth; k++ ) {
@@ -440,29 +407,26 @@ public class ConvolveImageStandard {
 	}
 
 	public static void vertical( Kernel1D_I32 kernel,
-								 ImageSInt16 image, ImageInt16 dest,
-								 boolean includeBorder)
+								 ImageSInt16 image, ImageInt16 dest )
 	{
 		final short[] dataSrc = image.data;
 		final short[] dataDst = dest.data;
 		final int[] dataKer = kernel.data;
 
-		final int radius = kernel.getRadius();
+		final int offset = kernel.getOffset();
 		final int kernelWidth = kernel.getWidth();
 
 		final int imgWidth = dest.getWidth();
 		final int imgHeight = dest.getHeight();
 
-		final int yEnd = imgHeight-radius;
+		final int yEnd = imgHeight-(kernelWidth-offset-1);
 
-		final int xBorder = includeBorder ? 0 : radius;
+		for( int y = offset; y < yEnd; y++ ) {
+			int indexDst = dest.startIndex+y*dest.stride;
+			int i = image.startIndex + (y-offset)*image.stride;
+			final int iEnd = i+imgWidth;
 
-		for( int y = radius; y < yEnd; y++ ) {
-			int indexDst = dest.startIndex+y*dest.stride+xBorder;
-			int i = image.startIndex + (y-radius)*image.stride;
-			final int iEnd = i+imgWidth-xBorder;
-
-			for( i += xBorder; i < iEnd; i++ ) {
+			for( ; i < iEnd; i++ ) {
 				int total = 0;
 				int indexSrc = i;
 				for( int k = 0; k < kernelWidth; k++ ) {
@@ -502,70 +466,61 @@ public class ConvolveImageStandard {
 	}
 
 	public static void horizontal( Kernel1D_I32 kernel ,
-								  ImageUInt8 image, ImageInt8 dest, int divisor,
-								  boolean includeBorder) {
+								  ImageUInt8 image, ImageInt8 dest , int divisor ) {
 		final byte[] dataSrc = image.data;
 		final byte[] dataDst = dest.data;
 		final int[] dataKer = kernel.data;
 
-		final int radius = kernel.getRadius();
+		final int offset = kernel.getOffset();
 		final int kernelWidth = kernel.getWidth();
 		final int halfDivisor = divisor/2;
 
-		final int yBorder = includeBorder ? 0 : radius;
-
 		final int width = image.getWidth();
-		final int height = image.getHeight()-yBorder;
 
-		for( int i = yBorder; i < height; i++ ) {
-			int indexDst = dest.startIndex + i*dest.stride+radius;
-			int j = image.startIndex + i*image.stride - radius;
-			final int jEnd = j+width-radius;
+		for( int i = 0; i < image.height; i++ ) {
+			int indexDst = dest.startIndex + i*dest.stride+offset;
+			int j = image.startIndex + i*image.stride;
+			final int jEnd = j+width-(kernelWidth-1);
 
-			for( j += radius; j < jEnd; j++ ) {
+			for( ; j < jEnd; j++ ) {
 				int total = 0;
 				int indexSrc = j;
 				for( int k = 0; k < kernelWidth; k++ ) {
 					total += (dataSrc[indexSrc++] & 0xFF) * dataKer[k];
 				}
-
 				dataDst[indexDst++] = (byte)((total+halfDivisor)/divisor);
 			}
 		}
 	}
 
 	public static void vertical( Kernel1D_I32 kernel,
-								 ImageUInt8 image, ImageInt8 dest, int divisor,
-								 boolean includeBorder)
+								 ImageUInt8 image, ImageInt8 dest , int divisor )
 	{
 		final byte[] dataSrc = image.data;
 		final byte[] dataDst = dest.data;
 		final int[] dataKer = kernel.data;
 
-		final int radius = kernel.getRadius();
+		final int offset = kernel.getOffset();
 		final int kernelWidth = kernel.getWidth();
 		final int halfDivisor = divisor/2;
 
 		final int imgWidth = dest.getWidth();
 		final int imgHeight = dest.getHeight();
 
-		final int yEnd = imgHeight-radius;
+		final int yEnd = imgHeight-(kernelWidth-offset-1);
 
-		final int xBorder = includeBorder ? 0 : radius;
+		for( int y = offset; y < yEnd; y++ ) {
+			int indexDst = dest.startIndex+y*dest.stride;
+			int i = image.startIndex + (y-offset)*image.stride;
+			final int iEnd = i+imgWidth;
 
-		for( int y = radius; y < yEnd; y++ ) {
-			int indexDst = dest.startIndex+y*dest.stride+xBorder;
-			int i = image.startIndex + (y-radius)*image.stride;
-			final int iEnd = i+imgWidth-xBorder;
-
-			for( i += xBorder; i < iEnd; i++ ) {
+			for( ; i < iEnd; i++ ) {
 				int total = 0;
 				int indexSrc = i;
 				for( int k = 0; k < kernelWidth; k++ ) {
 					total += (dataSrc[indexSrc] & 0xFF)* dataKer[k];
 					indexSrc += image.stride;
 				}
-
 				dataDst[indexDst++] = (byte)((total+halfDivisor)/divisor);
 			}
 		}
@@ -600,27 +555,23 @@ public class ConvolveImageStandard {
 	}
 
 	public static void horizontal( Kernel1D_I32 kernel ,
-								  ImageSInt16 image, ImageInt16 dest, int divisor,
-								  boolean includeBorder) {
+								  ImageSInt16 image, ImageInt16 dest , int divisor ) {
 		final short[] dataSrc = image.data;
 		final short[] dataDst = dest.data;
 		final int[] dataKer = kernel.data;
 
-		final int radius = kernel.getRadius();
+		final int offset = kernel.getOffset();
 		final int kernelWidth = kernel.getWidth();
 		final int halfDivisor = divisor/2;
 
-		final int yBorder = includeBorder ? 0 : radius;
-
 		final int width = image.getWidth();
-		final int height = image.getHeight()-yBorder;
 
-		for( int i = yBorder; i < height; i++ ) {
-			int indexDst = dest.startIndex + i*dest.stride+radius;
-			int j = image.startIndex + i*image.stride - radius;
-			final int jEnd = j+width-radius;
+		for( int i = 0; i < image.height; i++ ) {
+			int indexDst = dest.startIndex + i*dest.stride+offset;
+			int j = image.startIndex + i*image.stride;
+			final int jEnd = j+width-(kernelWidth-1);
 
-			for( j += radius; j < jEnd; j++ ) {
+			for( ; j < jEnd; j++ ) {
 				int total = 0;
 				int indexSrc = j;
 				for( int k = 0; k < kernelWidth; k++ ) {
@@ -632,30 +583,27 @@ public class ConvolveImageStandard {
 	}
 
 	public static void vertical( Kernel1D_I32 kernel,
-								 ImageSInt16 image, ImageInt16 dest, int divisor,
-								 boolean includeBorder)
+								 ImageSInt16 image, ImageInt16 dest , int divisor )
 	{
 		final short[] dataSrc = image.data;
 		final short[] dataDst = dest.data;
 		final int[] dataKer = kernel.data;
 
-		final int radius = kernel.getRadius();
+		final int offset = kernel.getOffset();
 		final int kernelWidth = kernel.getWidth();
 		final int halfDivisor = divisor/2;
 
 		final int imgWidth = dest.getWidth();
 		final int imgHeight = dest.getHeight();
 
-		final int yEnd = imgHeight-radius;
+		final int yEnd = imgHeight-(kernelWidth-offset-1);
 
-		final int xBorder = includeBorder ? 0 : radius;
+		for( int y = offset; y < yEnd; y++ ) {
+			int indexDst = dest.startIndex+y*dest.stride;
+			int i = image.startIndex + (y-offset)*image.stride;
+			final int iEnd = i+imgWidth;
 
-		for( int y = radius; y < yEnd; y++ ) {
-			int indexDst = dest.startIndex+y*dest.stride+xBorder;
-			int i = image.startIndex + (y-radius)*image.stride;
-			final int iEnd = i+imgWidth-xBorder;
-
-			for( i += xBorder; i < iEnd; i++ ) {
+			for( ; i < iEnd; i++ ) {
 				int total = 0;
 				int indexSrc = i;
 				for( int k = 0; k < kernelWidth; k++ ) {
@@ -696,26 +644,22 @@ public class ConvolveImageStandard {
 	}
 
 	public static void horizontal( Kernel1D_I32 kernel ,
-								  ImageSInt32 image, ImageSInt32 dest,
-								  boolean includeBorder) {
+								  ImageSInt32 image, ImageSInt32 dest ) {
 		final int[] dataSrc = image.data;
 		final int[] dataDst = dest.data;
 		final int[] dataKer = kernel.data;
 
-		final int radius = kernel.getRadius();
+		final int offset = kernel.getOffset();
 		final int kernelWidth = kernel.getWidth();
 
-		final int yBorder = includeBorder ? 0 : radius;
-
 		final int width = image.getWidth();
-		final int height = image.getHeight()-yBorder;
 
-		for( int i = yBorder; i < height; i++ ) {
-			int indexDst = dest.startIndex + i*dest.stride+radius;
-			int j = image.startIndex + i*image.stride - radius;
-			final int jEnd = j+width-radius;
+		for( int i = 0; i < image.height; i++ ) {
+			int indexDst = dest.startIndex + i*dest.stride+offset;
+			int j = image.startIndex + i*image.stride;
+			final int jEnd = j+width-(kernelWidth-1);
 
-			for( j += radius; j < jEnd; j++ ) {
+			for( ; j < jEnd; j++ ) {
 				int total = 0;
 				int indexSrc = j;
 				for( int k = 0; k < kernelWidth; k++ ) {
@@ -727,29 +671,26 @@ public class ConvolveImageStandard {
 	}
 
 	public static void vertical( Kernel1D_I32 kernel,
-								 ImageSInt32 image, ImageSInt32 dest,
-								 boolean includeBorder)
+								 ImageSInt32 image, ImageSInt32 dest )
 	{
 		final int[] dataSrc = image.data;
 		final int[] dataDst = dest.data;
 		final int[] dataKer = kernel.data;
 
-		final int radius = kernel.getRadius();
+		final int offset = kernel.getOffset();
 		final int kernelWidth = kernel.getWidth();
 
 		final int imgWidth = dest.getWidth();
 		final int imgHeight = dest.getHeight();
 
-		final int yEnd = imgHeight-radius;
+		final int yEnd = imgHeight-(kernelWidth-offset-1);
 
-		final int xBorder = includeBorder ? 0 : radius;
+		for( int y = offset; y < yEnd; y++ ) {
+			int indexDst = dest.startIndex+y*dest.stride;
+			int i = image.startIndex + (y-offset)*image.stride;
+			final int iEnd = i+imgWidth;
 
-		for( int y = radius; y < yEnd; y++ ) {
-			int indexDst = dest.startIndex+y*dest.stride+xBorder;
-			int i = image.startIndex + (y-radius)*image.stride;
-			final int iEnd = i+imgWidth-xBorder;
-
-			for( i += xBorder; i < iEnd; i++ ) {
+			for( ; i < iEnd; i++ ) {
 				int total = 0;
 				int indexSrc = i;
 				for( int k = 0; k < kernelWidth; k++ ) {
@@ -789,27 +730,23 @@ public class ConvolveImageStandard {
 	}
 
 	public static void horizontal( Kernel1D_I32 kernel ,
-								  ImageSInt32 image, ImageSInt32 dest, int divisor,
-								  boolean includeBorder) {
+								  ImageSInt32 image, ImageSInt32 dest , int divisor ) {
 		final int[] dataSrc = image.data;
 		final int[] dataDst = dest.data;
 		final int[] dataKer = kernel.data;
 
-		final int radius = kernel.getRadius();
+		final int offset = kernel.getOffset();
 		final int kernelWidth = kernel.getWidth();
 		final int halfDivisor = divisor/2;
 
-		final int yBorder = includeBorder ? 0 : radius;
-
 		final int width = image.getWidth();
-		final int height = image.getHeight()-yBorder;
 
-		for( int i = yBorder; i < height; i++ ) {
-			int indexDst = dest.startIndex + i*dest.stride+radius;
-			int j = image.startIndex + i*image.stride - radius;
-			final int jEnd = j+width-radius;
+		for( int i = 0; i < image.height; i++ ) {
+			int indexDst = dest.startIndex + i*dest.stride+offset;
+			int j = image.startIndex + i*image.stride;
+			final int jEnd = j+width-(kernelWidth-1);
 
-			for( j += radius; j < jEnd; j++ ) {
+			for( ; j < jEnd; j++ ) {
 				int total = 0;
 				int indexSrc = j;
 				for( int k = 0; k < kernelWidth; k++ ) {
@@ -821,30 +758,27 @@ public class ConvolveImageStandard {
 	}
 
 	public static void vertical( Kernel1D_I32 kernel,
-								 ImageSInt32 image, ImageSInt32 dest, int divisor,
-								 boolean includeBorder)
+								 ImageSInt32 image, ImageSInt32 dest , int divisor )
 	{
 		final int[] dataSrc = image.data;
 		final int[] dataDst = dest.data;
 		final int[] dataKer = kernel.data;
 
-		final int radius = kernel.getRadius();
+		final int offset = kernel.getOffset();
 		final int kernelWidth = kernel.getWidth();
 		final int halfDivisor = divisor/2;
 
 		final int imgWidth = dest.getWidth();
 		final int imgHeight = dest.getHeight();
 
-		final int yEnd = imgHeight-radius;
+		final int yEnd = imgHeight-(kernelWidth-offset-1);
 
-		final int xBorder = includeBorder ? 0 : radius;
+		for( int y = offset; y < yEnd; y++ ) {
+			int indexDst = dest.startIndex+y*dest.stride;
+			int i = image.startIndex + (y-offset)*image.stride;
+			final int iEnd = i+imgWidth;
 
-		for( int y = radius; y < yEnd; y++ ) {
-			int indexDst = dest.startIndex+y*dest.stride+xBorder;
-			int i = image.startIndex + (y-radius)*image.stride;
-			final int iEnd = i+imgWidth-xBorder;
-
-			for( i += xBorder; i < iEnd; i++ ) {
+			for( ; i < iEnd; i++ ) {
 				int total = 0;
 				int indexSrc = i;
 				for( int k = 0; k < kernelWidth; k++ ) {

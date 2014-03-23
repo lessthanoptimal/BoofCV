@@ -22,6 +22,7 @@ import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.filter.kernel.FactoryKernel;
 import boofcv.factory.filter.kernel.FactoryKernelGaussian;
+import boofcv.struct.convolve.Kernel1D;
 import boofcv.struct.convolve.KernelBase;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.testing.BoofTesting;
@@ -97,13 +98,13 @@ public class TestConvolveImageStandard {
 		GImageMiscOps.fillUniform(input, rand, 1, 10);
 
 		if( m.getName().contentEquals("horizontal")) {
-			if( param.length == 4 ) {
+			if( param.length == 3 ) {
 				BoofTesting.checkSubImage(this, "horizontal", true, input, output);
 			} else {
 				BoofTesting.checkSubImage(this, "horizontalDiv", true, input, output);
 			}
 		} else if( m.getName().contentEquals("vertical")) {
-			if( param.length == 4 ) {
+			if( param.length == 3 ) {
 				BoofTesting.checkSubImage(this, "vertical", true, input, output);
 			} else {
 				BoofTesting.checkSubImage(this, "verticalDiv", true, input, output);
@@ -126,19 +127,40 @@ public class TestConvolveImageStandard {
 	public void horizontal(ImageSingleBand img, ImageSingleBand dest) {
 		Object ker = FactoryKernelGaussian.gaussian1D(img.getClass(),-1,kernelRadius);
 
-		invokeMethod("horizontal", ker, img, dest, false);
-		// the top border should not be convolved yet
-		assertEquals(0, get(dest, 1, 0), 1e-6);
+		// standard symmetric odd kernel
+		GImageMiscOps.fill(dest,0);
+		invokeMethod("horizontal", ker, img, dest);
+		double expected = horizontal(1,1,img,ker,kernelRadius,2*kernelRadius+1);
+		assertEquals(expected, get(dest, 1, 1), 1e-6);
+		// horizontal border check
+		assertEquals(0, get(dest, 0, 3), 1e-6);
+		assertEquals(0, get(dest, width-1, 3), 1e-6);
 
-		//  see if some point was convolved correctly
-		double val = get(img, 0, 1) * getKernel(ker, 0) + get(img, 1, 1) * getKernel(ker, 1) + get(img, 2, 1) * getKernel(ker, 2);
+		// non-symmetric kernel
+		GImageMiscOps.fill(dest,0);
+		((Kernel1D)ker).offset=0;
+		invokeMethod("horizontal", ker, img, dest);
+		expected = horizontal(1,1,img,ker,0,2*kernelRadius+1);
+		assertEquals(expected, get(dest, 1, 1), 1e-6);
+		// horizontal border check
+		assertTrue(0 != get(dest, 0, 3));
+		assertEquals(0, get(dest, width-2, 3), 1e-6);
+		assertEquals(0, get(dest, width-1, 3), 1e-6);
+	}
 
-		assertEquals(val, get(dest, 1, 1), 1e-6);
 
-		// now let it process the vertical border
-		invokeMethod("horizontal", ker, img, dest, true);
-		assertEquals(val, get(dest, 1, 1), 1e-6);
-		assertTrue(0 != get(dest, 1, 0));
+	public double horizontal( int x , int y , ImageSingleBand img , Object ker , int offset , int width ) {
+
+		double total = 0;
+
+		for( int i = 0; i < width; i++ ) {
+			double valI = get(img,x-offset+i,y);
+			double valK = getKernel(ker,i);
+
+			total += valI*valK;
+		}
+
+		return total;
 	}
 
 	/**
@@ -146,24 +168,45 @@ public class TestConvolveImageStandard {
 	 */
 	public void horizontalDiv(ImageSingleBand img, ImageSingleBand dest) {
 		int divisor = 11;
-		int halfDivisor = divisor/2;
 		Object ker = FactoryKernelGaussian.gaussian1D(img.getClass(),-1,kernelRadius);
 
-		invokeMethod("horizontal", ker, img, dest, divisor, false);
-		// the top border should not be convolved yet
-		assertEquals(0, get(dest, 1, 0), 1e-6);
+		// standard symmetric odd kernel
+		GImageMiscOps.fill(dest,0);
+		invokeMethod("horizontal", ker, img, dest, divisor);
+		double expected = horizontal(1,1,img,ker,kernelRadius,2*kernelRadius+1,divisor);
+		if( dest.getDataType().isInteger())
+			expected = (int)expected;
+		assertEquals(expected, get(dest, 1, 1), 1e-6);
+		// horizontal border check
+		assertEquals(0, get(dest, 0, 3), 1e-6);
+		assertEquals(0, get(dest, width-1, 3), 1e-6);
 
-		//  see if some point was convolved correctly
-		double val = (get(img, 0, 1) * getKernel(ker, 0) + get(img, 1, 1) * getKernel(ker, 1) + get(img, 2, 1) * getKernel(ker, 2) + halfDivisor) / divisor;
-		if (dest.getDataType().isInteger())
-			val = (int) val;
+		// non-symmetric kernel
+		GImageMiscOps.fill(dest,0);
+		((Kernel1D)ker).offset=0;
+		invokeMethod("horizontal", ker, img, dest, divisor);
+		expected = horizontal(1,1,img,ker,0,2*kernelRadius+1,divisor);
+		if( dest.getDataType().isInteger())
+			expected = (int)expected;
+		assertEquals(expected, get(dest, 1, 1), 1e-6);
+		// border check
+		assertTrue(0 != get(dest, 0, 3));
+		assertEquals(0, get(dest, width-2, 3), 1e-6);
+		assertEquals(0, get(dest, width-1, 3), 1e-6);
+	}
 
-		assertEquals(val, get(dest, 1, 1), 1e-6);
+	public double horizontal( int x , int y , ImageSingleBand img , Object ker , int offset , int width , int divisor ) {
 
-		// now let it process the vertical border
-		invokeMethod("horizontal", ker, img, dest, divisor, true);
-		assertEquals(val, get(dest, 1, 1), 1e-6);
-		assertTrue(0 != get(dest, 1, 0));
+		double total = 0;
+
+		for( int i = 0; i < width; i++ ) {
+			double valI = get(img,x-offset+i,y);
+			double valK = getKernel(ker,i);
+
+			total += valI*valK;
+		}
+
+		return (total+(divisor/2))/divisor;
 	}
 
 	/**
@@ -172,19 +215,38 @@ public class TestConvolveImageStandard {
 	public void vertical(ImageSingleBand img, ImageSingleBand dest) {
 		Object ker = FactoryKernelGaussian.gaussian1D(img.getClass(),-1,kernelRadius);
 
-		invokeMethod("vertical", ker, img, dest, false);
+		// standard symmetric odd kernel
+		GImageMiscOps.fill(dest,0);
+		invokeMethod("vertical", ker, img, dest);
+		double expected = vertical(1, 1, img, ker, kernelRadius, 2 * kernelRadius + 1);
+		assertEquals(expected, get(dest, 1, 1), 1e-6);
+		// horizontal border check
+		assertEquals(0, get(dest, 3, 0), 1e-6);
+		assertEquals(0, get(dest, 3, height-1), 1e-6);
 
-		// the left border should not be convolved yet
-		assertEquals(0, get(dest, 0, 1), 1e-6);
+		// non-symmetric kernel
+		GImageMiscOps.fill(dest,0);
+		((Kernel1D)ker).offset=0;
+		invokeMethod("vertical", ker, img, dest);
+		expected = vertical(1, 1, img, ker, 0, 2 * kernelRadius + 1);
+		assertEquals(expected, get(dest, 1, 1), 1e-6);
+		// horizontal border check
+		assertTrue(0 != get(dest, 3, 0));
+		assertEquals(0, get(dest, 3, height-2), 1e-6);
+		assertEquals(0, get(dest, 3, height-1), 1e-6);
+	}
 
-		double val = get(img, 1, 0) * getKernel(ker, 0) + get(img, 1, 1) * getKernel(ker, 1) + get(img, 1, 2) * getKernel(ker, 2);
+	public double vertical( int x , int y , ImageSingleBand img , Object ker , int offset , int width ) {
+		double total = 0;
 
-		assertEquals(val, get(dest, 1, 1), 1e-6);
+		for( int i = 0; i < width; i++ ) {
+			double valI = get(img,x,y-offset+i);
+			double valK = getKernel(ker,i);
 
-		// now let it process the vertical border
-		invokeMethod("vertical", ker, img, dest, true);
-		assertEquals(val, get(dest, 1, 1), 1e-6);
-		assertTrue(0 != get(dest, 0, 1));
+			total += valI*valK;
+		}
+
+		return total;
 	}
 
 	/**
@@ -194,22 +256,43 @@ public class TestConvolveImageStandard {
 		Object ker = FactoryKernelGaussian.gaussian1D(img.getClass(),-1,kernelRadius);
 
 		int divisor = 11;
-		int halfDivisor = divisor/2;
-		invokeMethod("vertical", ker, img, dest, divisor, false);
 
-		// the left border should not be convolved yet
-		assertEquals(0, get(dest, 0, 1), 1e-6);
-
-		double val = (get(img, 1, 0) * getKernel(ker, 0) + get(img, 1, 1) * getKernel(ker, 1) + get(img, 1, 2) * getKernel(ker, 2) + halfDivisor) / divisor;
+		// standard symmetric odd kernel
+		GImageMiscOps.fill(dest,0);
+		invokeMethod("vertical", ker, img, dest, divisor);
+		double expected = vertical(1,1,img,ker,kernelRadius,2*kernelRadius+1,divisor);
 		if (dest.getDataType().isInteger())
-			val = (int) val;
+			expected = (int) expected;
+		assertEquals(expected, get(dest, 1, 1), 1e-6);
+		// horizontal border check
+		assertEquals(0, get(dest, 3, 0), 1e-6);
+		assertEquals(0, get(dest, 3, height-1), 1e-6);
 
-		assertEquals(val, get(dest, 1, 1), 1e-6);
+		// non-symmetric kernel
+		GImageMiscOps.fill(dest,0);
+		((Kernel1D)ker).offset=0;
+		invokeMethod("vertical", ker, img, dest, divisor);
+		expected = vertical(1,1,img,ker,0,2*kernelRadius+1,divisor);
+		if (dest.getDataType().isInteger())
+			expected = (int) expected;
+		assertEquals(expected, get(dest, 1, 1), 1e-6);
+		// horizontal border check
+		assertTrue(0 != get(dest, 3, 0));
+		assertEquals(0, get(dest, 3, height-2), 1e-6);
+		assertEquals(0, get(dest, 3, height-1), 1e-6);
+	}
 
-		// invokeMethod let it process the vertical border
-		invokeMethod("vertical", ker, img, dest, divisor, true);
-		assertEquals(val, get(dest, 1, 1), 1e-6);
-		assertTrue(0 != get(dest, 0, 1));
+	public double vertical( int x , int y , ImageSingleBand img , Object ker , int offset , int width , int divisor ) {
+		double total = 0;
+
+		for( int i = 0; i < width; i++ ) {
+			double valI = get(img,x,y-offset+i);
+			double valK = getKernel(ker,i);
+
+			total += valI*valK;
+		}
+
+		return (total+(divisor/2))/divisor;
 	}
 
 	/**

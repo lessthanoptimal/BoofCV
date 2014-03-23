@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -162,6 +162,10 @@ public class GenerateConvolveDownNoBorderStandard extends CodeGeneratorBase {
 		} else {
 			out.print("\t\t\t\t\t\t\t\t   int skip ) {\n");
 		}
+
+		out.print(
+				"\t\tif( kernel.offset != kernel.width/2 || kernel.width%2 != 1)\n" +
+				"\t\t\tthrow new IllegalArgumentException(\"Non symmetric odd kernels not supported\");\n\n");
 
 		out.print("\t\tfinal "+inputData+"[] dataSrc = input.data;\n" +
 				"\t\tfinal "+outputData+"[] dataDst = output.data;\n" +

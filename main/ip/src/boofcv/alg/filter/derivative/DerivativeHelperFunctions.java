@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,105 +35,105 @@ import boofcv.struct.image.ImageUInt8;
 public class DerivativeHelperFunctions {
 
 	public static void processBorderHorizontal( ImageUInt8 orig , ImageSInt16 deriv ,
-												Kernel1D_I32 kernel , int border , ImageBorder_I32 borderType )
+												Kernel1D_I32 kernel , ImageBorder_I32 borderType )
 	{
 		borderType.setImage(orig);
-		ConvolveJustBorder_General.horizontal(kernel, borderType,deriv,border);
+		ConvolveJustBorder_General.horizontal(kernel, borderType,deriv);
 
 		ImageUInt8 origSub;
 		ImageSInt16 derivSub;
 
 		origSub = orig.subimage(0,0,orig.width,2, null);
 		derivSub = deriv.subimage(0,0,orig.width,2, null);
-		ConvolveImageNoBorder.horizontal(kernel,origSub,derivSub,true);
+		ConvolveImageNoBorder.horizontal(kernel,origSub,derivSub);
 		origSub = orig.subimage(0,orig.height-2,orig.width,orig.height, null);
 		derivSub = deriv.subimage(0,orig.height-2,orig.width,orig.height, null);
-		ConvolveImageNoBorder.horizontal(kernel,origSub,derivSub,true);
+		ConvolveImageNoBorder.horizontal(kernel,origSub,derivSub);
 	}
 
 	public static void processBorderHorizontal( ImageSInt16 orig , ImageSInt16 deriv ,
-												Kernel1D_I32 kernel , int border , ImageBorder_I32 borderType )
+												Kernel1D_I32 kernel , ImageBorder_I32 borderType )
 	{
 		borderType.setImage(orig);
-		ConvolveJustBorder_General.horizontal(kernel, borderType,deriv,border);
+		ConvolveJustBorder_General.horizontal(kernel, borderType,deriv);
 
 		ImageSInt16 origSub;
 		ImageSInt16 derivSub;
 
 		origSub = orig.subimage(0,0,orig.width,2, null);
 		derivSub = deriv.subimage(0,0,orig.width,2, null);
-		ConvolveImageNoBorder.horizontal(kernel,origSub,derivSub,true);
+		ConvolveImageNoBorder.horizontal(kernel,origSub,derivSub);
 		origSub = orig.subimage(0,orig.height-2,orig.width,orig.height, null);
 		derivSub = deriv.subimage(0,orig.height-2,orig.width,orig.height, null);
-		ConvolveImageNoBorder.horizontal(kernel,origSub,derivSub,true);
+		ConvolveImageNoBorder.horizontal(kernel,origSub,derivSub);
 	}
 
 	public static void processBorderVertical( ImageUInt8 orig , ImageSInt16 deriv ,
-											  Kernel1D_I32 kernel , int border , ImageBorder_I32 borderType)
+											  Kernel1D_I32 kernel , ImageBorder_I32 borderType)
 	{
 		borderType.setImage(orig);
-		ConvolveJustBorder_General.vertical(kernel,borderType,deriv,border);
+		ConvolveJustBorder_General.vertical(kernel,borderType,deriv);
 
 		ImageUInt8 origSub;
 		ImageSInt16 derivSub;
 
 		origSub = orig.subimage(0,0,2,orig.height, null);
 		derivSub = deriv.subimage(0,0,2,orig.height, null);
-		ConvolveImageNoBorder.vertical(kernel,origSub,derivSub,true);
+		ConvolveImageNoBorder.vertical(kernel,origSub,derivSub);
 		origSub = orig.subimage(orig.width-2,0,orig.width,orig.height, null);
 		derivSub = deriv.subimage(orig.width-2,0,orig.width,orig.height, null);
-		ConvolveImageNoBorder.vertical(kernel,origSub,derivSub,true);
+		ConvolveImageNoBorder.vertical(kernel,origSub,derivSub);
 	}
 
 	public static void processBorderVertical( ImageSInt16 orig , ImageSInt16 deriv ,
-											  Kernel1D_I32 kernel , int border , ImageBorder_I32 borderType)
+											  Kernel1D_I32 kernel , ImageBorder_I32 borderType)
 	{
 		borderType.setImage(orig);
-		ConvolveJustBorder_General.vertical(kernel, borderType ,deriv,border);
+		ConvolveJustBorder_General.vertical(kernel, borderType ,deriv);
 
 		ImageSInt16 origSub;
 		ImageSInt16 derivSub;
 
 		origSub = orig.subimage(0,0,2,orig.height, null);
 		derivSub = deriv.subimage(0,0,2,orig.height, null);
-		ConvolveImageNoBorder.vertical(kernel,origSub,derivSub,true);
+		ConvolveImageNoBorder.vertical(kernel,origSub,derivSub);
 		origSub = orig.subimage(orig.width-2,0,orig.width,orig.height, null);
 		derivSub = deriv.subimage(orig.width-2,0,orig.width,orig.height, null);
-		ConvolveImageNoBorder.vertical(kernel,origSub,derivSub,true);
+		ConvolveImageNoBorder.vertical(kernel,origSub,derivSub);
 	}
 
 	public static void processBorderHorizontal( ImageFloat32 orig , ImageFloat32 deriv ,
-												Kernel1D_F32 kernel , int border , ImageBorder_F32 borderType )
+												Kernel1D_F32 kernel , ImageBorder_F32 borderType )
 	{
 		borderType.setImage(orig);
-		ConvolveJustBorder_General.horizontal(kernel, borderType , deriv , border);
+		ConvolveJustBorder_General.horizontal(kernel, borderType , deriv );
 
 		ImageFloat32 origSub;
 		ImageFloat32 derivSub;
 
 		origSub = orig.subimage(0,0,orig.width,2, null);
 		derivSub = deriv.subimage(0,0,orig.width,2, null);
-		ConvolveImageNoBorder.horizontal(kernel,origSub,derivSub,true);
+		ConvolveImageNoBorder.horizontal(kernel,origSub,derivSub);
 		origSub = orig.subimage(0,orig.height-2,orig.width,orig.height, null);
 		derivSub = deriv.subimage(0,orig.height-2,orig.width,orig.height, null);
-		ConvolveImageNoBorder.horizontal(kernel,origSub,derivSub,true);
+		ConvolveImageNoBorder.horizontal(kernel,origSub,derivSub);
 	}
 
 	public static void processBorderVertical( ImageFloat32 orig , ImageFloat32 deriv ,
-											  Kernel1D_F32 kernel , int border , ImageBorder_F32 borderType)
+											  Kernel1D_F32 kernel , ImageBorder_F32 borderType)
 	{
 		borderType.setImage(orig);
-		ConvolveJustBorder_General.vertical(kernel, borderType ,deriv,border);
+		ConvolveJustBorder_General.vertical(kernel, borderType ,deriv );
 
 		ImageFloat32 origSub;
 		ImageFloat32 derivSub;
 
 		origSub = orig.subimage(0,0,2,orig.height, null);
 		derivSub = deriv.subimage(0,0,2,orig.height, null);
-		ConvolveImageNoBorder.vertical(kernel,origSub,derivSub,true);
+		ConvolveImageNoBorder.vertical(kernel,origSub,derivSub);
 		origSub = orig.subimage(orig.width-2,0,orig.width,orig.height, null);
 		derivSub = deriv.subimage(orig.width-2,0,orig.width,orig.height, null);
-		ConvolveImageNoBorder.vertical(kernel,origSub,derivSub,true);
+		ConvolveImageNoBorder.vertical(kernel,origSub,derivSub);
 	}
 
 }

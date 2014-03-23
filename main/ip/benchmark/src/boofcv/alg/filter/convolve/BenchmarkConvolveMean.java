@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -73,31 +73,31 @@ public class BenchmarkConvolveMean extends SimpleBenchmark {
 
 	public int timeConvolve_Vertical_U8_I8(int reps) {
 		for( int i = 0; i < reps; i++ )
-			ConvolveImageNoBorder.vertical(kernelI32, input_I8,out_I8,radius*2+1,false);
+			ConvolveImageNoBorder.vertical(kernelI32, input_I8,out_I8,radius*2+1);
 		return 0;
 	}
 
 	public int timeConvolve_Horizontal_U8_I8(int reps) {
 		for( int i = 0; i < reps; i++ )
-			ConvolveImageNoBorder.horizontal(kernelI32, input_I8, out_I8, radius * 2 + 1, false);
+			ConvolveImageNoBorder.horizontal(kernelI32, input_I8, out_I8, radius * 2 + 1);
 		return 0;
 	}
 
 	public int timeMean_U8_I8_Vertical(int reps) {
 		for( int i = 0; i < reps; i++ )
-			ImplConvolveMean.vertical(input_I8, out_I8, radius, false);
+			ImplConvolveMean.vertical(input_I8, out_I8, radius);
 		return 0;
 	}
 
 	public int timeMean_F32_F32_Vertical(int reps) {
 		for( int i = 0; i < reps; i++ )
-			ImplConvolveMean.vertical(input_F32,out_F32,radius,false);
+			ImplConvolveMean.vertical(input_F32,out_F32,radius);
 		return 0;
 	}
 
 	public int timeMean_F32_F32_Horizontal(int reps) {
 		for( int i = 0; i < reps; i++ )
-			ImplConvolveMean.horizontal(input_F32, out_F32, radius, false);
+			ImplConvolveMean.horizontal(input_F32, out_F32, radius);
 		return 0;
 	}
 

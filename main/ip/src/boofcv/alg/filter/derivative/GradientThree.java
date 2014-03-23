@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -47,7 +47,7 @@ import boofcv.struct.image.ImageUInt8;
  */
 public class GradientThree {
 
-	public static Kernel1D_I32 kernelDeriv_I32 = new Kernel1D_I32(3,-1,0,1);
+	public static Kernel1D_I32 kernelDeriv_I32 = new Kernel1D_I32(new int[]{-1,0,1},3);
 	public static Kernel1D_F32 kernelDeriv_F32 = new Kernel1D_F32(new float[]{-0.5f,0,0.5f},3);
 
 	/**
@@ -75,8 +75,8 @@ public class GradientThree {
 		GradientThree_Standard.process(orig, derivX, derivY);
 
 		if( border != null ) {
-			DerivativeHelperFunctions.processBorderHorizontal(orig, derivX , kernelDeriv_I32, 1 , border);
-			DerivativeHelperFunctions.processBorderVertical(orig, derivY , kernelDeriv_I32, 1 , border);
+			DerivativeHelperFunctions.processBorderHorizontal(orig, derivX , kernelDeriv_I32, border);
+			DerivativeHelperFunctions.processBorderVertical(orig, derivY , kernelDeriv_I32, border);
 		}
 	}
 
@@ -95,8 +95,8 @@ public class GradientThree {
 		GradientThree_Standard.process(orig, derivX, derivY);
 
 		if( border != null ) {
-			DerivativeHelperFunctions.processBorderHorizontal(orig, derivX , kernelDeriv_I32, 1 , border);
-			DerivativeHelperFunctions.processBorderVertical(orig, derivY , kernelDeriv_I32, 1 , border);
+			DerivativeHelperFunctions.processBorderHorizontal(orig, derivX , kernelDeriv_I32, border);
+			DerivativeHelperFunctions.processBorderVertical(orig, derivY , kernelDeriv_I32, border);
 		}
 	}
 
@@ -115,8 +115,8 @@ public class GradientThree {
 		GradientThree_Standard.process(orig, derivX, derivY);
 
 		if( border != null ) {
-			DerivativeHelperFunctions.processBorderHorizontal(orig, derivX , kernelDeriv_F32, 1 , border);
-			DerivativeHelperFunctions.processBorderVertical(orig, derivY , kernelDeriv_F32, 1 , border);
+			DerivativeHelperFunctions.processBorderHorizontal(orig, derivX , kernelDeriv_F32, border);
+			DerivativeHelperFunctions.processBorderVertical(orig, derivY , kernelDeriv_F32, border);
 		}
 	}
 

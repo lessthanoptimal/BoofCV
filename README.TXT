@@ -35,7 +35,13 @@ BEFORE trying to compile BoofCV make sure you have the following installed and t
 - Maven (Optional)
       http://maven.apache.org/
 
-In Linux, BoofCV can be compiled using Ant with the following command line squence:
+BoofCV is in general very easy to build on just about any system.  Because it is Java you don't have any of the annoying system dependent or compiler issues that are the source of endless headaches.
+
+
+== STABLE BUILD ANT:
+
+If you are using a stable build the latest jars of its dependencies are provided for you and can be easily
+compiled using Ant:
 
 ---- BEGIN TEXT-----
 cd main
@@ -44,7 +50,47 @@ ant
 
 After the last command has finished you can find BoofCV.jar in the lib/ directory.  It is also possible to create JavaDoc by typing "ant javadoc".  Next if you wish to compile and run the example code, move into the example/ directory and following the readme.txt instructions you find there.  Code inside integration directory can be easily compiled using the same command.
 
-BoofCV is in general very easy to build on just about any system.  Because it is Java you don't have any of the annoying system dependent or compilor issues that are the source of endless headaches.
+== STABLE BUILD MAVEN:
+
+---- BEGIN TEXT-----
+cd main
+mvn package
+----- END TEXT -----
+
+== DEVELOPMENTAL BUILD ANT:
+
+So you checked out the latest Git code for BoofCV.  Chances are ant won't work because the jars it depends on are out of date.  You will need check out the source code of all its dependencies and then build them.
+
+------ BEGIN TEXT -----
+git clone git://github.com/lessthanoptimal/BoofCV.git boofcv
+cd boofcv
+git submodule init
+git submodule update
+cd ..
+git clone git://github.com/lessthanoptimal/GeoRegression.git georegression
+git clone git://github.com/lessthanoptimal/ddogleg.git ddogleg
+mkdir -p ejml/trunk
+svn checkout https://efficient-java-matrix-library.googlecode.com/svn/trunk/ ejml/trunk
+------ END TEXT -------
+
+Next you must build and copy jars.
+
+------ BEGIN TEXT -----
+cd ejml/trunk/
+ant
+cp build/jar/EJML.jar ../../ddogleg/lib/
+cp build/jar/EJML.jar ../../georegression/lib/
+cp build/jar/EJML.jar ../../boofcv/lib/
+cd ../../ddogleg/
+ant
+cp build/jar/DDogleg.jar ../georegression/lib/
+cp build/jar/DDogleg.jar ../boofcv/lib/
+cd ../georegression/
+ant
+cp build/jar/GeoRegression.jar ../boofcv/lib/
+cd ../boofcv/main/
+ant
+------ END TEXT -------
 
 ========= Dependencies =======================
 

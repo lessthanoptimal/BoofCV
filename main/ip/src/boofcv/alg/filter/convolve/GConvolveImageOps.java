@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -105,52 +105,46 @@ public class GConvolveImageOps {
 	}
 
 	/**
-	 * Performs a horizontal 1D convolution across the image.  The horizontal border
-	 * is not processed and the vertical border is optionally processed.  The border is as wide
-	 * as the radius of the kernel.
+	 * Performs a horizontal 1D convolution across the image.  The horizontal border is not processed.
 	 *
 	 * @param input	 The original image. Not modified.
 	 * @param output Where the resulting image is written to. Modified.
 	 * @param kernel The kernel that is being convolved. Not modified.
-	 * @param includeVerticalBorder Should the vertical border of the image be processed?
 	 */
 	public static <T extends ImageSingleBand, K extends Kernel1D>
-	void horizontal(K kernel, T input, T output , boolean includeVerticalBorder ) {
+	void horizontal(K kernel, T input, T output ) {
 		if( input instanceof ImageFloat32 ) {
-			ConvolveImageNoBorder.horizontal((Kernel1D_F32)kernel,(ImageFloat32)input,(ImageFloat32)output,includeVerticalBorder);
+			ConvolveImageNoBorder.horizontal((Kernel1D_F32)kernel,(ImageFloat32)input,(ImageFloat32)output);
 		} else if( input instanceof ImageUInt8 ) {
 			if( ImageInt16.class.isAssignableFrom(output.getClass()) )
-				ConvolveImageNoBorder.horizontal((Kernel1D_I32)kernel,(ImageUInt8)input,(ImageInt16)output,includeVerticalBorder);
+				ConvolveImageNoBorder.horizontal((Kernel1D_I32)kernel,(ImageUInt8)input,(ImageInt16)output);
 			else
-				ConvolveImageNoBorder.horizontal((Kernel1D_I32)kernel,(ImageUInt8)input,(ImageSInt32)output,includeVerticalBorder);
+				ConvolveImageNoBorder.horizontal((Kernel1D_I32)kernel,(ImageUInt8)input,(ImageSInt32)output);
 		} else if( input instanceof ImageSInt16 ) {
-			ConvolveImageNoBorder.horizontal((Kernel1D_I32)kernel,(ImageSInt16)input,(ImageInt16)output,includeVerticalBorder);
+			ConvolveImageNoBorder.horizontal((Kernel1D_I32)kernel,(ImageSInt16)input,(ImageInt16)output);
 		} else {
 			throw new IllegalArgumentException("Unknown image type: "+input.getClass().getName());
 		}
 	}
 
 	/**
-	 * Performs a horizontal 1D convolution across the image.  The horizontal border
-	 * is not processed and the vertical border is optionally processed.  The border is as wide
-	 * as the radius of the kernel.
+	 * Performs a horizontal 1D convolution across the image.  The horizontal border is not processed.
 	 *
 	 * @param input	 The original image. Not modified.
 	 * @param output Where the resulting image is written to. Modified.
 	 * @param kernel The kernel that is being convolved. Not modified.
-	 * @param includeHorizontalBorder Should the vertical border of the image be processed?
 	 */
 	public static <T extends ImageSingleBand, K extends Kernel1D>
-	void vertical(K kernel, T input, T output , boolean  includeHorizontalBorder ) {
+	void vertical(K kernel, T input, T output ) {
 		if( input instanceof ImageFloat32 ) {
-			ConvolveImageNoBorder.vertical((Kernel1D_F32) kernel, (ImageFloat32) input, (ImageFloat32) output, includeHorizontalBorder);
+			ConvolveImageNoBorder.vertical((Kernel1D_F32) kernel, (ImageFloat32) input, (ImageFloat32) output);
 		} else if( input instanceof ImageUInt8 ) {
 			if( ImageInt16.class.isAssignableFrom(output.getClass()) )
-				ConvolveImageNoBorder.vertical((Kernel1D_I32) kernel, (ImageUInt8) input, (ImageInt16) output, includeHorizontalBorder);
+				ConvolveImageNoBorder.vertical((Kernel1D_I32) kernel, (ImageUInt8) input, (ImageInt16) output);
 			else
-				ConvolveImageNoBorder.vertical((Kernel1D_I32) kernel, (ImageUInt8) input, (ImageSInt32) output, includeHorizontalBorder);
+				ConvolveImageNoBorder.vertical((Kernel1D_I32) kernel, (ImageUInt8) input, (ImageSInt32) output);
 		} else if( input instanceof ImageSInt16 ) {
-			ConvolveImageNoBorder.vertical((Kernel1D_I32) kernel, (ImageSInt16) input, (ImageInt16) output, includeHorizontalBorder);
+			ConvolveImageNoBorder.vertical((Kernel1D_I32) kernel, (ImageSInt16) input, (ImageInt16) output);
 		} else {
 			throw new IllegalArgumentException("Unknown image type: "+input.getClass().getName());
 		}

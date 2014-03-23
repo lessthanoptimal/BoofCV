@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,6 +20,8 @@ package boofcv.alg.filter.convolve.border;
 
 import boofcv.alg.filter.convolve.ConvolveImageNoBorder;
 import boofcv.factory.filter.kernel.FactoryKernelGaussian;
+import boofcv.struct.convolve.Kernel1D;
+import boofcv.struct.convolve.KernelBase;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.testing.CompareEquivalentFunctions;
 
@@ -36,9 +38,11 @@ import java.util.Random;
 public abstract class CompareImageBorder extends CompareEquivalentFunctions {
 
 	protected Random rand = new Random(234324);
-	protected int kernelRadius = 2;
 	protected int width = 30;
 	protected int height = 40;
+
+	protected int borderX0=0,borderY0=0;
+	protected int borderX1=0,borderY1=0;
 
 	public CompareImageBorder(Class<?> targetClass ) {
 		super(targetClass, ConvolveImageNoBorder.class);
@@ -54,12 +58,34 @@ public abstract class CompareImageBorder extends CompareEquivalentFunctions {
 		}
 		return false;
 	}
-	
-	protected ImageSingleBand stripBorder( ImageSingleBand a ) {
-		return a.subimage(kernelRadius,kernelRadius,width+kernelRadius,height+kernelRadius, null);
+
+	protected void computeBorder( KernelBase kernel , String functionName ) {
+		borderX0=borderY0=0;
+		borderX1=borderY1=0;
+
+		if( kernel instanceof Kernel1D) {
+			if( functionName.contains("horizontal")) {
+				borderX0 = kernel.getOffset();
+				borderX1 = kernel.getWidth() - kernel.getOffset() - 1;
+			} else {
+				borderY0 = kernel.getOffset();
+				borderY1 = kernel.getWidth() - kernel.getOffset() - 1;
+			}
+		} else {
+			borderX0 = borderY0 = kernel.getWidth()/2;
+			borderX1 = borderY1 = kernel.getWidth()/2;
+		}
 	}
 
-	protected Object createKernel(Class kernelType) {
-		return FactoryKernelGaussian.gaussian(kernelType,-1,kernelRadius);
+	protected ImageSingleBand stripBorder( ImageSingleBand a ,
+										   int borderX0 , int borderY0,
+										   int borderX1 , int borderY1 ) {
+		return a.subimage(borderX0,borderY0,a.width-borderX1,a.height-borderY1, null);
+	}
+
+	protected KernelBase createKernel(Class kernelType, int offset , int width) {
+		KernelBase k = FactoryKernelGaussian.gaussian(kernelType,-1,width/2);
+		k.offset = offset;
+		return k;
 	}
 }

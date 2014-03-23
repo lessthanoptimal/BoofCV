@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -14,9 +14,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
-
-package boofcv.alg.filter.convolve.border;
+ */package boofcv.alg.filter.convolve.border;
 
 import boofcv.core.image.border.ImageBorder_F32;
 import boofcv.core.image.border.ImageBorder_I32;
@@ -42,60 +40,64 @@ import boofcv.struct.image.ImageSInt32;
  */
 public class ConvolveJustBorder_General {
 
-	public static void horizontal(Kernel1D_F32 kernel, ImageBorder_F32 input, ImageFloat32 output , int border ) {
+	public static void horizontal(Kernel1D_F32 kernel, ImageBorder_F32 input, ImageFloat32 output ) {
 		final float[] dataDst = output.data;
 		final float[] dataKer = kernel.data;
 
-		final int radius = kernel.getRadius();
+		final int offset = kernel.getOffset();
+		final int kernelWidth = kernel.getWidth();
 		final int width = output.getWidth();
 		final int height = output.getHeight();
+		final int borderRight = kernelWidth-offset-1;
 
 		for (int y = 0; y < height; y++) {
 			int indexDest = output.startIndex + y * output.stride;
 
-			for ( int x = 0; x < border; x++ ) {
+			for ( int x = 0; x < offset; x++ ) {
 				float total = 0;
-				for (int k = -radius; k <= radius; k++) {
-					total += input.get(x+k,y) * dataKer[k+radius];
+				for (int k = 0; k < kernelWidth; k++) {
+					total += input.get(x+k-offset,y) * dataKer[k];
 				}
 				dataDst[indexDest++] = total;
 			}
 
-			indexDest = output.startIndex + y * output.stride + width-border;
-			for ( int x = width-border; x < width; x++ ) {
+			indexDest = output.startIndex + y * output.stride + width-borderRight;
+			for ( int x = width-borderRight; x < width; x++ ) {
 				float total = 0;
-				for (int k = -radius; k <= radius; k++) {
-					total += input.get(x+k,y) * dataKer[k+radius];
+				for (int k = 0; k < kernelWidth; k++) {
+					total += input.get(x+k-offset,y) * dataKer[k];
 				}
 				dataDst[indexDest++] = total;
 			}
 		}
 	}
 
-	public static void vertical(Kernel1D_F32 kernel, ImageBorder_F32 input, ImageFloat32 output , int border ) {
+	public static void vertical(Kernel1D_F32 kernel, ImageBorder_F32 input, ImageFloat32 output ) {
 		final float[] dataDst = output.data;
 		final float[] dataKer = kernel.data;
 
-		final int radius = kernel.getRadius();
+		final int offset = kernel.getOffset();
+		final int kernelWidth = kernel.getWidth();
 		final int width = output.getWidth();
 		final int height = output.getHeight();
+		final int borderBottom = kernelWidth-offset-1;
 
 		for ( int x = 0; x < width; x++ ) {
 			int indexDest = output.startIndex + x;
 
-			for (int y = 0; y < border; y++, indexDest += output.stride) {
+			for (int y = 0; y < offset; y++, indexDest += output.stride) {
 				float total = 0;
-				for (int k = -radius; k <= radius; k++) {
-					total += input.get(x,y+k) * dataKer[k+radius];
+				for (int k = 0; k < kernelWidth; k++) {
+					total += input.get(x,y+k-offset) * dataKer[k];
 				}
 				dataDst[indexDest] = total;
 			}
 
-			indexDest = output.startIndex + (height-border) * output.stride + x;
-			for (int y = height-border; y < height; y++, indexDest += output.stride) {
+			indexDest = output.startIndex + (height-borderBottom) * output.stride + x;
+			for (int y = height-borderBottom; y < height; y++, indexDest += output.stride) {
 				float total = 0;
-				for (int k = -radius; k <= radius; k++ ) {
-					total += input.get(x,y+k) * dataKer[k+radius];
+				for (int k = 0; k < kernelWidth; k++ ) {
+					total += input.get(x,y+k-offset) * dataKer[k];
 				}
 				dataDst[indexDest] = total;
 			}
@@ -167,60 +169,64 @@ public class ConvolveJustBorder_General {
 		}
 	}
 
-	public static void horizontal(Kernel1D_I32 kernel, ImageBorder_I32 input, ImageInt16 output , int border ) {
+	public static void horizontal(Kernel1D_I32 kernel, ImageBorder_I32 input, ImageInt16 output ) {
 		final short[] dataDst = output.data;
 		final int[] dataKer = kernel.data;
 
-		final int radius = kernel.getRadius();
+		final int offset = kernel.getOffset();
+		final int kernelWidth = kernel.getWidth();
 		final int width = output.getWidth();
 		final int height = output.getHeight();
+		final int borderRight = kernelWidth-offset-1;
 
 		for (int y = 0; y < height; y++) {
 			int indexDest = output.startIndex + y * output.stride;
 
-			for ( int x = 0; x < border; x++ ) {
+			for ( int x = 0; x < offset; x++ ) {
 				int total = 0;
-				for (int k = -radius; k <= radius; k++) {
-					total += input.get(x+k,y) * dataKer[k+radius];
+				for (int k = 0; k < kernelWidth; k++) {
+					total += input.get(x+k-offset,y) * dataKer[k];
 				}
 				dataDst[indexDest++] = (short)total;
 			}
 
-			indexDest = output.startIndex + y * output.stride + width-border;
-			for ( int x = width-border; x < width; x++ ) {
+			indexDest = output.startIndex + y * output.stride + width-borderRight;
+			for ( int x = width-borderRight; x < width; x++ ) {
 				int total = 0;
-				for (int k = -radius; k <= radius; k++) {
-					total += input.get(x+k,y) * dataKer[k+radius];
+				for (int k = 0; k < kernelWidth; k++) {
+					total += input.get(x+k-offset,y) * dataKer[k];
 				}
 				dataDst[indexDest++] = (short)total;
 			}
 		}
 	}
 
-	public static void vertical(Kernel1D_I32 kernel, ImageBorder_I32 input, ImageInt16 output , int border ) {
+	public static void vertical(Kernel1D_I32 kernel, ImageBorder_I32 input, ImageInt16 output ) {
 		final short[] dataDst = output.data;
 		final int[] dataKer = kernel.data;
 
-		final int radius = kernel.getRadius();
+		final int offset = kernel.getOffset();
+		final int kernelWidth = kernel.getWidth();
 		final int width = output.getWidth();
 		final int height = output.getHeight();
+		final int borderBottom = kernelWidth-offset-1;
 
 		for ( int x = 0; x < width; x++ ) {
 			int indexDest = output.startIndex + x;
 
-			for (int y = 0; y < border; y++, indexDest += output.stride) {
+			for (int y = 0; y < offset; y++, indexDest += output.stride) {
 				int total = 0;
-				for (int k = -radius; k <= radius; k++) {
-					total += input.get(x,y+k) * dataKer[k+radius];
+				for (int k = 0; k < kernelWidth; k++) {
+					total += input.get(x,y+k-offset) * dataKer[k];
 				}
 				dataDst[indexDest] = (short)total;
 			}
 
-			indexDest = output.startIndex + (height-border) * output.stride + x;
-			for (int y = height-border; y < height; y++, indexDest += output.stride) {
+			indexDest = output.startIndex + (height-borderBottom) * output.stride + x;
+			for (int y = height-borderBottom; y < height; y++, indexDest += output.stride) {
 				int total = 0;
-				for (int k = -radius; k <= radius; k++ ) {
-					total += input.get(x,y+k) * dataKer[k+radius];
+				for (int k = 0; k < kernelWidth; k++ ) {
+					total += input.get(x,y+k-offset) * dataKer[k];
 				}
 				dataDst[indexDest] = (short)total;
 			}
@@ -292,60 +298,64 @@ public class ConvolveJustBorder_General {
 		}
 	}
 
-	public static void horizontal(Kernel1D_I32 kernel, ImageBorder_I32 input, ImageSInt32 output , int border ) {
+	public static void horizontal(Kernel1D_I32 kernel, ImageBorder_I32 input, ImageSInt32 output ) {
 		final int[] dataDst = output.data;
 		final int[] dataKer = kernel.data;
 
-		final int radius = kernel.getRadius();
+		final int offset = kernel.getOffset();
+		final int kernelWidth = kernel.getWidth();
 		final int width = output.getWidth();
 		final int height = output.getHeight();
+		final int borderRight = kernelWidth-offset-1;
 
 		for (int y = 0; y < height; y++) {
 			int indexDest = output.startIndex + y * output.stride;
 
-			for ( int x = 0; x < border; x++ ) {
+			for ( int x = 0; x < offset; x++ ) {
 				int total = 0;
-				for (int k = -radius; k <= radius; k++) {
-					total += input.get(x+k,y) * dataKer[k+radius];
+				for (int k = 0; k < kernelWidth; k++) {
+					total += input.get(x+k-offset,y) * dataKer[k];
 				}
 				dataDst[indexDest++] = total;
 			}
 
-			indexDest = output.startIndex + y * output.stride + width-border;
-			for ( int x = width-border; x < width; x++ ) {
+			indexDest = output.startIndex + y * output.stride + width-borderRight;
+			for ( int x = width-borderRight; x < width; x++ ) {
 				int total = 0;
-				for (int k = -radius; k <= radius; k++) {
-					total += input.get(x+k,y) * dataKer[k+radius];
+				for (int k = 0; k < kernelWidth; k++) {
+					total += input.get(x+k-offset,y) * dataKer[k];
 				}
 				dataDst[indexDest++] = total;
 			}
 		}
 	}
 
-	public static void vertical(Kernel1D_I32 kernel, ImageBorder_I32 input, ImageSInt32 output , int border ) {
+	public static void vertical(Kernel1D_I32 kernel, ImageBorder_I32 input, ImageSInt32 output ) {
 		final int[] dataDst = output.data;
 		final int[] dataKer = kernel.data;
 
-		final int radius = kernel.getRadius();
+		final int offset = kernel.getOffset();
+		final int kernelWidth = kernel.getWidth();
 		final int width = output.getWidth();
 		final int height = output.getHeight();
+		final int borderBottom = kernelWidth-offset-1;
 
 		for ( int x = 0; x < width; x++ ) {
 			int indexDest = output.startIndex + x;
 
-			for (int y = 0; y < border; y++, indexDest += output.stride) {
+			for (int y = 0; y < offset; y++, indexDest += output.stride) {
 				int total = 0;
-				for (int k = -radius; k <= radius; k++) {
-					total += input.get(x,y+k) * dataKer[k+radius];
+				for (int k = 0; k < kernelWidth; k++) {
+					total += input.get(x,y+k-offset) * dataKer[k];
 				}
 				dataDst[indexDest] = total;
 			}
 
-			indexDest = output.startIndex + (height-border) * output.stride + x;
-			for (int y = height-border; y < height; y++, indexDest += output.stride) {
+			indexDest = output.startIndex + (height-borderBottom) * output.stride + x;
+			for (int y = height-borderBottom; y < height; y++, indexDest += output.stride) {
 				int total = 0;
-				for (int k = -radius; k <= radius; k++ ) {
-					total += input.get(x,y+k) * dataKer[k+radius];
+				for (int k = 0; k < kernelWidth; k++ ) {
+					total += input.get(x,y+k-offset) * dataKer[k];
 				}
 				dataDst[indexDest] = total;
 			}

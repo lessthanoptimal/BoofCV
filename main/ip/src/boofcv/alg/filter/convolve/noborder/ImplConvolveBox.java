@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -15,7 +15,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package boofcv.alg.filter.convolve.noborder;
 
 import boofcv.struct.image.*;
@@ -32,13 +31,10 @@ import boofcv.struct.image.*;
  */
 public class ImplConvolveBox {
 
-	public static void horizontal( ImageUInt8 input , ImageInt16 output , int radius , boolean includeBorder) {
+	public static void horizontal( ImageUInt8 input , ImageInt16 output , int radius ) {
 		final int kernelWidth = radius*2 + 1;
 
-		final int startY = includeBorder ? 0 : radius;
-		final int endY = includeBorder ? input.height : input.height - radius;
-
-		for( int y = startY; y < endY; y++ ) {
+		for( int y = 0; y < input.height; y++ ) {
 			int indexIn = input.startIndex + input.stride*y;
 			int indexOut = output.startIndex + output.stride*y + radius;
 
@@ -61,15 +57,12 @@ public class ImplConvolveBox {
 		}
 	}
 
-	public static void vertical( ImageUInt8 input , ImageInt16 output , int radius , boolean includeBorder ) {
+	public static void vertical( ImageUInt8 input , ImageInt16 output , int radius ) {
 		final int kernelWidth = radius*2 + 1;
-
-		final int startX = includeBorder ? 0 : radius;
-		final int endX = includeBorder ? input.width : input.width - radius;
 
 		final int backStep = kernelWidth*input.stride;
 
-		for( int x = startX; x < endX; x++ ) {
+		for( int x = 0; x < input.width; x++ ) {
 			int indexIn = input.startIndex + x;
 			int indexOut = output.startIndex + output.stride*radius + x;
 
@@ -84,10 +77,10 @@ public class ImplConvolveBox {
 
 		// change the order it is processed in to reduce cache misses
 		for( int y = radius+1; y < output.height-radius; y++ ) {
-			int indexIn = input.startIndex + (y+radius)*input.stride+startX;
-			int indexOut = output.startIndex + y*output.stride+startX;
+			int indexIn = input.startIndex + (y+radius)*input.stride;
+			int indexOut = output.startIndex + y*output.stride;
 
-			for( int x = startX; x < endX; x++ ,indexIn++,indexOut++) {
+			for( int x = 0; x < input.width; x++ ,indexIn++,indexOut++) {
 				int total = output.data[ indexOut - output.stride]  - (input.data[ indexIn - backStep ]& 0xFF);
 				total += input.data[ indexIn ]& 0xFF;
 
@@ -96,13 +89,10 @@ public class ImplConvolveBox {
 		}
 	}
 
-	public static void horizontal( ImageUInt8 input , ImageSInt32 output , int radius , boolean includeBorder) {
+	public static void horizontal( ImageUInt8 input , ImageSInt32 output , int radius ) {
 		final int kernelWidth = radius*2 + 1;
 
-		final int startY = includeBorder ? 0 : radius;
-		final int endY = includeBorder ? input.height : input.height - radius;
-
-		for( int y = startY; y < endY; y++ ) {
+		for( int y = 0; y < input.height; y++ ) {
 			int indexIn = input.startIndex + input.stride*y;
 			int indexOut = output.startIndex + output.stride*y + radius;
 
@@ -125,15 +115,12 @@ public class ImplConvolveBox {
 		}
 	}
 
-	public static void vertical( ImageUInt8 input , ImageSInt32 output , int radius , boolean includeBorder ) {
+	public static void vertical( ImageUInt8 input , ImageSInt32 output , int radius ) {
 		final int kernelWidth = radius*2 + 1;
-
-		final int startX = includeBorder ? 0 : radius;
-		final int endX = includeBorder ? input.width : input.width - radius;
 
 		final int backStep = kernelWidth*input.stride;
 
-		for( int x = startX; x < endX; x++ ) {
+		for( int x = 0; x < input.width; x++ ) {
 			int indexIn = input.startIndex + x;
 			int indexOut = output.startIndex + output.stride*radius + x;
 
@@ -148,10 +135,10 @@ public class ImplConvolveBox {
 
 		// change the order it is processed in to reduce cache misses
 		for( int y = radius+1; y < output.height-radius; y++ ) {
-			int indexIn = input.startIndex + (y+radius)*input.stride+startX;
-			int indexOut = output.startIndex + y*output.stride+startX;
+			int indexIn = input.startIndex + (y+radius)*input.stride;
+			int indexOut = output.startIndex + y*output.stride;
 
-			for( int x = startX; x < endX; x++ ,indexIn++,indexOut++) {
+			for( int x = 0; x < input.width; x++ ,indexIn++,indexOut++) {
 				int total = output.data[ indexOut - output.stride]  - (input.data[ indexIn - backStep ]& 0xFF);
 				total += input.data[ indexIn ]& 0xFF;
 
@@ -160,13 +147,10 @@ public class ImplConvolveBox {
 		}
 	}
 
-	public static void horizontal( ImageSInt16 input , ImageInt16 output , int radius , boolean includeBorder) {
+	public static void horizontal( ImageSInt16 input , ImageInt16 output , int radius ) {
 		final int kernelWidth = radius*2 + 1;
 
-		final int startY = includeBorder ? 0 : radius;
-		final int endY = includeBorder ? input.height : input.height - radius;
-
-		for( int y = startY; y < endY; y++ ) {
+		for( int y = 0; y < input.height; y++ ) {
 			int indexIn = input.startIndex + input.stride*y;
 			int indexOut = output.startIndex + output.stride*y + radius;
 
@@ -189,15 +173,12 @@ public class ImplConvolveBox {
 		}
 	}
 
-	public static void vertical( ImageSInt16 input , ImageInt16 output , int radius , boolean includeBorder ) {
+	public static void vertical( ImageSInt16 input , ImageInt16 output , int radius ) {
 		final int kernelWidth = radius*2 + 1;
-
-		final int startX = includeBorder ? 0 : radius;
-		final int endX = includeBorder ? input.width : input.width - radius;
 
 		final int backStep = kernelWidth*input.stride;
 
-		for( int x = startX; x < endX; x++ ) {
+		for( int x = 0; x < input.width; x++ ) {
 			int indexIn = input.startIndex + x;
 			int indexOut = output.startIndex + output.stride*radius + x;
 
@@ -212,10 +193,10 @@ public class ImplConvolveBox {
 
 		// change the order it is processed in to reduce cache misses
 		for( int y = radius+1; y < output.height-radius; y++ ) {
-			int indexIn = input.startIndex + (y+radius)*input.stride+startX;
-			int indexOut = output.startIndex + y*output.stride+startX;
+			int indexIn = input.startIndex + (y+radius)*input.stride;
+			int indexOut = output.startIndex + y*output.stride;
 
-			for( int x = startX; x < endX; x++ ,indexIn++,indexOut++) {
+			for( int x = 0; x < input.width; x++ ,indexIn++,indexOut++) {
 				int total = output.data[ indexOut - output.stride]  - (input.data[ indexIn - backStep ]);
 				total += input.data[ indexIn ];
 
@@ -224,13 +205,10 @@ public class ImplConvolveBox {
 		}
 	}
 
-	public static void horizontal( ImageSInt32 input , ImageSInt32 output , int radius , boolean includeBorder) {
+	public static void horizontal( ImageSInt32 input , ImageSInt32 output , int radius ) {
 		final int kernelWidth = radius*2 + 1;
 
-		final int startY = includeBorder ? 0 : radius;
-		final int endY = includeBorder ? input.height : input.height - radius;
-
-		for( int y = startY; y < endY; y++ ) {
+		for( int y = 0; y < input.height; y++ ) {
 			int indexIn = input.startIndex + input.stride*y;
 			int indexOut = output.startIndex + output.stride*y + radius;
 
@@ -253,15 +231,12 @@ public class ImplConvolveBox {
 		}
 	}
 
-	public static void vertical( ImageSInt32 input , ImageSInt32 output , int radius , boolean includeBorder ) {
+	public static void vertical( ImageSInt32 input , ImageSInt32 output , int radius ) {
 		final int kernelWidth = radius*2 + 1;
-
-		final int startX = includeBorder ? 0 : radius;
-		final int endX = includeBorder ? input.width : input.width - radius;
 
 		final int backStep = kernelWidth*input.stride;
 
-		for( int x = startX; x < endX; x++ ) {
+		for( int x = 0; x < input.width; x++ ) {
 			int indexIn = input.startIndex + x;
 			int indexOut = output.startIndex + output.stride*radius + x;
 
@@ -276,10 +251,10 @@ public class ImplConvolveBox {
 
 		// change the order it is processed in to reduce cache misses
 		for( int y = radius+1; y < output.height-radius; y++ ) {
-			int indexIn = input.startIndex + (y+radius)*input.stride+startX;
-			int indexOut = output.startIndex + y*output.stride+startX;
+			int indexIn = input.startIndex + (y+radius)*input.stride;
+			int indexOut = output.startIndex + y*output.stride;
 
-			for( int x = startX; x < endX; x++ ,indexIn++,indexOut++) {
+			for( int x = 0; x < input.width; x++ ,indexIn++,indexOut++) {
 				int total = output.data[ indexOut - output.stride]  - (input.data[ indexIn - backStep ]);
 				total += input.data[ indexIn ];
 
@@ -288,13 +263,10 @@ public class ImplConvolveBox {
 		}
 	}
 
-	public static void horizontal( ImageFloat32 input , ImageFloat32 output , int radius , boolean includeBorder) {
+	public static void horizontal( ImageFloat32 input , ImageFloat32 output , int radius ) {
 		final int kernelWidth = radius*2 + 1;
 
-		final int startY = includeBorder ? 0 : radius;
-		final int endY = includeBorder ? input.height : input.height - radius;
-
-		for( int y = startY; y < endY; y++ ) {
+		for( int y = 0; y < input.height; y++ ) {
 			int indexIn = input.startIndex + input.stride*y;
 			int indexOut = output.startIndex + output.stride*y + radius;
 
@@ -317,15 +289,12 @@ public class ImplConvolveBox {
 		}
 	}
 
-	public static void vertical( ImageFloat32 input , ImageFloat32 output , int radius , boolean includeBorder ) {
+	public static void vertical( ImageFloat32 input , ImageFloat32 output , int radius ) {
 		final int kernelWidth = radius*2 + 1;
-
-		final int startX = includeBorder ? 0 : radius;
-		final int endX = includeBorder ? input.width : input.width - radius;
 
 		final int backStep = kernelWidth*input.stride;
 
-		for( int x = startX; x < endX; x++ ) {
+		for( int x = 0; x < input.width; x++ ) {
 			int indexIn = input.startIndex + x;
 			int indexOut = output.startIndex + output.stride*radius + x;
 
@@ -340,10 +309,10 @@ public class ImplConvolveBox {
 
 		// change the order it is processed in to reduce cache misses
 		for( int y = radius+1; y < output.height-radius; y++ ) {
-			int indexIn = input.startIndex + (y+radius)*input.stride+startX;
-			int indexOut = output.startIndex + y*output.stride+startX;
+			int indexIn = input.startIndex + (y+radius)*input.stride;
+			int indexOut = output.startIndex + y*output.stride;
 
-			for( int x = startX; x < endX; x++ ,indexIn++,indexOut++) {
+			for( int x = 0; x < input.width; x++ ,indexIn++,indexOut++) {
 				float total = output.data[ indexOut - output.stride]  - (input.data[ indexIn - backStep ]);
 				total += input.data[ indexIn ];
 
@@ -352,13 +321,10 @@ public class ImplConvolveBox {
 		}
 	}
 
-	public static void horizontal( ImageFloat64 input , ImageFloat64 output , int radius , boolean includeBorder) {
+	public static void horizontal( ImageFloat64 input , ImageFloat64 output , int radius ) {
 		final int kernelWidth = radius*2 + 1;
 
-		final int startY = includeBorder ? 0 : radius;
-		final int endY = includeBorder ? input.height : input.height - radius;
-
-		for( int y = startY; y < endY; y++ ) {
+		for( int y = 0; y < input.height; y++ ) {
 			int indexIn = input.startIndex + input.stride*y;
 			int indexOut = output.startIndex + output.stride*y + radius;
 
@@ -381,15 +347,12 @@ public class ImplConvolveBox {
 		}
 	}
 
-	public static void vertical( ImageFloat64 input , ImageFloat64 output , int radius , boolean includeBorder ) {
+	public static void vertical( ImageFloat64 input , ImageFloat64 output , int radius ) {
 		final int kernelWidth = radius*2 + 1;
-
-		final int startX = includeBorder ? 0 : radius;
-		final int endX = includeBorder ? input.width : input.width - radius;
 
 		final int backStep = kernelWidth*input.stride;
 
-		for( int x = startX; x < endX; x++ ) {
+		for( int x = 0; x < input.width; x++ ) {
 			int indexIn = input.startIndex + x;
 			int indexOut = output.startIndex + output.stride*radius + x;
 
@@ -404,10 +367,10 @@ public class ImplConvolveBox {
 
 		// change the order it is processed in to reduce cache misses
 		for( int y = radius+1; y < output.height-radius; y++ ) {
-			int indexIn = input.startIndex + (y+radius)*input.stride+startX;
-			int indexOut = output.startIndex + y*output.stride+startX;
+			int indexIn = input.startIndex + (y+radius)*input.stride;
+			int indexOut = output.startIndex + y*output.stride;
 
-			for( int x = startX; x < endX; x++ ,indexIn++,indexOut++) {
+			for( int x = 0; x < input.width; x++ ,indexIn++,indexOut++) {
 				double total = output.data[ indexOut - output.stride]  - (input.data[ indexIn - backStep ]);
 				total += input.data[ indexIn ];
 
