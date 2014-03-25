@@ -20,19 +20,17 @@ package boofcv.alg.flow;
 
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSInt16;
-import boofcv.struct.image.ImageUInt8;
 
 /**
- * Implementation of {@link HornSchunckPyramid} for {@link ImageUInt8}.
+ * Implementation of {@link boofcv.alg.flow.HornSchunckPyramid} for {@link boofcv.struct.image.ImageUInt8}.
  *
  * @author Peter Abeles
  */
-public class HornSchunckPyramid_U8 extends HornSchunckPyramid<ImageUInt8,ImageSInt16>{
+public class HornSchunckPyramid_F32 extends HornSchunckPyramid<ImageFloat32,ImageFloat32>{
 
 
-	public HornSchunckPyramid_U8(float alpha, float w, int maxIterations, float convergeTolerance,
-								 InterpolatePixelS<ImageFloat32> interp) {
+	public HornSchunckPyramid_F32(float alpha, float w, int maxIterations, float convergeTolerance,
+								  InterpolatePixelS<ImageFloat32> interp) {
 		super(alpha, w, maxIterations, convergeTolerance, interp);
 	}
 
@@ -41,7 +39,7 @@ public class HornSchunckPyramid_U8 extends HornSchunckPyramid<ImageUInt8,ImageSI
 	 * Flow estimates from previous layers are feed into this by setting initFlow and flow to their values.
 	 */
 	@Override
-	protected void processLayer( ImageUInt8 image1 , ImageUInt8 image2 , ImageSInt16 derivX2 , ImageSInt16 derivY2) {
+	protected void processLayer( ImageFloat32 image1 , ImageFloat32 image2 , ImageFloat32 derivX2 , ImageFloat32 derivY2) {
 
 		float uf,vf;
 
@@ -60,19 +58,19 @@ public class HornSchunckPyramid_U8 extends HornSchunckPyramid<ImageUInt8,ImageSI
 					float u = flowX.data[pixelIndex];
 					float v = flowY.data[pixelIndex];
 
-					int I1 = image1.data[pixelIndex] & 0xFF;
-					int I2 = image2.data[pixelIndex] & 0xFF;
+					float I1 = image1.data[pixelIndex];
+					float I2 = image2.data[pixelIndex];
 
-					int I2x = derivX2.data[pixelIndex];
-					int I2y = derivY2.data[pixelIndex];
+					float I2x = derivX2.data[pixelIndex];
+					float I2y = derivY2.data[pixelIndex];
 
 					float AU = A(x,y,flowX);
 					float AV = A(x,y,flowY);
 
-					flowX.data[pixelIndex] = uf = (1-w)*u + w*((I1-I2 + I2x*ui - I2y*(v-vi) )*I2x + alpha2*AU)/(I2x*I2x + alpha2);
-					flowY.data[pixelIndex] = vf = (1-w)*v + w*((I1-I2 + I2y*vi - I2x*(u-ui) )*I2y + alpha2*AV)/(I2y*I2y + alpha2);
+					flowX.data[pixelIndex] = uf = (1-w)*u + w*((I1-I2+I2x*ui - I2y*(v-vi))*I2x + alpha2*AU)/(I2x*I2x + alpha2);
+					flowY.data[pixelIndex] = vf = (1-w)*v + w*((I1-I2+I2y*vi - I2x*(u-ui))*I2y + alpha2*AV)/(I2y*I2y + alpha2);
 
-					if( Float.isNaN(uf) || Float.isNaN(vf) || Float.isInfinite(uf) || Float.isInfinite(vf) ) {
+					if( Float.isNaN(uf) || Float.isNaN(vf)) {
 						System.out.println();
 					}
 

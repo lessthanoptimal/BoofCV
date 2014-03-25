@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -106,6 +106,22 @@ public class GImageDerivativeOps {
 			GradientThree.process((ImageUInt8)input,(ImageSInt16)derivX,(ImageSInt16)derivY,(ImageBorder_I32)border);
 		} else if( input instanceof ImageSInt16 ) {
 			GradientThree.process((ImageSInt16)input,(ImageSInt16)derivX,(ImageSInt16)derivY,(ImageBorder_I32)border);
+		} else {
+			throw new IllegalArgumentException("Unknown input image type: "+input.getClass().getSimpleName());
+		}
+	}
+
+	public static <I extends ImageSingleBand, D extends ImageSingleBand>
+	void two( I input , D derivX , D derivY , BorderType borderType )
+	{
+		ImageBorder<I> border = BorderType.SKIP == borderType ? null : FactoryImageBorder.general(input,borderType);
+
+		if( input instanceof ImageFloat32 ) {
+			GradientTwo.process((ImageFloat32)input,(ImageFloat32)derivX,(ImageFloat32)derivY,(ImageBorder_F32)border);
+		} else if( input instanceof ImageUInt8 ) {
+			GradientTwo.process((ImageUInt8)input,(ImageSInt16)derivX,(ImageSInt16)derivY,(ImageBorder_I32)border);
+		} else if( input instanceof ImageSInt16 ) {
+			GradientTwo.process((ImageSInt16)input,(ImageSInt16)derivX,(ImageSInt16)derivY,(ImageBorder_I32)border);
 		} else {
 			throw new IllegalArgumentException("Unknown input image type: "+input.getClass().getSimpleName());
 		}

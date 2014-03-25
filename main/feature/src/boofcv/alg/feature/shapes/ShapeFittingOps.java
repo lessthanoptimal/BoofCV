@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,7 +39,7 @@ import java.util.List;
  * contour or edge.
  *
  * @see boofcv.alg.feature.detect.edge.CannyEdge
- * @see boofcv.alg.filter.binary.BinaryImageOps#contour(boofcv.struct.image.ImageUInt8, int, boofcv.struct.image.ImageSInt32)
+ * @see boofcv.alg.filter.binary.BinaryImageOps#contour(boofcv.struct.image.ImageUInt8, boofcv.struct.ConnectRule, boofcv.struct.image.ImageSInt32)
  *
  * @author Peter Abeles
  */
@@ -130,18 +130,12 @@ public class ShapeFittingOps {
 			ClosestPointEllipseAngle_F64 closestPoint = new ClosestPointEllipseAngle_F64(1e-8,100);
 			closestPoint.setEllipse(outputStorage.shape);
 
-			int N = 0;
 			double total = 0;
 			for( Point2D_F64 p : points ) {
-				if( closestPoint.process(p) ) {
-					N++;
-					total += p.distance(closestPoint.getClosest());
-				}
+				closestPoint.process(p);
+				total += p.distance(closestPoint.getClosest());
 			}
-			if( N == 0 )
-				outputStorage.error = 0;
-			else
-				outputStorage.error = total/N;
+			outputStorage.error = total/points.size();
 		} else {
 			outputStorage.error = 0;
 		}

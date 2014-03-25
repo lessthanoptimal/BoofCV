@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -42,17 +42,18 @@ public class CompareDerivativeToConvolution {
 
 	Method m;
 	FilterImageInterface outputFilters[];
+	Border borders[];
 
 	Class<ImageSingleBand> inputType;
 	Class<ImageSingleBand> outputType;
 
 	boolean processBorder;
-	int borderSize = 0;
 
 	public void setTarget( Method m )  {
 		this.m = m;
 		Class<?> []param = m.getParameterTypes();
 		outputFilters = new FilterImageInterface<?,?>[ param.length ];
+		borders = new Border[ param.length ];
 
 		inputType = (Class<ImageSingleBand>)param[0];
 		outputType = (Class<ImageSingleBand>)param[1];
@@ -63,25 +64,19 @@ public class CompareDerivativeToConvolution {
 		FilterImageInterface<?,?> f2 = FactoryConvolve.convolve(vertical,outputType,outputType, BorderType.EXTENDED,false);
 
 		outputFilters[which] = new FilterSequence(f1,f2);
+		borders[which] = setBorder(horizontal,vertical);
 
-		if( borderSize < horizontal.getRadius() )
-			borderSize = horizontal.getRadius();
-		if( borderSize < vertical.getRadius() )
-			borderSize = vertical.getRadius();
 	}
 
 	public void setKernel( int which , Kernel1D kernel , boolean isHorizontal) {
 		outputFilters[which] =
 				FactoryConvolve.convolve(kernel,inputType,outputType, BorderType.EXTENDED,isHorizontal);
-		if( borderSize < kernel.getRadius() )
-			borderSize = kernel.getRadius();
+		borders[which] = setBorder(kernel,isHorizontal);
 	}
 
 	public void setKernel( int which , Kernel2D kernel ) {
-		outputFilters[which] =
-				FactoryConvolve.convolve(kernel,inputType,outputType, BorderType.EXTENDED);
-		if( borderSize < kernel.getRadius() )
-			borderSize = kernel.getRadius();
+		outputFilters[which] = FactoryConvolve.convolve(kernel,inputType,outputType, BorderType.EXTENDED);
+		borders[which] = setBorder(kernel);
 	}
 	public void compare( ImageSingleBand inputImage , ImageSingleBand...outputImages)  {
 		compare(false,inputImage,outputImages);
@@ -135,11 +130,13 @@ public class CompareDerivativeToConvolution {
 
 		// compare the results
 		for( int i = 0; i < expectedOutput.length; i++ ) {
-			int border = processBorder ? 0 : borderSize;
-			BoofTesting.assertEqualsInner(expectedOutput[i], outputImages[i], 1e-4f, border, border, false);
+			Border b = borders[i];
+
+			BoofTesting.assertEqualsInner(expectedOutput[i], outputImages[i], 1e-4f,
+					b.borderX0, b.borderY0, b.borderX1, b.borderY1, false);
 
 			if( !processBorder )
-				BoofTesting.checkBorderZero(outputImages[i],border);
+				BoofTesting.checkBorderZero(outputImages[i],b.borderX0, b.borderY0, b.borderX1, b.borderY1);
 		}
 	}
 
@@ -159,5 +156,48 @@ public class CompareDerivativeToConvolution {
 		}
 
 		return count;
+	}
+
+	private Border setBorder( Kernel2D kernel ) {
+		Border b = new Border();
+		b.borderX0 = b.borderX1 = b.borderY0 = b.borderY1 = kernel.getRadius();
+		return b;
+	}
+
+	private Border setBorder( Kernel1D kernel , boolean isHorizontal ) {
+		return setBorder(kernel, kernel);
+		// just assume it is going to convolve both at the same time
+//		Border b = new Border();
+//		if( isHorizontal ) {
+//			b.borderX0 = kernel.getOffset();
+//			b.borderX1 = kernel.getWidth() - kernel.getOffset() - 1;
+//			b.borderY0 = 0;
+//			b.borderY1 = 0;
+//		} else {
+//			b.borderX0 = 0;
+//			b.borderX1 = 0;
+//			b.borderY0 = kernel.getOffset();
+//			b.borderY1 = kernel.getWidth() - kernel.getOffset() - 1;
+//		}
+//		return b;
+	}
+
+	private Border setBorder( Kernel1D horizontal , Kernel1D vertical ) {
+		Border b = new Border();
+		b.borderX0 = horizontal.getOffset();
+		b.borderX1 = horizontal.getWidth() - horizontal.getOffset() - 1;
+		b.borderY0 = horizontal.getOffset();
+		b.borderY1 = horizontal.getWidth() - horizontal.getOffset() - 1;
+
+		if( horizontal.getWidth() != vertical.getWidth() )
+			throw new RuntimeException("handle this case in the unit test");
+		return b;
+	}
+
+	private static class Border {
+		int borderX0 = 0;
+		int borderY0 = 0;
+		int borderX1 = 0;
+		int borderY1 = 0;
 	}
 }

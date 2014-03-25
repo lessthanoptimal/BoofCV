@@ -54,9 +54,10 @@ public class ExampleDenseOpticalFlow {
 //		String fileName1 = "../data/applet/denseflow/Grove2_09.png";
 
 		DenseOpticalFlow<ImageUInt8> denseFlow =
-//				FactoryDenseOpticalFlow.flowKlt(null, 6, ImageUInt8.class, null);
+				FactoryDenseOpticalFlow.flowKlt(null, 6, ImageUInt8.class, null);
 //				FactoryDenseOpticalFlow.region(null,ImageUInt8.class);
-				FactoryDenseOpticalFlow.hornSchunck(20, 1000, ImageUInt8.class);
+//				FactoryDenseOpticalFlow.hornSchunck(20, 1000, ImageUInt8.class);
+//				FactoryDenseOpticalFlow.hornSchunckPyramid(5, 1.9f, 0.7, 0.5, 10, ImageUInt8.class, ImageSInt16.class);
 
 		BufferedImage buff0 = media.openImage(fileName0);
 		BufferedImage buff1 = media.openImage(fileName1);

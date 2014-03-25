@@ -47,6 +47,7 @@ Version : Alpha 0.17
   * Thanks Julien Seinturier for the suggestion
 - Convolution
   * 1D convolution now supports kernels which are not symmetric
+- Image gradient from a difference of two neighbors added
 
 - TODO Application DenseOpticalFlow
 - TODO ExampleBundleAdjustment

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -63,7 +63,7 @@ public class ImplBilinearPixel_F32 extends BilinearPixel<ImageFloat32> {
 	@Override
 	public float get(float x, float y) {
 		if (x < 0 || y < 0 || x > width-1 || y > height-1)
-			throw new IllegalArgumentException("Point is outside of the image");
+			throw new IllegalArgumentException("Point is outside of the image: "+x+" "+y);
 
 		int xt = (int) x;
 		int yt = (int) y;

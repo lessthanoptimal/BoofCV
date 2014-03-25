@@ -19,15 +19,14 @@
 package boofcv.factory.flow;
 
 import boofcv.abst.filter.derivative.ImageGradient;
-import boofcv.abst.flow.DenseOpticalFlow;
-import boofcv.abst.flow.FlowBlock_to_DenseOpticalFlow;
-import boofcv.abst.flow.FlowKlt_to_DenseOpticalFlow;
-import boofcv.abst.flow.HornSchunck_to_DenseOpticalFlow;
+import boofcv.abst.flow.*;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.alg.flow.*;
+import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.tracker.klt.PkltConfig;
 import boofcv.alg.tracker.klt.PyramidKltTracker;
 import boofcv.factory.filter.derivative.FactoryDerivative;
+import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.factory.tracker.FactoryTrackerAlg;
 import boofcv.factory.transform.pyramid.FactoryPyramid;
 import boofcv.struct.image.ImageFloat32;
@@ -129,5 +128,31 @@ public class FactoryDenseOpticalFlow {
 			throw new IllegalArgumentException("Unsupported image type "+imageType);
 
 		return new HornSchunck_to_DenseOpticalFlow<T,D>(alg, ImageType.single(imageType));
+	}
+
+	/**
+	 * TODO comment
+	 *
+	 * @param alpha
+	 * @param numIterations
+	 * @param imageType
+	 * @return
+	 */
+	public static <T extends ImageSingleBand,D extends ImageSingleBand>
+	DenseOpticalFlow<T> hornSchunckPyramid( float alpha , float w , double scale , double sigma , int numIterations,
+											Class<T> imageType , Class<D> derivType )
+	{
+		InterpolatePixelS<ImageFloat32> interpolate = FactoryInterpolation.bilinearPixelS(ImageFloat32.class);
+
+		HornSchunckPyramid<T,D> alg;
+		if( imageType == ImageUInt8.class )
+			alg = (HornSchunckPyramid)new HornSchunckPyramid_U8(alpha,w,numIterations,1e-5f,interpolate);
+		else
+		if( imageType == ImageFloat32.class )
+			alg = (HornSchunckPyramid)new HornSchunckPyramid_F32(alpha,w,numIterations,1e-5f,interpolate);
+		else
+			throw new IllegalArgumentException("Unsupported image type "+imageType);
+
+		return new HornSchunckPyramid_to_DenseOpticalFlow<T,D>(alg, scale,sigma,ImageType.single(imageType),ImageType.single(derivType));
 	}
 }

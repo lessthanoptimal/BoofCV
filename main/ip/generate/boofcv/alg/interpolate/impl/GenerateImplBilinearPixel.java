@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -114,7 +114,7 @@ public class GenerateImplBilinearPixel extends CodeGeneratorBase {
 				"\t@Override\n" +
 				"\tpublic float get(float x, float y) {\n" +
 				"\t\tif (x < 0 || y < 0 || x > width-1 || y > height-1)\n" +
-				"\t\t\tthrow new IllegalArgumentException(\"Point is outside of the image\");\n" +
+				"\t\t\tthrow new IllegalArgumentException(\"Point is outside of the image \"+x+\" \"+y);\n" +
 				"\n" +
 				"\t\tint xt = (int) x;\n" +
 				"\t\tint yt = (int) y;\n" +
