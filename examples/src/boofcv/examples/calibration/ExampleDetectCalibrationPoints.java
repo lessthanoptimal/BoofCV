@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -55,7 +55,7 @@ public class ExampleDetectCalibrationPoints {
 		PlanarCalibrationDetector detector;
 
 		// For chessboard targets, tune RADIUS parameter for your images
-//		detector = FactoryPlanarCalibrationTarget.detectorSquareGrid( 5, 7);
+//		detector = FactoryPlanarCalibrationTarget.detectorSquareGrid( new ConfigSquareGrid(5,7));
 		detector = FactoryPlanarCalibrationTarget.detectorChessboard( new ConfigChessboard(5,7));
 
 		// process the image and check for failure condition
