@@ -539,6 +539,46 @@ public class BoofTesting {
 		}
 	}
 
+	public static void assertEqualsInner(ImageBase imgA, ImageBase imgB, double tol ,
+										 int borderX0 , int borderY0 , int borderX1 , int borderY1 ,
+										 boolean relative ) {
+
+		// if no specialized check exists, use a slower generalized approach
+		if( imgA instanceof ImageSingleBand ) {
+			GImageSingleBand a = FactoryGImageSingleBand.wrap((ImageSingleBand)imgA);
+			GImageSingleBand b = FactoryGImageSingleBand.wrap((ImageSingleBand)imgB);
+
+			for( int y = borderY0; y < imgA.height-borderY1; y++ ) {
+				for( int x = borderX0; x < imgA.width-borderX1; x++ ) {
+					double valA = a.get(x,y).doubleValue();
+					double valB = b.get(x,y).doubleValue();
+
+					double error = Math.abs(valA - valB);
+					if( relative ) {
+						double denominator = Math.abs(valA) + Math.abs(valB);
+						if( denominator == 0 )
+							denominator = 1;
+						error /= denominator;
+					}
+					if( error > tol )
+						throw new RuntimeException("Values not equal at ("+x+","+y+") "+valA+"  "+valB);
+				}
+			}
+		} else if( imgA instanceof MultiSpectral ){
+			MultiSpectral a = (MultiSpectral)imgA;
+			MultiSpectral b = (MultiSpectral)imgB;
+
+			if( a.getNumBands() != b.getNumBands() )
+				throw new RuntimeException("Number of bands not equal");
+
+			for( int band = 0; band < a.getNumBands(); band++ ) {
+				assertEqualsInner(a.getBand(band),b.getBand(band),tol,borderX0,borderY0,borderX1,borderY1,relative );
+			}
+		} else {
+			throw new RuntimeException("Unknown image type");
+		}
+	}
+
 	public static void assertEqualsRelative(ImageBase imgA, ImageBase imgB, double tolFrac ) {
 
 		// if no specialized check exists, use a slower generalized approach
@@ -1022,6 +1062,22 @@ public class BoofTesting {
 
 			for (int x = 0; x < img.getWidth(); x++) {
 				if (x >= border && x < img.getWidth() - border)
+					continue;
+				if (img.get(x, y).intValue() != 0)
+					throw new RuntimeException("The border is not zero: "+x+" "+y);
+			}
+		}
+	}
+
+	public static void checkBorderZero(ImageSingleBand outputImage, int borderX0 , int borderY0 , int borderX1 , int borderY1 ) {
+		GImageSingleBand img = FactoryGImageSingleBand.wrap(outputImage);
+
+		for (int y = 0; y < img.getHeight(); y++) {
+			if (y >= borderY0  && y < img.getHeight() - borderY1)
+				continue;
+
+			for (int x = 0; x < img.getWidth(); x++) {
+				if (x >= borderX0 && x < img.getWidth() - borderX1)
 					continue;
 				if (img.get(x, y).intValue() != 0)
 					throw new RuntimeException("The border is not zero: "+x+" "+y);

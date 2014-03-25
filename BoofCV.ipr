@@ -413,6 +413,13 @@
     </option>
     <option name="USE_PER_PROJECT_SETTINGS" value="true" />
   </component>
+  <component name="ProjectDictionaryState">
+    <dictionary name="pja">
+      <words>
+        <w>minima</w>
+      </words>
+    </dictionary>
+  </component>
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/BoofCV.iml" filepath="$PROJECT_DIR$/BoofCV.iml" />

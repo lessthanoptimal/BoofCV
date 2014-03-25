@@ -15,6 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package boofcv.struct.convolve;
 
 /**
@@ -39,6 +40,8 @@ public class Kernel1D_I32 extends Kernel1D {
 	 */
 	public Kernel1D_I32(int data[], int width) {
 		this(data,width/2,width);
+		if( width % 2 != 1 )
+			throw new IllegalArgumentException("Kernel must be add to use this constructor");
 	}
 
 	/**

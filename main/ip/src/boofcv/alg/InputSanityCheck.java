@@ -107,4 +107,12 @@ public class InputSanityCheck {
 		if (imgA.height != imgB.height || imgA.height != imgC.height || imgA.height != imgD.height || imgA.height != imgE.height)
 			throw new IllegalArgumentException("Image heights do not match.");
 	}
+
+	/**
+	 * Makes sure the input image is not a sub-image
+	 */
+	public static void checkSubimage( ImageBase image ) {
+		if( image.isSubimage() )
+			throw new IllegalArgumentException("Input image cannot be a subimage");
+	}
 }

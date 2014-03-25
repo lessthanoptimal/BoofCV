@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -73,6 +73,13 @@ public class FactoryDerivative {
 	ImageGradient<I,D> three( Class<I> inputType , Class<D> derivType)
 	{
 		Method m = findDerivative(GradientThree.class,inputType,derivType);
+		return new ImageGradient_Reflection<I,D>(m);
+	}
+
+	public static <I extends ImageSingleBand, D extends ImageSingleBand>
+	ImageGradient<I,D> two( Class<I> inputType , Class<D> derivType)
+	{
+		Method m = findDerivative(GradientTwo.class,inputType,derivType);
 		return new ImageGradient_Reflection<I,D>(m);
 	}
 
