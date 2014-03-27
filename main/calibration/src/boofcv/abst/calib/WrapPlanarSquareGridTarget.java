@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,7 +23,6 @@ import boofcv.alg.feature.detect.grid.DetectSquareCalibrationPoints;
 import boofcv.alg.feature.detect.grid.RefineCalibrationGridCorner;
 import boofcv.alg.feature.detect.grid.UtilCalibrationGrid;
 import boofcv.alg.feature.detect.grid.refine.WrapRefineCornerSegmentFit;
-import boofcv.alg.feature.detect.quadblob.OrderPointsIntoGrid;
 import boofcv.alg.feature.detect.quadblob.QuadBlob;
 import boofcv.alg.filter.binary.GThresholdImageOps;
 import boofcv.struct.image.ImageFloat32;
@@ -52,8 +51,6 @@ public class WrapPlanarSquareGridTarget implements PlanarCalibrationDetector {
 	// set of found points
 	List<Point2D_F64> ret;
 
-	OrderPointsIntoGrid orderAlg = new OrderPointsIntoGrid();
-
 	ImageFloat32 work1 = new ImageFloat32(1,1);
 	ImageFloat32 work2 = new ImageFloat32(1,1);
 
@@ -69,7 +66,7 @@ public class WrapPlanarSquareGridTarget implements PlanarCalibrationDetector {
 		pointColumns = (squareColumns/2+1)*2;
 		pointRows = (config.numRows/2+1)*2;
 
-		detect = new DetectSquareCalibrationPoints(500,config.relativeSizeThreshold,squareColumns,config.numRows);
+		detect = new DetectSquareCalibrationPoints(config.relativeSizeThreshold,config.spaceToSquareRatio , squareColumns,config.numRows);
 	}
 
 	@Override
@@ -97,16 +94,14 @@ public class WrapPlanarSquareGridTarget implements PlanarCalibrationDetector {
 			// refine the corner accuracy estimate to sub-pixel
 			refine.refine(squares,input);
 
-			List<Point2D_F64> unordered = new ArrayList<Point2D_F64>();
+			List<Point2D_F64> subpixel = new ArrayList<Point2D_F64>();
 			for( QuadBlob b : squares ) {
 				for( Point2D_F64 p : b.subpixel )
-					unordered.add(p);
+					subpixel.add(p);
 			}
 
-			orderAlg.process(unordered);
-
-			ret = UtilCalibrationGrid.rotatePoints(orderAlg.getOrdered(),
-					orderAlg.getNumRows(),orderAlg.getNumCols(),
+			ret = UtilCalibrationGrid.rotatePoints(subpixel,
+					pointRows,pointColumns,
 					pointRows,pointColumns);
 		} catch( InvalidCalibrationTarget e ) {
 //			e.printStackTrace();

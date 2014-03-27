@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,10 +36,7 @@ public class ConfigSquareGrid implements Configuration {
 	 * Number of squares tall the grid is. Target dependent.
 	 */
 	public int numRows = -1;
-	/**
-	 * Maximum number of combinations of squares it will try when looking for a target. Try 500.
-	 */
-	public int maxCombinations = 500;
+
 	/**
 	 * Increases or decreases the minimum allowed blob size. Try 1.0
 	 */
@@ -57,16 +54,27 @@ public class ConfigSquareGrid implements Configuration {
 	 */
 	public double binaryAdaptiveBias = -10;
 
-	public ConfigSquareGrid(int numCols, int numRows) {
+	/**
+	 * Length of the space relative to the length of a square in the grid
+	 */
+	public double spaceToSquareRatio = 1.0;
+
+	public ConfigSquareGrid(int numCols, int numRows ) {
 		this.numCols = numCols;
 		this.numRows = numRows;
 	}
 
-	public ConfigSquareGrid(int numCols, int numRows, int maxCombinations,
+	public ConfigSquareGrid(int numCols, int numRows , double spaceToSquareRatio ) {
+		this.numCols = numCols;
+		this.numRows = numRows;
+		this.spaceToSquareRatio = spaceToSquareRatio;
+	}
+
+	public ConfigSquareGrid(int numCols, int numRows, double spaceToSquareRatio ,
 							double relativeSizeThreshold) {
 		this.numCols = numCols;
 		this.numRows = numRows;
-		this.maxCombinations = maxCombinations;
+		this.spaceToSquareRatio = spaceToSquareRatio;
 		this.relativeSizeThreshold = relativeSizeThreshold;
 	}
 

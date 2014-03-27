@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,8 +19,6 @@
 package boofcv.alg.feature.detect.grid;
 
 import boofcv.alg.feature.detect.quadblob.QuadBlob;
-import georegression.metric.Intersection2D_F64;
-import georegression.struct.line.LineSegment2D_F64;
 import georegression.struct.point.Point2D_I32;
 
 import java.util.ArrayList;
@@ -82,81 +80,99 @@ public class ConnectGridSquares {
 	 * For each blob it finds the blobs which are directly next to it.  Up to 4 blobs can be next to
 	 * any blob and two connected blobs should have the closes side approximately parallel.
 	 */
-	public static void connect( List<QuadBlob> blobs ) {
-
-		LineSegment2D_F64 centerLine = new LineSegment2D_F64();
-		LineSegment2D_F64 cornerLine = new LineSegment2D_F64();
+	public static void connect( List<QuadBlob> blobs , double spaceToSquareRatio ) {
 
 		for( int i = 0; i < blobs.size(); i++ ) {
 			QuadBlob b = blobs.get(i);
-			// for each pair of corners, find the closest blob
-			// center line between blobs must intersect line segment between two corners
-
-			centerLine.a.set(b.center.x,b.center.y);
 
 			// examine each side in the blob
 			for( int j = 0; j < 4; j++ ) {
 				Point2D_I32 c0 = b.corners.get(j);
 				Point2D_I32 c1 = b.corners.get((j+1)%4);
+				Point2D_I32 c2 = b.corners.get((j+2)%4);
+				Point2D_I32 c3 = b.corners.get((j+3)%4);
 
-				cornerLine.a.set(c0.x,c0.y);
-				cornerLine.b.set(c1.x,c1.y);
-
-				// see if another node already placed a connection to this side
-				if( checkConnection(b.conn,centerLine,cornerLine)) {
-					continue;
-				}
-
-				double best = Double.MAX_VALUE;
-				QuadBlob bestBlob = null;
-
-				// find the blob which is closest to it and "approximately parallel"
+				double bestDistance = Math.max(2,b.largestSide*0.2);
+				QuadBlob bestQuad = null;
 				for( int k = i+1; k < blobs.size(); k++ ) {
-					QuadBlob c = blobs.get(k);
+					QuadBlob candidate = blobs.get(k);
 
-					centerLine.b.set(c.center.x,c.center.y);
-
-					// two sides are declared approximately parallel if the center line intersects
-					// the sides of blob 'b'
-					if(Intersection2D_F64.intersection(cornerLine, centerLine, null) != null ) {
-						double d = c.center.distance2(b.center);
-						if( d < best  ) {
-							// the physical distance between centers is 2 time a side's length
-							// and perspective distortion would only make it shorter,
-							// 2.5 = 2 + fudge factor
-							// NOTE: Could be improved by having it be the length of perpendicular sides
-							double max = Math.min(c.largestSide, b.largestSide)*2.5;
-							if( d < max*max ) {
-								best = d;
-								bestBlob = c;
-							}
-						}
+					double d = predictedDistance(c0,c1,c2,c3,candidate,spaceToSquareRatio);
+					if( !Double.isNaN(d) && d < bestDistance ) {
+						bestDistance = d;
+						bestQuad = candidate;
 					}
 				}
 
-				if( bestBlob != null ) {
-					bestBlob.conn.add(b);
-					b.conn.add(bestBlob);
+				// make the connection
+				if( bestQuad != null ) {
+					bestQuad.conn.add(b);
+					b.conn.add(bestQuad);
 				}
 			}
 		}
 	}
 
 	/**
-	 * Checks to see if a connection has already been added to this side
+	 * Distance metric between the two quads for a particular side.  Allows the distance between the two sides
+	 * to be arbitrary since it can very.  Better way would be to use information in target description
 	 */
-	private static boolean checkConnection( List<QuadBlob> connections ,
-											LineSegment2D_F64 centerLine,
-											LineSegment2D_F64 cornerLine ) {
+	private static double predictedDistance( Point2D_I32 a0 , Point2D_I32 a1,
+											 Point2D_I32 a2 , Point2D_I32 a3 ,
+											 QuadBlob b , double spaceToSquareRatio ) {
 
-		for( QuadBlob b : connections ) {
-			centerLine.b.set(b.center.x,b.center.y);
-			if(Intersection2D_F64.intersection(cornerLine,centerLine,null) != null ) {
-				return true;
+		double total = 0;
+
+		// find equivalent side on b
+		Point2D_I32 b0 = findClosest(a0,a1,b);
+		Point2D_I32 b1 = findClosest(a1,a0,b);
+
+		total += Math.abs(a0.distance(a1) - b0.distance(b1));
+
+		// crudely take on account perspective distortion by scaling it by the difference in the two faces
+		double predictedSpace = spaceToSquareRatio*a0.distance(a1);
+		double actualSpace = (a0.distance(b0) + a1.distance(b1))/2;
+
+		// perspective distortion requires a very large margin of error here.  This could be shrunk
+		// if it was accurately estimated
+		if( Math.abs(predictedSpace-actualSpace)/predictedSpace > 0.6 )
+			return Double.NaN;
+
+		total +=  Math.abs(predictedSpace-actualSpace);
+
+		// continue computing the difference between side lengths
+		Point2D_I32 predB0 = new Point2D_I32(b0.x + a0.x-a3.x , b0.y + a0.y-a3.y);
+		Point2D_I32 predB1 = new Point2D_I32(b1.x + a1.x-a2.x , b1.y + a1.y-a2.y);
+
+		Point2D_I32 b2 = findClosest(predB1,predB0,b);
+		Point2D_I32 b3 = findClosest(predB0,predB1,b);
+
+		total += Math.abs(a2.distance(a3) - b2.distance(b3));
+		total += Math.abs(a0.distance(a3) - b0.distance(b3));
+		total += Math.abs(a1.distance(a2) - b1.distance(b2));
+
+		return total/(4+1);
+	}
+
+	private static Point2D_I32 findClosest(Point2D_I32 a0 , Point2D_I32 a1, QuadBlob blob )  {
+		double best = Double.MAX_VALUE;
+		Point2D_I32 bestPoint = null;
+
+		for( int i = 0; i < 4; i++ ) {
+			// encourage it to be close to the first corner
+			double d = a0.distance(blob.corners.get(i));
+			// penalize it for being close to the other corner
+			double d1 = a1.distance(blob.corners.get(i));
+
+			d -= d1;
+
+			if( d < best ) {
+				best = d;
+				bestPoint = blob.corners.get(i);
 			}
 		}
 
-		return false;
+		return bestPoint;
 	}
 
 	/**

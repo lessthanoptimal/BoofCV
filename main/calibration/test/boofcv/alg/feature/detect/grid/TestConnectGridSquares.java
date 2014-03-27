@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -86,14 +86,14 @@ public class TestConnectGridSquares {
 	public void basic() throws InvalidCalibrationTarget {
 		List<QuadBlob> blobs = new ArrayList<QuadBlob>();
 
-		blobs.add( createBlob(5,5,1));
-		blobs.add( createBlob(7,5,1));
-		blobs.add( createBlob(9,5,1));
+		blobs.add( createBlob(5,7,1));
+		blobs.add( createBlob(10,7,1));
+		blobs.add( createBlob(15,7,1));
 		blobs.add( createBlob(5,2,1));
-		blobs.add( createBlob(7,2,1));
-		blobs.add( createBlob(9,2,1));
+		blobs.add( createBlob(10,2,1));
+		blobs.add( createBlob(15,2,1));
 
-		ConnectGridSquares.connect(blobs);
+		ConnectGridSquares.connect(blobs,1);
 
 		// see if they have the expected number of connections
 		assertEquals(2, blobs.get(0).conn.size());

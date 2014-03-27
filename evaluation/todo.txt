@@ -2,3 +2,7 @@
 - Speed up ImageMotionBaseApp by translating the buffered image into a BoofCV interleaved int32 image
   * Faster to distort the color image later on
   * Might make gray scale slightly slower
+
+- Subpixel square grid has issues if the white border surrounding the squares is small.
+- If a false positive is near the square grid and gets added to a column or row it will cause the whole thing
+  to fail when it could probably be easily filtered

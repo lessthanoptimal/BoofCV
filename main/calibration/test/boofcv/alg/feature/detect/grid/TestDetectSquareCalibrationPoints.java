@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -56,7 +56,7 @@ public class TestDetectSquareCalibrationPoints {
 		// add a bit of noise
 		ImageMiscOps.fillRectangle(binary,1,400,100,25,22);
 
-		DetectSquareCalibrationPoints alg = new DetectSquareCalibrationPoints(100,1.0,7,5);
+		DetectSquareCalibrationPoints alg = new DetectSquareCalibrationPoints(1.0,1.0,7,5);
 
 		assertTrue(alg.process(binary));
 
