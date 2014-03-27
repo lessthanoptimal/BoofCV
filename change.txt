@@ -48,6 +48,9 @@ Version : Alpha 0.17
 - Convolution
   * 1D convolution now supports kernels which are not symmetric
 - Image gradient from a difference of two neighbors added
+- Square grid calibration grid detector has been improved.
+  * No longer permutes through all combinations.  Selects each valid square and assumes its the first instead
+  * Graph connection rule has been improved too to reduce false connections
 
 - TODO Application DenseOpticalFlow
 - TODO ExampleBundleAdjustment

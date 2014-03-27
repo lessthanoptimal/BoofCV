@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -75,7 +75,7 @@ public class DebugSquaresSubpixelApp
 		this.targetColumns = numSquaresCol;
 		this.targetRows = numSquaresRow;
 
-		detectAlg = new DetectSquareCalibrationPoints(500,1.0,targetColumns,targetRows);
+		detectAlg = new DetectSquareCalibrationPoints(1.0,1.0,targetColumns,targetRows);
 
 //		refineAlg = new WrapCornerIntensity<T,ImageSingleBand>(1,imageType);
 //		refineAlg = new WrapRefineCornerSegmentFit();

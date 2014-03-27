@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -194,7 +194,7 @@ public class CalibrateMonoPlanarGuiApp extends JPanel
 	}
 
 	public static void main( String args[] ) {
-//		PlanarCalibrationDetector detector = FactoryPlanarCalibrationTarget.detectorSquareGrid(new ConfigSquareGrid(15,15));
+//		PlanarCalibrationDetector detector = FactoryPlanarCalibrationTarget.detectorSquareGrid(new ConfigSquareGrid(15,15, 14.0/18.0));
 //		PlanarCalibrationDetector detector = FactoryPlanarCalibrationTarget.detectorSquareGrid(new ConfigSquareGrid(5,7));
 		PlanarCalibrationDetector detector = FactoryPlanarCalibrationTarget.detectorChessboard(new ConfigChessboard(5,7));
 
@@ -203,14 +203,14 @@ public class CalibrateMonoPlanarGuiApp extends JPanel
 		PlanarCalibrationTarget target = FactoryPlanarCalibrationTarget.gridChess(5, 7, 30);
 
 //		String directory = "../data/evaluation/calibration/mono/Sony_DSC-HX5V_Square";
-		String directory = "../data/evaluation/calibration/mono/Sony_DSC-HX5V_Chess";
+//		String directory = "../data/evaluation/calibration/mono/Sony_DSC-HX5V_Chess";
 //		String directory = "../data/evaluation/calibration/mono/PULNiX_CCD_6mm_Zhang";
-//		String directory = "../data/evaluation/calibration/stereo/Bumblebee2_Chess";
+		String directory = "../data/evaluation/calibration/stereo/Bumblebee2_Chess";
 //		String directory = "../data/evaluation/calibration/stereo/Bumblebee2_Square";
 
 		CalibrateMonoPlanarGuiApp app = new CalibrateMonoPlanarGuiApp();
-		app.configure(detector,target,BoofMiscOps.directoryList(directory, "frame" ),false);
-//		app.configure(detector,target,BoofMiscOps.directoryList(directory, "left" ),false);
+//		app.configure(detector,target,BoofMiscOps.directoryList(directory, "frame" ),false);
+		app.configure(detector,target,BoofMiscOps.directoryList(directory, "left" ),false);
 //		app.configure(detector,target,BoofMiscOps.directoryList(directory, "CalibIm" ),false);
 
 		JFrame frame = new JFrame("Planar Calibration");

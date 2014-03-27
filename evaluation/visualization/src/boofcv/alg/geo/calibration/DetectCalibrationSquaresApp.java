@@ -96,7 +96,7 @@ public class DetectCalibrationSquaresApp
 		this.targetColumns = numCols;
 		this.targetRows = numRows;
 
-		alg = new DetectSquareCalibrationPoints(500,1.0,targetColumns,targetRows);
+		alg = new DetectSquareCalibrationPoints(1.0,1.0,targetColumns,targetRows);
 	}
 
 
@@ -183,7 +183,11 @@ public class DetectCalibrationSquaresApp
 				drawBounds(g2,targetBounds);
 			calibGUI.setSuccessMessage("FOUND",true);
 		} else {
-			drawSquareCorners(g2,alg.getSquaresBad(),Color.BLUE);
+			drawSquareCorners(g2,alg.getSquaresBad(),Color.RED);
+			drawSquareCorners(g2,alg.getInterestSquares(),Color.BLUE);
+
+			if( calibGUI.isShowGraph())
+				drawGraph(g2, alg.getInterestSquares());
 
 			calibGUI.setSuccessMessage("FAILED", false);
 		}
@@ -205,8 +209,8 @@ public class DetectCalibrationSquaresApp
 		g2.setStroke(new BasicStroke(2.0f));
 		g2.drawLine((int) c0.x, (int) c0.y, (int) c1.x, (int) c1.y);
 		g2.drawLine((int) c1.x, (int) c1.y, (int) c2.x, (int) c2.y);
-		g2.drawLine((int)c2.x,(int)c2.y,(int)c3.x,(int)c3.y);
-		g2.drawLine((int)c3.x,(int)c3.y,(int)c0.x,(int)c0.y);
+		g2.drawLine((int) c2.x, (int) c2.y, (int) c3.x, (int) c3.y);
+		g2.drawLine((int) c3.x, (int) c3.y, (int) c0.x, (int) c0.y);
 	}
 
 	private void drawPoints( Graphics2D g2 , java.util.List<Point2D_F64> foundTarget) {
@@ -218,6 +222,9 @@ public class DetectCalibrationSquaresApp
 	}
 
 	public static void drawGraph(Graphics2D g2, List<QuadBlob> squares) {
+
+		if( squares.size() == 0)
+			return;
 
 		g2.setStroke(new BasicStroke(2.0f));
 		for( int i = 0; i < squares.size(); i++ ) {

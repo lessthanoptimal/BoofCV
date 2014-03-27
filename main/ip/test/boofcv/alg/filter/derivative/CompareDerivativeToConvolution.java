@@ -128,15 +128,24 @@ public class CompareDerivativeToConvolution {
 			throw new RuntimeException(e);
 		}
 
-		// compare the results
+		// assume the most extreme border is used
+		int borderX0 = 0, borderY0 = 0, borderX1 = 0, borderY1 = 0;
 		for( int i = 0; i < expectedOutput.length; i++ ) {
 			Border b = borders[i];
 
+			borderX0 = Math.max(borderX0,b.borderX0);
+			borderX1 = Math.max(borderX0,b.borderX1);
+			borderY0 = Math.max(borderX0,b.borderY0);
+			borderY1 = Math.max(borderX0,b.borderY1);
+		}
+
+		// compare the results
+		for( int i = 0; i < expectedOutput.length; i++ ) {
 			BoofTesting.assertEqualsInner(expectedOutput[i], outputImages[i], 1e-4f,
-					b.borderX0, b.borderY0, b.borderX1, b.borderY1, false);
+					borderX0, borderY0, borderX1, borderY1, false);
 
 			if( !processBorder )
-				BoofTesting.checkBorderZero(outputImages[i],b.borderX0, b.borderY0, b.borderX1, b.borderY1);
+				BoofTesting.checkBorderZero(outputImages[i],borderX0, borderY0, borderX1, borderY1);
 		}
 	}
 

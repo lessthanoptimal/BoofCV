@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -57,16 +57,23 @@ public class WrapRefineCornerSegmentFit
 			for( int i = 0; i < 4; i++ ) {
 				Point2D_I32 cp = s.corners.get(i);
 				Point2D_F64 rp = s.subpixel.get(i);
-				
+
+				// todo background is getting mixed up I think
 				ImageRectangle r = new ImageRectangle(cp.x- searchRadius,cp.y - searchRadius,
 						cp.x + searchRadius +1,cp.y+ searchRadius +1);
 				BoofMiscOps.boundRectangleInside(image, r);
 
 				ImageFloat32 sub = image.subimage(r.x0,r.y0,r.x1,r.y1, null);
 
-				alg.process(sub);
-				rp.x = r.x0 + (float)alg.getCorner().x;
-				rp.y = r.y0 + (float)alg.getCorner().y;
+//				try {
+					alg.process(sub);
+					rp.x = r.x0 + (float)alg.getCorner().x;
+					rp.y = r.y0 + (float)alg.getCorner().y;
+//				} catch( RuntimeException e ) {
+//					revert to the non-subpixel if it fails
+//					rp.x = cp.x;
+//					rp.y = cp.y;
+//				}
 			}
 		}
 	}

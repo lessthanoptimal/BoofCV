@@ -24,7 +24,10 @@ import boofcv.struct.ConnectRule;
 import boofcv.struct.image.ImageSInt32;
 import boofcv.struct.image.ImageUInt8;
 import georegression.geometry.UtilPolygons2D_I32;
+import georegression.metric.Intersection2D_F64;
+import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I32;
+import georegression.struct.shapes.Polygon2D_F64;
 import georegression.struct.shapes.RectangleCorner2D_I32;
 
 import java.util.ArrayList;
@@ -132,6 +135,8 @@ public class DetectQuadBlobsBinary {
 		// remove blobs that touch the image border
 		filterTouchEdge();
 
+		filterDoesNotContainsCenter();
+
 		// create  list of squares and find an initial estimate of their corners
 		squares = new ArrayList<QuadBlob>();
 		for( Contour c : contours ) {
@@ -208,6 +213,40 @@ public class DetectQuadBlobsBinary {
 				contours.remove(i);
 			} else {
 				i++;
+			}
+		}
+	}
+
+	/**
+	 * Remove shapes which do not contain the center inside their polygon
+	 */
+	private void filterDoesNotContainsCenter() {
+
+		Polygon2D_F64 polygon = new Polygon2D_F64();
+		Point2D_F64 center = new Point2D_F64();
+
+		for( int i = 0; i < contours.size();  ) {
+			Contour c = contours.get(i);
+
+			polygon.vertexes.reset();
+			double centerX=0,centerY=0;
+
+			for( int j = 0; j < c.external.size(); j++ ) {
+				Point2D_I32 p = c.external.get(j);
+
+				centerX += p.x;
+				centerY += p.y;
+
+				polygon.vertexes.grow().set(p.x,p.y);
+			}
+
+			center.x = centerX /= c.external.size();
+			center.y = centerY /= c.external.size();
+
+			if(Intersection2D_F64.containConcave(polygon,center) ) {
+				i++;
+			} else {
+				contours.remove(i);
 			}
 		}
 	}
