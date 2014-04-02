@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -187,8 +187,12 @@ public class IntrinsicParameters implements Serializable {
 		System.out.println("fx = " + fx);
 		System.out.println("fy = "+fy);
 		System.out.println("skew = "+skew);
-		for( int i = 0; i < radial.length; i++ ) {
-			System.out.printf("radial[%d] = %6.2e\n",i,radial[i]);
+		if( radial != null ) {
+			for( int i = 0; i < radial.length; i++ ) {
+				System.out.printf("radial[%d] = %6.2e\n",i,radial[i]);
+			}
+		} else {
+			System.out.println("No radial");
 		}
 	}
 }
