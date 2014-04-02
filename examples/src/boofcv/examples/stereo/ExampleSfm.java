@@ -19,6 +19,8 @@
 package boofcv.examples.stereo;
 
 import georegression.fitting.se.ModelManagerSe3_F64;
+import georegression.struct.point.Point2D_F64;
+import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 
 import java.awt.Dimension;
@@ -31,40 +33,29 @@ import org.ddogleg.fitting.modelset.ModelGenerator;
 import org.ddogleg.fitting.modelset.ModelManager;
 import org.ddogleg.fitting.modelset.ModelMatcher;
 import org.ddogleg.fitting.modelset.ransac.Ransac;
+import org.ejml.alg.dense.linsol.svd.SolvePseudoInverseSvd;
 import org.ejml.data.DenseMatrix64F;
+import org.ejml.ops.CommonOps;
 
-import boofcv.abst.feature.disparity.StereoDisparity;
 import boofcv.abst.geo.Estimate1ofEpipolar;
 import boofcv.abst.geo.TriangulateTwoViewsCalibrated;
-import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.distort.LensDistortionOps;
-import boofcv.alg.filter.derivative.LaplacianEdge;
 import boofcv.alg.geo.PerspectiveOps;
-import boofcv.alg.geo.RectifyImageOps;
-import boofcv.alg.geo.rectify.RectifyCalibrated;
 import boofcv.alg.sfm.robust.DistanceSe3SymmetricSq;
 import boofcv.alg.sfm.robust.Se3FromEssentialGenerator;
-import boofcv.core.image.ConvertBufferedImage;
-import boofcv.factory.feature.disparity.DisparityAlgorithms;
-import boofcv.factory.feature.disparity.FactoryStereoDisparity;
 import boofcv.factory.geo.EnumEpipolar;
 import boofcv.factory.geo.FactoryMultiView;
 import boofcv.factory.geo.FactoryTriangulate;
 import boofcv.gui.d3.PointCloudTiltPanel;
 import boofcv.gui.feature.AssociationPanel;
 import boofcv.gui.image.ShowImages;
-import boofcv.gui.image.VisualizeImageData;
-import boofcv.gui.stereo.RectifiedPairPanel;
 import boofcv.io.image.UtilImageIO;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.distort.DoNothingTransform_F64;
 import boofcv.struct.distort.PointTransform_F64;
 import boofcv.struct.geo.AssociatedPair;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSInt16;
 import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.image.ImageUInt8;
 
 /**
  * Example demonstrating how to use to images taken from a single calibrated camera to create a stereo disparity image,
@@ -75,75 +66,44 @@ import boofcv.struct.image.ImageUInt8;
  * @author Peter Abeles
  */
 public class ExampleSfm {
-	
-	private static final int minDisparity = 15;
-	private static final int maxDisparity = 100;
-	
+
 	public static void main(String args[]) {
 		// specify location of images and calibration
 		String calibDir = "data/applet/sfm/";
+		PointCloud pc = new PointCloud();
 
 		// Camera parameters
 		IntrinsicParameters intrinsic = BoofMiscOps.loadXML(calibDir + "intrinsic.xml");
 
 		// Input images from the camera moving left to right
-		BufferedImage origLeft = UtilImageIO.loadImage(calibDir + "img_2150.jpg");
-		BufferedImage origRight = UtilImageIO.loadImage(calibDir + "img_2150.jpg");
-//		BufferedImage origLeft = UtilImageIO.loadImage(calibDir + "img_2150.jpg");
-
-		// Input images with lens distortion
-		ImageUInt8 distortedLeft = ConvertBufferedImage.convertFrom(origLeft, (ImageUInt8) null);
-		ImageUInt8 distortedRight = ConvertBufferedImage.convertFrom(origRight, (ImageUInt8) null);
+		BufferedImage first = UtilImageIO.loadImage(calibDir + "img_2150.jpg");
+		BufferedImage second = UtilImageIO.loadImage(calibDir + "img_2151.jpg");
+		BufferedImage third = UtilImageIO.loadImage(calibDir + "img_2152.jpg");
 
 		// matched features between the two images
-		List<AssociatedPair> matchedFeatures = ExampleFundamentalMatrix.computeMatches(origLeft, origRight);
-
-		System.out.println(matchedFeatures.size() + " matches found");
+		List<AssociatedPair> matched12 = ExampleFundamentalMatrix.computeMatches(first, second);
+		List<AssociatedPair> matched13 = ExampleFundamentalMatrix.computeMatches(first, third);
+		List<AssociatedPair> matched23 = ExampleFundamentalMatrix.computeMatches(second, third);
+		
+		System.out.println(matched12.size() + " matches found between 1-2");
+		System.out.println(matched23.size() + " matches found between 2-3");
+		System.out.println(matched13.size() + " matches found between 1-3");
 		
 		// convert from pixel coordinates into normalized image coordinates
-		List<AssociatedPair> matchedCalibrated = convertToNormalizedCoordinates(matchedFeatures, intrinsic);
+		List<AssociatedPair> matchedCal12 = convertToNormalizedCoordinates(matched12, intrinsic);
+		List<AssociatedPair> matchedCal13 = convertToNormalizedCoordinates(matched13, intrinsic);
+		List<AssociatedPair> matchedCal23 = convertToNormalizedCoordinates(matched23, intrinsic);
 
 		// Robustly estimate camera motion
-		List<AssociatedPair> inliers = new ArrayList<AssociatedPair>();
-		Se3_F64 leftToRight = estimateCameraMotion(intrinsic, matchedCalibrated, inliers);
+		List<AssociatedPair> inliers12 = new ArrayList<AssociatedPair>();
+		Se3_F64 P1 = estimateCameraMotion(intrinsic, matchedCal12, inliers12);
 
-		drawInliers(origLeft, origRight, intrinsic, inliers);
+		addFirstPoints( pc, matchedCal12, P1, intrinsic );
 
-		// Rectify and remove lens distortion for stereo processing
-		DenseMatrix64F rectifiedK = new DenseMatrix64F(3, 3);
-		ImageUInt8 rectifiedLeft = new ImageUInt8(distortedLeft.width, distortedLeft.height);
-		ImageUInt8 rectifiedRight = new ImageUInt8(distortedLeft.width, distortedLeft.height);
+		drawInliers(first, second, intrinsic, inliers12);
 
-		rectifyImages(distortedLeft, distortedRight, leftToRight, intrinsic, rectifiedLeft, rectifiedRight, rectifiedK);
-
-		// compute disparity
-		StereoDisparity<ImageSInt16, ImageFloat32> disparityAlg =
-				FactoryStereoDisparity.regionSubpixelWta(DisparityAlgorithms.RECT_FIVE,
-						minDisparity, maxDisparity, 5, 5, 20, 1, 0.1, ImageSInt16.class);
-
-		// Apply the Laplacian across the image to add extra resistance to changes in lighting or camera gain
-		ImageSInt16 derivLeft = new ImageSInt16(rectifiedLeft.width,rectifiedLeft.height);
-		ImageSInt16 derivRight = new ImageSInt16(rectifiedLeft.width,rectifiedLeft.height);
-		LaplacianEdge.process(rectifiedLeft, derivLeft);
-		LaplacianEdge.process(rectifiedRight,derivRight);
-
-		// process and return the results
-		disparityAlg.process(derivLeft, derivRight);
-		ImageFloat32 disparity = disparityAlg.getDisparity();
-
-		// show results
-		BufferedImage visualized = VisualizeImageData.disparity(disparity, null, minDisparity, maxDisparity, 0);
-
-		BufferedImage outLeft = ConvertBufferedImage.convertTo(rectifiedLeft, null);
-		BufferedImage outRight = ConvertBufferedImage.convertTo(rectifiedRight, null);
-
-		ShowImages.showWindow(new RectifiedPairPanel(true, outLeft, outRight), "Rectification");
-		ShowImages.showWindow(visualized, "Disparity");
-
-		showPointCloud(disparity, outLeft, leftToRight, rectifiedK, minDisparity, maxDisparity);
-
-		System.out.println("Total found " + matchedCalibrated.size());
-		System.out.println("Total Inliers " + inliers.size());
+		System.out.println("Total Inliers " + inliers12.size());
+		System.out.println( pc.points );
 	}
 
 	/**
@@ -206,51 +166,6 @@ public class ExampleSfm {
 	}
 
 	/**
-	 * Remove lens distortion and rectify stereo images
-	 *
-	 * @param distortedLeft  Input distorted image from left camera.
-	 * @param distortedRight Input distorted image from right camera.
-	 * @param leftToRight    Camera motion from left to right
-	 * @param intrinsic      Intrinsic camera parameters
-	 * @param rectifiedLeft  Output rectified image for left camera.
-	 * @param rectifiedRight Output rectified image for right camera.
-	 * @param rectifiedK     Output camera calibration matrix for rectified camera
-	 */
-	public static void rectifyImages(ImageUInt8 distortedLeft,
-									 ImageUInt8 distortedRight,
-									 Se3_F64 leftToRight,
-									 IntrinsicParameters intrinsic,
-									 ImageUInt8 rectifiedLeft,
-									 ImageUInt8 rectifiedRight,
-									 DenseMatrix64F rectifiedK) {
-		RectifyCalibrated rectifyAlg = RectifyImageOps.createCalibrated();
-
-		// original camera calibration matrices
-		DenseMatrix64F K = PerspectiveOps.calibrationMatrix(intrinsic, null);
-
-		rectifyAlg.process(K, new Se3_F64(), K, leftToRight);
-
-		// rectification matrix for each image
-		DenseMatrix64F rect1 = rectifyAlg.getRect1();
-		DenseMatrix64F rect2 = rectifyAlg.getRect2();
-
-		// New calibration matrix,
-		rectifiedK.set(rectifyAlg.getCalibrationMatrix());
-
-		// Adjust the rectification to make the view area more useful
-		RectifyImageOps.allInsideLeft(intrinsic, rect1, rect2, rectifiedK);
-
-		// undistorted and rectify images
-		ImageDistort<ImageUInt8> distortLeft =
-				RectifyImageOps.rectifyImage(intrinsic, rect1, ImageUInt8.class);
-		ImageDistort<ImageUInt8> distortRight =
-				RectifyImageOps.rectifyImage(intrinsic, rect2, ImageUInt8.class);
-
-		distortLeft.apply(distortedLeft, rectifiedLeft);
-		distortRight.apply(distortedRight, rectifiedRight);
-	}
-
-	/**
 	 * Draw inliers for debugging purposes.  Need to convert from normalized to pixel coordinates.
 	 */
 	public static void drawInliers(BufferedImage left, BufferedImage right, IntrinsicParameters intrinsic,
@@ -275,7 +190,119 @@ public class ExampleSfm {
 
 		ShowImages.showWindow(panel, "Inlier Features");
 	}
+	
+	private static void addFirstPoints( PointCloud pc, List<AssociatedPair> normCoords, Se3_F64 P1, IntrinsicParameters intrinsics ) 
+	{
+		List<Point2D_F64> pointsImg1 = new ArrayList<Point2D_F64>();
+		List<Point2D_F64> pointsImg2 = new ArrayList<Point2D_F64>();
+	
+		for ( int i = 0; i < normCoords.size(); i++ ) {
+			AssociatedPair cp = normCoords.get( i );
+			pointsImg1.add( new Point2D_F64( cp.p1.x, cp.p1.y ) );
+			pointsImg2.add( new Point2D_F64( cp.p2.x, cp.p2.y ) );
+		}
 
+		List<Point3D_F64> pointCloud = new ArrayList<Point3D_F64>();
+
+		Se3_F64 P = new Se3_F64();
+		P.R.set(0,0,1.0);
+		P.R.set(1,1,1.0);
+		P.R.set(2,2,1.0);
+		
+		DenseMatrix64F K = new DenseMatrix64F(3,3);
+		PerspectiveOps.calibrationMatrix( intrinsics, K );
+		double error = triangulatePoints( pointsImg1, pointsImg2, P, P1, K, pointCloud, intrinsics );
+		
+		System.out.println("calculated error: " + error);
+		System.out.println(P);
+		System.out.println(P1);
+	}
+
+	private static DenseMatrix64F linearLSTriangulation( Point3D_F64 u, Se3_F64 P, Point3D_F64 u1, Se3_F64 P1 )
+	{
+		int i = 0;
+		DenseMatrix64F A = new DenseMatrix64F( 4, 3 );
+		DenseMatrix64F B = new DenseMatrix64F( 4, 1 );
+		DenseMatrix64F X = new DenseMatrix64F( 3, 1 );
+
+		A.set(i++, u.x*P.R.get( 2, 0 ) - P.R.get(0,0) );
+		A.set(i++, u.x*P.R.get( 2, 1 ) - P.R.get(0,1) );
+		A.set(i++, u.x*P.R.get( 2, 2 ) - P.R.get(0,2) );
+		A.set(i++, u.y*P.R.get( 2, 0 ) - P.R.get(1,0) );
+
+		A.set(i++, u.y*P.R.get( 2, 1 ) - P.R.get(1,1) );
+		A.set(i++, u.y*P.R.get( 2, 2 ) - P.R.get(1,2) );
+		A.set(i++, u1.x*P1.R.get( 2, 0 ) - P1.R.get(0,0) );
+		A.set(i++, u1.x*P1.R.get( 2, 1 ) - P1.R.get(0,1) );
+
+		A.set(i++, u1.x*P1.R.get( 2, 2 ) - P1.R.get(0,2) );
+		A.set(i++, u1.y*P1.R.get( 2, 0 ) - P1.R.get(1,0) );
+		A.set(i++, u1.y*P1.R.get( 2, 1 ) - P1.R.get(1,1) );
+		A.set(i++, u1.y*P1.R.get( 2, 2 ) - P1.R.get(1,2) );
+
+		i = 0;
+		B.set(i++,0, -(u.x*P.T.z - P.T.x) );
+		B.set(i++,0, -(u.y*P.T.z - P.T.y) );
+		B.set(i++,0, -(u1.x*P1.T.z - P1.T.x) );
+		B.set(i++,0, -(u1.y*P1.T.z - P1.T.y) );
+		
+		//solve for X
+		SolvePseudoInverseSvd svd = new SolvePseudoInverseSvd(3, 4);
+		svd.setA( A );
+		svd.solve( B, X );
+		
+		return X;
+	}
+	
+	private static double triangulatePoints( List<Point2D_F64> pt_set1, List<Point2D_F64> pt_set2,
+			Se3_F64 P, Se3_F64 P1, DenseMatrix64F K, List<Point3D_F64> pointCloud, IntrinsicParameters intrinsics )
+	{
+		List<Double> reproj_error = new ArrayList<Double>();
+		DenseMatrix64F xPt_img = new DenseMatrix64F(3,1);
+		DenseMatrix64F im = new DenseMatrix64F(3,4);
+		PointTransform_F64 tran2 = LensDistortionOps.transformNormToRadial_F64( intrinsics );
+		Point2D_F64 orig = new Point2D_F64();
+		
+		for ( int i = 0; i < pt_set1.size(); i++) {
+			//convert to normalized homogeneous coordinates
+			Point3D_F64 u = new Point3D_F64( pt_set1.get( i ).x, pt_set1.get( i ).y, 1.0 );
+			Point3D_F64 u1 = new Point3D_F64( pt_set2.get( i ).x, pt_set2.get( i ).y, 1.0 );
+			
+			// triangulate
+			DenseMatrix64F X = linearLSTriangulation(u,P,u1,P1);
+			X.reshape( 4, 1, true );
+			X.set( 3, 1.0 );
+	
+			//calculate reprojection error
+			im = PerspectiveOps.createCameraMatrix(P1.R, P1.T, K, null);
+			CommonOps.mult( im, X, xPt_img );
+	
+			tran2.compute( u1.x,  u1.y, orig );
+			
+			Point2D_F64 xPt_img_ = new Point2D_F64( xPt_img.get(0)/xPt_img.get(2), xPt_img.get(1)/xPt_img.get(2) );
+	
+			System.out.println( norm( xPt_img_, orig ) );
+			
+			reproj_error.add( norm( xPt_img_, orig ) );
+			
+			//store 3D point
+			pointCloud.add(new Point3D_F64(X.get(0,0),X.get(1,0),X.get(2,0)));
+		}
+		
+		double me = 0.0f;
+		for (int i = 0; i < reproj_error.size(); i++ ) {
+			me += reproj_error.get( i ).doubleValue();
+		}
+		me /= reproj_error.size();
+		return me;
+	}
+
+	private static double norm( Point2D_F64 p1, Point2D_F64 p2 ) {
+		double dx = p1.x - p2.x;
+		double dy = p1.y - p2.y;
+		return Math.sqrt( dx*dx + dy*dy );
+	}
+	
 	/**
 	 * Show results as a point cloud
 	 */
