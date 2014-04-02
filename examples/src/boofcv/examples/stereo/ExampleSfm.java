@@ -26,23 +26,41 @@ import georegression.struct.se.Se3_F64;
 import java.awt.Dimension;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.ddogleg.fitting.modelset.DistanceFromModel;
+import org.ddogleg.fitting.modelset.ModelFitter;
 import org.ddogleg.fitting.modelset.ModelGenerator;
 import org.ddogleg.fitting.modelset.ModelManager;
 import org.ddogleg.fitting.modelset.ModelMatcher;
 import org.ddogleg.fitting.modelset.ransac.Ransac;
+import org.ddogleg.struct.FastQueue;
 import org.ejml.alg.dense.linsol.svd.SolvePseudoInverseSvd;
 import org.ejml.data.DenseMatrix64F;
 import org.ejml.ops.CommonOps;
 
+import boofcv.abst.feature.associate.AssociateDescription;
+import boofcv.abst.feature.associate.ScoreAssociation;
+import boofcv.abst.feature.detdesc.DetectDescribePoint;
+import boofcv.abst.feature.detect.interest.ConfigFastHessian;
 import boofcv.abst.geo.Estimate1ofEpipolar;
+import boofcv.abst.geo.Estimate1ofPnP;
 import boofcv.abst.geo.TriangulateTwoViewsCalibrated;
+import boofcv.abst.geo.fitting.GenerateMotionPnP;
 import boofcv.alg.distort.LensDistortionOps;
 import boofcv.alg.geo.PerspectiveOps;
+import boofcv.alg.geo.pose.PnPDistanceReprojectionSq;
+import boofcv.alg.geo.pose.PnPLepetitEPnP;
 import boofcv.alg.sfm.robust.DistanceSe3SymmetricSq;
 import boofcv.alg.sfm.robust.Se3FromEssentialGenerator;
+import boofcv.examples.features.ExampleAssociatePoints;
+import boofcv.examples.stereo.PointCloud.Point;
+import boofcv.factory.feature.associate.FactoryAssociation;
+import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
 import boofcv.factory.geo.EnumEpipolar;
 import boofcv.factory.geo.FactoryMultiView;
 import boofcv.factory.geo.FactoryTriangulate;
@@ -54,7 +72,11 @@ import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.distort.DoNothingTransform_F64;
 import boofcv.struct.distort.PointTransform_F64;
+import boofcv.struct.feature.AssociatedIndex;
+import boofcv.struct.feature.SurfFeature;
 import boofcv.struct.geo.AssociatedPair;
+import boofcv.struct.geo.Point2D3D;
+import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 
 /**
@@ -75,37 +97,201 @@ public class ExampleSfm {
 		// Camera parameters
 		IntrinsicParameters intrinsic = BoofMiscOps.loadXML(calibDir + "intrinsic.xml");
 
-		// Input images from the camera moving left to right
+		// Input images from the camera
 		BufferedImage first = UtilImageIO.loadImage(calibDir + "img_2150.jpg");
 		BufferedImage second = UtilImageIO.loadImage(calibDir + "img_2151.jpg");
 		BufferedImage third = UtilImageIO.loadImage(calibDir + "img_2152.jpg");
 
+		/**
+		 *  Feature matching between all image pairs (one direction only).
+		 */
 		// matched features between the two images
-		List<AssociatedPair> matched12 = ExampleFundamentalMatrix.computeMatches(first, second);
-		List<AssociatedPair> matched13 = ExampleFundamentalMatrix.computeMatches(first, third);
-		List<AssociatedPair> matched23 = ExampleFundamentalMatrix.computeMatches(second, third);
+		List<AssociatedPair> matched12 = new ArrayList<AssociatedPair>();
+		List<AssociatedPair> matched13 = new ArrayList<AssociatedPair>();
+		List<AssociatedPair> matched23 = new ArrayList<AssociatedPair>();
+		List<AssociatedIndex> indices12 = new ArrayList<AssociatedIndex>(); 
+		List<AssociatedIndex> indices13 = new ArrayList<AssociatedIndex>(); 
+		List<AssociatedIndex> indices23 = new ArrayList<AssociatedIndex>(); 
+		computeMatches(first, second, matched12, indices12 );
+		computeMatches(first, third, matched13, indices13 );
+		computeMatches(second, third, matched23, indices23 );
 		
 		System.out.println(matched12.size() + " matches found between 1-2");
-		System.out.println(matched23.size() + " matches found between 2-3");
 		System.out.println(matched13.size() + " matches found between 1-3");
+		System.out.println(matched23.size() + " matches found between 2-3");		
 		
+		/** 
+		 * Converting all coordinates to normalized form.
+		 */
 		// convert from pixel coordinates into normalized image coordinates
 		List<AssociatedPair> matchedCal12 = convertToNormalizedCoordinates(matched12, intrinsic);
 		List<AssociatedPair> matchedCal13 = convertToNormalizedCoordinates(matched13, intrinsic);
 		List<AssociatedPair> matchedCal23 = convertToNormalizedCoordinates(matched23, intrinsic);
 
-		// Robustly estimate camera motion
+		/** 
+		 * Estimating the position/rotation of the first camera.
+		 * We add new triangulations on the basis of this initial model.
+		 */
 		List<AssociatedPair> inliers12 = new ArrayList<AssociatedPair>();
 		Se3_F64 P1 = estimateCameraMotion(intrinsic, matchedCal12, inliers12);
-
-		addFirstPoints( pc, matchedCal12, P1, intrinsic );
-
 		drawInliers(first, second, intrinsic, inliers12);
 
-		System.out.println("Total Inliers " + inliers12.size());
-		System.out.println( pc.points );
+		/** 
+		 * From the found camera matrices, start triangulating the points...
+		 * P = first camera (does this actually match with "estimateCameraMotion"?)
+		 * P1 = second camera.
+		 * So this describes image1->image2
+		 */
+		Se3_F64 P = new Se3_F64();
+		P.R.set(0,0,1.0);
+		P.R.set(1,1,1.0);
+		P.R.set(2,2,1.0);
+		addFirstPoints( pc, matchedCal12, indices12, P, P1, intrinsic, 3, 0, 1 );
+
+		/**
+		 *  Prepare for the iterative PNP process.
+		 *  Here there's only one extra image, so there's no loop.
+		 */
+		// Start the epnp process for each other set
+		PnPLepetitEPnP epnp = new PnPLepetitEPnP();
+		epnp.setNumIterations( 10 );
+
+		List<Point2D3D> points = new ArrayList<Point2D3D>();
+		Map<Integer,Set<Integer>> toTriangulate = new HashMap<Integer,Set<Integer>>();
+		
+		/** 
+		 * In the real world this would work as follows:
+		 * - select new image to add: X
+		 * - find out where matches have occurred from Y to X
+		 * - for each combination Y-X, go through all matches.
+		 * - if for a 3D point the same index is already recorded, that 3D point also corresponds to the 2D point in X.
+		 *   * thus, since 2D corresponds to a 3D, we can estimate the camera position on that basis.
+		 * - add the index for that 2D point in X to the 3D point so it can be retriangulated later.
+		 * - if the match between Y-X is not in the 3D cloud already, add it to a queue for triangulation. 
+		 */
+		addOtherImages( matchedCal13, indices13, points, toTriangulate, pc, 0, 2 );
+		addOtherImages( matchedCal23, indices23, points, toTriangulate, pc, 1, 2 );
+		
+		/** 
+		 * Here we start the PNP process of estimating the camera position for the new image X.
+		 */
+		List<Point2D3D> inliers = new ArrayList<Point2D3D>();
+		Se3_F64 P2 = robustPnp( points, inliers );
+
+		/**
+		 * with the results of the new camera position, we triangulate new points that did not yet exist in the cloud.
+		 */
+		triangulateMorePoints( pc, 0, 2, 3, toTriangulate, matchedCal13, indices13, P, P2, intrinsic );
+		triangulateMorePoints( pc, 0, 2, 3, toTriangulate, matchedCal13, indices13, P, P2, intrinsic );
 	}
 
+	private static void triangulateMorePoints( 
+		PointCloud pc, 
+		int srcViewIdx,
+		int dstViewIdx, 
+		int totalImages, 
+		Map<Integer,Set<Integer>> toTriangulate, 
+		List<AssociatedPair> matchedCal,
+		List<AssociatedIndex> indices, 
+		Se3_F64 Pa,
+		Se3_F64 Pb, 
+		IntrinsicParameters intrinsics ) 
+	{
+		Set<Integer> plist = toTriangulate.get( srcViewIdx );
+		
+		List<Point2D_F64> pointsImg1 = new ArrayList<Point2D_F64>();
+		List<Point2D_F64> pointsImg2 = new ArrayList<Point2D_F64>();
+		
+		for ( int i = 0; i < matchedCal.size(); i++ ) {
+			AssociatedIndex ai = indices.get( i );
+			if ( plist.contains( ai.src ) ) {
+				AssociatedPair p = matchedCal.get( i );
+				pointsImg1.add( p.p1 );
+				pointsImg2.add( p.p2 );
+			}
+		}
+		
+		DenseMatrix64F K = new DenseMatrix64F(3,3);
+		PerspectiveOps.calibrationMatrix( intrinsics, K );
+		
+		List<Point3D_F64> pointCloud = new ArrayList<Point3D_F64>();
+		double error = triangulatePoints( pointsImg1, pointsImg2, Pa, Pb, K, pointCloud, intrinsics );
+		
+		for ( int i = 0; i < pointCloud.size(); i++ ) {
+			Point p = new Point( pointCloud.get( i ), totalImages );
+			AssociatedIndex ai = indices.get( i );
+			p.indices[ srcViewIdx ] = ai.src;
+			p.indices[ dstViewIdx ] = ai.dst;
+			pc.points.add( p );
+		}
+	}
+	
+	private static void addOtherImages( List<AssociatedPair> matchedCal, List<AssociatedIndex> indices, List<Point2D3D> points, Map<Integer,Set<Integer>> toTriangulate, PointCloud pc, int viewIdx1, int viewIdx2 ) 
+	{
+		for ( int i = 0; i < matchedCal.size(); i++ ) {
+			AssociatedPair p = matchedCal.get( i );
+			AssociatedIndex ai = indices.get( i );
+			int queryIdx = ai.src;
+
+			boolean found = false;
+			for ( int k = 0; k < pc.points.size(); k++ ) {
+				Point mypoint = pc.points.get( k );
+				if ( mypoint.indices[ viewIdx1 ] == queryIdx ) {
+					Point2D3D p2d3d = new Point2D3D();
+					p2d3d.setLocation( mypoint.point );
+					p2d3d.setObservation( p.p2 );
+					points.add( p2d3d );
+					
+					// in multiple transforms the same point is found. This means it creates duplicates...
+					// Should have a "status" list of points already added to avoid this.
+					mypoint.indices[ viewIdx2 ] = ai.dst;
+					
+					mypoint.points2d.put( viewIdx2, p.p2 );
+					found = true;
+				} 
+			}
+			if ( !found ) {
+				if ( toTriangulate.containsKey( viewIdx1 )) {
+					Set<Integer> plist = toTriangulate.get( viewIdx1 );
+					plist.add( queryIdx );
+				} else {
+					Set<Integer> plist = new HashSet<Integer>();
+					plist.add( queryIdx );
+					toTriangulate.put( viewIdx1, plist );	
+				}
+			}
+		}		
+	}
+	
+	/**
+	 * Use the associate point feature example to create a list of {@link AssociatedPair} for use in computing the
+	 * fundamental matrix.
+	 */
+	public static void computeMatches( BufferedImage left , BufferedImage right, List<AssociatedPair> matches, List<AssociatedIndex> indices ) 
+	{
+		DetectDescribePoint detDesc = FactoryDetectDescribe.surfStable(
+			new ConfigFastHessian(1, 2, 800, 1, 9, 4, 4), null,null, ImageFloat32.class);
+
+		ScoreAssociation<SurfFeature> scorer = FactoryAssociation.scoreEuclidean(SurfFeature.class,true);
+		AssociateDescription<SurfFeature> associate =
+				FactoryAssociation.greedy(scorer, 1, true);
+
+		ExampleAssociatePoints<ImageFloat32,SurfFeature> findMatches =
+			new ExampleAssociatePoints<ImageFloat32,SurfFeature>
+				(detDesc, associate, ImageFloat32.class);
+
+		findMatches.associate(left,right);
+
+		FastQueue<AssociatedIndex> matchIndexes = associate.getMatches();
+
+		for( int i = 0; i < matchIndexes.size; i++ ) {
+			AssociatedIndex a = matchIndexes.get(i);
+			AssociatedPair p = new AssociatedPair(findMatches.pointsA.get(a.src) , findMatches.pointsB.get(a.dst));
+			matches.add( p);
+			indices.add( a );
+		}
+	}
+	
 	/**
 	 * Estimates the camera motion robustly using RANSAC and a set of associated points.
 	 *
@@ -142,6 +328,49 @@ public class ExampleSfm {
 		inliers.addAll(epipolarMotion.getMatchSet());
 
 		return epipolarMotion.getModelParameters();
+	}
+	
+	public static Se3_F64 robustPnp( List<Point2D3D> points, List<Point2D3D> inliers ) 
+	{	
+		// used to create and copy new instances of the fit model
+		ModelManager<Se3_F64> managerP = new ModelManagerSe3_F64();
+		// Select which linear algorithm is to be used.  Try playing with the number of remove ambiguity points
+		Estimate1ofPnP estimatePnP = FactoryMultiView.computePnPwithEPnP(10, 0.1);
+
+		// Wrapper so that this estimator can be used by the robust estimator
+		GenerateMotionPnP generateP = new GenerateMotionPnP(estimatePnP);
+
+		// How the error is measured
+		DistanceFromModel<Se3_F64,Point2D3D> errorMetric =
+			new PnPDistanceReprojectionSq();
+
+		// Use RANSAC to estimate the PNP matrix
+		ModelMatcher<Se3_F64,Point2D3D> robustPnp =
+			new Ransac<Se3_F64, Point2D3D>(123123,managerP,generateP,errorMetric,10000,0.00001);
+
+		// Estimate the fundamental matrix while removing outliers
+		if( !robustPnp.process(points) ) {
+			System.out.println("Could not find a pnp solution");
+			return null;
+		}
+
+		// save the set of features that were used to compute the fundamental matrix
+		inliers.addAll(robustPnp.getMatchSet());
+
+		System.out.println( inliers.size() + " inliers and " + points.size() + " points total" );
+		
+		// Improve the estimate of the fundamental matrix using non-linear optimization
+		Se3_F64 P = new Se3_F64();
+		ModelFitter<Se3_F64,Point2D3D> refine =
+				FactoryMultiView.refinePnP( 1e-8, 200);
+		
+		if( !refine.fitModel(inliers, robustPnp.getModelParameters(), P) ) {
+			System.out.println( "Refining and refitting the model failed");
+			return null;
+		}
+
+		// Return the solution
+		return P;
 	}
 
 	/**
@@ -191,29 +420,34 @@ public class ExampleSfm {
 		ShowImages.showWindow(panel, "Inlier Features");
 	}
 	
-	private static void addFirstPoints( PointCloud pc, List<AssociatedPair> normCoords, Se3_F64 P1, IntrinsicParameters intrinsics ) 
+	private static void addFirstPoints( PointCloud pc, List<AssociatedPair> normCoords, List<AssociatedIndex> indices, Se3_F64 P, Se3_F64 P1, IntrinsicParameters intrinsics, int totalImages, int viewIdx1, int viewIdx2 ) 
 	{
 		List<Point2D_F64> pointsImg1 = new ArrayList<Point2D_F64>();
 		List<Point2D_F64> pointsImg2 = new ArrayList<Point2D_F64>();
 	
 		for ( int i = 0; i < normCoords.size(); i++ ) {
 			AssociatedPair cp = normCoords.get( i );
+			AssociatedIndex index = indices.get( i );
 			pointsImg1.add( new Point2D_F64( cp.p1.x, cp.p1.y ) );
 			pointsImg2.add( new Point2D_F64( cp.p2.x, cp.p2.y ) );
 		}
 
 		List<Point3D_F64> pointCloud = new ArrayList<Point3D_F64>();
-
-		Se3_F64 P = new Se3_F64();
-		P.R.set(0,0,1.0);
-		P.R.set(1,1,1.0);
-		P.R.set(2,2,1.0);
 		
 		DenseMatrix64F K = new DenseMatrix64F(3,3);
 		PerspectiveOps.calibrationMatrix( intrinsics, K );
 		double error = triangulatePoints( pointsImg1, pointsImg2, P, P1, K, pointCloud, intrinsics );
 		
+		for ( int i = 0; i < pointCloud.size(); i++ ) {
+			Point p = new Point( pointCloud.get( i ), totalImages );
+			AssociatedIndex ai = indices.get( i );
+			p.indices[ viewIdx1 ] = ai.src;
+			p.indices[ viewIdx2 ] = ai.dst;
+			pc.points.add( p );
+		}
+		
 		System.out.println("calculated error: " + error);
+		
 		System.out.println(P);
 		System.out.println(P1);
 	}
@@ -280,9 +514,6 @@ public class ExampleSfm {
 			tran2.compute( u1.x,  u1.y, orig );
 			
 			Point2D_F64 xPt_img_ = new Point2D_F64( xPt_img.get(0)/xPt_img.get(2), xPt_img.get(1)/xPt_img.get(2) );
-	
-			System.out.println( norm( xPt_img_, orig ) );
-			
 			reproj_error.add( norm( xPt_img_, orig ) );
 			
 			//store 3D point
