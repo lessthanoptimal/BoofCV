@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -46,7 +46,7 @@ public abstract class ImagePyramidBase<T extends ImageSingleBand>
 	protected int bottomHeight;
 
 	// The image at different resolutions.  Larger indexes for lower resolutions
-	protected T layers[];
+	public T layers[];
 
 	// if the top layer is full resolution, should a copy be made or a reference to the original be saved?i
 	protected boolean saveOriginalReference;
