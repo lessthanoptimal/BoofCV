@@ -76,8 +76,7 @@ public class FactoryConvolve {
 					break;
 
 				case NORMALIZED:
-					m = ConvolveNormalized.class.
-							getMethod(direction,kernel.getClass(),inputType,outputType);
+					m = ConvolveNormalized.class.getMethod(direction,kernel.getClass(),inputType,outputType);
 					break;
 
 				default:
