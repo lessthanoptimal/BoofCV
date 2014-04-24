@@ -30,7 +30,7 @@ import boofcv.gui.image.ShowImages;
 import boofcv.io.MediaManager;
 import boofcv.io.wrapper.DefaultMediaManager;
 import boofcv.struct.flow.ImageFlow;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.ImageFloat32;
 
 import java.awt.image.BufferedImage;
 
@@ -53,20 +53,20 @@ public class ExampleDenseOpticalFlow {
 //		String fileName0 = "../data/applet/denseflow/Grove2_07.png";
 //		String fileName1 = "../data/applet/denseflow/Grove2_09.png";
 
-		DenseOpticalFlow<ImageUInt8> denseFlow =
-				FactoryDenseOpticalFlow.flowKlt(null, 6, ImageUInt8.class, null);
-//				FactoryDenseOpticalFlow.region(null,ImageUInt8.class);
+		DenseOpticalFlow<ImageFloat32> denseFlow =
+//				FactoryDenseOpticalFlow.flowKlt(null, 6, ImageFloat32.class, null);
+//				FactoryDenseOpticalFlow.region(null,ImageFloat32.class);
 //				FactoryDenseOpticalFlow.hornSchunck(20, 1000, ImageUInt8.class);
-//				FactoryDenseOpticalFlow.hornSchunckPyramid(5, 1.9f, 0.7, 0.5, 10, ImageUInt8.class, ImageSInt16.class);
+				FactoryDenseOpticalFlow.hornSchunckPyramid(0.02f, 1.9f, 0.75, 0.8, 10,10, 250);
 
 		BufferedImage buff0 = media.openImage(fileName0);
 		BufferedImage buff1 = media.openImage(fileName1);
 
-		ImageUInt8 full = new ImageUInt8(buff0.getWidth(),buff0.getHeight());
+		ImageFloat32 full = new ImageFloat32(buff0.getWidth(),buff0.getHeight());
 
 		// Dense optical flow is very computationally expensive.  Just process the image at 1/2 resolution
-		ImageUInt8 previous = new ImageUInt8(full.width/2,full.height/2);
-		ImageUInt8 current = new ImageUInt8(previous.width,previous.height);
+		ImageFloat32 previous = new ImageFloat32(full.width/2,full.height/2);
+		ImageFloat32 current = new ImageFloat32(previous.width,previous.height);
 		ImageFlow flow = new ImageFlow(previous.width,previous.height);
 
 		ConvertBufferedImage.convertFrom(buff0,full);

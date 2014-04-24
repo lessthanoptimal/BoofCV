@@ -18,29 +18,20 @@
 
 package boofcv.abst.flow;
 
-import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.factory.flow.FactoryDenseOpticalFlow;
 import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageUInt8;
-import org.junit.Test;
 
 /**
  * @author Peter Abeles
  */
-public class TestHornSchunckPyramid_to_DenseOpticalFlow {
+public class TestHornSchunckPyramid_to_DenseOpticalFlow extends GeneralDenseOpticalFlowChecks<ImageFloat32>{
 
-	@Test
-	public void allTests() {
-		Class imageTypes[] = new Class[]{ImageUInt8.class,ImageFloat32.class};
+	protected TestHornSchunckPyramid_to_DenseOpticalFlow() {
+		super(ImageFloat32.class);
+	}
 
-		for( Class it : imageTypes ) {
-			new GeneralDenseOpticalFlowChecks(it) {
-				@Override
-				public DenseOpticalFlow createAlg(Class imageType) {
-					Class derivType = GImageDerivativeOps.getDerivativeType(imageType);
-					return FactoryDenseOpticalFlow.hornSchunckPyramid(20f,1.9f, 0.7, 1, 1000, imageType,derivType);
-				}
-			}.allTests(true);
-		}
+	@Override
+	public DenseOpticalFlow<ImageFloat32> createAlg(Class<ImageFloat32> imageType) {
+		return FactoryDenseOpticalFlow.hornSchunckPyramid(20f,1.9f, 0.7, 1, 10 ,10, 1000);
 	}
 }

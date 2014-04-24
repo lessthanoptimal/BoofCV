@@ -135,24 +135,15 @@ public class FactoryDenseOpticalFlow {
 	 *
 	 * @param alpha
 	 * @param numIterations
-	 * @param imageType
 	 * @return
 	 */
-	public static <T extends ImageSingleBand,D extends ImageSingleBand>
-	DenseOpticalFlow<T> hornSchunckPyramid( float alpha , float w , double scale , double sigma , int numIterations,
-											Class<T> imageType , Class<D> derivType )
+	public static DenseOpticalFlow<ImageFloat32>
+	hornSchunckPyramid( float alpha , float w , double scale , double sigma , int maxLayers, int numWarps ,  int numIterations )
 	{
 		InterpolatePixelS<ImageFloat32> interpolate = FactoryInterpolation.bilinearPixelS(ImageFloat32.class);
 
-		HornSchunckPyramid<T,D> alg;
-		if( imageType == ImageUInt8.class )
-			alg = (HornSchunckPyramid)new HornSchunckPyramid_U8(alpha,w,numIterations,1e-5f,interpolate);
-		else
-		if( imageType == ImageFloat32.class )
-			alg = (HornSchunckPyramid)new HornSchunckPyramid_F32(alpha,w,numIterations,1e-5f,interpolate);
-		else
-			throw new IllegalArgumentException("Unsupported image type "+imageType);
+		HornSchunckPyramid alg = new HornSchunckPyramid(alpha,w, numWarps, numIterations,1e-5f,scale,sigma,maxLayers,interpolate);
 
-		return new HornSchunckPyramid_to_DenseOpticalFlow<T,D>(alg, scale,sigma,ImageType.single(imageType),ImageType.single(derivType));
+		return new HornSchunckPyramid_to_DenseOpticalFlow(alg);
 	}
 }
