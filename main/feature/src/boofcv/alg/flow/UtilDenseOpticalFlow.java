@@ -66,7 +66,7 @@ public class UtilDenseOpticalFlow {
 
 		int numScales;
 
-		if( scale == 1 ) {
+		if( scale == 1 || maxLayers == 1 ) {
 			numScales = 1;
 		} else if ( scale == 0 ) {
 			numScales = maxLayers;
