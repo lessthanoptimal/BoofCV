@@ -23,6 +23,8 @@ import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
 import org.junit.Test;
 
+import java.util.Arrays;
+
 import static org.junit.Assert.*;
 
 /**
@@ -63,10 +65,12 @@ public class TestDenseOpticalFlowBlockPyramid {
 
 	@Test
 	public void checkNeighbors() {
-		int r = 3;
-		Dummy alg = new Dummy(r,2,200,ImageUInt8.class);
+		int sr = 3;
+		int rr = 2;
+		Dummy alg = new Dummy(sr,rr,200,ImageUInt8.class);
 
 		alg.scores = new float[20*30];
+		Arrays.fill(alg.scores,20);
 		ImageFlow flows = new ImageFlow(20,30);
 		flows.invalidateAll();
 		ImageFlow.D tmp = new ImageFlow.D();
@@ -93,8 +97,8 @@ public class TestDenseOpticalFlowBlockPyramid {
 
 		alg.checkNeighbors(6,7,tmp,flows,5);
 
-		for( int i = -r; i <= r; i++ ) {
-			for( int j = -r; j <= r; j++ ) {
+		for( int i = -rr; i <= rr; i++ ) {
+			for( int j = -rr; j <= rr; j++ ) {
 				int x = j+6;
 				int y = i+7;
 
