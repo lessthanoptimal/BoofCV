@@ -127,7 +127,7 @@ public class TestHornSchunckPyramid {
 
 		alg.processLayer(image1,image2,deriv2X,deriv2Y);
 
-		alg.getFlowX().print("%4f");
+//		alg.getFlowX().print("%4f");
 
 		for( int y = 0; y < height; y++ ) {
 			for( int x = 0; x < width; x++ ) {

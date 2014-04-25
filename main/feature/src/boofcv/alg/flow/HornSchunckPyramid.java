@@ -90,17 +90,17 @@ public class HornSchunckPyramid< T extends ImageSingleBand> {
 	private ImageGradient<ImageFloat32, ImageFloat32> gradient = FactoryDerivative.two(ImageFloat32.class, ImageFloat32.class);
 
 	// found flow for the most recently processed layer.  Final output is stored here
-	private ImageFloat32 flowX = new ImageFloat32(1,1);
-	private ImageFloat32 flowY = new ImageFloat32(1,1);
+	protected ImageFloat32 flowX = new ImageFloat32(1,1);
+	protected ImageFloat32 flowY = new ImageFloat32(1,1);
 
 	// flow estimation at the start of the iteration
-	private ImageFloat32 initFlowX = new ImageFloat32(1,1);
-	private ImageFloat32 initFlowY = new ImageFloat32(1,1);
+	protected ImageFloat32 initFlowX = new ImageFloat32(1,1);
+	protected ImageFloat32 initFlowY = new ImageFloat32(1,1);
 
 	// storage for the warped flow
-	private ImageFloat32 warpImage2 = new ImageFloat32(1,1);
-	private ImageFloat32 warpDeriv2X = new ImageFloat32(1,1);
-	private ImageFloat32 warpDeriv2Y = new ImageFloat32(1,1);
+	protected ImageFloat32 warpImage2 = new ImageFloat32(1,1);
+	protected ImageFloat32 warpDeriv2X = new ImageFloat32(1,1);
+	protected ImageFloat32 warpDeriv2Y = new ImageFloat32(1,1);
 
 	// Used to interpolate values between pixels
 	private InterpolatePixelS<ImageFloat32> interp;
@@ -370,10 +370,10 @@ public class HornSchunckPyramid< T extends ImageSingleBand> {
 					error += iterationSorSafe(image1,x,image1.height-1,pixelIndex1++);
 				}
 
-				pixelIndex0 = image1.width + 1;
+				pixelIndex0 = image1.width;
 				 pixelIndex1 = image1.width + image1.width-1;
 				for( int y = 1; y < image1.height-1; y++ ) {
-					error += iterationSorSafe(image1,1,y,pixelIndex0);
+					error += iterationSorSafe(image1,0,y,pixelIndex0);
 					error += iterationSorSafe(image1,image1.width-1,y,pixelIndex1);
 
 					pixelIndex0 += image1.width;
