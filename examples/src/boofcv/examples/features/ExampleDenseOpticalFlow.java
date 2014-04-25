@@ -56,8 +56,8 @@ public class ExampleDenseOpticalFlow {
 		DenseOpticalFlow<ImageFloat32> denseFlow =
 //				FactoryDenseOpticalFlow.flowKlt(null, 6, ImageFloat32.class, null);
 //				FactoryDenseOpticalFlow.region(null,ImageFloat32.class);
-//				FactoryDenseOpticalFlow.hornSchunck(20, 1000, ImageUInt8.class);
-				FactoryDenseOpticalFlow.hornSchunckPyramid(0.02f, 1.9f, 0.75, 0.8, 10,10, 250);
+//				FactoryDenseOpticalFlow.hornSchunck(20, 1000, ImageFloat32.class);
+				FactoryDenseOpticalFlow.hornSchunckPyramid(null,ImageFloat32.class);
 
 		BufferedImage buff0 = media.openImage(fileName0);
 		BufferedImage buff1 = media.openImage(fileName1);

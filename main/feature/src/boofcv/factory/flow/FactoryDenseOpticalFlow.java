@@ -88,9 +88,8 @@ public class FactoryDenseOpticalFlow {
 	 * @return
 	 */
 	public static <T extends ImageSingleBand>
-	DenseOpticalFlow<T> region( ConfigOpticalFlowBlockPyramid config ,
-								Class<T> imageType ) {
-
+	DenseOpticalFlow<T> region( ConfigOpticalFlowBlockPyramid config , Class<T> imageType )
+	{
 		if( config == null )
 			config = new ConfigOpticalFlowBlockPyramid();
 
@@ -116,8 +115,8 @@ public class FactoryDenseOpticalFlow {
 	 * @return
 	 */
 	public static <T extends ImageSingleBand,D extends ImageSingleBand>
-	DenseOpticalFlow<T> hornSchunck( float alpha , int numIterations, Class<T> imageType ) {
-
+	DenseOpticalFlow<T> hornSchunck( float alpha , int numIterations, Class<T> imageType )
+	{
 		HornSchunck<T,D> alg;
 		if( imageType == ImageUInt8.class )
 			alg = (HornSchunck)new HornSchunck_U8(alpha,numIterations);
@@ -131,18 +130,22 @@ public class FactoryDenseOpticalFlow {
 	}
 
 	/**
-	 * TODO comment
+	 * Creates an instance of {@link HornSchunckPyramid}
 	 *
-	 * @param alpha
-	 * @param numIterations
-	 * @return
+	 * @see HornSchunckPyramid
+	 *
+	 * @param config Configuration parameters.  If null defaults will be used.
+	 * @return Dense optical flow implementation of HornSchunckPyramid
 	 */
-	public static DenseOpticalFlow<ImageFloat32>
-	hornSchunckPyramid( float alpha , float w , double scale , double sigma , int maxLayers, int numWarps ,  int numIterations )
+	public static <T extends ImageSingleBand>
+	DenseOpticalFlow<T> hornSchunckPyramid( ConfigHornSchunckPyramid config , Class<T> imageType )
 	{
-		InterpolatePixelS<ImageFloat32> interpolate = FactoryInterpolation.bilinearPixelS(ImageFloat32.class);
+		if( config == null )
+			config = new ConfigHornSchunckPyramid();
 
-		HornSchunckPyramid alg = new HornSchunckPyramid(alpha,w, numWarps, numIterations,1e-5f,scale,sigma,maxLayers,interpolate);
+		InterpolatePixelS<T> interpolate = FactoryInterpolation.createPixelS(0,255,config.interpolation, imageType);
+
+		HornSchunckPyramid alg = new HornSchunckPyramid(config,interpolate);
 
 		return new HornSchunckPyramid_to_DenseOpticalFlow(alg);
 	}

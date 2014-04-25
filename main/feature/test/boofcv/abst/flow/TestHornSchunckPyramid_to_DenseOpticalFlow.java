@@ -26,12 +26,13 @@ import boofcv.struct.image.ImageFloat32;
  */
 public class TestHornSchunckPyramid_to_DenseOpticalFlow extends GeneralDenseOpticalFlowChecks<ImageFloat32>{
 
-	protected TestHornSchunckPyramid_to_DenseOpticalFlow() {
+	public TestHornSchunckPyramid_to_DenseOpticalFlow() {
 		super(ImageFloat32.class);
+		justCorrectSign = true;
 	}
 
 	@Override
 	public DenseOpticalFlow<ImageFloat32> createAlg(Class<ImageFloat32> imageType) {
-		return FactoryDenseOpticalFlow.hornSchunckPyramid(20f,1.9f, 0.7, 1, 10 ,10, 1000);
+		return FactoryDenseOpticalFlow.hornSchunckPyramid(null,ImageFloat32.class);
 	}
 }
