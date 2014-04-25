@@ -63,7 +63,6 @@ public class UtilDenseOpticalFlow {
 		if( scale > 1.0 || scale < 0 )
 			throw new IllegalArgumentException("Scale must be 0 <= scale <= 1");
 
-
 		int numScales;
 
 		if( scale == 1 || maxLayers == 1 ) {

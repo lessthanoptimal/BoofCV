@@ -20,108 +20,115 @@ package boofcv.alg.flow;
 
 import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.alg.interpolate.InterpolatePixelS;
+import boofcv.alg.misc.GImageStatistics;
 import boofcv.alg.misc.ImageMiscOps;
-import boofcv.alg.misc.ImageStatistics;
 import boofcv.alg.transform.pyramid.PyramidOps;
+import boofcv.core.image.GConvertImage;
+import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.filter.derivative.FactoryDerivative;
+import boofcv.factory.flow.ConfigHornSchunckPyramid;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.pyramid.ImagePyramid;
 import boofcv.struct.pyramid.PyramidFloat;
 
 /**
+ * <p>
  * Pyramidal implementation of Horn-Schunck based on the discussion in [1].  The problem formulation has been
- * modified from the original found in [2] to account for larger displacements.
+ * modified from the original found in [2] to account for larger displacements.  The Euler-Lagrange equations
+ * are solved using Successive Over-Relaxation (SOR).
+ * </p>
  *
+ * <p>
+ * <ol>
+ * <li>Meinhardt-Llopis, Enric and Sánchez Pérez, Javier and Kondermann, Daniel,
+ * "Horn-Schunck Optical Flow with a Multi-Scale Strategy" vol 3, 2013, Image Processing On Line</li>
+ * <li>Horn, Berthold K., and Brian G. Schunck. "Determining optical flow."
+ * 1981 Technical Symposium East. International Society for Optics and Photonics, 1981.</li>
+ * </ol>
+ * </p>
  *
- * The image derivative should have a thickness of 1 for a straight edge.  If it is thicker you run into a situation
- * where the weight given to image difference is much greater than smoothing, but there is no image difference
- * at that point, causing the flow to get stuck.
- *
- * TODO finish commenting
  *
  * @author Peter Abeles
  */
-public class HornSchunckPyramid {
+public class HornSchunckPyramid< T extends ImageSingleBand> {
 
 	// used to weight the error of image brightness and smoothness of velocity flow
-	protected float alpha2;
+	private float alpha2;
 
 	// relaxation parameter for SOR  0 < w < 2.  Recommended default is 1.9
-	float SOR_RELAXATION;
+	private float SOR_RELAXATION;
 
 	// number of warps for outer loop
-	int numWarps;
+	private int numWarps;
 	// maximum number of iterations in inner loop
-	int maxInnerIterations;
+	private int maxInnerIterations;
 	// convergence tolerance
-	float convergeTolerance;
+	private float convergeTolerance;
 
 	// parameters used to create pyramid
-	double scale;
-	double sigma;
-	int maxLayers;
+	private double scale;
+	private double sigma;
+	private int maxLayers;
 
 	// storage for normalized image
-	ImageFloat32 norm1 = new ImageFloat32(1,1);
-	ImageFloat32 norm2 = new ImageFloat32(1,1);
+	private ImageFloat32 norm1 = new ImageFloat32(1,1);
+	private ImageFloat32 norm2 = new ImageFloat32(1,1);
 
 	// image pyramid and its derivative
-	PyramidFloat<ImageFloat32> pyr1;
-	PyramidFloat<ImageFloat32> pyr2;
+	private PyramidFloat<ImageFloat32> pyr1;
+	private PyramidFloat<ImageFloat32> pyr2;
 
-	ImageFloat32 deriv2X[];
-	ImageFloat32 deriv2Y[];
+	private ImageFloat32 deriv2X[];
+	private ImageFloat32 deriv2Y[];
 
-	// computes the gradient
-	ImageGradient<ImageFloat32, ImageFloat32> gradient = FactoryDerivative.two(ImageFloat32.class, ImageFloat32.class);
+	/*
+	 * The image derivative should have a thickness of 1 for a straight edge.  If it is thicker you run into a situation
+	 * where the weight given to image difference is much greater than smoothing, but there is no image difference
+	 * at that point, causing the flow to get stuck.
+	 */
+	private ImageGradient<ImageFloat32, ImageFloat32> gradient = FactoryDerivative.two(ImageFloat32.class, ImageFloat32.class);
 
 	// found flow for the most recently processed layer.  Final output is stored here
-	ImageFloat32 flowX = new ImageFloat32(1,1);
-	ImageFloat32 flowY = new ImageFloat32(1,1);
+	private ImageFloat32 flowX = new ImageFloat32(1,1);
+	private ImageFloat32 flowY = new ImageFloat32(1,1);
 
 	// flow estimation at the start of the iteration
-	ImageFloat32 initFlowX = new ImageFloat32(1,1);
-	ImageFloat32 initFlowY = new ImageFloat32(1,1);
+	private ImageFloat32 initFlowX = new ImageFloat32(1,1);
+	private ImageFloat32 initFlowY = new ImageFloat32(1,1);
 
 	// storage for the warped flow
-	ImageFloat32 warpImage2 = new ImageFloat32(1,1);
-	ImageFloat32 warpDeriv2X = new ImageFloat32(1,1);
-	ImageFloat32 warpDeriv2Y = new ImageFloat32(1,1);
+	private ImageFloat32 warpImage2 = new ImageFloat32(1,1);
+	private ImageFloat32 warpDeriv2X = new ImageFloat32(1,1);
+	private ImageFloat32 warpDeriv2Y = new ImageFloat32(1,1);
 
 	// Used to interpolate values between pixels
-	InterpolatePixelS<ImageFloat32> interp;
+	private InterpolatePixelS<ImageFloat32> interp;
 
 	/**
 	 * Configures flow estimation
 	 *
-	 * @param alpha  Weights importance of image brightness error and velocity smoothness.  Try 15
-	 * @param SOR_RELAXATION  relaxation parameter for SOR  0 < w < 2.  Recommended default is 1.9
-	 * @param numWarps Number of Taylor series iterations in each layer. Try 10
-	 * @param maxInnerIterations Maximum number inner iterations.  Try 100
-	 * @param convergeTolerance When the change drops below this value it will stop iterating.  Per pixel error.  Try 1e-4f
-	 * @param pyrScale
-	 * @param pyrSigma
-	 * @param maxLayers
-	 * @param interp Interpolation for image flow between image layers and warping.
+	 * @param config Configuration parameters
+	 * @param interp Interpolation for image flow between image layers and warping.  Overrides selection in config.
 	 */
-	public HornSchunckPyramid(float alpha, float SOR_RELAXATION, int numWarps, int maxInnerIterations, float convergeTolerance,
-							  double pyrScale, double pyrSigma , int maxLayers,
-							  InterpolatePixelS<ImageFloat32> interp) {
-		this.alpha2 = alpha*alpha;
-		this.SOR_RELAXATION = SOR_RELAXATION;
-		this.numWarps = numWarps;
-		this.maxInnerIterations = maxInnerIterations;
+	public HornSchunckPyramid(ConfigHornSchunckPyramid config , InterpolatePixelS<ImageFloat32> interp)
+	{
+		this.alpha2 = config.alpha*config.alpha;
+		this.SOR_RELAXATION = config.SOR_RELAXATION;
+		this.numWarps = config.numWarps;
+		this.maxInnerIterations = config.maxInnerIterations;
 		this.interp = interp;
-		this.convergeTolerance = convergeTolerance;
-		this.scale = pyrScale;
-		this.sigma = pyrSigma;
-		this.maxLayers = maxLayers;
+		this.convergeTolerance = config.convergeTolerance;
+		this.scale = config.pyrScale;
+		this.sigma = config.pyrSigma;
+		this.maxLayers = config.pyrMaxLayers;
 	}
 
 	/**
 	 * Processes the raw input images.  Normalizes them and creates image pyramids from them.
 	 */
-	public void process( ImageFloat32 image1 , ImageFloat32 image2 ) {
+	public void process( T image1 , T image2 )
+	{
 		// declare image data structures
 		if( pyr1 == null || pyr1.getInputWidth() != image1.width || pyr1.getInputHeight() != image1.height ) {
 			pyr1 = UtilDenseOpticalFlow.standardPyramid(image1.width, image1.height, scale, sigma, 5, maxLayers, ImageFloat32.class);
@@ -153,32 +160,36 @@ public class HornSchunckPyramid {
 	/**
 	 * Function to normalize the images between 0 and 255.
 	 **/
-	private static void imageNormalization( ImageFloat32 image1, ImageFloat32 image2,
-											ImageFloat32 normalized1, ImageFloat32 normalized2 )
+	private void imageNormalization( T image1, T image2, ImageFloat32 normalized1, ImageFloat32 normalized2 )
 	{
 		// find the max and min of both images
-		final float max1 = ImageStatistics.max(image1);
-		final float max2 = ImageStatistics.max(image2);
-		final float min1 = ImageStatistics.min(image1);
-		final float min2 = ImageStatistics.min(image2);
+		final float max1 = (float)GImageStatistics.max(image1);
+		final float max2 = (float)GImageStatistics.max(image2);
+		final float min1 = (float)GImageStatistics.min(image1);
+		final float min2 = (float)GImageStatistics.min(image2);
 
 		// obtain the absolute max and min
 		final float max = max1 > max2 ? max1 : max2;
 		final float min = min1 < min2 ? min1 : min2;
 		final float den = max - min;
 
-		final int size = image1.width*image1.height;
-
 		if(den > 0) {
 			// normalize both images
-			for(int i = 0; i < size; i++)
-			{
-				normalized1.data[i] = (image1.data[i] - min) / den;
-				normalized2.data[i] = (image2.data[i] - min) / den;
+			int indexN = 0;
+			for (int y = 0; y < image1.height; y++) {
+				for (int x = 0; x < image1.width; x++,indexN++) {
+					// this is a slow way to convert the image type into a float, but everything else is much
+					// more expensive
+					float pv1 = (float)GeneralizedImageOps.get(image1,x,y);
+					float pv2 = (float)GeneralizedImageOps.get(image2,x,y);
+
+					normalized1.data[indexN] = (pv1 - min) / den;
+					normalized2.data[indexN] = (pv2 - min) / den;
+				}
 			}
 		} else {
-			normalized1.setTo(image1);
-			normalized2.setTo(image2);
+			GConvertImage.convert(image1,normalized1);
+			GConvertImage.convert(image2,normalized2);
 		}
 	}
 
@@ -309,7 +320,6 @@ public class HornSchunckPyramid {
 
 		// outer Taylor expansion iterations
 		for( int warp = 0; warp < numWarps; warp++ ) {
-			System.out.println("WARP: "+warp);
 
 			initFlowX.setTo(flowX);
 			initFlowY.setTo(flowY);
@@ -325,9 +335,11 @@ public class HornSchunckPyramid {
 				// inner SOR iteration.
 				error = 0;
 
-				for( int y = 0; y < image1.height; y++ ) {
-					int pixelIndex = y*image1.width;
-					for (int x = 0; x < image1.width; x++, pixelIndex++ ) {
+				// inner portion
+				for( int y = 1; y < image1.height-1; y++ ) {
+					int pixelIndex = y*image1.width+1;
+					for (int x = 1; x < image1.width-1; x++, pixelIndex++ ) {
+						// could speed this up a bit more by precomputing the constant portion before the do-while loop
 						float ui = initFlowX.data[pixelIndex];
 						float vi = initFlowY.data[pixelIndex];
 
@@ -349,16 +361,63 @@ public class HornSchunckPyramid {
 						error += (uf - u)*(uf - u) + (vf - v)*(vf - v);
 					}
 				}
+
+				// border regions require special treatment
+				int pixelIndex0 = 0;
+				int pixelIndex1 = (image1.height-1)*image1.width;
+				for (int x = 0; x < image1.width; x++ ) {
+					error += iterationSorSafe(image1,x,0,pixelIndex0++);
+					error += iterationSorSafe(image1,x,image1.height-1,pixelIndex1++);
+				}
+
+				pixelIndex0 = image1.width + 1;
+				 pixelIndex1 = image1.width + image1.width-1;
+				for( int y = 1; y < image1.height-1; y++ ) {
+					error += iterationSorSafe(image1,1,y,pixelIndex0);
+					error += iterationSorSafe(image1,image1.width-1,y,pixelIndex1);
+
+					pixelIndex0 += image1.width;
+					pixelIndex1 += image1.width;
+				}
+
 				iter++;
 			} while( error > convergeTolerance*image1.width*image1.height && iter < maxInnerIterations);
 		}
 	}
 
 	/**
-	 * See equation 25.
+	 * SOR iteration for border pixels
 	 */
-	// TODO optimize by having and inner and border version
-	protected static float A( int x , int y , ImageFloat32 flow ) {
+	private float iterationSorSafe(ImageFloat32 image1, int x, int y, int pixelIndex) {
+		float w = SOR_RELAXATION;
+
+		float uf;
+		float vf;
+		float ui = initFlowX.data[pixelIndex];
+		float vi = initFlowY.data[pixelIndex];
+
+		float u = flowX.data[pixelIndex];
+		float v = flowY.data[pixelIndex];
+
+		float I1 = image1.data[pixelIndex];
+		float I2 = warpImage2.data[pixelIndex];
+
+		float I2x = warpDeriv2X.data[pixelIndex];
+		float I2y = warpDeriv2Y.data[pixelIndex];
+
+		float AU = A_safe(x,y,flowX);
+		float AV = A_safe(x,y,flowY);
+
+		flowX.data[pixelIndex] = uf = (1-w)*u + w*((I1-I2+I2x*ui - I2y*(v-vi))*I2x + alpha2*AU)/(I2x*I2x + alpha2);
+		flowY.data[pixelIndex] = vf = (1-w)*v + w*((I1-I2+I2y*vi - I2x*(uf-ui))*I2y + alpha2*AV)/(I2y*I2y + alpha2);
+
+		return (uf - u)*(uf - u) + (vf - v)*(vf - v);
+	}
+
+	/**
+	 * See equation 25.  Safe version
+	 */
+	protected static float A_safe( int x , int y , ImageFloat32 flow ) {
 		float u0 = safe(x-1,y  ,flow);
 		float u1 = safe(x+1,y  ,flow);
 		float u2 = safe(x  ,y-1,flow);
@@ -368,6 +427,25 @@ public class HornSchunckPyramid {
 		float u5 = safe(x+1,y-1,flow);
 		float u6 = safe(x-1,y+1,flow);
 		float u7 = safe(x+1,y+1,flow);
+
+		return (1.0f/6.0f)*(u0 + u1 + u2 + u3) + (1.0f/12.0f)*(u4 + u5 + u6 + u7);
+	}
+
+	/**
+	 * See equation 25.  Fast unsafe version
+	 */
+	protected static float A( int x , int y , ImageFloat32 flow ) {
+		int index = flow.getIndex(x,y);
+
+		float u0 = flow.data[index-1];
+		float u1 = flow.data[index+1];
+		float u2 = flow.data[index-flow.stride];
+		float u3 = flow.data[index+flow.stride];
+
+		float u4 = flow.data[index-1-flow.stride];
+		float u5 = flow.data[index+1-flow.stride];
+		float u6 = flow.data[index-1+flow.stride];
+		float u7 = flow.data[index+1+flow.stride];
 
 		return (1.0f/6.0f)*(u0 + u1 + u2 + u3) + (1.0f/12.0f)*(u4 + u5 + u6 + u7);
 	}

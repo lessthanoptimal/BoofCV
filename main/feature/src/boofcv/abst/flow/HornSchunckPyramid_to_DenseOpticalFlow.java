@@ -21,6 +21,7 @@ package boofcv.abst.flow;
 import boofcv.alg.flow.HornSchunckPyramid;
 import boofcv.struct.flow.ImageFlow;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageType;
 
 /**
@@ -29,21 +30,18 @@ import boofcv.struct.image.ImageType;
  * @author Peter Abeles
  */
 // TODO normalize histogram
-public class HornSchunckPyramid_to_DenseOpticalFlow
-	implements DenseOpticalFlow<ImageFloat32>
+public class HornSchunckPyramid_to_DenseOpticalFlow<T extends ImageSingleBand>
+	implements DenseOpticalFlow<T>
 {
-	HornSchunckPyramid hornSchunck;
+	HornSchunckPyramid<T> hornSchunck;
+	Class<T> imageType;
 
-	/**
-	 * TODO fill out
-	 * @param hornSchunck
-	 */
-	public HornSchunckPyramid_to_DenseOpticalFlow(HornSchunckPyramid hornSchunck) {
+	public HornSchunckPyramid_to_DenseOpticalFlow(HornSchunckPyramid<T> hornSchunck) {
 		this.hornSchunck = hornSchunck;
 	}
 
 	@Override
-	public void process(ImageFloat32 source, ImageFloat32 destination, ImageFlow flow) {
+	public void process(T source, T destination, ImageFlow flow) {
 
 		hornSchunck.process(source,destination);
 
@@ -61,7 +59,7 @@ public class HornSchunckPyramid_to_DenseOpticalFlow
 	}
 
 	@Override
-	public ImageType<ImageFloat32> getInputType() {
-		return ImageType.single(ImageFloat32.class);
+	public ImageType<T> getInputType() {
+		return ImageType.single(imageType);
 	}
 }

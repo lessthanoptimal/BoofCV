@@ -187,8 +187,8 @@ public abstract class DenseOpticalFlowBlockPyramid<T extends ImageSingleBand> {
 		int bestFlowX=0,bestFlowY=0;
 
 		// ensure the search region is contained entirely inside the image
-		int startY = cy-searchRadius-regionRadius < 0 ? 0 : -searchRadius;
-		int startX = cx-searchRadius-regionRadius < 0 ? 0 : -searchRadius;
+		int startY = cy-searchRadius-regionRadius < 0 ? Math.max(regionRadius - cy, 0) : -searchRadius;
+		int startX = cx-searchRadius-regionRadius < 0 ? Math.max(regionRadius-cx,0) : -searchRadius;
 		int endY = cy+searchRadius+regionRadius >= curr.height ? curr.height-cy-regionRadius-1 : searchRadius;
 		int endX = cx+searchRadius+regionRadius >= curr.width ? curr.width-cx-regionRadius-1 : searchRadius;
 
