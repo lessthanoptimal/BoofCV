@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,6 +20,7 @@ package boofcv.alg.transform.pyramid;
 
 import boofcv.abst.filter.FilterImageInterface;
 import boofcv.abst.filter.derivative.ImageGradient;
+import boofcv.abst.filter.derivative.ImageHessian;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.pyramid.ImagePyramid;
@@ -68,7 +69,7 @@ public class PyramidOps {
 		for( int i = 0; i < output.length; i++ ) {
 			int w = pyramid.getWidth(i);
 			int h = pyramid.getHeight(i);
-			output[i].reshape(w,h);
+			output[i].reshape(w, h);
 		}
 	}
 
@@ -118,6 +119,26 @@ public class PyramidOps {
 		for( int i = 0; i < input.getNumLayers(); i++ ) {
 			I imageIn = input.getLayer(i);
 			gradient.process(imageIn,derivX[i],derivY[i]);
+		}
+	}
+
+	/**
+	 * <p>
+	 * Computes the hessian (2nd order derivative) for each image the pyramid.
+	 * </p>
+	 *
+	 * @param derivX (Input) Pyramid where x-derivative is stored.
+	 * @param derivY (Input) Pyramid where y-derivative is stored.
+	 * @param hessian (Input) Computes hessian from gradient
+	 * @param derivXX (Output) Second derivative XX
+	 * @param derivYY (Output) Second derivative YY
+	 * @param derivXY (Output) Second derivative XY
+	 */
+	public static <I extends ImageSingleBand, O extends ImageSingleBand>
+	void hessian(O[] derivX, O[] derivY , ImageHessian<O> hessian , O[] derivXX, O[] derivYY , O[] derivXY )
+	{
+		for( int i = 0; i < derivX.length; i++ ) {
+			hessian.process(derivX[i],derivY[i],derivXX[i],derivYY[i],derivXY[i]);
 		}
 	}
 }

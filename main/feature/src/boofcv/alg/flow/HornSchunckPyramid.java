@@ -20,17 +20,12 @@ package boofcv.alg.flow;
 
 import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.alg.interpolate.InterpolatePixelS;
-import boofcv.alg.misc.GImageStatistics;
 import boofcv.alg.misc.ImageMiscOps;
-import boofcv.alg.transform.pyramid.PyramidOps;
-import boofcv.core.image.GConvertImage;
-import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.factory.flow.ConfigHornSchunckPyramid;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.pyramid.ImagePyramid;
-import boofcv.struct.pyramid.PyramidFloat;
 
 /**
  * <p>
@@ -51,8 +46,9 @@ import boofcv.struct.pyramid.PyramidFloat;
  *
  * @author Peter Abeles
  */
-public class HornSchunckPyramid< T extends ImageSingleBand> {
-
+public class HornSchunckPyramid< T extends ImageSingleBand>
+		extends DenseFlowPyramidBase<T>
+{
 	// used to weight the error of image brightness and smoothness of velocity flow
 	private float alpha2;
 
@@ -66,28 +62,12 @@ public class HornSchunckPyramid< T extends ImageSingleBand> {
 	// convergence tolerance
 	private float convergeTolerance;
 
-	// parameters used to create pyramid
-	private double scale;
-	private double sigma;
-	private int maxLayers;
+	// computes the image gradient
+	private ImageGradient<ImageFloat32, ImageFloat32> gradient = FactoryDerivative.three(ImageFloat32.class, ImageFloat32.class);
 
-	// storage for normalized image
-	private ImageFloat32 norm1 = new ImageFloat32(1,1);
-	private ImageFloat32 norm2 = new ImageFloat32(1,1);
-
-	// image pyramid and its derivative
-	private PyramidFloat<ImageFloat32> pyr1;
-	private PyramidFloat<ImageFloat32> pyr2;
-
-	private ImageFloat32 deriv2X[];
-	private ImageFloat32 deriv2Y[];
-
-	/*
-	 * The image derivative should have a thickness of 1 for a straight edge.  If it is thicker you run into a situation
-	 * where the weight given to image difference is much greater than smoothing, but there is no image difference
-	 * at that point, causing the flow to get stuck.
-	 */
-	private ImageGradient<ImageFloat32, ImageFloat32> gradient = FactoryDerivative.two(ImageFloat32.class, ImageFloat32.class);
+	// image gradient second image
+	private ImageFloat32 deriv2X = new ImageFloat32(1,1);
+	private ImageFloat32 deriv2Y = new ImageFloat32(1,1);
 
 	// found flow for the most recently processed layer.  Final output is stored here
 	protected ImageFloat32 flowX = new ImageFloat32(1,1);
@@ -102,9 +82,6 @@ public class HornSchunckPyramid< T extends ImageSingleBand> {
 	protected ImageFloat32 warpDeriv2X = new ImageFloat32(1,1);
 	protected ImageFloat32 warpDeriv2Y = new ImageFloat32(1,1);
 
-	// Used to interpolate values between pixels
-	private InterpolatePixelS<ImageFloat32> interp;
-
 	/**
 	 * Configures flow estimation
 	 *
@@ -113,84 +90,14 @@ public class HornSchunckPyramid< T extends ImageSingleBand> {
 	 */
 	public HornSchunckPyramid(ConfigHornSchunckPyramid config , InterpolatePixelS<ImageFloat32> interp)
 	{
+		super(config.pyrScale,config.pyrSigma,config.pyrMaxLayers,interp);
+
 		this.alpha2 = config.alpha*config.alpha;
 		this.SOR_RELAXATION = config.SOR_RELAXATION;
 		this.numWarps = config.numWarps;
 		this.maxInnerIterations = config.maxInnerIterations;
 		this.interp = interp;
 		this.convergeTolerance = config.convergeTolerance;
-		this.scale = config.pyrScale;
-		this.sigma = config.pyrSigma;
-		this.maxLayers = config.pyrMaxLayers;
-	}
-
-	/**
-	 * Processes the raw input images.  Normalizes them and creates image pyramids from them.
-	 */
-	public void process( T image1 , T image2 )
-	{
-		// declare image data structures
-		if( pyr1 == null || pyr1.getInputWidth() != image1.width || pyr1.getInputHeight() != image1.height ) {
-			pyr1 = UtilDenseOpticalFlow.standardPyramid(image1.width, image1.height, scale, sigma, 5, maxLayers, ImageFloat32.class);
-			pyr2 = UtilDenseOpticalFlow.standardPyramid(image1.width, image1.height, scale, sigma, 5, maxLayers, ImageFloat32.class);
-
-			pyr1.initialize(image1.width,image1.height);
-			pyr2.initialize(image1.width,image1.height);
-
-			deriv2X = PyramidOps.declareOutput(pyr2, ImageFloat32.class);
-			deriv2Y = PyramidOps.declareOutput(pyr2,ImageFloat32.class);
-		}
-
-		norm1.reshape(image1.width,image1.height);
-		norm2.reshape(image1.width,image1.height);
-
-		// normalize input image to make sure alpha is image independent
-		imageNormalization(image1, image2, norm1, norm2);
-
-		// create image pyramid
-		pyr1.process(norm1);
-		pyr2.process(norm2);
-
-		PyramidOps.gradient(pyr2,gradient,deriv2X,deriv2Y);
-
-		// compute flow from pyramid
-		process(pyr1,pyr2,deriv2X,deriv2Y);
-	}
-
-	/**
-	 * Function to normalize the images between 0 and 255.
-	 **/
-	private void imageNormalization( T image1, T image2, ImageFloat32 normalized1, ImageFloat32 normalized2 )
-	{
-		// find the max and min of both images
-		final float max1 = (float)GImageStatistics.max(image1);
-		final float max2 = (float)GImageStatistics.max(image2);
-		final float min1 = (float)GImageStatistics.min(image1);
-		final float min2 = (float)GImageStatistics.min(image2);
-
-		// obtain the absolute max and min
-		final float max = max1 > max2 ? max1 : max2;
-		final float min = min1 < min2 ? min1 : min2;
-		final float den = max - min;
-
-		if(den > 0) {
-			// normalize both images
-			int indexN = 0;
-			for (int y = 0; y < image1.height; y++) {
-				for (int x = 0; x < image1.width; x++,indexN++) {
-					// this is a slow way to convert the image type into a float, but everything else is much
-					// more expensive
-					float pv1 = (float)GeneralizedImageOps.get(image1,x,y);
-					float pv2 = (float)GeneralizedImageOps.get(image2,x,y);
-
-					normalized1.data[indexN] = (pv1 - min) / den;
-					normalized2.data[indexN] = (pv2 - min) / den;
-				}
-			}
-		} else {
-			GConvertImage.convert(image1,normalized1);
-			GConvertImage.convert(image2,normalized2);
-		}
 	}
 
 	/**
@@ -199,12 +106,10 @@ public class HornSchunckPyramid< T extends ImageSingleBand> {
 	 *
 	 * @param image1 Pyramid of first image
 	 * @param image2 Pyramid of second image
-	 * @param derivX2 Pyramid of image derive-x computed from second image pyramid
-	 * @param derivY2 Pyramid of image derive-y computed from second image pyramid
 	 */
+	@Override
 	public void process( ImagePyramid<ImageFloat32> image1 ,
-						 ImagePyramid<ImageFloat32> image2 ,
-						 ImageFloat32[] derivX2 , ImageFloat32[] derivY2 ) {
+						 ImagePyramid<ImageFloat32> image2 ) {
 
 
 		// Process the pyramid from low resolution to high resolution
@@ -212,12 +117,16 @@ public class HornSchunckPyramid< T extends ImageSingleBand> {
 		for( int i = image1.getNumLayers()-1; i >= 0; i-- ) {
 			ImageFloat32 layer1 = image1.getLayer(i);
 			ImageFloat32 layer2 = image2.getLayer(i);
-			ImageFloat32 layerDX1 = derivX2[i];
-			ImageFloat32 layerDY1 = derivY2[i];
 
+			// declare memory for this layer
+			deriv2X.reshape(layer1.width,layer1.height);
+			deriv2Y.reshape(layer1.width,layer1.height);
 			warpDeriv2X.reshape(layer1.width,layer1.height);
 			warpDeriv2Y.reshape(layer1.width,layer1.height);
 			warpImage2.reshape(layer1.width,layer1.height);
+
+			// compute the gradient for the second image
+			gradient.process(layer2,deriv2X,deriv2Y);
 
 			if( !first ) {
 				// interpolate initial flow from previous layer
@@ -238,7 +147,7 @@ public class HornSchunckPyramid< T extends ImageSingleBand> {
 			}
 
 			// compute flow for this layer
-			processLayer(layer1,layer2,layerDX1,layerDY1);
+			processLayer(layer1,layer2,deriv2X,deriv2Y);
 		}
 	}
 
@@ -297,14 +206,12 @@ public class HornSchunckPyramid< T extends ImageSingleBand> {
 				float wx = x + u;
 				float wy = y + v;
 
-				if( wx < 0) wx = 0;
-				else if( wx > before.width-1 )
-					wx = before.width-1;
-				if( wy < 0) wy = 0;
-				else if( wy > before.height-1 )
-					wy = before.height-1;
-
-				after.data[pixelIndex] = interp.get(wx, wy);
+				if( wx < 0 || wx > before.width-1 || wy < 0 || wy > before.height-1 ) {
+					// setting outside pixels to zero seems to produce smoother results than extending the image
+					after.data[pixelIndex] = 0;
+				} else {
+					after.data[pixelIndex] = interp.get(wx, wy);
+				}
 			}
 		}
 	}
@@ -380,8 +287,7 @@ public class HornSchunckPyramid< T extends ImageSingleBand> {
 					pixelIndex1 += image1.width;
 				}
 
-				iter++;
-			} while( error > convergeTolerance*image1.width*image1.height && iter < maxInnerIterations);
+			} while( error > convergeTolerance*image1.width*image1.height && ++iter < maxInnerIterations);
 		}
 	}
 

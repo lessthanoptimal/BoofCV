@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,6 +20,7 @@ package boofcv.alg.transform.pyramid;
 
 import boofcv.abst.filter.FilterImageInterface;
 import boofcv.abst.filter.derivative.ImageGradient;
+import boofcv.abst.filter.derivative.ImageHessian;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.factory.filter.blur.FactoryBlurFilter;
 import boofcv.factory.filter.derivative.FactoryDerivative;
@@ -103,6 +104,46 @@ public class TestPyramidOps {
 			BoofTesting.assertEquals(x,outX[i],1e-4);
 			BoofTesting.assertEquals(y,outY[i],1e-4);
 		}
+	}
+
+	@Test
+	public void hessian() {
+		ImageHessian<ImageFloat32> gradient = FactoryDerivative.hessianThree(ImageFloat32.class);
+
+		ImageFloat32[] derivX = new ImageFloat32[5];
+		ImageFloat32[] derivY = new ImageFloat32[5];
+		ImageFloat32[] derivXX = new ImageFloat32[5];
+		ImageFloat32[] derivYY = new ImageFloat32[5];
+		ImageFloat32[] derivXY = new ImageFloat32[5];
+
+		for( int i = 0; i < 5; i++ ) {
+			derivX[i] = new ImageFloat32(20,30-i);
+			derivY[i] = new ImageFloat32(20,30-i);
+			derivXX[i] = new ImageFloat32(20,30-i);
+			derivYY[i] = new ImageFloat32(20,30-i);
+			derivXY[i] = new ImageFloat32(20,30-i);
+
+			GImageMiscOps.fillUniform(derivX[i], rand, 0, 100);
+			GImageMiscOps.fillUniform(derivY[i], rand, 0, 100);
+		}
+
+		PyramidOps.hessian(derivX,derivY, gradient,derivXX,derivYY,derivXY);
+
+		for( int i = 0; i < derivX.length; i++ ) {
+			ImageFloat32 dx = derivX[i];
+			ImageFloat32 dy = derivY[i];
+
+			ImageFloat32 foundXX = new ImageFloat32(dx.width,dy.height);
+			ImageFloat32 foundYY = new ImageFloat32(dx.width,dy.height);
+			ImageFloat32 foundXY = new ImageFloat32(dx.width,dy.height);
+
+			gradient.process(dx,dy,foundXX,foundYY,foundXY);
+
+			BoofTesting.assertEquals(foundXX,derivXX[i],1e-4);
+			BoofTesting.assertEquals(foundYY,derivYY[i],1e-4);
+			BoofTesting.assertEquals(foundXY,derivXY[i],1e-4);
+		}
+
 	}
 
 	public static <I extends ImageSingleBand>
