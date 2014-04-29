@@ -18,13 +18,10 @@
 
 package boofcv.alg.flow;
 
-import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.misc.ImageMiscOps;
-import boofcv.alg.transform.pyramid.PyramidOps;
 import boofcv.core.image.border.BorderType;
-import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.factory.flow.ConfigHornSchunckPyramid;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.image.ImageFloat32;
@@ -34,7 +31,6 @@ import org.junit.Test;
 import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 /**
  * @author Peter Abeles
@@ -53,8 +49,8 @@ public class TestHornSchunckPyramid {
 		ImageFloat32 original1 = new ImageFloat32(width,height);
 		ImageFloat32 original2 = new ImageFloat32(width,height);
 
-		ImageMiscOps.fillRectangle(original1,40,10,0,10,height);
-		ImageMiscOps.fillRectangle(original2,40,15,0,10,height);
+		ImageMiscOps.fillRectangle(original1, 40, 10, 0, 10, height);
+		ImageMiscOps.fillRectangle(original2, 40, 15, 0, 10, height);
 
 		PyramidFloat<ImageFloat32> pyr1 = UtilDenseOpticalFlow.standardPyramid(width,height,0.7,0,5,12,ImageFloat32.class);
 		PyramidFloat<ImageFloat32> pyr2 = UtilDenseOpticalFlow.standardPyramid(width,height,0.7,0,5,12,ImageFloat32.class);
@@ -62,17 +58,9 @@ public class TestHornSchunckPyramid {
 		pyr1.process(original1);
 		pyr2.process(original2);
 
-		ImageGradient<ImageFloat32, ImageFloat32> gradient = FactoryDerivative.two(ImageFloat32.class, ImageFloat32.class);
-
-		ImageFloat32 derivX[] = PyramidOps.declareOutput(pyr2,ImageFloat32.class);
-		ImageFloat32 derivY[] = PyramidOps.declareOutput(pyr2,ImageFloat32.class);
-
-
-		PyramidOps.gradient(pyr2,gradient,derivX,derivY);
-
 		InterpolatePixelS<ImageFloat32> interpolate = FactoryInterpolation.bilinearPixelS(ImageFloat32.class);
 		HornSchunckPyramid alg = new HornSchunckPyramid(new ConfigHornSchunckPyramid(20f,100),interpolate);
-		alg.process(pyr1,pyr2,derivX,derivY);
+		alg.process(pyr1,pyr2);
 
 		for( int y = 0; y < height; y++ ) {
 			for( int x = 0; x < width; x++ ) {
@@ -81,24 +69,6 @@ public class TestHornSchunckPyramid {
 			}
 		}
 
-	}
-
-	@Test
-	public void interpolateFlow() {
-		InterpolatePixelS<ImageFloat32> interpolate = FactoryInterpolation.bilinearPixelS(ImageFloat32.class);
-		HornSchunckPyramid alg = new HornSchunckPyramid(new ConfigHornSchunckPyramid(0.01f,100),interpolate);
-
-		ImageFloat32 input = new ImageFloat32(5,7);
-		ImageFloat32 output = new ImageFloat32(8,14);
-
-		ImageMiscOps.fillUniform(input,rand,0,10);
-
-		alg.interpolateFlowScale(input, output);
-
-		// there should be no zero values.  This is a very crude test
-		for( int i = 0; i < output.data.length; i++ ) {
-			assertTrue( output.data[i] != 0 );
-		}
 	}
 
 	@Test

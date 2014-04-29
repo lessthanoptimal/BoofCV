@@ -107,7 +107,9 @@ public class FactoryDenseOpticalFlow {
 	}
 
 	/**
-	 * TODO comment
+	 * The original Horn-Schunck algorithm.  Only good for very small motions.
+	 *
+	 * @see HornSchunck
 	 *
 	 * @param alpha
 	 * @param numIterations

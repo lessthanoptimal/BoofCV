@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,7 +35,7 @@ public interface ImageHessian<Output extends ImageSingleBand> extends ImageDeriv
 	 * @param inputDerivX Precomputed image X-derivative.
 	 * @param inputDerivY Precomputed image Y-derivative.
 	 * @param derivXX Second derivative x-axis x-axis
-	 * @param derivYY Second derivative x-axis y-axis
+	 * @param derivYY Second derivative y-axis y-axis
 	 * @param derivXY Second derivative x-axis y-axis
 	 */
 	public void process( Output inputDerivX , Output inputDerivY, Output derivXX, Output derivYY, Output derivXY  );

@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.factory.flow;
+package boofcv.alg.flow;
 
 import boofcv.alg.interpolate.TypeInterpolate;
 import boofcv.struct.Configuration;
@@ -26,33 +26,45 @@ import boofcv.struct.Configuration;
  *
  * @author Peter Abeles
  */
-public class ConfigHornSchunckPyramid implements Configuration {
+public class ConfigBroxWarping implements Configuration {
 
 	/**
-	 * Weights importance of image brightness error and velocity smoothness.  Larger values which prefer a smooth
-	 * flow.
+	 * Brightness difference weighting factor.  Larger values which prefer a smooth flow.
 	 */
 	public float alpha = 0.05f;
+
 	/**
-	 * SOR relaxation parameter.
+	 * Gradient difference weighting factor.  Larger values which prefer a smooth flow.
+	 */
+	public float gamma = 0.02f;
+
+	/**
+	 * SOR relaxation parameter.  0 < w < 2.  Recommended default is 1.9
 	 */
 	public float SOR_RELAXATION = 1.9f;
+
 	/**
-	 * Number of warps which it will apply.
+	 * NUmber of iterations in the outer loop
 	 */
-	public int numWarps = 10;
+	public int numOuter = 15;
 	/**
-	 * Maximum number of iterations in the inner loop.
+	 * NUmber of interations in the inner loop
 	 */
-	public int maxInnerIterations = 150;
+	public int numInner = 1;
+
 	/**
-	 * Convergence tolerance for inner loop.  Specified in per pixel error.
+	 * Maximum allowed iterations for SOR
 	 */
-	public float convergeTolerance = 1e-5f;
+	public int maxIterationsSor = 100;
+
 	/**
-	 * Change in scale between each layer.  Try 0.7
+	 * Convergence tolerance for SOR loop.  Specified in per pixel error.
 	 */
-	public double pyrScale = 0.7;
+	public float convergeToleranceSor = 1e-5f;
+	/**
+	 * Change in scale between each layer.  Try 0.75
+	 */
+	public double pyrScale = 0.75;
 	/**
 	 * Amount of blur applied to each layer in the pyramid.  If sigma <= 0 then no blur is applied.
 	 */
@@ -60,22 +72,21 @@ public class ConfigHornSchunckPyramid implements Configuration {
 	/**
 	 * Maximum number of layers in the pyramid
 	 */
-	public int pyrMaxLayers = 10;
+	public int pyrMaxLayers = 100;
 
 	/**
 	 * Type of interpolation used.  Bilinear recommended
 	 */
 	public TypeInterpolate interpolation = TypeInterpolate.BILINEAR;
 
-
 	@Override
 	public void checkValidity() {}
 
-	public ConfigHornSchunckPyramid() {
+	public ConfigBroxWarping() {
 	}
 
-	public ConfigHornSchunckPyramid(float alpha, int maxInnerIterations) {
+	public ConfigBroxWarping(float alpha, float gamma) {
 		this.alpha = alpha;
-		this.maxInnerIterations = maxInnerIterations;
+		this.gamma = gamma;
 	}
 }
