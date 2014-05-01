@@ -144,31 +144,32 @@ public abstract class DenseFlowPyramidBase<T extends ImageSingleBand> {
 	/**
 	 * Function to normalize the images between 0 and 255.
 	 **/
-	private void imageNormalization( T image1, T image2, ImageFloat32 normalized1, ImageFloat32 normalized2 )
+	protected static<T extends ImageSingleBand>
+	void imageNormalization( T image1, T image2, ImageFloat32 normalized1, ImageFloat32 normalized2 )
 	{
 		// find the max and min of both images
-		final float max1 = (float)GImageStatistics.max(image1);
-		final float max2 = (float)GImageStatistics.max(image2);
-		final float min1 = (float)GImageStatistics.min(image1);
-		final float min2 = (float)GImageStatistics.min(image2);
+		float max1 = (float)GImageStatistics.max(image1);
+		float max2 = (float)GImageStatistics.max(image2);
+		float min1 = (float)GImageStatistics.min(image1);
+		float min2 = (float)GImageStatistics.min(image2);
 
 		// obtain the absolute max and min
-		final float max = max1 > max2 ? max1 : max2;
-		final float min = min1 < min2 ? min1 : min2;
-		final float den = max - min;
+		float max = max1 > max2 ? max1 : max2;
+		float min = min1 < min2 ? min1 : min2;
+		float range = max - min;
 
-		if(den > 0) {
+		if(range > 0) {
 			// normalize both images
 			int indexN = 0;
 			for (int y = 0; y < image1.height; y++) {
 				for (int x = 0; x < image1.width; x++,indexN++) {
 					// this is a slow way to convert the image type into a float, but everything else is much
 					// more expensive
-					float pv1 = (float) GeneralizedImageOps.get(image1, x, y);
+					float pv1 = (float)GeneralizedImageOps.get(image1, x, y);
 					float pv2 = (float)GeneralizedImageOps.get(image2,x,y);
 
-					normalized1.data[indexN] = (pv1 - min) / den;
-					normalized2.data[indexN] = (pv2 - min) / den;
+					normalized1.data[indexN] = (pv1 - min) / range;
+					normalized2.data[indexN] = (pv2 - min) / range;
 				}
 			}
 		} else {

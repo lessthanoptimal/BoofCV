@@ -145,10 +145,25 @@ public class FactoryDenseOpticalFlow {
 		if( config == null )
 			config = new ConfigHornSchunckPyramid();
 
-		InterpolatePixelS<T> interpolate = FactoryInterpolation.createPixelS(0,255,config.interpolation, imageType);
+		InterpolatePixelS<ImageFloat32> interpolate =
+				FactoryInterpolation.createPixelS(0,255,config.interpolation, ImageFloat32.class);
 
-		HornSchunckPyramid alg = new HornSchunckPyramid(config,interpolate);
+		HornSchunckPyramid<T> alg = new HornSchunckPyramid<T>(config,interpolate);
 
-		return new HornSchunckPyramid_to_DenseOpticalFlow(alg);
+		return new HornSchunckPyramid_to_DenseOpticalFlow<T>(alg);
+	}
+
+	public static <T extends ImageSingleBand>
+	DenseOpticalFlow<T> broxWarping( ConfigBroxWarping config , Class<T> imageType )
+	{
+		if( config == null )
+			config = new ConfigBroxWarping();
+
+		InterpolatePixelS<ImageFloat32> interpolate =
+				FactoryInterpolation.createPixelS(0,255,config.interpolation, ImageFloat32.class);
+
+		BroxWarpingSpacial<T> alg = new BroxWarpingSpacial<T>(config,interpolate);
+
+		return new BroxWarpingSpacial_to_DenseOpticalFlow<T>(alg);
 	}
 }

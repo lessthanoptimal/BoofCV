@@ -44,11 +44,11 @@ public class ConfigBroxWarping implements Configuration {
 	public float SOR_RELAXATION = 1.9f;
 
 	/**
-	 * NUmber of iterations in the outer loop
+	 * Number of iterations in the outer loop
 	 */
 	public int numOuter = 15;
 	/**
-	 * NUmber of interations in the inner loop
+	 * Number of iterations in the inner loop
 	 */
 	public int numInner = 1;
 
@@ -66,7 +66,7 @@ public class ConfigBroxWarping implements Configuration {
 	 */
 	public double pyrScale = 0.75;
 	/**
-	 * Amount of blur applied to each layer in the pyramid.  If sigma <= 0 then no blur is applied.
+	 * Amount of gaussian blur applied to each layer in the pyramid.  If sigma <= 0 then no blur is applied.
 	 */
 	public double pyrSigma = 0.5;
 	/**
