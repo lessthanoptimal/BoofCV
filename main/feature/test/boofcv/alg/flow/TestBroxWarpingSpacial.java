@@ -220,5 +220,4 @@ public class TestBroxWarpingSpacial {
 		assertEquals(a.getIndex(0,5),alg.s(-1,5),1e-4f);
 		assertEquals(a.getIndex(width-1,5),alg.s(width,5),1e-4f);
 	}
-
 }

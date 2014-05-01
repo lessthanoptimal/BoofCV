@@ -50,9 +50,9 @@ public class BroxWarpingSpacial<T extends ImageSingleBand> extends DenseFlowPyra
 	private static final double EPSILON = 0.001;
 
 	// brightness error weighting factor
-	private float alpha;
+	protected float alpha;
 	// gradient error weighting factor
-	private float gamma;
+	protected float gamma;
 
 	// relaxation parameter for SOR  0 < w < 2.  Recommended default is 1.9
 	private float SOR_RELAXATION;
@@ -239,7 +239,6 @@ public class BroxWarpingSpacial<T extends ImageSingleBand> extends DenseFlowPyra
 
 		// outer Taylor expansion iterations
 		for( int indexOuter = 0; indexOuter < numOuter; indexOuter++ ) {
-			System.out.println("Outer iteration "+indexOuter);
 
 			// warp the image and the first + second derivatives
 			warpImageTaylor(image2, flowU, flowV, warpImage2);
@@ -263,8 +262,6 @@ public class BroxWarpingSpacial<T extends ImageSingleBand> extends DenseFlowPyra
 			Arrays.fill(dv.data,0,N,0);
 
 			for( int indexInner = 0; indexInner < numInner; indexInner++ ) {
-
-				System.out.println("Inner iteration");
 
 				computePsiDataPsiGradient(image1, image2,
 						deriv1X, deriv1Y,
@@ -305,15 +302,12 @@ public class BroxWarpingSpacial<T extends ImageSingleBand> extends DenseFlowPyra
 						error += iterationSor(image1, deriv1X, deriv1Y,
 								s(x1, y), s(x1 - 1, y), s(x1 + 1, y), s(x1, y - 1), s(x1, y + 1));
 					}
-
-					System.out.println("error = "+error);
 				} while (error > convergeTolerance * image1.width * image1.height && ++iter < maxIterationsSor);
 			}
 
 			// update the flow with the motion increments
 			PixelMath.add(flowU,du, flowU);
 			PixelMath.add(flowV,dv, flowV);
-
 		}
 	}
 
@@ -349,7 +343,7 @@ public class BroxWarpingSpacial<T extends ImageSingleBand> extends DenseFlowPyra
 
 		float Du = psid*dx2*dx2 + psig*(dxx2*dxx2 + dxy2*dxy2) + alpha*divD.data[i];
 		float Dv = psid*dy2*dy2 + psig*(dyy2*dyy2 + dxy2*dxy2) + alpha*divD.data[i];
-		float D = psid*dx2*dxy2 + psig*(dxx2 + dyy2)*dxy2;
+		float D = psid*dx2*dy2 + psig*(dxx2 + dyy2)*dxy2;
 
 		// update the change in flow
 		float psi_index = psiSmooth.data[i];
