@@ -239,6 +239,7 @@ public class BroxWarpingSpacial<T extends ImageSingleBand> extends DenseFlowPyra
 
 		// outer Taylor expansion iterations
 		for( int indexOuter = 0; indexOuter < numOuter; indexOuter++ ) {
+			System.out.println("Outer iteration "+indexOuter);
 
 			// warp the image and the first + second derivatives
 			warpImageTaylor(image2, flowU, flowV, warpImage2);
@@ -255,7 +256,7 @@ public class BroxWarpingSpacial<T extends ImageSingleBand> extends DenseFlowPyra
 
 			computePsiSmooth(derivFlowUX,derivFlowUY,derivFlowVX,derivFlowVY,psiSmooth);
 
-			computeDivUVD(flowU, flowV,psiSmooth,alpha,divU,divV,divD);
+			computeDivUVD(flowU, flowV,psiSmooth,divU,divV,divD);
 
 			// initialize the motion increments to zero
 			Arrays.fill(du.data,0,N,0);
@@ -263,10 +264,12 @@ public class BroxWarpingSpacial<T extends ImageSingleBand> extends DenseFlowPyra
 
 			for( int indexInner = 0; indexInner < numInner; indexInner++ ) {
 
-				computePsiDataPsiGradient(image1,image2,
-						deriv1X,deriv1Y,
-						deriv2X,deriv2Y,deriv2XX,deriv2YY,deriv2XY,
-						du,dv,psiData,psiGradient);
+				System.out.println("Inner iteration");
+
+				computePsiDataPsiGradient(image1, image2,
+						deriv1X, deriv1Y,
+						deriv2X, deriv2Y, deriv2XX, deriv2YY, deriv2XY,
+						du, dv, psiData, psiGradient);
 
 				float error;
 				int iter = 0;
@@ -303,6 +306,7 @@ public class BroxWarpingSpacial<T extends ImageSingleBand> extends DenseFlowPyra
 								s(x1, y), s(x1 - 1, y), s(x1 + 1, y), s(x1, y - 1), s(x1, y + 1));
 					}
 
+					System.out.println("error = "+error);
 				} while (error > convergeTolerance * image1.width * image1.height && ++iter < maxIterationsSor);
 			}
 
@@ -338,14 +342,14 @@ public class BroxWarpingSpacial<T extends ImageSingleBand> extends DenseFlowPyra
 		float dxy2 = warpDeriv2XY.data[i];
 
 		float Au = -psid*di*dx2 + alpha*divU.data[i]
-				- gamma*psig*((dx2 - deriv1X.data[i])*warpDeriv2XX.data[i] + (dy2 - deriv1Y.data[i])*warpDeriv2XY.data[i]);
+				- psig*((dx2 - deriv1X.data[i])*warpDeriv2XX.data[i] + (dy2 - deriv1Y.data[i])*warpDeriv2XY.data[i]);
 
 		float Av = -psid*di*dy2 + alpha*divV.data[i]
-				- gamma*psig*((dx2 - deriv1X.data[i])*warpDeriv2XY.data[i] + (dy2 - deriv1Y.data[i])*warpDeriv2YY.data[i]);
+				- psig*((dx2 - deriv1X.data[i])*warpDeriv2XY.data[i] + (dy2 - deriv1Y.data[i])*warpDeriv2YY.data[i]);
 
-		float Du = psid*dx2*dx2 + gamma*psig*(dxx2*dxx2 + dxy2*dxy2) + alpha*divD.data[i];
-		float Dv = psid*dy2*dy2 + gamma*psig*(dyy2*dyy2 + dxy2*dxy2) + alpha*divD.data[i];
-		float D = psid*dx2*dxy2 + gamma*psig*(dxx2 + dyy2)*dxy2;
+		float Du = psid*dx2*dx2 + psig*(dxx2*dxx2 + dxy2*dxy2) + alpha*divD.data[i];
+		float Dv = psid*dy2*dy2 + psig*(dyy2*dyy2 + dxy2*dxy2) + alpha*divD.data[i];
+		float D = psid*dx2*dxy2 + psig*(dxx2 + dyy2)*dxy2;
 
 		// update the change in flow
 		float psi_index = psiSmooth.data[i];
@@ -362,8 +366,8 @@ public class BroxWarpingSpacial<T extends ImageSingleBand> extends DenseFlowPyra
 		final float dui = du.data[i];
 		final float dvi = dv.data[i];
 
-		du.data[i] = ((1f-w)*dui + w*(Au - D*dvi + alpha*div_du))/Du;
-		dv.data[i] = ((1f-w)*dvi + w*(Av - D*du.data[i] + alpha*div_dv))/Dv;
+		du.data[i] = (1f-w)*dui + w*(Au - D*dvi + alpha*div_du)/Du;
+		dv.data[i] = (1f-w)*dvi + w*(Av - D*du.data[i] + alpha*div_dv)/Dv;
 
 		return (du.data[i] - dui) * (du.data[i] - dui) + (dv.data[i] - dvi) * (dv.data[i] - dvi);
 	}
@@ -384,19 +388,19 @@ public class BroxWarpingSpacial<T extends ImageSingleBand> extends DenseFlowPyra
 			float mu = vux*vux + vuy*vuy;
 			float mv = vvx*vvx + vvy*vvy;
 
-			psiSmooth.data[i] = (float)(1.0/Math.sqrt(mu + mv + EPSILON*EPSILON));
+			psiSmooth.data[i] = (float)(1.0/(2.0*Math.sqrt(mu + mv + EPSILON*EPSILON)));
 		}
 	}
 
 	/**
 	 * Compute Psi-data using equation 6 and approximation in equation 5
 	 */
-	private void computePsiDataPsiGradient(ImageFloat32 image1, ImageFloat32 image2,
-										   ImageFloat32 deriv1x, ImageFloat32 deriv1y,
-										   ImageFloat32 deriv2x, ImageFloat32 deriv2y,
-										   ImageFloat32 deriv2xx, ImageFloat32 deriv2yy, ImageFloat32 deriv2xy,
-										   ImageFloat32 du, ImageFloat32 dv,
-										   ImageFloat32 psiData, ImageFloat32 psiGradient ) {
+	protected void computePsiDataPsiGradient(ImageFloat32 image1, ImageFloat32 image2,
+											 ImageFloat32 deriv1x, ImageFloat32 deriv1y,
+											 ImageFloat32 deriv2x, ImageFloat32 deriv2y,
+											 ImageFloat32 deriv2xx, ImageFloat32 deriv2yy, ImageFloat32 deriv2xy,
+											 ImageFloat32 du, ImageFloat32 dv,
+											 ImageFloat32 psiData, ImageFloat32 psiGradient ) {
 		int N = image1.width * image1.height;
 
 		for( int i = 0; i < N; i++ ) {
@@ -405,24 +409,24 @@ public class BroxWarpingSpacial<T extends ImageSingleBand> extends DenseFlowPyra
 			float dv_ = dv.data[i];
 
 			// compute Psi-data
-			float left = image2.data[i] + deriv2x.data[i]*du_ + deriv2y.data[i]*dv_;
-			float v = left - image1.data[i];
+			float taylor2 = image2.data[i] + deriv2x.data[i]*du_ + deriv2y.data[i]*dv_;
+			float v = taylor2 - image1.data[i];
 
-			psiData.data[i] = (float)(1.0/Math.sqrt(v*v + EPSILON*EPSILON));
+			psiData.data[i] = (float)(1.0/(2.0*Math.sqrt(v*v + EPSILON*EPSILON)));
 
 			// compute Psi-gradient
 			float dIx = deriv2x.data[i] + deriv2xx.data[i]*du_ + deriv2xy.data[i]*dv_ - deriv1x.data[i];
 			float dIy = deriv2y.data[i] + deriv2xy.data[i]*du_ + deriv2yy.data[i]*dv_ - deriv1y.data[i];
 			float dI2 = dIx*dIx +  dIy*dIy;
 
-			psiGradient.data[i] = (float)(1.0/Math.sqrt(dI2 + EPSILON*EPSILON));
+			psiGradient.data[i] = (float)(1.0/(2.0*Math.sqrt(dI2 + EPSILON*EPSILON)));
 		}
 	}
 
 	/**
 	 * Computes the divergence for u,v, and d. Equation 8 and Equation 10.
 	 */
-	private void computeDivUVD( ImageFloat32 u , ImageFloat32 v , ImageFloat32 psi , float alpha ,
+	private void computeDivUVD( ImageFloat32 u , ImageFloat32 v , ImageFloat32 psi ,
 								ImageFloat32 divU , ImageFloat32 divV , ImageFloat32 divD ) {
 
 		final int stride = psi.stride;
@@ -452,24 +456,24 @@ public class BroxWarpingSpacial<T extends ImageSingleBand> extends DenseFlowPyra
 				divV.data[index] = coef0*(v.data[index+1] - v_index) + coef1*(v.data[index-1] - v_index) +
 								   coef2*(v.data[index+stride] - v_index) + coef3*(v.data[index-stride] - v_index);
 
-				divD.data[index] = alpha*(coef0 + coef1 + coef2 + coef3);
+				divD.data[index] = coef0 + coef1 + coef2 + coef3;
 			}
 		}
 
 		// handle the image borders
 		for( int x = 0; x < psi.width; x++ ) {
-			computeDivUVD_safe(x,0,u,v,psi,alpha,divU,divV,divD);
-			computeDivUVD_safe(x,psi.height-1,u,v,psi,alpha,divU,divV,divD);
+			computeDivUVD_safe(x,0,u,v,psi,divU,divV,divD);
+			computeDivUVD_safe(x,psi.height-1,u,v,psi,divU,divV,divD);
 		}
 		for( int y = 1; y < psi.height-1; y++ ) {
-			computeDivUVD_safe(0,y,u,v,psi,alpha,divU,divV,divD);
-			computeDivUVD_safe(psi.width-1,y,u,v,psi,alpha,divU,divV,divD);
+			computeDivUVD_safe(0,y,u,v,psi,divU,divV,divD);
+			computeDivUVD_safe(psi.width-1,y,u,v,psi,divU,divV,divD);
 		}
 	}
 
-	private void computeDivUVD_safe( int x , int y ,
-									 ImageFloat32 u , ImageFloat32 v , ImageFloat32 psi , float alpha ,
-									 ImageFloat32 divU , ImageFloat32 divV , ImageFloat32 divD ) {
+	protected void computeDivUVD_safe( int x , int y ,
+									   ImageFloat32 u , ImageFloat32 v , ImageFloat32 psi ,
+									   ImageFloat32 divU , ImageFloat32 divV , ImageFloat32 divD ) {
 
 		int index = u.getIndex(x, y);
 		int index_px = s(x + 1, y);
@@ -494,10 +498,10 @@ public class BroxWarpingSpacial<T extends ImageSingleBand> extends DenseFlowPyra
 		divV.data[index] = coef0*(v.data[index_px] - v_index) + coef1*(v.data[index_mx] - v_index) +
 				coef2*(v.data[index_py] - v_index) + coef3*(v.data[index_my] - v_index);
 
-		divD.data[index] = alpha*(coef0 + coef1 + coef2 + coef3);
+		divD.data[index] = coef0 + coef1 + coef2 + coef3;
 	}
 
-	private int s( int x , int y ) {
+	protected int s( int x , int y ) {
 		if( x < 0 ) x = 0;
 		else if( x >= warpImage2.width ) x = warpImage2.width-1;
 		if( y < 0 ) y = 0;

@@ -18,34 +18,34 @@
 
 package boofcv.abst.flow;
 
-import boofcv.alg.flow.HornSchunckPyramid;
+import boofcv.alg.flow.BroxWarpingSpacial;
 import boofcv.struct.flow.ImageFlow;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageType;
 
 /**
- * Implementation of {@link boofcv.abst.flow.DenseOpticalFlow} for {@link boofcv.alg.flow.HornSchunck}.
+ * Implementation of {@link BroxWarpingSpacial} for {@link boofcv.alg.flow.HornSchunck}.
  *
  * @author Peter Abeles
  */
-public class HornSchunckPyramid_to_DenseOpticalFlow<T extends ImageSingleBand>
+public class BroxWarpingSpacial_to_DenseOpticalFlow<T extends ImageSingleBand>
 	implements DenseOpticalFlow<T>
 {
-	HornSchunckPyramid<T> hornSchunck;
+	BroxWarpingSpacial<T> brox;
 	Class<T> imageType;
 
-	public HornSchunckPyramid_to_DenseOpticalFlow(HornSchunckPyramid<T> hornSchunck) {
-		this.hornSchunck = hornSchunck;
+	public BroxWarpingSpacial_to_DenseOpticalFlow(BroxWarpingSpacial<T> brox) {
+		this.brox = brox;
 	}
 
 	@Override
 	public void process(T source, T destination, ImageFlow flow) {
 
-		hornSchunck.process(source,destination);
+		brox.process(source, destination);
 
-		ImageFloat32 flowX = hornSchunck.getFlowX();
-		ImageFloat32 flowY = hornSchunck.getFlowY();
+		ImageFloat32 flowX = brox.getFlowX();
+		ImageFloat32 flowY = brox.getFlowY();
 
 		int index = 0;
 		for( int y = 0; y < flow.height; y++){

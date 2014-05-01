@@ -19,6 +19,7 @@
 package boofcv.alg.flow;
 
 import boofcv.alg.misc.ImageMiscOps;
+import boofcv.alg.misc.ImageStatistics;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.pyramid.ImagePyramid;
@@ -27,7 +28,6 @@ import org.junit.Test;
 import java.util.Random;
 
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
@@ -55,7 +55,23 @@ public class TestDenseFlowPyramidBase {
 
 	@Test
 	public void imageNormalization() {
-		fail("Implement");
+		ImageFloat32 input1 = new ImageFloat32(5,7);
+		ImageFloat32 input2 = new ImageFloat32(5,7);
+
+		ImageFloat32 norm1 = new ImageFloat32(5,7);
+		ImageFloat32 norm2 = new ImageFloat32(5,7);
+
+		ImageMiscOps.fillUniform(input1, rand, 0, 10);
+		ImageMiscOps.fillUniform(input2, rand, 0, 15);
+
+		DenseFlowPyramidBase.imageNormalization(input1,input2,norm1,norm2);
+
+		// should be normalized so that its values are between 0 and 1
+		assertTrue(ImageStatistics.min(norm1) >= 0 );
+		assertTrue(ImageStatistics.min(norm2) >= 0 );
+
+		assertTrue(ImageStatistics.max(norm1) <= 1 );
+		assertTrue(ImageStatistics.max(norm2) <= 1 );
 	}
 
 	public static class Dummy extends DenseFlowPyramidBase {
