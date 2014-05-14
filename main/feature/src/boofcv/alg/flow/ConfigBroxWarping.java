@@ -31,12 +31,12 @@ public class ConfigBroxWarping implements Configuration {
 	/**
 	 * Brightness difference weighting factor.  Larger values which prefer a smooth flow.
 	 */
-	public float alpha = 0.05f;
+	public float alpha = 0.04f;
 
 	/**
 	 * Gradient difference weighting factor.  Larger values which prefer a smooth flow.
 	 */
-	public float gamma = 0.02f;
+	public float gamma = 0.03f;
 
 	/**
 	 * SOR relaxation parameter.  0 < w < 2.  Recommended default is 1.9
@@ -46,7 +46,7 @@ public class ConfigBroxWarping implements Configuration {
 	/**
 	 * Number of iterations in the outer loop
 	 */
-	public int numOuter = 15;
+	public int numOuter = 10;
 	/**
 	 * Number of iterations in the inner loop
 	 */
