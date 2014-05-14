@@ -31,19 +31,28 @@ import boofcv.struct.pyramid.ImagePyramid;
 import java.util.Arrays;
 
 /**
- * TODO write
- *
+ * <p>
+ * Dense optical flow which adheres to a brightness constancy assumption, a gradient constancy
+ * assumption, and a discontinuity-preserving spatio-temporal smoothness constraint.  Based on the
+ * work of Brox [2] with implementation details taken from [1].
+ * </p>
  *
  * <p>
  * <ol>
- * <li></li>
- * <li></li>
+ * <li>
+ * Javier Sánchez Pérez, Nelson Monzón López, and Agustín Salgado de la Nuez, Robust Optical Flow Estimation,
+ * Image Processing On Line, 3 (2013), pp. 252–270. http://dx.doi.org/10.5201/ipol.2013.21</li>
+ * <li>
+ * Thomas Brox, Andr´es Bruhn, Nils Papenberg, and Joachim Weickert. High accuracy optical
+ * ﬂow estimation based on a theory for warping. In T. Pajdla and J. Matas, editors, European
+ * Conference on Computer Vision (ECCV), volume 3024 of Lecture Notes in Computer Science,
+ * pages 25–36, Prague, Czech Republic, May 2004. Springer.
+ * </li>
  * </ol>
  * </p>
  *
  * @author Peter Abeles
  */
-// TODO change pyramid such that blur is applied once and that's it
 public class BroxWarpingSpacial<T extends ImageSingleBand> extends DenseFlowPyramidBase<T> {
 
 	// regularization term
