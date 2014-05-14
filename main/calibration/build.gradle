@@ -1,0 +1,11 @@
+dependencies {
+    compile project(':main:ip')
+    compile project(':main:feature')
+    compile project(':main:geo')
+}
+
+idea {
+    module {
+        name = "BoofCV Calibration"
+    }
+}

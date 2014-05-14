@@ -19,6 +19,22 @@ Checkout the data files from github.  You can also just download them directly f
 
 git@github.com:lessthanoptimal/BoofCV-Data.git
 
+---------------------------------------------------------
+---- Gradle Instructions: Linux/Unix ----
+---------------------------------------------------------
+
+You can run these examples easily using gradle:
+
+------------- BEGIN PASTE ----------------------
+gradle exampleRun -Pwhich=boofcv.examples.imageprocessing.ExampleBinaryOps
+-------------- END PASTE -----------------------
+
+However, Gradle is a bit slow when all you want to do is run an example and you can do the following instead:
+
+------------- BEGIN PASTE ----------------------
+gradle exampleJar
+java -cp build/libs/*.jar boofcv.examples.imageprocessing.ExampleBinaryOps
+-------------- END PASTE -----------------------
 
 ---------------------------------------------------------
 ---- Ant Instructions: Linux/Unix ----

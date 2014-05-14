@@ -1,0 +1,33 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath 'com.android.tools.build:gradle:0.9.0'
+    }
+}
+
+apply plugin: 'android'
+
+dependencies {
+    compile project(':main:ip')
+    compile project(':main:feature')
+    compile project(':main:calibration')
+    compile project(':main:geo')
+}
+
+android {
+    compileSdkVersion 19
+
+    buildToolsVersion "19.0.0"
+
+}
+
+idea {
+    module {
+        name = "BoofCV Android"
+    }
+}
+
+uploadArchives.enabled = false

@@ -1,0 +1,34 @@
+
+dependencies {
+    compile project(':main:ip')
+    compile project(':main:io')
+    compile project(':main:feature')
+    compile project(':main:geo')
+    compile project(':main:sfm')
+    compile project(':main:recognition')
+    compile project(':main:visualize')
+}
+
+idea {
+    module {
+        name = "BoofCV Examples"
+    }
+}
+
+task exampleJar(type: Jar, dependsOn:jar) {
+    from files(sourceSets.main.output.classesDir)
+    from files(sourceSets.main.output.resourcesDir)
+    from {configurations.compile.collect {zipTree(it)}}
+}
+
+// gradle exampleRun -Pwhich=boofcv.examples.imageprocessing.ExampleBinaryOps
+task exampleRun(dependsOn: 'classes' )<< {
+    if (project.hasProperty('which')) {
+        javaexec {
+            main = "$which"
+            classpath = sourceSets.main.runtimeClasspath //files(jar.archivePath)
+        }
+    } else {
+        print 'Which not specified!!!!!'
+    }
+}

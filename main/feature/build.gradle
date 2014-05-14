@@ -1,0 +1,9 @@
+dependencies {
+    compile project(':main:ip')
+}
+
+idea {
+    module {
+        name = "BoofCV Feature"
+    }
+}

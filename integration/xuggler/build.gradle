@@ -1,0 +1,20 @@
+
+repositories {
+    maven {
+        url "http://xuggle.googlecode.com/svn/trunk/repo/share/java/"
+    }
+}
+
+dependencies {
+    compile project(':main:ip')
+    compile project(':main:io')
+    compile project(':main:visualize')
+
+    compile group: 'xuggle', name: 'xuggle-xuggler', version: '5.4'
+}
+
+idea {
+    module {
+        name = "BoofCV Xuggler"
+    }
+}
