@@ -1,0 +1,29 @@
+dependencies {
+    compile project(':main:ip')
+    compile project(':main:visualize')
+    compile project(':main:geo')
+    compile project(':main:io')
+    compile project(':main:sfm')
+
+    compile group: 'net.java.dev.jna', name: 'jna', version: '3.5.2'
+    compile group: 'net.java.dev.jna', name: 'platform', version: '3.5.2'
+//    compile group: 'org.openkinect', name: 'freenect', version: '0.0.1-SNAPSHOT'
+}
+
+sourceSets {
+    main {
+        java {
+            srcDir 'src'
+            srcDir 'libfreenect/wrappers/java/src/main/java'
+        }
+        resources {
+            srcDir 'resources/src'
+        }
+    }
+}
+
+idea {
+    module {
+        name = "BoofCV OpenKinect"
+    }
+}

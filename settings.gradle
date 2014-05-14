@@ -1,0 +1,14 @@
+include 'main','examples','evaluation',
+        'main:ip','main:io','main:feature','main:geo','main:calibration','main:sfm','main:recognition','main:visualize',
+        'integration:xuggler','integration:applet'
+
+// these are packages which require external files that must be manually downloaded or configured to compile
+if (System.getenv()['ANDROID_HOME']) {
+    include 'integration:android'
+}
+if( new File('integration/openkinect/libfreenect').exists()) {
+    include 'integration:openkinect'
+}
+if( new File('integration/v4l4j/v4l4j-0.9.1').exists()) {
+    include 'integration:v4l4j'
+}

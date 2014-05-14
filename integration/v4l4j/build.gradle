@@ -1,0 +1,13 @@
+
+dependencies {
+    compile project(':main:ip')
+    compile project(':main:io')
+    compile project(':main:visualize')
+    compile files("v4l4j-0.9.1/v4l4j.jar")
+}
+
+idea {
+    module {
+        name = "BoofCV V4L4J"
+    }
+}
