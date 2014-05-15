@@ -18,12 +18,9 @@
 
 package boofcv.io;
 
-import boofcv.misc.BoofcvClassLoader;
-import boofcv.misc.XStreamAppletVersion;
-import com.thoughtworks.boofcv.converters.javabean.JavaBeanConverter;
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.converters.javabean.JavaBeanConverter;
 import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider;
-import com.thoughtworks.xstream.core.DefaultConverterLookup;
-import com.thoughtworks.xstream.io.xml.DomDriver;
 
 import javax.swing.*;
 import java.io.*;
@@ -130,9 +127,9 @@ public class UtilIO {
 	}
 
 	public static void saveXML( Object o , String fileName ) {
-		BoofcvClassLoader loader = new BoofcvClassLoader();
-		XStreamAppletVersion xstream = new XStreamAppletVersion(new PureJavaReflectionProvider(),new DomDriver(),loader,null,new DefaultConverterLookup(), null);
-//		XStream xstream = new XStream(new PureJavaReflectionProvider(),new DomDriver(),loader,null,new DefaultConverterLookup(), null);
+//		BoofcvClassLoader loader = new BoofcvClassLoader();
+//		XStreamAppletVersion xstream = new XStreamAppletVersion(new PureJavaReflectionProvider(),new DomDriver(),loader,null,new DefaultConverterLookup(), null);
+		XStream xstream = new XStream(new PureJavaReflectionProvider());
 		xstream.registerConverter(new JavaBeanConverter(xstream.getMapper()));
 
 		try {
@@ -144,8 +141,7 @@ public class UtilIO {
 
 	public static <T> T loadXML( String fileName ) {
 
-		BoofcvClassLoader loader = new BoofcvClassLoader();
-		XStreamAppletVersion xstream = new XStreamAppletVersion(new PureJavaReflectionProvider(),new DomDriver(),loader,null,new DefaultConverterLookup(), null);
+		XStream xstream = new XStream(new PureJavaReflectionProvider());
 		xstream.registerConverter(new JavaBeanConverter(xstream.getMapper()));
 		try {
 			return (T)xstream.fromXML(new FileReader(fileName));
@@ -155,8 +151,7 @@ public class UtilIO {
 	}
 
 	public static <T> T loadXML( Reader r ) {
-		BoofcvClassLoader loader = new BoofcvClassLoader();
-		XStreamAppletVersion xstream = new XStreamAppletVersion(new PureJavaReflectionProvider(),new DomDriver(),loader,null,new DefaultConverterLookup(), null);
+		XStream xstream = new XStream(new PureJavaReflectionProvider());
 		xstream.registerConverter(new JavaBeanConverter(xstream.getMapper()));
 		return (T)xstream.fromXML(r);
 	}

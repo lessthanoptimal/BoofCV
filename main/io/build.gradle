@@ -1,5 +1,8 @@
 dependencies {
     compile project(':main:ip')
+
+    //    compile files("$libpath/lib/xstream-1.4.4.jar")
+    compile group: 'com.thoughtworks.xstream', name: 'xstream', version: '1.4.7'
 }
 
 idea {
