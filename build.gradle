@@ -14,6 +14,11 @@ subprojects {
 
     repositories {
         mavenCentral()
+        mavenLocal()
+
+        maven {
+            url = "https://oss.sonatype.org/content/repositories/snapshots/"
+        }
     }
 
     sourceSets {
@@ -39,13 +44,13 @@ subprojects {
     }
 
     dependencies {
-        compile files("$libpath/lib/EJML.jar")
-        compile files("$libpath/lib/DDogleg.jar")
-        compile files("$libpath/lib/GeoRegression.jar")
+//        compile files("$libpath/lib/EJML.jar")
+//        compile files("$libpath/lib/DDogleg.jar")
+//        compile files("$libpath/lib/GeoRegression.jar")
 
-//    compile group: 'com.googlecode.efficient-java-matrix-library', name: 'ejml', version: '0.25-SNAPSHOT'
-//    compile group: 'org.georegression', name: 'georegression', version: '0.6-SNAPSHOT'
-//    compile group: 'org.ddogleg', name: 'ddogleg', version: '0.4'
+        compile group: 'com.googlecode.efficient-java-matrix-library', name: 'ejml', version: '0.25-SNAPSHOT'
+        compile group: 'org.ddogleg', name: 'ddogleg', version: '0.5-SNAPSHOT'
+        compile group: 'org.georegression', name: 'georegression', version: '0.6-SNAPSHOT'
 
         testCompile group: 'junit', name: 'junit', version: '4.+'
         testCompile files("$libpath/lib/testing/caliper.jar")
@@ -65,17 +70,5 @@ idea {
     project {
         jdkName = '1.6 (64bit)'
         languageLevel = '1.6'
-    }
-}
-
-project(':examples') {
-    dependencies {
-        compile project(':main')
-    }
-}
-
-project(':evaluation') {
-    dependencies {
-        compile project(':main')
     }
 }

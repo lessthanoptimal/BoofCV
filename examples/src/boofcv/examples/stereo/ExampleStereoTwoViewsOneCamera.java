@@ -40,8 +40,8 @@ import boofcv.gui.feature.AssociationPanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.gui.image.VisualizeImageData;
 import boofcv.gui.stereo.RectifiedPairPanel;
+import boofcv.io.UtilIO;
 import boofcv.io.image.UtilImageIO;
-import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.distort.DoNothingTransform_F64;
 import boofcv.struct.distort.PointTransform_F64;
@@ -84,7 +84,7 @@ public class ExampleStereoTwoViewsOneCamera {
 		String imageDir = "../data/applet/stereo/";
 
 		// Camera parameters
-		IntrinsicParameters intrinsic = BoofMiscOps.loadXML(calibDir + "intrinsic.xml");
+		IntrinsicParameters intrinsic = UtilIO.loadXML(calibDir + "intrinsic.xml");
 
 		// Input images from the camera moving left to right
 		BufferedImage origLeft = UtilImageIO.loadImage(imageDir + "mono_wall_01.jpg");

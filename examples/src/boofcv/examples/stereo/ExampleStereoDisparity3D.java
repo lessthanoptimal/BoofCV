@@ -26,8 +26,8 @@ import boofcv.core.image.ConvertBufferedImage;
 import boofcv.gui.d3.PointCloudViewer;
 import boofcv.gui.image.ShowImages;
 import boofcv.gui.image.VisualizeImageData;
+import boofcv.io.UtilIO;
 import boofcv.io.image.UtilImageIO;
-import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageUInt8;
@@ -63,7 +63,7 @@ public class ExampleStereoDisparity3D {
 		String calibDir = "../data/applet/calibration/stereo/Bumblebee2_Chess/";
 		String imageDir = "../data/applet/stereo/";
 
-		StereoParameters param = BoofMiscOps.loadXML(calibDir + "stereo.xml");
+		StereoParameters param = UtilIO.loadXML(calibDir + "stereo.xml");
 
 		// load and convert images into a BoofCV format
 		BufferedImage origLeft = UtilImageIO.loadImage(imageDir + "chair01_left.jpg");

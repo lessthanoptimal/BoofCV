@@ -22,8 +22,8 @@ import boofcv.alg.depth.VisualDepthOps;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.gui.d3.PointCloudViewer;
 import boofcv.gui.image.ShowImages;
+import boofcv.io.UtilIO;
 import boofcv.io.image.UtilImageIO;
-import boofcv.misc.BoofMiscOps;
 import boofcv.openkinect.UtilOpenKinect;
 import boofcv.struct.FastQueueArray_I32;
 import boofcv.struct.calib.IntrinsicParameters;
@@ -51,7 +51,7 @@ public class DisplayKinectPointCloudApp {
 		String nameDepth = baseDir+"basket.depth";
 		String nameCalib = baseDir+"intrinsic.xml";
 
-		IntrinsicParameters param = BoofMiscOps.loadXML(nameCalib);
+		IntrinsicParameters param = UtilIO.loadXML(nameCalib);
 
 		ImageUInt16 depth = new ImageUInt16(1,1);
 		MultiSpectral<ImageUInt8> rgb = new MultiSpectral<ImageUInt8>(ImageUInt8.class,1,1,3);

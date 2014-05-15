@@ -30,8 +30,8 @@ import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.gui.ListDisplayPanel;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ShowImages;
+import boofcv.io.UtilIO;
 import boofcv.io.image.UtilImageIO;
-import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.distort.PointTransform_F32;
 import boofcv.struct.image.ImageFloat32;
@@ -58,7 +58,7 @@ public class ExampleRemoveLensDistortion {
 		String imageDir = "../data/evaluation/structure/";
 
 		// load calibration parameters from the previously calibrated camera
-		IntrinsicParameters param = BoofMiscOps.loadXML(calibDir + "intrinsic.xml");
+		IntrinsicParameters param = UtilIO.loadXML(calibDir + "intrinsic.xml");
 
 		// load images and convert the image into a color BoofCV format
 		BufferedImage orig = UtilImageIO.loadImage(imageDir + "dist_cyto_01.jpg");

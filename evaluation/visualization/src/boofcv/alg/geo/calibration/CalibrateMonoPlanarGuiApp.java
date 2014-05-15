@@ -29,6 +29,7 @@ import boofcv.factory.calib.FactoryPlanarCalibrationTarget;
 import boofcv.gui.VisualizeApp;
 import boofcv.io.MediaManager;
 import boofcv.io.ProgressMonitorThread;
+import boofcv.io.UtilIO;
 import boofcv.io.wrapper.DefaultMediaManager;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.IntrinsicParameters;
@@ -132,7 +133,7 @@ public class CalibrateMonoPlanarGuiApp extends JPanel
 		monitor.stopThread();
 
 		if( outputFileName != null )
-			BoofMiscOps.saveXML(param,outputFileName);
+			UtilIO.saveXML(param, outputFileName);
 
 		// tell it how to undistort the image
 		SwingUtilities.invokeLater(new Runnable() {

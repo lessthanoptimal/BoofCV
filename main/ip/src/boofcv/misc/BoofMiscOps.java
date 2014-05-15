@@ -20,12 +20,10 @@ package boofcv.misc;
 
 import boofcv.struct.ImageRectangle;
 import boofcv.struct.image.*;
-import com.thoughtworks.boofcv.converters.javabean.JavaBeanConverter;
-import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider;
-import com.thoughtworks.xstream.core.DefaultConverterLookup;
-import com.thoughtworks.xstream.io.xml.DomDriver;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,38 +33,6 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class BoofMiscOps {
-
-	public static void saveXML( Object o , String fileName ) {
-		BoofcvClassLoader loader = new BoofcvClassLoader();
-		XStreamAppletVersion xstream = new XStreamAppletVersion(new PureJavaReflectionProvider(),new DomDriver(),loader,null,new DefaultConverterLookup(), null);
-//		XStream xstream = new XStream(new PureJavaReflectionProvider(),new DomDriver(),loader,null,new DefaultConverterLookup(), null);
-		xstream.registerConverter(new JavaBeanConverter(xstream.getMapper()));
-
-		try {
-			xstream.toXML(o,new FileOutputStream(fileName));
-		} catch (FileNotFoundException e) {
-			throw new RuntimeException(e);
-		}
-	}
-	
-	public static <T> T loadXML( String fileName ) {
-
-		BoofcvClassLoader loader = new BoofcvClassLoader();
-		XStreamAppletVersion xstream = new XStreamAppletVersion(new PureJavaReflectionProvider(),new DomDriver(),loader,null,new DefaultConverterLookup(), null);
-		xstream.registerConverter(new JavaBeanConverter(xstream.getMapper()));
-		try {
-			return (T)xstream.fromXML(new FileReader(fileName));
-		} catch (FileNotFoundException e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	public static <T> T loadXML( Reader r ) {
-		BoofcvClassLoader loader = new BoofcvClassLoader();
-		XStreamAppletVersion xstream = new XStreamAppletVersion(new PureJavaReflectionProvider(),new DomDriver(),loader,null,new DefaultConverterLookup(), null);
-		xstream.registerConverter(new JavaBeanConverter(xstream.getMapper()));
-		return (T)xstream.fromXML(r);
-	}
 
 	public static String toString( Reader r ) {
 		char buff[] = new char[1024];

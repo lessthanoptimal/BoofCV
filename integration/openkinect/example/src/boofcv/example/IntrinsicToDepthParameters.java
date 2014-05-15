@@ -1,6 +1,6 @@
 package boofcv.example;
 
-import boofcv.misc.BoofMiscOps;
+import boofcv.io.UtilIO;
 import boofcv.openkinect.UtilOpenKinect;
 import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.calib.VisualDepthParameters;
@@ -15,7 +15,7 @@ public class IntrinsicToDepthParameters {
 
 		String nameCalib = baseDir+"intrinsic.xml";
 
-		IntrinsicParameters intrinsic = BoofMiscOps.loadXML(nameCalib);
+		IntrinsicParameters intrinsic = UtilIO.loadXML(nameCalib);
 
 		VisualDepthParameters depth = new VisualDepthParameters();
 
@@ -23,6 +23,6 @@ public class IntrinsicToDepthParameters {
 		depth.setMaxDepth(UtilOpenKinect.FREENECT_DEPTH_MM_MAX_VALUE);
 		depth.setPixelNoDepth(UtilOpenKinect.FREENECT_DEPTH_MM_NO_VALUE);
 
-		BoofMiscOps.saveXML(depth,baseDir+"visualdepth.xml");
+		UtilIO.saveXML(depth, baseDir + "visualdepth.xml");
 	}
 }

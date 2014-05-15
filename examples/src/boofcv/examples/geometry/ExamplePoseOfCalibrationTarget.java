@@ -29,6 +29,7 @@ import boofcv.factory.calib.FactoryPlanarCalibrationTarget;
 import boofcv.gui.d3.PointCloudViewer;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ShowImages;
+import boofcv.io.UtilIO;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.wrapper.DefaultMediaManager;
 import boofcv.misc.BoofMiscOps;
@@ -64,7 +65,7 @@ public class ExamplePoseOfCalibrationTarget {
 
 		// Load camera calibration
 		IntrinsicParameters intrinsic =
-				BoofMiscOps.loadXML("../data/applet/calibration/mono/Sony_DSC-HX5V_Chess/intrinsic.xml");
+				UtilIO.loadXML("../data/applet/calibration/mono/Sony_DSC-HX5V_Chess/intrinsic.xml");
 
 		int width = intrinsic.width; int height = intrinsic.height;
 

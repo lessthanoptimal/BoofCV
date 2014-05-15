@@ -24,10 +24,10 @@ import boofcv.alg.distort.LensDistortionOps;
 import boofcv.alg.interpolate.TypeInterpolate;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.io.MediaManager;
+import boofcv.io.UtilIO;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.image.UtilImageIO;
 import boofcv.io.wrapper.DefaultMediaManager;
-import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.image.ImageType;
 import boofcv.struct.image.ImageUInt8;
@@ -49,7 +49,7 @@ public class RemoveLensDistortionSequenceApp {
 		String outputDir = "/home/pja/a/images/";
 
 		// load camera calibration and create class to undistort image
-		IntrinsicParameters param = BoofMiscOps.loadXML(calibDir+"intrinsic.xml");
+		IntrinsicParameters param = UtilIO.loadXML(calibDir + "intrinsic.xml");
 
 		ImageDistort<ImageUInt8> undistorter = DistortImageOps.createImageDistort(
 				LensDistortionOps.allInside(param,null),TypeInterpolate.BILINEAR,ImageUInt8.class);

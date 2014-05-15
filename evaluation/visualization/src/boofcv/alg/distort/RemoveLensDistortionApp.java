@@ -28,7 +28,7 @@ import boofcv.gui.SelectAlgorithmAndInputPanel;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.PathLabel;
-import boofcv.misc.BoofMiscOps;
+import boofcv.io.UtilIO;
 import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.distort.PointTransform_F32;
 import boofcv.struct.image.ImageFloat32;
@@ -122,7 +122,7 @@ public class RemoveLensDistortionApp extends SelectAlgorithmAndInputPanel {
 	public void changeInput(String name, int index) {
 		PathLabel refs = inputRefs.get(index);
 
-		IntrinsicParameters param = BoofMiscOps.loadXML(media.openFile(refs.getPath(0)));
+		IntrinsicParameters param = UtilIO.loadXML(media.openFile(refs.getPath(0)));
 		BufferedImage orig = media.openImage(refs.getPath(1));
 
 		configure(orig,param);

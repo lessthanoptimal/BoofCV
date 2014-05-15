@@ -51,12 +51,13 @@ Version : Alpha 0.17
 - Square grid calibration grid detector has been improved.
   * No longer permutes through all combinations.  Selects each valid square and assumes its the first instead
   * Graph connection rule has been improved too to reduce false connections
+- Moved serializeXML from BoofMiscOps to UtilIO
+  * Removing an IO function which shouldn't be in image processing
 
 - TODO Application DenseOpticalFlow
 - TODO ExampleBundleAdjustment
 - TODO Automatically compile and push unstable builds.
 - TODO Make those two failed unit tests ago away
-- TODO BoofMiscOps move XML serialization into IO package
 - TODO Consider using JUnitBenchmark instead of Caliper
 
 
