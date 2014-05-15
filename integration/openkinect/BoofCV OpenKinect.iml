@@ -24,15 +24,14 @@
     <orderEntry type="module" module-name="BoofCV Geometric Vision" exported="" />
     <orderEntry type="module" module-name="BoofCV IO" exported="" />
     <orderEntry type="module" module-name="BoofCV SFM" exported="" />
+    <orderEntry type="library" exported="" name="Gradle: jna-3.5.2" level="project" />
+    <orderEntry type="library" exported="" name="Gradle: platform-3.5.2" level="project" />
     <orderEntry type="library" exported="" name="Gradle: EJML" level="project" />
     <orderEntry type="library" exported="" name="Gradle: DDogleg" level="project" />
     <orderEntry type="library" exported="" name="Gradle: GeoRegression" level="project" />
-    <orderEntry type="library" exported="" name="Gradle: xstream-1.4.4" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: junit-4.11" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: hamcrest-core-1.3" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: caliper" level="project" />
-    <orderEntry type="library" exported="" name="Gradle: jna-3.5.2" level="project" />
-    <orderEntry type="library" exported="" name="Gradle: platform-3.5.2" level="project" />
   </component>
 </module>
 
