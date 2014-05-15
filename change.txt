@@ -57,9 +57,7 @@ Version : Alpha 0.17
 - TODO Automatically compile and push unstable builds.
 - TODO Make those two failed unit tests ago away
 - TODO BoofMiscOps move XML serialization into IO package
-- TODO Dense Optical Flow Horn-Schunck Pyramid
-- TODO                    KLT Pyramid
-- TODO                    Fix up the block one
+- TODO Consider using JUnitBenchmark instead of Caliper
 
 
 ---------------------------------------------
