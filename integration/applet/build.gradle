@@ -9,6 +9,12 @@ dependencies {
     compile project(':main:visualize')
 }
 
+task appletJar(type: Jar, dependsOn:jar) {
+    from files(sourceSets.main.output.classesDir)
+    from files(sourceSets.main.output.resourcesDir)
+    from {configurations.compile.collect {zipTree(it)}}
+}
+
 idea {
     module {
         name = "BoofCV Applet"

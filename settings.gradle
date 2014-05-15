@@ -6,9 +6,9 @@ include 'main','examples','evaluation',
 if (System.getenv()['ANDROID_HOME']) {
     include 'integration:android'
 }
-if( new File('integration/openkinect/libfreenect').exists()) {
+if( file('./integration/openkinect/libfreenect').exists()) {
     include 'integration:openkinect'
 }
-if( new File('integration/v4l4j/v4l4j-0.9.1').exists()) {
+if( file('./integration/v4l4j/v4l4j-0.9.1').exists()) {
     include 'integration:v4l4j'
 }
