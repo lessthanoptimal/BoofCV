@@ -25,6 +25,7 @@ import boofcv.abst.calib.PlanarCalibrationDetector;
 import boofcv.alg.geo.calibration.PlanarCalibrationTarget;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.factory.calib.FactoryPlanarCalibrationTarget;
+import boofcv.io.UtilIO;
 import boofcv.io.image.UtilImageIO;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.IntrinsicParameters;
@@ -127,7 +128,7 @@ public class ExampleCalibrateMonocularPlanar {
 		IntrinsicParameters intrinsic = calibrationAlg.process();
 
 		// save results to a file and print out
-		BoofMiscOps.saveXML(intrinsic, "intrinsic.xml");
+		UtilIO.saveXML(intrinsic, "intrinsic.xml");
 
 		calibrationAlg.printStatistics();
 		System.out.println();

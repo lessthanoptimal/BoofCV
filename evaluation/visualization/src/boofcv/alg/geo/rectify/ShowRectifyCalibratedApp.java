@@ -29,7 +29,7 @@ import boofcv.gui.SelectAlgorithmAndInputPanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.gui.stereo.RectifiedPairPanel;
 import boofcv.io.PathLabel;
-import boofcv.misc.BoofMiscOps;
+import boofcv.io.UtilIO;
 import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.MultiSpectral;
@@ -151,7 +151,7 @@ public class ShowRectifyCalibratedApp extends SelectAlgorithmAndInputPanel {
 	public void changeInput(String name, int index) {
 		PathLabel refs = inputRefs.get(index);
 
-		StereoParameters param = BoofMiscOps.loadXML(media.openFile(refs.getPath(0)));
+		StereoParameters param = UtilIO.loadXML(media.openFile(refs.getPath(0)));
 		BufferedImage origLeft = media.openImage(refs.getPath(1));
 		BufferedImage origRight = media.openImage(refs.getPath(2));
 

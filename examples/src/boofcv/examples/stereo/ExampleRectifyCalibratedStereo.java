@@ -27,8 +27,8 @@ import boofcv.core.image.ConvertBufferedImage;
 import boofcv.gui.ListDisplayPanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.gui.stereo.RectifiedPairPanel;
+import boofcv.io.UtilIO;
 import boofcv.io.image.UtilImageIO;
-import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.MultiSpectral;
@@ -60,7 +60,7 @@ public class ExampleRectifyCalibratedStereo {
 	public static void main( String args[] ) {
 		String dir = "../data/applet/calibration/stereo/Bumblebee2_Chess/";
 
-		StereoParameters param = BoofMiscOps.loadXML(dir+"stereo.xml");
+		StereoParameters param = UtilIO.loadXML(dir + "stereo.xml");
 
 		// load images
 		BufferedImage origLeft = UtilImageIO.loadImage(dir+"left05.jpg");

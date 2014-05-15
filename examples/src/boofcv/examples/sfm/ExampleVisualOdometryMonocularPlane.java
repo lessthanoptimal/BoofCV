@@ -27,9 +27,9 @@ import boofcv.alg.tracker.klt.PkltConfig;
 import boofcv.factory.feature.tracker.FactoryPointTrackerTwoPass;
 import boofcv.factory.sfm.FactoryVisualOdometry;
 import boofcv.io.MediaManager;
+import boofcv.io.UtilIO;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.wrapper.DefaultMediaManager;
-import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.MonoPlaneParameters;
 import boofcv.struct.image.ImageSInt16;
 import boofcv.struct.image.ImageType;
@@ -53,7 +53,7 @@ public class ExampleVisualOdometryMonocularPlane {
 		String directory = "../data/applet/vo/drc/";
 
 		// load camera description and the video sequence
-		MonoPlaneParameters calibration = BoofMiscOps.loadXML(media.openFile(directory + "mono_plane.xml"));
+		MonoPlaneParameters calibration = UtilIO.loadXML(media.openFile(directory + "mono_plane.xml"));
 		SimpleImageSequence<ImageUInt8> video = media.openVideo(directory + "left.mjpeg", ImageType.single(ImageUInt8.class));
 
 		// specify how the image features are going to be tracked

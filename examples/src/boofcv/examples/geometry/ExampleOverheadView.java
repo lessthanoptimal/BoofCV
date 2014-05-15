@@ -24,8 +24,8 @@ import boofcv.alg.sfm.overhead.CreateSyntheticOverheadViewMS;
 import boofcv.alg.sfm.overhead.SelectOverheadParameters;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.gui.image.ShowImages;
+import boofcv.io.UtilIO;
 import boofcv.io.image.UtilImageIO;
-import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.image.ImageUInt8;
 import boofcv.struct.image.MultiSpectral;
@@ -46,8 +46,8 @@ public class ExampleOverheadView {
 
 		MultiSpectral<ImageUInt8> imageRGB = ConvertBufferedImage.convertFromMulti(input, null,true, ImageUInt8.class);
 
-		StereoParameters stereoParam = BoofMiscOps.loadXML("../data/applet/road/stereo01.xml");
-		Se3_F64 groundToLeft = BoofMiscOps.loadXML("../data/applet/road/ground_to_left_01.xml");
+		StereoParameters stereoParam = UtilIO.loadXML("../data/applet/road/stereo01.xml");
+		Se3_F64 groundToLeft = UtilIO.loadXML("../data/applet/road/ground_to_left_01.xml");
 
 		CreateSyntheticOverheadView<MultiSpectral<ImageUInt8>> generateOverhead =
 				new CreateSyntheticOverheadViewMS<ImageUInt8>(TypeInterpolate.BILINEAR,3,ImageUInt8.class);

@@ -1,5 +1,5 @@
 include 'main','examples','evaluation',
-        'main:ip','main:io','main:feature','main:geo','main:calibration','main:sfm','main:recognition','main:visualize',
+        'main:ip','main:io','main:feature','main:geo','main:calibration','main:sfm','main:recognition','main:visualize','main:checks',
         'integration:xuggler','integration:applet'
 
 // these are packages which require external files that must be manually downloaded or configured to compile

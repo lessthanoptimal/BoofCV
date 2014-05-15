@@ -25,6 +25,7 @@ import boofcv.abst.calib.PlanarCalibrationDetector;
 import boofcv.alg.geo.calibration.PlanarCalibrationTarget;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.factory.calib.FactoryPlanarCalibrationTarget;
+import boofcv.io.UtilIO;
 import boofcv.io.image.UtilImageIO;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.StereoParameters;
@@ -133,7 +134,7 @@ public class ExampleCalibrateStereoPlanar {
 		calibratorAlg.printStatistics();
 
 		// save results to a file and print out
-		BoofMiscOps.saveXML(stereoCalib, "stereo.xml");
+		UtilIO.saveXML(stereoCalib, "stereo.xml");
 		stereoCalib.print();
 
 		// Note that the stereo baseline translation will be specified in the same units as the calibration grid.

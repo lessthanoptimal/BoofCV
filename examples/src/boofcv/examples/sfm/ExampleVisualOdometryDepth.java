@@ -29,9 +29,9 @@ import boofcv.alg.tracker.klt.PkltConfig;
 import boofcv.factory.feature.tracker.FactoryPointTrackerTwoPass;
 import boofcv.factory.sfm.FactoryVisualOdometry;
 import boofcv.io.MediaManager;
+import boofcv.io.UtilIO;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.wrapper.DefaultMediaManager;
-import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.VisualDepthParameters;
 import boofcv.struct.image.*;
 import georegression.struct.point.Vector3D_F64;
@@ -55,7 +55,7 @@ public class ExampleVisualOdometryDepth {
 		String directory = "../data/applet/kinect/straight/";
 
 		// load camera description and the video sequence
-		VisualDepthParameters param = BoofMiscOps.loadXML(media.openFile(directory + "visualdepth.xml"));
+		VisualDepthParameters param = UtilIO.loadXML(media.openFile(directory + "visualdepth.xml"));
 
 		// specify how the image features are going to be tracked
 		PkltConfig configKlt = new PkltConfig();

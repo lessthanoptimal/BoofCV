@@ -30,6 +30,7 @@ import boofcv.factory.calib.FactoryPlanarCalibrationTarget;
 import boofcv.gui.VisualizeApp;
 import boofcv.io.MediaManager;
 import boofcv.io.ProgressMonitorThread;
+import boofcv.io.UtilIO;
 import boofcv.io.wrapper.DefaultMediaManager;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.StereoParameters;
@@ -130,7 +131,7 @@ public class CalibrateStereoPlanarGuiApp extends JPanel
 		calibrator.printStatistics();
 		param.print();
 		if( outputFileName != null )
-			BoofMiscOps.saveXML(param,outputFileName);
+			UtilIO.saveXML(param, outputFileName);
 	}
 
 	/**

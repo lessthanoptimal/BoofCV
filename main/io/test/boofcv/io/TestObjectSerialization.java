@@ -18,7 +18,6 @@
 
 package boofcv.io;
 
-import boofcv.misc.BoofMiscOps;
 import boofcv.struct.image.ImageUInt8;
 import org.ddogleg.struct.FastQueue;
 import org.junit.After;
@@ -53,9 +52,9 @@ public class TestObjectSerialization {
 		list.add(new ImageUInt8(1,2));
 		list.add(new ImageUInt8(2,4));
 
-		BoofMiscOps.saveXML(list, "temp.txt");
+		UtilIO.saveXML(list, "temp.txt");
 
-		FastQueue<ImageUInt8> found = BoofMiscOps.loadXML("temp.txt");
+		FastQueue<ImageUInt8> found = UtilIO.loadXML("temp.txt");
 
 		assertEquals(list.size(),found.size());
 		assertTrue(list.type==found.type);

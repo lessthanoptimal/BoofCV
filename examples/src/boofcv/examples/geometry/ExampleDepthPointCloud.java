@@ -25,8 +25,8 @@ import boofcv.core.image.ConvertBufferedImage;
 import boofcv.gui.d3.PointCloudViewer;
 import boofcv.gui.image.ShowImages;
 import boofcv.gui.image.VisualizeImageData;
+import boofcv.io.UtilIO;
 import boofcv.io.image.UtilImageIO;
-import boofcv.misc.BoofMiscOps;
 import boofcv.struct.FastQueueArray_I32;
 import boofcv.struct.calib.VisualDepthParameters;
 import boofcv.struct.image.ImageUInt16;
@@ -55,7 +55,7 @@ public class ExampleDepthPointCloud {
 		String nameDepth = baseDir+"basket_depth.png";
 		String nameCalib = baseDir+"visualdepth.xml";
 
-		VisualDepthParameters param = BoofMiscOps.loadXML(nameCalib);
+		VisualDepthParameters param = UtilIO.loadXML(nameCalib);
 
 		BufferedImage buffered = UtilImageIO.loadImage(nameRgb);
 		MultiSpectral<ImageUInt8> rgb = ConvertBufferedImage.convertFromMulti(buffered,null,true,ImageUInt8.class);
