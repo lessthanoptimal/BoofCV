@@ -66,9 +66,50 @@ subprojects {
     }
 }
 
+def javadocProjects= [
+        ':main:ip',
+        ':main:io',
+        ':main:feature',
+        ':main:geo',
+        ':main:calibration',
+        ':main:sfm',
+        ':main:recognition',
+        ':main:visualize',
+        ':main:checks',
+
+        ':integration:xuggler',
+        ':integration:openkinect',
+]
+
+try {
+    project(':integration:android')
+    javadocProjects.add(':integration:android')
+} catch( UnknownProjectException ignore ) {}
+try {
+    project(':integration:v4l4j')
+    javadocProjects.add(':integration:v4l4j')
+} catch( UnknownProjectException ignore ) {}
+
+task alljavadoc(type: Javadoc) {
+    source javadocProjects.collect { project(it).sourceSets.main.allJava }
+    classpath = files(javadocProjects.collect { project(it).sourceSets.main.compileClasspath })
+    destinationDir = file("${buildDir}/docs/javadoc")
+    configure(options) {
+        docTitle = "BoofCV JavaDoc ($project.version)"
+        links = [ 'http://docs.oracle.com/javase/7/docs/api/',
+                  'http://georegression.org/javadoc/',
+                  'http://ddogleg.org/javadoc/']
+//        header = file('misc/header.txt').text
+//        bottom = file('misc/bottom.txt').text.replace("\n", "");
+    }
+}
+
 idea {
     project {
         jdkName = '1.6 (64bit)'
         languageLevel = '1.6'
     }
 }
+
+// TODO insert analytics and adsense into javadoc
+// TODO Publish onto maven central
