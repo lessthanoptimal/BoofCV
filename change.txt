@@ -59,6 +59,7 @@ Version : Alpha 0.17
 - TODO Automatically compile and push unstable builds.
 - TODO Make those two failed unit tests ago away
 - TODO Consider using JUnitBenchmark instead of Caliper
+- TODO Make sure latest xstream works in applets
 
 
 ---------------------------------------------
