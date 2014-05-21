@@ -1,0 +1,17 @@
+List of what a new developer needs to do.
+
+Maven Central
+
+Add gradle.properties to .gradle/
+
+------- START ---------
+signing.keyId=KEYID
+signing.password=PASSWORD
+signing.secretKeyRingFile=/home/pja/.gnupg/secring.gpg
+
+ossrhUsername=LOGIN
+ossrhPassword=PASSWORD
+------- END -----------
+
+Key ID can be found using gpg --list-public-keys
+It's pub   2048R/KEYID   blah

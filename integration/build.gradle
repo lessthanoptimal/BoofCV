@@ -1,3 +1,9 @@
 subprojects {
 
 }
+
+signArchives.enabled = false
+jar.enabled = false
+uploadArchives.enabled = false
+sourcesJar.enabled = false
+javadocJar.enabled = false

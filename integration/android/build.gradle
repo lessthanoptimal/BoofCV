@@ -1,27 +1,19 @@
-buildscript {
-    repositories {
-        mavenCentral()
-    }
+// Forsake the standard Android build environment since it's too complex
 
-    dependencies {
-        classpath 'com.android.tools.build:gradle:0.9.0'
-    }
-}
+// TODO search for a platform 17 or later
+ext.ANDROID_PATH = System.getenv()['ANDROID_HOME']+"/platforms/android-17/"
 
-apply plugin: 'android'
+if( !new File(ext.ANDROID_PATH).exists())
+    throw new RuntimeException("Can't find "+ext.ANDROID_PATH+"  Install it or modify the android/build.gradle file")
 
 dependencies {
     compile project(':main:ip')
     compile project(':main:feature')
     compile project(':main:calibration')
     compile project(':main:geo')
-}
 
-android {
-    compileSdkVersion 19
-
-    buildToolsVersion "19.0.0"
-
+    compile fileTree(dir: ANDROID_PATH, include: '*.jar')
+    compile fileTree(dir: ANDROID_PATH+'data/', include: '*.jar')
 }
 
 idea {
@@ -29,5 +21,3 @@ idea {
         name = "BoofCV Android"
     }
 }
-
-uploadArchives.enabled = false
