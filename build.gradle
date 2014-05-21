@@ -1,3 +1,5 @@
+// TODO insert analytics and adsense into javadoc
+
 ext.libpath = file('./').absolutePath
 
 allprojects {
@@ -9,6 +11,9 @@ allprojects {
 
 subprojects {
     apply plugin: 'java'
+    apply plugin: 'osgi'
+    apply plugin: 'maven'
+    apply plugin: 'signing'
 
     sourceCompatibility = 1.6
 
@@ -57,10 +62,73 @@ subprojects {
 //        testCompile group: 'com.google.caliper', name: 'caliper', version: '1.0-beta-1'
     }
 
+    jar {
+        manifest { // the manifest of the default jar is of type OsgiManifest
+            instruction 'Bundle-Vendor', 'BoofCV'
+//            instruction 'Bundle-Description', 'BoofCV'
+            instruction 'Bundle-DocURL', 'http://boofcv.org'
+        }
+    }
+
+    task javadocJar(type: Jar) {
+        classifier = 'javadoc'
+        from javadoc
+    }
+
+    task sourcesJar(type: Jar) {
+        classifier = 'sources'
+        from sourceSets.main.allSource
+    }
+
+    artifacts {
+        archives javadocJar, sourcesJar
+    }
+
+    signing {
+        sign configurations.archives
+    }
+
     uploadArchives {
         repositories {
-            flatDir {
-                dirs "$libpath/repos"
+            mavenDeployer {
+                beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
+                repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+                    authentication(userName: ossrhUsername, password: ossrhPassword)
+                }
+
+                snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
+                    authentication(userName: ossrhUsername, password: ossrhPassword)
+                }
+
+                pom.project {
+                    name 'BoofCV'
+                    packaging 'pom'
+                    // optionally artifactId can be defined here
+                    description 'BoofCV is an open source Java library for real-time computer vision and robotics applications.'
+                    url 'http://boofcv.org'
+
+                    scm {
+                        connection 'scm:git:git://github.com/lessthanoptimal/BoofCV.git'
+                        developerConnection 'scm:git:git://github.com/lessthanoptimal/BoofCV.git'
+                        url 'https://github.com/lessthanoptimal/BoofCV'
+                    }
+
+                    licenses {
+                        license {
+                            name 'The Apache Software License, Version 2.0'
+                            url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                        }
+                    }
+
+                    developers {
+                        developer {
+                            id 'pabeles'
+                            name 'Peter Abeles'
+                            email 'peter.abeles@gmail.com'
+                        }
+                    }
+                }
             }
         }
     }
@@ -91,16 +159,19 @@ try {
 } catch( UnknownProjectException ignore ) {}
 
 task alljavadoc(type: Javadoc) {
-    source javadocProjects.collect { project(it).sourceSets.main.allJava }
+    // only include source code in src directory to avoid including 3rd party code which some projects do as a hack
+    source = javadocProjects.collect { project(it).fileTree('src').include('**/*.java') }
+//    source = javadocProjects.collect { project(it).sourceSets.main.allJava }
     classpath = files(javadocProjects.collect { project(it).sourceSets.main.compileClasspath })
+
     destinationDir = file("${buildDir}/docs/javadoc")
     configure(options) {
         docTitle = "BoofCV JavaDoc ($project.version)"
         links = [ 'http://docs.oracle.com/javase/7/docs/api/',
                   'http://georegression.org/javadoc/',
                   'http://ddogleg.org/javadoc/']
-//        header = file('misc/header.txt').text
-//        bottom = file('misc/bottom.txt').text.replace("\n", "");
+//        header = file('misc/header.txt').text.replace("\n", "")
+//        bottom = file('misc/bottom.txt').text.replace("\n", "")
     }
 }
 
@@ -111,5 +182,15 @@ idea {
     }
 }
 
-// TODO insert analytics and adsense into javadoc
-// TODO Publish onto maven central
+// Disable the creation of jars for distribution.  If you don't do this it will crash
+[':main',':evaluation',':examples',':main:checks'].each {String a ->
+    project(a) {
+        signArchives.enabled = false
+        jar.enabled = false
+        uploadArchives.enabled = false
+        sourcesJar.enabled = false
+        javadocJar.enabled = false
+    }
+}
+
+
