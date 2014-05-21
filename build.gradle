@@ -70,62 +70,65 @@ subprojects {
         }
     }
 
-    task javadocJar(type: Jar) {
-        classifier = 'javadoc'
-        from javadoc
-    }
+    // if Maven central isn't setup in gradle.properties skip all of this
+    if( hasProperty('ossrhUsername') ) {
+        task javadocJar(type: Jar) {
+            classifier = 'javadoc'
+            from javadoc
+        }
 
-    task sourcesJar(type: Jar) {
-        classifier = 'sources'
-        from sourceSets.main.allSource
-    }
+        task sourcesJar(type: Jar) {
+            classifier = 'sources'
+            from sourceSets.main.allSource
+        }
 
-    artifacts {
-        archives javadocJar, sourcesJar
-    }
+        artifacts {
+            archives javadocJar, sourcesJar
+        }
 
-    signing {
-        sign configurations.archives
-    }
+        signing {
+            sign configurations.archives
+        }
 
-    uploadArchives {
-        repositories {
-            mavenDeployer {
-                beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+        uploadArchives {
+            repositories {
+                mavenDeployer {
+                    beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
 
-                repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
-                    authentication(userName: ossrhUsername, password: ossrhPassword)
-                }
-
-                snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
-                    authentication(userName: ossrhUsername, password: ossrhPassword)
-                }
-
-                pom.project {
-                    name 'BoofCV'
-                    packaging 'pom'
-                    // optionally artifactId can be defined here
-                    description 'BoofCV is an open source Java library for real-time computer vision and robotics applications.'
-                    url 'http://boofcv.org'
-
-                    scm {
-                        connection 'scm:git:git://github.com/lessthanoptimal/BoofCV.git'
-                        developerConnection 'scm:git:git://github.com/lessthanoptimal/BoofCV.git'
-                        url 'https://github.com/lessthanoptimal/BoofCV'
+                    repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+                        authentication(userName: ossrhUsername, password: ossrhPassword)
                     }
 
-                    licenses {
-                        license {
-                            name 'The Apache Software License, Version 2.0'
-                            url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
+                        authentication(userName: ossrhUsername, password: ossrhPassword)
+                    }
+
+                    pom.project {
+                        name 'BoofCV'
+                        packaging 'pom'
+                        // optionally artifactId can be defined here
+                        description 'BoofCV is an open source Java library for real-time computer vision and robotics applications.'
+                        url 'http://boofcv.org'
+
+                        scm {
+                            connection 'scm:git:git://github.com/lessthanoptimal/BoofCV.git'
+                            developerConnection 'scm:git:git://github.com/lessthanoptimal/BoofCV.git'
+                            url 'https://github.com/lessthanoptimal/BoofCV'
                         }
-                    }
 
-                    developers {
-                        developer {
-                            id 'pabeles'
-                            name 'Peter Abeles'
-                            email 'peter.abeles@gmail.com'
+                        licenses {
+                            license {
+                                name 'The Apache Software License, Version 2.0'
+                                url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                            }
+                        }
+
+                        developers {
+                            developer {
+                                id 'pabeles'
+                                name 'Peter Abeles'
+                                email 'peter.abeles@gmail.com'
+                            }
                         }
                     }
                 }
@@ -183,13 +186,15 @@ idea {
 }
 
 // Disable the creation of jars for distribution.  If you don't do this it will crash
-[':main',':evaluation',':examples',':main:checks'].each {String a ->
+[':main',':evaluation',':examples',':main:checks','integration'].each {String a ->
     project(a) {
-        signArchives.enabled = false
-        jar.enabled = false
-        uploadArchives.enabled = false
-        sourcesJar.enabled = false
-        javadocJar.enabled = false
+        if( hasProperty('ossrhUsername') ) {
+            signArchives.enabled = false
+            jar.enabled = false
+            uploadArchives.enabled = false
+            sourcesJar.enabled = false
+            javadocJar.enabled = false
+        }
     }
 }
 
