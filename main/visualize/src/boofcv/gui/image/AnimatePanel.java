@@ -23,6 +23,8 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 
 /**
+ * Displays a sequence of images.
+ *
  * @author Peter Abeles
  */
 public class AnimatePanel extends JPanel {
@@ -37,7 +39,12 @@ public class AnimatePanel extends JPanel {
 	public AnimatePanel( int period , BufferedImage... images) {
 		this.period = period;
 		this.images = images;
-		setPreferredSize(new Dimension(images[0].getWidth(),images[1].getHeight()));
+		if( images != null )
+			setPreferredSize(new Dimension(images[0].getWidth(),images[1].getHeight()));
+	}
+
+	public void setAnimation( BufferedImage... images ) {
+		this.images = images;
 	}
 
 	public void start() {
@@ -57,6 +64,9 @@ public class AnimatePanel extends JPanel {
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		Graphics2D g2 = (Graphics2D)g;
+
+		if( images == null )
+			return;
 
 		if( previousTime <= System.currentTimeMillis() ) {
 			previousTime = System.currentTimeMillis()+period-1;
