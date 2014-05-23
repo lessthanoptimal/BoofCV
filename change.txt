@@ -54,11 +54,9 @@ Version : Alpha 0.17
 - Moved serializeXML from BoofMiscOps to UtilIO
   * Removing an IO function which shouldn't be in image processing
 
-- TODO Application DenseOpticalFlow
 - TODO ExampleBundleAdjustment
 - TODO Automatically compile and push unstable builds.
 - TODO Make those two failed unit tests ago away
-- TODO Consider using JUnitBenchmark instead of Caliper
 - TODO Make sure latest xstream works in applets
 
 
