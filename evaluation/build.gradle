@@ -13,7 +13,7 @@ dependencies {
 sourceSets {
     main {
         java {
-
+            srcDir 'visualization/src'
         }
         resources {
             srcDir 'resources/validation'
@@ -23,7 +23,6 @@ sourceSets {
     test {
         java {
 //            srcDir 'validation/calibration/src'
-            srcDir 'visualization/src'
             srcDir 'visualization/test'
             srcDir 'benchmark'
         }

@@ -7,12 +7,17 @@ dependencies {
     compile project(':main:sfm')
     compile project(':main:recognition')
     compile project(':main:visualize')
+    compile project(':evaluation')
+
 }
 
 task appletJar(type: Jar, dependsOn:jar) {
     from files(sourceSets.main.output.classesDir)
     from files(sourceSets.main.output.resourcesDir)
     from {configurations.compile.collect {zipTree(it)}}
+
+    destinationDir = file('./')
+    archiveName = 'BoofCV_Applet.jar'
 }
 
 idea {

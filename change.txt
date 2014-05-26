@@ -58,6 +58,7 @@ Version : Alpha 0.17
 - TODO Automatically compile and push unstable builds.
 - TODO Make those two failed unit tests ago away
 - TODO Make sure latest xstream works in applets
+- TODO move BundleAdjustmentCalibrated into SFM?
 
 
 ---------------------------------------------
