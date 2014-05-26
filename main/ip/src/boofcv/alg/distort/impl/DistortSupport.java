@@ -28,9 +28,9 @@ import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.MultiSpectral;
 import georegression.struct.affine.Affine2D_F32;
-import georegression.struct.se.InvertibleTransformSequence;
 import georegression.struct.se.Se2_F32;
 import georegression.transform.ConvertTransform_F32;
+import georegression.transform.InvertibleTransformSequence;
 
 
 /**
