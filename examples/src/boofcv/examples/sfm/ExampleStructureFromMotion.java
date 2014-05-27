@@ -39,6 +39,8 @@ import boofcv.factory.geo.EnumEpipolar;
 import boofcv.factory.geo.EnumPNP;
 import boofcv.factory.geo.FactoryMultiView;
 import boofcv.factory.geo.FactoryTriangulate;
+import boofcv.gui.d3.PointCloudViewer;
+import boofcv.gui.image.ShowImages;
 import boofcv.io.UtilIO;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.calib.IntrinsicParameters;
@@ -62,6 +64,7 @@ import org.ddogleg.fitting.modelset.ransac.Ransac;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_I32;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -94,32 +97,49 @@ public class ExampleStructureFromMotion {
 	FastQueue<Point2D_F64> pixelsA = new FastQueue<Point2D_F64>(Point2D_F64.class, true);
 	FastQueue<Point2D_F64> pixelsB = new FastQueue<Point2D_F64>(Point2D_F64.class, true);
 
+	GrowQueue_I32 colorsA = new GrowQueue_I32();
+	GrowQueue_I32 colorsB = new GrowQueue_I32();
+
+
 	List<Track> tracks = new ArrayList<Track>();
 	List<Track> activeTracks = new ArrayList<Track>();
 	List<Track> activeTracks2 = new ArrayList<Track>();
 	// transforms from camera to world for each frame after frame 0
-	List<Se3_F64> motionWorldToB = new ArrayList<Se3_F64>();
+	List<Se3_F64> motionWorldToCamera = new ArrayList<Se3_F64>();
 
 	public void process(IntrinsicParameters intrinsic , List<ImageFloat32> images) {
 
 		this.intrinsic = intrinsic;
 		pixelToNorm = LensDistortionOps.transformRadialToNorm_F64(intrinsic);
 
-		detectFeatures(images.get(0), featuresA, pixelsA);
-		detectFeatures(images.get(1), featuresB, pixelsB);
+		detectFeatures(images.get(0), featuresA, pixelsA, colorsA);
+		detectFeatures(images.get(1), featuresB, pixelsB, colorsB);
 
-		initialize(featuresA,featuresB,pixelsA,pixelsB);
+		initialize(featuresA,featuresB,pixelsA,pixelsB,colorsA);
 
 		swap();
 		for( int i = 2; i < images.size(); i++ ) {
-			detectFeatures(images.get(i), featuresB, pixelsB);
-			addFrame(featuresA, featuresB, pixelsA, pixelsB);
+			detectFeatures(images.get(i), featuresB, pixelsB, colorsB);
+			addFrame(featuresA, featuresB, pixelsA, pixelsB,colorsA);
 			swap();
 		}
+;
+		normalizeScale();
+//		performBundleAdjustment();
+//		normalizeScale();
 
-		performBundleAdjustment();
-		// TODO adjust scale
-		// TODO show 3D points
+		for( Se3_F64 m : motionWorldToCamera) {
+			m.print();
+		}
+
+		PointCloudViewer gui = new PointCloudViewer(intrinsic,1);
+
+		for( Track t : tracks ) {
+			gui.addPoint(t.worldPt.x,t.worldPt.y,t.worldPt.z,t.color);
+		}
+
+		gui.setPreferredSize(new Dimension(500,500));
+		ShowImages.showWindow(gui,"Points");
 	}
 
 	/**
@@ -133,12 +153,19 @@ public class ExampleStructureFromMotion {
 		FastQueue<Point2D_F64> tmpP = pixelsA;
 		pixelsA = pixelsB;
 		pixelsB = tmpP;
+
+		GrowQueue_I32 tmpC = colorsA;
+		colorsA = colorsB;
+		colorsB = tmpC;
 	}
 
-	private void detectFeatures(ImageFloat32 image, FastQueue<SurfFeature> features,
-								FastQueue<Point2D_F64> pixels) {
+	private void detectFeatures(ImageFloat32 image,
+								FastQueue<SurfFeature> features,
+								FastQueue<Point2D_F64> pixels,
+								GrowQueue_I32 colors ) {
 		features.reset();
 		pixels.reset();
+		colors.reset();
 		detDesc.detect(image);
 		for (int i = 0; i < detDesc.getNumberOfFeatures(); i++) {
 			Point2D_F64 p = detDesc.getLocation(i);
@@ -146,13 +173,29 @@ public class ExampleStructureFromMotion {
 			features.grow().set(detDesc.getDescription(i));
 			// store pixels are normalized image coordinates
 			pixelToNorm.compute(p.x, p.y, pixels.grow());
+
+			int v = (int)image.get((int)p.x,(int)p.y);
+			colors.add( v << 16 | v << 8 | v );
 		}
 	}
 
 	protected void initialize(FastQueue<SurfFeature> featuresA, FastQueue<SurfFeature> featuresB,
-							  FastQueue<Point2D_F64> pixelsA, FastQueue<Point2D_F64> pixelsB) {
+							  FastQueue<Point2D_F64> pixelsA, FastQueue<Point2D_F64> pixelsB,
+							  GrowQueue_I32 colorsA ) {
 
-		List<AssociatedPair> pairs = associateFeatures(featuresA, featuresB, pixelsA, pixelsB);
+		// associate the features together
+		associate.setSource(featuresA);
+		associate.setDestination(featuresB);
+		associate.associate();
+
+		FastQueue<AssociatedIndex> matches = associate.getMatches();
+
+		// create the associated pair for motion estimation
+		List<AssociatedPair> pairs = new ArrayList<AssociatedPair>();
+		for (int i = 0; i < matches.size(); i++) {
+			AssociatedIndex a = matches.get(i);
+			pairs.add(new AssociatedPair(pixelsA.get(a.src), pixelsB.get(a.dst)));
+		}
 
 		// Since this is the first frame estimate the camera motion up to a translational scale factor
 		Estimate1ofEpipolar essentialAlg = FactoryMultiView.computeFundamental_1(EnumEpipolar.ESSENTIAL_5_NISTER, 5);
@@ -179,16 +222,16 @@ public class ExampleStructureFromMotion {
 
 		// the motion is estimated from src to dst
 		Se3_F64 motionAtoB = epipolarMotion.getModelParameters();
-		motionWorldToB.add(motionAtoB.copy());
+		motionWorldToCamera.add(motionAtoB.copy());
 
 		// create tracks for only those features in the inlier list
-		FastQueue<AssociatedIndex> matches = associate.getMatches();
 		int N = epipolarMotion.getMatchSet().size();
 		for (int i = 0; i < N; i++) {
 			int index = epipolarMotion.getInputIndex(i);
 			AssociatedIndex a = matches.get(index);
 
 			Track t = new Track();
+			t.color = colorsA.get(a.src);
 			t.prevIndex = a.dst;
 			t.obs.grow().set( pixelsA.get(a.src) );
 			t.obs.grow().set( pixelsB.get(a.dst) );
@@ -204,26 +247,9 @@ public class ExampleStructureFromMotion {
 		activeTracks.addAll(tracks);
 	}
 
-	private List<AssociatedPair> associateFeatures(FastQueue<SurfFeature> featuresA, FastQueue<SurfFeature> featuresB,
-												   FastQueue<Point2D_F64> pixelsA, FastQueue<Point2D_F64> pixelsB) {
-		// associate the features together
-		associate.setSource(featuresA);
-		associate.setDestination(featuresB);
-		associate.associate();
-
-		FastQueue<AssociatedIndex> matches = associate.getMatches();
-
-		// create the associated pair for motion estimation
-		List<AssociatedPair> pairs = new ArrayList<AssociatedPair>();
-		for (int i = 0; i < matches.size(); i++) {
-			AssociatedIndex a = matches.get(i);
-			pairs.add(new AssociatedPair(pixelsA.get(a.src), pixelsB.get(a.dst)));
-		}
-		return pairs;
-	}
-
 	public void addFrame( FastQueue<SurfFeature> featuresA, FastQueue<SurfFeature> featuresB,
-						  FastQueue<Point2D_F64> pixelsA, FastQueue<Point2D_F64> pixelsB )
+						  FastQueue<Point2D_F64> pixelsA, FastQueue<Point2D_F64> pixelsB ,
+						  GrowQueue_I32 colorsA )
 	{
 		// associate the features together
 		associate.setSource(featuresA);
@@ -245,6 +271,7 @@ public class ExampleStructureFromMotion {
 
 		Estimate1ofPnP estimator = FactoryMultiView.computePnP_1(EnumPNP.P3P_FINSTERWALDER,-1,2);
 		final DistanceModelMonoPixels<Se3_F64,Point2D3D> distance = new PnPDistanceReprojectionSq();
+		distance.setIntrinsic(intrinsic.fx,intrinsic.fy,intrinsic.skew);
 
 		ModelManagerSe3_F64 manager = new ModelManagerSe3_F64();
 		EstimatorToGenerator<Se3_F64,Point2D3D> generator = new EstimatorToGenerator<Se3_F64,Point2D3D>(estimator);
@@ -259,38 +286,40 @@ public class ExampleStructureFromMotion {
 			throw new RuntimeException("Motion estimation failed");
 
 		Se3_F64 motionWorldToB = motionEstimator.getModelParameters().copy();
-		this.motionWorldToB.add(motionWorldToB);
+		motionWorldToCamera.add(motionWorldToB);
 		Se3_F64 motionBtoWorld = motionWorldToB.invert(null);
-		Se3_F64 motionAtoWorld = this.motionWorldToB.get(this.motionWorldToB.size() - 2);
+		Se3_F64 motionWorldToA = motionWorldToCamera.get(motionWorldToCamera.size() - 2);
 
-		Se3_F64 motionBtoA =  motionBtoWorld.concat( motionAtoWorld.invert(null),null);
+		Se3_F64 motionBtoA =  motionBtoWorld.concat( motionWorldToA,null);
 
 		// create tracks for only those features in the inlier list
 		activeTracks2.clear();
 		int N = motionEstimator.getMatchSet().size();
-		Point3D_F64 Pt_in_b = new Point3D_F64();
+		Point3D_F64 pt_in_b = new Point3D_F64();
 		for (int i = 0; i < N; i++) {
 			int index = motionEstimator.getInputIndex(i);
 			AssociatedIndex a = matches.get(index);
 
 			Track t = lookupTrack(a.src);
 			if( t == null ) {
+				// TODO these haven't been verified through RANSAC and shouldn't be part of the final output
 				t = new Track();
+				t.color = colorsA.get(a.src);
 				t.prevIndex = a.dst;
 				t.obs.grow().set( pixelsA.get(a.src) );
 				t.obs.grow().set( pixelsB.get(a.dst) );
-				t.frame.add(this.motionWorldToB.size()-1);
-				t.frame.add(this.motionWorldToB.size());
+				t.frame.add(this.motionWorldToCamera.size()-1);
+				t.frame.add(this.motionWorldToCamera.size());
 				// compute point location in B frame
-				triangulate.triangulate(pixelsB.get(a.dst),pixelsA.get(a.src),motionBtoA,Pt_in_b);
+				triangulate.triangulate(pixelsB.get(a.dst),pixelsA.get(a.src),motionBtoA,pt_in_b);
 				// transform from B back to world frame
-				SePointOps_F64.transform(motionBtoWorld,Pt_in_b,t.worldPt);
+				SePointOps_F64.transform(motionBtoWorld,pt_in_b,t.worldPt);
 
 				tracks.add(t);
 			} else {
 				t.prevIndex = a.dst;
 				t.obs.grow().set(pixelsB.get(a.dst));
-				t.frame.add(this.motionWorldToB.size());
+				t.frame.add(motionWorldToCamera.size());
 			}
 
 			activeTracks2.add(t);
@@ -312,18 +341,18 @@ public class ExampleStructureFromMotion {
 
 	protected void performBundleAdjustment() {
 		System.out.println("Starting bundle adjustment");
-		BundleAdjustmentCalibrated bundle = FactoryMultiView.bundleCalibrated(1e-8,2);
+		BundleAdjustmentCalibrated bundle = FactoryMultiView.bundleCalibrated(1e-8,3);
 
 		CalibratedPoseAndPoint initialModel = new CalibratedPoseAndPoint();
 		List<ViewPointObservations> observations = new ArrayList<ViewPointObservations>();
 
-		initialModel.configure(motionWorldToB.size()+1,tracks.size());
+		initialModel.configure(motionWorldToCamera.size()+1,tracks.size());
 
 		initialModel.setViewKnown(0,true);
 		initialModel.getWorldToCamera(0).reset();
 
-		for (int i = 0; i < motionWorldToB.size(); i++) {
-			initialModel.getWorldToCamera(i+1).set(motionWorldToB.get(i));
+		for (int i = 0; i < motionWorldToCamera.size(); i++) {
+			initialModel.getWorldToCamera(i+1).set(motionWorldToCamera.get(i));
 		}
 
 		for (int i = 0; i < tracks.size(); i++) {
@@ -332,7 +361,7 @@ public class ExampleStructureFromMotion {
 			initialModel.getPoint(i).set(t.worldPt);
 		}
 
-		for( int frameIndex = 0; frameIndex <= motionWorldToB.size(); frameIndex++ ) {
+		for( int frameIndex = 0; frameIndex <= motionWorldToCamera.size(); frameIndex++ ) {
 			ViewPointObservations o = new ViewPointObservations();
 
 			for (int j = 0; j < tracks.size(); j++) {
@@ -353,10 +382,27 @@ public class ExampleStructureFromMotion {
 		if( !bundle.process(initialModel,observations) )
 			throw new RuntimeException("Bundle adjustment failed!");
 
+		// TODO Copy results!
 		System.out.println("Done with BA!");
 	}
 
+	public void normalizeScale() {
+
+		double T = motionWorldToCamera.get(0).T.norm();
+		double scale = 1.0/T;
+
+		for( Se3_F64 m : motionWorldToCamera) {
+			m.T.scale(scale);
+		}
+
+		for( Track t : tracks ) {
+			t.worldPt.scale(scale);
+		}
+	}
+
 	public static class Track {
+		// color of the pixel first found int
+		int color;
 		// estimate 3D position of the feature
 		Point3D_F64 worldPt = new Point3D_F64();
 		// observations in each frame that it's visible
