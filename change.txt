@@ -60,6 +60,15 @@ Version : Alpha 0.17
 - TODO Make sure latest xstream works in applets
 - TODO move BundleAdjustmentCalibrated into SFM?
 
+- Processing
+  * filters
+  * line detection
+  * binary image ops
+  * shape fitting
+  * feature detection
+  * feature association
+  * image stitching
+  * object tracking
 
 ---------------------------------------------
 Date    : 2013/12/25

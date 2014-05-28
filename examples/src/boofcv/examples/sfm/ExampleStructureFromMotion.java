@@ -27,12 +27,12 @@ import boofcv.abst.geo.Estimate1ofPnP;
 import boofcv.abst.geo.TriangulateTwoViewsCalibrated;
 import boofcv.alg.distort.LensDistortionOps;
 import boofcv.alg.geo.DistanceModelMonoPixels;
+import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.bundle.CalibratedPoseAndPoint;
 import boofcv.alg.geo.bundle.ViewPointObservations;
 import boofcv.alg.geo.pose.PnPDistanceReprojectionSq;
-import boofcv.alg.sfm.robust.DistanceSe3SymmetricSq;
-import boofcv.alg.sfm.robust.EstimatorToGenerator;
-import boofcv.alg.sfm.robust.Se3FromEssentialGenerator;
+import boofcv.alg.sfm.robust.*;
+import boofcv.core.image.ConvertBufferedImage;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
 import boofcv.factory.geo.EnumEpipolar;
@@ -51,26 +51,33 @@ import boofcv.struct.feature.SurfFeatureQueue;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.geo.Point2D3D;
 import boofcv.struct.image.ImageFloat32;
+import georegression.fitting.homography.ModelManagerHomography2D_F64;
 import georegression.fitting.se.ModelManagerSe3_F64;
+import georegression.struct.homo.Homography2D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
-import org.ddogleg.fitting.modelset.DistanceFromModel;
-import org.ddogleg.fitting.modelset.ModelGenerator;
-import org.ddogleg.fitting.modelset.ModelManager;
-import org.ddogleg.fitting.modelset.ModelMatcher;
+import org.ddogleg.fitting.modelset.*;
 import org.ddogleg.fitting.modelset.ransac.Ransac;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_I32;
 
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
+ *
+ * Doesn't handle pure rotations.  Almost pure rotation has poor performance.
+ * Doesn't close the loop.  Pose error increases with each image.
+ *
  * @author Peter Abeles
  */
+// TODO Incorporate test to see if two sequential images are good for computing epipolar geometry
+// TODO use results from essential matrix calculation to prune initial list of p3p points
+
 // TODO example with more images maybe 6?
 // TODO discard features which are visible for less than 3 images
 // TODO visualize results
@@ -81,8 +88,10 @@ public class ExampleStructureFromMotion {
 	IntrinsicParameters intrinsic;
 	PointTransform_F64 pixelToNorm;
 
+	double keyframeRatio = 1.6;
+
 	// tolerance for inliers in pixels
-	double inlierTol = 0.5;
+	double inlierTol = 1.5;
 
 	DetectDescribePoint<ImageFloat32, SurfFeature> detDesc = FactoryDetectDescribe.surfStable(null, null, null, ImageFloat32.class);
 	ScoreAssociation<SurfFeature> scorer = FactoryAssociation.scoreEuclidean(SurfFeature.class, true);
@@ -100,30 +109,42 @@ public class ExampleStructureFromMotion {
 	GrowQueue_I32 colorsA = new GrowQueue_I32();
 	GrowQueue_I32 colorsB = new GrowQueue_I32();
 
-
 	List<Track> tracks = new ArrayList<Track>();
+	List<Track> candidate = new ArrayList<Track>();
 	List<Track> activeTracks = new ArrayList<Track>();
 	List<Track> activeTracks2 = new ArrayList<Track>();
 	// transforms from camera to world for each frame after frame 0
 	List<Se3_F64> motionWorldToCamera = new ArrayList<Se3_F64>();
 
-	public void process(IntrinsicParameters intrinsic , List<ImageFloat32> images) {
+	ModelMatcher<Se3_F64, AssociatedPair> estimateEssential;
+	ModelMatcher<Homography2D_F64,AssociatedPair> estimateHomography;
+	ModelMatcher<Se3_F64, Point2D3D> estimatePnP;
+	ModelFitter<Se3_F64, Point2D3D> refinePnP = FactoryMultiView.refinePnP(1e-12,40);
+
+
+	public void process(IntrinsicParameters intrinsic , List<BufferedImage> colorImages ) {
 
 		this.intrinsic = intrinsic;
 		pixelToNorm = LensDistortionOps.transformRadialToNorm_F64(intrinsic);
 
-		detectFeatures(images.get(0), featuresA, pixelsA, colorsA);
-		detectFeatures(images.get(1), featuresB, pixelsB, colorsB);
+		setupHomography();
+		setupEssential();
+		setupPnP();
+
+		System.out.println("Processing initial pair");
+		detectFeatures(colorImages.get(0), featuresA, pixelsA, colorsA);
+		detectFeatures(colorImages.get(1), featuresB, pixelsB, colorsB);
 
 		initialize(featuresA,featuresB,pixelsA,pixelsB,colorsA);
 
 		swap();
-		for( int i = 2; i < images.size(); i++ ) {
-			detectFeatures(images.get(i), featuresB, pixelsB, colorsB);
+		for( int i = 2; i < colorImages.size(); i++ ) {
+			System.out.println("Processing image "+i);
+			detectFeatures(colorImages.get(i), featuresB, pixelsB, colorsB);
 			addFrame(featuresA, featuresB, pixelsA, pixelsB,colorsA);
 			swap();
 		}
-;
+
 		normalizeScale();
 //		performBundleAdjustment();
 //		normalizeScale();
@@ -140,6 +161,52 @@ public class ExampleStructureFromMotion {
 
 		gui.setPreferredSize(new Dimension(500,500));
 		ShowImages.showWindow(gui,"Points");
+	}
+
+	private void setupPnP() {
+		Estimate1ofPnP estimator = FactoryMultiView.computePnP_1(EnumPNP.P3P_FINSTERWALDER, -1, 2);
+		final DistanceModelMonoPixels<Se3_F64,Point2D3D> distance = new PnPDistanceReprojectionSq();
+		distance.setIntrinsic(intrinsic.fx,intrinsic.fy,intrinsic.skew);
+
+		ModelManagerSe3_F64 manager = new ModelManagerSe3_F64();
+		EstimatorToGenerator<Se3_F64,Point2D3D> generator = new EstimatorToGenerator<Se3_F64,Point2D3D>(estimator);
+
+		// 1/2 a pixel tolerance for RANSAC inliers
+		double ransacTOL = inlierTol * inlierTol;
+
+		estimatePnP = new Ransac<Se3_F64, Point2D3D>(2323, manager, generator, distance, 2000, ransacTOL);
+	}
+
+	private void setupEssential() {
+		// Since this is the first frame estimate the camera motion up to a translational scale factor
+		Estimate1ofEpipolar essentialAlg = FactoryMultiView.computeFundamental_1(EnumEpipolar.ESSENTIAL_5_NISTER, 5);
+
+		ModelManager<Se3_F64> manager = new ModelManagerSe3_F64();
+		ModelGenerator<Se3_F64, AssociatedPair> generateEpipolarMotion =
+				new Se3FromEssentialGenerator(essentialAlg, triangulate);
+
+		DistanceFromModel<Se3_F64, AssociatedPair> distanceSe3 =
+				new DistanceSe3SymmetricSq(triangulate,
+						intrinsic.fx, intrinsic.fy, intrinsic.skew,
+						intrinsic.fx, intrinsic.fy, intrinsic.skew);
+
+		// tolerance for RANSAC inliers
+		double ransacTOL = inlierTol * inlierTol * 2.0;
+
+		estimateEssential = new Ransac<Se3_F64, AssociatedPair>(2323, manager, generateEpipolarMotion, distanceSe3,
+				4000, ransacTOL);
+	}
+
+	private void setupHomography() {
+		ModelManager<Homography2D_F64> manager = new ModelManagerHomography2D_F64();
+		GenerateHomographyLinear modelFitter = new GenerateHomographyLinear(true);
+		DistanceHomographySq distance = new DistanceHomographySq();
+
+		// tolerance for RANSAC inliers
+		double ransacTOL = inlierTol * inlierTol;
+
+		estimateHomography =
+				new Ransac<Homography2D_F64,AssociatedPair>(123,manager,modelFitter,distance,300,ransacTOL);
 	}
 
 	/**
@@ -159,10 +226,13 @@ public class ExampleStructureFromMotion {
 		colorsB = tmpC;
 	}
 
-	private void detectFeatures(ImageFloat32 image,
+	private void detectFeatures(BufferedImage colorImage,
 								FastQueue<SurfFeature> features,
 								FastQueue<Point2D_F64> pixels,
 								GrowQueue_I32 colors ) {
+
+		ImageFloat32 image = ConvertBufferedImage.convertFrom(colorImage, (ImageFloat32) null);
+
 		features.reset();
 		pixels.reset();
 		colors.reset();
@@ -174,8 +244,7 @@ public class ExampleStructureFromMotion {
 			// store pixels are normalized image coordinates
 			pixelToNorm.compute(p.x, p.y, pixels.grow());
 
-			int v = (int)image.get((int)p.x,(int)p.y);
-			colors.add( v << 16 | v << 8 | v );
+			colors.add( colorImage.getRGB((int)p.x,(int)p.y) );
 		}
 	}
 
@@ -183,54 +252,19 @@ public class ExampleStructureFromMotion {
 							  FastQueue<Point2D_F64> pixelsA, FastQueue<Point2D_F64> pixelsB,
 							  GrowQueue_I32 colorsA ) {
 
-		// associate the features together
-		associate.setSource(featuresA);
-		associate.setDestination(featuresB);
-		associate.associate();
+		Se3_F64 motionAtoB = new Se3_F64();
+		List<AssociatedIndex> inliers = new ArrayList<AssociatedIndex>();
+		if( !findMatches(featuresA,featuresB,pixelsA,pixelsB,motionAtoB,inliers))
+			throw new RuntimeException("The first image pair is a bad keyframe!");
 
-		FastQueue<AssociatedIndex> matches = associate.getMatches();
-
-		// create the associated pair for motion estimation
-		List<AssociatedPair> pairs = new ArrayList<AssociatedPair>();
-		for (int i = 0; i < matches.size(); i++) {
-			AssociatedIndex a = matches.get(i);
-			pairs.add(new AssociatedPair(pixelsA.get(a.src), pixelsB.get(a.dst)));
-		}
-
-		// Since this is the first frame estimate the camera motion up to a translational scale factor
-		Estimate1ofEpipolar essentialAlg = FactoryMultiView.computeFundamental_1(EnumEpipolar.ESSENTIAL_5_NISTER, 5);
-
-		ModelManager<Se3_F64> manager = new ModelManagerSe3_F64();
-		ModelGenerator<Se3_F64, AssociatedPair> generateEpipolarMotion =
-				new Se3FromEssentialGenerator(essentialAlg, triangulate);
-
-		DistanceFromModel<Se3_F64, AssociatedPair> distanceSe3 =
-				new DistanceSe3SymmetricSq(triangulate,
-						intrinsic.fx, intrinsic.fy, intrinsic.skew,
-						intrinsic.fx, intrinsic.fy, intrinsic.skew);
-
-		// 1/2 a pixel tolerance for RANSAC inliers
-		double ransacTOL = inlierTol * inlierTol * 2.0;
-
-		ModelMatcher<Se3_F64, AssociatedPair> epipolarMotion =
-				new Ransac<Se3_F64, AssociatedPair>(2323, manager, generateEpipolarMotion, distanceSe3,
-						200, ransacTOL);
-
-		// don't forget that the observations in pairs is in normalized image coordinates
-		if (!epipolarMotion.process(pairs))
-			throw new RuntimeException("Motion estimation failed");
-
-		// the motion is estimated from src to dst
-		Se3_F64 motionAtoB = epipolarMotion.getModelParameters();
 		motionWorldToCamera.add(motionAtoB.copy());
 
 		// create tracks for only those features in the inlier list
-		int N = epipolarMotion.getMatchSet().size();
-		for (int i = 0; i < N; i++) {
-			int index = epipolarMotion.getInputIndex(i);
-			AssociatedIndex a = matches.get(index);
+		for (int i = 0; i < inliers.size(); i++) {
+			AssociatedIndex a = inliers.get(i);
 
 			Track t = new Track();
+			t.stable = true;
 			t.color = colorsA.get(a.src);
 			t.prevIndex = a.dst;
 			t.obs.grow().set( pixelsA.get(a.src) );
@@ -238,92 +272,132 @@ public class ExampleStructureFromMotion {
 			t.frame.add(0);
 			t.frame.add(1);
 			// compute the 3D coordinate of the feature
-			triangulate.triangulate(pixelsA.get(a.src),pixelsB.get(a.dst),motionAtoB,t.worldPt);
+			Point2D_F64 pa = pixelsA.get(a.src);
+			Point2D_F64 pb = pixelsB.get(a.dst);
 
-			tracks.add(t);
+//			double theta = computeAngle(pa, pb);
+//
+//			if( theta >= Math.PI*10/180.0 ) {
+				triangulate.triangulate(pa, pb, motionAtoB, t.worldPt);
+				// the feature has to be in front of the camera
+				if (t.worldPt.z > 0) {
+					tracks.add(t);
+				}
+//			}
 		}
 
 		activeTracks.clear();
 		activeTracks.addAll(tracks);
 	}
 
+	private double computeAngle(Point2D_F64 pa, Point2D_F64 pb) {
+		double dotAB = pa.x*pb.x + pa.y*pb.y + 1;
+		double nA = Math.sqrt(pa.x*pa.x + pa.y*pa.y + 1);
+		double nB = Math.sqrt(pb.x*pb.x + pb.y*pb.y + 1);
+		return Math.acos(dotAB/(nA*nB));
+	}
+
 	public void addFrame( FastQueue<SurfFeature> featuresA, FastQueue<SurfFeature> featuresB,
 						  FastQueue<Point2D_F64> pixelsA, FastQueue<Point2D_F64> pixelsB ,
 						  GrowQueue_I32 colorsA )
 	{
-		// associate the features together
-		associate.setSource(featuresA);
-		associate.setDestination(featuresB);
-		associate.associate();
-
-		FastQueue<AssociatedIndex> matches = associate.getMatches();
+		List<AssociatedIndex> inliers = new ArrayList<AssociatedIndex>();
+		if( !findMatches(featuresA,featuresB,pixelsA,pixelsB,new Se3_F64(),inliers))
+			throw new RuntimeException("Bad image pair is a bad keyframe!");
 
 		// create the associated pair for motion estimation
 		List<Point2D3D> features = new ArrayList<Point2D3D>();
-		for (int i = 0; i < matches.size(); i++) {
-			AssociatedIndex a = matches.get(i);
+		List<AssociatedIndex> inputRansac = new ArrayList<AssociatedIndex>();
+		List<AssociatedIndex> unmatched = new ArrayList<AssociatedIndex>();
+		for (int i = 0; i < inliers.size(); i++) {
+			AssociatedIndex a = inliers.get(i);
 			Track t = lookupTrack(a.src);
 			if( t != null ) {
 				Point2D_F64 p = pixelsB.get(a.dst);
 				features.add(new Point2D3D(p, t.worldPt));
+				inputRansac.add(a);
+			} else {
+				unmatched.add(a);
 			}
 		}
 
-		Estimate1ofPnP estimator = FactoryMultiView.computePnP_1(EnumPNP.P3P_FINSTERWALDER,-1,2);
-		final DistanceModelMonoPixels<Se3_F64,Point2D3D> distance = new PnPDistanceReprojectionSq();
-		distance.setIntrinsic(intrinsic.fx,intrinsic.fy,intrinsic.skew);
-
-		ModelManagerSe3_F64 manager = new ModelManagerSe3_F64();
-		EstimatorToGenerator<Se3_F64,Point2D3D> generator = new EstimatorToGenerator<Se3_F64,Point2D3D>(estimator);
-
-		// 1/2 a pixel tolerance for RANSAC inliers
-		double ransacTOL = inlierTol * inlierTol;
-
-		ModelMatcher<Se3_F64, Point2D3D> motionEstimator =
-				new Ransac<Se3_F64, Point2D3D>(2323, manager, generator, distance, 200, ransacTOL);
-
-		if( !motionEstimator.process(features))
+		if( !estimatePnP.process(features))
 			throw new RuntimeException("Motion estimation failed");
 
-		Se3_F64 motionWorldToB = motionEstimator.getModelParameters().copy();
+
+		Se3_F64 motionWorldToB = new Se3_F64();
+		refinePnP.fitModel(estimatePnP.getMatchSet(),estimatePnP.getModelParameters(),motionWorldToB);
+//		motionWorldToB.set(estimatePnP.getModelParameters());
+
 		motionWorldToCamera.add(motionWorldToB);
 		Se3_F64 motionBtoWorld = motionWorldToB.invert(null);
 		Se3_F64 motionWorldToA = motionWorldToCamera.get(motionWorldToCamera.size() - 2);
 
-		Se3_F64 motionBtoA =  motionBtoWorld.concat( motionWorldToA,null);
+		Se3_F64 motionBtoA =  motionBtoWorld.concat(motionWorldToA, null);
 
 		// create tracks for only those features in the inlier list
 		activeTracks2.clear();
-		int N = motionEstimator.getMatchSet().size();
+		int N = estimatePnP.getMatchSet().size();
+		System.out.println("  PNP inliers "+N+"  ransac input "+inputRansac.size());
 		Point3D_F64 pt_in_b = new Point3D_F64();
 		for (int i = 0; i < N; i++) {
-			int index = motionEstimator.getInputIndex(i);
-			AssociatedIndex a = matches.get(index);
+			int index = estimatePnP.getInputIndex(i);
+			AssociatedIndex a = inputRansac.get(index);
 
 			Track t = lookupTrack(a.src);
-			if( t == null ) {
-				// TODO these haven't been verified through RANSAC and shouldn't be part of the final output
-				t = new Track();
-				t.color = colorsA.get(a.src);
-				t.prevIndex = a.dst;
-				t.obs.grow().set( pixelsA.get(a.src) );
-				t.obs.grow().set( pixelsB.get(a.dst) );
-				t.frame.add(this.motionWorldToCamera.size()-1);
-				t.frame.add(this.motionWorldToCamera.size());
-				// compute point location in B frame
-				triangulate.triangulate(pixelsB.get(a.dst),pixelsA.get(a.src),motionBtoA,pt_in_b);
-				// transform from B back to world frame
-				SePointOps_F64.transform(motionBtoWorld,pt_in_b,t.worldPt);
-
+			t.prevIndex = a.dst;
+			t.obs.grow().set(pixelsB.get(a.dst));
+			t.frame.add(motionWorldToCamera.size());
+			if( !t.stable ) {
+				t.stable = true;
 				tracks.add(t);
-			} else {
-				t.prevIndex = a.dst;
-				t.obs.grow().set(pixelsB.get(a.dst));
-				t.frame.add(motionWorldToCamera.size());
 			}
+
+//			Point3D_F64 tmp3 = new Point3D_F64();
+//			triangulate.triangulate(pixelsB.get(a.dst),pixelsA.get(a.src),motionBtoA,pt_in_b);
+//			SePointOps_F64.transform(motionBtoWorld, pt_in_b, tmp3);
+//			System.out.println("  actual " + t.worldPt);
+//			System.out.println("  found  "+tmp3);
+
 
 			activeTracks2.add(t);
 		}
+
+		int totalAdded = 0;
+		// create new tracks from the set of matched features which were not used.
+		for( int i = 0; i < unmatched.size(); i++ ) {
+			AssociatedIndex a = unmatched.get(i);
+			Track t = new Track();
+			t.stable = false;
+			t.color = colorsA.get(a.src);
+			t.prevIndex = a.dst;
+			t.obs.grow().set( pixelsA.get(a.src) );
+			t.obs.grow().set( pixelsB.get(a.dst) );
+			t.frame.add(this.motionWorldToCamera.size()-1);
+			t.frame.add(this.motionWorldToCamera.size());
+
+			Point2D_F64 pa = pixelsA.get(a.src);
+			Point2D_F64 pb = pixelsB.get(a.dst);
+
+			double theta = computeAngle(pa, pb);
+
+			// make sure it can be triangulated with a little bit of accuracy
+//			if( theta >= Math.PI*10/180.0 ) {
+				// compute point location in B frame
+				triangulate.triangulate(pixelsB.get(a.dst),pixelsA.get(a.src),motionBtoA,pt_in_b);
+
+				// the feature has to be in front of the camera
+				if( pt_in_b.z > 0 ) {
+					// transform from B back to world frame
+					SePointOps_F64.transform(motionBtoWorld, pt_in_b, t.worldPt);
+
+					activeTracks2.add(t);
+					totalAdded++;
+				}
+//			}
+		}
+
+		System.out.println("New ones added "+totalAdded);
 
 		List<Track> tmp = activeTracks2;
 		activeTracks2 = activeTracks;
@@ -386,6 +460,54 @@ public class ExampleStructureFromMotion {
 		System.out.println("Done with BA!");
 	}
 
+	protected boolean findMatches(FastQueue<SurfFeature> featuresA, FastQueue<SurfFeature> featuresB,
+								  FastQueue<Point2D_F64> pixelsA, FastQueue<Point2D_F64> pixelsB,
+								  Se3_F64 motionAtoB ,
+								  List<AssociatedIndex> inliers )
+	{
+		// associate the features together
+		associate.setSource(featuresA);
+		associate.setDestination(featuresB);
+		associate.associate();
+
+		FastQueue<AssociatedIndex> matches = associate.getMatches();
+
+		// create the associated pair for motion estimation
+		List<AssociatedPair> pairs = new ArrayList<AssociatedPair>();
+		for (int i = 0; i < matches.size(); i++) {
+			AssociatedIndex a = matches.get(i);
+			pairs.add(new AssociatedPair(pixelsA.get(a.src), pixelsB.get(a.dst)));
+		}
+
+		if( !estimateHomography.process(pairs) )
+			throw new RuntimeException("Failed to estimate homography");
+
+		List<AssociatedPair> inliersHomography = estimateHomography.getMatchSet();
+
+		if( !estimateEssential.process(pairs) )
+			throw new RuntimeException("Motion estimation failed");
+
+		List<AssociatedPair> inliersEssential = estimateEssential.getMatchSet();
+
+		System.out.println("Homography "+inliersHomography.size()+"  essential "+inliersEssential.size());
+
+		if( inliersHomography.size() >= inliersEssential.size()*keyframeRatio ) {
+			System.err.println("WARNING: Degenerate geometry found.");
+//			return false;
+		}
+
+		motionAtoB.set(estimateEssential.getModelParameters());
+
+		for (int i = 0; i < inliersEssential.size(); i++) {
+			int index = estimateEssential.getInputIndex(i);
+
+			inliers.add( matches.get(index));
+		}
+
+		return true;
+	}
+
+
 	public void normalizeScale() {
 
 		double T = motionWorldToCamera.get(0).T.norm();
@@ -403,6 +525,7 @@ public class ExampleStructureFromMotion {
 	public static class Track {
 		// color of the pixel first found int
 		int color;
+		boolean stable;
 		// estimate 3D position of the feature
 		Point3D_F64 worldPt = new Point3D_F64();
 		// observations in each frame that it's visible
@@ -416,14 +539,33 @@ public class ExampleStructureFromMotion {
 
 	public static void main(String[] args) {
 
-		List<ImageFloat32> images = new ArrayList<ImageFloat32>();
+		List<BufferedImage> images = new ArrayList<BufferedImage>();
 
-		IntrinsicParameters intrinsic =
-				UtilIO.loadXML("../data/applet/calibration/mono/Sony_DSC-HX5V_Chess/intrinsic.xml");
+		String directory = "../data/applet/sfm/tree0/";
 
-		images.add(UtilImageIO.loadImage("../data/applet/stereo/mono_wall_01.jpg",ImageFloat32.class));
-		images.add(UtilImageIO.loadImage("../data/applet/stereo/mono_wall_02.jpg",ImageFloat32.class));
-		images.add(UtilImageIO.loadImage("../data/applet/stereo/mono_wall_03.jpg",ImageFloat32.class));
+		double scaleFactor = 1.0;
+
+		IntrinsicParameters intrinsic = UtilIO.loadXML(directory+"intrinsic.xml");
+		if( scaleFactor != 1.0 )
+			PerspectiveOps.scaleIntrinsic(intrinsic,scaleFactor);
+
+		for( int i = 0; i < 25; i++ ) {
+			BufferedImage b = UtilImageIO.loadImage(directory+String.format("image%02d.jpg",i));
+
+			BufferedImage c;
+			if( scaleFactor != 1.0 ) {
+				c = new BufferedImage((int) (b.getWidth() * scaleFactor), (int) (b.getHeight() * scaleFactor), b.getType());
+
+				Graphics2D g2 = c.createGraphics();
+
+				g2.scale(scaleFactor, scaleFactor);
+				g2.drawImage(b, 0, 0, null);
+			} else {
+				c = b;
+			}
+
+			images.add(c);
+		}
 
 		ExampleStructureFromMotion example = new ExampleStructureFromMotion();
 

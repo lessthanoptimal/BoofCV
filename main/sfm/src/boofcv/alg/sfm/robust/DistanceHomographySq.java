@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,6 +32,11 @@ import java.util.List;
  * Computes the Euclidean error squared between 'p1' and 'p2' after projecting 'p1' into image 2.  Input
  * can be in pixels or normalized image coordinates, but the error for normalized image coordinates doesn't
  * have a physical meaning.
+ * </p>
+ *
+ * <p>
+ * error = (p2'.x - p2.x)<sup>2</sup>  + (p2'.y - p2.y)<sup>2</sup>, where p2' is the predicted location and p2 is
+ * the observed location.
  * </p>
  * 
  * @author Peter Abeles
