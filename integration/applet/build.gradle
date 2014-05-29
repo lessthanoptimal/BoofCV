@@ -8,7 +8,6 @@ dependencies {
     compile project(':main:recognition')
     compile project(':main:visualize')
     compile project(':evaluation')
-
 }
 
 task appletJar(type: Jar, dependsOn:jar) {

@@ -34,7 +34,7 @@ public class GThresholdImageOps {
 	 * to 'threshold' are set to 1 and the others set to 0.
 	 *
 	 * @param input Input image. Not modified.
-	 * @param output Binary output image. If null a new image will be declared. Modified.
+	 * @param output (Optional) Binary output image. If null a new image will be declared. Modified.
 	 * @param threshold threshold value.
 	 * @param down If true then the inequality <= is used, otherwise if false then >= is used.
 	 * @return Output image.

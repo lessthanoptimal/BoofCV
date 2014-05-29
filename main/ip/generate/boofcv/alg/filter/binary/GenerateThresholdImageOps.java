@@ -85,7 +85,7 @@ public class GenerateThresholdImageOps extends CodeGeneratorBase {
 				"\t * to 'threshold' are set to 1 and the others set to 0.\n" +
 				"\t *\n" +
 				"\t * @param input Input image. Not modified.\n" +
-				"\t * @param output Binary output image. If null a new image will be declared. Modified.\n" +
+				"\t * @param output (Optional) Binary output image. If null a new image will be declared. Modified.\n" +
 				"\t * @param threshold threshold value.\n" +
 				"\t * @param down If true then the inequality <= is used, otherwise if false then >= is used.\n" +
 				"\t * @return Output image.\n" +
