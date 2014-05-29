@@ -1,0 +1,74 @@
+configurations {
+    processing
+    compile.extendsFrom processing
+}
+
+
+dependencies {
+    compile project(':main:ip')
+    compile project(':main:io')
+    compile project(':main:feature')
+    compile project(':main:calibration')
+    compile project(':main:geo')
+    compile project(':main:sfm')
+    compile project(':main:recognition')
+    compile project(':main:visualize')
+
+    processing files("core.jar")
+}
+
+task dependenciesJar(type: Jar, dependsOn:jar) {
+
+    dependsOn configurations.runtime
+    from {
+        (configurations.runtime - configurations.processing).collect {
+            it.isDirectory() ? it : zipTree(it)
+        }
+    }
+
+    destinationDir = file('./')
+    archiveName = 'boofcv_dependencies.jar'
+}
+
+task processingJar(type: Jar, dependsOn:jar ) {
+
+    dependsOn dependenciesJar
+
+    from files(sourceSets.main.output.classesDir)
+    from files(sourceSets.main.output.resourcesDir)
+
+    destinationDir = file('./')
+    archiveName = 'boofcv_processing.jar'
+}
+
+task processingDirectory( dependsOn:processingJar) {
+    file('tmp').deleteDir()
+    file('tmp/boofcv_processing').mkdirs()
+    file('tmp/boofcv_processing/library').mkdir()
+    copy {
+        from 'library.properties'
+        into 'tmp/boofcv_processing'
+    }
+    copy {
+        from 'boofcv_dependencies.jar'
+        into 'tmp/boofcv_processing/library'
+    }
+    copy {
+        from 'boofcv_processing.jar'
+        into 'tmp/boofcv_processing/library'
+    }
+}
+
+task processingZip( type: Zip, dependsOn:processingDirectory) {
+    from 'tmp'
+
+    destinationDir = file('./')
+    archiveName = 'boofcv_processing.zip'
+}
+
+idea {
+    module {
+        name = "BoofCV Processing"
+    }
+}
+

@@ -12,3 +12,6 @@ if( file('./integration/openkinect/libfreenect').exists()) {
 if( file('./integration/v4l4j/v4l4j-0.9.1').exists()) {
     include 'integration:v4l4j'
 }
+if( file('./integration/processing/core.jar').exists()) {
+    include 'integration:processing'
+}
