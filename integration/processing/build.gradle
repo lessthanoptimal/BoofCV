@@ -44,18 +44,40 @@ task processingJar(type: Jar, dependsOn:jar ) {
 task processingDirectory( dependsOn:processingJar) {
     file('tmp').deleteDir()
     file('tmp/boofcv_processing').mkdirs()
+    file('tmp/boofcv_processing/examples').mkdir()
+    file('tmp/boofcv_processing/data').mkdir()
     file('tmp/boofcv_processing/library').mkdir()
-    copy {
-        from 'library.properties'
-        into 'tmp/boofcv_processing'
-    }
-    copy {
-        from 'boofcv_dependencies.jar'
-        into 'tmp/boofcv_processing/library'
-    }
-    copy {
-        from 'boofcv_processing.jar'
-        into 'tmp/boofcv_processing/library'
+
+    doLast {
+        copy {
+            from 'examples'
+            into 'tmp/boofcv_processing/examples'
+        }
+        copy {
+            from '../../data/applet/particles01.jpg'
+            into 'tmp/boofcv_processing/examples/Contours'
+        }
+        copy {
+            from '../../data/applet/simple_objects.jpg'
+            into 'tmp/boofcv_processing/examples/Gradient'
+        }
+        copy {
+            from '../../data/applet/simple_objects.jpg'
+            into 'tmp/boofcv_processing/examples/PolygonFitting'
+        }
+
+        copy {
+            from 'library.properties'
+            into 'tmp/boofcv_processing'
+        }
+        copy {
+            from 'boofcv_dependencies.jar'
+            into 'tmp/boofcv_processing/library'
+        }
+        copy {
+            from 'boofcv_processing.jar'
+            into 'tmp/boofcv_processing/library'
+        }
     }
 }
 

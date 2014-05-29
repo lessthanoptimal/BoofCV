@@ -53,22 +53,14 @@ Version : Alpha 0.17
   * Graph connection rule has been improved too to reduce false connections
 - Moved serializeXML from BoofMiscOps to UtilIO
   * Removing an IO function which shouldn't be in image processing
+- FactoryDerivative
+  * If derivative type is null it will use the default
 
 - TODO ExampleBundleAdjustment
 - TODO Automatically compile and push unstable builds.
 - TODO Make those two failed unit tests ago away
 - TODO Make sure latest xstream works in applets
 - TODO move BundleAdjustmentCalibrated into SFM?
-
-- Processing
-  * filters
-  * line detection
-  * binary image ops
-  * shape fitting
-  * feature detection
-  * feature association
-  * image stitching
-  * object tracking
 
 ---------------------------------------------
 Date    : 2013/12/25
