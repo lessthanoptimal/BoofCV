@@ -169,7 +169,7 @@ public class ShapeFittingOps {
 	/**
 	 * Computes a circle which has it's center at the mean position of the provided points and radius is equal to the
 	 * average distance of each point from the center.  While fast to compute the provided circle is not a best
-	 * first circle by any reasonable metric, except is very special cases.
+	 * fit circle by any reasonable metric, except for special cases.
 	 *
 	 * @param points (Input) Set of unordered points. Not modified.
 	 * @param optional (Optional) Used internally to store the distance of each point from the center.  Can be null.
@@ -228,7 +228,7 @@ public class ShapeFittingOps {
 	/**
 	 * Computes a circle which has it's center at the mean position of the provided points and radius is equal to the
 	 * average distance of each point from the center.  While fast to compute the provided circle is not a best
-	 * first circle by any reasonable metric, except is very special cases.
+	 * fit circle by any reasonable metric, except for special cases.
 	 *
 	 * @param points (Input) Set of unordered points. Not modified.
 	 * @param optional (Optional) Used internally to store the distance of each point from the center.  Can be null.

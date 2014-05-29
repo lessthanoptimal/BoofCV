@@ -58,6 +58,9 @@ public class FactoryDerivative {
 	public static <I extends ImageSingleBand, D extends ImageSingleBand>
 	ImageGradient<I,D> prewitt( Class<I> inputType , Class<D> derivType)
 	{
+		if( derivType == null )
+			derivType = GImageDerivativeOps.getDerivativeType(inputType);
+
 		Method m = findDerivative(GradientPrewitt.class,inputType,derivType);
 		return new ImageGradient_Reflection<I,D>(m);
 	}
@@ -65,6 +68,9 @@ public class FactoryDerivative {
 	public static <I extends ImageSingleBand, D extends ImageSingleBand>
 	ImageGradient<I,D> sobel( Class<I> inputType , Class<D> derivType)
 	{
+		if( derivType == null )
+			derivType = GImageDerivativeOps.getDerivativeType(inputType);
+
 		Method m = findDerivative(GradientSobel.class,inputType,derivType);
 		return new ImageGradient_Reflection<I,D>(m);
 	}
@@ -72,6 +78,8 @@ public class FactoryDerivative {
 	public static <I extends ImageSingleBand, D extends ImageSingleBand>
 	ImageGradient<I,D> three( Class<I> inputType , Class<D> derivType)
 	{
+		if( derivType == null )
+			derivType = GImageDerivativeOps.getDerivativeType(inputType);
 		Method m = findDerivative(GradientThree.class,inputType,derivType);
 		return new ImageGradient_Reflection<I,D>(m);
 	}
@@ -79,6 +87,8 @@ public class FactoryDerivative {
 	public static <I extends ImageSingleBand, D extends ImageSingleBand>
 	ImageGradient<I,D> two( Class<I> inputType , Class<D> derivType)
 	{
+		if( derivType == null )
+			derivType = GImageDerivativeOps.getDerivativeType(inputType);
 		Method m = findDerivative(GradientTwo.class,inputType,derivType);
 		return new ImageGradient_Reflection<I,D>(m);
 	}
@@ -86,6 +96,8 @@ public class FactoryDerivative {
 	public static <I extends ImageSingleBand, D extends ImageSingleBand>
 	ImageHessianDirect<I,D> hessianDirectThree( Class<I> inputType , Class<D> derivType)
 	{
+		if( derivType == null )
+			derivType = GImageDerivativeOps.getDerivativeType(inputType);
 		Method m = findHessian(HessianThree.class,inputType,derivType);
 		return new ImageHessianDirect_Reflection<I,D>(m);
 	}
@@ -93,6 +105,8 @@ public class FactoryDerivative {
 	public static <I extends ImageSingleBand, D extends ImageSingleBand>
 	ImageHessianDirect<I,D> hessianDirectSobel( Class<I> inputType , Class<D> derivType)
 	{
+		if( derivType == null )
+			derivType = GImageDerivativeOps.getDerivativeType(inputType);
 		Method m = findHessian(HessianSobel.class,inputType,derivType);
 		return new ImageHessianDirect_Reflection<I,D>(m);
 	}
@@ -105,6 +119,8 @@ public class FactoryDerivative {
 
 	public static <I extends ImageSingleBand, D extends ImageSingleBand>
 	ImageGradient<I,D> gaussian( double sigma , int radius , Class<I> inputType , Class<D> derivType) {
+		if( derivType == null )
+			derivType = GImageDerivativeOps.getDerivativeType(inputType);
 		return new ImageGradient_Gaussian<I,D>(sigma,radius,inputType,derivType);
 	}
 

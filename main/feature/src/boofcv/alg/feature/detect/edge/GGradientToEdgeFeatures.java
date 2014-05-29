@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,6 +31,13 @@ import boofcv.struct.image.ImageSingleBand;
  */
 public class GGradientToEdgeFeatures {
 
+	/**
+	 * Computes the edge intensity using a Euclidean norm.
+	 *
+	 * @param derivX Derivative along x-axis. Not modified.
+	 * @param derivY Derivative along y-axis. Not modified.
+	 * @param intensity Edge intensity.
+	 */
 	static public <D extends ImageSingleBand>
 	void intensityE( D derivX , D derivY , ImageFloat32 intensity )
 	{
@@ -45,6 +52,13 @@ public class GGradientToEdgeFeatures {
 		}
 	}
 
+	/**
+	 * Computes the edge intensity using a Euclidean norm.
+	 *
+	 * @param derivX Derivative along x-axis. Not modified.
+	 * @param derivY Derivative along y-axis. Not modified.
+	 * @param intensity Edge intensity.
+	 */
 	static public <D extends ImageSingleBand>
 	void intensityAbs( D derivX , D derivY , ImageFloat32 intensity )
 	{
@@ -59,6 +73,13 @@ public class GGradientToEdgeFeatures {
 		}
 	}
 
+	/**
+	 * Computes the edge orientation using the {@link Math#atan} function.
+	 *
+	 * @param derivX Derivative along x-axis. Not modified.
+	 * @param derivY Derivative along y-axis. Not modified.
+	 * @param angle Edge orientation in radians (-pi/2 to pi/2).
+	 */
 	static public <D extends ImageSingleBand>
 	void direction( D derivX , D derivY , ImageFloat32 angle )
 	{
@@ -73,6 +94,13 @@ public class GGradientToEdgeFeatures {
 		}
 	}
 
+	/**
+	 * Computes the edge orientation using the {@link Math#atan2} function.
+	 *
+	 * @param derivX Derivative along x-axis. Not modified.
+	 * @param derivY Derivative along y-axis. Not modified.
+	 * @param angle Edge orientation in radians (-pi to pi).
+	 */
 	static public <D extends ImageSingleBand>
 	void direction2( D derivX , D derivY , ImageFloat32 angle )
 	{
@@ -87,6 +115,18 @@ public class GGradientToEdgeFeatures {
 		}
 	}
 
+	/**
+	 * <p>
+	 * Sets edge intensities to zero if the pixel has an intensity which is less than any of
+	 * the two adjacent pixels.  Pixel adjacency is determined based upon the sign of the image gradient.  Less precise
+	 * than other methods, but faster.
+	 * </p>
+	 *
+	 * @param intensity Edge intensities. Not modified.
+	 * @param derivX Image derivative along x-axis.
+	 * @param derivY Image derivative along y-axis.
+	 * @param output Filtered intensity. Modified.
+	 */
 	static public <D extends ImageSingleBand>
 	void nonMaxSuppressionCrude4( ImageFloat32 intensity , D derivX , D derivY , ImageFloat32 output )
 	{
