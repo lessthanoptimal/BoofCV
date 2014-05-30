@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,6 +20,7 @@ package boofcv.alg.interpolate.impl;
 
 import boofcv.alg.interpolate.PolynomialPixel;
 import boofcv.struct.image.ImageInteger;
+import boofcv.struct.image.ImageType;
 
 /**
  * <p>
@@ -108,4 +109,8 @@ public class ImplPolynomialPixel_I extends PolynomialPixel<ImageInteger> {
 		return ret;
 	}
 
+	@Override
+	public ImageType<ImageInteger> getImageType() {
+		return ImageType.single(ImageInteger.class);
+	}
 }

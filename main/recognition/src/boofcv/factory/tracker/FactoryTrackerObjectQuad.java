@@ -151,6 +151,9 @@ public class FactoryTrackerObjectQuad {
 	public static <T extends ImageMultiBand>
 	TrackerObjectQuad<T> meanShiftComaniciu2003(ConfigComaniciu2003 config, ImageType<T> imageType ) {
 
+		if( config == null )
+			config = new ConfigComaniciu2003();
+
 		InterpolatePixelMB<T> interp = FactoryInterpolation.createPixelMB(0,config.maxPixelValue,
 				config.interpolation,imageType);
 

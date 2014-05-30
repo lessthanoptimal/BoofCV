@@ -15,11 +15,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package boofcv.alg.segmentation.fh04.impl;
 
 import boofcv.alg.segmentation.fh04.FhEdgeWeights;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageType;
 import boofcv.struct.image.MultiSpectral;
 import org.ddogleg.struct.FastQueue;
 
@@ -157,6 +157,11 @@ public class FhEdgeWeights8_MsF32 implements FhEdgeWeights<MultiSpectral<ImageFl
 		e1.sortValue = (float)Math.sqrt(weight);
 		e1.indexA = indexA;
 		e1.indexB = indexB;
+	}
+
+	@Override
+	public ImageType<MultiSpectral<ImageFloat32>> getInputType() {
+		return ImageType.ms(3,ImageFloat32.class);
 	}
 
 }

@@ -46,6 +46,7 @@ public class GenerateFhEdgeWeights_SB extends CodeGeneratorBase {
 		printProcess(imageType,rule);
 		printCheckAround(imageType,rule);
 		printCheck(imageType);
+		printType(imageType);
 		out.print("}\n");
 	}
 
@@ -57,9 +58,10 @@ public class GenerateFhEdgeWeights_SB extends CodeGeneratorBase {
 
 		out.print("import boofcv.struct.image."+imageName+";\n" +
 				"import boofcv.alg.segmentation.fh04.FhEdgeWeights;\n" +
+				"import boofcv.struct.image.ImageType;\n" +
 				"import org.ddogleg.struct.FastQueue;\n" +
 				"\n" +
-				"import static boofcv.alg.segmentation.fh04.SegmentFelzenHutten04.Edge;\n" +
+				"import static boofcv.alg.segmentation.fh04.SegmentFelzenszwalbHuttenlocher04.Edge;\n" +
 				"\n" +
 				"/**\n" +
 				" * <p>Computes edge weight as the absolute value of the different in pixel value for single band images.\n" +
@@ -203,6 +205,15 @@ public class GenerateFhEdgeWeights_SB extends CodeGeneratorBase {
 				"\t\te1.sortValue = (float)Math.abs(color0-colorN);\n" +
 				"\t\te1.indexA = indexA;\n" +
 				"\t\te1.indexB = indexB;\n" +
+				"\t}\n\n");
+	}
+
+	private void printType( AutoTypeImage imageType ) {
+		String imageName = imageType.getSingleBandName();
+
+		out.print("\t@Override\n" +
+				"\tpublic ImageType<"+imageName+"> getInputType() {\n" +
+				"\t\treturn ImageType.single("+imageName+".class);\n" +
 				"\t}\n\n");
 	}
 

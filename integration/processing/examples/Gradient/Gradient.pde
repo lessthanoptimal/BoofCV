@@ -1,4 +1,5 @@
 import boofcv.processing.*;
+import boofcv.struct.image.*;
 
 PImage img0,img1,img2,img3;
 
@@ -7,7 +8,7 @@ void setup() {
   PImage input = loadImage("simple_objects.jpg");
 
   // Convert the image into a simplified BoofCV data type
-  SimpleGray gray = Boof.convF32(input);
+  SimpleGray gray = Boof.gray(input,ImageDataType.F32);
 
   SimpleGradient gradient = gray.gradientSobel();
 

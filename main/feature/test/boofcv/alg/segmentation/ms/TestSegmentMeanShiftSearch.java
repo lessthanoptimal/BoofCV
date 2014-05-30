@@ -19,6 +19,7 @@
 package boofcv.alg.segmentation.ms;
 
 import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageType;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -67,6 +68,11 @@ public class TestSegmentMeanShiftSearch {
 
 		@Override
 		public void process(ImageBase image) {}
+
+		@Override
+		public ImageType getImageType() {
+			return null;
+		}
 	}
 
 }

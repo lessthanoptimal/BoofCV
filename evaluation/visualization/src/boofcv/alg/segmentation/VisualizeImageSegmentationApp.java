@@ -146,7 +146,7 @@ public class VisualizeImageSegmentationApp <T extends ImageBase>
 			case 0: alg = FactoryImageSegmentation.fh04(leftPanel.configFh, imageType); break;
 			case 1: alg = FactoryImageSegmentation.slic(leftPanel.configSlic, imageType); break;
 			case 2: alg = FactoryImageSegmentation.meanShift(leftPanel.configMeanShift, imageType); break;
-			case 3: alg = FactoryImageSegmentation.watershed(leftPanel.configWatershed); break;
+			case 3: alg = FactoryImageSegmentation.watershed(leftPanel.configWatershed, imageType); break;
 			default: throw new RuntimeException("BUG!");
 		}
 

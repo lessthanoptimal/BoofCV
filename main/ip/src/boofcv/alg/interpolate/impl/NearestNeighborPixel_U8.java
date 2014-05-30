@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,7 @@
 package boofcv.alg.interpolate.impl;
 
 import boofcv.alg.interpolate.NearestNeighborPixel;
+import boofcv.struct.image.ImageType;
 import boofcv.struct.image.ImageUInt8;
 
 
@@ -61,5 +62,10 @@ public class NearestNeighborPixel_U8 extends NearestNeighborPixel<ImageUInt8> {
 		int yy = (int)y;
 
 		return data[ orig.startIndex + yy*stride + xx] & 0xFF;
+	}
+
+	@Override
+	public ImageType<ImageUInt8> getImageType() {
+		return ImageType.single(ImageUInt8.class);
 	}
 }

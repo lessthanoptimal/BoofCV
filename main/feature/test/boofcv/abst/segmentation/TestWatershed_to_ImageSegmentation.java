@@ -37,7 +37,7 @@ public class TestWatershed_to_ImageSegmentation <T extends ImageBase> extends Ge
 
 	@Override
 	public ImageSegmentation<T> createAlg( ImageType<T> imageType ) {
-		return FactoryImageSegmentation.watershed(null);
+		return FactoryImageSegmentation.watershed(null,null);
 	}
 
 }

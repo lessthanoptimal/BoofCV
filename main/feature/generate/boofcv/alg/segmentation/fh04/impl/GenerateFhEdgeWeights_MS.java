@@ -46,6 +46,7 @@ public class GenerateFhEdgeWeights_MS extends CodeGeneratorBase {
 		printProcess(imageType,rule);
 		printCheckAround(imageType,rule);
 		printCheck(imageType);
+		printType(imageType);
 		out.print("}\n");
 	}
 
@@ -56,11 +57,12 @@ public class GenerateFhEdgeWeights_MS extends CodeGeneratorBase {
 		String ruleName = rule.getShortName();
 
 		out.print("import boofcv.struct.image."+imageName+";\n" +
+				"import boofcv.struct.image.ImageType;\n" +
 				"import boofcv.alg.segmentation.fh04.FhEdgeWeights;\n" +
 				"import boofcv.struct.image.MultiSpectral;\n" +
 				"import org.ddogleg.struct.FastQueue;\n" +
 				"\n" +
-				"import static boofcv.alg.segmentation.fh04.SegmentFelzenHutten04.Edge;\n" +
+				"import static boofcv.alg.segmentation.fh04.SegmentFelzenszwalbHuttenlocher04.Edge;\n" +
 				"\n" +
 				"/**\n" +
 				" * <p>Computes edge weight as the F-norm different in pixel value for {@link MultiSpectral} images.\n" +
@@ -248,6 +250,15 @@ public class GenerateFhEdgeWeights_MS extends CodeGeneratorBase {
 				"\t\te1.sortValue = (float)Math.sqrt(weight);\n" +
 				"\t\te1.indexA = indexA;\n" +
 				"\t\te1.indexB = indexB;\n" +
+				"\t}\n\n");
+	}
+
+	private void printType( AutoTypeImage imageType ) {
+		String imageName = imageType.getSingleBandName();
+
+		out.print("\t@Override\n" +
+				"\tpublic ImageType<MultiSpectral<"+imageName+">> getInputType() {\n" +
+				"\t\treturn ImageType.ms(3,"+imageName+".class);\n" +
 				"\t}\n\n");
 	}
 

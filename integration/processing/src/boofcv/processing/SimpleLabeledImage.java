@@ -26,30 +26,25 @@ import processing.core.PImage;
 /**
  * @author Peter Abeles
  */
-public class SimpleLabeledImage {
-	ImageSInt32 labeled;
+public class SimpleLabeledImage extends SimpleImage<ImageSInt32> {
 
-	public SimpleLabeledImage(ImageSInt32 labeled) {
-		this.labeled = labeled;
+	public SimpleLabeledImage(ImageSInt32 image) {
+		super(image);
 	}
 
 	public SimpleBinary convertBinary() {
-		ImageUInt8 binary = new ImageUInt8(labeled.width,labeled.height);
-		BinaryImageOps.labelToBinary(labeled,binary);
+		ImageUInt8 binary = new ImageUInt8(image.width, image.height);
+		BinaryImageOps.labelToBinary(image,binary);
 		return new SimpleBinary(binary);
 	}
 
 	public SimpleBinary convertBinary( boolean selectedBlobs[] ) {
-		ImageUInt8 binary = new ImageUInt8(labeled.width,labeled.height);
-		BinaryImageOps.labelToBinary(labeled,binary,selectedBlobs);
+		ImageUInt8 binary = new ImageUInt8(image.width, image.height);
+		BinaryImageOps.labelToBinary(image,binary,selectedBlobs);
 		return new SimpleBinary(binary);
 	}
 
-	public ImageSInt32 getLabeled() {
-		return labeled;
-	}
-
 	public PImage visualize() {
-		return VisualizeProcessing.labeled(labeled);
+		return VisualizeProcessing.labeled(image);
 	}
 }

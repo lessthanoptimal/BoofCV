@@ -21,6 +21,7 @@ package boofcv.alg.segmentation.fh04;
 import boofcv.alg.InputSanityCheck;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageSInt32;
+import boofcv.struct.image.ImageType;
 import org.ddogleg.sorting.ApproximateSort_F32;
 import org.ddogleg.sorting.QuickSortObj_F32;
 import org.ddogleg.sorting.SortableParameter_F32;
@@ -326,6 +327,10 @@ public class SegmentFelzenszwalbHuttenlocher04<T extends ImageBase> {
 	 */
 	public GrowQueue_I32 getRegionSizes() {
 		return outputRegionSizes;
+	}
+
+	public ImageType<T> getInputType() {
+		return computeWeights.getInputType();
 	}
 
 	/**

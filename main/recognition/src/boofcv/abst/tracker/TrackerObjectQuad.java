@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,14 +23,17 @@ import boofcv.struct.image.ImageType;
 import georegression.struct.shapes.Quadrilateral_F64;
 
 /**
+ * <p>
  * High level interface for an object tracker where the object being tracked is specified using a quadrilateral. The
  * input is assumed to be a sequence of consecutive video images. When initialize is called the tracker is put
  * into its initial state ago and its past history is discarded.   The vertices in the quadrilateral are specified
  * in a clock-wise direction (a,b,c,d).
- *
+ * </p>
+ * <p>
  * The motion/distortion model used by the trackers will vary.  Typical models are (scale,translation),
  * (scale,translation,rotation), and affine.  For maximum abstraction, access to the underlying model is not provided
  * through this interface.  To access that model invoke the lower level algorithm directly.
+ * </p>
  *
  * @author Peter Abeles
  */

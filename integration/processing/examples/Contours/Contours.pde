@@ -1,24 +1,34 @@
 import boofcv.processing.*;
+import boofcv.struct.image.*;
 
-PImage img;
+PImage imgContour;
+PImage imgBlobs;
 
 void setup() {
 
-  img = loadImage("particles01.jpg");
+  PImage input = loadImage("particles01.jpg");
 
   // Convert the image into a simplified BoofCV data type
-  SimpleGray bimg = Boof.convF32(img);
+  SimpleGray gray = Boof.gray(input,ImageDataType.F32);
 
   // Threshold the image using its mean value
-  double threshold = bimg.mean();
+  double threshold = gray.mean();
 
-  // Create a binary image, erode it, find the contours, then visualize them
-  // External contours are red and internal are green
-  img = bimg.threshold(threshold,true).erode8(1).contour().getContours().visualize();
+  // find blobs and contour of the particles
+  ResultsBlob results = gray.threshold(threshold,true).erode8(1).contour();
 
-  size(img.width, img.height);
+  // Visualize the results
+  imgContour = results.getContours().visualize();
+  imgBlobs = results.getLabeledImage().visualize();
+
+  size(input.width, input.height);
 }
 
 void draw() {
-  image(img, 0, 0);
+  background(0);
+  if( mousePressed ) {
+    image(imgBlobs, 0, 0);
+  } else {
+    image(imgContour, 0, 0);
+  }
 }

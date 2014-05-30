@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -15,12 +15,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package boofcv.alg.interpolate.impl;
 
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.struct.convolve.KernelContinuous1D_F32;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageType;
 
 /**
  * <p>
@@ -157,6 +157,11 @@ public class ImplInterpolatePixelConvolution_F32 implements InterpolatePixelS<Im
 	@Override
 	public int getFastBorderY() {
 		return kernel.getRadius();
+	}
+
+	@Override
+	public ImageType<ImageFloat32> getImageType() {
+		return ImageType.single(ImageFloat32.class);
 	}
 
 }

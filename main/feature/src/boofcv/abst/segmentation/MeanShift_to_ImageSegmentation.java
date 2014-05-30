@@ -22,6 +22,7 @@ import boofcv.alg.segmentation.ms.SegmentMeanShift;
 import boofcv.struct.ConnectRule;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageSInt32;
+import boofcv.struct.image.ImageType;
 
 /**
  * @author Peter Abeles
@@ -50,5 +51,10 @@ public class MeanShift_to_ImageSegmentation<T extends ImageBase>
 	@Override
 	public ConnectRule getRule() {
 		return rule;
+	}
+
+	@Override
+	public ImageType<T> getImageType() {
+		return ms.getImageType();
 	}
 }

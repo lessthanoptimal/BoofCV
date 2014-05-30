@@ -23,6 +23,7 @@ import boofcv.alg.segmentation.fh04.SegmentFelzenszwalbHuttenlocher04;
 import boofcv.struct.ConnectRule;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageSInt32;
+import boofcv.struct.image.ImageType;
 
 /**
  * Wrapper around {@link SegmentFelzenszwalbHuttenlocher04} for {@link ImageSegmentation}.
@@ -59,5 +60,10 @@ public class Fh04_to_ImageSegmentation<T extends ImageBase> implements ImageSegm
 	@Override
 	public ConnectRule getRule() {
 		return rule;
+	}
+
+	@Override
+	public ImageType<T> getImageType() {
+		return alg.getInputType();
 	}
 }

@@ -1,22 +1,23 @@
 import boofcv.processing.*;
+import boofcv.struct.image.*;
 import georegression.struct.point.*;
 import java.util.*;
 
-PImage img;
+PImage input;
 List<List<Point2D_I32>> polygons;
 
 void setup() {
 
-  img = loadImage("simple_objects.jpg");
+  input = loadImage("simple_objects.jpg");
 
   // Convert the image into a simplified BoofCV data type
-  SimpleGray bimg = Boof.convF32(img);
+  SimpleGray gray = Boof.gray(input,ImageDataType.F32);
 
   // Threshold the image using its mean value
-  double threshold = bimg.mean();
+  double threshold = gray.mean();
 
   // Find the initial set of contours
-  SimpleContourList contours = bimg.threshold(threshold, false).erode8(1).contour().getContours();
+  SimpleContourList contours = gray.threshold(threshold, false).erode8(1).contour().getContours();
 
   // filter contours which are too small
   List<SimpleContour> list = contours.getList();
@@ -29,22 +30,20 @@ void setup() {
   }
 
   // create a new contour list
-  contours = new SimpleContourList(prunedList, img.width, img.height);
+  contours = new SimpleContourList(prunedList, input.width, input.height);
 
   // Fit polygons to external contours
   polygons = contours.fitPolygons(true, 3, 0.1);
 
-  size(img.width, img.height);
+  size(input.width, input.height);
 }
 
 void draw() {
   // Toggle between the background image and a solid color for clarity
   if( mousePressed ) {
-    fill(0);
-    noStroke();
-    rect(0, 0, width, height);
+    background(0);
   } else {
-    image(img, 0, 0);
+    image(input, 0, 0);
   }
 
   // Configure the line's appearance

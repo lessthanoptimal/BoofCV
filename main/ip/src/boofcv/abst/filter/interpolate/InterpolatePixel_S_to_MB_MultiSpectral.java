@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,6 +21,7 @@ package boofcv.abst.filter.interpolate;
 import boofcv.alg.interpolate.InterpolatePixelMB;
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageType;
 import boofcv.struct.image.MultiSpectral;
 
 /**
@@ -83,5 +84,10 @@ public class InterpolatePixel_S_to_MB_MultiSpectral<T extends ImageSingleBand>
 	@Override
 	public int getFastBorderY() {
 		return alg.getFastBorderY();
+	}
+
+	@Override
+	public ImageType<MultiSpectral<T>> getImageType() {
+		throw new RuntimeException("Image type isn't determined until it processes an image");
 	}
 }
