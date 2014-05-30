@@ -49,6 +49,7 @@ public class SegmentMeanShiftSearchColor<T extends ImageMultiBand> extends Segme
 	// Mean-shift trajectory history
 	protected FastQueue<Point2D_F32> history = new FastQueue<Point2D_F32>(Point2D_F32.class,true);
 
+	ImageType<T> imageType;
 
 	public SegmentMeanShiftSearchColor(int maxIterations, float convergenceTol,
 									   InterpolatePixelMB<T> interpolate,
@@ -60,6 +61,7 @@ public class SegmentMeanShiftSearchColor<T extends ImageMultiBand> extends Segme
 		this.pixelColor = new float[ imageType.getNumBands() ];
 		this.meanColor = new float[ imageType.getNumBands() ];
 		this.sumColor = new float[ imageType.getNumBands() ];
+		this.imageType = imageType;
 
 		final int numBands = imageType.getNumBands();
 
@@ -139,6 +141,11 @@ public class SegmentMeanShiftSearchColor<T extends ImageMultiBand> extends Segme
 				}
 			}
 		}
+	}
+
+	@Override
+	public ImageType<T> getImageType() {
+		return imageType;
 	}
 
 	/**

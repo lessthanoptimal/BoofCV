@@ -15,10 +15,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package boofcv.alg.segmentation.fh04.impl;
 
 import boofcv.alg.segmentation.fh04.FhEdgeWeights;
+import boofcv.struct.image.ImageType;
 import boofcv.struct.image.ImageUInt8;
 import org.ddogleg.struct.FastQueue;
 
@@ -103,6 +103,11 @@ public class FhEdgeWeights4_U8 implements FhEdgeWeights<ImageUInt8> {
 		e1.sortValue = (float)Math.abs(color0-colorN);
 		e1.indexA = indexA;
 		e1.indexB = indexB;
+	}
+
+	@Override
+	public ImageType<ImageUInt8> getInputType() {
+		return ImageType.single(ImageUInt8.class);
 	}
 
 }

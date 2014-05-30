@@ -22,6 +22,7 @@ import boofcv.alg.InputSanityCheck;
 import boofcv.struct.ConnectRule;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageSInt32;
+import boofcv.struct.image.ImageType;
 import georegression.struct.point.Point2D_I32;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_I32;
@@ -143,5 +144,9 @@ public class SegmentMeanShift<T extends ImageBase> {
 	 */
 	public GrowQueue_I32 getRegionSize() {
 		return search.getRegionMemberCount();
+	}
+
+	public ImageType<T> getImageType() {
+		return search.getImageType();
 	}
 }

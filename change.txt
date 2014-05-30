@@ -55,6 +55,11 @@ Version : Alpha 0.17
   * Removing an IO function which shouldn't be in image processing
 - FactoryDerivative
   * If derivative type is null it will use the default
+- Added ImageType to interpolate interface
+- Added ImageType to ImageSegmentation interface
+- Processing integration
+  * Lots of examples
+  * Simplified interface for working with BoofCV
 
 - TODO ExampleBundleAdjustment
 - TODO Automatically compile and push unstable builds.

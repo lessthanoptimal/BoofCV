@@ -15,11 +15,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package boofcv.alg.interpolate.impl;
 
 import boofcv.alg.interpolate.BilinearPixel;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageType;
 
 
 /**
@@ -63,7 +63,7 @@ public class ImplBilinearPixel_F32 extends BilinearPixel<ImageFloat32> {
 	@Override
 	public float get(float x, float y) {
 		if (x < 0 || y < 0 || x > width-1 || y > height-1)
-			throw new IllegalArgumentException("Point is outside of the image: "+x+" "+y);
+			throw new IllegalArgumentException("Point is outside of the image "+x+" "+y);
 
 		int xt = (int) x;
 		int yt = (int) y;
@@ -85,6 +85,11 @@ public class ImplBilinearPixel_F32 extends BilinearPixel<ImageFloat32> {
 		val += (1.0f - ax) * ay * (data[index + dy] ); // (x,y+1)
 
 		return val;
+	}
+
+	@Override
+	public ImageType<ImageFloat32> getImageType() {
+		return ImageType.single(ImageFloat32.class);
 	}
 
 }

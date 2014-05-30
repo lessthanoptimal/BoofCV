@@ -75,13 +75,15 @@ public class FactoryImageSegmentation {
 	 * @return
 	 */
 	public static <T extends ImageBase>ImageSegmentation<T>
-	watershed( ConfigWatershed config )
+	watershed( ConfigWatershed config , ImageType<T> imageType )
 	{
 		if( config == null )
 			config = new ConfigWatershed();
 
 		WatershedVincentSoille1991 watershed = FactorySegmentationAlg.watershed(config.connectRule);
 
-		return new Watershed_to_ImageSegmentation<T>(watershed,config.minimumRegionSize,config.connectRule);
+		Watershed_to_ImageSegmentation ret = new Watershed_to_ImageSegmentation<T>(watershed,config.minimumRegionSize,config.connectRule);
+		ret.setImageType(imageType);
+		return ret;
 	}
 }

@@ -16,21 +16,26 @@
  * limitations under the License.
  */
 
-package boofcv.alg.segmentation.fh04;
+package boofcv.processing;
 
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
-import org.ddogleg.struct.FastQueue;
 
 /**
- * Computes edge weights for {@Link SegmentFelzenHutten04}.  An edge weight is measure of how different
- * two adjacent pixels are from each other.
- *
  * @author Peter Abeles
  */
-public interface FhEdgeWeights<T extends ImageBase> {
+public class SimpleImage<T extends ImageBase> {
+	protected T image;
 
-	public void process( T input , FastQueue<SegmentFelzenszwalbHuttenlocher04.Edge> edges );
+	public SimpleImage(T image) {
+		this.image = image;
+	}
 
-	public ImageType<T> getInputType();
+	public T getImage() {
+		return image;
+	}
+
+	public ImageType getImageType() {
+		return image.getImageType();
+	}
 }

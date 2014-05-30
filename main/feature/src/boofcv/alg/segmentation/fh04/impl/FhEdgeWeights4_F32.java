@@ -15,11 +15,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package boofcv.alg.segmentation.fh04.impl;
 
 import boofcv.alg.segmentation.fh04.FhEdgeWeights;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageType;
 import org.ddogleg.struct.FastQueue;
 
 import static boofcv.alg.segmentation.fh04.SegmentFelzenszwalbHuttenlocher04.Edge;
@@ -103,6 +103,11 @@ public class FhEdgeWeights4_F32 implements FhEdgeWeights<ImageFloat32> {
 		e1.sortValue = (float)Math.abs(color0-colorN);
 		e1.indexA = indexA;
 		e1.indexB = indexB;
+	}
+
+	@Override
+	public ImageType<ImageFloat32> getInputType() {
+		return ImageType.single(ImageFloat32.class);
 	}
 
 }

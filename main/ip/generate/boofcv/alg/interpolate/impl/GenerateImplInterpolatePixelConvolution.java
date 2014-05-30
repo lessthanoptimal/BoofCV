@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -53,6 +53,7 @@ public class GenerateImplInterpolatePixelConvolution extends CodeGeneratorBase {
 	private void printPreamble( String fileName ) {
 		out.print("import boofcv.alg.interpolate.InterpolatePixelS;\n" +
 				"import boofcv.struct.convolve.KernelContinuous1D_F32;\n" +
+				"import boofcv.struct.image.ImageType;\n" +
 				"import boofcv.struct.image.*;\n" +
 				"\n" +
 				"/**\n" +
@@ -195,6 +196,11 @@ public class GenerateImplInterpolatePixelConvolution extends CodeGeneratorBase {
 				"\t@Override\n" +
 				"\tpublic int getFastBorderY() {\n" +
 				"\t\treturn kernel.getRadius();\n" +
+				"\t}\n" +
+				"\n" +
+				"\t@Override\n" +
+				"\tpublic ImageType<"+inputType.getSingleBandName()+"> getImageType() {\n" +
+				"\t\treturn ImageType.single("+inputType.getSingleBandName()+".class);\n" +
 				"\t}\n");
 	}
 

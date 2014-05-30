@@ -97,7 +97,7 @@ public class SimpleContour {
 			ellipses.add(found.shape);
 		} else {
 			for( List<Point2D_I32> i : contour.internal ) {
-				FitData<EllipseRotated_F64> found = ShapeFittingOps.fitEllipse_I32(contour.external,0,false,null);
+				FitData<EllipseRotated_F64> found = ShapeFittingOps.fitEllipse_I32(i,0,false,null);
 				ellipses.add(found.shape);
 			}
 		}

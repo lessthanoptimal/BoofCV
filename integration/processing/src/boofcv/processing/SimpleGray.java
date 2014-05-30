@@ -36,13 +36,11 @@ import processing.core.PImage;
  *
  * @author Peter Abeles
  */
-// TODO gradient Abs and Sign
 @SuppressWarnings("unchecked")
-public class SimpleGray {
-	ImageSingleBand image;
+public class SimpleGray extends SimpleImage<ImageSingleBand>{
 
 	public SimpleGray(ImageSingleBand image) {
-		this.image = image;
+		super(image);
 	}
 
 	public SimpleGray blurMean( int radius ) {
@@ -71,7 +69,7 @@ public class SimpleGray {
 	 * @see GThresholdImageOps#adaptiveSquare
 	 */
 	public SimpleBinary thresholdSquare( int radius, double bias, boolean down ) {
-		return new SimpleBinary(GThresholdImageOps.adaptiveSquare(image, null,radius,bias,down,null,null));
+		return new SimpleBinary(GThresholdImageOps.adaptiveSquare(image, null, radius, bias, down, null, null));
 	}
 
 	/**
@@ -82,7 +80,7 @@ public class SimpleGray {
 	}
 
 	public SimpleGradient gradientSobel() {
-		return gradient(FactoryDerivative.sobel(image.getClass(),null));
+		return gradient(FactoryDerivative.sobel(image.getClass(), null));
 	}
 
 	public SimpleGradient gradientPrewitt() {
@@ -125,7 +123,6 @@ public class SimpleGray {
 		return GImageStatistics.sum(image);
 	}
 
-
 	private SimpleGradient gradient(ImageGradient gradient) {
 		SimpleGradient ret = new SimpleGradient(gradient.getDerivType(),image.width,image.height);
 		gradient.process(image,ret.dx,ret.dy);
@@ -155,9 +152,5 @@ public class SimpleGray {
 			throw new RuntimeException("Unknown image type");
 		}
 		return out;
-	}
-
-	public ImageSingleBand getImage() {
-		return image;
 	}
 }

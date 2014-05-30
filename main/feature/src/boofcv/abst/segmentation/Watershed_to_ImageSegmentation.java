@@ -28,6 +28,7 @@ import boofcv.struct.ConnectRule;
 import boofcv.struct.feature.ColorQueue_F32;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageSInt32;
+import boofcv.struct.image.ImageType;
 import boofcv.struct.image.ImageUInt8;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_I32;
@@ -52,6 +53,10 @@ public class Watershed_to_ImageSegmentation<T extends ImageBase> implements Imag
 	private FastQueue<float[]> regionColor = new ColorQueue_F32(1);
 
 	private int numRegions;
+
+	// this isn't really needed since image type is determined when segment is called
+	// but is required by the interface
+	private ImageType<T> imageType;
 
 	public Watershed_to_ImageSegmentation(WatershedVincentSoille1991 alg , int minimumSize,  ConnectRule rule ) {
 		this.alg = alg;
@@ -97,5 +102,13 @@ public class Watershed_to_ImageSegmentation<T extends ImageBase> implements Imag
 	@Override
 	public ConnectRule getRule() {
 		return rule;
+	}
+
+	public ImageType<T> getImageType() {
+		return imageType;
+	}
+
+	public void setImageType(ImageType<T> imageType) {
+		this.imageType = imageType;
 	}
 }

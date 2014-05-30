@@ -65,6 +65,15 @@ task processingDirectory( dependsOn:processingJar) {
             from '../../data/applet/simple_objects.jpg'
             into 'tmp/boofcv_processing/examples/PolygonFitting'
         }
+        copy {
+            from '../../data/applet/shapes02.png'
+            into 'tmp/boofcv_processing/examples/EllipseFitting'
+        }
+        copy {
+            from '../../data/applet/segment/berkeley_horses.jpg'
+            into 'tmp/boofcv_processing/examples/ImageSegmentation'
+        }
+
 
         copy {
             from 'library.properties'

@@ -62,6 +62,7 @@ public class GenerateImplBilinearPixel extends CodeGeneratorBase {
 	private void printPreamble() throws FileNotFoundException {
 		setOutputFile(className);
 		out.print("import boofcv.alg.interpolate.BilinearPixel;\n" +
+				"import boofcv.struct.image.ImageType;\n" +
 				"import boofcv.struct.image."+image.getSingleBandName()+";\n");
 		out.println();
 		out.println();
@@ -136,6 +137,11 @@ public class GenerateImplBilinearPixel extends CodeGeneratorBase {
 				"\t\tval += (1.0"+f+" - ax) * ay * (data[index + dy] "+bitWise+"); // (x,y+1)\n" +
 				"\n" +
 				"\t\treturn val;\n" +
+				"\t}\n"+
+				"\n" +
+				"\t@Override\n" +
+				"\tpublic ImageType<"+image.getSingleBandName()+"> getImageType() {\n" +
+				"\t\treturn ImageType.single("+image.getSingleBandName()+".class);\n" +
 				"\t}\n\n");
 	}
 

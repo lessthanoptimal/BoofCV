@@ -15,10 +15,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package boofcv.alg.segmentation.fh04.impl;
 
 import boofcv.alg.segmentation.fh04.FhEdgeWeights;
+import boofcv.struct.image.ImageType;
 import boofcv.struct.image.ImageUInt8;
 import boofcv.struct.image.MultiSpectral;
 import org.ddogleg.struct.FastQueue;
@@ -157,6 +157,11 @@ public class FhEdgeWeights8_MsU8 implements FhEdgeWeights<MultiSpectral<ImageUIn
 		e1.sortValue = (float)Math.sqrt(weight);
 		e1.indexA = indexA;
 		e1.indexB = indexB;
+	}
+
+	@Override
+	public ImageType<MultiSpectral<ImageUInt8>> getInputType() {
+		return ImageType.ms(3,ImageUInt8.class);
 	}
 
 }

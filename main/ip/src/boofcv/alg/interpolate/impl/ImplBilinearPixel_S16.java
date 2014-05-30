@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -15,11 +15,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package boofcv.alg.interpolate.impl;
 
 import boofcv.alg.interpolate.BilinearPixel;
 import boofcv.struct.image.ImageSInt16;
+import boofcv.struct.image.ImageType;
 
 
 /**
@@ -63,7 +63,7 @@ public class ImplBilinearPixel_S16 extends BilinearPixel<ImageSInt16> {
 	@Override
 	public float get(float x, float y) {
 		if (x < 0 || y < 0 || x > width-1 || y > height-1)
-			throw new IllegalArgumentException("Point is outside of the image");
+			throw new IllegalArgumentException("Point is outside of the image "+x+" "+y);
 
 		int xt = (int) x;
 		int yt = (int) y;
@@ -85,6 +85,11 @@ public class ImplBilinearPixel_S16 extends BilinearPixel<ImageSInt16> {
 		val += (1.0f - ax) * ay * (data[index + dy] ); // (x,y+1)
 
 		return val;
+	}
+
+	@Override
+	public ImageType<ImageSInt16> getImageType() {
+		return ImageType.single(ImageSInt16.class);
 	}
 
 }

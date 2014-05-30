@@ -20,6 +20,7 @@ package boofcv.alg.segmentation.ms;
 
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageSInt32;
+import boofcv.struct.image.ImageType;
 import georegression.struct.point.Point2D_I32;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_I32;
@@ -218,4 +219,6 @@ public abstract class SegmentMeanShiftSearch<T extends ImageBase> {
 	public FastQueue<float[]> getModeColor() {
 		return modeColor;
 	}
+
+	public abstract ImageType<T> getImageType();
 }

@@ -21,6 +21,7 @@ package boofcv.abst.segmentation;
 import boofcv.struct.ConnectRule;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageSInt32;
+import boofcv.struct.image.ImageType;
 
 /**
  * High level interface for image segmentation.  Each pixel in the segmented image is assigned an integer label
@@ -36,4 +37,6 @@ public interface ImageSegmentation<T extends ImageBase> {
 	public int getTotalSegments();
 
 	public ConnectRule getRule();
+
+	public ImageType<T> getImageType();
 }

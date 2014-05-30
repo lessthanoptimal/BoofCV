@@ -22,6 +22,7 @@ import boofcv.alg.segmentation.slic.SegmentSlic;
 import boofcv.struct.ConnectRule;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageSInt32;
+import boofcv.struct.image.ImageType;
 
 /**
  * Wrapper around {@link SegmentSlic} for {@link ImageSegmentation}.
@@ -49,5 +50,10 @@ public class Slic_to_ImageSegmentation<T extends ImageBase> implements ImageSegm
 	@Override
 	public ConnectRule getRule() {
 		return null;
+	}
+
+	@Override
+	public ImageType<T> getImageType() {
+		return slic.getImageType();
 	}
 }

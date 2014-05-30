@@ -22,6 +22,7 @@ import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.struct.feature.ColorQueue_F32;
 import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageType;
 import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_I32;
 import org.ddogleg.struct.FastQueue;
@@ -126,6 +127,11 @@ public class SegmentMeanShiftSearchGray<T extends ImageSingleBand> extends Segme
 				}
 			}
 		}
+	}
+
+	@Override
+	public ImageType<T> getImageType() {
+		return interpolate.getImageType();
 	}
 
 	/**

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,7 @@
 package boofcv.alg.interpolate;
 
 import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageType;
 
 
 /**
@@ -65,5 +66,10 @@ public interface InterpolatePixel<T extends ImageBase> {
 	 * @return Border size in pixels
 	 */
 	public int getFastBorderY();
+
+	/**
+	 * Type of image it can process
+	 */
+	public ImageType<T> getImageType();
 
 }
