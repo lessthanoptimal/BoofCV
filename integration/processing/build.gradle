@@ -101,6 +101,17 @@ task processingDirectory( dependsOn:processingJar) {
             into 'tmp/boofcv_processing/examples/ImageEnhancement'
         }
 
+        copy {
+            from '../../data/applet/simple_objects.jpg'
+            into 'tmp/boofcv_processing/examples/DetectLines'
+        }
+
+        copy {
+            from '../../data/applet/goals_and_stuff.jpg'
+            into 'tmp/boofcv_processing/examples/RemovePerspective'
+        }
+
+
 
         copy {
             from 'library.properties'
