@@ -35,8 +35,10 @@ public class BroxWarpingSpacial_to_DenseOpticalFlow<T extends ImageSingleBand>
 	BroxWarpingSpacial<T> brox;
 	Class<T> imageType;
 
-	public BroxWarpingSpacial_to_DenseOpticalFlow(BroxWarpingSpacial<T> brox) {
+	public BroxWarpingSpacial_to_DenseOpticalFlow(BroxWarpingSpacial<T> brox,
+												  Class<T> imageType ) {
 		this.brox = brox;
+		this.imageType = imageType;
 	}
 
 	@Override

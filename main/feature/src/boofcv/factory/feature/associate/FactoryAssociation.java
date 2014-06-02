@@ -61,7 +61,7 @@ public class FactoryAssociation {
 	 * order.
 	 *
 	 * @see AssociateNearestNeighbor
-	 * @see org.ddogleg.nn.alg.KdTreeSearchBbf
+	 * @see org.ddogleg.nn.alg.KdTreeSearch1Bbf
 	 *
 	 * @param dimension Number of elements in the feature vector
 	 * @param maxNodesSearched  Maximum number of nodes it will search.  Controls speed and accuracy.

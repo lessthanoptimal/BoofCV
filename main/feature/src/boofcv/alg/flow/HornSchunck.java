@@ -61,7 +61,8 @@ public abstract class HornSchunck<T extends ImageBase, D extends ImageBase> {
 	/**
 	 * Constructor
 	 *
-	 * @param alpha Weighting used adjust the importance of brightness and smoothness.  Try ?
+	 * @param alpha Larger values place more importance on flow smoothness consistency over brightness consistency.  Try 20
+	 * @param numIterations Number of iterations.  Try 1000
 	 */
 	public HornSchunck(float alpha, int numIterations, ImageType<D> derivType ) {
 		this.alpha2 = alpha*alpha;

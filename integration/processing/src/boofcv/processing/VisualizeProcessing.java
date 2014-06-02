@@ -19,6 +19,7 @@
 package boofcv.processing;
 
 import boofcv.alg.misc.ImageStatistics;
+import boofcv.struct.flow.ImageFlow;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageInteger;
 import boofcv.struct.image.ImageSInt16;
@@ -184,6 +185,57 @@ public class VisualizeProcessing {
 				}
 
 				out.pixels[indexOut] = 0xFF << 24 | r << 16 | g << 8 | b;
+			}
+		}
+
+		return out;
+	}
+
+	public static PImage denseFlow(ImageFlow flowImage ) {
+
+		float maxValue = 0;
+		int N = flowImage.width*flowImage.height;
+		for (int i = 0; i < N; i++) {
+			ImageFlow.D f = flowImage.data[i];
+
+			float v = Math.max(Math.abs(f.x),Math.abs(f.y));
+			if( v > maxValue )
+				maxValue = v;
+		}
+		return denseFlow(flowImage,maxValue);
+	}
+
+	public static PImage denseFlow(ImageFlow flowImage , float maxValue ) {
+
+		PImage out = new PImage(flowImage.width,flowImage.height, PConstants.RGB);
+
+		int tableSine[] = new int[360];
+		int tableCosine[] = new int[360];
+
+		for( int i = 0; i < 360; i++ ) {
+			double angle = i*Math.PI/180.0;
+			tableSine[i] = (int)(255*(Math.sin(angle)+1)/2);
+			tableCosine[i] = (int)(255*(Math.cos(angle)+1)/2);
+		}
+
+		int N = flowImage.width*flowImage.height;
+
+		for (int i = 0; i < N; i++) {
+			ImageFlow.D f = flowImage.data[i];
+
+			if( !f.isValid() ) {
+				out.pixels[i] = 0xFF000055;
+			} else {
+				float m = Math.max(Math.abs(f.x),Math.abs(f.y))/maxValue;
+
+				if( m > 1 )m = 1;
+
+				double angle = Math.atan2(f.y,f.x);
+				int degree = (int)(180+angle*179.999/Math.PI);
+				int r = (int)(m*tableSine[degree]);
+				int g = (int)(m*tableCosine[degree]);
+
+				out.pixels[i] = 0xFF << 24 | r << 16 | g << 8;
 			}
 		}
 

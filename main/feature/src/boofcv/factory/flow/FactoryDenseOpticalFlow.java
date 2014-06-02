@@ -111,20 +111,22 @@ public class FactoryDenseOpticalFlow {
 	 *
 	 * @see HornSchunck
 	 *
-	 * @param alpha
-	 * @param numIterations
-	 * @param imageType
-	 * @return
+	 * @param config Configuration parameters.  If null then default is used.
+	 * @param imageType Type of input gray scale image
+	 * @return dense optical flow
 	 */
 	public static <T extends ImageSingleBand,D extends ImageSingleBand>
-	DenseOpticalFlow<T> hornSchunck( float alpha , int numIterations, Class<T> imageType )
+	DenseOpticalFlow<T> hornSchunck( ConfigHornSchunck config , Class<T> imageType )
 	{
+		if( config == null )
+			config = new ConfigHornSchunck();
+
 		HornSchunck<T,D> alg;
 		if( imageType == ImageUInt8.class )
-			alg = (HornSchunck)new HornSchunck_U8(alpha,numIterations);
+			alg = (HornSchunck)new HornSchunck_U8(config.alpha,config.numIterations);
 		else
 		if( imageType == ImageFloat32.class )
-			alg = (HornSchunck)new HornSchunck_F32(alpha,numIterations);
+			alg = (HornSchunck)new HornSchunck_F32(config.alpha,config.numIterations);
 		else
 			throw new IllegalArgumentException("Unsupported image type "+imageType);
 
@@ -150,7 +152,7 @@ public class FactoryDenseOpticalFlow {
 
 		HornSchunckPyramid<T> alg = new HornSchunckPyramid<T>(config,interpolate);
 
-		return new HornSchunckPyramid_to_DenseOpticalFlow<T>(alg);
+		return new HornSchunckPyramid_to_DenseOpticalFlow<T>(alg,imageType);
 	}
 
 	public static <T extends ImageSingleBand>
@@ -164,6 +166,6 @@ public class FactoryDenseOpticalFlow {
 
 		BroxWarpingSpacial<T> alg = new BroxWarpingSpacial<T>(config,interpolate);
 
-		return new BroxWarpingSpacial_to_DenseOpticalFlow<T>(alg);
+		return new BroxWarpingSpacial_to_DenseOpticalFlow<T>(alg,imageType);
 	}
 }

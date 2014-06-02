@@ -36,7 +36,7 @@ public class TestHornSchunck_to_DenseOpticalFlow {
 			new GeneralDenseOpticalFlowChecks(it) {
 				@Override
 				public DenseOpticalFlow createAlg(Class imageType) {
-					return FactoryDenseOpticalFlow.hornSchunck(20f, 1000,imageType);
+					return FactoryDenseOpticalFlow.hornSchunck(null,imageType);
 				}
 			}.allTests(true);
 		}

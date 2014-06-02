@@ -18,17 +18,28 @@
 
 package boofcv.processing;
 
+import boofcv.abst.feature.associate.AssociateDescription;
+import boofcv.abst.feature.associate.ScoreAssociation;
+import boofcv.abst.feature.detdesc.DetectDescribePoint;
 import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
 import boofcv.abst.feature.tracker.PointTracker;
+import boofcv.abst.flow.DenseOpticalFlow;
 import boofcv.abst.segmentation.ImageSegmentation;
 import boofcv.abst.tracker.ConfigCirculantTracker;
 import boofcv.abst.tracker.ConfigComaniciu2003;
 import boofcv.abst.tracker.ConfigTld;
 import boofcv.abst.tracker.TrackerObjectQuad;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
+import boofcv.alg.flow.ConfigBroxWarping;
 import boofcv.alg.tracker.klt.PkltConfig;
 import boofcv.alg.tracker.sfot.SfotConfig;
+import boofcv.factory.feature.associate.FactoryAssociation;
+import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
 import boofcv.factory.feature.tracker.FactoryPointTracker;
+import boofcv.factory.flow.ConfigHornSchunck;
+import boofcv.factory.flow.ConfigHornSchunckPyramid;
+import boofcv.factory.flow.ConfigOpticalFlowBlockPyramid;
+import boofcv.factory.flow.FactoryDenseOpticalFlow;
 import boofcv.factory.segmentation.*;
 import boofcv.factory.tracker.FactoryTrackerObjectQuad;
 import boofcv.struct.image.*;
@@ -41,14 +52,10 @@ import processing.core.PImage;
  *
  * @author Peter Abeles
  */
-// TODO Binary image ops example
-
-// TODO Dense flow
-// TODO Detect corners
-// TODO Detect SURF
-// TODO Associate two images
-// TODO Compute homography
-// TODO Apply homography
+// TODO Stitch two images together
+// TODO Remove perspective
+// TODO Detect lines
+// TODO image enhancement
 
 public class Boof {
 
@@ -182,4 +189,67 @@ public class Boof {
 		ImageSegmentation alg = FactoryImageSegmentation.watershed(config, imageType);
 		return new SimpleImageSegmentation(alg);
 	}
+
+	public static SimpleDenseOpticalFlow flowKlt( PkltConfig configKlt, int radius , ImageDataType imageType ) {
+		Class inputType = ImageDataType.typeToSingleClass(imageType);
+		Class derivType = GImageDerivativeOps.getDerivativeType(inputType);
+		DenseOpticalFlow flow = FactoryDenseOpticalFlow.flowKlt(configKlt,radius,inputType,derivType);
+		return new SimpleDenseOpticalFlow(flow);
+	}
+
+	public static SimpleDenseOpticalFlow flowRegion( ConfigOpticalFlowBlockPyramid config, ImageDataType imageType ) {
+		Class inputType = ImageDataType.typeToSingleClass(imageType);
+		DenseOpticalFlow flow = FactoryDenseOpticalFlow.region(config, inputType);
+		return new SimpleDenseOpticalFlow(flow);
+	}
+
+	public static SimpleDenseOpticalFlow flowHornSchunck( ConfigHornSchunck config, ImageDataType imageType ) {
+		Class inputType = ImageDataType.typeToSingleClass(imageType);
+		DenseOpticalFlow flow = FactoryDenseOpticalFlow.hornSchunck(config, inputType);
+		return new SimpleDenseOpticalFlow(flow);
+	}
+
+	public static SimpleDenseOpticalFlow flowHornSchunckPyramid( ConfigHornSchunckPyramid config, ImageDataType imageType ) {
+		Class inputType = ImageDataType.typeToSingleClass(imageType);
+		DenseOpticalFlow flow = FactoryDenseOpticalFlow.hornSchunckPyramid(config, inputType);
+		return new SimpleDenseOpticalFlow(flow);
+	}
+
+	public static SimpleDenseOpticalFlow flowBroxWarping( ConfigBroxWarping configKlt, ImageDataType imageType ) {
+		Class inputType = ImageDataType.typeToSingleClass(imageType);
+		DenseOpticalFlow flow = FactoryDenseOpticalFlow.broxWarping(configKlt,inputType);
+		return new SimpleDenseOpticalFlow(flow);
+	}
+
+	public static SimpleDetectDescribePoint detectSurf( boolean stable , ImageDataType imageType ) {
+		Class inputType = ImageDataType.typeToSingleClass(imageType);
+
+		DetectDescribePoint ddp;
+		if( stable )
+			ddp = FactoryDetectDescribe.surfStable(null,null,null,inputType);
+		else
+			ddp = FactoryDetectDescribe.surfFast(null,null,null,inputType);
+
+		return new SimpleDetectDescribePoint(ddp, ImageType.single(inputType));
+	}
+
+	public static SimpleDetectDescribePoint detectSift( ImageDataType imageType ) {
+		if( imageType != ImageDataType.F32 )
+			throw new IllegalArgumentException("Only ImageFloat32 is supported, e.g. ImageDataType.F32");
+
+		DetectDescribePoint ddp = FactoryDetectDescribe.sift(null,null,null,null);
+
+		return new SimpleDetectDescribePoint(ddp, ImageType.single(ImageFloat32.class));
+	}
+
+	public static SimpleAssociateDescription associateGreedy( SimpleDetectDescribePoint detector ,
+															  boolean backwardsValidation ) {
+
+		ScoreAssociation score = FactoryAssociation.defaultScore(detector.detectDescribe.getDescriptionType());
+
+		AssociateDescription assoc = FactoryAssociation.greedy(score,Double.MAX_VALUE,backwardsValidation);
+
+		return new SimpleAssociateDescription(assoc);
+	}
+
 }
