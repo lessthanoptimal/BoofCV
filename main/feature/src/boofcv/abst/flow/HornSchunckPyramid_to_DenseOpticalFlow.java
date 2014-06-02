@@ -35,8 +35,9 @@ public class HornSchunckPyramid_to_DenseOpticalFlow<T extends ImageSingleBand>
 	HornSchunckPyramid<T> hornSchunck;
 	Class<T> imageType;
 
-	public HornSchunckPyramid_to_DenseOpticalFlow(HornSchunckPyramid<T> hornSchunck) {
+	public HornSchunckPyramid_to_DenseOpticalFlow(HornSchunckPyramid<T> hornSchunck, Class<T> imageType ) {
 		this.hornSchunck = hornSchunck;
+		this.imageType = imageType;
 	}
 
 	@Override

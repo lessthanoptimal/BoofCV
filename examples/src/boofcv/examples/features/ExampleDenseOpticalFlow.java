@@ -44,11 +44,11 @@ public class ExampleDenseOpticalFlow {
 	public static void main(String[] args) {
 		MediaManager media = DefaultMediaManager.INSTANCE;
 
-		String fileName0 = "../data/applet/denseflow/dogdance07.png";
-		String fileName1 = "../data/applet/denseflow/dogdance08.png";
+//		String fileName0 = "../data/applet/denseflow/dogdance07.png";
+//		String fileName1 = "../data/applet/denseflow/dogdance08.png";
 
-//		String fileName0 = "../data/applet/denseflow/Urban2_07.png";
-//		String fileName1 = "../data/applet/denseflow/Urban2_08.png";
+		String fileName0 = "../data/applet/denseflow/Urban2_07.png";
+		String fileName1 = "../data/applet/denseflow/Urban2_08.png";
 
 //		String fileName0 = "../data/applet/denseflow/Grove2_07.png";
 //		String fileName1 = "../data/applet/denseflow/Grove2_09.png";

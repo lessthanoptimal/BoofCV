@@ -75,7 +75,7 @@ public class DenseFlowApp
 		addAlgorithm(0, "Region", FactoryDenseOpticalFlow.region(null,T));
 		addAlgorithm(0, "Horn-Schunck-Pyramid",FactoryDenseOpticalFlow.hornSchunckPyramid(null,ImageFloat32.class));
 		addAlgorithm(0, "Brox",FactoryDenseOpticalFlow.broxWarping(null, ImageFloat32.class));
-		addAlgorithm(0, "Horn-Schunck",FactoryDenseOpticalFlow.hornSchunck(20, 1000, ImageFloat32.class));
+		addAlgorithm(0, "Horn-Schunck",FactoryDenseOpticalFlow.hornSchunck(null, ImageFloat32.class));
 
 		animationPanel = new AnimatePanel(100,null);
 		flowPanel = new ImagePanel();

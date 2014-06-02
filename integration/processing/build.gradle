@@ -73,6 +73,28 @@ task processingDirectory( dependsOn:processingJar) {
             from '../../data/applet/segment/berkeley_horses.jpg'
             into 'tmp/boofcv_processing/examples/ImageSegmentation'
         }
+        copy {
+            from '../../data/applet/denseflow/Urban2_07.png'
+            into 'tmp/boofcv_processing/examples/DenseOpticalFlow'
+        }
+        copy {
+            from '../../data/applet/denseflow/Urban2_08.png'
+            into 'tmp/boofcv_processing/examples/DenseOpticalFlow'
+        }
+
+        copy {
+            from '../../data/applet/cave_01.jpg'
+            into 'tmp/boofcv_processing/examples/AssociateInterestPoints'
+        }
+        copy {
+            from '../../data/applet/cave_02.jpg'
+            into 'tmp/boofcv_processing/examples/AssociateInterestPoints'
+        }
+
+        copy {
+            from '../../data/applet/kayak_02.jpg'
+            into 'tmp/boofcv_processing/examples/DetectInterestPoints'
+        }
 
 
         copy {
