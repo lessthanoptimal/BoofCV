@@ -52,10 +52,6 @@ import processing.core.PImage;
  *
  * @author Peter Abeles
  */
-// TODO Stitch two images together
-// TODO Remove perspective
-// TODO Detect lines
-
 public class Boof {
 
 	PApplet parent;

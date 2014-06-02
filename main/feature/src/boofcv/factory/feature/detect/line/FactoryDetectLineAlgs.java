@@ -107,6 +107,9 @@ public class FactoryDetectLineAlgs {
 									   Class<I> imageType ,
 									   Class<D> derivType ) {
 
+		if( config == null )
+			config = new ConfigHoughFoot();
+
 		ImageGradient<I,D> gradient = FactoryDerivative.sobel(imageType,derivType);
 
 		return new DetectLineHoughFoot<I,D>(config.localMaxRadius,config.minCounts,config.minDistanceFromOrigin,
