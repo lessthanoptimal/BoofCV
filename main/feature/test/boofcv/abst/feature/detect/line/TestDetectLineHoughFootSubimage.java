@@ -19,6 +19,7 @@
 package boofcv.abst.feature.detect.line;
 
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
+import boofcv.factory.feature.detect.line.ConfigHoughFootSubimage;
 import boofcv.factory.feature.detect.line.FactoryDetectLineAlgs;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
@@ -43,6 +44,7 @@ public class TestDetectLineHoughFootSubimage extends GeneralDetectLineTests {
 
 		Class derivType = GImageDerivativeOps.getDerivativeType(imageType);
 
-		return FactoryDetectLineAlgs.houghFootSub(2, 3, 2, 10, 10, 2, 2, imageType, derivType);
+		return FactoryDetectLineAlgs.houghFootSub(new ConfigHoughFootSubimage( 2, 3, 2, 10, 10, 2, 2)
+				, imageType, derivType);
 	}
 }

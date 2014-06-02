@@ -21,6 +21,7 @@ package boofcv.examples.features;
 import boofcv.abst.feature.detect.line.DetectLineHoughPolar;
 import boofcv.abst.feature.detect.line.DetectLineSegmentsGridRansac;
 import boofcv.core.image.ConvertBufferedImage;
+import boofcv.factory.feature.detect.line.ConfigHoughPolar;
 import boofcv.factory.feature.detect.line.FactoryDetectLineAlgs;
 import boofcv.gui.feature.ImageLinePanel;
 import boofcv.gui.image.ShowImages;
@@ -64,12 +65,12 @@ public class ExampleLineDetection {
 		T input = ConvertBufferedImage.convertFromSingle(image, null, imageType );
 
 		// Comment/uncomment to try a different type of line detector
-		DetectLineHoughPolar<T,D> detector = FactoryDetectLineAlgs.houghPolar(3, 30, 2, Math.PI / 180,
-				edgeThreshold, maxLines, imageType, derivType);
-//		DetectLineHoughFoot<T,D> detector = FactoryDetectLineAlgs.houghFoot(3, 8, 5, edgeThreshold,
-//				maxLines, imageType, derivType);
-//		DetectLineHoughFootSubimage<T,D> detector = FactoryDetectLineAlgs.houghFootSub(3, 8, 5, edgeThreshold,
-//				maxLines, 2, 2, imageType, derivType);
+		DetectLineHoughPolar<T,D> detector = FactoryDetectLineAlgs.houghPolar(
+				new ConfigHoughPolar(3, 30, 2, Math.PI / 180,edgeThreshold, maxLines), imageType, derivType);
+//		DetectLineHoughFoot<T,D> detector = FactoryDetectLineAlgs.houghFoot(
+//				new ConfigHoughFoot(3, 8, 5, edgeThreshold,maxLines), imageType, derivType);
+//		DetectLineHoughFootSubimage<T,D> detector = FactoryDetectLineAlgs.houghFootSub(
+//				new ConfigHoughFootSubimage(3, 8, 5, edgeThreshold,maxLines, 2, 2), imageType, derivType);
 
 		List<LineParametric2D_F32> found = detector.detect(input);
 

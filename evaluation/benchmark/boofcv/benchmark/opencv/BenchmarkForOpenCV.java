@@ -33,6 +33,7 @@ import boofcv.core.image.border.BorderType;
 import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
 import boofcv.factory.feature.detect.edge.FactoryEdgeDetectors;
 import boofcv.factory.feature.detect.interest.FactoryDetectPoint;
+import boofcv.factory.feature.detect.line.ConfigHoughPolar;
 import boofcv.factory.feature.detect.line.FactoryDetectLineAlgs;
 import boofcv.io.image.UtilImageIO;
 import boofcv.misc.PerformerBase;
@@ -118,7 +119,8 @@ public class BenchmarkForOpenCV<T extends ImageSingleBand, D extends ImageSingle
 
 		public HoughLine() {
 			GImageDerivativeOps.sobel(input, derivX, derivY, BorderType.EXTENDED);
-			detector = FactoryDetectLineAlgs.houghPolar(2, 40, 2, Math.PI / 180, 150, -1, imageType, derivType);
+			detector = FactoryDetectLineAlgs.houghPolar(
+					new ConfigHoughPolar(2, 40, 2, Math.PI / 180, 150, -1), imageType, derivType);
 		}
 
 		@Override

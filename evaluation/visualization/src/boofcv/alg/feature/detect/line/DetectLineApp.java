@@ -25,6 +25,9 @@ import boofcv.alg.feature.detect.ImageCorruptPanel;
 import boofcv.alg.filter.blur.GBlurImageOps;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.core.image.GeneralizedImageOps;
+import boofcv.factory.feature.detect.line.ConfigHoughFoot;
+import boofcv.factory.feature.detect.line.ConfigHoughFootSubimage;
+import boofcv.factory.feature.detect.line.ConfigHoughPolar;
 import boofcv.factory.feature.detect.line.FactoryDetectLineAlgs;
 import boofcv.gui.SelectAlgorithmAndInputPanel;
 import boofcv.gui.feature.ImageLinePanel;
@@ -68,9 +71,12 @@ public class DetectLineApp<T extends ImageSingleBand, D extends ImageSingleBand>
 
 		this.imageType = imageType;
 
-		addAlgorithm(0,"Hough Polar", FactoryDetectLineAlgs.houghPolar(3, 30, 2, Math.PI / 180, edgeThreshold, maxLines, imageType, derivType));
-		addAlgorithm(0,"Hough Foot", FactoryDetectLineAlgs.houghFoot(3, 8, 5, edgeThreshold, maxLines, imageType, derivType));
-		addAlgorithm(0,"Hough Foot Sub Image", FactoryDetectLineAlgs.houghFootSub(3, 8, 5, edgeThreshold, maxLines, 2, 2, imageType, derivType));
+		addAlgorithm(0,"Hough Polar", FactoryDetectLineAlgs.houghPolar(
+				new ConfigHoughPolar(3, 30, 2, Math.PI / 180, edgeThreshold, maxLines), imageType, derivType));
+		addAlgorithm(0,"Hough Foot", FactoryDetectLineAlgs.houghFoot(
+				new ConfigHoughFoot(3, 8, 5, edgeThreshold, maxLines), imageType, derivType));
+		addAlgorithm(0,"Hough Foot Sub Image", FactoryDetectLineAlgs.houghFootSub(
+				new ConfigHoughFootSubimage(3, 8, 5, edgeThreshold, maxLines, 2, 2), imageType, derivType));
 		addAlgorithm(0,"Grid Line", FactoryDetectLineAlgs.lineRansac(40, 30, 2.36, true, imageType, derivType));
 
 		input = GeneralizedImageOps.createSingleBand(imageType, 1, 1);
