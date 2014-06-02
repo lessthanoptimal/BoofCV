@@ -22,6 +22,9 @@ import boofcv.abst.feature.detect.line.DetectLine;
 import boofcv.abst.feature.detect.line.DetectLineSegment;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.core.image.GeneralizedImageOps;
+import boofcv.factory.feature.detect.line.ConfigHoughFoot;
+import boofcv.factory.feature.detect.line.ConfigHoughFootSubimage;
+import boofcv.factory.feature.detect.line.ConfigHoughPolar;
 import boofcv.factory.feature.detect.line.FactoryDetectLineAlgs;
 import boofcv.misc.PerformerBase;
 import boofcv.misc.ProfileOperation;
@@ -60,7 +63,7 @@ public class BenchmarkDetectLines<T extends ImageSingleBand, D extends ImageSing
 	public class HoughPolar extends PerformerBase {
 
 		DetectLine<T> detector =
-				FactoryDetectLineAlgs.houghPolar(3, 30, 4, Math.PI / 180, edgeThreshold, maxLines, imageType, derivType);
+				FactoryDetectLineAlgs.houghPolar(new ConfigHoughPolar(3, 30, 4, Math.PI / 180, edgeThreshold, maxLines), imageType, derivType);
 
 		@Override
 		public void process() {
@@ -71,7 +74,7 @@ public class BenchmarkDetectLines<T extends ImageSingleBand, D extends ImageSing
 	public class HoughFoot extends PerformerBase {
 
 		DetectLine<T> detector =
-				FactoryDetectLineAlgs.houghFoot(3, 10, 5, edgeThreshold, maxLines, imageType, derivType);
+				FactoryDetectLineAlgs.houghFoot(new ConfigHoughFoot(3, 10, 5, edgeThreshold, maxLines), imageType, derivType);
 
 		@Override
 		public void process() {
@@ -82,7 +85,7 @@ public class BenchmarkDetectLines<T extends ImageSingleBand, D extends ImageSing
 	public class HoughFootSub extends PerformerBase {
 
 		DetectLine<T> detector =
-				FactoryDetectLineAlgs.houghFootSub(3, 6, 5, edgeThreshold, maxLines, 2, 2, imageType, derivType);
+				FactoryDetectLineAlgs.houghFootSub(new ConfigHoughFootSubimage(3, 6, 5, edgeThreshold, maxLines, 2, 2), imageType, derivType);
 
 		@Override
 		public void process() {

@@ -55,7 +55,6 @@ import processing.core.PImage;
 // TODO Stitch two images together
 // TODO Remove perspective
 // TODO Detect lines
-// TODO image enhancement
 
 public class Boof {
 

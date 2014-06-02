@@ -23,6 +23,7 @@ import boofcv.abst.feature.detect.line.DetectLineHoughPolar;
 import boofcv.alg.filter.blur.GBlurImageOps;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.core.image.GeneralizedImageOps;
+import boofcv.factory.feature.detect.line.ConfigHoughPolar;
 import boofcv.factory.feature.detect.line.FactoryDetectLineAlgs;
 import boofcv.gui.binary.VisualizeBinaryData;
 import boofcv.gui.feature.ImageLinePanel;
@@ -59,7 +60,8 @@ public class VisualizeHoughPolar<I extends ImageSingleBand, D extends ImageSingl
 		ConvertBufferedImage.convertFromSingle(image, input, imageType);
 		GBlurImageOps.gaussian(input, blur, -1, 2, null);
 
-		DetectLineHoughPolar<I,D> alg =  FactoryDetectLineAlgs.houghPolar(5, 10, 2, Math.PI / 180, 25, 10, imageType, derivType);
+		DetectLineHoughPolar<I,D> alg =  FactoryDetectLineAlgs.houghPolar(
+				new ConfigHoughPolar(5, 10, 2, Math.PI / 180, 25, 10), imageType, derivType);
 
 		List<LineParametric2D_F32> lines = alg.detect(blur);
 

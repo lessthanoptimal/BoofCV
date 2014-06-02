@@ -19,12 +19,12 @@ void setup() {
   input1 = loadImage("cave_02.jpg");
 
   // BoofCV supports several feature descriptors and detectors, but SIFT and SURF are the
-  // easest and most well known so they are provided in the 'simple' interface.  The others
+  // easy to configure and well known so they are provided in the 'simple' interface.  The others
   // can still be used but will take a bit more effort and understanding.
   SimpleDetectDescribePoint ddp = Boof.detectSurf(true, ImageDataType.F32);
   //SimpleDetectDescribePoint ddp = Boof.detectSift(ImageDataType.F32);
 
-  // Only greedy assoication is provided in the simple interface.  Other options are available
+  // Only greedy association is provided in the simple interface.  Other options are available
   // in BoofCV, such as random forest.
   SimpleAssociateDescription assoc = Boof.associateGreedy(ddp, true);
 

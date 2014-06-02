@@ -96,6 +96,11 @@ task processingDirectory( dependsOn:processingJar) {
             into 'tmp/boofcv_processing/examples/DetectInterestPoints'
         }
 
+        copy {
+            from '../../data/applet/enhance/dark.png'
+            into 'tmp/boofcv_processing/examples/ImageEnhancement'
+        }
+
 
         copy {
             from 'library.properties'

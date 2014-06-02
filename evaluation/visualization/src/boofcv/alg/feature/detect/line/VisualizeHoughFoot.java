@@ -23,6 +23,7 @@ import boofcv.abst.feature.detect.line.DetectLineHoughFoot;
 import boofcv.alg.filter.blur.GBlurImageOps;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.core.image.GeneralizedImageOps;
+import boofcv.factory.feature.detect.line.ConfigHoughFoot;
 import boofcv.factory.feature.detect.line.FactoryDetectLineAlgs;
 import boofcv.gui.binary.VisualizeBinaryData;
 import boofcv.gui.feature.ImageLinePanel;
@@ -57,7 +58,8 @@ public class VisualizeHoughFoot<I extends ImageSingleBand, D extends ImageSingle
 		ConvertBufferedImage.convertFromSingle(image, input, imageType);
 		GBlurImageOps.gaussian(input, blur, -1, 2, null);
 
-		DetectLineHoughFoot<I,D> alg =  FactoryDetectLineAlgs.houghFoot(6, 12, 5, 25, 10, imageType, derivType);
+		DetectLineHoughFoot<I,D> alg =  FactoryDetectLineAlgs.houghFoot(
+				new ConfigHoughFoot(6, 12, 5, 25, 10), imageType, derivType);
 
 		ImageLinePanel gui = new ImageLinePanel();
 		gui.setBackground(image);

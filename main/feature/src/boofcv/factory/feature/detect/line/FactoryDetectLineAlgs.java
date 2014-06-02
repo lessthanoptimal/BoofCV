@@ -82,7 +82,6 @@ public class FactoryDetectLineAlgs {
 			throw new IllegalArgumentException("Unsupported derivative type");
 		}
 
-
 		ConnectLinesGrid connect = null;
 		if( connectLines )
 			connect = new ConnectLinesGrid(Math.PI*0.01,1,8);
@@ -96,11 +95,7 @@ public class FactoryDetectLineAlgs {
 	 *
 	 * @see DetectLineHoughFoot
 	 *
-	 * @param localMaxRadius Lines in transform space must be a local max in a region with this radius. Try 5;
-	 * @param minCounts Minimum number of counts/votes inside the transformed image. Try 5.
-	 * @param minDistanceFromOrigin Lines which are this close to the origin of the transformed image are ignored.  Try 5.
-	 * @param thresholdEdge Threshold for classifying pixels as edge or not.  Try 30.
-	 * @param maxLines Maximum number of lines to return. If <= 0 it will return them all.
+	 * @param config Configuration for line detector.  If null then default will be used.
 	 * @param imageType Type of single band input image.
 	 * @param derivType Image derivative type.                    
 	 * @param <I> Input image type.
@@ -108,17 +103,14 @@ public class FactoryDetectLineAlgs {
 	 * @return Line detector.
 	 */
 	public static <I extends ImageSingleBand, D extends ImageSingleBand>
-	DetectLineHoughFoot<I,D> houghFoot(int localMaxRadius,
-									   int minCounts ,
-									   int minDistanceFromOrigin ,
-									   float thresholdEdge ,
-									   int maxLines ,
+	DetectLineHoughFoot<I,D> houghFoot(ConfigHoughFoot config ,
 									   Class<I> imageType ,
 									   Class<D> derivType ) {
 
 		ImageGradient<I,D> gradient = FactoryDerivative.sobel(imageType,derivType);
 
-		return new DetectLineHoughFoot<I,D>(localMaxRadius,minCounts,minDistanceFromOrigin,thresholdEdge,maxLines,gradient);
+		return new DetectLineHoughFoot<I,D>(config.localMaxRadius,config.minCounts,config.minDistanceFromOrigin,
+				config.thresholdEdge,config.maxLines,gradient);
 	}
 
 	/**
@@ -127,13 +119,7 @@ public class FactoryDetectLineAlgs {
 	 *
 	 * @see DetectLineHoughFootSubimage
 	 *
-	 * @param localMaxRadius Lines in transform space must be a local max in a region with this radius. Try 5;
-	 * @param minCounts Minimum number of counts/votes inside the transformed image. Try 5.
-	 * @param minDistanceFromOrigin Lines which are this close to the origin of the transformed image are ignored.  Try 5.
-	 * @param thresholdEdge Threshold for classifying pixels as edge or not.  Try 30.
-	 * @param maxLines Maximum number of lines to return. If <= 0 it will return them all.
-	 * @param totalHorizontalDivisions Number of sub-images in horizontal direction Try 2
-	 * @param totalVerticalDivisions Number of sub images in vertical direction.  Try 2
+	 * @param config Configuration for line detector.  If null then default will be used.
 	 * @param imageType Type of single band input image.
 	 * @param derivType Image derivative type.
 	 * @param <I> Input image type.
@@ -141,21 +127,18 @@ public class FactoryDetectLineAlgs {
 	 * @return Line detector.
 	 */
 	public static <I extends ImageSingleBand, D extends ImageSingleBand>
-	DetectLineHoughFootSubimage<I,D> houghFootSub(int localMaxRadius,
-									   int minCounts ,
-									   int minDistanceFromOrigin ,
-									   float thresholdEdge ,
-									   int maxLines ,
-									   int totalHorizontalDivisions ,
-									   int totalVerticalDivisions ,
-									   Class<I> imageType ,
-									   Class<D> derivType ) {
+	DetectLineHoughFootSubimage<I,D> houghFootSub(ConfigHoughFootSubimage config ,
+												  Class<I> imageType ,
+												  Class<D> derivType ) {
+
+		if( config == null )
+			config = new ConfigHoughFootSubimage();
 
 		ImageGradient<I,D> gradient = FactoryDerivative.sobel(imageType,derivType);
 
-		return new DetectLineHoughFootSubimage<I,D>(localMaxRadius,
-				minCounts,minDistanceFromOrigin,thresholdEdge,
-				totalHorizontalDivisions,totalVerticalDivisions,maxLines,gradient);
+		return new DetectLineHoughFootSubimage<I,D>(config.localMaxRadius,
+				config.minCounts,config.minDistanceFromOrigin,config.thresholdEdge,
+				config.totalHorizontalDivisions,config.totalVerticalDivisions,config.maxLines,gradient);
 	}
 
 	/**
@@ -163,12 +146,7 @@ public class FactoryDetectLineAlgs {
 	 *
 	 * @see DetectLineHoughPolar
 	 *
-	 * @param localMaxRadius Radius for local maximum suppression.  Try 2.
-	 * @param minCounts Minimum number of counts for detected line.  Critical tuning parameter and image dependent.
-	 * @param resolutionRange Resolution of line range in pixels.  Try 2
-	 * @param resolutionAngle Resolution of line angle in radius.  Try PI/180
-	 * @param thresholdEdge Edge detection threshold. Try 50.
-	 * @param maxLines Maximum number of lines to return. If <= 0 it will return them all.
+	 * @param config Configuration for line detector.  Can't be null.
 	 * @param imageType Type of single band input image.
 	 * @param derivType Image derivative type.                    
 	 * @param <I> Input image type.
@@ -176,18 +154,17 @@ public class FactoryDetectLineAlgs {
 	 * @return Line detector.
 	 */
 	public static <I extends ImageSingleBand, D extends ImageSingleBand>
-	DetectLineHoughPolar<I,D> houghPolar(int localMaxRadius,
-										 int minCounts,
-										 double resolutionRange ,
-										 double resolutionAngle ,
-										 float thresholdEdge,
-										 int maxLines ,
+	DetectLineHoughPolar<I,D> houghPolar(ConfigHoughPolar config ,
 										 Class<I> imageType ,
 										 Class<D> derivType ) {
 
+		if( config == null )
+			throw new IllegalArgumentException("This is no default since minCounts must be specified");
+
 		ImageGradient<I,D> gradient = FactoryDerivative.sobel(imageType,derivType);
 
-		return new DetectLineHoughPolar<I,D>(localMaxRadius,minCounts,resolutionRange,resolutionAngle,thresholdEdge,maxLines,gradient);
+		return new DetectLineHoughPolar<I,D>(config.localMaxRadius,config.minCounts,config.resolutionRange,
+				config.resolutionAngle,config.thresholdEdge,config.maxLines,gradient);
 	}
 
 }
