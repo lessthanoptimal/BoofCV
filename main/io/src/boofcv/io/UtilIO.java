@@ -19,8 +19,9 @@
 package boofcv.io;
 
 import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.converters.javabean.JavaBeanConverter;
 import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider;
+import com.thoughtworks.xstream.core.ClassLoaderReference;
+import com.thoughtworks.xstream.io.xml.XppDriver;
 
 import javax.swing.*;
 import java.io.*;
@@ -127,10 +128,7 @@ public class UtilIO {
 	}
 
 	public static void saveXML( Object o , String fileName ) {
-//		BoofcvClassLoader loader = new BoofcvClassLoader();
-//		XStreamAppletVersion xstream = new XStreamAppletVersion(new PureJavaReflectionProvider(),new DomDriver(),loader,null,new DefaultConverterLookup(), null);
-		XStream xstream = new XStream(new PureJavaReflectionProvider());
-		xstream.registerConverter(new JavaBeanConverter(xstream.getMapper()));
+		XStream xstream = createXStream();
 
 		try {
 			xstream.toXML(o,new FileOutputStream(fileName));
@@ -140,19 +138,25 @@ public class UtilIO {
 	}
 
 	public static <T> T loadXML( String fileName ) {
-
-		XStream xstream = new XStream(new PureJavaReflectionProvider());
-		xstream.registerConverter(new JavaBeanConverter(xstream.getMapper()));
 		try {
-			return (T)xstream.fromXML(new FileReader(fileName));
+			return (T)loadXML(new FileReader(fileName));
 		} catch (FileNotFoundException e) {
 			throw new RuntimeException(e);
 		}
 	}
 
 	public static <T> T loadXML( Reader r ) {
-		XStream xstream = new XStream(new PureJavaReflectionProvider());
-		xstream.registerConverter(new JavaBeanConverter(xstream.getMapper()));
+		XStream xstream = createXStream();
+
 		return (T)xstream.fromXML(r);
 	}
+
+	private static XStream createXStream() {
+		XStream xstream = new XStream(new PureJavaReflectionProvider(),new XppDriver(),
+				new ClassLoaderReference(UtilIO.class.getClassLoader()));
+		// uncomment to work in Applets, but breaks current xml files
+//		xstream.registerConverter(new JavaBeanConverter(xstream.getMapper()));
+		return xstream;
+	}
+
 }

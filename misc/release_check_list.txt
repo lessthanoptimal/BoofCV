@@ -22,7 +22,7 @@ Update Version:
   * mvn -N versions:update-child-modules
 
 Post a SNAPSHOT:
-  mvn clean deploy
+  mvn -DperformRelease=true clean deploy
 
 Full Release
   * ./python/src/packagemvn.py

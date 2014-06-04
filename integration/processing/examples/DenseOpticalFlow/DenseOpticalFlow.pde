@@ -29,20 +29,13 @@ void setup() {
   size(input0.width*2, input0.height);
 }
 
-int which = 0;
-int ticks = 0;
 void draw() {
   
   // animate the input
-  if ( which == 0 )
+  if ( (frameCount / 12) % 2 == 0 )
     image(input0, 0, 0);
   else
     image(input1, 0, 0);
 
   image(outputFlow, input0.width, 0);
-
-  if( ticks++ >= 12 ) {
-    which = (which+1)%2;
-    ticks = 0;  
-  }
 }
