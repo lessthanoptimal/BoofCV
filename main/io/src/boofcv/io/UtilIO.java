@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,7 @@
 package boofcv.io;
 
 import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.converters.javabean.JavaBeanConverter;
 import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider;
 import com.thoughtworks.xstream.core.ClassLoaderReference;
 import com.thoughtworks.xstream.io.xml.XppDriver;
@@ -153,9 +154,8 @@ public class UtilIO {
 
 	private static XStream createXStream() {
 		XStream xstream = new XStream(new PureJavaReflectionProvider(),new XppDriver(),
-				new ClassLoaderReference(UtilIO.class.getClassLoader()));
-		// uncomment to work in Applets, but breaks current xml files
-//		xstream.registerConverter(new JavaBeanConverter(xstream.getMapper()));
+				new ClassLoaderReference(Thread.currentThread().getContextClassLoader()));
+		xstream.registerConverter(new JavaBeanConverter(xstream.getMapper()));
 		return xstream;
 	}
 
