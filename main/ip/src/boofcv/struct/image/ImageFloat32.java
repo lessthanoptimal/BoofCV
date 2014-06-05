@@ -129,4 +129,12 @@ public class ImageFloat32 extends ImageFloat<ImageFloat32> {
 	public ImageDataType getDataType() {
 		return ImageDataType.F32;
 	}
+
+	public float[] getData() {
+		return data;
+	}
+
+	public void setData(float[] data) {
+		this.data = data;
+	}
 }
