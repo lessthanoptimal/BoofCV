@@ -102,4 +102,12 @@ public class ImageSInt64 extends ImageSingleBand<ImageSInt64> {
 			return new ImageSInt64();
 		return new ImageSInt64(imgWidth, imgHeight);
 	}
+
+	public long[] getData() {
+		return data;
+	}
+
+	public void setData(long[] data) {
+		this.data = data;
+	}
 }

@@ -224,4 +224,16 @@ public class MultiSpectral<T extends ImageSingleBand> extends ImageMultiBand<Mul
 	public MultiSpectral<T> _createNew(int imgWidth, int imgHeight) {
 		return new MultiSpectral<T>(type,imgWidth,imgHeight,bands.length);
 	}
+
+	public void setType(Class<T> type) {
+		this.type = type;
+	}
+
+	public T[] getBands() {
+		return bands;
+	}
+
+	public void setBands(T[] bands) {
+		this.bands = bands;
+	}
 }

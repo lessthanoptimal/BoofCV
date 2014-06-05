@@ -77,4 +77,12 @@ public abstract class ImageInt16<T extends ImageInt16> extends ImageInteger<T> {
 	public ImageDataType getDataType() {
 		return ImageDataType.I16;
 	}
+
+	public short[] getData() {
+		return data;
+	}
+
+	public void setData(short[] data) {
+		this.data = data;
+	}
 }

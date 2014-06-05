@@ -120,4 +120,12 @@ public class ImageFloat64 extends ImageFloat<ImageFloat64> {
 	public ImageDataType getDataType() {
 		return ImageDataType.F64;
 	}
+
+	public double[] getData() {
+		return data;
+	}
+
+	public void setData(double[] data) {
+		this.data = data;
+	}
 }

@@ -76,4 +76,12 @@ public abstract class ImageInt8<T extends ImageInt8> extends ImageInteger<T> {
 	public ImageDataType getDataType() {
 		return ImageDataType.I8;
 	}
+
+	public byte[] getData() {
+		return data;
+	}
+
+	public void setData(byte[] data) {
+		this.data = data;
+	}
 }

@@ -91,4 +91,12 @@ public class ImageSInt32 extends ImageInteger<ImageSInt32> {
 			return new ImageSInt32();
 		return new ImageSInt32(imgWidth, imgHeight);
 	}
+
+	public int[] getData() {
+		return data;
+	}
+
+	public void setData(int[] data) {
+		this.data = data;
+	}
 }
