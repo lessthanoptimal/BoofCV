@@ -71,7 +71,7 @@ subprojects {
     }
 
     // if Maven central isn't setup in gradle.properties skip all of this
-    if( hasProperty('ossrhUsername') ) {
+    if( project.hasProperty('ossrhUsername') ) {
         task javadocJar(type: Jar) {
             classifier = 'javadoc'
             from javadoc
@@ -186,9 +186,9 @@ idea {
 }
 
 // Disable the creation of jars for distribution.  If you don't do this it will crash
-[':main',':evaluation',':examples',':main:checks','integration'].each {String a ->
+[':main',':evaluation',':examples',':main:checks',':integration'].each {String a ->
     project(a) {
-        if( hasProperty('ossrhUsername') ) {
+        if( project.hasProperty('ossrhUsername') ) {
             signArchives.enabled = false
             jar.enabled = false
             uploadArchives.enabled = false
