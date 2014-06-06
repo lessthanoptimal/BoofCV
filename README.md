@@ -64,7 +64,7 @@ directory and follow the instructions there for how to run those using the comma
 
 ## IntelliJ
 
-You will need to import the Gradle project.  This has been verified to work in IntelliJ IDEA 13.1.x.
+You will need to import the Gradle project into IntelliJ.  Verified to work in IntelliJ IDEA 13.1.x.
 
 ### Install IntelliJ Gradle Plug-In
 1. File -> Settings -> Plugins
@@ -76,15 +76,8 @@ You will need to import the Gradle project.  This has been verified to work in I
 
 ## Eclipse
 
-*Unfortunately Eclipse's Gradle plugin has a bug which causes it to fail.  The Eclipse plugin fails because it can't
-handle optional sub-projects.*  If you install all the manual dependencies for sub-projects in integration it should
-(in theory) have no issues. 
-
-The work around is to use Gradle's plugin for Eclipse.  Run 'gradle eclipse' and let Gradle build the Eclipse project for
-you and then open the project as usual.
-
-The following instructions are for using the broken Eclipse Gradle Plugin.  **MOST PEOPLE SHOULD IGNORE THE REST OF THIS
-SECTION.**
+Eclipse has a Gradle plugin available which allow it to open a Gradle project directly.  The following was
+ tested with Kepler.
 
 ### Install Eclipse Gradle Plug-In
 1. Help -> Eclipse Marketplace
@@ -100,7 +93,8 @@ SECTION.**
 1. File -> Import -> SelectGradle
 2. Click "Browse" button and browse to boofcv/ directory
 3. Click "Build Model" button
-4. Release a violent primal scream as it fails due to its inability to handle optional dependencies
+4. Click "Select All" to import all sub-projects 
+5. Click finish
 
 ## Integration Modules
 

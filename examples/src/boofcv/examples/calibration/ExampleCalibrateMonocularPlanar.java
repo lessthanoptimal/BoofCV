@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -90,8 +90,7 @@ public class ExampleCalibrateMonocularPlanar {
 	 * Images collected from a Bumblee Bee stereo camera.  Large amounts of radial distortion. Chessboard pattern.
 	 */
 	private void setupBumbleBee() {
-		// Use the wrapper below for chessboard targets.  The last parameter adjusts the size of the corner detection
-		// region.  TUNE THIS PARAMETER FOR OPTIMAL ACCURACY!
+		// Use the wrapper below for chessboard targets.
 		detector = FactoryPlanarCalibrationTarget.detectorChessboard(new ConfigChessboard(5,7));
 
 		// physical description
