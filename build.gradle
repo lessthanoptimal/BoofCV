@@ -150,7 +150,6 @@ def javadocProjects= [
         ':main:checks',
 
         ':integration:xuggler',
-        ':integration:openkinect',
 ]
 
 try {
@@ -160,6 +159,10 @@ try {
 try {
     project(':integration:v4l4j')
     javadocProjects.add(':integration:v4l4j')
+} catch( UnknownProjectException ignore ) {}
+try {
+    project(':integration:openkinect')
+    javadocProjects.add(':integration:openkinect')
 } catch( UnknownProjectException ignore ) {}
 
 task alljavadoc(type: Javadoc) {

@@ -16,8 +16,11 @@
  * limitations under the License.
  */
 
-package boofcv.alg.filter.convolve;
+package boofcv.abst.filter.convolve;
 
+import boofcv.alg.filter.convolve.ConvolveImageNoBorder;
+import boofcv.alg.filter.convolve.ConvolveUnsafe_U8;
+import boofcv.alg.filter.convolve.ConvolveWithBorder;
 import boofcv.alg.filter.convolve.noborder.*;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.core.image.border.BorderIndex1D_Extend;
@@ -165,7 +168,7 @@ public class BenchmarkConvolve extends SimpleBenchmark {
 
 	public int timeConvolve2D_Extend_I8_I16(int reps) {
 		for( int i = 0; i < reps; i++ )
-			ConvolveWithBorder.convolve(kernel2D_I32, input_U8, out_S16,new ImageBorder1D_I32(BorderIndex1D_Extend.class));
+			ConvolveWithBorder.convolve(kernel2D_I32, input_U8, out_S16, new ImageBorder1D_I32(BorderIndex1D_Extend.class));
 		return 0;
 	}
 
@@ -183,7 +186,7 @@ public class BenchmarkConvolve extends SimpleBenchmark {
 
 	public int timeConvolveUnsafe2D_I8_I8_DIV(int reps) {
 		for( int i = 0; i < reps; i++ )
-			ConvolveUnsafe_U8.convolve(kernel2D_I32, input_U8, out_U8,10);
+			ConvolveUnsafe_U8.convolve(kernel2D_I32, input_U8, out_U8, 10);
 		return 0;
 	}
 
