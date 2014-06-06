@@ -4,6 +4,7 @@ ext.libpath = file('./').absolutePath
 
 allprojects {
     apply plugin: 'idea'
+    apply plugin: 'eclipse'
 
     group = 'org.boofcv'
     version = '0.17-SNAPSHOT'
