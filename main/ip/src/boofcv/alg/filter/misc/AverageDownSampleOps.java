@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -109,6 +109,35 @@ public class AverageDownSampleOps {
 	}
 
 	/**
+	 * Down samples image.  Type checking is done at runtime.
+	 *
+	 * @param input Input image. Not modified.
+	 * @param output Output image. Modified.
+	 */
+	public static <T extends ImageSingleBand>
+	void down( T input , T output ) {
+		if( input instanceof ImageUInt8 ) {
+			ImageFloat32 middle = new ImageFloat32(output.width,input.height);
+			ImplAverageDownSample.horizontal((ImageUInt8) input, middle);
+			ImplAverageDownSample.vertical(middle, (ImageInt8) output);
+		} else if( input instanceof ImageUInt16) {
+			ImageFloat32 middle = new ImageFloat32(output.width,input.height);
+			ImplAverageDownSample.horizontal((ImageUInt16) input, middle);
+			ImplAverageDownSample.vertical(middle, (ImageUInt16) output);
+		} else if( input instanceof ImageFloat32) {
+			ImageFloat32 middle = new ImageFloat32(output.width,input.height);
+			ImplAverageDownSample.horizontal((ImageFloat32) input, middle);
+			ImplAverageDownSample.vertical(middle, (ImageFloat32) output);
+		} else if( input instanceof ImageFloat64) {
+			ImageFloat64 middle = new ImageFloat64(output.width,input.height);
+			ImplAverageDownSample.horizontal((ImageFloat64) input, middle);
+			ImplAverageDownSample.vertical(middle, (ImageFloat64) output);
+		} else {
+			throw new IllegalArgumentException("Unknown image type");
+		}
+	}
+
+	/**
 	 * Down samples a multi-spectral image.  Type checking is done at runtime.
 	 *
 	 * @param input Input image. Not modified.
@@ -116,10 +145,23 @@ public class AverageDownSampleOps {
 	 * @param output Output image. Modified.
 	 */
 	public static <T extends ImageSingleBand> void down( MultiSpectral<T> input ,
-														 int sampleWidth , MultiSpectral<T> output ) {
-
+														 int sampleWidth , MultiSpectral<T> output )
+	{
 		for( int band = 0; band < input.getNumBands(); band++ ) {
-			down( input.getBand(band),sampleWidth,output.getBand(band));
+			down(input.getBand(band), sampleWidth, output.getBand(band));
+		}
+	}
+
+	/**
+	 * Down samples a multi-spectral image.  Type checking is done at runtime.
+	 *
+	 * @param input Input image. Not modified.
+	 * @param output Output image. Modified.
+	 */
+	public static <T extends ImageSingleBand> void down( MultiSpectral<T> input , MultiSpectral<T> output )
+	{
+		for( int band = 0; band < input.getNumBands(); band++ ) {
+			down(input.getBand(band), output.getBand(band));
 		}
 	}
 
