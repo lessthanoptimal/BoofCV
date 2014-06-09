@@ -25,7 +25,7 @@ import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.affine.Affine2D_F32;
 import georegression.struct.affine.Affine2D_F64;
 import georegression.struct.point.Point2D_F64;
-import georegression.transform.affine.AffinePointOps;
+import georegression.transform.affine.AffinePointOps_F64;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -97,7 +97,7 @@ public abstract class StabilityEvaluatorPoint<T extends ImageSingleBand>
 
 		for( int index = 0; index < initialPoints.size(); index++ ) {
 			Point2D_F64 a = initialPoints.get(index);
-			AffinePointOps.transform(initToImage,a,b);
+			AffinePointOps_F64.transform(initToImage, a, b);
 			if( b.x >= borderSize && b.y >= borderSize && b.x < w && b.y < h) {
 				transformPoints.add( b.copy() );
 				transformIndexes.add(index);
