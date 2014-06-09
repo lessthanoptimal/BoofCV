@@ -22,7 +22,8 @@ import georegression.struct.affine.Affine2D_F32;
 import georegression.struct.affine.Affine2D_F64;
 import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_F64;
-import georegression.transform.affine.AffinePointOps;
+import georegression.transform.affine.AffinePointOps_F32;
+import georegression.transform.affine.AffinePointOps_F64;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -42,7 +43,7 @@ public class TestPixelDistortAffine_F32 {
 		alg.compute(2,3);
 		Point2D_F32 p = new Point2D_F32(2,3);
 		Point2D_F32 expected = new Point2D_F32();
-		AffinePointOps.transform(a,p,expected);
+		AffinePointOps_F32.transform(a, p, expected);
 
 		assertEquals(expected.x,alg.distX,1e-4);
 		assertEquals(expected.y,alg.distY,1e-4);
@@ -58,7 +59,7 @@ public class TestPixelDistortAffine_F32 {
 		alg.compute(2,3);
 		Point2D_F64 p = new Point2D_F64(2,3);
 		Point2D_F64 expected = new Point2D_F64();
-		AffinePointOps.transform(a,p,expected);
+		AffinePointOps_F64.transform(a, p, expected);
 
 		assertEquals(expected.x,alg.distX,1e-4);
 		assertEquals(expected.y,alg.distY,1e-4);

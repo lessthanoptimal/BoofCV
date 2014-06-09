@@ -21,7 +21,7 @@ package boofcv.alg.sfm.robust;
 import boofcv.struct.geo.AssociatedPair;
 import georegression.struct.affine.Affine2D_F64;
 import georegression.struct.point.Point2D_F64;
-import georegression.transform.affine.AffinePointOps;
+import georegression.transform.affine.AffinePointOps_F64;
 import org.ddogleg.fitting.modelset.ModelFitter;
 import org.ddogleg.fitting.modelset.ModelGenerator;
 import org.junit.Test;
@@ -88,7 +88,7 @@ public class TestGenerateAffine2D implements ModelTestingInterface<Affine2D_F64,
 		ret.p1.x = rand.nextDouble()*10;
 		ret.p1.y = rand.nextDouble()*10;
 
-		AffinePointOps.transform(affine,ret.p1,ret.p2);
+		AffinePointOps_F64.transform(affine, ret.p1, ret.p2);
 
 		return ret;
 	}
@@ -99,7 +99,7 @@ public class TestGenerateAffine2D implements ModelTestingInterface<Affine2D_F64,
 		Point2D_F64 expected = new Point2D_F64();
 
 		for( AssociatedPair p : dataSet ) {
-			AffinePointOps.transform(affine,p.p1,expected);
+			AffinePointOps_F64.transform(affine,p.p1,expected);
 
 			if( expected.distance(p.p2) > 0.01 )
 				return false;

@@ -21,7 +21,7 @@ package boofcv.alg.sfm.robust;
 import boofcv.struct.geo.AssociatedPair;
 import georegression.struct.affine.Affine2D_F64;
 import georegression.struct.point.Point2D_F64;
-import georegression.transform.affine.AffinePointOps;
+import georegression.transform.affine.AffinePointOps_F64;
 import org.ddogleg.fitting.modelset.DistanceFromModel;
 
 import java.util.Random;
@@ -66,7 +66,7 @@ public class TestDistanceAffine2D extends StandardDistanceTest<Affine2D_F64, Ass
 
 		Point2D_F64 result = new Point2D_F64();
 
-		AffinePointOps.transform(affine,associatedPair.p1,result);
+		AffinePointOps_F64.transform(affine, associatedPair.p1, result);
 
 		return result.distance(associatedPair.p2);
 	}
