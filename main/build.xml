@@ -27,6 +27,11 @@
                 windowtitle="BoofCV"
 	        sourcepathref="source.classpath">
 
+            <link offline="false" href="http://docs.oracle.com/javase/7/docs/api/" packagelistloc="package-list" />
+            <link offline="false" href="http://georegression.org/javadoc/" packagelistloc="package-list" />
+            <link offline="false" href="http://ddogleg.org/javadoc/" packagelistloc="package-list" />
+            <link offline="false" href="http://ejml.org/javadoc/" packagelistloc="package-list" />
+
             <doctitle><![CDATA[<h1>BoofCV API Specification</h1>]]></doctitle>
 	    <header><![CDATA[
 <script type="text/javascript"><!--
@@ -72,6 +77,10 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
                 use="true"
                 windowtitle="BoofCV"
 	        sourcepathref="source.classpath" >
+
+            <link offline="false" href="http://docs.oracle.com/javase/7/docs/api/" packagelistloc="package-list" />
+            <link offline="false" href="http://georegression.org/javadoc/" packagelistloc="package-list" />
+            <link offline="false" href="http://ddogleg.org/javadoc/" packagelistloc="package-list" />
 
             <doctitle><![CDATA[<h1>BoofCV API Specification</h1>]]></doctitle>
             <bottom><![CDATA[<b>Copyright &copy; 2011-2013 Peter Abeles</b>]]></bottom>

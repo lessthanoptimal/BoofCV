@@ -22,7 +22,7 @@ import boofcv.struct.distort.PixelTransform_F32;
 import georegression.struct.affine.Affine2D_F32;
 import georegression.struct.affine.Affine2D_F64;
 import georegression.struct.point.Point2D_F32;
-import georegression.transform.affine.AffinePointOps;
+import georegression.transform.affine.AffinePointOps_F32;
 
 
 /**
@@ -59,7 +59,7 @@ public class PixelTransformAffine_F32 extends PixelTransform_F32 {
 
 	@Override
 	public void compute(int x, int y) {
-		AffinePointOps.transform(affine,x,y,tran);
+		AffinePointOps_F32.transform(affine, x, y, tran);
 		distX = tran.x;
 		distY = tran.y;
 	}

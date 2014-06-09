@@ -30,6 +30,12 @@ Version : Alpha 0.17
   * Mean-shift
   * Felzenszwalb-Huttenlocher 2004
   * SLIC Superpixels
+- Dense Optical Flow
+  * KLT Based
+  * Square Region Based
+  * Horn Schunck
+  * Horn Schunck Pyramid
+  * Brox Spacial Warping
 - Fixed bugs in ConvertNV21
   * Was applying YV12 byte alignment to NV21 images.  Depending on image size, this could cause a crash.
 - Fixed bug in ImplConvertToBitmap.multiToArray_F32()
@@ -57,14 +63,13 @@ Version : Alpha 0.17
   * If derivative type is null it will use the default
 - Added ImageType to interpolate interface
 - Added ImageType to ImageSegmentation interface
-- Processing integration
+- Processing (http://processing.org) integration
   * Lots of examples
   * Simplified interface for working with BoofCV
 - XStream now works without that ugly hack
 
 - TODO ExampleBundleAdjustment
-- TODO Automatically compile and push unstable builds.
-- TODO Make those two failed unit tests ago away
+- TODO Automatically compile and push unstable builds.  https://travis-ci.org/ ?
 - TODO move BundleAdjustmentCalibrated into SFM?
 
 ---------------------------------------------
