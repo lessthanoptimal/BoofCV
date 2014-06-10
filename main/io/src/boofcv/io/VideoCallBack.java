@@ -22,19 +22,16 @@ import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 
 /**
- * Simplified interface for processing frames in a video sequence.
+ * Callback for video streams.
  *
  * @author Peter Abeles
  */
 public interface VideoCallBack<T extends ImageBase> {
 
 	/**
-	 * Specifies the size of the video feed.
-	 *
-	 * @param width Image width.
-	 * @param height Image height;
+	 * Called when the camera has been initialized and the image properties are known.
 	 */
-	public void init( int width , int height );
+	public void init( int width , int height , ImageType<T> imageType );
 
 	/**
 	 * Passes in the next frame in the sequence.  Time in this function should be minimized to avoid causing a
@@ -44,7 +41,7 @@ public interface VideoCallBack<T extends ImageBase> {
 	 * @param sourceData Platform specific image data.
 	 * @param timeStamp Time the video frame was collected.
 	 */
-	public <O> void nextFrame( T frame , Object sourceData , long timeStamp );
+	public void nextFrame( T frame , Object sourceData , long timeStamp );
 
 	/**
 	 * Called when the video stream has stopped.
@@ -58,12 +55,5 @@ public interface VideoCallBack<T extends ImageBase> {
 	 * @return true if a request has been made to stop the steam
 	 */
 	public boolean stopRequested();
-
-	/**
-	 * Specifies the image data structure that's being processed.
-	 *
-	 * @return
-	 */
-	public ImageType<T> getImageDataType();
 
 }

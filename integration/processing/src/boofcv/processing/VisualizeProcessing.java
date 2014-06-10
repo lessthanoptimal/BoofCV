@@ -36,6 +36,11 @@ import java.util.Random;
  */
 public class VisualizeProcessing {
 
+	/**
+	 * Visualizes a labeled image.  Each label is assigned a random color
+	 * @param image Labeled input image
+	 * @return Rendered color output image
+	 */
 	public static PImage labeled( ImageSInt32 image ) {
 
 		int numRegions = ImageStatistics.max(image)+1;
@@ -51,6 +56,14 @@ public class VisualizeProcessing {
 		return labeled(image, colors);
 	}
 
+	/**
+	 * Renders positive values as red and negative values as green.  The intensity of the color is a linear
+	 * function relative to the maximum intensity of the image.
+	 *
+	 * @param src Input image.
+	 * @param maxAbsValue The maximum absolute value of the image.
+	 * @return Visualized image.
+	 */
 	public static PImage colorizeSign(ImageFloat32 src, float maxAbsValue) {
 		PImage out = new PImage(src.width, src.height, PConstants.RGB);
 
@@ -72,6 +85,14 @@ public class VisualizeProcessing {
 		return out;
 	}
 
+	/**
+	 * Renders positive values as red and negative values as green.  The intensity of the color is a linear
+	 * function relative to the maximum intensity of the image.
+	 *
+	 * @param src Input image.
+	 * @param maxAbsValue The maximum absolute value of the image.
+	 * @return Visualized image.
+	 */
 	public static PImage colorizeSign(ImageInteger src, int maxAbsValue) {
 		PImage out = new PImage(src.width, src.height, PConstants.RGB);
 
@@ -93,6 +114,13 @@ public class VisualizeProcessing {
 		return out;
 	}
 
+	/**
+	 * Renders a labeled image with the provided lookup table for each region's RGB color.
+	 *
+	 * @param image Input labeled image
+	 * @param colors Color lookup table
+	 * @return Visualized image
+	 */
 	public static PImage labeled(ImageSInt32 image, int[] colors) {
 		PImage out = new PImage(image.width, image.height, PConstants.RGB);
 
@@ -107,6 +135,13 @@ public class VisualizeProcessing {
 		return out;
 	}
 
+	/**
+	 * Renders the image gradient into a single output image.  Each direction has a unique color and the
+	 * intensity is dependent upon the edge's relative intensity
+	 * @param dx Derivative x-axis
+	 * @param dy Derivative y-axis
+	 * @return Visualized image
+	 */
 	public static PImage gradient(ImageFloat32 dx, ImageFloat32 dy) {
 		PImage out = new PImage(dx.width, dx.height, PConstants.RGB);
 
@@ -149,6 +184,13 @@ public class VisualizeProcessing {
 		return out;
 	}
 
+	/**
+	 * Renders the image gradient into a single output image.  Each direction has a unique color and the
+	 * intensity is dependent upon the edge's relative intensity
+	 * @param dx Derivative x-axis
+	 * @param dy Derivative y-axis
+	 * @return Visualized image
+	 */
 	public static PImage gradient(ImageSInt16 dx, ImageSInt16 dy) {
 		PImage out = new PImage(dx.width, dx.height, PConstants.RGB);
 

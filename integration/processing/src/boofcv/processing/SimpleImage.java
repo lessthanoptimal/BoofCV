@@ -22,6 +22,8 @@ import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 
 /**
+ * Base class for simplified images.  This provides a more object oriented way of interacting with images.
+ *
  * @author Peter Abeles
  */
 public class SimpleImage<T extends ImageBase> {

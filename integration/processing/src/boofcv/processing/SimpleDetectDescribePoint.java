@@ -11,6 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * Simplified version of {@link DetectDescribePoint}.
+ *
  * @author Peter Abeles
  */
 public class SimpleDetectDescribePoint<T extends ImageBase, Desc extends TupleDesc> {

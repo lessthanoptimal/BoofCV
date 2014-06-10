@@ -41,7 +41,7 @@ import processing.core.PImage;
 import java.util.ArrayList;
 
 /**
- * High level interface for handling gray scale images
+ * Simplified interface for handling color images
  *
  * @author Peter Abeles
  */

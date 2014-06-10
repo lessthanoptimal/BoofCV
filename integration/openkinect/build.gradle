@@ -20,6 +20,16 @@ sourceSets {
             srcDir 'resources/src'
         }
     }
+
+    test {
+        java {
+            srcDir 'test'
+            srcDir 'examples'
+        }
+        resources {
+            srcDir 'resources/test'
+        }
+    }
 }
 
 idea {
