@@ -18,10 +18,12 @@
 
 package boofcv.gui.image;
 
+import boofcv.alg.InputSanityCheck;
 import boofcv.alg.misc.GImageStatistics;
 import boofcv.alg.misc.ImageStatistics;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.struct.image.*;
+import sun.awt.image.IntegerInterleavedRaster;
 
 import java.awt.image.BufferedImage;
 
@@ -379,5 +381,125 @@ public class VisualizeImageData {
 			dst = new BufferedImage(src.getWidth(), src.getHeight(), BufferedImage.TYPE_INT_RGB);
 		}
 		return dst;
+	}
+
+	/**
+	 * Renders two gradients on the same image using two sets of colors, on for each input image.
+	 *
+	 * @param derivX (Input) Image with positive and negative values.
+	 * @param derivY (Input) Image with positive and negative values.
+	 * @param maxAbsValue  The largest absolute value of any pixel in the image.  Set to < 0 if not known.
+	 * @return visualized gradient
+	 */
+	public static BufferedImage colorizeGradient( ImageSInt16 derivX , ImageSInt16 derivY , int maxAbsValue ) {
+		InputSanityCheck.checkSameShape(derivX,derivY);
+
+		BufferedImage output = new BufferedImage(derivX.width,derivX.height,BufferedImage.TYPE_INT_RGB);
+
+		IntegerInterleavedRaster outputRaster = (IntegerInterleavedRaster)output.getRaster();
+		int[] outData = outputRaster.getDataStorage();
+		int outStride = outputRaster.getScanlineStride();
+		int outOffset = outputRaster.getDataOffset(0)-outputRaster.getPixelStride()+1;
+
+
+		if( maxAbsValue < 0 ) {
+			maxAbsValue = ImageStatistics.maxAbs(derivX);
+			maxAbsValue = Math.max(maxAbsValue, ImageStatistics.maxAbs(derivY));
+		}
+		if( maxAbsValue == 0 )
+			return output;
+
+		int indexOut = outOffset;
+
+		for( int y = 0; y < derivX.height; y++ ) {
+			int indexX = derivX.startIndex + y*derivX.stride;
+			int indexY = derivY.startIndex + y*derivY.stride;
+
+			for( int x = 0; x < derivX.width; x++ ) {
+				int valueX = derivX.data[ indexX++ ];
+				int valueY = derivY.data[ indexY++ ];
+
+				int r=0,g=0,b=0;
+
+				if( valueX > 0 ) {
+					r = 255*valueX/maxAbsValue;
+				} else {
+					g = -255*valueX/maxAbsValue;
+				}
+				if( valueY > 0 ) {
+					b = 255*valueY/maxAbsValue;
+				} else {
+					int v = -255*valueY/maxAbsValue;
+					r += v;
+					g += v;
+					if( r > 255 ) r = 255;
+					if( g > 255 ) g = 255;
+				}
+
+				outData[indexOut++] = r << 16 | g << 8 | b;
+			}
+		}
+
+		return output;
+	}
+
+	/**
+	 * Renders two gradients on the same image using two sets of colors, on for each input image.
+	 *
+	 * @param derivX (Input) Image with positive and negative values.
+	 * @param derivY (Input) Image with positive and negative values.
+	 * @param maxAbsValue  The largest absolute value of any pixel in the image.  Set to < 0 if not known.
+	 * @return visualized gradient
+	 */
+	public static BufferedImage colorizeGradient( ImageFloat32 derivX , ImageFloat32 derivY , float maxAbsValue ) {
+		InputSanityCheck.checkSameShape(derivX,derivY);
+
+		BufferedImage output = new BufferedImage(derivX.width,derivX.height,BufferedImage.TYPE_INT_RGB);
+
+		IntegerInterleavedRaster outputRaster = (IntegerInterleavedRaster)output.getRaster();
+		int[] outData = outputRaster.getDataStorage();
+		int outStride = outputRaster.getScanlineStride();
+		int outOffset = outputRaster.getDataOffset(0)-outputRaster.getPixelStride()+1;
+
+
+		if( maxAbsValue < 0 ) {
+			maxAbsValue = ImageStatistics.maxAbs(derivX);
+			maxAbsValue = Math.max(maxAbsValue, ImageStatistics.maxAbs(derivY));
+		}
+		if( maxAbsValue == 0 )
+			return output;
+
+		int indexOut = outOffset;
+
+		for( int y = 0; y < derivX.height; y++ ) {
+			int indexX = derivX.startIndex + y*derivX.stride;
+			int indexY = derivY.startIndex + y*derivY.stride;
+
+			for( int x = 0; x < derivX.width; x++ ) {
+				float valueX = derivX.data[ indexX++ ];
+				float valueY = derivY.data[ indexY++ ];
+
+				int r=0,g=0,b=0;
+
+				if( valueX > 0 ) {
+					r = (int)(255*valueX/maxAbsValue);
+				} else {
+					g = -(int)(255*valueX/maxAbsValue);
+				}
+				if( valueY > 0 ) {
+					b = (int)(255*valueY/maxAbsValue);
+				} else {
+					int v = -(int)(255*valueY/maxAbsValue);
+					r += v;
+					g += v;
+					if( r > 255 ) r = 255;
+					if( g > 255 ) g = 255;
+				}
+
+				outData[indexOut++] = r << 16 | g << 8 | b;
+			}
+		}
+
+		return output;
 	}
 }

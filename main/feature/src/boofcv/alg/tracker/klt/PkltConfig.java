@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.alg.tracker.klt;
 
 /**
- * Configuration class for {@link PointTrackerKltPyramid}.
+ * Configuration class for {@link PyramidKltTracker}.
  *
  * @author Peter Abeles
  */
@@ -32,4 +32,16 @@ public class PkltConfig{
 
 	/** Scale factor for each layer in the pyramid */
 	public int pyramidScaling[] = new int[]{1,2,4};
+
+	public PkltConfig() {
+	}
+
+	public PkltConfig(int templateRadius) {
+		this.templateRadius = templateRadius;
+	}
+
+	public PkltConfig(int templateRadius, int[] pyramidScaling) {
+		this.templateRadius = templateRadius;
+		this.pyramidScaling = pyramidScaling;
+	}
 }
