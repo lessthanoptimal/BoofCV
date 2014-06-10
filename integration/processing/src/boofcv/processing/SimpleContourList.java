@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Storage for a the contours from a binary image and the labeled blobs inside the image.
+ * List of {@link boofcv.processing.SimpleContour}
  *
  * @author Peter Abeles
  */

@@ -44,6 +44,7 @@ task processingJar(type: Jar, dependsOn:jar ) {
 task processingDirectory( dependsOn:processingJar) {
     file('tmp').deleteDir()
     file('tmp/boofcv_processing').mkdirs()
+    file('tmp/boofcv_processing/src').mkdir()
     file('tmp/boofcv_processing/examples').mkdir()
     file('tmp/boofcv_processing/data').mkdir()
     file('tmp/boofcv_processing/library').mkdir()
@@ -111,8 +112,10 @@ task processingDirectory( dependsOn:processingJar) {
             into 'tmp/boofcv_processing/examples/RemovePerspective'
         }
 
-
-
+        copy {
+            from 'src'
+            into 'tmp/boofcv_processing/src'
+        }
         copy {
             from 'library.properties'
             into 'tmp/boofcv_processing'

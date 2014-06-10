@@ -26,6 +26,8 @@ import georegression.struct.shapes.RectangleCorner2D_F64;
 import processing.core.PImage;
 
 /**
+ * Simplified interface for {@link TrackerObjectQuad}.
+ *
  * @author Peter Abeles
  */
 public class SimpleTrackerObject {

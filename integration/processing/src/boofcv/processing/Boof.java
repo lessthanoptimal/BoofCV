@@ -43,23 +43,22 @@ import boofcv.factory.flow.FactoryDenseOpticalFlow;
 import boofcv.factory.segmentation.*;
 import boofcv.factory.tracker.FactoryTrackerObjectQuad;
 import boofcv.struct.image.*;
-import processing.core.PApplet;
 import processing.core.PConstants;
 import processing.core.PImage;
 
 /**
- * Convince class for Processing.
+ * Main class for invoking processing functions.
  *
  * @author Peter Abeles
  */
 public class Boof {
 
-	PApplet parent;
-
-	public Boof(PApplet parent) {
-		this.parent = parent;
-	}
-
+	/**
+	 * Convert PImage into a {@link SimpleGray} of the specified data type
+	 * @param image Original input image.
+	 * @param type Data type of image pixel.  F32 or U8
+	 * @return Converted image
+	 */
 	public static SimpleGray gray(PImage image, ImageDataType type) {
 		if (type == ImageDataType.F32) {
 			ImageFloat32 out = new ImageFloat32(image.width, image.height);
@@ -94,6 +93,12 @@ public class Boof {
 		}
 	}
 
+	/**
+	 * Convert PImage into a {@link SimpleColor} of the specified data type
+	 * @param image Original input image.
+	 * @param type Data type of image pixel.  F32 or U8
+	 * @return Converted image
+	 */
 	public static SimpleColor colorMS(PImage image, ImageDataType type) {
 		if (type == ImageDataType.F32) {
 			MultiSpectral<ImageFloat32> out =
@@ -130,6 +135,17 @@ public class Boof {
 		}
 	}
 
+	/**
+	 * Creates a KLT point tracker
+	 *
+	 * @see PointTracker
+	 * @see boofcv.alg.tracker.klt.PyramidKltTracker
+	 *
+	 * @param config Configuration for KLT tracker.  If null defaults will be used.
+	 * @param configExtract Configuration for corner detector.  If null defaults will be used.
+	 * @param imageType Image type which is processed.  F32 or U8
+	 * @return Point tracker
+	 */
 	public static SimpleTrackerPoints trackerKlt(PkltConfig config,
 												ConfigGeneralDetector configExtract,
 												ImageDataType imageType) {

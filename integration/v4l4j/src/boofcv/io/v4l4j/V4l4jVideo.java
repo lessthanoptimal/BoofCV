@@ -25,6 +25,8 @@ import boofcv.core.image.ConvertBufferedImage;
 import boofcv.io.VideoCallBack;
 import boofcv.io.VideoController;
 import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageType;
 
 import javax.swing.*;
 import java.awt.event.WindowAdapter;
@@ -42,6 +44,7 @@ public class V4l4jVideo<T extends ImageBase> extends WindowAdapter
 	private static int std = V4L4JConstants.STANDARD_WEBCAM, channel = 0;
 
 	VideoCallBack<T> callback;
+	ImageType<T> imageType;
 
 	private VideoDevice     videoDevice;
 	private FrameGrabber frameGrabber;
@@ -79,17 +82,13 @@ public class V4l4jVideo<T extends ImageBase> extends WindowAdapter
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {
-				new V4l4jVideo();
+				new V4l4jVideo<ImageFloat32>(ImageType.single(ImageFloat32.class));
 			}
 		});
 	}
 
-	/**
-	 * Builds a WebcamViewer object
-	 * @throws V4L4JException if any parameter if invalid
-	 */
-	public V4l4jVideo(){
-
+	public V4l4jVideo(ImageType<T> imageType) {
+		this.imageType = imageType;
 	}
 
 	@Override
@@ -132,8 +131,8 @@ public class V4l4jVideo<T extends ImageBase> extends WindowAdapter
 		height = frameGrabber.getHeight();
 
 		// declare storage and initialize the callback
-		imageBoof = callback.getImageDataType().createImage(width,height);
-		callback.init(width, height);
+		imageBoof = imageType.createImage(width, height);
+		callback.init(width, height,imageType);
 	}
 
 	/**

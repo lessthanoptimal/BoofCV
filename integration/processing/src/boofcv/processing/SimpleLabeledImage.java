@@ -24,6 +24,8 @@ import boofcv.struct.image.ImageUInt8;
 import processing.core.PImage;
 
 /**
+ * Simplified interface for labeled images.  A labeled is an image which
+ *
  * @author Peter Abeles
  */
 public class SimpleLabeledImage extends SimpleImage<ImageSInt32> {

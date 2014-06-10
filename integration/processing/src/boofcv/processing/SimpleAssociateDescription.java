@@ -9,6 +9,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * Simplified point feature association
+ *
+ * @see boofcv.abst.feature.associate.AssociateDescription
+ *
  * @author Peter Abeles
  */
 public class SimpleAssociateDescription< Desc extends TupleDesc > {

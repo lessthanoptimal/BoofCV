@@ -29,7 +29,7 @@ import processing.core.PImage;
 import java.util.List;
 
 /**
- * High level interface for handling binary images
+ * Simplified interface for handling binary images
  *
  * @author Peter Abeles
  */
