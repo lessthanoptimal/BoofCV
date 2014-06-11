@@ -38,8 +38,8 @@ import java.awt.image.BufferedImage;
 
 /**
  * Example demonstrating high level image segmentation interface.  An image segmented using this
- * interface will have each pixel assigned a unique label from 0 to N-1, where N is the number of regions.  All
- * pixels which belong to the same region are connected.
+ * interface will have each pixel assigned a unique label from 0 to N-1, where N is the number of regions.
+ * All pixels which belong to the same region are connected.  These regions are also known as superpixels.
  *
  * @author Peter Abeles
  */
