@@ -39,8 +39,6 @@ import boofcv.factory.geo.EnumEpipolar;
 import boofcv.factory.geo.EnumPNP;
 import boofcv.factory.geo.FactoryMultiView;
 import boofcv.factory.geo.FactoryTriangulate;
-import boofcv.gui.d3.PointCloudViewer;
-import boofcv.gui.image.ShowImages;
 import boofcv.io.UtilIO;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.calib.IntrinsicParameters;
@@ -99,15 +97,9 @@ public class ExampleStructureFromMotion {
 
 	TriangulateTwoViewsCalibrated triangulate = FactoryTriangulate.twoGeometric();
 
-	FastQueue<SurfFeature> featuresA = new SurfFeatureQueue(64);
-	FastQueue<SurfFeature> featuresB = new SurfFeatureQueue(64);
-
-	// pixels stored as normalized image coordinates
-	FastQueue<Point2D_F64> pixelsA = new FastQueue<Point2D_F64>(Point2D_F64.class, true);
-	FastQueue<Point2D_F64> pixelsB = new FastQueue<Point2D_F64>(Point2D_F64.class, true);
-
-	GrowQueue_I32 colorsA = new GrowQueue_I32();
-	GrowQueue_I32 colorsB = new GrowQueue_I32();
+	List<FastQueue<SurfFeature>> imageFeatures = new ArrayList<FastQueue<SurfFeature>>();
+	List<FastQueue<Point2D_F64>> imagePixels = new ArrayList<FastQueue<Point2D_F64>>();
+	List<GrowQueue_I32> imageColors = new ArrayList<GrowQueue_I32>();
 
 	List<Track> tracks = new ArrayList<Track>();
 	List<Track> candidate = new ArrayList<Track>();
@@ -131,36 +123,95 @@ public class ExampleStructureFromMotion {
 		setupEssential();
 		setupPnP();
 
-		System.out.println("Processing initial pair");
-		detectFeatures(colorImages.get(0), featuresA, pixelsA, colorsA);
-		detectFeatures(colorImages.get(1), featuresB, pixelsB, colorsB);
+		// find features in each image
+		System.out.println("Detecting Features in each image");
+		for (BufferedImage colorImage : colorImages) {
+			FastQueue<SurfFeature> features = new SurfFeatureQueue(64);
+			FastQueue<Point2D_F64> pixels = new FastQueue<Point2D_F64>(Point2D_F64.class, true);
+			GrowQueue_I32 colors = new GrowQueue_I32();
+			detectFeatures(colorImage, features, pixels, colors);
 
-		initialize(featuresA,featuresB,pixelsA,pixelsB,colorsA);
-
-		swap();
-		for( int i = 2; i < colorImages.size(); i++ ) {
-			System.out.println("Processing image "+i);
-			detectFeatures(colorImages.get(i), featuresB, pixelsB, colorsB);
-			addFrame(featuresA, featuresB, pixelsA, pixelsB,colorsA);
-			swap();
+			imageFeatures.add(features);
+			imagePixels.add(pixels);
+			imageColors.add(colors);
 		}
 
-		normalizeScale();
-//		performBundleAdjustment();
+		// see which images are the most similar to each o ther
+		double matrix[][] = new double[colorImages.size()][colorImages.size()];
+
+		for (int i = 0; i < colorImages.size(); i++) {
+			for (int j = i+1; j < colorImages.size(); j++) {
+				System.out.printf("Associated %02d %02d ",i,j);
+				associate.setSource(imageFeatures.get(i));
+				associate.setDestination(imageFeatures.get(j));
+				associate.associate();
+
+				matrix[i][j] = associate.getMatches().size()/(double)imageFeatures.get(i).size();
+				matrix[j][i] = associate.getMatches().size()/(double)imageFeatures.get(j).size();
+
+				System.out.println(" = "+matrix[i][j]);
+			}
+		}
+
+		// find the image which is connected to the most other images.  Use that as the origin of the arbitrary
+		// coordinate system
+		int bestImage = -1;
+		int bestCount = 0;
+		for (int i = 0; i < colorImages.size(); i++) {
+			int count = 0;
+			for (int j = 0; j < colorImages.size(); j++) {
+				if( matrix[i][j] > 0.3 ) {
+					count++;
+				}
+			}
+			System.out.println(i+"  count "+count);
+			if( count > bestCount ) {
+				bestCount = count;
+				bestImage = i;
+			}
+		}
+
+		// pick the image most similar to the original image to initialize pose estimation
+
+
+		// estimate the motion to the rest in order of greatest similarity
+
+		// for each connected image see if there are images connected to it without their motion estimated
+
+
+		// continue until no more images can be estimated
+
+
+//		System.out.println("Processing initial pair");
+//		detectFeatures(colorImages.get(0), featuresA, pixelsA, colorsA);
+//		detectFeatures(colorImages.get(1), featuresB, pixelsB, colorsB);
+//
+//		initialize(featuresA,featuresB,pixelsA,pixelsB,colorsA);
+//
+//		swap();
+//		for( int i = 2; i < colorImages.size(); i++ ) {
+//			System.out.println("Processing image "+i);
+//			detectFeatures(colorImages.get(i), featuresB, pixelsB, colorsB);
+//			addFrame(featuresA, featuresB, pixelsA, pixelsB,colorsA);
+//			swap();
+//		}
+//
 //		normalizeScale();
-
-		for( Se3_F64 m : motionWorldToCamera) {
-			m.print();
-		}
-
-		PointCloudViewer gui = new PointCloudViewer(intrinsic,1);
-
-		for( Track t : tracks ) {
-			gui.addPoint(t.worldPt.x,t.worldPt.y,t.worldPt.z,t.color);
-		}
-
-		gui.setPreferredSize(new Dimension(500,500));
-		ShowImages.showWindow(gui,"Points");
+////		performBundleAdjustment();
+////		normalizeScale();
+//
+//		for( Se3_F64 m : motionWorldToCamera) {
+//			m.print();
+//		}
+//
+//		PointCloudViewer gui = new PointCloudViewer(intrinsic,1);
+//
+//		for( Track t : tracks ) {
+//			gui.addPoint(t.worldPt.x,t.worldPt.y,t.worldPt.z,t.color);
+//		}
+//
+//		gui.setPreferredSize(new Dimension(500,500));
+//		ShowImages.showWindow(gui,"Points");
 	}
 
 	private void setupPnP() {
@@ -207,23 +258,6 @@ public class ExampleStructureFromMotion {
 
 		estimateHomography =
 				new Ransac<Homography2D_F64,AssociatedPair>(123,manager,modelFitter,distance,300,ransacTOL);
-	}
-
-	/**
-	 * Swap features and pixel lists A and B to recycle data
-	 */
-	private void swap() {
-		FastQueue<SurfFeature> tmpF = featuresA;
-		featuresA = featuresB;
-		featuresB = tmpF;
-
-		FastQueue<Point2D_F64> tmpP = pixelsA;
-		pixelsA = pixelsB;
-		pixelsB = tmpP;
-
-		GrowQueue_I32 tmpC = colorsA;
-		colorsA = colorsB;
-		colorsB = tmpC;
 	}
 
 	private void detectFeatures(BufferedImage colorImage,
@@ -541,16 +575,16 @@ public class ExampleStructureFromMotion {
 
 		List<BufferedImage> images = new ArrayList<BufferedImage>();
 
-		String directory = "../data/applet/sfm/tree0/";
+		String directory = "/home/pja/Desktop/sfm/day02/a/";
 
 		double scaleFactor = 1.0;
 
-		IntrinsicParameters intrinsic = UtilIO.loadXML(directory+"intrinsic.xml");
+		IntrinsicParameters intrinsic = UtilIO.loadXML(directory+"intrinsic_DSC-HX5_3648x2736_to_640x480.xml");
 		if( scaleFactor != 1.0 )
 			PerspectiveOps.scaleIntrinsic(intrinsic,scaleFactor);
 
-		for( int i = 0; i < 25; i++ ) {
-			BufferedImage b = UtilImageIO.loadImage(directory+String.format("image%02d.jpg",i));
+		for( int i = 0; i < 18; i++ ) {
+			BufferedImage b = UtilImageIO.loadImage(directory+String.format("image%03d.jpg",i));
 
 			BufferedImage c;
 			if( scaleFactor != 1.0 ) {

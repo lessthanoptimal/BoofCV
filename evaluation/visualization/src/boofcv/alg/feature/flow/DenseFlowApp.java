@@ -77,7 +77,7 @@ public class DenseFlowApp
 		addAlgorithm(0, "Brox",FactoryDenseOpticalFlow.broxWarping(null, ImageFloat32.class));
 		addAlgorithm(0, "Horn-Schunck",FactoryDenseOpticalFlow.hornSchunck(null, ImageFloat32.class));
 
-		animationPanel = new AnimatePanel(100,null);
+		animationPanel = new AnimatePanel(200,null);
 		flowPanel = new ImagePanel();
 		gui = new PanelGridPanel(2,animationPanel,flowPanel);
 		animationPanel.start();
@@ -179,6 +179,9 @@ public class DenseFlowApp
 	public static void main( String args[] ) {
 
 		DenseFlowApp app = new DenseFlowApp();
+
+//		app.setBaseDirectory("../data/applet/denseflow/");
+//		app.loadInputData("../data/applet/denseflow/denseflow.txt");
 
 		java.util.List<PathLabel> inputs = new ArrayList<PathLabel>();
 

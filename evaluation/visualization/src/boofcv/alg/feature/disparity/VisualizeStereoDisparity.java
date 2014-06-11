@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -420,6 +420,9 @@ public class VisualizeStereoDisparity <T extends ImageSingleBand, D extends Imag
 	public static void main( String args[] ) {
 
 		VisualizeStereoDisparity app = new VisualizeStereoDisparity();
+
+//		app.setBaseDirectory("../data/applet/");
+//		app.loadInputData("../data/applet/disparity.txt");
 
 		String dirCalib = "../data/applet/calibration/stereo/Bumblebee2_Chess/";
 		String dirImgs = "../data/applet/stereo/";

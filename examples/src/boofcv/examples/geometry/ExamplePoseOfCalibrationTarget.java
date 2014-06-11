@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,6 +26,7 @@ import boofcv.alg.geo.calibration.PlanarCalibrationTarget;
 import boofcv.alg.geo.calibration.Zhang99ComputeTargetHomography;
 import boofcv.alg.geo.calibration.Zhang99DecomposeHomography;
 import boofcv.factory.calib.FactoryPlanarCalibrationTarget;
+import boofcv.gui.MousePauseHelper;
 import boofcv.gui.d3.PointCloudViewer;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ShowImages;
@@ -100,6 +101,9 @@ public class ExamplePoseOfCalibrationTarget {
 		gui.add(BorderLayout.WEST, imagePanel); gui.add(BorderLayout.CENTER, viewer);
 		ShowImages.showWindow(gui,"Calibration Target Pose");
 
+		// Allows the user to click on the image and pause
+		MousePauseHelper pauseHelper = new MousePauseHelper(gui);
+
 		// saves the target's center location
 		List<Point3D_F64> path = new ArrayList<Point3D_F64>();
 
@@ -148,7 +152,10 @@ public class ExamplePoseOfCalibrationTarget {
 			viewer.repaint();
 			imagePanel.repaint();
 
-			BoofMiscOps.pause(20);
+			BoofMiscOps.pause(30);
+			while( pauseHelper.isPaused() ) {
+				BoofMiscOps.pause(30);
+			}
 		}
 	}
 }
