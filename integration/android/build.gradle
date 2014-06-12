@@ -1,10 +1,12 @@
 // Forsake the standard Android build environment since it's too complex
 
-// TODO search for a platform 17 or later
-ext.ANDROID_PATH = System.getenv()['ANDROID_HOME']+"/platforms/android-17/"
+// Find all the possible versions of android that it could use and use the most recent
+ext.ANDROID_PLATFORMS = new File(System.getenv()['ANDROID_HOME']+"/platforms").list().grep{it.contains("android-")}
+if( ext.ANDROID_PLATFORMS.isEmpty() )
+    throw new RuntimeException("Can't find any platforms in ANDROID_HOME/platforms")
+ext.ANDROID_PATH = System.getenv()['ANDROID_HOME']+"/platforms/"+ext.ANDROID_PLATFORMS.sort().last()
 
-if( !new File(ext.ANDROID_PATH).exists())
-    throw new RuntimeException("Can't find "+ext.ANDROID_PATH+"  Install it or modify the android/build.gradle file")
+println "Build Android module using $ext.ANDROID_PATH"
 
 dependencies {
     compile project(':main:ip')
