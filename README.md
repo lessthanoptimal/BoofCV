@@ -34,7 +34,7 @@ main/          | Contains the source code for BoofCV
 Building from Source
 ====================================
 
-BoofCV is a java library and can be compiled on any platform with Java installed. Gradle is now the preferred way to build BoofCV.  There are still Ant and Maven build scripts laying around but those will be removed in the near future and their use is not offically supported any more.
+BoofCV is a java library and can be compiled on any platform with Java installed. Gradle is now the preferred way to build BoofCV.  There are still Ant and Maven build scripts laying around but those will be removed in the near future and their use is not officially supported any more.
 
 BEFORE trying to compile BoofCV make sure you have the following installed and that the paths are setup correctly:
 
@@ -47,20 +47,23 @@ BoofCV is very easy to build on just about any system with Gradle and Java suppo
 dependencies for you.  Well that's not totally true, there are a couple of optional packages which require manual 
 downloading since they lack jars on Maven central. More on that later.
 
+Below are a few useful custom Gradle scripts that can be invoked:
+
+* _createLibraryDirectory_ : Will gather all the BoofCV jars and jars which boofcv/main depend on and place them in the boofcv/library directory.
+* _alljavadoc_ : Combines JavaDoc from all the sub-projects into one set.
+* _exampleRun_ : Used to run an example from boofcv/examples, e.g. "gradle exampleRun -Pwhich=boofcv.examples.imageprocessing.ExampleBinaryOps"
+* _webcamRun_ : Used to run an example from integration/WebcamCapture, e.g. "gradle webcamRun -Pwhich=boofcv.examples.ExampleTrackingKlt"
+
 ## Compilation Error
 
-A stable build should always compile out of the box with no problem.  Before you complain about a 
-problem on a stable build make sure you are absolutely certain that you're doing everything right.  If after a few 
+A stable build should always compile out of the box with no problem.  All of the examples should run without any problems,
+as long as you don't modify anything, even slightly.  Before you complain about a problem on a stable build make 
+sure you are absolutely certain that you're doing everything right.  If after a few 
 attempts you still can't figure out post a message.  Maybe these instructions are lacking in clarity.
 
 If you checked out the code from Github then you don't have a stable build and like to live dangerously.  There is a 
 chance the code won't compile or one of the libraries it depends on has changed.  If you get a compilation error feel 
 free to post a polite message with a copy of the error asking for someone to fix it.
-
-## Command Line
-
-In Linux you just need to switch to the boofcv directory and type "gradle compileJava".  Take a look at the examples 
-directory and follow the instructions there for how to run those using the command line.
 
 ## IntelliJ
 
@@ -105,7 +108,7 @@ Specific instructions are contained in the readme file in each of the module dir
 Dependencies
 ====================================
 
-BoofCV depends on a few other packages listed below.
+The main BoofCV modules depends on the following libraries:
 
 - [ EJML          ]  ( http://code.google.com/p/efficient-java-matrix-library )
 - [ GeoRegression ]  ( http://georegression.org                               )
@@ -115,6 +118,8 @@ The following are required for running unit tests and micro-benchmarks:
 
 - [ JUnit   ]       ( http://junit.sourceforge.net/                           )
 - [ Caliper ]       ( http://code.google.com/p/caliper/                       )
+
+The optional sub-projects in integration also have several dependencies. See those sub-projects for a list of their dependencies.
 
 Contact
 ====================================

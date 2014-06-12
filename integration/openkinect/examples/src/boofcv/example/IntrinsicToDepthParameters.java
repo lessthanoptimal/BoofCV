@@ -1,4 +1,4 @@
-package boofcv.example;
+package boofcv.examples;
 
 import boofcv.io.UtilIO;
 import boofcv.openkinect.UtilOpenKinect;

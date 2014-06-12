@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.example;
+package boofcv.examples;
 
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.gui.image.ImageGridPanel;
