@@ -170,7 +170,7 @@ try {
 def javadocProjects = mainProjects + integrationProjects
 
 // Creates a directory with all the compiled BoofCV jars and the dependencies for main
-task createLibraryDirectory << {
+task createLibraryDirectory( dependsOn: javadocProjects.collect{ it+":jar"} ) << {
 
     // dependencies for main and their own jars
     ext.listExternal = files(mainProjects.collect{ project(it).configurations.compile })
@@ -193,12 +193,12 @@ task createLibraryDirectory << {
 
         // append on BoofCV so it's clear which jars are part of BoofCV and which are not
         rename { String fileName ->
-            "BoofCV-"+fileName
+            "BoofCV-" + fileName
         }
     }
 }
 
-task alljavadoc(type: Javadoc) {
+task alljavadoc(type: Javadoc) << {
     // only include source code in src directory to avoid including 3rd party code which some projects do as a hack
     source = javadocProjects.collect { project(it).fileTree('src').include('**/*.java') }
 //    source = javadocProjects.collect { project(it).sourceSets.main.allJava }
