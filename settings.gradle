@@ -6,23 +6,23 @@ include 'main','examples','evaluation',
 if (System.getenv()['ANDROID_HOME']) {
     include 'integration:android'
 } else {
-    logger.warn('Skipping integration/android because ANDROID_HOME has not been set!')
+    logger.warn('Skipping integration/android because ANDROID_HOME has not been set!  See integration/android/readme.txt')
 }
 
 if( file('./integration/openkinect/libfreenect').exists()) {
     include 'integration:openkinect'
 } else {
-    logger.warn('Skipping integration/openkinect because openkinect/libfreenect is missing!')
+    logger.warn('Skipping integration/openkinect because openkinect/libfreenect is missing! See integration/openkinect/readme.txt')
 }
 
 if( file('./integration/v4l4j/v4l4j-0.9.1').exists()) {
     include 'integration:v4l4j'
 } else {
-    logger.warn('Skipping integration/v4l4j because v4l4j/v4l4j-0.9.1 is missing!')
+    logger.warn('Skipping integration/v4l4j because v4l4j/v4l4j-0.9.1 is missing!  See integration/v4l4j/readme.txt')
 }
 
 if( file('./integration/processing/core.jar').exists()) {
     include 'integration:processing'
 } else {
-    logger.warn('Skipping integration/processing because core.jar is missing!')
+    logger.warn('Skipping integration/processing because core.jar is missing!  See integration/processing/readme.txt')
 }

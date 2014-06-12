@@ -54,6 +54,9 @@ Below are a few useful custom Gradle scripts that can be invoked:
 * _exampleRun_ : Used to run an example from boofcv/examples, e.g. "gradle exampleRun -Pwhich=boofcv.examples.imageprocessing.ExampleBinaryOps"
 * _webcamRun_ : Used to run an example from integration/WebcamCapture, e.g. "gradle webcamRun -Pwhich=boofcv.examples.ExampleTrackingKlt"
 
+_createLibraryDirectory_ will probably not generate all the jars in from 'boofcv/integration' that you're interested in.
+See the "Integration Modules" section below.
+
 ## Compilation Error
 
 A stable build should always compile out of the box with no problem.  All of the examples should run without any problems,
