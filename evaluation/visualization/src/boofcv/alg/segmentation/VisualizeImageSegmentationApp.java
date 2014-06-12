@@ -66,6 +66,10 @@ public class VisualizeImageSegmentationApp <T extends ImageBase>
 	boolean processImage = false;
 	boolean busy = false;
 
+	public VisualizeImageSegmentationApp() {
+		this((ImageType)ImageType.ms(3,ImageFloat32.class));
+	}
+
 	public VisualizeImageSegmentationApp(ImageType<T> imageType ) {
 		super(1);
 		this.imageType = imageType;
