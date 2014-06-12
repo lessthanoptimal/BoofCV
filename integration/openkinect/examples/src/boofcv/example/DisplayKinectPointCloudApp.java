@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.example;
+package boofcv.examples;
 
 import boofcv.alg.depth.VisualDepthOps;
 import boofcv.alg.geo.PerspectiveOps;

@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.example;
+package boofcv.examples;
 
 import boofcv.abst.tracker.TrackerObjectQuad;
 import boofcv.core.image.ConvertBufferedImage;

@@ -24,3 +24,17 @@ idea {
         name = "BoofCV Webcam Capture"
     }
 }
+
+// Runs an application from the examples directory
+// gradle webcamRun -Pwhich=boofcv.examples.ExampleTrackingKlt
+task webcamRun(dependsOn: [classes,testClasses] ) << {
+
+    if (project.hasProperty('which')) {
+        javaexec {
+            main = "$which"
+            classpath = sourceSets.main.runtimeClasspath  + sourceSets.test.runtimeClasspath
+        }
+    } else {
+        print 'Which not specified!!!!!'
+    }
+}

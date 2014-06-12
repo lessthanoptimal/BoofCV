@@ -21,12 +21,13 @@ task exampleJar(type: Jar, dependsOn:jar) {
     from {configurations.compile.collect {zipTree(it)}}
 }
 
+// Runs an application from the examples directory
 // gradle exampleRun -Pwhich=boofcv.examples.imageprocessing.ExampleBinaryOps
 task exampleRun(dependsOn: 'classes' )<< {
     if (project.hasProperty('which')) {
         javaexec {
             main = "$which"
-            classpath = sourceSets.main.runtimeClasspath //files(jar.archivePath)
+            classpath = sourceSets.main.runtimeClasspath
         }
     } else {
         print 'Which not specified!!!!!'
