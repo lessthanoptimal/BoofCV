@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,7 +34,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Peter Abeles
@@ -43,10 +44,10 @@ public class TestPnPLepetitEPnP {
 
 	Random rand = new Random(234);
 
-	@Test
-	public void seeCommentAboutSolutions() {
-		fail("consider");
-	}
+//	@Test
+//	public void seeCommentAboutSolutions() {
+//		fail("consider");
+//	}
 
 	@Test
 	public void standardTests() {

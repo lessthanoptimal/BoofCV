@@ -35,7 +35,9 @@ import boofcv.struct.image.ImageFloat32;
 import java.awt.image.BufferedImage;
 
 /**
- * TODO Comment
+ * Demonstration of how to compute the dense optical flow between two images.  Dense optical flow of an image
+ * describes how each pixel moves from one image to the next.  The results is visualized in a color image.  The
+ * color indicates the direction of motion and the intensity the magnitude.
  *
  * @author Peter Abeles
  */

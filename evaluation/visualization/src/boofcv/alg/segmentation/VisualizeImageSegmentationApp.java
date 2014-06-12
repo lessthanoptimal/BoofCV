@@ -236,6 +236,9 @@ public class VisualizeImageSegmentationApp <T extends ImageBase>
 
 		VisualizeImageSegmentationApp app = new VisualizeImageSegmentationApp(imageType);
 
+//		app.setBaseDirectory("../data/applet/segment/");
+//		app.loadInputData("../data/applet/segment/segment.txt");
+
 		java.util.List<PathLabel> inputs = new ArrayList<PathLabel>();
 		inputs.add(new PathLabel("Horses", "../data/applet/segment/berkeley_horses.jpg"));
 		inputs.add(new PathLabel("Kangaroo", "../data/applet/segment/berkeley_kangaroo.jpg"));

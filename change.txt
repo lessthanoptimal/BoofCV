@@ -68,12 +68,12 @@ Version : Alpha 0.17
   * Simplified interface for working with BoofCV
 - XStream now works without that ugly hack
 - Webcam Capture Support
+  * Easy to use library for streaming webcams
   * Wrote several example showing how Webcam Capture can be used with BoofCV
 
 - TODO ExampleBundleAdjustment
 - TODO Automatically compile and push unstable builds.  https://travis-ci.org/ ?
 - TODO move BundleAdjustmentCalibrated into SFM?
-- TODO Finish Webcam Capture examples
 
 ---------------------------------------------
 Date    : 2013/12/25
