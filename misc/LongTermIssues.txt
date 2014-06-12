@@ -1,0 +1,3 @@
+- Add offset parameter to convolution kernel
+- Process the convolution kernel in the correct order
+- Look at comments in PnPLepetitEPnP and consider
