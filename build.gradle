@@ -54,7 +54,7 @@ subprojects {
 //        compile files("$libpath/lib/DDogleg.jar")
 //        compile files("$libpath/lib/GeoRegression.jar")
 
-        compile group: 'com.googlecode.efficient-java-matrix-library', name: 'ejml', version: '0.25-SNAPSHOT'
+        compile group: 'com.googlecode.efficient-java-matrix-library', name: 'ejml', version: '0.25'
         compile group: 'org.ddogleg', name: 'ddogleg', version: '0.5-SNAPSHOT'
         compile group: 'org.georegression', name: 'georegression', version: '0.6-SNAPSHOT'
 
