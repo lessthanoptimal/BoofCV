@@ -71,22 +71,22 @@ subprojects {
         }
     }
 
+    task javadocJar(type: Jar) {
+        classifier = 'javadoc'
+        from javadoc
+    }
+
+    task sourcesJar(type: Jar) {
+        classifier = 'sources'
+        from sourceSets.main.allSource
+    }
+
+    artifacts {
+        archives javadocJar, sourcesJar
+    }
+
     // if Maven central isn't setup in gradle.properties skip all of this
     if( project.hasProperty('ossrhUsername') ) {
-        task javadocJar(type: Jar) {
-            classifier = 'javadoc'
-            from javadoc
-        }
-
-        task sourcesJar(type: Jar) {
-            classifier = 'sources'
-            from sourceSets.main.allSource
-        }
-
-        artifacts {
-            archives javadocJar, sourcesJar
-        }
-
         signing {
             sign configurations.archives
         }
@@ -227,11 +227,11 @@ idea {
     project(a) {
         if( project.hasProperty('ossrhUsername') ) {
             signArchives.enabled = false
-            jar.enabled = false
-            uploadArchives.enabled = false
-            sourcesJar.enabled = false
-            javadocJar.enabled = false
         }
+        sourcesJar.enabled = false
+        javadocJar.enabled = false
+        jar.enabled = false
+        uploadArchives.enabled = false
     }
 }
 
