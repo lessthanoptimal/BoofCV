@@ -26,31 +26,53 @@ import boofcv.struct.flow.ImageFlow;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.pyramid.ImagePyramid;
 
+import java.util.Arrays;
+
 /**
  * Computes the dense optical flow using {@link KltTracker}.  A feature is computed from each pixel in the prev
- * image and it is tracked into the curr image.   If the region around a pixel lacks texture or no good match
- * can be found the pixel will be marked as invalid.
+ * image and it is tracked into the curr image. The flow assigned to a pixel is the template with the lowest error
+ * which overlaps it.  In other words, a pixel is assigned the flow with the lowest error with in 'radius' pixels
+ * of it.  A pixel is marked as invalid if all tracks around the pixel fail.
  *
  * @author Peter Abeles
  */
 public class DenseOpticalFlowKlt<I extends ImageSingleBand, D extends ImageSingleBand> {
 
-	PyramidKltTracker<I,D> tracker;
-	PyramidKltFeature feature;
+	private PyramidKltTracker<I,D> tracker;
+	private PyramidKltFeature feature;
+
+	// goodness of fit for each template
+	float scores[] = new float[1];
+
+	// size of template
+	private int regionRadius;
+	// image shape
+	private int width,height;
 
 	public DenseOpticalFlowKlt(PyramidKltTracker<I, D> tracker , int numLayers , int radius ) {
 		this.tracker = tracker;
 		feature = new PyramidKltFeature(numLayers,radius);
+		this.regionRadius = radius;
 	}
 
 	public void process( ImagePyramid<I> prev, D[] prevDerivX, D[] prevDerivY,
 						 ImagePyramid<I> curr , ImageFlow output ) {
 
-		int indexOut = 0;
+		this.width = output.width;
+		this.height = output.height;
+
+		// initialize and set the score for each pixel to be very high
+		int N = width*height;
+		if( scores.length < N)
+			scores = new float[N];
+		Arrays.fill(scores,0,N,Float.MAX_VALUE);
+
+		for (int i = 0; i < N; i++) {
+			output.data[i].markInvalid();
+		}
+
 		for( int y = 0; y < output.height; y++ ) {
-			for( int x = 0; x < output.width; x++ , indexOut++ ) {
-				ImageFlow.D flow = output.data[indexOut];
-				flow.markInvalid();
+			for( int x = 0; x < output.width; x++ ) {
 
 				tracker.setImage(prev,prevDerivX,prevDerivY);
 				feature.setPosition(x,y);
@@ -60,8 +82,45 @@ public class DenseOpticalFlowKlt<I extends ImageSingleBand, D extends ImageSingl
 					tracker.setImage(curr);
 					KltTrackFault fault = tracker.track(feature);
 					if( fault == KltTrackFault.SUCCESS ) {
-						flow.x = feature.x-x;
-						flow.y = feature.y-y;
+						float score = tracker.getError();
+						// bias the result to prefer the central template
+						// TODO Validate this approach through some sort of test.  Visually looks better, but...
+						scores[y*output.width+x] = score*0.70f;
+						output.get(x,y).set(feature.x-x,feature.y-y);
+						// see if this flow should be assigned to any of its neighbors
+						checkNeighbors(x, y, score, feature.x-x,feature.y-y, output);
+					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * Examines every pixel inside the region centered at (cx,cy) to see if their optical flow has a worse
+	 * score the one specified in 'flow'
+	 */
+	protected void checkNeighbors( int cx , int cy , float score , float flowX , float flowY , ImageFlow output ) {
+
+		int x0 = Math.max(0,cx-regionRadius);
+		int x1 = Math.min(output.width, cx + regionRadius + 1);
+		int y0 = Math.max(0,cy-regionRadius);
+		int y1 = Math.min(output.height, cy + regionRadius + 1);
+
+		for( int i = y0; i < y1; i++ ) {
+			int index = width*i + x0;
+			for( int j = x0; j < x1; j++ , index++ ) {
+				float s = scores[ index ];
+				ImageFlow.D f = output.data[index];
+				if( s > score ) {
+					f.set(flowX,flowY);
+					scores[index] = score;
+				} else if( s == score ) {
+					// Pick solution with the least motion when ambiguous
+					float m0 = f.x*f.x + f.y*f.y;
+					float m1 = flowX*flowX + flowY*flowY;
+					if( m1 < m0 ) {
+						f.set(flowX,flowY);
+						scores[index] = score;
 					}
 				}
 			}

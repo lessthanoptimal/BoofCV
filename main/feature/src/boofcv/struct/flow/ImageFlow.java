@@ -118,6 +118,11 @@ public class ImageFlow {
 			this.y = d.y;
 		}
 
+		public void set( float x , float y ) {
+			this.x = x;
+			this.y = y;
+		}
+
 		public void markInvalid() {
 			x = Float.NaN;
 		}
