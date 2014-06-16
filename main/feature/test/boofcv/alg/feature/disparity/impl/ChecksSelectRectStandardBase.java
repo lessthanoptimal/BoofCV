@@ -28,7 +28,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 
 /**
- * Unit tests for implementers of {@Link SelectRectStandardBase_S32}
+ * Unit tests for implementers of {@link SelectRectStandardBase_S32}
  *
  * @author Peter Abeles
  */

@@ -23,7 +23,7 @@ import boofcv.struct.image.ImageType;
 import org.ddogleg.struct.FastQueue;
 
 /**
- * Computes edge weights for {@Link SegmentFelzenHutten04}.  An edge weight is measure of how different
+ * Computes edge weights for {@link SegmentFelzenHutten04}.  An edge weight is measure of how different
  * two adjacent pixels are from each other.
  *
  * @author Peter Abeles

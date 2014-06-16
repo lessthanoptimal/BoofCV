@@ -25,7 +25,7 @@ import georegression.struct.point.Point2D_F64;
 import java.util.List;
 
 /**
- * Wrapper around {@link DetectChessCalibrationPoints} for {@Link PlanarCalibrationDetector}
+ * Wrapper around {@link DetectChessCalibrationPoints} for {@link PlanarCalibrationDetector}
  * 
  * @author Peter Abeles
  */

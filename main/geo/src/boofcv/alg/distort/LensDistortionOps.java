@@ -217,7 +217,7 @@ public class LensDistortionOps {
 	}
 
 	/**
-	 * Creates an {@Link ImageDistort} which removes radial distortion. How pixels outside the image are handled
+	 * Creates an {@link ImageDistort} which removes radial distortion. How pixels outside the image are handled
 	 * is specified by the BorderType.  If BorderType.VALUE then pixels outside the image will be filled in with a
 	 * value of 0.  For viewing purposes it is recommended that BorderType.VALUE be used and BorderType.EXTENDED
 	 * in computer vision applications.  VALUE creates harsh edges which can cause false positives

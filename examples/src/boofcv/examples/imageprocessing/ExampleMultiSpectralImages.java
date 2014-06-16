@@ -30,7 +30,7 @@ import java.awt.image.BufferedImage;
 
 /**
  * <p>
- * {@Link MultiSpectral} images are one way in which color images can be stored and manipulated inside
+ * {@link MultiSpectral} images are one way in which color images can be stored and manipulated inside
  * of BoofCV.  Inside of a MultiSpectral image each color band is stored as an independent {@link boofcv.struct.image.ImageSingleBand}.
  * This is unlike the more common interleaved format where color information is stored in the same image.
  * </p>

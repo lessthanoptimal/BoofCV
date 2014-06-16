@@ -24,7 +24,7 @@ import org.ddogleg.struct.GrowQueue_I32;
 
 /**
  * Merges regions together quickly and efficiently using a directed tree graph.  To merge two segments together
- * first call {@Link #markMerge}. Then after all the regions which are to be merged are marked call
+ * first call {@link #markMerge}. Then after all the regions which are to be merged are marked call
  * {@link #performMerge}.
  *
  * Internally a disjoint-set forest tree graph is maintained using an array.  When two regions are marked to be merged

@@ -61,7 +61,7 @@ public class GenerateSelectRectBasicWta extends CodeGeneratorBase {
 				"\n" +
 				"/**\n" +
 				" * <p>\n" +
-				" * Implementation of {@Link SelectRectBasicWta} for scores of type "+dataAbr+".\n" +
+				" * Implementation of {@link SelectRectBasicWta} for scores of type "+dataAbr+".\n" +
 				" * </p>\n" +
 				" *\n" +
 				" * <p>\n" +
