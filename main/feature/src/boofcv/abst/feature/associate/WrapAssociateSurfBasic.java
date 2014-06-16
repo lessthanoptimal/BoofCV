@@ -27,7 +27,7 @@ import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_I32;
 
 /**
- * Wrapper around {@Link AssociateSurfBasic} for {@link AssociateDescription}.
+ * Wrapper around {@link AssociateSurfBasic} for {@link AssociateDescription}.
  *
  * @author Peter Abeles
  */

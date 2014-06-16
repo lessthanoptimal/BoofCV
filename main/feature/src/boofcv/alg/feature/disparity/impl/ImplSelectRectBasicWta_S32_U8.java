@@ -23,7 +23,7 @@ import boofcv.struct.image.ImageUInt8;
 
 /**
  * <p>
- * Implementation of {@Link SelectRectBasicWta} for scores of type S32.
+ * Implementation of {@link SelectRectBasicWta} for scores of type S32.
  * </p>
  *
  * <p>

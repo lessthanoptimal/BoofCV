@@ -40,7 +40,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Wrapper around {@link VisOdomPixelDepthPnP} for {@Link DepthVisualOdometry}.
+ * Wrapper around {@link VisOdomPixelDepthPnP} for {@link DepthVisualOdometry}.
  *
  * @author Peter Abeles
  */

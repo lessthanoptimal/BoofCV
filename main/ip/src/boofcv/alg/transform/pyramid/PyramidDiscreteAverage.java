@@ -23,7 +23,7 @@ import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.pyramid.PyramidDiscrete;
 
 /**
- * Creates an image pyramid by down sampling square regions using {@Link AverageDownSampleOps}.
+ * Creates an image pyramid by down sampling square regions using {@link AverageDownSampleOps}.
  *
  * @author Peter Abeles
  */
