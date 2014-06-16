@@ -74,6 +74,7 @@ Version : Alpha 0.17
 - TODO ExampleBundleAdjustment
 - TODO Automatically compile and push unstable builds.  https://travis-ci.org/ ?
 - TODO move BundleAdjustmentCalibrated into SFM?
+- TODO evaluate optical flow algorithms some how
 
 ---------------------------------------------
 Date    : 2013/12/25

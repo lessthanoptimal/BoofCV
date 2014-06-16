@@ -150,6 +150,17 @@ public class PyramidKltTracker<InputImage extends ImageSingleBand, DerivativeIma
 		return KltTrackFault.SUCCESS;
 	}
 
+	/**
+	 * Average error between track template and the image.
+	 *
+	 * @see boofcv.alg.tracker.klt.KltTracker#getError()
+	 *
+	 * @return error
+	 */
+	public float getError() {
+		return tracker.getError();
+	}
+
 	private void setupKltTracker(int layer) {
 		if (derivX != null)
 			tracker.unsafe_setImage(image.getLayer(layer), derivX[layer], derivY[layer]);

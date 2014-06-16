@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -97,6 +97,9 @@ public class KltTracker<InputImage extends ImageSingleBand, DerivativeImage exte
 	float outsideRight;
 	float outsideTop;
 	float outsideBottom;
+
+	// error between template and the current track position in the image
+	float error;
 
 	public KltTracker(InterpolateRectangle<InputImage> interpInput,
 					  InterpolateRectangle<DerivativeImage> interpDeriv,
@@ -315,7 +318,7 @@ public class KltTracker<InputImage extends ImageSingleBand, DerivativeImage exte
 			}
 		}
 
-		if (computeError(feature) > config.maxPerPixelError)
+		if ( (error=computeError(feature)) > config.maxPerPixelError)
 			return KltTrackFault.LARGE_ERROR;
 
 		return KltTrackFault.SUCCESS;
@@ -489,6 +492,14 @@ public class KltTracker<InputImage extends ImageSingleBand, DerivativeImage exte
 			return true;
 
 		return false;
+	}
+
+	/**
+	 * Average absolute value of the difference between each pixel in the image and the template
+	 * @return Average error
+	 */
+	public float getError() {
+		return error;
 	}
 
 	public KltConfig getConfig() {
