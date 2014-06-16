@@ -38,6 +38,10 @@ import java.util.Arrays;
  */
 public class DenseOpticalFlowKlt<I extends ImageSingleBand, D extends ImageSingleBand> {
 
+	// Amount it adjusts the score for the center of a region.
+	// Visually this looks better, but only makes a small difference in benchmark performance
+	private static float MAGIC_ADJUSTMENT = 0.7f;
+
 	private PyramidKltTracker<I,D> tracker;
 	private PyramidKltFeature feature;
 
@@ -84,8 +88,7 @@ public class DenseOpticalFlowKlt<I extends ImageSingleBand, D extends ImageSingl
 					if( fault == KltTrackFault.SUCCESS ) {
 						float score = tracker.getError();
 						// bias the result to prefer the central template
-						// TODO Validate this approach through some sort of test.  Visually looks better, but...
-						scores[y*output.width+x] = score*0.70f;
+						scores[y*output.width+x] = score*MAGIC_ADJUSTMENT;
 						output.get(x,y).set(feature.x-x,feature.y-y);
 						// see if this flow should be assigned to any of its neighbors
 						checkNeighbors(x, y, score, feature.x-x,feature.y-y, output);
