@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,6 +31,8 @@ import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.URL;
 import java.security.AccessControlException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Class for loading and saving images.
@@ -60,6 +62,32 @@ public class UtilImageIO {
 		}
 
 		return img;
+	}
+
+	/**
+	 * Loads all the image in the specified directory which match the provided regex
+	 * @param directory File directory
+	 * @param regex Regex used to match file names
+	 * @return List of found images.
+	 */
+	public static List<BufferedImage> loadImages( String directory , final String regex ) {
+
+		File[] files = new File(directory).listFiles(new FilenameFilter() {
+			@Override
+			public boolean accept(File dir, String name) {
+				return name.matches(regex);
+			}
+		});
+
+		List<BufferedImage> ret = new ArrayList<BufferedImage>();
+
+		for( File f : files ) {
+			BufferedImage img = loadImage(f.getAbsolutePath());
+			if( img != null )
+				ret.add( img );
+		}
+
+		return ret;
 	}
 
 	/**
