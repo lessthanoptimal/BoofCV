@@ -41,6 +41,7 @@ Version : Alpha 0.17
 - Threshold in the interface Associate is now <= instead of <
 - Android
   * Added classes which greatly simplify dealing with camera previews
+  * Added new visualizations intended for use with segmented images
   * Simplified example code
 - Added XYZ and LAB color spaces
 - GImageMiscOps.fillUniform() max is inclusive for both integer and float and this is enforced

@@ -1,15 +1,36 @@
+/*
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ *
+ * This file is part of BoofCV (http://boofcv.org).
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package boofcv.android;
 
 import android.graphics.Bitmap;
 import boofcv.alg.feature.detect.edge.EdgeContour;
 import boofcv.alg.feature.detect.edge.EdgeSegment;
 import boofcv.alg.misc.ImageStatistics;
+import boofcv.alg.segmentation.ImageSegmentationOps;
 import boofcv.struct.image.*;
 import georegression.struct.point.Point2D_I32;
+import org.ddogleg.struct.FastQueue;
 
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 
 import static boofcv.android.ConvertBitmap.declareStorage;
 
@@ -492,6 +513,116 @@ public class VisualizeImageData {
 					storage[index++] = r;
 					storage[index]   = (byte)0xFF;
 				}
+			}
+		}
+
+		output.copyPixelsFromBuffer(ByteBuffer.wrap(storage));
+	}
+
+	/**
+	 * Renders a labeled where each region is assigned a random color.
+	 *
+	 * @param labelImage Labeled image with labels from 0 to numRegions-1
+	 * @param numRegions Number of labeled in the image
+	 * @param output Where the output is written to
+	 * @param storage Optional working buffer for Bitmap image. Can be null.
+	 **/
+	public static void renderLabeled(ImageSInt32 labelImage, int numRegions, Bitmap output , byte[] storage) {
+
+		if( storage == null )
+			storage = declareStorage(output,null);
+
+		int colors[] = new int[numRegions];
+
+		Random rand = new Random(123);
+		for( int i = 0; i < colors.length; i++ ) {
+			colors[i] = rand.nextInt();
+		}
+
+		int w = labelImage.getWidth();
+		int h = labelImage.getHeight();
+
+		int indexOut = 0;
+		for( int y = 0; y < h; y++ ) {
+			int indexSrc = labelImage.startIndex + y*labelImage.stride;
+			for( int x = 0; x < w; x++ ) {
+				int rgb = colors[labelImage.data[indexSrc++]];
+
+				storage[indexOut++] = (byte)(rgb & 0xFF);
+				storage[indexOut++] = (byte)((rgb >> 8) & 0xFF);
+				storage[indexOut++] = (byte)((rgb >> 16) & 0xFF);
+				storage[indexOut++] = (byte)0xFF;
+			}
+		}
+
+		output.copyPixelsFromBuffer(ByteBuffer.wrap(storage));
+	}
+
+	/**
+	 * Draws border pixels of each region using the specified color.
+	 *
+	 * @param pixelToRegion Conversion from pixel to region
+	 * @param borderColor RGB value of border pixel
+	 * @param output Where the output is written to
+	 * @param storage Optional working buffer for Bitmap image. Can be null.
+	 */
+	public static void regionBorders( ImageSInt32 pixelToRegion , int borderColor ,
+									  Bitmap output , byte[] storage) {
+		if( storage == null )
+			storage = declareStorage(output,null);
+
+		ImageUInt8 binary = new ImageUInt8(pixelToRegion.width,pixelToRegion.height);
+		ImageSegmentationOps.markRegionBorders(pixelToRegion, binary);
+		int indexOut = 0;
+		for( int y = 0; y < binary.height; y++ ) {
+			for( int x = 0; x < binary.width; x++ ) {
+				if( binary.unsafe_get(x,y) == 1 )  {
+					storage[indexOut++] = (byte)(borderColor & 0xFF);
+					storage[indexOut++] = (byte)((borderColor >> 8) & 0xFF);
+					storage[indexOut++] = (byte)((borderColor >> 16) & 0xFF);
+					storage[indexOut++] = (byte)0xFF;
+				} else {
+					indexOut += 4;
+				}
+			}
+		}
+
+		output.copyPixelsFromBuffer(ByteBuffer.wrap(storage));
+	}
+
+	/**
+	 * Draws each region using the provided color
+	 * @param pixelToRegion Conversion from pixel to region
+	 * @param segmentColor Color of each region
+	 * @param output Where the output is written to
+	 * @param storage Optional working buffer for Bitmap image. Can be null.
+	 */
+	public static void regionsColor( ImageSInt32 pixelToRegion ,
+									 FastQueue<float[]> segmentColor ,
+									 Bitmap output , byte[] storage ) {
+		if( storage == null )
+			storage = declareStorage(output,null);
+
+		int indexOut = 0;
+		for( int y = 0; y < pixelToRegion.height; y++ ) {
+			for( int x = 0; x < pixelToRegion.width; x++ ) {
+				int index = pixelToRegion.unsafe_get(x,y);
+				float []cv = segmentColor.get(index);
+
+				int r,g,b;
+
+				if( cv.length == 3 ) {
+					r = (int)cv[0];
+					g = (int)cv[1];
+					b = (int)cv[2];
+				} else {
+					r = g = b = (int)cv[0];
+				}
+
+				storage[indexOut++] = (byte)r;
+				storage[indexOut++] = (byte)g;
+				storage[indexOut++] = (byte)b;
+				storage[indexOut++] = (byte)0xFF;
 			}
 		}
 
