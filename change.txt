@@ -6,9 +6,6 @@ Date Format: year/month/day
 Date    : 2014
 Version : Alpha 0.17
 
-- Dense Optical Flow
-  * KLT based
-  * Exhaustive block search
 - Improved/Fixed serialization
   * Several classes were missing no argument constructors
 - Added ImageMiscOps.flipHorizontal()
@@ -70,11 +67,11 @@ Version : Alpha 0.17
 - Webcam Capture Support
   * Easy to use library for streaming webcams
   * Wrote several example showing how Webcam Capture can be used with BoofCV
+- Structure From Motion (SFM) example
 
-- TODO ExampleBundleAdjustment
 - TODO Automatically compile and push unstable builds.  https://travis-ci.org/ ?
 - TODO move BundleAdjustmentCalibrated into SFM?
-- TODO evaluate optical flow algorithms some how
+- TODO Make sure android code still works
 
 ---------------------------------------------
 Date    : 2013/12/25
