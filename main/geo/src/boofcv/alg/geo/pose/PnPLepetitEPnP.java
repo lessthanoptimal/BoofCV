@@ -190,7 +190,7 @@ public class PnPLepetitEPnP {
 	 * Used to turn on and off non-linear optimization.  To turn on set to a positive number.
 	 * See warning in class description about setting the number of iterations too high.
 	 *
-	 * @param numIterations  NUmber of iterations.  Try 10.
+	 * @param numIterations  Number of iterations.  Try 10.
 	 */
 	public void setNumIterations(int numIterations) {
 		this.numIterations = numIterations;
