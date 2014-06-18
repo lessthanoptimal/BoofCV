@@ -67,11 +67,11 @@ import java.util.List;
 /**
  * Demonstration on how to do 3D reconstruction from a set of unordered photos with known intrinsic camera calibration.
  * The code below is still a work in process and is very basic, but still require a solid understanding of
- * structure from motion and all its algorithms to understand.  In other words, this is not for beginners and
- * requires good clean data to work.
+ * structure from motion to understand.  In other words, this is not for beginners and requires good clean set of
+ * images to work.
  *
  * One key element it is missing is bundle adjustment to improve the estimated camera location and 3D points.  The
- * current bundle adjustment in BoofCV is too inefficient.   Better noise removal and numerious other improvements
+ * current bundle adjustment in BoofCV is too inefficient.   Better noise removal and numerous other improvements
  * are needed before it can compete with commercial equivalents.
  *
  * @author Peter Abeles
