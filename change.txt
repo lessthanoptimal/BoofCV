@@ -70,10 +70,6 @@ Version : Alpha 0.17
   * Wrote several example showing how Webcam Capture can be used with BoofCV
 - Structure From Motion (SFM) example
 
-- TODO Automatically compile and push unstable builds.  https://travis-ci.org/ ?
-- TODO move BundleAdjustmentCalibrated into SFM?
-- TODO Make sure android code still works
-
 ---------------------------------------------
 Date    : 2013/12/25
 Version : Alpha 0.16
