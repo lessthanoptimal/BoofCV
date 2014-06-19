@@ -1,0 +1,91 @@
+<project name="BoofCV_All" basedir="." default="javadocWeb">
+
+
+    <path id="source.classpath">
+        <pathelement path="main/calibration/src"/>
+        <pathelement path="main/feature/src"/>
+        <pathelement path="main/geo/src"/>
+        <pathelement path="main/io/src"/>
+        <pathelement path="main/ip/src"/>
+        <pathelement path="main/recognition/src"/>
+        <pathelement path="main/sfm/src"/>
+        <pathelement path="main/visualize/src"/>
+        <pathelement path="integration/android/src"/>
+        <pathelement path="integration/applet/src"/>
+        <pathelement path="integration/openkinect/src"/>
+        <pathelement path="integration/WebcamCapture/src"/>
+        <pathelement path="integration/xuggler/src"/>
+    </path>
+
+    <target name="javadocWeb">
+        <javadoc
+                destdir="docs/api"
+                author="true"
+                version="true"
+                use="true"
+                windowtitle="BoofCV"
+                sourcepathref="source.classpath">
+
+            <link offline="false" href="http://docs.oracle.com/javase/7/docs/api/" packagelistloc="package-list" />
+            <link offline="false" href="http://georegression.org/javadoc/" packagelistloc="package-list" />
+            <link offline="false" href="http://ddogleg.org/javadoc/" packagelistloc="package-list" />
+            <link offline="false" href="http://ejml.org/javadoc/" packagelistloc="package-list" />
+
+            <doctitle><![CDATA[<h1>BoofCV API Specification</h1>]]></doctitle>
+            <header><![CDATA[
+<script type="text/javascript"><!--
+google_ad_client = "ca-pub-0419821832107208";
+/* boofcv javadoc banner */
+google_ad_slot = "3257872658";
+google_ad_width = 468;
+google_ad_height = 60;
+//-->
+</script>
+<script type="text/javascript"
+src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
+</script>
+]]>
+            </header>
+            <bottom><![CDATA[<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-10413214-5']);
+  _gaq.push(['_setDomainName', 'boofcv.org']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+<br>
+<b>Copyright &copy; 2011-2014 Peter Abeles</b>
+]]>
+            </bottom>
+
+        </javadoc>
+    </target>
+
+    <target name="javadoc">
+        <javadoc
+                destdir="docs/api"
+                author="true"
+                version="true"
+                use="true"
+                windowtitle="BoofCV"
+                sourcepathref="source.classpath" >
+
+            <link offline="false" href="http://docs.oracle.com/javase/7/docs/api/" packagelistloc="package-list" />
+            <link offline="false" href="http://georegression.org/javadoc/" packagelistloc="package-list" />
+            <link offline="false" href="http://ddogleg.org/javadoc/" packagelistloc="package-list" />
+            <link offline="false" href="http://ejml.org/javadoc/" packagelistloc="package-list" />
+
+            <doctitle><![CDATA[<h1>BoofCV API Specification</h1>]]></doctitle>
+            <bottom><![CDATA[<b>Copyright &copy; 2011-2014 Peter Abeles</b>]]></bottom>
+
+        </javadoc>
+        <jar compress="true" destfile="docs/javadoc.jar" basedir="docs/api" />
+    </target>
+</project>

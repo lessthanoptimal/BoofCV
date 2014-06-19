@@ -7,7 +7,7 @@ allprojects {
     apply plugin: 'eclipse'
 
     group = 'org.boofcv'
-    version = '0.17-SNAPSHOT'
+    version = '0.17'
 }
 
 subprojects {
@@ -55,8 +55,8 @@ subprojects {
 //        compile files("$libpath/lib/GeoRegression.jar")
 
         compile group: 'com.googlecode.efficient-java-matrix-library', name: 'ejml', version: '0.25'
-        compile group: 'org.ddogleg', name: 'ddogleg', version: '0.5-SNAPSHOT'
-        compile group: 'org.georegression', name: 'georegression', version: '0.6-SNAPSHOT'
+        compile group: 'org.ddogleg', name: 'ddogleg', version: '0.5'
+        compile group: 'org.georegression', name: 'georegression', version: '0.6'
 
         testCompile group: 'junit', name: 'junit', version: '4.+'
         testCompile files("$libpath/lib/testing/caliper.jar")
@@ -201,7 +201,7 @@ task createLibraryDirectory( dependsOn: javadocProjects.collect{ it+":jar"}+java
     }
 }
 
-task alljavadoc(type: Javadoc) << {
+task alljavadoc(type: Javadoc) {
     // only include source code in src directory to avoid including 3rd party code which some projects do as a hack
     source = javadocProjects.collect { project(it).fileTree('src').include('**/*.java') }
 //    source = javadocProjects.collect { project(it).sourceSets.main.allJava }
@@ -211,6 +211,7 @@ task alljavadoc(type: Javadoc) << {
     configure(options) {
         docTitle = "BoofCV JavaDoc ($project.version)"
         links = [ 'http://docs.oracle.com/javase/7/docs/api/',
+                  'http://ejml.org/javadoc/',
                   'http://georegression.org/javadoc/',
                   'http://ddogleg.org/javadoc/']
 //        header = file('misc/header.txt').text.replace("\n", "")
