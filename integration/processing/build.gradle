@@ -41,9 +41,25 @@ task processingJar(type: Jar, dependsOn:jar ) {
     archiveName = 'boofcv_processing.jar'
 }
 
-task processingDirectory( dependsOn:processingJar) {
+task processingJavaDoc(type: Javadoc) {
+    source = sourceSets.main.allJava
+
+    // provide references to external javadoc
+    configure(options) {
+        links = ['http://docs.oracle.com/javase/7/docs/api/',
+                 'http://ejml.org/javadoc/',
+                 'http://georegression.org/javadoc/',
+                 'http://ddogleg.org/javadoc/',
+                 'http://boofcv.org/javadoc/',
+                 'http://processing.org/reference/javadoc/core/']
+    }
+}
+
+task processingDirectory( dependsOn:[processingJar,processingJavaDoc]) {
+
     file('tmp').deleteDir()
     file('tmp/boofcv_processing').mkdirs()
+    file('tmp/boofcv_processing/reference').mkdirs()
     file('tmp/boofcv_processing/src').mkdir()
     file('tmp/boofcv_processing/examples').mkdir()
     file('tmp/boofcv_processing/data').mkdir()
@@ -112,6 +128,10 @@ task processingDirectory( dependsOn:processingJar) {
             into 'tmp/boofcv_processing/examples/RemovePerspective'
         }
 
+        copy {
+            from javadoc.destinationDir
+            into 'tmp/boofcv_processing/reference'
+        }
         copy {
             from 'src'
             into 'tmp/boofcv_processing/src'

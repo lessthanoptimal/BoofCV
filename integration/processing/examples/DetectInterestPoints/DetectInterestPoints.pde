@@ -1,3 +1,5 @@
+// Detects interest points in an image.  Then draws the size and location of the found interest point
+
 import boofcv.processing.*;
 import boofcv.struct.image.*;
 import georegression.struct.point.*;

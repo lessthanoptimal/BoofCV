@@ -42,7 +42,7 @@ public class FactoryAssociation {
 	 * @param backwardsValidation If true associations are validated by associating in the reverse direction.  If the 
 	 *                  forward and reverse matches fit an association is excepted.
 	 * @param <D> Data structure being associated
-	 * @return 
+	 * @return AssociateDescription
 	 */
 	public static <D> AssociateDescription<D>
 	greedy( ScoreAssociation<D> score ,

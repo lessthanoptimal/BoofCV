@@ -1,3 +1,8 @@
+// Launches your webcam and when you select an object it will track it.
+// By modifying the code below you can change the type of tracker used.
+// None of the trackers are perfect and they each have different strengths
+// and weaknesses.
+
 import processing.video.*;
 import boofcv.processing.*;
 import boofcv.struct.image.*;

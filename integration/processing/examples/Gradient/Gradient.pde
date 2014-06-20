@@ -1,3 +1,5 @@
+// Finds the image gradient for the input image and visualizes it
+
 import boofcv.processing.*;
 import boofcv.struct.image.*;
 

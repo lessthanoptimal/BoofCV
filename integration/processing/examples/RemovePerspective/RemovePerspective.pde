@@ -1,3 +1,5 @@
+// Given 4 corners of a shape which is known to be rectangular, remove the perspective distortion from it
+
 import boofcv.processing.*;
 import boofcv.struct.image.*;
 
