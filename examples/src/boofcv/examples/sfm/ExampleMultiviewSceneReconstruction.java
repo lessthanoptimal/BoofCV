@@ -76,7 +76,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class ExampleStructureFromMotion {
+public class ExampleMultiviewSceneReconstruction {
 
 	// Converts a point from pixel to normalized image coordinates
 	PointTransform_F64 pixelToNorm;
@@ -667,7 +667,7 @@ public class ExampleStructureFromMotion {
 
 		List<BufferedImage> images = UtilImageIO.loadImages(directory,".*jpg");
 
-		ExampleStructureFromMotion example = new ExampleStructureFromMotion();
+		ExampleMultiviewSceneReconstruction example = new ExampleMultiviewSceneReconstruction();
 
 		long before = System.currentTimeMillis();
 		example.process(intrinsic,images);

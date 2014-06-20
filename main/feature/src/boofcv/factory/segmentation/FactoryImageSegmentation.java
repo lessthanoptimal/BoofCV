@@ -31,7 +31,7 @@ import boofcv.struct.image.ImageType;
  */
 public class FactoryImageSegmentation {
 
-	public static <T extends ImageBase>ImageSegmentation<T>
+	public static <T extends ImageBase>ImageSuperpixels<T>
 	meanShift( ConfigSegmentMeanShift config ,  ImageType<T> imageType )
 	{
 		if( config == null )
@@ -40,18 +40,18 @@ public class FactoryImageSegmentation {
 
 		SegmentMeanShift<T> ms = FactorySegmentationAlg.meanShift(config,imageType);
 
-		return new MeanShift_to_ImageSegmentation<T>(ms,config.connectRule);
+		return new MeanShift_to_ImageSuperpixels<T>(ms,config.connectRule);
 	}
 
-	public static <T extends ImageBase>ImageSegmentation<T>
+	public static <T extends ImageBase>ImageSuperpixels<T>
 	slic( ConfigSlic config , ImageType<T> imageType )
 	{
 		SegmentSlic<T> ms = FactorySegmentationAlg.slic(config, imageType);
 
-		return new Slic_to_ImageSegmentation<T>(ms);
+		return new Slic_to_ImageSuperpixels<T>(ms);
 	}
 
-	public static <T extends ImageBase>ImageSegmentation<T>
+	public static <T extends ImageBase>ImageSuperpixels<T>
 	fh04( ConfigFh04 config , ImageType<T> imageType )
 	{
 		if( config == null )
@@ -59,12 +59,12 @@ public class FactoryImageSegmentation {
 
 		SegmentFelzenszwalbHuttenlocher04<T> fh = FactorySegmentationAlg.fh04(config, imageType);
 
-		return new Fh04_to_ImageSegmentation<T>(fh,config.connectRule);
+		return new Fh04_to_ImageSuperpixels<T>(fh,config.connectRule);
 	}
 
 	/**
 	 * Creates an instance of {@link WatershedVincentSoille1991}.  Watershed works better when initial seeds
-	 * are provided.  In this adaptation of watershed to {@link ImageSegmentation} only the more basic algorithm
+	 * are provided.  In this adaptation of watershed to {@link boofcv.abst.segmentation.ImageSuperpixels} only the more basic algorithm
 	 * is used where each local minima is a region, which causes over segmentation.  Watershed also only can process
 	 * gray scale U8 images.  All other image types are converted into that format.
 	 *
@@ -74,7 +74,7 @@ public class FactoryImageSegmentation {
 	 * @param <T>
 	 * @return
 	 */
-	public static <T extends ImageBase>ImageSegmentation<T>
+	public static <T extends ImageBase>ImageSuperpixels<T>
 	watershed( ConfigWatershed config , ImageType<T> imageType )
 	{
 		if( config == null )
@@ -82,7 +82,7 @@ public class FactoryImageSegmentation {
 
 		WatershedVincentSoille1991 watershed = FactorySegmentationAlg.watershed(config.connectRule);
 
-		Watershed_to_ImageSegmentation ret = new Watershed_to_ImageSegmentation<T>(watershed,config.minimumRegionSize,config.connectRule);
+		Watershed_to_ImageSuperpixels ret = new Watershed_to_ImageSuperpixels<T>(watershed,config.minimumRegionSize,config.connectRule);
 		ret.setImageType(imageType);
 		return ret;
 	}

@@ -374,7 +374,7 @@ public class BinaryImageOps {
 	 * @see LinearContourLabelChang2004
 	 *
 	 * @param input Input binary image.  Not modified.
-	 * @oaram rule Connectivity rule.  Can be 4 or 8.  8 is more commonly used.
+	 * @param rule Connectivity rule.  Can be 4 or 8.  8 is more commonly used.
 	 * @param output (Optional) Output labeled image. If null, an image will be declared internally.  Modified.
 	 * @return List of found contours for each blob.
 	 */
@@ -459,15 +459,10 @@ public class BinaryImageOps {
 
 			for( ; indexIn < end; indexIn++, indexOut++ ) {
 				int val = labelImage.data[indexIn];
-				if( 0 == val ) {
-					binaryImage.data[indexOut] = 0;
+				if( selectedBlobs[val] ) {
+					binaryImage.data[indexOut] = 1;
 				} else {
-					if( selectedBlobs[val] ) {
-						binaryImage.data[indexOut] = 1;
-					} else {
-						binaryImage.data[indexOut] = 0;
-					}
-
+					binaryImage.data[indexOut] = 0;
 				}
 			}
 		}

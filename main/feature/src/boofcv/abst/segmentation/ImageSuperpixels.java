@@ -24,19 +24,38 @@ import boofcv.struct.image.ImageSInt32;
 import boofcv.struct.image.ImageType;
 
 /**
- * High level interface for image segmentation.  Each pixel in the segmented image is assigned an integer label
- * to identify which region in the image it belongs to.  A region is a continuous connected set of pixels.
+ * High level interface for computing superpixels.  Superpixels are sets of connected adjacent pixels which belong.
+ * They are intended to break the image up intelligently along object boundaries allowing for easier processing.
+ * Each pixel in the output segmented image is assigned an integer label to identify which region in the image it
+ * belongs to.  A region is a continuous connected set of pixels.
  *
  * @author Peter Abeles
  */
-// TODO add size to the interface since everything computes the size?
-public interface ImageSegmentation<T extends ImageBase> {
+public interface ImageSuperpixels<T extends ImageBase> {
 
+	/**
+	 * Segments the input image into superpixels and puts the output in labeled image.
+	 * @param input (Input) image.
+	 * @param output (Output) Labeled image
+	 */
 	public void segment( T input , ImageSInt32 output );
 
-	public int getTotalSegments();
+	/**
+	 * Returns the total number of image segments/superpixels found
+	 * @return Number of superpixels
+	 */
+	public int getTotalSuperpixels();
 
+	/**
+	 * Connectivity rule used to determine if a pixel is connected
+	 * @return Connectivity rule
+	 */
 	public ConnectRule getRule();
 
+	/**
+	 * Type of input image it can process
+	 *
+	 * @return Input image type
+	 */
 	public ImageType<T> getImageType();
 }

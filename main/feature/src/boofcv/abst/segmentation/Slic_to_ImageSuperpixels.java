@@ -18,52 +18,42 @@
 
 package boofcv.abst.segmentation;
 
-import boofcv.alg.segmentation.ImageSegmentationOps;
-import boofcv.alg.segmentation.fh04.SegmentFelzenszwalbHuttenlocher04;
+import boofcv.alg.segmentation.slic.SegmentSlic;
 import boofcv.struct.ConnectRule;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageSInt32;
 import boofcv.struct.image.ImageType;
 
 /**
- * Wrapper around {@link SegmentFelzenszwalbHuttenlocher04} for {@link ImageSegmentation}.
+ * Wrapper around {@link SegmentSlic} for {@link ImageSuperpixels}.
  *
  * @author Peter Abeles
  */
-public class Fh04_to_ImageSegmentation<T extends ImageBase> implements ImageSegmentation<T> {
+public class Slic_to_ImageSuperpixels<T extends ImageBase> implements ImageSuperpixels<T> {
 
-	SegmentFelzenszwalbHuttenlocher04<T> alg;
-	ConnectRule rule;
+	SegmentSlic<T> slic;
 
-	ImageSInt32 pixelToSegment = new ImageSInt32(1,1);
-
-	public Fh04_to_ImageSegmentation(SegmentFelzenszwalbHuttenlocher04<T> alg, ConnectRule rule) {
-		this.alg = alg;
-		this.rule = rule;
+	public Slic_to_ImageSuperpixels(SegmentSlic<T> slic) {
+		this.slic = slic;
 	}
 
 	@Override
 	public void segment(T input, ImageSInt32 output) {
-
-		pixelToSegment.reshape(input.width, input.height);
-
-		alg.process(input,pixelToSegment);
-
-		ImageSegmentationOps.regionPixelId_to_Compact(pixelToSegment, alg.getRegionId(), output);
+		slic.process(input,output);
 	}
 
 	@Override
-	public int getTotalSegments() {
-		return alg.getRegionSizes().size();
+	public int getTotalSuperpixels() {
+		return slic.getRegionMemberCount().size;
 	}
 
 	@Override
 	public ConnectRule getRule() {
-		return rule;
+		return slic.getConnectRule();
 	}
 
 	@Override
 	public ImageType<T> getImageType() {
-		return alg.getInputType();
+		return slic.getImageType();
 	}
 }

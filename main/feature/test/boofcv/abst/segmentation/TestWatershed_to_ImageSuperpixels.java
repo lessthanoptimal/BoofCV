@@ -27,8 +27,8 @@ import boofcv.struct.image.ImageUInt8;
 /**
  * @author Peter Abeles
  */
-public class TestWatershed_to_ImageSegmentation <T extends ImageBase> extends GeneralImageSegmentationChecks<T> {
-	public TestWatershed_to_ImageSegmentation() {
+public class TestWatershed_to_ImageSuperpixels<T extends ImageBase> extends GeneralImageSuperpixelsChecks<T> {
+	public TestWatershed_to_ImageSuperpixels() {
 		super(ImageType.single(ImageUInt8.class),
 				ImageType.single(ImageFloat32.class),
 				ImageType.ms(3, ImageUInt8.class),
@@ -36,7 +36,7 @@ public class TestWatershed_to_ImageSegmentation <T extends ImageBase> extends Ge
 	}
 
 	@Override
-	public ImageSegmentation<T> createAlg( ImageType<T> imageType ) {
+	public ImageSuperpixels<T> createAlg( ImageType<T> imageType ) {
 		return FactoryImageSegmentation.watershed(null,null);
 	}
 

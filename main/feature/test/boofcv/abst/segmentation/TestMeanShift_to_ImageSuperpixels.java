@@ -18,42 +18,26 @@
 
 package boofcv.abst.segmentation;
 
-import boofcv.alg.segmentation.slic.SegmentSlic;
-import boofcv.struct.ConnectRule;
+import boofcv.factory.segmentation.ConfigSegmentMeanShift;
+import boofcv.factory.segmentation.FactoryImageSegmentation;
 import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageSInt32;
+import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageType;
+import boofcv.struct.image.ImageUInt8;
 
 /**
- * Wrapper around {@link SegmentSlic} for {@link ImageSegmentation}.
- *
  * @author Peter Abeles
  */
-public class Slic_to_ImageSegmentation<T extends ImageBase> implements ImageSegmentation<T> {
-
-	SegmentSlic<T> slic;
-
-	public Slic_to_ImageSegmentation(SegmentSlic<T> slic) {
-		this.slic = slic;
+public class TestMeanShift_to_ImageSuperpixels<T extends ImageBase> extends GeneralImageSuperpixelsChecks<T> {
+	public TestMeanShift_to_ImageSuperpixels() {
+		super(ImageType.single(ImageUInt8.class),
+				ImageType.single(ImageFloat32.class),
+				ImageType.ms(3, ImageUInt8.class),
+				ImageType.ms(3, ImageFloat32.class));
 	}
 
 	@Override
-	public void segment(T input, ImageSInt32 output) {
-		slic.process(input,output);
-	}
-
-	@Override
-	public int getTotalSegments() {
-		return slic.getRegionMemberCount().size;
-	}
-
-	@Override
-	public ConnectRule getRule() {
-		return null;
-	}
-
-	@Override
-	public ImageType<T> getImageType() {
-		return slic.getImageType();
+	public ImageSuperpixels<T> createAlg( ImageType<T> imageType ) {
+		return FactoryImageSegmentation.meanShift(new ConfigSegmentMeanShift(2,20,3,true), imageType);
 	}
 }
