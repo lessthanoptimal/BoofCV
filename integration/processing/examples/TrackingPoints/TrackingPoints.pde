@@ -1,3 +1,7 @@
+// Launches the webcam and detects corner features in the image which are then tracked using KLT.
+// KLT has many uses and can be used to track objects in the view or estimate the 3D structure
+// of a scene.  In this case it just looks cool.
+
 import processing.video.*;
 import boofcv.processing.*;
 import boofcv.struct.image.*;
@@ -6,6 +10,7 @@ import boofcv.abst.feature.detect.interest.*;
 
 Capture cam;
 SimpleTrackerPoints tracker;
+int target = 100;
 
 void setup() {
   // Open up the camera so that it has a video feed to process
@@ -18,6 +23,7 @@ void setup() {
   tracker = Boof.trackerKlt(null,confDetector,ImageDataType.F32);
 }
 
+
 void draw() {
   if (cam.available() == true) {
     cam.read();
@@ -25,8 +31,10 @@ void draw() {
     tracker.process(cam);
 
     // spawn new tracks if there are too few active
-    if( tracker.totalTracks() < 75 ) {
+    if( tracker.totalTracks() < target ) {
       tracker.spawnTracks();
+      target = (int)(tracker.totalTracks()*0.4);
+      target = target < 30 ? 30 : target;
     }
   }
   image(cam, 0, 0);

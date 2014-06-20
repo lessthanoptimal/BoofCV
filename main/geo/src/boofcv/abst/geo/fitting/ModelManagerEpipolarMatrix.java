@@ -22,7 +22,7 @@ import org.ddogleg.fitting.modelset.ModelManager;
 import org.ejml.data.DenseMatrix64F;
 
 /**
- * {@link ModelManager} for 3x3 {@liuk DenseMatrix64F}.
+ * {@link ModelManager} for 3x3 {@link DenseMatrix64F}.
  *
  * @author Peter Abeles
  */

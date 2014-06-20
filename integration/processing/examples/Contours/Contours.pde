@@ -1,3 +1,5 @@
+// Converts the image from gray scale into binary and then finds the contour around each binary blob.
+// Internal and external contours of each blob are drawn a different color.
 import boofcv.processing.*;
 import boofcv.struct.image.*;
 

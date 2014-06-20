@@ -1,3 +1,6 @@
+// Converts the image into a binary image, finds the contours of each blob, and then fits
+// a polygon to each external contour.
+
 import boofcv.processing.*;
 import boofcv.struct.image.*;
 import georegression.struct.point.*;

@@ -1,3 +1,6 @@
+// Detects interest points between two images and matches them together.
+// These matches are shown by drawing a line between the matching features in each images.
+
 import boofcv.processing.*;
 import boofcv.struct.image.*;
 import boofcv.struct.feature.*;

@@ -1,3 +1,7 @@
+// Applies different image enhancement operators to the input image.
+// These operators are designed to make features inside the image easier for a person to see.
+// Each time you click the image it switches to a different one.
+
 import boofcv.processing.*;
 import boofcv.struct.image.*;
 
