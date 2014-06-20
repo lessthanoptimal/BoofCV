@@ -18,10 +18,13 @@
 
 package boofcv.abst.segmentation;
 
+import boofcv.alg.filter.binary.BinaryImageOps;
 import boofcv.alg.misc.GImageMiscOps;
+import boofcv.struct.ConnectRule;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageSInt32;
 import boofcv.struct.image.ImageType;
+import boofcv.struct.image.ImageUInt8;
 import boofcv.testing.BoofTesting;
 import org.junit.Test;
 
@@ -33,7 +36,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author Peter Abeles
  */
-public abstract class GeneralImageSegmentationChecks<T extends ImageBase> {
+public abstract class GeneralImageSuperpixelsChecks<T extends ImageBase> {
 
 	ImageType imageTypes[];
 
@@ -42,11 +45,45 @@ public abstract class GeneralImageSegmentationChecks<T extends ImageBase> {
 	int width = 20;
 	int height = 30;
 
-	public GeneralImageSegmentationChecks(ImageType ...types ) {
+	public GeneralImageSuperpixelsChecks(ImageType... types) {
 		this.imageTypes = types;
 	}
 
-	public abstract ImageSegmentation<T> createAlg( ImageType<T> imageType );
+	public abstract ImageSuperpixels<T> createAlg( ImageType<T> imageType );
+
+	/**
+	 * Makes sure all pixels with the same label are connected
+	 */
+	@Test
+	public void connectivity() {
+		for( ImageType<T> t : imageTypes ) {
+//			System.out.println("Image type "+t);
+
+			ImageSuperpixels<T> alg = createAlg(t);
+
+			T input = t.createImage(width, height);
+			ImageSInt32 output = new ImageSInt32(width, height);
+
+			GImageMiscOps.fillUniform(input, rand, 0, 100);
+
+			alg.segment(input, output);
+
+			assertTrue(alg.getTotalSuperpixels() > 4);
+
+			ImageUInt8 binary = new ImageUInt8(width,height);
+			boolean selected[] = new boolean[ alg.getTotalSuperpixels()];
+
+			for (int i = 0; i < alg.getTotalSuperpixels(); i++) {
+				selected[i] = true;
+				BinaryImageOps.labelToBinary(output,binary,selected);
+				selected[i] = false;
+
+				// the number of blobs should always be one
+				ConnectRule rule = alg.getRule();
+				assertEquals(1,BinaryImageOps.contour(binary,rule,null).size());
+			}
+		}
+	}
 
 	/**
 	 * Make sure subimages produce the same results
@@ -56,7 +93,7 @@ public abstract class GeneralImageSegmentationChecks<T extends ImageBase> {
 		for( ImageType<T> t : imageTypes ) {
 //			System.out.println("Image type "+t);
 
-			ImageSegmentation<T> alg = createAlg(t);
+			ImageSuperpixels<T> alg = createAlg(t);
 
 			T input = t.createImage(width,height);
 			ImageSInt32 expected = new ImageSInt32(width,height);
@@ -86,7 +123,7 @@ public abstract class GeneralImageSegmentationChecks<T extends ImageBase> {
 	public void sequentialNumbers() {
 		for( ImageType<T> t : imageTypes ) {
 
-			ImageSegmentation<T> alg = createAlg(t);
+			ImageSuperpixels<T> alg = createAlg(t);
 
 			T input = t.createImage(width,height);
 			ImageSInt32 output = new ImageSInt32(width,height);
@@ -94,7 +131,7 @@ public abstract class GeneralImageSegmentationChecks<T extends ImageBase> {
 
 			alg.segment(input,output);
 
-			int N = alg.getTotalSegments();
+			int N = alg.getTotalSuperpixels();
 			assertTrue(N > 2);
 
 			boolean found[] = new boolean[N];
@@ -121,7 +158,7 @@ public abstract class GeneralImageSegmentationChecks<T extends ImageBase> {
 	public void multipleCalls() {
 		for( ImageType<T> t : imageTypes ) {
 
-			ImageSegmentation<T> alg = createAlg(t);
+			ImageSuperpixels<T> alg = createAlg(t);
 
 			T input = t.createImage(width,height);
 			ImageSInt32 output = new ImageSInt32(width,height);
@@ -147,7 +184,7 @@ public abstract class GeneralImageSegmentationChecks<T extends ImageBase> {
 	public void changeInImageSize() {
 		for( ImageType<T> t : imageTypes ) {
 
-			ImageSegmentation<T> alg = createAlg(t);
+			ImageSuperpixels<T> alg = createAlg(t);
 
 			T input = t.createImage(width/2,height/2);
 			ImageSInt32 output = new ImageSInt32(width/2,height/2);

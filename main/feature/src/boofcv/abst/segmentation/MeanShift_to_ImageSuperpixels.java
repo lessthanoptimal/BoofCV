@@ -18,27 +18,43 @@
 
 package boofcv.abst.segmentation;
 
-import boofcv.factory.segmentation.ConfigFh04;
-import boofcv.factory.segmentation.FactoryImageSegmentation;
+import boofcv.alg.segmentation.ms.SegmentMeanShift;
 import boofcv.struct.ConnectRule;
 import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageSInt32;
 import boofcv.struct.image.ImageType;
-import boofcv.struct.image.ImageUInt8;
 
 /**
  * @author Peter Abeles
  */
-public class TestFh04_to_ImageSegmentation<T extends ImageBase> extends GeneralImageSegmentationChecks<T> {
-	public TestFh04_to_ImageSegmentation() {
-		super(ImageType.single(ImageUInt8.class),
-				ImageType.single(ImageFloat32.class),
-				ImageType.ms(3, ImageUInt8.class),
-				ImageType.ms(3, ImageFloat32.class));
+public class MeanShift_to_ImageSuperpixels<T extends ImageBase>
+		implements ImageSuperpixels<T>
+{
+	SegmentMeanShift<T> ms;
+	ConnectRule rule;
+
+	public MeanShift_to_ImageSuperpixels(SegmentMeanShift<T> ms, ConnectRule rule) {
+		this.ms = ms;
+		this.rule = rule;
 	}
 
 	@Override
-	public ImageSegmentation<T> createAlg( ImageType<T> imageType ) {
-		return FactoryImageSegmentation.fh04(new ConfigFh04(20,8, ConnectRule.FOUR), imageType);
+	public void segment(T input, ImageSInt32 output) {
+		ms.process(input,output);
+	}
+
+	@Override
+	public int getTotalSuperpixels() {
+		return ms.getNumberOfRegions();
+	}
+
+	@Override
+	public ConnectRule getRule() {
+		return rule;
+	}
+
+	@Override
+	public ImageType<T> getImageType() {
+		return ms.getImageType();
 	}
 }

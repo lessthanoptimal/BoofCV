@@ -3,6 +3,15 @@ Change Log
 Date Format: year/month/day
 
 ---------------------------------------------
+Date    : 2014
+Version : Alpha 0.18
+
+- Renamed ImageSegmentation to ImageSuperpixels
+ * Added a unit test which ensures connectivity requirement is meet
+ * Fixed issue with SLIC where it did not set its ConnectRule
+- Renamed ExampleStructureFromMotion to ExampleMultiviewSceneReconstruction
+
+---------------------------------------------
 Date    : 2014/6/19
 Version : Alpha 0.17
 

@@ -34,13 +34,13 @@ import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_I32;
 
 /**
- * Wrapper around {@link WatershedVincentSoille1991} for {@link ImageSegmentation}.  Watershed regions
+ * Wrapper around {@link WatershedVincentSoille1991} for {@link ImageSuperpixels}.  Watershed regions
  * and small regions are merged together.  When merging regions a preference is given to regions which are the
  * most similar in color intensity.
  *
  * @author Peter Abeles
  */
-public class Watershed_to_ImageSegmentation<T extends ImageBase> implements ImageSegmentation<T> {
+public class Watershed_to_ImageSuperpixels<T extends ImageBase> implements ImageSuperpixels<T> {
 
 	private WatershedVincentSoille1991 alg;
 	private ConnectRule rule;
@@ -58,7 +58,7 @@ public class Watershed_to_ImageSegmentation<T extends ImageBase> implements Imag
 	// but is required by the interface
 	private ImageType<T> imageType;
 
-	public Watershed_to_ImageSegmentation(WatershedVincentSoille1991 alg , int minimumSize,  ConnectRule rule ) {
+	public Watershed_to_ImageSuperpixels(WatershedVincentSoille1991 alg, int minimumSize, ConnectRule rule) {
 		this.alg = alg;
 		this.rule = rule;
 
@@ -95,7 +95,7 @@ public class Watershed_to_ImageSegmentation<T extends ImageBase> implements Imag
 	}
 
 	@Override
-	public int getTotalSegments() {
+	public int getTotalSuperpixels() {
 		return numRegions;
 	}
 

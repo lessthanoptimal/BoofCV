@@ -18,34 +18,43 @@
 
 package boofcv.abst.segmentation;
 
-import boofcv.alg.segmentation.ms.SegmentMeanShift;
+import boofcv.alg.segmentation.ImageSegmentationOps;
+import boofcv.alg.segmentation.fh04.SegmentFelzenszwalbHuttenlocher04;
 import boofcv.struct.ConnectRule;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageSInt32;
 import boofcv.struct.image.ImageType;
 
 /**
+ * Wrapper around {@link SegmentFelzenszwalbHuttenlocher04} for {@link ImageSuperpixels}.
+ *
  * @author Peter Abeles
  */
-public class MeanShift_to_ImageSegmentation<T extends ImageBase>
-		implements ImageSegmentation<T>
-{
-	SegmentMeanShift<T> ms;
+public class Fh04_to_ImageSuperpixels<T extends ImageBase> implements ImageSuperpixels<T> {
+
+	SegmentFelzenszwalbHuttenlocher04<T> alg;
 	ConnectRule rule;
 
-	public MeanShift_to_ImageSegmentation(SegmentMeanShift<T> ms , ConnectRule rule ) {
-		this.ms = ms;
+	ImageSInt32 pixelToSegment = new ImageSInt32(1,1);
+
+	public Fh04_to_ImageSuperpixels(SegmentFelzenszwalbHuttenlocher04<T> alg, ConnectRule rule) {
+		this.alg = alg;
 		this.rule = rule;
 	}
 
 	@Override
 	public void segment(T input, ImageSInt32 output) {
-		ms.process(input,output);
+
+		pixelToSegment.reshape(input.width, input.height);
+
+		alg.process(input,pixelToSegment);
+
+		ImageSegmentationOps.regionPixelId_to_Compact(pixelToSegment, alg.getRegionId(), output);
 	}
 
 	@Override
-	public int getTotalSegments() {
-		return ms.getNumberOfRegions();
+	public int getTotalSuperpixels() {
+		return alg.getRegionSizes().size();
 	}
 
 	@Override
@@ -55,6 +64,6 @@ public class MeanShift_to_ImageSegmentation<T extends ImageBase>
 
 	@Override
 	public ImageType<T> getImageType() {
-		return ms.getImageType();
+		return alg.getInputType();
 	}
 }

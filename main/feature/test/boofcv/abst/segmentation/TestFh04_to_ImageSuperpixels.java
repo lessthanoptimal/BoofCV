@@ -18,8 +18,9 @@
 
 package boofcv.abst.segmentation;
 
-import boofcv.factory.segmentation.ConfigSlic;
+import boofcv.factory.segmentation.ConfigFh04;
 import boofcv.factory.segmentation.FactoryImageSegmentation;
+import boofcv.struct.ConnectRule;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageType;
@@ -28,8 +29,8 @@ import boofcv.struct.image.ImageUInt8;
 /**
  * @author Peter Abeles
  */
-public class TestSlic_to_ImageSegmentation<T extends ImageBase> extends GeneralImageSegmentationChecks<T> {
-	public TestSlic_to_ImageSegmentation() {
+public class TestFh04_to_ImageSuperpixels<T extends ImageBase> extends GeneralImageSuperpixelsChecks<T> {
+	public TestFh04_to_ImageSuperpixels() {
 		super(ImageType.single(ImageUInt8.class),
 				ImageType.single(ImageFloat32.class),
 				ImageType.ms(3, ImageUInt8.class),
@@ -37,7 +38,7 @@ public class TestSlic_to_ImageSegmentation<T extends ImageBase> extends GeneralI
 	}
 
 	@Override
-	public ImageSegmentation<T> createAlg( ImageType<T> imageType ) {
-		return FactoryImageSegmentation.slic(new ConfigSlic(12), imageType);
+	public ImageSuperpixels<T> createAlg( ImageType<T> imageType ) {
+		return FactoryImageSegmentation.fh04(new ConfigFh04(20,8, ConnectRule.FOUR), imageType);
 	}
 }

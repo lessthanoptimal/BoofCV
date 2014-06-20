@@ -24,7 +24,7 @@ import boofcv.abst.feature.detdesc.DetectDescribePoint;
 import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
 import boofcv.abst.feature.tracker.PointTracker;
 import boofcv.abst.flow.DenseOpticalFlow;
-import boofcv.abst.segmentation.ImageSegmentation;
+import boofcv.abst.segmentation.ImageSuperpixels;
 import boofcv.abst.tracker.ConfigCirculantTracker;
 import boofcv.abst.tracker.ConfigComaniciu2003;
 import boofcv.abst.tracker.ConfigTld;
@@ -182,22 +182,22 @@ public class Boof {
 	}
 
 	public static SimpleImageSegmentation segmentMeanShift( ConfigSegmentMeanShift config , ImageType imageType ) {
-		ImageSegmentation alg = FactoryImageSegmentation.meanShift(config,imageType);
+		ImageSuperpixels alg = FactoryImageSegmentation.meanShift(config,imageType);
 		return new SimpleImageSegmentation(alg);
 	}
 
 	public static SimpleImageSegmentation segmentSlic( ConfigSlic config , ImageType imageType ) {
-		ImageSegmentation alg = FactoryImageSegmentation.slic(config, imageType);
+		ImageSuperpixels alg = FactoryImageSegmentation.slic(config, imageType);
 		return new SimpleImageSegmentation(alg);
 	}
 
 	public static SimpleImageSegmentation segmentFH04( ConfigFh04 config , ImageType imageType ) {
-		ImageSegmentation alg = FactoryImageSegmentation.fh04(config, imageType);
+		ImageSuperpixels alg = FactoryImageSegmentation.fh04(config, imageType);
 		return new SimpleImageSegmentation(alg);
 	}
 
 	public static SimpleImageSegmentation segmentWatershed( ConfigWatershed config , ImageType imageType ) {
-		ImageSegmentation alg = FactoryImageSegmentation.watershed(config, imageType);
+		ImageSuperpixels alg = FactoryImageSegmentation.watershed(config, imageType);
 		return new SimpleImageSegmentation(alg);
 	}
 

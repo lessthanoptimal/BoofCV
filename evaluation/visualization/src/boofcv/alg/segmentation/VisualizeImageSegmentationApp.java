@@ -18,7 +18,7 @@
 
 package boofcv.alg.segmentation;
 
-import boofcv.abst.segmentation.ImageSegmentation;
+import boofcv.abst.segmentation.ImageSuperpixels;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.factory.segmentation.FactoryImageSegmentation;
 import boofcv.factory.segmentation.FactorySegmentationAlg;
@@ -38,7 +38,7 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
 /**
- * Visualization for {@link ImageSegmentation}.
+ * Visualization for {@link boofcv.abst.segmentation.ImageSuperpixels}.
  *
  * @author Peter Abeles
  */
@@ -53,7 +53,7 @@ public class VisualizeImageSegmentationApp <T extends ImageBase>
 	BufferedImage outSegments = new BufferedImage(1,1,BufferedImage.TYPE_INT_RGB);
 	BufferedImage outBorder = new BufferedImage(1,1,BufferedImage.TYPE_INT_RGB);
 
-	ImageSegmentation<T> alg = null;
+	ImageSuperpixels<T> alg = null;
 
 	int activeDisplay = 0;
 
@@ -200,7 +200,7 @@ public class VisualizeImageSegmentationApp <T extends ImageBase>
 
 		System.out.println("Total time "+(after-before));
 
-		int numSegments = alg.getTotalSegments();
+		int numSegments = alg.getTotalSuperpixels();
 
 		// Computes the mean color inside each region
 		ImageType<T> type = color.getImageType();

@@ -18,7 +18,7 @@
 
 package boofcv.abst.segmentation;
 
-import boofcv.factory.segmentation.ConfigSegmentMeanShift;
+import boofcv.factory.segmentation.ConfigSlic;
 import boofcv.factory.segmentation.FactoryImageSegmentation;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
@@ -28,8 +28,8 @@ import boofcv.struct.image.ImageUInt8;
 /**
  * @author Peter Abeles
  */
-public class TestMeanShift_to_ImageSegmentation<T extends ImageBase> extends GeneralImageSegmentationChecks<T> {
-	public TestMeanShift_to_ImageSegmentation() {
+public class TestSlic_to_ImageSuperpixels<T extends ImageBase> extends GeneralImageSuperpixelsChecks<T> {
+	public TestSlic_to_ImageSuperpixels() {
 		super(ImageType.single(ImageUInt8.class),
 				ImageType.single(ImageFloat32.class),
 				ImageType.ms(3, ImageUInt8.class),
@@ -37,7 +37,7 @@ public class TestMeanShift_to_ImageSegmentation<T extends ImageBase> extends Gen
 	}
 
 	@Override
-	public ImageSegmentation<T> createAlg( ImageType<T> imageType ) {
-		return FactoryImageSegmentation.meanShift(new ConfigSegmentMeanShift(2,20,3,true), imageType);
+	public ImageSuperpixels<T> createAlg( ImageType<T> imageType ) {
+		return FactoryImageSegmentation.slic(new ConfigSlic(12), imageType);
 	}
 }

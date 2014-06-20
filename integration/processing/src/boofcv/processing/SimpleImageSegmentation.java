@@ -18,23 +18,23 @@
 
 package boofcv.processing;
 
-import boofcv.abst.segmentation.ImageSegmentation;
+import boofcv.abst.segmentation.ImageSuperpixels;
 import boofcv.struct.ConnectRule;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageSInt32;
 import processing.core.PImage;
 
 /**
- * Simplified interface around {@link boofcv.abst.segmentation.ImageSegmentation}.
+ * Simplified interface around {@link boofcv.abst.segmentation.ImageSuperpixels}.
  *
  * @author Peter Abeles
  */
 public class SimpleImageSegmentation {
 	ImageBase image;
 	SimpleLabeledImage output = new SimpleLabeledImage(new ImageSInt32(1,1));
-	ImageSegmentation segmentation;
+	ImageSuperpixels segmentation;
 
-	public SimpleImageSegmentation(ImageSegmentation segmentation) {
+	public SimpleImageSegmentation(ImageSuperpixels segmentation) {
 		this.segmentation = segmentation;
 		image = segmentation.getImageType().createImage(1,1);
 	}
@@ -56,7 +56,7 @@ public class SimpleImageSegmentation {
 	}
 
 	public int getTotalSegments() {
-		return segmentation.getTotalSegments();
+		return segmentation.getTotalSuperpixels();
 	}
 
 	public ConnectRule getRule() {

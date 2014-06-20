@@ -18,7 +18,7 @@
 
 package boofcv.examples.segmentation;
 
-import boofcv.abst.segmentation.ImageSegmentation;
+import boofcv.abst.segmentation.ImageSuperpixels;
 import boofcv.alg.filter.blur.GBlurImageOps;
 import boofcv.alg.segmentation.ComputeRegionMeanColor;
 import boofcv.alg.segmentation.ImageSegmentationOps;
@@ -49,7 +49,7 @@ public class ExampleImageSegmentation {
 	 * Segments and visualizes the image
 	 */
 	public static <T extends ImageBase>
-	void performSegmentation( ImageSegmentation<T> alg , T color )
+	void performSegmentation( ImageSuperpixels<T> alg , T color )
 	{
 		// Segmentation often works better after blurring the image.  Reduces high frequency image components which
 		// can cause over segmentation
@@ -63,7 +63,7 @@ public class ExampleImageSegmentation {
 		alg.segment(color,pixelToSegment);
 
 		// Displays the results
-		visualize(pixelToSegment,color,alg.getTotalSegments());
+		visualize(pixelToSegment,color,alg.getTotalSuperpixels());
 	}
 
 	/**
@@ -118,7 +118,7 @@ public class ExampleImageSegmentation {
 
 //		ImageSegmentation alg = FactoryImageSegmentation.meanShift(null, imageType);
 //		ImageSegmentation alg = FactoryImageSegmentation.slic(new ConfigSlic(800), imageType);
-		ImageSegmentation alg = FactoryImageSegmentation.fh04(new ConfigFh04(100,30), imageType);
+		ImageSuperpixels alg = FactoryImageSegmentation.fh04(new ConfigFh04(100,30), imageType);
 //		ImageSegmentation alg = FactoryImageSegmentation.watershed(ConnectRule.EIGHT);
 
 		// Convert image into BoofCV format

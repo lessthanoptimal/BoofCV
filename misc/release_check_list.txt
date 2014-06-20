@@ -18,9 +18,12 @@
 ----
 Gradle
 
-Post a SNAPSHOT:
+To post a SNAPSHOT or full release:
 gradle uploadArchives
 
+SNAPSHOT is it has that in its name.
+
+log onto http://oss.sonatype.org
 -----
 Maven
 

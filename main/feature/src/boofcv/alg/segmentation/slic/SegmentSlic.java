@@ -103,8 +103,11 @@ public abstract class SegmentSlic<T extends ImageBase> {
 	protected FastQueue<Cluster> clusters;
 	protected FastQueue<Pixel> pixels = new FastQueue<Pixel>(Pixel.class,true);
 
-	// typre of input image
+	// type of input image
 	protected ImageType<T> imageType;
+
+	// connectivity rule
+	protected ConnectRule connectRule;
 
 	public SegmentSlic( int numberOfRegions , float m , int totalIterations ,
 						ConnectRule connectRule , ImageType<T> imageType ) {
@@ -112,6 +115,7 @@ public abstract class SegmentSlic<T extends ImageBase> {
 		this.m = m;
 		this.totalIterations = totalIterations;
 		this.numBands = imageType.getNumBands();
+		this.connectRule = connectRule;
 		this.imageType = imageType;
 
 		ComputeRegionMeanColor<T> regionColor = FactorySegmentationAlg.regionMeanColor(imageType);
@@ -464,5 +468,9 @@ public abstract class SegmentSlic<T extends ImageBase> {
 
 	public ImageType<T> getImageType() {
 		return imageType;
+	}
+
+	public ConnectRule getConnectRule() {
+		return connectRule;
 	}
 }
