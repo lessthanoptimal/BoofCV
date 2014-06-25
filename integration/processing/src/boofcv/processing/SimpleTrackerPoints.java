@@ -64,6 +64,8 @@ public class SimpleTrackerPoints {
 
 	public void spawnTracks() {
 		tracker.spawnTracks();
+		list.clear();
+		tracker.getActiveTracks(list);
 	}
 
 	void reset() {

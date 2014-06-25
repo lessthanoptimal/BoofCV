@@ -1,3 +1,6 @@
+// Detects lines inside an image using different variables of a Hough detector.
+// Each time you click the image it switches to a different type.
+
 import boofcv.processing.*;
 import boofcv.struct.image.*;
 import boofcv.alg.feature.detect.line.*;

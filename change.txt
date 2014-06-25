@@ -10,6 +10,10 @@ Version : Alpha 0.18
  * Added a unit test which ensures connectivity requirement is meet
  * Fixed issue with SLIC where it did not set its ConnectRule
 - Renamed ExampleStructureFromMotion to ExampleMultiviewSceneReconstruction
+- Processing
+ * Copies over processing JavaDoc
+ * Fixed SimpleTrackerPoints.spawn() which did not update the tracks before
+ * Added more comments to examples
 
 ---------------------------------------------
 Date    : 2014/6/19

@@ -1,3 +1,6 @@
+// Compares two images from a sequence and finds the motion of each pixel from the first
+// image to the second image
+
 import boofcv.processing.*;
 import boofcv.struct.image.*;
 
