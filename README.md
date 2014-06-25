@@ -49,13 +49,12 @@ downloading since they lack jars on Maven central. More on that later.
 
 Below are a few useful custom Gradle scripts that can be invoked:
 
-* _createLibraryDirectory_ : Will gather all the BoofCV jars and jars which boofcv/main depend on and place them in the boofcv/library directory.
+* _createLibraryDirectory_ : Will gather all the BoofCV jars (main and integration) and jars which boofcv/main depend on and place them in the boofcv/library directory.
 * _alljavadoc_ : Combines JavaDoc from all the sub-projects into one set.
 * _exampleRun_ : Used to run an example from boofcv/examples, e.g. "gradle exampleRun -Pwhich=boofcv.examples.imageprocessing.ExampleBinaryOps"
 * _webcamRun_ : Used to run an example from integration/WebcamCapture, e.g. "gradle webcamRun -Pwhich=boofcv.examples.ExampleTrackingKlt"
 
-_createLibraryDirectory_ will probably not generate all the jars in from 'boofcv/integration' that you're interested in.
-See the "Integration Modules" section below.
+_createLibraryDirectory_ unless all dependencies are meet, not all projects in 'boofcv/integration' will produce jars.  See the "Integration Modules" section below for the details.
 
 ## Compilation Error
 

@@ -7,3 +7,4 @@ Example in ~/.profile on Linux:
 export ANDROID_HOME=/path/to/android-sdk-linux/
 ------------- END -----------------
 
+To build this sub-project's jar type "gradle createLibraryDirectory" and look in boofcv/libraries for the compiled jar.
