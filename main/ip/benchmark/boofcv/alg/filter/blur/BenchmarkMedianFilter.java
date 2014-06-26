@@ -26,9 +26,6 @@ import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSInt16;
 import boofcv.struct.image.ImageSInt32;
 import boofcv.struct.image.ImageUInt8;
-import com.google.caliper.Param;
-import com.google.caliper.Runner;
-import com.google.caliper.SimpleBenchmark;
 
 import java.util.Random;
 
@@ -36,7 +33,7 @@ import java.util.Random;
  * Benchmark for different convolution operations.
  * @author Peter Abeles
  */
-public class BenchmarkMedianFilter extends SimpleBenchmark {
+public class BenchmarkMedianFilter  {
 	static int imgWidth = 640;
 	static int imgHeight = 480;
 	static long TEST_TIME = 1000;
@@ -50,7 +47,7 @@ public class BenchmarkMedianFilter extends SimpleBenchmark {
 	static ImageSInt32 out_I32 = new ImageSInt32(imgWidth,imgHeight);
 
 	// iterate through different sized kernel radius
-	@Param({"1", "2", "3", "5","10"}) private int radius;
+	private int radius;
 
 	public BenchmarkMedianFilter() {
 		Random rand = new Random(234);
@@ -98,6 +95,6 @@ public class BenchmarkMedianFilter extends SimpleBenchmark {
 		System.out.println("=========  Profile Image Size "+imgWidth+" x "+imgHeight+" ==========");
 		System.out.println();
 
-		Runner.main(BenchmarkMedianFilter.class, args);
+//		Runner.main(BenchmarkMedianFilter.class, args);
 	}
 }

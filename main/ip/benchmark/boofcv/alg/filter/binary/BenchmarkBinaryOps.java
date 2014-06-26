@@ -22,8 +22,6 @@ import boofcv.alg.filter.binary.impl.ImplBinaryInnerOps;
 import boofcv.alg.filter.binary.impl.ImplBinaryNaiveOps;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.struct.image.ImageUInt8;
-import com.google.caliper.Runner;
-import com.google.caliper.SimpleBenchmark;
 
 import java.util.Random;
 
@@ -32,7 +30,7 @@ import java.util.Random;
  *
  * @author Peter Abeles
  */
-public class BenchmarkBinaryOps extends SimpleBenchmark {
+public class BenchmarkBinaryOps  {
 	static int imgWidth = 640;
 	static int imgHeight = 480;
 
@@ -176,6 +174,6 @@ public class BenchmarkBinaryOps extends SimpleBenchmark {
 	public static void main(String args[]) {
 		System.out.println("=========  Profile Image Size " + imgWidth + " x " + imgHeight + " ==========");
 
-		Runner.main(BenchmarkBinaryOps.class, args);
+//		Runner.main(BenchmarkBinaryOps.class, args);
 	}
 }

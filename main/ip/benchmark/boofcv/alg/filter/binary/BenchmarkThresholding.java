@@ -21,8 +21,6 @@ package boofcv.alg.filter.binary;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.struct.image.ImageSInt32;
 import boofcv.struct.image.ImageUInt8;
-import com.google.caliper.Runner;
-import com.google.caliper.SimpleBenchmark;
 
 import java.util.Random;
 
@@ -31,7 +29,7 @@ import java.util.Random;
  *
  * @author Peter Abeles
  */
-public class BenchmarkThresholding extends SimpleBenchmark {
+public class BenchmarkThresholding {
 	static int imgWidth = 640;
 	static int imgHeight = 480;
 	static long TEST_TIME = 1000;
@@ -74,6 +72,6 @@ public class BenchmarkThresholding extends SimpleBenchmark {
 		System.out.println("=========  Profile Image Size " + imgWidth + " x " + imgHeight + " ==========");
 		System.out.println();
 
-		Runner.main(BenchmarkThresholding.class, args);
+//		Runner.main(BenchmarkThresholding.class, args);
 	}
 }

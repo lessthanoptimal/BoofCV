@@ -29,9 +29,6 @@ import boofcv.struct.convolve.Kernel1D_I32;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSInt16;
 import boofcv.struct.image.ImageUInt8;
-import com.google.caliper.Param;
-import com.google.caliper.Runner;
-import com.google.caliper.SimpleBenchmark;
 
 import java.util.Random;
 
@@ -40,7 +37,7 @@ import java.util.Random;
  * @author Peter Abeles
  */
 @SuppressWarnings({"UnusedDeclaration"})
-public class BenchmarkConvolveMean extends SimpleBenchmark {
+public class BenchmarkConvolveMean {
 	static private int width = 640;
 	static private int height = 480;
 	static private Random rand = new Random(234);
@@ -57,7 +54,8 @@ public class BenchmarkConvolveMean extends SimpleBenchmark {
 	static private BlurFilter<ImageFloat32> filter;
 
 	// iterate through different sized kernel radius
-	@Param({"1", "2", "3", "5","10"}) private int radius;
+//	@Param({"1", "2", "3", "5","10"})
+	private int radius;
 
 	public BenchmarkConvolveMean() {
 		ImageMiscOps.fillUniform(input_I8,rand,0,20);
@@ -65,7 +63,7 @@ public class BenchmarkConvolveMean extends SimpleBenchmark {
 		ImageMiscOps.fillUniform(input_F32,rand,0,20);
 	}
 
-	@Override protected void setUp() throws Exception {
+	protected void setUp() throws Exception {
 		filter = FactoryBlurFilter.mean(ImageFloat32.class,radius);
 		kernelF32 = FactoryKernel.table1D_F32(radius, true);
 		kernelI32 = FactoryKernel.table1D_I32(radius);
@@ -116,6 +114,6 @@ public class BenchmarkConvolveMean extends SimpleBenchmark {
 	public static void main( String args[] ) {
 		System.out.println("=========  Profile Image Size "+ width +" x "+ height +" ==========");
 
-		Runner.main(BenchmarkConvolveMean.class, args);
+//		Runner.main(BenchmarkConvolveMean.class, args);
 	}
 }

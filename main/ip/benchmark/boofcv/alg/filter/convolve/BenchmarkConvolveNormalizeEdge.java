@@ -29,9 +29,6 @@ import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSInt16;
 import boofcv.struct.image.ImageSInt32;
 import boofcv.struct.image.ImageUInt8;
-import com.google.caliper.Param;
-import com.google.caliper.Runner;
-import com.google.caliper.SimpleBenchmark;
 
 import java.util.Random;
 
@@ -41,7 +38,7 @@ import java.util.Random;
  * @author Peter Abeles
  */
 @SuppressWarnings({"UnusedDeclaration"})
-public class BenchmarkConvolveNormalizeEdge extends SimpleBenchmark {
+public class BenchmarkConvolveNormalizeEdge {
 	static private int imgWidth = 640;
 	static private int imgHeight = 480;
 
@@ -58,7 +55,8 @@ public class BenchmarkConvolveNormalizeEdge extends SimpleBenchmark {
 	static private ImageSInt32 out_I32;
 
 	// iterate through different sized kernel radius
-	@Param({"1", "2", "3", "5","10"}) private int radius;
+//	@Param({"1", "2", "3", "5","10"})
+	private int radius;
 
 	public BenchmarkConvolveNormalizeEdge() {
 		imgInt8 = new ImageUInt8(imgWidth,imgHeight);
@@ -75,7 +73,7 @@ public class BenchmarkConvolveNormalizeEdge extends SimpleBenchmark {
 		ImageMiscOps.fillUniform(imgFloat32,rand,0,200);
 	}
 
-	@Override protected void setUp() throws Exception {
+	protected void setUp() throws Exception {
 		kernelF32 = FactoryKernelGaussian.gaussian(Kernel1D_F32.class, -1, radius);
 		kernelI32 = FactoryKernelGaussian.gaussian(Kernel1D_I32.class, -1, radius);
 		kernel2D_F32 = FactoryKernelGaussian.gaussian(Kernel2D_F32.class,-1,radius);
@@ -127,6 +125,6 @@ public class BenchmarkConvolveNormalizeEdge extends SimpleBenchmark {
 	public static void main( String args[] ) {
 		System.out.println("=========  Profile Image Size "+ imgWidth +" x "+ imgHeight +" ==========");
 
-		Runner.main(BenchmarkConvolveMean.class, args);
+//		Runner.main(BenchmarkConvolveMean.class, args);
 	}
 }

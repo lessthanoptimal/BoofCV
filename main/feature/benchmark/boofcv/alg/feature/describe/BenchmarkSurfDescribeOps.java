@@ -24,8 +24,6 @@ import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.sparse.GradientValue;
 import boofcv.struct.sparse.SparseImageGradient;
-import com.google.caliper.Runner;
-import com.google.caliper.SimpleBenchmark;
 
 import java.util.Random;
 
@@ -33,7 +31,6 @@ import java.util.Random;
  * @author Peter Abeles
  */
 public class BenchmarkSurfDescribeOps<T extends ImageSingleBand>
-		extends SimpleBenchmark
 {
 	static int imgWidth = 640;
 	static int imgHeight = 480;
@@ -136,6 +133,6 @@ public class BenchmarkSurfDescribeOps<T extends ImageSingleBand>
 	public static void main( String args[] ) {
 		System.out.println("=========  Profile Image Size "+ imgWidth +" x "+ imgHeight  +" ==========");
 
-		Runner.main(BenchmarkSurfDescribeOps.class, args);
+//		Runner.main(BenchmarkSurfDescribeOps.class, args);
 	}
 }

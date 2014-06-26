@@ -27,9 +27,6 @@ import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSInt16;
 import boofcv.struct.image.ImageSInt32;
 import boofcv.struct.image.ImageUInt8;
-import com.google.caliper.Param;
-import com.google.caliper.Runner;
-import com.google.caliper.SimpleBenchmark;
 
 import java.util.Random;
 
@@ -38,7 +35,7 @@ import java.util.Random;
  * @author Peter Abeles
  */
 @SuppressWarnings("UnusedDeclaration")
-public class BenchmarkConvolveBox extends SimpleBenchmark {
+public class BenchmarkConvolveBox {
 
 	static int width = 640;
 	static int height = 480;
@@ -57,7 +54,8 @@ public class BenchmarkConvolveBox extends SimpleBenchmark {
 	static ImageSInt32 out_I32 = new ImageSInt32(width,height);
 
 	// iterate through different sized kernel radius
-	@Param({"1", "2", "3", "5","10"}) private int radius;
+//	@Param({"1", "2", "3", "5","10"})
+	private int radius;
 
 	public BenchmarkConvolveBox() {
 		ImageMiscOps.fillUniform(input_I8,rand,0,20);
@@ -65,7 +63,7 @@ public class BenchmarkConvolveBox extends SimpleBenchmark {
 		ImageMiscOps.fillUniform(input_F32,rand,0,20);
 	}
 
-	@Override protected void setUp() throws Exception {
+	protected void setUp() throws Exception {
 		kernelF32 = FactoryKernel.table1D_F32(radius,false);
 		kernelI32 = FactoryKernel.table1D_I32(radius);
 	}
@@ -136,7 +134,7 @@ public class BenchmarkConvolveBox extends SimpleBenchmark {
 		return 0;
 	}
 
-	public static void main( String args[] ) {
-		Runner.main(BenchmarkConvolveBox.class, args);
-	}
+//	public static void main( String args[] ) {
+//		Runner.main(BenchmarkConvolveBox.class, args);
+//	}
 }
