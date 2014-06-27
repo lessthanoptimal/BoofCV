@@ -16,6 +16,7 @@ Version : Alpha 0.18
  * Added more comments to examples
 - Removed Caliper dependency
  * Not designed the way I want it to be and recent changes made it less usable
+- Removed v4l4j support since Webcam Capture is easier and does a better job
 
 ---------------------------------------------
 Date    : 2014/6/19

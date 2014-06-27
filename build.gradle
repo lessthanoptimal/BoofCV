@@ -157,10 +157,6 @@ try {
     integrationProjects.add(':integration:android')
 } catch( UnknownProjectException ignore ) {}
 try {
-    project(':integration:v4l4j')
-    integrationProjects.add(':integration:v4l4j')
-} catch( UnknownProjectException ignore ) {}
-try {
     project(':integration:openkinect')
     integrationProjects.add(':integration:openkinect')
 } catch( UnknownProjectException ignore ) {}
