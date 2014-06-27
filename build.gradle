@@ -54,7 +54,9 @@ subprojects {
 //        compile files("$libpath/lib/DDogleg.jar")
 //        compile files("$libpath/lib/GeoRegression.jar")
 
-        compile group: 'com.googlecode.efficient-java-matrix-library', name: 'ejml', version: '0.25'
+        compile group: 'com.googlecode.efficient-java-matrix-library', name: 'core', version: '0.26-SNAPSHOT'
+        compile group: 'com.googlecode.efficient-java-matrix-library', name: 'equation', version: '0.26-SNAPSHOT'
+        install.enabled = false
         compile group: 'org.ddogleg', name: 'ddogleg', version: '0.5'
         compile group: 'org.georegression', name: 'georegression', version: '0.6'
 
@@ -230,6 +232,7 @@ idea {
         javadocJar.enabled = false
         jar.enabled = false
         uploadArchives.enabled = false
+        install.enabled = false
     }
 }
 
