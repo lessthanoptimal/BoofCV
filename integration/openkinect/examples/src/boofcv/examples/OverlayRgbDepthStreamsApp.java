@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,66 +21,47 @@ package boofcv.examples;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ShowImages;
-import boofcv.io.image.UtilImageIO;
-import boofcv.misc.BoofMiscOps;
+import boofcv.gui.image.VisualizeImageData;
 import boofcv.openkinect.StreamOpenKinectRgbDepth;
 import boofcv.openkinect.UtilOpenKinect;
 import boofcv.struct.image.ImageUInt16;
 import boofcv.struct.image.ImageUInt8;
 import boofcv.struct.image.MultiSpectral;
 import com.sun.jna.NativeLibrary;
-import org.ddogleg.struct.GrowQueue_I8;
 import org.openkinect.freenect.Context;
 import org.openkinect.freenect.Device;
 import org.openkinect.freenect.Freenect;
 import org.openkinect.freenect.Resolution;
 
+import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.DataOutputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
 
 /**
  * @author Peter Abeles
  */
-public class LogKinectDataApp implements StreamOpenKinectRgbDepth.Listener {
+public class OverlayRgbDepthStreamsApp implements StreamOpenKinectRgbDepth.Listener {
 	{
 		// Modify this link to be where you store your shared library
 		if( UtilOpenKinect.PATH_TO_SHARED_LIBRARY != null )
 			NativeLibrary.addSearchPath("freenect", UtilOpenKinect.PATH_TO_SHARED_LIBRARY);
 	}
 
-	int maxImages;
-	boolean showImage;
 	Resolution resolution = Resolution.MEDIUM;
 
 	BufferedImage buffRgb;
-	int frameNumber;
-
-	DataOutputStream logFile;
-
-	GrowQueue_I8 buffer = new GrowQueue_I8(1);
+	BufferedImage buffDepth;
 
 	ImagePanel gui;
 
-	public LogKinectDataApp(int maxImages, boolean showImage) {
-		this.maxImages = maxImages;
-		this.showImage = showImage;
-	}
-
-	public void process() throws IOException {
-
-		logFile = new DataOutputStream(new FileOutputStream("log/timestamps.txt"));
-		logFile.write("# Time stamps for rgb and depth cameras.\n".getBytes());
+	public void process() {
 
 		int w = UtilOpenKinect.getWidth(resolution);
 		int h = UtilOpenKinect.getHeight(resolution);
 
 		buffRgb = new BufferedImage(w,h,BufferedImage.TYPE_INT_RGB);
+		buffDepth = new BufferedImage(w,h,BufferedImage.TYPE_INT_RGB);
 
-		if( showImage ) {
-			gui = ShowImages.showWindow(buffRgb,"Kinect RGB");
-		}
+		gui = ShowImages.showWindow(buffRgb,"Kinect Overlay");
 
 		StreamOpenKinectRgbDepth stream = new StreamOpenKinectRgbDepth();
 		Context kinect = Freenect.createContext();
@@ -89,41 +70,27 @@ public class LogKinectDataApp implements StreamOpenKinectRgbDepth.Listener {
 			throw new RuntimeException("No kinect found!");
 
 		Device device = kinect.openDevice(0);
-
 		stream.start(device,resolution,this);
-
-		if( maxImages > 0 ) {
-			while( frameNumber < maxImages ) {
-				System.out.printf("Total saved %d\n",frameNumber);
-				BoofMiscOps.pause(100);
-			}
-			stream.stop();
-			System.out.println("Exceeded max images");
-			System.exit(0);
-		}
 	}
 
 	@Override
 	public void processKinect(MultiSpectral<ImageUInt8> rgb, ImageUInt16 depth, long timeRgb, long timeDepth) {
-		System.out.println(frameNumber+"  "+timeRgb);
-		try {
-			logFile.write(String.format("%10d %d %d\n",frameNumber,timeRgb,timeDepth).getBytes());
-			logFile.flush();
-			UtilImageIO.savePPM(rgb, String.format("log/rgb%07d.ppm", frameNumber), buffer);
-			UtilOpenKinect.saveDepth(depth, String.format("log/depth%07d.depth", frameNumber), buffer);
-			frameNumber++;
+		VisualizeImageData.disparity(depth, buffDepth, 0, UtilOpenKinect.FREENECT_DEPTH_MM_MAX_VALUE,0);
+		ConvertBufferedImage.convertTo_U8(rgb,buffRgb,true);
 
-			if( showImage ) {
-				ConvertBufferedImage.convertTo_U8(rgb,buffRgb,true);
-				gui.repaint();
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		Graphics2D g2 = buffRgb.createGraphics();
+		float alpha = 0.5f;
+		int type = AlphaComposite.SRC_OVER;
+		AlphaComposite composite =
+				AlphaComposite.getInstance(type, alpha);
+		g2.setComposite(composite);
+		g2.drawImage(buffDepth,0,0,null);
+
+		gui.repaint();
 	}
 
-	public static void main( String args[] ) throws IOException {
-		LogKinectDataApp app = new LogKinectDataApp(1000000,false);
+	public static void main( String args[] ) {
+		OverlayRgbDepthStreamsApp app = new OverlayRgbDepthStreamsApp();
 		app.process();
 	}
 }

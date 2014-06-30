@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -41,7 +41,8 @@ public class OpenKinectStreamingTest {
 
 	{
 		// Modify this link to be where you store your shared library
-		NativeLibrary.addSearchPath("freenect", "/home/pja/libfreenect/build/lib");
+		if( UtilOpenKinect.PATH_TO_SHARED_LIBRARY != null )
+			NativeLibrary.addSearchPath("freenect", UtilOpenKinect.PATH_TO_SHARED_LIBRARY);
 	}
 
 	MultiSpectral<ImageUInt8> rgb = new MultiSpectral<ImageUInt8>(ImageUInt8.class,1,1,3);
@@ -98,7 +99,8 @@ public class OpenKinectStreamingTest {
 
 		UtilOpenKinect.bufferDepthToU16(frame, depth);
 
-		VisualizeImageData.grayUnsigned(depth,outDepth,1000);
+//		VisualizeImageData.grayUnsigned(depth,outDepth,UtilOpenKinect.FREENECT_DEPTH_MM_MAX_VALUE);
+		VisualizeImageData.disparity(depth, outDepth, 0, UtilOpenKinect.FREENECT_DEPTH_MM_MAX_VALUE,0);
 		guiDepth.repaint();
 	}
 
@@ -107,7 +109,7 @@ public class OpenKinectStreamingTest {
 			System.out.println("Bad rgb format!");
 		}
 
-		System.out.println("Got rgb! "+timestamp);
+		System.out.println("Got rgb!   "+timestamp);
 
 		if( outRgb == null ) {
 			rgb.reshape(mode.getWidth(),mode.getHeight());

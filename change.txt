@@ -17,6 +17,7 @@ Version : Alpha 0.18
 - Removed Caliper dependency
  * Not designed the way I want it to be and recent changes made it less usable
 - Removed v4l4j support since Webcam Capture is easier and does a better job
+- Fixed OpenKinect examples
 
 ---------------------------------------------
 Date    : 2014/6/19

@@ -24,7 +24,7 @@ sourceSets {
     test {
         java {
             srcDir 'test'
-            srcDir 'examples'
+            srcDir 'examples/src'
         }
         resources {
             srcDir 'resources/test'
