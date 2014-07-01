@@ -40,9 +40,8 @@ import java.nio.ByteBuffer;
 public class OpenKinectStreamingTest {
 
 	{
-		// Modify this link to be where you store your shared library
-		if( UtilOpenKinect.PATH_TO_SHARED_LIBRARY != null )
-			NativeLibrary.addSearchPath("freenect", UtilOpenKinect.PATH_TO_SHARED_LIBRARY);
+		// be sure to set OpenKinectExampleParam.PATH_TO_SHARED_LIBRARY to the location of your shared library!
+		NativeLibrary.addSearchPath("freenect", OpenKinectExampleParam.PATH_TO_SHARED_LIBRARY);
 	}
 
 	MultiSpectral<ImageUInt8> rgb = new MultiSpectral<ImageUInt8>(ImageUInt8.class,1,1,3);

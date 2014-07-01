@@ -45,9 +45,8 @@ import java.io.IOException;
  */
 public class LogKinectDataApp implements StreamOpenKinectRgbDepth.Listener {
 	{
-		// Modify this link to be where you store your shared library
-		if( UtilOpenKinect.PATH_TO_SHARED_LIBRARY != null )
-			NativeLibrary.addSearchPath("freenect", UtilOpenKinect.PATH_TO_SHARED_LIBRARY);
+		// be sure to set OpenKinectExampleParam.PATH_TO_SHARED_LIBRARY to the location of your shared library!
+		NativeLibrary.addSearchPath("freenect", OpenKinectExampleParam.PATH_TO_SHARED_LIBRARY);
 	}
 
 	int maxImages;

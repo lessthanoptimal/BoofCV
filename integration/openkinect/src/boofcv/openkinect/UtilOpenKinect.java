@@ -32,9 +32,6 @@ import java.nio.ByteBuffer;
  */
 public class UtilOpenKinect {
 
-	// Modify this link to be where you store your shared library
-	public static String PATH_TO_SHARED_LIBRARY = "/home/pja/projects/thirdparty/libfreenect/build/lib";
-
 	public static final int FREENECT_DEPTH_MM_MAX_VALUE = 10000;
 	public static final int FREENECT_DEPTH_MM_NO_VALUE = 0;
 

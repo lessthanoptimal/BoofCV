@@ -56,7 +56,6 @@ subprojects {
 
         compile group: 'com.googlecode.efficient-java-matrix-library', name: 'core', version: '0.26-SNAPSHOT'
         compile group: 'com.googlecode.efficient-java-matrix-library', name: 'equation', version: '0.26-SNAPSHOT'
-        install.enabled = false
         compile group: 'org.ddogleg', name: 'ddogleg', version: '0.5'
         compile group: 'org.georegression', name: 'georegression', version: '0.6'
 
