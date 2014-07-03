@@ -10,13 +10,27 @@ dependencies {
     compile project(':evaluation')
 }
 
-task appletJar(type: Jar, dependsOn:jar) {
-    from files(sourceSets.main.output.classesDir)
-    from files(sourceSets.main.output.resourcesDir)
-    from {configurations.compile.collect {zipTree(it)}}
+task appletJar( dependsOn: compileJava ) {
+    doFirst {
+        // decompress the jars it depends on to remove duplicate files.  They will decompress on top of each other
+        copy {
+            from { configurations.compile.collect { zipTree(it) } }
+            into 'tmp'
+        }
+    }
 
-    destinationDir = file('./')
-    archiveName = 'BoofCV_Applet.jar'
+    jar {
+        from files(sourceSets.main.output.classesDir)
+        from files(sourceSets.main.output.resourcesDir)
+        from files('tmp')
+
+        destinationDir = file('./')
+        archiveName = 'BoofCV_Applet.jar'
+    }
+
+    doLast {
+        file('tmp').deleteDir()
+    }
 }
 
 idea {
