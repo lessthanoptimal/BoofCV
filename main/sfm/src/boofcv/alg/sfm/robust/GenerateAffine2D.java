@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -61,7 +61,7 @@ public class GenerateAffine2D implements
 		if( !fitter.process(from,to) )
 			return false;
 
-		found.set(fitter.getMotion());
+		found.set(fitter.getTransformSrcToDst());
 		return true;
 	}
 
@@ -80,7 +80,7 @@ public class GenerateAffine2D implements
 		if( !fitter.process(from,to) )
 			return false;
 
-		model.set(fitter.getMotion());
+		model.set(fitter.getTransformSrcToDst());
 
 		return true;
 	}

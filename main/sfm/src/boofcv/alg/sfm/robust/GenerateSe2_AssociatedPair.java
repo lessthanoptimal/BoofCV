@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -59,7 +59,7 @@ public class GenerateSe2_AssociatedPair implements
 		if( !estimate.process(from,to) )
 			return false;
 
-		output.set(estimate.getMotion());
+		output.set(estimate.getTransformSrcToDst());
 		return true;
 	}
 

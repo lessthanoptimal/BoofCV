@@ -269,7 +269,7 @@ public class PnPLepetitEPnP {
 		UtilLepetitEPnP.computeCameraControl(solution,nullPts,solutionPts,numControl);
 		motionFit.process(controlWorldPts.toList(), solutionPts.toList());
 
-		solutionModel.set(motionFit.getMotion());
+		solutionModel.set(motionFit.getTransformSrcToDst());
 	}
 
 	/**

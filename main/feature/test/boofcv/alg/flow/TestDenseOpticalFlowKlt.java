@@ -33,6 +33,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Peter Abeles
@@ -54,6 +55,7 @@ public class TestDenseOpticalFlowKlt {
 	@Before
 	public void setup() {
 		config.pyramidScaling = new int[]{1,2};
+		config.config.maxPerPixelError = 15;
 
 		prev = FactoryPyramid.discreteGaussian(config.pyramidScaling, -1, 2, true, ImageFloat32.class);
 		curr = FactoryPyramid.discreteGaussian(config.pyramidScaling, -1, 2, true, ImageFloat32.class);
@@ -130,10 +132,14 @@ public class TestDenseOpticalFlowKlt {
 
 		alg.process(prev,prevDerivX,prevDerivY,curr,flow);
 
-		check(flow.get(10,12),false,1,1);
-		check(flow.get(11,12),false,1,1);
-		check(flow.get(10,13),false,1,1);
-		check(flow.get(11,13),false,1,1);
+		int totalFail = 0;
+		for (int i = 0; i < flow.data.length; i++) {
+			if( !flow.data[i].isValid() ) {
+				totalFail++;
+			}
+		}
+
+		assertTrue( totalFail/(double)flow.data.length >= 0.90 );
 	}
 
 }
