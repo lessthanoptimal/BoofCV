@@ -10,23 +10,34 @@ dependencies {
     compile project(':evaluation')
 }
 
-task appletJar( dependsOn: compileJava ) {
+task createAppletTmp( dependsOn: jar ) {
     doFirst {
         // decompress the jars it depends on to remove duplicate files.  They will decompress on top of each other
         copy {
+            from files(sourceSets.main.output.classesDir)
+            from files(sourceSets.main.output.resourcesDir)
             from { configurations.compile.collect { zipTree(it) } }
             into 'tmp'
         }
     }
+}
 
-    jar {
-        from files(sourceSets.main.output.classesDir)
-        from files(sourceSets.main.output.resourcesDir)
-        from files('tmp')
+task appletJar( type: Jar , dependsOn: createAppletTmp ) {
 
-        destinationDir = file('./')
-        archiveName = 'BoofCV_Applet.jar'
+    from files('tmp')
+
+    manifest {
+        attributes(
+                "Permissions": "sandbox",
+                "Codebase": "*.boofcv.org",
+//                "Trusted-Only": "true", // doesn't work on windows if this is true
+                "Caller-Allowable-Codebase": "boofcv.org 127.0.0.1",
+                "Application-Name": "BoofCV Demonstration"
+        )
     }
+
+    destinationDir = file('./')
+    archiveName = 'BoofCV_Applet.jar'
 
     doLast {
         file('tmp').deleteDir()
