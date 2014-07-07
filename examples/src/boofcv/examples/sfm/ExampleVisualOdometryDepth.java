@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,10 +33,12 @@ import boofcv.io.UtilIO;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.wrapper.DefaultMediaManager;
 import boofcv.struct.calib.VisualDepthParameters;
-import boofcv.struct.image.*;
+import boofcv.struct.image.ImageSInt16;
+import boofcv.struct.image.ImageType;
+import boofcv.struct.image.ImageUInt16;
+import boofcv.struct.image.ImageUInt8;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
-import org.ddogleg.struct.GrowQueue_I8;
 
 import java.io.IOException;
 
@@ -76,23 +78,15 @@ public class ExampleVisualOdometryDepth {
 		// Pass in intrinsic/extrinsic calibration.  This can be changed in the future.
 		visualOdometry.setCalibration(param.visualParam,new DoNothingPixelTransform_F32());
 
-		// image with depth information
-		ImageUInt16 depth = new ImageUInt16(1,1);
-		// image with color information
-		MultiSpectral<ImageUInt8> rgb = new MultiSpectral<ImageUInt8>(ImageUInt8.class,1,1,3);
-		ImageUInt8 gray = new ImageUInt8(1,1);
-		// work space
-		GrowQueue_I8 data = new GrowQueue_I8();
-
 		// Process the video sequence and output the location plus number of inliers
 		SimpleImageSequence<ImageUInt8> videoVisual = media.openVideo(directory+"rgb.mjpeg", ImageType.single(ImageUInt8.class));
 		SimpleImageSequence<ImageUInt16> videoDepth = media.openVideo(directory + "depth.mpng", ImageType.single(ImageUInt16.class));
 
 		while( videoVisual.hasNext() ) {
-			ImageUInt8 left = videoVisual.next();
-			ImageUInt16 right = videoDepth.next();
+			ImageUInt8 visual = videoVisual.next();
+			ImageUInt16 depth = videoDepth.next();
 
-			if( !visualOdometry.process(left,right) ) {
+			if( !visualOdometry.process(visual,depth) ) {
 				throw new RuntimeException("VO Failed!");
 			}
 
