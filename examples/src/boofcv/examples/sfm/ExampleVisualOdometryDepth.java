@@ -76,14 +76,6 @@ public class ExampleVisualOdometryDepth {
 		// Pass in intrinsic/extrinsic calibration.  This can be changed in the future.
 		visualOdometry.setCalibration(param.visualParam,new DoNothingPixelTransform_F32());
 
-		// image with depth information
-		ImageUInt16 depth = new ImageUInt16(1,1);
-		// image with color information
-		MultiSpectral<ImageUInt8> rgb = new MultiSpectral<ImageUInt8>(ImageUInt8.class,1,1,3);
-		ImageUInt8 gray = new ImageUInt8(1,1);
-		// work space
-		GrowQueue_I8 data = new GrowQueue_I8();
-
 		// Process the video sequence and output the location plus number of inliers
 		SimpleImageSequence<ImageUInt8> videoVisual = media.openVideo(directory+"rgb.mjpeg", ImageType.single(ImageUInt8.class));
 		SimpleImageSequence<ImageUInt16> videoDepth = media.openVideo(directory + "depth.mpng", ImageType.single(ImageUInt16.class));
