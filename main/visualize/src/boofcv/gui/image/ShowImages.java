@@ -111,7 +111,7 @@ public class ShowImages {
 		return showWindow(buff,title);
 	}
 
-	public static void showWindow( final JComponent component , String title ) {
+	public static JFrame showWindow( final JComponent component , String title ) {
 		final JFrame frame = new JFrame(title);
 		frame.add(component, BorderLayout.CENTER);
 
@@ -121,5 +121,7 @@ public class ShowImages {
 				frame.setVisible(true);
 			}
 		});
+
+		return frame;
 	}
 }

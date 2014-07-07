@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,19 +19,18 @@
 package boofcv.examples.sfm;
 
 import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
-import boofcv.abst.feature.tracker.PointTrackerTwoPass;
+import boofcv.abst.feature.tracker.PointTracker;
 import boofcv.abst.sfm.AccessPointTracks3D;
 import boofcv.abst.sfm.d3.MonocularPlaneVisualOdometry;
 import boofcv.abst.sfm.d3.VisualOdometry;
 import boofcv.alg.tracker.klt.PkltConfig;
-import boofcv.factory.feature.tracker.FactoryPointTrackerTwoPass;
+import boofcv.factory.feature.tracker.FactoryPointTracker;
 import boofcv.factory.sfm.FactoryVisualOdometry;
 import boofcv.io.MediaManager;
 import boofcv.io.UtilIO;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.wrapper.DefaultMediaManager;
 import boofcv.struct.calib.MonoPlaneParameters;
-import boofcv.struct.image.ImageSInt16;
 import boofcv.struct.image.ImageType;
 import boofcv.struct.image.ImageUInt8;
 import georegression.struct.point.Vector3D_F64;
@@ -60,10 +59,9 @@ public class ExampleVisualOdometryMonocularPlane {
 		PkltConfig configKlt = new PkltConfig();
 		configKlt.pyramidScaling = new int[]{1, 2, 4, 8};
 		configKlt.templateRadius = 3;
+		ConfigGeneralDetector configDetector = new ConfigGeneralDetector(600,3,1);
 
-		PointTrackerTwoPass<ImageUInt8> tracker =
-				FactoryPointTrackerTwoPass.klt(configKlt, new ConfigGeneralDetector(600, 3, 1),
-						ImageUInt8.class, ImageSInt16.class);
+		PointTracker<ImageUInt8> tracker = FactoryPointTracker.klt(configKlt, configDetector, ImageUInt8.class, null);
 
 		// declares the algorithm
 		MonocularPlaneVisualOdometry<ImageUInt8> visualOdometry =
@@ -74,10 +72,11 @@ public class ExampleVisualOdometryMonocularPlane {
 
 		// Process the video sequence and output the location plus number of inliers
 		while( video.hasNext() ) {
-			ImageUInt8 left = video.next();
+			ImageUInt8 image = video.next();
 
-			if( !visualOdometry.process(left) ) {
-				throw new RuntimeException("VO Failed!");
+			if( !visualOdometry.process(image) ) {
+				System.out.println("Fault!");
+				visualOdometry.reset();
 			}
 
 			Se3_F64 leftToWorld = visualOdometry.getCameraToWorld();
