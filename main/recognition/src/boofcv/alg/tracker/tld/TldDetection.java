@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -288,7 +288,7 @@ public class TldDetection<T extends ImageSingleBand> {
 
 	/**
 	 * Rectangles selected by the fern classifier as candidates
-	 * @return
+	 * @return List of rectangles
 	 */
 	public List<ImageRectangle> getSelectedFernRectangles() {
 		return fernRegions;

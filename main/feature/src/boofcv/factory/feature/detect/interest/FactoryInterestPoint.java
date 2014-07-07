@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -42,7 +42,6 @@ import boofcv.struct.pyramid.PyramidFloat;
  *
  * @author Peter Abeles
  * @see FactoryFeatureExtractor
- * @see FactoryInterestPoint
  */
 public class FactoryInterestPoint {
 
@@ -52,7 +51,7 @@ public class FactoryInterestPoint {
 	 * @param feature   Feature detector.
 	 * @param scale Scale of detected features
 	 * @param inputType Image type of input image.
-	 * @param inputType Image type for gradient.
+	 * @param derivType Image type for gradient.
 	 * @return The interest point detector.
 	 */
 	public static <T extends ImageSingleBand, D extends ImageSingleBand>

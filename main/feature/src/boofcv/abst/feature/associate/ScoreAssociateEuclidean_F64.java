@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,7 +26,7 @@ import boofcv.struct.feature.TupleDesc_F64;
 /**
  * Scores based on Euclidean distance
  *
- * @see {@link DescriptorDistance#euclidean(boofcv.struct.feature.TupleDesc_F64, boofcv.struct.feature.TupleDesc_F64)}
+ * @see DescriptorDistance#euclidean(TupleDesc_F64,TupleDesc_F64)
  *
  * @author Peter Abeles
  */

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,8 +26,8 @@ import boofcv.struct.image.ImageSingleBand;
  * Extracts corners from a the image and or its gradient.  This is a generalized interface and lacks some of the functionality
  * of more specialized classes.
  *
- * @see boofcv.alg.feature.detect.intensity
- * @see boofcv.abst.feature.detect.extract
+ * @see boofcv.alg.feature.detect.intensity.FeatureIntensity
+ * @see boofcv.abst.feature.detect.extract.NonMaxSuppression
  *
  * @param <I> Input image type.
  * @param <D> Image derivative type.

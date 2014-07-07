@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,7 +37,7 @@ import boofcv.struct.sparse.SparseImageGradient;
 public class ImplSurfDescribeOps {
 
 	/**
-	 * Computes the gradient for a using the derivX kernel found in {@link boofcv.alg.transform.ii.DerivativeIntegralImage)}.
+	 * Computes the gradient for a using the derivX kernel found in {@link boofcv.alg.transform.ii.DerivativeIntegralImage}.
 	 * Assumes that the entire region, including the surrounding pixels, are inside the image.
 	 */
 	public static void gradientInner(ImageFloat32 ii, double tl_x, double tl_y, double samplePeriod ,
@@ -97,7 +97,7 @@ public class ImplSurfDescribeOps {
 	}
 
 	/**
-	 * Computes the gradient for a using the derivX kernel found in {@link boofcv.alg.transform.ii.DerivativeIntegralImage)}.
+	 * Computes the gradient for a using the derivX kernel found in {@link boofcv.alg.transform.ii.DerivativeIntegralImage}.
 	 * Assumes that the entire region, including the surrounding pixels, are inside the image.
 	 */
 	public static void gradientInner(ImageSInt32 ii, double tl_x, double tl_y, double samplePeriod ,

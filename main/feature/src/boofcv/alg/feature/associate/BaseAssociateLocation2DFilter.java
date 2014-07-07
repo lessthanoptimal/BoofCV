@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -162,7 +162,7 @@ public abstract class BaseAssociateLocation2DFilter<D> implements AssociateDescr
 	 *
 	 * @param indexSrc The index in source being examined
 	 * @param bestIndex Index in dst with the best fit to source
-	 * @return
+	 * @return true if a match was found and false if not
 	 */
 	private boolean backwardsValidation(int indexSrc, int bestIndex) {
 		double bestScoreV = maxError;

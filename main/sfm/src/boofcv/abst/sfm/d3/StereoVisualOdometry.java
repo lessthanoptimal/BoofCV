@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -53,7 +53,7 @@ public interface StereoVisualOdometry<T extends ImageBase> extends VisualOdometr
 {
 	/**
 	 * Specifies intrinsic and extrinsic parameters for the stereo camera system. Can be called
-	 * at any time, but must be called at least once before {@link #process) can be called.
+	 * at any time, but must be called at least once before {@link #process} can be called.
 	 *
 	 * @param parameters stereo calibration
 	 */

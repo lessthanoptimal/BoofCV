@@ -39,7 +39,7 @@ import boofcv.struct.image.ImageType;
 /**
  * Factory for creating low level implementations of object tracking algorithms.  These algorithms allow
  * the user to specify an object in a video stream and then track it.  For a high level and user to use
- * common interface see {@kink FactoryTrackerObjectQuad}
+ * common interface see {@link FactoryTrackerObjectQuad}
  *
  * @author Peter Abeles
  */

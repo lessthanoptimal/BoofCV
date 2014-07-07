@@ -172,7 +172,7 @@ public class FactoryTrackerObjectQuad {
 	 * Discrete Fourier Transform (DCF), and linear classifiers to track a target.  Fixed sized rectangular target
 	 * and only estimates translation.  Can't detect when it loses track or re-aquire track.
 	 *
-	 * @see {@link CirculantTracker}
+	 * @see CirculantTracker
 	 *
 	 * @param config Configuration
 	 * @return CirculantTracker

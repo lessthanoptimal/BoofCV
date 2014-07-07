@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -442,7 +442,7 @@ public class ConvertBufferedImage {
 
 	/**
 	 * Converts a {@link boofcv.struct.image.ImageUInt8} into a BufferedImage.  If the buffered image
-	 * has multiple channels the intensities of each channel are averaged together.
+	 * has multiple channels then the input image is copied into each channel.
 	 *
 	 * @param src Input image.
 	 * @param dst Where the converted image is written to.  If null a new image is created.
@@ -471,7 +471,7 @@ public class ConvertBufferedImage {
 
 	/**
 	 * Converts a {@link boofcv.struct.image.ImageInt16} into a BufferedImage.  If the buffered image
-	 * has multiple channels the intensities of each channel are averaged together.
+	 * has multiple channels then the input image is copied into each channel.
 	 *
 	 * @param src Input image.
 	 * @param dst Where the converted image is written to.  If null a new image is created.
@@ -502,7 +502,7 @@ public class ConvertBufferedImage {
 
 	/**
 	 * Converts the buffered image into an {@link boofcv.struct.image.ImageFloat32}.  If the buffered image
-	 * has multiple channels the intensities of each channel are averaged together.  The floating
+	 * has multiple channels then the input image is copied into each channel.  The floating
 	 * point image is assumed to be between 0 and 255.
 	 *
 	 * @param src Input image.
@@ -531,8 +531,7 @@ public class ConvertBufferedImage {
 	}
 
 	/**
-	 * Converts a {@link boofcv.struct.image.ImageUInt8} into a BufferedImage.  If the buffered image
-	 * has multiple channels the intensities of each channel are averaged together.
+	 * Converts a {@link MultiSpectral} {@link ImageUInt8} into a BufferedImage.
 	 *
 	 * @param src Input image.
 	 * @param dst Where the converted image is written to.  If null a new image is created.
@@ -566,8 +565,7 @@ public class ConvertBufferedImage {
 	}
 
 	/**
-	 * Converts a {@link boofcv.struct.image.ImageUInt8} into a BufferedImage.  If the buffered image
-	 * has multiple channels the intensities of each channel are averaged together.
+	 * Converts a {@link MultiSpectral} {@link ImageFloat32} into a BufferedImage.
 	 *
 	 * @param src Input image.
 	 * @param dst Where the converted image is written to.  If null a new image is created.

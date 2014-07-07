@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -64,7 +64,7 @@ public class SurfDescribeOps {
 	}
 
 	/**
-	 * Faster version of {@lin #gradient} which assumes the region is entirely contained inside the
+	 * Faster version of {@link #gradient} which assumes the region is entirely contained inside the
 	 * of the image.  This includes the convolution kernel's radius.
 	 */
 	public static
@@ -76,7 +76,7 @@ public class SurfDescribeOps {
 	}
 
 	/**
-	 * Faster version of {@lin #gradient} which assumes the region is entirely contained inside the
+	 * Faster version of {@link #gradient} which assumes the region is entirely contained inside the
 	 * of the image.  This includes the convolution kernel's radius.
 	 */
 	public static

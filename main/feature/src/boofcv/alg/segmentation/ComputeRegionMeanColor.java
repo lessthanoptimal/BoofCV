@@ -118,7 +118,7 @@ public abstract class ComputeRegionMeanColor<T extends ImageBase> {
 	}
 
 	/**
-	 * Implementation for {@link ImageFloat32}
+	 * Implementation for {@link boofcv.struct.image.ImageFloat32}
 	 */
 	public static class F32 extends ComputeRegionMeanColor<ImageFloat32> {
 		public F32() {super(1);}
@@ -130,7 +130,7 @@ public abstract class ComputeRegionMeanColor<T extends ImageBase> {
 	}
 
 	/**
-	 * Implementation for {@link MultiSpectral<ImageUInt8>}
+	 * Implementation for {@link MultiSpectral}
 	 */
 	public static class MS_U8 extends ComputeRegionMeanColor<MultiSpectral<ImageUInt8>> {
 		public MS_U8( int numBands ) {super(numBands);}
@@ -144,7 +144,7 @@ public abstract class ComputeRegionMeanColor<T extends ImageBase> {
 	}
 
 	/**
-	 * Implementation for {@link MultiSpectral<ImageFloat32>}
+	 * Implementation for {@link MultiSpectral}
 	 */
 	public static class MS_F32 extends ComputeRegionMeanColor<MultiSpectral<ImageFloat32>> {
 		public MS_F32( int numBands ) {super(numBands);}
