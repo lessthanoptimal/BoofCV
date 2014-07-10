@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -318,13 +318,11 @@ public class FactoryKernelGaussian {
 
 	/**
 	 * <p>
-	 * Given the the radius of a Gaussian distribution, choose an appropriate sigma.
+	 * Given the the radius of a Gaussian distribution and the order of its derivative, choose an appropriate sigma.
 	 * </p>
-	 * <p>
-	 * NOTE: If trying to determine sigma for gaussian derivative -1 from radius.
-	 * </p>
-	 * @param radius
-	 * @return
+	 * @param radius Kernel's radius
+	 * @param order Order of the derivative.  0 original distribution
+	 * @return Default sigma
 	 */
 	public static double sigmaForRadius(double radius , int order ) {
 		if( radius <= 0 )
@@ -334,11 +332,13 @@ public class FactoryKernelGaussian {
 	}
 
 	/**
+	 * <p>
+	 * Given the the sigma of a Gaussian distribution and the order of its derivative, choose an appropriate radius.
+	 * </p>
 	 *
-	 * NOTE: If trying to determine radius for gaussian derivative +1 to returned value..
-	 *
-	 * @param sigma
-	 * @return
+	 * @param sigma Distribution's sigma
+	 * @param order Order of the derivative.  0 original distribution
+	 * @return Default sigma
 	 */
 	public static int radiusForSigma(double sigma, int order ) {
 		if( sigma <= 0 )
