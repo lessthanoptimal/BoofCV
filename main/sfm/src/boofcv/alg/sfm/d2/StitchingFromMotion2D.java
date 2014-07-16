@@ -201,10 +201,10 @@ public class StitchingFromMotion2D<I extends ImageBase, IT extends InvertibleTra
 		Rectangle2D_I32 box = DistortImageOps.boundBox(image.width, image.height,
 				stitchedImage.width, stitchedImage.height, tranCurrToWorld);
 
-		int x0 = box.tl_x;
-		int y0 = box.tl_y;
-		int x1 = box.tl_x + box.width;
-		int y1 = box.tl_y + box.height;
+		int x0 = box.x0;
+		int y0 = box.y0;
+		int x1 = box.x0 + box.width;
+		int y1 = box.y0 + box.height;
 
 		distorter.setModel(tranWorldToCurr);
 		distorter.apply(image, stitchedImage,x0,y0,x1,y1);

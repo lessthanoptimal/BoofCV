@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -91,7 +91,7 @@ public class LikelihoodHueSatHistInd_U8 implements PixelLikelihood<MultiSpectral
 		float total = 0;
 
 		for( int y = 0; y < target.height; y++ ) {
-			int index = imageRed.startIndex + (y+target.tl_y)*imageRed.stride + target.tl_x;
+			int index = imageRed.startIndex + (y+target.y0)*imageRed.stride + target.x0;
 			for( int x = 0; x < target.width; x++ , index++ ) {
 				int r = imageRed.data[index] & 0xFF;
 				int g = imageGreen.data[index] & 0xFF;

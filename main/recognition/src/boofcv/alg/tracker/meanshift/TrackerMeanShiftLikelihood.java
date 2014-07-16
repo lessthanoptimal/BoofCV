@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -91,9 +91,9 @@ public class TrackerMeanShiftLikelihood<T extends ImageBase> {
 	 * @param initial Initial target location and the mean-shift bandwidth
 	 */
 	public void initialize( T image , Rectangle2D_I32 initial ) {
-		if( !image.isInBounds(initial.tl_x,initial.tl_y) )
+		if( !image.isInBounds(initial.x0,initial.y0) )
 			throw new IllegalArgumentException("Initial rectangle is out of bounds!");
-		if( !image.isInBounds(initial.tl_x+initial.width,initial.tl_y+initial.height) )
+		if( !image.isInBounds(initial.x0+initial.width,initial.y0+initial.height) )
 			throw new IllegalArgumentException("Initial rectangle is out of bounds!");
 
 
@@ -115,7 +115,7 @@ public class TrackerMeanShiftLikelihood<T extends ImageBase> {
 
 		for( int y = 0; y < initial.height; y++ ) {
 			for( int x = 0; x < initial.width; x++ ) {
-				minimumSum += targetModel.compute(x+initial.tl_x,y+initial.tl_y);
+				minimumSum += targetModel.compute(x+initial.x0,y+initial.y0);
 			}
 		}
 		minimumSum *= minFractionDrop;
@@ -136,17 +136,17 @@ public class TrackerMeanShiftLikelihood<T extends ImageBase> {
 		targetModel.setImage(image);
 
 		// mark the region where the pdf has been modified as dirty
-		dirty.set(location.tl_x, location.tl_y, location.tl_x + location.width, location.tl_y + location.height);
+		dirty.set(location.x0, location.y0, location.x0 + location.width, location.y0 + location.height);
 		// compute the pdf inside the initial rectangle
-		updatePdfImage(location.tl_x , location.tl_y , location.tl_x+location.width , location.tl_y+location.height);
+		updatePdfImage(location.x0 , location.y0 , location.x0+location.width , location.y0+location.height);
 
 		// current location of the target
-		int tl_x = location.tl_x;
-		int tl_y = location.tl_y;
+		int x0 = location.x0;
+		int y0 = location.y0;
 
 		// previous location of the target in the most recent iteration
-		int prevX = tl_x;
-		int prevY = tl_y;
+		int prevX = x0;
+		int prevY = y0;
 
 		// iterate until it converges or reaches the maximum number of iterations
 		for( int i = 0; i < maxIterations; i++ ) {
@@ -157,13 +157,13 @@ public class TrackerMeanShiftLikelihood<T extends ImageBase> {
 			float sumY = 0;
 
 			for( int y = 0; y < location.height; y++ ) {
-				int indexPdf = pdf.startIndex + pdf.stride*(y+tl_y) + tl_x;
+				int indexPdf = pdf.startIndex + pdf.stride*(y+y0) + x0;
 				for( int x = 0; x < location.width; x++ ) {
 					float p = pdf.data[indexPdf++];
 
 					totalPdf += p;
-					sumX += (tl_x+x)*p;
-					sumY += (tl_y+y)*p;
+					sumX += (x0+x)*p;
+					sumY += (y0+y)*p;
 				}
 			}
 
@@ -174,35 +174,35 @@ public class TrackerMeanShiftLikelihood<T extends ImageBase> {
 			}
 
 			// Use the new center to find the new top left corner, while rounding to the nearest integer
-			tl_x = (int)(sumX/totalPdf-location.width/2+0.5f);
-			tl_y = (int)(sumY/totalPdf-location.height/2+0.5f);
+			x0 = (int)(sumX/totalPdf-location.width/2+0.5f);
+			y0 = (int)(sumY/totalPdf-location.height/2+0.5f);
 
 			// make sure it doesn't go outside the image
-			if( tl_x < 0 )
-				tl_x = 0;
-			else if( tl_x >= image.width-location.width )
-				tl_x = image.width-location.width;
+			if( x0 < 0 )
+				x0 = 0;
+			else if( x0 >= image.width-location.width )
+				x0 = image.width-location.width;
 
-			if( tl_y < 0 )
-				tl_y = 0;
-			else if( tl_y >= image.height-location.height )
-				tl_y = image.height-location.height;
+			if( y0 < 0 )
+				y0 = 0;
+			else if( y0 >= image.height-location.height )
+				y0 = image.height-location.height;
 
 			// see if it has converged
-			if( tl_x == prevX && tl_y == prevY )
+			if( x0 == prevX && y0 == prevY )
 				break;
 
 			// save the previous location
-			prevX = tl_x;
-			prevY = tl_y;
+			prevX = x0;
+			prevY = y0;
 
 			// update the pdf
-			updatePdfImage(tl_x,tl_y,tl_x+location.width,tl_y+location.height);
+			updatePdfImage(x0,y0,x0+location.width,y0+location.height);
 		}
 
 		// update the output
-		location.tl_x = tl_x;
-		location.tl_y = tl_y;
+		location.x0 = x0;
+		location.y0 = y0;
 
 		// clean up the image for the next iteration
 		ImageMiscOps.fillRectangle(pdf,-1,dirty.x0,dirty.y0,dirty.x1-dirty.x0,dirty.y1-dirty.y0);

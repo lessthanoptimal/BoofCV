@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,8 +18,10 @@
 
 package boofcv.gui.tracker;
 
+import georegression.geometry.UtilPolygons2D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.Quadrilateral_F64;
+import georegression.struct.shapes.Rectangle2D_I32;
 
 import javax.swing.*;
 import java.awt.*;
@@ -70,6 +72,14 @@ public class TrackerObjectQuadPanel extends JPanel implements MouseListener {
 	public synchronized void setTarget( Quadrilateral_F64 quad , boolean visible ) {
 		if( quad != null )
 			this.quad.set(quad);
+		selectMode = false;
+		targetVisible = visible;
+		repaint();
+	}
+
+	public synchronized void setTarget( Rectangle2D_I32 rect , boolean visible ) {
+		if( quad != null )
+			UtilPolygons2D_F64.convert(rect, quad);
 		selectMode = false;
 		targetVisible = visible;
 		repaint();

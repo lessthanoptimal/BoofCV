@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -55,10 +55,10 @@ public class Msl_to_TrackerObjectQuad <T extends ImageMultiBand> implements Trac
 
 		UtilPolygons2D_F64.bounding(location, rect);
 
-		target.tl_x = (int)rect.x0;
-		target.tl_y = (int)rect.y0;
-		target.width = (int)rect.getWidth();
-		target.height = (int)rect.getHeight();
+		target.x0 = (int)rect.x0;
+		target.y0 = (int)rect.y0;
+		target.width = (int)rect.getWidth()+1;
+		target.height = (int)rect.getHeight()+1;
 
 		likelihood.setImage(image);
 		likelihood.createModel(target);
@@ -74,15 +74,7 @@ public class Msl_to_TrackerObjectQuad <T extends ImageMultiBand> implements Trac
 		    return false;
 
 		Rectangle2D_I32 rect = tracker.getLocation();
-
-		location.a.x = rect.tl_x;
-		location.a.y = rect.tl_y;
-		location.b.x = rect.tl_x + rect.width;
-		location.b.y = rect.tl_y;
-		location.c.x = rect.tl_x + rect.width;
-		location.c.y = rect.tl_y + rect.height;
-		location.d.x = rect.tl_x;
-		location.d.y = rect.tl_y + rect.height;
+		UtilPolygons2D_F64.convert(rect,location);
 
 		return true;
 	}

@@ -1,3 +1,21 @@
+/*
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ *
+ * This file is part of BoofCV (http://boofcv.org).
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package boofcv.alg.tracker.circulant;
 
 import boofcv.alg.interpolate.InterpolatePixelS;
@@ -73,8 +91,8 @@ public class TestCirculantTracker {
 		double tolerance = 1;
 
 		Rectangle2D_F32 r = alg.getTargetLocation();
-		assertEquals(5+2,r.tl_x,tolerance);
-		assertEquals(6 + 4, r.tl_y, tolerance);
+		assertEquals(5+2,r.x0,tolerance);
+		assertEquals(6 + 4, r.y0, tolerance);
 	}
 
 	@Test
@@ -159,23 +177,23 @@ public class TestCirculantTracker {
 
 		// No motion motion
 		Rectangle2D_F32 r = alg.getTargetLocation();
-		assertEquals(5,r.tl_x,tolerance);
-		assertEquals(6,r.tl_y,tolerance);
+		assertEquals(5,r.x0,tolerance);
+		assertEquals(6,r.y0,tolerance);
 
 		// check estimated motion
 		GImageMiscOps.fillUniform(b,rand,0,200);
 		shiftCopy(-3,2,a,b);
 		alg.updateTrackLocation(b);
 		r = alg.getTargetLocation();
-		assertEquals(5-3,r.tl_x,tolerance);
-		assertEquals(6+2,r.tl_y,tolerance);
+		assertEquals(5-3,r.x0,tolerance);
+		assertEquals(6+2,r.y0,tolerance);
 
 		// try out of bounds case
 		GImageMiscOps.fillUniform(b,rand,0,200);
 		shiftCopy(-6,0,a,b);
 		alg.updateTrackLocation(b);
-		assertEquals(5-6,r.tl_x,tolerance);
-		assertEquals(6,r.tl_y,tolerance);
+		assertEquals(5-6,r.x0,tolerance);
+		assertEquals(6,r.y0,tolerance);
 	}
 
 	@Test

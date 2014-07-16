@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -275,10 +275,10 @@ public class DistortImageOps {
 	{
 		Rectangle2D_I32 ret = boundBox(srcWidth,srcHeight,transform);
 
-		int x0 = ret.tl_x;
-		int y0 = ret.tl_y;
-		int x1 = ret.tl_x + ret.width;
-		int y1 = ret.tl_y + ret.height;
+		int x0 = ret.x0;
+		int y0 = ret.y0;
+		int x1 = ret.x0 + ret.width;
+		int y1 = ret.y0 + ret.height;
 
 		if( x0 < 0 ) x0 = 0;
 		if( x1 > dstWidth) x1 = dstWidth;

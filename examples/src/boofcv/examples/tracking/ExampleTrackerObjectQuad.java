@@ -26,7 +26,7 @@ import boofcv.io.MediaManager;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.wrapper.DefaultMediaManager;
 import boofcv.misc.BoofMiscOps;
-import boofcv.struct.image.ImageType;
+import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageUInt8;
 import georegression.struct.shapes.Quadrilateral_F64;
 
@@ -51,18 +51,24 @@ public class ExampleTrackerObjectQuad {
 		MediaManager media = DefaultMediaManager.INSTANCE;
 		String fileName = "../data/applet/tracking/track_book.mjpeg";
 
-		SimpleImageSequence<ImageUInt8> video = media.openVideo(fileName, ImageType.single(ImageUInt8.class));
-
 		// Create the tracker.  Comment/Uncomment to change the tracker.  Mean-shift trackers have been omitted
 		// from the list since they use color information and including color images could clutter up the example.
-		TrackerObjectQuad<ImageUInt8> tracker =
+		TrackerObjectQuad tracker =
 				FactoryTrackerObjectQuad.circulant(null, ImageUInt8.class);
 //				FactoryTrackerObjectQuad.sparseFlow(null,ImageUInt8.class,null);
 //				FactoryTrackerObjectQuad.tld(null,ImageUInt8.class);
+//				FactoryTrackerObjectQuad.meanShiftComaniciu2003(new ConfigComaniciu2003(), ImageType.ms(3,ImageUInt8.class));
+//				FactoryTrackerObjectQuad.meanShiftComaniciu2003(new ConfigComaniciu2003(true),ImageType.ms(3,ImageUInt8.class));
+
+				// Mean-shift likelihood will fail in this video, but is excellent at tracking objects with
+				// a single unique color.  See ExampleTrackerMeanShiftLikelihood
+//				FactoryTrackerObjectQuad.meanShiftLikelihood(30,5,255, MeanShiftLikelihoodType.HISTOGRAM,ImageType.ms(3,ImageUInt8.class));
+
+		SimpleImageSequence video = media.openVideo(fileName, tracker.getImageType());
 
 		// specify the target's initial location and initialize with the first frame
 		Quadrilateral_F64 location = new Quadrilateral_F64(276,159,362,163,358,292,273,289);
-		ImageUInt8 frame = video.next();
+		ImageBase frame = video.next();
 		tracker.initialize(frame,location);
 
 		// For displaying the results

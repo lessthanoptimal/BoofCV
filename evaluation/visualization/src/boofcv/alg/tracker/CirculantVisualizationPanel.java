@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -95,8 +95,8 @@ public class CirculantVisualizationPanel extends JPanel implements MouseListener
 
 		if( hasSelected ) {
 			Rectangle2D_F32 r = tracker.getTargetLocation();
-			selected.x0 = (int)r.tl_x;
-			selected.y0 = (int)r.tl_y;
+			selected.x0 = (int)r.x0;
+			selected.y0 = (int)r.y0;
 			selected.x1 = selected.x0 + (int)r.width;
 			selected.y1 = selected.y0 + (int)r.height;
 

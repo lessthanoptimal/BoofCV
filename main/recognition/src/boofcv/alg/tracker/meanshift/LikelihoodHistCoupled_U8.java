@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -67,7 +67,7 @@ public class LikelihoodHistCoupled_U8 implements PixelLikelihood<MultiSpectral<I
 	public void createModel(Rectangle2D_I32 target) {
 		for( int y = 0; y < target.height; y++ ) {
 
-			int index = image.startIndex + (y+target.tl_y)*image.stride + target.tl_x;
+			int index = image.startIndex + (y+target.y0)*image.stride + target.x0;
 			for( int x = 0; x < target.width; x++ , index++ ) {
 				int indexBin = 0;
 				int binStride = 1;

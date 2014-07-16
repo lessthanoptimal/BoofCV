@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -234,8 +234,8 @@ public class RectifyImageOps {
 										 DenseMatrix64F rectifyK,
 										 Rectangle2D_F32 bound, double scale) {
 		// translation
-		double deltaX = -bound.tl_x*scale;
-		double deltaY = -bound.tl_y*scale;
+		double deltaX = -bound.x0*scale;
+		double deltaY = -bound.y0*scale;
 
 		// adjustment matrix
 		SimpleMatrix A = new SimpleMatrix(3,3,true,scale,0,deltaX,0,scale,deltaY,0,0,1);
@@ -262,8 +262,8 @@ public class RectifyImageOps {
 	private static void adjustUncalibrated(DenseMatrix64F rectifyLeft, DenseMatrix64F rectifyRight,
 										   Rectangle2D_F32 bound, double scale) {
 		// translation
-		double deltaX = -bound.tl_x*scale;
-		double deltaY = -bound.tl_y*scale;
+		double deltaX = -bound.x0*scale;
+		double deltaY = -bound.y0*scale;
 
 		// adjustment matrix
 		SimpleMatrix A = new SimpleMatrix(3,3,true,scale,0,deltaX,0,scale,deltaY,0,0,1);

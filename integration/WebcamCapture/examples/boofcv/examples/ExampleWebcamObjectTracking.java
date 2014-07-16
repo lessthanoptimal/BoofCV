@@ -191,7 +191,6 @@ public class ExampleWebcamObjectTracking<T extends ImageBase> extends JPanel
 
 	@Override
 	public void mouseReleased(MouseEvent e) {
-		System.out.println("Mouse released");
 		point1.set(e.getX(),e.getY());
 		mode = 2;
 	}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -260,8 +260,8 @@ public class TestLensDistortionOps {
 		PixelTransformAffine_F32 transform = new PixelTransformAffine_F32(affine);
 		Rectangle2D_F32 found = LensDistortionOps.boundBoxInside(20, 10, transform);
 
-		assertEquals(10,found.tl_x,1e-4);
-		assertEquals(2 ,found.tl_y,1e-4);
+		assertEquals(10,found.x0,1e-4);
+		assertEquals(2 ,found.y0,1e-4);
 		assertEquals(20-9,found.width,1e-4);
 		assertEquals(10, found.height,1e-4);
 	}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -70,8 +70,8 @@ public class LensDistortionOps {
 		double scale = Math.max(scaleX, scaleY);
 
 		// translation
-		double deltaX = bound.tl_x;
-		double deltaY = bound.tl_y;
+		double deltaX = bound.x0;
+		double deltaY = bound.y0;
 
 		// adjustment matrix
 		DenseMatrix64F A = new DenseMatrix64F(3,3,true,scale,0,deltaX,0,scale,deltaY,0,0,1);
@@ -118,8 +118,8 @@ public class LensDistortionOps {
 		double scale = Math.min(scaleX, scaleY);
 
 		// translation and shift over so that the small axis is in the middle
-		double deltaX = bound.tl_x + (scaleX-scale)*param.width/2.0;
-		double deltaY = bound.tl_y + (scaleY-scale)*param.height/2.0;
+		double deltaX = bound.x0 + (scaleX-scale)*param.width/2.0;
+		double deltaY = bound.y0 + (scaleY-scale)*param.height/2.0;
 
 		// adjustment matrix
 		DenseMatrix64F A = new DenseMatrix64F(3,3,true,scale,0,deltaX,0,scale,deltaY,0,0,1);
@@ -298,13 +298,13 @@ public class LensDistortionOps {
 	 * single pixel wide black regions
 	 */
 	public static void roundInside( Rectangle2D_F32 bound ) {
-		float x0 = (float)Math.ceil(bound.tl_x);
-		float y0 = (float)Math.ceil(bound.tl_y);
-		float x1 = (float)Math.floor(bound.tl_x+bound.width);
-		float y1 = (float)Math.floor(bound.tl_y+bound.height);
+		float x0 = (float)Math.ceil(bound.x0);
+		float y0 = (float)Math.ceil(bound.y0);
+		float x1 = (float)Math.floor(bound.x0+bound.width);
+		float y1 = (float)Math.floor(bound.y0+bound.height);
 
-		bound.tl_x = x0;
-		bound.tl_y = y0;
+		bound.x0 = x0;
+		bound.y0 = y0;
 		bound.width = x1-x0;
 		bound.height = y1-y0;
 	}

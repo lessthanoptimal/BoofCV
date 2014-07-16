@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -200,8 +200,8 @@ public class CirculantTracker<T extends ImageSingleBand> {
 		// save the track location
 		this.regionTrack.width = w;
 		this.regionTrack.height = h;
-		this.regionTrack.tl_x = cx-w/2;
-		this.regionTrack.tl_y = cy-h/2;
+		this.regionTrack.x0 = cx-w/2;
+		this.regionTrack.y0 = cy-h/2;
 
 		stepX = (w-1)/(float)(workRegionSize-1);
 		stepY = (h-1)/(float)(workRegionSize-1);
@@ -344,8 +344,8 @@ public class CirculantTracker<T extends ImageSingleBand> {
 		float deltaY = (peakY+offY) - templateNew.height/2;
 
 		// convert peak location into image coordinate system
-		regionTrack.tl_x = regionTrack.tl_x + deltaX*stepX;
-		regionTrack.tl_y = regionTrack.tl_y + deltaY*stepY;
+		regionTrack.x0 = regionTrack.x0 + deltaX*stepX;
+		regionTrack.y0 = regionTrack.y0 + deltaY*stepY;
 
 		updateRegionOut();
 	}
@@ -367,8 +367,8 @@ public class CirculantTracker<T extends ImageSingleBand> {
 	}
 
 	private void updateRegionOut() {
-		regionOut.tl_x = (regionTrack.tl_x+((int)regionTrack.width)/2)-((int)regionOut.width)/2;
-		regionOut.tl_y = (regionTrack.tl_y+((int)regionTrack.height)/2)-((int)regionOut.height)/2;
+		regionOut.x0 = (regionTrack.x0+((int)regionTrack.width)/2)-((int)regionOut.width)/2;
+		regionOut.y0 = (regionTrack.y0+((int)regionTrack.height)/2)-((int)regionOut.height)/2;
 	}
 
 	/**
@@ -560,10 +560,10 @@ public class CirculantTracker<T extends ImageSingleBand> {
 		interp.setImage(image);
 		int index = 0;
 		for( int y = 0; y < workRegionSize; y++ ) {
-			float yy = regionTrack.tl_y + y*stepY;
+			float yy = regionTrack.y0 + y*stepY;
 
 			for( int x = 0; x < workRegionSize; x++ ) {
-				float xx = regionTrack.tl_x + x*stepX;
+				float xx = regionTrack.x0 + x*stepX;
 
 				if( interp.isInFastBounds(xx,yy))
 					output.data[index++] = interp.get_fast(xx,yy);
