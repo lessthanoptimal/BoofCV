@@ -640,11 +640,11 @@ public class ExampleMultiviewSceneReconstruction {
 		double scale = 1.0/T;
 
 		for( Se3_F64 m : motionWorldToCamera) {
-			m.T.scale(scale);
+			m.T.timesIP(scale);
 		}
 
 		for( Feature3D t : features) {
-			t.worldPt.scale(scale);
+			t.worldPt.timesIP(scale);
 		}
 	}
 
