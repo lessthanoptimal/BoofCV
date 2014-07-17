@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -96,7 +96,7 @@ public class StereoParameters implements Serializable {
 	}
 
 	public void print() {
-		double euler[] = RotationMatrixGenerator.matrixToEulerXYZ(rightToLeft.getR(),null);
+		double euler[] = RotationMatrixGenerator.matrixToEulerXYZ(rightToLeft.getR(),(double[])null);
 		Vector3D_F64 t = rightToLeft.getT();
 		System.out.println();
 		System.out.println("Left Camera");

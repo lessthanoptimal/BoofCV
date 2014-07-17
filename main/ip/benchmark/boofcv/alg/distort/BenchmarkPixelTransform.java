@@ -22,7 +22,7 @@ import boofcv.misc.Performer;
 import boofcv.misc.ProfileOperation;
 import boofcv.struct.distort.PixelTransform_F32;
 import georegression.struct.affine.Affine2D_F32;
-import georegression.struct.homo.Homography2D_F32;
+import georegression.struct.homography.Homography2D_F32;
 
 import java.util.Random;
 

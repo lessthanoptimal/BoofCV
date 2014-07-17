@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,12 +19,12 @@
 package boofcv.alg.distort;
 
 
-import georegression.struct.homo.Homography2D_F32;
-import georegression.struct.homo.Homography2D_F64;
+import georegression.struct.homography.Homography2D_F32;
+import georegression.struct.homography.Homography2D_F64;
 import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_F64;
-import georegression.transform.homo.HomographyPointOps_F32;
-import georegression.transform.homo.HomographyPointOps_F64;
+import georegression.transform.homography.HomographyPointOps_F32;
+import georegression.transform.homography.HomographyPointOps_F64;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

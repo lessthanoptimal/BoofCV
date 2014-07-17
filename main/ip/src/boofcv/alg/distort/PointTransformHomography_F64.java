@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,15 +19,15 @@
 package boofcv.alg.distort;
 
 import boofcv.struct.distort.PointTransform_F64;
-import georegression.struct.homo.Homography2D_F64;
-import georegression.struct.homo.UtilHomography;
+import georegression.struct.homography.Homography2D_F64;
+import georegression.struct.homography.UtilHomography;
 import georegression.struct.point.Point2D_F64;
-import georegression.transform.homo.HomographyPointOps_F64;
+import georegression.transform.homography.HomographyPointOps_F64;
 import org.ejml.data.DenseMatrix64F;
 
 
 /**
- * {@link boofcv.struct.distort.PointTransform_F64} using {@link georegression.struct.homo.Homography2D_F64}.
+ * {@link boofcv.struct.distort.PointTransform_F64} using {@link georegression.struct.homography.Homography2D_F64}.
  *
  * @author Peter Abeles
  */

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,11 +23,11 @@ import boofcv.alg.geo.MultiViewOps;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.struct.geo.AssociatedPair;
 import georegression.geometry.RotationMatrixGenerator;
-import georegression.struct.homo.Homography2D_F64;
-import georegression.struct.homo.UtilHomography;
+import georegression.struct.homography.Homography2D_F64;
+import georegression.struct.homography.UtilHomography;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Vector3D_F64;
-import georegression.transform.homo.HomographyPointOps_F64;
+import georegression.transform.homography.HomographyPointOps_F64;
 import org.ddogleg.fitting.modelset.DistanceFromModel;
 import org.ejml.data.DenseMatrix64F;
 

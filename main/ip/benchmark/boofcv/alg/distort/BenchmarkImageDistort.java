@@ -30,7 +30,7 @@ import boofcv.misc.ProfileOperation;
 import boofcv.struct.distort.PixelTransform_F32;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
-import georegression.struct.homo.Homography2D_F32;
+import georegression.struct.homography.Homography2D_F32;
 
 import java.util.Random;
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -450,7 +450,7 @@ public class VisOdomQuadPnP<T extends ImageSingleBand,TD extends TupleDesc> {
 	}
 
 	private String toString( Se3_F64 motion ) {
-		double euler[] = RotationMatrixGenerator.matrixToEulerXYZ(motion.getR(),null);
+		double euler[] = RotationMatrixGenerator.matrixToEulerXYZ(motion.getR(),(double[])null);
 		return String.format("%5e %5e %5e",euler[0],euler[1],euler[2]);
 	}
 

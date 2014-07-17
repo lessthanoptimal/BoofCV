@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,9 +19,9 @@
 package boofcv.alg.sfm.d2;
 
 import boofcv.gui.feature.VisualizeFeatures;
-import georegression.struct.homo.Homography2D_F64;
+import georegression.struct.homography.Homography2D_F64;
 import georegression.struct.point.Point2D_F64;
-import georegression.transform.homo.HomographyPointOps_F64;
+import georegression.transform.homography.HomographyPointOps_F64;
 import org.ddogleg.struct.FastQueue;
 
 import javax.swing.*;

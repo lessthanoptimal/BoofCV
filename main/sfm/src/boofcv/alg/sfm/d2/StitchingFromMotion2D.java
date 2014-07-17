@@ -26,7 +26,7 @@ import boofcv.struct.distort.PixelTransform_F32;
 import boofcv.struct.image.ImageBase;
 import georegression.metric.Area2D_F64;
 import georegression.struct.InvertibleTransform;
-import georegression.struct.homo.Homography2D_F64;
+import georegression.struct.homography.Homography2D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.Rectangle2D_I32;
 

@@ -35,7 +35,7 @@ import boofcv.misc.BoofMiscOps;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageType;
 import boofcv.struct.image.MultiSpectral;
-import georegression.struct.homo.Homography2D_F64;
+import georegression.struct.homography.Homography2D_F64;
 
 import java.awt.image.BufferedImage;
 
