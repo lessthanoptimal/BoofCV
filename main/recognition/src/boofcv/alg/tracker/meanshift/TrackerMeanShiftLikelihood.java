@@ -23,7 +23,7 @@ import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.sparse.SparseImageSample_F32;
 import georegression.struct.shapes.Rectangle2D_I32;
-import georegression.struct.shapes.RectangleCorner2D_I32;
+import georegression.struct.shapes.RectangleLength2D_I32;
 
 /**
  * <p>
@@ -54,11 +54,11 @@ public class TrackerMeanShiftLikelihood<T extends ImageBase> {
 	// image used to store the likelihood
 	private ImageFloat32 pdf = new ImageFloat32(1,1);
 	// current location of the target
-	private Rectangle2D_I32 location = new Rectangle2D_I32();
+	private RectangleLength2D_I32 location = new RectangleLength2D_I32();
 
 	// rectangle inside of PDF which has been modified.  Used to minimize writing to the image.  probably
 	// premature optimization
-	private RectangleCorner2D_I32 dirty = new RectangleCorner2D_I32();
+	private Rectangle2D_I32 dirty = new Rectangle2D_I32();
 
 	// maximum number of iterations
 	private int maxIterations;
@@ -90,7 +90,7 @@ public class TrackerMeanShiftLikelihood<T extends ImageBase> {
 	 * @param image Image
 	 * @param initial Initial target location and the mean-shift bandwidth
 	 */
-	public void initialize( T image , Rectangle2D_I32 initial ) {
+	public void initialize( T image , RectangleLength2D_I32 initial ) {
 		if( !image.isInBounds(initial.x0,initial.y0) )
 			throw new IllegalArgumentException("Initial rectangle is out of bounds!");
 		if( !image.isInBounds(initial.x0+initial.width,initial.y0+initial.height) )
@@ -239,7 +239,7 @@ public class TrackerMeanShiftLikelihood<T extends ImageBase> {
 	 * Current location of target in the image
 	 * @return rectangle containing the target
 	 */
-	public Rectangle2D_I32 getLocation() {
+	public RectangleLength2D_I32 getLocation() {
 		return location;
 	}
 

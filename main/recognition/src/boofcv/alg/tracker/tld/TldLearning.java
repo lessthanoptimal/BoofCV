@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.alg.tracker.tld;
 
 import boofcv.struct.ImageRectangle;
 import boofcv.struct.image.ImageSingleBand;
-import georegression.struct.shapes.RectangleCorner2D_F64;
+import georegression.struct.shapes.Rectangle2D_F64;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_F64;
 
@@ -80,7 +80,7 @@ public class TldLearning<T extends ImageSingleBand> {
 	 * @param targetRegion user selected region
 	 * @param cascadeRegions Set of regions used by the cascade detector
 	 */
-	public void initialLearning( RectangleCorner2D_F64 targetRegion ,
+	public void initialLearning( Rectangle2D_F64 targetRegion ,
 								 FastQueue<ImageRectangle> cascadeRegions ) {
 		storageMetric.reset();
 		fernNegative.clear();
@@ -130,7 +130,7 @@ public class TldLearning<T extends ImageSingleBand> {
 	 * Updates learning using the latest tracking results.
 	 * @param targetRegion Region selected by the fused tracking
 	 */
-	public void updateLearning( RectangleCorner2D_F64 targetRegion ) {
+	public void updateLearning( Rectangle2D_F64 targetRegion ) {
 
 		storageMetric.reset();
 
@@ -165,7 +165,7 @@ public class TldLearning<T extends ImageSingleBand> {
 	 * Mark regions which were local maximums and had high confidence as negative.  These regions were
 	 * candidates for the tracker but were not selected
 	 */
-	protected void learnAmbiguousNegative(RectangleCorner2D_F64 targetRegion) {
+	protected void learnAmbiguousNegative(Rectangle2D_F64 targetRegion) {
 
 		TldHelperFunctions.convertRegion(targetRegion, targetRegion_I32);
 

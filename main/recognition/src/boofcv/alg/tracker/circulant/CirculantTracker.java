@@ -28,7 +28,7 @@ import boofcv.misc.BoofMiscOps;
 import boofcv.struct.image.ImageFloat64;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.InterleavedF64;
-import georegression.struct.shapes.Rectangle2D_F32;
+import georegression.struct.shapes.RectangleLength2D_F32;
 
 import java.util.Random;
 
@@ -103,8 +103,8 @@ public class CirculantTracker<T extends ImageSingleBand> {
 	private InterleavedF64 newAlphaf = new InterleavedF64(1,1,2);
 
 	// location of target
-	protected Rectangle2D_F32 regionTrack = new Rectangle2D_F32();
-	protected Rectangle2D_F32 regionOut = new Rectangle2D_F32();
+	protected RectangleLength2D_F32 regionTrack = new RectangleLength2D_F32();
+	protected RectangleLength2D_F32 regionOut = new RectangleLength2D_F32();
 
 	// Used for computing the gaussian kernel
 	protected ImageFloat64 gaussianWeight = new ImageFloat64(1,1);
@@ -587,7 +587,7 @@ public class CirculantTracker<T extends ImageSingleBand> {
 	/**
 	 * The location of the target in the image
 	 */
-	public Rectangle2D_F32 getTargetLocation() {
+	public RectangleLength2D_F32 getTargetLocation() {
 		return regionOut;
 	}
 

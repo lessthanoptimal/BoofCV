@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,7 +23,7 @@ import boofcv.alg.sfm.robust.GenerateScaleTranslate2D;
 import boofcv.alg.sfm.robust.ModelManagerScaleTranslate2D;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.sfm.ScaleTranslate2D;
-import georegression.struct.shapes.RectangleCorner2D_F64;
+import georegression.struct.shapes.Rectangle2D_F64;
 import org.ddogleg.fitting.modelset.DistanceFromModel;
 import org.ddogleg.fitting.modelset.ModelGenerator;
 import org.ddogleg.fitting.modelset.ModelManager;
@@ -69,7 +69,7 @@ public class TldAdjustRegion {
 	 * @param targetRectangle (Input) current location of rectangle.  (output) adjusted location
 	 * @return true if successful
 	 */
-	public boolean process( FastQueue<AssociatedPair> pairs , RectangleCorner2D_F64 targetRectangle ) {
+	public boolean process( FastQueue<AssociatedPair> pairs , Rectangle2D_F64 targetRectangle ) {
 		// estimate how the rectangle has changed and update it
 		if( !estimateMotion.process(pairs.toList()) )
 			return false;
@@ -78,10 +78,10 @@ public class TldAdjustRegion {
 
 		adjustRectangle(targetRectangle,motion);
 
-		if( targetRectangle.x0 < 0 || targetRectangle.y0 < 0 )
+		if( targetRectangle.p0.x < 0 || targetRectangle.p0.y < 0 )
 			return false;
 
-		if( targetRectangle.x1 >= imageWidth || targetRectangle.y1 >= imageHeight )
+		if( targetRectangle.p1.x >= imageWidth || targetRectangle.p1.y >= imageHeight )
 			return false;
 
 		return true;
@@ -90,10 +90,10 @@ public class TldAdjustRegion {
 	/**
 	 * Estimate motion of points inside the rectangle and updates the rectangle using the found motion.
 	 */
-	protected void adjustRectangle( RectangleCorner2D_F64 rect , ScaleTranslate2D motion ) {
-		rect.x0 = rect.x0*motion.scale + motion.transX;
-		rect.y0 = rect.y0*motion.scale + motion.transY;
-		rect.x1 = rect.x1*motion.scale + motion.transX;
-		rect.y1 = rect.y1*motion.scale + motion.transY;
+	protected void adjustRectangle( Rectangle2D_F64 rect , ScaleTranslate2D motion ) {
+		rect.p0.x = rect.p0.x*motion.scale + motion.transX;
+		rect.p0.y = rect.p0.y*motion.scale + motion.transY;
+		rect.p1.x = rect.p1.x*motion.scale + motion.transX;
+		rect.p1.y = rect.p1.y*motion.scale + motion.transY;
 	}
 }

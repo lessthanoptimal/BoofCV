@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,7 +23,7 @@ import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageType;
 import georegression.geometry.UtilPolygons2D_F64;
 import georegression.struct.shapes.Quadrilateral_F64;
-import georegression.struct.shapes.RectangleCorner2D_F64;
+import georegression.struct.shapes.Rectangle2D_F64;
 
 /**
  * Wrapper around {@link boofcv.alg.tracker.tld.TldTracker} for {@link TrackerObjectQuad}.
@@ -33,7 +33,7 @@ import georegression.struct.shapes.RectangleCorner2D_F64;
 public class Tld_to_TrackerObjectQuad<T extends ImageSingleBand, D extends ImageSingleBand>
 		implements TrackerObjectQuad<T>
 {
-	RectangleCorner2D_F64 rect = new RectangleCorner2D_F64();
+	Rectangle2D_F64 rect = new Rectangle2D_F64();
 	TldTracker<T,D> tracker;
 	ImageType<T> type;
 
@@ -47,7 +47,7 @@ public class Tld_to_TrackerObjectQuad<T extends ImageSingleBand, D extends Image
 
 		UtilPolygons2D_F64.bounding(location, rect);
 
-		tracker.initialize(image,(int)rect.x0,(int)rect.y0,(int)rect.x1,(int)rect.y1);
+		tracker.initialize(image,(int)rect.p0.x,(int)rect.p0.y,(int)rect.p1.x,(int)rect.p1.y);
 
 		return true;
 	}
@@ -58,16 +58,16 @@ public class Tld_to_TrackerObjectQuad<T extends ImageSingleBand, D extends Image
 		if( !tracker.track(image) )
 			return false;
 
-		RectangleCorner2D_F64 rect = tracker.getTargetRegion();
+		Rectangle2D_F64 rect = tracker.getTargetRegion();
 
-		location.a.x = rect.x0;
-		location.a.y = rect.y0;
-		location.b.x = rect.x1;
-		location.b.y = rect.y0;
-		location.c.x = rect.x1;
-		location.c.y = rect.y1;
-		location.d.x = rect.x0;
-		location.d.y = rect.y1;
+		location.a.x = rect.p0.x;
+		location.a.y = rect.p0.y;
+		location.b.x = rect.p1.x;
+		location.b.y = rect.p0.y;
+		location.c.x = rect.p1.x;
+		location.c.y = rect.p1.y;
+		location.d.x = rect.p0.x;
+		location.d.y = rect.p1.y;
 
 		return true;
 	}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.alg.tracker.meanshift;
 
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.sparse.SparseImageSample_F32;
-import georegression.struct.shapes.Rectangle2D_I32;
+import georegression.struct.shapes.RectangleLength2D_I32;
 
 /**
  * Computes the likelihood that a pixel belongs to the target.
@@ -39,6 +39,6 @@ public interface PixelLikelihood<T extends ImageBase> extends SparseImageSample_
 	 * inside the rectangle
 	 * @param target Location of target inside the image
 	 */
-	public void createModel( Rectangle2D_I32 target );
+	public void createModel( RectangleLength2D_I32 target );
 
 }

@@ -26,7 +26,7 @@ import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageFloat64;
 import boofcv.struct.image.InterleavedF64;
-import georegression.struct.shapes.Rectangle2D_F32;
+import georegression.struct.shapes.RectangleLength2D_F32;
 import org.ddogleg.complex.ComplexMath64F;
 import org.ejml.data.Complex64F;
 import org.junit.Test;
@@ -90,7 +90,7 @@ public class TestCirculantTracker {
 
 		double tolerance = 1;
 
-		Rectangle2D_F32 r = alg.getTargetLocation();
+		RectangleLength2D_F32 r = alg.getTargetLocation();
 		assertEquals(5+2,r.x0,tolerance);
 		assertEquals(6 + 4, r.y0, tolerance);
 	}
@@ -176,7 +176,7 @@ public class TestCirculantTracker {
 		float tolerance = 1f;
 
 		// No motion motion
-		Rectangle2D_F32 r = alg.getTargetLocation();
+		RectangleLength2D_F32 r = alg.getTargetLocation();
 		assertEquals(5,r.x0,tolerance);
 		assertEquals(6,r.y0,tolerance);
 

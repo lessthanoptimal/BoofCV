@@ -29,7 +29,7 @@ import boofcv.misc.BoofMiscOps;
 import boofcv.struct.image.ImageType;
 import boofcv.struct.image.ImageUInt8;
 import boofcv.struct.image.MultiSpectral;
-import georegression.struct.shapes.Rectangle2D_I32;
+import georegression.struct.shapes.RectangleLength2D_I32;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -75,7 +75,7 @@ public class ExampleTrackerMeanShiftLikelihood {
 		 * model is provided in the constructor it isn't needed or used.
 		 */
 		@Override
-		public void createModel(Rectangle2D_I32 target) {
+		public void createModel(RectangleLength2D_I32 target) {
 			throw new RuntimeException("Not supported");
 		}
 
@@ -98,7 +98,7 @@ public class ExampleTrackerMeanShiftLikelihood {
 	public static void main(String[] args) {
 		MediaManager media = DefaultMediaManager.INSTANCE;
 		String fileName = "../data/applet/tracking/balls_blue_red.mjpeg";
-		Rectangle2D_I32 location = new Rectangle2D_I32(394,247,475-394,325-247);
+		RectangleLength2D_I32 location = new RectangleLength2D_I32(394,247,475-394,325-247);
 
 		ImageType<MultiSpectral<ImageUInt8>> imageType = ImageType.ms(3,ImageUInt8.class);
 

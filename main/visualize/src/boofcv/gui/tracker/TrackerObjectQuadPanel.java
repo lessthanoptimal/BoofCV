@@ -21,7 +21,7 @@ package boofcv.gui.tracker;
 import georegression.geometry.UtilPolygons2D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.Quadrilateral_F64;
-import georegression.struct.shapes.Rectangle2D_I32;
+import georegression.struct.shapes.RectangleLength2D_I32;
 
 import javax.swing.*;
 import java.awt.*;
@@ -77,7 +77,7 @@ public class TrackerObjectQuadPanel extends JPanel implements MouseListener {
 		repaint();
 	}
 
-	public synchronized void setTarget( Rectangle2D_I32 rect , boolean visible ) {
+	public synchronized void setTarget( RectangleLength2D_I32 rect , boolean visible ) {
 		if( quad != null )
 			UtilPolygons2D_F64.convert(rect, quad);
 		selectMode = false;

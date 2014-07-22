@@ -28,7 +28,7 @@ import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.distort.*;
 import boofcv.struct.image.ImageSingleBand;
-import georegression.struct.shapes.Rectangle2D_F32;
+import georegression.struct.shapes.RectangleLength2D_F32;
 import org.ejml.data.DenseMatrix64F;
 
 /**
@@ -61,7 +61,7 @@ public class LensDistortionOps {
 		removeDistort.set(param.fx, param.fy, param.skew, param.cx, param.cy, param.radial);
 		addDistort.set(param.fx, param.fy, param.skew, param.cx, param.cy, param.radial);
 
-		Rectangle2D_F32 bound = DistortImageOps.boundBox_F32(param.width, param.height,
+		RectangleLength2D_F32 bound = DistortImageOps.boundBox_F32(param.width, param.height,
 				new PointToPixelTransform_F32(removeDistort));
 
 		double scaleX = bound.width/param.width;
@@ -106,7 +106,7 @@ public class LensDistortionOps {
 		removeDistort.set(param.fx, param.fy, param.skew, param.cx, param.cy, param.radial);
 		addDistort.set(param.fx, param.fy, param.skew, param.cx, param.cy, param.radial);
 
-		Rectangle2D_F32 bound = LensDistortionOps.boundBoxInside(param.width, param.height,
+		RectangleLength2D_F32 bound = LensDistortionOps.boundBoxInside(param.width, param.height,
 				new PointToPixelTransform_F32(removeDistort));
 
 		// ensure there are no strips of black
@@ -258,7 +258,7 @@ public class LensDistortionOps {
 	 * @param transform Transform being applied to the image
 	 * @return Bounding box
 	 */
-	public static Rectangle2D_F32 boundBoxInside(int srcWidth, int srcHeight,
+	public static RectangleLength2D_F32 boundBoxInside(int srcWidth, int srcHeight,
 												 PixelTransform_F32 transform) {
 
 		float x0,y0,x1,y1;
@@ -269,7 +269,7 @@ public class LensDistortionOps {
 
 		transform.compute(srcWidth,0);
 		x1=transform.distX;
-		transform.compute(0,srcHeight);
+		transform.compute(0, srcHeight);
 		y1=transform.distY;
 
 		for( int x = 0; x < srcWidth; x++ ) {
@@ -290,14 +290,14 @@ public class LensDistortionOps {
 				x1 = transform.distX;
 		}
 
-		return new Rectangle2D_F32(x0,y0,x1-x0,y1-y0);
+		return new RectangleLength2D_F32(x0,y0,x1-x0,y1-y0);
 	}
 
 	/**
 	 * Adjust bound to ensure the entire image is contained inside, otherwise there might be
 	 * single pixel wide black regions
 	 */
-	public static void roundInside( Rectangle2D_F32 bound ) {
+	public static void roundInside( RectangleLength2D_F32 bound ) {
 		float x0 = (float)Math.ceil(bound.x0);
 		float y0 = (float)Math.ceil(bound.y0);
 		float x1 = (float)Math.floor(bound.x0+bound.width);

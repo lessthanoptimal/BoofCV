@@ -23,8 +23,8 @@ import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageType;
 import georegression.geometry.UtilPolygons2D_F64;
 import georegression.struct.shapes.Quadrilateral_F64;
-import georegression.struct.shapes.Rectangle2D_F32;
-import georegression.struct.shapes.RectangleCorner2D_F64;
+import georegression.struct.shapes.Rectangle2D_F64;
+import georegression.struct.shapes.RectangleLength2D_F32;
 
 /**
  * Wrapper around {@link CirculantTracker} for {@link TrackerObjectQuad}.
@@ -34,7 +34,7 @@ import georegression.struct.shapes.RectangleCorner2D_F64;
 public class Circulant_to_TrackerObjectQuad<T extends ImageSingleBand> implements TrackerObjectQuad<T> {
 
 	CirculantTracker<T> tracker;
-	RectangleCorner2D_F64 rect = new RectangleCorner2D_F64();
+	Rectangle2D_F64 rect = new Rectangle2D_F64();
 
 	ImageType<T> imageType;
 
@@ -50,10 +50,10 @@ public class Circulant_to_TrackerObjectQuad<T extends ImageSingleBand> implement
 
 		UtilPolygons2D_F64.bounding(location, rect);
 
-		int width = (int)(rect.x1 - rect.x0);
-		int height = (int)(rect.y1 - rect.y0);
+		int width = (int)(rect.p1.x - rect.p0.x);
+		int height = (int)(rect.p1.y - rect.p0.y);
 
-		tracker.initialize(image,(int)rect.x0,(int)rect.y0,width,height);
+		tracker.initialize(image,(int)rect.p0.x,(int)rect.p0.y,width,height);
 
 		return true;
 	}
@@ -62,7 +62,7 @@ public class Circulant_to_TrackerObjectQuad<T extends ImageSingleBand> implement
 	public boolean process(T image, Quadrilateral_F64 location) {
 
 		tracker.performTracking(image);
-		Rectangle2D_F32 r = tracker.getTargetLocation();
+		RectangleLength2D_F32 r = tracker.getTargetLocation();
 
 		if( r.x0 >= image.width || r.y0 >= image.height )
 			return false;

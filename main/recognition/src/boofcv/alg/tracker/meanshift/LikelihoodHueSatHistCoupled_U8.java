@@ -21,7 +21,7 @@ package boofcv.alg.tracker.meanshift;
 import boofcv.alg.color.ColorHsv;
 import boofcv.struct.image.ImageUInt8;
 import boofcv.struct.image.MultiSpectral;
-import georegression.struct.shapes.Rectangle2D_I32;
+import georegression.struct.shapes.RectangleLength2D_I32;
 
 /**
  * TODO redo comments
@@ -88,7 +88,7 @@ public class LikelihoodHueSatHistCoupled_U8 implements PixelLikelihood<MultiSpec
 	}
 
 	@Override
-	public void createModel(Rectangle2D_I32 target) {
+	public void createModel(RectangleLength2D_I32 target) {
 
 		float total = 0;
 

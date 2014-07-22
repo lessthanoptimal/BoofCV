@@ -20,7 +20,7 @@ package boofcv.alg.tracker.meanshift;
 
 import boofcv.struct.image.ImageUInt8;
 import boofcv.struct.image.MultiSpectral;
-import georegression.struct.shapes.Rectangle2D_I32;
+import georegression.struct.shapes.RectangleLength2D_I32;
 
 /**
  * Creates a histogram in a color image.  The histogram is computed in N-dimensional space, where N is the number
@@ -64,7 +64,7 @@ public class LikelihoodHistCoupled_U8 implements PixelLikelihood<MultiSpectral<I
 	}
 
 	@Override
-	public void createModel(Rectangle2D_I32 target) {
+	public void createModel(RectangleLength2D_I32 target) {
 		for( int y = 0; y < target.height; y++ ) {
 
 			int index = image.startIndex + (y+target.y0)*image.stride + target.x0;

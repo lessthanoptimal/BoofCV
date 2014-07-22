@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,7 +22,7 @@ import boofcv.alg.tracker.tld.TldHelperFunctions;
 import boofcv.alg.tracker.tld.TldRegion;
 import boofcv.alg.tracker.tld.TldTracker;
 import boofcv.struct.ImageRectangle;
-import georegression.struct.shapes.RectangleCorner2D_F64;
+import georegression.struct.shapes.Rectangle2D_F64;
 import org.ddogleg.struct.FastQueue;
 
 import javax.swing.*;
@@ -93,7 +93,7 @@ public class TldVisualizationPanel extends JPanel implements MouseListener{
 		this.hasSelected = hasSelected;
 
 		if( hasSelected ) {
-			RectangleCorner2D_F64 r = tracker.getTargetRegion();
+			Rectangle2D_F64 r = tracker.getTargetRegion();
 			TldHelperFunctions.convertRegion(r, this.selected);
 
 			addDetections(tracker.getDetection().getLocalMaximums());

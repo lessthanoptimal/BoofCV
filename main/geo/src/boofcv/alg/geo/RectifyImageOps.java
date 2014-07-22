@@ -30,7 +30,7 @@ import boofcv.struct.distort.PointTransform_F64;
 import boofcv.struct.distort.SequencePointTransform_F32;
 import boofcv.struct.distort.SequencePointTransform_F64;
 import boofcv.struct.image.ImageSingleBand;
-import georegression.struct.shapes.Rectangle2D_F32;
+import georegression.struct.shapes.RectangleLength2D_F32;
 import org.ejml.data.DenseMatrix64F;
 import org.ejml.ops.CommonOps;
 import org.ejml.simple.SimpleMatrix;
@@ -119,7 +119,7 @@ public class RectifyImageOps {
 
 		PointTransform_F32 tranLeft = transformPixelToRect_F32(paramLeft, rectifyLeft);
 
-		Rectangle2D_F32 bound = DistortImageOps.boundBox_F32(paramLeft.width, paramLeft.height,
+		RectangleLength2D_F32 bound = DistortImageOps.boundBox_F32(paramLeft.width, paramLeft.height,
 				new PointToPixelTransform_F32(tranLeft));
 
 		double scaleX = paramLeft.width/bound.width;
@@ -151,7 +151,7 @@ public class RectifyImageOps {
 	{
 		PointTransform_F32 tranLeft = new PointTransformHomography_F32(rectifyLeft);
 
-		Rectangle2D_F32 bound = DistortImageOps.boundBox_F32(imageWidth, imageHeight,
+		RectangleLength2D_F32 bound = DistortImageOps.boundBox_F32(imageWidth, imageHeight,
 				new PointToPixelTransform_F32(tranLeft));
 
 		double scaleX = imageWidth/bound.width;
@@ -185,7 +185,7 @@ public class RectifyImageOps {
 
 		PointTransform_F32 tranLeft = transformPixelToRect_F32(paramLeft, rectifyLeft);
 
-		Rectangle2D_F32 bound = LensDistortionOps.boundBoxInside(paramLeft.width, paramLeft.height,
+		RectangleLength2D_F32 bound = LensDistortionOps.boundBoxInside(paramLeft.width, paramLeft.height,
 				new PointToPixelTransform_F32(tranLeft));
 
 		LensDistortionOps.roundInside(bound);
@@ -216,7 +216,7 @@ public class RectifyImageOps {
 	{
 		PointTransform_F32 tranLeft = new PointTransformHomography_F32(rectifyLeft);
 
-		Rectangle2D_F32 bound = LensDistortionOps.boundBoxInside(imageWidth, imageHeight,
+		RectangleLength2D_F32 bound = LensDistortionOps.boundBoxInside(imageWidth, imageHeight,
 				new PointToPixelTransform_F32(tranLeft));
 
 		double scaleX = imageWidth/(double)bound.width;
@@ -232,7 +232,7 @@ public class RectifyImageOps {
 	 */
 	private static void adjustCalibrated(DenseMatrix64F rectifyLeft, DenseMatrix64F rectifyRight,
 										 DenseMatrix64F rectifyK,
-										 Rectangle2D_F32 bound, double scale) {
+										 RectangleLength2D_F32 bound, double scale) {
 		// translation
 		double deltaX = -bound.x0*scale;
 		double deltaY = -bound.y0*scale;
@@ -260,7 +260,7 @@ public class RectifyImageOps {
 	 * Internal function which applies the rectification adjustment to an uncalibrated stereo pair
 	 */
 	private static void adjustUncalibrated(DenseMatrix64F rectifyLeft, DenseMatrix64F rectifyRight,
-										   Rectangle2D_F32 bound, double scale) {
+										   RectangleLength2D_F32 bound, double scale) {
 		// translation
 		double deltaX = -bound.x0*scale;
 		double deltaY = -bound.y0*scale;

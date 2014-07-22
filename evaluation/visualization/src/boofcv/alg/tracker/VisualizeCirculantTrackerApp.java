@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,7 +27,7 @@ import boofcv.io.wrapper.DefaultMediaManager;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageType;
 import boofcv.struct.image.ImageUInt8;
-import georegression.struct.shapes.Rectangle2D_F32;
+import georegression.struct.shapes.RectangleLength2D_F32;
 
 import java.awt.image.BufferedImage;
 
@@ -88,7 +88,7 @@ public class VisualizeCirculantTrackerApp<T extends ImageSingleBand>
 
 			gui.update(tracker);
 
-			Rectangle2D_F32 r = tracker.getTargetLocation();
+			RectangleLength2D_F32 r = tracker.getTargetLocation();
 			System.out.println("Target: " + r);
 			gui.repaint();
 

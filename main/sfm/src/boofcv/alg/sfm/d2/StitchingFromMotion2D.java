@@ -28,7 +28,7 @@ import georegression.metric.Area2D_F64;
 import georegression.struct.InvertibleTransform;
 import georegression.struct.homography.Homography2D_F64;
 import georegression.struct.point.Point2D_F64;
-import georegression.struct.shapes.Rectangle2D_I32;
+import georegression.struct.shapes.RectangleLength2D_I32;
 
 /**
  * Stitches together sequences of images using {@link ImageMotion2D}, typically used for image stabilization
@@ -198,7 +198,7 @@ public class StitchingFromMotion2D<I extends ImageBase, IT extends InvertibleTra
 		computeCurrToInit_PixelTran();
 
 		// only process a cropped portion to speed up processing
-		Rectangle2D_I32 box = DistortImageOps.boundBox(image.width, image.height,
+		RectangleLength2D_I32 box = DistortImageOps.boundBox(image.width, image.height,
 				stitchedImage.width, stitchedImage.height, tranCurrToWorld);
 
 		int x0 = box.x0;

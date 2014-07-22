@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,7 +29,7 @@ import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.pyramid.ImagePyramid;
 import boofcv.struct.pyramid.PyramidDiscrete;
 import georegression.geometry.UtilPoint2D_F32;
-import georegression.struct.shapes.RectangleCorner2D_F64;
+import georegression.struct.shapes.Rectangle2D_F64;
 import org.ddogleg.sorting.QuickSelectArray;
 import org.ddogleg.struct.FastQueue;
 
@@ -86,7 +86,7 @@ public class TldRegionTracker< Image extends ImageSingleBand , Derivative extend
 	private int featureRadius;
 
 	// tracking rectangle adjusted for the image's view rectangle
-	private RectangleCorner2D_F64 spawnRect = new RectangleCorner2D_F64();
+	private Rectangle2D_F64 spawnRect = new Rectangle2D_F64();
 
 	/**
 	 * Configures tracker
@@ -171,7 +171,7 @@ public class TldRegionTracker< Image extends ImageSingleBand , Derivative extend
 	 * @param targetRectangle Location of target in previous frame. Not modified.
 	 * @return true if tracking was successful or false if not
 	 */
-	public boolean process( ImagePyramid<Image> image , RectangleCorner2D_F64 targetRectangle ) {
+	public boolean process( ImagePyramid<Image> image , Rectangle2D_F64 targetRectangle ) {
 
 		boolean success = true;
 		updateCurrent(image);
@@ -285,12 +285,12 @@ public class TldRegionTracker< Image extends ImageSingleBand , Derivative extend
 	/**
 	 * Spawn KLT tracks at evenly spaced points inside a grid
 	 */
-	protected void spawnGrid(RectangleCorner2D_F64 prevRect ) {
+	protected void spawnGrid(Rectangle2D_F64 prevRect ) {
 		// Shrink the rectangle to ensure that all features are entirely contained inside
-		spawnRect.x0 = prevRect.x0 + featureRadius;
-		spawnRect.y0 = prevRect.y0 + featureRadius;
-		spawnRect.x1 = prevRect.x1 - featureRadius;
-		spawnRect.y1 = prevRect.y1 - featureRadius;
+		spawnRect.p0.x = prevRect.p0.x + featureRadius;
+		spawnRect.p0.y = prevRect.p0.y + featureRadius;
+		spawnRect.p1.x = prevRect.p1.x - featureRadius;
+		spawnRect.p1.y = prevRect.p1.y - featureRadius;
 
 		double spawnWidth = spawnRect.getWidth();
 		double spawnHeight = spawnRect.getHeight();
@@ -300,10 +300,10 @@ public class TldRegionTracker< Image extends ImageSingleBand , Derivative extend
 
 		for( int i = 0; i < gridWidth; i++ ) {
 
-			float y = (float)(spawnRect.y0 + i*spawnHeight/(gridWidth-1));
+			float y = (float)(spawnRect.p0.y + i*spawnHeight/(gridWidth-1));
 
 			for( int j = 0; j < gridWidth; j++ ) {
-				float x = (float)(spawnRect.x0 + j*spawnWidth/(gridWidth-1));
+				float x = (float)(spawnRect.p0.x + j*spawnWidth/(gridWidth-1));
 
 				Track t = tracks[i*gridWidth+j];
 				t.klt.x = x;

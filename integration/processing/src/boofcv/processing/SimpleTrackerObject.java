@@ -22,7 +22,7 @@ import boofcv.abst.tracker.TrackerObjectQuad;
 import boofcv.struct.image.ImageBase;
 import georegression.geometry.UtilPolygons2D_F64;
 import georegression.struct.shapes.Quadrilateral_F64;
-import georegression.struct.shapes.RectangleCorner2D_F64;
+import georegression.struct.shapes.Rectangle2D_F64;
 import processing.core.PImage;
 
 /**
@@ -35,7 +35,7 @@ public class SimpleTrackerObject {
 	ImageBase boofImage;
 
 	Quadrilateral_F64 location = new Quadrilateral_F64();
-	RectangleCorner2D_F64 locationR = new RectangleCorner2D_F64();
+	Rectangle2D_F64 locationR = new Rectangle2D_F64();
 
 	public SimpleTrackerObject( TrackerObjectQuad tracker ) {
 		this.tracker = tracker;
@@ -82,7 +82,7 @@ public class SimpleTrackerObject {
 	/**
 	 * Location of the target which has been approximated by a rectangle
 	 */
-	public RectangleCorner2D_F64 getLocationR() {
+	public Rectangle2D_F64 getLocationR() {
 		UtilPolygons2D_F64.bounding(location, locationR);
 		return locationR;
 	}

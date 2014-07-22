@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,12 +20,12 @@ package boofcv.struct;
 
 
 import georegression.metric.Intersection2D_I32;
-import georegression.struct.shapes.RectangleCorner2D_I32;
+import georegression.struct.shapes.Rectangle2D_I32;
 
 /**
  * @author Peter Abeles
  */
-public class ImageRectangle extends RectangleCorner2D_I32 {
+public class ImageRectangle extends Rectangle2D_I32 {
 
 	public ImageRectangle(int x0, int y0, int x1, int y1) {
 		set(x0,y0,x1,y1);

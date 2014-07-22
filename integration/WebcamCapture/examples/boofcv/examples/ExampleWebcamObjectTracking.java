@@ -30,7 +30,7 @@ import com.github.sarxos.webcam.Webcam;
 import georegression.geometry.UtilPolygons2D_F64;
 import georegression.struct.point.Point2D_I32;
 import georegression.struct.shapes.Quadrilateral_F64;
-import georegression.struct.shapes.RectangleCorner2D_F64;
+import georegression.struct.shapes.Rectangle2D_F64;
 
 import javax.swing.*;
 import java.awt.*;
@@ -114,7 +114,7 @@ public class ExampleWebcamObjectTracking<T extends ImageBase> extends JPanel
 
 			boolean success = false;
 			if( mode == 2 ) {
-				RectangleCorner2D_F64 rect = new RectangleCorner2D_F64();
+				Rectangle2D_F64 rect = new Rectangle2D_F64();
 				rect.set(point0.x, point0.y, point1.x, point1.y);
 				UtilPolygons2D_F64.convert(rect, target);
 				success = tracker.initialize(input,target);

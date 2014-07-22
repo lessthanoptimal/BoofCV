@@ -24,8 +24,8 @@ import boofcv.struct.image.ImageMultiBand;
 import boofcv.struct.image.ImageType;
 import georegression.geometry.UtilPolygons2D_F64;
 import georegression.struct.shapes.Quadrilateral_F64;
-import georegression.struct.shapes.Rectangle2D_I32;
-import georegression.struct.shapes.RectangleCorner2D_F64;
+import georegression.struct.shapes.Rectangle2D_F64;
+import georegression.struct.shapes.RectangleLength2D_I32;
 
 /**
  * Wrapper around {@link  boofcv.alg.tracker.meanshift.TrackerMeanShiftLikelihood} for {@link TrackerObjectQuad}
@@ -39,8 +39,8 @@ public class Msl_to_TrackerObjectQuad <T extends ImageMultiBand> implements Trac
 
 	ImageType<T> type;
 
-	RectangleCorner2D_F64 rect = new RectangleCorner2D_F64();
-	Rectangle2D_I32 target = new Rectangle2D_I32();
+	Rectangle2D_F64 rect = new Rectangle2D_F64();
+	RectangleLength2D_I32 target = new RectangleLength2D_I32();
 
 	public Msl_to_TrackerObjectQuad(TrackerMeanShiftLikelihood<T> tracker,
 									PixelLikelihood<T> likelihood , ImageType<T> imageType) {
@@ -55,8 +55,8 @@ public class Msl_to_TrackerObjectQuad <T extends ImageMultiBand> implements Trac
 
 		UtilPolygons2D_F64.bounding(location, rect);
 
-		target.x0 = (int)rect.x0;
-		target.y0 = (int)rect.y0;
+		target.x0 = (int)rect.p0.x;
+		target.y0 = (int)rect.p0.y;
 		target.width = (int)rect.getWidth()+1;
 		target.height = (int)rect.getHeight()+1;
 
@@ -73,7 +73,7 @@ public class Msl_to_TrackerObjectQuad <T extends ImageMultiBand> implements Trac
 		if( !tracker.process(image ))
 		    return false;
 
-		Rectangle2D_I32 rect = tracker.getLocation();
+		RectangleLength2D_I32 rect = tracker.getLocation();
 		UtilPolygons2D_F64.convert(rect,location);
 
 		return true;

@@ -28,7 +28,7 @@ import georegression.metric.Intersection2D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I32;
 import georegression.struct.shapes.Polygon2D_F64;
-import georegression.struct.shapes.RectangleCorner2D_I32;
+import georegression.struct.shapes.Rectangle2D_I32;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -168,7 +168,7 @@ public class DetectQuadBlobsBinary {
 		}
 	}
 
-	RectangleCorner2D_I32 rectangle = new RectangleCorner2D_I32();
+	Rectangle2D_I32 rectangle = new Rectangle2D_I32();
 	private void removeBadPerimeterRatio()
 	{
 		for( int i = 0; i < contours.size(); ) {

@@ -26,7 +26,7 @@ import georegression.geometry.GeometryMath_F64;
 import georegression.struct.affine.Affine2D_F32;
 import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_F64;
-import georegression.struct.shapes.Rectangle2D_F32;
+import georegression.struct.shapes.RectangleLength2D_F32;
 import org.ejml.data.DenseMatrix64F;
 import org.ejml.ops.CommonOps;
 import org.junit.Test;
@@ -258,7 +258,7 @@ public class TestLensDistortionOps {
 		// basic sanity check
 		Affine2D_F32 affine = new Affine2D_F32(1,1,0,1,1,2);
 		PixelTransformAffine_F32 transform = new PixelTransformAffine_F32(affine);
-		Rectangle2D_F32 found = LensDistortionOps.boundBoxInside(20, 10, transform);
+		RectangleLength2D_F32 found = LensDistortionOps.boundBoxInside(20, 10, transform);
 
 		assertEquals(10,found.x0,1e-4);
 		assertEquals(2 ,found.y0,1e-4);

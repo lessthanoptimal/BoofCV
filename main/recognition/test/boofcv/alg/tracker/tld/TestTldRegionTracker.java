@@ -1,3 +1,21 @@
+/*
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ *
+ * This file is part of BoofCV (http://boofcv.org).
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package boofcv.alg.tracker.tld;
 
 import boofcv.abst.filter.derivative.ImageGradient;
@@ -10,7 +28,7 @@ import boofcv.factory.transform.pyramid.FactoryPyramid;
 import boofcv.struct.image.ImageSInt16;
 import boofcv.struct.image.ImageUInt8;
 import boofcv.struct.pyramid.PyramidDiscrete;
-import georegression.struct.shapes.RectangleCorner2D_F64;
+import georegression.struct.shapes.Rectangle2D_F64;
 import org.junit.Test;
 
 import java.util.Random;
@@ -46,7 +64,7 @@ public class TestTldRegionTracker {
 	public void process() {
 		TldRegionTracker alg = createAlg();
 
-		RectangleCorner2D_F64 rect = new RectangleCorner2D_F64(10,20,115,125);
+		Rectangle2D_F64 rect = new Rectangle2D_F64(10,20,115,125);
 
 		alg.initialize(pyramid);
 		assertTrue(alg.process(pyramid, rect));
@@ -63,7 +81,7 @@ public class TestTldRegionTracker {
 		TldRegionTracker alg = createAlg();
 
 		alg.initialize(pyramid);
-		alg.spawnGrid(new RectangleCorner2D_F64(10,20,80,100));
+		alg.spawnGrid(new Rectangle2D_F64(10,20,80,100));
 
 		TldRegionTracker.Track[] tracks = alg.getTracks();
 
@@ -92,7 +110,7 @@ public class TestTldRegionTracker {
 
 		alg.initialize(pyramid);
 		alg.updateCurrent(pyramid);
-		alg.spawnGrid(new RectangleCorner2D_F64(10,20,80,100));
+		alg.spawnGrid(new Rectangle2D_F64(10,20,80,100));
 
 		TldRegionTracker.Track[] tracks = alg.getTracks();
 

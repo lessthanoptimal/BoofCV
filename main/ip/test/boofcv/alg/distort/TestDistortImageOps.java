@@ -24,8 +24,8 @@ import boofcv.alg.misc.GImageMiscOps;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.image.ImageFloat32;
 import georegression.struct.affine.Affine2D_F32;
-import georegression.struct.shapes.Rectangle2D_F32;
-import georegression.struct.shapes.Rectangle2D_I32;
+import georegression.struct.shapes.RectangleLength2D_F32;
+import georegression.struct.shapes.RectangleLength2D_I32;
 import org.junit.Test;
 
 import java.util.Random;
@@ -114,7 +114,7 @@ public class TestDistortImageOps {
 		// basic sanity check
 		Affine2D_F32 affine = new Affine2D_F32(1,0,0,1,2,3);
 		PixelTransformAffine_F32 transform = new PixelTransformAffine_F32(affine);
-		Rectangle2D_I32 found = DistortImageOps.boundBox(10,20,30,40,transform);
+		RectangleLength2D_I32 found = DistortImageOps.boundBox(10,20,30,40,transform);
 		
 		assertEquals(2,found.x0);
 		assertEquals(3,found.y0);
@@ -143,7 +143,7 @@ public class TestDistortImageOps {
 		// basic sanity check
 		Affine2D_F32 affine = new Affine2D_F32(1,0,0,1,2,3);
 		PixelTransformAffine_F32 transform = new PixelTransformAffine_F32(affine);
-		Rectangle2D_I32 found = DistortImageOps.boundBox(10,20,transform);
+		RectangleLength2D_I32 found = DistortImageOps.boundBox(10,20,transform);
 
 		assertEquals(2,found.x0);
 		assertEquals(3,found.y0);
@@ -157,7 +157,7 @@ public class TestDistortImageOps {
 		// basic sanity check
 		Affine2D_F32 affine = new Affine2D_F32(1,0,0,1,2,3);
 		PixelTransformAffine_F32 transform = new PixelTransformAffine_F32(affine);
-		Rectangle2D_F32 found = DistortImageOps.boundBox_F32(10,20,transform);
+		RectangleLength2D_F32 found = DistortImageOps.boundBox_F32(10,20,transform);
 
 		assertEquals(2,found.x0,1e-4);
 		assertEquals(3,found.y0,1e-4);

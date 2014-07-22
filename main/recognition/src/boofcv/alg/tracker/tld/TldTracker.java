@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,7 +26,7 @@ import boofcv.factory.transform.pyramid.FactoryPyramid;
 import boofcv.struct.ImageRectangle;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.pyramid.PyramidDiscrete;
-import georegression.struct.shapes.RectangleCorner2D_F64;
+import georegression.struct.shapes.Rectangle2D_F64;
 import org.ddogleg.struct.FastQueue;
 
 import java.util.Random;
@@ -67,12 +67,12 @@ public class TldTracker<T extends ImageSingleBand, D extends ImageSingleBand> {
 	private TldParameters config;
 
 	// selected region for output
-	private RectangleCorner2D_F64 targetRegion = new RectangleCorner2D_F64();
+	private Rectangle2D_F64 targetRegion = new Rectangle2D_F64();
 
 	// region selected by KLT tracker
 	// NOTE: The tracker updates a pointing point region.  Rounding to the closest integer rectangle introduces errors
 	//       which can build up.
-	private RectangleCorner2D_F64 trackerRegion = new RectangleCorner2D_F64();
+	private Rectangle2D_F64 trackerRegion = new Rectangle2D_F64();
 	private ImageRectangle trackerRegion_I32 = new ImageRectangle();
 
 	// Region used inside detection cascade
@@ -401,11 +401,11 @@ public class TldTracker<T extends ImageSingleBand, D extends ImageSingleBand> {
 	 * Returns the estimated location of the target in the current image
 	 * @return Location of the target
 	 */
-	public RectangleCorner2D_F64 getTargetRegion() {
+	public Rectangle2D_F64 getTargetRegion() {
 		return targetRegion;
 	}
 
-	public RectangleCorner2D_F64 getTrackerRegion() {
+	public Rectangle2D_F64 getTrackerRegion() {
 		return trackerRegion;
 	}
 

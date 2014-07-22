@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,8 +19,8 @@
 package boofcv.alg.tracker.tld;
 
 import boofcv.struct.ImageRectangle;
-import georegression.struct.shapes.RectangleCorner2D_F64;
-import georegression.struct.shapes.RectangleCorner2D_I32;
+import georegression.struct.shapes.Rectangle2D_F64;
+import georegression.struct.shapes.Rectangle2D_I32;
 
 /**
  * @author Peter Abeles
@@ -46,17 +46,15 @@ public class TldHelperFunctions {
 		return areaI/ (double)bottom;
 	}
 
-	public static void convertRegion(RectangleCorner2D_F64 input, RectangleCorner2D_I32 output) {
-		output.x0 = (int)(input.x0+0.5);
-		output.x1 = (int)(input.x1+0.5);
-		output.y0 = (int)(input.y0+0.5);
-		output.y1 = (int)(input.y1+0.5);
+	public static void convertRegion(Rectangle2D_F64 input, Rectangle2D_I32 output) {
+		output.x0 = (int)(input.p0.x+0.5);
+		output.x1 = (int)(input.p1.x+0.5);
+		output.y0 = (int)(input.p0.y+0.5);
+		output.y1 = (int)(input.p1.y+0.5);
 	}
 
-	public static void convertRegion(RectangleCorner2D_I32 input, RectangleCorner2D_F64 output) {
-		output.x0 = input.x0;
-		output.x1 = input.x1;
-		output.y0 = input.y0;
-		output.y1 = input.y1;
+	public static void convertRegion(Rectangle2D_I32 input, Rectangle2D_F64 output) {
+		output.p0.set(input.x0,input.y0);
+		output.p1.set(input.x1,input.y1);
 	}
 }

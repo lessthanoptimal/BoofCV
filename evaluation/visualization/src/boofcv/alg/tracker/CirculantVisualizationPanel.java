@@ -26,7 +26,7 @@ import boofcv.gui.image.VisualizeImageData;
 import boofcv.struct.ImageRectangle;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageFloat64;
-import georegression.struct.shapes.Rectangle2D_F32;
+import georegression.struct.shapes.RectangleLength2D_F32;
 
 import javax.swing.*;
 import java.awt.*;
@@ -94,7 +94,7 @@ public class CirculantVisualizationPanel extends JPanel implements MouseListener
 	public synchronized void update( final CirculantTracker tracker  ) {
 
 		if( hasSelected ) {
-			Rectangle2D_F32 r = tracker.getTargetLocation();
+			RectangleLength2D_F32 r = tracker.getTargetLocation();
 			selected.x0 = (int)r.x0;
 			selected.y0 = (int)r.y0;
 			selected.x1 = selected.x0 + (int)r.width;

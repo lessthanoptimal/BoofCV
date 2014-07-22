@@ -32,8 +32,8 @@ import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.MultiSpectral;
 import georegression.struct.affine.Affine2D_F32;
-import georegression.struct.shapes.Rectangle2D_F32;
-import georegression.struct.shapes.Rectangle2D_I32;
+import georegression.struct.shapes.RectangleLength2D_F32;
+import georegression.struct.shapes.RectangleLength2D_I32;
 
 
 /**
@@ -269,11 +269,11 @@ public class DistortImageOps {
 	 * @param transform Transform being applied to the image
 	 * @return Bounding box
 	 */
-	public static Rectangle2D_I32 boundBox( int srcWidth , int srcHeight ,
+	public static RectangleLength2D_I32 boundBox( int srcWidth , int srcHeight ,
 											int dstWidth , int dstHeight ,
 											PixelTransform_F32 transform )
 	{
-		Rectangle2D_I32 ret = boundBox(srcWidth,srcHeight,transform);
+		RectangleLength2D_I32 ret = boundBox(srcWidth,srcHeight,transform);
 
 		int x0 = ret.x0;
 		int y0 = ret.y0;
@@ -285,7 +285,7 @@ public class DistortImageOps {
 		if( y0 < 0 ) y0 = 0;
 		if( y1 > dstHeight) y1 = dstHeight;
 
-		return new Rectangle2D_I32(x0,y0,x1-x0,y1-y0);
+		return new RectangleLength2D_I32(x0,y0,x1-x0,y1-y0);
 	}
 
 	/**
@@ -297,7 +297,7 @@ public class DistortImageOps {
 	 * @param transform Transform being applied to the image
 	 * @return Bounding box
 	 */
-	public static Rectangle2D_I32 boundBox( int srcWidth , int srcHeight ,
+	public static RectangleLength2D_I32 boundBox( int srcWidth , int srcHeight ,
 											PixelTransform_F32 transform )
 	{
 		int x0,y0,x1,y1;
@@ -324,7 +324,7 @@ public class DistortImageOps {
 				y1 = (int)transform.distY;
 		}
 
-		return new Rectangle2D_I32(x0,y0,x1-x0,y1-y0);
+		return new RectangleLength2D_I32(x0,y0,x1-x0,y1-y0);
 	}
 
 	/**
@@ -336,8 +336,8 @@ public class DistortImageOps {
 	 * @param transform Transform being applied to the image
 	 * @return Bounding box
 	 */
-	public static Rectangle2D_F32 boundBox_F32( int srcWidth , int srcHeight ,
-												PixelTransform_F32 transform )
+	public static RectangleLength2D_F32 boundBox_F32( int srcWidth , int srcHeight ,
+													  PixelTransform_F32 transform )
 	{
 		ImageRectangle_F32 r=new ImageRectangle_F32();
 
@@ -358,7 +358,7 @@ public class DistortImageOps {
 			updateBoundBox(transform, r);
 		}
 
-		return new Rectangle2D_F32(r.x0,r.y0,r.x1-r.x0,r.y1-r.y0);
+		return new RectangleLength2D_F32(r.x0,r.y0,r.x1-r.x0,r.y1-r.y0);
 	}
 
 	private static void updateBoundBox(PixelTransform_F32 transform, ImageRectangle_F32 r) {
