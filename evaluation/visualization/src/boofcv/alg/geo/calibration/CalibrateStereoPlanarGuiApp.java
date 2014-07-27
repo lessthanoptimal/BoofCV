@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -152,9 +152,9 @@ public class CalibrateStereoPlanarGuiApp extends JPanel
 //		RectifyImageOps.fullViewLeft(param.getLeft(),toRight,rect1,rect2,rectify.getCalibrationMatrix());
 
 		// Rectification distortion for each image
-		final ImageDistort<ImageFloat32> distort1 = RectifyImageOps.rectifyImage(param.getLeft(),
+		final ImageDistort<ImageFloat32,ImageFloat32> distort1 = RectifyImageOps.rectifyImage(param.getLeft(),
 				rect1,ImageFloat32.class);
-		final ImageDistort<ImageFloat32> distort2 = RectifyImageOps.rectifyImage(param.getRight(),
+		final ImageDistort<ImageFloat32,ImageFloat32> distort2 = RectifyImageOps.rectifyImage(param.getRight(),
 				rect2,ImageFloat32.class);
 
 		SwingUtilities.invokeLater(new Runnable() {

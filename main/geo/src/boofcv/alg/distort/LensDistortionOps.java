@@ -228,7 +228,7 @@ public class LensDistortionOps {
 	 * @param borderType Specifies how the image border is handled.
 	 * @return Image distort that removes radial distortion
 	 */
-	public static <T extends ImageSingleBand> ImageDistort<T>
+	public static <T extends ImageSingleBand> ImageDistort<T,T>
 	removeRadialImage(IntrinsicParameters param, BorderType borderType, Class<T> imageType)
 	{
 		InterpolatePixelS<T> interp = FactoryInterpolation.bilinearPixelS(imageType);
@@ -239,7 +239,7 @@ public class LensDistortionOps {
 			border = FactoryImageBorder.general(imageType,borderType);
 
 		// only compute the transform once
-		ImageDistort<T> ret = FactoryDistort.distortCached(interp, border, imageType);
+		ImageDistort<T,T> ret = FactoryDistort.distortCached(interp, border, imageType);
 
 		PointTransform_F32 transform = transformPixelToRadial_F32(param);
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,10 +35,10 @@ public class TestImplImageDistort_S32 extends GeneralImageDistortTests<ImageSInt
 	}
 
 	@Override
-	public ImageDistort<ImageSInt32> createDistort(PixelTransform_F32 dstToSrc,
-												   InterpolatePixelS<ImageSInt32> interp ,
-												   ImageBorder<ImageSInt32> border) {
-		ImageDistort<ImageSInt32> ret = new ImplImageDistort_S32<ImageSInt32>(interp,border);
+	public ImageDistort<ImageSInt32,ImageSInt32> createDistort(PixelTransform_F32 dstToSrc,
+															   InterpolatePixelS<ImageSInt32> interp ,
+															   ImageBorder<ImageSInt32> border) {
+		ImageDistort<ImageSInt32,ImageSInt32> ret = new ImplImageDistort_S32<ImageSInt32>(interp,border);
 		ret.setModel(dstToSrc);
 		return ret;
 	}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,6 +22,7 @@ import boofcv.alg.distort.ImageDistortBasic;
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.core.image.border.ImageBorder;
 import boofcv.struct.image.ImageInt8;
+import boofcv.struct.image.ImageSingleBand;
 
 
 /**
@@ -30,10 +31,11 @@ import boofcv.struct.image.ImageInt8;
  * @author Peter Abeles
  */
 @SuppressWarnings({"UnnecessaryLocalVariable"})
-public class ImplImageDistort_I8<T extends ImageInt8> extends ImageDistortBasic<T> {
+public class ImplImageDistort_I8<Input extends ImageSingleBand, Output extends ImageInt8>
+		extends ImageDistortBasic<Input,Output> {
 
-	public ImplImageDistort_I8(InterpolatePixelS<T> interp,
-							   ImageBorder<T> border) {
+	public ImplImageDistort_I8(InterpolatePixelS<Input> interp,
+							   ImageBorder<Input> border) {
 		super(interp, border);
 	}
 

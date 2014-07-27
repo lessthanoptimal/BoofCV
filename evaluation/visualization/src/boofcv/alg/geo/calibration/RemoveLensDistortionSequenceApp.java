@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -51,8 +51,8 @@ public class RemoveLensDistortionSequenceApp {
 		// load camera calibration and create class to undistort image
 		IntrinsicParameters param = UtilIO.loadXML(calibDir + "intrinsic.xml");
 
-		ImageDistort<ImageUInt8> undistorter = DistortImageOps.createImageDistort(
-				LensDistortionOps.allInside(param,null),TypeInterpolate.BILINEAR,ImageUInt8.class);
+		ImageDistort<ImageUInt8,ImageUInt8> undistorter = DistortImageOps.createImageDistort(
+				LensDistortionOps.allInside(param,null),TypeInterpolate.BILINEAR,ImageUInt8.class,ImageUInt8.class);
 
 		MultiSpectral<ImageUInt8> input = null;
 		MultiSpectral<ImageUInt8> output = null;

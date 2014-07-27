@@ -445,7 +445,7 @@ public class RectifyImageOps {
 	 * @param imageType Type of single band image the transform is to be applied to.
 	 * @return ImageDistort for rectifying the image.
 	 */
-	public static <T extends ImageSingleBand> ImageDistort<T>
+	public static <T extends ImageSingleBand> ImageDistort<T,T>
 	rectifyImage( DenseMatrix64F rectify , Class<T> imageType)
 	{
 		InterpolatePixelS<T> interp = FactoryInterpolation.bilinearPixelS(imageType);
@@ -455,7 +455,7 @@ public class RectifyImageOps {
 		PointTransformHomography_F32 rectifyTran = new PointTransformHomography_F32(rectifyInv);
 
 		// don't bother caching the results since it is likely to only be applied once and is cheap to compute
-		ImageDistort<T> ret = FactoryDistort.distort(interp, null, imageType);
+		ImageDistort<T,T> ret = FactoryDistort.distort(interp, null, imageType);
 
 		ret.setModel(new PointToPixelTransform_F32(rectifyTran));
 
@@ -471,14 +471,14 @@ public class RectifyImageOps {
 	 * @param imageType Type of single band image the transform is to be applied to.
 	 * @return ImageDistort for rectifying the image.
 	 */
-	public static <T extends ImageSingleBand> ImageDistort<T>
+	public static <T extends ImageSingleBand> ImageDistort<T,T>
 	rectifyImage(IntrinsicParameters param,
 				 DenseMatrix64F rectify , Class<T> imageType)
 	{
 		InterpolatePixelS<T> interp = FactoryInterpolation.bilinearPixelS(imageType);
 
 		// only compute the transform once
-		ImageDistort<T> ret = FactoryDistort.distortCached(interp,null,imageType);
+		ImageDistort<T,T> ret = FactoryDistort.distortCached(interp,null,imageType);
 
 		PointTransform_F32 transform = transformRectToPixel_F32(param, rectify);
 

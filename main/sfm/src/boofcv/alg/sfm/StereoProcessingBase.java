@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -40,8 +40,8 @@ import org.ejml.data.DenseMatrix64F;
 public class StereoProcessingBase<T extends ImageSingleBand> {
 
 	// applied rectification to input images
-	private ImageDistort<T> distortLeftRect;
-	private ImageDistort<T> distortRightRect;
+	private ImageDistort<T,T> distortLeftRect;
+	private ImageDistort<T,T> distortRightRect;
 
 	// references to input images
 	private T imageLeftInput;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,20 +29,21 @@ import boofcv.struct.image.ImageSingleBand;
  *
  * @author Peter Abeles
  */
-public abstract class ImageDistortBasic<T extends ImageSingleBand> implements ImageDistort<T> {
+public abstract class ImageDistortBasic<Input extends ImageSingleBand,Output extends ImageSingleBand>
+		implements ImageDistort<Input,Output> {
 
 	// distortion model from the dst to src image
 	protected PixelTransform_F32 dstToSrc;
 	// sub pixel interpolation
-	protected InterpolatePixelS<T> interp;
+	protected InterpolatePixelS<Input> interp;
 	// handle the image border
-	protected ImageBorder<T> border;
+	protected ImageBorder<Input> border;
 
 	// crop boundary
 	protected int x0,y0,x1,y1;
 
-	protected T srcImg;
-	protected T dstImg;
+	protected Input srcImg;
+	protected Output dstImg;
 
 	/**
 	 * Specifies configuration parameters
@@ -50,8 +51,8 @@ public abstract class ImageDistortBasic<T extends ImageSingleBand> implements Im
 	 * @param interp Interpolation algorithm
 	 * @param border How borders are handled
 	 */
-	public ImageDistortBasic(InterpolatePixelS<T> interp,
-							 ImageBorder<T> border) {
+	public ImageDistortBasic(InterpolatePixelS<Input> interp,
+							 ImageBorder<Input> border) {
 		this.interp = interp;
 		this.border = border;
 	}
@@ -62,7 +63,7 @@ public abstract class ImageDistortBasic<T extends ImageSingleBand> implements Im
 	}
 
 	@Override
-	public void apply(T srcImg, T dstImg) {
+	public void apply(Input srcImg, Output dstImg) {
 		init(srcImg, dstImg);
 
 		x0 = 0;y0 = 0;x1 = dstImg.width;y1 = dstImg.height;
@@ -74,7 +75,7 @@ public abstract class ImageDistortBasic<T extends ImageSingleBand> implements Im
 	}
 
 	@Override
-	public void apply(T srcImg, T dstImg, int dstX0, int dstY0, int dstX1, int dstY1) {
+	public void apply(Input srcImg, Output dstImg, int dstX0, int dstY0, int dstX1, int dstY1) {
 		init(srcImg, dstImg);
 
 		x0 = dstX0;y0 = dstY0;x1 = dstX1;y1 = dstY1;
@@ -85,7 +86,7 @@ public abstract class ImageDistortBasic<T extends ImageSingleBand> implements Im
 			applyNoBorder();
 	}
 
-	private void init(T srcImg, T dstImg) {
+	private void init(Input srcImg, Output dstImg) {
 		this.srcImg = srcImg;
 		this.dstImg = dstImg;
 		interp.setImage(srcImg);

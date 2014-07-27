@@ -18,6 +18,9 @@ Version : Alpha 0.18
  * Not designed the way I want it to be and recent changes made it less usable
 - Removed v4l4j support since Webcam Capture is easier and does a better job
 - Fixed OpenKinect examples
+- ImageDistort now supports a different input and output types
+  * Support is provided for the same image type
+  * It now allows for all types to float 32. Interpolation always outputs a floating point value.
 
 ---------------------------------------------
 Date    : 2014/6/19

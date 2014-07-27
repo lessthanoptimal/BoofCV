@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,15 +31,16 @@ import georegression.struct.point.Point2D_F32;
  *
  * @author Peter Abeles
  */
-public abstract class ImageDistortCache<T extends ImageSingleBand> implements ImageDistort<T> {
+public abstract class ImageDistortCache<Input extends ImageSingleBand,Output extends ImageSingleBand>
+		implements ImageDistort<Input,Output> {
 
 	// size of output image
 	private int width=-1,height=-1;
 	private Point2D_F32 map[];
 	// sub pixel interpolation
-	private InterpolatePixelS<T> interp;
+	private InterpolatePixelS<Input> interp;
 	// handle the image border
-	private ImageBorder<T> border;
+	private ImageBorder<Input> border;
 
 	// transform
 	private PixelTransform_F32 dstToSrc;
@@ -47,8 +48,8 @@ public abstract class ImageDistortCache<T extends ImageSingleBand> implements Im
 	// crop boundary
 	private int x0,y0,x1,y1;
 
-	protected T srcImg;
-	protected T dstImg;
+	protected Input srcImg;
+	protected Output dstImg;
 
 	protected boolean dirty;
 
@@ -58,8 +59,8 @@ public abstract class ImageDistortCache<T extends ImageSingleBand> implements Im
 	 * @param interp Interpolation algorithm
 	 * @param border How borders are handled
 	 */
-	public ImageDistortCache(InterpolatePixelS<T> interp,
-							 ImageBorder<T> border) {
+	public ImageDistortCache(InterpolatePixelS<Input> interp,
+							 ImageBorder<Input> border) {
 		this.interp = interp;
 		this.border = border;
 	}
@@ -71,7 +72,7 @@ public abstract class ImageDistortCache<T extends ImageSingleBand> implements Im
 	}
 
 	@Override
-	public void apply(T srcImg, T dstImg) {
+	public void apply(Input srcImg, Output dstImg) {
 		init(srcImg, dstImg);
 
 		x0 = 0;y0 = 0;x1 = dstImg.width;y1 = dstImg.height;
@@ -83,7 +84,7 @@ public abstract class ImageDistortCache<T extends ImageSingleBand> implements Im
 	}
 
 	@Override
-	public void apply(T srcImg, T dstImg, int dstX0, int dstY0, int dstX1, int dstY1) {
+	public void apply(Input srcImg, Output dstImg, int dstX0, int dstY0, int dstX1, int dstY1) {
 		init(srcImg, dstImg);
 
 		x0 = dstX0;y0 = dstY0;x1 = dstX1;y1 = dstY1;
@@ -94,7 +95,7 @@ public abstract class ImageDistortCache<T extends ImageSingleBand> implements Im
 			applyNoBorder();
 	}
 
-	private void init(T srcImg, T dstImg) {
+	private void init(Input srcImg, Output dstImg) {
 		if( dirty || width != dstImg.width || height != dstImg.height) {
 			width = dstImg.width;
 			height = dstImg.height;

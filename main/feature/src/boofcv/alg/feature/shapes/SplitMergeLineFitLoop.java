@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,6 +37,9 @@ public class SplitMergeLineFitLoop extends SplitMergeLineFit {
 	// number of points in the contour
 	protected int N;
 
+	/**
+	 * @see SplitMergeLineFit#SplitMergeLineFit(double, double, int)
+	 */
 	public SplitMergeLineFitLoop(double toleranceSplit,
 								 double toleranceMerge,
 								 int maxIterations)

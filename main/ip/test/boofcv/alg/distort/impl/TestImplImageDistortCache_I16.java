@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,9 +33,9 @@ public class TestImplImageDistortCache_I16 extends CommonImageDistortCacheTests<
 	}
 
 	@Override
-	public ImageDistortCache<ImageSInt16> create(InterpolatePixelS<ImageSInt16> interp,
-												ImageBorder<ImageSInt16> border,
-												Class<ImageSInt16> imageType) {
-		return new ImplImageDistortCache_I16<ImageSInt16>(interp,border);
+	public ImageDistortCache<ImageSInt16,ImageSInt16> create(InterpolatePixelS<ImageSInt16> interp,
+															 ImageBorder<ImageSInt16> border,
+															 Class<ImageSInt16> imageType) {
+		return new ImplImageDistortCache_I16<ImageSInt16,ImageSInt16>(interp,border);
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,10 +35,10 @@ public class TestImplImageDistort_F32 extends GeneralImageDistortTests<ImageFloa
 	}
 
 	@Override
-	public ImageDistort<ImageFloat32> createDistort(PixelTransform_F32 dstToSrc,
-													InterpolatePixelS<ImageFloat32> interp,
-													ImageBorder<ImageFloat32> border) {
-		ImageDistort<ImageFloat32> ret = new ImplImageDistort_F32(interp,border);
+	public ImageDistort<ImageFloat32,ImageFloat32> createDistort(PixelTransform_F32 dstToSrc,
+																 InterpolatePixelS<ImageFloat32> interp,
+																 ImageBorder<ImageFloat32> border) {
+		ImageDistort<ImageFloat32,ImageFloat32> ret = new ImplImageDistort_F32(interp,border);
 		ret.setModel(dstToSrc);
 		return ret;
 	}

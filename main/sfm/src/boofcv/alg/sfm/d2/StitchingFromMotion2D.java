@@ -57,7 +57,7 @@ public class StitchingFromMotion2D<I extends ImageBase, IT extends InvertibleTra
 	// estimates image motion
 	private ImageMotion2D<I,IT> motion;
 	// renders the distorted image according to results from motion
-	private ImageDistort<I> distorter;
+	private ImageDistort<I,I> distorter;
 	// converts different types of motion models into other formats
 	private StitchingTransform<IT> converter;
 
@@ -95,7 +95,7 @@ public class StitchingFromMotion2D<I extends ImageBase, IT extends InvertibleTra
 	 * @param maxJumpFraction If the view area changes by more than this fraction a fault is declared
 	 */
 	public StitchingFromMotion2D(ImageMotion2D<I, IT> motion,
-								 ImageDistort<I> distorter,
+								 ImageDistort<I,I> distorter,
 								 StitchingTransform<IT> converter ,
 								 double maxJumpFraction )
 	{

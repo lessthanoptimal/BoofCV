@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,21 +35,21 @@ public class FactoryDistort {
 	 *
 	 * @param interp Which interpolation algorithm should be used.
 	 * @param border Specifies how requests to pixels outside the image should be handled.  If null then no change
-	 * @param imageType Type of image being processed.
+	 * @param outputType Type of output image.
 	 */
-	public static <T extends ImageSingleBand>
-	ImageDistort<T> distort(InterpolatePixelS<T> interp, ImageBorder border, Class<T> imageType)
+	public static <Input extends ImageSingleBand, Ouput extends ImageSingleBand>
+	ImageDistort<Input,Ouput> distort(InterpolatePixelS<Input> interp, ImageBorder border, Class<Ouput> outputType)
 	{
-		if( imageType == ImageFloat32.class ) {
-			return (ImageDistort<T>)new ImplImageDistort_F32((InterpolatePixelS<ImageFloat32>)interp,border);
-		} else if( ImageSInt32.class.isAssignableFrom(imageType) ) {
-			return (ImageDistort<T>)new ImplImageDistort_S32((InterpolatePixelS<ImageSInt32>)interp,border);
-		} else if( ImageInt16.class.isAssignableFrom(imageType) ) {
-			return (ImageDistort<T>)new ImplImageDistort_I16((InterpolatePixelS<ImageInt16>)interp,border);
-		} else if( ImageInt8.class.isAssignableFrom(imageType) ) {
-			return (ImageDistort<T>)new ImplImageDistort_I8((InterpolatePixelS<ImageInt8>)interp,border);
+		if( outputType == ImageFloat32.class ) {
+			return (ImageDistort<Input,Ouput>)new ImplImageDistort_F32(interp,border);
+		} else if( ImageSInt32.class.isAssignableFrom(outputType) ) {
+			return (ImageDistort<Input,Ouput>)new ImplImageDistort_S32(interp,border);
+		} else if( ImageInt16.class.isAssignableFrom(outputType) ) {
+			return (ImageDistort<Input,Ouput>)new ImplImageDistort_I16(interp,border);
+		} else if( ImageInt8.class.isAssignableFrom(outputType) ) {
+			return (ImageDistort<Input,Ouput>)new ImplImageDistort_I8(interp,border);
 		} else {
-			throw new IllegalArgumentException("Image type not supported: "+imageType.getSimpleName());
+			throw new IllegalArgumentException("Output type not supported: "+outputType.getSimpleName());
 		}
 	}
 
@@ -59,13 +59,14 @@ public class FactoryDistort {
 	 *
 	 * @param interp Which interpolation algorithm should be used.
 	 * @param border Specifies how requests to pixels outside the image should be handled.  If null then no change
-	 * @param imageType Type of image being processed.
+	 * @param outputType Type of output image.
 	 */
-	public static <T extends ImageSingleBand>
-	ImageDistort<MultiSpectral<T>> distortMS(InterpolatePixelS<T> interp, ImageBorder border, Class<T> imageType)
+	public static <Input extends ImageSingleBand,Output extends ImageSingleBand>
+	ImageDistort<MultiSpectral<Input>,MultiSpectral<Output>>
+	distortMS(InterpolatePixelS<Input> interp, ImageBorder border, Class<Output> outputType)
 	{
-		ImageDistort<T> distortSingle = distort(interp,border,imageType);
-		return new ImplImageDistort_MS<T>(distortSingle);
+		ImageDistort<Input, Output> distortSingle = distort(interp,border,outputType);
+		return new ImplImageDistort_MS<Input, Output>(distortSingle);
 	}
 
 	/**
@@ -75,23 +76,23 @@ public class FactoryDistort {
 	 *
 	 * @param interp Which interpolation algorithm should be used.
 	 * @param border Specifies how requests to pixels outside the image should be handled.  If null then no change
-	 * @param imageType Type of image being processed.
+	 * @param outputType Type of output image.
 	 * @return Image distort which caches the distortion.
 	 */
-	public static <T extends ImageSingleBand>
-	ImageDistort<T> distortCached(InterpolatePixelS<T> interp, ImageBorder border ,
-								  Class<T> imageType)
+	public static <Input extends ImageSingleBand,Output extends ImageSingleBand>
+	ImageDistort<Input, Output> distortCached(InterpolatePixelS<Input> interp, ImageBorder border ,
+											  Class<Output> outputType)
 	{
-		if( imageType == ImageFloat32.class ) {
-			return (ImageDistort<T>)new ImplImageDistortCache_F32((InterpolatePixelS<ImageFloat32>)interp,border);
-		} else if( ImageSInt32.class.isAssignableFrom(imageType) ) {
-			return (ImageDistort<T>)new ImplImageDistortCache_S32((InterpolatePixelS<ImageSInt32>)interp,border);
-		} else if( ImageInt16.class.isAssignableFrom(imageType) ) {
-			return (ImageDistort<T>)new ImplImageDistortCache_I16((InterpolatePixelS<ImageInt16>)interp,border);
-		} else if( ImageInt8.class.isAssignableFrom(imageType) ) {
-			return (ImageDistort<T>)new ImplImageDistortCache_I8((InterpolatePixelS<ImageInt8>)interp,border);
+		if( outputType == ImageFloat32.class ) {
+			return (ImageDistort<Input,Output>)new ImplImageDistortCache_F32(interp,border);
+		} else if( ImageSInt32.class.isAssignableFrom(outputType) ) {
+			return (ImageDistort<Input,Output>)new ImplImageDistortCache_S32(interp,border);
+		} else if( ImageInt16.class.isAssignableFrom(outputType) ) {
+			return (ImageDistort<Input,Output>)new ImplImageDistortCache_I16(interp,border);
+		} else if( ImageInt8.class.isAssignableFrom(outputType) ) {
+			return (ImageDistort<Input,Output>)new ImplImageDistortCache_I8(interp,border);
 		} else {
-			throw new IllegalArgumentException("Image type not supported: "+imageType.getSimpleName());
+			throw new IllegalArgumentException("Output type not supported: "+outputType.getSimpleName());
 		}
 	}
 }

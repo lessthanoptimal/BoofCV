@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -62,7 +62,7 @@ public class TestImplPolynomialPixel_I extends GeneralChecksInterpolationPixelS<
 		InterpolatePixelS<ImageUInt8> alg = (InterpolatePixelS)new ImplPolynomialPixel_I(2,0,255);
 
 		ImageBorder<ImageUInt8> border = FactoryImageBorder.value(ImageUInt8.class, 0);
-		ImageDistort<ImageUInt8> distorter = FactoryDistort.distort(alg, border, ImageUInt8.class);
+		ImageDistort<ImageUInt8,ImageUInt8> distorter = FactoryDistort.distort(alg, border, ImageUInt8.class);
 		distorter.setModel(new PixelTransformAffine_F32(tran));
 		distorter.apply(img,found);
 

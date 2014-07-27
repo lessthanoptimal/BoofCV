@@ -55,7 +55,7 @@ public class BenchmarkImageDistort<T extends ImageSingleBand> {
 	}
 
 	public class HomographyBilinear_F32 extends PerformerBase {
-		ImageDistort<T> alg;
+		ImageDistort<T,T> alg;
 
 		public HomographyBilinear_F32(Homography2D_F32 affine) {
 			PixelTransform_F32 tran = new PixelTransformHomography_F32(affine);
@@ -73,7 +73,7 @@ public class BenchmarkImageDistort<T extends ImageSingleBand> {
 	}
 
 	public class HomographyBilinearCrop_F32 extends PerformerBase {
-		ImageDistort<T> alg;
+		ImageDistort<T,T> alg;
 
 		public HomographyBilinearCrop_F32(Homography2D_F32 affine) {
 			PixelTransform_F32 tran = new PixelTransformHomography_F32(affine);
@@ -91,7 +91,7 @@ public class BenchmarkImageDistort<T extends ImageSingleBand> {
 	}
 
 	public class MapBilinear_F32 extends PerformerBase {
-		ImageDistort<T> alg;
+		ImageDistort<T,T> alg;
 
 		public MapBilinear_F32( Homography2D_F32 homography ) {
 			PixelTransform_F32 tran = new PixelTransformHomography_F32(homography);

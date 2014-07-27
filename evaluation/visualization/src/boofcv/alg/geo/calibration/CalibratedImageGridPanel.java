@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -65,7 +65,7 @@ public class CalibratedImageGridPanel extends JPanel {
 	boolean showAll = false;
 	boolean showNumbers = true;
 
-	ImageDistort<ImageFloat32> undoRadial;
+	ImageDistort<ImageFloat32,ImageFloat32> undoRadial;
 
 	// how much errors are scaled up
 	double errorScale;
@@ -234,7 +234,7 @@ public class CalibratedImageGridPanel extends JPanel {
 		}
 	}
 
-	public void setDistorted (ImageDistort<ImageFloat32> undoRadial ) {
+	public void setDistorted (ImageDistort<ImageFloat32,ImageFloat32> undoRadial ) {
 		this.undoRadial = undoRadial;
 	}
 

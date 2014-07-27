@@ -139,7 +139,8 @@ public class CalibrateMonoPlanarGuiApp extends JPanel
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 
-				ImageDistort<ImageFloat32> dist = LensDistortionOps.removeRadialImage(param,BorderType.VALUE,ImageFloat32.class);
+				ImageDistort<ImageFloat32,ImageFloat32> dist =
+						LensDistortionOps.removeRadialImage(param,BorderType.VALUE,ImageFloat32.class);
 				gui.setCorrection(dist);
 
 				gui.repaint();

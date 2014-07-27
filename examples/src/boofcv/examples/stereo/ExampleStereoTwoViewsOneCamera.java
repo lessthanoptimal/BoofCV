@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -238,9 +238,9 @@ public class ExampleStereoTwoViewsOneCamera {
 		RectifyImageOps.allInsideLeft(intrinsic, rect1, rect2, rectifiedK);
 
 		// undistorted and rectify images
-		ImageDistort<ImageUInt8> distortLeft =
+		ImageDistort<ImageUInt8,ImageUInt8> distortLeft =
 				RectifyImageOps.rectifyImage(intrinsic, rect1, ImageUInt8.class);
-		ImageDistort<ImageUInt8> distortRight =
+		ImageDistort<ImageUInt8,ImageUInt8> distortRight =
 				RectifyImageOps.rectifyImage(intrinsic, rect2, ImageUInt8.class);
 
 		distortLeft.apply(distortedLeft, rectifiedLeft);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -69,8 +69,8 @@ public abstract class CommonImageDistortCacheTests<T extends ImageSingleBand> {
 	@Test
 	public void compareNoCrop() {
 
-		ImageDistort<T> standard = FactoryDistort.distort(interp,border,imageType);
-		ImageDistortCache<T> alg = create(interp,border,imageType);
+		ImageDistort<T,T> standard = FactoryDistort.distort(interp,border,imageType);
+		ImageDistortCache<T,T> alg = create(interp,border,imageType);
 		
 		standard.setModel(tran);
 		alg.setModel(tran);
@@ -84,8 +84,8 @@ public abstract class CommonImageDistortCacheTests<T extends ImageSingleBand> {
 	@Test
 	public void compareCrop() {
 
-		ImageDistort<T> standard = FactoryDistort.distort(interp,border,imageType);
-		ImageDistortCache<T> alg = create(interp,border,imageType);
+		ImageDistort<T,T> standard = FactoryDistort.distort(interp,border,imageType);
+		ImageDistortCache<T,T> alg = create(interp,border,imageType);
 
 		standard.setModel(tran);
 		alg.setModel(tran);
@@ -96,6 +96,6 @@ public abstract class CommonImageDistortCacheTests<T extends ImageSingleBand> {
 		BoofTesting.assertEquals(dst0, dst1, 1e-4);
 	}
 	
-	public abstract ImageDistortCache<T> 
+	public abstract ImageDistortCache<T,T>
 	create(InterpolatePixelS<T> interp, ImageBorder<T> border , Class<T> imageType );
 }

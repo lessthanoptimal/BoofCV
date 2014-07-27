@@ -16,30 +16,24 @@
  * limitations under the License.
  */
 
-package boofcv.alg.distort.impl;
+package boofcv.alg.fiducial;
 
-import boofcv.alg.distort.ImageDistortBasic;
-import boofcv.alg.interpolate.InterpolatePixelS;
-import boofcv.core.image.border.ImageBorder;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSingleBand;
+import georegression.struct.point.Point2D_I32;
+import georegression.struct.shapes.Quadrilateral_F64;
 
+import java.util.List;
 
 /**
- * <p>Implementation of {@link boofcv.alg.distort.ImageDistort}.</p>
+ * Uses expectation maximisation to fit a quadrilateral to a contour given an initial set
+ * of corner candidates.
  *
  * @author Peter Abeles
  */
-@SuppressWarnings({"UnnecessaryLocalVariable"})
-public class ImplImageDistort_F32<Input extends ImageSingleBand>
-		extends ImageDistortBasic<Input,ImageFloat32> {
+public class FitQuadrilaterialEM {
 
-	public ImplImageDistort_F32(InterpolatePixelS<Input> interp, ImageBorder<Input> border) {
-		super(interp, border);
-	}
-
-	@Override
-	protected void assign(int indexDst, float value) {
-		dstImg.data[indexDst] = value;
+	public boolean fit( List<Point2D_I32> initial , List<Point2D_I32> contour ,
+						Quadrilateral_F64 output )
+	{
+		return false;
 	}
 }

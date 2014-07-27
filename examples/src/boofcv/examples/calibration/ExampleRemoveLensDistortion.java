@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -78,7 +78,7 @@ public class ExampleRemoveLensDistortion {
 
 		// Set up image distort
 		InterpolatePixelS<ImageFloat32> interp = FactoryInterpolation.bilinearPixelS(ImageFloat32.class);
-		ImageDistort<ImageFloat32> distort = FactoryDistort.distort(interp,null,ImageFloat32.class);
+		ImageDistort<ImageFloat32,ImageFloat32> distort = FactoryDistort.distort(interp,null,ImageFloat32.class);
 
 		// render and display the different types of views in a window
 		displayResults(orig, distortedImg, tran, fullView, allInside, distort);
@@ -92,7 +92,7 @@ public class ExampleRemoveLensDistortion {
 									   PointTransform_F32 tran,
 									   PointTransform_F32 fullView,
 									   PointTransform_F32 allInside,
-									   ImageDistort<ImageFloat32> distort) {
+									   ImageDistort<ImageFloat32,ImageFloat32> distort) {
 		// render the results
 		MultiSpectral<ImageFloat32> undistortedImg = new MultiSpectral<ImageFloat32>(ImageFloat32.class,
 				distortedImg.getWidth(),distortedImg.getHeight(),distortedImg.getNumBands());

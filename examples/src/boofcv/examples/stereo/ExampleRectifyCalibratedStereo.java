@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -100,9 +100,9 @@ public class ExampleRectifyCalibratedStereo {
 //		RectifyImageOps.allInsideLeft(param.left, leftHanded, rect1, rect2, rectK);
 
 		// undistorted and rectify images
-		ImageDistort<ImageFloat32> imageDistortLeft =
+		ImageDistort<ImageFloat32,ImageFloat32> imageDistortLeft =
 				RectifyImageOps.rectifyImage(param.getLeft(), rect1, ImageFloat32.class);
-		ImageDistort<ImageFloat32> imageDistortRight =
+		ImageDistort<ImageFloat32,ImageFloat32> imageDistortRight =
 				RectifyImageOps.rectifyImage(param.getRight(), rect2, ImageFloat32.class);
 
 		DistortImageOps.distortMS(distLeft, rectLeft, imageDistortLeft);

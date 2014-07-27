@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -63,9 +63,9 @@ public abstract class GeneralImageDistortTests<T extends ImageSingleBand> {
 		border = FactoryImageBorder.general(imageType, BorderType.EXTENDED);
 	}
 
-	public abstract ImageDistort<T> createDistort(PixelTransform_F32 dstToSrc,
-												  InterpolatePixelS<T> interp,
-												  ImageBorder<T> border );
+	public abstract ImageDistort<T,T> createDistort(PixelTransform_F32 dstToSrc,
+													InterpolatePixelS<T> interp,
+													ImageBorder<T> border );
 
 
 	@Test
@@ -82,7 +82,7 @@ public abstract class GeneralImageDistortTests<T extends ImageSingleBand> {
 
 		ImageBorder border = withBorder ? this.border : null;
 
-		ImageDistort<T> tran = createDistort(new BasicTransform(),interp,border);
+		ImageDistort<T,T> tran = createDistort(new BasicTransform(),interp,border);
 		tran.apply(src,dst);
 
 		for( int dstY = 0; dstY < height; dstY++ ) {
@@ -120,7 +120,7 @@ public abstract class GeneralImageDistortTests<T extends ImageSingleBand> {
 
 		ImageBorder border = withBorder ? this.border : null;
 
-		ImageDistort<T> tran = createDistort(new BasicTransform(),interp,border);
+		ImageDistort<T,T> tran = createDistort(new BasicTransform(),interp,border);
 		tran.apply(src,dst,x0,y0,x1,y1);
 
 		for( int dstY = 0; dstY < height; dstY++ ) {
@@ -166,7 +166,7 @@ public abstract class GeneralImageDistortTests<T extends ImageSingleBand> {
 
 		ImageBorder border = withBorder ? this.border : null;
 
-		ImageDistort<T> tran = createDistort(new BasicTransform(),interp,border);
+		ImageDistort<T,T> tran = createDistort(new BasicTransform(),interp,border);
 		tran.apply(src,dst,x0,y0,x1,y1);
 
 		for( int dstY = 0; dstY < height; dstY++ ) {

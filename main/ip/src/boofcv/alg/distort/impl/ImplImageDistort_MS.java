@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,11 +28,12 @@ import boofcv.struct.image.MultiSpectral;
  * 
  * @author Peter Abeles
  */
-public class ImplImageDistort_MS <T extends ImageSingleBand> implements ImageDistort<MultiSpectral<T>> {
+public class ImplImageDistort_MS <Input extends ImageSingleBand,Output extends ImageSingleBand>
+		implements ImageDistort<MultiSpectral<Input>,MultiSpectral<Output>> {
 
-	ImageDistort<T> layerDistort;
+	ImageDistort<Input,Output> layerDistort;
 
-	public ImplImageDistort_MS(ImageDistort<T> layerDistort) {
+	public ImplImageDistort_MS(ImageDistort<Input,Output> layerDistort) {
 		this.layerDistort = layerDistort;
 	}
 
@@ -42,7 +43,7 @@ public class ImplImageDistort_MS <T extends ImageSingleBand> implements ImageDis
 	}
 
 	@Override
-	public void apply(MultiSpectral<T> srcImg, MultiSpectral<T> dstImg) {
+	public void apply(MultiSpectral<Input> srcImg, MultiSpectral<Output> dstImg) {
 		if( srcImg.getNumBands() != dstImg.getNumBands() )
 			throw new IllegalArgumentException("Number of bands must be the same");
 		int N = srcImg.getNumBands();
@@ -53,7 +54,7 @@ public class ImplImageDistort_MS <T extends ImageSingleBand> implements ImageDis
 	}
 
 	@Override
-	public void apply(MultiSpectral<T> srcImg, MultiSpectral<T> dstImg, 
+	public void apply(MultiSpectral<Input> srcImg, MultiSpectral<Output> dstImg,
 					  int dstX0, int dstY0, int dstX1, int dstY1) {
 		if( srcImg.getNumBands() != dstImg.getNumBands() )
 			throw new IllegalArgumentException("Number of bands must be the same");

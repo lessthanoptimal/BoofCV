@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -140,7 +140,7 @@ public class FactoryBenchmarkFeatureDistort {
 			Affine2D_F32 imageToInit = initToImage.invert(null);
 			PixelTransformAffine_F32 affine = new PixelTransformAffine_F32(imageToInit);
 			InterpolatePixelS<T> interp = FactoryInterpolation.createPixelS(0, 255, TypeInterpolate.BILINEAR, imageType);
-			ImageDistort<T> distorter = FactoryDistort.distort(interp, FactoryImageBorder.value(imageType, 0), imageType);
+			ImageDistort<T,T> distorter = FactoryDistort.distort(interp, FactoryImageBorder.value(imageType, 0), imageType);
 			distorter.setModel(affine);
 			distorter.apply(image,distortedImage);
 		}

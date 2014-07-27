@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,15 +22,17 @@ import boofcv.alg.distort.ImageDistortCache;
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.core.image.border.ImageBorder;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageSingleBand;
 
 /**
  * Implementation of {@link boofcv.alg.distort.ImageDistortCache} for {@link ImageFloat32}.
  * 
  * @author Peter Abeles
  */
-public class ImplImageDistortCache_F32 extends ImageDistortCache<ImageFloat32> {
-	public ImplImageDistortCache_F32(InterpolatePixelS<ImageFloat32> interp,
-									 ImageBorder<ImageFloat32> border)
+public class ImplImageDistortCache_F32<Input extends ImageSingleBand>
+		extends ImageDistortCache<Input,ImageFloat32> {
+	public ImplImageDistortCache_F32(InterpolatePixelS<Input> interp,
+									 ImageBorder<Input> border)
 	{
 		super(interp, border);
 	}

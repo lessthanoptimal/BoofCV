@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -97,13 +97,13 @@ public class DistortSupport {
 	 * @param border Specifies how requests to pixels outside the image should be handled.  If null then no change
 	 *               happens to pixels which have a source pixel outside the image.
 	 */
-	public static <T extends ImageSingleBand>
-	ImageDistort<MultiSpectral<T>> createDistortMS(Class<T> imageType,
-												   PixelTransform_F32 dstToSrc,
-												   InterpolatePixelS<T> interp, ImageBorder border)
+	public static <Input extends ImageSingleBand,Output extends ImageSingleBand>
+	ImageDistort<MultiSpectral<Input>,MultiSpectral<Output>>
+	createDistortMS(Class<Output> outputType,PixelTransform_F32 dstToSrc,
+					InterpolatePixelS<Input> interp, ImageBorder border)
 	{
-		ImageDistort<T> bandDistort = FactoryDistort.distort(interp, border, imageType);
+		ImageDistort<Input,Output> bandDistort = FactoryDistort.distort(interp, border, outputType);
 		bandDistort.setModel(dstToSrc);
-		return new ImplImageDistort_MS<T>(bandDistort);
+		return new ImplImageDistort_MS<Input,Output>(bandDistort);
 	}
 }

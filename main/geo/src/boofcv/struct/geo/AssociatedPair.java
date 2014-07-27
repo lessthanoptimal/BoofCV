@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -105,6 +105,14 @@ public class AssociatedPair {
 	public void set( Point2D_F64 p1 , Point2D_F64 p2 ) {
 		this.p1.set(p1);
 		this.p2.set(p2);
+	}
+
+	/**
+	 * Sets the value of p1 and p2 to be equal to the values of the passed in objects
+	 */
+	public void set( double p1_x , double p1_y , double p2_x , double p2_y ) {
+		this.p1.set(p1_x,p1_y);
+		this.p2.set(p2_x,p2_y);
 	}
 
 	/**

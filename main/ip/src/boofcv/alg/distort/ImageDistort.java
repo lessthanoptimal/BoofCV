@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,7 +28,7 @@ import boofcv.struct.image.ImageBase;
  *
  * @author Peter Abeles
  */
-public interface ImageDistort<T extends ImageBase> {
+public interface ImageDistort<Input extends ImageBase,Output extends ImageBase> {
 
 	/**
 	 * Specifies how pixel coordinates are transformed from the destination
@@ -44,7 +44,7 @@ public interface ImageDistort<T extends ImageBase> {
 	 * @param srcImg Input image. Not modified.
 	 * @param dstImg Output image. Modified.
 	 */
-	public void apply( T srcImg , T dstImg );
+	public void apply( Input srcImg , Output dstImg );
 
 	/**
 	 * Applies the transform to only the specified region inside the destination image.
@@ -56,5 +56,5 @@ public interface ImageDistort<T extends ImageBase> {
 	 * @param dstX1 Right most crop boundary. Exclusive.
 	 * @param dstY1 Bottom most crop boundary. Exclusive.
 	 */
-	public void apply( T srcImg , T dstImg , int dstX0 , int dstY0 , int dstX1 , int dstY1 );
+	public void apply( Input srcImg , Output dstImg , int dstX0 , int dstY0 , int dstX1 , int dstY1 );
 }

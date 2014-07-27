@@ -244,8 +244,8 @@ public class VisualizeStereoDisparity <T extends ImageSingleBand, D extends Imag
 		// compute transforms to apply rectify the images
 		leftRectToPixel = transformRectToPixel_F64(calib.left, rect1);
 
-		ImageDistort<T> distortRect1 = RectifyImageOps.rectifyImage(calib.left, rect1, activeAlg.getInputType());
-		ImageDistort<T> distortRect2 = RectifyImageOps.rectifyImage(calib.right, rect2, activeAlg.getInputType());
+		ImageDistort<T,T> distortRect1 = RectifyImageOps.rectifyImage(calib.left, rect1, activeAlg.getInputType());
+		ImageDistort<T,T> distortRect2 = RectifyImageOps.rectifyImage(calib.right, rect2, activeAlg.getInputType());
 
 		// rectify and undo distortion
 		distortRect1.apply(inputLeft, rectLeft);

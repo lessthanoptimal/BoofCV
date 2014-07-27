@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -158,7 +158,8 @@ public class StereoPlanarPanel extends JPanel
 		return toolBar;
 	}
 
-	public void setRectification( ImageDistort<ImageFloat32> rectifyLeft , ImageDistort<ImageFloat32> rectifyRight ) {
+	public void setRectification( ImageDistort<ImageFloat32,ImageFloat32> rectifyLeft ,
+								  ImageDistort<ImageFloat32,ImageFloat32> rectifyRight ) {
 		leftView.setDistorted(rectifyLeft);
 		rightView.setDistorted(rectifyRight);
 		checkUndistorted.setEnabled(true);

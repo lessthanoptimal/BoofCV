@@ -94,22 +94,23 @@ public class DistortImageOps {
 	 *                          or set to the value of zero.
 	 * @param interpType Which type of pixel interpolation should be used. BILINEAR is in general recommended
 	 */
-	public static <T extends ImageSingleBand>
-	void distortSingle(T input, T output,
+	public static <Input extends ImageSingleBand,Output extends ImageSingleBand>
+	void distortSingle(Input input, Output output,
 					   PixelTransform_F32 transform,
 					   boolean skipOutsidePixels, TypeInterpolate interpType)
 	{
-		Class<T> inputType = (Class<T>)input.getClass();
-		InterpolatePixelS<T> interp = FactoryInterpolation.createPixelS(0, 255, interpType, inputType);
+		Class<Input> inputType = (Class<Input>)input.getClass();
+		Class<Output> outputType = (Class<Output>)input.getClass();
+		InterpolatePixelS<Input> interp = FactoryInterpolation.createPixelS(0, 255, interpType, inputType);
 
-		ImageBorder<T> border;
+		ImageBorder<Input> border;
 		if( skipOutsidePixels ) {
 			border = null;
 		} else {
 			border = FactoryImageBorder.value(inputType,0);
 		}
 
-		ImageDistort<T> distorter = FactoryDistort.distort(interp, border, inputType);
+		ImageDistort<Input,Output> distorter = FactoryDistort.distort(interp, border, outputType);
 		distorter.setModel(transform);
 		distorter.apply(input,output);
 	}
@@ -123,14 +124,14 @@ public class DistortImageOps {
 	 * @param border How border pixels are handled.
 	 * @param interp Interpolation algorithm.
 	 */
-	public static <T extends ImageSingleBand>
-	void distortSingle(T input, T output,
+	public static <Input extends ImageSingleBand,Output extends ImageSingleBand>
+	void distortSingle(Input input, Output output,
 					   PixelTransform_F32 transform,
-					   ImageBorder<T> border,
-					   InterpolatePixelS<T> interp )
+					   ImageBorder<Input> border,
+					   InterpolatePixelS<Input> interp )
 	{
-		Class<T> inputType = (Class<T>)input.getClass();
-		ImageDistort<T> distorter = FactoryDistort.distort(interp, border, inputType);
+		Class<Output> inputType = (Class<Output>)input.getClass();
+		ImageDistort<Input,Output> distorter = FactoryDistort.distort(interp, border, inputType);
 		distorter.setModel(transform);
 		distorter.apply(input,output);
 	}
@@ -145,22 +146,24 @@ public class DistortImageOps {
 	 *                          or set to the value of zero.
 	 * @param interpType Which type of pixel interpolation should be used.
 	 */
-	public static <T extends ImageSingleBand,M extends MultiSpectral<T>>
-	void distortMS(M input, M output,
+	public static <Input extends ImageSingleBand,Output extends ImageSingleBand,
+			M extends MultiSpectral<Input>,N extends MultiSpectral<Output>>
+	void distortMS(M input, N output,
 				   PixelTransform_F32 transform, boolean skipOutsidePixels,
 				   TypeInterpolate interpType)
 	{
-		Class<T> bandType = input.getType();
-		InterpolatePixelS<T> interp = FactoryInterpolation.createPixelS(0, 255, interpType, bandType);
+		Class<Input> inputBandType = input.getType();
+		Class<Output> outputBandType = output.getType();
+		InterpolatePixelS<Input> interp = FactoryInterpolation.createPixelS(0, 255, interpType, inputBandType);
 
-		ImageBorder<T> border;
+		ImageBorder<Input> border;
 		if( skipOutsidePixels ) {
 			border = null;
 		} else {
-			border = FactoryImageBorder.value(bandType,0);
+			border = FactoryImageBorder.value(inputBandType,0);
 		}
 
-		ImageDistort<T> distorter = FactoryDistort.distort(interp, border, bandType);
+		ImageDistort<Input,Output> distorter = FactoryDistort.distort(interp, border, outputBandType);
 		distorter.setModel(transform);
 
 		distortMS(input,output,distorter);
@@ -175,15 +178,16 @@ public class DistortImageOps {
 	 *
 	 * @param transform Image transform.
 	 * @param interpType Which interpolation. Try bilinear.
-	 * @param imageType Image of single band image it will process.
+	 * @param inputType Image of single band image it will process.
 	 * @return The {@link ImageDistort}
 	 */
-	public static <T extends ImageSingleBand>
-	ImageDistort<T> createImageDistort( PointTransform_F32 transform ,
-										TypeInterpolate interpType,
-										Class<T> imageType ) {
-		InterpolatePixelS<T> interp = FactoryInterpolation.createPixelS(0, 255, interpType, imageType);
-		ImageDistort<T> distorter = FactoryDistort.distortCached(interp, FactoryImageBorder.value(imageType, 0), imageType);
+	public static <Input extends ImageSingleBand,Output extends ImageSingleBand>
+	ImageDistort<Input,Output> createImageDistort( PointTransform_F32 transform ,
+												   TypeInterpolate interpType,
+												   Class<Input> inputType, Class<Output> outputType )
+	{
+		InterpolatePixelS<Input> interp = FactoryInterpolation.createPixelS(0, 255, interpType, inputType);
+		ImageDistort<Input,Output> distorter = FactoryDistort.distortCached(interp, FactoryImageBorder.value(inputType, 0), outputType);
 		distorter.setModel(new PointToPixelTransform_F32(transform));
 
 		return distorter;
@@ -248,10 +252,11 @@ public class DistortImageOps {
 	 * @param input Image being distorted. Not modified.
 	 * @param output Output image. modified.
 	 * @param distortion The distortion model
-	 * @param <T> Band type.
+	 * @param <Input> Band type.
 	 */
-	public static <T extends ImageSingleBand> void distortMS( MultiSpectral<T> input , MultiSpectral<T> output ,
-															  ImageDistort<T> distortion )
+	public static <Input extends ImageSingleBand,Output extends ImageSingleBand>
+	void distortMS( MultiSpectral<Input> input , MultiSpectral<Output> output ,
+					ImageDistort<Input,Output> distortion )
 	{
 		for( int band = 0; band < input.getNumBands(); band++ )
 			distortion.apply(input.getBand(band),output.getBand(band));
