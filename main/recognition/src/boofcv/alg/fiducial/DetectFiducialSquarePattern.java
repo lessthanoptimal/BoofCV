@@ -38,7 +38,6 @@ import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSInt32;
 import boofcv.struct.image.ImageUInt8;
 import georegression.struct.homography.UtilHomography;
-import georegression.struct.point.Point2D_I32;
 import georegression.struct.se.Se3_F64;
 import georegression.struct.shapes.Quadrilateral_F64;
 import org.ddogleg.struct.FastQueue;
@@ -51,6 +50,8 @@ import java.util.List;
 /**
  * @author Peter Abeles
  */
+// TODO allow for different binary strategies to be used for speed reasons
+// TODO create a tracking algorithm which uses previous frame information for speed + stability
 public abstract class DetectFiducialSquarePattern {
 
 	double squareWidth;
@@ -77,6 +78,8 @@ public abstract class DetectFiducialSquarePattern {
 	List<AssociatedPair> pairs = new ArrayList<AssociatedPair>();
 	ImageDistort<ImageUInt8,ImageFloat32> removePerspective;
 	PointTransformHomography_F32 transformHomography = new PointTransformHomography_F32();
+
+	FitQuadrilaterialEM fitQuad = new FitQuadrilaterialEM();
 
 	IntrinsicParameters intrinsic;
 
@@ -118,7 +121,8 @@ public abstract class DetectFiducialSquarePattern {
 		candidates.reset();
 
 		// convert image into a binary image using adaptive thresholding
-		ThresholdImageOps.adaptiveSquare(gray,binary,3,-5,true,temp0,temp1);
+		ThresholdImageOps.threshold(gray,binary,200,true);
+//		ThresholdImageOps.adaptiveSquare(gray,binary,3,-5,true,temp0,temp1);
 
 //		binary.printNotZero();
 
@@ -161,30 +165,20 @@ public abstract class DetectFiducialSquarePattern {
 
 			System.out.println("Contour size "+c.external.size());
 
+			// todo use internal contour?
 			if( c.external.size() >= minimumContour) {
 				fitPolygon.process(c.external);
 				GrowQueue_I32 splits = fitPolygon.getSplits();
 				System.out.println("  splits "+splits.size);
-				if( splits.size == 4 ) {
-					// TODO filter extreme shapes here
-
-					Point2D_I32 p0 = c.external.get(splits.get(0));
-					Point2D_I32 p1 = c.external.get(splits.get(1));
-					Point2D_I32 p2 = c.external.get(splits.get(2));
-					Point2D_I32 p3 = c.external.get(splits.get(3));
-
+				if( splits.size <= 8 ) {
 					Quadrilateral_F64 q = candidates.grow();
-					q.a.set(p0.x,p0.y);
-					q.b.set(p1.x, p1.y);
-					q.c.set(p2.x, p2.y);
-					q.d.set(p3.x, p3.y);
-
-					// TODO refine the initial estimate?
-				} else {
-					for (int j = 0; j < splits.size; j++) {
-						Point2D_I32 p = c.external.get(splits.get(j));
-						System.out.println("  "+p);
+					if( !fitQuad.fit(c.external,splits,q))
+						candidates.removeTail();
+					else {
+						System.out.println(" quad "+q);
 					}
+
+					// TODO filter extreme shapes here
 				}
 			}
 		}

@@ -19,6 +19,8 @@
 package boofcv.alg.filter.binary;
 
 import boofcv.alg.misc.ImageMiscOps;
+import boofcv.misc.PerformerBase;
+import boofcv.misc.ProfileOperation;
 import boofcv.struct.image.ImageSInt32;
 import boofcv.struct.image.ImageUInt8;
 
@@ -43,28 +45,32 @@ public class BenchmarkThresholding {
 	static int threshLower = 20;
 	static int threshUpper = 30;
 
+	static int adaptiveRadius = 6;
 
 	public BenchmarkThresholding() {
 		Random rand = new Random(234);
 		ImageMiscOps.fillUniform(input, rand, 0, 100);
 	}
 
-	public int timeThreshold(int reps) {
-		for( int i = 0; i < reps; i++ )
+	public static class Threshold extends PerformerBase {
+		@Override
+		public void process() {
 			ThresholdImageOps.threshold(input, output_U8, threshLower, true);
-		return 0;
+		}
 	}
 
-	public int timeAdaptiveSquare(int reps) {
-		for( int i = 0; i < reps; i++ )
-			ThresholdImageOps.adaptiveSquare(input, output_U8, 20,0, true,work,work2);
-		return 0;
+	public static class AdaptiveSquare extends PerformerBase {
+		@Override
+		public void process() {
+			ThresholdImageOps.adaptiveSquare(input, output_U8, adaptiveRadius, 0, true, work, work2);
+		}
 	}
 
-	public int timeAdaptiveGaussian(int reps) {
-		for( int i = 0; i < reps; i++ )
-			ThresholdImageOps.adaptiveGaussian(input, output_U8, 20, 0, true, work, work2);
-		return 0;
+	public static class AdaptiveGaussian extends PerformerBase {
+		@Override
+		public void process() {
+			ThresholdImageOps.adaptiveGaussian(input, output_U8, adaptiveRadius,0, true,work,work2);
+		}
 	}
 
 	public static void main(String args[]) {
@@ -72,6 +78,8 @@ public class BenchmarkThresholding {
 		System.out.println("=========  Profile Image Size " + imgWidth + " x " + imgHeight + " ==========");
 		System.out.println();
 
-//		Runner.main(BenchmarkThresholding.class, args);
+		ProfileOperation.printOpsPerSec(new Threshold(), TEST_TIME);
+		ProfileOperation.printOpsPerSec(new AdaptiveSquare(), TEST_TIME);
+		ProfileOperation.printOpsPerSec(new AdaptiveGaussian(), TEST_TIME);
 	}
 }

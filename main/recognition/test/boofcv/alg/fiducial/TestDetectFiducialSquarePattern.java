@@ -40,13 +40,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
  */
 public class TestDetectFiducialSquarePattern {
+	/**
+	 * Basic test where a distorted pattern is places in the image and the found coordinates
+	 * are compared against ground truth
+	 */
 	@Test
-	public void easyTest() {
+	public void findPatternEasy() {
 		ImageUInt8 pattern = createPattern(100);
 		Quadrilateral_F64 where = new Quadrilateral_F64(50,50,  130,60,  140,150,  40,140);
 
@@ -62,9 +67,15 @@ public class TestDetectFiducialSquarePattern {
 
 		assertEquals(1,dummy.detected.size());
 
-		System.out.println(dummy.quads.get(0));
+		// todo check quad coordinates
+
+		// todo see if it did a reasonable job removing distortion
 	}
 
+	@Test
+	public void computeTargetToWorld() {
+		fail("implement");
+	}
 
 	/**
 	 * Creates a square pattern image of the specified size
