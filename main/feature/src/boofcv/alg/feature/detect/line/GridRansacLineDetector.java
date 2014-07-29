@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -191,7 +191,7 @@ public abstract class GridRansacLineDetector<D extends ImageSingleBand> {
 		float minT = Float.MAX_VALUE;
 		float maxT = -Float.MAX_VALUE;
 
-		LineParametric2D_F32 line = UtilLine2D_F32.convert(model,null);
+		LineParametric2D_F32 line = UtilLine2D_F32.convert(model,(LineParametric2D_F32)null);
 
 		Point2D_F32 p = new Point2D_F32();
 		for( Edgel e : matchSet ) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -193,7 +193,7 @@ public class LineImageOps {
 
 	private static void mergeIntoA( LineSegment2D_F32 a , LineSegment2D_F32 b )
 	{
-		LineParametric2D_F32 paraA = UtilLine2D_F32.convert(a,null);
+		LineParametric2D_F32 paraA = UtilLine2D_F32.convert(a,(LineParametric2D_F32)null);
 
 		Point2D_F32 pts[] = new Point2D_F32[4];
 		float t[] = new float[4];

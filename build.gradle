@@ -54,9 +54,6 @@ subprojects {
 //        compile files("$libpath/lib/DDogleg.jar")
 //        compile files("$libpath/lib/GeoRegression.jar")
 
-        compile group: 'com.googlecode.efficient-java-matrix-library', name: 'core', version: '0.26-SNAPSHOT'
-        compile group: 'com.googlecode.efficient-java-matrix-library', name: 'equation', version: '0.26-SNAPSHOT'
-        compile group: 'org.ddogleg', name: 'ddogleg', version: '0.5'
         compile group: 'org.georegression', name: 'georegression', version: '0.7-SNAPSHOT'
 
         testCompile group: 'junit', name: 'junit', version: '4.11'
@@ -165,7 +162,7 @@ try {
 def javadocProjects = mainProjects + integrationProjects
 
 // Creates a directory with all the compiled BoofCV jars and the dependencies for main
-task createLibraryDirectory( dependsOn: javadocProjects.collect{ it+":jar"}+javadocProjects.collect{ it+":sourcesJar"} ) << {
+task createLibraryDirectory( dependsOn: javadocProjects.collect {[ it+':jar',it+':sourcesJar']}.flatten() ) << {
 
     // dependencies for main and their own jars
     ext.listExternal = files(mainProjects.collect{ project(it).configurations.compile })
