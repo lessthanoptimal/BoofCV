@@ -172,11 +172,9 @@ public abstract class DetectFiducialSquarePattern {
 				System.out.println("  splits "+splits.size);
 				if( splits.size <= 8 ) {
 					Quadrilateral_F64 q = candidates.grow();
-					if( !fitQuad.fit(c.external,splits,q))
-						candidates.removeTail();
-					else {
-						System.out.println(" quad "+q);
-					}
+					fitQuad.fit(c.external,splits,q);
+					// todo check quality of the fit here some how
+					candidates.removeTail();
 
 					// TODO filter extreme shapes here
 				}

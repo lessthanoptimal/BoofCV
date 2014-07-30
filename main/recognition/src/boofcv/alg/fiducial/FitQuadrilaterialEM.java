@@ -43,22 +43,26 @@ import java.util.List;
  */
 public class FitQuadrilaterialEM {
 
-	double maxDistance = 6.0; // maximum distance in pixels
+	// maximum distance in pixels away a point can be from the line for it to have a weight
+	private double maxDistance = 6.0;
 
-	int iterationsEM = 10;
+	// maximum number of EM iterations
+	private int iterationsEM = 10;
 
 	// used to select the largest segments
-	QuickSortObj_F64 sorter = new QuickSortObj_F64();
-	FastQueue<Segment> segments = new FastQueue<Segment>(Segment.class,true);
+	private QuickSortObj_F64 sorterLength = new QuickSortObj_F64();
+	private FastQueue<Segment> segments = new FastQueue<Segment>(Segment.class,true);
 
-	FastQueue<Point> points = new FastQueue<Point>(Point.class,true);
+	private FastQueue<Point> points = new FastQueue<Point>(Point.class,true);
 	// lines in general notation with A*A + B*B = 1
-	LineGeneral2D_F64 lines[];
+	protected LineGeneral2D_F64 lines[];
 
-	GrowQueue_F64 weights = new GrowQueue_F64();
+	// storage for weights provided to line fitter
+	private GrowQueue_F64 weights = new GrowQueue_F64();
 
-	LineSegment2D_F64 work = new LineSegment2D_F64();
-	LinePolar2D_F64 polar = new LinePolar2D_F64();
+	// local storage
+	private LineSegment2D_F64 work = new LineSegment2D_F64();
+	private LinePolar2D_F64 polar = new LinePolar2D_F64();
 
 	public FitQuadrilaterialEM(double maxDistance, int iterationsEM) {
 		this();
@@ -74,13 +78,13 @@ public class FitQuadrilaterialEM {
 	}
 
 	/**
+	 * Fits a quadrilateral to the contour given an initial set of candidate corners
 	 *
-	 * @param contour
-	 * @param corners
-	 * @param output
-	 * @return
+	 * @param contour Contours around the shape
+	 * @param corners Initial set of corners
+	 * @param output the fitted quadrilateral
 	 */
-	public boolean fit( List<Point2D_I32> contour , GrowQueue_I32 corners ,
+	public void fit( List<Point2D_I32> contour , GrowQueue_I32 corners ,
 						Quadrilateral_F64 output )
 	{
 		// pick the 4 largest segments to act as the initial seeds
@@ -89,8 +93,13 @@ public class FitQuadrilaterialEM {
 			int next = (i+1)%corners.size;
 			segments.grow().set(corners.get(i),corners.get(next),contour.size());
 		}
-		sorter.sort(segments.data,segments.size);
+		sorterLength.sort(segments.data, segments.size);
 
+		// order the lines so that they can be converted into a quad later on easily
+		// bubble sort below
+		bubbleSortLines(segments);
+
+		// now create the lines
 		for (int i = 0; i < 4; i++) {
 			createLine(segments.get(i), contour, lines[i]);
 		}
@@ -98,13 +107,30 @@ public class FitQuadrilaterialEM {
 		// estimate line equations
 		performLineEM(contour);
 
-		// compute the quality of the fit and decide if it's valid or not
-		// TODO write this part
-
 		// convert from lines to quadrilateral
 		convert(lines,output);
+	}
 
-		return true;
+	/**
+	 * Performs bubble sort on the first 4 lines to ensure they are in a circular order
+	 */
+	protected static void bubbleSortLines( FastQueue<Segment> segments ) {
+		for (int i = 0; i < 4; i++) {
+			int bestValue = segments.get(i).index0;
+			int bestIndex = i;
+			for (int j = i+1; j < 4; j++) {
+				Segment b = segments.get(j);
+				if( b.index0 < bestValue ) {
+					bestIndex = j;
+					bestValue = b.index0;
+				}
+			}
+			if( bestIndex != i ) {
+				Segment tmp = segments.data[i];
+				segments.data[i] = segments.data[bestIndex];
+				segments.data[bestIndex] = tmp;
+			}
+		}
 	}
 
 	/**
@@ -121,7 +147,6 @@ public class FitQuadrilaterialEM {
 		System.out.println("line0 = "+lines[0]);
 		weights.resize(points.size);
 
-		int N = iterationsEM-1;
 		for (int EM = 0; EM < iterationsEM; EM++) {
 			// compute the weight for each point to each line based on distance away
 			computePointWeights();
@@ -130,6 +155,10 @@ public class FitQuadrilaterialEM {
 			computeLineEquations();
 			System.out.println("line0 = "+lines[0]);
 		}
+
+		// recompute the lines one last time but without the points which have ambiguous weights
+		// which are near the border of two lines and skew the results
+		computeLineEquationsNoAmbiguous();
 	}
 
 	private void computePointWeights() {
@@ -164,10 +193,22 @@ public class FitQuadrilaterialEM {
 		}
 	}
 
+	private void computeLineEquationsNoAmbiguous() {
+		for (int i = 0; i < 4; i++) {
+			for (int j = 0; j < points.size; j++) {
+				double w = points.data[j].weight[i];
+				weights.data[j] = w < 0.9 ? 0 : w;
+			}
+			FitLine_F64.polar((List) points.toList(), weights.data, polar);
+			UtilLine2D_F64.convert(polar, lines[i]);
+			// no need to normalize the line since A*A + B*B = 1 already
+		}
+	}
+
 	/**
 	 * If A*A + B*B == 1 then a simplified distance formula can be used
 	 */
-	private static double distance( LineGeneral2D_F64 line , Point2D_F64 p ) {
+	protected static double distance( LineGeneral2D_F64 line , Point2D_F64 p ) {
 		return Math.abs(line.A*p.x + line.B*p.y + line.C);
 	}
 
@@ -190,53 +231,19 @@ public class FitQuadrilaterialEM {
 
 	/**
 	 * Finds the intersections between the four lines and converts it into a quadrilateral
+	 *
+	 * @param lines Assumes lines are ordered
 	 */
 	protected static void convert( LineGeneral2D_F64[] lines , Quadrilateral_F64 quad ) {
 
-		LineGeneral2D_F64 l0 = lines[0];
-		LineGeneral2D_F64 l1=null,l2=null,l3=null;
-
-		double angle1 = angle(lines[0],lines[1]);
-		double angle2 = angle(lines[0],lines[2]);
-		double angle3 = angle(lines[0],lines[3]);
-
-		if( angle1 > angle2 ) {
-			l1 = lines[1];
-			if( angle2 > angle3 ) {
-				l2 = lines[2];
-				l3 = lines[3];
-			} else {
-				l3 = lines[2];
-				l2 = lines[3];
-			}
-		} else {
-			l1 = lines[2];
-
-			if( angle1 > angle3 ) {
-				l2 = lines[1];
-				l3 = lines[3];
-			} else {
-				l3 = lines[1];
-				l2 = lines[3];
-			}
-		}
-
-		if( null == Intersection2D_F64.intersection(l0,l1,quad.a) )
+		if( null == Intersection2D_F64.intersection(lines[0],lines[1],quad.a) )
 			throw new RuntimeException("Oh crap");
-		if( null == Intersection2D_F64.intersection(l0,l2,quad.b) )
+		if( null == Intersection2D_F64.intersection(lines[2],lines[1],quad.b) )
 			throw new RuntimeException("Oh crap");
-		if( null == Intersection2D_F64.intersection(l3,l2,quad.c) )
+		if( null == Intersection2D_F64.intersection(lines[2],lines[3],quad.c) )
 			throw new RuntimeException("Oh crap");
-		if( null == Intersection2D_F64.intersection(l3,l1,quad.d) )
+		if( null == Intersection2D_F64.intersection(lines[0],lines[3],quad.d) )
 			throw new RuntimeException("Oh crap");
-	}
-
-	protected static double angle( LineGeneral2D_F64 a , LineGeneral2D_F64 b ) {
-
-		double la = Math.sqrt(a.A*a.A + a.B*a.B);
-		double lb = Math.sqrt(b.A*b.A + b.B*b.B);
-
-		return Math.acos((a.A*b.A + a.B*b.B)/(la*lb));
 	}
 
 	public static class Segment extends SortableParameter_F64 {
