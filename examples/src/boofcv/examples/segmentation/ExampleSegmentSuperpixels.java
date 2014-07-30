@@ -43,7 +43,7 @@ import java.awt.image.BufferedImage;
  *
  * @author Peter Abeles
  */
-public class ExampleImageSegmentation {
+public class ExampleSegmentSuperpixels {
 
 	/**
 	 * Segments and visualizes the image
