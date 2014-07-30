@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.alg.filter.binary;
 
+import boofcv.alg.misc.GImageStatistics;
 import boofcv.struct.image.*;
 
 
@@ -27,6 +28,170 @@ import boofcv.struct.image.*;
  * @author Peter Abeles
  */
 public class GThresholdImageOps {
+
+	/**
+	 * <p>
+	 * Computes the variance based threshold using Otsu's method from an input image. Internally it uses
+	 * {@link #computeOtsu(int[], int, int)} and {@link boofcv.alg.misc.GImageStatistics#histogram(boofcv.struct.image.ImageSingleBand, int, int[])}
+	 * </p>
+	 *
+	 * @param input Input gray-scale image
+	 * @param minValue The minimum value of a pixel in the image.  (inclusive)
+	 * @param maxValue The maximum value of a pixel in the image.  (exclusive)
+	 * @return Selected threshold.
+	 */
+	public static int computeOtsu( ImageSingleBand input , int minValue , int maxValue ) {
+
+		int range = maxValue - minValue;
+		int histogram[] = new int[ range ];
+
+		GImageStatistics.histogram(input,minValue,histogram);
+
+		// Total number of pixels
+		int total = input.width*input.height;
+
+		return computeOtsu(histogram,range,total)+minValue;
+	}
+
+	/**
+	 * Computes the variance based Otsu threshold from a histogram directly. The threshold is selected by minimizing the
+	 * spread of both foreground and background pixel values.
+	 *
+	 * @param histogram Histogram of pixel intensities.
+	 * @param length Number of elements in the histogram.
+	 * @param totalPixels Total pixels in the image
+	 * @return Selected threshold
+	 */
+	// original code from http://www.labbookpages.co.uk/software/imgProc/otsuThreshold.html
+	//                    Dr. Andrew Greensted
+	public static int computeOtsu( int histogram[] , int length , int totalPixels ) {
+
+		int sum = 0;
+		for (int i=0 ; i< length ; i++)
+			sum += i*histogram[i];
+
+		int sumB = 0;
+		int wB = 0;
+
+		double varMax = 0;
+		int threshold = 0;
+
+		for (int i=0 ; i<length ; i++) {
+			wB += histogram[i];               // Weight Background
+			if (wB == 0) continue;
+
+			int wF = totalPixels - wB;         // Weight Foreground
+			if (wF == 0) break;
+
+			sumB += i*histogram[i];
+
+			double mB = sumB / (double)wB;            // Mean Background
+			double mF = (sum - sumB) / (double)wF;    // Mean Foreground
+
+			// Calculate Between Class Variance
+			double varBetween = (double)wB*(double)wF*(mB - mF)*(mB - mF);
+
+			// Check if new maximum found
+			if (varBetween > varMax) {
+				varMax = varBetween;
+				threshold = i;
+			}
+		}
+
+		return threshold;
+	}
+
+	/**
+	 * <p>
+	 * Computes a threshold which maximizes the entropy between the foreground and background regions.  See
+	 * {@link #computeEntropy(int[], int, int)} for more details.
+	 * </p>
+	 *
+	 * @see boofcv.alg.misc.GImageStatistics#histogram(boofcv.struct.image.ImageSingleBand, int, int[])
+	 *
+	 * @param input Input gray-scale image
+	 * @param minValue The minimum value of a pixel in the image.  (inclusive)
+	 * @param maxValue The maximum value of a pixel in the image.  (exclusive)
+	 * @return Selected threshold.
+	 */
+	public static int computeEntropy( ImageSingleBand input , int minValue , int maxValue ) {
+
+		int range = maxValue - minValue;
+		int histogram[] = new int[ range ];
+
+		GImageStatistics.histogram(input,minValue,histogram);
+
+		// Total number of pixels
+		int total = input.width*input.height;
+
+		return computeEntropy(histogram, range, total)+minValue;
+	}
+
+	/**
+	 * <p>
+	 * Computes a threshold which maximizes the entropy between the foreground and background regions.  See [1]
+	 * for algorithmic details, which cites [2].
+	 * </p>
+	 *
+	 * <p>
+	 * [1] E.R. Davies "Machine Vision Theory Algorithms Practicalities" 3rd Ed. 2005. pg. 124<br>
+	 * [2] Hannah, Ian, Devesh Patel, and Roy Davies. "The use of variance and entropic thresholding methods
+	 * for image segmentation." Pattern Recognition 28.8 (1995): 1135-1143.
+	 * </p>
+	 *
+	 * @param histogram Histogram of pixel intensities.
+	 * @param length Number of elements in the histogram.
+	 * @param totalPixels Total pixels in the image
+	 * @return Selected threshold
+	 */
+	public static int computeEntropy( int histogram[] , int length , int totalPixels ) {
+
+		// precompute p[i]*ln(p[i]) and handle special case where p[i] = 0
+		double p[] = new double[length];
+		for (int i = 0; i < length; i++) {
+			int h = histogram[i];
+			if( h == 0 ) {
+				p[i] = 0;
+			} else {
+				p[i] = h/(double)totalPixels;
+				p[i] *= Math.log(p[i]);
+			}
+		}
+
+		double bestScore = 0;
+		int bestIndex = 0;
+		int countF = 0;
+
+		for (int i=0 ; i<length ; i++) {
+			countF += histogram[i];
+			double sumF = countF/(double)totalPixels;
+
+			if( sumF == 0 || sumF == 1.0 ) continue;
+
+			double sumB = 1.0-sumF;
+
+			double HA = 0;
+			for (int j = 0; j <= i; j++) {
+				HA += p[j];
+			}
+			HA/=sumF;
+
+			double HB = 0;
+			for (int j = i+1; j < length; j++) {
+				HB += p[j];
+			}
+			HB/=sumB;
+
+			double entropy = Math.log(sumF) + Math.log(sumB)  - HA - HB;
+
+			if( entropy > bestScore ) {
+				bestScore = entropy;
+				bestIndex = i;
+			}
+		}
+
+		return bestIndex;
+	}
 
 	/**
 	 * Applies a global threshold across the whole image.  If 'down' is true, then pixels with values <=

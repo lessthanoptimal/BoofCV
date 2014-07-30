@@ -21,8 +21,8 @@ package boofcv.examples.imageprocessing;
 
 import boofcv.alg.filter.binary.BinaryImageOps;
 import boofcv.alg.filter.binary.Contour;
+import boofcv.alg.filter.binary.GThresholdImageOps;
 import boofcv.alg.filter.binary.ThresholdImageOps;
-import boofcv.alg.misc.ImageStatistics;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.gui.binary.VisualizeBinaryData;
 import boofcv.gui.image.ShowImages;
@@ -39,6 +39,8 @@ import java.util.List;
  * Demonstrates how to create binary images by thresholding, applying binary morphological operations, and
  * then extracting detected features by finding their contours.
  *
+ * @see boofcv.examples.segmentation.ExampleThresholding
+ *
  * @author Peter Abeles
  */
 public class ExampleBinaryOps {
@@ -52,11 +54,11 @@ public class ExampleBinaryOps {
 		ImageUInt8 binary = new ImageUInt8(input.width,input.height);
 		ImageSInt32 label = new ImageSInt32(input.width,input.height);
 
-		// the mean pixel value is often a reasonable threshold when creating a binary image
-		double mean = ImageStatistics.mean(input);
+		// Select a global threshold using Otsu's method.
+		double threshold = GThresholdImageOps.computeOtsu(input, 0, 256);
 
-		// create a binary image by thresholding
-		ThresholdImageOps.threshold(input,binary,(float)mean,true);
+		// Apply the threshold to create a binary image
+		ThresholdImageOps.threshold(input,binary,(float)threshold,true);
 
 		// remove small blobs through erosion and dilation
 		// The null in the input indicates that it should internally declare the work image it needs

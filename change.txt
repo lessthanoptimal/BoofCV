@@ -11,7 +11,7 @@ Version : Alpha 0.18
  * Fixed issue with SLIC where it did not set its ConnectRule
 - Renamed ExampleStructureFromMotion to ExampleMultiviewSceneReconstruction
 - Processing
- * Copies over processing JavaDoc
+ * Gradle copies over processing JavaDoc
  * Fixed SimpleTrackerPoints.spawn() which did not update the tracks before
  * Added more comments to examples
 - Removed Caliper dependency
@@ -21,6 +21,11 @@ Version : Alpha 0.18
 - ImageDistort now supports a different input and output types
   * Support is provided for the same image type
   * It now allows for all types to float 32. Interpolation always outputs a floating point value.
+- ThresholdImageOps
+  * Otsu's method
+  * Entropy based method
+  * Created ExampleThresholding
+- Fixed problem in FilterImageReflection where it assumed two arguments but some binary operations have 3 now
 
 ---------------------------------------------
 Date    : 2014/6/19

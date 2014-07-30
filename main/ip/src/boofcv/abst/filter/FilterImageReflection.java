@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -41,7 +41,11 @@ public class FilterImageReflection<Input extends ImageSingleBand, Output extends
 	int borderY;
 
 	public FilterImageReflection(Class owner, String methodName, int borderX, int borderY, Class<Input> inputType, Class<Output> outputType) {
-		this.m = BoofTesting.findMethod(owner, methodName, inputType, outputType);
+		try {
+			this.m = BoofTesting.findMethod(owner, methodName, inputType, outputType);
+		} catch( RuntimeException e ) {
+			this.m = BoofTesting.findMethod(owner, methodName, inputType,int.class, outputType);
+		}
 		this.inputType = inputType;
 		this.outputType = outputType;
 		this.borderX = borderX;
@@ -49,8 +53,8 @@ public class FilterImageReflection<Input extends ImageSingleBand, Output extends
 
 		// sanity check
 		Class param[] = m.getParameterTypes();
-		if (param.length != 2)
-			throw new IllegalArgumentException("Input method must have two inputs");
+		if (param.length != 2 && param.length != 3 )
+			throw new IllegalArgumentException("Input method must have two or three inputs");
 		if (!ImageSingleBand.class.isAssignableFrom(param[0]) || !ImageSingleBand.class.isAssignableFrom(param[0]))
 			throw new IllegalArgumentException("TWo input parameters must be of type ImageSingleBand");
 	}
@@ -65,8 +69,8 @@ public class FilterImageReflection<Input extends ImageSingleBand, Output extends
 
 		// sanity check
 		Class param[] = m.getParameterTypes();
-		if (param.length != 2)
-			throw new IllegalArgumentException("Input method must have two inputs");
+		if (param.length != 2 && param.length != 3 )
+			throw new IllegalArgumentException("Input method must have two or three inputs");
 		if (!ImageSingleBand.class.isAssignableFrom(param[0]) || !ImageSingleBand.class.isAssignableFrom(param[0]))
 			throw new IllegalArgumentException("TWo input parameters must be of type ImageSingleBand");
 	}
@@ -79,7 +83,11 @@ public class FilterImageReflection<Input extends ImageSingleBand, Output extends
 			throw new IllegalArgumentException("Output parameter is null");
 
 		try {
-			m.invoke(null, input, output);
+			if( m.getParameterTypes().length == 3 ) {
+				m.invoke(null, input, 1 , output);
+			} else {
+				m.invoke(null, input, output);
+			}
 		} catch (IllegalAccessException e) {
 			throw new RuntimeException(e);
 		} catch (InvocationTargetException e) {

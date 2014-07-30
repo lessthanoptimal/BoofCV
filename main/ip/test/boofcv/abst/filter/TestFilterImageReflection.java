@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,8 +30,8 @@ public class TestFilterImageReflection {
 	/**
 	 * Checks to see if the provided function is invoked and that it returned the correct border
 	 */
-    @Test
-    public void basicTest() {
+	@Test
+	public void basicTest2() {
 		FilterImageReflection filter = new FilterImageReflection(getClass(),"methodDummy",2,3,ImageUInt8.class,ImageUInt16.class);
 
 		ImageUInt8 in = new ImageUInt8(5,5);
@@ -44,7 +44,28 @@ public class TestFilterImageReflection {
 		assertEquals(1,out.get(0,0));
     }
 
+	/**
+	 * Some filters have a parameter which specify the number of times it is invoked
+	 */
+	@Test
+	public void basicTest3() {
+		FilterImageReflection filter = new FilterImageReflection(getClass(),"methodDummy2",2,3,ImageUInt8.class,ImageUInt16.class);
+
+		ImageUInt8 in = new ImageUInt8(5,5);
+		ImageUInt16 out = new ImageUInt16(5,5);
+		filter.process(in,out);
+
+		assertEquals(2,filter.getHorizontalBorder());
+		assertEquals(3,filter.getVerticalBorder());
+		assertTrue(ImageUInt8.class==filter.getInputType());
+		assertEquals(1,out.get(0,0));
+	}
+
 	public static void methodDummy( ImageUInt8 imgA , ImageUInt16 imgB ) {
+		imgB.set(0,0,1);
+	}
+
+	public static void methodDummy2( ImageUInt8 imgA , int numTimes , ImageUInt16 imgB ) {
 		imgB.set(0,0,1);
 	}
 }

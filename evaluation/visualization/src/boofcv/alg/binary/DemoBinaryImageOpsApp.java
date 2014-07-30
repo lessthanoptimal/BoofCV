@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,6 @@ package boofcv.alg.binary;
 
 import boofcv.abst.filter.FilterImageInterface;
 import boofcv.alg.filter.binary.GThresholdImageOps;
-import boofcv.alg.misc.GImageStatistics;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.filter.binary.FactoryBinaryImageOps;
@@ -117,8 +116,7 @@ public class DemoBinaryImageOpsApp<T extends ImageSingleBand> extends SelectAlgo
 
 		ConvertBufferedImage.convertFromSingle(image, imageInput, imageType);
 
-		// average pixel intensity should be a reasonable threshold
-		final double threshold = GImageStatistics.mean(imageInput);
+		final double threshold = GThresholdImageOps.computeOtsu(imageInput,0,256);
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				selectThresh.setThreshold((int) threshold);

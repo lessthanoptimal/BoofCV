@@ -22,7 +22,6 @@ import boofcv.abst.filter.FilterImageInterface;
 import boofcv.alg.filter.binary.BinaryImageOps;
 import boofcv.alg.filter.binary.Contour;
 import boofcv.alg.filter.binary.GThresholdImageOps;
-import boofcv.alg.misc.GImageStatistics;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.filter.binary.FactoryBinaryImageOps;
@@ -142,8 +141,7 @@ public class DemoBinaryImageLabelOpsApp<T extends ImageSingleBand> extends Selec
 
 		ConvertBufferedImage.convertFromSingle(image, imageInput, imageType);
 
-		// average pixel intensity should be a reasonable threshold
-		final double threshold = GImageStatistics.mean(imageInput);
+		final double threshold = GThresholdImageOps.computeOtsu(imageInput,0,256);
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				selectThresh.setThreshold((int) threshold);
