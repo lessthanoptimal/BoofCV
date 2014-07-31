@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,7 +26,7 @@ import boofcv.struct.feature.Match;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
 import georegression.struct.point.Point2D_I16;
-import org.ddogleg.sorting.QuickSelectArray;
+import org.ddogleg.sorting.QuickSelect;
 import org.ddogleg.struct.FastQueue;
 
 /**
@@ -133,7 +133,7 @@ public class TemplateMatching<T extends ImageBase> {
 
 		int N = Math.min(maxMatches, candidates.size);
 
-		QuickSelectArray.selectIndex(scores, N, candidates.size, indexes);
+		QuickSelect.selectIndex(scores, N, candidates.size, indexes);
 
 		// save the results
 		results.reset();
@@ -141,7 +141,7 @@ public class TemplateMatching<T extends ImageBase> {
 			Point2D_I16 p = candidates.get(indexes[i]);
 
 			Match m = results.grow();
-			m.score = -scores[i];
+			m.score = -scores[indexes[i]];
 			m.set(p.x - offsetX, p.y - offsetY);
 		}
 	}

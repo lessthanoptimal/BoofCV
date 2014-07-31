@@ -30,7 +30,7 @@ import boofcv.struct.pyramid.ImagePyramid;
 import boofcv.struct.pyramid.PyramidDiscrete;
 import georegression.geometry.UtilPoint2D_F32;
 import georegression.struct.shapes.Rectangle2D_F64;
-import org.ddogleg.sorting.QuickSelectArray;
+import org.ddogleg.sorting.QuickSelect;
 import org.ddogleg.struct.FastQueue;
 
 import java.lang.reflect.Array;
@@ -272,7 +272,7 @@ public class TldRegionTracker< Image extends ImageSingleBand , Derivative extend
 		}
 
 		// if the forward-backwards error is too large, give up
-		double medianFB = QuickSelectArray.select(errorsFB,numTracksFB/2,numTracksFB);
+		double medianFB = QuickSelect.select(errorsFB,numTracksFB/2,numTracksFB);
 
 //		System.out.println("Median tracking error FB: "+medianFB);
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -57,7 +57,7 @@ public class GenerateImplMedianSortEdgeNaive extends CodeGeneratorBase {
 				"\n" +
 				"import boofcv.struct.image.ImageFloat32;\n" +
 				"import boofcv.struct.image.ImageInteger;\n" +
-				"import pja.sorting.QuickSelectArray;\n" +
+				"import pja.sorting.QuickSelect;\n" +
 				"\n" +
 				"/**\n" +
 				" * <p>\n" +
@@ -115,7 +115,7 @@ public class GenerateImplMedianSortEdgeNaive extends CodeGeneratorBase {
 				"\t\t\t\t}\n" +
 				"\t\t\t\t\n" +
 				"\t\t\t\t// use quick select to avoid sorting the whole list\n" +
-				"\t\t\t\t"+sumType+" median = QuickSelectArray.select(storage,index/2,index);\n" +
+				"\t\t\t\t"+sumType+" median = QuickSelect.select(storage,index/2,index);\n" +
 				"\t\t\t\toutput.set(x,y, median );\n" +
 				"\t\t\t}\n" +
 				"\t\t}\n" +
@@ -143,7 +143,7 @@ public class GenerateImplMedianSortEdgeNaive extends CodeGeneratorBase {
 				"\t\t\t\t}\n" +
 				"\n" +
 				"\t\t\t\t// use quick select to avoid sorting the whole list\n" +
-				"\t\t\t\t"+sumType+" median = QuickSelectArray.select(storage,index/2,index);\n" +
+				"\t\t\t\t"+sumType+" median = QuickSelect.select(storage,index/2,index);\n" +
 				"\t\t\t\toutput.set(x,y, median );\n" +
 				"\t\t\t}\n" +
 				"\t\t}\n" +
@@ -168,7 +168,7 @@ public class GenerateImplMedianSortEdgeNaive extends CodeGeneratorBase {
 				"\t\t\t\t}\n" +
 				"\n" +
 				"\t\t\t\t// use quick select to avoid sorting the whole list\n" +
-				"\t\t\t\t"+sumType+" median = QuickSelectArray.select(storage,index/2,index);\n" +
+				"\t\t\t\t"+sumType+" median = QuickSelect.select(storage,index/2,index);\n" +
 				"\t\t\t\toutput.set(x,y, median );\n" +
 				"\t\t\t}\n" +
 				"\t\t}\n" +
@@ -193,7 +193,7 @@ public class GenerateImplMedianSortEdgeNaive extends CodeGeneratorBase {
 				"\t\t\t\t}\n" +
 				"\n" +
 				"\t\t\t\t// use quick select to avoid sorting the whole list\n" +
-				"\t\t\t\t"+sumType+" median = QuickSelectArray.select(storage,index/2,index);\n" +
+				"\t\t\t\t"+sumType+" median = QuickSelect.select(storage,index/2,index);\n" +
 				"\t\t\t\toutput.set(x,y, median );\n" +
 				"\t\t\t}\n" +
 				"\t\t}\n" +

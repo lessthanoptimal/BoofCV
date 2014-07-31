@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.alg.denoise.wavelet;
 
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
-import org.ddogleg.sorting.QuickSelectArray;
+import org.ddogleg.sorting.QuickSelect;
 
 
 /**
@@ -55,7 +55,7 @@ public class UtilDenoiseWavelet {
 		storage = subbandAbsVal(subband, storage );
 
 		int N = subband.width*subband.height;
-		return QuickSelectArray.select(storage, N / 2, N)/0.6745f;
+		return QuickSelect.select(storage, N / 2, N)/0.6745f;
 	}
 
 	/**

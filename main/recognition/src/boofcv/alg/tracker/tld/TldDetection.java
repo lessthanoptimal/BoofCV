@@ -20,7 +20,7 @@ package boofcv.alg.tracker.tld;
 
 import boofcv.struct.ImageRectangle;
 import boofcv.struct.image.ImageSingleBand;
-import org.ddogleg.sorting.QuickSelectArray;
+import org.ddogleg.sorting.QuickSelect;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_F64;
 import org.ddogleg.struct.GrowQueue_I32;
@@ -207,7 +207,7 @@ public class TldDetection<T extends ImageSingleBand> {
 			int N = Math.min(config.maximumCascadeConsider, storageMetric.size);
 			storageIndexes.resize(storageMetric.size);
 
-			QuickSelectArray.selectIndex(storageMetric.data, N - 1, storageMetric.size, storageIndexes.data);
+			QuickSelect.selectIndex(storageMetric.data, N - 1, storageMetric.size, storageIndexes.data);
 			for( int i = 0; i < N; i++ ) {
 				fernRegions.add(storageRect.get(storageIndexes.get(i)));
 			}

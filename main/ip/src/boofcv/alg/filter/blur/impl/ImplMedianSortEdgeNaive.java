@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.alg.filter.blur.impl;
 
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageInteger;
-import org.ddogleg.sorting.QuickSelectArray;
+import org.ddogleg.sorting.QuickSelect;
 
 /**
  * <p>
@@ -72,7 +72,7 @@ public class ImplMedianSortEdgeNaive {
 				}
 				
 				// use quick select to avoid sorting the whole list
-				float median = QuickSelectArray.select(storage, index / 2, index);
+				float median = QuickSelect.select(storage, index / 2, index);
 				output.set(x,y, median );
 			}
 		}
@@ -100,7 +100,7 @@ public class ImplMedianSortEdgeNaive {
 				}
 
 				// use quick select to avoid sorting the whole list
-				float median = QuickSelectArray.select(storage,index/2,index);
+				float median = QuickSelect.select(storage,index/2,index);
 				output.set(x,y, median );
 			}
 		}
@@ -125,7 +125,7 @@ public class ImplMedianSortEdgeNaive {
 				}
 
 				// use quick select to avoid sorting the whole list
-				float median = QuickSelectArray.select(storage,index/2,index);
+				float median = QuickSelect.select(storage,index/2,index);
 				output.set(x,y, median );
 			}
 		}
@@ -150,7 +150,7 @@ public class ImplMedianSortEdgeNaive {
 				}
 
 				// use quick select to avoid sorting the whole list
-				float median = QuickSelectArray.select(storage,index/2,index);
+				float median = QuickSelect.select(storage,index/2,index);
 				output.set(x,y, median );
 			}
 		}
@@ -188,7 +188,7 @@ public class ImplMedianSortEdgeNaive {
 				}
 				
 				// use quick select to avoid sorting the whole list
-				int median = QuickSelectArray.select(storage,index/2,index);
+				int median = QuickSelect.select(storage,index/2,index);
 				output.set(x,y, median );
 			}
 		}
@@ -216,7 +216,7 @@ public class ImplMedianSortEdgeNaive {
 				}
 
 				// use quick select to avoid sorting the whole list
-				int median = QuickSelectArray.select(storage,index/2,index);
+				int median = QuickSelect.select(storage,index/2,index);
 				output.set(x,y, median );
 			}
 		}
@@ -241,7 +241,7 @@ public class ImplMedianSortEdgeNaive {
 				}
 
 				// use quick select to avoid sorting the whole list
-				int median = QuickSelectArray.select(storage,index/2,index);
+				int median = QuickSelect.select(storage,index/2,index);
 				output.set(x,y, median );
 			}
 		}
@@ -266,7 +266,7 @@ public class ImplMedianSortEdgeNaive {
 				}
 
 				// use quick select to avoid sorting the whole list
-				int median = QuickSelectArray.select(storage,index/2,index);
+				int median = QuickSelect.select(storage,index/2,index);
 				output.set(x,y, median );
 			}
 		}
