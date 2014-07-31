@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,14 +32,13 @@ import static org.junit.Assert.assertTrue;
  */
 public class TestGPixelMath extends BaseGClassChecksInMisc {
 
-
 	public TestGPixelMath() {
 		super(GPixelMath.class, PixelMath.class);
 	}
 
 	@Test
 	public void compareToPixelMath() {
-		performTests(16);
+		performTests(18);
 	}
 
 	@Override
@@ -109,6 +108,14 @@ public class TestGPixelMath extends BaseGClassChecksInMisc {
 			ret[0][3] = 12;
 			ret[0][4] = output;
 		} else if( name.equals("log") ) {
+			inputB = createImage(param[1],null);
+			ret[0][0] = inputA;
+			ret[0][1] = inputB;
+		} else if( name.equals("pow2") ) {
+			inputB = createImage(param[1],null);
+			ret[0][0] = inputA;
+			ret[0][1] = inputB;
+		} else if( name.equals("sqrt") ) {
 			inputB = createImage(param[1],null);
 			ret[0][0] = inputA;
 			ret[0][1] = inputB;

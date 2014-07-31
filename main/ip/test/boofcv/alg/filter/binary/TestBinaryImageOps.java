@@ -124,6 +124,27 @@ public class TestBinaryImageOps {
 		assertEquals(0, out.get(0, 1));
 	}
 
+	@Test
+	public void invert() {
+		ImageUInt8 input = new ImageUInt8(5,6);
+		ImageUInt8 expected = new ImageUInt8(5,6);
+
+		for (int y = 0; y < input.height; y++) {
+			for (int x = 0; x < input.width; x++) {
+				boolean a = rand.nextBoolean();
+				if( a ) {
+					input.set(x,y,1);
+					expected.set(x,y,0);
+				} else {
+					input.set(x,y,0);
+					expected.set(x,y,1);
+				}
+			}
+		}
+
+		ImageUInt8 found = BinaryImageOps.invert(input, null);
+		BoofTesting.assertEquals(found,expected,0);
+	}
 	
 	@Test
 	public void compareToNaive() {

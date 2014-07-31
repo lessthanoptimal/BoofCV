@@ -18,7 +18,9 @@
 
 package boofcv.alg.filter.binary;
 
+import boofcv.alg.filter.binary.impl.ThresholdSauvola;
 import boofcv.alg.misc.GImageStatistics;
+import boofcv.core.image.GConvertImage;
 import boofcv.struct.image.*;
 
 
@@ -66,11 +68,11 @@ public class GThresholdImageOps {
 	//                    Dr. Andrew Greensted
 	public static int computeOtsu( int histogram[] , int length , int totalPixels ) {
 
-		int sum = 0;
+		double sum = 0;
 		for (int i=0 ; i< length ; i++)
 			sum += i*histogram[i];
 
-		int sumB = 0;
+		double sumB = 0;
 		int wB = 0;
 
 		double varMax = 0;
@@ -85,8 +87,8 @@ public class GThresholdImageOps {
 
 			sumB += i*histogram[i];
 
-			double mB = sumB / (double)wB;            // Mean Background
-			double mF = (sum - sumB) / (double)wF;    // Mean Foreground
+			double mB = sumB / wB;            // Mean Background
+			double mF = (sum - sumB) / wF;    // Mean Foreground
 
 			// Calculate Between Class Variance
 			double varBetween = (double)wB*(double)wF*(mB - mF)*(mB - mF);
@@ -202,7 +204,7 @@ public class GThresholdImageOps {
 	 * @param output (Optional) Binary output image. If null a new image will be declared. Modified.
 	 * @param threshold threshold value.
 	 * @param down If true then the inequality <= is used, otherwise if false then >= is used.
-	 * @return Output image.
+	 * @return binary image.
 	 */
 	public static <T extends ImageSingleBand>
 	ImageUInt8 threshold( T input , ImageUInt8 output ,
@@ -245,7 +247,7 @@ public class GThresholdImageOps {
 	 * @param down Should it threshold up or down.
 	 * @param work1 (Optional) Internal workspace.  Can be null
 	 * @param work2 (Optional) Internal workspace.  Can be null
-	 * @return Thresholded image.
+	 * @return binary image.
 	 */
 	public static <T extends ImageSingleBand>
 	ImageUInt8 adaptiveSquare( T input , ImageUInt8 output ,
@@ -282,7 +284,7 @@ public class GThresholdImageOps {
 	 * @param down Should it threshold up or down.
 	 * @param work1 (Optional) Internal workspace.  Can be null
 	 * @param work2 (Optional) Internal workspace.  Can be null
-	 * @return Thresholded image.
+	 * @return binary image.
 	 */
 	public static <T extends ImageSingleBand>
 	ImageUInt8 adaptiveGaussian( T input , ImageUInt8 output ,
@@ -299,4 +301,37 @@ public class GThresholdImageOps {
 			throw new IllegalArgumentException("Unknown image type: "+input.getClass().getSimpleName());
 		}
 	}
+
+	/**
+	 * Applies {@link boofcv.alg.filter.binary.impl.ThresholdSauvola Sauvola} thresholding to the input image.
+	 * Intended for use with text image.
+	 *
+	 * @see boofcv.alg.filter.binary.impl.ThresholdSauvola
+	 *
+	 * @param input Input image.
+	 * @param output (optional) Output binary image.  If null it will be declared internally.
+	 * @param radius Radius of local region.  Try 15
+	 * @param k Positive parameter used to tune threshold.  Try 0.5
+	 * @param down Should it threshold up or down.
+	 * @return binary image
+	 */
+	public static <T extends ImageSingleBand>
+	ImageUInt8 adaptiveSauvola( T input , ImageUInt8 output , int radius , float k , boolean down )
+	{
+		ThresholdSauvola alg = new ThresholdSauvola(radius,k, down);
+
+		if( output == null )
+			output = new ImageUInt8(input.width,input.height);
+
+		if( input instanceof ImageFloat32 ) {
+			alg.process((ImageFloat32)input,output);
+		} else {
+			ImageFloat32 conv = new ImageFloat32(input.width,input.height);
+			GConvertImage.convert(input, conv);
+			alg.process(conv,output);
+		}
+
+		return output;
+	}
+
 }

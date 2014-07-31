@@ -24,10 +24,10 @@ Version : Alpha 0.18
 - ThresholdImageOps
   * Otsu's method
   * Entropy based method
-  * TODO add Sauvola
-  * TODO rename adaptive to local?
-  * Created ExampleThresholding
+  * Sauvola
 - Fixed problem in FilterImageReflection where it assumed two arguments but some binary operations have 3 now
+- Added pow2 and sqrt to PixelMath
+- Added invert to BinaryImageOps
 
 TODO
 - BlurImageOps.mean() and gaussian() UInt8 images.
@@ -36,8 +36,8 @@ TODO
     after the first sweep
   * unit test: compare to brute force and see if it produces an identical solution
 TODO
-- Consider adding Document image binarization using background estimation
-                  and stroke edges
+- Consider adding "Document image binarization using background estimation
+                  and stroke edges"
 ---------------------------------------------
 Date    : 2014/6/19
 Version : Alpha 0.17

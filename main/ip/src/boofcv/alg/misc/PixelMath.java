@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -2615,6 +2615,50 @@ public class PixelMath {
 	}
 
 	/**
+	 * Raises each pixel in the input image to the power of two. Both the input and output image can be the 
+	 * same instance.	 *
+	 * @param input The input image. Not modified.
+	 * @param output Where the pow2 image is written to. Modified.
+	 */
+	public static void pow2( ImageFloat32 input , ImageFloat32 output ) {
+
+		InputSanityCheck.checkSameShape(input,output);
+
+		for( int y = 0; y < input.height; y++ ) {
+			int indexSrc = input.startIndex + y* input.stride;
+			int indexDst = output.startIndex + y* output.stride;
+			int end = indexSrc + input.width;
+
+			for( ; indexSrc < end; indexSrc++ , indexDst++) {
+				float v = input.data[indexSrc];
+				output.data[indexDst] = v*v;
+			}
+		}
+	}
+
+	/**
+	 * Computes the square root of each pixel in the input image. Both the input and output image can be the
+	 * same instance.
+	 *
+	 * @param input The input image. Not modified.
+	 * @param output Where the sqrt() image is written to. Modified.
+	 */
+	public static void sqrt( ImageFloat32 input , ImageFloat32 output ) {
+
+		InputSanityCheck.checkSameShape(input,output);
+
+		for( int y = 0; y < input.height; y++ ) {
+			int indexSrc = input.startIndex + y* input.stride;
+			int indexDst = output.startIndex + y* output.stride;
+			int end = indexSrc + input.width;
+
+			for( ; indexSrc < end; indexSrc++ , indexDst++) {
+				output.data[indexDst] = (float)Math.sqrt(input.data[indexSrc]);
+			}
+		}
+	}
+
+	/**
 	 * <p>
 	 * Performs pixel-wise addition<br>
 	 * output(x,y) = imgA(x,y) + imgB(x,y)
@@ -2744,6 +2788,50 @@ public class PixelMath {
 
 			for( ; indexSrc < end; indexSrc++ , indexDst++) {
 				output.data[indexDst] = Math.log(1 + input.data[indexSrc]);
+			}
+		}
+	}
+
+	/**
+	 * Raises each pixel in the input image to the power of two. Both the input and output image can be the 
+	 * same instance.	 *
+	 * @param input The input image. Not modified.
+	 * @param output Where the pow2 image is written to. Modified.
+	 */
+	public static void pow2( ImageFloat64 input , ImageFloat64 output ) {
+
+		InputSanityCheck.checkSameShape(input,output);
+
+		for( int y = 0; y < input.height; y++ ) {
+			int indexSrc = input.startIndex + y* input.stride;
+			int indexDst = output.startIndex + y* output.stride;
+			int end = indexSrc + input.width;
+
+			for( ; indexSrc < end; indexSrc++ , indexDst++) {
+				double v = input.data[indexSrc];
+				output.data[indexDst] = v*v;
+			}
+		}
+	}
+
+	/**
+	 * Computes the square root of each pixel in the input image. Both the input and output image can be the
+	 * same instance.
+	 *
+	 * @param input The input image. Not modified.
+	 * @param output Where the sqrt() image is written to. Modified.
+	 */
+	public static void sqrt( ImageFloat64 input , ImageFloat64 output ) {
+
+		InputSanityCheck.checkSameShape(input,output);
+
+		for( int y = 0; y < input.height; y++ ) {
+			int indexSrc = input.startIndex + y* input.stride;
+			int indexDst = output.startIndex + y* output.stride;
+			int end = indexSrc + input.width;
+
+			for( ; indexSrc < end; indexSrc++ , indexDst++) {
+				output.data[indexDst] = Math.sqrt(input.data[indexSrc]);
 			}
 		}
 	}

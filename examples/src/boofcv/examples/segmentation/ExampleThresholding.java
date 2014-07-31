@@ -65,6 +65,8 @@ public class ExampleThresholding {
 		gui.addImage(VisualizeBinaryData.renderBinary(binary, null),"Adaptive: Square");
 		GThresholdImageOps.adaptiveGaussian(input, binary, 42, 0, true, null, null);
 		gui.addImage(VisualizeBinaryData.renderBinary(binary, null),"Adaptive: Gaussian");
+		GThresholdImageOps.adaptiveSauvola(input, binary, 5, 0.50f, true);
+		gui.addImage(VisualizeBinaryData.renderBinary(binary, null),"Adaptive: Sauvola");
 
 		// Show the image image for reference
 		gui.addImage(ConvertBufferedImage.convertTo(input,null),"Input Image");
@@ -78,5 +80,7 @@ public class ExampleThresholding {
 		threshold("../data/applet/particles01.jpg");
 		// example in which adaptive/local thresholding works best
 		threshold("../data/applet/segment/uneven_lighting_squares.jpg");
+		// hand written text with non-uniform stained background
+		threshold("../data/applet/segment/stained_handwriting.jpg");
 	}
 }

@@ -138,6 +138,30 @@ public class BinaryImageOps {
 	}
 
 	/**
+	 * Inverts each pixel from true to false and vis-versa.
+	 *
+	 * @param input Input image. Not modified.
+	 * @param output Output image. Can be same as input.  If null a new instance will be declared, Modified.
+	 * @return Output of logical operation.
+	 */
+	public static ImageUInt8 invert( ImageUInt8 input , ImageUInt8 output)
+	{
+		output = InputSanityCheck.checkDeclare(input, output);
+
+		for( int y = 0; y < input.height; y++ ) {
+			int index = input.startIndex + y*input.stride;
+			int indexOut = output.startIndex + y*output.stride;
+
+			int end = index + input.width;
+			for( ; index < end; index++,indexOut++) {
+				output.data[indexOut] = input.data[index] == 0 ? (byte)1 : (byte)0;
+			}
+		}
+
+		return output;
+	}
+
+	/**
 	 * <p>
 	 * Erodes an image according to a 4-neighborhood.  Unless a pixel is connected to all its neighbors its value
 	 * is set to zero.

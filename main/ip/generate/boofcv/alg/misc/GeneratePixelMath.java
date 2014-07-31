@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -88,6 +88,8 @@ public class GeneratePixelMath extends CodeGeneratorBase {
 				printMultTwoImages(types[i],types[i]);
 				printDivTwoImages(types[i],types[i]);
 				printLog(types[i],types[i]);
+				printPow2(types[i], types[i]);
+				printSqrt(types[i], types[i]);
 			}
 		}
 	}
@@ -523,6 +525,60 @@ public class GeneratePixelMath extends CodeGeneratorBase {
 				"\n" +
 				"\t\t\tfor( ; indexSrc < end; indexSrc++ , indexDst++) {\n" +
 				"\t\t\t\toutput.data[indexDst] = "+typeCast+"Math.log(1 + input.data[indexSrc]"+bitWise+");\n" +
+				"\t\t\t}\n" +
+				"\t\t}\n" +
+				"\t}\n\n");
+	}
+
+	public void printPow2( AutoTypeImage typeIn , AutoTypeImage typeOut ) {
+		String bitWise = typeIn.getBitWise();
+
+		out.print("\t/**\n" +
+				"\t * Raises each pixel in the input image to the power of two. Both the input and output image can be the \n" +
+				"\t * same instance." +
+				"\t *\n" +
+				"\t * @param input The input image. Not modified.\n" +
+				"\t * @param output Where the pow2 image is written to. Modified.\n" +
+				"\t */\n" +
+				"\tpublic static void pow2( "+typeIn.getSingleBandName()+" input , "+typeOut.getSingleBandName()+" output ) {\n" +
+				"\n" +
+				"\t\tInputSanityCheck.checkSameShape(input,output);\n" +
+				"\n" +
+				"\t\tfor( int y = 0; y < input.height; y++ ) {\n" +
+				"\t\t\tint indexSrc = input.startIndex + y* input.stride;\n" +
+				"\t\t\tint indexDst = output.startIndex + y* output.stride;\n" +
+				"\t\t\tint end = indexSrc + input.width;\n" +
+				"\n" +
+				"\t\t\tfor( ; indexSrc < end; indexSrc++ , indexDst++) {\n" +
+				"\t\t\t\t"+typeOut.getDataType()+" v = input.data[indexSrc]"+bitWise+";\n" +
+				"\t\t\t\toutput.data[indexDst] = v*v;\n" +
+				"\t\t\t}\n" +
+				"\t\t}\n" +
+				"\t}\n\n");
+	}
+
+	public void printSqrt( AutoTypeImage typeIn , AutoTypeImage typeOut ) {
+		String bitWise = typeIn.getBitWise();
+		String typeCast = typeOut != AutoTypeImage.F64 ? "("+typeOut.getDataType()+")" : "";
+
+		out.print("\t/**\n" +
+				"\t * Computes the square root of each pixel in the input image. Both the input and output image can be the\n" +
+				"\t * same instance.\n" +
+				"\t *\n" +
+				"\t * @param input The input image. Not modified.\n" +
+				"\t * @param output Where the sqrt() image is written to. Modified.\n" +
+				"\t */\n" +
+				"\tpublic static void sqrt( "+typeIn.getSingleBandName()+" input , "+typeOut.getSingleBandName()+" output ) {\n" +
+				"\n" +
+				"\t\tInputSanityCheck.checkSameShape(input,output);\n" +
+				"\n" +
+				"\t\tfor( int y = 0; y < input.height; y++ ) {\n" +
+				"\t\t\tint indexSrc = input.startIndex + y* input.stride;\n" +
+				"\t\t\tint indexDst = output.startIndex + y* output.stride;\n" +
+				"\t\t\tint end = indexSrc + input.width;\n" +
+				"\n" +
+				"\t\t\tfor( ; indexSrc < end; indexSrc++ , indexDst++) {\n" +
+				"\t\t\t\toutput.data[indexDst] = "+typeCast+"Math.sqrt(input.data[indexSrc]"+bitWise+");\n" +
 				"\t\t\t}\n" +
 				"\t\t}\n" +
 				"\t}\n\n");

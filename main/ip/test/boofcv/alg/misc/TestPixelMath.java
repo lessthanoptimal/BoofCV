@@ -43,7 +43,7 @@ public class TestPixelMath {
 
 	@Test
 	public void checkAll() {
-		int numExpected = 2*9+11*8;
+		int numExpected = 2*11+11*8;
 		Method methods[] = PixelMath.class.getMethods();
 
 		// sanity check to make sure the functions are being found
@@ -80,6 +80,10 @@ public class TestPixelMath {
 					testAdd(m);
 				} else if( m.getName().compareTo("log") == 0 ) {
 					testLog(m);
+				} else if( m.getName().compareTo("pow2") == 0 ) {
+					testPow2(m);
+				} else if( m.getName().compareTo("sqrt") == 0 ) {
+					testSqrt(m);
 				} else if( m.getName().compareTo("invert") == 0 ) {
 					testInvert(m);
 				} else if( m.getName().compareTo("subtract") == 0 ) {
@@ -571,6 +575,46 @@ public class TestPixelMath {
 				double b = GeneralizedImageOps.get(inputB,j,i);
 
 				assertEquals(Math.log(1+a),b,1e-4);
+			}
+		}
+	}
+
+	private void testPow2(Method m) throws InvocationTargetException, IllegalAccessException {
+		Class paramTypes[] = m.getParameterTypes();
+		ImageSingleBand inputA = GeneralizedImageOps.createSingleBand(paramTypes[0], width, height);
+		ImageSingleBand inputB = GeneralizedImageOps.createSingleBand(paramTypes[1], width, height);
+
+		GImageMiscOps.fillUniform(inputA, rand, -20,20);
+		GImageMiscOps.fillUniform(inputB, rand, -20,20);
+
+		m.invoke(null,inputA,inputB);
+
+		for( int i = 0; i < height; i++ ) {
+			for( int j = 0; j < width; j++ ) {
+				double a = GeneralizedImageOps.get(inputA,j,i);
+				double b = GeneralizedImageOps.get(inputB,j,i);
+
+				assertEquals(a*a,b,1e-4);
+			}
+		}
+	}
+
+	private void testSqrt(Method m) throws InvocationTargetException, IllegalAccessException {
+		Class paramTypes[] = m.getParameterTypes();
+		ImageSingleBand inputA = GeneralizedImageOps.createSingleBand(paramTypes[0], width, height);
+		ImageSingleBand inputB = GeneralizedImageOps.createSingleBand(paramTypes[1], width, height);
+
+		GImageMiscOps.fillUniform(inputA, rand, -20,20);
+		GImageMiscOps.fillUniform(inputB, rand, -20,20);
+
+		m.invoke(null,inputA,inputB);
+
+		for( int i = 0; i < height; i++ ) {
+			for( int j = 0; j < width; j++ ) {
+				double a = GeneralizedImageOps.get(inputA,j,i);
+				double b = GeneralizedImageOps.get(inputB,j,i);
+
+				assertEquals(Math.sqrt(a),b,1e-4);
 			}
 		}
 	}

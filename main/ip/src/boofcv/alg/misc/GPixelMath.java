@@ -268,6 +268,40 @@ public class GPixelMath {
 	}
 
 	/**
+	 * Raises each pixel in the input image to the power of two. Both the input and output image can be the same
+	 * instance.
+	 *
+	 * @param input The input image. Not modified.
+	 * @param output Where the pow2 image is written to. Modified.
+	 */
+	public static <T extends ImageSingleBand> void pow2( T input , T output ) {
+		if( ImageFloat32.class == input.getClass() ) {
+			PixelMath.pow2((ImageFloat32) input, (ImageFloat32) output);
+		} else if( ImageFloat64.class == input.getClass() ) {
+			PixelMath.pow2((ImageFloat64) input, (ImageFloat64) output);
+		} else {
+			throw new IllegalArgumentException("Unknown image Type: "+input.getClass().getSimpleName());
+		}
+	}
+
+	/**
+	 * Computes the square root of each pixel in the input image. Both the input and output image can be the
+	 * same instance.
+	 *
+	 * @param input The input image. Not modified.
+	 * @param output Where the sqrt() image is written to. Modified.
+	 */
+	public static <T extends ImageSingleBand> void sqrt( T input , T output ) {
+		if( ImageFloat32.class == input.getClass() ) {
+			PixelMath.sqrt((ImageFloat32) input, (ImageFloat32) output);
+		} else if( ImageFloat64.class == input.getClass() ) {
+			PixelMath.sqrt((ImageFloat64) input, (ImageFloat64) output);
+		} else {
+			throw new IllegalArgumentException("Unknown image Type: "+input.getClass().getSimpleName());
+		}
+	}
+
+	/**
 	 * Each element has the specified number added to it. Both input and output images can
 	 * be the same.
 	 *
