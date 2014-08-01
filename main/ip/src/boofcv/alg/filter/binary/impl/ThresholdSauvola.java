@@ -35,7 +35,7 @@ import boofcv.struct.image.ImageUInt8;
  *
  * <p>
  * There are two tuning parameters 'k' a positive number and the the 'radius' of the local region.  Recommended
- * values are k=0.5 and radius=15.  These were found by tuning against a set of text.
+ * values are k=0.3 and radius=15.  These were found by tuning against a set of text.
  * </p>
  *
  * @author Peter Abeles
@@ -61,7 +61,7 @@ public class ThresholdSauvola {
 	/**
 	 * Configures the algorithm.
 	 * @param radius size of local radius.  Try 15
-	 * @param k User specified threshold adjustment factor.  Must be positive. Try 0.5
+	 * @param k User specified threshold adjustment factor.  Must be positive. Try 0.3
 	 * @param down Threshold down or up
 	 */
 	public ThresholdSauvola(int radius, float k, boolean down) {
@@ -104,7 +104,7 @@ public class ThresholdSauvola {
 				int indexIn = input.startIndex + y * input.stride;
 				int indexOut = output.startIndex + y * output.stride;
 
-				for (int x = 0; x < input.width; x++) {
+				for (int x = 0; x < input.width; x++, i++) {
 					// threshold = mean.*(1 + k * ((deviation/R)-1));
 					float threshold = inputMean.data[i] * (1.0f + k * (stdev.data[i] / R - 1.0f));
 					output.data[indexOut++] = (byte) (input.data[indexIn++] <= threshold ? 1 : 0);
@@ -116,7 +116,7 @@ public class ThresholdSauvola {
 				int indexIn = input.startIndex + y * input.stride;
 				int indexOut = output.startIndex + y * output.stride;
 
-				for (int x = 0; x < input.width; x++) {
+				for (int x = 0; x < input.width; x++, i++) {
 					// threshold = mean.*(1 + k * ((deviation/R)-1));
 					float threshold = inputMean.data[i] * (1.0f + k * (stdev.data[i] / R - 1.0f));
 					output.data[indexOut++] = (byte) (input.data[indexIn++] >= threshold ? 1 : 0);

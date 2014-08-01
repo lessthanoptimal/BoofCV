@@ -311,7 +311,7 @@ public class GThresholdImageOps {
 	 * @param input Input image.
 	 * @param output (optional) Output binary image.  If null it will be declared internally.
 	 * @param radius Radius of local region.  Try 15
-	 * @param k Positive parameter used to tune threshold.  Try 0.5
+	 * @param k Positive parameter used to tune threshold.  Try 0.3
 	 * @param down Should it threshold up or down.
 	 * @return binary image
 	 */

@@ -65,8 +65,10 @@ public class ExampleThresholding {
 		gui.addImage(VisualizeBinaryData.renderBinary(binary, null),"Adaptive: Square");
 		GThresholdImageOps.adaptiveGaussian(input, binary, 42, 0, true, null, null);
 		gui.addImage(VisualizeBinaryData.renderBinary(binary, null),"Adaptive: Gaussian");
-		GThresholdImageOps.adaptiveSauvola(input, binary, 5, 0.50f, true);
+		GThresholdImageOps.adaptiveSauvola(input, binary, 5, 0.30f, true);
 		gui.addImage(VisualizeBinaryData.renderBinary(binary, null),"Adaptive: Sauvola");
+
+		// Sauvola is tuned for text image.  Change radius to make it run better in others.
 
 		// Show the image image for reference
 		gui.addImage(ConvertBufferedImage.convertTo(input,null),"Input Image");
