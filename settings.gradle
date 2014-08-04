@@ -1,4 +1,4 @@
-include 'examples','evaluation',
+include 'examples','evaluation','applications',
         'main:ip','main:io','main:feature','main:geo','main:calibration','main:sfm','main:recognition','main:visualize','main:checks',
         'integration:xuggler','integration:applet',"integration:WebcamCapture"
 

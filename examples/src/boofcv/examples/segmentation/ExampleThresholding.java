@@ -54,7 +54,7 @@ public class ExampleThresholding {
 
 		// Global Methods
 		GThresholdImageOps.threshold(input, binary, ImageStatistics.mean(input), true);
-		gui.addImage(VisualizeBinaryData.renderBinary(binary, null), "Global: Mean");
+		gui.addImage(VisualizeBinaryData.renderBinary(binary, null),"Global: Mean");
 		GThresholdImageOps.threshold(input, binary, GThresholdImageOps.computeOtsu(input, 0, 256), true);
 		gui.addImage(VisualizeBinaryData.renderBinary(binary, null),"Global: Otsu");
 		GThresholdImageOps.threshold(input, binary, GThresholdImageOps.computeEntropy(input, 0, 256), true);

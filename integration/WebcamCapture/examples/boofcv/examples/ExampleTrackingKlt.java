@@ -53,7 +53,7 @@ public class ExampleTrackingKlt {
 		// Open a webcam at a resolution close to 640x480
 		Webcam webcam = UtilWebcamCapture.openDefault(640,480);
 
-		// Create the panel used to display the image and
+		// Create the panel used to display the image and feature tracks
 		ImagePanel gui = new ImagePanel();
 		gui.setPreferredSize(webcam.getViewSize());
 

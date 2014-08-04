@@ -72,6 +72,14 @@ public class FactoryInterpolation {
 		throw new IllegalArgumentException("Add type: "+type);
 	}
 
+	/**
+	 * Pixel based interpolation on multi-band image
+	 *
+	 * @param min Minimum possible pixel value.  Inclusive.
+	 * @param max Maximum possible pixel value.  Inclusive.
+	 * @param type Interpolation type
+	 * @param imageType Type of input image
+	 */
 	public static <T extends ImageMultiBand> InterpolatePixelMB<T>
 	createPixelMB(double min, double max, TypeInterpolate type, ImageType<T> imageType )
 	{

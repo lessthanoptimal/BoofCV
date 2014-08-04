@@ -1,0 +1,1 @@
+List of applications for common tasks which use BoofCV.

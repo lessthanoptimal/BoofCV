@@ -47,9 +47,8 @@ public class CreateSquareBinaryPatternEPS {
 		int x = bit%4;
 		int y = bit/4;
 
-		String wx = x==0?"w" : "w"+(x+1);
-		String wy = y==0?"w" : "w"+(y+1);
-
+		String wx = "w"+(x+2);
+		String wy = "w"+(y+2);
 
 		out.print("  "+wx+" "+wy+" box\n");
 	}
@@ -78,6 +77,7 @@ public class CreateSquareBinaryPatternEPS {
 
 		double sideLength = width*CM_TO_POINTS;
 		double squareLength = sideLength/6;
+		double pageLength = sideLength+squareLength*2;
 
 		out.println("%!PS-Adobe-3.0 EPSF-3.0\n" +
 				"%%Creator: BoofCV\n" +
@@ -85,25 +85,27 @@ public class CreateSquareBinaryPatternEPS {
 				"%%DocumentData: Clean7Bit\n" +
 				"%%Origin: 0 0\n" +
 //				"%%BoundingBox: xmin ymin xmax ymax\n" +
-				"%%BoundingBox: 0 0 "+sideLength+" "+sideLength+"\n" +
+				"%%BoundingBox: 0 0 "+pageLength+" "+pageLength+"\n" +
 				"%%LanguageLevel: 3\n" +
 				"%%Pages: 1\n" +
 				"%%Page: 1 1\n" +
-				"  /w "+squareLength+" def\n" +
-				"  /w2 { 2 "+squareLength+" mul} def\n" +
-				"  /w3 { 3 "+squareLength+" mul} def\n" +
-				"  /w4 { 4 "+squareLength+" mul} def\n" +
-				"  /w5 { 5 "+squareLength+" mul} def\n" +
-				"  /w6 { 6 "+squareLength+" mul} def\n" +
+				"  /w { 1 "+squareLength+" mul} def\n" +
+				"  /w2 { w "+squareLength+" add} def\n" +
+				"  /w3 { w2 "+squareLength+" add} def\n" +
+				"  /w4 { w3 "+squareLength+" add} def\n" +
+				"  /w5 { w4 "+squareLength+" add} def\n" +
+				"  /w6 { w5 "+squareLength+" add} def\n" +
+				"  /w7 { w6 "+squareLength+" add} def\n" +
+				"  /w8 { w7 "+squareLength+" add} def\n" +
 				"  /pagewidth "+sideLength+" def\n" +
-				"  /box {newpath moveto w 0 rlineto 0 w rlineto -1 w mul 0 rlineto closepath fill} def\n" +
+				"  /box {newpath moveto w 0 rlineto 0 w rlineto w neg 0 rlineto closepath fill} def\n" +
 				"% bottom top left right borders..\n" +
-				"  newpath 0 0 moveto w6 0 lineto w6 w lineto 0 w lineto closepath fill\n" +
-				"  newpath 0 w5 moveto w6 w5 lineto w6 w6 lineto 0 w6 lineto closepath fill\n" +
-				"  newpath 0 w moveto w w lineto w w5 lineto 0 w5 lineto closepath fill\n" +
-				"  newpath w5 w moveto w6 w lineto w6 w5 lineto w5 w5 lineto closepath fill\n" +
+				"  newpath w w moveto w7 w lineto w7 w2 lineto w w2 lineto closepath fill\n" +
+				"  newpath w w6 moveto w7 w6 lineto w7 w7 lineto w w7 lineto closepath fill\n" +
+				"  newpath w w2 moveto w2 w2 lineto w2 w6 lineto w w6 lineto closepath fill\n" +
+				"  newpath w6 w2 moveto w7 w2 lineto w7 w6 lineto w6 w6 lineto closepath fill\n" +
 				"% Block corner used to identify orientation\n" +
-				"  w w box\n" +
+				"  w2 w2 box\n" +
 				"% information bits\n");
 
 		for (int i = 0; i < 12; i++) {
@@ -112,6 +114,9 @@ public class CreateSquareBinaryPatternEPS {
 			}
 		}
 
+		// print out encoding information for convenience
+		out.print("  /Times-Roman findfont\n" +
+				"7 scalefont setfont w "+(pageLength-10)+" moveto (# "+number+"   "+width+" cm) show\n");
 		out.print("  showpage\n" +
 				"%%EOF\n");
 
