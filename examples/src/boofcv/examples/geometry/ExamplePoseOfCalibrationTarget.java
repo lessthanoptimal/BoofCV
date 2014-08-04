@@ -81,7 +81,7 @@ public class ExamplePoseOfCalibrationTarget {
 		double sizeOfSquareInMeters = 0.03;
 		PlanarCalibrationTarget target = FactoryPlanarCalibrationTarget.gridChess(5, 4, sizeOfSquareInMeters);
 		// Computes the homography
-		Zhang99ComputeTargetHomography computeH = new Zhang99ComputeTargetHomography(target);
+		Zhang99ComputeTargetHomography computeH = new Zhang99ComputeTargetHomography(target.points);
 		// decomposes the homography
 		Zhang99DecomposeHomography decomposeH = new Zhang99DecomposeHomography();
 

@@ -23,6 +23,7 @@ import boofcv.alg.distort.DistortImageOps;
 import boofcv.alg.distort.PointToPixelTransform_F32;
 import boofcv.alg.distort.PointTransformHomography_F32;
 import boofcv.alg.feature.shapes.SplitMergeLineFitLoop;
+import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.interpolate.TypeInterpolate;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.factory.geo.FactoryMultiView;
@@ -31,21 +32,25 @@ import boofcv.struct.distort.PixelTransform_F32;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageUInt8;
+import georegression.geometry.RotationMatrixGenerator;
 import georegression.struct.point.Point2D_F64;
+import georegression.struct.point.Point3D_F64;
+import georegression.struct.se.Se3_F64;
 import georegression.struct.shapes.Quadrilateral_F64;
 import org.ejml.data.DenseMatrix64F;
+import org.ejml.ops.MatrixFeatures;
 import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Peter Abeles
  */
-public class TestDetectFiducialSquarePattern {
+public class TestBaseDetectFiducialSquare {
 	/**
 	 * Basic test where a distorted pattern is places in the image and the found coordinates
 	 * are compared against ground truth
@@ -74,7 +79,35 @@ public class TestDetectFiducialSquarePattern {
 
 	@Test
 	public void computeTargetToWorld() {
-		fail("implement");
+
+		IntrinsicParameters intrinsic = new IntrinsicParameters(400,400,0,320,240,640,380,false,null);
+		DenseMatrix64F K = PerspectiveOps.calibrationMatrix(intrinsic,null);
+
+		BaseDetectFiducialSquare alg = new Dummy();
+		alg.setIntrinsic(intrinsic);
+		alg.setTargetShape(0.5,0.05);
+
+		Se3_F64 targetToWorld = new Se3_F64();
+		targetToWorld.getT().set(0.1,-0.07,1.5);
+		RotationMatrixGenerator.eulerXYZ(0.03,0.1,0,targetToWorld.getR());
+
+
+		Quadrilateral_F64 quad = new Quadrilateral_F64();
+
+		quad.a = PerspectiveOps.renderPixel(targetToWorld,K,c(alg.pairsPose.get(0).p1));
+		quad.b = PerspectiveOps.renderPixel(targetToWorld,K,c(alg.pairsPose.get(1).p1));
+		quad.c = PerspectiveOps.renderPixel(targetToWorld,K,c(alg.pairsPose.get(2).p1));
+		quad.d = PerspectiveOps.renderPixel(targetToWorld,K,c(alg.pairsPose.get(3).p1));
+
+		Se3_F64 found = new Se3_F64();
+		alg.computeTargetToWorld(quad, found);
+
+		assertTrue(MatrixFeatures.isIdentical(targetToWorld.getR(), found.getR(), 1e-6));
+		assertEquals(0,targetToWorld.getT().distance(found.getT()),1e-6);
+	}
+
+	private static Point3D_F64 c( Point2D_F64 a ) {
+		return new Point3D_F64(a.x,a.y,0);
 	}
 
 	/**
@@ -122,19 +155,18 @@ public class TestDetectFiducialSquarePattern {
 		DistortImageOps.distortSingle(pattern, output, pixelTransform, true, TypeInterpolate.BILINEAR);
 	}
 
-	public static class Dummy extends DetectFiducialSquarePattern {
+	public static class Dummy extends BaseDetectFiducialSquare {
 
 		public List<ImageFloat32> detected = new ArrayList<ImageFloat32>();
-		public List<Quadrilateral_F64> quads = new ArrayList<Quadrilateral_F64>();
 
 		protected Dummy() {
 			super(new SplitMergeLineFitLoop(2.0,0.05,200), 100);
 		}
 
 		@Override
-		public void processSquare(ImageFloat32 square, Quadrilateral_F64 where) {
+		public boolean processSquare(ImageFloat32 square, Result result) {
 			detected.add(square.clone());
-			quads.add( where.copy() );
+			return true;
 		}
 	}
 }

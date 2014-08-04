@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -45,12 +45,12 @@ public class Zhang99ComputeTargetHomography {
 	HomographyLinear4 linear = new HomographyLinear4(true);
 	DenseMatrix64F found = new DenseMatrix64F(3,3);
 
-	// location of grid coordinates in the world frame.
+	// location of calibration points in the target frame in world units.
 	// the z-axis is assumed to be zero
 	List<Point2D_F64> worldPoints;
 
-	public Zhang99ComputeTargetHomography(PlanarCalibrationTarget config) {
-		this.worldPoints = config.points;
+	public Zhang99ComputeTargetHomography( List<Point2D_F64> worldPoints ) {
+		this.worldPoints = worldPoints;
 	}
 
 	/**
@@ -74,7 +74,7 @@ public class Zhang99ComputeTargetHomography {
 		if( !linear.process(pairs,found) )
 			return false;
 
-		// todo do non-linear refinement.  Take advantage of coordintes being fixed
+		// todo do non-linear refinement.  Take advantage of coordinates being fixed
 
 		return true;
 	}

@@ -18,9 +18,12 @@
 
 package boofcv.alg.filter.binary;
 
+import boofcv.alg.filter.binary.impl.ThresholdSauvola;
 import boofcv.alg.misc.ImageMiscOps;
+import boofcv.core.image.ConvertImage;
 import boofcv.misc.PerformerBase;
 import boofcv.misc.ProfileOperation;
+import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSInt32;
 import boofcv.struct.image.ImageUInt8;
 
@@ -37,6 +40,7 @@ public class BenchmarkThresholding {
 	static long TEST_TIME = 1000;
 
 	static ImageUInt8 input = new ImageUInt8(imgWidth, imgHeight);
+	static ImageFloat32 inputF32 = new ImageFloat32(imgWidth, imgHeight);
 	static ImageSInt32 output_S32 = new ImageSInt32(imgWidth, imgHeight);
 	static ImageUInt8 output_U8 = new ImageUInt8(imgWidth, imgHeight);
 	static ImageUInt8 work = new ImageUInt8(imgWidth, imgHeight);
@@ -50,6 +54,7 @@ public class BenchmarkThresholding {
 	public BenchmarkThresholding() {
 		Random rand = new Random(234);
 		ImageMiscOps.fillUniform(input, rand, 0, 100);
+		ConvertImage.convert(input,inputF32);
 	}
 
 	public static class Threshold extends PerformerBase {
@@ -73,6 +78,21 @@ public class BenchmarkThresholding {
 		}
 	}
 
+	public static class AdaptiveSauvola extends PerformerBase {
+		@Override
+		public void process() {
+			GThresholdImageOps.adaptiveSauvola(input, output_U8, adaptiveRadius, 0.3f, true);
+		}
+	}
+
+	public static class AdaptiveSauvola2 extends PerformerBase {
+		ThresholdSauvola alg = new ThresholdSauvola(adaptiveRadius,0.3f, true);
+		@Override
+		public void process() {
+			alg.process(inputF32,output_U8);
+		}
+	}
+
 	public static void main(String args[]) {
 
 		System.out.println("=========  Profile Image Size " + imgWidth + " x " + imgHeight + " ==========");
@@ -81,5 +101,7 @@ public class BenchmarkThresholding {
 		ProfileOperation.printOpsPerSec(new Threshold(), TEST_TIME);
 		ProfileOperation.printOpsPerSec(new AdaptiveSquare(), TEST_TIME);
 		ProfileOperation.printOpsPerSec(new AdaptiveGaussian(), TEST_TIME);
+		ProfileOperation.printOpsPerSec(new AdaptiveSauvola(), TEST_TIME);
+		ProfileOperation.printOpsPerSec(new AdaptiveSauvola2(), TEST_TIME);
 	}
 }

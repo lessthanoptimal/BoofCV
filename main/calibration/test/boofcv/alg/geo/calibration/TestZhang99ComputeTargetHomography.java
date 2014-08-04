@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -51,7 +51,7 @@ public class TestZhang99ComputeTargetHomography {
 		List<Point2D_F64> observations = GenericCalibrationGrid.observations(motion,config);
 
 		// compute the homography
-		Zhang99ComputeTargetHomography alg = new Zhang99ComputeTargetHomography(config);
+		Zhang99ComputeTargetHomography alg = new Zhang99ComputeTargetHomography(config.points);
 
 		assertTrue(alg.computeHomography(observations));
 

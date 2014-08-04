@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -86,7 +86,7 @@ public class CalibrationPlanarGridZhang99 {
 										boolean assumeZeroSkew,
 										int numRadialParam)
 	{
-		computeHomography = new Zhang99ComputeTargetHomography(target);
+		computeHomography = new Zhang99ComputeTargetHomography(target.points);
 		computeK = new Zhang99CalibrationMatrixFromHomographies(assumeZeroSkew);
 		computeRadial = new RadialDistortionEstimateLinear(target,numRadialParam);
 		this.target = target;

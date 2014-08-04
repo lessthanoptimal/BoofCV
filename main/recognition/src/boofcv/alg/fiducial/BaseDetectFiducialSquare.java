@@ -25,6 +25,8 @@ import boofcv.alg.feature.shapes.SplitMergeLineFitLoop;
 import boofcv.alg.filter.binary.Contour;
 import boofcv.alg.filter.binary.LinearContourLabelChang2004;
 import boofcv.alg.filter.binary.ThresholdImageOps;
+import boofcv.alg.geo.PerspectiveOps;
+import boofcv.alg.geo.calibration.Zhang99DecomposeHomography;
 import boofcv.alg.geo.h.HomographyLinear4;
 import boofcv.core.image.border.BorderType;
 import boofcv.core.image.border.FactoryImageBorder;
@@ -52,10 +54,14 @@ import java.util.List;
  */
 // TODO allow for different binary strategies to be used for speed reasons
 // TODO create a tracking algorithm which uses previous frame information for speed + stability
-public abstract class DetectFiducialSquarePattern {
+public abstract class BaseDetectFiducialSquare {
 
-	double squareWidth;
+	// how wide the entire target is
+	double targetWidth;
+	// how wide the black border is
 	double borderWidth;
+
+	FastQueue<FoundFidicial> found = new FastQueue<FoundFidicial>(FoundFidicial.class,true);
 
 	// minimum size of a shape's contour
 	int minimumContour = 100;
@@ -75,7 +81,7 @@ public abstract class DetectFiducialSquarePattern {
 
 	HomographyLinear4 computeHomography = new HomographyLinear4(true);
 	DenseMatrix64F H = new DenseMatrix64F(3,3);
-	List<AssociatedPair> pairs = new ArrayList<AssociatedPair>();
+	List<AssociatedPair> pairsRemovePerspective = new ArrayList<AssociatedPair>();
 	ImageDistort<ImageUInt8,ImageFloat32> removePerspective;
 	PointTransformHomography_F32 transformHomography = new PointTransformHomography_F32();
 
@@ -83,20 +89,42 @@ public abstract class DetectFiducialSquarePattern {
 
 	IntrinsicParameters intrinsic;
 
-	protected DetectFiducialSquarePattern( SplitMergeLineFitLoop fitPolygon , int squarePixels ) {
+	Result result = new Result();
+
+	// ----- Used to estimate 3D pose of calibration target
+
+	// p1 is set to the corner locations in 2D target frame. [0] is top right (upper extreme)
+	// and the points are added in clock-wise direction.  The center of the target is
+	// the center of the coordinate system
+	List<AssociatedPair> pairsPose = new ArrayList<AssociatedPair>();
+	Zhang99DecomposeHomography homographyToPose = new Zhang99DecomposeHomography();
+
+	protected BaseDetectFiducialSquare(SplitMergeLineFitLoop fitPolygon, int squarePixels) {
 
 		this.square = new ImageFloat32(squarePixels,squarePixels);
 
 		this.fitPolygon = fitPolygon;
 
 		for (int i = 0; i < 4; i++) {
-			pairs.add( new AssociatedPair());
+			pairsRemovePerspective.add(new AssociatedPair());
+			pairsPose.add( new AssociatedPair());
 		}
 
 		removePerspective = FactoryDistort.distort(FactoryInterpolation.bilinearPixelS(ImageUInt8.class),
 				FactoryImageBorder.general(ImageUInt8.class, BorderType.EXTENDED),ImageFloat32.class);
 		PixelTransform_F32 squareToInput= new PointToPixelTransform_F32(transformHomography);
 		removePerspective.setModel(squareToInput);
+	}
+
+	public void setTargetShape( double squareWidth , double borderWidth ) {
+		this.targetWidth = squareWidth;
+		this.borderWidth = borderWidth;
+
+		// add corner points in target frame
+		pairsPose.get(0).p1.set( squareWidth / 2,  squareWidth / 2);
+		pairsPose.get(1).p1.set( squareWidth / 2, -squareWidth / 2);
+		pairsPose.get(2).p1.set(-squareWidth / 2, -squareWidth / 2);
+		pairsPose.get(3).p1.set(-squareWidth / 2,  squareWidth / 2);
 	}
 
 	/**
@@ -110,6 +138,10 @@ public abstract class DetectFiducialSquarePattern {
 		temp0.reshape(intrinsic.width,intrinsic.height);
 		temp1.reshape(intrinsic.width,intrinsic.height);
 		labeled.reshape(intrinsic.width,intrinsic.height);
+
+		DenseMatrix64F K = new DenseMatrix64F(3,3);
+		PerspectiveOps.calibrationMatrix(intrinsic,K);
+		homographyToPose.setCalibrationMatrix(K);
 	}
 
 	/**
@@ -118,6 +150,7 @@ public abstract class DetectFiducialSquarePattern {
 	 */
 	public void process( ImageUInt8 gray ) {
 
+		found.reset();
 		candidates.reset();
 
 		// convert image into a binary image using adaptive thresholding
@@ -136,17 +169,23 @@ public abstract class DetectFiducialSquarePattern {
 			// compute the homography from the input image to an undistorted square image
 			Quadrilateral_F64 q = candidates.get(i);
 
-			pairs.get(0).set( 0              ,    0            , q.a.x , q.a.y);
-			pairs.get(1).set( square.width-1 ,    0            , q.b.x , q.b.y );
-			pairs.get(2).set( square.width-1 , square.height-1 , q.c.x , q.c.y );
-			pairs.get(3).set( 0              , square.height-1 , q.d.x , q.d.y );
+			pairsRemovePerspective.get(0).set( 0              ,    0            , q.a.x , q.a.y);
+			pairsRemovePerspective.get(1).set( square.width-1 ,    0            , q.b.x , q.b.y );
+			pairsRemovePerspective.get(2).set( square.width-1 , square.height-1 , q.c.x , q.c.y );
+			pairsRemovePerspective.get(3).set( 0              , square.height-1 , q.d.x , q.d.y );
 
-			computeHomography.process(pairs,H);
+			computeHomography.process(pairsRemovePerspective,H);
 			// pass the found homography onto the image transform
 			UtilHomography.convert(H,transformHomography.getModel());
 			// remove the perspective distortion and process it
 			removePerspective.apply(gray,square);
-			processSquare(square,q);
+			if( processSquare(square,result)) {
+				FoundFidicial f = found.grow();
+				f.index = result.which;
+
+				// TODO estimate mode
+
+			}
 		}
 	}
 
@@ -165,7 +204,6 @@ public abstract class DetectFiducialSquarePattern {
 
 			System.out.println("Contour size "+c.external.size());
 
-			// todo use internal contour?
 			if( c.external.size() >= minimumContour) {
 				fitPolygon.process(c.external);
 				GrowQueue_I32 splits = fitPolygon.getSplits();
@@ -182,9 +220,37 @@ public abstract class DetectFiducialSquarePattern {
 		}
 	}
 
+	/**
+	 * Given observed location of corners, compute the transform from target to world frame.
+	 * See code comments for correct ordering of corners in quad.
+	 *
+	 * @param quad (Input) Observed location of corner points in the specified order.
+	 * @param targetToWorld (output) transform from target to world frame.
+	 */
 	public void computeTargetToWorld( Quadrilateral_F64 quad , Se3_F64 targetToWorld ) {
+		pairsPose.get(0).p2.set(quad.a);
+		pairsPose.get(1).p2.set(quad.b);
+		pairsPose.get(2).p2.set(quad.c);
+		pairsPose.get(3).p2.set(quad.d);
 
+		if( !computeHomography.process(pairsPose,H) )
+			throw new RuntimeException("Compute homography failed!");
+
+		targetToWorld.set(homographyToPose.decompose(H));
 	}
 
-	public abstract void processSquare( ImageFloat32 square , Quadrilateral_F64 where );
+	/**
+	 * Processes the detected square and matches it to a known fiducial
+	 *
+	 * @param square Image of the undistorted square
+	 * @param result Which target and its orientation was found
+	 * @return true if the square matches a known target.
+	 */
+	public abstract boolean processSquare( ImageFloat32 square , Result result );
+
+
+	public static class Result {
+		int which;
+		int rotation;
+	}
 }
