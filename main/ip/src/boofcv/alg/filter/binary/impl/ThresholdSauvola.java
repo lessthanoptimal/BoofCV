@@ -85,8 +85,7 @@ public class ThresholdSauvola {
 		tmp.reshape(input.width,input.height);
 		inputPow2.reshape(input.width,input.height);
 
-
-		// mean of input image = E[X}
+		// mean of input image = E[X]
 		BlurImageOps.mean(input, inputMean, radius, tmp);
 
 		// standard deviation = sqrt( E[X^2] + E[X]^2)

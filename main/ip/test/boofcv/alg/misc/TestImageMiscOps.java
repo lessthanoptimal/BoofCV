@@ -46,7 +46,7 @@ public class TestImageMiscOps {
 
 	@Test
 	public void checkAll() {
-		int numExpected = 10*6 + 8*2;
+		int numExpected = 12*6 + 8*2;
 		Method methods[] = ImageMiscOps.class.getMethods();
 
 		// sanity check to make sure the functions are being found
@@ -76,6 +76,10 @@ public class TestImageMiscOps {
 					testFlipVertical(m);
 				} else if( m.getName().compareTo("flipHorizontal") == 0 ) {
 					testFlipHorizontal(m);
+				} else if( m.getName().compareTo("rotateCW") == 0 ) {
+					testRotateCW(m);
+				} else if( m.getName().compareTo("rotateCCW") == 0 ) {
+					testRotateCCW(m);
 				} else {
 					throw new RuntimeException("Unknown function");
 				}
@@ -428,5 +432,43 @@ public class TestImageMiscOps {
 				assertTrue(valA==valB);
 			}
 		}
+	}
+
+	public void testRotateCW( Method m ) throws InvocationTargetException, IllegalAccessException {
+		Class paramTypes[] = m.getParameterTypes();
+		ImageSingleBand a = GeneralizedImageOps.createSingleBand(paramTypes[0], 3, 2);
+		ImageSingleBand b = GeneralizedImageOps.createSingleBand(paramTypes[0], 2, 3);
+
+		for (int i = 0; i < 6; i++) {
+			GeneralizedImageOps.set(a,i%3,i/3,i);
+		}
+
+		m.invoke(null,a,b);
+
+		assertEquals(3,GeneralizedImageOps.get(b,0,0),1e-8);
+		assertEquals(0,GeneralizedImageOps.get(b,1,0),1e-8);
+		assertEquals(4,GeneralizedImageOps.get(b,0,1),1e-8);
+		assertEquals(1,GeneralizedImageOps.get(b,1,1),1e-8);
+		assertEquals(5,GeneralizedImageOps.get(b,0,2),1e-8);
+		assertEquals(2,GeneralizedImageOps.get(b,1,2),1e-8);
+	}
+
+	public void testRotateCCW( Method m ) throws InvocationTargetException, IllegalAccessException {
+		Class paramTypes[] = m.getParameterTypes();
+		ImageSingleBand a = GeneralizedImageOps.createSingleBand(paramTypes[0], 3, 2);
+		ImageSingleBand b = GeneralizedImageOps.createSingleBand(paramTypes[0], 2, 3);
+
+		for (int i = 0; i < 6; i++) {
+			GeneralizedImageOps.set(a,i%3,i/3,i);
+		}
+
+		m.invoke(null,a,b);
+
+		assertEquals(2,GeneralizedImageOps.get(b,0,0),1e-8);
+		assertEquals(5,GeneralizedImageOps.get(b,1,0),1e-8);
+		assertEquals(1,GeneralizedImageOps.get(b,0,1),1e-8);
+		assertEquals(4,GeneralizedImageOps.get(b,1,1),1e-8);
+		assertEquals(0,GeneralizedImageOps.get(b,0,2),1e-8);
+		assertEquals(3,GeneralizedImageOps.get(b,1,2),1e-8);
 	}
 }

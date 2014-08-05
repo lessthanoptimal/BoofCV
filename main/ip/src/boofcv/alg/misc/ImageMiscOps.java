@@ -262,6 +262,40 @@ public class ImageMiscOps {
 	}
 
 	/**
+	 * Rotates the image 90 degrees in the clockwise direction.
+	 */
+	public static void rotateCW( ImageInt8 input , ImageInt8 output ) {
+		if( input.width != output.height || input.height != output.width )
+			throw new IllegalArgumentException("Incompatible shapes");
+
+		int h = input.height-1;
+
+		for( int y = 0; y < input.height; y++ ) {
+			int indexIn = input.startIndex + y*input.stride;
+			for (int x = 0; x < input.width; x++) {
+				output.unsafe_set(h-y,x,input.data[indexIn++]);
+			}
+		}
+	}
+
+	/**
+	 * Rotates the image 90 degrees in the counter-clockwise direction.
+	 */
+	public static void rotateCCW( ImageInt8 input , ImageInt8 output ) {
+		if( input.width != output.height || input.height != output.width )
+			throw new IllegalArgumentException("Incompatible shapes");
+
+		int w = input.width-1;
+
+		for( int y = 0; y < input.height; y++ ) {
+			int indexIn = input.startIndex + y*input.stride;
+			for (int x = 0; x < input.width; x++) {
+				output.unsafe_set(y,w-x,input.data[indexIn++]);
+			}
+		}
+	}
+
+	/**
 	 * Copies a rectangular region from one image into another.<br>
 	 * output[dstX:(dstX+width) , dstY:(dstY+height-1)] = input[srcX:(srcX+width) , srcY:(srcY+height-1)]
 	 *
@@ -487,6 +521,40 @@ public class ImageMiscOps {
 				int tmp = input.data[index1];
 				input.data[index1++] = input.data[index2];
 				input.data[index2--] = (short)tmp;
+			}
+		}
+	}
+
+	/**
+	 * Rotates the image 90 degrees in the clockwise direction.
+	 */
+	public static void rotateCW( ImageInt16 input , ImageInt16 output ) {
+		if( input.width != output.height || input.height != output.width )
+			throw new IllegalArgumentException("Incompatible shapes");
+
+		int h = input.height-1;
+
+		for( int y = 0; y < input.height; y++ ) {
+			int indexIn = input.startIndex + y*input.stride;
+			for (int x = 0; x < input.width; x++) {
+				output.unsafe_set(h-y,x,input.data[indexIn++]);
+			}
+		}
+	}
+
+	/**
+	 * Rotates the image 90 degrees in the counter-clockwise direction.
+	 */
+	public static void rotateCCW( ImageInt16 input , ImageInt16 output ) {
+		if( input.width != output.height || input.height != output.width )
+			throw new IllegalArgumentException("Incompatible shapes");
+
+		int w = input.width-1;
+
+		for( int y = 0; y < input.height; y++ ) {
+			int indexIn = input.startIndex + y*input.stride;
+			for (int x = 0; x < input.width; x++) {
+				output.unsafe_set(y,w-x,input.data[indexIn++]);
 			}
 		}
 	}
@@ -722,6 +790,40 @@ public class ImageMiscOps {
 	}
 
 	/**
+	 * Rotates the image 90 degrees in the clockwise direction.
+	 */
+	public static void rotateCW( ImageSInt32 input , ImageSInt32 output ) {
+		if( input.width != output.height || input.height != output.width )
+			throw new IllegalArgumentException("Incompatible shapes");
+
+		int h = input.height-1;
+
+		for( int y = 0; y < input.height; y++ ) {
+			int indexIn = input.startIndex + y*input.stride;
+			for (int x = 0; x < input.width; x++) {
+				output.unsafe_set(h-y,x,input.data[indexIn++]);
+			}
+		}
+	}
+
+	/**
+	 * Rotates the image 90 degrees in the counter-clockwise direction.
+	 */
+	public static void rotateCCW( ImageSInt32 input , ImageSInt32 output ) {
+		if( input.width != output.height || input.height != output.width )
+			throw new IllegalArgumentException("Incompatible shapes");
+
+		int w = input.width-1;
+
+		for( int y = 0; y < input.height; y++ ) {
+			int indexIn = input.startIndex + y*input.stride;
+			for (int x = 0; x < input.width; x++) {
+				output.unsafe_set(y,w-x,input.data[indexIn++]);
+			}
+		}
+	}
+
+	/**
 	 * Copies a rectangular region from one image into another.<br>
 	 * output[dstX:(dstX+width) , dstY:(dstY+height-1)] = input[srcX:(srcX+width) , srcY:(srcY+height-1)]
 	 *
@@ -947,6 +1049,40 @@ public class ImageMiscOps {
 				long tmp = input.data[index1];
 				input.data[index1++] = input.data[index2];
 				input.data[index2--] = (long)tmp;
+			}
+		}
+	}
+
+	/**
+	 * Rotates the image 90 degrees in the clockwise direction.
+	 */
+	public static void rotateCW( ImageSInt64 input , ImageSInt64 output ) {
+		if( input.width != output.height || input.height != output.width )
+			throw new IllegalArgumentException("Incompatible shapes");
+
+		int h = input.height-1;
+
+		for( int y = 0; y < input.height; y++ ) {
+			int indexIn = input.startIndex + y*input.stride;
+			for (int x = 0; x < input.width; x++) {
+				output.unsafe_set(h-y,x,input.data[indexIn++]);
+			}
+		}
+	}
+
+	/**
+	 * Rotates the image 90 degrees in the counter-clockwise direction.
+	 */
+	public static void rotateCCW( ImageSInt64 input , ImageSInt64 output ) {
+		if( input.width != output.height || input.height != output.width )
+			throw new IllegalArgumentException("Incompatible shapes");
+
+		int w = input.width-1;
+
+		for( int y = 0; y < input.height; y++ ) {
+			int indexIn = input.startIndex + y*input.stride;
+			for (int x = 0; x < input.width; x++) {
+				output.unsafe_set(y,w-x,input.data[indexIn++]);
 			}
 		}
 	}
@@ -1182,6 +1318,40 @@ public class ImageMiscOps {
 	}
 
 	/**
+	 * Rotates the image 90 degrees in the clockwise direction.
+	 */
+	public static void rotateCW( ImageFloat32 input , ImageFloat32 output ) {
+		if( input.width != output.height || input.height != output.width )
+			throw new IllegalArgumentException("Incompatible shapes");
+
+		int h = input.height-1;
+
+		for( int y = 0; y < input.height; y++ ) {
+			int indexIn = input.startIndex + y*input.stride;
+			for (int x = 0; x < input.width; x++) {
+				output.unsafe_set(h-y,x,input.data[indexIn++]);
+			}
+		}
+	}
+
+	/**
+	 * Rotates the image 90 degrees in the counter-clockwise direction.
+	 */
+	public static void rotateCCW( ImageFloat32 input , ImageFloat32 output ) {
+		if( input.width != output.height || input.height != output.width )
+			throw new IllegalArgumentException("Incompatible shapes");
+
+		int w = input.width-1;
+
+		for( int y = 0; y < input.height; y++ ) {
+			int indexIn = input.startIndex + y*input.stride;
+			for (int x = 0; x < input.width; x++) {
+				output.unsafe_set(y,w-x,input.data[indexIn++]);
+			}
+		}
+	}
+
+	/**
 	 * Copies a rectangular region from one image into another.<br>
 	 * output[dstX:(dstX+width) , dstY:(dstY+height-1)] = input[srcX:(srcX+width) , srcY:(srcY+height-1)]
 	 *
@@ -1407,6 +1577,40 @@ public class ImageMiscOps {
 				double tmp = input.data[index1];
 				input.data[index1++] = input.data[index2];
 				input.data[index2--] = (double)tmp;
+			}
+		}
+	}
+
+	/**
+	 * Rotates the image 90 degrees in the clockwise direction.
+	 */
+	public static void rotateCW( ImageFloat64 input , ImageFloat64 output ) {
+		if( input.width != output.height || input.height != output.width )
+			throw new IllegalArgumentException("Incompatible shapes");
+
+		int h = input.height-1;
+
+		for( int y = 0; y < input.height; y++ ) {
+			int indexIn = input.startIndex + y*input.stride;
+			for (int x = 0; x < input.width; x++) {
+				output.unsafe_set(h-y,x,input.data[indexIn++]);
+			}
+		}
+	}
+
+	/**
+	 * Rotates the image 90 degrees in the counter-clockwise direction.
+	 */
+	public static void rotateCCW( ImageFloat64 input , ImageFloat64 output ) {
+		if( input.width != output.height || input.height != output.width )
+			throw new IllegalArgumentException("Incompatible shapes");
+
+		int w = input.width-1;
+
+		for( int y = 0; y < input.height; y++ ) {
+			int indexIn = input.startIndex + y*input.stride;
+			for (int x = 0; x < input.width; x++) {
+				output.unsafe_set(y,w-x,input.data[indexIn++]);
 			}
 		}
 	}

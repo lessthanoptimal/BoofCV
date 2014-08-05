@@ -40,6 +40,7 @@ import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSInt32;
 import boofcv.struct.image.ImageUInt8;
 import georegression.struct.homography.UtilHomography;
+import georegression.struct.point.Point2D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.struct.shapes.Quadrilateral_F64;
 import org.ddogleg.struct.FastQueue;
@@ -58,8 +59,6 @@ public abstract class BaseDetectFiducialSquare {
 
 	// how wide the entire target is
 	double targetWidth;
-	// how wide the black border is
-	double borderWidth;
 
 	FastQueue<FoundFidicial> found = new FastQueue<FoundFidicial>(FoundFidicial.class,true);
 
@@ -116,9 +115,8 @@ public abstract class BaseDetectFiducialSquare {
 		removePerspective.setModel(squareToInput);
 	}
 
-	public void setTargetShape( double squareWidth , double borderWidth ) {
+	public void setTargetShape( double squareWidth ) {
 		this.targetWidth = squareWidth;
-		this.borderWidth = borderWidth;
 
 		// add corner points in target frame
 		pairsPose.get(0).p1.set( squareWidth / 2,  squareWidth / 2);
@@ -154,7 +152,7 @@ public abstract class BaseDetectFiducialSquare {
 		candidates.reset();
 
 		// convert image into a binary image using adaptive thresholding
-		ThresholdImageOps.threshold(gray,binary,200,true);
+		ThresholdImageOps.threshold(gray,binary,50,true);
 //		ThresholdImageOps.adaptiveSquare(gray,binary,3,-5,true,temp0,temp1);
 
 //		binary.printNotZero();
@@ -183,10 +181,27 @@ public abstract class BaseDetectFiducialSquare {
 				FoundFidicial f = found.grow();
 				f.index = result.which;
 
-				// TODO estimate mode
+				// account for the rotation
+				for (int j = 0; j < result.rotation; j++) {
+					rotateClockWise(q);
+				}
 
+				// estimate position
+				computeTargetToWorld(q,f.targetToWorld);
 			}
 		}
+	}
+
+	private void rotateClockWise( Quadrilateral_F64 quad ) {
+		Point2D_F64 a = quad.a;
+		Point2D_F64 b = quad.b;
+		Point2D_F64 c = quad.c;
+		Point2D_F64 d = quad.d;
+
+		quad.a = d;
+		quad.b = a;
+		quad.c = b;
+		quad.d = c;
 	}
 
 	private void findCandidateShapes() {
@@ -240,14 +255,14 @@ public abstract class BaseDetectFiducialSquare {
 	}
 
 	/**
-	 * Processes the detected square and matches it to a known fiducial
+	 * Processes the detected square and matches it to a known fiducial.  Black border
+	 * is included.
 	 *
 	 * @param square Image of the undistorted square
 	 * @param result Which target and its orientation was found
 	 * @return true if the square matches a known target.
 	 */
-	public abstract boolean processSquare( ImageFloat32 square , Result result );
-
+	protected abstract boolean processSquare( ImageFloat32 square , Result result );
 
 	public static class Result {
 		int which;

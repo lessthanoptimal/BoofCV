@@ -28,6 +28,7 @@ Version : Alpha 0.18
 - Fixed problem in FilterImageReflection where it assumed two arguments but some binary operations have 3 now
 - Added pow2 and sqrt to PixelMath
 - Added invert to BinaryImageOps
+- Added rotateCW and rotateCCW to ImageMiscOps
 
 TODO
 - BlurImageOps.mean() and gaussian() UInt8 images.

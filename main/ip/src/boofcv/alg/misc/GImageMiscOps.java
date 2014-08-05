@@ -367,6 +367,8 @@ public class GImageMiscOps {
 				ImageMiscOps.flipVertical((ImageFloat32)img);
 			} else if (ImageFloat64.class.isAssignableFrom(img.getClass()) ) {
 				ImageMiscOps.flipVertical((ImageFloat64)img);
+			} else if (ImageSInt64.class.isAssignableFrom(img.getClass()) ) {
+				ImageMiscOps.flipVertical((ImageSInt64) img);
 			} else {
 				throw new IllegalArgumentException("Unknown or incompatible image type: " + img.getClass().getSimpleName());
 			}
@@ -396,6 +398,8 @@ public class GImageMiscOps {
 				ImageMiscOps.flipHorizontal((ImageFloat32) img);
 			} else if (ImageFloat64.class.isAssignableFrom(img.getClass()) ) {
 				ImageMiscOps.flipHorizontal((ImageFloat64) img);
+			} else if (ImageSInt64.class.isAssignableFrom(img.getClass()) ) {
+				ImageMiscOps.flipHorizontal((ImageSInt64) img);
 			} else {
 				throw new IllegalArgumentException("Unknown or incompatible image type: " + img.getClass().getSimpleName());
 			}
@@ -405,6 +409,70 @@ public class GImageMiscOps {
 				flipHorizontal(m.getBand(i));
 		} else {
 			throw new IllegalArgumentException("Unknown image type: " + img.getClass().getSimpleName());
+		}
+	}
+
+	/**
+	 * Rotates the image 90 degrees in the clockwise direction.
+	 */
+	public static void rotateCW( ImageBase imageA , ImageBase imageB ) {
+		if( imageA instanceof ImageSingleBand ) {
+			if( ImageInt8.class.isAssignableFrom(imageA.getClass()) ) {
+				ImageMiscOps.rotateCW((ImageInt8) imageA, (ImageInt8) imageB);
+			} else if( ImageInt16.class.isAssignableFrom(imageA.getClass()) ) {
+				ImageMiscOps.rotateCW((ImageInt16) imageA, (ImageInt16) imageB);
+			} else if ( ImageSInt32.class.isAssignableFrom(imageA.getClass()) ) {
+				ImageMiscOps.rotateCW((ImageSInt32) imageA, (ImageSInt32) imageB);
+			} else if ( ImageSInt64.class.isAssignableFrom(imageA.getClass()) ) {
+				ImageMiscOps.rotateCW((ImageSInt64) imageA, (ImageSInt64) imageB);
+			} else if (ImageFloat32.class.isAssignableFrom(imageA.getClass()) ) {
+				ImageMiscOps.rotateCW((ImageFloat32) imageA, (ImageFloat32) imageB);
+			} else if (ImageFloat64.class.isAssignableFrom(imageA.getClass()) ) {
+				ImageMiscOps.rotateCW((ImageFloat64) imageA, (ImageFloat64) imageB);
+			} else if (ImageSInt64.class.isAssignableFrom(imageA.getClass()) ) {
+				ImageMiscOps.rotateCW((ImageSInt64) imageA,(ImageSInt64) imageB);
+			} else {
+				throw new IllegalArgumentException("Unknown or incompatible image type: " + imageA.getClass().getSimpleName());
+			}
+		} else if( imageA instanceof MultiSpectral ) {
+			MultiSpectral a = (MultiSpectral)imageA;
+			MultiSpectral b = (MultiSpectral)imageB;
+			for( int i = 0; i < a.getNumBands(); i++ )
+				rotateCW(a.getBand(i), b.getBand(i));
+		} else {
+			throw new IllegalArgumentException("Unknown image type: " + imageA.getClass().getSimpleName());
+		}
+	}
+
+	/**
+	 * Rotates the image 90 degrees in the counter-clockwise direction.
+	 */
+	public static void rotateCCW( ImageBase imageA , ImageBase imageB ) {
+		if( imageA instanceof ImageSingleBand ) {
+			if( ImageInt8.class.isAssignableFrom(imageA.getClass()) ) {
+				ImageMiscOps.rotateCCW((ImageInt8) imageA, (ImageInt8) imageB);
+			} else if( ImageInt16.class.isAssignableFrom(imageA.getClass()) ) {
+				ImageMiscOps.rotateCCW((ImageInt16) imageA, (ImageInt16) imageB);
+			} else if ( ImageSInt32.class.isAssignableFrom(imageA.getClass()) ) {
+				ImageMiscOps.rotateCCW((ImageSInt32) imageA, (ImageSInt32) imageB);
+			} else if ( ImageSInt64.class.isAssignableFrom(imageA.getClass()) ) {
+				ImageMiscOps.rotateCCW((ImageSInt64) imageA, (ImageSInt64) imageB);
+			} else if (ImageFloat32.class.isAssignableFrom(imageA.getClass()) ) {
+				ImageMiscOps.rotateCCW((ImageFloat32) imageA, (ImageFloat32) imageB);
+			} else if (ImageFloat64.class.isAssignableFrom(imageA.getClass()) ) {
+				ImageMiscOps.rotateCCW((ImageFloat64) imageA, (ImageFloat64) imageB);
+			} else if (ImageSInt64.class.isAssignableFrom(imageA.getClass()) ) {
+				ImageMiscOps.rotateCCW((ImageSInt64) imageA,(ImageSInt64) imageB);
+			} else {
+				throw new IllegalArgumentException("Unknown or incompatible image type: " + imageA.getClass().getSimpleName());
+			}
+		} else if( imageA instanceof MultiSpectral ) {
+			MultiSpectral a = (MultiSpectral)imageA;
+			MultiSpectral b = (MultiSpectral)imageB;
+			for( int i = 0; i < a.getNumBands(); i++ )
+				rotateCCW(a.getBand(i), b.getBand(i));
+		} else {
+			throw new IllegalArgumentException("Unknown image type: " + imageA.getClass().getSimpleName());
 		}
 	}
 }

@@ -19,7 +19,7 @@
 package boofcv.alg.fiducial;
 
 import boofcv.alg.feature.shapes.SplitMergeLineFitLoop;
-import boofcv.alg.filter.binary.ThresholdImageOps;
+import boofcv.alg.filter.binary.impl.ThresholdSauvola;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageUInt8;
 
@@ -32,43 +32,120 @@ import boofcv.struct.image.ImageUInt8;
  */
 public class DetectFiducialSquareBinary extends BaseDetectFiducialSquare {
 
+	ThresholdSauvola sauvola;
 	ImageUInt8 binary = new ImageUInt8(1,1);
-	ImageFloat32 temp0 = new ImageFloat32(1,1);
-	ImageFloat32 temp1 = new ImageFloat32(1,1);
-
-	int radius;
 
 	int counts[] = new int[16];
 	int squareSize[] = new int[16];
 	int classified[] = new int[16];
 
+	int tmp[] = new int[16];
+
+	ImageFloat32 grayNoBorder = new ImageFloat32();
+
 	protected DetectFiducialSquareBinary(SplitMergeLineFitLoop fitPolygon, int squarePixels) {
 		super(fitPolygon, squarePixels);
-		binary.reshape(squarePixels,squarePixels);
-		temp0.reshape(squarePixels,squarePixels);
-		temp1.reshape(squarePixels,squarePixels);
+
+		int widthNoBorder = (int)(squarePixels*(4.0/6.0)+0.5);
+
+		binary.reshape(widthNoBorder,widthNoBorder);
+		temp0.reshape(widthNoBorder,widthNoBorder);
+		temp1.reshape(widthNoBorder,widthNoBorder);
 
 		// make the radius large enough so that it will include an entire square
-		radius = (squarePixels/12 + squarePixels/24 );
+		int radius = (squarePixels/12 + squarePixels/24 );
+		sauvola = new ThresholdSauvola(radius,0.3f,true);
 	}
 
 	@Override
-	public boolean processSquare(ImageFloat32 gray, Result result) {
+	protected boolean processSquare(ImageFloat32 gray, Result result) {
+
+		int off = (gray.width-binary.width)/2;
+		gray.subimage(off,off,gray.width-off,gray.width-off,grayNoBorder);
+
+//		grayNoBorder.printInt();
+
 		// convert input image into binary number
-		findBitCounts(gray);
+		findBitCounts(grayNoBorder);
 
 		if (thresholdBinaryNumber())
 			return false;
 
-		// search for the black corner for orientation information
+		// adjust the orientation until the black corner is in the lower left
+		if (rotateUntilInLowerCorner(result))
+			return false;
 
-		// adjust binary number for rotating it
+		// extract the numerical value it encodes
+		int val = 0;
 
-		// return the results
+		val |= classified[13] << 0;
+		val |= classified[14] << 1;
+		val |= classified[8] << 2;
+		val |= classified[9] << 3;
+		val |= classified[10] << 4;
+		val |= classified[11] << 5;
+		val |= classified[4] << 6;
+		val |= classified[5] << 7;
+		val |= classified[6] << 8;
+		val |= classified[7] << 9;
+		val |= classified[1] << 10;
+		val |= classified[2] << 11;
+
+		result.which = val;
 
 		return true;
 	}
 
+	/**
+	 * Rotate the pattern until the black corner is in the lower right.  Sanity check to make
+	 * sure there is only one black corner
+	 */
+	private boolean rotateUntilInLowerCorner(Result result) {
+		// sanity check corners.  There should only be one exactly one black
+		if( classified[0] + classified[3] + classified[15] + classified[12] != 1 )
+			return true;
+
+		// Rotate until the black corner is in the lower left hand corner on the image.
+		// remember that origin is the top left corner
+		result.rotation = 0;
+		while( classified[12] != 1 ) {
+			result.rotation++;
+			rotateClockWise();
+		}
+		return false;
+	}
+
+	/**
+	 * Rotate the 4x4 binary clockwise
+	 */
+	protected void rotateClockWise() {
+		tmp[0] = classified[12];
+		tmp[1] = classified[8];
+		tmp[2] = classified[4];
+		tmp[3] = classified[0];
+
+		tmp[4] = classified[13];
+		tmp[5] = classified[9];
+		tmp[6] = classified[5];
+		tmp[7] = classified[1];
+
+		tmp[8] = classified[14];
+		tmp[9] = classified[10];
+		tmp[10] = classified[6];
+		tmp[11] = classified[2];
+
+		tmp[12] = classified[15];
+		tmp[13] = classified[11];
+		tmp[14] = classified[7];
+		tmp[15] = classified[3];
+
+		System.arraycopy(tmp,0,classified,0,16);
+	}
+
+	/**
+	 * Sees how many pixels were positive and negative in each square region.  Then decides if they
+	 * should be 0 or 1 or unknown
+	 */
 	private boolean thresholdBinaryNumber() {
 		for (int i = 0; i < 16; i++) {
 			int lower = (int)(squareSize[i]*0.15);
@@ -88,15 +165,14 @@ public class DetectFiducialSquareBinary extends BaseDetectFiducialSquare {
 
 	private void findBitCounts(ImageFloat32 gray) {
 		// compute binary image using an adaptive algorithm to handle shadows
-		// TODO use fancy one
-		ThresholdImageOps.adaptiveSquare(gray, binary, 3, -5, true, temp0, temp1);
+		sauvola.process(gray,binary);
 
 		for (int row = 0; row < 4; row++) {
-			int y0 = (row+1)*binary.width/6;
-			int y1 = (row+2)*binary.width/6;
+			int y0 = row*binary.width/4;
+			int y1 = (row+1)*binary.width/4;
 			for (int col = 0; col < 4; col++) {
-				int x0 = (col+1)*binary.width/6;
-				int x1 = (col+2)*binary.width/6;
+				int x0 = col*binary.width/4;
+				int x1 = (col+1)*binary.width/4;
 
 				int total = 0;
 				for (int i = y0; i < y1; i++) {

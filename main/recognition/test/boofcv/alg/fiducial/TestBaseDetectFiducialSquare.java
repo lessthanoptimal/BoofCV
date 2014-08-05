@@ -85,7 +85,7 @@ public class TestBaseDetectFiducialSquare {
 
 		BaseDetectFiducialSquare alg = new Dummy();
 		alg.setIntrinsic(intrinsic);
-		alg.setTargetShape(0.5,0.05);
+		alg.setTargetShape(0.5);
 
 		Se3_F64 targetToWorld = new Se3_F64();
 		targetToWorld.getT().set(0.1,-0.07,1.5);

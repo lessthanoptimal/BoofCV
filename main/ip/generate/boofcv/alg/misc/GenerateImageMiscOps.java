@@ -79,6 +79,8 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 			printFillGaussian();
 			printFlipVertical();
 			printFlipHorizontal();
+			printRotateCW();
+			printRotateCCW();
 		}
 	}
 
@@ -450,6 +452,44 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 				"\t\t\t\t"+sumType+" tmp = input.data[index1];\n" +
 				"\t\t\t\tinput.data[index1++] = input.data[index2];\n" +
 				"\t\t\t\tinput.data[index2--] = ("+dataType+")tmp;\n" +
+				"\t\t\t}\n" +
+				"\t\t}\n" +
+				"\t}\n\n");
+	}
+
+	public void printRotateCW() {
+		out.print("\t/**\n" +
+				"\t * Rotates the image 90 degrees in the clockwise direction.\n" +
+				"\t */\n" +
+				"\tpublic static void rotateCW( "+imageName+" input , "+imageName+" output ) {\n" +
+				"\t\tif( input.width != output.height || input.height != output.width )\n" +
+				"\t\t\tthrow new IllegalArgumentException(\"Incompatible shapes\");\n" +
+				"\n" +
+				"\t\tint h = input.height-1;\n" +
+				"\n" +
+				"\t\tfor( int y = 0; y < input.height; y++ ) {\n" +
+				"\t\t\tint indexIn = input.startIndex + y*input.stride;\n" +
+				"\t\t\tfor (int x = 0; x < input.width; x++) {\n" +
+				"\t\t\t\toutput.unsafe_set(h-y,x,input.data[indexIn++]);\n" +
+				"\t\t\t}\n" +
+				"\t\t}\n" +
+				"\t}\n\n");
+	}
+
+	public void printRotateCCW() {
+		out.print("\t/**\n" +
+				"\t * Rotates the image 90 degrees in the counter-clockwise direction.\n" +
+				"\t */\n" +
+				"\tpublic static void rotateCCW( "+imageName+" input , "+imageName+" output ) {\n" +
+				"\t\tif( input.width != output.height || input.height != output.width )\n" +
+				"\t\t\tthrow new IllegalArgumentException(\"Incompatible shapes\");\n" +
+				"\n" +
+				"\t\tint w = input.width-1;\n" +
+				"\n" +
+				"\t\tfor( int y = 0; y < input.height; y++ ) {\n" +
+				"\t\t\tint indexIn = input.startIndex + y*input.stride;\n" +
+				"\t\t\tfor (int x = 0; x < input.width; x++) {\n" +
+				"\t\t\t\toutput.unsafe_set(y,w-x,input.data[indexIn++]);\n" +
 				"\t\t\t}\n" +
 				"\t\t}\n" +
 				"\t}\n\n");
