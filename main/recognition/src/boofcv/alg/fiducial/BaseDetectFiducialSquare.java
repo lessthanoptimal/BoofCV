@@ -51,6 +51,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ *
+ * Target orientation. Corner 0 = (r,r), 1 = (r,-r) , 2 = (-r,-r) , 3 = (-r,r).
+ *
  * @author Peter Abeles
  */
 // TODO allow for different binary strategies to be used for speed reasons

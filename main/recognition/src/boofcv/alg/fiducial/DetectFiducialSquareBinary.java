@@ -28,33 +28,41 @@ import boofcv.struct.image.ImageUInt8;
  * either white or black.  One corner is always back and the others are always white.  This
  * allows orientation to be uniquely determined.
  *
+ * Canonical orientation is with the black square in the lower-left hand corner.
+ *
  * @author Peter Abeles
  */
 public class DetectFiducialSquareBinary extends BaseDetectFiducialSquare {
 
+	// converts the input image into a binary one
 	ThresholdSauvola sauvola;
 	ImageUInt8 binary = new ImageUInt8(1,1);
 
+	// helper data structures for computing the value of each grid point
 	int counts[] = new int[16];
-	int squareSize[] = new int[16];
 	int classified[] = new int[16];
 
 	int tmp[] = new int[16];
 
+	// storage for no border sub-image
 	ImageFloat32 grayNoBorder = new ImageFloat32();
 
-	protected DetectFiducialSquareBinary(SplitMergeLineFitLoop fitPolygon, int squarePixels) {
-		super(fitPolygon, squarePixels);
+	// size of a square and the adaptive region for binarization
+	protected final static int r=5;
+	protected final static int w=r*2+1;
+	protected final static int N=w*w;
 
-		int widthNoBorder = (int)(squarePixels*(4.0/6.0)+0.5);
+	protected DetectFiducialSquareBinary(SplitMergeLineFitLoop fitPolygon) {
+		super(fitPolygon, w*6);
+
+		int widthNoBorder = w*4;
 
 		binary.reshape(widthNoBorder,widthNoBorder);
 		temp0.reshape(widthNoBorder,widthNoBorder);
 		temp1.reshape(widthNoBorder,widthNoBorder);
 
 		// make the radius large enough so that it will include an entire square
-		int radius = (squarePixels/12 + squarePixels/24 );
-		sauvola = new ThresholdSauvola(radius,0.3f,true);
+		sauvola = new ThresholdSauvola(r,0.3f,true);
 	}
 
 	@Override
@@ -147,9 +155,12 @@ public class DetectFiducialSquareBinary extends BaseDetectFiducialSquare {
 	 * should be 0 or 1 or unknown
 	 */
 	private boolean thresholdBinaryNumber() {
+
+		int lower = (int)(N*0.15);
+		int upper = (int)(N*0.85);
+
 		for (int i = 0; i < 16; i++) {
-			int lower = (int)(squareSize[i]*0.15);
-			int upper = (int)(squareSize[i]*0.85);
+
 
 			if( counts[i] < lower ) {
 				classified[i] = 0;
@@ -182,7 +193,6 @@ public class DetectFiducialSquareBinary extends BaseDetectFiducialSquare {
 					}
 				}
 
-				squareSize[row*4 + col] = (x1-x0)*(y1-y0);
 				counts[row*4 + col] = total;
 			}
 		}

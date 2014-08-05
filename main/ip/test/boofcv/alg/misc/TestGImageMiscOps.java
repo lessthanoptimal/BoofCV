@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -41,7 +41,7 @@ public class TestGImageMiscOps extends BaseGClassChecksInMisc{
 
 	@Test
 	public void compareToPixelMath() {
-		performTests(10);
+		performTests(12);
 	}
 
 	@Override
@@ -120,8 +120,14 @@ public class TestGImageMiscOps extends BaseGClassChecksInMisc{
 			ret[0][0] = inputA;
 		} else if( name.equals("flipHorizontal")) {
 			ret[0][0] = inputA;
+		} else if( name.equals("rotateCW")) {
+			ret[0][0] = inputA;
+			ret[0][1] = inputA._createNew(height,width);
+		} else if( name.equals("rotateCCW")) {
+			ret[0][0] = inputA;
+			ret[0][1] = inputA._createNew(height,width);
 		} else {
-			throw new RuntimeException("Unknown function");
+			throw new RuntimeException("Unknown function: "+name);
 		}
 
 		fillRandom(inputA);
@@ -135,7 +141,8 @@ public class TestGImageMiscOps extends BaseGClassChecksInMisc{
 
 		for( int i = 0; i < ret.length; i++ ) {
 			if( targetParam[i] instanceof ImageBase) {
-				ret[i] = ((ImageBase)targetParam[i])._createNew(width,height);
+				ImageBase img = (ImageBase)targetParam[i];
+				ret[i] = ((ImageBase)targetParam[i])._createNew(img.width,img.height);
 				((ImageBase)ret[i]).setTo((ImageBase)targetParam[i]);
 			} else if( targetParam[i] instanceof Random ) {
 				ret[i] = new Random(randomSeed);
