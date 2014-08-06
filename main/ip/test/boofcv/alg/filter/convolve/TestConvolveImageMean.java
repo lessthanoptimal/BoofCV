@@ -97,7 +97,8 @@ public class TestConvolveImageMean extends CompareEquivalentFunctions {
 	@Override
 	protected Object[] reformatForValidation(Method m, Object[] targetParam) {
 		Class<?> params[] = m.getParameterTypes();
-		Object kernel = createTableKernel(params[0],kernelRadius,rand);
+		int radius = (Integer)targetParam[2];
+		Object kernel = createTableKernel(params[0],radius,rand);
 
 		ImageSingleBand output = (ImageSingleBand)((ImageSingleBand)targetParam[1]).clone();
 
