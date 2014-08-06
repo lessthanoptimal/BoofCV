@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -52,9 +52,9 @@ public class FactoryDescribePointAlgs {
 	}
 
 	public static <T extends ImageSingleBand>
-	DescribePointSurfMod<T> surfStability(ConfigSurfDescribe.Stablility config, Class<T> imageType) {
+	DescribePointSurfMod<T> surfStability(ConfigSurfDescribe.Stability config, Class<T> imageType) {
 		if( config == null )
-			config = new ConfigSurfDescribe.Stablility();
+			config = new ConfigSurfDescribe.Stability();
 		config.checkValidity();
 
 		return new DescribePointSurfMod<T>(config.widthLargeGrid,config.widthSubRegion,config.widthSample,

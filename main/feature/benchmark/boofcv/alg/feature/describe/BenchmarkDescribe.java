@@ -159,7 +159,7 @@ public class BenchmarkDescribe<I extends ImageSingleBand, D extends ImageSingleB
 		System.out.println();
 
 		ConfigSurfDescribe.Speed surfSpeed = new ConfigSurfDescribe.Speed();
-		ConfigSurfDescribe.Stablility surfStable = new ConfigSurfDescribe.Stablility();
+		ConfigSurfDescribe.Stability surfStable = new ConfigSurfDescribe.Stability();
 
 		ProfileOperation.printOpsPerSec(new Describe("SURF-F",
 				FactoryDescribeRegionPoint.<I,II>surfFast(surfSpeed, imageType)),TEST_TIME);

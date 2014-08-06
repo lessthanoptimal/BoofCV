@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -63,7 +63,7 @@ public abstract class ConfigSurfDescribe implements Configuration {
 	 *
 	 * @see boofcv.alg.feature.describe.DescribePointSurfMod
 	 */
-	public static class Stablility extends ConfigSurfDescribe {
+	public static class Stability extends ConfigSurfDescribe {
 		/**
 		 * Number of sample points sub-regions overlap, Typically 2.
 		 */

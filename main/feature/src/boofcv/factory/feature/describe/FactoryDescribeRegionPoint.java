@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -108,7 +108,7 @@ public class FactoryDescribeRegionPoint {
 	 * @return SURF description extractor
 	 */
 	public static <T extends ImageSingleBand, II extends ImageSingleBand>
-	DescribeRegionPoint<T,SurfFeature> surfStable(ConfigSurfDescribe.Stablility config, Class<T> imageType) {
+	DescribeRegionPoint<T,SurfFeature> surfStable(ConfigSurfDescribe.Stability config, Class<T> imageType) {
 
 		Class<II> integralType = GIntegralImageOps.getIntegralType(imageType);
 
@@ -127,7 +127,7 @@ public class FactoryDescribeRegionPoint {
 	 * @return SURF color description extractor
 	 */
 	public static <T extends ImageBase, II extends ImageSingleBand>
-	DescribeRegionPoint<T,SurfFeature> surfColorStable(ConfigSurfDescribe.Stablility config, ImageType<T> imageType) {
+	DescribeRegionPoint<T,SurfFeature> surfColorStable(ConfigSurfDescribe.Stability config, ImageType<T> imageType) {
 
 		Class bandType = imageType.getImageClass();
 		Class<II> integralType = GIntegralImageOps.getIntegralType(bandType);

@@ -36,9 +36,8 @@ TODO
   * The current technique is prone towards numerical round off error since it forces it back to 8bit
     after the first sweep
   * unit test: compare to brute force and see if it produces an identical solution
-TODO
-- Consider adding "Document image binarization using background estimation
-                  and stroke edges"
+- Add an escape value to scoreassociate.  if the value computed so far isn't better than X, stop.
+  Suggested by David G Ortega
 ---------------------------------------------
 Date    : 2014/6/19
 Version : Alpha 0.17

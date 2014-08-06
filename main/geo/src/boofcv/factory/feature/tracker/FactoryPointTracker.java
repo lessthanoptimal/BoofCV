@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -192,7 +192,7 @@ public class FactoryPointTracker {
 	public static <I extends ImageSingleBand>
 	PointTracker<I> dda_FH_SURF_Stable(
 											ConfigFastHessian configDetector ,
-											ConfigSurfDescribe.Stablility configDescribe ,
+											ConfigSurfDescribe.Stability configDescribe ,
 											ConfigSlidingIntegral configOrientation ,
 											Class<I> imageType)
 	{
@@ -384,7 +384,7 @@ public class FactoryPointTracker {
 	PointTracker<I> combined_FH_SURF_KLT( PkltConfig kltConfig ,
 										  int reactivateThreshold ,
 										  ConfigFastHessian configDetector ,
-										  ConfigSurfDescribe.Stablility configDescribe ,
+										  ConfigSurfDescribe.Stability configDescribe ,
 										  ConfigSlidingIntegral configOrientation ,
 										  Class<I> imageType) {
 
@@ -419,7 +419,7 @@ public class FactoryPointTracker {
 	PointTracker<I> combined_ST_SURF_KLT(ConfigGeneralDetector configExtract,
 										 PkltConfig kltConfig,
 										 int reactivateThreshold,
-										 ConfigSurfDescribe.Stablility configDescribe,
+										 ConfigSurfDescribe.Stability configDescribe,
 										 ConfigSlidingIntegral configOrientation,
 										 Class<I> imageType,
 										 Class<D> derivType) {

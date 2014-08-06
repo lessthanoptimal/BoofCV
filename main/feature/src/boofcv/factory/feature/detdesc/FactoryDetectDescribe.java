@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -187,7 +187,7 @@ public class FactoryDetectDescribe {
 	 */
 	public static <T extends ImageSingleBand, II extends ImageSingleBand>
 	DetectDescribePoint<T,SurfFeature> surfStable( ConfigFastHessian configDetector,
-												   ConfigSurfDescribe.Stablility configDescribe,
+												   ConfigSurfDescribe.Stability configDescribe,
 												   ConfigSlidingIntegral configOrientation,
 												   Class<T> imageType ) {
 
@@ -219,7 +219,7 @@ public class FactoryDetectDescribe {
 	 */
 	public static <T extends ImageMultiBand, II extends ImageSingleBand>
 	DetectDescribePoint<T,SurfFeature> surfColorStable( ConfigFastHessian configDetector,
-														ConfigSurfDescribe.Stablility configDescribe,
+														ConfigSurfDescribe.Stability configDescribe,
 														ConfigSlidingIntegral configOrientation,
 														ImageType<T> imageType ) {
 
