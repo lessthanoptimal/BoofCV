@@ -18,13 +18,13 @@
 
 package boofcv.alg.fiducial;
 
+import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.distort.PointToPixelTransform_F32;
 import boofcv.alg.distort.PointTransformHomography_F32;
 import boofcv.alg.feature.shapes.SplitMergeLineFitLoop;
 import boofcv.alg.filter.binary.Contour;
 import boofcv.alg.filter.binary.LinearContourLabelChang2004;
-import boofcv.alg.filter.binary.ThresholdImageOps;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.calibration.Zhang99DecomposeHomography;
 import boofcv.alg.geo.h.HomographyLinear4;
@@ -38,6 +38,7 @@ import boofcv.struct.distort.PixelTransform_F32;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSInt32;
+import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
 import georegression.struct.homography.UtilHomography;
 import georegression.struct.point.Point2D_F64;
@@ -58,12 +59,15 @@ import java.util.List;
  */
 // TODO allow for different binary strategies to be used for speed reasons
 // TODO create a tracking algorithm which uses previous frame information for speed + stability
-public abstract class BaseDetectFiducialSquare {
+public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 
 	// how wide the entire target is
 	double targetWidth;
 
-	FastQueue<FoundFidicial> found = new FastQueue<FoundFidicial>(FoundFidicial.class,true);
+	FastQueue<FoundFiducial> found = new FastQueue<FoundFiducial>(FoundFiducial.class,true);
+
+	// Converts the input image into a binary one
+	InputToBinary<T> thresholder;
 
 	// minimum size of a shape's contour
 	int minimumContour = 100;
@@ -84,7 +88,7 @@ public abstract class BaseDetectFiducialSquare {
 	HomographyLinear4 computeHomography = new HomographyLinear4(true);
 	DenseMatrix64F H = new DenseMatrix64F(3,3);
 	List<AssociatedPair> pairsRemovePerspective = new ArrayList<AssociatedPair>();
-	ImageDistort<ImageUInt8,ImageFloat32> removePerspective;
+	ImageDistort<T,ImageFloat32> removePerspective;
 	PointTransformHomography_F32 transformHomography = new PointTransformHomography_F32();
 
 	FitQuadrilaterialEM fitQuad = new FitQuadrilaterialEM();
@@ -92,6 +96,9 @@ public abstract class BaseDetectFiducialSquare {
 	IntrinsicParameters intrinsic;
 
 	Result result = new Result();
+
+	// type of input image
+	Class<T> inputType;
 
 	// ----- Used to estimate 3D pose of calibration target
 
@@ -101,8 +108,13 @@ public abstract class BaseDetectFiducialSquare {
 	List<AssociatedPair> pairsPose = new ArrayList<AssociatedPair>();
 	Zhang99DecomposeHomography homographyToPose = new Zhang99DecomposeHomography();
 
-	protected BaseDetectFiducialSquare(SplitMergeLineFitLoop fitPolygon, int squarePixels) {
+	protected BaseDetectFiducialSquare(InputToBinary<T> thresholder,
+									   SplitMergeLineFitLoop fitPolygon,
+									   int squarePixels,
+									   Class<T> inputType ) {
 
+		this.thresholder = thresholder;
+		this.inputType = inputType;
 		this.square = new ImageFloat32(squarePixels,squarePixels);
 
 		this.fitPolygon = fitPolygon;
@@ -112,8 +124,8 @@ public abstract class BaseDetectFiducialSquare {
 			pairsPose.add( new AssociatedPair());
 		}
 
-		removePerspective = FactoryDistort.distort(FactoryInterpolation.bilinearPixelS(ImageUInt8.class),
-				FactoryImageBorder.general(ImageUInt8.class, BorderType.EXTENDED),ImageFloat32.class);
+		removePerspective = FactoryDistort.distort(FactoryInterpolation.bilinearPixelS(inputType),
+				FactoryImageBorder.general(inputType, BorderType.EXTENDED),ImageFloat32.class);
 		PixelTransform_F32 squareToInput= new PointToPixelTransform_F32(transformHomography);
 		removePerspective.setModel(squareToInput);
 	}
@@ -125,7 +137,7 @@ public abstract class BaseDetectFiducialSquare {
 		pairsPose.get(0).p1.set( squareWidth / 2,  squareWidth / 2);
 		pairsPose.get(1).p1.set( squareWidth / 2, -squareWidth / 2);
 		pairsPose.get(2).p1.set(-squareWidth / 2, -squareWidth / 2);
-		pairsPose.get(3).p1.set(-squareWidth / 2,  squareWidth / 2);
+		pairsPose.get(3).p1.set(-squareWidth / 2, squareWidth / 2);
 	}
 
 	/**
@@ -136,12 +148,12 @@ public abstract class BaseDetectFiducialSquare {
 		this.intrinsic = intrinsic;
 
 		binary.reshape(intrinsic.width,intrinsic.height);
-		temp0.reshape(intrinsic.width,intrinsic.height);
-		temp1.reshape(intrinsic.width,intrinsic.height);
+		temp0.reshape(intrinsic.width, intrinsic.height);
+		temp1.reshape(intrinsic.width, intrinsic.height);
 		labeled.reshape(intrinsic.width,intrinsic.height);
 
 		DenseMatrix64F K = new DenseMatrix64F(3,3);
-		PerspectiveOps.calibrationMatrix(intrinsic,K);
+		PerspectiveOps.calibrationMatrix(intrinsic, K);
 		homographyToPose.setCalibrationMatrix(K);
 	}
 
@@ -149,18 +161,12 @@ public abstract class BaseDetectFiducialSquare {
 	 *
 	 * @param gray Input image with lens distortion removed
 	 */
-	public void process( ImageUInt8 gray ) {
+	public void process( T gray ) {
 
 		found.reset();
 		candidates.reset();
 
-		// convert image into a binary image using adaptive thresholding
-		ThresholdImageOps.threshold(gray,binary,50,true);
-//		ThresholdImageOps.adaptiveSquare(gray,binary,3,-5,true,temp0,temp1);
-
-//		binary.printNotZero();
-
-		// TODO filter binary?
+		thresholder.process(gray,binary);
 
 		// Find quadrilaterials that could be fiducials
 		findCandidateShapes();
@@ -181,7 +187,7 @@ public abstract class BaseDetectFiducialSquare {
 			// remove the perspective distortion and process it
 			removePerspective.apply(gray,square);
 			if( processSquare(square,result)) {
-				FoundFidicial f = found.grow();
+				FoundFiducial f = found.grow();
 				f.index = result.which;
 
 				// account for the rotation
@@ -190,7 +196,7 @@ public abstract class BaseDetectFiducialSquare {
 				}
 
 				// estimate position
-				computeTargetToWorld(q,f.targetToWorld);
+				computeTargetToWorld(q,f.targetToSensor);
 			}
 		}
 	}
@@ -258,6 +264,13 @@ public abstract class BaseDetectFiducialSquare {
 	}
 
 	/**
+	 * Returns list of found fiducials
+	 */
+	public FastQueue<FoundFiducial> getFound() {
+		return found;
+	}
+
+	/**
 	 * Processes the detected square and matches it to a known fiducial.  Black border
 	 * is included.
 	 *
@@ -266,6 +279,10 @@ public abstract class BaseDetectFiducialSquare {
 	 * @return true if the square matches a known target.
 	 */
 	protected abstract boolean processSquare( ImageFloat32 square , Result result );
+
+	public Class<T> getInputType() {
+		return inputType;
+	}
 
 	public static class Result {
 		int which;

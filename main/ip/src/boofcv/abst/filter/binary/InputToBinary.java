@@ -16,15 +16,16 @@
  * limitations under the License.
  */
 
-package boofcv.alg.fiducial;
+package boofcv.abst.filter.binary;
 
-import georegression.struct.se.Se3_F64;
+import boofcv.abst.filter.FilterImageInterface;
+import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageUInt8;
 
 /**
+ * Outputs a binary image when given an input image
+ *
  * @author Peter Abeles
  */
-public class FoundFidicial {
-	int index;
-	Se3_F64 targetToWorld = new Se3_F64();
+public interface InputToBinary<Input extends ImageBase> extends FilterImageInterface<Input,ImageUInt8> {
 }
-

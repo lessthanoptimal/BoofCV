@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -79,7 +79,7 @@ public class FactoryConvolveDown {
 			throw new IllegalArgumentException("The specified convolution cannot be found");
 		}
 
-		return new GenericConvolveDown<Input,Output>(m,kernel,border,skip,inputType);
+		return new GenericConvolveDown<Input,Output>(m,kernel,border,skip,inputType,outputType);
 	}
 
 	/**
@@ -121,6 +121,6 @@ public class FactoryConvolveDown {
 			throw new IllegalArgumentException("The specified convolution cannot be found");
 		}
 
-		return new GenericConvolveDown<Input,Output>(m,kernel,border,skip,inputType);
+		return new GenericConvolveDown<Input,Output>(m,kernel,border,skip,inputType,outputType);
 	}
 }

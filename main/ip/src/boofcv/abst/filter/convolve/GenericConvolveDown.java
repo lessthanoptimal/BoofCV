@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,6 +21,7 @@ package boofcv.abst.filter.convolve;
 import boofcv.core.image.border.BorderType;
 import boofcv.struct.convolve.KernelBase;
 import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageType;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -40,16 +41,19 @@ public class GenericConvolveDown<Input extends ImageSingleBand, Output extends I
 	KernelBase kernel;
 	BorderType type;
 	int skip;
-	Class<Input> imageType;
+	Class<Input> inputType;
+	Class<Output> outputType;
 
 	public GenericConvolveDown(Method m, KernelBase kernel,
 							   BorderType type, int skip ,
-							   Class<Input> imageType ) {
+							   Class<Input> inputType,
+							   Class<Output> outputType) {
 		this.m = m;
 		this.kernel = kernel;
 		this.type = type;
 		this.skip = skip;
-		this.imageType = imageType;
+		this.inputType = inputType;
+		this.outputType = outputType;
 	}
 
 	public int getSkip() {
@@ -90,7 +94,12 @@ public class GenericConvolveDown<Input extends ImageSingleBand, Output extends I
 	}
 
 	@Override
-	public Class<Input> getInputType() {
-		return imageType;
+	public ImageType<Input> getInputType() {
+		return ImageType.single(inputType);
+	}
+
+	@Override
+	public ImageType<Output> getOutputType() {
+		return ImageType.single(outputType);
 	}
 }

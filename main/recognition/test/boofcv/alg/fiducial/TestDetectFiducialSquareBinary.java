@@ -20,6 +20,7 @@ package boofcv.alg.fiducial;
 
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageUInt8;
 import org.junit.Test;
 
 import java.util.Random;
@@ -44,7 +45,7 @@ public class TestDetectFiducialSquareBinary {
 			for (int j = 0; j < i - 1; j++) {
 				ImageMiscOps.rotateCCW(input.clone(), input);
 			}
-			DetectFiducialSquareBinary alg = new DetectFiducialSquareBinary(null);
+			DetectFiducialSquareBinary alg = new DetectFiducialSquareBinary(null,null, ImageUInt8.class);
 
 			BaseDetectFiducialSquare.Result result = new BaseDetectFiducialSquare.Result();
 			assertTrue(alg.processSquare(input, result));
@@ -63,7 +64,7 @@ public class TestDetectFiducialSquareBinary {
 		ImageFloat32 input = create(DetectFiducialSquareBinary.w, 314);
 		ImageMiscOps.fillUniform(input,rand,0,255);
 
-		DetectFiducialSquareBinary alg = new DetectFiducialSquareBinary(null);
+		DetectFiducialSquareBinary alg = new DetectFiducialSquareBinary(null,null,ImageUInt8.class);
 
 		BaseDetectFiducialSquare.Result result = new BaseDetectFiducialSquare.Result();
 		assertFalse(alg.processSquare(input, result));

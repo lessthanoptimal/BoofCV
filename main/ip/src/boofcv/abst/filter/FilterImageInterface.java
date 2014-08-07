@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,8 @@
 
 package boofcv.abst.filter;
 
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageType;
 
 
 /**
@@ -26,7 +27,7 @@ import boofcv.struct.image.ImageSingleBand;
  *
  * @author Peter Abeles
  */
-public interface FilterImageInterface<Input extends ImageSingleBand, Output extends ImageSingleBand>
+public interface FilterImageInterface<Input extends ImageBase, Output extends ImageBase>
 {
 	/**
 	 * Processes the input image and writes the results to the output image.
@@ -51,9 +52,16 @@ public interface FilterImageInterface<Input extends ImageSingleBand, Output exte
 	public int getVerticalBorder();
 
 	/**
-	 * Specifies the type of image it takes as input.
+	 * Specifies the input image type
 	 *
 	 * @return Input image type.
 	 */
-	public Class<Input> getInputType();
+	public ImageType<Input> getInputType();
+
+	/**
+	 * Specifies the output image type
+	 *
+	 * @return Output image type.
+	 */
+	public ImageType<Output> getOutputType();
 }

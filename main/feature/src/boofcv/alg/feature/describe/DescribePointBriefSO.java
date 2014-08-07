@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -64,7 +64,8 @@ public class DescribePointBriefSO<T extends ImageSingleBand> {
 		this.filterBlur = filterBlur;
 		this.interp = interp;
 
-		blur = GeneralizedImageOps.createSingleBand(filterBlur.getInputType(), 1, 1);
+		Class<T> imageType = filterBlur.getInputType().getImageClass();
+		blur = GeneralizedImageOps.createSingleBand(imageType, 1, 1);
 		values = new float[ definition.samplePoints.length ];
 	}
 

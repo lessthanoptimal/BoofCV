@@ -69,7 +69,7 @@ public class FactoryDescribePointAlgs {
 
 	public static <T extends ImageSingleBand>
 	DescribePointBrief<T> brief(BinaryCompareDefinition_I32 definition, BlurFilter<T> filterBlur ) {
-		Class<T> imageType = filterBlur.getInputType();
+		Class<T> imageType = filterBlur.getInputType().getImageClass();
 
 		DescribePointBinaryCompare<T> compare;
 
@@ -87,7 +87,7 @@ public class FactoryDescribePointAlgs {
 	// todo remove filterBlur for all BRIEF change to radius,sigma,type
 	public static <T extends ImageSingleBand>
 	DescribePointBriefSO<T> briefso(BinaryCompareDefinition_I32 definition, BlurFilter<T> filterBlur) {
-		Class<T> imageType = filterBlur.getInputType();
+		Class<T> imageType = filterBlur.getInputType().getImageClass();
 
 		InterpolatePixelS<T> interp = FactoryInterpolation.bilinearPixelS(imageType);
 

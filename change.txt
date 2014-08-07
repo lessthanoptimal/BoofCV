@@ -29,6 +29,11 @@ Version : Alpha 0.18
 - Added pow2 and sqrt to PixelMath
 - Added invert to BinaryImageOps
 - Added rotateCW and rotateCCW to ImageMiscOps
+- FilterImageInterface
+  * Reference ImageBase instead of ImageSingleBand
+  * Can get output type
+- InputToBinary = Interface for converting an arbitrary image into a binary one
+  * Added wrappers/implementations for all current thresholding techniques
 
 TODO
 - BlurImageOps.mean() and gaussian() UInt8 images.

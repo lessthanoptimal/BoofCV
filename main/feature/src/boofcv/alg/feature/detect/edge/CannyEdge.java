@@ -82,7 +82,7 @@ public class CannyEdge<T extends ImageSingleBand, D extends ImageSingleBand> {
 		this.blur = blur;
 		this.gradient = gradient;
 
-		Class<T> imageType = blur.getInputType();
+		Class<T> imageType = blur.getInputType().getImageClass();
 
 		blurred = GeneralizedImageOps.createSingleBand(imageType, 1, 1);
 		derivX = gradient.getDerivType().createImage(1,1);

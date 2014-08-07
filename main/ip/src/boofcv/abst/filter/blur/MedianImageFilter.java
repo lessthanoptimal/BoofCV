@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,6 +20,7 @@ package boofcv.abst.filter.blur;
 
 import boofcv.alg.filter.blur.BlurImageOps;
 import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageType;
 import boofcv.testing.BoofTesting;
 
 import java.lang.reflect.InvocationTargetException;
@@ -87,7 +88,12 @@ public class MedianImageFilter<T extends ImageSingleBand> implements BlurFilter<
 	}
 
 	@Override
-	public Class<T> getInputType() {
-		return imageType;
+	public ImageType<T> getInputType() {
+		return ImageType.single(imageType);
+	}
+
+	@Override
+	public ImageType<T> getOutputType() {
+		return ImageType.single(imageType);
 	}
 }

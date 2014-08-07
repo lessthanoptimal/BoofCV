@@ -23,6 +23,7 @@ import boofcv.core.image.border.FactoryImageBorder;
 import boofcv.core.image.border.ImageBorder;
 import boofcv.struct.convolve.KernelBase;
 import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageType;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -42,13 +43,16 @@ public class GenericConvolve<Input extends ImageSingleBand, Output extends Image
 	BorderType type;
 	ImageBorder borderRule;
 
-	Class<Input> imageType;
+	Class<Input> inputType;
+	Class<Output> outputType;
 
-	public GenericConvolve(Method m, KernelBase kernel, BorderType type , Class<Input> imageType) {
+	public GenericConvolve(Method m, KernelBase kernel, BorderType type ,
+						   Class<Input> inputType, Class<Output> outputType) {
 		this.m = m;
 		this.kernel = kernel;
 		this.type = type;
-		this.imageType = imageType;
+		this.inputType = inputType;
+		this.outputType = outputType;
 
 		Class<?> params[] = m.getParameterTypes();
 		if( type == BorderType.SKIP || type == BorderType.NORMALIZED )
@@ -111,7 +115,12 @@ public class GenericConvolve<Input extends ImageSingleBand, Output extends Image
 	}
 
 	@Override
-	public Class<Input> getInputType() {
-		return imageType;
+	public ImageType<Input> getInputType() {
+		return ImageType.single(inputType);
+	}
+
+	@Override
+	public ImageType<Output> getOutputType() {
+		return ImageType.single(outputType);
 	}
 }

@@ -18,9 +18,11 @@
 
 package boofcv.alg.fiducial;
 
+import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.alg.feature.shapes.SplitMergeLineFitLoop;
 import boofcv.alg.filter.binary.impl.ThresholdSauvola;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
 
 /**
@@ -32,7 +34,8 @@ import boofcv.struct.image.ImageUInt8;
  *
  * @author Peter Abeles
  */
-public class DetectFiducialSquareBinary extends BaseDetectFiducialSquare {
+public class DetectFiducialSquareBinary<T extends ImageSingleBand>
+		extends BaseDetectFiducialSquare<T> {
 
 	// converts the input image into a binary one
 	ThresholdSauvola sauvola;
@@ -52,8 +55,15 @@ public class DetectFiducialSquareBinary extends BaseDetectFiducialSquare {
 	protected final static int w=r*2+1;
 	protected final static int N=w*w;
 
-	protected DetectFiducialSquareBinary(SplitMergeLineFitLoop fitPolygon) {
-		super(fitPolygon, w*6);
+	/**
+	 * Configures the fiducial detector
+	 *
+	 * @param fitPolygon used to fit a polygon to binary blobs
+	 * @param inputType Type of image it's processing
+	 */
+	public DetectFiducialSquareBinary(InputToBinary<T> thresholder,
+									  SplitMergeLineFitLoop fitPolygon, Class<T> inputType) {
+		super(thresholder,fitPolygon, w*6,inputType);
 
 		int widthNoBorder = w*4;
 

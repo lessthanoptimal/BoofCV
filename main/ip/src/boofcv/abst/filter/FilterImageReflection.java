@@ -19,6 +19,7 @@
 package boofcv.abst.filter;
 
 import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageType;
 import boofcv.testing.BoofTesting;
 
 import java.lang.reflect.InvocationTargetException;
@@ -106,7 +107,12 @@ public class FilterImageReflection<Input extends ImageSingleBand, Output extends
 	}
 
 	@Override
-	public Class<Input> getInputType() {
-		return inputType;
+	public ImageType<Input> getInputType() {
+		return ImageType.single(inputType);
+	}
+
+	@Override
+	public ImageType<Output> getOutputType() {
+		return ImageType.single(outputType);
 	}
 }

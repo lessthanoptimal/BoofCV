@@ -40,7 +40,8 @@ public class TestFilterImageReflection {
 
 		assertEquals(2,filter.getHorizontalBorder());
 		assertEquals(3,filter.getVerticalBorder());
-		assertTrue(ImageUInt8.class==filter.getInputType());
+		assertTrue(ImageUInt8.class==filter.getInputType().getImageClass());
+		assertTrue(ImageUInt16.class==filter.getOutputType().getImageClass());
 		assertEquals(1,out.get(0,0));
     }
 
@@ -57,7 +58,8 @@ public class TestFilterImageReflection {
 
 		assertEquals(2,filter.getHorizontalBorder());
 		assertEquals(3,filter.getVerticalBorder());
-		assertTrue(ImageUInt8.class==filter.getInputType());
+		assertTrue(ImageUInt8.class==filter.getInputType().getImageClass());
+		assertTrue(ImageUInt16.class==filter.getOutputType().getImageClass());
 		assertEquals(1,out.get(0,0));
 	}
 

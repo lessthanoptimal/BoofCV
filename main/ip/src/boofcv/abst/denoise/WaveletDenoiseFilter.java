@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,6 +24,7 @@ import boofcv.alg.denoise.DenoiseWavelet;
 import boofcv.alg.transform.wavelet.UtilWavelet;
 import boofcv.struct.image.ImageDimension;
 import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageType;
 
 
 /**
@@ -85,7 +86,12 @@ public class WaveletDenoiseFilter<T extends ImageSingleBand> implements FilterIm
 	}
 
 	@Override
-	public Class<T> getInputType() {
-		return wavelet.getOriginalType();
+	public ImageType<T> getInputType() {
+		return ImageType.single(wavelet.getOriginalType());
+	}
+
+	@Override
+	public ImageType<T> getOutputType() {
+		return ImageType.single(wavelet.getOriginalType());
 	}
 }

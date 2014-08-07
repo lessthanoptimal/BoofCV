@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,6 +20,7 @@ package boofcv.abst.filter;
 
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageType;
 
 
 /**
@@ -86,7 +87,12 @@ public class FilterSequence<Input extends ImageSingleBand, Output extends ImageS
 	}
 
 	@Override
-	public Class<Input> getInputType() {
+	public ImageType<Input> getInputType() {
 		return firstFilter.getInputType();
+	}
+
+	@Override
+	public ImageType<Output> getOutputType() {
+		return firstFilter.getOutputType();
 	}
 }

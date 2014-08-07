@@ -26,6 +26,7 @@ import boofcv.alg.feature.shapes.SplitMergeLineFitLoop;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.interpolate.TypeInterpolate;
 import boofcv.alg.misc.ImageMiscOps;
+import boofcv.factory.filter.binary.FactoryThresholdBinary;
 import boofcv.factory.geo.FactoryMultiView;
 import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.distort.PixelTransform_F32;
@@ -83,7 +84,7 @@ public class TestBaseDetectFiducialSquare {
 		IntrinsicParameters intrinsic = new IntrinsicParameters(400,400,0,320,240,640,380,false,null);
 		DenseMatrix64F K = PerspectiveOps.calibrationMatrix(intrinsic,null);
 
-		BaseDetectFiducialSquare alg = new Dummy();
+		BaseDetectFiducialSquare<ImageUInt8> alg = new Dummy();
 		alg.setIntrinsic(intrinsic);
 		alg.setTargetShape(0.5);
 
@@ -155,12 +156,13 @@ public class TestBaseDetectFiducialSquare {
 		DistortImageOps.distortSingle(pattern, output, pixelTransform, true, TypeInterpolate.BILINEAR);
 	}
 
-	public static class Dummy extends BaseDetectFiducialSquare {
+	public static class Dummy extends BaseDetectFiducialSquare<ImageUInt8> {
 
 		public List<ImageFloat32> detected = new ArrayList<ImageFloat32>();
 
 		protected Dummy() {
-			super(new SplitMergeLineFitLoop(2.0,0.05,200), 100);
+			super(FactoryThresholdBinary.globalFixed(50,true,ImageUInt8.class),
+					new SplitMergeLineFitLoop(2.0,0.05,200), 100,ImageUInt8.class);
 		}
 
 		@Override
