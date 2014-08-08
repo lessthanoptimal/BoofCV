@@ -20,6 +20,7 @@ package boofcv.alg.distort;
 
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.interpolate.InterpolatePixelS;
+import boofcv.alg.interpolate.TypeInterpolate;
 import boofcv.core.image.border.BorderType;
 import boofcv.core.image.border.FactoryImageBorder;
 import boofcv.core.image.border.ImageBorder;
@@ -28,6 +29,7 @@ import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.distort.*;
 import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageType;
 import georegression.struct.shapes.RectangleLength2D_F32;
 import org.ejml.data.DenseMatrix64F;
 
@@ -37,6 +39,69 @@ import org.ejml.data.DenseMatrix64F;
  * @author Peter Abeles
  */
 public class LensDistortionOps {
+
+	/**
+	 * <p>
+	 * Creates an {@link ImageDistort} class which will remove the lens distortion.  The user
+	 * can select how the view is adjusted.
+	 * </p>
+	 *
+	 * <p>
+	 * If BorderType.VALUE or null then pixels outside the image will be filled in with a
+	 * value of 0.  For viewing purposes it is recommended that BorderType.VALUE be used and BorderType.EXTENDED
+	 * in computer vision applications.  VALUE creates harsh edges which can cause false positives
+	 * when detecting features, which EXTENDED minimizes.
+	 * </p>
+	 *
+	 * @param allInside If true then the undistorted image will be filled with valid pixels.
+	 *                  If false then the undistorted image will contain the entire original image.
+	 * @param borderType Specifies how the image border is handled.
+	 * @param param Original intrinsic parameters.
+	 * @param paramAdj (output) Intrinsic parameters which reflect the undistorted image.  Can be null.
+	 * @param imageType Type of image it will undistort
+	 * @return ImageDistort which removes lens distortion
+	 */
+	public static <T extends ImageSingleBand>
+	ImageDistort<T,T> removeDistortion( boolean allInside , BorderType borderType ,
+										IntrinsicParameters param, IntrinsicParameters paramAdj ,
+										ImageType<T> imageType )
+	{
+		Class bandType = imageType.getImageClass();
+
+		InterpolatePixelS interp =
+				FactoryInterpolation.createPixelS(0, 255, TypeInterpolate.BILINEAR, bandType);
+
+		ImageBorder<T> border;
+		if( borderType == null || borderType == BorderType.VALUE )
+			border = FactoryImageBorder.value(bandType, 0);
+		else
+			border = FactoryImageBorder.general(bandType,borderType);
+
+		PointTransform_F32 transform;
+		if( allInside)
+			transform = LensDistortionOps.allInside(param, paramAdj);
+		else
+			transform = LensDistortionOps.fullView(param,paramAdj);
+
+		ImageDistort<T,T> distort;
+
+		switch( imageType.getFamily() ) {
+			case SINGLE_BAND:
+				distort = FactoryDistort.distort(true,interp, border, bandType);
+				break;
+
+			case MULTI_SPECTRAL:
+				distort = FactoryDistort.distortMS(true,interp, border, bandType);
+				break;
+
+			default:
+				throw new RuntimeException("Unsupported image family");
+		}
+
+		distort.setModel(new PointToPixelTransform_F32(transform));
+
+		return distort;
+	}
 
 	/**
 	 * <p>
@@ -214,38 +279,6 @@ public class LensDistortionOps {
 		} else {
 			return radialDistort;
 		}
-	}
-
-	/**
-	 * Creates an {@link ImageDistort} which removes radial distortion. How pixels outside the image are handled
-	 * is specified by the BorderType.  If BorderType.VALUE then pixels outside the image will be filled in with a
-	 * value of 0.  For viewing purposes it is recommended that BorderType.VALUE be used and BorderType.EXTENDED
-	 * in computer vision applications.  VALUE creates harsh edges which can cause false positives
-	 * when detecting features, which EXTENDED minimizes.
-	 *
-	 * @param param Intrinsic camera parameters
-	 * @param imageType Type of single band image being processed
-	 * @param borderType Specifies how the image border is handled.
-	 * @return Image distort that removes radial distortion
-	 */
-	public static <T extends ImageSingleBand> ImageDistort<T,T>
-	removeRadialImage(IntrinsicParameters param, BorderType borderType, Class<T> imageType)
-	{
-		InterpolatePixelS<T> interp = FactoryInterpolation.bilinearPixelS(imageType);
-		ImageBorder<T> border;
-		if( borderType == BorderType.VALUE )
-			border = FactoryImageBorder.value(imageType, 0);
-		else
-			border = FactoryImageBorder.general(imageType,borderType);
-
-		// only compute the transform once
-		ImageDistort<T,T> ret = FactoryDistort.distortCached(interp, border, imageType);
-
-		PointTransform_F32 transform = transformPixelToRadial_F32(param);
-
-		ret.setModel(new PointToPixelTransform_F32(transform));
-
-		return ret;
 	}
 
 	/**

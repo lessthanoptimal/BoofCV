@@ -62,7 +62,7 @@ public class BenchmarkImageDistort<T extends ImageSingleBand> {
 			InterpolatePixelS<T> interp = FactoryInterpolation.bilinearPixelS(imageType);
 			ImageBorder<T> border = FactoryImageBorder.general(imageType, BorderType.EXTENDED);
 			
-			alg = FactoryDistort.distort(interp, border, imageType);
+			alg = FactoryDistort.distort(false,interp, border, imageType);
 			alg.setModel(tran);
 		}
 
@@ -80,7 +80,7 @@ public class BenchmarkImageDistort<T extends ImageSingleBand> {
 			InterpolatePixelS<T> interp = FactoryInterpolation.bilinearPixelS(imageType);
 			ImageBorder<T> border = FactoryImageBorder.general(imageType, BorderType.EXTENDED);
 
-			alg = FactoryDistort.distort(interp,border,imageType);
+			alg = FactoryDistort.distort(false,interp,border,imageType);
 			alg.setModel(tran);
 		}
 
@@ -98,7 +98,7 @@ public class BenchmarkImageDistort<T extends ImageSingleBand> {
 			InterpolatePixelS<T> interp = FactoryInterpolation.bilinearPixelS(imageType);
 			ImageBorder<T> border = FactoryImageBorder.general(imageType, BorderType.EXTENDED);
 
-			alg = FactoryDistort.distortCached(interp,border,imageType);
+			alg = FactoryDistort.distort(true,interp,border,imageType);
 			alg.setModel(tran);
 		}
 

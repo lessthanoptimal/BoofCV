@@ -188,7 +188,7 @@ public class TestStitchingFromMotion2D {
 	public void resizeStitchImage_Transform() {
 		HelperMotion motion = new HelperMotion();
 		InterpolatePixelS interp = FactoryInterpolation.createPixelS(0, 255, TypeInterpolate.BILINEAR, ImageFloat32.class);
-		ImageDistort distorter = FactoryDistort.distort(interp, null, ImageFloat32.class);
+		ImageDistort distorter = FactoryDistort.distort(false,interp, null, ImageFloat32.class);
 
 		StitchingTransform trans = FactoryStitchingTransform.createAffine_F64();
 

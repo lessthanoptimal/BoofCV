@@ -30,9 +30,10 @@ import boofcv.struct.image.ImageSingleBand;
  * @author Peter Abeles
  */
 // TODO debugging.  Show all detected quads in an image
+// TODO add calibration targets here
 public class FactoryFiducial {
 
-	public <T extends ImageSingleBand>
+	public static <T extends ImageSingleBand>
 	FiducialDetector<T> squareBinaryFast( int binaryThreshold ,
 										  int borderTolerance ,
 										  int borderMaxIterations ,
@@ -46,7 +47,7 @@ public class FactoryFiducial {
 		return new SquareBinary_to_FiducialDetector<T>(alg);
 	}
 
-	public <T extends ImageSingleBand>
+	public static  <T extends ImageSingleBand>
 	FiducialDetector<T> squareBinaryRobust( int thresholdRadius,
 											int borderTolerance ,
 											int borderMaxIterations ,

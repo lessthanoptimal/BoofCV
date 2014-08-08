@@ -18,30 +18,9 @@
 
 package boofcv.abst.fiducial;
 
-import boofcv.struct.calib.IntrinsicParameters;
-import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageType;
-import georegression.struct.se.Se3_F64;
-
 /**
- * Interface for detecting fiducials.  If the {@link boofcv.struct.calib.IntrinsicParameters} specifies lens
- * distortion then it will be automatically removed and if there is no lens distortion then it will skip that step.
- *
- *
  * @author Peter Abeles
  */
-// TODO Comment
-public interface FiducialDetector<T extends ImageBase>
-{
-	public void detect( T input );
-
-	public void setIntrinsic( IntrinsicParameters intrinsic );
-
-	public int totalFound();
-
-	public void getFiducialToWorld(int which, Se3_F64 fiducialToSensor );
-
-	public int getId( int which );
-
-	public ImageType<T> getInputType();
+public class GenericFiducialDetectorChecks {
+	// TODO with no distortion and with distortion
 }

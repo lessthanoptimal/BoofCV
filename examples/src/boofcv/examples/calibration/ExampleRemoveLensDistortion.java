@@ -78,7 +78,7 @@ public class ExampleRemoveLensDistortion {
 
 		// Set up image distort
 		InterpolatePixelS<ImageFloat32> interp = FactoryInterpolation.bilinearPixelS(ImageFloat32.class);
-		ImageDistort<ImageFloat32,ImageFloat32> distort = FactoryDistort.distort(interp,null,ImageFloat32.class);
+		ImageDistort<ImageFloat32,ImageFloat32> distort = FactoryDistort.distort(false,interp,null,ImageFloat32.class);
 
 		// render and display the different types of views in a window
 		displayResults(orig, distortedImg, tran, fullView, allInside, distort);

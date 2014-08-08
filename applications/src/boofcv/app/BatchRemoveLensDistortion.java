@@ -20,18 +20,13 @@ package boofcv.app;
 
 import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.distort.LensDistortionOps;
-import boofcv.alg.distort.PointToPixelTransform_F32;
-import boofcv.alg.interpolate.InterpolatePixelS;
-import boofcv.alg.interpolate.TypeInterpolate;
 import boofcv.core.image.ConvertBufferedImage;
-import boofcv.factory.distort.FactoryDistort;
-import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.io.UtilIO;
 import boofcv.io.image.UtilImageIO;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.IntrinsicParameters;
-import boofcv.struct.distort.PointTransform_F32;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageType;
 import boofcv.struct.image.MultiSpectral;
 
 import java.awt.image.BufferedImage;
@@ -51,17 +46,12 @@ public class BatchRemoveLensDistortion {
 		IntrinsicParameters paramAdj = new IntrinsicParameters();
 		List<String> fileNames = BoofMiscOps.directoryList(directory, "image");
 
-		InterpolatePixelS<ImageFloat32> interp =
-				FactoryInterpolation.createPixelS(0, 255, TypeInterpolate.BILINEAR, ImageFloat32.class);
-
-		PointTransform_F32 allInside = LensDistortionOps.allInside(param, paramAdj);
-		UtilIO.saveXML(paramAdj,directory+"intrinsicUndistorted.xml");
-
 		MultiSpectral<ImageFloat32> distoredImg = new MultiSpectral<ImageFloat32>(ImageFloat32.class,param.width,param.height,3);
 		MultiSpectral<ImageFloat32> undistoredImg = new MultiSpectral<ImageFloat32>(ImageFloat32.class,param.width,param.height,3);
 
-		ImageDistort distort = FactoryDistort.distortMS(interp, null, ImageFloat32.class);
-		distort.setModel(new PointToPixelTransform_F32(allInside));
+		ImageDistort distort = LensDistortionOps.removeDistortion(true,null,param,paramAdj,
+				(ImageType)distoredImg.getImageType());
+		UtilIO.saveXML(paramAdj,directory+"intrinsicUndistorted.xml");
 
 		BufferedImage out = new BufferedImage(param.width,param.height,BufferedImage.TYPE_INT_RGB);
 

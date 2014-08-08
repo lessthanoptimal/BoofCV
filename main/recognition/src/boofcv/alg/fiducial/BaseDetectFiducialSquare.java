@@ -124,7 +124,7 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 			pairsPose.add( new AssociatedPair());
 		}
 
-		removePerspective = FactoryDistort.distort(FactoryInterpolation.bilinearPixelS(inputType),
+		removePerspective = FactoryDistort.distort(false,FactoryInterpolation.bilinearPixelS(inputType),
 				FactoryImageBorder.general(inputType, BorderType.EXTENDED),ImageFloat32.class);
 		PixelTransform_F32 squareToInput= new PointToPixelTransform_F32(transformHomography);
 		removePerspective.setModel(squareToInput);

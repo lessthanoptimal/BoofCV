@@ -69,7 +69,7 @@ public abstract class CommonImageDistortCacheTests<T extends ImageSingleBand> {
 	@Test
 	public void compareNoCrop() {
 
-		ImageDistort<T,T> standard = FactoryDistort.distort(interp,border,imageType);
+		ImageDistort<T,T> standard = FactoryDistort.distort(false,interp,border,imageType);
 		ImageDistortCache<T,T> alg = create(interp,border,imageType);
 		
 		standard.setModel(tran);
@@ -84,7 +84,7 @@ public abstract class CommonImageDistortCacheTests<T extends ImageSingleBand> {
 	@Test
 	public void compareCrop() {
 
-		ImageDistort<T,T> standard = FactoryDistort.distort(interp,border,imageType);
+		ImageDistort<T,T> standard = FactoryDistort.distort(false,interp,border,imageType);
 		ImageDistortCache<T,T> alg = create(interp,border,imageType);
 
 		standard.setModel(tran);

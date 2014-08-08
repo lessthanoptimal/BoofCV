@@ -100,9 +100,9 @@ public class DistortSupport {
 	public static <Input extends ImageSingleBand,Output extends ImageSingleBand>
 	ImageDistort<MultiSpectral<Input>,MultiSpectral<Output>>
 	createDistortMS(Class<Output> outputType,PixelTransform_F32 dstToSrc,
-					InterpolatePixelS<Input> interp, ImageBorder border)
+					InterpolatePixelS<Input> interp, boolean cached , ImageBorder border)
 	{
-		ImageDistort<Input,Output> bandDistort = FactoryDistort.distort(interp, border, outputType);
+		ImageDistort<Input,Output> bandDistort = FactoryDistort.distort(cached,interp, border, outputType);
 		bandDistort.setModel(dstToSrc);
 		return new ImplImageDistort_MS<Input,Output>(bandDistort);
 	}
