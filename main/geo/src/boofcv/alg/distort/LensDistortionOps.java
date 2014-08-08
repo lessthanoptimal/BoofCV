@@ -28,7 +28,7 @@ import boofcv.factory.distort.FactoryDistort;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.distort.*;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 import georegression.struct.shapes.RectangleLength2D_F32;
 import org.ejml.data.DenseMatrix64F;
@@ -61,7 +61,7 @@ public class LensDistortionOps {
 	 * @param imageType Type of image it will undistort
 	 * @return ImageDistort which removes lens distortion
 	 */
-	public static <T extends ImageSingleBand>
+	public static <T extends ImageBase>
 	ImageDistort<T,T> removeDistortion( boolean allInside , BorderType borderType ,
 										IntrinsicParameters param, IntrinsicParameters paramAdj ,
 										ImageType<T> imageType )
@@ -71,7 +71,7 @@ public class LensDistortionOps {
 		InterpolatePixelS interp =
 				FactoryInterpolation.createPixelS(0, 255, TypeInterpolate.BILINEAR, bandType);
 
-		ImageBorder<T> border;
+		ImageBorder border;
 		if( borderType == null || borderType == BorderType.VALUE )
 			border = FactoryImageBorder.value(bandType, 0);
 		else
@@ -95,7 +95,7 @@ public class LensDistortionOps {
 				break;
 
 			default:
-				throw new RuntimeException("Unsupported image family");
+				throw new RuntimeException("Unsupported image family: "+imageType.getFamily());
 		}
 
 		distort.setModel(new PointToPixelTransform_F32(transform));

@@ -18,6 +18,9 @@
 
 package boofcv.factory.fiducial;
 
+import boofcv.abst.calib.ConfigChessboard;
+import boofcv.abst.calib.ConfigSquareGrid;
+import boofcv.abst.fiducial.CalibrationFiducialDetector;
 import boofcv.abst.fiducial.FiducialDetector;
 import boofcv.abst.fiducial.SquareBinary_to_FiducialDetector;
 import boofcv.abst.filter.binary.InputToBinary;
@@ -58,5 +61,15 @@ public class FactoryFiducial {
 		DetectFiducialSquareBinary<T> alg = new DetectFiducialSquareBinary<T>(binary,poly,imageType);
 
 		return new SquareBinary_to_FiducialDetector<T>(alg);
+	}
+
+	public static <T extends ImageSingleBand>
+	CalibrationFiducialDetector<T> calibChessboard( ConfigChessboard config, double sizeOfSquares,Class<T> imageType) {
+		return new CalibrationFiducialDetector<T>(config,sizeOfSquares,imageType);
+	}
+
+	public static <T extends ImageSingleBand>
+	CalibrationFiducialDetector<T> calibSquareGrid( ConfigSquareGrid config, double sizeOfSquares,Class<T> imageType) {
+		return new CalibrationFiducialDetector<T>(config,sizeOfSquares,imageType);
 	}
 }
