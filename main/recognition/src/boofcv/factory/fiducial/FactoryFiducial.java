@@ -37,7 +37,8 @@ import boofcv.struct.image.ImageSingleBand;
 public class FactoryFiducial {
 
 	public static <T extends ImageSingleBand>
-	FiducialDetector<T> squareBinaryFast( int binaryThreshold ,
+	FiducialDetector<T> squareBinaryFast( double targetWidth,
+										  int binaryThreshold ,
 										  int borderTolerance ,
 										  int borderMaxIterations ,
 										  Class<T> imageType ) {
@@ -46,12 +47,14 @@ public class FactoryFiducial {
 
 		SplitMergeLineFitLoop poly = new SplitMergeLineFitLoop(borderTolerance,0.05,borderMaxIterations );
 		DetectFiducialSquareBinary<T> alg = new DetectFiducialSquareBinary<T>(binary,poly,imageType);
+		alg.setTargetShape(targetWidth);
 
 		return new SquareBinary_to_FiducialDetector<T>(alg);
 	}
 
 	public static  <T extends ImageSingleBand>
-	FiducialDetector<T> squareBinaryRobust( int thresholdRadius,
+	FiducialDetector<T> squareBinaryRobust( double targetWidth,
+											int thresholdRadius,
 											int borderTolerance ,
 											int borderMaxIterations ,
 											Class<T> imageType ) {
@@ -59,6 +62,7 @@ public class FactoryFiducial {
 
 		SplitMergeLineFitLoop poly = new SplitMergeLineFitLoop(borderTolerance,0.05,borderMaxIterations );
 		DetectFiducialSquareBinary<T> alg = new DetectFiducialSquareBinary<T>(binary,poly,imageType);
+		alg.setTargetShape(targetWidth);
 
 		return new SquareBinary_to_FiducialDetector<T>(alg);
 	}

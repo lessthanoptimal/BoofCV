@@ -46,6 +46,7 @@ import georegression.struct.se.Se3_F64;
 import georegression.struct.shapes.Quadrilateral_F64;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_I32;
+import org.ejml.UtilEjml;
 import org.ejml.data.DenseMatrix64F;
 
 import java.util.ArrayList;
@@ -70,7 +71,8 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 	InputToBinary<T> thresholder;
 
 	// minimum size of a shape's contour
-	int minimumContour = 100;
+	int minimumContour = 200;
+	double minimumArea = Math.pow(minimumContour/4.0,2);
 
 	ImageUInt8 binary = new ImageUInt8(1,1);
 	ImageUInt8 temp0 = new ImageUInt8(1,1);
@@ -189,6 +191,7 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 			if( processSquare(square,result)) {
 				FoundFiducial f = found.grow();
 				f.index = result.which;
+				f.location.set(q);
 
 				// account for the rotation
 				for (int j = 0; j < result.rotation; j++) {
@@ -226,19 +229,23 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 			if( c.internal.isEmpty() )
 				continue;
 
-			System.out.println("Contour size "+c.external.size());
 
 			if( c.external.size() >= minimumContour) {
 				fitPolygon.process(c.external);
 				GrowQueue_I32 splits = fitPolygon.getSplits();
-				System.out.println("  splits "+splits.size);
-				if( splits.size <= 8 ) {
-					Quadrilateral_F64 q = candidates.grow();
-					fitQuad.fit(c.external,splits,q);
-					// todo check quality of the fit here some how
-					candidates.removeTail();
 
-					// TODO filter extreme shapes here
+				// If there are too many splits it's probably not a quadrilateral
+				if( splits.size <= 8 && splits.size >= 4 ) {
+					Quadrilateral_F64 q = candidates.grow();
+					if( !fitQuad.fit(c.external,splits,q) ) {
+						candidates.removeTail();
+					} else {
+						// remove small and flat out bad shapes
+						double area = q.area();
+						if(UtilEjml.isUncountable(area) || area < minimumArea ) {
+							candidates.removeTail();
+						}
+					}
 				}
 			}
 		}

@@ -32,16 +32,22 @@ import georegression.struct.se.Se3_F64;
 public class ExampleFiducialNumber {
 	public static void main(String[] args) {
 
-		String directory = "/home/pja/projects/boofcv/evaluation/fiducial/";
+		String directory = "/home/pja/projects/boofcv/data/applet/fiducial/binary/";
 
 		// load the lens distortion parameters and the input image
 		IntrinsicParameters param = UtilIO.loadXML(directory + "intrinsic.xml");
-		ImageFloat32 original = UtilImageIO.loadImage(directory+"foo.png",ImageFloat32.class);
+		ImageFloat32 original = UtilImageIO.loadImage(directory+"angled_643_284.jpg",ImageFloat32.class);
 
 		// Detect the fiducial
-		FiducialDetector<ImageFloat32> detector = FactoryFiducial.squareBinaryRobust(6,4,20,ImageFloat32.class);
+		FiducialDetector<ImageFloat32> detector = FactoryFiducial.squareBinaryRobust(0.1,6,4,20,ImageFloat32.class);
+//		FiducialDetector<ImageFloat32> detector = FactoryFiducial.squareBinaryFast(0.1,100,4,20,ImageFloat32.class);
 		detector.setIntrinsic(param);
-		detector.detect(original);
+
+		long before = System.currentTimeMillis();
+//		for (int i = 0; i < 20; i++) {
+			detector.detect(original);
+//		}
+		System.out.println("Elapsed "+(System.currentTimeMillis()-before)/20.0);
 
 		// print the results
 		Se3_F64 targetToSensor = new Se3_F64();

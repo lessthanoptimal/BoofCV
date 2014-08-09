@@ -84,7 +84,7 @@ public class FitQuadrilaterialEM {
 	 * @param corners Initial set of corners
 	 * @param output the fitted quadrilateral
 	 */
-	public void fit( List<Point2D_I32> contour , GrowQueue_I32 corners ,
+	public boolean fit( List<Point2D_I32> contour , GrowQueue_I32 corners ,
 						Quadrilateral_F64 output )
 	{
 		// pick the 4 largest segments to act as the initial seeds
@@ -108,7 +108,7 @@ public class FitQuadrilaterialEM {
 		performLineEM(contour);
 
 		// convert from lines to quadrilateral
-		convert(lines,output);
+		return convert(lines,output);
 	}
 
 	/**
@@ -144,7 +144,7 @@ public class FitQuadrilaterialEM {
 			points.grow().set(p.x,p.y);
 		}
 
-		System.out.println("line0 = "+lines[0]);
+//		System.out.println("line0 = "+lines[0]);
 		weights.resize(points.size);
 
 		for (int EM = 0; EM < iterationsEM; EM++) {
@@ -153,7 +153,7 @@ public class FitQuadrilaterialEM {
 
 			// update line equations using the points and their weights
 			computeLineEquations();
-			System.out.println("line0 = "+lines[0]);
+//			System.out.println("line0 = "+lines[0]);
 		}
 
 		// recompute the lines one last time but without the points which have ambiguous weights
@@ -234,16 +234,17 @@ public class FitQuadrilaterialEM {
 	 *
 	 * @param lines Assumes lines are ordered
 	 */
-	protected static void convert( LineGeneral2D_F64[] lines , Quadrilateral_F64 quad ) {
+	protected static boolean convert( LineGeneral2D_F64[] lines , Quadrilateral_F64 quad ) {
 
 		if( null == Intersection2D_F64.intersection(lines[0],lines[1],quad.a) )
-			throw new RuntimeException("Oh crap");
+			return false;
 		if( null == Intersection2D_F64.intersection(lines[2],lines[1],quad.b) )
-			throw new RuntimeException("Oh crap");
+			return false;
 		if( null == Intersection2D_F64.intersection(lines[2],lines[3],quad.c) )
-			throw new RuntimeException("Oh crap");
+			return false;
 		if( null == Intersection2D_F64.intersection(lines[0],lines[3],quad.d) )
-			throw new RuntimeException("Oh crap");
+			return false;
+		return true;
 	}
 
 	public static class Segment extends SortableParameter_F64 {

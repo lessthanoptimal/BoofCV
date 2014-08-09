@@ -23,4 +23,8 @@ package boofcv.abst.fiducial;
  */
 public class GenericFiducialDetectorChecks {
 	// TODO with no distortion and with distortion
+
+	// TODO multiple runs same solution
+
+	// TODO sub-images
 }

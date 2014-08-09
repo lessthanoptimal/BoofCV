@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,8 +18,10 @@
 
 package boofcv.gui.feature;
 
+import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I32;
 import georegression.struct.shapes.EllipseRotated_F64;
+import georegression.struct.shapes.Quadrilateral_F64;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
@@ -30,6 +32,18 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class VisualizeShapes {
+
+
+	public static void draw( Quadrilateral_F64 quad , Graphics2D g2 ) {
+		draw(quad.a,quad.b,g2);
+		draw(quad.b,quad.c,g2);
+		draw(quad.c,quad.d,g2);
+		draw(quad.d,quad.a,g2);
+	}
+
+	public static void draw( Point2D_F64 p0 , Point2D_F64 p1 , Graphics2D g2 ) {
+		g2.drawLine((int)(p0.x+0.5),(int)(p0.y+0.5),(int)(p1.x+0.5),(int)(p1.y+0.5));
+	}
 
 	/**
 	 * Draws a polygon

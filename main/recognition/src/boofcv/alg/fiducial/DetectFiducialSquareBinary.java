@@ -20,7 +20,7 @@ package boofcv.alg.fiducial;
 
 import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.alg.feature.shapes.SplitMergeLineFitLoop;
-import boofcv.alg.filter.binary.impl.ThresholdSauvola;
+import boofcv.factory.filter.binary.FactoryThresholdBinary;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
@@ -38,7 +38,7 @@ public class DetectFiducialSquareBinary<T extends ImageSingleBand>
 		extends BaseDetectFiducialSquare<T> {
 
 	// converts the input image into a binary one
-	ThresholdSauvola sauvola;
+	InputToBinary<ImageFloat32> threshold = FactoryThresholdBinary.globalOtsu(0,256,true,ImageFloat32.class);
 	ImageUInt8 binary = new ImageUInt8(1,1);
 
 	// helper data structures for computing the value of each grid point
@@ -70,9 +70,6 @@ public class DetectFiducialSquareBinary<T extends ImageSingleBand>
 		binary.reshape(widthNoBorder,widthNoBorder);
 		temp0.reshape(widthNoBorder,widthNoBorder);
 		temp1.reshape(widthNoBorder,widthNoBorder);
-
-		// make the radius large enough so that it will include an entire square
-		sauvola = new ThresholdSauvola(r,0.3f,true);
 	}
 
 	@Override
@@ -186,7 +183,7 @@ public class DetectFiducialSquareBinary<T extends ImageSingleBand>
 
 	private void findBitCounts(ImageFloat32 gray) {
 		// compute binary image using an adaptive algorithm to handle shadows
-		sauvola.process(gray,binary);
+		threshold.process(gray,binary);
 
 		for (int row = 0; row < 4; row++) {
 			int y0 = row*binary.width/4;

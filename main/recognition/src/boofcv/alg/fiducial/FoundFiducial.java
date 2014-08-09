@@ -19,6 +19,7 @@
 package boofcv.alg.fiducial;
 
 import georegression.struct.se.Se3_F64;
+import georegression.struct.shapes.Quadrilateral_F64;
 
 /**
  * Contains the ID and pose for a fiducial
@@ -34,5 +35,10 @@ public class FoundFiducial {
 	 * Transform from the fiducial to the sensor reference frame
 	 */
 	public Se3_F64 targetToSensor = new Se3_F64();
+
+	/**
+	 * Where the fiducial was found in the image
+	 */
+	public Quadrilateral_F64 location = new Quadrilateral_F64();
 }
 
