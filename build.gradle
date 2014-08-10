@@ -216,6 +216,10 @@ idea {
         jdkName = '1.6 (64bit)'
         languageLevel = '1.6'
     }
+
+    module {
+        excludeDirs += file('.idea')
+    }
 }
 
 // Disable the creation of jars for distribution.  If you don't do this it will crash

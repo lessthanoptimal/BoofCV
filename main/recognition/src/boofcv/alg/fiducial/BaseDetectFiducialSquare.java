@@ -19,9 +19,7 @@
 package boofcv.alg.fiducial;
 
 import boofcv.abst.filter.binary.InputToBinary;
-import boofcv.alg.distort.ImageDistort;
-import boofcv.alg.distort.PointToPixelTransform_F32;
-import boofcv.alg.distort.PointTransformHomography_F32;
+import boofcv.alg.distort.*;
 import boofcv.alg.feature.shapes.SplitMergeLineFitLoop;
 import boofcv.alg.filter.binary.Contour;
 import boofcv.alg.filter.binary.LinearContourLabelChang2004;
@@ -35,6 +33,7 @@ import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.ConnectRule;
 import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.distort.PixelTransform_F32;
+import boofcv.struct.distort.SequencePointTransform_F32;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSInt32;
@@ -78,6 +77,10 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 	ImageUInt8 temp0 = new ImageUInt8(1,1);
 	ImageUInt8 temp1 = new ImageUInt8(1,1);
 
+	// precomputed lookup table for distorted to undistorted pixel locations
+	private Point2D_I32 map[];
+	FastQueue<Point2D_I32> contourUndist = new FastQueue<Point2D_I32>(Point2D_I32.class,false);
+
 	LinearContourLabelChang2004 contourFinder = new LinearContourLabelChang2004(ConnectRule.FOUR);
 	ImageSInt32 labeled = new ImageSInt32(1,1);
 
@@ -89,6 +92,7 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 
 	HomographyLinear4 computeHomography = new HomographyLinear4(true);
 	DenseMatrix64F H = new DenseMatrix64F(3,3);
+	AddRadialPtoP_F32 addDistortion = new AddRadialPtoP_F32();
 	List<AssociatedPair> pairsRemovePerspective = new ArrayList<AssociatedPair>();
 	ImageDistort<T,ImageFloat32> removePerspective;
 	PointTransformHomography_F32 transformHomography = new PointTransformHomography_F32();
@@ -128,8 +132,12 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 
 		removePerspective = FactoryDistort.distort(false,FactoryInterpolation.bilinearPixelS(inputType),
 				FactoryImageBorder.general(inputType, BorderType.EXTENDED),ImageFloat32.class);
-		PixelTransform_F32 squareToInput= new PointToPixelTransform_F32(transformHomography);
+		SequencePointTransform_F32 sequence = new SequencePointTransform_F32(transformHomography,addDistortion);
+		PixelTransform_F32 squareToInput= new PointToPixelTransform_F32(sequence);
+
 		removePerspective.setModel(squareToInput);
+
+		map = new Point2D_I32[0];
 	}
 
 	public void setTargetShape( double squareWidth ) {
@@ -157,6 +165,20 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 		DenseMatrix64F K = new DenseMatrix64F(3,3);
 		PerspectiveOps.calibrationMatrix(intrinsic, K);
 		homographyToPose.setCalibrationMatrix(K);
+
+		RemoveRadialPtoP_F64 removeDistort = new RemoveRadialPtoP_F64();
+		removeDistort.set(intrinsic.fx,intrinsic.fy,intrinsic.skew,intrinsic.cx,intrinsic.cy,intrinsic.radial);
+		addDistortion.set(intrinsic.fx,intrinsic.fy,intrinsic.skew,intrinsic.cx,intrinsic.cy,intrinsic.radial);
+		int N = intrinsic.width*intrinsic.height;
+		Point2D_F64 p = new Point2D_F64();
+		if( map.length < N ) {
+			map = new Point2D_I32[N];
+			for (int i = 0; i < N; i++) {
+				map[i] = new Point2D_I32();
+				removeDistort.compute(i%intrinsic.width,i/intrinsic.width,p);
+				map[i].set( (int)Math.round(p.x) , (int)Math.round(p.y) );
+			}
+		}
 	}
 
 	/**
@@ -168,7 +190,7 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 		found.reset();
 		candidates.reset();
 
-		thresholder.process(gray,binary);
+		thresholder.process(gray, binary);
 
 		// Find quadrilaterials that could be fiducials
 		findCandidateShapes();
@@ -218,7 +240,7 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 
 	private void findCandidateShapes() {
 		// find binary blobs
-		contourFinder.process(binary,labeled);
+		contourFinder.process(binary, labeled);
 
 		int endX = binary.width-1;
 		int endY = binary.height-1;
@@ -237,24 +259,29 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 				// is used due to the number of large false positives
 				// This is reasonable since you can't estimate the location without the entire target border
 				boolean skip = false;
+				contourUndist.reset();
 				for (int j = 0; j < c.external.size(); j++) {
 					Point2D_I32 p = c.external.get(j);
 					if( p.x == 0 || p.y == 0 || p.x == endX || p.y == endY )
 					{
 						skip = true;
 						break;
+					} else {
+						// look up undistorted pixel locations
+						contourUndist.add( map[p.y*binary.width+p.x]);
 					}
 				}
 				if( skip )
 					continue;
 
-				fitPolygon.process(c.external);
+				fitPolygon.process(contourUndist.toList());
 				GrowQueue_I32 splits = fitPolygon.getSplits();
 
 				// If there are too many splits it's probably not a quadrilateral
 				if( splits.size <= 8 && splits.size >= 4 ) {
+
 					Quadrilateral_F64 q = candidates.grow();
-					if( !fitQuad.fit(c.external,splits,q) ) {
+					if( !fitQuad.fit(contourUndist.toList(),splits,q) ) {
 						candidates.removeTail();
 					} else {
 						// remove small and flat out bad shapes

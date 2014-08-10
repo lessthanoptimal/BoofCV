@@ -47,7 +47,7 @@ public class LensDistortionOps {
 	 * </p>
 	 *
 	 * <p>
-	 * If BorderType.VALUE or null then pixels outside the image will be filled in with a
+	 * If BorderType.VALUE then pixels outside the image will be filled in with a
 	 * value of 0.  For viewing purposes it is recommended that BorderType.VALUE be used and BorderType.EXTENDED
 	 * in computer vision applications.  VALUE creates harsh edges which can cause false positives
 	 * when detecting features, which EXTENDED minimizes.
@@ -55,7 +55,7 @@ public class LensDistortionOps {
 	 *
 	 * @param allInside If true then the undistorted image will be filled with valid pixels.
 	 *                  If false then the undistorted image will contain the entire original image.
-	 * @param borderType Specifies how the image border is handled.
+	 * @param borderType Specifies how the image border is handled. Null means borders are ignored.
 	 * @param param Original intrinsic parameters.
 	 * @param paramAdj (output) Intrinsic parameters which reflect the undistorted image.  Can be null.
 	 * @param imageType Type of image it will undistort
@@ -72,7 +72,9 @@ public class LensDistortionOps {
 				FactoryInterpolation.createPixelS(0, 255, TypeInterpolate.BILINEAR, bandType);
 
 		ImageBorder border;
-		if( borderType == null || borderType == BorderType.VALUE )
+		if( borderType == null ) {
+			border = null;
+		} else if( borderType == BorderType.VALUE )
 			border = FactoryImageBorder.value(bandType, 0);
 		else
 			border = FactoryImageBorder.general(bandType,borderType);

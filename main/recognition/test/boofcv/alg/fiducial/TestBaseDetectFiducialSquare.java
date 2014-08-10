@@ -45,8 +45,7 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * @author Peter Abeles
@@ -76,6 +75,15 @@ public class TestBaseDetectFiducialSquare {
 		// todo check quad coordinates
 
 		// todo see if it did a reasonable job removing distortion
+	}
+
+	/**
+	 * Makes sure all the remove lens and perspective distortion code works correctly.  Add a square target to the
+	 * image. Distort it badly, and see if it reproduces the original
+	 */
+	@Test
+	public void removeDistortion() {
+		fail("Implement");
 	}
 
 	@Test

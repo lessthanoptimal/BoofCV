@@ -18,8 +18,6 @@
 
 package boofcv.abst.fiducial;
 
-import boofcv.alg.distort.ImageDistort;
-import boofcv.alg.distort.LensDistortionOps;
 import boofcv.alg.fiducial.DetectFiducialSquareBinary;
 import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.image.ImageSingleBand;
@@ -36,39 +34,21 @@ public class SquareBinary_to_FiducialDetector<T extends ImageSingleBand>
 {
 	DetectFiducialSquareBinary<T> alg;
 
-	IntrinsicParameters intrinsicAdj = new IntrinsicParameters();
-
-	ImageDistort<T,T> undistorter;
-
-	T undistorted;
-
 	ImageType<T> type;
 
 	public SquareBinary_to_FiducialDetector(DetectFiducialSquareBinary<T> alg) {
 		this.alg = alg;
 		this.type = ImageType.single(alg.getInputType());
-		this.undistorted = type.createImage(1,1);
 	}
 
 	@Override
 	public void detect(T input) {
-		if( undistorter != null ) {
-			undistorted.reshape(input.width,input.height);
-			undistorter.apply(input,undistorted);
-			input = undistorted;
-		}
 		alg.process(input);
 	}
 
 	@Override
 	public void setIntrinsic(IntrinsicParameters intrinsic) {
-		if( intrinsic.radial != null) {
-			undistorter = LensDistortionOps.removeDistortion(true, null, intrinsic, intrinsicAdj, type);
-			alg.setIntrinsic(intrinsicAdj);
-		} else {
-			undistorter = null;
-			alg.setIntrinsic(intrinsic);
-		}
+		alg.setIntrinsic(intrinsic);
 	}
 
 	@Override
