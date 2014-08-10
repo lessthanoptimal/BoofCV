@@ -29,6 +29,7 @@ import georegression.struct.se.Se3_F64;
 /**
  * @author Peter Abeles
  */
+// TODO visualize results with a cube
 public class ExampleFiducialNumber {
 	public static void main(String[] args) {
 
@@ -39,14 +40,15 @@ public class ExampleFiducialNumber {
 		ImageFloat32 original = UtilImageIO.loadImage(directory+"angled_643_284.jpg",ImageFloat32.class);
 
 		// Detect the fiducial
-		FiducialDetector<ImageFloat32> detector = FactoryFiducial.squareBinaryRobust(0.1,6,4,20,ImageFloat32.class);
-//		FiducialDetector<ImageFloat32> detector = FactoryFiducial.squareBinaryFast(0.1,100,4,20,ImageFloat32.class);
+//		FiducialDetector<ImageFloat32> detector = FactoryFiducial.squareBinaryRobust(0.1,6,4,20,ImageFloat32.class);
+		FiducialDetector<ImageFloat32> detector = FactoryFiducial.squareBinaryFast(0.1,100,4,20,ImageFloat32.class);
 		detector.setIntrinsic(param);
 
+		detector.detect(original);
 		long before = System.currentTimeMillis();
-//		for (int i = 0; i < 20; i++) {
+		for (int i = 0; i < 20; i++) {
 			detector.detect(original);
-//		}
+		}
 		System.out.println("Elapsed "+(System.currentTimeMillis()-before)/20.0);
 
 		// print the results

@@ -203,6 +203,34 @@ public class ConvertBufferedImage {
 	}
 
 	/**
+	 * Converts a buffered image into an image of the specified type.
+	 *
+	 * @param src Input BufferedImage which is to be converted
+	 * @param orderRgb If applicable, should it adjust the ordering of each color band to maintain color consistency
+	 * @param imageType Type of image it is to be converted into
+	 * @return The image
+	 */
+	public static <T extends ImageBase> T convertFrom(BufferedImage src , boolean orderRgb , ImageType<T> imageType) {
+
+		T out = imageType.createImage(src.getWidth(),src.getHeight());
+
+		switch( imageType.getFamily() ) {
+			case SINGLE_BAND:
+				convertFromSingle(src, (ImageSingleBand)out, imageType.getImageClass());
+				break;
+
+			case MULTI_SPECTRAL:
+				convertFromMulti(src, (MultiSpectral)out,orderRgb, imageType.getImageClass());
+				break;
+
+			default:
+				throw new RuntimeException("Not supported yet");
+		}
+
+		return out;
+	}
+
+	/**
 	 * Converts a buffered image into an image of the specified type.  In a 'dst' image is provided
 	 * it will be used for output, otherwise a new image will be created.
 	 */

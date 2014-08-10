@@ -43,6 +43,7 @@ TODO
   * unit test: compare to brute force and see if it produces an identical solution
 - Add an escape value to scoreassociate.  if the value computed so far isn't better than X, stop.
   Suggested by David G Ortega
+- Try to get fiducial code down to 10ms for simple threshold
 ---------------------------------------------
 Date    : 2014/6/19
 Version : Alpha 0.17

@@ -70,7 +70,8 @@ public class TestDetectFiducialSquareBinary {
 		assertFalse(alg.processSquare(input, result));
 	}
 
-	public ImageFloat32 create( int square , int value ) {
+
+	public static ImageFloat32 create( int square , int value ) {
 
 		ImageFloat32 ret = new ImageFloat32(square*6,square*6);
 

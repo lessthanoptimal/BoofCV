@@ -42,6 +42,7 @@ import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
 import georegression.struct.homography.UtilHomography;
 import georegression.struct.point.Point2D_F64;
+import georegression.struct.point.Point2D_I32;
 import georegression.struct.se.Se3_F64;
 import georegression.struct.shapes.Quadrilateral_F64;
 import org.ddogleg.struct.FastQueue;
@@ -58,7 +59,6 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-// TODO allow for different binary strategies to be used for speed reasons
 // TODO create a tracking algorithm which uses previous frame information for speed + stability
 public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 
@@ -187,7 +187,7 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 			// pass the found homography onto the image transform
 			UtilHomography.convert(H,transformHomography.getModel());
 			// remove the perspective distortion and process it
-			removePerspective.apply(gray,square);
+			removePerspective.apply(gray, square);
 			if( processSquare(square,result)) {
 				FoundFiducial f = found.grow();
 				f.index = result.which;
@@ -220,6 +220,9 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 		// find binary blobs
 		contourFinder.process(binary,labeled);
 
+		int endX = binary.width-1;
+		int endY = binary.height-1;
+
 		// find blobs where all 4 edges are lines
 		FastQueue<Contour> blobs = contourFinder.getContours();
 		for (int i = 0; i < blobs.size; i++) {
@@ -229,8 +232,22 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 			if( c.internal.isEmpty() )
 				continue;
 
-
 			if( c.external.size() >= minimumContour) {
+				// if it touches the image border skip. Speeds thinks up a little bit when adaptive thresholding
+				// is used due to the number of large false positives
+				// This is reasonable since you can't estimate the location without the entire target border
+				boolean skip = false;
+				for (int j = 0; j < c.external.size(); j++) {
+					Point2D_I32 p = c.external.get(j);
+					if( p.x == 0 || p.y == 0 || p.x == endX || p.y == endY )
+					{
+						skip = true;
+						break;
+					}
+				}
+				if( skip )
+					continue;
+
 				fitPolygon.process(c.external);
 				GrowQueue_I32 splits = fitPolygon.getSplits();
 

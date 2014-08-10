@@ -18,16 +18,45 @@
 
 package boofcv.abst.fiducial;
 
-import org.junit.Test;
+import boofcv.core.image.ConvertBufferedImage;
+import boofcv.factory.fiducial.FactoryFiducial;
+import boofcv.io.UtilIO;
+import boofcv.io.image.UtilImageIO;
+import boofcv.struct.calib.IntrinsicParameters;
+import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageType;
+import boofcv.struct.image.ImageUInt8;
 
-import static org.junit.Assert.fail;
+import java.awt.image.BufferedImage;
 
 /**
  * @author Peter Abeles
  */
-public class TestSquareBinary_to_FiducialDetector {
-	@Test
-	public void stuff() {
-		fail("Implement");
+public class TestSquareBinary_to_FiducialDetector extends GenericFiducialDetectorChecks {
+
+
+	String directory = UtilIO.getPathToBase()+"data/applet/fiducial/binary/";
+
+	public TestSquareBinary_to_FiducialDetector() {
+		types.add( ImageType.single(ImageUInt8.class));
+		types.add( ImageType.single(ImageFloat32.class));
+	}
+
+	@Override
+	public ImageBase loadImage(ImageType imageType) {
+
+		BufferedImage out = UtilImageIO.loadImage(directory+"angled_643_284.jpg");
+		return ConvertBufferedImage.convertFrom(out,true,imageType);
+	}
+
+	@Override
+	public IntrinsicParameters loadIntrinsic() {
+		return UtilIO.loadXML(directory+"intrinsic.xml");
+	}
+
+	@Override
+	public FiducialDetector createDetector(ImageType imageType) {
+		return FactoryFiducial.squareBinaryRobust(0.1,6,4,20,imageType.getImageClass());
 	}
 }

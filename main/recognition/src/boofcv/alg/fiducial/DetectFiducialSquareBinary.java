@@ -25,6 +25,8 @@ import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
 
+import java.util.Arrays;
+
 /**
  * This fiducial encores a 12-bit number.  The inner region is broken up into 16-squares which are
  * either white or black.  One corner is always back and the others are always white.  This
@@ -34,6 +36,7 @@ import boofcv.struct.image.ImageUInt8;
  *
  * @author Peter Abeles
  */
+// TODO classify the border.  If not all black discard the pattern
 public class DetectFiducialSquareBinary<T extends ImageSingleBand>
 		extends BaseDetectFiducialSquare<T> {
 
@@ -185,6 +188,7 @@ public class DetectFiducialSquareBinary<T extends ImageSingleBand>
 		// compute binary image using an adaptive algorithm to handle shadows
 		threshold.process(gray,binary);
 
+		Arrays.fill(counts,0);
 		for (int row = 0; row < 4; row++) {
 			int y0 = row*binary.width/4;
 			int y1 = (row+1)*binary.width/4;
