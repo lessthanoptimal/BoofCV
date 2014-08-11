@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.fiducial;
+package boofcv.app;
 
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
@@ -26,7 +26,7 @@ import java.io.PrintStream;
  *
  * @author Peter Abeles
  */
-public class CreateSquareBinaryPatternEPS {
+public class CreateFiducialSquareBinaryEPS {
 
 	public static String fileName = "pattern.eps";
 	public static int number = 284;
