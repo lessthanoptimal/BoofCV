@@ -48,7 +48,7 @@ public class VisualizeSquareBinaryFiducial {
 		IntrinsicParameters intrinsic = UtilIO.loadXML(nameIntrinsic);
 
 		Detector detector = new Detector();
-		detector.setIntrinsic(intrinsic);
+		detector.configure(0.1, intrinsic);
 		detector.process(input);
 
 		System.out.println("Total Found: "+detector.squares.size());
@@ -70,7 +70,6 @@ public class VisualizeSquareBinaryFiducial {
 			VisualizeShapes.draw(fiducials.get(i).location,g2);
 		}
 
-		// TODO Draw quads on the input image
 		ShowImages.showWindow(output,"Binary");
 		ShowImages.showWindow(squares,"Candidates");
 	}
@@ -81,10 +80,9 @@ public class VisualizeSquareBinaryFiducial {
 		public List<ImageFloat32> squaresGray = new ArrayList<ImageFloat32>();
 
 		protected Detector() {
-			super(FactoryThresholdBinary.adaptiveSquare(10,0,true,ImageFloat32.class),
-					new SplitMergeLineFitLoop(5,0.05,20),
+			super(FactoryThresholdBinary.adaptiveSquare(10, 0, true, ImageFloat32.class),
+					new SplitMergeLineFitLoop(5, 0.05, 20), 200,
 					ImageFloat32.class);
-			setTargetShape(0.1);
 		}
 
 		@Override

@@ -28,12 +28,14 @@ import boofcv.struct.image.ImageUInt8;
 import java.util.Arrays;
 
 /**
+ * <p>
  * This fiducial encores a 12-bit number.  The inner region is broken up into 16-squares which are
  * either white or black.  One corner is always back and the others are always white.  This
  * allows orientation to be uniquely determined.
- *
+ * </p>
+ * <p>
  * Canonical orientation is with the black square in the lower-left hand corner.
- *
+ * </p>
  * @author Peter Abeles
  */
 // TODO classify the border.  If not all black discard the pattern
@@ -65,14 +67,13 @@ public class DetectFiducialSquareBinary<T extends ImageSingleBand>
 	 * @param inputType Type of image it's processing
 	 */
 	public DetectFiducialSquareBinary(InputToBinary<T> thresholder,
-									  SplitMergeLineFitLoop fitPolygon, Class<T> inputType) {
-		super(thresholder,fitPolygon, w*6,inputType);
+									  SplitMergeLineFitLoop fitPolygon,
+									  int minimumContour, Class<T> inputType) {
+		super(thresholder,fitPolygon, w*6, minimumContour, inputType);
 
 		int widthNoBorder = w*4;
 
 		binary.reshape(widthNoBorder,widthNoBorder);
-		temp0.reshape(widthNoBorder,widthNoBorder);
-		temp1.reshape(widthNoBorder,widthNoBorder);
 	}
 
 	@Override

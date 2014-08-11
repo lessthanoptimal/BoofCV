@@ -47,7 +47,7 @@ public class VisualizeSquareFiducial {
 		IntrinsicParameters intrinsic = UtilIO.loadXML(nameIntrinsic);
 
 		Detector detector = new Detector();
-		detector.setIntrinsic(intrinsic);
+		detector.configure(0.1, intrinsic);
 		detector.process(input);
 
 		System.out.println("Total Found: "+detector.squares.size());
@@ -60,7 +60,7 @@ public class VisualizeSquareFiducial {
 		}
 
 		BufferedImage output = new BufferedImage(input.width,input.height,BufferedImage.TYPE_INT_RGB);
-		VisualizeBinaryData.renderBinary(detector.binary,output);
+		VisualizeBinaryData.renderBinary(detector.getBinary(),output);
 		Graphics2D g2 = output.createGraphics();
 		g2.setColor(Color.RED);
 		g2.setStroke(new BasicStroke(2));
@@ -81,7 +81,7 @@ public class VisualizeSquareFiducial {
 			super(FactoryThresholdBinary.adaptiveGaussian(10,0,true,ImageFloat32.class),
 					new SplitMergeLineFitLoop(5,0.05,20),
 					200,
-					ImageFloat32.class);
+					200, ImageFloat32.class);
 		}
 
 		@Override

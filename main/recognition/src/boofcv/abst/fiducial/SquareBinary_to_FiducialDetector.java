@@ -34,10 +34,12 @@ public class SquareBinary_to_FiducialDetector<T extends ImageSingleBand>
 {
 	DetectFiducialSquareBinary<T> alg;
 
+	double targetWidth;
 	ImageType<T> type;
 
-	public SquareBinary_to_FiducialDetector(DetectFiducialSquareBinary<T> alg) {
+	public SquareBinary_to_FiducialDetector(DetectFiducialSquareBinary<T> alg,double targetWidth) {
 		this.alg = alg;
+		this.targetWidth = targetWidth;
 		this.type = ImageType.single(alg.getInputType());
 	}
 
@@ -48,7 +50,7 @@ public class SquareBinary_to_FiducialDetector<T extends ImageSingleBand>
 
 	@Override
 	public void setIntrinsic(IntrinsicParameters intrinsic) {
-		alg.setIntrinsic(intrinsic);
+		alg.configure(targetWidth, intrinsic);
 	}
 
 	@Override

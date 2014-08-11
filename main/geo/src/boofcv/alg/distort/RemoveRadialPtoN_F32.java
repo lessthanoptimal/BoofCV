@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -74,9 +74,13 @@ public class RemoveRadialPtoN_F32 implements PointTransform_F32 {
 		this.x_c = (float)x_c;
 		this.y_c = (float)y_c;
 
-		this.radial = new float[radial.length];
-		for( int i = 0; i < radial.length; i++ ) {
-			this.radial[i] = (float)radial[i];
+		if( radial == null ) {
+			this.radial = new float[0];
+		} else {
+			this.radial = new float[radial.length];
+			for (int i = 0; i < radial.length; i++) {
+				this.radial[i] = (float) radial[i];
+			}
 		}
 	}
 

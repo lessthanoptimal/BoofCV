@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -79,8 +79,12 @@ public class RemoveRadialPtoN_F64 implements PointTransform_F64 {
 		this.x_c = x_c;
 		this.y_c = y_c;
 
-		this.radial = new double[radial.length];
-		System.arraycopy(radial, 0, this.radial, 0, radial.length);
+		if( radial == null )
+			this.radial = new double[0];
+		else {
+			this.radial = new double[radial.length];
+			System.arraycopy(radial, 0, this.radial, 0, radial.length);
+		}
 	}
 
 	/**

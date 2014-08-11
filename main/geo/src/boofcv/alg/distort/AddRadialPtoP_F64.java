@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -70,9 +70,13 @@ public class AddRadialPtoP_F64 implements PointTransform_F64 {
 		this.cx = cx;
 		this.cy = cy;
 
-		this.radial = new double[radial.length];
-		for( int i = 0; i < radial.length; i++ ) {
-			this.radial[i] = radial[i];
+		if( radial == null )
+			this.radial = new double[0];
+		else {
+			this.radial = new double[radial.length];
+			for (int i = 0; i < radial.length; i++) {
+				this.radial[i] = radial[i];
+			}
 		}
 	}
 

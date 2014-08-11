@@ -37,34 +37,30 @@ import boofcv.struct.image.ImageSingleBand;
 public class FactoryFiducial {
 
 	public static <T extends ImageSingleBand>
-	FiducialDetector<T> squareBinaryFast( double targetWidth,
+	FiducialDetector<T> squareBinaryFast( ConfigFiducialBinary config,
 										  int binaryThreshold ,
-										  int borderTolerance ,
-										  int borderMaxIterations ,
 										  Class<T> imageType ) {
 
 		InputToBinary<T> binary = FactoryThresholdBinary.globalFixed(binaryThreshold,true,imageType);
 
-		SplitMergeLineFitLoop poly = new SplitMergeLineFitLoop(borderTolerance,0.05,borderMaxIterations );
-		DetectFiducialSquareBinary<T> alg = new DetectFiducialSquareBinary<T>(binary,poly,imageType);
-		alg.setTargetShape(targetWidth);
+		SplitMergeLineFitLoop poly = new SplitMergeLineFitLoop(config.borderTolerance,0.05,config.borderMaxIterations );
+		DetectFiducialSquareBinary<T> alg = new DetectFiducialSquareBinary<T>(
+				binary,poly,config.detectMinContour,imageType);
 
-		return new SquareBinary_to_FiducialDetector<T>(alg);
+		return new SquareBinary_to_FiducialDetector<T>(alg,config.targetWidth);
 	}
 
 	public static  <T extends ImageSingleBand>
-	FiducialDetector<T> squareBinaryRobust( double targetWidth,
+	FiducialDetector<T> squareBinaryRobust( ConfigFiducialBinary config,
 											int thresholdRadius,
-											int borderTolerance ,
-											int borderMaxIterations ,
 											Class<T> imageType ) {
 		InputToBinary<T> binary = FactoryThresholdBinary.adaptiveSquare(thresholdRadius, 0, true, imageType);
 
-		SplitMergeLineFitLoop poly = new SplitMergeLineFitLoop(borderTolerance,0.05,borderMaxIterations );
-		DetectFiducialSquareBinary<T> alg = new DetectFiducialSquareBinary<T>(binary,poly,imageType);
-		alg.setTargetShape(targetWidth);
+		SplitMergeLineFitLoop poly = new SplitMergeLineFitLoop(config.borderTolerance,0.05,config.borderMaxIterations );
+		DetectFiducialSquareBinary<T> alg = new DetectFiducialSquareBinary<T>(
+				binary,poly,config.detectMinContour,imageType);
 
-		return new SquareBinary_to_FiducialDetector<T>(alg);
+		return new SquareBinary_to_FiducialDetector<T>(alg,config.targetWidth);
 	}
 
 	public static <T extends ImageSingleBand>
