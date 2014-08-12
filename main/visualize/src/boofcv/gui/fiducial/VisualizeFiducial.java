@@ -67,19 +67,19 @@ public class VisualizeFiducial {
 		g2.drawLine(pixel[2].x,pixel[2].y,pixel[3].x,pixel[3].y);
 		g2.drawLine(pixel[3].x,pixel[3].y,pixel[0].x,pixel[0].y);
 
-		g2.setColor(new Color(0x00,0xFF,0x00,125));
+		g2.setColor(Color.BLACK);
 		g2.drawLine(pixel[0].x,pixel[0].y,pixel[4].x,pixel[4].y);
-		g2.setColor(new Color(0xC0,0x10,0xC0,125));
 		g2.drawLine(pixel[1].x,pixel[1].y,pixel[5].x,pixel[5].y);
-		g2.setColor(new Color(0x00,0xA0,0xC0,125));
 		g2.drawLine(pixel[2].x,pixel[2].y,pixel[6].x,pixel[6].y);
-		g2.setColor(new Color(0x10,0x10,0xFF,125));
 		g2.drawLine(pixel[3].x,pixel[3].y,pixel[7].x,pixel[7].y);
 
-		g2.setColor(Color.BLUE);
+		g2.setColor(new Color(0x00,0xFF,0x00,125));
 		g2.drawLine(pixel[4].x,pixel[4].y,pixel[5].x,pixel[5].y);
+		g2.setColor(new Color(0xC0,0x10,0xC0,125));
 		g2.drawLine(pixel[5].x,pixel[5].y,pixel[6].x,pixel[6].y);
+		g2.setColor(new Color(0x00,0xA0,0xC0,125));
 		g2.drawLine(pixel[6].x,pixel[6].y,pixel[7].x,pixel[7].y);
+		g2.setColor(Color.BLUE);
 		g2.drawLine(pixel[7].x,pixel[7].y,pixel[4].x,pixel[4].y);
 
 

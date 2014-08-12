@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -79,7 +79,7 @@ public class FactoryPlanarCalibrationTarget {
 		double startX = -(numCols*squareWidth + (numCols-1)*spaceWidth)/2;
 		double startY = -(numRows*squareWidth + (numRows-1)*spaceWidth)/2;
 
-		for( int i = 0; i < numRows; i++ ) {
+		for( int i = numRows-1; i >= 0; i-- ) {
 			double y = startY + i*(squareWidth+spaceWidth);
 
 			List<Point2D_F64> top = new ArrayList<Point2D_F64>();
@@ -123,7 +123,7 @@ public class FactoryPlanarCalibrationTarget {
 		double startX = -((numCols-1)*squareWidth)/2.0;
 		double startY = -((numRows-1)*squareWidth)/2.0;
 
-		for( int i = 0; i < numRows; i++ ) {
+		for( int i = numRows-1; i >= 0; i-- ) {
 			double y = startY+i*squareWidth;
 			for( int j = 0; j < numCols; j++ ) {
 				double x = startX+j*squareWidth;

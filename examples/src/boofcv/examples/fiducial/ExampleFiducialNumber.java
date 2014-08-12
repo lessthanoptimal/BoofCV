@@ -43,7 +43,7 @@ import java.awt.image.BufferedImage;
 public class ExampleFiducialNumber {
 	public static void main(String[] args) {
 
-		String directory = "/home/pja/projects/boofcv/data/applet/fiducial/binary/";
+		String directory = "../data/applet/fiducial/binary/";
 
 		// load the lens distortion parameters and the input image
 		IntrinsicParameters param = UtilIO.loadXML(directory + "intrinsic.xml");

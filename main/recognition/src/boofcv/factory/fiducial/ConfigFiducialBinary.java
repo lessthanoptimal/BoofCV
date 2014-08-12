@@ -36,7 +36,7 @@ public class ConfigFiducialBinary implements Configuration {
 	/**
 	 * Minimum number of pixels in a shape's contour.  Used to prune shapes which are too small.
 	 */
-	public int detectMinContour = 200;
+	public int detectMinContour = 150;
 	/**
 	 * Tolerance in pixels before a line is split when fitting a contour
 	 */
