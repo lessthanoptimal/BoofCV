@@ -382,6 +382,7 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 
 	public static class Result {
 		int which;
+		// amount of clock-wise rotation.  Each value = +90 degrees
 		int rotation;
 	}
 }

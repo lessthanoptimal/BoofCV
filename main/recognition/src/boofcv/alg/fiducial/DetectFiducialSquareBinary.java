@@ -55,7 +55,7 @@ public class DetectFiducialSquareBinary<T extends ImageSingleBand>
 	// storage for no border sub-image
 	ImageFloat32 grayNoBorder = new ImageFloat32();
 
-	// size of a square and the adaptive region for binarization
+	// size of a square
 	protected final static int r=5;
 	protected final static int w=r*2+1;
 	protected final static int N=w*w;

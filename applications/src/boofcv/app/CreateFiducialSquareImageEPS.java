@@ -38,10 +38,9 @@ public class CreateFiducialSquareImageEPS {
 
 	public static String outputName = "fiducial_image.eps";
 	public static String inputPath = UtilIO.getPathToBase()+"data/applet/fiducial/image/dog.png";
-	public static double width = 10;
+	public static double width = 10; // in centimeters
 
 	public static double CM_TO_POINTS = 72.0/2.54;
-
 
 	public static String binaryToHex( ImageUInt8 binary ) {
 
@@ -121,7 +120,6 @@ public class CreateFiducialSquareImageEPS {
 						"  /w7 { w6 " + squareLength + " add} def\n" +
 						"  /w8 { w7 " + squareLength + " add} def\n" +
 						"  /pagewidth " + sideLength + " def\n" +
-						"  /box {newpath moveto w 0 rlineto 0 w rlineto w neg 0 rlineto closepath fill} def\n" +
 						"% bottom top left right borders..\n" +
 						"  newpath w w moveto w7 w lineto w7 w2 lineto w w2 lineto closepath fill\n" +
 						"  newpath w w6 moveto w7 w6 lineto w7 w7 lineto w w7 lineto closepath fill\n" +
