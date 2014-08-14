@@ -229,7 +229,7 @@ public class TestBaseDetectFiducialSquare {
 
 		protected Dummy() {
 			super(FactoryThresholdBinary.globalFixed(50,true,ImageUInt8.class),
-					new SplitMergeLineFitLoop(2.0,0.05,200), 100, 200, ImageUInt8.class);
+					new SplitMergeLineFitLoop(2.0,0.05,200), 100, 0.23, ImageUInt8.class);
 		}
 
 		@Override

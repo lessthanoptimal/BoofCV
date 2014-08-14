@@ -80,6 +80,7 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 	private InputToBinary<T> thresholder;
 
 	// minimum size of a shape's contour
+	private double minContourFraction;
 	private int minimumContour;
 	private double minimumArea;
 
@@ -135,24 +136,20 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 	 * @param thresholder Converts the input image into a binary one
 	 * @param fitPolygon Provides a crude polygon fit around a shape
 	 * @param squarePixels  Number of pixels wide the image with lens and perspective distortion removed is.
-	 * @param minimumContour Minimum number of pixels in a blob's contour for it to be considered
+	 * @param minContourFraction Size of minimum contour as a fraction of the input image's width.  Try 0.23
 	 * @param inputType Type of input image it's processing
 	 */
 	protected BaseDetectFiducialSquare(InputToBinary<T> thresholder,
 									   SplitMergeLineFitLoop fitPolygon,
 									   int squarePixels,
-									   int minimumContour,
+									   double minContourFraction,
 									   Class<T> inputType) {
 
 		this.thresholder = thresholder;
 		this.inputType = inputType;
-		this.minimumContour = minimumContour;
+		this.minContourFraction = minContourFraction;
 		this.fitPolygon = fitPolygon;
 		this.square = new ImageFloat32(squarePixels,squarePixels);
-
-		// area of a square shape given its contour
-		this.minimumArea = Math.pow(this.minimumContour /4.0,2);
-
 
 		for (int i = 0; i < 4; i++) {
 			pairsRemovePerspective.add(new AssociatedPair());
@@ -182,6 +179,10 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 		// resize storage images
 		binary.reshape(intrinsic.width,intrinsic.height);
 		labeled.reshape(intrinsic.width,intrinsic.height);
+
+		// adjust size based parameters based on image size
+		this.minimumContour = (int)(intrinsic.width*minContourFraction);
+		this.minimumArea = Math.pow(this.minimumContour /4.0,2);
 
 		// add corner points in target frame.  Used to compute homography.  Target's center is at its origin
 		// see comment in class JavaDoc above

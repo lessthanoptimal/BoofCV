@@ -81,8 +81,7 @@ public class VisualizeSquareBinaryFiducial {
 
 		protected Detector() {
 			super(FactoryThresholdBinary.adaptiveSquare(10, 0, true, ImageFloat32.class),
-					new SplitMergeLineFitLoop(5, 0.05, 20), 200,
-					ImageFloat32.class);
+					new SplitMergeLineFitLoop(5, 0.05, 20), 0.23,ImageFloat32.class);
 		}
 
 		@Override
@@ -103,6 +102,6 @@ public class VisualizeSquareBinaryFiducial {
 
 		VisualizeSquareBinaryFiducial app = new VisualizeSquareBinaryFiducial();
 
-		app.process(directory+"/angled_643_284.jpg",directory+"/intrinsic.xml");
+		app.process(directory+"/angled00_643_284.jpg",directory+"/intrinsic.xml");
 	}
 }

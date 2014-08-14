@@ -35,7 +35,8 @@ Version : Alpha 0.18
 - InputToBinary = Interface for converting an arbitrary image into a binary one
   * Added wrappers/implementations for all current thresholding techniques
 - Fiducial Detector
-  * Square-binary. Encodes 4096 numbers
+  * Square-Binary. Encodes 4096 numbers
+  * Square-Image. Detects arbitrary image fiducials contained inside a square.
 
 TODO
 - BlurImageOps.mean() and gaussian() UInt8 images.
@@ -43,10 +44,12 @@ TODO
   * The current technique is prone towards numerical round off error since it forces it back to 8bit
     after the first sweep
   * unit test: compare to brute force and see if it produces an identical solution
-- Add an escape value to scoreassociate.  if the value computed so far isn't better than X, stop.
+- Add an escape value to score associate.  if the value computed so far isn't better than X, stop.
   Suggested by David G Ortega
 - Check to see if a square in fiducial is concave and discard
 - Improve stability of fiducials
+- Look at using poly fit in calibration detection routines
+
 ---------------------------------------------
 Date    : 2014/6/19
 Version : Alpha 0.17

@@ -115,9 +115,7 @@ public class VisualizeSquareFiducial {
 
 		protected Detector() {
 			super(FactoryThresholdBinary.adaptiveSquare(6, 0, true, ImageFloat32.class),
-					new SplitMergeLineFitLoop(5,0.05,20),
-					200,
-					125, ImageFloat32.class);
+					new SplitMergeLineFitLoop(5,0.05,20), 200, 0.2, ImageFloat32.class);
 		}
 
 		@Override

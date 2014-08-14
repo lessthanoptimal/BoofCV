@@ -18,9 +18,9 @@
 
 package boofcv.examples.fiducial;
 
-import boofcv.abst.fiducial.FiducialDetector;
+import boofcv.abst.fiducial.SquareImage_to_FiducialDetector;
 import boofcv.core.image.ConvertBufferedImage;
-import boofcv.factory.fiducial.ConfigFiducialBinary;
+import boofcv.factory.fiducial.ConfigFiducialImage;
 import boofcv.factory.fiducial.FactoryFiducial;
 import boofcv.gui.fiducial.VisualizeFiducial;
 import boofcv.gui.image.ShowImages;
@@ -40,21 +40,25 @@ import java.awt.image.BufferedImage;
  *
  * @author Peter Abeles
  */
-public class ExampleFiducialNumber {
+public class ExampleFiducialImage {
 	public static void main(String[] args) {
 
-		String directory = "../data/applet/fiducial/binary/";
+		String directory = "../data/applet/fiducial/image/";
 
 		// load the lens distortion parameters and the input image
 		IntrinsicParameters param = UtilIO.loadXML(directory + "intrinsic.xml");
-		BufferedImage input = UtilImageIO.loadImage(directory + "angled00_643_284.jpg");
+		ImageFloat32 dog = UtilImageIO.loadImage(directory + "dog.png",ImageFloat32.class);
+		BufferedImage input = UtilImageIO.loadImage(directory + "view01.jpg");
 		ImageFloat32 original = ConvertBufferedImage.convertFrom(input,true, ImageType.single(ImageFloat32.class));
 
 		// Detect the fiducial
-		FiducialDetector<ImageFloat32> detector = FactoryFiducial.
-				squareBinaryRobust(new ConfigFiducialBinary(0.1),6,ImageFloat32.class);
-//		FiducialDetector<ImageFloat32> detector = FactoryFiducial.
-//				squareBinaryFast(new ConfigFiducialBinary(0.1),100,ImageFloat32.class);
+//		SquareImage_to_FiducialDetector<ImageFloat32> detector = FactoryFiducial.
+//				squareImageRobust(new ConfigFiducialImage(0.1),6,ImageFloat32.class);
+		SquareImage_to_FiducialDetector<ImageFloat32> detector = FactoryFiducial.
+				squareImageFast(new ConfigFiducialImage(0.1), 100, ImageFloat32.class);
+
+		// give it a description of all the targets
+		detector.addTarget(dog, 125);
 
 		detector.setIntrinsic(param);
 

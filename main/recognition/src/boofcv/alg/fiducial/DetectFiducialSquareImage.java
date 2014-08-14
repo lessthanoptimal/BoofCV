@@ -41,42 +41,42 @@ import java.util.List;
 public class DetectFiducialSquareImage<T extends ImageSingleBand>
 		extends BaseDetectFiducialSquare<T> {
 
-	// Width of black border
-	protected final static int w=16;
-	protected final static int squareLength=w*4; // this must be a multiple of 16
-	protected final static int DESC_LENGTH = squareLength*squareLength;
+	// Width of black border (units = pixels)
+	private final static int w=16;
+	private final static int squareLength=w*4; // this must be a multiple of 16
+	// length of description in 16bit units
+	private final static int DESC_LENGTH = squareLength*squareLength/16;
 
 	// converts the input image into a binary one
-	InputToBinary<ImageFloat32> threshold = FactoryThresholdBinary.globalOtsu(0,256,true,ImageFloat32.class);
-	ImageUInt8 binary = new ImageUInt8(squareLength,squareLength);
+	private InputToBinary<ImageFloat32> threshold = FactoryThresholdBinary.globalOtsu(0,256,true,ImageFloat32.class);
+	private ImageUInt8 binary = new ImageUInt8(squareLength,squareLength);
 
 	// list of all known targets
-	List<FiducialDef> targets = new ArrayList<FiducialDef>();
+	private List<FiducialDef> targets = new ArrayList<FiducialDef>();
 
 	// lookup table to make computing the match score very fast
-	HammingTable16 table = new HammingTable16();
+	private HammingTable16 table = new HammingTable16();
 
 	// description of the current target candidate
-	protected short squareDef[] = new short[DESC_LENGTH];
+	private  short squareDef[] = new short[DESC_LENGTH];
 
 	// storage for no border sub-image
-	ImageFloat32 grayNoBorder = new ImageFloat32();
+	private ImageFloat32 grayNoBorder = new ImageFloat32();
 
 	// if the hamming score is better than this it is considered to be a good match
-	int hammingThreshold;
+	private int hammingThreshold;
 
 	/**
 	 * Configures the fiducial detector
 	 *
-	 * @param fitPolygon used to fit a polygon to binary blobs
-	 * @param inputType Type of image it's processing
+	 * @param matchThreshold Considered a match if the hamming distance is less than this fraction of the maximum
 	 */
 	public DetectFiducialSquareImage(InputToBinary<T> thresholder,
 									 SplitMergeLineFitLoop fitPolygon,
-									 int minimumContour, double matchThreshold, Class<T> inputType) {
-		super(thresholder,fitPolygon, squareLength+2*w, minimumContour, inputType);
+									 double minContourFraction, double matchThreshold, Class<T> inputType) {
+		super(thresholder,fitPolygon, squareLength+2*w, minContourFraction, inputType);
 
-		hammingThreshold = (int)(DESC_LENGTH*matchThreshold);
+		hammingThreshold = (int)(squareLength*squareLength*matchThreshold);
 
 		//noinspection ConstantConditions
 		if( squareLength%16 != 0 )
@@ -95,7 +95,7 @@ public class DetectFiducialSquareImage<T extends ImageSingleBand>
 	 */
 	public int addImage( T grayScale , double threshold ) {
 		// scale the image to the desired size
-		T scaled = GeneralizedImageOps.createSingleBand(getInputType(),w*4,w*4);
+		T scaled = GeneralizedImageOps.createSingleBand(getInputType(),squareLength,squareLength);
 		DistortImageOps.scale(grayScale,scaled, TypeInterpolate.BILINEAR);
 
 		// threshold it
@@ -106,9 +106,9 @@ public class DetectFiducialSquareImage<T extends ImageSingleBand>
 		// describe it in 4 different orientations
 		FiducialDef def = new FiducialDef();
 
-		binaryToDef(binary0,def.desc[0]);
-		ImageMiscOps.rotateCW(binary0,binary1);
-		binaryToDef(binary1,def.desc[1]);
+		binaryToDef(binary0, def.desc[0]);
+		ImageMiscOps.rotateCW(binary0, binary1);
+		binaryToDef(binary1, def.desc[1]);
 		ImageMiscOps.rotateCW(binary1,binary0);
 		binaryToDef(binary0,def.desc[2]);
 		ImageMiscOps.rotateCW(binary0,binary1);
@@ -122,7 +122,7 @@ public class DetectFiducialSquareImage<T extends ImageSingleBand>
 	/**
 	 * Converts a binary image into the compressed bit format
 	 */
-	protected void binaryToDef( ImageUInt8 binary , short[] desc ) {
+	protected static void binaryToDef( ImageUInt8 binary , short[] desc ) {
 		for (int i = 0; i < binary.data.length; i+=16) {
 			int value = 0;
 			for (int j = 0; j < 16; j++) {
@@ -148,7 +148,7 @@ public class DetectFiducialSquareImage<T extends ImageSingleBand>
 			int bestOrientation = 0;
 			int bestScore = Integer.MAX_VALUE;
 			for (int j = 0; j < 4; j++) {
-				int score = hamming(def.desc[i],squareDef);
+				int score = hamming(def.desc[j], squareDef);
 				if( score < bestScore ) {
 					bestScore = score;
 					bestOrientation = j;
@@ -156,7 +156,7 @@ public class DetectFiducialSquareImage<T extends ImageSingleBand>
 			}
 
 			// see if it meets the match threshold
-			if( bestScore >= hammingThreshold ) {
+			if( bestScore <= hammingThreshold ) {
 				result.rotation = bestOrientation;
 				result.which = i;
 				return true;
@@ -169,18 +169,22 @@ public class DetectFiducialSquareImage<T extends ImageSingleBand>
 	/**
 	 * Computes the hamming score between two descriptions.  Larger the number better the fit
 	 */
-	protected int hamming( short[] a , short[]b ) {
-		int score = 0;
+	protected int hamming(short[] a, short[] b) {
+		int distance = 0;
 		for (int i = 0; i < a.length; i++) {
-			score += table.lookup(a[i],b[i]);
+			distance += table.lookup(a[i],b[i]);
 		}
-		return score;
+		return distance;
+	}
+
+	public List<FiducialDef> getTargets() {
+		return targets;
 	}
 
 	/**
 	 * description of an image in 4 different orientations
 	 */
-	private static class FiducialDef
+	protected static class FiducialDef
 	{
 		short[][] desc = new short[4][DESC_LENGTH];
 	}

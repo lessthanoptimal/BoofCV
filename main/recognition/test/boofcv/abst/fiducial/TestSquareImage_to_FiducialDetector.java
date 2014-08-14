@@ -19,7 +19,7 @@
 package boofcv.abst.fiducial;
 
 import boofcv.core.image.ConvertBufferedImage;
-import boofcv.factory.fiducial.ConfigFiducialBinary;
+import boofcv.factory.fiducial.ConfigFiducialImage;
 import boofcv.factory.fiducial.FactoryFiducial;
 import boofcv.io.UtilIO;
 import boofcv.io.image.UtilImageIO;
@@ -34,12 +34,12 @@ import java.awt.image.BufferedImage;
 /**
  * @author Peter Abeles
  */
-public class TestSquareBinary_to_FiducialDetector extends GenericFiducialDetectorChecks {
+public class TestSquareImage_to_FiducialDetector extends GenericFiducialDetectorChecks {
 
 
-	String directory = UtilIO.getPathToBase()+"data/applet/fiducial/binary/";
+	String directory = UtilIO.getPathToBase()+"data/applet/fiducial/image/";
 
-	public TestSquareBinary_to_FiducialDetector() {
+	public TestSquareImage_to_FiducialDetector() {
 		types.add( ImageType.single(ImageUInt8.class));
 		types.add( ImageType.single(ImageFloat32.class));
 	}
@@ -47,7 +47,7 @@ public class TestSquareBinary_to_FiducialDetector extends GenericFiducialDetecto
 	@Override
 	public ImageBase loadImage(ImageType imageType) {
 
-		BufferedImage out = UtilImageIO.loadImage(directory+"angled00_643_284.jpg");
+		BufferedImage out = UtilImageIO.loadImage(directory+"view01.jpg");
 		return ConvertBufferedImage.convertFrom(out,true,imageType);
 	}
 
@@ -58,6 +58,11 @@ public class TestSquareBinary_to_FiducialDetector extends GenericFiducialDetecto
 
 	@Override
 	public FiducialDetector createDetector(ImageType imageType) {
-		return FactoryFiducial.squareBinaryRobust(new ConfigFiducialBinary(0.1),6,imageType.getImageClass());
+		SquareImage_to_FiducialDetector ret = FactoryFiducial.squareImageRobust
+				(new ConfigFiducialImage(0.1), 6, imageType.getImageClass());
+
+		ret.addTarget(UtilImageIO.loadImage(directory + "dog.png", imageType.getImageClass()), 125);
+
+		return ret;
 	}
 }

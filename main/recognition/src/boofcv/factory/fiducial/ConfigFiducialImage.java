@@ -27,7 +27,7 @@ import boofcv.struct.Configuration;
  *
  * @author Peter Abeles
  */
-public class ConfigFiducialBinary implements Configuration {
+public class ConfigFiducialImage implements Configuration {
 	/**
 	 * Length of a targets size in world units.
 	 */
@@ -47,10 +47,16 @@ public class ConfigFiducialBinary implements Configuration {
 	 */
 	public int borderMaxIterations = 20;
 
-	public ConfigFiducialBinary() {
+	/**
+	 * If the difference between an candidate and a target is less than this amount it is considered
+	 * a match.
+	 */
+	public double maxErrorFraction = 0.1;
+
+	public ConfigFiducialImage() {
 	}
 
-	public ConfigFiducialBinary(double targetWidth) {
+	public ConfigFiducialImage(double targetWidth) {
 		this.targetWidth = targetWidth;
 	}
 
