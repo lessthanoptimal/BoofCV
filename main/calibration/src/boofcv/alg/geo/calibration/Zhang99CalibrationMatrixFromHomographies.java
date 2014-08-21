@@ -150,8 +150,8 @@ public class Zhang99CalibrationMatrixFromHomographies {
 			double max2 = CommonOps.elementMaxAbs(h2);
 			double max = Math.max(max1,max2);
 
-			CommonOps.divide(max,h1);
-			CommonOps.divide(max,h2);
+			CommonOps.divide(h1,max);
+			CommonOps.divide(h2,max);
 
 			// compute elements of A
 			computeV(h1, h2, v12);
@@ -195,8 +195,8 @@ public class Zhang99CalibrationMatrixFromHomographies {
 			double max2 = CommonOps.elementMaxAbs(h2);
 			double max = Math.max(max1,max2);
 
-			CommonOps.divide(max,h1);
-			CommonOps.divide(max,h2);
+			CommonOps.divide(h1,max);
+			CommonOps.divide(h2,max);
 
 			// compute elements of A
 			computeV_NoSkew(h1, h2, v12);
@@ -257,7 +257,7 @@ public class Zhang99CalibrationMatrixFromHomographies {
 	 */
 	private void computeParam() {
 		// reduce overflow/underflow
-		CommonOps.divide(CommonOps.elementMaxAbs(b),b);
+		CommonOps.divide(b,CommonOps.elementMaxAbs(b));
 
 		double B11 = b.get(0,0);
 		double B12 = b.get(1,0);
@@ -292,7 +292,7 @@ public class Zhang99CalibrationMatrixFromHomographies {
 	 */
 	private void computeParam_ZeroSkew() {
 		// reduce overflow/underflow
-		CommonOps.divide(CommonOps.elementMaxAbs(b),b);
+		CommonOps.divide(b,CommonOps.elementMaxAbs(b));
 
 		double B11 = b.get(0,0);
 		double B22 = b.get(1,0);

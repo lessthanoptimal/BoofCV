@@ -698,7 +698,7 @@ public class MultiViewOps {
 		DenseMatrix64F H = new DenseMatrix64F(3,3);
 
 		GeometryMath_F64.outerProd(T,N,H);
-		CommonOps.divide(d,H);
+		CommonOps.divide(H,d);
 		CommonOps.addEquals(H, R);
 
 		return H;

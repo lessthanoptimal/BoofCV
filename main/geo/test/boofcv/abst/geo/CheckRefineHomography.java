@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -53,8 +53,8 @@ public abstract class CheckRefineHomography extends CommonHomographyChecks {
 		assertTrue(alg.fitModel(pairs, H, found));
 
 		// normalize so that they are the same
-		CommonOps.divide(H.get(2, 2), H);
-		CommonOps.divide(found.get(2, 2), found);
+		CommonOps.divide(H,H.get(2, 2));
+		CommonOps.divide(found,found.get(2, 2));
 
 		assertTrue(MatrixFeatures.isEquals(H, found, 1e-8));
 	}
@@ -76,9 +76,9 @@ public abstract class CheckRefineHomography extends CommonHomographyChecks {
 		assertTrue(alg.fitModel(pairs, Hmod, found));
 
 		// normalize to allow comparison
-		CommonOps.divide(H.get(2,2),H);
-		CommonOps.divide(Hmod.get(2,2),Hmod);
-		CommonOps.divide(found.get(2,2),found);
+		CommonOps.divide(H,H.get(2,2));
+		CommonOps.divide(Hmod,Hmod.get(2,2));
+		CommonOps.divide(found,found.get(2,2));
 
 		double error0 = 0;
 		double error1 = 0;

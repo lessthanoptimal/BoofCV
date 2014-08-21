@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -58,8 +58,8 @@ public abstract class CheckRefineFundamental extends EpipolarTestSimulation {
 		assertTrue(alg.fitModel(pairs, E, found));
 
 		// normalize so that they are the same
-		CommonOps.divide(E.get(2, 2), E);
-		CommonOps.divide(found.get(2,2),found);
+		CommonOps.divide(E,E.get(2, 2));
+		CommonOps.divide(found,found.get(2,2));
 
 		assertTrue(MatrixFeatures.isEquals(E, found, 1e-8));
 	}
@@ -82,9 +82,9 @@ public abstract class CheckRefineFundamental extends EpipolarTestSimulation {
 		assertTrue(alg.fitModel(pairs, Emod, found));
 
 		// normalize to allow comparison
-		CommonOps.divide(E.get(2,2),E);
-		CommonOps.divide(Emod.get(2,2),Emod);
-		CommonOps.divide(found.get(2,2),found);
+		CommonOps.divide(E,E.get(2,2));
+		CommonOps.divide(Emod,Emod.get(2,2));
+		CommonOps.divide(found,found.get(2,2));
 
 		double error0 = 0;
 		double error1 = 0;

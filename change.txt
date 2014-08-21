@@ -48,6 +48,7 @@ TODO
   Suggested by David G Ortega
 - Check to see if a square in fiducial is concave and discard
 - Improve stability of fiducials
+  * Optimize to minimize reprojection errors? Quad corners?  Edges?
 - Look at using poly fit in calibration detection routines
 
 ---------------------------------------------

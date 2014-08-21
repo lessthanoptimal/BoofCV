@@ -70,7 +70,7 @@ public class AdjustHomographyMatrix {
 		Arrays.sort(svd.getSingularValues(), 0, 3);
 
 		double scale = svd.getSingularValues()[1];
-		CommonOps.divide(scale, H);
+		CommonOps.divide(H,scale);
 
 		return true;
 	}
