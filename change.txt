@@ -37,6 +37,9 @@ Version : Alpha 0.18
 - Fiducial Detector
   * Square-Binary. Encodes 4096 numbers
   * Square-Image. Detects arbitrary image fiducials contained inside a square.
+- Fixed bug in ColorHsv for multi-spectral images
+  * Was missing a check to see if saturation was zero
+  * Thanks sandreas for reporting the bug
 
 TODO
 - BlurImageOps.mean() and gaussian() UInt8 images.
@@ -50,6 +53,7 @@ TODO
 - Improve stability of fiducials
   * Optimize to minimize reprojection errors? Quad corners?  Edges?
 - Look at using poly fit in calibration detection routines
+- Convolution example?
 
 ---------------------------------------------
 Date    : 2014/6/19

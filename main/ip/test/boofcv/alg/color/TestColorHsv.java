@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,6 +26,7 @@ import org.junit.Test;
 import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
 /**
  * @author Peter Abeles
@@ -50,6 +51,7 @@ public class TestColorHsv {
 		check(0.5, 0.5, 0.5);
 		check(0.25, 0.5, 0.75);
 		check(0.8, 0.1, 0.75);
+		check(151, 151, 151);
 
 		for( int i = 0; i < 50; i++ ) {
 			double r = rand.nextDouble();
@@ -89,16 +91,28 @@ public class TestColorHsv {
 		MultiSpectral<ImageFloat32> hsv = new MultiSpectral<ImageFloat32>(ImageFloat32.class,10,15,3);
 		MultiSpectral<ImageFloat32> found = new MultiSpectral<ImageFloat32>(ImageFloat32.class,10,15,3);
 
-		GImageMiscOps.fillUniform(rgb, rand, 0, 1);
+		GImageMiscOps.fillUniform(rgb, rand, 0, 255);
 
-		ColorHsv.hsvToRgb_F32(rgb,hsv);
-		ColorHsv.rgbToHsv_F32(hsv, found);
+		// insert a specific code which was found to fail
+		for (int i = 0; i < 3; i++) {
+			rgb.getBand(i).set(0,0,151);
+		}
+
+		ColorHsv.rgbToHsv_F32(rgb, hsv);
+		ColorHsv.hsvToRgb_F32(hsv, found);
+
+		float tmp[] = new float[3];
 
 		for( int y = 0; y < rgb.height; y++ ) {
 			for( int x = 0; x < rgb.width; x++ ) {
 				float r = rgb.getBand(0).get(x,y);
 				float g = rgb.getBand(1).get(x,y);
 				float b = rgb.getBand(2).get(x,y);
+
+				ColorHsv.rgbToHsv(r,g,b,tmp);
+				for (int i = 0; i < 3; i++) {
+					assertEquals(tmp[i], hsv.getBand(i).unsafe_get(x, y), tol);
+				}
 
 				assertEquals(r,found.getBand(0).get(x,y),tol);
 				assertEquals(g,found.getBand(1).get(x,y),tol);
@@ -110,6 +124,9 @@ public class TestColorHsv {
 	private static void check( double found[] , double a , double b , double c ) {
 		double tol = TestColorHsv.tol * Math.max(Math.max(a,b),c);
 
+		for (int i = 0; i < found.length; i++) {
+			assertFalse(Double.isNaN(found[i]));
+		}
 		assertEquals(a,found[0],tol);
 		assertEquals(b,found[1],tol);
 		assertEquals(c,found[2],tol);
