@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -261,15 +261,21 @@ public class ColorHsv {
 		ImageFloat32 B = rgb.getBand(2);
 
 		for( int row = 0; row < hsv.height; row++ ) {
-			int indexYuv = hsv.startIndex + row*hsv.stride;
+			int indexHsv = hsv.startIndex + row*hsv.stride;
 			int indexRgb = rgb.startIndex + row*rgb.stride;
 
-			for( int col = 0; col < hsv.width; col++ , indexYuv++ , indexRgb++) {
-				float h = H.data[indexRgb];
-				float s = S.data[indexRgb];
-				float v = V.data[indexRgb];
+			for( int col = 0; col < hsv.width; col++ , indexHsv++ , indexRgb++) {
+				float h = H.data[indexHsv];
+				float s = S.data[indexHsv];
+				float v = V.data[indexHsv];
 
-				h /= d60_F64;
+				if( s == 0 ) {
+					R.data[indexRgb] = v;
+					G.data[indexRgb] = v;
+					B.data[indexRgb] = v;
+					continue;
+				}
+				h /= d60_F32;
 				int h_int = (int)h;
 				float remainder = h - h_int;
 				float p = v * ( 1 - s );
