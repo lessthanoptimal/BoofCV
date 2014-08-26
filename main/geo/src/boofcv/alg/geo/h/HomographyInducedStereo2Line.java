@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -150,7 +150,7 @@ public class HomographyInducedStereo2Line {
 
 		// H = A - e2*v^T
 		GeometryMath_F64.outerProd(e2,v,av);
-		CommonOps.sub(A,av,H);
+		CommonOps.subtract(A, av, H);
 
 		// pick a good scale and sign for H
 		adjust.adjust(H, line0);

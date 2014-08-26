@@ -209,7 +209,7 @@ public class DecomposeHomography {
 		CommonOps.multTransB(W,U,se.getR());
 		GeometryMath_F64.cross(v2,u,N);
 
-		CommonOps.sub(H, se.getR(),tempM);
+		CommonOps.subtract(H, se.getR(), tempM);
 		GeometryMath_F64.mult(tempM,N,se.getT());
 	}
 
