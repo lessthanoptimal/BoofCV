@@ -158,7 +158,7 @@ public class Zhang99CalibrationMatrixFromHomographies {
 			computeV(h1, h1, v11);
 			computeV(h2, h2, v22);
 
-			CommonOps.sub(v11,v22,v11m22);
+			CommonOps.subtract(v11, v22, v11m22);
 
 			CommonOps.insert( v12    , A, i*2   , 0);
 			CommonOps.insert( v11m22 , A, i*2+1 , 0);
@@ -203,7 +203,7 @@ public class Zhang99CalibrationMatrixFromHomographies {
 			computeV_NoSkew(h1, h1, v11);
 			computeV_NoSkew(h2, h2, v22);
 
-			CommonOps.sub(v11,v22,v11m22);
+			CommonOps.subtract(v11, v22, v11m22);
 
 			CommonOps.insert( v12    , A, i*2   , 0);
 			CommonOps.insert( v11m22 , A, i*2+1 , 0);
