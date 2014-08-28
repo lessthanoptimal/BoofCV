@@ -32,12 +32,21 @@ import boofcv.factory.filter.binary.FactoryThresholdBinary;
 import boofcv.struct.image.ImageSingleBand;
 
 /**
+ * Factory for creating fiducial detectors which implement {@link FiducialDetector}.
+ *
  * @author Peter Abeles
  */
-// TODO debugging.  Show all detected quads in an image
-// TODO add calibration targets here
 public class FactoryFiducial {
 
+	/**
+	 * Fast detector for square binary based fiducials.  The speed increase comes from using a simple
+	 * threshold and is not lighting invariant.
+	 *
+	 * @param config Description of the fiducial.  Can't be null.
+	 * @param binaryThreshold Threshold for binary image.
+	 * @param imageType Type of image it's processing
+	 * @return FiducialDetector
+	 */
 	public static <T extends ImageSingleBand>
 	FiducialDetector<T> squareBinaryFast( ConfigFiducialBinary config,
 										  int binaryThreshold ,
@@ -52,6 +61,14 @@ public class FactoryFiducial {
 		return new SquareBinary_to_FiducialDetector<T>(alg,config.targetWidth);
 	}
 
+	/**
+	 * Robust detector for square image based fiducials.  Lighting invariant detector
+	 *
+	 * @param config Description of the fiducial.  Can't be null.
+	 * @param thresholdRadius Size of the radius used for adaptive thresholding.  For 640x480 image try radius of 6.
+	 * @param imageType Type of image it's processing
+	 * @return FiducialDetector
+	 */
 	public static  <T extends ImageSingleBand>
 	FiducialDetector<T> squareBinaryRobust( ConfigFiducialBinary config,
 											int thresholdRadius,
@@ -65,6 +82,15 @@ public class FactoryFiducial {
 		return new SquareBinary_to_FiducialDetector<T>(alg,config.targetWidth);
 	}
 
+	/**
+	 * Fast detector for square image based fiducials.  The speed increase comes from using a simple
+	 * threshold and is not lighting invariant.
+	 *
+	 * @param config Description of the fiducial.  Can't be null.
+	 * @param binaryThreshold Threshold for binary image.
+	 * @param imageType Type of image it's processing
+	 * @return FiducialDetector
+	 */
 	public static  <T extends ImageSingleBand>
 	SquareImage_to_FiducialDetector<T> squareImageFast( ConfigFiducialImage config,
 														int binaryThreshold,
@@ -78,6 +104,14 @@ public class FactoryFiducial {
 		return new SquareImage_to_FiducialDetector<T>(alg,config.targetWidth);
 	}
 
+	/**
+	 * Robust detector for square image based fiducials.  Lighting invariant detector
+	 *
+	 * @param config Description of the fiducial.  Can't be null.
+	 * @param thresholdRadius Size of the radius used for adaptive thresholding.  For 640x480 image try radius of 6.
+	 * @param imageType Type of image it's processing
+	 * @return FiducialDetector
+	 */
 	public static  <T extends ImageSingleBand>
 	SquareImage_to_FiducialDetector<T> squareImageRobust( ConfigFiducialImage config,
 														  int thresholdRadius,
@@ -91,11 +125,27 @@ public class FactoryFiducial {
 		return new SquareImage_to_FiducialDetector<T>(alg,config.targetWidth);
 	}
 
+	/**
+	 * Wrapper around chessboard calibration detector.
+	 *
+	 * @param config Description of the chessboard.
+	 * @param sizeOfSquares Physical size of each square.
+	 * @param imageType Type of image it's processing
+	 * @return FiducialDetector
+	 */
 	public static <T extends ImageSingleBand>
 	CalibrationFiducialDetector<T> calibChessboard( ConfigChessboard config, double sizeOfSquares,Class<T> imageType) {
 		return new CalibrationFiducialDetector<T>(config,sizeOfSquares,imageType);
 	}
 
+	/**
+	 * Wrapper around square-grid calibration detector.
+	 *
+	 * @param config Description of the chessboard.
+	 * @param sizeOfSquares Physical size of each square.
+	 * @param imageType Type of image it's processing
+	 * @return FiducialDetector
+	 */
 	public static <T extends ImageSingleBand>
 	CalibrationFiducialDetector<T> calibSquareGrid( ConfigSquareGrid config, double sizeOfSquares,Class<T> imageType) {
 		return new CalibrationFiducialDetector<T>(config,sizeOfSquares,imageType);

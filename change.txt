@@ -40,6 +40,8 @@ Version : Alpha 0.18
 - Fixed bug in ColorHsv for multi-spectral images
   * Was missing a check to see if saturation was zero
   * Thanks sandreas for reporting the bug
+- GConvolveImageOps
+  * Fixed generics so it wasn't forcing input and output to be the same type
 
 TODO
 - BlurImageOps.mean() and gaussian() UInt8 images.

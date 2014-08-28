@@ -38,8 +38,8 @@ public class GConvolveImageOps {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 * @param border How the image borders are handled.
 	 */
-	public static <T extends ImageSingleBand, K extends Kernel1D, B extends ImageBorder<T>>
-	void horizontal(K kernel, T input, T output , B border ) {
+	public static <In extends ImageSingleBand, Out extends ImageSingleBand, K extends Kernel1D, B extends ImageBorder<In>>
+	void horizontal(K kernel, In input, Out output , B border ) {
 		if( input instanceof ImageFloat32 ) {
 			ConvolveWithBorder.horizontal((Kernel1D_F32)kernel,(ImageFloat32)input,(ImageFloat32)output,(ImageBorder_F32)border);
 		} else if( input instanceof ImageUInt8 ) {
@@ -63,8 +63,8 @@ public class GConvolveImageOps {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 * @param border How the image borders are handled.
 	 */
-	public static <T extends ImageSingleBand, K extends Kernel1D, B extends ImageBorder<T>>
-	void vertical(K kernel, T input, T output , B border ) {
+	public static <In extends ImageSingleBand, Out extends ImageSingleBand, K extends Kernel1D, B extends ImageBorder<In>>
+	void vertical(K kernel, In input, Out output , B border ) {
 		if( input instanceof ImageFloat32 ) {
 			ConvolveWithBorder.vertical((Kernel1D_F32) kernel, (ImageFloat32) input, (ImageFloat32) output, (ImageBorder_F32) border);
 		} else if( input instanceof ImageUInt8 ) {
@@ -88,8 +88,8 @@ public class GConvolveImageOps {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 * @param border How the image borders are handled.
 	 */
-	public static <T extends ImageSingleBand, K extends Kernel2D, B extends ImageBorder<T>>
-	void convolve(K kernel, T input, T output , B border ) {
+	public static <In extends ImageSingleBand, Out extends ImageSingleBand, K extends Kernel2D, B extends ImageBorder<In>>
+	void convolve(K kernel, In input, Out output , B border ) {
 		if( input instanceof ImageFloat32 ) {
 			ConvolveWithBorder.convolve((Kernel2D_F32) kernel, (ImageFloat32) input, (ImageFloat32) output, (ImageBorder_F32) border);
 		} else if( input instanceof ImageUInt8 ) {
@@ -111,8 +111,8 @@ public class GConvolveImageOps {
 	 * @param output Where the resulting image is written to. Modified.
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
-	public static <T extends ImageSingleBand, K extends Kernel1D>
-	void horizontal(K kernel, T input, T output ) {
+	public static <In extends ImageSingleBand, Out extends ImageSingleBand, K extends Kernel1D>
+	void horizontal(K kernel, In input, In output ) {
 		if( input instanceof ImageFloat32 ) {
 			ConvolveImageNoBorder.horizontal((Kernel1D_F32)kernel,(ImageFloat32)input,(ImageFloat32)output);
 		} else if( input instanceof ImageUInt8 ) {
@@ -134,8 +134,8 @@ public class GConvolveImageOps {
 	 * @param output Where the resulting image is written to. Modified.
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
-	public static <T extends ImageSingleBand, K extends Kernel1D>
-	void vertical(K kernel, T input, T output ) {
+	public static <In extends ImageSingleBand, Out extends ImageSingleBand, K extends Kernel1D>
+	void vertical(K kernel, In input, Out output ) {
 		if( input instanceof ImageFloat32 ) {
 			ConvolveImageNoBorder.vertical((Kernel1D_F32) kernel, (ImageFloat32) input, (ImageFloat32) output);
 		} else if( input instanceof ImageUInt8 ) {
@@ -157,8 +157,8 @@ public class GConvolveImageOps {
 	 * @param input  The source image that is to be convolved
 	 * @param output   The results of the convolution
 	 */
-	public static <T extends ImageSingleBand, K extends Kernel2D>
-	void convolve(K kernel, T input, T output ) {
+	public static <In extends ImageSingleBand, Out extends ImageSingleBand, K extends Kernel2D>
+	void convolve(K kernel, In input, Out output ) {
 		if( input instanceof ImageFloat32 ) {
 			ConvolveImageNoBorder.convolve((Kernel2D_F32) kernel, (ImageFloat32) input, (ImageFloat32) output);
 		} else if( input instanceof ImageUInt8 ) {
@@ -181,8 +181,8 @@ public class GConvolveImageOps {
 	 * @param output	 Where the resulting image is written to. Modified.
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
-	public static <T extends ImageSingleBand, K extends Kernel1D>
-	void horizontalNormalized(K kernel, T input, T output ) {
+	public static <In extends ImageSingleBand, Out extends ImageSingleBand, K extends Kernel1D>
+	void horizontalNormalized(K kernel, In input, Out output ) {
 		if( input instanceof ImageFloat32 ) {
 			ConvolveNormalized.horizontal((Kernel1D_F32)kernel,(ImageFloat32)input,(ImageFloat32)output);
 		} else if( input instanceof ImageUInt8 ) {

@@ -104,6 +104,7 @@ public class VisualizeImageData {
 	}
 
 	private static BufferedImage colorizeSign(ImageInteger src, BufferedImage dst, int normalize) {
+		dst = checkInputs(src, dst);
 
 		for (int y = 0; y < src.height; y++) {
 			for (int x = 0; x < src.width; x++) {

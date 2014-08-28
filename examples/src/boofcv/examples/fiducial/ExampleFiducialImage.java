@@ -48,6 +48,7 @@ public class ExampleFiducialImage {
 		// load the lens distortion parameters and the input image
 		IntrinsicParameters param = UtilIO.loadXML(directory + "intrinsic.xml");
 		ImageFloat32 dog = UtilImageIO.loadImage(directory + "dog.png",ImageFloat32.class);
+		ImageFloat32 text = UtilImageIO.loadImage(directory + "text.png",ImageFloat32.class);
 		BufferedImage input = UtilImageIO.loadImage(directory + "view01.jpg");
 		ImageFloat32 original = ConvertBufferedImage.convertFrom(input,true, ImageType.single(ImageFloat32.class));
 
@@ -59,6 +60,7 @@ public class ExampleFiducialImage {
 
 		// give it a description of all the targets
 		detector.addTarget(dog, 125);
+//		detector.addTarget(text, 125); // uncomment to detect the text target
 
 		detector.setIntrinsic(param);
 

@@ -87,7 +87,7 @@ public class FactoryKernelGaussian {
 	K gaussian2D(Class<T> imageType, double sigma, int radius )
 	{
 		boolean isFloat = GeneralizedImageOps.isFloatingPoint(imageType);
-		int numBits = GeneralizedImageOps.getNumBits(imageType);
+		int numBits = Math.max(32, GeneralizedImageOps.getNumBits(imageType));
 		return gaussian(2,isFloat, numBits, sigma,radius);
 	}
 
