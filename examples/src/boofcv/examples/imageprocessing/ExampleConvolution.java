@@ -90,11 +90,13 @@ public class ExampleConvolution {
 	}
 
 	/**
-	 * Convolves a 2D normalized kernel.  This kernel is divided by its sum after completion.
+	 * Convolves a 2D normalized kernel.  This kernel is divided by its sum after computation.
 	 */
 	private static void normalize2D(ImageUInt8 gray) {
 		// Create a Gaussian kernel with radius of 3
 		Kernel2D_I32 kernel = FactoryKernelGaussian.gaussian2D(ImageUInt8.class, -1, 3);
+		// Note that there is a more efficient way to compute this convolution since it is a separable kernel
+		// just use BlurImageOps instead.
 
 		// Since it's normalized it can be saved inside an 8bit image
 		ImageUInt8 output = new ImageUInt8(gray.width,gray.height);

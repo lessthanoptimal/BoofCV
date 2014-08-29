@@ -28,6 +28,7 @@ import boofcv.struct.convolve.Kernel1D_F32;
 import boofcv.struct.convolve.Kernel1D_I32;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSInt16;
+import boofcv.struct.image.ImageUInt16;
 import boofcv.struct.image.ImageUInt8;
 
 import java.util.Random;
@@ -48,6 +49,7 @@ public class BenchmarkConvolveMean {
 	static private ImageFloat32 storageF32 = new ImageFloat32(width,height);
 	static private Kernel1D_I32 kernelI32;
 	static private ImageUInt8 input_I8 = new ImageUInt8(width,height);
+	static private ImageUInt16 input_U16 = new ImageUInt16(width,height);
 	static private ImageSInt16 input_I16 = new ImageSInt16(width,height);
 	static private ImageUInt8 out_I8 = new ImageUInt8(width,height);
 
@@ -59,6 +61,7 @@ public class BenchmarkConvolveMean {
 
 	public BenchmarkConvolveMean() {
 		ImageMiscOps.fillUniform(input_I8,rand,0,20);
+		ImageMiscOps.fillUniform(input_U16,rand,0,20);
 		ImageMiscOps.fillUniform(input_I16,rand,0,20);
 		ImageMiscOps.fillUniform(input_F32,rand,0,20);
 	}
@@ -83,7 +86,7 @@ public class BenchmarkConvolveMean {
 
 	public int timeMean_U8_I8_Vertical(int reps) {
 		for( int i = 0; i < reps; i++ )
-			ImplConvolveMean.vertical(input_I8, out_I8, radius);
+			ImplConvolveMean.vertical(input_U16, out_I8, radius);
 		return 0;
 	}
 

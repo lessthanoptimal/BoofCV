@@ -42,6 +42,10 @@ Version : Alpha 0.18
   * Thanks sandreas for reporting the bug
 - GConvolveImageOps
   * Fixed generics so it wasn't forcing input and output to be the same type
+- Added ExampleConvolution
+- Convolution
+  * ConvolveNormalizedNaive correctly handles offsets in the kernel
+  * ConvolveNormalizedNaive has new vertical which divides with horizontal weights taken in account
 
 TODO
 - BlurImageOps.mean() and gaussian() UInt8 images.

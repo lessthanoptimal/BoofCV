@@ -25,6 +25,7 @@ import boofcv.misc.PerformerBase;
 import boofcv.misc.ProfileOperation;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSInt32;
+import boofcv.struct.image.ImageUInt16;
 import boofcv.struct.image.ImageUInt8;
 
 import java.util.Random;
@@ -44,7 +45,7 @@ public class BenchmarkThresholding {
 	static ImageSInt32 output_S32 = new ImageSInt32(imgWidth, imgHeight);
 	static ImageUInt8 output_U8 = new ImageUInt8(imgWidth, imgHeight);
 	static ImageUInt8 work = new ImageUInt8(imgWidth, imgHeight);
-	static ImageUInt8 work2 = new ImageUInt8(imgWidth, imgHeight);
+	static ImageUInt16 work2 = new ImageUInt16(imgWidth, imgHeight);
 
 	static int threshLower = 20;
 	static int threshUpper = 30;

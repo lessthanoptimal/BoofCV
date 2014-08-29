@@ -41,22 +41,24 @@ public class GenerateConvolveImageStandard extends CodeGeneratorBase {
 	String typeCast;
 	String bitWise;
 	boolean hasDivide;
-	boolean hasBound;
+	boolean hasBound = false; // should delete this code if it's never needed
 
 	@Override
 	public void generate()throws FileNotFoundException {
 		printPreamble();
-		printAllOps(AutoTypeImage.F32, AutoTypeImage.F32, false, false);
+		printAllOps(AutoTypeImage.F32, AutoTypeImage.F32, false);
 //		printAllOps(AutoTypeImage.F32, AutoTypeImage.F32, false, true);
-		printAllOps(AutoTypeImage.F64, AutoTypeImage.F64, false, false);
-		printAllOps(AutoTypeImage.U8, AutoTypeImage.I16, false, false);
-		printAllOps(AutoTypeImage.U8, AutoTypeImage.S32, false, false);
-		printAllOps(AutoTypeImage.S16,AutoTypeImage.I16,false, false);
-		printAllOps(AutoTypeImage.U8,AutoTypeImage.I8,true, false);
+		printAllOps(AutoTypeImage.F64, AutoTypeImage.F64, false);
+		printAllOps(AutoTypeImage.U8, AutoTypeImage.I16, false);
+		printAllOps(AutoTypeImage.U8, AutoTypeImage.S32, false);
+		printAllOps(AutoTypeImage.U16,AutoTypeImage.I8, true,true);
+		printAllOps(AutoTypeImage.S16,AutoTypeImage.I16,false);
+		printAllOps(AutoTypeImage.U8,AutoTypeImage.I8,true);
 //		printAllOps(AutoTypeImage.U8,AutoTypeImage.I8,false, true);
-		printAllOps(AutoTypeImage.S16,AutoTypeImage.I16,true, false);
-		printAllOps(AutoTypeImage.S32,AutoTypeImage.S32,false, false);
-		printAllOps(AutoTypeImage.S32,AutoTypeImage.S32,true, false);
+		printAllOps(AutoTypeImage.S16,AutoTypeImage.I16,true);
+		printAllOps(AutoTypeImage.S32,AutoTypeImage.I16,true,true);
+		printAllOps(AutoTypeImage.S32,AutoTypeImage.S32,false);
+		printAllOps(AutoTypeImage.S32,AutoTypeImage.S32,true);
 
 		out.println("}");
 	}
@@ -82,7 +84,13 @@ public class GenerateConvolveImageStandard extends CodeGeneratorBase {
 				"public class " + className + " {\n\n");
 	}
 
-	private void printAllOps(AutoTypeImage input, AutoTypeImage output, boolean hasDivide, boolean hasBound)
+	private void printAllOps(AutoTypeImage input, AutoTypeImage output, boolean hasDivide)
+	{
+		printAllOps(input,output,hasDivide,false);
+	}
+
+	private void printAllOps(AutoTypeImage input, AutoTypeImage output, boolean hasDivide,
+							 boolean justVertical )
 	{
 		boolean isInteger = input.isInteger();
 		boolean is64 = input.getNumBits()==64;
@@ -99,11 +107,15 @@ public class GenerateConvolveImageStandard extends CodeGeneratorBase {
 		this.hasDivide = hasDivide;
 		this.hasBound = hasBound;
 
-		if( !hasBound ) {
-			printHorizontal();
+		if( justVertical ) {
 			printVertical();
+		} else {
+			if (!hasBound) {
+				printHorizontal();
+				printVertical();
+			}
+			printConvolve2D();
 		}
-		printConvolve2D();
 	}
 
 	private void printHorizontal() {

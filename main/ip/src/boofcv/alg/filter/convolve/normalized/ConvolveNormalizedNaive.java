@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -15,7 +15,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package boofcv.alg.filter.convolve.normalized;
 
 import boofcv.struct.convolve.Kernel1D_F32;
@@ -38,7 +37,7 @@ public class ConvolveNormalizedNaive {
 
 	public static void horizontal(Kernel1D_F32 kernel, ImageFloat32 input, ImageFloat32 output ) {
 
-		final int radius = kernel.getRadius();
+		final int offset = kernel.getOffset();
 
 		final int width = input.getWidth();
 		final int height = input.getHeight();
@@ -46,27 +45,27 @@ public class ConvolveNormalizedNaive {
 		for (int y = 0; y < height; y++) {
 			for( int x = 0; x < width; x++ ) {
 				float total = 0;
-				float div = 0;
+				float weight = 0;
 
-				int startX = x - radius;
-				int endX = x + radius;
+				int startX = x - offset;
+				int endX = startX+kernel.getWidth();
 
 				if( startX < 0 ) startX = 0;
 				if( endX >= width ) endX = width-1;
 
 				for( int j = startX; j <= endX; j++ ) {
-					float v = kernel.get(j-x+radius);
+					float v = kernel.get(j-x+offset);
 					total += input.get(j,y)*v;
-					div += v;
+					weight += v;
 				}
-				output.set(x,y, total/div );
+				output.set(x,y, total/weight );
 			}
 		}
 	}
 
 	public static void vertical(Kernel1D_F32 kernel, ImageFloat32 input, ImageFloat32 output ) {
 
-		final int radius = kernel.getRadius();
+		final int offset = kernel.getOffset();
 
 		final int width = input.getWidth();
 		final int height = input.getHeight();
@@ -74,27 +73,27 @@ public class ConvolveNormalizedNaive {
 		for (int y = 0; y < height; y++) {
 			for( int x = 0; x < width; x++ ) {
 				float total = 0;
-				float div = 0;
+				float weight = 0;
 
-				int startY = y - radius;
-				int endY = y + radius;
+				int startY = y - offset;
+				int endY = startY + kernel.getWidth();
 
 				if( startY < 0 ) startY = 0;
 				if( endY >= height ) endY = height-1;
 
 				for( int i = startY; i <= endY; i++ ) {
-					float v = kernel.get(i-y+radius);
+					float v = kernel.get(i-y+offset);
 					total += input.get(x,i)*v;
-					div += v;
+					weight += v;
 				}
-				output.set(x,y, total/div );
+				output.set(x,y, total/weight );
 			}
 		}
 	}
 
 	public static void convolve(Kernel2D_F32 kernel, ImageFloat32 input, ImageFloat32 output ) {
 
-		final int radius = kernel.getRadius();
+		final int offset = kernel.getOffset();
 
 		final int width = input.getWidth();
 		final int height = input.getHeight();
@@ -102,36 +101,36 @@ public class ConvolveNormalizedNaive {
 		for (int y = 0; y < height; y++) {
 			for( int x = 0; x < width; x++ ) {
 
-				int startX = x - radius;
-				int endX = x + radius;
+				int startX = x - offset;
+				int endX = startX + kernel.getWidth();
 
 				if( startX < 0 ) startX = 0;
 				if( endX >= width ) endX = width-1;
 
-				int startY = y - radius;
-				int endY = y + radius;
+				int startY = y - offset;
+				int endY = startY + kernel.getWidth();
 
 				if( startY < 0 ) startY = 0;
 				if( endY >= height ) endY = height-1;
 
 				float total = 0;
-				float div = 0;
+				float weight = 0;
 
 				for( int i = startY; i <= endY; i++ ) {
 					for( int j = startX; j <= endX; j++ ) {
-						float v = kernel.get(j-x+radius,i-y+radius);
+						float v = kernel.get(j-x+offset,i-y+offset);
 						total += input.get(j,i)*v;
-						div += v;
+						weight += v;
 					}
 				}
-				output.set(x,y, total/div );
+				output.set(x,y, total/weight );
 			}
 		}
 	}
 
 	public static void horizontal(Kernel1D_I32 kernel, ImageUInt8 input, ImageInt8 output ) {
 
-		final int radius = kernel.getRadius();
+		final int offset = kernel.getOffset();
 
 		final int width = input.getWidth();
 		final int height = input.getHeight();
@@ -139,27 +138,27 @@ public class ConvolveNormalizedNaive {
 		for (int y = 0; y < height; y++) {
 			for( int x = 0; x < width; x++ ) {
 				int total = 0;
-				int div = 0;
+				int weight = 0;
 
-				int startX = x - radius;
-				int endX = x + radius;
+				int startX = x - offset;
+				int endX = startX+kernel.getWidth();
 
 				if( startX < 0 ) startX = 0;
 				if( endX >= width ) endX = width-1;
 
 				for( int j = startX; j <= endX; j++ ) {
-					int v = kernel.get(j-x+radius);
+					int v = kernel.get(j-x+offset);
 					total += input.get(j,y)*v;
-					div += v;
+					weight += v;
 				}
-				output.set(x,y, (total+div/2)/div );
+				output.set(x,y, (total+weight/2)/weight );
 			}
 		}
 	}
 
 	public static void vertical(Kernel1D_I32 kernel, ImageUInt8 input, ImageInt8 output ) {
 
-		final int radius = kernel.getRadius();
+		final int offset = kernel.getOffset();
 
 		final int width = input.getWidth();
 		final int height = input.getHeight();
@@ -167,27 +166,27 @@ public class ConvolveNormalizedNaive {
 		for (int y = 0; y < height; y++) {
 			for( int x = 0; x < width; x++ ) {
 				int total = 0;
-				int div = 0;
+				int weight = 0;
 
-				int startY = y - radius;
-				int endY = y + radius;
+				int startY = y - offset;
+				int endY = startY + kernel.getWidth();
 
 				if( startY < 0 ) startY = 0;
 				if( endY >= height ) endY = height-1;
 
 				for( int i = startY; i <= endY; i++ ) {
-					int v = kernel.get(i-y+radius);
+					int v = kernel.get(i-y+offset);
 					total += input.get(x,i)*v;
-					div += v;
+					weight += v;
 				}
-				output.set(x,y, (total+div/2)/div );
+				output.set(x,y, (total+weight/2)/weight );
 			}
 		}
 	}
 
 	public static void convolve(Kernel2D_I32 kernel, ImageUInt8 input, ImageInt8 output ) {
 
-		final int radius = kernel.getRadius();
+		final int offset = kernel.getOffset();
 
 		final int width = input.getWidth();
 		final int height = input.getHeight();
@@ -195,36 +194,36 @@ public class ConvolveNormalizedNaive {
 		for (int y = 0; y < height; y++) {
 			for( int x = 0; x < width; x++ ) {
 
-				int startX = x - radius;
-				int endX = x + radius;
+				int startX = x - offset;
+				int endX = startX + kernel.getWidth();
 
 				if( startX < 0 ) startX = 0;
 				if( endX >= width ) endX = width-1;
 
-				int startY = y - radius;
-				int endY = y + radius;
+				int startY = y - offset;
+				int endY = startY + kernel.getWidth();
 
 				if( startY < 0 ) startY = 0;
 				if( endY >= height ) endY = height-1;
 
 				int total = 0;
-				int div = 0;
+				int weight = 0;
 
 				for( int i = startY; i <= endY; i++ ) {
 					for( int j = startX; j <= endX; j++ ) {
-						int v = kernel.get(j-x+radius,i-y+radius);
+						int v = kernel.get(j-x+offset,i-y+offset);
 						total += input.get(j,i)*v;
-						div += v;
+						weight += v;
 					}
 				}
-				output.set(x,y, (total+div/2)/div );
+				output.set(x,y, (total+weight/2)/weight );
 			}
 		}
 	}
 
 	public static void horizontal(Kernel1D_I32 kernel, ImageSInt16 input, ImageInt16 output ) {
 
-		final int radius = kernel.getRadius();
+		final int offset = kernel.getOffset();
 
 		final int width = input.getWidth();
 		final int height = input.getHeight();
@@ -232,27 +231,27 @@ public class ConvolveNormalizedNaive {
 		for (int y = 0; y < height; y++) {
 			for( int x = 0; x < width; x++ ) {
 				int total = 0;
-				int div = 0;
+				int weight = 0;
 
-				int startX = x - radius;
-				int endX = x + radius;
+				int startX = x - offset;
+				int endX = startX+kernel.getWidth();
 
 				if( startX < 0 ) startX = 0;
 				if( endX >= width ) endX = width-1;
 
 				for( int j = startX; j <= endX; j++ ) {
-					int v = kernel.get(j-x+radius);
+					int v = kernel.get(j-x+offset);
 					total += input.get(j,y)*v;
-					div += v;
+					weight += v;
 				}
-				output.set(x,y, (total+div/2)/div );
+				output.set(x,y, (total+weight/2)/weight );
 			}
 		}
 	}
 
 	public static void vertical(Kernel1D_I32 kernel, ImageSInt16 input, ImageInt16 output ) {
 
-		final int radius = kernel.getRadius();
+		final int offset = kernel.getOffset();
 
 		final int width = input.getWidth();
 		final int height = input.getHeight();
@@ -260,27 +259,27 @@ public class ConvolveNormalizedNaive {
 		for (int y = 0; y < height; y++) {
 			for( int x = 0; x < width; x++ ) {
 				int total = 0;
-				int div = 0;
+				int weight = 0;
 
-				int startY = y - radius;
-				int endY = y + radius;
+				int startY = y - offset;
+				int endY = startY + kernel.getWidth();
 
 				if( startY < 0 ) startY = 0;
 				if( endY >= height ) endY = height-1;
 
 				for( int i = startY; i <= endY; i++ ) {
-					int v = kernel.get(i-y+radius);
+					int v = kernel.get(i-y+offset);
 					total += input.get(x,i)*v;
-					div += v;
+					weight += v;
 				}
-				output.set(x,y, (total+div/2)/div );
+				output.set(x,y, (total+weight/2)/weight );
 			}
 		}
 	}
 
 	public static void convolve(Kernel2D_I32 kernel, ImageSInt16 input, ImageInt16 output ) {
 
-		final int radius = kernel.getRadius();
+		final int offset = kernel.getOffset();
 
 		final int width = input.getWidth();
 		final int height = input.getHeight();
@@ -288,36 +287,36 @@ public class ConvolveNormalizedNaive {
 		for (int y = 0; y < height; y++) {
 			for( int x = 0; x < width; x++ ) {
 
-				int startX = x - radius;
-				int endX = x + radius;
+				int startX = x - offset;
+				int endX = startX + kernel.getWidth();
 
 				if( startX < 0 ) startX = 0;
 				if( endX >= width ) endX = width-1;
 
-				int startY = y - radius;
-				int endY = y + radius;
+				int startY = y - offset;
+				int endY = startY + kernel.getWidth();
 
 				if( startY < 0 ) startY = 0;
 				if( endY >= height ) endY = height-1;
 
 				int total = 0;
-				int div = 0;
+				int weight = 0;
 
 				for( int i = startY; i <= endY; i++ ) {
 					for( int j = startX; j <= endX; j++ ) {
-						int v = kernel.get(j-x+radius,i-y+radius);
+						int v = kernel.get(j-x+offset,i-y+offset);
 						total += input.get(j,i)*v;
-						div += v;
+						weight += v;
 					}
 				}
-				output.set(x,y, (total+div/2)/div );
+				output.set(x,y, (total+weight/2)/weight );
 			}
 		}
 	}
 
 	public static void horizontal(Kernel1D_I32 kernel, ImageSInt32 input, ImageSInt32 output ) {
 
-		final int radius = kernel.getRadius();
+		final int offset = kernel.getOffset();
 
 		final int width = input.getWidth();
 		final int height = input.getHeight();
@@ -325,27 +324,27 @@ public class ConvolveNormalizedNaive {
 		for (int y = 0; y < height; y++) {
 			for( int x = 0; x < width; x++ ) {
 				int total = 0;
-				int div = 0;
+				int weight = 0;
 
-				int startX = x - radius;
-				int endX = x + radius;
+				int startX = x - offset;
+				int endX = startX+kernel.getWidth();
 
 				if( startX < 0 ) startX = 0;
 				if( endX >= width ) endX = width-1;
 
 				for( int j = startX; j <= endX; j++ ) {
-					int v = kernel.get(j-x+radius);
+					int v = kernel.get(j-x+offset);
 					total += input.get(j,y)*v;
-					div += v;
+					weight += v;
 				}
-				output.set(x,y, (total+div/2)/div );
+				output.set(x,y, (total+weight/2)/weight );
 			}
 		}
 	}
 
 	public static void vertical(Kernel1D_I32 kernel, ImageSInt32 input, ImageSInt32 output ) {
 
-		final int radius = kernel.getRadius();
+		final int offset = kernel.getOffset();
 
 		final int width = input.getWidth();
 		final int height = input.getHeight();
@@ -353,27 +352,27 @@ public class ConvolveNormalizedNaive {
 		for (int y = 0; y < height; y++) {
 			for( int x = 0; x < width; x++ ) {
 				int total = 0;
-				int div = 0;
+				int weight = 0;
 
-				int startY = y - radius;
-				int endY = y + radius;
+				int startY = y - offset;
+				int endY = startY + kernel.getWidth();
 
 				if( startY < 0 ) startY = 0;
 				if( endY >= height ) endY = height-1;
 
 				for( int i = startY; i <= endY; i++ ) {
-					int v = kernel.get(i-y+radius);
+					int v = kernel.get(i-y+offset);
 					total += input.get(x,i)*v;
-					div += v;
+					weight += v;
 				}
-				output.set(x,y, (total+div/2)/div );
+				output.set(x,y, (total+weight/2)/weight );
 			}
 		}
 	}
 
 	public static void convolve(Kernel2D_I32 kernel, ImageSInt32 input, ImageSInt32 output ) {
 
-		final int radius = kernel.getRadius();
+		final int offset = kernel.getOffset();
 
 		final int width = input.getWidth();
 		final int height = input.getHeight();
@@ -381,31 +380,105 @@ public class ConvolveNormalizedNaive {
 		for (int y = 0; y < height; y++) {
 			for( int x = 0; x < width; x++ ) {
 
-				int startX = x - radius;
-				int endX = x + radius;
+				int startX = x - offset;
+				int endX = startX + kernel.getWidth();
 
 				if( startX < 0 ) startX = 0;
 				if( endX >= width ) endX = width-1;
 
-				int startY = y - radius;
-				int endY = y + radius;
+				int startY = y - offset;
+				int endY = startY + kernel.getWidth();
 
 				if( startY < 0 ) startY = 0;
 				if( endY >= height ) endY = height-1;
 
 				int total = 0;
-				int div = 0;
+				int weight = 0;
 
 				for( int i = startY; i <= endY; i++ ) {
 					for( int j = startX; j <= endX; j++ ) {
-						int v = kernel.get(j-x+radius,i-y+radius);
+						int v = kernel.get(j-x+offset,i-y+offset);
 						total += input.get(j,i)*v;
-						div += v;
+						weight += v;
 					}
 				}
-				output.set(x,y, (total+div/2)/div );
+				output.set(x,y, (total+weight/2)/weight );
 			}
 		}
 	}
+
+public static void vertical(Kernel1D_I32 kernelX, Kernel1D_I32 kernelY,
+								ImageUInt16 input, ImageInt8 output ) {
+
+		final int offsetX = kernelX.getOffset();
+		final int offsetY = kernelY.getOffset();
+
+		final int width = input.getWidth();
+		final int height = input.getHeight();
+
+		for (int y = 0; y < height; y++) {
+			for( int x = 0; x < width; x++ ) {
+				int total = 0;
+				int weightY = 0;
+
+				int startY = y - offsetY;
+				int endY = y + offsetY;
+
+				if( startY < 0 ) startY = 0;
+				if( endY >= height ) endY = height-1;
+
+				int weightX = 0;
+				for (int i = offsetX; i < kernelX.getWidth(); i++) {
+					weightX += kernelX.get(i);
+				}
+
+				for( int i = startY; i <= endY; i++ ) {
+					int v = kernelY.get(i-y+offsetY);
+					total += input.get(x,i)*v;
+					weightY += v;
+				}
+				int weight = weightX*weightY;
+				output.set(x,y, (total+weight/2)/weight );
+			}
+		}
+	}
+
+
+public static void vertical(Kernel1D_I32 kernelX, Kernel1D_I32 kernelY,
+								ImageSInt32 input, ImageInt16 output ) {
+
+		final int offsetX = kernelX.getOffset();
+		final int offsetY = kernelY.getOffset();
+
+		final int width = input.getWidth();
+		final int height = input.getHeight();
+
+		for (int y = 0; y < height; y++) {
+			for( int x = 0; x < width; x++ ) {
+				int total = 0;
+				int weightY = 0;
+
+				int startY = y - offsetY;
+				int endY = y + offsetY;
+
+				if( startY < 0 ) startY = 0;
+				if( endY >= height ) endY = height-1;
+
+				int weightX = 0;
+				for (int i = offsetX; i < kernelX.getWidth(); i++) {
+					weightX += kernelX.get(i);
+				}
+
+				for( int i = startY; i <= endY; i++ ) {
+					int v = kernelY.get(i-y+offsetY);
+					total += input.get(x,i)*v;
+					weightY += v;
+				}
+				int weight = weightX*weightY;
+				output.set(x,y, (total+weight/2)/weight );
+			}
+		}
+	}
+
 
 }

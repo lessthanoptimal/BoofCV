@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -47,10 +47,13 @@ public class GenerateConvolveNormalized_JustBorder extends CodeGeneratorBase  {
 	public void generate() {
 		printPreamble();
 
-		printAllOps(AutoTypeImage.F32,AutoTypeImage.F32);
-		printAllOps(AutoTypeImage.U8,AutoTypeImage.I8);
+		printAllOps(AutoTypeImage.F32, AutoTypeImage.F32);
+		printAllOps(AutoTypeImage.U8, AutoTypeImage.I8);
 		printAllOps(AutoTypeImage.S16,AutoTypeImage.I16);
 		printAllOps(AutoTypeImage.S32,AutoTypeImage.S32);
+
+		printVertical2Int(AutoTypeImage.U16, AutoTypeImage.I8);
+		printVertical2Int(AutoTypeImage.S32, AutoTypeImage.I16);
 
 		out.println("}");
 	}
@@ -96,6 +99,22 @@ public class GenerateConvolveNormalized_JustBorder extends CodeGeneratorBase  {
 		printHorizontal();
 		printVertical();
 		printConvolve();
+	}
+
+	private void printVertical2Int( AutoTypeImage input , AutoTypeImage output )
+	{
+		kernelType = "I32";
+		inputType = input.getSingleBandName();
+		outputType = output.getSingleBandName();
+		kernelData = "int";
+		inputData = input.getDataType();
+		outputData = output.getDataType();
+		sumType = input.getSumType();
+		bitWiseOp = input.getBitWise();
+
+		divide = "(total+weight/2)/weight";
+
+		printVertical2();
 
 	}
 
@@ -211,6 +230,92 @@ public class GenerateConvolveNormalized_JustBorder extends CodeGeneratorBase  {
 				"\t\t\t\t\ttotal += (dataSrc[indexSrc]"+bitWiseOp+") * dataKer[k];\n" +
 				"\t\t\t\t}\n" +
 				"\t\t\t\tdataDst[indexDst++] = "+typeCast+"("+divide+");\n" +
+				"\t\t\t}\n" +
+				"\t\t}\n" +
+				"\t}\n\n");
+	}
+
+	private void printVertical2() {
+
+		String typeCast = outputData.compareTo(sumType) == 0 ? "" : "("+outputData+")";
+
+		out.print("\tpublic static void vertical(Kernel1D_"+kernelType+" kernelX,Kernel1D_"+kernelType+" kernelY,\n" +
+				"\t\t\t\t\t\t\t\t"+inputType+" input, "+outputType+" output ) {\n" +
+				"\t\tfinal "+inputData+"[] dataSrc = input.data;\n" +
+				"\t\tfinal "+outputData+"[] dataDst = output.data;\n" +
+				"\t\tfinal "+kernelData+"[] dataKer = kernelY.data;\n" +
+				"\n" +
+				"\t\tfinal int offsetY = kernelY.getOffset();\n" +
+				"\t\tfinal int kernelWidthY = kernelY.getWidth();\n" +
+				"\n" +
+				"\t\tfinal int offsetX = kernelX.getOffset();\n" +
+				"\t\tfinal int kernelWidthX = kernelX.getWidth();\n" +
+				"\n" +
+				"\t\tfinal int imgWidth = output.getWidth();\n" +
+				"\t\tfinal int imgHeight = output.getHeight();\n" +
+				"\n" +
+				"\t\tfinal int yEnd = imgHeight - offsetY;\n" +
+				"\n" +
+				"\t\tint startWeightX = 0;\n" +
+				"\t\tfor (int k = offsetX; k < kernelWidthX; k++) {\n" +
+				"\t\t\tstartWeightX += dataKer[k];\n" +
+				"\t\t}\n" +
+				"\n" +
+				"\t\tfor (int y = 0; y < offsetY; y++) {\n" +
+				"\t\t\tint indexDst = output.startIndex + y * output.stride;\n" +
+				"\t\t\tint i = input.startIndex + y * input.stride;\n" +
+				"\t\t\tfinal int iEnd = i + imgWidth;\n" +
+				"\n" +
+				"\t\t\tint kStart = offsetY - y;\n" +
+				"\n" +
+				"\t\t\tint weightY = 0;\n" +
+				"\t\t\tfor (int k = kStart; k < kernelWidthY; k++) {\n" +
+				"\t\t\t\tweightY += dataKer[k];\n" +
+				"\t\t\t}\n" +
+				"\t\t\tint weightX = startWeightX;\n" +
+				"\n" +
+				"\t\t\tfor ( int x = 0; i < iEnd; i++, x++ ) {\n" +
+				"\t\t\t\tint weight = weightX*weightY;\n" +
+				"\t\t\t\tint total = 0;\n" +
+				"\t\t\t\tint indexSrc = i - y * input.stride;\n" +
+				"\t\t\t\tfor (int k = kStart; k < kernelWidthY; k++, indexSrc += input.stride) {\n" +
+				"\t\t\t\t\ttotal += (dataSrc[indexSrc]"+bitWiseOp+") * dataKer[k];\n" +
+				"\t\t\t\t}\n" +
+				"\t\t\t\tdataDst[indexDst++] = "+typeCast+"("+divide+");\n" +
+				"\t\t\t\tif( x < kernelWidthX ) {\n" +
+				"\t\t\t\t\tweightX += dataKer[kernelWidthY-1-x];\n" +
+				"\t\t\t\t} else if( x > input.width-(kernelWidthX-offsetX) ) {\n" +
+				"\t\t\t\t\tweightX -= dataKer[input.width-x-1];\n" +
+				"\t\t\t\t}\n" +
+				"\t\t\t}\n" +
+				"\t\t}\n" +
+				"\n" +
+				"\t\tfor (int y = yEnd; y < imgHeight; y++) {\n" +
+				"\t\t\tint indexDst = output.startIndex + y * output.stride;\n" +
+				"\t\t\tint i = input.startIndex + y * input.stride;\n" +
+				"\t\t\tfinal int iEnd = i + imgWidth;\n" +
+				"\n" +
+				"\t\t\tint kEnd = imgHeight - (y - offsetY);\n" +
+				"\n" +
+				"\t\t\tint weightY = 0;\n" +
+				"\t\t\tfor (int k = 0; k < kEnd; k++) {\n" +
+				"\t\t\t\tweightY += dataKer[k];\n" +
+				"\t\t\t}\n" +
+				"\t\t\tint weightX = startWeightX;\n" +
+				"\n" +
+				"\t\t\tfor ( int x = 0; i < iEnd; i++) {\n" +
+				"\t\t\t\tint weight = weightX*weightY;\n" +
+				"\t\t\t\tint total = 0;\n" +
+				"\t\t\t\tint indexSrc = i - offsetY * input.stride;\n" +
+				"\t\t\t\tfor (int k = 0; k < kEnd; k++, indexSrc += input.stride) {\n" +
+				"\t\t\t\t\ttotal += (dataSrc[indexSrc]"+bitWiseOp+") * dataKer[k];\n" +
+				"\t\t\t\t}\n" +
+				"\t\t\t\tdataDst[indexDst++] = "+typeCast+"("+divide+");\n" +
+				"\t\t\t\tif( x < kernelWidthX ) {\n" +
+				"\t\t\t\t\tweightX += dataKer[kernelWidthX-1-x];\n" +
+				"\t\t\t\t} else if( x > input.width-(kernelWidthX-offsetX) ) {\n" +
+				"\t\t\t\t\tweightX -= dataKer[input.width-x-1];\n" +
+				"\t\t\t\t}\n" +
 				"\t\t\t}\n" +
 				"\t\t}\n" +
 				"\t}\n\n");

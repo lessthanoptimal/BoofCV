@@ -62,9 +62,14 @@ public class InputSanityCheck {
 		return output;
 	}
 
-	public static <T extends ImageSingleBand> T checkDeclare(ImageSingleBand<?> input, T output , Class<T> outputType ) {
+	/**
+	 * If the output has not been declared a new instance is declared.  If an instance of the output
+	 * is provided its bounds are checked.
+	 */
+	public static <In extends ImageSingleBand,Out extends ImageSingleBand>
+	Out checkDeclare(In input, Out output , Class<Out> typeOut) {
 		if (output == null) {
-			output = (T) GeneralizedImageOps.createSingleBand(outputType, input.width, input.height);
+			output = (Out) GeneralizedImageOps.createSingleBand(typeOut,input.width, input.height);
 		} else if (output.width != input.width || output.height != input.height)
 			throw new IllegalArgumentException("Width and/or height of input and output do not match.");
 		return output;

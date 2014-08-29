@@ -22,16 +22,15 @@ import boofcv.alg.InputSanityCheck;
 import boofcv.alg.filter.blur.impl.ImplMedianHistogramInner;
 import boofcv.alg.filter.blur.impl.ImplMedianSortEdgeNaive;
 import boofcv.alg.filter.blur.impl.ImplMedianSortNaive;
+import boofcv.alg.filter.convolve.ConvolveImageBox;
 import boofcv.alg.filter.convolve.ConvolveImageMean;
 import boofcv.alg.filter.convolve.ConvolveNormalized;
+import boofcv.alg.filter.convolve.noborder.ConvolveImageStandard;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.filter.kernel.FactoryKernelGaussian;
 import boofcv.struct.convolve.Kernel1D_F32;
 import boofcv.struct.convolve.Kernel1D_I32;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.image.ImageUInt8;
-import boofcv.struct.image.MultiSpectral;
+import boofcv.struct.image.*;
 
 /**
  * Catch all class for function which "blur" an image, typically used to "reduce" the amount
@@ -50,15 +49,15 @@ public class BlurImageOps {
 	 * @param storage (Optional) Storage for intermediate results.  Same size as input image.  Can be null.
 	 * @return Output blurred image.
 	 */
-	public static ImageUInt8 mean(ImageUInt8 input, ImageUInt8 output, int radius, ImageUInt8 storage) {
+	public static ImageUInt8 mean(ImageUInt8 input, ImageUInt8 output, int radius, ImageUInt16 storage) {
 
 		if( radius <= 0 )
 			throw new IllegalArgumentException("Radius must be > 0");
 
 		output = InputSanityCheck.checkDeclare(input,output);
-		storage = InputSanityCheck.checkDeclare(input,storage);
+		storage = InputSanityCheck.checkDeclare(input,storage,ImageUInt16.class);
 
-		ConvolveImageMean.horizontal(input, storage, radius);
+		ConvolveImageBox.horizontal(input,storage,radius);
 		ConvolveImageMean.vertical(storage, output, radius);
 
 		return output;
@@ -99,14 +98,14 @@ public class BlurImageOps {
 	 * @return Output blurred image.
 	 */
 	public static ImageUInt8 gaussian(ImageUInt8 input, ImageUInt8 output, double sigma , int radius,
-									  ImageUInt8 storage ) {
+									  ImageUInt16 storage ) {
 		output = InputSanityCheck.checkDeclare(input,output);
-		storage = InputSanityCheck.checkDeclare(input,storage);
+		storage = InputSanityCheck.checkDeclare(input,storage,ImageUInt16.class);
 
 		Kernel1D_I32 kernel = FactoryKernelGaussian.gaussian(Kernel1D_I32.class,sigma,radius);
 
-		ConvolveNormalized.horizontal(kernel,input,storage);
-		ConvolveNormalized.vertical(kernel,storage,output);
+		ConvolveImageStandard.horizontal(kernel, input, storage);
+		ConvolveNormalized.vertical(kernel,kernel,storage,output);
 
 		return output;
 	}

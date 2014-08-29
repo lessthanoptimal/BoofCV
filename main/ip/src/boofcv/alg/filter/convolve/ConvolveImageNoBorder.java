@@ -193,6 +193,22 @@ public class ConvolveImageNoBorder {
 	 * @param output Where the resulting image is written to. Modified.
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
+	public static void vertical(Kernel1D_I32 kernel,
+								ImageUInt16 input,  ImageInt8 output, int divisor) {
+		InputSanityCheck.checkSameShape(input, output);
+
+		// TODO unroll
+		ConvolveImageStandard.vertical(kernel, input,  output, divisor);
+	}
+
+	/**
+	 * Performs a vertical 1D convolution across the image in the vertical direction.
+	 * The vertical border is not processed.
+	 *
+	 * @param input The original image. Not modified.
+	 * @param output Where the resulting image is written to. Modified.
+	 * @param kernel The kernel that is being convolved. Not modified.
+	 */
 	public static void vertical(Kernel1D_I32 kernel, ImageUInt8 input,  ImageInt16 output ) {
 		InputSanityCheck.checkSameShape(input, output);
 
@@ -243,6 +259,22 @@ public class ConvolveImageNoBorder {
 
 		if (!ConvolveImageUnrolled_S16_I16_Div.vertical(kernel, input, output, divisor))
 			ConvolveImageStandard.vertical(kernel, input, output, divisor);
+	}
+
+	/**
+	 * Performs a vertical 1D convolution across the image in the vertical direction.
+	 * The vertical border is not processed.
+	 *
+	 * @param input The original image. Not modified.
+	 * @param output Where the resulting image is written to. Modified.
+	 * @param kernel The kernel that is being convolved. Not modified.
+	 * @param divisor The value that the convolved image is divided by.
+	 */
+	public static void vertical(Kernel1D_I32 kernel, ImageSInt32 input,  ImageInt16 output, int divisor ) {
+		InputSanityCheck.checkSameShape(input, output);
+
+		// todo unroll
+		ConvolveImageStandard.vertical(kernel, input, output, divisor);
 	}
 
 	/**

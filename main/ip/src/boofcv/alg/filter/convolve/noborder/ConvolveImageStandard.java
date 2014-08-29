@@ -379,6 +379,39 @@ public class ConvolveImageStandard {
 		}
 	}
 
+	public static void vertical( Kernel1D_I32 kernel,
+								 ImageUInt16 image, ImageInt8 dest , int divisor )
+	{
+		final short[] dataSrc = image.data;
+		final byte[] dataDst = dest.data;
+		final int[] dataKer = kernel.data;
+
+		final int offset = kernel.getOffset();
+		final int kernelWidth = kernel.getWidth();
+		final int halfDivisor = divisor/2;
+
+		final int imgWidth = dest.getWidth();
+		final int imgHeight = dest.getHeight();
+
+		final int yEnd = imgHeight-(kernelWidth-offset-1);
+
+		for( int y = offset; y < yEnd; y++ ) {
+			int indexDst = dest.startIndex+y*dest.stride;
+			int i = image.startIndex + (y-offset)*image.stride;
+			final int iEnd = i+imgWidth;
+
+			for( ; i < iEnd; i++ ) {
+				int total = 0;
+				int indexSrc = i;
+				for( int k = 0; k < kernelWidth; k++ ) {
+					total += (dataSrc[indexSrc] & 0xFFFF)* dataKer[k];
+					indexSrc += image.stride;
+				}
+				dataDst[indexDst++] = (byte)((total+halfDivisor)/divisor);
+			}
+		}
+	}
+
 	public static void horizontal( Kernel1D_I32 kernel ,
 								  ImageSInt16 image, ImageInt16 dest ) {
 		final short[] dataSrc = image.data;
@@ -637,6 +670,39 @@ public class ConvolveImageStandard {
 					for( int kj = -kernelRadius; kj <= kernelRadius; kj++ ) {
 						total += (dataSrc[indexSrc+kj]  )* dataKernel[indexKer++];
 					}
+				}
+				dataDst[indexDst++] = (short)((total+halfDivisor)/divisor);
+			}
+		}
+	}
+
+	public static void vertical( Kernel1D_I32 kernel,
+								 ImageSInt32 image, ImageInt16 dest , int divisor )
+	{
+		final int[] dataSrc = image.data;
+		final short[] dataDst = dest.data;
+		final int[] dataKer = kernel.data;
+
+		final int offset = kernel.getOffset();
+		final int kernelWidth = kernel.getWidth();
+		final int halfDivisor = divisor/2;
+
+		final int imgWidth = dest.getWidth();
+		final int imgHeight = dest.getHeight();
+
+		final int yEnd = imgHeight-(kernelWidth-offset-1);
+
+		for( int y = offset; y < yEnd; y++ ) {
+			int indexDst = dest.startIndex+y*dest.stride;
+			int i = image.startIndex + (y-offset)*image.stride;
+			final int iEnd = i+imgWidth;
+
+			for( ; i < iEnd; i++ ) {
+				int total = 0;
+				int indexSrc = i;
+				for( int k = 0; k < kernelWidth; k++ ) {
+					total += (dataSrc[indexSrc] )* dataKer[k];
+					indexSrc += image.stride;
 				}
 				dataDst[indexDst++] = (short)((total+halfDivisor)/divisor);
 			}

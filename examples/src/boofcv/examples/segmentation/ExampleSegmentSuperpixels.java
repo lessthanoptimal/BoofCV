@@ -116,10 +116,10 @@ public class ExampleSegmentSuperpixels {
 //		ImageType<ImageFloat32> imageType = ImageType.single(ImageFloat32.class);
 //		ImageType<ImageUInt8> imageType = ImageType.single(ImageUInt8.class);
 
-//		ImageSegmentation alg = FactoryImageSegmentation.meanShift(null, imageType);
-//		ImageSegmentation alg = FactoryImageSegmentation.slic(new ConfigSlic(800), imageType);
+//		ImageSuperpixels alg = FactoryImageSegmentation.meanShift(null, imageType);
+//		ImageSuperpixels alg = FactoryImageSegmentation.slic(new ConefigSlic(400), imageType);
 		ImageSuperpixels alg = FactoryImageSegmentation.fh04(new ConfigFh04(100,30), imageType);
-//		ImageSegmentation alg = FactoryImageSegmentation.watershed(ConnectRule.EIGHT);
+//		ImageSuperpixels alg = FactoryImageSegmentation.watershed(null,imageType);
 
 		// Convert image into BoofCV format
 		ImageBase color = imageType.createImage(image.getWidth(),image.getHeight());

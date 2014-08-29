@@ -40,9 +40,9 @@ public class GBlurImageOps {
 	 * @return Output blurred image.
 	 */
 	public static <T extends ImageBase>
-	T mean(T input, T output, int radius, T storage ) {
+	T mean(T input, T output, int radius, ImageBase storage ) {
 		if( input instanceof ImageUInt8 ) {
-			return (T)BlurImageOps.mean((ImageUInt8)input,(ImageUInt8)output,radius,(ImageUInt8)storage);
+			return (T)BlurImageOps.mean((ImageUInt8)input,(ImageUInt8)output,radius,(ImageUInt16)storage);
 		} else if( input instanceof ImageFloat32) {
 			return (T)BlurImageOps.mean((ImageFloat32)input,(ImageFloat32)output,radius,(ImageFloat32)storage);
 		} else if( input instanceof MultiSpectral ) {
@@ -88,7 +88,7 @@ public class GBlurImageOps {
 	public static <T extends ImageBase>
 	T gaussian(T input, T output, double sigma , int radius, T storage ) {
 		if( input instanceof ImageUInt8 ) {
-			return (T)BlurImageOps.gaussian((ImageUInt8)input,(ImageUInt8)output,sigma,radius,(ImageUInt8)storage);
+			return (T)BlurImageOps.gaussian((ImageUInt8)input,(ImageUInt8)output,sigma,radius,(ImageUInt16)storage);
 		} else if( input instanceof ImageFloat32) {
 			return (T)BlurImageOps.gaussian((ImageFloat32)input,(ImageFloat32)output,sigma,radius,(ImageFloat32)storage);
 		} else if( input instanceof MultiSpectral ) {
