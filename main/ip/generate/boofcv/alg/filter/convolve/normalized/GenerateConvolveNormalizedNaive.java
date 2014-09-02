@@ -116,9 +116,9 @@ public class GenerateConvolveNormalizedNaive extends CodeGeneratorBase {
 				"\t\t\t\tint endX = startX+kernel.getWidth();\n" +
 				"\n" +
 				"\t\t\t\tif( startX < 0 ) startX = 0;\n" +
-				"\t\t\t\tif( endX >= width ) endX = width-1;\n" +
+				"\t\t\t\tif( endX > width ) endX = width;\n" +
 				"\n" +
-				"\t\t\t\tfor( int j = startX; j <= endX; j++ ) {\n" +
+				"\t\t\t\tfor( int j = startX; j < endX; j++ ) {\n" +
 				"\t\t\t\t\t"+kernelData+" v = kernel.get(j-x+offset);\n" +
 				"\t\t\t\t\ttotal += input.get(j,y)*v;\n" +
 				"\t\t\t\t\tweight += v;\n" +
@@ -148,9 +148,9 @@ public class GenerateConvolveNormalizedNaive extends CodeGeneratorBase {
 				"\t\t\t\tint endY = startY + kernel.getWidth();\n" +
 				"\n" +
 				"\t\t\t\tif( startY < 0 ) startY = 0;\n" +
-				"\t\t\t\tif( endY >= height ) endY = height-1;\n" +
+				"\t\t\t\tif( endY > height ) endY = height;\n" +
 				"\n" +
-				"\t\t\t\tfor( int i = startY; i <= endY; i++ ) {\n" +
+				"\t\t\t\tfor( int i = startY; i < endY; i++ ) {\n" +
 				"\t\t\t\t\t"+kernelData+" v = kernel.get(i-y+offset);\n" +
 				"\t\t\t\t\ttotal += input.get(x,i)*v;\n" +
 				"\t\t\t\t\tweight += v;\n" +
@@ -181,14 +181,14 @@ public class GenerateConvolveNormalizedNaive extends CodeGeneratorBase {
 				"\t\t\t\tint endY = y + offsetY;\n" +
 				"\n" +
 				"\t\t\t\tif( startY < 0 ) startY = 0;\n" +
-				"\t\t\t\tif( endY >= height ) endY = height-1;\n" +
+				"\t\t\t\tif( endY > height ) endY = height;\n" +
 				"\n" +
 				"\t\t\t\tint weightX = 0;\n" +
 				"\t\t\t\tfor (int i = offsetX; i < kernelX.getWidth(); i++) {\n" +
 				"\t\t\t\t\tweightX += kernelX.get(i);\n" +
 				"\t\t\t\t}\n" +
 				"\n" +
-				"\t\t\t\tfor( int i = startY; i <= endY; i++ ) {\n" +
+				"\t\t\t\tfor( int i = startY; i < endY; i++ ) {\n" +
 				"\t\t\t\t\t"+kernelData+" v = kernelY.get(i-y+offsetY);\n" +
 				"\t\t\t\t\ttotal += input.get(x,i)*v;\n" +
 				"\t\t\t\t\tweightY += v;\n" +
@@ -217,19 +217,19 @@ public class GenerateConvolveNormalizedNaive extends CodeGeneratorBase {
 				"\t\t\t\tint endX = startX + kernel.getWidth();\n" +
 				"\n" +
 				"\t\t\t\tif( startX < 0 ) startX = 0;\n" +
-				"\t\t\t\tif( endX >= width ) endX = width-1;\n" +
+				"\t\t\t\tif( endX > width ) endX = width;\n" +
 				"\n" +
 				"\t\t\t\tint startY = y - offset;\n" +
 				"\t\t\t\tint endY = startY + kernel.getWidth();\n" +
 				"\n" +
 				"\t\t\t\tif( startY < 0 ) startY = 0;\n" +
-				"\t\t\t\tif( endY >= height ) endY = height-1;\n" +
+				"\t\t\t\tif( endY > height ) endY = height;\n" +
 				"\n" +
 				"\t\t\t\t"+sumType+" total = 0;\n" +
 				"\t\t\t\t"+sumType+" weight = 0;\n" +
 				"\n" +
-				"\t\t\t\tfor( int i = startY; i <= endY; i++ ) {\n" +
-				"\t\t\t\t\tfor( int j = startX; j <= endX; j++ ) {\n" +
+				"\t\t\t\tfor( int i = startY; i < endY; i++ ) {\n" +
+				"\t\t\t\t\tfor( int j = startX; j < endX; j++ ) {\n" +
 				"\t\t\t\t\t\t"+kernelData+" v = kernel.get(j-x+offset,i-y+offset);\n" +
 				"\t\t\t\t\t\ttotal += input.get(j,i)*v;\n" +
 				"\t\t\t\t\t\tweight += v;\n" +

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -70,5 +70,10 @@ public class BicubicKernel_F32 extends KernelContinuous1D_F32 {
 		} else {
 			return 0f;
 		}
+	}
+
+	@Override
+	public double getDouble(int index) {
+		throw new RuntimeException("Well this function really shouldn't be required to be implemented");
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -119,9 +119,9 @@ public class HessianSobel {
 
 		if( border != null ) {
 			border.setImage(orig);
-			ConvolveJustBorder_General.convolve(kernelXX_I32, border,derivXX,2);
-			ConvolveJustBorder_General.convolve(kernelYY_I32, border,derivYY,2);
-			ConvolveJustBorder_General.convolve(kernelXY_I32, border,derivXY,2);
+			ConvolveJustBorder_General.convolve(kernelXX_I32, border,derivXX);
+			ConvolveJustBorder_General.convolve(kernelYY_I32, border,derivYY);
+			ConvolveJustBorder_General.convolve(kernelXY_I32, border,derivXY);
 		}
 	}
 
@@ -142,9 +142,9 @@ public class HessianSobel {
 
 		if( border != null ) {
 			border.setImage(orig);
-			ConvolveJustBorder_General.convolve(kernelXX_F32, border , derivXX , 2);
-			ConvolveJustBorder_General.convolve(kernelYY_F32, border , derivYY , 2);
-			ConvolveJustBorder_General.convolve(kernelXY_F32, border , derivXY , 2);
+			ConvolveJustBorder_General.convolve(kernelXX_F32, border , derivXX);
+			ConvolveJustBorder_General.convolve(kernelYY_F32, border , derivYY);
+			ConvolveJustBorder_General.convolve(kernelXY_F32, border , derivXY);
 		}
 	}
 }

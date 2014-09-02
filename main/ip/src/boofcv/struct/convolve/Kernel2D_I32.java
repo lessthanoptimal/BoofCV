@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,10 +39,7 @@ public class Kernel2D_I32 extends Kernel2D {
 	 * @param data  The value of the kernel. Not modified.  Reference is not saved.
 	 */
 	public Kernel2D_I32(int width, int data[]) {
-		if (width % 2 == 0 && width <= 0)
-			throw new IllegalArgumentException("invalid width");
-
-		this.width = width;
+		super(width);
 
 		this.data = new int[width * width];
 		System.arraycopy(data, 0, this.data, 0, this.data.length);
@@ -54,11 +51,9 @@ public class Kernel2D_I32 extends Kernel2D {
 	 * @param width How wide the kernel is.  Must be odd.
 	 */
 	public Kernel2D_I32(int width) {
-		if (width % 2 == 0 && width <= 0)
-			throw new IllegalArgumentException("invalid width");
+		super(width);
 
 		data = new int[width * width];
-		this.width = width;
 	}
 
 	protected Kernel2D_I32() {
@@ -76,11 +71,7 @@ public class Kernel2D_I32 extends Kernel2D {
 		if (width % 2 == 0 && width <= 0 && width * width > data.length)
 			throw new IllegalArgumentException("invalid width");
 
-		Kernel2D_I32 ret = new Kernel2D_I32();
-		ret.data = data;
-		ret.width = width;
-
-		return ret;
+		return new Kernel2D_I32(width,data);
 	}
 
 	public int[] getData() {
@@ -116,5 +107,10 @@ public class Kernel2D_I32 extends Kernel2D {
 
 	public void set(int x, int y, int value) {
 		data[y * width + x] = value;
+	}
+
+	@Override
+	public double getDouble(int x, int y) {
+		return get(x,y);
 	}
 }

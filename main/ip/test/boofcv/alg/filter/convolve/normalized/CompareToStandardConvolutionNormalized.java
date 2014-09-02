@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,6 +21,7 @@ package boofcv.alg.filter.convolve.normalized;
 import boofcv.alg.filter.convolve.ConvolutionTestHelper;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.factory.filter.kernel.FactoryKernelGaussian;
+import boofcv.struct.convolve.KernelBase;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.testing.CompareIdenticalFunctions;
 
@@ -39,6 +40,7 @@ public class CompareToStandardConvolutionNormalized extends CompareIdenticalFunc
 	protected int width = 7;
 	protected int height = 8;
 	protected int kernelRadius = 1;
+	protected int offset = 1;
 
 	public CompareToStandardConvolutionNormalized( Class<?> targetClass ) {
 		super(targetClass, ConvolveNormalizedNaive.class);
@@ -49,8 +51,9 @@ public class CompareToStandardConvolutionNormalized extends CompareIdenticalFunc
 		this.height = height;
 	}
 
-	public void setKernelRadius(int kernelRadius) {
+	public void setKernelRadius(int kernelRadius , int offset) {
 		this.kernelRadius = kernelRadius;
+		this.offset = offset;
 	}
 
 	public void compareMethod( Method target , String validationName , int radius ) {
@@ -62,18 +65,28 @@ public class CompareToStandardConvolutionNormalized extends CompareIdenticalFunc
 	protected Object[][] createInputParam(Method candidate, Method validation) {
 		Class<?> paramTypes[] = candidate.getParameterTypes();
 
-		Object kernel = FactoryKernelGaussian.gaussian((Class)paramTypes[0],-1,kernelRadius);
-
-		ImageSingleBand src = ConvolutionTestHelper.createImage(paramTypes[1], width, height);
-		GImageMiscOps.fillUniform(src, rand, 0, 5);
-		ImageSingleBand dst = ConvolutionTestHelper.createImage(paramTypes[2], width, height);
-
 		Object[][] ret = new Object[1][paramTypes.length];
-		ret[0][0] = kernel;
-		ret[0][1] = src;
-		ret[0][2] = dst;
-		if( paramTypes.length == 4) {
-			ret[0][3] = 11;
+
+		ret[0][0]= FactoryKernelGaussian.gaussian((Class)paramTypes[0],-1,kernelRadius);
+		((KernelBase)ret[0][0]).offset = offset;
+
+		int index = 1;
+		if( KernelBase.class.isAssignableFrom(paramTypes[1]) ) {
+			ret[0][index]= FactoryKernelGaussian.gaussian((Class)paramTypes[index],-1,kernelRadius);
+			((KernelBase)ret[0][index]).offset = offset;
+			index++;
+		}
+
+		System.out.println(" "+paramTypes[index].getSimpleName()+" "+paramTypes[index+1].getSimpleName());
+
+		ImageSingleBand src = ConvolutionTestHelper.createImage(paramTypes[index], width, height);
+		ret[0][index++] = src;
+		GImageMiscOps.fillUniform(src, rand, 0, 5);
+		ImageSingleBand dst = ConvolutionTestHelper.createImage(paramTypes[index], width, height);
+		ret[0][index++] = dst;
+
+		if( paramTypes.length > index) {
+			ret[0][index] = 11;
 		}
 
 		return ret;

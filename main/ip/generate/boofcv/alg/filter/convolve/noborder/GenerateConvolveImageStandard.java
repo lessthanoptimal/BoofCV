@@ -218,16 +218,17 @@ public class GenerateConvolveImageStandard extends CodeGeneratorBase {
 		if( hasDivide )
 			out.print("\t\tfinal int halfDivisor = divisor/2;\n");
 		out.print("\n" +
-				"\t\tint kernelRadius = kernel.width/2;\n" +
+				"\t\tint offsetL = kernel.offset;\n" +
+				"\t\tint offsetR = kernel.width-kernel.offset-1;\n" +
 				"\n" +
-				"\t\tfor( int y = kernelRadius; y < height-kernelRadius; y++ ) {\n" +
-				"\t\t\tint indexDst = dest.startIndex + y*dest.stride+kernelRadius;\n" +
-				"\t\t\tfor( int x = kernelRadius; x < width-kernelRadius; x++ ) {\n" +
+				"\t\tfor( int y = offsetL; y < height-offsetR; y++ ) {\n" +
+				"\t\t\tint indexDst = dest.startIndex + y*dest.stride+offsetL;\n" +
+				"\t\t\tfor( int x = offsetL; x < width-offsetR; x++ ) {\n" +
 				"\t\t\t\t" + sumType + " total = 0;\n" +
 				"\t\t\t\tint indexKer = 0;\n" +
-				"\t\t\t\tfor( int ki = -kernelRadius; ki <= kernelRadius; ki++ ) {\n" +
-				"\t\t\t\t\tint indexSrc = src.startIndex+(y+ki)*src.stride+ x;\n" +
-				"\t\t\t\t\tfor( int kj = -kernelRadius; kj <= kernelRadius; kj++ ) {\n" +
+				"\t\t\t\tfor( int ki = 0; ki < kernel.width; ki++ ) {\n" +
+				"\t\t\t\t\tint indexSrc = src.startIndex + (y+ki-offsetL)*src.stride + x-offsetL;\n" +
+				"\t\t\t\t\tfor( int kj = 0; kj <  kernel.width; kj++ ) {\n" +
 				"\t\t\t\t\t\ttotal += (dataSrc[indexSrc+kj] " + bitWise + " )* dataKernel[indexKer++];\n" +
 				"\t\t\t\t\t}\n" +
 				"\t\t\t\t}\n" +

@@ -19,7 +19,7 @@
 package boofcv.alg.filter.convolve.border;
 
 import boofcv.alg.filter.convolve.ConvolveImageNoBorder;
-import boofcv.factory.filter.kernel.FactoryKernelGaussian;
+import boofcv.factory.filter.kernel.FactoryKernel;
 import boofcv.struct.convolve.Kernel1D;
 import boofcv.struct.convolve.KernelBase;
 import boofcv.struct.image.ImageSingleBand;
@@ -72,8 +72,8 @@ public abstract class CompareImageBorder extends CompareEquivalentFunctions {
 				borderY1 = kernel.getWidth() - kernel.getOffset() - 1;
 			}
 		} else {
-			borderX0 = borderY0 = kernel.getWidth()/2;
-			borderX1 = borderY1 = kernel.getWidth()/2;
+			borderX0 = borderY0 = kernel.getOffset();
+			borderX1 = borderY1 = kernel.getWidth()-kernel.getOffset()-1;
 		}
 	}
 
@@ -84,7 +84,7 @@ public abstract class CompareImageBorder extends CompareEquivalentFunctions {
 	}
 
 	protected KernelBase createKernel(Class kernelType, int offset , int width) {
-		KernelBase k = FactoryKernelGaussian.gaussian(kernelType,-1,width/2);
+		KernelBase k = FactoryKernel.random(kernelType, width / 2, -12, 10, rand);
 		k.offset = offset;
 		return k;
 	}

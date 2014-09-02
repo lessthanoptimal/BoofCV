@@ -141,14 +141,12 @@ public class GenerateConvolvedUnrolled extends CodeGeneratorBase {
 			out.print(") {\n");
 		}
 
-		if( opName.compareTo("convolve") != 0 ) {
-			out.print(
-					"\n" +
-					"\t\t// Unrolled functions only exist for symmetric kernels with an odd width\n" +
-					"\t\tif( kernel.offset != kernel.width/2 || kernel.width%2 == 0 )\n" +
-					"\t\t\treturn false;\n" +
-					"\n");
-		}
+		out.print(
+				"\n" +
+				"\t\t// Unrolled functions only exist for symmetric kernels with an odd width\n" +
+				"\t\tif( kernel.offset != kernel.width/2 || kernel.width%2 == 0 )\n" +
+				"\t\t\treturn false;\n" +
+				"\n");
 
 		out.print("\t\tswitch( kernel.width ) {\n");
 		for (int i = 0; i < numUnrolled; i++) {

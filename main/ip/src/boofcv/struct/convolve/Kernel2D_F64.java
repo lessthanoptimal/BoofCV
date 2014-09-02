@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,10 +39,7 @@ public class Kernel2D_F64 extends Kernel2D {
 	 * @param data  The value of the kernel. Not modified.  Reference is not saved.
 	 */
 	public Kernel2D_F64(int width, double ...data) {
-		if (width % 2 == 0 && width <= 0)
-			throw new IllegalArgumentException("invalid width");
-
-		this.width = width;
+		super(width);
 
 		this.data = new double[width * width];
 		System.arraycopy(data, 0, this.data, 0, this.data.length);
@@ -54,11 +51,9 @@ public class Kernel2D_F64 extends Kernel2D {
 	 * @param width How wide the kernel is.  Must be odd.
 	 */
 	public Kernel2D_F64(int width) {
-		if (width % 2 == 0 && width <= 0)
-			throw new IllegalArgumentException("invalid width");
+		super(width);
 
 		data = new double[width * width];
-		this.width = width;
 	}
 
 	protected Kernel2D_F64() {
@@ -79,6 +74,7 @@ public class Kernel2D_F64 extends Kernel2D {
 		Kernel2D_F64 ret = new Kernel2D_F64();
 		ret.data = data;
 		ret.width = width;
+		ret.offset = ret.getRadius();
 
 		return ret;
 	}
@@ -108,5 +104,10 @@ public class Kernel2D_F64 extends Kernel2D {
 			System.out.println();
 		}
 		System.out.println();
+	}
+
+	@Override
+	public double getDouble(int x, int y) {
+		return get(x,y);
 	}
 }

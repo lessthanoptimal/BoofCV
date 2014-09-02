@@ -83,7 +83,7 @@ public class HessianThree {
 		if( border != null ) {
 			DerivativeHelperFunctions.processBorderHorizontal(orig, derivXX ,kernelXXYY_I32, border );
 			DerivativeHelperFunctions.processBorderVertical(orig, derivYY ,kernelXXYY_I32, border );
-			ConvolveJustBorder_General.convolve(kernelCross_I32, border,derivXY,2);
+			ConvolveJustBorder_General.convolve(kernelCross_I32, border,derivXY);
 		}
 	}
 
@@ -105,7 +105,7 @@ public class HessianThree {
 		if( border != null ) {
 			DerivativeHelperFunctions.processBorderHorizontal(orig, derivXX ,kernelXXYY_F32, border );
 			DerivativeHelperFunctions.processBorderVertical(orig, derivYY ,kernelXXYY_F32, border );
-			ConvolveJustBorder_General.convolve(kernelCross_F32,border,derivXY,2);
+			ConvolveJustBorder_General.convolve(kernelCross_F32,border,derivXY);
 		}
 	}
 }

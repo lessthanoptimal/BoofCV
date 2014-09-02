@@ -41,7 +41,7 @@ public class Kernel1D_I32 extends Kernel1D {
 	public Kernel1D_I32(int data[], int width) {
 		this(data,width/2,width);
 		if( width % 2 != 1 )
-			throw new IllegalArgumentException("Kernel must be add to use this constructor");
+			throw new IllegalArgumentException("Kernel must be odd to use this constructor");
 	}
 
 	/**
@@ -80,6 +80,11 @@ public class Kernel1D_I32 extends Kernel1D {
 	}
 
 	protected Kernel1D_I32() {
+	}
+
+	@Override
+	public double getDouble(int index) {
+		return data[index];
 	}
 
 	/**

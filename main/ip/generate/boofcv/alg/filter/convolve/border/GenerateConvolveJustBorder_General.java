@@ -202,11 +202,12 @@ public class GenerateConvolveJustBorder_General {
 		String typeOutput = imageOut.getSingleBandName();
 		String dataOutput = imageOut.getDataType();
 
-		out.print("\tpublic static void convolve(Kernel2D_"+typeKernel+" kernel, "+typeInput+" input, "+typeOutput+" output , int border ) {\n" +
+		out.print("\tpublic static void convolve(Kernel2D_"+typeKernel+" kernel, "+typeInput+" input, "+typeOutput+" output ) {\n" +
 				"\t\tfinal "+dataOutput+"[] dataDst = output.data;\n" +
 				"\t\tfinal "+dataKernel+"[] dataKer = kernel.data;\n" +
 				"\n" +
-				"\t\tfinal int radius = kernel.getRadius();\n"+
+				"\t\tfinal int offsetL = kernel.getOffset();\n" +
+				"\t\tfinal int offsetR = kernel.getWidth()-offsetL-1;\n"+
 				"\t\tfinal int width = output.getWidth();\n" +
 				"\t\tfinal int height = output.getHeight();\n" +
 				"\n" +
@@ -214,23 +215,23 @@ public class GenerateConvolveJustBorder_General {
 				"\t\tfor (int y = 0; y < height; y++) {\n" +
 				"\t\t\tint indexDest = output.startIndex + y * output.stride;\n" +
 				"\n" +
-				"\t\t\tfor ( int x = 0; x < border; x++ ) {\n" +
+				"\t\t\tfor ( int x = 0; x < offsetL; x++ ) {\n" +
 				"\t\t\t\t"+sumType+" total = 0;\n" +
 				"\t\t\t\tint indexKer = 0;\n" +
-				"\t\t\t\tfor( int i = -radius; i <= radius; i++ ) {\n" +
-				"\t\t\t\t\tfor (int j = -radius; j <= radius; j++) {\n" +
+				"\t\t\t\tfor( int i = -offsetL; i <= offsetR; i++ ) {\n" +
+				"\t\t\t\t\tfor (int j = -offsetL; j <= offsetR; j++) {\n" +
 				"\t\t\t\t\t\ttotal += input.get(x+j,y+i) * dataKer[indexKer++];\n" +
 				"\t\t\t\t\t}\n" +
 				"\t\t\t\t}\n" +
 				"\t\t\t\tdataDst[indexDest++] = "+typeCast+"total;\n" +
 				"\t\t\t}\n" +
 				"\n" +
-				"\t\t\tindexDest = output.startIndex + y * output.stride + width-border;\n" +
-				"\t\t\tfor ( int x = width-border; x < width; x++ ) {\n" +
+				"\t\t\tindexDest = output.startIndex + y * output.stride + width-offsetR;\n" +
+				"\t\t\tfor ( int x = width-offsetR; x < width; x++ ) {\n" +
 				"\t\t\t\t"+sumType+" total = 0;\n" +
 				"\t\t\t\tint indexKer = 0;\n" +
-				"\t\t\t\tfor( int i = -radius; i <= radius; i++ ) {\n" +
-				"\t\t\t\t\tfor (int j = -radius; j <= radius; j++) {\n" +
+				"\t\t\t\tfor( int i = -offsetL; i <= offsetR; i++ ) {\n" +
+				"\t\t\t\t\tfor (int j = -offsetL; j <= offsetR; j++) {\n" +
 				"\t\t\t\t\t\ttotal += input.get(x+j,y+i) * dataKer[indexKer++];\n" +
 				"\t\t\t\t\t}\n" +
 				"\t\t\t\t}\n" +
@@ -239,26 +240,26 @@ public class GenerateConvolveJustBorder_General {
 				"\t\t}\n" +
 				"\n" +
 				"\t\t// convolve along the top and bottom borders\n" +
-				"\t\tfor ( int x = border; x < width-border; x++ ) {\n" +
+				"\t\tfor ( int x = offsetL; x < width-offsetR; x++ ) {\n" +
 				"\t\t\tint indexDest = output.startIndex + x;\n" +
 				"\n" +
-				"\t\t\tfor (int y = 0; y < border; y++, indexDest += output.stride) {\n" +
+				"\t\t\tfor (int y = 0; y < offsetL; y++, indexDest += output.stride) {\n" +
 				"\t\t\t\t"+sumType+" total = 0;\n" +
 				"\t\t\t\tint indexKer = 0;\n" +
-				"\t\t\t\tfor( int i = -radius; i <= radius; i++ ) {\n" +
-				"\t\t\t\t\tfor (int j = -radius; j <= radius; j++) {\n" +
+				"\t\t\t\tfor( int i = -offsetL; i <= offsetR; i++ ) {\n" +
+				"\t\t\t\t\tfor (int j = -offsetL; j <= offsetR; j++) {\n" +
 				"\t\t\t\t\t\ttotal += input.get(x+j,y+i) * dataKer[indexKer++];\n" +
 				"\t\t\t\t\t}\n" +
 				"\t\t\t\t}\n" +
 				"\t\t\t\tdataDst[indexDest] = "+typeCast+"total;\n" +
 				"\t\t\t}\n" +
 				"\n" +
-				"\t\t\tindexDest = output.startIndex + (height-border) * output.stride + x;\n" +
-				"\t\t\tfor (int y = height-border; y < height; y++, indexDest += output.stride) {\n" +
+				"\t\t\tindexDest = output.startIndex + (height-offsetR) * output.stride + x;\n" +
+				"\t\t\tfor (int y = height-offsetR; y < height; y++, indexDest += output.stride) {\n" +
 				"\t\t\t\t"+sumType+" total = 0;\n" +
 				"\t\t\t\tint indexKer = 0;\n" +
-				"\t\t\t\tfor( int i = -radius; i <= radius; i++ ) {\n" +
-				"\t\t\t\t\tfor (int j = -radius; j <= radius; j++) {\n" +
+				"\t\t\t\tfor( int i = -offsetL; i <= offsetR; i++ ) {\n" +
+				"\t\t\t\t\tfor (int j = -offsetL; j <= offsetR; j++) {\n" +
 				"\t\t\t\t\t\ttotal += input.get(x+j,y+i) * dataKer[indexKer++];\n" +
 				"\t\t\t\t\t}\n" +
 				"\t\t\t\t}\n" +
@@ -272,12 +273,13 @@ public class GenerateConvolveJustBorder_General {
 		String typeOutput = imageOut.getSingleBandName();
 		String dataOutput = imageOut.getDataType();
 
-		out.print("\tpublic static void convolve(Kernel2D_"+typeKernel+" kernel, "+typeInput+" input, "+typeOutput+" output , int border ,\n" +
+		out.print("\tpublic static void convolve(Kernel2D_"+typeKernel+" kernel, "+typeInput+" input, "+typeOutput+" output ,\n" +
 				"\t\t\t\t\t\t\t\t"+sumType+" minValue , "+sumType+" maxValue ) {\n" +
 				"\t\tfinal "+dataOutput+"[] dataDst = output.data;\n" +
 				"\t\tfinal "+dataKernel+"[] dataKer = kernel.data;\n" +
 				"\n" +
-				"\t\tfinal int radius = kernel.getRadius();\n"+
+				"\t\tfinal int offsetL = kernel.getOffset();\n" +
+				"\t\tfinal int offsetR = kernel.getWidth()-offsetL-1;\n"+
 				"\t\tfinal int width = output.getWidth();\n" +
 				"\t\tfinal int height = output.getHeight();\n" +
 				"\n" +
@@ -285,11 +287,11 @@ public class GenerateConvolveJustBorder_General {
 				"\t\tfor (int y = 0; y < height; y++) {\n" +
 				"\t\t\tint indexDest = output.startIndex + y * output.stride;\n" +
 				"\n" +
-				"\t\t\tfor ( int x = 0; x < border; x++ ) {\n" +
+				"\t\t\tfor ( int x = 0; x < offsetL; x++ ) {\n" +
 				"\t\t\t\t"+sumType+" total = 0;\n" +
 				"\t\t\t\tint indexKer = 0;\n" +
-				"\t\t\t\tfor( int i = -radius; i <= radius; i++ ) {\n" +
-				"\t\t\t\t\tfor (int j = -radius; j <= radius; j++) {\n" +
+				"\t\t\t\tfor( int i = -offsetL; i <= offsetR; i++ ) {\n" +
+				"\t\t\t\t\tfor (int j = -offsetL; j <= offsetR; j++) {\n" +
 				"\t\t\t\t\t\ttotal += input.get(x+j,y+i) * dataKer[indexKer++];\n" +
 				"\t\t\t\t\t}\n" +
 				"\t\t\t\t}\n" +
@@ -302,12 +304,12 @@ public class GenerateConvolveJustBorder_General {
 				"\t\t\t\tdataDst[indexDest++] = "+typeCast+"total;\n" +
 				"\t\t\t}\n" +
 				"\n" +
-				"\t\t\tindexDest = output.startIndex + y * output.stride + width-border;\n" +
-				"\t\t\tfor ( int x = width-border; x < width; x++ ) {\n" +
+				"\t\t\tindexDest = output.startIndex + y * output.stride + width-offsetR;\n" +
+				"\t\t\tfor ( int x = width-offsetR; x < width; x++ ) {\n" +
 				"\t\t\t\t"+sumType+" total = 0;\n" +
 				"\t\t\t\tint indexKer = 0;\n" +
-				"\t\t\t\tfor( int i = -radius; i <= radius; i++ ) {\n" +
-				"\t\t\t\t\tfor (int j = -radius; j <= radius; j++) {\n" +
+				"\t\t\t\tfor( int i = -offsetL; i <= offsetR; i++ ) {\n" +
+				"\t\t\t\t\tfor (int j = -offsetL; j <= offsetR; j++) {\n" +
 				"\t\t\t\t\t\ttotal += input.get(x+j,y+i) * dataKer[indexKer++];\n" +
 				"\t\t\t\t\t}\n" +
 				"\t\t\t\t}\n" +
@@ -322,14 +324,14 @@ public class GenerateConvolveJustBorder_General {
 				"\t\t}\n" +
 				"\n" +
 				"\t\t// convolve along the top and bottom borders\n" +
-				"\t\tfor ( int x = border; x < width-border; x++ ) {\n" +
+				"\t\tfor ( int x = offsetL; x < width-offsetR; x++ ) {\n" +
 				"\t\t\tint indexDest = output.startIndex + x;\n" +
 				"\n" +
-				"\t\t\tfor (int y = 0; y < border; y++, indexDest += output.stride) {\n" +
+				"\t\t\tfor (int y = 0; y < offsetL; y++, indexDest += output.stride) {\n" +
 				"\t\t\t\t"+sumType+" total = 0;\n" +
 				"\t\t\t\tint indexKer = 0;\n" +
-				"\t\t\t\tfor( int i = -radius; i <= radius; i++ ) {\n" +
-				"\t\t\t\t\tfor (int j = -radius; j <= radius; j++) {\n" +
+				"\t\t\t\tfor( int i = -offsetL; i <= offsetR; i++ ) {\n" +
+				"\t\t\t\t\tfor (int j = -offsetL; j <= offsetR; j++) {\n" +
 				"\t\t\t\t\t\ttotal += input.get(x+j,y+i) * dataKer[indexKer++];\n" +
 				"\t\t\t\t\t}\n" +
 				"\t\t\t\t}\n" +
@@ -342,12 +344,12 @@ public class GenerateConvolveJustBorder_General {
 				"\t\t\t\tdataDst[indexDest] = "+typeCast+"total;\n" +
 				"\t\t\t}\n" +
 				"\n" +
-				"\t\t\tindexDest = output.startIndex + (height-border) * output.stride + x;\n" +
-				"\t\t\tfor (int y = height-border; y < height; y++, indexDest += output.stride) {\n" +
+				"\t\t\tindexDest = output.startIndex + (height-offsetR) * output.stride + x;\n" +
+				"\t\t\tfor (int y = height-offsetR; y < height; y++, indexDest += output.stride) {\n" +
 				"\t\t\t\t"+sumType+" total = 0;\n" +
 				"\t\t\t\tint indexKer = 0;\n" +
-				"\t\t\t\tfor( int i = -radius; i <= radius; i++ ) {\n" +
-				"\t\t\t\t\tfor (int j = -radius; j <= radius; j++) {\n" +
+				"\t\t\t\tfor( int i = -offsetL; i <= offsetR; i++ ) {\n" +
+				"\t\t\t\t\tfor (int j = -offsetL; j <= offsetR; j++) {\n" +
 				"\t\t\t\t\t\ttotal += input.get(x+j,y+i) * dataKer[indexKer++];\n" +
 				"\t\t\t\t\t}\n" +
 				"\t\t\t\t}\n" +

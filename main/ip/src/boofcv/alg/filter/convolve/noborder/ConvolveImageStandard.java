@@ -103,16 +103,17 @@ public class ConvolveImageStandard {
 		final int width = src.getWidth();
 		final int height = src.getHeight();
 
-		int kernelRadius = kernel.width/2;
+		int offsetL = kernel.offset;
+		int offsetR = kernel.width-kernel.offset-1;
 
-		for( int y = kernelRadius; y < height-kernelRadius; y++ ) {
-			int indexDst = dest.startIndex + y*dest.stride+kernelRadius;
-			for( int x = kernelRadius; x < width-kernelRadius; x++ ) {
+		for( int y = offsetL; y < height-offsetR; y++ ) {
+			int indexDst = dest.startIndex + y*dest.stride+offsetL;
+			for( int x = offsetL; x < width-offsetR; x++ ) {
 				float total = 0;
 				int indexKer = 0;
-				for( int ki = -kernelRadius; ki <= kernelRadius; ki++ ) {
-					int indexSrc = src.startIndex+(y+ki)*src.stride+ x;
-					for( int kj = -kernelRadius; kj <= kernelRadius; kj++ ) {
+				for( int ki = 0; ki < kernel.width; ki++ ) {
+					int indexSrc = src.startIndex + (y+ki-offsetL)*src.stride + x-offsetL;
+					for( int kj = 0; kj <  kernel.width; kj++ ) {
 						total += (dataSrc[indexSrc+kj]  )* dataKernel[indexKer++];
 					}
 				}
@@ -189,16 +190,17 @@ public class ConvolveImageStandard {
 		final int width = src.getWidth();
 		final int height = src.getHeight();
 
-		int kernelRadius = kernel.width/2;
+		int offsetL = kernel.offset;
+		int offsetR = kernel.width-kernel.offset-1;
 
-		for( int y = kernelRadius; y < height-kernelRadius; y++ ) {
-			int indexDst = dest.startIndex + y*dest.stride+kernelRadius;
-			for( int x = kernelRadius; x < width-kernelRadius; x++ ) {
+		for( int y = offsetL; y < height-offsetR; y++ ) {
+			int indexDst = dest.startIndex + y*dest.stride+offsetL;
+			for( int x = offsetL; x < width-offsetR; x++ ) {
 				double total = 0;
 				int indexKer = 0;
-				for( int ki = -kernelRadius; ki <= kernelRadius; ki++ ) {
-					int indexSrc = src.startIndex+(y+ki)*src.stride+ x;
-					for( int kj = -kernelRadius; kj <= kernelRadius; kj++ ) {
+				for( int ki = 0; ki < kernel.width; ki++ ) {
+					int indexSrc = src.startIndex + (y+ki-offsetL)*src.stride + x-offsetL;
+					for( int kj = 0; kj <  kernel.width; kj++ ) {
 						total += (dataSrc[indexSrc+kj]  )* dataKernel[indexKer++];
 					}
 				}
@@ -275,16 +277,17 @@ public class ConvolveImageStandard {
 		final int width = src.getWidth();
 		final int height = src.getHeight();
 
-		int kernelRadius = kernel.width/2;
+		int offsetL = kernel.offset;
+		int offsetR = kernel.width-kernel.offset-1;
 
-		for( int y = kernelRadius; y < height-kernelRadius; y++ ) {
-			int indexDst = dest.startIndex + y*dest.stride+kernelRadius;
-			for( int x = kernelRadius; x < width-kernelRadius; x++ ) {
+		for( int y = offsetL; y < height-offsetR; y++ ) {
+			int indexDst = dest.startIndex + y*dest.stride+offsetL;
+			for( int x = offsetL; x < width-offsetR; x++ ) {
 				int total = 0;
 				int indexKer = 0;
-				for( int ki = -kernelRadius; ki <= kernelRadius; ki++ ) {
-					int indexSrc = src.startIndex+(y+ki)*src.stride+ x;
-					for( int kj = -kernelRadius; kj <= kernelRadius; kj++ ) {
+				for( int ki = 0; ki < kernel.width; ki++ ) {
+					int indexSrc = src.startIndex + (y+ki-offsetL)*src.stride + x-offsetL;
+					for( int kj = 0; kj <  kernel.width; kj++ ) {
 						total += (dataSrc[indexSrc+kj] & 0xFF )* dataKernel[indexKer++];
 					}
 				}
@@ -361,16 +364,17 @@ public class ConvolveImageStandard {
 		final int width = src.getWidth();
 		final int height = src.getHeight();
 
-		int kernelRadius = kernel.width/2;
+		int offsetL = kernel.offset;
+		int offsetR = kernel.width-kernel.offset-1;
 
-		for( int y = kernelRadius; y < height-kernelRadius; y++ ) {
-			int indexDst = dest.startIndex + y*dest.stride+kernelRadius;
-			for( int x = kernelRadius; x < width-kernelRadius; x++ ) {
+		for( int y = offsetL; y < height-offsetR; y++ ) {
+			int indexDst = dest.startIndex + y*dest.stride+offsetL;
+			for( int x = offsetL; x < width-offsetR; x++ ) {
 				int total = 0;
 				int indexKer = 0;
-				for( int ki = -kernelRadius; ki <= kernelRadius; ki++ ) {
-					int indexSrc = src.startIndex+(y+ki)*src.stride+ x;
-					for( int kj = -kernelRadius; kj <= kernelRadius; kj++ ) {
+				for( int ki = 0; ki < kernel.width; ki++ ) {
+					int indexSrc = src.startIndex + (y+ki-offsetL)*src.stride + x-offsetL;
+					for( int kj = 0; kj <  kernel.width; kj++ ) {
 						total += (dataSrc[indexSrc+kj] & 0xFF )* dataKernel[indexKer++];
 					}
 				}
@@ -480,16 +484,17 @@ public class ConvolveImageStandard {
 		final int width = src.getWidth();
 		final int height = src.getHeight();
 
-		int kernelRadius = kernel.width/2;
+		int offsetL = kernel.offset;
+		int offsetR = kernel.width-kernel.offset-1;
 
-		for( int y = kernelRadius; y < height-kernelRadius; y++ ) {
-			int indexDst = dest.startIndex + y*dest.stride+kernelRadius;
-			for( int x = kernelRadius; x < width-kernelRadius; x++ ) {
+		for( int y = offsetL; y < height-offsetR; y++ ) {
+			int indexDst = dest.startIndex + y*dest.stride+offsetL;
+			for( int x = offsetL; x < width-offsetR; x++ ) {
 				int total = 0;
 				int indexKer = 0;
-				for( int ki = -kernelRadius; ki <= kernelRadius; ki++ ) {
-					int indexSrc = src.startIndex+(y+ki)*src.stride+ x;
-					for( int kj = -kernelRadius; kj <= kernelRadius; kj++ ) {
+				for( int ki = 0; ki < kernel.width; ki++ ) {
+					int indexSrc = src.startIndex + (y+ki-offsetL)*src.stride + x-offsetL;
+					for( int kj = 0; kj <  kernel.width; kj++ ) {
 						total += (dataSrc[indexSrc+kj]  )* dataKernel[indexKer++];
 					}
 				}
@@ -569,16 +574,17 @@ public class ConvolveImageStandard {
 		final int height = src.getHeight();
 		final int halfDivisor = divisor/2;
 
-		int kernelRadius = kernel.width/2;
+		int offsetL = kernel.offset;
+		int offsetR = kernel.width-kernel.offset-1;
 
-		for( int y = kernelRadius; y < height-kernelRadius; y++ ) {
-			int indexDst = dest.startIndex + y*dest.stride+kernelRadius;
-			for( int x = kernelRadius; x < width-kernelRadius; x++ ) {
+		for( int y = offsetL; y < height-offsetR; y++ ) {
+			int indexDst = dest.startIndex + y*dest.stride+offsetL;
+			for( int x = offsetL; x < width-offsetR; x++ ) {
 				int total = 0;
 				int indexKer = 0;
-				for( int ki = -kernelRadius; ki <= kernelRadius; ki++ ) {
-					int indexSrc = src.startIndex+(y+ki)*src.stride+ x;
-					for( int kj = -kernelRadius; kj <= kernelRadius; kj++ ) {
+				for( int ki = 0; ki < kernel.width; ki++ ) {
+					int indexSrc = src.startIndex + (y+ki-offsetL)*src.stride + x-offsetL;
+					for( int kj = 0; kj <  kernel.width; kj++ ) {
 						total += (dataSrc[indexSrc+kj] & 0xFF )* dataKernel[indexKer++];
 					}
 				}
@@ -658,16 +664,17 @@ public class ConvolveImageStandard {
 		final int height = src.getHeight();
 		final int halfDivisor = divisor/2;
 
-		int kernelRadius = kernel.width/2;
+		int offsetL = kernel.offset;
+		int offsetR = kernel.width-kernel.offset-1;
 
-		for( int y = kernelRadius; y < height-kernelRadius; y++ ) {
-			int indexDst = dest.startIndex + y*dest.stride+kernelRadius;
-			for( int x = kernelRadius; x < width-kernelRadius; x++ ) {
+		for( int y = offsetL; y < height-offsetR; y++ ) {
+			int indexDst = dest.startIndex + y*dest.stride+offsetL;
+			for( int x = offsetL; x < width-offsetR; x++ ) {
 				int total = 0;
 				int indexKer = 0;
-				for( int ki = -kernelRadius; ki <= kernelRadius; ki++ ) {
-					int indexSrc = src.startIndex+(y+ki)*src.stride+ x;
-					for( int kj = -kernelRadius; kj <= kernelRadius; kj++ ) {
+				for( int ki = 0; ki < kernel.width; ki++ ) {
+					int indexSrc = src.startIndex + (y+ki-offsetL)*src.stride + x-offsetL;
+					for( int kj = 0; kj <  kernel.width; kj++ ) {
 						total += (dataSrc[indexSrc+kj]  )* dataKernel[indexKer++];
 					}
 				}
@@ -777,16 +784,17 @@ public class ConvolveImageStandard {
 		final int width = src.getWidth();
 		final int height = src.getHeight();
 
-		int kernelRadius = kernel.width/2;
+		int offsetL = kernel.offset;
+		int offsetR = kernel.width-kernel.offset-1;
 
-		for( int y = kernelRadius; y < height-kernelRadius; y++ ) {
-			int indexDst = dest.startIndex + y*dest.stride+kernelRadius;
-			for( int x = kernelRadius; x < width-kernelRadius; x++ ) {
+		for( int y = offsetL; y < height-offsetR; y++ ) {
+			int indexDst = dest.startIndex + y*dest.stride+offsetL;
+			for( int x = offsetL; x < width-offsetR; x++ ) {
 				int total = 0;
 				int indexKer = 0;
-				for( int ki = -kernelRadius; ki <= kernelRadius; ki++ ) {
-					int indexSrc = src.startIndex+(y+ki)*src.stride+ x;
-					for( int kj = -kernelRadius; kj <= kernelRadius; kj++ ) {
+				for( int ki = 0; ki < kernel.width; ki++ ) {
+					int indexSrc = src.startIndex + (y+ki-offsetL)*src.stride + x-offsetL;
+					for( int kj = 0; kj <  kernel.width; kj++ ) {
 						total += (dataSrc[indexSrc+kj]  )* dataKernel[indexKer++];
 					}
 				}
@@ -866,16 +874,17 @@ public class ConvolveImageStandard {
 		final int height = src.getHeight();
 		final int halfDivisor = divisor/2;
 
-		int kernelRadius = kernel.width/2;
+		int offsetL = kernel.offset;
+		int offsetR = kernel.width-kernel.offset-1;
 
-		for( int y = kernelRadius; y < height-kernelRadius; y++ ) {
-			int indexDst = dest.startIndex + y*dest.stride+kernelRadius;
-			for( int x = kernelRadius; x < width-kernelRadius; x++ ) {
+		for( int y = offsetL; y < height-offsetR; y++ ) {
+			int indexDst = dest.startIndex + y*dest.stride+offsetL;
+			for( int x = offsetL; x < width-offsetR; x++ ) {
 				int total = 0;
 				int indexKer = 0;
-				for( int ki = -kernelRadius; ki <= kernelRadius; ki++ ) {
-					int indexSrc = src.startIndex+(y+ki)*src.stride+ x;
-					for( int kj = -kernelRadius; kj <= kernelRadius; kj++ ) {
+				for( int ki = 0; ki < kernel.width; ki++ ) {
+					int indexSrc = src.startIndex + (y+ki-offsetL)*src.stride + x-offsetL;
+					for( int kj = 0; kj <  kernel.width; kj++ ) {
 						total += (dataSrc[indexSrc+kj]  )* dataKernel[indexKer++];
 					}
 				}

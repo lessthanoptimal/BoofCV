@@ -41,4 +41,6 @@ public abstract class Kernel1D extends KernelBase {
 	public int getDimension() {
 		return 1;
 	}
+
+	public abstract double getDouble( int index );
 }

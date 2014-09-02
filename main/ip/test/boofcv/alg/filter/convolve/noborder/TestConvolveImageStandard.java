@@ -23,13 +23,12 @@ import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.filter.kernel.FactoryKernel;
 import boofcv.factory.filter.kernel.FactoryKernelGaussian;
 import boofcv.struct.convolve.Kernel1D;
+import boofcv.struct.convolve.Kernel2D;
 import boofcv.struct.convolve.KernelBase;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.testing.BoofTesting;
 import org.junit.Test;
 
-import java.lang.reflect.Array;
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Random;
@@ -57,7 +56,7 @@ public class TestConvolveImageStandard {
 	 */
 	@Test
 	public void checkAll() {
-		int numExpected = 27;
+		int numExpected = 29;
 		Method methods[] = ConvolveImageStandard.class.getMethods();
 
 		// sanity check to make sure the functions are being found
@@ -125,7 +124,7 @@ public class TestConvolveImageStandard {
 	 * Unit test for horizontal convolution.
 	 */
 	public void horizontal(ImageSingleBand img, ImageSingleBand dest) {
-		Object ker = FactoryKernelGaussian.gaussian1D(img.getClass(),-1,kernelRadius);
+		Kernel1D ker = FactoryKernelGaussian.gaussian1D(img.getClass(),-1,kernelRadius);
 
 		// standard symmetric odd kernel
 		GImageMiscOps.fill(dest,0);
@@ -149,15 +148,16 @@ public class TestConvolveImageStandard {
 	}
 
 
-	public double horizontal( int x , int y , ImageSingleBand img , Object ker , int offset , int width ) {
+	public double horizontal( int x , int y , ImageSingleBand img , Kernel1D ker , int offset , int width ) {
 
 		double total = 0;
 
 		for( int i = 0; i < width; i++ ) {
-			double valI = get(img,x-offset+i,y);
-			double valK = getKernel(ker,i);
+			if( img.isInBounds(x-offset+i,y)) {
+				double valI = get(img, x - offset + i, y);
 
-			total += valI*valK;
+				total += valI * ker.getDouble(i);
+			}
 		}
 
 		return total;
@@ -168,7 +168,7 @@ public class TestConvolveImageStandard {
 	 */
 	public void horizontalDiv(ImageSingleBand img, ImageSingleBand dest) {
 		int divisor = 11;
-		Object ker = FactoryKernelGaussian.gaussian1D(img.getClass(),-1,kernelRadius);
+		Kernel1D ker = FactoryKernelGaussian.gaussian1D(img.getClass(),-1,kernelRadius);
 
 		// standard symmetric odd kernel
 		GImageMiscOps.fill(dest,0);
@@ -195,15 +195,14 @@ public class TestConvolveImageStandard {
 		assertEquals(0, get(dest, width-1, 3), 1e-6);
 	}
 
-	public double horizontal( int x , int y , ImageSingleBand img , Object ker , int offset , int width , int divisor ) {
+	public double horizontal( int x , int y , ImageSingleBand img , Kernel1D ker , int offset , int width , int divisor ) {
 
 		double total = 0;
 
 		for( int i = 0; i < width; i++ ) {
-			double valI = get(img,x-offset+i,y);
-			double valK = getKernel(ker,i);
+			double valI = get(img, x - offset + i, y);
 
-			total += valI*valK;
+			total += valI*ker.getDouble(i);
 		}
 
 		return (total+(divisor/2))/divisor;
@@ -213,7 +212,7 @@ public class TestConvolveImageStandard {
 	 * Unit test for vertical convolution.
 	 */
 	public void vertical(ImageSingleBand img, ImageSingleBand dest) {
-		Object ker = FactoryKernelGaussian.gaussian1D(img.getClass(),-1,kernelRadius);
+		Kernel1D ker = FactoryKernelGaussian.gaussian1D(img.getClass(),-1,kernelRadius);
 
 		// standard symmetric odd kernel
 		GImageMiscOps.fill(dest,0);
@@ -236,14 +235,13 @@ public class TestConvolveImageStandard {
 		assertEquals(0, get(dest, 3, height-1), 1e-6);
 	}
 
-	public double vertical( int x , int y , ImageSingleBand img , Object ker , int offset , int width ) {
+	public double vertical( int x , int y , ImageSingleBand img , Kernel1D ker , int offset , int width ) {
 		double total = 0;
 
 		for( int i = 0; i < width; i++ ) {
-			double valI = get(img,x,y-offset+i);
-			double valK = getKernel(ker,i);
+			double valI = get(img, x, y - offset + i);
 
-			total += valI*valK;
+			total += valI*ker.getDouble(i);
 		}
 
 		return total;
@@ -253,7 +251,7 @@ public class TestConvolveImageStandard {
 	 * Unit test for vertical convolution with division.
 	 */
 	public void verticalDiv(ImageSingleBand img, ImageSingleBand dest) {
-		Object ker = FactoryKernelGaussian.gaussian1D(img.getClass(),-1,kernelRadius);
+		Kernel1D ker = FactoryKernelGaussian.gaussian1D(img.getClass(),-1,kernelRadius);
 
 		int divisor = 11;
 
@@ -282,14 +280,13 @@ public class TestConvolveImageStandard {
 		assertEquals(0, get(dest, 3, height-1), 1e-6);
 	}
 
-	public double vertical( int x , int y , ImageSingleBand img , Object ker , int offset , int width , int divisor ) {
+	public double vertical( int x , int y , ImageSingleBand img , Kernel1D ker , int offset , int width , int divisor ) {
 		double total = 0;
 
 		for( int i = 0; i < width; i++ ) {
 			double valI = get(img,x,y-offset+i);
-			double valK = getKernel(ker,i);
 
-			total += valI*valK;
+			total += valI*ker.getDouble(i);
 		}
 
 		return (total+(divisor/2))/divisor;
@@ -308,16 +305,23 @@ public class TestConvolveImageStandard {
 		} else
 			ker = FactoryKernel.random2D_I32(kernelRadius, 0, 10, new Random(234));
 
+		// standard symmetric kernel
+		convolve(img, dest, ker);
+
+		// non-symmetric kernel
+		((KernelBase)ker).offset = 0;
+		convolve(img, dest, ker);
+	}
+
+	private void convolve(ImageSingleBand img, ImageSingleBand dest, Object ker) {
 		int testX = 1;
 		int testY = 2;
-		double expected = 0;
+
+		Kernel2D kernel = (Kernel2D)ker;
 
 		// manually perform a convolution
-		for (int i = -kernelRadius; i <= kernelRadius; i++) {
-			for (int j = -kernelRadius; j <= kernelRadius; j++) {
-				expected += getKernel(ker, kernelRadius + i, kernelRadius + j) * get(img, testX + i, testY + j);
-			}
-		}
+		GImageMiscOps.fill(dest,0);
+		double expected = convolve(img, testX, testY, kernel);
 
 		invokeMethod("convolve",ker, img, dest);
 
@@ -327,10 +331,24 @@ public class TestConvolveImageStandard {
 		// the border should be zero
 		for (int i = 0; i < height; i++) {
 			for (int j = 0; j < width; j++) {
-				if (i < kernelRadius || j < kernelRadius)
-					assertEquals(0f, get(dest, j, i), 1e-6);
+				if (i < kernel.offset || j < kernel.offset
+						|| i >= height-(kernel.width-kernel.offset-1)
+						|| j >= width-(kernel.width-kernel.offset-1))
+					assertEquals(j+"  "+i,0f, get(dest, j, i), 1e-6);
 			}
 		}
+	}
+
+	private double convolve(ImageSingleBand img, int cx, int cy, Kernel2D kernel) {
+		double expected = 0;
+		for (int i = 0; i < kernel.width; i++) {
+			int y = cy - kernel.offset + i;
+			for (int j = 0; j < kernel.width; j++) {
+				int x = cx - kernel.offset + j;
+				expected += kernel.getDouble(j, i) * get(img,x,y);
+			}
+		}
+		return expected;
 	}
 
 	/**
@@ -347,14 +365,9 @@ public class TestConvolveImageStandard {
 		int halfDivisor = divisor/2;
 		int testX = 1;
 		int testY = 2;
-		double expected = 0;
 
 		// manually perform a convolution
-		for (int i = -kernelRadius; i <= kernelRadius; i++) {
-			for (int j = -kernelRadius; j <= kernelRadius; j++) {
-				expected += getKernel(ker, kernelRadius + i, kernelRadius + j) * get(img, testX + i, testY + j);
-			}
-		}
+		int expected = (int)convolve(img, testX, testY, (Kernel2D)ker);
 		expected = (expected + halfDivisor)/divisor;
 		if (dest.getDataType().isInteger())
 			expected = (int) expected;
@@ -370,34 +383,6 @@ public class TestConvolveImageStandard {
 				if (i < kernelRadius || j < kernelRadius)
 					assertEquals(0f, get(dest, j, i), 1e-6);
 			}
-		}
-	}
-
-	private double getKernel(Object ker, int index) {
-		try {
-			Field f = ker.getClass().getField("data");
-			Object o = f.get(ker);
-			Number n = (Number) Array.get(o, index);
-			return n.doubleValue();
-		} catch (NoSuchFieldException e) {
-			throw new RuntimeException(e);
-		} catch (IllegalAccessException e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	private double getKernel(Object ker, int x, int y) {
-		try {
-			Field fw = ker.getClass().getField("width");
-			int width = (Integer) fw.get(ker);
-			Field f = ker.getClass().getField("data");
-			Object o = f.get(ker);
-			Number n = (Number) Array.get(o, y * width + x);
-			return n.doubleValue();
-		} catch (NoSuchFieldException e) {
-			throw new RuntimeException(e);
-		} catch (IllegalAccessException e) {
-			throw new RuntimeException(e);
 		}
 	}
 

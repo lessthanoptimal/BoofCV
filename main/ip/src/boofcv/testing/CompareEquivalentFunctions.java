@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -65,7 +65,7 @@ public abstract class CompareEquivalentFunctions {
 			}
 
 			if( !foundMatch ) {
-				System.out.println("Can't find an equivalent function in validation class");
+				System.out.println("Can't find an equivalent function in validation class. "+m.getName());
 			} else {
 				numFound++;
 			}

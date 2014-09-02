@@ -133,7 +133,7 @@ public class TestImplEnhanceFilter {
 			expected = new ImageSInt16(input.width,input.height);
 			ImageBorder_I32 border = BoofDefaults.borderDerivative_I32();
 			border.setImage(input);
-			ConvolveJustBorder_General.convolve(ImplEnhanceFilter.kernelEnhance4_I32,border,(ImageSInt16)expected,1);
+			ConvolveJustBorder_General.convolve(ImplEnhanceFilter.kernelEnhance4_I32,border,(ImageSInt16)expected);
 			GPixelMath.boundImage(expected, 0, 255);
 		} else {
 			BoofTesting.callStaticMethod(ImplEnhanceFilter.class,"sharpenBorder4",input,output,0f,255f);
@@ -141,7 +141,7 @@ public class TestImplEnhanceFilter {
 			expected = new ImageFloat32(input.width,input.height);
 			ImageBorder_F32 border = BoofDefaults.borderDerivative_F32();
 			border.setImage((ImageFloat32)input);
-			ConvolveJustBorder_General.convolve(ImplEnhanceFilter.kernelEnhance4_F32, border, (ImageFloat32) expected,1);
+			ConvolveJustBorder_General.convolve(ImplEnhanceFilter.kernelEnhance4_F32, border, (ImageFloat32) expected);
 			GPixelMath.boundImage(expected, 0, 255);
 		}
 
@@ -234,7 +234,7 @@ public class TestImplEnhanceFilter {
 			expected = new ImageSInt16(input.width,input.height);
 			ImageBorder_I32 border = BoofDefaults.borderDerivative_I32();
 			border.setImage(input);
-			ConvolveJustBorder_General.convolve(ImplEnhanceFilter.kernelEnhance8_I32,border,(ImageSInt16)expected,1);
+			ConvolveJustBorder_General.convolve(ImplEnhanceFilter.kernelEnhance8_I32,border,(ImageSInt16)expected);
 			GPixelMath.boundImage(expected, 0, 255);
 		} else {
 			BoofTesting.callStaticMethod(ImplEnhanceFilter.class,"sharpenBorder8",input,output,0f,255f);
@@ -242,7 +242,7 @@ public class TestImplEnhanceFilter {
 			expected = new ImageFloat32(input.width,input.height);
 			ImageBorder_F32 border = BoofDefaults.borderDerivative_F32();
 			border.setImage((ImageFloat32)input);
-			ConvolveJustBorder_General.convolve(ImplEnhanceFilter.kernelEnhance8_F32, border, (ImageFloat32) expected,1);
+			ConvolveJustBorder_General.convolve(ImplEnhanceFilter.kernelEnhance8_F32, border, (ImageFloat32) expected);
 			GPixelMath.boundImage(expected, 0, 255);
 		}
 

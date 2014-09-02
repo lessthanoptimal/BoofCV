@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,12 +18,23 @@
 
 package boofcv.alg.filter.convolve.normalized;
 
+import boofcv.alg.misc.ImageMiscOps;
+import boofcv.factory.filter.kernel.FactoryKernel;
+import boofcv.struct.convolve.Kernel1D_I32;
+import boofcv.struct.convolve.Kernel2D_I32;
+import boofcv.struct.image.ImageUInt8;
 import org.junit.Test;
+
+import java.util.Random;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Peter Abeles
  */
 public class TestConvolveNormalizedNaive {
+
+	Random rand = new Random(234);
 
 	/**
 	 * This unit test is here as a place holder so that in the future it will be clear that a unit test for
@@ -33,5 +44,130 @@ public class TestConvolveNormalizedNaive {
 	 */
 	@Test
 	public void doNothing() {
+	}
+
+	/**
+	 * Check it against one specific type to see if the core algorithm is correct
+	 */
+	@Test
+	public void horizontal() {
+		Kernel1D_I32 kernel = new Kernel1D_I32(new int[]{1,2,3,4,5,6},4,6);
+
+		ImageUInt8 input = new ImageUInt8(15,16);
+		ImageMiscOps.fillUniform(input, rand, 0, 50);
+		ImageUInt8 output = new ImageUInt8(15,16);
+
+		ConvolveNormalizedNaive.horizontal(kernel,input,output);
+
+		for (int y = 0; y < output.height; y++) {
+			for (int x = 0; x < output.width; x++) {
+				int expected = horizontal(x,y,kernel,input);
+				int found = output.get(x,y);
+				assertEquals(x+"  "+y,expected,found);
+			}
+		}
+	}
+
+	private int horizontal( int x , int y , Kernel1D_I32 kernel , ImageUInt8 image )
+	{
+		int total = 0;
+		int weight = 0;
+
+		for (int i = 0; i < kernel.width; i++) {
+			if( image.isInBounds(x+i-kernel.offset,y)) {
+				int w = kernel.get(i);
+				int v = image.get(x+i-kernel.offset,y);
+
+				total += w*v;
+				weight += w;
+			}
+		}
+
+		return (total + weight/2)/weight;
+	}
+
+	/**
+	 * Check it against one specific type to see if the core algorithm is correct
+	 */
+	@Test
+	public void vertical() {
+		Kernel1D_I32 kernel = new Kernel1D_I32(new int[]{1,2,3,4,5,6},4,6);
+
+		ImageUInt8 input = new ImageUInt8(15,16);
+		ImageMiscOps.fillUniform(input, rand, 0, 50);
+		ImageUInt8 output = new ImageUInt8(15,16);
+
+		ConvolveNormalizedNaive.vertical(kernel, input, output);
+
+		for (int y = 0; y < output.height; y++) {
+			for (int x = 0; x < output.width; x++) {
+				int expected = vertical(x, y, kernel, input);
+				int found = output.get(x,y);
+				assertEquals(x+"  "+y,expected,found);
+			}
+		}
+	}
+
+	private int vertical( int x , int y , Kernel1D_I32 kernel , ImageUInt8 image )
+	{
+		int total = 0;
+		int weight = 0;
+
+		for (int i = 0; i < kernel.width; i++) {
+			if( image.isInBounds(x,y+i-kernel.offset)) {
+				int w = kernel.get(i);
+				int v = image.get(x,y+i-kernel.offset);
+
+				total += w*v;
+				weight += w;
+			}
+		}
+
+		return (total + weight/2)/weight;
+	}
+
+	/**
+	 * Check it against one specific type to see if the core algorithm is correct
+	 */
+	@Test
+	public void convolve() {
+		Kernel2D_I32 kernel = FactoryKernel.random2D_I32(3,0,20,rand);
+		kernel.offset = 1;
+
+		ImageUInt8 input = new ImageUInt8(15,16);
+		ImageMiscOps.fillUniform(input, rand, 0, 50);
+		ImageUInt8 output = new ImageUInt8(15,16);
+
+		ConvolveNormalizedNaive.convolve(kernel, input, output);
+
+		for (int y = 0; y < output.height; y++) {
+			for (int x = 0; x < output.width; x++) {
+				int expected = convolve(x, y, kernel, input);
+				int found = output.get(x,y);
+				assertEquals(x+"  "+y,expected,found);
+			}
+		}
+	}
+
+	private int convolve( int cx , int cy , Kernel2D_I32 kernel , ImageUInt8 image )
+	{
+		int total = 0;
+		int weight = 0;
+
+		for (int i = 0; i < kernel.width; i++) {
+			int y = cy+i-kernel.offset;
+			for (int j = 0; j < kernel.width; j++) {
+				int x = cx+j-kernel.offset;
+
+				if( image.isInBounds(x,y)) {
+					int w = kernel.get(j,i);
+					int v = image.get(x,y);
+					weight += w;
+					total += w*v;
+				}
+			}
+		}
+
+		return (total + weight/2)/weight;
 	}
 }

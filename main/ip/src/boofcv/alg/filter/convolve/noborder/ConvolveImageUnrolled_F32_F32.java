@@ -109,6 +109,11 @@ public class ConvolveImageUnrolled_F32_F32 {
 
 	public static boolean convolve( Kernel2D_F32 kernel ,
 								   ImageFloat32 image, ImageFloat32 dest) {
+
+		// Unrolled functions only exist for symmetric kernels with an odd width
+		if( kernel.offset != kernel.width/2 || kernel.width%2 == 0 )
+			return false;
+
 		switch( kernel.width ) {
 			case 3:
 				convolve3(kernel,image,dest);

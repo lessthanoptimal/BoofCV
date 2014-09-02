@@ -37,6 +37,8 @@ public abstract class KernelBase {
 	}
 
 	protected KernelBase(int offset, int width) {
+		if (width % 2 == 0 && width <= 0)
+			throw new IllegalArgumentException("invalid width");
 		this.width = width;
 		this.offset = offset;
 	}

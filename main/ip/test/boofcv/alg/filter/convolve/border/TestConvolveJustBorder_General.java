@@ -75,13 +75,8 @@ public class TestConvolveJustBorder_General extends CompareImageBorder {
 		Class<?> e[] = evaluation.getParameterTypes();
 		Class<?> c[] = candidate.getParameterTypes();
 
-		if( evaluation.getName().compareTo("convolve") == 0) {
-			if( e.length != c.length+1 )
-				return false;
-		} else  {
-			if( e.length != c.length )
-				return false;
-		}
+		if( e.length != c.length )
+			return false;
 
 		if( e[0] != c[0] )
 			return false;
@@ -128,17 +123,13 @@ public class TestConvolveJustBorder_General extends CompareImageBorder {
 		ret[0][1] = ImageFloat32.class == src.getClass() ?
 				ImageBorderValue.wrap((ImageFloat32)src,fillValue) : ImageBorderValue.wrap((ImageInteger)src,fillValue);
 		ret[0][2] = dst;
-		if( paramTypes.length == 4)
-			ret[0][3] = kernelWidth/2;
 
 		// change the offset
-		kernel = createKernel(paramTypes[0],0,kernelWidth);
+		kernel = createKernel(paramTypes[0],kernelWidth/2-1,kernelWidth);
 		ret[1][0] = kernel;
 		ret[1][1] = ImageFloat32.class == src.getClass() ?
 				ImageBorderValue.wrap((ImageFloat32)src,fillValue) : ImageBorderValue.wrap((ImageInteger)src,fillValue);
-		ret[1][2] = dst;
-		if( paramTypes.length == 4 )
-			ret[1][3] = kernelWidth/2;
+		ret[1][2] = ConvolutionTestHelper.createImage(validation.getParameterTypes()[2], width, height);
 
 		return ret;
 	}

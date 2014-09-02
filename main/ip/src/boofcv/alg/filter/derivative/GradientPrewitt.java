@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -65,8 +65,8 @@ public class GradientPrewitt {
 
 		if( border != null ) {
 			border.setImage(orig);
-			ConvolveJustBorder_General.convolve(kernelDerivX_I32, border,derivX,1);
-			ConvolveJustBorder_General.convolve(kernelDerivY_I32, border,derivY,1);
+			ConvolveJustBorder_General.convolve(kernelDerivX_I32, border,derivX);
+			ConvolveJustBorder_General.convolve(kernelDerivY_I32, border,derivY);
 		}
 	}
 
@@ -84,8 +84,8 @@ public class GradientPrewitt {
 
 		if( border != null ) {
 			border.setImage(orig);
-			ConvolveJustBorder_General.convolve(kernelDerivX_I32, border,derivX,1);
-			ConvolveJustBorder_General.convolve(kernelDerivY_I32, border,derivY,1);
+			ConvolveJustBorder_General.convolve(kernelDerivX_I32, border,derivX);
+			ConvolveJustBorder_General.convolve(kernelDerivY_I32, border,derivY);
 		}
 	}
 
@@ -104,8 +104,8 @@ public class GradientPrewitt {
 
 		if( border != null ) {
 			border.setImage(orig);
-			ConvolveJustBorder_General.convolve(kernelDerivX_F32, border, derivX,1);
-			ConvolveJustBorder_General.convolve(kernelDerivY_F32, border, derivY,1);
+			ConvolveJustBorder_General.convolve(kernelDerivX_F32, border, derivX);
+			ConvolveJustBorder_General.convolve(kernelDerivY_F32, border, derivY);
 		}
 	}
 }

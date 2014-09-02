@@ -87,7 +87,7 @@ public class ConvolveWithBorder {
 
 		border.setImage(image);
 		ConvolveImageNoBorder.convolve(kernel,image,dest);
-		ConvolveJustBorder_General.convolve(kernel,border,dest,kernel.getRadius());
+		ConvolveJustBorder_General.convolve(kernel,border,dest);
 	}
 
 	/**
@@ -141,7 +141,7 @@ public class ConvolveWithBorder {
 
 		border.setImage(image);
 		ConvolveImageNoBorder.convolve(kernel,image,dest);
-		ConvolveJustBorder_General.convolve(kernel,border,dest,kernel.getRadius());
+		ConvolveJustBorder_General.convolve(kernel,border,dest);
 	}
 
 	/**
@@ -195,7 +195,7 @@ public class ConvolveWithBorder {
 
 		border.setImage(image);
 		ConvolveImageNoBorder.convolve(kernel,image,dest);
-		ConvolveJustBorder_General.convolve(kernel,border,dest,kernel.getRadius());
+		ConvolveJustBorder_General.convolve(kernel,border,dest);
 	}
 
 	/**
@@ -249,6 +249,6 @@ public class ConvolveWithBorder {
 
 		border.setImage(image);
 		ConvolveImageNoBorder.convolve(kernel,image,dest);
-		ConvolveJustBorder_General.convolve(kernel,border,dest,kernel.getRadius());
+		ConvolveJustBorder_General.convolve(kernel,border,dest);
 	}
 }

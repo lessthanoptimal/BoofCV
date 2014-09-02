@@ -82,6 +82,11 @@ public class Kernel1D_F32 extends Kernel1D {
 	protected Kernel1D_F32() {
 	}
 
+	@Override
+	public double getDouble(int index) {
+		return data[index];
+	}
+
 	/**
 	 * Creates a kernel whose elements are the specified data array and has
 	 * the specified width.

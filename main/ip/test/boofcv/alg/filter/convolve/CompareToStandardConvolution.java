@@ -21,10 +21,7 @@ package boofcv.alg.filter.convolve;
 import boofcv.alg.filter.convolve.noborder.ConvolveImageStandard;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.factory.filter.kernel.FactoryKernel;
-import boofcv.struct.convolve.Kernel1D_F32;
-import boofcv.struct.convolve.Kernel1D_I32;
-import boofcv.struct.convolve.Kernel2D_F32;
-import boofcv.struct.convolve.Kernel2D_I32;
+import boofcv.struct.convolve.*;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.testing.CompareIdenticalFunctions;
 
@@ -42,7 +39,7 @@ public class CompareToStandardConvolution extends CompareIdenticalFunctions
 
 	protected int width = 20;
 	protected int height = 30;
-	protected int kernelRadius = 1;
+	protected int kernelRadius = 2;
 
 	public CompareToStandardConvolution( Class<?> targetClass ) {
 		super(targetClass, ConvolveImageStandard.class);
@@ -57,38 +54,33 @@ public class CompareToStandardConvolution extends CompareIdenticalFunctions
 	protected Object[][] createInputParam(Method candidate, Method validation) {
 		Class<?> paramTypes[] = candidate.getParameterTypes();
 
-		Object kernel;
-		if (Kernel1D_F32.class == paramTypes[0]) {
-			kernel = FactoryKernel.random1D_F32(kernelRadius, -1, 1, rand);
-		} else if (Kernel1D_I32.class == paramTypes[0]) {
-			kernel = FactoryKernel.random1D_I32(kernelRadius, 0, 5, rand);
-		} else if (Kernel2D_I32.class == paramTypes[0]) {
-			kernel = FactoryKernel.random2D_I32(kernelRadius, -1, 1, rand);
-		} else if (Kernel2D_F32.class == paramTypes[0]) {
-			kernel = FactoryKernel.random2D_F32(kernelRadius, 0, 5, rand);
-		} else {
-			throw new RuntimeException("Unknown kernel type");
-		}
-
 		ImageSingleBand src = ConvolutionTestHelper.createImage(paramTypes[1], width, height);
 		GImageMiscOps.fillUniform(src, rand, 0, 130);
 		ImageSingleBand dst = ConvolutionTestHelper.createImage(paramTypes[2], width, height);
 
 		if( candidate.getName().compareTo("convolve") != 0 ) {
-			Object[][] ret = new Object[1][paramTypes.length];
-			int i = 0;
-			ret[0][i] = kernel; i++;
-			ret[0][i] = src;    i++;
-			ret[0][i] = dst;    i++;
+			Object[][] ret = new Object[2][paramTypes.length];
+			ret[0][0] = createKernel(paramTypes[0]);
+			ret[0][1] = src;
+			ret[0][2] = dst;
 			if( paramTypes.length == 4) {
-				ret[0][i] = 11;
+				ret[0][3] = 11;
+			}
+
+			KernelBase kernel = createKernel(paramTypes[0]);
+			kernel.offset--;
+			ret[1][0] = kernel;
+			ret[1][1] = src;
+			ret[1][2] = dst;
+			if( paramTypes.length == 4) {
+				ret[1][3] = 11;
 			}
 
 			return ret;
 		} else {
-			Object[][] ret = new Object[1][paramTypes.length];
+			Object[][] ret = new Object[2][paramTypes.length];
 
-			ret[0][0] = kernel;
+			ret[0][0] = createKernel(paramTypes[0]);
 			ret[0][1] = src;
 			ret[0][2] = dst;
 
@@ -96,7 +88,33 @@ public class CompareToStandardConvolution extends CompareIdenticalFunctions
 				ret[0][3] = 11;
 			}
 
+			KernelBase kernel = createKernel(paramTypes[0]);
+			kernel.offset--;
+			ret[1][0] = kernel;
+			ret[1][1] = src;
+			ret[1][2] = dst;
+
+			if( paramTypes.length == 4 ) {
+				ret[1][3] = 11;
+			}
+
 			return ret;
 		}
+	}
+
+	private KernelBase createKernel(Class<?> paramType) {
+		KernelBase kernel;
+		if (Kernel1D_F32.class == paramType) {
+			kernel = FactoryKernel.random1D_F32(kernelRadius, -1, 1, rand);
+		} else if (Kernel1D_I32.class == paramType) {
+			kernel = FactoryKernel.random1D_I32(kernelRadius, 0, 5, rand);
+		} else if (Kernel2D_I32.class == paramType) {
+			kernel = FactoryKernel.random2D_I32(kernelRadius, -1, 1, rand);
+		} else if (Kernel2D_F32.class == paramType) {
+			kernel = FactoryKernel.random2D_F32(kernelRadius, 0, 5, rand);
+		} else {
+			throw new RuntimeException("Unknown kernel type");
+		}
+		return kernel;
 	}
 }
