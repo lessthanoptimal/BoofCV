@@ -18,10 +18,12 @@
 
 package boofcv.alg.filter.convolve.normalized;
 
+import boofcv.alg.filter.convolve.ConvolveImageNoBorder;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.factory.filter.kernel.FactoryKernel;
 import boofcv.struct.convolve.Kernel1D_I32;
 import boofcv.struct.convolve.Kernel2D_I32;
+import boofcv.struct.image.ImageUInt16;
 import boofcv.struct.image.ImageUInt8;
 import org.junit.Test;
 
@@ -123,6 +125,67 @@ public class TestConvolveNormalizedNaive {
 			}
 		}
 
+		return (total + weight/2)/weight;
+	}
+
+	/**
+	 * Check it against one specific type to see if the core algorithm is correct
+	 */
+	@Test
+	public void vertical2_U16_U8() {
+		Kernel1D_I32 kernelY = new Kernel1D_I32(new int[]{1,2,3,4,5,6},4,6);
+		Kernel1D_I32 kernelX = new Kernel1D_I32(new int[]{4,2,1,4,3,6},2,5);
+
+		ImageUInt16 input = new ImageUInt16(15,16);
+		ImageMiscOps.fillUniform(input, rand, 0, 50);
+		ImageUInt8 output = new ImageUInt8(15,16);
+
+		ConvolveNormalizedNaive.vertical(kernelX,kernelY, input, output);
+
+		ImageUInt8 alt = new ImageUInt8(15,16);
+		ConvolveImageNoBorder.vertical(kernelY, input, alt, kernelX.computeSum() * kernelY.computeSum());
+
+		alt.print();
+		System.out.println("-----------");
+		output.print();
+
+
+		for (int y = 0; y < output.height; y++) {
+			for (int x = 0; x < output.width; x++) {
+				int expected = vertical2(x, y, kernelX, kernelY, input);
+				int found = output.get(x,y);
+				assertEquals(x+"  "+y,expected,found);
+			}
+		}
+	}
+
+	private int vertical2(int x, int y,
+						  Kernel1D_I32 kernelX, Kernel1D_I32 kernelY,
+						  ImageUInt16 image)
+	{
+		int total = 0;
+		int weightY = 0;
+
+		for (int i = 0; i < kernelY.width; i++) {
+			if( image.isInBounds(x,y+i-kernelY.offset)) {
+				int w = kernelY.get(i);
+				int v = image.get(x,y+i-kernelY.offset);
+
+				total += w*v;
+				weightY += w;
+			}
+		}
+
+		int weightX = 0;
+		for (int i = 0; i < kernelX.width; i++) {
+			if( image.isInBounds(x+i-kernelX.offset,y)) {
+				int w = kernelX.get(i);
+
+				weightX += w;
+			}
+		}
+
+		int weight = weightX*weightY;
 		return (total + weight/2)/weight;
 	}
 

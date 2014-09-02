@@ -18,6 +18,7 @@
 
 package boofcv.testing;
 
+import boofcv.struct.image.ImageInteger;
 import boofcv.struct.image.ImageSingleBand;
 
 import java.lang.reflect.Method;
@@ -60,6 +61,8 @@ public abstract class CompareIdenticalFunctions extends CompareEquivalentFunctio
 			if( e[i] != c[i])
 				return false;
 		}
+		System.out.println("   "+c[1].getSimpleName()+"  "+c[2].getSimpleName());
+
 		return true;
 	}
 
@@ -87,6 +90,12 @@ public abstract class CompareIdenticalFunctions extends CompareEquivalentFunctio
 
 			ImageSingleBand t = (ImageSingleBand)targetParam[i];
 			ImageSingleBand v = (ImageSingleBand)validationParam[i];
+
+			if( i == 3) {
+				((ImageInteger)t).print();
+				System.out.println("--------");
+				((ImageInteger)v).print();
+			}
 
 			BoofTesting.assertEqualsRelative(v, t, 1e-4);// todo is this tolerance too big?  some operations with a slightly different ordering seem to require it
 		}

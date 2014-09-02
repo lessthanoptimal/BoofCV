@@ -77,17 +77,12 @@ public class CompareToStandardConvolutionNormalized extends CompareIdenticalFunc
 			index++;
 		}
 
-		System.out.println(" "+paramTypes[index].getSimpleName()+" "+paramTypes[index+1].getSimpleName());
-
 		ImageSingleBand src = ConvolutionTestHelper.createImage(paramTypes[index], width, height);
 		ret[0][index++] = src;
-		GImageMiscOps.fillUniform(src, rand, 0, 5);
+		GImageMiscOps.fillUniform(src, rand, 0, 50);
 		ImageSingleBand dst = ConvolutionTestHelper.createImage(paramTypes[index], width, height);
 		ret[0][index++] = dst;
 
-		if( paramTypes.length > index) {
-			ret[0][index] = 11;
-		}
 
 		return ret;
 	}

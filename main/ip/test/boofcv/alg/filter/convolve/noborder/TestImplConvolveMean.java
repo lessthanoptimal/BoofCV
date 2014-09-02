@@ -48,7 +48,7 @@ public class TestImplConvolveMean extends CompareEquivalentFunctions {
 
 	@Test
 	public void compareToStandard() {
-		performTests(6);
+		performTests(4);
 	}
 
 	@Override
@@ -92,7 +92,7 @@ public class TestImplConvolveMean extends CompareEquivalentFunctions {
 		ImageSingleBand input = GeneralizedImageOps.createSingleBand(c[0], width, height);
 		ImageSingleBand output = GeneralizedImageOps.createSingleBand(c[1], width, height);
 
-		GImageMiscOps.fillUniform(input, rand, 0, 20);
+		GImageMiscOps.fillUniform(input, rand, 0, 50);
 
 		Object[][] ret = new Object[1][];
 		ret[0] = new Object[]{input,output,kernelRadius};
@@ -107,8 +107,10 @@ public class TestImplConvolveMean extends CompareEquivalentFunctions {
 
 		ImageSingleBand output = (ImageSingleBand)((ImageSingleBand)targetParam[1]).clone();
 
+		int w = kernelRadius*2+1;
+
 		if( output.getDataType().isInteger() )
-			return new Object[]{kernel,targetParam[0],output,kernelRadius*2+1};
+			return new Object[]{kernel,targetParam[0],output,w*w};
 		else
 			return new Object[]{kernel,targetParam[0],output};
 	}

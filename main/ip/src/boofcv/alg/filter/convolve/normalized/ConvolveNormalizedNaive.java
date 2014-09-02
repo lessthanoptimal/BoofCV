@@ -151,7 +151,7 @@ public class ConvolveNormalizedNaive {
 					total += input.get(j,y)*v;
 					weight += v;
 				}
-				output.set(x, y, (total + weight / 2) / weight);
+				output.set(x,y, (total+weight/2)/weight );
 			}
 		}
 	}
@@ -417,27 +417,32 @@ public static void vertical(Kernel1D_I32 kernelX, Kernel1D_I32 kernelY,
 		final int height = input.getHeight();
 
 		for (int y = 0; y < height; y++) {
-			for( int x = 0; x < width; x++ ) {
+			for (int x = 0; x < width; x++) {
 				int total = 0;
 				int weightY = 0;
 
 				int startY = y - offsetY;
-				int endY = y + offsetY;
+				int endY = startY + kernelY.getWidth();
 
-				if( startY < 0 ) startY = 0;
-				if( endY > height ) endY = height;
+				if (startY < 0) startY = 0;
+				if (endY > height) endY = height;
+
+				for (int i = startY; i < endY; i++) {
+					int v = kernelY.get(i - y + offsetY);
+					total += input.get(x, i) * v;
+					weightY += v;
+				}
+
+				int kerX0 = Math.max(0, offsetX - x);
+				int kerX1 = Math.min(kernelX.getWidth(), width - x + offsetX);
 
 				int weightX = 0;
-				for (int i = offsetX; i < kernelX.getWidth(); i++) {
+				for (int i = kerX0; i < kerX1; i++) {
 					weightX += kernelX.get(i);
 				}
 
-				for( int i = startY; i < endY; i++ ) {
-					int v = kernelY.get(i-y+offsetY);
-					total += input.get(x,i)*v;
-					weightY += v;
-				}
-				int weight = weightX*weightY;
+				int weight = weightX * weightY;
+
 				output.set(x,y, (total+weight/2)/weight );
 			}
 		}
@@ -454,27 +459,32 @@ public static void vertical(Kernel1D_I32 kernelX, Kernel1D_I32 kernelY,
 		final int height = input.getHeight();
 
 		for (int y = 0; y < height; y++) {
-			for( int x = 0; x < width; x++ ) {
+			for (int x = 0; x < width; x++) {
 				int total = 0;
 				int weightY = 0;
 
 				int startY = y - offsetY;
-				int endY = y + offsetY;
+				int endY = startY + kernelY.getWidth();
 
-				if( startY < 0 ) startY = 0;
-				if( endY > height ) endY = height;
+				if (startY < 0) startY = 0;
+				if (endY > height) endY = height;
+
+				for (int i = startY; i < endY; i++) {
+					int v = kernelY.get(i - y + offsetY);
+					total += input.get(x, i) * v;
+					weightY += v;
+				}
+
+				int kerX0 = Math.max(0, offsetX - x);
+				int kerX1 = Math.min(kernelX.getWidth(), width - x + offsetX);
 
 				int weightX = 0;
-				for (int i = offsetX; i < kernelX.getWidth(); i++) {
+				for (int i = kerX0; i < kerX1; i++) {
 					weightX += kernelX.get(i);
 				}
 
-				for( int i = startY; i < endY; i++ ) {
-					int v = kernelY.get(i-y+offsetY);
-					total += input.get(x,i)*v;
-					weightY += v;
-				}
-				int weight = weightX*weightY;
+				int weight = weightX * weightY;
+
 				output.set(x,y, (total+weight/2)/weight );
 			}
 		}

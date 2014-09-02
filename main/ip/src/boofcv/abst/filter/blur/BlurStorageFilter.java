@@ -19,9 +19,9 @@
 package boofcv.abst.filter.blur;
 
 import boofcv.alg.filter.blur.BlurImageOps;
+import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageType;
-import boofcv.testing.BoofTesting;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -53,10 +53,10 @@ public class BlurStorageFilter<T extends ImageSingleBand> implements BlurFilter<
 		this.inputType = inputType;
 
 		hasSigma = false;
-		m = BoofTesting.findMethod(BlurImageOps.class,functionName, inputType, inputType,int.class, inputType);
-
-		if( m == null )
-			throw new IllegalArgumentException("Can't find matching function for image type "+ inputType.getSimpleName());
+		m = findMethod(functionName, inputType);
+		Class params[] = m.getParameterTypes();
+		if( params.length == 4 )
+			storage = GeneralizedImageOps.createSingleBand((Class)m.getParameterTypes()[3],1,1);
 	}
 
 	public BlurStorageFilter( String functionName , Class<T> inputType, double sigma , int radius) {
@@ -65,10 +65,26 @@ public class BlurStorageFilter<T extends ImageSingleBand> implements BlurFilter<
 		this.inputType = inputType;
 
 		hasSigma = true;
-		m = BoofTesting.findMethod(BlurImageOps.class,functionName, inputType, inputType,double.class,int.class, inputType);
+		m = findMethod(functionName, inputType);
+		storage = GeneralizedImageOps.createSingleBand((Class)m.getParameterTypes()[4],1,1);
+	}
 
-		if( m == null )
-			throw new IllegalArgumentException("Can't find matching function for image type "+ inputType.getSimpleName());
+	private Method findMethod( String name , Class<T> inputType ) {
+		Method methods[] = BlurImageOps.class.getMethods();
+
+		for (int i = 0; i < methods.length; i++) {
+			Method m = methods[i];
+
+			if( !m.getName().equals(name) )
+				continue;
+
+			Class params[] = m.getParameterTypes();
+
+			if(params[1] == inputType )
+				return m;
+		}
+
+		throw new RuntimeException("Can't find function "+name+"  "+inputType.getSimpleName());
 	}
 
 	/**
@@ -89,15 +105,15 @@ public class BlurStorageFilter<T extends ImageSingleBand> implements BlurFilter<
 	@Override
 	public void process(T input, T output) {
 		try {
-			if( storage == null ) {
-				storage = (ImageSingleBand)output._createNew(output.width,output.height);
+			if( storage != null ) {
+				storage.reshape(output.width, output.height);
+				if (hasSigma)
+					m.invoke(null, input, output, sigma, radius, storage);
+				else
+					m.invoke(null, input, output, radius, storage);
 			} else {
-				storage.reshape(output.width,output.height);
+				m.invoke(null, input, output,radius);
 			}
-			if( hasSigma )
-				m.invoke(null,input,output,sigma,radius,storage);
-			else
-				m.invoke(null,input,output,radius,storage);
 		} catch (IllegalAccessException e) {
 			throw new RuntimeException(e);
 		} catch (InvocationTargetException e) {

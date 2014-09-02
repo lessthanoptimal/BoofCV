@@ -84,7 +84,7 @@ public class ConvolveImageMean {
 	 * @param output Where the resulting image is written to. Modified.
 	 * @param radius Kernel size.
 	 */
-	public static void vertical(ImageUInt16 input, ImageUInt8 output, int radius) {
+	public static void vertical(ImageUInt16 input, ImageInt8 output, int radius) {
 
 		Kernel1D_I32 kernel = FactoryKernel.table1D_I32(radius);
 		if( kernel.width > input.height ) {
@@ -104,7 +104,7 @@ public class ConvolveImageMean {
 	 * @param output Where the resulting image is written to. Modified.
 	 * @param radius Kernel size.
 	 */
-	public static void vertical(ImageSInt32 input, ImageSInt16 output, int radius ) {
+	public static void vertical(ImageSInt32 input, ImageInt16 output, int radius ) {
 
 		Kernel1D_I32 kernel = FactoryKernel.table1D_I32(radius);
 		if( kernel.width > input.height ) {

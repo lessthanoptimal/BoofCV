@@ -49,7 +49,7 @@ public class TestConvolveImageMean extends CompareEquivalentFunctions {
 
 	@Test
 	public void compareToStandard() {
-		performTests(6);
+		performTests(4);
 	}
 
 	@Override
@@ -68,13 +68,20 @@ public class TestConvolveImageMean extends CompareEquivalentFunctions {
 		Class<?> v[] = candidate.getParameterTypes();
 		Class<?> c[] = validation.getParameterTypes();
 
-		if( v.length != 3 )
-			return false;
-
 		if( !candidate.getName().equals(validation.getName()))
 			return false;
 
-		return c[0] == v[1] && c[1] == v[2];
+		if( candidate.getName().equals("horizontal")) {
+			if (v.length != 3)
+				return false;
+			return c[0] == v[1] && c[1] == v[2];
+		} else {
+			if (v.length == 3)
+				return c[0] == v[1] && c[1] == v[2];
+			else if( v.length == 4 )
+				return c[0] == v[2] && c[1] == v[3];
+		}
+		return false;
 	}
 
 	@Override
@@ -102,15 +109,27 @@ public class TestConvolveImageMean extends CompareEquivalentFunctions {
 
 		ImageSingleBand output = (ImageSingleBand)((ImageSingleBand)targetParam[1]).clone();
 
-		return new Object[]{kernel,targetParam[0],output};
+		if( params.length == 3) {
+			return new Object[]{kernel, targetParam[0], output};
+		} else {
+			return new Object[]{kernel,kernel, targetParam[0], output};
+		}
 	}
 
 	@Override
 	protected void compareResults(Object targetResult, Object[] targetParam, Object validationResult, Object[] validationParam) {
-		ImageSingleBand expected = (ImageSingleBand)validationParam[2];
-		ImageSingleBand found = (ImageSingleBand)targetParam[1];
 
-		BoofTesting.assertEquals(expected, found, 1e-4);
+		if (validationParam.length == 3) {
+			ImageSingleBand expected = (ImageSingleBand) validationParam[2];
+			ImageSingleBand found = (ImageSingleBand) targetParam[1];
+
+			BoofTesting.assertEquals(expected, found, 1e-4);
+		} else {
+			ImageSingleBand expected = (ImageSingleBand) validationParam[3];
+			ImageSingleBand found = (ImageSingleBand) targetParam[1];
+
+			BoofTesting.assertEquals(expected, found, 1e-4);
+		}
 	}
 
 	public static Object createTableKernel(Class<?> kernelType, int kernelRadius, Random rand) {

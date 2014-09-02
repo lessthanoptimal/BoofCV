@@ -40,13 +40,19 @@ public class CompareToStandardConvolution extends CompareIdenticalFunctions
 	protected int width = 20;
 	protected int height = 30;
 	protected int kernelRadius = 2;
+	protected int offset = kernelRadius;
 
 	public CompareToStandardConvolution( Class<?> targetClass ) {
 		super(targetClass, ConvolveImageStandard.class);
 	}
 
 	public void compareMethod( Method target , String validationName , int radius ) {
+		compareMethod(target,validationName,radius,radius);
+	}
+
+	public void compareMethod( Method target , String validationName , int radius , int offset ) {
 		this.kernelRadius = radius;
+		this.offset = offset;
 		super.compareMethod(target,validationName);
 	}
 
@@ -59,7 +65,7 @@ public class CompareToStandardConvolution extends CompareIdenticalFunctions
 		ImageSingleBand dst = ConvolutionTestHelper.createImage(paramTypes[2], width, height);
 
 		if( candidate.getName().compareTo("convolve") != 0 ) {
-			Object[][] ret = new Object[2][paramTypes.length];
+			Object[][] ret = new Object[1][paramTypes.length];
 			ret[0][0] = createKernel(paramTypes[0]);
 			ret[0][1] = src;
 			ret[0][2] = dst;
@@ -67,18 +73,10 @@ public class CompareToStandardConvolution extends CompareIdenticalFunctions
 				ret[0][3] = 11;
 			}
 
-			KernelBase kernel = createKernel(paramTypes[0]);
-			kernel.offset--;
-			ret[1][0] = kernel;
-			ret[1][1] = src;
-			ret[1][2] = dst;
-			if( paramTypes.length == 4) {
-				ret[1][3] = 11;
-			}
 
 			return ret;
 		} else {
-			Object[][] ret = new Object[2][paramTypes.length];
+			Object[][] ret = new Object[1][paramTypes.length];
 
 			ret[0][0] = createKernel(paramTypes[0]);
 			ret[0][1] = src;
@@ -86,16 +84,6 @@ public class CompareToStandardConvolution extends CompareIdenticalFunctions
 
 			if( paramTypes.length == 4 ) {
 				ret[0][3] = 11;
-			}
-
-			KernelBase kernel = createKernel(paramTypes[0]);
-			kernel.offset--;
-			ret[1][0] = kernel;
-			ret[1][1] = src;
-			ret[1][2] = dst;
-
-			if( paramTypes.length == 4 ) {
-				ret[1][3] = 11;
 			}
 
 			return ret;
@@ -115,6 +103,15 @@ public class CompareToStandardConvolution extends CompareIdenticalFunctions
 		} else {
 			throw new RuntimeException("Unknown kernel type");
 		}
+		kernel.offset = offset;
 		return kernel;
+	}
+
+	public void setKernelRadius(int kernelRadius) {
+		this.kernelRadius = kernelRadius;
+	}
+
+	public void setOffset(int offset) {
+		this.offset = offset;
 	}
 }

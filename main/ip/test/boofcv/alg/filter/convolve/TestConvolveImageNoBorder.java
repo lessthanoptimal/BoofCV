@@ -26,8 +26,18 @@ import org.junit.Test;
 public class TestConvolveImageNoBorder {
 
 	@Test
-	public void compareToStandard() {
+	public void compareToStandard_symmetric() {
 		CompareToStandardConvolution a = new CompareToStandardConvolution(ConvolveImageNoBorder.class);
+		a.setKernelRadius(2);
+		a.setOffset(2);
+		a.performTests(22);
+	}
+
+	@Test
+	public void compareToStandard_UNsymmetric() {
+		CompareToStandardConvolution a = new CompareToStandardConvolution(ConvolveImageNoBorder.class);
+		a.setKernelRadius(2);
+		a.setOffset(1);
 		a.performTests(22);
 	}
 }

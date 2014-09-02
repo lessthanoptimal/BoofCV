@@ -72,40 +72,27 @@ public class TestConvolveNormalized_JustBorder {
 			final int width = t.getWidth();
 			final int height = t.getHeight();
 
+			int borderX0=0,borderX1=0;
+			int borderY0=0,borderY1=0;
+
 			if( methodTest.getName().contentEquals("convolve")) {
-				for( int y = 0; y < height; y++ ) {
-					for( int x = 0; x < width; x++ ) {
-						if( y < kernelRadius || y >= height - kernelRadius || x < kernelRadius || x >= width-kernelRadius)
-						{
-							Number numT = t.get(x,y);
-							Number numV = v.get(x,y);
-
-							assertEquals( x+" "+y,numV.doubleValue() , numT.doubleValue() , 1e-4 );
-						}
-					}
-				}
+				borderX0=borderY0 = offset;
+				borderX1=borderY1 = kernelRadius*2-offset;
 			} else if( methodTest.getName().contentEquals("horizontal") ) {
-				for( int y = 0; y < height; y++ ) {
-					for( int x = 0; x < width; x++ ) {
-						if( x < kernelRadius || x >= width-kernelRadius)
-						{
-							Number numT = t.get(x,y);
-							Number numV = v.get(x,y);
-
-							assertEquals( x+" "+y,numV.doubleValue() , numT.doubleValue() , 1e-4 );
-						}
-					}
-				}
+				borderX0 = offset;
+				borderX1 = kernelRadius*2-offset;
 			} else if( methodTest.getName().contentEquals("vertical")) {
-				for( int y = 0; y < height; y++ ) {
-					for( int x = 0; x < width; x++ ) {
-						if( y < kernelRadius || y >= height - kernelRadius )
-						{
-							Number numT = t.get(x,y);
-							Number numV = v.get(x,y);
+				borderY0 = offset;
+				borderY1 = kernelRadius*2-offset;
+			}
+			for( int y = 0; y < height; y++ ) {
+				for( int x = 0; x < width; x++ ) {
+					if( x < borderX0 || y < borderY0 || x >= width - borderX1 || y >= height - borderY1 )
+					{
+						Number numT = t.get(x,y);
+						Number numV = v.get(x,y);
 
-							assertEquals( x+" "+y,numV.doubleValue() , numT.doubleValue() , 1e-4 );
-						}
+						assertEquals( x+" "+y,numV.doubleValue() , numT.doubleValue() , 1e-4 );
 					}
 				}
 			}

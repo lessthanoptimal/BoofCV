@@ -43,8 +43,9 @@ public class ConvolveNormalized_JustBorder {
 		final float[] dataDst = output.data;
 		final float[] dataKer = kernel.data;
 
-		final int radius = kernel.getRadius();
 		final int kernelWidth = kernel.getWidth();
+		final int offsetL = kernel.getOffset();
+		final int offsetR = kernelWidth-offsetL-1;
 
 		final int width = input.getWidth();
 		final int height = input.getHeight();
@@ -53,13 +54,13 @@ public class ConvolveNormalized_JustBorder {
 			int indexDest = output.startIndex + i * output.stride;
 			int j = input.startIndex + i * input.stride;
 			final int jStart = j;
-			int jEnd = j + radius;
+			int jEnd = j + offsetL;
 
 			for (; j < jEnd; j++) {
 				float total = 0;
 				float weight = 0;
 				int indexSrc = jStart;
-				for (int k = kernelWidth - (radius + 1 + j - jStart); k < kernelWidth; k++) {
+				for (int k = kernelWidth - (offsetR + 1 + j - jStart); k < kernelWidth; k++) {
 					float w = dataKer[k];
 					weight += w;
 					total += (dataSrc[indexSrc++]) * w;
@@ -67,14 +68,14 @@ public class ConvolveNormalized_JustBorder {
 				dataDst[indexDest++] = (total/weight);
 			}
 
-			j += width - 2*radius;
-			indexDest += width - 2*radius;
+			j += width - (offsetL+offsetR);
+			indexDest += width - (offsetL+offsetR);
 
 			jEnd = jStart + width;
 			for (; j < jEnd; j++) {
 				float total = 0;
 				float weight = 0;
-				int indexSrc = j - radius;
+				int indexSrc = j - offsetL;
 				final int kEnd = jEnd - indexSrc;
 
 				for (int k = 0; k < kEnd; k++) {
@@ -92,20 +93,21 @@ public class ConvolveNormalized_JustBorder {
 		final float[] dataDst = output.data;
 		final float[] dataKer = kernel.data;
 
-		final int radius = kernel.getRadius();
 		final int kernelWidth = kernel.getWidth();
+		final int offsetL = kernel.getOffset();
+		final int offsetR = kernelWidth-offsetL-1;
 
 		final int imgWidth = output.getWidth();
 		final int imgHeight = output.getHeight();
 
-		final int yEnd = imgHeight - radius;
+		final int yEnd = imgHeight - offsetR;
 
-		for (int y = 0; y < radius; y++) {
+		for (int y = 0; y < offsetL; y++) {
 			int indexDst = output.startIndex + y * output.stride;
 			int i = input.startIndex + y * input.stride;
 			final int iEnd = i + imgWidth;
 
-			int kStart = radius - y;
+			int kStart = offsetL - y;
 
 			float weight = 0;
 			for (int k = kStart; k < kernelWidth; k++) {
@@ -127,7 +129,7 @@ public class ConvolveNormalized_JustBorder {
 			int i = input.startIndex + y * input.stride;
 			final int iEnd = i + imgWidth;
 
-			int kEnd = imgHeight - (y - radius);
+			int kEnd = imgHeight - (y - offsetL);
 
 			float weight = 0;
 			for (int k = 0; k < kEnd; k++) {
@@ -136,7 +138,7 @@ public class ConvolveNormalized_JustBorder {
 
 			for ( ; i < iEnd; i++) {
 				float total = 0;
-				int indexSrc = i - radius * input.stride;
+				int indexSrc = i - offsetL * input.stride;
 				for (int k = 0; k < kEnd; k++, indexSrc += input.stride) {
 					total += (dataSrc[indexSrc]) * dataKer[k];
 				}
@@ -150,8 +152,9 @@ public class ConvolveNormalized_JustBorder {
 		final float[] dataDst = output.data;
 		final float[] dataKer = kernel.data;
 
-		final int radius = kernel.getRadius();
 		final int kernelWidth = kernel.getWidth();
+		final int offsetL = kernel.getOffset();
+		final int offsetR = kernelWidth-offsetL-1;
 
 		final int width = input.getWidth();
 		final int height = input.getHeight();
@@ -159,22 +162,22 @@ public class ConvolveNormalized_JustBorder {
 		// convolve across the left and right borders
 		for (int y = 0; y < height; y++) {
 
-			int minI = y >= radius ? -radius : -y;
-			int maxI = y < height - radius ?  radius : height - y - 1;
+			int minI = y >= offsetL ? -offsetL : -y;
+			int maxI = y < height - offsetR ?  offsetR : height - y - 1;
 
 			int indexDst = output.startIndex + y* output.stride;
 
-			for( int x = 0; x < radius; x++ ) {
+			for( int x = 0; x < offsetL; x++ ) {
 
 				float total = 0;
 				float weight = 0;
 
 				for( int i = minI; i <= maxI; i++ ) {
 					int indexSrc = input.startIndex + (y+i)* input.stride+x;
-					int indexKer = (i+radius)*kernelWidth;
+					int indexKer = (i+offsetL)*kernelWidth;
 
-					for( int j = -x; j <= radius; j++ ) {
-						float w = dataKer[indexKer+j+radius];
+					for( int j = -x; j <= offsetR; j++ ) {
+						float w = dataKer[indexKer+j+offsetL];
 						weight += w;
 						total += (dataSrc[indexSrc+j]) * w;
 					}
@@ -183,8 +186,8 @@ public class ConvolveNormalized_JustBorder {
 				dataDst[indexDst++] = (total/weight);
 			}
 
-			indexDst = output.startIndex + y* output.stride + width-radius;
-			for( int x = width-radius; x < width; x++ ) {
+			indexDst = output.startIndex + y* output.stride + width-offsetR;
+			for( int x = width-offsetR; x < width; x++ ) {
 
 				int maxJ = width-x-1;
 
@@ -193,10 +196,10 @@ public class ConvolveNormalized_JustBorder {
 
 				for( int i = minI; i <= maxI; i++ ) {
 					int indexSrc = input.startIndex + (y+i)* input.stride+x;
-					int indexKer = (i+radius)*kernelWidth;
+					int indexKer = (i+offsetL)*kernelWidth;
 
-					for( int j = -radius; j <= maxJ; j++ ) {
-						float w = dataKer[indexKer+j+radius];
+					for( int j = -offsetL; j <= maxJ; j++ ) {
+						float w = dataKer[indexKer+j+offsetL];
 						weight += w;
 						total += (dataSrc[indexSrc+j]) * w;
 					}
@@ -207,23 +210,23 @@ public class ConvolveNormalized_JustBorder {
 		}
 
 		// convolve across the top border while avoiding convolving the corners again
-		for (int y = 0; y < radius; y++) {
+		for (int y = 0; y < offsetL; y++) {
 
-			int indexDst = output.startIndex + y* output.stride+radius;
+			int indexDst = output.startIndex + y* output.stride+offsetL;
 
-			for( int x = radius; x < width-radius; x++ ) {
+			for( int x = offsetL; x < width-offsetR; x++ ) {
 
 				float total = 0;
 				float weight = 0;
 
-				for( int i = -y; i <= radius; i++ ) {
+				for( int i = -y; i <= offsetR; i++ ) {
 					int indexSrc = input.startIndex + (y+i)* input.stride+x;
-					int indexKer = (i+radius)*kernelWidth;
+					int indexKer = (i+offsetL)*kernelWidth;
 
-					for( int j = -radius; j <= radius; j++ ) {
-						float w = dataKer[indexKer+j+radius];
+					for( int j = -offsetL; j <= offsetR; j++ ) {
+						float w = dataKer[indexKer+j+offsetL];
 						weight += w;
-						total += (dataSrc[indexSrc + j]) * w;
+						total += (dataSrc[indexSrc+j]) * w;
 					}
 				}
 				dataDst[indexDst++] = (total/weight);
@@ -231,24 +234,24 @@ public class ConvolveNormalized_JustBorder {
 		}
 
 		// convolve across the bottom border
-		for (int y = height-radius; y < height; y++) {
+		for (int y = height-offsetR; y < height; y++) {
 
 			int maxI = height - y - 1;
-			int indexDst = output.startIndex + y* output.stride+radius;
+			int indexDst = output.startIndex + y* output.stride+offsetL;
 
-			for( int x = radius; x < width-radius; x++ ) {
+			for( int x = offsetL; x < width-offsetR; x++ ) {
 
 				float total = 0;
 				float weight = 0;
 
-				for( int i = -radius; i <= maxI; i++ ) {
+				for( int i = -offsetL; i <= maxI; i++ ) {
 					int indexSrc = input.startIndex + (y+i)* input.stride+x;
-					int indexKer = (i+radius)*kernelWidth;
+					int indexKer = (i+offsetL)*kernelWidth;
 
-					for( int j = -radius; j <= radius; j++ ) {
-						float w = dataKer[indexKer+j+radius];
+					for( int j = -offsetL; j <= offsetR; j++ ) {
+						float w = dataKer[indexKer+j+offsetL];
 						weight += w;
-						total += (dataSrc[indexSrc + j]) * w;
+						total += (dataSrc[indexSrc+j]) * w;
 					}
 				}
 				dataDst[indexDst++] = (total/weight);
@@ -261,8 +264,9 @@ public class ConvolveNormalized_JustBorder {
 		final byte[] dataDst = output.data;
 		final int[] dataKer = kernel.data;
 
-		final int radius = kernel.getRadius();
 		final int kernelWidth = kernel.getWidth();
+		final int offsetL = kernel.getOffset();
+		final int offsetR = kernelWidth-offsetL-1;
 
 		final int width = input.getWidth();
 		final int height = input.getHeight();
@@ -271,13 +275,13 @@ public class ConvolveNormalized_JustBorder {
 			int indexDest = output.startIndex + i * output.stride;
 			int j = input.startIndex + i * input.stride;
 			final int jStart = j;
-			int jEnd = j + radius;
+			int jEnd = j + offsetL;
 
 			for (; j < jEnd; j++) {
 				int total = 0;
 				int weight = 0;
 				int indexSrc = jStart;
-				for (int k = kernelWidth - (radius + 1 + j - jStart); k < kernelWidth; k++) {
+				for (int k = kernelWidth - (offsetR + 1 + j - jStart); k < kernelWidth; k++) {
 					int w = dataKer[k];
 					weight += w;
 					total += (dataSrc[indexSrc++]& 0xFF) * w;
@@ -285,14 +289,14 @@ public class ConvolveNormalized_JustBorder {
 				dataDst[indexDest++] = (byte)((total+weight/2)/weight);
 			}
 
-			j += width - 2*radius;
-			indexDest += width - 2*radius;
+			j += width - (offsetL+offsetR);
+			indexDest += width - (offsetL+offsetR);
 
 			jEnd = jStart + width;
 			for (; j < jEnd; j++) {
 				int total = 0;
 				int weight = 0;
-				int indexSrc = j - radius;
+				int indexSrc = j - offsetL;
 				final int kEnd = jEnd - indexSrc;
 
 				for (int k = 0; k < kEnd; k++) {
@@ -310,20 +314,21 @@ public class ConvolveNormalized_JustBorder {
 		final byte[] dataDst = output.data;
 		final int[] dataKer = kernel.data;
 
-		final int radius = kernel.getRadius();
 		final int kernelWidth = kernel.getWidth();
+		final int offsetL = kernel.getOffset();
+		final int offsetR = kernelWidth-offsetL-1;
 
 		final int imgWidth = output.getWidth();
 		final int imgHeight = output.getHeight();
 
-		final int yEnd = imgHeight - radius;
+		final int yEnd = imgHeight - offsetR;
 
-		for (int y = 0; y < radius; y++) {
+		for (int y = 0; y < offsetL; y++) {
 			int indexDst = output.startIndex + y * output.stride;
 			int i = input.startIndex + y * input.stride;
 			final int iEnd = i + imgWidth;
 
-			int kStart = radius - y;
+			int kStart = offsetL - y;
 
 			int weight = 0;
 			for (int k = kStart; k < kernelWidth; k++) {
@@ -345,7 +350,7 @@ public class ConvolveNormalized_JustBorder {
 			int i = input.startIndex + y * input.stride;
 			final int iEnd = i + imgWidth;
 
-			int kEnd = imgHeight - (y - radius);
+			int kEnd = imgHeight - (y - offsetL);
 
 			int weight = 0;
 			for (int k = 0; k < kEnd; k++) {
@@ -354,7 +359,7 @@ public class ConvolveNormalized_JustBorder {
 
 			for ( ; i < iEnd; i++) {
 				int total = 0;
-				int indexSrc = i - radius * input.stride;
+				int indexSrc = i - offsetL * input.stride;
 				for (int k = 0; k < kEnd; k++, indexSrc += input.stride) {
 					total += (dataSrc[indexSrc]& 0xFF) * dataKer[k];
 				}
@@ -368,8 +373,9 @@ public class ConvolveNormalized_JustBorder {
 		final byte[] dataDst = output.data;
 		final int[] dataKer = kernel.data;
 
-		final int radius = kernel.getRadius();
 		final int kernelWidth = kernel.getWidth();
+		final int offsetL = kernel.getOffset();
+		final int offsetR = kernelWidth-offsetL-1;
 
 		final int width = input.getWidth();
 		final int height = input.getHeight();
@@ -377,22 +383,22 @@ public class ConvolveNormalized_JustBorder {
 		// convolve across the left and right borders
 		for (int y = 0; y < height; y++) {
 
-			int minI = y >= radius ? -radius : -y;
-			int maxI = y < height - radius ?  radius : height - y - 1;
+			int minI = y >= offsetL ? -offsetL : -y;
+			int maxI = y < height - offsetR ?  offsetR : height - y - 1;
 
 			int indexDst = output.startIndex + y* output.stride;
 
-			for( int x = 0; x < radius; x++ ) {
+			for( int x = 0; x < offsetL; x++ ) {
 
 				int total = 0;
 				int weight = 0;
 
 				for( int i = minI; i <= maxI; i++ ) {
 					int indexSrc = input.startIndex + (y+i)* input.stride+x;
-					int indexKer = (i+radius)*kernelWidth;
+					int indexKer = (i+offsetL)*kernelWidth;
 
-					for( int j = -x; j <= radius; j++ ) {
-						int w = dataKer[indexKer+j+radius];
+					for( int j = -x; j <= offsetR; j++ ) {
+						int w = dataKer[indexKer+j+offsetL];
 						weight += w;
 						total += (dataSrc[indexSrc+j]& 0xFF) * w;
 					}
@@ -401,8 +407,8 @@ public class ConvolveNormalized_JustBorder {
 				dataDst[indexDst++] = (byte)((total+weight/2)/weight);
 			}
 
-			indexDst = output.startIndex + y* output.stride + width-radius;
-			for( int x = width-radius; x < width; x++ ) {
+			indexDst = output.startIndex + y* output.stride + width-offsetR;
+			for( int x = width-offsetR; x < width; x++ ) {
 
 				int maxJ = width-x-1;
 
@@ -411,10 +417,10 @@ public class ConvolveNormalized_JustBorder {
 
 				for( int i = minI; i <= maxI; i++ ) {
 					int indexSrc = input.startIndex + (y+i)* input.stride+x;
-					int indexKer = (i+radius)*kernelWidth;
+					int indexKer = (i+offsetL)*kernelWidth;
 
-					for( int j = -radius; j <= maxJ; j++ ) {
-						int w = dataKer[indexKer+j+radius];
+					for( int j = -offsetL; j <= maxJ; j++ ) {
+						int w = dataKer[indexKer+j+offsetL];
 						weight += w;
 						total += (dataSrc[indexSrc+j]& 0xFF) * w;
 					}
@@ -425,23 +431,23 @@ public class ConvolveNormalized_JustBorder {
 		}
 
 		// convolve across the top border while avoiding convolving the corners again
-		for (int y = 0; y < radius; y++) {
+		for (int y = 0; y < offsetL; y++) {
 
-			int indexDst = output.startIndex + y* output.stride+radius;
+			int indexDst = output.startIndex + y* output.stride+offsetL;
 
-			for( int x = radius; x < width-radius; x++ ) {
+			for( int x = offsetL; x < width-offsetR; x++ ) {
 
 				int total = 0;
 				int weight = 0;
 
-				for( int i = -y; i <= radius; i++ ) {
+				for( int i = -y; i <= offsetR; i++ ) {
 					int indexSrc = input.startIndex + (y+i)* input.stride+x;
-					int indexKer = (i+radius)*kernelWidth;
+					int indexKer = (i+offsetL)*kernelWidth;
 
-					for( int j = -radius; j <= radius; j++ ) {
-						int w = dataKer[indexKer+j+radius];
+					for( int j = -offsetL; j <= offsetR; j++ ) {
+						int w = dataKer[indexKer+j+offsetL];
 						weight += w;
-						total += (dataSrc[indexSrc + j]& 0xFF) * w;
+						total += (dataSrc[indexSrc+j]& 0xFF) * w;
 					}
 				}
 				dataDst[indexDst++] = (byte)((total+weight/2)/weight);
@@ -449,24 +455,24 @@ public class ConvolveNormalized_JustBorder {
 		}
 
 		// convolve across the bottom border
-		for (int y = height-radius; y < height; y++) {
+		for (int y = height-offsetR; y < height; y++) {
 
 			int maxI = height - y - 1;
-			int indexDst = output.startIndex + y* output.stride+radius;
+			int indexDst = output.startIndex + y* output.stride+offsetL;
 
-			for( int x = radius; x < width-radius; x++ ) {
+			for( int x = offsetL; x < width-offsetR; x++ ) {
 
 				int total = 0;
 				int weight = 0;
 
-				for( int i = -radius; i <= maxI; i++ ) {
+				for( int i = -offsetL; i <= maxI; i++ ) {
 					int indexSrc = input.startIndex + (y+i)* input.stride+x;
-					int indexKer = (i+radius)*kernelWidth;
+					int indexKer = (i+offsetL)*kernelWidth;
 
-					for( int j = -radius; j <= radius; j++ ) {
-						int w = dataKer[indexKer+j+radius];
+					for( int j = -offsetL; j <= offsetR; j++ ) {
+						int w = dataKer[indexKer+j+offsetL];
 						weight += w;
-						total += (dataSrc[indexSrc + j]& 0xFF) * w;
+						total += (dataSrc[indexSrc+j]& 0xFF) * w;
 					}
 				}
 				dataDst[indexDst++] = (byte)((total+weight/2)/weight);
@@ -479,8 +485,9 @@ public class ConvolveNormalized_JustBorder {
 		final short[] dataDst = output.data;
 		final int[] dataKer = kernel.data;
 
-		final int radius = kernel.getRadius();
 		final int kernelWidth = kernel.getWidth();
+		final int offsetL = kernel.getOffset();
+		final int offsetR = kernelWidth-offsetL-1;
 
 		final int width = input.getWidth();
 		final int height = input.getHeight();
@@ -489,13 +496,13 @@ public class ConvolveNormalized_JustBorder {
 			int indexDest = output.startIndex + i * output.stride;
 			int j = input.startIndex + i * input.stride;
 			final int jStart = j;
-			int jEnd = j + radius;
+			int jEnd = j + offsetL;
 
 			for (; j < jEnd; j++) {
 				int total = 0;
 				int weight = 0;
 				int indexSrc = jStart;
-				for (int k = kernelWidth - (radius + 1 + j - jStart); k < kernelWidth; k++) {
+				for (int k = kernelWidth - (offsetR + 1 + j - jStart); k < kernelWidth; k++) {
 					int w = dataKer[k];
 					weight += w;
 					total += (dataSrc[indexSrc++]) * w;
@@ -503,14 +510,14 @@ public class ConvolveNormalized_JustBorder {
 				dataDst[indexDest++] = (short)((total+weight/2)/weight);
 			}
 
-			j += width - 2*radius;
-			indexDest += width - 2*radius;
+			j += width - (offsetL+offsetR);
+			indexDest += width - (offsetL+offsetR);
 
 			jEnd = jStart + width;
 			for (; j < jEnd; j++) {
 				int total = 0;
 				int weight = 0;
-				int indexSrc = j - radius;
+				int indexSrc = j - offsetL;
 				final int kEnd = jEnd - indexSrc;
 
 				for (int k = 0; k < kEnd; k++) {
@@ -528,20 +535,21 @@ public class ConvolveNormalized_JustBorder {
 		final short[] dataDst = output.data;
 		final int[] dataKer = kernel.data;
 
-		final int radius = kernel.getRadius();
 		final int kernelWidth = kernel.getWidth();
+		final int offsetL = kernel.getOffset();
+		final int offsetR = kernelWidth-offsetL-1;
 
 		final int imgWidth = output.getWidth();
 		final int imgHeight = output.getHeight();
 
-		final int yEnd = imgHeight - radius;
+		final int yEnd = imgHeight - offsetR;
 
-		for (int y = 0; y < radius; y++) {
+		for (int y = 0; y < offsetL; y++) {
 			int indexDst = output.startIndex + y * output.stride;
 			int i = input.startIndex + y * input.stride;
 			final int iEnd = i + imgWidth;
 
-			int kStart = radius - y;
+			int kStart = offsetL - y;
 
 			int weight = 0;
 			for (int k = kStart; k < kernelWidth; k++) {
@@ -563,7 +571,7 @@ public class ConvolveNormalized_JustBorder {
 			int i = input.startIndex + y * input.stride;
 			final int iEnd = i + imgWidth;
 
-			int kEnd = imgHeight - (y - radius);
+			int kEnd = imgHeight - (y - offsetL);
 
 			int weight = 0;
 			for (int k = 0; k < kEnd; k++) {
@@ -572,7 +580,7 @@ public class ConvolveNormalized_JustBorder {
 
 			for ( ; i < iEnd; i++) {
 				int total = 0;
-				int indexSrc = i - radius * input.stride;
+				int indexSrc = i - offsetL * input.stride;
 				for (int k = 0; k < kEnd; k++, indexSrc += input.stride) {
 					total += (dataSrc[indexSrc]) * dataKer[k];
 				}
@@ -586,8 +594,9 @@ public class ConvolveNormalized_JustBorder {
 		final short[] dataDst = output.data;
 		final int[] dataKer = kernel.data;
 
-		final int radius = kernel.getRadius();
 		final int kernelWidth = kernel.getWidth();
+		final int offsetL = kernel.getOffset();
+		final int offsetR = kernelWidth-offsetL-1;
 
 		final int width = input.getWidth();
 		final int height = input.getHeight();
@@ -595,22 +604,22 @@ public class ConvolveNormalized_JustBorder {
 		// convolve across the left and right borders
 		for (int y = 0; y < height; y++) {
 
-			int minI = y >= radius ? -radius : -y;
-			int maxI = y < height - radius ?  radius : height - y - 1;
+			int minI = y >= offsetL ? -offsetL : -y;
+			int maxI = y < height - offsetR ?  offsetR : height - y - 1;
 
 			int indexDst = output.startIndex + y* output.stride;
 
-			for( int x = 0; x < radius; x++ ) {
+			for( int x = 0; x < offsetL; x++ ) {
 
 				int total = 0;
 				int weight = 0;
 
 				for( int i = minI; i <= maxI; i++ ) {
 					int indexSrc = input.startIndex + (y+i)* input.stride+x;
-					int indexKer = (i+radius)*kernelWidth;
+					int indexKer = (i+offsetL)*kernelWidth;
 
-					for( int j = -x; j <= radius; j++ ) {
-						int w = dataKer[indexKer+j+radius];
+					for( int j = -x; j <= offsetR; j++ ) {
+						int w = dataKer[indexKer+j+offsetL];
 						weight += w;
 						total += (dataSrc[indexSrc+j]) * w;
 					}
@@ -619,8 +628,8 @@ public class ConvolveNormalized_JustBorder {
 				dataDst[indexDst++] = (short)((total+weight/2)/weight);
 			}
 
-			indexDst = output.startIndex + y* output.stride + width-radius;
-			for( int x = width-radius; x < width; x++ ) {
+			indexDst = output.startIndex + y* output.stride + width-offsetR;
+			for( int x = width-offsetR; x < width; x++ ) {
 
 				int maxJ = width-x-1;
 
@@ -629,10 +638,10 @@ public class ConvolveNormalized_JustBorder {
 
 				for( int i = minI; i <= maxI; i++ ) {
 					int indexSrc = input.startIndex + (y+i)* input.stride+x;
-					int indexKer = (i+radius)*kernelWidth;
+					int indexKer = (i+offsetL)*kernelWidth;
 
-					for( int j = -radius; j <= maxJ; j++ ) {
-						int w = dataKer[indexKer+j+radius];
+					for( int j = -offsetL; j <= maxJ; j++ ) {
+						int w = dataKer[indexKer+j+offsetL];
 						weight += w;
 						total += (dataSrc[indexSrc+j]) * w;
 					}
@@ -643,23 +652,23 @@ public class ConvolveNormalized_JustBorder {
 		}
 
 		// convolve across the top border while avoiding convolving the corners again
-		for (int y = 0; y < radius; y++) {
+		for (int y = 0; y < offsetL; y++) {
 
-			int indexDst = output.startIndex + y* output.stride+radius;
+			int indexDst = output.startIndex + y* output.stride+offsetL;
 
-			for( int x = radius; x < width-radius; x++ ) {
+			for( int x = offsetL; x < width-offsetR; x++ ) {
 
 				int total = 0;
 				int weight = 0;
 
-				for( int i = -y; i <= radius; i++ ) {
+				for( int i = -y; i <= offsetR; i++ ) {
 					int indexSrc = input.startIndex + (y+i)* input.stride+x;
-					int indexKer = (i+radius)*kernelWidth;
+					int indexKer = (i+offsetL)*kernelWidth;
 
-					for( int j = -radius; j <= radius; j++ ) {
-						int w = dataKer[indexKer+j+radius];
+					for( int j = -offsetL; j <= offsetR; j++ ) {
+						int w = dataKer[indexKer+j+offsetL];
 						weight += w;
-						total += (dataSrc[indexSrc + j]) * w;
+						total += (dataSrc[indexSrc+j]) * w;
 					}
 				}
 				dataDst[indexDst++] = (short)((total+weight/2)/weight);
@@ -667,24 +676,24 @@ public class ConvolveNormalized_JustBorder {
 		}
 
 		// convolve across the bottom border
-		for (int y = height-radius; y < height; y++) {
+		for (int y = height-offsetR; y < height; y++) {
 
 			int maxI = height - y - 1;
-			int indexDst = output.startIndex + y* output.stride+radius;
+			int indexDst = output.startIndex + y* output.stride+offsetL;
 
-			for( int x = radius; x < width-radius; x++ ) {
+			for( int x = offsetL; x < width-offsetR; x++ ) {
 
 				int total = 0;
 				int weight = 0;
 
-				for( int i = -radius; i <= maxI; i++ ) {
+				for( int i = -offsetL; i <= maxI; i++ ) {
 					int indexSrc = input.startIndex + (y+i)* input.stride+x;
-					int indexKer = (i+radius)*kernelWidth;
+					int indexKer = (i+offsetL)*kernelWidth;
 
-					for( int j = -radius; j <= radius; j++ ) {
-						int w = dataKer[indexKer+j+radius];
+					for( int j = -offsetL; j <= offsetR; j++ ) {
+						int w = dataKer[indexKer+j+offsetL];
 						weight += w;
-						total += (dataSrc[indexSrc + j]) * w;
+						total += (dataSrc[indexSrc+j]) * w;
 					}
 				}
 				dataDst[indexDst++] = (short)((total+weight/2)/weight);
@@ -697,8 +706,9 @@ public class ConvolveNormalized_JustBorder {
 		final int[] dataDst = output.data;
 		final int[] dataKer = kernel.data;
 
-		final int radius = kernel.getRadius();
 		final int kernelWidth = kernel.getWidth();
+		final int offsetL = kernel.getOffset();
+		final int offsetR = kernelWidth-offsetL-1;
 
 		final int width = input.getWidth();
 		final int height = input.getHeight();
@@ -707,13 +717,13 @@ public class ConvolveNormalized_JustBorder {
 			int indexDest = output.startIndex + i * output.stride;
 			int j = input.startIndex + i * input.stride;
 			final int jStart = j;
-			int jEnd = j + radius;
+			int jEnd = j + offsetL;
 
 			for (; j < jEnd; j++) {
 				int total = 0;
 				int weight = 0;
 				int indexSrc = jStart;
-				for (int k = kernelWidth - (radius + 1 + j - jStart); k < kernelWidth; k++) {
+				for (int k = kernelWidth - (offsetR + 1 + j - jStart); k < kernelWidth; k++) {
 					int w = dataKer[k];
 					weight += w;
 					total += (dataSrc[indexSrc++]) * w;
@@ -721,14 +731,14 @@ public class ConvolveNormalized_JustBorder {
 				dataDst[indexDest++] = ((total+weight/2)/weight);
 			}
 
-			j += width - 2*radius;
-			indexDest += width - 2*radius;
+			j += width - (offsetL+offsetR);
+			indexDest += width - (offsetL+offsetR);
 
 			jEnd = jStart + width;
 			for (; j < jEnd; j++) {
 				int total = 0;
 				int weight = 0;
-				int indexSrc = j - radius;
+				int indexSrc = j - offsetL;
 				final int kEnd = jEnd - indexSrc;
 
 				for (int k = 0; k < kEnd; k++) {
@@ -746,20 +756,21 @@ public class ConvolveNormalized_JustBorder {
 		final int[] dataDst = output.data;
 		final int[] dataKer = kernel.data;
 
-		final int radius = kernel.getRadius();
 		final int kernelWidth = kernel.getWidth();
+		final int offsetL = kernel.getOffset();
+		final int offsetR = kernelWidth-offsetL-1;
 
 		final int imgWidth = output.getWidth();
 		final int imgHeight = output.getHeight();
 
-		final int yEnd = imgHeight - radius;
+		final int yEnd = imgHeight - offsetR;
 
-		for (int y = 0; y < radius; y++) {
+		for (int y = 0; y < offsetL; y++) {
 			int indexDst = output.startIndex + y * output.stride;
 			int i = input.startIndex + y * input.stride;
 			final int iEnd = i + imgWidth;
 
-			int kStart = radius - y;
+			int kStart = offsetL - y;
 
 			int weight = 0;
 			for (int k = kStart; k < kernelWidth; k++) {
@@ -781,7 +792,7 @@ public class ConvolveNormalized_JustBorder {
 			int i = input.startIndex + y * input.stride;
 			final int iEnd = i + imgWidth;
 
-			int kEnd = imgHeight - (y - radius);
+			int kEnd = imgHeight - (y - offsetL);
 
 			int weight = 0;
 			for (int k = 0; k < kEnd; k++) {
@@ -790,7 +801,7 @@ public class ConvolveNormalized_JustBorder {
 
 			for ( ; i < iEnd; i++) {
 				int total = 0;
-				int indexSrc = i - radius * input.stride;
+				int indexSrc = i - offsetL * input.stride;
 				for (int k = 0; k < kEnd; k++, indexSrc += input.stride) {
 					total += (dataSrc[indexSrc]) * dataKer[k];
 				}
@@ -804,8 +815,9 @@ public class ConvolveNormalized_JustBorder {
 		final int[] dataDst = output.data;
 		final int[] dataKer = kernel.data;
 
-		final int radius = kernel.getRadius();
 		final int kernelWidth = kernel.getWidth();
+		final int offsetL = kernel.getOffset();
+		final int offsetR = kernelWidth-offsetL-1;
 
 		final int width = input.getWidth();
 		final int height = input.getHeight();
@@ -813,22 +825,22 @@ public class ConvolveNormalized_JustBorder {
 		// convolve across the left and right borders
 		for (int y = 0; y < height; y++) {
 
-			int minI = y >= radius ? -radius : -y;
-			int maxI = y < height - radius ?  radius : height - y - 1;
+			int minI = y >= offsetL ? -offsetL : -y;
+			int maxI = y < height - offsetR ?  offsetR : height - y - 1;
 
 			int indexDst = output.startIndex + y* output.stride;
 
-			for( int x = 0; x < radius; x++ ) {
+			for( int x = 0; x < offsetL; x++ ) {
 
 				int total = 0;
 				int weight = 0;
 
 				for( int i = minI; i <= maxI; i++ ) {
 					int indexSrc = input.startIndex + (y+i)* input.stride+x;
-					int indexKer = (i+radius)*kernelWidth;
+					int indexKer = (i+offsetL)*kernelWidth;
 
-					for( int j = -x; j <= radius; j++ ) {
-						int w = dataKer[indexKer+j+radius];
+					for( int j = -x; j <= offsetR; j++ ) {
+						int w = dataKer[indexKer+j+offsetL];
 						weight += w;
 						total += (dataSrc[indexSrc+j]) * w;
 					}
@@ -837,8 +849,8 @@ public class ConvolveNormalized_JustBorder {
 				dataDst[indexDst++] = ((total+weight/2)/weight);
 			}
 
-			indexDst = output.startIndex + y* output.stride + width-radius;
-			for( int x = width-radius; x < width; x++ ) {
+			indexDst = output.startIndex + y* output.stride + width-offsetR;
+			for( int x = width-offsetR; x < width; x++ ) {
 
 				int maxJ = width-x-1;
 
@@ -847,10 +859,10 @@ public class ConvolveNormalized_JustBorder {
 
 				for( int i = minI; i <= maxI; i++ ) {
 					int indexSrc = input.startIndex + (y+i)* input.stride+x;
-					int indexKer = (i+radius)*kernelWidth;
+					int indexKer = (i+offsetL)*kernelWidth;
 
-					for( int j = -radius; j <= maxJ; j++ ) {
-						int w = dataKer[indexKer+j+radius];
+					for( int j = -offsetL; j <= maxJ; j++ ) {
+						int w = dataKer[indexKer+j+offsetL];
 						weight += w;
 						total += (dataSrc[indexSrc+j]) * w;
 					}
@@ -861,23 +873,23 @@ public class ConvolveNormalized_JustBorder {
 		}
 
 		// convolve across the top border while avoiding convolving the corners again
-		for (int y = 0; y < radius; y++) {
+		for (int y = 0; y < offsetL; y++) {
 
-			int indexDst = output.startIndex + y* output.stride+radius;
+			int indexDst = output.startIndex + y* output.stride+offsetL;
 
-			for( int x = radius; x < width-radius; x++ ) {
+			for( int x = offsetL; x < width-offsetR; x++ ) {
 
 				int total = 0;
 				int weight = 0;
 
-				for( int i = -y; i <= radius; i++ ) {
+				for( int i = -y; i <= offsetR; i++ ) {
 					int indexSrc = input.startIndex + (y+i)* input.stride+x;
-					int indexKer = (i+radius)*kernelWidth;
+					int indexKer = (i+offsetL)*kernelWidth;
 
-					for( int j = -radius; j <= radius; j++ ) {
-						int w = dataKer[indexKer+j+radius];
+					for( int j = -offsetL; j <= offsetR; j++ ) {
+						int w = dataKer[indexKer+j+offsetL];
 						weight += w;
-						total += (dataSrc[indexSrc + j]) * w;
+						total += (dataSrc[indexSrc+j]) * w;
 					}
 				}
 				dataDst[indexDst++] = ((total+weight/2)/weight);
@@ -885,24 +897,24 @@ public class ConvolveNormalized_JustBorder {
 		}
 
 		// convolve across the bottom border
-		for (int y = height-radius; y < height; y++) {
+		for (int y = height-offsetR; y < height; y++) {
 
 			int maxI = height - y - 1;
-			int indexDst = output.startIndex + y* output.stride+radius;
+			int indexDst = output.startIndex + y* output.stride+offsetL;
 
-			for( int x = radius; x < width-radius; x++ ) {
+			for( int x = offsetL; x < width-offsetR; x++ ) {
 
 				int total = 0;
 				int weight = 0;
 
-				for( int i = -radius; i <= maxI; i++ ) {
+				for( int i = -offsetL; i <= maxI; i++ ) {
 					int indexSrc = input.startIndex + (y+i)* input.stride+x;
-					int indexKer = (i+radius)*kernelWidth;
+					int indexKer = (i+offsetL)*kernelWidth;
 
-					for( int j = -radius; j <= radius; j++ ) {
-						int w = dataKer[indexKer+j+radius];
+					for( int j = -offsetL; j <= offsetR; j++ ) {
+						int w = dataKer[indexKer+j+offsetL];
 						weight += w;
-						total += (dataSrc[indexSrc + j]) * w;
+						total += (dataSrc[indexSrc+j]) * w;
 					}
 				}
 				dataDst[indexDst++] = ((total+weight/2)/weight);
@@ -954,7 +966,7 @@ public class ConvolveNormalized_JustBorder {
 				}
 				dataDst[indexDst++] = (byte)((total+weight/2)/weight);
 				if( x < kernelWidthX ) {
-					weightX += dataKer[kernelWidthY-1-x];
+					weightX += dataKer[kernelWidthX-1-x];
 				} else if( x > input.width-(kernelWidthX-offsetX) ) {
 					weightX -= dataKer[input.width-x-1];
 				}

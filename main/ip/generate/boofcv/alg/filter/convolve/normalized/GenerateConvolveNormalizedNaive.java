@@ -173,27 +173,32 @@ public class GenerateConvolveNormalizedNaive extends CodeGeneratorBase {
 				"\t\tfinal int height = input.getHeight();\n" +
 				"\n" +
 				"\t\tfor (int y = 0; y < height; y++) {\n" +
-				"\t\t\tfor( int x = 0; x < width; x++ ) {\n" +
+				"\t\t\tfor (int x = 0; x < width; x++) {\n" +
 				"\t\t\t\t"+sumType+" total = 0;\n" +
 				"\t\t\t\t"+sumType+" weightY = 0;\n" +
 				"\n" +
 				"\t\t\t\tint startY = y - offsetY;\n" +
-				"\t\t\t\tint endY = y + offsetY;\n" +
+				"\t\t\t\tint endY = startY + kernelY.getWidth();\n" +
 				"\n" +
-				"\t\t\t\tif( startY < 0 ) startY = 0;\n" +
-				"\t\t\t\tif( endY > height ) endY = height;\n" +
+				"\t\t\t\tif (startY < 0) startY = 0;\n" +
+				"\t\t\t\tif (endY > height) endY = height;\n" +
+				"\n" +
+				"\t\t\t\tfor (int i = startY; i < endY; i++) {\n" +
+				"\t\t\t\t\t"+kernelData+" v = kernelY.get(i - y + offsetY);\n" +
+				"\t\t\t\t\ttotal += input.get(x, i) * v;\n" +
+				"\t\t\t\t\tweightY += v;\n" +
+				"\t\t\t\t}\n" +
+				"\n" +
+				"\t\t\t\tint kerX0 = Math.max(0, offsetX - x);\n" +
+				"\t\t\t\tint kerX1 = Math.min(kernelX.getWidth(), width - x + offsetX);\n" +
 				"\n" +
 				"\t\t\t\tint weightX = 0;\n" +
-				"\t\t\t\tfor (int i = offsetX; i < kernelX.getWidth(); i++) {\n" +
+				"\t\t\t\tfor (int i = kerX0; i < kerX1; i++) {\n" +
 				"\t\t\t\t\tweightX += kernelX.get(i);\n" +
 				"\t\t\t\t}\n" +
 				"\n" +
-				"\t\t\t\tfor( int i = startY; i < endY; i++ ) {\n" +
-				"\t\t\t\t\t"+kernelData+" v = kernelY.get(i-y+offsetY);\n" +
-				"\t\t\t\t\ttotal += input.get(x,i)*v;\n" +
-				"\t\t\t\t\tweightY += v;\n" +
-				"\t\t\t\t}\n" +
-				"\t\t\t\tint weight = weightX*weightY;\n" +
+				"\t\t\t\tint weight = weightX * weightY;\n" +
+				"\n" +
 				"\t\t\t\toutput.set(x,y, "+divide+" );\n" +
 				"\t\t\t}\n" +
 				"\t\t}\n" +
