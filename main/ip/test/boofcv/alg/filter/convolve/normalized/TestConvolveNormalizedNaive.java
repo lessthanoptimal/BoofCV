@@ -137,7 +137,7 @@ public class TestConvolveNormalizedNaive {
 		Kernel1D_I32 kernelX = new Kernel1D_I32(new int[]{4,2,1,4,3,6},2,5);
 
 		ImageUInt16 input = new ImageUInt16(15,16);
-		ImageMiscOps.fillUniform(input, rand, 0, 50);
+		ImageMiscOps.fillUniform(input, rand, 0, 80);
 		ImageUInt8 output = new ImageUInt8(15,16);
 
 		ConvolveNormalizedNaive.vertical(kernelX,kernelY, input, output);

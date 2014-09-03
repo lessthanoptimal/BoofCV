@@ -47,13 +47,9 @@ Version : Alpha 0.18
   * ConvolveNormalizedNaive correctly handles offsets in the kernel
   * ConvolveNormalizedNaive has new vertical which divides with horizontal weights taken in account
   * 2D convolution correctly supports offset.  before it used radius no matter what
+  * Reduced round off error in BlurImageOps.mean() for ImageUInt8.
 
 TODO
-- BlurImageOps.mean() and gaussian() UInt8 images.
-  * sum up horizontal and vertical then divide by total at the very end.
-  * The current technique is prone towards numerical round off error since it forces it back to 8bit
-    after the first sweep
-  * unit test: compare to brute force and see if it produces an identical solution
 - Add an escape value to score associate.  if the value computed so far isn't better than X, stop.
   Suggested by David G Ortega
 - Check to see if a square in fiducial is concave and discard

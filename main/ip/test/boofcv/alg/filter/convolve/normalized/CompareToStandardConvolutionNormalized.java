@@ -20,7 +20,7 @@ package boofcv.alg.filter.convolve.normalized;
 
 import boofcv.alg.filter.convolve.ConvolutionTestHelper;
 import boofcv.alg.misc.GImageMiscOps;
-import boofcv.factory.filter.kernel.FactoryKernelGaussian;
+import boofcv.factory.filter.kernel.FactoryKernel;
 import boofcv.struct.convolve.KernelBase;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.testing.CompareIdenticalFunctions;
@@ -67,21 +67,21 @@ public class CompareToStandardConvolutionNormalized extends CompareIdenticalFunc
 
 		Object[][] ret = new Object[1][paramTypes.length];
 
-		ret[0][0]= FactoryKernelGaussian.gaussian((Class)paramTypes[0],-1,kernelRadius);
+		ret[0][0]= FactoryKernel.random((Class) paramTypes[0], kernelRadius,1,10,rand);
 		((KernelBase)ret[0][0]).offset = offset;
 
 		int index = 1;
 		if( KernelBase.class.isAssignableFrom(paramTypes[1]) ) {
-			ret[0][index]= FactoryKernelGaussian.gaussian((Class)paramTypes[index],-1,kernelRadius);
+			ret[0][index] = FactoryKernel.random((Class) paramTypes[1], kernelRadius, 1, 10, rand);
 			((KernelBase)ret[0][index]).offset = offset;
 			index++;
 		}
 
 		ImageSingleBand src = ConvolutionTestHelper.createImage(paramTypes[index], width, height);
 		ret[0][index++] = src;
-		GImageMiscOps.fillUniform(src, rand, 0, 50);
+		GImageMiscOps.fillUniform(src, rand, 0, 120);
 		ImageSingleBand dst = ConvolutionTestHelper.createImage(paramTypes[index], width, height);
-		ret[0][index++] = dst;
+		ret[0][index] = dst;
 
 
 		return ret;

@@ -117,6 +117,13 @@ public class Kernel2D_F32 extends Kernel2D {
 		System.out.println();
 	}
 
+	public Kernel2D_F32 copy() {
+		Kernel2D_F32 ret = new Kernel2D_F32(width);
+		ret.offset = this.offset;
+		System.arraycopy(data,0,ret.data,0,data.length);
+		return ret;
+	}
+
 	@Override
 	public double getDouble(int x, int y) {
 		return get(x,y);

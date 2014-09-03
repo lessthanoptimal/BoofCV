@@ -252,15 +252,16 @@ public class GenerateConvolveNormalized_JustBorder extends CodeGeneratorBase  {
 				"\n" +
 				"\t\tfinal int offsetX = kernelX.getOffset();\n" +
 				"\t\tfinal int kernelWidthX = kernelX.getWidth();\n" +
+				"\t\tfinal int offsetX1 = kernelWidthX-offsetX-1;\n" +
 				"\n" +
 				"\t\tfinal int imgWidth = output.getWidth();\n" +
 				"\t\tfinal int imgHeight = output.getHeight();\n" +
 				"\n" +
-				"\t\tfinal int yEnd = imgHeight - offsetY;\n" +
+				"\t\tfinal int yEnd = imgHeight - (kernelWidthY-offsetY-1);\n" +
 				"\n" +
 				"\t\tint startWeightX = 0;\n" +
 				"\t\tfor (int k = offsetX; k < kernelWidthX; k++) {\n" +
-				"\t\t\tstartWeightX += dataKer[k];\n" +
+				"\t\t\tstartWeightX += kernelX.data[k];\n" +
 				"\t\t}\n" +
 				"\n" +
 				"\t\tfor (int y = 0; y < offsetY; y++) {\n" +
@@ -284,10 +285,10 @@ public class GenerateConvolveNormalized_JustBorder extends CodeGeneratorBase  {
 				"\t\t\t\t\ttotal += (dataSrc[indexSrc]"+bitWiseOp+") * dataKer[k];\n" +
 				"\t\t\t\t}\n" +
 				"\t\t\t\tdataDst[indexDst++] = "+typeCast+"("+divide+");\n" +
-				"\t\t\t\tif( x < kernelWidthX ) {\n" +
-				"\t\t\t\t\tweightX += dataKer[kernelWidthX-1-x];\n" +
-				"\t\t\t\t} else if( x > input.width-(kernelWidthX-offsetX) ) {\n" +
-				"\t\t\t\t\tweightX -= dataKer[input.width-x-1];\n" +
+				"\t\t\t\tif( x < offsetX ) {\n" +
+				"\t\t\t\t\tweightX += kernelX.data[offsetX-x-1];\n" +
+				"\t\t\t\t} else if( x >= input.width-(kernelWidthX-offsetX) ) {\n" +
+				"\t\t\t\t\tweightX -= kernelX.data[input.width-x+offsetX-1];\n" +
 				"\t\t\t\t}\n" +
 				"\t\t\t}\n" +
 				"\t\t}\n" +
@@ -305,7 +306,7 @@ public class GenerateConvolveNormalized_JustBorder extends CodeGeneratorBase  {
 				"\t\t\t}\n" +
 				"\t\t\tint weightX = startWeightX;\n" +
 				"\n" +
-				"\t\t\tfor ( int x = 0; i < iEnd; i++) {\n" +
+				"\t\t\tfor ( int x = 0; i < iEnd; i++, x++ ) {\n" +
 				"\t\t\t\tint weight = weightX*weightY;\n" +
 				"\t\t\t\tint total = 0;\n" +
 				"\t\t\t\tint indexSrc = i - offsetY * input.stride;\n" +
@@ -313,11 +314,48 @@ public class GenerateConvolveNormalized_JustBorder extends CodeGeneratorBase  {
 				"\t\t\t\t\ttotal += (dataSrc[indexSrc]"+bitWiseOp+") * dataKer[k];\n" +
 				"\t\t\t\t}\n" +
 				"\t\t\t\tdataDst[indexDst++] = "+typeCast+"("+divide+");\n" +
-				"\t\t\t\tif( x < kernelWidthX ) {\n" +
-				"\t\t\t\t\tweightX += dataKer[kernelWidthX-1-x];\n" +
-				"\t\t\t\t} else if( x > input.width-(kernelWidthX-offsetX) ) {\n" +
-				"\t\t\t\t\tweightX -= dataKer[input.width-x-1];\n" +
+				"\t\t\t\tif( x < offsetX ) {\n" +
+				"\t\t\t\t\tweightX += kernelX.data[offsetX-x-1];\n" +
+				"\t\t\t\t} else if( x >= input.width-(kernelWidthX-offsetX) ) {\n" +
+				"\t\t\t\t\tweightX -= kernelX.data[input.width-x+offsetX-1];\n" +
 				"\t\t\t\t}\n" +
+				"\t\t\t}\n" +
+				"\t\t}\n" +
+				"\n" +
+				"\t\t// left and right border\n" +
+				"\t\tint weightY = kernelY.computeSum();\n" +
+				"\t\tfor (int y = offsetY; y < yEnd; y++) {\n" +
+				"\t\t\tint indexDst = output.startIndex + y * output.stride;\n" +
+				"\t\t\tint i = input.startIndex + y * input.stride;\n" +
+				"\n" +
+				"\t\t\t// left side\n" +
+				"\t\t\tint iEnd = i + offsetY;\n" +
+				"\t\t\tint weightX = startWeightX;\n" +
+				"\t\t\tfor ( int x = 0; i < iEnd; i++, x++ ) {\n" +
+				"\t\t\t\tint weight = weightX*weightY;\n" +
+				"\t\t\t\tint total = 0;\n" +
+				"\t\t\t\tint indexSrc = i - offsetY * input.stride;\n" +
+				"\t\t\t\tfor (int k = 0; k < kernelWidthY; k++, indexSrc += input.stride) {\n" +
+				"\t\t\t\t\ttotal += (dataSrc[indexSrc]"+bitWiseOp+") * dataKer[k];\n" +
+				"\t\t\t\t}\n" +
+				"\t\t\t\tdataDst[indexDst++] = "+typeCast+"("+divide+");\n" +
+				"\t\t\t\tweightX += kernelX.data[offsetX-x-1];\n" +
+				"\t\t\t}\n" +
+				"\n" +
+				"\t\t\t// right side\n" +
+				"\t\t\tint startX = input.width-offsetX1;\n" +
+				"\t\t\tindexDst = output.startIndex + y * output.stride + startX;\n" +
+				"\t\t\ti = input.startIndex + y * input.stride + startX;\n" +
+				"\t\t\tiEnd = input.startIndex + y * input.stride + input.width;\n" +
+				"\t\t\tfor ( int x = startX; i < iEnd; i++, x++ ) {\n" +
+				"\t\t\t\tweightX -= kernelX.data[input.width-x+offsetX];\n" +
+				"\t\t\t\tint weight = weightX*weightY;\n" +
+				"\t\t\t\tint total = 0;\n" +
+				"\t\t\t\tint indexSrc = i - offsetY * input.stride;\n" +
+				"\t\t\t\tfor (int k = 0; k < kernelWidthY; k++, indexSrc += input.stride) {\n" +
+				"\t\t\t\t\ttotal += (dataSrc[indexSrc]"+bitWiseOp+") * dataKer[k];\n" +
+				"\t\t\t\t}\n" +
+				"\t\t\t\tdataDst[indexDst++] = "+typeCast+"("+divide+");\n" +
 				"\t\t\t}\n" +
 				"\t\t}\n" +
 				"\t}\n\n");

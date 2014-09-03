@@ -933,15 +933,16 @@ public class ConvolveNormalized_JustBorder {
 
 		final int offsetX = kernelX.getOffset();
 		final int kernelWidthX = kernelX.getWidth();
+		final int offsetX1 = kernelWidthX-offsetX-1;
 
 		final int imgWidth = output.getWidth();
 		final int imgHeight = output.getHeight();
 
-		final int yEnd = imgHeight - offsetY;
+		final int yEnd = imgHeight - (kernelWidthY-offsetY-1);
 
 		int startWeightX = 0;
 		for (int k = offsetX; k < kernelWidthX; k++) {
-			startWeightX += dataKer[k];
+			startWeightX += kernelX.data[k];
 		}
 
 		for (int y = 0; y < offsetY; y++) {
@@ -964,11 +965,13 @@ public class ConvolveNormalized_JustBorder {
 				for (int k = kStart; k < kernelWidthY; k++, indexSrc += input.stride) {
 					total += (dataSrc[indexSrc]& 0xFFFF) * dataKer[k];
 				}
+				if( x == 0 && y == 0 )
+					System.out.println("normalized border "+total);
 				dataDst[indexDst++] = (byte)((total+weight/2)/weight);
-				if( x < kernelWidthX ) {
-					weightX += dataKer[kernelWidthX-1-x];
-				} else if( x > input.width-(kernelWidthX-offsetX) ) {
-					weightX -= dataKer[input.width-x-1];
+				if( x < offsetX ) {
+					weightX += kernelX.data[offsetX-x-1];
+				} else if( x >= input.width-(kernelWidthX-offsetX) ) {
+					weightX -= kernelX.data[input.width-x+offsetX-1];
 				}
 			}
 		}
@@ -986,7 +989,7 @@ public class ConvolveNormalized_JustBorder {
 			}
 			int weightX = startWeightX;
 
-			for ( int x = 0; i < iEnd; i++) {
+			for ( int x = 0; i < iEnd; i++, x++ ) {
 				int weight = weightX*weightY;
 				int total = 0;
 				int indexSrc = i - offsetY * input.stride;
@@ -994,11 +997,48 @@ public class ConvolveNormalized_JustBorder {
 					total += (dataSrc[indexSrc]& 0xFFFF) * dataKer[k];
 				}
 				dataDst[indexDst++] = (byte)((total+weight/2)/weight);
-				if( x < kernelWidthX ) {
-					weightX += dataKer[kernelWidthX-1-x];
-				} else if( x > input.width-(kernelWidthX-offsetX) ) {
-					weightX -= dataKer[input.width-x-1];
+				if( x < offsetX ) {
+					weightX += kernelX.data[offsetX-x-1];
+				} else if( x >= input.width-(kernelWidthX-offsetX) ) {
+					weightX -= kernelX.data[input.width-x+offsetX-1];
 				}
+			}
+		}
+
+		// left and right border
+		int weightY = kernelY.computeSum();
+		for (int y = offsetY; y < yEnd; y++) {
+			int indexDst = output.startIndex + y * output.stride;
+			int i = input.startIndex + y * input.stride;
+
+			// left side
+			int iEnd = i + offsetY;
+			int weightX = startWeightX;
+			for ( int x = 0; i < iEnd; i++, x++ ) {
+				int weight = weightX*weightY;
+				int total = 0;
+				int indexSrc = i - offsetY * input.stride;
+				for (int k = 0; k < kernelWidthY; k++, indexSrc += input.stride) {
+					total += (dataSrc[indexSrc]& 0xFFFF) * dataKer[k];
+				}
+				dataDst[indexDst++] = (byte)((total+weight/2)/weight);
+				weightX += kernelX.data[offsetX-x-1];
+			}
+
+			// right side
+			int startX = input.width-offsetX1;
+			indexDst = output.startIndex + y * output.stride + startX;
+			i = input.startIndex + y * input.stride + startX;
+			iEnd = input.startIndex + y * input.stride + input.width;
+			for ( int x = startX; i < iEnd; i++, x++ ) {
+				weightX -= kernelX.data[input.width-x+offsetX];
+				int weight = weightX*weightY;
+				int total = 0;
+				int indexSrc = i - offsetY * input.stride;
+				for (int k = 0; k < kernelWidthY; k++, indexSrc += input.stride) {
+					total += (dataSrc[indexSrc]& 0xFFFF) * dataKer[k];
+				}
+				dataDst[indexDst++] = (byte)((total+weight/2)/weight);
 			}
 		}
 	}
@@ -1014,15 +1054,16 @@ public class ConvolveNormalized_JustBorder {
 
 		final int offsetX = kernelX.getOffset();
 		final int kernelWidthX = kernelX.getWidth();
+		final int offsetX1 = kernelWidthX-offsetX-1;
 
 		final int imgWidth = output.getWidth();
 		final int imgHeight = output.getHeight();
 
-		final int yEnd = imgHeight - offsetY;
+		final int yEnd = imgHeight - (kernelWidthY-offsetY-1);
 
 		int startWeightX = 0;
 		for (int k = offsetX; k < kernelWidthX; k++) {
-			startWeightX += dataKer[k];
+			startWeightX += kernelX.data[k];
 		}
 
 		for (int y = 0; y < offsetY; y++) {
@@ -1046,10 +1087,10 @@ public class ConvolveNormalized_JustBorder {
 					total += (dataSrc[indexSrc]) * dataKer[k];
 				}
 				dataDst[indexDst++] = (short)((total+weight/2)/weight);
-				if( x < kernelWidthX ) {
-					weightX += dataKer[kernelWidthY-1-x];
-				} else if( x > input.width-(kernelWidthX-offsetX) ) {
-					weightX -= dataKer[input.width-x-1];
+				if( x < offsetX ) {
+					weightX += kernelX.data[offsetX-x-1];
+				} else if( x >= input.width-(kernelWidthX-offsetX) ) {
+					weightX -= kernelX.data[input.width-x+offsetX-1];
 				}
 			}
 		}
@@ -1067,7 +1108,7 @@ public class ConvolveNormalized_JustBorder {
 			}
 			int weightX = startWeightX;
 
-			for ( int x = 0; i < iEnd; i++) {
+			for ( int x = 0; i < iEnd; i++, x++ ) {
 				int weight = weightX*weightY;
 				int total = 0;
 				int indexSrc = i - offsetY * input.stride;
@@ -1075,11 +1116,48 @@ public class ConvolveNormalized_JustBorder {
 					total += (dataSrc[indexSrc]) * dataKer[k];
 				}
 				dataDst[indexDst++] = (short)((total+weight/2)/weight);
-				if( x < kernelWidthX ) {
-					weightX += dataKer[kernelWidthX-1-x];
-				} else if( x > input.width-(kernelWidthX-offsetX) ) {
-					weightX -= dataKer[input.width-x-1];
+				if( x < offsetX ) {
+					weightX += kernelX.data[offsetX-x-1];
+				} else if( x >= input.width-(kernelWidthX-offsetX) ) {
+					weightX -= kernelX.data[input.width-x+offsetX-1];
 				}
+			}
+		}
+
+		// left and right border
+		int weightY = kernelY.computeSum();
+		for (int y = offsetY; y < yEnd; y++) {
+			int indexDst = output.startIndex + y * output.stride;
+			int i = input.startIndex + y * input.stride;
+
+			// left side
+			int iEnd = i + offsetY;
+			int weightX = startWeightX;
+			for ( int x = 0; i < iEnd; i++, x++ ) {
+				int weight = weightX*weightY;
+				int total = 0;
+				int indexSrc = i - offsetY * input.stride;
+				for (int k = 0; k < kernelWidthY; k++, indexSrc += input.stride) {
+					total += (dataSrc[indexSrc]) * dataKer[k];
+				}
+				dataDst[indexDst++] = (short)((total+weight/2)/weight);
+				weightX += kernelX.data[offsetX-x-1];
+			}
+
+			// right side
+			int startX = input.width-offsetX1;
+			indexDst = output.startIndex + y * output.stride + startX;
+			i = input.startIndex + y * input.stride + startX;
+			iEnd = input.startIndex + y * input.stride + input.width;
+			for ( int x = startX; i < iEnd; i++, x++ ) {
+				weightX -= kernelX.data[input.width-x+offsetX];
+				int weight = weightX*weightY;
+				int total = 0;
+				int indexSrc = i - offsetY * input.stride;
+				for (int k = 0; k < kernelWidthY; k++, indexSrc += input.stride) {
+					total += (dataSrc[indexSrc]) * dataKer[k];
+				}
+				dataDst[indexDst++] = (short)((total+weight/2)/weight);
 			}
 		}
 	}

@@ -47,6 +47,8 @@ public class TestConvolveNormalized_JustBorder {
 			// non symmetric
 			test.setKernelRadius(3,1);
 			test.performTests(numFunctions);
+			test.setKernelRadius(3,4);
+			test.performTests(numFunctions);
 
 			// NOTE it intentionally can't handle this special case
 			// now try a pathological case where the kernel is larger than the image
@@ -66,25 +68,41 @@ public class TestConvolveNormalized_JustBorder {
 		 */
 		@Override
 		protected void compareResults(Object targetResult, Object[] targetParam, Object validationResult, Object[] validationParam) {
-			GImageSingleBand t = FactoryGImageSingleBand.wrap((ImageSingleBand) targetParam[2]);
-			GImageSingleBand v = FactoryGImageSingleBand.wrap((ImageSingleBand) validationParam[2]);
 
-			final int width = t.getWidth();
-			final int height = t.getHeight();
+			GImageSingleBand t,v;
 
 			int borderX0=0,borderX1=0;
 			int borderY0=0,borderY1=0;
 
 			if( methodTest.getName().contentEquals("convolve")) {
+				t = FactoryGImageSingleBand.wrap((ImageSingleBand) targetParam[2]);
+				v = FactoryGImageSingleBand.wrap((ImageSingleBand) validationParam[2]);
 				borderX0=borderY0 = offset;
 				borderX1=borderY1 = kernelRadius*2-offset;
 			} else if( methodTest.getName().contentEquals("horizontal") ) {
+				t = FactoryGImageSingleBand.wrap((ImageSingleBand) targetParam[2]);
+				v = FactoryGImageSingleBand.wrap((ImageSingleBand) validationParam[2]);
 				borderX0 = offset;
 				borderX1 = kernelRadius*2-offset;
 			} else if( methodTest.getName().contentEquals("vertical")) {
-				borderY0 = offset;
-				borderY1 = kernelRadius*2-offset;
+				if( methodTest.getParameterTypes().length == 3 ) {
+					t = FactoryGImageSingleBand.wrap((ImageSingleBand) targetParam[2]);
+					v = FactoryGImageSingleBand.wrap((ImageSingleBand) validationParam[2]);
+					borderY0 = offset;
+					borderY1 = kernelRadius * 2 - offset;
+				} else {
+					t = FactoryGImageSingleBand.wrap((ImageSingleBand) targetParam[3]);
+					v = FactoryGImageSingleBand.wrap((ImageSingleBand) validationParam[3]);
+					borderX0=borderY0 = offset;
+					borderX1=borderY1 = kernelRadius*2-offset;
+				}
+			} else {
+				throw new RuntimeException("Unknown");
 			}
+
+			final int width = t.getWidth();
+			final int height = t.getHeight();
+
 			for( int y = 0; y < height; y++ ) {
 				for( int x = 0; x < width; x++ ) {
 					if( x < borderX0 || y < borderY0 || x >= width - borderX1 || y >= height - borderY1 )

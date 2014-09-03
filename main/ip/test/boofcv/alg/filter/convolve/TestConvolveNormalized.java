@@ -27,7 +27,7 @@ import org.junit.Test;
 public class TestConvolveNormalized {
 	@Test
 	public void compareToNaive() {
-		int numFunctions = 11;
+		int numFunctions = 13;
 		CompareToStandardConvolutionNormalized test = new CompareToStandardConvolutionNormalized(ConvolveNormalized.class);
 
 		for( int i = 0; i < 2; i++ ) {

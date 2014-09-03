@@ -126,6 +126,13 @@ public class Kernel1D_F32 extends Kernel1D {
 		return data;
 	}
 
+	public Kernel1D_F32 copy() {
+		Kernel1D_F32 ret = new Kernel1D_F32(width);
+		ret.offset = this.offset;
+		System.arraycopy(data,0,ret.data,0,ret.width);
+		return ret;
+	}
+
 	public void print() {
 		for (int i = 0; i < width; i++) {
 		}

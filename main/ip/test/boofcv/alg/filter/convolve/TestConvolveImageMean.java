@@ -92,7 +92,7 @@ public class TestConvolveImageMean extends CompareEquivalentFunctions {
 		ImageSingleBand input = GeneralizedImageOps.createSingleBand(c[0], width, height);
 		ImageSingleBand output = GeneralizedImageOps.createSingleBand(c[1], width, height);
 
-		GImageMiscOps.fillUniform(input, rand, 0, 20);
+		GImageMiscOps.fillUniform(input, rand, 0, 100);
 
 		Object[][] ret = new Object[2][];
 		ret[0] = new Object[]{input,output,kernelRadius};

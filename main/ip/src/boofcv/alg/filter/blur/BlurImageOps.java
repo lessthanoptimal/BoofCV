@@ -25,8 +25,10 @@ import boofcv.alg.filter.blur.impl.ImplMedianSortNaive;
 import boofcv.alg.filter.convolve.ConvolveImageBox;
 import boofcv.alg.filter.convolve.ConvolveImageMean;
 import boofcv.alg.filter.convolve.ConvolveNormalized;
-import boofcv.alg.filter.convolve.noborder.ConvolveImageStandard;
+import boofcv.alg.filter.convolve.ConvolveWithBorder;
 import boofcv.core.image.GeneralizedImageOps;
+import boofcv.core.image.border.FactoryImageBorder;
+import boofcv.core.image.border.ImageBorder_I32;
 import boofcv.factory.filter.kernel.FactoryKernelGaussian;
 import boofcv.struct.convolve.Kernel1D_F32;
 import boofcv.struct.convolve.Kernel1D_I32;
@@ -104,7 +106,8 @@ public class BlurImageOps {
 
 		Kernel1D_I32 kernel = FactoryKernelGaussian.gaussian(Kernel1D_I32.class,sigma,radius);
 
-		ConvolveImageStandard.horizontal(kernel, input, storage);
+		ImageBorder_I32<ImageUInt8> border = (ImageBorder_I32)FactoryImageBorder.value(input,0);
+		ConvolveWithBorder.horizontal(kernel, input, storage,border);
 		ConvolveNormalized.vertical(kernel,kernel,storage,output);
 
 		return output;

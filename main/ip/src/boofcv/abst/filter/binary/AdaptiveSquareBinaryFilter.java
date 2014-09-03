@@ -21,6 +21,7 @@ package boofcv.abst.filter.binary;
 import boofcv.alg.filter.binary.GThresholdImageOps;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageType;
+import boofcv.struct.image.ImageUInt16;
 import boofcv.struct.image.ImageUInt8;
 
 /**
@@ -35,7 +36,7 @@ public class AdaptiveSquareBinaryFilter<T extends ImageSingleBand> implements In
 	ImageType<T> inputType;
 
 	T work1;
-	T work2;
+	ImageSingleBand work2;
 
 	int radius;
 	double bias;
@@ -48,7 +49,11 @@ public class AdaptiveSquareBinaryFilter<T extends ImageSingleBand> implements In
 		this.down = down;
 		this.inputType = inputType;
 		work1 = inputType.createImage(1,1);
-		work2 = inputType.createImage(1,1);
+		if( inputType.getDataType().isInteger()) {
+			work2 = new ImageUInt16(1,1);
+		} else {
+			work2 = inputType.createImage(1,1);
+		}
 	}
 
 	@Override

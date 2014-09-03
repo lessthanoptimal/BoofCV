@@ -21,6 +21,7 @@ package boofcv.alg.filter.convolve;
 import boofcv.alg.InputSanityCheck;
 import boofcv.alg.filter.convolve.normalized.ConvolveNormalizedNaive;
 import boofcv.alg.filter.convolve.normalized.ConvolveNormalized_JustBorder;
+import boofcv.alg.filter.kernel.KernelMath;
 import boofcv.struct.convolve.Kernel1D_F32;
 import boofcv.struct.convolve.Kernel1D_I32;
 import boofcv.struct.convolve.Kernel2D_F32;
@@ -28,8 +29,8 @@ import boofcv.struct.convolve.Kernel2D_I32;
 import boofcv.struct.image.*;
 
 /**
- * Convolves a kernel across an image and re-normalize the kernel along image borders.  This should only be used with
- * kernels that can be re-normalize.  Typically kernels for blurring images can be re-normalized.
+ * Convolves a kernel across an image and scales the kernel such that the sum of the portion inside
+ * the image sums up to one.
  *
  * @author Peter Abeles
  */
@@ -48,6 +49,11 @@ public class ConvolveNormalized {
 		if( kernel.width >= image.width ) {
 			ConvolveNormalizedNaive.horizontal(kernel,image,dest);
 		} else {
+			if( Math.abs(kernel.computeSum() - 1.0f) > 1e-4f ) {
+				Kernel1D_F32 k = kernel.copy();
+				KernelMath.normalizeSumToOne(k);
+				kernel = k;
+			}
 			ConvolveImageNoBorder.horizontal(kernel,image,dest);
 			ConvolveNormalized_JustBorder.horizontal(kernel,image,dest);
 		}
@@ -67,6 +73,11 @@ public class ConvolveNormalized {
 		if( kernel.width >= image.height ) {
 			ConvolveNormalizedNaive.vertical(kernel,image,dest);
 		} else {
+			if( Math.abs(kernel.computeSum() - 1.0f) > 1e-4f ) {
+				Kernel1D_F32 k = kernel.copy();
+				KernelMath.normalizeSumToOne(k);
+				kernel = k;
+			}
 			ConvolveImageNoBorder.vertical(kernel,image,dest);
 			ConvolveNormalized_JustBorder.vertical(kernel,image,dest);
 		}
@@ -86,6 +97,11 @@ public class ConvolveNormalized {
 		if( kernel.width >= image.width || kernel.width >= image.height ) {
 			ConvolveNormalizedNaive.convolve(kernel, image, dest);
 		} else {
+			if( Math.abs(kernel.computeSum() - 1.0f) > 1e-4f ) {
+				Kernel2D_F32 k = kernel.copy();
+				KernelMath.normalizeSumToOne(k);
+				kernel = k;
+			}
 			ConvolveImageNoBorder.convolve(kernel, image, dest);
 			ConvolveNormalized_JustBorder.convolve(kernel, image, dest);
 		}
@@ -141,7 +157,7 @@ public class ConvolveNormalized {
 	public static void vertical(Kernel1D_I32 kernelX,Kernel1D_I32 kernelY, ImageUInt16 image, ImageInt8 dest ) {
 		InputSanityCheck.checkSameShape(image, dest);
 
-		if( kernelY.width >= image.height ) {
+		if( kernelX.width >= image.width  || kernelY.width >= image.height ) {
 			ConvolveNormalizedNaive.vertical(kernelX,kernelY,image,dest);
 		} else {
 			int weight = kernelX.computeSum()*kernelY.computeSum();
@@ -162,7 +178,7 @@ public class ConvolveNormalized {
 	public static void vertical(Kernel1D_I32 kernelX,Kernel1D_I32 kernelY, ImageSInt32 image, ImageInt16 dest ) {
 		InputSanityCheck.checkSameShape(image, dest);
 
-		if( kernelY.width >= image.height ) {
+		if( kernelX.width >= image.width  || kernelY.width >= image.height ) {
 			ConvolveNormalizedNaive.vertical(kernelX,kernelY,image,dest);
 		} else {
 			int weight = kernelX.computeSum()*kernelY.computeSum();
