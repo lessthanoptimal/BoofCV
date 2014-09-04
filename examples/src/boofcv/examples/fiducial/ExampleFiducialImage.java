@@ -45,22 +45,26 @@ public class ExampleFiducialImage {
 
 		String directory = "../data/applet/fiducial/image/";
 
+		String imageName = "view01.jpg";
+//		String imageName = "view02.jpg";
+
 		// load the lens distortion parameters and the input image
 		IntrinsicParameters param = UtilIO.loadXML(directory + "intrinsic.xml");
-		ImageFloat32 dog = UtilImageIO.loadImage(directory + "dog.png",ImageFloat32.class);
-		ImageFloat32 text = UtilImageIO.loadImage(directory + "text.png",ImageFloat32.class);
-		BufferedImage input = UtilImageIO.loadImage(directory + "view01.jpg");
-		ImageFloat32 original = ConvertBufferedImage.convertFrom(input,true, ImageType.single(ImageFloat32.class));
+		BufferedImage input = UtilImageIO.loadImage(directory + imageName);
+		ImageFloat32 original = ConvertBufferedImage.convertFrom(input, true, ImageType.single(ImageFloat32.class));
 
 		// Detect the fiducial
-//		SquareImage_to_FiducialDetector<ImageFloat32> detector = FactoryFiducial.
-//				squareImageRobust(new ConfigFiducialImage(0.1),6,ImageFloat32.class);
 		SquareImage_to_FiducialDetector<ImageFloat32> detector = FactoryFiducial.
-				squareImageFast(new ConfigFiducialImage(0.1), 100, ImageFloat32.class);
+				squareImageRobust(new ConfigFiducialImage(0.1), 6, ImageFloat32.class);
+//		SquareImage_to_FiducialDetector<ImageFloat32> detector = FactoryFiducial.
+//				squareImageFast(new ConfigFiducialImage(0.1), 100, ImageFloat32.class);
 
 		// give it a description of all the targets
+		ImageFloat32 dog = UtilImageIO.loadImage(directory + "dog.png",ImageFloat32.class);
 		detector.addTarget(dog, 125);
-//		detector.addTarget(text, 125); // uncomment to detect the text target
+		// uncomment to detect the text target
+//		ImageFloat32 text = UtilImageIO.loadImage(directory + "text.png",ImageFloat32.class);
+//		detector.addTarget(text, 125);
 
 		detector.setIntrinsic(param);
 

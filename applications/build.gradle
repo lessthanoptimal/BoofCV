@@ -15,3 +15,52 @@ idea {
         name = "BoofCV Applications"
     }
 }
+
+// gradle fiducialBinary -Pwidth=10.0 -Pnumber=325
+task fiducialBinary(dependsOn: classes ) << {
+
+    if (project.hasProperty('width') && project.hasProperty('number')) {
+        javaexec {
+            main = "boofcv.app.CreateFiducialSquareBinaryEPS"
+            args = ["$width","$number"]
+            classpath = sourceSets.main.runtimeClasspath
+        }
+    } else {
+        print 'width and number must be specified!'
+    }
+}
+
+// gradle fiducialBinary -Pwidth=10.0 -Pnumber="../data/applet/fiducial/image/dog.png"
+task fiducialImage(dependsOn: classes ) << {
+
+    if (project.hasProperty('width') && project.hasProperty('image')) {
+        javaexec {
+            main = "boofcv.app.CreateFiducialSquareImageEPS"
+            args = ["$width","$image"]
+            classpath = sourceSets.main.runtimeClasspath
+        }
+    } else {
+        print 'width and number must be specified!'
+    }
+}
+
+// gradle trackFiducial -Pcamera=0 -Pintrinsic="../data/applet/fiducial/binary/intrinsic.xml"
+// gradle trackFiducial -Pcamera=0
+task trackFiducial(dependsOn: classes ) << {
+
+    ext.param = []
+    if (project.hasProperty('camera') || project.hasProperty('intrinsic')) {
+        if( !project.hasProperty('camera') ) {
+            ext.param = ["0","$intrinsic"]
+        } else if( !project.hasProperty('intrinsic')) {
+            ext.param = ["$camera"]
+        } else {
+            ext.param = ["$camera","$intrinsic"]
+        }
+    }
+    javaexec {
+        main = "boofcv.app.TrackFiducialWebcam"
+        args = ext.param
+        classpath = sourceSets.main.runtimeClasspath
+    }
+}
