@@ -56,7 +56,6 @@ public class ExampleFiducialImage {
 		// Detect the fiducial
 		SquareImage_to_FiducialDetector<ImageFloat32> detector = FactoryFiducial.
 				squareImageRobust(new ConfigFiducialImage(0.1), 6, ImageFloat32.class);
-//		SquareImage_to_FiducialDetector<ImageFloat32> detector = FactoryFiducial.
 //				squareImageFast(new ConfigFiducialImage(0.1), 100, ImageFloat32.class);
 
 		// give it a description of all the targets

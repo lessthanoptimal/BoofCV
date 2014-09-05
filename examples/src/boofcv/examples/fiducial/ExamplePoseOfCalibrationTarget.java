@@ -19,8 +19,7 @@
 package boofcv.examples.fiducial;
 
 import boofcv.abst.calib.ConfigChessboard;
-import boofcv.abst.fiducial.FiducialDetector;
-import boofcv.factory.calib.FactoryPlanarCalibrationTarget;
+import boofcv.abst.fiducial.CalibrationFiducialDetector;
 import boofcv.factory.fiducial.FactoryFiducial;
 import boofcv.gui.MousePauseHelper;
 import boofcv.gui.d3.PointCloudViewer;
@@ -74,13 +73,13 @@ public class ExamplePoseOfCalibrationTarget {
 		// Let's use the FiducialDetector interface since it is much easier than coding up
 		// the entire thing ourselves.  Look at FiducialDetector's code if you want to understand how it works.
 		double sizeOfSquareInMeters = 0.03;
-		FiducialDetector<ImageFloat32> detector =
+		CalibrationFiducialDetector<ImageFloat32> detector =
 				FactoryFiducial.calibChessboard(new ConfigChessboard(5, 4),sizeOfSquareInMeters,ImageFloat32.class);
 
 		detector.setIntrinsic(intrinsic);
 
 		// Get the 2D coordinate of calibration points for visualization purposes
-		List<Point2D_F64> calibPts = FactoryPlanarCalibrationTarget.gridChess(5,4, sizeOfSquareInMeters).points;
+		List<Point2D_F64> calibPts = detector.getCalibrationPoints();
 
 		// Set up visualization
 		JPanel gui = new JPanel();
