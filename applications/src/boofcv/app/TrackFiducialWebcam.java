@@ -61,7 +61,7 @@ public class TrackFiducialWebcam {
 
 		System.out.println();
 		System.out.println("camera ID = "+cameraId);
-		System.out.println("intrinsic file = "+nameIntrinsic);
+		System.out.println("intrinsic file = " + nameIntrinsic);
 		System.out.println();
 
 		Webcam webcam = Webcam.getWebcams().get(cameraId);

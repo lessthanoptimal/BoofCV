@@ -76,10 +76,10 @@ public class ExampleConvolution {
 	private static void convolve2D(ImageUInt8 gray) {
 		// By default 2D kernels will be centered around width/2
 		Kernel2D_I32 kernel = new Kernel2D_I32(3);
-		kernel.set(0,0,2);
-		kernel.set(0,2,2);
-		kernel.set(2,0,-2);
-		kernel.set(2,2,-2);
+		kernel.set(1,0,2);
+		kernel.set(2,1,2);
+		kernel.set(0,1,-2);
+		kernel.set(1,2,-2);
 
 		// Output needs to handle the increased domain after convolution.  Can't be 8bit
 		ImageSInt16 output = new ImageSInt16(gray.width,gray.height);

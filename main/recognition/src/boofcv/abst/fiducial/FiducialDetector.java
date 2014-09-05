@@ -27,21 +27,48 @@ import georegression.struct.se.Se3_F64;
  * Interface for detecting fiducials.  If the {@link boofcv.struct.calib.IntrinsicParameters} specifies lens
  * distortion then it will be automatically removed and if there is no lens distortion then it will skip that step.
  *
- *
  * @author Peter Abeles
  */
-// TODO Comment
 public interface FiducialDetector<T extends ImageBase>
 {
+	/**
+	 * Call to detect the fiducial inside the image.  Must call
+	 * {@link #setIntrinsic(boofcv.struct.calib.IntrinsicParameters)} first.
+	 * @param input Input image.  Not modified.
+	 */
 	public void detect( T input );
 
+	/**
+	 * Specifies the intrinsic camera parameters.  Allows for the euclidean geometry of be extracted from
+	 * a single image
+	 *
+	 * @param intrinsic The camera's intrinsic parmeters
+	 */
 	public void setIntrinsic( IntrinsicParameters intrinsic );
 
+	/**
+	 * The total number of targets found
+	 * @return number of targets found
+	 */
 	public int totalFound();
 
+	/**
+	 * Used to retrieve the transformation from the fiducial's reference frame to the sensor's refernece frame.
+	 *
+	 * @param which Fiducial's index
+	 * @param fiducialToSensor (output) Storage for the transform. modified.
+	 */
 	public void getFiducialToWorld(int which, Se3_F64 fiducialToSensor );
 
+	/**
+	 * If applicable, returns the ID of the fiducial found.
+	 * @param which Fiducial's index
+	 * @return ID of the fiducial
+	 */
 	public int getId( int which );
 
+	/**
+	 * Type of input image
+	 */
 	public ImageType<T> getInputType();
 }
