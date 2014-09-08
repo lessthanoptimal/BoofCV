@@ -30,12 +30,41 @@ import boofcv.struct.image.*;
  */
 public class ImplConvolveMean {
 
-	public static void vertical( ImageUInt16 input , ImageInt8 output , int radius ) {
+	public static void horizontal( ImageUInt8 input , ImageInt8 output , int radius ) {
+		final int kernelWidth = radius*2 + 1;
+
+		final int divisor = kernelWidth;
+		final int halfDivisor = divisor/2;
+
+		for( int y = 0; y < input.height; y++ ) {
+			int indexIn = input.startIndex + input.stride*y;
+			int indexOut = output.startIndex + output.stride*y + radius;
+
+			int total = 0;
+
+			int indexEnd = indexIn + kernelWidth;
+			
+			for( ; indexIn < indexEnd; indexIn++ ) {
+				total += input.data[indexIn] & 0xFF;
+			}
+			output.data[indexOut++] = (byte)((total+halfDivisor)/divisor);
+
+			indexEnd = indexIn + input.width - kernelWidth;
+			for( ; indexIn < indexEnd; indexIn++ ) {
+				total -= input.data[ indexIn - kernelWidth ] & 0xFF;
+				total += input.data[ indexIn ] & 0xFF;
+
+				output.data[indexOut++] = (byte)((total+halfDivisor)/divisor);
+			}
+		}
+	}
+
+	public static void vertical( ImageUInt8 input , ImageInt8 output , int radius ) {
 		final int kernelWidth = radius*2 + 1;
 
 		final int backStep = kernelWidth*input.stride;
 
-		int divisor = kernelWidth*kernelWidth;
+		int divisor = kernelWidth;
 		final int halfDivisor = divisor/2;
 		int totals[] = new int[ input.width ];
 
@@ -46,7 +75,7 @@ public class ImplConvolveMean {
 			int total = 0;
 			int indexEnd = indexIn + input.stride*kernelWidth;
 			for( ; indexIn < indexEnd; indexIn += input.stride) {
-				total += input.data[indexIn] & 0xFFFF;
+				total += input.data[indexIn] & 0xFF;
 			}
 			totals[x] = total;
 			output.data[indexOut] = (byte)((total+halfDivisor)/divisor);
@@ -58,20 +87,49 @@ public class ImplConvolveMean {
 			int indexOut = output.startIndex + y*output.stride;
 
 			for( int x = 0; x < input.width; x++ ,indexIn++,indexOut++) {
-				int total = totals[ x ]  - (input.data[ indexIn - backStep ]& 0xFFFF);
-				totals[ x ] = total += input.data[ indexIn ]& 0xFFFF;
+				int total = totals[ x ]  - (input.data[ indexIn - backStep ]& 0xFF);
+				totals[ x ] = total += input.data[ indexIn ]& 0xFF;
 
 				output.data[indexOut] = (byte)((total+halfDivisor)/divisor);
 			}
 		}
 	}
 
-	public static void vertical( ImageSInt32 input , ImageInt16 output , int radius ) {
+	public static void horizontal( ImageSInt16 input , ImageInt16 output , int radius ) {
+		final int kernelWidth = radius*2 + 1;
+
+		final int divisor = kernelWidth;
+		final int halfDivisor = divisor/2;
+
+		for( int y = 0; y < input.height; y++ ) {
+			int indexIn = input.startIndex + input.stride*y;
+			int indexOut = output.startIndex + output.stride*y + radius;
+
+			int total = 0;
+
+			int indexEnd = indexIn + kernelWidth;
+			
+			for( ; indexIn < indexEnd; indexIn++ ) {
+				total += input.data[indexIn] ;
+			}
+			output.data[indexOut++] = (short)((total+halfDivisor)/divisor);
+
+			indexEnd = indexIn + input.width - kernelWidth;
+			for( ; indexIn < indexEnd; indexIn++ ) {
+				total -= input.data[ indexIn - kernelWidth ] ;
+				total += input.data[ indexIn ] ;
+
+				output.data[indexOut++] = (short)((total+halfDivisor)/divisor);
+			}
+		}
+	}
+
+	public static void vertical( ImageSInt16 input , ImageInt16 output , int radius ) {
 		final int kernelWidth = radius*2 + 1;
 
 		final int backStep = kernelWidth*input.stride;
 
-		int divisor = kernelWidth*kernelWidth;
+		int divisor = kernelWidth;
 		final int halfDivisor = divisor/2;
 		int totals[] = new int[ input.width ];
 

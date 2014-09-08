@@ -146,48 +146,6 @@ public class ConvolveNormalized {
 	}
 
 	/**
-	 * Performs a vertical 1D convolution across the image while re-normalizing the kernel depending on its
-	 * overlap with the image.
-	 *
-	 * @param image	 The original image. Not modified.
-	 * @param dest	 Where the resulting image is written to. Modified.
-	 * @param kernelX The kernel that was convolved along the x-axis. Not modified.
-	 * @param kernelY The kernel that is convolved along the y-axis. Not modified.
-	 */
-	public static void vertical(Kernel1D_I32 kernelX,Kernel1D_I32 kernelY, ImageUInt16 image, ImageInt8 dest ) {
-		InputSanityCheck.checkSameShape(image, dest);
-
-		if( kernelX.width >= image.width  || kernelY.width >= image.height ) {
-			ConvolveNormalizedNaive.vertical(kernelX,kernelY,image,dest);
-		} else {
-			int weight = kernelX.computeSum()*kernelY.computeSum();
-			ConvolveImageNoBorder.vertical(kernelY,image,dest,weight);
-			ConvolveNormalized_JustBorder.vertical(kernelX,kernelY,image,dest);
-		}
-	}
-
-	/**
-	 * Performs a vertical 1D convolution across the image while re-normalizing the kernel depending on its
-	 * overlap with the image.
-	 *
-	 * @param image	 The original image. Not modified.
-	 * @param dest	 Where the resulting image is written to. Modified.
-	 * @param kernelX The kernel that was convolved along the x-axis. Not modified.
-	 * @param kernelY The kernel that is convolved along the y-axis. Not modified.
-	 */
-	public static void vertical(Kernel1D_I32 kernelX,Kernel1D_I32 kernelY, ImageSInt32 image, ImageInt16 dest ) {
-		InputSanityCheck.checkSameShape(image, dest);
-
-		if( kernelX.width >= image.width  || kernelY.width >= image.height ) {
-			ConvolveNormalizedNaive.vertical(kernelX,kernelY,image,dest);
-		} else {
-			int weight = kernelX.computeSum()*kernelY.computeSum();
-			ConvolveImageNoBorder.vertical(kernelY,image,dest,weight);
-			ConvolveNormalized_JustBorder.vertical(kernelX,kernelY,image,dest);
-		}
-	}
-
-	/**
 	 * Performs a 2D convolution across the image while re-normalizing the kernel depending on its
 	 * overlap with the image.
 	 *

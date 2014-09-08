@@ -48,7 +48,7 @@ public class TestImplConvolveMean extends CompareEquivalentFunctions {
 
 	@Test
 	public void compareToStandard() {
-		performTests(4);
+		performTests(6);
 	}
 
 	@Override
@@ -110,7 +110,7 @@ public class TestImplConvolveMean extends CompareEquivalentFunctions {
 		int w = kernelRadius*2+1;
 
 		if( output.getDataType().isInteger() )
-			return new Object[]{kernel,targetParam[0],output,w*w};
+			return new Object[]{kernel,targetParam[0],output,w};
 		else
 			return new Object[]{kernel,targetParam[0],output};
 	}

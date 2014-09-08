@@ -258,7 +258,7 @@ public class GThresholdImageOps {
 					(ImageFloat32) work1, (ImageFloat32) work2);
 		} else if( input instanceof ImageUInt8 ) {
 			return ThresholdImageOps.adaptiveSquare((ImageUInt8) input, output, radius, (int) bias, down,
-					(ImageUInt8) work1, (ImageUInt16) work2);
+					(ImageUInt8) work1, (ImageUInt8) work2);
 		} else {
 			throw new IllegalArgumentException("Unknown image type: "+input.getClass().getSimpleName());
 		}
@@ -296,7 +296,7 @@ public class GThresholdImageOps {
 					(ImageFloat32) work1, (ImageFloat32) work2);
 		} else if( input instanceof ImageUInt8 ) {
 			return ThresholdImageOps.adaptiveGaussian((ImageUInt8) input, output, radius, (int) bias, down,
-					(ImageUInt8) work1, (ImageUInt16) work2);
+					(ImageUInt8) work1, (ImageUInt8) work2);
 		} else {
 			throw new IllegalArgumentException("Unknown image type: "+input.getClass().getSimpleName());
 		}

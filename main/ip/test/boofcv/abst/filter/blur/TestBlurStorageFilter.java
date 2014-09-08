@@ -19,7 +19,6 @@
 package boofcv.abst.filter.blur;
 
 import boofcv.alg.filter.blur.BlurImageOps;
-import boofcv.struct.image.ImageUInt16;
 import boofcv.struct.image.ImageUInt8;
 import boofcv.testing.BoofTesting;
 import org.junit.Test;
@@ -37,7 +36,7 @@ public class TestBlurStorageFilter {
 		ImageUInt8 input = new ImageUInt8(width,height);
 		ImageUInt8 found = new ImageUInt8(width,height);
 		ImageUInt8 expected = new ImageUInt8(width,height);
-		ImageUInt16 storage = new ImageUInt16(width,height);
+		ImageUInt8 storage = new ImageUInt8(width,height);
 
 		BlurStorageFilter<ImageUInt8> alg = new BlurStorageFilter<ImageUInt8>("gaussian",ImageUInt8.class,-1,2);
 
@@ -53,7 +52,7 @@ public class TestBlurStorageFilter {
 		ImageUInt8 input = new ImageUInt8(width,height);
 		ImageUInt8 found = new ImageUInt8(width,height);
 		ImageUInt8 expected = new ImageUInt8(width,height);
-		ImageUInt16 storage = new ImageUInt16(width,height);
+		ImageUInt8 storage = new ImageUInt8(width,height);
 
 		BlurStorageFilter<ImageUInt8> alg = new BlurStorageFilter<ImageUInt8>("mean",ImageUInt8.class,2);
 

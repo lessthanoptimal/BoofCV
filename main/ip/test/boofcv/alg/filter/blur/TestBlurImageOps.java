@@ -67,7 +67,7 @@ public class TestBlurImageOps {
 
 			BlurImageOps.mean(input,found, radius, null);
 
-			BoofTesting.assertEquals(expected,found,0);
+			BoofTesting.assertEquals(expected,found,2);
 		}
 	}
 
@@ -146,7 +146,7 @@ public class TestBlurImageOps {
 			ConvolveNormalizedNaive.convolve(kernel, input, expected);
 
 			BlurImageOps.gaussian(input,found,-1,radius,null);
-			BoofTesting.assertEquals(expected,found,0);
+			BoofTesting.assertEquals(expected,found,2);
 		}
 	}
 

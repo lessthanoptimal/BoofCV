@@ -42,8 +42,8 @@ public class GenerateImplConvolveMean {
 
 	public void createAll() throws FileNotFoundException {
 		printPreamble();
-		addFunctions(AutoTypeImage.U16, AutoTypeImage.I8);
-		addFunctions(AutoTypeImage.S32, AutoTypeImage.I16);
+		addFunctions(AutoTypeImage.U8, AutoTypeImage.I8);
+		addFunctions(AutoTypeImage.S16, AutoTypeImage.I16);
 		addFunctions(AutoTypeImage.F32, AutoTypeImage.F32);
 		out.println("}");
 	}
@@ -52,8 +52,7 @@ public class GenerateImplConvolveMean {
 
 		this.imageIn = imageIn;
 		this.imageOut = imageOut;
-		if( !imageIn.isInteger() )
-			printHorizontal();
+		printHorizontal();
 		printVertical();
 	}
 
@@ -76,17 +75,20 @@ public class GenerateImplConvolveMean {
 				"public class " + className + " {\n\n");
 	}
 
-	// designed to only work with floats.  integer should be summed horizontally
 	public void printHorizontal() {
 
 		String typeCast = imageOut.getTypeCastFromSum();
 		String sumType = imageIn.getSumType();
 		String bitWise = imageIn.getBitWise();
 
+		String declareHalf = imageIn.isInteger() ? "\t\tfinal " + sumType + " halfDivisor = divisor/2;\n" : "";
+		String divide = imageIn.isInteger() ? "(total+halfDivisor)/divisor" : "total/divisor";
+
 		out.print("\tpublic static void horizontal( " + imageIn.getSingleBandName() + " input , " + imageOut.getSingleBandName() + " output , int radius ) {\n" +
 				"\t\tfinal int kernelWidth = radius*2 + 1;\n" +
 				"\n" +
 				"\t\tfinal " + sumType + " divisor = kernelWidth;\n" +
+				declareHalf +
 				"\n" +
 				"\t\tfor( int y = 0; y < input.height; y++ ) {\n" +
 				"\t\t\tint indexIn = input.startIndex + input.stride*y;\n" +
@@ -99,14 +101,14 @@ public class GenerateImplConvolveMean {
 				"\t\t\tfor( ; indexIn < indexEnd; indexIn++ ) {\n" +
 				"\t\t\t\ttotal += input.data[indexIn] " + bitWise + ";\n" +
 				"\t\t\t}\n" +
-				"\t\t\toutput.data[indexOut++] = " + typeCast + "(total/divisor);\n" +
+				"\t\t\toutput.data[indexOut++] = " + typeCast + "("+divide+");\n" +
 				"\n" +
 				"\t\t\tindexEnd = indexIn + input.width - kernelWidth;\n" +
 				"\t\t\tfor( ; indexIn < indexEnd; indexIn++ ) {\n" +
 				"\t\t\t\ttotal -= input.data[ indexIn - kernelWidth ] " + bitWise + ";\n" +
 				"\t\t\t\ttotal += input.data[ indexIn ] " + bitWise + ";\n" +
 				"\n" +
-				"\t\t\t\toutput.data[indexOut++] = " + typeCast + "(total/divisor);\n" +
+				"\t\t\t\toutput.data[indexOut++] = " + typeCast + "("+divide+");\n" +
 				"\t\t\t}\n" +
 				"\t\t}\n" +
 				"\t}\n\n");
@@ -118,7 +120,6 @@ public class GenerateImplConvolveMean {
 		String sumType = imageIn.getSumType();
 		String bitWise = imageIn.getBitWise();
 
-		String divisor = imageIn.isInteger() ? "kernelWidth*kernelWidth" : "kernelWidth";
 		String declareHalf = imageIn.isInteger() ? "\t\tfinal " + sumType + " halfDivisor = divisor/2;\n" : "";
 		String divide = imageIn.isInteger() ? "(total+halfDivisor)/divisor" : "total/divisor";
 
@@ -127,7 +128,7 @@ public class GenerateImplConvolveMean {
 				"\n" +
 				"\t\tfinal int backStep = kernelWidth*input.stride;\n" +
 				"\n" +
-				"\t\t"+sumType+" divisor = "+divisor+";\n" +
+				"\t\t"+sumType+" divisor = kernelWidth;\n" +
 				declareHalf +
 				"\t\t"+sumType+" totals[] = new "+sumType+"[ input.width ];\n" +
 				"\n" +

@@ -49,7 +49,7 @@ public class TestConvolveImageMean extends CompareEquivalentFunctions {
 
 	@Test
 	public void compareToStandard() {
-		performTests(4);
+		performTests(6);
 	}
 
 	@Override
@@ -71,17 +71,9 @@ public class TestConvolveImageMean extends CompareEquivalentFunctions {
 		if( !candidate.getName().equals(validation.getName()))
 			return false;
 
-		if( candidate.getName().equals("horizontal")) {
-			if (v.length != 3)
-				return false;
-			return c[0] == v[1] && c[1] == v[2];
-		} else {
-			if (v.length == 3)
-				return c[0] == v[1] && c[1] == v[2];
-			else if( v.length == 4 )
-				return c[0] == v[2] && c[1] == v[3];
-		}
-		return false;
+		if (v.length != 3)
+			return false;
+		return v[1].isAssignableFrom(c[0]) && v[2].isAssignableFrom(c[1]);
 	}
 
 	@Override
@@ -105,15 +97,11 @@ public class TestConvolveImageMean extends CompareEquivalentFunctions {
 	protected Object[] reformatForValidation(Method m, Object[] targetParam) {
 		Class<?> params[] = m.getParameterTypes();
 		int radius = (Integer)targetParam[2];
-		Object kernel = createTableKernel(params[0],radius,rand);
+		Object kernel = createTableKernel(params[0],radius);
 
 		ImageSingleBand output = (ImageSingleBand)((ImageSingleBand)targetParam[1]).clone();
 
-		if( params.length == 3) {
-			return new Object[]{kernel, targetParam[0], output};
-		} else {
-			return new Object[]{kernel,kernel, targetParam[0], output};
-		}
+		return new Object[]{kernel, targetParam[0], output};
 	}
 
 	@Override
@@ -132,7 +120,7 @@ public class TestConvolveImageMean extends CompareEquivalentFunctions {
 		}
 	}
 
-	public static Object createTableKernel(Class<?> kernelType, int kernelRadius, Random rand) {
+	public static Object createTableKernel(Class<?> kernelType, int kernelRadius) {
 		Object kernel;
 		if (Kernel1D_F32.class == kernelType) {
 			kernel = FactoryKernel.table1D_F32(kernelRadius,true);

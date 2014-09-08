@@ -48,11 +48,11 @@ public class ConvolveImageMean {
 
 		Kernel1D_F32 kernel = FactoryKernel.table1D_F32(radius,true);
 		if( kernel.width > input.width ) {
-			ConvolveNormalized.horizontal(kernel, input, output);
+			ConvolveNormalized.horizontal(kernel,input,output);
 		} else {
 			InputSanityCheck.checkSameShape(input , output);
+			ConvolveNormalized_JustBorder.horizontal(kernel, input ,output );
 			ImplConvolveMean.horizontal(input, output, radius);
-			ConvolveNormalized_JustBorder.horizontal(kernel, input, output);
 		}
 	}
 
@@ -66,13 +66,32 @@ public class ConvolveImageMean {
 	 */
 	public static void vertical(ImageFloat32 input, ImageFloat32 output, int radius) {
 
-		Kernel1D_F32 kernel = FactoryKernel.table1D_F32(radius, true);
-		if( kernel.width >= input.height && kernel.width >= input.width ) {
+		Kernel1D_F32 kernel = FactoryKernel.table1D_F32(radius,true);
+		if( kernel.width > input.height ) {
 			ConvolveNormalized.vertical(kernel, input, output);
 		} else {
 			InputSanityCheck.checkSameShape(input , output);
-			ImplConvolveMean.vertical(input, output, radius);
 			ConvolveNormalized_JustBorder.vertical(kernel, input, output);
+			ImplConvolveMean.vertical(input, output, radius);
+		}
+	}
+
+	/**
+	 * Performs a horizontal 1D convolution which computes the mean value of elements
+	 * inside the kernel.
+	 *
+	 * @param input The original image. Not modified.
+	 * @param output Where the resulting image is written to. Modified.
+	 * @param radius Kernel size.
+	 */
+	public static void horizontal(ImageUInt8 input, ImageUInt8 output, int radius) {
+		Kernel1D_I32 kernel = FactoryKernel.table1D_I32(radius);
+		if( kernel.width > input.width ) {
+			ConvolveNormalized.horizontal(kernel,input,output);
+		} else {
+			InputSanityCheck.checkSameShape(input , output);
+			ConvolveNormalized_JustBorder.horizontal(kernel, input ,output );
+			ImplConvolveMean.horizontal(input, output, radius);
 		}
 	}
 
@@ -84,15 +103,34 @@ public class ConvolveImageMean {
 	 * @param output Where the resulting image is written to. Modified.
 	 * @param radius Kernel size.
 	 */
-	public static void vertical(ImageUInt16 input, ImageInt8 output, int radius) {
+	public static void vertical(ImageUInt8 input, ImageInt8 output, int radius) {
 
 		Kernel1D_I32 kernel = FactoryKernel.table1D_I32(radius);
-		if( kernel.width >= input.height && kernel.width >= input.width ) {
-			ConvolveNormalized.vertical(kernel,kernel,input,output);
+		if( kernel.width > input.height ) {
+			ConvolveNormalized.vertical(kernel,input,output);
 		} else {
 			InputSanityCheck.checkSameShape(input , output);
+			ConvolveNormalized_JustBorder.vertical(kernel, input ,output );
 			ImplConvolveMean.vertical(input, output, radius);
-			ConvolveNormalized_JustBorder.vertical(kernel,kernel, input ,output );
+		}
+	}
+
+	/**
+	 * Performs a horizontal 1D convolution which computes the mean value of elements
+	 * inside the kernel.
+	 *
+	 * @param input The original image. Not modified.
+	 * @param output Where the resulting image is written to. Modified.
+	 * @param radius Kernel size.
+	 */
+	public static void horizontal(ImageSInt16 input, ImageInt16 output, int radius) {
+		Kernel1D_I32 kernel = FactoryKernel.table1D_I32(radius);
+		if( kernel.width > input.width ) {
+			ConvolveNormalized.horizontal(kernel,input,output);
+		} else {
+			InputSanityCheck.checkSameShape(input , output);
+			ConvolveNormalized_JustBorder.horizontal(kernel, input ,output );
+			ImplConvolveMean.horizontal(input, output, radius);
 		}
 	}
 
@@ -104,15 +142,15 @@ public class ConvolveImageMean {
 	 * @param output Where the resulting image is written to. Modified.
 	 * @param radius Kernel size.
 	 */
-	public static void vertical(ImageSInt32 input, ImageInt16 output, int radius ) {
+	public static void vertical(ImageSInt16 input, ImageInt16 output, int radius ) {
 
 		Kernel1D_I32 kernel = FactoryKernel.table1D_I32(radius);
-		if( kernel.width >= input.height && kernel.width >= input.width ) {
-			ConvolveNormalized.vertical(kernel,kernel,input,output);
+		if( kernel.width > input.height ) {
+			ConvolveNormalized.vertical(kernel,input,output);
 		} else {
 			InputSanityCheck.checkSameShape(input , output);
+			ConvolveNormalized_JustBorder.vertical(kernel, input ,output );
 			ImplConvolveMean.vertical(input, output, radius);
-			ConvolveNormalized_JustBorder.vertical(kernel,kernel, input ,output );
 		}
 	}
 }

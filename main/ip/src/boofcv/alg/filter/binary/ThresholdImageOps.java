@@ -346,11 +346,11 @@ public class ThresholdImageOps {
 	 */
 	public static ImageUInt8 adaptiveSquare( ImageUInt8 input , ImageUInt8 output ,
 											 int radius , int bias , boolean down ,
-											 ImageUInt8 storage1 , ImageUInt16 storage2 ) {
+											 ImageUInt8 storage1 , ImageUInt8 storage2 ) {
 
 		output = InputSanityCheck.checkDeclare(input,output,ImageUInt8.class);
 		storage1 = InputSanityCheck.checkDeclare(input,storage1,ImageUInt8.class);
-		storage2 = InputSanityCheck.checkDeclare(input,storage2,ImageUInt16.class);
+		storage2 = InputSanityCheck.checkDeclare(input,storage2,ImageUInt8.class);
 
 		ImageUInt8 mean = storage1;
 
@@ -412,11 +412,11 @@ public class ThresholdImageOps {
 	 */
 	public static ImageUInt8 adaptiveGaussian( ImageUInt8 input , ImageUInt8 output ,
 											   int radius , int bias , boolean down ,
-											   ImageUInt8 storage1 , ImageUInt16 storage2 ) {
+											   ImageUInt8 storage1 , ImageUInt8 storage2 ) {
 
 		output = InputSanityCheck.checkDeclare(input,output,ImageUInt8.class);
 		storage1 = InputSanityCheck.checkDeclare(input,storage1,ImageUInt8.class);
-		storage2 = InputSanityCheck.checkDeclare(input,storage2,ImageUInt16.class);
+		storage2 = InputSanityCheck.checkDeclare(input,storage2,ImageUInt8.class);
 
 		ImageUInt8 blur = storage1;
 

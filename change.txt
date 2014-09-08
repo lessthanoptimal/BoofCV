@@ -45,12 +45,10 @@ Version : Alpha 0.18
 - Added ExampleConvolution
 - Convolution
   * ConvolveNormalizedNaive correctly handles offsets in the kernel
-  * ConvolveNormalizedNaive has new vertical which divides with horizontal weights taken in account
   * 2D convolution correctly supports offset.  Before it used radius no matter what
-  * Reduced round off error in BlurImageOps.mean() for ImageUInt8.
+  * Normalized convolution makes sure the input kernel sums up to 1 for floating point
 
 TODO
-- Consider partial revert and have integer mean horizontal and vertical instead of sum horizontal
 - Add an escape value to score associate.  if the value computed so far isn't better than X, stop.
   Suggested by David G Ortega
 - Check to see if a square in fiducial is concave and discard
