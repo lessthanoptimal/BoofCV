@@ -28,7 +28,6 @@ import java.io.PrintStream;
  */
 public class CreateFiducialSquareBinaryEPS {
 
-	public static String fileName = "pattern.eps";
 	public static int number = 284;
 	public static double width = 10;
 
@@ -62,6 +61,7 @@ public class CreateFiducialSquareBinaryEPS {
 		number &= 0x0FFF;
 
 		System.out.println("Target width "+width+" (cm)  number = "+number);
+		String fileName = String.format("square%04d.eps",number);
 
 		// print out the selected number in binary for debugging purposes
 		for (int i = 0; i < 12; i++) {

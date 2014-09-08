@@ -69,7 +69,7 @@ public class DetectFiducialSquareBinary<T extends ImageSingleBand>
 	public DetectFiducialSquareBinary(InputToBinary<T> thresholder,
 									  SplitMergeLineFitLoop fitPolygon,
 									  double minContourFraction, Class<T> inputType) {
-		super(thresholder,fitPolygon, w*6, minContourFraction, inputType);
+		super(thresholder,fitPolygon, w*8, minContourFraction, inputType);
 
 		int widthNoBorder = w*4;
 

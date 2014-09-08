@@ -5,6 +5,7 @@ dependencies {
     compile project(':main:sfm')
 
     testCompile project(':main:io')
+    testCompile project(':main:visualize')
 }
 
 idea {

@@ -40,7 +40,7 @@ public class ExampleCollectImages {
 	public static void main(String[] args) {
 
 		// Open a webcam at a resolution close to 640x480
-		Webcam webcam = Webcam.getWebcams().get(1);
+		Webcam webcam = Webcam.getWebcams().get(0);
 		UtilWebcamCapture.adjustResolution(webcam,640,480);
 		webcam.open();
 

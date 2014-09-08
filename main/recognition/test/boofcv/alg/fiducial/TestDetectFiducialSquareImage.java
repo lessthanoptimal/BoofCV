@@ -49,10 +49,15 @@ public class TestDetectFiducialSquareImage {
 		PixelMath.multiply(pattern,255,pattern);
 
 		// add a border around it
-		ImageUInt8 border = new ImageUInt8(16*6,16*6);
-		border.subimage(16,16,16*5,16*5,null).setTo(pattern);
+		ImageUInt8 border = new ImageUInt8(16*8,16*8);
+		border.subimage(16*2,16*2,16*6,16*6,null).setTo(pattern);
 		ImageFloat32 input = new ImageFloat32(border.width,border.height);
 		ConvertImage.convert(border,input);
+
+//		BufferedImage foo = ConvertBufferedImage.convertTo(input,null);
+//		ShowImages.showWindow(foo,"target");
+//
+//		BoofMiscOps.pause(10000);
 
 		// process it in different orientations
 		DetectFiducialSquareImage<ImageUInt8> alg =
@@ -72,7 +77,7 @@ public class TestDetectFiducialSquareImage {
 		// give it a random input that shouldn't match
 		ImageMiscOps.fillUniform(pattern, rand, 0, 2);
 		PixelMath.multiply(pattern, 255, pattern);
-		border.subimage(16,16,16*5,16*5,null).setTo(pattern);
+		border.subimage(16*2,16*2,16*6,16*6,null).setTo(pattern);
 		ConvertImage.convert(border,input);
 		assertFalse(alg.processSquare(input, result));
 	}

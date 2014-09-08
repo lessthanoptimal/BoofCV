@@ -74,7 +74,7 @@ public class DetectFiducialSquareImage<T extends ImageSingleBand>
 	public DetectFiducialSquareImage(InputToBinary<T> thresholder,
 									 SplitMergeLineFitLoop fitPolygon,
 									 double minContourFraction, double matchThreshold, Class<T> inputType) {
-		super(thresholder,fitPolygon, squareLength+2*w, minContourFraction, inputType);
+		super(thresholder,fitPolygon, squareLength+squareLength, minContourFraction, inputType);
 
 		hammingThreshold = (int)(squareLength*squareLength*matchThreshold);
 

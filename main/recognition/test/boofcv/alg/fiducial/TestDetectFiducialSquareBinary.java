@@ -73,7 +73,9 @@ public class TestDetectFiducialSquareBinary {
 
 	public static ImageFloat32 create( int square , int value ) {
 
-		ImageFloat32 ret = new ImageFloat32(square*6,square*6);
+		ImageFloat32 ret = new ImageFloat32(square*8,square*8);
+
+		int s2 = 2*square;
 
 		for (int i = 0; i < 12; i++) {
 			if( (value& (1<<i)) != 0 )
@@ -83,15 +85,14 @@ public class TestDetectFiducialSquareBinary {
 			int x = where%4;
 			int y = 3-(where/4);
 
-			x = square + square*x;
-			y = square + square*y;
-
+			x = s2 + square*x;
+			y = s2 + square*y;
 
 			ImageMiscOps.fillRectangle(ret,0xFF,x,y,square,square);
 		}
-		ImageMiscOps.fillRectangle(ret,0xFF,square,square,square,square);
-		ImageMiscOps.fillRectangle(ret,0xFF,square*4,square*4,square,square);
-		ImageMiscOps.fillRectangle(ret,0xFF,square*4,square,square,square);
+		ImageMiscOps.fillRectangle(ret,0xFF,s2,s2,square,square);
+		ImageMiscOps.fillRectangle(ret,0xFF,square*5,square*5,square,square);
+		ImageMiscOps.fillRectangle(ret,0xFF,square*5,s2,square,square);
 
 		return ret;
 	}

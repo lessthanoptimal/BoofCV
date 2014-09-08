@@ -47,7 +47,9 @@ public class ExampleFiducialNumber {
 
 		// load the lens distortion parameters and the input image
 		IntrinsicParameters param = UtilIO.loadXML(directory + "intrinsic.xml");
-		BufferedImage input = UtilImageIO.loadImage(directory + "angled00_643_284.jpg");
+		BufferedImage input = UtilImageIO.loadImage(directory + "image0000.jpg");
+//		BufferedImage input = UtilImageIO.loadImage(directory + "image0001.jpg");
+//		BufferedImage input = UtilImageIO.loadImage(directory + "image0002.jpg");
 		ImageFloat32 original = ConvertBufferedImage.convertFrom(input,true, ImageType.single(ImageFloat32.class));
 
 		// Detect the fiducial

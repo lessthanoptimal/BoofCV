@@ -45,8 +45,9 @@ public class ExampleFiducialImage {
 
 		String directory = "../data/applet/fiducial/image/";
 
-		String imageName = "view01.jpg";
-//		String imageName = "view02.jpg";
+		String imageName = "image0000.jpg";
+//		String imageName = "image0001.jpg";
+//		String imageName = "image0002.jpg";
 
 		// load the lens distortion parameters and the input image
 		IntrinsicParameters param = UtilIO.loadXML(directory + "intrinsic.xml");
@@ -62,8 +63,8 @@ public class ExampleFiducialImage {
 		ImageFloat32 dog = UtilImageIO.loadImage(directory + "dog.png",ImageFloat32.class);
 		detector.addTarget(dog, 125);
 		// uncomment to detect the text target
-//		ImageFloat32 text = UtilImageIO.loadImage(directory + "text.png",ImageFloat32.class);
-//		detector.addTarget(text, 125);
+		ImageFloat32 text = UtilImageIO.loadImage(directory + "text.png",ImageFloat32.class);
+		detector.addTarget(text, 125);
 
 		detector.setIntrinsic(param);
 
