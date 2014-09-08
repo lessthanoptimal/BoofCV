@@ -47,8 +47,8 @@ public class CreateFiducialSquareBinaryEPS {
 		int x = bit%4;
 		int y = bit/4;
 
-		String wx = "w"+(x+2);
-		String wy = "w"+(y+2);
+		String wx = "w"+x;
+		String wy = "w"+y;
 
 		out.print("  "+wx+" "+wy+" box\n");
 	}
@@ -75,9 +75,12 @@ public class CreateFiducialSquareBinaryEPS {
 
 		PrintStream out = new PrintStream(fileName);
 
-		double sideLength = width*CM_TO_POINTS;
-		double squareLength = sideLength/6;
-		double pageLength = sideLength+squareLength*2;
+		double targetLength = width*CM_TO_POINTS;
+		double whiteBorder = targetLength/4.0;
+		double blackBorder = targetLength/4.0;
+		double innerWidth = targetLength/2.0;
+		double squareLength = innerWidth/4;
+		double pageLength = targetLength+whiteBorder*2;
 
 		out.println("%!PS-Adobe-3.0 EPSF-3.0\n" +
 				"%%Creator: BoofCV\n" +
@@ -89,23 +92,27 @@ public class CreateFiducialSquareBinaryEPS {
 				"%%LanguageLevel: 3\n" +
 				"%%Pages: 1\n" +
 				"%%Page: 1 1\n" +
-				"  /w { 1 "+squareLength+" mul} def\n" +
-				"  /w2 { w "+squareLength+" add} def\n" +
-				"  /w3 { w2 "+squareLength+" add} def\n" +
-				"  /w4 { w3 "+squareLength+" add} def\n" +
-				"  /w5 { w4 "+squareLength+" add} def\n" +
-				"  /w6 { w5 "+squareLength+" add} def\n" +
-				"  /w7 { w6 "+squareLength+" add} def\n" +
-				"  /w8 { w7 "+squareLength+" add} def\n" +
-				"  /pagewidth "+sideLength+" def\n" +
-				"  /box {newpath moveto w 0 rlineto 0 w rlineto w neg 0 rlineto closepath fill} def\n" +
+				"  /sl "+squareLength+" def\n" +
+				"  /pl "+pageLength+" def\n" +
+				"  /wb "+whiteBorder+" def\n" +
+				"  /bb "+blackBorder+" def\n" +
+				"  /b0 "+whiteBorder+" def\n" +
+				"  /b1 { wb bb add} def\n" +
+				"  /b2 { b1 "+innerWidth+" add} def\n" +
+				"  /b3 { b2 bb add} def\n" +
+				"  /w0 b1 def\n" +
+				"  /w1 { w0 sl add} def\n" +
+				"  /w2 { w1 sl add} def\n" +
+				"  /w3 { w2 sl add} def\n" +
+//				"  /pagewidth "+targetLength+" def\n" +
+				"  /box {newpath moveto sl 0 rlineto 0 sl rlineto sl neg 0 rlineto closepath fill} def\n" +
 				"% bottom top left right borders..\n" +
-				"  newpath w w moveto w7 w lineto w7 w2 lineto w w2 lineto closepath fill\n" +
-				"  newpath w w6 moveto w7 w6 lineto w7 w7 lineto w w7 lineto closepath fill\n" +
-				"  newpath w w2 moveto w2 w2 lineto w2 w6 lineto w w6 lineto closepath fill\n" +
-				"  newpath w6 w2 moveto w7 w2 lineto w7 w6 lineto w6 w6 lineto closepath fill\n" +
+				"  newpath b0 b0 moveto b0 b3 lineto b1 b3 lineto b1 b0 lineto closepath fill\n" +
+				"  newpath b1 b2 moveto b1 b3 lineto b3 b3 lineto b3 b2 lineto closepath fill\n" +
+				"  newpath b1 b0 moveto b1 b1 lineto b3 b1 lineto b2 b0 lineto closepath fill\n" +
+				"  newpath b2 b0 moveto b2 b3 lineto b3 b3 lineto b3 b0 lineto closepath fill\n" +
 				"% Block corner used to identify orientation\n" +
-				"  w2 w2 box\n" +
+				"  b1 b1 box\n" +
 				"% information bits\n");
 
 		for (int i = 0; i < 12; i++) {
@@ -113,10 +120,9 @@ public class CreateFiducialSquareBinaryEPS {
 				box(out,i);
 			}
 		}
-
-		// print out encoding information for convenience
+//		print out encoding information for convenience
 		out.print("  /Times-Roman findfont\n" +
-				"7 scalefont setfont w "+(pageLength-10)+" moveto (# "+number+"   "+width+" cm) show\n");
+				"7 scalefont setfont w0 "+(pageLength-10)+" moveto (# "+number+"   "+width+" cm) show\n");
 		out.print("  showpage\n" +
 				"%%EOF\n");
 

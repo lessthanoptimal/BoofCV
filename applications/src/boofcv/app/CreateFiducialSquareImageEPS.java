@@ -94,44 +94,40 @@ public class CreateFiducialSquareImageEPS {
 		// print out the selected number in binary for debugging purposes
 		PrintStream out = new PrintStream(outputName);
 
-		double sideLength = width*CM_TO_POINTS;
-		double squareLength = sideLength/6;
-		double pageLength = sideLength+squareLength*2;
-
-		double scale = binary.width/(squareLength*4);
+		double targetLength = width*CM_TO_POINTS;
+		double whiteBorder = targetLength/4.0;
+		double blackBorder = targetLength/4.0;
+		double innerWidth = targetLength/2.0;
+		double pageLength = targetLength+whiteBorder*2;
+		double scale = binary.width/innerWidth;
 
 		out.println("%!PS-Adobe-3.0 EPSF-3.0\n" +
 				"%%Creator: BoofCV\n" +
 				"%%Title: "+inputName+" w="+width+"cm\n" +
 				"%%DocumentData: Clean7Bit\n" +
 				"%%Origin: 0 0\n" +
-//				"%%BoundingBox: xmin ymin xmax ymax\n" +
 				"%%BoundingBox: 0 0 "+pageLength+" "+pageLength+"\n" +
 				"%%LanguageLevel: 3\n" +
 				"%%Pages: 1\n" +
-				"%%Page: 1 1\n");
-		out.println(
-				"  /w { 1 " + squareLength + " mul} def\n" +
-						"  /w2 { w " + squareLength + " add} def\n" +
-						"  /w3 { w2 " + squareLength + " add} def\n" +
-						"  /w4 { w3 " + squareLength + " add} def\n" +
-						"  /w5 { w4 " + squareLength + " add} def\n" +
-						"  /w6 { w5 " + squareLength + " add} def\n" +
-						"  /w7 { w6 " + squareLength + " add} def\n" +
-						"  /w8 { w7 " + squareLength + " add} def\n" +
-						"  /pagewidth " + sideLength + " def\n" +
-						"% bottom top left right borders..\n" +
-						"  newpath w w moveto w7 w lineto w7 w2 lineto w w2 lineto closepath fill\n" +
-						"  newpath w w6 moveto w7 w6 lineto w7 w7 lineto w w7 lineto closepath fill\n" +
-						"  newpath w w2 moveto w2 w2 lineto w2 w6 lineto w w6 lineto closepath fill\n" +
-						"  newpath w6 w2 moveto w7 w2 lineto w7 w6 lineto w6 w6 lineto closepath fill\n");
+				"%%Page: 1 1\n" +
+				"  /wb "+whiteBorder+" def\n" +
+				"  /bb "+blackBorder+" def\n" +
+				"  /b0 "+whiteBorder+" def\n" +
+				"  /b1 { wb bb add} def\n" +
+				"  /b2 { b1 "+innerWidth+" add} def\n" +
+				"  /b3 { b2 bb add} def\n" +
+				"% bottom top left right borders..\n" +
+				"  newpath b0 b0 moveto b0 b3 lineto b1 b3 lineto b1 b0 lineto closepath fill\n" +
+				"  newpath b1 b2 moveto b1 b3 lineto b3 b3 lineto b3 b2 lineto closepath fill\n" +
+				"  newpath b1 b0 moveto b1 b1 lineto b3 b1 lineto b2 b0 lineto closepath fill\n" +
+				"  newpath b2 b0 moveto b2 b3 lineto b3 b3 lineto b3 b0 lineto closepath fill\n");
 
 		// print out encoding information for convenience
 		out.print("  /Times-Roman findfont\n" +
-				"7 scalefont setfont w " + (pageLength - 10) + " moveto (" + inputName + "   " + width + " cm) show\n");
+				"7 scalefont setfont b1 " + (pageLength - 10) + " moveto (" + inputName + "   " + width + " cm) show\n");
 
 		out.println("% Drawing the image");
-		out.println("w2 w2 translate");
+		out.println("b1 b1 translate");
 		out.println(binary.width+" "+binary.height+" 1 ["+scale+" 0 0 "+scale+" 0 0]");
 		out.println("{<" + binaryToHex(binary) + ">} image");
 		out.print("  showpage\n" +
