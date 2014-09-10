@@ -102,6 +102,6 @@ public class VisualizeSquareBinaryFiducial {
 
 		VisualizeSquareBinaryFiducial app = new VisualizeSquareBinaryFiducial();
 
-		app.process(directory+"/angled00_643_284.jpg",directory+"/intrinsic.xml");
+		app.process(directory+"/image0000.jpg",directory+"/intrinsic.xml");
 	}
 }
