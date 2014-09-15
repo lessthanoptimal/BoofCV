@@ -131,7 +131,8 @@ public class VisualizeSquareFiducial {
 
 		VisualizeSquareFiducial app = new VisualizeSquareFiducial();
 
-		app.process(directory+"/angled00_643_284.jpg",directory+"/intrinsic.xml");
-		app.process(directory+"/far00_643_284.jpg",directory+"/intrinsic.xml");
+//		app.process(directory+"/image0000.jpg",directory+"/intrinsic.xml");
+//		app.process(directory+"/image0001.jpg",directory+"/intrinsic.xml");
+		app.process(directory+"/image0002.jpg",directory+"/intrinsic.xml");
 	}
 }
