@@ -69,7 +69,7 @@ public class ExampleWatershedWithSeeds {
 		ImageSInt32 output = watershed.getOutput();
 
 		BufferedImage outLabeled = VisualizeBinaryData.renderLabeledBG(label, numRegions, null);
-		VisualizeRegions.watersheds(output,image);
+		VisualizeRegions.watersheds(output,image,1);
 
 		// Removing the watersheds and update the region count
 		// NOTE: watershed.getTotalRegions() does not return correct results if seeds are used!

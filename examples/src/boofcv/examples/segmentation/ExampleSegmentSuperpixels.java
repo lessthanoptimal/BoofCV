@@ -117,7 +117,7 @@ public class ExampleSegmentSuperpixels {
 //		ImageType<ImageUInt8> imageType = ImageType.single(ImageUInt8.class);
 
 //		ImageSuperpixels alg = FactoryImageSegmentation.meanShift(null, imageType);
-//		ImageSuperpixels alg = FactoryImageSegmentation.slic(new ConefigSlic(400), imageType);
+//		ImageSuperpixels alg = FactoryImageSegmentation.slic(new ConfigSlic(400), imageType);
 		ImageSuperpixels alg = FactoryImageSegmentation.fh04(new ConfigFh04(100,30), imageType);
 //		ImageSuperpixels alg = FactoryImageSegmentation.watershed(null,imageType);
 

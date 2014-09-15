@@ -35,17 +35,38 @@ public class VisualizeRegions {
 	 * Sets the pixels of each watershed as red in the output image.  Watersheds have a value of 0
 	 * @param segments Conversion from pixel to region
 	 * @param output Storage for output image.  Can be null.
+	 * @param radius Thickness of watershed.  0 is 1 pixel wide. 1 is 3 pixels wide.
 	 * @return Output image.
 	 */
-	public static BufferedImage watersheds( ImageSInt32 segments , BufferedImage output ) {
+	public static BufferedImage watersheds( ImageSInt32 segments , BufferedImage output , int radius ) {
 		if( output == null )
 			output = new BufferedImage(segments.width,segments.height,BufferedImage.TYPE_INT_RGB);
 
-		for( int y = 0; y < segments.height; y++ ) {
-			for( int x = 0; x < segments.width; x++ ) {
-				int index = segments.unsafe_get(x, y);
-				if( index == 0 )
-					output.setRGB(x, y, 0xFF0000);
+		if( radius <= 0 ) {
+			for (int y = 0; y < segments.height; y++) {
+				for (int x = 0; x < segments.width; x++) {
+					int index = segments.unsafe_get(x, y);
+					if (index == 0)
+						output.setRGB(x, y, 0xFF0000);
+				}
+			}
+		} else {
+			for (int y = 0; y < segments.height; y++) {
+				for (int x = 0; x < segments.width; x++) {
+					int index = segments.unsafe_get(x, y);
+					if (index == 0) {
+						for (int i = -radius; i <= radius; i++) {
+							int yy = y + i;
+							for (int j = -radius; j <= radius; j++) {
+								int xx = x + j;
+
+								if (segments.isInBounds(xx, yy)) {
+									output.setRGB(xx, yy, 0xFF0000);
+								}
+							}
+						}
+					}
+				}
 			}
 		}
 
