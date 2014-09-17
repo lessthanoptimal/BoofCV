@@ -206,8 +206,9 @@ task alljavadoc(type: Javadoc) {
                   'http://ejml.org/javadoc/',
                   'http://georegression.org/javadoc/',
                   'http://ddogleg.org/javadoc/']
-//        header = file('misc/header.txt').text.replace("\n", "")
-//        bottom = file('misc/bottom.txt').text.replace("\n", "")
+        header = file('misc/header.txt').text
+        // TODO still has issues with quotes
+        bottom = file('misc/bottom.txt').text
     }
 }
 

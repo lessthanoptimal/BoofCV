@@ -51,10 +51,9 @@ Version : Alpha 0.18
 TODO
 - Add an escape value to score associate.  if the value computed so far isn't better than X, stop.
   Suggested by David G Ortega
-- Check to see if a square in fiducial is concave and discard
-- Improve stability of fiducials
-  * Optimize to minimize reprojection errors? Quad corners?  Edges?
-- Look at using poly fit in calibration detection routines
+
+- Update documention to mention gradlew
+- Update android application
 
 ---------------------------------------------
 Date    : 2014/6/19

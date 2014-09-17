@@ -1,0 +1,4 @@
+- Check to see if a square in fiducial is concave and discard
+- Improve stability of fiducials, especially when they become smaller
+  * Optimize to minimize reprojection errors? Quad corners?  Edges?
+- Look at using poly fit in calibration detection routines

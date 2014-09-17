@@ -116,10 +116,9 @@ The main BoofCV modules depends on the following libraries:
 - [ GeoRegression ]  ( http://georegression.org                               )
 - [ DDogleg       ]  ( http://ddogleg.org                                     )
 
-The following are required for running unit tests and micro-benchmarks:
+The following are required for running unit tests
 
 - [ JUnit   ]       ( http://junit.sourceforge.net/                           )
-- [ Caliper ]       ( http://code.google.com/p/caliper/                       )
 
 The optional sub-projects in integration also have several dependencies. See those sub-projects for a list of their dependencies.
 

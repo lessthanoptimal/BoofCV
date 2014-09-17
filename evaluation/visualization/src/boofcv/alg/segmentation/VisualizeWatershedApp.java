@@ -46,7 +46,7 @@ public class VisualizeWatershedApp {
 
 		ImageSInt32 pixelToRegion = alg.getOutput();
 
-		VisualizeRegions.watersheds(pixelToRegion,image);
+		VisualizeRegions.watersheds(pixelToRegion,image,0);
 
 		alg.removeWatersheds();
 		int numRegions = alg.getTotalRegions();
