@@ -18,10 +18,14 @@
 
 package boofcv.alg.fiducial;
 
+import boofcv.abst.calib.ConfigChessboard;
 import boofcv.abst.fiducial.FiducialDetector;
+import boofcv.abst.fiducial.SquareImage_to_FiducialDetector;
+import boofcv.core.image.ConvertBufferedImage;
 import boofcv.core.image.GConvertImage;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.fiducial.ConfigFiducialBinary;
+import boofcv.factory.fiducial.ConfigFiducialImage;
 import boofcv.factory.fiducial.FactoryFiducial;
 import boofcv.gui.VideoProcessAppBase;
 import boofcv.gui.fiducial.VisualizeFiducial;
@@ -39,8 +43,6 @@ import georegression.struct.se.Se3_F64;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.util.ArrayList;
 
 /**
@@ -62,8 +64,6 @@ public class FiducialTrackerApp<I extends ImageSingleBand>
 
 	ImagePanel panel = new ImagePanel();
 
-	int whichAlg;
-
 	I gray;
 
 	FiducialDetector detector;
@@ -79,11 +79,7 @@ public class FiducialTrackerApp<I extends ImageSingleBand>
 
 		gray = GeneralizedImageOps.createSingleBand(imageType,1,1);
 
-
 		panel.setPreferredSize(new Dimension(640, 480));
-
-		detector = FactoryFiducial.squareBinaryRobust(new ConfigFiducialBinary(0.1),6,imageType);
-//		detector = FactoryFiducial.squareBinaryFast(new ConfigFiducialBinary(0.1),100,imageType);
 
 		setMainGUI(panel);
 
@@ -97,7 +93,7 @@ public class FiducialTrackerApp<I extends ImageSingleBand>
 		stopWorker();
 
 		this.sequence = sequence;
-		sequence.setLoop(false);
+		sequence.setLoop(true);
 		setPause(false);
 		if( !sequence.hasNext() )
 			throw new IllegalArgumentException("Empty sequence");
@@ -119,8 +115,6 @@ public class FiducialTrackerApp<I extends ImageSingleBand>
 	public void setActiveAlgorithm(int indexFamily, String name, Object cookie) {
 		stopWorker();
 
-		whichAlg = (Integer)cookie;
-
 		sequence.reset();
 
 		refreshAll(null);
@@ -129,12 +123,9 @@ public class FiducialTrackerApp<I extends ImageSingleBand>
 	@Override
 	protected void updateAlg(MultiSpectral<I> frame, BufferedImage buffImage) {
 
-		boolean grayScale = false;
-
 		if( detector.getInputType().getFamily() == ImageType.Family.SINGLE_BAND ) {
-			gray.reshape(frame.width,frame.height);
+			gray.reshape(frame.width, frame.height);
 			GConvertImage.average(frame, gray);
-			grayScale = true;
 		}
 
 		detector.detect(gray);
@@ -162,18 +153,34 @@ public class FiducialTrackerApp<I extends ImageSingleBand>
 
 	@Override
 	public void changeInput(String name, int index) {
+
+		stopWorker();
 		processedInputImage = false;
 
 		String videoName = inputRefs.get(index).getPath();
 		String path = videoName.substring(0,videoName.lastIndexOf('/'));
 
-		try {
-			intrinsic = UtilIO.loadXML(new FileReader(path+"/intrinsic.xml"));
-		} catch (FileNotFoundException e) {
-			throw new RuntimeException(e);
+		if( name.compareTo(SQUARE_NUMBER) == 0 ) {
+			detector = FactoryFiducial.squareBinaryRobust(new ConfigFiducialBinary(0.1),6,imageClass);
+		} else if( name.compareTo(SQUARE_PICTURE) == 0 ) {
+			detector = FactoryFiducial.squareImageRobust(new ConfigFiducialImage(0.1), 6, imageClass);
+
+			SquareImage_to_FiducialDetector<I> d = (SquareImage_to_FiducialDetector<I>)detector;
+			BufferedImage dog = media.openImage(path + "/dog.png");
+			BufferedImage text = media.openImage(path+"/text.png");
+			d.addTarget(ConvertBufferedImage.convertFromSingle(dog,null,imageClass),125);
+			d.addTarget(ConvertBufferedImage.convertFromSingle(text,null,imageClass),125);
+
+		} else if( name.compareTo(CALIB_CHESS) == 0 ) {
+			detector = FactoryFiducial.calibChessboard(new ConfigChessboard(5,7), 0.03, imageClass);
+		} else {
+			throw new RuntimeException("Unknown selection");
 		}
 
+		intrinsic = UtilIO.loadXML(media.openFile(path+"/intrinsic.xml"));
+
 		detector.setIntrinsic(intrinsic);
+
 		SimpleImageSequence<MultiSpectral<I>> video = media.openVideo(videoName, ImageType.ms(3, imageClass));
 
 		process(video);
@@ -203,7 +210,9 @@ public class FiducialTrackerApp<I extends ImageSingleBand>
 //		app.loadInputData("../data/applet/tracking/file_list.txt");
 
 		java.util.List<PathLabel> inputs = new ArrayList<PathLabel>();
-		inputs.add(new PathLabel(SQUARE_NUMBER, "../data/applet/fiducial/binary/square_number.mjpeg"));
+		inputs.add(new PathLabel(SQUARE_NUMBER, "../data/applet/fiducial/binary/movie.mjpeg"));
+		inputs.add(new PathLabel(SQUARE_PICTURE, "../data/applet/fiducial/image/movie.mjpeg"));
+		inputs.add(new PathLabel(CALIB_CHESS, "../data/applet/fiducial/calibration/movie.mjpeg"));
 
 		app.setInputList(inputs);
 
