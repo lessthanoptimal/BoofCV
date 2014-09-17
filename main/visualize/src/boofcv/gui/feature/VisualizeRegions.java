@@ -27,6 +27,8 @@ import org.ddogleg.struct.FastQueue;
 import java.awt.image.BufferedImage;
 
 /**
+ * Code for visualizing regions and superpixels
+ *
  * @author Peter Abeles
  */
 public class VisualizeRegions {
