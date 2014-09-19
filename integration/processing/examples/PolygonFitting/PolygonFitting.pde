@@ -16,11 +16,9 @@ void setup() {
   // Convert the image into a simplified BoofCV data type
   SimpleGray gray = Boof.gray(input,ImageDataType.F32);
 
-  // Threshold the image using its mean value
-  double threshold = gray.mean();
-
-  // Find the initial set of contours
-  SimpleContourList contours = gray.threshold(threshold, false).erode8(1).contour().getContours();
+  // Find the initial set of contours automatically select a threshold
+  // using the Otsu method
+  SimpleContourList contours = gray.thresholdOtsu(false).erode8(1).contour().getContours();
 
   // filter contours which are too small
   List<SimpleContour> list = contours.getList();

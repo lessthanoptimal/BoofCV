@@ -3,13 +3,14 @@
 
 import processing.video.*;
 import boofcv.processing.*;
+import java.util.*;
 
 Capture cam;
 SimpleFiducial detector;
 
 void setup() {
   // Open up the camera so that it has a video feed to process
-  initializeCamera(320, 240);
+  initializeCamera(640, 480);
   size(cam.width, cam.height);
 
   // Robust fiducial detectors are invariant to lightning conditions, while the other is much faster
@@ -17,11 +18,10 @@ void setup() {
   detector = Boof.fiducialSquareBinaryRobust(0.1,4);
   //detector = Boof.fiducialSquareBinary(0.1,100);
 
-  // Much better results if you calibrate the camera.  For now let's just guess its parameters
+  // Much better results if you calibrate the camera.
+  // It is guessing the parameters and assuming there is no lens distortion, which is never true!
   // detector.setIntrinsic(intrinsic);
   detector.guessCrappyIntrinsic(cam.width,cam.height);
-
-  f = createFont("Arial", 32, true);
 }
 
 void draw() {
@@ -35,6 +35,7 @@ void draw() {
     for( FiducialFound f : found ) {
       detector.render(this,f);
     }
+  }
 }
 
 void initializeCamera( int desiredWidth, int desiredHeight ) {

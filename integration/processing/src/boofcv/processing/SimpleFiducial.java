@@ -29,6 +29,7 @@ import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
 import processing.core.PApplet;
+import processing.core.PFont;
 import processing.core.PImage;
 
 import java.util.ArrayList;
@@ -130,5 +131,19 @@ public class SimpleFiducial {
 		p.line(pixel[6].x,pixel[6].y,pixel[7].x,pixel[7].y);
 		p.stroke(0, 0, 0xFF);
 		p.line(pixel[7].x,pixel[7].y,pixel[4].x,pixel[4].y);
+
+		Point2D_I32 middle = pixel[0];
+		middle.x = middle.y = 0;
+		for (int i = 4; i < 8; i++) {
+			middle.x += pixel[i].x;
+			middle.y += pixel[i].y;
+		}
+		middle.x /= 4;
+		middle.y /= 4;
+
+		PFont f = p.createFont("Arial",24,true);
+		p.textFont(f,24);
+		p.fill(255, 0, 0);
+		p.text(fiducial.getId()+"",middle.x,middle.y);
 	}
 }
