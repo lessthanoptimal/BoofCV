@@ -29,3 +29,7 @@
 
 - Hough Detectors
   * Used round to reduce round off error?  Right now it is equivalent of floor
+
+
+- Add an escape value to score associate.  if the value computed so far isn't better than X, stop.
+  Suggested by David G Ortega

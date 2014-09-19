@@ -34,7 +34,7 @@ main/          | Contains the source code for BoofCV
 Building from Source
 ====================================
 
-BoofCV is a java library and can be compiled on any platform with Java installed. Gradle is now the preferred way to build BoofCV.  There are still Ant and Maven build scripts laying around but those will be removed in the near future and their use is not officially supported any more.
+BoofCV is a java library and can be compiled on any platform with Java installed. Gradle is now the preferred way to build BoofCV.  There are still Ant build scripts laying around but those will be removed in the near future and their use is not officially supported any more.
 
 BEFORE trying to compile BoofCV make sure you have the following installed and that the paths are setup correctly:
 
@@ -46,6 +46,8 @@ BEFORE trying to compile BoofCV make sure you have the following installed and t
 BoofCV is very easy to build on just about any system with Gradle and Java support.  Gradle will download all of the 
 dependencies for you.  Well that's not totally true, there are a couple of optional packages which require manual 
 downloading since they lack jars on Maven central. More on that later.
+
+*NOTE* As an alternative to installing Gradle directly there are shell scripts "boofcv/gradlew" and "boofcv/gradlew.bat".  They will download gradle and execute the commands the same as invoking "gradle" would.
 
 Below are a few useful custom Gradle scripts that can be invoked:
 
