@@ -26,7 +26,7 @@ void setup() {
   size(cam.width, cam.height);
 
   // Select which tracker you want to use by uncommenting and commenting the lines below
-    tracker = Boof.trackerCirculant(null, ImageDataType.F32);
+  tracker = Boof.trackerCirculant(null, ImageDataType.F32);
 //    tracker = Boof.trackerTld(null,ImageDataType.F32);
 //    tracker = Boof.trackerMeanShiftComaniciu(null, ImageType.ms(3,ImageFloat32.class));
 //    tracker = Boof.trackerSparseFlow(null, ImageDataType.F32);

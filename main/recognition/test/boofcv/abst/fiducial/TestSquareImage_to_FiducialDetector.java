@@ -45,9 +45,9 @@ public class TestSquareImage_to_FiducialDetector extends GenericFiducialDetector
 	}
 
 	@Override
-	public ImageBase loadImage(ImageType imageType) {
-
-		BufferedImage out = UtilImageIO.loadImage(directory+"view01.jpg");
+	public ImageBase loadImage(ImageType imageType)
+	{
+		BufferedImage out = UtilImageIO.loadImage(directory+"image0000.jpg");
 		return ConvertBufferedImage.convertFrom(out,true,imageType);
 	}
 

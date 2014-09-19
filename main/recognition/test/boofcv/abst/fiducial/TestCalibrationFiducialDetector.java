@@ -18,16 +18,46 @@
 
 package boofcv.abst.fiducial;
 
-import org.junit.Test;
+import boofcv.abst.calib.ConfigChessboard;
+import boofcv.core.image.ConvertBufferedImage;
+import boofcv.factory.fiducial.FactoryFiducial;
+import boofcv.io.UtilIO;
+import boofcv.io.image.UtilImageIO;
+import boofcv.struct.calib.IntrinsicParameters;
+import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageType;
+import boofcv.struct.image.ImageUInt8;
 
-import static org.junit.Assert.fail;
+import java.awt.image.BufferedImage;
 
 /**
  * @author Peter Abeles
  */
-public class TestCalibrationFiducialDetector {
-	@Test
-	public void stuff() {
-		fail("Implement");
+public class TestCalibrationFiducialDetector extends GenericFiducialDetectorChecks {
+
+
+	String directory = UtilIO.getPathToBase()+"data/applet/fiducial/calibration/";
+
+	public TestCalibrationFiducialDetector() {
+		types.add( ImageType.single(ImageUInt8.class));
+		types.add( ImageType.single(ImageFloat32.class));
+	}
+
+	@Override
+	public ImageBase loadImage(ImageType imageType) {
+
+		BufferedImage out = UtilImageIO.loadImage(directory + "image00.jpg");
+		return ConvertBufferedImage.convertFrom(out, true, imageType);
+	}
+
+	@Override
+	public IntrinsicParameters loadIntrinsic() {
+		return UtilIO.loadXML(directory+"intrinsic.xml");
+	}
+
+	@Override
+	public FiducialDetector createDetector(ImageType imageType) {
+		return FactoryFiducial.calibChessboard(new ConfigChessboard(5,7), 0.03, imageType.getImageClass());
 	}
 }

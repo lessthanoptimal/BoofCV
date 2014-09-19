@@ -79,4 +79,8 @@ public class SquareImage_to_FiducialDetector<T extends ImageSingleBand>
 	public ImageType<T> getInputType() {
 		return type;
 	}
+
+	public double getTargetWidth() {
+		return targetWidth;
+	}
 }

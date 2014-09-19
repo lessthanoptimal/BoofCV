@@ -47,7 +47,7 @@ public class TestSquareBinary_to_FiducialDetector extends GenericFiducialDetecto
 	@Override
 	public ImageBase loadImage(ImageType imageType) {
 
-		BufferedImage out = UtilImageIO.loadImage(directory+"angled00_643_284.jpg");
+		BufferedImage out = UtilImageIO.loadImage(directory+"image0000.jpg");
 		return ConvertBufferedImage.convertFrom(out,true,imageType);
 	}
 

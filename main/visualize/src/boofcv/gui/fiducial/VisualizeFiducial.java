@@ -81,9 +81,5 @@ public class VisualizeFiducial {
 		g2.drawLine(pixel[6].x,pixel[6].y,pixel[7].x,pixel[7].y);
 		g2.setColor(Color.BLUE);
 		g2.drawLine(pixel[7].x,pixel[7].y,pixel[4].x,pixel[4].y);
-
-
-
-
 	}
 }

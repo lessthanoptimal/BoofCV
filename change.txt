@@ -47,6 +47,8 @@ Version : Alpha 0.18
   * ConvolveNormalizedNaive correctly handles offsets in the kernel
   * 2D convolution correctly supports offset.  Before it used radius no matter what
   * Normalized convolution makes sure the input kernel sums up to 1 for floating point
+- Processing
+  * Added new thresholding and fiducials
 
 ---------------------------------------------
 Date    : 2014/6/19

@@ -221,6 +221,22 @@ public class SimpleGray extends SimpleImage<ImageSingleBand>{
 	}
 
 	/**
+	 * @see GThresholdImageOps#computeOtsu
+	 */
+	public SimpleBinary thresholdOtsu(boolean down ) {
+		double threshold = GThresholdImageOps.computeOtsu(image,0,256);
+		return new SimpleBinary(GThresholdImageOps.threshold(image, null, threshold, down));
+	}
+
+	/**
+	 * @see GThresholdImageOps#computeEntropy
+	 */
+	public SimpleBinary thresholdEntropy(boolean down ) {
+		double threshold = GThresholdImageOps.computeEntropy(image,0,256);
+		return new SimpleBinary(GThresholdImageOps.threshold(image, null, threshold, down));
+	}
+
+	/**
 	 * @see GThresholdImageOps#adaptiveSquare
 	 */
 	public SimpleBinary thresholdSquare( int radius, double bias, boolean down ) {
@@ -232,6 +248,16 @@ public class SimpleGray extends SimpleImage<ImageSingleBand>{
 	 */
 	public SimpleBinary thresholdGaussian( int radius, double bias, boolean down ) {
 		return new SimpleBinary(GThresholdImageOps.adaptiveGaussian(image, null,radius,bias,down,null,null));
+	}
+
+	/**
+	 * @see GThresholdImageOps#adaptiveSauvola
+	 *
+	 * @param radius Radius of adaptive region
+	 * @param k Positive parameter used to tune threshold.  Try 0.3
+	 */
+	public SimpleBinary thresholdSauvola( int radius, double k , boolean down ) {
+		return new SimpleBinary(GThresholdImageOps.adaptiveSauvola(image, null, radius, (float) k, down));
 	}
 
 	public SimpleGradient gradientSobel() {
