@@ -1,3 +1,5 @@
+- Do all unit tests pass?
+- Run regression tests
 - Update BoofDefaults.version
 - Set release data in change.txt
 - Make sure all examples work
@@ -13,7 +15,7 @@
 - Tag git
 - Upload to source forge
 - Update version on website
-
+- Post new Processing jar
 
 ----
 Gradle
@@ -24,56 +26,9 @@ gradle uploadArchives
 SNAPSHOT is it has that in its name.
 
 log onto http://oss.sonatype.org
------
-Maven
-
-Update Version:
-  * Change in parent pom.xml
-  * mvn -N versions:update-child-modules
-
-Post a SNAPSHOT:
-  mvn -DperformRelease=true clean deploy
-
-Full Release
-  * ./python/src/packagemvn.py
-  * type password a lot
-
-Log onto oss.sonatype.org
-Make sure all the modules are there.
-Promote
 
 
-Use this to access staging stuff:
+----
+jar signing
 
-    <repositories>
-        <repository>
-            <id>sonatype-snapshots</id>
-            <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
-        <repository>
-            <id>sonatype-releases</id>
-            <url>https://oss.sonatype.org/content/repositories/releases/</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-        <repository>
-            <id>sonatype-staging</id>
-            <url>https://oss.sonatype.org/content/repositories/staging/</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-    </repositories>
+jarsigner -storetype pkcs12 -keystore Abeles_Comodo_CA.p12 BoofCV_Applet.jar "peter abeles's comodo ca limited id"

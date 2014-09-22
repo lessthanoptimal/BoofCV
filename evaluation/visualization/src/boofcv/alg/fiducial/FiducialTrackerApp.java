@@ -31,7 +31,6 @@ import boofcv.gui.VideoProcessAppBase;
 import boofcv.gui.fiducial.VisualizeFiducial;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ShowImages;
-import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.struct.calib.IntrinsicParameters;
@@ -43,7 +42,6 @@ import georegression.struct.se.Se3_F64;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
 
 /**
  * Let's the user select a region in the image and tracks it using different algorithms.
@@ -206,15 +204,15 @@ public class FiducialTrackerApp<I extends ImageSingleBand>
 
 		FiducialTrackerApp app = new FiducialTrackerApp(type);
 
-//		app.setBaseDirectory("../data/applet/");
-//		app.loadInputData("../data/applet/tracking/file_list.txt");
+		app.setBaseDirectory("../data/applet/fiducial/");
+		app.loadInputData("../data/applet/fiducial/fiducial.txt");
 
-		java.util.List<PathLabel> inputs = new ArrayList<PathLabel>();
-		inputs.add(new PathLabel(SQUARE_NUMBER, "../data/applet/fiducial/binary/movie.mjpeg"));
-		inputs.add(new PathLabel(SQUARE_PICTURE, "../data/applet/fiducial/image/movie.mjpeg"));
-		inputs.add(new PathLabel(CALIB_CHESS, "../data/applet/fiducial/calibration/movie.mjpeg"));
-
-		app.setInputList(inputs);
+//		java.util.List<PathLabel> inputs = new ArrayList<PathLabel>();
+//		inputs.add(new PathLabel(SQUARE_NUMBER, "../data/applet/fiducial/binary/movie.mjpeg"));
+//		inputs.add(new PathLabel(SQUARE_PICTURE, "../data/applet/fiducial/image/movie.mjpeg"));
+//		inputs.add(new PathLabel(CALIB_CHESS, "../data/applet/fiducial/calibration/movie.mjpeg"));
+//
+//		app.setInputList(inputs);
 
 		// wait for it to process one image so that the size isn't all screwed up
 		while( !app.getHasProcessedImage() ) {
