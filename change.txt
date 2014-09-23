@@ -7,15 +7,15 @@ Date    : 2014/9/22
 Version : Alpha 0.18
 
 - Renamed ImageSegmentation to ImageSuperpixels
- * Added a unit test which ensures connectivity requirement is meet
- * Fixed issue with SLIC where it did not set its ConnectRule
+  * Added a unit test which ensures connectivity requirement is meet
+  * Fixed issue with SLIC where it did not set its ConnectRule
 - Renamed ExampleStructureFromMotion to ExampleMultiviewSceneReconstruction
 - Processing
- * Gradle copies over processing JavaDoc
- * Fixed SimpleTrackerPoints.spawn() which did not update the tracks before
- * Added more comments to examples
+  * Gradle copies over processing JavaDoc
+  * Fixed SimpleTrackerPoints.spawn() which did not update the tracks before
+  * Added more comments to examples
 - Removed Caliper dependency
- * Not designed the way I want it to be and recent changes made it less usable
+  * Not designed the way I want it to be and recent changes made it less usable
 - Removed v4l4j support since Webcam Capture is easier and does a better job
 - Fixed OpenKinect examples
 - ImageDistort now supports a different input and output types

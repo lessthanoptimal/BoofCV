@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,6 +33,7 @@ import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.alg.transform.ii.GIntegralImageOps;
 import boofcv.core.image.ConvertBufferedImage;
+import boofcv.core.image.GConvertImage;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.feature.describe.FactoryDescribeRegionPoint;
@@ -135,6 +136,8 @@ public class VisualizeAssociationMatchesApp<T extends ImageSingleBand, D extends
 
 		ConvertBufferedImage.convertFromMulti(buffLeft, imageLeft, true, imageType);
 		ConvertBufferedImage.convertFromMulti(buffRight, imageRight, true, imageType);
+		GConvertImage.average(imageLeft, grayLeft);
+		GConvertImage.average(imageRight, grayRight);
 
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
