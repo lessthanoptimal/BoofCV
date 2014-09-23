@@ -21,6 +21,7 @@ package boofcv.examples.calibration;
 import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.distort.LensDistortionOps;
 import boofcv.core.image.ConvertBufferedImage;
+import boofcv.core.image.border.BorderType;
 import boofcv.gui.ListDisplayPanel;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ShowImages;
@@ -64,9 +65,10 @@ public class ExampleRemoveLensDistortion {
 		// create new transforms which optimize view area in different ways.
 		// allInside makes sure there are no dead zones inside the image
 		// fullView will include the entire original image
-		ImageDistort allInside = LensDistortionOps.removeDistortion(true,null,param,null,
+		// The border is VALUE, which defaults to black, just so you can see it
+		ImageDistort allInside = LensDistortionOps.removeDistortion(true,BorderType.VALUE,param,null,
 				ImageType.ms(numBands,ImageFloat32.class));
-		ImageDistort fullView = LensDistortionOps.removeDistortion(false,null,param,null,
+		ImageDistort fullView = LensDistortionOps.removeDistortion(false,BorderType.VALUE,param,null,
 				ImageType.ms(numBands,ImageFloat32.class));
 
 		// NOTE: After lens distortion has been removed the intrinsic parameters is changed.  If you pass
