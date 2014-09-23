@@ -3,7 +3,7 @@ Change Log
 Date Format: year/month/day
 
 ---------------------------------------------
-Date    : 2014/9/19
+Date    : 2014/9/22
 Version : Alpha 0.18
 
 - Renamed ImageSegmentation to ImageSuperpixels
