@@ -6,14 +6,13 @@
 - Make sure all applications in evaluation work
 - Update examples on website
 - Fresh checkout from repository then do the following
-- ant make for 1) main 2) integration 3) examples
-- ant javadoc
+- See if gradle 1) main 2) integration 3) examples
+- ant javadoc for website
 - create zip files for
-  * JavaDoc
-  * binary of main + integration
-  * source code
+  * binary of main + integration + source jars
+  * source code + data
 - Tag git
-- Upload to source forge
+- Upload to sourceforge
 - Update version on website
 - Post new Processing jar
 
