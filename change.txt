@@ -3,6 +3,19 @@ Change Log
 Date Format: year/month/day
 
 ---------------------------------------------
+Date    : 2014
+Version : Alpha 0.19
+
+TODO
+  * Square Detector.  Create set of images in validation boof with hand selected corners
+                      Improve performance across a range of distances and orientations
+  * Square Image: Better example image than the dog, which can have ambiguous orientation
+  * Hough - investigate bug report
+  * Template with transparent pixels
+  * Android Demo:   Automatic Threshold.  Dim slider for global
+  * Look at Sandreas's NewWarp
+
+---------------------------------------------
 Date    : 2014/9/22
 Version : Alpha 0.18
 
