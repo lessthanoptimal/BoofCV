@@ -26,11 +26,45 @@ import boofcv.struct.image.MultiSpectral;
  * <p>
  * Color conversion between RGB and HSV color spaces.  HSV stands for Hue-Saturation-Value.  "Hue" has a range of [0,2*PI]
  * and "Saturation" has a range of [0,1], the two together represent the color.  While "Value" has the same range as the
- * input pixels and represents how light/dark the color is.
+ * input pixels and represents how light/dark the color is. Original algorithm taken from [1] and modified slightly.
  * </p>
  *
  * <p>
  * NOTE: The hue is represented in radians instead of degrees, as is often done.
+ * NOTE: Hue will be set to NaN if it is undefined.  It is undefined when chroma is zero, which happens when the input
+ * color is a pure gray (e.g. same value across all color bands).
+ * </p>
+ *
+ * <p>
+ * RGB to HSV:<br>
+ * <pre>
+ * min = min(r,g,b)
+ * max = max(r,g,b)
+ * delta = max-min  // this is the chroma
+ * value = max
+ *
+ * if( max != 0 )
+ *   saturation = delta/max
+ * else
+ *   saturation = 0;
+ *   hue = NaN
+ *
+ * if( r == max )
+ *   hue = (g-b)/delta
+ * else if( g == max )
+ *   hue = 2 + (b-r)/delta
+ * else
+ *   hue = 4 + (r-g)/delta
+ *
+ * hue *= 60.0*PI/180.0
+ * if( hue < 0 )
+ *   hue += 2.0*PI
+ *
+ * </pre>
+ * </p>
+ *
+ * <p>
+ * [1] http://www.cs.rit.edu/~ncs/color/t_convert.html
  * </p>
  *
  * @author Peter Abeles
@@ -53,7 +87,6 @@ import boofcv.struct.image.MultiSpectral;
 
  This doesn't seem to improve the runtime noticeably and makes the code uglier.
   */
-
 public class ColorHsv {
 
 	// 60 degrees in radians

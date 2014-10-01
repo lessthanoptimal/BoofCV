@@ -52,6 +52,10 @@ public class TestColorHsv {
 		check(0.25, 0.5, 0.75);
 		check(0.8, 0.1, 0.75);
 		check(151, 151, 151);
+		check(151, 120, 120);
+		check(120, 151, 120);
+		check(120, 120, 151);
+
 
 		for( int i = 0; i < 50; i++ ) {
 			double r = rand.nextDouble();
