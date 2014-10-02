@@ -44,13 +44,13 @@ public class CachedSineCosine_F32 {
 	public CachedSineCosine_F32( float minAngle, float maxAngle, int size )  {
 		this.minAngle = minAngle;
 		this.maxAngle = maxAngle;
-		this.delta = (maxAngle - minAngle)/(size-1);
+		this.delta = (maxAngle - minAngle)/(size);
 
 		c = new float[size];
 		s = new float[size];
 
 		for( int i = 0; i < size; i++ ) {
-			float angle = (maxAngle - minAngle)*i/(size-1) + minAngle;
+			float angle = (maxAngle - minAngle)*i/(size) + minAngle;
 			c[i] = (float)Math.cos(angle);
 			s[i] = (float)Math.sin(angle);
 		}
