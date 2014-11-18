@@ -16,8 +16,9 @@
  * limitations under the License.
  */
 
-package boofcv.core.image;
+package boofcv.io.image;
 
+import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.*;
 import sun.awt.image.ByteInterleavedRaster;
 import sun.awt.image.IntegerInterleavedRaster;
@@ -294,7 +295,7 @@ public class ConvertBufferedImage {
 				throw new IllegalArgumentException("image dimension are different");
 			}
 		} else {
-			dst = GeneralizedImageOps.createSingleBand(type,src.getWidth(), src.getHeight());
+			dst = GeneralizedImageOps.createSingleBand(type, src.getWidth(), src.getHeight());
 		}
 
 		try {

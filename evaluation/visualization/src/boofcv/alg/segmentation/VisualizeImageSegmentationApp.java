@@ -19,7 +19,6 @@
 package boofcv.alg.segmentation;
 
 import boofcv.abst.segmentation.ImageSuperpixels;
-import boofcv.core.image.ConvertBufferedImage;
 import boofcv.factory.segmentation.FactoryImageSegmentation;
 import boofcv.factory.segmentation.FactorySegmentationAlg;
 import boofcv.gui.SelectAlgorithmAndInputPanel;
@@ -27,6 +26,7 @@ import boofcv.gui.feature.VisualizeRegions;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.PathLabel;
+import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.feature.ColorQueue_F32;
 import boofcv.struct.image.*;
 import org.ddogleg.struct.FastQueue;

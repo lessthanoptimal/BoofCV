@@ -20,8 +20,8 @@ package boofcv.alg.geo.calibration;
 
 import boofcv.abst.calib.ImageResults;
 import boofcv.alg.distort.ImageDistort;
-import boofcv.core.image.ConvertBufferedImage;
 import boofcv.gui.feature.VisualizeFeatures;
+import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.MultiSpectral;
 import georegression.struct.point.Point2D_F64;

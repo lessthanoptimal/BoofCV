@@ -9,6 +9,8 @@ Version : Alpha 0.19
 - Removed -1 from CachedSineCosine_F32
   * Change suggested by Jochem
   * Original code could cause problems for edge cases in hough transform
+- Moved BufferedImage to IO package since it is swing dependent
+  * Suggested by Baha Elkassaby
 
 TODO
   * Square Detector.  Create set of images in validation boof with hand selected corners
@@ -18,7 +20,6 @@ TODO
   * Android Demo:   Automatic Threshold.  Dim slider for global
   * Look at Sandreas's NewWarp
   * Histogram stuff
-  * Moved ConvertBufferedImage out of IP and into IO
 
 ---------------------------------------------
 Date    : 2014/9/22

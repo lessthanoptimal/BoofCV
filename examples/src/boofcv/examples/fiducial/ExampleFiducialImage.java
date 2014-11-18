@@ -19,12 +19,12 @@
 package boofcv.examples.fiducial;
 
 import boofcv.abst.fiducial.SquareImage_to_FiducialDetector;
-import boofcv.core.image.ConvertBufferedImage;
 import boofcv.factory.fiducial.ConfigFiducialImage;
 import boofcv.factory.fiducial.FactoryFiducial;
 import boofcv.gui.fiducial.VisualizeFiducial;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.UtilIO;
+import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.image.ImageFloat32;

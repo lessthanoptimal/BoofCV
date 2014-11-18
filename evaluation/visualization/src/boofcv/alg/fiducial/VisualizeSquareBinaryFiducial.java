@@ -19,13 +19,13 @@
 package boofcv.alg.fiducial;
 
 import boofcv.alg.feature.shapes.SplitMergeLineFitLoop;
-import boofcv.core.image.ConvertBufferedImage;
 import boofcv.factory.filter.binary.FactoryThresholdBinary;
 import boofcv.gui.ListDisplayPanel;
 import boofcv.gui.binary.VisualizeBinaryData;
 import boofcv.gui.feature.VisualizeShapes;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.UtilIO;
+import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.image.ImageFloat32;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,13 +21,13 @@ package boofcv.alg.feature.describe;
 import boofcv.abst.feature.describe.ConfigBrief;
 import boofcv.abst.feature.describe.DescribeRegionPoint;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
-import boofcv.core.image.ConvertBufferedImage;
 import boofcv.factory.feature.describe.FactoryDescribeRegionPoint;
 import boofcv.gui.SelectAlgorithmAndInputPanel;
 import boofcv.gui.feature.SelectRegionDescriptionPanel;
 import boofcv.gui.feature.TupleDescPanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.PathLabel;
+import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.BoofDefaults;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.image.ImageFloat32;

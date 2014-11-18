@@ -19,8 +19,8 @@
 package boofcv.alg.ip;
 
 import boofcv.alg.misc.ImageMiscOps;
-import boofcv.core.image.ConvertBufferedImage;
 import boofcv.gui.image.ShowImages;
+import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.image.ImageUInt8;
 

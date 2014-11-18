@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,6 @@
 package boofcv.alg.feature.detect.interest;
 
 import boofcv.abst.feature.detect.interest.InterestPointScaleSpacePyramid;
-import boofcv.core.image.ConvertBufferedImage;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.feature.detect.interest.FactoryInterestPointAlgs;
 import boofcv.factory.transform.pyramid.FactoryPyramid;
@@ -27,6 +26,7 @@ import boofcv.gui.SelectAlgorithmAndInputPanel;
 import boofcv.gui.feature.ScaleSpacePyramidPointPanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.PathLabel;
+import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.BoofDefaults;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;

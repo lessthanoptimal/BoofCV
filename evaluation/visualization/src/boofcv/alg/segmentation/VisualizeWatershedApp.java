@@ -19,10 +19,10 @@
 package boofcv.alg.segmentation;
 
 import boofcv.alg.segmentation.watershed.WatershedVincentSoille1991;
-import boofcv.core.image.ConvertBufferedImage;
 import boofcv.factory.segmentation.FactorySegmentationAlg;
 import boofcv.gui.feature.VisualizeRegions;
 import boofcv.gui.image.ShowImages;
+import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.ConnectRule;
 import boofcv.struct.image.ImageSInt32;

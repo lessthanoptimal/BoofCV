@@ -21,9 +21,9 @@ package boofcv.alg.feature.associate;
 import boofcv.abst.feature.associate.AssociateDescription;
 import boofcv.abst.feature.associate.ScoreAssociation;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
-import boofcv.core.image.ConvertBufferedImage;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
+import boofcv.io.image.ConvertBufferedImage;
 import boofcv.misc.Performer;
 import boofcv.misc.ProfileOperation;
 import boofcv.struct.feature.TupleDesc_F64;
@@ -91,7 +91,7 @@ public class BenchmarkAssociationSpeedSurf {
 
 		try {
 			BufferedImage image = ImageIO.read(new File(imageName));
-			ImageFloat32 gray = ConvertBufferedImage.convertFrom(image,(ImageFloat32)null);
+			ImageFloat32 gray = ConvertBufferedImage.convertFrom(image, (ImageFloat32) null);
 
 			FastQueue<TupleDesc_F64> ret = new FastQueue<TupleDesc_F64>(10,TupleDesc_F64.class, false);
 

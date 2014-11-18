@@ -20,13 +20,13 @@ package boofcv.alg.transform.fft;
 
 import boofcv.abst.transform.fft.DiscreteFourierTransform;
 import boofcv.alg.misc.GPixelMath;
-import boofcv.core.image.ConvertBufferedImage;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.gui.ListDisplayPanel;
 import boofcv.gui.SelectInputPanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.gui.image.VisualizeImageData;
 import boofcv.io.PathLabel;
+import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageFloat;
 import boofcv.struct.image.ImageInterleaved;

@@ -18,8 +18,8 @@
 
 package boofcv.abst.calib;
 
-import boofcv.core.image.ConvertBufferedImage;
 import boofcv.factory.calib.FactoryPlanarCalibrationTarget;
+import boofcv.io.image.ConvertBufferedImage;
 import boofcv.misc.PerformerBase;
 import boofcv.misc.ProfileOperation;
 import boofcv.struct.image.ImageFloat32;
@@ -69,7 +69,7 @@ public class BenchmarkCalibrationDetectors {
 			return null;
 		}
 
-		return ConvertBufferedImage.convertFrom(img,(ImageFloat32)null);
+		return ConvertBufferedImage.convertFrom(img, (ImageFloat32) null);
 	}
 
 	public static void main(String[] args) {

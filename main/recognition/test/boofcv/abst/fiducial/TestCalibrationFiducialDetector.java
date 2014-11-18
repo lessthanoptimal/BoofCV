@@ -19,9 +19,9 @@
 package boofcv.abst.fiducial;
 
 import boofcv.abst.calib.ConfigChessboard;
-import boofcv.core.image.ConvertBufferedImage;
 import boofcv.factory.fiducial.FactoryFiducial;
 import boofcv.io.UtilIO;
+import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.image.ImageBase;

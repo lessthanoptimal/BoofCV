@@ -19,7 +19,7 @@
 package boofcv.gui.image;
 
 import boofcv.alg.misc.ImageStatistics;
-import boofcv.core.image.ConvertBufferedImage;
+import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSInt16;
 import boofcv.struct.image.ImageUInt8;

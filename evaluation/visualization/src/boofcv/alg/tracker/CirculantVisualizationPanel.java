@@ -20,9 +20,9 @@ package boofcv.alg.tracker;
 
 import boofcv.alg.misc.PixelMath;
 import boofcv.alg.tracker.circulant.CirculantTracker;
-import boofcv.core.image.ConvertBufferedImage;
 import boofcv.core.image.ConvertImage;
 import boofcv.gui.image.VisualizeImageData;
+import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.ImageRectangle;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageFloat64;

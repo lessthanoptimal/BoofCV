@@ -21,7 +21,7 @@ package boofcv.gui.image;
 import boofcv.alg.InputSanityCheck;
 import boofcv.alg.misc.GImageStatistics;
 import boofcv.alg.misc.ImageStatistics;
-import boofcv.core.image.ConvertBufferedImage;
+import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.image.*;
 import sun.awt.image.IntegerInterleavedRaster;
 

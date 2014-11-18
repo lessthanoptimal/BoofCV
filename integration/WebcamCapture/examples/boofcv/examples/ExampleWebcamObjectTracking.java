@@ -19,8 +19,8 @@
 package boofcv.examples;
 
 import boofcv.abst.tracker.TrackerObjectQuad;
-import boofcv.core.image.ConvertBufferedImage;
 import boofcv.factory.tracker.FactoryTrackerObjectQuad;
+import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.webcamcapture.UtilWebcamCapture;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;

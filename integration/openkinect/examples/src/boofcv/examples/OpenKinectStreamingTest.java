@@ -18,10 +18,10 @@
 
 package boofcv.examples;
 
-import boofcv.core.image.ConvertBufferedImage;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.gui.image.VisualizeImageData;
+import boofcv.io.image.ConvertBufferedImage;
 import boofcv.openkinect.UtilOpenKinect;
 import boofcv.struct.image.ImageUInt16;
 import boofcv.struct.image.ImageUInt8;

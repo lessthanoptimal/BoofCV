@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,12 +20,12 @@ package boofcv.alg.feature.detect.edge;
 
 import boofcv.abst.filter.blur.BlurStorageFilter;
 import boofcv.abst.filter.derivative.ImageGradient;
-import boofcv.core.image.ConvertBufferedImage;
 import boofcv.factory.filter.blur.FactoryBlurFilter;
 import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.gui.binary.VisualizeBinaryData;
 import boofcv.gui.edge.VisualizeEdgeFeatures;
 import boofcv.gui.image.ShowImages;
+import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSInt8;

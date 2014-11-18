@@ -2,6 +2,8 @@ dependencies {
     compile project(':main:ip')
     compile project(':main:feature')
     compile project(':main:geo')
+
+    testCompile project(':main:io')
 }
 
 idea {

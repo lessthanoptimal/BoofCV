@@ -21,7 +21,6 @@ package boofcv.alg.feature.flow;
 import boofcv.abst.flow.DenseOpticalFlow;
 import boofcv.alg.distort.DistortImageOps;
 import boofcv.alg.interpolate.TypeInterpolate;
-import boofcv.core.image.ConvertBufferedImage;
 import boofcv.factory.flow.FactoryDenseOpticalFlow;
 import boofcv.gui.PanelGridPanel;
 import boofcv.gui.SelectAlgorithmAndInputPanel;
@@ -31,6 +30,7 @@ import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.PathLabel;
 import boofcv.io.ProgressMonitorThread;
+import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.flow.ImageFlow;
 import boofcv.struct.image.ImageFloat32;
 

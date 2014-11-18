@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,11 +25,11 @@ import boofcv.alg.filter.derivative.GradientSobel;
 import boofcv.alg.filter.derivative.GradientThree;
 import boofcv.alg.filter.derivative.HessianFromGradient;
 import boofcv.alg.misc.ImageMiscOps;
-import boofcv.core.image.ConvertBufferedImage;
 import boofcv.core.image.border.FactoryImageBorder;
 import boofcv.core.image.border.ImageBorder_I32;
 import boofcv.factory.feature.detect.interest.FactoryDetectPoint;
 import boofcv.gui.image.ShowImages;
+import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.BoofDefaults;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.image.ImageFloat32;

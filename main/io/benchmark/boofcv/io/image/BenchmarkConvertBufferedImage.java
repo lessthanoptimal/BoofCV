@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.core.image;
+package boofcv.io.image;
 
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.misc.PerformerBase;

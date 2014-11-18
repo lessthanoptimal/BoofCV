@@ -19,7 +19,7 @@
 package boofcv.gui.feature;
 
 import boofcv.alg.misc.PixelMath;
-import boofcv.core.image.ConvertBufferedImage;
+import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.flow.ImageFlow;
 import boofcv.struct.image.ImageFloat32;
 

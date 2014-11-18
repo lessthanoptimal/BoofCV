@@ -20,7 +20,6 @@ package boofcv.alg.binary;
 
 import boofcv.abst.filter.FilterImageInterface;
 import boofcv.alg.filter.binary.GThresholdImageOps;
-import boofcv.core.image.ConvertBufferedImage;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.filter.binary.FactoryBinaryImageOps;
 import boofcv.gui.SelectAlgorithmAndInputPanel;
@@ -28,6 +27,7 @@ import boofcv.gui.binary.VisualizeBinaryData;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.PathLabel;
+import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;

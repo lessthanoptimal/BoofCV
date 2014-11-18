@@ -19,9 +19,9 @@
 package boofcv.examples.segmentation;
 
 import boofcv.alg.color.ColorHsv;
-import boofcv.core.image.ConvertBufferedImage;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ShowImages;
+import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.MultiSpectral;

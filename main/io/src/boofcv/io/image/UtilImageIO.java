@@ -18,7 +18,6 @@
 
 package boofcv.io.image;
 
-import boofcv.core.image.ConvertBufferedImage;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
 import boofcv.struct.image.MultiSpectral;
