@@ -6,14 +6,19 @@ Date Format: year/month/day
 Date    : 2014
 Version : Alpha 0.19
 
+- Removed -1 from CachedSineCosine_F32
+  * Change suggested by Jochem
+  * Original code could cause problems for edge cases in hough transform
+
 TODO
   * Square Detector.  Create set of images in validation boof with hand selected corners
                       Improve performance across a range of distances and orientations
   * Square Image: Better example image than the dog, which can have ambiguous orientation
-  * Hough - investigate bug report
   * Template with transparent pixels
   * Android Demo:   Automatic Threshold.  Dim slider for global
   * Look at Sandreas's NewWarp
+  * Histogram stuff
+  * Moved ConvertBufferedImage out of IP and into IO
 
 ---------------------------------------------
 Date    : 2014/9/22

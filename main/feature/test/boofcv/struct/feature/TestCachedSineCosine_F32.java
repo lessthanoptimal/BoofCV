@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,19 +37,19 @@ public class TestCachedSineCosine_F32 {
 
 		assertEquals(-2,alg.minAngle,1e-4);
 		assertEquals(1,alg.maxAngle,1e-4);
-		assertEquals(0.75,alg.delta,1e-4);
+		assertEquals(0.6,alg.delta,1e-4);
 
 		assertEquals(-0.41615,alg.c[0],0.2);
 		assertEquals(-0.90930,alg.s[0],0.2);
 
-		assertEquals(0.87758,alg.c[2],0.2);
-		assertEquals(-0.47943,alg.s[2],0.2);
+		assertEquals(0.69671,alg.c[2],0.2);
+		assertEquals(-0.71736,alg.s[2],0.2);
 
-		assertEquals(0.54030,alg.c[4],0.2);
-		assertEquals(0.84147,alg.s[4],0.2);
+		assertEquals(0.92106,alg.c[4],0.2);
+		assertEquals(0.38942,alg.s[4],0.2);
 
 		assertEquals(0,alg.computeIndex(-2));
-		assertEquals(2,alg.computeIndex(0));
-		assertEquals(4,alg.computeIndex(1));
+		assertEquals(3,alg.computeIndex(0));
+		assertEquals(4,alg.computeIndex(0.99f));
 	}
 }

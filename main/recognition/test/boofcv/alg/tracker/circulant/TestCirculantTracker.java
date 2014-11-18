@@ -27,8 +27,8 @@ import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageFloat64;
 import boofcv.struct.image.InterleavedF64;
 import georegression.struct.shapes.RectangleLength2D_F32;
-import org.ddogleg.complex.ComplexMath64F;
 import org.ejml.data.Complex64F;
+import org.ejml.ops.ComplexMath64F;
 import org.junit.Test;
 
 import java.util.Random;
@@ -342,7 +342,7 @@ public class TestCirculantTracker {
 
 				Complex64F cc = new Complex64F();
 				ComplexMath64F.conj(bb, bb);
-				ComplexMath64F.mult(aa,bb,cc);
+				ComplexMath64F.multiply(aa, bb, cc);
 
 				double foundReal = c.getBand(x,y,0);
 				double foundImg = c.getBand(x,y,1);
@@ -372,7 +372,7 @@ public class TestCirculantTracker {
 				Complex64F b = new Complex64F(kf.getBand(x,y,0)+lambda,kf.getBand(x,y,1));
 
 				Complex64F c = new Complex64F();
-				ComplexMath64F.div(a, b, c);
+				ComplexMath64F.divide(a, b, c);
 
 				double foundReal = alphaf.getBand(x,y,0);
 				double foundImg = alphaf.getBand(x,y,1);

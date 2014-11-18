@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,8 +22,8 @@ import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.*;
 import boofcv.testing.BoofTesting;
-import org.ddogleg.complex.ComplexMath64F;
 import org.ejml.data.Complex64F;
+import org.ejml.ops.ComplexMath64F;
 import org.junit.Test;
 
 import java.util.Random;
@@ -266,7 +266,7 @@ public class TestDiscreteFourierTransformOps {
 				Complex64F a = new Complex64F(get(realA,x, y),0);
 				Complex64F b = new Complex64F(get(complexB,x,y,0),get(complexB, x, y, 1));
 
-				ComplexMath64F.mult(a,b,expected);
+				ComplexMath64F.multiply(a, b, expected);
 
 				assertEquals(expected.getReal(),get(complexC, x, y, 0),1e-4);
 				assertEquals(expected.getImaginary(),get(complexC, x, y, 1),1e-4);
@@ -303,7 +303,7 @@ public class TestDiscreteFourierTransformOps {
 				Complex64F a = new Complex64F(get(complexA, x, y, 0),get(complexA, x, y, 1));
 				Complex64F b = new Complex64F(get(complexB, x, y, 0),get(complexB,x,y,1));
 
-				ComplexMath64F.mult(a,b,expected);
+				ComplexMath64F.multiply(a, b, expected);
 
 				assertEquals(expected.getReal(),get(complexC, x, y, 0),1e-4);
 				assertEquals(expected.getImaginary(),get(complexC, x, y, 1),1e-4);
