@@ -16,41 +16,36 @@
  * limitations under the License.
  */
 
-package boofcv.struct.feature;
+package boofcv.abst.feature.dense;
+
+import boofcv.abst.feature.describe.ConfigSurfDescribe;
+import boofcv.struct.Configuration;
 
 /**
- * Base class for tuple based feature descriptors
- *
  * @author Peter Abeles
  */
-public interface TupleDesc<T extends TupleDesc> {
+public class ConfigDenseSurf implements Configuration {
 
 	/**
-	 * Sets this tuple to be the same as the provided tuple
-	 * @param source The tuple which this one is to become a copy of.
+	 * Standard configuration for SURF
 	 */
-	public void setTo( T source );
+	ConfigSurfDescribe surf;
 
 	/**
-	 * Returns the value of a tuple's element as a double.  In general this function should not be used
-	 * because of how inefficient it is.
-	 *
-	 * @param index Which element
-	 * @return Element's value as a double
+	 * Space between the center of each descriptor region along the image's rows.
 	 */
-	public double getDouble( int index );
-
+	int periodRows = 20;
 	/**
-	 * Number of elements in the tuple.
-	 *
-	 * @return Number of elements in the tuple
+	 * Space between the center of each descriptor region along the image's columns.
 	 */
-	public int size();
-
+	int periodColumns = 20;
 	/**
-	 * Creates a copy of this description
-	 *
-	 * @return Copy
+	 * The scale at which each feature is to be computed at
 	 */
-	public T copy();
+	double scale = 1;
+
+	@Override
+	public void checkValidity() {
+
+	}
 }

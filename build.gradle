@@ -143,6 +143,7 @@ def mainProjects = [
         ':main:calibration',
         ':main:sfm',
         ':main:recognition',
+        ':main:learning',
         ':main:visualize',
 ]
 
