@@ -1,7 +1,8 @@
 include 'examples','evaluation','applications',
         'main:ip','main:io','main:feature','main:geo','main:calibration','main:sfm','main:recognition',
         'main:visualize','main:checks','main:learning',
-        'integration:xuggler','integration:applet',"integration:WebcamCapture"
+        'integration:xuggler','integration:applet',"integration:WebcamCapture",
+        'integration:jcodec'
 
 // these are packages which require external files that must be manually downloaded or configured to compile
 if (System.getenv()['ANDROID_HOME']) {

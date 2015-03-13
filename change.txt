@@ -11,6 +11,9 @@ Version : Alpha 0.19
   * Original code could cause problems for edge cases in hough transform
 - Moved BufferedImage to IO package since it is swing dependent
   * Suggested by Baha Elkassaby
+- JCodec
+  * Formally added it back in since it works on Android videos
+  * Added utilities to convert Picture into BoofCV formated images
 
 TODO
   * Square Detector.  Create set of images in validation boof with hand selected corners
@@ -19,7 +22,9 @@ TODO
   * Template with transparent pixels
   * Android Demo:   Automatic Threshold.  Dim slider for global
   * Look at Sandreas's NewWarp
-  * Histogram stuff
+  * Histogram comparison
+  * Add a jar which includes everything to Maven?
+  * Documentation on how to build a single jar
 
 ---------------------------------------------
 Date    : 2014/9/22

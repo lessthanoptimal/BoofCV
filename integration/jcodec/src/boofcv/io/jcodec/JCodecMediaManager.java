@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -95,12 +95,8 @@ public class JCodecMediaManager implements MediaManager {
 			} catch (FileNotFoundException e) {
 				throw new RuntimeException(e);
 			}
-		} else if( fileName.toLowerCase().endsWith("mpg")) {
-			return new JCodecSimplified<T>(fileName,type);
-		} else if( fileName.toLowerCase().endsWith("wmv")) {
-			return new JCodecSimplified<T>(fileName,type);
 		} else {
-			throw new RuntimeException("Unknown movie type.  Must be an mjpeg");
+			return new JCodecSimplified<T>(fileName,type);
 		}
 	}
 

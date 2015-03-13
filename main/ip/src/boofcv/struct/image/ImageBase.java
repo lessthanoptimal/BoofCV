@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -56,8 +56,27 @@ public abstract class ImageBase<T extends ImageBase> implements Serializable, Cl
 	 */
 	public ImageType<T> imageType;
 
+	/**
+	 * Returns a rectangular subimage of this image.  The subimage reference the same image data, but has a different
+	 * startIndex, stride, width, and height.  Thus no memory is copied and is an inexpensive operation.
+	 *
+	 * @param x0 Lower extent of subimage. x-axis
+	 * @param y0 Lower extent of subimage. y-axis
+	 * @param x1 Upper extent of subimage. x-axis
+	 * @param y1 Upper extent of subimage. y-axis
+	 * @param subimage (Optional) Storage for where the subimage is written to.  If null a new instance is created.
+	 * @return The subimage
+	 */
 	public abstract T subimage(int x0, int y0, int x1, int y1, T subimage);
 
+	/**
+	 * Changes the width and height of the image.  If the image data array isn't large enough to hold an
+	 * image of this size then a new array is declared.  Otherwise the image data array is left unchanged
+	 * and only the width and height variables are modified.
+	 *
+	 * @param width Desired image width
+	 * @param height Desired image height
+	 */
 	public abstract void reshape(int width, int height);
 
 	/**
@@ -77,6 +96,13 @@ public abstract class ImageBase<T extends ImageBase> implements Serializable, Cl
 		return subImage;
 	}
 
+	/**
+	 * Returns true if the pixel coordinate is inside the image or false if not.
+	 *
+	 * @param x pixel location x-axis
+	 * @param y pixel location y-axis
+	 * @return true if inside and false if outside
+	 */
 	public final boolean isInBounds(int x, int y) {
 		return x >= 0 && x < width && y >= 0 && y < height;
 	}
