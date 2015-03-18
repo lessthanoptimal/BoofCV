@@ -83,7 +83,7 @@ public class ExampleLearnSceneKnn {
 					ImageUInt8 image = UtilImageIO.loadImage(path, ImageUInt8.class);
 
 					features.reset();
-					describeImage.process(image,features);
+					describeImage.process(image,features,null);
 
 					// add the features to the overall list which the clusters will be found inside of
 					for (int i = 0; i < features.size; i++) {
@@ -116,7 +116,7 @@ public class ExampleLearnSceneKnn {
 					ImageUInt8 image = UtilImageIO.loadImage(path, ImageUInt8.class);
 
 					features.reset();
-					describeImage.process(image, features);
+					describeImage.process(image, features,null);
 					for (int i = 0; i < features.size; i++) {
 						featuresToHistogram.addFeature(features.get(i));
 					}

@@ -18,14 +18,18 @@
 
 package boofcv.io.jcodec;
 
+import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
+import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.MultiSpectral;
 import org.jcodec.api.FrameGrab;
 import org.jcodec.api.JCodecException;
 import org.jcodec.common.NIOUtils;
 import org.jcodec.common.model.Picture;
 
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
@@ -77,7 +81,14 @@ public class JCodecSimplified<T extends ImageBase> implements SimpleImageSequenc
 
 	@Override
 	public <InternalImage> InternalImage getGuiImage() {
-		return (InternalImage)frameCurrent;
+		MultiSpectral<ImageUInt8> boofColor = new MultiSpectral<ImageUInt8>(ImageUInt8.class,
+				frameCurrent.getWidth(),frameCurrent.getHeight(),3);
+
+		BufferedImage output = new BufferedImage(boofColor.width,boofColor.height,BufferedImage.TYPE_INT_RGB);
+
+		UtilJCodec.convertToBoof(frameCurrent,boofColor);
+		ConvertBufferedImage.convertTo(boofColor,output,true);
+		return (InternalImage)output;
 	}
 
 	@Override
@@ -91,7 +102,8 @@ public class JCodecSimplified<T extends ImageBase> implements SimpleImageSequenc
 
 	@Override
 	public void setLoop(boolean loop) {
-		throw new IllegalArgumentException("Not supported");
+		if( loop )
+			throw new IllegalArgumentException("Not supported");
 	}
 
 	@Override

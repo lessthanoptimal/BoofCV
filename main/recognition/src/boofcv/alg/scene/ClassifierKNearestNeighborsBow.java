@@ -89,7 +89,7 @@ public class ClassifierKNearestNeighborsBow<T extends ImageBase,Desc extends Tup
 
 		// compute all the features inside the image
 		imageFeatures.reset();
-		describe.process(image, imageFeatures);
+		describe.process(image, imageFeatures, null);
 
 		// find which word the feature matches and construct a frequency histogram
 		featureToHistogram.reset();

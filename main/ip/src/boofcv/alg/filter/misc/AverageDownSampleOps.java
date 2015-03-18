@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -114,26 +114,37 @@ public class AverageDownSampleOps {
 	 * @param input Input image. Not modified.
 	 * @param output Output image. Modified.
 	 */
-	public static <T extends ImageSingleBand>
+	public static <T extends ImageBase>
 	void down( T input , T output ) {
-		if( input instanceof ImageUInt8 ) {
-			ImageFloat32 middle = new ImageFloat32(output.width,input.height);
-			ImplAverageDownSample.horizontal((ImageUInt8) input, middle);
-			ImplAverageDownSample.vertical(middle, (ImageInt8) output);
-		} else if( input instanceof ImageUInt16) {
-			ImageFloat32 middle = new ImageFloat32(output.width,input.height);
-			ImplAverageDownSample.horizontal((ImageUInt16) input, middle);
-			ImplAverageDownSample.vertical(middle, (ImageUInt16) output);
-		} else if( input instanceof ImageFloat32) {
-			ImageFloat32 middle = new ImageFloat32(output.width,input.height);
-			ImplAverageDownSample.horizontal((ImageFloat32) input, middle);
-			ImplAverageDownSample.vertical(middle, (ImageFloat32) output);
-		} else if( input instanceof ImageFloat64) {
-			ImageFloat64 middle = new ImageFloat64(output.width,input.height);
-			ImplAverageDownSample.horizontal((ImageFloat64) input, middle);
-			ImplAverageDownSample.vertical(middle, (ImageFloat64) output);
-		} else {
-			throw new IllegalArgumentException("Unknown image type");
+		if( ImageSingleBand.class.isAssignableFrom(input.getClass())  ) {
+			if (input instanceof ImageUInt8) {
+				ImageFloat32 middle = new ImageFloat32(output.width, input.height);
+				ImplAverageDownSample.horizontal((ImageUInt8) input, middle);
+				ImplAverageDownSample.vertical(middle, (ImageInt8) output);
+			} else if (input instanceof ImageUInt16) {
+				ImageFloat32 middle = new ImageFloat32(output.width, input.height);
+				ImplAverageDownSample.horizontal((ImageUInt16) input, middle);
+				ImplAverageDownSample.vertical(middle, (ImageUInt16) output);
+			} else if (input instanceof ImageFloat32) {
+				ImageFloat32 middle = new ImageFloat32(output.width, input.height);
+				ImplAverageDownSample.horizontal((ImageFloat32) input, middle);
+				ImplAverageDownSample.vertical(middle, (ImageFloat32) output);
+			} else if (input instanceof ImageFloat64) {
+				ImageFloat64 middle = new ImageFloat64(output.width, input.height);
+				ImplAverageDownSample.horizontal((ImageFloat64) input, middle);
+				ImplAverageDownSample.vertical(middle, (ImageFloat64) output);
+			} else {
+				throw new IllegalArgumentException("Unknown image type");
+			}
+		} else if( MultiSpectral.class.isAssignableFrom(input.getClass())  ) {
+			MultiSpectral in = (MultiSpectral)input;
+			MultiSpectral out = (MultiSpectral)output;
+
+			int N = in.getNumBands();
+
+			for (int i = 0; i < N; i++) {
+				down(in.getBand(i),out.getBand(0));
+			}
 		}
 	}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,20 +22,17 @@ import boofcv.io.MediaManager;
 import boofcv.io.VideoCallBack;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.image.UtilImageIO;
-import boofcv.io.video.VideoMjpegCodec;
-import boofcv.io.wrapper.images.ImageStreamSequence;
-import boofcv.io.wrapper.images.JpegByteImageSequence;
+import boofcv.io.video.DynamicVideoInterface;
+import boofcv.io.video.VideoInterface;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.Reader;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -46,6 +43,7 @@ public class DefaultMediaManager implements MediaManager {
 	public static final DefaultMediaManager INSTANCE = new DefaultMediaManager();
 
 	Map<String,BufferedImage> cachedImage = new HashMap<String, BufferedImage>();
+	VideoInterface videoInterface = new DynamicVideoInterface();
 	
 	@Override
 	public Reader openFile(String fileName) {
@@ -80,24 +78,7 @@ public class DefaultMediaManager implements MediaManager {
 	@Override
 	public <T extends ImageBase> SimpleImageSequence<T>
 	openVideo(String fileName, ImageType<T> type) {
-
-		if( fileName.endsWith("mjpeg") || fileName.endsWith("MJPEG") ) {
-			try {
-				VideoMjpegCodec codec = new VideoMjpegCodec();
-				List<byte[]> data = codec.read(new FileInputStream(fileName));
-				return new JpegByteImageSequence<T>(type,data,false);
-			} catch (FileNotFoundException e) {
-				throw new RuntimeException(e);
-			}
-		} else if( fileName.endsWith("mpng") || fileName.endsWith("MPNG")) {
-			try {
-				return new ImageStreamSequence<T>(fileName,true,type);
-			} catch (FileNotFoundException e) {
-				throw new RuntimeException(e);
-			}
-		} else {
-			throw new RuntimeException("Unknown movie type.  Must be an mjpeg");
-		}
+		return videoInterface.load(fileName,type);
 	}
 
 	@Override

@@ -27,7 +27,7 @@ import static org.junit.Assert.fail;
  */
 public class TestConfusion {
 	@Test
-	public void foo() {
+	public void computeAccuracy() {
 		fail("implement");
 	}
 }

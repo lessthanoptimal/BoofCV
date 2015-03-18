@@ -27,7 +27,37 @@ import static org.junit.Assert.fail;
  */
 public class TestPrecisionRecall {
 	@Test
-	public void foo() {
+	public void getTruePositive() {
+		fail("implement");
+	}
+
+	@Test
+	public void getTrueNegative() {
+		fail("implement");
+	}
+
+	@Test
+	public void getFalsePositive() {
+		fail("implement");
+	}
+
+	@Test
+	public void getFalseNegative() {
+		fail("implement");
+	}
+
+	@Test
+	public void getFMeasure() {
+		fail("implement");
+	}
+
+	@Test
+	public void getPrecision() {
+		fail("implement");
+	}
+
+	@Test
+	public void getRecall() {
 		fail("implement");
 	}
 }

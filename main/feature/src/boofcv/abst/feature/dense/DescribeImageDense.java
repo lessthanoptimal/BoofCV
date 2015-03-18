@@ -22,6 +22,7 @@ import boofcv.abst.feature.describe.DescriptorInfo;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
+import georegression.struct.point.Point2D_I32;
 import org.ddogleg.struct.FastQueue;
 
 /**
@@ -39,8 +40,10 @@ public interface DescribeImageDense<T extends ImageBase, Desc extends TupleDesc>
 	 *
 	 * @param input Input image.
 	 * @param descriptions (Output) Storage for descriptors.  The grow() command is used to request more data.
+	 * @param locations (output) (Optional) Storage for location of feature sample center points.
+	 *                  New locations are added by invoking grow().   If null then it's ignored.
 	 */
-	public void process( T input , FastQueue<Desc> descriptions );
+	public void process( T input , FastQueue<Desc> descriptions , FastQueue<Point2D_I32> locations );
 
 	/**
 	 * Description of the type of image it can process

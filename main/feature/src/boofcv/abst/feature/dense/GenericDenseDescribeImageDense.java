@@ -22,6 +22,7 @@ import boofcv.abst.feature.describe.DescribeRegionPoint;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
+import georegression.struct.point.Point2D_I32;
 import org.ddogleg.struct.FastQueue;
 
 /**
@@ -43,6 +44,14 @@ public class GenericDenseDescribeImageDense<T extends ImageBase, Desc extends Tu
 	int periodX;
 	int periodY;
 
+	/**
+	 * Configures dense description.
+	 * @param alg Sparse feature sampler.
+	 * @param scale The scale at which the features should be sampled
+	 * @param featureWidth Tells it how wide a feature is so that it can avoid sampling outside the image
+	 * @param periodX  sample rate along the x-axis
+	 * @param periodY  sample rate along the y-axis
+	 */
 	public GenericDenseDescribeImageDense(DescribeRegionPoint<T, Desc> alg, double scale,
 										  int featureWidth, int periodX, int periodY) {
 		this.alg = alg;
@@ -53,7 +62,7 @@ public class GenericDenseDescribeImageDense<T extends ImageBase, Desc extends Tu
 	}
 
 	@Override
-	public void process(T input, FastQueue<Desc> descriptions) {
+	public void process(T input, FastQueue<Desc> descriptions, FastQueue<Point2D_I32> locations ) {
 		alg.setImage(input);
 
 		int x0 = featureWidth/2;
@@ -67,6 +76,8 @@ public class GenericDenseDescribeImageDense<T extends ImageBase, Desc extends Tu
 
 				if( !alg.process(x,y,0,scale,d) ) {
 					descriptions.removeTail();
+				} else if( locations != null ) {
+					locations.grow().set(x,y);
 				}
 			}
 		}

@@ -13,7 +13,7 @@ Version : Alpha 0.19
   * Suggested by Baha Elkassaby
 - JCodec
   * Formally added it back in since it works on Android videos
-  * Added utilities to convert Picture into BoofCV formated images
+  * Added utilities to convert Picture into BoofCV formatted images
 
 TODO
   * Square Detector.  Create set of images in validation boof with hand selected corners

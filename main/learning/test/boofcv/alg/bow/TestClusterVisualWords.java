@@ -18,16 +18,74 @@
 
 package boofcv.alg.bow;
 
+import boofcv.struct.feature.TupleDesc_F64;
+import org.ddogleg.clustering.AssignCluster;
+import org.ddogleg.clustering.ComputeClusters;
 import org.junit.Test;
 
-import static org.junit.Assert.fail;
+import java.util.List;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Peter Abeles
  */
 public class TestClusterVisualWords {
+
+	int DOF = 2;
+	long SEED = 123;
+	int NUM_CLUSTERS = 12;
+	double DISTANCE = 394.5;
+
 	@Test
-	public void foo() {
-		fail("implement");
+	public void process() {
+		DummyClusters clusters = new DummyClusters();
+		ClusterVisualWords alg = new ClusterVisualWords(clusters,DOF,SEED);
+
+		alg.add(new TupleDesc_F64(2));
+		alg.add(new TupleDesc_F64(2));
+		alg.add(new TupleDesc_F64(2));
+		alg.process(NUM_CLUSTERS);
+
+		assertEquals(1,clusters.numInit);
+		assertEquals(1,clusters.numProcess);
+		assertEquals(3,clusters.numInputPoints);
+		assertEquals(DISTANCE,clusters.getDistanceMeasure(),1e-8);
+	}
+
+	protected class DummyClusters implements ComputeClusters<double[]> {
+
+		int numInit = 0;
+		int numProcess = 0;
+		int numInputPoints = 0;
+
+		@Override
+		public void init(int pointDimension, long randomSeed) {
+			numInit++;
+
+			assertEquals(DOF, pointDimension);
+			assertEquals(SEED,randomSeed);
+
+		}
+
+		@Override
+		public void process(List<double[]> points, int numCluster) {
+			numProcess++;
+
+			numInputPoints = points.size();
+			assertTrue(points != null);
+			assertEquals(NUM_CLUSTERS, numCluster);
+		}
+
+		@Override
+		public AssignCluster<double[]> getAssignment() {
+			return null;
+		}
+
+		@Override
+		public double getDistanceMeasure() {
+			return DISTANCE;
+		}
 	}
 }

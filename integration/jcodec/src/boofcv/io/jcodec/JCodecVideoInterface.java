@@ -16,38 +16,21 @@
  * limitations under the License.
  */
 
-package boofcv.abst.feature.dense;
+package boofcv.io.jcodec;
 
-import boofcv.abst.feature.describe.ConfigSurfDescribe;
-import boofcv.struct.Configuration;
+import boofcv.io.image.SimpleImageSequence;
+import boofcv.io.video.VideoInterface;
+import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageType;
 
 /**
- * Configuration for dense surf computation.
+ * Instance of {@link boofcv.io.video.VideoInterface} which uses {@link boofcv.io.jcodec.JCodecSimplified}.
  *
  * @author Peter Abeles
  */
-public class ConfigDenseSurf implements Configuration {
-
-	/**
-	 * Standard configuration for SURF
-	 */
-	ConfigSurfDescribe surf;
-
-	/**
-	 * Space between the center of each descriptor region along the image's rows.
-	 */
-	int periodRows = 20;
-	/**
-	 * Space between the center of each descriptor region along the image's columns.
-	 */
-	int periodColumns = 20;
-	/**
-	 * The scale at which each feature is to be computed at
-	 */
-	double scale = 1;
-
+public class JCodecVideoInterface implements VideoInterface {
 	@Override
-	public void checkValidity() {
-
+	public <T extends ImageBase> SimpleImageSequence<T> load(String fileName, ImageType<T> imageType) {
+		return new JCodecSimplified<T>(fileName,imageType);
 	}
 }
