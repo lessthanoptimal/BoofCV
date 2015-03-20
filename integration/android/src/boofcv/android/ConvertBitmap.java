@@ -183,7 +183,26 @@ public class ConvertBitmap {
 
 		return output;
 	}
-	
+
+	/**
+	 * Converts many BoofCV image types into a Bitmap.
+	 *
+	 * @see #declareStorage(android.graphics.Bitmap, byte[])
+	 *
+	 * @param input Input BoofCV image.
+	 * @param output Output Bitmap image.
+	 * @param storage Byte array used for internal storage. If null it will be declared internally.
+	 */
+	public static void boofToBitmap( ImageBase input , Bitmap output , byte[] storage) {
+		if( input instanceof MultiSpectral ) {
+			multiToBitmap((MultiSpectral)input,output,storage);
+		} else if( input instanceof ImageSingleBand ) {
+			grayToBitmap((ImageSingleBand)input,output,storage);
+		} else {
+			throw new IllegalArgumentException("Unsupported input image type");
+		}
+	}
+
 	/**
 	 * Converts ImageSingleBand into Bitmap.
 	 *
