@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,8 +20,14 @@ package boofcv.struct.image;
 
 import boofcv.core.image.FactoryGImageSingleBand;
 import boofcv.core.image.GImageSingleBand;
+import boofcv.core.image.GeneralizedImageOps;
+import com.sun.xml.internal.messaging.saaj.util.ByteInputStream;
+import com.sun.xml.internal.messaging.saaj.util.ByteOutputStream;
 import org.junit.Test;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -185,14 +191,14 @@ public abstract class StandardSingleBandTests {
 		
 		ImageSingleBand sub = img.subimage(2,3,3,5, null);
 		
-		assertEquals(1,sub.getWidth());
-		assertEquals(2,sub.getHeight());
+		assertEquals(1, sub.getWidth());
+		assertEquals(2, sub.getHeight());
 
 		GImageSingleBand a = FactoryGImageSingleBand.wrap(img);
 		GImageSingleBand b = FactoryGImageSingleBand.wrap(sub);
 		
-		assertEquals(a.get(2,3),b.get(0,0));
-		assertEquals(a.get(2,4),b.get(0,1));
+		assertEquals(a.get(2, 3), b.get(0, 0));
+		assertEquals(a.get(2, 4), b.get(0, 1));
 	}
 	
 	@Test
@@ -201,12 +207,55 @@ public abstract class StandardSingleBandTests {
 		
 		// reshape to something smaller
 		img.reshape(5,4);
-		assertEquals(5,img.getWidth());
-		assertEquals(4,img.getHeight());
+		assertEquals(5, img.getWidth());
+		assertEquals(4, img.getHeight());
 
 		// reshape to something larger
 		img.reshape(15,21);
-		assertEquals(15,img.getWidth());
-		assertEquals(21,img.getHeight());
+		assertEquals(15, img.getWidth());
+		assertEquals(21, img.getHeight());
+	}
+
+	@Test
+	public void serialize() throws IOException, ClassNotFoundException {
+
+		// randomly fill the image
+		ImageSingleBand imgA = createImage(10, 20);
+		GImageSingleBand a = FactoryGImageSingleBand.wrap(imgA);
+		for (int i = 0; i < imgA.getHeight(); i++) {
+			for (int j = 0; j < imgA.getWidth(); j++) {
+				a.set(j,i,rand.nextDouble()*200);
+			}
+		}
+
+		// make a copy of the original
+		ImageSingleBand imgB = (ImageSingleBand)imgA.clone();
+
+
+		ByteOutputStream streamOut = new ByteOutputStream(1000);
+		ObjectOutputStream out = new ObjectOutputStream(streamOut);
+		out.writeObject(imgA);
+		out.close();
+
+
+		ByteInputStream streamIn = new ByteInputStream(streamOut.getBytes(),streamOut.getCount());
+		ObjectInputStream in = new ObjectInputStream(streamIn);
+
+		ImageSingleBand found = (ImageSingleBand)in.readObject();
+
+		// see if everything is equals
+		checkEquals(imgA, imgB);
+		checkEquals(imgA, found);
+	}
+
+	private void checkEquals(ImageSingleBand imgA, ImageSingleBand imgB) {
+		for (int i = 0; i < imgA.getHeight(); i++) {
+			for (int j = 0; j < imgA.getWidth(); j++) {
+				double valA = GeneralizedImageOps.get(imgA, j, i);
+				double valB = GeneralizedImageOps.get(imgB, j, i);
+
+				assertEquals(valA, valB, 1e-8);
+			}
+		}
 	}
 }

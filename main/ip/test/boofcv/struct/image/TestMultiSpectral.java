@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,8 +18,19 @@
 
 package boofcv.struct.image;
 
+import boofcv.alg.misc.GImageMiscOps;
+import boofcv.core.image.FactoryGImageSingleBand;
+import boofcv.core.image.GImageSingleBand;
+import boofcv.core.image.GeneralizedImageOps;
 import boofcv.testing.BoofTesting;
+import com.sun.xml.internal.messaging.saaj.util.ByteInputStream;
+import com.sun.xml.internal.messaging.saaj.util.ByteOutputStream;
 import org.junit.Test;
+
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.util.Random;
 
 import static org.junit.Assert.*;
 
@@ -28,6 +39,7 @@ import static org.junit.Assert.*;
  */
 public class TestMultiSpectral {
 
+	Random rand = new Random(234);
 	int imgWidth = 10;
 	int imgHeight = 20;
 
@@ -44,7 +56,6 @@ public class TestMultiSpectral {
 			assertTrue(img.bands[i] != null);
 		}
 	}
-
 
 	@Test
 	public void getBand() {
@@ -126,5 +137,32 @@ public class TestMultiSpectral {
 		c.setTo(a);
 
 		BoofTesting.assertEquals(a,c,1e-8);
+	}
+
+	@Test
+	public void serialize() throws IOException, ClassNotFoundException {
+
+		// randomly fill the image
+		MultiSpectral<ImageUInt8> imgA = new MultiSpectral<ImageUInt8>(ImageUInt8.class,5, 10, 3);
+		GImageMiscOps.fillUniform(imgA, rand, -10, 10);
+
+		// make a copy of the original
+		MultiSpectral<ImageUInt8> imgB = imgA.clone();
+
+
+		ByteOutputStream streamOut = new ByteOutputStream(1000);
+		ObjectOutputStream out = new ObjectOutputStream(streamOut);
+		out.writeObject(imgA);
+		out.close();
+
+
+		ByteInputStream streamIn = new ByteInputStream(streamOut.getBytes(),streamOut.getCount());
+		ObjectInputStream in = new ObjectInputStream(streamIn);
+
+		MultiSpectral<ImageUInt8> found = (MultiSpectral)in.readObject();
+
+		// see if everything is equals
+		BoofTesting.assertEquals(imgA, imgB, 1e-8);
+		BoofTesting.assertEquals(imgA, found, 1e-8);
 	}
 }

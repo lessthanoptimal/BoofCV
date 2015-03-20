@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,6 +20,7 @@ package boofcv.struct.image;
 
 import boofcv.core.image.GeneralizedImageOps;
 
+import java.io.Serializable;
 import java.lang.reflect.Array;
 
 /**
@@ -27,7 +28,7 @@ import java.lang.reflect.Array;
  *
  * @author Peter Abeles
  */
-public class ImageType<T extends ImageBase> {
+public class ImageType<T extends ImageBase> implements Serializable {
 
 	/**
 	 * Specifies the image data structure
