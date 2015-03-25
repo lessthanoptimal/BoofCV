@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -44,6 +44,14 @@ public class Point2D3D {
 	public Point2D3D(Point2D_F64 observation, Point3D_F64 location) {
 		this.observation = observation;
 		this.location = location;
+	}
+
+	/**
+	 * Sets 'this' to be identical to 'src'.
+	 */
+	public void set( Point2D3D src ) {
+		observation.set(src.observation);
+		location.set(src.location);
 	}
 
 	public Point2D_F64 getObservation() {
