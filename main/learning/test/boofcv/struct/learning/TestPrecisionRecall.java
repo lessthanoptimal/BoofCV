@@ -20,44 +20,63 @@ package boofcv.struct.learning;
 
 import org.junit.Test;
 
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Peter Abeles
  */
 public class TestPrecisionRecall {
+	double TP=1.0,TN=2.0,FP=3.0,FN=4.0;
 	@Test
 	public void getTruePositive() {
-		fail("implement");
+		PrecisionRecall p = new PrecisionRecall(1,2,3,4);
+
+		assertEquals(1, p.getTruePositive(), 1e-8);
 	}
 
 	@Test
 	public void getTrueNegative() {
-		fail("implement");
+		PrecisionRecall p = new PrecisionRecall(1,2,3,4);
+
+		assertEquals(2, p.getTrueNegative(), 1e-8);
 	}
 
 	@Test
 	public void getFalsePositive() {
-		fail("implement");
+		PrecisionRecall p = new PrecisionRecall(1,2,3,4);
+
+		assertEquals(3, p.getFalsePositive(), 1e-8);
 	}
 
 	@Test
 	public void getFalseNegative() {
-		fail("implement");
+		PrecisionRecall p = new PrecisionRecall(1,2,3,4);
+
+		assertEquals(4, p.getFalseNegative(), 1e-8);
 	}
 
 	@Test
 	public void getFMeasure() {
-		fail("implement");
+		PrecisionRecall p = new PrecisionRecall(1,2,3,4);
+
+		double expected = 2.0*(p.getPrecision()*p.getRecall())/(p.getPrecision()+p.getRecall());
+
+		assertEquals(expected,p.getFMeasure(),1e-8);
 	}
 
 	@Test
 	public void getPrecision() {
-		fail("implement");
+		PrecisionRecall p = new PrecisionRecall(TP,TN,FP,FN);
+
+		double expected =  TP/(TP+FP);
+		assertEquals(expected,p.getPrecision(),1e-8);
 	}
 
 	@Test
 	public void getRecall() {
-		fail("implement");
+		PrecisionRecall p = new PrecisionRecall(TP,TN,FP,FN);
+
+		double expected =  TP/(TP+FN);
+		assertEquals(expected, p.getRecall(), 1e-8);
 	}
 }

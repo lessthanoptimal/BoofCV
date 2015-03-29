@@ -136,14 +136,14 @@ public class ExampleLearnSceneKnn {
 
 			// Provide the training results to K-NN and it will preprocess these results for quick lookup later on
 			classifier = new ClassifierKNearestNeighborsBow<ImageUInt8,TupleDesc_F64>(nn,describeImage,featuresToHistogram);
-			classifier.setTrainingData(memory);
+			classifier.setClassificationData(memory);
 		}
 
 		@Override
 		protected int classify(String path) {
 			ImageUInt8 image = UtilImageIO.loadImage(path, ImageUInt8.class);
 
-			return classifier.process(image);
+			return classifier.classify(image);
 		}
 
 

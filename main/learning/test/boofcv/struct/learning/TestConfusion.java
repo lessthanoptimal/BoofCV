@@ -20,7 +20,7 @@ package boofcv.struct.learning;
 
 import org.junit.Test;
 
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Peter Abeles
@@ -28,6 +28,14 @@ import static org.junit.Assert.fail;
 public class TestConfusion {
 	@Test
 	public void computeAccuracy() {
-		fail("implement");
+		Confusion c = new Confusion(2);
+
+		c.matrix.set(0,0,0.25);
+		c.matrix.set(0,1,0.75);
+		c.matrix.set(1,1,0.85);
+		c.matrix.set(1,0,0.15);
+
+		double accuracy = (0.25+0.85)/2.0;
+		assertEquals(accuracy,c.computeAccuracy(),1e-8);
 	}
 }

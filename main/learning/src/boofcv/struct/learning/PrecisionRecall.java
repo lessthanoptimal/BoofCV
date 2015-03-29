@@ -29,6 +29,16 @@ public class PrecisionRecall {
 	public double FP;
 	public double FN;
 
+	public PrecisionRecall(double TP, double TN, double FP, double FN) {
+		this.TP = TP;
+		this.TN = TN;
+		this.FP = FP;
+		this.FN = FN;
+	}
+
+	public PrecisionRecall() {
+	}
+
 	public double getTruePositive() {
 		return TP;
 	}

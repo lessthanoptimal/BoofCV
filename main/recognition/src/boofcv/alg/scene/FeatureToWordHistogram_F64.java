@@ -24,24 +24,39 @@ import org.ddogleg.clustering.AssignCluster;
 import java.util.Arrays;
 
 /**
+ * <p>
  * Creates a normalized histogram which represents the frequency of different visual words from the set of features.
  * Both hard and soft assignment can be used.  For hard assignment all the weight is given to the word which is the
  * best fit to the feature.  In soft the relative similarity between the words is used to assign values to the histogram.
- *
+ * </p>
+ * <p>
+ * With hard assignment a single word is selected.  With soft a fraction is assigned to each word based on some
+ * implementation specific distance metric.  See {@link AssignCluster} for the details.
+ * </p>
  * @author Peter Abeles
  */
 public class FeatureToWordHistogram_F64
 		implements FeatureToWordHistogram<TupleDesc_F64>
 {
-	AssignCluster<double[]> assignment;
+	// Assigns a feature to a word
+	private AssignCluster<double[]> assignment;
 
-	boolean hardAssignment;
+	// should it use hard or soft assignment
+	private boolean hardAssignment;
 
-	int total;
-	double histogram[];
+	// total number of features which have been assigned to the histogram
+	private int total;
+	private double histogram[];
 
-	double temp[];
+	// internal work space
+	private double temp[];
 
+	/**
+	 * Assigns and configures internal algorithms.
+	 *
+	 * @param assignment Specifies the assignment algorithm
+	 * @param hardAssignment true for hard assignment and false for soft assignment
+	 */
 	public FeatureToWordHistogram_F64(AssignCluster<double[]> assignment, boolean hardAssignment ) {
 		this.assignment = assignment;
 		this.hardAssignment = hardAssignment;
@@ -58,21 +73,16 @@ public class FeatureToWordHistogram_F64
 		Arrays.fill(histogram,0);
 	}
 
-	/**
-	 *
-	 * @param feature A feature which is to be matched to words.  Not modified.
-	 */
 	@Override
 	public void addFeature( TupleDesc_F64 feature ) {
 		if( hardAssignment ) {
 			histogram[assignment.assign(feature.getValue())] += 1;
-
 		} else {
 			assignment.assign(feature.getValue(),temp);
 			for (int i = 0; i < histogram.length; i++) {
 				histogram[i] += temp[i];
 			}
-			// temp is normalized such that the sum is equal to 1.  so total is also += 1
+			// temp is already normalized such that the sum is equal to 1.  so total is also += 1
 		}
 		total += 1;
 	}
@@ -101,6 +111,6 @@ public class FeatureToWordHistogram_F64
 	 */
 	@Override
 	public int getTotalWords() {
-		return total;
+		return histogram.length;
 	}
 }

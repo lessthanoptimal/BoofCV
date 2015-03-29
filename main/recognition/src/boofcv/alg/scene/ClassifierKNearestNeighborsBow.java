@@ -30,12 +30,18 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Scene classification which uses bag-of-word model and K-Nearest Neighbors.  When an image is processed
- * its dense features are extracted.  These features are then converted into words and a frequency histogram created.
- * When a new image is observers its word frequency histogram is computed.  Then the K-nearest neighbors is found
- * to its histogram.  The scene with the most hits in that neighbor hood is the scene's classification.
+ * <p>
+ * Scene classification which uses bag-of-word model and K-Nearest Neighbors.  Classification data consists of a labeled
+ * set of word histograms.  Each word histogram was created by 1) extracting all the features inside an image which
+ * was known to belong to a specific scene, 2) the word which best matches each feature is found and added to the
+ * histogram, and 3) the histogram is then normalized so that it adds up to one.
+ * </p>
  *
- * TODO handle and describe above case where multiple neighbors have number
+ * <p>
+ * When classifying an image its word histogram is computed the same way.  Using the just computed histogram the
+ * K-nearest neighbors to its word histogram are found in the classification data.  The most frequent scene
+ * (the mode) of the k-neighbors is the selected scene type of the image being considered.
+ * </p>
  *
  * @author Peter Abeles
  */
@@ -43,38 +49,63 @@ import java.util.List;
 public class ClassifierKNearestNeighborsBow<T extends ImageBase,Desc extends TupleDesc> {
 
 	// Used to look up the histograms in memory which are the most similar
-	NearestNeighbor<HistogramScene> nn;
+	private NearestNeighbor<HistogramScene> nn;
 	// Computes all the features in the image
-	DescribeImageDense<T,Desc> describe;
+	private DescribeImageDense<T,Desc> describe;
 	// Converts the set of image features into visual words into a histogram which describes the frequency
 	// of visual words
-	FeatureToWordHistogram<Desc> featureToHistogram;
+	private FeatureToWordHistogram<Desc> featureToHistogram;
 
 	// storage for NN results
-	FastQueue<NnData<HistogramScene>> resultsNN = new FastQueue(NnData.class,true);
+	private FastQueue<NnData<HistogramScene>> resultsNN = new FastQueue(NnData.class,true);
 
 	// storage for image features
-	FastQueue<Desc> imageFeatures;
+	private FastQueue<Desc> imageFeatures;
 
 	// number of neighbors it will consider
-	int numNeighbors;
+	private int numNeighbors;
 
 	// used what the most frequent neighbor is
-	int scenes[];
+	private int scenes[];
 
+	/**
+	 * Configures internal algorithms.
+	 *
+	 * @param nn Used to perform nearest-neighbor search
+	 * @param describe Computes the dense image features
+	 * @param featureToHistogram Converts a set of features into a word histogram
+	 */
 	public ClassifierKNearestNeighborsBow(NearestNeighbor<HistogramScene> nn,
-										  DescribeImageDense<T, Desc> describe,
+										  final DescribeImageDense<T, Desc> describe,
 										  FeatureToWordHistogram<Desc> featureToHistogram) {
 		this.nn = nn;
 		this.describe = describe;
 		this.featureToHistogram = featureToHistogram;
 
 		scenes = new int[ featureToHistogram.getTotalWords() ];
+
+		imageFeatures = new FastQueue<Desc>(describe.getDescriptionType(),true) {
+			@Override
+			protected Desc createInstance() {
+				return describe.createDescription();
+			}
+		};
 	}
 
-	public void setTrainingData( List<HistogramScene> memory ) {
+	/**
+	 * Specifies the number of neighbors it should search for when classifying\
+	 */
+	public void setNumNeighbors(int numNeighbors) {
+		this.numNeighbors = numNeighbors;
+	}
 
-		List<double[]> points = new ArrayList<double[]>();
+	/**
+	 * Provides a set of labeled word histograms to use to classify a new image
+	 * @param memory labeled histograms
+	 */
+	public void setClassificationData(List<HistogramScene> memory) {
+
+		List<double[]> points = new ArrayList<double[]>(memory.size());
 		for (int i = 0; i < memory.size(); i++) {
 			points.add( memory.get(i).getHistogram() );
 		}
@@ -85,7 +116,12 @@ public class ClassifierKNearestNeighborsBow<T extends ImageBase,Desc extends Tup
 		nn.setPoints(points,memory);
 	}
 
-	public int process( T image ) {
+	/**
+	 * Finds the scene which most resembles the provided image
+	 * @param image Image that's to be classified
+	 * @return The index of the scene it most resembles
+	 */
+	public int classify(T image) {
 
 		// compute all the features inside the image
 		imageFeatures.reset();
@@ -100,16 +136,17 @@ public class ClassifierKNearestNeighborsBow<T extends ImageBase,Desc extends Tup
 		featureToHistogram.process();
 		double[] hist = featureToHistogram.getHistogram();
 
-		// see which previously seen images are the closest match
+		// Find the N most similar image histograms
 		resultsNN.reset();
 		nn.findNearest(hist,-1,numNeighbors,resultsNN);
 
-		Arrays.fill(hist,0);
+		// Find the most common scene among those neighbors
+		Arrays.fill(scenes,0);
 		for (int i = 0; i < resultsNN.size; i++) {
 			NnData<HistogramScene> data = resultsNN.get(i);
 			HistogramScene n = data.data;
 
-			hist[n.type]++;
+			scenes[n.type]++;
 		}
 
 		// pick the scene with the highest frequency

@@ -51,7 +51,7 @@ public class Confusion {
 
 		for (int i = 0; i < actualCounts.length; i++) {
 			for (int j = 0; j < actualCounts.length; j++) {
-				if( i == i ) {
+				if( i == j ) {
 					totalCorrect += matrix.get(i,j);
 				} else {
 					totalIncorrect += matrix.get(i,j);

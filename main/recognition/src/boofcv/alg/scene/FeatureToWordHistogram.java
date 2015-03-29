@@ -54,7 +54,7 @@ public interface FeatureToWordHistogram<Desc extends TupleDesc> {
 	public double[] getHistogram();
 
 	/**
-	 * The total number of words used to create this histogram
+	 * Number of elements in the histogram.  Which is the number of words the features are assigned to.
 	 */
 	public int getTotalWords();
 }
