@@ -1,6 +1,16 @@
+Table of Contents
+======================================
 
-Introduction
-====================================
+* [Introduction]                       (#introduction)
+  * [Downloading]                      (#where-to-download)
+  * [Gradle and Maven]                 (#include-in-gradle-and-maven-projects)
+* [Building from Source]               (#building-from-source)
+* [Running Example Code]               (#running-example-code)
+* [Dependencies]                       (#dependencies)
+* [Help/Contact]                       (#contact)
+
+# Introduction
+------------------------------------
 
 BoofCV is an open source computer vision library written entirely in Java by Peter Abeles.  It is released under the Apache License 2.0.  Source code, examples, and other utilties are included in this package.  This document contains only a brief summary of the directory structure and how to build the source code.  For more detailed and update information please visible the web pages below.
 
@@ -21,7 +31,7 @@ BoofCV is divided up into many modules.  The easiest way to include all of them 
 
 For Gradle projects:
 ```groovy
-compile group: 'org.boofcv', name: 'main:all', version: '0.19'
+compile group: 'org.boofcv', name: 'main:all', version: '0.19-SNAPSHOT'
 ```
 
 For Maven projects:
@@ -29,7 +39,7 @@ For Maven projects:
 <dependency>
   <groupId>org.boofcv</groupId>
   <artifactId>main:all</artifactId>
-  <version>0.19</version>
+  <version>0.19-SNAPSHOT</version>
 </dependency>
 ```
 
@@ -38,7 +48,7 @@ There are also several integration modules which help BoofCV interact with exter
           Name            |                 Description
 --------------------------|---------------------------------------------------------------------
 integration:applet        | Code for using BoofCV inside a Java applet
-integration:jcodec        | [JCodec]{http://jcodec.org/} is a pure Java video reader/writer
+integration:jcodec        | [JCodec](http://jcodec.org/) is a pure Java video reader/writer
 integration:openkinect    | Used the [Kinect](http://openkinect.org) RGB-D sensor with BoofCV
 integration:processing    | Easy to use interface in [Processing](https://processing.org/) programming language
 integration:WebcamCapture | Use webcams with BoofCV using [WebcamCapture](http://webcam-capture.sarxos.pl/)
@@ -60,8 +70,8 @@ examples/      | Set of example code designed to be easy to read and understand.
 integration/   | Contains code which allows BoofCV to be easily integrated with 3rd party libraries.  Primary for video input/output.
 main/          | Contains the source code for BoofCV
 
-Building from Source
-====================================
+# Building from Source
+------------------------------------
 
 BoofCV is a java library and can be compiled on any platform with Java installed. Gradle is now the preferred way to build BoofCV.  There are still Ant build scripts laying around but those will be removed in the near future and their use is not officially supported any more.
 
@@ -72,9 +82,7 @@ BEFORE trying to compile BoofCV make sure you have the following installed and t
 - [ Gradle                                            ]
   ( http://www.gradle.org/                            )
 
-BoofCV is very easy to build on just about any system with Gradle and Java support.  Gradle will download all of the 
-dependencies for you.  Well that's not totally true, there are a couple of optional packages which require manual 
-downloading since they lack jars on Maven central. More on that later.
+BoofCV is very easy to build on just about any system with Gradle and Java support.  Gradle will download all of the dependencies for you.  Well that's not totally true, there are a couple of optional packages which require manual downloading since they lack jars on Maven central. More on that later.
 
 *NOTE* As an alternative to installing Gradle directly there are shell scripts "boofcv/gradlew" and "boofcv/gradlew.bat".  They will download gradle and execute the commands the same as invoking "gradle" would.
 
@@ -82,21 +90,15 @@ Below are a few useful custom Gradle scripts that can be invoked:
 
 * _createLibraryDirectory_ : Will gather all the BoofCV jars (main and integration) and jars which boofcv/main depend on and place them in the boofcv/library directory.
 * _alljavadoc_ : Combines JavaDoc from all the sub-projects into one set.
-* _exampleRun_ : Used to run an example from boofcv/examples, e.g. "gradle exampleRun -Pwhich=boofcv.examples.imageprocessing.ExampleBinaryOps"
-* _webcamRun_ : Used to run an example from integration/WebcamCapture, e.g. "gradle webcamRun -Pwhich=boofcv.examples.ExampleTrackingKlt"
 
 _createLibraryDirectory_ unless all dependencies are meet, not all projects in 'boofcv/integration' will produce jars.  See the "Integration Modules" section below for the details.
 
 ## Compilation Error
 
-A stable build should always compile out of the box with no problem.  All of the examples should run without any problems,
-as long as you don't modify anything, even slightly.  Before you complain about a problem on a stable build make 
-sure you are absolutely certain that you're doing everything right.  If after a few 
+A stable build should always compile out of the box with no problem.  All of the examples should run without any problems, as long as you don't modify anything, even slightly.  Before you complain about a problem on a stable build make sure you are absolutely certain that you're doing everything right.  If after a few 
 attempts you still can't figure out post a message.  Maybe these instructions are lacking in clarity.
 
-If you checked out the code from Github then you don't have a stable build and like to live dangerously.  There is a 
-chance the code won't compile or one of the libraries it depends on has changed.  If you get a compilation error feel 
-free to post a polite message with a copy of the error asking for someone to fix it.
+If you checked out the code from Github then you don't have a stable build and like to live dangerously.  There is a chance the code won't compile or one of the libraries it depends on has changed.  If you get a compilation error feel free to post a polite message with a copy of the error asking for someone to fix it.
 
 ## IntelliJ
 
@@ -134,12 +136,25 @@ Eclipse has a Gradle plugin available which allow it to open a Gradle project di
 
 ## Integration Modules
 
-Most of the modules in the integration package should automatically with everything else.  Some require you to 
-manually download and place files in certain locations.  Until you do so Gradle will ignore those modules.
+Most of the modules in the integration package should automatically with everything else.  Some require you to manually download and place files in certain locations.  Until you do so Gradle will ignore those modules.
 Specific instructions are contained in the readme file in each of the module directories.
 
-Dependencies
-====================================
+# Running Example Code
+-----------------------------------------
+
+The example code can be easily run from your favorite IDE.  You might need to change the workspace directory so that
+it can find the boofcv/data directory.
+
+Examples can also be run using gradle.
+
+* _exampleRun_ : Ruins an example from boofcv/examples
+  * gradle exampleRun -Pwhich=boofcv.examples.imageprocessing.ExampleBinaryOps
+* _webcamRun_ : Run an example from boofcv/integration/WebcamCapture
+  * gradle webcamRun -Pwhich=boofcv.examples.ExampleTrackingKlt
+
+
+# Dependencies
+-----------------------------------------
 
 The main BoofCV modules depends on the following libraries:
 
@@ -153,10 +168,9 @@ The following are required for running unit tests
 
 The optional sub-projects in integration also have several dependencies. See those sub-projects for a list of their dependencies.
 
-Contact
-====================================
+# Contact
+------------------------------------
 
-For questions or comments about BoofCV please use the message board.  Only post a bug report after doing some due
-diligence to make sure it is really a bug and that it has not already been reported.
+For questions or comments about BoofCV please use the message board.  Only post a bug report after doing some due diligence to make sure it is really a bug and that it has not already been reported.
 
 [Message Board](http://groups.google.com/group/boofcv)
