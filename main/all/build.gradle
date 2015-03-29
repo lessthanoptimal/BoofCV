@@ -1,0 +1,18 @@
+
+dependencies {
+    compile project(':main:calibration')
+    compile project(':main:feature')
+    compile project(':main:geo')
+    compile project(':main:io')
+    compile project(':main:ip')
+    compile project(':main:learning')
+    compile project(':main:recognition')
+    compile project(':main:sfm')
+    compile project(':main:visualize')
+}
+
+idea {
+    module {
+        name = "BoofCV All"
+    }
+}

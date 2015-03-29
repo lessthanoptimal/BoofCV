@@ -16,6 +16,9 @@ Version : Alpha 0.19
   * Added utilities to convert Picture into BoofCV formatted images
 - Images can be serialized again
   * Made ImageType serializable now
+- Scene classification
+  * Bag-of-Words based techniques
+  * K-Nearest-Neighbor classification.  Learning and Classifier
 
 TODO
   * Square Detector.  Create set of images in validation boof with hand selected corners

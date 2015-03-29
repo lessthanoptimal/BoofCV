@@ -1,7 +1,5 @@
 dependencies {
-    compile project(':main:ip')
-    compile project(':main:io')
-    compile project(':main:feature')
+    compile project(':main:all')
 }
 
 idea {

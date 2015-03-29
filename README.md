@@ -15,21 +15,50 @@ You can download complete jars, use Maven, or checkout from Github.  See the web
 
 http://boofcv.org/index.php?title=Download:BoofCV
 
+## Include in Gradle and Maven Projects
+
+BoofCV is divided up into many modules.  The easiest way to include all of them is to make your project dependent on 'main:all'
+
+For Gradle projects:
+```groovy
+compile group: 'org.boofcv', name: 'main:all', version: '0.19'
+```
+
+For Maven projects:
+```
+<dependency>
+  <groupId>org.boofcv</groupId>
+  <artifactId>main:all</artifactId>
+  <version>0.19</version>
+</dependency>
+```
+
+There are also several integration modules which help BoofCV interact with external projects.  A list of those is included below:
+
+          Name            |                 Description
+--------------------------|---------------------------------------------------------------------
+integration:applet        | Code for using BoofCV inside a Java applet
+integration:jcodec        | [JCodec]{http://jcodec.org/} is a pure Java video reader/writer
+integration:openkinect    | Used the [Kinect](http://openkinect.org) RGB-D sensor with BoofCV
+integration:processing    | Easy to use interface in [Processing](https://processing.org/) programming language
+integration:WebcamCapture | Use webcams with BoofCV using [WebcamCapture](http://webcam-capture.sarxos.pl/)
+integration:xuggler       | [Xuggler](http://www.xuggle.com/xuggler/) is a wrapper around FFMPEG for reading video files.
+
+
 ## New to Java?
 
 If you are new to Java, then using BoofCV will be a challenge.  With just a little bit of knowledge it is possible to build and run examples using the instructions below.  Integrating BoofCV into your own project is another issue.  If you don't know what a jar file is or how to import classes, it is highly recommend that you learn the basics first before attempting to use BoofCV.
 
 ## Directories
 
-<pre>
-applet/        | Contains source code for Java applets which demonstrate BoofCV's capabilities.
+Directory      | Description
+---------------|-------------------------------------------------------------------------------------
+applications/  | Helpful applications
 data/          | Directory containing optional data used by applets and examples.
-evaluation/    | Code that is used to debug and evaluate BoofCV's performance.
+evaluation/    | Contains code used to visual and debug.  Where the Applet code resides
 examples/      | Set of example code designed to be easy to read and understand.
 integration/   | Contains code which allows BoofCV to be easily integrated with 3rd party libraries.  Primary for video input/output.
-lib/           | Set of 3rd party libraries that BoofCV is dependent on.
 main/          | Contains the source code for BoofCV
-</pre>
 
 Building from Source
 ====================================
