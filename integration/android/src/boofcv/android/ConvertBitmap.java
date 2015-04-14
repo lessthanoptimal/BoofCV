@@ -218,7 +218,7 @@ public class ConvertBitmap {
 		else if( input instanceof ImageFloat32 )
 			grayToBitmap((ImageFloat32)input,output,storage);
 		else
-			throw new IllegalArgumentException("Unsupported BoofCV Type");
+			throw new IllegalArgumentException("Unsupported BoofCV Type: "+input);
 	}
 	
 	/**

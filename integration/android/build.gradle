@@ -8,6 +8,9 @@ ext.ANDROID_PATH = System.getenv()['ANDROID_HOME']+"/platforms/"+ext.ANDROID_PLA
 
 println "Build Android module using $ext.ANDROID_PATH"
 
+// disable tests since they can't be run on a regular desktop
+test.enabled = false
+
 dependencies {
     compile project(':main:ip')
     compile project(':main:feature')
