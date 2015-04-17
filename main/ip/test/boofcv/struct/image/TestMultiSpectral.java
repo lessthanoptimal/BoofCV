@@ -19,9 +19,6 @@
 package boofcv.struct.image;
 
 import boofcv.alg.misc.GImageMiscOps;
-import boofcv.core.image.FactoryGImageSingleBand;
-import boofcv.core.image.GImageSingleBand;
-import boofcv.core.image.GeneralizedImageOps;
 import boofcv.testing.BoofTesting;
 import com.sun.xml.internal.messaging.saaj.util.ByteInputStream;
 import com.sun.xml.internal.messaging.saaj.util.ByteOutputStream;
@@ -99,13 +96,13 @@ public class TestMultiSpectral {
 
 		// reshape to something smaller
 		img.reshape(5,4);
-		assertEquals(5,img.getWidth());
+		assertEquals(5, img.getWidth());
 		assertEquals(4,img.getHeight());
 
 		// reshape to something larger
-		img.reshape(15,21);
+		img.reshape(15, 21);
 		assertEquals(15,img.getWidth());
-		assertEquals(21,img.getHeight());
+		assertEquals(21, img.getHeight());
 	}
 
 	@Test
@@ -136,7 +133,21 @@ public class TestMultiSpectral {
 		c = c.subimage(7,8,12,18, null);
 		c.setTo(a);
 
-		BoofTesting.assertEquals(a,c,1e-8);
+		BoofTesting.assertEquals(a, c, 1e-8);
+	}
+
+	/**
+	 * The two matrices do not have the same shape
+	 */
+	@Test
+	public void setTo_mismatch() {
+		MultiSpectral<ImageUInt8> a = new MultiSpectral<ImageUInt8>(ImageUInt8.class,5, 10, 3);
+		MultiSpectral<ImageUInt8> b = new MultiSpectral<ImageUInt8>(ImageUInt8.class,6, 11, 3);
+
+		a.setTo(b);
+
+		assertEquals(a.width, 6);
+		assertEquals(b.height, 11);
 	}
 
 	@Test

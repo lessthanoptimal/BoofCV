@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -82,12 +82,15 @@ public class TestImageSingleBand {
 	/**
 	 * The two matrices do not have the same shape
 	 */
-	@Test(expected = IllegalArgumentException.class)
+	@Test
 	public void setTo_mismatch() {
 		DummyImage a = new DummyImage(10, 20);
-		DummyImage b = new DummyImage(11, 20);
+		DummyImage b = new DummyImage(11, 21);
 
 		a.setTo(b);
+
+		assertEquals(a.width, 11);
+		assertEquals(b.height, 21);
 	}
 
 	/**
@@ -163,7 +166,7 @@ public class TestImageSingleBand {
 
 		@Override
 		public DummyImage _createNew(int imgWidth, int imgHeight) {
-			return new DummyImage();
+			return new DummyImage(imgWidth,imgHeight);
 		}
 	}
 }

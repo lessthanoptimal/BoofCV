@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -149,16 +149,16 @@ public abstract class ImageSingleBand<T extends ImageSingleBand> extends ImageBa
 	}
 
 	/**
-	 * Sets the values of each pixel equal to the pixels in the specified matrix.  Both image's shape
-	 * must be the same.
+	 * Sets the values of each pixel equal to the pixels in the specified matrix. If the images are not
+	 * the same shape this will be resized.
 	 *
 	 * @param orig The original image whose value is to be copied into this one
 	 */
 	@SuppressWarnings({"SuspiciousSystemArraycopy"})
 	@Override
 	public void setTo(T orig) {
-		if (orig.width != width || orig.height != height)
-			throw new IllegalArgumentException("The width and/or height of 'orig' is not the same as this class");
+		if( width != orig.width || height != orig.height)
+			reshape(orig.width,orig.height);
 
 		if (!orig.isSubimage() && !isSubimage()) {
 			System.arraycopy(orig._getData(), orig.startIndex, _getData(), startIndex, stride * height);

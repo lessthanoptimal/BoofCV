@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -173,15 +173,15 @@ public class MultiSpectral<T extends ImageSingleBand> extends ImageMultiBand<Mul
 	}
 
 	/**
-	 * Sets the values of each pixel equal to the pixels in the specified matrix.  Both image's shape
-	 * must be the same.
+	 * Sets the values of each pixel equal to the pixels in the specified matrix.
+	 * Automatically resized to match the input image.
 	 *
 	 * @param orig The original image whose value is to be copied into this one
 	 */
 	@Override
 	public void setTo( MultiSpectral<T> orig) {
 		if (orig.width != width || orig.height != height)
-			throw new IllegalArgumentException("The width and/or height of 'orig' is not the same as this class");
+			reshape(orig.width,orig.height);
 		if( orig.getNumBands() != getNumBands() )
 			throw new IllegalArgumentException("The number of bands must be the same");
 		if( orig.getType() != getType() )

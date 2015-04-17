@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -114,8 +114,7 @@ public abstract class ImageInterleaved<T extends ImageInterleaved> extends Image
 	}
 
 	/**
-	 * Sets this image equal to the specified image.  Both image's shape
-	 * must be the same.
+	 * Sets this image equal to the specified image. Automatically resized to match the input image.
 	 *
 	 * @param orig The original image whose value is to be copied into this one
 	 */
@@ -123,7 +122,7 @@ public abstract class ImageInterleaved<T extends ImageInterleaved> extends Image
 	@Override
 	public void setTo(T orig) {
 		if (orig.width != width || orig.height != height)
-			throw new IllegalArgumentException("The width and/or height of 'orig' is not the same as this class");
+			reshape(orig.width,orig.height);
 		if (orig.numBands != numBands)
 			throw new IllegalArgumentException("The two images have different number of bands");
 
