@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -262,6 +262,38 @@ public class ImageMiscOps {
 	}
 
 	/**
+	 * In-place 90 degree image rotation in the clockwise direction.  Only works on
+	 * square images.
+	 */
+	public static void rotateCW( ImageInt8 image ) {
+		if( image.width != image.height )
+			throw new IllegalArgumentException("Image must be square");
+
+		int w = image.height/2 + image.height%2;
+		int h = image.height/2;
+
+		for( int y0 = 0; y0 < h; y0++ ) {
+			int y1 = image.height-y0-1;
+
+			for( int x0 = 0; x0 < w; x0++ ) {
+				int x1 = image.width-x0-1;
+
+				int index0 = image.startIndex + y0*image.stride + x0;
+				int index1 = image.startIndex + x0*image.stride + y1;
+				int index2 = image.startIndex + y1*image.stride + x1;
+				int index3 = image.startIndex + x1*image.stride + y0;
+				
+				int tmp3 = image.data[index3];
+
+				image.data[index3] = image.data[index2];
+				image.data[index2] = image.data[index1];
+				image.data[index1] = image.data[index0];
+				image.data[index0] = (byte)tmp3;
+			}
+		}
+	}
+
+	/**
 	 * Rotates the image 90 degrees in the clockwise direction.
 	 */
 	public static void rotateCW( ImageInt8 input , ImageInt8 output ) {
@@ -274,6 +306,38 @@ public class ImageMiscOps {
 			int indexIn = input.startIndex + y*input.stride;
 			for (int x = 0; x < input.width; x++) {
 				output.unsafe_set(h-y,x,input.data[indexIn++]);
+			}
+		}
+	}
+
+	/**
+	 * In-place 90 degree image rotation in the counter-clockwise direction.  Only works on
+	 * square images.
+	 */
+	public static void rotateCCW( ImageInt8 image ) {
+		if( image.width != image.height )
+			throw new IllegalArgumentException("Image must be square");
+
+		int w = image.height/2 + image.height%2;
+		int h = image.height/2;
+
+		for( int y0 = 0; y0 < h; y0++ ) {
+			int y1 = image.height-y0-1;
+
+			for( int x0 = 0; x0 < w; x0++ ) {
+				int x1 = image.width-x0-1;
+
+				int index0 = image.startIndex + y0*image.stride + x0;
+				int index1 = image.startIndex + x0*image.stride + y1;
+				int index2 = image.startIndex + y1*image.stride + x1;
+				int index3 = image.startIndex + x1*image.stride + y0;
+				
+				int tmp0 = image.data[index0];
+
+				image.data[index0] = image.data[index1];
+				image.data[index1] = image.data[index2];
+				image.data[index2] = image.data[index3];
+				image.data[index3] = (byte)tmp0;
 			}
 		}
 	}
@@ -526,6 +590,38 @@ public class ImageMiscOps {
 	}
 
 	/**
+	 * In-place 90 degree image rotation in the clockwise direction.  Only works on
+	 * square images.
+	 */
+	public static void rotateCW( ImageInt16 image ) {
+		if( image.width != image.height )
+			throw new IllegalArgumentException("Image must be square");
+
+		int w = image.height/2 + image.height%2;
+		int h = image.height/2;
+
+		for( int y0 = 0; y0 < h; y0++ ) {
+			int y1 = image.height-y0-1;
+
+			for( int x0 = 0; x0 < w; x0++ ) {
+				int x1 = image.width-x0-1;
+
+				int index0 = image.startIndex + y0*image.stride + x0;
+				int index1 = image.startIndex + x0*image.stride + y1;
+				int index2 = image.startIndex + y1*image.stride + x1;
+				int index3 = image.startIndex + x1*image.stride + y0;
+				
+				int tmp3 = image.data[index3];
+
+				image.data[index3] = image.data[index2];
+				image.data[index2] = image.data[index1];
+				image.data[index1] = image.data[index0];
+				image.data[index0] = (short)tmp3;
+			}
+		}
+	}
+
+	/**
 	 * Rotates the image 90 degrees in the clockwise direction.
 	 */
 	public static void rotateCW( ImageInt16 input , ImageInt16 output ) {
@@ -538,6 +634,38 @@ public class ImageMiscOps {
 			int indexIn = input.startIndex + y*input.stride;
 			for (int x = 0; x < input.width; x++) {
 				output.unsafe_set(h-y,x,input.data[indexIn++]);
+			}
+		}
+	}
+
+	/**
+	 * In-place 90 degree image rotation in the counter-clockwise direction.  Only works on
+	 * square images.
+	 */
+	public static void rotateCCW( ImageInt16 image ) {
+		if( image.width != image.height )
+			throw new IllegalArgumentException("Image must be square");
+
+		int w = image.height/2 + image.height%2;
+		int h = image.height/2;
+
+		for( int y0 = 0; y0 < h; y0++ ) {
+			int y1 = image.height-y0-1;
+
+			for( int x0 = 0; x0 < w; x0++ ) {
+				int x1 = image.width-x0-1;
+
+				int index0 = image.startIndex + y0*image.stride + x0;
+				int index1 = image.startIndex + x0*image.stride + y1;
+				int index2 = image.startIndex + y1*image.stride + x1;
+				int index3 = image.startIndex + x1*image.stride + y0;
+				
+				int tmp0 = image.data[index0];
+
+				image.data[index0] = image.data[index1];
+				image.data[index1] = image.data[index2];
+				image.data[index2] = image.data[index3];
+				image.data[index3] = (short)tmp0;
 			}
 		}
 	}
@@ -790,6 +918,38 @@ public class ImageMiscOps {
 	}
 
 	/**
+	 * In-place 90 degree image rotation in the clockwise direction.  Only works on
+	 * square images.
+	 */
+	public static void rotateCW( ImageSInt32 image ) {
+		if( image.width != image.height )
+			throw new IllegalArgumentException("Image must be square");
+
+		int w = image.height/2 + image.height%2;
+		int h = image.height/2;
+
+		for( int y0 = 0; y0 < h; y0++ ) {
+			int y1 = image.height-y0-1;
+
+			for( int x0 = 0; x0 < w; x0++ ) {
+				int x1 = image.width-x0-1;
+
+				int index0 = image.startIndex + y0*image.stride + x0;
+				int index1 = image.startIndex + x0*image.stride + y1;
+				int index2 = image.startIndex + y1*image.stride + x1;
+				int index3 = image.startIndex + x1*image.stride + y0;
+				
+				int tmp3 = image.data[index3];
+
+				image.data[index3] = image.data[index2];
+				image.data[index2] = image.data[index1];
+				image.data[index1] = image.data[index0];
+				image.data[index0] = (int)tmp3;
+			}
+		}
+	}
+
+	/**
 	 * Rotates the image 90 degrees in the clockwise direction.
 	 */
 	public static void rotateCW( ImageSInt32 input , ImageSInt32 output ) {
@@ -802,6 +962,38 @@ public class ImageMiscOps {
 			int indexIn = input.startIndex + y*input.stride;
 			for (int x = 0; x < input.width; x++) {
 				output.unsafe_set(h-y,x,input.data[indexIn++]);
+			}
+		}
+	}
+
+	/**
+	 * In-place 90 degree image rotation in the counter-clockwise direction.  Only works on
+	 * square images.
+	 */
+	public static void rotateCCW( ImageSInt32 image ) {
+		if( image.width != image.height )
+			throw new IllegalArgumentException("Image must be square");
+
+		int w = image.height/2 + image.height%2;
+		int h = image.height/2;
+
+		for( int y0 = 0; y0 < h; y0++ ) {
+			int y1 = image.height-y0-1;
+
+			for( int x0 = 0; x0 < w; x0++ ) {
+				int x1 = image.width-x0-1;
+
+				int index0 = image.startIndex + y0*image.stride + x0;
+				int index1 = image.startIndex + x0*image.stride + y1;
+				int index2 = image.startIndex + y1*image.stride + x1;
+				int index3 = image.startIndex + x1*image.stride + y0;
+				
+				int tmp0 = image.data[index0];
+
+				image.data[index0] = image.data[index1];
+				image.data[index1] = image.data[index2];
+				image.data[index2] = image.data[index3];
+				image.data[index3] = (int)tmp0;
 			}
 		}
 	}
@@ -1054,6 +1246,38 @@ public class ImageMiscOps {
 	}
 
 	/**
+	 * In-place 90 degree image rotation in the clockwise direction.  Only works on
+	 * square images.
+	 */
+	public static void rotateCW( ImageSInt64 image ) {
+		if( image.width != image.height )
+			throw new IllegalArgumentException("Image must be square");
+
+		int w = image.height/2 + image.height%2;
+		int h = image.height/2;
+
+		for( int y0 = 0; y0 < h; y0++ ) {
+			int y1 = image.height-y0-1;
+
+			for( int x0 = 0; x0 < w; x0++ ) {
+				int x1 = image.width-x0-1;
+
+				int index0 = image.startIndex + y0*image.stride + x0;
+				int index1 = image.startIndex + x0*image.stride + y1;
+				int index2 = image.startIndex + y1*image.stride + x1;
+				int index3 = image.startIndex + x1*image.stride + y0;
+				
+				long tmp3 = image.data[index3];
+
+				image.data[index3] = image.data[index2];
+				image.data[index2] = image.data[index1];
+				image.data[index1] = image.data[index0];
+				image.data[index0] = (long)tmp3;
+			}
+		}
+	}
+
+	/**
 	 * Rotates the image 90 degrees in the clockwise direction.
 	 */
 	public static void rotateCW( ImageSInt64 input , ImageSInt64 output ) {
@@ -1066,6 +1290,38 @@ public class ImageMiscOps {
 			int indexIn = input.startIndex + y*input.stride;
 			for (int x = 0; x < input.width; x++) {
 				output.unsafe_set(h-y,x,input.data[indexIn++]);
+			}
+		}
+	}
+
+	/**
+	 * In-place 90 degree image rotation in the counter-clockwise direction.  Only works on
+	 * square images.
+	 */
+	public static void rotateCCW( ImageSInt64 image ) {
+		if( image.width != image.height )
+			throw new IllegalArgumentException("Image must be square");
+
+		int w = image.height/2 + image.height%2;
+		int h = image.height/2;
+
+		for( int y0 = 0; y0 < h; y0++ ) {
+			int y1 = image.height-y0-1;
+
+			for( int x0 = 0; x0 < w; x0++ ) {
+				int x1 = image.width-x0-1;
+
+				int index0 = image.startIndex + y0*image.stride + x0;
+				int index1 = image.startIndex + x0*image.stride + y1;
+				int index2 = image.startIndex + y1*image.stride + x1;
+				int index3 = image.startIndex + x1*image.stride + y0;
+				
+				long tmp0 = image.data[index0];
+
+				image.data[index0] = image.data[index1];
+				image.data[index1] = image.data[index2];
+				image.data[index2] = image.data[index3];
+				image.data[index3] = (long)tmp0;
 			}
 		}
 	}
@@ -1318,6 +1574,38 @@ public class ImageMiscOps {
 	}
 
 	/**
+	 * In-place 90 degree image rotation in the clockwise direction.  Only works on
+	 * square images.
+	 */
+	public static void rotateCW( ImageFloat32 image ) {
+		if( image.width != image.height )
+			throw new IllegalArgumentException("Image must be square");
+
+		int w = image.height/2 + image.height%2;
+		int h = image.height/2;
+
+		for( int y0 = 0; y0 < h; y0++ ) {
+			int y1 = image.height-y0-1;
+
+			for( int x0 = 0; x0 < w; x0++ ) {
+				int x1 = image.width-x0-1;
+
+				int index0 = image.startIndex + y0*image.stride + x0;
+				int index1 = image.startIndex + x0*image.stride + y1;
+				int index2 = image.startIndex + y1*image.stride + x1;
+				int index3 = image.startIndex + x1*image.stride + y0;
+				
+				float tmp3 = image.data[index3];
+
+				image.data[index3] = image.data[index2];
+				image.data[index2] = image.data[index1];
+				image.data[index1] = image.data[index0];
+				image.data[index0] = (float)tmp3;
+			}
+		}
+	}
+
+	/**
 	 * Rotates the image 90 degrees in the clockwise direction.
 	 */
 	public static void rotateCW( ImageFloat32 input , ImageFloat32 output ) {
@@ -1330,6 +1618,38 @@ public class ImageMiscOps {
 			int indexIn = input.startIndex + y*input.stride;
 			for (int x = 0; x < input.width; x++) {
 				output.unsafe_set(h-y,x,input.data[indexIn++]);
+			}
+		}
+	}
+
+	/**
+	 * In-place 90 degree image rotation in the counter-clockwise direction.  Only works on
+	 * square images.
+	 */
+	public static void rotateCCW( ImageFloat32 image ) {
+		if( image.width != image.height )
+			throw new IllegalArgumentException("Image must be square");
+
+		int w = image.height/2 + image.height%2;
+		int h = image.height/2;
+
+		for( int y0 = 0; y0 < h; y0++ ) {
+			int y1 = image.height-y0-1;
+
+			for( int x0 = 0; x0 < w; x0++ ) {
+				int x1 = image.width-x0-1;
+
+				int index0 = image.startIndex + y0*image.stride + x0;
+				int index1 = image.startIndex + x0*image.stride + y1;
+				int index2 = image.startIndex + y1*image.stride + x1;
+				int index3 = image.startIndex + x1*image.stride + y0;
+				
+				float tmp0 = image.data[index0];
+
+				image.data[index0] = image.data[index1];
+				image.data[index1] = image.data[index2];
+				image.data[index2] = image.data[index3];
+				image.data[index3] = (float)tmp0;
 			}
 		}
 	}
@@ -1582,6 +1902,38 @@ public class ImageMiscOps {
 	}
 
 	/**
+	 * In-place 90 degree image rotation in the clockwise direction.  Only works on
+	 * square images.
+	 */
+	public static void rotateCW( ImageFloat64 image ) {
+		if( image.width != image.height )
+			throw new IllegalArgumentException("Image must be square");
+
+		int w = image.height/2 + image.height%2;
+		int h = image.height/2;
+
+		for( int y0 = 0; y0 < h; y0++ ) {
+			int y1 = image.height-y0-1;
+
+			for( int x0 = 0; x0 < w; x0++ ) {
+				int x1 = image.width-x0-1;
+
+				int index0 = image.startIndex + y0*image.stride + x0;
+				int index1 = image.startIndex + x0*image.stride + y1;
+				int index2 = image.startIndex + y1*image.stride + x1;
+				int index3 = image.startIndex + x1*image.stride + y0;
+				
+				double tmp3 = image.data[index3];
+
+				image.data[index3] = image.data[index2];
+				image.data[index2] = image.data[index1];
+				image.data[index1] = image.data[index0];
+				image.data[index0] = (double)tmp3;
+			}
+		}
+	}
+
+	/**
 	 * Rotates the image 90 degrees in the clockwise direction.
 	 */
 	public static void rotateCW( ImageFloat64 input , ImageFloat64 output ) {
@@ -1594,6 +1946,38 @@ public class ImageMiscOps {
 			int indexIn = input.startIndex + y*input.stride;
 			for (int x = 0; x < input.width; x++) {
 				output.unsafe_set(h-y,x,input.data[indexIn++]);
+			}
+		}
+	}
+
+	/**
+	 * In-place 90 degree image rotation in the counter-clockwise direction.  Only works on
+	 * square images.
+	 */
+	public static void rotateCCW( ImageFloat64 image ) {
+		if( image.width != image.height )
+			throw new IllegalArgumentException("Image must be square");
+
+		int w = image.height/2 + image.height%2;
+		int h = image.height/2;
+
+		for( int y0 = 0; y0 < h; y0++ ) {
+			int y1 = image.height-y0-1;
+
+			for( int x0 = 0; x0 < w; x0++ ) {
+				int x1 = image.width-x0-1;
+
+				int index0 = image.startIndex + y0*image.stride + x0;
+				int index1 = image.startIndex + x0*image.stride + y1;
+				int index2 = image.startIndex + y1*image.stride + x1;
+				int index3 = image.startIndex + x1*image.stride + y0;
+				
+				double tmp0 = image.data[index0];
+
+				image.data[index0] = image.data[index1];
+				image.data[index1] = image.data[index2];
+				image.data[index2] = image.data[index3];
+				image.data[index3] = (double)tmp0;
 			}
 		}
 	}

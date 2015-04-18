@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -79,17 +79,17 @@ public class GImageMiscOps {
 	public static void fill( ImageBase input , double value ) {
 		if( input instanceof ImageSingleBand ) {
 			if( ImageInt8.class.isAssignableFrom(input.getClass()) ) {
-				ImageMiscOps.fill((ImageInt8)input,(int)value);
+				ImageMiscOps.fill((ImageInt8) input, (int) value);
 			} else if( ImageInt16.class.isAssignableFrom(input.getClass()) ) {
-				ImageMiscOps.fill((ImageInt16)input,(int)value);
+				ImageMiscOps.fill((ImageInt16) input, (int) value);
 			} else if( ImageSInt32.class == input.getClass() ) {
-				ImageMiscOps.fill((ImageSInt32)input,(int)value);
+				ImageMiscOps.fill((ImageSInt32) input, (int) value);
 			} else if( ImageSInt64.class == input.getClass() ) {
-				ImageMiscOps.fill((ImageSInt64)input,(long)value);
+				ImageMiscOps.fill((ImageSInt64) input, (long) value);
 			} else if( ImageFloat32.class == input.getClass() ) {
-				ImageMiscOps.fill((ImageFloat32)input,(float)value);
+				ImageMiscOps.fill((ImageFloat32) input, (float) value);
 			} else if( ImageFloat64.class == input.getClass() ) {
-				ImageMiscOps.fill((ImageFloat64)input,value);
+				ImageMiscOps.fill((ImageFloat64) input, value);
 			} else {
 				throw new IllegalArgumentException("Unknown image Type: "+input.getClass().getSimpleName());
 			}
@@ -164,24 +164,24 @@ public class GImageMiscOps {
 	public static void fillRectangle( ImageBase input , double value, int x0, int y0, int width, int height ) {
 		if( input instanceof ImageSingleBand ) {
 			if( ImageInt8.class.isAssignableFrom(input.getClass()) ) {
-				ImageMiscOps.fillRectangle((ImageInt8)input,(int)value,x0,y0,width,height);
+				ImageMiscOps.fillRectangle((ImageInt8) input, (int) value, x0, y0, width, height);
 			} else if( ImageInt16.class.isAssignableFrom(input.getClass()) ) {
-				ImageMiscOps.fillRectangle((ImageInt16)input,(int)value,x0,y0,width,height);
+				ImageMiscOps.fillRectangle((ImageInt16) input, (int) value, x0, y0, width, height);
 			} else if( ImageSInt32.class == input.getClass() ) {
-				ImageMiscOps.fillRectangle((ImageSInt32)input,(int)value,x0,y0,width,height);
+				ImageMiscOps.fillRectangle((ImageSInt32) input, (int) value, x0, y0, width, height);
 			} else if( ImageSInt64.class == input.getClass() ) {
-				ImageMiscOps.fillRectangle((ImageSInt64)input,(long)value,x0,y0,width,height);
+				ImageMiscOps.fillRectangle((ImageSInt64) input, (long) value, x0, y0, width, height);
 			} else if( ImageFloat32.class == input.getClass() ) {
-				ImageMiscOps.fillRectangle((ImageFloat32)input,(float)value,x0,y0,width,height);
+				ImageMiscOps.fillRectangle((ImageFloat32) input, (float) value, x0, y0, width, height);
 			} else if( ImageFloat64.class == input.getClass() ) {
-				ImageMiscOps.fillRectangle((ImageFloat64)input,value,x0,y0,width,height);
+				ImageMiscOps.fillRectangle((ImageFloat64) input, value, x0, y0, width, height);
 			} else {
 				throw new IllegalArgumentException("Unknown image Type: "+input.getClass().getSimpleName());
 			}
 		} else if( input instanceof MultiSpectral ) {
 			MultiSpectral m = (MultiSpectral)input;
 			for( int i = 0; i < m.getNumBands(); i++ )
-				fillRectangle(m.getBand(i),value,x0,y0,width,height);
+				fillRectangle(m.getBand(i), value, x0, y0, width, height);
 		} else {
 			throw new IllegalArgumentException("Unknown image type: " + input.getClass().getSimpleName());
 		}
@@ -236,17 +236,17 @@ public class GImageMiscOps {
 	public static void fillUniform( ImageBase input , Random rand , double min , double max  ) {
 		if( input instanceof ImageSingleBand ) {
 			if( ImageInt8.class.isAssignableFrom(input.getClass()) ) {
-				ImageMiscOps.fillUniform((ImageInt8) input, rand, (int) min, ((int)max)-1);
+				ImageMiscOps.fillUniform((ImageInt8) input, rand, (int) min, ((int) max) - 1);
 			} else if( ImageInt16.class.isAssignableFrom(input.getClass()) ) {
-				ImageMiscOps.fillUniform((ImageInt16) input, rand, (int) min, ((int)max)-1);
+				ImageMiscOps.fillUniform((ImageInt16) input, rand, (int) min, ((int) max) - 1);
 			} else if( ImageSInt32.class == input.getClass() ) {
-				ImageMiscOps.fillUniform((ImageSInt32) input, rand, (int) min, ((int)max)-1);
+				ImageMiscOps.fillUniform((ImageSInt32) input, rand, (int) min, ((int) max) - 1);
 			} else if( ImageSInt64.class == input.getClass() ) {
-				ImageMiscOps.fillUniform((ImageSInt64) input, rand, (long) min, ((long)max)-1);
+				ImageMiscOps.fillUniform((ImageSInt64) input, rand, (long) min, ((long) max) - 1);
 			} else if( ImageFloat32.class == input.getClass() ) {
-				ImageMiscOps.fillUniform((ImageFloat32) input, rand, (float)min, (float) max);
+				ImageMiscOps.fillUniform((ImageFloat32) input, rand, (float) min, (float) max);
 			} else if( ImageFloat64.class == input.getClass() ) {
-				ImageMiscOps.fillUniform((ImageFloat64) input, rand, min,  max);
+				ImageMiscOps.fillUniform((ImageFloat64) input, rand, min, max);
 			} else {
 				throw new IllegalArgumentException("Unknown image Type: "+input.getClass().getSimpleName());
 			}
@@ -356,17 +356,17 @@ public class GImageMiscOps {
 	public static void flipVertical( ImageBase img ) {
 		if( img instanceof ImageSingleBand ) {
 			if( ImageInt8.class.isAssignableFrom(img.getClass()) ) {
-				ImageMiscOps.flipVertical((ImageInt8)img);
+				ImageMiscOps.flipVertical((ImageInt8) img);
 			} else if( ImageInt16.class.isAssignableFrom(img.getClass()) ) {
-				ImageMiscOps.flipVertical((ImageInt16)img);
+				ImageMiscOps.flipVertical((ImageInt16) img);
 			} else if ( ImageSInt32.class.isAssignableFrom(img.getClass()) ) {
-				ImageMiscOps.flipVertical((ImageSInt32)img);
+				ImageMiscOps.flipVertical((ImageSInt32) img);
 			} else if ( ImageSInt64.class.isAssignableFrom(img.getClass()) ) {
-				ImageMiscOps.flipVertical((ImageSInt64)img);
+				ImageMiscOps.flipVertical((ImageSInt64) img);
 			} else if (ImageFloat32.class.isAssignableFrom(img.getClass()) ) {
-				ImageMiscOps.flipVertical((ImageFloat32)img);
+				ImageMiscOps.flipVertical((ImageFloat32) img);
 			} else if (ImageFloat64.class.isAssignableFrom(img.getClass()) ) {
-				ImageMiscOps.flipVertical((ImageFloat64)img);
+				ImageMiscOps.flipVertical((ImageFloat64) img);
 			} else if (ImageSInt64.class.isAssignableFrom(img.getClass()) ) {
 				ImageMiscOps.flipVertical((ImageSInt64) img);
 			} else {
@@ -413,6 +413,38 @@ public class GImageMiscOps {
 	}
 
 	/**
+	 * In-place 90 degree image rotation in the clockwise direction.  Only works on
+	 * square images.
+	 */
+	public static void rotateCW( ImageBase image ) {
+		if( image instanceof ImageSingleBand ) {
+			if( ImageInt8.class.isAssignableFrom(image.getClass()) ) {
+				ImageMiscOps.rotateCW((ImageInt8) image);
+			} else if( ImageInt16.class.isAssignableFrom(image.getClass()) ) {
+				ImageMiscOps.rotateCW((ImageInt16) image);
+			} else if ( ImageSInt32.class.isAssignableFrom(image.getClass()) ) {
+				ImageMiscOps.rotateCW((ImageSInt32) image);
+			} else if ( ImageSInt64.class.isAssignableFrom(image.getClass()) ) {
+				ImageMiscOps.rotateCW((ImageSInt64) image);
+			} else if (ImageFloat32.class.isAssignableFrom(image.getClass()) ) {
+				ImageMiscOps.rotateCW((ImageFloat32) image);
+			} else if (ImageFloat64.class.isAssignableFrom(image.getClass()) ) {
+				ImageMiscOps.rotateCW((ImageFloat64) image);
+			} else if (ImageSInt64.class.isAssignableFrom(image.getClass()) ) {
+				ImageMiscOps.rotateCW((ImageSInt64) image);
+			} else {
+				throw new IllegalArgumentException("Unknown or incompatible image type: " + image.getClass().getSimpleName());
+			}
+		} else if( image instanceof MultiSpectral ) {
+			MultiSpectral a = (MultiSpectral)image;
+			for( int i = 0; i < a.getNumBands(); i++ )
+				rotateCW(a.getBand(i));
+		} else {
+			throw new IllegalArgumentException("Unknown image type: " + image.getClass().getSimpleName());
+		}
+	}
+
+	/**
 	 * Rotates the image 90 degrees in the clockwise direction.
 	 */
 	public static void rotateCW( ImageBase imageA , ImageBase imageB ) {
@@ -430,7 +462,7 @@ public class GImageMiscOps {
 			} else if (ImageFloat64.class.isAssignableFrom(imageA.getClass()) ) {
 				ImageMiscOps.rotateCW((ImageFloat64) imageA, (ImageFloat64) imageB);
 			} else if (ImageSInt64.class.isAssignableFrom(imageA.getClass()) ) {
-				ImageMiscOps.rotateCW((ImageSInt64) imageA,(ImageSInt64) imageB);
+				ImageMiscOps.rotateCW((ImageSInt64) imageA, (ImageSInt64) imageB);
 			} else {
 				throw new IllegalArgumentException("Unknown or incompatible image type: " + imageA.getClass().getSimpleName());
 			}
@@ -441,6 +473,38 @@ public class GImageMiscOps {
 				rotateCW(a.getBand(i), b.getBand(i));
 		} else {
 			throw new IllegalArgumentException("Unknown image type: " + imageA.getClass().getSimpleName());
+		}
+	}
+
+	/**
+	 * In-place 90 degree image rotation in the counter-clockwise direction.  Only works on
+	 * square images.
+	 */
+	public static void rotateCCW( ImageBase image ) {
+		if( image instanceof ImageSingleBand ) {
+			if( ImageInt8.class.isAssignableFrom(image.getClass()) ) {
+				ImageMiscOps.rotateCCW((ImageInt8) image);
+			} else if( ImageInt16.class.isAssignableFrom(image.getClass()) ) {
+				ImageMiscOps.rotateCCW((ImageInt16) image);
+			} else if ( ImageSInt32.class.isAssignableFrom(image.getClass()) ) {
+				ImageMiscOps.rotateCCW((ImageSInt32) image);
+			} else if ( ImageSInt64.class.isAssignableFrom(image.getClass()) ) {
+				ImageMiscOps.rotateCCW((ImageSInt64) image);
+			} else if (ImageFloat32.class.isAssignableFrom(image.getClass()) ) {
+				ImageMiscOps.rotateCCW((ImageFloat32) image);
+			} else if (ImageFloat64.class.isAssignableFrom(image.getClass()) ) {
+				ImageMiscOps.rotateCCW((ImageFloat64) image);
+			} else if (ImageSInt64.class.isAssignableFrom(image.getClass()) ) {
+				ImageMiscOps.rotateCCW((ImageSInt64) image);
+			} else {
+				throw new IllegalArgumentException("Unknown or incompatible image type: " + image.getClass().getSimpleName());
+			}
+		} else if( image instanceof MultiSpectral ) {
+			MultiSpectral a = (MultiSpectral)image;
+			for( int i = 0; i < a.getNumBands(); i++ )
+				rotateCCW(a.getBand(i));
+		} else {
+			throw new IllegalArgumentException("Unknown image type: " + image.getClass().getSimpleName());
 		}
 	}
 

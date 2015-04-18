@@ -22,6 +22,7 @@ Version : Alpha 0.19
 - Image setTo() will now automatically resize the image to match it's input
 - Added invert option to visualizing binary images
   * swing and android
+- Added in-place CW and CCW image rotation
 
 TODO
   * Square Detector.  Create set of images in validation boof with hand selected corners

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -46,7 +46,7 @@ public class TestImageMiscOps {
 
 	@Test
 	public void checkAll() {
-		int numExpected = 12*6 + 8*2;
+		int numExpected = 14*6 + 8*2;
 		Method methods[] = ImageMiscOps.class.getMethods();
 
 		// sanity check to make sure the functions are being found
@@ -333,7 +333,7 @@ public class TestImageMiscOps {
 	private void testAddUniform( Method m ) throws InvocationTargetException, IllegalAccessException {
 		Class paramTypes[] = m.getParameterTypes();
 		ImageSingleBand orig = GeneralizedImageOps.createSingleBand(paramTypes[0], width, height);
-		GImageMiscOps.fill(orig,1);
+		GImageMiscOps.fill(orig, 1);
 
 		if( orig.getDataType().isInteger() ) {
 			m.invoke(null,orig,rand,1,10);
@@ -370,7 +370,7 @@ public class TestImageMiscOps {
 		}
 
 		GImageMiscOps.fill(orig,mean);
-		m.invoke(null,orig,rand,10.0,0,255);
+		m.invoke(null, orig, rand, 10.0, 0, 255);
 
 		double stdev10 = 0;
 		for( int i = 0; i < height; i++ ) {
@@ -387,18 +387,18 @@ public class TestImageMiscOps {
 	private void testFlipVertical(Method m) throws InvocationTargetException, IllegalAccessException {
 
 		// test with an even and odd height
-		testFlipVertical(m,height);
-		testFlipVertical(m,height+1);
+		testFlipVertical(m, height);
+		testFlipVertical(m, height + 1);
 	}
 
 	private void testFlipVertical(Method m, int height) throws IllegalAccessException, InvocationTargetException {
 		Class paramTypes[] = m.getParameterTypes();
 		ImageSingleBand imgA = GeneralizedImageOps.createSingleBand(paramTypes[0], width, height);
 
-		GImageMiscOps.fillUniform(imgA,rand,0,100);
+		GImageMiscOps.fillUniform(imgA, rand, 0, 100);
 		ImageSingleBand imgB = (ImageSingleBand)imgA.clone();
 
-		m.invoke(null,imgB);
+		m.invoke(null, imgB);
 
 		for( int y = 0; y < height; y++ ) {
 			for( int x = 0; x < width; x++ ) {
@@ -420,10 +420,10 @@ public class TestImageMiscOps {
 		Class paramTypes[] = m.getParameterTypes();
 		ImageSingleBand imgA = GeneralizedImageOps.createSingleBand(paramTypes[0], width, height);
 
-		GImageMiscOps.fillUniform(imgA,rand,0,100);
+		GImageMiscOps.fillUniform(imgA, rand, 0, 100);
 		ImageSingleBand imgB = (ImageSingleBand)imgA.clone();
 
-		m.invoke(null,imgB);
+		m.invoke(null, imgB);
 
 		for( int y = 0; y < height; y++ ) {
 			for( int x = 0; x < width; x++ ) {
@@ -435,6 +435,38 @@ public class TestImageMiscOps {
 	}
 
 	public void testRotateCW( Method m ) throws InvocationTargetException, IllegalAccessException {
+		Class paramTypes[] = m.getParameterTypes();
+		if( paramTypes.length == 1 ) {
+			testRotateCW_one(m);
+		} else {
+			testRotateCW_two(m);
+		}
+	}
+
+	public void testRotateCW_one( Method m ) throws InvocationTargetException, IllegalAccessException {
+		Class paramTypes[] = m.getParameterTypes();
+
+		// test even and odd width
+		for (int i = 0; i < 2; i++) {
+			int w = 6+i;
+			ImageSingleBand orig = GeneralizedImageOps.createSingleBand(paramTypes[0], w, w);
+			GImageMiscOps.fillUniform(orig, rand, 0, 10);
+			ImageSingleBand rotated = (ImageSingleBand)orig.clone();
+
+			m.invoke(null, rotated);
+
+			for (int y = 0; y < w; y++) {
+				for (int x = 0; x < w; x++) {
+					double expected = GeneralizedImageOps.get(orig,x,y);
+					double found = GeneralizedImageOps.get(rotated,w-y-1,x);
+
+					assertEquals(x+" "+y,expected,found,1e-8);
+				}
+			}
+		}
+	}
+
+	public void testRotateCW_two( Method m ) throws InvocationTargetException, IllegalAccessException {
 		Class paramTypes[] = m.getParameterTypes();
 		ImageSingleBand a = GeneralizedImageOps.createSingleBand(paramTypes[0], 3, 2);
 		ImageSingleBand b = GeneralizedImageOps.createSingleBand(paramTypes[0], 2, 3);
@@ -454,6 +486,37 @@ public class TestImageMiscOps {
 	}
 
 	public void testRotateCCW( Method m ) throws InvocationTargetException, IllegalAccessException {
+		Class paramTypes[] = m.getParameterTypes();
+		if( paramTypes.length == 1 ) {
+			testRotateCCW_one(m);
+		} else {
+			testRotateCCW_two(m);
+		}
+	}
+
+	public void testRotateCCW_one( Method m ) throws InvocationTargetException, IllegalAccessException {
+		Class paramTypes[] = m.getParameterTypes();
+		// test even and odd width
+		for (int i = 0; i < 2; i++) {
+			int w = 6+i;
+			ImageSingleBand orig = GeneralizedImageOps.createSingleBand(paramTypes[0], w, w);
+			GImageMiscOps.fillUniform(orig, rand, 0, 10);
+			ImageSingleBand rotated = (ImageSingleBand)orig.clone();
+
+			m.invoke(null,rotated);
+
+			for (int y = 0; y < w; y++) {
+				for (int x = 0; x < w; x++) {
+					double expected = GeneralizedImageOps.get(orig,x,y);
+					double found = GeneralizedImageOps.get(rotated,y,w-x-1);
+
+					assertEquals(expected,found,1e-8);
+				}
+			}
+		}
+	}
+
+	public void testRotateCCW_two( Method m ) throws InvocationTargetException, IllegalAccessException {
 		Class paramTypes[] = m.getParameterTypes();
 		ImageSingleBand a = GeneralizedImageOps.createSingleBand(paramTypes[0], 3, 2);
 		ImageSingleBand b = GeneralizedImageOps.createSingleBand(paramTypes[0], 2, 3);
