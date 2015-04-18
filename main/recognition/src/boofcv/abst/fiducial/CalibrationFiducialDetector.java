@@ -155,9 +155,9 @@ public class CalibrationFiducialDetector<T extends ImageSingleBand>
 	}
 
 	@Override
-	public void getFiducialToWorld(int which, Se3_F64 fiducialToSensor ) {
+	public void getFiducialToCamera(int which, Se3_F64 fiducialToCamera) {
 		if( which == 0 )
-			fiducialToSensor.set(targetToCamera);
+			fiducialToCamera.set(targetToCamera);
 	}
 
 	@Override

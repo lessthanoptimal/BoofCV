@@ -53,12 +53,12 @@ public interface FiducialDetector<T extends ImageBase>
 	public int totalFound();
 
 	/**
-	 * Used to retrieve the transformation from the fiducial's reference frame to the sensor's refernece frame.
+	 * Used to retrieve the transformation from the fiducial's reference frame to the camera's reference frame.
 	 *
 	 * @param which Fiducial's index
-	 * @param fiducialToSensor (output) Storage for the transform. modified.
+	 * @param fiducialToCamera (output) Storage for the transform. modified.
 	 */
-	public void getFiducialToWorld(int which, Se3_F64 fiducialToSensor );
+	public void getFiducialToCamera(int which, Se3_F64 fiducialToCamera);
 
 	/**
 	 * If applicable, returns the ID of the fiducial found.

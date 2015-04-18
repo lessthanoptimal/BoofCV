@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -111,7 +111,7 @@ public abstract class GenericFiducialDetectorChecks {
 			for (int i = 0; i < detector.totalFound(); i++) {
 				foundID[i] = detector.getId(i);
 				Se3_F64 pose = new Se3_F64();
-				detector.getFiducialToWorld(i,pose);
+				detector.getFiducialToCamera(i, pose);
 				foundPose.add(pose);
 			}
 
@@ -123,7 +123,7 @@ public abstract class GenericFiducialDetectorChecks {
 			for (int i = 0; i < detector.totalFound(); i++) {
 				assertEquals(foundID[i],detector.getId(i));
 				Se3_F64 pose = new Se3_F64();
-				detector.getFiducialToWorld(i,pose);
+				detector.getFiducialToCamera(i, pose);
 				assertEquals(0,pose.getT().distance(foundPose.get(i).T),1e-8);
 				assertTrue(MatrixFeatures.isIdentical(pose.getR(),foundPose.get(i).R,1e-8));
 			}
@@ -150,7 +150,7 @@ public abstract class GenericFiducialDetectorChecks {
 			for (int i = 0; i < detector.totalFound(); i++) {
 				foundID[i] = detector.getId(i);
 				Se3_F64 pose = new Se3_F64();
-				detector.getFiducialToWorld(i,pose);
+				detector.getFiducialToCamera(i, pose);
 				foundPose.add(pose);
 			}
 
@@ -162,7 +162,7 @@ public abstract class GenericFiducialDetectorChecks {
 			for (int i = 0; i < detector.totalFound(); i++) {
 				assertEquals(foundID[i],detector.getId(i));
 				Se3_F64 pose = new Se3_F64();
-				detector.getFiducialToWorld(i,pose);
+				detector.getFiducialToCamera(i, pose);
 				assertEquals(0,pose.getT().distance(foundPose.get(i).T),1e-8);
 				assertTrue(MatrixFeatures.isIdentical(pose.getR(),foundPose.get(i).R,1e-8));
 			}

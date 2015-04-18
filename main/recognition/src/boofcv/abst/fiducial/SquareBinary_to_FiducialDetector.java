@@ -60,8 +60,8 @@ public class SquareBinary_to_FiducialDetector<T extends ImageSingleBand>
 	}
 
 	@Override
-	public void getFiducialToWorld(int which, Se3_F64 fiducialToSensor ) {
-		fiducialToSensor.set(alg.getFound().get(which).targetToSensor);
+	public void getFiducialToCamera(int which, Se3_F64 fiducialToCamera) {
+		fiducialToCamera.set(alg.getFound().get(which).targetToSensor);
 	}
 
 	@Override
