@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -343,6 +343,19 @@ public class PerspectiveOps {
 
 		// convert into pixel coordinates
 		return GeometryMath_F64.mult(K, norm, norm);
+	}
+
+	/**
+	 * Renders a point in camera coordinates into the image plane in pixels.  Does not account
+	 * for lens distortion
+	 *
+	 * @param intrinsic Intrinsic camera parameters.
+	 * @param X 3D Point in world reference frame..
+	 * @return 2D Render point on image plane or null if it's behind the camera
+	 */
+	public static Point2D_F64 renderPixel( IntrinsicParameters intrinsic , Point3D_F64 X ) {
+		Point2D_F64 norm = new Point2D_F64(X.x/X.z,X.y/X.z);
+		return PerspectiveOps.convertNormToPixel(intrinsic, norm, norm);
 	}
 
 	/**

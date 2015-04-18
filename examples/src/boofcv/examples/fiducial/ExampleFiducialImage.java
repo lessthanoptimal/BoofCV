@@ -76,7 +76,7 @@ public class ExampleFiducialImage {
 		Se3_F64 targetToSensor = new Se3_F64();
 		for (int i = 0; i < detector.totalFound(); i++) {
 			System.out.println("Target ID = "+detector.getId(i));
-			detector.getFiducialToWorld(i, targetToSensor);
+			detector.getFiducialToCamera(i, targetToSensor);
 			System.out.println("Location:");
 			System.out.println(targetToSensor);
 

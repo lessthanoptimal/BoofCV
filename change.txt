@@ -25,6 +25,8 @@ Version : Alpha 0.19
 - Added in-place CW and CCW image rotation
 - Fiducials
   * Image square fiducials can now have their width individually set
+- PerspectiveOps
+  * Can render pixel in camera frame using InrinsicParameters
 
 TODO
   * Square Detector.  Create set of images in validation boof with hand selected corners

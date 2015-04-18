@@ -79,7 +79,7 @@ public class SimpleFiducial {
 			int id = detector.getId(i);
 			double width = detector.getWidth(i);
 			Se3_F64 fiducialToWorld = new Se3_F64();
-			detector.getFiducialToWorld(i,fiducialToWorld);
+			detector.getFiducialToCamera(i, fiducialToWorld);
 
 			found.add( new FiducialFound(id,width,fiducialToWorld) );
 		}

@@ -23,6 +23,7 @@ import boofcv.alg.distort.DistortImageOps;
 import boofcv.alg.feature.associate.HammingTable16;
 import boofcv.alg.feature.shapes.SplitMergeLineFitLoop;
 import boofcv.alg.filter.binary.GThresholdImageOps;
+import boofcv.alg.filter.misc.AverageDownSampleOps;
 import boofcv.alg.interpolate.TypeInterpolate;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
@@ -97,7 +98,13 @@ public class DetectFiducialSquareImage<T extends ImageSingleBand>
 	public int addImage( T grayScale , double threshold , double lengthSide ) {
 		// scale the image to the desired size
 		T scaled = GeneralizedImageOps.createSingleBand(getInputType(),squareLength,squareLength);
-		DistortImageOps.scale(grayScale,scaled, TypeInterpolate.BILINEAR);
+
+		// See if it can use the better algorithm for scaling down the image
+		if( grayScale.width > squareLength && grayScale.height > squareLength ) {
+			AverageDownSampleOps.down(grayScale,scaled);
+		} else {
+			DistortImageOps.scale(grayScale, scaled, TypeInterpolate.BILINEAR);
+		}
 
 		// threshold it
 		ImageUInt8 binary0 = binary;

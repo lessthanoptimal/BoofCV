@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -110,7 +110,7 @@ public class TrackFiducialWebcam {
 			Graphics2D g2 = frame.createGraphics();
 			Se3_F64 targetToSensor = new Se3_F64();
 			for (int i = 0; i < detector.totalFound(); i++) {
-				detector.getFiducialToWorld(i, targetToSensor);
+				detector.getFiducialToCamera(i, targetToSensor);
 
 				VisualizeFiducial.drawCube(targetToSensor, param, 0.1, g2);
 			}

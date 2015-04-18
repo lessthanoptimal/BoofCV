@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -107,7 +107,7 @@ public class ExamplePoseOfCalibrationTarget {
 			if( detector.totalFound() == 0 )
 				throw new RuntimeException("Failed to detect target");
 
-			detector.getFiducialToWorld(0,targetToCamera);
+			detector.getFiducialToCamera(0, targetToCamera);
 
 			// Visualization.  Show a path with green points and the calibration points in black
 			viewer.reset();

@@ -141,7 +141,7 @@ public class FiducialTrackerApp<I extends ImageSingleBand>
 		Graphics2D g2 = imageGUI.createGraphics();
 		Se3_F64 targetToSensor = new Se3_F64();
 		for (int i = 0; i < detector.totalFound(); i++) {
-			detector.getFiducialToWorld(i, targetToSensor);
+			detector.getFiducialToCamera(i, targetToSensor);
 
 			VisualizeFiducial.drawCube(targetToSensor, intrinsic, 0.1, g2);
 		}

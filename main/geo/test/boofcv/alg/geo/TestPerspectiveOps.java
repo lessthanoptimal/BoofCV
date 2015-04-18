@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -171,12 +171,12 @@ public class TestPerspectiveOps {
 		Point2D_F64 norm = new Point2D_F64(-0.1,0.25);
 		Point2D_F64 expected = new Point2D_F64();
 
-		GeometryMath_F64.mult(K,norm,expected);
+		GeometryMath_F64.mult(K, norm, expected);
 
 		Point2D_F64 found = PerspectiveOps.convertNormToPixel(intrinsic,norm.x,norm.y,null);
 
-		assertEquals(expected.x,found.x,1e-8);
-		assertEquals(expected.y,found.y,1e-8);
+		assertEquals(expected.x, found.x, 1e-8);
+		assertEquals(expected.y, found.y, 1e-8);
 	}
 
 	@Test
@@ -207,7 +207,7 @@ public class TestPerspectiveOps {
 
 		GeometryMath_F64.mult(K_inv,pixel,expected);
 
-		Point2D_F64 found = PerspectiveOps.convertPixelToNorm(intrinsic,pixel,null);
+		Point2D_F64 found = PerspectiveOps.convertPixelToNorm(intrinsic, pixel, null);
 
 		assertEquals(expected.x, found.x, 1e-8);
 		assertEquals(expected.y, found.y, 1e-8);
@@ -235,7 +235,7 @@ public class TestPerspectiveOps {
 		Point3D_F64 X = new Point3D_F64(0.1,-0.05,3);
 
 		Se3_F64 worldToCamera = new Se3_F64();
-		RotationMatrixGenerator.eulerXYZ(0.1,-0.05,0.03,worldToCamera.getR());
+		RotationMatrixGenerator.eulerXYZ(0.1, -0.05, 0.03, worldToCamera.getR());
 		worldToCamera.getT().set(0.2,0.01,-0.03);
 
 		DenseMatrix64F K = RandomMatrices.createUpperTriangle(3, 0, -1, 1, rand);
@@ -255,6 +255,24 @@ public class TestPerspectiveOps {
 		GeometryMath_F64.mult(K,expected,expected);
 
 		found = PerspectiveOps.renderPixel(worldToCamera,K,X);
+		assertEquals(expected.x,found.x,1e-8);
+		assertEquals(expected.y,found.y,1e-8);
+	}
+
+	@Test
+	public void renderPixel_intrinsic() {
+		Point3D_F64 X = new Point3D_F64(0.1,-0.05,3);
+
+		IntrinsicParameters intrinsic = new IntrinsicParameters(100,150,0.1,120,209,500,600,false,null);
+
+		double normX = X.x/X.z;
+		double normY = X.y/X.z;
+
+		Point2D_F64 expected = new Point2D_F64();
+		PerspectiveOps.convertNormToPixel(intrinsic,normX,normY,expected);
+
+		Point2D_F64 found = PerspectiveOps.renderPixel(intrinsic,X);
+
 		assertEquals(expected.x,found.x,1e-8);
 		assertEquals(expected.y,found.y,1e-8);
 	}
