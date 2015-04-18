@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -158,7 +158,7 @@ public class DemoBinaryImageOpsApp<T extends ImageSingleBand> extends SelectAlgo
 				if (work == null || work.getWidth() != imageInput.width || work.getHeight() != imageInput.height) {
 					work = new BufferedImage(imageInput.width, imageInput.height, BufferedImage.TYPE_INT_BGR);
 				}
-				VisualizeBinaryData.renderBinary(selectedVisualize, work);
+				VisualizeBinaryData.renderBinary(selectedVisualize, false, work);
 				gui.setBufferedImage(work);
 				gui.setPreferredSize(new Dimension(imageInput.width, imageInput.height));
 				processedImage = true;
@@ -185,7 +185,7 @@ public class DemoBinaryImageOpsApp<T extends ImageSingleBand> extends SelectAlgo
 				selectedVisualize = imageOutput;
 			}
 			if( work != null ) {
-				VisualizeBinaryData.renderBinary(selectedVisualize, work);
+				VisualizeBinaryData.renderBinary(selectedVisualize, false, work);
 				gui.repaint();
 			}
 		} else {

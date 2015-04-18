@@ -46,10 +46,11 @@ public class VisualizeImageData {
 	 * {@link ConvertBitmap#declareStorage(android.graphics.Bitmap, byte[])};
 	 *
 	 * @param binary (Input) Binary image.
+	 * @param invert If true it will invert the output image.
 	 * @param output (Output) Bitmap ARGB_8888 image.
 	 * @param storage Optional working buffer for Bitmap image.
 	 */
-	public static void binaryToBitmap( ImageUInt8 binary , Bitmap output , byte[] storage ) {
+	public static void binaryToBitmap( ImageUInt8 binary , boolean invert , Bitmap output , byte[] storage ) {
 		shapeShape(binary, output);
 
 		if( storage == null )
@@ -57,15 +58,29 @@ public class VisualizeImageData {
 
 		int indexDst = 0;
 
-		for( int y = 0; y < binary.height; y++ ) {
-			int indexSrc = binary.startIndex + y*binary.stride;
-			for( int x = 0; x < binary.width; x++ ) {
-				int value = binary.data[ indexSrc++ ] * 255;
+		if( invert ) {
+			for (int y = 0; y < binary.height; y++) {
+				int indexSrc = binary.startIndex + y * binary.stride;
+				for (int x = 0; x < binary.width; x++) {
+					int value = (1-binary.data[indexSrc++]) * 255;
 
-				storage[indexDst++] = (byte) value;
-				storage[indexDst++] = (byte) value;
-				storage[indexDst++] = (byte) value;
-				storage[indexDst++] = (byte) 0xFF;
+					storage[indexDst++] = (byte) value;
+					storage[indexDst++] = (byte) value;
+					storage[indexDst++] = (byte) value;
+					storage[indexDst++] = (byte) 0xFF;
+				}
+			}
+		} else {
+			for (int y = 0; y < binary.height; y++) {
+				int indexSrc = binary.startIndex + y * binary.stride;
+				for (int x = 0; x < binary.width; x++) {
+					int value = binary.data[indexSrc++] * 255;
+
+					storage[indexDst++] = (byte) value;
+					storage[indexDst++] = (byte) value;
+					storage[indexDst++] = (byte) value;
+					storage[indexDst++] = (byte) 0xFF;
+				}
 			}
 		}
 

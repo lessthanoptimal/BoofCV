@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -81,7 +81,7 @@ public class VisualizeCannySteps {
 		HysteresisEdgeTraceMark hysteresis = new HysteresisEdgeTraceMark();
 		hysteresis.process(suppressed,direction,threshLow,threshHigh,output);
 
-		BufferedImage renderedLabel = VisualizeBinaryData.renderBinary(output, null);
+		BufferedImage renderedLabel = VisualizeBinaryData.renderBinary(output, false, null);
 
 		ShowImages.showWindow(intensity,"Raw Intensity",true);
 		ShowImages.showWindow(renderedOrientation,"Orientation");

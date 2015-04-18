@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -156,7 +156,7 @@ public class DetectCalibrationSquaresApp
 				break;
 
 			case 1:
-				VisualizeBinaryData.renderBinary(binary, workImage);
+				VisualizeBinaryData.renderBinary(binary, false, workImage);
 				break;
 
 			case 2:

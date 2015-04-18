@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -40,7 +40,7 @@ public class ImageBinaryPanel extends JPanel {
 	public ImageBinaryPanel( ImageUInt8 binaryImage ) {
 		this.binaryImage = binaryImage;
 		img = new BufferedImage(binaryImage.getWidth(),binaryImage.getHeight(),BufferedImage.TYPE_BYTE_GRAY);
-		VisualizeBinaryData.renderBinary(binaryImage,img);
+		VisualizeBinaryData.renderBinary(binaryImage,false,img);
 
 		setPreferredSize(new Dimension(binaryImage.getWidth(), binaryImage.getHeight()));
 		setMinimumSize(getPreferredSize());
@@ -59,7 +59,7 @@ public class ImageBinaryPanel extends JPanel {
 
 	public void setBinaryImage(ImageUInt8 binaryImage) {
 		this.binaryImage = binaryImage;
-		VisualizeBinaryData.renderBinary(binaryImage,img);
+		VisualizeBinaryData.renderBinary(binaryImage,false,img);
 	}
 
 	public BufferedImage getImage() {

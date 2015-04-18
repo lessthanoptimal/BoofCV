@@ -94,12 +94,15 @@ public class TestImageInterleaved {
 	/**
 	 * The two matrices do not have the same shape
 	 */
-	@Test(expected = IllegalArgumentException.class)
+	@Test
 	public void setTo_mismatch_Shape() {
 		DummyImage a = new DummyImage(10, 20, 3);
-		DummyImage b = new DummyImage(11, 20, 3);
+		DummyImage b = new DummyImage(11, 21, 3);
 
 		a.setTo(b);
+
+		assertEquals(a.width, 11);
+		assertEquals(b.height, 21);
 	}
 
 	/**

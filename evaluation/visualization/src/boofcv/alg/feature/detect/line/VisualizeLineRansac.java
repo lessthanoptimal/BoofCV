@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -118,7 +118,7 @@ public class VisualizeLineRansac<I extends ImageSingleBand, D extends ImageSingl
 		gui.setLineSegments(found);
 		gui.setPreferredSize(new Dimension(image.getWidth(),image.getHeight()));
 
-		BufferedImage renderedBinary = VisualizeBinaryData.renderBinary(detected, null);
+		BufferedImage renderedBinary = VisualizeBinaryData.renderBinary(detected, false, null);
 
 		ShowImages.showWindow(renderedBinary,"Detected Edges");
 		ShowImages.showWindow(gui,"Detected Lines");

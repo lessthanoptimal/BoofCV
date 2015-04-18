@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -74,8 +74,8 @@ public class ExampleBinaryOps {
 		int colorInternal = 0xFF2020;
 
 		// display the results
-		BufferedImage visualBinary = VisualizeBinaryData.renderBinary(binary, null);
-		BufferedImage visualFiltered = VisualizeBinaryData.renderBinary(filtered, null);
+		BufferedImage visualBinary = VisualizeBinaryData.renderBinary(binary, false, null);
+		BufferedImage visualFiltered = VisualizeBinaryData.renderBinary(filtered, false, null);
 		BufferedImage visualLabel = VisualizeBinaryData.renderLabeledBG(label, contours.size(), null);
 		BufferedImage visualContour = VisualizeBinaryData.renderContours(contours,colorExternal,colorInternal,
 				input.width,input.height,null);

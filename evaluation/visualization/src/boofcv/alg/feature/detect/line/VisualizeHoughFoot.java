@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -67,7 +67,7 @@ public class VisualizeHoughFoot<I extends ImageSingleBand, D extends ImageSingle
 		gui.setPreferredSize(new Dimension(image.getWidth(),image.getHeight()));
 
 		BufferedImage renderedTran = VisualizeImageData.grayMagnitude(alg.getTransform().getTransform(),null,-1);
-		BufferedImage renderedBinary = VisualizeBinaryData.renderBinary(alg.getBinary(), null);
+		BufferedImage renderedBinary = VisualizeBinaryData.renderBinary(alg.getBinary(), false, null);
 
 		ShowImages.showWindow(renderedBinary,"Detected Edges");
 		ShowImages.showWindow(renderedTran,"Parameter Space");

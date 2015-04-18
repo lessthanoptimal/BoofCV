@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -270,7 +270,15 @@ public class VisualizeBinaryData {
 		}
 	}
 
-	public static BufferedImage renderBinary( ImageUInt8 binaryImage , BufferedImage out ) {
+	/**
+	 * Renders a binary image.  0 = black and 1 = white.
+	 *
+	 * @param binaryImage (Input) Input binary image.
+	 * @param invert (Input) if true it will invert the image on output
+	 * @param out (Output) optional storage for output image
+	 * @return Output rendered binary image
+	 */
+	public static BufferedImage renderBinary(ImageUInt8 binaryImage, boolean invert, BufferedImage out) {
 
 		if( out == null ) {
 			out = new BufferedImage(binaryImage.getWidth(),binaryImage.getHeight(),BufferedImage.TYPE_BYTE_GRAY);
@@ -278,40 +286,59 @@ public class VisualizeBinaryData {
 
 		try {
 			if( out.getRaster() instanceof ByteInterleavedRaster ) {
-				renderBinary(binaryImage, (ByteInterleavedRaster)out.getRaster());
+				renderBinary(binaryImage, invert, (ByteInterleavedRaster)out.getRaster());
 			} else {
-				_renderBinary(binaryImage, out);
+				_renderBinary(binaryImage, invert,  out);
 			}
 		} catch( SecurityException e ) {
-			_renderBinary(binaryImage, out);
+			_renderBinary(binaryImage, invert, out);
 		}
 		return out;
 	}
 
-	private static void _renderBinary(ImageUInt8 binaryImage, BufferedImage out) {
+	private static void _renderBinary(ImageUInt8 binaryImage, boolean invert, BufferedImage out) {
 		int w = binaryImage.getWidth();
 		int h = binaryImage.getHeight();
 
-		for( int y = 0; y < h; y++ ) {
-			int indexSrc = binaryImage.startIndex + y*binaryImage.stride;
-			for( int x = 0; x < w; x++ ) {
-				int rgb = binaryImage.data[indexSrc++] > 0 ? 0x00FFFFFF : 0;
-				out.setRGB(x,y,rgb);
+		if( invert ) {
+			for (int y = 0; y < h; y++) {
+				int indexSrc = binaryImage.startIndex + y * binaryImage.stride;
+				for (int x = 0; x < w; x++) {
+					int rgb = binaryImage.data[indexSrc++] > 0 ? 0 : 0x00FFFFFF;
+					out.setRGB(x, y, rgb);
+				}
+			}
+		} else {
+			for (int y = 0; y < h; y++) {
+				int indexSrc = binaryImage.startIndex + y * binaryImage.stride;
+				for (int x = 0; x < w; x++) {
+					int rgb = binaryImage.data[indexSrc++] > 0 ? 0x00FFFFFF : 0;
+					out.setRGB(x, y, rgb);
+				}
 			}
 		}
 	}
 
-	private static void renderBinary(ImageUInt8 binaryImage, ByteInterleavedRaster raster) {
+	private static void renderBinary(ImageUInt8 binaryImage, boolean invert, ByteInterleavedRaster raster) {
 		int rasterIndex = 0;
 		byte data[] = raster.getDataStorage();
 
 		int w = binaryImage.getWidth();
 		int h = binaryImage.getHeight();
 
-		for( int y = 0; y < h; y++ ) {
-			int indexSrc = binaryImage.startIndex + y*binaryImage.stride;
-			for( int x = 0; x < w; x++ ) {
-				data[rasterIndex++] = binaryImage.data[indexSrc++] > 0 ? (byte)255 : (byte)0;
+		if( invert ) {
+			for (int y = 0; y < h; y++) {
+				int indexSrc = binaryImage.startIndex + y * binaryImage.stride;
+				for (int x = 0; x < w; x++) {
+					data[rasterIndex++] = (byte)(1-binaryImage.data[indexSrc++] * 255);
+				}
+			}
+		} else {
+			for (int y = 0; y < h; y++) {
+				int indexSrc = binaryImage.startIndex + y * binaryImage.stride;
+				for (int x = 0; x < w; x++) {
+					data[rasterIndex++] = (byte)(binaryImage.data[indexSrc++] * 255);
+				}
 			}
 		}
 	}

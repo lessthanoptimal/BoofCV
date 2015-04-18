@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -54,19 +54,19 @@ public class ExampleThresholding {
 
 		// Global Methods
 		GThresholdImageOps.threshold(input, binary, ImageStatistics.mean(input), true);
-		gui.addImage(VisualizeBinaryData.renderBinary(binary, null),"Global: Mean");
+		gui.addImage(VisualizeBinaryData.renderBinary(binary, false, null),"Global: Mean");
 		GThresholdImageOps.threshold(input, binary, GThresholdImageOps.computeOtsu(input, 0, 256), true);
-		gui.addImage(VisualizeBinaryData.renderBinary(binary, null),"Global: Otsu");
+		gui.addImage(VisualizeBinaryData.renderBinary(binary, false, null),"Global: Otsu");
 		GThresholdImageOps.threshold(input, binary, GThresholdImageOps.computeEntropy(input, 0, 256), true);
-		gui.addImage(VisualizeBinaryData.renderBinary(binary, null),"Global: Entropy");
+		gui.addImage(VisualizeBinaryData.renderBinary(binary, false, null),"Global: Entropy");
 
 		// Local method
 		GThresholdImageOps.adaptiveSquare(input, binary, 28, 0, true, null, null);
-		gui.addImage(VisualizeBinaryData.renderBinary(binary, null),"Adaptive: Square");
+		gui.addImage(VisualizeBinaryData.renderBinary(binary, false, null),"Adaptive: Square");
 		GThresholdImageOps.adaptiveGaussian(input, binary, 42, 0, true, null, null);
-		gui.addImage(VisualizeBinaryData.renderBinary(binary, null),"Adaptive: Gaussian");
+		gui.addImage(VisualizeBinaryData.renderBinary(binary, false, null),"Adaptive: Gaussian");
 		GThresholdImageOps.adaptiveSauvola(input, binary, 5, 0.30f, true);
-		gui.addImage(VisualizeBinaryData.renderBinary(binary, null),"Adaptive: Sauvola");
+		gui.addImage(VisualizeBinaryData.renderBinary(binary, false, null),"Adaptive: Sauvola");
 
 		// Sauvola is tuned for text image.  Change radius to make it run better in others.
 

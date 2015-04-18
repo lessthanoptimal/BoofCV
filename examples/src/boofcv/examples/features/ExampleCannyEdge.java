@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -64,7 +64,7 @@ public class ExampleCannyEdge {
 		List<Contour> contours = BinaryImageOps.contour(edgeImage, ConnectRule.EIGHT, null);
 
 		// display the results
-		BufferedImage visualBinary = VisualizeBinaryData.renderBinary(edgeImage, null);
+		BufferedImage visualBinary = VisualizeBinaryData.renderBinary(edgeImage, false, null);
 		BufferedImage visualCannyContour = VisualizeBinaryData.renderContours(edgeContours,null,
 				gray.width,gray.height,null);
 		BufferedImage visualEdgeContour = VisualizeBinaryData.renderExternal(contours, null,

@@ -20,6 +20,8 @@ Version : Alpha 0.19
   * Bag-of-Words based techniques
   * K-Nearest-Neighbor classification.  Learning and Classifier
 - Image setTo() will now automatically resize the image to match it's input
+- Added invert option to visualizing binary images
+  * swing and android
 
 TODO
   * Square Detector.  Create set of images in validation boof with hand selected corners

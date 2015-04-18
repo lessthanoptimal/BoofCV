@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,7 +39,7 @@ public class TestImplKitRosCornerIntensity
 		a.genericTests();
 	}
 
-	private static class Test_F32 extends GenericCornerIntensityGradientTests
+	public static class Test_F32 extends GenericCornerIntensityGradientTests
 	{
 		@Test
 		public void genericTests() {
@@ -52,7 +52,7 @@ public class TestImplKitRosCornerIntensity
 		}
 	}
 
-	private static class Test_S16 extends GenericCornerIntensityGradientTests
+	public static class Test_S16 extends GenericCornerIntensityGradientTests
 	{
 		@Test
 		public void genericTests() {

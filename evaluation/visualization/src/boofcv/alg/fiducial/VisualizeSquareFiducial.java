@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -65,7 +65,7 @@ public class VisualizeSquareFiducial {
 		}
 
 		BufferedImage output = new BufferedImage(input.width,input.height,BufferedImage.TYPE_INT_RGB);
-		VisualizeBinaryData.renderBinary(detector.getBinary(),output);
+		VisualizeBinaryData.renderBinary(detector.getBinary(),false, output);
 		Graphics2D g2 = output.createGraphics();
 		g2.setColor(Color.RED);
 		g2.setStroke(new BasicStroke(2));
