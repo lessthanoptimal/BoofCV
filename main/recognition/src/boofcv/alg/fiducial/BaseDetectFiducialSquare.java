@@ -222,6 +222,8 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 	 * @param gray Input image
 	 */
 	public void process( T gray ) {
+		if( binary.width == 0 || binary.height == 0 )
+			throw new RuntimeException("Did you call configure() yet? zero width/height");
 
 		found.reset();
 		candidates.reset();

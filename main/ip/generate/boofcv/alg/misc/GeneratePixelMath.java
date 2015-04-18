@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -189,8 +189,8 @@ public class GeneratePixelMath extends CodeGeneratorBase {
 				"\t *\n" +
 				"\t * @param input The input image. Not modified.\n" +
 				"\t * @param denominator What each element is divided by.\n" +
-				"\t * @param lower Lower bound on output\n" +
-				"\t * @param upper Upper bound on output\n" +
+				"\t * @param lower Lower bound on output. Inclusive.\n" +
+				"\t * @param upper Upper bound on output. Inclusive.\n" +
 				"\t * @param output The output image. Modified.\n" +
 				"\t */\n" +
 				"\tpublic static void divide( "+input.getSingleBandName()+" input , "+scaleType+" denominator , "+
@@ -253,8 +253,8 @@ public class GeneratePixelMath extends CodeGeneratorBase {
 				"\t *\n" +
 				"\t * @param input The input image. Not modified.\n" +
 				"\t * @param value What each element is multiplied by.\n" +
-				"\t * @param lower Lower bound on output\n" +
-				"\t * @param upper Upper bound on output\n" +
+				"\t * @param lower Lower bound on output. Inclusive.\n" +
+				"\t * @param upper Upper bound on output. Inclusive.\n" +
 				"\t * @param output The output image. Modified.\n" +
 				"\t */\n" +
 				"\tpublic static void multiply( "+input.getSingleBandName()+" input , "+scaleType+" value , " +
@@ -309,8 +309,8 @@ public class GeneratePixelMath extends CodeGeneratorBase {
 				"\t *\n" +
 				"\t * @param input The input image. Not modified.\n" +
 				"\t * @param value What is added to each element.\n" +
-				"\t * @param lower Lower bound on output\n" +
-				"\t * @param upper Upper bound on output\n" +
+				"\t * @param lower Lower bound on output. Inclusive.\n" +
+				"\t * @param upper Upper bound on output. Inclusive.\n" +
 				"\t * @param output The output image. Modified.\n" +
 				"\t */\n" +
 				"\tpublic static void plus( "+input.getSingleBandName()+" input , "+sumType+" value , "+

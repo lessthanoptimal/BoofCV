@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -113,8 +113,8 @@ public class GPixelMath {
 	 *
 	 * @param input The input image. Not modified.
 	 * @param denominator What each element is divided by.
-	 * @param lower Lower bound on output
-	 * @param upper Upper bound on output
+	 * @param lower Lower bound on output. Inclusive.
+	 * @param upper Upper bound on output. Inclusive.
 	 * @param output The output image. Modified.
 	 */
 	public static <T extends ImageSingleBand> void divide(T input, double denominator,
@@ -200,8 +200,8 @@ public class GPixelMath {
 	 *
 	 * @param input The input image. Not modified.
 	 * @param value What each element is multiplied by.
-	 * @param lower Lower bound on output
-	 * @param upper Upper bound on output
+	 * @param lower Lower bound on output. Inclusive.
+	 * @param upper Upper bound on output. Inclusive.
 	 * @param output The output image. Modified.
 	 */
 	public static <T extends ImageSingleBand> void multiply(T input, double value,
@@ -336,8 +336,8 @@ public class GPixelMath {
 	 *
 	 * @param input The input image. Not modified.
 	 * @param value What is added to each element.
-	 * @param lower Lower bound on output
-	 * @param upper Upper bound on output
+	 * @param lower Lower bound on output. Inclusive.
+	 * @param upper Upper bound on output. Inclusive.
 	 * @param output The output image. Modified.
 	 */
 	public static <T extends ImageSingleBand> void plus(T input, double value,
@@ -436,8 +436,8 @@ public class GPixelMath {
 	 * Bounds image pixels to be between these two values.
 	 *
 	 * @param input Input image.
-	 * @param min minimum value.
-	 * @param max maximum value.
+	 * @param min minimum value. Inclusive.
+	 * @param max maximum value. Inclusive.
 	 */
 	public static <T extends ImageSingleBand> void boundImage( T input , double min , double max ) {
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -15,7 +15,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package boofcv.alg.misc;
 
 import boofcv.alg.InputSanityCheck;
@@ -317,8 +316,8 @@ public class PixelMath {
 	 *
 	 * @param input The input image. Not modified.
 	 * @param value What each element is multiplied by.
-	 * @param lower Lower bound on output
-	 * @param upper Upper bound on output
+	 * @param lower Lower bound on output. Inclusive.
+	 * @param upper Upper bound on output. Inclusive.
 	 * @param output The output image. Modified.
 	 */
 	public static void multiply( ImageUInt8 input , double value , int lower , int upper , ImageUInt8 output ) {
@@ -366,8 +365,8 @@ public class PixelMath {
 	 *
 	 * @param input The input image. Not modified.
 	 * @param denominator What each element is divided by.
-	 * @param lower Lower bound on output
-	 * @param upper Upper bound on output
+	 * @param lower Lower bound on output. Inclusive.
+	 * @param upper Upper bound on output. Inclusive.
 	 * @param output The output image. Modified.
 	 */
 	public static void divide( ImageUInt8 input , double denominator , int lower , int upper , ImageUInt8 output ) {
@@ -415,8 +414,8 @@ public class PixelMath {
 	 *
 	 * @param input The input image. Not modified.
 	 * @param value What is added to each element.
-	 * @param lower Lower bound on output
-	 * @param upper Upper bound on output
+	 * @param lower Lower bound on output. Inclusive.
+	 * @param upper Upper bound on output. Inclusive.
 	 * @param output The output image. Modified.
 	 */
 	public static void plus( ImageUInt8 input , int value , int lower , int upper , ImageUInt8 output ) {
@@ -549,8 +548,8 @@ public class PixelMath {
 	 *
 	 * @param input The input image. Not modified.
 	 * @param value What each element is multiplied by.
-	 * @param lower Lower bound on output
-	 * @param upper Upper bound on output
+	 * @param lower Lower bound on output. Inclusive.
+	 * @param upper Upper bound on output. Inclusive.
 	 * @param output The output image. Modified.
 	 */
 	public static void multiply( ImageSInt8 input , double value , int lower , int upper , ImageSInt8 output ) {
@@ -598,8 +597,8 @@ public class PixelMath {
 	 *
 	 * @param input The input image. Not modified.
 	 * @param denominator What each element is divided by.
-	 * @param lower Lower bound on output
-	 * @param upper Upper bound on output
+	 * @param lower Lower bound on output. Inclusive.
+	 * @param upper Upper bound on output. Inclusive.
 	 * @param output The output image. Modified.
 	 */
 	public static void divide( ImageSInt8 input , double denominator , int lower , int upper , ImageSInt8 output ) {
@@ -647,8 +646,8 @@ public class PixelMath {
 	 *
 	 * @param input The input image. Not modified.
 	 * @param value What is added to each element.
-	 * @param lower Lower bound on output
-	 * @param upper Upper bound on output
+	 * @param lower Lower bound on output. Inclusive.
+	 * @param upper Upper bound on output. Inclusive.
 	 * @param output The output image. Modified.
 	 */
 	public static void plus( ImageSInt8 input , int value , int lower , int upper , ImageSInt8 output ) {
@@ -781,8 +780,8 @@ public class PixelMath {
 	 *
 	 * @param input The input image. Not modified.
 	 * @param value What each element is multiplied by.
-	 * @param lower Lower bound on output
-	 * @param upper Upper bound on output
+	 * @param lower Lower bound on output. Inclusive.
+	 * @param upper Upper bound on output. Inclusive.
 	 * @param output The output image. Modified.
 	 */
 	public static void multiply( ImageUInt16 input , double value , int lower , int upper , ImageUInt16 output ) {
@@ -830,8 +829,8 @@ public class PixelMath {
 	 *
 	 * @param input The input image. Not modified.
 	 * @param denominator What each element is divided by.
-	 * @param lower Lower bound on output
-	 * @param upper Upper bound on output
+	 * @param lower Lower bound on output. Inclusive.
+	 * @param upper Upper bound on output. Inclusive.
 	 * @param output The output image. Modified.
 	 */
 	public static void divide( ImageUInt16 input , double denominator , int lower , int upper , ImageUInt16 output ) {
@@ -879,8 +878,8 @@ public class PixelMath {
 	 *
 	 * @param input The input image. Not modified.
 	 * @param value What is added to each element.
-	 * @param lower Lower bound on output
-	 * @param upper Upper bound on output
+	 * @param lower Lower bound on output. Inclusive.
+	 * @param upper Upper bound on output. Inclusive.
 	 * @param output The output image. Modified.
 	 */
 	public static void plus( ImageUInt16 input , int value , int lower , int upper , ImageUInt16 output ) {
@@ -1013,8 +1012,8 @@ public class PixelMath {
 	 *
 	 * @param input The input image. Not modified.
 	 * @param value What each element is multiplied by.
-	 * @param lower Lower bound on output
-	 * @param upper Upper bound on output
+	 * @param lower Lower bound on output. Inclusive.
+	 * @param upper Upper bound on output. Inclusive.
 	 * @param output The output image. Modified.
 	 */
 	public static void multiply( ImageSInt16 input , double value , int lower , int upper , ImageSInt16 output ) {
@@ -1062,8 +1061,8 @@ public class PixelMath {
 	 *
 	 * @param input The input image. Not modified.
 	 * @param denominator What each element is divided by.
-	 * @param lower Lower bound on output
-	 * @param upper Upper bound on output
+	 * @param lower Lower bound on output. Inclusive.
+	 * @param upper Upper bound on output. Inclusive.
 	 * @param output The output image. Modified.
 	 */
 	public static void divide( ImageSInt16 input , double denominator , int lower , int upper , ImageSInt16 output ) {
@@ -1111,8 +1110,8 @@ public class PixelMath {
 	 *
 	 * @param input The input image. Not modified.
 	 * @param value What is added to each element.
-	 * @param lower Lower bound on output
-	 * @param upper Upper bound on output
+	 * @param lower Lower bound on output. Inclusive.
+	 * @param upper Upper bound on output. Inclusive.
 	 * @param output The output image. Modified.
 	 */
 	public static void plus( ImageSInt16 input , int value , int lower , int upper , ImageSInt16 output ) {
@@ -1245,8 +1244,8 @@ public class PixelMath {
 	 *
 	 * @param input The input image. Not modified.
 	 * @param value What each element is multiplied by.
-	 * @param lower Lower bound on output
-	 * @param upper Upper bound on output
+	 * @param lower Lower bound on output. Inclusive.
+	 * @param upper Upper bound on output. Inclusive.
 	 * @param output The output image. Modified.
 	 */
 	public static void multiply( ImageSInt32 input , double value , int lower , int upper , ImageSInt32 output ) {
@@ -1294,8 +1293,8 @@ public class PixelMath {
 	 *
 	 * @param input The input image. Not modified.
 	 * @param denominator What each element is divided by.
-	 * @param lower Lower bound on output
-	 * @param upper Upper bound on output
+	 * @param lower Lower bound on output. Inclusive.
+	 * @param upper Upper bound on output. Inclusive.
 	 * @param output The output image. Modified.
 	 */
 	public static void divide( ImageSInt32 input , double denominator , int lower , int upper , ImageSInt32 output ) {
@@ -1343,8 +1342,8 @@ public class PixelMath {
 	 *
 	 * @param input The input image. Not modified.
 	 * @param value What is added to each element.
-	 * @param lower Lower bound on output
-	 * @param upper Upper bound on output
+	 * @param lower Lower bound on output. Inclusive.
+	 * @param upper Upper bound on output. Inclusive.
 	 * @param output The output image. Modified.
 	 */
 	public static void plus( ImageSInt32 input , int value , int lower , int upper , ImageSInt32 output ) {
@@ -1477,8 +1476,8 @@ public class PixelMath {
 	 *
 	 * @param input The input image. Not modified.
 	 * @param value What each element is multiplied by.
-	 * @param lower Lower bound on output
-	 * @param upper Upper bound on output
+	 * @param lower Lower bound on output. Inclusive.
+	 * @param upper Upper bound on output. Inclusive.
 	 * @param output The output image. Modified.
 	 */
 	public static void multiply( ImageSInt64 input , double value , long lower , long upper , ImageSInt64 output ) {
@@ -1526,8 +1525,8 @@ public class PixelMath {
 	 *
 	 * @param input The input image. Not modified.
 	 * @param denominator What each element is divided by.
-	 * @param lower Lower bound on output
-	 * @param upper Upper bound on output
+	 * @param lower Lower bound on output. Inclusive.
+	 * @param upper Upper bound on output. Inclusive.
 	 * @param output The output image. Modified.
 	 */
 	public static void divide( ImageSInt64 input , double denominator , long lower , long upper , ImageSInt64 output ) {
@@ -1575,8 +1574,8 @@ public class PixelMath {
 	 *
 	 * @param input The input image. Not modified.
 	 * @param value What is added to each element.
-	 * @param lower Lower bound on output
-	 * @param upper Upper bound on output
+	 * @param lower Lower bound on output. Inclusive.
+	 * @param upper Upper bound on output. Inclusive.
 	 * @param output The output image. Modified.
 	 */
 	public static void plus( ImageSInt64 input , long value , long lower , long upper , ImageSInt64 output ) {
@@ -1709,8 +1708,8 @@ public class PixelMath {
 	 *
 	 * @param input The input image. Not modified.
 	 * @param value What each element is multiplied by.
-	 * @param lower Lower bound on output
-	 * @param upper Upper bound on output
+	 * @param lower Lower bound on output. Inclusive.
+	 * @param upper Upper bound on output. Inclusive.
 	 * @param output The output image. Modified.
 	 */
 	public static void multiply( ImageFloat32 input , float value , float lower , float upper , ImageFloat32 output ) {
@@ -1758,8 +1757,8 @@ public class PixelMath {
 	 *
 	 * @param input The input image. Not modified.
 	 * @param denominator What each element is divided by.
-	 * @param lower Lower bound on output
-	 * @param upper Upper bound on output
+	 * @param lower Lower bound on output. Inclusive.
+	 * @param upper Upper bound on output. Inclusive.
 	 * @param output The output image. Modified.
 	 */
 	public static void divide( ImageFloat32 input , float denominator , float lower , float upper , ImageFloat32 output ) {
@@ -1807,8 +1806,8 @@ public class PixelMath {
 	 *
 	 * @param input The input image. Not modified.
 	 * @param value What is added to each element.
-	 * @param lower Lower bound on output
-	 * @param upper Upper bound on output
+	 * @param lower Lower bound on output. Inclusive.
+	 * @param upper Upper bound on output. Inclusive.
 	 * @param output The output image. Modified.
 	 */
 	public static void plus( ImageFloat32 input , float value , float lower , float upper , ImageFloat32 output ) {
@@ -1941,8 +1940,8 @@ public class PixelMath {
 	 *
 	 * @param input The input image. Not modified.
 	 * @param value What each element is multiplied by.
-	 * @param lower Lower bound on output
-	 * @param upper Upper bound on output
+	 * @param lower Lower bound on output. Inclusive.
+	 * @param upper Upper bound on output. Inclusive.
 	 * @param output The output image. Modified.
 	 */
 	public static void multiply( ImageFloat64 input , double value , double lower , double upper , ImageFloat64 output ) {
@@ -1990,8 +1989,8 @@ public class PixelMath {
 	 *
 	 * @param input The input image. Not modified.
 	 * @param denominator What each element is divided by.
-	 * @param lower Lower bound on output
-	 * @param upper Upper bound on output
+	 * @param lower Lower bound on output. Inclusive.
+	 * @param upper Upper bound on output. Inclusive.
 	 * @param output The output image. Modified.
 	 */
 	public static void divide( ImageFloat64 input , double denominator , double lower , double upper , ImageFloat64 output ) {
@@ -2039,8 +2038,8 @@ public class PixelMath {
 	 *
 	 * @param input The input image. Not modified.
 	 * @param value What is added to each element.
-	 * @param lower Lower bound on output
-	 * @param upper Upper bound on output
+	 * @param lower Lower bound on output. Inclusive.
+	 * @param upper Upper bound on output. Inclusive.
 	 * @param output The output image. Modified.
 	 */
 	public static void plus( ImageFloat64 input , double value , double lower , double upper , ImageFloat64 output ) {
