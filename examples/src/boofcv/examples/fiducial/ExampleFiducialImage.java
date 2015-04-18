@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -56,15 +56,16 @@ public class ExampleFiducialImage {
 
 		// Detect the fiducial
 		SquareImage_to_FiducialDetector<ImageFloat32> detector = FactoryFiducial.
-				squareImageRobust(new ConfigFiducialImage(0.1), 6, ImageFloat32.class);
+				squareImageRobust(new ConfigFiducialImage(), 6, ImageFloat32.class);
 //				squareImageFast(new ConfigFiducialImage(0.1), 100, ImageFloat32.class);
 
 		// give it a description of all the targets
+		double width = 0.1;
 		ImageFloat32 dog = UtilImageIO.loadImage(directory + "dog.png",ImageFloat32.class);
-		detector.addTarget(dog, 125);
+		detector.addTarget(dog, 125, width);
 		// uncomment to detect the text target
 		ImageFloat32 text = UtilImageIO.loadImage(directory + "text.png",ImageFloat32.class);
-		detector.addTarget(text, 125);
+		detector.addTarget(text, 125, width);
 
 		detector.setIntrinsic(param);
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,11 +27,16 @@ import georegression.struct.se.Se3_F64;
  */
 public class FiducialFound {
 	int id;
+	double width;
 	Se3_F64 pose;
 
-	public FiducialFound(int id, Se3_F64 pose) {
+	public FiducialFound(int id, double width, Se3_F64 pose) {
 		this.id = id;
 		this.pose = pose;
+	}
+
+	public double getWidth() {
+		return width;
 	}
 
 	public int getId() {

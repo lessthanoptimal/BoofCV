@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,13 +33,19 @@ public class SimpleFiducialSquareImage extends SimpleFiducial {
 	SquareImage_to_FiducialDetector detector;
 
 	public SimpleFiducialSquareImage(SquareImage_to_FiducialDetector detector) {
-		super(detector,detector.getTargetWidth());
+		super(detector);
 		this.detector = detector;
 	}
 
-	public void addTarget( PImage image ) {
+	/**
+	 * Adds a new fiducial using the provided image and size
+	 *
+	 * @param image Image which is to be converted into a target description
+	 * @param targetLength Length of a fiducial's side in world units
+	 */
+	public void addTarget( PImage image , double targetLength ) {
 		ImageUInt8 gray = new ImageUInt8(image.width,image.height);
 		ConvertProcessing.convertFromRGB(image,gray);
-		detector.addTarget(gray,125);
+		detector.addTarget(gray,targetLength,125);
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -63,7 +63,7 @@ public class TestDetectFiducialSquareImage {
 		DetectFiducialSquareImage<ImageUInt8> alg =
 				new DetectFiducialSquareImage<ImageUInt8>(null,null,0.2,0.1,ImageUInt8.class);
 
-		alg.addImage(pattern,125);
+		alg.addImage(pattern,125,1.0);
 		BaseDetectFiducialSquare.Result result = new BaseDetectFiducialSquare.Result();
 		assertTrue(alg.processSquare(input, result));
 		assertEquals(0, result.which);
@@ -96,7 +96,7 @@ public class TestDetectFiducialSquareImage {
 		DetectFiducialSquareImage<ImageUInt8> alg =
 				new DetectFiducialSquareImage<ImageUInt8>(null,null,0.2,0.1,ImageUInt8.class);
 
-		alg.addImage(image,100);
+		alg.addImage(image,100,1.0);
 
 		List<DetectFiducialSquareImage.FiducialDef> defs = alg.getTargets();
 		assertEquals(1,defs.size());

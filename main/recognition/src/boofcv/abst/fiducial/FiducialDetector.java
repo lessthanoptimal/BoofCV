@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -66,6 +66,15 @@ public interface FiducialDetector<T extends ImageBase>
 	 * @return ID of the fiducial
 	 */
 	public int getId( int which );
+
+	/**
+	 * Returns the width of the fiducial in world units.  If not square then it returns a reasonable
+	 * approximation.  Intended for use in visualization and not precise calculations.
+	 *
+	 * @param which Fiducial's index
+	 * @return Fiducial's width.
+	 */
+	public double getWidth( int which );
 
 	/**
 	 * Type of input image

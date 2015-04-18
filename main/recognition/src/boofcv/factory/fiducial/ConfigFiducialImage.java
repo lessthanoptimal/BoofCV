@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,10 +28,6 @@ import boofcv.struct.Configuration;
  * @author Peter Abeles
  */
 public class ConfigFiducialImage implements Configuration {
-	/**
-	 * Length of a targets size in world units.
-	 */
-	public double targetWidth;
 
 	/**
 	 * Minimum number of pixels in a shape's contour specified as a fraction of the input
@@ -56,21 +52,9 @@ public class ConfigFiducialImage implements Configuration {
 	public ConfigFiducialImage() {
 	}
 
-	public ConfigFiducialImage(double targetWidth) {
-		this.targetWidth = targetWidth;
-	}
-
 	@Override
 	public void checkValidity() {
 
-	}
-
-	public double getTargetWidth() {
-		return targetWidth;
-	}
-
-	public void setTargetWidth(double targetWidth) {
-		this.targetWidth = targetWidth;
 	}
 
 	public int getBorderTolerance() {

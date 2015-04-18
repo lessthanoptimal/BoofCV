@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -273,17 +273,16 @@ public class Boof {
 	 * @param radius Radius of adaptive region
 	 */
 	public static SimpleFiducial fiducialSquareBinaryRobust( double width , int radius ) {
-		return new SimpleFiducial(FactoryFiducial.squareBinaryRobust(new ConfigFiducialBinary(width),radius,ImageUInt8.class),width);
+		return new SimpleFiducial(FactoryFiducial.squareBinaryRobust(new ConfigFiducialBinary(width),radius,ImageUInt8.class));
 	}
 
 	/**
 	 * Creates a square-binary fiducial detector which is light invariant.
 	 *
-	 * @param width Width of square in world units
 	 * @param radius Radius of adaptive region
 	 */
-	public static SimpleFiducialSquareImage fiducialSquareImageRobust( double width , int radius ) {
-		return new SimpleFiducialSquareImage(FactoryFiducial.squareImageRobust(new ConfigFiducialImage(width), radius, ImageUInt8.class));
+	public static SimpleFiducialSquareImage fiducialSquareImageRobust( int radius ) {
+		return new SimpleFiducialSquareImage(FactoryFiducial.squareImageRobust(new ConfigFiducialImage(), radius, ImageUInt8.class));
 	}
 
 	/**
@@ -293,7 +292,7 @@ public class Boof {
 	 * @param threshold Binary threshold
 	 */
 	public static SimpleFiducial fiducialSquareBinary( double width , int threshold ) {
-		return new SimpleFiducial(FactoryFiducial.squareBinaryFast(new ConfigFiducialBinary(width), threshold, ImageUInt8.class),width);
+		return new SimpleFiducial(FactoryFiducial.squareBinaryFast(new ConfigFiducialBinary(width), threshold, ImageUInt8.class));
 	}
 
 	/**
@@ -303,7 +302,7 @@ public class Boof {
 	 * @param threshold Binary threshold
 	 */
 	public static SimpleFiducialSquareImage fiducialSquareImage( double width , int threshold ) {
-		return new SimpleFiducialSquareImage(FactoryFiducial.squareImageFast(new ConfigFiducialImage(width), threshold, ImageUInt8.class));
+		return new SimpleFiducialSquareImage(FactoryFiducial.squareImageFast(new ConfigFiducialImage(), threshold, ImageUInt8.class));
 	}
 
 }

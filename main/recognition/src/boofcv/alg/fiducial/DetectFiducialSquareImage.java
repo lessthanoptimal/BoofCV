@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -91,9 +91,10 @@ public class DetectFiducialSquareImage<T extends ImageSingleBand>
 	 *
 	 * @param grayScale Grayscale input image
 	 * @param threshold Threshold which will be used to convert it into a binary image
+	 * @param lengthSide How long one of the sides of the target is in world units.
 	 * @return The ID of the provided image
 	 */
-	public int addImage( T grayScale , double threshold ) {
+	public int addImage( T grayScale , double threshold , double lengthSide ) {
 		// scale the image to the desired size
 		T scaled = GeneralizedImageOps.createSingleBand(getInputType(),squareLength,squareLength);
 		DistortImageOps.scale(grayScale,scaled, TypeInterpolate.BILINEAR);
@@ -105,6 +106,7 @@ public class DetectFiducialSquareImage<T extends ImageSingleBand>
 
 		// describe it in 4 different orientations
 		FiducialDef def = new FiducialDef();
+		def.lengthSide = lengthSide;
 
 		binaryToDef(binary0, def.desc[0]);
 		ImageMiscOps.rotateCW(binary0, binary1);
@@ -159,6 +161,7 @@ public class DetectFiducialSquareImage<T extends ImageSingleBand>
 			if( bestScore <= hammingThreshold ) {
 				result.rotation = bestOrientation;
 				result.which = i;
+				result.lengthSide = def.lengthSide;
 				return true;
 			}
 		}
@@ -184,8 +187,9 @@ public class DetectFiducialSquareImage<T extends ImageSingleBand>
 	/**
 	 * description of an image in 4 different orientations
 	 */
-	protected static class FiducialDef
+	public static class FiducialDef
 	{
-		short[][] desc = new short[4][DESC_LENGTH];
+		public short[][] desc = new short[4][DESC_LENGTH];
+		public double lengthSide;
 	}
 }

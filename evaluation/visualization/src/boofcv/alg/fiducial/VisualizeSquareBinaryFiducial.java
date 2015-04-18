@@ -48,7 +48,8 @@ public class VisualizeSquareBinaryFiducial {
 		IntrinsicParameters intrinsic = UtilIO.loadXML(nameIntrinsic);
 
 		Detector detector = new Detector();
-		detector.configure(0.1, intrinsic);
+		detector.configure(intrinsic);
+		detector.setLengthSide(0.1);
 		detector.process(input);
 
 		System.out.println("Total Found: "+detector.squares.size());

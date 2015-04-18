@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -50,7 +50,8 @@ public class SquareBinary_to_FiducialDetector<T extends ImageSingleBand>
 
 	@Override
 	public void setIntrinsic(IntrinsicParameters intrinsic) {
-		alg.configure(targetWidth, intrinsic);
+		alg.setLengthSide(targetWidth);
+		alg.configure(intrinsic);
 	}
 
 	@Override
@@ -66,6 +67,11 @@ public class SquareBinary_to_FiducialDetector<T extends ImageSingleBand>
 	@Override
 	public int getId( int which ) {
 		return alg.getFound().get(which).index;
+	}
+
+	@Override
+	public double getWidth(int which) {
+		return targetWidth;
 	}
 
 	@Override

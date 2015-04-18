@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -70,6 +70,9 @@ public class CalibrationFiducialDetector<T extends ImageSingleBand>
 	// Expected type of input image
 	ImageType<T> type;
 
+	// average of width and height
+	double width;
+
 	/**
 	 * Configure it to detect chessboard style targets
 	 */
@@ -79,6 +82,11 @@ public class CalibrationFiducialDetector<T extends ImageSingleBand>
 		this.target = FactoryPlanarCalibrationTarget.gridChess(config.numCols, config.numRows, sizeOfSquares);
 		this.type = ImageType.single(imageType);
 		this.converted = new ImageFloat32(1,1);
+
+		double sideWidth = config.numCols*sizeOfSquares;
+		double sideHeight = config.numRows*sizeOfSquares;
+
+		width = (sideWidth+sideHeight)/2.0;
 
 		computeH = new Zhang99ComputeTargetHomography(target.points);
 	}
@@ -155,6 +163,11 @@ public class CalibrationFiducialDetector<T extends ImageSingleBand>
 	@Override
 	public int getId( int which ) {
 		return 0;
+	}
+
+	@Override
+	public double getWidth(int which) {
+		return width;
 	}
 
 	@Override

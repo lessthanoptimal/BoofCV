@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -161,13 +161,14 @@ public class FiducialTrackerApp<I extends ImageSingleBand>
 		if( name.compareTo(SQUARE_NUMBER) == 0 ) {
 			detector = FactoryFiducial.squareBinaryRobust(new ConfigFiducialBinary(0.1),6,imageClass);
 		} else if( name.compareTo(SQUARE_PICTURE) == 0 ) {
-			detector = FactoryFiducial.squareImageRobust(new ConfigFiducialImage(0.1), 6, imageClass);
+			double length = 0.1;
+			detector = FactoryFiducial.squareImageRobust(new ConfigFiducialImage(), 6, imageClass);
 
 			SquareImage_to_FiducialDetector<I> d = (SquareImage_to_FiducialDetector<I>)detector;
 			BufferedImage dog = media.openImage(path + "/dog.png");
 			BufferedImage text = media.openImage(path+"/text.png");
-			d.addTarget(ConvertBufferedImage.convertFromSingle(dog,null,imageClass),125);
-			d.addTarget(ConvertBufferedImage.convertFromSingle(text,null,imageClass),125);
+			d.addTarget(ConvertBufferedImage.convertFromSingle(dog,null,imageClass),length,125);
+			d.addTarget(ConvertBufferedImage.convertFromSingle(text,null,imageClass),length,125);
 
 		} else if( name.compareTo(CALIB_CHESS) == 0 ) {
 			detector = FactoryFiducial.calibChessboard(new ConfigChessboard(5,7), 0.03, imageClass);

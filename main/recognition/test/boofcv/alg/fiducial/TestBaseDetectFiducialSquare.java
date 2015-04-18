@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -76,7 +76,7 @@ public class TestBaseDetectFiducialSquare {
 		distorter.apply(image,distorted);
 
 		Dummy dummy = new Dummy();
-		dummy.configure(0.1, intrinsic);
+		dummy.configure(intrinsic);
 		dummy.process(distorted);
 
 		assertEquals(1,dummy.detected.size());
@@ -118,11 +118,12 @@ public class TestBaseDetectFiducialSquare {
 	@Test
 	public void computeTargetToWorld() {
 
+		double lengthSide = 0.5;
 		IntrinsicParameters intrinsic = new IntrinsicParameters(400,400,0,320,240,640,380,false,null);
 		DenseMatrix64F K = PerspectiveOps.calibrationMatrix(intrinsic,null);
 
 		Dummy alg = new Dummy();
-		alg.configure(0.5, intrinsic);
+		alg.configure(intrinsic);
 
 		Se3_F64 targetToWorld = new Se3_F64();
 		targetToWorld.getT().set(0.1,-0.07,1.5);
@@ -130,13 +131,14 @@ public class TestBaseDetectFiducialSquare {
 
 		Quadrilateral_F64 quad = new Quadrilateral_F64();
 
-		quad.a = PerspectiveOps.renderPixel(targetToWorld,K,c(alg.pairsPose.get(0).p1));
-		quad.b = PerspectiveOps.renderPixel(targetToWorld,K,c(alg.pairsPose.get(1).p1));
-		quad.c = PerspectiveOps.renderPixel(targetToWorld,K,c(alg.pairsPose.get(2).p1));
-		quad.d = PerspectiveOps.renderPixel(targetToWorld,K,c(alg.pairsPose.get(3).p1));
+		double r = lengthSide/2.0;
+		quad.a = PerspectiveOps.renderPixel(targetToWorld,K,c(new Point2D_F64( r, r)));
+		quad.b = PerspectiveOps.renderPixel(targetToWorld,K,c(new Point2D_F64( r,-r)));
+		quad.c = PerspectiveOps.renderPixel(targetToWorld,K,c(new Point2D_F64(-r,-r)));
+		quad.d = PerspectiveOps.renderPixel(targetToWorld,K,c(new Point2D_F64(-r, r)));
 
 		Se3_F64 found = new Se3_F64();
-		alg.computeTargetToWorld(quad, found);
+		alg.computeTargetToWorld(quad, 0.5, found);
 
 		assertTrue(MatrixFeatures.isIdentical(targetToWorld.getR(), found.getR(), 1e-6));
 		assertEquals(0,targetToWorld.getT().distance(found.getT()),1e-6);

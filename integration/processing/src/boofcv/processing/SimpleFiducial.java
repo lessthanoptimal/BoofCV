@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -43,13 +43,11 @@ import java.util.List;
 public class SimpleFiducial {
 	FiducialDetector detector;
 	ImageBase boofImage;
-	double targetWidth;
 	IntrinsicParameters intrinsic;
 
-	public SimpleFiducial(FiducialDetector detector , double targetWidth ) {
+	public SimpleFiducial(FiducialDetector detector) {
 		this.detector = detector;
 		boofImage = detector.getInputType().createImage(1,1);
-		this.targetWidth = targetWidth;
 	}
 
 	public void setIntrinsic( IntrinsicParameters intrinsic ) {
@@ -79,17 +77,18 @@ public class SimpleFiducial {
 		for (int i = 0; i < detector.totalFound(); i++) {
 
 			int id = detector.getId(i);
+			double width = detector.getWidth(i);
 			Se3_F64 fiducialToWorld = new Se3_F64();
 			detector.getFiducialToWorld(i,fiducialToWorld);
 
-			found.add( new FiducialFound(id,fiducialToWorld) );
+			found.add( new FiducialFound(id,width,fiducialToWorld) );
 		}
 
 		return found;
 	}
 
 	public void render( PApplet p , FiducialFound fiducial ) {
-		double r = targetWidth/2.0;
+		double r = fiducial.getWidth()/2.0;
 		Point3D_F64 corners[] = new Point3D_F64[8];
 		corners[0] = new Point3D_F64(-r,-r,0);
 		corners[1] = new Point3D_F64( r,-r,0);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -41,7 +41,7 @@ public class TestGImageMiscOps extends BaseGClassChecksInMisc{
 
 	@Test
 	public void compareToPixelMath() {
-		performTests(12);
+		performTests(14);
 	}
 
 	@Override
@@ -50,13 +50,17 @@ public class TestGImageMiscOps extends BaseGClassChecksInMisc{
 		String name = candidate.getName();
 
 		ImageBase inputA = null;
+		ImageBase inputSquare = null;
 
 		for( int i = 0; i < param.length; i++ ) {
 			if( ImageBase.class.isAssignableFrom(param[i]) ) {
-				if( ImageSingleBand.class.isAssignableFrom(param[i]))
+				if( ImageSingleBand.class.isAssignableFrom(param[i])) {
 					inputA = GeneralizedImageOps.createSingleBand((Class) param[i], width, height);
-				else
+					inputSquare = GeneralizedImageOps.createSingleBand((Class) param[i], width, width);
+				} else {
 					inputA = GeneralizedImageOps.createInterleaved((Class) param[i], width, height, numBands);
+					inputSquare = GeneralizedImageOps.createInterleaved((Class) param[i], width, width, numBands);
+				}
 			}
 		}
 		if( inputA == null )
@@ -121,11 +125,19 @@ public class TestGImageMiscOps extends BaseGClassChecksInMisc{
 		} else if( name.equals("flipHorizontal")) {
 			ret[0][0] = inputA;
 		} else if( name.equals("rotateCW")) {
-			ret[0][0] = inputA;
-			ret[0][1] = inputA._createNew(height,width);
+			if( param.length == 1 ) {
+				ret[0][0] = inputSquare;
+			} else {
+				ret[0][0] = inputA;
+				ret[0][1] = inputA._createNew(height,width);
+			}
 		} else if( name.equals("rotateCCW")) {
-			ret[0][0] = inputA;
-			ret[0][1] = inputA._createNew(height,width);
+			if( param.length == 1 ) {
+				ret[0][0] = inputSquare;
+			} else {
+				ret[0][0] = inputA;
+				ret[0][1] = inputA._createNew(height,width);
+			}
 		} else {
 			throw new RuntimeException("Unknown function: "+name);
 		}

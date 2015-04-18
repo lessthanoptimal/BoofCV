@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -59,9 +59,9 @@ public class TestSquareImage_to_FiducialDetector extends GenericFiducialDetector
 	@Override
 	public FiducialDetector createDetector(ImageType imageType) {
 		SquareImage_to_FiducialDetector ret = FactoryFiducial.squareImageRobust
-				(new ConfigFiducialImage(0.1), 6, imageType.getImageClass());
+				(new ConfigFiducialImage(), 6, imageType.getImageClass());
 
-		ret.addTarget(UtilImageIO.loadImage(directory + "dog.png", imageType.getImageClass()), 125);
+		ret.addTarget(UtilImageIO.loadImage(directory + "dog.png", imageType.getImageClass()), 125,0.1);
 
 		return ret;
 	}

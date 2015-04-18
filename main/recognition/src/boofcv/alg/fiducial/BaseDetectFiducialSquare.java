@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,6 +39,7 @@ import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSInt32;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
+import georegression.geometry.GeometryMath_F64;
 import georegression.struct.homography.UtilHomography;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I32;
@@ -62,7 +63,7 @@ import java.util.List;
  * </p>
  *
  * <p>
- * Must call {@link #configure(double, boofcv.struct.calib.IntrinsicParameters)} before it can process an image.
+ * Must call {@link #configure(boofcv.struct.calib.IntrinsicParameters)} before it can process an image.
  * </p>
  *
  * <p>
@@ -171,25 +172,25 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 	/**
 	 * Specifies the image's intrinsic parameters and target size
 	 *
-	 * @param squareWidth How wide the target is in world units.
 	 * @param intrinsic Intrinsic parameters for the distortion free input image
 	 */
-	public void configure( double squareWidth , IntrinsicParameters intrinsic) {
+	public void configure( IntrinsicParameters intrinsic) {
 
 		// resize storage images
-		binary.reshape(intrinsic.width,intrinsic.height);
-		labeled.reshape(intrinsic.width,intrinsic.height);
+		binary.reshape(intrinsic.width, intrinsic.height);
+		labeled.reshape(intrinsic.width, intrinsic.height);
 
 		// adjust size based parameters based on image size
 		this.minimumContour = (int)(intrinsic.width*minContourFraction);
 		this.minimumArea = Math.pow(this.minimumContour /4.0,2);
 
 		// add corner points in target frame.  Used to compute homography.  Target's center is at its origin
-		// see comment in class JavaDoc above
-		pairsPose.get(0).p1.set( squareWidth / 2,  squareWidth / 2);
-		pairsPose.get(1).p1.set( squareWidth / 2, -squareWidth / 2);
-		pairsPose.get(2).p1.set(-squareWidth / 2, -squareWidth / 2);
-		pairsPose.get(3).p1.set(-squareWidth / 2, squareWidth / 2);
+		// see comment in class JavaDoc above.  Note that the target's length is one below.  The scale factor
+		// will be provided later one
+		pairsPose.get(0).p1.set( 0.5,  0.5);
+		pairsPose.get(1).p1.set( 0.5, -0.5);
+		pairsPose.get(2).p1.set(-0.5, -0.5);
+		pairsPose.get(3).p1.set(-0.5,  0.5);
 
 		// Setup homography to camera pose estimator
 		DenseMatrix64F K = new DenseMatrix64F(3,3);
@@ -256,7 +257,7 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 				}
 
 				// estimate position
-				computeTargetToWorld(q,f.targetToSensor);
+				computeTargetToWorld(q,result.lengthSide,f.targetToSensor);
 			}
 		}
 	}
@@ -342,9 +343,11 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 	 * See code comments for correct ordering of corners in quad.
 	 *
 	 * @param quad (Input) Observed location of corner points in the specified order.
+	 * @param lengthSide (Input) Length of a side on the square
 	 * @param targetToWorld (output) transform from target to world frame.
 	 */
-	public void computeTargetToWorld( Quadrilateral_F64 quad , Se3_F64 targetToWorld ) {
+	public void computeTargetToWorld( Quadrilateral_F64 quad , double lengthSide , Se3_F64 targetToWorld )
+	{
 		pairsPose.get(0).p2.set(quad.a);
 		pairsPose.get(1).p2.set(quad.b);
 		pairsPose.get(2).p2.set(quad.c);
@@ -354,6 +357,7 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 			throw new RuntimeException("Compute homography failed!");
 
 		targetToWorld.set(homographyToPose.decompose(H));
+		GeometryMath_F64.scale(targetToWorld.getT(),lengthSide);
 	}
 
 	/**
@@ -383,6 +387,8 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 
 	public static class Result {
 		int which;
+		// length of one of the sides in world units
+		double lengthSide;
 		// amount of clock-wise rotation.  Each value = +90 degrees
 		int rotation;
 	}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,20 +34,22 @@ public class SquareImage_to_FiducialDetector<T extends ImageSingleBand>
 {
 	DetectFiducialSquareImage<T> alg;
 
-	double targetWidth;
 	ImageType<T> type;
 
-	public SquareImage_to_FiducialDetector(DetectFiducialSquareImage<T> alg, double targetWidth) {
+	public SquareImage_to_FiducialDetector(DetectFiducialSquareImage<T> alg) {
 		this.alg = alg;
-		this.targetWidth = targetWidth;
 		this.type = ImageType.single(alg.getInputType());
 	}
 
 	/**
-	 * Add a new target to the list
+	 * Add a new target to the list.
+	 *
+	 * @param target Gray scale image of the target
+	 * @param threshold Threshold used to convert it into a binary image
+	 * @param lengthSide Length of a side on the square in world units.
 	 */
-	public void addTarget( T target , double threshold ) {
-		alg.addImage(target,threshold);
+	public void addTarget( T target , double threshold , double lengthSide ) {
+		alg.addImage(target, threshold, lengthSide);
 	}
 
 	@Override
@@ -57,7 +59,7 @@ public class SquareImage_to_FiducialDetector<T extends ImageSingleBand>
 
 	@Override
 	public void setIntrinsic(IntrinsicParameters intrinsic) {
-		alg.configure(targetWidth, intrinsic);
+		alg.configure(intrinsic);
 	}
 
 	@Override
@@ -76,11 +78,13 @@ public class SquareImage_to_FiducialDetector<T extends ImageSingleBand>
 	}
 
 	@Override
-	public ImageType<T> getInputType() {
-		return type;
+	public double getWidth(int which) {
+		int index = alg.getFound().get(which).index;
+		return alg.getTargets().get(index).lengthSide;
 	}
 
-	public double getTargetWidth() {
-		return targetWidth;
+	@Override
+	public ImageType<T> getInputType() {
+		return type;
 	}
 }

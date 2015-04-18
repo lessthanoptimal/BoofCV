@@ -52,7 +52,7 @@ public class VisualizeSquareFiducial {
 		IntrinsicParameters intrinsic = UtilIO.loadXML(nameIntrinsic);
 
 		Detector detector = new Detector();
-		detector.configure(0.1, intrinsic);
+		detector.configure(intrinsic);
 		detector.process(input);
 
 		System.out.println("Total Found: "+detector.squares.size());
@@ -78,7 +78,7 @@ public class VisualizeSquareFiducial {
 			// add back in lens distortion
 			Quadrilateral_F64 q = fiducials.get(i).location;
 
-			detector.computeTargetToWorld(q,targetToWorld);
+			detector.computeTargetToWorld(q,0.1,targetToWorld);
 			VisualizeFiducial.drawCube(targetToWorld, intrinsic, 0.1, g2);
 
 			apply(addRadialDistortion,q.a,q.a);

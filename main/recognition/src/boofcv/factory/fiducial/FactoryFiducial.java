@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -101,7 +101,7 @@ public class FactoryFiducial {
 		DetectFiducialSquareImage<T> alg = new DetectFiducialSquareImage<T>(
 				binary,poly,config.minContourFraction,config.maxErrorFraction,imageType);
 
-		return new SquareImage_to_FiducialDetector<T>(alg,config.targetWidth);
+		return new SquareImage_to_FiducialDetector<T>(alg);
 	}
 
 	/**
@@ -122,7 +122,7 @@ public class FactoryFiducial {
 		DetectFiducialSquareImage<T> alg = new DetectFiducialSquareImage<T>(
 				binary,poly,config.minContourFraction,config.maxErrorFraction,imageType);
 
-		return new SquareImage_to_FiducialDetector<T>(alg,config.targetWidth);
+		return new SquareImage_to_FiducialDetector<T>(alg);
 	}
 
 	/**

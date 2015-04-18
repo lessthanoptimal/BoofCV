@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -60,6 +60,9 @@ public class DetectFiducialSquareBinary<T extends ImageSingleBand>
 	protected final static int w=r*2+1;
 	protected final static int N=w*w;
 
+	// length of a side on the fiducials in world units
+	private double lengthSide = 1;
+
 	/**
 	 * Configures the fiducial detector
 	 *
@@ -74,6 +77,10 @@ public class DetectFiducialSquareBinary<T extends ImageSingleBand>
 		int widthNoBorder = w*4;
 
 		binary.reshape(widthNoBorder,widthNoBorder);
+	}
+
+	public void setLengthSide(double lengthSide) {
+		this.lengthSide = lengthSide;
 	}
 
 	@Override
@@ -111,6 +118,7 @@ public class DetectFiducialSquareBinary<T extends ImageSingleBand>
 		val |= classified[2] << 11;
 
 		result.which = val;
+		result.lengthSide = lengthSide;
 
 		return true;
 	}
