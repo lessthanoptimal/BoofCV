@@ -36,7 +36,7 @@ import java.util.regex.Pattern;
  *
  * @author Peter Abeles
  */
-public class BatchDownsizeImage {
+public class BatchDownSizeImage {
 
 	public static void printHelpAndExit() {
 		System.out.println("<app name> <file path regex> <output directory> <width> <height>");
@@ -108,7 +108,7 @@ public class BatchDownsizeImage {
 			AverageDownSampleOps.down(input,small);
 
 			String nout = f.getName();
-			nout = nout.substring(0,nout.length()-4) + "png";
+			nout = nout.substring(0,nout.length()-3) + "png";
 
 			File fout = new File(output,nout);
 			BufferedImage bout = new BufferedImage(width,height,BufferedImage.TYPE_INT_RGB);

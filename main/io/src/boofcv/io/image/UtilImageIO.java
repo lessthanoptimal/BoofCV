@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -137,7 +137,7 @@ public class UtilImageIO {
 					ImageUInt8 gray = ConvertBufferedImage.convertFrom(img, (ImageUInt8) null);
 					savePGM(gray, fileName);
 				}else
-					throw new IllegalArgumentException("No writter appropriate found");
+					throw new IllegalArgumentException("No writer appropriate found");
 			}
 		} catch (IOException e) {
 			throw new RuntimeException(e);

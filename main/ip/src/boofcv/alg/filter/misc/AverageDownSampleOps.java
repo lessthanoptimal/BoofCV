@@ -143,7 +143,7 @@ public class AverageDownSampleOps {
 			int N = in.getNumBands();
 
 			for (int i = 0; i < N; i++) {
-				down(in.getBand(i),out.getBand(0));
+				down(in.getBand(i),out.getBand(i));
 			}
 		}
 	}
