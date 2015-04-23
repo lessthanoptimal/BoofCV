@@ -107,21 +107,19 @@ public class DetectFiducialSquareImage<T extends ImageSingleBand>
 		}
 
 		// threshold it
-		ImageUInt8 binary0 = binary;
-		ImageUInt8 binary1 = new ImageUInt8(squareLength,squareLength);
-		GThresholdImageOps.threshold(scaled,binary0,threshold,true);
+		GThresholdImageOps.threshold(scaled,binary,threshold,true);
 
 		// describe it in 4 different orientations
 		FiducialDef def = new FiducialDef();
 		def.lengthSide = lengthSide;
 
-		binaryToDef(binary0, def.desc[0]);
-		ImageMiscOps.rotateCW(binary0, binary1);
-		binaryToDef(binary1, def.desc[1]);
-		ImageMiscOps.rotateCW(binary1,binary0);
-		binaryToDef(binary0,def.desc[2]);
-		ImageMiscOps.rotateCW(binary0,binary1);
-		binaryToDef(binary1,def.desc[3]);
+		binaryToDef(binary, def.desc[0]);
+		ImageMiscOps.rotateCW(binary);
+		binaryToDef(binary, def.desc[1]);
+		ImageMiscOps.rotateCW(binary);
+		binaryToDef(binary,def.desc[2]);
+		ImageMiscOps.rotateCW(binary);
+		binaryToDef(binary,def.desc[3]);
 
 		int index = targets.size();
 		targets.add( def );

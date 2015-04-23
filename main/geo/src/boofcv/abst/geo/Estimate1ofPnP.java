@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,12 +24,13 @@ import georegression.struct.se.Se3_F64;
 
 /**
  * <p>
- * Marker interface for computing one solution to the Perspective N-Point (PnP) problem.  Given a set of point
- * observations from a single view and the known 3D location of the points being observed, estimate the camera
- * location.  All observations must be in calibrated image coordinates.
+ * Marker interface for computing one solution to the Perspective N-Point (PnP) problem.  Given a set of
+ * observations from a single view and the known 3D location of the points being observed, estimate the rigid body
+ * transform from <b>world to camera</b> frame.
  * </p>
  * <p>
- * Estimated motion is from the world frame into the camera frame.
+ * <b>Observations are in normalized image coordinates</b>, e.g. 3D pointing vector from camera origin
+ * of the form (x,y,1.0).
  * </p>
  *
  * @author Peter Abeles
