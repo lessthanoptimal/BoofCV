@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,20 +21,12 @@ package boofcv.examples.sfm;
 import boofcv.abst.feature.associate.AssociateDescription;
 import boofcv.abst.feature.associate.ScoreAssociation;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
-import boofcv.abst.geo.Estimate1ofEpipolar;
-import boofcv.abst.geo.Estimate1ofPnP;
 import boofcv.abst.geo.TriangulateTwoViewsCalibrated;
 import boofcv.alg.distort.LensDistortionOps;
-import boofcv.alg.geo.DistanceModelMonoPixels;
-import boofcv.alg.geo.pose.PnPDistanceReprojectionSq;
-import boofcv.alg.sfm.robust.DistanceSe3SymmetricSq;
-import boofcv.alg.sfm.robust.EstimatorToGenerator;
-import boofcv.alg.sfm.robust.Se3FromEssentialGenerator;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
-import boofcv.factory.geo.EnumEpipolar;
-import boofcv.factory.geo.EnumPNP;
 import boofcv.factory.geo.FactoryMultiView;
+import boofcv.factory.geo.FactoryMultiViewRobust;
 import boofcv.factory.geo.FactoryTriangulate;
 import boofcv.gui.d3.PointCloudViewer;
 import boofcv.gui.image.ShowImages;
@@ -49,13 +41,12 @@ import boofcv.struct.feature.SurfFeatureQueue;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.geo.Point2D3D;
 import boofcv.struct.image.ImageFloat32;
-import georegression.fitting.se.ModelManagerSe3_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
-import org.ddogleg.fitting.modelset.*;
-import org.ddogleg.fitting.modelset.ransac.Ransac;
+import org.ddogleg.fitting.modelset.ModelFitter;
+import org.ddogleg.fitting.modelset.ModelMatcher;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_I32;
 
@@ -129,8 +120,8 @@ public class ExampleMultiviewSceneReconstruction {
 
 		pixelToNorm = LensDistortionOps.transformRadialToNorm_F64(intrinsic);
 
-		setupEssential(intrinsic);
-		setupPnP(intrinsic);
+		estimateEssential = FactoryMultiViewRobust.essentialRansac(2323,4000,inlierTol,intrinsic);
+		estimatePnP = FactoryMultiViewRobust.pnpRansac(2323,4000,inlierTol,intrinsic);
 
 		// find features in each image
 		detectImageFeatures(colorImages);
@@ -203,7 +194,7 @@ public class ExampleMultiviewSceneReconstruction {
 					count++;
 				}
 			}
-			System.out.println(i+"  count "+count);
+			System.out.println(i + "  count " + count);
 			if( count > bestCount ) {
 				bestCount = count;
 				bestImage = i;
@@ -267,46 +258,6 @@ public class ExampleMultiviewSceneReconstruction {
 			}
 			System.out.println();
 		}
-	}
-
-	/**
-	 * Configure robust algorithm for estimating pose from 3D features
-	 */
-	private void setupPnP( IntrinsicParameters intrinsic ) {
-		Estimate1ofPnP estimator = FactoryMultiView.computePnP_1(EnumPNP.P3P_FINSTERWALDER, -1, 2);
-		final DistanceModelMonoPixels<Se3_F64,Point2D3D> distance = new PnPDistanceReprojectionSq();
-		distance.setIntrinsic(intrinsic.fx, intrinsic.fy, intrinsic.skew);
-
-		ModelManagerSe3_F64 manager = new ModelManagerSe3_F64();
-		EstimatorToGenerator<Se3_F64,Point2D3D> generator = new EstimatorToGenerator<Se3_F64,Point2D3D>(estimator);
-
-		// 1/2 a pixel tolerance for RANSAC inliers
-		double ransacTOL = inlierTol * inlierTol;
-
-		estimatePnP = new Ransac<Se3_F64, Point2D3D>(2323, manager, generator, distance, 4000, ransacTOL);
-	}
-
-	/**
-	 * Configure robust algorithm for estimating pose from essential matrix
-	 */
-	private void setupEssential( IntrinsicParameters intrinsic ) {
-		// Since this is the first frame estimate the camera motion up to a translational scale factor
-		Estimate1ofEpipolar essentialAlg = FactoryMultiView.computeFundamental_1(EnumEpipolar.ESSENTIAL_5_NISTER, 5);
-
-		ModelManager<Se3_F64> manager = new ModelManagerSe3_F64();
-		ModelGenerator<Se3_F64, AssociatedPair> generateEpipolarMotion =
-				new Se3FromEssentialGenerator(essentialAlg, triangulate);
-
-		DistanceFromModel<Se3_F64, AssociatedPair> distanceSe3 =
-				new DistanceSe3SymmetricSq(triangulate,
-						intrinsic.fx, intrinsic.fy, intrinsic.skew,
-						intrinsic.fx, intrinsic.fy, intrinsic.skew);
-
-		// tolerance for RANSAC inliers
-		double ransacTOL = inlierTol * inlierTol * 2.0;
-
-		estimateEssential = new Ransac<Se3_F64, AssociatedPair>(2323, manager, generateEpipolarMotion, distanceSe3,
-				4000, ransacTOL);
 	}
 
 	/**

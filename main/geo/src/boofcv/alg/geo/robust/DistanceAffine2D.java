@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.sfm.robust;
+package boofcv.alg.geo.robust;
 
 import boofcv.struct.geo.AssociatedPair;
 import georegression.struct.affine.Affine2D_F64;
@@ -28,17 +28,12 @@ import java.util.List;
 
 
 /**
- * <p>
  * Applies an affine transformation to the associated pair and computes the euclidean distance
- * squared between their locations.  This reduces computations by avoiding the square root
- * functions, which is computationally expensive. While both this error metric and euclidean
- * distance have the same minimum, this exaggerates the magnitude of outliers.
- * The transform is applied to the "keyLoc".
- * </p>
- * 
+ * between their locations.  The transform is applied to the "keyLoc".
+ *
  * @author Peter Abeles
  */
-public class DistanceAffine2DSq implements DistanceFromModel<Affine2D_F64,AssociatedPair> {
+public class DistanceAffine2D implements DistanceFromModel<Affine2D_F64,AssociatedPair> {
 
 	Affine2D_F64 model;
 	Point2D_F64 expected = new Point2D_F64();
@@ -52,7 +47,7 @@ public class DistanceAffine2DSq implements DistanceFromModel<Affine2D_F64,Associ
 	public double computeDistance(AssociatedPair pt) {
 		AffinePointOps_F64.transform(model, pt.p1, expected);
 
-		return expected.distance2(pt.p2);
+		return expected.distance(pt.p2);
 	}
 
 	@Override
@@ -61,7 +56,7 @@ public class DistanceAffine2DSq implements DistanceFromModel<Affine2D_F64,Associ
 			AssociatedPair p = points.get(i);
 			AffinePointOps_F64.transform(model,p.p1,expected);
 
-			distance[i] = expected.distance2(p.p2);
+			distance[i] = expected.distance(p.p2);
 		}
 	}
 }

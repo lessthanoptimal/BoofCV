@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -16,12 +16,12 @@
  * limitations under the License.
  */
 
-package boofcv.alg.sfm.robust;
+package boofcv.alg.geo.robust;
 
 import boofcv.struct.geo.AssociatedPair;
-import georegression.struct.homography.Homography2D_F64;
+import georegression.struct.affine.Affine2D_F64;
 import georegression.struct.point.Point2D_F64;
-import georegression.transform.homography.HomographyPointOps_F64;
+import georegression.transform.affine.AffinePointOps_F64;
 import org.ddogleg.fitting.modelset.DistanceFromModel;
 
 import java.util.List;
@@ -29,31 +29,28 @@ import java.util.List;
 
 /**
  * <p>
- * Computes the Euclidean error squared between 'p1' and 'p2' after projecting 'p1' into image 2.  Input
- * can be in pixels or normalized image coordinates, but the error for normalized image coordinates doesn't
- * have a physical meaning.
- * </p>
- *
- * <p>
- * error = (p2'.x - p2.x)<sup>2</sup>  + (p2'.y - p2.y)<sup>2</sup>, where p2' is the predicted location and p2 is
- * the observed location.
+ * Applies an affine transformation to the associated pair and computes the euclidean distance
+ * squared between their locations.  This reduces computations by avoiding the square root
+ * functions, which is computationally expensive. While both this error metric and euclidean
+ * distance have the same minimum, this exaggerates the magnitude of outliers.
+ * The transform is applied to the "keyLoc".
  * </p>
  * 
  * @author Peter Abeles
  */
-public class DistanceHomographySq implements DistanceFromModel<Homography2D_F64,AssociatedPair> {
+public class DistanceAffine2DSq implements DistanceFromModel<Affine2D_F64,AssociatedPair> {
 
-	Homography2D_F64 model;
+	Affine2D_F64 model;
 	Point2D_F64 expected = new Point2D_F64();
 
 	@Override
-	public void setModel(Homography2D_F64 model ) {
+	public void setModel(Affine2D_F64 model ) {
 		this.model = model;
 	}
 
 	@Override
 	public double computeDistance(AssociatedPair pt) {
-		HomographyPointOps_F64.transform(model, pt.p1, expected);
+		AffinePointOps_F64.transform(model, pt.p1, expected);
 
 		return expected.distance2(pt.p2);
 	}
@@ -62,7 +59,7 @@ public class DistanceHomographySq implements DistanceFromModel<Homography2D_F64,
 	public void computeDistance(List<AssociatedPair> points, double[] distance) {
 		for( int i = 0; i < points.size(); i++ ) {
 			AssociatedPair p = points.get(i);
-			HomographyPointOps_F64.transform(model, p.p1, expected);
+			AffinePointOps_F64.transform(model,p.p1,expected);
 
 			distance[i] = expected.distance2(p.p2);
 		}

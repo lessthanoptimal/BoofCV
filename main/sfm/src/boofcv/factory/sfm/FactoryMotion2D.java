@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,10 +22,10 @@ import boofcv.abst.feature.tracker.PointTracker;
 import boofcv.abst.sfm.d2.ImageMotion2D;
 import boofcv.abst.sfm.d2.WrapImageMotionPtkSmartRespawn;
 import boofcv.alg.distort.ImageDistort;
+import boofcv.alg.geo.robust.*;
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.interpolate.TypeInterpolate;
 import boofcv.alg.sfm.d2.*;
-import boofcv.alg.sfm.robust.*;
 import boofcv.factory.distort.FactoryDistort;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.geo.AssociatedPair;

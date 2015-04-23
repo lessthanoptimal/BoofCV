@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,9 @@
 
 package boofcv.alg.sfm.robust;
 
+import boofcv.alg.geo.robust.GenerateSe2_AssociatedPair;
+import boofcv.alg.geo.robust.ModelTestingInterface;
+import boofcv.alg.geo.robust.StandardModelGeneratorTests;
 import boofcv.struct.geo.AssociatedPair;
 import georegression.fitting.MotionTransformPoint;
 import georegression.fitting.se.MotionSe2PointSVD_F64;

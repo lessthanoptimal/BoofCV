@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,10 +28,9 @@ import boofcv.alg.distort.PixelTransformHomography_F32;
 import boofcv.alg.distort.impl.DistortSupport;
 import boofcv.alg.feature.UtilFeature;
 import boofcv.alg.interpolate.impl.ImplBilinearPixel_F32;
-import boofcv.alg.sfm.robust.DistanceHomographySq;
-import boofcv.alg.sfm.robust.GenerateHomographyLinear;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
+import boofcv.factory.geo.FactoryMultiViewRobust;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
@@ -42,14 +41,11 @@ import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.MultiSpectral;
-import georegression.fitting.homography.ModelManagerHomography2D_F64;
 import georegression.struct.homography.Homography2D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I32;
 import georegression.transform.homography.HomographyPointOps_F64;
-import org.ddogleg.fitting.modelset.ModelManager;
 import org.ddogleg.fitting.modelset.ModelMatcher;
-import org.ddogleg.fitting.modelset.ransac.Ransac;
 import org.ddogleg.struct.FastQueue;
 
 import java.awt.*;
@@ -154,12 +150,8 @@ public class ExampleImageStitching {
 		AssociateDescription<SurfFeature> associate = FactoryAssociation.greedy(scorer,2,true);
 
 		// fit the images using a homography.  This works well for rotations and distant objects.
-		ModelManager<Homography2D_F64> manager = new ModelManagerHomography2D_F64();
-		GenerateHomographyLinear modelFitter = new GenerateHomographyLinear(true);
-		DistanceHomographySq distance = new DistanceHomographySq();
-
 		ModelMatcher<Homography2D_F64,AssociatedPair> modelMatcher =
-				new Ransac<Homography2D_F64,AssociatedPair>(123,manager,modelFitter,distance,60,9);
+				FactoryMultiViewRobust.homographyRansac(123,60,3);
 
 		Homography2D_F64 H = computeTransform(inputA, inputB, detDesc, associate, modelMatcher);
 

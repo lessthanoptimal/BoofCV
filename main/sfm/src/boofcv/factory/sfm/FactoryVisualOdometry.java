@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -43,10 +43,10 @@ import boofcv.alg.sfm.DepthSparse3D;
 import boofcv.alg.sfm.StereoSparse3D;
 import boofcv.alg.sfm.d3.*;
 import boofcv.alg.sfm.robust.DistancePlane2DToPixelSq;
-import boofcv.alg.sfm.robust.EstimatorToGenerator;
 import boofcv.alg.sfm.robust.GenerateSe2_PlanePtPixel;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.geo.EnumPNP;
+import boofcv.factory.geo.EstimatorToGenerator;
 import boofcv.factory.geo.FactoryMultiView;
 import boofcv.factory.geo.FactoryTriangulate;
 import boofcv.struct.feature.TupleDesc;

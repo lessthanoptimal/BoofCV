@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.alg.sfm.robust;
 
+import boofcv.alg.geo.robust.GenerateAffine2D;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.sfm.ScaleTranslateRotate2D;
 import georegression.struct.affine.Affine2D_F64;

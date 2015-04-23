@@ -27,6 +27,8 @@ Version : Alpha 0.19
   * Image square fiducials can now have their width individually set
 - PerspectiveOps
   * Can render pixel in camera frame using InrinsicParameters
+- Created FactoryMultiViewRobust for simplifying the creation of robust versions of
+  solutions to PnP, essential, homography
 
 TODO
   * Square Detector.  Create set of images in validation boof with hand selected corners
@@ -38,6 +40,7 @@ TODO
   * Histogram comparison
   * Add a jar which includes everything to Maven?
   * Documentation on how to build a single jar
+  * ExamplePnP
 
 ---------------------------------------------
 Date    : 2014/9/22

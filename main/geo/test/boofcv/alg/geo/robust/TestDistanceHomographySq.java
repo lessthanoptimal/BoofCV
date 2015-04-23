@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -16,45 +16,48 @@
  * limitations under the License.
  */
 
-package boofcv.alg.sfm.robust;
+package boofcv.alg.geo.robust;
+
 
 import boofcv.struct.geo.AssociatedPair;
-import georegression.struct.affine.Affine2D_F64;
+import georegression.struct.homography.Homography2D_F64;
 import georegression.struct.point.Point2D_F64;
-import georegression.transform.affine.AffinePointOps_F64;
+import georegression.transform.homography.HomographyPointOps_F64;
 import org.ddogleg.fitting.modelset.DistanceFromModel;
 
 import java.util.Random;
 
-
 /**
  * @author Peter Abeles
  */
-public class TestDistanceAffine2D extends StandardDistanceTest<Affine2D_F64, AssociatedPair> {
+public class TestDistanceHomographySq extends StandardDistanceTest<Homography2D_F64, AssociatedPair> {
 
 	Random rand = new Random(234);
 
 	@Override
-	public DistanceFromModel<Affine2D_F64, AssociatedPair> create() {
-		return new DistanceAffine2D();
+	public DistanceFromModel<Homography2D_F64, AssociatedPair> create() {
+		return new DistanceHomographySq();
 	}
 
 	@Override
-	public Affine2D_F64 createRandomModel() {
+	public Homography2D_F64 createRandomModel() {
+		Homography2D_F64 h = new Homography2D_F64();
 
-		double a11 = rand.nextGaussian();
-		double a12 = rand.nextGaussian();
-		double a21 = rand.nextGaussian();
-		double a22 = rand.nextGaussian();
-		double dx = rand.nextGaussian();
-		double dy = rand.nextGaussian();
+		h.a11 = rand.nextDouble()*5;
+		h.a12 = rand.nextDouble()*5;
+		h.a13 = rand.nextDouble()*5;
+		h.a21 = rand.nextDouble()*5;
+		h.a22 = rand.nextDouble()*5;
+		h.a23 = rand.nextDouble()*5;
+		h.a31 = rand.nextDouble()*5;
+		h.a32 = rand.nextDouble()*5;
+		h.a33 = rand.nextDouble()*5;
 
-		return new Affine2D_F64(a11,a12,a21,a22,dx,dy);
+		return h;
 	}
 
 	@Override
 	public AssociatedPair createRandomData() {
-
 		Point2D_F64 p1 = new Point2D_F64(rand.nextGaussian(),rand.nextGaussian());
 		Point2D_F64 p2 = new Point2D_F64(rand.nextGaussian(),rand.nextGaussian());
 
@@ -62,12 +65,11 @@ public class TestDistanceAffine2D extends StandardDistanceTest<Affine2D_F64, Ass
 	}
 
 	@Override
-	public double distance(Affine2D_F64 affine, AssociatedPair associatedPair) {
+	public double distance(Homography2D_F64 h, AssociatedPair associatedPair) {
 
 		Point2D_F64 result = new Point2D_F64();
 
-		AffinePointOps_F64.transform(affine, associatedPair.p1, result);
-
-		return result.distance(associatedPair.p2);
+		HomographyPointOps_F64.transform(h, associatedPair.p1, result);
+		return result.distance2(associatedPair.p2);
 	}
 }

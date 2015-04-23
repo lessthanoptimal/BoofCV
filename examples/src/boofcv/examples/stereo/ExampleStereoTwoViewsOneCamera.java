@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,21 +19,15 @@
 package boofcv.examples.stereo;
 
 import boofcv.abst.feature.disparity.StereoDisparity;
-import boofcv.abst.geo.Estimate1ofEpipolar;
-import boofcv.abst.geo.TriangulateTwoViewsCalibrated;
 import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.distort.LensDistortionOps;
 import boofcv.alg.filter.derivative.LaplacianEdge;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.RectifyImageOps;
 import boofcv.alg.geo.rectify.RectifyCalibrated;
-import boofcv.alg.sfm.robust.DistanceSe3SymmetricSq;
-import boofcv.alg.sfm.robust.Se3FromEssentialGenerator;
 import boofcv.factory.feature.disparity.DisparityAlgorithms;
 import boofcv.factory.feature.disparity.FactoryStereoDisparity;
-import boofcv.factory.geo.EnumEpipolar;
-import boofcv.factory.geo.FactoryMultiView;
-import boofcv.factory.geo.FactoryTriangulate;
+import boofcv.factory.geo.FactoryMultiViewRobust;
 import boofcv.gui.d3.PointCloudTiltPanel;
 import boofcv.gui.feature.AssociationPanel;
 import boofcv.gui.image.ShowImages;
@@ -50,13 +44,8 @@ import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSInt16;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
-import georegression.fitting.se.ModelManagerSe3_F64;
 import georegression.struct.se.Se3_F64;
-import org.ddogleg.fitting.modelset.DistanceFromModel;
-import org.ddogleg.fitting.modelset.ModelGenerator;
-import org.ddogleg.fitting.modelset.ModelManager;
 import org.ddogleg.fitting.modelset.ModelMatcher;
-import org.ddogleg.fitting.modelset.ransac.Ransac;
 import org.ejml.data.DenseMatrix64F;
 
 import java.awt.*;
@@ -154,23 +143,8 @@ public class ExampleStereoTwoViewsOneCamera {
 	public static Se3_F64 estimateCameraMotion(IntrinsicParameters intrinsic,
 											   List<AssociatedPair> matchedNorm, List<AssociatedPair> inliers)
 	{
-		Estimate1ofEpipolar essentialAlg = FactoryMultiView.computeFundamental_1(EnumEpipolar.ESSENTIAL_5_NISTER, 5);
-		TriangulateTwoViewsCalibrated triangulate = FactoryTriangulate.twoGeometric();
-		ModelManager<Se3_F64> manager = new ModelManagerSe3_F64();
-		ModelGenerator<Se3_F64, AssociatedPair> generateEpipolarMotion =
-				new Se3FromEssentialGenerator(essentialAlg, triangulate);
-
-		DistanceFromModel<Se3_F64, AssociatedPair> distanceSe3 =
-				new DistanceSe3SymmetricSq(triangulate,
-						intrinsic.fx, intrinsic.fy, intrinsic.skew,
-						intrinsic.fx, intrinsic.fy, intrinsic.skew);
-
-		// 1/2 a pixel tolerance for RANSAC inliers
-		double ransacTOL = 0.5 * 0.5 * 2.0;
-
 		ModelMatcher<Se3_F64, AssociatedPair> epipolarMotion =
-				new Ransac<Se3_F64, AssociatedPair>(2323, manager, generateEpipolarMotion, distanceSe3,
-						200, ransacTOL);
+				FactoryMultiViewRobust.essentialRansac(2323,200,0.5,intrinsic);
 
 		if (!epipolarMotion.process(matchedNorm))
 			throw new RuntimeException("Motion estimation failed");
