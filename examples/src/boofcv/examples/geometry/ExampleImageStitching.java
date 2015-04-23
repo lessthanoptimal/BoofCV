@@ -30,6 +30,7 @@ import boofcv.alg.feature.UtilFeature;
 import boofcv.alg.interpolate.impl.ImplBilinearPixel_F32;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
+import boofcv.factory.geo.ConfigRansac;
 import boofcv.factory.geo.FactoryMultiViewRobust;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.image.ConvertBufferedImage;
@@ -151,7 +152,7 @@ public class ExampleImageStitching {
 
 		// fit the images using a homography.  This works well for rotations and distant objects.
 		ModelMatcher<Homography2D_F64,AssociatedPair> modelMatcher =
-				FactoryMultiViewRobust.homographyRansac(123,60,3);
+				FactoryMultiViewRobust.homographyRansac(null,new ConfigRansac(60,3));
 
 		Homography2D_F64 H = computeTransform(inputA, inputB, detDesc, associate, modelMatcher);
 

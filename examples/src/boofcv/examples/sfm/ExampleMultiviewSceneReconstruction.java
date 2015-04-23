@@ -25,9 +25,7 @@ import boofcv.abst.geo.TriangulateTwoViewsCalibrated;
 import boofcv.alg.distort.LensDistortionOps;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
-import boofcv.factory.geo.FactoryMultiView;
-import boofcv.factory.geo.FactoryMultiViewRobust;
-import boofcv.factory.geo.FactoryTriangulate;
+import boofcv.factory.geo.*;
 import boofcv.gui.d3.PointCloudViewer;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.UtilIO;
@@ -120,8 +118,10 @@ public class ExampleMultiviewSceneReconstruction {
 
 		pixelToNorm = LensDistortionOps.transformRadialToNorm_F64(intrinsic);
 
-		estimateEssential = FactoryMultiViewRobust.essentialRansac(2323,4000,inlierTol,intrinsic);
-		estimatePnP = FactoryMultiViewRobust.pnpRansac(2323,4000,inlierTol,intrinsic);
+		estimateEssential = FactoryMultiViewRobust.essentialRansac(
+				new ConfigEssential(intrinsic),new ConfigRansac(4000,inlierTol));
+		estimatePnP = FactoryMultiViewRobust.pnpRansac(
+				new ConfigPnP(intrinsic),new ConfigRansac(4000,inlierTol));
 
 		// find features in each image
 		detectImageFeatures(colorImages);

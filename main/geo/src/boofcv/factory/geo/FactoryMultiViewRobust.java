@@ -55,59 +55,51 @@ public class FactoryMultiViewRobust {
 	 *
 	 * <ul>
 	 *     <li>Error units is pixels squared.</li>
-	 *     <li>3 point solution to PnP is used</li>
-	 *     <li>One point is used to resolve PnP solution ambiguity</li>
 	 * </ul>
 	 *
-	 * See code for all the details.
+	 * <p>See code for all the details.</p>
 	 *
-	 * @param randSeed Random seed.
-	 * @param totalCycles Number of cycles.
+	 * @param pnp PnP parameters.  Can't be null.
+	 * @param lmeds Parameters for LMedS.  Can't be null.
 	 * @return Robust Se3_F64 estimator
 	 */
-	public static LeastMedianOfSquares<Se3_F64, Point2D3D> pnpLMedS( long randSeed , int totalCycles,
-																	 IntrinsicParameters intrinsic)
+	public static LeastMedianOfSquares<Se3_F64, Point2D3D> pnpLMedS( ConfigPnP pnp,
+																	 ConfigLMedS lmeds)
 	{
 		Estimate1ofPnP estimatorPnP = FactoryMultiView.computePnP_1(EnumPNP.P3P_FINSTERWALDER, -1, 1);
 		DistanceModelMonoPixels<Se3_F64,Point2D3D> distance = new PnPDistanceReprojectionSq();
-		distance.setIntrinsic(intrinsic.fx,intrinsic.fy,intrinsic.skew);
+		distance.setIntrinsic(pnp.intrinsic.fx,pnp.intrinsic.fy,pnp.intrinsic.skew);
 		ModelManagerSe3_F64 manager = new ModelManagerSe3_F64();
 		EstimatorToGenerator<Se3_F64,Point2D3D> generator =
 				new EstimatorToGenerator<Se3_F64,Point2D3D>(estimatorPnP);
 
-		return new LeastMedianOfSquares<Se3_F64, Point2D3D>(randSeed, totalCycles, manager, generator, distance);
+		return new LeastMedianOfSquares<Se3_F64, Point2D3D>(lmeds.randSeed, lmeds.totalCycles, manager, generator, distance);
 	}
 
 	/**
 	 * Robust solution to PnP problem using {@link Ransac}.  Input observations are in normalized
 	 * image coordinates.
 	 *
-	 * <ul>
-	 *     <li>3 point solution to PnP is used</li>
-	 *     <li>One point is used to resolve PnP solution ambiguity</li>
-	 * </ul>
+	 * <p>See code for all the details.</p>
 	 *
-	 * See code for all the details.
-	 *
-	 * @param randSeed Random seed .
-	 * @param maxIterations Number of iterations
-	 * @param inlierThreshold Inlier threshold used by RANSAC in pixels.
+	 * @param pnp PnP parameters.  Can't be null.
+	 * @param ransac Parameters for RANSAC.  Can't be null.
 	 * @return Robust Se3_F64 estimator
 	 */
-	public static Ransac<Se3_F64, Point2D3D> pnpRansac( long randSeed , int maxIterations,double inlierThreshold,
-														IntrinsicParameters intrinsic)
+	public static Ransac<Se3_F64, Point2D3D> pnpRansac( ConfigPnP pnp,
+														ConfigRansac ransac)
 	{
-		Estimate1ofPnP estimatorPnP = FactoryMultiView.computePnP_1(EnumPNP.P3P_FINSTERWALDER, -1, 1);
+		Estimate1ofPnP estimatorPnP = FactoryMultiView.computePnP_1(pnp.which, -1, pnp.numResolve);
 		DistanceModelMonoPixels<Se3_F64,Point2D3D> distance = new PnPDistanceReprojectionSq();
-		distance.setIntrinsic(intrinsic.fx,intrinsic.fy,intrinsic.skew);
+		distance.setIntrinsic(pnp.intrinsic.fx,pnp.intrinsic.fy,pnp.intrinsic.skew);
 		ModelManagerSe3_F64 manager = new ModelManagerSe3_F64();
 		EstimatorToGenerator<Se3_F64,Point2D3D> generator =
 				new EstimatorToGenerator<Se3_F64,Point2D3D>(estimatorPnP);
 
 		// convert from pixels to pixels squared
-		double threshold = inlierThreshold*inlierThreshold;
+		double threshold = ransac.inlierThreshold*ransac.inlierThreshold;
 
-		return new Ransac<Se3_F64, Point2D3D>(randSeed, manager, generator, distance,maxIterations,threshold);
+		return new Ransac<Se3_F64, Point2D3D>(ransac.randSeed, manager, generator, distance,ransac.maxIterations,threshold);
 	}
 
 	/**
@@ -115,27 +107,28 @@ public class FactoryMultiViewRobust {
 	 * {@link LeastMedianOfSquares LMedS}.  Input observations are in normalized image coordinates.
 	 *
 	 * <ul>
-	 *     <li>Five point essential is used internally</p>
-	 *     <li>Two points are used to resolve solution ambiguity</p>
 	 *     <li>Error units is pixels squared times two</li>
 	 * </ul>
 	 *
-	 * See code for all the details.
+	 * <p>See code for all the details.</p>
 	 *
-	 * @param randSeed Random seed .
-	 * @param totalCycles Number of cycles.
-	 * @param intrinsic Intrinsic camera parameters.  Used to compute error in pixels
+	 * @param essential Essential matrix estimation parameters.  Can't be null.
+	 * @param lmeds Parameters for RANSAC.  Can't be null.
 	 * @return Robust Se3_F64 estimator
 	 */
-	public static LeastMedianOfSquares<Se3_F64, AssociatedPair> essentialLMedS( long randSeed ,
-																				int totalCycles,
-																				IntrinsicParameters intrinsic ) {
+	public static LeastMedianOfSquares<Se3_F64, AssociatedPair> essentialLMedS( ConfigEssential essential,
+																				ConfigLMedS lmeds ) {
+
+		essential.checkValidity();
+
 		Estimate1ofEpipolar essentialAlg = FactoryMultiView.
-				computeFundamental_1(EnumEpipolar.ESSENTIAL_5_NISTER, 2);
+				computeFundamental_1(essential.which, essential.numResolve);
 		TriangulateTwoViewsCalibrated triangulate = FactoryTriangulate.twoGeometric();
 		ModelManager<Se3_F64> manager = new ModelManagerSe3_F64();
 		ModelGenerator<Se3_F64, AssociatedPair> generateEpipolarMotion =
 				new Se3FromEssentialGenerator(essentialAlg, triangulate);
+
+		IntrinsicParameters intrinsic = essential.intrinsic;
 
 		DistanceFromModel<Se3_F64, AssociatedPair> distanceSe3 =
 				new DistanceSe3SymmetricSq(triangulate,
@@ -144,7 +137,7 @@ public class FactoryMultiViewRobust {
 
 
 		return new LeastMedianOfSquares<Se3_F64, AssociatedPair>
-				(randSeed, totalCycles, manager, generateEpipolarMotion, distanceSe3);
+				(lmeds.randSeed, lmeds.totalCycles, manager, generateEpipolarMotion, distanceSe3);
 
 	}
 
@@ -152,39 +145,35 @@ public class FactoryMultiViewRobust {
 	 * Robust solution for estimating {@link Se3_F64} using epipolar geometry from two views with
 	 * {@link Ransac}.  Input observations are in normalized image coordinates.
 	 *
-	 * <ul>
-	 *     <li>Five point essential is used internally</p>
-	 *     <li>Two points are used to resolve solution ambiguity</p>
-	 * </ul>
+	 * <p>See code for all the details.</p>
 	 *
-	 * See code for all the details.
-	 *
-	 * @param randSeed Random seed .
-	 * @param maxIterations Number of iterations
-	 * @param inlierThreshold Inlier threshold used by RANSAC in pixels.
-	 * @param intrinsic Intrinsic camera parameters.  Used to compute error in pixels
+	 * @param essential Essential matrix estimation parameters.  Can't be null.
+	 * @param ransac Parameters for RANSAC.  Can't be null.
 	 * @return Robust Se3_F64 estimator
 	 */
-	public static Ransac<Se3_F64, AssociatedPair> essentialRansac( long randSeed ,
-																   int maxIterations,
-																   double inlierThreshold,
-																   IntrinsicParameters intrinsic ) {
+	public static Ransac<Se3_F64, AssociatedPair> essentialRansac( ConfigEssential essential,
+																   ConfigRansac ransac ) {
+
+		essential.checkValidity();
+
 		Estimate1ofEpipolar essentialAlg = FactoryMultiView.
-				computeFundamental_1(EnumEpipolar.ESSENTIAL_5_NISTER, 2);
+				computeFundamental_1(essential.which, essential.numResolve);
 		TriangulateTwoViewsCalibrated triangulate = FactoryTriangulate.twoGeometric();
 		ModelManager<Se3_F64> manager = new ModelManagerSe3_F64();
 		ModelGenerator<Se3_F64, AssociatedPair> generateEpipolarMotion =
 				new Se3FromEssentialGenerator(essentialAlg, triangulate);
+
+		IntrinsicParameters intrinsic = essential.intrinsic;
 
 		DistanceFromModel<Se3_F64, AssociatedPair> distanceSe3 =
 				new DistanceSe3SymmetricSq(triangulate,
 						intrinsic.fx, intrinsic.fy, intrinsic.skew,
 						intrinsic.fx, intrinsic.fy, intrinsic.skew);
 
-		double ransacTOL = inlierThreshold * inlierThreshold * 2.0;
+		double ransacTOL = ransac.inlierThreshold * ransac.inlierThreshold * 2.0;
 
-		return new Ransac<Se3_F64, AssociatedPair>(randSeed, manager, generateEpipolarMotion, distanceSe3,
-				maxIterations, ransacTOL);
+		return new Ransac<Se3_F64, AssociatedPair>(ransac.randSeed, manager, generateEpipolarMotion, distanceSe3,
+				ransac.maxIterations, ransacTOL);
 	}
 
 	/**
@@ -193,24 +182,27 @@ public class FactoryMultiViewRobust {
 	 *
 	 * <ul>
 	 *     <li>Four point linear is used internally</p>
+	 *     <li>inlierThreshold is in pixels</p>
 	 * </ul>
 	 *
-	 * See code for all the details.
+	 * <p>See code for all the details.</p>
 	 *
-	 * @param randSeed Random seed .
-	 * @param totalCycles Number of cycles..
+	 * @param homography Homography estimation parameters.  If null default is used.
+	 * @param lmeds Parameters for LMedS.  Can't be null.
 	 * @return Homography estimator
 	 */
 	public static LeastMedianOfSquares<Homography2D_F64,AssociatedPair>
-	homographyLMedS( long randSeed ,
-					 int totalCycles )
+	homographyLMedS( ConfigHomography homography , ConfigLMedS lmeds )
 	{
+		if( homography == null )
+			homography = new ConfigHomography();
+
 		ModelManager<Homography2D_F64> manager = new ModelManagerHomography2D_F64();
-		GenerateHomographyLinear modelFitter = new GenerateHomographyLinear(true);
+		GenerateHomographyLinear modelFitter = new GenerateHomographyLinear(homography.normalize);
 		DistanceHomographySq distance = new DistanceHomographySq();
 
 		return new LeastMedianOfSquares<Homography2D_F64,AssociatedPair>
-				(randSeed,totalCycles,manager,modelFitter,distance);
+				(lmeds.randSeed,lmeds.totalCycles,manager,modelFitter,distance);
 	}
 
 	/**
@@ -219,27 +211,28 @@ public class FactoryMultiViewRobust {
 	 *
 	 * <ul>
 	 *     <li>Four point linear is used internally</p>
+	 *     <li>inlierThreshold is in pixels</p>
 	 * </ul>
 	 *
-	 * See code for all the details.
+	 * <p>See code for all the details.</p>
 	 *
-	 * @param randSeed Random seed .
-	 * @param maxIterations Number of iterations
-	 * @param inlierThreshold Inlier threshold used by RANSAC in pixels.
+	 * @param homography Homography estimation parameters.  If null default is used.
+	 * @param ransac Parameters for RANSAC.  Can't be null.
 	 * @return Homography estimator
 	 */
 	public static Ransac<Homography2D_F64,AssociatedPair>
-	homographyRansac( long randSeed ,
-					  int maxIterations,
-					  double inlierThreshold )
+	homographyRansac( ConfigHomography homography , ConfigRansac ransac )
 	{
+		if( homography == null )
+			homography = new ConfigHomography();
+
 		ModelManager<Homography2D_F64> manager = new ModelManagerHomography2D_F64();
-		GenerateHomographyLinear modelFitter = new GenerateHomographyLinear(true);
+		GenerateHomographyLinear modelFitter = new GenerateHomographyLinear(homography.normalize);
 		DistanceHomographySq distance = new DistanceHomographySq();
 
-		double ransacTol = inlierThreshold*inlierThreshold;
+		double ransacTol = ransac.inlierThreshold*ransac.inlierThreshold;
 
 		return new Ransac<Homography2D_F64,AssociatedPair>
-				(randSeed,manager,modelFitter,distance,maxIterations,ransacTol);
+				(ransac.randSeed,manager,modelFitter,distance,ransac.maxIterations,ransacTol);
 	}
 }

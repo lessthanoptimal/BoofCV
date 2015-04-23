@@ -27,6 +27,8 @@ import boofcv.alg.geo.RectifyImageOps;
 import boofcv.alg.geo.rectify.RectifyCalibrated;
 import boofcv.factory.feature.disparity.DisparityAlgorithms;
 import boofcv.factory.feature.disparity.FactoryStereoDisparity;
+import boofcv.factory.geo.ConfigEssential;
+import boofcv.factory.geo.ConfigRansac;
 import boofcv.factory.geo.FactoryMultiViewRobust;
 import boofcv.gui.d3.PointCloudTiltPanel;
 import boofcv.gui.feature.AssociationPanel;
@@ -144,7 +146,7 @@ public class ExampleStereoTwoViewsOneCamera {
 											   List<AssociatedPair> matchedNorm, List<AssociatedPair> inliers)
 	{
 		ModelMatcher<Se3_F64, AssociatedPair> epipolarMotion =
-				FactoryMultiViewRobust.essentialRansac(2323,200,0.5,intrinsic);
+				FactoryMultiViewRobust.essentialRansac(new ConfigEssential(intrinsic),new ConfigRansac(200,0.5));
 
 		if (!epipolarMotion.process(matchedNorm))
 			throw new RuntimeException("Motion estimation failed");
