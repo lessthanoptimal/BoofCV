@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,29 +24,29 @@ package boofcv.alg.feature.color;
  *
  * @author Peter Abeles
  */
-public class FHistogramNormalized {
+public class HistogramMultiNorm {
 
 	/**
 	 * Number of color bands in the image
 	 */
-	int numBands;
+	public int numBands;
 	/**
 	 * Number of discrete bins each band is broken down into
 	 */
-	int numBins;
+	public int stride[];
 	/**
 	 * Value of each histogram.  For a 3 band image each index = index0 + index1*numBins + index2*numBins^2
 	 */
-	float hist[];
+	public float hist[];
 
-	public FHistogramNormalized(int numBins, int numBands) {
+	public HistogramMultiNorm(int... stride) {
 
-		this.numBins = numBins;
-		this.numBands = numBands;
+		this.numBands = stride.length;
+		this.stride = stride.clone();
 
 		int N = 1;
 		for( int i = 0; i < numBands; i++ )
-			N *= numBins;
+			N *= stride[i];
 
 		hist = new float[ N ];
 	}
@@ -68,4 +68,45 @@ public class FHistogramNormalized {
 		}
 	}
 
+	public float get( int ...coordinate ) {
+		int index = 0;
+		for (int i = 0; i < numBands; i++) {
+			index = index * stride[i] + coordinate[i];
+		}
+		return hist[index];
+	}
+
+	/**
+	 * Specialized get for 1-D histogram
+	 * @param x index
+	 * @return histogram value at index
+	 */
+	public float get( int x ) {
+		return hist[x];
+	}
+
+	/**
+	 * Specialized get for 2-D histogram
+	 * @param x x-coordinate
+	 * @param y y-coordinate
+	 * @return histogram value at coordinate
+	 */
+	public float get( int x , int y ) {
+		return hist[x* stride[0] + y];
+	}
+
+	/**
+	 * Specialized get for 3-D histogram
+	 * @param x x-coordinate
+	 * @param y y-coordinate
+	 * @param z z-coordinate
+	 * @return histogram value at coordinate
+	 */
+	public float get( int x , int y , int z ) {
+		return hist[x*stride[0]*stride[1] + y*stride[1] + z];
+	}
+
+	public int getNumBands() {
+		return numBands;
+	}
 }
