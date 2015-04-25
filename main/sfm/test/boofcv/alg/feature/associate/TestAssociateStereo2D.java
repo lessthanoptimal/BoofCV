@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -63,8 +63,8 @@ public class TestAssociateStereo2D {
 		param = new StereoParameters();
 		param.rightToLeft = leftToRight.invert(null);
 
-		param.left = new IntrinsicParameters(400,500,0.1,160,120,320,240,false,new double[]{0,0});
-		param.right = new IntrinsicParameters(380,505,0.05,165,115,320,240,false,new double[]{0,0});
+		param.left = new IntrinsicParameters(400,500,0.1,160,120,320,240).fsetRadial(0,0);
+		param.right = new IntrinsicParameters(380,505,0.05,165,115,320,240).fsetRadial(0,0);
 
 		descLeft = new FastQueue<TupleDesc_F64>(TupleDesc_F64.class,true) {
 			@Override

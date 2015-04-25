@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,7 +37,7 @@ public class TestCreateSyntheticOverheadViewMS {
 
 	int width = 800;
 	int height = 850;
-	IntrinsicParameters param = new IntrinsicParameters(200,201,0,width/2,height/2,width,height, false, new double[]{0.002,0});
+	IntrinsicParameters param = new IntrinsicParameters(200,201,0,width/2,height/2,width,height).fsetRadial(0.002,0);
 
 	int overheadW = 500;
 	int overheadH = 600;

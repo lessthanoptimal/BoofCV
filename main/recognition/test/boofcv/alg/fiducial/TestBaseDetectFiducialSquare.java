@@ -55,7 +55,7 @@ public class TestBaseDetectFiducialSquare {
 	 */
 	@Test
 	public void findPatternEasy() {
-		checkFindKnown(new IntrinsicParameters(500,500,0,320,240,640,480,false,null),1);
+		checkFindKnown(new IntrinsicParameters(500,500,0,320,240,640,480),1);
 	}
 
 	private void checkFindKnown(IntrinsicParameters intrinsic, double tol ) {
@@ -112,14 +112,14 @@ public class TestBaseDetectFiducialSquare {
 	 */
 	@Test
 	public void removeDistortion() {
-		checkFindKnown(new IntrinsicParameters(500,500,0,320,240,640,480,false,new double[]{0.1,0.3}),1.5);
+		checkFindKnown(new IntrinsicParameters(500,500,0,320,240,640,480).fsetRadial(0.1,0.3),1.5);
 	}
 
 	@Test
 	public void computeTargetToWorld() {
 
 		double lengthSide = 0.5;
-		IntrinsicParameters intrinsic = new IntrinsicParameters(400,400,0,320,240,640,380,false,null);
+		IntrinsicParameters intrinsic = new IntrinsicParameters(400,400,0,320,240,640,380);
 		DenseMatrix64F K = PerspectiveOps.calibrationMatrix(intrinsic,null);
 
 		Dummy alg = new Dummy();

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -42,7 +42,7 @@ public class TestVisualDepthOps {
 	int width = 640;
 	int height = 480;
 
-	IntrinsicParameters param = new IntrinsicParameters(200,201,0,width/2,height/2,width,height, false, new double[]{0,0});
+	IntrinsicParameters param = new IntrinsicParameters(200,201,0,width/2,height/2,width,height).fsetRadial(0,0);
 
 	@Test
 	public void depthTo3D() {

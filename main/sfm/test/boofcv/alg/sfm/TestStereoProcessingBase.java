@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -154,11 +154,11 @@ public class TestStereoProcessingBase {
 		StereoParameters ret = new StereoParameters();
 
 		ret.setRightToLeft(new Se3_F64());
-		ret.getRightToLeft().getT().set(-0.2,0.001,-0.012);
+		ret.getRightToLeft().getT().set(-0.2, 0.001, -0.012);
 		RotationMatrixGenerator.eulerXYZ(0.001, -0.01, 0.0023, ret.getRightToLeft().getR());
 
-		ret.left = new IntrinsicParameters(300,320,0,width/2,height/2,width,height, flipY, new double[]{0.1,1e-4});
-		ret.right = new IntrinsicParameters(290,310,0,width/2+2,height/2-6,width,height, flipY, new double[]{0.05,-2e-4});
+		ret.left = new IntrinsicParameters(flipY).fsetMatrix(300,320,0,width/2,height/2,width,height).fsetRadial(0.1,1e-4);
+		ret.right = new IntrinsicParameters(flipY).fsetMatrix(290,310,0,width/2+2,height/2-6,width,height).fsetRadial(0.05, -2e-4);
 
 		return ret;
 	}

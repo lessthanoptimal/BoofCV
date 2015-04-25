@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,7 +38,7 @@ import static org.junit.Assert.assertEquals;
  */
 public class TestDistancePlane2DToPixelSq {
 
-	IntrinsicParameters intrinsic = new IntrinsicParameters(200,210,0,320,240,640,480,false,new double[]{0,0});
+	IntrinsicParameters intrinsic = new IntrinsicParameters(200,210,0,320,240,640,480).fsetRadial(0,0);
 
 	DistancePlane2DToPixelSq alg = new DistancePlane2DToPixelSq();
 	Se3_F64 planeToCamera;

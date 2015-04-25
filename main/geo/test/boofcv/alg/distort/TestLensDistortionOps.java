@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -49,8 +49,8 @@ public class TestLensDistortionOps {
 	 */
 	@Test
 	public void fullView() {
-		IntrinsicParameters param = new IntrinsicParameters(300,320,0,150,130,
-				width,height, false, new double[]{0.1,1e-4});
+		IntrinsicParameters param = new IntrinsicParameters(false).
+				fsetMatrix(300, 320, 0, 150, 130, width, height).fsetRadial(0.1,1e-4);
 
 		PointTransform_F32 adjusted = LensDistortionOps.fullView(param,null);
 
@@ -86,8 +86,8 @@ public class TestLensDistortionOps {
 	 */
 	@Test
 	public void allInside() {
-		IntrinsicParameters param = new IntrinsicParameters(300,320,0,150,130,
-				width,height, false, new double[]{0.1,1e-4});
+		IntrinsicParameters param = new IntrinsicParameters().
+				fsetMatrix(300, 320, 0, 150, 130, width, height).fsetRadial(0.1,1e-4);
 
 		PointTransform_F32 adjusted = LensDistortionOps.allInside(param,null);
 
@@ -123,8 +123,8 @@ public class TestLensDistortionOps {
 	}
 
 	private void transformRadialToNorm_F64( boolean flipY ) {
-		IntrinsicParameters param = new IntrinsicParameters(300,320,2,150,130,
-				width,height, flipY, new double[]{0.1,1e-4});
+		IntrinsicParameters param = new IntrinsicParameters(flipY).
+				fsetMatrix(300,320,2,150,130,width,height).fsetRadial(0.1,1e-4);
 
 		// Undistorted pixel
 		Point2D_F64 pixel = new Point2D_F64(20,120);
@@ -159,8 +159,8 @@ public class TestLensDistortionOps {
 	}
 
 	private void transformRadialToPixel_F64( boolean flipY ) {
-		IntrinsicParameters param = new IntrinsicParameters(300,320,2,150,130,
-				width,height, flipY, new double[]{0.1,1e-4});
+		IntrinsicParameters param =
+				new IntrinsicParameters(flipY).fsetMatrix(300,320,2,150,130,width,height).fsetRadial(0.1,1e-4);
 
 		// Undistorted pixel
 		Point2D_F64 pixel = new Point2D_F64(20,120);
@@ -192,8 +192,8 @@ public class TestLensDistortionOps {
 	}
 
 	private void transformNormToRadial_F64( boolean flipY ) {
-		IntrinsicParameters param = new IntrinsicParameters(300,320,2,150,130,
-				width,height, flipY, new double[]{0.1,1e-4});
+		IntrinsicParameters param = new IntrinsicParameters(flipY).
+				fsetMatrix(300,320,2,150,130,width,height).fsetRadial(0.1,1e-4);
 
 		// Undistorted pixel
 		Point2D_F64 pixel = new Point2D_F64(20,120);
@@ -228,8 +228,8 @@ public class TestLensDistortionOps {
 	}
 
 	private void transformPixelToRadial_F32( boolean flipY ) {
-		IntrinsicParameters param = new IntrinsicParameters(300,320,2,150,130,
-				width,height, flipY, new double[]{0.1,1e-4});
+		IntrinsicParameters param = new IntrinsicParameters(flipY).
+		fsetMatrix(300,320,2,150,130,width,height).fsetRadial(0.1,1e-4);
 
 		// Undistorted pixel
 		Point2D_F64 pixel = new Point2D_F64(20,120);

@@ -29,6 +29,8 @@ Version : Alpha 0.19
   * Can render pixel in camera frame using InrinsicParameters
 - Created FactoryMultiViewRobust for simplifying the creation of robust versions of
   solutions to PnP, essential, homography
+- Camera Model
+  * Intrinsic paramters can now use a flow style assignment of parameters
 
 TODO
   * Square Detector.  Create set of images in validation boof with hand selected corners

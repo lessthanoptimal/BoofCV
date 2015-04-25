@@ -57,7 +57,7 @@ public class TestPerspectiveOps {
 	public void scaleIntrinsic() {
 		Point3D_F64 X = new Point3D_F64(0.1,0.3,2);
 
-		IntrinsicParameters param = new IntrinsicParameters(200,300,2,250,260,200,300, true, null);
+		IntrinsicParameters param = new IntrinsicParameters(200,300,2,250,260,200,300);
 		DenseMatrix64F K = PerspectiveOps.calibrationMatrix(param,null);
 
 		// find the pixel location in the unscaled image
@@ -79,7 +79,7 @@ public class TestPerspectiveOps {
 		DenseMatrix64F A = new DenseMatrix64F(3,3,true,1,2,3,10,4,8,2,4,9);
 		DenseMatrix64F B = new DenseMatrix64F(3,3,true,2,0,1,0,3,2,0,0,1);
 
-		IntrinsicParameters param = new IntrinsicParameters(200,300,2,250,260,200,300, true, null);
+		IntrinsicParameters param = new IntrinsicParameters(200,300,2,250,260,200,300);
 		IntrinsicParameters paramAdj = new IntrinsicParameters();
 
 		PointTransformHomography_F32 firstTran = new PointTransformHomography_F32(A);
@@ -164,7 +164,7 @@ public class TestPerspectiveOps {
 
 	@Test
 	public void convertNormToPixel_intrinsic() {
-		IntrinsicParameters intrinsic = new IntrinsicParameters(100,150,0.1,120,209,500,600,false,null);
+		IntrinsicParameters intrinsic = new IntrinsicParameters(100,150,0.1,120,209,500,600);
 
 		DenseMatrix64F K = PerspectiveOps.calibrationMatrix(intrinsic, null);
 
@@ -196,7 +196,7 @@ public class TestPerspectiveOps {
 
 	@Test
 	public void convertPixelToNorm_intrinsic() {
-		IntrinsicParameters intrinsic = new IntrinsicParameters(100,150,0.1,120,209,500,600,false,null);
+		IntrinsicParameters intrinsic = new IntrinsicParameters(100,150,0.1,120,209,500,600);
 
 		DenseMatrix64F K = PerspectiveOps.calibrationMatrix(intrinsic, null);
 		DenseMatrix64F K_inv = new DenseMatrix64F(3,3);
@@ -263,7 +263,7 @@ public class TestPerspectiveOps {
 	public void renderPixel_intrinsic() {
 		Point3D_F64 X = new Point3D_F64(0.1,-0.05,3);
 
-		IntrinsicParameters intrinsic = new IntrinsicParameters(100,150,0.1,120,209,500,600,false,null);
+		IntrinsicParameters intrinsic = new IntrinsicParameters(100,150,0.1,120,209,500,600);
 
 		double normX = X.x/X.z;
 		double normY = X.y/X.z;
