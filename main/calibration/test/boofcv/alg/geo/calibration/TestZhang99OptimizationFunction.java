@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -57,8 +57,9 @@ public class TestZhang99OptimizationFunction {
 			observations.add( estimate(param,param.views[i],gridPts));
 		}
 
+		// TODO add in includeTangential?
 		Zhang99OptimizationFunction alg =
-				new Zhang99OptimizationFunction( new Zhang99Parameters(false,2,3),gridPts,observations );
+				new Zhang99OptimizationFunction( new Zhang99Parameters(false,2,false,3),gridPts,observations );
 
 		double residuals[] = new double[ alg.getNumOfOutputsM()];
 		for( int i = 0; i < residuals.length; i++ )
@@ -95,7 +96,7 @@ public class TestZhang99OptimizationFunction {
 			calibratedPt.y = cameraPt.y/ cameraPt.z;
 
 			// apply radial distortion
-			CalibrationPlanarGridZhang99.applyDistortion(calibratedPt, param.distortion);
+			CalibrationPlanarGridZhang99.applyDistortion(calibratedPt, param.radial);
 
 			// convert to pixel coordinates
 			double x = param.a*calibratedPt.x + param.c*calibratedPt.y + param.x0;

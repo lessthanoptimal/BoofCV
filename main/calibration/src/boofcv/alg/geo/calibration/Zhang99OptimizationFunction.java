@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -113,7 +113,7 @@ public class Zhang99OptimizationFunction implements FunctionNtoM {
 				calibratedPt.y = cameraPt.y/ cameraPt.z;
 
 				// apply radial distortion
-				CalibrationPlanarGridZhang99.applyDistortion(calibratedPt, param.distortion);
+				CalibrationPlanarGridZhang99.applyDistortion(calibratedPt, param.radial);
 
 				// convert to pixel coordinates
 				double x = param.a*calibratedPt.x + param.c*calibratedPt.y + param.x0;

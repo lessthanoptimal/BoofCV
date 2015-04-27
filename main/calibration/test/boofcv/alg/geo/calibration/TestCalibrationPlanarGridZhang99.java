@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -83,7 +83,7 @@ public class TestCalibrationPlanarGridZhang99 {
 		PlanarCalibrationTarget config = GenericCalibrationGrid.createStandardConfig();
 		List<Point2D_F64> grid = config.points;
 		Zhang99Parameters initial = GenericCalibrationGrid.createStandardParam(true,2,3,rand);
-		Zhang99Parameters found = new Zhang99Parameters(true,2,3);
+		Zhang99Parameters found = new Zhang99Parameters(true,2,false,3);// TODO add in includeTangential?
 
 		List<List<Point2D_F64>> observations = GenericCalibrationGrid.createObservations(initial,grid);
 
@@ -103,7 +103,7 @@ public class TestCalibrationPlanarGridZhang99 {
 		List<Point2D_F64> grid = config.points;
 		Zhang99Parameters initial = GenericCalibrationGrid.createStandardParam(true,2,3,rand);
 		Zhang99Parameters expected = initial.copy();
-		Zhang99Parameters found = new Zhang99Parameters(true,2,3);
+		Zhang99Parameters found = new Zhang99Parameters(true,2,false,3);// TODO add in includeTangential?
 
 		List<List<Point2D_F64>> observations = GenericCalibrationGrid.createObservations(initial,grid);
 
@@ -114,8 +114,8 @@ public class TestCalibrationPlanarGridZhang99 {
 		initial.x0 += rand.nextDouble()*0.01*Math.abs(initial.x0);
 		initial.y0 += rand.nextDouble()*0.01*Math.abs(initial.y0);
 
-		for( int i = 0; i < expected.distortion.length; i++ ) {
-			initial.distortion[i] = rand.nextGaussian()*expected.distortion[i]*0.1;
+		for( int i = 0; i < expected.radial.length; i++ ) {
+			initial.radial[i] = rand.nextGaussian()*expected.radial[i]*0.1;
 		}
 
 		CalibrationPlanarGridZhang99 alg = new CalibrationPlanarGridZhang99(config,true,2);
@@ -132,8 +132,8 @@ public class TestCalibrationPlanarGridZhang99 {
 		assertEquals(initial.x0,found.x0,Math.abs(initial.x0)*tolK);
 		assertEquals(initial.y0, found.y0, Math.abs(initial.y0) * tolK);
 
-		for( int i = 0; i < initial.distortion.length; i++ ) {
-			assertEquals(initial.distortion[i],found.distortion[i],tolD);
+		for( int i = 0; i < initial.radial.length; i++ ) {
+			assertEquals(initial.radial[i],found.radial[i],tolD);
 		}
 	}
 
@@ -151,10 +151,10 @@ public class TestCalibrationPlanarGridZhang99 {
 		assertTrue(Math.abs(expected.x0-initial.x0)*paramTol >= Math.abs(expected.x0-found.x0));
 		assertTrue(Math.abs(expected.y0-initial.y0)*paramTol >= Math.abs(expected.y0-found.y0));
 
-		for( int i = 0; i < expected.distortion.length; i++ ) {
-			double e = expected.distortion[i];
-			double f = found.distortion[i];
-			double init = initial.distortion[i];
+		for( int i = 0; i < expected.radial.length; i++ ) {
+			double e = expected.radial[i];
+			double f = found.radial[i];
+			double init = initial.radial[i];
 			assertTrue(Math.abs(init - f) * 0.5 >= Math.abs(f - e));
 		}
 

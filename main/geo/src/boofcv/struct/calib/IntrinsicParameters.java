@@ -74,8 +74,8 @@ public class IntrinsicParameters implements Serializable {
 
 	/** radial distortion parameters */
 	public double radial[];
-	/** tangental distortion parameters */
-	public double tangental1,tangental2;
+	/** tangential distortion parameters */
+	public double t1, t2;
 
 	/**
 	 * Default constructor.  flipY is false and everything else is zero or null.
@@ -121,8 +121,8 @@ public class IntrinsicParameters implements Serializable {
 	}
 
 	public IntrinsicParameters fsetTangental( double t1 , double t2) {
-		this.tangental1 = t1;
-		this.tangental2 = t2;
+		this.t1 = t1;
+		this.t2 = t2;
 		return this;
 	}
 
@@ -140,8 +140,8 @@ public class IntrinsicParameters implements Serializable {
 		if( param.radial != null )
 			radial = param.radial.clone();
 
-		this.tangental1 = param.tangental1;
-		this.tangental2 = param.tangental2;
+		this.t1 = param.t1;
+		this.t2 = param.t2;
 	}
 
 	public double getCx() {
@@ -216,20 +216,20 @@ public class IntrinsicParameters implements Serializable {
 		this.flipY = flipY;
 	}
 
-	public double getTangental1() {
-		return tangental1;
+	public double getT1() {
+		return t1;
 	}
 
-	public void setTangental1(double tangental1) {
-		this.tangental1 = tangental1;
+	public void setT1(double t1) {
+		this.t1 = t1;
 	}
 
-	public double getTangental2() {
-		return tangental2;
+	public double getT2() {
+		return t2;
 	}
 
-	public void setTangental2(double tangental2) {
-		this.tangental2 = tangental2;
+	public void setT2(double t2) {
+		this.t2 = t2;
 	}
 
 	public void print() {
@@ -245,10 +245,10 @@ public class IntrinsicParameters implements Serializable {
 		} else {
 			System.out.println("No radial");
 		}
-		if( tangental1 != 0 && tangental2 != 0)
-			System.out.printf("tangental = ( %6.2e , %6.2e)\n",tangental1,tangental2);
+		if( t1 != 0 && t2 != 0)
+			System.out.printf("tangential = ( %6.2e , %6.2e)\n", t1, t2);
 		else {
-			System.out.println("No tangental");
+			System.out.println("No tangential");
 		}
 	}
 }

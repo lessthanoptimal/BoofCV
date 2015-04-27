@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -46,9 +46,9 @@ public class TestZhang99OptimizationJacobian {
 	private void compareToNumerical(boolean assumeZeroSkew) {
 		PlanarCalibrationTarget config = FactoryPlanarCalibrationTarget.gridSquare(1, 1, 30, 30);
 		Zhang99Parameters param = GenericCalibrationGrid.createStandardParam(assumeZeroSkew, 2, 3, rand);
-		param.distortion[0] = 0.1;
-		param.distortion[1] = -0.2;
-		param.distortion = new double[]{0.1};
+		param.radial[0] = 0.1;
+		param.radial[1] = -0.2;
+		param.radial = new double[]{0.1};
 
 		List<Point2D_F64> gridPts = config.points;
 
@@ -65,7 +65,7 @@ public class TestZhang99OptimizationJacobian {
 				new Zhang99OptimizationFunction( param.copy(),gridPts,observations );
 
 		Zhang99OptimizationJacobian alg = new Zhang99OptimizationJacobian(
-				assumeZeroSkew,param.distortion.length,observations.size(),gridPts);
+				assumeZeroSkew,param.radial.length,observations.size(),gridPts);
 
 		// Why does the tolerance need to be so crude?  Is there a fundamental reason for this?
 //		JacobianChecker.jacobianPrint(func, alg, dataParam, 1e-3);

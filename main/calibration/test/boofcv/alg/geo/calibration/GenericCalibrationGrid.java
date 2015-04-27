@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -155,8 +155,9 @@ public class GenericCalibrationGrid {
 		return homographies;
 	}
 
-	static Zhang99Parameters createStandardParam(boolean zeroSkew, int numSkew, int numView, Random rand) {
-		Zhang99Parameters ret = new Zhang99Parameters(zeroSkew,numSkew,numView);
+	// TODO add in includeTangential?
+	public static Zhang99Parameters createStandardParam(boolean zeroSkew, int numSkew, int numView, Random rand) {
+		Zhang99Parameters ret = new Zhang99Parameters(zeroSkew,numSkew,false,numView);
 
 		DenseMatrix64F K = createStandardCalibration();
 		ret.a = K.get(0,0);
@@ -166,9 +167,9 @@ public class GenericCalibrationGrid {
 		ret.y0 = K.get(1,2);
 		if( zeroSkew ) ret.c = 0;
 
-		ret.distortion = new double[numSkew];
+		ret.radial = new double[numSkew];
 		for( int i = 0; i < numSkew;i++ ) {
-			ret.distortion[i] = rand.nextGaussian()*0.001;
+			ret.radial[i] = rand.nextGaussian()*0.001;
 		}
 
 		for(Zhang99Parameters.View v : ret.views ) {
@@ -216,7 +217,7 @@ public class GenericCalibrationGrid {
 				calibratedPt.y = cameraPt.y/ cameraPt.z;
 
 				// apply radial distortion
-				CalibrationPlanarGridZhang99.applyDistortion(calibratedPt, config.distortion);
+				CalibrationPlanarGridZhang99.applyDistortion(calibratedPt, config.radial);
 
 				// convert to pixel coordinates
 				double x = config.a*calibratedPt.x + config.c*calibratedPt.y + config.x0;

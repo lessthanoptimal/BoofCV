@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,8 +37,8 @@ import java.util.List;
  *
  * <p>
  * Radial distortion is modeled using the following equations:<br>
- * u' = u + (u - u<sub>0</sub>)*[ k<sub>1</sub>(x<sup>2</sup> + x<sup>2</sup>) +k<sub>2</sub>(x<sup>2</sup> + x<sup>2</sup>)<sup>2</sup>]<br>
- * v' = v + (v - v<sub>0</sub>)*[ k<sub>1</sub>(x<sup>2</sup> + x<sup>2</sup>) +k<sub>2</sub>(x<sup>2</sup> + x<sup>2</sup>)<sup>2</sup>]<br>
+ * u' = u + (u - u<sub>0</sub>)*[ k<sub>1</sub>(x<sup>2</sup> + y<sup>2</sup>) +k<sub>2</sub>(x<sup>2</sup> + y<sup>2</sup>)<sup>2</sup>]<br>
+ * v' = v + (v - v<sub>0</sub>)*[ k<sub>1</sub>(x<sup>2</sup> + y<sup>2</sup>) +k<sub>2</sub>(x<sup>2</sup> + y<sup>2</sup>)<sup>2</sup>]<br>
  * where (u',v') is the observed distortion in pixel coordinates, (u<sub>0</sub>,v<sub>0</sub>) is the image center in
  * pixel coordinates, (x,y) is the predicted distortion free calibrated coordinates.
  * </p>

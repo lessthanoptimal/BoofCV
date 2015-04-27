@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -98,8 +98,8 @@ public class CalibrateUsingZhangData {
 		System.out.println("a = "+found.a);
 		System.out.println("b = "+found.b);
 		System.out.println("c = "+found.c);
-		for( int i = 0; i < found.distortion.length; i++ ) {
-			System.out.printf("radial[%d] = %6.2e\n",i,found.distortion[i]);
+		for( int i = 0; i < found.radial.length; i++ ) {
+			System.out.printf("radial[%d] = %6.2e\n",i,found.radial[i]);
 		}
 	}
 

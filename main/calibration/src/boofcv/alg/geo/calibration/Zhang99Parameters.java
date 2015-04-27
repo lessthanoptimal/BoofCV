@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,6 +28,7 @@ import georegression.struct.so.Rodrigues_F64;
  * <br>
  * Calibration matrix = [ a c x0 ; 0 b y0; 0 0 1];
  * </p>
+ * Same as in the paper, but with the addition of tangental distortion terms.
  *
  * @author Peter Abeles
  */
@@ -35,24 +36,33 @@ public class Zhang99Parameters {
 	// camera calibration matrix
 	public double a,b,c,x0,y0;
 	// radial distortion
-	public double distortion[];
+	public double radial[];
+	// tangential distortion
+	public double t1,t2;
 
 	// does it assume c = 0?
 	public boolean assumeZeroSkew;
+	// should it estimate the tangetial terms?
+	public boolean includeTangential;
 
 	// position of each view of the target
 	// target to camera transform
 	public View[] views;
 
-	public Zhang99Parameters(boolean assumeZeroSkew , int numDistort, int numViews) {
+	public Zhang99Parameters(boolean assumeZeroSkew ,
+							 int numRadial, boolean includeTangential,
+							 int numViews)
+	{
 		this.assumeZeroSkew = assumeZeroSkew;
-		distortion = new double[numDistort];
+		radial = new double[numRadial];
+		this.includeTangential = includeTangential;
 		setNumberOfViews(numViews);
 	}
 
-	public Zhang99Parameters(boolean assumeZeroSkew , int numDistort) {
+	public Zhang99Parameters(boolean assumeZeroSkew , int numRadial, boolean includeTangential) {
 		this.assumeZeroSkew = assumeZeroSkew;
-		distortion = new double[numDistort];
+		radial = new double[numRadial];
+		this.includeTangential = includeTangential;
 	}
 
 	public Zhang99Parameters() {
@@ -66,7 +76,7 @@ public class Zhang99Parameters {
 	}
 
 	public Zhang99Parameters createNew() {
-		return new Zhang99Parameters(assumeZeroSkew,distortion.length,views.length);
+		return new Zhang99Parameters(assumeZeroSkew, radial.length,includeTangential,views.length);
 	}
 
 	public Zhang99Parameters copy() {
@@ -77,9 +87,13 @@ public class Zhang99Parameters {
 		ret.x0 = x0;
 		ret.y0 = y0;
 
-		for( int i = 0; i < distortion.length; i++ ) {
-			ret.distortion[i] = distortion[i];
+		for( int i = 0; i < radial.length; i++ ) {
+			ret.radial[i] = radial[i];
 		}
+
+		ret.t1 = t1;
+		ret.t2 = t2;
+		ret.includeTangential = includeTangential;
 
 		for( int i = 0; i < views.length; i++ ) {
 			View a = views[i];
@@ -102,10 +116,10 @@ public class Zhang99Parameters {
 	}
 
 	public int size() {
-		if( assumeZeroSkew )
-			return 4+distortion.length+(3+3)*views.length;
-		else
-			return 5+distortion.length+(3+3)*views.length;
+		int numTangential = includeTangential ? 2 : 0;
+		int skew = assumeZeroSkew ? 0 : 1;
+
+		return 4 + skew + radial.length + numTangential+(3+3)*views.length;
 	}
 
 	public void setFromParam( double param[] ) {
@@ -118,8 +132,13 @@ public class Zhang99Parameters {
 		x0 = param[index++];
 		y0 = param[index++];
 
-		for( int i = 0; i < distortion.length; i++ ) {
-			distortion[i] = param[index++];
+		for( int i = 0; i < radial.length; i++ ) {
+			radial[i] = param[index++];
+		}
+
+		if( includeTangential ) {
+			t1 = param[index++];
+			t2 = param[index++];
 		}
 
 		for( View v : views ) {
@@ -140,8 +159,13 @@ public class Zhang99Parameters {
 		param[index++] = x0;
 		param[index++] = y0;
 
-		for( int i = 0; i < distortion.length; i++ ) {
-			param[index++] = distortion[i];
+		for( int i = 0; i < radial.length; i++ ) {
+			param[index++] = radial[i];
+		}
+
+		if( includeTangential ) {
+			param[index++] = t1;
+			param[index++] = t2;
 		}
 
 		for( View v : views ) {
@@ -170,8 +194,14 @@ public class Zhang99Parameters {
 			ret.skew = c;
 		ret.cx = x0;
 		ret.cy = y0;
-		ret.radial = new double[ distortion.length ];
-		System.arraycopy(distortion,0,ret.radial,0,distortion.length);
+		ret.radial = new double[ radial.length ];
+		System.arraycopy(radial,0,ret.radial,0, radial.length);
+		if( includeTangential ) {
+			ret.t1 = t1;
+			ret.t2 = t2;
+		} else {
+			ret.t1 = ret.t2 = 0;
+		}
 
 		return ret;
 	}

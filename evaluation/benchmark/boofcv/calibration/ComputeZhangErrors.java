@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -86,15 +86,16 @@ public class ComputeZhangErrors {
 	 * Returns a set of parameters using the found results on Zhang's website
 	 */
 	private static Zhang99Parameters getZhangParam() {
-		Zhang99Parameters param = new Zhang99Parameters(false,2,5);
+		Zhang99Parameters param = new Zhang99Parameters(false,2,false,5);
 
 		param.a = 832.5;
 		param.c = 0.204494;
 		param.b = 832.53;
 		param.x0 = 303.959;
 		param.y0 = 206.585;
-		param.distortion[0] = -0.228601;
-		param.distortion[1] = 0.190353;
+		param.radial[0] = -0.228601;
+		param.radial[1] = 0.190353;
+		param.t1 = param.t2 = 0;
 
 		List<DenseMatrix64F> mat = getPose();
 
@@ -119,7 +120,7 @@ public class ComputeZhangErrors {
 	public static void nonlinearUsingZhang(List<List<Point2D_F64>> observations ,
 										   PlanarCalibrationTarget target) {
 		Zhang99Parameters param = getZhangParam();
-		Zhang99Parameters found = new Zhang99Parameters(false,2,5);
+		Zhang99Parameters found = new Zhang99Parameters(false,2,false,5);
 
 		// perform non-linear optimization to improve results
 		// NOTE: constructor doesn't matter

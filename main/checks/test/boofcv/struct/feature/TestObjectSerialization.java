@@ -212,8 +212,8 @@ public class TestObjectSerialization {
 		assertEquals(original.flipY,found.flipY);
 		assertEquals(original.radial[0],found.radial[0],1e-8);
 		assertEquals(original.radial[1],found.radial[1],1e-8);
-		assertEquals(original.tangental1,found.tangental1,1e-8);
-		assertEquals(original.tangental2,found.tangental2,1e-8);
+		assertEquals(original.t1,found.t1,1e-8);
+		assertEquals(original.t2,found.t2,1e-8);
 
 
 	}

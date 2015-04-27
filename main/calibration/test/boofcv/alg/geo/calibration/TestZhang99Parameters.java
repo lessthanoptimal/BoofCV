@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,16 +37,19 @@ public class TestZhang99Parameters {
 	 */
 	@Test
 	public void toAndFromParametersArray() {
-		checkToAndFromParam(true);
-		checkToAndFromParam(false);
+		checkToAndFromParam(true,false);
+		checkToAndFromParam(false,false);
+		checkToAndFromParam(true,true);
+		checkToAndFromParam(false,true);
 	}
 
-	public void checkToAndFromParam( boolean assumeZeroSkew )
+	public void checkToAndFromParam( boolean assumeZeroSkew , boolean includeTangential )
 	{
-		Zhang99Parameters p = new Zhang99Parameters(assumeZeroSkew,3,2);
+		Zhang99Parameters p = new Zhang99Parameters(assumeZeroSkew,3,includeTangential,2);
 
 		p.a = 2;p.b=3;p.c=4;p.x0=5;p.y0=6;
-		p.distortion = new double[]{1,2,3};
+		p.radial = new double[]{1,2,3};
+		p.t1 = 7; p.t2 = 8;
 		for( int i = 0; i < 2; i++ ) {
 			Zhang99Parameters.View v = p.views[i];
 			v.T.set(rand.nextDouble(),rand.nextDouble(),rand.nextDouble());
@@ -60,16 +63,16 @@ public class TestZhang99Parameters {
 		p.convertToParam(array);
 
 		// create a new set of parameters and assign its value from the array
-		Zhang99Parameters found = new Zhang99Parameters(assumeZeroSkew,3,2);
+		Zhang99Parameters found = new Zhang99Parameters(assumeZeroSkew,3,includeTangential,2);
 		found.setFromParam(array);
 
 		// compare the two sets of parameters
-		checkEquals(p,found,assumeZeroSkew);
+		checkEquals(p,found,assumeZeroSkew,includeTangential);
 	}
 
 	private void checkEquals(Zhang99Parameters expected ,
 							 Zhang99Parameters found ,
-							 boolean assumeZeroSkew ) {
+							 boolean assumeZeroSkew , boolean includeTangential) {
 		double tol = 1e-6;
 
 		assertEquals(expected.a,found.a,tol);
@@ -79,8 +82,13 @@ public class TestZhang99Parameters {
 		assertEquals(expected.x0,found.x0,tol);
 		assertEquals(expected.y0,found.y0,tol);
 
-		for( int i = 0; i < expected.distortion.length; i++ ) {
-			assertEquals(expected.distortion[i],found.distortion[i],tol);
+		for( int i = 0; i < expected.radial.length; i++ ) {
+			assertEquals(expected.radial[i],found.radial[i],tol);
+		}
+
+		if( includeTangential ) {
+			assertEquals(expected.t1,found.t1,tol);
+			assertEquals(expected.t2,found.t2,tol);
 		}
 
 		for( int i = 0; i < 2; i++ ) {

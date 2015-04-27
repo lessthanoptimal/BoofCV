@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,7 +33,7 @@ public class ParametersPointsZhang99 extends Zhang99Parameters {
 	Point2D_F64[][] points;
 
 	public ParametersPointsZhang99( boolean assumeZeroSkew , int numDistort, int numViews, int numCalibrationPoints) {
-		super(assumeZeroSkew,numDistort, numViews);
+		super(assumeZeroSkew,numDistort, false, numViews); // TODO add in includeTangential?
 		this.numCalibrationPoints = numCalibrationPoints;
 		
 		points = new Point2D_F64[numViews][];
@@ -48,7 +48,7 @@ public class ParametersPointsZhang99 extends Zhang99Parameters {
 
 	@Override
 	public ParametersPointsZhang99 createNew() {
-		return new ParametersPointsZhang99(assumeZeroSkew,distortion.length,views.length,numCalibrationPoints);
+		return new ParametersPointsZhang99(assumeZeroSkew, radial.length,views.length,numCalibrationPoints);
 	}
 
 	@Override
@@ -60,8 +60,8 @@ public class ParametersPointsZhang99 extends Zhang99Parameters {
 		ret.x0 = x0;
 		ret.y0 = y0;
 
-		for( int i = 0; i < distortion.length; i++ ) {
-			ret.distortion[i] = distortion[i];
+		for( int i = 0; i < radial.length; i++ ) {
+			ret.radial[i] = radial[i];
 		}
 
 		for( int i = 0; i < views.length; i++ ) {
@@ -85,7 +85,7 @@ public class ParametersPointsZhang99 extends Zhang99Parameters {
 	
 	@Override
 	public int size() {
-		return 5+distortion.length+(4+3+numCalibrationPoints)*views.length;
+		return 5+ radial.length+(4+3+numCalibrationPoints)*views.length;
 	}
 
 	@Override
