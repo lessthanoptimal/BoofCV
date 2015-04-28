@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -182,7 +182,7 @@ public class MonoPlanarPanel extends JPanel implements ItemListener ,
 		updateResultsGUI();
 	}
 
-	public void setCalibration(Zhang99Parameters found) {
+	public void setCalibration(Zhang99ParamAll found) {
 		String textX = String.format("%5.1f",found.x0);
 		String textY = String.format("%5.1f", found.y0);
 		paramCenterX.setText(textX);

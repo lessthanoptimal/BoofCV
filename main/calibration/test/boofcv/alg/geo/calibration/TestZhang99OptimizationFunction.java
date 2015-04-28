@@ -44,9 +44,9 @@ public class TestZhang99OptimizationFunction {
 	@Test
 	public void computeResidualsPerfect() {
 		PlanarCalibrationTarget config = GenericCalibrationGrid.createStandardConfig();
-		Zhang99Parameters param = GenericCalibrationGrid.createStandardParam(false, 2, 3, rand);
+		Zhang99ParamAll param = GenericCalibrationGrid.createStandardParam(false, 2, true, 3, rand);
 
-		double array[] = new double[ param.size() ];
+		double array[] = new double[ param.numParameters() ];
 		param.convertToParam(array);
 		
 		List<Point2D_F64> gridPts = config.points;
@@ -57,9 +57,8 @@ public class TestZhang99OptimizationFunction {
 			observations.add( estimate(param,param.views[i],gridPts));
 		}
 
-		// TODO add in includeTangential?
 		Zhang99OptimizationFunction alg =
-				new Zhang99OptimizationFunction( new Zhang99Parameters(false,2,false,3),gridPts,observations );
+				new Zhang99OptimizationFunction( new Zhang99ParamAll(false,2,true,3),gridPts,observations );
 
 		double residuals[] = new double[ alg.getNumOfOutputsM()];
 		for( int i = 0; i < residuals.length; i++ )
@@ -72,8 +71,8 @@ public class TestZhang99OptimizationFunction {
 		}
 	}
 	
-	protected static List<Point2D_F64> estimate( Zhang99Parameters param ,
-												 Zhang99Parameters.View v ,
+	protected static List<Point2D_F64> estimate( Zhang99ParamAll param ,
+												 Zhang99ParamAll.View v ,
 												 List<Point2D_F64> grid ) {
 
 		List<Point2D_F64> ret = new ArrayList<Point2D_F64>();
@@ -96,7 +95,7 @@ public class TestZhang99OptimizationFunction {
 			calibratedPt.y = cameraPt.y/ cameraPt.z;
 
 			// apply radial distortion
-			CalibrationPlanarGridZhang99.applyDistortion(calibratedPt, param.radial);
+			CalibrationPlanarGridZhang99.applyDistortion(calibratedPt, param.radial,param.t1,param.t2);
 
 			// convert to pixel coordinates
 			double x = param.a*calibratedPt.x + param.c*calibratedPt.y + param.x0;

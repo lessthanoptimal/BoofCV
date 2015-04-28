@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -63,21 +63,18 @@ public class Zhang99OptimizationJacobian implements FunctionNtoMxN {
 	// number of calibration targets that were observed
 	private int numObservedTargets;
 
-	// should it assume the skew parameter is zero?
-	private boolean assumeZeroSkew;
-
 	// variables for storing intermediate results
 	private Se3_F64 se = new Se3_F64();
 
 	// location of point in camera frame
 	private Point3D_F64 cameraPt = new Point3D_F64();
-	// observed point location in normalized image coordinates
+	// observed point location in undistorted normalized image coordinates
 	private Point2D_F64 normPt = new Point2D_F64();
+	// observed point location in distorted normalized image coordinates
+	private Point2D_F64 dnormPt = new Point2D_F64();
 
-	// intrinsic camera parameters
-	public double a,b,c,x0,y0;
-	// radial distortion
-	public double radial[];
+	// stores the optimization parameters
+	private Zhang99ParamCamera param;
 
 	// output index for x and y
 	int indexJacX;
@@ -92,27 +89,21 @@ public class Zhang99OptimizationJacobian implements FunctionNtoMxN {
 	 */
 	public Zhang99OptimizationJacobian(boolean assumeZeroSkew,
 									   int numRadial ,
+									   boolean includeTangential,
 									   int numObservedTargets ,
 									   List<Point2D_F64> grid ) {
-		this.assumeZeroSkew = assumeZeroSkew;
+		this.param = new Zhang99ParamCamera(assumeZeroSkew,numRadial,includeTangential);
 		this.numObservedTargets = numObservedTargets;
 
 		for( Point2D_F64 p : grid ) {
 			this.grid.add( new Point3D_F64(p.x,p.y,0) );
 		}
 
-		numParam = numRadial+(3+3)*numObservedTargets;
-		if( assumeZeroSkew )
-			numParam += 4;
-		else
-			numParam += 5;
+		numParam = param.numParameters()+(3+3)*numObservedTargets;
 
 		numFuncs = numObservedTargets*grid.size()*2;
 
-		radial = new double[numRadial];
-
-		if( assumeZeroSkew )
-			c = 0;
+		param.zeroNotUsed();
 	}
 
 	@Override
@@ -127,20 +118,7 @@ public class Zhang99OptimizationJacobian implements FunctionNtoMxN {
 
 	@Override
 	public void process(double[] input, double[] output) {
-		int index = 0;
-
-		// extract calibration matrix parameters
-		a = input[index++];
-		b = input[index++];
-		if( !assumeZeroSkew )
-			c = input[index++];
-		x0 = input[index++];
-		y0 = input[index++];
-
-		// extract radial distortion parameters
-		for( int i = 0; i < radial.length; i++ ) {
-			radial[i] = input[index++];
-		}
+		int index = param.setFromParam(input);
 
 		for( int indexView = 0; indexView < numObservedTargets; indexView++ ) {
 
@@ -170,7 +148,11 @@ public class Zhang99OptimizationJacobian implements FunctionNtoMxN {
 				normPt.x = cameraPt.x/ cameraPt.z;
 				normPt.y = cameraPt.y/ cameraPt.z;
 
-				calibrationGradient(output);
+				// apply distortion to the normalized coordinate
+				dnormPt.set(normPt);
+				CalibrationPlanarGridZhang99.applyDistortion(dnormPt, param.radial, param.t1, param.t2);
+
+				calibrationGradient(dnormPt,output);
 				distortGradient(normPt,output);
 
 				indexJacX += indexView*6;
@@ -188,17 +170,17 @@ public class Zhang99OptimizationJacobian implements FunctionNtoMxN {
 	/**
 	 * Gradient for calibration matrix
 	 */
-	private void calibrationGradient( double[] output ) {
-		output[indexJacX++] = normPt.x;
+	private void calibrationGradient( Point2D_F64 distNorm , double[] output ) {
+		output[indexJacX++] = distNorm.x;
 		output[indexJacX++] = 0;
-		if( !assumeZeroSkew )
-			output[indexJacX++] = normPt.y;
+		if( !param.assumeZeroSkew )
+			output[indexJacX++] = distNorm.y;
 		output[indexJacX++] = 1;
 		output[indexJacX++] = 0;
 
 		output[indexJacY++] = 0;
-		output[indexJacY++] = normPt.y;
-		if( !assumeZeroSkew )
+		output[indexJacY++] = distNorm.y;
+		if( !param.assumeZeroSkew )
 			output[indexJacY++] = 0;
 		output[indexJacY++] = 0;
 		output[indexJacY++] = 1;
@@ -209,18 +191,32 @@ public class Zhang99OptimizationJacobian implements FunctionNtoMxN {
 	 *
 	 * deriv [x,y] =  [x,y]*r
 	 *       [x,y] =  [x,y]*r*r
+	 *
+	 * @param norm undistorted normalized image coordinate
 	 */
-	private void distortGradient( Point2D_F64 pt , double[] output ) {
+	private void distortGradient( Point2D_F64 norm , double[] output ) {
 
-		double r2 = pt.x*pt.x + pt.y*pt.y;
-		double r = r2;
-		for( int i = 0; i < radial.length; i++ ) {
-			double xdot = pt.x*r;
-			double ydot = pt.y*r;
+		double r2 = norm.x*norm.x + norm.y*norm.y;
+		double r2i = r2;
+		for( int i = 0; i < param.radial.length; i++ ) {
+			double xdot = norm.x*r2i;
+			double ydot = norm.y*r2i;
 
-			output[indexJacX++] = a*xdot + c*ydot;
-			output[indexJacY++] = b*ydot;
-			r *= r2;
+			output[indexJacX++] = param.a*xdot + param.c*ydot;
+			output[indexJacY++] = param.b*ydot;
+			r2i *= r2;
+		}
+
+		if( param.includeTangential ) {
+			double xy2 = 2.0*norm.x*norm.y;
+			double r2yy = r2 + 2*norm.y*norm.y;
+			double r2xx = r2 + 2*norm.x*norm.x;
+
+			output[indexJacX++] = param.a*xy2 + param.c*r2yy;
+			output[indexJacY++] = param.b*r2yy;
+
+			output[indexJacX++] = param.a*r2xx + param.c*xy2;
+			output[indexJacY++] = param.b*xy2;
 		}
 	}
 
@@ -239,39 +235,47 @@ public class Zhang99OptimizationJacobian implements FunctionNtoMxN {
 									Point3D_F64 cameraPt ,
 									Point2D_F64 normPt ,
 									double[] output ) {
+		// create short hand for normalized image coordinate
+		final double x = normPt.x;
+		final double y = normPt.y;
 
-		double r2 = normPt.x*normPt.x + normPt.y*normPt.y;
-		double r = r2;
+		final double r2 = x*x + y*y;
+		double r2i = r2;
 		double rdev = 1;
 
 		double sum = 0;
 		double sumdot = 0;
 
-		for( int i = 0; i < radial.length; i++ ) {
-			sum += radial[i]*r;
-			sumdot += radial[i]*2*(i+1)*rdev;
+		for( int i = 0; i < param.radial.length; i++ ) {
+			sum += param.radial[i]*r2i;
+			sumdot += param.radial[i]*2*(i+1)*rdev;
 
-			r *= r2;
+			r2i *= r2;
 			rdev *= r2;
 		}
 
 		GeometryMath_F64.mult(Rdot,X,Xdot);
 
 		// part of radial distortion derivative
-		double r_dot = (normPt.x*Xdot.x + normPt.y*Xdot.y)/cameraPt.z - r2*Xdot.z/cameraPt.z;
+		double r_dot = (x*Xdot.x + y*Xdot.y)/cameraPt.z - r2*Xdot.z/cameraPt.z;
 
 		// derivative of normPt
-		double n_dot_x = (-normPt.x*Xdot.z+Xdot.x)/cameraPt.z;
-		double n_dot_y = (-normPt.y*Xdot.z+Xdot.y)/cameraPt.z;
+		double n_dot_x = (-x*Xdot.z+Xdot.x)/cameraPt.z;
+		double n_dot_y = (-y*Xdot.z+Xdot.y)/cameraPt.z;
 //		double n_dot_z = 0;
 
 		// total partial derivative
-		double xdot = sumdot*r_dot*normPt.x + (1 + sum)*n_dot_x;
-		double ydot = sumdot*r_dot*normPt.y + (1 + sum)*n_dot_y;
+		double xdot = sumdot*r_dot*x + (1 + sum)*n_dot_x;
+		double ydot = sumdot*r_dot*y + (1 + sum)*n_dot_y;
 //		double zdot = 0;
 
-		output[indexJacX++] = a*xdot + c*ydot;
-		output[indexJacY++] = b*ydot;
+		if( param.includeTangential ) {
+			xdot += 2*param.t1*(n_dot_x*y + x*n_dot_y) + 6*param.t2*x*n_dot_x + 2*param.t2*y*n_dot_y;
+			ydot += 2*param.t1*x*n_dot_x + 6*param.t1*y*n_dot_y + 2*param.t2*(n_dot_x*y + x*n_dot_y);
+		}
+
+		output[indexJacX++] = param.a*xdot + param.c*ydot;
+		output[indexJacY++] = param.b*ydot;
 	}
 
 	/**
@@ -285,43 +289,60 @@ public class Zhang99OptimizationJacobian implements FunctionNtoMxN {
 									Point2D_F64 normPt ,
 									double[] output ) {
 
-		double r2 = normPt.x*normPt.x + normPt.y*normPt.y;
-		double r = r2;
+		// create short hand for normalized image coordinate
+		final double x = normPt.x;
+		final double y = normPt.y;
+
+		final double r2 = x*x + y*y;
+		double r2i = r2;
 		double rdev = 1;
 
 		double sum = 0;
 		double sumdot = 0;
 
-		for( int i = 0; i < radial.length; i++ ) {
-			sum += radial[i]*r;
-			sumdot += radial[i]*2*(i+1)*rdev;
+		for( int i = 0; i < param.radial.length; i++ ) {
+			sum += param.radial[i]*r2i;
+			sumdot += param.radial[i]*(i+1)*rdev;
 
-			r *= r2;
+			r2i *= r2;
 			rdev *= r2;
 		}
 		// Partial T.x
-		double xdot = sumdot*normPt.x*normPt.x/cameraPt.z + (1+sum)/cameraPt.z;
-		double ydot = sumdot*normPt.x*normPt.y/cameraPt.z;
-		//double zdot = 0;
+		double xdot = sumdot*2*x*x/cameraPt.z + (1+sum)/cameraPt.z;
+		double ydot = sumdot*2*x*y/cameraPt.z;
+		// double zdot = 0
+		if( param.includeTangential ) {
+			xdot += (2*param.t1*y + param.t2*6*x)/cameraPt.z;
+			ydot += (2*param.t1*x + 2*y*param.t2)/cameraPt.z;
+		}
 
-		output[indexJacX++] = a*xdot + c*ydot;
-		output[indexJacY++] = b*ydot;
+		output[indexJacX++] = param.a*xdot + param.c*ydot;
+		output[indexJacY++] = param.b*ydot;
 
 		// Partial T.y
-		xdot = sumdot*normPt.y*normPt.x/cameraPt.z;
-		ydot = sumdot*normPt.y*normPt.y/cameraPt.z + (1 + sum)/cameraPt.z;
+		xdot = sumdot*2*y*x/cameraPt.z;
+		ydot = sumdot*2*y*y/cameraPt.z + (1 + sum)/cameraPt.z;
+		if( param.includeTangential ) {
+			xdot += (2*param.t1*x + param.t2*2*y)/cameraPt.z;
+			ydot += (6*param.t1*y + 2*x*param.t2)/cameraPt.z;
+		}
 
-		output[indexJacX++] = a*xdot + c*ydot;
-		output[indexJacY++] = b*ydot;
+		output[indexJacX++] = param.a*xdot + param.c*ydot;
+		output[indexJacY++] = param.b*ydot;
 
 		// Partial T.z
-		xdot = -sumdot*r2*normPt.x/cameraPt.z;
-		ydot = -sumdot*r2*normPt.y/cameraPt.z;
+		xdot = -sumdot*2*r2*x/cameraPt.z;
+		ydot = -sumdot*2*r2*y/cameraPt.z;
 
-		xdot += -(1 + sum)*normPt.x/cameraPt.z;
-		ydot += -(1 + sum)*normPt.y/cameraPt.z;
+		xdot += -(1 + sum)*x/cameraPt.z;
+		ydot += -(1 + sum)*y/cameraPt.z;
 
-		output[indexJacX++] = a*xdot + c*ydot;
-		output[indexJacY++] = b*ydot;
+		if( param.includeTangential ) {
+			xdot += -(4*param.t1*x*y + 6*param.t2*x*x + 2*param.t2*y*y)/cameraPt.z;
+			ydot += -(2*param.t1*x*x + 6*param.t1*y*y + 4*x*y*param.t2)/cameraPt.z;
+		}
+
+		output[indexJacX++] = param.a*xdot + param.c*ydot;
+		output[indexJacY++] = param.b*ydot;
 	}
 }

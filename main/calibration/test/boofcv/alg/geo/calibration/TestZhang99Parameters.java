@@ -45,13 +45,13 @@ public class TestZhang99Parameters {
 
 	public void checkToAndFromParam( boolean assumeZeroSkew , boolean includeTangential )
 	{
-		Zhang99Parameters p = new Zhang99Parameters(assumeZeroSkew,3,includeTangential,2);
+		Zhang99ParamAll p = new Zhang99ParamAll(assumeZeroSkew,3,includeTangential,2);
 
 		p.a = 2;p.b=3;p.c=4;p.x0=5;p.y0=6;
 		p.radial = new double[]{1,2,3};
 		p.t1 = 7; p.t2 = 8;
 		for( int i = 0; i < 2; i++ ) {
-			Zhang99Parameters.View v = p.views[i];
+			Zhang99ParamAll.View v = p.views[i];
 			v.T.set(rand.nextDouble(),rand.nextDouble(),rand.nextDouble());
 			v.rotation.theta = rand.nextDouble();
 			v.rotation.unitAxisRotation.set(rand.nextGaussian(),rand.nextGaussian(),rand.nextGaussian());
@@ -59,19 +59,19 @@ public class TestZhang99Parameters {
 		}
 
 		// convert it into array format
-		double array[] = new double[ p.size() ];
+		double array[] = new double[ p.numParameters() ];
 		p.convertToParam(array);
 
 		// create a new set of parameters and assign its value from the array
-		Zhang99Parameters found = new Zhang99Parameters(assumeZeroSkew,3,includeTangential,2);
+		Zhang99ParamAll found = new Zhang99ParamAll(assumeZeroSkew,3,includeTangential,2);
 		found.setFromParam(array);
 
 		// compare the two sets of parameters
 		checkEquals(p,found,assumeZeroSkew,includeTangential);
 	}
 
-	private void checkEquals(Zhang99Parameters expected ,
-							 Zhang99Parameters found ,
+	private void checkEquals(Zhang99ParamAll expected ,
+							 Zhang99ParamAll found ,
 							 boolean assumeZeroSkew , boolean includeTangential) {
 		double tol = 1e-6;
 
@@ -92,8 +92,8 @@ public class TestZhang99Parameters {
 		}
 
 		for( int i = 0; i < 2; i++ ) {
-			Zhang99Parameters.View pp = expected.views[i];
-			Zhang99Parameters.View ff = found.views[i];
+			Zhang99ParamAll.View pp = expected.views[i];
+			Zhang99ParamAll.View ff = found.views[i];
 
 			GeometryUnitTest.assertEquals(pp.T, ff.T, tol);
 			GeometryUnitTest.assertEquals(pp.rotation.unitAxisRotation,ff.rotation.unitAxisRotation,tol);

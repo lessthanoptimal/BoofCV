@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -113,7 +113,7 @@ public class ExampleCalibrateMonocularPlanar {
 		CalibrateMonoPlanar calibrationAlg = new CalibrateMonoPlanar(detector, flipY);
 
 		// tell it type type of target and which parameters to estimate
-		calibrationAlg.configure(target, true, 2);
+		calibrationAlg.configure(target, true, 2, false);
 
 		for( String n : images ) {
 			BufferedImage input = UtilImageIO.loadImage(n);

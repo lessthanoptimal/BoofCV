@@ -22,7 +22,7 @@ import boofcv.abst.calib.CalibrateMonoPlanar;
 import boofcv.abst.calib.ImageResults;
 import boofcv.alg.geo.calibration.CalibrationPlanarGridZhang99;
 import boofcv.alg.geo.calibration.PlanarCalibrationTarget;
-import boofcv.alg.geo.calibration.Zhang99Parameters;
+import boofcv.alg.geo.calibration.Zhang99ParamAll;
 import georegression.struct.point.Point2D_F64;
 import org.ddogleg.optimization.UnconstrainedLeastSquares;
 
@@ -42,7 +42,7 @@ import java.util.List;
 public class CalibrateUsingZhangData {
 	PlanarCalibrationTarget target;
 	List<List<Point2D_F64>> observations = new ArrayList<List<Point2D_F64>>();
-	Zhang99Parameters found;
+	Zhang99ParamAll found;
 
 	UnconstrainedLeastSquares optimizer;
 	
@@ -80,7 +80,7 @@ public class CalibrateUsingZhangData {
 	public void process(  boolean assumeZeroSkew ,
 						  int numRadialParam) {
 		CalibrationPlanarGridZhang99 Zhang99
-				= new CalibrationPlanarGridZhang99(target,assumeZeroSkew,numRadialParam);
+				= new CalibrationPlanarGridZhang99(target,assumeZeroSkew,numRadialParam,false);
 		Zhang99.setOptimizer(optimizer);
 
 		if( !Zhang99.process(observations) ) {

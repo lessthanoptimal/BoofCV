@@ -32,40 +32,25 @@ import georegression.struct.so.Rodrigues_F64;
  *
  * @author Peter Abeles
  */
-public class Zhang99Parameters {
-	// camera calibration matrix
-	public double a,b,c,x0,y0;
-	// radial distortion
-	public double radial[];
-	// tangential distortion
-	public double t1,t2;
-
-	// does it assume c = 0?
-	public boolean assumeZeroSkew;
-	// should it estimate the tangetial terms?
-	public boolean includeTangential;
+public class Zhang99ParamAll extends Zhang99ParamCamera {
 
 	// position of each view of the target
 	// target to camera transform
 	public View[] views;
 
-	public Zhang99Parameters(boolean assumeZeroSkew ,
-							 int numRadial, boolean includeTangential,
-							 int numViews)
+	public Zhang99ParamAll(boolean assumeZeroSkew,
+						   int numRadial, boolean includeTangential,
+						   int numViews)
 	{
-		this.assumeZeroSkew = assumeZeroSkew;
-		radial = new double[numRadial];
-		this.includeTangential = includeTangential;
+		super(assumeZeroSkew,numRadial,includeTangential);
 		setNumberOfViews(numViews);
 	}
 
-	public Zhang99Parameters(boolean assumeZeroSkew , int numRadial, boolean includeTangential) {
-		this.assumeZeroSkew = assumeZeroSkew;
-		radial = new double[numRadial];
-		this.includeTangential = includeTangential;
+	public Zhang99ParamAll(boolean assumeZeroSkew, int numRadial, boolean includeTangential) {
+		super(assumeZeroSkew,numRadial,includeTangential);
 	}
 
-	public Zhang99Parameters() {
+	public Zhang99ParamAll() {
 	}
 
 	public void setNumberOfViews( int numViews ) {
@@ -75,12 +60,12 @@ public class Zhang99Parameters {
 		}
 	}
 
-	public Zhang99Parameters createNew() {
-		return new Zhang99Parameters(assumeZeroSkew, radial.length,includeTangential,views.length);
+	public Zhang99ParamAll createNew() {
+		return new Zhang99ParamAll(assumeZeroSkew, radial.length,includeTangential,views.length);
 	}
 
-	public Zhang99Parameters copy() {
-		Zhang99Parameters ret = createNew();
+	public Zhang99ParamAll copy() {
+		Zhang99ParamAll ret = createNew();
 		ret.a = a;
 		ret.b = b;
 		ret.c = c;
@@ -115,31 +100,13 @@ public class Zhang99Parameters {
 		public Vector3D_F64 T = new Vector3D_F64();
 	}
 
-	public int size() {
-		int numTangential = includeTangential ? 2 : 0;
-		int skew = assumeZeroSkew ? 0 : 1;
-
-		return 4 + skew + radial.length + numTangential+(3+3)*views.length;
+	@Override
+	public int numParameters() {
+		return super.numParameters()+ (3+3)*views.length;
 	}
 
-	public void setFromParam( double param[] ) {
-		int index = 0;
-
-		a = param[index++];
-		b = param[index++];
-		if( !assumeZeroSkew )
-			c = param[index++];
-		x0 = param[index++];
-		y0 = param[index++];
-
-		for( int i = 0; i < radial.length; i++ ) {
-			radial[i] = param[index++];
-		}
-
-		if( includeTangential ) {
-			t1 = param[index++];
-			t2 = param[index++];
-		}
+	public int setFromParam( double param[] ) {
+		int index = super.setFromParam(param);
 
 		for( View v : views ) {
 			v.rotation.setParamVector(param[index++],param[index++],param[index++]);
@@ -147,26 +114,13 @@ public class Zhang99Parameters {
 			v.T.y = param[index++];
 			v.T.z = param[index++];
 		}
+
+		return index;
 	}
 
-	public void convertToParam( double param[] ) {
-		int index = 0;
-
-		param[index++] = a;
-		param[index++] = b;
-		if( !assumeZeroSkew )
-			param[index++] = c;
-		param[index++] = x0;
-		param[index++] = y0;
-
-		for( int i = 0; i < radial.length; i++ ) {
-			param[index++] = radial[i];
-		}
-
-		if( includeTangential ) {
-			param[index++] = t1;
-			param[index++] = t2;
-		}
+	@Override
+	public int convertToParam( double param[] ) {
+		int index = super.convertToParam(param);
 
 		for( View v : views ) {
 			param[index++] = v.rotation.unitAxisRotation.x*v.rotation.theta;
@@ -176,6 +130,7 @@ public class Zhang99Parameters {
 			param[index++] = v.T.y;
 			param[index++] = v.T.z;
 		}
+		return index;
 	}
 
 	/**

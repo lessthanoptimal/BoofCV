@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.abst.calib;
 
 import boofcv.alg.geo.calibration.PlanarCalibrationTarget;
-import boofcv.alg.geo.calibration.Zhang99Parameters;
+import boofcv.alg.geo.calibration.Zhang99ParamAll;
 import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.image.ImageFloat32;
@@ -92,13 +92,15 @@ public class CalibrateStereoPlanar {
 	 * @param target Describes the calibration target.
 	 * @param assumeZeroSkew If true zero skew is assumed.
 	 * @param numRadialParam Number of radial parameters
+	 * @param includeTangential If true it will estimate tangential distortion parameters.
 	 */
 	public void configure( PlanarCalibrationTarget target ,
 						   boolean assumeZeroSkew ,
-						   int numRadialParam )
+						   int numRadialParam ,
+						   boolean includeTangential )
 	{
-		calibLeft.configure(target,assumeZeroSkew,numRadialParam);
-		calibRight.configure(target,assumeZeroSkew,numRadialParam);
+		calibLeft.configure(target,assumeZeroSkew,numRadialParam,includeTangential);
+		calibRight.configure(target,assumeZeroSkew,numRadialParam,includeTangential);
 	}
 
 	/**
@@ -143,9 +145,9 @@ public class CalibrateStereoPlanar {
 	{
 		IntrinsicParameters intrinsic = calib.process();
 
-		Zhang99Parameters zhangParam = calib.getZhangParam();
+		Zhang99ParamAll zhangParam = calib.getZhangParam();
 
-		for( Zhang99Parameters.View v : zhangParam.views ) {
+		for( Zhang99ParamAll.View v : zhangParam.views ) {
 			Se3_F64 pose = new Se3_F64();
 			RotationMatrixGenerator.rodriguesToMatrix(v.rotation,pose.getR());
 			pose.getT().set(v.T);

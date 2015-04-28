@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,7 +22,7 @@ import boofcv.abst.calib.ConfigChessboard;
 import boofcv.abst.calib.PlanarCalibrationDetector;
 import boofcv.alg.geo.calibration.CalibrationPlanarGridZhang99;
 import boofcv.alg.geo.calibration.PlanarCalibrationTarget;
-import boofcv.alg.geo.calibration.Zhang99Parameters;
+import boofcv.alg.geo.calibration.Zhang99ParamAll;
 import boofcv.factory.calib.FactoryPlanarCalibrationTarget;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
@@ -58,13 +58,13 @@ public class ExampleCalibrateMonocularPoints {
 
 		// Assume zero skew and model lens distortion with two radial parameters
 		CalibrationPlanarGridZhang99 zhang99 =
-				new CalibrationPlanarGridZhang99(targetDesc,true,2);
+				new CalibrationPlanarGridZhang99(targetDesc,true,2,false);
 
 		if( !zhang99.process(observations) )
 			throw new RuntimeException("Calibration failed!");
 
 		// Get camera parameters and extrinsic target location in each image
-		Zhang99Parameters found = zhang99.getOptimized();
+		Zhang99ParamAll found = zhang99.getOptimized();
 
 		// Convenient function for converting from specialized Zhang99 format to generalized
 		IntrinsicParameters param = found.convertToIntrinsic();

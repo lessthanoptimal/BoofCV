@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -80,7 +80,7 @@ public class TestCalibrateMonoPlanar {
 
 		CalibrateMonoPlanar alg = new CalibrateMonoPlanar(detector,!manualFlip);
 
-		alg.configure(target,false,2);
+		alg.configure(target,false,2,false);
 
 		for( int i = 0; i < pose.size(); i++ )
 			alg.addImage(new ImageFloat32(width,height));

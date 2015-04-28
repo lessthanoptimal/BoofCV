@@ -40,13 +40,13 @@ public class Zhang99OptimizationFunction implements FunctionNtoM {
 	// description of the calibration grid
 	private List<Point3D_F64> grid = new ArrayList<Point3D_F64>();
 	// optimization parameters
-	private Zhang99Parameters param;
+	private Zhang99ParamAll param;
 
 	// variables for storing intermediate results
 	private Se3_F64 se = new Se3_F64();
 
 	private Point3D_F64 cameraPt = new Point3D_F64();
-	private Point2D_F64 calibratedPt = new Point2D_F64();
+	private Point2D_F64 normPt = new Point2D_F64();
 
 	// observations
 	private List<List<Point2D_F64>> observations;
@@ -59,7 +59,7 @@ public class Zhang99OptimizationFunction implements FunctionNtoM {
 	 * @param grid Location of points on the calibration grid.  z=0
 	 * @param observations calibration point observation pixel coordinates
 	 */
-	public Zhang99OptimizationFunction(Zhang99Parameters param,
+	public Zhang99OptimizationFunction(Zhang99ParamAll param,
 									   List<Point2D_F64> grid,
 									   List<List<Point2D_F64>> observations) {
 		if( param.views.length != observations.size() )
@@ -72,7 +72,7 @@ public class Zhang99OptimizationFunction implements FunctionNtoM {
 			this.grid.add( new Point3D_F64(p.x,p.y,0) );
 		}
 
-		N = param.size();
+		N = param.numParameters();
 		M = observations.size()*grid.size()*2;
 	}
 
@@ -93,11 +93,11 @@ public class Zhang99OptimizationFunction implements FunctionNtoM {
 		process(param,output);
 	}
 
-	public void process( Zhang99Parameters param , double []residuals ) {
+	public void process( Zhang99ParamAll param , double []residuals ) {
 		int index = 0;
 		for( int indexView = 0; indexView < param.views.length; indexView++ ) {
 
-			Zhang99Parameters.View v = param.views[indexView];
+			Zhang99ParamAll.View v = param.views[indexView];
 
 			RotationMatrixGenerator.rodriguesToMatrix(v.rotation,se.getR());
 			se.T = v.T;
@@ -108,16 +108,16 @@ public class Zhang99OptimizationFunction implements FunctionNtoM {
 				// Put the point in the camera's reference frame
 				SePointOps_F64.transform(se,grid.get(i), cameraPt);
 
-				// calibrated pixel coordinates
-				calibratedPt.x = cameraPt.x/ cameraPt.z;
-				calibratedPt.y = cameraPt.y/ cameraPt.z;
+				// normalized image coordinates
+				normPt.x = cameraPt.x/ cameraPt.z;
+				normPt.y = cameraPt.y/ cameraPt.z;
 
-				// apply radial distortion
-				CalibrationPlanarGridZhang99.applyDistortion(calibratedPt, param.radial);
+				// apply distortion
+				CalibrationPlanarGridZhang99.applyDistortion(normPt, param.radial, param.t1, param.t2);
 
 				// convert to pixel coordinates
-				double x = param.a*calibratedPt.x + param.c*calibratedPt.y + param.x0;
-				double y = param.b*calibratedPt.y + param.y0;
+				double x = param.a * normPt.x + param.c * normPt.y + param.x0;
+				double y = param.b * normPt.y + param.y0;
 
 				Point2D_F64 p = obs.get(i);
 

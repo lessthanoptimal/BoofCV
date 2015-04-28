@@ -22,7 +22,7 @@ import boofcv.abst.calib.CalibrateMonoPlanar;
 import boofcv.abst.calib.ImageResults;
 import boofcv.alg.geo.calibration.CalibrationPlanarGridZhang99;
 import boofcv.alg.geo.calibration.PlanarCalibrationTarget;
-import boofcv.alg.geo.calibration.Zhang99Parameters;
+import boofcv.alg.geo.calibration.Zhang99ParamAll;
 import georegression.geometry.RotationMatrixGenerator;
 import georegression.struct.point.Point2D_F64;
 import org.ejml.UtilEjml;
@@ -74,7 +74,7 @@ public class ComputeZhangErrors {
 	 * Compute error metrics using parameters on Zhang's website
 	 */
 	public static void zhangResults( List<List<Point2D_F64>> observations , List<Point2D_F64> target ) {
-		Zhang99Parameters param = getZhangParam();
+		Zhang99ParamAll param = getZhangParam();
 
 		param.convertToIntrinsic().print();
 		List<ImageResults> errors =
@@ -85,8 +85,8 @@ public class ComputeZhangErrors {
 	/**
 	 * Returns a set of parameters using the found results on Zhang's website
 	 */
-	private static Zhang99Parameters getZhangParam() {
-		Zhang99Parameters param = new Zhang99Parameters(false,2,false,5);
+	private static Zhang99ParamAll getZhangParam() {
+		Zhang99ParamAll param = new Zhang99ParamAll(false,2,false,5);
 
 		param.a = 832.5;
 		param.c = 0.204494;
@@ -119,12 +119,12 @@ public class ComputeZhangErrors {
 	 */
 	public static void nonlinearUsingZhang(List<List<Point2D_F64>> observations ,
 										   PlanarCalibrationTarget target) {
-		Zhang99Parameters param = getZhangParam();
-		Zhang99Parameters found = new Zhang99Parameters(false,2,false,5);
+		Zhang99ParamAll param = getZhangParam();
+		Zhang99ParamAll found = new Zhang99ParamAll(false,2,false,5);
 
 		// perform non-linear optimization to improve results
 		// NOTE: constructor doesn't matter
-		CalibrationPlanarGridZhang99 alg = new CalibrationPlanarGridZhang99(target,false,1);
+		CalibrationPlanarGridZhang99 alg = new CalibrationPlanarGridZhang99(target,false,1,false);
 		alg.optimizedParam(observations,target.points,param,found,null);
 
 		found.convertToIntrinsic().print();

@@ -155,9 +155,10 @@ public class GenericCalibrationGrid {
 		return homographies;
 	}
 
-	// TODO add in includeTangential?
-	public static Zhang99Parameters createStandardParam(boolean zeroSkew, int numSkew, int numView, Random rand) {
-		Zhang99Parameters ret = new Zhang99Parameters(zeroSkew,numSkew,false,numView);
+	public static Zhang99ParamAll createStandardParam(boolean zeroSkew, int numRadial,
+													  boolean includeTangential,
+													  int numView, Random rand) {
+		Zhang99ParamAll ret = new Zhang99ParamAll(zeroSkew,numRadial,includeTangential,numView);
 
 		DenseMatrix64F K = createStandardCalibration();
 		ret.a = K.get(0,0);
@@ -167,12 +168,17 @@ public class GenericCalibrationGrid {
 		ret.y0 = K.get(1,2);
 		if( zeroSkew ) ret.c = 0;
 
-		ret.radial = new double[numSkew];
-		for( int i = 0; i < numSkew;i++ ) {
-			ret.radial[i] = rand.nextGaussian()*0.001;
+		ret.radial = new double[numRadial];
+		for( int i = 0; i < numRadial;i++ ) {
+			ret.radial[i] = rand.nextGaussian()*1.0;
 		}
 
-		for(Zhang99Parameters.View v : ret.views ) {
+		if( includeTangential ) {
+			ret.t1 = rand.nextGaussian()*0.1;
+			ret.t2 = rand.nextGaussian()*0.1;
+		}
+
+		for(Zhang99ParamAll.View v : ret.views ) {
 			double rotX = (rand.nextDouble()-0.5)*0.1;
 			double rotY = (rand.nextDouble()-0.5)*0.1;
 			double rotZ = (rand.nextDouble()-0.5)*0.1;
@@ -181,7 +187,7 @@ public class GenericCalibrationGrid {
 
 			double x = rand.nextGaussian()*5;
 			double y = rand.nextGaussian()*5;
-			double z = rand.nextGaussian()*5-750;
+			double z = rand.nextGaussian()*5-100;
 
 			v.T.set(x,y,z);
 		}
@@ -192,7 +198,7 @@ public class GenericCalibrationGrid {
 	 * Creates a set of observed points in pixel coordinates given zhang parameters and a calibration
 	 * grid.
 	 */
-	public static List<List<Point2D_F64>> createObservations( Zhang99Parameters config,
+	public static List<List<Point2D_F64>> createObservations( Zhang99ParamAll config,
 															  List<Point2D_F64> grid)
 	{
 		List<List<Point2D_F64>> ret = new ArrayList<List<Point2D_F64>>();
@@ -200,7 +206,7 @@ public class GenericCalibrationGrid {
 		Point3D_F64 cameraPt = new Point3D_F64();
 		Point2D_F64 calibratedPt = new Point2D_F64();
 
-		for( Zhang99Parameters.View v : config.views ) {
+		for( Zhang99ParamAll.View v : config.views ) {
 			List<Point2D_F64> obs = new ArrayList<Point2D_F64>();
 			Se3_F64 se = new Se3_F64();
 			RotationMatrixGenerator.rodriguesToMatrix(v.rotation,se.getR());
@@ -217,7 +223,7 @@ public class GenericCalibrationGrid {
 				calibratedPt.y = cameraPt.y/ cameraPt.z;
 
 				// apply radial distortion
-				CalibrationPlanarGridZhang99.applyDistortion(calibratedPt, config.radial);
+				CalibrationPlanarGridZhang99.applyDistortion(calibratedPt, config.radial,config.t1,config.t2);
 
 				// convert to pixel coordinates
 				double x = config.a*calibratedPt.x + config.c*calibratedPt.y + config.x0;

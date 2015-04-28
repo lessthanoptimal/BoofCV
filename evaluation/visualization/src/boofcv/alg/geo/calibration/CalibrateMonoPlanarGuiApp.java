@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -75,7 +75,7 @@ public class CalibrateMonoPlanarGuiApp extends JPanel
 						   boolean flipY ) {
 
 		calibrator = new CalibrateMonoPlanar(detector,flipY);
-		calibrator.configure(target,true,2);
+		calibrator.configure(target,true,2,false);
 		this.images = images;
 	}
 

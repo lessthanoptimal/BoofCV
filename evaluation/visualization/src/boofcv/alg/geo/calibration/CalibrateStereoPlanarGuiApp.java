@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -191,7 +191,7 @@ public class CalibrateStereoPlanarGuiApp extends JPanel
 			throw new IllegalArgumentException("Number of left and right images must be the same");
 
 		calibrator = new CalibrateStereoPlanar(detector,flipY);
-		calibrator.configure(target,assumeZeroSkew,2);
+		calibrator.configure(target,assumeZeroSkew,2,false);
 		this.leftImages = leftImages;
 		this.rightImages = rightImages;
 	}

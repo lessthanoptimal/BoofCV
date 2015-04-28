@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,7 @@ package boofcv.abst.calib;
 import boofcv.alg.geo.calibration.CalibrationPlanarGridZhang99;
 import boofcv.alg.geo.calibration.PlanarCalibrationTarget;
 import boofcv.alg.geo.calibration.Zhang99OptimizationFunction;
-import boofcv.alg.geo.calibration.Zhang99Parameters;
+import boofcv.alg.geo.calibration.Zhang99ParamAll;
 import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.image.ImageFloat32;
 import georegression.struct.point.Point2D_F64;
@@ -69,10 +69,9 @@ public class CalibrateMonoPlanar {
 	protected CalibrationPlanarGridZhang99 zhang99;
 	// calibration configuration
 	protected PlanarCalibrationTarget target;
-	protected boolean assumeZeroSkew;
 
 	// computed parameters
-	protected Zhang99Parameters foundZhang;
+	protected Zhang99ParamAll foundZhang;
 	protected IntrinsicParameters foundIntrinsic;
 
 	// Information on calibration targets and results
@@ -105,14 +104,16 @@ public class CalibrateMonoPlanar {
 	 * @param target Description of the calibration target's physical layout.
 	 * @param assumeZeroSkew If true then zero skew is assumed.  Typically this will be true.
 	 * @param numRadialParam Number of radial parameters. Typically set to 2.
+	 * @param includeTangential If true it will estimate tangential distortion parameters.
+	 *                          Try false then true
 	 */
 	public void configure( PlanarCalibrationTarget target ,
 						   boolean assumeZeroSkew ,
-						   int numRadialParam )
+						   int numRadialParam ,
+						   boolean includeTangential )
 	{
-		this.assumeZeroSkew = assumeZeroSkew;
 		this.target = target;
-		zhang99 = new CalibrationPlanarGridZhang99(target,assumeZeroSkew,numRadialParam);
+		zhang99 = new CalibrationPlanarGridZhang99(target,assumeZeroSkew,numRadialParam,includeTangential);
 	}
 
 	/**
@@ -205,7 +206,7 @@ public class CalibrateMonoPlanar {
 	 * @return List of error statistics
 	 */
 	public static List<ImageResults> computeErrors( List<List<Point2D_F64>> observation ,
-													Zhang99Parameters param ,
+													Zhang99ParamAll param ,
 													List<Point2D_F64> grid )
 	{
 		Zhang99OptimizationFunction function =
@@ -274,7 +275,7 @@ public class CalibrateMonoPlanar {
 		return errors;
 	}
 
-	public Zhang99Parameters getZhangParam() {
+	public Zhang99ParamAll getZhangParam() {
 		return foundZhang;
 	}
 

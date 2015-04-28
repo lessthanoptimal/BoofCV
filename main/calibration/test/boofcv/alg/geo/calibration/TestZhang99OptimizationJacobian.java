@@ -39,16 +39,15 @@ public class TestZhang99OptimizationJacobian {
 
 	@Test
 	public void compareToNumeric() {
-		compareToNumerical(false);
-		compareToNumerical(true);
+		compareToNumerical(false,false);
+		compareToNumerical(true,false);
+		compareToNumerical(false,true);
+		compareToNumerical(true, true);
 	}
 
-	private void compareToNumerical(boolean assumeZeroSkew) {
+	private void compareToNumerical(boolean assumeZeroSkew, boolean includeTangential ) {
 		PlanarCalibrationTarget config = FactoryPlanarCalibrationTarget.gridSquare(1, 1, 30, 30);
-		Zhang99Parameters param = GenericCalibrationGrid.createStandardParam(assumeZeroSkew, 2, 3, rand);
-		param.radial[0] = 0.1;
-		param.radial[1] = -0.2;
-		param.radial = new double[]{0.1};
+		Zhang99ParamAll param = GenericCalibrationGrid.createStandardParam(assumeZeroSkew, 2,includeTangential, 3, rand);
 
 		List<Point2D_F64> gridPts = config.points;
 
@@ -58,17 +57,20 @@ public class TestZhang99OptimizationJacobian {
 			observations.add( estimate(param,param.views[i],gridPts));
 		}
 
-		double dataParam[] = new double[ param.size() ];
+		double dataParam[] = new double[ param.numParameters() ];
 		param.convertToParam(dataParam);
 
 		Zhang99OptimizationFunction func =
 				new Zhang99OptimizationFunction( param.copy(),gridPts,observations );
 
 		Zhang99OptimizationJacobian alg = new Zhang99OptimizationJacobian(
-				assumeZeroSkew,param.radial.length,observations.size(),gridPts);
+				assumeZeroSkew,param.radial.length,param.includeTangential,observations.size(),gridPts);
 
 		// Why does the tolerance need to be so crude?  Is there a fundamental reason for this?
-//		JacobianChecker.jacobianPrint(func, alg, dataParam, 1e-3);
-		assertTrue(JacobianChecker.jacobian(func, alg, dataParam, 1e-3));
+		double tol = includeTangential ? 0.05 : 0.01;
+//		JacobianChecker.jacobianPrintR(func, alg, dataParam, tol);
+		assertTrue(JacobianChecker.jacobianR(func, alg, dataParam, tol));
 	}
+
+
 }
