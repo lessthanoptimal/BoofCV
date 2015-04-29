@@ -183,6 +183,8 @@ public class CalibrateStereoPlanarGuiApp extends JPanel
 	 */
 	public void configure( PlanarCalibrationDetector detector ,
 						   PlanarCalibrationTarget target,
+						   int numRadial,
+						   boolean includeTangential,
 						   boolean assumeZeroSkew ,
 						   boolean flipY ,
 						   List<String> leftImages , List<String> rightImages  ) {
@@ -191,7 +193,7 @@ public class CalibrateStereoPlanarGuiApp extends JPanel
 			throw new IllegalArgumentException("Number of left and right images must be the same");
 
 		calibrator = new CalibrateStereoPlanar(detector,flipY);
-		calibrator.configure(target,assumeZeroSkew,2,false);
+		calibrator.configure(target,assumeZeroSkew,numRadial,includeTangential);
 		this.leftImages = leftImages;
 		this.rightImages = rightImages;
 	}
@@ -201,7 +203,8 @@ public class CalibrateStereoPlanarGuiApp extends JPanel
 		ParseStereoCalibrationConfig parser = new ParseStereoCalibrationConfig(media);
 
 		if( parser.parse(fileName) ) {
-			configure(parser.detector,parser.target,parser.assumeZeroSkew,parser.flipY,
+			configure(parser.detector,parser.target,parser.numRadial,
+					parser.includeTangential,parser.assumeZeroSkew,parser.flipY,
 					parser.getLeftImages(),parser.getRightImages());
 		} else {
 			System.err.println("Configuration failed");
@@ -261,7 +264,7 @@ public class CalibrateStereoPlanarGuiApp extends JPanel
 		Collections.sort(rightImages);
 
 		CalibrateStereoPlanarGuiApp app = new CalibrateStereoPlanarGuiApp();
-		app.configure(detector,target,true,false, leftImages,rightImages);
+		app.configure(detector,target,2,false,true,false, leftImages,rightImages);
 
 		JFrame frame = new JFrame("Planar Stereo Calibration");
 		frame.add(app, BorderLayout.CENTER);
