@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,18 +33,19 @@ public class TestAddRadialNtoN_F32 {
 	@Test
 	public void againstManual() {
 		float radial[]= new float[]{0.01f,-0.03f};
+		float t1 = 0.1f,t2=-.05f;
 
 		Point2D_F32 orig = new Point2D_F32(0.1f,-0.2f);
 
 		// manually compute the distortion
-		float r2 = orig.x*orig.x + orig.y*orig.y;
-		float mag = radial[0]*r2 + radial[1]*r2*r2;
+		double x = orig.x, y = orig.y;
+		double r2 = x*x + y*y;
+		double mag = radial[0]*r2 + radial[1]*r2*r2;
 
-		float distX = orig.x*(1+mag);
-		float distY = orig.y*(1+mag);
+		double distX = orig.x*(1+mag) + 2*t1*x*y + t2*(r2 + 2*x*x);
+		double distY = orig.y*(1+mag) + t1*(r2 + 2*y*y) + 2*t2*x*y;
 
-		AddRadialNtoN_F32 alg = new AddRadialNtoN_F32();
-		alg.set(radial);
+		AddRadialNtoN_F32 alg = new AddRadialNtoN_F32().set(radial,t1,t2);
 
 		Point2D_F32 found = new Point2D_F32();
 

@@ -23,51 +23,66 @@ package boofcv.alg.distort;
  *
  * @author Peter Abeles
  */
-public class RadialTangential_F64 {
+public class RadialTangential_F32 {
 	/**
 	 * Radial distortion parameters
 	 */
-	public double radial[];
+	public float radial[];
 	/**
 	 * Tangential distortion parameters
 	 */
-	public double t1,t2;
+	public float t1,t2;
 
-	public RadialTangential_F64(int numRadial) {
-		radial = new double[numRadial];
+	public RadialTangential_F32(int numRadial) {
+		radial = new float[numRadial];
 	}
 
-	public RadialTangential_F64() {
+	public RadialTangential_F32() {
 	}
 
-	public RadialTangential_F64(double[] radial, double t1, double t2) {
+	public RadialTangential_F32(float[] radial, float t1, float t2) {
 		this.set(radial,t1,t2);
 	}
 
-	public void set(double[] radial, double t1, double t2) {
-		if( radial == null )
-			this.radial = new double[0];
-		else {
-			this.radial = new double[radial.length];
+	public RadialTangential_F32 set(double[] radial, double t1, double t2) {
+		if( radial == null ) {
+			this.radial = new float[0];
+		} else {
+			this.radial = new float[radial.length];
+			for (int i = 0; i < radial.length; i++) {
+				this.radial[i] = (float)radial[i];
+			}
+		}
+		this.t1 = (float)t1;
+		this.t2 = (float)t2;
+
+		return this;
+	}
+
+	public void set(float[] radial, float t1, float t2) {
+		if( radial == null ) {
+			radial = new float[0];
+		} else {
+			this.radial = new float[radial.length];
 			System.arraycopy(radial, 0, this.radial, 0, radial.length);
 		}
 		this.t1 = t1;
 		this.t2 = t2;
 	}
 
-	public double getT1() {
+	public float getT1() {
 		return t1;
 	}
 
-	public void setT1(double t1) {
+	public void setT1(float t1) {
 		this.t1 = t1;
 	}
 
-	public double getT2() {
+	public float getT2() {
 		return t2;
 	}
 
-	public void setT2(double t2) {
+	public void setT2(float t2) {
 		this.t2 = t2;
 	}
 }

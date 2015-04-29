@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,35 +33,39 @@ public class TestRemoveRadialPtoN_F32 {
 
 	@Test
 	public void checkAgainstAdd() {
-		double fx = 600;
-		double fy = 500;
-		double skew = 2;
-		double xc = 300;
-		double yc = 350;
+		checkAgainstAdd(0,0);
+		checkAgainstAdd(0.1f,-0.05f);
+	}
 
-		double radial[]= new double[]{0.12,-0.13};
+	public void checkAgainstAdd( float t1 , float t2 ) {
+		float fx = 600;
+		float fy = 500;
+		float skew = 2;
+		float xc = 300;
+		float yc = 350;
+
+		double radial[]= new double[]{0.12f,-0.13f};
 
 		Point2D_F32 point = new Point2D_F32();
 
 		float undistX = 19.5f;
 		float undistY = 200.1f;
 
-		new AddRadialPtoP_F32(fx,fy,skew,xc,yc,radial).compute(undistX,undistY,point);
+		new AddRadialPtoP_F32().setK(fx,fy,skew,xc,yc).setDistortion(radial,t1,t2).compute(undistX, undistY, point);
 
 		float distX = point.x;
 		float distY = point.y;
 
-		RemoveRadialPtoN_F32 alg = new RemoveRadialPtoN_F32();
-		alg.set(fx,fy,skew,xc,yc,radial);
+		RemoveRadialPtoN_F32 alg = new RemoveRadialPtoN_F32().setK(fx,fy,skew,xc,yc).setDistortion(radial,t1,t2);
 
 		alg.compute(distX, distY, point);
 
 		/// go from calibrated coordinates to pixel
 		DenseMatrix64F K = PerspectiveOps.calibrationMatrix(fx, fy, skew, xc, yc);
 
-		GeometryMath_F32.mult(K, point, point);
+		GeometryMath_F32.mult(K,point,point);
 
-		assertEquals(undistX, point.x, 1e-4);
-		assertEquals(undistY,point.y,1e-4);
+		assertEquals(undistX,point.x,1e-2);
+		assertEquals(undistY,point.y,1e-2);
 	}
 }

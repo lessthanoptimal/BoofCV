@@ -293,7 +293,8 @@ public class RectifyImageOps {
 															  DenseMatrix64F rectify)
 	{
 		AddRadialPtoP_F32 addDistortion = new AddRadialPtoP_F32();
-		addDistortion.set(param.fx, param.fy, param.skew, param.cx, param.cy, param.radial);
+		addDistortion.setK(param.fx, param.fy, param.skew, param.cx, param.cy).
+				setDistortion(param.radial,param.t1,param.t2);
 
 		DenseMatrix64F rectifyInv = new DenseMatrix64F(3,3);
 		CommonOps.invert(rectify,rectifyInv);
@@ -356,7 +357,8 @@ public class RectifyImageOps {
 															  DenseMatrix64F rectify)
 	{
 		RemoveRadialPtoP_F32 removeDistortion = new RemoveRadialPtoP_F32();
-		removeDistortion.set(param.fx, param.fy, param.skew, param.cx, param.cy, param.radial);
+		removeDistortion.setK(param.fx, param.fy, param.skew, param.cx, param.cy).
+				setDistortion(param.radial,param.t1,param.t2);
 
 		PointTransformHomography_F32 rectifyPixel = new PointTransformHomography_F32(rectify);
 

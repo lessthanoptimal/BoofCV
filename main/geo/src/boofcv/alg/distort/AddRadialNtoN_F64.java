@@ -30,10 +30,6 @@ public class AddRadialNtoN_F64 implements PointTransform_F64 {
 
 	private RadialTangential_F64 params;
 
-	public AddRadialNtoN_F64(RadialTangential_F64 params ) {
-		this.params = params;
-	}
-
 	public AddRadialNtoN_F64() {
 	}
 

@@ -125,8 +125,10 @@ public class LensDistortionOps {
 
 		RemoveRadialPtoP_F32 removeDistort = new RemoveRadialPtoP_F32();
 		AddRadialPtoP_F32 addDistort = new AddRadialPtoP_F32();
-		removeDistort.set(param.fx, param.fy, param.skew, param.cx, param.cy, param.radial);
-		addDistort.set(param.fx, param.fy, param.skew, param.cx, param.cy, param.radial);
+		removeDistort.setK(param.fx, param.fy, param.skew, param.cx, param.cy).
+				setDistortion(param.radial,param.t1,param.t2);
+		addDistort.setK(param.fx, param.fy, param.skew, param.cx, param.cy).
+				setDistortion(param.radial,param.t1,param.t2);
 
 		RectangleLength2D_F32 bound = DistortImageOps.boundBox_F32(param.width, param.height,
 				new PointToPixelTransform_F32(removeDistort));
@@ -170,8 +172,10 @@ public class LensDistortionOps {
 												IntrinsicParameters paramAdj ) {
 		RemoveRadialPtoP_F32 removeDistort = new RemoveRadialPtoP_F32();
 		AddRadialPtoP_F32 addDistort = new AddRadialPtoP_F32();
-		removeDistort.set(param.fx, param.fy, param.skew, param.cx, param.cy, param.radial);
-		addDistort.set(param.fx, param.fy, param.skew, param.cx, param.cy, param.radial);
+		removeDistort.setK(param.fx, param.fy, param.skew, param.cx, param.cy).
+				setDistortion(param.radial,param.t1,param.t2);
+		addDistort.setK(param.fx, param.fy, param.skew, param.cx, param.cy).
+				setDistortion(param.radial,param.t1,param.t2);
 
 		RectangleLength2D_F32 bound = LensDistortionOps.boundBoxInside(param.width, param.height,
 				new PointToPixelTransform_F32(removeDistort));
@@ -275,7 +279,8 @@ public class LensDistortionOps {
 	public static PointTransform_F32 transformPixelToRadial_F32(IntrinsicParameters param)
 	{
 		AddRadialPtoP_F32 radialDistort = new AddRadialPtoP_F32();
-		radialDistort.set(param.fx, param.fy, param.skew, param.cx, param.cy, param.radial);
+		radialDistort.setK(param.fx, param.fy, param.skew, param.cx, param.cy).
+				setDistortion(param.radial,param.t1,param.t2);
 
 		if( param.flipY) {
 			PointTransform_F32 flip = new FlipVertical_F32(param.height);

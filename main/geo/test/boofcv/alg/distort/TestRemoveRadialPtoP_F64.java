@@ -31,7 +31,7 @@ public class TestRemoveRadialPtoP_F64 {
 	@Test
 	public void checkAgainstAdd() {
 		checkAgainstAdd(0,0);
-//		checkAgainstAdd(-0.12,0.03);
+		checkAgainstAdd(-0.12,0.03);
 	}
 
 	public void checkAgainstAdd( double t1 , double t2) {

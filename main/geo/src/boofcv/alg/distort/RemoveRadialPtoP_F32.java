@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,7 +39,7 @@ public class RemoveRadialPtoP_F32 extends RemoveRadialPtoN_F32 {
 		//  distorted pixel to undistorted normalized
 		super.compute(x,y,out);
 
-		out.x = (x+x_c*sum)/(1+sum);
-		out.y = (y+y_c*sum)/(1+sum);
+		out.x = (x + cx*sum - fx*tx - skew*ty)/(1+sum);
+		out.y = (y + cy*sum - fy*ty)/(1+sum);
 	}
 }

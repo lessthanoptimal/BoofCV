@@ -68,7 +68,8 @@ public class TestBaseDetectFiducialSquare {
 		render(pattern, where, image);
 
 		RemoveRadialPtoP_F32 distort = new RemoveRadialPtoP_F32();
-		distort.set(intrinsic.fx,intrinsic.fy,intrinsic.skew,intrinsic.cx,intrinsic.cy,intrinsic.radial);
+		distort.setK(intrinsic.fx,intrinsic.fy,intrinsic.skew,intrinsic.cx,intrinsic.cy).
+				setDistortion(intrinsic.radial,intrinsic.t1,intrinsic.t2);
 
 		ImageDistort<ImageUInt8,ImageUInt8> distorter
 				= DistortImageOps.createImageDistort(distort,TypeInterpolate.BILINEAR,ImageUInt8.class,ImageUInt8.class);

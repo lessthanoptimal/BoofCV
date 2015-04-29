@@ -198,7 +198,8 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 		homographyToPose.setCalibrationMatrix(K);
 
 		// provide intrinsic camera parameters
-		addRadialDistortion.set(intrinsic.fx, intrinsic.fy, intrinsic.skew, intrinsic.cx, intrinsic.cy, intrinsic.radial);
+		addRadialDistortion.setK(intrinsic.fx, intrinsic.fy, intrinsic.skew, intrinsic.cx, intrinsic.cy).
+				setDistortion(intrinsic.radial,intrinsic.t1,intrinsic.t2);
 		RemoveRadialPtoP_F64 removeLensDistort = new RemoveRadialPtoP_F64();
 		removeLensDistort.setK(intrinsic.fx, intrinsic.fy, intrinsic.skew, intrinsic.cx, intrinsic.cy).
 				setDistortion(intrinsic.radial,intrinsic.t1,intrinsic.t2);

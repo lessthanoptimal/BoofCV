@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,8 +28,7 @@ import georegression.struct.point.Point2D_F32;
  */
 public class AddRadialNtoN_F32 implements PointTransform_F32 {
 
-	// radial distortion
-	private float radial[];
+	private RadialTangential_F32 params;
 
 	public AddRadialNtoN_F32() {
 	}
@@ -39,12 +38,9 @@ public class AddRadialNtoN_F32 implements PointTransform_F32 {
 	 *
 	 * @param radial Radial distortion parameters
 	 */
-	public void set(float[] radial) {
-
-		this.radial = new float[radial.length];
-		for( int i = 0; i < radial.length; i++ ) {
-			this.radial[i] = radial[i];
-		}
+	public AddRadialNtoN_F32 set(float[] radial , float t1 , float t2) {
+		params = new RadialTangential_F32(radial,t1,t2);
+		return this;
 	}
 
 	/**
@@ -58,16 +54,22 @@ public class AddRadialNtoN_F32 implements PointTransform_F32 {
 	public void compute(float x, float y, Point2D_F32 out) {
 		float sum = 0;
 
-		double r2 = x*x + y*y;
+		float[] radial = params.radial;
+		float t1 = params.t1;
+		float t2 = params.t2;
 
-		double r = r2;
+		float r2 = x*x + y*y;
+		float ri2 = r2;
 
 		for( int i = 0; i < radial.length; i++ ) {
-			sum += radial[i]*r;
-			r *= r2;
+			sum += radial[i]*ri2;
+			ri2 *= r2;
 		}
 
 		out.x = x*( 1 + sum);
 		out.y = y*( 1 + sum);
+
+		out.x += 2*t1*x*y + t2*(r2 + 2*x*x);
+		out.y += t1*(r2 + 2*y*y) + 2*t2*x*y;
 	}
 }

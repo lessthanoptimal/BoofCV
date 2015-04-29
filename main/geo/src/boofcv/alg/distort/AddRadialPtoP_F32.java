@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,18 +32,17 @@ import org.ejml.ops.CommonOps;
 public class AddRadialPtoP_F32 implements PointTransform_F32 {
 
 	// principle point / image center
-	private float x_c,y_c;
-	// radial distortion
-	private float radial[];
+	private float cx, cy;
+	// other intrinsic parameters
+	private float fx,fy,skew;
+
+	// distortion parameters
+	protected RadialTangential_F32 params;
 
 	private DenseMatrix64F K_inv = new DenseMatrix64F(3,3);
 	private Point2D_F32 temp0 = new Point2D_F32();
 
 	public AddRadialPtoP_F32() {
-	}
-
-	public AddRadialPtoP_F32(double fx, double fy, double skew, double x_c, double y_c, double... radial) {
-		set(fx,fy,skew,x_c,y_c, radial);
 	}
 
 	/**
@@ -52,32 +51,38 @@ public class AddRadialPtoP_F32 implements PointTransform_F32 {
 	 * @param fx Focal length x-axis in pixels
 	 * @param fy Focal length y-axis in pixels
 	 * @param skew skew in pixels
-	 * @param x_c camera center x-axis in pixels
-	 * @param y_c center center y-axis in pixels
-	 * @param radial Radial distortion parameters
+	 * @param cx camera center x-axis in pixels
+	 * @param cy center center y-axis in pixels
 	 */
-	public void set(double fx, double fy, double skew, double x_c, double y_c, double[] radial) {
+	public AddRadialPtoP_F32 setK(double fx, double fy, double skew, double cx, double cy) {
 
+		this.fx = (float)fx;
+		this.fy = (float)fy;
+		this.skew = (float)skew;
+		this.cx = (float)cx;
+		this.cy = (float)cy;
+
+		K_inv.zero();
 		K_inv.set(0,0,fx);
 		K_inv.set(1,1,fy);
 		K_inv.set(0,1,skew);
-		K_inv.set(0,2,x_c);
-		K_inv.set(1,2,y_c);
+		K_inv.set(0,2,cx);
+		K_inv.set(1,2,cy);
 		K_inv.set(2,2,1);
 
 		CommonOps.invert(K_inv);
 
-		this.x_c = (float)x_c;
-		this.y_c = (float)y_c;
+		return this;
+	}
 
-		if( radial == null ) {
-			this.radial = new float[0];
-		} else {
-			this.radial = new float[radial.length];
-			for (int i = 0; i < radial.length; i++) {
-				this.radial[i] = (float) radial[i];
-			}
-		}
+	/**
+	 * Specify intrinsic camera parameters
+	 *
+	 * @param radial Radial distortion parameters
+	 */
+	public AddRadialPtoP_F32 setDistortion(double[] radial, double t1, double t2) {
+		params = new RadialTangential_F32().set(radial,t1,t2);
+		return this;
 	}
 
 	/**
@@ -91,21 +96,26 @@ public class AddRadialPtoP_F32 implements PointTransform_F32 {
 	public void compute(float x, float y, Point2D_F32 out) {
 		float sum = 0;
 
+		float radial[] = params.radial;
+		float t1 = params.t1,t2 = params.t2;
+
 		temp0.x = x;
 		temp0.y = y;
 
 		GeometryMath_F32.mult(K_inv, temp0, out);
 
 		float r2 = out.x*out.x + out.y*out.y;
-
-		float r = r2;
+		float ri2 = r2;
 
 		for( int i = 0; i < radial.length; i++ ) {
-			sum += radial[i]*r;
-			r *= r2;
+			sum += radial[i]*ri2;
+			ri2 *= r2;
 		}
 
-		out.x = x + (x-x_c)*sum;
-		out.y = y + (y-y_c)*sum;
+		float tx = 2*t1*out.x*out.y + t2*(r2 + 2*out.x*out.x);
+		float ty = t1*(r2 + 2*out.y*out.y) + 2*t2*out.x*out.y;
+
+		out.x = x + (x - cx)*sum + fx*tx + skew*ty;
+		out.y = y + (y - cy)*sum + fy*ty;
 	}
 }

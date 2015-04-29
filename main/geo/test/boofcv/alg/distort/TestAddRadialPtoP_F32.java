@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,9 +18,8 @@
 
 package boofcv.alg.distort;
 
-import georegression.geometry.GeometryMath_F64;
+import georegression.geometry.GeometryMath_F32;
 import georegression.struct.point.Point2D_F32;
-import georegression.struct.point.Point2D_F64;
 import org.ejml.data.DenseMatrix64F;
 import org.ejml.ops.CommonOps;
 import org.junit.Test;
@@ -37,42 +36,55 @@ public class TestAddRadialPtoP_F32 {
 	 */
 	@Test
 	public void againstManual() {
-		double fx = 600;
-		double fy = 500;
-		double skew = 2;
-		double xc = 300;
-		double yc = 350;
+		againstManual(0,0);
+		againstManual(-0.5f,0.03f);
+	}
 
-		double radial[]= new double[]{0.01,-0.03};
+	public void againstManual( float t1, float t2 ) {
+		float fx = 600;
+		float fy = 500;
+		float skew = 2;
+		float xc = 300;
+		float yc = 350;
 
-		Point2D_F64 orig = new Point2D_F64(19.5,400.1);
-		Point2D_F64 dist = new Point2D_F64();
+		double radial[]= new double[]{0.01f,-0.03f};
 
-		Point2D_F64 normPt = new Point2D_F64();
+		Point2D_F32 orig = new Point2D_F32(19.5f,400.1f); // undistorted pixel coordinates
+		Point2D_F32 dist = new Point2D_F32();
+
+		Point2D_F32 normPt = new Point2D_F32();
 
 		DenseMatrix64F K = new DenseMatrix64F(3,3,true,fx,skew,xc,0,fy,yc,0,0,1);
 		DenseMatrix64F K_inv = new DenseMatrix64F(3,3);
 		CommonOps.invert(K, K_inv);
 
 		// compute normalized image coordinate
-		GeometryMath_F64.mult(K_inv, orig, normPt);
+		GeometryMath_F32.mult(K_inv, orig, normPt);
 
-		double c2 = normPt.x*normPt.x + normPt.y*normPt.y;
-		double r = 1;
-		double sum = 0;
+		float nx = normPt.x; // undistorted normalized image coordinates
+		float ny = normPt.y;
+
+		float r2 = nx*nx + ny*ny;
+		float ri2 = 1;
+		float sum = 0;
 		for( int i = 0; i < radial.length; i++ ) {
-			r *= c2;
-			sum += radial[i]*r;
+			ri2 *= r2;
+			sum += radial[i]*ri2;
 		}
 
-		dist.x = orig.x + (orig.x-xc)*sum;
-		dist.y = orig.y + (orig.y-yc)*sum;
+		// distorted normalized image coordinates
+		float dnx = nx + nx*sum + 2*t1*nx*ny + t2*(r2 + 2*nx*nx);
+		float dny = ny + ny*sum + t1*(r2 + 2*ny*ny) + 2*t2*nx*ny;
 
-		AddRadialPtoP_F32 alg = new AddRadialPtoP_F32(fx,fy,skew,xc,yc,radial);
+		dist.x = fx*dnx + skew*dny + xc;
+		dist.y = fy*dny + yc;
+
+		AddRadialPtoP_F32 alg = new AddRadialPtoP_F32().setK(fx, fy, skew, xc, yc).
+				setDistortion(radial, t1, t2);
 
 		Point2D_F32 found = new Point2D_F32();
 
-		alg.compute(19.5f,400.1f,found);
+		alg.compute(orig.x,orig.y,found);
 
 		assertEquals(dist.x,found.x,1e-4);
 		assertEquals(dist.y,found.y,1e-4);

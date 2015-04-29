@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -160,8 +160,8 @@ public class ShowLensDistortion<T extends ImageSingleBand>
 		thread.start();
 
 		PointTransform_F32 ptran =
-				new AddRadialPtoP_F32(input.width*0.8,input.width*0.8,0,
-						input.width/2,input.height/2,radial1,radial2);
+				new AddRadialPtoP_F32().setK(input.width*0.8,input.width*0.8,0,
+						input.width/2,input.height/2).setDistortion(new double[]{radial1,radial2},0,0);
 		PixelTransform_F32 tran=new PointToPixelTransform_F32(ptran);
 
 		for( int i = 0; i < input.getNumBands(); i++ , progress++ ) {
