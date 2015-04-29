@@ -18,7 +18,7 @@
 
 package boofcv.alg.sfm;
 
-import boofcv.alg.distort.RemoveRadialPtoN_F64;
+import boofcv.alg.distort.radtan.RemoveRadialPtoN_F64;
 import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.distort.PixelTransform_F32;
 import boofcv.struct.image.ImageFloat32;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -56,7 +56,7 @@ public class TestParseStereoCalibrationConfig {
 				"\n   \n\n"; // some white space garbage a person might add
 		
 		String targetDesc =
-				"chess false true 3 4 33";
+				"chess 2 true false true 3 4 33";
 		
 		m.files.add(s);
 		m.files.add(targetDesc);

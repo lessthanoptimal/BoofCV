@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.distort;
+package boofcv.alg.distort.radtan;
 
 import georegression.geometry.GeometryMath_F32;
 import georegression.struct.point.Point2D_F32;
@@ -29,8 +29,7 @@ import static org.junit.Assert.assertEquals;
 /**
  * @author Peter Abeles
  */
-public class TestAddRadialPtoP_F32 {
-
+public class TestAddRadialPtoN_F32 {
 	/**
 	 * Manually compute the distorted coordinate for a point and see if it matches
 	 */
@@ -50,7 +49,6 @@ public class TestAddRadialPtoP_F32 {
 		double radial[]= new double[]{0.01f,-0.03f};
 
 		Point2D_F32 orig = new Point2D_F32(19.5f,400.1f); // undistorted pixel coordinates
-		Point2D_F32 dist = new Point2D_F32();
 
 		Point2D_F32 normPt = new Point2D_F32();
 
@@ -76,17 +74,14 @@ public class TestAddRadialPtoP_F32 {
 		float dnx = nx + nx*sum + 2*t1*nx*ny + t2*(r2 + 2*nx*nx);
 		float dny = ny + ny*sum + t1*(r2 + 2*ny*ny) + 2*t2*nx*ny;
 
-		dist.x = fx*dnx + skew*dny + xc;
-		dist.y = fy*dny + yc;
-
-		AddRadialPtoP_F32 alg = new AddRadialPtoP_F32().setK(fx, fy, skew, xc, yc).
+		AddRadialPtoN_F32 alg = new AddRadialPtoN_F32().setK(fx, fy, skew, xc, yc).
 				setDistortion(radial, t1, t2);
 
 		Point2D_F32 found = new Point2D_F32();
 
 		alg.compute(orig.x,orig.y,found);
 
-		assertEquals(dist.x,found.x,1e-4);
-		assertEquals(dist.y,found.y,1e-4);
+		assertEquals(dnx,found.x,1e-4);
+		assertEquals(dny,found.y,1e-4);
 	}
 }

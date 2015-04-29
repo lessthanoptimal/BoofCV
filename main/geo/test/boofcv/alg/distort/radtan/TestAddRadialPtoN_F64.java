@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.distort;
+package boofcv.alg.distort.radtan;
 
 import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Point2D_F64;
@@ -29,8 +29,7 @@ import static org.junit.Assert.assertEquals;
 /**
  * @author Peter Abeles
  */
-public class TestAddRadialPtoP_F64 {
-
+public class TestAddRadialPtoN_F64 {
 	/**
 	 * Manually compute the distorted coordinate for a point and see if it matches
 	 */
@@ -50,7 +49,6 @@ public class TestAddRadialPtoP_F64 {
 		double radial[]= new double[]{0.01,-0.03};
 
 		Point2D_F64 orig = new Point2D_F64(19.5,400.1); // undistorted pixel coordinates
-		Point2D_F64 dist = new Point2D_F64();
 
 		Point2D_F64 normPt = new Point2D_F64();
 
@@ -76,17 +74,14 @@ public class TestAddRadialPtoP_F64 {
 		double dnx = nx + nx*sum + 2*t1*nx*ny + t2*(r2 + 2*nx*nx);
 		double dny = ny + ny*sum + t1*(r2 + 2*ny*ny) + 2*t2*nx*ny;
 
-		dist.x = fx*dnx + skew*dny + xc;
-		dist.y = fy*dny + yc;
-
-		AddRadialPtoP_F64 alg = new AddRadialPtoP_F64().setK(fx, fy, skew, xc, yc).
+		AddRadialPtoN_F64 alg = new AddRadialPtoN_F64().setK(fx, fy, skew, xc, yc).
 				setDistortion(radial, t1, t2);
 
 		Point2D_F64 found = new Point2D_F64();
 
 		alg.compute(orig.x,orig.y,found);
 
-		assertEquals(dist.x,found.x,1e-4);
-		assertEquals(dist.y,found.y,1e-4);
+		assertEquals(dnx,found.x,1e-4);
+		assertEquals(dny,found.y,1e-4);
 	}
 }

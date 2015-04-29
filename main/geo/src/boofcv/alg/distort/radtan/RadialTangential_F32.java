@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.distort;
+package boofcv.alg.distort.radtan;
 
 /**
  * Distortion parameters for radial and tangential model
@@ -59,7 +59,7 @@ public class RadialTangential_F32 {
 		return this;
 	}
 
-	public void set(float[] radial, float t1, float t2) {
+	public RadialTangential_F32 set(float[] radial, float t1, float t2) {
 		if( radial == null ) {
 			radial = new float[0];
 		} else {
@@ -68,6 +68,8 @@ public class RadialTangential_F32 {
 		}
 		this.t1 = t1;
 		this.t2 = t2;
+
+		return this;
 	}
 
 	public float getT1() {

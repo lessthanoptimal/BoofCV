@@ -49,12 +49,16 @@ public class TestLensDistortionOps {
 	 */
 	@Test
 	public void fullView() {
-		IntrinsicParameters param = new IntrinsicParameters(false).
-				fsetMatrix(300, 320, 0, 150, 130, width, height).fsetRadial(0.1,1e-4);
+		IntrinsicParameters param = new IntrinsicParameters(false).fsetK(300, 320, 0, 150, 130, width, height).
+				fsetRadial(0.1, 0.05);
 
 		PointTransform_F32 adjusted = LensDistortionOps.fullView(param,null);
-
 		checkBorderOutside(adjusted);
+
+		param = new IntrinsicParameters(false).fsetK(300, 320, 0, 150, 130, width, height).fsetRadial(-0.1,-0.05);
+		adjusted = LensDistortionOps.fullView(param,null);
+		checkBorderOutside(adjusted);
+
 	}
 
 	private void checkBorderOutside(PointTransform_F32 tran) {
@@ -86,24 +90,46 @@ public class TestLensDistortionOps {
 	 */
 	@Test
 	public void allInside() {
-		IntrinsicParameters param = new IntrinsicParameters().
-				fsetMatrix(300, 320, 0, 150, 130, width, height).fsetRadial(0.1,1e-4);
+		IntrinsicParameters param = new IntrinsicParameters().fsetK(300, 320, 0, 150, 130, width, height).fsetRadial(0.1,1e-4);
 
 		PointTransform_F32 adjusted = LensDistortionOps.allInside(param,null);
+		checkInside(adjusted);
 
+		// distort it in the other direction
+		param = new IntrinsicParameters().fsetK(300, 320, 0, 150, 130, width, height).fsetRadial(-0.1,-1e-4);
+
+		adjusted = LensDistortionOps.allInside(param, null);
 		checkInside(adjusted);
 	}
 
 	private void checkInside(PointTransform_F32 tran) {
+		double closestT = Double.MAX_VALUE;
+		double closestB = Double.MAX_VALUE;
+
 		for( int y = 0; y < height; y++ ) {
 			checkInside(0,y,tran);
 			checkInside(width-1,y,tran);
+
+			closestT = Math.min(closestT,distanceEdge(0,y,tran));
+			closestB = Math.min(closestB,distanceEdge(width-1,y,tran));
 		}
 
+		// should be close to the edge at some point
+		assertTrue( closestT < 1 );
+		assertTrue( closestB < 1 );
+
+		closestT = closestB = Double.MAX_VALUE;
 		for( int x = 0; x < width; x++ ) {
 			checkInside(x,0,tran);
 			checkInside(x,height-1,tran);
+
+			closestT = Math.min(closestT,distanceEdge(x,0,tran));
+			closestB = Math.min(closestB,distanceEdge(x,height-1,tran));
 		}
+
+		// should be close to the edge at some point
+		assertTrue( closestT < 1 );
+		assertTrue( closestB < 1 );
 	}
 
 	private void checkInside( int x , int y , PointTransform_F32 tran ) {
@@ -116,6 +142,19 @@ public class TestLensDistortionOps {
 		assertTrue(s,p.y >= -tol && p.y < height+tol );
 	}
 
+	private double distanceEdge( int x , int y ,  PointTransform_F32 tran ) {
+		tran.compute(x, y, p);
+
+		double min = Double.MAX_VALUE;
+
+		if( x < min ) min = x;
+		if( y < min ) min = y;
+		if( width-x-1 < min ) min = width-x-1;
+		if( height-y-1 < min ) min = height-y-1;
+
+		return min;
+	}
+
 	@Test
 	public void transformRadialToNorm_F64() {
 		transformRadialToNorm_F64(false);
@@ -124,16 +163,15 @@ public class TestLensDistortionOps {
 
 	private void transformRadialToNorm_F64( boolean flipY ) {
 		IntrinsicParameters param = new IntrinsicParameters(flipY).
-				fsetMatrix(300,320,2,150,130,width,height).fsetRadial(0.1,1e-4);
+				fsetK(300, 320, 2, 150, 130, width, height).fsetRadial(0.1,1e-4);
 
 		// Undistorted pixel
 		Point2D_F64 pixel = new Point2D_F64(20,120);
 
 		// Distorted pixel
-		AddRadialPtoP_F64 addRadial = new AddRadialPtoP_F64().
-				setK(param.fx,param.fy,param.skew,param.cx,param.cy).setDistortion(param.radial,param.t1,param.t2);
+		PointTransform_F64 add_p_to_p = LensDistortionOps.createLensDistortion(param).distort_F64(true,true);
 		Point2D_F64 pixelD = new Point2D_F64();
-		addRadial.compute(pixel.x,pixel.y,pixelD);
+		add_p_to_p.compute(pixel.x, pixel.y, pixelD);
 		if( flipY )
 			pixelD.y = param.height-pixelD.y-1;
 
@@ -161,21 +199,20 @@ public class TestLensDistortionOps {
 
 	private void transformRadialToPixel_F64( boolean flipY ) {
 		IntrinsicParameters param =
-				new IntrinsicParameters(flipY).fsetMatrix(300,320,2,150,130,width,height).fsetRadial(0.1,1e-4);
+				new IntrinsicParameters(flipY).fsetK(300, 320, 2, 150, 130, width, height).fsetRadial(0.1,1e-4);
 
 		// Undistorted pixel
 		Point2D_F64 pixel = new Point2D_F64(20,120);
 
 		// Distorted pixel
-		AddRadialPtoP_F64 addRadial = new AddRadialPtoP_F64().
-				setK(param.fx,param.fy,param.skew,param.cx,param.cy).setDistortion(param.radial,param.t1,param.t2);
+		PointTransform_F64 add_p_to_p = LensDistortionOps.createLensDistortion(param).distort_F64(true, true);
 		Point2D_F64 pixelD = new Point2D_F64();
 
 		if( flipY ) {
-			addRadial.compute(pixel.x,param.height-pixel.y-1,pixelD);
+			add_p_to_p.compute(pixel.x,param.height-pixel.y-1,pixelD);
 			pixelD.y = param.height-pixelD.y-1;
 		} else {
-			addRadial.compute(pixel.x,pixel.y,pixelD);
+			add_p_to_p.compute(pixel.x,pixel.y,pixelD);
 		}
 
 		// test it
@@ -183,8 +220,8 @@ public class TestLensDistortionOps {
 		Point2D_F64 found = new Point2D_F64();
 		alg.compute(pixelD.x,pixelD.y,found);
 
-		assertEquals(pixel.x,found.x,1e-6);
-		assertEquals(pixel.y,found.y,1e-6);
+		assertEquals(pixel.x,found.x,1e-5);
+		assertEquals(pixel.y,found.y,1e-5);
 	}
 
 	@Test
@@ -195,16 +232,15 @@ public class TestLensDistortionOps {
 
 	private void transformNormToRadial_F64( boolean flipY ) {
 		IntrinsicParameters param = new IntrinsicParameters(flipY).
-				fsetMatrix(300,320,2,150,130,width,height).fsetRadial(0.1,1e-4);
+				fsetK(300, 320, 2, 150, 130, width, height).fsetRadial(0.1,1e-4);
 
 		// Undistorted pixel
 		Point2D_F64 pixel = new Point2D_F64(20,120);
 
 		// Distorted pixel
-		AddRadialPtoP_F64 addRadial = new AddRadialPtoP_F64().
-				setK(param.fx,param.fy,param.skew,param.cx,param.cy).setDistortion(param.radial,param.t1,param.t2);
+		PointTransform_F64 add_p_to_p = LensDistortionOps.createLensDistortion(param).distort_F64(true, true);
 		Point2D_F64 pixelD = new Point2D_F64();
-		addRadial.compute(pixel.x,pixel.y,pixelD);
+		add_p_to_p.compute(pixel.x,pixel.y,pixelD);
 		if( flipY )
 			pixelD.y = param.height-pixelD.y-1;
 
@@ -232,16 +268,15 @@ public class TestLensDistortionOps {
 
 	private void transformPixelToRadial_F32( boolean flipY ) {
 		IntrinsicParameters param = new IntrinsicParameters(flipY).
-		fsetMatrix(300,320,2,150,130,width,height).fsetRadial(0.1,1e-4);
+				fsetK(300, 320, 2, 150, 130, width, height).fsetRadial(0.1,1e-4);
 
 		// Undistorted pixel
 		Point2D_F64 pixel = new Point2D_F64(20,120);
 
 		// Distorted pixel
-		AddRadialPtoP_F64 addRadial = new AddRadialPtoP_F64().
-				setK(param.fx,param.fy,param.skew,param.cx,param.cy).setDistortion(param.radial,param.t1,param.t2);
+		PointTransform_F64 add_p_to_p = LensDistortionOps.createLensDistortion(param).distort_F64(true, true);
 		Point2D_F64 pixelD = new Point2D_F64();
-		addRadial.compute(pixel.x,pixel.y,pixelD);
+		add_p_to_p.compute(pixel.x,pixel.y,pixelD);
 		if( flipY )
 			pixelD.y = param.height-pixelD.y-1;
 

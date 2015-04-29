@@ -19,7 +19,10 @@
 package boofcv.alg.fiducial;
 
 import boofcv.abst.filter.binary.InputToBinary;
-import boofcv.alg.distort.*;
+import boofcv.alg.distort.ImageDistort;
+import boofcv.alg.distort.LensDistortionOps;
+import boofcv.alg.distort.PointToPixelTransform_F32;
+import boofcv.alg.distort.PointTransformHomography_F32;
 import boofcv.alg.feature.shapes.SplitMergeLineFitLoop;
 import boofcv.alg.filter.binary.Contour;
 import boofcv.alg.filter.binary.LinearContourLabelChang2004;
@@ -33,6 +36,8 @@ import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.ConnectRule;
 import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.distort.PixelTransform_F32;
+import boofcv.struct.distort.PointTransform_F32;
+import boofcv.struct.distort.PointTransform_F64;
 import boofcv.struct.distort.SequencePointTransform_F32;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.image.ImageFloat32;
@@ -111,9 +116,6 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 	private ImageDistort<T,ImageFloat32> removePerspective;
 	private PointTransformHomography_F32 transformHomography = new PointTransformHomography_F32();
 
-	// used to remove radial distortion from the lens
-	private AddRadialPtoP_F32 addRadialDistortion = new AddRadialPtoP_F32();
-
 	// refines the initial estimate of the quadrilateral around the fiducial
 	private FitQuadrilaterialEM fitQuad = new FitQuadrilaterialEM();
 
@@ -161,10 +163,6 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 		// is sent to fiducial decoder
 		removePerspective = FactoryDistort.distort(false,FactoryInterpolation.bilinearPixelS(inputType),
 				FactoryImageBorder.general(inputType, BorderType.EXTENDED),ImageFloat32.class);
-		SequencePointTransform_F32 sequence = new SequencePointTransform_F32(transformHomography, addRadialDistortion);
-		PixelTransform_F32 squareToInput= new PointToPixelTransform_F32(sequence);
-
-		removePerspective.setModel(squareToInput);
 
 		tableDistPixel = new Point2D_I32[0];
 	}
@@ -198,11 +196,12 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 		homographyToPose.setCalibrationMatrix(K);
 
 		// provide intrinsic camera parameters
-		addRadialDistortion.setK(intrinsic.fx, intrinsic.fy, intrinsic.skew, intrinsic.cx, intrinsic.cy).
-				setDistortion(intrinsic.radial,intrinsic.t1,intrinsic.t2);
-		RemoveRadialPtoP_F64 removeLensDistort = new RemoveRadialPtoP_F64();
-		removeLensDistort.setK(intrinsic.fx, intrinsic.fy, intrinsic.skew, intrinsic.cx, intrinsic.cy).
-				setDistortion(intrinsic.radial,intrinsic.t1,intrinsic.t2);
+		PointTransform_F64 remove_p_to_p = LensDistortionOps.createLensDistortion(intrinsic).undistort_F64(true, true);
+		PointTransform_F32 add_p_to_p = LensDistortionOps.createLensDistortion(intrinsic).distort_F32(true, true);
+
+		SequencePointTransform_F32 sequence = new SequencePointTransform_F32(transformHomography, add_p_to_p);
+		PixelTransform_F32 squareToInput= new PointToPixelTransform_F32(sequence);
+		removePerspective.setModel(squareToInput);
 
 		// Create the distorted image to undistorted pixel lookup table
 		int N = intrinsic.width*intrinsic.height;
@@ -212,7 +211,7 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 			for (int i = 0; i < N; i++) {
 				// NOTE: Ideally a floating point point would be used here since integer ones introduce more
 				//       rounding errors.  However, "fitPolygon" only works with integer coordinates
-				removeLensDistort.compute(i % intrinsic.width, i / intrinsic.width, p);
+				remove_p_to_p.compute(i % intrinsic.width, i / intrinsic.width, p);
 				tableDistPixel[i] = new Point2D_I32( (int)Math.round(p.x) , (int)Math.round(p.y) );
 			}
 		}

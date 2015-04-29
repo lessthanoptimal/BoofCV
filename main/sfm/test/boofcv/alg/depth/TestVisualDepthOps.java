@@ -18,7 +18,7 @@
 
 package boofcv.alg.depth;
 
-import boofcv.alg.distort.RemoveRadialPtoN_F64;
+import boofcv.alg.distort.radtan.RemoveRadialPtoN_F64;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.struct.FastQueueArray_I32;
 import boofcv.struct.calib.IntrinsicParameters;

@@ -18,28 +18,16 @@
 
 package boofcv.alg.distort;
 
-import georegression.struct.point.Point2D_F32;
+import org.junit.Test;
+
+import static org.junit.Assert.fail;
 
 /**
- * Removes radial distortion from a pixel coordinate and outputs pixel coordinates
- *
  * @author Peter Abeles
  */
-public class RemoveRadialPtoP_F32 extends RemoveRadialPtoN_F32 {
-
-	/**
-	 * Removes radial distortion
-	 *
-	 * @param x Distorted x-coordinate pixel
-	 * @param y Distorted y-coordinate pixel
-	 * @param out Undistorted pixel coordinate.
-	 */
-	@Override
-	public void compute(float x, float y, Point2D_F32 out) {
-		//  distorted pixel to undistorted normalized
-		super.compute(x,y,out);
-
-		out.x = (x + cx*sum - fx*tx - skew*ty)/(1+sum);
-		out.y = (y + cy*sum - fy*ty)/(1+sum);
+public class TestTransformThenPixel_F64 {
+	@Test
+	public void stuff() {
+		fail("Implement");
 	}
 }

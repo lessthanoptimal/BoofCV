@@ -16,11 +16,12 @@
  * limitations under the License.
  */
 
-package boofcv.alg.distort;
+package boofcv.alg.distort.radtan;
 
+import boofcv.alg.distort.TransformThenPixel_F32;
 import boofcv.alg.geo.PerspectiveOps;
-import georegression.geometry.GeometryMath_F64;
-import georegression.struct.point.Point2D_F64;
+import georegression.geometry.GeometryMath_F32;
+import georegression.struct.point.Point2D_F32;
 import org.ejml.data.DenseMatrix64F;
 import org.junit.Test;
 
@@ -29,43 +30,44 @@ import static org.junit.Assert.assertEquals;
 /**
  * @author Peter Abeles
  */
-public class TestRemoveRadialPtoN_F64 {
+public class TestRemoveRadialPtoN_F32 {
 
 	@Test
 	public void checkAgainstAdd() {
 		checkAgainstAdd(0,0);
-		checkAgainstAdd(0.1,-0.05);
+		checkAgainstAdd(0.1f,-0.05f);
 	}
 
-	public void checkAgainstAdd( double t1 , double t2 ) {
-		double fx = 600;
-		double fy = 500;
-		double skew = 2;
-		double xc = 300;
-		double yc = 350;
+	public void checkAgainstAdd( float t1 , float t2 ) {
+		float fx = 600;
+		float fy = 500;
+		float skew = 2;
+		float xc = 300;
+		float yc = 350;
 
-		double radial[]= new double[]{0.12,-0.13};
+		double radial[]= new double[]{0.12f,-0.13f};
 
-		Point2D_F64 point = new Point2D_F64();
+		Point2D_F32 point = new Point2D_F32();
 
-		double undistX = 19.5;
-		double undistY = 200.1;
+		float undistX = 19.5f;
+		float undistY = 200.1f;
 
-		new AddRadialPtoP_F64().setK(fx,fy,skew,xc,yc).setDistortion(radial,t1,t2).compute(undistX, undistY,point);
+		AddRadialPtoN_F32 add_p_to_n = new AddRadialPtoN_F32().setK(fx, fy, skew, xc, yc).setDistortion(radial,t1,t2);
+		new TransformThenPixel_F32(add_p_to_n).set(fx, fy, skew, xc, yc).compute(undistX, undistY, point);
 
-		double distX = point.x;
-		double distY = point.y;
+		float distX = point.x;
+		float distY = point.y;
 
-		RemoveRadialPtoN_F64 alg = new RemoveRadialPtoN_F64().setK(fx,fy,skew,xc,yc).setDistortion(radial,t1,t2);
+		RemoveRadialPtoN_F32 alg = new RemoveRadialPtoN_F32().setK(fx,fy,skew,xc,yc).setDistortion(radial,t1,t2);
 
 		alg.compute(distX, distY, point);
 
 		/// go from calibrated coordinates to pixel
 		DenseMatrix64F K = PerspectiveOps.calibrationMatrix(fx, fy, skew, xc, yc);
 
-		GeometryMath_F64.mult(K,point,point);
+		GeometryMath_F32.mult(K,point,point);
 
-		assertEquals(undistX,point.x,1e-4);
-		assertEquals(undistY,point.y,1e-4);
+		assertEquals(undistX,point.x,1e-2);
+		assertEquals(undistY,point.y,1e-2);
 	}
 }

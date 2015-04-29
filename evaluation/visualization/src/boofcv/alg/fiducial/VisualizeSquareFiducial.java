@@ -18,7 +18,7 @@
 
 package boofcv.alg.fiducial;
 
-import boofcv.alg.distort.AddRadialPtoP_F64;
+import boofcv.alg.distort.LensDistortionOps;
 import boofcv.alg.feature.shapes.SplitMergeLineFitLoop;
 import boofcv.factory.filter.binary.FactoryThresholdBinary;
 import boofcv.gui.ListDisplayPanel;
@@ -30,6 +30,7 @@ import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.calib.IntrinsicParameters;
+import boofcv.struct.distort.PointTransform_F64;
 import boofcv.struct.image.ImageFloat32;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.se.Se3_F64;
@@ -70,9 +71,8 @@ public class VisualizeSquareFiducial {
 		g2.setColor(Color.RED);
 		g2.setStroke(new BasicStroke(2));
 
-		AddRadialPtoP_F64 addRadialDistortion = new AddRadialPtoP_F64().
-				setK(intrinsic.fx, intrinsic.fy, intrinsic.skew, intrinsic.cx, intrinsic.cy).
-				setDistortion(intrinsic.radial,intrinsic.t1,intrinsic.t2);
+		PointTransform_F64 add_p_to_p = LensDistortionOps.createLensDistortion(intrinsic).distort_F64(true, true);
+
 		Se3_F64 targetToWorld = new Se3_F64();
 
 		for (int i = 0; i < N; i++) {
@@ -82,10 +82,10 @@ public class VisualizeSquareFiducial {
 			detector.computeTargetToWorld(q,0.1,targetToWorld);
 			VisualizeFiducial.drawCube(targetToWorld, intrinsic, 0.1, g2);
 
-			apply(addRadialDistortion,q.a,q.a);
-			apply(addRadialDistortion,q.b,q.b);
-			apply(addRadialDistortion,q.c,q.c);
-			apply(addRadialDistortion,q.d,q.d);
+			apply(add_p_to_p,q.a,q.a);
+			apply(add_p_to_p,q.b,q.b);
+			apply(add_p_to_p,q.c,q.c);
+			apply(add_p_to_p,q.d,q.d);
 
 			VisualizeShapes.draw(q,g2);
 		}
@@ -106,7 +106,7 @@ public class VisualizeSquareFiducial {
 		ShowImages.showWindow(squares,"Candidates");
 	}
 
-	private void apply( AddRadialPtoP_F64 dist , Point2D_F64 p , Point2D_F64 o ) {
+	private void apply( PointTransform_F64 dist , Point2D_F64 p , Point2D_F64 o ) {
 		dist.compute(p.x,p.y,o);
 	}
 

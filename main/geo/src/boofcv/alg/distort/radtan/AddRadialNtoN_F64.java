@@ -16,21 +16,21 @@
  * limitations under the License.
  */
 
-package boofcv.alg.distort;
+package boofcv.alg.distort.radtan;
 
-import boofcv.struct.distort.PointTransform_F32;
-import georegression.struct.point.Point2D_F32;
+import boofcv.struct.distort.PointTransform_F64;
+import georegression.struct.point.Point2D_F64;
 
 /**
  * Given an undistorted normalized pixel coordinate, compute the distorted normalized coordinate.
  *
  * @author Peter Abeles
  */
-public class AddRadialNtoN_F32 implements PointTransform_F32 {
+public class AddRadialNtoN_F64 implements PointTransform_F64 {
 
-	private RadialTangential_F32 params;
+	private RadialTangential_F64 params;
 
-	public AddRadialNtoN_F32() {
+	public AddRadialNtoN_F64() {
 	}
 
 	/**
@@ -38,8 +38,8 @@ public class AddRadialNtoN_F32 implements PointTransform_F32 {
 	 *
 	 * @param radial Radial distortion parameters
 	 */
-	public AddRadialNtoN_F32 set(float[] radial , float t1 , float t2) {
-		params = new RadialTangential_F32(radial,t1,t2);
+	public AddRadialNtoN_F64 setDistortion(double[] radial, double t1, double t2) {
+		params = new RadialTangential_F64(radial,t1,t2);
 		return this;
 	}
 
@@ -51,15 +51,15 @@ public class AddRadialNtoN_F32 implements PointTransform_F32 {
 	 * @param out Distorted normalized image coordinate.
 	 */
 	@Override
-	public void compute(float x, float y, Point2D_F32 out) {
+	public void compute(double x, double y, Point2D_F64 out) {
 		float sum = 0;
 
-		float[] radial = params.radial;
-		float t1 = params.t1;
-		float t2 = params.t2;
+		double[] radial = params.radial;
+		double t1 = params.t1;
+		double t2 = params.t2;
 
-		float r2 = x*x + y*y;
-		float ri2 = r2;
+		double r2 = x*x + y*y;
+		double ri2 = r2;
 
 		for( int i = 0; i < radial.length; i++ ) {
 			sum += radial[i]*ri2;

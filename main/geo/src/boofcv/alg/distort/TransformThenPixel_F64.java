@@ -22,28 +22,35 @@ import boofcv.struct.distort.PointTransform_F64;
 import georegression.struct.point.Point2D_F64;
 
 /**
- * Converts normalized pixel coordinate into pixel coordinate.
+ * Applies a transform which outputs normalized image coordinates then converts that into
+ * pixel coordinates
  *
  * @author Peter Abeles
  */
-public class NormalizedToPixel_F64 implements PointTransform_F64 {
+public class TransformThenPixel_F64 implements PointTransform_F64  {
 
-	// camera calibration matrix
 	double fx, fy, skew, cx, cy;
+	PointTransform_F64 first;
 
-	public NormalizedToPixel_F64 set(double fx, double fy, double skew, double cx, double cy) {
+	public TransformThenPixel_F64(PointTransform_F64 first) {
+		this.first = first;
+	}
+
+	public PointTransform_F64 set(double fx, double fy, double skew, double cx, double cy ) {
 		this.fx = fx;
 		this.fy = fy;
 		this.skew = skew;
 		this.cx = cx;
 		this.cy = cy;
+
 		return this;
 	}
 
-
 	@Override
 	public void compute(double x, double y, Point2D_F64 out) {
-		out.x = fx * x + skew * y + cx;
-		out.y = fy * y + cy;
+		first.compute(x,y,out);
+		x = out.x; y = out.y;
+		out.x = fx*x + skew*y + cx;
+		out.y = fy*y + cy;
 	}
 }

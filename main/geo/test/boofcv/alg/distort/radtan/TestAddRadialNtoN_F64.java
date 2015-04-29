@@ -16,13 +16,9 @@
  * limitations under the License.
  */
 
-package boofcv.alg.distort;
+package boofcv.alg.distort.radtan;
 
-import boofcv.alg.geo.PerspectiveOps;
-import boofcv.struct.calib.IntrinsicParameters;
-import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Point2D_F64;
-import org.ejml.data.DenseMatrix64F;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -30,27 +26,32 @@ import static org.junit.Assert.assertEquals;
 /**
  * @author Peter Abeles
  */
-public class TestNormalizedToPixel_F64 {
-
+public class TestAddRadialNtoN_F64 {
+	/**
+	 * Manually compute the distorted coordinate for a point and see if it matches
+	 */
 	@Test
-	public void basicTest() {
-		IntrinsicParameters p = new IntrinsicParameters(false).fsetK(1, 2, 3, 4, 5, 200, 300);
+	public void againstManual() {
+		double radial[]= new double[]{0.01,-0.03};
+		double t1 = 0.1,t2=-.05;
 
-		DenseMatrix64F K = PerspectiveOps.calibrationMatrix(p, null);
+		Point2D_F64 orig = new Point2D_F64(0.1,-0.2);
 
-		Point2D_F64 pixel = new Point2D_F64(150, 200);
-		Point2D_F64 expected = new Point2D_F64();
+		// manually compute the distortion
+		double x = orig.x, y = orig.y;
+		double r2 = x*x + y*y;
+		double mag = radial[0]*r2 + radial[1]*r2*r2;
+
+		double distX = orig.x*(1+mag) + 2*t1*x*y + t2*(r2 + 2*x*x);
+		double distY = orig.y*(1+mag) + t1*(r2 + 2*y*y) + 2*t2*x*y;
+
+		AddRadialNtoN_F64 alg = new AddRadialNtoN_F64().setDistortion(radial, t1, t2);
+
 		Point2D_F64 found = new Point2D_F64();
 
-		GeometryMath_F64.mult(K, pixel, expected);
+		alg.compute(orig.x,orig.y,found);
 
-		NormalizedToPixel_F64 alg = new NormalizedToPixel_F64();
-		alg.set(p.fx, p.fy, p.skew, p.cx, p.cy);
-
-		alg.compute(pixel.x, pixel.y, found);
-
-		assertEquals(expected.x, found.x, 1e-8);
-		assertEquals(expected.y, found.y, 1e-8);
+		assertEquals(distX,found.x,1e-4);
+		assertEquals(distY,found.y,1e-4);
 	}
-
 }

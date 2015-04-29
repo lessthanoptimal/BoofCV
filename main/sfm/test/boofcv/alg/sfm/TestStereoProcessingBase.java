@@ -157,8 +157,8 @@ public class TestStereoProcessingBase {
 		ret.getRightToLeft().getT().set(-0.2, 0.001, -0.012);
 		RotationMatrixGenerator.eulerXYZ(0.001, -0.01, 0.0023, ret.getRightToLeft().getR());
 
-		ret.left = new IntrinsicParameters(flipY).fsetMatrix(300,320,0,width/2,height/2,width,height).fsetRadial(0.1,1e-4);
-		ret.right = new IntrinsicParameters(flipY).fsetMatrix(290,310,0,width/2+2,height/2-6,width,height).fsetRadial(0.05, -2e-4);
+		ret.left = new IntrinsicParameters(flipY).fsetK(300, 320, 0, width / 2, height / 2, width, height).fsetRadial(0.1,1e-4);
+		ret.right = new IntrinsicParameters(flipY).fsetK(290, 310, 0, width / 2 + 2, height / 2 - 6, width, height).fsetRadial(0.05, -2e-4);
 
 		return ret;
 	}

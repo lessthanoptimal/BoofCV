@@ -55,7 +55,7 @@ public class TestRectifyImageOps {
 	public void fullViewLeft_calibrated( boolean flipY ) {
 
 		IntrinsicParameters param =
-				new IntrinsicParameters(flipY).fsetMatrix(300,320,0,150,130,width,height).fsetRadial(0.1,1e-4);
+				new IntrinsicParameters(flipY).fsetK(300, 320, 0, 150, 130, width, height).fsetRadial(0.1,1e-4);
 
 		// do nothing rectification
 		DenseMatrix64F rect1 = CommonOps.identity(3);
@@ -100,7 +100,7 @@ public class TestRectifyImageOps {
 
 	public void allInsideLeft_calibrated( boolean flipY ) {
 		IntrinsicParameters param =
-				new IntrinsicParameters(flipY).fsetMatrix(300,320,0,150,130,width,height).fsetRadial(0.1,1e-4);
+				new IntrinsicParameters(flipY).fsetK(300, 320, 0, 150, 130, width, height).fsetRadial(0.1,1e-4);
 
 		// do nothing rectification
 		DenseMatrix64F rect1 = CommonOps.identity(3);
@@ -156,7 +156,7 @@ public class TestRectifyImageOps {
 
 	public void transform_PixelToRect_and_RectToPixel_F32( boolean flipY ) {
 		IntrinsicParameters param =
-				new IntrinsicParameters(flipY).fsetMatrix(300,320,0,150,130,width,height).fsetRadial(0.1,1e-4);
+				new IntrinsicParameters(flipY).fsetK(300, 320, 0, 150, 130, width, height).fsetRadial(0.1,1e-4);
 
 		DenseMatrix64F rect = new DenseMatrix64F(3,3,true,1.1,0,0,0,2,0,0.1,0,3);
 
@@ -186,7 +186,7 @@ public class TestRectifyImageOps {
 
 	public void transform_PixelToRect_and_RectToPixel_F64( boolean flipY ) {
 		IntrinsicParameters param =
-				new IntrinsicParameters(flipY).fsetMatrix(300,320,0,150,130,width,height).fsetRadial(0.1,1e-4);
+				new IntrinsicParameters(flipY).fsetK(300, 320, 0, 150, 130, width, height).fsetRadial(0.1,1e-4);
 
 		DenseMatrix64F rect = new DenseMatrix64F(3,3,true,1.1,0,0,0,2,0,0.1,0,3);
 
@@ -204,8 +204,8 @@ public class TestRectifyImageOps {
 
 		inverse.compute(out.x,out.y,out);
 
-		assertEquals(x, out.x, 1e-6);
-		assertEquals(y, out.y, 1e-6);
+		assertEquals(x, out.x, 1e-5);
+		assertEquals(y, out.y, 1e-5);
 	}
 
 	/**
@@ -219,7 +219,7 @@ public class TestRectifyImageOps {
 
 	public void transformPixelToRectNorm_F64(boolean flipY) {
 		IntrinsicParameters param =
-				new IntrinsicParameters(flipY).fsetMatrix(300,320,0,150,130,width,height).fsetRadial(0.1,1e-4);
+				new IntrinsicParameters(flipY).fsetK(300, 320, 0, 150, 130, width, height).fsetRadial(0.1,1e-4);
 
 		DenseMatrix64F rect = new DenseMatrix64F(3,3,true,1.1,0,0,0,2,0,0.1,0,3);
 		DenseMatrix64F rectK = PerspectiveOps.calibrationMatrix(param, null);

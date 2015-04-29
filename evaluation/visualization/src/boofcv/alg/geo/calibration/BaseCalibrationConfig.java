@@ -64,7 +64,7 @@ public class BaseCalibrationConfig {
 			throw new RuntimeException("Not enough tokens in config file");
 
 		String type = reader.nextString();
-		numRadial = Integer.parseInt(reader.nextString());
+		numRadial = (int)reader.nextDouble();
 		includeTangential = Boolean.parseBoolean(reader.nextString());
 		assumeZeroSkew = Boolean.parseBoolean(reader.nextString());
 		flipY = Boolean.parseBoolean(reader.nextString());

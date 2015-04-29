@@ -18,6 +18,8 @@
 
 package boofcv.alg.distort;
 
+import boofcv.alg.distort.radtan.AddRadialNtoN_F64;
+import boofcv.alg.distort.radtan.RemoveRadialPtoN_F64;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.interpolate.TypeInterpolate;
@@ -123,15 +125,11 @@ public class LensDistortionOps {
 	public static PointTransform_F32 fullView( IntrinsicParameters param,
 											   IntrinsicParameters paramAdj ) {
 
-		RemoveRadialPtoP_F32 removeDistort = new RemoveRadialPtoP_F32();
-		AddRadialPtoP_F32 addDistort = new AddRadialPtoP_F32();
-		removeDistort.setK(param.fx, param.fy, param.skew, param.cx, param.cy).
-				setDistortion(param.radial,param.t1,param.t2);
-		addDistort.setK(param.fx, param.fy, param.skew, param.cx, param.cy).
-				setDistortion(param.radial,param.t1,param.t2);
+		PointTransform_F32 remove_p_to_p = createLensDistortion(param).undistort_F32(true,true);
+		PointTransform_F32 add_p_to_p = createLensDistortion(param).distort_F32(true, true);
 
 		RectangleLength2D_F32 bound = DistortImageOps.boundBox_F32(param.width, param.height,
-				new PointToPixelTransform_F32(removeDistort));
+				new PointToPixelTransform_F32(remove_p_to_p));
 
 		double scaleX = bound.width/param.width;
 		double scaleY = bound.height/param.height;
@@ -145,7 +143,7 @@ public class LensDistortionOps {
 		// adjustment matrix
 		DenseMatrix64F A = new DenseMatrix64F(3,3,true,scale,0,deltaX,0,scale,deltaY,0,0,1);
 
-		PointTransform_F32 tranAdj = PerspectiveOps.adjustIntrinsic_F32(addDistort, false, param, A, paramAdj);
+		PointTransform_F32 tranAdj = PerspectiveOps.adjustIntrinsic_F32(add_p_to_p, false, param, A, paramAdj);
 
 		if( param.flipY) {
 			PointTransform_F32 flip = new FlipVertical_F32(param.height);
@@ -170,15 +168,11 @@ public class LensDistortionOps {
 	 */
 	public static PointTransform_F32 allInside( IntrinsicParameters param,
 												IntrinsicParameters paramAdj ) {
-		RemoveRadialPtoP_F32 removeDistort = new RemoveRadialPtoP_F32();
-		AddRadialPtoP_F32 addDistort = new AddRadialPtoP_F32();
-		removeDistort.setK(param.fx, param.fy, param.skew, param.cx, param.cy).
-				setDistortion(param.radial,param.t1,param.t2);
-		addDistort.setK(param.fx, param.fy, param.skew, param.cx, param.cy).
-				setDistortion(param.radial,param.t1,param.t2);
+		PointTransform_F32 remove_p_to_p = createLensDistortion(param).undistort_F32(true,true);
+		PointTransform_F32 add_p_to_p = createLensDistortion(param).distort_F32(true, true);
 
 		RectangleLength2D_F32 bound = LensDistortionOps.boundBoxInside(param.width, param.height,
-				new PointToPixelTransform_F32(removeDistort));
+				new PointToPixelTransform_F32(remove_p_to_p));
 
 		// ensure there are no strips of black
 		LensDistortionOps.roundInside(bound);
@@ -195,7 +189,7 @@ public class LensDistortionOps {
 		// adjustment matrix
 		DenseMatrix64F A = new DenseMatrix64F(3,3,true,scale,0,deltaX,0,scale,deltaY,0,0,1);
 
-		PointTransform_F32 tranAdj = PerspectiveOps.adjustIntrinsic_F32(addDistort, false, param, A, paramAdj);
+		PointTransform_F32 tranAdj = PerspectiveOps.adjustIntrinsic_F32(add_p_to_p, false, param, A, paramAdj);
 
 		if( param.flipY) {
 			PointTransform_F32 flip = new FlipVertical_F32(param.height);
@@ -231,15 +225,13 @@ public class LensDistortionOps {
 	 */
 	public static PointTransform_F64 transformRadialToPixel_F64( IntrinsicParameters param )
 	{
-		RemoveRadialPtoP_F64 removeRadial = new RemoveRadialPtoP_F64();
-		removeRadial.setK(param.fx, param.fy, param.skew, param.cx, param.cy).
-				setDistortion(param.radial,param.t1,param.t2);
+		PointTransform_F64 remove_p_to_p = createLensDistortion(param).undistort_F64(true,true);
 
 		if( param.flipY) {
 			PointTransform_F64 flip = new FlipVertical_F64(param.height);
-			return new SequencePointTransform_F64(flip,removeRadial,flip);
+			return new SequencePointTransform_F64(flip,remove_p_to_p,flip);
 		} else {
-			return removeRadial;
+			return remove_p_to_p;
 		}
 	}
 
@@ -252,10 +244,10 @@ public class LensDistortionOps {
 	public static PointTransform_F64 transformNormToRadial_F64(IntrinsicParameters param)
 	{
 		AddRadialNtoN_F64 addRadial = new AddRadialNtoN_F64();
-		addRadial.set(param.radial,param.t1,param.t2);
+		addRadial.setDistortion(param.radial, param.t1, param.t2);
 
 		NormalizedToPixel_F64 toPixel = new NormalizedToPixel_F64();
-		toPixel.set(param.fx,param.fy,param.skew,param.cx,param.cy);
+		toPixel.set(param.fx, param.fy, param.skew, param.cx, param.cy);
 
 		if( param.flipY ) {
 			return new SequencePointTransform_F64(addRadial,toPixel,new FlipVertical_F64(param.height));
@@ -278,16 +270,21 @@ public class LensDistortionOps {
 	 */
 	public static PointTransform_F32 transformPixelToRadial_F32(IntrinsicParameters param)
 	{
-		AddRadialPtoP_F32 radialDistort = new AddRadialPtoP_F32();
-		radialDistort.setK(param.fx, param.fy, param.skew, param.cx, param.cy).
-				setDistortion(param.radial,param.t1,param.t2);
+		PointTransform_F32 add_p_to_p = createLensDistortion(param).distort_F32(true,true);
 
 		if( param.flipY) {
 			PointTransform_F32 flip = new FlipVertical_F32(param.height);
-			return new SequencePointTransform_F32(flip,radialDistort,flip);
+			return new SequencePointTransform_F32(flip,add_p_to_p,flip);
 		} else {
-			return radialDistort;
+			return add_p_to_p;
 		}
+	}
+
+	/**
+	 * Creates the lens distortion {@link PointTransform_F64} for the specified camera parameters
+	 */
+	public static LensDistortionPinhole createLensDistortion( IntrinsicParameters param ) {
+		return new LensDistortionRadialTangential(param);
 	}
 
 	/**

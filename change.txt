@@ -31,6 +31,7 @@ Version : Alpha 0.19
   solutions to PnP, essential, homography
 - Camera Model
   * Intrinsic paramters can now use a flow style assignment of parameters
+  * Lens distortion.  More abstracted
 
 TODO
   * Square Detector.  Create set of images in validation boof with hand selected corners

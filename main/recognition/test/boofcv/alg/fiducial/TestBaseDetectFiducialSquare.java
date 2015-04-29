@@ -28,6 +28,7 @@ import boofcv.factory.filter.binary.FactoryThresholdBinary;
 import boofcv.factory.geo.FactoryMultiView;
 import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.distort.PixelTransform_F32;
+import boofcv.struct.distort.PointTransform_F32;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageUInt8;
@@ -67,12 +68,10 @@ public class TestBaseDetectFiducialSquare {
 		ImageMiscOps.fill(image, 255);
 		render(pattern, where, image);
 
-		RemoveRadialPtoP_F32 distort = new RemoveRadialPtoP_F32();
-		distort.setK(intrinsic.fx,intrinsic.fy,intrinsic.skew,intrinsic.cx,intrinsic.cy).
-				setDistortion(intrinsic.radial,intrinsic.t1,intrinsic.t2);
+		PointTransform_F32 remove_p_to_p = LensDistortionOps.createLensDistortion(intrinsic).undistort_F32(true, true);
 
 		ImageDistort<ImageUInt8,ImageUInt8> distorter
-				= DistortImageOps.createImageDistort(distort,TypeInterpolate.BILINEAR,ImageUInt8.class,ImageUInt8.class);
+				= DistortImageOps.createImageDistort(remove_p_to_p,TypeInterpolate.BILINEAR,ImageUInt8.class,ImageUInt8.class);
 
 		distorter.apply(image,distorted);
 

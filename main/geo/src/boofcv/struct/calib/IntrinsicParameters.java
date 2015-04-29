@@ -97,13 +97,13 @@ public class IntrinsicParameters implements Serializable {
 								double skew,
 								double cx, double cy,
 								int width, int height ) {
-		fsetMatrix(fx, fy, skew, cx, cy, width, height);
+		fsetK(fx, fy, skew, cx, cy, width, height);
 	}
 
-	public IntrinsicParameters fsetMatrix(double fx, double fy,
-										 double skew,
-										 double cx, double cy,
-										 int width, int height) {
+	public IntrinsicParameters fsetK(double fx, double fy,
+									 double skew,
+									 double cx, double cy,
+									 int width, int height) {
 		this.fx = fx;
 		this.fy = fy;
 		this.skew = skew;

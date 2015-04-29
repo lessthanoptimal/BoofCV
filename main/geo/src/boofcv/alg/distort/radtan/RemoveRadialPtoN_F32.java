@@ -16,11 +16,11 @@
  * limitations under the License.
  */
 
-package boofcv.alg.distort;
+package boofcv.alg.distort.radtan;
 
-import boofcv.struct.distort.PointTransform_F64;
-import georegression.geometry.GeometryMath_F64;
-import georegression.struct.point.Point2D_F64;
+import boofcv.struct.distort.PointTransform_F32;
+import georegression.geometry.GeometryMath_F32;
+import georegression.struct.point.Point2D_F32;
 import org.ejml.data.DenseMatrix64F;
 import org.ejml.ops.CommonOps;
 
@@ -29,34 +29,34 @@ import org.ejml.ops.CommonOps;
  *
  * @author Peter Abeles
  */
-public class RemoveRadialPtoN_F64 implements PointTransform_F64 {
+public class RemoveRadialPtoN_F32 implements PointTransform_F32 {
 
 	// principle point / image center
-	protected double cx, cy;
+	protected float cx, cy;
 	// other intrinsic parameters
-	protected double fx,fy,skew;
+	protected float fx,fy,skew;
 
 	// distortion parameters
-	protected RadialTangential_F64 params;
+	protected RadialTangential_F32 params;
 
 	// radial distortion magnitude
-	protected double sum;
+	protected float sum;
 	// found tangential distortion
-	protected double tx,ty;
+	protected float tx,ty;
 
 	// inverse of camera calibration matrix
 	protected DenseMatrix64F K_inv = new DenseMatrix64F(3,3);
 
-	private double tol=1e-10;
+	private float tol=1e-5f;
 
-	public RemoveRadialPtoN_F64() {
+	public RemoveRadialPtoN_F32() {
 	}
 
-	public RemoveRadialPtoN_F64( double tol ) {
+	public RemoveRadialPtoN_F32( float tol ) {
 		this.tol = tol;
 	}
 
-	public void setTolerance(double tol) {
+	public void setTolerance(float tol) {
 		this.tol = tol;
 	}
 
@@ -69,13 +69,13 @@ public class RemoveRadialPtoN_F64 implements PointTransform_F64 {
 	 * @param cx camera center x-axis in pixels
 	 * @param cy center center y-axis in pixels
 	 */
-	public RemoveRadialPtoN_F64 setK(double fx, double fy, double skew, double cx, double cy ) {
+	public RemoveRadialPtoN_F32 setK(double fx, double fy, double skew, double cx, double cy ) {
 
-		this.fx = fx;
-		this.fy = fy;
-		this.skew = skew;
-		this.cx = cx;
-		this.cy = cy;
+		this.fx = (float)fx;
+		this.fy = (float)fy;
+		this.skew = (float)skew;
+		this.cx = (float)cx;
+		this.cy = (float)cy;
 
 		K_inv.set(0,0,fx);
 		K_inv.set(1,1,fy);
@@ -89,8 +89,8 @@ public class RemoveRadialPtoN_F64 implements PointTransform_F64 {
 		return this;
 	}
 
-	public RemoveRadialPtoN_F64 setDistortion( double[] radial, double t1, double t2 ) {
-		params = new RadialTangential_F64(radial,t1,t2);
+	public RemoveRadialPtoN_F32 setDistortion( double[] radial, double t1, double t2 ) {
+		params = new RadialTangential_F32().set(radial,t1,t2);
 		return this;
 	}
 
@@ -102,26 +102,26 @@ public class RemoveRadialPtoN_F64 implements PointTransform_F64 {
 	 * @param out Undistorted normalized coordinate.
 	 */
 	@Override
-	public void compute(double x, double y, Point2D_F64 out) {
+	public void compute(float x, float y, Point2D_F32 out) {
 		out.x = x;
 		out.y = y;
 
-		double radial[] = params.radial;
-		double t1 = params.t1,t2 = params.t2;
+		float radial[] = params.radial;
+		float t1 = params.t1,t2 = params.t2;
 
 		// initial estimate of undistorted point
-		GeometryMath_F64.mult(K_inv, out, out);
+		GeometryMath_F32.mult(K_inv, out, out);
 
-		double origX = x = out.x;
-		double origY = y = out.y;
+		float origX = x = out.x;
+		float origY = y = out.y;
 
-		double prevSum = 0;
+		float prevSum = 0;
 
 		for( int iter = 0; iter < 20; iter++ ) {
 
 			// estimate the radial distance
-			double r2 = x*x + y*y;
-			double ri2 = r2;
+			float r2 = x*x + y*y;
+			float ri2 = r2;
 
 			sum = 0;
 			for( int i = 0; i < radial.length; i++ ) {

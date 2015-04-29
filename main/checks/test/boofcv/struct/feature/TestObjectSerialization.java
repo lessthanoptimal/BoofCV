@@ -196,7 +196,7 @@ public class TestObjectSerialization {
 	@Test
 	public void testIntrinsicParamters() {
 		IntrinsicParameters original = new IntrinsicParameters(true).
-				fsetMatrix(1,2,3,4,5,6,7).fsetRadial(8,9).fsetTangental(10, 11);
+				fsetK(1, 2, 3, 4, 5, 6, 7).fsetRadial(8,9).fsetTangental(10, 11);
 
 		UtilIO.saveXML(original, "temp.txt");
 

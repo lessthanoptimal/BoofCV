@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.distort;
+package boofcv.alg.distort.radtan;
 
 import georegression.struct.point.Point2D_F32;
 import org.junit.Test;
@@ -45,7 +45,7 @@ public class TestAddRadialNtoN_F32 {
 		double distX = orig.x*(1+mag) + 2*t1*x*y + t2*(r2 + 2*x*x);
 		double distY = orig.y*(1+mag) + t1*(r2 + 2*y*y) + 2*t2*x*y;
 
-		AddRadialNtoN_F32 alg = new AddRadialNtoN_F32().set(radial,t1,t2);
+		AddRadialNtoN_F32 alg = new AddRadialNtoN_F32().setDistortion(radial, t1, t2);
 
 		Point2D_F32 found = new Point2D_F32();
 

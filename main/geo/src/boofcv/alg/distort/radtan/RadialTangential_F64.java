@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.distort;
+package boofcv.alg.distort.radtan;
 
 /**
  * Distortion parameters for radial and tangential model

@@ -25,6 +25,7 @@ import boofcv.gui.image.ShowImages;
 import boofcv.io.PathLabel;
 import boofcv.io.ProgressMonitorThread;
 import boofcv.io.image.ConvertBufferedImage;
+import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.distort.PixelTransform_F32;
 import boofcv.struct.distort.PointTransform_F32;
 import boofcv.struct.image.ImageSingleBand;
@@ -159,10 +160,10 @@ public class ShowLensDistortion<T extends ImageSingleBand>
 		ProgressMonitorThread thread = new MyMonitorThread(this);
 		thread.start();
 
-		PointTransform_F32 ptran =
-				new AddRadialPtoP_F32().setK(input.width*0.8,input.width*0.8,0,
-						input.width/2,input.height/2).setDistortion(new double[]{radial1,radial2},0,0);
-		PixelTransform_F32 tran=new PointToPixelTransform_F32(ptran);
+		IntrinsicParameters param = new IntrinsicParameters().fsetK(input.width * 0.8, input.width * 0.8, 0,
+				input.width / 2, input.height / 2, input.width, input.height).fsetRadial(radial1, radial2).fsetTangental(0, 0);
+		PointTransform_F32 add_p_to_p = LensDistortionOps.createLensDistortion(param).distort_F32(true, true);
+		PixelTransform_F32 tran=new PointToPixelTransform_F32(add_p_to_p);
 
 		for( int i = 0; i < input.getNumBands(); i++ , progress++ ) {
 			T bandIn = input.getBand(i);
