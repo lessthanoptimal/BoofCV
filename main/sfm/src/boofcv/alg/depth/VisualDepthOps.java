@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -44,7 +44,7 @@ public class VisualDepthOps {
 		cloud.reset();
 
 		RemoveRadialPtoN_F64 p2n = new RemoveRadialPtoN_F64();
-		p2n.set(param.fx,param.fy,param.skew,param.cx,param.cy,param.radial);
+		p2n.setK(param.fx,param.fy,param.skew,param.cx,param.cy).setDistortion(param.radial,param.t1,param.t2);
 
 		Point2D_F64 n = new Point2D_F64();
 
@@ -83,7 +83,7 @@ public class VisualDepthOps {
 		cloudColor.reset();
 
 		RemoveRadialPtoN_F64 p2n = new RemoveRadialPtoN_F64();
-		p2n.set(param.fx,param.fy,param.skew,param.cx,param.cy,param.radial);
+		p2n.setK(param.fx,param.fy,param.skew,param.cx,param.cy).setDistortion(param.radial,param.t1,param.t2);
 
 		Point2D_F64 n = new Point2D_F64();
 

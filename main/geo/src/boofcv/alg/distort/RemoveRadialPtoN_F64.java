@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,12 +32,17 @@ import org.ejml.ops.CommonOps;
 public class RemoveRadialPtoN_F64 implements PointTransform_F64 {
 
 	// principle point / image center
-	protected double x_c,y_c;
-	// radial distortion
-	protected double radial[];
+	protected double cx, cy;
+	// other intrinsic parameters
+	protected double fx,fy,skew;
+
+	// distortion parameters
+	protected RadialTangential_F64 params;
 
 	// radial distortion magnitude
 	protected double sum;
+	// found tangential distortion
+	protected double tx,ty;
 
 	// inverse of camera calibration matrix
 	protected DenseMatrix64F K_inv = new DenseMatrix64F(3,3);
@@ -61,30 +66,32 @@ public class RemoveRadialPtoN_F64 implements PointTransform_F64 {
 	 * @param fx Focal length x-axis in pixels
 	 * @param fy Focal length y-axis in pixels
 	 * @param skew skew in pixels
-	 * @param x_c camera center x-axis in pixels
-	 * @param y_c center center y-axis in pixels
-	 * @param radial Radial distortion parameters
+	 * @param cx camera center x-axis in pixels
+	 * @param cy center center y-axis in pixels
 	 */
-	public void set(double fx, double fy, double skew, double x_c, double y_c, double... radial) {
+	public RemoveRadialPtoN_F64 setK(double fx, double fy, double skew, double cx, double cy ) {
+
+		this.fx = fx;
+		this.fy = fy;
+		this.skew = skew;
+		this.cx = cx;
+		this.cy = cy;
 
 		K_inv.set(0,0,fx);
 		K_inv.set(1,1,fy);
 		K_inv.set(0,1,skew);
-		K_inv.set(0,2,x_c);
-		K_inv.set(1,2,y_c);
+		K_inv.set(0,2,cx);
+		K_inv.set(1,2,cy);
 		K_inv.set(2,2,1);
 
 		CommonOps.invert(K_inv);
 
-		this.x_c = x_c;
-		this.y_c = y_c;
+		return this;
+	}
 
-		if( radial == null )
-			this.radial = new double[0];
-		else {
-			this.radial = new double[radial.length];
-			System.arraycopy(radial, 0, this.radial, 0, radial.length);
-		}
+	public RemoveRadialPtoN_F64 setDistortion( double[] radial, double t1, double t2 ) {
+		params = new RadialTangential_F64(radial,t1,t2);
+		return this;
 	}
 
 	/**
@@ -99,28 +106,34 @@ public class RemoveRadialPtoN_F64 implements PointTransform_F64 {
 		out.x = x;
 		out.y = y;
 
+		double radial[] = params.radial;
+		double t1 = params.t1,t2 = params.t2;
+
 		// initial estimate of undistorted point
 		GeometryMath_F64.mult(K_inv, out, out);
 
-		double origX = out.x;
-		double origY = out.y;
+		double origX = x = out.x;
+		double origY = y = out.y;
 
 		double prevSum = 0;
 
 		for( int iter = 0; iter < 20; iter++ ) {
 
 			// estimate the radial distance
-			double r2 = out.x*out.x + out.y*out.y;
-			double r = r2;
+			double r2 = x*x + y*y;
+			double ri2 = r2;
 
 			sum = 0;
 			for( int i = 0; i < radial.length; i++ ) {
-				sum += radial[i]*r;
-				r *= r2;
+				sum += radial[i]*ri2;
+				ri2 *= r2;
 			}
 
-			out.x = origX/(1+sum);
-			out.y = origY/(1+sum);
+			tx = 2*t1*x*y + t2*(r2 + 2*x*x);
+			ty = t1*(r2 + 2*y*y) + 2*t2*x*y;
+
+			x = (origX - tx)/(1+sum);
+			y = (origY - ty)/(1+sum);
 
 			if( Math.abs(prevSum-sum) <= tol ) {
 				break;
@@ -128,5 +141,6 @@ public class RemoveRadialPtoN_F64 implements PointTransform_F64 {
 				prevSum = sum;
 			}
 		}
+		out.set(x,y);
 	}
 }

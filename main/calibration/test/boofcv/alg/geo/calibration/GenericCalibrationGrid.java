@@ -194,6 +194,46 @@ public class GenericCalibrationGrid {
 		return ret;
 	}
 
+	public static Zhang99ParamAll createEasierParam(boolean zeroSkew, int numRadial,
+													  boolean includeTangential,
+													  int numView, Random rand) {
+		Zhang99ParamAll ret = new Zhang99ParamAll(zeroSkew,numRadial,includeTangential,numView);
+
+		DenseMatrix64F K = createStandardCalibration();
+		ret.a = K.get(0,0);
+		ret.b = K.get(1,1);
+		ret.c = K.get(0,1);
+		ret.x0 = K.get(0,2);
+		ret.y0 = K.get(1,2);
+		if( zeroSkew ) ret.c = 0;
+
+		ret.radial = new double[numRadial];
+		for( int i = 0; i < numRadial;i++ ) {
+			ret.radial[i] = rand.nextGaussian()*0.01;
+		}
+
+		if( includeTangential ) {
+			ret.t1 = rand.nextGaussian()*0.01;
+			ret.t2 = rand.nextGaussian()*0.01;
+		}
+
+		for(Zhang99ParamAll.View v : ret.views ) {
+			double rotX = (rand.nextDouble()-0.5)*0.1;
+			double rotY = (rand.nextDouble()-0.5)*0.1;
+			double rotZ = (rand.nextDouble()-0.5)*0.1;
+			DenseMatrix64F R = RotationMatrixGenerator.eulerXYZ(rotX,rotY,rotZ,null);
+			RotationMatrixGenerator.matrixToRodrigues(R,v.rotation);
+
+			double x = rand.nextGaussian()*5;
+			double y = rand.nextGaussian()*5;
+			double z = rand.nextGaussian()*5-600;
+
+			v.T.set(x,y,z);
+		}
+		return ret;
+	}
+
+
 	/**
 	 * Creates a set of observed points in pixel coordinates given zhang parameters and a calibration
 	 * grid.

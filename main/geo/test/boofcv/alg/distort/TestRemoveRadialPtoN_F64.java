@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,6 +33,11 @@ public class TestRemoveRadialPtoN_F64 {
 
 	@Test
 	public void checkAgainstAdd() {
+		checkAgainstAdd(0,0);
+		checkAgainstAdd(0.1,-0.05);
+	}
+
+	public void checkAgainstAdd( double t1 , double t2 ) {
 		double fx = 600;
 		double fy = 500;
 		double skew = 2;
@@ -46,22 +51,21 @@ public class TestRemoveRadialPtoN_F64 {
 		double undistX = 19.5;
 		double undistY = 200.1;
 
-		new AddRadialPtoP_F64(fx,fy,skew,xc,yc,radial).compute(undistX,undistY,point);
+		new AddRadialPtoP_F64().setK(fx,fy,skew,xc,yc).setDistortion(radial,t1,t2).compute(undistX, undistY,point);
 
 		double distX = point.x;
 		double distY = point.y;
 
-		RemoveRadialPtoN_F64 alg = new RemoveRadialPtoN_F64();
-		alg.set(fx,fy,skew,xc,yc,radial);
+		RemoveRadialPtoN_F64 alg = new RemoveRadialPtoN_F64().setK(fx,fy,skew,xc,yc).setDistortion(radial,t1,t2);
 
 		alg.compute(distX, distY, point);
-		
+
 		/// go from calibrated coordinates to pixel
 		DenseMatrix64F K = PerspectiveOps.calibrationMatrix(fx, fy, skew, xc, yc);
 
 		GeometryMath_F64.mult(K,point,point);
 
-		assertEquals(undistX, point.x, 1e-4);
+		assertEquals(undistX,point.x,1e-4);
 		assertEquals(undistY,point.y,1e-4);
 	}
 }

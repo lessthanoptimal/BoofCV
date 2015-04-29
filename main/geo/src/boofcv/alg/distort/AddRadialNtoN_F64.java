@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,8 +28,11 @@ import georegression.struct.point.Point2D_F64;
  */
 public class AddRadialNtoN_F64 implements PointTransform_F64 {
 
-	// radial distortion
-	private double radial[];
+	private RadialTangential_F64 params;
+
+	public AddRadialNtoN_F64(RadialTangential_F64 params ) {
+		this.params = params;
+	}
 
 	public AddRadialNtoN_F64() {
 	}
@@ -39,12 +42,9 @@ public class AddRadialNtoN_F64 implements PointTransform_F64 {
 	 *
 	 * @param radial Radial distortion parameters
 	 */
-	public void set(double[] radial) {
-
-		this.radial = new double[radial.length];
-		for( int i = 0; i < radial.length; i++ ) {
-			this.radial[i] = radial[i];
-		}
+	public AddRadialNtoN_F64 set(double[] radial , double t1 , double t2) {
+		params = new RadialTangential_F64(radial,t1,t2);
+		return this;
 	}
 
 	/**
@@ -58,16 +58,22 @@ public class AddRadialNtoN_F64 implements PointTransform_F64 {
 	public void compute(double x, double y, Point2D_F64 out) {
 		float sum = 0;
 
-		double r2 = x*x + y*y;
+		double[] radial = params.radial;
+		double t1 = params.t1;
+		double t2 = params.t2;
 
-		double r = r2;
+		double r2 = x*x + y*y;
+		double ri2 = r2;
 
 		for( int i = 0; i < radial.length; i++ ) {
-			sum += radial[i]*r;
-			r *= r2;
+			sum += radial[i]*ri2;
+			ri2 *= r2;
 		}
 
 		out.x = x*( 1 + sum);
 		out.y = y*( 1 + sum);
+
+		out.x += 2*t1*x*y + t2*(r2 + 2*x*x);
+		out.y += t1*(r2 + 2*y*y) + 2*t2*x*y;
 	}
 }

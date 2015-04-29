@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -209,7 +209,8 @@ public class LensDistortionOps {
 	public static PointTransform_F64 transformRadialToNorm_F64(IntrinsicParameters param)
 	{
 		RemoveRadialPtoN_F64 radialDistort = new RemoveRadialPtoN_F64();
-		radialDistort.set(param.fx, param.fy, param.skew, param.cx, param.cy, param.radial);
+		radialDistort.setK(param.fx, param.fy, param.skew, param.cx, param.cy).
+				setDistortion(param.radial, param.t1, param.t2);
 
 		if( param.flipY) {
 			return new FlipVerticalNorm_F64(radialDistort,param.height);
@@ -227,7 +228,8 @@ public class LensDistortionOps {
 	public static PointTransform_F64 transformRadialToPixel_F64( IntrinsicParameters param )
 	{
 		RemoveRadialPtoP_F64 removeRadial = new RemoveRadialPtoP_F64();
-		removeRadial.set(param.fx, param.fy, param.skew, param.cx, param.cy, param.radial);
+		removeRadial.setK(param.fx, param.fy, param.skew, param.cx, param.cy).
+				setDistortion(param.radial,param.t1,param.t2);
 
 		if( param.flipY) {
 			PointTransform_F64 flip = new FlipVertical_F64(param.height);
@@ -246,7 +248,7 @@ public class LensDistortionOps {
 	public static PointTransform_F64 transformNormToRadial_F64(IntrinsicParameters param)
 	{
 		AddRadialNtoN_F64 addRadial = new AddRadialNtoN_F64();
-		addRadial.set(param.radial);
+		addRadial.set(param.radial,param.t1,param.t2);
 
 		NormalizedToPixel_F64 toPixel = new NormalizedToPixel_F64();
 		toPixel.set(param.fx,param.fy,param.skew,param.cx,param.cy);

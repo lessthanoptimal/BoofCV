@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,17 +33,16 @@ public class AddRadialPtoP_F64 implements PointTransform_F64 {
 
 	// principle point / image center
 	private double cx, cy;
-	// radial distortion
-	private double radial[];
+	// other intrinsic parameters
+	private double fx,fy,skew;
+
+	// distortion parameters
+	protected RadialTangential_F64 params;
 
 	private DenseMatrix64F K_inv = new DenseMatrix64F(3,3);
 	private Point2D_F64 temp0 = new Point2D_F64();
 
 	public AddRadialPtoP_F64() {
-	}
-
-	public AddRadialPtoP_F64(double fx, double fy, double skew, double cx, double cy, double... radial) {
-		set(fx,fy,skew, cx, cy, radial);
 	}
 
 	/**
@@ -54,11 +53,17 @@ public class AddRadialPtoP_F64 implements PointTransform_F64 {
 	 * @param skew skew in pixels
 	 * @param cx camera center x-axis in pixels
 	 * @param cy center center y-axis in pixels
-	 * @param radial Radial distortion parameters
 	 */
-	public void set(double fx, double fy, double skew, double cx, double cy, double[] radial) {
+	public AddRadialPtoP_F64 setK(double fx, double fy, double skew, double cx, double cy) {
 
-		K_inv.set(0, 0, fx);
+		this.fx = fx;
+		this.fy = fy;
+		this.skew = skew;
+		this.cx = cx;
+		this.cy = cy;
+
+		K_inv.zero();
+		K_inv.set(0,0,fx);
 		K_inv.set(1,1,fy);
 		K_inv.set(0,1,skew);
 		K_inv.set(0,2,cx);
@@ -67,17 +72,17 @@ public class AddRadialPtoP_F64 implements PointTransform_F64 {
 
 		CommonOps.invert(K_inv);
 
-		this.cx = cx;
-		this.cy = cy;
+		return this;
+	}
 
-		if( radial == null )
-			this.radial = new double[0];
-		else {
-			this.radial = new double[radial.length];
-			for (int i = 0; i < radial.length; i++) {
-				this.radial[i] = radial[i];
-			}
-		}
+	/**
+	 * Specify intrinsic camera parameters
+	 *
+	 * @param radial Radial distortion parameters
+	 */
+	public AddRadialPtoP_F64 setDistortion(double[] radial, double t1, double t2) {
+		params = new RadialTangential_F64(radial,t1,t2);
+		return this;
 	}
 
 	/**
@@ -91,21 +96,26 @@ public class AddRadialPtoP_F64 implements PointTransform_F64 {
 	public void compute(double x, double y, Point2D_F64 out) {
 		float sum = 0;
 
+		double radial[] = params.radial;
+		double t1 = params.t1,t2 = params.t2;
+
 		temp0.x = x;
 		temp0.y = y;
 
 		GeometryMath_F64.mult(K_inv, temp0, out);
 
 		double r2 = out.x*out.x + out.y*out.y;
-
-		double r = r2;
+		double ri2 = r2;
 
 		for( int i = 0; i < radial.length; i++ ) {
-			sum += radial[i]*r;
-			r *= r2;
+			sum += radial[i]*ri2;
+			ri2 *= r2;
 		}
 
-		out.x = x + (x- cx)*sum;
-		out.y = y + (y- cy)*sum;
+		double tx = 2*t1*out.x*out.y + t2*(r2 + 2*out.x*out.x);
+		double ty = t1*(r2 + 2*out.y*out.y) + 2*t2*out.x*out.y;
+
+		out.x = x + (x - cx)*sum + fx*tx + skew*ty;
+		out.y = y + (y - cy)*sum + fy*ty;
 	}
 }

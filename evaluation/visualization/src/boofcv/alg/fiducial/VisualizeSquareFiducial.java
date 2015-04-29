@@ -65,13 +65,14 @@ public class VisualizeSquareFiducial {
 		}
 
 		BufferedImage output = new BufferedImage(input.width,input.height,BufferedImage.TYPE_INT_RGB);
-		VisualizeBinaryData.renderBinary(detector.getBinary(),false, output);
+		VisualizeBinaryData.renderBinary(detector.getBinary(), false, output);
 		Graphics2D g2 = output.createGraphics();
 		g2.setColor(Color.RED);
 		g2.setStroke(new BasicStroke(2));
 
-		AddRadialPtoP_F64 addRadialDistortion = new AddRadialPtoP_F64();
-		addRadialDistortion.set(intrinsic.fx, intrinsic.fy, intrinsic.skew, intrinsic.cx, intrinsic.cy, intrinsic.radial);
+		AddRadialPtoP_F64 addRadialDistortion = new AddRadialPtoP_F64().
+				setK(intrinsic.fx, intrinsic.fy, intrinsic.skew, intrinsic.cx, intrinsic.cy).
+				setDistortion(intrinsic.radial,intrinsic.t1,intrinsic.t2);
 		Se3_F64 targetToWorld = new Se3_F64();
 
 		for (int i = 0; i < N; i++) {

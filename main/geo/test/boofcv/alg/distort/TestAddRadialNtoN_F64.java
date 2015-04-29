@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,18 +33,19 @@ public class TestAddRadialNtoN_F64 {
 	@Test
 	public void againstManual() {
 		double radial[]= new double[]{0.01,-0.03};
+		double t1 = 0.1,t2=-.05;
 
 		Point2D_F64 orig = new Point2D_F64(0.1,-0.2);
 
 		// manually compute the distortion
-		double r2 = orig.x*orig.x + orig.y*orig.y;
+		double x = orig.x, y = orig.y;
+		double r2 = x*x + y*y;
 		double mag = radial[0]*r2 + radial[1]*r2*r2;
 
-		double distX = orig.x*(1+mag);
-		double distY = orig.y*(1+mag);
+		double distX = orig.x*(1+mag) + 2*t1*x*y + t2*(r2 + 2*x*x);
+		double distY = orig.y*(1+mag) + t1*(r2 + 2*y*y) + 2*t2*x*y;
 
-		AddRadialNtoN_F64 alg = new AddRadialNtoN_F64();
-		alg.set(radial);
+		AddRadialNtoN_F64 alg = new AddRadialNtoN_F64().set(radial,t1,t2);
 
 		Point2D_F64 found = new Point2D_F64();
 

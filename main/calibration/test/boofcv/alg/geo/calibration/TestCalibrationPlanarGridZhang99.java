@@ -25,7 +25,8 @@ import org.junit.Test;
 import java.util.List;
 import java.util.Random;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Peter Abeles
@@ -63,7 +64,8 @@ public class TestCalibrationPlanarGridZhang99 {
 	public void initialParam() {
 		PlanarCalibrationTarget config = GenericCalibrationGrid.createStandardConfig();
 		List<Point2D_F64> grid = config.points;
-		Zhang99ParamAll initial = GenericCalibrationGrid.createStandardParam(true,2,false,3,rand);
+		Zhang99ParamAll initial = GenericCalibrationGrid.createEasierParam(true, 2, false, 3, rand);
+		// tangential can't be linearly estimated
 
 		List<List<Point2D_F64>> observations = GenericCalibrationGrid.createObservations(initial,grid);
 
@@ -126,7 +128,20 @@ public class TestCalibrationPlanarGridZhang99 {
 
 	@Test
 	public void applyDistortion() {
-		fail("Implement");
+		Point2D_F64 n = new Point2D_F64(0.05,-0.1);
+		double radial[] = new double[]{0.1};
+		double t1 = 0.034,t2 = 0.34;
+
+		Point2D_F64 distorted = new Point2D_F64();
+
+		double r2 = n.x*n.x + n.y*n.y;
+		distorted.x = n.x + radial[0]*r2*n.x + 2*t1*n.x*n.y + t2*(r2 + 2*n.x*n.x);
+		distorted.y = n.y + radial[0]*r2*n.y + t1*(r2 + 2*n.y*n.y) + 2*t2*n.x*n.y;
+
+		CalibrationPlanarGridZhang99.applyDistortion(n,radial,t1,t2);
+
+		assertEquals(distorted.x, n.x, 1e-8);
+		assertEquals(distorted.y, n.y, 1e-8);
 	}
 
 	private void checkIntrinsicOnly(Zhang99ParamAll initial,

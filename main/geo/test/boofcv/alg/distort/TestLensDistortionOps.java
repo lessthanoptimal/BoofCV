@@ -130,7 +130,8 @@ public class TestLensDistortionOps {
 		Point2D_F64 pixel = new Point2D_F64(20,120);
 
 		// Distorted pixel
-		AddRadialPtoP_F64 addRadial = new AddRadialPtoP_F64(param.fx,param.fy,param.skew,param.cx,param.cy,param.radial);
+		AddRadialPtoP_F64 addRadial = new AddRadialPtoP_F64().
+				setK(param.fx,param.fy,param.skew,param.cx,param.cy).setDistortion(param.radial,param.t1,param.t2);
 		Point2D_F64 pixelD = new Point2D_F64();
 		addRadial.compute(pixel.x,pixel.y,pixelD);
 		if( flipY )
@@ -166,7 +167,8 @@ public class TestLensDistortionOps {
 		Point2D_F64 pixel = new Point2D_F64(20,120);
 
 		// Distorted pixel
-		AddRadialPtoP_F64 addRadial = new AddRadialPtoP_F64(param.fx,param.fy,param.skew,param.cx,param.cy,param.radial);
+		AddRadialPtoP_F64 addRadial = new AddRadialPtoP_F64().
+				setK(param.fx,param.fy,param.skew,param.cx,param.cy).setDistortion(param.radial,param.t1,param.t2);
 		Point2D_F64 pixelD = new Point2D_F64();
 
 		if( flipY ) {
@@ -199,7 +201,8 @@ public class TestLensDistortionOps {
 		Point2D_F64 pixel = new Point2D_F64(20,120);
 
 		// Distorted pixel
-		AddRadialPtoP_F64 addRadial = new AddRadialPtoP_F64(param.fx,param.fy,param.skew,param.cx,param.cy,param.radial);
+		AddRadialPtoP_F64 addRadial = new AddRadialPtoP_F64().
+				setK(param.fx,param.fy,param.skew,param.cx,param.cy).setDistortion(param.radial,param.t1,param.t2);
 		Point2D_F64 pixelD = new Point2D_F64();
 		addRadial.compute(pixel.x,pixel.y,pixelD);
 		if( flipY )
@@ -235,7 +238,8 @@ public class TestLensDistortionOps {
 		Point2D_F64 pixel = new Point2D_F64(20,120);
 
 		// Distorted pixel
-		AddRadialPtoP_F64 addRadial = new AddRadialPtoP_F64(param.fx,param.fy,param.skew,param.cx,param.cy,param.radial);
+		AddRadialPtoP_F64 addRadial = new AddRadialPtoP_F64().
+				setK(param.fx,param.fy,param.skew,param.cx,param.cy).setDistortion(param.radial,param.t1,param.t2);
 		Point2D_F64 pixelD = new Point2D_F64();
 		addRadial.compute(pixel.x,pixel.y,pixelD);
 		if( flipY )

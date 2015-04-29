@@ -200,7 +200,8 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 		// provide intrinsic camera parameters
 		addRadialDistortion.set(intrinsic.fx, intrinsic.fy, intrinsic.skew, intrinsic.cx, intrinsic.cy, intrinsic.radial);
 		RemoveRadialPtoP_F64 removeLensDistort = new RemoveRadialPtoP_F64();
-		removeLensDistort.set(intrinsic.fx, intrinsic.fy, intrinsic.skew, intrinsic.cx, intrinsic.cy, intrinsic.radial);
+		removeLensDistort.setK(intrinsic.fx, intrinsic.fy, intrinsic.skew, intrinsic.cx, intrinsic.cy).
+				setDistortion(intrinsic.radial,intrinsic.t1,intrinsic.t2);
 
 		// Create the distorted image to undistorted pixel lookup table
 		int N = intrinsic.width*intrinsic.height;

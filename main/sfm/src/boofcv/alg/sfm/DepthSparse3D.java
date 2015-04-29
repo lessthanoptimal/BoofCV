@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -76,8 +76,8 @@ public abstract class DepthSparse3D<T extends ImageSingleBand> {
 	 */
 	public void configure(IntrinsicParameters paramVisual , PixelTransform_F32 visualToDepth ) {
 		this.visualToDepth = visualToDepth;
-		p2n.set(paramVisual.fx,paramVisual.fy,paramVisual.skew,paramVisual.cx,paramVisual.cy,
-				paramVisual.radial);
+		p2n.setK(paramVisual.fx,paramVisual.fy,paramVisual.skew,paramVisual.cx,paramVisual.cy).
+				setDistortion(paramVisual.radial, paramVisual.t1,paramVisual.t2);
 	}
 
 

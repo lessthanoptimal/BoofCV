@@ -98,7 +98,7 @@ public class TestVisualDepthOps {
 		Point2D_F64 n = new Point2D_F64();
 
 		RemoveRadialPtoN_F64 p2n = new RemoveRadialPtoN_F64();
-		p2n.set(param.fx,param.fy,param.skew,param.cx,param.cy,param.radial);
+		p2n.setK(param.fx,param.fy,param.skew,param.cx,param.cy).setDistortion(param.radial,param.t1,param.t2);
 
 		p2n.compute(x,y,n);
 

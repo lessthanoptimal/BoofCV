@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -324,8 +324,8 @@ public class RectifyImageOps {
 	public static PointTransform_F64 transformRectToPixel_F64(IntrinsicParameters param,
 															  DenseMatrix64F rectify)
 	{
-		AddRadialPtoP_F64 addDistortion = new AddRadialPtoP_F64();
-		addDistortion.set(param.fx, param.fy, param.skew, param.cx, param.cy, param.radial);
+		AddRadialPtoP_F64 addDistortion = new AddRadialPtoP_F64().
+				setK(param.fx, param.fy, param.skew, param.cx, param.cy).setDistortion(param.radial,param.t1,param.t2);
 
 		DenseMatrix64F rectifyInv = new DenseMatrix64F(3,3);
 		CommonOps.invert(rectify,rectifyInv);
@@ -385,7 +385,8 @@ public class RectifyImageOps {
 															  DenseMatrix64F rectify)
 	{
 		RemoveRadialPtoP_F64 distortedToPixel = new RemoveRadialPtoP_F64();
-		distortedToPixel.set(param.fx, param.fy, param.skew, param.cx, param.cy, param.radial);
+		distortedToPixel.setK(param.fx, param.fy, param.skew, param.cx, param.cy).
+				setDistortion(param.radial,param.t1,param.t2);
 
 		PointTransformHomography_F64 rectifyDistort = new PointTransformHomography_F64(rectify);
 
@@ -420,7 +421,8 @@ public class RectifyImageOps {
 			throw new IllegalArgumentException("Skew should be zero in rectified images");
 
 		RemoveRadialPtoP_F64 radialDistort = new RemoveRadialPtoP_F64();
-		radialDistort.set(param.fx, param.fy, param.skew, param.cx, param.cy, param.radial);
+		radialDistort.setK(param.fx, param.fy, param.skew, param.cx, param.cy).
+				setDistortion(param.radial, param.t1,param.t2);
 
 		PointTransformHomography_F64 rectifyDistort = new PointTransformHomography_F64(rectify);
 

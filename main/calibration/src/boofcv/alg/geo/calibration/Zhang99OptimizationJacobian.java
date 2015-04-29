@@ -187,10 +187,7 @@ public class Zhang99OptimizationJacobian implements FunctionNtoMxN {
 	}
 
 	/**
-	 * Gradient for radial distortion
-	 *
-	 * deriv [x,y] =  [x,y]*r
-	 *       [x,y] =  [x,y]*r*r
+	 * Gradient for radial and tangential distortion
 	 *
 	 * @param norm undistorted normalized image coordinate
 	 */

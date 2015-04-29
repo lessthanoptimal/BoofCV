@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,6 +30,11 @@ public class TestRemoveRadialPtoP_F64 {
 
 	@Test
 	public void checkAgainstAdd() {
+		checkAgainstAdd(0,0);
+//		checkAgainstAdd(-0.12,0.03);
+	}
+
+	public void checkAgainstAdd( double t1 , double t2) {
 		double fx = 600;
 		double fy = 500;
 		double skew = 2;
@@ -43,13 +48,13 @@ public class TestRemoveRadialPtoP_F64 {
 		double undistX = 19.5;
 		double undistY = 200.1;
 
-		new AddRadialPtoP_F64(fx,fy,skew,xc,yc,radial).compute(undistX,undistY,point);
+		new AddRadialPtoP_F64().setK(fx,fy,skew,xc,yc).setDistortion(radial,t1,t2).compute(undistX, undistY,point);
 
 		double distX = point.x;
 		double distY = point.y;
 
 		RemoveRadialPtoP_F64 alg = new RemoveRadialPtoP_F64();
-		alg.set(fx,fy,skew,xc,yc,radial);
+		alg.setK(fx,fy,skew,xc,yc).setDistortion(radial,t1,t2);
 
 		alg.compute(distX, distY, point);
 
