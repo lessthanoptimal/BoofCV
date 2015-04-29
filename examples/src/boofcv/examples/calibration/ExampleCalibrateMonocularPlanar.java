@@ -63,11 +63,6 @@ public class ExampleCalibrateMonocularPlanar {
 	// List of calibration images
 	List<String> images;
 
-	// Many 3D operations assumed a right handed coordinate system with +Z pointing out of the image.
-	// If the image coordinate system is left handed then the y-axis needs to be flipped to meet
-	// that requirement.  Most of the time this is false.
-	boolean flipY;
-
 	/**
 	 * Images from Zhang's website.  Square grid pattern.
 	 */
@@ -81,9 +76,6 @@ public class ExampleCalibrateMonocularPlanar {
 		// load image list
 		String directory = "../data/evaluation/calibration/mono/PULNiX_CCD_6mm_Zhang";
 		images = BoofMiscOps.directoryList(directory,"CalibIm");
-
-		// standard image format
-		flipY = false;
 	}
 
 	/**
@@ -99,9 +91,6 @@ public class ExampleCalibrateMonocularPlanar {
 		// load image list
 		String directory = "../data/evaluation/calibration/stereo/Bumblebee2_Chess";
 		images = BoofMiscOps.directoryList(directory,"left");
-
-		// standard image format
-		flipY = false;
 	}
 
 	/**
@@ -110,7 +99,7 @@ public class ExampleCalibrateMonocularPlanar {
 	public void process() {
 
 		// Declare and setup the calibration algorithm
-		CalibrateMonoPlanar calibrationAlg = new CalibrateMonoPlanar(detector, flipY);
+		CalibrateMonoPlanar calibrationAlg = new CalibrateMonoPlanar(detector);
 
 		// tell it type type of target and which parameters to estimate
 		calibrationAlg.configure(target, true, 2, false);

@@ -48,14 +48,8 @@ public class TestRectifyImageOps {
 	@Test
 	public void fullViewLeft_calibrated() {
 
-		fullViewLeft_calibrated(false);
-		fullViewLeft_calibrated(true);
-	}
-
-	public void fullViewLeft_calibrated( boolean flipY ) {
-
 		IntrinsicParameters param =
-				new IntrinsicParameters(flipY).fsetK(300, 320, 0, 150, 130, width, height).fsetRadial(0.1,1e-4);
+				new IntrinsicParameters().fsetK(300, 320, 0, 150, 130, width, height).fsetRadial(0.1,1e-4);
 
 		// do nothing rectification
 		DenseMatrix64F rect1 = CommonOps.identity(3);
@@ -89,18 +83,14 @@ public class TestRectifyImageOps {
 
 		String s = x+" "+y+" -> "+p.x+" "+p.y;
 		assertTrue(s,p.x >= -tol && p.x < width+tol );
-		assertTrue(s,p.y >= -tol && p.y < height+tol );
+		assertTrue(s, p.y >= -tol && p.y < height + tol);
 	}
 
 	@Test
 	public void allInsideLeft_calibrated() {
-		allInsideLeft_calibrated(false);
-		allInsideLeft_calibrated(true);
-	}
 
-	public void allInsideLeft_calibrated( boolean flipY ) {
-		IntrinsicParameters param =
-				new IntrinsicParameters(flipY).fsetK(300, 320, 0, 150, 130, width, height).fsetRadial(0.1,1e-4);
+		IntrinsicParameters param = new IntrinsicParameters().
+				fsetK(300, 320, 0, 150, 130, width, height).fsetRadial(0.1,1e-4);
 
 		// do nothing rectification
 		DenseMatrix64F rect1 = CommonOps.identity(3);
@@ -121,7 +111,7 @@ public class TestRectifyImageOps {
 		DenseMatrix64F rect1 = CommonOps.diag(2, 3, 1);
 		DenseMatrix64F rect2 = CommonOps.diag(0.5, 2, 1);
 
-		RectifyImageOps.fullViewLeft(300,250,rect1,rect2);
+		RectifyImageOps.fullViewLeft(300, 250, rect1, rect2);
 
 		// check left image
 		PointTransformHomography_F32 tran = new PointTransformHomography_F32(rect1);
@@ -139,7 +129,7 @@ public class TestRectifyImageOps {
 
 		// check left image
 		DenseMatrix64F inv = new DenseMatrix64F(3,3);
-		CommonOps.invert(rect1,inv);
+		CommonOps.invert(rect1, inv);
 		PointTransformHomography_F32 tran = new PointTransformHomography_F32(inv);
 		checkInside(tran);
 		// the right view is not checked since it is not part of the contract
@@ -150,13 +140,9 @@ public class TestRectifyImageOps {
 	 */
 	@Test
 	public void transform_PixelToRect_and_RectToPixel_F32() {
-		transform_PixelToRect_and_RectToPixel_F32(true);
-		transform_PixelToRect_and_RectToPixel_F32(false);
-	}
 
-	public void transform_PixelToRect_and_RectToPixel_F32( boolean flipY ) {
-		IntrinsicParameters param =
-				new IntrinsicParameters(flipY).fsetK(300, 320, 0, 150, 130, width, height).fsetRadial(0.1,1e-4);
+		IntrinsicParameters param = new IntrinsicParameters().
+				fsetK(300, 320, 0, 150, 130, width, height).fsetRadial(0.1,1e-4);
 
 		DenseMatrix64F rect = new DenseMatrix64F(3,3,true,1.1,0,0,0,2,0,0.1,0,3);
 
@@ -180,13 +166,9 @@ public class TestRectifyImageOps {
 
 	@Test
 	public void transform_PixelToRect_and_RectToPixel_F64() {
-		transform_PixelToRect_and_RectToPixel_F64(true);
-		transform_PixelToRect_and_RectToPixel_F64(false);
-	}
 
-	public void transform_PixelToRect_and_RectToPixel_F64( boolean flipY ) {
-		IntrinsicParameters param =
-				new IntrinsicParameters(flipY).fsetK(300, 320, 0, 150, 130, width, height).fsetRadial(0.1,1e-4);
+		IntrinsicParameters param = new IntrinsicParameters().
+				fsetK(300, 320, 0, 150, 130, width, height).fsetRadial(0.1,1e-4);
 
 		DenseMatrix64F rect = new DenseMatrix64F(3,3,true,1.1,0,0,0,2,0,0.1,0,3);
 
@@ -213,13 +195,8 @@ public class TestRectifyImageOps {
 	 */
 	@Test
 	public void transformPixelToRectNorm_F64() {
-		transformPixelToRectNorm_F64(true);
-		transformPixelToRectNorm_F64(false);
-	}
-
-	public void transformPixelToRectNorm_F64(boolean flipY) {
-		IntrinsicParameters param =
-				new IntrinsicParameters(flipY).fsetK(300, 320, 0, 150, 130, width, height).fsetRadial(0.1,1e-4);
+		IntrinsicParameters param = new IntrinsicParameters().
+						fsetK(300, 320, 0, 150, 130, width, height).fsetRadial(0.1,1e-4);
 
 		DenseMatrix64F rect = new DenseMatrix64F(3,3,true,1.1,0,0,0,2,0,0.1,0,3);
 		DenseMatrix64F rectK = PerspectiveOps.calibrationMatrix(param, null);
@@ -236,9 +213,7 @@ public class TestRectifyImageOps {
 		Point2D_F32 rectified = new Point2D_F32();
 		tranRect.compute((float)x,(float)y,rectified);
 		Point2D_F64 expected = new Point2D_F64();
-		// the transform converts it back into the flipped input coordinates, we don't want that
-		double yFlip = flipY ? param.height-rectified.y-1 : rectified.y;
-		GeometryMath_F64.mult(rectK_inv,new Point2D_F64(rectified.x,yFlip),expected);
+		GeometryMath_F64.mult(rectK_inv,new Point2D_F64(rectified.x,rectified.y),expected);
 
 		// compute the 'found' results
 		Point2D_F64 found = new Point2D_F64();

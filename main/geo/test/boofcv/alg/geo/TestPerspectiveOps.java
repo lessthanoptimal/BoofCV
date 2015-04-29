@@ -150,7 +150,7 @@ public class TestPerspectiveOps {
 		double cy = 5;
 
 		DenseMatrix64F K = new DenseMatrix64F(3,3,true,fx,skew,cx,0,fy,cy,0,0,1);
-		IntrinsicParameters ret = PerspectiveOps.matrixToParam(K, 100, 200, true, null);
+		IntrinsicParameters ret = PerspectiveOps.matrixToParam(K, 100, 200, null);
 
 		assertTrue(ret.fx == fx);
 		assertTrue(ret.fy == fy);
@@ -159,7 +159,6 @@ public class TestPerspectiveOps {
 		assertTrue(ret.cy == cy);
 		assertTrue(ret.width == 100);
 		assertTrue(ret.height == 200);
-		assertTrue(ret.flipY);
 	}
 
 	@Test

@@ -177,7 +177,6 @@ public class CalibrateStereoPlanarGuiApp extends JPanel
 	 * @param detector Calibration target detector.
 	 * @param target Description of the target being detected.
 	 * @param assumeZeroSkew If true the skew parameter is assumed to be zero
-	 * @param flipY If true the y-axis will be inverted.
 	 * @param leftImages Images taken by left camera.
 	 * @param rightImages Images taken by right camera.
 	 */
@@ -186,13 +185,12 @@ public class CalibrateStereoPlanarGuiApp extends JPanel
 						   int numRadial,
 						   boolean includeTangential,
 						   boolean assumeZeroSkew ,
-						   boolean flipY ,
 						   List<String> leftImages , List<String> rightImages  ) {
 
 		if( leftImages.size() != rightImages.size() )
 			throw new IllegalArgumentException("Number of left and right images must be the same");
 
-		calibrator = new CalibrateStereoPlanar(detector,flipY);
+		calibrator = new CalibrateStereoPlanar(detector);
 		calibrator.configure(target,assumeZeroSkew,numRadial,includeTangential);
 		this.leftImages = leftImages;
 		this.rightImages = rightImages;
@@ -204,7 +202,7 @@ public class CalibrateStereoPlanarGuiApp extends JPanel
 
 		if( parser.parse(fileName) ) {
 			configure(parser.detector,parser.target,parser.numRadial,
-					parser.includeTangential,parser.assumeZeroSkew,parser.flipY,
+					parser.includeTangential,parser.assumeZeroSkew,
 					parser.getLeftImages(),parser.getRightImages());
 		} else {
 			System.err.println("Configuration failed");
@@ -264,7 +262,7 @@ public class CalibrateStereoPlanarGuiApp extends JPanel
 		Collections.sort(rightImages);
 
 		CalibrateStereoPlanarGuiApp app = new CalibrateStereoPlanarGuiApp();
-		app.configure(detector,target,2,false,true,false, leftImages,rightImages);
+		app.configure(detector,target,2,false,true, leftImages,rightImages);
 
 		JFrame frame = new JFrame("Planar Stereo Calibration");
 		frame.add(app, BorderLayout.CENTER);

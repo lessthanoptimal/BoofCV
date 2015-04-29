@@ -62,9 +62,6 @@ public class CalibrateMonoPlanar {
 	// detects calibration points inside of images
 	protected PlanarCalibrationDetector detector;
 
-	// Is the image's y-axis inverted?
-	protected boolean flipY;
-
 	// computes calibration parameters
 	protected CalibrationPlanarGridZhang99 zhang99;
 	// calibration configuration
@@ -90,12 +87,9 @@ public class CalibrateMonoPlanar {
 	 * High level configuration
 	 *
 	 * @param detector Target detection algorithm.
-	 * @param flipY If true the y-axis will be inverted to ensure the assumed coordinate system is being used.
-	 *                Normally this should be false.
 	 */
-	public CalibrateMonoPlanar(PlanarCalibrationDetector detector , boolean flipY) {
+	public CalibrateMonoPlanar(PlanarCalibrationDetector detector ) {
 		this.detector = detector;
-		this.flipY = flipY;
 	}
 
 	/**
@@ -148,15 +142,7 @@ public class CalibrateMonoPlanar {
 			List<Point2D_F64> points = detector.getPoints();
 			List<Point2D_F64> adjusted = new ArrayList<Point2D_F64>();
 
-			// make it so +y is pointed up not down, and becomes a right handed coordinate system
-			if(flipY) {
-				for( Point2D_F64 p : points ) {
-					Point2D_F64 a = new Point2D_F64(p.x,h-p.y-1);
-					adjusted.add(a);
-				}
-			} else {
-				adjusted.addAll(points);
-			}
+			adjusted.addAll(points);
 
 			observations.add(points);
 			observationsAdj.add(adjusted);
@@ -186,7 +172,6 @@ public class CalibrateMonoPlanar {
 		errors = computeErrors(observationsAdj, foundZhang,target.points);
 
 		foundIntrinsic = foundZhang.convertToIntrinsic();
-		foundIntrinsic.flipY = flipY;
 		foundIntrinsic.width = widthImg;
 		foundIntrinsic.height = heightImg;
 
@@ -285,9 +270,5 @@ public class CalibrateMonoPlanar {
 
 	public PlanarCalibrationTarget getTarget() {
 		return target;
-	}
-
-	public boolean isFlipY() {
-		return flipY;
 	}
 }

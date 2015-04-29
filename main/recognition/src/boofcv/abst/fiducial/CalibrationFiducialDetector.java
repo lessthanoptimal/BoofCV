@@ -145,7 +145,7 @@ public class CalibrationFiducialDetector<T extends ImageSingleBand>
 
 	@Override
 	public void setIntrinsic(IntrinsicParameters intrinsic) {
-		distortToUndistorted = LensDistortionOps.transformRadialToPixel_F64(intrinsic);
+		distortToUndistorted = LensDistortionOps.distortTransform(intrinsic).undistort_F64(true,true);
 		PerspectiveOps.calibrationMatrix(intrinsic, K);
 	}
 

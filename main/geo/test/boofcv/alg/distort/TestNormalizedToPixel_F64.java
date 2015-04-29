@@ -34,7 +34,7 @@ public class TestNormalizedToPixel_F64 {
 
 	@Test
 	public void basicTest() {
-		IntrinsicParameters p = new IntrinsicParameters(false).fsetK(1, 2, 3, 4, 5, 200, 300);
+		IntrinsicParameters p = new IntrinsicParameters().fsetK(1, 2, 3, 4, 5, 200, 300);
 
 		DenseMatrix64F K = PerspectiveOps.calibrationMatrix(p, null);
 

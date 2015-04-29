@@ -64,11 +64,6 @@ public class ExampleCalibrateStereoPlanar {
 	List<String> left;
 	List<String> right;
 
-	// Many 3D operations assumed a right handed coordinate system with +Z pointing out of the image.
-	// If the image coordinate system is left handed then the y-axis needs to be flipped to meet
-	// that requirement.  Most of the time this is false.
-	boolean flipY;
-
 	/**
 	 * Square grid target taken by a PtGrey Bumblebee camera.
 	 */
@@ -82,8 +77,6 @@ public class ExampleCalibrateStereoPlanar {
 
 		left = BoofMiscOps.directoryList(directory, "left");
 		right = BoofMiscOps.directoryList(directory, "right");
-
-		flipY = false;
 	}
 
 	/**
@@ -99,8 +92,6 @@ public class ExampleCalibrateStereoPlanar {
 
 		left = BoofMiscOps.directoryList(directory, "left");
 		right = BoofMiscOps.directoryList(directory, "right");
-
-		flipY = false;
 	}
 
 	/**
@@ -108,7 +99,7 @@ public class ExampleCalibrateStereoPlanar {
 	 */
 	public void process() {
 		// Declare and setup the calibration algorithm
-		CalibrateStereoPlanar calibratorAlg = new CalibrateStereoPlanar(detector, flipY);
+		CalibrateStereoPlanar calibratorAlg = new CalibrateStereoPlanar(detector);
 		calibratorAlg.configure(target, true, 2, false);
 
 		// ensure the lists are in the same order

@@ -68,7 +68,7 @@ public class TestBaseDetectFiducialSquare {
 		ImageMiscOps.fill(image, 255);
 		render(pattern, where, image);
 
-		PointTransform_F32 remove_p_to_p = LensDistortionOps.createLensDistortion(intrinsic).undistort_F32(true, true);
+		PointTransform_F32 remove_p_to_p = LensDistortionOps.distortTransform(intrinsic).undistort_F32(true, true);
 
 		ImageDistort<ImageUInt8,ImageUInt8> distorter
 				= DistortImageOps.createImageDistort(remove_p_to_p,TypeInterpolate.BILINEAR,ImageUInt8.class,ImageUInt8.class);

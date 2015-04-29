@@ -72,10 +72,9 @@ public class CalibrateMonoPlanarGuiApp extends JPanel
 	public void configure( PlanarCalibrationDetector detector ,
 						   PlanarCalibrationTarget target,
 						   List<String> images  ,
-						   int numRadial, boolean includeTangential,
-						   boolean flipY ) {
-
-		calibrator = new CalibrateMonoPlanar(detector,flipY);
+						   int numRadial, boolean includeTangential )
+	{
+		calibrator = new CalibrateMonoPlanar(detector);
 		calibrator.configure(target,true,numRadial,includeTangential);
 		this.images = images;
 	}
@@ -86,7 +85,7 @@ public class CalibrateMonoPlanarGuiApp extends JPanel
 
 		if( parser.parse(fileName) ) {
 			configure(parser.detector,parser.target,parser.images,
-					parser.numRadial,parser.includeTangential,parser.flipY);
+					parser.numRadial,parser.includeTangential);
 		} else {
 			System.err.println("Configuration failed");
 		}
@@ -214,9 +213,9 @@ public class CalibrateMonoPlanarGuiApp extends JPanel
 //		String directory = "../data/evaluation/calibration/stereo/Bumblebee2_Square";
 
 		CalibrateMonoPlanarGuiApp app = new CalibrateMonoPlanarGuiApp();
-//		app.configure(detector,target,BoofMiscOps.directoryList(directory, "frame" ),2,false,false);
-		app.configure(detector,target,BoofMiscOps.directoryList(directory, "left" ),2,false,false);
-//		app.configure(detector,target,BoofMiscOps.directoryList(directory, "CalibIm" ),2,false,false);
+//		app.configure(detector,target,BoofMiscOps.directoryList(directory, "frame" ),2,false);
+		app.configure(detector,target,BoofMiscOps.directoryList(directory, "left" ),2,false);
+//		app.configure(detector,target,BoofMiscOps.directoryList(directory, "CalibIm" ),2,false);
 
 		JFrame frame = new JFrame("Planar Calibration");
 		frame.add(app, BorderLayout.CENTER);

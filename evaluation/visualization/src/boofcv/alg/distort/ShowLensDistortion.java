@@ -162,7 +162,7 @@ public class ShowLensDistortion<T extends ImageSingleBand>
 
 		IntrinsicParameters param = new IntrinsicParameters().fsetK(input.width * 0.8, input.width * 0.8, 0,
 				input.width / 2, input.height / 2, input.width, input.height).fsetRadial(radial1, radial2).fsetTangental(0, 0);
-		PointTransform_F32 add_p_to_p = LensDistortionOps.createLensDistortion(param).distort_F32(true, true);
+		PointTransform_F32 add_p_to_p = LensDistortionOps.distortTransform(param).distort_F32(true, true);
 		PixelTransform_F32 tran=new PointToPixelTransform_F32(add_p_to_p);
 
 		for( int i = 0; i < input.getNumBands(); i++ , progress++ ) {

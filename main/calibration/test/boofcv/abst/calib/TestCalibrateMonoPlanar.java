@@ -30,12 +30,9 @@ import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
 import org.ejml.data.DenseMatrix64F;
-import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * @author Peter Abeles
@@ -59,26 +56,11 @@ public class TestCalibrateMonoPlanar {
 		pose.add( new Se3_F64(RotationMatrixGenerator.eulerXYZ(0.05,0,0.1,null),new Vector3D_F64(0,-w,z)));
 
 	}
+	
+	private IntrinsicParameters computeIntrinsic() {
+		PlanarCalibrationDetector detector = new FakeDetector();
 
-	/**
-	 * Calibrates the images once by manually flipping the images and another time by setting flipY
-	 * to true.  Results should be identical
-	 */
-	@Test
-	public void testFlipY() {
-		IntrinsicParameters foundManual = computeIntrinsic(true);
-		IntrinsicParameters foundOther = computeIntrinsic(false);
-
-		assertEquals(foundManual.cx,foundOther.cx,1e-8);
-		assertEquals(foundManual.cy,foundOther.cy,1e-8);
-		assertEquals(foundManual.fx,foundOther.fx,1e-8);
-		assertEquals(foundManual.fy,foundOther.fy,1e-8);
-	}
-
-	private IntrinsicParameters computeIntrinsic(boolean manualFlip) {
-		PlanarCalibrationDetector detector = new FakeDetector(manualFlip);
-
-		CalibrateMonoPlanar alg = new CalibrateMonoPlanar(detector,!manualFlip);
+		CalibrateMonoPlanar alg = new CalibrateMonoPlanar(detector);
 
 		alg.configure(target,false,2,false);
 
@@ -90,14 +72,9 @@ public class TestCalibrateMonoPlanar {
 
 	private class FakeDetector implements PlanarCalibrationDetector {
 
-		boolean manualFlip;
 		int count = 0;
 
 		List<Point2D_F64> obs;
-
-		private FakeDetector(boolean manualFlip) {
-			this.manualFlip = manualFlip;
-		}
 
 		@Override
 		public boolean process(ImageFloat32 input) {
@@ -122,10 +99,6 @@ public class TestCalibrateMonoPlanar {
 
 				if( pixel.x < 0 || pixel.x >= width || pixel.y < 0 || pixel.y >= height )
 					throw new RuntimeException("Adjust test setup, bad observation");
-
-				if( manualFlip ) {
-					pixel.y = height - pixel.y - 1;
-				}
 
 				obs.add(pixel);
 			}

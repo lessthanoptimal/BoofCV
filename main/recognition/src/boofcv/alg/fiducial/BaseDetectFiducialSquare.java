@@ -196,8 +196,8 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 		homographyToPose.setCalibrationMatrix(K);
 
 		// provide intrinsic camera parameters
-		PointTransform_F64 remove_p_to_p = LensDistortionOps.createLensDistortion(intrinsic).undistort_F64(true, true);
-		PointTransform_F32 add_p_to_p = LensDistortionOps.createLensDistortion(intrinsic).distort_F32(true, true);
+		PointTransform_F64 remove_p_to_p = LensDistortionOps.distortTransform(intrinsic).undistort_F64(true, true);
+		PointTransform_F32 add_p_to_p = LensDistortionOps.distortTransform(intrinsic).distort_F32(true, true);
 
 		SequencePointTransform_F32 sequence = new SequencePointTransform_F32(transformHomography, add_p_to_p);
 		PixelTransform_F32 squareToInput= new PointToPixelTransform_F32(sequence);

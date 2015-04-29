@@ -40,7 +40,6 @@ public class BaseCalibrationConfig {
 	MediaManager media = DefaultMediaManager.INSTANCE;
 
 	public boolean assumeZeroSkew;
-	public boolean flipY;
 	public int numRadial;
 	public boolean includeTangential;
 	public PlanarCalibrationDetector detector;
@@ -60,14 +59,13 @@ public class BaseCalibrationConfig {
 		if( !reader.read(input) )
 			throw new RuntimeException("Parsing configuration failed");
 
-		if( reader.remainingTokens() < 8 )
+		if( reader.remainingTokens() < 7 )
 			throw new RuntimeException("Not enough tokens in config file");
 
 		String type = reader.nextString();
 		numRadial = (int)reader.nextDouble();
 		includeTangential = Boolean.parseBoolean(reader.nextString());
 		assumeZeroSkew = Boolean.parseBoolean(reader.nextString());
-		flipY = Boolean.parseBoolean(reader.nextString());
 		int numCols = (int)reader.nextDouble();
 		int numRows = (int)reader.nextDouble();
 

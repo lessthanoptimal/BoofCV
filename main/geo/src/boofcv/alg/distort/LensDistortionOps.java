@@ -18,8 +18,6 @@
 
 package boofcv.alg.distort;
 
-import boofcv.alg.distort.radtan.AddRadialNtoN_F64;
-import boofcv.alg.distort.radtan.RemoveRadialPtoN_F64;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.interpolate.TypeInterpolate;
@@ -29,7 +27,8 @@ import boofcv.core.image.border.ImageBorder;
 import boofcv.factory.distort.FactoryDistort;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.calib.IntrinsicParameters;
-import boofcv.struct.distort.*;
+import boofcv.struct.distort.PixelTransform_F32;
+import boofcv.struct.distort.PointTransform_F32;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 import georegression.struct.shapes.RectangleLength2D_F32;
@@ -125,8 +124,8 @@ public class LensDistortionOps {
 	public static PointTransform_F32 fullView( IntrinsicParameters param,
 											   IntrinsicParameters paramAdj ) {
 
-		PointTransform_F32 remove_p_to_p = createLensDistortion(param).undistort_F32(true,true);
-		PointTransform_F32 add_p_to_p = createLensDistortion(param).distort_F32(true, true);
+		PointTransform_F32 remove_p_to_p = distortTransform(param).undistort_F32(true,true);
+		PointTransform_F32 add_p_to_p = distortTransform(param).distort_F32(true, true);
 
 		RectangleLength2D_F32 bound = DistortImageOps.boundBox_F32(param.width, param.height,
 				new PointToPixelTransform_F32(remove_p_to_p));
@@ -143,13 +142,7 @@ public class LensDistortionOps {
 		// adjustment matrix
 		DenseMatrix64F A = new DenseMatrix64F(3,3,true,scale,0,deltaX,0,scale,deltaY,0,0,1);
 
-		PointTransform_F32 tranAdj = PerspectiveOps.adjustIntrinsic_F32(add_p_to_p, false, param, A, paramAdj);
-
-		if( param.flipY) {
-			PointTransform_F32 flip = new FlipVertical_F32(param.height);
-			return new SequencePointTransform_F32(flip,tranAdj,flip);
-		} else
-			return tranAdj;
+		return PerspectiveOps.adjustIntrinsic_F32(add_p_to_p, false, param, A, paramAdj);
 	}
 
 	/**
@@ -168,8 +161,8 @@ public class LensDistortionOps {
 	 */
 	public static PointTransform_F32 allInside( IntrinsicParameters param,
 												IntrinsicParameters paramAdj ) {
-		PointTransform_F32 remove_p_to_p = createLensDistortion(param).undistort_F32(true,true);
-		PointTransform_F32 add_p_to_p = createLensDistortion(param).distort_F32(true, true);
+		PointTransform_F32 remove_p_to_p = distortTransform(param).undistort_F32(true,true);
+		PointTransform_F32 add_p_to_p = distortTransform(param).distort_F32(true, true);
 
 		RectangleLength2D_F32 bound = LensDistortionOps.boundBoxInside(param.width, param.height,
 				new PointToPixelTransform_F32(remove_p_to_p));
@@ -189,101 +182,15 @@ public class LensDistortionOps {
 		// adjustment matrix
 		DenseMatrix64F A = new DenseMatrix64F(3,3,true,scale,0,deltaX,0,scale,deltaY,0,0,1);
 
-		PointTransform_F32 tranAdj = PerspectiveOps.adjustIntrinsic_F32(add_p_to_p, false, param, A, paramAdj);
-
-		if( param.flipY) {
-			PointTransform_F32 flip = new FlipVertical_F32(param.height);
-			return new SequencePointTransform_F32(flip,tranAdj,flip);
-		} else
-			return tranAdj;
+		return PerspectiveOps.adjustIntrinsic_F32(add_p_to_p, false, param, A, paramAdj);
 	}
 
 	/**
-	 * Removes radial distortion from the image in pixel coordinates and converts it into normalized image coordinates
-	 *
-	 * @param param Intrinsic camera parameters
-	 * @return Distorted pixel to normalized image coordinates
+	 * Creates the {@link LensDistortionPinhole lens distortion} for the specified camera parameters.
+	 * Call this to create transforms to and from pixel and normalized image coordinates with and without
+	 * lens distortion.
 	 */
-	public static PointTransform_F64 transformRadialToNorm_F64(IntrinsicParameters param)
-	{
-		RemoveRadialPtoN_F64 radialDistort = new RemoveRadialPtoN_F64();
-		radialDistort.setK(param.fx, param.fy, param.skew, param.cx, param.cy).
-				setDistortion(param.radial, param.t1, param.t2);
-
-		if( param.flipY) {
-			return new FlipVerticalNorm_F64(radialDistort,param.height);
-		} else {
-			return radialDistort;
-		}
-	}
-
-	/**
-	 * Removes radial distortion from the pixel coordinate.
-	 *
-	 * @param param Intrinsic camera parameters
-	 * @return Transformation into undistorted pixel coordinates
-	 */
-	public static PointTransform_F64 transformRadialToPixel_F64( IntrinsicParameters param )
-	{
-		PointTransform_F64 remove_p_to_p = createLensDistortion(param).undistort_F64(true,true);
-
-		if( param.flipY) {
-			PointTransform_F64 flip = new FlipVertical_F64(param.height);
-			return new SequencePointTransform_F64(flip,remove_p_to_p,flip);
-		} else {
-			return remove_p_to_p;
-		}
-	}
-
-	/**
-	 * Converts normalized image coordinates into distorted pixel coordinates.
-	 *
-	 * @param param Intrinsic camera parameters
-	 * @return Transform from normalized image coordinates into distorted pixel coordinates
-	 */
-	public static PointTransform_F64 transformNormToRadial_F64(IntrinsicParameters param)
-	{
-		AddRadialNtoN_F64 addRadial = new AddRadialNtoN_F64();
-		addRadial.setDistortion(param.radial, param.t1, param.t2);
-
-		NormalizedToPixel_F64 toPixel = new NormalizedToPixel_F64();
-		toPixel.set(param.fx, param.fy, param.skew, param.cx, param.cy);
-
-		if( param.flipY ) {
-			return new SequencePointTransform_F64(addRadial,toPixel,new FlipVertical_F64(param.height));
-		} else {
-			return new SequencePointTransform_F64(addRadial,toPixel);
-		}
-	}
-
-	/**
-	 * <p>
-	 * Transform from undistorted pixel coordinates to distorted with radial pixel coordinates
-	 * </p>
-	 *
-	 * <p>
-	 * NOTE: The original image coordinate system is maintained even if the intrinsic parameter flipY is true.
-	 * </p>
-	 *
-	 * @param param Intrinsic camera parameters
-	 * @return Transform from undistorted to distorted image.
-	 */
-	public static PointTransform_F32 transformPixelToRadial_F32(IntrinsicParameters param)
-	{
-		PointTransform_F32 add_p_to_p = createLensDistortion(param).distort_F32(true,true);
-
-		if( param.flipY) {
-			PointTransform_F32 flip = new FlipVertical_F32(param.height);
-			return new SequencePointTransform_F32(flip,add_p_to_p,flip);
-		} else {
-			return add_p_to_p;
-		}
-	}
-
-	/**
-	 * Creates the lens distortion {@link PointTransform_F64} for the specified camera parameters
-	 */
-	public static LensDistortionPinhole createLensDistortion( IntrinsicParameters param ) {
+	public static LensDistortionPinhole distortTransform(IntrinsicParameters param) {
 		return new LensDistortionRadialTangential(param);
 	}
 

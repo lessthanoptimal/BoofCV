@@ -62,9 +62,6 @@ public class IntrinsicParameters implements Serializable {
 	/** image shape (units: pixels) */
 	public int width,height;
 
-	/** When calibrated was the y-axis flipped: y = (height - y - 1) */
-	public boolean flipY;
-
 	/** focal length along x and y axis (units: pixels) */
 	public double fx,fy;
 	/** skew parameter, typically 0 (units: pixels)*/
@@ -81,12 +78,6 @@ public class IntrinsicParameters implements Serializable {
 	 * Default constructor.  flipY is false and everything else is zero or null.
 	 */
 	public IntrinsicParameters() {
-		flipY = false;
-	}
-
-	public IntrinsicParameters(boolean flipY)
-	{
-		this.flipY = flipY;
 	}
 
 	public IntrinsicParameters( IntrinsicParameters param ) {
@@ -134,7 +125,6 @@ public class IntrinsicParameters implements Serializable {
 		this.cy = param.cy;
 		this.width = param.width;
 		this.height = param.height;
-		this.flipY = param.flipY;
 		this.radial = param.radial;
 
 		if( param.radial != null )
@@ -208,14 +198,6 @@ public class IntrinsicParameters implements Serializable {
 		this.height = height;
 	}
 
-	public boolean isFlipY() {
-		return flipY;
-	}
-
-	public void setFlipY(boolean flipY) {
-		this.flipY = flipY;
-	}
-
 	public double getT1() {
 		return t1;
 	}
@@ -233,7 +215,7 @@ public class IntrinsicParameters implements Serializable {
 	}
 
 	public void print() {
-		System.out.println("Shape "+width+" "+height+" flipY = "+ flipY);
+		System.out.println("Shape "+width+" "+height);
 		System.out.printf("center %7.2f %7.2f\n", cx, cy);
 		System.out.println("fx = " + fx);
 		System.out.println("fy = "+fy);

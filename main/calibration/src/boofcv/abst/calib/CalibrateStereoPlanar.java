@@ -67,13 +67,11 @@ public class CalibrateStereoPlanar {
 	 * Configures stereo calibration
 	 *
 	 * @param detector Target detection algorithm.
-	 * @param flipY If true the y-axis will be inverted to ensure the assumed coordinate system is being used.
-	 *                Most of the time this will be false.
 	 */
-	public CalibrateStereoPlanar(PlanarCalibrationDetector detector, boolean flipY)
+	public CalibrateStereoPlanar(PlanarCalibrationDetector detector)
 	{
-		calibLeft = new CalibrateMonoPlanar(detector,flipY);
-		calibRight = new CalibrateMonoPlanar(detector,flipY);
+		calibLeft = new CalibrateMonoPlanar(detector);
+		calibRight = new CalibrateMonoPlanar(detector);
 	}
 
 	/**
@@ -200,10 +198,6 @@ public class CalibrateStereoPlanar {
 
 	public CalibrateMonoPlanar getCalibRight() {
 		return calibRight;
-	}
-
-	public boolean isConvertToRightHanded() {
-		return calibLeft.isFlipY();
 	}
 
 	public void printStatistics() {

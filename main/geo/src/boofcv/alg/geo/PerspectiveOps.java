@@ -109,8 +109,7 @@ public class PerspectiveOps {
 			}
 			CommonOps.mult(A, K, K_adj);
 
-			PerspectiveOps.matrixToParam(K_adj, parameters.width, parameters.height,
-					parameters.flipY, adjustedParam);
+			PerspectiveOps.matrixToParam(K_adj, parameters.width, parameters.height, adjustedParam);
 		}
 
 		PointTransformHomography_F32 adjust = new PointTransformHomography_F32(adjustMatrix);
@@ -166,11 +165,10 @@ public class PerspectiveOps {
 	 * @param K Camera calibration matrix.
 	 * @param width Image width in pixels
 	 * @param height Image height in pixels
-	 * @param flipY When calibrated was the y-axis adjusted with: y = (height - y - 1)
 	 * @param param Where the intrinsic parameter are written to.  If null then a new instance is declared.
 	 * @return IntrinsicParameters structure.
 	 */
-	public static IntrinsicParameters matrixToParam( DenseMatrix64F K , int width , int height , boolean flipY,
+	public static IntrinsicParameters matrixToParam( DenseMatrix64F K , int width , int height ,
 													 IntrinsicParameters param ) {
 
 		if( param == null )
@@ -184,7 +182,6 @@ public class PerspectiveOps {
 
 		param.width = width;
 		param.height = height;
-		param.flipY = flipY;
 
 		return param;
 	}

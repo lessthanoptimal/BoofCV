@@ -195,7 +195,7 @@ public class TestObjectSerialization {
 
 	@Test
 	public void testIntrinsicParamters() {
-		IntrinsicParameters original = new IntrinsicParameters(true).
+		IntrinsicParameters original = new IntrinsicParameters().
 				fsetK(1, 2, 3, 4, 5, 6, 7).fsetRadial(8,9).fsetTangental(10, 11);
 
 		UtilIO.saveXML(original, "temp.txt");
@@ -209,7 +209,6 @@ public class TestObjectSerialization {
 		assertEquals(original.cy,found.cy,1e-8);
 		assertEquals(original.width,found.width);
 		assertEquals(original.height,found.height);
-		assertEquals(original.flipY,found.flipY);
 		assertEquals(original.radial[0],found.radial[0],1e-8);
 		assertEquals(original.radial[1],found.radial[1],1e-8);
 		assertEquals(original.t1,found.t1,1e-8);

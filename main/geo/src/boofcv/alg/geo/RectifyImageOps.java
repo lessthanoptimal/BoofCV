@@ -35,7 +35,7 @@ import org.ejml.data.DenseMatrix64F;
 import org.ejml.ops.CommonOps;
 import org.ejml.simple.SimpleMatrix;
 
-import static boofcv.alg.distort.LensDistortionOps.createLensDistortion;
+import static boofcv.alg.distort.LensDistortionOps.distortTransform;
 
 /**
  * <p>
@@ -117,7 +117,6 @@ public class RectifyImageOps {
 	{
 		// need to take in account the order in which image distort will remove rectification later on
 		paramLeft = new IntrinsicParameters(paramLeft);
-		paramLeft.flipY = false;
 
 		PointTransform_F32 tranLeft = transformPixelToRect_F32(paramLeft, rectifyLeft);
 
@@ -183,7 +182,6 @@ public class RectifyImageOps {
 	{
 		// need to take in account the order in which image distort will remove rectification later on
 		paramLeft = new IntrinsicParameters(paramLeft);
-		paramLeft.flipY = false;
 
 		PointTransform_F32 tranLeft = transformPixelToRect_F32(paramLeft, rectifyLeft);
 
@@ -294,18 +292,13 @@ public class RectifyImageOps {
 	public static PointTransform_F32 transformRectToPixel_F32(IntrinsicParameters param,
 															  DenseMatrix64F rectify)
 	{
-		PointTransform_F32 add_p_to_p = createLensDistortion(param).distort_F32(true, true);
+		PointTransform_F32 add_p_to_p = distortTransform(param).distort_F32(true, true);
 
 		DenseMatrix64F rectifyInv = new DenseMatrix64F(3,3);
 		CommonOps.invert(rectify,rectifyInv);
 		PointTransformHomography_F32 removeRect = new PointTransformHomography_F32(rectifyInv);
 
-		if( param.flipY) {
-			PointTransform_F32 flip = new FlipVertical_F32(param.height);
-			return new SequencePointTransform_F32(flip,removeRect,add_p_to_p,flip);
-		} else {
-			return new SequencePointTransform_F32(removeRect,add_p_to_p);
-		}
+		return new SequencePointTransform_F32(removeRect,add_p_to_p);
 	}
 
 	/**
@@ -325,18 +318,13 @@ public class RectifyImageOps {
 	public static PointTransform_F64 transformRectToPixel_F64(IntrinsicParameters param,
 															  DenseMatrix64F rectify)
 	{
-		PointTransform_F64 add_p_to_p = createLensDistortion(param).distort_F64(true, true);
+		PointTransform_F64 add_p_to_p = distortTransform(param).distort_F64(true, true);
 
 		DenseMatrix64F rectifyInv = new DenseMatrix64F(3,3);
 		CommonOps.invert(rectify,rectifyInv);
 		PointTransformHomography_F64 removeRect = new PointTransformHomography_F64(rectifyInv);
 
-		if( param.flipY) {
-			PointTransform_F64 flip = new FlipVertical_F64(param.height);
-			return new SequencePointTransform_F64(flip,removeRect,add_p_to_p,flip);
-		} else {
-			return new SequencePointTransform_F64(removeRect,add_p_to_p);
-		}
+		return new SequencePointTransform_F64(removeRect,add_p_to_p);
 	}
 
 	/**
@@ -355,16 +343,11 @@ public class RectifyImageOps {
 	public static PointTransform_F32 transformPixelToRect_F32(IntrinsicParameters param,
 															  DenseMatrix64F rectify)
 	{
-		PointTransform_F32 remove_p_to_p = createLensDistortion(param).undistort_F32(true, true);
+		PointTransform_F32 remove_p_to_p = distortTransform(param).undistort_F32(true, true);
 
 		PointTransformHomography_F32 rectifyPixel = new PointTransformHomography_F32(rectify);
 
-		if( param.flipY) {
-			PointTransform_F32 flip = new FlipVertical_F32(param.height);
-			return new SequencePointTransform_F32(flip,remove_p_to_p,rectifyPixel,flip);
-		} else {
-			return new SequencePointTransform_F32(remove_p_to_p,rectifyPixel);
-		}
+		return new SequencePointTransform_F32(remove_p_to_p,rectifyPixel);
 	}
 
 	/**
@@ -383,16 +366,11 @@ public class RectifyImageOps {
 	public static PointTransform_F64 transformPixelToRect_F64(IntrinsicParameters param,
 															  DenseMatrix64F rectify)
 	{
-		PointTransform_F64 remove_p_to_p = createLensDistortion(param).undistort_F64(true, true);
+		PointTransform_F64 remove_p_to_p = distortTransform(param).undistort_F64(true, true);
 
 		PointTransformHomography_F64 rectifyDistort = new PointTransformHomography_F64(rectify);
 
-		if( param.flipY) {
-			PointTransform_F64 flip = new FlipVertical_F64(param.height);
-			return new SequencePointTransform_F64(flip,remove_p_to_p,rectifyDistort,flip);
-		} else {
-			return new SequencePointTransform_F64(remove_p_to_p,rectifyDistort);
-		}
+		return new SequencePointTransform_F64(remove_p_to_p,rectifyDistort);
 	}
 
 	/**
@@ -412,26 +390,20 @@ public class RectifyImageOps {
 	 */
 	public static PointTransform_F64 transformPixelToRectNorm_F64(IntrinsicParameters param,
 																  DenseMatrix64F rectify,
-																  DenseMatrix64F rectifyK)
-	{
-		if( rectifyK.get(0,1) != 0 )
+																  DenseMatrix64F rectifyK) {
+		if (rectifyK.get(0, 1) != 0)
 			throw new IllegalArgumentException("Skew should be zero in rectified images");
 
-		PointTransform_F64 remove_p_to_p = createLensDistortion(param).undistort_F64(true, true);
+		PointTransform_F64 remove_p_to_p = distortTransform(param).undistort_F64(true, true);
 
 		PointTransformHomography_F64 rectifyDistort = new PointTransformHomography_F64(rectify);
 
 		PixelToNormalized_F64 pixelToNorm = new PixelToNormalized_F64();
-		pixelToNorm.set(rectifyK.get(0,0),rectifyK.get(1,1),
-				rectifyK.get(0,1),
-				rectifyK.get(0,2),rectifyK.get(1,2));
+		pixelToNorm.set(rectifyK.get(0, 0), rectifyK.get(1, 1),
+				rectifyK.get(0, 1),
+				rectifyK.get(0, 2), rectifyK.get(1, 2));
 
-		if( param.flipY) {
-			FlipVertical_F64 flip = new FlipVertical_F64(param.height);
-			return new SequencePointTransform_F64(flip,remove_p_to_p,rectifyDistort,pixelToNorm);
-		} else {
-			return new SequencePointTransform_F64(remove_p_to_p,rectifyDistort,pixelToNorm);
-		}
+		return new SequencePointTransform_F64(remove_p_to_p, rectifyDistort, pixelToNorm);
 	}
 
 	/**

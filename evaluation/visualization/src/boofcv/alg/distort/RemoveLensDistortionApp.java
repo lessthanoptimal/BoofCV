@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -83,8 +83,8 @@ public class RemoveLensDistortionApp extends SelectAlgorithmAndInputPanel {
 		});
 
 		// add different types of adjustments
-		PointTransform_F32 tran = LensDistortionOps.transformPixelToRadial_F32(param);
-		addUndistorted("No Adjustment", tran);
+		PointTransform_F32 add_p_to_p = LensDistortionOps.distortTransform(param).distort_F32(true,true);
+		addUndistorted("No Adjustment", add_p_to_p);
 		PointTransform_F32 allInside = LensDistortionOps.allInside(param, null);
 		addUndistorted("All Inside", allInside);
 		PointTransform_F32 fullView = LensDistortionOps.fullView(param, null);

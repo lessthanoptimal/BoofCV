@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -86,7 +86,7 @@ public abstract class CreateSyntheticOverheadView<T extends ImageBase>
 		this.overheadWidth = overheadWidth;
 		this.overheadHeight = overheadHeight;
 
-		PointTransform_F64 normToPixel = LensDistortionOps.transformNormToRadial_F64(intrinsic);
+		PointTransform_F64 normToPixel = LensDistortionOps.distortTransform(intrinsic).distort_F64(false, true);
 
 		// Declare storage for precomputed pixel locations
 		int overheadPixels = overheadHeight*overheadWidth;
