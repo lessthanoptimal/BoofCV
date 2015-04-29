@@ -21,7 +21,6 @@ package boofcv.alg.geo.calibration;
 import boofcv.abst.calib.CalibrateStereoPlanar;
 import boofcv.abst.calib.ConfigChessboard;
 import boofcv.abst.calib.PlanarCalibrationDetector;
-import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.RectifyImageOps;
 import boofcv.alg.geo.rectify.RectifyCalibrated;
@@ -137,7 +136,7 @@ public class CalibrateStereoPlanarGuiApp extends JPanel
 	/**
 	 * Computes stereo rectification and then passes the distortion along to the gui.
 	 */
-	private void setRectification(StereoParameters param) {
+	private void setRectification(final StereoParameters param) {
 
 		// calibration matrix for left and right camera
 		DenseMatrix64F K1 = PerspectiveOps.calibrationMatrix(param.getLeft(), null);
@@ -146,20 +145,12 @@ public class CalibrateStereoPlanarGuiApp extends JPanel
 		RectifyCalibrated rectify = RectifyImageOps.createCalibrated();
 		rectify.process(K1,new Se3_F64(),K2,param.getRightToLeft().invert(null));
 
-		DenseMatrix64F rect1 = rectify.getRect1();
-		DenseMatrix64F rect2 = rectify.getRect2();
-
-//		RectifyImageOps.fullViewLeft(param.getLeft(),toRight,rect1,rect2,rectify.getCalibrationMatrix());
-
-		// Rectification distortion for each image
-		final ImageDistort<ImageFloat32,ImageFloat32> distort1 = RectifyImageOps.rectifyImage(param.getLeft(),
-				rect1,ImageFloat32.class);
-		final ImageDistort<ImageFloat32,ImageFloat32> distort2 = RectifyImageOps.rectifyImage(param.getRight(),
-				rect2,ImageFloat32.class);
+		final DenseMatrix64F rect1 = rectify.getRect1();
+		final DenseMatrix64F rect2 = rectify.getRect2();
 
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
-				gui.setRectification(distort1, distort2);
+				gui.setRectification(param.getLeft(),rect1,param.getRight(),rect2);
 			}
 		});
 		gui.repaint();

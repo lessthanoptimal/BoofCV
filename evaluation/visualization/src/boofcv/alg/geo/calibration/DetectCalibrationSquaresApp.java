@@ -116,7 +116,6 @@ public class DetectCalibrationSquaresApp
 		}
 
 		boolean zeroSkew = reader.nextString().compareTo("true") == 0;
-		boolean flipY = reader.nextString().compareTo("true") == 0;
 
 		int numCols = (int)reader.nextDouble();
 		int numRows = (int)reader.nextDouble();

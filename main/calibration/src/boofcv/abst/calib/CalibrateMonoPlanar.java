@@ -73,8 +73,6 @@ public class CalibrateMonoPlanar {
 
 	// Information on calibration targets and results
 	protected List<List<Point2D_F64>> observations = new ArrayList<List<Point2D_F64>>();
-	// observations with the y-axis inverted, if flipY is true
-	protected List<List<Point2D_F64>> observationsAdj = new ArrayList<List<Point2D_F64>>();
 	protected List<ImageResults> errors;
 
 	public boolean verbose = false;
@@ -145,7 +143,6 @@ public class CalibrateMonoPlanar {
 			adjusted.addAll(points);
 
 			observations.add(points);
-			observationsAdj.add(adjusted);
 			return true;
 		}
 	}
@@ -155,7 +152,6 @@ public class CalibrateMonoPlanar {
 	 */
 	public void removeLatestImage() {
 		observations.remove( observations.size() - 1 );
-		observationsAdj.remove( observationsAdj.size() - 1 );
 	}
 
 	/**
@@ -163,13 +159,13 @@ public class CalibrateMonoPlanar {
 	 * estimate calibration parameters.  Error statistics are also computed.
 	 */
 	public IntrinsicParameters process() {
-		if( !zhang99.process(observationsAdj) ) {
+		if( !zhang99.process(observations) ) {
 			throw new RuntimeException("Zhang99 algorithm failed!");
 		}
 
 		foundZhang = zhang99.getOptimized();
 
-		errors = computeErrors(observationsAdj, foundZhang,target.points);
+		errors = computeErrors(observations, foundZhang,target.points);
 
 		foundIntrinsic = foundZhang.convertToIntrinsic();
 		foundIntrinsic.width = widthImg;

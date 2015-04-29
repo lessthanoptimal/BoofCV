@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,11 +20,19 @@ package boofcv.alg.geo.calibration;
 
 import boofcv.abst.calib.ImageResults;
 import boofcv.alg.distort.ImageDistort;
+import boofcv.alg.distort.LensDistortionOps;
+import boofcv.alg.geo.RectifyImageOps;
+import boofcv.core.image.border.BorderType;
 import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.io.image.ConvertBufferedImage;
+import boofcv.struct.calib.IntrinsicParameters;
+import boofcv.struct.distort.PointTransform_F32;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageType;
 import boofcv.struct.image.MultiSpectral;
+import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_F64;
+import org.ejml.data.DenseMatrix64F;
 
 import javax.swing.*;
 import java.awt.*;
@@ -66,6 +74,7 @@ public class CalibratedImageGridPanel extends JPanel {
 	boolean showNumbers = true;
 
 	ImageDistort<ImageFloat32,ImageFloat32> undoRadial;
+	PointTransform_F32 remove_p_to_p;
 
 	// how much errors are scaled up
 	double errorScale;
@@ -171,29 +180,51 @@ public class CalibratedImageGridPanel extends JPanel {
 
 	private void drawFeatures(Graphics2D g2 , double scale) {
 		List<Point2D_F64> points = features.get(selectedImage);
+
+		Point2D_F32 adj = new Point2D_F32();
+
 		if( showPoints ) {
+
 			g2.setColor(Color.BLACK);
 			g2.setStroke(new BasicStroke(3));
 			for( Point2D_F64 p : points ) {
-				VisualizeFeatures.drawCross(g2, (int) (p.x*scale), (int) (p.y*scale), 4);
+				if( showUndistorted ) {
+					remove_p_to_p.compute((float)p.x,(float)p.y,adj);
+				} else {
+					adj.set((float)p.x,(float)p.y);
+				}
+				VisualizeFeatures.drawCross(g2, (int) (adj.x*scale), (int) (adj.y*scale), 4);
 			}
 			g2.setStroke(new BasicStroke(1));
 			g2.setColor(Color.RED);
 			for( Point2D_F64 p : points ) {
-				VisualizeFeatures.drawCross(g2, (int) (p.x*scale), (int) (p.y*scale), 4);
+				if( showUndistorted ) {
+					remove_p_to_p.compute((float)p.x,(float)p.y,adj);
+				} else {
+					adj.set((float)p.x,(float)p.y);
+				}
+				VisualizeFeatures.drawCross(g2, (int) (adj.x*scale), (int) (adj.y*scale), 4);
 			}
 		}
 
 		if( showAll ) {
 			for( List<Point2D_F64> l : features ) {
 				for( Point2D_F64 p : l ) {
-					VisualizeFeatures.drawPoint(g2,(int)(p.x*scale),(int)(p.y*scale),2,Color.BLUE);
+					if( showUndistorted ) {
+						remove_p_to_p.compute((float)p.x,(float)p.y,adj);
+					} else {
+						adj.set((float)p.x,(float)p.y);
+					}
+					VisualizeFeatures.drawPoint(g2,(int)(adj.x*scale),(int)(adj.y*scale),2,Color.BLUE);
 				}
 			}
 		}
 
 		if( showNumbers ) {
-			DetectCalibrationChessApp.drawNumbers(g2, points,scale);
+			if( showUndistorted )
+				DetectCalibrationChessApp.drawNumbers(g2, points,remove_p_to_p,scale);
+			else
+				DetectCalibrationChessApp.drawNumbers(g2, points,null,scale);
 		}
 
 		if( showErrors && results != null && results.size() > selectedImage ) {
@@ -205,12 +236,18 @@ public class CalibratedImageGridPanel extends JPanel {
 			for( int i = 0; i < points.size(); i++ ) {
 				Point2D_F64 p = points.get(i);
 
+				if( showUndistorted ) {
+					remove_p_to_p.compute((float)p.x,(float)p.y,adj);
+				} else {
+					adj.set((float)p.x,(float)p.y);
+				}
+
 				int r = (int)(errorScale*result.pointError[i]);
 				if( r < 1 )
 					continue;
 
-				int x = (int)(p.x*scale) - r;
-				int y = (int)(p.y*scale) - r;
+				int x = (int)(adj.x*scale) - r;
+				int y = (int)(adj.y*scale) - r;
 				int w = r*2+1;
 
 				g2.drawOval(x, y, w, w);
@@ -221,12 +258,18 @@ public class CalibratedImageGridPanel extends JPanel {
 			for( int i = 0; i < points.size(); i++ ) {
 				Point2D_F64 p = points.get(i);
 
+				if( showUndistorted ) {
+					remove_p_to_p.compute((float)p.x,(float)p.y,adj);
+				} else {
+					adj.set((float)p.x,(float)p.y);
+				}
+
 				int r = (int)(errorScale*result.pointError[i]);
 				if( r < 1 )
 					continue;
 
-				int x = (int)(p.x*scale) - r;
-				int y = (int)(p.y*scale) - r;
+				int x = (int)(adj.x*scale) - r;
+				int y = (int)(adj.y*scale) - r;
 				int w = r*2+1;
 
 				g2.drawOval(x, y, w, w);
@@ -234,8 +277,15 @@ public class CalibratedImageGridPanel extends JPanel {
 		}
 	}
 
-	public void setDistorted (ImageDistort<ImageFloat32,ImageFloat32> undoRadial ) {
-		this.undoRadial = undoRadial;
+	public void setDistorted ( IntrinsicParameters param , DenseMatrix64F rect ) {
+		if( rect == null ) {
+			this.undoRadial = LensDistortionOps.removeDistortion(
+					false, BorderType.VALUE, param, null, ImageType.single(ImageFloat32.class));
+			this.remove_p_to_p = LensDistortionOps.fullView(param, null, false);
+		} else {
+			this.undoRadial = RectifyImageOps.rectifyImage(param, rect, ImageFloat32.class);
+			this.remove_p_to_p = RectifyImageOps.transformPixelToRect_F32(param, rect);
+		}
 	}
 
 	public void setLine( int y ) {

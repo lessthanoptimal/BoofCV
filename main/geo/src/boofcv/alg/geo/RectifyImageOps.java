@@ -281,10 +281,6 @@ public class RectifyImageOps {
 	 * Rectification includes removal of lens distortion.  Used for rendering rectified images.
 	 * </p>
 	 *
-	 * <p>
-	 * The original image coordinate system is maintained even if the intrinsic parameter flipY is true.
-	 * </p>
-	 *
 	 * @param param Intrinsic parameters.
 	 * @param rectify Transform for rectifying the image.
 	 * @return Transform from rectified to unrectified pixels
@@ -305,10 +301,6 @@ public class RectifyImageOps {
 	 * <p>
 	 * Creates a transform that goes from rectified to original distorted pixel coordinates.
 	 * Rectification includes removal of lens distortion.  Used for rendering rectified images.
-	 * </p>
-	 *
-	 * <p>
-	 * The original image coordinate system is maintained even if the intrinsic parameter flipY is true.
 	 * </p>
 	 *
 	 * @param param Intrinsic parameters.
@@ -332,10 +324,6 @@ public class RectifyImageOps {
 	 * Creates a transform that applies rectification to unrectified distorted pixels.
 	 * </p>
 	 *
-	 * <p>
-	 * The original image coordinate system is maintained even if the intrinsic parameter flipY is true.
-	 * </p>
-	 *
 	 * @param param Intrinsic parameters.
 	 * @param rectify Transform for rectifying the image.
 	 * @return Transform from unrectified to rectified pixels
@@ -353,10 +341,6 @@ public class RectifyImageOps {
 	/**
 	 * <p>
 	 * Creates a transform that applies rectification to unrectified distorted pixels.
-	 * </p>
-	 *
-	 * <p>
-	 * The original image coordinate system is maintained even if the intrinsic parameter flipY is true.
 	 * </p>
 	 *
 	 * @param param Intrinsic parameters.
@@ -377,10 +361,6 @@ public class RectifyImageOps {
 	 * <p>
 	 * Creates a transform that applies rectification to unrectified distorted pixels and outputs
 	 * normalized pixel coordinates.
-	 * </p>
-	 *
-	 * <p>
-	 * The original image coordinate system is maintained even if the intrinsic parameter flipY is true.
 	 * </p>
 	 *
 	 * @param param Intrinsic parameters.

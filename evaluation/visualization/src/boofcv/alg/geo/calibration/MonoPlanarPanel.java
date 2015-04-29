@@ -19,9 +19,8 @@
 package boofcv.alg.geo.calibration;
 
 import boofcv.abst.calib.ImageResults;
-import boofcv.alg.distort.ImageDistort;
 import boofcv.gui.StandardAlgConfigPanel;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.calib.IntrinsicParameters;
 import georegression.struct.point.Point2D_F64;
 
 import javax.swing.*;
@@ -82,7 +81,6 @@ public class MonoPlanarPanel extends JPanel implements ItemListener ,
 
 	int errorScale = 20;
 
-	
 	public MonoPlanarPanel() {
 		super(new BorderLayout());
 
@@ -196,10 +194,10 @@ public class MonoPlanarPanel extends JPanel implements ItemListener ,
 		paramC.setText(textC);
 	}
 
-	public void setCorrection( ImageDistort<ImageFloat32,ImageFloat32> undoRadial )
+	public void setCorrection( IntrinsicParameters param )
 	{
 		checkUndistorted.setEnabled(true);
-		mainView.setDistorted(undoRadial);
+		mainView.setDistorted(param,null);
 	}
 
 	@Override

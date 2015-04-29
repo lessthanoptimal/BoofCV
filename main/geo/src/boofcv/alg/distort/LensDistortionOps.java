@@ -33,6 +33,7 @@ import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 import georegression.struct.shapes.RectangleLength2D_F32;
 import org.ejml.data.DenseMatrix64F;
+import org.ejml.ops.CommonOps;
 
 /**
  * Operations related to manipulating lens distortion in images
@@ -80,11 +81,11 @@ public class LensDistortionOps {
 		else
 			border = FactoryImageBorder.general(bandType,borderType);
 
-		PointTransform_F32 transform;
+		PointTransform_F32 undistToDist;
 		if( allInside)
-			transform = LensDistortionOps.allInside(param, paramAdj);
+			undistToDist = LensDistortionOps.allInside(param, paramAdj,true);
 		else
-			transform = LensDistortionOps.fullView(param,paramAdj);
+			undistToDist = LensDistortionOps.fullView(param,paramAdj,true);
 
 		ImageDistort<T,T> distort;
 
@@ -101,7 +102,7 @@ public class LensDistortionOps {
 				throw new RuntimeException("Unsupported image family: "+imageType.getFamily());
 		}
 
-		distort.setModel(new PointToPixelTransform_F32(transform));
+		distort.setModel(new PointToPixelTransform_F32(undistToDist));
 
 		return distort;
 	}
@@ -113,19 +114,17 @@ public class LensDistortionOps {
 	 * the "virtual" camera that is associated with the returned transformed.
 	 * </p>
 	 *
-	 * <p>
-	 * The original image coordinate system is maintained even if the intrinsic parameter flipY is true.
-	 * </p>
-	 *
 	 * @param param Intrinsic camera parameters.
 	 * @param paramAdj If not null, the new camera parameters are stored here.
+	 * @param forwardTransform if true then the transform will be from undistorted to distorted pixels,
+	 *                         false for the opposite.
 	 * @return New transform that adjusts the view and removes lens distortion..
 	 */
 	public static PointTransform_F32 fullView( IntrinsicParameters param,
-											   IntrinsicParameters paramAdj ) {
+											   IntrinsicParameters paramAdj ,
+											   boolean forwardTransform ) {
 
-		PointTransform_F32 remove_p_to_p = distortTransform(param).undistort_F32(true,true);
-		PointTransform_F32 add_p_to_p = distortTransform(param).distort_F32(true, true);
+		PointTransform_F32 remove_p_to_p = distortTransform(param).undistort_F32(true, true);
 
 		RectangleLength2D_F32 bound = DistortImageOps.boundBox_F32(param.width, param.height,
 				new PointToPixelTransform_F32(remove_p_to_p));
@@ -142,7 +141,13 @@ public class LensDistortionOps {
 		// adjustment matrix
 		DenseMatrix64F A = new DenseMatrix64F(3,3,true,scale,0,deltaX,0,scale,deltaY,0,0,1);
 
-		return PerspectiveOps.adjustIntrinsic_F32(add_p_to_p, false, param, A, paramAdj);
+		if( forwardTransform ) {
+			PointTransform_F32 add_p_to_p = distortTransform(param).distort_F32(true, true);
+			return PerspectiveOps.adjustIntrinsic_F32(add_p_to_p, true, param, A, paramAdj);
+		} else {
+			CommonOps.invert(A);
+			return PerspectiveOps.adjustIntrinsic_F32(remove_p_to_p, false, param, A, paramAdj);
+		}
 	}
 
 	/**
@@ -151,18 +156,16 @@ public class LensDistortionOps {
 	 * view area. In other words no black regions which can cause problems for some image processing algorithms.
 	 * </p>
 	 *
-	 * <p>
-	 * The original image coordinate system is maintained even if the intrinsic parameter flipY is true.
-	 * </p>
-	 *
 	 * @param param Intrinsic camera parameters.
 	 * @param paramAdj If not null, the new camera parameters are stored here.
+	 * @param forwardTransform if true then the transform will be from undistorted to distorted pixels,
+	 *                         false for the opposite.
 	 * @return New transform that adjusts the view and removes lens distortion..
 	 */
 	public static PointTransform_F32 allInside( IntrinsicParameters param,
-												IntrinsicParameters paramAdj ) {
-		PointTransform_F32 remove_p_to_p = distortTransform(param).undistort_F32(true,true);
-		PointTransform_F32 add_p_to_p = distortTransform(param).distort_F32(true, true);
+												IntrinsicParameters paramAdj ,
+												boolean forwardTransform ) {
+		PointTransform_F32 remove_p_to_p = distortTransform(param).undistort_F32(true, true);
 
 		RectangleLength2D_F32 bound = LensDistortionOps.boundBoxInside(param.width, param.height,
 				new PointToPixelTransform_F32(remove_p_to_p));
@@ -182,7 +185,13 @@ public class LensDistortionOps {
 		// adjustment matrix
 		DenseMatrix64F A = new DenseMatrix64F(3,3,true,scale,0,deltaX,0,scale,deltaY,0,0,1);
 
-		return PerspectiveOps.adjustIntrinsic_F32(add_p_to_p, false, param, A, paramAdj);
+		if( forwardTransform ) {
+			PointTransform_F32 add_p_to_p = distortTransform(param).distort_F32(true, true);
+			return PerspectiveOps.adjustIntrinsic_F32(add_p_to_p, true, param, A, paramAdj);
+		} else {
+			CommonOps.invert(A);
+			return PerspectiveOps.adjustIntrinsic_F32(remove_p_to_p, false, param, A, paramAdj);
+		}
 	}
 
 	/**

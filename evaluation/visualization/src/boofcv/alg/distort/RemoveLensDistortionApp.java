@@ -85,9 +85,9 @@ public class RemoveLensDistortionApp extends SelectAlgorithmAndInputPanel {
 		// add different types of adjustments
 		PointTransform_F32 add_p_to_p = LensDistortionOps.distortTransform(param).distort_F32(true,true);
 		addUndistorted("No Adjustment", add_p_to_p);
-		PointTransform_F32 allInside = LensDistortionOps.allInside(param, null);
+		PointTransform_F32 allInside = LensDistortionOps.allInside(param, null,true);
 		addUndistorted("All Inside", allInside);
-		PointTransform_F32 fullView = LensDistortionOps.fullView(param, null);
+		PointTransform_F32 fullView = LensDistortionOps.fullView(param, null,true);
 		addUndistorted("Full View", fullView);
 
 		hasProcessed = true;

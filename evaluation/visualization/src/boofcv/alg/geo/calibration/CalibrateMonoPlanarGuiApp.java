@@ -21,9 +21,6 @@ package boofcv.alg.geo.calibration;
 import boofcv.abst.calib.CalibrateMonoPlanar;
 import boofcv.abst.calib.ConfigChessboard;
 import boofcv.abst.calib.PlanarCalibrationDetector;
-import boofcv.alg.distort.ImageDistort;
-import boofcv.alg.distort.LensDistortionOps;
-import boofcv.core.image.border.BorderType;
 import boofcv.factory.calib.FactoryPlanarCalibrationTarget;
 import boofcv.gui.VisualizeApp;
 import boofcv.io.MediaManager;
@@ -34,7 +31,6 @@ import boofcv.io.wrapper.DefaultMediaManager;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageType;
 
 import javax.swing.*;
 import java.awt.*;
@@ -140,10 +136,7 @@ public class CalibrateMonoPlanarGuiApp extends JPanel
 		// tell it how to undistort the image
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
-
-				ImageDistort<ImageFloat32,ImageFloat32> dist = LensDistortionOps.removeDistortion(
-						true, BorderType.VALUE, param, null, ImageType.single(ImageFloat32.class));
-				gui.setCorrection(dist);
+				gui.setCorrection(param);
 
 				gui.repaint();
 			}});

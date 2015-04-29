@@ -45,12 +45,6 @@ import java.io.Serializable;
  * Pixel coordinates are found x = K*[u;v]
  * </p>
  *
- * <p>
- * If flipY axis is true then the y-coordinate was transformed by, y = height - y - 1, (flipped along
- * the vertical axis) during calibration.  This is done to ensure that the image coordinate system has
- * the following characteristics, +Z axis points out of the camera optical axis and is right handed.
- * </p>
- *
  * @author Peter Abeles
  */
 // todo move distortion parameters into its own class?
