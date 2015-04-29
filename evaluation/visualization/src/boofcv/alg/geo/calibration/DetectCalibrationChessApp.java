@@ -324,24 +324,25 @@ public class DetectCalibrationChessApp<T extends ImageSingleBand, D extends Imag
 
 		DetectCalibrationChessApp app = new DetectCalibrationChessApp(ImageFloat32.class);
 
-		String prefix = "/media/pja/foobar/calib_images/";
+		String prefix = "../data/applet/calibration/mono/Sony_DSC-HX5V_Chess/";
 
-//		app.loadConfigurationFile(prefix + "info.txt");
-		app.configure(5,7);
+		app.loadConfigurationFile(prefix + "info.txt");
 
 //		app.setBaseDirectory(prefix);
 //		app.loadInputData(prefix+"images.txt");
 
 		List<PathLabel> inputs = new ArrayList<PathLabel>();
 
-		inputs.add(new PathLabel("View 01",prefix+"image00000.png"));
-		inputs.add(new PathLabel("View 02",prefix+"image00001.png"));
-		inputs.add(new PathLabel("View 03",prefix+"image00002.png"));
-		inputs.add(new PathLabel("View 04",prefix+"image00003.png"));
-		inputs.add(new PathLabel("View 05",prefix+"image00004.png"));
-		inputs.add(new PathLabel("View 07",prefix+"image00006.png"));
-		inputs.add(new PathLabel("View 08",prefix+"image00007.png"));
-		inputs.add(new PathLabel("View 11",prefix+"image00008.png"));
+		inputs.add(new PathLabel("View 01",prefix+"frame01.jpg"));
+		inputs.add(new PathLabel("View 02",prefix+"frame02.jpg"));
+		inputs.add(new PathLabel("View 03",prefix+"frame03.jpg"));
+		inputs.add(new PathLabel("View 04",prefix+"frame04.jpg"));
+		inputs.add(new PathLabel("View 05",prefix+"frame05.jpg"));
+		inputs.add(new PathLabel("View 06",prefix+"frame06.jpg"));
+		inputs.add(new PathLabel("View 07",prefix+"frame07.jpg"));
+		inputs.add(new PathLabel("View 08",prefix+"frame08.jpg"));
+		inputs.add(new PathLabel("View 11",prefix+"frame11.jpg"));
+		inputs.add(new PathLabel("View 12",prefix+"frame12.jpg"));
 
 		app.setInputList(inputs);
 

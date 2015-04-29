@@ -48,7 +48,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class CalibrateMonoPlanarGuiApp extends JPanel 
+public class CalibrateMonoPlanarGuiApp extends JPanel
 		implements VisualizeApp {
 
 	// computes calibration parameters
@@ -60,12 +60,12 @@ public class CalibrateMonoPlanarGuiApp extends JPanel
 
 	List<String> images;
 	MediaManager media = DefaultMediaManager.INSTANCE;
-	
+
 	public CalibrateMonoPlanarGuiApp() {
 		setLayout(new BorderLayout());
 		setPreferredSize(new Dimension(800,525));
 		this.owner = this;
-		
+
 		add(gui,BorderLayout.CENTER);
 	}
 
@@ -89,7 +89,7 @@ public class CalibrateMonoPlanarGuiApp extends JPanel
 			System.err.println("Configuration failed");
 		}
 	}
-	
+
 	public void process( String outputFileName ) {
 		calibrator.reset();
 		final ProcessThread monitor = new ProcessThread();
@@ -113,7 +113,7 @@ public class CalibrateMonoPlanarGuiApp extends JPanel
 				}
 			}
 		}
-		
+
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				gui.setObservations(calibrator.getObservations());
@@ -199,8 +199,7 @@ public class CalibrateMonoPlanarGuiApp extends JPanel
 	public static void main( String args[] ) {
 //		PlanarCalibrationDetector detector = FactoryPlanarCalibrationTarget.detectorSquareGrid(new ConfigSquareGrid(15,15, 14.0/18.0));
 //		PlanarCalibrationDetector detector = FactoryPlanarCalibrationTarget.detectorSquareGrid(new ConfigSquareGrid(5,7));
-		PlanarCalibrationDetector detector = FactoryPlanarCalibrationTarget.
-				detectorChessboard(new ConfigChessboard(5,7));
+		PlanarCalibrationDetector detector = FactoryPlanarCalibrationTarget.detectorChessboard(new ConfigChessboard(5,7));
 
 //		PlanarCalibrationTarget target = FactoryPlanarCalibrationTarget.gridSquare(15, 15, 0.5, 7.0 / 18.0);
 //		PlanarCalibrationTarget target = FactoryPlanarCalibrationTarget.gridSquare(5, 7,30,30);
@@ -209,12 +208,12 @@ public class CalibrateMonoPlanarGuiApp extends JPanel
 //		String directory = "../data/evaluation/calibration/mono/Sony_DSC-HX5V_Square";
 //		String directory = "../data/evaluation/calibration/mono/Sony_DSC-HX5V_Chess";
 //		String directory = "../data/evaluation/calibration/mono/PULNiX_CCD_6mm_Zhang";
-		String directory = "/media/pja/foobar/calib_images";
+		String directory = "../data/evaluation/calibration/stereo/Bumblebee2_Chess";
 //		String directory = "../data/evaluation/calibration/stereo/Bumblebee2_Square";
 
 		CalibrateMonoPlanarGuiApp app = new CalibrateMonoPlanarGuiApp();
 //		app.configure(detector,target,BoofMiscOps.directoryList(directory, "frame" ),false);
-		app.configure(detector,target,BoofMiscOps.directoryList(directory, "image" ),false);
+		app.configure(detector,target,BoofMiscOps.directoryList(directory, "left" ),false);
 //		app.configure(detector,target,BoofMiscOps.directoryList(directory, "CalibIm" ),false);
 
 		JFrame frame = new JFrame("Planar Calibration");
