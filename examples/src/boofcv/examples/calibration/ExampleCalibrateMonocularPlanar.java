@@ -22,7 +22,6 @@ import boofcv.abst.calib.CalibrateMonoPlanar;
 import boofcv.abst.calib.ConfigChessboard;
 import boofcv.abst.calib.ConfigSquareGrid;
 import boofcv.abst.calib.PlanarCalibrationDetector;
-import boofcv.alg.geo.calibration.PlanarCalibrationTarget;
 import boofcv.factory.calib.FactoryPlanarCalibrationTarget;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
@@ -57,9 +56,6 @@ public class ExampleCalibrateMonocularPlanar {
 	// Detects the target and calibration point inside the target
 	PlanarCalibrationDetector detector;
 
-	// Description of the target's physical dimension
-	PlanarCalibrationTarget target;
-
 	// List of calibration images
 	List<String> images;
 
@@ -67,11 +63,8 @@ public class ExampleCalibrateMonocularPlanar {
 	 * Images from Zhang's website.  Square grid pattern.
 	 */
 	private void setupZhang99() {
-		// Use the wrapper below for square grid targets.
-		detector = FactoryPlanarCalibrationTarget.detectorSquareGrid(new ConfigSquareGrid(15, 15));
-
-		// physical description
-		target = FactoryPlanarCalibrationTarget.gridSquare(15, 15, 0.5, 7.0 / 18.0);
+		// Creates a detector and specifies its physical characteristics
+		detector = FactoryPlanarCalibrationTarget.detectorSquareGrid(new ConfigSquareGrid(15, 15, 0.5, 7.0 / 18.0));
 
 		// load image list
 		String directory = "../data/evaluation/calibration/mono/PULNiX_CCD_6mm_Zhang";
@@ -82,11 +75,8 @@ public class ExampleCalibrateMonocularPlanar {
 	 * Images collected from a Bumblee Bee stereo camera.  Large amounts of radial distortion. Chessboard pattern.
 	 */
 	private void setupBumbleBee() {
-		// Use the wrapper below for chessboard targets.
-		detector = FactoryPlanarCalibrationTarget.detectorChessboard(new ConfigChessboard(5,7));
-
-		// physical description
-		target = FactoryPlanarCalibrationTarget.gridChess(5, 7, 30);
+		// Creates a detector and specifies its physical characteristics
+		detector = FactoryPlanarCalibrationTarget.detectorChessboard(new ConfigChessboard(5,7, 30));
 
 		// load image list
 		String directory = "../data/evaluation/calibration/stereo/Bumblebee2_Chess";
@@ -102,7 +92,7 @@ public class ExampleCalibrateMonocularPlanar {
 		CalibrateMonoPlanar calibrationAlg = new CalibrateMonoPlanar(detector);
 
 		// tell it type type of target and which parameters to estimate
-		calibrationAlg.configure(target, true, 2, false);
+		calibrationAlg.configure( true, 2, false);
 
 		for( String n : images ) {
 			BufferedImage input = UtilImageIO.loadImage(n);

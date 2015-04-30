@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -42,25 +42,24 @@ public class TestZhang99ComputeTargetHomography {
 	@Test
 	public void basicTest() {
 		// create a grid an apply an arbitrary transform to it
-		PlanarCalibrationTarget config = GenericCalibrationGrid.createStandardConfig();
+		List<Point2D_F64> layout = GenericCalibrationGrid.standardLayout();
 
 		DenseMatrix64F R = RotationMatrixGenerator.eulerXYZ(0.02,-0.05,0.01,null);
 		Vector3D_F64 T = new Vector3D_F64(0,0,-1000);
 		Se3_F64 motion = new Se3_F64(R,T);
 
-		List<Point2D_F64> observations = GenericCalibrationGrid.observations(motion,config);
+		List<Point2D_F64> observations = GenericCalibrationGrid.observations(motion,layout);
 
 		// compute the homography
-		Zhang99ComputeTargetHomography alg = new Zhang99ComputeTargetHomography(config.points);
+		Zhang99ComputeTargetHomography alg = new Zhang99ComputeTargetHomography(layout);
 
 		assertTrue(alg.computeHomography(observations));
 
 		DenseMatrix64F H = alg.getHomography();
 
 		// test this homography property: x2 = H*x1
-		List<Point2D_F64> gridPoints = config.points;
 		for( int i = 0; i < observations.size(); i++ ) {
-			Point2D_F64 a = GeometryMath_F64.mult(H, gridPoints.get(i), new Point2D_F64());
+			Point2D_F64 a = GeometryMath_F64.mult(H, layout.get(i), new Point2D_F64());
 
 			double diff = a.distance(observations.get(i));
 			assertEquals(0,diff,1e-8);

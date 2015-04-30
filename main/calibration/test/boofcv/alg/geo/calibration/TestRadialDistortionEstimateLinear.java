@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -46,13 +46,13 @@ public class TestRadialDistortionEstimateLinear {
 		DenseMatrix64F K = GenericCalibrationGrid.createStandardCalibration();
 		List<DenseMatrix64F> homographies = GenericCalibrationGrid.createHomographies(K, 2, rand);
 
-		PlanarCalibrationTarget config = GenericCalibrationGrid.createStandardConfig();
+		List<Point2D_F64> layout = GenericCalibrationGrid.standardLayout();
 
 		List<List<Point2D_F64>> observations = new ArrayList<List<Point2D_F64>>();
 
 		for( DenseMatrix64F H : homographies ) {
 			// in calibrated image coordinates
-			List<Point2D_F64> pixels = GenericCalibrationGrid.observations(H, config);
+			List<Point2D_F64> pixels = GenericCalibrationGrid.observations(H, layout);
 			// apply distortion
 			for( Point2D_F64 p : pixels ) {
 				distort(p, distort);
@@ -65,7 +65,7 @@ public class TestRadialDistortionEstimateLinear {
 			observations.add( pixels );
 		}
 
-		RadialDistortionEstimateLinear alg = new RadialDistortionEstimateLinear(config,distort.length);
+		RadialDistortionEstimateLinear alg = new RadialDistortionEstimateLinear(layout,distort.length);
 
 		alg.process(K,homographies,observations);
 

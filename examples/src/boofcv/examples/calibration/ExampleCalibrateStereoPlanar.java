@@ -22,7 +22,6 @@ import boofcv.abst.calib.CalibrateStereoPlanar;
 import boofcv.abst.calib.ConfigChessboard;
 import boofcv.abst.calib.ConfigSquareGrid;
 import boofcv.abst.calib.PlanarCalibrationDetector;
-import boofcv.alg.geo.calibration.PlanarCalibrationTarget;
 import boofcv.factory.calib.FactoryPlanarCalibrationTarget;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
@@ -57,9 +56,6 @@ public class ExampleCalibrateStereoPlanar {
 	// Detects the target and calibration point inside the target
 	PlanarCalibrationDetector detector;
 
-	// Description of the target's physical dimension
-	PlanarCalibrationTarget target;
-
 	// List of calibration images
 	List<String> left;
 	List<String> right;
@@ -68,10 +64,8 @@ public class ExampleCalibrateStereoPlanar {
 	 * Square grid target taken by a PtGrey Bumblebee camera.
 	 */
 	public void setupBumblebeeSquare() {
-		// Use the wrapper below for square grid targets.
-		detector = FactoryPlanarCalibrationTarget.detectorSquareGrid(new ConfigSquareGrid(5,7));
-		// Target physical description
-		target = FactoryPlanarCalibrationTarget.gridSquare(5, 7, 30,30);
+		// Creates a detector and specifies its physical characteristics
+		detector = FactoryPlanarCalibrationTarget.detectorSquareGrid(new ConfigSquareGrid(5, 7, 30, 30));
 
 		String directory = "../data/evaluation/calibration/stereo/Bumblebee2_Square";
 
@@ -83,10 +77,8 @@ public class ExampleCalibrateStereoPlanar {
 	 * Chessboard target taken by a PtGrey Bumblebee camera.
 	 */
 	public void setupBumblebeeChess() {
-		// Use the wrapper below for chessboard targets.
-		detector = FactoryPlanarCalibrationTarget.detectorChessboard(new ConfigChessboard(5,7));
-		// Target physical description
-		target = FactoryPlanarCalibrationTarget.gridChess(5, 7, 30);
+		// Creates a detector and specifies its physical characteristics
+		detector = FactoryPlanarCalibrationTarget.detectorChessboard(new ConfigChessboard(5,7, 30));
 
 		String directory = "../data/evaluation/calibration/stereo/Bumblebee2_Chess";
 
@@ -100,7 +92,7 @@ public class ExampleCalibrateStereoPlanar {
 	public void process() {
 		// Declare and setup the calibration algorithm
 		CalibrateStereoPlanar calibratorAlg = new CalibrateStereoPlanar(detector);
-		calibratorAlg.configure(target, true, 2, false);
+		calibratorAlg.configure(true, 2, false);
 
 		// ensure the lists are in the same order
 		Collections.sort(left);

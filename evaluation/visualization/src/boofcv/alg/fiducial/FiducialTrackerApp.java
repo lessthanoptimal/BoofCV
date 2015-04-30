@@ -171,7 +171,7 @@ public class FiducialTrackerApp<I extends ImageSingleBand>
 			d.addTarget(ConvertBufferedImage.convertFromSingle(text,null,imageClass),length,125);
 
 		} else if( name.compareTo(CALIB_CHESS) == 0 ) {
-			detector = FactoryFiducial.calibChessboard(new ConfigChessboard(5,7), 0.03, imageClass);
+			detector = FactoryFiducial.calibChessboard(new ConfigChessboard(5,7,0.03), imageClass);
 		} else {
 			throw new RuntimeException("Unknown selection");
 		}

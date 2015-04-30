@@ -98,7 +98,7 @@ public class DetectCalibrationChessApp<T extends ImageSingleBand, D extends Imag
 	}
 
 	public void configure( int numCols , int numRows ) {
-		ConfigChessboard config = new ConfigChessboard(numCols,numRows);
+		ConfigChessboard config = new ConfigChessboard(numCols,numRows,30);
 
 		alg = new DetectChessCalibrationPoints<T,D>(numCols,numRows,5,2,imageType);
 
@@ -115,7 +115,7 @@ public class DetectCalibrationChessApp<T extends ImageSingleBand, D extends Imag
 		if( !reader.read(r) )
 			throw new RuntimeException("Parsing configuration failed");
 
-		if( reader.remainingTokens() != 6) {
+		if( reader.remainingTokens() != 7) {
 			while( reader.remainingTokens() != 0 ) {
 				System.out.println("token: "+reader.nextString());
 			}
@@ -126,6 +126,8 @@ public class DetectCalibrationChessApp<T extends ImageSingleBand, D extends Imag
 			throw new RuntimeException("Not a chessboard config file");
 		}
 
+		int numRadial = (int)reader.nextDouble();
+		boolean includeTangential = reader.nextString().compareTo("true") == 0;
 		boolean zeroSkew = reader.nextString().compareTo("true") == 0;
 
 		int numCols = (int)reader.nextDouble();

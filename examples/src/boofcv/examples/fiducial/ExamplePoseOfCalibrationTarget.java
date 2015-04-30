@@ -72,9 +72,8 @@ public class ExamplePoseOfCalibrationTarget {
 
 		// Let's use the FiducialDetector interface since it is much easier than coding up
 		// the entire thing ourselves.  Look at FiducialDetector's code if you want to understand how it works.
-		double sizeOfSquareInMeters = 0.03;
 		CalibrationFiducialDetector<ImageFloat32> detector =
-				FactoryFiducial.calibChessboard(new ConfigChessboard(5, 4),sizeOfSquareInMeters,ImageFloat32.class);
+				FactoryFiducial.calibChessboard(new ConfigChessboard(5, 4, 0.03),ImageFloat32.class);
 
 		detector.setIntrinsic(intrinsic);
 

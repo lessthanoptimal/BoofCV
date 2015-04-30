@@ -21,7 +21,6 @@ package boofcv.calibration;
 import boofcv.abst.calib.CalibrateMonoPlanar;
 import boofcv.abst.calib.ImageResults;
 import boofcv.alg.geo.calibration.CalibrationPlanarGridZhang99;
-import boofcv.alg.geo.calibration.PlanarCalibrationTarget;
 import boofcv.alg.geo.calibration.Zhang99ParamAll;
 import georegression.geometry.RotationMatrixGenerator;
 import georegression.struct.point.Point2D_F64;
@@ -118,18 +117,18 @@ public class ComputeZhangErrors {
 	 * as the initial value when optimizing to see if the focal length stays the same.
 	 */
 	public static void nonlinearUsingZhang(List<List<Point2D_F64>> observations ,
-										   PlanarCalibrationTarget target) {
+										   List<Point2D_F64> layout) {
 		Zhang99ParamAll param = getZhangParam();
 		Zhang99ParamAll found = new Zhang99ParamAll(false,2,false,5);
 
 		// perform non-linear optimization to improve results
 		// NOTE: constructor doesn't matter
-		CalibrationPlanarGridZhang99 alg = new CalibrationPlanarGridZhang99(target,false,1,false);
-		alg.optimizedParam(observations,target.points,param,found,null);
+		CalibrationPlanarGridZhang99 alg = new CalibrationPlanarGridZhang99(layout,false,1,false);
+		alg.optimizedParam(observations,layout,param,found,null);
 
 		found.convertToIntrinsic().print();
 		List<ImageResults> errors =
-				CalibrateMonoPlanar.computeErrors(observations, found, target.points);
+				CalibrateMonoPlanar.computeErrors(observations, found, layout);
 		CalibrateMonoPlanar.printErrors(errors);
 	}
 }

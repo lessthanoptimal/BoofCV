@@ -65,32 +65,32 @@ public class CalibrationPlanarGridZhang99 {
 	// contains found parameters
 	private Zhang99ParamAll optimized;
 
-	// description of the calibration target with point locations
-	private PlanarCalibrationTarget target;
-
 	// optimization algorithm
 	private UnconstrainedLeastSquares optimizer;
 
 	// provides information on calibration status
 	private Listener listener;
 
+	// where calibration points are layout on the target.
+	private List<Point2D_F64> layout;
+
 	/**
 	 * Configures calibration process.
 	 *
-	 * @param target Description of the known calibration target
+	 * @param layout Layout of calibration points on the target
 	 * @param assumeZeroSkew Should it assumed the camera has zero skew. Typically true.
 	 * @param numRadialParam Number of radial distortion parameters to consider.  Typically 0,1,2.
 	 * @param includeTangential Should it include tangential distortion?
 	 */
-	public CalibrationPlanarGridZhang99(PlanarCalibrationTarget target,
+	public CalibrationPlanarGridZhang99(List<Point2D_F64> layout,
 										boolean assumeZeroSkew,
 										int numRadialParam,
 										boolean includeTangential )
 	{
-		computeHomography = new Zhang99ComputeTargetHomography(target.points);
+		this.layout = layout;
+		computeHomography = new Zhang99ComputeTargetHomography(layout);
 		computeK = new Zhang99CalibrationMatrixFromHomographies(assumeZeroSkew);
-		computeRadial = new RadialDistortionEstimateLinear(target,numRadialParam);
-		this.target = target;
+		computeRadial = new RadialDistortionEstimateLinear(layout,numRadialParam);
 		optimized = new Zhang99ParamAll(assumeZeroSkew,numRadialParam,includeTangential);
 	}
 
@@ -121,7 +121,7 @@ public class CalibrationPlanarGridZhang99 {
 
 		status("Non-linear refinement");
 		// perform non-linear optimization to improve results
-		if( !optimizedParam(observations,target.points,initial,optimized,optimizer))
+		if( !optimizedParam(observations,layout,initial,optimized,optimizer))
 			return false;
 
 		return true;

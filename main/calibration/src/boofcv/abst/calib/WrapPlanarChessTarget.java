@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,6 +22,7 @@ import boofcv.alg.feature.detect.chess.DetectChessCalibrationPoints;
 import boofcv.struct.image.ImageFloat32;
 import georegression.struct.point.Point2D_F64;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -33,6 +34,8 @@ public class WrapPlanarChessTarget implements PlanarCalibrationDetector {
 
 	DetectChessCalibrationPoints<ImageFloat32,ImageFloat32> alg;
 
+	List<Point2D_F64> layoutPoints;
+
 	public WrapPlanarChessTarget(ConfigChessboard config ) {
 		alg = new DetectChessCalibrationPoints<ImageFloat32, ImageFloat32>(
 				config.numCols,config.numRows,config.nonmaxRadius,
@@ -40,6 +43,8 @@ public class WrapPlanarChessTarget implements PlanarCalibrationDetector {
 		alg.setUserBinaryThreshold(config.binaryGlobalThreshold);
 		alg.setUserAdaptiveRadius(config.binaryAdaptiveRadius);
 		alg.setUserAdaptiveBias(config.binaryAdaptiveBias);
+
+		layoutPoints = gridChess(config.numCols,config.numRows,config.squareWidth);
 	}
 
 	@Override
@@ -48,12 +53,50 @@ public class WrapPlanarChessTarget implements PlanarCalibrationDetector {
 	}
 
 	@Override
-	public List<Point2D_F64> getPoints() {
+	public List<Point2D_F64> getDetectedPoints() {
 		// points should be at sub-pixel accuracy and in the correct orientation
 		return alg.getPoints();
 	}
 
+	@Override
+	public List<Point2D_F64> getLayout() {
+		return layoutPoints;
+	}
+
 	public DetectChessCalibrationPoints<ImageFloat32, ImageFloat32> getAlg() {
 		return alg;
+	}
+
+	/**
+	 * This target is composed of a checkered chess board like squares.  Each corner of an interior square
+	 * touches an adjacent square, but the sides are separated.  Only interior square corners provide
+	 * calibration points.
+	 *
+	 * @param numCols Number of grid columns in the calibration target
+	 * @param numRows Number of grid rows in the calibration target
+	 * @param squareWidth How wide each square is.  Units are target dependent.
+	 * @return Target description
+	 */
+	public static List<Point2D_F64> gridChess( int numCols , int numRows , double squareWidth )
+	{
+		List<Point2D_F64> all = new ArrayList<Point2D_F64>();
+
+		// convert it into the number of calibration points
+		numCols = numCols - 1;
+		numRows = numRows - 1;
+
+		// center the grid around the origin. length of a size divided by two
+		double startX = -((numCols-1)*squareWidth)/2.0;
+		double startY = -((numRows-1)*squareWidth)/2.0;
+
+		for( int i = numRows-1; i >= 0; i-- ) {
+			double y = startY+i*squareWidth;
+			for( int j = 0; j < numCols; j++ ) {
+				double x = startX+j*squareWidth;
+				all.add( new Point2D_F64(x,y));
+			}
+		}
+
+		return all;
 	}
 }

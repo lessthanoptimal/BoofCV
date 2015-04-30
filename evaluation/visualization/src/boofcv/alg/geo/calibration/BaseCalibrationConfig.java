@@ -43,7 +43,6 @@ public class BaseCalibrationConfig {
 	public int numRadial;
 	public boolean includeTangential;
 	public PlanarCalibrationDetector detector;
-	public PlanarCalibrationTarget target;
 
 	public BaseCalibrationConfig(MediaManager media) {
 		this.media = media;
@@ -73,11 +72,9 @@ public class BaseCalibrationConfig {
 
 		if( type.compareToIgnoreCase("square") == 0 ) {
 			double space = reader.nextDouble();
-			detector = FactoryPlanarCalibrationTarget.detectorSquareGrid(new ConfigSquareGrid(numCols, numRows));
-			target = FactoryPlanarCalibrationTarget.gridSquare(numCols, numRows, width, space);
+			detector = FactoryPlanarCalibrationTarget.detectorSquareGrid(new ConfigSquareGrid(numCols, numRows,width, space));
 		} else if( type.compareToIgnoreCase("chess") == 0 ) {
-			detector = FactoryPlanarCalibrationTarget.detectorChessboard(new ConfigChessboard(numCols, numRows));
-			target = FactoryPlanarCalibrationTarget.gridChess(numCols,numRows,width);
+			detector = FactoryPlanarCalibrationTarget.detectorChessboard(new ConfigChessboard(numCols, numRows,width));
 		} else {
 			throw new RuntimeException("Unknown type: "+type);
 		}
@@ -89,9 +86,5 @@ public class BaseCalibrationConfig {
 
 	public PlanarCalibrationDetector getDetector() {
 		return detector;
-	}
-
-	public PlanarCalibrationTarget getTarget() {
-		return target;
 	}
 }

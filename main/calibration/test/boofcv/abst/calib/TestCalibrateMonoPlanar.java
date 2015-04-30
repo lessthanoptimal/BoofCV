@@ -18,8 +18,6 @@
 
 package boofcv.abst.calib;
 
-import boofcv.alg.geo.calibration.PlanarCalibrationTarget;
-import boofcv.factory.calib.FactoryPlanarCalibrationTarget;
 import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.image.ImageFloat32;
 import georegression.geometry.GeometryMath_F64;
@@ -40,7 +38,6 @@ import java.util.List;
 public class TestCalibrateMonoPlanar {
 
 	List<Se3_F64> pose = new ArrayList<Se3_F64>();
-	PlanarCalibrationTarget target = FactoryPlanarCalibrationTarget.gridChess(3, 4, 30);
 	DenseMatrix64F K = new DenseMatrix64F(3,3,true,300,0,250,0,350,400,0,0,1);
 	int width = 500;
 	int height = 600;
@@ -62,7 +59,7 @@ public class TestCalibrateMonoPlanar {
 
 		CalibrateMonoPlanar alg = new CalibrateMonoPlanar(detector);
 
-		alg.configure(target,false,2,false);
+		alg.configure(false,2,false);
 
 		for( int i = 0; i < pose.size(); i++ )
 			alg.addImage(new ImageFloat32(width,height));
@@ -76,6 +73,8 @@ public class TestCalibrateMonoPlanar {
 
 		List<Point2D_F64> obs;
 
+		List<Point2D_F64> layout = WrapPlanarSquareGridTarget.createLayout(3,4,30,30);
+
 		@Override
 		public boolean process(ImageFloat32 input) {
 
@@ -83,7 +82,7 @@ public class TestCalibrateMonoPlanar {
 
 			obs = new ArrayList<Point2D_F64>();
 
-			for( Point2D_F64 p2 : target.points ) {
+			for( Point2D_F64 p2 : layout ) {
 				Point3D_F64 p3 = new Point3D_F64(p2.x,p2.y,0);
 
 				Point3D_F64 a = SePointOps_F64.transform(se,p3,null);
@@ -108,8 +107,13 @@ public class TestCalibrateMonoPlanar {
 		}
 
 		@Override
-		public List<Point2D_F64> getPoints() {
+		public List<Point2D_F64> getDetectedPoints() {
 			return obs;
+		}
+
+		@Override
+		public List<Point2D_F64> getLayout() {
+			return layout;
 		}
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,7 +36,7 @@ public interface PlanarCalibrationDetector {
 	 * @param input Gray scale image containing calibration target
 	 * @return true if target was detected and false if not
 	 */
-	public boolean process( ImageFloat32 input );
+	boolean process( ImageFloat32 input );
 
 	/**
 	 * Returns the set of detected points.  Each time this function is invoked a new instance
@@ -44,5 +44,11 @@ public interface PlanarCalibrationDetector {
 	 *
 	 * @return List of detected points in row major grid order.
 	 */
-	public List<Point2D_F64> getPoints();
+	List<Point2D_F64> getDetectedPoints();
+
+	/**
+	 * Returns the layout of the calibration points on the target
+	 * @return List of calibration points
+	 */
+	List<Point2D_F64> getLayout();
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -16,23 +16,39 @@
  * limitations under the License.
  */
 
-package boofcv.alg.geo.calibration;
+package boofcv.abst.calib;
 
 import georegression.struct.point.Point2D_F64;
+import org.junit.Test;
 
 import java.util.List;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 /**
- * Specifies location of points on a planar calibration target
- *
  * @author Peter Abeles
  */
-public class PlanarCalibrationTarget {
+public class TestWrapPlanarSquareGridTarget {
+	@Test
+	public void stuff() {
+		fail("Implement");
+	}
 
-	// location of calibration points on calibration grid in world units
-	public List<Point2D_F64> points;
+	@Test
+	public void createLayout() {
+		List<Point2D_F64> l = WrapPlanarSquareGridTarget.createLayout(3,5,0.1,0.2);
 
-	public PlanarCalibrationTarget(List<Point2D_F64> points) {
-		this.points = points;
+		assertEquals(4*6,l.size());
+
+		double w = l.get(1).x - l.get(0).x;
+		double h = l.get(0).y - l.get(4).y ;
+
+		assertEquals(0.1,w,1e-8);
+		assertEquals(0.1,h,1e-8);
+
+		double s = l.get(2).x - l.get(1).x;
+
+		assertEquals(0.2, s, 1e-8);
 	}
 }

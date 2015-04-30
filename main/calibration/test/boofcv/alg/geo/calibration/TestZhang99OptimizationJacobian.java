@@ -18,7 +18,7 @@
 
 package boofcv.alg.geo.calibration;
 
-import boofcv.factory.calib.FactoryPlanarCalibrationTarget;
+import boofcv.abst.calib.WrapPlanarSquareGridTarget;
 import georegression.struct.point.Point2D_F64;
 import org.ddogleg.optimization.JacobianChecker;
 import org.junit.Test;
@@ -46,10 +46,9 @@ public class TestZhang99OptimizationJacobian {
 	}
 
 	private void compareToNumerical(boolean assumeZeroSkew, boolean includeTangential ) {
-		PlanarCalibrationTarget config = FactoryPlanarCalibrationTarget.gridSquare(1, 1, 30, 30);
 		Zhang99ParamAll param = GenericCalibrationGrid.createStandardParam(assumeZeroSkew, 2,includeTangential, 3, rand);
 
-		List<Point2D_F64> gridPts = config.points;
+		List<Point2D_F64> gridPts = WrapPlanarSquareGridTarget.createLayout(1,1,30,30);
 
 		List<List<Point2D_F64>> observations = new ArrayList<List<Point2D_F64>>();
 

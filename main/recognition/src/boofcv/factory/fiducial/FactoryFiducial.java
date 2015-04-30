@@ -129,25 +129,23 @@ public class FactoryFiducial {
 	 * Wrapper around chessboard calibration detector.
 	 *
 	 * @param config Description of the chessboard.
-	 * @param sizeOfSquares Physical size of each square.
 	 * @param imageType Type of image it's processing
 	 * @return FiducialDetector
 	 */
 	public static <T extends ImageSingleBand>
-	CalibrationFiducialDetector<T> calibChessboard( ConfigChessboard config, double sizeOfSquares,Class<T> imageType) {
-		return new CalibrationFiducialDetector<T>(config,sizeOfSquares,imageType);
+	CalibrationFiducialDetector<T> calibChessboard( ConfigChessboard config, Class<T> imageType) {
+		return new CalibrationFiducialDetector<T>(config,imageType);
 	}
 
 	/**
 	 * Wrapper around square-grid calibration detector.
 	 *
 	 * @param config Description of the chessboard.
-	 * @param sizeOfSquares Physical size of each square.
 	 * @param imageType Type of image it's processing
 	 * @return FiducialDetector
 	 */
 	public static <T extends ImageSingleBand>
-	CalibrationFiducialDetector<T> calibSquareGrid( ConfigSquareGrid config, double sizeOfSquares,Class<T> imageType) {
-		return new CalibrationFiducialDetector<T>(config,sizeOfSquares,imageType);
+	CalibrationFiducialDetector<T> calibSquareGrid( ConfigSquareGrid config, Class<T> imageType) {
+		return new CalibrationFiducialDetector<T>(config,imageType);
 	}
 }

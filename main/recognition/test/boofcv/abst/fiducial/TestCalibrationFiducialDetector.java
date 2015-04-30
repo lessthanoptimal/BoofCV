@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -58,6 +58,6 @@ public class TestCalibrationFiducialDetector extends GenericFiducialDetectorChec
 
 	@Override
 	public FiducialDetector createDetector(ImageType imageType) {
-		return FactoryFiducial.calibChessboard(new ConfigChessboard(5,7), 0.03, imageType.getImageClass());
+		return FactoryFiducial.calibChessboard(new ConfigChessboard(5,7,0.03), imageType.getImageClass());
 	}
 }

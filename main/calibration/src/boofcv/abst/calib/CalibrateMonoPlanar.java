@@ -19,7 +19,6 @@
 package boofcv.abst.calib;
 
 import boofcv.alg.geo.calibration.CalibrationPlanarGridZhang99;
-import boofcv.alg.geo.calibration.PlanarCalibrationTarget;
 import boofcv.alg.geo.calibration.Zhang99OptimizationFunction;
 import boofcv.alg.geo.calibration.Zhang99ParamAll;
 import boofcv.struct.calib.IntrinsicParameters;
@@ -64,8 +63,6 @@ public class CalibrateMonoPlanar {
 
 	// computes calibration parameters
 	protected CalibrationPlanarGridZhang99 zhang99;
-	// calibration configuration
-	protected PlanarCalibrationTarget target;
 
 	// computed parameters
 	protected Zhang99ParamAll foundZhang;
@@ -92,20 +89,18 @@ public class CalibrateMonoPlanar {
 
 	/**
 	 * Specify calibration assumptions.
-	 * 
-	 * @param target Description of the calibration target's physical layout.
+	 *
 	 * @param assumeZeroSkew If true then zero skew is assumed.  Typically this will be true.
 	 * @param numRadialParam Number of radial parameters. Typically set to 2.
 	 * @param includeTangential If true it will estimate tangential distortion parameters.
 	 *                          Try false then true
 	 */
-	public void configure( PlanarCalibrationTarget target ,
-						   boolean assumeZeroSkew ,
+	public void configure( boolean assumeZeroSkew ,
 						   int numRadialParam ,
 						   boolean includeTangential )
 	{
-		this.target = target;
-		zhang99 = new CalibrationPlanarGridZhang99(target,assumeZeroSkew,numRadialParam,includeTangential);
+		zhang99 = new CalibrationPlanarGridZhang99(
+				detector.getLayout(),assumeZeroSkew,numRadialParam,includeTangential);
 	}
 
 	/**
@@ -136,7 +131,7 @@ public class CalibrateMonoPlanar {
 		if( !detector.process(image) )
 			return false;
 		else {
-			observations.add(detector.getPoints());
+			observations.add(detector.getDetectedPoints());
 			return true;
 		}
 	}
@@ -159,7 +154,7 @@ public class CalibrateMonoPlanar {
 
 		foundZhang = zhang99.getOptimized();
 
-		errors = computeErrors(observations, foundZhang,target.points);
+		errors = computeErrors(observations, foundZhang,detector.getLayout());
 
 		foundIntrinsic = foundZhang.convertToIntrinsic();
 		foundIntrinsic.width = widthImg;
@@ -256,9 +251,5 @@ public class CalibrateMonoPlanar {
 
 	public IntrinsicParameters getIntrinsic() {
 		return foundIntrinsic;
-	}
-
-	public PlanarCalibrationTarget getTarget() {
-		return target;
 	}
 }

@@ -23,7 +23,6 @@ import boofcv.abst.calib.ConfigSquareGrid;
 import boofcv.abst.calib.PlanarCalibrationDetector;
 import boofcv.alg.distort.LensDistortionOps;
 import boofcv.alg.geo.PerspectiveOps;
-import boofcv.alg.geo.calibration.PlanarCalibrationTarget;
 import boofcv.alg.geo.calibration.Zhang99ComputeTargetHomography;
 import boofcv.alg.geo.calibration.Zhang99DecomposeHomography;
 import boofcv.core.image.GConvertImage;
@@ -50,8 +49,6 @@ public class CalibrationFiducialDetector<T extends ImageSingleBand>
 {
 	// detects the calibration target
 	PlanarCalibrationDetector detector;
-	// describes the calibration target's geometry
-	PlanarCalibrationTarget target;
 	// used to compute and decompose the homography
 	Zhang99ComputeTargetHomography computeH;
 	Zhang99DecomposeHomography decomposeH = new Zhang99DecomposeHomography();
@@ -76,36 +73,31 @@ public class CalibrationFiducialDetector<T extends ImageSingleBand>
 	/**
 	 * Configure it to detect chessboard style targets
 	 */
-	public CalibrationFiducialDetector(ConfigChessboard config, double sizeOfSquares,
+	public CalibrationFiducialDetector(ConfigChessboard config,
 									   Class<T> imageType) {
 		this.detector = FactoryPlanarCalibrationTarget.detectorChessboard(config);
-		this.target = FactoryPlanarCalibrationTarget.gridChess(config.numCols, config.numRows, sizeOfSquares);
 		this.type = ImageType.single(imageType);
 		this.converted = new ImageFloat32(1,1);
 
-		double sideWidth = config.numCols*sizeOfSquares;
-		double sideHeight = config.numRows*sizeOfSquares;
+		double sideWidth = config.numCols*config.squareWidth;
+		double sideHeight = config.numRows*config.squareWidth;
 
 		width = (sideWidth+sideHeight)/2.0;
 
-		computeH = new Zhang99ComputeTargetHomography(target.points);
+		computeH = new Zhang99ComputeTargetHomography(detector.getLayout());
 	}
 
 	/**
 	 * Configure it to detect square-grid style targets
 	 */
-	public CalibrationFiducialDetector(ConfigSquareGrid config, double sizeOfSquares,
+	public CalibrationFiducialDetector(ConfigSquareGrid config,
 									   Class<T> imageType) {
 		this.detector = FactoryPlanarCalibrationTarget.detectorSquareGrid(config);
 
-		double spaceWidth = sizeOfSquares*config.spaceToSquareRatio;
-
-		this.target = FactoryPlanarCalibrationTarget.gridSquare(
-				config.numCols, config.numRows,sizeOfSquares,spaceWidth);
 		this.type = ImageType.single(imageType);
 		this.converted = new ImageFloat32(1,1);
 
-		computeH = new Zhang99ComputeTargetHomography(target.points);
+		computeH = new Zhang99ComputeTargetHomography(detector.getLayout());
 	}
 
 	@Override
@@ -125,7 +117,7 @@ public class CalibrationFiducialDetector<T extends ImageSingleBand>
 			targetDetected = true;
 		}
 
-		List<Point2D_F64> points = detector.getPoints();
+		List<Point2D_F64> points = detector.getDetectedPoints();
 		for( Point2D_F64 p : points ) {
 			distortToUndistorted.compute(p.x,p.y,p);
 		}
@@ -176,6 +168,6 @@ public class CalibrationFiducialDetector<T extends ImageSingleBand>
 	}
 
 	public List<Point2D_F64> getCalibrationPoints() {
-		return target.points;
+		return detector.getLayout();
 	}
 }

@@ -56,6 +56,7 @@ public class WrapPlanarSquareGridTarget implements PlanarCalibrationDetector {
 	ImageFloat32 work2 = new ImageFloat32(1,1);
 
 	ConfigSquareGrid config;
+	List<Point2D_F64> layoutPoints;
 
 	public WrapPlanarSquareGridTarget( ConfigSquareGrid config ) {
 		this.config = config;
@@ -67,7 +68,12 @@ public class WrapPlanarSquareGridTarget implements PlanarCalibrationDetector {
 		pointColumns = (squareColumns/2+1)*2;
 		pointRows = (config.numRows/2+1)*2;
 
-		detect = new DetectSquareCalibrationPoints(config.relativeSizeThreshold,config.spaceToSquareRatio , squareColumns,config.numRows);
+		double spaceToSquareRatio = config.spaceWidth/config.squareWidth;
+
+		detect = new DetectSquareCalibrationPoints(config.relativeSizeThreshold,spaceToSquareRatio ,
+				squareColumns,config.numRows);
+
+		layoutPoints = createLayout(config.numCols,config.numRows,config.squareWidth,config.spaceWidth);
 	}
 
 	@Override
@@ -117,9 +123,61 @@ public class WrapPlanarSquareGridTarget implements PlanarCalibrationDetector {
 
 	}
 
+	/**
+	 * Creates a target that is composed of squares.  The squares are spaced out and each corner provides
+	 * a calibration point.
+	 *
+	 * @param numCols Number of column in each calibration target.  Must be odd.
+	 * @param numRows Number of rows in calibration target. Must be odd.
+	 * @param squareWidth How wide each square is. Units are target dependent.
+	 * @param spaceWidth Distance between the sides on each square.  Units are target dependent.
+	 * @return Target description
+	 */
+	public static List<Point2D_F64> createLayout( int numCols , int numRows , double squareWidth , double spaceWidth )
+	{
+		List<Point2D_F64> all = new ArrayList<Point2D_F64>();
+
+		// modify the size so that it's just the number of black squares in the grid
+		numCols = numCols/2 + 1;
+		numRows = numRows/2 + 1;
+
+		double width = (numCols*squareWidth + (numCols-1)*spaceWidth);
+		double height = (numRows*squareWidth + (numRows-1)*spaceWidth);
+
+		double startX = -width/2;
+		double startY = -height/2;
+
+		for( int i = numRows-1; i >= 0; i-- ) {
+			// this will be on the top of the black in the row
+			double y = startY + i*(squareWidth+spaceWidth);
+
+			List<Point2D_F64> top = new ArrayList<Point2D_F64>();
+			List<Point2D_F64> bottom = new ArrayList<Point2D_F64>();
+
+			for( int j = 0; j < numCols; j++ ) {
+				double x = startX + j*(squareWidth+spaceWidth);
+
+				top.add( new Point2D_F64(x,y));
+				top.add( new Point2D_F64(x+squareWidth,y));
+				bottom.add( new Point2D_F64(x,y-squareWidth));
+				bottom.add( new Point2D_F64(x + squareWidth, y - squareWidth));
+			}
+
+			all.addAll(top);
+			all.addAll(bottom);
+		}
+
+		return all;
+	}
+
 	@Override
-	public List<Point2D_F64> getPoints() {
+	public List<Point2D_F64> getDetectedPoints() {
 		return ret;
+	}
+
+	@Override
+	public List<Point2D_F64> getLayout() {
+		return layoutPoints;
 	}
 
 	public ImageUInt8 getBinary() {

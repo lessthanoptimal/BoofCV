@@ -67,7 +67,6 @@ public class CalibrateMonoPlanarGuiApp extends JPanel
 	}
 
 	public void configure( PlanarCalibrationDetector detector ,
-						   PlanarCalibrationTarget target,
 						   List<String> images  ,
 						   int numRadial, boolean includeTangential )
 	{
@@ -75,7 +74,7 @@ public class CalibrateMonoPlanarGuiApp extends JPanel
 			throw new IllegalArgumentException("No images!");
 		Collections.sort(images);
 		calibrator = new CalibrateMonoPlanar(detector);
-		calibrator.configure(target,true,numRadial,includeTangential);
+		calibrator.configure(true,numRadial,includeTangential);
 		this.images = images;
 	}
 
@@ -84,7 +83,7 @@ public class CalibrateMonoPlanarGuiApp extends JPanel
 		ParseMonoCalibrationConfig parser = new ParseMonoCalibrationConfig(media);
 
 		if( parser.parse(fileName) ) {
-			configure(parser.detector,parser.target,parser.images,
+			configure(parser.detector,parser.images,
 					parser.numRadial,parser.includeTangential);
 		} else {
 			System.err.println("Configuration failed");
@@ -197,13 +196,12 @@ public class CalibrateMonoPlanarGuiApp extends JPanel
 	}
 
 	public static void main( String args[] ) {
-//		PlanarCalibrationDetector detector = FactoryPlanarCalibrationTarget.detectorSquareGrid(new ConfigSquareGrid(15, 15, 14.0 / 18.0));
-//		PlanarCalibrationDetector detector = FactoryPlanarCalibrationTarget.detectorSquareGrid(new ConfigSquareGrid(5,7));
-		PlanarCalibrationDetector detector = FactoryPlanarCalibrationTarget.detectorChessboard(new ConfigChessboard(5, 7));
-//
-//		PlanarCalibrationTarget target = FactoryPlanarCalibrationTarget.gridSquare(15, 15, 0.5, 7.0 / 18.0);
-//		PlanarCalibrationTarget target = FactoryPlanarCalibrationTarget.gridSquare(5, 7,30,30);
-		PlanarCalibrationTarget target = FactoryPlanarCalibrationTarget.gridChess(5, 7, 30);
+//		PlanarCalibrationDetector detector =
+//				FactoryPlanarCalibrationTarget.detectorSquareGrid(new ConfigSquareGrid(15, 15, 0.5 , 7.0 / 18.0));
+//		PlanarCalibrationDetector detector =
+//				FactoryPlanarCalibrationTarget.detectorSquareGrid(new ConfigSquareGrid(5,7,30,30));
+		PlanarCalibrationDetector detector =
+				FactoryPlanarCalibrationTarget.detectorChessboard(new ConfigChessboard(5, 7,30));
 
 //		String directory = "../data/evaluation/calibration/mono/Sony_DSC-HX5V_Square";
 //		String directory = "../data/evaluation/calibration/mono/Sony_DSC-HX5V_Chess";
@@ -212,9 +210,9 @@ public class CalibrateMonoPlanarGuiApp extends JPanel
 //		String directory = "../data/evaluation/calibration/stereo/Bumblebee2_Square";
 
 		CalibrateMonoPlanarGuiApp app = new CalibrateMonoPlanarGuiApp();
-//		app.configure(detector,target,BoofMiscOps.directoryList(directory, "frame" ),2,false);
-		app.configure(detector,target,BoofMiscOps.directoryList(directory, "left" ),2,false);
-//		app.configure(detector,target,BoofMiscOps.directoryList(directory, "CalibIm" ),2,false);
+//		app.configure(detector,BoofMiscOps.directoryList(directory, "frame" ),2,false);
+		app.configure(detector,BoofMiscOps.directoryList(directory, "left" ),2,false);
+//		app.configure(detector,BoofMiscOps.directoryList(directory, "CalibIm" ),2,false);
 
 		JFrame frame = new JFrame("Planar Calibration");
 		frame.add(app, BorderLayout.CENTER);

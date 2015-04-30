@@ -19,11 +19,6 @@
 package boofcv.factory.calib;
 
 import boofcv.abst.calib.*;
-import boofcv.alg.geo.calibration.PlanarCalibrationTarget;
-import georegression.struct.point.Point2D_F64;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Creates descriptions of commonly used calibration targets
@@ -56,85 +51,5 @@ public class FactoryPlanarCalibrationTarget {
 		config.checkValidity();
 
 		return new WrapPlanarChessTarget(config);
-	}
-
-	/**
-	 * Creates a target that is composed of squares.  The squares are spaced out and each corner provides
-	 * a calibration point.
-	 *
-	 * @param numCols Number of column in each calibration target.  Must be odd.
-	 * @param numRows Number of rows in calibration target. Must be odd.
-	 * @param squareWidth How wide each square is. Units are target dependent.
-	 * @param spaceWidth Distance between the sides on each square.  Units are target dependent.
-	 * @return Target description
-	 */
-	public static PlanarCalibrationTarget gridSquare( int numCols , int numRows , double squareWidth , double spaceWidth )
-	{
-		List<Point2D_F64> all = new ArrayList<Point2D_F64>();
-
-		// modify the size so that it's just the number of black squares in the grid
-		numCols = numCols/2 + 1;
-		numRows = numRows/2 + 1;
-
-		double width = (numCols*squareWidth + (numCols-1)*spaceWidth);
-		double height = (numRows*squareWidth + (numRows-1)*spaceWidth);
-
-		double startX = -width/2;
-		double startY = -height/2;
-
-		for( int i = numRows-1; i >= 0; i-- ) {
-			// this will be on the top of the black in the row
-			double y = startY + i*(squareWidth+spaceWidth);
-
-			List<Point2D_F64> top = new ArrayList<Point2D_F64>();
-			List<Point2D_F64> bottom = new ArrayList<Point2D_F64>();
-
-			for( int j = 0; j < numCols; j++ ) {
-				double x = startX + j*(squareWidth+spaceWidth);
-
-				top.add( new Point2D_F64(x,y));
-				top.add( new Point2D_F64(x+squareWidth,y));
-				bottom.add( new Point2D_F64(x,y-squareWidth));
-				bottom.add( new Point2D_F64(x + squareWidth, y - squareWidth));
-			}
-			
-			all.addAll(top);
-			all.addAll(bottom);
-		}
-
-		return new PlanarCalibrationTarget(all);
-	}
-
-	/**
-	 * This target is composed of a checkered chess board like squares.  Each corner of an interior square
-	 * touches an adjacent square, but the sides are separated.  Only interior square corners provide
-	 * calibration points.
-	 *
-	 * @param numCols Number of grid columns in the calibration target
-	 * @param numRows Number of grid rows in the calibration target
-	 * @param squareWidth How wide each square is.  Units are target dependent.
-	 * @return Target description
-	 */
-	public static PlanarCalibrationTarget gridChess( int numCols , int numRows , double squareWidth )
-	{
-		List<Point2D_F64> all = new ArrayList<Point2D_F64>();
-
-		// convert it into the number of calibration points
-		numCols = numCols - 1;
-		numRows = numRows - 1;
-
-		// center the grid around the origin. length of a size divided by two
-		double startX = -((numCols-1)*squareWidth)/2.0;
-		double startY = -((numRows-1)*squareWidth)/2.0;
-
-		for( int i = numRows-1; i >= 0; i-- ) {
-			double y = startY+i*squareWidth;
-			for( int j = 0; j < numCols; j++ ) {
-				double x = startX+j*squareWidth;
-				all.add( new Point2D_F64(x,y));
-			}
-		}
-
-		return new PlanarCalibrationTarget(all);
 	}
 }

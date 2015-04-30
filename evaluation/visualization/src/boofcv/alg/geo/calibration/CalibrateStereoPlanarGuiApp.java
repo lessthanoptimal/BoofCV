@@ -170,13 +170,11 @@ public class CalibrateStereoPlanarGuiApp extends JPanel
 	 * correspond to images taken at the same time.
 	 *
 	 * @param detector Calibration target detector.
-	 * @param target Description of the target being detected.
 	 * @param assumeZeroSkew If true the skew parameter is assumed to be zero
 	 * @param leftImages Images taken by left camera.
 	 * @param rightImages Images taken by right camera.
 	 */
 	public void configure( PlanarCalibrationDetector detector ,
-						   PlanarCalibrationTarget target,
 						   int numRadial,
 						   boolean includeTangential,
 						   boolean assumeZeroSkew ,
@@ -186,7 +184,7 @@ public class CalibrateStereoPlanarGuiApp extends JPanel
 			throw new IllegalArgumentException("Number of left and right images must be the same");
 
 		calibrator = new CalibrateStereoPlanar(detector);
-		calibrator.configure(target,assumeZeroSkew,numRadial,includeTangential);
+		calibrator.configure(assumeZeroSkew,numRadial,includeTangential);
 		this.leftImages = leftImages;
 		this.rightImages = rightImages;
 	}
@@ -196,7 +194,7 @@ public class CalibrateStereoPlanarGuiApp extends JPanel
 		ParseStereoCalibrationConfig parser = new ParseStereoCalibrationConfig(media);
 
 		if( parser.parse(fileName) ) {
-			configure(parser.detector,parser.target,parser.numRadial,
+			configure(parser.detector,parser.numRadial,
 					parser.includeTangential,parser.assumeZeroSkew,
 					parser.getLeftImages(),parser.getRightImages());
 		} else {
@@ -241,11 +239,10 @@ public class CalibrateStereoPlanarGuiApp extends JPanel
 	}
 
 	public static void main( String args[] ) {
-//		PlanarCalibrationDetector detector = FactoryPlanarCalibrationTarget.detectorSquareGrid(new ConfigSquareGrid(5,7));
-		PlanarCalibrationDetector detector = FactoryPlanarCalibrationTarget.detectorChessboard(new ConfigChessboard(5,7));
-
-//		PlanarCalibrationTarget target = FactoryPlanarCalibrationTarget.gridSquare(5,7,30,30);
-		PlanarCalibrationTarget target = FactoryPlanarCalibrationTarget.gridChess(5, 7, 30);
+//		PlanarCalibrationDetector detector =
+//				FactoryPlanarCalibrationTarget.detectorSquareGrid(new ConfigSquareGrid(5,7,30,30));
+		PlanarCalibrationDetector detector =
+				FactoryPlanarCalibrationTarget.detectorChessboard(new ConfigChessboard(5,7,30));
 
 		String directory = "../data/evaluation/calibration/stereo/Bumblebee2_Chess";
 //		String directory = "../data/evaluation/calibration/stereo/Bumblebee2_Square";
@@ -257,7 +254,7 @@ public class CalibrateStereoPlanarGuiApp extends JPanel
 		Collections.sort(rightImages);
 
 		CalibrateStereoPlanarGuiApp app = new CalibrateStereoPlanarGuiApp();
-		app.configure(detector,target,2,false,true, leftImages,rightImages);
+		app.configure(detector,2,false,true, leftImages,rightImages);
 
 		JFrame frame = new JFrame("Planar Stereo Calibration");
 		frame.add(app, BorderLayout.CENTER);

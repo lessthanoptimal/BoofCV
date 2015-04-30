@@ -66,7 +66,6 @@ public class TestParseStereoCalibrationConfig {
 		
 		assertTrue(null!=parser.getDetector());
 		assertFalse(parser.assumeZeroSkew);
-		assertTrue(null!=parser.getTarget());
 		assertEquals(2,parser.getLeftImages().size());
 		assertEquals(2,parser.getRightImages().size());
 	}

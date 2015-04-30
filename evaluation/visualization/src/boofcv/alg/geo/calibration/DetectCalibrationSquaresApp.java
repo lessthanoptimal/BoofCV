@@ -341,7 +341,7 @@ public class DetectCalibrationSquaresApp
 	 */
 	private void detectTarget() {
 
-		ConfigChessboard config = new ConfigChessboard(1,1);
+		ConfigChessboard config = new ConfigChessboard(1,1,30);
 
 		if( calibGUI.isManual() ) {
 			GThresholdImageOps.threshold(gray,binary,calibGUI.getThresholdLevel(),true);

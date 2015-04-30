@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -55,27 +55,33 @@ public class ConfigSquareGrid implements Configuration {
 	public double binaryAdaptiveBias = -10;
 
 	/**
-	 * Length of the space relative to the length of a square in the grid
+	 * Physical width of the square.
 	 */
-	public double spaceToSquareRatio = 1.0;
+	public double squareWidth;
 
-	public ConfigSquareGrid(int numCols, int numRows ) {
+	/**
+	 * Physical width of hte space between each square
+	 */
+	public double spaceWidth;
+
+	public ConfigSquareGrid(int numCols, int numRows , double squareWidth , double spaceWidth  ) {
 		this.numCols = numCols;
 		this.numRows = numRows;
+		this.squareWidth = squareWidth;
+		this.spaceWidth = spaceWidth;
 	}
 
-	public ConfigSquareGrid(int numCols, int numRows , double spaceToSquareRatio ) {
-		this.numCols = numCols;
-		this.numRows = numRows;
-		this.spaceToSquareRatio = spaceToSquareRatio;
-	}
-
-	public ConfigSquareGrid(int numCols, int numRows, double spaceToSquareRatio ,
+	public ConfigSquareGrid(int numCols, int numRows, double squareWidth , double spaceWidth  ,
 							double relativeSizeThreshold) {
 		this.numCols = numCols;
 		this.numRows = numRows;
-		this.spaceToSquareRatio = spaceToSquareRatio;
+		this.squareWidth = squareWidth;
+		this.spaceWidth = spaceWidth;
 		this.relativeSizeThreshold = relativeSizeThreshold;
+	}
+
+	public double getSpacetoSquareRatio() {
+		return spaceWidth/squareWidth;
 	}
 
 	@Override
