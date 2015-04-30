@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -76,10 +76,14 @@ public class FactoryPlanarCalibrationTarget {
 		numCols = numCols/2 + 1;
 		numRows = numRows/2 + 1;
 
-		double startX = -(numCols*squareWidth + (numCols-1)*spaceWidth)/2;
-		double startY = -(numRows*squareWidth + (numRows-1)*spaceWidth)/2;
+		double width = (numCols*squareWidth + (numCols-1)*spaceWidth);
+		double height = (numRows*squareWidth + (numRows-1)*spaceWidth);
+
+		double startX = -width/2;
+		double startY = -height/2;
 
 		for( int i = numRows-1; i >= 0; i-- ) {
+			// this will be on the top of the black in the row
 			double y = startY + i*(squareWidth+spaceWidth);
 
 			List<Point2D_F64> top = new ArrayList<Point2D_F64>();
@@ -90,8 +94,8 @@ public class FactoryPlanarCalibrationTarget {
 
 				top.add( new Point2D_F64(x,y));
 				top.add( new Point2D_F64(x+squareWidth,y));
-				bottom.add( new Point2D_F64(x,y+squareWidth));
-				bottom.add( new Point2D_F64(x + squareWidth, y + squareWidth));
+				bottom.add( new Point2D_F64(x,y-squareWidth));
+				bottom.add( new Point2D_F64(x + squareWidth, y - squareWidth));
 			}
 			
 			all.addAll(top);

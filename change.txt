@@ -30,17 +30,20 @@ Version : Alpha 0.19
 - Created FactoryMultiViewRobust for simplifying the creation of robust versions of
   solutions to PnP, essential, homography
 - Camera Model
-  * Intrinsic parameters can now use a flow style assignment of parameters
   * Support for tangential distortion has been added
+  * Intrinsic parameters can now use a flow style assignment of parameters
   * Removed support for flipY to simplify the code.  Just flip the image if this is an issue.
   * Lens distortion.  More abstracted
+- Square grid calibration target
+  * Fixed.  Multiple bugs were introduced at some point in the past but were not caught due to the
+    lack of regression tests
 
 TODO
   * Distortion Model + Calibration
     - Update distortion visualization app to include tangential
-    - calibration apps.
-       * Automatically skip images which don't load or can't detect
-       * Always show the undistorted image for mono
+    - calibration regression
+       * given points compute parameters.  radial and tangential
+       * detect calibration points, chessboard and square grid.  many images
   * Square Detector.  Create set of images in validation boof with hand selected corners
                       Improve performance across a range of distances and orientations
   * Square Image: Better example image than the dog, which can have ambiguous orientation

@@ -136,13 +136,7 @@ public class CalibrateMonoPlanar {
 		if( !detector.process(image) )
 			return false;
 		else {
-			int h = image.getHeight();
-			List<Point2D_F64> points = detector.getPoints();
-			List<Point2D_F64> adjusted = new ArrayList<Point2D_F64>();
-
-			adjusted.addAll(points);
-
-			observations.add(points);
+			observations.add(detector.getPoints());
 			return true;
 		}
 	}

@@ -199,12 +199,11 @@ public class CalibrationPlanarGridZhang99 {
 		Zhang99OptimizationFunction func = new Zhang99OptimizationFunction(
 				initial.createNew(), grid,observations);
 
-// Both the numerical and analytical Jacobian appear to provide the same results, but the
-// unit test tolerance is so crude that I trust the numerical Jacobian more
-//		Zhang99OptimizationJacobian jacobian = new Zhang99OptimizationJacobian(
-//				initial.assumeZeroSkew,initial.distortion.length,observations.size(),grid);
+		Zhang99OptimizationJacobian jacobian = new Zhang99OptimizationJacobian(
+				initial.assumeZeroSkew,initial.radial.length,initial.includeTangential,
+				observations.size(),grid);
 
-		optimizer.setFunction(func,null);
+		optimizer.setFunction(func,jacobian);
 		optimizer.initialize(model,1e-10,1e-25*observations.size());
 
 		for( int i = 0; i < 500; i++ ) {

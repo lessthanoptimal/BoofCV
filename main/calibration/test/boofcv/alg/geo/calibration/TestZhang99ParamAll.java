@@ -28,7 +28,7 @@ import static org.junit.Assert.assertEquals;
 /**
  * @author Peter Abeles
  */
-public class TestZhang99Parameters {
+public class TestZhang99ParamAll {
 
 	Random rand = new Random(234);
 

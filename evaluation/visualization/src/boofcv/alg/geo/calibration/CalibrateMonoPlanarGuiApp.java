@@ -36,6 +36,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -70,6 +71,9 @@ public class CalibrateMonoPlanarGuiApp extends JPanel
 						   List<String> images  ,
 						   int numRadial, boolean includeTangential )
 	{
+		if( images.size() == 0 )
+			throw new IllegalArgumentException("No images!");
+		Collections.sort(images);
 		calibrator = new CalibrateMonoPlanar(detector);
 		calibrator.configure(target,true,numRadial,includeTangential);
 		this.images = images;
@@ -193,10 +197,10 @@ public class CalibrateMonoPlanarGuiApp extends JPanel
 	}
 
 	public static void main( String args[] ) {
-//		PlanarCalibrationDetector detector = FactoryPlanarCalibrationTarget.detectorSquareGrid(new ConfigSquareGrid(15,15, 14.0/18.0));
+//		PlanarCalibrationDetector detector = FactoryPlanarCalibrationTarget.detectorSquareGrid(new ConfigSquareGrid(15, 15, 14.0 / 18.0));
 //		PlanarCalibrationDetector detector = FactoryPlanarCalibrationTarget.detectorSquareGrid(new ConfigSquareGrid(5,7));
 		PlanarCalibrationDetector detector = FactoryPlanarCalibrationTarget.detectorChessboard(new ConfigChessboard(5, 7));
-
+//
 //		PlanarCalibrationTarget target = FactoryPlanarCalibrationTarget.gridSquare(15, 15, 0.5, 7.0 / 18.0);
 //		PlanarCalibrationTarget target = FactoryPlanarCalibrationTarget.gridSquare(5, 7,30,30);
 		PlanarCalibrationTarget target = FactoryPlanarCalibrationTarget.gridChess(5, 7, 30);

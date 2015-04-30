@@ -282,31 +282,6 @@ public class CalibratedImageGridPanel extends JPanel {
 			this.undoRadial = LensDistortionOps.removeDistortion(
 					false, BorderType.VALUE, param, null, ImageType.single(ImageFloat32.class));
 			this.remove_p_to_p = LensDistortionOps.fullView(param, null, false);
-
-			PointTransform_F32 a = LensDistortionOps.fullView(param, null,true);
-			PointTransform_F32 b = LensDistortionOps.fullView(param, null,false);
-
-			Point2D_F32 pta = new Point2D_F32();
-			Point2D_F32 ptb = new Point2D_F32();
-
-			a.compute(0,0,pta);
-			b.compute(pta.x, pta.y, ptb);
-
-			Point2D_F32 tl = new Point2D_F32();
-			Point2D_F32 tr = new Point2D_F32();
-			Point2D_F32 br = new Point2D_F32();
-			Point2D_F32 bl = new Point2D_F32();
-
-			int w = param.width-1;
-			int h = param.height-1;
-
-			PointTransform_F32 tran = LensDistortionOps.distortTransform(param).undistort_F32(true, true);
-			tran.compute(0,0,tl);
-			tran.compute(w,0,tr);
-			tran.compute(w,h,br);
-			tran.compute(0,h,bl);
-
-			System.out.println();
 		} else {
 			this.undoRadial = RectifyImageOps.rectifyImage(param, rect, ImageFloat32.class);
 			this.remove_p_to_p = RectifyImageOps.transformPixelToRect_F32(param, rect);

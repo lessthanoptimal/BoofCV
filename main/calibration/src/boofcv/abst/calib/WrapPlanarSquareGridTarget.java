@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,6 +23,7 @@ import boofcv.alg.feature.detect.grid.DetectSquareCalibrationPoints;
 import boofcv.alg.feature.detect.grid.RefineCalibrationGridCorner;
 import boofcv.alg.feature.detect.grid.UtilCalibrationGrid;
 import boofcv.alg.feature.detect.grid.refine.WrapRefineCornerSegmentFit;
+import boofcv.alg.feature.detect.quadblob.OrderPointsIntoGrid;
 import boofcv.alg.feature.detect.quadblob.QuadBlob;
 import boofcv.alg.filter.binary.GThresholdImageOps;
 import boofcv.struct.image.ImageFloat32;
@@ -100,8 +101,12 @@ public class WrapPlanarSquareGridTarget implements PlanarCalibrationDetector {
 					subpixel.add(p);
 			}
 
-			ret = UtilCalibrationGrid.rotatePoints(subpixel,
-					pointRows,pointColumns,
+			//TODO it was already ordered before subpixel.  can that be used again?
+			OrderPointsIntoGrid orderAlg = new OrderPointsIntoGrid();
+			List<Point2D_F64> ordered = orderAlg.process(subpixel);
+
+			ret = UtilCalibrationGrid.rotatePoints(ordered,
+					orderAlg.getNumRows(),orderAlg.getNumCols(),
 					pointRows,pointColumns);
 		} catch( InvalidCalibrationTarget e ) {
 //			e.printStackTrace();

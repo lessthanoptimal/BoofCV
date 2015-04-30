@@ -28,7 +28,7 @@ import georegression.struct.so.Rodrigues_F64;
  * <br>
  * Calibration matrix = [ a c x0 ; 0 b y0; 0 0 1];
  * </p>
- * Same as in the paper, but with the addition of tangental distortion terms.
+ * Same as in the paper, but with the addition of tangential distortion terms.
  *
  * @author Peter Abeles
  */
