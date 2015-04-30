@@ -63,7 +63,7 @@ public class DefaultMediaManager implements MediaManager {
 			b = UtilImageIO.loadImage(fileName);
 			
 			if( b == null )
-				throw new RuntimeException("Image cannot be found! "+fileName);
+				return null;
 			
 			cachedImage.put(fileName,b);
 		}

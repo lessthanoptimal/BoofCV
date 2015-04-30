@@ -98,6 +98,10 @@ public class CalibrateStereoPlanarGuiApp extends JPanel
 					System.out.println("Feature detection failed in:");
 					System.out.println(leftImages.get(i)+" and/or "+rightImages.get(i));
 				}
+			} else {
+				System.out.println("Failed to load left  = "+leftImages.get(i));
+				System.out.println("Failed to load right = "+rightImages.get(i));
+
 			}
 		}
 

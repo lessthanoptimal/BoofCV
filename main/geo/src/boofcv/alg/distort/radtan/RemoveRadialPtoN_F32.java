@@ -115,8 +115,7 @@ public class RemoveRadialPtoN_F32 implements PointTransform_F32 {
 		float origX = x = out.x;
 		float origY = y = out.y;
 
-		float prevSum = 0;
-
+		float prevX = x, prevY = y;
 		for( int iter = 0; iter < 20; iter++ ) {
 
 			// estimate the radial distance
@@ -135,10 +134,11 @@ public class RemoveRadialPtoN_F32 implements PointTransform_F32 {
 			x = (origX - tx)/(1+sum);
 			y = (origY - ty)/(1+sum);
 
-			if( Math.abs(prevSum-sum) <= tol ) {
+			if( Math.abs(prevX-x) <= tol && Math.abs(prevY-y) <= tol ) {
 				break;
 			} else {
-				prevSum = sum;
+				prevX = x;
+				prevY = y;
 			}
 		}
 		out.set(x,y);

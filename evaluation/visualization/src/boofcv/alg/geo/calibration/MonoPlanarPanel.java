@@ -152,7 +152,8 @@ public class MonoPlanarPanel extends JPanel implements ItemListener ,
 		return comp;
 	}
 	
-	public void addImage( String name , BufferedImage image ) {
+	public void addImage( String name , BufferedImage image )
+	{
 		names.add(name);
 		images.add(image);
 

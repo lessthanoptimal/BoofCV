@@ -108,6 +108,8 @@ public class CalibrateMonoPlanarGuiApp extends JPanel
 				} else {
 					System.out.println("Failed to detect image.  "+file.getName());
 				}
+			} else {
+				System.out.println("Failed to load "+images.get(i));
 			}
 		}
 

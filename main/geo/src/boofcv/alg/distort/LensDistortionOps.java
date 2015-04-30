@@ -116,13 +116,13 @@ public class LensDistortionOps {
 	 *
 	 * @param param Intrinsic camera parameters.
 	 * @param paramAdj If not null, the new camera parameters are stored here.
-	 * @param forwardTransform if true then the transform will be from undistorted to distorted pixels,
+	 * @param inputUndistorted if true then the transform will be from undistorted to distorted pixels,
 	 *                         false for the opposite.
 	 * @return New transform that adjusts the view and removes lens distortion..
 	 */
 	public static PointTransform_F32 fullView( IntrinsicParameters param,
 											   IntrinsicParameters paramAdj ,
-											   boolean forwardTransform ) {
+											   boolean inputUndistorted ) {
 
 		PointTransform_F32 remove_p_to_p = distortTransform(param).undistort_F32(true, true);
 
@@ -141,12 +141,13 @@ public class LensDistortionOps {
 		// adjustment matrix
 		DenseMatrix64F A = new DenseMatrix64F(3,3,true,scale,0,deltaX,0,scale,deltaY,0,0,1);
 
-		if( forwardTransform ) {
+		if( inputUndistorted ) {
 			PointTransform_F32 add_p_to_p = distortTransform(param).distort_F32(true, true);
-			return PerspectiveOps.adjustIntrinsic_F32(add_p_to_p, true, param, A, paramAdj);
+			// by setting forward false here the matrix is applied first
+			return PerspectiveOps.adjustIntrinsic_F32(add_p_to_p, false, param, A, paramAdj);
 		} else {
 			CommonOps.invert(A);
-			return PerspectiveOps.adjustIntrinsic_F32(remove_p_to_p, false, param, A, paramAdj);
+			return PerspectiveOps.adjustIntrinsic_F32(remove_p_to_p, true, param, A, paramAdj);
 		}
 	}
 
@@ -158,13 +159,13 @@ public class LensDistortionOps {
 	 *
 	 * @param param Intrinsic camera parameters.
 	 * @param paramAdj If not null, the new camera parameters are stored here.
-	 * @param forwardTransform if true then the transform will be from undistorted to distorted pixels,
+	 * @param inputUndistorted if true then the transform will be from undistorted to distorted pixels,
 	 *                         false for the opposite.
 	 * @return New transform that adjusts the view and removes lens distortion..
 	 */
 	public static PointTransform_F32 allInside( IntrinsicParameters param,
 												IntrinsicParameters paramAdj ,
-												boolean forwardTransform ) {
+												boolean inputUndistorted ) {
 		PointTransform_F32 remove_p_to_p = distortTransform(param).undistort_F32(true, true);
 
 		RectangleLength2D_F32 bound = LensDistortionOps.boundBoxInside(param.width, param.height,
@@ -185,12 +186,12 @@ public class LensDistortionOps {
 		// adjustment matrix
 		DenseMatrix64F A = new DenseMatrix64F(3,3,true,scale,0,deltaX,0,scale,deltaY,0,0,1);
 
-		if( forwardTransform ) {
+		if( inputUndistorted ) {
 			PointTransform_F32 add_p_to_p = distortTransform(param).distort_F32(true, true);
-			return PerspectiveOps.adjustIntrinsic_F32(add_p_to_p, true, param, A, paramAdj);
+			return PerspectiveOps.adjustIntrinsic_F32(add_p_to_p, false, param, A, paramAdj);
 		} else {
 			CommonOps.invert(A);
-			return PerspectiveOps.adjustIntrinsic_F32(remove_p_to_p, false, param, A, paramAdj);
+			return PerspectiveOps.adjustIntrinsic_F32(remove_p_to_p, true, param, A, paramAdj);
 		}
 	}
 
