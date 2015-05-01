@@ -27,7 +27,7 @@ package boofcv.struct.convolve;
 public abstract class Kernel2D extends KernelBase {
 
 
-	protected Kernel2D(int offset, int width) {
+	protected Kernel2D(int width, int offset) {
 		super(width, offset);
 	}
 

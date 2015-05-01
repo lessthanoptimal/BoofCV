@@ -119,7 +119,7 @@ public class TestFactoryConvolve {
 
 	@Test
 	public void convolve2D_F32() {
-		Kernel2D_F32 kernel = FactoryKernel.random2D_F32(radius,1,6,rand);
+		Kernel2D_F32 kernel = FactoryKernel.random2D_F32(kernelWidth,radius,1,6,rand);
 
 		ConvolveInterface<ImageFloat32,ImageFloat32> conv;
 
@@ -151,7 +151,7 @@ public class TestFactoryConvolve {
 	@Test
 	public void convolve2D_I32() {
 
-		Kernel2D_I32 kernel = FactoryKernel.random2D_I32(radius,1,6,rand);
+		Kernel2D_I32 kernel = FactoryKernel.random2D_I32(kernelWidth,radius,1,6,rand);
 
 		ConvolveInterface conv;
 

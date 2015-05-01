@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,7 +39,7 @@ public class TestWeightPixelKernel_F32 {
 			public void setRadius(int radiusX, int radiusY) {}
 		};
 
-		alg.kernel = FactoryKernel.random2D_F32(2,-2,2,rand);
+		alg.kernel = FactoryKernel.random2D_F32(5,2,-2,2,rand);
 
 		int index = 0;
 		for( int y = -2; y <= 2; y++ )

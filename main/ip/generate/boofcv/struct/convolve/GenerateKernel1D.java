@@ -126,6 +126,7 @@ public class GenerateKernel1D extends CodeGeneratorBase {
 				"\t\treturn ret;\n" +
 				"\t}\n" +
 				"\n" +
+				"\t@Override\n" +
 				"\tpublic " + className + " copy() {\n" +
 				"\t\t"+className+" ret = new "+className+"(width,offset);\n" +
 				"\t\tSystem.arraycopy(data,0,ret.data,0,ret.width);\n" +

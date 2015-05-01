@@ -74,7 +74,7 @@ public class TestKernelMath {
 
 	@Test
 	public void fill_F32() {
-		Kernel2D_F32 a = FactoryKernel.random2D_F32(2, -2, 2, rand);
+		Kernel2D_F32 a = FactoryKernel.random2D_F32(5,2, -2, 2, rand);
 		KernelMath.fill(a,1);
 
 		for( int i = 0; i < a.width; i++ ) {
@@ -86,7 +86,7 @@ public class TestKernelMath {
 
 	@Test
 	public void fill_I32() {
-		Kernel2D_I32 a = FactoryKernel.random2D_I32(2, -2, 2, rand);
+		Kernel2D_I32 a = FactoryKernel.random2D_I32(5,2, -2, 2, rand);
 		KernelMath.fill(a,1);
 
 		for( int i = 0; i < a.width; i++ ) {
@@ -98,7 +98,7 @@ public class TestKernelMath {
 
 	@Test
 	public void transpose_F32() {
-		Kernel2D_F32 a = FactoryKernel.random2D_F32(2, -2, 2, rand);
+		Kernel2D_F32 a = FactoryKernel.random2D_F32(5,2, -2, 2, rand);
 		Kernel2D_F32 b = KernelMath.transpose(a);
 
 		for( int i = 0; i < a.width; i++ ) {
@@ -110,7 +110,7 @@ public class TestKernelMath {
 
 	@Test
 	public void transpose_I32() {
-		Kernel2D_I32 a = FactoryKernel.random2D_I32(2, -2, 2, rand);
+		Kernel2D_I32 a = FactoryKernel.random2D_I32(5,2, -2, 2, rand);
 		Kernel2D_I32 b = KernelMath.transpose(a);
 
 		for( int i = 0; i < a.width; i++ ) {
@@ -183,8 +183,8 @@ public class TestKernelMath {
 
 	@Test
 	public void convolve2D_F32() {
-		Kernel2D_F32 k1 = new Kernel2D_F32(3,1,2,3,4,5,6,7,8,9);
-		Kernel2D_F32 k2 = new Kernel2D_F32(3,2,3,4,5,6,7,8,9,10);
+		Kernel2D_F32 k1 = new Kernel2D_F32(3,new float[]{1,2,3,4,5,6,7,8,9});
+		Kernel2D_F32 k2 = new Kernel2D_F32(3,new float[]{2,3,4,5,6,7,8,9,10});
 
 		Kernel2D_F32 c = KernelMath.convolve2D(k1,k2);
 
@@ -257,7 +257,7 @@ public class TestKernelMath {
 
 	@Test
 	public void convertToImage_F32() {
-		Kernel2D_F32 kernel = FactoryKernel.random2D_F32(3,-10,10,rand);
+		Kernel2D_F32 kernel = FactoryKernel.random2D_F32(7,3,-10,10,rand);
 		ImageFloat32 image = KernelMath.convertToImage(kernel);
 
 		assertEquals(kernel.width,image.width);
@@ -272,7 +272,7 @@ public class TestKernelMath {
 
 	@Test
 	public void convertToImage_I32() {
-		Kernel2D_I32 kernel = FactoryKernel.random2D_I32(3,-10,10,rand);
+		Kernel2D_I32 kernel = FactoryKernel.random2D_I32(7,3,-10,10,rand);
 		ImageSInt32 image = KernelMath.convertToImage(kernel);
 
 		assertEquals(kernel.width,image.width);
@@ -347,7 +347,7 @@ public class TestKernelMath {
 
 	@Test
 	public void convert_2D_F32_to_I32() {
-		Kernel2D_F32 orig = new Kernel2D_F32(3,0.1f,1,0.1f,1,1e-6f,-1,-0.1f,-1,-0.1f);
+		Kernel2D_F32 orig = new Kernel2D_F32(3,new float[]{0.1f,1,0.1f,1,1e-6f,-1,-0.1f,-1,-0.1f});
 		Kernel2D_I32 found = KernelMath.convert(orig,1f/60f);
 
 		assertEquals(orig.width,found.width);

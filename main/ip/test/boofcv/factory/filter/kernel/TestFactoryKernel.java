@@ -113,7 +113,7 @@ public class TestFactoryKernel {
 
 	@Test
 	public void random2D_I32() {
-		Kernel2D_I32 kernel = FactoryKernel.random2D_I32(2, -2, 2, rand);
+		Kernel2D_I32 kernel = FactoryKernel.random2D_I32(5,2, -2, 2, rand);
 		int nonZero = 0;
 		for (int i = 0; i < kernel.width; i++) {
 			for (int j = 0; j < kernel.width; j++) {
@@ -128,7 +128,7 @@ public class TestFactoryKernel {
 
 	@Test
 	public void random2D_F32() {
-		Kernel2D_F32 kernel = FactoryKernel.random2D_F32(2, -2, 2, rand);
+		Kernel2D_F32 kernel = FactoryKernel.random2D_F32(5,2, -2, 2, rand);
 		int nonZero = 0;
 		for (int i = 0; i < kernel.width; i++) {
 			for (int j = 0; j < kernel.width; j++) {

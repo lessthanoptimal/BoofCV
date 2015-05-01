@@ -40,16 +40,16 @@ import boofcv.struct.convolve.KernelContinuous1D_F32;
 public class BicubicKernel_F32 extends KernelContinuous1D_F32 {
 
 	// parameter in its convolution function
-    float a;
+	float a;
 
-    /**
-     * Values of a =-0.5 and -0.75 are typical
-     * @param a A parameter
-     */
-    public BicubicKernel_F32( float a ) {
+	/**
+	 * Values of a =-0.5 and -0.75 are typical
+	 * @param a A parameter
+	 */
+	public BicubicKernel_F32( float a ) {
 		super(5);
-        this.a = a;
-    }
+		this.a = a;
+	}
 
 	@Override
 	public boolean isInteger() {
@@ -58,7 +58,7 @@ public class BicubicKernel_F32 extends KernelContinuous1D_F32 {
 
 	@Override
 	public <T extends KernelBase> T copy() {
-		return null;
+		return (T)new BicubicKernel_F32(a);
 	}
 
 	@Override

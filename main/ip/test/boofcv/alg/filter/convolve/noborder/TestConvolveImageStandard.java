@@ -49,7 +49,8 @@ public class TestConvolveImageStandard {
 
 	int width = 4;
 	int height = 5;
-	int kernelRadius = 1;
+	int kernelWidth = 3;
+	int kernelRadius = kernelWidth/2;
 
 	/**
 	 * Using reflections get a list of all the functions and test each of them
@@ -145,6 +146,8 @@ public class TestConvolveImageStandard {
 		assertTrue(0 != get(dest, 0, 3));
 		assertEquals(0, get(dest, width-2, 3), 1e-6);
 		assertEquals(0, get(dest, width - 1, 3), 1e-6);
+
+
 	}
 
 
@@ -299,11 +302,11 @@ public class TestConvolveImageStandard {
 		Object ker;
 		if (!img.getDataType().isInteger()) {
 			if( img.getDataType().getNumBits() == 32 )
-				ker = FactoryKernel.random2D_F32(kernelRadius, 0f, 1f, new Random(234));
+				ker = FactoryKernel.random2D_F32(kernelWidth,kernelRadius, 0f, 1f, new Random(234));
 			else
-				ker = FactoryKernel.random2D_F64(kernelRadius, 0f, 1f, new Random(234));
+				ker = FactoryKernel.random2D_F64(kernelWidth,kernelRadius, 0f, 1f, new Random(234));
 		} else
-			ker = FactoryKernel.random2D_I32(kernelRadius, 0, 10, new Random(234));
+			ker = FactoryKernel.random2D_I32(kernelWidth,kernelRadius, 0, 10, new Random(234));
 
 		// standard symmetric kernel
 		convolve(img, dest, ker);
@@ -357,9 +360,9 @@ public class TestConvolveImageStandard {
 	public void convolveDiv(ImageSingleBand img, ImageSingleBand dest) {
 		Object ker;
 		if (!img.getDataType().isInteger())
-			ker = FactoryKernel.random2D_F32(kernelRadius, 0f, 1f, new Random(234));
+			ker = FactoryKernel.random2D_F32(kernelWidth,kernelRadius, 0f, 1f, new Random(234));
 		else
-			ker = FactoryKernel.random2D_I32(kernelRadius, 0, 4, new Random(234));
+			ker = FactoryKernel.random2D_I32(kernelWidth,kernelRadius, 0, 4, new Random(234));
 
 		int divisor = 11;
 		int halfDivisor = divisor/2;

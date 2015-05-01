@@ -101,6 +101,7 @@ public class Kernel1D_F32 extends Kernel1D {
 		return ret;
 	}
 
+	@Override
 	public Kernel1D_F32 copy() {
 		Kernel1D_F32 ret = new Kernel1D_F32(width,offset);
 		System.arraycopy(data,0,ret.data,0,ret.width);

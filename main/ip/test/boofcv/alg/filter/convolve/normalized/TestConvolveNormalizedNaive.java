@@ -194,7 +194,7 @@ public class TestConvolveNormalizedNaive {
 	 */
 	@Test
 	public void convolve() {
-		Kernel2D_I32 kernel = FactoryKernel.random2D_I32(3,0,20,rand);
+		Kernel2D_I32 kernel = FactoryKernel.random2D_I32(7,3,0,20,rand);
 		kernel.offset = 1;
 
 		ImageUInt8 input = new ImageUInt8(15,16);

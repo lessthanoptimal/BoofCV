@@ -39,7 +39,8 @@ public class CompareToStandardConvolution extends CompareIdenticalFunctions
 
 	protected int width = 20;
 	protected int height = 30;
-	protected int kernelRadius = 2;
+	protected int kernelWidth = 5;
+	protected int kernelRadius = kernelWidth/2;
 	protected int offset = kernelRadius;
 
 	public CompareToStandardConvolution( Class<?> targetClass ) {
@@ -51,6 +52,7 @@ public class CompareToStandardConvolution extends CompareIdenticalFunctions
 	}
 
 	public void compareMethod( Method target , String validationName , int radius , int offset ) {
+		this.kernelWidth = radius*2 + 1;
 		this.kernelRadius = radius;
 		this.offset = offset;
 		super.compareMethod(target,validationName);
@@ -92,17 +94,16 @@ public class CompareToStandardConvolution extends CompareIdenticalFunctions
 
 	private KernelBase createKernel(Class<?> paramType) {
 		KernelBase kernel;
-		int width = kernelRadius*2+1;
 		if (Kernel1D_F32.class == paramType) {
-			kernel = FactoryKernel.random1D_F32(width,kernelRadius, -1, 1, rand);
+			kernel = FactoryKernel.random1D_F32(kernelWidth,kernelRadius, -1, 1, rand);
 		} else if (Kernel1D_F64.class == paramType) {
-			kernel = FactoryKernel.random1D_F64(width, kernelRadius, 0, 5, rand);
+			kernel = FactoryKernel.random1D_F64(kernelWidth,kernelRadius, 0, 5, rand);
 		} else if (Kernel1D_I32.class == paramType) {
-			kernel = FactoryKernel.random1D_I32(width, kernelRadius, 0, 5, rand);
+			kernel = FactoryKernel.random1D_I32(kernelWidth,kernelRadius, 0, 5, rand);
 		} else if (Kernel2D_I32.class == paramType) {
-			kernel = FactoryKernel.random2D_I32(kernelRadius, -1, 1, rand);
+			kernel = FactoryKernel.random2D_I32(kernelWidth,kernelRadius, -1, 1, rand);
 		} else if (Kernel2D_F32.class == paramType) {
-			kernel = FactoryKernel.random2D_F32(kernelRadius, 0, 5, rand);
+			kernel = FactoryKernel.random2D_F32(kernelWidth,kernelRadius, 0, 5, rand);
 		} else {
 			throw new RuntimeException("Unknown kernel type");
 		}

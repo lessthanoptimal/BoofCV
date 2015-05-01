@@ -101,6 +101,7 @@ public class Kernel1D_F64 extends Kernel1D {
 		return ret;
 	}
 
+	@Override
 	public Kernel1D_F64 copy() {
 		Kernel1D_F64 ret = new Kernel1D_F64(width,offset);
 		System.arraycopy(data,0,ret.data,0,ret.width);
