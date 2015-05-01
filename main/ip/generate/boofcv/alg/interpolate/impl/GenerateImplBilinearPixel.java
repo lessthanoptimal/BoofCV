@@ -116,10 +116,12 @@ public class GenerateImplBilinearPixel extends CodeGeneratorBase {
 				"\n" +
 				"\t@Override\n" +
 				"\tpublic float get_border(float x, float y) {\n" +
-				"\t\tint xt = (int) Math.floor(x);\n" +
-				"\t\tint yt = (int) Math.floor(y);\n" +
-				"\t\t"+floatType+" ax = x - xt;\n" +
-				"\t\t"+floatType+" ay = y - yt;\n" +
+				"\t\t"+floatType+" xf = ("+floatType+")Math.floor(x);\n" +
+				"\t\t"+floatType+" yf = ("+floatType+")Math.floor(y);\n" +
+				"\t\tint xt = (int) xf;\n" +
+				"\t\tint yt = (int) yf;\n" +
+				"\t\t"+floatType+" ax = x - xf;\n" +
+				"\t\t"+floatType+" ay = y - yf;\n" +
 				"\n" +
 				"\t\tImageBorder_"+borderType+" border = (ImageBorder_"+borderType+")this.border;\n" +
 				"\n" +
