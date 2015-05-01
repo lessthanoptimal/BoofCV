@@ -18,6 +18,7 @@
 
 package boofcv.factory.filter.kernel;
 
+import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.convolve.*;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageInteger;
@@ -40,6 +41,38 @@ import java.util.Random;
  */
 @SuppressWarnings({"ForLoopReplaceableByForEach", "unchecked"})
 public class FactoryKernel {
+
+	public static <T extends KernelBase> T createKernelForImage( int width , int offset, int DOF , Class imageType ) {
+		boolean isFloat = GeneralizedImageOps.isFloatingPoint(imageType);
+		int numBits = Math.max(32, GeneralizedImageOps.getNumBits(imageType));
+
+		return createKernel(width,offset,DOF,isFloat,numBits);
+	}
+
+	public static <T extends KernelBase> T createKernel(int width , int offset, int DOF, boolean isFloat, int numBits ) {
+		if( DOF == 1 ) {
+			if( isFloat ) {
+				if( numBits == 32 )
+					return (T)new Kernel1D_F32(width,offset);
+				else if( numBits == 64 )
+					return (T)new Kernel1D_F64(width,offset);
+			} else {
+				if( numBits == 32 )
+					return (T)new Kernel1D_I32(width,offset);
+			}
+		} else if( DOF == 2 ) {
+			if( isFloat ) {
+				if( numBits == 32 )
+					return (T)new Kernel2D_F32(width,offset);
+				else if( numBits == 64 )
+					return (T)new Kernel2D_F64(width,offset);
+			} else {
+				if( numBits == 32 )
+					return (T)new Kernel2D_I32(width,offset);
+			}
+		}
+		throw new IllegalArgumentException("Unsupported specifications. DOF = "+DOF+" float = "+isFloat+" bits = "+numBits);
+	}
 
 	/**
 	 * <p>
@@ -115,18 +148,25 @@ public class FactoryKernel {
 	{
 		int width = radius*2+1;
 
+		return random(type,width,radius,min,max,rand);
+	}
+
+	public static <T extends KernelBase> T random( Class<?> type , int width , int offset , int min , int max , Random rand )
+	{
 		if (Kernel1D_F32.class == type) {
-			return (T) FactoryKernel.random1D_F32(width, radius, min, max, rand);
+			return (T) FactoryKernel.random1D_F32(width, offset, min, max, rand);
 		} else if (Kernel1D_F64.class == type) {
-				return (T) FactoryKernel.random1D_F64(width, radius, min, max, rand);
+			return (T) FactoryKernel.random1D_F64(width, offset, min, max, rand);
 		} else if (Kernel1D_I32.class == type) {
-			return (T) FactoryKernel.random1D_I32(width, radius, min, max, rand);
+			return (T) FactoryKernel.random1D_I32(width, offset, min, max, rand);
 		} else if (Kernel2D_I32.class == type) {
-			return (T) FactoryKernel.random2D_I32(width, radius, min, max, rand);
+			return (T) FactoryKernel.random2D_I32(width, offset, min, max, rand);
 		} else if (Kernel2D_F32.class == type) {
-			return (T) FactoryKernel.random2D_F32(width, radius, min, max, rand);
+			return (T) FactoryKernel.random2D_F32(width, offset, min, max, rand);
+		} else if (Kernel2D_F64.class == type) {
+			return (T) FactoryKernel.random2D_F64(width, offset, min, max, rand);
 		} else {
-			throw new RuntimeException("Unknown kernel type");
+			throw new RuntimeException("Unknown kernel type. "+type.getSimpleName());
 		}
 	}
 
