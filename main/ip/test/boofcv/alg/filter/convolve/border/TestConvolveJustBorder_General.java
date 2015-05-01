@@ -90,7 +90,7 @@ public class TestConvolveJustBorder_General extends CompareImageBorder {
 	protected Object[] reformatForValidation(Method m, Object[] targetParam) {
 		Object[] ret =  new Object[]{targetParam[0],targetParam[1],targetParam[2]};
 
-		ImageSingleBand inputImage = ((ImageBorder)targetParam[1]).getImage();
+		ImageSingleBand inputImage = (ImageSingleBand)((ImageBorder) targetParam[1]).getImage();
 
 		KernelBase kernel = (KernelBase)targetParam[0];
 

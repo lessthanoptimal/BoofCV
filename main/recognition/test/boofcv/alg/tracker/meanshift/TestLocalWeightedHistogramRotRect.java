@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,6 +20,7 @@ package boofcv.alg.tracker.meanshift;
 
 import boofcv.alg.interpolate.InterpolatePixelMB;
 import boofcv.alg.misc.GImageMiscOps;
+import boofcv.core.image.border.ImageBorder;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.RectangleRotate_F32;
 import boofcv.struct.image.*;
@@ -261,6 +262,9 @@ public class TestLocalWeightedHistogramRotRect {
 	static class DummyInterpolate implements InterpolatePixelMB {
 
 		List<Point2D_F32> list = new ArrayList<Point2D_F32>();
+
+		@Override
+		public void setBorder(ImageBorder border) {}
 
 		@Override
 		public void setImage(ImageBase image) {}

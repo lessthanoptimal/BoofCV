@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -15,43 +15,49 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package boofcv.alg.interpolate.impl;
 
 import boofcv.alg.interpolate.NearestNeighborPixel;
+import boofcv.core.image.border.ImageBorder_I32;
 import boofcv.struct.image.ImageType;
 import boofcv.struct.image.ImageUInt8;
 
 
 /**
+ * <p>
  * Performs nearest neighbor interpolation to extract values between pixels in an image.
+ * </p>
+ *
+ * <p>
+ * NOTE: This code was automatically generated using {@link GenerateNearestNeighborPixel}.
+ * </p>
  *
  * @author Peter Abeles
  */
 public class NearestNeighborPixel_U8 extends NearestNeighborPixel<ImageUInt8> {
 
-
 	private byte data[];
-
 	public NearestNeighborPixel_U8() {
 	}
 
 	public NearestNeighborPixel_U8(ImageUInt8 orig) {
+
 		setImage(orig);
 	}
-
 	@Override
 	public void setImage(ImageUInt8 image) {
-		this.orig = image;
+		super.setImage(image);
 		this.data = orig.data;
-		this.stride = orig.getStride();
-		this.width = orig.getWidth();
-		this.height = orig.getHeight();
 	}
 
 	@Override
 	public float get_fast(float x, float y) {
-		return data[ orig.startIndex + ((int)y)*stride + (int)x] & 0xFF;
+		return data[ orig.startIndex + ((int)y)*stride + (int)x]& 0xFF;
+	}
+
+	@Override
+	public float get_border(float x, float y) {
+		return ((ImageBorder_I32)border).get((int)Math.floor(x),(int)Math.floor(y));
 	}
 
 	@Override
@@ -61,11 +67,12 @@ public class NearestNeighborPixel_U8 extends NearestNeighborPixel<ImageUInt8> {
 		int xx = (int)x;
 		int yy = (int)y;
 
-		return data[ orig.startIndex + yy*stride + xx] & 0xFF;
+		return data[ orig.startIndex + yy*stride + xx]& 0xFF;
 	}
 
 	@Override
 	public ImageType<ImageUInt8> getImageType() {
 		return ImageType.single(ImageUInt8.class);
 	}
+
 }

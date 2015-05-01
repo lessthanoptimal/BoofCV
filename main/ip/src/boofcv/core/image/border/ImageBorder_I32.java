@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -51,7 +51,7 @@ public abstract class ImageBorder_I32<T extends ImageInteger> extends ImageBorde
 	}
 
 	@Override
-	public double getGeneral(int x, int y) {
+	public double getGeneral(int x, int y, int band) {
 		return get(x,y);
 	}
 

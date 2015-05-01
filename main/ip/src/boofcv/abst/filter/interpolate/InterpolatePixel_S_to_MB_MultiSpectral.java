@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,6 +20,7 @@ package boofcv.abst.filter.interpolate;
 
 import boofcv.alg.interpolate.InterpolatePixelMB;
 import boofcv.alg.interpolate.InterpolatePixelS;
+import boofcv.core.image.border.ImageBorder;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageType;
 import boofcv.struct.image.MultiSpectral;
@@ -57,6 +58,11 @@ public class InterpolatePixel_S_to_MB_MultiSpectral<T extends ImageSingleBand>
 			alg.setImage(image.getBand(i));
 			values[i] = alg.get_fast(x,y);
 		}
+	}
+
+	@Override
+	public void setBorder(ImageBorder<MultiSpectral<T>> border) {
+		throw new RuntimeException("Need to write code to handle this");
 	}
 
 	@Override

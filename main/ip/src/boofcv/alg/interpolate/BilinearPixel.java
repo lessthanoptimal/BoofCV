@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.alg.interpolate;
 
+import boofcv.core.image.border.ImageBorder;
 import boofcv.struct.image.ImageSingleBand;
 
 /**
@@ -30,13 +31,21 @@ import boofcv.struct.image.ImageSingleBand;
  */
 public abstract class BilinearPixel<T extends ImageSingleBand> implements InterpolatePixelS<T> {
 
+	protected ImageBorder<T> border;
 	protected T orig;
 	protected int stride;
 	protected int width;
 	protected int height;
 
 	@Override
+	public void setBorder(ImageBorder<T> border) {
+		this.border = border;
+	}
+
+	@Override
 	public void setImage(T image) {
+		if( border != null )
+			border.setImage(image);
 		this.orig = image;
 		this.stride = orig.getStride();
 		this.width = orig.getWidth();

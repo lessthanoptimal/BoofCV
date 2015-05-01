@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.alg.interpolate;
 
+import boofcv.core.image.border.ImageBorder;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 
@@ -29,6 +30,13 @@ import boofcv.struct.image.ImageType;
  * @author Peter Abeles
  */
 public interface InterpolatePixel<T extends ImageBase> {
+
+	/**
+	 * Set's the class used to "read" pixels outside the image border.
+	 *
+	 * @param border Class for reading outside the image border
+	 */
+	void setBorder( ImageBorder<T> border );
 
 	/**
 	 * Change the image that is being interpolated.
