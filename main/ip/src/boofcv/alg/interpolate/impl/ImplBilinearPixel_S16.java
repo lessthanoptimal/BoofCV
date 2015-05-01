@@ -64,10 +64,12 @@ public class ImplBilinearPixel_S16 extends BilinearPixel<ImageSInt16> {
 
 	@Override
 	public float get_border(float x, float y) {
-		int xt = (int) Math.floor(x);
-		int yt = (int) Math.floor(y);
-		float ax = x - xt;
-		float ay = y - yt;
+		float xf = (float)Math.floor(x);
+		float yf = (float)Math.floor(y);
+		int xt = (int) xf;
+		int yt = (int) yf;
+		float ax = x - xf;
+		float ay = y - yf;
 
 		ImageBorder_I32 border = (ImageBorder_I32)this.border;
 
