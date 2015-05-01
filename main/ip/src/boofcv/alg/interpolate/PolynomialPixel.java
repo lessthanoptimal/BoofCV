@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,6 +20,7 @@ package boofcv.alg.interpolate;
 
 
 import boofcv.alg.interpolate.array.PolynomialNevilleFixed_F32;
+import boofcv.core.image.border.ImageBorder;
 import boofcv.struct.image.ImageSingleBand;
 
 /**
@@ -36,6 +37,8 @@ import boofcv.struct.image.ImageSingleBand;
  * @author Peter Abeles
  */
 public abstract class PolynomialPixel<T extends ImageSingleBand> implements InterpolatePixelS<T> {
+	// for reading pixels outside the image border
+	protected ImageBorder<T> border;
 	// the image that is being interpolated
 	protected T image;
 
@@ -71,7 +74,14 @@ public abstract class PolynomialPixel<T extends ImageSingleBand> implements Inte
 	}
 
 	@Override
+	public void setBorder(ImageBorder<T> border) {
+		this.border = border;
+	}
+
+	@Override
 	public void setImage(T image) {
+		if( border != null )
+			border.setImage(image);
 		this.image = image;
 	}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -116,12 +116,11 @@ public abstract class ImageDistortCache<Input extends ImageSingleBand,Output ext
 
 		this.srcImg = srcImg;
 		this.dstImg = dstImg;
+		interp.setBorder(border);
 		interp.setImage(srcImg);
 	}
 
 	public void applyBorder() {
-
-		border.setImage(srcImg);
 
 		final float minInterpX = interp.getFastBorderX();
 		final float minInterpY = interp.getFastBorderY();
@@ -138,7 +137,7 @@ public abstract class ImageDistortCache<Input extends ImageSingleBand,Output ext
 
 				if( s.x < minInterpX || s.x > maxInterpX || s.y < minInterpY || s.y > maxInterpY ) {
 					if( s.x < 0f || s.x > widthF || s.y < 0f || s.y > heightF )
-						assign(indexDst,(float)border.getGeneral((int)s.x,(int)s.y));
+						assign(indexDst,interp.get_border(s.x, s.y));
 					else
 						assign(indexDst,interp.get(s.x, s.y));
 				} else {

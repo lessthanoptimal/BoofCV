@@ -43,7 +43,7 @@ public class CameraPreview extends ViewGroup implements SurfaceHolder.Callback {
 	Camera.PreviewCallback previewCallback;
 	boolean hidden;
 
-	CameraPreview(Context context, Camera.PreviewCallback previewCallback, boolean hidden ) {
+	public CameraPreview(Context context, Camera.PreviewCallback previewCallback, boolean hidden ) {
 		super(context);
 		this.previewCallback = previewCallback;
 		this.hidden = hidden;

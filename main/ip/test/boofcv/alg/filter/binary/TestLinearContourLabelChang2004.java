@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -256,19 +256,19 @@ public class TestLinearContourLabelChang2004 {
 						Point2D_I32 a = local.get(i);
 						Point2D_I32 b = local.get(i+1);
 
-						if( border.getGeneral(x+a.x,y+a.y) != target && border.getGeneral(x+b.x,y+b.y) != target ) {
+						if( border.getGeneral(x+a.x,y+a.y, 0) != target && border.getGeneral(x+b.x,y+b.y, 0) != target ) {
 							isContour = true;
 							break;
 						}
 					}
 
-					if( !isContour && border.getGeneral(x+1,y) != target)
+					if( !isContour && border.getGeneral(x+1,y, 0) != target)
 						isContour = true;
-					if( !isContour && border.getGeneral(x-1,y) != target)
+					if( !isContour && border.getGeneral(x-1,y, 0) != target)
 						isContour = true;
-					if( !isContour && border.getGeneral(x,y+1) != target)
+					if( !isContour && border.getGeneral(x,y+1, 0) != target)
 						isContour = true;
-					if( !isContour && border.getGeneral(x,y-1) != target)
+					if( !isContour && border.getGeneral(x,y-1, 0) != target)
 						isContour = true;
 
 					if( isContour )
@@ -294,7 +294,7 @@ public class TestLinearContourLabelChang2004 {
 					boolean isContour = false;
 					for( int i = 0; i < local.size(); i++ ) {
 						Point2D_I32 a = local.get(i);
-						if( border.getGeneral(x+a.x,y+a.y) != target ) {
+						if( border.getGeneral(x+a.x,y+a.y, 0) != target ) {
 							isContour = true;
 						}
 					}

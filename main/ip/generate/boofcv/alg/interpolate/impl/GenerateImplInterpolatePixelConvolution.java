@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,6 +30,7 @@ import java.io.FileNotFoundException;
 public class GenerateImplInterpolatePixelConvolution extends CodeGeneratorBase {
 
 	AutoTypeImage inputType;
+	String borderType;
 
 	@Override
 	public void generate() throws FileNotFoundException {
@@ -40,6 +41,7 @@ public class GenerateImplInterpolatePixelConvolution extends CodeGeneratorBase {
 
 	private void createFile( AutoTypeImage inputType ) throws FileNotFoundException {
 		this.inputType = inputType;
+		borderType = inputType.isInteger() ? "I32" : inputType.getAbbreviatedType();
 		setOutputFile("ImplInterpolatePixelConvolution_"+inputType.getAbbreviatedType());
 
 		printPreamble(className);
@@ -55,6 +57,8 @@ public class GenerateImplInterpolatePixelConvolution extends CodeGeneratorBase {
 				"import boofcv.struct.convolve.KernelContinuous1D_F32;\n" +
 				"import boofcv.struct.image.ImageType;\n" +
 				"import boofcv.struct.image.*;\n" +
+				"import boofcv.core.image.border.ImageBorder;\n" +
+				"import boofcv.core.image.border.ImageBorder_"+borderType+";\n" +
 				"\n" +
 				"/**\n" +
 				" * <p>\n" +
@@ -71,6 +75,8 @@ public class GenerateImplInterpolatePixelConvolution extends CodeGeneratorBase {
 				" */\n" +
 				"public class "+fileName+" implements InterpolatePixelS<"+inputType.getSingleBandName()+">  {\n" +
 				"\n" +
+				"\t// used to read outside the image border\n" +
+				"\tprivate ImageBorder_"+borderType+" border;\n" +
 				"\t// kernel used to perform interpolation\n" +
 				"\tprivate KernelContinuous1D_F32 kernel;\n" +
 				"\t// input image\n" +
@@ -89,8 +95,15 @@ public class GenerateImplInterpolatePixelConvolution extends CodeGeneratorBase {
 
 		String bitWise = inputType.getBitWise();
 
-		out.print("\t@Override\n" +
+		out.print( "\t@Override\n" +
+				"\tpublic void setBorder(ImageBorder<"+inputType.getSingleBandName()+"> border) {\n" +
+				"\t\tthis.border = (ImageBorder_"+borderType+")border;\n" +
+				"\t}\n" +
+				"\n" +
+				"\t@Override\n" +
 				"\tpublic void setImage("+inputType.getSingleBandName()+" image ) {\n" +
+				"\t\tif( border != null )\n" +
+				"\t\t\tborder.setImage(image);\n" +
 				"\t\tthis.image = image;\n" +
 				"\t}\n" +
 				"\n" +
@@ -141,6 +154,39 @@ public class GenerateImplInterpolatePixelConvolution extends CodeGeneratorBase {
 				"\n" +
 				"\t\tvalue /= totalWeightY;\n" +
 				"\t\t\n" +
+				"\t\tif( value > max )\n" +
+				"\t\t\treturn max;\n" +
+				"\t\telse if( value < min )\n" +
+				"\t\t\treturn min;\n" +
+				"\t\telse\n" +
+				"\t\t\treturn value;\n" +
+				"\t}\n" +
+				"\n" +
+				"\t@Override\n" +
+				"\tpublic float get_border(float x, float y) {\n" +
+				"\t\tint xx = (int)Math.floor(x);\n" +
+				"\t\tint yy = (int)Math.floor(y);\n" +
+				"\n" +
+				"\t\tfinal int radius = kernel.getRadius();\n" +
+				"\t\tfinal int width = kernel.getWidth();\n" +
+				"\n" +
+				"\t\tint x0 = xx - radius;\n" +
+				"\t\tint x1 = x0 + width;\n" +
+				"\n" +
+				"\t\tint y0 = yy - radius;\n" +
+				"\t\tint y1 = y0 + width;\n" +
+				"\n" +
+				"\t\tfloat value = 0;\n" +
+				"\t\tfor( int i = y0; i < y1; i++ ) {\n" +
+				"\t\t\tfloat valueX = 0;\n" +
+				"\t\t\tfor( int j = x0; j < x1; j++ ) {\n" +
+				"\t\t\t\tfloat w = kernel.compute(j-x);\n" +
+				"\t\t\t\tvalueX += w * border.get(j,i);\n" +
+				"\t\t\t}\n" +
+				"\t\t\tfloat w = kernel.compute(i-y);\n" +
+				"\t\t\tvalue += w*valueX;\n" +
+				"\t\t}\n" +
+				"\n" +
 				"\t\tif( value > max )\n" +
 				"\t\t\treturn max;\n" +
 				"\t\telse if( value < min )\n" +

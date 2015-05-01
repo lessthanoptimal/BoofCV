@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,6 +32,7 @@ public class GenerateImplBilinearPixel extends CodeGeneratorBase {
 
 	String floatType;
 	String f;
+	String borderType;
 
 	@Override
 	public void generate() throws FileNotFoundException {
@@ -51,6 +52,7 @@ public class GenerateImplBilinearPixel extends CodeGeneratorBase {
 
 	private void createFile() throws FileNotFoundException {
 
+		borderType = image.isInteger() ? "I32" : image.getAbbreviatedType();
 		floatType = !image.isInteger() && image.getNumBits()==64 ? "double" : "float";
 		f = !image.isInteger() && image.getNumBits()==64 ? "" : "f";
 
@@ -63,7 +65,8 @@ public class GenerateImplBilinearPixel extends CodeGeneratorBase {
 		setOutputFile(className);
 		out.print("import boofcv.alg.interpolate.BilinearPixel;\n" +
 				"import boofcv.struct.image.ImageType;\n" +
-				"import boofcv.struct.image."+image.getSingleBandName()+";\n");
+				"import boofcv.struct.image." + image.getSingleBandName() + ";\n" +
+				"import boofcv.core.image.border.ImageBorder_"+borderType+";\n");
 		out.println();
 		out.println();
 		out.print("/**\n" +
@@ -83,6 +86,7 @@ public class GenerateImplBilinearPixel extends CodeGeneratorBase {
 				"\t}\n" +
 				"\n" +
 				"\tpublic "+className+"("+image.getSingleBandName()+" orig) {\n" +
+				"\n" +
 				"\t\tsetImage(orig);\n" +
 				"\t}\n");
 
@@ -90,8 +94,6 @@ public class GenerateImplBilinearPixel extends CodeGeneratorBase {
 
 	private void printTheRest() {
 		String bitWise = image.getBitWise();
-
-
 
 		out.print("\t@Override\n" +
 				"\tpublic float get_fast(float x, float y) {\n" +
@@ -111,6 +113,23 @@ public class GenerateImplBilinearPixel extends CodeGeneratorBase {
 				"\n" +
 				"\t\treturn val;\n" +
 				"\t}\n" +
+				"\n" +
+				"\t@Override\n" +
+				"\tpublic float get_border(float x, float y) {\n" +
+				"\t\tint xt = (int) Math.floor(x);\n" +
+				"\t\tint yt = (int) Math.floor(y);\n" +
+				"\t\t"+floatType+" ax = x - xt;\n" +
+				"\t\t"+floatType+" ay = y - yt;\n" +
+				"\n" +
+				"\t\tImageBorder_"+borderType+" border = (ImageBorder_"+borderType+")this.border;\n" +
+				"\n" +
+				"\t\t"+floatType+" val = (1.0f - ax) * (1.0f - ay) * border.get(xt,yt); // (x,y)\n" +
+				"\t\tval += ax * (1.0f - ay) *  border.get(xt + 1, yt);; // (x+1,y)\n" +
+				"\t\tval += ax * ay *  border.get(xt + 1, yt + 1);; // (x+1,y+1)\n" +
+				"\t\tval += (1.0f - ax) * ay *  border.get(xt,yt+1);; // (x,y+1)\n" +
+				"\n" +
+				"\t\treturn val;\n" +
+				"\t}\n"+
 				"\n" +
 				"\t@Override\n" +
 				"\tpublic float get(float x, float y) {\n" +

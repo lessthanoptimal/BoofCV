@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 package boofcv.alg.interpolate.impl;
 
 import boofcv.alg.interpolate.BilinearPixel;
+import boofcv.core.image.border.ImageBorder_F64;
 import boofcv.struct.image.ImageFloat64;
 import boofcv.struct.image.ImageType;
 
@@ -39,6 +40,7 @@ public class ImplBilinearPixel_F64 extends BilinearPixel<ImageFloat64> {
 	}
 
 	public ImplBilinearPixel_F64(ImageFloat64 orig) {
+
 		setImage(orig);
 	}
 	@Override
@@ -56,6 +58,23 @@ public class ImplBilinearPixel_F64 extends BilinearPixel<ImageFloat64> {
 		val += ax * (1.0 - ay) * (data[index + 1] ); // (x+1,y)
 		val += ax * ay * (data[index + 1 + stride] ); // (x+1,y+1)
 		val += (1.0 - ax) * ay * (data[index + stride] ); // (x,y+1)
+
+		return (float)val;
+	}
+
+	@Override
+	public float get_border(float x, float y) {
+		int xt = (int) Math.floor(x);
+		int yt = (int) Math.floor(y);
+		double ax = x - xt;
+		double ay = y - yt;
+
+		ImageBorder_F64 border = (ImageBorder_F64)this.border;
+
+		double val = (1.0f - ax) * (1.0f - ay) * border.get(xt,yt); // (x,y)
+		val += ax * (1.0f - ay) *  border.get(xt + 1, yt);; // (x+1,y)
+		val += ax * ay *  border.get(xt + 1, yt + 1);; // (x+1,y+1)
+		val += (1.0f - ax) * ay *  border.get(xt,yt+1);; // (x,y+1)
 
 		return (float)val;
 	}

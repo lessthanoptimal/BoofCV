@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,19 +39,20 @@ public class CompareToStandardConvolution extends CompareIdenticalFunctions
 
 	protected int width = 20;
 	protected int height = 30;
-	protected int kernelRadius = 2;
-	protected int offset = kernelRadius;
+
+	protected int kernelWidth = 5;
+	protected int offset = 2;
 
 	public CompareToStandardConvolution( Class<?> targetClass ) {
 		super(targetClass, ConvolveImageStandard.class);
 	}
 
 	public void compareMethod( Method target , String validationName , int radius ) {
-		compareMethod(target,validationName,radius,radius);
+		compareMethod(target,validationName,2*radius+1,radius);
 	}
 
-	public void compareMethod( Method target , String validationName , int radius , int offset ) {
-		this.kernelRadius = radius;
+	public void compareMethod( Method target , String validationName , int width , int offset ) {
+		this.kernelWidth = width;
 		this.offset = offset;
 		super.compareMethod(target,validationName);
 	}
@@ -93,22 +94,23 @@ public class CompareToStandardConvolution extends CompareIdenticalFunctions
 	private KernelBase createKernel(Class<?> paramType) {
 		KernelBase kernel;
 		if (Kernel1D_F32.class == paramType) {
-			kernel = FactoryKernel.random1D_F32(kernelRadius, -1, 1, rand);
+			kernel = FactoryKernel.random1D_F32(kernelWidth,offset, -1, 1, rand);
+		} else if (Kernel1D_F64.class == paramType) {
+			kernel = FactoryKernel.random1D_F64(kernelWidth,offset, 0, 5, rand);
 		} else if (Kernel1D_I32.class == paramType) {
-			kernel = FactoryKernel.random1D_I32(kernelRadius, 0, 5, rand);
+			kernel = FactoryKernel.random1D_I32(kernelWidth,offset, 0, 5, rand);
 		} else if (Kernel2D_I32.class == paramType) {
-			kernel = FactoryKernel.random2D_I32(kernelRadius, -1, 1, rand);
+			kernel = FactoryKernel.random2D_I32(kernelWidth,offset, -1, 1, rand);
 		} else if (Kernel2D_F32.class == paramType) {
-			kernel = FactoryKernel.random2D_F32(kernelRadius, 0, 5, rand);
+			kernel = FactoryKernel.random2D_F32(kernelWidth,offset, 0, 5, rand);
 		} else {
 			throw new RuntimeException("Unknown kernel type");
 		}
-		kernel.offset = offset;
 		return kernel;
 	}
 
-	public void setKernelRadius(int kernelRadius) {
-		this.kernelRadius = kernelRadius;
+	public void setKernelWidth(int kernelWidth) {
+		this.kernelWidth = kernelWidth;
 	}
 
 	public void setOffset(int offset) {

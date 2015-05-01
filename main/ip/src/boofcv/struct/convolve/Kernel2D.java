@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,8 +27,8 @@ package boofcv.struct.convolve;
 public abstract class Kernel2D extends KernelBase {
 
 
-	protected Kernel2D(int offset, int width) {
-		super(offset, width);
+	protected Kernel2D(int width, int offset) {
+		super(width, offset);
 	}
 
 	protected Kernel2D(int width) {

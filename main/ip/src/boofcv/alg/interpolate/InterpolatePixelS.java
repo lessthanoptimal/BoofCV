@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,6 +27,14 @@ import boofcv.struct.image.ImageSingleBand;
  * @author Peter Abeles
  */
 public interface InterpolatePixelS<T extends ImageSingleBand> extends InterpolatePixel<T> {
+
+	/**
+	 * Interpolates using the border class.  This is the slowest interpoaltion method provided.
+	 * @param x Point's x-coordinate. Can be outside the image.
+	 * @param y Point's y-coordinate. Can be outside the image.
+	 * @return Interpolated intensity value
+	 */
+	public float get_border(float x, float y);
 
 	/**
 	 * Returns the interpolated pixel value at the specified location while taking in account

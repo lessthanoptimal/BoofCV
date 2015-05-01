@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.core.image.border;
 
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageBase;
 
 /**
  * A wrapper around a normal image that returns a numeric value if a pixel is requested that is outside of the image
@@ -26,7 +26,7 @@ import boofcv.struct.image.ImageSingleBand;
  *
  * @author Peter Abeles
  */
-public abstract class ImageBorder<T extends ImageSingleBand> {
+public abstract class ImageBorder<T extends ImageBase> {
 
 	T image;
 
@@ -48,5 +48,5 @@ public abstract class ImageBorder<T extends ImageSingleBand> {
 	/**
 	 * Generalized non image type specific set.  This can be very slow
 	 */
-	public abstract double getGeneral( int x , int y );
+	public abstract double getGeneral(int x, int y, int band);
 }

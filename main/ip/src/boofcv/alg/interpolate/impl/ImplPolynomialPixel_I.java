@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -15,16 +15,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package boofcv.alg.interpolate.impl;
 
 import boofcv.alg.interpolate.PolynomialPixel;
+import boofcv.core.image.border.ImageBorder_I32;
 import boofcv.struct.image.ImageInteger;
 import boofcv.struct.image.ImageType;
 
 /**
  * <p>
  * Implementation of {@link PolynomialPixel}.
+ * </p>
+ * <p>
+ * NOTE: This code was automatically generated using {@link GenerateImplPolynomialPixel}.
  * </p>
  * 
  * @author Peter Abeles
@@ -39,7 +42,6 @@ public class ImplPolynomialPixel_I extends PolynomialPixel<ImageInteger> {
 	public float get(float x, float y) {
 		if( x < 0 || y < 0 || x > image.width-1 || y > image.height-1 )
 			throw new IllegalArgumentException("Pixel out of bounds. "+x+" "+y);
-
 		int width = image.getWidth();
 		int height = image.getHeight();
 
@@ -110,7 +112,37 @@ public class ImplPolynomialPixel_I extends PolynomialPixel<ImageInteger> {
 	}
 
 	@Override
+	public float get_border(float x, float y) {
+		int xt = (int) Math.floor(x);
+		int yt = (int) Math.floor(y);
+
+		int x0 = xt - M/2 + offM;
+		int y0 = yt - M/2 + offM;
+
+		ImageBorder_I32 border = (ImageBorder_I32)this.border;
+
+		interp1D.setInput(horiz,horiz.length);
+		for( int i = 0; i < M; i++ ) {
+			for( int j = 0; j < M; j++ ) {
+				horiz[j] = border.get(j+x0,i+y0);
+			}
+			vert[i]=interp1D.process(x-x0,0,M-1);
+		}
+		interp1D.setInput(vert,vert.length);
+
+		float ret = interp1D.process(y-y0,0,M-1);
+
+		// because it is fitting polynomials it can go above or below max or min values.
+		if( ret > max ) {
+			ret = max;
+		} else if( ret < min ) {
+			ret = min;
+		}
+		return ret;
+	}
+	@Override
 	public ImageType<ImageInteger> getImageType() {
 		return ImageType.single(ImageInteger.class);
 	}
+
 }

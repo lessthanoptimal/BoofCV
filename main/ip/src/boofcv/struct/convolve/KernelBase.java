@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,13 +32,17 @@ public abstract class KernelBase {
 	public int offset;
 
 	protected KernelBase(int width) {
+		if (width <= 0)
+			throw new IllegalArgumentException("Kernel width must be greater than zero not "+width);
 		this.width = width;
 		this.offset = width/2;
 	}
 
-	protected KernelBase(int offset, int width) {
-		if (width % 2 == 0 && width <= 0)
-			throw new IllegalArgumentException("invalid width");
+	protected KernelBase(int width, int offset) {
+		if (width <= 0)
+			throw new IllegalArgumentException("Kernel width must be greater than zero not "+width);
+		if (offset < 0 || offset >= width)
+			throw new IllegalArgumentException("The offset must be inside the kernel's bounds");
 		this.width = width;
 		this.offset = offset;
 	}
@@ -79,4 +83,6 @@ public abstract class KernelBase {
 	public abstract int getDimension();
 
 	public abstract boolean isInteger();
+
+	public abstract <T extends KernelBase>T copy();
 }

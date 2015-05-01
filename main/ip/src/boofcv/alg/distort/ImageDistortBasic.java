@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -89,12 +89,11 @@ public abstract class ImageDistortBasic<Input extends ImageSingleBand,Output ext
 	private void init(Input srcImg, Output dstImg) {
 		this.srcImg = srcImg;
 		this.dstImg = dstImg;
+		interp.setBorder(border);
 		interp.setImage(srcImg);
 	}
 
 	public void applyBorder() {
-
-		border.setImage(srcImg);
 
 		final float minInterpX = interp.getFastBorderX();
 		final float minInterpY = interp.getFastBorderY();
@@ -112,7 +111,7 @@ public abstract class ImageDistortBasic<Input extends ImageSingleBand,Output ext
 				if( dstToSrc.distX < minInterpX || dstToSrc.distX > maxInterpX ||
 						dstToSrc.distY < minInterpY || dstToSrc.distY > maxInterpY ) {
 					if( dstToSrc.distX < 0f || dstToSrc.distX > widthF || dstToSrc.distY < 0f || dstToSrc.distY > heightF )
-						assign(indexDst,(float)border.getGeneral((int)dstToSrc.distX,(int)dstToSrc.distY));
+						assign(indexDst,interp.get_border(dstToSrc.distX, dstToSrc.distY));
 					else
 						assign(indexDst,interp.get(dstToSrc.distX, dstToSrc.distY));
 				} else {

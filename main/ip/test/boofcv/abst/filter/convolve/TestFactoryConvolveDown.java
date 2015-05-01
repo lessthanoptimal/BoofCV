@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -43,7 +43,8 @@ import java.util.Random;
 public class TestFactoryConvolveDown {
 
 	int skip = 2;
-	int radius = 2;
+	int kernelWidth = 5;
+	int radius = kernelWidth/2;
 	Random rand = new Random(2342);
 
 	int width = 30;
@@ -51,7 +52,7 @@ public class TestFactoryConvolveDown {
 
 	@Test
 	public void convolve1D_F32() {
-		Kernel1D_F32 kernel = FactoryKernel.random1D_F32(radius,1,6,rand);
+		Kernel1D_F32 kernel = FactoryKernel.random1D_F32(kernelWidth,radius,1,6,rand);
 
 		FilterImageInterface<ImageFloat32,ImageFloat32> conv;
 
@@ -83,7 +84,7 @@ public class TestFactoryConvolveDown {
 	@Test
 	public void convolve1D_I32() {
 
-		Kernel1D_I32 kernel = FactoryKernel.random1D_I32(radius,1,6,rand);
+		Kernel1D_I32 kernel = FactoryKernel.random1D_I32(kernelWidth,radius,1,6,rand);
 
 		FilterImageInterface conv;
 
@@ -116,7 +117,7 @@ public class TestFactoryConvolveDown {
 
 	@Test
 	public void convolve2D_F32() {
-		Kernel2D_F32 kernel = FactoryKernel.random2D_F32(radius,1,6,rand);
+		Kernel2D_F32 kernel = FactoryKernel.random2D_F32(kernelWidth,radius,1,6,rand);
 
 		FilterImageInterface<ImageFloat32,ImageFloat32> conv;
 
@@ -148,7 +149,7 @@ public class TestFactoryConvolveDown {
 	@Test
 	public void convolve2D_I32() {
 
-		Kernel2D_I32 kernel = FactoryKernel.random2D_I32(radius,1,6,rand);
+		Kernel2D_I32 kernel = FactoryKernel.random2D_I32(kernelWidth,radius,1,6,rand);
 
 		FilterImageInterface conv;
 
