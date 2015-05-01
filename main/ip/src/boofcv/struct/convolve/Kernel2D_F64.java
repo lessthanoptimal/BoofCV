@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -90,6 +90,11 @@ public class Kernel2D_F64 extends Kernel2D {
 	@Override
 	public boolean isInteger() {
 		return false;
+	}
+
+	@Override
+	public <T extends KernelBase> T copy() {
+		return null;
 	}
 
 	public double[] getData() {

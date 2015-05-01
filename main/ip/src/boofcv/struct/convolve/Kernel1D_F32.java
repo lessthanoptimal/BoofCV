@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -15,7 +15,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package boofcv.struct.convolve;
 
 /**
@@ -32,50 +31,48 @@ public class Kernel1D_F32 extends Kernel1D {
 	public float data[];
 
 	/**
-	 * Creates a new kernel whose initial values are specified by data and width.  The length
-	 * of its internal data will be width.  Data must be at least as long as width.
+	 * Creates a new kernel whose initial values are specified by "data" and length is "width". 
+	 * The offset will be set to width/2
 	 *
 	 * @param data  The value of the kernel. Not modified.  Reference is not saved.
-	 * @param width The kernels width.  Must be odd.
+	 * @param width The kernels width.
 	 */
 	public Kernel1D_F32(float data[], int width) {
-		this(data,width/2,width);
-		if( width % 2 != 1 )
-			throw new IllegalArgumentException("Kernel must be add to use this constructor");
+		this(data,width,width/2);
 	}
 
 	/**
-	 * Creates a new kernel whose initial values are specified by data and width.  The length
-	 * of its internal data will be width.  Data must be at least as long as width.
+	 * Creates a kernel with elements equal to 'data' and with the specified 'width' plus 'offset'
 	 *
 	 * @param data  The value of the kernel. Not modified.  Reference is not saved.
-	 * @param width The kernels width.  Must be odd.
+	 * @param width The kernels width.
 	 * @param offset Location of the origin in the array
 	 */
-	public Kernel1D_F32(float data[], int offset , int width) {
-		super(offset,width);
+	public Kernel1D_F32(float data[], int width , int offset) {
+		super(width,offset);
 
 		this.data = new float[width];
 		System.arraycopy(data, 0, this.data, 0, width);
 	}
 
 	/**
-	 * Create a kernel whose elements are all equal to zero.
+	 * Create a kernel with elements initialized to zero.  Offset is automatically
+	 * set to width/2.
 	 *
-	 * @param width How wide the kernel is.  Must be odd.
+	 * @param width How wide the kernel is. 
 	 */
 	public Kernel1D_F32(int width) {
-		this(width/2,width);
+		this(width,width/2);
 	}
 
 	/**
-	 * Create a kernel whose elements are all equal to zero.
+	 * Create a kernel whose elements initialized to zero.
 	 *
-	 * @param width How wide the kernel is.  Must be odd.
+	 * @param width How wide the kernel is.
 	 * @param offset Location of the origin in the array
 	 */
-	public Kernel1D_F32(int offset , int width) {
-		super(offset,width);
+	public Kernel1D_F32(int width , int offset) {
+		super(width,offset);
 		data = new float[width];
 	}
 
@@ -104,6 +101,12 @@ public class Kernel1D_F32 extends Kernel1D {
 		return ret;
 	}
 
+	public Kernel1D_F32 copy() {
+		Kernel1D_F32 ret = new Kernel1D_F32(width,offset);
+		System.arraycopy(data,0,ret.data,0,ret.width);
+		return ret;
+	}
+
 	@Override
 	public boolean isInteger() {
 		return false;
@@ -124,13 +127,6 @@ public class Kernel1D_F32 extends Kernel1D {
 
 	public float[] getData() {
 		return data;
-	}
-
-	public Kernel1D_F32 copy() {
-		Kernel1D_F32 ret = new Kernel1D_F32(width);
-		ret.offset = this.offset;
-		System.arraycopy(data,0,ret.data,0,ret.width);
-		return ret;
 	}
 
 	public void print() {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -117,6 +117,7 @@ public class Kernel2D_F32 extends Kernel2D {
 		System.out.println();
 	}
 
+	@Override
 	public Kernel2D_F32 copy() {
 		Kernel2D_F32 ret = new Kernel2D_F32(width);
 		ret.offset = this.offset;

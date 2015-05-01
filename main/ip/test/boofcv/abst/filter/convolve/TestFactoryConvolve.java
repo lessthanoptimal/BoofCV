@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -45,7 +45,8 @@ import java.util.Random;
 @SuppressWarnings({"unchecked"})
 public class TestFactoryConvolve {
 
-	int radius = 2;
+	int kernelWidth = 5;
+	int radius = kernelWidth/2;
 	Random rand = new Random(2342);
 
 	int width = 30;
@@ -53,7 +54,7 @@ public class TestFactoryConvolve {
 
 	@Test
 	public void convolve1D_F32() {
-		Kernel1D_F32 kernel = FactoryKernel.random1D_F32(radius,1,6,rand);
+		Kernel1D_F32 kernel = FactoryKernel.random1D_F32(kernelWidth,radius,1,6,rand);
 
 		ConvolveInterface<ImageFloat32,ImageFloat32> conv;
 
@@ -85,7 +86,7 @@ public class TestFactoryConvolve {
 	@Test
 	public void convolve1D_I32() {
 
-		Kernel1D_I32 kernel = FactoryKernel.random1D_I32(radius,1,6,rand);
+		Kernel1D_I32 kernel = FactoryKernel.random1D_I32(kernelWidth,radius,1,6,rand);
 
 		ConvolveInterface conv;
 

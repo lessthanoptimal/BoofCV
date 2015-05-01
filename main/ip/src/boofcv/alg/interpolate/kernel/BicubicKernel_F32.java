@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.alg.interpolate.kernel;
 
+import boofcv.struct.convolve.KernelBase;
 import boofcv.struct.convolve.KernelContinuous1D_F32;
 
 /**
@@ -53,6 +54,11 @@ public class BicubicKernel_F32 extends KernelContinuous1D_F32 {
 	@Override
 	public boolean isInteger() {
 		return false;
+	}
+
+	@Override
+	public <T extends KernelBase> T copy() {
+		return null;
 	}
 
 	@Override

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -47,8 +47,8 @@ import boofcv.struct.image.ImageUInt8;
  */
 public class GradientTwo {
 
-	public static Kernel1D_I32 kernelDeriv_I32 = new Kernel1D_I32(new int[]{-1,1},0,2);
-	public static Kernel1D_F32 kernelDeriv_F32 = new Kernel1D_F32(new float[]{-1,1},0,2);
+	public static Kernel1D_I32 kernelDeriv_I32 = new Kernel1D_I32(new int[]{-1,1}, 2, 0);
+	public static Kernel1D_F32 kernelDeriv_F32 = new Kernel1D_F32(new float[]{-1,1}, 2, 0);
 
 	/**
 	 * Returns the kernel for computing the derivative along the x-axis.

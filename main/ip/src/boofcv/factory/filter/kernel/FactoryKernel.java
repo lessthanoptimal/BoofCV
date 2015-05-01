@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -113,10 +113,14 @@ public class FactoryKernel {
 	 */
 	public static <T extends KernelBase> T random( Class<?> type , int radius , int min , int max , Random rand )
 	{
+		int width = radius*2+1;
+
 		if (Kernel1D_F32.class == type) {
-			return (T) FactoryKernel.random1D_F32(radius, min, max, rand);
+			return (T) FactoryKernel.random1D_F32(width, radius, min, max, rand);
+		} else if (Kernel1D_F64.class == type) {
+				return (T) FactoryKernel.random1D_F64(width, radius, min, max, rand);
 		} else if (Kernel1D_I32.class == type) {
-			return (T) FactoryKernel.random1D_I32(radius, min, max, rand);
+			return (T) FactoryKernel.random1D_I32(width, radius, min, max, rand);
 		} else if (Kernel2D_I32.class == type) {
 			return (T) FactoryKernel.random2D_I32(radius, min, max, rand);
 		} else if (Kernel2D_F32.class == type) {
@@ -135,8 +139,8 @@ public class FactoryKernel {
 	 * @param rand   Random number generator.
 	 * @return Randomized kernel.
 	 */
-	public static Kernel1D_I32 random1D_I32(int radius, int min, int max, Random rand) {
-		Kernel1D_I32 ret = new Kernel1D_I32(radius * 2 + 1);
+	public static Kernel1D_I32 random1D_I32(int width , int radius, int min, int max, Random rand) {
+		Kernel1D_I32 ret = new Kernel1D_I32(width,radius);
 
 		int range = max - min;
 		for (int i = 0; i < ret.data.length; i++) {
@@ -149,14 +153,15 @@ public class FactoryKernel {
 	/**
 	 * Creates a random 1D kernel drawn from a uniform distribution.
 	 *
-	 * @param radius Kernel's radius.
+	 * @param width Kernel's width.
+	 * @param offset Offset for element zero in the kernel
 	 * @param min	minimum value.
 	 * @param max	maximum value.
 	 * @param rand   Random number generator.
 	 * @return Randomized kernel.
 	 */
-	public static Kernel1D_F32 random1D_F32(int radius, float min, float max, Random rand) {
-		Kernel1D_F32 ret = new Kernel1D_F32(radius * 2 + 1);
+	public static Kernel1D_F32 random1D_F32(int width , int offset, float min, float max, Random rand) {
+		Kernel1D_F32 ret = new Kernel1D_F32(width,offset);
 
 		float range = max - min;
 		for (int i = 0; i < ret.data.length; i++) {
@@ -166,8 +171,9 @@ public class FactoryKernel {
 		return ret;
 	}
 
-	public static Kernel1D_F64 random1D_F64(int radius, double min, double max, Random rand) {
-		Kernel1D_F64 ret = new Kernel1D_F64(radius * 2 + 1);
+
+	public static Kernel1D_F64 random1D_F64(int width , int offset, double min, double max, Random rand) {
+		Kernel1D_F64 ret = new Kernel1D_F64(width,offset);
 
 		double range = max - min;
 		for (int i = 0; i < ret.data.length; i++) {

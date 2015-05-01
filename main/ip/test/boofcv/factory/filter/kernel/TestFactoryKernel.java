@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -74,7 +74,7 @@ public class TestFactoryKernel {
 
 	@Test
 	public void random1D_I32() {
-		Kernel1D_I32 kernel = FactoryKernel.random1D_I32(2, -2, 2, rand);
+		Kernel1D_I32 kernel = FactoryKernel.random1D_I32(5,2, -2, 2, rand);
 		int nonZero = 0;
 		for (int i = 0; i < kernel.width; i++) {
 			assertTrue(kernel.get(i) <= 2);
@@ -87,7 +87,7 @@ public class TestFactoryKernel {
 
 	@Test
 	public void random1D_F32() {
-		Kernel1D_F32 kernel = FactoryKernel.random1D_F32(2, -2, 2, rand);
+		Kernel1D_F32 kernel = FactoryKernel.random1D_F32(5,2, -2, 2, rand);
 		int nonZero = 0;
 		for (int i = 0; i < kernel.width; i++) {
 			assertTrue(kernel.get(i) <= 2);
@@ -100,7 +100,7 @@ public class TestFactoryKernel {
 
 	@Test
 	public void random1D_F64() {
-		Kernel1D_F64 kernel = FactoryKernel.random1D_F64(2, -2, 2, rand);
+		Kernel1D_F64 kernel = FactoryKernel.random1D_F64(5,2, -2, 2, rand);
 		int nonZero = 0;
 		for (int i = 0; i < kernel.width; i++) {
 			assertTrue(kernel.get(i) <= 2);

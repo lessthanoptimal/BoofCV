@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -92,10 +92,13 @@ public class CompareToStandardConvolution extends CompareIdenticalFunctions
 
 	private KernelBase createKernel(Class<?> paramType) {
 		KernelBase kernel;
+		int width = kernelRadius*2+1;
 		if (Kernel1D_F32.class == paramType) {
-			kernel = FactoryKernel.random1D_F32(kernelRadius, -1, 1, rand);
+			kernel = FactoryKernel.random1D_F32(width,kernelRadius, -1, 1, rand);
+		} else if (Kernel1D_F64.class == paramType) {
+			kernel = FactoryKernel.random1D_F64(width, kernelRadius, 0, 5, rand);
 		} else if (Kernel1D_I32.class == paramType) {
-			kernel = FactoryKernel.random1D_I32(kernelRadius, 0, 5, rand);
+			kernel = FactoryKernel.random1D_I32(width, kernelRadius, 0, 5, rand);
 		} else if (Kernel2D_I32.class == paramType) {
 			kernel = FactoryKernel.random2D_I32(kernelRadius, -1, 1, rand);
 		} else if (Kernel2D_F32.class == paramType) {
