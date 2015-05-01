@@ -45,6 +45,9 @@ public class Zhang99ParamCamera {
 	public Zhang99ParamCamera() {
 	}
 
+	/**
+	 * Sets to zero parameters which are assumed zero and not estimated
+	 */
 	public void zeroNotUsed() {
 		if( assumeZeroSkew)
 			c = 0;
@@ -53,6 +56,9 @@ public class Zhang99ParamCamera {
 		}
 	}
 
+	/**
+	 * Returns the total number of parameters being estimated
+	 */
 	public int numParameters() {
 		int total = 4 + radial.length;
 		if( !assumeZeroSkew )
@@ -64,6 +70,11 @@ public class Zhang99ParamCamera {
 		return total;
 	}
 
+	/**
+	 * Sets the camera parameters from the passed in array
+	 *
+	 * @return number of parameters read.
+	 */
 	public int setFromParam( double param[] ) {
 		int index = 0;
 
@@ -86,6 +97,11 @@ public class Zhang99ParamCamera {
 		return index;
 	}
 
+	/**
+	 * Writes the parameters into the provided array
+	 *
+	 * @return number of parameters
+	 */
 	public int convertToParam( double param[] ) {
 		int index = 0;
 

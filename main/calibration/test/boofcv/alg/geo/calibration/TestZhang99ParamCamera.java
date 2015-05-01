@@ -20,7 +20,8 @@ package boofcv.alg.geo.calibration;
 
 import org.junit.Test;
 
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Peter Abeles
@@ -28,21 +29,83 @@ import static org.junit.Assert.fail;
 public class TestZhang99ParamCamera {
 	@Test
 	public void zeroNotUsed() {
-		fail("Implement");
+		for (int i = 0; i < 4; i++) {
+			boolean skew = i%2 == 0;
+			boolean tangent = i/2 == 0;
+
+			Zhang99ParamCamera param = new Zhang99ParamCamera(skew,2,tangent);
+			param.a = param.b = param.c = param.x0 = param.y0 = 2;
+			param.t1 = param.t2 = 3;
+
+			param.zeroNotUsed();
+
+			assertTrue(param.a != 0);
+			assertTrue(param.b != 0);
+			assertTrue(skew == (param.c == 0));
+			assertTrue(param.x0 != 0);
+			assertTrue(param.y0 != 0);
+
+			assertTrue(tangent == (param.t1 != 0));
+			assertTrue(tangent == (param.t2 != 0));
+		}
 	}
 
 	@Test
 	public void numParameters() {
-		fail("Implement");
+		for (int i = 0; i < 4; i++) {
+			boolean skew = i % 2 == 0;
+			boolean tangent = i / 2 == 0;
+
+			Zhang99ParamCamera param = new Zhang99ParamCamera(skew, 2, tangent);
+
+			int expected = 6;
+			if( !skew ) expected++;
+			if( tangent ) expected += 2;
+
+			assertEquals(expected, param.numParameters());
+		}
 	}
 
 	@Test
-	public void setFromParam() {
-		fail("Implement");
-	}
+	public void setFromParam_convertToParam() {
+		for (int i = 0; i < 4; i++) {
+			boolean skew = i % 2 == 0;
+			boolean tangent = i / 2 == 0;
 
-	@Test
-	public void convertToParam() {
-		fail("Implement");
+			Zhang99ParamCamera param = new Zhang99ParamCamera(skew, 2, tangent);
+
+			double d[] = new double[ param.numParameters()];
+			for (int j = 0; j < d.length; j++) {
+				d[j] = j+1;
+			}
+
+			param.setFromParam(d);
+
+			int c = 1;
+			assertEquals(c++, param.a, 1e-8);
+			assertEquals(c++, param.b, 1e-8);
+			if( !skew )
+				assertEquals(c++, param.c, 1e-8);
+			else
+				assertEquals(0, param.c, 1e-8);
+			assertEquals(c++, param.x0, 1e-8);
+			assertEquals(c++, param.y0, 1e-8);
+			assertEquals(c++, param.radial[0], 1e-8);
+			assertEquals(c++, param.radial[1], 1e-8);
+			if (tangent) {
+				assertEquals(c++, param.t1, 1e-8);
+				assertEquals(c, param.t2, 1e-8);
+			} else {
+				assertEquals(0, param.t1, 1e-8);
+				assertEquals(0, param.t2, 1e-8);
+			}
+
+			double e[] = new double[d.length];
+			param.convertToParam(e);
+
+			for (int j = 0; j < e.length; j++) {
+				assertTrue(e[j]==d[j]);
+			}
+		}
 	}
 }

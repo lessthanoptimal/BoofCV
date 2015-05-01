@@ -18,16 +18,18 @@
 
 package boofcv.alg.distort;
 
-import org.junit.Test;
-
-import static org.junit.Assert.fail;
+import boofcv.struct.calib.IntrinsicParameters;
 
 /**
  * @author Peter Abeles
  */
-public class TestLensDistortionRadialTangential {
-	@Test
-	public void stuff() {
-		fail("Implement");
+public class TestLensDistortionRadialTangential extends GeneralLensDistortionPinholeChecks{
+
+	@Override
+	public LensDistortionPinhole create() {
+		IntrinsicParameters param = new IntrinsicParameters(500,550,0.001,400,450,1000,800).
+				fsetRadial(0.02, 0.005);
+
+		return new LensDistortionRadialTangential(param);
 	}
 }

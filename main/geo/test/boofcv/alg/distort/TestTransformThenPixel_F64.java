@@ -18,16 +18,55 @@
 
 package boofcv.alg.distort;
 
+import boofcv.struct.distort.PointTransform_F64;
+import georegression.struct.point.Point2D_F64;
 import org.junit.Test;
 
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Peter Abeles
  */
 public class TestTransformThenPixel_F64 {
 	@Test
-	public void stuff() {
-		fail("Implement");
+	public void set() {
+		TransformThenPixel_F64 alg = new TransformThenPixel_F64(null);
+
+		assertTrue(alg == alg.set(1, 2, 3, 4, 5));
+		assertEquals(1,alg.fx,1e-8);
+		assertEquals(2,alg.fy,1e-8);
+		assertEquals(3,alg.skew,1e-8);
+		assertEquals(4,alg.cx,1e-8);
+		assertEquals(5,alg.cy,1e-8);
+		
+	}
+
+	@Test
+	public void compute() {
+		TransformThenPixel_F64 alg = new TransformThenPixel_F64(new Dummy());
+		alg.set(1, 2, 3, 4, 5);
+
+		double nx = 0.1, ny = 0.2;
+
+		double expectedX = 1*nx + 3*ny + 4;
+		double expectedY = 2*ny + 5;
+
+		Point2D_F64 found = new Point2D_F64();
+		alg.compute(1,2,found);
+
+		assertEquals(expectedX, found.x, 1e-8);
+		assertEquals(expectedY, found.y, 1e-8);
+	}
+
+	protected static class Dummy implements PointTransform_F64 {
+
+		@Override
+		public void compute(double x, double y, Point2D_F64 out) {
+			assertEquals(1,x,1e-8);
+			assertEquals(2,y,1e-8);
+			out.x = 0.1;
+			out.y = 0.2;
+		}
 	}
 }
