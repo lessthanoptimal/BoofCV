@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -83,9 +83,8 @@ public abstract class CompareImageBorder extends CompareEquivalentFunctions {
 		return a.subimage(borderX0,borderY0,a.width-borderX1,a.height-borderY1, null);
 	}
 
-	protected KernelBase createKernel(Class kernelType, int offset , int width) {
-		KernelBase k = FactoryKernel.random(kernelType, width / 2, -12, 10, rand);
-		k.offset = offset;
+	protected KernelBase createKernel(Class kernelType, int kernelWidth, int kernelOffset) {
+		KernelBase k = FactoryKernel.random(kernelType, kernelWidth, kernelOffset, -12, 10, rand);
 		return k;
 	}
 }

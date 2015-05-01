@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -111,7 +111,7 @@ public class TestConvolveJustBorder_General extends CompareImageBorder {
 	protected Object[][] createInputParam(Method candidate, Method validation) {
 		Class<?> paramTypes[] = candidate.getParameterTypes();
 
-		KernelBase kernel = createKernel(paramTypes[0],kernelWidth/2,kernelWidth);
+		KernelBase kernel = createKernel(paramTypes[0], kernelWidth, kernelWidth/2);
 
 		ImageSingleBand src = ConvolutionTestHelper.createImage(validation.getParameterTypes()[1], width, height);
 		GImageMiscOps.fillUniform(src, rand, 0, 5);
@@ -125,7 +125,7 @@ public class TestConvolveJustBorder_General extends CompareImageBorder {
 		ret[0][2] = dst;
 
 		// change the offset
-		kernel = createKernel(paramTypes[0],kernelWidth/2-1,kernelWidth);
+		kernel = createKernel(paramTypes[0], kernelWidth, kernelWidth/2-1);
 		ret[1][0] = kernel;
 		ret[1][1] = ImageFloat32.class == src.getClass() ?
 				ImageBorderValue.wrap((ImageFloat32)src,fillValue) : ImageBorderValue.wrap((ImageInteger)src,fillValue);

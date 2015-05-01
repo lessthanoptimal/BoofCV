@@ -32,6 +32,8 @@ public abstract class KernelBase {
 	public int offset;
 
 	protected KernelBase(int width) {
+		if (width <= 0)
+			throw new IllegalArgumentException("Kernel width must be greater than zero not "+width);
 		this.width = width;
 		this.offset = width/2;
 	}

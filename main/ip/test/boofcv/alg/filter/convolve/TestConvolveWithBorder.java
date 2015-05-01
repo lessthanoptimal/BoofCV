@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -41,7 +41,8 @@ import static org.junit.Assert.assertEquals;
 @SuppressWarnings({"unchecked"})
 public class TestConvolveWithBorder extends CompareImageBorder {
 
-	int kernelWidth = 5;
+	private int kernelWidth;
+	private int kernelOffset;
 
 	public TestConvolveWithBorder() {
 		super(ConvolveWithBorder.class);
@@ -49,6 +50,13 @@ public class TestConvolveWithBorder extends CompareImageBorder {
 
 	@Test
 	public void compareToNoBorder() {
+		kernelWidth = 5; kernelOffset = 2;
+		performTests(12);
+		kernelWidth = 5; kernelOffset = 0;
+		performTests(12);
+		kernelWidth = 5; kernelOffset = 4;
+		performTests(12);
+		kernelWidth = 4; kernelOffset = 1;
 		performTests(12);
 	}
 
@@ -117,22 +125,15 @@ public class TestConvolveWithBorder extends CompareImageBorder {
 	protected Object[][] createInputParam(Method candidate, Method validation) {
 		Class<?> paramTypes[] = candidate.getParameterTypes();
 
-		Object kernel = createKernel(paramTypes[0],kernelWidth/2,kernelWidth);
-
 		ImageSingleBand src = ConvolutionTestHelper.createImage(validation.getParameterTypes()[1], width, height);
 		GImageMiscOps.fillUniform(src, rand, 0, 5);
 		ImageSingleBand dst = ConvolutionTestHelper.createImage(validation.getParameterTypes()[2], width, height);
 
-		Object[][] ret = new Object[2][paramTypes.length];
-		ret[0][0] = kernel;
+		Object[][] ret = new Object[1][paramTypes.length];
+		ret[0][0] = createKernel(paramTypes[0], kernelWidth, kernelOffset);
 		ret[0][1] = src;
 		ret[0][2] = dst;
 		ret[0][3] = FactoryImageBorder.general(src, BorderType.EXTENDED);
-
-		ret[1][0] = createKernel(paramTypes[0],0,kernelWidth);
-		ret[1][1] = src;
-		ret[1][2] = dst;
-		ret[1][3] = FactoryImageBorder.general(src, BorderType.EXTENDED);
 
 		return ret;
 	}

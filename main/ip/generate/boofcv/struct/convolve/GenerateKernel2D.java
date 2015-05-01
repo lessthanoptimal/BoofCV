@@ -54,9 +54,9 @@ public class GenerateKernel2D extends CodeGeneratorBase {
 				" * \n" +
 				" * @author Peter Abeles\n" +
 				" */\n" +
-				"public class "+className+" extends Kernel2D {\n" +
+				"public class " + className + " extends Kernel2D {\n" +
 				"\n" +
-				"\tpublic "+sumType+" data[];\n" +
+				"\tpublic " + sumType + " data[];\n" +
 				"\n" +
 				"\t/**\n" +
 				"\t * Creates a new kernel whose initial values are specified by 'data' and 'width'.  The length\n" +
@@ -66,10 +66,10 @@ public class GenerateKernel2D extends CodeGeneratorBase {
 				"\t * @param width The kernels width.  Must be odd.\n" +
 				"\t * @param data  The value of the kernel. Not modified.  Reference is not saved.\n" +
 				"\t */\n" +
-				"\tpublic "+className+"(int width, "+sumType+" []data) {\n" +
+				"\tpublic " + className + "(int width, " + sumType + " []data) {\n" +
 				"\t\tsuper(width);\n" +
 				"\n" +
-				"\t\tthis.data = new "+sumType+"[width * width];\n" +
+				"\t\tthis.data = new " + sumType + "[width * width];\n" +
 				"\t\tSystem.arraycopy(data, 0, this.data, 0, this.data.length);\n" +
 				"\t}\n" +
 				"\n" +
@@ -79,10 +79,10 @@ public class GenerateKernel2D extends CodeGeneratorBase {
 				"\t *\n" +
 				"\t * @param width How wide the kernel is.\n" +
 				"\t */\n" +
-				"\tpublic "+className+"(int width) {\n" +
+				"\tpublic " + className + "(int width) {\n" +
 				"\t\tsuper(width);\n" +
 				"\n" +
-				"\t\tdata = new "+sumType+"[width * width];\n" +
+				"\t\tdata = new " + sumType + "[width * width];\n" +
 				"\t}\n" +
 				"\n" +
 				"\t/**\n" +
@@ -90,13 +90,13 @@ public class GenerateKernel2D extends CodeGeneratorBase {
 				"\t *\n" +
 				"\t * @param width How wide the kernel is.\n" +
 				"\t */\n" +
-				"\tpublic "+className+"(int width, int offset) {\n" +
+				"\tpublic " + className + "(int width, int offset) {\n" +
 				"\t\tsuper(width,offset);\n" +
 				"\n" +
-				"\t\tdata = new "+sumType+"[width * width];\n" +
+				"\t\tdata = new " + sumType + "[width * width];\n" +
 				"\t}\n" +
 				"\n" +
-				"\tprotected "+className+"() {\n" +
+				"\tprotected " + className + "() {\n" +
 				"\t}\n" +
 				"\n" +
 				"\t/**\n" +
@@ -108,11 +108,11 @@ public class GenerateKernel2D extends CodeGeneratorBase {
 				"\t * @param offset Kernel origin's offset from element 0.\n" +
 				"\t * @return A new kernel.\n" +
 				"\t */\n" +
-				"\tpublic static "+className+" wrap("+sumType+" data[], int width, int offset) {\n" +
+				"\tpublic static " + className + " wrap(" + sumType + " data[], int width, int offset) {\n" +
 				"\t\tif (width % 2 == 0 && width <= 0 && width * width > data.length)\n" +
 				"\t\t\tthrow new IllegalArgumentException(\"invalid width\");\n" +
 				"\n" +
-				"\t\t"+className+" ret = new "+className+"();\n" +
+				"\t\t" + className + " ret = new " + className + "();\n" +
 				"\t\tret.data = data;\n" +
 				"\t\tret.width = width;\n" +
 				"\t\tret.offset = offset;\n" +
@@ -120,26 +120,26 @@ public class GenerateKernel2D extends CodeGeneratorBase {
 				"\t\treturn ret;\n" +
 				"\t}\n" +
 				"\n" +
-				"\tpublic "+sumType+" get(int x, int y) {\n" +
+				"\tpublic " + sumType + " get(int x, int y) {\n" +
 				"\t\treturn data[y * width + x];\n" +
 				"\t}\n" +
 				"\n" +
-				"\tpublic void set( int x , int y , "+sumType+" value ) {\n" +
+				"\tpublic void set( int x , int y , " + sumType + " value ) {\n" +
 				"\t\tdata[y * width + x] = value;\n" +
 				"\t}\n" +
 				"\n" +
 				"\t@Override\n" +
 				"\tpublic boolean isInteger() {\n" +
-				"\t\treturn false;\n" +
+				"\t\treturn "+imageType.isInteger()+";\n" +
 				"\t}\n" +
 				"\n" +
-				"\tpublic "+sumType+"[] getData() {\n" +
+				"\tpublic " + sumType + "[] getData() {\n" +
 				"\t\treturn data;\n" +
 				"\t}\n" +
 				"\n" +
-				"\tpublic "+sumType+" computeSum() {\n" +
+				"\tpublic " + sumType + " computeSum() {\n" +
 				"\t\tint N = width*width;\n" +
-				"\t\t"+sumType+" total = 0;\n" +
+				"\t\t" + sumType + " total = 0;\n" +
 				"\t\tfor( int i = 0; i < N; i++ ) {\n" +
 				"\t\t\ttotal += data[i];\n" +
 				"\t\t}\n" +
@@ -148,9 +148,12 @@ public class GenerateKernel2D extends CodeGeneratorBase {
 				"\n" +
 				"\tpublic void print() {\n" +
 				"\t\tfor( int i = 0; i < width; i++ ) {\n" +
-				"\t\t\tfor( int j = 0; j < width; j++ ) {\n" +
-				"\t\t\t\tSystem.out.printf(\"%15f \",data[i*width+j]);\n" +
-				"\t\t\t}\n" +
+				"\t\t\tfor( int j = 0; j < width; j++ ) {\n");
+		if( imageType.isInteger() )
+			out.print("\t\t\t\tSystem.out.printf(\"%6d \", data[i*width+j]);\n");
+		else
+			out.print("\t\t\t\tSystem.out.printf(\"%15f \", data[i*width+j]);\n");
+		out.print("\t\t\t}\n" +
 				"\t\t\tSystem.out.println();\n" +
 				"\t\t}\n" +
 				"\t\tSystem.out.println();\n" +

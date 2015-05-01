@@ -90,13 +90,14 @@ public class Kernel1D_F32 extends Kernel1D {
 	 *
 	 * @param data  The array who will be the kernel's data.  Reference is saved.
 	 * @param width The kernel's width.
+	 * @param offset Location of the origin in the array
 	 * @return A new kernel.
 	 */
-	public static Kernel1D_F32 wrap(float data[], int width) {
+	public static Kernel1D_F32 wrap(float data[], int width, int offset ) {
 		Kernel1D_F32 ret = new Kernel1D_F32();
 		ret.data = data;
 		ret.width = width;
-		ret.offset = width/2;
+		ret.offset = offset;
 
 		return ret;
 	}
@@ -132,6 +133,7 @@ public class Kernel1D_F32 extends Kernel1D {
 
 	public void print() {
 		for (int i = 0; i < width; i++) {
+			System.out.printf("%6.3f ", data[i]);
 		}
 		System.out.println();
 	}

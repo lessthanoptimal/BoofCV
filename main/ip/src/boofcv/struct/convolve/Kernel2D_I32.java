@@ -105,7 +105,7 @@ public class Kernel2D_I32 extends Kernel2D {
 
 	@Override
 	public boolean isInteger() {
-		return false;
+		return true;
 	}
 
 	public int[] getData() {
@@ -124,7 +124,7 @@ public class Kernel2D_I32 extends Kernel2D {
 	public void print() {
 		for( int i = 0; i < width; i++ ) {
 			for( int j = 0; j < width; j++ ) {
-				System.out.printf("%15f ",data[i*width+j]);
+				System.out.printf("%6d ", data[i*width+j]);
 			}
 			System.out.println();
 		}

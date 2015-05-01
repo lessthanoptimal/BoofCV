@@ -115,13 +115,14 @@ public class GenerateKernel1D extends CodeGeneratorBase {
 				"\t *\n" +
 				"\t * @param data  The array who will be the kernel's data.  Reference is saved.\n" +
 				"\t * @param width The kernel's width.\n" +
+				"\t * @param offset Location of the origin in the array\n" +
 				"\t * @return A new kernel.\n" +
 				"\t */\n" +
-				"\tpublic static " + className + " wrap(" + sumType + " data[], int width) {\n" +
+				"\tpublic static " + className + " wrap(" + sumType + " data[], int width, int offset ) {\n" +
 				"\t\t" + className + " ret = new " + className + "();\n" +
 				"\t\tret.data = data;\n" +
 				"\t\tret.width = width;\n" +
-				"\t\tret.offset = width/2;\n" +
+				"\t\tret.offset = offset;\n" +
 				"\n" +
 				"\t\treturn ret;\n" +
 				"\t}\n" +
@@ -158,8 +159,8 @@ public class GenerateKernel1D extends CodeGeneratorBase {
 				"\tpublic void print() {\n" +
 				"\t\tfor (int i = 0; i < width; i++) {\n");
 		if( imageType.isInteger() )
-				out.print("\t\t\tSystem.out.printf(\"%6d \", data[i]);\n");
-		else if( imageType.isInteger() )
+			out.print("\t\t\tSystem.out.printf(\"%6d \", data[i]);\n");
+		else
 			out.print("\t\t\tSystem.out.printf(\"%6.3f \", data[i]);\n");
 
 		out.print("\t\t}\n" +
