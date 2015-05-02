@@ -108,7 +108,6 @@ public class CalibrateStereoPlanar {
 	 * @param right Image of right target.
 	 */
 	public boolean addPair( ImageFloat32 left , ImageFloat32 right ) {
-
 		if( !calibLeft.addImage(left) )
 			return false;
 

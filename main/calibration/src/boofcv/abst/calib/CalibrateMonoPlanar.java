@@ -148,6 +148,8 @@ public class CalibrateMonoPlanar {
 	 * estimate calibration parameters.  Error statistics are also computed.
 	 */
 	public IntrinsicParameters process() {
+		if( zhang99 == null )
+			throw new IllegalArgumentException("Please call configure first.");
 		if( !zhang99.process(observations) ) {
 			throw new RuntimeException("Zhang99 algorithm failed!");
 		}
