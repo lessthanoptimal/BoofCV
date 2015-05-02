@@ -30,13 +30,13 @@ import java.util.List;
  * 
  * @author Peter Abeles
  */
-public class WrapPlanarChessTarget implements PlanarCalibrationDetector {
+public class PlanarDetectorChessboard implements PlanarCalibrationDetector {
 
 	DetectChessCalibrationPoints<ImageFloat32,ImageFloat32> alg;
 
 	List<Point2D_F64> layoutPoints;
 
-	public WrapPlanarChessTarget(ConfigChessboard config ) {
+	public PlanarDetectorChessboard(ConfigChessboard config) {
 		alg = new DetectChessCalibrationPoints<ImageFloat32, ImageFloat32>(
 				config.numCols,config.numRows,config.nonmaxRadius,
 				config.relativeSizeThreshold,ImageFloat32.class);

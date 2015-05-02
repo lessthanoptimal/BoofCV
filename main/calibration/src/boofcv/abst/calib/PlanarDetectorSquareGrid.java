@@ -34,12 +34,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * Implementation of {@link PlanarCalibrationDetector} for square grid target types.
+ *
  * @author Peter Abeles
  */
-public class WrapPlanarSquareGridTarget implements PlanarCalibrationDetector {
+public class PlanarDetectorSquareGrid implements PlanarCalibrationDetector {
 
+	// number of squares in the grid's column
 	int squareColumns;
 
+	// shape of grid in calibration points
 	int pointColumns;
 	int pointRows;
 
@@ -58,7 +62,7 @@ public class WrapPlanarSquareGridTarget implements PlanarCalibrationDetector {
 	ConfigSquareGrid config;
 	List<Point2D_F64> layoutPoints;
 
-	public WrapPlanarSquareGridTarget( ConfigSquareGrid config ) {
+	public PlanarDetectorSquareGrid(ConfigSquareGrid config) {
 		this.config = config;
 		refine = new WrapRefineCornerSegmentFit();
 //		refine = new WrapRefineCornerCanny();
@@ -115,6 +119,7 @@ public class WrapPlanarSquareGridTarget implements PlanarCalibrationDetector {
 					orderAlg.getNumRows(),orderAlg.getNumCols(),
 					pointRows,pointColumns);
 		} catch( InvalidCalibrationTarget e ) {
+			System.err.println("Target lost during subpixel estimation.  This algorithm needs to be improved");
 //			e.printStackTrace();
 			return false;
 		}

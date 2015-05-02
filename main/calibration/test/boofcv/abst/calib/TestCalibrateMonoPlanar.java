@@ -73,7 +73,7 @@ public class TestCalibrateMonoPlanar {
 
 		List<Point2D_F64> obs;
 
-		List<Point2D_F64> layout = WrapPlanarSquareGridTarget.createLayout(3,4,30,30);
+		List<Point2D_F64> layout = PlanarDetectorSquareGrid.createLayout(3, 4, 30, 30);
 
 		@Override
 		public boolean process(ImageFloat32 input) {

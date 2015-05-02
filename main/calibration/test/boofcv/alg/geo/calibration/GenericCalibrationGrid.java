@@ -20,7 +20,7 @@ package boofcv.alg.geo.calibration;
 
 import boofcv.abst.calib.ConfigSquareGrid;
 import boofcv.abst.calib.PlanarCalibrationDetector;
-import boofcv.abst.calib.WrapPlanarSquareGridTarget;
+import boofcv.abst.calib.PlanarDetectorSquareGrid;
 import boofcv.factory.calib.FactoryPlanarCalibrationTarget;
 import georegression.geometry.GeometryMath_F64;
 import georegression.geometry.RotationMatrixGenerator;
@@ -42,7 +42,7 @@ import java.util.Random;
 public class GenericCalibrationGrid {
 
 	public static List<Point2D_F64> standardLayout() {
-		return WrapPlanarSquareGridTarget.createLayout(4,5,30,30);
+		return PlanarDetectorSquareGrid.createLayout(4, 5, 30, 30);
 	}
 
 	public static PlanarCalibrationDetector createStandardConfig() {

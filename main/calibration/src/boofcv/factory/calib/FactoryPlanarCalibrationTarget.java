@@ -36,7 +36,7 @@ public class FactoryPlanarCalibrationTarget {
 	public static PlanarCalibrationDetector detectorSquareGrid( ConfigSquareGrid config) {
 		config.checkValidity();
 
-		return new WrapPlanarSquareGridTarget(config);
+		return new PlanarDetectorSquareGrid(config);
 	}
 
 	/**
@@ -50,6 +50,6 @@ public class FactoryPlanarCalibrationTarget {
 	public static PlanarCalibrationDetector detectorChessboard( ConfigChessboard config ) {
 		config.checkValidity();
 
-		return new WrapPlanarChessTarget(config);
+		return new PlanarDetectorChessboard(config);
 	}
 }
