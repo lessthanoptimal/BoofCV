@@ -39,9 +39,9 @@ import java.util.regex.Pattern;
 public class BatchDownSizeImage {
 
 	public static void printHelpAndExit() {
-		System.out.println("<app name> <file path regex> <output directory> <width> <height>");
+		System.out.println("<file path regex> <output directory> <width> <height>");
 		System.out.println("If height == 0 then it will select the height which maintains the same aspect ratio");
-		System.out.println("java -jar FOO.jar ASDASD path/to/input/image\\d*.jpg path/to/output 640 0");
+		System.out.println("path/to/input/image\\d*.jpg path/to/output 640 0");
 		System.exit(0);
 	}
 

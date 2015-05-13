@@ -161,20 +161,13 @@ public abstract class GenericPlanarCalibrationDetectorChecks {
 		}
 
 		assertEquals(expected.size(),found.size());
+
+		// the order is important.  check to see that they are close and in the correct order
 		for (int i = 0; i < found.size(); i++) {
 			Point2D_F64 f = found.get(i);
+			Point2D_F64 e = expected.get(i);
 
-			boolean matched = false;
-			for (int j = 0; j < expected.size(); j++) {
-				Point2D_F64 e = expected.get(j);
-
-				if( f.distance(e) < 3) {
-					matched = true;
-					break;
-				}
-			}
-
-			assertTrue(matched);
+			assertTrue(f.distance(e) < 3 );
 		}
 	}
 

@@ -101,7 +101,7 @@ public class PlanarDetectorSquareGrid implements PlanarCalibrationDetector {
 			return false;
 		try {
 			List<QuadBlob> squares = detect.getInterestSquares();
-		
+
 			// refine the corner accuracy estimate to sub-pixel
 			refine.refine(squares,input);
 
@@ -154,7 +154,7 @@ public class PlanarDetectorSquareGrid implements PlanarCalibrationDetector {
 
 		for( int i = numRows-1; i >= 0; i-- ) {
 			// this will be on the top of the black in the row
-			double y = startY + i*(squareWidth+spaceWidth);
+			double y = startY + i*(squareWidth+spaceWidth)+squareWidth;
 
 			List<Point2D_F64> top = new ArrayList<Point2D_F64>();
 			List<Point2D_F64> bottom = new ArrayList<Point2D_F64>();
