@@ -45,7 +45,6 @@ Version : Alpha 0.19
 
 TODO
   * Distortion Model + Calibration
-    - Update distortion visualization app to include tangential
     - calibration regression
        * given points compute parameters.  radial and tangential
        * detect calibration points, chessboard and square grid.  many images

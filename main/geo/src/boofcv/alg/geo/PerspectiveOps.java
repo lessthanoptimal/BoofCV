@@ -18,15 +18,15 @@
 
 package boofcv.alg.geo;
 
+import boofcv.alg.distort.NormalizedToPixel_F32;
 import boofcv.alg.distort.NormalizedToPixel_F64;
+import boofcv.alg.distort.PixelToNormalized_F32;
 import boofcv.alg.distort.PixelToNormalized_F64;
-import boofcv.alg.distort.PointTransformHomography_F32;
 import boofcv.struct.calib.IntrinsicParameters;
-import boofcv.struct.distort.PointTransform_F32;
-import boofcv.struct.distort.SequencePointTransform_F32;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.geo.AssociatedTriple;
 import georegression.geometry.GeometryMath_F64;
+import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Vector3D_F64;
@@ -62,62 +62,35 @@ public class PerspectiveOps {
 	}
 
 	/**
-	 * <p>
-	 * Creates a new {@link PointTransform_F32} which is the same as applying a homography transform
-	 * and another arbitrary transform.  A typical application is removing lens distortion.  The order that each
-	 * transform is applied depends on if the arbitrary transform is forward or reverse transform.  A new set of
-	 * camera parameters is computed to account for the adjustment.
-	 * </p>
+	 *
+	 * <p>Recomputes the {@link IntrinsicParameters} given an adjustment matrix.</p>
+	 * K<sub>A</sub> = A*K<br>
+	 * Where K<sub>A</sub> is the returned adjusted intrinsic matrix, A is the adjustment matrix and K is the
+	 * original intrinsic calibration matrix.
 	 *
 	 * <p>
-	 * When removing camera distortion, the undistorted image is likely to have a different shape not
-	 * entirely enclosed by the original image.  This can be compensated for by transforming the undistorted
-	 * image using a homography transform.  Typically this will translate and scale the undistorted image.
-	 * The end result is a new virtual camera which has the adjusted intrinsic camera parameters.
+	 * NOTE: Distortion parameters are ignored in the provided {@link IntrinsicParameters} class.
 	 * </p>
 	 *
-	 * <p>
-	 * The returned transform:<br>
-	 * &lambda;x = A*K*[R|T]X<br>
-	 * where A is the homography.
-	 * </p>
-	 *
-	 * @param distortPixel Transform that distorts the pixels in an image.
-	 * @param forwardTran If true then the distortion expects undistorted pixels as input, false means it
-	 *                    expects distorted pixels as input.
-	 * @param parameters Original intrinsic camera parameters
-	 * @param adjustMatrix Invertible homography
-	 * @param adjustedParam The new intrinsic calibration matrix.
-	 * @return The new transform.
+	 * @param parameters (Input) Original intrinsic parameters. Not modified.
+	 * @param adjustMatrix (Input) Adjustment matrix. Not modified.
+	 * @param adjustedParam (Output) Optional storage for adjusted intrinsic parameters. Can be null.
+	 * @return Adjusted intrinsic parameters.
 	 */
-	public static PointTransform_F32 adjustIntrinsic_F32(PointTransform_F32 distortPixel,
-														 boolean forwardTran,
-														 IntrinsicParameters parameters,
-														 DenseMatrix64F adjustMatrix,
-														 IntrinsicParameters adjustedParam)
+	public static IntrinsicParameters adjustIntrinsic(IntrinsicParameters parameters,
+													  DenseMatrix64F adjustMatrix,
+													  IntrinsicParameters adjustedParam)
 	{
-		if( adjustedParam != null ) {
-			DenseMatrix64F K = PerspectiveOps.calibrationMatrix(parameters, null);
-			DenseMatrix64F K_adj = new DenseMatrix64F(3,3);
-			DenseMatrix64F A;
-			// in the reverse case
-			if( !forwardTran ) {
-				A = new DenseMatrix64F(3,3);
-				CommonOps.invert(adjustMatrix,A);
-			} else {
-				A = adjustMatrix;
-			}
-			CommonOps.mult(A, K, K_adj);
+		if( adjustedParam == null )
+			adjustedParam = new IntrinsicParameters();
 
-			PerspectiveOps.matrixToParam(K_adj, parameters.width, parameters.height, adjustedParam);
-		}
+		DenseMatrix64F K = PerspectiveOps.calibrationMatrix(parameters, null);
+		DenseMatrix64F K_adj = new DenseMatrix64F(3,3);
+		CommonOps.mult(adjustMatrix, K, K_adj);
 
-		PointTransformHomography_F32 adjust = new PointTransformHomography_F32(adjustMatrix);
+		PerspectiveOps.matrixToParam(K_adj, parameters.width, parameters.height, adjustedParam);
 
-		if( forwardTran )
-			return new SequencePointTransform_F32(distortPixel,adjust);
-		else
-			return new SequencePointTransform_F32(adjust,distortPixel);
+		return adjustedParam;
 	}
 
 	/**
@@ -216,6 +189,33 @@ public class PerspectiveOps {
 	/**
 	 * <p>
 	 * Convenient function for converting from normalized image coordinates to the original image pixel coordinate.
+	 * If speed is a concern then {@link NormalizedToPixel_F32} should be used instead.
+	 * </p>
+	 * <p>
+	 * NOTE: Lens distortion handled!
+	 * </p>
+	 *
+	 * @param param Intrinsic camera parameters
+	 * @param x X-coordinate of normalized.
+	 * @param y Y-coordinate of normalized.
+	 * @param pixel Optional storage for output.  If null a new instance will be declared.
+	 * @return pixel image coordinate
+	 */
+	public static Point2D_F32 convertNormToPixel( IntrinsicParameters param , float x , float y , Point2D_F32 pixel ) {
+		if( pixel == null )
+			pixel = new Point2D_F32();
+
+		NormalizedToPixel_F32 alg = new NormalizedToPixel_F32();
+		alg.set(param.fx,param.fy,param.skew,param.cx,param.cy);
+
+		alg.compute(x,y,pixel);
+
+		return pixel;
+	}
+
+	/**
+	 * <p>
+	 * Convenient function for converting from normalized image coordinates to the original image pixel coordinate.
 	 * If speed is a concern then {@link NormalizedToPixel_F64} should be used instead.
 	 * </p>
 	 *
@@ -283,6 +283,34 @@ public class PerspectiveOps {
 			norm = new Point2D_F64();
 
 		PixelToNormalized_F64 alg = new PixelToNormalized_F64();
+		alg.set(param.fx,param.fy,param.skew,param.cx,param.cy);
+
+		alg.compute(pixel.x,pixel.y,norm);
+
+		return norm;
+	}
+
+	/**
+	 * <p>
+	 * Convenient function for converting from original image pixel coordinate to normalized< image coordinates.
+	 * If speed is a concern then {@link PixelToNormalized_F32} should be used instead.
+	 * </p>
+	 * <p>
+	 * NOTE: Lens distortion is not removed!
+	 * </p>
+	 *
+	 * NOTE: norm and pixel can be the same instance.
+	 *
+	 * @param param Intrinsic camera parameters
+	 * @param pixel Pixel coordinate
+	 * @param norm Optional storage for output.  If null a new instance will be declared.
+	 * @return normalized image coordinate
+	 */
+	public static Point2D_F32 convertPixelToNorm( IntrinsicParameters param , Point2D_F32 pixel , Point2D_F32 norm ) {
+		if( norm == null )
+			norm = new Point2D_F32();
+
+		PixelToNormalized_F32 alg = new PixelToNormalized_F32();
 		alg.set(param.fx,param.fy,param.skew,param.cx,param.cy);
 
 		alg.compute(pixel.x,pixel.y,norm);

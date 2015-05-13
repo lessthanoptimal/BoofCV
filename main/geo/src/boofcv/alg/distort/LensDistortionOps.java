@@ -29,6 +29,7 @@ import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.distort.PixelTransform_F32;
 import boofcv.struct.distort.PointTransform_F32;
+import boofcv.struct.distort.SequencePointTransform_F32;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 import georegression.struct.shapes.RectangleLength2D_F32;
@@ -115,14 +116,15 @@ public class LensDistortionOps {
 	 * </p>
 	 *
 	 * @param param Intrinsic camera parameters.
-	 * @param paramAdj If not null, the new camera parameters are stored here.
-	 * @param inputUndistorted if true then the transform will be from undistorted to distorted pixels,
-	 *                         false for the opposite.
-	 * @return New transform that adjusts the view and removes lens distortion..
+	 * @param paramAdj If not null, the new camera parameters for the undistorted view are stored here.
+	 * @param adjToDistorted If true then the transform's input is assumed to be pixels in the adjusted undistorted
+	 *                       image and the output will be in distorted image, if false then the reverse transform
+	 *                       is returned.
+	 * @return The requested transform
 	 */
 	public static PointTransform_F32 fullView( IntrinsicParameters param,
 											   IntrinsicParameters paramAdj ,
-											   boolean inputUndistorted ) {
+											   boolean adjToDistorted ) {
 
 		PointTransform_F32 remove_p_to_p = distortTransform(param).undistort_F32(true, true);
 
@@ -141,14 +143,7 @@ public class LensDistortionOps {
 		// adjustment matrix
 		DenseMatrix64F A = new DenseMatrix64F(3,3,true,scale,0,deltaX,0,scale,deltaY,0,0,1);
 
-		if( inputUndistorted ) {
-			PointTransform_F32 add_p_to_p = distortTransform(param).distort_F32(true, true);
-			// by setting forward false here the matrix is applied first
-			return PerspectiveOps.adjustIntrinsic_F32(add_p_to_p, false, param, A, paramAdj);
-		} else {
-			CommonOps.invert(A);
-			return PerspectiveOps.adjustIntrinsic_F32(remove_p_to_p, true, param, A, paramAdj);
-		}
+		return adjustmentTransform(param, paramAdj, adjToDistorted, remove_p_to_p, A);
 	}
 
 	/**
@@ -158,14 +153,15 @@ public class LensDistortionOps {
 	 * </p>
 	 *
 	 * @param param Intrinsic camera parameters.
-	 * @param paramAdj If not null, the new camera parameters are stored here.
-	 * @param inputUndistorted if true then the transform will be from undistorted to distorted pixels,
-	 *                         false for the opposite.
-	 * @return New transform that adjusts the view and removes lens distortion..
+	 * @param paramAdj If not null, the new camera parameters for the undistorted view are stored here.
+	 * @param adjToDistorted If true then the transform's input is assumed to be pixels in the adjusted undistorted
+	 *                       image and the output will be in distorted image, if false then the reverse transform
+	 *                       is returned.
+	 * @return The requested transform
 	 */
 	public static PointTransform_F32 allInside( IntrinsicParameters param,
 												IntrinsicParameters paramAdj ,
-												boolean inputUndistorted ) {
+												boolean adjToDistorted ) {
 		PointTransform_F32 remove_p_to_p = distortTransform(param).undistort_F32(true, true);
 
 		RectangleLength2D_F32 bound = LensDistortionOps.boundBoxInside(param.width, param.height,
@@ -186,12 +182,40 @@ public class LensDistortionOps {
 		// adjustment matrix
 		DenseMatrix64F A = new DenseMatrix64F(3,3,true,scale,0,deltaX,0,scale,deltaY,0,0,1);
 
-		if( inputUndistorted ) {
+		return adjustmentTransform(param, paramAdj, adjToDistorted, remove_p_to_p, A);
+	}
+
+	/**
+	 * Given the lens distortion and the intrinsic adjustment matrix compute the new intrinsic parameters
+	 * and {@link PointTransform_F32}
+	 */
+	private static PointTransform_F32 adjustmentTransform(IntrinsicParameters param,
+														  IntrinsicParameters paramAdj,
+														  boolean adjToDistorted,
+														  PointTransform_F32 remove_p_to_p,
+														  DenseMatrix64F A) {
+		DenseMatrix64F A_inv = null;
+
+		if( !adjToDistorted || paramAdj != null ) {
+			A_inv = new DenseMatrix64F(3, 3);
+			if (!CommonOps.invert(A, A_inv)) {
+				throw new RuntimeException("Failed to invert adjustment matrix.  Probably bad.");
+			}
+		}
+
+		if( paramAdj != null ) {
+			PerspectiveOps.adjustIntrinsic(param, A_inv, paramAdj);
+		}
+
+		if( adjToDistorted ) {
 			PointTransform_F32 add_p_to_p = distortTransform(param).distort_F32(true, true);
-			return PerspectiveOps.adjustIntrinsic_F32(add_p_to_p, false, param, A, paramAdj);
+			PointTransformHomography_F32 adjust = new PointTransformHomography_F32(A);
+
+			return new SequencePointTransform_F32(adjust,add_p_to_p);
 		} else {
-			CommonOps.invert(A);
-			return PerspectiveOps.adjustIntrinsic_F32(remove_p_to_p, true, param, A, paramAdj);
+			PointTransformHomography_F32 adjust = new PointTransformHomography_F32(A_inv);
+
+			return new SequencePointTransform_F32(remove_p_to_p,adjust);
 		}
 	}
 

@@ -18,18 +18,32 @@
 
 package boofcv.alg.distort;
 
-import boofcv.struct.calib.IntrinsicParameters;
+import boofcv.struct.distort.PointTransform_F32;
+import georegression.struct.point.Point2D_F32;
 
 /**
+ * Converts normalized pixel coordinate into pixel coordinate.
+ *
  * @author Peter Abeles
  */
-public class TestLensDistortionRadialTangential extends GeneralLensDistortionPinholeChecks
-{
-	@Override
-	public LensDistortionPinhole create() {
-		IntrinsicParameters param = new IntrinsicParameters(500,550,0.001,400,450,1000,800).
-				fsetRadial(0.02, 0.005);
+public class NormalizedToPixel_F32 implements PointTransform_F32 {
 
-		return new LensDistortionRadialTangential(param);
+	// camera calibration matrix
+	float fx, fy, skew, cx, cy;
+
+	public NormalizedToPixel_F32 set(double fx, double fy, double skew, double cx, double cy) {
+		this.fx = (float)fx;
+		this.fy = (float)fy;
+		this.skew = (float)skew;
+		this.cx = (float)cx;
+		this.cy = (float)cy;
+		return this;
+	}
+
+
+	@Override
+	public void compute(float x, float y, Point2D_F32 out) {
+		out.x = fx * x + skew * y + cx;
+		out.y = fy * y + cy;
 	}
 }

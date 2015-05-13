@@ -105,10 +105,10 @@ public class RectifyImageOps {
 	 * and a pixel are parallel it will require infinite area.
 	 * </p>
 	 *
-	 * @param paramLeft Intrinsic parameters for left camera
-	 * @param rectifyLeft Rectification matrix for left image.
-	 * @param rectifyRight Rectification matrix for right image.
-	 * @param rectifyK Rectification calibration matrix.
+	 * @param paramLeft Intrinsic parameters for left camera. Not modified.
+	 * @param rectifyLeft Rectification matrix for left image. Input and Output. Modified.
+	 * @param rectifyRight Rectification matrix for right image. Input and Output. Modified.
+	 * @param rectifyK Rectification calibration matrix. Input and Output. Modified.
 	 */
 	// TODO Delete this function?  It should reasonably fill the old view in most non-pathological cases
 	public static void fullViewLeft(IntrinsicParameters paramLeft,
@@ -171,7 +171,7 @@ public class RectifyImageOps {
 	 * overwritten with adjusted values on output.
 	 * </p>
 	 *
-	 * @param paramLeft Intrinsic parameters for left camera
+	 * @param paramLeft Intrinsic parameters for left camera. Not modified.
 	 * @param rectifyLeft Rectification matrix for left image. Input and Output. Modified.
 	 * @param rectifyRight Rectification matrix for right image. Input and Output. Modified.
 	 * @param rectifyK Rectification calibration matrix. Input and Output. Modified.
@@ -324,8 +324,8 @@ public class RectifyImageOps {
 	 * Creates a transform that applies rectification to unrectified distorted pixels.
 	 * </p>
 	 *
-	 * @param param Intrinsic parameters.
-	 * @param rectify Transform for rectifying the image.
+	 * @param param Intrinsic parameters. Not modified.
+	 * @param rectify Transform for rectifying the image. Not modified.
 	 * @return Transform from unrectified to rectified pixels
 	 */
 	public static PointTransform_F32 transformPixelToRect_F32(IntrinsicParameters param,
@@ -343,8 +343,8 @@ public class RectifyImageOps {
 	 * Creates a transform that applies rectification to unrectified distorted pixels.
 	 * </p>
 	 *
-	 * @param param Intrinsic parameters.
-	 * @param rectify Transform for rectifying the image.
+	 * @param param Intrinsic parameters. Not modified.
+	 * @param rectify Transform for rectifying the image. Not modified.
 	 * @return Transform from distorted pixel to rectified pixels
 	 */
 	public static PointTransform_F64 transformPixelToRect_F64(IntrinsicParameters param,
