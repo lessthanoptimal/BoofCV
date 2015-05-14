@@ -19,6 +19,7 @@
 package boofcv.alg.geo.calibration;
 
 import boofcv.abst.calib.ImageResults;
+import boofcv.alg.distort.AdjustmentType;
 import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.distort.LensDistortionOps;
 import boofcv.alg.geo.RectifyImageOps;
@@ -280,7 +281,7 @@ public class CalibratedImageGridPanel extends JPanel {
 	public void setDistorted ( IntrinsicParameters param , DenseMatrix64F rect ) {
 		if( rect == null ) {
 			this.undoRadial = LensDistortionOps.removeDistortion(
-					false, BorderType.VALUE, param, null, ImageType.single(ImageFloat32.class));
+					AdjustmentType.FULL_VIEW, BorderType.VALUE, param, null, ImageType.single(ImageFloat32.class));
 			this.remove_p_to_p = LensDistortionOps.fullView(param, null, false);
 		} else {
 			this.undoRadial = RectifyImageOps.rectifyImage(param, rect, ImageFloat32.class);

@@ -56,8 +56,7 @@ public class LensDistortionOps {
 	 * when detecting features, which EXTENDED minimizes.
 	 * </p>
 	 *
-	 * @param allInside If true then the undistorted image will be filled with valid pixels.
-	 *                  If false then the undistorted image will contain the entire original image.
+	 * @param type The type of adjustment it will do
 	 * @param borderType Specifies how the image border is handled. Null means borders are ignored.
 	 * @param param Original intrinsic parameters.
 	 * @param paramAdj (output) Intrinsic parameters which reflect the undistorted image.  Can be null.
@@ -65,7 +64,7 @@ public class LensDistortionOps {
 	 * @return ImageDistort which removes lens distortion
 	 */
 	public static <T extends ImageBase>
-	ImageDistort<T,T> removeDistortion( boolean allInside , BorderType borderType ,
+	ImageDistort<T,T> removeDistortion( AdjustmentType type , BorderType borderType ,
 										IntrinsicParameters param, IntrinsicParameters paramAdj ,
 										ImageType<T> imageType )
 	{
@@ -82,11 +81,20 @@ public class LensDistortionOps {
 		else
 			border = FactoryImageBorder.general(bandType,borderType);
 
-		PointTransform_F32 undistToDist;
-		if( allInside)
-			undistToDist = LensDistortionOps.allInside(param, paramAdj,true);
-		else
-			undistToDist = LensDistortionOps.fullView(param,paramAdj,true);
+		PointTransform_F32 undistToDist = null;
+		switch( type ) {
+			case ALL_INSIDE:
+				undistToDist = allInside(param, paramAdj,true);
+				break;
+
+			case FULL_VIEW:
+				undistToDist = fullView(param,paramAdj,true);
+				break;
+
+			case NONE:
+				undistToDist = distortTransform(param).distort_F32(true, true);
+				break;
+		}
 
 		ImageDistort<T,T> distort;
 

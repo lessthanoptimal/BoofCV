@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.app;
 
+import boofcv.alg.distort.AdjustmentType;
 import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.distort.LensDistortionOps;
 import boofcv.io.UtilIO;
@@ -49,7 +50,7 @@ public class BatchRemoveLensDistortion {
 		MultiSpectral<ImageFloat32> distoredImg = new MultiSpectral<ImageFloat32>(ImageFloat32.class,param.width,param.height,3);
 		MultiSpectral<ImageFloat32> undistoredImg = new MultiSpectral<ImageFloat32>(ImageFloat32.class,param.width,param.height,3);
 
-		ImageDistort distort = LensDistortionOps.removeDistortion(true,null,param,paramAdj,
+		ImageDistort distort = LensDistortionOps.removeDistortion(AdjustmentType.ALL_INSIDE,null,param,paramAdj,
 				(ImageType)distoredImg.getImageType());
 		UtilIO.saveXML(paramAdj,directory+"intrinsicUndistorted.xml");
 
