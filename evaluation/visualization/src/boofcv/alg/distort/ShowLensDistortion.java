@@ -54,7 +54,7 @@ public class ShowLensDistortion<T extends ImageSingleBand>
 	double radial2 = 0;
 	double tangential1 = 0;
 	double tangential2 = 0;
-	boolean fullView = true;
+	boolean fullView = false;
 
 	Class<T> imageType;
 
@@ -103,12 +103,12 @@ public class ShowLensDistortion<T extends ImageSingleBand>
 		radialOrder2.setPreferredSize(new Dimension(50, h));
 		radialOrder2.setMaximumSize(radialOrder1.getPreferredSize());
 
-		tangentialOrder1 = new JSpinner(new SpinnerNumberModel(tangential1,-1.0,2.0,0.05));
+		tangentialOrder1 = new JSpinner(new SpinnerNumberModel(tangential1,-1.0,1.0,0.01));
 		tangentialOrder1.addChangeListener(this);
 		tangentialOrder1.setPreferredSize(new Dimension(50, h));
 		tangentialOrder1.setMaximumSize(tangentialOrder1.getPreferredSize());
 
-		tangentialOrder2 = new JSpinner(new SpinnerNumberModel(tangential2,-1.0,2.0,0.05));
+		tangentialOrder2 = new JSpinner(new SpinnerNumberModel(tangential2,-1.0,1.0,0.01));
 		tangentialOrder2.addChangeListener(this);
 		tangentialOrder2.setPreferredSize(new Dimension(50, h));
 		tangentialOrder2.setMaximumSize(tangentialOrder2.getPreferredSize());
