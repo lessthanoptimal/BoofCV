@@ -18,9 +18,11 @@
 
 package boofcv.alg.depth;
 
+import boofcv.alg.distort.LensDistortionOps;
 import boofcv.alg.distort.radtan.RemoveRadialPtoN_F64;
 import boofcv.struct.FastQueueArray_I32;
 import boofcv.struct.calib.IntrinsicParameters;
+import boofcv.struct.distort.PointTransform_F64;
 import boofcv.struct.image.ImageUInt16;
 import boofcv.struct.image.ImageUInt8;
 import boofcv.struct.image.MultiSpectral;
@@ -43,8 +45,7 @@ public class VisualDepthOps {
 	public static void depthTo3D( IntrinsicParameters param , ImageUInt16 depth , FastQueue<Point3D_F64> cloud ) {
 		cloud.reset();
 
-		RemoveRadialPtoN_F64 p2n = new RemoveRadialPtoN_F64();
-		p2n.setK(param.fx,param.fy,param.skew,param.cx,param.cy).setDistortion(param.radial,param.t1,param.t2);
+		PointTransform_F64 p2n = LensDistortionOps.distortTransform(param).undistort_F64(true,false);
 
 		Point2D_F64 n = new Point2D_F64();
 
