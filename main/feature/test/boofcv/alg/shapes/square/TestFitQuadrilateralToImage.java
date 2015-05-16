@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -16,27 +16,40 @@
  * limitations under the License.
  */
 
-package boofcv.alg.feature.shapes;
+package boofcv.alg.shapes.square;
+
+import org.junit.Test;
+
+import static org.junit.Assert.fail;
 
 /**
- * Structure that contains results from fitting a shape to a set of observations.
- *
  * @author Peter Abeles
  */
-public class FitData<Shape> {
-	/**
-	 * Description of the shape
-	 */
-	public Shape shape;
-	/**
-	 * Fitting error
-	 */
-	public double error;
-
-	public FitData(Shape shape) {
-		this.shape = shape;
+public class TestFitQuadrilateralToImage {
+	@Test
+	public void all() {
+		fail("implement");
 	}
 
-	public FitData() {
+	@Test
+	public void localToImage() {
+		fail("implement");
 	}
+
+	@Test
+	public void optimize() {
+		fail("implement");
+	}
+
+	@Test
+	public void computePointsAndWeights() {
+		// white and dark
+		fail("implement");
+	}
+
+	@Test
+	public void convert() {
+		fail("implement");
+	}
+
 }

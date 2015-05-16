@@ -19,7 +19,7 @@
 package boofcv.alg.fiducial;
 
 import boofcv.abst.filter.binary.InputToBinary;
-import boofcv.alg.feature.shapes.SplitMergeLineFitLoop;
+import boofcv.alg.shapes.SplitMergeLineFitLoop;
 import boofcv.factory.filter.binary.FactoryThresholdBinary;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;

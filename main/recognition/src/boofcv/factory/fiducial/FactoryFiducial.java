@@ -25,9 +25,9 @@ import boofcv.abst.fiducial.FiducialDetector;
 import boofcv.abst.fiducial.SquareBinary_to_FiducialDetector;
 import boofcv.abst.fiducial.SquareImage_to_FiducialDetector;
 import boofcv.abst.filter.binary.InputToBinary;
-import boofcv.alg.feature.shapes.SplitMergeLineFitLoop;
 import boofcv.alg.fiducial.DetectFiducialSquareBinary;
 import boofcv.alg.fiducial.DetectFiducialSquareImage;
+import boofcv.alg.shapes.SplitMergeLineFitLoop;
 import boofcv.factory.filter.binary.FactoryThresholdBinary;
 import boofcv.struct.image.ImageSingleBand;
 

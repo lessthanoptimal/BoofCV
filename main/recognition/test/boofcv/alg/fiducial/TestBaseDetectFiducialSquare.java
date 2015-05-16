@@ -20,10 +20,10 @@ package boofcv.alg.fiducial;
 
 import boofcv.abst.geo.Estimate1ofEpipolar;
 import boofcv.alg.distort.*;
-import boofcv.alg.feature.shapes.SplitMergeLineFitLoop;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.interpolate.TypeInterpolate;
 import boofcv.alg.misc.ImageMiscOps;
+import boofcv.alg.shapes.SplitMergeLineFitLoop;
 import boofcv.factory.filter.binary.FactoryThresholdBinary;
 import boofcv.factory.geo.FactoryMultiView;
 import boofcv.struct.calib.IntrinsicParameters;

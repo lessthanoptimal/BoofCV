@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,12 +18,12 @@
 
 package boofcv.examples.features;
 
-import boofcv.alg.feature.shapes.FitData;
-import boofcv.alg.feature.shapes.ShapeFittingOps;
 import boofcv.alg.filter.binary.BinaryImageOps;
 import boofcv.alg.filter.binary.Contour;
 import boofcv.alg.filter.binary.ThresholdImageOps;
 import boofcv.alg.misc.ImageStatistics;
+import boofcv.alg.shapes.FitData;
+import boofcv.alg.shapes.ShapeFittingOps;
 import boofcv.gui.feature.VisualizeShapes;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.image.ConvertBufferedImage;

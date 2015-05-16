@@ -45,7 +45,7 @@ public class SimpleContourList {
 	/**
 	 * Fits a polygon to the specified contour.
 	 *
-	 * @see boofcv.alg.feature.shapes.ShapeFittingOps#fitPolygon(java.util.List, boolean, double, double, int)
+	 * @see boofcv.alg.shapes.ShapeFittingOps#fitPolygon(java.util.List, boolean, double, double, int)
 	 *
 	 * @param external true for the external contour or false for all the internal contours
 	 * @param toleranceDist Maximum distance away each point in the sequence can be from a line, in pixels.  Try 2.
@@ -65,7 +65,7 @@ public class SimpleContourList {
 	/**
 	 * Fits ellipse(s) to the specified contour
 	 *
-	 * @see boofcv.alg.feature.shapes.ShapeFittingOps#fitEllipse_I32
+	 * @see boofcv.alg.shapes.ShapeFittingOps#fitEllipse_I32
 	 *
 	 * @param external true for the external contour or false for all the internal contours
 	 * @return List of found ellipses

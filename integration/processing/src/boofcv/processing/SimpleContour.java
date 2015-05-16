@@ -18,8 +18,8 @@
 
 package boofcv.processing;
 
-import boofcv.alg.feature.shapes.FitData;
-import boofcv.alg.feature.shapes.ShapeFittingOps;
+import boofcv.alg.shapes.FitData;
+import boofcv.alg.shapes.ShapeFittingOps;
 import boofcv.alg.filter.binary.Contour;
 import boofcv.struct.PointIndex_I32;
 import georegression.struct.point.Point2D_I32;
@@ -84,7 +84,7 @@ public class SimpleContour {
 	/**
 	 * Fits ellipse(s) to the specified contour
 	 *
-	 * @see boofcv.alg.feature.shapes.ShapeFittingOps#fitEllipse_I32
+	 * @see boofcv.alg.shapes.ShapeFittingOps#fitEllipse_I32
 	 *
 	 * @param external true for the external contour or false for all the internal contours
 	 * @return List of found ellipses

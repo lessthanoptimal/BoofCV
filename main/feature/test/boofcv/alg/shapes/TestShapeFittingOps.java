@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.feature.shapes;
+package boofcv.alg.shapes;
 
 import boofcv.struct.PointIndex_I32;
 import georegression.geometry.UtilEllipse_F64;

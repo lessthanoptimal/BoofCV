@@ -23,12 +23,13 @@ import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.distort.LensDistortionOps;
 import boofcv.alg.distort.PointToPixelTransform_F32;
 import boofcv.alg.distort.PointTransformHomography_F32;
-import boofcv.alg.feature.shapes.SplitMergeLineFitLoop;
 import boofcv.alg.filter.binary.Contour;
 import boofcv.alg.filter.binary.LinearContourLabelChang2004;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.calibration.Zhang99DecomposeHomography;
 import boofcv.alg.geo.h.HomographyLinear4;
+import boofcv.alg.shapes.SplitMergeLineFitLoop;
+import boofcv.alg.shapes.square.FitBinaryQuadrilateralEM;
 import boofcv.core.image.border.BorderType;
 import boofcv.core.image.border.FactoryImageBorder;
 import boofcv.factory.distort.FactoryDistort;
@@ -117,7 +118,7 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 	private PointTransformHomography_F32 transformHomography = new PointTransformHomography_F32();
 
 	// refines the initial estimate of the quadrilateral around the fiducial
-	private FitQuadrilaterialEM fitQuad = new FitQuadrilaterialEM();
+	private FitBinaryQuadrilateralEM fitQuad = new FitBinaryQuadrilateralEM();
 
 	// Storage for results of fiducial reading
 	private Result result = new Result();

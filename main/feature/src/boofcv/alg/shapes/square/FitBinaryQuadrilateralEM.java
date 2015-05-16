@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.fiducial;
+package boofcv.alg.shapes.square;
 
 import georegression.fitting.line.FitLine_F64;
 import georegression.geometry.UtilLine2D_F64;
@@ -41,7 +41,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class FitQuadrilaterialEM {
+public class FitBinaryQuadrilateralEM {
 
 	// maximum distance in pixels away a point can be from the line for it to have a weight
 	private double maxDistance = 6.0;
@@ -64,13 +64,13 @@ public class FitQuadrilaterialEM {
 	private LineSegment2D_F64 work = new LineSegment2D_F64();
 	private LinePolar2D_F64 polar = new LinePolar2D_F64();
 
-	public FitQuadrilaterialEM(double maxDistance, int iterationsEM) {
+	public FitBinaryQuadrilateralEM(double maxDistance, int iterationsEM) {
 		this();
 		this.maxDistance = maxDistance;
 		this.iterationsEM = iterationsEM;
 	}
 
-	public FitQuadrilaterialEM() {
+	public FitBinaryQuadrilateralEM() {
 		lines = new LineGeneral2D_F64[4];
 		for (int i = 0; i < lines.length; i++) {
 			lines[i] = new LineGeneral2D_F64();

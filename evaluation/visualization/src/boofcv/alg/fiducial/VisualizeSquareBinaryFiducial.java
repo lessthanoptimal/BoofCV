@@ -18,7 +18,7 @@
 
 package boofcv.alg.fiducial;
 
-import boofcv.alg.feature.shapes.SplitMergeLineFitLoop;
+import boofcv.alg.shapes.SplitMergeLineFitLoop;
 import boofcv.factory.filter.binary.FactoryThresholdBinary;
 import boofcv.gui.ListDisplayPanel;
 import boofcv.gui.binary.VisualizeBinaryData;

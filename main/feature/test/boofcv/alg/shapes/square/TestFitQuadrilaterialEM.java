@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.fiducial;
+package boofcv.alg.shapes.square;
 
 import georegression.geometry.UtilLine2D_F64;
 import georegression.geometry.UtilPoint2D_F64;
@@ -59,7 +59,7 @@ public class TestFitQuadrilaterialEM {
 		addPoints(x1,y1,x0,y1,points);
 		addPoints(x0, y1, x0, y0, points);
 
-		FitQuadrilaterialEM alg = new FitQuadrilaterialEM();
+		FitBinaryQuadrilateralEM alg = new FitBinaryQuadrilateralEM();
 
 		GrowQueue_I32 corners = new GrowQueue_I32();
 		corners.add(0);
@@ -105,7 +105,7 @@ public class TestFitQuadrilaterialEM {
 		addPoints(x1,y1,x0,y1,points);
 		addPoints(x0,y1,x0,y0,points);
 
-		FitQuadrilaterialEM alg = new FitQuadrilaterialEM();
+		FitBinaryQuadrilateralEM alg = new FitBinaryQuadrilateralEM();
 		alg.lines[0] = line(x0,y0,x1,y0+offY);
 		alg.lines[1] = line(x1,y0,x1+offX,y1);
 		alg.lines[2] = line(x1,y1-offY,x0,y1);
@@ -146,7 +146,7 @@ public class TestFitQuadrilaterialEM {
 
 		double expected = Distance2D_F64.distance(line,p);
 		line.normalize();
-		double found = FitQuadrilaterialEM.distance(line,p);
+		double found = FitBinaryQuadrilateralEM.distance(line, p);
 
 		assertEquals(expected,found,1e-8);
 	}
@@ -154,15 +154,15 @@ public class TestFitQuadrilaterialEM {
 	@Test
 	public void bubbleSortLines() {
 		for (int i = 0; i < 10; i++) {
-			FastQueue<FitQuadrilaterialEM.Segment> segments =
-					new FastQueue<FitQuadrilaterialEM.Segment>(FitQuadrilaterialEM.Segment.class,true);
+			FastQueue<FitBinaryQuadrilateralEM.Segment> segments =
+					new FastQueue<FitBinaryQuadrilateralEM.Segment>(FitBinaryQuadrilateralEM.Segment.class,true);
 
 			int original[] = new int[7];
 			for (int j = 0; j < 7; j++) {
 				original[j] = segments.grow().index0 = rand.nextInt(100);
 			}
 
-			FitQuadrilaterialEM.bubbleSortLines(segments);
+			FitBinaryQuadrilateralEM.bubbleSortLines(segments);
 
 			// make sure it doesn't touch the others
 			for (int j = 4; j < original.length; j++) {
@@ -197,7 +197,7 @@ public class TestFitQuadrilaterialEM {
 		}
 
 		Quadrilateral_F64 quad = new Quadrilateral_F64();
-		FitQuadrilaterialEM.convert(lines.toArray(new LineGeneral2D_F64[4]),quad);
+		FitBinaryQuadrilateralEM.convert(lines.toArray(new LineGeneral2D_F64[4]), quad);
 
 		assertTrue(findMatch(quad.a,points));
 		assertTrue(findMatch(quad.b,points));
@@ -211,7 +211,7 @@ public class TestFitQuadrilaterialEM {
 		}
 		lines= alt;
 
-		FitQuadrilaterialEM.convert(lines.toArray(new LineGeneral2D_F64[4]),quad);
+		FitBinaryQuadrilateralEM.convert(lines.toArray(new LineGeneral2D_F64[4]), quad);
 
 		assertTrue(findMatch(quad.a,points));
 		assertTrue(findMatch(quad.b,points));
