@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,6 +22,8 @@ import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.misc.GImageStatistics;
 import boofcv.core.image.GConvertImage;
 import boofcv.core.image.GeneralizedImageOps;
+import boofcv.core.image.border.BorderType;
+import boofcv.core.image.border.FactoryImageBorder;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.pyramid.ImagePyramid;
@@ -48,7 +50,7 @@ public abstract class DenseFlowPyramidBase<T extends ImageSingleBand> {
 	protected PyramidFloat<ImageFloat32> pyr2;
 
 	// Used to interpolate values between pixels
-	protected InterpolatePixelS<ImageFloat32> interp;
+	protected InterpolatePixelS<ImageFloat32> interp;// todo remove
 
 	public DenseFlowPyramidBase(double scale, double sigma, int maxLayers,
 								InterpolatePixelS<ImageFloat32> interp ) {
@@ -56,6 +58,7 @@ public abstract class DenseFlowPyramidBase<T extends ImageSingleBand> {
 		this.sigma = sigma;
 		this.maxLayers = maxLayers;
 		this.interp = interp;
+		interp.setBorder(FactoryImageBorder.general(ImageFloat32.class, BorderType.EXTENDED));
 	}
 
 	/**
@@ -93,15 +96,21 @@ public abstract class DenseFlowPyramidBase<T extends ImageSingleBand> {
 	protected void interpolateFlowScale(ImageFloat32 prev, ImageFloat32 curr) {
 		interp.setImage(prev);
 
-		float scaleX = (float)(prev.width-1)/(float)(curr.width-1)*0.999f;
-		float scaleY = (float)(prev.height-1)/(float)(curr.height-1)*0.999f;
+		float scaleX = (float)prev.width/(float)curr.width;
+		float scaleY = (float)prev.height/(float)curr.height;
 
 		float scale = (float)prev.width/(float)curr.width;
 
 		int indexCurr = 0;
 		for( int y = 0; y < curr.height; y++ ) {
+			float yy = y*scaleY;
 			for( int x = 0; x < curr.width; x++ ) {
-				curr.data[indexCurr++] = interp.get(x*scaleX,y*scaleY)/scale;
+				float xx = x*scaleX;
+				if( interp.isInFastBounds(xx,yy)) {
+					curr.data[indexCurr++] = interp.get_fast(x * scaleX, y * scaleY) / scale;
+				} else {
+					curr.data[indexCurr++] = interp.get_border(x * scaleX, y * scaleY) / scale;
+				}
 			}
 		}
 	}
@@ -111,6 +120,7 @@ public abstract class DenseFlowPyramidBase<T extends ImageSingleBand> {
 	 * in the current layer.  Adjusts for change in image scale.
 	 */
 	protected void warpImageTaylor(ImageFloat32 before, ImageFloat32 flowX , ImageFloat32 flowY , ImageFloat32 after) {
+		interp.setBorder(FactoryImageBorder.general(before.getImageType().getImageClass(), BorderType.EXTENDED));
 		interp.setImage(before);
 
 		for( int y = 0; y < before.height; y++ ) {
@@ -123,8 +133,7 @@ public abstract class DenseFlowPyramidBase<T extends ImageSingleBand> {
 				float wy = y + v;
 
 				if( wx < 0 || wx > before.width-1 || wy < 0 || wy > before.height-1 ) {
-					// setting outside pixels to zero seems to produce smoother results than extending the image
-					after.data[pixelIndex] = 0;
+					after.data[pixelIndex] = interp.get_border(wx,wy);
 				} else {
 					after.data[pixelIndex] = interp.get(wx, wy);
 				}

@@ -24,6 +24,7 @@ import boofcv.alg.distort.PointToPixelTransform_F32;
 import boofcv.alg.distort.impl.DistortSupport;
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.interpolate.TypeInterpolate;
+import boofcv.core.image.border.BorderType;
 import boofcv.core.image.border.FactoryImageBorder;
 import boofcv.core.image.border.ImageBorder;
 import boofcv.factory.distort.FactoryDistort;
@@ -120,6 +121,24 @@ public class FDistort
 	public FDistort border( ImageBorder border ) {
 		distorter = null;
 		this.border = border;
+		return this;
+	}
+
+	/**
+	 * Sets the border by type.
+	 */
+	public FDistort border( BorderType type ) {
+		distorter = null;
+		this.border = FactoryImageBorder.general(input.getImageType().getImageClass(),type);
+		return this;
+	}
+
+	/**
+	 * Sets the border toa fixed gray-scale value
+	 */
+	public FDistort border( double value ) {
+		distorter = null;
+		this.border = FactoryImageBorder.value(input.getImageType().getImageClass(),value);
 		return this;
 	}
 
