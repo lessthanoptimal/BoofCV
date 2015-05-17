@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,7 +38,7 @@ public class TestGPixelMath extends BaseGClassChecksInMisc {
 
 	@Test
 	public void compareToPixelMath() {
-		performTests(18);
+		performTests(22);
 	}
 
 	@Override
@@ -104,6 +104,22 @@ public class TestGPixelMath extends BaseGClassChecksInMisc {
 			output = createImage(param[param.length-1],null);
 			ret[0][0] = inputA;
 			ret[0][1] = 3;
+			ret[0][2] = -10;
+			ret[0][3] = 12;
+			ret[0][4] = output;
+		} else if( name.equals("minus") && param.length == 3) {
+			output = createImage(param[param.length - 1],null);
+			boolean first = ImageBase.class.isAssignableFrom(param[0]);
+			if( inputA == null ) inputA = createImage(param[1],null);
+			ret[0][0] = first ? inputA : 3;
+			ret[0][1] = first ? 3 : inputA;
+			ret[0][2] = output;
+		} else if( name.equals("minus") && param.length == 5) {
+			output = createImage(param[param.length-1],null);
+			boolean first = ImageBase.class.isAssignableFrom(param[0]);
+			if( inputA == null ) inputA = createImage(param[1],null);
+			ret[0][0] = first ? inputA : 3;
+			ret[0][1] = first ? 3 : inputA;
 			ret[0][2] = -10;
 			ret[0][3] = 12;
 			ret[0][4] = output;

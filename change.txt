@@ -43,6 +43,9 @@ Version : Alpha 0.19
   * Intrinsic paramters can now use a flow style assignment of parameters
 - Interpolation actually can interpolate along the image border now
   * Added get_border() function
+- PixelMath
+  * Added minus(image,scalar)
+  * Added minus(scalar,image)
 - Distortion
   * Scale once again goes from in.width/out.width instead of (in.width-1)/(out.width-1)
     - The former is correct, but you have to deal with interpolating values like 9.5 when there are 10 pixels (9 is largest index)
