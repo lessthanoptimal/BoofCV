@@ -75,8 +75,8 @@ public class ExampleStereoDisparity3D {
 		ImageUInt8 scaledLeft = new ImageUInt8((int)(distLeft.width*scale),(int)(distLeft.height*scale));
 		ImageUInt8 scaledRight = new ImageUInt8((int)(distRight.width*scale),(int)(distRight.height*scale));
 
-		new FDistort(distLeft,scaledLeft).scale().apply();
-		new FDistort(distRight,scaledRight).scale().apply();
+		new FDistort(distLeft,scaledLeft).scaleExt().apply();
+		new FDistort(distRight,scaledRight).scaleExt().apply();
 
 		// Don't forget to adjust camera parameters for the change in scale!
 		PerspectiveOps.scaleIntrinsic(param.left, scale);

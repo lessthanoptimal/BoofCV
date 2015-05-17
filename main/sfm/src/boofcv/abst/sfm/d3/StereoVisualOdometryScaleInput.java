@@ -65,8 +65,8 @@ public class StereoVisualOdometryScaleInput<T extends ImageBase> implements Ster
 	@Override
 	public boolean process(T leftImage, T rightImage) {
 
-		new FDistort(leftImage,scaleLeft).scale().apply();
-		new FDistort(rightImage,scaleRight).scale().apply();
+		new FDistort(leftImage,scaleLeft).scaleExt().apply();
+		new FDistort(rightImage,scaleRight).scaleExt().apply();
 
 		return alg.process(scaleLeft,scaleRight);
 	}

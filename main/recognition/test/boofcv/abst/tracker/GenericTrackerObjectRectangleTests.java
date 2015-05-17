@@ -66,7 +66,7 @@ public abstract class GenericTrackerObjectRectangleTests<T extends ImageBase> {
 
 		T smaller = (T)input._createNew(width/2,height/2);
 
-		new FDistort(input,smaller).scale().apply();
+		new FDistort(input,smaller).scaleExt().apply();
 
 		assertTrue(tracker.initialize(smaller, rect(20, 25, 70, 100)));
 		assertTrue(tracker.process(smaller, where));

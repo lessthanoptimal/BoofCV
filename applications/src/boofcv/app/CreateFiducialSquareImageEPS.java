@@ -81,14 +81,13 @@ public class CreateFiducialSquareImageEPS {
 
 		if( image.width != 304 || image.height != 304 ) {
 			ImageUInt8 out = new ImageUInt8(304,304);
-			new FDistort(image,out).scale().apply();
+			new FDistort(image,out).scaleExt().apply();
 			image = out;
 		}
 
 		ImageUInt8 binary = ThresholdImageOps.threshold(image,null,256/2,false);
 
-//		BinaryImageOps.invert(binary,binary);
-//		ShowImages.showWindow(VisualizeBinaryData.renderBinary(binary,null),"Binary Image");
+//		ShowImages.showWindow(VisualizeBinaryData.renderBinary(binary,false, null), "Binary Image");
 
 		// print out the selected number in binary for debugging purposes
 		PrintStream out = new PrintStream(outputName);

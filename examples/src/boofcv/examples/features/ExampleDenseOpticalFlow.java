@@ -72,9 +72,9 @@ public class ExampleDenseOpticalFlow {
 		ImageFlow flow = new ImageFlow(previous.width,previous.height);
 
 		ConvertBufferedImage.convertFrom(buff0,full);
-		new FDistort(full, previous).scale().apply();
+		new FDistort(full, previous).scaleExt().apply();
 		ConvertBufferedImage.convertFrom(buff1, full);
-		new FDistort(full, current).scale().apply();
+		new FDistort(full, current).scaleExt().apply();
 
 		// compute dense motion
 		denseFlow.process(previous, current, flow);

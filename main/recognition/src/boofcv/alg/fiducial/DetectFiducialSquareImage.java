@@ -102,7 +102,7 @@ public class DetectFiducialSquareImage<T extends ImageSingleBand>
 		if( grayScale.width > squareLength && grayScale.height > squareLength ) {
 			AverageDownSampleOps.down(grayScale,scaled);
 		} else {
-			new FDistort(grayScale,scaled).scale().apply();
+			new FDistort(grayScale,scaled).scaleExt().apply();
 		}
 
 		// threshold it

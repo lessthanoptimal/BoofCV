@@ -138,7 +138,7 @@ public class IntensityFeaturePyramidApp<T extends ImageSingleBand, D extends Ima
 			ImageFloat32 featureImg = intensity.getIntensity();
 
 			// scale it up to full resolution
-			new FDistort(featureImg,scaledIntensity).interpNN().scale().apply();
+			new FDistort(featureImg,scaledIntensity).interpNN().scaleExt().apply();
 			// visualize the rescaled intensity
 			b = VisualizeImageData.colorizeSign(scaledIntensity,null, ImageStatistics.maxAbs(scaledIntensity));
 			gui.addImage(b,String.format("Scale %6.2f",scale));

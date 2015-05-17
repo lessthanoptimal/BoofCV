@@ -330,7 +330,7 @@ public class VisualizeBinaryData {
 			for (int y = 0; y < h; y++) {
 				int indexSrc = binaryImage.startIndex + y * binaryImage.stride;
 				for (int x = 0; x < w; x++) {
-					data[rasterIndex++] = (byte)(1-binaryImage.data[indexSrc++] * 255);
+					data[rasterIndex++] = (byte)((1-binaryImage.data[indexSrc++]) * 255);
 				}
 			}
 		} else {

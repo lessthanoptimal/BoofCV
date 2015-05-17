@@ -63,7 +63,7 @@ public class MonocularPlaneVisualOdometryScaleInput <T extends ImageBase> implem
 	@Override
 	public boolean process(T leftImage) {
 
-		new FDistort(leftImage,scaled).scale().apply();
+		new FDistort(leftImage,scaled).scaleExt().apply();
 
 		return alg.process(scaled);
 	}

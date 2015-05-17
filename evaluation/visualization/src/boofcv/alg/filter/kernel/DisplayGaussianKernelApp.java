@@ -86,7 +86,7 @@ public class DisplayGaussianKernelApp<T extends ImageSingleBand> extends SelectA
 			Kernel2D kernel = GKernelMath.convolve(kerY,kerX);
 
 			T smallImg = GKernelMath.convertToImage(kernel);
-			new FDistort(smallImg,largeImg).interpNN().scale().apply();
+			new FDistort(smallImg,largeImg).interpNN().scaleExt().apply();
 
 			double maxValue = GImageStatistics.maxAbs(largeImg);
 			BufferedImage out = VisualizeImageData.colorizeSign(largeImg,null,maxValue);

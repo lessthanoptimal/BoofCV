@@ -106,7 +106,7 @@ public class ImagePyramidPanel<T extends ImageSingleBand> extends ListDisplayPan
 		int N = pyramid.getNumLayers();
 
 		for( int i = 0; i < N; i++ ) {
-			new FDistort(pyramid.getLayer(i),upscale).interpNN().scale().apply();
+			new FDistort(pyramid.getLayer(i),upscale).interpNN().scaleExt().apply();
 			BufferedImage b = ConvertBufferedImage.convertTo(upscale,null,true);
 			if( showScales )
 				addImage(b,String.format("%5.2f",pyramid.getScale(i)));

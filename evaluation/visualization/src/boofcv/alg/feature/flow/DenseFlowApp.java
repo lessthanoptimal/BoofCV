@@ -102,9 +102,9 @@ public class DenseFlowApp
 		flow.reshape(unscaled.width/2,unscaled.height/2);
 
 		ConvertBufferedImage.convertFrom(image0, unscaled, false);
-		new FDistort(unscaled,input0).scale().apply();
+		new FDistort(unscaled,input0).scaleExt().apply();
 		ConvertBufferedImage.convertFrom(image1, unscaled, false);
-		new FDistort(unscaled,input1).scale().apply();
+		new FDistort(unscaled,input1).scaleExt().apply();
 
 		converted0 = new BufferedImage(input0.width,input0.height,BufferedImage.TYPE_INT_RGB);
 		converted1 = new BufferedImage(input0.width,input0.height,BufferedImage.TYPE_INT_RGB);

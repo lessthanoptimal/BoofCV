@@ -89,7 +89,7 @@ public abstract class DisplaySteerableBase<T extends ImageSingleBand, K extends 
 
 		for( int i = 0; i < steerable.getBasisSize(); i++ ) {
 			T smallImg = GKernelMath.convertToImage(steerable.getBasis(i));
-			new FDistort(smallImg,largeImg).scale().interpNN().apply();
+			new FDistort(smallImg,largeImg).scaleExt().interpNN().apply();
 
 			double maxValue = GImageStatistics.maxAbs(largeImg);
 			BufferedImage out = VisualizeImageData.colorizeSign(largeImg,null,maxValue);
@@ -105,7 +105,7 @@ public abstract class DisplaySteerableBase<T extends ImageSingleBand, K extends 
 			K kernel = steerable.compute(angle);
 
 			T smallImg = GKernelMath.convertToImage(kernel);
-			new FDistort(smallImg,largeImg).scale().interpNN().apply();
+			new FDistort(smallImg,largeImg).scaleExt().interpNN().apply();
 
 			double maxValue = GImageStatistics.maxAbs(largeImg);
 			BufferedImage out = VisualizeImageData.colorizeSign(largeImg,null,maxValue);

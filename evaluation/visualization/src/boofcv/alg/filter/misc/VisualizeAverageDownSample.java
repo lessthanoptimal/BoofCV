@@ -45,7 +45,7 @@ public class VisualizeAverageDownSample {
 				original.getWidth()/3,original.getHeight()/3,3);
 
 		AverageDownSampleOps.down(input,output);
-		new FDistort(input,output2).scale().apply();
+		new FDistort(input,output2).scaleExt().apply();
 
 		BufferedImage outputFull = ConvertBufferedImage.convertTo_F32(output, null, true);
 		BufferedImage outputFull2 = ConvertBufferedImage.convertTo_F32(output2, null, true);

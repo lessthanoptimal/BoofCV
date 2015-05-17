@@ -128,19 +128,23 @@ public class FDistort
 	 * Sets the border by type.
 	 */
 	public FDistort border( BorderType type ) {
-		distorter = null;
-		this.border = FactoryImageBorder.general(input.getImageType().getImageClass(),type);
-		return this;
+		return border(FactoryImageBorder.general(input.getImageType().getImageClass(), type));
 	}
 
 	/**
-	 * Sets the border toa fixed gray-scale value
+	 * Sets the border to a fixed gray-scale value
 	 */
 	public FDistort border( double value ) {
-		distorter = null;
-		this.border = FactoryImageBorder.value(input.getImageType().getImageClass(),value);
-		return this;
+		return border(FactoryImageBorder.value(input.getImageType().getImageClass(), value));
 	}
+
+	/**
+	 * Sets the border to EXTEND
+	 */
+	public FDistort borderExt() {
+		return border(BorderType.EXTENDED);
+	}
+
 
 	/**
 	 * used to provide a custom interpolation algorithm
@@ -213,10 +217,22 @@ public class FDistort
 	}
 
 	/**
-	 * Applies a distortion which will rescale the input image into the output image
+	 * Applies a distortion which will rescale the input image into the output image.  You
+	 * might want to consider using {@link #scaleExt()} instead since it sets the border behavior to extended, which
+	 * is probably what you want to do.
 	 */
 	public FDistort scale() {
 		return transform(DistortSupport.transformScale(output, input));
+	}
+
+	/**
+	 * Scales the image and sets the border to {@link BorderType#EXTENDED}. This is normally what you want
+	 * to do when scaling an image.  If you don't use an extended border when you hit the right and bottom
+	 * boundaries it will go outside the image bounds and if a fixed value of 0 is used it will average towards
+	 * zero.
+	 */
+	public FDistort scaleExt() {
+		return scale().borderExt();
 	}
 
 	/**
