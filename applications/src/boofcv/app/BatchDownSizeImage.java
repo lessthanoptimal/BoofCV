@@ -111,9 +111,7 @@ public class BatchDownSizeImage {
 			nout = nout.substring(0,nout.length()-3) + "png";
 
 			File fout = new File(output,nout);
-			BufferedImage bout = new BufferedImage(width,height,BufferedImage.TYPE_INT_RGB);
-			ConvertBufferedImage.convertTo(small,bout,true);
-			UtilImageIO.saveImage(bout,fout.getPath());
+			UtilImageIO.saveImage(small,fout.getPath());
 		}
 		System.out.println("Done");
 	}

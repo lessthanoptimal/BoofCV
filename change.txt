@@ -51,6 +51,8 @@ Version : Alpha 0.19
     - The former is correct, but you have to deal with interpolating values like 9.5 when there are 10 pixels (9 is largest index)
   * Added FDistort
     - Much easier to use and more flexible than the procedural fuctions in DistortImageOps
+- UtilImageIO
+  * Can save an image directly which is in BoofCV format
 
 TODO
   * Distortion Model + Calibration

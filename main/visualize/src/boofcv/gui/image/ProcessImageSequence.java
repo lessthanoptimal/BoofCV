@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,6 @@
 
 package boofcv.gui.image;
 
-import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.image.ImageSingleBand;
@@ -186,9 +185,7 @@ public abstract class ProcessImageSequence<T extends ImageSingleBand> implements
 			System.out.println("Saving image");
 			String name = String.format("image%05d.jpg", savedIndex++);
 
-			BufferedImage img = ConvertBufferedImage.convertTo(image,null,true);
-			UtilImageIO.saveImage(img, name);
-
+			UtilImageIO.saveImage(image, name);
 		} else {
 			paused = true;
 			step = true;
