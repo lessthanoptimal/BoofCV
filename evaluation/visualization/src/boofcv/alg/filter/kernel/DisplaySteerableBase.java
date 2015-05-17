@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,8 +18,7 @@
 
 package boofcv.alg.filter.kernel;
 
-import boofcv.alg.distort.DistortImageOps;
-import boofcv.alg.interpolate.TypeInterpolate;
+import boofcv.abst.distort.FDistort;
 import boofcv.alg.misc.GImageStatistics;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.gui.ListDisplayPanel;
@@ -90,7 +89,7 @@ public abstract class DisplaySteerableBase<T extends ImageSingleBand, K extends 
 
 		for( int i = 0; i < steerable.getBasisSize(); i++ ) {
 			T smallImg = GKernelMath.convertToImage(steerable.getBasis(i));
-			DistortImageOps.scale(smallImg,largeImg, TypeInterpolate.NEAREST_NEIGHBOR);
+			new FDistort(smallImg,largeImg).scale().interpNN().apply();
 
 			double maxValue = GImageStatistics.maxAbs(largeImg);
 			BufferedImage out = VisualizeImageData.colorizeSign(largeImg,null,maxValue);
@@ -106,7 +105,7 @@ public abstract class DisplaySteerableBase<T extends ImageSingleBand, K extends 
 			K kernel = steerable.compute(angle);
 
 			T smallImg = GKernelMath.convertToImage(kernel);
-			DistortImageOps.scale(smallImg,largeImg, TypeInterpolate.NEAREST_NEIGHBOR);
+			new FDistort(smallImg,largeImg).scale().interpNN().apply();
 
 			double maxValue = GImageStatistics.maxAbs(largeImg);
 			BufferedImage out = VisualizeImageData.colorizeSign(largeImg,null,maxValue);

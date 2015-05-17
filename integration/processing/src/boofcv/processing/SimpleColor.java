@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -94,7 +94,7 @@ public class SimpleColor extends SimpleImage<MultiSpectral>{
 		PixelTransform_F32 pixelTransform = new PointToPixelTransform_F32(homography);
 
 		// Apply distortion and show the results
-		DistortImageOps.distortMS(image, output, pixelTransform, true, TypeInterpolate.BILINEAR);
+		DistortImageOps.distortMS(image, output, pixelTransform, null, TypeInterpolate.BILINEAR);
 
 		return new SimpleColor(output);
 	}

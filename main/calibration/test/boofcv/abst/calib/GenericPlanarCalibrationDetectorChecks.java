@@ -125,7 +125,7 @@ public abstract class GenericPlanarCalibrationDetectorChecks {
 		PixelTransform_F32 pixelTransform = new PointToPixelTransform_F32(d2o);
 
 		ImageMiscOps.fill(distorted, 0xff);
-		DistortImageOps.distortSingle(original, distorted, pixelTransform, true, TypeInterpolate.BILINEAR);
+		DistortImageOps.distortSingle(original, distorted, pixelTransform, null, TypeInterpolate.BILINEAR);
 
 //		display(distorted);
 

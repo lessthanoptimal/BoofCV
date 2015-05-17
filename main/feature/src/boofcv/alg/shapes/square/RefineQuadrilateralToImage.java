@@ -33,19 +33,22 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * <p>
  * Fits a quadrilateral to an image when given a good initial guess. Each line in the quadrilateral is processed
  * individually and fit to a line using weighted regression. The weight is determined by the difference of points
  * sampled on other side of the line.  This process is repeated until it converges or the maximum number of iterations
  * has been reached.
- *
+ * </p>
+ * <p>
  * When sampling along the line it avoid the corners since those regions don't have a clear edge.  Points are sampled
  * starting at one end and moving towards the other.  The intensity is sampled at the line then a point 1 pixels to
  * the left, which is outside of the line.  Additional points along the tangent can also be sampled.  The difference
  * in value determines the weight.
+ * </p>
  *
  * @author Peter Abeles
  */
-public class FitQuadrilateralToImage<T extends ImageSingleBand> {
+public class RefineQuadrilateralToImage<T extends ImageSingleBand> {
 
 	// How far away from a corner will it sample the line
 	float lineBorder = 2.0f;
@@ -77,7 +80,7 @@ public class FitQuadrilateralToImage<T extends ImageSingleBand> {
 	private InterpolatePixelS<T> interpolate;
 
 
-	public FitQuadrilateralToImage( boolean fitBlack , InterpolatePixelS<T> interpolate) {
+	public RefineQuadrilateralToImage(boolean fitBlack, InterpolatePixelS<T> interpolate) {
 		this.interpolate = interpolate;
 
 		general = new LineGeneral2D_F64[4];
@@ -244,13 +247,13 @@ public class FitQuadrilateralToImage<T extends ImageSingleBand> {
 	 */
 	protected static boolean convert( LineGeneral2D_F64[] lines , Quadrilateral_F64 quad ) {
 
-		if( null == Intersection2D_F64.intersection(lines[0],lines[1],quad.a) )
+		if( null == Intersection2D_F64.intersection(lines[0],lines[1],quad.b) )
 			return false;
-		if( null == Intersection2D_F64.intersection(lines[2],lines[1],quad.b) )
+		if( null == Intersection2D_F64.intersection(lines[2],lines[1],quad.c) )
 			return false;
-		if( null == Intersection2D_F64.intersection(lines[2],lines[3],quad.c) )
+		if( null == Intersection2D_F64.intersection(lines[2],lines[3],quad.d) )
 			return false;
-		if( null == Intersection2D_F64.intersection(lines[0],lines[3],quad.d) )
+		if( null == Intersection2D_F64.intersection(lines[0],lines[3],quad.a) )
 			return false;
 		return true;
 	}

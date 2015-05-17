@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -54,7 +54,7 @@ public class DebugDescribeTransform {
 
 		T distorted = (T)orig._createNew((int)(w*scale) , (int)(w*scale) );
 
-		DistortImageOps.rotate(orig,distorted, TypeInterpolate.BILINEAR,(float)theta);
+		DistortImageOps.rotate(orig,distorted,null , TypeInterpolate.BILINEAR, (float)theta);
 //		DistortImageOps.scale(orig,distorted, TypeInterpolate.BILINEAR);
 
 		alg.setImage(orig);

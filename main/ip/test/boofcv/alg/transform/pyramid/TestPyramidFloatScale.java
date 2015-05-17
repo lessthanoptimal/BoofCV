@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,9 +18,8 @@
 
 package boofcv.alg.transform.pyramid;
 
-import boofcv.alg.distort.DistortImageOps;
+import boofcv.abst.distort.FDistort;
 import boofcv.alg.interpolate.InterpolatePixelS;
-import boofcv.alg.interpolate.TypeInterpolate;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.image.ImageFloat32;
@@ -58,14 +57,14 @@ public class TestPyramidFloatScale extends GenericPyramidTests<ImageFloat32> {
 
 		// test the first layer
 		ImageFloat32 expected = new ImageFloat32((int)Math.ceil(width/3.0),(int)Math.ceil(height/3.0));
-		DistortImageOps.scale(input, expected, TypeInterpolate.BILINEAR);
+		new FDistort(input,expected).scale().apply();
 		ImageFloat32 found = alg.getLayer(0);
 
 		BoofTesting.assertEquals(expected,found,1e-4);
 
 		// test the second layer
 		ImageFloat32 next = new ImageFloat32((int)Math.ceil(width/5.0),(int)Math.ceil(height/5.0));
-		DistortImageOps.scale(expected, next, TypeInterpolate.BILINEAR);
+		new FDistort(expected,next).scale().apply();
 		found = alg.getLayer(1);
 
 		BoofTesting.assertEquals(next,found,1e-4);

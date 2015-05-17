@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,12 +18,11 @@
 
 package boofcv.factory.filter.kernel;
 
-import boofcv.alg.distort.DistortImageOps;
+import boofcv.abst.distort.FDistort;
 import boofcv.alg.filter.kernel.GKernelMath;
 import boofcv.alg.filter.kernel.SteerableKernel;
 import boofcv.alg.filter.kernel.impl.SteerableKernel_F32;
 import boofcv.alg.filter.kernel.impl.SteerableKernel_I32;
-import boofcv.alg.interpolate.TypeInterpolate;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.struct.convolve.Kernel1D;
 import boofcv.struct.convolve.Kernel2D;
@@ -90,7 +89,7 @@ public class FactorySteerable {
 			float angle = (float)(angleStep*index);
 
 			GImageMiscOps.fill(imageRotated, 0);
-			DistortImageOps.rotate(image,imageRotated, TypeInterpolate.BILINEAR,angle);
+			new FDistort(image,imageRotated).rotate(angle).apply();
 
 			basis[index] = GKernelMath.convertToKernel(imageRotated);
 		}

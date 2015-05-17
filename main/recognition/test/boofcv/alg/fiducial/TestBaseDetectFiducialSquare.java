@@ -71,7 +71,7 @@ public class TestBaseDetectFiducialSquare {
 		PointTransform_F32 remove_p_to_p = LensDistortionOps.distortTransform(intrinsic).undistort_F32(true, true);
 
 		ImageDistort<ImageUInt8,ImageUInt8> distorter
-				= DistortImageOps.createImageDistort(remove_p_to_p,TypeInterpolate.BILINEAR,ImageUInt8.class,ImageUInt8.class);
+				= DistortImageOps.createImageDistort(remove_p_to_p, null, TypeInterpolate.BILINEAR,ImageUInt8.class,ImageUInt8.class);
 
 		distorter.apply(image,distorted);
 
@@ -222,7 +222,7 @@ public class TestBaseDetectFiducialSquare {
 		PixelTransform_F32 pixelTransform = new PointToPixelTransform_F32(homography);
 
 		// Apply distortion and show the results
-		DistortImageOps.distortSingle(pattern, output, pixelTransform, true, TypeInterpolate.BILINEAR);
+		DistortImageOps.distortSingle(pattern, output, pixelTransform, null, TypeInterpolate.BILINEAR);
 	}
 
 	public static class Dummy extends BaseDetectFiducialSquare<ImageUInt8> {

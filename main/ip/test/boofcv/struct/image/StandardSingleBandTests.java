@@ -190,7 +190,8 @@ public abstract class StandardSingleBandTests {
 		setRandom(img);
 		
 		ImageSingleBand sub = img.subimage(2,3,3,5, null);
-		
+
+		assertTrue(img.getImageType() == sub.getImageType());
 		assertEquals(1, sub.getWidth());
 		assertEquals(2, sub.getHeight());
 

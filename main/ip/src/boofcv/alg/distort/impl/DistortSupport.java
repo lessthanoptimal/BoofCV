@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -46,8 +46,8 @@ public class DistortSupport {
 	 */
 	public static PixelTransformAffine_F32 transformScale(ImageBase from, ImageBase to)
 	{
-		float scaleX = (float)(to.width-1)/(float)(from.width-1);
-		float scaleY = (float)(to.height-1)/(float)(from.height-1);
+		float scaleX = (float)(to.width)/(float)(from.width);
+		float scaleY = (float)(to.height)/(float)(from.height);
 
 		Affine2D_F32 affine = new Affine2D_F32(scaleX,0,0,scaleY,0,0);
 		PixelTransformAffine_F32 distort = new PixelTransformAffine_F32();

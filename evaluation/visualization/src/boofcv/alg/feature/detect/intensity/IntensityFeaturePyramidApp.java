@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,11 +18,10 @@
 
 package boofcv.alg.feature.detect.intensity;
 
+import boofcv.abst.distort.FDistort;
 import boofcv.abst.feature.detect.intensity.*;
 import boofcv.abst.filter.derivative.AnyImageDerivative;
-import boofcv.alg.distort.DistortImageOps;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
-import boofcv.alg.interpolate.TypeInterpolate;
 import boofcv.alg.misc.ImageStatistics;
 import boofcv.core.image.inst.FactoryImageGenerator;
 import boofcv.factory.feature.detect.intensity.FactoryIntensityPointAlg;
@@ -139,7 +138,7 @@ public class IntensityFeaturePyramidApp<T extends ImageSingleBand, D extends Ima
 			ImageFloat32 featureImg = intensity.getIntensity();
 
 			// scale it up to full resolution
-			DistortImageOps.scale(featureImg,scaledIntensity, TypeInterpolate.NEAREST_NEIGHBOR);
+			new FDistort(featureImg,scaledIntensity).interpNN().scale().apply();
 			// visualize the rescaled intensity
 			b = VisualizeImageData.colorizeSign(scaledIntensity,null, ImageStatistics.maxAbs(scaledIntensity));
 			gui.addImage(b,String.format("Scale %6.2f",scale));

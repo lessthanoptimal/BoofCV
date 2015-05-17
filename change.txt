@@ -16,6 +16,7 @@ Version : Alpha 0.19
   * Added utilities to convert Picture into BoofCV formatted images
 - Images can be serialized again
   * Made ImageType serializable now
+  * Fixed bug where subimages were not assigned an image type.
 - Scene classification
   * Bag-of-Words based techniques
   * K-Nearest-Neighbor classification.  Learning and Classifier
@@ -42,6 +43,11 @@ Version : Alpha 0.19
   * Intrinsic paramters can now use a flow style assignment of parameters
 - Interpolation actually can interpolate along the image border now
   * Added get_border() function
+- Distortion
+  * Scale once again goes from in.width/out.width instead of (in.width-1)/(out.width-1)
+    - The former is correct, but you have to deal with interpolating values like 9.5 when there are 10 pixels (9 is largest index)
+  * Added FDistort
+    - Much easier to use and more flexible than the procedural fuctions in DistortImageOps
 
 TODO
   * Distortion Model + Calibration

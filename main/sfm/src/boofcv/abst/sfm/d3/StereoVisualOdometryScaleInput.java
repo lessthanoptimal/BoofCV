@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,9 +18,8 @@
 
 package boofcv.abst.sfm.d3;
 
-import boofcv.alg.distort.DistortImageOps;
+import boofcv.abst.distort.FDistort;
 import boofcv.alg.geo.PerspectiveOps;
-import boofcv.alg.interpolate.TypeInterpolate;
 import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
@@ -66,8 +65,8 @@ public class StereoVisualOdometryScaleInput<T extends ImageBase> implements Ster
 	@Override
 	public boolean process(T leftImage, T rightImage) {
 
-		DistortImageOps.scale(leftImage,scaleLeft, TypeInterpolate.BILINEAR);
-		DistortImageOps.scale(rightImage,scaleRight, TypeInterpolate.BILINEAR);
+		new FDistort(leftImage,scaleLeft).scale().apply();
+		new FDistort(rightImage,scaleRight).scale().apply();
 
 		return alg.process(scaleLeft,scaleRight);
 	}

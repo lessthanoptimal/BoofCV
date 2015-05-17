@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,8 +18,7 @@
 
 package boofcv.gui.feature;
 
-import boofcv.alg.distort.DistortImageOps;
-import boofcv.alg.interpolate.TypeInterpolate;
+import boofcv.abst.distort.FDistort;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.feature.ScalePoint;
@@ -87,7 +86,7 @@ public class ScaleSpacePyramidPointPanel extends JPanel implements MouseListener
 
 			ImageSingleBand small = ss.getLayer(level-1);
 			ImageSingleBand enlarge = GeneralizedImageOps.createSingleBand(small.getClass(), ss.getInputWidth(), ss.getInputHeight());
-			DistortImageOps.scale(small,enlarge, TypeInterpolate.NEAREST_NEIGHBOR);
+			new FDistort(small,enlarge).interpNN().apply();
 
 			// if the size isn't the same null it so a new image will be declared
 			if( levelImage != null &&

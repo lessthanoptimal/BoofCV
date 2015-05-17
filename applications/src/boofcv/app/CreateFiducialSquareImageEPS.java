@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,9 +18,8 @@
 
 package boofcv.app;
 
-import boofcv.alg.distort.DistortImageOps;
+import boofcv.abst.distort.FDistort;
 import boofcv.alg.filter.binary.ThresholdImageOps;
-import boofcv.alg.interpolate.TypeInterpolate;
 import boofcv.io.UtilIO;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.image.ImageUInt8;
@@ -82,7 +81,7 @@ public class CreateFiducialSquareImageEPS {
 
 		if( image.width != 304 || image.height != 304 ) {
 			ImageUInt8 out = new ImageUInt8(304,304);
-			DistortImageOps.scale(image,out, TypeInterpolate.BILINEAR);
+			new FDistort(image,out).scale().apply();
 			image = out;
 		}
 

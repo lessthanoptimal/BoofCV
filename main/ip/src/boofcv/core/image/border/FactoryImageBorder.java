@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -65,7 +65,6 @@ public class FactoryImageBorder {
 	public static <T extends ImageSingleBand> ImageBorder<T>
 	general( Class<T> imageType , BorderType borderType )
 	{
-
 		Class<?> borderClass;
 		switch(borderType) {
 			case SKIP:

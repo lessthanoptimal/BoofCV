@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.shapes.square;
+package boofcv.abst.distort;
 
 import org.junit.Test;
 
@@ -25,31 +25,21 @@ import static org.junit.Assert.fail;
 /**
  * @author Peter Abeles
  */
-public class TestFitQuadrilateralToImage {
+public class TestFDistort {
 	@Test
-	public void all() {
-		fail("implement");
+	public void scale() {
+		fail("Implement");
 	}
 
 	@Test
-	public void localToImage() {
-		fail("implement");
+	public void rotate() {
+		fail("Implement");
 	}
 
 	@Test
-	public void optimize() {
-		fail("implement");
+	public void affine() {
+		fail("Implement");
 	}
 
-	@Test
-	public void computePointsAndWeights() {
-		// white and dark
-		fail("implement");
-	}
-
-	@Test
-	public void convert() {
-		fail("implement");
-	}
 
 }

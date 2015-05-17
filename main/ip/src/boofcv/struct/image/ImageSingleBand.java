@@ -119,6 +119,7 @@ public abstract class ImageSingleBand<T extends ImageSingleBand> extends ImageBa
 		subimage.height = y1 - y0;
 		subimage.startIndex = startIndex + y0 * stride + x0;
 		subimage.subImage = true;
+		subimage.imageType = imageType;
 
 		return subimage;
 	}

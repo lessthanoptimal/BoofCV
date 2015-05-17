@@ -39,6 +39,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
+// TODO rename to quadrilateral detector?
 public class BinarySquareDetector<T extends ImageSingleBand> {
 
 	// Converts the input image into a binary one

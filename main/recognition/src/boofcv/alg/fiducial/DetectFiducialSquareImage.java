@@ -18,12 +18,11 @@
 
 package boofcv.alg.fiducial;
 
+import boofcv.abst.distort.FDistort;
 import boofcv.abst.filter.binary.InputToBinary;
-import boofcv.alg.distort.DistortImageOps;
 import boofcv.alg.feature.associate.HammingTable16;
 import boofcv.alg.filter.binary.GThresholdImageOps;
 import boofcv.alg.filter.misc.AverageDownSampleOps;
-import boofcv.alg.interpolate.TypeInterpolate;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.alg.shapes.SplitMergeLineFitLoop;
 import boofcv.core.image.GeneralizedImageOps;
@@ -103,7 +102,7 @@ public class DetectFiducialSquareImage<T extends ImageSingleBand>
 		if( grayScale.width > squareLength && grayScale.height > squareLength ) {
 			AverageDownSampleOps.down(grayScale,scaled);
 		} else {
-			DistortImageOps.scale(grayScale, scaled, TypeInterpolate.BILINEAR);
+			new FDistort(grayScale,scaled).scale().apply();
 		}
 
 		// threshold it

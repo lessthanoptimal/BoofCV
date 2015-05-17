@@ -18,10 +18,8 @@
 
 package boofcv.alg.geo.calibration;
 
-import boofcv.alg.distort.DistortImageOps;
-import boofcv.alg.distort.ImageDistort;
+import boofcv.abst.distort.FDistort;
 import boofcv.alg.distort.LensDistortionOps;
-import boofcv.alg.interpolate.TypeInterpolate;
 import boofcv.io.MediaManager;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
@@ -51,9 +49,7 @@ public class RemoveLensDistortionSequenceApp {
 		// load camera calibration and create class to undistort image
 		IntrinsicParameters param = UtilIO.loadXML(calibDir + "intrinsic.xml");
 
-		ImageDistort<ImageUInt8,ImageUInt8> undistorter = DistortImageOps.createImageDistort(
-				LensDistortionOps.allInside(param,null,true),TypeInterpolate.BILINEAR,ImageUInt8.class,ImageUInt8.class);
-
+		FDistort undistorter = null;
 		MultiSpectral<ImageUInt8> input = null;
 		MultiSpectral<ImageUInt8> output = null;
 
@@ -67,10 +63,13 @@ public class RemoveLensDistortionSequenceApp {
 			BufferedImage image = sequence.getGuiImage();
 
 			input = ConvertBufferedImage.convertFromMulti(image,input,true,ImageUInt8.class);
-			if( output == null )
-				output = new MultiSpectral<ImageUInt8>(ImageUInt8.class,input.width,input.height,input.getNumBands());
+			if( output == null ) {
+				output = new MultiSpectral<ImageUInt8>(ImageUInt8.class, input.width, input.height, input.getNumBands());
+				undistorter = new FDistort(input,output).cached(true).
+						transform(LensDistortionOps.allInside(param, null, true));
+			}
 
-			DistortImageOps.distortMS(input,output,undistorter);
+			undistorter.apply();
 
 			undistorted = ConvertBufferedImage.convertTo_U8(output, undistorted,true);
 
