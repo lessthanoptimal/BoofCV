@@ -59,6 +59,7 @@ public class DistortImageOps {
 	 * @param border Describes how pixels outside the image border should be handled.  null means skip.
 	 * @param interpType Which type of interpolation will be used.
 	 */
+	@Deprecated
 	public static <T extends ImageBase>
 	void affine(T input, T output, ImageBorder<T> border, TypeInterpolate interpType,
 				double a11, double a12, double a21, double a22,
@@ -186,6 +187,7 @@ public class DistortImageOps {
 	 * @param border Describes how pixels outside the image border should be handled.  null means skip.
 	 * @param interpType Which interpolation algorithm should be used.
 	 */
+	@Deprecated
 	public static <T extends ImageBase>
 	void scale(T input, T output, ImageBorder<T> border, TypeInterpolate interpType) {
 
@@ -215,6 +217,7 @@ public class DistortImageOps {
 	 * @param interpType Which type of interpolation will be used.
 	 * @param angleInputToOutput Angle of rotation in radians. From input to output, CCW rotation.
 	 */
+	@Deprecated
 	public static <T extends ImageBase>
 	void rotate(T input, T output, ImageBorder<T> border, TypeInterpolate interpType, float angleInputToOutput) {
 

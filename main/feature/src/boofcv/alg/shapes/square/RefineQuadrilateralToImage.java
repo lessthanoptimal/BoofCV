@@ -54,13 +54,16 @@ public class RefineQuadrilateralToImage<T extends ImageSingleBand> {
 	float lineBorder = 2.0f;
 
 	// number of times it will sample along the line
-	int numSamples = 20;
+	int lineSamples = 20;
 
-	// number of pixels it will sample tangent to the line
-	int numTangent = 2;
+	// 1/2 the number of points it will sample around the line
+	int sampleRadius = 2;
 
 	// maximum number of iterations
 	private int iterations = 10;
+
+	// convergence tolerance in pixels
+	private double convergeTolPixels = 0.01;
 
 	// used to determine if it's snapping to a black (1) or white(-1) quadrilateral
 	float sign;
@@ -68,35 +71,70 @@ public class RefineQuadrilateralToImage<T extends ImageSingleBand> {
 	//---------- storage for local work space
 	private LinePolar2D_F64 polar = new LinePolar2D_F64();
 	private LineGeneral2D_F64 general[]; // estimated line for each side
-	private double weights[];// storage for weights in line fitting
+	protected double weights[];// storage for weights in line fitting
 	private Quadrilateral_F64 previous = new Quadrilateral_F64();
 	// storage for where the points that are sampled along the line
-	private List<Point2D_F64> samplePts = new ArrayList<Point2D_F64>();
+	protected List<Point2D_F64> samplePts = new ArrayList<Point2D_F64>();
+	// temporary storage for sample image intensity values
+	float values[];
 
 	// local coordinate system that line estimation is found in
-	private Point2D_F64 center = new Point2D_F64();
+	protected Point2D_F64 center = new Point2D_F64();
 
 	// used to interpolate the pixel's value
-	private InterpolatePixelS<T> interpolate;
+	InterpolatePixelS<T> interpolate;
 
-
-	public RefineQuadrilateralToImage(boolean fitBlack, InterpolatePixelS<T> interpolate) {
+	/**
+	 * Constructor which provides full access to all parameters.  See code documents
+	 * value a description of these variables.
+	 */
+	public RefineQuadrilateralToImage(float lineBorder, int lineSamples, int sampleRadius,
+									  int iterations, double convergeTolPixels, boolean fitBlack,
+									  InterpolatePixelS<T> interpolate) {
+		this.lineBorder = lineBorder;
+		this.lineSamples = lineSamples;
+		this.sampleRadius = sampleRadius;
+		this.iterations = iterations;
+		this.convergeTolPixels = convergeTolPixels;
 		this.interpolate = interpolate;
 
+		initialize(fitBlack);
+	}
+
+	/**
+	 * Simplified constructor which uses reasonable default values for most variables
+	 * @param fitBlack If true it's fitting a black square.  false is white.
+	 * @param interpolate Interpolation class
+	 */
+	public RefineQuadrilateralToImage(boolean fitBlack, InterpolatePixelS<T> interpolate) {
+		this.interpolate = interpolate;
+		initialize(fitBlack);
+	}
+
+	/**
+	 * Declares data structures
+	 */
+	private void initialize( boolean fitBlack ) {
 		general = new LineGeneral2D_F64[4];
 		for (int i = 0; i < general.length; i++) {
 			general[i] = new LineGeneral2D_F64();
 		}
 
-		weights = new double[numSamples];
+		values = new float[sampleRadius*2];
 
-		for (int i = 0; i < numSamples; i++) {
+		int totalPts = lineSamples *(2*sampleRadius-1);
+		weights = new double[totalPts];
+
+		for (int i = 0; i < totalPts; i++) {
 			samplePts.add( new Point2D_F64());
 		}
 
 		sign = fitBlack ? 1 : -1;
 	}
 
+	/**
+	 * Sets the image which is going to be processed
+	 */
 	public void setImage( T image ) {
 		interpolate.setImage(image);
 	}
@@ -123,7 +161,8 @@ public class RefineQuadrilateralToImage<T extends ImageSingleBand> {
 
 		previous.set(seed);
 
-		double convergeTol = 0.01*0.01;
+		// pixels squares is faster to compute
+		double convergeTol = convergeTolPixels*convergeTolPixels;
 
 		for (int EM = 0; EM < iterations; EM++) {
 			// snap each line to the edge independently.  Lines will be in local coordinates
@@ -174,27 +213,27 @@ public class RefineQuadrilateralToImage<T extends ImageSingleBand> {
 	 * @param b Corner point in image coordinates.
 	 * @param foundLocal (output) Line in local coordinates
 	 */
-	private void optimize( Point2D_F64 a , Point2D_F64 b , LineGeneral2D_F64 foundLocal ) {
+	protected void optimize( Point2D_F64 a , Point2D_F64 b , LineGeneral2D_F64 foundLocal ) {
 
 		float slopeX = (float)(b.x - a.x);
 		float slopeY = (float)(b.y - a.y);
+		float r = (float)Math.sqrt(slopeX*slopeX + slopeY*slopeY);
+		// vector of unit length pointing in direction of the slope
+		float unitX = slopeX/r;
+		float unitY = slopeY/r;
 
 		// define the line segment which points will be sampled along.
 		// don't sample too close to the corner since the line because less clear there and it can screw up results
-		float x0 = (float)a.x + slopeX*lineBorder;
-		float y0 = (float)a.y + slopeY*lineBorder;
+		float x0 = (float)a.x + unitX*lineBorder;
+		float y0 = (float)a.y + unitY*lineBorder;
 
 		// truncate the slope
-		slopeX *= (1.0f-2.0f*lineBorder);
-		slopeY *= (1.0f-2.0f*lineBorder);
+		slopeX -= 2.0f*unitX*lineBorder;
+		slopeY -= 2.0f*unitY*lineBorder;
 
 		// normalized tangent of sample distance length
-		float tanX = -slopeY;
-		float tanY = slopeX;
-
-		float r = (float)Math.sqrt(tanX*tanX + tanY*tanY);
-		tanX = tanX/r;
-		tanY = tanY/r;
+		float tanX = -unitY;
+		float tanY = unitX;
 
 		// set up inputs into line fitting
 		computePointsAndWeights(slopeX, slopeY, x0, y0, tanX, tanY);
@@ -207,35 +246,34 @@ public class RefineQuadrilateralToImage<T extends ImageSingleBand> {
 	/**
 	 * Computes the location of points along the line and their weights
 	 */
-	private void computePointsAndWeights(float slopeX, float slopeY, float x0, float y0, float tanX, float tanY) {
+	protected void computePointsAndWeights(float slopeX, float slopeY, float x0, float y0, float tanX, float tanY) {
 		float centerX = (float)center.x;
 		float centerY = (float)center.y;
 
-		for (int i = 0; i < numSamples; i++) {
-			// find point on line
-			float frac = i/(float)(numSamples-1);
-			float x = x0 + slopeX*frac;
-			float y = y0 + slopeY*frac;
+		for (int i = 0; i < lineSamples; i++ ) {
+			// find point on line and shift it over to the first sample point
+			float frac = i/(float)(lineSamples -1);
+			float x = x0 + slopeX*frac + sampleRadius*tanX;
+			float y = y0 + slopeY*frac + sampleRadius*tanY;
 
-			// compute sample point one pixel to the left of the line where the color should be different
-			float leftX = x + tanX;
-			float leftY = y + tanY;
-			float rightX = x;
-			float rightY = y;
+			int indexPts = i*(values.length-1);
 
-			for (int j = 0; j < numTangent; j++) {
+			values[0] = interpolate.get(x,y);
+			for (int j = 1; j < values.length; j++) {
+				x -= tanX;
+				y -= tanY;
+
 				// sample the value
-				float valueLeft = interpolate.get(leftX,leftY);
-				float valueLine = interpolate.get(rightX,rightY);
+				values[j] = interpolate.get(x,y);
 
 				// add the point to the list and convert into local coordinates
-				samplePts.get(i).set(x-centerX,y-centerY);
-				weights[i] = Math.max(0,sign*(valueLeft-valueLine));
+				samplePts.get(indexPts+j-1).set(x-centerX,y-centerY);
+			}
 
-				leftX += tanX;
-				leftY += tanY;
-				rightX -= tanX;
-				rightY -= tanY;
+			// compute the weights using the difference between adjacent sample points
+			// the weight should be maximized if the right sample point is inside the square
+			for (int j = 0; j < values.length-1; j++) {
+				weights[indexPts+j] = Math.max(0,sign*(values[j]-values[j+1]));
 			}
 		}
 	}

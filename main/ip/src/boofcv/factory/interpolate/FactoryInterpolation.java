@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -53,6 +53,15 @@ public class FactoryInterpolation {
 		return createPixelS(min,max,type,t);
 	}
 
+	/**
+	 * Creates an interpolation class of the specified type for the specified image type.
+	 *
+	 * @param min Minimum possible pixel value.  Inclusive.
+	 * @param max Maximum possible pixel value.  Inclusive.
+	 * @param type Interpolation type
+	 * @param imageType Type of input image
+	 * @return Interpolation
+	 */
 	public static <T extends ImageSingleBand> InterpolatePixelS<T>
 	createPixelS(double min, double max, TypeInterpolate type, Class<T> imageType)
 	{

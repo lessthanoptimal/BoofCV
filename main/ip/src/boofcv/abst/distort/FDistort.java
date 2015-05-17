@@ -34,6 +34,7 @@ import boofcv.struct.distort.PointTransform_F32;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 import georegression.struct.affine.Affine2D_F32;
+import georegression.struct.affine.Affine2D_F64;
 
 /**
  * High level interface for rendering a distorted image into another one.  Uses a flow style interface to remove
@@ -214,6 +215,10 @@ public class FDistort
 		m = m.invert(null);
 
 		return transform(new PixelTransformAffine_F32(m));
+	}
+
+	public FDistort affine( Affine2D_F64 affine ) {
+		return affine(affine.a11,affine.a12,affine.a21,affine.a22,affine.tx,affine.ty);
 	}
 
 	/**
