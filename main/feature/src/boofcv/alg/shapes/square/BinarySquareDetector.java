@@ -21,16 +21,17 @@ package boofcv.alg.shapes.square;
 import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.alg.filter.binary.Contour;
 import boofcv.alg.filter.binary.LinearContourLabelChang2004;
+import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.shapes.SplitMergeLineFitLoop;
 import boofcv.struct.ConnectRule;
 import boofcv.struct.image.ImageSInt32;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
-import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I32;
 import georegression.struct.shapes.Quadrilateral_F64;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_I32;
+import org.ejml.UtilEjml;
 
 import java.util.List;
 
@@ -59,8 +60,11 @@ public class BinarySquareDetector<T extends ImageSingleBand> {
 	// finds the initial polygon around a target candidate
 	private SplitMergeLineFitLoop fitPolygon;
 
+	// converts the polygon into a quadrilateral
+	private FindQuadCornersInPolygon polyToQuad = new FindQuadCornersInPolygon();
+
 	// refines the initial estimate of the quadrilateral around the fiducial
-	private FitBinaryQuadrilateralEM fitQuad = new FitBinaryQuadrilateralEM();
+	private RefineQuadrilateralLineToImage refine;
 
 	// List of all squares that it finds
 	private FastQueue<Quadrilateral_F64> found = new FastQueue<Quadrilateral_F64>(Quadrilateral_F64.class,true);
@@ -72,11 +76,13 @@ public class BinarySquareDetector<T extends ImageSingleBand> {
 	 * Configures the detector.
 	 *
 	 * @param thresholder Converts the input image into a binary one
+	 * @param interp Interpolation used when refining the edge estimate
 	 * @param fitPolygon Provides a crude polygon fit around a shape
 	 * @param minContourFraction Size of minimum contour as a fraction of the input image's width.  Try 0.23
 	 * @param inputType Type of input image it's processing
 	 */
 	protected BinarySquareDetector(InputToBinary<T> thresholder,
+								   InterpolatePixelS<T> interp ,
 								   SplitMergeLineFitLoop fitPolygon,
 								   double minContourFraction,
 								   Class<T> inputType) {
@@ -85,7 +91,7 @@ public class BinarySquareDetector<T extends ImageSingleBand> {
 		this.inputType = inputType;
 		this.minContourFraction = minContourFraction;
 		this.fitPolygon = fitPolygon;
-
+		this.refine = new RefineQuadrilateralLineToImage<T>(true,interp);
 	}
 
 	/**
@@ -121,8 +127,6 @@ public class BinarySquareDetector<T extends ImageSingleBand> {
 
 		// Find quadrilaterals that could be fiducials
 		findCandidateShapes();
-
-		// sub-pixel optimize them
 	}
 
 	/**
@@ -147,19 +151,16 @@ public class BinarySquareDetector<T extends ImageSingleBand> {
 
 				GrowQueue_I32 splits = fitPolygon.getSplits();
 
-				// If there are too many splits it's probably not a quadrilateral
-				if( splits.size <= 8 && splits.size >= 4 ) {
-
-					Quadrilateral_F64 q = found.grow();
-//					if( !fitQuad.fit(contourUndist.toList(),splits,q) ) {
-//						found.removeTail();
-//					} else {
-//						// remove small and flat out bad shapes
-//						double area = q.area();
-//						if(UtilEjml.isUncountable(area) || area < minimumArea ) {
-//							found.removeTail();
-//						}
-//					}
+				if( polyToQuad.computeQuadrilateral(c.external,splits) ) {
+					Quadrilateral_F64 q = polyToQuad.getOutput();
+					if( refine.fit(q,found.grow()) ) {
+						double area = q.area();
+						if(UtilEjml.isUncountable(area) || area < minimumArea ) {
+							found.removeTail();
+						}
+					} else {
+						found.removeTail();
+					}
 				}
 			}
 		}
@@ -187,18 +188,7 @@ public class BinarySquareDetector<T extends ImageSingleBand> {
 		return binary;
 	}
 
-
 	public Class<T> getInputType() {
 		return inputType;
-	}
-
-	public static class Result {
-		Point2D_F64 corners[] = new Point2D_F64[4];
-
-		public Result() {
-			for (int i = 0; i < corners.length; i++) {
-				corners[i]= new Point2D_F64();
-			}
-		}
 	}
 }

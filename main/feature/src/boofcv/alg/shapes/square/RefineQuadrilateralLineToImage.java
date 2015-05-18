@@ -34,21 +34,27 @@ import java.util.List;
 
 /**
  * <p>
- * Fits a quadrilateral to an image when given a good initial guess. Each line in the quadrilateral is processed
- * individually and fit to a line using weighted regression. The weight is determined by the difference of points
- * sampled on other side of the line.  This process is repeated until it converges or the maximum number of iterations
- * has been reached.
+ * Fits a quadrilateral to an image when given a good initial guess. The edges of the quadrilateral are assumed
+ * to be perfectly straight lines.  The edges are processed individually and fit to a line using weighted regression.
+ * Both black squares with white backgrounds and white squares with black backgrounds can be found.
  * </p>
  * <p>
- * When sampling along the line it avoid the corners since those regions don't have a clear edge.  Points are sampled
- * starting at one end and moving towards the other.  The intensity is sampled at the line then a point 1 pixels to
- * the left, which is outside of the line.  Additional points along the tangent can also be sampled.  The difference
- * in value determines the weight.
+ * The weight of each sample point is determined by the intensity difference between it and a point 1 pixel to its
+ * left.  Points are sampled along the line and tangentially from each of those points along the line.
+ * This allows for the line's estimate to be improved.  This entire process is iterated until it converges or
+ * the maximum number of iterations has been reached.
+ * </p>
+ * <p>
+ * When sampling along the line corners are avoided since those regions don't have a clear edge.  Points are sampled
+ * starting at one end and moving towards the other.  The intensity is sampled using interpolation from (radius+1) pixels
+ * to the left up to radius pixels to the right.  The weight for points of distance radius to the left and right
+ * is found by computing the difference for that point and one to its left.  So for a radius of 1, the intensity
+ * is sampled 4 times but 3 points are added to the line fitting, for each point sampled along the line.
  * </p>
  *
  * @author Peter Abeles
  */
-public class RefineQuadrilateralToImage<T extends ImageSingleBand> {
+public class RefineQuadrilateralLineToImage<T extends ImageSingleBand> {
 
 	// How far away from a corner will it sample the line
 	float lineBorder = 2.0f;
@@ -56,8 +62,9 @@ public class RefineQuadrilateralToImage<T extends ImageSingleBand> {
 	// number of times it will sample along the line
 	int lineSamples = 20;
 
-	// 1/2 the number of points it will sample around the line
-	int sampleRadius = 2;
+	// Determines the number of tangental points sampled at each point along the line.
+	// Total intensity values sampled is radius*2+2, and points added to line fitting is radius*2+1.
+	int sampleRadius = 1;
 
 	// maximum number of iterations
 	private int iterations = 10;
@@ -88,9 +95,9 @@ public class RefineQuadrilateralToImage<T extends ImageSingleBand> {
 	 * Constructor which provides full access to all parameters.  See code documents
 	 * value a description of these variables.
 	 */
-	public RefineQuadrilateralToImage(float lineBorder, int lineSamples, int sampleRadius,
-									  int iterations, double convergeTolPixels, boolean fitBlack,
-									  InterpolatePixelS<T> interpolate) {
+	public RefineQuadrilateralLineToImage(float lineBorder, int lineSamples, int sampleRadius,
+										  int iterations, double convergeTolPixels, boolean fitBlack,
+										  InterpolatePixelS<T> interpolate) {
 		this.lineBorder = lineBorder;
 		this.lineSamples = lineSamples;
 		this.sampleRadius = sampleRadius;
@@ -103,10 +110,10 @@ public class RefineQuadrilateralToImage<T extends ImageSingleBand> {
 
 	/**
 	 * Simplified constructor which uses reasonable default values for most variables
-	 * @param fitBlack If true it's fitting a black square.  false is white.
+	 * @param fitBlack If true it's fitting a black square with a white background.  false is the inverse.
 	 * @param interpolate Interpolation class
 	 */
-	public RefineQuadrilateralToImage(boolean fitBlack, InterpolatePixelS<T> interpolate) {
+	public RefineQuadrilateralLineToImage(boolean fitBlack, InterpolatePixelS<T> interpolate) {
 		this.interpolate = interpolate;
 		initialize(fitBlack);
 	}
@@ -115,14 +122,17 @@ public class RefineQuadrilateralToImage<T extends ImageSingleBand> {
 	 * Declares data structures
 	 */
 	private void initialize( boolean fitBlack ) {
+		if( sampleRadius < 1 )
+			throw new IllegalArgumentException("If sampleRadius < 1 it won't do anything");
+
 		general = new LineGeneral2D_F64[4];
 		for (int i = 0; i < general.length; i++) {
 			general[i] = new LineGeneral2D_F64();
 		}
 
-		values = new float[sampleRadius*2];
+		values = new float[sampleRadius*2+2];
 
-		int totalPts = lineSamples *(2*sampleRadius-1);
+		int totalPts = lineSamples *(2*sampleRadius+1);
 		weights = new double[totalPts];
 
 		for (int i = 0; i < totalPts; i++) {
@@ -253,8 +263,8 @@ public class RefineQuadrilateralToImage<T extends ImageSingleBand> {
 		for (int i = 0; i < lineSamples; i++ ) {
 			// find point on line and shift it over to the first sample point
 			float frac = i/(float)(lineSamples -1);
-			float x = x0 + slopeX*frac + sampleRadius*tanX;
-			float y = y0 + slopeY*frac + sampleRadius*tanY;
+			float x = x0 + slopeX*frac + (sampleRadius+1)*tanX;
+			float y = y0 + slopeY*frac + (sampleRadius+1)*tanY;
 
 			int indexPts = i*(values.length-1);
 

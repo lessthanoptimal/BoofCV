@@ -100,7 +100,7 @@ public class TestRefineQuadrilateralToImage {
 	public void fit_perfect( boolean black , Affine2D_F64 affine , Class imageType ) {
 		setup(affine, black, imageType);
 
-		RefineQuadrilateralToImage alg = createAlg(black, imageType);
+		RefineQuadrilateralLineToImage alg = createAlg(black, imageType);
 
 		Quadrilateral_F64 input = new Quadrilateral_F64();
 		AffinePointOps_F64.transform(affine,new Point2D_F64(x0,y0),input.a);
@@ -142,7 +142,7 @@ public class TestRefineQuadrilateralToImage {
 	public void fit_noisy( boolean black , Affine2D_F64 affine, Class imageType) {
 		setup(affine, black, imageType);
 
-		RefineQuadrilateralToImage alg = createAlg(black, imageType);
+		RefineQuadrilateralLineToImage alg = createAlg(black, imageType);
 
 		Quadrilateral_F64 input = new Quadrilateral_F64();
 		AffinePointOps_F64.transform(affine,new Point2D_F64(x0,y0),input.a);
@@ -165,7 +165,7 @@ public class TestRefineQuadrilateralToImage {
 			double before = computeMaxDistance(input,expected);
 			double after = computeMaxDistance(found,expected);
 
-//			System.out.println(before+"  "+after);
+			System.out.println(before+"  "+after);
 
 			assertTrue(after<before);
 			checkEquals(expected, found, 0.5);
@@ -183,9 +183,10 @@ public class TestRefineQuadrilateralToImage {
 		input.d.y += rand.nextGaussian()*sigma;
 	}
 
-	private RefineQuadrilateralToImage createAlg(boolean black, Class imageType) {
+	private RefineQuadrilateralLineToImage createAlg(boolean black, Class imageType) {
 		InterpolatePixelS interp = FactoryInterpolation.createPixelS(0, 255, TypeInterpolate.BILINEAR, imageType);
-		return new RefineQuadrilateralToImage(black,interp);
+		return new RefineQuadrilateralLineToImage(black,interp);
+//		return new RefineQuadrilateralToImage(2,20,2,10,0.01,black,interp);
 	}
 
 	/**
@@ -202,7 +203,7 @@ public class TestRefineQuadrilateralToImage {
 	public void optimize_line_perfect(boolean black, Class imageType) {
 		setup(null, black, imageType);
 
-		RefineQuadrilateralToImage alg = createAlg(black, imageType);
+		RefineQuadrilateralLineToImage alg = createAlg(black, imageType);
 
 		Quadrilateral_F64 input = new Quadrilateral_F64(x0,y0,x0,y1,x1,y1,x1,y0);
 		LineGeneral2D_F64 found = new LineGeneral2D_F64();
@@ -244,7 +245,7 @@ public class TestRefineQuadrilateralToImage {
 	public void computePointsAndWeights( boolean black , Class imageType ) {
 		setup(null,black,imageType);
 
-		RefineQuadrilateralToImage alg = createAlg(black, imageType);
+		RefineQuadrilateralLineToImage alg = createAlg(black, imageType);
 
 		float H = y1-y0-10;
 
@@ -253,18 +254,18 @@ public class TestRefineQuadrilateralToImage {
 		alg.computePointsAndWeights(0, H, x0, y0 + 5, -1, 0);
 
 		int radius = alg.sampleRadius;
-		int N = radius*2-1;
+		int N = radius*2+1;
 
 		for (int i = 0; i < alg.lineSamples; i++) {
 			for (int j = 0; j < N; j++) {
 				int index = i*N+j;
-				if( j == radius-1 ) {
+				if( j == radius ) {
 					assertEquals(white,alg.weights[index],1e-8);
 				} else {
 					assertEquals(0,alg.weights[index],1e-8);
 				}
 
-				double x = x0 - 10 - (radius-j-1);
+				double x = x0 - 10 - (radius-j);
 				double y = y0 + 5 + H*i/(alg.lineSamples -1) - 12;
 				Point2D_F64 p = (Point2D_F64)alg.samplePts.get(index);
 				assertEquals(x,p.x,1e-4);
@@ -284,7 +285,7 @@ public class TestRefineQuadrilateralToImage {
 		lines[3] = UtilLine2D_F64.convert(new LineSegment2D_F64(orig.d,orig.a),(LineGeneral2D_F64)null);
 
 		Quadrilateral_F64 found = new Quadrilateral_F64();
-		RefineQuadrilateralToImage.convert(lines, found);
+		RefineQuadrilateralLineToImage.convert(lines, found);
 
 		checkEquals(orig, found, 1e-8);
 	}
