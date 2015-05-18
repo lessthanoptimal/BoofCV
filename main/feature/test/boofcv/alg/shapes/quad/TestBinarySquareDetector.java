@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.shapes.square;
+package boofcv.alg.shapes.quad;
 
 import org.junit.Test;
 

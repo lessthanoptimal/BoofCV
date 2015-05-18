@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.shapes.square;
+package boofcv.alg.shapes.quad;
 
 import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.alg.filter.binary.Contour;
@@ -36,12 +36,27 @@ import org.ejml.UtilEjml;
 import java.util.List;
 
 /**
- * TODO comment
+ * <p>
+ * Detects quadrilaterals in an image.  This is important since squares appear as quadrilaterals under
+ * perspective distortion.  So this can effectively be used to detect squares.
+ * </p>
+ *
+ * <p>
+ * Processing Steps:
+ * <ol>
+ * <li>First the input gray scale image is converted into a binary image.</li>
+ * <li>The contours of black blobs are found.</li>
+ * <li>From the contours a polygons are fitted.</li>
+ * <li>From the polygons quadrilaterasl iare fitted.</li>
+ * <li>Then a sub-pixel algorithm aligns the quadrilateral to its edge</li>
+ * </ol>
+ * The last step assumes that the lines of the shape are straight.  This is a reasonable assumption
+ * when lens distortion has been removed.  The other steps are fairly tolerant to distortion.
+ * </p>
  *
  * @author Peter Abeles
  */
-// TODO rename to quadrilateral detector?
-public class BinarySquareDetector<T extends ImageSingleBand> {
+public class BinaryQuadrilateralDetector<T extends ImageSingleBand> {
 
 	// Converts the input image into a binary one
 	private InputToBinary<T> thresholder;
@@ -81,11 +96,11 @@ public class BinarySquareDetector<T extends ImageSingleBand> {
 	 * @param minContourFraction Size of minimum contour as a fraction of the input image's width.  Try 0.23
 	 * @param inputType Type of input image it's processing
 	 */
-	protected BinarySquareDetector(InputToBinary<T> thresholder,
-								   InterpolatePixelS<T> interp ,
-								   SplitMergeLineFitLoop fitPolygon,
-								   double minContourFraction,
-								   Class<T> inputType) {
+	protected BinaryQuadrilateralDetector(InputToBinary<T> thresholder,
+										  InterpolatePixelS<T> interp,
+										  SplitMergeLineFitLoop fitPolygon,
+										  double minContourFraction,
+										  Class<T> inputType) {
 
 		this.thresholder = thresholder;
 		this.inputType = inputType;

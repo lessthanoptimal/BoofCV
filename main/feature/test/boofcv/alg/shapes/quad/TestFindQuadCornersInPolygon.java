@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.shapes.square;
+package boofcv.alg.shapes.quad;
 
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I32;
