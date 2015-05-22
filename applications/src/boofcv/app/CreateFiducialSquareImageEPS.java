@@ -79,15 +79,13 @@ public class CreateFiducialSquareImageEPS {
 
 		ImageUInt8 image = UtilImageIO.loadImage(inputPath,ImageUInt8.class);
 
-		if( image.width != 304 || image.height != 304 ) {
-			ImageUInt8 out = new ImageUInt8(304,304);
-			new FDistort(image,out).scaleExt().apply();
-			image = out;
+		// make sure the image is square and divisible by 8
+		int s = image.width - (image.width%8);
+		if( image.width != s || image.height != s ) {
+			ImageUInt8 tmp = new ImageUInt8(s, s);
+			new FDistort(image, tmp).scaleExt().apply();
+			image = tmp;
 		}
-
-		ImageUInt8 binary = ThresholdImageOps.threshold(image,null,256/2,false);
-
-//		ShowImages.showWindow(VisualizeBinaryData.renderBinary(binary,false, null), "Binary Image");
 
 		// print out the selected number in binary for debugging purposes
 		PrintStream out = new PrintStream(outputName);
@@ -97,7 +95,10 @@ public class CreateFiducialSquareImageEPS {
 		double blackBorder = targetLength/4.0;
 		double innerWidth = targetLength/2.0;
 		double pageLength = targetLength+whiteBorder*2;
-		double scale = binary.width/innerWidth;
+		double scale = image.width/innerWidth;
+
+		ImageUInt8 binary = ThresholdImageOps.threshold(image,null,3*256/4,false);
+//		ShowImages.showWindow(VisualizeBinaryData.renderBinary(binary, false, null), "Binary Image");
 
 		out.println("%!PS-Adobe-3.0 EPSF-3.0\n" +
 				"%%Creator: BoofCV\n" +
