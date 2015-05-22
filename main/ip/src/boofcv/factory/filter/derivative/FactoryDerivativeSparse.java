@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,6 +21,10 @@ package boofcv.factory.filter.derivative;
 import boofcv.abst.filter.ImageFunctionSparse;
 import boofcv.abst.filter.convolve.ImageConvolveSparse;
 import boofcv.alg.filter.derivative.LaplacianEdge;
+import boofcv.alg.filter.derivative.impl.GradientSparsePrewitt_F32;
+import boofcv.alg.filter.derivative.impl.GradientSparsePrewitt_U8;
+import boofcv.alg.filter.derivative.impl.GradientSparseSobel_F32;
+import boofcv.alg.filter.derivative.impl.GradientSparseSobel_U8;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.core.image.border.*;
 import boofcv.factory.filter.convolve.FactoryConvolveSparse;
@@ -29,6 +33,9 @@ import boofcv.struct.convolve.Kernel2D_I32;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageInteger;
 import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.sparse.GradientValue;
+import boofcv.struct.sparse.SparseImageGradient;
 
 /**
  * Creates filters for performing sparse derivative calculations.
@@ -45,7 +52,8 @@ public class FactoryDerivativeSparse {
 	 * @param border How the border should be handled.  If null {@link BorderType#EXTENDED} will be used.
 	 * @return Filter for performing a sparse laplacian.
 	 */
-	public static <T extends ImageSingleBand> ImageFunctionSparse<T> createLaplacian( Class<T> imageType , ImageBorder<T> border )
+	public static <T extends ImageSingleBand>
+	ImageFunctionSparse<T> createLaplacian( Class<T> imageType , ImageBorder<T> border )
 	{
 		if( border == null ) {
 			border = FactoryImageBorder.general(imageType,BorderType.EXTENDED);
@@ -63,6 +71,44 @@ public class FactoryDerivativeSparse {
 			r.setImageBorder((ImageBorder_I32)border);
 
 			return (ImageFunctionSparse<T>)r;
+		}
+	}
+
+	/**
+	 * Creates a sparse sobel gradient operator.
+	 *
+	 * @param imageType The type of image which is to be processed.
+	 * @param border How the border should be handled.  If null then the borders can't be processed.
+	 * @return Sparse gradient
+	 */
+	public static <T extends ImageSingleBand, G extends GradientValue>
+	SparseImageGradient<T,G> createSobel( Class<T> imageType , ImageBorder<T> border )
+	{
+		if( imageType == ImageFloat32.class) {
+			return (SparseImageGradient)new GradientSparseSobel_F32((ImageBorder_F32)border);
+		} else if( imageType == ImageUInt8.class ){
+			return (SparseImageGradient)new GradientSparseSobel_U8((ImageBorder_I32)border);
+		} else {
+			throw new IllegalArgumentException("Unsupported image type "+imageType.getSimpleName());
+		}
+	}
+
+	/**
+	 * Creates a sparse prewitt gradient operator.
+	 *
+	 * @param imageType The type of image which is to be processed.
+	 * @param border How the border should be handled.  If null then the borders can't be processed.
+	 * @return Sparse gradient.
+	 */
+	public static <T extends ImageSingleBand, G extends GradientValue>
+	SparseImageGradient<T,G> createPrewitt( Class<T> imageType , ImageBorder<T> border )
+	{
+		if( imageType == ImageFloat32.class) {
+			return (SparseImageGradient)new GradientSparsePrewitt_F32((ImageBorder_F32)border);
+		} else if( imageType == ImageUInt8.class ){
+			return (SparseImageGradient)new GradientSparsePrewitt_U8((ImageBorder_I32)border);
+		} else {
+			throw new IllegalArgumentException("Unsupported image type "+imageType.getSimpleName());
 		}
 	}
 }

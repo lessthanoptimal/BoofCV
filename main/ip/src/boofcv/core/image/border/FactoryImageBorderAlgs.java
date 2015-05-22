@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -71,20 +71,20 @@ public class FactoryImageBorderAlgs {
 		return ImageBorderValue.wrap(image,value);
 	}
 
-	public static ImageBorder1D_I32 extend( ImageInteger image ) {
-		ImageBorder1D_I32 ret = new ImageBorder1D_I32((Class)BorderIndex1D_Extend.class);
+	public static <T extends ImageInteger> ImageBorder1D_I32<T> extend( T image ) {
+		ImageBorder1D_I32<T> ret = new ImageBorder1D_I32<T>((Class)BorderIndex1D_Extend.class);
 		ret.setImage(image);
 		return ret;
 	}
 
-	public static ImageBorder1D_I32 reflect( ImageInteger image ) {
-		ImageBorder1D_I32 ret = new ImageBorder1D_I32((Class)BorderIndex1D_Reflect.class);
+	public static <T extends ImageInteger> ImageBorder1D_I32<T> reflect( T image ) {
+		ImageBorder1D_I32<T> ret = new ImageBorder1D_I32<T>((Class)BorderIndex1D_Reflect.class);
 		ret.setImage(image);
 		return ret;
 	}
 
-	public static ImageBorder1D_I32 wrap( ImageInteger image ) {
-		ImageBorder1D_I32 ret = new ImageBorder1D_I32((Class)BorderIndex1D_Wrap.class);
+	public static <T extends ImageInteger> ImageBorder1D_I32<T> wrap( T image ) {
+		ImageBorder1D_I32<T> ret = new ImageBorder1D_I32<T>((Class)BorderIndex1D_Wrap.class);
 		ret.setImage(image);
 		return ret;
 	}
