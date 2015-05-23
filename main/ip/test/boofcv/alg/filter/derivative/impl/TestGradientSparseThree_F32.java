@@ -16,10 +16,9 @@
  * limitations under the License.
  */
 
-package boofcv.alg.filter.derivative;
+package boofcv.alg.filter.derivative.impl;
 
 import boofcv.abst.filter.derivative.ImageGradient;
-import boofcv.alg.filter.derivative.impl.GradientSparsePrewitt_F32;
 import boofcv.core.image.border.ImageBorder;
 import boofcv.core.image.border.ImageBorder_F32;
 import boofcv.factory.filter.derivative.FactoryDerivative;
@@ -29,20 +28,20 @@ import boofcv.struct.sparse.SparseImageGradient;
 /**
  * @author Peter Abeles
  */
-public class TestGradientSparsePrewitt_F32 extends GeneralGradientSparse {
+public class TestGradientSparseThree_F32 extends GeneralGradientSparse {
 
-	public TestGradientSparsePrewitt_F32() {
+	public TestGradientSparseThree_F32() {
 		super(ImageFloat32.class, ImageFloat32.class);
 	}
 
 	@Override
 	public SparseImageGradient createAlg(ImageBorder border) {
-		return new GradientSparsePrewitt_F32((ImageBorder_F32)border);
+		return new GradientSparseThree_F32((ImageBorder_F32)border);
 	}
 
 	@Override
 	public ImageGradient createGradient() {
-		return FactoryDerivative.prewitt(imageType,derivType);
+		return FactoryDerivative.three_F32();
 	}
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,11 +18,8 @@
 
 package boofcv.gui.image;
 
-import boofcv.alg.misc.ImageStatistics;
 import boofcv.io.image.ConvertBufferedImage;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSInt16;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.ImageBase;
 
 import javax.swing.*;
 import java.awt.*;
@@ -83,31 +80,8 @@ public class ShowImages {
 		return panel;
 	}
 
-	public static ImagePanel showWindow( ImageUInt8 img , String title ) {
-		BufferedImage buff = ConvertBufferedImage.convertTo(img,null);
-
-		return showWindow(buff,title);
-	}
-
-	public static ImagePanel showWindow( ImageSInt16 img , String title ) {
-		int max = ImageStatistics.maxAbs(img);
-		BufferedImage buff;
-		if( img.getDataType().isSigned() )
-			buff = VisualizeImageData.colorizeSign(img,null,max);
-		else
-			buff = VisualizeImageData.grayUnsigned(img,null,max);
-
-		return showWindow(buff,title);
-	}
-
-	public static ImagePanel showWindow( ImageFloat32 img , String title , boolean showMagnitude) {
-		float max = ImageStatistics.maxAbs(img);
-		BufferedImage buff;
-		if( showMagnitude )
-			buff = VisualizeImageData.grayMagnitude(img,null,max);
-		else
-			buff = VisualizeImageData.colorizeSign(img,null,max);
-
+	public static ImagePanel showWindow( ImageBase img, String title ) {
+		BufferedImage buff = ConvertBufferedImage.convertTo(img,null,true);
 		return showWindow(buff,title);
 	}
 

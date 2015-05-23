@@ -24,9 +24,8 @@ import org.ddogleg.optimization.functions.FunctionNtoS;
 import java.util.List;
 
 /**
- * Function which is maximized when the local gradient and the line connecting the local point to the corner point
- * is tangential.  It computes the square magnitude of the cross product.  THe cross product is all along the
- * z-axis since both vectors lie on the x-y plane.
+ * Function which is minimized when the local gradient and the line connecting the local point to the corner point
+ * is tangential.  It computes the square magnitude of the dot product, which is zero when two vectors are perpendicular.
  *
  * @author Peter Abeles
  */
@@ -50,7 +49,7 @@ public class CornerFitFunction_F64 implements FunctionNtoS {
 		double x = input[0];
 		double y = input[1];
 
-		double sumZ2 = 0;
+		double dotSum = 0;
 
 		for (int i = 0; i < points.size(); i++) {
 			PointGradient_F64 p = points.get(i);
@@ -59,11 +58,12 @@ public class CornerFitFunction_F64 implements FunctionNtoS {
 			double ry = p.y-y;
 			double r2 = rx*rx + ry*ry;
 
-			// cross product between the gradient and vector from corner point and the pixel
-			double Z = rx*p.dy - ry*p.dx;
-			sumZ2 += Z*Z/r2;
+			// dot product between the gradient and vector from corner point and the pixel
+			double dot = rx*p.dx + ry*p.dy;
+			// squared to ensure that it's always a positive number
+			dotSum += dot*dot/r2;
 		}
 
-		return sumZ2;
+		return dotSum;
 	}
 }

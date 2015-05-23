@@ -38,9 +38,30 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * TODO write
+ * <p>
+ * Refines the estimated location of a corner and places it at the "tip".  The algorithm takes advantage of the
+ * gradient along an edge being perpendicular to the line radiating outwards from the corner to the point.  It
+ * maximizes the magnitude of the cross product between the unit vector pointing from the corner to a pixel and
+ * the pixel's gradient.  This technique works well for corners on any polygon as well as chessboard patterns.
+ * </p>
+ * <p>
+ * This algorithm is considered sparse since it computes the gradient locally around each corner estimate.  A dense
+ * algorithm would use the precomputed gradient of the entire image.
+ * </p>
+ * <ol>
+ * <li>Compute gradient for pixels within a local region around the initial estimate.  Ignore pixels right next
+ * to the initial corner estimate since pixels at the corner will not have a reliable gradient.</li>
+ * <li>Normalize pixel coordinates and gradient to reduce numerical issues</li>
+ * <li>Run an unconstrained optimization algorithm on the corner estimate</li>
+ * </ol>
  *
- * Assumptions:
+ * <p>
+ * Accuracy:<br>
+ * From tests on synthetic images it seems to get you to within about 0.7 pixels of the corner.  If you
+ * define the corner as the extremes of the black square.  This is due to how the gradient is computed.
+ * Since you don't know which pixels belong to the inside or outside a symmetric gradient calculation
+ * is used.  This will pull the estimate for the corner towards the outside.
+ * </p>
  *
  * @author Peter Abeles
  */
@@ -48,55 +69,62 @@ public class SubpixelSparseCornerFit <T extends ImageSingleBand>{
 
 	// ignore radius
 	// all pictures are ignored inside this region around the center.
-	int ignoreRadius=1;
+	private int ignoreRadius=1;
 
-	// radius of the region it will git the corner to
-	int fitRadius=4;
+	// radius of the region it will search for the corner in
+	private int localRadius = 4;
 
 	// the minimum threshold a gradient needs to be to be considered
 	// relative to the maximum gradient
-	double minRelThreshold = 0.02;
+	private double minRelThreshold = 0.02;
 
 	// maximum number of optimization steps.  Can be used to control speed.
-	int maxOptimizeSteps = 200;
+	private int maxOptimizeSteps = 200;
 
-	SparseImageGradient<T,GradientValue> gradient;
+	// maximum number of iterations it will perform with a different central seed
+	private int maxIterations = 5;
+
+	// computes the gradient for a pixel
+	private SparseImageGradient<T,GradientValue> gradient;
 
 	// storage for local search region
-	ImageRectangle region = new ImageRectangle();
+	private ImageRectangle region = new ImageRectangle();
 
 	// storage for pixels and their gradient
-	FastQueue<PointGradient_F64> points = new FastQueue<PointGradient_F64>(PointGradient_F64.class,true);
+	protected FastQueue<PointGradient_F64> points = new FastQueue<PointGradient_F64>(PointGradient_F64.class,true);
 	// magnitude of the gradient storage
-	GrowQueue_F64 mag = new GrowQueue_F64();
+	private GrowQueue_F64 mag = new GrowQueue_F64();
 	// storage for significant gradients
-	List<PointGradient_F64> significant = new ArrayList<PointGradient_F64>();
+	private List<PointGradient_F64> significant = new ArrayList<PointGradient_F64>();
 
-	// Classes related to optimization
-	CornerFitFunction_F64 function = new CornerFitFunction_F64();
-	CornerFitGradient_F64 functionGradient = new CornerFitGradient_F64();
-	UnconstrainedMinimization minimization = FactoryOptimization.unconstrained();
-	double initialParam[] = new double[2];
+	// unconstrained optimization
+	private UnconstrainedMinimization minimization = FactoryOptimization.unconstrained();
+	private double initialParam[] = new double[2];
 
 	// reference to input image
-	T image;
+	private T image;
 
 	// the refined corner
-	double refinedX;
-	double refinedY;
+	private double refinedX;
+	private double refinedY;
 
+	/**
+	 * Constructor that specifies the type of image it can process
+	 * @param imageType Type of gray scale image
+	 */
 	public SubpixelSparseCornerFit( Class<T> imageType ) {
 		ImageBorder<T> border = FactoryImageBorder.general(imageType, BorderType.EXTENDED);
 		gradient = FactoryDerivativeSparse.createSobel(imageType,border);
 
+		CornerFitFunction_F64 function = new CornerFitFunction_F64();
+		CornerFitGradient_F64 functionGradient = new CornerFitGradient_F64();
 		function.setPoints(significant);
 		functionGradient.setPoints(significant);
-		minimization.setFunction(function,functionGradient,0);
+		minimization.setFunction(function, functionGradient,0);
 	}
 
 	/**
-	 * Sets the image which
-	 * @param image
+	 * Sets the image which is processed
 	 */
 	public void setImage( T image ) {
 		this.image = image;
@@ -112,6 +140,39 @@ public class SubpixelSparseCornerFit <T extends ImageSingleBand>{
 	 * @return true if successful and false if it failed
 	 */
 	public boolean refine( int cx , int cy ) {
+		int prevPixelX = cx;
+		int prevPixelY = cy;
+
+		for (int i = 0; i < maxIterations; i++) {
+			if( !performOptimization(prevPixelX,prevPixelY) )
+				return false;
+
+			int pixelX = (int)(refinedX+0.5);
+			int pixelY = (int)(refinedY+0.5);
+
+			// moved outside the image, that's bad
+			if( !image.isInBounds(pixelX,pixelY))
+				return false;
+			// if it moved a large distance the solution is most likely corrupt
+			if( Math.abs(pixelX-cx) > localRadius || Math.abs(pixelY-cy) > localRadius )
+				return false;
+
+			// see if no change, if true then stop iterations early
+			if( pixelX == prevPixelX && pixelY == prevPixelY ) {
+//				System.out.println("Finished early on "+i);
+				break;
+			}
+			prevPixelX = pixelX;
+			prevPixelY = pixelY;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Sets up the optimization and runs it to find the corner
+	 */
+	protected boolean performOptimization( int cx , int cy ) {
 		points.reset();
 
 		// computes the local gradient around the initial estimate
@@ -119,7 +180,8 @@ public class SubpixelSparseCornerFit <T extends ImageSingleBand>{
 
 		// adjust scale of gradient for numerical reasons and find points with significant gradients
 		significant.clear();
-		massageGradient(significant);
+		if( !massageGradient(significant) )
+			return false;
 
 		// optimize the solution.  It already has a reference to the significant points list
 		minimization.initialize(initialParam,1e-6,1e-6);
@@ -127,8 +189,8 @@ public class SubpixelSparseCornerFit <T extends ImageSingleBand>{
 		double[] found = minimization.getParameters();
 
 		// return the refined location while undoing the scale adjustment done earlier
-		refinedX = found[0]*fitRadius + cx;
-		refinedY = found[1]*fitRadius + cy;
+		refinedX = found[0]* localRadius + cx;
+		refinedY = found[1]* localRadius + cy;
 
 		return true;
 	}
@@ -138,22 +200,20 @@ public class SubpixelSparseCornerFit <T extends ImageSingleBand>{
 	 * -1 to 1.
 	 *
 	 */
-	private void computeLocalGradient(int cx, int cy) {
+	protected void computeLocalGradient(int cx, int cy) {
 		// Find the local region that it will search inside of while avoiding image border
-		region.set(cx-fitRadius,cy-fitRadius, cx + fitRadius+1,cy + fitRadius+1);
+		region.set(cx- localRadius,cy- localRadius, cx + localRadius +1,cy + localRadius +1);
 		BoofMiscOps.boundRectangleInside(image, region);
 
-		double dRadius = (double)fitRadius;
+		double dRadius = (double) localRadius;
 
 		// compute the gradient at each pixel while taking in account the ignore radius
 		// scale the coordinate so that they range from -1 to 1 for numerical reasons.  not sure if neccisary
 		// but doesn't really hurt
 		for (int y = region.y0; y < region.y1; y++) {
-			if( Math.abs(y-cy) > ignoreRadius )
-				continue;
 			double scaledY = (y-cy)/dRadius;
 			for (int x = region.x0; x < region.x1; x++) {
-				if( Math.abs(x-cx) > ignoreRadius )
+				if( Math.abs(x-cx) <= ignoreRadius && Math.abs(y-cy) <= ignoreRadius)
 					continue;
 
 				GradientValue v = gradient.compute(x,y);
@@ -168,7 +228,7 @@ public class SubpixelSparseCornerFit <T extends ImageSingleBand>{
 	 * Scales gradient so that maximum value has a magnitude of 1.  Puts all points with significant gradients into
 	 * a list
 	 */
-	protected void massageGradient( List<PointGradient_F64> significant )
+	protected boolean massageGradient( List<PointGradient_F64> significant )
 	{
 		double max = 0;
 		mag.reset();
@@ -181,6 +241,9 @@ public class SubpixelSparseCornerFit <T extends ImageSingleBand>{
 				max = m;
 		}
 
+		if( max == 0 )
+			return false;
+
 		double threshold = max*minRelThreshold;
 		for (int i = 0; i < points.size; i++) {
 			if( mag.get(i) >= threshold ) {
@@ -190,6 +253,7 @@ public class SubpixelSparseCornerFit <T extends ImageSingleBand>{
 				significant.add(p);
 			}
 		}
+		return true;
 	}
 
 	/**
@@ -204,5 +268,45 @@ public class SubpixelSparseCornerFit <T extends ImageSingleBand>{
 	 */
 	public double getRefinedY() {
 		return refinedY;
+	}
+
+	public int getIgnoreRadius() {
+		return ignoreRadius;
+	}
+
+	public void setIgnoreRadius(int ignoreRadius) {
+		this.ignoreRadius = ignoreRadius;
+	}
+
+	public int getLocalRadius() {
+		return localRadius;
+	}
+
+	public void setLocalRadius(int localRadius) {
+		this.localRadius = localRadius;
+	}
+
+	public double getMinRelThreshold() {
+		return minRelThreshold;
+	}
+
+	public void setMinRelThreshold(double minRelThreshold) {
+		this.minRelThreshold = minRelThreshold;
+	}
+
+	public int getMaxOptimizeSteps() {
+		return maxOptimizeSteps;
+	}
+
+	public void setMaxOptimizeSteps(int maxOptimizeSteps) {
+		this.maxOptimizeSteps = maxOptimizeSteps;
+	}
+
+	public int getMaxIterations() {
+		return maxIterations;
+	}
+
+	public void setMaxIterations(int maxIterations) {
+		this.maxIterations = maxIterations;
 	}
 }

@@ -52,9 +52,15 @@ Version : Alpha 0.19
   * Added FDistort
     - Much easier to use and more flexible than the procedural fuctions in DistortImageOps
 - Sparse Gradient
-  * Added sobel, prewitt
+  * Added sobel, prewitt, three
 - UtilImageIO
-  * Can save an image directly which is in BoofCV format
+  * Can save an image directly that is in BoofCV format
+- Shape Features
+  * Corner fitting algorithm that uses the tangent of the gradient
+  * (TODO) Line fitting
+  * (TODO) Quadrilateral detector
+- ShowImages
+  * Will now display any BoofCV image directly.
 
 TODO
   * Distortion Model + Calibration

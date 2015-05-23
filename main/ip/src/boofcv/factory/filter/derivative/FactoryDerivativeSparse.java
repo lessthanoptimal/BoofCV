@@ -21,10 +21,7 @@ package boofcv.factory.filter.derivative;
 import boofcv.abst.filter.ImageFunctionSparse;
 import boofcv.abst.filter.convolve.ImageConvolveSparse;
 import boofcv.alg.filter.derivative.LaplacianEdge;
-import boofcv.alg.filter.derivative.impl.GradientSparsePrewitt_F32;
-import boofcv.alg.filter.derivative.impl.GradientSparsePrewitt_U8;
-import boofcv.alg.filter.derivative.impl.GradientSparseSobel_F32;
-import boofcv.alg.filter.derivative.impl.GradientSparseSobel_U8;
+import boofcv.alg.filter.derivative.impl.*;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.core.image.border.*;
 import boofcv.factory.filter.convolve.FactoryConvolveSparse;
@@ -107,6 +104,25 @@ public class FactoryDerivativeSparse {
 			return (SparseImageGradient)new GradientSparsePrewitt_F32((ImageBorder_F32)border);
 		} else if( imageType == ImageUInt8.class ){
 			return (SparseImageGradient)new GradientSparsePrewitt_U8((ImageBorder_I32)border);
+		} else {
+			throw new IllegalArgumentException("Unsupported image type "+imageType.getSimpleName());
+		}
+	}
+
+	/**
+	 * Creates a sparse three gradient operator.
+	 *
+	 * @param imageType The type of image which is to be processed.
+	 * @param border How the border should be handled.  If null then the borders can't be processed.
+	 * @return Sparse gradient.
+	 */
+	public static <T extends ImageSingleBand, G extends GradientValue>
+	SparseImageGradient<T,G> createThree( Class<T> imageType , ImageBorder<T> border )
+	{
+		if( imageType == ImageFloat32.class) {
+			return (SparseImageGradient)new GradientSparseThree_F32((ImageBorder_F32)border);
+		} else if( imageType == ImageUInt8.class ){
+			return (SparseImageGradient)new GradientSparseThree_U8((ImageBorder_I32)border);
 		} else {
 			throw new IllegalArgumentException("Unsupported image type "+imageType.getSimpleName());
 		}

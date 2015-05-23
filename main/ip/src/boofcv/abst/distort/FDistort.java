@@ -244,10 +244,10 @@ public class FDistort
 	 * Applies a distortion which will rotate the input image by the specified amount.
 	 */
 	public FDistort rotate( double angleInputToOutput ) {
-		PixelTransform_F32 model = DistortSupport.transformRotate(input.width/2,input.height/2,
+		PixelTransform_F32 outputToInput = DistortSupport.transformRotate(input.width/2,input.height/2,
 				output.width/2,output.height/2,(float)angleInputToOutput);
 
-		return transform(model);
+		return transform(outputToInput);
 	}
 
 	/**

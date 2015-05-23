@@ -16,10 +16,9 @@
  * limitations under the License.
  */
 
-package boofcv.alg.filter.derivative;
+package boofcv.alg.filter.derivative.impl;
 
 import boofcv.abst.filter.derivative.ImageGradient;
-import boofcv.alg.filter.derivative.impl.GradientSparseSobel_F32;
 import boofcv.core.image.border.ImageBorder;
 import boofcv.core.image.border.ImageBorder_F32;
 import boofcv.factory.filter.derivative.FactoryDerivative;

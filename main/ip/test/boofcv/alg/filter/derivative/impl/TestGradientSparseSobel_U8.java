@@ -16,10 +16,9 @@
  * limitations under the License.
  */
 
-package boofcv.alg.filter.derivative;
+package boofcv.alg.filter.derivative.impl;
 
 import boofcv.abst.filter.derivative.ImageGradient;
-import boofcv.alg.filter.derivative.impl.GradientSparsePrewitt_U8;
 import boofcv.core.image.border.ImageBorder;
 import boofcv.core.image.border.ImageBorder_I32;
 import boofcv.factory.filter.derivative.FactoryDerivative;
@@ -30,20 +29,20 @@ import boofcv.struct.sparse.SparseImageGradient;
 /**
  * @author Peter Abeles
  */
-public class TestGradientSparsePrewitt_U8 extends GeneralGradientSparse {
+public class TestGradientSparseSobel_U8 extends GeneralGradientSparse {
 
-	public TestGradientSparsePrewitt_U8() {
+	public TestGradientSparseSobel_U8() {
 		super(ImageUInt8.class, ImageSInt16.class);
 	}
 
 	@Override
 	public SparseImageGradient createAlg(ImageBorder border) {
-		return new GradientSparsePrewitt_U8((ImageBorder_I32)border);
+		return new GradientSparseSobel_U8((ImageBorder_I32)border);
 	}
 
 	@Override
 	public ImageGradient createGradient() {
-		return FactoryDerivative.prewitt(imageType,derivType);
+		return FactoryDerivative.sobel_U8();
 	}
 
 }

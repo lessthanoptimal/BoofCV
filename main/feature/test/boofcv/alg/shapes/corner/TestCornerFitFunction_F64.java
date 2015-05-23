@@ -43,11 +43,11 @@ public class TestCornerFitFunction_F64 {
 		double c = alg.process(new double[]{-1, 3});
 		double d = alg.process(new double[]{-2, 0});
 
-		assertTrue(a>0);
-		assertEquals(a, b, 1e-8);
-		assertEquals(0, c, 1e-8);
+		assertEquals(0,a,1e-6);
+		assertEquals(0,b,1e-6);
+		assertEquals(2,c,1e-6);
 		assertTrue(0 < d);
-		assertTrue(d < a);
+		assertTrue(d < c);
 
 		points.grow().set(2,2,-1,1);
 
@@ -57,7 +57,6 @@ public class TestCornerFitFunction_F64 {
 		d = alg.process(new double[]{-2, 0});
 
 		assertEquals(a, b, 1e-8);
-		assertTrue(0 < c && c < a);
-		assertTrue(0 < d && d < a);
+		assertTrue(0 < d && d < c);
 	}
 }
