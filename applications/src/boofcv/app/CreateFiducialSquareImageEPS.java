@@ -37,9 +37,12 @@ public class CreateFiducialSquareImageEPS {
 
 	public static String outputName = "fiducial_image.eps";
 	public static String inputPath = UtilIO.getPathToBase()+"data/applet/fiducial/image/dog.png";
-	public static double width = 10; // in centimeters
+	public static double width = 10; // in centimeters of fiducial
 
+	public static int threshold = 255/2; // threshold for converting to a binary image
 	public static double CM_TO_POINTS = 72.0/2.54;
+	// should it add the file name and size to the document?
+	public static boolean displayInfo = true;
 
 	public static String binaryToHex( ImageUInt8 binary ) {
 
@@ -76,9 +79,15 @@ public class CreateFiducialSquareImageEPS {
 		String inputName = new File(inputPath).getName();
 
 		System.out.println("Target width "+width+" (cm)  image = "+inputName);
+		System.out.println("    input path = "+inputPath);
 
 		ImageUInt8 image = UtilImageIO.loadImage(inputPath,ImageUInt8.class);
 
+		if( image == null ) {
+			System.err.println("Can't find image.  Path = "+inputPath);
+			System.exit(0);
+		}
+		
 		// make sure the image is square and divisible by 8
 		int s = image.width - (image.width%8);
 		if( image.width != s || image.height != s ) {
@@ -91,13 +100,13 @@ public class CreateFiducialSquareImageEPS {
 		PrintStream out = new PrintStream(outputName);
 
 		double targetLength = width*CM_TO_POINTS;
-		double whiteBorder = targetLength/4.0;
+		double whiteBorder = Math.max(2*CM_TO_POINTS,targetLength/4.0);
 		double blackBorder = targetLength/4.0;
 		double innerWidth = targetLength/2.0;
 		double pageLength = targetLength+whiteBorder*2;
 		double scale = image.width/innerWidth;
 
-		ImageUInt8 binary = ThresholdImageOps.threshold(image,null,3*256/4,false);
+		ImageUInt8 binary = ThresholdImageOps.threshold(image,null,threshold,false);
 //		ShowImages.showWindow(VisualizeBinaryData.renderBinary(binary, false, null), "Binary Image");
 
 		out.println("%!PS-Adobe-3.0 EPSF-3.0\n" +
@@ -122,8 +131,10 @@ public class CreateFiducialSquareImageEPS {
 				"  newpath b2 b0 moveto b2 b3 lineto b3 b3 lineto b3 b0 lineto closepath fill\n");
 
 		// print out encoding information for convenience
-		out.print("  /Times-Roman findfont\n" +
-				"7 scalefont setfont b1 " + (pageLength - 10) + " moveto (" + inputName + "   " + width + " cm) show\n");
+		if( displayInfo ) {
+			out.print("  /Times-Roman findfont\n" +
+					"7 scalefont setfont b1 " + (pageLength - 10) + " moveto (" + inputName + "   " + width + " cm) show\n");
+		}
 
 		out.println("% Drawing the image");
 		out.println("b1 b1 translate");
@@ -132,5 +143,6 @@ public class CreateFiducialSquareImageEPS {
 		out.print("  showpage\n" +
 				"%%EOF\n");
 
+		System.out.println("Saved to "+new File(outputName).getAbsolutePath());
 	}
 }
