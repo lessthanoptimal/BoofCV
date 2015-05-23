@@ -30,7 +30,7 @@ task fiducialBinary(dependsOn: classes ) << {
     }
 }
 
-// gradle fiducialBinary -Pwidth=10.0 -Pnumber="../data/applet/fiducial/image/dog.png"
+// gradle fiducialBinary -Pwidth=10.0 -Pimage="../data/applet/fiducial/image/dog.png"
 task fiducialImage(dependsOn: classes ) << {
 
     if (project.hasProperty('width') && project.hasProperty('image')) {
