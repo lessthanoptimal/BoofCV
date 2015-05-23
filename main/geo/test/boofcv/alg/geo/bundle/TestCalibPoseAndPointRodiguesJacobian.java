@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.alg.geo.bundle;
 
 import georegression.struct.se.Se3_F64;
-import org.ddogleg.optimization.JacobianChecker;
+import org.ddogleg.optimization.DerivativeChecker;
 import org.junit.Test;
 
 import java.util.List;
@@ -83,7 +83,7 @@ public class TestCalibPoseAndPointRodiguesJacobian {
 
 		codec.encode(model,param);
 
-//		JacobianChecker.jacobianPrint(func, alg, param, 1e-6);
-		assertTrue(JacobianChecker.jacobian(func, alg, param, 1e-4));
+//		DerivativeChecker.jacobianPrint(func, alg, param, 1e-6);
+		assertTrue(DerivativeChecker.jacobian(func, alg, param, 1e-4));
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,7 +23,7 @@ import boofcv.struct.sfm.Stereo2D3D;
 import boofcv.struct.sfm.StereoPose;
 import georegression.geometry.RotationMatrixGenerator;
 import georegression.struct.se.Se3_F64;
-import org.ddogleg.optimization.JacobianChecker;
+import org.ddogleg.optimization.DerivativeChecker;
 import org.junit.Test;
 
 import static org.junit.Assert.assertTrue;
@@ -72,7 +72,7 @@ public class TestPnPStereoJacobianRodrigues extends CommonStereoMotionNPoint {
 
 		codec.encode(pose,param);
 
-//		JacobianChecker.jacobianPrint(func,alg,param,1e-6);
-		assertTrue(JacobianChecker.jacobian(func, alg, param, 1e-6));
+//		DerivativeChecker.jacobianPrint(func,alg,param,1e-6);
+		assertTrue(DerivativeChecker.jacobian(func, alg, param, 1e-6));
 	}
 }

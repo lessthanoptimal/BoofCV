@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -102,7 +102,7 @@ public class VideoShowImageHessian extends ProcessImageSequence<ImageUInt8> {
 		}
 		SimpleImageSequence<ImageUInt8> sequence = BoofVideoManager.loadManagerDefault().load(fileName, ImageType.single(ImageUInt8.class));
 
-		ImageHessianDirect<ImageUInt8, ImageSInt16> hessian = FactoryDerivative.hessianDirectSobel_I8();
+		ImageHessianDirect<ImageUInt8, ImageSInt16> hessian = FactoryDerivative.hessianDirectSobel_U8();
 
 		VideoShowImageHessian display = new VideoShowImageHessian(sequence, hessian);
 

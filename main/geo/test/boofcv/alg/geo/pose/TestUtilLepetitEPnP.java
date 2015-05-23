@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.alg.geo.pose;
 
-import org.ddogleg.optimization.JacobianChecker;
+import org.ddogleg.optimization.DerivativeChecker;
 import org.ddogleg.optimization.functions.FunctionNtoM;
 import org.ddogleg.optimization.functions.FunctionNtoMxN;
 import org.ejml.data.DenseMatrix64F;
@@ -48,7 +48,7 @@ public class TestUtilLepetitEPnP {
 		residuals.setParameters(L_full, y);
 		jacobian.setParameters(L_full);
 
-		boolean worked = JacobianChecker.jacobian(residuals, jacobian, new double[]{1, 2, 3, 4}, 1e-6);
+		boolean worked = DerivativeChecker.jacobian(residuals, jacobian, new double[]{1, 2, 3, 4}, 1e-6);
 		assertTrue(worked);
 	}
 
@@ -64,7 +64,7 @@ public class TestUtilLepetitEPnP {
 		residuals.setParameters(L_full, y);
 		jacobian.setParameters(L_full);
 
-		boolean worked = JacobianChecker.jacobian(residuals,jacobian,new double[]{1,2,3},1e-6);
+		boolean worked = DerivativeChecker.jacobian(residuals,jacobian,new double[]{1,2,3},1e-6);
 		assertTrue(worked);
 	}
 

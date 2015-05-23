@@ -20,7 +20,7 @@ package boofcv.alg.geo.calibration;
 
 import boofcv.abst.calib.PlanarDetectorSquareGrid;
 import georegression.struct.point.Point2D_F64;
-import org.ddogleg.optimization.JacobianChecker;
+import org.ddogleg.optimization.DerivativeChecker;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -67,8 +67,8 @@ public class TestZhang99OptimizationJacobian {
 
 		// Why does the tolerance need to be so crude?  Is there a fundamental reason for this?
 		double tol = includeTangential ? 0.05 : 0.01;
-//		JacobianChecker.jacobianPrintR(func, alg, dataParam, tol);
-		assertTrue(JacobianChecker.jacobianR(func, alg, dataParam, tol));
+//		DerivativeChecker.jacobianPrintR(func, alg, dataParam, tol);
+		assertTrue(DerivativeChecker.jacobianR(func, alg, dataParam, tol));
 	}
 
 
