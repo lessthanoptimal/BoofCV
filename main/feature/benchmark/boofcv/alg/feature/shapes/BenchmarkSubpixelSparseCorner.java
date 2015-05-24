@@ -94,12 +94,10 @@ public class BenchmarkSubpixelSparseCorner<T extends ImageSingleBand> {
 		SubpixelSparseCornerFit<T> subGen = new SubpixelSparseCornerFit<T>(imageType);
 //		SubpixelSparseCornerFit<T> subSpecific;
 
-
-
 //		if( imageType == ImageUInt8.class ) {
 //			subSpecific = (SubpixelSparseCornerFit)new SubpixelSparseCornerFit_U8();
 //		} else {
-//			subSpecific = (SubpixelSparseCornerFit)new SubpixelSparseCornerFit_F32();
+//			subSpecific = null;//(SubpixelSparseCornerFit)new SubpixelSparseCornerFit_F32();
 //		}
 
 		System.out.println("orig G = "+benchmark(subGen,orig,corners[0]));

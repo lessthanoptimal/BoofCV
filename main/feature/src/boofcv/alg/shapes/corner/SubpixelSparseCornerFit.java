@@ -130,6 +130,8 @@ public class SubpixelSparseCornerFit <T extends ImageSingleBand>{
 	// parameters for weighting function
 	// weight = max(0,||value-target||/spread)
 	double target,spread;
+	// storage for weight calculation
+	double pixelValues[] = new double[0];
 
 	// image wrapper so that type specific code doesn't need to be included in this class
 	// did some benchmarking and only in trivial cases does using type specific images make a difference
@@ -154,6 +156,7 @@ public class SubpixelSparseCornerFit <T extends ImageSingleBand>{
 		functionGradient.setPoints(significant);
 
 		minimization.setFunction(function, functionGradient,0);
+		setLocalRadius(localRadius);
 	}
 
 	/**
@@ -277,7 +280,7 @@ public class SubpixelSparseCornerFit <T extends ImageSingleBand>{
 	public boolean iterateOptimization( double x , double y ) {
 		initialParam[0] = x;
 		initialParam[1] = y;
-		minimization.initialize(initialParam,1e-6,0);
+		minimization.initialize(initialParam,1e-5,1e-5);
 		for (int i = 0; i < maxOptimizeSteps; i++) {
 			boolean updated = false;
 			for (int j = 0; j < 10000 && !updated; j++) {
@@ -323,17 +326,17 @@ public class SubpixelSparseCornerFit <T extends ImageSingleBand>{
 	 */
 	protected void initializeWeights() {
 		int N = region.area();
-		double values[] = new double[N];
+
 		int i = 0;
 		for (int y = region.y0; y < region.y1; y++) {
 			for (int x = region.x0; x < region.x1; x++) {
-				values[i++] = imageWrapper.unsafe_getD(x, y);
+				pixelValues[i++] = imageWrapper.unsafe_getD(x, y);
 			}
 		}
 
 		double mean = 0;
 		for (int j = 0; j < N; j++) {
-			mean += values[j];
+			mean += pixelValues[j];
 		}
 		mean /= N;
 
@@ -342,7 +345,7 @@ public class SubpixelSparseCornerFit <T extends ImageSingleBand>{
 		int lowerN = 0;
 
 		for (int j = 0; j < N; j++) {
-			double v = values[j];
+			double v = pixelValues[j];
 			if( v < mean ) {
 				lower += v;
 				lowerN++;
@@ -462,6 +465,9 @@ public class SubpixelSparseCornerFit <T extends ImageSingleBand>{
 
 	public void setLocalRadius(int localRadius) {
 		this.localRadius = localRadius;
+		int w = localRadius*2+1;
+		if( pixelValues.length < w*w )
+			pixelValues = new double[w*w];
 	}
 
 	public double getMinRelThreshold() {
