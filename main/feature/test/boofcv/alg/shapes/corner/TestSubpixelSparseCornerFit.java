@@ -34,8 +34,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * @author Peter Abeles
@@ -65,7 +64,7 @@ public class TestSubpixelSparseCornerFit {
 			alg.setIgnoreRadius(1);
 			alg.setLocalRadius(4);
 			alg.setMaxOptimizeSteps(100);
-			alg.setImage(image);
+			alg.initialize(image);
 
 			checkConverge(alg,50,52,2);
 			checkConverge(alg,50,81,2);
@@ -91,7 +90,7 @@ public class TestSubpixelSparseCornerFit {
 			alg.setIgnoreRadius(1);
 			alg.setLocalRadius(4);
 			alg.setMaxOptimizeSteps(100);
-			alg.setImage(BoofTesting.createSubImageOf_S(image));
+			alg.initialize(BoofTesting.createSubImageOf_S(image));
 
 			checkConverge(alg,50,52,2);
 			checkConverge(alg,50,81,2);
@@ -122,7 +121,7 @@ public class TestSubpixelSparseCornerFit {
 			alg.setIgnoreRadius(2);
 			alg.setLocalRadius(7);
 			alg.setMaxOptimizeSteps(100);
-			alg.setImage(image);
+			alg.initialize(image);
 
 			// the corner is going to get "sucked" towards the other adjacent square
 			checkConverge(alg, 69.5, 71.5, 2);
@@ -148,11 +147,11 @@ public class TestSubpixelSparseCornerFit {
 			alg.setIgnoreRadius(2);
 			alg.setLocalRadius(6);
 			alg.setMaxOptimizeSteps(100);
-			alg.setImage(rotated);
+			alg.initialize(rotated);
 
-			for (int i = 1; i < 5; i++) {
+			for (int i = 0; i < 5; i++) {
 				float angle = 0.05f + i*0.15f;
-				System.out.println("Angle = "+angle);
+//				System.out.println("Angle = "+angle);
 				GImageMiscOps.fill(image, 200);
 				GImageMiscOps.fillRectangle(image, 0, 100, 102, 50, 55);
 
@@ -187,7 +186,7 @@ public class TestSubpixelSparseCornerFit {
 
 		alg.setIgnoreRadius(1);
 		alg.setLocalRadius(4);
-		alg.setImage(input);
+		alg.initialize(input);
 
 		alg.computeLocalGradient(10,11);
 		assertEquals((9*9-3*3),alg.points.size());
@@ -232,11 +231,32 @@ public class TestSubpixelSparseCornerFit {
 		assertEquals(200/max,b.dy,1e-8);
 	}
 
+	@Test
+	public void iterateOptimization() {
+		fail("implement");
+	}
+
+	@Test
+	public void initializeWeights_dark() {
+		fail("implement");
+	}
+
+	@Test
+	public void initializeWeights_light() {
+		fail("implement");
+	}
+
+	@Test
+	public void computeWeight() {
+		fail("implement");
+	}
+
 	private void checkConverge( SubpixelSparseCornerFit alg , double cx , double cy , int r ) {
 //		System.out.println("============ cx "+cx+"  cy "+cy);
 		for (int y = -r; y <= r ; y++) {
 			for (int x = -r; x <= r; x++) {
-				assertTrue(alg.refine((int)(cx + x+0.5), (int)(cy + y+0.5)));
+//				System.out.println("   "+x+" "+y);
+				assertTrue(alg.refine(cx + x, cy + y));
 
 				double foundX = alg.getRefinedX();
 				double foundY = alg.getRefinedY();

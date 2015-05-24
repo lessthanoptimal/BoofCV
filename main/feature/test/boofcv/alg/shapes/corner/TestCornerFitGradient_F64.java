@@ -24,6 +24,7 @@ import org.ddogleg.struct.FastQueue;
 import org.junit.Test;
 
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
@@ -45,6 +46,14 @@ public class TestCornerFitGradient_F64 {
 
 		assertTrue(DerivativeChecker.gradient(func,gradient,new double[]{0.1,2},1e-6));
 		assertTrue(DerivativeChecker.gradient(func,gradient,new double[]{5,5},1e-6));
+	}
+
+	/**
+	 * Test the case where the corner point is exactly in the same position as a pixel
+	 */
+	@Test
+	public void convergeOnTopOfPoint() {
+		fail("implement");
 	}
 
 }

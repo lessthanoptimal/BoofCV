@@ -18,7 +18,8 @@
 
 package boofcv.alg.shapes.corner;
 
-import boofcv.core.image.GeneralizedImageOps;
+import boofcv.core.image.FactoryGImageSingleBand;
+import boofcv.core.image.GImageSingleBand;
 import boofcv.core.image.border.BorderType;
 import boofcv.core.image.border.FactoryImageBorder;
 import boofcv.core.image.border.ImageBorder;
@@ -30,13 +31,13 @@ import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.sparse.GradientValue;
 import boofcv.struct.sparse.SparseImageGradient;
 import org.ddogleg.optimization.FactoryOptimization;
-import org.ddogleg.optimization.UtilOptimize;
 import org.ddogleg.optimization.wrap.QuasiNewtonBFGS_to_UnconstrainedMinimization;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_F64;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 /**
  * <p>
@@ -49,22 +50,35 @@ import java.util.List;
  * This algorithm is considered sparse since it computes the gradient locally around each corner estimate.  A dense
  * algorithm would use the precomputed gradient of the entire image.
  * </p>
+ * Inner iteration:
  * <ol>
  * <li>Compute gradient for pixels within a local region around the initial estimate.  Ignore pixels right next
  * to the initial corner estimate since pixels at the corner will not have a reliable gradient.</li>
  * <li>Normalize pixel coordinates and gradient to reduce numerical issues</li>
  * <li>Run an unconstrained optimization algorithm on the corner estimate</li>
  * </ol>
- *
  * <p>
- * Accuracy:<br>
- * From tests on synthetic images it seems to get you to within about 0.7 pixels of the corner.  If you
- * define the corner as the extremes of the black square.  This is due to how the gradient is computed.
- * Since you don't know which pixels belong to the inside or outside a symmetric gradient calculation
- * is used.  This will pull the estimate for the corner towards the outside.
+ * The outer iteration takes the results from the inner iteration and uses that as a new initial seed for the
+ * next call to the inner iteration.  The outer iteration is repeated until the pixel location no longer changes
+ * or the maximum number of outer iterations has been reached.
  * </p>
  *
- * TODO Update with weighted pixels
+ * <p>
+ * Pixel Weights:<br>
+ * When finding the corner on a polygon it is recommended that weights be turned on.  When searching for a corner
+ * in a chessboard pattern weights should be off.  It can be configured to weigh darker or lighter pixels more.
+ * If pixels are not weighted the symmetric gradient operator will bias the estimator and pull it outside the shape,
+ * even when a perfect corner is provided.
+ * </p>
+ *
+ * The weight is computed as follows:<br>
+ * <ol>
+ * <li>Find mean intensity in local region</li>
+ * <li>Find mean for all pixels less than mean and the mean for all above mean</li>
+ * <li>If weighted for dark pixels set target to low mean otherwise the high mean</li>
+ * <li>Spread is set to high mean minus low mean</li>
+ * <li>weight = max(0,|target - value|/spread)</li>
+ * </ol>
  *
  * @author Peter Abeles
  */
@@ -85,16 +99,16 @@ public class SubpixelSparseCornerFit <T extends ImageSingleBand>{
 	private int maxOptimizeSteps = 200;
 
 	// maximum number of iterations it will perform with a different central seed
-	private int maxIterations = 5;
+	private int maxInitialSeeds = 5;
 
 	//.0 = no weight, 1 = prefer bright, -1 = prefer dark
-	private int weightToggle = 0;
+	protected int weightToggle = 0;
 
 	// computes the gradient for a pixel
 	private SparseImageGradient<T,GradientValue> gradient;
 
 	// storage for local search region
-	private ImageRectangle region = new ImageRectangle();
+	protected ImageRectangle region = new ImageRectangle();
 
 	// storage for pixels and their gradient
 	protected FastQueue<PointGradient_F64> points = new FastQueue<PointGradient_F64>(PointGradient_F64.class,true);
@@ -107,8 +121,19 @@ public class SubpixelSparseCornerFit <T extends ImageSingleBand>{
 	private QuasiNewtonBFGS_to_UnconstrainedMinimization minimization = FactoryOptimization.createBfgsWithMore94();
 	private double initialParam[] = new double[2];
 
+	// Used to select new random initial locations
+	private Random rand = new Random(234);
+
 	// reference to input image
-	private T image;
+	protected T image;
+
+	// parameters for weighting function
+	// weight = max(0,||value-target||/spread)
+	double target,spread;
+
+	// image wrapper so that type specific code doesn't need to be included in this class
+	// did some benchmarking and only in trivial cases does using type specific images make a difference
+	GImageSingleBand imageWrapper;
 
 	// the refined corner
 	private double refinedX;
@@ -121,6 +146,7 @@ public class SubpixelSparseCornerFit <T extends ImageSingleBand>{
 	public SubpixelSparseCornerFit( Class<T> imageType ) {
 		ImageBorder<T> border = FactoryImageBorder.general(imageType, BorderType.EXTENDED);
 		gradient = FactoryDerivativeSparse.createSobel(imageType, border);
+		imageWrapper = FactoryGImageSingleBand.create(imageType);
 
 		CornerFitFunction_F64 function = new CornerFitFunction_F64();
 		CornerFitGradient_F64 functionGradient = new CornerFitGradient_F64();
@@ -143,15 +169,16 @@ public class SubpixelSparseCornerFit <T extends ImageSingleBand>{
 	}
 
 	/**
-	 * Sets the image which is processed
+	 * Sets the image which is processed.  Must be called before refine.
 	 */
-	public void setImage( T image ) {
+	public void initialize(T image) {
 		this.image = image;
 		gradient.setImage(image);
+		imageWrapper.wrap(image);
 	}
 
 	/**
-	 * Refine the location of a corner estimated to be at pixel (cx,cy).  Must call {@link #setImage(ImageSingleBand)}
+	 * Refine the location of a corner estimated to be at pixel (cx,cy).  Must call {@link #initialize(ImageSingleBand)}
 	 * first.
 	 *
 	 * @param cx Initial estimate of the corner. x-axis
@@ -164,18 +191,33 @@ public class SubpixelSparseCornerFit <T extends ImageSingleBand>{
 		refinedX = cx;
 		refinedY = cy;
 
-		for (int i = 0; i < maxIterations; i++) {
-			if( !performOptimization(prevPixelX,prevPixelY,refinedX,refinedY) )
-				return false;
+		boolean hasSolution = false;
+		for (int i = 0; i < maxInitialSeeds; i++) {
+			// optimize
+			switch(performOptimization(prevPixelX,prevPixelY,refinedX,refinedY)) {
+				case -1: return false; // fatal error
 
+				case 0: // diverged or never found a solution
+					if (hasSolution) {
+						return true;
+					} else {
+						// try optimizing from a new initial location
+						refinedX = cx + rand.nextDouble()*localRadius - localRadius/2.0;
+						refinedY = cy + rand.nextDouble()*localRadius - localRadius/2.0;
+						prevPixelX = (int)(cx+0.5);
+						prevPixelY = (int)(cy+0.5);
+					}
+					continue;
+
+				case 1: hasSolution = true; break;
+			}
+
+			// set up the next search around this location
 			int pixelX = (int)(refinedX+0.5);
 			int pixelY = (int)(refinedY+0.5);
 
 			// moved outside the image, that's bad
 			if( !image.isInBounds(pixelX,pixelY))
-				return false;
-			// if it moved a large distance the solution is most likely corrupt
-			if( Math.abs(pixelX-cx) > localRadius || Math.abs(pixelY-cy) > localRadius )
 				return false;
 
 			// see if no change, if true then stop iterations early
@@ -187,13 +229,15 @@ public class SubpixelSparseCornerFit <T extends ImageSingleBand>{
 			prevPixelY = pixelY;
 		}
 
-		return true;
+		return hasSolution;
 	}
 
 	/**
-	 * Sets up the optimization and runs it to find the corner
+	 * Sets up the optimization and runs it to find the corner.
+	 *
+	 * @return -1 = fatal unrecoverable, 0 = try again, 1 = success
 	 */
-	protected boolean performOptimization( int cx , int cy , double fx , double fy ) {
+	protected int performOptimization( int cx , int cy , double fx , double fy ) {
 		points.reset();
 		// Find the rectangular region inside the image around (cx,cy)
 		defineSearchRegion(cx,cy);
@@ -208,35 +252,82 @@ public class SubpixelSparseCornerFit <T extends ImageSingleBand>{
 		// adjust scale of gradient for numerical reasons and find points with significant gradients
 		significant.clear();
 		if( !massageGradient(significant) )
-			return false;
+			return -1;
 
 		// optimize the solution.  It already has a reference to the significant points list
-		initialParam[0] = fx-cx; initialParam[1] = fy-cy;
-		minimization.initialize(initialParam,1e-6,0);
-		UtilOptimize.process(minimization,maxOptimizeSteps);
-		double[] found = minimization.getParameters();
+		if( iterateOptimization((fx-cx)/localRadius,(fy-cy)/localRadius)) {
+			double[] found = minimization.getParameters();
+			// return the refined location while undoing the scale adjustment done earlier
+			refinedX = found[0]*localRadius + cx;
+			refinedY = found[1]*localRadius + cy;
+			return 1;
+		} else {
+			return 0;
+		}
+	}
 
-		// return the refined location while undoing the scale adjustment done earlier
-		refinedX = found[0]* localRadius + cx;
-		refinedY = found[1]* localRadius + cy;
+	/**
+	 * Manually step through the minimization process.  Every time it updates the state it checks to see if it
+	 * has diverged.
+	 *
+	 * @param x initial point in transformed pixels coordinates
+	 * @param y initial point in transformed pixels coordinates
+	 * @return true if a new solution has been found, false if it failed
+	 */
+	public boolean iterateOptimization( double x , double y ) {
+		initialParam[0] = x;
+		initialParam[1] = y;
+		minimization.initialize(initialParam,1e-6,0);
+		for (int i = 0; i < maxOptimizeSteps; i++) {
+			boolean updated = false;
+			for (int j = 0; j < 10000 && !updated; j++) {
+				boolean converged = minimization.iterate();
+				if(converged || minimization.isUpdated()) {
+					updated = true;
+				}
+			}
+
+			// something went wrong if after 10000 iterations the state wasn't updated
+			if( !updated ) {
+				return false;
+			}
+
+			double curr[] = minimization.getParameters();
+
+			// check for divergence
+			double deltaX = curr[0]-x;
+			double deltaY = curr[1]-y;
+			double r2 = deltaX*deltaX + deltaY*deltaY;
+
+			if( r2 >= 2 ) { // remember, normalized so that 1 = localRadius.
+				return false;
+			} else if( minimization.isConverged() ) {
+				return true;
+			}
+		}
 
 		return true;
 	}
 
+	/**
+	 * Sets the region around the specified pixel while taking in account the image boundaries
+	 */
 	protected void defineSearchRegion( int cx , int cy ) {
 		// Find the local region that it will search inside of while avoiding image border
 		region.set(cx- localRadius,cy- localRadius, cx + localRadius +1,cy + localRadius +1);
 		BoofMiscOps.boundRectangleInside(image, region);
 	}
 
-	double target,spread;
+	/**
+	 * Examines the local pixels and finds the parameters for the weight function
+	 */
 	protected void initializeWeights() {
 		int N = region.area();
 		double values[] = new double[N];
 		int i = 0;
 		for (int y = region.y0; y < region.y1; y++) {
 			for (int x = region.x0; x < region.x1; x++) {
-				values[i++] = GeneralizedImageOps.get(image,x,y);
+				values[i++] = imageWrapper.unsafe_getD(x, y);
 			}
 		}
 
@@ -249,7 +340,6 @@ public class SubpixelSparseCornerFit <T extends ImageSingleBand>{
 		double lower = 0;
 		double upper = 0;
 		int lowerN = 0;
-		int upperN = 0;
 
 		for (int j = 0; j < N; j++) {
 			double v = values[j];
@@ -261,9 +351,8 @@ public class SubpixelSparseCornerFit <T extends ImageSingleBand>{
 			}
 		}
 
-		upperN = N-lowerN;
 		lower /= lowerN;
-		upper /= upperN;
+		upper /= (N-lowerN);
 
 		if( weightToggle == 1) {
 			target = upper;
@@ -273,12 +362,15 @@ public class SubpixelSparseCornerFit <T extends ImageSingleBand>{
 		spread = upper-lower;
 	}
 
+	/**
+	 * Computes a weight for a pixel at the specified image coordinate
+	 * @return weight from 0 to 1, inclusive
+	 */
 	protected double computeWeight( int x , int y ) {
 		if( weightToggle == 0 ) {
 			return 1.0;
 		} else {
-			double value = GeneralizedImageOps.get(image, x, y);
-//			return Math.abs(value-target)/spread < 0.95 ? 1 : 0;
+			double value = imageWrapper.unsafe_getD(x,y);
 			return Math.max(0, 1.0 - Math.abs(value - target) / spread);
 		}
 	}
@@ -388,11 +480,15 @@ public class SubpixelSparseCornerFit <T extends ImageSingleBand>{
 		this.maxOptimizeSteps = maxOptimizeSteps;
 	}
 
-	public int getMaxIterations() {
-		return maxIterations;
+	public int getMaxInitialSeeds() {
+		return maxInitialSeeds;
 	}
 
-	public void setMaxIterations(int maxIterations) {
-		this.maxIterations = maxIterations;
+	public void setMaxInitialSeeds(int maxInitialSeeds) {
+		this.maxInitialSeeds = maxInitialSeeds;
+	}
+
+	public void setRandomSeed( long seed ) {
+		rand = new Random(seed);
 	}
 }

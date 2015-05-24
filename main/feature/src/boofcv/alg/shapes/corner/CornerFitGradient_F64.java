@@ -56,11 +56,13 @@ public class CornerFitGradient_F64 implements FunctionNtoN {
 			double ry = p.y-y;
 
 			double r2 = rx*rx + ry*ry;
-			double dot = rx*p.dx + ry*p.dy;
+			if( r2 > 0 ) {
+				double dot = rx * p.dx + ry * p.dy;
 
-			// gradient of the cross product
-			gradX +=  2*dot*( rx*dot/r2 - p.dx)/r2;
-			gradY +=  2*dot*( ry*dot/r2 - p.dy)/r2;
+				// gradient of the cross product
+				gradX += 2 * dot * (rx * dot / r2 - p.dx) / r2;
+				gradY += 2 * dot * (ry * dot / r2 - p.dy) / r2;
+			}
 		}
 
 		output[0] = gradX;

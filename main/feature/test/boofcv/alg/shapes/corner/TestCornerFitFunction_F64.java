@@ -22,8 +22,7 @@ import boofcv.struct.PointGradient_F64;
 import org.ddogleg.struct.FastQueue;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * @author Peter Abeles
@@ -45,7 +44,7 @@ public class TestCornerFitFunction_F64 {
 
 		assertEquals(0,a,1e-6);
 		assertEquals(0,b,1e-6);
-		assertEquals(2,c,1e-6);
+		assertEquals(2, c, 1e-6);
 		assertTrue(0 < d);
 		assertTrue(d < c);
 
@@ -58,5 +57,13 @@ public class TestCornerFitFunction_F64 {
 
 		assertEquals(a, b, 1e-8);
 		assertTrue(0 < d && d < c);
+	}
+
+	/**
+	 * Test the case where the corner point is exactly in the same position as a pixel
+	 */
+	@Test
+	public void convergeOnTopOfPoint() {
+		fail("implement");
 	}
 }

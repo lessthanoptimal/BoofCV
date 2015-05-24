@@ -58,10 +58,12 @@ public class CornerFitFunction_F64 implements FunctionNtoS {
 			double ry = p.y-y;
 			double r2 = rx*rx + ry*ry;
 
-			// dot product between the gradient and vector from corner point and the pixel
-			double dot = rx*p.dx + ry*p.dy;
-			// squared to ensure that it's always a positive number
-			dotSum += dot*dot/r2;
+			if( r2 > 0 ) {
+				// dot product between the gradient and vector from corner point and the pixel
+				double dot = rx * p.dx + ry * p.dy;
+				// squared to ensure that it's always a positive number
+				dotSum += dot * dot / r2;
+			}
 		}
 
 		return dotSum;

@@ -18,8 +18,10 @@
 
 package boofcv.gui.image;
 
+import boofcv.alg.misc.GImageStatistics;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 
 import javax.swing.*;
 import java.awt.*;
@@ -97,5 +99,16 @@ public class ShowImages {
 		});
 
 		return frame;
+	}
+
+	public static ImagePanel showWindow( ImageSingleBand img , String title , boolean showMagnitude) {
+		double max = GImageStatistics.maxAbs(img);
+		BufferedImage buff;
+		if( showMagnitude )
+			buff = VisualizeImageData.grayMagnitude(img,null,max);
+		else
+			buff = VisualizeImageData.colorizeSign(img,null,max);
+
+		return showWindow(buff,title);
 	}
 }
