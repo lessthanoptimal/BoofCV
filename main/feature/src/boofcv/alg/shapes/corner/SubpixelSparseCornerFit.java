@@ -18,6 +18,7 @@
 
 package boofcv.alg.shapes.corner;
 
+import boofcv.core.image.GeneralizedImageOps;
 import boofcv.core.image.border.BorderType;
 import boofcv.core.image.border.FactoryImageBorder;
 import boofcv.core.image.border.ImageBorder;
@@ -29,8 +30,8 @@ import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.sparse.GradientValue;
 import boofcv.struct.sparse.SparseImageGradient;
 import org.ddogleg.optimization.FactoryOptimization;
-import org.ddogleg.optimization.UnconstrainedMinimization;
 import org.ddogleg.optimization.UtilOptimize;
+import org.ddogleg.optimization.wrap.QuasiNewtonBFGS_to_UnconstrainedMinimization;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_F64;
 
@@ -63,6 +64,8 @@ import java.util.List;
  * is used.  This will pull the estimate for the corner towards the outside.
  * </p>
  *
+ * TODO Update with weighted pixels
+ *
  * @author Peter Abeles
  */
 public class SubpixelSparseCornerFit <T extends ImageSingleBand>{
@@ -84,6 +87,9 @@ public class SubpixelSparseCornerFit <T extends ImageSingleBand>{
 	// maximum number of iterations it will perform with a different central seed
 	private int maxIterations = 5;
 
+	//.0 = no weight, 1 = prefer bright, -1 = prefer dark
+	private int weightToggle = 0;
+
 	// computes the gradient for a pixel
 	private SparseImageGradient<T,GradientValue> gradient;
 
@@ -98,7 +104,7 @@ public class SubpixelSparseCornerFit <T extends ImageSingleBand>{
 	private List<PointGradient_F64> significant = new ArrayList<PointGradient_F64>();
 
 	// unconstrained optimization
-	private UnconstrainedMinimization minimization = FactoryOptimization.unconstrained();
+	private QuasiNewtonBFGS_to_UnconstrainedMinimization minimization = FactoryOptimization.createBfgsWithMore94();
 	private double initialParam[] = new double[2];
 
 	// reference to input image
@@ -114,13 +120,26 @@ public class SubpixelSparseCornerFit <T extends ImageSingleBand>{
 	 */
 	public SubpixelSparseCornerFit( Class<T> imageType ) {
 		ImageBorder<T> border = FactoryImageBorder.general(imageType, BorderType.EXTENDED);
-		gradient = FactoryDerivativeSparse.createSobel(imageType,border);
+		gradient = FactoryDerivativeSparse.createSobel(imageType, border);
 
 		CornerFitFunction_F64 function = new CornerFitFunction_F64();
 		CornerFitGradient_F64 functionGradient = new CornerFitGradient_F64();
 		function.setPoints(significant);
 		functionGradient.setPoints(significant);
+
 		minimization.setFunction(function, functionGradient,0);
+	}
+
+	/**
+	 * Turns on weighted fitting.  Can improve accuracy by removing bias from pixels not part of the corner object.
+	 * Recommended you turn on for polygons and turn off for chessboard.
+	 *
+	 * @param toggle -1 for dark shape, 0 unweighted, 1 for white shapes
+	 */
+	public void setWeightToggle(int toggle) {
+		if( toggle < -1 || toggle > 1 )
+			throw new IllegalArgumentException("Toggle can be -1,0,1");
+		this.weightToggle = toggle;
 	}
 
 	/**
@@ -139,12 +158,14 @@ public class SubpixelSparseCornerFit <T extends ImageSingleBand>{
 	 * @param cy Initial estimate of the corner. y-axis
 	 * @return true if successful and false if it failed
 	 */
-	public boolean refine( int cx , int cy ) {
-		int prevPixelX = cx;
-		int prevPixelY = cy;
+	public boolean refine( double cx , double cy ) {
+		int prevPixelX = (int)(cx+0.5);
+		int prevPixelY = (int)(cy+0.5);
+		refinedX = cx;
+		refinedY = cy;
 
 		for (int i = 0; i < maxIterations; i++) {
-			if( !performOptimization(prevPixelX,prevPixelY) )
+			if( !performOptimization(prevPixelX,prevPixelY,refinedX,refinedY) )
 				return false;
 
 			int pixelX = (int)(refinedX+0.5);
@@ -172,8 +193,14 @@ public class SubpixelSparseCornerFit <T extends ImageSingleBand>{
 	/**
 	 * Sets up the optimization and runs it to find the corner
 	 */
-	protected boolean performOptimization( int cx , int cy ) {
+	protected boolean performOptimization( int cx , int cy , double fx , double fy ) {
 		points.reset();
+		// Find the rectangular region inside the image around (cx,cy)
+		defineSearchRegion(cx,cy);
+
+		// Compute the weights
+		if( weightToggle != 0 )
+			initializeWeights();
 
 		// computes the local gradient around the initial estimate
 		computeLocalGradient(cx, cy);
@@ -184,7 +211,8 @@ public class SubpixelSparseCornerFit <T extends ImageSingleBand>{
 			return false;
 
 		// optimize the solution.  It already has a reference to the significant points list
-		minimization.initialize(initialParam,1e-6,1e-6);
+		initialParam[0] = fx-cx; initialParam[1] = fy-cy;
+		minimization.initialize(initialParam,1e-6,0);
 		UtilOptimize.process(minimization,maxOptimizeSteps);
 		double[] found = minimization.getParameters();
 
@@ -195,20 +223,76 @@ public class SubpixelSparseCornerFit <T extends ImageSingleBand>{
 		return true;
 	}
 
-	/**
-	 * Computes the gradient locally while taking in account the image border and adjusts coordinates to be from
-	 * -1 to 1.
-	 *
-	 */
-	protected void computeLocalGradient(int cx, int cy) {
+	protected void defineSearchRegion( int cx , int cy ) {
 		// Find the local region that it will search inside of while avoiding image border
 		region.set(cx- localRadius,cy- localRadius, cx + localRadius +1,cy + localRadius +1);
 		BoofMiscOps.boundRectangleInside(image, region);
+	}
+
+	double target,spread;
+	protected void initializeWeights() {
+		int N = region.area();
+		double values[] = new double[N];
+		int i = 0;
+		for (int y = region.y0; y < region.y1; y++) {
+			for (int x = region.x0; x < region.x1; x++) {
+				values[i++] = GeneralizedImageOps.get(image,x,y);
+			}
+		}
+
+		double mean = 0;
+		for (int j = 0; j < N; j++) {
+			mean += values[j];
+		}
+		mean /= N;
+
+		double lower = 0;
+		double upper = 0;
+		int lowerN = 0;
+		int upperN = 0;
+
+		for (int j = 0; j < N; j++) {
+			double v = values[j];
+			if( v < mean ) {
+				lower += v;
+				lowerN++;
+			} else {
+				upper += v;
+			}
+		}
+
+		upperN = N-lowerN;
+		lower /= lowerN;
+		upper /= upperN;
+
+		if( weightToggle == 1) {
+			target = upper;
+		} else {
+			target = lower;
+		}
+		spread = upper-lower;
+	}
+
+	protected double computeWeight( int x , int y ) {
+		if( weightToggle == 0 ) {
+			return 1.0;
+		} else {
+			double value = GeneralizedImageOps.get(image, x, y);
+//			return Math.abs(value-target)/spread < 0.95 ? 1 : 0;
+			return Math.max(0, 1.0 - Math.abs(value - target) / spread);
+		}
+	}
+
+	/**
+	 * Computes the gradient locally while taking in account the image border and adjusts coordinates to be from
+	 * -1 to 1.
+	 */
+	protected void computeLocalGradient(int cx, int cy) {
 
 		double dRadius = (double) localRadius;
 
 		// compute the gradient at each pixel while taking in account the ignore radius
-		// scale the coordinate so that they range from -1 to 1 for numerical reasons.  not sure if neccisary
+		// scale the coordinate so that they range from -1 to 1 for numerical reasons.  not sure if necessary
 		// but doesn't really hurt
 		for (int y = region.y0; y < region.y1; y++) {
 			double scaledY = (y-cy)/dRadius;
@@ -216,10 +300,12 @@ public class SubpixelSparseCornerFit <T extends ImageSingleBand>{
 				if( Math.abs(x-cx) <= ignoreRadius && Math.abs(y-cy) <= ignoreRadius)
 					continue;
 
+				// compute weight based on intensity
+				double w = computeWeight(x,y);
 				GradientValue v = gradient.compute(x,y);
 				double scaledX = (x-cx)/dRadius;
 
-				points.grow().set(scaledX,scaledY,v.getX(),v.getY());
+				points.grow().set(scaledX,scaledY,v.getX()*w,v.getY()*w);
 			}
 		}
 	}

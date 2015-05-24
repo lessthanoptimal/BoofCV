@@ -25,7 +25,6 @@ import boofcv.alg.misc.ImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.PointGradient_F64;
 import boofcv.struct.distort.PixelTransform_F32;
-import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
 import boofcv.testing.BoofTesting;
@@ -45,7 +44,7 @@ public class TestSubpixelSparseCornerFit {
 
 	Random rand = new Random(345);
 
-	Class imageTypes[] = new Class[]{ImageUInt8.class, ImageFloat32.class};
+	Class imageTypes[] = new Class[]{ImageUInt8.class};
 
 	double tol;
 
@@ -54,7 +53,7 @@ public class TestSubpixelSparseCornerFit {
 	 */
 	@Test
 	public void easyCase_square() {
-		tol = 0.7;
+		tol = 0.01;
 		for( Class imageType : imageTypes ) {
 			ImageSingleBand image = GeneralizedImageOps.createSingleBand(imageType,400,500);
 
@@ -62,6 +61,7 @@ public class TestSubpixelSparseCornerFit {
 			GImageMiscOps.fillRectangle(image,0,50,52,20,30);
 
 			SubpixelSparseCornerFit alg = new SubpixelSparseCornerFit(imageType);
+			alg.setWeightToggle(-1);
 			alg.setIgnoreRadius(1);
 			alg.setLocalRadius(4);
 			alg.setMaxOptimizeSteps(100);
@@ -79,7 +79,7 @@ public class TestSubpixelSparseCornerFit {
 	 */
 	@Test
 	public void easyCase_square_subimage() {
-		tol = 0.7;
+		tol = 0.01;
 		for( Class imageType : imageTypes ) {
 			ImageSingleBand image = GeneralizedImageOps.createSingleBand(imageType,400,500);
 
@@ -87,6 +87,7 @@ public class TestSubpixelSparseCornerFit {
 			GImageMiscOps.fillRectangle(image,0,50,52,20,30);
 
 			SubpixelSparseCornerFit alg = new SubpixelSparseCornerFit(imageType);
+			alg.setWeightToggle(-1);
 			alg.setIgnoreRadius(1);
 			alg.setLocalRadius(4);
 			alg.setMaxOptimizeSteps(100);
@@ -104,42 +105,30 @@ public class TestSubpixelSparseCornerFit {
 	 */
 	@Test
 	public void easyCase_chess() {
-		tol = 0.7;
-		for( Class imageType : imageTypes ) {
-			ImageSingleBand image = GeneralizedImageOps.createSingleBand(imageType,400,500);
+		tol = 0.05;
+		for (Class imageType : imageTypes) {
+			ImageSingleBand image = GeneralizedImageOps.createSingleBand(imageType, 400, 500);
 
-			GImageMiscOps.fill(image,200);
-			GImageMiscOps.fillRectangle(image,0,50,52,20,20);
-			GImageMiscOps.fillRectangle(image,0,50,92,20,20);
-			GImageMiscOps.fillRectangle(image,0,90,52,20,20);
-			GImageMiscOps.fillRectangle(image,0,90,92,20,20);
-			GImageMiscOps.fillRectangle(image,0,70,72,20,20);
+			GImageMiscOps.fill(image, 200);
+			GImageMiscOps.fillRectangle(image, 0, 50, 52, 20, 20);
+			GImageMiscOps.fillRectangle(image, 0, 50, 92, 20, 20);
+			GImageMiscOps.fillRectangle(image, 0, 90, 52, 20, 20);
+			GImageMiscOps.fillRectangle(image, 0, 90, 92, 20, 20);
+
+			GImageMiscOps.fillRectangle(image, 0, 70, 72, 20, 20);
 
 			SubpixelSparseCornerFit alg = new SubpixelSparseCornerFit(imageType);
-			alg.setIgnoreRadius(1);
-			alg.setLocalRadius(4);
+			alg.setWeightToggle(0);
+			alg.setIgnoreRadius(2);
+			alg.setLocalRadius(7);
 			alg.setMaxOptimizeSteps(100);
 			alg.setImage(image);
 
-			checkConverge(alg,70,72,2);
-			checkConverge(alg,70,91,2);
-			checkConverge(alg,89,91,2);
-			checkConverge(alg,89,72,2);
-		}
-	}
-
-	private void checkConverge( SubpixelSparseCornerFit alg , int cx , int cy , int r ) {
-//		System.out.println("============ cx "+cx+"  cy "+cy);
-		for (int y = -r; y <= r ; y++) {
-			for (int x = -r; x <= r; x++) {
-				assertTrue(alg.refine(cx + x, cy + y));
-
-				double foundX = alg.getRefinedX();
-				double foundY = alg.getRefinedY();
-
-				assertEquals(x+" "+y,cx,foundX,tol);
-				assertEquals(x+" "+y,cy,foundY,tol);
-			}
+			// the corner is going to get "sucked" towards the other adjacent square
+			checkConverge(alg, 69.5, 71.5, 2);
+			checkConverge(alg, 69.5, 91.5, 2);
+			checkConverge(alg, 89.5, 91.5, 2);
+			checkConverge(alg, 89.5, 71.5, 2);
 		}
 	}
 
@@ -149,33 +138,38 @@ public class TestSubpixelSparseCornerFit {
 	 */
 	@Test
 	public void rotation() {
-		tol = 1.0; // more tolerance due to interpolation and approximate target
+		tol = 0.3; // interpolation will reduce the accuracy
 		for( Class imageType : imageTypes ) {
 			ImageSingleBand image = GeneralizedImageOps.createSingleBand(imageType,400,500);
 			ImageSingleBand rotated = GeneralizedImageOps.createSingleBand(imageType,400,500);
 
-			GImageMiscOps.fill(image,200);
-			GImageMiscOps.fillRectangle(image,0,100,102,50,55);
-
-			new FDistort(image,rotated).border(200).rotate(0.3).apply();
-			int halfW = image.width/2 , halfH = image.height/2;
-			PixelTransform_F32 inputToOutput = DistortSupport.transformRotate(
-					halfW,halfH, halfW,halfH, -0.3f);
-
 			SubpixelSparseCornerFit alg = new SubpixelSparseCornerFit(imageType);
+			alg.setWeightToggle(-1);
 			alg.setIgnoreRadius(2);
 			alg.setLocalRadius(6);
 			alg.setMaxOptimizeSteps(100);
 			alg.setImage(rotated);
 
-			inputToOutput.compute(100,102);
-			checkConverge(alg, (int)(inputToOutput.distX+0.5),(int)(inputToOutput.distY+0.5),3);
-			inputToOutput.compute(100,156);
-			checkConverge(alg, (int)(inputToOutput.distX+0.5),(int)(inputToOutput.distY+0.5),3);
-			inputToOutput.compute(149,156);
-			checkConverge(alg, (int)(inputToOutput.distX+0.5),(int)(inputToOutput.distY+0.5),3);
-			inputToOutput.compute(149,102);
-			checkConverge(alg, (int)(inputToOutput.distX+0.5),(int)(inputToOutput.distY+0.5),3);
+			for (int i = 1; i < 5; i++) {
+				float angle = 0.05f + i*0.15f;
+				System.out.println("Angle = "+angle);
+				GImageMiscOps.fill(image, 200);
+				GImageMiscOps.fillRectangle(image, 0, 100, 102, 50, 55);
+
+				new FDistort(image, rotated).border(200).rotate(angle).apply();
+				int halfW = image.width / 2, halfH = image.height / 2;
+				PixelTransform_F32 inputToOutput = DistortSupport.transformRotate(
+						halfW, halfH, halfW, halfH, -angle);
+
+				inputToOutput.compute(100, 102);
+				checkConverge(alg, inputToOutput.distX, inputToOutput.distY, 3);
+				inputToOutput.compute(100, 156);
+				checkConverge(alg, inputToOutput.distX, inputToOutput.distY, 3);
+				inputToOutput.compute(149, 156);
+				checkConverge(alg, inputToOutput.distX, inputToOutput.distY, 3);
+				inputToOutput.compute(149, 102);
+				checkConverge(alg, inputToOutput.distX, inputToOutput.distY, 3);
+			}
 		}
 	}
 
@@ -238,5 +232,19 @@ public class TestSubpixelSparseCornerFit {
 		assertEquals(200/max,b.dy,1e-8);
 	}
 
+	private void checkConverge( SubpixelSparseCornerFit alg , double cx , double cy , int r ) {
+//		System.out.println("============ cx "+cx+"  cy "+cy);
+		for (int y = -r; y <= r ; y++) {
+			for (int x = -r; x <= r; x++) {
+				assertTrue(alg.refine((int)(cx + x+0.5), (int)(cy + y+0.5)));
+
+				double foundX = alg.getRefinedX();
+				double foundY = alg.getRefinedY();
+
+				assertEquals(x+" "+y,cx,foundX,tol);
+				assertEquals(x+" "+y,cy,foundY,tol);
+			}
+		}
+	}
 
 }
