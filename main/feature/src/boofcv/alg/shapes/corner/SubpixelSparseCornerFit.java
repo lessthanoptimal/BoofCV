@@ -30,6 +30,7 @@ import boofcv.struct.PointGradient_F64;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.sparse.GradientValue;
 import boofcv.struct.sparse.SparseImageGradient;
+import georegression.struct.point.Point2D_F64;
 import org.ddogleg.optimization.FactoryOptimization;
 import org.ddogleg.optimization.wrap.QuasiNewtonBFGS_to_UnconstrainedMinimization;
 import org.ddogleg.struct.FastQueue;
@@ -137,9 +138,8 @@ public class SubpixelSparseCornerFit <T extends ImageSingleBand>{
 	// did some benchmarking and only in trivial cases does using type specific images make a difference
 	GImageSingleBand imageWrapper;
 
-	// the refined corner
-	private double refinedX;
-	private double refinedY;
+	// storage for intermediate solutions
+	Point2D_F64 refined = new Point2D_F64();
 
 	/**
 	 * Constructor that specifies the type of image it can process
@@ -186,18 +186,18 @@ public class SubpixelSparseCornerFit <T extends ImageSingleBand>{
 	 *
 	 * @param cx Initial estimate of the corner. x-axis
 	 * @param cy Initial estimate of the corner. y-axis
+	 * @param output The refined estimate for the corner's position
 	 * @return true if successful and false if it failed
 	 */
-	public boolean refine( double cx , double cy ) {
+	public boolean refine( double cx , double cy , Point2D_F64 output ) {
 		int prevPixelX = (int)(cx+0.5);
 		int prevPixelY = (int)(cy+0.5);
-		refinedX = cx;
-		refinedY = cy;
+		refined.set(output);
 
 		boolean hasSolution = false;
 		for (int i = 0; i < maxInitialSeeds; i++) {
 			// optimize
-			switch(performOptimization(prevPixelX,prevPixelY,refinedX,refinedY)) {
+			switch(performOptimization(prevPixelX,prevPixelY,refined)) {
 				case -1: return false; // fatal error
 
 				case 0: // diverged or never found a solution
@@ -205,8 +205,8 @@ public class SubpixelSparseCornerFit <T extends ImageSingleBand>{
 						return true;
 					} else {
 						// try optimizing from a new initial location
-						refinedX = cx + rand.nextDouble()*localRadius - localRadius/2.0;
-						refinedY = cy + rand.nextDouble()*localRadius - localRadius/2.0;
+						refined.x = cx + rand.nextDouble()*localRadius - localRadius/2.0;
+						refined.y = cy + rand.nextDouble()*localRadius - localRadius/2.0;
 						prevPixelX = (int)(cx+0.5);
 						prevPixelY = (int)(cy+0.5);
 					}
@@ -216,8 +216,8 @@ public class SubpixelSparseCornerFit <T extends ImageSingleBand>{
 			}
 
 			// set up the next search around this location
-			int pixelX = (int)(refinedX+0.5);
-			int pixelY = (int)(refinedY+0.5);
+			int pixelX = (int)(refined.x+0.5);
+			int pixelY = (int)(refined.y+0.5);
 
 			// moved outside the image, that's bad
 			if( !image.isInBounds(pixelX,pixelY))
@@ -232,6 +232,9 @@ public class SubpixelSparseCornerFit <T extends ImageSingleBand>{
 			prevPixelY = pixelY;
 		}
 
+		if( hasSolution ) {
+			output.set(refined);
+		}
 		return hasSolution;
 	}
 
@@ -240,7 +243,7 @@ public class SubpixelSparseCornerFit <T extends ImageSingleBand>{
 	 *
 	 * @return -1 = fatal unrecoverable, 0 = try again, 1 = success
 	 */
-	protected int performOptimization( int cx , int cy , double fx , double fy ) {
+	protected int performOptimization( int cx , int cy , Point2D_F64 output ) {
 		points.reset();
 		// Find the rectangular region inside the image around (cx,cy)
 		defineSearchRegion(cx,cy);
@@ -258,11 +261,11 @@ public class SubpixelSparseCornerFit <T extends ImageSingleBand>{
 			return -1;
 
 		// optimize the solution.  It already has a reference to the significant points list
-		if( iterateOptimization((fx-cx)/localRadius,(fy-cy)/localRadius)) {
+		if( iterateOptimization((output.x-cx)/localRadius,(output.y-cy)/localRadius)) {
 			double[] found = minimization.getParameters();
 			// return the refined location while undoing the scale adjustment done earlier
-			refinedX = found[0]*localRadius + cx;
-			refinedY = found[1]*localRadius + cy;
+			output.x = found[0]*localRadius + cx;
+			output.y = found[1]*localRadius + cy;
 			return 1;
 		} else {
 			return 0;
@@ -435,20 +438,6 @@ public class SubpixelSparseCornerFit <T extends ImageSingleBand>{
 			}
 		}
 		return true;
-	}
-
-	/**
-	 * x-coordinate of the refined corner estimate
-	 */
-	public double getRefinedX() {
-		return refinedX;
-	}
-
-	/**
-	 * y-coordinate of the refined corner estimate
-	 */
-	public double getRefinedY() {
-		return refinedY;
 	}
 
 	public int getIgnoreRadius() {

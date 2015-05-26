@@ -168,7 +168,7 @@ public class BinaryQuadrilateralDetector<T extends ImageSingleBand> {
 
 				if( polyToQuad.computeQuadrilateral(c.external,splits) ) {
 					Quadrilateral_F64 q = polyToQuad.getOutput();
-					if( refine.fit(q,found.grow()) ) {
+					if( refine.refine(q, found.grow()) ) {
 						double area = q.area();
 						if(UtilEjml.isUncountable(area) || area < minimumArea ) {
 							found.removeTail();

@@ -27,6 +27,7 @@ import boofcv.struct.distort.PixelTransform_F32;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
 import georegression.struct.point.Point2D_F32;
+import georegression.struct.point.Point2D_F64;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -116,10 +117,11 @@ public class BenchmarkSubpixelSparseCorner<T extends ImageSingleBand> {
 		alg.setMaxOptimizeSteps(200);
 		alg.initialize(image);
 
+		Point2D_F64 refined = new Point2D_F64();
 		for (int i = 0; i < 3000; i++) {
 			for (int j = 0; j < corners.size(); j++) {
 				Point2D_F32 c = corners.get(j);
-				alg.refine(c.x,c.y);
+				alg.refine(c.x,c.y,refined);
 			}
 		}
 		long after = System.currentTimeMillis();

@@ -145,7 +145,7 @@ public class RefineQuadrilateralLineToImage<T extends ImageSingleBand> {
 	/**
 	 * Sets the image which is going to be processed
 	 */
-	public void setImage( T image ) {
+	public void initialize(T image) {
 		interpolate.setImage(image);
 	}
 
@@ -155,7 +155,7 @@ public class RefineQuadrilateralLineToImage<T extends ImageSingleBand> {
 	 * @param input (input) Initial estimate for the quadrilateral. Vertexes must be in clockwise order.
 	 * @param output (output) the fitted quadrilateral
 	 */
-	public boolean fit( Quadrilateral_F64 input , Quadrilateral_F64 output )
+	public boolean refine(Quadrilateral_F64 input, Quadrilateral_F64 output)
 	{
 		// find center to use as local coordinate system.  Improves numerics slightly
 		UtilPolygons2D_F64.center(input,center);

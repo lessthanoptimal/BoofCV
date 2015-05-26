@@ -28,6 +28,7 @@ import boofcv.struct.distort.PixelTransform_F32;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
 import boofcv.testing.BoofTesting;
+import georegression.struct.point.Point2D_F64;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -253,16 +254,14 @@ public class TestSubpixelSparseCornerFit {
 
 	private void checkConverge( SubpixelSparseCornerFit alg , double cx , double cy , int r ) {
 //		System.out.println("============ cx "+cx+"  cy "+cy);
+		Point2D_F64 refined = new Point2D_F64();
 		for (int y = -r; y <= r ; y++) {
 			for (int x = -r; x <= r; x++) {
 //				System.out.println("   "+x+" "+y);
-				assertTrue(alg.refine(cx + x, cy + y));
+				assertTrue(alg.refine(cx + x, cy + y,refined));
 
-				double foundX = alg.getRefinedX();
-				double foundY = alg.getRefinedY();
-
-				assertEquals(x+" "+y,cx,foundX,tol);
-				assertEquals(x+" "+y,cy,foundY,tol);
+				assertEquals(x+" "+y,cx,refined.x,tol);
+				assertEquals(x+" "+y,cy,refined.y,tol);
 			}
 		}
 	}

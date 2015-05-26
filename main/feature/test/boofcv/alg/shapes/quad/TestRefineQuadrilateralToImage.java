@@ -27,13 +27,16 @@ import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
+import boofcv.testing.BoofTesting;
 import georegression.geometry.UtilLine2D_F64;
 import georegression.metric.Distance2D_F64;
 import georegression.struct.affine.Affine2D_F64;
 import georegression.struct.line.LineGeneral2D_F64;
 import georegression.struct.line.LineSegment2D_F64;
 import georegression.struct.point.Point2D_F64;
+import georegression.struct.se.Se2_F64;
 import georegression.struct.shapes.Quadrilateral_F64;
+import georegression.transform.ConvertTransform_F64;
 import georegression.transform.affine.AffinePointOps_F64;
 import org.junit.Test;
 
@@ -75,29 +78,88 @@ public class TestRefineQuadrilateralToImage {
 	 */
 	@Test
 	public void fit_subimage() {
-		fail("implement");
+		final boolean black = true;
+
+		Quadrilateral_F64 input = new Quadrilateral_F64();
+		input.a.set(x0,y0);
+		input.b.set(x0,yy1);
+		input.c.set(xx1,yy1);
+		input.d.set(xx1,y0);
+
+		for (Class imageType : imageTypes) {
+			setup(new Affine2D_F64(), black, imageType);
+
+			RefineQuadrilateralLineToImage alg = createAlg(black, imageType);
+
+			Quadrilateral_F64 output = new Quadrilateral_F64();
+			alg.initialize(image);
+			alg.refine(input, output);
+
+			// do it again with a sub-image
+			Quadrilateral_F64 output2 = new Quadrilateral_F64();
+			image = BoofTesting.createSubImageOf_S(image);
+			alg.initialize(image);
+			alg.refine(input, output2);
+
+			assertTrue(output.isEquals(output2,1e-8));
+		}
 	}
 
 	/**
-	 * Perfect intiial guess
+	 * Fit a square which is alligned to the image axis.  It should get a nearly perfect fit.
+	 * Initial conditions are be a bit off.
 	 */
 	@Test
-	public void fit_perfect() {
-		// distorted and undistorted views
-		Affine2D_F64 affines[] = new Affine2D_F64[2];
-		affines[0] = new Affine2D_F64();
-		affines[1] = new Affine2D_F64(1.3,0.05,-0.15,0.87,0.1,0.6);
+	public void alignedSquare() {
+		Quadrilateral_F64 original = new Quadrilateral_F64();
+		original.a.set(x0,y0);
+		original.b.set(x0,yy1);
+		original.c.set(xx1,yy1);
+		original.d.set(xx1,y0);
 
 		for (Class imageType : imageTypes) {
-			for (Affine2D_F64 a : affines) {
-//				System.out.println(imageType+"  "+a);
-				fit_perfect(true, a, imageType);
-				fit_perfect(false, a, imageType);
+			for (int i = 0; i < 2; i++) {
+				boolean black = i == 0;
+
+				setup(new Affine2D_F64(), black, imageType);
+
+				RefineQuadrilateralLineToImage alg = createAlg(black, imageType);
+
+				for (int j = 0; j < 20; j++) {
+					Quadrilateral_F64 input = original.copy();
+					addNoise(input,2);
+
+					Quadrilateral_F64 output = new Quadrilateral_F64();
+					alg.initialize(image);
+					alg.refine(input, output);
+
+					assertTrue(original.isEquals(output, 0.01));
+				}
 			}
 		}
 	}
 
-	public void fit_perfect( boolean black , Affine2D_F64 affine , Class imageType ) {
+	/**
+	 * Perfect initial guess.
+	 */
+	@Test
+	public void fit_perfect_affine() {
+		// distorted and undistorted views
+		Affine2D_F64 affines[] = new Affine2D_F64[2];
+		affines[0] = new Affine2D_F64();
+		affines[1] = new Affine2D_F64(1.3,0.05,-0.15,0.87,0.1,0.6);
+		ConvertTransform_F64.convert(new Se2_F64(0,0,0.2),affines[0]);
+
+		for (Class imageType : imageTypes) {
+			for (Affine2D_F64 a : affines) {
+//				System.out.println(imageType+"  "+a);
+				fit_perfect_affine(true, a, imageType);
+				fit_perfect_affine(false, a, imageType);
+			}
+		}
+	}
+
+	public void fit_perfect_affine(boolean black, Affine2D_F64 affine, Class imageType) {
 		setup(affine, black, imageType);
 
 		RefineQuadrilateralLineToImage alg = createAlg(black, imageType);
@@ -111,12 +173,19 @@ public class TestRefineQuadrilateralToImage {
 		Quadrilateral_F64 expected = input.copy();
 		Quadrilateral_F64 found = new Quadrilateral_F64();
 
-		alg.setImage(image);
-		alg.fit(input, found);
+		alg.initialize(image);
+		alg.refine(input, found);
 
 		// input shouldn't be modified
 		checkEquals(expected, input, 0);
 		// should be close to the expected
+		checkEquals(expected, found, 0.25 );
+
+		// do it again with a sub-image to see if it handles that
+		image = BoofTesting.createSubImageOf_S(image);
+		alg.initialize(image);
+		alg.refine(input, found);
+		checkEquals(expected, input, 0);
 		checkEquals(expected, found, 0.25 );
 	}
 
@@ -124,22 +193,23 @@ public class TestRefineQuadrilateralToImage {
 	 * Fit the quad with a noisy initial guess
 	 */
 	@Test
-	public void fit_noisy() {
+	public void fit_noisy_affine() {
 		// distorted and undistorted views
 		Affine2D_F64 affines[] = new Affine2D_F64[2];
 		affines[0] = new Affine2D_F64();
 		affines[1] = new Affine2D_F64(1.3,0.05,-0.15,0.87,0.1,0.6);
+		ConvertTransform_F64.convert(new Se2_F64(0,0,0.2),affines[0]);
 
 		for (Class imageType : imageTypes) {
 			for (Affine2D_F64 a : affines) {
 //				System.out.println(imageType+"  "+a);
-				fit_noisy(true, a, imageType);
-				fit_noisy(false, a, imageType);
+				fit_noisy_affine(true, a, imageType);
+				fit_noisy_affine(false, a, imageType);
 			}
 		}
 	}
 
-	public void fit_noisy( boolean black , Affine2D_F64 affine, Class imageType) {
+	public void fit_noisy_affine(boolean black, Affine2D_F64 affine, Class imageType) {
 		setup(affine, black, imageType);
 
 		RefineQuadrilateralLineToImage alg = createAlg(black, imageType);
@@ -156,31 +226,29 @@ public class TestRefineQuadrilateralToImage {
 		for (int i = 0; i < 10; i++) {
 			// add some noise
 			input.set(expected);
-			addNoise(input, 0.5);
+			addNoise(input, 2);
 
-			alg.setImage(image);
-			alg.fit(input, found);
+			alg.initialize(image);
+			alg.refine(input, found);
 
 			// should be close to the expected
 			double before = computeMaxDistance(input,expected);
 			double after = computeMaxDistance(found,expected);
-
-			System.out.println(before+"  "+after);
 
 			assertTrue(after<before);
 			checkEquals(expected, found, 0.5);
 		}
 	}
 
-	private void addNoise(Quadrilateral_F64 input, double sigma) {
-		input.a.x += rand.nextGaussian()*sigma;
-		input.a.y += rand.nextGaussian()*sigma;
-		input.b.x += rand.nextGaussian()*sigma;
-		input.b.y += rand.nextGaussian()*sigma;
-		input.c.x += rand.nextGaussian()*sigma;
-		input.c.y += rand.nextGaussian()*sigma;
-		input.d.x += rand.nextGaussian()*sigma;
-		input.d.y += rand.nextGaussian()*sigma;
+	private void addNoise(Quadrilateral_F64 input, double spread) {
+		input.a.x += rand.nextDouble()*spread - spread/2.0;
+		input.a.y += rand.nextDouble()*spread - spread/2.0;
+		input.b.x += rand.nextDouble()*spread - spread/2.0;
+		input.b.y += rand.nextDouble()*spread - spread/2.0;
+		input.c.x += rand.nextDouble()*spread - spread/2.0;
+		input.c.y += rand.nextDouble()*spread - spread/2.0;
+		input.d.x += rand.nextDouble()*spread - spread/2.0;
+		input.d.y += rand.nextDouble()*spread - spread/2.0;
 	}
 
 	private RefineQuadrilateralLineToImage createAlg(boolean black, Class imageType) {
