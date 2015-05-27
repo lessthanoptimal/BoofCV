@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.shapes.quad;
+package boofcv.alg.shapes.polygon;
 
 import boofcv.abst.distort.FDistort;
 import boofcv.alg.misc.GImageMiscOps;
@@ -40,7 +40,7 @@ import static org.junit.Assert.fail;
 /**
  * @author Peter Abeles
  */
-public class TestBinarySquareDetector {
+public class TestBinaryPolygonConvexDetector {
 
 	int width = 400,height=450;
 
@@ -91,5 +91,25 @@ public class TestBinarySquareDetector {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
+	}
+
+	@Test
+	public void rejectShapes_circle() {
+		fail("Implement");
+	}
+
+	@Test
+	public void rejectShapes_triangle() {
+		fail("Implement");
+	}
+
+	@Test
+	public void rejectShapes_pentagon() {
+		fail("Implement");
+	}
+
+	@Test
+	public void touchesBorder() {
+		fail("Implement");
 	}
 }

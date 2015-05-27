@@ -83,8 +83,8 @@ import java.util.Random;
  *
  * @author Peter Abeles
  */
-public class SubpixelSparseCornerFit <T extends ImageSingleBand>{
-
+public class SubpixelSparseCornerFit<T extends ImageSingleBand>
+{
 	// ignore radius
 	// all pictures are ignored inside this region around the center.
 	private int ignoreRadius=1;

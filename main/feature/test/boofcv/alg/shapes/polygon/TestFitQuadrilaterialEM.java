@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.shapes.quad;
+package boofcv.alg.shapes.polygon;
 
 import georegression.geometry.UtilLine2D_F64;
 import georegression.geometry.UtilPoint2D_F64;

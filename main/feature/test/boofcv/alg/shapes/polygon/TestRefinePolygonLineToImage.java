@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.shapes.quad;
+package boofcv.alg.shapes.polygon;
 
 import boofcv.abst.distort.FDistort;
 import boofcv.alg.interpolate.InterpolatePixelS;
@@ -49,7 +49,7 @@ import static org.junit.Assert.*;
  * @author Peter Abeles
  */
 @SuppressWarnings("unchecked")
-public class TestRefineQuadrilateralToImage {
+public class TestRefinePolygonLineToImage {
 
 	Random rand = new Random(234);
 
@@ -70,7 +70,23 @@ public class TestRefineQuadrilateralToImage {
 	 */
 	@Test
 	public void fit_tooSmall() {
-		fail("implement");
+		final boolean black = true;
+
+		Quadrilateral_F64 input = new Quadrilateral_F64();
+		input.a.set(5,5);
+		input.b.set(5,6);
+		input.c.set(6,6);
+		input.d.set(6,5);
+
+		for (Class imageType : imageTypes) {
+			setup(new Affine2D_F64(), black, imageType);
+
+			RefinePolygonLineToImage alg = createAlg(black, imageType);
+
+			Quadrilateral_F64 output = new Quadrilateral_F64();
+			alg.initialize(image);
+			assertFalse(alg.refine(input, output));
+		}
 	}
 
 	/**
@@ -89,17 +105,17 @@ public class TestRefineQuadrilateralToImage {
 		for (Class imageType : imageTypes) {
 			setup(new Affine2D_F64(), black, imageType);
 
-			RefineQuadrilateralLineToImage alg = createAlg(black, imageType);
+			RefinePolygonLineToImage alg = createAlg(black, imageType);
 
 			Quadrilateral_F64 output = new Quadrilateral_F64();
 			alg.initialize(image);
-			alg.refine(input, output);
+			assertTrue(alg.refine(input, output));
 
 			// do it again with a sub-image
 			Quadrilateral_F64 output2 = new Quadrilateral_F64();
 			image = BoofTesting.createSubImageOf_S(image);
 			alg.initialize(image);
-			alg.refine(input, output2);
+			assertTrue(alg.refine(input, output2));
 
 			assertTrue(output.isEquals(output2,1e-8));
 		}
@@ -123,7 +139,7 @@ public class TestRefineQuadrilateralToImage {
 
 				setup(new Affine2D_F64(), black, imageType);
 
-				RefineQuadrilateralLineToImage alg = createAlg(black, imageType);
+				RefinePolygonLineToImage alg = createAlg(black, imageType);
 
 				for (int j = 0; j < 20; j++) {
 					Quadrilateral_F64 input = original.copy();
@@ -131,7 +147,7 @@ public class TestRefineQuadrilateralToImage {
 
 					Quadrilateral_F64 output = new Quadrilateral_F64();
 					alg.initialize(image);
-					alg.refine(input, output);
+					assertTrue(alg.refine(input, output));
 
 					assertTrue(original.isEquals(output, 0.01));
 				}
@@ -162,7 +178,7 @@ public class TestRefineQuadrilateralToImage {
 	public void fit_perfect_affine(boolean black, Affine2D_F64 affine, Class imageType) {
 		setup(affine, black, imageType);
 
-		RefineQuadrilateralLineToImage alg = createAlg(black, imageType);
+		RefinePolygonLineToImage alg = createAlg(black, imageType);
 
 		Quadrilateral_F64 input = new Quadrilateral_F64();
 		AffinePointOps_F64.transform(affine,new Point2D_F64(x0,y0),input.a);
@@ -174,7 +190,7 @@ public class TestRefineQuadrilateralToImage {
 		Quadrilateral_F64 found = new Quadrilateral_F64();
 
 		alg.initialize(image);
-		alg.refine(input, found);
+		assertTrue(alg.refine(input, found));
 
 		// input shouldn't be modified
 		checkEquals(expected, input, 0);
@@ -184,7 +200,7 @@ public class TestRefineQuadrilateralToImage {
 		// do it again with a sub-image to see if it handles that
 		image = BoofTesting.createSubImageOf_S(image);
 		alg.initialize(image);
-		alg.refine(input, found);
+		assertTrue(alg.refine(input, found));
 		checkEquals(expected, input, 0);
 		checkEquals(expected, found, 0.25 );
 	}
@@ -212,7 +228,7 @@ public class TestRefineQuadrilateralToImage {
 	public void fit_noisy_affine(boolean black, Affine2D_F64 affine, Class imageType) {
 		setup(affine, black, imageType);
 
-		RefineQuadrilateralLineToImage alg = createAlg(black, imageType);
+		RefinePolygonLineToImage alg = createAlg(black, imageType);
 
 		Quadrilateral_F64 input = new Quadrilateral_F64();
 		AffinePointOps_F64.transform(affine,new Point2D_F64(x0,y0),input.a);
@@ -229,7 +245,7 @@ public class TestRefineQuadrilateralToImage {
 			addNoise(input, 2);
 
 			alg.initialize(image);
-			alg.refine(input, found);
+			assertTrue(alg.refine(input, found));
 
 			// should be close to the expected
 			double before = computeMaxDistance(input,expected);
@@ -251,9 +267,9 @@ public class TestRefineQuadrilateralToImage {
 		input.d.y += rand.nextDouble()*spread - spread/2.0;
 	}
 
-	private RefineQuadrilateralLineToImage createAlg(boolean black, Class imageType) {
+	private RefinePolygonLineToImage createAlg(boolean black, Class imageType) {
 		InterpolatePixelS interp = FactoryInterpolation.createPixelS(0, 255, TypeInterpolate.BILINEAR, imageType);
-		return new RefineQuadrilateralLineToImage(black,interp);
+		return new RefinePolygonLineToImage(black,interp);
 //		return new RefineQuadrilateralToImage(2,20,2,10,0.01,black,interp);
 	}
 
@@ -271,7 +287,7 @@ public class TestRefineQuadrilateralToImage {
 	public void optimize_line_perfect(boolean black, Class imageType) {
 		setup(null, black, imageType);
 
-		RefineQuadrilateralLineToImage alg = createAlg(black, imageType);
+		RefinePolygonLineToImage alg = createAlg(black, imageType);
 
 		Quadrilateral_F64 input = new Quadrilateral_F64(x0,y0,x0,y1,x1,y1,x1,y0);
 		LineGeneral2D_F64 found = new LineGeneral2D_F64();
@@ -313,7 +329,7 @@ public class TestRefineQuadrilateralToImage {
 	public void computePointsAndWeights( boolean black , Class imageType ) {
 		setup(null,black,imageType);
 
-		RefineQuadrilateralLineToImage alg = createAlg(black, imageType);
+		RefinePolygonLineToImage alg = createAlg(black, imageType);
 
 		float H = y1-y0-10;
 
@@ -353,7 +369,7 @@ public class TestRefineQuadrilateralToImage {
 		lines[3] = UtilLine2D_F64.convert(new LineSegment2D_F64(orig.d,orig.a),(LineGeneral2D_F64)null);
 
 		Quadrilateral_F64 found = new Quadrilateral_F64();
-		RefineQuadrilateralLineToImage.convert(lines, found);
+		RefinePolygonLineToImage.convert(lines, found);
 
 		checkEquals(orig, found, 1e-8);
 	}

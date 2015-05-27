@@ -16,11 +16,11 @@
  * limitations under the License.
  */
 
-package boofcv.alg.shapes.quad;
+package boofcv.alg.shapes.polygon;
 
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I32;
-import georegression.struct.shapes.Quadrilateral_F64;
+import georegression.struct.shapes.Polygon2D_F64;
 import org.ddogleg.struct.GrowQueue_I32;
 import org.junit.Test;
 
@@ -29,18 +29,19 @@ import java.util.List;
 
 import static georegression.metric.Distance2D_F64.distance;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
  */
-public class TestFindQuadCornersInPolygon {
+public class TestReduceCornersInContourPolygon {
 
 	/**
 	 * Give it 4 perfect vertexes that match the contour
 	 */
 	@Test
 	public void all_4() {
-		FindQuadCornersInPolygon alg = new FindQuadCornersInPolygon();
+		ReduceCornersInContourPolygon alg = new ReduceCornersInContourPolygon(4,2,true);
 
 		GrowQueue_I32 vertexes = new GrowQueue_I32();
 
@@ -54,9 +55,9 @@ public class TestFindQuadCornersInPolygon {
 
 		for (int i = 0; i < 10; i++) {
 
-			alg.computeQuadrilateral(contour, vertexes);
+			alg.process(contour, vertexes);
 
-			Quadrilateral_F64 found = alg.getOutput();
+			Polygon2D_F64 found = alg.getOutput();
 
 			assertTrue(maxDistance(contour, found) < 1);
 
@@ -79,7 +80,7 @@ public class TestFindQuadCornersInPolygon {
 	 */
 	@Test
 	public void moreThanFour() {
-		FindQuadCornersInPolygon alg = new FindQuadCornersInPolygon();
+		ReduceCornersInContourPolygon alg = new ReduceCornersInContourPolygon(4,2,true);
 
 		GrowQueue_I32 vertexes = new GrowQueue_I32();
 
@@ -92,17 +93,28 @@ public class TestFindQuadCornersInPolygon {
 		vertexes.add(addTo(contour,new Point2D_I32(28,9)));
 		addTo(contour, new Point2D_I32(30, 34));
 
-		alg.computeQuadrilateral(contour, vertexes);
+		alg.process(contour, vertexes);
 
-		Quadrilateral_F64 found = alg.getOutput();
+		Polygon2D_F64 found = alg.getOutput();
 
 		assertTrue(maxDistance(contour, found) < 1);
 	}
 
-	private double maxDistance( List<Point2D_I32> contour , Quadrilateral_F64 quad ) {
+
+	@Test
+	public void bubbleSortLines() {
+		fail("Implement");
+	}
+
+	@Test
+	public void checkPolygonCornerDistance() {
+		fail("Implement");
+	}
+
+	private double maxDistance( List<Point2D_I32> contour , Polygon2D_F64 poly ) {
 		double max = 0;
 		for( Point2D_I32 c : contour ) {
-			max = Math.max(max, distance(quad, new Point2D_F64(c.x, c.y)));
+			max = Math.max(max, distance(poly, new Point2D_F64(c.x, c.y)));
 		}
 		return max;
 	}

@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.shapes.quad;
+package boofcv.alg.shapes.polygon;
 
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.struct.image.ImageSingleBand;
@@ -27,14 +27,14 @@ import georegression.metric.Intersection2D_F64;
 import georegression.struct.line.LineGeneral2D_F64;
 import georegression.struct.line.LinePolar2D_F64;
 import georegression.struct.point.Point2D_F64;
-import georegression.struct.shapes.Quadrilateral_F64;
+import georegression.struct.shapes.Polygon2D_F64;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * <p>
- * Fits a quadrilateral to an image when given a good initial guess. The edges of the quadrilateral are assumed
+ * Fits a polygon to an image when given a good initial guess. The edges of the polygon are assumed
  * to be perfectly straight lines.  The edges are processed individually and fit to a line using weighted regression.
  * Both black squares with white backgrounds and white squares with black backgrounds can be found.
  * </p>
@@ -54,7 +54,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class RefineQuadrilateralLineToImage<T extends ImageSingleBand> {
+public class RefinePolygonLineToImage<T extends ImageSingleBand> {
 
 	// How far away from a corner will it sample the line
 	float lineBorder = 2.0f;
@@ -62,7 +62,7 @@ public class RefineQuadrilateralLineToImage<T extends ImageSingleBand> {
 	// number of times it will sample along the line
 	int lineSamples = 20;
 
-	// Determines the number of tangental points sampled at each point along the line.
+	// Determines the number of tangential points sampled at each point along the line.
 	// Total intensity values sampled is radius*2+2, and points added to line fitting is radius*2+1.
 	int sampleRadius = 1;
 
@@ -72,14 +72,14 @@ public class RefineQuadrilateralLineToImage<T extends ImageSingleBand> {
 	// convergence tolerance in pixels
 	private double convergeTolPixels = 0.01;
 
-	// used to determine if it's snapping to a black (1) or white(-1) quadrilateral
+	// used to determine if it's snapping to a black (1) or white(-1) shape
 	float sign;
 
 	//---------- storage for local work space
 	private LinePolar2D_F64 polar = new LinePolar2D_F64();
 	private LineGeneral2D_F64 general[]; // estimated line for each side
 	protected double weights[];// storage for weights in line fitting
-	private Quadrilateral_F64 previous = new Quadrilateral_F64();
+	private Polygon2D_F64 previous;
 	// storage for where the points that are sampled along the line
 	protected List<Point2D_F64> samplePts = new ArrayList<Point2D_F64>();
 	// temporary storage for sample image intensity values
@@ -94,10 +94,13 @@ public class RefineQuadrilateralLineToImage<T extends ImageSingleBand> {
 	/**
 	 * Constructor which provides full access to all parameters.  See code documents
 	 * value a description of these variables.
+	 *
+	 * @param numSides Number of sides on the polygon
 	 */
-	public RefineQuadrilateralLineToImage(float lineBorder, int lineSamples, int sampleRadius,
-										  int iterations, double convergeTolPixels, boolean fitBlack,
-										  InterpolatePixelS<T> interpolate) {
+	public RefinePolygonLineToImage(int numSides,
+									float lineBorder, int lineSamples, int sampleRadius,
+									int iterations, double convergeTolPixels, boolean fitBlack,
+									InterpolatePixelS<T> interpolate) {
 		this.lineBorder = lineBorder;
 		this.lineSamples = lineSamples;
 		this.sampleRadius = sampleRadius;
@@ -105,7 +108,9 @@ public class RefineQuadrilateralLineToImage<T extends ImageSingleBand> {
 		this.convergeTolPixels = convergeTolPixels;
 		this.interpolate = interpolate;
 
-		initialize(fitBlack);
+		previous = new Polygon2D_F64(numSides);
+
+		setup(fitBlack);
 	}
 
 	/**
@@ -113,15 +118,15 @@ public class RefineQuadrilateralLineToImage<T extends ImageSingleBand> {
 	 * @param fitBlack If true it's fitting a black square with a white background.  false is the inverse.
 	 * @param interpolate Interpolation class
 	 */
-	public RefineQuadrilateralLineToImage(boolean fitBlack, InterpolatePixelS<T> interpolate) {
+	public RefinePolygonLineToImage(boolean fitBlack, InterpolatePixelS<T> interpolate) {
 		this.interpolate = interpolate;
-		initialize(fitBlack);
+		setup(fitBlack);
 	}
 
 	/**
 	 * Declares data structures
 	 */
-	private void initialize( boolean fitBlack ) {
+	private void setup(boolean fitBlack) {
 		if( sampleRadius < 1 )
 			throw new IllegalArgumentException("If sampleRadius < 1 it won't do anything");
 
@@ -150,24 +155,54 @@ public class RefineQuadrilateralLineToImage<T extends ImageSingleBand> {
 	}
 
 	/**
-	 * Fits a quadrilateral to the contour given an initial set of candidate corners
+	 * Refines the fit a polygon by snapping it to the edges.
 	 *
-	 * @param input (input) Initial estimate for the quadrilateral. Vertexes must be in clockwise order.
-	 * @param output (output) the fitted quadrilateral
+	 * @param input (input) Initial estimate for the polygon. Vertexes must be in clockwise order.
+	 * @param output (output) the fitted polygon
 	 */
-	public boolean refine(Quadrilateral_F64 input, Quadrilateral_F64 output)
+	public boolean refine(Polygon2D_F64 input, Polygon2D_F64 output)
 	{
+		if( input.size() != previous.size() )
+			throw new IllegalArgumentException("Unexpected number of sides in the input polygon");
+		if( output.size() != previous.size() )
+			throw new IllegalArgumentException("Unexpected number of sides in the input polygon");
+
+
+		// sanity check input.  If it's too small this algorithm won't work
+		if( checkShapeTooSmall(input) )
+			return false;
+
 		// find center to use as local coordinate system.  Improves numerics slightly
-		UtilPolygons2D_F64.center(input,center);
+		UtilPolygons2D_F64.vertexAverage(input, center);
 
 		// estimate line equations
 		return optimize(input,output);
 	}
 
 	/**
+	 * Looks at the distance between each vertex.  If that distance is so small the edge can't be measured the
+	 * return true.
+	 * @param input polygon
+	 * @return true if too small or false if not
+	 */
+	private boolean checkShapeTooSmall(Polygon2D_F64 input) {
+		// must be longer than the border plus some small fudge factor
+		double minLength = lineBorder*2 + 2;
+		for (int i = 0; i < input.size(); i++) {
+			int j = (i+1)%input.size();
+			Point2D_F64 a = input.get(i);
+			Point2D_F64 b = input.get(j);
+			if( a.distance2(b) < minLength*minLength )
+				return true;
+		}
+
+		return false;
+	}
+
+	/**
 	 * Refines the initial line estimates using EM.  The number of iterations is fixed.
 	 */
-	protected boolean optimize(Quadrilateral_F64 seed , Quadrilateral_F64 current ) {
+	protected boolean optimize(Polygon2D_F64 seed , Polygon2D_F64 current ) {
 
 		previous.set(seed);
 
@@ -176,10 +211,12 @@ public class RefineQuadrilateralLineToImage<T extends ImageSingleBand> {
 
 		for (int EM = 0; EM < iterations; EM++) {
 			// snap each line to the edge independently.  Lines will be in local coordinates
-			optimize(previous.a,previous.b,general[0]);
-			optimize(previous.b,previous.c,general[1]);
-			optimize(previous.c,previous.d,general[2]);
-			optimize(previous.d,previous.a,general[3]);
+			for (int i = 0; i < previous.size(); i++) {
+				int j = (i + 1) % previous.size();
+				Point2D_F64 a = previous.get(i);
+				Point2D_F64 b = previous.get(j);
+				optimize(a,b,general[i]);
+			}
 
 			// Find the corners of the quadrilateral from the lines
 			if( !convert(general,current) )
@@ -189,10 +226,14 @@ public class RefineQuadrilateralLineToImage<T extends ImageSingleBand> {
 			localToImage(current);
 
 			// see if it has converged
-			if( current.a.distance2(previous.a) < convergeTol &&
-					current.b.distance2(previous.b) < convergeTol &&
-					current.c.distance2(previous.c) < convergeTol &&
-					current.d.distance2(previous.d) < convergeTol ) {
+			boolean converged = true;
+			for (int i = 0; i < current.size(); i++) {
+				if( current.get(i).distance2(previous.get(i)) > convergeTol ) {
+					converged = false;
+					break;
+				}
+ 			}
+			if( converged ) {
 				break;
 			} else {
 				previous.set(current);
@@ -205,15 +246,12 @@ public class RefineQuadrilateralLineToImage<T extends ImageSingleBand> {
 	/**
 	 * Converts the quad from local coordinates back into global coordinates
 	 */
-	private void localToImage(Quadrilateral_F64 current) {
-		current.a.x += center.x;
-		current.a.y += center.y;
-		current.b.x += center.x;
-		current.b.y += center.y;
-		current.c.x += center.x;
-		current.c.y += center.y;
-		current.d.x += center.x;
-		current.d.y += center.y;
+	private void localToImage(Polygon2D_F64 current) {
+		for (int i = 0; i < current.size(); i++) {
+			Point2D_F64 v = current.get(i);
+			v.x += center.x;
+			v.y += center.y;
+		}
 	}
 
 	/**
@@ -293,16 +331,29 @@ public class RefineQuadrilateralLineToImage<T extends ImageSingleBand> {
 	 *
 	 * @param lines Assumes lines are ordered
 	 */
-	protected static boolean convert( LineGeneral2D_F64[] lines , Quadrilateral_F64 quad ) {
+	protected static boolean convert( LineGeneral2D_F64[] lines , Polygon2D_F64 poly ) {
 
-		if( null == Intersection2D_F64.intersection(lines[0],lines[1],quad.b) )
-			return false;
-		if( null == Intersection2D_F64.intersection(lines[2],lines[1],quad.c) )
-			return false;
-		if( null == Intersection2D_F64.intersection(lines[2],lines[3],quad.d) )
-			return false;
-		if( null == Intersection2D_F64.intersection(lines[0],lines[3],quad.a) )
-			return false;
+		for (int i = 0; i < poly.size(); i++) {
+			int j = (i + 1) % poly.size();
+			if( null == Intersection2D_F64.intersection(lines[i],lines[j],poly.get(j)) )
+				return false;
+		}
+
 		return true;
+	}
+
+	/**
+	 * Returns the expected number of sides of the input polygon
+	 */
+	public int getNumberOfSides() {
+		return previous.size();
+	}
+
+	/**
+	 * True if it is fitting black to the image
+	 * @return
+	 */
+	public boolean isFitBlack() {
+		return sign < 0 ;
 	}
 }
