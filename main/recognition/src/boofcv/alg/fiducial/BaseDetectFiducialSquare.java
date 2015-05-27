@@ -29,7 +29,7 @@ import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.calibration.Zhang99DecomposeHomography;
 import boofcv.alg.geo.h.HomographyLinear4;
 import boofcv.alg.shapes.SplitMergeLineFitLoop;
-import boofcv.alg.shapes.quad.FitBinaryQuadrilateralEM;
+import boofcv.alg.shapes.polygon.FitBinaryQuadrilateralEM;
 import boofcv.core.image.border.BorderType;
 import boofcv.core.image.border.FactoryImageBorder;
 import boofcv.factory.distort.FactoryDistort;
