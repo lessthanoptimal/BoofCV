@@ -29,12 +29,13 @@ import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
 import boofcv.testing.BoofTesting;
 import georegression.geometry.UtilLine2D_F64;
+import georegression.geometry.UtilPolygons2D_F64;
 import georegression.metric.Distance2D_F64;
 import georegression.struct.affine.Affine2D_F64;
 import georegression.struct.line.LineGeneral2D_F64;
-import georegression.struct.line.LineSegment2D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.se.Se2_F64;
+import georegression.struct.shapes.Polygon2D_F64;
 import georegression.struct.shapes.Quadrilateral_F64;
 import georegression.transform.ConvertTransform_F64;
 import georegression.transform.affine.AffinePointOps_F64;
@@ -72,18 +73,14 @@ public class TestRefinePolygonLineToImage {
 	public void fit_tooSmall() {
 		final boolean black = true;
 
-		Quadrilateral_F64 input = new Quadrilateral_F64();
-		input.a.set(5,5);
-		input.b.set(5,6);
-		input.c.set(6,6);
-		input.d.set(6,5);
+		Polygon2D_F64 input = new Polygon2D_F64(5,5, 5,6, 6,6, 6,5);
 
 		for (Class imageType : imageTypes) {
 			setup(new Affine2D_F64(), black, imageType);
 
-			RefinePolygonLineToImage alg = createAlg(black, imageType);
+			RefinePolygonLineToImage alg = createAlg(input.size(),black, imageType);
 
-			Quadrilateral_F64 output = new Quadrilateral_F64();
+			Polygon2D_F64 output = new Polygon2D_F64(input.size());
 			alg.initialize(image);
 			assertFalse(alg.refine(input, output));
 		}
@@ -96,28 +93,24 @@ public class TestRefinePolygonLineToImage {
 	public void fit_subimage() {
 		final boolean black = true;
 
-		Quadrilateral_F64 input = new Quadrilateral_F64();
-		input.a.set(x0,y0);
-		input.b.set(x0,yy1);
-		input.c.set(xx1,yy1);
-		input.d.set(xx1,y0);
+		Polygon2D_F64 input = new Polygon2D_F64(x0,y0 , x0,yy1, xx1,yy1, xx1,y0);
 
 		for (Class imageType : imageTypes) {
 			setup(new Affine2D_F64(), black, imageType);
 
-			RefinePolygonLineToImage alg = createAlg(black, imageType);
+			RefinePolygonLineToImage alg = createAlg(input.size(),black, imageType);
 
-			Quadrilateral_F64 output = new Quadrilateral_F64();
+			Polygon2D_F64 output = new Polygon2D_F64(4);
 			alg.initialize(image);
 			assertTrue(alg.refine(input, output));
 
 			// do it again with a sub-image
-			Quadrilateral_F64 output2 = new Quadrilateral_F64();
+			Polygon2D_F64 output2 = new Polygon2D_F64(4);
 			image = BoofTesting.createSubImageOf_S(image);
 			alg.initialize(image);
 			assertTrue(alg.refine(input, output2));
 
-			assertTrue(output.isEquals(output2,1e-8));
+			assertTrue(UtilPolygons2D_F64.isIdentical(output, output2, 1e-8));
 		}
 	}
 
@@ -127,11 +120,7 @@ public class TestRefinePolygonLineToImage {
 	 */
 	@Test
 	public void alignedSquare() {
-		Quadrilateral_F64 original = new Quadrilateral_F64();
-		original.a.set(x0,y0);
-		original.b.set(x0,yy1);
-		original.c.set(xx1,yy1);
-		original.d.set(xx1,y0);
+		Polygon2D_F64 original = new Polygon2D_F64(x0,y0 , x0,yy1, xx1,yy1, xx1,y0);
 
 		for (Class imageType : imageTypes) {
 			for (int i = 0; i < 2; i++) {
@@ -139,17 +128,17 @@ public class TestRefinePolygonLineToImage {
 
 				setup(new Affine2D_F64(), black, imageType);
 
-				RefinePolygonLineToImage alg = createAlg(black, imageType);
+				RefinePolygonLineToImage alg = createAlg(original.size(),black, imageType);
 
 				for (int j = 0; j < 20; j++) {
-					Quadrilateral_F64 input = original.copy();
+					Polygon2D_F64 input = original.copy();
 					addNoise(input,2);
 
-					Quadrilateral_F64 output = new Quadrilateral_F64();
+					Polygon2D_F64 output = new Polygon2D_F64(original.size());
 					alg.initialize(image);
 					assertTrue(alg.refine(input, output));
 
-					assertTrue(original.isEquals(output, 0.01));
+					assertTrue(original.isIdentical(output, 0.01));
 				}
 			}
 		}
@@ -178,31 +167,31 @@ public class TestRefinePolygonLineToImage {
 	public void fit_perfect_affine(boolean black, Affine2D_F64 affine, Class imageType) {
 		setup(affine, black, imageType);
 
-		RefinePolygonLineToImage alg = createAlg(black, imageType);
+		RefinePolygonLineToImage alg = createAlg(4,black, imageType);
 
-		Quadrilateral_F64 input = new Quadrilateral_F64();
-		AffinePointOps_F64.transform(affine,new Point2D_F64(x0,y0),input.a);
-		AffinePointOps_F64.transform(affine,new Point2D_F64(x0,yy1),input.b);
-		AffinePointOps_F64.transform(affine,new Point2D_F64(xx1,yy1),input.c);
-		AffinePointOps_F64.transform(affine,new Point2D_F64(xx1,y0),input.d);
+		Polygon2D_F64 input = new Polygon2D_F64(4);
+		AffinePointOps_F64.transform(affine,new Point2D_F64(x0,y0),input.get(0));
+		AffinePointOps_F64.transform(affine,new Point2D_F64(x0,yy1),input.get(1));
+		AffinePointOps_F64.transform(affine,new Point2D_F64(xx1,yy1),input.get(2));
+		AffinePointOps_F64.transform(affine,new Point2D_F64(xx1,y0),input.get(3));
 
-		Quadrilateral_F64 expected = input.copy();
-		Quadrilateral_F64 found = new Quadrilateral_F64();
+		Polygon2D_F64 expected = input.copy();
+		Polygon2D_F64 found = new Polygon2D_F64(4);
 
 		alg.initialize(image);
 		assertTrue(alg.refine(input, found));
 
 		// input shouldn't be modified
-		checkEquals(expected, input, 0);
+		assertTrue(expected.isIdentical(input,0));
 		// should be close to the expected
-		checkEquals(expected, found, 0.25 );
+		assertTrue(expected.isIdentical(found,0.25));
 
 		// do it again with a sub-image to see if it handles that
 		image = BoofTesting.createSubImageOf_S(image);
 		alg.initialize(image);
 		assertTrue(alg.refine(input, found));
-		checkEquals(expected, input, 0);
-		checkEquals(expected, found, 0.25 );
+		assertTrue(expected.isIdentical(input,0));
+		assertTrue(expected.isIdentical(found,0.25));
 	}
 
 	/**
@@ -228,16 +217,16 @@ public class TestRefinePolygonLineToImage {
 	public void fit_noisy_affine(boolean black, Affine2D_F64 affine, Class imageType) {
 		setup(affine, black, imageType);
 
-		RefinePolygonLineToImage alg = createAlg(black, imageType);
+		RefinePolygonLineToImage alg = createAlg(4,black, imageType);
 
-		Quadrilateral_F64 input = new Quadrilateral_F64();
-		AffinePointOps_F64.transform(affine,new Point2D_F64(x0,y0),input.a);
-		AffinePointOps_F64.transform(affine,new Point2D_F64(x0,yy1),input.b);
-		AffinePointOps_F64.transform(affine,new Point2D_F64(xx1,yy1),input.c);
-		AffinePointOps_F64.transform(affine,new Point2D_F64(xx1,y0),input.d);
+		Polygon2D_F64 input = new Polygon2D_F64(4);
+		AffinePointOps_F64.transform(affine,new Point2D_F64(x0,y0),input.get(0));
+		AffinePointOps_F64.transform(affine,new Point2D_F64(x0,yy1),input.get(1));
+		AffinePointOps_F64.transform(affine,new Point2D_F64(xx1,yy1),input.get(2));
+		AffinePointOps_F64.transform(affine,new Point2D_F64(xx1,y0),input.get(3));
 
-		Quadrilateral_F64 expected = input.copy();
-		Quadrilateral_F64 found = new Quadrilateral_F64();
+		Polygon2D_F64 expected = input.copy();
+		Polygon2D_F64 found = new Polygon2D_F64(4);
 
 		for (int i = 0; i < 10; i++) {
 			// add some noise
@@ -252,24 +241,21 @@ public class TestRefinePolygonLineToImage {
 			double after = computeMaxDistance(found,expected);
 
 			assertTrue(after<before);
-			checkEquals(expected, found, 0.5);
+			assertTrue(expected.isIdentical(found,0.5));
 		}
 	}
 
-	private void addNoise(Quadrilateral_F64 input, double spread) {
-		input.a.x += rand.nextDouble()*spread - spread/2.0;
-		input.a.y += rand.nextDouble()*spread - spread/2.0;
-		input.b.x += rand.nextDouble()*spread - spread/2.0;
-		input.b.y += rand.nextDouble()*spread - spread/2.0;
-		input.c.x += rand.nextDouble()*spread - spread/2.0;
-		input.c.y += rand.nextDouble()*spread - spread/2.0;
-		input.d.x += rand.nextDouble()*spread - spread/2.0;
-		input.d.y += rand.nextDouble()*spread - spread/2.0;
+	private void addNoise(Polygon2D_F64 input, double spread) {
+		for (int i = 0; i < input.size(); i++) {
+			Point2D_F64 v = input.get(i);
+			v.x += rand.nextDouble()*spread - spread/2.0;
+			v.y += rand.nextDouble()*spread - spread/2.0;
+		}
 	}
 
-	private RefinePolygonLineToImage createAlg(boolean black, Class imageType) {
+	private RefinePolygonLineToImage createAlg( int numSides , boolean black, Class imageType) {
 		InterpolatePixelS interp = FactoryInterpolation.createPixelS(0, 255, TypeInterpolate.BILINEAR, imageType);
-		return new RefinePolygonLineToImage(black,interp);
+		return new RefinePolygonLineToImage(numSides,black,interp);
 //		return new RefineQuadrilateralToImage(2,20,2,10,0.01,black,interp);
 	}
 
@@ -287,7 +273,7 @@ public class TestRefinePolygonLineToImage {
 	public void optimize_line_perfect(boolean black, Class imageType) {
 		setup(null, black, imageType);
 
-		RefinePolygonLineToImage alg = createAlg(black, imageType);
+		RefinePolygonLineToImage alg = createAlg(4,black, imageType);
 
 		Quadrilateral_F64 input = new Quadrilateral_F64(x0,y0,x0,y1,x1,y1,x1,y0);
 		LineGeneral2D_F64 found = new LineGeneral2D_F64();
@@ -299,20 +285,13 @@ public class TestRefinePolygonLineToImage {
 		assertTrue(Distance2D_F64.distance(found, input.b) <= 1e-4);
 	}
 
-	private void checkEquals(Quadrilateral_F64 expected, Quadrilateral_F64 found, double tol) {
-		assertTrue(expected.a.distance(found.a)<=tol);
-		assertTrue(expected.b.distance(found.b)<=tol);
-		assertTrue(expected.c.distance(found.c)<=tol);
-		assertTrue(expected.d.distance(found.d)<=tol);
-	}
+	private double computeMaxDistance(Polygon2D_F64 expected, Polygon2D_F64 found ) {
+		double a = 0;
+		for (int i = 0; i < expected.size(); i++) {
+			a = max(a,expected.get(i).distance(found.get(i)));
+		}
 
-	private double computeMaxDistance(Quadrilateral_F64 expected, Quadrilateral_F64 found ) {
-		double a = expected.a.distance(found.a);
-		double b = expected.b.distance(found.b);
-		double c = expected.c.distance(found.c);
-		double d = expected.d.distance(found.d);
-
-		return max(max(max(a, b),c),d);
+		return a;
 	}
 
 	/**
@@ -329,7 +308,7 @@ public class TestRefinePolygonLineToImage {
 	public void computePointsAndWeights( boolean black , Class imageType ) {
 		setup(null,black,imageType);
 
-		RefinePolygonLineToImage alg = createAlg(black, imageType);
+		RefinePolygonLineToImage alg = createAlg(4,black, imageType);
 
 		float H = y1-y0-10;
 
@@ -360,18 +339,18 @@ public class TestRefinePolygonLineToImage {
 
 	@Test
 	public void convert() {
-		Quadrilateral_F64 orig = new Quadrilateral_F64(10,20,30,21,19.5,-10,8,-8);
+		Polygon2D_F64 orig = new Polygon2D_F64(10,20,30,21,19.5,-10,8,-8);
 
 		LineGeneral2D_F64[] lines = new LineGeneral2D_F64[4];
-		lines[0] = UtilLine2D_F64.convert(new LineSegment2D_F64(orig.a,orig.b),(LineGeneral2D_F64)null);
-		lines[1] = UtilLine2D_F64.convert(new LineSegment2D_F64(orig.b,orig.c),(LineGeneral2D_F64)null);
-		lines[2] = UtilLine2D_F64.convert(new LineSegment2D_F64(orig.c,orig.d),(LineGeneral2D_F64)null);
-		lines[3] = UtilLine2D_F64.convert(new LineSegment2D_F64(orig.d,orig.a),(LineGeneral2D_F64)null);
+		lines[0] = UtilLine2D_F64.convert(orig.getLine(0,null),(LineGeneral2D_F64)null);
+		lines[1] = UtilLine2D_F64.convert(orig.getLine(1,null),(LineGeneral2D_F64)null);
+		lines[2] = UtilLine2D_F64.convert(orig.getLine(2,null),(LineGeneral2D_F64)null);
+		lines[3] = UtilLine2D_F64.convert(orig.getLine(3,null),(LineGeneral2D_F64)null);
 
-		Quadrilateral_F64 found = new Quadrilateral_F64();
-		RefinePolygonLineToImage.convert(lines, found);
+		Polygon2D_F64 found = new Polygon2D_F64(4);
+		assertTrue(RefinePolygonLineToImage.convert(lines, found));
 
-		checkEquals(orig, found, 1e-8);
+		assertTrue(orig.isIdentical(found, 1e-8));
 	}
 
 	private void setup( Affine2D_F64 affine, boolean black , Class imageType ) {

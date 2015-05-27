@@ -115,11 +115,13 @@ public class RefinePolygonLineToImage<T extends ImageSingleBand> {
 
 	/**
 	 * Simplified constructor which uses reasonable default values for most variables
+	 * @param numSides Number of sides on the polygon
 	 * @param fitBlack If true it's fitting a black square with a white background.  false is the inverse.
 	 * @param interpolate Interpolation class
 	 */
-	public RefinePolygonLineToImage(boolean fitBlack, InterpolatePixelS<T> interpolate) {
+	public RefinePolygonLineToImage(int numSides , boolean fitBlack, InterpolatePixelS<T> interpolate) {
 		this.interpolate = interpolate;
+		previous = new Polygon2D_F64(numSides);
 		setup(fitBlack);
 	}
 
