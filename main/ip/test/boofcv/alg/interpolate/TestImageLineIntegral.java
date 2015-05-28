@@ -25,7 +25,6 @@ import org.junit.Test;
 
 import static java.lang.Math.sqrt;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
@@ -113,10 +112,10 @@ public class TestImageLineIntegral {
 		alg.setImage(img);
 
 		checkSolution(0.5, 0, 0.5, 0.5, 50);
-		checkSolution(9.5, 14.5, 9.5, 14.999, (14.999-14.5)*120);
+		checkSolution(9.5, 14.5, 9.5, 15, 0.5*120);
 
 		checkSolution(0, 0.5, 0.5, 0.5, 50);
-		checkSolution(9.5, 14.5, 9.999, 14.5, (9.999-9.5)*120);
+		checkSolution(9.5, 14.5, 10.0, 14.5, 0.5*120);
 	}
 
 	/**
@@ -182,8 +181,22 @@ public class TestImageLineIntegral {
 	 * See if it handles borders correctly with both slopes are not zero
 	 */
 	@Test
-	public void border_nonZero() {
-		fail("implement");
+	public void nearBorder_nonZero() {
+		ImageUInt8 img = new ImageUInt8(2,2);
+		img.set(0,0,100);
+		img.set(0,1,200);
+		img.set(1,0,140);
+		img.set(1,1,150);
+
+		alg.setImage(img);
+
+		checkSolution(0, 0, 2, 2, sqrt(2) * (100+150));
+		checkSolution(2, 0, 0, 2, sqrt(2) * (200+140));
+
+		// two squares horizontal and vertical
+		double r = Math.sqrt(1+4)/2;
+		checkSolution(0, 0, 2, 1, r * (100+140));
+		checkSolution(0, 0, 1, 2, r * (100+200));
 	}
 
 	private void checkSolution(double x0, double y0, double x1, double y1, double expected) {

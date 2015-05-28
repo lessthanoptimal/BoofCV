@@ -113,7 +113,8 @@ public class ImageLineIntegral<Image extends ImageSingleBand> {
 
 			t /= (slopeX+slopeY);
 			if (t > 1) t = 1;
-			sum += t * image.unsafe_getD(px, py);
+			if( t > 0 )
+				sum += t * image.unsafe_getD(px, py);
 			double deltaT = (sgnX+sgnY)/ (slopeX+slopeY);
 
 			while (t < 1) {
@@ -135,7 +136,8 @@ public class ImageLineIntegral<Image extends ImageSingleBand> {
 
 			double t = Math.min(deltaTX,deltaTY);
 			if (t > 1) t = 1;
-			sum += t * image.unsafe_getD(px, py);
+			if( t > 0 )
+				sum += t * image.unsafe_getD(px, py);
 
 			double x = x0 + t*slopeX;
 			double y = y0 + t*slopeY;
