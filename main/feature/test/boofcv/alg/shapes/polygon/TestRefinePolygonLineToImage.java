@@ -60,7 +60,6 @@ public class TestRefinePolygonLineToImage {
 
 	int x0 = 200, y0 = 160;
 	int x1 = 260, y1 = 400; // that's exclusive
-	int xx1 = x1-1, yy1 = y1-1; // inclusive location, this is where the estimate will actually end
 
 	int white = 200;
 
@@ -93,7 +92,7 @@ public class TestRefinePolygonLineToImage {
 	public void fit_subimage() {
 		final boolean black = true;
 
-		Polygon2D_F64 input = new Polygon2D_F64(x0,y0 , x0,yy1, xx1,yy1, xx1,y0);
+		Polygon2D_F64 input = new Polygon2D_F64(x0,y0 , x0,y1, x1,y1, x1,y0);
 
 		for (Class imageType : imageTypes) {
 			setup(new Affine2D_F64(), black, imageType);
@@ -120,7 +119,7 @@ public class TestRefinePolygonLineToImage {
 	 */
 	@Test
 	public void alignedSquare() {
-		Polygon2D_F64 original = new Polygon2D_F64(x0,y0 , x0,yy1, xx1,yy1, xx1,y0);
+		Polygon2D_F64 original = new Polygon2D_F64(x0,y0 , x0,y1, x1,y1, x1,y0);
 
 		for (Class imageType : imageTypes) {
 			for (int i = 0; i < 2; i++) {
@@ -171,9 +170,9 @@ public class TestRefinePolygonLineToImage {
 
 		Polygon2D_F64 input = new Polygon2D_F64(4);
 		AffinePointOps_F64.transform(affine,new Point2D_F64(x0,y0),input.get(0));
-		AffinePointOps_F64.transform(affine,new Point2D_F64(x0,yy1),input.get(1));
-		AffinePointOps_F64.transform(affine,new Point2D_F64(xx1,yy1),input.get(2));
-		AffinePointOps_F64.transform(affine,new Point2D_F64(xx1,y0),input.get(3));
+		AffinePointOps_F64.transform(affine,new Point2D_F64(x0,y1),input.get(1));
+		AffinePointOps_F64.transform(affine,new Point2D_F64(x1,y1),input.get(2));
+		AffinePointOps_F64.transform(affine,new Point2D_F64(x1,y0),input.get(3));
 
 		Polygon2D_F64 expected = input.copy();
 		Polygon2D_F64 found = new Polygon2D_F64(4);
@@ -221,9 +220,9 @@ public class TestRefinePolygonLineToImage {
 
 		Polygon2D_F64 input = new Polygon2D_F64(4);
 		AffinePointOps_F64.transform(affine,new Point2D_F64(x0,y0),input.get(0));
-		AffinePointOps_F64.transform(affine,new Point2D_F64(x0,yy1),input.get(1));
-		AffinePointOps_F64.transform(affine,new Point2D_F64(xx1,yy1),input.get(2));
-		AffinePointOps_F64.transform(affine,new Point2D_F64(xx1,y0),input.get(3));
+		AffinePointOps_F64.transform(affine,new Point2D_F64(x0,y1),input.get(1));
+		AffinePointOps_F64.transform(affine,new Point2D_F64(x1,y1),input.get(2));
+		AffinePointOps_F64.transform(affine,new Point2D_F64(x1,y0),input.get(3));
 
 		Polygon2D_F64 expected = input.copy();
 		Polygon2D_F64 found = new Polygon2D_F64(4);

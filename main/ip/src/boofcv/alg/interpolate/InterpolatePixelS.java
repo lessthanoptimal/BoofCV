@@ -29,7 +29,7 @@ import boofcv.struct.image.ImageSingleBand;
 public interface InterpolatePixelS<T extends ImageSingleBand> extends InterpolatePixel<T> {
 
 	/**
-	 * Interpolates using the border class.  This is the slowest interpoaltion method provided.
+	 * Interpolates using the border class.  This is the slowest interpolation method provided.
 	 * @param x Point's x-coordinate. Can be outside the image.
 	 * @param y Point's y-coordinate. Can be outside the image.
 	 * @return Interpolated intensity value

@@ -34,10 +34,16 @@ import java.util.List;
 
 /**
  * <p>
- * Fits a polygon to an image when given a good initial guess. The edges of the polygon are assumed
- * to be perfectly straight lines.  The edges are processed individually and fit to a line using weighted regression.
- * Both black squares with white backgrounds and white squares with black backgrounds can be found.
+ * Fits a polygon the edge of a shape inside an image when given a good initial guess. The edges of the polygon are
+ * assumed to be perfectly straight lines.  The edges are processed individually and fit to a line using weighted
+ * regression. Both black squares with white backgrounds and white squares with black backgrounds can be found.
+ * The edges are selected such that they will contain the entire black/white shape.
  * </p>
+ * <p>
+ * For example, assume an image axis aligned rectangle lower extent of 1,2 and a upper extent of 12,15, is
+ * entirely filled, excluding the upper extent (as is typical).  Then the found lower and upper extends of the
+ * found polygon will also be 1,2 and 12,15.
+ * <p>
  * <p>
  * The weight of each sample point is determined by the intensity difference between it and a point 1 pixel to its
  * left.  Points are sampled along the line and tangentially from each of those points along the line.
