@@ -21,7 +21,6 @@ package boofcv.alg.shapes.polygon;
 import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.alg.filter.binary.Contour;
 import boofcv.alg.filter.binary.LinearContourLabelChang2004;
-import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.shapes.SplitMergeLineFitLoop;
 import boofcv.alg.shapes.corner.SubpixelSparseCornerFit;
 import boofcv.struct.ConnectRule;
@@ -55,11 +54,6 @@ import java.util.List;
  * The last step assumes that the lines of the shape are straight.  This is a reasonable assumption
  * when lens distortion has been removed.  The other steps are fairly tolerant to distortion.
  *
- * <p>
- * Tuning Tips:<br>
- * {@link #setContourFracDistance(double)}: Set to a higher number to make it less strict for what it considers a shape.
- * </p>
- *
  * TODO discuss subpixel
  *
  * <p>
@@ -74,14 +68,14 @@ public class BinaryPolygonConvexDetector<T extends ImageSingleBand> {
 	// Converts the input image into a binary one
 	private InputToBinary<T> thresholder;
 
-	// maximum distance along the contour a point can be from a side can be from
-	// actually a fractional distance based on contour size
-	private double contourFracDistance = 0.1;
+	// private maximum distance a point can deviate from the edge of the contour and not
+	// cause a new line to formed as a fraction of the contour's size
+	private double splitDistanceFraction;
 
-	// minimum size of a shape's contour
+	// minimum size of a shape's contour as a fraction of the image width
 	private double minContourFraction;
-	private int minimumContour;
-	private double minimumArea;
+	private int minimumContour; // this is image.width*minContourFraction
+	private double minimumArea; // computed from minimumContour
 
 	// Storage for the binary image
 	private ImageUInt8 binary = new ImageUInt8(1,1);
@@ -93,12 +87,12 @@ public class BinaryPolygonConvexDetector<T extends ImageSingleBand> {
 	private SplitMergeLineFitLoop fitPolygon;
 
 	// converts the polygon into a quadrilateral
-	private ReduceCornersInContourPolygon reduceSides;
+//	private ReduceCornersInContourPolygon reduceSides;
 
 	// Refines the estimate of the polygon's lines using a subpixel technique
-	private RefinePolygonLineToImage refineLine;
+	private RefinePolygonLineToImage<T> refineLine;
 	// Refines the estimate of the polygon's corners using a subpixel technique
-	private SubpixelSparseCornerFit refineCorner;
+	private SubpixelSparseCornerFit<T> refineCorner;
 
 	// List of all squares that it finds
 	private FastQueue<Polygon2D_F64> found;
@@ -106,47 +100,55 @@ public class BinaryPolygonConvexDetector<T extends ImageSingleBand> {
 	// type of input image
 	private Class<T> inputType;
 
+	// number of lines in the polygon
+	private int polyNumberOfLines;
+
+	// work space for initial polygon
+	private Polygon2D_F64 workPoly = new Polygon2D_F64();
+
 	/**
 	 * Configures the detector.
 	 *
-	 * @param numLines Number of lines in the polygon
+	 * @param polygonSides Number of lines in the polygon
 	 * @param thresholder Converts the input image into a binary one
-	 * @param interp Interpolation used when refining the edge estimate
-	 * @param coursePolygon Provides a crude polygon fit around a shape
+	 * @param contourToPolygon Fits a crude polygon to the shape's binary contour
 	 * @param refineLine Refines the polygon's lines.  Set to null to skip step
 	 * @param refineCorner Refines the polygon's corners.  Set to null to skip step
 	 * @param minContourFraction Size of minimum contour as a fraction of the input image's width.  Try 0.23
+	 * @param splitDistanceFraction Number of pixels as a fraction of contour length to split a new line in
+	 *                             SplitMergeLineFitLoop.  Try 0.04
 	 * @param inputType Type of input image it's processing
 	 */
-	protected BinaryPolygonConvexDetector(final int numLines,
+	protected BinaryPolygonConvexDetector(final int polygonSides,
 										  InputToBinary<T> thresholder,
-										  InterpolatePixelS<T> interp,
-										  SplitMergeLineFitLoop coursePolygon,
-										  RefinePolygonLineToImage refineLine,
-										  SubpixelSparseCornerFit refineCorner,
+										  SplitMergeLineFitLoop contourToPolygon,
+										  RefinePolygonLineToImage<T> refineLine,
+										  SubpixelSparseCornerFit<T> refineCorner,
 										  double minContourFraction,
+										  double splitDistanceFraction,
 										  Class<T> inputType) {
 
 		if( refineLine != null ) {
-			if (numLines != refineLine.getNumberOfSides())
-				throw new IllegalArgumentException("Miss match between lines with refineLine");
+			if (polygonSides != refineLine.getNumberOfSides())
+				throw new IllegalArgumentException("Miss matched number of lines with refineLine");
 			this.refineLine = refineLine;
 		}
 		if( refineCorner != null ) {
 			this.refineCorner = refineCorner;
 		}
 
+		this.polyNumberOfLines = polygonSides;
 		this.thresholder = thresholder;
 		this.inputType = inputType;
 		this.minContourFraction = minContourFraction;
-		this.fitPolygon = coursePolygon;
+		this.fitPolygon = contourToPolygon;
+		this.splitDistanceFraction = splitDistanceFraction;
 
-		reduceSides = new ReduceCornersInContourPolygon(numLines,6,true);
-
+		workPoly = new Polygon2D_F64(polygonSides);
 		found = new FastQueue<Polygon2D_F64>(Polygon2D_F64.class,true) {
 			@Override
 			protected Polygon2D_F64 createInstance() {
-				return new Polygon2D_F64(numLines);
+				return new Polygon2D_F64(polygonSides);
 			}
 		};
 	}
@@ -158,6 +160,7 @@ public class BinaryPolygonConvexDetector<T extends ImageSingleBand> {
 	 * @param height Height of the input image
 	 *
 	 */
+	// TODO move to process
 	public void configure( int width , int height ) {
 
 		// resize storage images
@@ -183,14 +186,14 @@ public class BinaryPolygonConvexDetector<T extends ImageSingleBand> {
 		thresholder.process(gray, binary);
 
 		// Find quadrilaterals that could be fiducials
-		findCandidateShapes();
+		findCandidateShapes(gray);
 	}
 
 	/**
 	 * Finds blobs in the binary image.  Then looks for blobs that meet size and shape requirements.  See code
 	 * below for the requirements.  Those that remain are considered to be target candidates.
 	 */
-	private void findCandidateShapes() {
+	private void findCandidateShapes( T gray ) {
 		// find binary blobs
 		contourFinder.process(binary, labeled);
 
@@ -204,50 +207,72 @@ public class BinaryPolygonConvexDetector<T extends ImageSingleBand> {
 				if( touchesBorder(c.external))
 					continue;
 
+				// dynamically set split distance based on polygon's size
+				double splitTolerance = splitDistanceFraction*c.external.size();
+				fitPolygon.setToleranceSplit(splitTolerance);
 				fitPolygon.process(c.external);
 
 				GrowQueue_I32 splits = fitPolygon.getSplits();
 
-				double maxDistance = contourFracDistance*c.external.size()/reduceSides.getNumberOfSides();
-				reduceSides.setMaximumDistance(maxDistance);
+				// only accept polygons with the expected number of sides
+				if( splits.size() != polyNumberOfLines )
+					continue;
 
-				if( reduceSides.process(c.external, splits) ) {
-					Polygon2D_F64 q = reduceSides.getOutput();
-
-					// this only supports convex polygons
-					if( !UtilPolygons2D_F64.isConvex(q))
-						continue;
-
-					// make sure it's big enough
-					double area = Area2D_F64.polygonConvex(q);
-					if( area < minimumArea )
-						continue;
-
-					// refine the estimate
-					Polygon2D_F64 refined = found.grow();
-
-					boolean failed = false;
-
-					if( refineCorner != null ) {
-						if( !refinePolygonCorners(q,refined) )
-							failed = true;
-					}
-					if( !failed && refineLine != null ) {
-						if( !refineLine.refine(q, refined) ) {
-							failed = true;
-						}
-					}
-					// or don't refine the estimate
-					if( refineCorner == null && refineLine == null ) {
-						refined.set(q);
-					}
-
-					// if it failed, discard
-					if( failed ) {
-						found.removeTail();
-					}
+				// convert the format of the initial crude polygon
+				for (int j = 0; j < polyNumberOfLines; j++) {
+					Point2D_I32 p = c.external.get( splits.get(j));
+					workPoly.get(j).set(p.x,p.y);
 				}
+
+				if( workPoly.isCCW() ) {
+					UtilPolygons2D_F64.reverseOrder(workPoly);
+				}
+				// this only supports convex polygons
+				if( !UtilPolygons2D_F64.isConvex(workPoly))
+					continue;
+
+				// make sure it's big enough
+				double area = Area2D_F64.polygonConvex(workPoly);
+				if( area < minimumArea )
+					continue;
+
+				// refine the polygon and add it to the found list
+				refinePolygon(gray);
 			}
+		}
+	}
+
+	/**
+	 * Refine using corner then line or any combination, including none.  Put into list
+	 * of found polygons if nothing goe wrong.
+	 */
+	private void refinePolygon( T gray ) {
+		// refine the estimate
+		Polygon2D_F64 refined = found.grow();
+		refined.set(workPoly);
+
+		boolean failed = false;
+
+		if( refineCorner != null ) {
+			refineCorner.initialize(gray);
+			if( !refinePolygonCorners(workPoly,refined) )
+				failed = true;
+		}
+		if( !failed && refineLine != null ) {
+			refineLine.initialize(gray);
+			workPoly.set(refined);
+			if( !refineLine.refine(workPoly, refined) ) {
+				failed = true;
+			}
+		}
+		// or don't refine the estimate
+		if( refineCorner == null && refineLine == null ) {
+			refined.set(workPoly);
+		}
+
+		// if it failed, discard
+		if( failed ) {
+			found.removeTail();
 		}
 	}
 
@@ -282,16 +307,8 @@ public class BinaryPolygonConvexDetector<T extends ImageSingleBand> {
 		return false;
 	}
 
-	/**
-	 * Fractions of the average length of a side a point is allowed to be from any side
-	 * @return contourFracDistance
-	 */
-	public double getContourFracDistance() {
-		return contourFracDistance;
-	}
-
-	public void setContourFracDistance(double contourFracDistance) {
-		this.contourFracDistance = contourFracDistance;
+	public FastQueue<Polygon2D_F64> getFound() {
+		return found;
 	}
 
 	public ImageUInt8 getBinary() {

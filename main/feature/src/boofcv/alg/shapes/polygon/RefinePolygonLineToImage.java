@@ -68,7 +68,7 @@ public class RefinePolygonLineToImage<T extends ImageSingleBand> {
 	int sampleRadius = 1;
 
 	// maximum number of iterations
-	private int iterations = 10;
+	private int maxIterations = 10;
 
 	// convergence tolerance in pixels
 	private double convergeTolPixels = 0.01;
@@ -100,12 +100,15 @@ public class RefinePolygonLineToImage<T extends ImageSingleBand> {
 	 */
 	public RefinePolygonLineToImage(int numSides,
 									double lineBorder, int lineSamples, int sampleRadius,
-									int iterations, double convergeTolPixels, boolean fitBlack,
+									int maxIterations, double convergeTolPixels, boolean fitBlack,
 									Class<T> imageType ) {
+		if( sampleRadius < 1 )
+			throw new IllegalArgumentException("Sample radius must be >= 1 to work");
+
 		this.lineBorder = lineBorder;
 		this.lineSamples = lineSamples;
 		this.sampleRadius = sampleRadius;
-		this.iterations = iterations;
+		this.maxIterations = maxIterations;
 		this.convergeTolPixels = convergeTolPixels;
 		this.integral = new ImageLineIntegral<T>(imageType);
 
@@ -209,7 +212,7 @@ public class RefinePolygonLineToImage<T extends ImageSingleBand> {
 		// pixels squares is faster to compute
 		double convergeTol = convergeTolPixels*convergeTolPixels;
 
-		for (int EM = 0; EM < iterations; EM++) {
+		for (int iteration = 0; iteration < maxIterations; iteration++) {
 			// snap each line to the edge independently.  Lines will be in local coordinates
 			for (int i = 0; i < previous.size(); i++) {
 				int j = (i + 1) % previous.size();
@@ -234,6 +237,7 @@ public class RefinePolygonLineToImage<T extends ImageSingleBand> {
 				}
  			}
 			if( converged ) {
+//				System.out.println("Converged early at "+iteration);
 				break;
 			} else {
 				previous.set(current);

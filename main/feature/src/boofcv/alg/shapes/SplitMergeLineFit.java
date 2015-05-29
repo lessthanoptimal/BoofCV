@@ -83,9 +83,9 @@ public abstract class SplitMergeLineFit {
 							 double toleranceMerge,
 							 int maxIterations)
 	{
-		this.toleranceSplitSq = toleranceSplit*toleranceSplit;
-		this.toleranceMerge = toleranceMerge;
-		this.maxIterations = maxIterations;
+		setToleranceSplit(toleranceSplit);
+		setToleranceMerge(toleranceMerge);
+		setMaxIterations(maxIterations);
 	}
 
 	/**
@@ -120,5 +120,17 @@ public abstract class SplitMergeLineFit {
 	 */
 	public GrowQueue_I32 getSplits() {
 		return splits;
+	}
+
+	public void setMaxIterations(int maxIterations) {
+		this.maxIterations = maxIterations;
+	}
+
+	public void setToleranceSplit(double toleranceSplit) {
+		this.toleranceSplitSq = toleranceSplit*toleranceSplit;
+	}
+
+	public void setToleranceMerge(double toleranceMerge) {
+		this.toleranceMerge = toleranceMerge;
 	}
 }
