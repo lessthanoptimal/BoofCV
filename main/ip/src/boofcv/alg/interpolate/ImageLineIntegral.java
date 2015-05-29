@@ -52,6 +52,9 @@ public class ImageLineIntegral<Image extends ImageSingleBand> {
 	ImageBorder<Image> border;
 	GImageSingleBand image;
 
+	// length of the line
+	double length;
+
 	public ImageLineIntegral(Class<Image> imageType) {
 		this.imageType = imageType;
 		image = FactoryGImageSingleBand.create(imageType);
@@ -92,6 +95,8 @@ public class ImageLineIntegral<Image extends ImageSingleBand> {
 
 		double slopeX = x1-x0;
 		double slopeY = y1-y0;
+
+		length = Math.sqrt(slopeX*slopeX + slopeY*slopeY);
 
 		int sgnX = (int)Math.signum(slopeX);
 		int sgnY = (int)Math.signum(slopeY);
@@ -172,7 +177,7 @@ public class ImageLineIntegral<Image extends ImageSingleBand> {
 			}
 		}
 
-		sum *= Math.sqrt(slopeX*slopeX + slopeY*slopeY);
+		sum *= length;
 
 		return sum;
 	}
@@ -189,6 +194,33 @@ public class ImageLineIntegral<Image extends ImageSingleBand> {
 	 */
 	public double computeBorder(double x0, double y0, double x1, double y1) {
 		return 0;
+	}
+
+	/**
+	 * <p>
+	 * Return true if the coordinate is inside the image or false if not.<br>
+	 * 0 <= x <= width<br>
+	 * 0 <= y <= height
+	 * </p>
+	 * <p>Note: while the image is defined up to width and height, including coordinates up to that point contribute
+	 * nothing towards the line integral since they are infinitesimally small.</p>
+	 *
+	 *
+	 *
+	 * @param x x-coordinate in pixel coordinates
+	 * @param y y-coordinate in pixel coordinates
+	 * @return true if inside or false if outside
+	 */
+	public boolean isInside( double x, double y ) {
+		return x >= 0 && y >= 0 && x <= image.getWidth() && y <= image.getHeight();
+	}
+
+	/**
+	 * Returns the line segment's length
+	 * @return length
+	 */
+	public double getLength() {
+		return length;
 	}
 
 	/**

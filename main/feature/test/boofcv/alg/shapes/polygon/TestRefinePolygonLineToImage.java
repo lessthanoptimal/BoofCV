@@ -19,11 +19,8 @@
 package boofcv.alg.shapes.polygon;
 
 import boofcv.abst.distort.FDistort;
-import boofcv.alg.interpolate.InterpolatePixelS;
-import boofcv.alg.interpolate.TypeInterpolate;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
@@ -253,9 +250,7 @@ public class TestRefinePolygonLineToImage {
 	}
 
 	private RefinePolygonLineToImage createAlg( int numSides , boolean black, Class imageType) {
-		InterpolatePixelS interp = FactoryInterpolation.createPixelS(0, 255, TypeInterpolate.BILINEAR, imageType);
-		return new RefinePolygonLineToImage(numSides,black,interp);
-//		return new RefineQuadrilateralToImage(2,20,2,10,0.01,black,interp);
+		return new RefinePolygonLineToImage(numSides,black,imageType);
 	}
 
 	/**
@@ -277,7 +272,7 @@ public class TestRefinePolygonLineToImage {
 		Quadrilateral_F64 input = new Quadrilateral_F64(x0,y0,x0,y1,x1,y1,x1,y0);
 		LineGeneral2D_F64 found = new LineGeneral2D_F64();
 
-		alg.interpolate.setImage(image);
+		alg.initialize(image);
 		alg.optimize(input.a, input.b, found);
 
 		assertTrue(Distance2D_F64.distance(found, input.a) <= 1e-4);
@@ -311,9 +306,10 @@ public class TestRefinePolygonLineToImage {
 
 		float H = y1-y0-10;
 
-		alg.interpolate.setImage(image);
+		alg.initialize(image);
 		alg.center.set(10, 12);
 		alg.computePointsAndWeights(0, H, x0, y0 + 5, -1, 0);
+		assertEquals(alg.weights.length,alg.samplePts.size());
 
 		int radius = alg.sampleRadius;
 		int N = radius*2+1;
@@ -327,13 +323,41 @@ public class TestRefinePolygonLineToImage {
 					assertEquals(0,alg.weights[index],1e-8);
 				}
 
-				double x = x0 - 10 - (radius-j);
+				double x = x0 - 10 + radius - j;
 				double y = y0 + 5 + H*i/(alg.lineSamples -1) - 12;
 				Point2D_F64 p = (Point2D_F64)alg.samplePts.get(index);
 				assertEquals(x,p.x,1e-4);
 				assertEquals(y,p.y,1e-4);
 			}
 		}
+	}
+
+	/**
+	 * Checks to see if it blows up along the image border
+	 */
+	@Test
+	public void computePointsAndWeights_border() {
+		for (Class imageType : imageTypes) {
+			computePointsAndWeights_border(true, imageType);
+			computePointsAndWeights_border(false, imageType);
+		}
+	}
+
+	public void computePointsAndWeights_border( boolean black , Class imageType ) {
+		setup(null,black,imageType);
+
+		RefinePolygonLineToImage alg = createAlg(4,black, imageType);
+
+		alg.initialize(image);
+		alg.computePointsAndWeights(0, image.height-2, 0, 2, 1, 0);
+		assertEquals(0,alg.samplePts.size());
+		alg.computePointsAndWeights(0, image.height-2, image.width-1, 2, 1, 0);
+		assertEquals(0,alg.samplePts.size());
+		alg.computePointsAndWeights(image.width-2,0, 1, 0, 0, 1);
+		assertEquals(0,alg.samplePts.size());
+		alg.computePointsAndWeights(image.width-2,0, 1, image.height-1, 0, 1);
+		assertEquals(0,alg.samplePts.size());
+
 	}
 
 	@Test

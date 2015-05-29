@@ -24,7 +24,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static java.lang.Math.sqrt;
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 /**
  * @author Peter Abeles
@@ -197,6 +197,24 @@ public class TestImageLineIntegral {
 		double r = Math.sqrt(1+4)/2;
 		checkSolution(0, 0, 2, 1, r * (100+140));
 		checkSolution(0, 0, 1, 2, r * (100+200));
+	}
+
+	@Test
+	public void isInside() {
+		ImageUInt8 image = new ImageUInt8(12,14);
+		alg.setImage(image);
+		assertTrue(alg.isInside(0,0));
+		assertTrue(alg.isInside(12,14));
+		assertTrue(alg.isInside(12,0));
+		assertTrue(alg.isInside(0,14));
+
+		assertFalse(alg.isInside(-0.0001, 0));
+		assertFalse(alg.isInside(0, -0.00001));
+		assertFalse(alg.isInside(12.000001, 14));
+		assertFalse(alg.isInside(12, 14.0001));
+		assertFalse(alg.isInside(12.0001, 0));
+		assertFalse(alg.isInside(0, 14.00001));
+
 	}
 
 	private void checkSolution(double x0, double y0, double x1, double y1, double expected) {

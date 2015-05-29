@@ -18,7 +18,7 @@
 
 package boofcv.alg.shapes.polygon;
 
-import boofcv.alg.interpolate.InterpolatePixelS;
+import boofcv.alg.interpolate.ImageLineIntegral;
 import boofcv.struct.image.ImageSingleBand;
 import georegression.fitting.line.FitLine_F64;
 import georegression.geometry.UtilLine2D_F64;
@@ -28,9 +28,7 @@ import georegression.struct.line.LineGeneral2D_F64;
 import georegression.struct.line.LinePolar2D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.Polygon2D_F64;
-
-import java.util.ArrayList;
-import java.util.List;
+import org.ddogleg.struct.FastQueue;
 
 /**
  * <p>
@@ -40,22 +38,19 @@ import java.util.List;
  * The edges are selected such that they will contain the entire black/white shape.
  * </p>
  * <p>
- * For example, assume an image axis aligned rectangle lower extent of 1,2 and a upper extent of 12,15, is
+ * For example, assume an image axis aligned rectangle has a lower extent of 1,2 and a upper extent of 12,15, is
  * entirely filled, excluding the upper extent (as is typical).  Then the found lower and upper extends of the
  * found polygon will also be 1,2 and 12,15.
  * <p>
  * <p>
- * The weight of each sample point is determined by the intensity difference between it and a point 1 pixel to its
- * left.  Points are sampled along the line and tangentially from each of those points along the line.
- * This allows for the line's estimate to be improved.  This entire process is iterated until it converges or
- * the maximum number of iterations has been reached.
+ * The weight of each sample point is determined by computing a the line integral across the image in the tangential
+ * left and right directions by a lenght of one pixel.  Then the weight is max(0,sgn*(right-left)).  This will more
+ * heavily weigh pixels which lie along an edge.
  * </p>
  * <p>
- * When sampling along the line corners are avoided since those regions don't have a clear edge.  Points are sampled
- * starting at one end and moving towards the other.  The intensity is sampled using interpolation from (radius+1) pixels
- * to the left up to radius pixels to the right.  The weight for points of distance radius to the left and right
- * is found by computing the difference for that point and one to its left.  So for a radius of 1, the intensity
- * is sampled 4 times but 3 points are added to the line fitting, for each point sampled along the line.
+ * When sampling along the line, corners are avoided since those regions don't always have a clear edge.  Points are
+ * sampled starting at one end and moving towards the other.  In addition to points along the line points are also
+ * sampled tangentially to the left and right.  This allows the line's angle to be corrected.
  * </p>
  *
  * @author Peter Abeles
@@ -63,7 +58,7 @@ import java.util.List;
 public class RefinePolygonLineToImage<T extends ImageSingleBand> {
 
 	// How far away from a corner will it sample the line
-	float lineBorder = 2.0f;
+	double lineBorder = 2.0;
 
 	// number of times it will sample along the line
 	int lineSamples = 20;
@@ -79,7 +74,7 @@ public class RefinePolygonLineToImage<T extends ImageSingleBand> {
 	private double convergeTolPixels = 0.01;
 
 	// used to determine if it's snapping to a black (1) or white(-1) shape
-	float sign;
+	double sign;
 
 	//---------- storage for local work space
 	private LinePolar2D_F64 polar = new LinePolar2D_F64();
@@ -87,15 +82,15 @@ public class RefinePolygonLineToImage<T extends ImageSingleBand> {
 	protected double weights[];// storage for weights in line fitting
 	private Polygon2D_F64 previous;
 	// storage for where the points that are sampled along the line
-	protected List<Point2D_F64> samplePts = new ArrayList<Point2D_F64>();
-	// temporary storage for sample image intensity values
-	float values[];
+	protected FastQueue<Point2D_F64> samplePts;
 
 	// local coordinate system that line estimation is found in
 	protected Point2D_F64 center = new Point2D_F64();
 
-	// used to interpolate the pixel's value
-	InterpolatePixelS<T> interpolate;
+	// used when computing the fit for a line at specific points
+	protected ImageLineIntegral<T> integral;
+	// the input image
+	protected T image;
 
 	/**
 	 * Constructor which provides full access to all parameters.  See code documents
@@ -104,15 +99,15 @@ public class RefinePolygonLineToImage<T extends ImageSingleBand> {
 	 * @param numSides Number of sides on the polygon
 	 */
 	public RefinePolygonLineToImage(int numSides,
-									float lineBorder, int lineSamples, int sampleRadius,
+									double lineBorder, int lineSamples, int sampleRadius,
 									int iterations, double convergeTolPixels, boolean fitBlack,
-									InterpolatePixelS<T> interpolate) {
+									Class<T> imageType ) {
 		this.lineBorder = lineBorder;
 		this.lineSamples = lineSamples;
 		this.sampleRadius = sampleRadius;
 		this.iterations = iterations;
 		this.convergeTolPixels = convergeTolPixels;
-		this.interpolate = interpolate;
+		this.integral = new ImageLineIntegral<T>(imageType);
 
 		previous = new Polygon2D_F64(numSides);
 
@@ -123,11 +118,11 @@ public class RefinePolygonLineToImage<T extends ImageSingleBand> {
 	 * Simplified constructor which uses reasonable default values for most variables
 	 * @param numSides Number of sides on the polygon
 	 * @param fitBlack If true it's fitting a black square with a white background.  false is the inverse.
-	 * @param interpolate Interpolation class
+	 * @param imageType Type of input image it processes
 	 */
-	public RefinePolygonLineToImage(int numSides , boolean fitBlack, InterpolatePixelS<T> interpolate) {
-		this.interpolate = interpolate;
+	public RefinePolygonLineToImage(int numSides , boolean fitBlack, Class<T> imageType) {
 		previous = new Polygon2D_F64(numSides);
+		this.integral = new ImageLineIntegral<T>(imageType);
 		setup(fitBlack);
 	}
 
@@ -143,14 +138,10 @@ public class RefinePolygonLineToImage<T extends ImageSingleBand> {
 			general[i] = new LineGeneral2D_F64();
 		}
 
-		values = new float[sampleRadius*2+2];
-
 		int totalPts = lineSamples *(2*sampleRadius+1);
 		weights = new double[totalPts];
 
-		for (int i = 0; i < totalPts; i++) {
-			samplePts.add( new Point2D_F64());
-		}
+		samplePts = new FastQueue<Point2D_F64>(totalPts,Point2D_F64.class,true);
 
 		sign = fitBlack ? 1 : -1;
 	}
@@ -159,7 +150,8 @@ public class RefinePolygonLineToImage<T extends ImageSingleBand> {
 	 * Sets the image which is going to be processed
 	 */
 	public void initialize(T image) {
-		interpolate.setImage(image);
+		this.image = image;
+		integral.setImage(image);
 	}
 
 	/**
@@ -271,65 +263,67 @@ public class RefinePolygonLineToImage<T extends ImageSingleBand> {
 	 */
 	protected void optimize( Point2D_F64 a , Point2D_F64 b , LineGeneral2D_F64 foundLocal ) {
 
-		float slopeX = (float)(b.x - a.x);
-		float slopeY = (float)(b.y - a.y);
-		float r = (float)Math.sqrt(slopeX*slopeX + slopeY*slopeY);
+		double slopeX = (b.x - a.x);
+		double slopeY = (b.y - a.y);
+		double r = Math.sqrt(slopeX*slopeX + slopeY*slopeY);
 		// vector of unit length pointing in direction of the slope
-		float unitX = slopeX/r;
-		float unitY = slopeY/r;
+		double unitX = slopeX/r;
+		double unitY = slopeY/r;
 
 		// define the line segment which points will be sampled along.
 		// don't sample too close to the corner since the line because less clear there and it can screw up results
-		float x0 = (float)a.x + unitX*lineBorder;
-		float y0 = (float)a.y + unitY*lineBorder;
+		double x0 = a.x + unitX*lineBorder;
+		double y0 = a.y + unitY*lineBorder;
 
 		// truncate the slope
-		slopeX -= 2.0f*unitX*lineBorder;
-		slopeY -= 2.0f*unitY*lineBorder;
+		slopeX -= 2.0*unitX*lineBorder;
+		slopeY -= 2.0*unitY*lineBorder;
 
 		// normalized tangent of sample distance length
-		float tanX = -unitY;
-		float tanY = unitX;
+		double tanX = -unitY;
+		double tanY = unitX;
 
 		// set up inputs into line fitting
 		computePointsAndWeights(slopeX, slopeY, x0, y0, tanX, tanY);
 
-		// fit line and convert into generalized format
-		FitLine_F64.polar(samplePts, weights, polar);
-		UtilLine2D_F64.convert(polar,foundLocal);
+		if( samplePts.size() >= 4 ) {
+			// fit line and convert into generalized format
+			FitLine_F64.polar(samplePts.toList(), weights, polar);
+			UtilLine2D_F64.convert(polar, foundLocal);
+		}
 	}
 
 	/**
 	 * Computes the location of points along the line and their weights
 	 */
-	protected void computePointsAndWeights(float slopeX, float slopeY, float x0, float y0, float tanX, float tanY) {
-		float centerX = (float)center.x;
-		float centerY = (float)center.y;
+	protected void computePointsAndWeights(double slopeX, double slopeY, double x0, double y0, double tanX, double tanY) {
 
+		int index = 0;
+		samplePts.reset();
 		for (int i = 0; i < lineSamples; i++ ) {
 			// find point on line and shift it over to the first sample point
-			float frac = i/(float)(lineSamples -1);
-			float x = x0 + slopeX*frac + (sampleRadius+1)*tanX;
-			float y = y0 + slopeY*frac + (sampleRadius+1)*tanY;
+			double frac = i/(double)(lineSamples -1);
+			double x = x0 + slopeX*frac-sampleRadius*tanX;
+			double y = y0 + slopeY*frac-sampleRadius*tanY;
 
-			int indexPts = i*(values.length-1);
+			// Unless all the sample points are inside the image, ignore this point
+			double leftX = x - tanX;
+			double leftY = y - tanY;
+			double rightX = x + (sampleRadius*2+1)*tanX;
+			double rightY = y + (sampleRadius*2+1)*tanY;
 
-			values[0] = interpolate.get(x,y);
-			for (int j = 1; j < values.length; j++) {
-				x -= tanX;
-				y -= tanY;
+			if(integral.isInside(leftX, leftY) && integral.isInside(rightX,rightY)) {
+				double sample0 = integral.computeInside(x, y, x - tanX, y - tanY);
+				for (int j = 0; j < sampleRadius * 2 + 1; j++) {
+					double sample1 = integral.computeInside(x, y, x + tanX, y + tanY);
 
-				// sample the value
-				values[j] = interpolate.get(x,y);
-
-				// add the point to the list and convert into local coordinates
-				samplePts.get(indexPts+j-1).set(x-centerX,y-centerY);
-			}
-
-			// compute the weights using the difference between adjacent sample points
-			// the weight should be maximized if the right sample point is inside the square
-			for (int j = 0; j < values.length-1; j++) {
-				weights[indexPts+j] = Math.max(0,sign*(values[j]-values[j+1]));
+					weights[index] = Math.max(0, sign * (sample1 - sample0));
+					samplePts.grow().set(x - center.x, y - center.y);
+					x += tanX;
+					y += tanY;
+					sample0 = sample1;
+					index++;
+				}
 			}
 		}
 	}
