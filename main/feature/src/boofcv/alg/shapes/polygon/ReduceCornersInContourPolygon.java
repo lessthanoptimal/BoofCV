@@ -50,7 +50,7 @@ public class ReduceCornersInContourPolygon {
 	boolean clockWise;
 
 	private QuickSortObj_F64 sorterLength = new QuickSortObj_F64();
-	private FastQueue<Segment> segments = new FastQueue<Segment>(Segment.class,true);
+	protected FastQueue<Segment> segments = new FastQueue<Segment>(Segment.class,true);
 
 	private LineGeneral2D_F64 lines[];
 	LineSegment2D_F64 lineSegment = new LineSegment2D_F64();
@@ -139,7 +139,7 @@ public class ReduceCornersInContourPolygon {
 		for (int i = 0; i < 4; i++) {
 			int bestValue = segments.get(i).index0;
 			int bestIndex = i;
-			for (int j = i+1; j < 4; j++) {
+			for (int j = i+1; j < segments.size; j++) {
 				Segment b = segments.get(j);
 				if( b.index0 < bestValue ) {
 					bestIndex = j;
