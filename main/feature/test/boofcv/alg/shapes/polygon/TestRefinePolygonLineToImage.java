@@ -25,7 +25,6 @@ import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
 import boofcv.testing.BoofTesting;
-import georegression.geometry.UtilLine2D_F64;
 import georegression.geometry.UtilPolygons2D_F64;
 import georegression.metric.Distance2D_F64;
 import georegression.struct.affine.Affine2D_F64;
@@ -358,22 +357,6 @@ public class TestRefinePolygonLineToImage {
 		alg.computePointsAndWeights(image.width-2,0, 1, image.height-1, 0, 1);
 		assertEquals(0,alg.samplePts.size());
 
-	}
-
-	@Test
-	public void convert() {
-		Polygon2D_F64 orig = new Polygon2D_F64(10,20,30,21,19.5,-10,8,-8);
-
-		LineGeneral2D_F64[] lines = new LineGeneral2D_F64[4];
-		lines[0] = UtilLine2D_F64.convert(orig.getLine(0,null),(LineGeneral2D_F64)null);
-		lines[1] = UtilLine2D_F64.convert(orig.getLine(1,null),(LineGeneral2D_F64)null);
-		lines[2] = UtilLine2D_F64.convert(orig.getLine(2,null),(LineGeneral2D_F64)null);
-		lines[3] = UtilLine2D_F64.convert(orig.getLine(3,null),(LineGeneral2D_F64)null);
-
-		Polygon2D_F64 found = new Polygon2D_F64(4);
-		assertTrue(RefinePolygonLineToImage.convert(lines, found));
-
-		assertTrue(orig.isIdentical(found, 1e-8));
 	}
 
 	private void setup( Affine2D_F64 affine, boolean black , Class imageType ) {

@@ -35,6 +35,7 @@ import georegression.struct.shapes.Polygon2D_F64;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_I32;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -86,8 +87,8 @@ public class BinaryPolygonConvexDetector<T extends ImageSingleBand> {
 	// finds the initial polygon around a target candidate
 	private SplitMergeLineFitLoop fitPolygon;
 
-	// converts the polygon into a quadrilateral
-//	private ReduceCornersInContourPolygon reduceSides;
+	// Improve the selection of corner pixels in the contour
+	private RefinePolygonContourLoop improveContour = new RefinePolygonContourLoop(20);
 
 	// Refines the estimate of the polygon's lines using a subpixel technique
 	private RefinePolygonLineToImage<T> refineLine;
@@ -106,6 +107,12 @@ public class BinaryPolygonConvexDetector<T extends ImageSingleBand> {
 	// work space for initial polygon
 	private Polygon2D_F64 workPoly = new Polygon2D_F64();
 
+	// should the order of the polygon be on clockwise order on output?
+	private boolean outputClockwise;
+
+	// storage for the contours associated with a found target.  used for debugging
+	private List<Contour> foundContours = new ArrayList<Contour>();
+
 	/**
 	 * Configures the detector.
 	 *
@@ -116,17 +123,19 @@ public class BinaryPolygonConvexDetector<T extends ImageSingleBand> {
 	 * @param refineCorner Refines the polygon's corners.  Set to null to skip step
 	 * @param minContourFraction Size of minimum contour as a fraction of the input image's width.  Try 0.23
 	 * @param splitDistanceFraction Number of pixels as a fraction of contour length to split a new line in
-	 *                             SplitMergeLineFitLoop.  Try 0.04
+	 *                             SplitMergeLineFitLoop.  Try 0.03
+	 * @param outputClockwise If true then the order of the output polygons will be in clockwise order
 	 * @param inputType Type of input image it's processing
 	 */
-	protected BinaryPolygonConvexDetector(final int polygonSides,
-										  InputToBinary<T> thresholder,
-										  SplitMergeLineFitLoop contourToPolygon,
-										  RefinePolygonLineToImage<T> refineLine,
-										  SubpixelSparseCornerFit<T> refineCorner,
-										  double minContourFraction,
-										  double splitDistanceFraction,
-										  Class<T> inputType) {
+	public BinaryPolygonConvexDetector(final int polygonSides,
+									   InputToBinary<T> thresholder,
+									   SplitMergeLineFitLoop contourToPolygon,
+									   RefinePolygonLineToImage<T> refineLine,
+									   SubpixelSparseCornerFit<T> refineCorner,
+									   double minContourFraction,
+									   double splitDistanceFraction,
+									   boolean outputClockwise,
+									   Class<T> inputType) {
 
 		if( refineLine != null ) {
 			if (polygonSides != refineLine.getNumberOfSides())
@@ -143,6 +152,7 @@ public class BinaryPolygonConvexDetector<T extends ImageSingleBand> {
 		this.minContourFraction = minContourFraction;
 		this.fitPolygon = contourToPolygon;
 		this.splitDistanceFraction = splitDistanceFraction;
+		this.outputClockwise = outputClockwise;
 
 		workPoly = new Polygon2D_F64(polygonSides);
 		found = new FastQueue<Polygon2D_F64>(Polygon2D_F64.class,true) {
@@ -158,7 +168,6 @@ public class BinaryPolygonConvexDetector<T extends ImageSingleBand> {
 	 *
 	 * @param width Width of the input image
 	 * @param height Height of the input image
-	 *
 	 */
 	// TODO move to process
 	public void configure( int width , int height ) {
@@ -182,6 +191,7 @@ public class BinaryPolygonConvexDetector<T extends ImageSingleBand> {
 			throw new RuntimeException("Did you call configure() yet? zero width/height");
 
 		found.reset();
+		foundContours.clear();
 
 		thresholder.process(gray, binary);
 
@@ -218,6 +228,9 @@ public class BinaryPolygonConvexDetector<T extends ImageSingleBand> {
 				if( splits.size() != polyNumberOfLines )
 					continue;
 
+				// further improve the selection of corner points
+				improveContour.fit(c.external,splits);
+
 				// convert the format of the initial crude polygon
 				for (int j = 0; j < polyNumberOfLines; j++) {
 					Point2D_I32 p = c.external.get( splits.get(j));
@@ -237,7 +250,10 @@ public class BinaryPolygonConvexDetector<T extends ImageSingleBand> {
 					continue;
 
 				// refine the polygon and add it to the found list
-				refinePolygon(gray);
+				if( refinePolygon(gray) ) {
+					c.id = found.size();
+					foundContours.add(c);
+				}
 			}
 		}
 	}
@@ -246,7 +262,7 @@ public class BinaryPolygonConvexDetector<T extends ImageSingleBand> {
 	 * Refine using corner then line or any combination, including none.  Put into list
 	 * of found polygons if nothing goe wrong.
 	 */
-	private void refinePolygon( T gray ) {
+	private boolean refinePolygon( T gray ) {
 		// refine the estimate
 		Polygon2D_F64 refined = found.grow();
 		refined.set(workPoly);
@@ -273,7 +289,11 @@ public class BinaryPolygonConvexDetector<T extends ImageSingleBand> {
 		// if it failed, discard
 		if( failed ) {
 			found.removeTail();
+		} else {
+			if( !outputClockwise )
+				UtilPolygons2D_F64.reverseOrder(refined);
 		}
+		return !failed;
 	}
 
 	/**
@@ -307,9 +327,15 @@ public class BinaryPolygonConvexDetector<T extends ImageSingleBand> {
 		return false;
 	}
 
+	public boolean isOutputClockwise() {
+		return outputClockwise;
+	}
+
 	public FastQueue<Polygon2D_F64> getFound() {
 		return found;
 	}
+
+	public List<Contour> getFoundContours(){return foundContours;}
 
 	public ImageUInt8 getBinary() {
 		return binary;
@@ -317,5 +343,9 @@ public class BinaryPolygonConvexDetector<T extends ImageSingleBand> {
 
 	public Class<T> getInputType() {
 		return inputType;
+	}
+
+	public int getPolyNumberOfLines() {
+		return polyNumberOfLines;
 	}
 }

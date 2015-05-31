@@ -23,7 +23,6 @@ import boofcv.struct.image.ImageSingleBand;
 import georegression.fitting.line.FitLine_F64;
 import georegression.geometry.UtilLine2D_F64;
 import georegression.geometry.UtilPolygons2D_F64;
-import georegression.metric.Intersection2D_F64;
 import georegression.struct.line.LineGeneral2D_F64;
 import georegression.struct.line.LinePolar2D_F64;
 import georegression.struct.point.Point2D_F64;
@@ -58,7 +57,7 @@ import org.ddogleg.struct.FastQueue;
 public class RefinePolygonLineToImage<T extends ImageSingleBand> {
 
 	// How far away from a corner will it sample the line
-	double lineBorder = 2.0;
+	double cornerOffset = 2.0;
 
 	// number of times it will sample along the line
 	int lineSamples = 20;
@@ -99,13 +98,13 @@ public class RefinePolygonLineToImage<T extends ImageSingleBand> {
 	 * @param numSides Number of sides on the polygon
 	 */
 	public RefinePolygonLineToImage(int numSides,
-									double lineBorder, int lineSamples, int sampleRadius,
+									double cornerOffset, int lineSamples, int sampleRadius,
 									int maxIterations, double convergeTolPixels, boolean fitBlack,
 									Class<T> imageType ) {
 		if( sampleRadius < 1 )
 			throw new IllegalArgumentException("Sample radius must be >= 1 to work");
 
-		this.lineBorder = lineBorder;
+		this.cornerOffset = cornerOffset;
 		this.lineSamples = lineSamples;
 		this.sampleRadius = sampleRadius;
 		this.maxIterations = maxIterations;
@@ -190,7 +189,7 @@ public class RefinePolygonLineToImage<T extends ImageSingleBand> {
 	 */
 	private boolean checkShapeTooSmall(Polygon2D_F64 input) {
 		// must be longer than the border plus some small fudge factor
-		double minLength = lineBorder*2 + 2;
+		double minLength = cornerOffset*2 + 2;
 		for (int i = 0; i < input.size(); i++) {
 			int j = (i+1)%input.size();
 			Point2D_F64 a = input.get(i);
@@ -222,7 +221,7 @@ public class RefinePolygonLineToImage<T extends ImageSingleBand> {
 			}
 
 			// Find the corners of the quadrilateral from the lines
-			if( !convert(general,current) )
+			if( !UtilShapePolygon.convert(general,current) )
 				return false;
 
 			// convert quad from local into image coorindates
@@ -276,12 +275,12 @@ public class RefinePolygonLineToImage<T extends ImageSingleBand> {
 
 		// define the line segment which points will be sampled along.
 		// don't sample too close to the corner since the line because less clear there and it can screw up results
-		double x0 = a.x + unitX*lineBorder;
-		double y0 = a.y + unitY*lineBorder;
+		double x0 = a.x + unitX*cornerOffset;
+		double y0 = a.y + unitY*cornerOffset;
 
 		// truncate the slope
-		slopeX -= 2.0*unitX*lineBorder;
-		slopeY -= 2.0*unitY*lineBorder;
+		slopeX -= 2.0*unitX*cornerOffset;
+		slopeY -= 2.0*unitY*cornerOffset;
 
 		// normalized tangent of sample distance length
 		double tanX = -unitY;
@@ -330,22 +329,6 @@ public class RefinePolygonLineToImage<T extends ImageSingleBand> {
 				}
 			}
 		}
-	}
-
-	/**
-	 * Finds the intersections between the four lines and converts it into a quadrilateral
-	 *
-	 * @param lines Assumes lines are ordered
-	 */
-	protected static boolean convert( LineGeneral2D_F64[] lines , Polygon2D_F64 poly ) {
-
-		for (int i = 0; i < poly.size(); i++) {
-			int j = (i + 1) % poly.size();
-			if( null == Intersection2D_F64.intersection(lines[i],lines[j],poly.get(j)) )
-				return false;
-		}
-
-		return true;
 	}
 
 	/**

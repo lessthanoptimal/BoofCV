@@ -21,8 +21,6 @@ package boofcv.abst.fiducial;
 import boofcv.alg.fiducial.DetectFiducialSquareBinary;
 import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.image.ImageType;
-import georegression.struct.se.Se3_F64;
 
 /**
  * Wrapper around {@link boofcv.alg.fiducial.DetectFiducialSquareBinary} for {@link boofcv.abst.fiducial.FiducialDetector}
@@ -30,52 +28,23 @@ import georegression.struct.se.Se3_F64;
  * @author Peter Abeles
  */
 public class SquareBinary_to_FiducialDetector<T extends ImageSingleBand>
-	implements FiducialDetector<T>
+	extends BaseSquare_FiducialDetector<T,DetectFiducialSquareBinary<T>>
 {
-	DetectFiducialSquareBinary<T> alg;
-
 	double targetWidth;
-	ImageType<T> type;
 
 	public SquareBinary_to_FiducialDetector(DetectFiducialSquareBinary<T> alg,double targetWidth) {
-		this.alg = alg;
+		super(alg);
 		this.targetWidth = targetWidth;
-		this.type = ImageType.single(alg.getInputType());
-	}
-
-	@Override
-	public void detect(T input) {
-		alg.process(input);
 	}
 
 	@Override
 	public void setIntrinsic(IntrinsicParameters intrinsic) {
 		alg.setLengthSide(targetWidth);
-		alg.configure(intrinsic);
-	}
-
-	@Override
-	public int totalFound() {
-		return alg.getFound().size;
-	}
-
-	@Override
-	public void getFiducialToCamera(int which, Se3_F64 fiducialToCamera) {
-		fiducialToCamera.set(alg.getFound().get(which).targetToSensor);
-	}
-
-	@Override
-	public int getId( int which ) {
-		return alg.getFound().get(which).index;
+		super.setIntrinsic(intrinsic);
 	}
 
 	@Override
 	public double getWidth(int which) {
 		return targetWidth;
-	}
-
-	@Override
-	public ImageType<T> getInputType() {
-		return type;
 	}
 }

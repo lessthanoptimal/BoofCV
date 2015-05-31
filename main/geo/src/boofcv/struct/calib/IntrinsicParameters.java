@@ -128,6 +128,15 @@ public class IntrinsicParameters implements Serializable {
 		this.t2 = param.t2;
 	}
 
+	/**
+	 * If true then distortion parameters are specified.
+	 */
+	public boolean isDistorted() {
+		if( radial == null || radial.length == 1 )
+			return t1 != 0 || t2 != 0;
+		return true;
+	}
+
 	public double getCx() {
 		return cx;
 	}

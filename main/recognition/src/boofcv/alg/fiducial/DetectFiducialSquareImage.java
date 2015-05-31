@@ -24,7 +24,7 @@ import boofcv.alg.feature.associate.HammingTable16;
 import boofcv.alg.filter.binary.GThresholdImageOps;
 import boofcv.alg.filter.misc.AverageDownSampleOps;
 import boofcv.alg.misc.ImageMiscOps;
-import boofcv.alg.shapes.SplitMergeLineFitLoop;
+import boofcv.alg.shapes.polygon.BinaryPolygonConvexDetector;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.filter.binary.FactoryThresholdBinary;
 import boofcv.struct.image.ImageFloat32;
@@ -71,10 +71,8 @@ public class DetectFiducialSquareImage<T extends ImageSingleBand>
 	 *
 	 * @param matchThreshold Considered a match if the hamming distance is less than this fraction of the maximum
 	 */
-	public DetectFiducialSquareImage(InputToBinary<T> thresholder,
-									 SplitMergeLineFitLoop fitPolygon,
-									 double minContourFraction, double matchThreshold, Class<T> inputType) {
-		super(thresholder,fitPolygon, squareLength+squareLength, minContourFraction, inputType);
+	public DetectFiducialSquareImage(BinaryPolygonConvexDetector<T> quadDetector, double matchThreshold, Class<T> inputType) {
+		super(quadDetector, squareLength+squareLength, inputType);
 
 		hammingThreshold = (int)(squareLength*squareLength*matchThreshold);
 

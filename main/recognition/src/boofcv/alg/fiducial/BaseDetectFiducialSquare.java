@@ -18,42 +18,30 @@
 
 package boofcv.alg.fiducial;
 
-import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.alg.distort.ImageDistort;
-import boofcv.alg.distort.LensDistortionOps;
 import boofcv.alg.distort.PointToPixelTransform_F32;
 import boofcv.alg.distort.PointTransformHomography_F32;
-import boofcv.alg.filter.binary.Contour;
-import boofcv.alg.filter.binary.LinearContourLabelChang2004;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.calibration.Zhang99DecomposeHomography;
 import boofcv.alg.geo.h.HomographyLinear4;
-import boofcv.alg.shapes.SplitMergeLineFitLoop;
-import boofcv.alg.shapes.polygon.FitBinaryQuadrilateralEM;
+import boofcv.alg.shapes.polygon.BinaryPolygonConvexDetector;
 import boofcv.core.image.border.BorderType;
 import boofcv.core.image.border.FactoryImageBorder;
 import boofcv.factory.distort.FactoryDistort;
 import boofcv.factory.interpolate.FactoryInterpolation;
-import boofcv.struct.ConnectRule;
 import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.distort.PixelTransform_F32;
-import boofcv.struct.distort.PointTransform_F32;
-import boofcv.struct.distort.PointTransform_F64;
-import boofcv.struct.distort.SequencePointTransform_F32;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSInt32;
 import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.image.ImageUInt8;
 import georegression.geometry.GeometryMath_F64;
+import georegression.geometry.UtilPolygons2D_F64;
 import georegression.struct.homography.UtilHomography;
 import georegression.struct.point.Point2D_F64;
-import georegression.struct.point.Point2D_I32;
 import georegression.struct.se.Se3_F64;
+import georegression.struct.shapes.Polygon2D_F64;
 import georegression.struct.shapes.Quadrilateral_F64;
 import org.ddogleg.struct.FastQueue;
-import org.ddogleg.struct.GrowQueue_I32;
-import org.ejml.UtilEjml;
 import org.ejml.data.DenseMatrix64F;
 
 import java.util.ArrayList;
@@ -83,29 +71,10 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 	// Storage for the found fiducials
 	private FastQueue<FoundFiducial> found = new FastQueue<FoundFiducial>(FoundFiducial.class,true);
 
-	// Converts the input image into a binary one
-	private InputToBinary<T> thresholder;
-
-	// minimum size of a shape's contour
-	private double minContourFraction;
-	private int minimumContour;
-	private double minimumArea;
-
-	// Storage for the binary image
-	private ImageUInt8 binary = new ImageUInt8(1,1);
-
 	// precomputed lookup table for distorted to undistorted pixel locations
-	private Point2D_I32 tableDistPixel[];
-	private FastQueue<Point2D_I32> contourUndist = new FastQueue<Point2D_I32>(Point2D_I32.class,false);
+//	private Point2D_I32 tableDistPixel[];
 
-	private LinearContourLabelChang2004 contourFinder = new LinearContourLabelChang2004(ConnectRule.FOUR);
-	private ImageSInt32 labeled = new ImageSInt32(1,1);
-
-	// finds the initial polygon around a target candidate
-	private SplitMergeLineFitLoop fitPolygon;
-
-	// List of all shapes it tihnks might be a fiducial
-	private FastQueue<Quadrilateral_F64> candidates = new FastQueue<Quadrilateral_F64>(Quadrilateral_F64.class,true);
+	private BinaryPolygonConvexDetector<T> squareDetector;
 
 	// image with lens and perspective distortion removed from it
 	private ImageFloat32 square;
@@ -116,9 +85,6 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 	private List<AssociatedPair> pairsRemovePerspective = new ArrayList<AssociatedPair>();
 	private ImageDistort<T,ImageFloat32> removePerspective;
 	private PointTransformHomography_F32 transformHomography = new PointTransformHomography_F32();
-
-	// refines the initial estimate of the quadrilateral around the fiducial
-	private FitBinaryQuadrilateralEM fitQuad = new FitBinaryQuadrilateralEM();
 
 	// Storage for results of fiducial reading
 	private Result result = new Result();
@@ -137,22 +103,21 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 	/**
 	 * Configures the detector.
 	 *
-	 * @param thresholder Converts the input image into a binary one
-	 * @param fitPolygon Provides a crude polygon fit around a shape
+	 * @param squareDetector Detects the quadrilaterals in the image
 	 * @param squarePixels  Number of pixels wide the image with lens and perspective distortion removed is.
-	 * @param minContourFraction Size of minimum contour as a fraction of the input image's width.  Try 0.23
 	 * @param inputType Type of input image it's processing
 	 */
-	protected BaseDetectFiducialSquare(InputToBinary<T> thresholder,
-									   SplitMergeLineFitLoop fitPolygon,
+	protected BaseDetectFiducialSquare(BinaryPolygonConvexDetector<T> squareDetector,
 									   int squarePixels,
-									   double minContourFraction,
 									   Class<T> inputType) {
 
-		this.thresholder = thresholder;
+		if( squareDetector.getPolyNumberOfLines() != 4 )
+			throw new IllegalArgumentException("quadDetector not configured to detect quadrilaterals");
+		if( squareDetector.isOutputClockwise() )
+			throw new IllegalArgumentException("output polygons needs to be counter-clockwise");
+
+		this.squareDetector = squareDetector;
 		this.inputType = inputType;
-		this.minContourFraction = minContourFraction;
-		this.fitPolygon = fitPolygon;
 		this.square = new ImageFloat32(squarePixels,squarePixels);
 
 		for (int i = 0; i < 4; i++) {
@@ -164,8 +129,6 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 		// is sent to fiducial decoder
 		removePerspective = FactoryDistort.distort(false,FactoryInterpolation.bilinearPixelS(inputType),
 				FactoryImageBorder.general(inputType, BorderType.EXTENDED),ImageFloat32.class);
-
-		tableDistPixel = new Point2D_I32[0];
 	}
 
 	/**
@@ -175,13 +138,10 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 	 */
 	public void configure( IntrinsicParameters intrinsic) {
 
-		// resize storage images
-		binary.reshape(intrinsic.width, intrinsic.height);
-		labeled.reshape(intrinsic.width, intrinsic.height);
+		if( intrinsic.isDistorted() )
+			throw new IllegalArgumentException("Detector assumes distortion has been removed already");
 
-		// adjust size based parameters based on image size
-		this.minimumContour = (int)(intrinsic.width*minContourFraction);
-		this.minimumArea = Math.pow(this.minimumContour /4.0,2);
+		squareDetector.configure(intrinsic.width, intrinsic.height);
 
 		// add corner points in target frame.  Used to compute homography.  Target's center is at its origin
 		// see comment in class JavaDoc above.  Note that the target's length is one below.  The scale factor
@@ -197,48 +157,28 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 		homographyToPose.setCalibrationMatrix(K);
 
 		// provide intrinsic camera parameters
-		PointTransform_F64 remove_p_to_p = LensDistortionOps.distortTransform(intrinsic).undistort_F64(true, true);
-		PointTransform_F32 add_p_to_p = LensDistortionOps.distortTransform(intrinsic).distort_F32(true, true);
-
-		SequencePointTransform_F32 sequence = new SequencePointTransform_F32(transformHomography, add_p_to_p);
-		PixelTransform_F32 squareToInput= new PointToPixelTransform_F32(sequence);
+		PixelTransform_F32 squareToInput= new PointToPixelTransform_F32(transformHomography);
 		removePerspective.setModel(squareToInput);
-
-		// Create the distorted image to undistorted pixel lookup table
-		int N = intrinsic.width*intrinsic.height;
-		Point2D_F64 p = new Point2D_F64();
-		if( tableDistPixel.length < N ) {
-			tableDistPixel = new Point2D_I32[N];
-			for (int i = 0; i < N; i++) {
-				// NOTE: Ideally a floating point point would be used here since integer ones introduce more
-				//       rounding errors.  However, "fitPolygon" only works with integer coordinates
-				remove_p_to_p.compute(i % intrinsic.width, i / intrinsic.width, p);
-				tableDistPixel[i] = new Point2D_I32( (int)Math.round(p.x) , (int)Math.round(p.y) );
-			}
-		}
 	}
 
 	/**
 	 * Examines the input image to detect fiducials inside of it
 	 *
-	 * @param gray Input image
+	 * @param gray Undistorted input image
 	 */
 	public void process( T gray ) {
-		if( binary.width == 0 || binary.height == 0 )
-			throw new RuntimeException("Did you call configure() yet? zero width/height");
+
+		squareDetector.process(gray);
+		FastQueue<Polygon2D_F64> candidates = squareDetector.getFound();
 
 		found.reset();
-		candidates.reset();
-
-		thresholder.process(gray, binary);
-
-		// Find quadrilaterials that could be fiducials
-		findCandidateShapes();
 
 		// undistort the squares
+		Quadrilateral_F64 q = new Quadrilateral_F64(); // todo predeclare
 		for (int i = 0; i < candidates.size; i++) {
 			// compute the homography from the input image to an undistorted square image
-			Quadrilateral_F64 q = candidates.get(i);
+			Polygon2D_F64 p = candidates.get(i);
+			UtilPolygons2D_F64.convert(p,q);
 
 			pairsRemovePerspective.get(0).set( 0              ,    0            , q.a.x , q.a.y);
 			pairsRemovePerspective.get(1).set( square.width-1 ,    0            , q.b.x , q.b.y );
@@ -282,67 +222,6 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 	}
 
 	/**
-	 * Finds blobs in the binary image.  Then looks for blobs that meet size and shape requirements.  See code
-	 * below for the requirements.  Those that remain are considered to be target candidates.
-	 */
-	private void findCandidateShapes() {
-		// find binary blobs
-		contourFinder.process(binary, labeled);
-
-		int endX = binary.width-1;
-		int endY = binary.height-1;
-
-		// find blobs where all 4 edges are lines
-		FastQueue<Contour> blobs = contourFinder.getContours();
-		for (int i = 0; i < blobs.size; i++) {
-			Contour c = blobs.get(i);
-
-			// can't be entirely black
-			if( c.internal.isEmpty() )
-				continue;
-
-			if( c.external.size() >= minimumContour) {
-				// if it touches the image border skip. Speeds thinks up a little bit when adaptive thresholding
-				// is used due to the number of large false positives
-				// This is reasonable since you can't estimate the location without the entire target border
-				boolean skip = false;
-				contourUndist.reset();
-				for (int j = 0; j < c.external.size(); j++) {
-					Point2D_I32 p = c.external.get(j);
-					if( p.x == 0 || p.y == 0 || p.x == endX || p.y == endY )
-					{
-						skip = true;
-						break;
-					} else {
-						// look up undistorted pixel locations
-						contourUndist.add( tableDistPixel[p.y*binary.width+p.x]);
-					}
-				}
-				if( skip )
-					continue;
-
-				fitPolygon.process(contourUndist.toList());
-				GrowQueue_I32 splits = fitPolygon.getSplits();
-
-				// If there are too many splits it's probably not a quadrilateral
-				if( splits.size <= 8 && splits.size >= 4 ) {
-
-					Quadrilateral_F64 q = candidates.grow();
-					if( !fitQuad.fit(contourUndist.toList(),splits,q) ) {
-						candidates.removeTail();
-					} else {
-						// remove small and flat out bad shapes
-						double area = q.area();
-						if(UtilEjml.isUncountable(area) || area < minimumArea ) {
-							candidates.removeTail();
-						}
-					}
-				}
-			}
-		}
-	}
-
-	/**
 	 * Given observed location of corners, compute the transform from target to world frame.
 	 * See code comments for correct ordering of corners in quad.
 	 *
@@ -371,10 +250,6 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 		return found;
 	}
 
-	public ImageUInt8 getBinary() {
-		return binary;
-	}
-
 	/**
 	 * Processes the detected square and matches it to a known fiducial.  Black border
 	 * is included.
@@ -384,6 +259,10 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 	 * @return true if the square matches a known target.
 	 */
 	protected abstract boolean processSquare( ImageFloat32 square , Result result );
+
+	public BinaryPolygonConvexDetector getSquareDetector() {
+		return squareDetector;
+	}
 
 	public Class<T> getInputType() {
 		return inputType;

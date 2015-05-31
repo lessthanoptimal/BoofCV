@@ -19,16 +19,18 @@
 package boofcv.alg.fiducial;
 
 import boofcv.abst.geo.Estimate1ofEpipolar;
-import boofcv.alg.distort.*;
+import boofcv.alg.distort.DistortImageOps;
+import boofcv.alg.distort.PointToPixelTransform_F32;
+import boofcv.alg.distort.PointTransformHomography_F32;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.interpolate.TypeInterpolate;
 import boofcv.alg.misc.ImageMiscOps;
-import boofcv.alg.shapes.SplitMergeLineFitLoop;
 import boofcv.factory.filter.binary.FactoryThresholdBinary;
 import boofcv.factory.geo.FactoryMultiView;
+import boofcv.factory.shape.ConfigPolygonDetector;
+import boofcv.factory.shape.FactoryShapeDetector;
 import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.distort.PixelTransform_F32;
-import boofcv.struct.distort.PointTransform_F32;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageUInt8;
@@ -62,22 +64,16 @@ public class TestBaseDetectFiducialSquare {
 	private void checkFindKnown(IntrinsicParameters intrinsic, double tol ) {
 		ImageUInt8 pattern = createPattern(100);
 		Quadrilateral_F64 where = new Quadrilateral_F64(50,50,  130,60,  140,150,  40,140);
+//		Quadrilateral_F64 where = new Quadrilateral_F64(50,50,  100,50,  100,150,  50,150);
+
 
 		ImageUInt8 image = new ImageUInt8(640,480);
-		ImageUInt8 distorted = new ImageUInt8(640,480);
 		ImageMiscOps.fill(image, 255);
 		render(pattern, where, image);
 
-		PointTransform_F32 remove_p_to_p = LensDistortionOps.distortTransform(intrinsic).undistort_F32(true, true);
-
-		ImageDistort<ImageUInt8,ImageUInt8> distorter
-				= DistortImageOps.createImageDistort(remove_p_to_p, null, TypeInterpolate.BILINEAR,ImageUInt8.class,ImageUInt8.class);
-
-		distorter.apply(image,distorted);
-
 		Dummy dummy = new Dummy();
 		dummy.configure(intrinsic);
-		dummy.process(distorted);
+		dummy.process(image);
 
 		assertEquals(1,dummy.detected.size());
 
@@ -85,8 +81,8 @@ public class TestBaseDetectFiducialSquare {
 //		System.out.println("found "+found);
 //		System.out.println("where "+where);
 		checkMatch(where, found.a, tol);
-		checkMatch(where,found.b,tol);
-		checkMatch(where,found.c,tol);
+		checkMatch(where, found.b, tol);
+		checkMatch(where, found.c, tol);
 		checkMatch(where, found.d, tol);
 
 		// see if the undistorted image is as expected
@@ -104,15 +100,6 @@ public class TestBaseDetectFiducialSquare {
 		if( q.d.distance(p) <= tol)
 			return;
 		fail("no match "+p+"    "+q);
-	}
-
-	/**
-	 * Makes sure all the remove lens and perspective distortion code works correctly.  Add a square target to the
-	 * image. Distort it badly, and see if it reproduces the original
-	 */
-	@Test
-	public void removeDistortion() {
-		checkFindKnown(new IntrinsicParameters(500,500,0,320,240,640,480).fsetRadial(0.1,0.3),1.5);
 	}
 
 	@Test
@@ -154,7 +141,7 @@ public class TestBaseDetectFiducialSquare {
 	public static ImageUInt8 createPattern( int length ) {
 		ImageUInt8 pattern = new ImageUInt8( length , length );
 
-		int b = length/8;
+		int b = length/6;
 
 		for (int y = 0; y < length; y++) {
 			for (int x = 0; x < length; x++) {
@@ -168,10 +155,10 @@ public class TestBaseDetectFiducialSquare {
 
 	public static void checkPattern( ImageFloat32 image ) {
 
-		int x0 = image.width/8;
-		int y0 = image.height/8;
-		int x1 = image.width - x0;
-		int y1 = image.height - y0;
+		int x0 = image.width/6;
+		int y0 = image.height/6;
+		int x1 = image.width-x0;
+		int y1 = image.height-y0;
 
 		double totalBorder = 0;
 		int countBorder = 0;
@@ -194,7 +181,7 @@ public class TestBaseDetectFiducialSquare {
 		totalBorder /= countBorder;
 		totalInner /= countInner;
 
-		assertTrue( totalBorder < 10 );
+		assertTrue( totalBorder < 15 );
 		assertTrue( totalInner > 245 );
 	}
 
@@ -203,8 +190,8 @@ public class TestBaseDetectFiducialSquare {
 	 */
 	public static void render( ImageUInt8 pattern , Quadrilateral_F64 where , ImageUInt8 output ) {
 
-		int w = pattern.width-1;
-		int h = pattern.height-1;
+		int w = pattern.width;
+		int h = pattern.height;
 
 		ArrayList<AssociatedPair> associatedPairs = new ArrayList<AssociatedPair>();
 		associatedPairs.add(new AssociatedPair(where.a,new Point2D_F64(0,0)));
@@ -230,8 +217,8 @@ public class TestBaseDetectFiducialSquare {
 		public List<ImageFloat32> detected = new ArrayList<ImageFloat32>();
 
 		protected Dummy() {
-			super(FactoryThresholdBinary.globalFixed(50,true,ImageUInt8.class),
-					new SplitMergeLineFitLoop(2.0,0.05,200), 100, 0.23, ImageUInt8.class);
+			super(FactoryShapeDetector.polygon(FactoryThresholdBinary.globalFixed(50,true,ImageUInt8.class),
+					new ConfigPolygonDetector(4),ImageUInt8.class),100, ImageUInt8.class);
 		}
 
 		@Override

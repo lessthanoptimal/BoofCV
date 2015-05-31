@@ -18,11 +18,12 @@
 
 package boofcv.alg.fiducial;
 
-import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.alg.misc.PixelMath;
+import boofcv.alg.shapes.polygon.BinaryPolygonConvexDetector;
 import boofcv.core.image.ConvertImage;
-import boofcv.factory.filter.binary.FactoryThresholdBinary;
+import boofcv.factory.shape.ConfigPolygonDetector;
+import boofcv.factory.shape.FactoryShapeDetector;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageUInt8;
 import org.junit.Test;
@@ -39,7 +40,8 @@ import static org.junit.Assert.*;
 public class TestDetectFiducialSquareImage {
 
 	Random rand = new Random(234);
-	InputToBinary<ImageUInt8> thesholder = FactoryThresholdBinary.globalFixed(50,true,ImageUInt8.class);
+	BinaryPolygonConvexDetector squareDetector = FactoryShapeDetector.polygon(null, new ConfigPolygonDetector(4), ImageUInt8.class);
+
 
 	@Test
 	public void processSquare() {
@@ -61,7 +63,7 @@ public class TestDetectFiducialSquareImage {
 
 		// process it in different orientations
 		DetectFiducialSquareImage<ImageUInt8> alg =
-				new DetectFiducialSquareImage<ImageUInt8>(null,null,0.2,0.1,ImageUInt8.class);
+				new DetectFiducialSquareImage<ImageUInt8>(squareDetector,0.1,ImageUInt8.class);
 
 		alg.addImage(pattern,125,1.0);
 		BaseDetectFiducialSquare.Result result = new BaseDetectFiducialSquare.Result();
@@ -94,7 +96,7 @@ public class TestDetectFiducialSquareImage {
 		}
 
 		DetectFiducialSquareImage<ImageUInt8> alg =
-				new DetectFiducialSquareImage<ImageUInt8>(null,null,0.2,0.1,ImageUInt8.class);
+				new DetectFiducialSquareImage<ImageUInt8>(squareDetector,0.1,ImageUInt8.class);
 
 		alg.addImage(image,100,1.0);
 
@@ -162,7 +164,7 @@ public class TestDetectFiducialSquareImage {
 			expected += valA != valB ? 1 : 0;
 		}
 
-		DetectFiducialSquareImage alg = new DetectFiducialSquareImage(null,null,0.2,0.1,ImageFloat32.class);
+		DetectFiducialSquareImage alg = new DetectFiducialSquareImage(squareDetector,0.1,ImageFloat32.class);
 		int found = alg.hamming(a, b);
 
 		assertEquals(expected,found);

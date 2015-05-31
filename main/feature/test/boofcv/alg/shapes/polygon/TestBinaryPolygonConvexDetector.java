@@ -120,7 +120,7 @@ public class TestBinaryPolygonConvexDetector {
 		RefinePolygonLineToImage refineLine = new RefinePolygonLineToImage(numberOfSides,true,imageType);
 		SubpixelSparseCornerFit refineCorner = new SubpixelSparseCornerFit(imageType);
 		return new BinaryPolygonConvexDetector(numberOfSides,inputToBinary,contourToPolygon,
-				refineLine,null,0.23,0.03,imageType);
+				refineLine,null,0.23,0.03,true,imageType);
 	}
 
 	private int findMatches( Polygon2D_F64 found , double tol ) {

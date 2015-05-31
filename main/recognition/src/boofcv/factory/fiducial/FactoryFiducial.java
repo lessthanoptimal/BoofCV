@@ -27,8 +27,9 @@ import boofcv.abst.fiducial.SquareImage_to_FiducialDetector;
 import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.alg.fiducial.DetectFiducialSquareBinary;
 import boofcv.alg.fiducial.DetectFiducialSquareImage;
-import boofcv.alg.shapes.SplitMergeLineFitLoop;
+import boofcv.alg.shapes.polygon.BinaryPolygonConvexDetector;
 import boofcv.factory.filter.binary.FactoryThresholdBinary;
+import boofcv.factory.shape.FactoryShapeDetector;
 import boofcv.struct.image.ImageSingleBand;
 
 /**
@@ -52,11 +53,13 @@ public class FactoryFiducial {
 										  int binaryThreshold ,
 										  Class<T> imageType ) {
 
-		InputToBinary<T> binary = FactoryThresholdBinary.globalFixed(binaryThreshold,true,imageType);
+		config.squareDetector.clockwise = false;
 
-		SplitMergeLineFitLoop poly = new SplitMergeLineFitLoop(config.borderTolerance,0.05,config.borderMaxIterations );
+		InputToBinary<T> binary = FactoryThresholdBinary.globalFixed(binaryThreshold,true,imageType);
+		BinaryPolygonConvexDetector<T> squareDetector = FactoryShapeDetector.polygon(binary,config.squareDetector,imageType);
+
 		DetectFiducialSquareBinary<T> alg = new DetectFiducialSquareBinary<T>(
-				binary,poly,config.minContourFraction,imageType);
+				squareDetector,imageType);
 
 		return new SquareBinary_to_FiducialDetector<T>(alg,config.targetWidth);
 	}
@@ -73,11 +76,14 @@ public class FactoryFiducial {
 	FiducialDetector<T> squareBinaryRobust( ConfigFiducialBinary config,
 											int thresholdRadius,
 											Class<T> imageType ) {
-		InputToBinary<T> binary = FactoryThresholdBinary.adaptiveSquare(thresholdRadius, 0, true, imageType);
 
-		SplitMergeLineFitLoop poly = new SplitMergeLineFitLoop(config.borderTolerance,0.05,config.borderMaxIterations );
+		config.squareDetector.clockwise = false;
+
+		InputToBinary<T> binary = FactoryThresholdBinary.adaptiveSquare(thresholdRadius, 0, true, imageType);
+		BinaryPolygonConvexDetector<T> squareDetector = FactoryShapeDetector.polygon(binary,config.squareDetector,imageType);
+
 		DetectFiducialSquareBinary<T> alg = new DetectFiducialSquareBinary<T>(
-				binary,poly,config.minContourFraction,imageType);
+				squareDetector,imageType);
 
 		return new SquareBinary_to_FiducialDetector<T>(alg,config.targetWidth);
 	}
@@ -95,11 +101,14 @@ public class FactoryFiducial {
 	SquareImage_to_FiducialDetector<T> squareImageFast( ConfigFiducialImage config,
 														int binaryThreshold,
 														Class<T> imageType ) {
-		InputToBinary<T> binary = FactoryThresholdBinary.globalFixed(binaryThreshold, true, imageType);
 
-		SplitMergeLineFitLoop poly = new SplitMergeLineFitLoop(config.borderTolerance,0.05,config.borderMaxIterations );
+		config.squareDetector.clockwise = false;
+
+		InputToBinary<T> binary = FactoryThresholdBinary.globalFixed(binaryThreshold, true, imageType);
+		BinaryPolygonConvexDetector<T> squareDetector = 
+				FactoryShapeDetector.polygon(binary,config.squareDetector,imageType);
 		DetectFiducialSquareImage<T> alg = new DetectFiducialSquareImage<T>(
-				binary,poly,config.minContourFraction,config.maxErrorFraction,imageType);
+				squareDetector,config.maxErrorFraction,imageType);
 
 		return new SquareImage_to_FiducialDetector<T>(alg);
 	}
@@ -116,11 +125,15 @@ public class FactoryFiducial {
 	SquareImage_to_FiducialDetector<T> squareImageRobust( ConfigFiducialImage config,
 														  int thresholdRadius,
 														  Class<T> imageType ) {
-		InputToBinary<T> binary = FactoryThresholdBinary.adaptiveSquare(thresholdRadius, 0, true, imageType);
 
-		SplitMergeLineFitLoop poly = new SplitMergeLineFitLoop(config.borderTolerance,0.05,config.borderMaxIterations );
+		config.squareDetector.clockwise = false;
+
+		InputToBinary<T> binary = FactoryThresholdBinary.adaptiveSquare(thresholdRadius, 0, true, imageType);
+		BinaryPolygonConvexDetector<T> squareDetector =
+				FactoryShapeDetector.polygon(binary,config.squareDetector,imageType);
+		
 		DetectFiducialSquareImage<T> alg = new DetectFiducialSquareImage<T>(
-				binary,poly,config.minContourFraction,config.maxErrorFraction,imageType);
+				squareDetector,config.maxErrorFraction,imageType);
 
 		return new SquareImage_to_FiducialDetector<T>(alg);
 	}
