@@ -63,6 +63,11 @@ public class DetectFiducialSquareBinary<T extends ImageSingleBand>
 	// length of a side on the fiducials in world units
 	private double lengthSide = 1;
 
+	// ambiguity threshold. 0 to 1.  0 = very strict and 1 = anything goes
+	// Sets how strict a square must be black or white for it to be accepted.
+	protected double ambiguityThreshold = 0.4;
+
+
 	/**
 	 * Configures the fiducial detector
 	 *
@@ -74,6 +79,16 @@ public class DetectFiducialSquareBinary<T extends ImageSingleBand>
 		int widthNoBorder = w*4;
 
 		binary.reshape(widthNoBorder,widthNoBorder);
+	}
+
+	/**
+	 * parameters which specifies how tolerant it is of a square being ambiguous black or white.
+	 * @param ambiguityThreshold 0 to 1, insclusive
+	 */
+	public void setAmbiguityThreshold(double ambiguityThreshold) {
+		if( ambiguityThreshold < 0 || ambiguityThreshold > 1 )
+			throw new IllegalArgumentException("Must be from 0 to 1, inclusive");
+		this.ambiguityThreshold = ambiguityThreshold;
 	}
 
 	public void setLengthSide(double lengthSide) {
@@ -172,12 +187,10 @@ public class DetectFiducialSquareBinary<T extends ImageSingleBand>
 	 */
 	private boolean thresholdBinaryNumber() {
 
-		int lower = (int)(N*0.15);
-		int upper = (int)(N*0.85);
+		int lower = (int)(N*(ambiguityThreshold/2.0));
+		int upper = (int)(N*(1-ambiguityThreshold/2.0));
 
 		for (int i = 0; i < 16; i++) {
-
-
 			if( counts[i] < lower ) {
 				classified[i] = 0;
 			} else if( counts[i] > upper ) {

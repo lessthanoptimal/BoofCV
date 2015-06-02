@@ -87,7 +87,6 @@ public class ShapeFitContourApp
 		addAlgorithm(0, "Polygon", 0);
 		addAlgorithm(0, "Ellipse", 1);
 
-
 		JPanel mainPanel = new JPanel();
 		mainPanel.setLayout(new BorderLayout());
 

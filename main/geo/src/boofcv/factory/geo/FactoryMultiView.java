@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -93,11 +93,11 @@ public class FactoryMultiView {
 		ModelObservationResidualN residuals;
 		switch( type ) {
 			case SIMPLE:
-				residuals = new HomographyResidualSampson();
+				residuals = new HomographyResidualTransfer();
 				break;
 
 			case SAMPSON:
-				residuals = new HomographyResidualTransfer();
+				residuals = new HomographyResidualSampson();;
 				break;
 
 			default:

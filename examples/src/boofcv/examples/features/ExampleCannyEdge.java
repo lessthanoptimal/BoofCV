@@ -67,8 +67,8 @@ public class ExampleCannyEdge {
 		BufferedImage visualBinary = VisualizeBinaryData.renderBinary(edgeImage, false, null);
 		BufferedImage visualCannyContour = VisualizeBinaryData.renderContours(edgeContours,null,
 				gray.width,gray.height,null);
-		BufferedImage visualEdgeContour = VisualizeBinaryData.renderExternal(contours, null,
-				gray.width, gray.height, null);
+		BufferedImage visualEdgeContour = new BufferedImage(gray.width, gray.height,BufferedImage.TYPE_INT_RGB);
+		VisualizeBinaryData.renderExternal(contours, (int[])null, visualEdgeContour);
 
 		ShowImages.showWindow(visualBinary,"Binary Edges from Canny");
 		ShowImages.showWindow(visualCannyContour,"Canny Trace Graph");

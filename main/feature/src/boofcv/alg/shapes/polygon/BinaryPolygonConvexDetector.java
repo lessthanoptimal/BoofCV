@@ -113,6 +113,8 @@ public class BinaryPolygonConvexDetector<T extends ImageSingleBand> {
 	// storage for the contours associated with a found target.  used for debugging
 	private List<Contour> foundContours = new ArrayList<Contour>();
 
+	boolean verbose = false;
+
 	/**
 	 * Configures the detector.
 	 *
@@ -164,31 +166,13 @@ public class BinaryPolygonConvexDetector<T extends ImageSingleBand> {
 	}
 
 	/**
-	 * Specifies the image's intrinsic parameters and target size
-	 *
-	 * @param width Width of the input image
-	 * @param height Height of the input image
-	 */
-	// TODO move to process
-	public void configure( int width , int height ) {
-
-		// resize storage images
-		binary.reshape(width, height);
-		labeled.reshape(width, height);
-
-		// adjust size based parameters based on image size
-		this.minimumContour = (int)(width*minContourFraction);
-		this.minimumArea = Math.pow(this.minimumContour /4.0,2);
-	}
-
-	/**
 	 * Examines the undistorted gray scake input image for squares.
 	 *
 	 * @param gray Input image
 	 */
 	public void process( T gray ) {
-		if( binary.width == 0 || binary.height == 0 )
-			throw new RuntimeException("Did you call configure() yet? zero width/height");
+		if( binary.width != gray.width || binary.height == gray.width )
+			configure(gray.width,gray.height);
 
 		found.reset();
 		foundContours.clear();
@@ -197,6 +181,23 @@ public class BinaryPolygonConvexDetector<T extends ImageSingleBand> {
 
 		// Find quadrilaterals that could be fiducials
 		findCandidateShapes(gray);
+	}
+
+	/**
+	 * Specifies the image's intrinsic parameters and target size
+	 *
+	 * @param width Width of the input image
+	 * @param height Height of the input image
+	 */
+	private void configure( int width , int height ) {
+
+		// resize storage images
+		binary.reshape(width, height);
+		labeled.reshape(width, height);
+
+		// adjust size based parameters based on image size
+		this.minimumContour = (int)(width*minContourFraction);
+		this.minimumArea = Math.pow(this.minimumContour /4.0,2);
 	}
 
 	/**
@@ -229,7 +230,10 @@ public class BinaryPolygonConvexDetector<T extends ImageSingleBand> {
 					continue;
 
 				// further improve the selection of corner points
-				improveContour.fit(c.external,splits);
+				if( !improveContour.fit(c.external,splits) ) {
+					if( verbose ) System.out.println("rejected improve contour");
+					continue;
+				}
 
 				// convert the format of the initial crude polygon
 				for (int j = 0; j < polyNumberOfLines; j++) {
@@ -241,18 +245,25 @@ public class BinaryPolygonConvexDetector<T extends ImageSingleBand> {
 					UtilPolygons2D_F64.reverseOrder(workPoly);
 				}
 				// this only supports convex polygons
-				if( !UtilPolygons2D_F64.isConvex(workPoly))
+				if( !UtilPolygons2D_F64.isConvex(workPoly)) {
+					if( verbose ) System.out.println("Rejected not convex");
 					continue;
+				}
 
 				// make sure it's big enough
 				double area = Area2D_F64.polygonConvex(workPoly);
-				if( area < minimumArea )
+
+				if( area < minimumArea ) {
+					if( verbose ) System.out.println("Rejected area");
 					continue;
+				}
 
 				// refine the polygon and add it to the found list
 				if( refinePolygon(gray) ) {
 					c.id = found.size();
 					foundContours.add(c);
+				} else {
+					if( verbose ) System.out.println("Rejected");
 				}
 			}
 		}
@@ -271,13 +282,16 @@ public class BinaryPolygonConvexDetector<T extends ImageSingleBand> {
 
 		if( refineCorner != null ) {
 			refineCorner.initialize(gray);
-			if( !refinePolygonCorners(workPoly,refined) )
+			if( !refinePolygonCorners(workPoly,refined) ) {
+				if( verbose ) System.out.println("  rejected refine corner");
 				failed = true;
-		}
+			}
+		};
 		if( !failed && refineLine != null ) {
 			refineLine.initialize(gray);
 			workPoly.set(refined);
 			if( !refineLine.refine(workPoly, refined) ) {
+				if( verbose ) System.out.println("  rejected refine line");
 				failed = true;
 			}
 		}

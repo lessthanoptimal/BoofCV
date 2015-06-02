@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,6 +21,7 @@ package boofcv.gui.feature;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I32;
 import georegression.struct.shapes.EllipseRotated_F64;
+import georegression.struct.shapes.Polygon2D_F64;
 import georegression.struct.shapes.Quadrilateral_F64;
 
 import java.awt.*;
@@ -45,6 +46,31 @@ public class VisualizeShapes {
 		g2.drawLine((int)(p0.x+0.5),(int)(p0.y+0.5),(int)(p1.x+0.5),(int)(p1.y+0.5));
 	}
 
+	public static void drawArrow( Quadrilateral_F64 quad , Graphics2D g2 ) {
+		drawArrow(quad.a, quad.b, g2);
+		drawArrow(quad.b, quad.c,g2);
+		drawArrow(quad.c, quad.d,g2);
+		drawArrow(quad.d, quad.a,g2);
+	}
+
+	public static void drawArrow( Point2D_F64 p0 , Point2D_F64 p1 , Graphics2D g2 ) {
+		int x0 = (int)(p0.x+0.5);
+		int y0 = (int)(p0.y+0.5);
+		int x1 = (int)(p1.x+0.5);
+		int y1 = (int)(p1.y+0.5);
+
+		g2.drawLine(x0,y0,x1,y1);
+
+		int x2 = x0+(int)((x1-x0)*0.9);
+		int y2 = y0+(int)((y1-y0)*0.9);
+
+		int tanX = (y1-y2);
+		int tanY = (x2-x1);
+
+		g2.drawLine(x2+tanX,y2+tanY,x1,y1);
+		g2.drawLine(x2-tanX,y2-tanY,x1,y1);
+	}
+
 	/**
 	 * Draws a polygon
 	 *
@@ -62,6 +88,26 @@ public class VisualizeShapes {
 			Point2D_I32 p0 = vertexes.get(0);
 			Point2D_I32 p1 = vertexes.get(vertexes.size()-1);
 			g2.drawLine(p0.x,p0.y,p1.x,p1.y);
+		}
+	}
+
+	/**
+	 * Draws a polygon
+	 *
+	 * @param polygon The polygon
+	 * @param loop true if the end points are connected, forming a loop
+	 * @param g2 Graphics object it's drawn to
+	 */
+	public static void drawPolygon( Polygon2D_F64 polygon, boolean loop, Graphics2D g2 ) {
+		for( int i = 0; i < polygon.size()-1; i++ ) {
+			Point2D_F64 p0 = polygon.get(i);
+			Point2D_F64 p1 = polygon.get(i+1);
+			g2.drawLine((int)(p0.x+0.5),(int)(p0.y+0.5),(int)(p1.x+0.5),(int)(p1.y+0.5));
+		}
+		if( loop && polygon.size() > 0) {
+			Point2D_F64 p0 = polygon.get(0);
+			Point2D_F64 p1 = polygon.get(polygon.size()-1);
+			g2.drawLine((int)(p0.x+0.5),(int)(p0.y+0.5),(int)(p1.x+0.5),(int)(p1.y+0.5));
 		}
 	}
 

@@ -102,7 +102,6 @@ public class TestBinaryPolygonConvexDetector {
 		int numberOfSides = 4;
 		BinaryPolygonConvexDetector alg = createDetector(imageType, numberOfSides);
 
-		alg.configure(width,height);
 		alg.process(dist);
 
 		FastQueue<Polygon2D_F64> found = alg.getFound();

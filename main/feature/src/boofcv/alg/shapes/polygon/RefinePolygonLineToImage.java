@@ -169,6 +169,8 @@ public class RefinePolygonLineToImage<T extends ImageSingleBand> {
 		if( output.size() != previous.size() )
 			throw new IllegalArgumentException("Unexpected number of sides in the input polygon");
 
+		if( input.isCCW() )
+			throw new IllegalArgumentException("Polygon must be in clockwise order");
 
 		// sanity check input.  If it's too small this algorithm won't work
 		if( checkShapeTooSmall(input) )
@@ -217,7 +219,11 @@ public class RefinePolygonLineToImage<T extends ImageSingleBand> {
 				int j = (i + 1) % previous.size();
 				Point2D_F64 a = previous.get(i);
 				Point2D_F64 b = previous.get(j);
-				optimize(a,b,general[i]);
+				if( !optimize(a,b,general[i]) ) {
+					// if it fails then the line is likely along the wrong edge (not leading into the square)
+					// or in an invalid region
+					return false;
+				}
 			}
 
 			// Find the corners of the quadrilateral from the lines
@@ -263,8 +269,9 @@ public class RefinePolygonLineToImage<T extends ImageSingleBand> {
 	 * @param a Corner point in image coordinates.
 	 * @param b Corner point in image coordinates.
 	 * @param foundLocal (output) Line in local coordinates
+	 * @return true if successful or false if it failed
 	 */
-	protected void optimize( Point2D_F64 a , Point2D_F64 b , LineGeneral2D_F64 foundLocal ) {
+	protected boolean optimize( Point2D_F64 a , Point2D_F64 b , LineGeneral2D_F64 foundLocal ) {
 
 		double slopeX = (b.x - a.x);
 		double slopeY = (b.y - a.y);
@@ -291,8 +298,14 @@ public class RefinePolygonLineToImage<T extends ImageSingleBand> {
 
 		if( samplePts.size() >= 4 ) {
 			// fit line and convert into generalized format
-			FitLine_F64.polar(samplePts.toList(), weights, polar);
+			if( null == FitLine_F64.polar(samplePts.toList(), weights, polar) ) {
+				throw new RuntimeException("All weights were zero, bug some place");
+			}
 			UtilLine2D_F64.convert(polar, foundLocal);
+
+			return true;
+		} else {
+			return false;
 		}
 	}
 
@@ -320,12 +333,15 @@ public class RefinePolygonLineToImage<T extends ImageSingleBand> {
 				for (int j = 0; j < sampleRadius * 2 + 1; j++) {
 					double sample1 = integral.computeInside(x, y, x + tanX, y + tanY);
 
-					weights[index] = Math.max(0, sign * (sample1 - sample0));
-					samplePts.grow().set(x - center.x, y - center.y);
+					double w = Math.max(0, sign * (sample1 - sample0));
+					if( w > 0 ) {
+						weights[index] = w;
+						samplePts.grow().set(x - center.x, y - center.y);
+						index++;
+					}
 					x += tanX;
 					y += tanY;
 					sample0 = sample1;
-					index++;
 				}
 			}
 		}

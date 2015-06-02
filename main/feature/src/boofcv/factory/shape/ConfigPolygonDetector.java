@@ -40,18 +40,18 @@ public class ConfigPolygonDetector implements Configuration {
 	/**
 	 * Number of split and merge iterations when converting contour into polygon
 	 */
-	public int contour2Poly_iterations = 40;
+	public int contour2Poly_iterations = 20;
 
 	/**
 	 * Number of pixels, as a fraction of contour length, to split a new line in SplitMergeLineFitLoop.
 	 */
-	public double contour2Poly_splitDistanceFraction = 0.03;
+	public double contour2Poly_splitDistanceFraction = 0.04;
 
 	/**
 	 * Subpixel refinement using lines.  This assumes that the lines are straight so it works best when lens
 	 * distortion has been removed.
 	 */
-	public boolean refineWithLines = false;
+	public boolean refineWithLines = true;
 
 	/**
 	 * Subpixel refinement using corners.  Doesn't require straight lines so it is more tolerant of distortion.

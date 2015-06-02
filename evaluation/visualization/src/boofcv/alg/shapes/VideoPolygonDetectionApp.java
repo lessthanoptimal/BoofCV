@@ -16,29 +16,34 @@
  * limitations under the License.
  */
 
-package boofcv.alg.fiducial;
+package boofcv.alg.shapes;
 
-import boofcv.abst.calib.ConfigChessboard;
-import boofcv.abst.fiducial.FiducialDetector;
-import boofcv.abst.fiducial.SquareImage_to_FiducialDetector;
+import boofcv.abst.filter.binary.InputToBinary;
+import boofcv.alg.distort.AdjustmentType;
+import boofcv.alg.distort.ImageDistort;
+import boofcv.alg.distort.LensDistortionOps;
+import boofcv.alg.shapes.polygon.BinaryPolygonConvexDetector;
 import boofcv.core.image.GConvertImage;
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.factory.fiducial.ConfigFiducialBinary;
-import boofcv.factory.fiducial.ConfigFiducialImage;
-import boofcv.factory.fiducial.FactoryFiducial;
+import boofcv.core.image.border.BorderType;
+import boofcv.factory.filter.binary.FactoryThresholdBinary;
+import boofcv.factory.shape.ConfigPolygonDetector;
+import boofcv.factory.shape.FactoryShapeDetector;
 import boofcv.gui.VideoProcessAppBase;
-import boofcv.gui.fiducial.VisualizeFiducial;
+import boofcv.gui.feature.VisualizeShapes;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.SimpleImageSequence;
+import boofcv.io.image.UtilImageIO;
 import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageType;
 import boofcv.struct.image.ImageUInt8;
 import boofcv.struct.image.MultiSpectral;
-import georegression.struct.se.Se3_F64;
+import georegression.struct.shapes.Polygon2D_F64;
+import org.ddogleg.struct.FastQueue;
 
 import java.awt.*;
 import java.awt.event.MouseEvent;
@@ -50,28 +55,28 @@ import java.awt.image.BufferedImage;
  *
  * @author Peter Abeles
  */
-public class FiducialTrackerApp<I extends ImageSingleBand>
+public class VideoPolygonDetectionApp<I extends ImageSingleBand>
 		extends VideoProcessAppBase<MultiSpectral<I>>
 {
-	public static final String SQUARE_NUMBER = "Square Number";
-	public static final String SQUARE_PICTURE = "Square Picture";
-	public static final String CALIB_CHESS = "Calib Chess";
-
 
 	Class<I> imageClass;
 
 	ImagePanel panel = new ImagePanel();
 
+	IntrinsicParameters intrinsicUndist = new IntrinsicParameters();
+	MultiSpectral<I> undistorted;
+	ImageDistort<MultiSpectral<I>,MultiSpectral<I>> undistorter;
+
 	I gray;
 
-	FiducialDetector detector;
+	BinaryPolygonConvexDetector<I> detector;
 
 	IntrinsicParameters intrinsic;
 
 	boolean processedInputImage = false;
 	boolean firstFrame = true;
 
-	public FiducialTrackerApp(Class<I> imageType) {
+	public VideoPolygonDetectionApp(Class<I> imageType) {
 		super(0, ImageType.ms(3, imageType));
 		this.imageClass = imageType;
 
@@ -85,15 +90,33 @@ public class FiducialTrackerApp<I extends ImageSingleBand>
 				isPaused = !isPaused;
 			}
 
-			@Override public void mousePressed(MouseEvent e) {}
-			@Override public void mouseReleased(MouseEvent e) {}
-			@Override public void mouseEntered(MouseEvent e) {}
-			@Override public void mouseExited(MouseEvent e) {}
+			@Override
+			public void mousePressed(MouseEvent e) {}
+
+			@Override
+			public void mouseReleased(MouseEvent e) {}
+
+			@Override
+			public void mouseEntered(MouseEvent e) {}
+
+			@Override
+			public void mouseExited(MouseEvent e) {}
 		});
 
 		setMainGUI(panel);
 
 		periodSpinner.setValue(33);
+
+		undistorted = new MultiSpectral<I>(imageType,1,1,3);
+
+		ConfigPolygonDetector config = new ConfigPolygonDetector(4);
+		config.refineWithLines = true;
+		config.refineWithCorners = false;
+
+//		InputToBinary<I> inputToBinary = FactoryThresholdBinary.adaptiveSquare(6, 0, true,imageType);
+		InputToBinary<I> inputToBinary = FactoryThresholdBinary.globalOtsu(0,256, true,imageType);
+
+		detector = FactoryShapeDetector.polygon(inputToBinary,config,imageType);
 	}
 
 	@Override
@@ -130,15 +153,22 @@ public class FiducialTrackerApp<I extends ImageSingleBand>
 		refreshAll(null);
 	}
 
+	int count = 0;
 	@Override
 	protected void updateAlg(MultiSpectral<I> frame, BufferedImage buffImage) {
 
-		if( detector.getInputType().getFamily() == ImageType.Family.SINGLE_BAND ) {
-			gray.reshape(frame.width, frame.height);
-			GConvertImage.average(frame, gray);
+		undistorter.apply(frame,undistorted);
+		GConvertImage.average(undistorted,gray);
+		detector.process(gray);
+
+		// frame 212 it isn't detecting a square
+		System.out.println(count+"  detected "+detector.getFound().size);
+
+		if( count == 212 ) {
+			UtilImageIO.saveImage(buffImage,"saved.png");
 		}
 
-		detector.detect(gray);
+		count++;
 
 		processedInputImage = true;
 	}
@@ -150,12 +180,14 @@ public class FiducialTrackerApp<I extends ImageSingleBand>
 			firstFrame = false;
 		}
 
+		ConvertBufferedImage.convertTo(undistorted, imageGUI, true);
 		Graphics2D g2 = imageGUI.createGraphics();
-		Se3_F64 targetToSensor = new Se3_F64();
-		for (int i = 0; i < detector.totalFound(); i++) {
-			detector.getFiducialToCamera(i, targetToSensor);
 
-			VisualizeFiducial.drawCube(targetToSensor, intrinsic, 0.1, g2);
+		FastQueue<Polygon2D_F64> found = detector.getFound();
+		g2.setColor(new Color(255,0,0,200));
+		g2.setStroke(new BasicStroke(4));
+		for (int i = 0; i < found.size(); i++) {
+			VisualizeShapes.drawPolygon(found.get(i), true, g2);
 		}
 		panel.setBufferedImageSafe(imageGUI);
 		panel.repaint();
@@ -170,27 +202,14 @@ public class FiducialTrackerApp<I extends ImageSingleBand>
 		String videoName = inputRefs.get(index).getPath();
 		String path = videoName.substring(0,videoName.lastIndexOf('/'));
 
-		if( name.compareTo(SQUARE_NUMBER) == 0 ) {
-			detector = FactoryFiducial.squareBinaryFast(new ConfigFiducialBinary(0.1), 100, imageClass);
-		} else if( name.compareTo(SQUARE_PICTURE) == 0 ) {
-			double length = 0.1;
-			detector = FactoryFiducial.squareImageFast(new ConfigFiducialImage(), 100, imageClass);
-
-			SquareImage_to_FiducialDetector<I> d = (SquareImage_to_FiducialDetector<I>)detector;
-			BufferedImage dog = media.openImage(path + "/dog.png");
-			BufferedImage text = media.openImage(path+"/text.png");
-			d.addTarget(ConvertBufferedImage.convertFromSingle(dog,null,imageClass),125,length);
-			d.addTarget(ConvertBufferedImage.convertFromSingle(text,null,imageClass),125,length);
-
-		} else if( name.compareTo(CALIB_CHESS) == 0 ) {
-			detector = FactoryFiducial.calibChessboard(new ConfigChessboard(5,7,0.03), imageClass);
-		} else {
-			throw new RuntimeException("Unknown selection");
-		}
-
 		intrinsic = UtilIO.loadXML(media.openFile(path+"/intrinsic.xml"));
 
-		detector.setIntrinsic(intrinsic);
+		undistorted.reshape(intrinsic.width,intrinsic.height);
+		undistorter = LensDistortionOps.removeDistortion(
+				AdjustmentType.ALL_INSIDE, BorderType.EXTENDED, intrinsic, intrinsicUndist, undistorted.getImageType());
+
+		undistorted.reshape(intrinsic.width,intrinsic.height);
+		gray.reshape(intrinsic.width,intrinsic.height);
 
 		SimpleImageSequence<MultiSpectral<I>> video = media.openVideo(videoName, ImageType.ms(3, imageClass));
 
@@ -215,7 +234,7 @@ public class FiducialTrackerApp<I extends ImageSingleBand>
 //		Class type = ImageFloat32.class;
 		Class type = ImageUInt8.class;
 
-		FiducialTrackerApp app = new FiducialTrackerApp(type);
+		VideoPolygonDetectionApp app = new VideoPolygonDetectionApp(type);
 
 		app.setBaseDirectory("../data/applet/fiducial/");
 		app.loadInputData("../data/applet/fiducial/fiducial.txt");
@@ -232,6 +251,6 @@ public class FiducialTrackerApp<I extends ImageSingleBand>
 			Thread.yield();
 		}
 
-		ShowImages.showWindow(app, "Tracking Rectangle");
+		ShowImages.showWindow(app, "Tracking Square");
 	}
 }

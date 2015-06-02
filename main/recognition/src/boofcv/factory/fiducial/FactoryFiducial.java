@@ -60,6 +60,7 @@ public class FactoryFiducial {
 
 		DetectFiducialSquareBinary<T> alg = new DetectFiducialSquareBinary<T>(
 				squareDetector,imageType);
+		alg.setAmbiguityThreshold(config.ambiguousThreshold);
 
 		return new SquareBinary_to_FiducialDetector<T>(alg,config.targetWidth);
 	}
@@ -84,6 +85,7 @@ public class FactoryFiducial {
 
 		DetectFiducialSquareBinary<T> alg = new DetectFiducialSquareBinary<T>(
 				squareDetector,imageType);
+		alg.setAmbiguityThreshold(config.ambiguousThreshold);
 
 		return new SquareBinary_to_FiducialDetector<T>(alg,config.targetWidth);
 	}

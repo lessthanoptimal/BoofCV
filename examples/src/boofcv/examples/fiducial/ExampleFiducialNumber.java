@@ -54,8 +54,8 @@ public class ExampleFiducialNumber {
 
 		// Detect the fiducial
 		FiducialDetector<ImageFloat32> detector = FactoryFiducial.
-				squareBinaryRobust(new ConfigFiducialBinary(0.1), 6, ImageFloat32.class);
-//				squareBinaryFast(new ConfigFiducialBinary(0.1),100,ImageFloat32.class);
+//				squareBinaryRobust(new ConfigFiducialBinary(0.1), 6, ImageFloat32.class);
+				squareBinaryFast(new ConfigFiducialBinary(0.1),100,ImageFloat32.class);
 
 		detector.setIntrinsic(param);
 

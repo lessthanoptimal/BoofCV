@@ -18,6 +18,7 @@
 
 package boofcv.alg.fiducial;
 
+import boofcv.abst.geo.RefineEpipolar;
 import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.distort.PointToPixelTransform_F32;
 import boofcv.alg.distort.PointTransformHomography_F32;
@@ -28,6 +29,8 @@ import boofcv.alg.shapes.polygon.BinaryPolygonConvexDetector;
 import boofcv.core.image.border.BorderType;
 import boofcv.core.image.border.FactoryImageBorder;
 import boofcv.factory.distort.FactoryDistort;
+import boofcv.factory.geo.EpipolarError;
+import boofcv.factory.geo.FactoryMultiView;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.distort.PixelTransform_F32;
@@ -81,7 +84,9 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 
 	// Used to compute/remove distortion from perspective
 	private HomographyLinear4 computeHomography = new HomographyLinear4(true);
+	private RefineEpipolar refineHomography = FactoryMultiView.refineHomography(1e-4,100, EpipolarError.SAMPSON);
 	private DenseMatrix64F H = new DenseMatrix64F(3,3);
+	private DenseMatrix64F H_refined = new DenseMatrix64F(3,3);
 	private List<AssociatedPair> pairsRemovePerspective = new ArrayList<AssociatedPair>();
 	private ImageDistort<T,ImageFloat32> removePerspective;
 	private PointTransformHomography_F32 transformHomography = new PointTransformHomography_F32();
@@ -91,6 +96,8 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 
 	// type of input image
 	private Class<T> inputType;
+
+	private boolean verbose = false;
 
 	// ----- Used to estimate 3D pose of calibration target
 
@@ -141,8 +148,6 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 		if( intrinsic.isDistorted() )
 			throw new IllegalArgumentException("Detector assumes distortion has been removed already");
 
-		squareDetector.configure(intrinsic.width, intrinsic.height);
-
 		// add corner points in target frame.  Used to compute homography.  Target's center is at its origin
 		// see comment in class JavaDoc above.  Note that the target's length is one below.  The scale factor
 		// will be provided later one
@@ -166,13 +171,14 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 	 *
 	 * @param gray Undistorted input image
 	 */
-	public void process( T gray ) {
+	public boolean process( T gray ) {
 
 		squareDetector.process(gray);
 		FastQueue<Polygon2D_F64> candidates = squareDetector.getFound();
 
 		found.reset();
 
+		if( verbose ) System.out.println("---------- Got Polygons! "+candidates.size);
 		// undistort the squares
 		Quadrilateral_F64 q = new Quadrilateral_F64(); // todo predeclare
 		for (int i = 0; i < candidates.size; i++) {
@@ -185,9 +191,19 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 			pairsRemovePerspective.get(2).set( square.width-1 , square.height-1 , q.c.x , q.c.y );
 			pairsRemovePerspective.get(3).set( 0              , square.height-1 , q.d.x , q.d.y );
 
-			computeHomography.process(pairsRemovePerspective,H);
+			if( !computeHomography.process(pairsRemovePerspective,H) ) {
+				if( verbose ) System.out.println("rejected initial homography");
+				continue;
+			}
+
+			// refine homography estimate
+			if( !refineHomography.fitModel(pairsRemovePerspective,H,H_refined) ) {
+				if( verbose ) System.out.println("rejected refine homography");
+				continue;
+			}
+
 			// pass the found homography onto the image transform
-			UtilHomography.convert(H,transformHomography.getModel());
+			UtilHomography.convert(H_refined,transformHomography.getModel());
 			// remove the perspective distortion and process it
 			removePerspective.apply(gray, square);
 			if( processSquare(square,result)) {
@@ -201,9 +217,13 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 				}
 
 				// estimate position
-				computeTargetToWorld(q,result.lengthSide,f.targetToSensor);
+				computeTargetToWorld(q, result.lengthSide, f.targetToSensor);
+				if( verbose ) System.out.println("accepted!");
+			} else {
+				if( verbose ) System.out.println("rejected process square");
 			}
 		}
+		return true;
 	}
 
 	/**
@@ -236,10 +256,10 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 		pairsPose.get(2).p2.set(quad.c);
 		pairsPose.get(3).p2.set(quad.d);
 
-		if( !computeHomography.process(pairsPose,H) )
+		if( !computeHomography.process(pairsPose,H_refined) )
 			throw new RuntimeException("Compute homography failed!");
 
-		targetToWorld.set(homographyToPose.decompose(H));
+		targetToWorld.set(homographyToPose.decompose(H_refined));
 		GeometryMath_F64.scale(targetToWorld.getT(),lengthSide);
 	}
 

@@ -272,7 +272,7 @@ public class TestRefinePolygonLineToImage {
 		LineGeneral2D_F64 found = new LineGeneral2D_F64();
 
 		alg.initialize(image);
-		alg.optimize(input.a, input.b, found);
+		assertTrue(alg.optimize(input.a, input.b, found));
 
 		assertTrue(Distance2D_F64.distance(found, input.a) <= 1e-4);
 		assertTrue(Distance2D_F64.distance(found, input.b) <= 1e-4);
@@ -285,6 +285,14 @@ public class TestRefinePolygonLineToImage {
 		}
 
 		return a;
+	}
+
+	/**
+	 * Try optimizing an edge which goes in the wrong direction.  should fail
+	 */
+	@Test
+	public void optimize_line_wrongEdge() {
+		fail("Implement");
 	}
 
 	/**

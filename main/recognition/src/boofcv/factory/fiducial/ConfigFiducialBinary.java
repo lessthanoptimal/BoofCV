@@ -35,6 +35,12 @@ public class ConfigFiducialBinary implements Configuration {
 	public double targetWidth;
 
 	/**
+	 * Value from 0 to 1.  0 is very strict and 1 is very relaxed.  Used when classifying a require block
+	 * as black or white.  If it can't be classified then the shape is discarded
+	 */
+	public double ambiguousThreshold = 0.4;
+
+	/**
 	 * Configuration for square detector
 	 */
 	public ConfigPolygonDetector squareDetector = new ConfigPolygonDetector(4);
@@ -48,7 +54,8 @@ public class ConfigFiducialBinary implements Configuration {
 
 	@Override
 	public void checkValidity() {
-
+		if( ambiguousThreshold < 0 || ambiguousThreshold > 1 )
+			throw new IllegalArgumentException("ambiguousThreshold must be from 0 to 1, inclusive");
 	}
 
 	public double getTargetWidth() {

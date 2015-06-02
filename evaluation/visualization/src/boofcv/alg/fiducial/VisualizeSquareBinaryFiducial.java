@@ -18,8 +18,14 @@
 
 package boofcv.alg.fiducial;
 
-import boofcv.alg.shapes.SplitMergeLineFitLoop;
+import boofcv.abst.filter.binary.InputToBinary;
+import boofcv.alg.distort.AdjustmentType;
+import boofcv.alg.distort.ImageDistort;
+import boofcv.alg.distort.LensDistortionOps;
+import boofcv.core.image.border.BorderType;
 import boofcv.factory.filter.binary.FactoryThresholdBinary;
+import boofcv.factory.shape.ConfigPolygonDetector;
+import boofcv.factory.shape.FactoryShapeDetector;
 import boofcv.gui.ListDisplayPanel;
 import boofcv.gui.binary.VisualizeBinaryData;
 import boofcv.gui.feature.VisualizeShapes;
@@ -29,6 +35,7 @@ import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageType;
 import boofcv.struct.image.ImageUInt8;
 import org.ddogleg.struct.FastQueue;
 
@@ -44,13 +51,22 @@ public class VisualizeSquareBinaryFiducial {
 
 	public void process( String nameImage , String nameIntrinsic ) {
 
-		ImageFloat32 input = UtilImageIO.loadImage(nameImage,ImageFloat32.class);
 		IntrinsicParameters intrinsic = UtilIO.loadXML(nameIntrinsic);
+		ImageFloat32 input = UtilImageIO.loadImage(nameImage, ImageFloat32.class);
+		ImageFloat32 undistorted = new ImageFloat32(input.width,input.height);
 
-		Detector detector = new Detector();
-		detector.configure(intrinsic);
+		IntrinsicParameters paramUndist = new IntrinsicParameters();
+		ImageDistort<ImageFloat32,ImageFloat32> undistorter = LensDistortionOps.removeDistortion(
+				AdjustmentType.ALL_INSIDE, BorderType.EXTENDED, intrinsic, paramUndist,
+				ImageType.single(ImageFloat32.class));
+
+		InputToBinary<ImageFloat32> inputToBinary = FactoryThresholdBinary.globalOtsu(0,256, true,ImageFloat32.class);
+		Detector detector = new Detector(inputToBinary);
+		detector.configure(paramUndist);
 		detector.setLengthSide(0.1);
-		detector.process(input);
+
+		undistorter.apply(input,undistorted);
+		detector.process(undistorted);
 
 		System.out.println("Total Found: "+detector.squares.size());
 		FastQueue<FoundFiducial> fiducials = detector.getFound();
@@ -80,9 +96,9 @@ public class VisualizeSquareBinaryFiducial {
 		public List<ImageUInt8> squares = new ArrayList<ImageUInt8>();
 		public List<ImageFloat32> squaresGray = new ArrayList<ImageFloat32>();
 
-		protected Detector() {
-			super(FactoryThresholdBinary.adaptiveSquare(10, 0, true, ImageFloat32.class),
-					new SplitMergeLineFitLoop(5, 0.05, 20), 0.23,ImageFloat32.class);
+		protected Detector( InputToBinary<ImageFloat32> inputToBinary ) {
+			super(FactoryShapeDetector.polygon(inputToBinary,
+					new ConfigPolygonDetector(4,false), ImageFloat32.class),ImageFloat32.class);
 		}
 
 		@Override
