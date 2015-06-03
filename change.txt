@@ -57,12 +57,15 @@ Version : Alpha 0.19
   * Can save an image directly that is in BoofCV format
 - Shape Features
   * Corner fitting algorithm that uses the tangent of the gradient
-  * (TODO) Line fitting
-  * (TODO) Quadrilateral detector
+  * Black convex polygon detector
+  * Polygon fitting
 - ShowImages
   * Will now display any BoofCV image directly.
+- Android
+  * Can convert from 8888 to 3 channel multi-spectral images
 
 TODO
+  * Polygon Detector - Avoid undistorting the image, do it sparsely
   * Distortion Model + Calibration
     - calibration regression
        * given points compute parameters.  radial and tangential

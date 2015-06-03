@@ -1,3 +1,21 @@
+/*
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ *
+ * This file is part of BoofCV (http://boofcv.org).
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package boofcv.android;
 
 import android.graphics.Bitmap;
@@ -402,19 +420,36 @@ public class ImplConvertBitmap {
 
 		switch (config) {
 		case ARGB_8888: {
-			ImageUInt8 A = output.getBand(3);
-			for (int y = 0; y < h; y++) {
-				int indexDst = output.startIndex + y * output.stride;
-				int end = indexDst + w;
-				// for (int x = 0; x < w; x++, indexSrc++) {
-				while (indexDst < end) {
-					R.data[indexDst] = input[indexSrc++];
-					G.data[indexDst] = input[indexSrc++];
-					B.data[indexDst] = input[indexSrc++];
-					A.data[indexDst] = input[indexSrc++];
-					
-					indexDst++;
+			if( output.getNumBands() == 4 ) {
+				ImageUInt8 A = output.getBand(3);
+				for (int y = 0; y < h; y++) {
+					int indexDst = output.startIndex + y * output.stride;
+					int end = indexDst + w;
+					// for (int x = 0; x < w; x++, indexSrc++) {
+					while (indexDst < end) {
+						R.data[indexDst] = input[indexSrc++];
+						G.data[indexDst] = input[indexSrc++];
+						B.data[indexDst] = input[indexSrc++];
+						A.data[indexDst] = input[indexSrc++];
+
+						indexDst++;
+					}
 				}
+			} else if( output.getNumBands() == 3 ) {
+				for (int y = 0; y < h; y++) {
+					int indexDst = output.startIndex + y * output.stride;
+					int end = indexDst + w;
+					// for (int x = 0; x < w; x++, indexSrc++) {
+					while (indexDst < end) {
+						R.data[indexDst] = input[indexSrc++];
+						G.data[indexDst] = input[indexSrc++];
+						B.data[indexDst] = input[indexSrc++];
+						indexSrc++;
+						indexDst++;
+					}
+				}
+			} else {
+				throw new IllegalArgumentException("Expected 3 or 4 bands in output");
 			}
 		}
 			break;
@@ -459,19 +494,36 @@ public class ImplConvertBitmap {
 
 		switch (config) {
 		case ARGB_8888: {
-			ImageFloat32 A = output.getBand(3);
-			for (int y = 0; y < h; y++) {
-				int indexDst = output.startIndex + y * output.stride;
-				int end = indexDst + w;
-				// for (int x = 0; x < w; x++, indexSrc++) {
-				while (indexDst < end) {
-					R.data[indexDst] = input[indexSrc++] & 0xFF;
-					G.data[indexDst] = input[indexSrc++] & 0xFF;
-					B.data[indexDst] = input[indexSrc++] & 0xFF;
-					A.data[indexDst] = input[indexSrc++] & 0xFF;
-					
-					indexDst++;
+			if( output.getNumBands() == 4 ) {
+				ImageFloat32 A = output.getBand(3);
+				for (int y = 0; y < h; y++) {
+					int indexDst = output.startIndex + y * output.stride;
+					int end = indexDst + w;
+					// for (int x = 0; x < w; x++, indexSrc++) {
+					while (indexDst < end) {
+						R.data[indexDst] = input[indexSrc++] & 0xFF;
+						G.data[indexDst] = input[indexSrc++] & 0xFF;
+						B.data[indexDst] = input[indexSrc++] & 0xFF;
+						A.data[indexDst] = input[indexSrc++] & 0xFF;
+
+						indexDst++;
+					}
 				}
+			} else if( output.getNumBands() == 3 ) {
+				for (int y = 0; y < h; y++) {
+					int indexDst = output.startIndex + y * output.stride;
+					int end = indexDst + w;
+					// for (int x = 0; x < w; x++, indexSrc++) {
+					while (indexDst < end) {
+						R.data[indexDst] = input[indexSrc++] & 0xFF;
+						G.data[indexDst] = input[indexSrc++] & 0xFF;
+						B.data[indexDst] = input[indexSrc++] & 0xFF;
+						indexSrc++;
+						indexDst++;
+					}
+				}
+			} else {
+				throw new IllegalArgumentException("Expected 3 or 4 bands in output");
 			}
 		}
 			break;
@@ -616,7 +668,7 @@ public class ImplConvertBitmap {
 						output[indexDst++] = A.data[indexSrc];
 					}
 				}
-			} else {
+			} else if( input.getNumBands() == 3 ) {
 				for (int y = 0; y < h; y++) {
 					int indexSrc = input.startIndex + y * input.stride;
 					for (int x = 0; x < w; x++,indexSrc++) {
@@ -626,6 +678,8 @@ public class ImplConvertBitmap {
 						output[indexDst++] = (byte)0xFF;
 					}
 				}
+			} else {
+				throw new IllegalArgumentException("Expected input to have 3 or 4 bands");
 			}
 			break;
 
@@ -680,7 +734,7 @@ public class ImplConvertBitmap {
 						output[indexDst++] = (byte)A.data[indexSrc];
 					}
 				}
-			} else {
+			} else if( input.getNumBands() == 3 ){
 				for (int y = 0; y < h; y++) {
 					int indexSrc = input.startIndex + y * input.stride;
 					for (int x = 0; x < w; x++,indexSrc++) {
@@ -690,6 +744,8 @@ public class ImplConvertBitmap {
 						output[indexDst++] = (byte)255;
 					}
 				}
+			} else {
+				throw new IllegalArgumentException("Expected input to have 3 or 4 bands");
 			}
 			break;
 
