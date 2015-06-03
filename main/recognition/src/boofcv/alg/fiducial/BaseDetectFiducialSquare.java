@@ -111,7 +111,7 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 	 * Configures the detector.
 	 *
 	 * @param squareDetector Detects the quadrilaterals in the image
-	 * @param squarePixels  Number of pixels wide the image with lens and perspective distortion removed is.
+	 * @param squarePixels  Number of pixels wide the image that stores the target's detector interior is.
 	 * @param inputType Type of input image it's processing
 	 */
 	protected BaseDetectFiducialSquare(BinaryPolygonConvexDetector<T> squareDetector,

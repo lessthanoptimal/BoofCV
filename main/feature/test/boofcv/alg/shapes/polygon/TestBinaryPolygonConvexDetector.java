@@ -21,10 +21,10 @@ package boofcv.alg.shapes.polygon;
 import boofcv.abst.distort.FDistort;
 import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.alg.misc.GImageMiscOps;
-import boofcv.alg.shapes.SplitMergeLineFitLoop;
-import boofcv.alg.shapes.corner.SubpixelSparseCornerFit;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.filter.binary.FactoryThresholdBinary;
+import boofcv.factory.shape.ConfigPolygonDetector;
+import boofcv.factory.shape.FactoryShapeDetector;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.image.ImageFloat32;
@@ -32,6 +32,7 @@ import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
 import georegression.geometry.UtilPolygons2D_F64;
 import georegression.struct.affine.Affine2D_F64;
+import georegression.struct.point.Point2D_I32;
 import georegression.struct.shapes.Polygon2D_F64;
 import georegression.struct.shapes.Rectangle2D_I32;
 import georegression.transform.affine.AffinePointOps_F64;
@@ -39,12 +40,12 @@ import org.ddogleg.struct.FastQueue;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 /**
  * @author Peter Abeles
@@ -101,7 +102,6 @@ public class TestBinaryPolygonConvexDetector {
 
 		int numberOfSides = 4;
 		BinaryPolygonConvexDetector alg = createDetector(imageType, numberOfSides);
-
 		alg.process(dist);
 
 		FastQueue<Polygon2D_F64> found = alg.getFound();
@@ -115,11 +115,8 @@ public class TestBinaryPolygonConvexDetector {
 
 	private BinaryPolygonConvexDetector createDetector(Class imageType, int numberOfSides) {
 		InputToBinary inputToBinary = FactoryThresholdBinary.globalFixed(100, true, imageType);
-		SplitMergeLineFitLoop contourToPolygon = new SplitMergeLineFitLoop(0,0.1,40);
-		RefinePolygonLineToImage refineLine = new RefinePolygonLineToImage(numberOfSides,true,imageType);
-		SubpixelSparseCornerFit refineCorner = new SubpixelSparseCornerFit(imageType);
-		return new BinaryPolygonConvexDetector(numberOfSides,inputToBinary,contourToPolygon,
-				refineLine,null,0.23,0.03,true,imageType);
+		return FactoryShapeDetector.polygon(inputToBinary,
+				new ConfigPolygonDetector(numberOfSides),imageType);
 	}
 
 	private int findMatches( Polygon2D_F64 found , double tol ) {
@@ -168,21 +165,86 @@ public class TestBinaryPolygonConvexDetector {
 
 	@Test
 	public void rejectShapes_circle() {
-		fail("Implement");
+		BufferedImage work = new BufferedImage(200,220,BufferedImage.TYPE_INT_RGB);
+		Graphics2D g2 = work.createGraphics();
+		g2.setColor(Color.WHITE);
+		g2.fillRect(0,0,200,220);
+		g2.setColor(Color.BLACK);
+		g2.fillOval(30, 30, 40, 50);
+
+		ImageUInt8 gray = ConvertBufferedImage.convertFrom(work,(ImageUInt8)null);
+
+		for (int i = 3; i <= 6; i++) {
+			BinaryPolygonConvexDetector alg = createDetector(ImageUInt8.class, i);
+
+			alg.process(gray);
+			assertEquals(0,alg.getFound().size());
+		}
 	}
 
 	@Test
 	public void rejectShapes_triangle() {
-		fail("Implement");
+		BufferedImage work = new BufferedImage(200,220,BufferedImage.TYPE_INT_RGB);
+		Graphics2D g2 = work.createGraphics();
+		g2.setColor(Color.WHITE);
+		g2.fillRect(0,0,200,220);
+		g2.setColor(Color.BLACK);
+		g2.fillPolygon(new int[]{10, 50, 30}, new int[]{10, 10, 40}, 3);
+
+		ImageUInt8 gray = ConvertBufferedImage.convertFrom(work,(ImageUInt8)null);
+
+		for (int i = 3; i <= 6; i++) {
+			BinaryPolygonConvexDetector alg = createDetector(ImageUInt8.class, i);
+
+			alg.process(gray);
+			if( i == 3 ) {
+				double tol = 0.5;
+				assertEquals(1, alg.getFound().size());
+				Polygon2D_F64 found = (Polygon2D_F64)alg.getFound().get(0);
+				assertEquals(10,found.get(0).x,tol);
+				assertEquals(10,found.get(0).y,tol);
+				assertEquals(30,found.get(1).x,tol);
+				assertEquals(40,found.get(1).y,tol);
+				assertEquals(50,found.get(2).x,tol);
+				assertEquals(10,found.get(2).y,tol);
+			} else
+				assertEquals(0,alg.getFound().size());
+		}
+	}
+
+
+	@Test
+	public void touchesBorder_false() {
+		List<Point2D_I32> contour = new ArrayList<Point2D_I32>();
+
+		BinaryPolygonConvexDetector alg = createDetector(ImageUInt8.class, 4);
+		alg.getBinary().reshape(20,30);
+		assertFalse(alg.touchesBorder(contour));
+
+		contour.add(new Point2D_I32(10,1));
+		assertFalse(alg.touchesBorder(contour));
+		contour.add(new Point2D_I32(10,28));
+		assertFalse(alg.touchesBorder(contour));
+		contour.add(new Point2D_I32(1,15));
+		assertFalse(alg.touchesBorder(contour));
+		contour.add(new Point2D_I32(18,15));
+		assertFalse(alg.touchesBorder(contour));
 	}
 
 	@Test
-	public void rejectShapes_pentagon() {
-		fail("Implement");
-	}
+	public void touchesBorder_true() {
+		List<Point2D_I32> contour = new ArrayList<Point2D_I32>();
 
-	@Test
-	public void touchesBorder() {
-		fail("Implement");
+		BinaryPolygonConvexDetector alg = createDetector(ImageUInt8.class, 4);
+		alg.getBinary().reshape(20,30);
+
+		contour.add(new Point2D_I32(10,0));
+		assertTrue(alg.touchesBorder(contour));
+		contour.clear();contour.add(new Point2D_I32(10, 29));
+		assertTrue(alg.touchesBorder(contour));
+		contour.clear();contour.add(new Point2D_I32(0,15));
+		assertTrue(alg.touchesBorder(contour));
+		contour.clear();contour.add(new Point2D_I32(19,15));
+		assertTrue(alg.touchesBorder(contour));
 	}
 }

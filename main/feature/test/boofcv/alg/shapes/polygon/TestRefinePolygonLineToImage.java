@@ -292,7 +292,20 @@ public class TestRefinePolygonLineToImage {
 	 */
 	@Test
 	public void optimize_line_wrongEdge() {
-		fail("Implement");
+		final boolean black = true;
+
+		for (Class imageType : imageTypes) {
+			setup(null, black, imageType);
+
+			RefinePolygonLineToImage alg = createAlg(4,black, imageType);
+
+			Quadrilateral_F64 input = new Quadrilateral_F64(x0,y0,x0,y1,x1,y1,x1,y0);
+			LineGeneral2D_F64 found = new LineGeneral2D_F64();
+
+			alg.initialize(image);
+			assertFalse(alg.optimize(input.b, input.a, found));
+			// should be a to b
+		}
 	}
 
 	/**
@@ -316,26 +329,20 @@ public class TestRefinePolygonLineToImage {
 		alg.initialize(image);
 		alg.center.set(10, 12);
 		alg.computePointsAndWeights(0, H, x0, y0 + 5, -1, 0);
-		assertEquals(alg.weights.length,alg.samplePts.size());
 
-		int radius = alg.sampleRadius;
-		int N = radius*2+1;
+		// sample points on the outside of the line will be zero since the image has no gradient
+		// there.  Thus the weight is zero and the point skipped
+		assertEquals(alg.lineSamples,alg.samplePts.size());
 
 		for (int i = 0; i < alg.lineSamples; i++) {
-			for (int j = 0; j < N; j++) {
-				int index = i*N+j;
-				if( j == radius ) {
-					assertEquals(white,alg.weights[index],1e-8);
-				} else {
-					assertEquals(0,alg.weights[index],1e-8);
-				}
+			// only points along the line were saved, the outer ones discarded
+			assertEquals(white,alg.weights[i],1e-8);
 
-				double x = x0 - 10 + radius - j;
-				double y = y0 + 5 + H*i/(alg.lineSamples -1) - 12;
-				Point2D_F64 p = (Point2D_F64)alg.samplePts.get(index);
-				assertEquals(x,p.x,1e-4);
-				assertEquals(y,p.y,1e-4);
-			}
+			double x = x0 - 10;
+			double y = y0 + 5 + H*i/(alg.lineSamples -1) - 12;
+			Point2D_F64 p = (Point2D_F64)alg.samplePts.get(i);
+			assertEquals(x,p.x,1e-4);
+			assertEquals(y,p.y,1e-4);
 		}
 	}
 
