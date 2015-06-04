@@ -218,7 +218,7 @@ public class TestBaseDetectFiducialSquare {
 
 		protected Dummy() {
 			super(FactoryShapeDetector.polygon(FactoryThresholdBinary.globalFixed(50,true,ImageUInt8.class),
-					new ConfigPolygonDetector(4),ImageUInt8.class),100, ImageUInt8.class);
+					new ConfigPolygonDetector(4,false),ImageUInt8.class),100, ImageUInt8.class);
 		}
 
 		@Override

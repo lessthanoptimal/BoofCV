@@ -71,7 +71,7 @@ public class GradientSparsePrewitt_F32 implements SparseImageGradient<ImageFloat
 			a22 = border.get(x+1,y+1);
 		}
 		gradient.y = -(a00 + a01 + a02);
-		gradient.y += (a20 + 2.0f*a21 + a22);
+		gradient.y += (a20 + a21 + a22);
 
 		gradient.x = -(a00 + a10 + a20);
 		gradient.x += (a02 + a12 + a22);

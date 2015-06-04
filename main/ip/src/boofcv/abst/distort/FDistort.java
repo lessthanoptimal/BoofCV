@@ -42,8 +42,6 @@ import georegression.struct.affine.Affine2D_F64;
  *
  * @author Peter Abeles
  */
-// TODO rename.  Too similar to ImageDistort.
-	// Distort , FDistort
 public class FDistort
 {
 	// input and output images

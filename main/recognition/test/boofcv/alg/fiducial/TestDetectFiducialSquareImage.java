@@ -40,7 +40,8 @@ import static org.junit.Assert.*;
 public class TestDetectFiducialSquareImage {
 
 	Random rand = new Random(234);
-	BinaryPolygonConvexDetector squareDetector = FactoryShapeDetector.polygon(null, new ConfigPolygonDetector(4), ImageUInt8.class);
+	BinaryPolygonConvexDetector squareDetector = FactoryShapeDetector.
+			polygon(null, new ConfigPolygonDetector(4,false), ImageUInt8.class);
 
 
 	@Test

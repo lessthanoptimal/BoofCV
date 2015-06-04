@@ -21,7 +21,7 @@ package boofcv.struct;
 import georegression.struct.point.Point2D_F64;
 
 /**
- * Data structure for a point and the gradient at that loction
+ * Data structure for a point coordinate and the gradient at that location
  *
  * @author Peter Abeles
  */
@@ -30,6 +30,12 @@ public class PointGradient_F64 extends Point2D_F64{
 	 * Image gradient at this location
 	 */
 	public double dx,dy;
+
+	public PointGradient_F64(double x, double y, double dx, double dy) {
+		super(x, y);
+		this.dx = dx;
+		this.dy = dy;
+	}
 
 	public PointGradient_F64(PointGradient_F64 orig) {
 		set(orig);
@@ -69,6 +75,6 @@ public class PointGradient_F64 extends Point2D_F64{
 	}
 
 	public PointGradient_F64 copy() {
-		return new PointGradient_F64();
+		return new PointGradient_F64(this);
 	}
 }

@@ -20,14 +20,43 @@ package boofcv.struct;
 
 import org.junit.Test;
 
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Peter Abeles
  */
 public class TestPointGradient_F64 {
 	@Test
-	public void foo() {
-		fail("implement");
+	public void set_object() {
+		PointGradient_F64 a = new PointGradient_F64(1,2,3,4);
+		PointGradient_F64 b = new PointGradient_F64();
+		b.set(a);
+
+		assertEquals(a.x,b.x,1e-8);
+		assertEquals(a.y,b.y,1e-8);
+		assertEquals(a.dx,b.dx,1e-8);
+		assertEquals(a.dy,b.dy,1e-8);
+	}
+
+	@Test
+	public void set_values() {
+		PointGradient_F64 b = new PointGradient_F64();
+		b.set(1,2,3,4);
+
+		assertEquals(1,b.x,1e-8);
+		assertEquals(2,b.y,1e-8);
+		assertEquals(3,b.dx,1e-8);
+		assertEquals(4,b.dy,1e-8);
+	}
+
+	@Test
+	public void copy() {
+		PointGradient_F64 a = new PointGradient_F64(1,2,3,4);
+		PointGradient_F64 b = a.copy();
+
+		assertEquals(a.x,b.x,1e-8);
+		assertEquals(a.y,b.y,1e-8);
+		assertEquals(a.dx,b.dx,1e-8);
+		assertEquals(a.dy,b.dy,1e-8);
 	}
 }
