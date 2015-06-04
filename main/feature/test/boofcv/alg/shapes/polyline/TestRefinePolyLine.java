@@ -16,8 +16,9 @@
  * limitations under the License.
  */
 
-package boofcv.alg.shapes.polygon;
+package boofcv.alg.shapes.polyline;
 
+import boofcv.alg.shapes.polygon.UtilShapePolygon;
 import georegression.geometry.UtilLine2D_F64;
 import georegression.struct.line.LineGeneral2D_F64;
 import georegression.struct.line.LineParametric2D_F64;
@@ -34,7 +35,7 @@ import static org.junit.Assert.assertEquals;
 /**
  * @author Peter Abeles
  */
-public class TestRefinePolygonContourLoop {
+public class TestRefinePolyLine {
 
 	Random rand = new Random(234);
 
@@ -52,7 +53,7 @@ public class TestRefinePolygonContourLoop {
 		addPoints(x1,y1,x0,y1,points);
 		addPoints(x0,y1,x0,y0,points);
 
-		RefinePolygonContourLoop alg = new RefinePolygonContourLoop();
+		RefinePolyLine alg = new RefinePolyLine(true);
 
 		GrowQueue_I32 corners = new GrowQueue_I32();
 		corners.add(0);
@@ -66,6 +67,37 @@ public class TestRefinePolygonContourLoop {
 		assertEquals(50,  corners.get(1));
 		assertEquals(134, corners.get(2));
 		assertEquals(184, corners.get(3));
+	}
+
+	/**
+	 * Fit to a square, but only a disconnected polyline on 3 sides
+	 */
+	@Test
+	public void fit_quad_segment() {
+		int x0 = 10,y0 = 15;
+		int x1 = 60,y1 = 99;
+
+		List<Point2D_I32> points = new ArrayList<Point2D_I32>();
+		addPoints(x0,y0,x1,y0,points);
+		addPoints(x1,y0,x1,y1,points);
+		addPoints(x1,y1,x0,y1,points);
+
+		RefinePolyLine alg = new RefinePolyLine(false);
+
+		for( int i = 0; i < 10; i++ ) {
+			GrowQueue_I32 corners = new GrowQueue_I32();
+			corners.add(0);
+			corners.add(50  + rand.nextInt(6)-3);
+			corners.add(50 + 84 + rand.nextInt(6)-3);
+			corners.add(points.size()-1);
+
+			alg.fit(points, corners);
+
+			assertEquals(0, corners.get(0));
+			assertEquals(50, corners.get(1));
+			assertEquals(134, corners.get(2));
+			assertEquals(points.size()-1, corners.get(3));
+		}
 	}
 
 	/**
@@ -89,7 +121,7 @@ public class TestRefinePolygonContourLoop {
 		corners.add(80);
 		corners.add(120);
 
-		RefinePolygonContourLoop alg = new RefinePolygonContourLoop();
+		RefinePolyLine alg = new RefinePolyLine(true);
 		for (int i = 0; i < 10; i++) {
 			// noise up the inputs
 			for (int j = 0; j < corners.size(); j++) {
@@ -116,7 +148,7 @@ public class TestRefinePolygonContourLoop {
 		addPoints(0, 0, 20, 0, contour);
 		addPoints(20, 0, 20, 20, contour);
 
-		RefinePolygonContourLoop alg = new RefinePolygonContourLoop();
+		RefinePolyLine alg = new RefinePolyLine(true);
 		alg.searchRadius = 5;
 		int found = alg.optimize(contour,2,16,36);
 		assertEquals(20,found);
@@ -135,7 +167,7 @@ public class TestRefinePolygonContourLoop {
 		contour.get(17).set(17,1);
 		contour.get(18).set(18,2);
 
-		RefinePolygonContourLoop alg = new RefinePolygonContourLoop();
+		RefinePolyLine alg = new RefinePolyLine(true);
 		alg.searchRadius = 5;
 		int found = alg.optimize(contour,2,16,36);
 		assertEquals(20,found);
@@ -143,7 +175,7 @@ public class TestRefinePolygonContourLoop {
 
 	@Test
 	public void distanceSum() {
-		RefinePolygonContourLoop alg = new RefinePolygonContourLoop();
+		RefinePolyLine alg = new RefinePolyLine(true);
 
 		List<Point2D_I32> contour = new ArrayList<Point2D_I32>();
 		for (int i = 0; i < 20; i++) {

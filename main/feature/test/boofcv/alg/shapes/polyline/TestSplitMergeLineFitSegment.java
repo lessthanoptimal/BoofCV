@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.shapes;
+package boofcv.alg.shapes.polyline;
 
 import georegression.struct.point.Point2D_I32;
 import org.ddogleg.struct.GrowQueue_I32;

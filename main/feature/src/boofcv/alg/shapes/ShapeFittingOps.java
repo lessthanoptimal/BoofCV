@@ -18,7 +18,9 @@
 
 package boofcv.alg.shapes;
 
-import boofcv.alg.shapes.polygon.RefinePolygonContourLoop;
+import boofcv.alg.shapes.polyline.RefinePolyLine;
+import boofcv.alg.shapes.polyline.SplitMergeLineFitLoop;
+import boofcv.alg.shapes.polyline.SplitMergeLineFitSegment;
 import boofcv.struct.PointIndex_I32;
 import georegression.fitting.ellipse.ClosestPointEllipseAngle_F64;
 import georegression.fitting.ellipse.FitEllipseAlgebraic;
@@ -71,13 +73,14 @@ public class ShapeFittingOps {
 			SplitMergeLineFitLoop alg = new SplitMergeLineFitLoop(toleranceDist,toleranceAngle,iterations);
 			alg.process(sequence);
 			splits = alg.getSplits();
-			RefinePolygonContourLoop refine = new RefinePolygonContourLoop(10);
+			RefinePolyLine refine = new RefinePolyLine(true,10);
 			refine.fit(sequence,splits);
 		} else {
 			SplitMergeLineFitSegment alg = new SplitMergeLineFitSegment(toleranceDist,toleranceAngle,iterations);
 			alg.process(sequence);
 			splits = alg.getSplits();
-			// TODO add refine
+			RefinePolyLine refine = new RefinePolyLine(false,10);
+			refine.fit(sequence,splits);
 		}
 
 		FastQueue<PointIndex_I32> output = new FastQueue<PointIndex_I32>(PointIndex_I32.class,true);

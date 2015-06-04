@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.shapes;
+package boofcv.alg.shapes.polyline;
 
 import georegression.metric.Distance2D_F64;
 import georegression.struct.point.Point2D_I32;

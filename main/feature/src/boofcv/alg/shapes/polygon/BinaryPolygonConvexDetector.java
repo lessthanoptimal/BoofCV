@@ -21,8 +21,9 @@ package boofcv.alg.shapes.polygon;
 import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.alg.filter.binary.Contour;
 import boofcv.alg.filter.binary.LinearContourLabelChang2004;
-import boofcv.alg.shapes.SplitMergeLineFitLoop;
 import boofcv.alg.shapes.corner.SubpixelSparseCornerFit;
+import boofcv.alg.shapes.polyline.RefinePolyLine;
+import boofcv.alg.shapes.polyline.SplitMergeLineFitLoop;
 import boofcv.struct.ConnectRule;
 import boofcv.struct.image.ImageSInt32;
 import boofcv.struct.image.ImageSingleBand;
@@ -48,18 +49,27 @@ import java.util.List;
  * <ol>
  * <li>First the input gray scale image is converted into a binary image.</li>
  * <li>The contours of black blobs are found.</li>
- * <li>From the contours a polygons are fitted.</li>
- * <li>From the polygons quadrilaterals are fitted.</li>
- * <li>Then a sub-pixel algorithm aligns the quadrilateral to its edge</li>
+ * <li>From the contours polygons are fitted and refined to pixel accuracy.</li>
+ * <li>(Optional) Sub-pixel refinement of the polygon's edges and/or corners.</li>
  * </ol>
- * The last step assumes that the lines of the shape are straight.  This is a reasonable assumption
- * when lens distortion has been removed.  The other steps are fairly tolerant to distortion.
- *
- * TODO discuss subpixel
  *
  * <p>
+ * Subpixel refinement is done using the provided {@link RefinePolygonLineToImage} and {@link SubpixelSparseCornerFit}.
+ * If straight lines are straight, as is the case with images with lens distortion removes, then the line based
+ * refinement will tend to produce better results.  If lens distortion is present then the corner sub-pixel algorithm
+ * is more likely to produce better results.
+ * </p>
+ *
+ * <p>
+ * NOTE: If both refinement methods are used then corner is applied first followed by line.<br>
  * NOTE: A binary image is not processed as input because the gray-scale image is used in the sub-pixel line/corner
  * refinement.
+ * </p>
+ *
+ * <p>
+ * The returned polygons will encompass the entire black polygon.  Here is a simple example in 1D. If all pixels are
+ * white, but pixels ranging from 5 to 10, inclusive, then the returned boundaries would be 5.0 to 11.0.  This
+ * means that coordinates 5.0 &le; x < 11.0 are all black.  11.0 is included, but note that the entire pixel 11 is white.
  * </p>
  *
  * @author Peter Abeles
@@ -88,7 +98,7 @@ public class BinaryPolygonConvexDetector<T extends ImageSingleBand> {
 	private SplitMergeLineFitLoop fitPolygon;
 
 	// Improve the selection of corner pixels in the contour
-	private RefinePolygonContourLoop improveContour = new RefinePolygonContourLoop(20);
+	private RefinePolyLine improveContour = new RefinePolyLine(true,20);
 
 	// Refines the estimate of the polygon's lines using a subpixel technique
 	private RefinePolygonLineToImage<T> refineLine;
@@ -121,8 +131,8 @@ public class BinaryPolygonConvexDetector<T extends ImageSingleBand> {
 	 * @param polygonSides Number of lines in the polygon
 	 * @param thresholder Converts the input image into a binary one
 	 * @param contourToPolygon Fits a crude polygon to the shape's binary contour
-	 * @param refineLine Refines the polygon's lines.  Set to null to skip step
-	 * @param refineCorner Refines the polygon's corners.  Set to null to skip step
+	 * @param refineLine (Optional) Refines the polygon's lines.  Set to null to skip step
+	 * @param refineCorner (Optional) Refines the polygon's corners.  Set to null to skip step
 	 * @param minContourFraction Size of minimum contour as a fraction of the input image's width.  Try 0.23
 	 * @param splitDistanceFraction Number of pixels as a fraction of contour length to split a new line in
 	 *                             SplitMergeLineFitLoop.  Try 0.03

@@ -19,10 +19,10 @@
 package boofcv.factory.shape;
 
 import boofcv.abst.filter.binary.InputToBinary;
-import boofcv.alg.shapes.SplitMergeLineFitLoop;
 import boofcv.alg.shapes.corner.SubpixelSparseCornerFit;
 import boofcv.alg.shapes.polygon.BinaryPolygonConvexDetector;
 import boofcv.alg.shapes.polygon.RefinePolygonLineToImage;
+import boofcv.alg.shapes.polyline.SplitMergeLineFitLoop;
 import boofcv.struct.image.ImageSingleBand;
 
 /**

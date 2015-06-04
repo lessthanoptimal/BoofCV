@@ -16,8 +16,9 @@
  * limitations under the License.
  */
 
-package boofcv.alg.shapes.polygon;
+package boofcv.alg.shapes.polyline;
 
+import boofcv.alg.shapes.polygon.UtilShapePolygon;
 import georegression.geometry.UtilLine2D_F64;
 import georegression.struct.line.LineGeneral2D_F64;
 import georegression.struct.line.LineSegment2D_F64;
@@ -27,13 +28,22 @@ import org.ddogleg.struct.GrowQueue_I32;
 import java.util.List;
 
 /**
- * Optimizes each corner placement individually for a looping polygon with corner list index.  The process is
- * repeated until the maximum number of iterations has been reached or there is no change.  Optimization is done by
- * exhaustively searching a local region around the current corner and saving the best result.
+ * <p>
+ * Optimizing corner placements to a pixel level when given a contour and integer list of approximate
+ * corner locations which define set of line segments.    Corners are optimized by searching for another near by
+ * pixel in the provided contour which reduces the distance of the contour from the line segments.  This
+ * is intended to optimize the output from {@link SplitMergeLineFit}.  Can be configured to
+ * handle case where line segments form a loop or have disconnected end points.
+ * </p>
+ *
+ * <p>
+ * Each corner is individually optimized once per iteration.  The process is repeated until the maximum number of
+ * iterations has been reached or there is no change in corner placements.
+ * </p>
  *
  * @author Peter Abeles
  */
-public class RefinePolygonContourLoop {
+public class RefinePolyLine {
 
 	// maximum number of iterations
 	private int maxIterations = 10;
@@ -47,23 +57,30 @@ public class RefinePolygonContourLoop {
 	LineGeneral2D_F64 line0 = new LineGeneral2D_F64();
 	LineGeneral2D_F64 line1 = new LineGeneral2D_F64();
 
+	// do the line segments form a loop or not?
+	boolean looping;
+
 	/**
 	 * Constructor with configurable parameters
 	 *
+	 * @param looping true if it loops or false if not
 	 * @param maxIterations Number of internal EM iterations
 	 */
-	public RefinePolygonContourLoop(int maxIterations) {
+	public RefinePolyLine(boolean looping, int maxIterations) {
+		this.looping = looping;
 		this.maxIterations = maxIterations;
 	}
 
 	/**
 	 * Constructor using default parameters
 	 */
-	public RefinePolygonContourLoop() {
+	public RefinePolyLine(boolean looping) {
+		this.looping = looping;
 	}
 
 	/**
-	 * Fits a polygon to the contour given an initial set of candidate corners
+	 * Fits a polygon to the contour given an initial set of candidate corners.  If not looping the corners
+	 * must include the end points still.
 	 *
 	 * @param contour Contours around the shape
 	 * @param corners (Input) initial set of corners.  (output) refined set of corners
@@ -72,11 +89,21 @@ public class RefinePolygonContourLoop {
 	{
 		searchRadius = Math.min(6,Math.max(contour.size()/12,3));
 
+		int startCorner,endCorner;
+		if( looping ) {
+			startCorner = 0;
+			endCorner = corners.size;
+		} else {
+			// the end point positions are fixed
+			startCorner = 1;
+			endCorner = corners.size-1;
+		}
+
 		boolean change = true;
 		for( int iteration = 0; iteration < maxIterations && change; iteration++ ) {
 			change = false;
-			for (int i = 0; i < corners.size(); i++) {
-				int c0 = UtilShapePolygon.minus(i,1,corners.size());
+			for (int i = startCorner; i < endCorner; i++) {
+				int c0 = UtilShapePolygon.minus(i, 1, corners.size());
 				int c2 = UtilShapePolygon.plus(i,1,corners.size());
 
 				int improved = optimize(contour, corners.get(c0), corners.get(i), corners.get(c2));

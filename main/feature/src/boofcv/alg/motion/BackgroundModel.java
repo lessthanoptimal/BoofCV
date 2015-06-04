@@ -16,18 +16,10 @@
  * limitations under the License.
  */
 
-package boofcv.alg.shapes.polygon;
-
-import org.junit.Test;
-
-import static org.junit.Assert.fail;
+package boofcv.alg.motion;
 
 /**
  * @author Peter Abeles
  */
-public class TestRefinePolygonContourSegment {
-	@Test
-	public void stuff() {
-		fail("Implement");
-	}
+public class BackgroundModel {
 }
