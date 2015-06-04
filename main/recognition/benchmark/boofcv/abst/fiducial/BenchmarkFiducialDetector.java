@@ -70,8 +70,8 @@ public class BenchmarkFiducialDetector<T extends ImageSingleBand> {
 	private static void perform(String directory, FiducialDetector detector) {
 		IntrinsicParameters intrinsic = UtilIO.loadXML(directory + "intrinsic.xml");
 
-		intrinsic.radial = null;
-		intrinsic.t1 = intrinsic.t2 = 0;
+//		intrinsic.radial = null;
+//		intrinsic.t1 = intrinsic.t2 = 0;
 
 		BenchmarkFiducialDetector benchmark = new BenchmarkFiducialDetector(detector);
 		benchmark.setParam(intrinsic);
@@ -79,7 +79,7 @@ public class BenchmarkFiducialDetector<T extends ImageSingleBand> {
 		benchmark.addImage(directory + "image0001.jpg");
 		benchmark.addImage(directory + "image0002.jpg");
 
-		System.out.println("FPS = "+benchmark.benchmark(300));
+		System.out.println("FPS = "+benchmark.benchmark(600));
 	}
 
 	public static void main(String[] args) {

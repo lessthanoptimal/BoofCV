@@ -18,10 +18,8 @@
 
 package boofcv.alg.interpolate;
 
-import boofcv.core.image.FactoryGImageSingleBand;
 import boofcv.core.image.GImageSingleBand;
 import boofcv.core.image.border.ImageBorder;
-import boofcv.struct.image.ImageSingleBand;
 
 /**
  * <p>
@@ -44,52 +42,35 @@ import boofcv.struct.image.ImageSingleBand;
  *
  * @author Peter Abeles
  */
-public class ImageLineIntegral<Image extends ImageSingleBand> {
+public class ImageLineIntegral {
 
-	// type of image it can process
-	Class<Image> imageType;
-	// handles image border
-	ImageBorder<Image> border;
+	// reference to image.
 	GImageSingleBand image;
 
-	// length of the line
+	// length of the line just computed
 	double length;
 
-	public ImageLineIntegral(Class<Image> imageType) {
-		this.imageType = imageType;
-		image = FactoryGImageSingleBand.create(imageType);
-	}
 
 	/**
 	 * Specify input image.
 	 *
 	 * @param image image
 	 */
-	public void setImage( Image image ) {
-		this.image.wrap(image);
+	public void setImage( GImageSingleBand image ) {
+		this.image = image;
 	}
 
 	/**
-	 * Specifies how the border is handled.  If null is passed in or is never called then it can't process
-	 * line segments which extend outside the image.
+	 * Computes the line segment's line integral across the inside of the image. Where the
+	 * inside is defined as 0 &le; x &le; width and 0 &le; y &le; height.
 	 *
-	 * @param border Border
-	 */
-	public void setBorder(ImageBorder<Image> border) {
-		this.border = border;
-	}
-
-	/**
-	 * Computes the line segment's line integral, which is assumed to be inside the image.  Faster then
-	 * {@link #computeBorder} since it doesn't need to do as many checks.
-	 *
-	 * @param x0 0 end point of line segment. x-coordinate
-	 * @param y0 0 end point of line segment. y-coordinate
-	 * @param x1 1 end point of line segment. x-coordinate
-	 * @param y1 1 end point of line segment. y-coordinate
+	 * @param x0 end point of line segment. x-coordinate
+	 * @param y0 end point of line segment. y-coordinate
+	 * @param x1 end point of line segment. x-coordinate
+	 * @param y1 end point of line segment. y-coordinate
 	 * @return line integral
 	 */
-	public double computeInside(double x0, double y0, double x1, double y1) {
+	public double compute(double x0, double y0, double x1, double y1) {
 
 		double sum = 0;
 
@@ -183,29 +164,13 @@ public class ImageLineIntegral<Image extends ImageSingleBand> {
 	}
 
 	/**
-	 * Computes the line segment's line integral.  Slower than {@link #computeInside} but can process pixels
-	 * outside the image.  Must call {@link #setBorder} before invoking.
-	 *
-	 * @param x0 0 end point of line segment. x-coordinate
-	 * @param y0 0 end point of line segment. y-coordinate
-	 * @param x1 1 end point of line segment. x-coordinate
-	 * @param y1 1 end point of line segment. y-coordinate
-	 * @return line integral
-	 */
-	public double computeBorder(double x0, double y0, double x1, double y1) {
-		return 0;
-	}
-
-	/**
 	 * <p>
 	 * Return true if the coordinate is inside the image or false if not.<br>
-	 * 0 <= x <= width<br>
-	 * 0 <= y <= height
+	 * 0 &le; x &le; width<br>
+	 * 0 &le; y &le; height
 	 * </p>
 	 * <p>Note: while the image is defined up to width and height, including coordinates up to that point contribute
 	 * nothing towards the line integral since they are infinitesimally small.</p>
-	 *
-	 *
 	 *
 	 * @param x x-coordinate in pixel coordinates
 	 * @param y y-coordinate in pixel coordinates
@@ -221,14 +186,5 @@ public class ImageLineIntegral<Image extends ImageSingleBand> {
 	 */
 	public double getLength() {
 		return length;
-	}
-
-	/**
-	 * Returns the type of single band image it can process
-	 * @return Image type
-	 */
-	@SuppressWarnings("unchecked")
-	public Class<Image> getImageType() {
-		return imageType;
 	}
 }

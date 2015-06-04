@@ -25,6 +25,7 @@ import boofcv.alg.shapes.corner.SubpixelSparseCornerFit;
 import boofcv.alg.shapes.polyline.RefinePolyLine;
 import boofcv.alg.shapes.polyline.SplitMergeLineFitLoop;
 import boofcv.struct.ConnectRule;
+import boofcv.struct.distort.PixelTransform_F32;
 import boofcv.struct.image.ImageSInt32;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
@@ -123,6 +124,9 @@ public class BinaryPolygonConvexDetector<T extends ImageSingleBand> {
 	// storage for the contours associated with a found target.  used for debugging
 	private List<Contour> foundContours = new ArrayList<Contour>();
 
+	// transforms which can be used to handle lens distortion
+	protected PixelTransform_F32 toUndistorted, toDistorted;
+
 	boolean verbose = false;
 
 	/**
@@ -173,6 +177,30 @@ public class BinaryPolygonConvexDetector<T extends ImageSingleBand> {
 				return new Polygon2D_F64(polygonSides);
 			}
 		};
+	}
+
+	/**
+	 * <p>Specifies transforms which can be used to change coordinates from distorted to undistorted and the opposite
+	 * coordinates.  The undistorted image is never explicitly created.</p>
+	 *
+	 * <p>
+	 * WARNING: The undistorted image must have the same bounds as the distorted input image.  This is because
+	 * several of the bounds checks use the image shape.  This are simplified greatly by this assumption.
+	 * </p>
+	 *
+	 * @param width Input image width.  Used in sanity check only.
+	 * @param height Input image height.  Used in sanity check only.
+	 * @param toUndistorted Transform from undistorted to distorted image.
+	 * @param toDistorted Transform from distorted to undistorted image.
+	 */
+	public void setLensDistortion( int width , int height ,
+								   PixelTransform_F32 toUndistorted , PixelTransform_F32 toDistorted ) {
+
+		this.toUndistorted = toUndistorted;
+		this.toDistorted = toDistorted;
+		if( refineLine != null ) {
+			refineLine.setTransform(width,height,toDistorted);
+		}
 	}
 
 	/**
@@ -228,6 +256,11 @@ public class BinaryPolygonConvexDetector<T extends ImageSingleBand> {
 				if( touchesBorder(c.external))
 					continue;
 
+				// remove lens distortion
+				if( toUndistorted != null ) {
+					removeDistortionFromContour(c.external);
+				}
+
 				// dynamically set split distance based on polygon's size
 				double splitTolerance = splitDistanceFraction*c.external.size();
 				fitPolygon.setToleranceSplit(splitTolerance);
@@ -276,6 +309,19 @@ public class BinaryPolygonConvexDetector<T extends ImageSingleBand> {
 					if( verbose ) System.out.println("Rejected");
 				}
 			}
+		}
+	}
+
+	/**
+	 * Removes lens distortion from the found contour
+	 */
+	private void removeDistortionFromContour(List<Point2D_I32> contour) {
+		for (int j = 0; j < contour.size(); j++) {
+			Point2D_I32 p = contour.get(j);
+			toUndistorted.compute(p.x,p.y);
+			// round to minimize error
+			p.x = Math.round(toUndistorted.distX);
+			p.y = Math.round(toUndistorted.distY);
 		}
 	}
 

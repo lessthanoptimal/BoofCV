@@ -18,11 +18,7 @@
 
 package boofcv.abst.fiducial;
 
-import boofcv.alg.distort.AdjustmentType;
-import boofcv.alg.distort.ImageDistort;
-import boofcv.alg.distort.LensDistortionOps;
 import boofcv.alg.fiducial.BaseDetectFiducialSquare;
-import boofcv.core.image.border.BorderType;
 import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageType;
@@ -40,39 +36,19 @@ public abstract class BaseSquare_FiducialDetector<T extends ImageSingleBand,Dete
 
 	ImageType<T> type;
 
-	boolean isDistorted;
-	IntrinsicParameters intrinsicUndist = new IntrinsicParameters();
-	T undistorted;
-	ImageDistort<T,T> undistorter;
-
 	public BaseSquare_FiducialDetector(Detector alg) {
 		this.alg = alg;
 		this.type = ImageType.single(alg.getInputType());
-		undistorted = type.createImage(1,1);
 	}
 
 	@Override
 	public void detect(T input) {
-		if( isDistorted ) {
-			undistorter.apply(input,undistorted);
-			alg.process(undistorted);
-		} else {
-			alg.process(input);
-		}
+		alg.process(input);
 	}
 
 	@Override
 	public void setIntrinsic(IntrinsicParameters intrinsic) {
-		if( intrinsic.isDistorted() ) {
-			isDistorted = true;
-			undistorted.reshape(intrinsic.width,intrinsic.height);
-			undistorter = LensDistortionOps.removeDistortion(
-					AdjustmentType.ALL_INSIDE, BorderType.EXTENDED, intrinsic, intrinsicUndist,type);
-			alg.configure(intrinsicUndist);
-		} else {
-			isDistorted = false;
-			alg.configure(intrinsic);
-		}
+		alg.configure(intrinsic,true);
 	}
 
 	@Override

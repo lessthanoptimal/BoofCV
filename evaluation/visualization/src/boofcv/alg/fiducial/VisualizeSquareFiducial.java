@@ -68,7 +68,7 @@ public class VisualizeSquareFiducial {
 				ImageType.single(ImageFloat32.class));
 
 		Detector detector = new Detector();
-		detector.configure(paramUndist);
+		detector.configure(paramUndist,false);
 
 		undistorter.apply(input,undistorted);
 		detector.process(undistorted);

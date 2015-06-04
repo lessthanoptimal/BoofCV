@@ -62,7 +62,7 @@ public class VisualizeSquareBinaryFiducial {
 
 		InputToBinary<ImageFloat32> inputToBinary = FactoryThresholdBinary.globalOtsu(0,256, true,ImageFloat32.class);
 		Detector detector = new Detector(inputToBinary);
-		detector.configure(paramUndist);
+		detector.configure(paramUndist,false);
 		detector.setLengthSide(0.1);
 
 		undistorter.apply(input,undistorted);

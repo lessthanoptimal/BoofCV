@@ -72,7 +72,7 @@ public class TestBaseDetectFiducialSquare {
 		render(pattern, where, image);
 
 		Dummy dummy = new Dummy();
-		dummy.configure(intrinsic);
+		dummy.configure(intrinsic,false);
 		dummy.process(image);
 
 		assertEquals(1,dummy.detected.size());
@@ -110,7 +110,7 @@ public class TestBaseDetectFiducialSquare {
 		DenseMatrix64F K = PerspectiveOps.calibrationMatrix(intrinsic,null);
 
 		Dummy alg = new Dummy();
-		alg.configure(intrinsic);
+		alg.configure(intrinsic,false);
 
 		Se3_F64 targetToWorld = new Se3_F64();
 		targetToWorld.getT().set(0.1,-0.07,1.5);

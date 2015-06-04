@@ -374,6 +374,11 @@ public class TestRefinePolygonLineToImage {
 
 	}
 
+	@Test
+	public void setTransform() {
+		fail("Implement");
+	}
+
 	private void setup( Affine2D_F64 affine, boolean black , Class imageType ) {
 		work = GeneralizedImageOps.createSingleBand(imageType,width,height);
 		image = GeneralizedImageOps.createSingleBand(imageType,width,height);

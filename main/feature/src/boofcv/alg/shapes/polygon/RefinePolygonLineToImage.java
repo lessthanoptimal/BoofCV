@@ -18,7 +18,14 @@
 
 package boofcv.alg.shapes.polygon;
 
+import boofcv.alg.distort.DistortImageOps;
 import boofcv.alg.interpolate.ImageLineIntegral;
+import boofcv.alg.interpolate.InterpolatePixelS;
+import boofcv.core.image.FactoryGImageSingleBand;
+import boofcv.core.image.GImageSingleBand;
+import boofcv.core.image.GImageSingleBandDistorted;
+import boofcv.factory.interpolate.FactoryInterpolation;
+import boofcv.struct.distort.PixelTransform_F32;
 import boofcv.struct.image.ImageSingleBand;
 import georegression.fitting.line.FitLine_F64;
 import georegression.geometry.UtilLine2D_F64;
@@ -27,6 +34,7 @@ import georegression.struct.line.LineGeneral2D_F64;
 import georegression.struct.line.LinePolar2D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.Polygon2D_F64;
+import georegression.struct.shapes.RectangleLength2D_F32;
 import org.ddogleg.struct.FastQueue;
 
 /**
@@ -87,9 +95,11 @@ public class RefinePolygonLineToImage<T extends ImageSingleBand> {
 	protected Point2D_F64 center = new Point2D_F64();
 
 	// used when computing the fit for a line at specific points
-	protected ImageLineIntegral<T> integral;
+	protected ImageLineIntegral integral;
+	protected GImageSingleBand integralImage;
 	// the input image
 	protected T image;
+	Class<T> imageType;
 
 	/**
 	 * Constructor which provides full access to all parameters.  See code documents
@@ -109,7 +119,9 @@ public class RefinePolygonLineToImage<T extends ImageSingleBand> {
 		this.sampleRadius = sampleRadius;
 		this.maxIterations = maxIterations;
 		this.convergeTolPixels = convergeTolPixels;
-		this.integral = new ImageLineIntegral<T>(imageType);
+		this.integral = new ImageLineIntegral();
+		this.integralImage = FactoryGImageSingleBand.create(imageType);
+		this.imageType = imageType;
 
 		previous = new Polygon2D_F64(numSides);
 
@@ -124,7 +136,8 @@ public class RefinePolygonLineToImage<T extends ImageSingleBand> {
 	 */
 	public RefinePolygonLineToImage(int numSides , boolean fitBlack, Class<T> imageType) {
 		previous = new Polygon2D_F64(numSides);
-		this.integral = new ImageLineIntegral<T>(imageType);
+		this.integral = new ImageLineIntegral();
+		this.integralImage = FactoryGImageSingleBand.create(imageType);
 		setup(fitBlack);
 	}
 
@@ -149,11 +162,35 @@ public class RefinePolygonLineToImage<T extends ImageSingleBand> {
 	}
 
 	/**
+	 * Used to specify a transform that's applied pixel coordinates.  The bounds of the
+	 * transformed coordinates MUST be the same as the input image.
+	 *
+	 * @param width Input image width.  Used in sanity check only.
+	 * @param height Input image height.  Used in sanity check only.
+	 * @param transform Pixel transformation.
+	 */
+	public void setTransform( int width , int height , PixelTransform_F32 transform ) {
+		// sanity check since I think many people will screw this up.
+		RectangleLength2D_F32 rect = DistortImageOps.boundBox_F32(width, height, transform);
+		float x1 = rect.x0 + rect.width;
+		float y1 = rect.y0 + rect.height;
+
+		if( rect.getX() < 0 || rect.getY() < 0 || x1 > width || y1 > height ) {
+			throw new IllegalArgumentException("You failed the idiot proof test! RTFM! The undistorted image "+
+					"must be contained by the same bounds as the input distorted image");
+		}
+
+		InterpolatePixelS<T> interpolate = FactoryInterpolation.bilinearPixelS(imageType);
+		integralImage = new GImageSingleBandDistorted<T>(transform,interpolate);
+	}
+
+	/**
 	 * Sets the image which is going to be processed
 	 */
 	public void initialize(T image) {
 		this.image = image;
-		integral.setImage(image);
+		integralImage.wrap(image);
+		integral.setImage(integralImage);
 	}
 
 	/**
@@ -167,7 +204,7 @@ public class RefinePolygonLineToImage<T extends ImageSingleBand> {
 		if( input.size() != previous.size() )
 			throw new IllegalArgumentException("Unexpected number of sides in the input polygon");
 		if( output.size() != previous.size() )
-			throw new IllegalArgumentException("Unexpected number of sides in the input polygon");
+			throw new IllegalArgumentException("Unexpected number of sides in the output polygon");
 
 		if( input.isCCW() )
 			throw new IllegalArgumentException("Polygon must be in clockwise order");
@@ -328,21 +365,23 @@ public class RefinePolygonLineToImage<T extends ImageSingleBand> {
 			double rightX = x + (sampleRadius*2+1)*tanX;
 			double rightY = y + (sampleRadius*2+1)*tanY;
 
-			if(integral.isInside(leftX, leftY) && integral.isInside(rightX,rightY)) {
-				double sample0 = integral.computeInside(x, y, x - tanX, y - tanY);
-				for (int j = 0; j < sampleRadius * 2 + 1; j++) {
-					double sample1 = integral.computeInside(x, y, x + tanX, y + tanY);
+			// TODO Need to handle this better for distorted image
+			if(!integral.isInside(leftX, leftY) || !integral.isInside(rightX,rightY))
+				continue;
 
-					double w = Math.max(0, sign * (sample1 - sample0));
-					if( w > 0 ) {
-						weights[index] = w;
-						samplePts.grow().set(x - center.x, y - center.y);
-						index++;
-					}
-					x += tanX;
-					y += tanY;
-					sample0 = sample1;
+			double sample0 = integral.compute(x, y, x - tanX, y - tanY);
+			for (int j = 0; j < sampleRadius * 2 + 1; j++) {
+				double sample1 = integral.compute(x, y, x + tanX, y + tanY);
+
+				double w = Math.max(0, sign * (sample1 - sample0));
+				if( w > 0 ) {
+					weights[index] = w;
+					samplePts.grow().set(x - center.x, y - center.y);
+					index++;
 				}
+				x += tanX;
+				y += tanY;
+				sample0 = sample1;
 			}
 		}
 	}

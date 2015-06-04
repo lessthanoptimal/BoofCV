@@ -19,9 +19,7 @@
 package boofcv.alg.fiducial;
 
 import boofcv.abst.geo.RefineEpipolar;
-import boofcv.alg.distort.ImageDistort;
-import boofcv.alg.distort.PointToPixelTransform_F32;
-import boofcv.alg.distort.PointTransformHomography_F32;
+import boofcv.alg.distort.*;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.calibration.Zhang99DecomposeHomography;
 import boofcv.alg.geo.h.HomographyLinear4;
@@ -142,11 +140,25 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 	 * Specifies the image's intrinsic parameters and target size
 	 *
 	 * @param intrinsic Intrinsic parameters for the distortion free input image
+	 * @param cache If there's lens distortion should it cache the transforms?  Speeds it up by about 12%.  Ignored
+	 *              if no lens distortion
 	 */
-	public void configure( IntrinsicParameters intrinsic) {
+	public void configure( IntrinsicParameters intrinsic , boolean cache ) {
 
-		if( intrinsic.isDistorted() )
-			throw new IllegalArgumentException("Detector assumes distortion has been removed already");
+		if( intrinsic.isDistorted() ) {
+			PixelTransform_F32 distToUndist =
+					new PointToPixelTransform_F32(LensDistortionOps.allInside(intrinsic, null, false));
+			PixelTransform_F32 undistToDist =
+					new PointToPixelTransform_F32(LensDistortionOps.allInside(intrinsic, null, true));
+
+			if( cache ) {
+				distToUndist = new PixelTransformCached_F32(intrinsic.width, intrinsic.height, distToUndist);
+				undistToDist = new PixelTransformCached_F32(intrinsic.width, intrinsic.height, undistToDist);
+			}
+
+			squareDetector.setLensDistortion(intrinsic.width,intrinsic.height,
+					distToUndist,undistToDist);
+		}
 
 		// add corner points in target frame.  Used to compute homography.  Target's center is at its origin
 		// see comment in class JavaDoc above.  Note that the target's length is one below.  The scale factor

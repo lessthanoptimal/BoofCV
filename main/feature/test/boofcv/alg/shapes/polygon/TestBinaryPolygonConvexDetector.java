@@ -71,6 +71,14 @@ public class TestBinaryPolygonConvexDetector {
 		transform.reset();
 	}
 
+	/**
+	 * See if it correctly applies the use lens distoriton ops
+	 */
+	@Test
+	public void usingSetLensDistortion() {
+		fail("Implement");
+	}
+
 	@Test
 	public void easyTestNoDistortion() {
 		rectangles.add(new Rectangle2D_I32(30,30,60,60));
