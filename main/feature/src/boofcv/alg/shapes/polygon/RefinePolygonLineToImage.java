@@ -138,6 +138,7 @@ public class RefinePolygonLineToImage<T extends ImageSingleBand> {
 		previous = new Polygon2D_F64(numSides);
 		this.integral = new ImageLineIntegral();
 		this.integralImage = FactoryGImageSingleBand.create(imageType);
+		this.imageType = imageType;
 		setup(fitBlack);
 	}
 
@@ -163,7 +164,7 @@ public class RefinePolygonLineToImage<T extends ImageSingleBand> {
 
 	/**
 	 * Used to specify a transform that's applied pixel coordinates.  The bounds of the
-	 * transformed coordinates MUST be the same as the input image.
+	 * transformed coordinates MUST be the same as the input image.  Call before {@link #initialize(ImageSingleBand)}.
 	 *
 	 * @param width Input image width.  Used in sanity check only.
 	 * @param height Input image height.  Used in sanity check only.
@@ -176,7 +177,7 @@ public class RefinePolygonLineToImage<T extends ImageSingleBand> {
 		float y1 = rect.y0 + rect.height;
 
 		if( rect.getX() < 0 || rect.getY() < 0 || x1 > width || y1 > height ) {
-			throw new IllegalArgumentException("You failed the idiot proof test! RTFM! The undistorted image "+
+			throw new IllegalArgumentException("You failed the idiot test! RTFM! The undistorted image "+
 					"must be contained by the same bounds as the input distorted image");
 		}
 
@@ -185,7 +186,8 @@ public class RefinePolygonLineToImage<T extends ImageSingleBand> {
 	}
 
 	/**
-	 * Sets the image which is going to be processed
+	 * Sets the image which is going to be processed.  If a transform is to be used
+	 * {@link #setTransform} should be called before this.
 	 */
 	public void initialize(T image) {
 		this.image = image;
@@ -277,7 +279,7 @@ public class RefinePolygonLineToImage<T extends ImageSingleBand> {
 					converged = false;
 					break;
 				}
- 			}
+			}
 			if( converged ) {
 //				System.out.println("Converged early at "+iteration);
 				break;
@@ -327,8 +329,10 @@ public class RefinePolygonLineToImage<T extends ImageSingleBand> {
 		slopeY -= 2.0*unitY*cornerOffset;
 
 		// normalized tangent of sample distance length
-		double tanX = -unitY;
-		double tanY = unitX;
+		// Two choices for tangent here.  Select the one which points to the "right" of the line,
+		// which is inside of the polygon
+		double tanX = unitY;
+		double tanY = -unitX;
 
 		// set up inputs into line fitting
 		computePointsAndWeights(slopeX, slopeY, x0, y0, tanX, tanY);
@@ -353,34 +357,33 @@ public class RefinePolygonLineToImage<T extends ImageSingleBand> {
 
 		int index = 0;
 		samplePts.reset();
+		int numSamples = sampleRadius*2+2;
+		int numPts = numSamples-1;
+		double widthX = numSamples*tanX;
+		double widthY = numSamples*tanY;
+
 		for (int i = 0; i < lineSamples; i++ ) {
 			// find point on line and shift it over to the first sample point
 			double frac = i/(double)(lineSamples -1);
-			double x = x0 + slopeX*frac-sampleRadius*tanX;
-			double y = y0 + slopeY*frac-sampleRadius*tanY;
+			double x = x0 + slopeX*frac-widthX/2.0;
+			double y = y0 + slopeY*frac-widthY/2.0;
 
 			// Unless all the sample points are inside the image, ignore this point
-			double leftX = x - tanX;
-			double leftY = y - tanY;
-			double rightX = x + (sampleRadius*2+1)*tanX;
-			double rightY = y + (sampleRadius*2+1)*tanY;
-
-			// TODO Need to handle this better for distorted image
-			if(!integral.isInside(leftX, leftY) || !integral.isInside(rightX,rightY))
+			if(!integral.isInside(x, y) || !integral.isInside(x + widthX,y + widthY))
 				continue;
 
-			double sample0 = integral.compute(x, y, x - tanX, y - tanY);
-			for (int j = 0; j < sampleRadius * 2 + 1; j++) {
+			double sample0 = integral.compute(x, y, x + tanX, y + tanY);
+			x += tanX; y += tanY;
+			for (int j = 0; j < numPts; j++) {
 				double sample1 = integral.compute(x, y, x + tanX, y + tanY);
 
-				double w = Math.max(0, sign * (sample1 - sample0));
+				double w = Math.max(0, sign * (sample0 - sample1));
 				if( w > 0 ) {
 					weights[index] = w;
 					samplePts.grow().set(x - center.x, y - center.y);
 					index++;
 				}
-				x += tanX;
-				y += tanY;
+				x += tanX; y += tanY;
 				sample0 = sample1;
 			}
 		}
@@ -395,7 +398,6 @@ public class RefinePolygonLineToImage<T extends ImageSingleBand> {
 
 	/**
 	 * True if it is fitting black to the image
-	 * @return
 	 */
 	public boolean isFitBlack() {
 		return sign < 0 ;

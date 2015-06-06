@@ -58,7 +58,7 @@ public class TestBaseDetectFiducialSquare {
 	 */
 	@Test
 	public void findPatternEasy() {
-		checkFindKnown(new IntrinsicParameters(500,500,0,320,240,640,480),1);
+		checkFindKnown(new IntrinsicParameters(500,500,0,320,240,640,480),1.1);
 	}
 
 	private void checkFindKnown(IntrinsicParameters intrinsic, double tol ) {

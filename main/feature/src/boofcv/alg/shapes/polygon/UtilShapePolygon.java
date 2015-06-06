@@ -45,10 +45,24 @@ public class UtilShapePolygon {
 		return true;
 	}
 
+	/**
+	 * Adds a positive offset to index in a circular buffer.
+	 * @param index element in circular buffer
+	 * @param offset integer which is positive and less than size
+	 * @param size size of the circular buffer
+	 * @return new index
+	 */
 	public static int plus( int index , int offset,  int size ) {
 		return (index+offset)%size;
 	}
 
+	/**
+	 * Subtracts a positive offset to index in a circular buffer.
+	 * @param index element in circular buffer
+	 * @param offset integer which is positive and less than size
+	 * @param size size of the circular buffer
+	 * @return new index
+	 */
 	public static int minus( int index , int offset, int size ) {
 		index -= offset;
 		if( index < 0 ) {
@@ -57,6 +71,13 @@ public class UtilShapePolygon {
 			return index;
 		}
 	}
+	/**
+	 * Adds offset (positive or negative) to index in a circular buffer.
+	 * @param index element in circular buffer
+	 * @param offset offset.  |offset| < size
+	 * @param size size of the circular buffer
+	 * @return new index
+	 */
 
 	public static int add(int index, int offset, int size) {
 		index += offset;

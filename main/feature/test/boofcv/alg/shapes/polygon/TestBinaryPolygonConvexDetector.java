@@ -20,6 +20,7 @@ package boofcv.alg.shapes.polygon;
 
 import boofcv.abst.distort.FDistort;
 import boofcv.abst.filter.binary.InputToBinary;
+import boofcv.alg.distort.PixelTransformAffine_F32;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.filter.binary.FactoryThresholdBinary;
@@ -27,13 +28,17 @@ import boofcv.factory.shape.ConfigPolygonDetector;
 import boofcv.factory.shape.FactoryShapeDetector;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.image.ConvertBufferedImage;
+import boofcv.struct.distort.PixelTransform_F32;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
 import georegression.geometry.UtilPolygons2D_F64;
+import georegression.struct.affine.Affine2D_F32;
 import georegression.struct.affine.Affine2D_F64;
+import georegression.struct.affine.UtilAffine;
 import georegression.struct.point.Point2D_I32;
 import georegression.struct.shapes.Polygon2D_F64;
+import georegression.struct.shapes.Rectangle2D_F64;
 import georegression.struct.shapes.Rectangle2D_I32;
 import georegression.transform.affine.AffinePointOps_F64;
 import org.ddogleg.struct.FastQueue;
@@ -72,11 +77,44 @@ public class TestBinaryPolygonConvexDetector {
 	}
 
 	/**
-	 * See if it correctly applies the use lens distoriton ops
+	 * See if it uses the provided lens distortion transforms correctly.  The distortion applied
+	 * is actually the affine transform instead of lens distortion.  It should find the original
+	 * rectangles.
 	 */
 	@Test
 	public void usingSetLensDistortion() {
-		fail("Implement");
+		rectangles.add(new Rectangle2D_I32(30,30,60,60));
+		rectangles.add(new Rectangle2D_I32(90,30,120,60));
+		rectangles.add(new Rectangle2D_I32(30,90,60,120));
+		rectangles.add(new Rectangle2D_I32(90,90,120,120));
+
+		transform.set(0.8,0,0,0.8,1,2);
+
+		for( Class imageType : imageTypes ) {
+			checkDetected_LensDistortion(imageType, 0.5);
+		}
+	}
+
+	private void checkDetected_LensDistortion(Class imageType, double tol) {
+		renderDistortedRectangle(imageType);
+
+		Affine2D_F32 a = new Affine2D_F32();
+		UtilAffine.convert(transform,a);
+		PixelTransform_F32 tranFrom = new PixelTransformAffine_F32(a);
+		PixelTransform_F32 tranTo = new PixelTransformAffine_F32(a.invert(null));
+
+		int numberOfSides = 4;
+		BinaryPolygonConvexDetector alg = createDetector(imageType, numberOfSides);
+		alg.setLensDistortion(dist.width,dist.height,tranTo,tranFrom);
+		alg.process(dist);
+
+		FastQueue<Polygon2D_F64> found = alg.getFound();
+
+		assertEquals(rectangles.size(),found.size);
+
+		for (int i = 0; i < found.size; i++) {
+			assertEquals(1, findMatchesOriginal(found.get(i), tol));
+		}
 	}
 
 	@Test
@@ -125,6 +163,25 @@ public class TestBinaryPolygonConvexDetector {
 		InputToBinary inputToBinary = FactoryThresholdBinary.globalFixed(100, true, imageType);
 		return FactoryShapeDetector.polygon(inputToBinary,
 				new ConfigPolygonDetector(numberOfSides),imageType);
+	}
+
+	/**
+	 * Compare found rectangle against rectangles in the original undistorted image
+	 */
+	private int findMatchesOriginal(Polygon2D_F64 found, double tol) {
+		int match = 0;
+		for (int i = 0; i < rectangles.size(); i++) {
+			Rectangle2D_I32 ri = rectangles.get(i);
+			Rectangle2D_F64 r = new Rectangle2D_F64(ri.x0,ri.y0,ri.x1,ri.y1);
+			Polygon2D_F64 p = new Polygon2D_F64(4);
+			UtilPolygons2D_F64.convert(r,p);
+			if( p.isCCW() )
+				UtilPolygons2D_F64.reverseOrder(p);
+
+			if(UtilPolygons2D_F64.isEquivalent(found,p,tol))
+				match++;
+		}
+		return match;
 	}
 
 	private int findMatches( Polygon2D_F64 found , double tol ) {
@@ -186,7 +243,7 @@ public class TestBinaryPolygonConvexDetector {
 			BinaryPolygonConvexDetector alg = createDetector(ImageUInt8.class, i);
 
 			alg.process(gray);
-			assertEquals(0,alg.getFound().size());
+			assertEquals("num sides = "+i,0,alg.getFound().size());
 		}
 	}
 

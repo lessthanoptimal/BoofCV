@@ -19,8 +19,12 @@
 package boofcv.alg.shapes.polygon;
 
 import boofcv.abst.distort.FDistort;
+import boofcv.alg.distort.PixelTransformAffine_F32;
+import boofcv.alg.distort.PointToPixelTransform_F32;
+import boofcv.alg.distort.PointTransformHomography_F32;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
+import boofcv.struct.distort.PixelTransform_F32;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
@@ -179,14 +183,61 @@ public class TestRefinePolygonLineToImage {
 		// input shouldn't be modified
 		assertTrue(expected.isIdentical(input,0));
 		// should be close to the expected
-		assertTrue(expected.isIdentical(found,0.25));
+		assertTrue(expected.isIdentical(found,0.27));
 
 		// do it again with a sub-image to see if it handles that
 		image = BoofTesting.createSubImageOf_S(image);
 		alg.initialize(image);
 		assertTrue(alg.refine(input, found));
 		assertTrue(expected.isIdentical(input,0));
-		assertTrue(expected.isIdentical(found,0.25));
+		assertTrue(expected.isIdentical(found,0.27));
+	}
+
+	/**
+	 * Perfect initial guess. But provide a transform which will undo the affine transform
+	 */
+	@Test
+	public void fit_perfect_transform() {
+		// distorted and undistorted views
+		Affine2D_F64 affines[] = new Affine2D_F64[1];
+		affines[0] = new Affine2D_F64(0.8,0,0,0.8,0,0);
+
+		for (Class imageType : imageTypes) {
+			for (Affine2D_F64 a : affines) {
+//				System.out.println(imageType+"  "+a);
+				fit_perfect_transform(true, a, imageType);
+				fit_perfect_transform(false, a, imageType);
+			}
+		}
+	}
+
+	public void fit_perfect_transform(boolean black, Affine2D_F64 regToDist, Class imageType) {
+		setup(regToDist, black, imageType);
+
+		RefinePolygonLineToImage alg = createAlg(4,black, imageType);
+
+		Polygon2D_F64 input = new Polygon2D_F64(4);
+		input.get(0).set(x0,y0);
+		input.get(1).set(x0,y1);
+		input.get(2).set(x1,y1);
+		input.get(3).set(x1,y0);
+
+		Polygon2D_F64 expected = input.copy();
+		Polygon2D_F64 found = new Polygon2D_F64(4);
+
+		alg.initialize(image);
+		// fail without the transform
+		assertFalse(alg.refine(input, found));
+
+		// work when the transform is applied
+		PixelTransformAffine_F32 transform = new PixelTransformAffine_F32();
+		transform.set(regToDist);
+		alg.setTransform(image.width, image.height, transform);
+		alg.initialize(image);
+		assertTrue(alg.refine(input, found));
+
+		// should be close to the expected
+		assertTrue(expected.isIdentical(found,0.3));
 	}
 
 	/**
@@ -328,7 +379,7 @@ public class TestRefinePolygonLineToImage {
 
 		alg.initialize(image);
 		alg.center.set(10, 12);
-		alg.computePointsAndWeights(0, H, x0, y0 + 5, -1, 0);
+		alg.computePointsAndWeights(0, H, x0, y0 + 5, 1, 0);
 
 		// sample points on the outside of the line will be zero since the image has no gradient
 		// there.  Thus the weight is zero and the point skipped
@@ -374,9 +425,25 @@ public class TestRefinePolygonLineToImage {
 
 	}
 
+	/**
+	 * Makes sure the transform doesn't extend points outside the original image
+	 */
 	@Test
-	public void setTransform() {
-		fail("Implement");
+	public void setTransform_input() {
+		PointTransformHomography_F32 H = new PointTransformHomography_F32();
+		PixelTransform_F32 transform = new PointToPixelTransform_F32(H);
+
+		RefinePolygonLineToImage alg = createAlg(4,true, ImageUInt8.class);
+
+		// correct example
+		alg.setTransform(20,30,transform);
+
+		// bad example
+		try {
+			H.getModel().a11 = 2;
+			alg.setTransform(20,30,transform);
+			fail("Should have thrown exception");
+		} catch( RuntimeException ignore ) {}
 	}
 
 	private void setup( Affine2D_F64 affine, boolean black , Class imageType ) {
@@ -395,7 +462,7 @@ public class TestRefinePolygonLineToImage {
 		}
 
 //		BufferedImage out = ConvertBufferedImage.convertTo(image, null, true);
-//		ShowImages.showWindow(out,"Renered");
+//		ShowImages.showWindow(out, "Renered");
 //		try {
 //			Thread.sleep(3000);
 //		} catch (InterruptedException e) {
