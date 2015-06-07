@@ -127,4 +127,42 @@ public class FactoryDerivativeSparse {
 			throw new IllegalArgumentException("Unsupported image type "+imageType.getSimpleName());
 		}
 	}
+
+	/**
+	 * Creates a sparse two-0 gradient operator.
+	 *
+	 * @param imageType The type of image which is to be processed.
+	 * @param border How the border should be handled.  If null then the borders can't be processed.
+	 * @return Sparse gradient.
+	 */
+	public static <T extends ImageSingleBand, G extends GradientValue>
+	SparseImageGradient<T,G> createTwo0( Class<T> imageType , ImageBorder<T> border )
+	{
+		if( imageType == ImageFloat32.class) {
+			return (SparseImageGradient)new GradientSparseTwo0_F32((ImageBorder_F32)border);
+		} else if( imageType == ImageUInt8.class ){
+			return (SparseImageGradient)new GradientSparseTwo0_U8((ImageBorder_I32)border);
+		} else {
+			throw new IllegalArgumentException("Unsupported image type "+imageType.getSimpleName());
+		}
+	}
+
+	/**
+	 * Creates a sparse two-1 gradient operator.
+	 *
+	 * @param imageType The type of image which is to be processed.
+	 * @param border How the border should be handled.  If null then the borders can't be processed.
+	 * @return Sparse gradient.
+	 */
+	public static <T extends ImageSingleBand, G extends GradientValue>
+	SparseImageGradient<T,G> createTwo1( Class<T> imageType , ImageBorder<T> border )
+	{
+		if( imageType == ImageFloat32.class) {
+			return (SparseImageGradient)new GradientSparseTwo1_F32((ImageBorder_F32)border);
+		} else if( imageType == ImageUInt8.class ){
+			return (SparseImageGradient)new GradientSparseTwo1_U8((ImageBorder_I32)border);
+		} else {
+			throw new IllegalArgumentException("Unsupported image type "+imageType.getSimpleName());
+		}
+	}
 }

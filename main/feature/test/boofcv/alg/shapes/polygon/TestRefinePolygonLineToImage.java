@@ -462,7 +462,7 @@ public class TestRefinePolygonLineToImage {
 		}
 
 //		BufferedImage out = ConvertBufferedImage.convertTo(image, null, true);
-//		ShowImages.showWindow(out, "Renered");
+//		ShowImages.showWindow(out, "Rendered");
 //		try {
 //			Thread.sleep(3000);
 //		} catch (InterruptedException e) {

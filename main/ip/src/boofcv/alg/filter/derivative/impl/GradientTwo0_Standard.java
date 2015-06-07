@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.alg.filter.derivative.impl;
 
+import boofcv.alg.filter.derivative.GradientTwo0;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSInt16;
 import boofcv.struct.image.ImageUInt8;
@@ -25,12 +26,12 @@ import boofcv.struct.image.ImageUInt8;
 
 /**
  * <p>
- * Basic implementation of {@link boofcv.alg.filter.derivative.GradientThree} with nothing fancy is done to improve its performance.
+ * Basic implementation of {@link GradientTwo0} with nothing fancy is done to improve its performance.
  * </p>
  *
  * @author Peter Abeles
  */
-public class GradientTwo_Standard {
+public class GradientTwo0_Standard {
 
 	/**
 	 * Computes the derivative along the x and y axes

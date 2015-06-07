@@ -111,7 +111,6 @@ public class BenchmarkSubpixelSparseCorner<T extends ImageSingleBand> {
 	public long benchmark( SubpixelSparseCornerFit<T> alg , T image , List<Point2D_F32> corners ) {
 
 		long before = System.currentTimeMillis();
-		alg.setWeightToggle(-1);
 		alg.setIgnoreRadius(1);
 		alg.setLocalRadius(5);
 		alg.setMaxOptimizeSteps(200);

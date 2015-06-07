@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.alg.filter.derivative.impl;
 
 import boofcv.alg.filter.derivative.CompareDerivativeToConvolution;
-import boofcv.alg.filter.derivative.GradientTwo;
+import boofcv.alg.filter.derivative.GradientTwo0;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSInt16;
@@ -31,7 +31,7 @@ import java.util.Random;
 /**
  * @author Peter Abeles
  */
-public class TestGradientTwo_Standard {
+public class TestGradientTwo0_Standard {
 
 	Random rand = new Random(234);
 
@@ -41,11 +41,11 @@ public class TestGradientTwo_Standard {
 	@Test
 	public void compareToConvolve_I8() throws NoSuchMethodException {
 		CompareDerivativeToConvolution validator = new CompareDerivativeToConvolution();
-		validator.setTarget(GradientTwo_Standard.class.getMethod("process",
+		validator.setTarget(GradientTwo0_Standard.class.getMethod("process",
 				ImageUInt8.class, ImageSInt16.class, ImageSInt16.class ));
 
-		validator.setKernel(0, GradientTwo.kernelDeriv_I32,true);
-		validator.setKernel(1, GradientTwo.kernelDeriv_I32,false);
+		validator.setKernel(0, GradientTwo0.kernelDeriv_I32,true);
+		validator.setKernel(1, GradientTwo0.kernelDeriv_I32,false);
 
 		ImageUInt8 input = new ImageUInt8(width,height);
 		ImageMiscOps.fillUniform(input, rand, 0, 10);
@@ -58,11 +58,11 @@ public class TestGradientTwo_Standard {
 	@Test
 	public void compareToConvolve_F32() throws NoSuchMethodException {
 		CompareDerivativeToConvolution validator = new CompareDerivativeToConvolution();
-		validator.setTarget(GradientTwo_Standard.class.getMethod("process",
+		validator.setTarget(GradientTwo0_Standard.class.getMethod("process",
 				ImageFloat32.class, ImageFloat32.class, ImageFloat32.class ));
 
-		validator.setKernel(0, GradientTwo.kernelDeriv_F32,true);
-		validator.setKernel(1, GradientTwo.kernelDeriv_F32,false);
+		validator.setKernel(0, GradientTwo0.kernelDeriv_F32,true);
+		validator.setKernel(1, GradientTwo0.kernelDeriv_F32,false);
 
 		ImageFloat32 input = new ImageFloat32(width,height);
 		ImageMiscOps.fillUniform(input, rand, 0, 10);

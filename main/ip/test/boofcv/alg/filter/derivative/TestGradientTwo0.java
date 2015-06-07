@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,7 +31,7 @@ import java.util.Random;
 /**
  * @author Peter Abeles
  */
-public class TestGradientTwo {
+public class TestGradientTwo0 {
 
 	Random rand = new Random(234);
 
@@ -41,17 +41,17 @@ public class TestGradientTwo {
 	@Test
 	public void testStandard() {
 		StandardGradientChecks standard = new StandardGradientChecks();
-		standard.secondDerivativeTest(GradientTwo.class,3);
+		standard.secondDerivativeTest(GradientTwo0.class,3);
 	}
 
 	@Test
 	public void compareToConvolve_I8() throws NoSuchMethodException {
 		CompareDerivativeToConvolution validator = new CompareDerivativeToConvolution();
-		validator.setTarget(GradientTwo.class.getMethod("process",
+		validator.setTarget(GradientTwo0.class.getMethod("process",
 				ImageUInt8.class, ImageSInt16.class, ImageSInt16.class, ImageBorder_I32.class ));
 
-		validator.setKernel(0,GradientTwo.kernelDeriv_I32,true);
-		validator.setKernel(1,GradientTwo.kernelDeriv_I32,false);
+		validator.setKernel(0, GradientTwo0.kernelDeriv_I32,true);
+		validator.setKernel(1, GradientTwo0.kernelDeriv_I32,false);
 
 		ImageUInt8 input = new ImageUInt8(width,height);
 		ImageMiscOps.fillUniform(input, rand, 0, 10);
@@ -64,11 +64,11 @@ public class TestGradientTwo {
 	@Test
 	public void compareToConvolve_I16() throws NoSuchMethodException {
 		CompareDerivativeToConvolution validator = new CompareDerivativeToConvolution();
-		validator.setTarget(GradientTwo.class.getMethod("process",
+		validator.setTarget(GradientTwo0.class.getMethod("process",
 				ImageSInt16.class, ImageSInt16.class, ImageSInt16.class, ImageBorder_I32.class ));
 
-		validator.setKernel(0,GradientTwo.kernelDeriv_I32,true);
-		validator.setKernel(1,GradientTwo.kernelDeriv_I32,false);
+		validator.setKernel(0, GradientTwo0.kernelDeriv_I32,true);
+		validator.setKernel(1, GradientTwo0.kernelDeriv_I32,false);
 
 		ImageSInt16 input = new ImageSInt16(width,height);
 		ImageMiscOps.fillUniform(input, rand, 0, 10);
@@ -81,11 +81,11 @@ public class TestGradientTwo {
 @	Test
 	public void compareToConvolve_F32() throws NoSuchMethodException {
 		CompareDerivativeToConvolution validator = new CompareDerivativeToConvolution();
-		validator.setTarget(GradientTwo.class.getMethod("process",
+		validator.setTarget(GradientTwo0.class.getMethod("process",
 				ImageFloat32.class, ImageFloat32.class, ImageFloat32.class, ImageBorder_F32.class ));
 
-		validator.setKernel(0,GradientTwo.kernelDeriv_F32,true);
-		validator.setKernel(1,GradientTwo.kernelDeriv_F32,false);
+		validator.setKernel(0, GradientTwo0.kernelDeriv_F32,true);
+		validator.setKernel(1, GradientTwo0.kernelDeriv_F32,false);
 
 		ImageFloat32 input = new ImageFloat32(width,height);
 		ImageMiscOps.fillUniform(input, rand, 0, 10);

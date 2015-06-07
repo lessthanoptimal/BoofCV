@@ -46,6 +46,9 @@ public abstract class GeneralGradientSparse {
 	ImageSingleBand image;
 	ImageSingleBand derivX,derivY;
 
+	protected int lower=-1;
+	protected int upper=1;
+
 	public GeneralGradientSparse(Class imageType, Class derivType) {
 		this.imageType = imageType;
 		this.derivType = derivType;
@@ -74,14 +77,14 @@ public abstract class GeneralGradientSparse {
 
 		for (int i = 0; i < image.height; i++) {
 			for (int j = 0; j < image.width; j++) {
-				if( i > 0 && j > 0 && i < image.height-1 && j < image.width-1 ) {
+				if( i >= -lower && j >= -lower && i < image.height-upper && j < image.width-upper ) {
 					assertTrue(j + " " + i, image.isInBounds(j, i));
 					GradientValue g = alg.compute(j, i);
 					double expectedX = GeneralizedImageOps.get(derivX,j,i);
 					double expectedY = GeneralizedImageOps.get(derivY,j,i);
 
 					assertEquals(expectedX, g.getX(), 1e-4f);
-					assertEquals(expectedY, g.getY(), 1e-4f);
+					assertEquals(j+" "+i,expectedY, g.getY(), 1e-4f);
 				} else {
 					assertFalse(j+" "+i,alg.isInBounds(j, i));
 				}

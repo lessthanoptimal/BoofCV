@@ -85,11 +85,20 @@ public class FactoryDerivative {
 	}
 
 	public static <I extends ImageSingleBand, D extends ImageSingleBand>
-	ImageGradient<I,D> two( Class<I> inputType , Class<D> derivType)
+	ImageGradient<I,D> two0(Class<I> inputType, Class<D> derivType)
 	{
 		if( derivType == null )
 			derivType = GImageDerivativeOps.getDerivativeType(inputType);
-		Method m = findDerivative(GradientTwo.class,inputType,derivType);
+		Method m = findDerivative(GradientTwo0.class,inputType,derivType);
+		return new ImageGradient_Reflection<I,D>(m);
+	}
+
+	public static <I extends ImageSingleBand, D extends ImageSingleBand>
+	ImageGradient<I,D> two1(Class<I> inputType, Class<D> derivType)
+	{
+		if( derivType == null )
+			derivType = GImageDerivativeOps.getDerivativeType(inputType);
+		Method m = findDerivative(GradientTwo1.class,inputType,derivType);
 		return new ImageGradient_Reflection<I,D>(m);
 	}
 

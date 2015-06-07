@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -134,9 +134,9 @@ public class CompareDerivativeToConvolution {
 			Border b = borders[i];
 
 			borderX0 = Math.max(borderX0,b.borderX0);
-			borderX1 = Math.max(borderX0,b.borderX1);
-			borderY0 = Math.max(borderX0,b.borderY0);
-			borderY1 = Math.max(borderX0,b.borderY1);
+			borderX1 = Math.max(borderX1,b.borderX1);
+			borderY0 = Math.max(borderY0,b.borderY0);
+			borderY1 = Math.max(borderY1,b.borderY1);
 		}
 
 		// compare the results

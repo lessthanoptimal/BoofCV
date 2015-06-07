@@ -24,11 +24,11 @@ import boofcv.struct.sparse.GradientValue_I32;
 import boofcv.struct.sparse.SparseImageGradient;
 
 /**
- * Sparse computation of the three gradient operator.
+ * Sparse computation of the two-0 gradient operator.
  *
  * @author Peter Abeles
  */
-public class GradientSparseThree_U8 implements SparseImageGradient<ImageUInt8,GradientValue_I32> {
+public class GradientSparseTwo0_U8 implements SparseImageGradient<ImageUInt8,GradientValue_I32> {
 
 	// image being processed
 	ImageUInt8 input;
@@ -41,29 +41,27 @@ public class GradientSparseThree_U8 implements SparseImageGradient<ImageUInt8,Gr
 	 * Specifies how border pixels are handled.  If null then the border is not handled.
 	 * @param border how borders are handled
 	 */
-	public GradientSparseThree_U8(ImageBorder_I32<ImageUInt8> border) {
+	public GradientSparseTwo0_U8(ImageBorder_I32<ImageUInt8> border) {
 		this.border = border;
 	}
 
 	@Override
 	public GradientValue_I32 compute(int x, int y) {
-		int a01,a10,a12,a21;
-		if( x >= 1 && y >= 1 && x < input.width - 1 && y < input.height - 1 ) {
+		int a00,a10,a01;
+		if( x >= 0 && y >= 0 && x < input.width - 1 && y < input.height - 1 ) {
 			int s = input.stride;
-			int tl = input.startIndex + input.stride*(y-1) + x-1;
+			int tl = input.startIndex + input.stride*y + x;
 
-			a01 = input.data[tl+1     ] & 0xFF;
-			a10 = input.data[tl   + s ] & 0xFF;
-			a12 = input.data[tl+2 + s ] & 0xFF;
-			a21 = input.data[tl+1 + 2*s] & 0xFF;
+			a00 = input.data[tl    ] & 0xFF;
+			a10 = input.data[tl  +s] & 0xFF;
+			a01 = input.data[tl+1  ] & 0xFF;
 		} else {
-			a01 = border.get(x  ,y-1);
-			a10 = border.get(x-1,y  );
-			a12 = border.get(x+1,y  );
-			a21 = border.get(x  ,y+1);
+			a00 = border.get(x  ,y  );
+			a10 = border.get(x  ,y+1);
+			a01 = border.get(x+1,y  );
 		}
-		gradient.y = a21-a01;
-		gradient.x = a12-a10;
+		gradient.y = a10-a00;
+		gradient.x = a01-a00;
 
 		return gradient;
 	}
@@ -83,6 +81,6 @@ public class GradientSparseThree_U8 implements SparseImageGradient<ImageUInt8,Gr
 
 	@Override
 	public boolean isInBounds(int x, int y) {
-		return border != null || x >= 1 && y >= 1 && x < input.width - 1 && y < input.height - 1;
+		return border != null || x >= 0 && y >= 0 && x < input.width - 1 && y < input.height - 1;
 	}
 }

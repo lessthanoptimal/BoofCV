@@ -24,7 +24,7 @@ import boofcv.struct.sparse.GradientValue_F32;
 import boofcv.struct.sparse.SparseImageGradient;
 
 /**
- * Sparse computation of the sobel gradient operator.
+ * Sparse computation of the three gradient operator.
  *
  * @author Peter Abeles
  */
