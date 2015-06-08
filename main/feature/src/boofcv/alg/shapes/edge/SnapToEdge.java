@@ -1,0 +1,240 @@
+/*
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ *
+ * This file is part of BoofCV (http://boofcv.org).
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package boofcv.alg.shapes.edge;
+
+import boofcv.alg.distort.DistortImageOps;
+import boofcv.alg.interpolate.ImageLineIntegral;
+import boofcv.alg.interpolate.InterpolatePixelS;
+import boofcv.core.image.FactoryGImageSingleBand;
+import boofcv.core.image.GImageSingleBand;
+import boofcv.core.image.GImageSingleBandDistorted;
+import boofcv.factory.interpolate.FactoryInterpolation;
+import boofcv.struct.distort.PixelTransform_F32;
+import boofcv.struct.image.ImageSingleBand;
+import georegression.fitting.line.FitLine_F64;
+import georegression.geometry.UtilLine2D_F64;
+import georegression.struct.line.LineGeneral2D_F64;
+import georegression.struct.line.LinePolar2D_F64;
+import georegression.struct.point.Point2D_F64;
+import georegression.struct.shapes.RectangleLength2D_F32;
+import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.GrowQueue_F64;
+
+/**
+ * <p>
+ * Snaps a line to an edge of an object.  Right side of the edge is assumed to be darker.  The algorithm works by
+ * sampling along an initial line.  Tangential points to the left and right
+ * are sampled.  Weights are found based on the difference in line integrals on the left and right sides.  A
+ * line is then fitted to the weighted sample points.
+ * </p>
+ * <p>
+ * Internally it will compute the solution in a local coordinate system to reduce numerical errors.
+ * </p>
+ * @author Peter Abeles
+ */
+public class SnapToEdge<T extends ImageSingleBand> {
+
+	// maximum number of times it will sample along the line
+	protected int lineSamples;
+
+	// number of samples outwards from the line
+	protected int radialSamples;
+
+	// storage for computed polar line
+	private LinePolar2D_F64 polar = new LinePolar2D_F64();
+
+	protected GrowQueue_F64 weights = new GrowQueue_F64();// storage for weights in line fitting
+	// storage for where the points that are sampled along the line
+	protected FastQueue<Point2D_F64> samplePts = new FastQueue<Point2D_F64>(Point2D_F64.class,true);
+
+	// used when computing the fit for a line at specific points
+	protected ImageLineIntegral integral;
+	protected GImageSingleBand integralImage;
+
+	// storage for the line's center.  used to reduce numerical problems.
+	protected Point2D_F64 center = new Point2D_F64();
+	protected double localScale;
+
+	// type of image it can process
+	Class<T> imageType;
+
+	/**
+	 * Configures the algorithm.
+	 *
+	 * @param lineSamples Number of times it will sample along the line's axis. Try 19
+	 * @param tangentialSamples Radius along the tangent of what it will sample.  Must be >= 1.  Try 2.
+	 * @param imageType Type of image it's going to process
+	 */
+	public SnapToEdge(int lineSamples, int tangentialSamples,  Class<T> imageType) {
+		if( tangentialSamples < 1 )
+			throw new IllegalArgumentException("Tangential samples must be >= 1 or else it won't work");
+
+		this.lineSamples = lineSamples;
+		this.radialSamples = tangentialSamples;
+		this.imageType = imageType;
+		this.integral = new ImageLineIntegral();
+		this.integralImage = FactoryGImageSingleBand.create(imageType);
+	}
+
+	/**
+	 * Used to specify a transform that's applied pixel coordinates.  The bounds of the
+	 * transformed coordinates MUST be the same as the input image.  Call before {@link #setImage(ImageSingleBand)}.
+	 *
+	 * @param width Input image width.  Used in sanity check only.
+	 * @param height Input image height.  Used in sanity check only.
+	 * @param transform Pixel transformation.
+	 */
+	public void setTransform( int width , int height , PixelTransform_F32 transform ) {
+		// sanity check since I think many people will screw this up.
+		RectangleLength2D_F32 rect = DistortImageOps.boundBox_F32(width, height, transform);
+		float x1 = rect.x0 + rect.width;
+		float y1 = rect.y0 + rect.height;
+
+		if( rect.getX() < 0 || rect.getY() < 0 || x1 > width || y1 > height ) {
+			throw new IllegalArgumentException("You failed the idiot test! RTFM! The undistorted image "+
+					"must be contained by the same bounds as the input distorted image");
+		}
+
+		InterpolatePixelS<T> interpolate = FactoryInterpolation.bilinearPixelS(imageType);
+		integralImage = new GImageSingleBandDistorted<T>(transform,interpolate);
+	}
+
+	/**
+	 * Sets the image which is going to be processed.  Must call {@link #setImage(ImageSingleBand)} first.
+	 */
+	public void setImage(T image) {
+		integralImage.wrap(image);
+		integral.setImage(integralImage);
+	}
+
+	/**
+	 * Fits a line defined by the two points. When fitting the line the weight of the edge is used to determine.
+	 * how influential the point is.  Multiple calls might be required to get a perfect fit.
+	 *
+	 * @param a Start of line
+	 * @param b End of line..
+	 * @param found (output) Fitted line to the edge
+	 * @return true if successful or false if it failed
+	 */
+	public boolean refine(Point2D_F64 a, Point2D_F64 b, LineGeneral2D_F64 found) {
+
+		// determine the local coordinate system
+		center.x = (a.x + b.x)/2.0;
+		center.y = (a.y + b.y)/2.0;
+		localScale = a.distance(center);
+
+		// define the line which points are going to be sampled along
+		double slopeX = (b.x - a.x);
+		double slopeY = (b.y - a.y);
+		double r = Math.sqrt(slopeX*slopeX + slopeY*slopeY);
+
+		// tangent of unit length that radial sample samples are going to be along
+		// Two choices for tangent here.  Select the one which points to the "right" of the line,
+		// which is inside of the edge
+		double tanX = slopeY/r;
+		double tanY = -slopeX/r;
+
+		// set up inputs into line fitting
+		computePointsAndWeights(slopeX, slopeY, a.x, a.y, tanX, tanY);
+
+		if( samplePts.size() >= 4 ) {
+			// fit line and convert into generalized format
+			if( null == FitLine_F64.polar(samplePts.toList(), weights.data, polar) ) {
+				throw new RuntimeException("All weights were zero, bug some place");
+			}
+			UtilLine2D_F64.convert(polar, found);
+
+			// Convert line from local to global coordinates
+			localToGlobal(found);
+
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	/**
+	 * Computes the location of points along the line and their weights
+	 */
+	protected void computePointsAndWeights(double slopeX, double slopeY, double x0, double y0, double tanX, double tanY) {
+
+		samplePts.reset();
+		weights.reset();
+		int numSamples = radialSamples*2+2;
+		int numPts = numSamples-1;
+		double widthX = numSamples*tanX;
+		double widthY = numSamples*tanY;
+
+		for (int i = 0; i < lineSamples; i++ ) {
+			// find point on line and shift it over to the first sample point
+			double frac = i/(double)(lineSamples -1);
+			double x = x0 + slopeX*frac-widthX/2.0;
+			double y = y0 + slopeY*frac-widthY/2.0;
+
+			// Unless all the sample points are inside the image, ignore this point
+			if(!integral.isInside(x, y) || !integral.isInside(x + widthX,y + widthY))
+				continue;
+
+			double sample0 = integral.compute(x, y, x + tanX, y + tanY);
+			x += tanX; y += tanY;
+			for (int j = 0; j < numPts; j++) {
+				double sample1 = integral.compute(x, y, x + tanX, y + tanY);
+
+				double w = Math.max(0, (sample0 - sample1));
+				if( w > 0 ) {
+					weights.add(w);
+					samplePts.grow().set((x - center.x)/localScale, (y - center.y)/localScale);
+				}
+				x += tanX; y += tanY;
+				sample0 = sample1;
+			}
+		}
+	}
+
+	/**
+	 * Converts the line from local to global image coordinates
+	 */
+	protected void localToGlobal( LineGeneral2D_F64 line ) {
+		line.C = localScale*line.C - center.x*line.A - center.y*line.B;
+	}
+
+	public int getLineSamples() {
+		return lineSamples;
+	}
+
+	public void setLineSamples(int lineSamples) {
+		this.lineSamples = lineSamples;
+	}
+
+	public int getRadialSamples() {
+		return radialSamples;
+	}
+
+	public void setRadialSamples(int radialSamples) {
+		this.radialSamples = radialSamples;
+	}
+
+	public Class<T> getImageType() {
+		return imageType;
+	}
+
+	public void setImageType(Class<T> imageType) {
+		this.imageType = imageType;
+	}
+}
