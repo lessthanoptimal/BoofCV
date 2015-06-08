@@ -422,7 +422,6 @@ public class TestRefinePolygonLineToImage {
 		assertEquals(0,alg.samplePts.size());
 		alg.computePointsAndWeights(image.width-2,0, 1, image.height-1, 0, 1);
 		assertEquals(0,alg.samplePts.size());
-
 	}
 
 	/**
