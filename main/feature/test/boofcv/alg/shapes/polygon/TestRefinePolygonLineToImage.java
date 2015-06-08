@@ -232,7 +232,7 @@ public class TestRefinePolygonLineToImage {
 		// work when the transform is applied
 		PixelTransformAffine_F32 transform = new PixelTransformAffine_F32();
 		transform.set(regToDist);
-		alg.setTransform(image.width, image.height, transform);
+		alg.getSnapToEdge().setTransform(image.width, image.height, transform);
 		alg.initialize(image);
 		assertTrue(alg.refine(input, found));
 
@@ -359,70 +359,6 @@ public class TestRefinePolygonLineToImage {
 		}
 	}
 
-	/**
-	 * Simple case where it samples along a line on a perfect rectangle
-	 */
-	@Test
-	public void computePointsAndWeights() {
-		for (Class imageType : imageTypes) {
-			computePointsAndWeights(true, imageType);
-			computePointsAndWeights(false, imageType);
-		}
-	}
-
-	public void computePointsAndWeights( boolean black , Class imageType ) {
-		setup(null,black,imageType);
-
-		RefinePolygonLineToImage alg = createAlg(4,black, imageType);
-
-		float H = y1-y0-10;
-
-		alg.initialize(image);
-		alg.center.set(10, 12);
-		alg.computePointsAndWeights(0, H, x0, y0 + 5, 1, 0);
-
-		// sample points on the outside of the line will be zero since the image has no gradient
-		// there.  Thus the weight is zero and the point skipped
-		assertEquals(alg.lineSamples,alg.samplePts.size());
-
-		for (int i = 0; i < alg.lineSamples; i++) {
-			// only points along the line were saved, the outer ones discarded
-			assertEquals(white,alg.weights[i],1e-8);
-
-			double x = x0 - 10;
-			double y = y0 + 5 + H*i/(alg.lineSamples -1) - 12;
-			Point2D_F64 p = (Point2D_F64)alg.samplePts.get(i);
-			assertEquals(x,p.x,1e-4);
-			assertEquals(y,p.y,1e-4);
-		}
-	}
-
-	/**
-	 * Checks to see if it blows up along the image border
-	 */
-	@Test
-	public void computePointsAndWeights_border() {
-		for (Class imageType : imageTypes) {
-			computePointsAndWeights_border(true, imageType);
-			computePointsAndWeights_border(false, imageType);
-		}
-	}
-
-	public void computePointsAndWeights_border( boolean black , Class imageType ) {
-		setup(null,black,imageType);
-
-		RefinePolygonLineToImage alg = createAlg(4,black, imageType);
-
-		alg.initialize(image);
-		alg.computePointsAndWeights(0, image.height-2, 0, 2, 1, 0);
-		assertEquals(0,alg.samplePts.size());
-		alg.computePointsAndWeights(0, image.height-2, image.width-1, 2, 1, 0);
-		assertEquals(0,alg.samplePts.size());
-		alg.computePointsAndWeights(image.width-2,0, 1, 0, 0, 1);
-		assertEquals(0,alg.samplePts.size());
-		alg.computePointsAndWeights(image.width-2,0, 1, image.height-1, 0, 1);
-		assertEquals(0,alg.samplePts.size());
-	}
 
 	/**
 	 * Makes sure the transform doesn't extend points outside the original image
@@ -435,12 +371,12 @@ public class TestRefinePolygonLineToImage {
 		RefinePolygonLineToImage alg = createAlg(4,true, ImageUInt8.class);
 
 		// correct example
-		alg.setTransform(20,30,transform);
+		alg.getSnapToEdge().setTransform(20,30,transform);
 
 		// bad example
 		try {
 			H.getModel().a11 = 2;
-			alg.setTransform(20,30,transform);
+			alg.getSnapToEdge().setTransform(20,30,transform);
 			fail("Should have thrown exception");
 		} catch( RuntimeException ignore ) {}
 	}

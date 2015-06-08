@@ -199,7 +199,7 @@ public class BinaryPolygonConvexDetector<T extends ImageSingleBand> {
 		this.toUndistorted = toUndistorted;
 		this.toDistorted = toDistorted;
 		if( refineLine != null ) {
-			refineLine.setTransform(width,height,toDistorted);
+			refineLine.getSnapToEdge().setTransform(width,height,toDistorted);
 		}
 	}
 

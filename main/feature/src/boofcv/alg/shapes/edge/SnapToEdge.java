@@ -38,14 +38,26 @@ import org.ddogleg.struct.GrowQueue_F64;
 
 /**
  * <p>
- * Snaps a line to an edge of an object.  Right side of the edge is assumed to be darker.  The algorithm works by
- * sampling along an initial line.  Tangential points to the left and right
- * are sampled.  Weights are found based on the difference in line integrals on the left and right sides.  A
- * line is then fitted to the weighted sample points.
+ * Snaps a line to an edge of an object.  The refined line attempts to maximize the difference between
+ * the left and right sides of it.  The right side of the edge is assumed to be darker.
+ * </p>
+ *
+ * <p>
+ * The algorithm works by sampling along the provided line segment.  For each point along the line it also
+ * samples points tangential to
+ * it in the left and right direction.  When a point is sampled it is actually the line integral between two points
+ * which are one pixel apart.  The weight is found as the difference between the two line integrals on other side.
  * </p>
  * <p>
  * Internally it will compute the solution in a local coordinate system to reduce numerical errors.
  * </p>
+ *
+ * <p>
+ * DISTORTED INPUT IMAGE:  If the distortion is known it is possible to sample along a straight line in distorted
+ * image space.  This can be accomplished through the use of {@link #setTransform} where the provided transform
+ * goes from undistorted pixel coordinates into the distorted input image.
+ * </p>
+ *
  * @author Peter Abeles
  */
 public class SnapToEdge<T extends ImageSingleBand> {
@@ -53,7 +65,9 @@ public class SnapToEdge<T extends ImageSingleBand> {
 	// maximum number of times it will sample along the line
 	protected int lineSamples;
 
-	// number of samples outwards from the line
+	// Determines the number of points sampled radially outwards from the line
+	// Total intensity values sampled at each point along the line is radius*2+2,
+	// and points added to line fitting is radius*2+1.
 	protected int radialSamples;
 
 	// storage for computed polar line
@@ -98,7 +112,7 @@ public class SnapToEdge<T extends ImageSingleBand> {
 	 *
 	 * @param width Input image width.  Used in sanity check only.
 	 * @param height Input image height.  Used in sanity check only.
-	 * @param transform Pixel transformation.
+	 * @param transform Pixel transformation from undistorted pixels into the actual distorted input image..
 	 */
 	public void setTransform( int width , int height , PixelTransform_F32 transform ) {
 		// sanity check since I think many people will screw this up.
