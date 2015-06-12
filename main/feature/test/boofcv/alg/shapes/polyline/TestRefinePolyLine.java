@@ -125,7 +125,7 @@ public class TestRefinePolyLine {
 		for (int i = 0; i < 10; i++) {
 			// noise up the inputs
 			for (int j = 0; j < corners.size(); j++) {
-				corners.data[j] = UtilShapePolygon.add(corners.data[j], rand.nextInt(10) - 5, points.size());
+				corners.data[j] = UtilShapePolygon.addOffset(corners.data[j], rand.nextInt(10) - 5, points.size());
 			}
 
 			alg.fit(points,corners);

@@ -122,7 +122,7 @@ public class RefinePolygonLineToImage<T extends ImageSingleBand> {
 	 * Sets the image which is going to be processed.  If a transform is to be used
 	 * {@link SnapToEdge#setTransform} should be called before this.
 	 */
-	public void initialize(T image) {
+	public void setImage(T image) {
 		this.image = image;
 		this.snapToEdge.setImage(image);
 	}

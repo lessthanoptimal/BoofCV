@@ -52,7 +52,7 @@ public class UtilShapePolygon {
 	 * @param size size of the circular buffer
 	 * @return new index
 	 */
-	public static int plus( int index , int offset,  int size ) {
+	public static int plusPOffset(int index, int offset, int size) {
 		return (index+offset)%size;
 	}
 
@@ -63,7 +63,7 @@ public class UtilShapePolygon {
 	 * @param size size of the circular buffer
 	 * @return new index
 	 */
-	public static int minus( int index , int offset, int size ) {
+	public static int minusPOffset(int index, int offset, int size) {
 		index -= offset;
 		if( index < 0 ) {
 			return size + index;
@@ -79,7 +79,7 @@ public class UtilShapePolygon {
 	 * @return new index
 	 */
 
-	public static int add(int index, int offset, int size) {
+	public static int addOffset(int index, int offset, int size) {
 		index += offset;
 		if( index < 0 ) {
 			return size + index;
@@ -87,4 +87,52 @@ public class UtilShapePolygon {
 			return index%size;
 		}
 	}
+
+
+	/**
+	 * Returns how many elements away in the positive direction you need to travel to get from
+	 * index0 to index1.
+	 *
+	 * @param index0 element in circular buffer
+	 * @param index1 element in circular buffer
+	 * @param size size of the circular buffer
+	 * @return positive distance
+	 */
+	public static int distanceP(int index0, int index1, int size) {
+		int difference = index1-index0;
+		if( difference < 0 ) {
+			difference = size+difference;
+		}
+		return difference;
+	}
+
+	/**
+	 * Subtracts index1 from index0. positive number if its closer in the positive
+	 * direction or negative if closer in the negative direction
+	 *
+	 * @param index0 element in circular buffer
+	 * @param index1 element in circular buffer
+	 * @param size size of the circular buffer
+	 * @return new index
+	 */
+	public static int subtract(int index0, int index1, int size) {
+		int distance = distanceP(index0, index1, size);
+		if( distance >= size/2 ) {
+			return distance-size;
+		} else {
+			return distance;
+		}
+	}
+
+	/**
+	 * Returns which direction of travel is closer from index0 to index1.  1 = positive
+	 * -1 = negative.  If it's a die then positive is returned.
+	 */
+	public static int dir( int index0 , int index1 , int size ) {
+		if( subtract(index1,index0,size) >= 0 )
+			return 1;
+		else
+			return -1;
+	}
+
 }

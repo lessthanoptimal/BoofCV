@@ -139,7 +139,8 @@ public class SnapToEdge<T extends ImageSingleBand> {
 
 	/**
 	 * Fits a line defined by the two points. When fitting the line the weight of the edge is used to determine.
-	 * how influential the point is.  Multiple calls might be required to get a perfect fit.
+	 * how influential the point is.  Multiple calls might be required to get a perfect fit.  The right side
+	 * of the line must be darker.
 	 *
 	 * @param a Start of line
 	 * @param b End of line..

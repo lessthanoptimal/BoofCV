@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.shapes.polygon;
+package boofcv.alg.shapes.corner;
 
 import boofcv.alg.shapes.edge.SnapToEdge;
 import boofcv.struct.distort.PixelTransform_F32;
@@ -24,6 +24,7 @@ import boofcv.struct.image.ImageSingleBand;
 import georegression.metric.Intersection2D_F64;
 import georegression.struct.line.LineGeneral2D_F64;
 import georegression.struct.point.Point2D_F64;
+import georegression.struct.point.Vector2D_F64;
 
 /**
  * <p>
@@ -44,7 +45,7 @@ import georegression.struct.point.Point2D_F64;
  *
  * @author Peter Abeles
  */
-public class RefineCornerToImage<T extends ImageSingleBand> {
+public class RefineCornerLinesToImage<T extends ImageSingleBand> {
 
 	// How far away from a corner will it sample the line
 	double cornerOffset;
@@ -75,10 +76,13 @@ public class RefineCornerToImage<T extends ImageSingleBand> {
 	Point2D_F64 _endLeft = new Point2D_F64();
 	Point2D_F64 _endRight = new Point2D_F64();
 
-
 	// storage for fitted lines
 	LineGeneral2D_F64 lineLeft = new LineGeneral2D_F64();
 	LineGeneral2D_F64 lineRight = new LineGeneral2D_F64();
+
+	// storage for original pointing vector for determining sign of slope
+	Vector2D_F64 directionLeft = new Vector2D_F64();
+	Vector2D_F64 directionRight = new Vector2D_F64();
 
 	// the input image
 	protected T image;
@@ -89,9 +93,9 @@ public class RefineCornerToImage<T extends ImageSingleBand> {
 	 * value a description of these variables.
 	 *
 	 */
-	public RefineCornerToImage(double cornerOffset, int maxLineSamples, int sampleRadius,
-							   int maxIterations, double convergeTolPixels, boolean fitBlack,
-							   Class<T> imageType) {
+	public RefineCornerLinesToImage(double cornerOffset, int maxLineSamples, int sampleRadius,
+									int maxIterations, double convergeTolPixels, boolean fitBlack,
+									Class<T> imageType) {
 		if( sampleRadius < 1 )
 			throw new IllegalArgumentException("Sample radius must be >= 1 to work");
 
@@ -109,15 +113,15 @@ public class RefineCornerToImage<T extends ImageSingleBand> {
 	 * @param fitBlack If true it's fitting a black square with a white background.  false is the inverse.
 	 * @param imageType Type of input image it processes
 	 */
-	public RefineCornerToImage(boolean fitBlack, Class<T> imageType) {
-		this(2.0, 10, 2, 10, 0.01, fitBlack, imageType);
+	public RefineCornerLinesToImage(boolean fitBlack, Class<T> imageType) {
+		this(2.0, 10, 2, 10, 1e-5, fitBlack, imageType);
 	}
 
 	/**
 	 * Sets the image which is going to be processed.  If a transform is to be used
 	 * {@link SnapToEdge#setTransform} should be called before this.
 	 */
-	public void initialize(T image) {
+	public void setImage(T image) {
 		this.image = image;
 		this.snapToEdge.setImage(image);
 	}
@@ -135,6 +139,13 @@ public class RefineCornerToImage<T extends ImageSingleBand> {
 		_endLeft.set(endLeft);
 		_endRight.set(endRight);
 
+		// save the pointing direction from corner to end point
+		directionLeft.minus(endLeft, corner);
+		directionLeft.normalize();
+		directionRight.minus(endRight, corner);
+		directionRight.normalize();
+
+		// original line length is used to update end point location
 		double lengthLeft = corner.distance(endLeft);
 		double lengthRight = corner.distance(endRight);
 
@@ -172,19 +183,36 @@ public class RefineCornerToImage<T extends ImageSingleBand> {
 			}
 
 			// find new line end points
-			lineLeft.normalize();
-			_endLeft.x = refined.x + lineLeft.B*lengthLeft;
-			_endLeft.y = refined.y - lineLeft.A*lengthLeft;
-
-			lineRight.normalize();
-			_endRight.x = refined.x + lineRight.B*lengthRight;
-			_endRight.y = refined.y - lineRight.A*lengthRight;
+			updateEndPoints(lengthLeft, lengthRight);
 
 			// save the current corner
 			previous.set(refined);
 		}
 
 		return true;
+	}
+
+	/**
+	 * Sets the location of the end point to be along the estimated line.  Need to determine which direction
+	 * to do the addition since the line's slope can point in either direction.
+	 */
+	private void updateEndPoints(double lengthLeft, double lengthRight) {
+		double sgn;
+		lineLeft.normalize();
+		if( directionLeft.x*lineLeft.B - directionLeft.y*lineLeft.A > 0 )
+			sgn = 1;
+		else
+			sgn = -1;
+		_endLeft.x = refined.x + sgn*lineLeft.B*lengthLeft;
+		_endLeft.y = refined.y - sgn*lineLeft.A*lengthLeft;
+
+		lineRight.normalize();
+		if( directionRight.x*lineRight.B - directionRight.y*lineRight.A > 0 )
+			sgn = 1;
+		else
+			sgn = -1;
+		_endRight.x = refined.x + sgn*lineRight.B*lengthRight;
+		_endRight.y = refined.y - sgn*lineRight.A*lengthRight;
 	}
 
 	/**
@@ -195,7 +223,8 @@ public class RefineCornerToImage<T extends ImageSingleBand> {
 	 * @param found (output) Line in image coordinates
 	 * @return true if successful or false if it failed
 	 */
-	protected boolean optimize( Point2D_F64 a , Point2D_F64 b , LineGeneral2D_F64 found, boolean darkRight ) {
+	protected boolean optimize( Point2D_F64 a , Point2D_F64 b , LineGeneral2D_F64 found,
+								boolean darkRight ) {
 
 		double slopeX = (b.x - a.x);
 		double slopeY = (b.y - a.y);

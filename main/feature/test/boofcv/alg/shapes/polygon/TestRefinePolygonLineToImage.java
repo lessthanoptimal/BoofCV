@@ -55,8 +55,8 @@ public class TestRefinePolygonLineToImage {
 	Random rand = new Random(234);
 
 	int width = 400, height = 500;
-	ImageSingleBand work; // original image before homography has been applied
-	ImageSingleBand image; // image after homography applied
+	ImageSingleBand work; // original image before affine has been applied
+	ImageSingleBand image; // image after affine applied
 
 	int x0 = 200, y0 = 160;
 	int x1 = 260, y1 = 400; // that's exclusive
@@ -80,7 +80,7 @@ public class TestRefinePolygonLineToImage {
 			RefinePolygonLineToImage alg = createAlg(input.size(),black, imageType);
 
 			Polygon2D_F64 output = new Polygon2D_F64(input.size());
-			alg.initialize(image);
+			alg.setImage(image);
 			assertFalse(alg.refine(input, output));
 		}
 	}
@@ -100,13 +100,13 @@ public class TestRefinePolygonLineToImage {
 			RefinePolygonLineToImage alg = createAlg(input.size(),black, imageType);
 
 			Polygon2D_F64 output = new Polygon2D_F64(4);
-			alg.initialize(image);
+			alg.setImage(image);
 			assertTrue(alg.refine(input, output));
 
 			// do it again with a sub-image
 			Polygon2D_F64 output2 = new Polygon2D_F64(4);
 			image = BoofTesting.createSubImageOf_S(image);
-			alg.initialize(image);
+			alg.setImage(image);
 			assertTrue(alg.refine(input, output2));
 
 			assertTrue(UtilPolygons2D_F64.isIdentical(output, output2, 1e-8));
@@ -134,7 +134,7 @@ public class TestRefinePolygonLineToImage {
 					addNoise(input,2);
 
 					Polygon2D_F64 output = new Polygon2D_F64(original.size());
-					alg.initialize(image);
+					alg.setImage(image);
 					assertTrue(alg.refine(input, output));
 
 					assertTrue(original.isIdentical(output, 0.01));
@@ -177,7 +177,7 @@ public class TestRefinePolygonLineToImage {
 		Polygon2D_F64 expected = input.copy();
 		Polygon2D_F64 found = new Polygon2D_F64(4);
 
-		alg.initialize(image);
+		alg.setImage(image);
 		assertTrue(alg.refine(input, found));
 
 		// input shouldn't be modified
@@ -187,7 +187,7 @@ public class TestRefinePolygonLineToImage {
 
 		// do it again with a sub-image to see if it handles that
 		image = BoofTesting.createSubImageOf_S(image);
-		alg.initialize(image);
+		alg.setImage(image);
 		assertTrue(alg.refine(input, found));
 		assertTrue(expected.isIdentical(input,0));
 		assertTrue(expected.isIdentical(found,0.27));
@@ -225,7 +225,7 @@ public class TestRefinePolygonLineToImage {
 		Polygon2D_F64 expected = input.copy();
 		Polygon2D_F64 found = new Polygon2D_F64(4);
 
-		alg.initialize(image);
+		alg.setImage(image);
 		// fail without the transform
 		assertFalse(alg.refine(input, found));
 
@@ -233,7 +233,7 @@ public class TestRefinePolygonLineToImage {
 		PixelTransformAffine_F32 transform = new PixelTransformAffine_F32();
 		transform.set(regToDist);
 		alg.getSnapToEdge().setTransform(image.width, image.height, transform);
-		alg.initialize(image);
+		alg.setImage(image);
 		assertTrue(alg.refine(input, found));
 
 		// should be close to the expected
@@ -279,7 +279,7 @@ public class TestRefinePolygonLineToImage {
 			input.set(expected);
 			addNoise(input, 2);
 
-			alg.initialize(image);
+			alg.setImage(image);
 			assertTrue(alg.refine(input, found));
 
 			// should be close to the expected
@@ -322,7 +322,7 @@ public class TestRefinePolygonLineToImage {
 		Quadrilateral_F64 input = new Quadrilateral_F64(x0,y0,x0,y1,x1,y1,x1,y0);
 		LineGeneral2D_F64 found = new LineGeneral2D_F64();
 
-		alg.initialize(image);
+		alg.setImage(image);
 		assertTrue(alg.optimize(input.a, input.b, found));
 
 		assertTrue(Distance2D_F64.distance(found, input.a) <= 1e-4);
@@ -353,7 +353,7 @@ public class TestRefinePolygonLineToImage {
 			Quadrilateral_F64 input = new Quadrilateral_F64(x0,y0,x0,y1,x1,y1,x1,y0);
 			LineGeneral2D_F64 found = new LineGeneral2D_F64();
 
-			alg.initialize(image);
+			alg.setImage(image);
 			assertFalse(alg.optimize(input.b, input.a, found));
 			// should be a to b
 		}
@@ -376,7 +376,7 @@ public class TestRefinePolygonLineToImage {
 		// bad example
 		try {
 			H.getModel().a11 = 2;
-			alg.getSnapToEdge().setTransform(20,30,transform);
+			alg.getSnapToEdge().setTransform(20, 30, transform);
 			fail("Should have thrown exception");
 		} catch( RuntimeException ignore ) {}
 	}

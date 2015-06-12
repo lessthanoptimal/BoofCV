@@ -54,8 +54,8 @@ public class TestSnapToEdge {
 	Random rand = new Random(234);
 
 	int width = 400, height = 500;
-	ImageSingleBand work; // original image before homography has been applied
-	ImageSingleBand image; // image after homography applied
+	ImageSingleBand work; // original image before affine has been applied
+	ImageSingleBand image; // image after affine applied
 
 	int x0 = 200, y0 = 160;
 	int x1 = 260, y1 = 400; // that's exclusive

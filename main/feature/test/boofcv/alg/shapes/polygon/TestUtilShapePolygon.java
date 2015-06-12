@@ -23,8 +23,7 @@ import georegression.struct.line.LineGeneral2D_F64;
 import georegression.struct.shapes.Polygon2D_F64;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * @author Peter Abeles
@@ -33,30 +32,30 @@ public class TestUtilShapePolygon {
 
 	@Test
 	public void plus() {
-		assertEquals(3,UtilShapePolygon.plus(2,1,5));
-		assertEquals(4,UtilShapePolygon.plus(2,2,5));
-		assertEquals(0,UtilShapePolygon.plus(2,3,5));
-		assertEquals(1,UtilShapePolygon.plus(2,4,5));
+		assertEquals(3,UtilShapePolygon.plusPOffset(2, 1, 5));
+		assertEquals(4,UtilShapePolygon.plusPOffset(2, 2, 5));
+		assertEquals(0,UtilShapePolygon.plusPOffset(2, 3, 5));
+		assertEquals(1,UtilShapePolygon.plusPOffset(2, 4, 5));
 	}
 
 	@Test
 	public void add() {
-		assertEquals(3,UtilShapePolygon.add(2, 1, 5));
-		assertEquals(4,UtilShapePolygon.add(2, 2, 5));
-		assertEquals(0,UtilShapePolygon.add(2, 3, 5));
-		assertEquals(1,UtilShapePolygon.add(2, 4, 5));
-		assertEquals(1,UtilShapePolygon.add(2, -1, 5));
-		assertEquals(0,UtilShapePolygon.add(2, -2, 5));
-		assertEquals(4,UtilShapePolygon.add(2, -3, 5));
-		assertEquals(3,UtilShapePolygon.add(2, -4, 5));
+		assertEquals(3,UtilShapePolygon.addOffset(2, 1, 5));
+		assertEquals(4,UtilShapePolygon.addOffset(2, 2, 5));
+		assertEquals(0,UtilShapePolygon.addOffset(2, 3, 5));
+		assertEquals(1,UtilShapePolygon.addOffset(2, 4, 5));
+		assertEquals(1,UtilShapePolygon.addOffset(2, -1, 5));
+		assertEquals(0,UtilShapePolygon.addOffset(2, -2, 5));
+		assertEquals(4,UtilShapePolygon.addOffset(2, -3, 5));
+		assertEquals(3,UtilShapePolygon.addOffset(2, -4, 5));
 	}
 
 	@Test
 	public void minus() {
-		assertEquals(1,UtilShapePolygon.minus(2, 1, 5));
-		assertEquals(0,UtilShapePolygon.minus(2, 2, 5));
-		assertEquals(4,UtilShapePolygon.minus(2, 3, 5));
-		assertEquals(3,UtilShapePolygon.minus(2, 4, 5));
+		assertEquals(1,UtilShapePolygon.minusPOffset(2, 1, 5));
+		assertEquals(0,UtilShapePolygon.minusPOffset(2, 2, 5));
+		assertEquals(4,UtilShapePolygon.minusPOffset(2, 3, 5));
+		assertEquals(3,UtilShapePolygon.minusPOffset(2, 4, 5));
 	}
 
 	@Test
@@ -73,6 +72,11 @@ public class TestUtilShapePolygon {
 		assertTrue(UtilShapePolygon.convert(lines, found));
 
 		assertTrue(orig.isIdentical(found, 1e-8));
+	}
+
+	@Test
+	public void dir() {
+		fail("implement");
 	}
 
 }

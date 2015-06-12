@@ -1,0 +1,24 @@
+dependencies {
+    compile project(':main:ip')
+    compile project(':main:io')
+    compile project(':main:calibration')
+}
+
+sourceSets {
+    test {
+        java {
+            srcDir 'test'
+            srcDir 'examples'
+        }
+        resources {
+            srcDir 'resources/test'
+        }
+    }
+}
+
+idea {
+    module {
+        name = "BoofCV OpenCV"
+    }
+}
+

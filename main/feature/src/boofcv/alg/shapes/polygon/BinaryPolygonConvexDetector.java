@@ -31,7 +31,6 @@ import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
 import georegression.geometry.UtilPolygons2D_F64;
 import georegression.metric.Area2D_F64;
-import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I32;
 import georegression.struct.shapes.Polygon2D_F64;
 import org.ddogleg.struct.FastQueue;
@@ -104,7 +103,7 @@ public class BinaryPolygonConvexDetector<T extends ImageSingleBand> {
 	// Refines the estimate of the polygon's lines using a subpixel technique
 	private RefinePolygonLineToImage<T> refineLine;
 	// Refines the estimate of the polygon's corners using a subpixel technique
-	private SubpixelSparseCornerFit<T> refineCorner;
+	private RefinePolygonCornersToImage<T> refineCorner;
 
 	// List of all squares that it finds
 	private FastQueue<Polygon2D_F64> found;
@@ -147,7 +146,7 @@ public class BinaryPolygonConvexDetector<T extends ImageSingleBand> {
 									   InputToBinary<T> thresholder,
 									   SplitMergeLineFitLoop contourToPolygon,
 									   RefinePolygonLineToImage<T> refineLine,
-									   SubpixelSparseCornerFit<T> refineCorner,
+									   RefinePolygonCornersToImage<T> refineCorner,
 									   double minContourFraction,
 									   double splitDistanceFraction,
 									   boolean outputClockwise,
@@ -301,12 +300,31 @@ public class BinaryPolygonConvexDetector<T extends ImageSingleBand> {
 					continue;
 				}
 
+				Polygon2D_F64 refined = found.grow();
+
+				boolean success;
+				if( refineCorner != null ) {
+					refineCorner.setImage(gray);
+					success = refineCorner.refine(c.external,splits,refined);
+					// TODO be careful about polygon direction of refined
+				} else if( refineLine != null ){
+					refineLine.setImage(gray);
+					success = refineLine.refine(workPoly, refined);
+				} else {
+					refined.set(workPoly);
+					success = true;
+				}
+
+				if( !outputClockwise )
+					UtilPolygons2D_F64.reverseOrder(refined);
+
 				// refine the polygon and add it to the found list
-				if( refinePolygon(gray) ) {
+				if( success ) {
 					c.id = found.size();
 					foundContours.add(c);
 				} else {
-					if( verbose ) System.out.println("Rejected");
+					found.removeTail();
+					if( verbose ) System.out.println("Rejected after refine");
 				}
 			}
 		}
@@ -325,59 +343,6 @@ public class BinaryPolygonConvexDetector<T extends ImageSingleBand> {
 		}
 	}
 
-	/**
-	 * Refine using corner then line or any combination, including none.  Put into list
-	 * of found polygons if nothing goe wrong.
-	 */
-	private boolean refinePolygon( T gray ) {
-		// refine the estimate
-		Polygon2D_F64 refined = found.grow();
-		refined.set(workPoly);
-
-		boolean failed = false;
-
-		if( refineCorner != null ) {
-			refineCorner.initialize(gray);
-			if( !refinePolygonCorners(workPoly,refined) ) {
-				if( verbose ) System.out.println("  rejected refine corner");
-				failed = true;
-			}
-		};
-		if( !failed && refineLine != null ) {
-			refineLine.initialize(gray);
-			workPoly.set(refined);
-			if( !refineLine.refine(workPoly, refined) ) {
-				if( verbose ) System.out.println("  rejected refine line");
-				failed = true;
-			}
-		}
-		// or don't refine the estimate
-		if( refineCorner == null && refineLine == null ) {
-			refined.set(workPoly);
-		}
-
-		// if it failed, discard
-		if( failed ) {
-			found.removeTail();
-		} else {
-			if( !outputClockwise )
-				UtilPolygons2D_F64.reverseOrder(refined);
-		}
-		return !failed;
-	}
-
-	/**
-	 * Refines each vertex in the polygon independently
-	 * @return true if no issues and false if it failed
-	 */
-	private boolean refinePolygonCorners(Polygon2D_F64 q, Polygon2D_F64 refined) {
-		for (int i = 0; i < q.size(); i++) {
-			Point2D_F64 v = q.get(i);
-			if( !refineCorner.refine(v.x,v.y,refined.get(i)) )
-				return false;
-		}
-		return true;
-	}
 
 	/**
 	 * Checks to see if some part of the contour touches the image border.  Most likely cropped
