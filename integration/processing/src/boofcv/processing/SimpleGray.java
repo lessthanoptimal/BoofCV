@@ -272,8 +272,12 @@ public class SimpleGray extends SimpleImage<ImageSingleBand>{
 		return gradient(FactoryDerivative.three(image.getClass(), null));
 	}
 
-	public SimpleGradient gradientTwo() {
-		return gradient(FactoryDerivative.two(image.getClass(), null));
+	public SimpleGradient gradientTwo0() {
+		return gradient(FactoryDerivative.two0(image.getClass(), null));
+	}
+
+	public SimpleGradient gradientTwo1() {
+		return gradient(FactoryDerivative.two1(image.getClass(), null));
 	}
 
 	/**

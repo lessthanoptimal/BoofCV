@@ -55,6 +55,7 @@ public class ConfigPolygonDetector implements Configuration {
 
 	/**
 	 * Subpixel refinement using corners.  Doesn't require straight lines so it is more tolerant of distortion.
+	 * However not as much information is being used so the fit might not be as good under ideal situations.
 	 */
 	public boolean refineWithCorners = false;
 
@@ -74,6 +75,11 @@ public class ConfigPolygonDetector implements Configuration {
 	public ConfigRefinePolygonLineToImage configRefineLines = new ConfigRefinePolygonLineToImage();
 
 	/**
+	 * Configuration for refining with corners.  Ignored if not used.
+	 */
+	public ConfigRefinePolygonCornersToImage configRefineCorners = new ConfigRefinePolygonCornersToImage();
+
+	/**
 	 * Specifies the number of sides in the polygon and uses default settings for everything else
 	 */
 	public ConfigPolygonDetector(int numberOfSides) {
@@ -87,6 +93,14 @@ public class ConfigPolygonDetector implements Configuration {
 
 	@Override
 	public void checkValidity() {
+		if( (refineWithCorners && refineWithLines) ) {
+			throw new IllegalArgumentException("Can't refine with both corners and lines");
+		}
+
+		if( refineWithLines && !configRefineLines.insideBlack)
+			throw new IllegalArgumentException("The detector only support black objects so refine lines fitBlack must be true");
+		if( refineWithCorners && !configRefineCorners.insideBlack )
+			throw new IllegalArgumentException("The detector only support black objects so refine corners fitBlack must be true");
 
 	}
 }

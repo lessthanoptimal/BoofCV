@@ -19,8 +19,8 @@
 package boofcv.factory.shape;
 
 import boofcv.abst.filter.binary.InputToBinary;
-import boofcv.alg.shapes.corner.SubpixelSparseCornerFit;
 import boofcv.alg.shapes.polygon.BinaryPolygonConvexDetector;
+import boofcv.alg.shapes.polygon.RefinePolygonCornersToImage;
 import boofcv.alg.shapes.polygon.RefinePolygonLineToImage;
 import boofcv.alg.shapes.polyline.SplitMergeLineFitLoop;
 import boofcv.struct.image.ImageSingleBand;
@@ -47,6 +47,8 @@ public class FactoryShapeDetector {
 											ConfigPolygonDetector config,
 											Class<T> imageType)
 	{
+		config.checkValidity();
+
 		SplitMergeLineFitLoop contourToPolygon = new SplitMergeLineFitLoop(0,config.contour2Poly_mergeTolerance,
 				config.contour2Poly_iterations);
 
@@ -56,10 +58,14 @@ public class FactoryShapeDetector {
 					config.configRefineLines.cornerOffset,config.configRefineLines.lineSamples,
 					config.configRefineLines.sampleRadius,config.configRefineLines.maxIterations,
 					config.configRefineLines.convergeTolPixels,
-					config.configRefineLines.fitBlack,imageType);
-		SubpixelSparseCornerFit<T> refineCorner = null;
+					true,imageType);
+		RefinePolygonCornersToImage<T> refineCorner = null;
 		if( config.refineWithCorners )
-			refineCorner = new SubpixelSparseCornerFit<T>(imageType);
+			refineCorner = new RefinePolygonCornersToImage<T>(
+					config.configRefineCorners.endPointDistance,true,
+					config.configRefineCorners.cornerOffset,config.configRefineCorners.lineSamples,
+					config.configRefineCorners.sampleRadius,config.configRefineCorners.maxIterations,
+					config.configRefineCorners.convergeTolPixels,imageType);
 
 		return new BinaryPolygonConvexDetector<T>(config.numberOfSides,inputToBinary,contourToPolygon,
 				refineLine,refineCorner,config.minContourImageWidthFraction,

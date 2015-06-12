@@ -23,7 +23,8 @@ import georegression.struct.line.LineGeneral2D_F64;
 import georegression.struct.shapes.Polygon2D_F64;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Peter Abeles
@@ -31,7 +32,7 @@ import static org.junit.Assert.*;
 public class TestUtilShapePolygon {
 
 	@Test
-	public void plus() {
+	public void plusPOffset() {
 		assertEquals(3,UtilShapePolygon.plusPOffset(2, 1, 5));
 		assertEquals(4,UtilShapePolygon.plusPOffset(2, 2, 5));
 		assertEquals(0,UtilShapePolygon.plusPOffset(2, 3, 5));
@@ -39,7 +40,7 @@ public class TestUtilShapePolygon {
 	}
 
 	@Test
-	public void add() {
+	public void addOffset() {
 		assertEquals(3,UtilShapePolygon.addOffset(2, 1, 5));
 		assertEquals(4,UtilShapePolygon.addOffset(2, 2, 5));
 		assertEquals(0,UtilShapePolygon.addOffset(2, 3, 5));
@@ -51,7 +52,7 @@ public class TestUtilShapePolygon {
 	}
 
 	@Test
-	public void minus() {
+	public void minusPOffset() {
 		assertEquals(1,UtilShapePolygon.minusPOffset(2, 1, 5));
 		assertEquals(0,UtilShapePolygon.minusPOffset(2, 2, 5));
 		assertEquals(4,UtilShapePolygon.minusPOffset(2, 3, 5));
@@ -63,7 +64,7 @@ public class TestUtilShapePolygon {
 		Polygon2D_F64 orig = new Polygon2D_F64(10,20,30,21,19.5,-10,8,-8);
 
 		LineGeneral2D_F64[] lines = new LineGeneral2D_F64[4];
-		lines[0] = UtilLine2D_F64.convert(orig.getLine(0, null), (LineGeneral2D_F64) null);
+		lines[0] = UtilLine2D_F64.convert(orig.getLine(0,null),(LineGeneral2D_F64) null);
 		lines[1] = UtilLine2D_F64.convert(orig.getLine(1,null),(LineGeneral2D_F64)null);
 		lines[2] = UtilLine2D_F64.convert(orig.getLine(2,null),(LineGeneral2D_F64)null);
 		lines[3] = UtilLine2D_F64.convert(orig.getLine(3,null),(LineGeneral2D_F64)null);
@@ -75,8 +76,20 @@ public class TestUtilShapePolygon {
 	}
 
 	@Test
-	public void dir() {
-		fail("implement");
+	public void distanceP() {
+		assertEquals(0,UtilShapePolygon.distanceP(2,2,4));
+		assertEquals(1,UtilShapePolygon.distanceP(2,3,4));
+		assertEquals(3,UtilShapePolygon.distanceP(2,1,4));
+		assertEquals(2,UtilShapePolygon.distanceP(2,0,4));
 	}
 
+	@Test
+	public void subtract() {
+		assertEquals( 0,UtilShapePolygon.subtract(2, 2, 4));
+		assertEquals( 1,UtilShapePolygon.subtract(2, 3, 4));
+		assertEquals(-1,UtilShapePolygon.subtract(2, 1, 4));
+		assertEquals(-2,UtilShapePolygon.subtract(2, 0, 4));
+		assertEquals(-2,UtilShapePolygon.subtract(2, 0, 5));
+		assertEquals( 2,UtilShapePolygon.subtract(2, 4, 5));
+	}
 }

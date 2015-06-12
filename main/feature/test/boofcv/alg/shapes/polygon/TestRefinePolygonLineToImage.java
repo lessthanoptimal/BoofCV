@@ -18,15 +18,10 @@
 
 package boofcv.alg.shapes.polygon;
 
-import boofcv.abst.distort.FDistort;
 import boofcv.alg.distort.PixelTransformAffine_F32;
 import boofcv.alg.distort.PointToPixelTransform_F32;
 import boofcv.alg.distort.PointTransformHomography_F32;
-import boofcv.alg.misc.GImageMiscOps;
-import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.distort.PixelTransform_F32;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
 import boofcv.testing.BoofTesting;
 import georegression.geometry.UtilPolygons2D_F64;
@@ -41,8 +36,6 @@ import georegression.transform.ConvertTransform_F64;
 import georegression.transform.affine.AffinePointOps_F64;
 import org.junit.Test;
 
-import java.util.Random;
-
 import static java.lang.Math.max;
 import static org.junit.Assert.*;
 
@@ -50,20 +43,7 @@ import static org.junit.Assert.*;
  * @author Peter Abeles
  */
 @SuppressWarnings("unchecked")
-public class TestRefinePolygonLineToImage {
-
-	Random rand = new Random(234);
-
-	int width = 400, height = 500;
-	ImageSingleBand work; // original image before affine has been applied
-	ImageSingleBand image; // image after affine applied
-
-	int x0 = 200, y0 = 160;
-	int x1 = 260, y1 = 400; // that's exclusive
-
-	int white = 200;
-
-	Class imageTypes[] = new Class[]{ImageUInt8.class,ImageFloat32.class};
+public class TestRefinePolygonLineToImage extends BaseFitPolygon{
 
 	/**
 	 * Give it a shape which is too small and see if it fails
@@ -381,28 +361,5 @@ public class TestRefinePolygonLineToImage {
 		} catch( RuntimeException ignore ) {}
 	}
 
-	private void setup( Affine2D_F64 affine, boolean black , Class imageType ) {
-		work = GeneralizedImageOps.createSingleBand(imageType,width,height);
-		image = GeneralizedImageOps.createSingleBand(imageType,width,height);
-
-		int bg = black ? white : 0;
-		int fg = black ? 0 : white;
-		GImageMiscOps.fill(work, bg);
-		GImageMiscOps.fillRectangle(work, fg, x0, y0, x1 - x0, y1 - y0);
-
-		if( affine != null ) {
-			new FDistort(work, image).border(bg).affine(affine).apply();
-		} else {
-			image.setTo(work);
-		}
-
-//		BufferedImage out = ConvertBufferedImage.convertTo(image, null, true);
-//		ShowImages.showWindow(out, "Rendered");
-//		try {
-//			Thread.sleep(3000);
-//		} catch (InterruptedException e) {
-//			e.printStackTrace();
-//		}
-	}
 
 }

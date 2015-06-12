@@ -92,6 +92,12 @@ public class RefineCornerLinesToImage<T extends ImageSingleBand> {
 	 * Constructor which provides full access to all parameters.  See code documents
 	 * value a description of these variables.
 	 *
+	 * @param cornerOffset pixels this close to the corner will be ignored. Try 2
+	 * @param maxLineSamples Number of points along the line which will be sampled.  try 10
+	 * @param sampleRadius How far away from the line will it sample pixels.  >= 1
+	 * @param maxIterations Maximum number of iterations it will perform.  Try 10
+	 * @param convergeTolPixels When the corner changes less than this amount it will stop iterating. Try 1e-5
+	 * @param fitBlack If true it's fitting a black shape with a white background.  false is the inverse.
 	 */
 	public RefineCornerLinesToImage(double cornerOffset, int maxLineSamples, int sampleRadius,
 									int maxIterations, double convergeTolPixels, boolean fitBlack,
@@ -110,7 +116,7 @@ public class RefineCornerLinesToImage<T extends ImageSingleBand> {
 
 	/**
 	 * Simplified constructor which uses reasonable default values for most variables
-	 * @param fitBlack If true it's fitting a black square with a white background.  false is the inverse.
+	 * @param fitBlack If true it's fitting a black shape with a white background.  false is the inverse.
 	 * @param imageType Type of input image it processes
 	 */
 	public RefineCornerLinesToImage(boolean fitBlack, Class<T> imageType) {

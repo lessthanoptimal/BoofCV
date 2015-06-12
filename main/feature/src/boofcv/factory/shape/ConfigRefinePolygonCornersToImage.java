@@ -18,38 +18,40 @@
 
 package boofcv.factory.shape;
 
-import boofcv.alg.shapes.polygon.RefinePolygonLineToImage;
+import boofcv.alg.shapes.polygon.RefinePolygonCornersToImage;
 import boofcv.struct.Configuration;
 
 /**
- * Configuration parameters for {@link RefinePolygonLineToImage}
+ * Configuration parameters for {@link RefinePolygonCornersToImage}
  *
  * @author Peter Abeles
  */
-public class ConfigRefinePolygonLineToImage implements Configuration{
-
+public class ConfigRefinePolygonCornersToImage implements Configuration
+{
 	/**
-	 *  How many indexes away in the contour list should end points be.
+	 * How many indexes away in the contour list should end points be.
 	 */
-	public int endPointDistance;
+	public int endPointDistance = 15;
+
 	/**
 	 * How far away in pixels it will start sampling the line from a corner.  Corners can become highly aliased
 	 * with ambiguous borders.
 	 */
 	public double cornerOffset = 2;
+
 	/**
 	 * Number of times along the line it will be sampled
 	 */
-	public int lineSamples = 30;
+	public int lineSamples = 15;
 	/**
 	 * Number of points tangent to the line in each direction it samples.  In total the number of
 	 * samples along a line will be lineSamples*(2*sampleRadius+1)
 	 */
-	public int sampleRadius = 1;
+	public int sampleRadius = 2;
 	/**
 	 * Maximum number of iterations
 	 */
-	public int maxIterations = 10;
+	public int maxIterations = 15;
 	/**
 	 * Convergence tolerance in pixels
 	 */

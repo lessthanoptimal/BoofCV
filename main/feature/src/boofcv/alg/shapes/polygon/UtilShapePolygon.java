@@ -108,7 +108,8 @@ public class UtilShapePolygon {
 
 	/**
 	 * Subtracts index1 from index0. positive number if its closer in the positive
-	 * direction or negative if closer in the negative direction
+	 * direction or negative if closer in the negative direction.  if equal distance then
+	 * it will return a negative number.
 	 *
 	 * @param index0 element in circular buffer
 	 * @param index1 element in circular buffer
@@ -117,22 +118,10 @@ public class UtilShapePolygon {
 	 */
 	public static int subtract(int index0, int index1, int size) {
 		int distance = distanceP(index0, index1, size);
-		if( distance >= size/2 ) {
+		if( distance >= size/2+size%2 ) {
 			return distance-size;
 		} else {
 			return distance;
 		}
 	}
-
-	/**
-	 * Returns which direction of travel is closer from index0 to index1.  1 = positive
-	 * -1 = negative.  If it's a die then positive is returned.
-	 */
-	public static int dir( int index0 , int index1 , int size ) {
-		if( subtract(index1,index0,size) >= 0 )
-			return 1;
-		else
-			return -1;
-	}
-
 }

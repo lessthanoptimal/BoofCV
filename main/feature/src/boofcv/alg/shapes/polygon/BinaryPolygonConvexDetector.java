@@ -283,8 +283,9 @@ public class BinaryPolygonConvexDetector<T extends ImageSingleBand> {
 					workPoly.get(j).set(p.x,p.y);
 				}
 
-				if( workPoly.isCCW() ) {
-					UtilPolygons2D_F64.reverseOrder(workPoly);
+				boolean workOrigCWW = workPoly.isCCW();
+				if( workOrigCWW ) {
+					workPoly.flip();
 				}
 				// this only supports convex polygons
 				if( !UtilPolygons2D_F64.isConvex(workPoly)) {
@@ -305,8 +306,10 @@ public class BinaryPolygonConvexDetector<T extends ImageSingleBand> {
 				boolean success;
 				if( refineCorner != null ) {
 					refineCorner.setImage(gray);
-					success = refineCorner.refine(c.external,splits,refined);
-					// TODO be careful about polygon direction of refined
+					success = refineCorner.refine(c.external,splits,refined)>=3;
+					if( workOrigCWW ) {
+						refined.flip();
+					}
 				} else if( refineLine != null ){
 					refineLine.setImage(gray);
 					success = refineLine.refine(workPoly, refined);
@@ -316,7 +319,7 @@ public class BinaryPolygonConvexDetector<T extends ImageSingleBand> {
 				}
 
 				if( !outputClockwise )
-					UtilPolygons2D_F64.reverseOrder(refined);
+					refined.flip();
 
 				// refine the polygon and add it to the found list
 				if( success ) {
