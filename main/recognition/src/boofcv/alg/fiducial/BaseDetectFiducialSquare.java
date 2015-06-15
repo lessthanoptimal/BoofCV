@@ -62,7 +62,7 @@ import java.util.List;
  * </p>
  *
  * <p>
- * Target orientation. Corner 0 = (r,r), 1 = (r,-r) , 2 = (-r,-r) , 3 = (-r,r).
+ * Target orientation. Corner 0 = (-r,r), 1 = (r,r) , 2 = (rr,-r) , 3 = (-r,-r).
  * </p>
  *
  * @author Peter Abeles
@@ -163,10 +163,10 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 		// add corner points in target frame.  Used to compute homography.  Target's center is at its origin
 		// see comment in class JavaDoc above.  Note that the target's length is one below.  The scale factor
 		// will be provided later one
-		pairsPose.get(0).p1.set( 0.5,  0.5);
-		pairsPose.get(1).p1.set( 0.5, -0.5);
-		pairsPose.get(2).p1.set(-0.5, -0.5);
-		pairsPose.get(3).p1.set(-0.5,  0.5);
+		pairsPose.get(0).p1.set(-0.5,  0.5);
+		pairsPose.get(1).p1.set( 0.5,  0.5);
+		pairsPose.get(2).p1.set( 0.5, -0.5);
+		pairsPose.get(3).p1.set(-0.5, -0.5);
 
 		// Setup homography to camera pose estimator
 		DenseMatrix64F K = new DenseMatrix64F(3,3);

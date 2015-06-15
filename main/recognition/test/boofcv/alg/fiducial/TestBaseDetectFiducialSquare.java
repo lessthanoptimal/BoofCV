@@ -25,6 +25,7 @@ import boofcv.alg.distort.PointTransformHomography_F32;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.interpolate.TypeInterpolate;
 import boofcv.alg.misc.ImageMiscOps;
+import boofcv.alg.misc.ImageStatistics;
 import boofcv.factory.filter.binary.FactoryThresholdBinary;
 import boofcv.factory.geo.FactoryMultiView;
 import boofcv.factory.shape.ConfigPolygonDetector;
@@ -39,6 +40,7 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.struct.shapes.Quadrilateral_F64;
+import georegression.transform.se.SePointOps_F64;
 import org.ejml.data.DenseMatrix64F;
 import org.ejml.ops.MatrixFeatures;
 import org.junit.Test;
@@ -52,6 +54,44 @@ import static org.junit.Assert.*;
  * @author Peter Abeles
  */
 public class TestBaseDetectFiducialSquare {
+
+	/**
+	 * Runs the entire processing loop with a very simple oriented fiducial.  Makes sure that the found projection
+	 * from fiducial to camera is consistent by transforming one of the corners and seeing if it ends up
+	 * in the correct location.
+	 */
+	@Test
+	public void checkFoundOrientation() {
+		IntrinsicParameters intrinsic =new IntrinsicParameters(500,500,0,320,240,640,480);
+
+		// create a pattern with a corner for orientation and put it into the image
+		ImageUInt8 pattern = createPattern(6*20, true);
+
+		ImageUInt8 image = new ImageUInt8(640,480);
+		ImageMiscOps.fill(image, 255);
+
+		image.subimage(200,300,200+pattern.width,300+pattern.height,null).setTo(pattern);
+
+		DetectCorner detector = new DetectCorner();
+
+		detector.configure(intrinsic,false);
+		detector.process(image);
+
+		assertEquals(1,detector.getFound().size());
+		FoundFiducial ff = detector.getFound().get(0);
+
+		// lower left hand corner in the fiducial.  side is of length 2
+		Point3D_F64 lowerLeft = new Point3D_F64(-1,-1,0);
+		Point3D_F64 cameraPt = new Point3D_F64();
+		SePointOps_F64.transform(ff.targetToSensor, lowerLeft, cameraPt);
+		Point2D_F64 pixelPt = new Point2D_F64();
+		PerspectiveOps.convertNormToPixel(intrinsic,cameraPt.x/cameraPt.z,cameraPt.y/cameraPt.z,pixelPt);
+
+		// see if that point projects into the correct location
+		assertEquals(200,pixelPt.x,1e-4);
+		assertEquals(300+pattern.height,pixelPt.y,1e-4);
+	}
+
 	/**
 	 * Basic test where a distorted pattern is places in the image and the found coordinates
 	 * are compared against ground truth
@@ -62,10 +102,9 @@ public class TestBaseDetectFiducialSquare {
 	}
 
 	private void checkFindKnown(IntrinsicParameters intrinsic, double tol ) {
-		ImageUInt8 pattern = createPattern(100);
+		ImageUInt8 pattern = createPattern(6*20, false);
 		Quadrilateral_F64 where = new Quadrilateral_F64(50,50,  130,60,  140,150,  40,140);
 //		Quadrilateral_F64 where = new Quadrilateral_F64(50,50,  100,50,  100,150,  50,150);
-
 
 		ImageUInt8 image = new ImageUInt8(640,480);
 		ImageMiscOps.fill(image, 255);
@@ -119,10 +158,10 @@ public class TestBaseDetectFiducialSquare {
 		Quadrilateral_F64 quad = new Quadrilateral_F64();
 
 		double r = lengthSide/2.0;
-		quad.a = PerspectiveOps.renderPixel(targetToWorld,K,c(new Point2D_F64( r, r)));
-		quad.b = PerspectiveOps.renderPixel(targetToWorld,K,c(new Point2D_F64( r,-r)));
-		quad.c = PerspectiveOps.renderPixel(targetToWorld,K,c(new Point2D_F64(-r,-r)));
-		quad.d = PerspectiveOps.renderPixel(targetToWorld,K,c(new Point2D_F64(-r, r)));
+		quad.a = PerspectiveOps.renderPixel(targetToWorld,K,c(new Point2D_F64(-r, r)));
+		quad.b = PerspectiveOps.renderPixel(targetToWorld,K,c(new Point2D_F64( r, r)));
+		quad.c = PerspectiveOps.renderPixel(targetToWorld,K,c(new Point2D_F64( r,-r)));
+		quad.d = PerspectiveOps.renderPixel(targetToWorld,K,c(new Point2D_F64(-r,-r)));
 
 		Se3_F64 found = new Se3_F64();
 		alg.computeTargetToWorld(quad, 0.5, found);
@@ -137,9 +176,14 @@ public class TestBaseDetectFiducialSquare {
 
 	/**
 	 * Creates a square pattern image of the specified size
+	 *
+	 * @param squareLowLeft If true a square will be added to the image lower left
 	 */
-	public static ImageUInt8 createPattern( int length ) {
+	public static ImageUInt8 createPattern(int length, boolean squareLowLeft) {
 		ImageUInt8 pattern = new ImageUInt8( length , length );
+
+		if( length%6 != 0 )
+			throw new RuntimeException("Must be divisible by 6!");
 
 		int b = length/6;
 
@@ -147,6 +191,14 @@ public class TestBaseDetectFiducialSquare {
 			for (int x = 0; x < length; x++) {
 				int color = (x < b || y < b || x >= length-b || y >= length-b ) ? 0 : 255;
 				pattern.set(x,y,color);
+			}
+		}
+
+		if( squareLowLeft ) {
+			for (int y = 0; y < 2*b; y++) {
+				for (int x = 0; x < 2*b; x++) {
+					pattern.set(x + b, y + 3*b, 0);
+				}
 			}
 		}
 
@@ -224,6 +276,44 @@ public class TestBaseDetectFiducialSquare {
 		@Override
 		public boolean processSquare(ImageFloat32 square, Result result) {
 			detected.add(square.clone());
+			return true;
+		}
+	}
+
+	/**
+	 * Accepts the pattern when it's in the lower left corner
+	 */
+	public static class DetectCorner extends BaseDetectFiducialSquare<ImageUInt8> {
+		protected DetectCorner() {
+			super(FactoryShapeDetector.polygon(FactoryThresholdBinary.globalFixed(50,true,ImageUInt8.class),
+					new ConfigPolygonDetector(4,false),ImageUInt8.class),100, ImageUInt8.class);
+		}
+
+		@Override
+		public boolean processSquare(ImageFloat32 square, Result result) {
+
+			int w2 = square.width/2;
+			int h2 = square.height/2;
+			int w = square.width;
+			int h = square.height;
+
+			float sum[] = new float[4];
+			sum[0] = ImageStatistics.sum(square.subimage(0,0,w2,h2,null));
+			sum[1] = ImageStatistics.sum(square.subimage(w2,0,w,h2,null));
+			sum[2] = ImageStatistics.sum(square.subimage(w2,h2,w,h,null));
+			sum[3] = ImageStatistics.sum(square.subimage(0,h2,w2,h,null));
+
+			int indexMin = -1;
+			float min = Float.MAX_VALUE;
+			for (int i = 0; i < 4; i++) {
+				if( sum[i] < min ) {
+					min = sum[i];
+					indexMin = i;
+				}
+			}
+
+			result.lengthSide = 2.0;
+			result.rotation = 3-indexMin;
 			return true;
 		}
 	}
