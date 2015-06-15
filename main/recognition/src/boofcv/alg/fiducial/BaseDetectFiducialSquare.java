@@ -198,10 +198,10 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 			Polygon2D_F64 p = candidates.get(i);
 			UtilPolygons2D_F64.convert(p,q);
 
-			pairsRemovePerspective.get(0).set( 0              ,    0            , q.a.x , q.a.y);
-			pairsRemovePerspective.get(1).set( square.width-1 ,    0            , q.b.x , q.b.y );
-			pairsRemovePerspective.get(2).set( square.width-1 , square.height-1 , q.c.x , q.c.y );
-			pairsRemovePerspective.get(3).set( 0              , square.height-1 , q.d.x , q.d.y );
+			pairsRemovePerspective.get(0).set( 0            ,    0          , q.a.x , q.a.y);
+			pairsRemovePerspective.get(1).set( square.width ,    0          , q.b.x , q.b.y );
+			pairsRemovePerspective.get(2).set( square.width , square.height , q.c.x , q.c.y );
+			pairsRemovePerspective.get(3).set( 0            , square.height , q.d.x , q.d.y );
 
 			if( !computeHomography.process(pairsRemovePerspective,H) ) {
 				if( verbose ) System.out.println("rejected initial homography");
