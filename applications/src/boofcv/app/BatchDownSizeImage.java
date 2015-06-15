@@ -21,6 +21,7 @@ package boofcv.app;
 import boofcv.alg.filter.misc.AverageDownSampleOps;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
+import boofcv.misc.BoofMiscOps;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageUInt8;
 import boofcv.struct.image.MultiSpectral;
@@ -28,8 +29,6 @@ import boofcv.struct.image.MultiSpectral;
 import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
 import java.io.File;
-import java.io.FileFilter;
-import java.util.regex.Pattern;
 
 /**
  * Loads a set of images, resizes them to a smaller size using an intelligent algorithm then saves them.
@@ -38,26 +37,18 @@ import java.util.regex.Pattern;
  */
 public class BatchDownSizeImage {
 
-	public static void printHelpAndExit() {
+	public static void printHelpAndExit(String[] args) {
+		System.out.println("Expected 4 arguments, had "+args.length+" instead");
+		System.out.println();
 		System.out.println("<file path regex> <output directory> <width> <height>");
 		System.out.println("If height == 0 then it will select the height which maintains the same aspect ratio");
 		System.out.println("path/to/input/image\\d*.jpg path/to/output 640 0");
 		System.exit(0);
 	}
 
-	public static File[] findMatches( File directory , String regex ) {
-		final Pattern p = Pattern.compile(regex); // careful: could also throw an exception!
-		return directory.listFiles(new FileFilter(){
-			@Override
-			public boolean accept(File file) {
-				return p.matcher(file.getName()).matches();
-			}
-		});
-	}
-
 	public static void main(String[] args) {
 		if( args.length != 4 )
-			printHelpAndExit();
+			printHelpAndExit(args);
 
 		String fileRegex = args[0];
 		String output = args[1];
@@ -75,7 +66,12 @@ public class BatchDownSizeImage {
 
 		String regex = new File(fileRegex).getName();
 
-		File[] images = findMatches(d,regex);
+		File[] images = BoofMiscOps.findMatches(d, regex);
+
+		if( images.length == 0 ) {
+			System.out.println(fileRegex);
+			throw new IllegalArgumentException("No images found.  Is the path/regex correct?");
+		}
 
 		WritableRaster info = UtilImageIO.loadImage(images[0].getPath()).getRaster();
 

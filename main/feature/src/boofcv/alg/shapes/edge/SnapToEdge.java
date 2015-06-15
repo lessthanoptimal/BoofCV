@@ -60,6 +60,7 @@ import org.ddogleg.struct.GrowQueue_F64;
  *
  * @author Peter Abeles
  */
+// TODO specify weight function.  close to A, close to B, even
 public class SnapToEdge<T extends ImageSingleBand> {
 
 	// maximum number of times it will sample along the line

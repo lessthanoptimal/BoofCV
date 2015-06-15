@@ -27,6 +27,7 @@ Version : Alpha 0.19
 - Fiducials
   * Image square fiducials can now have their width individually set
   * Square based fiducials now use the new polygon detector and benefit from its improved subpixel
+  * Fixed bug where the returned orientation was inconsistent with the JavaDoc
 - PerspectiveOps
   * Can render pixel in camera frame using InrinsicParameters
 - Created FactoryMultiViewRobust for simplifying the creation of robust versions of
@@ -66,14 +67,14 @@ Version : Alpha 0.19
   * Can convert from 8888 to 3 channel multi-spectral images
 
 TODO
-  * Polygon Detector - Avoid undistorting the image, do it sparsely
   * Distortion Model + Calibration
     - calibration regression
        * given points compute parameters.  radial and tangential
        * detect calibration points, chessboard and square grid.  many images
   * Square Detector.  Create set of images in validation boof with hand selected corners
                       Improve performance across a range of distances and orientations
-  * Square Image: Better example image than the dog, which can have ambiguous orientation
+                      - Refine corner: weight fit to corner more
+  * Square Image Fiducial: Better example image than the dog, which can have ambiguous orientation
   * Template with transparent pixels
   * Android Demo:   Automatic Threshold.  Dim slider for global
   * Look at Sandreas's NewWarp

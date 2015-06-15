@@ -176,7 +176,7 @@ public class TestBinaryPolygonConvexDetector {
 			Polygon2D_F64 p = new Polygon2D_F64(4);
 			UtilPolygons2D_F64.convert(r,p);
 			if( p.isCCW() )
-				UtilPolygons2D_F64.reverseOrder(p);
+				p.flip();
 
 			if(UtilPolygons2D_F64.isEquivalent(found,p,tol))
 				match++;
