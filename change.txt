@@ -53,8 +53,12 @@ Version : Alpha 0.19
     - The former is correct, but you have to deal with interpolating values like 9.5 when there are 10 pixels (9 is largest index)
   * Added FDistort
     - Much easier to use and more flexible than the procedural fuctions in DistortImageOps
-- Sparse Gradient
-  * Added sobel, prewitt, three
+- FactoryDerivativeSparse
+  * Added sobel, prewitt, three, two0, two1
+- Gradient Two0 and Two1
+  * There are two different ways to define the gradient from two samples, depending on the zero index.
+  * Two0 is [1] - [0] and Two1 is [0] - [-1].
+  * Before only one of these variants was available
 - UtilImageIO
   * Can save an image directly that is in BoofCV format
 - Shape Features
