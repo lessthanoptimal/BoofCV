@@ -110,13 +110,14 @@ public class DetectFiducialSquareImage<T extends ImageSingleBand>
 		FiducialDef def = new FiducialDef();
 		def.lengthSide = lengthSide;
 
+		// CCW rotation so that the index refers to how many CW rotation it takes to put it into the nominal pose
 		binaryToDef(binary, def.desc[0]);
-		ImageMiscOps.rotateCW(binary);
+		ImageMiscOps.rotateCCW(binary);
 		binaryToDef(binary, def.desc[1]);
-		ImageMiscOps.rotateCW(binary);
-		binaryToDef(binary,def.desc[2]);
-		ImageMiscOps.rotateCW(binary);
-		binaryToDef(binary,def.desc[3]);
+		ImageMiscOps.rotateCCW(binary);
+		binaryToDef(binary, def.desc[2]);
+		ImageMiscOps.rotateCCW(binary);
+		binaryToDef(binary, def.desc[3]);
 
 		int index = targets.size();
 		targets.add( def );
@@ -139,36 +140,33 @@ public class DetectFiducialSquareImage<T extends ImageSingleBand>
 	@Override
 	protected boolean processSquare(ImageFloat32 gray, Result result) {
 
-		int off = (gray.width-binary.width)/2;
+		int off = squareLength/2;
 		gray.subimage(off,off,gray.width-off,gray.width-off,grayNoBorder);
+
+//		gray.printInt();
 
 		threshold.process(grayNoBorder,binary);
 
 		binaryToDef(binary,squareDef);
 
+		boolean matched = false;
+		int bestScore = hammingThreshold+1;
 		for (int i = 0; i < targets.size(); i++) {
 			FiducialDef def = targets.get(i);
 
-			int bestOrientation = 0;
-			int bestScore = Integer.MAX_VALUE;
 			for (int j = 0; j < 4; j++) {
 				int score = hamming(def.desc[j], squareDef);
 				if( score < bestScore ) {
 					bestScore = score;
-					bestOrientation = j;
+					result.rotation = j;
+					result.which = i;
+					result.lengthSide = def.lengthSide;
+					matched = true;
 				}
-			}
-
-			// see if it meets the match threshold
-			if( bestScore <= hammingThreshold ) {
-				result.rotation = bestOrientation;
-				result.which = i;
-				result.lengthSide = def.lengthSide;
-				return true;
 			}
 		}
 
-		return false;
+		return matched;
 	}
 
 	/**

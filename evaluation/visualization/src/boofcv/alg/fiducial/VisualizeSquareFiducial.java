@@ -85,6 +85,7 @@ public class VisualizeSquareFiducial {
 		BufferedImage output = new BufferedImage(input.width,input.height,BufferedImage.TYPE_INT_RGB);
 		VisualizeBinaryData.renderBinary(detector.getSquareDetector().getBinary(), false, output);
 		Graphics2D g2 = output.createGraphics();
+		g2.setRenderingHint( RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		g2.setColor(Color.RED);
 		g2.setStroke(new BasicStroke(2));
 
@@ -114,7 +115,7 @@ public class VisualizeSquareFiducial {
 			// add back in lens distortion
 			Quadrilateral_F64 q = fiducials.get(i).location;
 			g2.setColor(Color.RED);
-			g2.setStroke(new BasicStroke(1));
+			g2.setStroke(new BasicStroke(2));
 			VisualizeShapes.drawArrow(q,g2);
 			VisualizeBinaryData.renderExternal(detector.getSquareDetector().getFoundContours(),Color.BLUE,outputGray);
 		}

@@ -62,34 +62,56 @@ public class TestBaseDetectFiducialSquare {
 	 */
 	@Test
 	public void checkFoundOrientation() {
+		List<Point2D_F64> expected = new ArrayList<Point2D_F64>();
+		expected.add( new Point2D_F64(200,300+120));
+		expected.add( new Point2D_F64(200,300));
+		expected.add( new Point2D_F64(200+120,300));
+		expected.add( new Point2D_F64(200+120,300+120));
+
 		IntrinsicParameters intrinsic =new IntrinsicParameters(500,500,0,320,240,640,480);
 
 		// create a pattern with a corner for orientation and put it into the image
 		ImageUInt8 pattern = createPattern(6*20, true);
 
 		ImageUInt8 image = new ImageUInt8(640,480);
-		ImageMiscOps.fill(image, 255);
 
-		image.subimage(200,300,200+pattern.width,300+pattern.height,null).setTo(pattern);
+		for (int i = 0; i < 4; i++) {
 
-		DetectCorner detector = new DetectCorner();
+			ImageMiscOps.fill(image, 255);
 
-		detector.configure(intrinsic,false);
-		detector.process(image);
+			image.subimage(200, 300, 200 + pattern.width, 300 + pattern.height, null).setTo(pattern);
 
-		assertEquals(1,detector.getFound().size());
-		FoundFiducial ff = detector.getFound().get(0);
+			DetectCorner detector = new DetectCorner();
 
-		// lower left hand corner in the fiducial.  side is of length 2
-		Point3D_F64 lowerLeft = new Point3D_F64(-1,-1,0);
-		Point3D_F64 cameraPt = new Point3D_F64();
-		SePointOps_F64.transform(ff.targetToSensor, lowerLeft, cameraPt);
-		Point2D_F64 pixelPt = new Point2D_F64();
-		PerspectiveOps.convertNormToPixel(intrinsic,cameraPt.x/cameraPt.z,cameraPt.y/cameraPt.z,pixelPt);
+			detector.configure(intrinsic, false);
+			detector.process(image);
 
-		// see if that point projects into the correct location
-		assertEquals(200,pixelPt.x,1e-4);
-		assertEquals(300+pattern.height,pixelPt.y,1e-4);
+			assertEquals(1, detector.getFound().size());
+			FoundFiducial ff = detector.getFound().get(0);
+
+			// make sure the returned quadrilateral makes sense
+			for (int j = 0; j < 4; j++) {
+				int index = j-i;
+				if( index < 0) index = 4 + index;
+				Point2D_F64 f = ff.location.get(index);
+				Point2D_F64 e = expected.get((j+1)%4);
+				assertTrue(f.distance(e) <= 1e-8 );
+			}
+
+			// lower left hand corner in the fiducial.  side is of length 2
+			Point3D_F64 lowerLeft = new Point3D_F64(-1, -1, 0);
+			Point3D_F64 cameraPt = new Point3D_F64();
+			SePointOps_F64.transform(ff.targetToSensor, lowerLeft, cameraPt);
+			Point2D_F64 pixelPt = new Point2D_F64();
+			PerspectiveOps.convertNormToPixel(intrinsic, cameraPt.x / cameraPt.z, cameraPt.y / cameraPt.z, pixelPt);
+
+//			System.out.println("pixel = " + pixelPt);
+			// see if that point projects into the correct location
+			assertEquals(expected.get(i).x, pixelPt.x, 1e-4);
+			assertEquals(expected.get(i).y, pixelPt.y, 1e-4);
+
+			ImageMiscOps.rotateCW(pattern);
+		}
 	}
 
 	/**
@@ -172,6 +194,16 @@ public class TestBaseDetectFiducialSquare {
 
 	private static Point3D_F64 c( Point2D_F64 a ) {
 		return new Point3D_F64(a.x,a.y,0);
+	}
+
+	/**
+	 * Makes sure distortion is being removed without introducing artifacts.  Such as
+	 * the value of pixels outside the found rectangle influencing the
+	 * value of pixels inside
+	 */
+	@Test
+	public void distortionRemoval() {
+		fail("implement");
 	}
 
 	/**
@@ -285,7 +317,7 @@ public class TestBaseDetectFiducialSquare {
 	 */
 	public static class DetectCorner extends BaseDetectFiducialSquare<ImageUInt8> {
 		protected DetectCorner() {
-			super(FactoryShapeDetector.polygon(FactoryThresholdBinary.globalFixed(50,true,ImageUInt8.class),
+			super(FactoryShapeDetector.polygon(FactoryThresholdBinary.globalFixed(50, true, ImageUInt8.class),
 					new ConfigPolygonDetector(4,false),ImageUInt8.class),100, ImageUInt8.class);
 		}
 
@@ -313,6 +345,7 @@ public class TestBaseDetectFiducialSquare {
 			}
 
 			result.lengthSide = 2.0;
+			// number of image clockwise rotations to put min in lower-left corner
 			result.rotation = 3-indexMin;
 			return true;
 		}

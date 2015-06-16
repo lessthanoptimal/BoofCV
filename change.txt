@@ -28,6 +28,7 @@ Version : Alpha 0.19
   * Image square fiducials can now have their width individually set
   * Square based fiducials now use the new polygon detector and benefit from its improved subpixel
   * Fixed bug where the returned orientation was inconsistent with the JavaDoc
+  * Fixed another bug that caused the sides to "flip" depending on view angle
 - PerspectiveOps
   * Can render pixel in camera frame using InrinsicParameters
 - Created FactoryMultiViewRobust for simplifying the creation of robust versions of

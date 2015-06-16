@@ -33,6 +33,8 @@ import georegression.struct.point.Point3D_F64;
 import georegression.transform.se.SePointOps_F64;
 import org.junit.Test;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 import static org.junit.Assert.*;
@@ -51,33 +53,46 @@ public class TestDetectFiducialSquareBinary {
 	 */
 	@Test
 	public void checkFoundRotationMatrix() {
+
 		IntrinsicParameters intrinsic =new IntrinsicParameters(500,500,0,320,240,640,480);
 
 		ImageFloat32 rendered_F32 = create(DetectFiducialSquareBinary.w, 314);
 		ImageUInt8 rendered = new ImageUInt8(rendered_F32.width,rendered_F32.height);
 		ConvertImage.convert(rendered_F32,rendered);
 		ImageUInt8 input = new ImageUInt8(640,480);
-		ImageMiscOps.fill(input,255);
-		input.subimage(200,250,200+rendered.width,250+rendered.height,null).setTo(rendered);
 
-		DetectFiducialSquareBinary<ImageUInt8> alg = new DetectFiducialSquareBinary<ImageUInt8>(squareDetector,ImageUInt8.class);
-		alg.setLengthSide(2);
-		alg.configure(intrinsic,false);
-		alg.process(input);
+		List<Point2D_F64> expected = new ArrayList<Point2D_F64>();
+		expected.add( new Point2D_F64(200,250+rendered.height));
+		expected.add( new Point2D_F64(200,250));
+		expected.add( new Point2D_F64(200+rendered.width,250));
+		expected.add( new Point2D_F64(200+rendered.width,250+rendered.height));
 
-		assertEquals(1,alg.getFound().size());
-		FoundFiducial ff = alg.getFound().get(0);
+		for (int i = 0; i < 4; i++) {
+			ImageMiscOps.fill(input, 255);
+			input.subimage(200, 250, 200 + rendered.width, 250 + rendered.height, null).setTo(rendered);
 
-		// lower left hand corner in the fiducial.  side is of length 2
-		Point3D_F64 lowerLeft = new Point3D_F64(-1,-1,0);
-		Point3D_F64 cameraPt = new Point3D_F64();
-		SePointOps_F64.transform(ff.targetToSensor, lowerLeft, cameraPt);
-		Point2D_F64 pixelPt = new Point2D_F64();
-		PerspectiveOps.convertNormToPixel(intrinsic, cameraPt.x / cameraPt.z, cameraPt.y / cameraPt.z, pixelPt);
+			DetectFiducialSquareBinary<ImageUInt8> alg = new DetectFiducialSquareBinary<ImageUInt8>(squareDetector, ImageUInt8.class);
+			alg.setLengthSide(2);
+			alg.configure(intrinsic, false);
+			alg.process(input);
 
-		// see if that point projects into the correct location
-		assertEquals(200,pixelPt.x,1e-4);
-		assertEquals(250+rendered.height,pixelPt.y,1e-4);
+			assertEquals(1, alg.getFound().size());
+			FoundFiducial ff = alg.getFound().get(0);
+
+			// lower left hand corner in the fiducial.  side is of length 2
+			Point3D_F64 lowerLeft = new Point3D_F64(-1, -1, 0);
+			Point3D_F64 cameraPt = new Point3D_F64();
+			SePointOps_F64.transform(ff.targetToSensor, lowerLeft, cameraPt);
+			Point2D_F64 pixelPt = new Point2D_F64();
+			PerspectiveOps.convertNormToPixel(intrinsic, cameraPt.x / cameraPt.z, cameraPt.y / cameraPt.z, pixelPt);
+
+//			System.out.println(pixelPt);
+			// see if that point projects into the correct location
+			assertEquals(expected.get(i).x, pixelPt.x, 1e-4);
+			assertEquals(expected.get(i).y, pixelPt.y, 1e-4);
+
+			ImageMiscOps.rotateCW(rendered);
+		}
 	}
 
 	/**

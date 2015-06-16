@@ -67,7 +67,6 @@ public class DetectFiducialSquareBinary<T extends ImageSingleBand>
 	// Sets how strict a square must be black or white for it to be accepted.
 	protected double ambiguityThreshold = 0.4;
 
-
 	/**
 	 * Configures the fiducial detector
 	 *

@@ -58,7 +58,7 @@ import java.util.List;
  * </p>
  *
  * <p>
- * Must call {@link #configure(boofcv.struct.calib.IntrinsicParameters)} before it can process an image.
+ * Must call {@link #configure} before it can process an image.
  * </p>
  *
  * <p>
@@ -99,9 +99,6 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 
 	// ----- Used to estimate 3D pose of calibration target
 
-	// p1 is set to the corner locations in 2D target frame. [0] is top right (upper extreme)
-	// and the points are added in clock-wise direction.  The center of the target is
-	// the center of the coordinate system
 	List<AssociatedPair> pairsPose = new ArrayList<AssociatedPair>();
 	Zhang99DecomposeHomography homographyToPose = new Zhang99DecomposeHomography();
 
@@ -132,7 +129,7 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 
 		// this combines two separate sources of distortion together so that it can be removed in the final image which
 		// is sent to fiducial decoder
-		removePerspective = FactoryDistort.distort(false,FactoryInterpolation.bilinearPixelS(inputType),
+		removePerspective = FactoryDistort.distort(false,FactoryInterpolation.nearestNeighborPixelS(inputType),
 				FactoryImageBorder.general(inputType, BorderType.EXTENDED),ImageFloat32.class);
 	}
 
@@ -193,13 +190,16 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 		if( verbose ) System.out.println("---------- Got Polygons! "+candidates.size);
 		// undistort the squares
 		Quadrilateral_F64 q = new Quadrilateral_F64(); // todo predeclare
+		Quadrilateral_F64 b = new Quadrilateral_F64();
 		for (int i = 0; i < candidates.size; i++) {
 			// compute the homography from the input image to an undistorted square image
 			Polygon2D_F64 p = candidates.get(i);
 			UtilPolygons2D_F64.convert(p,q);
 
-			pairsRemovePerspective.get(0).set( 0            ,    0          , q.a.x , q.a.y);
-			pairsRemovePerspective.get(1).set( square.width ,    0          , q.b.x , q.b.y );
+			// remember, visual clockwise isn't the same as math clockwise, hence
+			// counter clockwise visual to the clockwise quad
+			pairsRemovePerspective.get(0).set( 0            ,      0        , q.a.x , q.a.y);
+			pairsRemovePerspective.get(1).set( square.width ,      0        , q.b.x , q.b.y );
 			pairsRemovePerspective.get(2).set( square.width , square.height , q.c.x , q.c.y );
 			pairsRemovePerspective.get(3).set( 0            , square.height , q.d.x , q.d.y );
 
@@ -216,17 +216,28 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 
 			// pass the found homography onto the image transform
 			UtilHomography.convert(H_refined,transformHomography.getModel());
+
+			// TODO how perspective is removed is introducing artifacts.  If the "square" is larger
+			// than the detected region and bilinear interpolation is used then pixels outside will// influence the value of pixels inside and shift things over.  this is all bad
+
 			// remove the perspective distortion and process it
 			removePerspective.apply(gray, square);
+
+//			square.printInt();
 			if( processSquare(square,result)) {
+				// the rotation estimate, apply in counter clockwise direction
+				// since result.rotation is a clockwise rotation in the visual sense, which
+				// is CCW on the grid
+				int rotationCCW = (4-result.rotation)%4;
+				for (int j = 0; j < rotationCCW; j++) {
+
+					rotateCounterClockwise(q);
+				}
+
+				// save the results for output
 				FoundFiducial f = found.grow();
 				f.index = result.which;
 				f.location.set(q);
-
-				// account for the rotation
-				for (int j = 0; j < result.rotation; j++) {
-					rotateClockWise(q);
-				}
 
 				// estimate position
 				computeTargetToWorld(q, result.lengthSide, f.targetToSensor);
@@ -241,16 +252,16 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 	/**
 	 * Rotates the corners on the quad
 	 */
-	private void rotateClockWise( Quadrilateral_F64 quad ) {
+	private void rotateCounterClockwise(Quadrilateral_F64 quad) {
 		Point2D_F64 a = quad.a;
 		Point2D_F64 b = quad.b;
 		Point2D_F64 c = quad.c;
 		Point2D_F64 d = quad.d;
 
-		quad.a = d;
-		quad.b = a;
-		quad.c = b;
-		quad.d = c;
+		quad.a = b;
+		quad.b = c;
+		quad.c = d;
+		quad.d = a;
 	}
 
 	/**
@@ -304,7 +315,9 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 		int which;
 		// length of one of the sides in world units
 		double lengthSide;
-		// amount of clock-wise rotation.  Each value = +90 degrees
+		// amount of clockwise rotation.  Each value = +90 degrees
+		// Just to make things confusion, the rotation is done in the visual clockwise, which
+		// is a counter-clockwise rotation when you look at the actual coordinates
 		int rotation;
 	}
 }
