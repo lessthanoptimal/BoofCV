@@ -98,7 +98,7 @@ public class ConvertRaster {
 				indexSrc += srcStrideDiff;
 			}
 		} else {
-			throw new RuntimeException("Write more code here.");
+			throw new RuntimeException("Unexpected number of bands found. Bands = "+numBands);
 		}
 	}
 
