@@ -30,7 +30,7 @@ import java.io.FileNotFoundException;
 import java.io.PrintStream;
 
 /**
- *
+ * Base class for generating square fiducials EPS documents for printing.
  *
  * @author Peter Abeles
  */
@@ -40,12 +40,12 @@ public class BaseFiducialSquareEPS {
 	public int threshold = 255/2; // threshold for converting to a binary image
 	public double CM_TO_POINTS = 72.0/2.54;
 	// should it add the file name and size to the document?
-	public boolean displayInfo = true;
+	public boolean displayInfo = false;
 
 	public boolean showPreview = false;
 
-	public int numCols = 2;
-	public int numRows = 2;
+	public int numCols = 1;
+	public int numRows = 1;
 
 	PrintStream out;
 
@@ -59,6 +59,8 @@ public class BaseFiducialSquareEPS {
 	double scale;
 
 	public void process( double width, String inputPath , String outputName ) throws FileNotFoundException {
+		this.width = width;
+
 		String inputName = new File(inputPath).getName();
 
 		System.out.println("Target width "+width+" (cm)  image = "+inputName);
@@ -112,7 +114,7 @@ public class BaseFiducialSquareEPS {
 
 		for (int row = 0; row < numRows; row++) {
 			for (int col = 0; col < numCols; col++) {
-				insertFiducial(row,col,binary,inputName);
+				insertFiducial(row,col,inputName);
 			}
 		}
 
@@ -142,8 +144,7 @@ public class BaseFiducialSquareEPS {
 				"  /b3 { b2 bb add} def\n");
 	}
 
-	private void insertFiducial(int row, int col, ImageUInt8 binary, String inputName) {
-		System.out.println("row "+row+" col "+col);
+	private void insertFiducial(int row, int col, String inputName) {
 		out.print(
 				"  /originX " + (col * pageLength) + " def\n" +
 				"  /originY " + (row * pageLength) + " def\n" +
@@ -188,5 +189,10 @@ public class BaseFiducialSquareEPS {
 		}
 
 		return s.toString();
+	}
+
+	public void setGrid( int numRows , int numCols ) {
+		this.numRows = numRows;
+		this.numCols = numCols;
 	}
 }
