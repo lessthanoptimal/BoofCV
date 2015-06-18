@@ -43,19 +43,19 @@ public class TestLensDistortionOps {
 	 * Also makes sure that the requested inverse transform is actually the inverse.
 	 */
 	@Test
-	public void fullView_Transform() {
+	public void transform_F32_fullView() {
 		IntrinsicParameters param = new IntrinsicParameters().
 				fsetK(300, 320, 0, 150, 130, width, height).fsetRadial(0.1, 0.05);
 
-		PointTransform_F32 adjToDist = LensDistortionOps.fullView(param, null, true);
-		PointTransform_F32 distToAdj = LensDistortionOps.fullView(param, null, false);
+		PointTransform_F32 adjToDist = LensDistortionOps.transform_F32(AdjustmentType.FULL_VIEW, param, null, true);
+		PointTransform_F32 distToAdj = LensDistortionOps.transform_F32(AdjustmentType.FULL_VIEW, param, null, false);
 
 		checkBorderOutside(adjToDist,distToAdj);
 
 		param = new IntrinsicParameters().
 				fsetK(300, 320, 0, 150, 130, width, height).fsetRadial(-0.1,-0.05);
-		adjToDist = LensDistortionOps.fullView(param, null, true);
-		distToAdj = LensDistortionOps.fullView(param, null, false);
+		adjToDist = LensDistortionOps.transform_F32(AdjustmentType.FULL_VIEW, param, null, true);
+		distToAdj = LensDistortionOps.transform_F32(AdjustmentType.FULL_VIEW, param, null, false);
 		checkBorderOutside(adjToDist,distToAdj);
 	}
 
@@ -92,7 +92,7 @@ public class TestLensDistortionOps {
 	 * Sees if the adjusted intrinsic parameters is correct
 	 */
 	@Test
-	public void fullView_intrinsic() {
+	public void transform_F32_fullView_intrinsic() {
 
 		// distorted pixel in original image
 		float pixelX = 12.5f,pixelY = height-3;
@@ -106,7 +106,8 @@ public class TestLensDistortionOps {
 		distToNorm.compute(pixelX, pixelY, norm);
 
 		IntrinsicParameters adjusted = new IntrinsicParameters();
-		PointTransform_F32 distToAdj = LensDistortionOps.fullView(orig, adjusted, false);
+		PointTransform_F32 distToAdj = LensDistortionOps.
+				transform_F32(AdjustmentType.FULL_VIEW, orig, adjusted, false);
 
 		Point2D_F32 adjPixel = new Point2D_F32();
 		Point2D_F32 normFound = new Point2D_F32();
@@ -124,19 +125,19 @@ public class TestLensDistortionOps {
 	 * Also makes sure that the requested inverse transform is actually the inverse.
 	 */
 	@Test
-	public void allInside_Transform() {
+	public void transform_F32_shrink() {
 		IntrinsicParameters param =
 				new IntrinsicParameters().fsetK(300, 320, 0, 150, 130, width, height).fsetRadial(0.1, 1e-4);
 
-		PointTransform_F32 adjToDist = LensDistortionOps.allInside(param, null, true);
-		PointTransform_F32 distToAdj = LensDistortionOps.allInside(param, null, false);
+		PointTransform_F32 adjToDist = LensDistortionOps.transform_F32(AdjustmentType.SHRINK, param, null, true);
+		PointTransform_F32 distToAdj = LensDistortionOps.transform_F32(AdjustmentType.SHRINK, param, null, false);
 		checkInside(adjToDist, distToAdj);
 
 		// distort it in the other direction
 		param = new IntrinsicParameters().fsetK(300, 320, 0, 150, 130, width, height).fsetRadial(-0.1,-1e-4);
 
-		adjToDist = LensDistortionOps.allInside(param, null, true);
-		distToAdj = LensDistortionOps.allInside(param, null, false);
+		adjToDist = LensDistortionOps.transform_F32(AdjustmentType.SHRINK, param, null, true);
+		distToAdj = LensDistortionOps.transform_F32(AdjustmentType.SHRINK, param, null, false);
 
 		checkInside(adjToDist, distToAdj);
 	}
@@ -205,7 +206,7 @@ public class TestLensDistortionOps {
 	 * with the original distorted image and then with the adjusted undistorted image.
 	 */
 	@Test
-	public void allInside_intrinsic() {
+	public void transform_F32_shrink_intrinsic() {
 
 		// distorted pixel in original image
 		float pixelX = 12.5f,pixelY = height-3;
@@ -219,7 +220,7 @@ public class TestLensDistortionOps {
 		distToNorm.compute(pixelX, pixelY, norm);
 
 		IntrinsicParameters adjusted = new IntrinsicParameters();
-		PointTransform_F32 distToAdj = LensDistortionOps.allInside(orig,adjusted,false);
+		PointTransform_F32 distToAdj = LensDistortionOps.transform_F32(AdjustmentType.SHRINK, orig, adjusted, false);
 
 		Point2D_F32 adjPixel = new Point2D_F32();
 		Point2D_F32 normFound = new Point2D_F32();

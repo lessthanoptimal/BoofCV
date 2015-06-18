@@ -19,6 +19,7 @@
 package boofcv.alg.geo.calibration;
 
 import boofcv.abst.distort.FDistort;
+import boofcv.alg.distort.AdjustmentType;
 import boofcv.alg.distort.LensDistortionOps;
 import boofcv.io.MediaManager;
 import boofcv.io.UtilIO;
@@ -66,7 +67,7 @@ public class RemoveLensDistortionSequenceApp {
 			if( output == null ) {
 				output = new MultiSpectral<ImageUInt8>(ImageUInt8.class, input.width, input.height, input.getNumBands());
 				undistorter = new FDistort(input,output).cached(true).
-						transform(LensDistortionOps.allInside(param, null, true));
+						transform(LensDistortionOps.transform_F32(AdjustmentType.SHRINK,param, null, true));
 			}
 
 			undistorter.apply();

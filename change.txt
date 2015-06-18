@@ -38,6 +38,9 @@ Version : Alpha 0.19
   * Intrinsic parameters can now use a flow style assignment of parameters
   * Removed support for flipY to simplify the code.  Just flip the image if this is an issue.
   * Lens distortion.  More abstracted
+- LensDistortionOps
+  * refactored several functions to make it more consistent and easier to use
+  * Change fullView to shrink
 - Square grid calibration target
   * Fixed.  Multiple bugs were introduced at some point in the past but were not caught due to the
     lack of regression tests

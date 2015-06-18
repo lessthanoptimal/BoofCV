@@ -67,8 +67,8 @@ public class BatchRemoveLensDistortion {
 			for (int i = 0; i < numFlags; i++) {
 				if( args[i].compareToIgnoreCase("-rename") == 0 ) {
 					rename = true;
-				} else if( args[i].compareToIgnoreCase("-ALL_INSIDE") == 0 ) {
-					adjustmentType = AdjustmentType.ALL_INSIDE;
+				} else if( args[i].compareToIgnoreCase("-SHRINK") == 0 ) {
+					adjustmentType = AdjustmentType.SHRINK;
 				} else if( args[i].compareToIgnoreCase("-FULL_VIEW") == 0 ) {
 					adjustmentType = AdjustmentType.FULL_VIEW;
 				} else {

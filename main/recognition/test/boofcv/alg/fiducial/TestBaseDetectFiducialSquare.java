@@ -221,7 +221,34 @@ public class TestBaseDetectFiducialSquare {
 	 */
 	@Test
 	public void lensRemoval() {
-		fail("implement");
+		List<Point2D_F64> expected = new ArrayList<Point2D_F64>();
+		expected.add( new Point2D_F64(200,300+120));
+		expected.add( new Point2D_F64(200,300));
+		expected.add( new Point2D_F64(200+120,300));
+		expected.add( new Point2D_F64(200+120,300+120));
+//
+//		IntrinsicParameters intrinsic = new IntrinsicParameters(500,500,0,320,240,640,480).fsetRadial(0.1,0.06);
+//
+//		// create a pattern with a corner for orientation and put it into the image
+//		ImageUInt8 pattern = createPattern(6*20, true);
+//		ImageUInt8 image = new ImageUInt8(640,480);
+//		ImageMiscOps.fill(image, 255);
+//		image.subimage(200, 300, 200 + pattern.width, 300 + pattern.height, null).setTo(pattern);
+//
+//		// add lens distortion
+//		PointTransform_F64 distortPoint = LensDistortionOps.fullView(intrinsic, null, false);
+//		ImageDistort<ImageUInt8,ImageUInt8> distorter = LensDistortionOps.removeDistortion(
+//				AdjustmentType.FULL_VIEW, BorderType.EXTENDED, intrinsic, null, ImageType.single(ImageUInt8.class));
+//		ImageUInt8 distorted = new ImageUInt8(640,480);
+//		distorter.apply(image,distorted);
+//
+//		DetectCorner detector = new DetectCorner();
+//
+//		detector.configure(intrinsic, false);
+//		detector.process(distorted);
+//
+//		assertEquals(1, detector.getFound().size());
+//		FoundFiducial ff = detector.getFound().get(0);
 	}
 
 	/**

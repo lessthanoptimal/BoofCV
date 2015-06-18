@@ -64,10 +64,10 @@ public class ExampleRemoveLensDistortion {
 		int numBands = distortedImg.getNumBands();
 
 		// create new transforms which optimize view area in different ways.
-		// allInside makes sure there are no dead zones inside the image
+		// shrink makes sure there are no dead zones inside the image
 		// fullView will include the entire original image
 		// The border is VALUE, which defaults to black, just so you can see it
-		ImageDistort allInside = LensDistortionOps.removeDistortion(AdjustmentType.ALL_INSIDE,BorderType.VALUE,param,null,
+		ImageDistort allInside = LensDistortionOps.removeDistortion(AdjustmentType.SHRINK,BorderType.VALUE,param,null,
 				ImageType.ms(numBands,ImageFloat32.class));
 		ImageDistort fullView = LensDistortionOps.removeDistortion(AdjustmentType.FULL_VIEW,BorderType.VALUE,param,null,
 				ImageType.ms(numBands,ImageFloat32.class));

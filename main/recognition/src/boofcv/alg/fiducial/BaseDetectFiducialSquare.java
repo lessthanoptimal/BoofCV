@@ -144,9 +144,11 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 
 		if( intrinsic.isDistorted() ) {
 			PixelTransform_F32 distToUndist =
-					new PointToPixelTransform_F32(LensDistortionOps.allInside(intrinsic, null, false));
+					new PointToPixelTransform_F32(
+							LensDistortionOps.transform_F32(AdjustmentType.FULL_VIEW, intrinsic, null, false));
 			PixelTransform_F32 undistToDist =
-					new PointToPixelTransform_F32(LensDistortionOps.allInside(intrinsic, null, true));
+					new PointToPixelTransform_F32(
+							LensDistortionOps.transform_F32(AdjustmentType.FULL_VIEW, intrinsic, null, true));
 
 			if( cache ) {
 				distToUndist = new PixelTransformCached_F32(intrinsic.width, intrinsic.height, distToUndist);
@@ -214,7 +216,7 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 			}
 
 			// pass the found homography onto the image transform
-			UtilHomography.convert(H_refined,transformHomography.getModel());
+			UtilHomography.convert(H_refined, transformHomography.getModel());
 
 			System.out.println("quad lengths = "+p.getLine(0,null).getLength()+" "+p.getLine(1,null).getLength()
 					+" "+p.getLine(2,null).getLength()+" "+p.getLine(3,null).getLength());
