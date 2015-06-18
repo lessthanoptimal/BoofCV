@@ -25,13 +25,16 @@ import boofcv.core.image.border.ImageBorder;
 import boofcv.factory.distort.FactoryDistort;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.ImageRectangle_F32;
+import boofcv.struct.ImageRectangle_F64;
 import boofcv.struct.distort.PixelTransform_F32;
+import boofcv.struct.distort.PixelTransform_F64;
 import boofcv.struct.distort.PointTransform_F32;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.MultiSpectral;
 import georegression.struct.affine.Affine2D_F32;
 import georegression.struct.shapes.RectangleLength2D_F32;
+import georegression.struct.shapes.RectangleLength2D_F64;
 import georegression.struct.shapes.RectangleLength2D_I32;
 
 
@@ -355,6 +358,51 @@ public class DistortImageOps {
 	}
 
 	private static void updateBoundBox(PixelTransform_F32 transform, ImageRectangle_F32 r) {
+		if( transform.distX < r.x0 )
+			r.x0 = transform.distX;
+		else if( transform.distX > r.x1 )
+			r.x1 = transform.distX;
+		if( transform.distY < r.y0 )
+			r.y0 = transform.distY;
+		else if( transform.distY > r.y1 )
+			r.y1 = transform.distY;
+	}
+
+	/**
+	 * Finds an axis-aligned bounding box which would contain a image after it has been transformed.
+	 * The returned bounding box can be larger then the original image.
+	 *
+	 * @param srcWidth Width of the source image
+	 * @param srcHeight Height of the source image
+	 * @param transform Transform being applied to the image
+	 * @return Bounding box
+	 */
+	public static RectangleLength2D_F64 boundBox_F64( int srcWidth , int srcHeight ,
+													  PixelTransform_F64 transform )
+	{
+		ImageRectangle_F64 r = new ImageRectangle_F64();
+
+		r.x0=r.y0=Double.MAX_VALUE;
+		r.x1=r.y1=-Double.MAX_VALUE;
+
+		for( int y = 0; y < srcHeight; y++ ) {
+			transform.compute(0, y);
+			updateBoundBox(transform, r);
+			transform.compute(srcWidth, y);
+			updateBoundBox(transform, r);
+		}
+
+		for( int x = 0; x < srcWidth; x++ ) {
+			transform.compute(x, 0);
+			updateBoundBox(transform, r);
+			transform.compute(x, srcHeight);
+			updateBoundBox(transform, r);
+		}
+
+		return new RectangleLength2D_F64(r.x0,r.y0,r.x1-r.x0,r.y1-r.y0);
+	}
+
+	private static void updateBoundBox(PixelTransform_F64 transform, ImageRectangle_F64 r) {
 		if( transform.distX < r.x0 )
 			r.x0 = transform.distX;
 		else if( transform.distX > r.x1 )

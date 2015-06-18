@@ -90,6 +90,7 @@ TODO
   * Add a jar which includes everything to Maven?
   * Documentation on how to build a single jar
   * ExamplePnP
+  * Automatic generate F32 from F64 in some situations
 
 ---------------------------------------------
 Date    : 2014/9/22

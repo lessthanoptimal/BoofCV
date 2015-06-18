@@ -31,7 +31,7 @@ import boofcv.factory.geo.EpipolarError;
 import boofcv.factory.geo.FactoryMultiView;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.calib.IntrinsicParameters;
-import boofcv.struct.distort.PixelTransform_F32;
+import boofcv.struct.distort.*;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
@@ -89,6 +89,9 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 	private ImageDistort<T,ImageFloat32> removePerspective;
 	private PointTransformHomography_F32 transformHomography = new PointTransformHomography_F32();
 
+	// transform from undistorted image to distorted
+	PointTransform_F64 pointUndistToDist;
+
 	// Storage for results of fiducial reading
 	private Result result = new Result();
 
@@ -142,21 +145,37 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 	 */
 	public void configure( IntrinsicParameters intrinsic , boolean cache ) {
 
+		PointTransform_F32 pointSquareToInput;
 		if( intrinsic.isDistorted() ) {
-			PixelTransform_F32 distToUndist =
-					new PointToPixelTransform_F32(
-							LensDistortionOps.transform_F32(AdjustmentType.FULL_VIEW, intrinsic, null, false));
-			PixelTransform_F32 undistToDist =
-					new PointToPixelTransform_F32(
-							LensDistortionOps.transform_F32(AdjustmentType.FULL_VIEW, intrinsic, null, true));
+
+			IntrinsicParameters intrinsicUndist = new IntrinsicParameters();
+
+			// full view so that none of the pixels are discarded and to ensure that all pixels in the undistorted
+			// image are bounded by the the input image's shape
+
+			PointTransform_F32 pointDistToUndist = LensDistortionOps.
+					transform_F32(AdjustmentType.FULL_VIEW, intrinsic, intrinsicUndist, false);
+			PointTransform_F32 pointUndistToDist = LensDistortionOps.
+					transform_F32(AdjustmentType.FULL_VIEW, intrinsic, null, true);
+			PixelTransform_F32 distToUndist = new PointToPixelTransform_F32(pointDistToUndist);
+			PixelTransform_F32 undistToDist = new PointToPixelTransform_F32(pointUndistToDist);
 
 			if( cache ) {
 				distToUndist = new PixelTransformCached_F32(intrinsic.width, intrinsic.height, distToUndist);
 				undistToDist = new PixelTransformCached_F32(intrinsic.width, intrinsic.height, undistToDist);
 			}
 
-			squareDetector.setLensDistortion(intrinsic.width,intrinsic.height,
-					distToUndist,undistToDist);
+			squareDetector.setLensDistortion(intrinsic.width,intrinsic.height,distToUndist,undistToDist);
+
+			pointSquareToInput = new SequencePointTransform_F32(transformHomography,pointUndistToDist);
+
+			this.pointUndistToDist = LensDistortionOps.
+					transform_F64(AdjustmentType.FULL_VIEW, intrinsic, null, true);;
+
+			intrinsic = intrinsicUndist;
+		} else {
+			pointSquareToInput = transformHomography;
+			pointUndistToDist = new DoNothingTransform_F64();
 		}
 
 		// add corner points in target frame.  Used to compute homography.  Target's center is at its origin
@@ -173,7 +192,7 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 		homographyToPose.setCalibrationMatrix(K);
 
 		// provide intrinsic camera parameters
-		PixelTransform_F32 squareToInput= new PointToPixelTransform_F32(transformHomography);
+		PixelTransform_F32 squareToInput= new PointToPixelTransform_F32(pointSquareToInput);
 		removePerspective.setModel(squareToInput);
 	}
 
@@ -218,10 +237,6 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 			// pass the found homography onto the image transform
 			UtilHomography.convert(H_refined, transformHomography.getModel());
 
-			System.out.println("quad lengths = "+p.getLine(0,null).getLength()+" "+p.getLine(1,null).getLength()
-					+" "+p.getLine(2,null).getLength()+" "+p.getLine(3,null).getLength());
-			System.out.println("   square "+square.getWidth());
-
 			// TODO how perspective is removed is introducing artifacts.  If the "square" is larger
 			// than the detected region and bilinear interpolation is used then pixels outside will// influence the value of pixels inside and shift things over.  this is all bad
 
@@ -230,28 +245,42 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 
 //			square.printInt();
 			if( processSquare(square,result)) {
-				// the rotation estimate, apply in counter clockwise direction
-				// since result.rotation is a clockwise rotation in the visual sense, which
-				// is CCW on the grid
-				int rotationCCW = (4-result.rotation)%4;
-				for (int j = 0; j < rotationCCW; j++) {
+				prepareForOutput(q,result);
 
-					rotateCounterClockwise(q);
-				}
-
-				// save the results for output
-				FoundFiducial f = found.grow();
-				f.index = result.which;
-				f.location.set(q);
-
-				// estimate position
-				computeTargetToWorld(q, result.lengthSide, f.targetToSensor);
 				if( verbose ) System.out.println("accepted!");
 			} else {
 				if( verbose ) System.out.println("rejected process square");
 			}
 		}
 		return true;
+	}
+
+	/**
+	 * Takes the found quadrilateral and the computed 3D information and prepares it for output
+	 */
+	private void prepareForOutput(Quadrilateral_F64 imageShape, Result result) {
+		// the rotation estimate, apply in counter clockwise direction
+		// since result.rotation is a clockwise rotation in the visual sense, which
+		// is CCW on the grid
+		int rotationCCW = (4-result.rotation)%4;
+		for (int j = 0; j < rotationCCW; j++) {
+
+			rotateCounterClockwise(imageShape);
+		}
+
+		// save the results for output
+		FoundFiducial f = found.grow();
+		f.index = result.which;
+		f.location.set(imageShape);
+
+		// put it back into input image coordinates
+		for (int j = 0; j < 4; j++) {
+			Point2D_F64 a = f.location.get(j);
+			pointUndistToDist.compute(a.x,a.y,a);
+		}
+
+		// estimate position
+		computeTargetToWorld(imageShape, result.lengthSide, f.targetToSensor);
 	}
 
 	/**

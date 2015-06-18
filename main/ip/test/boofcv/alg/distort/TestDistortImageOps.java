@@ -24,7 +24,9 @@ import boofcv.alg.misc.GImageMiscOps;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.image.ImageFloat32;
 import georegression.struct.affine.Affine2D_F32;
+import georegression.struct.affine.Affine2D_F64;
 import georegression.struct.shapes.RectangleLength2D_F32;
+import georegression.struct.shapes.RectangleLength2D_F64;
 import georegression.struct.shapes.RectangleLength2D_I32;
 import org.junit.Test;
 
@@ -163,5 +165,18 @@ public class TestDistortImageOps {
 		assertEquals(3,found.y0,1e-4);
 		assertEquals(10,found.width,1e-4);
 		assertEquals(20,found.height,1e-4);
+	}
+
+	@Test
+	public void boundBox_F64() {
+		// basic sanity check
+		Affine2D_F64 affine = new Affine2D_F64(1,0,0,1,2,3);
+		PixelTransformAffine_F64 transform = new PixelTransformAffine_F64(affine);
+		RectangleLength2D_F64 found = DistortImageOps.boundBox_F64(10, 20, transform);
+
+		assertEquals(2,found.x0,1e-8);
+		assertEquals(3,found.y0,1e-8);
+		assertEquals(10,found.width,1e-8);
+		assertEquals(20,found.height,1e-8);
 	}
 }
