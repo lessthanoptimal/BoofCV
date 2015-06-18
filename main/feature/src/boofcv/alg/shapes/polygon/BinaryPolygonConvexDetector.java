@@ -19,6 +19,7 @@
 package boofcv.alg.shapes.polygon;
 
 import boofcv.abst.filter.binary.InputToBinary;
+import boofcv.alg.distort.DistortImageOps;
 import boofcv.alg.filter.binary.Contour;
 import boofcv.alg.filter.binary.LinearContourLabelChang2004;
 import boofcv.alg.shapes.corner.SubpixelSparseCornerFit;
@@ -33,6 +34,7 @@ import georegression.geometry.UtilPolygons2D_F64;
 import georegression.metric.Area2D_F64;
 import georegression.struct.point.Point2D_I32;
 import georegression.struct.shapes.Polygon2D_F64;
+import georegression.struct.shapes.RectangleLength2D_F32;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_I32;
 
@@ -197,8 +199,20 @@ public class BinaryPolygonConvexDetector<T extends ImageSingleBand> {
 
 		this.toUndistorted = toUndistorted;
 		this.toDistorted = toDistorted;
+
+		// sanity check since I think many people will screw this up.
+		RectangleLength2D_F32 rect = DistortImageOps.boundBox_F32(width, height, toUndistorted);
+		float x1 = rect.x0 + rect.width;
+		float y1 = rect.y0 + rect.height;
+
+		float tol = 1e-4f;
+		if( rect.getX() < -tol || rect.getY() < -tol || x1 > width+tol || y1 > height+tol ) {
+			throw new IllegalArgumentException("You failed the idiot test! RTFM! The undistorted image "+
+					"must be contained by the same bounds as the input distorted image");
+		}
+
 		if( refineLine != null ) {
-			refineLine.getSnapToEdge().setTransform(width,height,toDistorted);
+			refineLine.getSnapToEdge().setTransform(toDistorted);
 		}
 	}
 

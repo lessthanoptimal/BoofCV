@@ -108,7 +108,6 @@ public class GenerateNearestNeighborPixel extends CodeGeneratorBase {
 				"\t\treturn data[ orig.startIndex + ((int)y)*stride + (int)x]"+bitWise+";\n" +
 				"\t}\n" +
 				"\n" +
-				"\t@Override\n" +
 				"\tpublic float get_border(float x, float y) {\n" +
 				"\t\treturn ((ImageBorder_"+borderType+")border).get((int)Math.floor(x),(int)Math.floor(y));\n" +
 				"\t}\n" +
@@ -116,7 +115,7 @@ public class GenerateNearestNeighborPixel extends CodeGeneratorBase {
 				"\t@Override\n" +
 				"\tpublic float get(float x, float y) {\n" +
 				"\t\tif (x < 0 || y < 0 || x > width-1 || y > height-1 )\n" +
-				"\t\t\tthrow new IllegalArgumentException(\"Point is outside of the image\");\n" +
+				"\t\t\treturn get_border(x,y);\n" +
 				"\t\tint xx = (int)x;\n" +
 				"\t\tint yy = (int)y;\n" +
 				"\n" +

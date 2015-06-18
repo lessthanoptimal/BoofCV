@@ -155,7 +155,8 @@ public class RemoveLensDistortionApp extends SelectAlgorithmAndInputPanel {
 		while( !app.getHasProcessedImage() ) {
 			Thread.yield();
 		}
-		ShowImages.showWindow(app, "Remove Lens Distortion");
+		ShowImages.showWindow(app, "Remove Lens Distortion").
+				setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
 		System.out.println("Done");
 	}

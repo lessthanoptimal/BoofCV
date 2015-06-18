@@ -19,23 +19,27 @@
 package boofcv.alg.fiducial;
 
 import boofcv.abst.geo.Estimate1ofEpipolar;
-import boofcv.alg.distort.DistortImageOps;
-import boofcv.alg.distort.PointToPixelTransform_F32;
-import boofcv.alg.distort.PointTransformHomography_F32;
+import boofcv.alg.distort.*;
 import boofcv.alg.geo.PerspectiveOps;
+import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.interpolate.TypeInterpolate;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.alg.misc.ImageStatistics;
+import boofcv.core.image.border.FactoryImageBorder;
+import boofcv.factory.distort.FactoryDistort;
 import boofcv.factory.filter.binary.FactoryThresholdBinary;
 import boofcv.factory.geo.FactoryMultiView;
+import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.factory.shape.ConfigPolygonDetector;
 import boofcv.factory.shape.FactoryShapeDetector;
 import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.distort.PixelTransform_F32;
+import boofcv.struct.distort.PointTransform_F32;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageUInt8;
 import georegression.geometry.RotationMatrixGenerator;
+import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
@@ -226,29 +230,49 @@ public class TestBaseDetectFiducialSquare {
 		expected.add( new Point2D_F64(200,300));
 		expected.add( new Point2D_F64(200+120,300));
 		expected.add( new Point2D_F64(200+120,300+120));
-//
-//		IntrinsicParameters intrinsic = new IntrinsicParameters(500,500,0,320,240,640,480).fsetRadial(0.1,0.06);
-//
-//		// create a pattern with a corner for orientation and put it into the image
-//		ImageUInt8 pattern = createPattern(6*20, true);
-//		ImageUInt8 image = new ImageUInt8(640,480);
-//		ImageMiscOps.fill(image, 255);
-//		image.subimage(200, 300, 200 + pattern.width, 300 + pattern.height, null).setTo(pattern);
-//
-//		// add lens distortion
-//		PointTransform_F64 distortPoint = LensDistortionOps.fullView(intrinsic, null, false);
-//		ImageDistort<ImageUInt8,ImageUInt8> distorter = LensDistortionOps.removeDistortion(
-//				AdjustmentType.FULL_VIEW, BorderType.EXTENDED, intrinsic, null, ImageType.single(ImageUInt8.class));
-//		ImageUInt8 distorted = new ImageUInt8(640,480);
-//		distorter.apply(image,distorted);
-//
-//		DetectCorner detector = new DetectCorner();
-//
-//		detector.configure(intrinsic, false);
-//		detector.process(distorted);
-//
-//		assertEquals(1, detector.getFound().size());
-//		FoundFiducial ff = detector.getFound().get(0);
+
+		IntrinsicParameters intrinsic = new IntrinsicParameters(500,500,0,320,240,640,480).fsetRadial(-0.1,-0.05);
+
+		// create a pattern with a corner for orientation and put it into the image
+		ImageUInt8 pattern = createPattern(6*20, true);
+		ImageUInt8 image = new ImageUInt8(640,480);
+		ImageMiscOps.fill(image, 255);
+		image.subimage(200, 300, 200 + pattern.width, 300 + pattern.height, null).setTo(pattern);
+
+		// add lens distortion
+		PointTransform_F32 undistToDist = LensDistortionOps.distortTransform(intrinsic).distort_F32(true, true);
+		InterpolatePixelS interp = FactoryInterpolation.createPixelS(0, 255, TypeInterpolate.BILINEAR, ImageUInt8.class);
+		ImageDistort<ImageUInt8,ImageUInt8> distorter = FactoryDistort.distort(false, interp,
+				FactoryImageBorder.value(ImageUInt8.class, 0), ImageUInt8.class);
+		distorter.setModel(new PointToPixelTransform_F32(undistToDist));
+		ImageUInt8 distorted = new ImageUInt8(640,480);
+		distorter.apply(image,distorted);
+
+		DetectCorner detector = new DetectCorner();
+
+		detector.configure(intrinsic, false);
+		detector.process(distorted);
+
+//		ShowImages.showWindow(distorted,"Distorted");
+//		try {
+//			Thread.sleep(10000);
+//		} catch (InterruptedException e) {
+//			e.printStackTrace();
+//		}
+
+		assertEquals(1, detector.getFound().size());
+		FoundFiducial ff = detector.getFound().get(0);
+
+
+		Point2D_F32 foo = new Point2D_F32();
+		for (int j = 0; j < 4; j++) {
+			Point2D_F64 f = ff.location.get(j);
+			undistToDist.compute((float)f.x,(float)f.y,foo);
+			Point2D_F64 e = expected.get((j+1)%4);
+			assertTrue(f.distance(e) <= 50 ); // todo reduce tolerance more?
+		}
+
+		// TODO see if the internal square image has been undistored
 	}
 
 	/**

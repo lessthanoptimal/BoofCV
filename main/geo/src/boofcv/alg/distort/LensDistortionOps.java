@@ -117,7 +117,7 @@ public class LensDistortionOps {
 	 * @param type The type of adjustment it will apply to the transform
 	 * @param param Intrinsic camera parameters.
 	 * @param paramAdj If not null, the new camera parameters for the undistorted view are stored here.
-	 * @param adjToDistorted If true then the transform's input is assumed to be pixels in the adjusted undistorted
+	 * @param undistortedToDistorted If true then the transform's input is assumed to be pixels in the adjusted undistorted
 	 *                       image and the output will be in distorted image, if false then the reverse transform
 	 *                       is returned.
 	 * @return The requested transform
@@ -125,7 +125,7 @@ public class LensDistortionOps {
 	public static PointTransform_F32 transform_F32(AdjustmentType type,
 												   IntrinsicParameters param,
 												   IntrinsicParameters paramAdj,
-												   boolean adjToDistorted)
+												   boolean undistortedToDistorted)
 	{
 		PointTransform_F32 remove_p_to_p = distortTransform(param).undistort_F32(true, true);
 
@@ -146,23 +146,21 @@ public class LensDistortionOps {
 		double scaleX = bound.width/param.width;
 		double scaleY = bound.height/param.height;
 
-		double scale,deltaX,deltaY;
+		double scale;
 
 		if( type == AdjustmentType.FULL_VIEW ) {
 			scale = Math.max(scaleX, scaleY);
-			deltaX = bound.x0;
-			deltaY = bound.y0;
 		} else {
 			scale = Math.min(scaleX, scaleY);
-			// translation and shift over so that the small axis is in the middle
-			deltaX = bound.x0 + (scaleX-scale)*param.width/2.0;
-			deltaY = bound.y0 + (scaleY-scale)*param.height/2.0;
 		}
+
+		double deltaX = bound.x0 + (scaleX-scale)*param.width/2.0;
+		double deltaY = bound.y0 + (scaleY-scale)*param.height/2.0;
 
 		// adjustment matrix
 		DenseMatrix64F A = new DenseMatrix64F(3,3,true,scale,0,deltaX,0,scale,deltaY,0,0,1);
 
-		return adjustmentTransform_F32(param, paramAdj, adjToDistorted, remove_p_to_p, A);
+		return adjustmentTransform_F32(param, paramAdj, undistortedToDistorted, remove_p_to_p, A);
 	}
 
 	/**

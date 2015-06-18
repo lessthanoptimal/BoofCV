@@ -122,27 +122,14 @@ public abstract class ImageDistortCache<Input extends ImageSingleBand,Output ext
 
 	public void applyBorder() {
 
-		final float minInterpX = interp.getFastBorderX();
-		final float minInterpY = interp.getFastBorderY();
-		final float maxInterpX = srcImg.getWidth()-interp.getFastBorderX()-1;
-		final float maxInterpY = srcImg.getHeight()-interp.getFastBorderY()-1;
-
-		final float widthF = srcImg.getWidth()-1;
-		final float heightF = srcImg.getHeight()-1;
-
+		// todo TO make this faster first apply inside the region which can process the fast border
+		// then do the slower border thingy
 		for( int y = y0; y < y1; y++ ) {
 			int indexDst = dstImg.startIndex + dstImg.stride*y + x0;
 			for( int x = x0; x < x1; x++ , indexDst++ ) {
 				Point2D_F32 s = map[indexDst];
 
-				if( s.x < minInterpX || s.x > maxInterpX || s.y < minInterpY || s.y > maxInterpY ) {
-					if( s.x < 0f || s.x > widthF || s.y < 0f || s.y > heightF )
-						assign(indexDst,interp.get_border(s.x, s.y));
-					else
-						assign(indexDst,interp.get(s.x, s.y));
-				} else {
-					assign(indexDst,interp.get_fast(s.x, s.y));
-				}
+				assign(indexDst,interp.get(s.x, s.y));
 			}
 		}
 	}

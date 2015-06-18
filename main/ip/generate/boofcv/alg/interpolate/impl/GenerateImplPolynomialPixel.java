@@ -81,7 +81,7 @@ public class GenerateImplPolynomialPixel extends CodeGeneratorBase {
 		out.print("\t@Override\n" +
 						"\tpublic float get(float x, float y) {\n" +
 						"\t\tif( x < 0 || y < 0 || x > image.width-1 || y > image.height-1 )\n" +
-						"\t\t\tthrow new IllegalArgumentException(\"Pixel out of bounds. \"+x+\" \"+y);\n" +
+						"\t\t\treturn get_border(x,y);\n" +
 						"\t\tint width = image.getWidth();\n" +
 						"\t\tint height = image.getHeight();\n" +
 						"\n" +
@@ -151,7 +151,6 @@ public class GenerateImplPolynomialPixel extends CodeGeneratorBase {
 						"\t\treturn ret;\n" +
 						"\t}\n" +
 						"\n" +
-						"\t@Override\n" +
 						"\tpublic float get_border(float x, float y) {\n" +
 						"\t\tint xt = (int) Math.floor(x);\n" +
 						"\t\tint yt = (int) Math.floor(y);\n" +

@@ -312,4 +312,26 @@ public class TestBinaryPolygonConvexDetector {
 		contour.clear();contour.add(new Point2D_I32(19,15));
 		assertTrue(alg.touchesBorder(contour));
 	}
+
+	/**
+	 * Makes sure the transform doesn't extend points outside the original image
+	 */
+	@Test
+	public void setTransform_input() {
+		fail("Implement again");
+//		PointTransformHomography_F32 H = new PointTransformHomography_F32();
+//		PixelTransform_F32 transform = new PointToPixelTransform_F32(H);
+//
+//		RefinePolygonLineToImage alg = createAlg(4,true, ImageUInt8.class);
+//
+//		// correct example
+//		alg.getSnapToEdge().setTransform(20,30,transform);
+//
+//		// bad example
+//		try {
+//			H.getModel().a11 = 2;
+//			alg.getSnapToEdge().setTransform(20, 30, transform);
+//			fail("Should have thrown exception");
+//		} catch( RuntimeException ignore ) {}
+	}
 }

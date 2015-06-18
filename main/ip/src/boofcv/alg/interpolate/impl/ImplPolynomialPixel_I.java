@@ -15,7 +15,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package boofcv.alg.interpolate.impl;
 
 import boofcv.alg.interpolate.PolynomialPixel;
@@ -42,7 +41,7 @@ public class ImplPolynomialPixel_I extends PolynomialPixel<ImageInteger> {
 	@Override
 	public float get(float x, float y) {
 		if( x < 0 || y < 0 || x > image.width-1 || y > image.height-1 )
-			throw new IllegalArgumentException("Pixel out of bounds. "+x+" "+y);
+			return get_border(x,y);
 		int width = image.getWidth();
 		int height = image.getHeight();
 
@@ -112,7 +111,6 @@ public class ImplPolynomialPixel_I extends PolynomialPixel<ImageInteger> {
 		return ret;
 	}
 
-	@Override
 	public float get_border(float x, float y) {
 		int xt = (int) Math.floor(x);
 		int yt = (int) Math.floor(y);

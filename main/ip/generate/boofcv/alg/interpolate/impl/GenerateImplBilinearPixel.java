@@ -114,7 +114,6 @@ public class GenerateImplBilinearPixel extends CodeGeneratorBase {
 				"\t\treturn val;\n" +
 				"\t}\n" +
 				"\n" +
-				"\t@Override\n" +
 				"\tpublic float get_border(float x, float y) {\n" +
 				"\t\t"+floatType+" xf = ("+floatType+")Math.floor(x);\n" +
 				"\t\t"+floatType+" yf = ("+floatType+")Math.floor(y);\n" +
@@ -136,7 +135,7 @@ public class GenerateImplBilinearPixel extends CodeGeneratorBase {
 				"\t@Override\n" +
 				"\tpublic float get(float x, float y) {\n" +
 				"\t\tif (x < 0 || y < 0 || x > width-1 || y > height-1)\n" +
-				"\t\t\tthrow new IllegalArgumentException(\"Point is outside of the image \"+x+\" \"+y);\n" +
+				"\t\t\treturn get_border(x,y);\n" +
 				"\n" +
 				"\t\tint xt = (int) x;\n" +
 				"\t\tint yt = (int) y;\n" +

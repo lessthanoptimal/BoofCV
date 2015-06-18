@@ -19,10 +19,6 @@
 package boofcv.alg.shapes.polygon;
 
 import boofcv.alg.distort.PixelTransformAffine_F32;
-import boofcv.alg.distort.PointToPixelTransform_F32;
-import boofcv.alg.distort.PointTransformHomography_F32;
-import boofcv.struct.distort.PixelTransform_F32;
-import boofcv.struct.image.ImageUInt8;
 import boofcv.testing.BoofTesting;
 import georegression.geometry.UtilPolygons2D_F64;
 import georegression.metric.Distance2D_F64;
@@ -37,7 +33,8 @@ import georegression.transform.affine.AffinePointOps_F64;
 import org.junit.Test;
 
 import static java.lang.Math.max;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Peter Abeles
@@ -212,7 +209,7 @@ public class TestRefinePolygonLineToImage extends BaseFitPolygon{
 		// work when the transform is applied
 		PixelTransformAffine_F32 transform = new PixelTransformAffine_F32();
 		transform.set(regToDist);
-		alg.getSnapToEdge().setTransform(image.width, image.height, transform);
+		alg.getSnapToEdge().setTransform(transform);
 		alg.setImage(image);
 		assertTrue(alg.refine(input, found));
 
@@ -338,28 +335,4 @@ public class TestRefinePolygonLineToImage extends BaseFitPolygon{
 			// should be a to b
 		}
 	}
-
-
-	/**
-	 * Makes sure the transform doesn't extend points outside the original image
-	 */
-	@Test
-	public void setTransform_input() {
-		PointTransformHomography_F32 H = new PointTransformHomography_F32();
-		PixelTransform_F32 transform = new PointToPixelTransform_F32(H);
-
-		RefinePolygonLineToImage alg = createAlg(4,true, ImageUInt8.class);
-
-		// correct example
-		alg.getSnapToEdge().setTransform(20,30,transform);
-
-		// bad example
-		try {
-			H.getModel().a11 = 2;
-			alg.getSnapToEdge().setTransform(20, 30, transform);
-			fail("Should have thrown exception");
-		} catch( RuntimeException ignore ) {}
-	}
-
-
 }

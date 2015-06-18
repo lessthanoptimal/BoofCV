@@ -113,7 +113,7 @@ public class TestFDistort {
 			for( int y = 0; y < output.height; y++ ) {
 				for( int x = 0; x < output.width; x++ ) {
 					transform.compute(x,y);
-					float val = interp.get_border(transform.distX, transform.distY);
+					float val = interp.get(transform.distX, transform.distY);
 					assertEquals((int)val,output.get(x,y),1e-4);
 				}
 			}
@@ -121,7 +121,7 @@ public class TestFDistort {
 			for( int y = 0; y < output.height; y++ ) {
 				for( int x = 0; x < output.width; x++ ) {
 					transform.compute(x, y);
-					float val = interp.get_border(transform.distX, transform.distY);
+					float val = interp.get(transform.distX, transform.distY);
 					assertEquals(val,output.get(x,y),1e-4);
 				}
 			}

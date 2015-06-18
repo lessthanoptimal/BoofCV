@@ -15,7 +15,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package boofcv.alg.interpolate.impl;
 
 import boofcv.alg.interpolate.BilinearPixel;
@@ -63,7 +62,6 @@ public class ImplBilinearPixel_S16 extends BilinearPixel<ImageSInt16> {
 		return val;
 	}
 
-	@Override
 	public float get_border(float x, float y) {
 		float xf = (float)Math.floor(x);
 		float yf = (float)Math.floor(y);
@@ -85,7 +83,7 @@ public class ImplBilinearPixel_S16 extends BilinearPixel<ImageSInt16> {
 	@Override
 	public float get(float x, float y) {
 		if (x < 0 || y < 0 || x > width-1 || y > height-1)
-			throw new IllegalArgumentException("Point is outside of the image "+x+" "+y);
+			return get_border(x,y);
 
 		int xt = (int) x;
 		int yt = (int) y;

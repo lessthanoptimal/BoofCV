@@ -15,7 +15,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package boofcv.alg.interpolate.impl;
 
 import boofcv.alg.interpolate.NearestNeighborPixel;
@@ -56,7 +55,6 @@ public class NearestNeighborPixel_U8 extends NearestNeighborPixel<ImageUInt8> {
 		return data[ orig.startIndex + ((int)y)*stride + (int)x]& 0xFF;
 	}
 
-	@Override
 	public float get_border(float x, float y) {
 		return ((ImageBorder_I32)border).get((int)Math.floor(x),(int)Math.floor(y));
 	}
@@ -64,7 +62,7 @@ public class NearestNeighborPixel_U8 extends NearestNeighborPixel<ImageUInt8> {
 	@Override
 	public float get(float x, float y) {
 		if (x < 0 || y < 0 || x > width-1 || y > height-1 )
-			throw new IllegalArgumentException("Point is outside of the image");
+			return get_border(x,y);
 		int xx = (int)x;
 		int yy = (int)y;
 

@@ -95,28 +95,14 @@ public abstract class ImageDistortBasic<Input extends ImageSingleBand,Output ext
 
 	public void applyBorder() {
 
-		final float minInterpX = interp.getFastBorderX();
-		final float minInterpY = interp.getFastBorderY();
-		final float maxInterpX = srcImg.getWidth()-interp.getFastBorderX()-1;
-		final float maxInterpY = srcImg.getHeight()-interp.getFastBorderY()-1;
-
-		final float widthF = srcImg.getWidth()-1;
-		final float heightF = srcImg.getHeight()-1;
-
+		// todo TO make this faster first apply inside the region which can process the fast border
+		// then do the slower border thingy
 		for( int y = y0; y < y1; y++ ) {
 			int indexDst = dstImg.startIndex + dstImg.stride*y + x0;
 			for( int x = x0; x < x1; x++ , indexDst++ ) {
 				dstToSrc.compute(x,y);
 
-				if( dstToSrc.distX < minInterpX || dstToSrc.distX > maxInterpX ||
-						dstToSrc.distY < minInterpY || dstToSrc.distY > maxInterpY ) {
-					if( dstToSrc.distX < 0f || dstToSrc.distX > widthF || dstToSrc.distY < 0f || dstToSrc.distY > heightF )
-						assign(indexDst,interp.get_border(dstToSrc.distX, dstToSrc.distY));
-					else
-						assign(indexDst,interp.get(dstToSrc.distX, dstToSrc.distY));
-				} else {
-					assign(indexDst,interp.get_fast(dstToSrc.distX, dstToSrc.distY));
-				}
+				assign(indexDst,interp.get(dstToSrc.distX, dstToSrc.distY));
 			}
 		}
 	}

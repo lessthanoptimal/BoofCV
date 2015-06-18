@@ -116,7 +116,7 @@ public class GenerateImplInterpolatePixelConvolution extends CodeGeneratorBase {
 				"\tpublic float get(float x, float y) {\n" +
 				"\n" +
 				"\t\tif( x < 0 || y < 0 || x > image.width-1 || y > image.height-1 )\n" +
-				"\t\t\tthrow new IllegalArgumentException(\"Pixel out of bounds. \"+x+\" \"+y);\n" +
+				"\t\t\treturn get_border(x,y);\n" +
 				"\n" +
 				"\t\tint xx = (int)x;\n" +
 				"\t\tint yy = (int)y;\n" +
@@ -162,7 +162,6 @@ public class GenerateImplInterpolatePixelConvolution extends CodeGeneratorBase {
 				"\t\t\treturn value;\n" +
 				"\t}\n" +
 				"\n" +
-				"\t@Override\n" +
 				"\tpublic float get_border(float x, float y) {\n" +
 				"\t\tint xx = (int)Math.floor(x);\n" +
 				"\t\tint yy = (int)Math.floor(y);\n" +

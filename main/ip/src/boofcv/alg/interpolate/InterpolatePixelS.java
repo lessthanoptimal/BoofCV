@@ -29,20 +29,12 @@ import boofcv.struct.image.ImageSingleBand;
 public interface InterpolatePixelS<T extends ImageSingleBand> extends InterpolatePixel<T> {
 
 	/**
-	 * Interpolates using the border class.  This is the slowest interpolation method provided.
-	 * @param x Point's x-coordinate. Can be outside the image.
-	 * @param y Point's y-coordinate. Can be outside the image.
-	 * @return Interpolated intensity value
-	 */
-	public float get_border(float x, float y);
-
-	/**
-	 * Returns the interpolated pixel value at the specified location while taking in account
-	 * the image border. Bounds checking is done to ensure that the coordinate is inside the image
-	 * and to see if the interpolation technique needs to be adjusted for the image border.
+	 * Returns the interpolated pixel value at the specified location while checking to see if
+	 * border conditions apply.  If the requested pixel is outside the image border it will attempt
+	 * to process it using or throw a null pointer exception of a border handler has not been specified.
 	 *
-	 * @param x Point's x-coordinate. x >= 0 && x < image.width
-	 * @param y Point's y-coordinate. y >= 0 && y < image.height
+	 * @param x Point's x-coordinate. x >= 0 && x < image.width or all values if border specified
+	 * @param y Point's y-coordinate. y >= 0 && y < image.height or all values if border specified
 	 * @return Interpolated intensity value or NaN if it can't be interpolated.
 	 */
 	public float get(float x, float y);

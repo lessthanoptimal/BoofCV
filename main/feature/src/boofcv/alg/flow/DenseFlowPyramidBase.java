@@ -109,7 +109,7 @@ public abstract class DenseFlowPyramidBase<T extends ImageSingleBand> {
 				if( interp.isInFastBounds(xx,yy)) {
 					curr.data[indexCurr++] = interp.get_fast(x * scaleX, y * scaleY) / scale;
 				} else {
-					curr.data[indexCurr++] = interp.get_border(x * scaleX, y * scaleY) / scale;
+					curr.data[indexCurr++] = interp.get(x * scaleX, y * scaleY) / scale;
 				}
 			}
 		}
@@ -132,11 +132,7 @@ public abstract class DenseFlowPyramidBase<T extends ImageSingleBand> {
 				float wx = x + u;
 				float wy = y + v;
 
-				if( wx < 0 || wx > before.width-1 || wy < 0 || wy > before.height-1 ) {
-					after.data[pixelIndex] = interp.get_border(wx,wy);
-				} else {
-					after.data[pixelIndex] = interp.get(wx, wy);
-				}
+				after.data[pixelIndex] = interp.get(wx, wy);
 			}
 		}
 	}

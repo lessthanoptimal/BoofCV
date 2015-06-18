@@ -18,12 +18,14 @@
 
 package boofcv.alg.shapes.edge;
 
-import boofcv.alg.distort.DistortImageOps;
 import boofcv.alg.interpolate.ImageLineIntegral;
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.core.image.FactoryGImageSingleBand;
 import boofcv.core.image.GImageSingleBand;
 import boofcv.core.image.GImageSingleBandDistorted;
+import boofcv.core.image.border.BorderType;
+import boofcv.core.image.border.FactoryImageBorder;
+import boofcv.core.image.border.ImageBorder;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.distort.PixelTransform_F32;
 import boofcv.struct.image.ImageSingleBand;
@@ -32,7 +34,6 @@ import georegression.geometry.UtilLine2D_F64;
 import georegression.struct.line.LineGeneral2D_F64;
 import georegression.struct.line.LinePolar2D_F64;
 import georegression.struct.point.Point2D_F64;
-import georegression.struct.shapes.RectangleLength2D_F32;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_F64;
 
@@ -108,26 +109,18 @@ public class SnapToEdge<T extends ImageSingleBand> {
 	}
 
 	/**
-	 * Used to specify a transform that's applied pixel coordinates.  The bounds of the
-	 * transformed coordinates MUST be the same as the input image.  Call before {@link #setImage(ImageSingleBand)}.
+	 * Used to specify a transform that is applied to pixel coordinates to bring them back into original input
+	 * image coordinates.  For example if the input image has lens distortion but the edge were found
+	 * in undistorted coordinates this code needs to know how to go from undistorted back into distorted
+	 * image coordinates in order to read the pixel's value.
 	 *
-	 * @param width Input image width.  Used in sanity check only.
-	 * @param height Input image height.  Used in sanity check only.
-	 * @param transform Pixel transformation from undistorted pixels into the actual distorted input image..
+	 * @param undistToDist Pixel transformation from undistorted pixels into the actual distorted input image..
 	 */
-	public void setTransform( int width , int height , PixelTransform_F32 transform ) {
-		// sanity check since I think many people will screw this up.
-		RectangleLength2D_F32 rect = DistortImageOps.boundBox_F32(width, height, transform);
-		float x1 = rect.x0 + rect.width;
-		float y1 = rect.y0 + rect.height;
-
-		if( rect.getX() < 0 || rect.getY() < 0 || x1 > width || y1 > height ) {
-			throw new IllegalArgumentException("You failed the idiot test! RTFM! The undistorted image "+
-					"must be contained by the same bounds as the input distorted image");
-		}
-
+	public void setTransform( PixelTransform_F32 undistToDist ) {
 		InterpolatePixelS<T> interpolate = FactoryInterpolation.bilinearPixelS(imageType);
-		integralImage = new GImageSingleBandDistorted<T>(transform,interpolate);
+		ImageBorder<T> border = FactoryImageBorder.general(imageType, BorderType.EXTENDED);
+		interpolate.setBorder(border);
+		integralImage = new GImageSingleBandDistorted<T>(undistToDist,interpolate);
 	}
 
 	/**

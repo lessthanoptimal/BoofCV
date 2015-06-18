@@ -15,7 +15,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package boofcv.alg.interpolate.impl;
 
 import boofcv.alg.interpolate.InterpolatePixelS;
@@ -76,7 +75,7 @@ public class ImplInterpolatePixelConvolution_U8 implements InterpolatePixelS<Ima
 	public float get(float x, float y) {
 
 		if( x < 0 || y < 0 || x > image.width-1 || y > image.height-1 )
-			throw new IllegalArgumentException("Pixel out of bounds. "+x+" "+y);
+			return get_border(x,y);
 
 		int xx = (int)x;
 		int yy = (int)y;
@@ -122,7 +121,6 @@ public class ImplInterpolatePixelConvolution_U8 implements InterpolatePixelS<Ima
 			return value;
 	}
 
-	@Override
 	public float get_border(float x, float y) {
 		int xx = (int)Math.floor(x);
 		int yy = (int)Math.floor(y);
