@@ -190,7 +190,6 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 		if( verbose ) System.out.println("---------- Got Polygons! "+candidates.size);
 		// undistort the squares
 		Quadrilateral_F64 q = new Quadrilateral_F64(); // todo predeclare
-		Quadrilateral_F64 b = new Quadrilateral_F64();
 		for (int i = 0; i < candidates.size; i++) {
 			// compute the homography from the input image to an undistorted square image
 			Polygon2D_F64 p = candidates.get(i);
@@ -216,6 +215,10 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 
 			// pass the found homography onto the image transform
 			UtilHomography.convert(H_refined,transformHomography.getModel());
+
+			System.out.println("quad lengths = "+p.getLine(0,null).getLength()+" "+p.getLine(1,null).getLength()
+					+" "+p.getLine(2,null).getLength()+" "+p.getLine(3,null).getLength());
+			System.out.println("   square "+square.getWidth());
 
 			// TODO how perspective is removed is introducing artifacts.  If the "square" is larger
 			// than the detected region and bilinear interpolation is used then pixels outside will// influence the value of pixels inside and shift things over.  this is all bad

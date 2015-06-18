@@ -197,12 +197,30 @@ public class TestBaseDetectFiducialSquare {
 	}
 
 	/**
-	 * Makes sure distortion is being removed without introducing artifacts.  Such as
-	 * the value of pixels outside the found rectangle influencing the
-	 * value of pixels inside
+	 * Sees if perspective distortion is correctly removed from square regions in the image
+	 * which are smaller than the internal square.
+	 *
+	 * Earlier versions used bilinear interpolation which introduced artifacts in this situation.
 	 */
 	@Test
-	public void distortionRemoval() {
+	public void perspectiveRemoval_smallRegion() {
+		fail("implement");
+	}
+
+	/**
+	 * Sees if perspective distortion is correctly removed from square regions in the image
+	 * which are larger than the internal square
+	 */
+	@Test
+	public void perspectiveRemoval_largeRegion() {
+		fail("implement");
+	}
+
+	/**
+	 * Ensure that lens distortion is being removed from the fiducial square.
+	 */
+	@Test
+	public void lensRemoval() {
 		fail("implement");
 	}
 
