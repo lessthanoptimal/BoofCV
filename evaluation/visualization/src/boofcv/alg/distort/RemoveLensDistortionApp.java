@@ -19,7 +19,8 @@
 package boofcv.alg.distort;
 
 import boofcv.alg.interpolate.InterpolatePixelS;
-import boofcv.alg.misc.GImageMiscOps;
+import boofcv.core.image.border.FactoryImageBorder;
+import boofcv.core.image.border.ImageBorder;
 import boofcv.factory.distort.FactoryDistort;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.gui.ListDisplayPanel;
@@ -96,12 +97,11 @@ public class RemoveLensDistortionApp extends SelectAlgorithmAndInputPanel {
 	private void addUndistorted(final String name, final PointTransform_F32 model) {
 		// Set up image distort
 		InterpolatePixelS<ImageFloat32> interp = FactoryInterpolation.bilinearPixelS(ImageFloat32.class);
+		ImageBorder<ImageFloat32> border = FactoryImageBorder.value(ImageFloat32.class,0);
 		ImageDistort<ImageFloat32,ImageFloat32> undistorter =
-				FactoryDistort.distort(false,interp, null, ImageFloat32.class);
+				FactoryDistort.distort(false,interp, border, ImageFloat32.class);
 		undistorter.setModel(new PointToPixelTransform_F32(model));
 
-		// Fill the image with all black then render it
-		GImageMiscOps.fill(undist, 0);
 		DistortImageOps.distortMS(dist, undist, undistorter);
 
 		final BufferedImage out = ConvertBufferedImage.convertTo(undist,null,true);
