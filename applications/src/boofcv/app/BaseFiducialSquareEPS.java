@@ -36,13 +36,14 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
+// TODO When in grid mode.  just put labels above fiducials.  size printed once in the bottom
 public class BaseFiducialSquareEPS {
 
 	public int threshold = 255/2; // threshold for converting to a binary image
 	public double UNIT_TO_POINTS;
 	public static final double CM_TO_POINTS = 72.0/2.54;
 	// should it add the file name and size to the document?
-	public boolean displayInfo = true;
+	public boolean printInfo = true;
 
 	public boolean showPreview = false;
 
@@ -93,6 +94,22 @@ public class BaseFiducialSquareEPS {
 
 	public void addImage( String inputPath ) {
 		this.imagePaths.add(inputPath);
+	}
+
+	public boolean isPrintInfo() {
+		return printInfo;
+	}
+
+	public void setPrintInfo(boolean displayInfo) {
+		this.printInfo = displayInfo;
+	}
+
+	public boolean isShowPreview() {
+		return showPreview;
+	}
+
+	public void setShowPreview(boolean showPreview) {
+		this.showPreview = showPreview;
 	}
 
 	public void setPageBorder( double size , Unit units) {
@@ -265,7 +282,7 @@ public class BaseFiducialSquareEPS {
 					"  {<"+binaryToHex(binary)+">} image\n" +
 					"} def\n");
 			out.println();
-			if( displayInfo ) {
+			if(printInfo) {
 				out.print(" /"+getDisplayName(i)+"\n" +
 						"{\n" +
 						"  /Times-Roman findfont\n" + "7 scalefont setfont b1 " + (totalWidth - 10) +
@@ -314,7 +331,7 @@ public class BaseFiducialSquareEPS {
 		int imageNum = (row*numCols+col)%imagePaths.size();
 
 		// print out encoding information for convenience
-		if( displayInfo ) {
+		if(printInfo) {
 			out.println("  " + getDisplayName(imageNum));
 		}
 

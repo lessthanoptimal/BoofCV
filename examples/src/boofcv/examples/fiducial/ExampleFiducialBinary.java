@@ -40,7 +40,7 @@ import java.awt.image.BufferedImage;
  *
  * @author Peter Abeles
  */
-public class ExampleFiducialNumber {
+public class ExampleFiducialBinary {
 	public static void main(String[] args) {
 
 		String directory = "../data/applet/fiducial/binary/";

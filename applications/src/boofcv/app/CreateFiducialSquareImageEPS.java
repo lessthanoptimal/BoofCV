@@ -53,6 +53,8 @@ public class CreateFiducialSquareImageEPS extends BaseFiducialSquareEPS {
 //			inputPaths.add(UtilIO.getPathToBase()+"data/applet/fiducial/image/leaf02.png");
 //			inputPaths.add(UtilIO.getPathToBase()+"data/applet/fiducial/image/hand01.png");
 //			inputPaths.add(UtilIO.getPathToBase()+"data/applet/fiducial/image/chicken.png");
+//			inputPaths.add(UtilIO.getPathToBase()+"data/applet/fiducial/image/h2o.png");
+//			inputPaths.add(UtilIO.getPathToBase()+"data/applet/fiducial/image/yinyang.png");
 		}
 
 		CreateFiducialSquareImageEPS app = new CreateFiducialSquareImageEPS();
@@ -63,12 +65,13 @@ public class CreateFiducialSquareImageEPS extends BaseFiducialSquareEPS {
 
 		app.setOutputName("fiducial_image.eps");
 
+//		app.setPrintInfo(false);
 //		app.setPageBorder(4.0,Unit.CENTIMETER);
 //		app.setUnit(Unit.INCH);
 
 		app.generateSingle(fiducialWidth);
 //		app.generateGrid(2.5,1.0,2,3);
 //		app.generateSingle(2.5,PaperSize.LETTER);
-//		app.generateGrid(2.5,1.0,PaperSize.LETTER);
+//		app.generateGrid(4,1.0,PaperSize.LETTER);
 	}
 }
