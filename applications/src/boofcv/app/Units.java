@@ -18,32 +18,18 @@
 
 package boofcv.app;
 
-import boofcv.io.UtilIO;
-
-import java.io.IOException;
-
 /**
- * Outputs an EPS document describing a binary square fiducial that encodes the specified number
+ * Standard units of measure
  *
  * @author Peter Abeles
  */
-public class CreateFiducialSquareImageEPS extends BaseFiducialSquareEPS {
-
-	public static void main(String[] args) throws IOException {
-
-		String inputPath = UtilIO.getPathToBase()+"data/applet/fiducial/image/dog.png";
-		double width = 10;
-
-		if( args.length == 2 ) {
-			width = Double.parseDouble(args[0]);
-			inputPath = args[1];
-		}
-
-		CreateFiducialSquareImageEPS app = new CreateFiducialSquareImageEPS();
-
-		app.setImage(inputPath);
-//		app.setOutputName("fiducial_image.eps");
-
-		app.generateSingle(width);
-	}
+public enum Units {
+	MILLIMETERS,
+	CENTIMETERS,
+	METER,
+	KILOMETER,
+	INCH,
+	FOOT,
+	YARD,
+	MILE
 }

@@ -51,7 +51,7 @@ public class BatchRemoveLensDistortion {
 		System.out.println();
 		System.out.println("Flags:");
 		System.out.println("-rename  Rename files on output to image%0d.png");
-		System.out.println("-ALL_INSIDE  Output image will have no dark regions");
+		System.out.println("-SHRINK  Output image will be shrunk until there are no dark regions");
 		System.out.println("-FULL_VIEW  Output image will contain the entire undistorted image");
 		System.out.println();
 		System.out.println("Default is FULL_VIEW and it doesn't rename the images");

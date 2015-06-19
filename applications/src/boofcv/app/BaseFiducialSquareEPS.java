@@ -26,7 +26,7 @@ import boofcv.io.image.UtilImageIO;
 import boofcv.struct.image.ImageUInt8;
 
 import java.io.File;
-import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.PrintStream;
 
 /**
@@ -34,13 +34,15 @@ import java.io.PrintStream;
  *
  * @author Peter Abeles
  */
+// TODO Specify units used
+// TODO specify page size and auto center
 public class BaseFiducialSquareEPS {
 	public double width = 10; // in centimeters of fiducial
 
 	public int threshold = 255/2; // threshold for converting to a binary image
 	public double CM_TO_POINTS = 72.0/2.54;
 	// should it add the file name and size to the document?
-	public boolean displayInfo = false;
+	public boolean displayInfo = true;
 
 	public boolean showPreview = false;
 
@@ -58,15 +60,14 @@ public class BaseFiducialSquareEPS {
 	double pageLength;
 	double scale;
 
-	public void process( double width, String inputPath , String outputName ) throws FileNotFoundException {
-		this.width = width;
+	String outputName;
+	String inputPath;
 
-		String inputName = new File(inputPath).getName();
+	ImageUInt8 image;
 
-		System.out.println("Target width "+width+" (cm)  image = "+inputName);
-		System.out.println("    input path = "+inputPath);
-
-		ImageUInt8 image = UtilImageIO.loadImage(inputPath, ImageUInt8.class);
+	public void setImage( String inputPath ) {
+		this.inputPath = inputPath;
+		image = UtilImageIO.loadImage(inputPath, ImageUInt8.class);
 
 		if( image == null ) {
 			System.err.println("Can't find image.  Path = "+inputPath);
@@ -80,12 +81,49 @@ public class BaseFiducialSquareEPS {
 			new FDistort(image, tmp).scaleExt().apply();
 			image = tmp;
 		}
+	}
+
+	public void setOutputName( String outputName )  {
+		this.outputName = outputName;
+	}
+
+	public void generateGrid( double fiducialWidth , double whiteBorder , int numCols , int numRows )
+			throws IOException
+	{
+		this.numRows = numRows;
+		this.numCols = numCols;
+		generateSingle(fiducialWidth,whiteBorder);
+	}
+
+	public void generateSingle( double fiducialWidth ) throws IOException {
+		double whiteBorder = Math.max(2 * CM_TO_POINTS, targetLength / 4.0);
+		generateSingle(fiducialWidth, whiteBorder);
+	}
+
+	public void generateSingle( double fiducialWidth , double whiteBorder ) throws IOException {
+
+		String outputName;
+		if( this.outputName == null ) {
+			File dir = new File(inputPath).getParentFile();
+			outputName = new File(inputPath).getName();
+			outputName = outputName.substring(0,outputName.length()-3) + "eps";
+			outputName = new File(dir,outputName).getCanonicalPath();
+		} else {
+			outputName = this.outputName;
+		}
+
+		this.width = fiducialWidth;
+
+		String inputName = new File(inputPath).getName();
+
+		System.out.println("Target width "+width+" (cm)  image = "+inputName);
+		System.out.println("    input path = "+inputPath);
 
 		// print out the selected number in binary for debugging purposes
 		out = new PrintStream(outputName);
 
 		targetLength = width*CM_TO_POINTS;
-		whiteBorder = Math.max(2*CM_TO_POINTS,targetLength/4.0);
+		this.whiteBorder = whiteBorder;
 		blackBorder = targetLength/4.0;
 		innerWidth = targetLength/2.0;
 		pageLength = targetLength+whiteBorder*2;
