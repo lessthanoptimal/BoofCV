@@ -25,16 +25,15 @@ import boofcv.factory.shape.ConfigPolygonDetector;
 import boofcv.factory.shape.FactoryShapeDetector;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ShowImages;
-import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.webcamcapture.UtilWebcamCapture;
-import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.image.ImageFloat32;
 import com.github.sarxos.webcam.Webcam;
-import georegression.metric.UtilAngle;
 import georegression.struct.shapes.Polygon2D_F64;
 
+import javax.swing.*;
 import java.awt.*;
+import java.awt.geom.Line2D;
 import java.awt.image.BufferedImage;
 import java.util.List;
 
@@ -70,39 +69,26 @@ public class DetectPolygonWebcam {
 		UtilWebcamCapture.adjustResolution(webcam, 640, 480);
 		webcam.open();
 
-		// Load intrinsic camera parameters for the camera
-		// SERIOUSLY, YOU NEED TO CALIBRATE YOUR CAMERA AND USE THE FILE YOU GENERATE
-		IntrinsicParameters param;
+		Dimension d = webcam.getDevice().getResolution();
+		int imageWidth = d.width;
+		int imageHeight = d.height;
 
-		// just make up some reasonable parameters for a webcam and assume no lens distortion
-		if (nameIntrinsic == null) {
-			param = new IntrinsicParameters();
-			Dimension d = webcam.getDevice().getResolution();
-			param.width = d.width; param.height = d.height;
-			param.cx = d.width/2;
-			param.cy = d.height/2;
-			param.fx = param.cx/Math.tan(UtilAngle.degreeToRadian(30)); // assume 60 degree FOV
-			param.fy = param.cx/Math.tan(UtilAngle.degreeToRadian(30));
-		} else {
-			param = UtilIO.loadXML(nameIntrinsic);
-		}
 
 		ConfigPolygonDetector config = new ConfigPolygonDetector(4);
 		config.configRefineLines.sampleRadius = 2;
 		config.configRefineLines.maxIterations = 30;
 
-
 		InputToBinary<ImageFloat32> inputToBinary =
-//				FactoryThresholdBinary.globalOtsu(0,255,true,ImageFloat32.class);
+				FactoryThresholdBinary.globalOtsu(0, 255, true, ImageFloat32.class);
 //				FactoryThresholdBinary.globalEntropy(0,255,true,ImageFloat32.class);
-				FactoryThresholdBinary.adaptiveSquare(10,0,true,ImageFloat32.class);
+//				FactoryThresholdBinary.adaptiveSquare(10,0,true,ImageFloat32.class);
 		BinaryPolygonConvexDetector<ImageFloat32> detector = FactoryShapeDetector.
 				polygon(inputToBinary, new ConfigPolygonDetector(4), ImageFloat32.class);
 
 
-		ImageFloat32 gray = new ImageFloat32(640,480);
-		ImagePanel gui = new ImagePanel(640,480);
-		ShowImages.showWindow(gui,"Fiducials") ;
+		ImageFloat32 gray = new ImageFloat32(imageWidth,imageHeight);
+		ImagePanel gui = new ImagePanel(imageWidth,imageHeight);
+		ShowImages.showWindow(gui,"Fiducials").setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
 		while( true ) {
 			BufferedImage frame = webcam.getImage();
@@ -118,6 +104,8 @@ public class DetectPolygonWebcam {
 
 			g2.setStroke(new BasicStroke(4));
 			g2.setColor(Color.RED);
+			g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
+			Line2D.Double l = new Line2D.Double();
 
 			for (int i = 0; i < shapes.size(); i++) {
 				Polygon2D_F64 poly = shapes.get(i);
@@ -126,13 +114,8 @@ public class DetectPolygonWebcam {
 				for (int j = 0; j < poly.size(); j++) {
 					int k = (j+1)%poly.size();
 
-					int x0 = (int)(poly.get(j).x+0.5);
-					int y0 = (int)(poly.get(j).y+0.5);
-
-					int x1 = (int)(poly.get(k).x+0.5);
-					int y1 = (int)(poly.get(k).y+0.5);
-
-					g2.drawLine(x0,y0,x1,y1);
+					l.setLine(poly.get(j).x,poly.get(j).y,poly.get(k).x,poly.get(k).y);
+					g2.draw(l);
 				}
 			}
 

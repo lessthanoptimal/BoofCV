@@ -93,6 +93,10 @@ public class DetectFiducialSquareImage<T extends ImageSingleBand>
 	 * @return The ID of the provided image
 	 */
 	public int addImage( T grayScale , double threshold , double lengthSide ) {
+		if( grayScale == null ) {
+			throw new IllegalArgumentException("Input image is null.  Probably didn't load");
+		}
+
 		// scale the image to the desired size
 		T scaled = GeneralizedImageOps.createSingleBand(getInputType(),squareLength,squareLength);
 

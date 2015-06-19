@@ -27,6 +27,7 @@ import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
 
 import java.awt.*;
+import java.awt.geom.Line2D;
 
 /**
  * @author Peter Abeles
@@ -40,16 +41,20 @@ public class VisualizeFiducial {
 	public static void drawCube( Se3_F64 targetToCamera , IntrinsicParameters intrinsic , double width ,
 								 Graphics2D g2 )
 	{
+		g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
+
 		double r = width/2.0;
+		double w = width;
+
 		Point3D_F64 corners[] = new Point3D_F64[8];
 		corners[0] = new Point3D_F64(-r,-r,0);
 		corners[1] = new Point3D_F64( r,-r,0);
 		corners[2] = new Point3D_F64( r, r,0);
 		corners[3] = new Point3D_F64(-r, r,0);
-		corners[4] = new Point3D_F64(-r,-r,r);
-		corners[5] = new Point3D_F64( r,-r,r);
-		corners[6] = new Point3D_F64( r, r,r);
-		corners[7] = new Point3D_F64(-r, r,r);
+		corners[4] = new Point3D_F64(-r,-r,w);
+		corners[5] = new Point3D_F64( r,-r,w);
+		corners[6] = new Point3D_F64( r, r,w);
+		corners[7] = new Point3D_F64(-r, r,w);
 
 		Point2D_I32 pixel[] = new Point2D_I32[8];
 		Point2D_F64 p = new Point2D_F64();
@@ -60,26 +65,33 @@ public class VisualizeFiducial {
 			pixel[i] = new Point2D_I32((int)(p.x+0.5),(int)(p.y+0.5));
 		}
 
+		Line2D.Double l = new Line2D.Double();
 		g2.setStroke(new BasicStroke(4));
 		g2.setColor(Color.RED);
-		g2.drawLine(pixel[0].x,pixel[0].y,pixel[1].x,pixel[1].y);
-		g2.drawLine(pixel[1].x,pixel[1].y,pixel[2].x,pixel[2].y);
-		g2.drawLine(pixel[2].x,pixel[2].y,pixel[3].x,pixel[3].y);
-		g2.drawLine(pixel[3].x,pixel[3].y,pixel[0].x,pixel[0].y);
+
+		drawLine(g2,l,pixel[0].x, pixel[0].y, pixel[1].x, pixel[1].y);
+		drawLine(g2,l,pixel[1].x, pixel[1].y, pixel[2].x, pixel[2].y);
+		drawLine(g2,l,pixel[2].x, pixel[2].y, pixel[3].x, pixel[3].y);
+		drawLine(g2,l,pixel[3].x, pixel[3].y, pixel[0].x, pixel[0].y);
 
 		g2.setColor(Color.BLACK);
-		g2.drawLine(pixel[0].x,pixel[0].y,pixel[4].x,pixel[4].y);
-		g2.drawLine(pixel[1].x,pixel[1].y,pixel[5].x,pixel[5].y);
-		g2.drawLine(pixel[2].x,pixel[2].y,pixel[6].x,pixel[6].y);
-		g2.drawLine(pixel[3].x,pixel[3].y,pixel[7].x,pixel[7].y);
+		drawLine(g2,l,pixel[0].x,pixel[0].y,pixel[4].x,pixel[4].y);
+		drawLine(g2,l,pixel[1].x,pixel[1].y,pixel[5].x,pixel[5].y);
+		drawLine(g2,l,pixel[2].x,pixel[2].y,pixel[6].x,pixel[6].y);
+		drawLine(g2,l,pixel[3].x,pixel[3].y,pixel[7].x,pixel[7].y);
 
 		g2.setColor(new Color(0x00,0xFF,0x00,125));
-		g2.drawLine(pixel[4].x,pixel[4].y,pixel[5].x,pixel[5].y);
+		drawLine(g2,l,pixel[4].x,pixel[4].y,pixel[5].x,pixel[5].y);
 		g2.setColor(new Color(0xC0,0x10,0xC0,125));
-		g2.drawLine(pixel[5].x,pixel[5].y,pixel[6].x,pixel[6].y);
+		drawLine(g2,l,pixel[5].x,pixel[5].y,pixel[6].x,pixel[6].y);
 		g2.setColor(new Color(0x00,0xA0,0xC0,125));
-		g2.drawLine(pixel[6].x,pixel[6].y,pixel[7].x,pixel[7].y);
+		drawLine(g2,l,pixel[6].x,pixel[6].y,pixel[7].x,pixel[7].y);
 		g2.setColor(Color.BLUE);
-		g2.drawLine(pixel[7].x,pixel[7].y,pixel[4].x,pixel[4].y);
+		drawLine(g2,l,pixel[7].x,pixel[7].y,pixel[4].x,pixel[4].y);
+	}
+
+	private static void drawLine( Graphics2D g2 , Line2D.Double line , double x0 , double y0 , double x1 , double y1 ) {
+		line.setLine(x0,y0,x1,y1);
+		g2.draw(line);
 	}
 }

@@ -62,7 +62,7 @@ public class ConfigPolygonDetector implements Configuration {
 	/**
 	 * Size of minimum shape contour as a fraction of the input image's width.
 	 */
-	public double minContourImageWidthFraction = 0.23;
+	public double minContourImageWidthFraction = 0.1;
 
 	/**
 	 * Will the found polygons be in clockwise order?

@@ -302,7 +302,7 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 	 * Given observed location of corners, compute the transform from target to world frame.
 	 * See code comments for correct ordering of corners in quad.
 	 *
-	 * @param quad (Input) Observed location of corner points in the specified order.
+	 * @param quad (Input) Observed location of corner points in pixels the specified order.
 	 * @param lengthSide (Input) Length of a side on the square
 	 * @param targetToWorld (output) transform from target to world frame.
 	 */
@@ -313,8 +313,16 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 		pairsPose.get(2).p2.set(quad.c);
 		pairsPose.get(3).p2.set(quad.d);
 
-		if( !computeHomography.process(pairsPose,H_refined) )
-			throw new RuntimeException("Compute homography failed!");
+		if( !computeHomography.process(pairsPose,H) )
+			throw new RuntimeException("Compute homography failed in targetToWorld!");
+
+		// refine homography estimate
+		if( !refineHomography.fitModel(pairsPose,H,H_refined) ) {
+			if( verbose ) System.out.println("rejected refine homography");
+			throw new RuntimeException("Refine homography failed in targetToWorld!");
+		}
+
+		// TODO compute reprojection error
 
 		targetToWorld.set(homographyToPose.decompose(H_refined));
 		GeometryMath_F64.scale(targetToWorld.getT(),lengthSide);
