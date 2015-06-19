@@ -155,8 +155,8 @@ public class FiducialTrackerApp<I extends ImageSingleBand>
 		Se3_F64 targetToSensor = new Se3_F64();
 		for (int i = 0; i < detector.totalFound(); i++) {
 			detector.getFiducialToCamera(i, targetToSensor);
-
-			VisualizeFiducial.drawCube(targetToSensor, intrinsic, 0.1, g2);
+			double width = detector.getWidth(i);
+			VisualizeFiducial.drawCube(targetToSensor, intrinsic, width, g2);
 		}
 		panel.setBufferedImageSafe(imageGUI);
 		panel.repaint();

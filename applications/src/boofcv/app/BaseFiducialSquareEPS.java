@@ -40,6 +40,7 @@ public class BaseFiducialSquareEPS {
 
 	public int threshold = 255/2; // threshold for converting to a binary image
 	public double UNIT_TO_POINTS;
+	public static final double CM_TO_POINTS = 72.0/2.54;
 	// should it add the file name and size to the document?
 	public boolean displayInfo = true;
 
@@ -51,6 +52,8 @@ public class BaseFiducialSquareEPS {
 	// grid pattern
 	public int numCols = 1;
 	public int numRows = 1;
+
+	boolean autofillGrid = false;
 
 	PrintStream out;
 
@@ -66,6 +69,10 @@ public class BaseFiducialSquareEPS {
 	double totalWidth;
 	// width and height of the page
 	double pageWidth,pageHeight;
+	// border added around the page.
+	double pageBorder;
+	// the size of the requested border around the document.  the actual page border will be this minus the white border
+	double pageBorderRequest = 1*CM_TO_POINTS;
 	// offset to center everything
 	double centerOffsetX,centerOffsetY;
 
@@ -88,6 +95,10 @@ public class BaseFiducialSquareEPS {
 		this.imagePaths.add(inputPath);
 	}
 
+	public void setPageBorder( double size , Unit units) {
+		pageBorderRequest = units.convert(size,Unit.CENTIMETER)*CM_TO_POINTS;
+	}
+
 	public void setOutputName( String outputName )  {
 		this.outputName = outputName;
 	}
@@ -106,10 +117,7 @@ public class BaseFiducialSquareEPS {
 		double pageWidthUnit = paper.getUnit().convert(paper.getWidth(),unit);
 		double pageHeightUnit = paper.getUnit().convert(paper.getHeight(),unit);
 
-		double totalWidth = fiducialWidth+2*whiteBorder;
-
-		this.numRows = (int)Math.floor(pageHeightUnit/totalWidth);
-		this.numCols = (int)Math.floor(pageWidthUnit/ totalWidth);
+		this.autofillGrid = true;
 		generate(fiducialWidth, whiteBorder, pageWidthUnit,pageHeightUnit);
 	}
 
@@ -125,18 +133,29 @@ public class BaseFiducialSquareEPS {
 		double pageHeightUnit = paper.getUnit().convert(paper.getHeight(),unit);
 
 		numCols = numRows = 1;
-		generate(fiducialWidth, whiteBorder, pageWidthUnit,pageHeightUnit);
+		generate(fiducialWidth, whiteBorder, -1,pageHeightUnit);
 	}
 
 	public void generateSingle( double fiducialWidthCM , double whiteBorderCM ) throws IOException {
 		numCols = numRows = 1;
-		generate(fiducialWidthCM, whiteBorderCM,-1,-1);
+		generate(fiducialWidthCM, whiteBorderCM, -1,-1);
 	}
 
-	private void generate( double fiducialWidthUnit , double whiteBorderUnit ,
-						   double pageWidthUnit , double pageHeightUnit   ) throws IOException {
+	private void generate(double fiducialWidthUnit, double whiteBorderUnit,
+						  double pageWidthUnit, double pageHeightUnit) throws IOException {
 
 		UNIT_TO_POINTS = 72.0/(2.54*Unit.conversion(Unit.CENTIMETER,unit));
+
+		if( autofillGrid ) {
+			if( pageWidthUnit <= 0 || pageHeightUnit <=  0)
+				throw new IllegalArgumentException("If autofillGrid is turned on then the page size must be specified");
+
+			double pageBorderUnit = Math.max(0,pageBorderRequest/UNIT_TO_POINTS - whiteBorderUnit);
+
+			double totalWidthUnit = fiducialWidthUnit+2*whiteBorderUnit;
+			this.numRows = (int)Math.floor((pageHeightUnit-2*pageBorderUnit)/totalWidthUnit);
+			this.numCols = (int)Math.floor((pageWidthUnit-2*pageBorderUnit)/totalWidthUnit);
+		}
 
 		String outputName;
 		if( this.outputName == null ) {
@@ -168,21 +187,27 @@ public class BaseFiducialSquareEPS {
 		innerWidth = targetLength/2.0;
 		totalWidth = targetLength+whiteBorder*2;
 
+		if( pageBorderRequest > 0 ) {
+			pageBorder = Math.max(0,pageBorderRequest-whiteBorder);
+		} else {
+			pageBorder = 0;
+		}
+
 		if( pageWidthUnit <= 0 ) {
-			pageWidth = numCols*totalWidth;
+			pageWidth = numCols*totalWidth+2*pageBorder;
 		} else {
 			pageWidth = pageWidthUnit*UNIT_TO_POINTS;
 		}
 
 		if( pageHeightUnit <= 0 ) {
-			pageHeight = numRows*totalWidth;
+			pageHeight = numRows*totalWidth+2*pageBorder;
 		} else {
 			pageHeight = pageHeightUnit*UNIT_TO_POINTS;
 		}
 
 		// compute the offset to put it in the center of the page
-		centerOffsetX = (pageWidth-totalWidth*numCols)/2.0;
-		centerOffsetY = (pageHeight-totalWidth*numRows)/2.0;
+		centerOffsetX = (pageWidth-totalWidth*numCols-2*pageBorder)/2.0;
+		centerOffsetY = (pageHeight-totalWidth*numRows-2*pageBorder)/2.0;
 
 		printHeader(imageName,fiducialWidthUnit);
 
@@ -261,7 +286,7 @@ public class BaseFiducialSquareEPS {
 	private void printHeader( String inputName , double widthCM) {
 		out.println("%!PS-Adobe-3.0 EPSF-3.0\n" +
 				"%%Creator: BoofCV\n" +
-				"%%Title: "+inputName+" w="+ widthCM +"cm\n" +
+				"%%Title: "+inputName+" w="+ widthCM +" "+unit.abbreviation+"\n" +
 				"%%DocumentData: Clean7Bit\n" +
 				"%%Origin: 0 0\n" +
 				"%%BoundingBox: 0 0 "+pageWidth+" "+pageHeight+"\n" +
@@ -280,8 +305,8 @@ public class BaseFiducialSquareEPS {
 
 	private void insertFiducial(int row, int col ) {
 		out.print(
-				"  /originX " + (centerOffsetX + col * totalWidth) + " def\n" +
-				"  /originY " + (centerOffsetY + row * totalWidth) + " def\n" +
+				"  /originX " + (centerOffsetX + pageBorder + col * totalWidth) + " def\n" +
+				"  /originY " + (centerOffsetY + pageBorder + row * totalWidth) + " def\n" +
 				"  originX originY translate\n" );
 		out.println();
 		out.println("  drawBorder");
@@ -290,7 +315,7 @@ public class BaseFiducialSquareEPS {
 
 		// print out encoding information for convenience
 		if( displayInfo ) {
-			out.println("  "+getDisplayName(imageNum));
+			out.println("  " + getDisplayName(imageNum));
 		}
 
 		out.println("% Center then draw the image");
